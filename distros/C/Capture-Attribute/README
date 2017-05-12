@@ -1,0 +1,195 @@
+NAME
+    Capture::Attribute - s/return/print/g
+
+SYNOPSIS
+     use Capture::Attribute;
+ 
+     sub foobar :Capture {
+       print "Hello World\n";
+     }
+ 
+     my $result = foobar();
+     $result =~ s/World/Planet/;
+     print "$result";   # says "Hello Planet"
+
+DESCRIPTION
+    Sometimes you write a function that needs to build a long string via a
+    convoluted series of conditional statements, loops and so on. I tend to
+    end up defining a variable $return at the top of the code, concatenating
+    bits to it as required, and then return it at the end. For example:
+
+     sub count_to_10 {
+       my $return = "Listen to me count!\n";
+       foreach (1..10) {
+         $return .= "$_\n";
+         $return .= "Half-way there!\n" if $_==5;
+       }
+       $return .= "All done!\n";
+       return $return;
+     }
+ 
+     Mail::Message->new(
+       To      => 'teacher@example.com',
+       From    => 'student@example.com',
+       Subject => 'I can count!',
+       data    => count_to_ten(),
+       )->send;
+
+    Capture::Attribute simplifies this pattern by capturing all output to
+    STDOUT, so you can use STDOUT as a place to capture each part of the
+    string.
+
+     sub count_to_10 :Capture {
+       say "Listen to me count!";
+       foreach (1..10) {
+         say $_;
+         say "Half-way there!" if $_==5;
+       }
+       say "All done!";
+     }
+ 
+     Mail::Message->new(
+       To      => 'teacher@example.com',
+       From    => 'student@example.com',
+       Subject => 'I can count!',
+       data    => count_to_ten(),
+       )->send;
+
+    Doesn't that look nicer?
+
+    Within a sub marked with the ":Capture" attribute, all data that would be
+    printed is captured instead. When the sub is finished, the return value is
+    ignored and the captured text is returned instead.
+
+    The `return` keyword still works just fine for its control flow purpose
+    inside a captured sub. The return value just doesn't get returned.
+
+  How does it work?
+    When you `use Capture::Attribute`, then at BEGIN time (see perlmod) your
+    package will be automatically made into an subclass of Capture::Attribute.
+
+    At CHECK time (again perlmod), Capture::Attribute will then use
+    Attribute::Handlers to wrap each sub marked with the ":Capture" attribute
+    with a sub that captures its output via Capture::Tiny, and returns the
+    output.
+
+    At INIT time (again perlmod), Capture::Attribute then removes itself from
+    your package's @ISA, thus your package is no longer a subclass of
+    Capture::Attribute. (It would be nice if the subclassing could be avoided
+    altogether, but alas this seems to be the way Attribute::Handlers works.)
+
+  The ":Capture" Attribute
+    There are actually various options you can use on the ":Capture"
+    attribute. They are mostly useless.
+
+   `:Capture(STDOUT)`
+    This is the default. Captures STDOUT.
+
+   `:Capture(STDERR)`
+    Captures STDERR instead of STDOUT.
+
+   `:Capture(MERGED)`
+    Captures both STDOUT and STDERR, merged into one. Because of buffering,
+    lines from different handles may interleave differently than expected.
+
+   `:Capture(STDOUT,STDERR)`
+    Capture both STDOUT and STDERR. In scalar context, returns STDOUT. In List
+    context returns both.
+
+     sub foo :Capture(STDOUT,STDERR) {
+       print "World\n";
+       warn "Hello\n";
+     }
+     my ($hello, $world) = map { chomp;$_ } foo();
+
+   `:Capture(STDERR,STDOUT)`
+    Capture both STDOUT and STDERR. In scalar context, returns STDERR. In List
+    context returns both.
+
+CAVEATS
+  Subclassing
+    As mentioned above, Capture::Attribute temporarily installs itself as a
+    superclass of your class. If your class has subs named any of the
+    following, they may override the Capture::Attribute versions, and bad
+    stuff may happen.
+
+    *   `ATTR`
+
+    *   `Capture`
+
+    *   `MODIFY_CODE_ATTRIBUTES`
+
+    *   any sub matching the expresssion `/^_ATTR_CODE_/`
+
+  Accessing the real return value
+     sub quux :Capture
+     {
+       print "foo";
+       return "bar";
+     }
+ 
+     say quux();                             # says "foo"
+     say Capture::Attribute->return->value;  # says "bar"
+
+    The `Capture::Attribute->return` class method gives you the real return
+    value from the most recently captured sub. This is a
+    Capture::Attribute::Return object.
+
+    However, this section is listed under CAVEATS for a good reason. The fact
+    that a sub happens to use the ":Capture" attribute should be considered
+    private to it. The caller shouldn't consider there to be any difference
+    between:
+
+     sub foo :Capture { print "foo" }
+
+    and
+
+     sub foo { return "foo" }
+
+    If the caller of the captured sub goes on to inspect
+    `Capture::Attribute->return`, then this assumes an implementation detail
+    of the captured sub, which breaks encapsulation.
+
+  Adding a ":Capture" attribute to somebody else's function
+    So you want to do something like:
+
+     add_attribute(\&Some::Module::function, ':Capture(STDOUT)');
+
+    Here's how:
+
+     # Declare a generic wrapper
+     sub CAP :Capture { (shift)->(@_) }
+ 
+     # Wrap Some::Module::function in our wrapper.
+     my $orig = \&Some::Module::function;
+     local *Some::Module::function = sub { CAP($orig, @_) };
+
+    Though you are probably better off investigating Capture::Tiny.
+
+  Call stack
+    Capture::Attribute adds two extra frames to the call stack, and
+    Capture::Tiny adds (it seems) two more again. So any code that you capture
+    will see them quite clearly in the call stack if they decide to look.
+    They'll show up in stack traces, etc.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Capture-Attribute>.
+
+SEE ALSO
+    Capture::Tiny, "Subroutine Attributes" in perlsub.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

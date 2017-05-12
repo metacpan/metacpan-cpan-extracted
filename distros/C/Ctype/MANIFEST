@@ -1,0 +1,8 @@
+Changes
+Ctype.pm
+Ctype.xs
+MANIFEST
+Makefile.PL
+README
+t/Ctype.t
+META.yml                                Module meta-data (added by MakeMaker)

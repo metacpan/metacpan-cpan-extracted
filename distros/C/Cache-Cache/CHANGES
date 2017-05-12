@@ -1,0 +1,199 @@
+Revision history for Cache
+
+1.08 2015-01-22
+ - try to avoid some race conditions (thanks, Petr Písař)
+ - typo fixes (thanks, David Steinbrunner)
+
+1.07 2014-09-17
+ - fix a bug where we checked @$ instead of $@ after eval
+
+1.06 2009-02-28
+ - updated the project homepage and added notes about the CHI project
+ - fixed extra "use vars" in CacheUtils
+
+1.05 2006-05-26
+ - fixed infinite loop with auto_purge_on_get
+ - fixed directory paths on Windows partitions
+ - NullCache uses BaseCache
+
+1.04 2005-03-17-11-23
+ - release version 1.04
+ - repair permissions on temp cache files
+
+1.03 2004-10-04-11-23
+ - release version 1.03
+ - modified the FileBackend to use the more robust File::Temp
+ - "officially" recommend FileCache over SharedMemoryCache
+ - added more robust error checking for shared memory caches
+ - added a check for invalid frozen data
+ - added $1 to all error messages
+
+1.02 2003-04-15-10-41
+ - released version 1.02
+ - require Digest::SHA1 2.02, optionally IPC::ShareLite 0.09
+ - use Storable's "nfreeze" instead of "freeze"
+ - added notes on locking and Storable to the README
+ - updated documentation on expiration units
+ - modified the quoting of the untainted path regex
+ - fixed the duplicated get_keys in NullCache
+ - applied patch to ensure consistent state if the filesystem fills up
+ - applied patch to ensure initialization of the memory cache hash
+
+1.01 2002-04-14-01-30
+ - released version 1.01
+ - switched to Digest::SHA1
+ - updated copyright dates
+
+1.0 2002-04-06-18-51
+ - released version 1.0
+ - localized scope of global file and directory handles (FILE and DIR)
+ - applied Jonathan Swartz's patch for a much better untainting regex
+ - changed _Untaint_String to throw an exception on a taint
+ - further improved the fix to prevent race conditions that caused the
+   tests to fail
+ - exposed the get_namespaces method on Cache
+ - fixed the failing Win32 tests caused by fileglobs in Makefile.PL
+ - applied Yves Orton's patch in _Make_Path to fix warnings on Win32
+
+0.99 2001-12-09-18-45
+ - released version 0.99
+ - major refactoring of code
+ - replaced non-standard usage of SUCCESS and FAILURE with Error.pm
+ - replaced non-standard usage of TRUE and FALSE with 1 and 0
+ - migrated from the term "identifier" to the more standard term "key"
+   and marked the old public methods with identifier as deprecated
+ - broke out the MemoryBackend, FileBackend, SharedMemoryBackend into
+   distinct and reusable classes
+ - fixed a long outstanding bug in the unit tests that made working
+   caches appear to fail
+ - changed the meaning of object and cache size for file system based
+   caches to consistently reflect the total size of the objects on disk,
+   but not including the directory overhead
+ - changed format of persisted data in the FileBackend
+ - major rewrite of documentation
+
+0.09 2001-09-10-12-10
+ - released version 0.09
+ - applied Axel Beckert patch to fix the expiration units
+ - applied Ken Williams's directory creation patch to pass all tests
+ - changed the license to be either the GPL or the Artistic license
+ - added Jay Sachs' implementation of NullCache
+ - modified the remove methods to avoid croaking if two cache
+   instances are both purging or limiting at the same time
+ - migrated to a factory-like model with private constructors
+   to fix the auto_purge_interval functionality
+ - updated the documentation to better reflect that size means
+   size in bytes
+ - started version 0.09
+
+0.08 2001-04-26-08-53
+ - released version 0.08
+ - renamed the auto_purge option to auto_purge_interval
+ - added the auto_purge_on_set and auto_purge_on_get options
+ - moved the Auto_Purge and Reset_Auto_Purge methods to BaseCache
+   as the instance methods _auto_purge and _reset_auto_purge
+ - added the auto_purge option and property to the base cache interface
+   and implementations.  This option will call the purge method on
+   the cache after the specified interval expires
+ - renamed _set_namespace to set_namespace (i.e., made it public)
+ - added the set_object method to the cache interface
+ - updated the test scripts and CREDITS file
+ - updated the perldoc formatting to look better in HTML
+ - removed the $VERSION from SizeAwareCache
+ - started version 0.08
+
+0.07 2001-03-27-08-55
+ - released version 0.07
+ - prepared for initial CPAN release
+ - improved Cache::Cache documentation
+ - removed last "use IPC::Shareable"
+ - added support in the Makefile.PL to conditionally build the
+   SharedMemoryCache, which requires IPC::ShareLite, and thus runs only
+   on certain architectures.  Also broke out the IPC related routines
+   into the SharedCacheUtils package.
+ - started version 0.07
+
+0.06 2001-03-23-08-36
+ - release version 0.06
+ - added the get_identifiers method to the Cache interface, implemented
+   the method for all classes, added a new test, and updated the test
+   scripts
+ - added the size property to Object
+ - added the _freeze and _thaw methods to the BaseCache class and
+   modified all children classes to use them
+ - revert to separate freeze and thaws on the memory based caches to
+   ensure that cached data isn't modified at any time
+ - major rewrite of the size aware cache logic
+ - added the CacheMetaData class, which is used to efficiently keep track
+   of a size aware cache state
+ - refactored the instance specific limit_size routines into the
+   generic Limit_Size method in CacheUtils
+ - updated the size aware cache implementations to use the CacheMetaData
+   and Limit_Size methods
+ - improved the SizeAwareCacheTester and updated the test scripts
+ - removed unnecessary clone call from the SharedMemoryCache and the
+   SizeAwareSharedMemoryCache
+ - added exclusive locking on the shared cache for operations that
+   will both read and write to the cache
+ - replaced the cache_hash_ref instance property in MemoryCache with
+   a class property and updated the SharedMemoryCache and
+   SizeAwareSharedMemoryCache modules accordingly
+ - started version 0.06
+
+0.05 2001-03-20-10-25
+ - released version 0.05
+ - updated Storable dependency to 1.011
+ - replaced the IPC::Shareable backend with IPC::ShareLite
+ - started version 0.05
+
+0.04 2001-03-17-10-43
+ - released version 0.04
+ - replaced Data::Dumper with Storable, which is now a requirement
+ - implemented the SizeAwareMemoryCache and associated tests
+ - implemented the SizeAwareSharedMemoryCache and associated tests
+ - added the SizeAwareCache interface
+ - moved max_size logic from the _store method to the set method
+ - started version 0.04
+
+0.03 2001-03-10-12-40
+ - released version 0.03
+ - made the FileCache more multi-user friendly by allowing a more
+   permissive default directory umask, which can also be optionally
+   overridden
+ - updated documentation and code style
+ - completely rewrote and improved the limit_size method for a major
+   performance gain
+ - updated the syntax for expiration times to include the [number] [unit]
+   format, e.g. "10 seconds"
+ - added the get_object method to the Cache interface, which allows
+   access to the underlying cache object (without potentially expiring
+   the object)
+ - added the get_namespace and get_default_expires_in methods to the
+   Cache interface definition
+ - updated the MANIFEST
+ - checked in preliminary cache benchmarking code
+ - fixed bug fixed bug #406030 -- default_expires_in never invoked
+ - refactored common code into BaseCache
+ - use Static_Params method
+ - fixed default_expires_in bug
+ - added coding guidelines to STYLE
+ - started version 0.03
+
+0.02 2001-02-15-21-12
+ - released version 0.02
+ - added perldoc to SizeAwareFileCache
+ - created SizeAwareFileCache
+ - added the SizeAwareCacheTester module
+ - refactored common test code into the AbstractCacheTester module
+ - added the Recursively_List_Files_With_Paths routine to CacheUtils
+ - marked the FileCache and MemoryCache as ISA Cache::Cache
+ - updated the MANIFEST
+ - started version 0.02
+
+0.01 2001-02-13-16-16
+ - released version 0.01
+ - implemented Get_Temp_Dir to make the FileCache root more OS
+   independent
+ - started version 0.01
+
+

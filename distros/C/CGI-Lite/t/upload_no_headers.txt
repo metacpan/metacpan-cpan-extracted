@@ -1,0 +1,14 @@
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+
+bar
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+
+baz
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+
+quux
+--`!"$%^&*()-+[]{}'@.?~#|aaa--
+

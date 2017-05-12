@@ -1,0 +1,15 @@
+<h3>Distribution Summary:</h3>
+[% IF distributions %]
+<p>
+[% FOREACH d = distributions %]
+<a href="#[% d.distribution %]">[% d.distribution %]</a><br />
+[%- s = d.summary -%]
+[%- IF s.ALL -%]
+[%- IF s.PASS    %]<img src="/images/layout/green.png"  width="[% s.PASS    * 80 / s.ALL %]" height="16" alt="PASS"    />[% END -%]
+[%- IF s.NA      %]<img src="/images/layout/yellow.png" width="[% s.NA      * 80 / s.ALL %]" height="16" alt="NA"      />[% END -%]
+[%- IF s.UNKNOWN %]<img src="/images/layout/yellow.png" width="[% s.UNKNOWN * 80 / s.ALL %]" height="16" alt="UNKNOWN" />[% END -%]
+[%- IF s.FAIL    %]<img src="/images/layout/red.png"    width="[% s.FAIL    * 80 / s.ALL %]" height="16" alt="FAIL"    />[% END -%]
+[% END %]<br />
+[% END %]
+</p>
+[% END %]

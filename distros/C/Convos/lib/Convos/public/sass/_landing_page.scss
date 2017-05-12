@@ -1,0 +1,52 @@
+body.tactile {
+  height: 100%;
+  background: #e7e7e7 url(../image/tactile-body-bg.png) 0 0 repeat;
+}
+
+.landing-page {
+  background: transparent url(../image/tactile-highlight-bg.jpg) 50% 0 no-repeat;
+  min-height: 100%;
+
+  .row {
+    margin: auto;
+    padding-top: 1em;
+    width: 680px;
+  }
+
+  h1 {
+    margin-bottom: 0;
+    .logo {
+      text-indent: -1000px;
+      display: block;
+      height: 55px;
+      width: 300px;
+      background: url('/image/logo.png') no-repeat top left;
+      background: none,url('/image/logo.svg') no-repeat top left;
+    }
+    small {
+      font-size: 20px;
+      display: block;
+      font-weight: normal;
+      color: #999;
+    }
+  }
+  h2.login-register {
+    font-size: 1.1em;
+  }
+
+  @media (max-width: $responsiveWidth) {
+    img { margin: 2em 0; }
+    nav, .login, .register, .about { width: 100% };
+    .row { width: 100%; padding-left: 10px; padding-right: 10px; }
+  }
+}
+
+div.footer {
+  font-size: 0.8em;
+  margin-top: 2em;
+  padding-top: 1em;
+  a {
+    color: #777;
+    text-decoration: none;
+  }
+}

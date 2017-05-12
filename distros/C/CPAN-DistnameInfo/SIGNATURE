@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d75638f01f6bfab2fbdfd701842e3bf49be256f4 Changes
+SHA1 49d042e197b5c18b654acd4bd9c1d22d7014d174 MANIFEST
+SHA1 33e232f9b9f97f8877f5de337c562f2c976c5c30 META.yml
+SHA1 da8ac89bf8cf1d7b58fdc28503b380d94cebf6a3 Makefile.PL
+SHA1 75225b292ce4d6d6bb0212fa8f249aaa8ee41ae8 README
+SHA1 3a53c8c9043d82cfee930482d05eb18a08af4192 lib/CPAN/DistnameInfo.pm
+SHA1 199d53d9e7a540c4702f161d933764dddedbc42c t/ext.t
+SHA1 00af0a1012e1af4536120eab70958e51218c3b72 t/path.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEUEARECAAYFAk16smwACgkQR0BL4gbYw3QoYgCdH1lrCdfLnoF4qqbYEAKoG1v9
+zHQAmJTWKilUZqrWBMeVi165Zzp+rYc=
+=krP1
+-----END PGP SIGNATURE-----

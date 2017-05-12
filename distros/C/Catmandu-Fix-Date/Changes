@@ -1,0 +1,29 @@
+0.0131  2017-01-20 13:18:24 CET
+  - add fix Catmandu::Fix::datetime_diff
+0.0130  2016-08-08 08:55:18 CEST
+  - Fix leap second in test Catmandu-Fix-end_year.t by using DateTime::Format::Strptime instead of POSIX::strftime
+0.0129  2016-06-06 15:15:12 CEST
+  - DateTime::Format::Strptime minimum version 1.68 (no eval parser anymore)
+0.0128  2015-12-17
+  - cleanup documentation
+  - let Catmandu::Date export fixes as functions
+0.0127  2015-12-16
+  - add more tests
+0.0126  2015-11-16
+  - require Catmandu '0.9209' to support Catmandu::Fix::SimpleGetValue
+0.0125  2015-11-13
+  - set default locale to en_US instead of the non existing en_EN
+  - check if input variable for datetime_format is a string
+0.0124  2015-10-08
+  - add fix Catmandu::Fix::split_date, which is a replacement for the deprecated package Catmandu::Fix::expand_date
+0.0123  2015-06-12
+  - improve parsing speed for unix timestamp, in which case the parser from DateTime::Parser::Strptime is not used
+0.0122	2014-11-13
+	- start_day
+	- end_day
+	- start_week
+	- end_week
+	- start_year
+	- end_year
+	- fix Catmandu::Fix::timestamp - key not created if not exists already (emit_create_path necessary)
+	- fix Catmandu::Fix::datetime_format -  set default time_zone and set_time_zone to UTC instead of "local" (which delivers other results depending on the time zone)

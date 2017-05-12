@@ -1,0 +1,6 @@
+Revision history for Perl extension Continuity::REPL.
+
+0.01  Thu May  8 23:10:02 2008
+	- original version; created by h2xs 1.23 with options
+		-n Continuity::REPL -X
+

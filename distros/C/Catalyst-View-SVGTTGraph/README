@@ -1,0 +1,23 @@
+Catalyst-View-SVGTTGraph version 0.01
+=====================================
+
+Catalyst::View::SVGTTGraph - SVG Graph View Component
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please See POD.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) Shanon, Inc. All Rights Reserved.
+<http://www.shanon.co.jp/>
+
+This program is free software, you can redistribute it
+and/or modify it under the same terms as Perl itself.	

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Chart-Scientific
+version:      0.16
+version_from: lib/Chart/Scientific.pm
+installdirs:  site
+requires:
+    PDL:                           0
+    PDL::Graphics::PGPLOT:         0
+    PDL::NiceSlice:                0
+    PGPLOT:                        0
+    Tie::IxHash:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 af5fef16b65bb3e6d90c2322c2fd2f1e7a142104 Build.PL
+SHA1 adedb83409e7f8cb5ce9ccb2e7aeab3d1158f143 Changes
+SHA1 dc1868106cd64e347fbc2440ff309f1778bc1354 MANIFEST
+SHA1 cf3ff5d08ec507e20f936668297838fd7758f365 META.yml
+SHA1 e86245b6a930636e230cc7607c02cdabe7d1e2fc Makefile.PL
+SHA1 8abecd7be1b5e698427a6e6df81a660bceea9cda README
+SHA1 933bf0d29c33ade8f4502ff872e7d3873b7cf16d lib/CGI/Widget/Tabs.pm
+SHA1 c43a16c3b1e683335256d8c17e58ef2c11334ac8 lib/CGI/Widget/Tabs/Heading.pm
+SHA1 dab58981acba53c91c5c530009dbc3fa43328a53 lib/CGI/Widget/Tabs/Style.pm
+SHA1 01c3db36930081fa66154985efc56d8835c7c14c t/01_distribution.t
+SHA1 d1629997231ab7001f2f220628cf4808fb35068d t/02_main.t
+SHA1 a27d857e335e4b65de126047353c3d80a35de4b6 tabs-demo.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFHNKmGbD1fM9M5ytIRAut3AJ9gkfIgg6wgFO2hCizrWdTdjGYfsgCgukps
+NMxuFPbLL+jCO8oPMN99iY8=
+=Mq8l
+-----END PGP SIGNATURE-----

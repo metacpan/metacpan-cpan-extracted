@@ -1,0 +1,30 @@
+# This file documents the revision history for Perl extension Catalyst::ActionRole::Public.
+
+0.009 - 2015-05-05
+  - Fixed a bug that caused us to not play nice with other actionroles.
+
+0.008 - 2015-02-24
+  - Added 'CacheControl(...) attribute to allow you to control this HTTP header.
+
+0.007 - 2015-01-26
+  - use correct location for the default root directory for files and templates
+
+0.006 - 2015-01-22
+  - Tweak the debugging messages to be less noisy.
+  - prevent some 'uninitialized variable' type errors.
+
+0.005 - 2015-01-22
+  - released to fix broken previous release :(
+
+0.004 - 2015-01-22
+  - Allow one to set more than one allowed content type.
+
+0.003 - 2015-01-22
+  - If a content type is declared, make sure the requested file
+    extension matches.
+
+0.002 - 2015-01-16
+  - fixed pod errors
+
+0.001 - 2015-01-16
+  - First Release 

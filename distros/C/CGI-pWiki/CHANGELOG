@@ -1,0 +1,64 @@
+CGI::pWiki ToDo
+
+  * upload of binary files
+  * download of binary files
+  * automatic password assignment
+  * cvs mirroring
+  * cvs replication
+
+CGI::pWiki 0.15
+  
+  * first public release on CPAN.org
+  * search order of templates
+  * updated pod doku
+  * drop of shadow directory
+
+ -- Michael Koehne <kraehe@copyleft.de> 07 Aug 2002
+
+CGI::pWiki 0.14
+  
+  * pWiki.cgi is now a ErrorDocument 404 handler, for old apaches
+  * search in a notfound document
+  * parse_request will also parse post data
+  * save does no longer parse post data
+  * error might be an assignment
+
+ -- Michael Koehne <kraehe@copyleft.de> 03 Aug 2002
+
+CGI::pWiki 0.13
+
+  * CGI::pWiki is now pod and a bit more
+  * the <wiki tags are converted to pod command paragraphs
+  * the menu bar is now called content and not index
+  * autolinks are now in brackets and not in percents
+  * title and body extraction from html files
+
+ -- Michael Koehne <kraehe@copyleft.de> 01 Aug 2002
+
+CGI::pWiki 0.12
+
+  * online dokumentation
+  * relocation command paragraph
+  * drop of .link file extension
+  * first usage instuction as pod
+  * alpha test at http://rom.copyleft.de/
+
+ -- Michael Koehne <kraehe@copyleft.de> 17 Jul 2002
+  
+CGI::pWiki 0.11
+
+  * first installation instructions as pod
+  * added templates in HTML-pWiki
+  * adding %TAG% expansion in templates
+  * font sizes for pre and roff hard coded
+  * first search engine
+
+ -- Michael Koehne <kraehe@copyleft.de> 15 Jul 2002
+
+CGI::pWiki 0.10
+  
+  * a wiki as an apache handler
+  * it worked out if the box
+  * first test at home
+
+ -- Michael Koehne <kraehe@copyleft.de> 12 Jul 2002

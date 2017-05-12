@@ -1,0 +1,9 @@
+conf1
+{
+    foo    bar
+}
+
+conf2
+{
+    baz    etc
+}

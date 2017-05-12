@@ -1,0 +1,17 @@
+---
+abstract: 'Get a psgi_app in a unified way across different Catalyst versions'
+author:
+  - "['Peter Sergeant <pete@clueball.com>']"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-PSGIApp
+requires:
+  Catalyst: 0
+version: 0.01

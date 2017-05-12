@@ -1,0 +1,52 @@
+# $Id: Extending.pod,v 1.5 2008-08-28 17:07:11 cantrelld Exp $
+
+=head1 HOW TO EXTEND Class::DBI::ClassGenerator
+
+The module uses some "helper" modules, in which all database-specific
+code should live.  These are named Class::DBI::ClassGenerator::DBD::$dbname.
+
+eg Class::DBI::ClassGenerator::DBD::mysql
+
+where the last part of the module name comes from the DSN that you would use
+for accessing the database using DBI, and is case-sensitive.
+
+To add support for another database, simply write an appropriate module.  You
+don't need to tell the module about your new extension, as it will find it
+automatically.
+
+These modules should contain the following class methods.  You should
+probably base your code on Class::DBI::ClassGenerator::DBD::mysql.
+
+=head2 _get_tables
+
+Takes a database handle as its only argument and should return a list of
+all the tables in the database.
+
+=head2 _get_columns
+
+Takes a database handle and a table name, returns a hash of columns:
+
+    id => {
+        type    => 'INT' # currently this is the native db type and is ignored
+        null    => 0,    # true if NULLs are allowed
+        pk      => 1,    # true if this column is (part of) a primary key
+        default => 0     # the default value
+    },
+    name => { 
+        type => 'VARCHAR(128)',
+        ...
+    }
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Written by David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+Copyright 2008 Outcome Technologies Ltd
+
+This documentation is free-as-in-speech.  It may be used,
+distributed and modified under the terms of the Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, whose
+text you may read at
+L<http://creativecommons.org/licenses/by-sa/2.0/uk/>.
+
+=cut

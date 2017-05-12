@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+lib/Class/Object.pm
+t/Object.t
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm

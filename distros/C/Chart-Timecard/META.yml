@@ -1,0 +1,27 @@
+---
+abstract: 'Generate a Timecard chart from a time series'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chart-Timecard
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DateTime: 0.7
+  Object::Tiny: 1.08
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/gugod/Chart-Timecard.git
+version: 0.02

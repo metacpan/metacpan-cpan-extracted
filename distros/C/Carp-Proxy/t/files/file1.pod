@@ -1,0 +1,15 @@
+=pod
+
+=head1 NAME Ignored - this section ignored
+
+yak yak yak.
+
+=head1 SYNOPSIS
+
+  Body of the SYNOPSIS section goes here.
+
+=head1 DESCRIPTION
+
+blah blah blah.
+
+=cut

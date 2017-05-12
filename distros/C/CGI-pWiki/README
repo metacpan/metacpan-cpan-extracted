@@ -1,0 +1,16 @@
+The CGI::pWiki class is implementating the WikiWikiWeb idea of a
+user elaboratable database written in Perl and published at CPAN.
+
+Goal of CGI::pWiki is to provide a framework to enable large groups
+of authors to contribute content to a website.
+
+The CGI::pWiki acts as an Apache-Handler translating content from
+WikiWikiWeb to HTML adding style templates, if wanted. The CGI::pWiki
+knows about some additional file formats besides Wiki. So one can
+use text/plain, text/html text/pod and text/xml, also.
+
+Normal users will only generate GET events with browsing and searching,
+while authors generate POST events for editing and saving. So simple
+htaccess files could be used to restrict authorship of directories.
+
+(c) 2002 GPL <kraehe@copyleft.de> Michael Koehne

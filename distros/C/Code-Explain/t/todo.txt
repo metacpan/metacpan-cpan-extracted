@@ -1,0 +1,5 @@
+$x = /regex/                                      This is the same as if you wrote:       $x = $_ =~ /regex/',
+"print 'hey';"      
+'string'            
+split()                                           link to perldoc
+/(\$\w+(?:\-\>)?)\{([\'\"]?)([\$\&]?\w*)$/        explain this and in general some complex regexes

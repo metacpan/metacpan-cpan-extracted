@@ -1,0 +1,24 @@
+=head1 NAME
+
+Carton::Doc::Check - Check if your cpanfile and local environment are in sync
+
+=head1 SYNOPSIS
+
+  carton check
+
+=head1 DESCRIPTION
+
+This command checks the consistency between your C<cpanfile>,
+C<cpanfile.snapshot> and the local environment.
+
+=head2 MISSING MODULES
+
+If one or more of the modules specified in your I<cpanfile> are not
+found in your snapshot, C<carton check> will warn you about this:
+
+  $ carton check
+  Following dependencies are not satisfied.
+    JSON has version 2.51. Needs 2.52
+  Run `carton install` to install them.
+
+You can run C<carton install> again to reinstall these missing dependencies.

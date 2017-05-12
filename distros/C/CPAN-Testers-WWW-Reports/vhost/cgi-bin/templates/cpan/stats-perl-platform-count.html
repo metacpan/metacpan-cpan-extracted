@@ -1,0 +1,43 @@
+[%
+    passmatrix = 1
+
+    htmltitle = 'CPAN Distribution Cross-Platform Counts'
+    title = 'CPAN Distribution Cross-Platform Counts'
+
+    crumb3_name = 'Perl' ;
+    crumb3_href = '/' ;
+    crumb2_name = 'Platform' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Count' ;
+%]
+
+[% USE Comma -%]
+
+<h1>Number of CPAN modules with at least one PASSing test perl/platform cross table</h1>
+
+<p>The following table lists the count of distributions that have had at least one 
+PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+<p>See also: <a href="index.html">All stats</a></p>
+
+<div class="container">
+<table class="test_results">
+<tr><th><img src="/images/headings/distribution.png" alt="Distribution" /></th>
+   [% FOREACH name = osnames %]
+     <th><img src="/images/headings/[% name.oscode | lower %].png" alt="[% name.osname %]" /></th>
+   [% END %]
+</tr>
+
+[% FOREACH p = perlv %]
+<tr><td><a href="perl_[% p.perl %].html">[% p.perl %]</a></td>
+[%- FOREACH c = p.count -%]
+[%- IF c.count %]<td>[% c.count | comma %]</td>
+[%- ELSE %]<td></td>
+[%- END -%]
+[%- END -%] 
+</tr>
+[% END %] 
+</table>
+</div>
+

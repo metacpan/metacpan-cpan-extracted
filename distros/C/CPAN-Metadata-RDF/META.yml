@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                CPAN-Metadata-RDF
+version:             1.11
+abstract:            Generate metadata about CPAN in RDF
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    DateTime:                      0.01
+    DBD::SQLite:                   0.01
+    DBI:                           0.01
+    Digest::MD5:                   0.01
+    File::Find::Rule:              0.01
+    File::Type:                    0.01
+    Path::Class:                   0.01
+    RDF::Simple::Serialiser:       0.01
+    Test::More:                    0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

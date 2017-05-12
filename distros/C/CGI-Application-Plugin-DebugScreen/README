@@ -1,0 +1,40 @@
+ CGI-Application-Plugin-DebugScreen
+====================================
+
+"CGI::Application::Plugin::DebugScreen" is Debug support to CGI::Application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - strict
+ - warnings
+ - CGI::Application
+ - HTML::Template
+ - Devel::StackTrace
+ - IO::File
+ - CGI::Application::Plugin::ViewCode
+ - UNIVERSAL::require
+
+SEE ALSO
+
+ - Sledge::Plugin::DebugScreen
+ - CGI::Carp::DebugScreen
+ - Catalyst::Plugin::StackTrace
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.
+

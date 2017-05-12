@@ -1,0 +1,19 @@
+---
+name: Class-ByOS
+version: 0.02
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+abstract: write object classes that load OS-specific subclasses at runtime
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Class::ByOS:
+    file: lib/Class/ByOS.pm
+    version: 0.02
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

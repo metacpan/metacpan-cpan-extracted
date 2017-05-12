@@ -1,0 +1,10 @@
+# This file documents the revision history for Perl extension Catalyst::Plugin::ResponseFrom.
+
+0.003 - 2015-08-26
+  - Allow a third argument style that is the same as $c->uri_for
+
+0.002 - 2015-01-10
+  - Fixed distribution tarball and metadata, rerelease.
+
+0.001 - 2015-01-09
+  - initial release (broken, removed from CPAN)

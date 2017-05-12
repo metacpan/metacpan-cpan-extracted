@@ -1,0 +1,77 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the postProcess method.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the scrolling list.
+my @commandItems = ("Add Account             ",
+			"Delete Account          ", 
+			"Account Information     ",
+			"Change Account Password ",
+			"Change Account Shell    ",
+			"Change Account Directory",
+			"Quit                    ");
+my @commandInfo = ("<C>Adds a new account to the system.",
+			"<C>Deletes an exiting account from the system.",
+			"<C>Provides information about a given account.",
+			"<C>Changes a given account's current password.",
+			"<C>Changes a given account's login shell.",
+			"<C>Changes a given account's login directory.",
+			"<C>Exits this interface.");
+my @initMessage = ("******************************************************");
+
+# Create the title.
+my $title = new Cdk::Label ('Message' => ["<C></B/5>Unix System Admin Interface."],
+				'Xpos' => "TOP");
+
+# Create the scrolling list object.
+my $scroll = new Cdk::Scroll ('Title' => "<C></U/5>Pick An Option",
+				'Highlight' => "</B/R/24>",
+				'Height' => 10,
+				'Width' => 35,
+				'Numbers' => "TRUE",
+				'List' => \@commandItems);
+
+# Set the post-process for the scrolling list.
+$scroll->postProcess ('Function' => sub { setInfoLabelCB();} );
+
+# Create the scrolling list item label.
+my $infoLabel = new Cdk::Label ('Message' => \@initMessage, 'Xpos' => 17);
+
+# Set the contents of the info label.
+$infoLabel->set ('Message' => ["$commandInfo[0]"]);
+$infoLabel->draw();
+
+# Draw the screen.
+$title->draw();
+$infoLabel->draw();
+
+# Do this forever.
+for (;;)
+{
+   # Activate the scrolling list.
+   my $item = $scroll->activate();
+}
+
+# Exit Cdk.
+Cdk::end();
+
+#
+#
+#
+sub setInfoLabelCB
+{
+   # Get the current itrm from the scrolling list.
+   my ($size, $currentItem) = $scroll->info();
+
+   # Set the info in the label.
+   $infoLabel->set ('Message' => ["$commandInfo[$currentItem]"]);
+   $infoLabel->draw();
+}

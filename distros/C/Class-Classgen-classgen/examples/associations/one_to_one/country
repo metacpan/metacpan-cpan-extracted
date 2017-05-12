@@ -1,0 +1,6 @@
+header:
+	package Country;
+
+variables:
+	$name
+	$a_has_capital

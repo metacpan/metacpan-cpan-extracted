@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  49124:
+    - 134
+name: ddcb0c
+registers:
+  AF: 57217
+  AF_: 0
+  BC: 46796
+  BC_: 0
+  DE: 61069
+  DE_: 0
+  HL: 34394
+  HL_: 0
+  I: 0
+  IX: 49003
+  IY: 39805
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,47 @@
+CGI-Application-Plugin-View-HTML-Template version 0.02
+======================================================
+
+A plugin for CGI::Application which causes Catalyst-like behavior. Simply store
+your variables and HTML::Template template into CGI::Application's params and
+return from your runmode. The template will automatically be populated and
+output.
+
+Download site for CGI::Application::Plugin::View::HTML::Template:
+
+  http://search.cpan.org/search?dist=CGI-Application-Plugin-View-Template-HTML
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install the module in a library other than the system library
+(perhaps you don't have root access?) use this command instead of the 
+ Makefile.PL command above:
+
+   perl Makefile.PL PREFIX=/some/path/you/provide
+
+   And then, add this to your CGI::Application app before the line where you
+   "use" this plugin:
+
+      use lib '/some/path/you/provide';
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   CGI::Application
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Mark Fuller
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

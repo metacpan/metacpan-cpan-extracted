@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+
+	use Dog;
+	use Bird; 
+	use strict;
+
+# --- the next things could be achieved easier with conventional coding ---
+
+	my $snoopy = Dog->new();
+	my $woodstock = Bird->new();
+
+	$snoopy->set_name('snoopy');
+	$woodstock->set_name('woodstock');
+
+	$snoopy->set_pos(0);
+	$woodstock->set_pos(10);
+
+
+speaker("Snoopy sits at ".$snoopy->get_pos().", Woodstock is at ".$woodstock->get_pos());
+
+$woodstock->talk("'''''");
+$woodstock->meet($snoopy);
+$snoopy->think("The red baron meets his boloved friend.");
+$woodstock->talk("''' ''''' '''");
+$snoopy->think("Oh, you invite me for dinner? Thank you, yes I'll be there.");
+
+$woodstock->move(-10);
+speaker("Woodstock moved to".$woodstock->get_pos());
+$snoopy->think("He is so cute, when he is excited. <GRIN>");
+
+
+# --- try this with non OOP-coding -----------------
+#     more woodstock-fellows enter the scene
+
+	my $wood1 = Bird->new();
+	my $wood2 = Bird->new();
+	my $wood3 = Bird->new();
+	my $wood4 = Bird->new();
+	
+	$wood1->set_name("woodstock minor");
+	$wood2->set_name("woodstock minor minor");
+	$wood3->set_name("woodstock senior");
+	$wood4->set_name("woodstocks twin ");
+
+
+$wood1->meet($woodstock);
+$wood2->meet($woodstock);
+$wood3->meet($woodstock);
+$wood4->meet($woodstock);
+
+speaker("some other woodstock-fellows have approached woodstock");
+$wood4->talk("... ## '''");
+$woodstock->talk("??? ... !!");
+$wood3->talk(" ' ' ' '   ''");
+$snoopy->think("oh my god, I hate family meetings");
+$snoopy->think("I hope they will not come over here");
+
+speaker("Some woodies are moveing now towards Snoopy");
+$wood4->move(5);
+$wood3->move(4);
+$wood2->move(3);
+
+
+speaker($wood4->get_name()." is at ".$wood4->get_pos()." now");
+speaker($wood3->get_name()." is at ".$wood3->get_pos()." now");
+speaker($wood2->get_name()." is at ".$wood2->get_pos()." now");
+speaker("");
+
+$wood4->talk("'' '', ' ' '?");
+$snoopy->think("oh gosh, they're coming");
+
+# ------------------------------------------------------
+
+sub speaker {
+	my $text = shift;
+	print "\n>>>$text\n";
+}
+

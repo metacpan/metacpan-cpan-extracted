@@ -1,0 +1,65 @@
+---
+abstract: 'Hack custom CPAN repos'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  CPAN::Faker::HTTPD: 0
+  File::Find: 0
+  Module::Faker::Dist: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Local
+requires:
+  CPAN::DistnameInfo: 0
+  CPAN::Index::API: 0.003
+  CPAN::Index::API::File::MailRc: 0
+  CPAN::Index::API::File::ModList: 0
+  CPAN::Index::API::File::PackagesDetails: 0
+  CPAN::Inject: 0
+  Carp: 0
+  Class::Load: 0
+  Compress::Zlib: 0
+  Config::MVP::Assembler: 0
+  Config::MVP::Assembler::WithBundles: 0
+  Config::MVP::Reader::Finder: 0
+  Config::MVP::Reader::INI: 0
+  Digest::MD5: 0
+  Dist::Metadata: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Temp: 0
+  IO::String: 0
+  LWP::Simple: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Log::Dispatchouli: 0
+  Moose: 0
+  Moose::Meta::Class: 0
+  Moose::Role: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  MooseX::CoercePerAttribute: 0
+  MooseX::Role::Loggable: 0.009
+  Path::Class: 0
+  Path::Class::URI: 0
+  Perl::Version: 0
+  Regexp::Common: 0
+  String::RewritePrefix: 0
+  Try::Tiny: 0
+  URI: 0
+  URI::file: 0
+  namespace::autoclean: 0
+  namespace::clean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Local
+version: 0.010

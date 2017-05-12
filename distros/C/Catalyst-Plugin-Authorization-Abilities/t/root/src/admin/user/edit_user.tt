@@ -1,0 +1,60 @@
+<h1 class="caps">Edit user [% user_id %]</h1>
+
+[% form %]
+
+
+<div class="span-24">
+<div class="span-11">
+<form action="/admin/user/[% user_id %]/role/" method="post">
+<fieldset>
+<legend class="alt">User_Role</legend>
+
+<table>
+[% WHILE  (role=allroles.next) -%]
+  <tr>
+      <td><a href="/admin/role/[%  role.id %]/edit">[% role.name %]</a></td>
+      <td><input type="checkbox" name="role" value=[% role.id %] 
+  [% IF user_roles_id.defined(role.id) %]
+       checked 
+  [% END %] 
+></td>
+  </tr>
+[% END %]
+</table>
+
+<div class="buttons">
+<button name="submit" class="positive" ><img src="[% c.config.static_url_path %]/images/icons/tick.png" alt="">Save</button> 
+</div>
+
+</fieldset>
+</form>
+</div>
+
+
+<div class="span-12">
+<form action="/admin/user/[% user_id %]/action/" method="post">
+<fieldset>
+<legend class="alt">User_Action</legend>
+
+<table>
+[% WHILE  (action=allactions.next) -%]
+  <tr>
+    <td><a href="/admin/action/[%  action.id %]/edit">[% action.name %]</a></td>
+    <td><input type="checkbox" name="action" value=[% action.id %] 
+  [% IF user_actions_id.defined(action.id) %]
+       checked 
+  [% END %] 
+></td>
+  </tr>
+[% END %]
+</table>
+<div class="buttons">
+<button name="submit" class="positive" ><img src="[% c.config.static_url_path %]/images/icons/tick.png" alt="">Save</button> 
+</div>
+
+</fieldset>
+</form>
+</div>
+</div>
+
+<a href="/admin/user/list">Return to listing</a>

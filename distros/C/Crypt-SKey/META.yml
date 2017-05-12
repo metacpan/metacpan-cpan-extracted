@@ -1,0 +1,22 @@
+---
+name: Crypt-SKey
+version: 0.10
+author:
+  - 'Ken Williams, kwilliams@cpan.org'
+abstract: Perl S/Key calculator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+recommends:
+  Digest::MD4: 1
+  Digest::MD5: 2.16
+  Digest::SHA1: 2.11
+  Term::ReadKey: 2.14
+provides:
+  Crypt::SKey:
+    file: lib/Crypt/SKey.pm
+    version: 0.10
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,59 @@
+0.16   24 Jan 2012
+        - Remove superfluous call to ->setup in test app
+
+0.15   18 Jan 2012
+        - Moose-ified to fix https://rt.cpan.org/Ticket/Display.html?id=74132 (karpet)
+
+0.14   18 Nov 2010
+        - Added "page_size" config option per RT #62335 (karpet)
+
+0.13   18 Oct 2009
+        - Fixup copyright ino
+
+0.12   16 Oct 2009
+        - Port to new session config key
+
+0.11   16 June 2009
+        - Fixed warning during basic.t on Win32
+        - Added comment into doc about not being "thread-safe"
+
+0.10   13 May 2009
+        - Change tests to be compatible with Catalyst 5.80004
+        - Re-add /session-file prefix to the test session directory which was
+          present in 0.07. I can't see where this was removed, but the test
+          looks more correct with it. RT#45724
+
+0.09    04 May 2009
+        - remove Win32 hack since Cache::FastMmap 1.29 supports Win32.
+          see https://rt.cpan.org/Ticket/Display.html?id=45642
+
+0.08    01 May 2009
+        - Bump Cache::FastMmap requirement to 1.29 to fix RT#45210
+
+0.07    30 Mar 2009
+        - Port from NEXT to MRO::Compat.
+
+0.06    28 Jan 2009
+        - die when Cache::FastMmap::set() returns false value (RT #33667)
+        - patch from ton.voon@altinity.com to pass unlink_on_exit option
+          to Cache::FastMmap
+        - correctly set storage path from config rather than default - karman
+        - clean up temp files after tests
+
+0.05    16 Jan 2008
+        - removed all Module::Build cruft - karman
+
+0.04
+        - patch for Class::C3 compatability - karman
+
+0.03    02 Jul 2007
+        - Add support for Win32 by using Cache::FastMmap::WithWin32 on MS
+          platforms --Ash Berlin
+
+0.02    01 Jan 2006
+        - Workaround Storable/Cache::FastMmap limitation with non reference
+          data
+
+0.01    14 Nov 2005
+        - Initial release.
+

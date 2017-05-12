@@ -1,0 +1,26 @@
+0.06 2015-10-14T07:59:32+02:00
+ - Fix -char parameter description in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.05 2014-08-07T13:12:04+02:00
+ - Add output to examples in doc.
+ - Update Module::Install to 1.10 version.
+
+0.04 2014-05-21T22:46:55+02:00
+ - Fix test dependencies.
+
+0.03 2014-05-21T13:28:03+02:00
+ - Add missing __END__.
+ - Add minimal Perl version.
+ - Add missing LICENSE file.
+ - Rewrite variables to named variables.
+
+0.02 2014-05-21T10:49:04+02:00
+ - Fix dependecies to Curses::UI instead Curses.
+
+0.01 2014-05-20T19:51:56+02:00
+ - First version.

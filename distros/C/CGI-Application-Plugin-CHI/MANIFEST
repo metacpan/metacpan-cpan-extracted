@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/CGI/Application/Plugin/CHI.pm
+t/00-load.t
+t/01-export.t
+t/02-croaks.t
+t/03-cache.t
+t/04-rmcache.t
+t/05-default.t
+t/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/CORBA/Perl.pm
+lib/CORBA/Perl/CdrVisitor.pm
+lib/CORBA/Perl/ClientVisitor.pm
+lib/CORBA/Perl/LiteralVisitor.pm
+lib/CORBA/Perl/NameVisitor.pm
+lib/CORBA/Perl/CORBA.pm
+lib/CORBA/Perl/IOP.pm
+lib/CORBA/Perl/GIOP.pm
+lib/CORBA/Perl/MIOP.pm
+lib/CORBA/Perl/rpc_giop.pm
+bin/idl2pm
+bin/idl2pmrpc
+rpc1/calculator.idl
+rpc1/client.pl
+rpc1/server.pl
+rpc1/srv_calc.pm
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,99 @@
+                          Carp::Datum 0.1
+     Copyright (c) 2002, Dave Hoover
+     Copyright (c) 2000-2001, Christophe Dehaudt & Raphael Manfredi
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+========================================================================
+This module is known to exercise a bug in perl 5.6.0.  Don't use that
+version of perl: use 5.005_03, or try 5.6.1.
+
+If ran under 5.6.0 nonetheless, the t/failmsg_on tests will be skipped.
+========================================================================
+
+       *** This is alpha software -- use at your own risks ***
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Carp::Datum    adpf  Debugging And Tracing Ultimate Module        CDE
+
+========================================================================
+
+This module is the Perl version of a C/C++ library, called DATUM, which
+Christophe Dehaudt & Raphael Manfredi used in many programs since 1996.
+
+Following is the preamble to the DATUM library, written by Raphael in 1998:
+
+--- Begin Exerpt:
+
+A bug in a software system may have multiple causes. It can be the result
+of an oversight, a typo, a misunderstanding, a misuse, etc... Being able
+to identify the presence of a bug, and then nail it down as quickly as
+possible were the reasons of our deciding to create debugging foundations.
+
+During the bug hunting phase, a developer needs to be able to trace
+routine execution around the suspected bug spot, which is a moving target
+usually. Flexibility of the tracing subsystem is therefore mandatory to
+only be able to trace a specific area of the software.
+
+Detecting bugs as early as possible is also recognized as the most
+efficient route to quality, and it is certainly economically justified.
+By following the Design by Contract principle, i.e. by inserting pre- and
+post-conditions to specify the interfaces, one guards against improper
+implementations and also formally documents the original intent of the
+designer. That is also an invaluable aid during maintenance or evolution,
+since it avoids improper use of existing interfaces that could otherwise
+lead to havoc when left undetected.
+
+
+    NOTE: It is a wise practice to develop and test a piece of
+    software with all the assertions turned on (that includes pre- and
+    post-conditions, but also any additional assertion checking within
+    the code), and release it with only pre-conditions enabled. Indeed,
+    software correctness is compromised when any pre-condition is
+    violated.
+
+--- End Exerpt.
+
+Carp::Datum implements the following features:
+
+* Programming by contract: pre-conditions, post-conditions, assertions.
+* Flow control tracing: routine entry, arguments, returned values
+* Dynamic (i.e. runtime) configuration via mini language to tailor
+  debugging and/or tracing at the routine / file / package / type level.
+* Ability to statically remove all assertions and flow control tracing
+  hooks in modules making use of Carp::Datum.
+* Cooperation with Log::Agent for tracing.
+
+In order to do so, the following routines are provided:
+
+	Assertions:   DREQUIRE, DENSURE, DASSERT
+	Flow control: DFEATURE, DVAL, DARY, DVOID
+	Tracing:      DTRACE
+
+A sepcial precondition, VERIFY, is always kept (i.e. never stripped)
+and can be used for checking important conditions, to write:
+
+	VERIFY $pre_condition, "message";
+
+where one would otherwise use a test like:
+
+	logcroak "message" if !$pre_condition;
+
+in regular code.
+
+Over the years, the original authors found DATUM to be a very valuable
+aid in large software, especially in situations where the bug tolerence
+is zero: OS modules, DB access/replication modules.
+
+Send bug reports, hints, tips, suggestions to Dave Hoover at
+<squirrel@cpan.org>.

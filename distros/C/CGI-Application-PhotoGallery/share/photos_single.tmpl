@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><!-- TMPL_VAR name="title" --></title>
+    <style type="text/css">
+body {
+    font-family: Arial, sans-serif;
+    font-size: small;
+    background: #f0f0f0;
+}
+
+.contentwrapper {
+    width: 755px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 {
+    font-size: x-large;
+    background: #555;
+    color: #fff;
+    padding: 5px;
+    margin: 3px;
+}
+
+#header {
+    background: #fff;
+    border: 1px solid #b0b0b0;
+}
+
+h2 {
+    font-size: large;
+    padding: 3px;
+    border-bottom: 1px dotted #b0b0b0;
+}
+
+.title {
+    text-align: right;
+}
+
+#footer {
+    border-top: 1px solid #b0b0b0;
+}
+
+#footer p {
+    text-align: right;
+    font-size: small;
+    font-weight: bold;
+    color: #555;
+    padding: 5px;
+    margin: 3px;
+}
+
+#footer a {
+    text-decoration: none;
+    color: #6f6f6f;
+}
+
+.photo {
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.photo img {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 3px;
+}
+
+.caption {
+    border-top: 1px dotted #b0b0b0;
+    text-align: center;
+    padding-top: 1em;
+}
+
+.nav {
+    background: #fff;
+    padding: 3px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 1em;
+}
+
+.nav ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.nav li {
+    float: left;
+}
+    </style>
+</head>
+<body>
+<div class="contentwrapper">
+    <div id="header">
+        <h1><!-- TMPL_VAR name="title" --></h1>
+    </div>
+    <h2 class="title"><!-- TMPL_VAR name="photo" --></h2>
+</div>
+    <div class="photo">
+    <img src="<!-- TMPL_VAR name="script_name" -->?mode=full&photo=<!-- TMPL_VAR name="photo" ESCAPE="URL" -->" width="<!-- TMPL_VAR name="width" -->" height="<!-- TMPL_VAR name="height" -->" />
+    </div>
+    <!-- TMPL_IF name="caption" -->
+    <p class="caption"><!-- TMPL_VAR name="caption" --></p>
+    <!-- /TMPL_IF -->
+<div class="contentwrapper">
+    <div class="nav">
+    <ul>
+    <!-- TMPL_IF name="prev" -->
+        <li style="width: 32%;"><a href="<!-- TMPL_VAR name="script_name" -->?mode=view&amp;photo=<!-- TMPL_VAR NAME="prev" ESCAPE="URL" -->">Prev</a></li>
+    <!-- TMPL_ELSE -->
+        <li style="width: 32%;">Prev</li>
+    <!-- /TMPL_IF -->
+        <li style="text-align: center; width: 34%; margin-left: 1%; margin-right: 1%;"><a href="<!-- TMPL_VAR name="script_name" -->?dir=<!-- TMPL_VAR NAME="parent" ESCAPE="URL" -->">Back to gallery</a></li>
+    <!-- TMPL_IF name="next" -->
+        <li style="width: 32%; text-align: right;"><a href="<!-- TMPL_VAR name="script_name" -->?mode=view&amp;photo=<!-- TMPL_VAR NAME="next" ESCAPE="URL" -->">Next</a></li>
+    <!-- TMPL_ELSE -->
+        <li style="width: 32%; text-align: right;">Next</li>
+    <!-- /TMPL_IF -->
+    </ul>
+    <div style="clear:both;"></div>
+    </div>
+    <div id="footer">
+        <p>Powered by <a href="http://search.cpan.org/dist/CGI-Application-PhotoGallery/">CGI::Application::PhotoGallery</a></p>
+    </div>
+</div>
+</div>
+</body>
+</html>

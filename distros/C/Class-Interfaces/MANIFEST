@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/Interfaces.pm
+t/10_Class_Interfaces_test.t
+t/pod.t
+t/pod_coverage.t

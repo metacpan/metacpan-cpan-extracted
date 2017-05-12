@@ -1,0 +1,19 @@
+Changes
+lib/CSS/Orientation.pm
+Makefile.PL
+MANIFEST
+README
+script/css-orientation
+t/cssjanus_test.t
+t/FixBackgroundPosition.t
+t/FixBodyDirectionLtrAndRtl.t
+t/FixBorderRadius.t
+t/FixCursorProperties.t
+t/FixFourPartNotation.t
+t/FixLeftAndRight.t
+t/FixLeftAndRightInUrl.t
+t/FixLtrAndRtlInUrl.t
+t/load.t
+t/ReorderBorderRadius.t
+t/ReorderBorderRadiusPart.t
+META.yml                                 Module meta-data (added by MakeMaker)

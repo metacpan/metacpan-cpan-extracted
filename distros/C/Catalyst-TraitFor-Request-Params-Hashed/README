@@ -1,0 +1,92 @@
+NAME
+    Catalyst::TraitFor::Request::Params::Hashed - Access to parameters like
+    "name[index]" as hashes for Catalyst::Request.
+
+VERSION
+    Version is 0.03
+
+SYNOPSIS
+        #
+        # application class
+        #
+        package TestApp;
+
+        use Moose;
+        use namespace::autoclean;
+        use Catalyst qw/ ......... /;
+        extends 'Catalyst';
+        use CatalystX::RoleApplicator;
+    
+        __PACKAGE__->apply_request_class_roles(qw/
+            Catalyst::TraitFor::Request::Params::Hashed
+        /);
+
+        #
+        # controller class
+        #
+        package TestApp::Controller::Test;
+        .........
+            # query string was like
+            # site[name1]=100&site[name1]=150&site[name2]=200
+            my $site = $c->req->hashed_params->{site};
+
+            # $site is hashref:
+            #
+            # $site = {
+            #   name1 => [100, 150],
+            #   name2 => 200,
+            # }
+        .........
+
+DESCRIPTION
+    You can access "hashed_parameters", "hashed_query_parameters",
+    "hashed_body_parameters" to get access to parameters as to hashes. Also
+    you can use "hashes_params", "hashed_query_params" and
+    "hashed_body_params" as shortcuts. Or, if you too lazy, you can use
+    "hparams", "hquery_params" and "hbody_params" :)
+
+    Note, that this trait gives you read-only version of "params",
+    "query_params" and "body_params" respectively. Also note, that any
+    change to any of three above <WILL NOT HAVE> any effect to all of
+    "hashed*params".
+
+METHODS
+  hashed_params
+  hparams
+  hashed_query_params
+  hquery_params
+  hashed_body_params
+  hbody_params
+TODO
+    Write tests.
+
+SEE ALSO
+    Catalyst, Catalyst::Request,
+    "Catalyst::TraitFor::Request::BrowserDetect"
+
+SUPPORT
+    *   Report bugs or feature requests
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-TraitFor-Re
+        quest-Params-Hashed>
+
+        <http://www.assembla.com/spaces/Catalyst-TraitFor-Request-Params-Has
+        hed/tickets>
+
+    *   Git repository
+
+        git clone
+        git://git.assembla.com/Catalyst-TraitFor-Request-Params-Hashed.git
+
+AUTHOR
+    Oleg Kostyuk, "<cub#cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Oleg Kostyuk.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

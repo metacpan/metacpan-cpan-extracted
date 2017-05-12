@@ -1,0 +1,15 @@
+foo:bar baz {
+  bam: true;
+}
+
+foo:bar + baz {
+  bam: true;
+}
+
+foo:bar > baz {
+  bam: true;
+}
+
+foo:bar ~ baz {
+  bam: true;
+}

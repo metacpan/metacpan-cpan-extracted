@@ -1,0 +1,29 @@
+Revision history for Perl module CGI::Application::Plugin::ErrorPage
+
+1.21 Fri Jun 26 20:48:56 EDT 2009
+   No code changes.
+   - Clarify docs on why we ignore tmpl_path() and what you can do about it.
+     (Thanks to Jaldhar Vyas for feedback on this).
+
+1.20 Fri Nov 21 20:46:59 EST 2008
+    - Bug fix: AUTOLOADed error page no longer creates a circular reference. 
+        (RT#41130, Thanks to Bradley Bailey). 
+
+1.12 Sun Jul 15 08:39:43 EDT 2007
+    No code changes.
+    - explain the difference with error_mode()
+
+1.11 Sat Jul 14 07:39:46 EDT 2007
+    No code changes.
+    - Include proper importing example in POD
+    - fix a warning in t/basic.t.
+
+1.10 Tue Jun 26 00:10:20 EDT 2007
+
+    - install a default error page into AUTOLOAD if no AUTOLOAD page is already defined.  
+    - Add escape=HTML to template example
+
+1.00 Sat Jun 23 13:44:01 2007
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

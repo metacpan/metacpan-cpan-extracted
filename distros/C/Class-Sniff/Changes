@@ -1,0 +1,84 @@
+Revision history for Class-Sniff
+
+0.10 2014-06-07
+    - Tidied up the documentation: formatting tweaks, typos, etc.
+    - Fixed RT#72158 (see 0.09_01 below)
+    - Fixed RT#53423 (see 0.09_01 below)
+    - Min perl version set to 5.006
+
+0.09_01 2014-06-04
+    - Applied patch from Father C, which related to a change in 5.16+
+      to do with *{$undef}. RT#72158.
+    - The duplicate methods test in t/code_smells.t was failing due to
+      the hash randomization change in Perl 5.18. The duplicate methods
+      table is now always sorted, to make the output deterministic.
+    - Enforce case-sensitivity with command-line options, so --ignore
+      and -I don't clash if you shorten --ignore to -i. RT#53423
+
+0.09 2011-09-11
+    - Allow multiple paths to @INC (Bruno Vecchi)
+    - Searching for classes in more than one directory (Bruno Vecchi)
+    - Provide --output argument for csniff utility (Bruno Vecchi)
+
+0.08_05 2009-05-23
+    - Perl 5.010000 and greater now make circular inheritance fatal at
+      compile time, so let's skip that check for these Perls.
+
+0.08_04 2009-05-21
+    - Remove test dependency on Sub::Information.  Oops :)
+
+0.08_03 2009-05-20
+    - Add -I switch for csniff utility.
+    - Removed dependency on Sub::Information.  That has a dependency on
+      Data::Dump::Streamer and that module fails its tests for non-US
+      locales.
+
+0.08_02 2009-03-19
+    - Add C<csniff> command-line utility.
+    - Add 'clean' option to constructor to avoid tracking pseudo-packages.
+    - Added C<graph_from_namespace> as everyone seems to want this.
+
+0.08_01 unreleased
+    - Added experimental code to detect "fake" packages.  Ideas offered by
+      Graham Barr, but abused by me.  They're not his fault!
+    - OUCH!  Added the code smell and regression tests to the MANIFEST.
+      Would no wonder all tests are passing on the CPAN :)
+    - Clarified that "long methods" may not really be a code smell at all.
+      Doc changes don't really need to be here, but this is important
+      enough to mention it.
+    - new_from_namespace now can accept a regex, too.
+
+0.08 2009-02-15
+    - Added 'new_from_namespace' method.
+
+0.07 2009-02-15
+    - combine_graphs method added.  Now it's trivial to see inheritance
+      hierarchies.
+    - Allow an instance of an object to be passed to the constructor, not
+      just a class name.
+    - Removed the 'tree' representation. Code is much easier to read as a
+      result.
+
+0.06 2009-02-03
+    - Experimental 'method length' support.
+    - Circular paths are now a fatal error.
+
+0.05 2009-02-02
+    - Added experimental support for tracking duplicate methods.
+    - Started documentation reorganization.
+
+0.04 2009-02-02
+    - Added 'exported' to detect exported 'methods'.
+    - Added "report" method to create a simple, human-readable report.
+    - Added "build_path" fix from Aristotle.
+
+0.03 2009-02-02
+    - Added 'multiple_inheritance' method.
+    - Added support for including the "UNIVERSAL" class.
+
+0.02 2009-02-01
+    - Added documentation.
+    - Made the 'unreachable' return more sane.
+
+0.01 2009-02-01
+    - First version, released on an unsuspecting world.

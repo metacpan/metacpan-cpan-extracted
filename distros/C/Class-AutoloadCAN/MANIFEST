@@ -1,0 +1,8 @@
+Changes
+lib/Class/AutoloadCAN.pm
+MANIFEST
+test.pl
+README
+Build.PL
+Makefile.PL
+META.yml

@@ -1,0 +1,19 @@
+Revision history for Perl extension Cache::Memcached::Fast::Safe
+
+0.05 2015-03-09T14:52:06Z
+
+        - support touch/touch_multi (Thank you spiritloose)
+
+0.04 2013-10-16T04:47:07Z
+
+        - add get_or_set
+
+0.03 2013-08-22T08:17:25Z
+        - [important] fixed connection leak
+        - minil migrate
+
+0.02    Tue Dec 4 12:31:42 2012
+        - fixed test. memcached can't run as root without the -u switch
+
+0.01    Tue Nov 27 15:15:50 2012
+        - original version

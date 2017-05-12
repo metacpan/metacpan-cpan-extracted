@@ -1,0 +1,55 @@
+{
+   "abstract" : "Inject into your CPAN mirror from over here",
+   "author" : [
+      "Christopher Mckay <potatohead@potatolan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Mini-Inject-Remote",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "CPAN::Meta" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Params::Validate" : "0",
+            "Pod::Usage" : "0",
+            "YAML::Any" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Mini::Inject::Remote" : {
+         "file" : "lib/CPAN/Mini/Inject/Remote.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

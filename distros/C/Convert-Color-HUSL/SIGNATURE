@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 9bf357ce900aa9ec168d05d8af3d2775f160e378 Changes
+SHA1 6785834d2f392e6cb092a42f2d9ba59a89fefd4b MANIFEST
+SHA1 e3bd1492fef82bf01d7986cd725ebd33cf900ae9 META.json
+SHA1 aefc3d6c2cdf6158b59445008f3a5c7ec98898ce META.yml
+SHA1 d5869eb1eab4d4b10f886117188ec5940de0ec21 Makefile.PL
+SHA1 e8ddfd939db308bbdf0b9b77300cc4424d2211d9 README
+SHA1 3e1f8a3952b650727ddd2bb0f8dd6aafc1c8ae0e lib/Convert/Color/HUSL.pm
+SHA1 3ec24a8b1dc9d530058ae716bc06c1386c1735d2 lib/Convert/Color/HUSLp.pm
+SHA1 a98be4a58b353cc02bb831a6fc795b8dfb11f066 lib/Convert/Color/LCh.pm
+SHA1 149dbf8c08bbf7619c64dbffe3c632b3ce6b0e85 lib/Convert/Color/LUV.pm
+SHA1 07d6441357f358adb75f82d989b2b949923759ea lib/Convert/Color/XYZ.pm
+SHA1 9266b6e3c6f0d2aa07a95f730f981edffd73f68f t/Convert-Color-HUSL.t
+SHA1 9bab65a54378818fe0f9f28f608606c9f778346f t/accessors.t
+SHA1 c4330ed68e7b3d126cc29c42417a36009c254295 t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+SHA1 30c2b828cd8394eb6ada61dfba765867fadf60cb t/snapshot-rev4.csv
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXG7TyAAoJEMoENb5ewbNixsAP/iO9PFmz9UJ/iRyQLqnpssJ3
+q2CPD/jIC93CaOOT5A9V+eTUdjKD50Mp8zOZuupyUPim2vVvU7OFXw76ytabn1+1
+70OETMJYdV3PRo/EpAHNoQsu6xW89ko4XMn4z7H0U1NcNFC4uYFfxaJHQMl3syuZ
+pob8yURw5W3s4Rcon1LNmrPOztpGe0zzQIFMCe4k/H3eOqUgvBeUWfFewrYrlQ/I
+eNMCth/y4XMu/NvhDhUNNsO4sLMcyfF4bmQ9jcDzkYiLLoHiUB1yqiwApmv7X2aI
+3/xTjGQuJaiRqLLEdEJvvS1CikptZElKXjuIuc2yzjRGRE+1oowYlGCT+qKv9+FY
+5OEiilYq4KLQPW5eNlTrO0gLUYoSTJnD6ip9tGvyeTmkc6zUJSBsm/bYKw0+UWdS
+QQwlRrqCBCDnsExT0fC6hR31APgApJDT7+SmYdth01Xpa+HKgSIbegYlnTQMCS1+
+zHVC3w3PktDYb6yo12HRY7CvrnsgrEQOPFRB8OjSQN7tCCApBk/JcF9zPqbRtvsO
+yc/PAKeR8qm19fr7sGTv1fjkEpAcJ3hcRIIMA+nwEtE1KohpN54xGYUz3eLzFbJc
+gfRykg3+hYSKVtCZvAsL+aiSHK/PVyZJo+OvEhL47UlqJtmY4KCjFM7+gpYNpQgx
+Wq5cC9icKOPPGW7xPdtF
+=JERF
+-----END PGP SIGNATURE-----

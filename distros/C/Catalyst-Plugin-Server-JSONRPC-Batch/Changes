@@ -1,0 +1,9 @@
+Revision history for Catalyst::Plugin::Server::JSONRPC::Batch
+
+0.02
+        - Fixed response body length bug.
+        - Improved documentation.
+
+0.01
+        - Initial public release.
+

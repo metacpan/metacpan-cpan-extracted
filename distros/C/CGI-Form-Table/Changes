@@ -1,0 +1,50 @@
+Revision history for CGI-Form-Table
+
+0.161   2006-11-10
+        some code cleanup
+        packaging improvements
+
+0.16    2005-03-08
+        better test coverage
+        document initial_values argument
+
+0.14    2005-01-17
+        * Happy birthday, Gloria
+        new rows are now added after the current row
+        changed calling of _widget methods
+
+0.12    2004-10-21 13:20
+        made more public interface for customizing output
+        added initial_values to put an existing object into a form
+
+0.09    2004-10-19 19:50
+        fixed stupid javascript bug (didn't escape \ in regexp)
+        (no, really this time)
+        loop over the rows looking for a number of element types
+
+0.09    2004-10-19 19:50
+        fixed stupid javascript bug (didn't escape \ in regexp)
+        javascript seems to work in all major browsers now
+
+0.08    2004-10-19 12:20
+        added column_header attribute (experimental)
+
+0.07    2004-10-18 09:50
+        multiple forms per page now work properly
+        refactor javascript to accept table prefix as param
+        removed ->javascript called from as_html
+        fixed stupid column-count problem
+
+0.05    2004-10-13 13:00
+        fixed the C::F::T synopsis, which would not have worked
+        added column_content attribute for nonstandard columns
+        added experimental input/select generators
+        100% coverage
+
+0.01    2004-10-04 15:45
+        implemented generation of table (ugly)
+
+0.00    2004-10-04 13:55
+        generation unimplemented
+        parsing just dandy
+

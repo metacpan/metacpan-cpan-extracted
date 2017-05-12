@@ -1,0 +1,15 @@
+
+Catalyst::Blinker - show a little X11 blinker while Catalyst is reloading
+
+I'm developing under Catalyst and am using the Catalyst test server that
+is running on my local machine and is relaoding every time I'm saving changes
+to the source tree. This is a cool feature, but I have to wait in front of the
+browser until the application is loaded full and can answer http requests; if I hit
+F5 in the browser before it is up and running I get a failure and have to hit it
+again. I got tired of this and made this little module, that notifies me if it's
+safe or not to operate the app.
+
+The thing is very primitive. While Catalyst app is loading, it blinks yellow. If
+it has loaded ok, it shows green light for a couple of seconds and disappears.
+If there was a failure (syntax failure in my case most of the time), it shows red
+light which doesn't go away until the problem is fixed.

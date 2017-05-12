@@ -1,0 +1,48 @@
+Revision history for Perl extension Config::Framework.
+
+2.5		Mon Oct 20 17:20:49 EDT 2003
+		fixed default address bug in AlertAdmin
+
+2.4		Thu Oct  9 19:04:13 GMT 2003
+		fixed typo bug in Log... now we get an object AND args! ;-)
+		fixed typo bug in Log, causing error string to be reported incorrectly.
+
+2.3		Mon Oct  6 17:25:26 EDT 2003
+		fixed LoadConfig and WriteConfig to search propper paths
+
+2.1		Tue Sep 30 12:05:28 EDT 2003
+		fixed bug with exported methods in Data::DumpXML.
+
+2.0		Mon Sep 29 14:12:28 EDT 2003
+		Major Revision. Updated / Completed Documentation. Still needs comprehensive Test Suite.
+		WARNING: May break dependancies on older versions of Config::Framework.
+		Changes:
+			* Config::Framework::new changed to new Config::Framework
+			* File loading directory precidence (file exists or)
+				1) v_root/config_loc
+				2) FrameworkDir
+				3) user's home directory
+			* FrameworkDir set correctly
+			* WriteConfig handles Encryption transparently
+			* better syntax for exporting variables to shell environment
+			other changes too numerous to mention.
+			read the pod for details.
+			oh yeah, and the pod makes since now.
+
+1.05	Tue, 4/15/03 16:02:16
+		Log method will now die if given the 'Die' option (just liek AlertAdmin)
+		
+1.04	Tue, Mar 18 17:30:00 2003
+		last_resort.log is now written to v_root/var/log, also writes reason sendmail could
+		not be opened
+		
+1.03	Thu Jan 2 14:46:07 2003
+		added WriteConfig
+		
+1.02	New becomes new. **slaps head** ;-)
+
+1.01	Mon Oct 21 12:48:00 2002
+		fixed typo in AlertAdmin
+		
+1.0		Mon Oct 21 11:13:14 2002
+		initial version for release to CPAN under Config::Framework namespace.

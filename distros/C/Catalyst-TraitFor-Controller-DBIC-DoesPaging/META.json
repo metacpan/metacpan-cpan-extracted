@@ -1,0 +1,58 @@
+{
+   "abstract" : "Helps you paginate, search, sort, and more easily using DBIx::Class",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-TraitFor-Controller-DBIC-DoesPaging",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catalyst::Model::DBIC::Schema" : "0.29",
+            "Catalyst::Runtime" : "5.80000",
+            "Catalyst::Test" : "0",
+            "Catalyst::View::JSON" : "0",
+            "DBIx::Class" : "0.08108",
+            "FindBin" : "0",
+            "JSON" : "0",
+            "SQL::Translator" : "0.11002",
+            "Test::Deep" : "0",
+            "Test::More" : "0.88",
+            "Web::Util::DBIC::Paging" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Catalyst-TraitFor-Controller-DBIC-DoesPaging/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frioux/Catalyst-TraitFor-Controller-DBIC-DoesPaging.git",
+         "web" : "http://github.com/frioux/Catalyst-TraitFor-Controller-DBIC-DoesPaging"
+      }
+   },
+   "version" : "1.001003"
+}
+

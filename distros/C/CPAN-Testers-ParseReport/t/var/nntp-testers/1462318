@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>PASS Scriptalicious-1.15 i686-linux-64int-ld 2.6.24-16-generic -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/05.html">Postings from May 2008</a>
+
+<h2>PASS Scriptalicious-1.15 i686-linux-64int-ld 2.6.24-16-generic</h2>
+
+
+
+
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>DAGOLDEN</b><br/>
+<div class="h_name">Date:</div> May 15, 2008 15:20<br/>
+<div class="h_name">Subject:</div> PASS Scriptalicious-1.15 i686-linux-64int-ld 2.6.24-16-generic<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.10.0 patch 33823, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /home/david/perl/5.10.x/bin/perl &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious......ok
+t/02-script............ok
+t/03-yaml..............ok
+t/04-fork..............ok
+t/05-prompt............ok
+t/06-anydump...........ok
+t/07-tsay..............ok
+t/08-unit..............ok
+t/09-noyaml............ok
+All tests successful.
+Files=9, Tests=60,  3 wallclock secs ( 0.04 usr  0.04 sys +  1.36 cusr  1.09 csys =  2.53 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.80
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTHOR_TESTING = 1
+    AUTOMATED_TESTING = 1
+    LANG = en_US.UTF-8
+    LD_LIBRARY_PATH = /home/david/opt/subversion/lib
+    PATH = .:/home/david/bin:/home/david/svk/utility-scripts:/home/david/perl/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+    PERL5LIB = 
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 6629
+    PERL5_CPAN_IS_RUNNING = 6629
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 2781,6629
+    PERL_CR_SMOKER_CURRENT = Scriptalicious-1.15
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /bin/bash
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/david/perl/5.10.x/bin/perl
+    $UID/$EUID = 1000 / 1000
+    $GID = 1000 4 20 24 25 29 30 44 46 107 115 116 1000
+    $EGID = 1000 4 20 24 25 29 30 44 46 107 115 116 1000
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.23     
+    ExtUtils::Command   1.13     
+    ExtUtils::Install   1.50_01  
+    ExtUtils::MakeMaker 6.44     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.19_01  
+    File::Spec          3.2701   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       3.10     
+    Test::More          0.80     
+    YAML                0.66     
+    YAML::Syck          1.04     
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0 patch 33823) configuration:
+  Platform:
+    osname=linux, osvers=2.6.24-16-generic, archname=i686-linux-64int-ld
+    uname='linux griffon 2.6.24-16-generic #1 smp thu apr 10 13:23:42 utc 2008 i686 gnulinux '
+    config_args='-de -Uversiononly -Dusedevel -Dusemorebits -Dprefix=/home/david/perl/5.10.x -Dmydomain=.hyperbolic.net -Dcf_email=dagolden@cpan.org -Dperladmin=dagolden@cpan.org -Dcc=gcc'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=define, use64bitall=undef, uselongdouble=define
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='gcc', ccflags ='-fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='4.2.3 (Ubuntu 4.2.3-2ubuntu7)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long long', ivsize=8, nvtype='long double', nvsize=12, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='gcc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lnsl -ldl -lm -lcrypt -lutil -lc
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=/lib/libc-2.7.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.7'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -O2 -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  
+    <li><b>
+      PASS Scriptalicious-1.15 i686-linux-64int-ld 2.6.24-16-generic</b>
+      by DAGOLDEN</li> 
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

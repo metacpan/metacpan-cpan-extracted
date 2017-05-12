@@ -1,0 +1,134 @@
+From tomcat-user-return-131938-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Thu Aug 25 21:22:13 2005
+Return-Path: <tomcat-user-return-131938-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 85219 invoked from network); 25 Aug 2005 21:22:13 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 25 Aug 2005 21:22:13 -0000
+Received: (qmail 42982 invoked by uid 500); 25 Aug 2005 21:21:53 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 42962 invoked by uid 500); 25 Aug 2005 21:21:53 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 42949 invoked by uid 99); 25 Aug 2005 21:21:53 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 25 Aug 2005 14:21:53 -0700
+X-ASF-Spam-Status: No, hits=4.2 required=10.0
+        tests=DNS_FROM_RFC_ABUSE,FORGED_YAHOO_RCVD,MIME_MISSING_BOUNDARY,MISSING_DATE,MISSING_MIMEOLE,NO_REAL_NAME,PRIORITY_NO_NAME
+X-Spam-Check-By: apache.org
+Received-SPF: neutral (asf.osuosl.org: local policy)
+Received: from [209.194.72.195] (HELO localhost) (209.194.72.195)
+    by apache.org (qpsmtpd/0.29) with SMTP; Thu, 25 Aug 2005 14:22:07 -0700
+FROM: support@yahoo.com
+TO: tomcat-user@jakarta.apache.org
+SUBJECT:Re: Yahoo!
+MIME-Version: 1.0
+X-Priotity: 3
+X-MSMail-Priority: Normal
+Content-Type: multipart/mixed; boundary="--------looool--"
+X-Virus-Checked: Checked by ClamAV on apache.org
+Message-Id: <20050825212210.5B4C310FB2B5@asf.osuosl.org>
+Date: Thu, 25 Aug 2005 14:22:10 -0700 (PDT)
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+----------looool--
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Try this.
+
+From tomcat-user-return-131939-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Thu Aug 25 21:29:53 2005
+Return-Path: <tomcat-user-return-131939-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 87613 invoked from network); 25 Aug 2005 21:29:53 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 25 Aug 2005 21:29:53 -0000
+Received: (qmail 54508 invoked by uid 500); 25 Aug 2005 21:29:39 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 54495 invoked by uid 500); 25 Aug 2005 21:29:38 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 54482 invoked by uid 99); 25 Aug 2005 21:29:38 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 25 Aug 2005 14:29:38 -0700
+X-ASF-Spam-Status: No, hits=0.0 required=10.0
+        tests=
+X-Spam-Check-By: apache.org
+Received-SPF: neutral (asf.osuosl.org: local policy)
+Received: from [195.92.195.173] (HELO cmailg3.svr.pol.co.uk) (195.92.195.173)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Thu, 25 Aug 2005 14:29:55 -0700
+Received: from user-6291.l3.c4.dsl.pol.co.uk ([81.79.216.147] helo=[127.0.0.1])
+        by cmailg3.svr.pol.co.uk with esmtp (Exim 4.41)
+        id 1E8PHz-0000W9-Qz
+        for tomcat-user@jakarta.apache.org; Thu, 25 Aug 2005 22:29:35 +0100
+Message-ID: <430E383E.1070107@apache.org>
+Date: Thu, 25 Aug 2005 22:29:34 +0100
+From: Mark Thomas <markt@apache.org>
+User-Agent: Mozilla Thunderbird 1.0.6 (Windows/20050716)
+X-Accept-Language: en-us, en
+MIME-Version: 1.0
+To: Tomcat Users List <tomcat-user@jakarta.apache.org>
+Subject: Re: Single copy of Tomcat shared amongst multiple users
+References: <430E1B40.4010100@mindspring.com>
+In-Reply-To: <430E1B40.4010100@mindspring.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+Franklin Phan wrote:
+> In RUNNING.txt, a paragraph says:
+>
+> "In many circumstances, it is desirable to have a single copy of a Tomcat 4
+> binary distribution shared among multiple users on the same server.  To
+> make
+> this possible, you must configure a CATALINA_BASE environment variable (in
+> addition to CATALINA_HOME as described above) that points to a directory
+> that is unique to your instance."
+>
+> I'm not understanding this.  I've been thinking about having multiple
+> installs of Tomcat 4 on the same server.  I'm now wondering whether what
+> RUNNING.txt suggests can take the place of having multiple installs.
+> But I'm not understanding how just setting a CATALINA_BASE env var can
+> achieve this.  I can only set one CATALINA_BASE env var, right?  What if
+> there are four ...um...not instances, but...users who each want their
+> own Tomcat to work with?  How is it possible to have four CATALINA_BASE
+> environment variables?
+
+You need to read the rest of the text below the paragraph you quoted.
+In summary,
+
+There is one CATALINA_HOME which all users use for the the following
+directories:
+/bin
+/common
+/server
+
+Each user sets their own CATALINA_BASE that points to their own copy
+of the following directories:
+/conf
+/logs
+/shared
+/webapps
+/work
+/temp
+
+Mark
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+
+

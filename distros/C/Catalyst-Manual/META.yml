@@ -1,0 +1,26 @@
+---
+abstract: "The Catalyst developer's manual"
+author:
+  - 'Catalyst Contributors, see Catalyst.pm'
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Manual
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Manual.git
+version: '5.9009'

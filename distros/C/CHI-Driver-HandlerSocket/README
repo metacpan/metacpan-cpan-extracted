@@ -1,0 +1,101 @@
+
+NAME
+       CHI::Driver::HandlerSocket - Use DBI for cache storage, but access it
+       using the Net::HandlerSocket API for MySQL
+
+SYNOPSIS
+        use CHI;
+
+        # Supply a DBI handle
+        #
+        my $cache = CHI->new( driver => 'HandlerSocket', dbh => DBI->connect(...) );
+
+        # or a DBIx::Connector
+        my $cache = CHI->new( driver => 'HandlerSocket', dbh => DBIx::Connector->new(...) );
+
+        # or code that generates a DBI handle
+        #
+        my $cache = CHI->new( driver => 'HandlerSocket', dbh => sub { ...; return $dbh } );
+
+DESCRIPTION
+       This driver uses a MySQL database table to store the cache.  It
+       accesses it by way of the Net::HandlerSocket API and associated MySQL
+       plug-in:
+
+       http://yoshinorimatsunobu.blogspot.com/2010/10/using-mysql-as-nosql-story-for.html
+       <http://yoshinorimatsunobu.blogspot.com/2010/10/using-mysql-as-nosql-
+       story-for.html>
+
+       https://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL
+       <https://github.com/ahiguti/HandlerSocket-Plugin-for-MySQL>
+
+       Why cache things in a database?  Isn't the database what people are
+       trying to avoid with caches?
+
+       This is often true, but a simple primary key lookup is extremely fast
+       in MySQL and HandlerSocket absolutely screams, avoiding most of the
+       locking that normally happens and completing as many updates/queries as
+       it can at once under the same lock.  Avoiding parsing SQL is also a
+       huge performance boost.
+
+ATTRIBUTES
+       host
+       read_port
+       write_port
+           Host and port the MySQL server with the SocketHandler plugin is
+           running on.  The connection is TCP.  Two connections are used, one
+           for reading, one for writing, following the design of
+           Net::HandlerSocket.  The write port locks the table even for reads,
+           reportedly.  Default is "localhost", 9998, and 9999.
+
+       namespace
+           The namespace you pass in will be appended to the "table_prefix"
+           and used as a table name.  That means that if you don't specify a
+           namespace or table_prefix the cache will be stored in a table
+           called "chi_Default".
+
+       table_prefix
+           This is the prefix that is used when building a table name.  If you
+           want to just use the namespace as a literal table name, set this to
+           undef.  Defaults to "chi_".
+
+       dbh The DBI handle used to communicate with the db.
+
+           You may pass this handle in one of three forms:
+
+           o   a regular DBI handle
+
+           o   a DBIx::Connector object
+
+           o   a code reference that will be called each time and is expected
+               to return a DBI handle, e.g.
+
+                   sub { My::Rose::DB->new->dbh }
+
+           The last two options are valuable if your CHI object is going to
+           live for enough time that a single DBI handle might time out, etc.
+
+Authors
+       CHI::Driver::HandlerSocket by Scott Walters (scott@slowass.net) for
+       Plain Black Corp, <http://plainblack.com>.  CHI::Driver::HandlerSocket
+       is based on CHI::Driver::DBI.
+
+       CHI::Driver::DBI Authors:  Original version by Justin DeVuyst and
+       Perrin Harkins. Currently maintained by Jonathan Swartz.
+
+COPYRIGHT & LICENSE
+       Copyright (c) Plain Black Corp 2011 Copyright (c) Scott Walters
+       (scrottie) 2011 Copyright (c) Justin DeVuyst
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+POD ERRORS
+       Hey! The above document had some coding errors, which are explained
+       below:
+
+       Around line 108:
+           You forgot a '=back' before '=head1'
+
+
+

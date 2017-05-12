@@ -1,0 +1,14 @@
+Revision history for perl module Coro::Localize
+
+0.1.2     2012-07-09
+
+- Support for Syntax::Feature if it's installed
+- One more dependency
+
+0.1.1     2012-07-08
+
+- Fix dependency list
+
+0.1.0     2012-07-08
+
+- Initial release.

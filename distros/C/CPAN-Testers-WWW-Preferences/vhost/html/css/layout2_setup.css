@@ -1,0 +1,100 @@
+/*************************************************************/
+/*   Design:   Multiflex-3 Update-7 / Layout-2               */
+/*   File:     Global layout structure                       */
+/*-----------------------------------------------------------*/
+/*   Author:   Wolfgang                                      */
+/*   Date:     January 15, 2007                              */
+/*   Homepage: wwww.1-2-3-4.info                             */
+/*-----------------------------------------------------------*/
+/*   License:  Fully open source without restrictions.       */
+/*             Please keep footer credits with a link to     */
+/*             Wolfgang (www.1-2-3-4.info). Thank you!       */
+/*************************************************************/
+
+/************/
+/*  GLOBAL  */
+/************/
+
+/* NON-HEADER */
+*{padding:0; margin:0;}
+ body {font-size:10pt; background-color:rgb(255,255,255); font-family:verdana,arial,sans-serif;} /*Font-size: 1.0em = 10px when browser default size is 16px*/
+.page-container {width:900px; margin:0px auto; margin-top:10px; margin-bottom:10px; border:solid 1px rgb(150,150,150); font-size:0.9em;}
+.main {clear:both; width:900px; padding-bottom:30px; background:transparent url(/images/layout/bg_main_withnav.jpg) top left repeat-y;}
+.main-navigation {display:inline /*Fix IE floating margin bug*/; float:left; width:200px; overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+.main-content {display:inline; /*Fix IE floating margin bug*/; float:left; width:640px; margin:0 0 0 30px; overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+.footer {clear:both; width:900px; padding:1.0em 0 1.0em 0; background:rgb(225,225,225) url(/images/layout/bg_foot.jpg) no-repeat; font-size:0.9em; overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+
+/* --- For alternative headers START PASTE here --- */
+
+/* HEADER */
+.header {width:900px; font-family:"trebuchet ms",arial,sans-serif;}
+.header-top {width:900px; height:80px; background:rgb(240,240,240) url(/images/layout/bg_head_top.jpg); overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+.header-middle {width:900px; height:150px; background:#00ee00 url(/images/layout/banner-prefs.png); overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+.header-bottom {width:900px; height:40px; background:rgb(255,255,255) url(/images/layout/bg_head_breadcrumbs.jpg) repeat-y;}
+.header-breadcrumbs {clear:both; width:900px; padding:1.0em 0 1.5em 0; background:rgb(255,255,255) url(/images/layout/bg_head_breadcrumbs.jpg) repeat-y;}
+
+/********************/
+/*  HEADER SECTION  */
+/********************/
+.sitelogo {width:60px; height:40px; position:absolute; z-index:1; margin:22px 0 0 20px; background:url(/images/layout/bg_head_top_logo.jpg); }
+.sitename {width:600px; height:45px; position:absolute; z-index:1; margin:20px 0 0 160px; overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}
+.sitename h1 {font-size:220%;}
+.sitename h2 {margin:0px 0 0 0; color:white; font-size:110%;}
+.sitename h3 {margin:0px 0 0 0; color:#00ee00; font-size:110%;}
+.sitename a {text-decoration:none; color:#00ee00;}
+.sitename a:hover {text-decoration:none; color:yellow;}
+
+.header-breadcrumbs ul {float:left; width:560px; list-style:none; padding:0 0 0 15px; font-family:verdana,arial,sans-serif;}
+.header-breadcrumbs ul li {display:inline; padding:0 0 0 10px; background:transparent url(/images/layout/bg_bullet_arrow.gif) no-repeat 0 50%; font-weight:bold; color:rgb(125,125,125); font-size:90%;}
+.header-breadcrumbs ul a {color:rgb(70,122,167); text-decoration:none;}
+.header-breadcrumbs ul a:hover {color:rgb(42,90,138); text-decoration:underline;}
+
+.header-breadcrumbs .searchform {float:right; width:285px; padding:0 17px 0px 0px !important /*Non-IE6*/; padding:0 12px 0px 0px /*IE6*/;}
+.header-breadcrumbs .searchform form fieldset {float:right; border:none;}
+.header-breadcrumbs .searchform input.field {width:10.0em; padding:0.2em 0 0.2em 0; border:1px solid rgb(200,200,200); font-family:verdana,arial,sans-serif; font-size:120%; }
+.header-breadcrumbs .searchform input.button {width:3.0em; padding:1px !important /*Non-IE6*/; padding:0 /*IE6*/; background:rgb(230,230,230); border:solid 1px rgb(150,150,150); text-align:center; font-family:verdana,arial,sans-serif; color:rgb(150,150,150); font-size:120%;}
+.header-breadcrumbs .searchform input.button:hover {cursor:pointer; border:solid 1px rgb(80,80,80); background:rgb(220,220,220); color:rgb(80,80,80);}
+
+/* --- For alternative headers END PASTE here --- */
+
+/******************/
+/*  MAIN SECTION  */
+/******************/
+
+/* MAIN NAVIGATION */
+.main-navigation .round-border-topright {width:10px; height:10px; position:absolute; z-index:10; margin:0 0 0 190px; background:url(/images/layout/bg_corner_topright.gif) no-repeat;}
+
+/* MAIN CONTENT */
+.column1-unit {width:640px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/;}
+.column2-unit-left {float:left; width:300px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/;}
+.column2-unit-right {float:right; width:300px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/;}
+.column3-unit-left {float:left; width:186px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/}
+.column3-unit-middle {float:left; width:186px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/; margin-left:40px;}
+.column3-unit-right {float:right; width:186px; margin-bottom:10px !important /*Non-IE6*/; margin-bottom:5px /*IE6*/;}
+
+/********************/
+/*  FOOTER SECTION  */
+/********************/
+.footer p {line-height:1.3em; text-align:center; color:rgb(125,125,125); font-weight:bold; font-size:7pt; margin-bottom:5px;}
+.footer p.credits {font-weight:normal;}
+.footer a {text-decoration:underline; color:rgb(125,125,125);}
+.footer a:hover {text-decoration:none; color:rgb(0,0,0);}
+.footer a:visited {color:rgb(0,0,0);}
+
+/******************/
+/*  CLEAR FLOATS  */
+/******************/
+.page-container:after, .header:after, .header-breadcrumbs:after, .main:after, .main-navigation:after, .main-content:after {content:"."; display:block; height:0; clear:both; visibility:hidden;}
+.column1-unit:after, .column2-unit-left:after, .column2-unit-right:after, .column3-unit-left:after, .column3-unit-middle:after, .column3-unit-right:after {content:"."; display:block; height:0; clear:both; visibility:hidden;}
+.footer:after, p:after {content:"."; display:block; height:0; clear:both; visibility:hidden;}
+.clear-contentunit {clear:both; width:640px; height:0.1em; border:none; background:rgb(210,210,210); color:rgb(210,210,210);}
+
+/********************************/
+/*  PRINTING and MISCELLANEOUS  */
+/********************************/
+@media print {.header-top {width:900px; height:80px; background:rgb(240,240,240); overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}}
+@media print {.header-breadcrumbs {width:900px; background:transparent;}}
+@media print {.nav2 {float:left; width:900px; border:none; background:rgb(240,240,240); color:rgb(75,75,75); font-size:1.0em; font-size:130%;}} /*Color navigation bar normal mode*/
+@media print {.main {clear:both; width:900px; padding-bottom:30px; background:transparent;}}
+@media print {.main-navigation {display:inline /*Fix IE floating margin bug*/; float:left; width:199px; border-right:solid 1px rgb(200,200,200); border-bottom:solid 1px rgb(200,200,200); background-color:rgb(240,240,240); overflow:visible !important /*Firefox*/; overflow:hidden /*IE*/;}}
+@media print {.footer {clear:both; width:900px; height:3.7em; padding:1.1em 0 0; background:rgb(240,240,240); font-size:1.0em; overflow:visible !important /*Firefox*/; overflow:hidden /*IE6*/;}}

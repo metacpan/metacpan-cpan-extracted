@@ -1,0 +1,171 @@
+=head1 NAME
+
+CPAN::CachingProxy - A very simple lightweight CGI based Caching Proxy
+
+=head1 SYNOPSIS
+
+    use strict;
+    use CPAN::CachingProxy;
+    use CGI;
+    use CGI::Carp qw(fatalsToBrowser);
+
+    my $cache = CPAN::CachingProxy->new(mirrors=>['http://www.perl.com/CPAN/bug']);
+       $cache->run;
+
+=head1 new() arguments
+
+The new function takes quite a few arguments in the usual hash-like manor.  Here
+is an example:
+
+  while( my $cgi = new CGI::Fast ) { CGI::Carp->import('fatalsToBrowser');
+      my $cache =
+          CPAN::CachingProxy->new(
+              mirrors   => ['http://www.perl.com/CPAN/bug'],
+              key_space => "MyCache1", # increment to reset cache
+              cgi       => $cgi,
+              agent     => "MyProxy/0.1 (Hurray!!)",
+          );
+
+      $cache->run;
+  )
+
+=head2 mirrors [required]
+
+The only required argument is C<mirrors>.  It must be an arrayref of mirrors.
+CCP will choose randomly among them.  WARNING: The author has had problems
+choosing randomly between several mirrors -- they don't always have the same
+files!  It is therefore recommended to choose one favorite.
+
+Please do not use the mirror listed in the examples.  Pick one near you.
+
+ wget -qO - http://www.cpan.org/MIRRORED.BY | grep dst_http | less
+
+=head2 cgi
+
+CCP will choose a default CGI.pm if you don't specify one.  The main reason to
+choose another is to use FastCGI, something fancier, something of your own
+devising.
+
+=head2 cache_object
+
+By default, CCP will use Cache::File as the caching mechanism.  You may choose
+anything you like.  There are many other choices.  CCP will expect whichever
+module you choose to act exactly like Cache::File (including the C<handle()>
+method, which you will not find in many of the Cache modules).
+
+=head3 cache_root
+
+If you choose the default cache object (and only if CCP generates it), this
+option indicates the directory in which you wish to store the cache.  By
+default, it will choose: /tmp/ccp/
+
+=head3 debug
+
+You might find odd little problems with this module.  If you do, it might be
+helpful to turn on debugging and view your webserver error log.
+
+=head3 default_expire
+
+This sets the max age of the cache entries.  The value is passed to the C<set()>
+and C<handle()> calls as the expiry argument.  See L<Cache::Entry> for further
+information.  This value defaults to C<"2 day">.
+
+=head3 index_expire
+
+If the path info matches the C<{index_regexp}> regular expression, instead of using
+C<default_expire>, the value C<index_expire> will be used for the expiry
+argument to C<set()> and C<handle()>.
+
+It makes sense to cache the CPAN indexes for a shorter amount of time.
+Therefore, this value defaults to only C<"3 hour">.
+
+=head3 index_regexp
+
+A path is considered an index if it matches this regular expression.  The
+default follows.
+
+    qr/(?:03modlist\.data|02packages\.details\.txt|01mailrc\.txt)/;
+
+=head3 error_expire
+
+The amount of time to cache the result when an error is encountered.  The
+default is C<"15 minutes">.
+
+=head3 key_space
+
+CCP uses the root keyspace "CK" and stores cache entries under the name
+"CK:$path_info".  If you're using your cache for other things and this somehow
+clashes, you can override the root namespace with this argument.
+
+You can also use this to reset the cache.  On most unix-like platforms, the
+directory with the cache in it will be webserver writable, but not necessarily
+writable by you.  If you increment or change the key_space, it'll have the
+effect of resetting the cache.  The older entries will expire out on their own
+and so you can forget about them.
+
+=head2 ua
+
+The default user agent is L<LWP::UserAgent>.  You may choose an alternate if you
+like.  A likely candidate would be L<LWP::ParanoidAgent>.  It is technically
+possible to hijack a proxy of this type to pull locations inside your private
+networks.  It is somewhat unlikely in B<this> module since it prepends your
+selected mirror to all the URLs it processes.  But it's still technically
+possible.
+
+=head3 agent
+
+If you choose to use the default agent and let CCP generate the object, this
+option will set the user agent string to something other than the default:
+ 
+    CCP/$VERSION (Paul's CPAN caching proxy / perlmonks-id=16186)
+
+=head3 activity_timeout
+
+If you chose to use the default agent and let CCP generate the object, this
+option will set the C<$ua->timeout()> (see L<LWP::UserAgent> for details).  It
+defaults to 12 seconds and will not set the C<$ua->timeout()> at all if given an
+undefined value.
+
+=head3 ignore_last_modified
+
+Normally, CCP will attempt to check the Last-Modified HTTP header.  If the
+header differs between cache and server, CCP will force a cache miss.  CCP will
+not compare the Last-Modified header if it is not given by the server.
+
+Nevertheless, this could conceivably cause problems for some people, although
+the diagnosis would be somewhat tricky.  Use this option to disable the check
+altogether.
+
+=head3 url_lockfile_dir
+
+There are various things that go wrong with the main program flow if programs
+give up quickly and come back for another bite at the apple right away.  If this
+happens with a large file or impatient user, then they'll receive a truncated
+file on their second request and ... well, that's a bug.
+
+The solution (temporary?) is to lock the URL until the initial download is
+complete or some error occurs.
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know.
+
+I normally hang out on #perl on freenode, so you can try to get immediate
+gratification there if you like.  L<irc://irc.freenode.net/perl>
+
+I also respond to rt.cpan.org very quickly.
+
+=head1 COPYRIGHT
+
+Copyright © 2012 Paul Miller
+
+=head1 LICENSE
+
+Perl Artistic — see Perl's License.
+
+=head1 SEE ALSO
+
+perl(1), L<Cache>, L<Cache::File>, L<Cache::Entry>, L<LWP::UserAgent>, L<CGI>, L<CGI::Carp>

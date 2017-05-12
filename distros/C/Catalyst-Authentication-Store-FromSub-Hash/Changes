@@ -1,0 +1,29 @@
+Revision history for Catalyst-Authentication-Store-FromSub-Hash
+
+0.09    10/21/2008  11:41
+        configurable id column
+
+0.08    10/03/2008 13:58
+        avoid test breaks
+
+0.07    10/02/2008 13:58
+        add eval use DBI to t/*.t to avoid test breaks
+
+0.06    12/29/2007 21:48
+        change from_session to hit model_class sub auth every request
+
+0.05    12/21/2007 6:21
+        L<Catalyst::Plugin::Authorization::Roles> support
+
+0.04    12/20/2007 9:14
+        add require 'DBI' or skip in t/*.t
+
+0.03    12/11/2007 16:17
+        add require 'Catalyst::Plugin::Session::State::Cookie' or skip in t/*.t
+
+0.02    12/8/2007 18:30
+        add require 'require Catalyst::Model::DBIC::Schema' or skip in t/*.t
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

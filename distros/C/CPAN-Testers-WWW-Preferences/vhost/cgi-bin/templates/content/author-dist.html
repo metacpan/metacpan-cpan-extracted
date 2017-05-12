@@ -1,0 +1,146 @@
+[% 
+    title = "Distribution Notification Filters" ;
+
+    crumb3_name = 'Author' ;
+    crumb3_href = '/';
+    crumb2_name = 'Distributions' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=author-distros';
+    crumb1_name = data.dist ;
+%]
+
+<p>The following settings are used as the specific preferences for the 
+'[% data.dist %]' distribution. If you wish to find out more about a particular 
+entry, hover over the question mark, '?', to open a tooltip.</p>
+
+[% IF data.ignored == 1 OR data.ignored == 2 %]
+<p class="alert">Note: These settings are currently disabled, please select the 
+appropriate Report Type to re-enable these filter settings.</p>
+[% END %]
+
+[% IF thanks %]
+<p class="alert">Preferences saved successfully</p>
+[% END %]
+
+[% IF errmess == 1 %]
+<p class="alert">Sorry, there seems to have been a problem saving your 
+preferences. Please check the values you have selected and try again.</p>
+[% END %]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act"    value="author-distsave" />
+<input type="hidden" name="dist"   value="[% data.dist %]" />
+<input type="hidden" name="active" value="3" />
+
+<table width="100%">
+<tr><th>Filters</th>
+	<th>Current Setting</th>
+	<th>Change Setting</th>
+	</tr>
+<tr><td>Active <a href="#" class="tooltip">?<span>The "Active" setting allows you to disable reporting for this specific
+distribution. Internal default is for all distributions to be enabled.</span></a></td>
+	<td>[% IF data.ignored == 1 OR data.ignored == 2 %]Disabled
+	    [% ELSE                                      %]Enabled
+		  [% END %]</td>
+	<td><input type="checkbox" name="ignored" value="2" [% IF data.ignored == 1 OR data.ignored == 2 %]checked="checked"[% END %] onchange="toggle(this.checked)" /> Disable Notifications</td>
+	</tr>
+<tr><td>Report Type <a href="#" class="tooltip">?<span>The "Report Type" setting identifies whether you want to disable notifications
+by default (i.e. ignoring distributions for which you do not have a specific set of preference settings), or set to one of the current
+notifications available. Individual reports are not available currently, but are planned for the future. Note that for the Weekly Summary,
+you can either choose a specific day, or choose the default, which is typically a Saturday, but may be optimised to run at times when
+server loads are lower.</span></a></td>
+	<td>[%    IF data.report == 1  %]Daily Summary
+	    [% ELSIF data.report == 2  %]Weekly Summary (Default)
+	    [% ELSIF data.report == 3  %]Individual Reports
+	    [% ELSIF data.report == 4  %]Monthly Summary
+	    [% ELSIF data.report == 5  %]Weekly Summary (Sunday)
+	    [% ELSIF data.report == 6  %]Weekly Summary (Monday)
+	    [% ELSIF data.report == 7  %]Weekly Summary (Tuesday)
+	    [% ELSIF data.report == 8  %]Weekly Summary (Wednesday)
+	    [% ELSIF data.report == 9  %]Weekly Summary (Thursday)
+	    [% ELSIF data.report == 10 %]Weekly Summary (Friday)
+	    [% ELSIF data.report == 11 %]Weekly Summary (Saturday)
+	    [% ELSE                    %]author default
+		[% END %]</td>
+	<td><input type="radio" name="report" value="3"  [% IF data.report == 3  %]checked="checked"[% END %] /> Individual Reports<br />
+		<input type="radio" name="report" value="1"  [% IF data.report == 1  %]checked="checked"[% END %] /> Daily Summary<br />
+<!--		<input type="radio" name="report" value="2"  [% IF data.report == 2  %]checked="checked"[% END %] /> Weekly Summary (Default)<br />-->
+		<input type="radio" name="report" value="5"  [% IF data.report == 5  %]checked="checked"[% END %] /> Weekly Summary (Sun)<br />
+		<input type="radio" name="report" value="6"  [% IF data.report == 6  %]checked="checked"[% END %] /> Weekly Summary (Mon)<br />
+		<input type="radio" name="report" value="7"  [% IF data.report == 7  %]checked="checked"[% END %] /> Weekly Summary (Tue)<br />
+		<input type="radio" name="report" value="8"  [% IF data.report == 8  %]checked="checked"[% END %] /> Weekly Summary (Wed)<br />
+		<input type="radio" name="report" value="9"  [% IF data.report == 9  %]checked="checked"[% END %] /> Weekly Summary (Thu)<br />
+		<input type="radio" name="report" value="10" [% IF data.report == 10 %]checked="checked"[% END %] /> Weekly Summary (Fri)<br />
+		<input type="radio" name="report" value="11" [% IF data.report == 11 %]checked="checked"[% END %] /> Weekly Summary (Sat)<br />
+		<input type="radio" name="report" value="4"  [% IF data.report == 4  %]checked="checked"[% END %] /> Monthly Summary<br />
+	</td>
+	</tr>
+<tr><td>Grade <a href="#" class="tooltip">?<span>The "Grade" filter allows you to decide whether you wish to receive no reports 
+at all, or only those of a particular grade. The internal default is only allow FAIL reports.</span></a></td>
+	<td>[% IF data.grade; data.grade; ELSE %]author default[% END %]</td>
+	<td><input type="checkbox" name="grade" value="PASS"    [% IF data.grade.match('PASS')    %]checked="checked"[% END %] /> PASS<br />
+		<input type="checkbox" name="grade" value="FAIL"    [% IF data.grade.match('FAIL')    %]checked="checked"[% END %] /> FAIL<br />
+		<input type="checkbox" name="grade" value="NA"      [% IF data.grade.match('NA')      %]checked="checked"[% END %] /> NA<br />
+		<input type="checkbox" name="grade" value="UNKNOWN" [% IF data.grade.match('UNKNOWN') %]checked="checked"[% END %] /> UNKNOWN
+	</td>
+	</tr>
+<tr><td>Tuple <a href="#" class="tooltip">?<span>The "Tuple" filter enables you to be alerted only on the first instance of a 
+distribution report for the same Distribution version, Perl version and Operating System, or see all instances. The internal
+default is only allow the FIRST instance.</span></a></td>
+	<td>[% IF data.tuple; data.tuple; ELSE %]author default[% END %]</td>
+	<td><input type="radio" name="tuple" value="ALL"    [% IF data.tuple == 'ALL'    %]checked="checked"[% END %] /> ALL<br />
+		<input type="radio" name="tuple" value="FIRST"  [% IF data.tuple == 'FIRST'  %]checked="checked"[% END %] /> FIRST
+	</td>
+	</tr>
+<tr><td>Distribution Versions <a href="#" class="tooltip">?<span>The "Distribution Versions" filter is used to determine whether 
+you wish to receive reports for all versions of a given distribution, or just the latest. The internal default is to only send 
+for the LATEST version of a distribution.</span></a></td>
+	<td>[% IF data.version; data.version; ELSE %]author default[% END; disable=1 %]</td>
+	<td><input type="radio" name="version" value="ALL"    [% IF data.version.match('ALL')   ; disable=1 %]checked="checked"[% END %] onchange="document.forms[0].versions.disabled=this.checked" /> ALL<br />
+		<input type="radio" name="version" value="LATEST" [% IF data.version.match('LATEST'); disable=1 %]checked="checked"[% END %] onchange="document.forms[0].versions.disabled=this.checked" /> LATEST<br />
+		<input type="radio" name="version" value="NOT"    [% IF data.version.match('NOT')   ; disable=0 %]checked="checked"[% END %] onchange="document.forms[0].versions.disabled=!this.checked" /> Exclude selected<br />
+		<input type="radio" name="version" value="INC"    [% IF data.version.match('INC')   ; disable=0 %]checked="checked"[% END %] onchange="document.forms[0].versions.disabled=!this.checked" /> Only selected<br />
+		[% select = data.ddversions; multiple = 5; INCLUDE "content/dropdown-list.html" %]
+		</td>
+	</tr>
+<tr><td>Perl Versions <a href="#" class="tooltip">?<span>The "Perl Versions" filter allows you to decide which versions of Perl 
+you are interested in. You may exclude or include specific Perl versions, or select ALL. The internet default is to select ALL. 
+In addition you may wish to ignore patched versions of perl, or include them.</span></a></td>
+	<td>[% IF data.perl; data.perl; ELSE %]author default[% END; disable=1 %]</td>
+	<td><input type="radio" name="perl" value="ALL" [% IF data.perl.match('ALL'); disable=1 %]checked="checked"[% END %] onchange="document.forms[0].perls.disabled=this.checked" /> ALL<br />
+		<input type="radio" name="perl" value="NOT" [% IF data.perl.match('NOT'); disable=0 %]checked="checked"[% END %] onchange="document.forms[0].perls.disabled=!this.checked" /> Exclude selected<br />
+		<input type="radio" name="perl" value="INC" [% IF data.perl.match('INC'); disable=0 %]checked="checked"[% END %] onchange="document.forms[0].perls.disabled=!this.checked" /> Only selected<br />
+		[% select = data.ddperl; multiple = 5; INCLUDE "content/dropdown-list.html" %]<br />
+		<input type="checkbox" name="patches" value="1" [% IF data.patches == 1 %]checked="checked"[% END %] /> Include patched perls</td>
+	</tr>
+<tr><td>Platforms <a href="#" class="tooltip">?<span>The "Platforms" filter allows you to decide which Operating Systems you are 
+interested in. You may exclude or include specific Operating Systems, or select ALL. The internet default is to select ALL.</span></a></td>
+	<td>[% IF data.platform; data.platform; ELSE %]author default[% END; disable=1 %]</td>
+	<td><input type="radio" name="platform" value="ALL" [% IF data.platform.match('ALL'); disable=1 %]checked="checked"[% END %] onchange="document.forms[0].platforms.disabled=this.checked" /> ALL<br />
+		<input type="radio" name="platform" value="NOT" [% IF data.platform.match('NOT'); disable=0 %]checked="checked"[% END %] onchange="document.forms[0].platforms.disabled=!this.checked" /> Exclude selected<br />
+		<input type="radio" name="platform" value="INC" [% IF data.platform.match('INC'); disable=0 %]checked="checked"[% END %] onchange="document.forms[0].platforms.disabled=!this.checked" /> Only selected<br />
+		[% select = data.ddarch; multiple = 5; INCLUDE "content/dropdown-list.html" %]
+		</td>
+	</tr>
+</table>
+
+<p class="smalltext">
+<input type="submit" value='Save' />
+[% IF data.grade %]
+<a href="[% cgipath %]/pages.cgi?act=author-delete&amp;dist=[% data.dist %]"><input type="button" value='Default Settings' /></a>
+[% END %]
+</p>
+</form>
+
+[% IF NOT data.report %]
+
+<h2>Warning</h2>
+<p class="alert">Saving preferences, where author defaults are in effect, 
+without setting any form values, will automatically apply system defaults.</p>
+
+[% ELSE %]
+
+<h2>Notes</h2>
+<p>Click the "Default Settings" to remove the specific settings for this 
+distribution and use your author default preferences.</p>
+
+[% END %]

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# For debugging only :
+# PERL5LIB=blib/lib \
+exec cpan2dist --format=CPANPLUS::Dist::Gentoo    \
+               --dist-opts manifest=yes           \
+               --skiptest --verbose --buildprereq \
+               $@

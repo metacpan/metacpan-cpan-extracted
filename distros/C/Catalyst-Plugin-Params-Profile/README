@@ -1,0 +1,154 @@
+NAME
+    Catalyst::Plugin::Params::Profile - Parameter checking with
+    Params::Profile
+
+SYNOPSIS
+        package MyAPP;
+        use Catalyst qw/Params::Profile/;
+
+        # In a controller
+        MyAPP->register_profile(
+                        'method'    => 'subroto',
+                        'profile'   => {
+                                    testkey1 => { required => 1 },
+                                    testkey2 => {
+                                            required => 1,
+                                            allow => qr/^\d+$/,
+                                        },
+                                    testkey3 => {
+                                            allow => qr/^\w+$/,
+                                        },
+                                    },
+                    );
+
+        sub subroto : Private {
+            my (%params) = @_;
+
+            return unlesss $c->validate('params' => \%params);
+            ### OR
+            my %opts = $c->check_params or return;
+
+            ### DO SOME STUFF HERE ...
+
+            my $profile = $c->get_profile('method' => 'subroto');
+        }
+
+
+        ### Multiple Profile
+        MyAPP->register_profile(
+                        'method'    => 'subalso',
+                        'profile'   => [
+                                        'subroto',
+                                        {
+                                        testkey4 => { required => 1 },
+                                        testkey5 => {
+                                                required => 1,
+                                                allow => qr/^\d+$/,
+                                            },
+                                        testkey6 => {
+                                                allow => qr/^\w+$/,
+                                            },
+                                        },
+                                    ],
+                    );
+
+
+        sub subalso : Local {
+            my (%params) = @_;
+
+            ### Checks parameters agains profile of subroto and above registered
+            ### profile
+            return unlesss $c->validate('params' => \%params);
+
+            ### DO SOME STUFF HERE ...
+        }
+
+DESCRIPTION
+    Catalyst::Plugin::Params::Profile provides a mechanism for a centralised
+    Params::Check or a Data::FormValidater profile. You can bind a profile
+    to a class::subroutine, then, when you are in a subroutine you can
+    simply call $c->check($params) of $c->validate($params) to validate
+    against this profile.
+
+    For more information read the manual of "Params::Profile" , the methods
+    below are just an interface on it.
+
+Public Methods
+    See "Params::Profile" for more information about the specific methods,
+    the onse listed below are the most important.
+
+    $c->register_profile('method' => $METHOD, 'profile' => \%PROFILE);
+    $c->get_profile('method' => $METHOD);
+    $c->validate('params' => \%PARAMS);
+    $c->check('params' => \%PARAMS);
+
+  $c->check_params;
+    Checks $c->req->params against the profile of the calling sub. It
+    returns a HASHREF containing validate parameters, or undef on failure.
+    It will also log to Catalyst::Log about what happened.
+
+    Extra options to this sub are:
+
+    params OPTIONAL
+        Validate against params instead of $c->req->params
+
+    profile OPTIONAL
+        Validate against profile instead of profile of calling sub
+
+    allow_unknown OPTIONAL
+        Pass the unknown parameters to the return HREF rather than filtering
+        them out.
+
+    dv OPTIONAL
+        Instead of returning a hashref containing validated params, return
+        the Data::FormValidator::Results object.
+
+        NOTE: Only tested with Data::FormValidator yet!!
+
+XMLRPC
+    This module also registers a method name called "system.methodHelp" into
+    the Server::XMLRPC plugin when it is loaded. This method will try to
+    explain in plaintext the arguments for the subroutine by parsing the
+    given profile.
+
+    Example output when system.methodHelp is called with one argument
+    containing the name of the method you'd like to be explained:
+
+        Required arguments are:
+         * customer_id
+         * username
+         * product
+
+        Optional arguments are:
+         * roaming
+         * card_type
+
+    NOTE: This currently only works for Data::FormValidator profiles.
+
+AUTHOR
+    Michiel Ootjers <michiel@cpan.org>.
+
+    and
+
+    Jos Boumans <kane@cpan.org>.
+
+TODO
+    profile explanation
+        Fix the profile explanation to explain profiles other than
+        "Data::FormValidator"
+
+BUG REPORTS
+    Please submit all bugs regarding "Catalyst::Plugin::Params::Profile" to
+    "bug-catalyst-plugin-params-profile@rt.cpan.org"
+
+SOURCE
+    Please send your improvements as pull request via bitbucket.org to
+    "https://bitbucket.org/michielootjers/catalyst-plugin-params-profile"
+
+COPYRIGHT
+    This module is copyright (c) 2002-2013 Michiel Ootjers
+    <michiel@cpan.org>. All rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+

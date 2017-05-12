@@ -1,0 +1,4 @@
+- MOST IMPORTANT: Document everything and every detail
+- Do refactoring on naming the packages, don't known to what, yet.
+- Move MyApp::Role::Verification to package, or remove the neddle for calling ->execute on result(set)s
+- Ability to use other methods name (removing moose around and making routes configurable)

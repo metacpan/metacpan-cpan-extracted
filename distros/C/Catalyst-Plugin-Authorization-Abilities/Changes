@@ -1,0 +1,19 @@
+Revision history for Catalyst::Plugin::Authorization::Abilities
+
+v0.31.0   2012-09-06 22:02:41 Asia/Jerusalem
+	- Added a complete test suite (courtesy Dabg)
+
+v0.30.0   2011-03-27 22:43:31 Asia/Jerusalem
+	- Added support for recursive role inheritance
+	- Restructured module and its documentation
+	- Repackaged with Dist::Zilla
+	- Made documentation clearer, especially regarding recursive roles
+
+0.02	2009-05-04 21:00:00
+	- Added the ability to check if that a user belongs to specific roles with c->check_user_roles.
+	- Added the ability to assign roles into roles (see README).
+	- Fixed minor errors in the documentation.
+	- Added relationships for MyApp::Schema::Roles that I forgot to write in the documentation.
+
+0.01	2009-04-20 20:20:00
+	- Initial release.

@@ -1,0 +1,27 @@
+NAME
+    Catalyst::Plugin::Upload::MD5 - Compute MD5 message digest of uploads
+
+SYNOPSIS
+        use Catalyst qw[Upload::MD5];
+    
+        if ( my $upload = $c->request->upload('field') ) {
+            print $upload->md5sum;
+        }
+
+DESCRIPTION
+    Extends "Catalyst::Request::Upload" with a MD5 message digest method.
+
+METHODS
+    md5sum
+        Returns an MD5 message digest of upload in hexadecimal form.
+
+SEE ALSO
+    Digest::MD5, Catalyst::Request, Catalyst::Request::Upload.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

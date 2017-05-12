@@ -1,0 +1,83 @@
+NAME
+    Catalyst::Plugin::Session::Store::MongoDB - MongoDB session store for
+    Catalyst
+
+SYNOPSIS
+    In your MyApp.pm:
+
+      use Catalyst qw/
+        Session
+        Session::Store::MongoDB
+        Session::State::Cookie # or similar
+      /;
+
+    and in your MyApp.conf:
+
+      <Plugin::Session>
+        <client_options>             # if empty, lets MongoDB::MongoClient
+          host mongodb://foo:27017   #   use its own defaults
+          timeout 10000              # if unspecified, defaults to
+          ...                        #   { host => hostname, port => port }
+        </client_options>            #   for compatibility with previous versions
+        dbname test                  # defaults to catalyst
+        collectionname s2            # defaults to session
+      </Plugin::Session>
+
+    Then you can use it as usual:
+
+      $c->session->{foo} = 'bar'; # will be saved
+
+DESCRIPTION
+    "Catalyst::Plugin::Session::Store::MongoDB" is a session storage plugin
+    using MongoDB (<http://www.mongodb.org>) as its backend.
+
+CONFIGURATION
+    client_options
+        Options passed to MongoDB::MongoClient->new(). If a reference to an
+        empty hash is provided, lets MongoDB::MongoClient use its own
+        defaults.
+
+        If left unspecified, defaults to the following for compatibility
+        with previous versions of this module:
+
+          {
+            host => $self->hostname,
+            port => $self->port
+          }
+
+    dbname
+        Name of the database in which to store session data. Defaults to
+        catalyst.
+
+    collectioname
+        Name of the collection in which to store session data. Defaults to
+        session.
+
+    hostname, port
+        Deprecated: use client_options instead. Default to localhost and
+        27017, when used as default for an unspecified client_options for
+        compatibility with previous versions of this module.
+
+USAGE
+    See Catalyst::Plugin::Session and Catalyst::Plugin::Session::Store.
+
+    Expired Sessions
+        When getting session data, this store automatically deletes the
+        session if it has expired. Additionally this store implements the
+        optional delete_expired_sessions() method.
+
+AUTHORS
+    Ronald J Kimball, <rjk@tamias.net>
+
+    Stefan Völkel, <bd@bc-bd.org> <http://bc-bd.org>
+
+    Cory G Watson, <gphat at cpan.org>
+
+LICENSE
+    Copyright 2010 Stefan Völkel <bd@bc-bd.org>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License v2 or (at your option)
+    any later version, as published by the Free Software Foundation; or the
+    Artistic License.
+

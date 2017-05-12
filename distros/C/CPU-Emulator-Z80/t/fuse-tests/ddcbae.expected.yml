@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcbae
+registers:
+  AF: 24442
+  AF_: 0
+  BC: 39968
+  BC_: 0
+  DE: 61459
+  DE_: 0
+  HL: 50359
+  HL_: 0
+  I: 0
+  IX: 45830
+  IY: 5597
+  PC: 4
+  R: 2
+  SP: 0

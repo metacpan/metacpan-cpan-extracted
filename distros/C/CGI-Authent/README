@@ -1,0 +1,25 @@
+CGI::Authent - request a HTTP authentification under specified conditions
+version 0.2.1
+ by Jenda@Krynicky.cz
+ http://Jenda.Krynicky.cz
+
+Send the HTTP 401 UnAuthentified header if a condition (by default
+"defined $ENV{REMOTE_USER}") fails. Since your script doesn't get the
+password the user entered, you cannot use it as the only
+authentification scheme. And it was not intended to work like this. You
+have to find some other way to check the username/password pair.
+
+It was written primarily to overcome a bug in MS IIS/3.0.
+IIS usualy sends a HTTP 401 response if it finds out that it cannot
+access a file using the current users premissions
+(IUSR_... or the login/password you entered),
+but since IIS doesn't check the permissions to the script before launching
+perl, you get an error message.
+
+You may check if $ENV{REMOTE_USER} holds anything, if the user belongs to a group,
+if the script can open a file etc. etc. etc.
+
+Copyright (c) 1997-1999 Jan Krynicky <Jenda@Krynicky.cz>. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

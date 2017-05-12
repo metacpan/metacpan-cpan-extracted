@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Curses::UI::POE;
+use File::Spec;
+use File::Temp qw ( :POSIX );
+
+my $debug = 0;
+my $fh = tmpfile();
+open STDERR, ">&$fh";
+ 
+if (@ARGV and $ARGV[0] eq '-d') {
+    $debug = 1;
+}
+
+my $cui = new Curses::UI::POE (
+    -clear_on_exit => 0,
+    -debug         => $debug,
+);
+
+
+
+my $filename;
+foreach my $mod (keys %INC) {
+	$filename  = $INC{$mod} if ($mod =~ /UI\.pm/);
+}
+
+$filename =~ s/\.pm//gi;
+$filename = File::Spec->catfile($filename, "Language");
+
+opendir DIR, "$filename" or die "Couldn't open language dir $filename: $!\n";
+my @entries = grep /\.pm$/, sort readdir(DIR);
+map s/\.pm$//, @entries;
+
+$cui->dialog( "This demo will present all languages of Curses::UI::POE to you\n" .
+	      join "\n", @entries);
+
+foreach my $entry (@entries) {
+	my $lang = new Curses::UI::Language("$entry");
+
+	$cui->lang($lang);
+
+	$cui->dialog("\u$entry");
+
+	$cui->savefilebrowser();
+}

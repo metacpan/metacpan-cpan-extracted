@@ -1,0 +1,161 @@
+=head1 NAME
+
+CGI::Bus::file - file object
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->file(-name=>'t.txt', -mode=>'rwc')->store('aa','bb');
+
+=head1 DESCRIPTION
+
+
+This module is a file object encapsulating L<IO::File|IO/File> object.
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 SLOTS
+
+=over
+
+
+=item -iofile
+
+L<IO::File|IO/File> object
+
+
+=item -lock
+
+Current file lock, 0 or undef is used when unlocked
+
+
+=item -mode
+
+File access mode, default is 'r'
+
+
+=item -name
+
+File name
+
+
+=item -perm
+
+File permissions when to be created, default is 0666
+
+
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+
+=item AUTOLOAD
+
+'O_XXX' L<Fcntl|Fcntl> call or 
+'LOCK_XX' L<Fcntl|Fcntl> call
+or L<IO::File|IO/File> method call
+
+
+=item close -> self object
+
+Close file opened
+
+
+=item dump ( data ) -> self object
+
+=item dump -> data dump loaded
+
+=item dumpload -> data dump loaded
+
+=item dumpstore ( data ) -> self object
+
+Store and load data structure to or from file using 
+C<store>, C<load>, 
+L<CGI::Bus::dumpout|CGI/Bus>, L<CGI::Bus::dumpin|CGI/Bus>.
+C<seek>s to the beginning of the file before read or write.
+
+
+=item iofile ( ?file open args ) -> IO:File object
+
+Returns internal L<IO::File|IO/File> object.
+Create it if not exists or if arguments present to open file.
+See C<open> for arguments.
+
+
+=item load ( ?-asb, ?sub ) -> data loaded
+
+Reads file into memory as array or list ('-a'), text scalar ('-s'),
+binary scalar ('-b'). 
+Default, '-a' or '-b', is determined with L<wantarray|perlfunc/wantarray>.
+Locks file with 'LOCK_SH' if there is no shared or exclusive lock,
+lock remains after operation.
+C<seek>s to the beginning of the file before read.
+
+If sub is defined, it is evaluated for each row read into local $_, 
+and with '-a' option results of each evaluation are returned as a list, 
+true is returned otherwise.
+
+
+=item lock ( lock mode ) -> self object
+
+=item lock -> current lock mode
+
+Locks or unlocks file, or returns current lock.
+Lock mode may be L<Fcntl|Fcntl> 'LOCK_SH', 'LOCK_EX', 'LOCK_UN',
+or strings 'sh', 'ex', 'un' or '0'.
+0 means unlocked file.
+
+
+=item open ( filename, ?mode, ?perm ) -> self object
+
+Open file.
+Default mode is 'r', 
+mode may be L<Fcntl|Fcntl> constants like 'O_RDONLY',
+'fopen' mode signs 'r', 'w', 'a', 'r+', 'a+',
+mode strings 'rw' for O_RDWR and 'rwc' for O_RDWR|O_CREAT.
+Default permission is 0666.
+
+
+=item seek ( position, ?whence ) -> self object
+
+Filehandle positioning.
+Default positioning method is 0 - 'SEEK_SET'.
+
+
+=item store ( ?-b, data to store ) -> self object
+
+Writes given data into file. 
+Locks file with 'LOCK_EX' if there is no exclusive lock,
+lock remains after operation.
+Does not C<seek>s, call C<seek> before C<store> call.
+Option '-b' chooses binary mode and
+binary write. 
+Without '-b', each element of data list is printed with trailing "\n" added.
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+=head2 22/12/2001 - 23/12/2001
+
+Implemented and Documented.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

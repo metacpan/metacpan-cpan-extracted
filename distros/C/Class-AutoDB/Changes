@@ -1,0 +1,273 @@
+Revision history for Class-AutoDB
+
+ACTIVE MAINTENANCE and DEVELOPMENT ENDED!
+       While debugging 1.28 on Cantrell's machine, the compile of our patched
+       version of Data::Dumper generated 'deprecated' messages.
+       To continue work on this package, we will need to redo the Dumper patch.
+       Too much work for too little gain.
+
+1.291	2013-12-18
+	Corrected a small problem in dependencies
+
+1.29	2013-12-18
+	Changes to tests only
+        FAILs seen by David Cantrell on 1.28 caused by running of multiple test
+	instances in parallel. All tests were using same database and trampling
+	on each other. Solution is to create unique database for each test run. 
+	There may also be cases where tester cannot create new databases. For
+	such cases, tests use preexisting 'test' database.
+	BUT...
+	While developing these changes, the only two CPAN testers that were
+	previously able to run the test suite (Slaven Rezić and David Cantrell)
+	no longer can do so.  
+	- For Cantrell, the issue I think is that the new version of DBD::mysql
+	  (4.025) is FAILing its tests, and Cantrell's tester also tries to
+	  install the latest version of dependencies.
+	- For Rezić, I have no clue.
+
+1.28	2013-10-28
+	Fixed problems with manifest introduced in 1.27. Added dependency for
+	Test::CheckManifest
+	Unable to reproduce FAILs seen by David Cantrell.
+	Changes to tests
+	- streamlined manifest test
+	- made the socket test more cautious when connecting to a private MySQL
+	  instance. Tries to connect as user, then as root, then gives up 
+	- some tests were connecting to MySQL using undef as the user instead of
+	  $ENV{USER}. These are usually equivalent but may not be if the 
+	  DBI_USER environment variable is set
+
+1.27	2013-10-05
+	Bug fixes
+	- connect was using the wrong property name when setting 'socket' in
+	  dsn. was using 'sock'; should be 'mysql_socket'
+	Updated depdendencies
+	Changes to tests
+	 - regression test for socket bug
+	 - updated 002.pod to strip development sub-version number
+	 - imported 003.manifest from Babel
+         - fixed boilerplate & pod tests
+	 - added 000.reqs test to check existence of MySQL database, adapted 
+	   from Babel
+         - removed Developer tests from distro. Haven't been tested in a while!
+
+1.26	2012-11-29
+	Changes to tests
+	- fixed the change made in 1.25.  $^V, the variable containing Perl's
+	  version, works differently in different versions. in perls > 5.10 it
+	  returns a regular string, while in earlier versions it returns a 
+	  v-string. naturally, the code to handle these cases is different...
+
+1.25	2012-11-28
+	Changes to tests
+	- tests of DOES method now check for Perl version >= 5.10.1, since that
+	  is when DOES was added to UNIVERSAL. thanks to the CPAN smoke testers
+	  for finding this problem! 
+
+1.24	2012-10-28
+	Added test for version number in POD
+	Removed redundant 'dist_version_from' param from Build.PL
+	Bug fixes
+	- when invoking a UNIVERSAL method (isa, can, DOES, VERSION) on Oid or
+	  OidDelelted, the method was not redispatched to the real class
+
+1.23    2012-08-02
+	Changed code and tests to correct deprecated use of qw(...) as parentheses
+	Changes to Build.PL
+	- added Module::Build to configure_requires
+        - added dist_version_from
+
+1.22	2011-01-07
+	Bug fixes
+	- when 'using' a class at runtime, schema changes were not happening;
+	  the common failure case was a class loaded at runtime that defines
+	  a collection
+	Changes to Build.PL
+	- added explicit test for DBD::mysql based on code in Data::Babel's
+	  Build.PL and removed from prereqs. it doesn't work to put in prereqs
+	  because if not present, install tries to install 'DBD' which does not 
+	  exist
+	Changes to tests
+	- declare.030.pct_autodb.t was not setting 'create' flag in call to
+	  'new'. longstanding bug that remained undetected because previous
+	  tests left the database in a state that didn't bother it
+
+1.21	2011-01-05
+	Bug fixes;
+	- when deleting objects whose classes were not yet 'used', the deletes 
+	  were not being applied to the objects' collections; this was because
+	  the class-to-collection information was set in the registry
+
+1.20	2010-09-20
+        New features
+	- 'del' method to delete objects
+        - queries ('get', 'find', 'count') with no arguments retrieve/count all
+	  objects. makes it possible to retrieve objects without defining
+	  collections
+	- raw SQL can be used in queries ('get', 'find', 'count')
+        Bug fixes
+	- drop views everywhere that we drop tables, so views will not get in
+	  way when we create tables. (arises because DROP TABLE only drops 
+	  tables, not views)
+	Many small cleanups in code and tests
+
+1.19_02 2010-09-17
+ 	Bug fixes
+	- added 'numify' to overloads in Oid and OidDeleted. arises because
+	  Perls >= 5.10 use stringify to autogenerate numify
+	  (Thanks to CPAN testers for finding this!)
+	- found a few more places where I drop tables and now have to also
+	  drop views
+	Changes to tests
+	- added code to emit MySQL version in 000.code_exists test
+	- check MySQL version in 150.dropview test and skip if version too
+	  old to support views
+	- added tests for overloaded numify
+
+1.11	2010-03-08
+	Changes to build and test process only.
+	Changes to Build.PL:
+	- added DBD, DBI::mysql, plus some others to configure_requires. thanks 
+	  to CPAN testers for finding this problem
+	Changes in tests:
+	- more screwing around with MySQL's max_allowed_packet variable. this
+	  limits the size of the biggest object that can be stored. I have come
+	  to learn that setting this variable has no effect, even though the
+	  MySQL documentation claims that it is a session variable. recent
+	  versions of the docs correct this misconception...
+
+1.10	2010-03-01
+	Brings CPAN version up-to-date with version used internally at ISB
+        New features:
+        - 'put' method added to AutoDB (in Class::AutoDB::Database) to store
+           specific objects. this is a step towards cleaning up namespace of
+           user-objects
+        - 'oid' method added to AutoDB. this is a step towards cleaning up 
+          namespace of user-objects
+	- %AUTODB=0 works
+	- %AUTODB with HASH form of keys: type defaults to string, as it does
+	  with all other forms
+	- 'port' and 'timeout' added to connection parameters
+	Cleanup:
+	- connection management (connect, reconnect, etc) made consistent
+	- 'renew' made consistent with 'new'
+        Bug fixes:
+	- in perl 5.10, '==' comparison in AutoDB::put was forcing stringify when
+	  applied to Oids. fixed by moving '==' after check for Oid.
+        - 'exists' (in Class::AutoDB::Database) now checks for empty
+          _AutoDB table; this may address common problem where AutoDB
+          appears to exists, but registry does not exist
+	- fixed ambiguity of ‘get’ (AutoClass::get was masking AutoDB::get)
+	  by changing order of base classes; this is short term workaround --
+          really need to clean up AutoClass namespace!
+	- 'store' (in Class::AutoDB::Serialize) was using wrong regex when
+	  processing transients: /$key/ insead of /^$key$/. This caused keys to 
+	  be ignored if they matched any substring of a transient. 
+	  Scary this wasn't caught earlier!!
+	- 'count' was throwing exception when count was 0. Scary this wasn't
+	  caught earlier!!
+        - 'put' was storing undef in base table when value of key was 0. Does
+	  not impact the actual objects returned by 'get' (since objects stored
+	  in _AutoDB), but breaks queries selecting on 0. Scary this wasn't
+	  caught earlier!!
+	- queries on lists with duplicate values were returning duplicate
+	  objects
+	- queries with multiple terms addressing the same list key were ignoring
+	  all but one of the terms
+	- queries with multiple terms addressing the same scalar key now
+	  detected as illegal
+	- objects with incorrectly typed search keys now behave predictably
+	- queries with undef values now do 'IS NULL'
+        - keys declared with abbreviated types were not always being seen as
+	  equivalent (eg, 'int' vs. 'integer'
+	- programmatic definition of collections now works
+	Changes to Build process
+	- added Tie::ToObject to prereqs
+	- changes to Build.PL for better handling of MySQL dependency. not sure 
+	  either of these are necessary or even help...
+	- added DBD::mysql to prereqs
+	- put DBI->connect inside eval to catch error when DBD::mysql not
+	  installed
+	- removed Dumper.o from distro tarball
+	Bug fixes in tests:
+	- changed 'note' to 'diag' in several tests to get more information
+	  from testers
+	- fixed simple coding error in autodb.122.bad_freeze.t ('dbh' to '$dbh')
+        - return aggregate in t::Build::run_tap_harness (overrides method from
+	  Module::Build) as new versions of Module::Build require this
+	- in autodb.010.putget.t, now invoke perl via full (secure) path rather
+	  than just 'perl'
+	- in graph.020 tests, skip tests unless max_allowed_packet big enough
+	  (long term solution added to release 1.20 plan)
+	- in bad_freeze tests, skip tests unless max_allowed_packet big enough
+	  (long term solution added to release 1.20 plan)
+
+0.1     06-01-04
+	- in Oid, added code to 'use' classes when object is fetched
+          if not already 'used'. caution: this only works if people
+          follow the Perl convention of placing module Foo in file
+          Foo.pm.  Else, there's no easy way to translate a classname
+          into a string that can be 'used'
+	- in Oid, added overload for stringification and a few related
+          op. stringify fetches object, so serialized objects will
+          work as expected when used as hash key
+	- in Object, added overload declaration for objects after
+          they've been fetched.  don't know why this is needed, but it
+          didn't work without it
+	- in Serialize, made -transients work
+	- changed syntax of %AUTODB declaration to allow multiple
+          collections to be specified with different keys. backwards
+          compatible. affects code in Collection, Oid, Registration,
+          Registry, RegistryVersion
+
+0.092	05-10-25
+          data source might be wrong (evil and silent bug)
+	- added SQL limit capability to AutoDB, users can now pass a
+          _limit_ => n, where n=max number of rows to fetch, in find
+          args
+
+0.091   05-06-08
+	- Added option to turn off automatic indexing
+	The following defects have been addressed (see also bug tracker at 
+        www.sf.net project: isbiology):
+	  1216645 added "pass" synonym per feature request
+
+0.09  2004/20/10
+	- optimized patch courtesy of Jenda of perl monks
+	- find now handles multiple collections in query
+
+0.08  Wed Sep  1 14:09:29 PDT 2004
+	The following defects have been addressed (see also bug tracker at 
+        www.sf.net project: isbiology):
+         1016244 no persistence on (enclosed) test
+         1016246 reformat of list sorage
+         1019348 not all objects stored
+         1016242 create flag not working for registry
+         1016238 _registry_is_saved error
+         1017046 not all objects stored
+
+0.07  Tue Aug 17 10:52:27 PDT 2004
+	- require 5.8.2 added for perl version, manifest rebuilt to include patch files 
+
+0.06  Mon Aug 16 14:24:43 PDT 2004
+	- major refactor of persistence handling. store() method added to store 
+          objects explicitly (implicit storage still occurs when an object is 
+          destroyed. Implicitly destroyed objects will not overwrite explicitly 
+          destroyed ones). Mosts tests have been re-written and new ones have been 
+          added to test this storage handling.
+	
+0.05  17 May 2004
+	- refactor of reconstitution code
+	
+0.04  Mon Feb 23 11:15:53 PST 2004
+	- refactored tests so that tests that need a DB connection skip if DB 
+          connection is not negotiated
+
+0.03  Thu Feb 19 09:46:40 PST 2004
+	- refactored: database connection is now made at runtime
+
+0.02  Tues Jan 06 17:01:12 PST 2004
+	- some code cleanup, documentation changes 
+
+0.01  Mon Dec 22 17:28:49 PST 2003
+	- original version. 

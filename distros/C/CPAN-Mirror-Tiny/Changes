@@ -1,0 +1,28 @@
+Revision history for CPAN-Mirror-Tiny
+
+0.12  2017-03-19 14:27:29 JST
+  - Follow latest WorePAN; fix warning 'Argument "..." isn't numeric in numeric eq (==)'
+  - Show size in `cpan-mirror-tiny list`
+
+0.11  2016-12-31 16:47:17 JST
+  - Add inject_cpan method
+  - Improve document
+
+0.10  2016-11-04 01:56:27 JST
+  - Add command line interface cpan-mirror-tiny
+
+0.05  2016-07-30 00:26:24 JST
+  - Fix indexing issue; copy _update_packages from WorePAN (#3 by maxhq, #4)
+
+0.04  2016-07-23 19:51:24 JST
+  - Now metadata for dists are cached; this makes creating index significantly fast
+  - Incompatible change: Now dists from git repositories contains version in their names
+
+0.03  2016-07-23 09:54:50 JST
+  - $cpan->inject($local_tarball) accidentally used to remove $local_tarball; now fixed
+
+0.02  2016-06-22 15:46:22 EDT
+  - packages should be sorted case insensitively in 02packages
+
+0.01  2016-02-12 01:06:45 JST
+  - Initial release

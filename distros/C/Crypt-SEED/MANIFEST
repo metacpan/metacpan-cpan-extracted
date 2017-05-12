@@ -1,0 +1,20 @@
+Changes			- Revision history for Perl extension Crypt::SEED.
+Makefile.PL
+MANIFEST		- This file.
+README			- Yes, you should.
+SEED.pm			- Perl module.
+SEED.xs			- Interface from Perl to C
+test.pl			- Test script.
+filetest.pl		- Extra test script.
+
+SEED_KISA.c		- The main engine of this module to encrypt/decrypt things.
+			  KISA(Korea Information Security Agency) provided.
+SEED_KISA.h		- Declarations.
+SEED_KISA.tab		- Also a 'include' file provided by KISA
+SEED_test_KISA.c	- Simple testing program by KISA. Ignore it.
+SEED_VERIFY.txt		- Encryption results from make_test_set.c,
+			  which would be used by test.pl for verification.
+test_vector.txt		- Ignore it.
+make_test_set.c		- Utility to make SEED_VERIFY.txt file.
+			  Link with SEED_KISA.o to build.
+

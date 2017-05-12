@@ -1,0 +1,61 @@
+From gluu-ubuntu-users@m.gmane.org Tue Jun 14 14:16:39 2005
+Received: from main.gmane.org ([80.91.229.2] helo=ciao.gmane.org)
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1DiGtr-0002jp-EF
+        for ubuntu-users@lists.ubuntu.com; Tue, 14 Jun 2005 14:16:39 -0500
+Received: from root by ciao.gmane.org with local (Exim 4.43)
+        id 1DiGo7-0007Hd-3w
+        for ubuntu-users@lists.ubuntu.com; Tue, 14 Jun 2005 21:10:43 +0200
+Received: from 66.250.73.16 ([66.250.73.16])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <ubuntu-users@lists.ubuntu.com>; Tue, 14 Jun 2005 21:10:43 +0200
+Received: from russblau by 66.250.73.16 with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <ubuntu-users@lists.ubuntu.com>; Tue, 14 Jun 2005 21:10:43 +0200
+X-Injected-Via-Gmane: http://gmane.org/
+To: ubuntu-users@lists.ubuntu.com
+From: "Russell Blau" <russblau@hotmail.com>
+Date: Tue, 14 Jun 2005 10:29:08 -0400
+Lines: 20
+Message-ID: <d8mpan$80g$1@sea.gmane.org>
+X-Complaints-To: usenet@sea.gmane.org
+X-Gmane-NNTP-Posting-Host: 66.250.73.16
+X-MSMail-Priority: Normal
+X-Newsreader: Microsoft Outlook Express 6.00.2800.1437
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2800.1441
+Sender: news <news@sea.gmane.org>
+Subject: Help with new monitor
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: Russell Blau <russblau@hotmail.com>,
+        Ubuntu Help and User Discussions <ubuntu-users@lists.ubuntu.com>
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Tue, 14 Jun 2005 19:16:39 -0000
+
+I have Ubuntu (Hoary) installed on an Intel 486DX2 box.  I have two
+computers (the Ubuntu box and a Windows box) sharing a keyboard, mouse, and
+monitor using a KVM switch.
+
+This weekend I installed a new LCD monitor.  It works fine with the Windows
+box.  When I switch to Ubuntu I see the boot process just fine (in text
+mode), but then when Gnome kicks in for the login screen the monitor goes
+blank and I see "Cannot display current graphics mode."  So, the only way I
+can get into Ubuntu now is by SSH'ing to it from another machine.
+
+Here's the question -- somewhere on my system there is probably a file that
+tells Gnome what the default graphics mode should be.  How do I find and
+change that file to put in some plain-vanilla graphics mode that my new
+monitor should be able to handle?
+
+Thanks in advance.
+
+Russ Blau

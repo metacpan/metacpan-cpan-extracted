@@ -1,0 +1,22 @@
+---
+name: Catalyst-Plugin-Continuation
+version: 0.01
+author:
+  - |-
+    Sebastian Riedel, C<sri@oook.de>
+    Yuval Kogman, C<nothingmuch@woobling.org>
+abstract: Catalyst Continuation Plugin
+license: perl
+requires:
+  Catalyst: 5.691
+  Catalyst::Plugin::Session: 0
+  Data::Visitor: 0.05
+  Moose: 0.05
+  Test::WWW::Mechanize: 0
+provides:
+  Catalyst::Continuation:
+    file: lib/Catalyst/Continuation.pm
+  Catalyst::Plugin::Continuation:
+    file: lib/Catalyst/Plugin/Continuation.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

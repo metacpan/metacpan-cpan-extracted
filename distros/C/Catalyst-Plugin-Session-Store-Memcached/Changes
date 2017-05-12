@@ -1,0 +1,17 @@
+0.05 2012-04-04
+  - Upgrade code to use Moose compatibility layer
+
+0.04 2009-10-16
+  - Port to new session config key
+
+0.03 2009-02-08
+  - Switch Module::Build to Module::Install
+  - Switch from NEXT to MRO::Compat
+  - Swap inheritence hierarchy round so that we C3 linearise with other components.
+
+0.02 2006-01-01
+  - Fix session expiry
+
+0.01 2005-11-15
+  - Initial working release.
+

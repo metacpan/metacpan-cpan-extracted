@@ -1,0 +1,28 @@
+---
+IFF1: 1
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 85
+  54452:
+    - 234
+    - 201
+name: ed55
+registers:
+  AF: 45147
+  AF_: 0
+  BC: 24196
+  BC_: 0
+  DE: 55017
+  DE_: 0
+  HL: 52030
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 54452

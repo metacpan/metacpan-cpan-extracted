@@ -1,0 +1,14 @@
+---
+name: Catalyst-Plugin-Static-Simple
+version: 0.04
+author:
+  - 'Scott Connelly, C<ssc@cpan.org>'
+abstract: Simplified Groups-Roles-Permissions.
+license: perl
+requires:
+  Catalyst: 5.33  
+provides:
+  Catalyst::Plugin::Authorization::CDBI::GroupToken:
+    file: lib/Catalyst/Plugin/Authorization/CDBI/GroupToken.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

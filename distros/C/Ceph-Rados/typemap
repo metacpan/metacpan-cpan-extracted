@@ -1,0 +1,46 @@
+TYPEMAP
+uint32_t            T_UV
+uint64_t            T_UV
+const char **       T_PV
+rados_t *           T_RADOS
+rados_t             T_RADOS
+rados_ioctx_t *     T_RADOS_IO
+rados_ioctx_t       T_RADOS_IO
+rados_list_ctx_t *  T_RADOS_LIST
+rados_list_ctx_t    T_RADOS_LIST
+
+INPUT
+T_RADOS
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)
+        && sv_derived_from($arg, \"Ceph::Rados\") )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not a \\\"Ceph::Rados\\\" object\" );
+        XSRETURN_UNDEF;
+    }
+
+T_RADOS_IO
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)
+        && sv_derived_from($arg, \"Ceph::Rados::IO\") )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not a \\\"Ceph::Rados:IO\\\" object\" );
+        XSRETURN_UNDEF;
+    }
+
+T_RADOS_LIST
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)
+        && sv_derived_from($arg, \"Ceph::Rados::List\") )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else{
+        warn( \"${Package}::$func_name() -- $var is not a \\\"Ceph::Rados::List\\\" object\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+T_RADOS
+    sv_setref_pv( $arg, "Ceph::Rados", (void*)$var );
+T_RADOS_IO
+    sv_setref_pv( $arg, "Ceph::Rados::IO", (void*)$var );
+T_RADOS_LIST
+    sv_setref_pv( $arg, "Ceph::Rados::List", (void*)$var );

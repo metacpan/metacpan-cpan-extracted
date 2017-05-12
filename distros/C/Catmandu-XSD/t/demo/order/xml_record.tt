@@ -1,0 +1,6 @@
+<Record>
+ <Header><Identifier>[% _id %]</Identifier></Header>
+ <Payload>
+ [%- xml -%]
+ </Payload>
+</Record>

@@ -1,0 +1,42 @@
+Revision history for Perl extension Catalyst::Plugin::InjectionHelpers
+
+0.009   18 July 2016
+        - Fixed incorrect default value.
+        - Updated license info.
+
+0.008   08 September 2015
+        - Adaptor helper is now a component role not a model role since you
+          can use it for views and controllers.
+        - New PerSession Adaptor
+
+0.007   19 May 2015
+        - Another use of variable change similar to the previous release that
+          I missed the first time.
+        - Added 'transform_args' configuration for better control.
+        - Made more API in Catalyst::ModelRole::InjectionHelpers public in case
+          your need it for your custom subclasses.
+
+0.006   18 May 2015
+        - Changed the way a variable is used to prevent errors when the var
+          namespace can be obscure.
+
+0.005   11 May 2015
+        - Fix the way we merge parameters so that you can override global
+          parameters from the $c->model/view calls (for ACCEPT_CONTEXT components).
+
+0.004   01 May 2015
+        - Support for list arguments
+
+0.003   01 May 2015
+        - Added 'from_code' injector
+        - Made sure we get a fresh copy of the configuration for request scoped
+          components (to play nice with the MapComponentDependencies plugin).
+        - Loosen the constraint on the Application adaptor so that the component
+          is not required be be an object.
+        - Tweaked the documentation a bit.
+
+0.002   30 April 2015
+        - Made sure test case relied on Catalyst v5.90090+
+
+0.001   30 April 2015
+        - original version.

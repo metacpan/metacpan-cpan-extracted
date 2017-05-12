@@ -1,0 +1,26 @@
+---
+abstract: "Prepends CSS selectors to apply scope/context\r"
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CSS-Scopifier
+requires:
+  CSS::Tiny: '1.19'
+  Moo: '0'
+  Path::Class: '0'
+  Text::Balanced: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/vanstyn/CSS-Scopifier.git
+version: '0.04'

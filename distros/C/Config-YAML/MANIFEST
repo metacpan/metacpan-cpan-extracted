@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Config/YAML.pm
+t/00.load.t
+t/01.init-read.t
+t/02.read-overlay.t
+t/03.getopt-integrate.t
+t/04.get-set.t
+t/05.fold.t
+t/06.write.t
+t/test.yaml
+t/test2.yaml
+t/pod-coverage.t
+t/pod.t

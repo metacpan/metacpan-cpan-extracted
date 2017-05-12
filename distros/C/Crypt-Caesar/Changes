@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::Caesar.
+
+0.01  Sun May 19 16:41:43 2002
+	- original version; created by h2xs 1.21 with options
+		-Xn Crypt::Caesar
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-Loader-mysql-Grok
+version:      0.19
+version_from: lib/Class/DBI/Loader/mysql/Grok.pm
+installdirs:  site
+requires:
+    Class::DBI::Loader::mysql:     0.22
+    Class::DBI::mysql:             0.22
+    Lingua::EN::Inflect:           1.88
+    Time::Piece::MySQL:            0.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

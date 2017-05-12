@@ -1,0 +1,68 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::Flickr - Flickr
+    authentication for Catalyst
+
+SYNOPSIS
+        use Catalyst qw/
+          Authentication
+          Authentication::Credential::Flickr
+          Session
+          Session::Store::FastMmap
+          Session::State::Cookie
+          /;
+    
+        MyApp->config(
+            authentication => {
+                use_session => 1, # default 1. see C::P::Authentication
+                flickr      => {
+                    key    => 'your api_key',
+                    secret => 'your secret_key',
+                    perms  => 'read', # or write
+                },
+            },
+        );
+    
+        sub default : Private {
+            my ( $self, $c ) = @_;
+    
+            if ( $c->user_exists ) {
+                # $c->user setted
+            }
+        }
+    
+        # redirect flickr's login form
+        sub login : Local {
+            my ( $self, $c ) = @_;
+            $c->res->redirect( $c->authenticate_flickr_url );
+        }
+    
+        # login callback url
+        sub auth : Path('/flickr') {
+            my ( $self, $c ) = @_;
+            if ( $c->authenticate_flickr ) {
+                $c->res->redirect( $c->uri_for('/') );
+            }
+        }
+
+DESCRIPTION
+    This module provide authentication via Flickr, using it's api.
+
+EXTENDED METHODS
+  setup
+METHODS
+  authenticate_flickr_url
+  authenticate_flickr
+SEE ALSO
+    Catalyst::Plugin::Authentication,
+    Catalyst::Plugin::Authentication::Credential::TypeKey
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

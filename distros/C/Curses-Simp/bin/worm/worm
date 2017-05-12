@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+# 4BMK0TV - worm written by Dan Steele <Mutated@Gmail.Com>
+#   "...Actually I was using Curses::Simp because someone bet me I
+#    couldn't write an implementation of worm in only 30 lines of perl
+#    (A line being no longer than 80 chars) using only a CPAN curses
+#    module...well I won the bet anyways."
+# I have only modified Dan's code slightly below to make the final
+#   score Mesg box persist for 5 seconds without a keystroke dismissing it.
+# This code prompted me to expand it into wormxpnd to understand it better
+#   which I then re-compressed into w0rm for my own fun with obfuscation. -Pip
+use Curses::Simp; $|=1;$s=0,$go=0,$t=0.8,$d='u',$m=1,$gi=1;
+$w = Curses::Simp->new('hite'=>24,'widt'=>79);
+for($i=1;$i<23;$i++){for($j=0;$j<76;$j++){if ($j==0||$i==1||$j==75||$i==22){
+  $w->Prnt('ycrs'=>$i,'xcrs'=>$j,'#')}}}
+push(@x,int(rand(74))+2) && push(@y,int(rand(19))+1) && $w->FlagSDLK(1);
+do {
+  if ($gi) {
+    do { ($j,$i,$gi,$v) = (int(rand(75)+2),int(rand(19)+1),0,int(rand(9)+1))}
+      while (substr($w->Text->[$i],$j,1) ne ' ');
+    $w->Prnt('xcrs'=>$j,'ycrs'=>$i,"$v")}
+  $w->Prnt('xcrs'=>40,'ycrs'=>0,"Worms in 30 lines          Score: $s");
+  if (substr($w->Text->[$y[@y-1]],$x[@x-1],1) eq '#'){
+    $go=1 && $w->Mesg('wait'=>5,'flagprsk'=>0,
+      "You Died. Final Score $s Goodbye!")
+  }elsif(substr($w->Text->[$y[@y-1]],$x[@x-1],1)=~/\d/){($s,$m,$gi)=($v+$s,$v,1)
+ } elsif (! $m) {
+    (($tx,@x) = @x)&&(($ty,@y) = @y)&&
+$w->Prnt('ycrs'=>"$ty",'xcrs'=>"$tx",' ')  } else {($m,$t) = ($m - 1,$t-.005)}
+  $w->Prnt('ycrs'=>$y[@y-1],'xcrs'=>$x[@x-1],'#') && $w->Draw();
+  $k = $w->GetK($t);
+  if ($k eq SDLK_q) {exit}
+  if(($k eq SDLK_UP)||(($k==-1)&&($d eq 'u'))){
+    ($d='u') && push(@x,$x[@x-1])&&push(@y,($y[@y-1])-1)
+  }elsif(($k eq SDLK_DOWN)||(($k == -1) && ($d eq 'd'))){
+    ($d='d') && push(@x,$x[@x-1]) && push(@y,($y[@y - 1]) + 1)
+  }elsif(($k eq SDLK_LEFT)||(($k == -1)&&($d eq 'l'))){
+    ($d='l') && push(@x,($x[@x-1]) - 1)&&push(@y,$y[@y - 1])
+  }elsif(($k eq SDLK_RIGHT)||(($k == -1)&&($d eq 'r'))){
+    ($d='r') && push(@x,($x[@x-1]) + 1)&&push(@y,$y[@y - 1])}
+} while (! $go);

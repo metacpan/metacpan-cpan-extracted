@@ -1,0 +1,15 @@
+[% RINTEG.start_xhtml %]
+
+[% FOREACH field IN RINTEG.ordered_fields %]
+  [% field.xhtml_label %] [% IF field.required %] <strong>*</strong> [% END %]
+  [% IF field.error %]
+    <span class="error small">
+      [% field.error %]
+    </span>
+  [% END %]
+  <br>
+  [% field.xhtml_field %]
+  <br><br>
+[% END %]
+
+[% RINTEG.end_xhtml %]

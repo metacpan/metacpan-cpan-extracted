@@ -1,0 +1,9 @@
+#!perl
+use strict;
+use warnings;
+use Config::Extend::MySQL;
+use Data::Dumper;
+
+
+my $config = Config::Extend::MySQL->new({ from => shift, using => "Config::Tiny" });
+print Dumper($config);

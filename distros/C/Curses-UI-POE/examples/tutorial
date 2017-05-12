@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+# Tutorial example
+# 2003 (c) by Marcus Thiesen (marcus@cpan.org)
+# This file is a part of Curses::UI::POE and might be distributed 
+# under the same terms as perl itself.
+
+# Use the libraries from the distribution, instead of 
+# system wide libraries.
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use strict;
+use Curses::UI::POE;
+my $cui = new Curses::UI::POE( -color_support => 1 );
+
+my @menu = (
+  { -label => 'File', 
+    -submenu => [
+      { -label => 'Exit      ^Q', -value => \&exit_dialog  }
+    ]
+  },
+);
+ 
+my $menu = $cui->add(
+	'menu','Menubar', 
+	-menu => \@menu,
+	-fg  => "blue",
+);
+
+my $win1 = $cui->add(
+		     'win1', 'Window',
+		     -border => 1,
+		     -y    => 1,
+		     -bfg  => 'red',
+		     );
+
+
+sub exit_dialog()
+{
+	my $return = $cui->dialog(
+			-message   => "Do you really want to quit?",
+			-title     => "Are you sure???", 
+			-buttons   => ['yes', 'no'],
+
+	);
+
+	exit(0) if $return;
+}
+
+my $texteditor = $win1->add("text", "TextEditor", -text => "Here is some text\n"
+			                          . "And some more");
+
+
+$cui->set_binding(sub {$menu->focus()}, "\cX");
+$cui->set_binding( \&exit_dialog , "\cQ");
+
+$texteditor->focus();
+$cui->mainloop();
+
+

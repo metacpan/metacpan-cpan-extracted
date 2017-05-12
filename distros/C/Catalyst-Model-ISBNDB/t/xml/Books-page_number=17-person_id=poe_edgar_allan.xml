@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:45Z">
+<BookList total_results="252" page_size="10" page_number="17" shown_results="10">
+<BookData book_id="the_duc_de_lomlette" isbn="0585065950">
+<Title>The Duc de L'Omlette</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2003-11-26T17:26:23Z" price_time="2006-10-08T08:01:02Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086156 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="parody_in_literature_satire">Parody in literature -- Satire</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:23Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_duc_de_lomlette-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:08:48Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_duc_de_lomlette-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:30:44Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-the_duc_de_lomlette-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:35:19Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-the_duc_de_lomlette-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:51:46Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-the_duc_de_lomlette-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:36Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-the_duc_de_lomlette-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_essential_poe" isbn="0880014784">
+<Title>The essential Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>selected and with an introduction by Dave Smith</AuthorsText>
+<PublisherText publisher_id="ecco_press">Hopewell, New Jersey : Ecco Press, 1991.</PublisherText>
+<Details dewey_decimal="" physical_description_text="93 p. ; 17 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-07-27T12:10:54Z" price_time="2006-10-08T08:01:07Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780880014786" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-18T14:03:31Z" currency_rate="1" price="5.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-18T14:04:22Z" currency_rate="1" price="5.5" />
+<Price store_isbn="" store_title="The Essential Poe (Essential Poets Series)" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:00Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="The Essential Poe (Essential Poets Series)" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:00Z" currency_rate="1" price="3.89" />
+<Price store_isbn="" store_title="The Essential Poe" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="6.66" />
+<Price store_isbn="" store_title="The Essential Poe" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="6.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:07Z" currency_rate="1" price="6.25" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0880014784&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:55:00Z" currency_rate="1" price="14" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:55:06Z" currency_rate="1" price="7.5" />
+<Price store_isbn="" store_title="The Essential Poe Product 239724" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.239724&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:56:22Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_essential_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T08:01:07Z" currency_rate="1" price="10" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_poetry_american">Fantasy poetry, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Salt Lake City Public Library" last_update="2004-07-27T12:10:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-260-the_essential_poe-20040727.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="smith_dave">Smith, Dave</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_essential_poe_a01" isbn="0880012730">
+<Title>The essential Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>selected and with an introduction by Dave Smith</AuthorsText>
+<PublisherText publisher_id="ecco_press">New York : Ecco Press, 1991.</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="93 p. ; 17 cm." language="eng" edition_info="$8.00 ($11.00 Can.)" dewey_decimal_normalized="811.3" lcc_number="PS2603" change_time="2005-01-03T06:14:09Z" price_time="2006-10-08T08:01:12Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Essential Poe, Vol. 14" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-01-03T06:14:15Z" currency_rate="1" price="6.51" />
+<Price store_isbn="" store_title="The Essential Poe (The Essential Poets, V. 14)" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:01Z" currency_rate="1" price="0.89" />
+<Price store_isbn="" store_title="The Essential Poe (The Essential Poets, V. 14)" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:01Z" currency_rate="1" price="0.89" />
+<Price store_isbn="" store_title="The Essential Poe (the Essential Poets, V. 14)" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Essential Poe" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Essential Poe (The Essential Poets, V. 14)" store_url="http://isbndb.com/x/book/the_essential_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="1" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--Madison" last_update="2005-01-03T06:14:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-94-the_essential_poe_a01-20050102.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="smith_dave">Smith, Dave</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_facts_in_the_case_of_m_valdemar" isbn="0585051895">
+<Title>The facts in the case of M. Valdemar</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:22:10Z" price_time="2006-10-08T08:01:16Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085985 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:22:10Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-the_facts_in_the_case_of_m_valdemar-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_fall_of_the_house_of_usher" isbn="0451516591">
+<Title>The fall of the house of Usher</Title>
+<TitleLong>The fall of the house of Usher: and other tales</TitleLong>
+<AuthorsText>Edgar Allan Poe; with an afterword by R. P. Blackmur</AuthorsText>
+<PublisherText publisher_id="new_american_library">New York : New American Library, [1980]</PublisherText>
+<Details dewey_decimal="" physical_description_text="384 p. ; 18 cm." language="eng" edition_info="(pbk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-03-18T00:49:21Z" price_time="2006-10-08T08:01:20Z" />
+<Summary></Summary>
+<Notes>Selected bibliography: p. 384.
+
+The balloon-hoax -- Ms. found in a bottle -- A descent into the Maelström -- The murders in the Rue Morgue -- The purloined letter -- The black cat -- The fall of the house of Usher -- The pit and the pendulum -- The masque of the Red Death -- The cask of Amontillado -- The assignation -- The tell-tale heart -- Diddling -- The man that was used up -- Narrative of A. Gordon Pym.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-03-18T00:49:23Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://www.biblio.com/details.php?dcx=8806965&amp;aid=isbndb" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-03-18T00:49:25Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="0.08" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:07Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:55:12Z" currency_rate="1" price="2.06" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:55:12Z" currency_rate="1" price="1.03" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of California (MELVYL)" last_update="2005-03-18T00:49:21Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-the_fall_of_the_house_of_usher-20050317.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="blackmur_r_p">Blackmur, R. P.</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_fall_of_the_house_of_usher_and_other_tales" isbn="0451526759">
+<Title>The Fall of the House of Usher and Other Tales</Title>
+<TitleLong>The Fall of the House of Usher and Other Tales (Signet Classics (Paperback))</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="signet_classics">Signet Classics</PublisherText>
+<Details dewey_decimal="" physical_description_text="4.3&quot;x6.9&quot;x0.7&quot;; 400 pages; 0.4 lb" language="" edition_info="Mass Market Paperback; 1998-04-01" dewey_decimal_normalized="" lcc_number="" change_time="2004-12-31T16:47:59Z" price_time="2006-10-08T08:01:27Z" />
+<Summary>The eerie tales of Edgar Allan Poe remain among the most brilliant and influential works in American literature. Some of the celebrated tales contained in this unique volume include: the world's finest two detective stories - "The Murders in the Rue Morgue" and "The Purloined Letter"; and three stories sure to make a reader's hair stand on end - "The Cask of Amontillado," "The Tell-Tlae Heart," and "The Masque of the Red Death." * Includes a New Introduction by Stephen Marlowe, author of The Memoirs of Christopher Columbus and The Lighthouse at the End of the World * The Signet Classic Edition of The Fall of the House of Usher has over 250,000 copies in print! Course Adoption: High School: Senior High School Literature College: 19th Century American Literature</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780451526755" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:08Z" currency_rate="1" price="3.3" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales " store_url="http://www.biblio.com/details.php?dcx=84258254&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:13Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-06T17:51:18Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:18Z" currency_rate="1" price="3.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="4.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="4.76" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales (Signet Classics (Paperback))" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales (Signet Classics (Paperback))" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="1.65" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales (Signet Classics (Paperback))" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="3.69" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales (Signet Classics (Paperback))" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:09Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33689821%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:31Z" currency_rate="1" price="5.35" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0451526759&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:55:11Z" currency_rate="1" price="9.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:17Z" currency_rate="1" price="4.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:55:17Z" currency_rate="1" price="3.57" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Tales Product 438881" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.438881&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:32Z" currency_rate="1" price="4.76" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_tales/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:01:27Z" currency_rate="1" price="5.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_fall_of_the_house_of_usher_and_other_tales_a01" isbn="0585005540">
+<Title>The fall of the house of Usher and other tales</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="project_gutenberg">Champaign, Ill. : Project Gutenberg ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2602" change_time="2006-08-03T00:38:04Z" price_time="2006-08-03T00:38:42Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1014200 Access available to all libraries</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="River Bend Library System (Eastern Iowa/Western Illinois)" last_update="2006-08-03T00:38:04Z" marc_url="http://isbndb.com/x/libdata/isbndb-194-the_fall_of_the_house_of_usher_and_other_tales_a01-20060802.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_fall_of_the_house_of_usher_and_other_writings" isbn="0141439815">
+<Title>The fall of the House of Usher and other writings</Title>
+<TitleLong>The fall of the House of Usher and other writings: poems, tales, essays, and reviews</TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with an introduction and notes by David Galloway</AuthorsText>
+<PublisherText publisher_id="penguin">London ; Penguin, 2003.</PublisherText>
+<Details dewey_decimal="813.3" physical_description_text="lviii, 488 p. ; 20 cm." language="eng" edition_info="(pbk.)" dewey_decimal_normalized="813.3" lcc_number="PS2602" change_time="2004-08-01T03:27:16Z" price_time="2006-08-05T04:34:12Z" />
+<Summary></Summary>
+<Notes>Previously published as: Selected writings of Edgar Allan Poe, 1967. Reissued with new chronology and further reading 2003.
+
+Includes bibliographical references (p. [lvi]-lviii).</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:04Z" currency_rate="1" price="8.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:04Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="1.4" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="1.4" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="15.79" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="8.92" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays and Reviews" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="8.25" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="6.07" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="8.47" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="7.51" />
+<Price store_isbn="" store_title="Fall of the House of Usher" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=2894139" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:05Z" currency_rate="1" price="8.05" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33786805%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:06Z" currency_rate="1" price="7.92" />
+<Price store_isbn="" store_title="Fall of the House of Usher and Other Writings" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:06Z" currency_rate="1" price="11" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780141439815" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:06Z" currency_rate="1" price="6.05" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:06Z" currency_rate="1" price="6" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:06Z" currency_rate="1" price="11" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews(Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-05T04:34:07Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="The Fall Of the House Of Usher And Other Writings: Poems, Tales, Essays And Reviews " store_url="http://www.biblio.com/details.php?dcx=78278170&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:09Z" currency_rate="1" price="2.75" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poe" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-05T04:34:12Z" currency_rate="1" price="1.54" />
+</Prices>
+<Subjects>
+<Subject subject_id="fantasy_literature_american">Fantasy literature, American</Subject>
+<Subject subject_id="books_reviews">Books -- Reviews</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Texas A &amp; M University Database" last_update="2004-08-01T03:27:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-274-the_fall_of_the_house_of_usher_and_other_writings-20040731.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-08-05T04:34:03Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_fall_of_the_house_of_usher_and_other_writings-20060804.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="galloway_david">Galloway, David</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_fall_of_the_house_of_usher_and_other_writings_a01" isbn="0140432914">
+<Title>The fall of the House of Usher and other writings</Title>
+<TitleLong>The fall of the House of Usher and other writings: poems, tales, essays and reviews</TitleLong>
+<AuthorsText>edited with an introduction by David Galloway</AuthorsText>
+<PublisherText publisher_id="penguin">Harmondsworth : Penguin, 1967</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="539 p. ; 19 cm." language="eng" edition_info="(pbk) :£3.95" dewey_decimal_normalized="818.309" lcc_number="" change_time="2006-03-20T08:55:16Z" price_time="2006-06-06T17:51:33Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-04T17:59:01Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-04T17:59:02Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-05-04T17:59:02Z" currency_rate="1" price="7.96" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:50:52Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings: Poems, Tales, Essays, and Reviews" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-06T17:50:52Z" currency_rate="1" price="8.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:50:52Z" currency_rate="1" price="1.84" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poems, Tales, Essays, and Reviews (Penguin Classics)" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:50:59Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780140432916" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:05Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="The Fall of the House of Usher and Other Writings : Poems, Tales, Essays, and Reviews " store_url="http://www.biblio.com/details.php?dcx=69366998&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:09Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T17:51:16Z" currency_rate="1" price="3.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_fall_of_the_house_of_usher_and_other_writings_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-06T17:51:16Z" currency_rate="1" price="5.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="english_literature_american_writers_1830_1861_texts">English literature -- American writers, 1830-1861 - Texts</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Pittsburg" last_update="2006-03-20T08:55:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-298-the_fall_of_the_house_of_usher_and_other_writings_a01-20060320.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="galloway_david">Galloway, David</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_gold_bug" isbn="088682303X">
+<Title>The gold bug</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="creative_education">Mankato, MN : Creative Education, c1990.</PublisherText>
+<Details dewey_decimal="[Fic]" physical_description_text="79 p. ; 22 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PZ7" change_time="2004-12-28T16:00:40Z" price_time="2006-03-27T20:46:33Z" />
+<Summary>The discovery of a message in code on a shoreline formerly infested with pirates sends William Legrand and his friends on a hunt for buried treasure.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Gold-Bug (Creative Short Stories)" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:02Z" currency_rate="1" price="4.17" />
+<Price store_isbn="" store_title="The Gold-Bug (Creative Short Stories)" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-03-27T20:46:02Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Gold-Bug (Creative Short Stories)" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:02Z" currency_rate="1" price="4.12" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:05Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-27T20:46:05Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="The Gold Bug " store_url="http://www.biblio.com/details.php?dcx=7949958&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:09Z" currency_rate="1" price="8.99" />
+<Price store_isbn="" store_title="The Gold Bug (Creative Short Stories Series)" store_url="http://isbndb.com/x/book/the_gold_bug/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:10Z" currency_rate="1" price="8.99" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780886823030" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-27T20:46:11Z" currency_rate="1" price="4.38" />
+</Prices>
+<Subjects>
+<Subject subject_id="buried_treasure_fiction">Buried treasure -- Fiction</Subject>
+<Subject subject_id="mystery_and_detective_stories">Mystery and detective stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-12-28T16:00:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_gold_bug-20041228.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

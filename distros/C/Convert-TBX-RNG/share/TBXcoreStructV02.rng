@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Converted from TBXcoreStructV02.dtd by trang -->
+<!-- start schema here tbx_core.dtd -->
+<!-- TBXcoreStructV02.dtd -->
+<!--
+  =================================================================================
+  SOME USEFUL ENTITIES THAT ARE REFERENCED BELOW
+  ==================================================================================
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="plainText">
+    <text/>
+  </define>
+
+  <define name="basicText">
+    <zeroOrMore>
+      <choice>
+        <text/>
+        <ref name="hi"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="noteText">
+    <zeroOrMore>
+      <choice>
+        <text/>
+        <ref name="hi"/>
+        <ref name="foreign"/>
+        <ref name="bpt"/>
+        <ref name="ept"/>
+        <ref name="ph"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+
+  <!-- Needed to allow constraining appearance of descrip and descripGrp -->
+  <define name="auxInfoMinusDescrips">
+    <zeroOrMore>
+      <choice>
+        <ref name="admin"/>
+        <ref name="adminGrp"/>
+        <ref name="transacGrp"/>
+        <ref name="note"/>
+        <ref name="ref"/>
+        <ref name="xref"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <define name="noteLinkInfo">
+    <zeroOrMore>
+      <choice>
+        <ref name="admin"/>
+        <ref name="adminGrp"/>
+        <ref name="transacGrp"/>
+        <ref name="note"/>
+        <ref name="ref"/>
+        <ref name="xref"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+  <!-- Entities that define common sets of attributes -->
+  <define name="impIDLang">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang"/>
+    </optional>
+  </define>
+  <define name="impIDType">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="type"/>
+    </optional>
+  </define>
+
+<!-- Everything but the type for most meta data categories -->
+  <define name="impIDLangTgtDtyp">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang"/>
+    </optional>
+    <optional>
+      <attribute name="target">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="datatype"/>
+    </optional>
+  </define>
+
+  <define name="impIDLangTypTgtDtyp">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang"/>
+    </optional>
+    <attribute name="type"/>
+    <optional>
+      <attribute name="target">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="datatype"/>
+    </optional>
+  </define>
+  <!--
+    ================================================================================
+    ELEMENTS USED FOR TEXT MARKUP
+    ================================================================================
+  -->
+  <define name="hi">
+    <element name="hi">
+      <ref name="attlist.hi"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.hi" combine="interleave">
+    <optional>
+      <attribute name="type" xml:id="hi.type"/>
+    </optional>
+    <optional>
+      <attribute name="target">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xml:lang"/>
+    </optional>
+  </define>
+  <define name="foreign">
+    <element name="foreign">
+      <ref name="attlist.foreign"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.foreign" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+
+      <attribute name="xml:lang"/>
+    </optional>
+  </define>
+  <define name="bpt">
+    <element name="bpt">
+      <ref name="attlist.bpt"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.bpt" combine="interleave">
+    <optional>
+      <attribute name="i"/>
+    </optional>
+    <optional>
+      <attribute name="type"/>
+    </optional>
+  </define>
+  <define name="ept">
+    <element name="ept">
+      <ref name="attlist.ept"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.ept" combine="interleave">
+    <optional>
+      <attribute name="i"/>
+    </optional>
+  </define>
+  <define name="ph">
+    <element name="ph">
+      <ref name="attlist.ph"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.ph" combine="interleave">
+    <optional>
+      <attribute name="type"/>
+    </optional>
+  </define>
+  <!--
+    ================================================================================
+    ELEMENTS NEEDED FOR TERMINOLOGICAL ENTRIES (IN ALPHABETICAL ORDER)
+    ================================================================================
+  -->
+  <define name="admin">
+    <element name="admin" xml:id="admin.element">
+      <ref name="attlist.admin"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.admin" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="adminGrp">
+    <element name="adminGrp">
+      <ref name="attlist.adminGrp"/>
+      <ref name="admin"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="adminNote"/>
+          <ref name="note"/>
+          <ref name="ref"/>
+          <ref name="xref"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.adminGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="adminNote">
+    <element name="adminNote" xml:id="adminNote.element">
+      <ref name="attlist.adminNote"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.adminNote" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="date">
+    <element name="date">
+      <ref name="attlist.date"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.date" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+
+  <define name="term.descripGrp">
+    <element name="descripGrp">
+      <ref name="term.descrip"/>
+      <ref name="commonContents.descripGrp"/>
+    </element>
+  </define>
+  <define name="langSet.descripGrp">
+    <element name="descripGrp">
+      <ref name="langSet.descrip"/>
+      <ref name="commonContents.descripGrp"/>
+    </element>
+  </define>
+  <define name="termEntry.descripGrp">
+    <element name="descripGrp">
+      <ref name="termEntry.descrip"/>
+      <ref name="commonContents.descripGrp"/>
+    </element>
+  </define>
+
+  <!-- Contents shared by descripGrp's of all levels -->
+  <define name="commonContents.descripGrp">
+      <ref name="attlist.descripGrp"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="descripNote"/>
+          <ref name="admin"/>
+          <ref name="adminGrp"/>
+          <ref name="transacGrp"/>
+          <ref name="note"/>
+          <ref name="ref"/>
+          <ref name="xref"/>
+        </choice>
+      </zeroOrMore>
+  </define>
+
+  <define name="term.descrip">
+    <element name="descrip" xml:id="term.descrip.element">
+      <ref name="attlist.descrip"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="langSet.descrip">
+    <element name="descrip" xml:id="langSet.descrip.element">
+      <ref name="attlist.descrip"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="termEntry.descrip">
+    <element name="descrip" xml:id="termEntry.descrip.element">
+      <ref name="attlist.descrip"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.descrip" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+
+  <define name="attlist.descripGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="descripNote">
+    <element name="descripNote" xml:id="descripNote.element">
+      <ref name="attlist.descripNote"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.descripNote" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="langSet">
+    <element name="langSet">
+      <ref name="attlist.langSet"/>
+      <interleave>
+        <ref name="auxInfoMinusDescrips"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="langSet.descrip"/>
+            <ref name="langSet.descripGrp"/>
+          </choice>
+        </zeroOrMore>
+      </interleave>
+      <oneOrMore>
+        <choice>
+          <ref name="tig"/>
+          <ref name="ntig"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.langSet" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <!-- XCS languages here --><attribute name="xml:lang"/>
+  </define>
+  <define name="note">
+    <element name="note">
+      <ref name="attlist.note"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.note" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="ntig">
+    <element name="ntig">
+      <ref name="attlist.ntig"/>
+      <ref name="termGrp"/>
+      <interleave>
+        <ref name="auxInfoMinusDescrips"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="term.descrip"/>
+            <ref name="term.descripGrp"/>
+          </choice>
+        </zeroOrMore>
+      </interleave>
+    </element>
+  </define>
+  <define name="attlist.ntig" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="ref">
+    <element name="ref" xml:id="ref.element">
+      <ref name="attlist.ref"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.ref" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="term">
+    <element name="term">
+      <ref name="attlist.term"/>
+      <ref name="basicText"/>
+    </element>
+  </define>
+  <define name="attlist.term" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="termComp">
+    <element name="termComp">
+      <ref name="attlist.termComp"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.termComp" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="termCompGrp">
+    <element name="termCompGrp">
+      <ref name="attlist.termCompGrp"/>
+      <ref name="termComp"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="termCompGrp.termNote"/>
+          <ref name="termCompGrp.termNoteGrp"/>
+        </choice>
+      </zeroOrMore>
+      <ref name="noteLinkInfo"/>
+    </element>
+  </define>
+  <define name="attlist.termCompGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="termCompList">
+    <element name="termCompList" xml:id="termCompList.element">
+      <ref name="attlist.termCompList"/>
+      <ref name="auxInfoMinusDescrips"/>
+      <oneOrMore>
+        <choice>
+          <ref name="termComp"/>
+          <ref name="termCompGrp"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.termCompList" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <attribute name="type" xml:id="termCompList.type"/>
+  </define>
+  <define name="termEntry">
+    <element name="termEntry">
+      <ref name="attlist.termEntry"/>
+      <interleave>
+        <ref name="auxInfoMinusDescrips"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="termEntry.descrip"/>
+            <ref name="termEntry.descripGrp"/>
+          </choice>
+        </zeroOrMore>
+      </interleave>
+      <oneOrMore>
+        <ref name="langSet"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.termEntry" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="termGrp">
+    <element name="termGrp">
+      <ref name="attlist.termGrp"/>
+      <ref name="term"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="termNote"/>
+          <ref name="termNoteGrp"/>
+        </choice>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="termCompList"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.termGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <!-- For the termNotes used in termCompGrp -->
+  <define name="termCompGrp.termNote">
+    <element name="termNote" xml:id="termComp.termNote.element">
+      <ref name="attlist.termNote"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="termNote">
+    <element name="termNote" xml:id="termNote.element">
+      <ref name="attlist.termNote"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.termNote" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <!-- Special termNoteGrp to be used with datCats allowed in termpCompGrps -->
+  <define name="termCompGrp.termNoteGrp">
+    <element name="termNoteGrp">
+      <ref name="attlist.termNoteGrp"/>
+      <ref name="termCompGrp.termNote"/>
+      <ref name="noteLinkInfo"/>
+    </element>
+  </define>
+  <define name="termNoteGrp">
+    <element name="termNoteGrp">
+      <ref name="attlist.termNoteGrp"/>
+      <ref name="termNote"/>
+      <ref name="noteLinkInfo"/>
+    </element>
+  </define>
+  <define name="attlist.termNoteGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="tig">
+    <element name="tig">
+      <ref name="attlist.tig"/>
+      <ref name="term"/>
+      <zeroOrMore>
+        <ref name="termNote"/>
+      </zeroOrMore>
+      <interleave>
+        <ref name="auxInfoMinusDescrips"/>
+        <zeroOrMore>
+          <choice>
+            <ref name="term.descrip"/>
+            <ref name="term.descripGrp"/>
+          </choice>
+        </zeroOrMore>
+      </interleave>
+    </element>
+  </define>
+  <define name="attlist.tig" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="transac">
+    <element name="transac" xml:id="transac.element">
+      <ref name="attlist.transac"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.transac" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="transacGrp">
+    <element name="transacGrp">
+      <ref name="attlist.transacGrp"/>
+      <ref name="transac"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="transacNote"/>
+          <ref name="date"/>
+          <ref name="note"/>
+          <ref name="ref"/>
+          <ref name="xref"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.transacGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="transacNote">
+    <element name="transacNote" xml:id="transacNote.element">
+      <ref name="attlist.transacNote"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.transacNote" combine="interleave">
+    <ref name="impIDLangTypTgtDtyp"/>
+  </define>
+  <define name="xref">
+    <element name="xref">
+      <ref name="attlist.xref"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.xref" combine="interleave">
+    <!-- <ref name="impIDType"/> -->
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="type" xml:id="xref.type"/>
+    </optional>
+    <attribute name="target">
+      <data type="anyURI"/>
+    </attribute>
+  </define>
+  <!--
+    ===================================================================================
+    OTHER ELEMENTS (in hierarchical order)
+    ===================================================================================
+  -->
+  <define name="martif">
+    <element name="martif">
+      <ref name="attlist.martif"/>
+      <ref name="martifHeader"/>
+      <ref name="text"/>
+    </element>
+  </define>
+  <!-- *** starting element *** -->
+  <define name="attlist.martif" combine="interleave">
+    <attribute name="type"/>
+    <attribute name="xml:lang"/>
+  </define>
+  <define name="martifHeader">
+    <element name="martifHeader">
+      <ref name="attlist.martifHeader"/>
+      <ref name="fileDesc"/>
+      <optional>
+        <ref name="encodingDesc"/>
+      </optional>
+      <optional>
+        <ref name="revisionDesc"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.martifHeader" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="p">
+    <element name="p">
+      <ref name="attlist.p"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <!-- p is used in several header elements -->
+  <define name="attlist.p" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="type">
+        <choice>
+          <value>DCSName</value>
+          <value>XCSURI</value>
+          <value>XCSContent</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+
+      <attribute name="xml:lang"/>
+    </optional>
+  </define>
+  <define name="fileDesc">
+    <element name="fileDesc">
+      <ref name="attlist.fileDesc"/>
+      <optional>
+        <ref name="titleStmt"/>
+      </optional>
+      <optional>
+        <ref name="publicationStmt"/>
+      </optional>
+      <oneOrMore>
+        <ref name="sourceDesc"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.fileDesc" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="titleStmt">
+    <element name="titleStmt">
+      <ref name="attlist.titleStmt"/>
+      <ref name="title"/>
+      <zeroOrMore>
+        <ref name="note"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.titleStmt" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="title">
+    <element name="title">
+      <ref name="attlist.title"/>
+      <text/>
+    </element>
+  </define>
+  <define name="attlist.title" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="publicationStmt">
+    <element name="publicationStmt">
+      <ref name="attlist.publicationStmt"/>
+      <oneOrMore>
+        <ref name="p"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.publicationStmt" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="sourceDesc">
+    <element name="sourceDesc">
+      <ref name="attlist.sourceDesc"/>
+      <oneOrMore>
+        <ref name="p"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.sourceDesc" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="encodingDesc">
+    <element name="encodingDesc">
+      <ref name="attlist.encodingDesc"/>
+      <oneOrMore>
+        <ref name="p"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.encodingDesc" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="revisionDesc">
+    <element name="revisionDesc">
+      <ref name="attlist.revisionDesc"/>
+      <oneOrMore>
+        <ref name="change"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.revisionDesc" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="change">
+    <element name="change">
+      <ref name="attlist.change"/>
+      <oneOrMore>
+        <ref name="p"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.change" combine="interleave">
+    <ref name="impIDLang"/>
+  </define>
+  <define name="text">
+    <element name="text">
+      <ref name="attlist.text"/>
+      <ref name="body"/>
+      <optional>
+        <ref name="back"/>
+      </optional>
+    </element>
+  </define>
+  <define name="attlist.text" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="body">
+    <element name="body">
+      <ref name="attlist.body"/>
+      <oneOrMore>
+        <ref name="termEntry"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.body" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="back">
+    <element name="back">
+      <ref name="attlist.back"/>
+      <zeroOrMore>
+        <ref name="refObjectList"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.back" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="refObjectList">
+    <element name="refObjectList">
+      <ref name="attlist.refObjectList"/>
+      <oneOrMore>
+        <ref name="refObject"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.refObjectList" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <attribute name="type"/>
+  </define>
+  <define name="refObject">
+    <element name="refObject">
+      <ref name="attlist.refObject"/>
+      <oneOrMore>
+        <choice>
+          <ref name="itemSet"/>
+          <ref name="itemGrp"/>
+          <ref name="item"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.refObject" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="item">
+    <element name="item">
+      <ref name="attlist.item"/>
+      <ref name="noteText"/>
+    </element>
+  </define>
+  <define name="attlist.item" combine="interleave">
+    <ref name="impIDType"/>
+  </define>
+  <define name="itemGrp">
+    <element name="itemGrp">
+      <ref name="attlist.itemGrp"/>
+      <ref name="item"/>
+      <ref name="noteLinkInfo"/>
+    </element>
+  </define>
+  <define name="attlist.itemGrp" combine="interleave">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="itemSet">
+    <element name="itemSet">
+      <ref name="attlist.itemSet"/>
+      <oneOrMore>
+        <choice>
+          <ref name="item"/>
+          <ref name="itemGrp"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.itemSet" combine="interleave">
+    <ref name="impIDType"/>
+  </define>
+  <start>
+    <choice>
+      <ref name="martif"/>
+    </choice>
+  </start>
+</grammar>
+<!-- end -->
+<!-- end schema here -->

@@ -1,0 +1,104 @@
+commit 80c1baea15a71d1e27c24a001afd666136d1e116
+Merge: 1ccab34 b94f6bd
+Author: M. Nunberg <mnunberg@users.noreply.github.com>
+Date:   Mon Feb 16 08:43:10 2015 -0500
+
+    Merge pull request #2 from neilbowers/master
+    
+    Added the github repo to the dist metadata and the pod
+
+commit b94f6bd0898d330edbe846bddea6d9332567f42e
+Author: Neil Bowers <neil@bowers.com>
+Date:   Sun Feb 15 22:05:50 2015 +0000
+
+    Added the github repo to the dist metadata and the pod
+
+commit 1ccab34af42fdb75ff91b386ede12b4bd47b61e7
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jan 30 12:42:49 2012 -0800
+
+    Version bump, modified Changes to reflect git log
+
+commit 1a4583594fbe1f3d14ec41ab079f51d656e0d7b0
+Merge: 7f3d7a3 579158c
+Author: mnunberg <mnunberg@haskalah.org>
+Date:   Mon Jan 30 12:40:08 2012 -0800
+
+    Merge pull request #1 from neilbowers/master
+    
+    Performance improvement for scalar constants
+
+commit 579158cfdaae1bcdb6f5af14140a61c93cd12d35
+Author: Neil Bowers <neil@bowers.com>
+Date:   Mon Jan 30 20:03:51 2012 +0000
+
+    Documentation tidy-ups.
+    - There were some rogue spaces on blank lines meaning the pod didn't chunk right
+    - Changed mentioned of Constant::Generate::Stringified to Constant::Generate::Dualvar
+    - Changed tabs to spaces, so code samples don't have such a large indent on search.cpan.org
+
+commit 42ad225b771f025f4add62a9170b819f496bfd8a
+Author: Neil Bowers <neil@bowers.com>
+Date:   Sun Jan 29 19:53:03 2012 +0000
+
+    Performance improvement for scalar constants: accessing one is now 5 times faster!
+
+commit 7f3d7a379017cf30439cb05bdfe1d70a9a4fb6ee
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jan 24 00:04:48 2012 -0800
+
+    0.15    Some minor API tweaks:
+    
+            added 'dualvar' option, fixed POD errors,
+            changed ::Stringified to ::Dualvar
+    
+            https://rt.cpan.org/Ticket/Display.html?id=74247
+            https://rt.cpan.org/Ticket/Display.html?id=74249
+            https://rt.cpan.org/Ticket/Display.html?id=74235
+
+commit 1a3d862d7fd0d907b3d98a71a016dea0ffae8dbb
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Dec 19 00:06:02 2011 -0800
+
+    More documentation fixes, explain listings
+
+commit 14769cfa05a187d2c236f66c0ae27d834537432a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Dec 17 17:23:05 2011 -0800
+
+    documentation fixes
+
+commit 8040c0d0e2dd9fd04d3b95f5e445e76f0b70219c
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Dec 17 16:55:19 2011 -0800
+
+    Added new features - stringy retvals, listings
+    
+    More tests, cleaner refactoring of implementation
+
+commit 3caa975732fcbea707785b1d2632adfce55c7e51
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Dec 8 11:28:59 2011 -0800
+
+    Version bump, new tests, stricter constant.pm dep
+
+commit b2d785929800e24cdfdb853ec5f5a815fe47b9e7
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Dec 6 09:19:31 2011 -0800
+
+    Fixed bug
+    
+    - %EXPORT_TAGs requirement and reverse functions generated
+    even when not requested/able to
+
+commit 4486d06efcd32afabd796b92b6d8b5a4b51a2c05
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Nov 21 22:57:55 2011 -0800
+
+    testfiles, more documentation
+
+commit f2b0f2740eea1cf307f1536c2a1a951492f7a89e
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Nov 21 18:56:12 2011 -0800
+
+    initial commit

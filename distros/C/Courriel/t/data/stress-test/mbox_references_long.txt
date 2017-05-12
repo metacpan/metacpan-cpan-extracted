@@ -1,0 +1,162 @@
+From sentto-1238696-13333-1191841860-archive=grokbase.com@returns.groups.yahoo.com  Mon Oct  8 06:11:04 2007
+Return-Path: <sentto-1238696-13333-1191841860-archive=grokbase.com@returns.groups.yahoo.com>
+X-Original-To: archive@grokbase.com
+Delivered-To: archive@grokbase.com
+Received: from n19b.bullet.sp1.yahoo.com (HELO n19b.bullet.sp1.yahoo.com) (69.147.64.131)
+    by s69759.xenosight.com (qpsmtpd/0.32) with SMTP; Mon, 08 Oct 2007 06:11:04 -0500
+Comment: DomainKeys? See http://antispam.yahoo.com/domainkeys
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=lima; d=yahoogroups.com;
+	b=P9Qla4vt40BBfyD5kVF6bJhV2JXoS8Z2HJlbYvND5ia5CCqxUWOfz0j1b54k5U3e/Dkkvkchu6RmCwpcxL2u+VpJy3V8G3eyPhAWTpxSLzOh90KcD7W1Zi61LUx8/K5z;
+Received: from [216.252.122.219] by n19.bullet.sp1.yahoo.com with NNFMP; 08 Oct 2007 11:11:02 -0000
+Received: from [209.73.164.86] by t4.bullet.sp1.yahoo.com with NNFMP; 08 Oct 2007 11:11:01 -0000
+Received: from [66.218.66.97] by t8.bullet.scd.yahoo.com with NNFMP; 08 Oct 2007 11:11:01 -0000
+X-Yahoo-Newman-Id: 1238696-m13333
+X-Sender: kreinig@earthlink.net
+X-Apparently-To: online-saga@yahoogroups.com
+Received: (qmail 68166 invoked from network); 8 Oct 2007 11:10:59 -0000
+Received: from unknown (69.147.108.202)
+  by m57.grp.scd.yahoo.com with QMQP; 8 Oct 2007 11:10:59 -0000
+Received: from unknown (HELO elasmtp-banded.atl.sa.earthlink.net) (209.86.89.70)
+  by mta3.grp.re1.yahoo.com with SMTP; 8 Oct 2007 11:10:59 -0000
+Received: from [141.154.126.173] (helo=[10.0.1.3])
+	by elasmtp-banded.atl.sa.earthlink.net with asmtp (Exim 4.34)
+	id 1IeqVn-00047B-6y
+	for online-saga@yahoogroups.com; Mon, 08 Oct 2007 07:10:59 -0400
+In-Reply-To: <5a355a7f00009d0d@gdc4s.com>
+References: <5c521745000103fd@gdc4s.com> <513479.87790.qm@web60425.mail.yahoo.com> <20070907030600.1A8F2280213@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715B907DC@TNTNC4SXCH.gdc4s.com> <20070908023651.BF40327FF48@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715BF0638@TNTNC4SXCH.gdc4s.com> <200709101619.1iuPJ32Dw3Nl34m1@mx-casero.atl.sa.earthlink.net> <40DBE454-8732-4523-A6CC-4CD74462B516@earthlink.net> <200709110045.1iuXCGia3Nl36t0@mx-collie.atl.sa.earthlink.net> <5E8ABEB1-ED4C-45DC-819D-B7E15E93A7E5@earthlink.net> <8C431EC125E9924186D8BB91DC1152B715C80BAC@TNTNC4SXCH.gdc4s.com> <200709111429.1ivauO4Ub3Nl36v0@mx-harris.atl.sa.earthlink.net> <1BCEB9FD-3178-4C41-9853-D476C654C706@earthlink.net> <8C431EC125E9924186D8BB91DC1152B715CDA998@TNTNC4SXCH.gdc4s.com> <20070912181046.AC7F22801F8@gideon.gdc4s.com> <7cdfbb5100003670@gdc4s.com> <1C608308-E419-40A8-BC3E-5CDA15513250@earthlink.net> <20070914034847.DAB9128038F@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715D70  B3B@TN T N C4SXCH. g dc 4 s .com> <20070915014309.63A7D28040B@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715DDA0F9@TNTNC4SXCH.gdc4s.com> <20070917232538.CCBE6280074@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715E589EC@TNTNC4SXCH.gdc4s.com> <20070919024355.3A04522DD7A@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B715EBB648@TNTNC4SXCH.gdc4s.com> <20070920022848.18FC327FFEB@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B715F1D555@TNTNC4SXCH.gdc4s.com> <20070920215320.75CE722DD89@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B715F9B7B1@TNTNC4SXCH.gdc4s.com> <20070921191102.9F1BA22DD9C@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B715FCB1EF@TNTNC4SXCH.gdc4s.com> <200709250233.1iA3YS6D43Nl34m0@mx-casero.atl.sa.earthlink.net> <39D6B181-9758-45B6-A1E5-6BF30ACC9C19@earthlink.net> <200709260105.1iAp521YD3Nl36J0@mx-various.atl.sa.earthlink.net> <B9FEB5F7-FCB1-4AFE-A5ED-56FBC1763F6A@earthlink.net> <1c74de1600000284@gdc4s.com> <0EAA35F1-CF85-4096-B9D9-D2AC843DD446@e a rt hlink.net > < 200 70927064241.C2B4E22DD77@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B7160E7078@TNTNC4SXCH.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B7160E708A@TNTNC4SXCH.gdc4s.com> <20070928004307.BF00A27FEC3@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B716150B3B@TNTNC4SXCH.gdc4s.com> <20070929205326.1EC7E22DD77@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B7161BF91E@TNTNC4SXCH.gdc4s.com> <20071002233707.04A9122DD87@az25egs01.gdds.com> <8C431EC125E9924186D8BB91DC1152B71628B73E@TNTNC4SXCH.gdc4s.com> <20071004051418.958D928021C@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B71631D2FD@TNTNC4SXCH.gdc4s.com> <20071005032539.1F4462807AD@gideon.gdc4s.com> <8C431EC125E9924186D8BB91DC1152B71638B84F@TNTNC4SXCH.gdc4s.com> <20071008050727.BA7C622DD7B@az25egs01.gdds.com> <5a355a7f00009d0d@gdc4s.com>
+Message-Id: <AF7FA4F4-9738-403A-A954-FD6071229690@earthlink.net>
+To: online-saga@yahoogroups.com
+X-Mailer: Apple Mail (2.752.2)
+X-ELNK-Trace: 2dc96a205399d9b5d780f4a490ca69563f9fea00a6dd62bc96ce2dd453464dc77a5d205f361494b4350badd9bab72f9c350badd9bab72f9c350badd9bab72f9c
+X-Originating-IP: 209.86.89.70
+X-eGroups-Msg-Info: 1:12:0:0:0
+From: Kathy Reinig <kreinig@earthlink.net>
+X-Yahoo-Profile: krreinig
+Sender: online-saga@yahoogroups.com
+MIME-Version: 1.0
+Mailing-List: list online-saga@yahoogroups.com; contact online-saga-owner@yahoogroups.com
+Delivered-To: mailing list online-saga@yahoogroups.com
+List-Id: <online-saga.yahoogroups.com>
+Precedence: bulk
+List-Unsubscribe: <mailto:online-saga-unsubscribe@yahoogroups.com>
+Date: Mon, 8 Oct 2007 07:10:58 -0400
+Subject: Re: [ArM Saga] Exploring a Cave
+Reply-To: online-saga@yahoogroups.com
+X-Yahoo-Newman-Property: groups-email-tradt-m
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+
+On Oct 8, 2007, at 7:05 AM, Dahlene,William wrote:
+
+> No Problem.
+>
+> And I just realized Rurik wont be able to see in the dark to get  
+> back to the rope.
+
+True, but the rope should be against the wall, and a hand against the  
+wall then gets there.  It's the standard way to move in the dark.   
+And there's light above, which is where it would be most needed.
+
+Not that he's looking to leave.  Just noting that if you're used to  
+moving in the dark, it's not hard.
+
+
+
+ 
+Yahoo! Groups Links
+
+<*> To visit your group on the web, go to:
+    http://groups.yahoo.com/group/online-saga/
+
+<*> Your email settings:
+    Individual Email | Traditional
+
+<*> To change settings online go to:
+    http://groups.yahoo.com/group/online-saga/join
+    (Yahoo! ID required)
+
+<*> To change settings via email:
+    mailto:online-saga-digest@yahoogroups.com 
+    mailto:online-saga-fullfeatured@yahoogroups.com
+
+<*> To unsubscribe from this group, send an email to:
+    online-saga-unsubscribe@yahoogroups.com
+
+<*> Your use of Yahoo! Groups is subject to:
+    http://docs.yahoo.com/info/terms/
+ 
+
+From perl5-porters-return-129439-archive=grokbase.com@perl.org  Mon Oct  8 06:14:36 2007
+Return-Path: <perl5-porters-return-129439-archive=grokbase.com@perl.org>
+X-Original-To: archive@grokbase.com
+Delivered-To: archive@grokbase.com
+Received: from x6.develooper.com (HELO lists.develooper.com) (63.251.223.186)
+    by s69759.xenosight.com (qpsmtpd/0.32) with SMTP; Mon, 08 Oct 2007 06:14:36 -0500
+Received: (qmail 6546 invoked by uid 514); 8 Oct 2007 11:14:31 -0000
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Precedence: bulk
+list-help: <mailto:perl5-porters-help@perl.org>
+list-unsubscribe: <mailto:perl5-porters-unsubscribe@perl.org>
+list-post: <mailto:perl5-porters@perl.org>
+X-List-Archive: <http://nntp.perl.org/group/perl.perl5.porters/129439>
+List-Id: <perl5-porters.perl.org>
+Delivered-To: mailing list perl5-porters@perl.org
+Received: (qmail 6533 invoked from network); 8 Oct 2007 11:14:30 -0000
+Delivered-To: perl5-porters@perl.org
+X-Spam-Status: No, hits=0.3 required=8.0
+	tests=BAYES_00,RCVD_IN_PBL,RDNS_DYNAMIC,TVD_RCVD_IP
+X-Spam-Check-By: la.mx.develooper.com
+Date: Mon, 8 Oct 2007 12:13:29 +0100
+From: Dave Mitchell <davem@iabyn.com>
+To: demerphq <demerphq@gmail.com>
+Cc: Michael G Schwern <schwern@pobox.com>, albie@alfarrabio.di.uminho.pt,
+	perl5-porters@perl.org
+Subject: Re: [KOT] Languages Benchmarks
+Message-ID: <20071008111329.GD19071@iabyn.com>
+References: <46CF251B.2030701@alfarrabio.di.uminho.pt> <9b18b3110708241424n1601e457t9d541b71a06eb85f@mail.gmail.com> <46CF5F51.9050001@pobox.com> <9b18b3110708250351lfd5f498vbe5b058a5edad79f@mail.gmail.com> <20070827132502.GB19324@iabyn.com> <9b18b3110709030558v3b665f33kfba29cd1abfd9769@mail.gmail.com> <9b18b3110709041246t1b017095x8b6357b5166e6c25@mail.gmail.com> <20070904194743.GG13794@iabyn.com> <9b18b3110709041255t4796b08aqe355988b18f57160@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b18b3110709041255t4796b08aqe355988b18f57160@mail.gmail.com>
+User-Agent: Mutt/1.4.2.3i
+X-Disclaimer: This disclaimer may not be read without permission
+
+On Tue, Sep 04, 2007 at 09:55:31PM +0200, demerphq wrote:
+> On 9/4/07, Dave Mitchell <davem@iabyn.com> wrote:
+> > On Tue, Sep 04, 2007 at 09:46:28PM +0200, demerphq wrote:
+> > > Actually i built perl with the AC stuff disabled and the benchmark I
+> >
+> > Um, what does AC stand for?
+> 
+> Sorry. AC is abbreviation for Aho Corasick, which is more or less the
+> algorithm that the code in find_byclass() that you profiled
+> implements.
+> 
+> You can disable it by finding a line regcomp.c that says
+> 
+> #define TRIE_STCLASS
+> 
+> and commenting it out, or whatever. You can also disable the tri
+> optimisation outright by modifying on of the defines at the top of
+> regcomp.h
+
+This is odd - I've just had another look at this 20% slowdown thing, and
+I can no longer see any noticeable difference between the 5.8.8 and bleed
+times of this benchmark (based on the 'user' value of the UNIX 'time'
+output).
+
+This is unthreaded, optimised 5.8.8, and bleed from 25 Sept.
+
+So either:
+
+something's changed recently in bleed that's made the problem go away,
+or the 20% was just noise and varies randomly from build to build
+(wouldn't be the first time...),
+or I've made a mistake somewhere.
+
+
+-- 
+This is a great day for France!
+    -- Nixon at Charles De Gaulle's funeral
+

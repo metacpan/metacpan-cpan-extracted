@@ -1,0 +1,34 @@
+---
+abstract: 'read rcfile for CLI tools'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: 0.04
+configure_requires:
+  Module::Build: 0.40
+  Module::Build::Pluggable: 0
+  Module::Build::Pluggable::CPANfile: 0.04
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-CmdRC
+provides:
+  Config::CmdRC:
+    file: lib/Config/CmdRC.pm
+    version: 0.07
+requires:
+  Config::Simple: 4.58
+  File::Spec: 0
+  Hash::Merge: 0
+  perl: 5.008005
+resources:
+  bugtracker: http://github.com/bayashi/Config-CmdRC/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Config-CmdRC
+version: 0.07
+x_test_requires:
+  Test::More: 0.88
+  YAML: 0

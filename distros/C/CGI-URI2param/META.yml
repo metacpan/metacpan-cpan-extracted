@@ -1,0 +1,22 @@
+---
+name: CGI-URI2param
+version: 1.01
+author:
+  - 'Thomas Klausner <domm@zsi.at>'
+abstract: convert parts of an URL to param values
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::More: 0
+provides:
+  Apache::URI2param:
+    file: lib/Apache/URI2param.pm
+    version: 1.01
+  CGI::URI2param:
+    file: lib/CGI/URI2param.pm
+    version: 1.01
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Catalyst/Plugin/Authentication/Credential/BBAuth.pm
+t/00_compile.t
+t/01_basic.t
+t/98_pod.t
+t/99_podcoverage.t

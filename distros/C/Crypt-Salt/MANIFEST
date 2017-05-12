@@ -1,0 +1,11 @@
+Changes
+INSTALL
+lib/Crypt/Salt.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_test.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

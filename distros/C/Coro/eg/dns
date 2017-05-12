@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use Coro;
+use Coro::Util;
+use Coro::AnyEvent;
+
+use Socket;
+
+# do some asynchronous hostname resolution
+
+my @pid;
+
+for my $x (1..255) {
+   push @pid, async {
+      my $addr = "129.13.162.$x";
+      print "$addr => ",(scalar gethostbyaddr inet_aton($addr), AF_INET),"\n";
+   };
+}
+
+$_->join for @pid;
+

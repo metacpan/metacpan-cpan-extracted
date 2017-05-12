@@ -1,0 +1,21 @@
+---
+abstract: "Perl extension for generic copying.  This module's intented purpose is to facilitate file / dir copies between different types of remote systems that frequently use very different syntax for similar functions.  For example, Microsoft SharePoint's SOAP protocols and the Opentext Livelink's WebDAV protocols both support copy functions, but it is tedious to automate the movement of Livelink files into a SharePoint site."
+author:
+  - 'dbmolester de gmail.com'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CopyTree-VendorProof
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.0013

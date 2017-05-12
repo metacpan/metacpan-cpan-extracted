@@ -1,0 +1,4 @@
+#!/usr/bin/perl -n
+next if (/^\s*=/ .. /^\s*=cut/);
+next if /^\s*$/;
+print unless (/^(\s*)if\s*\(\s*.T_CHECKS/ .. /^$1\}/);

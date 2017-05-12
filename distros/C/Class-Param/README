@@ -1,0 +1,139 @@
+NAME
+    Class::Param - Param Class
+
+SYNOPSIS
+        use Class::Param;
+        use Class::Param::Encoding;
+        use Class::Param::Tie;
+
+        $param = Class::Param->new( { smiley => "\xE2\x98\xBA" } );
+        $param = Class::Param::Encoding->new( $param, 'UTF-8' );
+
+        if ( $param->get('smiley') eq "\x{263A}" ) {
+            # true
+        }
+
+        $param = Class::Param::Tie->new($param);
+
+        if ( $param->{smiley} eq "\x{263A}" ) {
+            # true
+        }
+
+        # ..
+
+        package MyClass;
+
+        sub param {
+            my $self  = shift;
+            my $param = $self->{param} ||= Class::Param->new;
+
+            if ( @_ == 0 && ! wantarray ) {
+                return $param;
+            }
+            else {
+                return $param->param(@_);
+            }
+        }
+
+        # Somewhere else
+
+        $object = MyClass->new;
+
+        @names  = $object->param;
+        @names  = $object->param->names;
+        $value  = $object->param('name');
+        $value  = $object->param->get('name');
+
+DESCRIPTION
+    Provides several classes to work with CGI.pm style params.
+
+METHODS
+    new
+            $param = Class::Param->new;
+            $param = Class::Param->new( \%params );
+
+    param
+            # get
+            @names   = $param->param;
+            $value   = $param->param($name);
+            @values  = $param->param($name);
+
+            # set
+            $param->param( $name => $value   );
+            $param->param( $name => @values  );
+
+            # remove
+            $param->param( $name => undef    );
+
+    get
+            $value = $param->get($name);
+
+    set
+            $param->set( $name => $value );
+
+    add
+            $param->add( $name => $value  );
+            $param->add( $name => @values );
+
+        Append value to name.
+
+    has
+            $boolean = $param->has($name);
+
+        Returns true if param has name.
+
+    count
+            $count = $param->count;
+
+        Returns the number of total params.
+
+    names
+            @names = $param->names;
+
+        Returns a list of all names in param.
+
+    clear
+            $param->clear;
+
+        Clears all params.
+
+    remove
+            $removed = $param->remove($name);
+
+        Remove name from param. Returns the removed value.
+
+    scan
+            $param->scan( sub {
+                my ( $name, @values ) = @_;
+            });
+
+        Applies a callback which will be called for each param.
+
+    as_hash
+            %hash = $param->as_hash;
+            $hash = $param->as_hash;
+
+        Returns params as a hash.
+
+SEE ASLO
+    Class::Param::Base.
+
+    Class::Param::Callback.
+
+    Class::Param::Compound.
+
+    Class::Param::Decorator.
+
+    Class::Param::Encoding.
+
+    Class::Param::Ordered.
+
+    Class::Param::Tie.
+
+AUTHOR
+    Christian Hansen "chansen@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

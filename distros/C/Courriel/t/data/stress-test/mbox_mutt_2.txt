@@ -1,0 +1,157 @@
+From maney@two14.net Wed Oct 06 12:43:34 2004
+Received: from gateway.two14.net ([69.17.22.215])
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1CFFp8-0005eB-3y
+        for ubuntu-users@lists.ubuntu.com; Wed, 06 Oct 2004 12:43:34 -0500
+Received: from wheel2.two14.net (wheel2.two14.net [172.31.1.10])
+        by gateway.two14.net (Postfix) with ESMTP id 6B104AD43
+        for <ubuntu-users@lists.ubuntu.com>;
+        Wed,  6 Oct 2004 12:43:03 -0500 (CDT)
+Received: from furrr.two14.net (furrr.two14.net [172.31.1.5])
+        by wheel2.two14.net (Postfix) with ESMTP id 4C8C3180C7
+        for <ubuntu-users@lists.ubuntu.com>;
+        Wed,  6 Oct 2004 12:43:03 -0500 (CDT)
+Received: by furrr.two14.net (Postfix, from userid 1000)
+        id 208282FF; Wed,  6 Oct 2004 12:43:03 -0500 (CDT)
+Date: Wed, 6 Oct 2004 12:43:03 -0500
+From: Martin Maney <ubuntu@two14.net>
+To: Ubuntu Linux users <ubuntu-users@lists.ubuntu.com>
+Message-ID: <20041006174303.GB7196@furrr.two14.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.3.28i
+Subject: Wiki problem
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: ubuntu-users@lists.ubuntu.com
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Wed, 06 Oct 2004 17:43:34 -0000
+
+
+Every time I do a text search ont he wiki, it crashes after displaying
+some results - looks like maybe it's trying to process one more matching
+file than actually exists?  Dies with Type Error: iteration over
+non-sequence in quoteFilename, passed a None as the filename.
+
+It appears to be consistent - any search of the full text I've tried
+gets this.
+
+--
+The most effective way to get information from usenet is not to ask
+a question; it is to post incorrect information.  -- Aahz's Law
+
+
+From ofiol@ikirux.com.ve Wed Oct 06 12:41:34 2004
+Received: from [201.249.53.93] (helo=ikirux.com.ve ident=root)
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1CFFnB-0005bP-O1
+        for ubuntu-users@lists.ubuntu.com; Wed, 06 Oct 2004 12:41:34 -0500
+Received: from [201.243.242.193] (account ofiol HELO localhost)
+        by ikirux.com.ve (CommuniGate Pro SMTP 4.1.8)
+        with ESMTP-TLS id 481165 for ubuntu-users@lists.ubuntu.com;
+        Wed, 06 Oct 2004 14:03:47 -0400
+Date: Wed, 6 Oct 2004 13:40:09 -0400
+To: ubuntu-users@lists.ubuntu.com
+Message-ID: <20041006174009.GB2445@(none)>
+References: <1097083715.3294.7.camel@localhost.local.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1097083715.3294.7.camel@localhost.local.net>
+User-Agent: Mutt/1.5.6+20040722i
+Subject: Re: Boot speed
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Wed, 06 Oct 2004 17:41:34 -0000
+
+On Wed, Oct 06, 2004 at 06:28:34PM +0100, Benjamin Roe wrote:
+[...]
+> Does anyone have any tips for reducing the boot time? I've already
+> stopped all the non-essential services (syslog,pcmcia etc), prelinked
+> everything etc. A lot of time seems to be spent in running the various
+> pci.rc, usb.rc scripts - is there a way to skip these?
+
+        I see that the hardware recognition process take too much time, but
+        Im new with Ubuntu and I haven't check this process internally.
+
+        Taking my experience with others distros that uses hardware
+        recognitions and activations routines, this try to load all possible
+        kernel modules for each device but, Why don't use lspci output and
+        use some kind of hardware DB to see which kernel modules to load?
+        maybe that  will be fastern
+
+>
+> Thanks,
+> Ben
+
+
+From c.casimir@laposte.net Wed Oct 06 12:47:54 2004
+Received: from mx.laposte.net ([81.255.54.11])
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1CFFtK-0005og-HP
+        for ubuntu-users@lists.ubuntu.com; Wed, 06 Oct 2004 12:47:54 -0500
+Received: from [192.168.0.2] (195.154.39.24) by mx.laposte.net (7.0.028)
+        (authenticated as c.casimir@laposte.net)
+        id 416173CE00212873 for ubuntu-users@lists.ubuntu.com;
+        Wed, 6 Oct 2004 19:47:22 +0200
+Message-ID: <41643049.5020403@laposte.net>
+Date: Wed, 06 Oct 2004 19:50:01 +0200
+From: Christian Casimir <c.casimir@laposte.net>
+User-Agent: Mozilla Thunderbird 0.8 (Windows/20040913)
+X-Accept-Language: fr, en
+MIME-Version: 1.0
+To: ubuntu-users@lists.ubuntu.com
+References: <415D3810.4090901@laposte.net>
+        <20041002000938.GE23790@alcor.net>      <4163A5AA.9030508@laposte.net>  <200410060917.47319.ubuntu@petethetree.co.uk>
+        <20041006171229.GK16935@alcor.net>
+In-Reply-To: <20041006171229.GK16935@alcor.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: Quoted-Printable
+Subject: Re: Ethernet and sound problem on IBM X20
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Wed, 06 Oct 2004 17:47:54 -0000
+
+Matt Zimmerman a =E9crit :
+>=20
+> That bug seems to be about a compilation error.
+>=20
+> The Ubuntu bug for this issue is
+> https://bugzilla.ubuntu.com/show_bug.cgi?id=3D1994
+>=20
+> If you are experiencing it as well, please test the workaround in comme=
+nt
+> #14.
+
+Unfortunately, I won't be able to test anything before the end of the=20
+week. I definitely will as soon as Monday. Thanks anyway and I'll be=20
+back soon with some test results.
+
+Christian C.

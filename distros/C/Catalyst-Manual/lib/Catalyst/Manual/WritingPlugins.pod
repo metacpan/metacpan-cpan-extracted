@@ -1,0 +1,19 @@
+=head1 NAME
+
+Catalyst::Manual::WritingPlugins - DEPRECATED, see L<Catalyst::Manual::ExtendingCatalyst> instead
+
+=head1 SEE INSTEAD
+
+This document is now deprecated. Please refer to L<Catalyst::Manual::ExtendingCatalyst>
+for information on how to extend the framework and your applications.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

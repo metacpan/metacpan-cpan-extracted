@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 4
+  26544:
+    - 205
+name: cb04
+registers:
+  AF: 35840
+  AF_: 0
+  BC: 48874
+  BC_: 0
+  DE: 3300
+  DE_: 0
+  HL: 26544
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

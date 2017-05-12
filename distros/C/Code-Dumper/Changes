@@ -1,0 +1,6 @@
+Revision history for Perl extension Code::Dumper.
+
+0.01  Mon Nov 21 06:56:47 2005
+	- original version; created by h2xs 1.23 with options
+		-XAn Code::Dumper
+

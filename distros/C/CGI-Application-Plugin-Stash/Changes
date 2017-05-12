@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Application::Plugin::Stash.
+
+0.01  Wed Nov  9 09:27:09 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n CGI::Application::Plugin::Stash
+

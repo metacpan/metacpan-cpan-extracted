@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb44
+registers:
+  AF: 24444
+  AF_: 0
+  BC: 56837
+  BC_: 0
+  DE: 4861
+  DE_: 0
+  HL: 63291
+  HL_: 0
+  I: 0
+  IX: 60938
+  IY: 26164
+  PC: 4
+  R: 2
+  SP: 0

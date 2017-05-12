@@ -1,0 +1,19 @@
+Changes
+lib/Class/DBI/Loader.pm
+lib/Class/DBI/Loader/Generic.pm
+lib/Class/DBI/Loader/mysql.pm
+lib/Class/DBI/Loader/Pg.pm
+lib/Class/DBI/Loader/SQLite.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04mysql.t
+t/05pg.t
+t/06sqlite.t
+t/lib/LoaderBase.pm
+t/lib/LoaderLeft.pm
+t/lib/SQLiteTest/LoaderTest1.pm

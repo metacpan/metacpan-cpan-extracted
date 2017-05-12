@@ -1,0 +1,9 @@
+goo_{.*} = 1234
+foo_{.*} = 5678
+
+foo_1     = foo1
+
+rfoo_1 = $(foo_1)
+rfoo_2 = $(foo_2)
+
+rfoo_e = $(var)/foo

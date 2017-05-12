@@ -1,0 +1,20 @@
+Revision history for Perl extension CGI::Application::PageBuilder.
+
+0.98 20120317
+    - fixed bug 48498
+      -- tests should pass on 5.10+
+
+0.9 - Docs make a little more sense.  Took out the unnecessary pb_init().
+
+0.8 - Cleanup and test changes.
+
+0.7 - Switched to being a CGI::App plugin instead of a standalone module.
+
+0.6 - POD changes, some cleanup.
+
+0.5 - Initial release to CPAN.
+
+0.01  Tue Jul 27 11:07:55 2004
+	- original version; created by h2xs 1.22 with options
+		-XA -n CGI::Application::PageBuilder
+

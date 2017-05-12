@@ -1,0 +1,21 @@
+---
+name: CAD-Drawing-Template
+version: 0.01
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: Replace tags with text and geometry.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Calc: 0.25
+  CAD::Drawing: 0.26
+  Test::More: 0
+provides:
+  CAD::Drawing::Template:
+    file: lib/CAD/Drawing/Template.pm
+    version: 0.01
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

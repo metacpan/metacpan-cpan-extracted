@@ -1,0 +1,45 @@
+---
+abstract: 'Bindings for the rados gateway admin api.'
+author:
+  - 'Chris Reinhardt <crein@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::MockTime: '0'
+  Test::More: '0'
+  Test::Spec: '0'
+  Test::VCR::LWP: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ceph-RadosGW-Admin
+requires:
+  Data::Dumper: '0'
+  Digest::HMAC_SHA1: '0'
+  Digest::MD5: '0'
+  HTTP::Date: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Moose: '0.85'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::StrictConstructor: '0.16'
+  URI: '0'
+  URI::Escape: '0'
+  URI::QueryParam: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/ctriv/perl-Ceph-RadosGW-Admin
+  repository: https://github.com/ctriv/perl-Ceph-RadosGW-Admin.git
+version: '0.4'
+x_contributors:
+  - 'Mark Ng <cpan@markng.co.uk>'

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbe4
+registers:
+  AF: 14729
+  AF_: 0
+  BC: 16706
+  BC_: 0
+  DE: 35298
+  DE_: 0
+  HL: 31579
+  HL_: 0
+  I: 0
+  IX: 3063
+  IY: 21620
+  PC: 4
+  R: 2
+  SP: 0

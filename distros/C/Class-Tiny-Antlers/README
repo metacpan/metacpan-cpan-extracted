@@ -1,0 +1,110 @@
+NAME
+    Class::Tiny::Antlers - Moose-like sugar for Class::Tiny
+
+SYNOPSIS
+       {
+          package Point;
+          use Class::Tiny::Antlers;
+          has x => (is => 'ro');
+          has y => (is => 'ro');
+       }
+   
+       {
+          package Point3D;
+          use Class::Tiny::Antlers;
+          extends 'Point';
+          has z => (is => 'ro');
+       }
+
+DESCRIPTION
+    Class::Tiny::Antlers provides Moose-like `has`, `extends`, `with`,
+    `before`, `after` and `around` keywords for Class::Tiny. (The `with`
+    keyword requires Role::Tiny; method modifiers require
+    Class::Method::Modifiers.)
+
+    Class::Tiny doesn't support all Moose's attribute options; `has` should
+    throw you an error if you try to do something it doesn't support (like
+    triggers or type constraints).
+
+    Class::Tiny::Antlers does however hack in support for `is => 'ro'` and
+    Moo-style `is => 'rwp'`, clearers and predicates.
+
+  Export
+    By default, Class::Tiny::Antlers exports `has`, `with` and `extends`, and
+    also imports strict into its caller. You can optionally also import
+    `confess` and warnings:
+
+       use Class::Tiny::Antlers qw( -default confess warnings );
+
+    And Class::Method::Modifiers keywords:
+
+       use Class::Tiny::Antlers qw( -default before after around );
+       use Class::Tiny::Antlers qw( -default -cmm );  # same thing
+
+    If you just want everything:
+
+       use Class::Tiny::Antlers qw( -all );
+
+    Class::Tiny::Antlers also ensures that Class::Tiny's import method is
+    called for your class.
+
+    You can put a `no Class::Tiny::Antlers` statement at the end of your class
+    definition to wipe the imported functions out of your namespace. (This
+    does not unimport strict/warnings though.) To clean up your namespace more
+    thoroughly, use something like namespace::sweep.
+
+  Functions
+    `has $attr, %spec`
+        Create an attribute. The specification hash roughly supports `is`,
+        `default`, `clearer` and `predicate` as per Moose and Moo.
+
+    `extends @classes`
+        Set the base class(es) for your class.
+
+    `with @roles`
+        Compose Role::Tiny roles with your class.
+
+    `before $name, \&code`
+        Install a `before` modifier using Class::Method::Modifiers.
+
+    `after $name, \&code`
+        Install a `after` modifier using Class::Method::Modifiers.
+
+    `around $name, \&code`
+        Install a `around` modifier using Class::Method::Modifiers.
+
+    `confess $format, @list`
+        `sprintf`-fueled version of Carp's `confess`.
+
+  Methods
+    Class::Tiny::Antlers inherits the `get_all_attributes_for` and
+    `get_all_attribute_defaults_for` methods from Class::Tiny, and also
+    provides:
+
+    `Class::Tiny::Antlers->get_all_attribute_specs_for($class)`
+        Gets Moose-style attribute specification hashes for all the class'
+        attributes as a big hashref. (Includes inherited attributes.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Class-Tiny-Antlers>.
+
+SEE ALSO
+    Class::Tiny, Role::Tiny, Class::Method::Modifiers.
+
+    Moose, Mouse, Moo.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

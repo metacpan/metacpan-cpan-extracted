@@ -1,0 +1,124 @@
+Revision history for Perl extension Class-Scaffold
+
+1.102280  2010-08-16 18:47:17 Europe/Vienna
+    - Class::Scaffold::App->run_app(): catching an error activates rollback
+      mode
+
+1.101400  2010-05-20 14:34:51 Europe/Vienna
+    - C::S::App: store the conf_file_spec in the default configuration layer
+      for reference
+    - C::S::Environment: forward get_config() onto the configurator
+
+1.100980  2010-04-08 16:23:58 Europe/Vienna
+    - use parent instead of use base
+    - Class::Scaffold::App: when specifying multiple configuration files,
+      accept a colon as delimiter as well to make it easier for bash usage.
+    - Class::Scaffold::App: documented initialized()
+    - removed unused variables
+    - POD typo fixes
+
+1.100810  2010-03-22 20:25:02 Europe/Vienna
+    - R::App::Test::YAMLDriven: should_skip_test() must return a reason
+      (string)
+    - added 'use Data::Storage;' to Class::Scaffold::Environment for AutoPrereq
+
+1.100760  2010-03-17 01:01:18 Europe/Vienna
+    - converted distribution to Dist::Zilla-style
+
+0.16 Fri 2010.02.12 14:08:24 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed scalar/list context bug in passing options to Property::Lookup
+    - refactored; now uses Test::Class::GetoptControl
+
+0.15 Mon 2010.02.01 17:35:27 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - C::S::App::CommandLine: added support for GETOPT_DEFAULTS
+    - added constant importer to avoid all those 'self->delegate->...' calls
+    - C::S::App::CommandLine: call usage() like a method
+    - C::S::App::Test::YAMLDriven: decode utf8 before YAML::Load to make it the
+      same as YAML::XS::Load
+    - convert to new-style PTAGS handling (see Vim::Tag)
+
+0.14 Mon 2009.11.16 11:17:38 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - C::S::Storable: shortcut MUNGE_CONSTRUCTOR_ARGS if storage_type arg is
+      present
+
+0.13 Wed 2009.11.04 23:45:02 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - C::S::Factory::Type got an import function that provides direct access
+      functions so it is easier and faster than '$self->delegate->make_obj()'
+    - miscellaneous performance tuning
+
+0.12 Tue 2009.11.03 14:06:18 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - C::S::App::Test::YAMLDriven now supports --shuffle, --reverse to affect
+      test order.
+
+0.11 Mon 2009.11.02 17:59:15 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - C::S::App::Test::YAMLDriven now has run_test(), which runs the abstract
+      run_subtest() in a subtest.
+
+0.10 Sat 2009.10.24 23:20:43 CEST (Marcel Gruenauer <marcel@cpan.org>)
+    - configurator mechanism is now handled by Property::Lookup
+    - 'getopt' configurator layer is now just 'hash'
+    - added check() to environment
+    - repo maintenance
+
+0.09 Tue Sep 29 15:56:27 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - repo maintenance
+    - added author requirements; fixed auxiliary files
+    - better YAML loader handling
+    - support for YAML::Marshall; YAMLDriven tests need to explicitly request
+      'use_yaml_active: 1' now
+    - C::S::App::Test::YAMLDriven: make_plan now just returns number of tests,
+      plan() happens above
+    - C::S::App: support for several conf files; C::S::Environment: isa_type
+      now handles the case where there's no factory type
+
+0.08 Mon Jul  6 13:23:27 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - added extra tests (xt/)
+     - doc fixes
+
+0.07  Sat Nov  1 21:59:22 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Now uses Vim::Tag
+
+0.06  Mon Oct 20 23:01:57 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - many optimizations to speed things up
+
+0.05  Thu, 29 May 2008 12:01:43 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.05
+     - re-fixed t/02_storage_conf.t - did the last fix get lost somewhere?
+       Anyway, set ENV{CF_CONF}='local' to appease the configurator
+     - .shipit: fixed svk.tagpattern
+
+0.04  Wed, 27 Feb 2008 14:03:27 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - fixed t/storage_conf.t to use 'local' CF_CONF
+     - mv t/storage_conf.t t/02_storage_conf.t
+     - added + t/02_storage_conf.t
+     - deleted t/storage_conf.t
+
+0.03  Mon, 25 Feb 2008 16:28:59 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install(); fixed process_templates()
+     - lib/*: template now uses standard_pod instead of standard_pod_zid
+     - bin/*: removed standard pod section
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+       had a bug in make_real_object()
+     - Makefile.PL: require v0.03 of Class::Accessor::FactoryTyped
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - Class::Scaffold::Environment's STORAGE_CLASS_NAME_HASH now also defines
+       STG_NULL_DBI => 'Data::Storage::DBI' for testing
+     - added t/storage_conf.t
+     - updated MANIFEST
+     - updated MANIFEST
+     - tags: NEWFEATURE
+
+0.02  Wed, 07 Nov 2007 18:51:08 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - Makefile.PL now requires Data::Storage 0.02
+
+0.01  Wed, 07 Nov 2007 13:14:02 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

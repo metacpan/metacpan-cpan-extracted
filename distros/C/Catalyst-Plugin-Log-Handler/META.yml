@@ -1,0 +1,28 @@
+---
+abstract: 'Catalyst Plugin for Log::Handler'
+author:
+  - 'Christoph Bussenius'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Log-Handler
+no_index:
+  directory: example
+provides:
+  Catalyst::Plugin::Log::Handler:
+    file: lib/Catalyst/Plugin/Log/Handler.pm
+    version: 0.08
+  Catalyst::Plugin::Log::Handler::Backend:
+    file: lib/Catalyst/Plugin/Log/Handler.pm
+requires:
+  Class::Accessor: 0
+  Log::Handler: 0.65
+  MRO::Compat: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

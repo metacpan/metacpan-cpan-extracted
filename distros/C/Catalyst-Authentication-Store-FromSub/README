@@ -1,0 +1,240 @@
+NAME
+    Catalyst::Authentication::Store::FromSub - A storage class for Catalyst
+    Authentication using one Catalyst Model class
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Catalyst qw/Authentication/;
+
+        __PACKAGE__->config->{authentication} = {  
+            default_realm => 'members',
+            realms => {
+                members => {
+                credential => {
+                    class => 'Password',
+                    password_field => 'password',
+                    password_type => 'clear'
+                },
+                store => {
+                    class => 'FromSub', # or 'Object'
+                    user_type => 'Hash',
+                    model_class => 'UserAuth',
+                    id_field => 'user_id',
+                }
+            }
+        } };
+
+        # Log a user in:
+        sub login : Global {
+            my ( $self, $c ) = @_;
+
+            $c->authenticate( {  
+                username => $c->req->params->username,
+                password => $c->req->params->password,
+            } );
+        }
+
+        package MyApp::Model::UserAuth; # map with model_class in config above
+        use base qw/Catalyst::Model/;
+        use strict;
+
+        sub auth { # sub name needs to be 'auth'
+            my ($self, $c, $userinfo) = @_;
+
+            my $where;
+            if (exists $userinfo->{user_id}) { # restore from session (id_field => 'user_id')
+                $where = { user_id => $userinfo->{user_id} };
+            } elsif (exists $userinfo->{username}) { # from authenticate
+                $where = { username => $userinfo->{username} };
+            } else { return; }
+
+            # deal with cache
+            # if (my $val = $c->cache->get($key) {
+            #     return $val;
+            # } else {
+                my $user = $c->model('TestApp')->resultset('User')->search( $where )->first;
+                $user = $user->{_column_data}; # hash
+            #     $c->cache->set($key, $user);
+            # }
+
+            return $user;
+        }
+
+DESCRIPTION
+    Catalyst::Authentication::Store::FromSub class provides access to
+    authentication information by using a Catalyst Model sub auth.
+
+    In sub auth of the Catalyst model, we can use cache there (or do some
+    complicated code). it would avoid the hit of db every request.
+
+  CONFIGURATION
+    The FromSub authentication store is activated by setting the store
+    config class element to 'FromSub'. See the
+    Catalyst::Plugin::Authentication documentation for more details on
+    configuring the store.
+
+    The FromSub storage module has several configuration options
+
+        __PACKAGE__->config->{authentication} = {  
+            default_realm => 'members',
+            realms => {
+                members => {
+                    credential => {
+                        # ...
+                    },
+                    store => {
+                        class => 'FromSub',
+                        user_type => 'Object',
+                        model_class => 'UserAuth',
+                        id_field => 'user_id',
+                    }
+                }
+            }
+        };
+
+        authentication:
+          default_realm: 'members'
+          realms:
+            members:
+              credential:
+                class: 'Password'
+              store:
+                class: 'FromSub'
+                user_type: 'Object'
+                model_class: "UserAuth"
+
+    class
+        Class is part of the core Catalyst::Authentication::Plugin module,
+        it contains the class name of the store to be used. it must be
+        'FromSub' here.
+
+    user_type
+        'Hash' or 'Object', depends on the return value in sub auth,
+        REQUIRED.
+
+    model_class
+        Contains the class name (as passed to $c->model()) of Catalyst. This
+        config item is REQUIRED.
+
+    id_field
+        For restore from session, we pass { $id_field =>
+        $c->session->{__user}->{$id_field} } to sub auth, so be sure you
+        deal with this $userinfo in sub auth like
+
+            sub auth { # sub name needs to be 'auth'
+                my ($self, $c, $userinfo) = @_;
+
+                my $where;
+                if (exists $userinfo->{user_id}) { # restore from session (id_field => 'user_id')
+                    $where = { user_id => $userinfo->{user_id} };
+                } elsif (exists $userinfo->{username}) { # from authenticate
+                    $where = { username => $userinfo->{username} };
+                } else { return; }
+
+        It is a primary key return by sub auth. Default as 'id'
+
+  USAGE
+    The Catalyst::Authentication::Store::FromSub storage module is not
+    called directly from application code. You interface with it through the
+    $c->authenticate() call.
+
+  EXAMPLES
+   Adv.
+        # for login
+        sub login : Global {
+            my ( $self, $c ) = @_;
+
+            $c->authenticate( {  
+                username => $c->req->params->username,
+                password => $c->req->params->password,
+                status => [ 'active', 'registered' ],
+            } );
+        }
+
+        sub is_admin : Global {
+            my ( $self, $c ) = @_;
+
+            # use Set::Object in C::P::A::Roles
+            eval {
+                if ( $c->assert_user_roles( qw/admin/ ) ) {
+                    $c->res->body( 'ok' );
+                }
+            };
+            if ($@) {
+                $c->res->body( 'failed' );
+            }
+        }
+
+        package MyApp::Model::UserAuth; # map with model_class in config above
+        use base qw/Catalyst::Model/;
+        use strict;
+
+        sub auth {
+            my ($self, $c, $userinfo) = @_;
+
+            my ($where, $cache_key);
+            if (exists $userinfo->{user_id}) {
+                $where = { user_id => $userinfo->{user_id} };
+                $cache_key = 'global|user|user_id=' . $userinfo->{user_id};
+            } elsif (exists $userinfo->{username}) {
+                $where = { username => $userinfo->{username} };
+                $cache_key = 'global|user|username=' . $userinfo->{username};
+            } else { return; }
+
+            my $user;
+            if (my $val = $c->cache->get($cache_key) {
+                $user = $val;
+            } else {
+                $user = $c->model('TestApp')->resultset('User')->search( $where )->first;
+                $user = $user->{_column_data}; # hash to cache
+                # get user roles
+                my $role_rs = $c->model('TestApp')->resultset('UserRole')->search( {
+                    user => $user->{id}
+                } );
+                while (my $r = $role_rs->next) {
+                    my $role = $c->model('TestApp')->resultset('Role')->find( {
+                        id => $r->roleid
+                    } );
+                    push @{$user->{roles}}, $role->role;
+                }
+                # $user = {
+                #     'roles' => [
+                #         'admin',
+                #         'user'
+                #     ],
+                #    'status' => 'active',
+                #    'session_data' => undef,
+                #    'username' => 'jayk',
+                #    'email' => 'j@cpants.org',
+                #    'password' => 'letmein',
+                #    'id' => '3'
+                #}
+                $c->cache->set($cache_key, $user);
+            }
+
+            # validate status
+            if ( exists $userinfo->{status} and ref $userinfo->{status} eq 'ARRAY') {
+                unless (grep { $_ eq $user->{status} } @{$userinfo->{status}}) {
+                    return;
+                }
+            }
+
+            return $user;
+        }
+
+  SEE ALSO
+    Catalyst::Plugin::Authentication,
+    Catalyst::Plugin::Authentication::Internals,
+    Catalyst::Plugin::Authorization::Roles
+
+AUTHOR
+      Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as perl itself.
+

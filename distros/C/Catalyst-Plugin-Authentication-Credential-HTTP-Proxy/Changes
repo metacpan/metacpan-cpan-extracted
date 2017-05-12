@@ -1,0 +1,4 @@
+0.03    2006-01-01 13:35:00
+        - $store->get_user now gets the user name as the first arg for maximum
+          compatibility with stores.
+        - Doc fixes

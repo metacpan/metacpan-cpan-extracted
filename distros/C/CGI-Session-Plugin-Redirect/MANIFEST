@@ -1,0 +1,5 @@
+lib/CGI/Session/Plugin/Redirect.pm
+Makefile.PL
+MANIFEST
+t/CGI-Session-Plugin-Redirect.t
+META.yml                                 Module meta-data (added by MakeMaker)

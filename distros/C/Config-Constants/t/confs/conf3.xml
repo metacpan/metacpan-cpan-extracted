@@ -1,0 +1,9 @@
+<config>
+    <include path='t/confs/conf3a.xml' />    
+    <module name='Foo::Bar'>
+          <constant name='BAZ' value='the coolest module ever (included)' />
+    </module>    
+    <module name='Bar::Baz'>
+        <constant name='BAR' value='Foo and Baz' />        
+    </module>    
+</config>

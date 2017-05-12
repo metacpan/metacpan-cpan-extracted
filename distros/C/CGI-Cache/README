@@ -1,0 +1,80 @@
+CGI::Cache - Perl extension to help cache output of time-intensive CGI scripts
+
+CGI::Cache is an easy-to-use module for automatically caching CGI output so
+that subsequent visits to such scripts will not take as much time.
+
+
+MODULE DEPENDENCIES
+
+To use this module, you will need to install:
+
+- File::Path
+- Tie::Restore
+- File::Spec
+- Cache::Cache
+- Storable
+
+To test this module, you will need to install:
+
+- Test::More
+
+
+INSTALLATION
+
+To install this package, change to the directory where you unarchived this
+distribution and type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can install this package into a non-default location by appending one of
+the following to the "perl Makefile.PL" command:
+
+- "PREFIX=/installation/path" (for installation into a custom location),
+- "INSTALLDIRS=site" (for installation into site-specific Perl directories)
+- "INSTALLDIRS=perl" (for installation into standard Perl directories).
+
+If you make the installation into your own directory, then remember that you
+must tell perl where to search for modules before trying to 'use' them. For
+example:
+
+  use lib '/home/userid/lib';
+  use CGI::Cache;
+
+During the 'make test', there are some tests that take a while longer to run.
+While testing that caching is working, CPU times are being recorded on some
+slow code to see that performance will actually be increased on subsequent
+visits.  Don't panic. It may take a couple of minutes to run, depending on
+your system.
+
+
+DOCUMENTATION
+
+Just "perldoc CGI::Cache". After installation on Unix systems,
+you can also do "man CGI::Cache".
+
+
+RESOURCES
+
+The CPAN Page:
+http://search.cpan.org/dist/CGI-Cache/
+
+The GitHub page:
+https://github.com/coppit/cgi-cache/
+
+Bug and feature tracking:
+http://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Cache
+
+
+COPYRIGHT
+
+Copyright (c) 1998-Sep 1 2000 Broc Seib. Copyright (c) Sep 1 2000-2015 David
+Coppit. All rights reserved, save those granted by the license. See the file
+LICENSE for licensing terms.
+
+
+AUTHOR
+
+David Coppit <david@coppit.org>

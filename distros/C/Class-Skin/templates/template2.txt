@@ -1,0 +1,5 @@
+--- start of template2 ---
+<comment> this is a comment in the included template </comment>
+included template 2 is here. Template 2 is inserted into the first template.
+We can put use here all the variables like "$title".
+---  end of template2  ---

@@ -1,0 +1,35 @@
+
+Cdk has the ability to add in special drawing characters into basic text 
+using format commands. The characters and their respective format commands
+are listed in the following table.
+
+<C></U>Table of Cdk's Drawing Characters
+<C><#UL><#HL(17)><#TT><#HL(4)><#TT><#HL(6)><#UR>
+<C><#VL></U>Description       <#VL>Code <#VL>Display<!U><#VL>
+<C><#VL>Horizontal Line   <#VL>\<\#HL><#VL>   <#HL>   <#VL>
+<C><#VL>Vertical Line     <#VL>\<\#VL><#VL>   <#VL>   <#VL>
+<C><#VL>Upper Left Corner <#VL>\<\#UL><#VL>   <#UL>   <#VL>
+<C><#VL>Upper Right Corner<#VL>\<\#UR><#VL>   <#UR>   <#VL>
+<C><#VL>Lower Left Corner <#VL>\<\#LL><#VL>   <#LL>   <#VL>
+<C><#VL>Lower Right Corner<#VL>\<\#LR><#VL>   <#LR>   <#VL>
+<C><#VL>Left Tee          <#VL>\<\#LT><#VL>   <#LT>   <#VL>
+<C><#VL>Right Tee         <#VL>\<\#RT><#VL>   <#RT>   <#VL>
+<C><#VL>Bottom Tee        <#VL>\<\#BT><#VL>   <#BT>   <#VL>
+<C><#VL>Top Tee           <#VL>\<\#TT><#VL>   <#TT>   <#VL>
+<C><#VL>Plus              <#VL>\<\#PL><#VL>   <#PL>   <#VL>
+<C><#VL>Plus/Minus        <#VL>\<\#PM><#VL>   <#PM>   <#VL>
+<C><#VL>Degree            <#VL>\<\#DG><#VL>   <#DG>   <#VL>
+<C><#VL>Checker Board     <#VL>\<\#CB><#VL>   <#CB>   <#VL>
+<C><#VL>Diamond           <#VL>\<\#DI><#VL>   <#DI>   <#VL>
+<C><#VL>Bullet            <#VL>\<\#BU><#VL>   <#BU>   <#VL>
+<C><#LL><#HL(17)><#BT><#HL(4)><#BT><#HL(6)><#LR>
+
+If you want more than one special character to appear, an optional numeric 
+repeat argument can be used. For example, if you wanted to draw 70 
+horizontal line characters in a row, typing in \<\#HL> 70 times is excessive.
+To do this use a numeric repeat value like \<\#HL(70)>. This tells Cdk to
+draw the horizontal line character 70 times. This is how the line below is
+drawn.
+
+<C><#HL(70)>
+<C>Document Created: January, 1996

@@ -1,0 +1,2 @@
+author:ACME
+dist:Abstract-Meta-Class

@@ -1,0 +1,163 @@
+=head1 NAME
+
+Cheat::Meta::Spec - How to use the Cheat:: namespace
+
+=head1 VERSION
+
+This document is Cheat::Meta::Spec version 0.0.5
+
+=head1 SYNOPSIS
+
+    # lib/Cheat/Sheet/Some.perl
+    Some::Module            # Short description
+        qw( various exportable symbols if any );
+        routine( $placeholder, @arguments );
+        $context    = function( @arguments);
+        $object->method();
+    
+    Some:OtherModule...
+    
+    # lib/Cheat/Sheet/Some.pod
+    
+    =head2 Some::Module
+    
+        Some::Module            # Short description
+            qw( various exportable symbols if any );
+            routine( $placeholder, @arguments );
+            $context    = function( @arguments);
+            $object->method();
+
+    =head2 Some::OtherModule ...
+
+=head1 DESCRIPTION
+
+I<But I caution you:> 
+
+I<I was quite close to revealing rare and powerful cheat codes.>
+
+--The Devil (Dinosaur Comics)
+
+This is a collection of "cheat sheets": highly compressed, abbreviated 
+documentation for various modules. Each module within the bundle covers a 
+top-level namespace or a set of otherwise closely-related modules. 
+
+If you want to I<read> cheat sheets, please check out L<Cheat::Meta>. 
+You can just install L<Bundle::Cheat::Sheet>.
+
+If you want to develop cheat sheets themselves, the current file is for you. 
+
+=head1 RATIONALE
+
+I created the Cheat:: top-level namespace and scheme after much hesitation 
+and some encouragement. I discussed several alternatives; none satisfied. 
+
+=head2 Namespace
+
+Cheat sheets aren't executable code, not in the aggregate. Each line is 
+formatted as valid Perl; that's its merit. But executing a whole cheat is 
+madness. This presents a problem when searching for a top-level namespace. 
+
+Modules under B<Doc::> seem to be tools for manipulating documentation. 
+B<Documentation::> is no better. Cheat sheets are not manuals or templates. 
+
+Other documentation on the CPAN is usually specific to another module or 
+tightly-related group of modules. For example, L<Template::Manual> documents 
+L<Template> and other modules within Template Toolkit. It wouldn't be nice to 
+drop, say, B<Template::Cheat::Sheet> into that namespace. Also, not every 
+cheat sheet falls neatly under a single namespace. L<Cheat::Sheet::Util> 
+covers L<Scalar::Util>, L<List::Util>, L<Hash::Util>.... Where should it go?
+
+L<perlcheat>.pod is in core. L<OpenResty::CheatSheet> exists and is a fair 
+example of the cheat sheet style; but again, I don't want to pollute other 
+namespaces. 
+
+There doesn't seem to be a workable alternative to a new namespace. 
+
+=head2 File Formats
+
+To be useful, cheat sheets must be available as plain text files that can be 
+opened in a user's code editor. These are not tutorials or even working demos. 
+User is expected to copy one or more lines directly from the cheat sheet, 
+paste into his ongoing project, and edit to suit. 
+
+Syntax highlighting or coloring is important to some users. Colors reveal the 
+intent of various tokens. In a cheat sheet, it's important to be able to see 
+immediately which tokens are literal and which placeholders. 
+It could be argued that an entirely different coloring scheme (than is normal) 
+would be even better; but I don't see that's going to happen. 
+
+When a Perl module is loaded, all C<use()> statements are executed 
+(at "compile-time"), as if they were enclosed in a BEGIN block. 
+Since a cheat sheet naturally includes many such statements, formatting one 
+as an ordinary Perl module causes each cheated module to load. 
+This might be correct from some very formal viewpoint but is rude. 
+
+So, presenting the cheat sheet as code in a C<.pm> file is out. 
+Presentation as POD means that syntax coloring is lost. 
+Also, verbatim code tends to copy out with too much, 
+often incorrect, indentation. However, CPAN demands, and some users expect, 
+code in POD format. So, a C<.pod> file -- POD only file -- is given. 
+
+Cheat sheets aren't tests or scripts. The only rational extension I can see 
+for naming the raw code-only files is C<.perl>.
+
+When authoring a cheat sheet, I decided to write a base or source file. 
+A little utility script, C<util/cheat-build.pl>, uses L<Template> 
+(Template::Toolkit, TT) and a pair of C<.tt2> template files to generate the 
+usable cheats in C<.perl> and C<.pod> forms. I settled on the unusual C<.agi> 
+extension for these source files. They have nothing whatever to do with AGI. 
+
+=head1 DEVELOPERS
+
+If you want to write a cheat sheet, great! Obviously, you might start by 
+looking through the files of I<this> distribution. 
+I'm a great believer in consistency. 
+
+Each cheat sheet should be released in both POD and raw Perl forms. 
+You're welcome to use existing files as models. Please name a cheat for Foo 
+as B<Cheat::Sheet::Foo>. Expect to install (for some lib/): 
+
+=over
+
+=item lib/Cheat/Sheet/Foo.perl
+
+Raw Perl code. 
+
+=item lib/Cheat/Sheet/Foo.pod
+
+Same content as POD verbatim paragraphs.
+
+I<Please seriously consider> contacting the maintainer of 
+L<Bundle::Cheat::Sheet>! I will be happy to assist you and I will include 
+your properly-formatted cheat sheets in the Bundle. You can still package and 
+upload them yourself and get all the credit. 
+I would like to avoid naming conflicts and duplication of effort; 
+please contact me I<before> starting work. 
+
+Naturally, suggestions for cheat sheets, new or old, are always welcome. 
+
+=back
+
+=head1 THANKS
+
+=over
+
+=item *
+
+To about 8500 authors who have uploaded about 85,000 modules to the CPAN. 
+
+=back
+
+=head1 AUTHOR
+
+Xiong Changnian  C<< <xiong@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright (C) 2010 Xiong Changnian C<< <xiong@cpan.org> >>
+
+This library and its contents are released under Artistic License 2.0:
+
+L<http://www.opensource.org/licenses/artistic-license-2.0.php>
+
+=cut

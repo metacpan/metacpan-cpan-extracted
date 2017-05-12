@@ -1,0 +1,154 @@
+######################################################################
+    CPAN::Unwind 0.06
+######################################################################
+
+NAME
+    CPAN::Unwind - Recursively determines dependencies of CPAN modules
+
+SYNOPSIS
+        use CPAN::Unwind;
+    
+        my $agent = CPAN::Unwind->new();
+    
+        my $resp = $agent->lookup("Log::Log4perl");
+        die $resp->message() unless $resp->is_success();
+    
+        my $deps = $resp->dependent_versions();
+    
+        for my $module (keys %$deps) {
+            printf "%30s: %s\n", $module, $deps->{$module};
+        }
+            # Prints:
+            #
+            #  Test::Harness: 2.03
+            #     Test::More: 0.45
+            #     File::Spec: 0.82
+            # File::Basename: 0
+            #           Carp: 0
+
+        print "Installation schedule:\n";
+        for($resp->schedule()) {
+            print "$_\n";
+        }
+            # Installation schedule:
+            # Carp
+            # File::Basename
+            # File::Spec
+            # Test::Harness
+            # Test::More
+            # Log::Log4perl
+
+DESCRIPTION
+    CPAN::Unwind recursively determines dependencies of CPAN modules. It
+    fetches distribution tarballs from CPAN, unpacks them, and runs
+    Module::Depends::Intrusive on them.
+
+    SECURITY NOTE: CPAN::Unwind runs all Makefile.PL files (via
+    "Module::Depends::Intrusive") of modules it finds dependencies on. If
+    you are concerned that any module in the dependency tree on CPAN isn't
+    trustworthy, only use it in a secured sandbox.
+
+  METHODS
+    CPAN::Unwind supports the following methods:
+
+    "my $agent = CPAN::Unwind->new();"
+        Create a new dependency agent. The following options are supported:
+
+        "cache"
+            Provide your own "Cache::Cache" object (see *Caching*).
+
+        "add"
+            Provide additional dependencies that should be part of the
+            result:
+
+                CPAN::Unwind->new(add => 
+                    ["Foo", "Bar" => 0.17,
+                     ...
+                    ]);
+
+            indicates that "Foo" has a dependency on "Bar" 0.17, even if
+            it's not listed in "Foo"'s "Makefile.PL". This way, you can fix
+            broken Makefile.PL files of some CPAN modules, not listing their
+            dependencies correctly.
+
+    "$resp = $agent->lookup_single($module_name)"
+        Goes to CPAN and fetches the tarball containing the module specified
+        in $module_name. After unpacking the tarball, it will use
+        Module::Depends::Intrusive to determine the modules it depends on.
+
+        Returns a "CPAN::Unwind::Response" object.
+
+    "$resp = $agent->lookup($module_name)"
+        Calls "lookup_single" on $module_name recursively, builds a
+        dependency tree and returns a "CPAN::Unwind::Response" object
+        containing a consolidated dependency tree.
+
+    CPAN::Unwind::Response supports the following methods:
+
+    "$resp->is_success()"
+        Returns true if there's a valid response and no error occurred.
+
+    "$resp->message()"
+        Returns a response's error message in case "is_success()" returned a
+        false value.
+
+    "$resp->dependent_versions()"
+        Returns a ref to a hash, containing a mapping between names of
+        dependent modules and their version numbers:
+
+            { "Test::More"  =>  0.51,
+              "List::Utils" =>  0.38,
+              ...
+            }
+
+    "$resp->missing()"
+        Similar to "dependent_versions()", but only modules that are
+        currently *not* installed are returned.
+
+    "$resp->dependents()"
+        Returns a ref to a hash, mapping module names to their dependencies.
+
+            { "Net::Amazon"  =>  ["Log::Log4perl", "XML::Simple"],
+              "List::Utils"  =>  [],
+              ...
+            }
+
+        If an entry holds a ref to an empty array, the module doesn't have
+        any dependencies.
+
+    "$resp->schedule()"
+        Returns an installation schedule, a list of module names in the
+        correct order without dependency conflicts. Returns "undef" if no
+        schedule can be made due to circular dependencies.
+
+  Caching
+    To avoid costly downloads, "CPAN::Unwind" will cache dependencies in a
+    Cache::FileCache cache, where they are stored indefinitely. Running it
+    the second time on a module will speed up processing significantly.
+
+  Turnkey Scripts
+    "CPAN::Unwind" comes with a ready-to-use script "cpan-unwind", which
+    gets installed in perl's bin path. It is ready to use, just call
+
+        $ cpan-unwind Log::Log4perl
+
+    to see which modules "Log::Log4perl" depends on.
+
+    "CPAN::Unwind" requires a valid CPAN configuration.
+
+EXAMPLES
+        $ cpan-unwind Net::Amazon
+        Carp Compress::Zlib Data::Dumper Fcntl File::Basename File::Path 
+        File::Spec HTML::Tagset IO::Socket MIME::Base64 Socket Test::Harness 
+        Test::More Test::Simple Time::HiRes URI XML::NamespaceSupport 
+        Digest::base File::Temp HTML::Parser Log::Log4perl Net::FTP 
+        XML::SAX XML::Simple Digest::MD5 LWP::UserAgent Net::Amazon
+
+LEGALESE
+    Copyright 2005-2011 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

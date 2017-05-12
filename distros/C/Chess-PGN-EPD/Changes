@@ -1,0 +1,133 @@
+Revision history for Perl extension Chess::PGN::EPD.
+
+0.01  Fri Feb 08 11:52:56 2002
+        - original version; created by h2xs 1.21 with options
+                -A -X Chess::PGN::EPD
+0.02  Fri Feb 08 17:06:00 2002
+        - documentation patch, correct pod format in SYNOPSIS section
+0.03  Fri Feb 08 23:32:17 2002
+        - added epdset; allows user to specify the initial position for a game
+        - patched bug associated with $debug parameter of epdlist (didn't work
+          since @moves eats all of @_, $debug was always undef)
+0.04  Sat Feb 09 00:49:55 2002
+        - documentation patch, correct reference to Chess::PGN::Parse (was
+          Chess::PGN::PGNParser)
+      Fri Feb 15 06:00:08 2002
+        - added epdstr; converts an epd string into a variety of typeset positions
+        - greatly expanded documentation
+0.05  Fri Feb 15 15:27:33 2002
+        - fixed bug, needed to parse moves of form 6e5 because author of ChessPad thought there
+          was a need to dis-ambiguate the move
+      Sun Feb 17 13:47:56 2002
+        - documentation patch, remove dummy comment from README
+0.06  Wed Feb 20 14:23:00 2002
+        - jump from 0.04 to 0.06 because I forgot to change the $VERSION in the last upload
+        - made necessary changes to Makefile.pl in order to install Berkeley DB files used
+          by epdcode()
+        - added epdcode; converts epd array to one of ECO code, NIC code or Opening name
+      Thu Feb 21 07:24:28 2002
+        - documentation patch, CHESS::PGN -> Chess::PGN, PGN::PGNParser -> PGN::Parse
+        - patched Makefile.pl, install:: -> install ::, spaces are important!
+        - added code to find DB files at BEGIN{}
+0.07  Sun Mar 10 08:37:35 2002
+        - yet more documentation fixes - remove misleading script names from examples
+        - added DB_File to dependancy list in changes
+        - removed 'taxonomy' from TODO list
+        - add 'palview' to epdstr type
+        - add 'text' to epdstr type
+0.08  Wed Mar 20 19:55:48 2002
+        - add %font2map lookup table
+0.09  Sat Mar 30 18:58:00 2002
+        - correct make test bug, $db_path needs default value of './db/' since test happens
+          before install
+0.10  Mon Apr 01 15:03:27 2002
+        - correct Makefile.PL to use '/' in list of files, not '\' which fails under Linux
+0.11  Tue Apr 02 09:08:21 2002
+        - must correct target of modified file list as well, 
+          not 'Chess/PGN/db' but 'Chess\PGN\db'
+0.12  Tue Apr 02 13:54:01 2002
+        - patch for permissions bug, db files are created 0644, so should access in
+          read-only mode
+        - also remove INIT block as un-necessary
+0.13  Mon Jun 24 04:23:01 2002
+        - fold in patch for 'Malformed UTF-8 character (byte 0xfe) in ord...' problem found
+          by Cyril Malkov - patch is his too!
+        - add better test.pl file
+0.14  Mon Jun 24 17:00:36 2002
+        - re-synchronize Makefile.PL to use the one with all of the corrections in it
+0.15  Wed Jun 26 20:25:38 2002
+        - figured out that MANIFEST should reflect what you want in the distribution,
+          but it should do so in a unix like fashion - similar to problem found in
+          version .10
+        - corrected other typo in README (version should be current, not 0.12!)
+0.16  Thu Jun 27 04:23:10 2002
+        - put Makefile.PL back in the MANIFEST and therefore back in the distribution!
+0.17  Sun Jul 21 13:55:12 2002
+        - stamp out a bug related to knight moves
+0.18  Wed Aug 21 12:49:00 2002
+        - found a forgotten dependency
+0.19  Thu Nov 28 10:56:49 2002
+        - another patch to the knight moves problem
+        - export psquares sub
+        - create and export new sub, epdgetboard
+      Sat Nov 30 07:49:37 2002
+        - modified epdstr to add 'board' as parameter
+0.20  Wed Feb 12 17:20:00 2003
+        - small code improvements, maintainence release...
+0.21  Mon Mar 03 12:31:00 2003
+        - added internal check for legal move to patch pinned piece bug...
+0.22  Tue Mar 04 07:51:37 2003
+        - small code improvements, maintainence release...
+        - added 3 tests to check for pinned piece bug
+0.23  Sat Apr 04 14:35:00 2009
+        - Patch problem with XP and forward slashes blocking database loading
+        - Patch problem with hashes that generates warnings (code will be depricated as well, so fix
+          is needed!)
+0.24  Sun Apr 05 14:40:00 2009
+        - Repatch patch above-- had nothing to do with XP, had to do with reliably finding database files!
+        - Found another hashref deprication and fixed.
+0.25  Sat Oct 02 04:27:21 2010
+        - drop usage of 'use DB_File' moving to 'use Storable' instead
+        - clean up code to avoid 'Deprecated' messages
+        - clean up code using PerlCritic level 4
+        - extend tests
+        - add sample code
+        - slight improvement to pod
+        - add epdfromto for telegraphic style from-to notation
+        - remove debug output from epdlist
+        - add epdTaxonomy to simplify ECO, NIC and Opening tag generation
+0.26  Tue May 03 03:04:40 2011
+        - apply patch so that module passes test code in Linux
+0.27  Tue May 03 05:14:59 2011
+        - add test for epdTaxonomy
+        - remove use feature ':5.10';
+        - rewrite epdTaxonomy to not use given/when
+0.28  Sun May 08 12:35:48 2011
+        - continue to stamp out 5.10 features; this time '//'
+0.29  Mon May 16 11:35:35 2011
+        - fix warnings found in test under 5.8.1 Linux
+        - fix errors in t\07_psquares.t under 5.8.1 Linux
+        - fix errors in t\08_epdset.t under 5.8.1 Linux
+0.30  Thu Jun 30 08:55:22 2011
+        - fix two errors spotted by user Klaus Ludens
+        - add typing filter for rare move case
+        - add new logic for setting $debug in epdlist
+        - add new test: 10_ludens.t to insure regression
+0.31  Wed Aug 29 06:01:39 2012
+        - change method for finding databases to something hopefully cross platform
+        - Add code from Klaus Ludens to allow for castling bug---generated wrong fen/EPD
+0.32  Tue Jan 02 20:36:18 2017
+        - Adopt Dist::Zilla
+        - fix install failure associated with not finding databases
+0.33  Wed Jan 04 21:38:17 2017
+        - Extend supported fonts to match font list at http://www.enpassant.dk/chess/fonteng.htm
+        - Didn't get to font item, will wait until stable release without bug list...
+0.34  Mon Jan 16 21:06:30 2017 
+        - Fix "119759	Undeclared dependency on Chess::PGN::Moves"
+        - Add 00_Dependancies.t as stop to test without Chess::PGN::Moves
+        - Add =head1 LICENSE and the text of the license to pod
+        - Add a META.json to the distribution
+        - List all modules used in the test suite in META.yml build_requires
+        - Add all modules contained in this distribution to the META.yml field 'provides'
+        - Generate README from pod
+

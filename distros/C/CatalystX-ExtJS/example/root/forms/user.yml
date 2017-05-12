@@ -1,0 +1,6 @@
+---
+  elements:
+    - name: id
+    - name: email
+    - name: first
+    - name: last

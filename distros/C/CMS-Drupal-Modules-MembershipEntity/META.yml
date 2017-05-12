@@ -1,0 +1,41 @@
+---
+abstract: 'Perl interface to Drupal MembershipEntity entities'
+author:
+  - 'Nick Tonkin <tonkin@cpan.org>'
+build_requires:
+  CMS::Drupal: '0'
+  Test::Exception: '0'
+  if: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CMS-Drupal-Modules-MembershipEntity
+requires:
+  Carp: '0'
+  Config::Tiny: '0'
+  Cwd: '0'
+  DBD::SQLite: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  DateTime::Event::Recurrence: '0'
+  Exporter::Tiny: '0'
+  File::Slurper: '0'
+  FindBin: '0'
+  MIME::Lite::TT: '0'
+  Moo: '0'
+  POSIX: '0'
+  Test::Group: '0'
+  Test::More: '0'
+  Time::Local: '0'
+  Types::Standard: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.96'

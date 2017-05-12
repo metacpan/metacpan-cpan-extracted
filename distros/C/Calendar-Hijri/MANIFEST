@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Calendar/Hijri.pm
+t/00-load.t
+t/calendar-hijri.t
+t/manifest.t
+t/pod.t
+t/hijri.xml
+t/fake-hijri.xml
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

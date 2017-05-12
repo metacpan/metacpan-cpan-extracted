@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  50210:
+    - 235
+name: fdcbc8
+registers:
+  AF: 8065
+  AF_: 0
+  BC: 60352
+  BC_: 0
+  DE: 34266
+  DE_: 0
+  HL: 15581
+  HL_: 0
+  I: 0
+  IX: 55380
+  IY: 50194
+  PC: 4
+  R: 2
+  SP: 0

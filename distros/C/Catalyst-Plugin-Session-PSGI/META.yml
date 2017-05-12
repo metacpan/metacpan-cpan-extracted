@@ -1,0 +1,22 @@
+---
+abstract: 'minimal configuration access to PSGI/Plack session (EXPERIMENTAL)'
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session-PSGI
+requires:
+  Catalyst::Plugin::Session::State: 0
+  Catalyst::Plugin::Session::Store: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session-PSGI
+  repository: git://github.com/chiselwright/catalyst-plugin-session-psgi.git
+version: 0.0.2

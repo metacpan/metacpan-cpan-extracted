@@ -1,0 +1,11 @@
+Revision history for Perl extension Catalyst::View::HTML::Template
+
+0.03  2009-05-07 14:36:00
+   - Change to use the Catalyst::View base class, rather than the
+     deprecated Catalyst::Base (Chisel Wright)
+
+0.02  2007-03-11 12:51:00 
+    -  add a render action to HTML::Template view (Alex Pavlovic)
+
+0.01  2005-04-27 01:00:00
+   - original version.

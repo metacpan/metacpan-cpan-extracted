@@ -1,0 +1,11 @@
+Revision history for Perl module PerlIO::via::Bzip2.
+
+2006-05-12 Arjen Laarhoven <arjen@cpan.org>
+
+    * Version 0.02.
+    - Bugfixes.  (Thanks kane)	
+
+2006-05-11 Arjen Laarhoven <arjen@cpan.org>
+
+    * Version 0.01 - First release.
+

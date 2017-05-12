@@ -1,0 +1,79 @@
+NAME
+
+    Catmandu::AAT - Retrieve items from the AAT
+
+SYNOPSIS
+
+    This module contains a store to lookup a Subject in the AAT
+    <https://www.getty.edu/research/tools/vocabularies/aat/> using its
+    SPARQL endpoint <http://vocab.getty.edu/sparql>.
+
+    Also included is a fix to match a term to a Subject and a fix to search
+    for a term in the AAT.
+
+      lookup_in_store(objectName, AAT, lang:nl)
+    
+      aat_match(objectName, -lang:nl)
+    
+      aat_search(objectName, -lang:nl)
+
+DESCRIPTION
+
+ Catmandu::Store::AAT
+
+      lookup_in_store(
+        objectName,
+        AAT,
+        lang: nl
+      )
+
+    The lang parameter is optional and defaults to nl. It sets the language
+    of the returned prefLabel. If no prefLabel for the Subject in provided
+    lang exists, nothing is returned.
+
+    The store takes the dc:identifier of a Subject from the AAT and returns
+    the following data:
+
+      {
+        'id'        => 'The dc:identifier of the Subject',
+        'prefLabel' => 'The prefLabel in the provided language',
+        'uri'       => 'The URI of the Subject'
+      }
+
+ Catmandu::Fix::aat_match
+
+      aat_match(
+        path,
+        -lang: nl
+      )
+
+    A fix that performs a match between a term and a prefLabel of an AAT
+    Subject.
+
+ Catmandu::Fix::aat_search
+
+      aat_search(
+        path,
+        -lang: nl
+      )
+
+    A fix that performs a search for a term in the AAT.
+
+AUTHOR
+
+    Pieter De Praetere <pieter at packed.be >
+
+COPYRIGHT
+
+    Copyright 2017- PACKED vzw
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Catmandu Catmandu::Store::AAT Catmandu::Fix::aat_search
+    Catmandu::Fix::aat_match
+

@@ -1,0 +1,10 @@
+Revision history for Catmandu-Serializer-messagepack
+
+0.0102  2016-01-04
+  - switch to Dist::Milla
+  - add more test scripts
+  - support for travis
+
+0.01    2014-03-04
+  - initial release
+

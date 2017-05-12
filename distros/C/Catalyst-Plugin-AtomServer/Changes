@@ -1,0 +1,25 @@
+$Id$
+
+Revision history for Catalyst::Plugin::AtomServer
+
+0.04  2006.06.27
+    - Added an is_atom flag to the Request object, so that Catalyst handlers
+      that are handling Atom requests can set this. finalize and finalize_error
+      handling now only occurs if is_atom is set, which fixes the problem
+      where they weren't conditional on the type of request (e.g. a normal
+      web request's errors would be returned in Catalyst error format).
+
+0.03  2006.04.21
+    - Basic auth now supports crypted/hashed passwords, by using
+      Catalyst::Plugin::Authentication::Credential::Password internally
+      in the case of Basic authentication. Thanks to Gosuke Miyashita for
+      the patch.
+
+0.02  2006.01.04
+    - Authentication plugin now properly emits WWW-Authenticate header,
+      and sends the proper HTTP response code, when authentication header
+      is empty or has improper credentials. Thanks to Tatsuhiko Miyagawa
+      for the catch.
+
+0.01  2006.01.04
+    - Initial distribution.

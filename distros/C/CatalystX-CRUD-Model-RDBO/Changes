@@ -1,0 +1,125 @@
+Revision history for CatalystX-CRUD-Model-RDBO
+
+0.302 13 May 2014
+ - fix bug in find_related() where foreign table column name assumed to be
+   same as local table, esp for one-to-many relationships
+
+0.301 10 May 2014
+ - skip related sort_by unless explicitly passed in cxc-* params
+   (fix for 0.29 r14454)
+
+0.30 28 Feb 2014
+ - support for CXC 0.56
+
+0.29 07 Oct 2013
+ - re-enable sort of related objects as long as they are o2m not m2m
+
+0.28 22 July 2013
+ - do not attempt to sort related objects till column name api can be
+   figured out r14454
+
+0.27 31 Jan 2013
+ - explicitly require JSON dependency for Helpers
+
+0.26 28 Jan 2013
+ - wrap RDBO::Iterator in CXC::Iterator for search_related() and
+   iterator_related() methods.
+
+0.25 5 Nov 2012
+ - fix skip test count for t/02-rest
+
+0.24 5 Nov 2012
+ - add tests for CatalystX::CRUD::Controller::REST
+
+0.23 31 Oct 2012
+ - add find_related() method
+
+0.22 13 June 2009
+ - fix tests for UPPERCASE normalize in newer Sort::SQL of ORDER BY string
+   direction
+
+0.21 13 June 2009
+ - fix multiple ORDER BY columns with comma-join (see RT 46904)
+ - explicitly call ->delegate->meta to fix moosification issue with
+   Catalyst 5.8x
+
+0.20 29 April 2009
+ - switch to MRO::Compat from Class::C3
+ - fixes for CatalystX::CRUD 0.43
+
+0.19 12 Dec 2008
+ - fix long-standing issue with passing additional args to load() via
+   CXC::Object::RDBO->read
+
+0.18 11 Dec 2008
+ - fix logic for mangling sort_by with table prefix. If the sort_by value
+   already has a . (dot) in it, assume the request knew what it was doing.
+
+0.17 25 Nov 2008
+ - added related_load_with() feature and docs for it and load_with().
+
+0.16 17 Nov 2008
+ - pass query if present in *_related() query methods
+
+0.15 7 Nov 2008
+ - (finally) fix load_with to be a real ro_accessor and only used in
+   _get_objects()
+
+0.14 11 Sept 2008
+ - fix add_related() to forget_related() after save, so that next access
+   reflects the addition.
+ - move column sort disambiguation from CatalystX::CRUD::YUI::Controller to
+   here.
+ - support for 0.30 core api param name change
+ - add 'int' to column types registered as 'treat_like_int'
+ - fix query for _related methods.
+ - update tests to support new make_sql_query() format in core API
+
+0.13 23 Aug 2008
+ - support new *_related methods in core API
+
+0.12 12 June 2008
+ - add ::Manager::Debug to debugging option
+ - add 'boolean' to _treat_like_int match
+
+0.11 06 Feb 2008
+ - fix bug with calculating treat_like_int(). Only set in hash if matches.
+
+0.10 29 Jan 2008
+ - made RDBO debugging depedent on CATALYST_DEBUG > 1
+
+0.09 04 Dec 2007
+ - add treat_like_int support
+
+0.08 20 Dec 2007
+ - factor out sql generation into core CatalystX::CRUD::Model::Utils.
+
+0.07 20 Nov 2007
+ - auto-discovery of PK to set a real column for default ORDER BY sorting
+   in make_query()
+
+0.06 12 Nov 2007
+ - RDBO Debug var set if CATALYST_DEBUG env var is true -- moved to
+   Xsetup() so it actually works.
+
+0.05 9 November 2007
+ - add method to get default available field names in make_query()
+ - allow for explicit _offset param as well as individual _sort and _dir
+   params
+
+0.04 1 November 2007
+ - RDBO Debug var set if CATALYST_DEBUG env var is true
+ - test for defined() param() values
+ - change reserved param names to start with _
+ - fix search() wantarray bug
+
+0.03 23 Oct 2007
+ - added Rose::DBx::TestDB to the prereq list
+
+0.02 23 Oct 2007
+ - fix typo in POD that fooled CPAN into forking separate doc file
+ - added Sort::SQL to prereq list
+
+0.01 20 Oct 2007
+ - First version, released on an unsuspecting world.
+

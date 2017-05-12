@@ -1,0 +1,47 @@
+Revision history for Catalyst-Controller-POD
+
+1.0.0    2011-01-25
+         - Using Google Prettify for Source Code Highlighting
+         - Updated ExtJS to 3.3.1
+         - using Dist::Zilla
+
+0.02008  2010-06-24
+         - using Static::Simple to deliver static files
+         - Cleanup
+
+0.02007  2010-03-07
+         - Added additional configuration options:
+           expanded_module_tree, home_tab_content, initial_module,
+           show_home_tab (Tristan Pratt)
+         - Added permalinks (Tristan Pratt)
+         - Update to ExtJS 3.1.1 (fixes memory leaks in browsers)
+
+0.02006  2009-11-20
+         - fixed another warning (#51681)
+
+0.02005  2009-11-20
+         - use next instead of NEXT
+         - Added "not found" page for namespaces like DBIx
+
+0.02004  2009-05-04
+         - JS cleanups
+         - filtered results do not expand by default
+         - moved to git repository
+
+0.02003  2009-05-03
+         - Works with Catalyst 5.8 (reported by T. Hosaka)
+
+0.02002  2008-08-16
+         - requires parent
+         - ext cleanup
+
+0.02001  2008-08-09
+         - removed Pod::TOC dependency
+
+0.01_03  2008-07-30
+         - A lot of new feature
+         - added some basic tests, more to come
+
+0.01_01    Date/time
+        First version, released on an unsuspecting world.
+

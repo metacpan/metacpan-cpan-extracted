@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Application/Plugin/BrowserDetect.pm
+t/01_basic.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

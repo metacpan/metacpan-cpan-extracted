@@ -1,0 +1,63 @@
+do { my $x = {
+       'configure' => {
+                        'recommends' => {
+                                          'Crypt::OpenSSL::DSA' => '0.15',
+                                          'Crypt::OpenSSL::RSA' => '0.28',
+                                          'Crypt::PK::ECC' => '0.041'
+                                        },
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Text::Wrap' => '2005.082401',
+                                        'perl' => '5.008008'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'Pod::Readme' => 'v1.1.2',
+                                      'Sort::Versions' => '1.62',
+                                      'Test::Kwalitee' => '0',
+                                      'Test::More' => '0.94',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Crypt::OpenSSL::DSA' => '0.15',
+                                        'Crypt::OpenSSL::RSA' => '0.28',
+                                        'Crypt::PK::ECC' => '0.041'
+                                      },
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Convert::ASN1' => '0.27',
+                                      'Digest::MD2' => '2.03',
+                                      'Digest::MD4' => '1.5',
+                                      'Digest::MD5' => '2.51',
+                                      'Digest::SHA' => '5.95',
+                                      'Encode' => '0',
+                                      'MIME::Base64' => '0',
+                                      'Scalar::Util' => '0',
+                                      'bytes' => '0',
+                                      'overload' => '0',
+                                      'perl' => '5.008008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Module::Signature' => '0',
+                                   'Socket' => '0',
+                                   'Test::More' => '0.94',
+                                   'Text::Wrap' => '2005.082401',
+                                   'perl' => '5.008008'
+                                 }
+                 }
+     };
+  $x;
+ }

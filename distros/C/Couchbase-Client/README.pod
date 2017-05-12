@@ -1,0 +1,232 @@
+=head1 NAME
+
+Couchbase::Client::README - README for Couchbase::Client
+
+B<This is for the OLDER client library. The new library is simply called>
+L<Couchbase>.
+
+=head1 Introduction
+
+Couch::Couchbase is a Perl client for Couchbase (http://www.couchbase.org).
+
+The couchbase client is a smart, vbucket-aware client. What this means is that
+Couchbase::Client can tap into your Couchbase cluster, with the client needing
+to be able to access (initially) only a single entry point.
+
+The module provides:
+
+=head2 Synchronous Interface: Couchbase::Client
+
+This is the simplest and most tested interface. The methods are self-explanatory.
+Additionally, the return type is complex and detailed, allowing error reporting
+for any unexpected conditions (something severely lacking in any Memcache client
+implementation).
+
+=head2 Legacy Interface: Couchbase::Client::Compat
+
+Drop-in replacement for Cache::Memcached and Cache::Memcached::Fast.
+
+I can't say it's 100% compatible yet, but the basic methods have been implemented.
+Internally it just wraps around the new interface
+
+=head2 Asynchronous Framework for Perl: Couchbase::Client::Async
+
+Provides the necessary functions and utilities needed to make a POE, IO::Async,
+etc. client for Couchbase.
+
+=head2 Mock Server Interface: Couchbase::MockServer
+
+Interface to the Java C<CouchbaseMock.jar>. This is a work in progress.
+
+=head2 Extra Components
+
+=head3 Couchbase::Config - REST API module
+
+This module will probably be a dependency for full testing, but will not necessarily
+be part of this distribution. It's currently available as a separate repository
+on github.
+
+=head3 Couchbase::VBucket - VBucket server mapping module
+
+Just a little utility module. May be useful for testing.
+
+
+=head1 Installing
+
+The following components are required for a proper C<Couchbase::Client>
+
+=over
+
+=item libcouchbase >= 1.0.1 (L<release|http://www.couchbase.com/develop/c/current>)
+
+=item libvbucket >= 1.8.0.2 (L<release|http://www.couchbase.com/develop/c/current>)
+
+=item libevent >= 1.4
+
+=item libsasl/libsasl2 (any version).
+
+=item Java (for the tests).
+
+=back
+
+All of the above components (except Java) are bundled in source form with the
+tarball distribution (see further).
+
+=head2 Building Couchbase::Client
+
+Couchbase::Client is bundled (in its tarball distribution) with source distributions
+of libevent, libisasl, libvbucket, and libcouchbase. These are not present on
+the git version because it is assumed that the user may want to provide copies
+of their own.
+
+The bundled configuration will only substitute I<missing> dependencies from
+the bundle; thus, if you have C<libsasl> but are missing a proper version of
+C<libevent>, then only the bundled libevent (but not libsasl) will be used.
+
+C<Couchbase::Client> can be configured to either link against the bundled
+libraries, or to link against a custom or system directory.
+
+=head3 Using Embedded Libraries:
+
+In order to use embedded libraries, you should ensure that you have a proper
+distribution for each needed and unfound library.
+
+The file C<PLCB_Config.pm> should contain a bunch of hash entries in the format
+of 
+
+    LIBFOO_RELEASE => 1.2.3-sdff
+    
+where C<LIBFOO> is the uper-case name of the library, and the value is the
+version of the library.
+
+The tarball B<must> be named C<libfoo-1.2.3-sdff.tar.gz>, and its top-level
+directory must be C<libfoo-1.2.3/>
+
+You will find that the config file has sane defaults, and that the main task
+is downloading them.
+
+The tarballs should then be relocated to the C<src/> directory.
+
+Once all is ready, you can invoke the C<Makefile.PL> script, optionally
+passing some arguments.
+
+=head4 Makefile.PL arguments
+
+=over
+
+=item --libpath
+
+A string for passing to the linker which should contain something like
+C<-L/foo -L/bar> etc.
+
+This is only necessary if your standard dependencies are found outside the linker's
+default search path (e.g. macports)
+
+=item --incpath
+
+This is the same as C<--libpath>, but are passed to the preprocessor and would
+look like C<-I/usr/foo/include> etc.
+
+=back
+
+Thus you can invoke somehting like:
+
+    $ perl Makefile.PL --incpath=-I/opt/local/include --libpath=-L/opt/local/lib
+    $ make
+    $ make test # but see the testing section, later
+    $ make install
+    
+=head3 Providing your own libraries.
+
+This is a relatively straight-forward option, and is what I use for development.
+
+Simply make use of the aforementioned C<--libpath> and C<--incpath> arguments to
+point to the directory which contains the necessary dependencies, and follow
+the relevant parts from the above section.
+
+
+There are some top-level scripts. Some have meaning to only the author, some might
+be useful.
+
+If you would like to generate the perl MANIFEST, run the C<gen_manifest.pl>
+script.
+
+Also, check out the runnable modules in the C<t/> directory
+
+=head2 Testing
+
+The tests in this module require java to run. Some tests furthermore will only
+work on a real cluster, due to some of the limitations in the Java client.
+
+A C<CouchbaseMock.jar> should be located within the C<t/tmp> directory. You can
+obtain one from L<here|http://files.couchbase.com/maven2/org/couchbase/mock/CouchbaseMock/0.5-SNAPSHOT/CouchbaseMock-0.5-20120202.071818-12.jar>
+
+To run the tests on a real cluster, you can make use of the
+C<PLCB_TEST_REAL_SERVER> environment variable.
+
+When set, it should/can contain something like this:
+
+    PLCB_TEST_REAL_SERVER='bucket=my_bucket,username=secret,memd_port=11212'
+    
+The keys available are
+
+=over
+
+=item username, password
+
+Authentication information
+
+=item bucket
+
+Which bucket to use (default is C<default>)
+
+=item server
+
+Which server to connect to (default is C<localhost:8091>)
+
+=item memd_port
+
+Required for some tests. This is the authless port for memcached client access.
+
+=back
+
+=head3 KNOWN ISSUES
+
+=over
+
+=item *
+
+32 Bit perls will have arithmetic results stringified if their value is greater
+than 32 bits.
+
+
+=item *
+
+Some tests within the test suite will fail in some unices (but not linux, from
+what i've seen) with the following message:
+
+        t/01-main.t .. 1/? 
+    #   Failed test 'have single error'
+    #   at /home/mordy/Couchbase-Client-0.16_0/blib/lib/Couchbase/Test/Settings.pm line 262.
+    #   (in Couchbase::Test::Settings->T25_multi_server_list)
+    #          got: '2'
+    #     expected: '1'
+    t/01-main.t .. 162/? # Looks like you failed 1 test of 166.
+    t/01-main.t .. Failed 1/166 subtests 
+        (less 1 skipped subtest: 164 okay)
+
+
+This is not a fatal error, and is being worked on
+
+=item *
+
+Asynchronous tests (and the reference POE implementation) will not work properly
+on NetBSD due to a weird L<kernel bug|http://gnats.netbsd.org/cgi-bin/query-pr-single.pl?number=46077>
+
+
+=item *
+
+I have not even bothered to figure out how to compile this on Windows. Mingw32
+will be supported eventually, but probably not MSVC.
+
+=back

@@ -1,0 +1,43 @@
+NAME
+    "CPS::Governor::IOAsync" - use IO::Async with CPS
+
+SYNOPSIS
+     use CPS qw( gkforeach );
+     use CPS::Governor::IOAsync;
+
+     use IO::Async::Loop;
+
+     my $loop = IO::Async::Loop->new;
+
+     my $gov = CPS::Governor::IOAsync->new( loop => $loop );
+
+     gkforeach( $gov, [ 1 .. 10 ],
+        sub {
+           my ( $item, $knext ) = @_;
+
+           $loop->do_something( on_done => $knext );
+        },
+        sub { $loop->loop_stop },
+     );
+
+     $loop->loop_forever;
+
+DESCRIPTION
+    This CPS::Governor allows functions using it to defer their re-execution
+    by using the IO::Async::Loop "later" method, meaning it will interleave
+    with other IO operations performed by "IO::Async".
+
+CONSTRUCTOR
+  $gov = CPS::Governor::IOAsync->new( %args )
+    Returns a new instance of a "CPS::Governor::IOAsync" object. Requires
+    the following argument:
+
+    loop => IO::Async::Loop
+            Reference to the "IO::Async::Loop" object.
+
+    Additionally may take any other arguments defined by the
+    CPS::Governor::Deferred class.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

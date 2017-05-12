@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                CGI-WebToolkit
+version:             0.08
+abstract:            Website Toolkit
+license:             ~
+author:              
+    - Tom Kirchner <tk@apple.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CGI:                           0
+    CGI::Carp:                     0
+    Data::Dump:                    0
+    DBI:                           0
+    Digest::MD5:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

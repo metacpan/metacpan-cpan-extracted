@@ -1,0 +1,9 @@
+---
+name: The Test TEST1
+scalar: blah
+array:
+    - bug
+    - sweet
+    - foobar
+hash:
+    foo: bar

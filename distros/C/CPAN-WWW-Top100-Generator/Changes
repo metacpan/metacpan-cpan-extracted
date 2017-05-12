@@ -1,0 +1,40 @@
+Changes for Perl extension CPAN-WWW-Top100-Generator
+
+0.10 Thu  9 Dec 2010
+	- Updating Module::Install::DSL to 1.00
+	- Adding an extra column to the FAIL chart to show raw fails
+
+0.09 Thu 18 Aug 2009
+	- Adding support for Google Chart
+
+0.08 Wed 17 Aug 2009
+	- Bug fix for 0.07
+
+0.07 Wed 17 Aug 2009
+	- Upgrading to CPANDB 0.10
+	- Adding new iteration of the Meta 100 (Layer 1) list
+
+0.06 Thu  9 Jul 2009
+	- Upgrading to Module::Install::DSL 0.91
+	- Changing from CPANTS::Weight to shiny new CPANDB
+
+0.05 Tue 19 May 2009
+	- Upgrading to Module::Install::DSL 0.88
+	- Upgrading to CPANTS::Weight 0.14
+	- Set a custom maxage of one day
+	  (so we don't publish week-old numbers)
+
+0.04 Mon  4 May 2009
+	- Upgrading to Module::Install::DSL 0.86
+	- Updating to CPANTS::Weight 0.10
+	- Adding the Downstream 100 list
+
+0.03 Mon 16 Feb 2009
+	- Updating to Module::Install::DSL 0.83
+	- Adding cpantop100 script
+
+0.02 Mon 16 Feb 2009
+	- Adding the Debian 100 list
+
+0.01 Sun 15 Feb 2009
+	- Creating the initial release

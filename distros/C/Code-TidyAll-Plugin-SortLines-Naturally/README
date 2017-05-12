@@ -1,0 +1,24 @@
+SYNOPSIS
+
+       # In configuration:
+    
+       [SortLines::Naturally]
+       select = .ispell* **/.gitignore
+
+DESCRIPTION
+
+    Sorts the lines of a file; whitespace lines are discarded. Useful for
+    files containing one entry per line, such as .svnignore, .gitignore,
+    and .ispell*.
+
+CONFIGURATION
+
+    locale
+
+      The locale to use for collation. Defaults to "en_US".
+
+ACKNOWLEDGEMENTS
+
+    This code was essentially pilfered from
+    Code::TidyAll::Plugin::SortLines
+

@@ -1,0 +1,37 @@
+CGI::Application::Plugin::HTMLPrototype
+
+Give easy access to the prototype JavaScript library using HTML::Prototype
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, if you do not have Module::Build but you do have 'make',
+you can used the included Makefile.PL and run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+CGI::Application
+HTML::Prototype
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Cees Hek, All Rights Reserved.
+
+This library is free software. You can modify and or distribute it under the same terms as Perl itself.
+

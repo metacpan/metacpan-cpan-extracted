@@ -1,0 +1,25 @@
+---
+abstract: 'Sugar for declaring RESTful chained actions in Catalyst'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200002, CPAN::Meta::Converter version 2.101670'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Routes
+requires:
+  Catalyst::Action::REST: 0.89
+  Catalyst::Runtime: 5.80030
+  Moose: 0
+  Params::Util: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CatalystX-Routes
+  repository: git://catagits@git.shadowcat.co.uk:CatalystX-Routes.git
+version: 0.02

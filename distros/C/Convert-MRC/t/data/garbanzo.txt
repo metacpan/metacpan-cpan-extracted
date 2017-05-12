@@ -1,0 +1,15 @@
+=MRCtermTable
+A	workingLanguage	en
+A	sourceDesc	a restaurant menu in English and French
+
+C005	subjectField	Restaurant Menus
+C005	xGraphic	garbanzo beans	Link: http://flickr.com/photos/lilgreen/432468210/
+C005en	definition	an edible legume of the family Fabaceae, subfamily Faboideae	Source: http://en.wikipedia.org/wiki/Chickpea
+C005en1	term	chick peas
+C005en1	partOfSpeech	noun
+C005en2	term	garbanzo beans
+C005en2	partOfSpeech	noun
+C005en2	geographicalUsage	southwest United States
+C005en2	customerSubset	AlmostRipe Foods
+C005fr1	term	pois chiches
+C005fr1	partOfSpeech	noun

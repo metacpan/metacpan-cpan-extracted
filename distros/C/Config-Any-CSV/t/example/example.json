@@ -1,0 +1,14 @@
+{
+    "\u00C3lice": {
+        "age": "42",
+        "comment": "friend",
+        "mail": "alice@example.org",
+        "foo": "bar"
+    },
+    "B\u00F6b": {
+        "age": "23",
+        "comment": "",
+        "mail": "bob@example.org",
+        "foo ": ""
+    }
+}

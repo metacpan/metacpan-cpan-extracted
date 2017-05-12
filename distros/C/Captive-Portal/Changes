@@ -1,0 +1,143 @@
+Revision history for Captive::Portal
+
+4.10    Tue, 19 Mar 2013 11:35:41 +0100
+	* cpan relase had an untested pod_coverage error, sigh
+
+4.09    Wed, 13 Mar 2013 11:29:04 +0100
+	* get rid of SUID, use capabilities
+
+4.07    Mon, 11 Mar 2013 16:54:10 +0100
+	* get rid of sudo, use SUID for iptables and ipset
+
+4.06    Tue, 26 Feb 2013 17:51:34 +0100
+	* fw_start_session also sets IP in the capo_activity_ipset
+          needed for stateful restarts
+
+4.05    Tue, 26 Feb 2013 16:42:41 +0100
+	* changed local templates for status view
+	* reversed template vars to prior 4.03
+
+4.04    Tue, 26 Feb 2013 16:08:00 +0100
+	* changed templates for status view
+	* fixed syntax bug from 4.03 in capo-ctl.pl
+
+4.03    Mon, 25 Feb 2013 15:46:44 +0100
+	* minor improvements
+
+4.02    Mon, 25 Feb 2013 11:57:46 +0100
+	* status view: show number of clients behind firewall from capo_activity_ipset
+	* minor pod corrections
+
+4.01    Thu, 21 Feb 2013 20:40:10 +0100
+	* bump COPYRIGHT to ..2013
+	* minor bug in parsing 'ipset list ...' line for 0 values in timeout
+
+4.00    Thu, 21 Feb 2013 17:54:19 +0100
+	* incompatible changes, no more support for ipset < 4.x
+	* use timeout in ipsets for IDLE algorithm
+	* allow incoming traffic only for active clients, probibit ARP sweeps
+	* capo_activity_ipset is now bitmap:ip and no longer bitmap:ip,mac due to timeout bug in current ipset
+          
+
+3.22    Wed, 20 Feb 2013 16:51:49 +0100
+	* repair bug for incoming traffic for not yet authenticated clients
+	* repair bug if --add-set in iptables not using the default timeout of the ipset
+
+3.21    Thu, 29 Nov 2012 14:50:52 +0100
+	* no more support for ipset() < 4.x
+	* use timeout option in ipset() to detect idle clients
+	* no more support for fping
+
+3.16-20 Thu, 29 Nov 2012 10:25:08 +0100
+	* only Uni-Ulm local changes
+
+3.15    Wed, 25 Apr 2012 11:51:50 +0200
+	* use JS to logg sslstrip attacks
+
+3.12    Thu, 02 Feb 2012 12:12:56 +0100
+	* use Spawn::Safe instead of Capture::Tiny
+
+3.11    Mon, 30 Jan 2012 09:23:34 +0100
+	* fixed typo in cfg slot for ipset_version
+
+3.10    Sun, 29 Jan 2012 15:39:34 +0100
+	* merged version 2 and version 3 again together
+	* reap zombies in capo.fcgi after each HTTP request
+
+3.03    Thu, 26 Jan 2012 10:50:13 +0100
+	* more DEBUG in authentication
+	* LOG in filter.tt firewall template removed
+	* mangled searchpath for ipset
+
+3.02    Wed, 25 Jan 2012 17:50:14 +0100
+	* call fw_status less often
+
+3.01    Mon, 23 Jan 2012 11:15:42 +0100
+	* rewrite for newer ipset versions greater 5.x
+	* add hint for version mismatch in INSTALL file
+	* fix pod2usage due to $0 hack
+	* use Captive::Portal Version 2.x line for ipset < version 5.x
+
+2.28    Fri, 20 Jan 2012 11:02:07 +0100
+	* fixed pod2usage error in capo-ctl.pl
+
+2.27    Thu, 19 Jan 2012 21:33:25 +0100
+	* hint for ipset/capo version mismatch in INSTALL file
+
+2.26    Thu, 19 Jan 2012 11:06:13 +0100
+	* arrgh, ipset API changed, check for ipset major version > 4 in Build.PL
+	* fixed minor POD typos
+
+2.25    Mon, 07 Nov 2011 10:13:15 +0100
+	* fixed again POD typos
+	* added script_files in Build.pl
+	* put scriptname for capo-ctl.pl in process table
+
+2.24    Fri, 04 Nov 2011 10:23:05 +0100
+	* fixed POD error in capo-ctl.pl
+
+2.23    Wed, 02 Nov 2011 11:03:51 +0100
+	* again more locking tweaks in handling old, idle sessions
+
+2.22    Mon, 31 Oct 2011 11:09:42 +0100
+	* still more timing tweaks in deleting old, idle sessions
+
+2.21    Sat, 29 Oct 2011 19:57:44 +0200
+	* more small tweaks in deleting old, idle sessions
+
+2.20    Fri, 28 Oct 2011 15:34:43 +0200
+	* solved race condition in deleting old, idle sessions
+
+2.19	Tue, 25 Oct 2011 09:48:12 +0200
+	* removed unneeded modules for locking from Captive::Portal::Role::Utils
+
+2.18	Tue, 25 Oct 2011 09:36:23 +0200
+	* OS hint in Build.pl for CPAN testers
+        * fixed POD error in Captive::Portal::LockHandle
+
+2.17	Wed, 12 Oct 2011 15:14:56 +0200
+	* use Captive::Portal::LockHandle as Class, no longer MIXIN get_lock_handle()
+
+2.16	Fri, 07 Oct 2011 09:52:45 +0200
+	* changed locking from being a role to a class for DESTROY() handling
+	* documentation improvements
+	* test improvements
+
+2.15	Thu, 06 Oct 2011 12:12:00 +0200
+	* capo.fcgi: put scriptname in process table
+
+2.14	Thu Oct 6 10:52:42 2011 +0200
+	* fixed minor documentation bugs
+
+2.13	Wed Oct 5 17:55:07 2011 +0200
+	* minor bug, Scalar::Util in role I18N missing
+
+2.12	Tue Sep 27 10:15:16 2011 +0200
+	* more documentation fixes
+
+2.11	Mon Sep 26 14:36:49 2011 +0200
+	* fixed minor documentation bugs
+
+2.10	Fri Sep 23 16:23:17 2011 +0200
+	* initial CPAN release, already in production for months
+

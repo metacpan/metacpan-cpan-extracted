@@ -1,0 +1,9 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+lib/CGI/Wiki/Formatter/Multiple.pm
+t/00_setup.t
+t/01_load.t
+t/02_multiple_formatters.t

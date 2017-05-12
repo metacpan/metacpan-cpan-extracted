@@ -1,0 +1,50 @@
+INSTALLATION
+============
+
+Using CPAN Interactive shell
+----------------------------
+
+    % perl -MCPAN -e shell
+    cpan> install CGI::Session
+
+Using Makefile.PL
+--------------------
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+If you don't have proper permissions to perform system-wide 
+installations you can install CGI::Session to your private 
+PERL5LIB folder:
+
+    % perl Makefile.PL LIB=~/perllib
+    % make
+    % make test
+    % make install
+
+Above set of commands install CGI::Session to your ~/perllib folder.
+
+TESTING
+========
+
+You are encouraged to run tests for the backend you will be using. 
+The database backends that need a customized connection string won't 
+run by default. To run them, some environment variables must be set.
+
+The simplest method is to use the standard "DBI_DSN" environment variable 
+to define a DBI connection string. Otherwise, you can set these variables 
+as well:
+
+For PostgreSQL:
+    CGISESS_PGSQL_DSN
+    CGISESS_PGSQL_USER
+    CGISESS_PGSQL_PASSWORD
+
+For MySQL:
+    CGISESS_MYSQL_DSN
+    CGISESS_MYSQL_USER
+    CGISESS_MYSQL_PASSWORD
+    CGISESS_MYSQL_SOCKET
+

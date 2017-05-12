@@ -1,0 +1,6 @@
+Revision history for Perl extension Cellular::Automata::Wolfram.
+
+1.0  Sun Dec  1 01:33:21 2002
+	- original version; created by h2xs 1.21 with options
+		-cfn Cellular::Automata::Wolfram -v 1.0
+

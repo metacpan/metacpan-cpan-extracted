@@ -1,0 +1,29 @@
+---
+abstract: 'Truly private classes with private data for Perl5'
+author:
+  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.007'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Anonymous
+provides:
+  Class::Anonymous:
+    file: lib/Class/Anonymous.pm
+    version: '0.03'
+  Class::Anonymous::Instance:
+    file: lib/Class/Anonymous/Instance.pm
+  Class::Anonymous::Utils:
+    file: lib/Class/Anonymous/Utils.pm
+recommends:
+  Package::Anon: '0'
+resources:
+  bugtracker: http://github.com/jberger/Class-Anonymous/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/Class-Anonymous
+version: '0.03'

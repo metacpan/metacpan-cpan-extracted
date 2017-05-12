@@ -1,0 +1,133 @@
+Revision history for Continuity. See the main repository for a detailed list of
+internal changes.
+
+Version 1.6 (released 2014.07.17)
+  * Spelling fixes mostly (thanks dsteinbrunner!)
+
+Version 1.5 (released 2011.09.17)
+  * Fix PSGI docroot
+  * Documentation improvements
+
+Version 1.4 (released 2011.03.20)
+  * Make PSGI adapter be non-blocking
+  * Also make it use the psgi.streaming interface
+  * Add yield to Adapt::HttpDaemon's print (I thought it was there before?)
+  * Add Coro thread descriptions for better debugging
+
+Version 1.3 (released 2010.11.22)
+  * Stupid version number issue
+
+Version 1.2.0 (released 2010.11.22)
+  * Refactor PSGI adaptor (scrottie)
+  * Random documentation updates
+
+Version 1.1.1 (released 2010.02.05)
+  * Add PSGI Adapter! Try "plackup -s Coro guess.pl"
+  * Remove experimental Plack adapter
+  * PSGI adapter uses AnyEvent, the rest of Continuity will too soon
+  * Misc cleanups
+
+Version 1.01 (released 2009.06.06)
+  * Allow callbacks to add callbacks without them getting deleted
+  * Build README from pod and update copyleft dates
+
+Version 1.0 (released 2009.05.09)
+  * Improve Continuity::RequestCallbacks documentation
+  * Add callback clearing options
+  * Add test for callbacks
+
+Version 0.998 (released 2009.02.28)
+  * Add RequestCallback mixin along with some documentation
+  * New inspect API
+  * Kill a race condition on watching for the inspector callback to finish
+
+Version 0.997 (released 2008.12.11)
+  * Forgot to update Changes file for 0.996
+  * Fix debug_callback for adapters
+  * Slight test-suite improvement
+  * POD updates
+  * Remove BETA warning!
+
+Version 0.995 (released 2008.08.03)
+  * Add work-around in Makefile.PL to possibly fix dependency order issue
+  * Make the list of allowed HTTP methods configurable
+  * Fixed bugs in error response
+  * Added a debug_callback for redirecting debug output
+  * Include an error message when "do" fails
+  * Thanks to John Beppu and Shawn M Moore for patches :)
+
+Version 0.994 (released 2008.06.17)
+  * List event as a prereq to make Coro::Event build better
+  * Inspector bugfixes for debug_level and send_basic_header
+  * Update examples - animals.pl and params example
+
+Version 0.993 (released 2008.05.13)
+  * Fix endless loop when calling $request->param()
+  * Add parameter example and test
+  * Add telnet terminal example
+
+Version 0.992 (released 2008.05.11)
+  * Improve $request->param method and documentation
+  * Minor internal changes
+
+Version 0.991 (released 2008.03.18)
+  * Set Coro version requirement to 4.37 so it will pass tests
+  * Add test_helper to MANIFEST
+
+Version 0.99 (released 2008.03.18)
+  * Update tests to fork and self-execute to help cpan-testers
+  * Run against localhost instead of the given server name to help cpan-testers
+  * Remove lvalue based accessors, perl debugger now works a bit
+  * Minor documentation fixes
+
+Version 0.98 (released 2008.03.12)
+  * Add test suite, building on code samples (BDD!)
+  * Documentation improvement
+  * Make the print and send_headers methods chainable
+  * Add and improve examples (query_session and cookies, for example)
+  * Remove broken examples
+
+Version 0.97 (released 2008.02.09)
+  * Fix Continuity::Adapt::FCGI (was broken in last release)
+  * Update FCGI examples
+  * Unify code on calling them "Adapters" instead of "Adaptors"
+  * Fixes debug_level respecting
+  * Set default debugging level to 1 (important warnings)
+  * Make debugging level 0 really quiet
+
+Version 0.96 (released 2008.01.28)
+  * Turn off debugging by default
+  * Fix debug_level to actually work and be respected
+  * Add get_cookie to adapters and use it in the mapper
+  * cookie_life arg/support
+  * Fix some param and params behavior
+  * Revert to ExtUtils::MakeMaker since Module::Install had no apparent advantage
+
+Version 0.95 (released 2007.10.11)
+  * Many internal improvements
+  * Documentation improvements, especially Continuity::Request
+  * Eliminate warnings about Module::Reload not being installed
+  * Clean and simplify examples
+  * Remove Continuity::Monitor (will be distributed separately)
+  * Switch to Module::Install for building
+
+Version 0.94 (released 2007.06.26)
+  * Declare BETA status
+  * Change default session tracking to use cookies
+  * Fix query-based session ID
+  * Reap abandoned-ish sessions after a timeout
+  * Documentation and sample code updates
+  * Add Continuity::Inspector -- a helper for server introspection
+  * Get rid of the Data::Alias dependency
+
+Version 0.93 (released 2007.05.25)
+  * Documentation updates
+  * FCGI adaptor works now, see eg/hello.fcgi
+  * Addition of manual process reap routine
+  * Add Coro::Event to the deps
+  * Add $request->send_headers method and delay sending headers until first print
+  * Eliminate the startup warnings
+  * Less insane cookie parsing code
+  * fixes to static file serving
+  * modularizing the inspector stuff and fixing the example to use the modular module
+

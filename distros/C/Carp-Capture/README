@@ -1,0 +1,54 @@
+Carp-Capture Version 0.02
+
+Carp-Capture provides an object interface for capturing snapshots of Perl's
+stack.  The object efficiently stores large quantities of Snapshots,
+which can be retrieved as confess-like stacktraces.
+
+Capture and later retrieval of stacktraces proved to be quite valuable
+for an application that accepted specifications from users.  There were
+a class of errors that could not be detected at specification time, but
+only became apparent as the effects of the specifications were combined.
+Being able to tag a specification with its origin in user code, enabled
+pinpoint debugging assistance.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Carp::Capture
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Carp-Capture
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Carp-Capture
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Carp-Capture
+
+    Search CPAN
+        http://search.cpan.org/dist/Carp-Capture/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014-2015 Paul Liebert
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

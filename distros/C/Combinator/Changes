@@ -1,0 +1,29 @@
+Revision history for Combinator
+
+v0.4.2  2012.7.8
+        Change only the version form for PAUSE to index it correctly.
+
+0.04.01 2011.2.8
+        Fix the version number in the document.
+
+0.04    2011.2.7
+        Introduce {{nex .. }}nex block for finer controled version
+        of {{next}}
+
+        Treat }}com }}cir }}next as the same by default.
+
+0.03    2011.11.24
+        Simplify and fix bugs in the sample code in the document.
+
+        Fix a memory leak issue that happens when cooperative with
+        AnyEvent timer.
+
+        Prevent invoking {{next}} more than once, and also
+        add a warning message.
+
+0.02    2011.11.7
+        Fix required perl version; remove pod-coverage
+
+0.01    2011.10.31
+        First version, released on an unsuspecting world.
+

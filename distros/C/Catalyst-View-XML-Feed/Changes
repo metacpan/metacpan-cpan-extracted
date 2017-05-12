@@ -1,0 +1,39 @@
+Revision history for Perl extension Catalyst::View::XML::Feed
+
+0.09  Tue Nov  8 10:08:14 CST 2016
+      - Corrected typo in documentation that
+        would cause an error if copied and pasted.
+        https://github.com/mstratman/Catalyst-View-XML-Feed/issues/2
+
+0.08  Mon Apr 13 10:20:32 CDT 2015
+      - Fixed overly restrictive failing test
+
+0.07  Mon Jul  2 14:25:25 CDT 2012
+      - Added entry for 0.06 in this Changes file.
+        (whoops - it was forgotten with 0.06 release).
+
+0.06  Mon Jul  2 14:24:18 CDT 2012
+      - Changed tests to use Catalyst::Test instead of
+        Test::WWW::Mechanize::Catalyst
+        https://rt.cpan.org/Ticket/Display.html?id=78122
+
+0.05  Wed Jan 11 09:32:21 CST 2012
+      - Re-releasing because 0.04 didn't include an updated version
+        of this file, nor any credit to t0m for the patch.
+
+0.04  Wed Jan 11 09:26:09 CST 2012
+      - Bugfix for encoding issue: adding an entry to an RSS
+        feed tried to add an Atom entry. Patch from Thomas Doran
+
+0.03  Mon Mar 28 11:11:44 CDT 2011
+      - Fixed tests to use Test::More::use_ok instead of Test::use::ok
+        http://www.cpantesters.org/cpan/report/421c5730-58cb-11e0-8a39-a371061ad747
+      - Fixed broken pod (missing =over and =back)
+
+0.02  Mon Mar 28 10:33:00 CDT 2011
+      - Fixed repository link (primary reason for this release)
+      - added documentation
+      - pod change: switched 3rd level headings to items
+
+0.01  Mon Mar 21 14:15:15 CDT 2011
+      - first release

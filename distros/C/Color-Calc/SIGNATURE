@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 01ee761cd1d9e4b60c226a5e7a311da95149994a Build.PL
+SHA1 39c9544e35b2e1f67715c271c9653edf1fa6b4a4 Changes
+SHA1 827ef1f8307d42d70d9407be2670e80ade7f007f LICENSE
+SHA1 723a226a473c615c649838fbf2c01f50856a96f5 MANIFEST
+SHA1 3d70456e64d970a5fe3acc6ac2033133de70d342 MANIFEST.SKIP
+SHA1 c5ed06f60901cdf7d7c0d3872beccdfc2ba00fa6 META.json
+SHA1 9f6be8c1012f81a665eb87e5f6807160df2ab0ca META.yml
+SHA1 817ddad4e4feaf47df1da3523373d57dca44e0d8 Makefile.PL
+SHA1 5ed9e2aadb613986d5ac3a78aaad9c75ffbed777 README
+SHA1 9d1b1a2592814a5faf66fe2b54c7617f11ceb958 eg/style-sheet.asp
+SHA1 42e5f6066aeb6a6628d09c04159a9bca2af8a15d eg/style-sheet.pl
+SHA1 82eacfd69463622f9376ee5014808ea843a4ae26 lib/Color/Calc.pm
+SHA1 401fa9aab05c72704c96513dbf23c6c9a313e5b9 lib/Color/Calc/WWW.pm
+SHA1 dd5e2852432a4d8a54d31a74f4f003f88b405473 t/00basic.t
+SHA1 056063d18c3f48338620bbff698f81f91f2ea4d0 t/10pod.t
+SHA1 e2b1f468d6ea1199f0d68655d25532095435aac8 t/11pod_cover.t
+SHA1 54e4cc9aa1b95c1207a0b7fe505a7fc3096ef5b4 t/DEPRECATED_import_MODEval.t
+SHA1 06bf92fe8ca89d99d76b1c19e698ffff50e1a3f9 t/DEPRECATED_import_suffix.t
+SHA1 35bac9ad47423d312eb8ad4afd549d43af2e0487 t/DEPRECATED_non-import_MODEval.t
+SHA1 a3986b8e72a3085f8eae6c7c68ff114fa59f0ad5 t/DEPRECATED_non-import_suffix.t
+SHA1 4e8ff91a5d3a40f4f64a79598dd97fc44c431f33 t/color_opposite.t
+SHA1 69a713d2b91ce77d3b4114db6e7da74ecc6b4ad8 t/color_round.t
+SHA1 c0c72124a020a1d3b17ae3877be8e59deef918ca t/color_safe.t
+SHA1 193eb24082f96dbdf2583e7befd20431d857484d t/import_MODEval.t
+SHA1 a4882816406cf9f8f7205f8420894651fa13b45c t/import_WWW.t
+SHA1 a0a5b31e8c3726bc4a111a84dd77869e55413678 t/import_hex.t
+SHA1 898e52e203b9c19e486cffc59b2494870370b445 t/import_html.t
+SHA1 e3f8994b5043707a36b84a4ace3f5bf1cd709c44 t/import_object.t
+SHA1 7f9add37de26d3482f7055a9b7acca1bdfbba085 t/import_tuple.t
+SHA1 327c1093fd5169461ee4896f3abec3dc03ce27ec t/input_import.t
+SHA1 c9bc6ff10d2f99e366a1a466561c8765d07d286d t/input_oo.t
+SHA1 aecc3997d1697c21382f3703bea8605a8fe2aead t/object-orientated.t
+SHA1 f2f7d33d66bc54c58e7bae2bcaa394186c8ed949 t/schemes_import_HTML.t
+SHA1 0ab6466fd71de056a14dd8c039816c0bf9d00afc t/schemes_import_X.t
+SHA1 db1f43e67cd656e7b02a253570e922b3354a4479 t/schemes_oo.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJUJo68AAoJEIS+srvgrWBmP9AIAJukRHame9lNxpizhYkj+RyF
+lRUi0b+SdN2I+f3bjW5ACfJ8+72Z3z1FsUvw1tHXX9UN8/k+v1LnXScpmscekBu4
+dgcu+1jWf3B254dXYW/c1u/xfiNPs7Mcd1HR/IDBUoDPCQjWJohP6y2XjUCYuN5c
+W3hInkoKGMFA4M0kmnOR7XtBgssmVmjc5BfSbrPLZVFGvvosB8FV/F/61d5Gz9Ec
+kSpCvRVPERqt/xlaf25Is5g3iSkgsoxW2pDqYxuLLN/8iGoHvTvSCrup04vIwk9t
+Pme3ZA1FeUfBZ8XLj74iUXniL/rbaBRbMk8YkRfRO7KGot2sRxzjyFhJT1U+4wU=
+=ScEx
+-----END PGP SIGNATURE-----

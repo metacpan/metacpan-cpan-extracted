@@ -1,0 +1,155 @@
+NAME
+    Catalyst::View::Chart::Strip - A Catalyst View for Chart::Strip graphics
+
+SYNOPSIS
+      package MyApp::View::ChartStrip;
+
+      use strict;
+      use base 'Catalyst::View::Chart::Strip';
+
+      __PACKAGE__->config(
+          cs_package => 'Chart::Strip',
+          height => 192,
+          width => 720,
+          limit_factor => 1,
+          transparent => 0,
+          img_type => 'png',
+          palette => [qw/
+                         FF0000
+                         00CC00
+                         0000FF 
+                         CC00CC 
+                     /],
+      );
+
+      1;
+
+      # A controller method which generates a chart:
+      sub thechart : Local {
+          my ( $self, $c ) = @_;
+
+          [ ... generate $data and $opts somehow or other ... ]
+          $c->stash->{chart_opts} = $opts;
+          $c->stash->{chart_data} = $data;
+          $c->forward('MyApp::View::ChartStrip');
+      }
+
+DESCRIPTION
+    This view allows the serving of Chart::Strip stripchart graphics via
+    Catalyst. The raw numeric data and various chart options are placed in
+    "$c->stash".
+
+    Instances of Catalyst::View::Chart::Strip, like
+    "MyApp::View::ChartStrip" shown in the synopsis above, can be thought of
+    as basically a collection of common defaults for the various chart
+    options. You should probably create a seperate View class for each
+    distinct style of charts your application commonly generates.
+
+    All of the standard constructor arguments documented by Chart::Strip are
+    supported as "->config" parameters in your View class, and are also
+    overrideable at chart generation time via "$c->stash->{chart_opts}".
+
+    Catalyst::View::Chart::Strip adds a few new options in addition to the
+    ones that are standard in Chart::Strip, which are detailed below.
+
+CONFIGURATION PARAMETERS
+    (See Chart::Strip for a complete list of options. Any Chart::Strip
+    option can be passed through as a "->config" parameter).
+
+    All of these options are valid both a "->config" time, or at chart
+    generation time via "$c->stash->{chart_opts}".
+
+  img_type
+    Sets the output image type. Values currently supported by Chart::Strip
+    and GD beneath it are "png" and "jpeg". The default is "png" if
+    unspecified.
+
+  quality
+    This is the quality parameter for the output graphics data, as
+    documented in detail by GD's documentation. Valid quality ranges are
+    0-100 for "jpeg" and 0-9 for "png". Completely optional, and defaults to
+    a reasonably normal value in both cases.
+
+  palette
+    An optional arrayref of colors as six-digit hexidecimal strings, like
+    "FFFFFF" or "4A5C2D". The various datasets in your graph will be colored
+    with the colors of this array in order, recycling to the top of the list
+    if there are more data items than colors specified. The default is a
+    reasonable 9-color high-contrast palette designed for a white
+    background, which happens to also be the default.
+
+  cs_package
+    This allows choosing an alternative but compatible "Chart::Strip"
+    implementation, such as Chart::Strip::Stacked. Defaults to the original
+    Chart::Strip.
+
+STASH VARIABLES
+    As shown in the synopsis at the top, your chart is ultimately defined by
+    the contents of two stash variables: "$c->stash->{chart_opts}", and
+    "$c->stash->{chart_data}".
+
+    "chart_opts" is analogous to the configuration options described above
+    for the View-wide "->config" settings. Valid things here are all of the
+    documented arguments to Chart::Strip's "new()" method, as well as the
+    configuration parameters specifically details above.
+
+    "chart_data" should be an arrayref of sets of data to be charted. Each
+    item in the arrayref should in turn be a hashref consisting of two keys:
+    "data" and "opts". These two keys are analogous to the two arguments of
+    Chart::Strip's "add_data" method.
+
+    In other words, the following example standard Chart::Strip code:
+
+      my $chart = Chart::Strip‐>new( title   => 'Happiness of our Group' );
+      $chart‐>add_data( $davey_data, { style => 'line',
+                                       color => 'FF0000',
+                                       label => 'Davey' } );
+
+      $chart‐>add_data( $jenna_data, { style => 'line',
+                                       color => '00FF88',
+                                       label => 'Jenna' } );
+
+    Becomes this in terms of stash variables:
+
+       $c->stash->{chart_opts}->{title} = 'Happiness of our Group';
+       $c->stash->{chart_data} = [
+           { data => $davey_data, opts => { style => 'line',
+                                            color => 'FF0000',
+                                            label => 'Davey'  }
+           },
+           { data => $jenna_data, opts => { style => 'line',
+                                            color => '00FF88',
+                                            label => 'Jenna'  }
+           },
+
+       ];
+
+    Note that colors are completely optional for us, since we have a
+    reasonable default palette. You need only neccesarily supply the style
+    and label options for a reasonable chart.
+
+    See Catalyst::View::Chart::Strip::Example for a full-fledged controller
+    action you can copy and paste as a working example.
+
+METHODS
+  new
+    Constructor for these Views. Mainly just defaults the above-documented
+    View-specific options, and loads the selected "cs_package" package.
+
+  process
+    This does the chart generation itself. The bulk of the code is concerned
+    with applying the palette to your data before constructing the
+    Chart::Strip object and using it to generate the output binary image
+    data.
+
+SEE ALSO
+    Catalyst, Catalyst::View, Catalyst::Helper::View::Chart::Strip,
+    Catalyst::View::Chart::Strip::Example, Chart::Strip,
+    Chart::Strip::Stacked
+
+AUTHOR
+    Brandon L Black, "blblack@gmail.com"
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

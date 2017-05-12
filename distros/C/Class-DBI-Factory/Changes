@@ -1,0 +1,138 @@
+Revision history for Perl extension Class::DBI::Factory.
+
+0.994 17 April 2005
+    - handler back to mod_perl 1 (with great relief) after widespread
+      grumbling about premature shift to mod_perl2.
+    - CDF::Handler2 available for experiments with mod_perl2
+    - new() now a synonym for instance() since a call to instance() is
+      now dropped into each data class. this caused a bug in which data 
+      classes would get the wrong factory back if the right factory had
+      been created with a call to new().
+    - fancy new Makefile.PL that installs the demo for you if you like, 
+      and adjusts the dependencies appropriately.
+    - documentation tidied up at top, rewritten further down.
+    - factory startup methods gathered behind init() to 
+      simplify future changes.
+	- load_class tests whether the class is already loaded, thanks to 
+	  clever line pinched from Merlyn. Factory now ok if many data classes 
+	  are declared in one file.
+	- interface to CDF::Mailer tidied up a bit.
+	- Back to SQLite3. added DBD::SQLite 1.08 dependency to Makefile 
+	  because 1.07 generates all those warnings. This might be a 
+	  nuisance but it means that the demo runs without extra cpanning.
+	- moved from CVS to SVN
+	- once mod_perl2 settles down, this is likely to be released as v1.
+    
+0.99  18 February 2005
+    - handler now mod_perl2 only.
+    - db_Main hooks in data classes now inserted for you.
+    - severely tidied up: everything non-essential removed
+    - mail-sending functions separated out into Class::DBI::Factory::Mailer
+      (mostly to make them optional)
+    - new relationships() method in Factory retrieves useful bits of 
+      cdbi meta_info.
+    - all SQLite mentions now SQLite2, to avoid spurious warnings from 
+      newer versions.
+    - works much better without config file
+    - all hard work deferred for as long as possible to make cdf fit better
+      into nasty quick data-munging type scripts.
+    - demo application brought up to date, cleaned up, made to work properly
+    - documentation redone. still pretty windy, though.
+    - tests more extensive. still no proper handler tests, though.
+    
+0.86
+    - Package-handling greatly improved.
+    - Documentation updated to explain about problems with live_object 
+      index and database shuffling
+    - boosterism got rid of to simplify documentation.
+    - ghosts made more useful, flexible
+
+0.85
+    - Various small fixes and tweaks over the last four point releases,
+      mostly to exception-handling and list-building.
+
+0.81
+    - Silly MANIFEST error corrected.
+
+0.80
+    - Should be a drop-in replacement, with subclasses working exactly
+      as before, but much extended:
+    - Class::DBI::Factory::Exception now provides a base class for 
+      systematic, mod_perl-friendly exception handling. All CDF family
+      now throw exceptions based on Apache return codes.
+    - CDF::Handler now much more useful and adaptable: includes full 
+      request-handling skeleton that should allow handler classes of
+      only a few lines.
+    - CDF::Ghost added (from Delivery) to simplify handling of 
+      object precursors (and deletion relics).
+    - Demo application brought up to date. still doesn't store, though.
+    - We now have tests for all modules except the Handler, which is
+      only use_ok'd. Apache integration is needed for Handler tests :(
+
+0.77
+    - minor tweaks to handler base class provide a better way to set
+      mime type during response cycle.
+
+0.76  Tues 22 June 2004
+    - Brought up to date with Class::DBI 0.96 and Ima::DBI 0.33
+      Definitely doesn't work with earlier versions: requirements updated.
+      Not guaranteed (or likely) to work with later versions.
+    - tweaks to documentation and tests
+
+0.75 Fri 23 April 2004
+    - list object now accepts prefix parameter used to mark input/output
+      relevant to this list, and allow inclusion of several lists on one page.
+    - minor improvements to Factory class, but no interface changes.
+    - pager-handling unborked thanks to Bill Moseley
+    - demo updated to paginate properly
+    
+0.742 Fri 5 March 2004
+    - bugs introduced by bug fix fixed.
+
+0.741 Fri 5 March 2004
+    - pager tests made conditional on presence of Class:DBI::Pager (d'oh).
+    
+0.74  Weds 3 March 2004
+    - tests no longer require Term::Prompt, so as to get out of the
+      dilemma of whether to record it as a dependency or not. This means
+      the tests don't work in mysql now, but it means the dependencies
+      are all that's required to run make test (so we get past CPAN testers)
+    - tests skip if DBD::SQLite not present.
+    - template processing consolidated in the factory so that it only
+      needs to subclassed in one place.
+    - more debugging flags in Factory.pm
+    - officially works with cdbi 0.95 (I had forgotten to update :)
+      should be fine with anything 0.9x, iirc.
+    - lots more tests
+      
+0.73  Tues 2 March 2004
+    - debugging hooks spread throughout the system in a way that's useful
+      to subclasses. Configuration files now supply a debug_level that
+      controls the amount of detail supplied. exception handling still
+      poor, though.
+    - This version is the first uploaded to CPAN.
+
+0.72
+    - bugfix: template path reversed before use, so that later definitions
+      appear earlier in path: allows package templates to override core
+      which was the whole point.
+    - various dull internal rationalisations
+    - bugfix: CDF::Config::package_loaded() now works. stupido.
+    - factory now exposes using() method for template decisions based 
+      on packages loaded. package/plugin thing generally smartened up 
+      behind it.
+    
+0.71  Thursday Jan 28 2004
+    - made the dbh connection method compatible with sybase by allowing the 
+      omission of db_name.
+    - configuration file can supply a whole DSN if required to get around 
+      compatibility issues (sugg. Ed Sabol).
+
+0.70  Tue Jan 26 2004
+    - first public release, and so heavily rewritten as to bear little relation 
+      to any previous version except in the names of the methods, so I shan't bother 
+      recording changes except to observe that the package/plugin thing, automatic 
+      configuration refresh and POD are all new in this release and therefore less 
+      beaten into shape than other parts.
+
+...

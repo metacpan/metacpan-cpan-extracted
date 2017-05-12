@@ -1,0 +1,185 @@
+Content-type: text/html
+
+<html>
+<head>
+<title>Finalize Your Order</title>
+<script type="text/javascript"><!-- hide from old browsers
+function validate_order (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // skip validation if they clicked "Cancel"
+    if (form._submit.value == 'Cancel') return true;
+    // first_name: standard text, hidden, password, or textarea box
+    var first_name = form.elements['first_name'].value;
+    if (first_name == null || first_name === "") {
+        alertstr += '- Enter shit in the "First Name" field\n';
+        invalid++;
+        invalid_fields.push('first_name');
+    }
+    // last_name: standard text, hidden, password, or textarea box
+    var last_name = form.elements['last_name'].value;
+    if (last_name == null || last_name === "") {
+        alertstr += '- Enter shit in the "Last Name" field\n';
+        invalid++;
+        invalid_fields.push('last_name');
+    }
+    // email: standard text, hidden, password, or textarea box
+    var email = form.elements['email'].value;
+    if (email == null || ! email.match(/^[\w\-\+\._]+\@[a-zA-Z0-9][-a-zA-Z0-9\.]*\.[a-zA-Z]+$/)) {
+        alertstr += '- Enter shit in the "Email" field\n';
+        invalid++;
+        invalid_fields.push('email');
+    }
+    // send_me_emails: radio group or multiple checkboxes
+    var send_me_emails = null;
+    var selected_send_me_emails = 0;
+    for (var loop = 0; loop < form.elements['send_me_emails'].length; loop++) {
+        if (form.elements['send_me_emails'][loop].checked) {
+            send_me_emails = form.elements['send_me_emails'][loop].value;
+            selected_send_me_emails++;
+            if (send_me_emails == null || send_me_emails === "") {
+                alertstr += '- Choose one of the "Send Me Emails" options\n';
+                invalid++;
+                invalid_fields.push('send_me_emails');
+            }
+        } // if
+    } // for send_me_emails
+    if (! selected_send_me_emails) {
+        alertstr += '- Choose one of the "Send Me Emails" options\n';
+        invalid++;
+        invalid_fields.push('send_me_emails');
+    }
+
+    // address: standard text, hidden, password, or textarea box
+    var address = form.elements['address'].value;
+    if (address == null || address === "") {
+        alertstr += '- Enter shit in the "Address" field\n';
+        invalid++;
+        invalid_fields.push('address');
+    }
+    // state: select list, always assume it's multiple to get all values
+    var state = null;
+    var selected_state = 0;
+    for (var loop = 0; loop < form.elements['state'].options.length; loop++) {
+        if (form.elements['state'].options[loop].selected) {
+            state = form.elements['state'].options[loop].value;
+            selected_state++;
+            if (state == null || state === "") {
+                alertstr += '- Select an option from the "State" list\n';
+                invalid++;
+                invalid_fields.push('state');
+            }
+        } // if
+    } // for state
+    if (! selected_state) {
+        alertstr += '- Select an option from the "State" list\n';
+        invalid++;
+    }
+
+    // zipcode: standard text, hidden, password, or textarea box
+    var zipcode = form.elements['zipcode'].value;
+    if (zipcode == null || ! zipcode.match(/^\d{5}$|^\d{5}\-\d{4}$/)) {
+        alertstr += '- Enter shit in the "Zipcode" field\n';
+        invalid++;
+        invalid_fields.push('zipcode');
+    }
+    // credit_card: standard text, hidden, password, or textarea box
+    var credit_card = form.elements['credit_card'].value;
+    if (credit_card == null || ! credit_card.match(/^\d{4}[\- ]?\d{4}[\- ]?\d{4}[\- ]?\d{4}$|^\d{4}[\- ]?\d{6}[\- ]?\d{5}$/)) {
+        alertstr += '- Enter shit in the "Credit Card" field\n';
+        invalid++;
+        invalid_fields.push('credit_card');
+    }
+    // expiration: standard text, hidden, password, or textarea box
+    var expiration = form.elements['expiration'].value;
+    if (expiration == null || ! expiration.match(/^(0?[1-9]|1[0-2])\/?[0-9]{2}$/)) {
+        alertstr += '- Enter shit in the "Expiration" field\n';
+        invalid++;
+        invalid_fields.push('expiration');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+</head>
+<body bgcolor="white">
+<h3>Finalize Your Order</h3>
+<noscript><font color="#cc0000"><b>Please enable Javascript or use a newer browser.</b></font></noscript>
+<p>Don't fuck up it causes me work. Fuck try again ok?</p>
+<form action="TEST" id="order" method="post" name="order" onsubmit="return validate_order(this);">
+<div id="order_state"><input id="_submitted_order" name="_submitted_order" type="hidden" value="1" /></div>
+<table id="order_body">
+<tr id="order_first_name_row" valign="top">
+  <td id="order_first_name_label"><b>First Name</b></td>
+  <td id="order_first_name_field"><input id="first_name" name="first_name" type="text" /></td>
+</tr>
+<tr id="order_last_name_row" valign="top">
+  <td id="order_last_name_label"><b>Last Name</b></td>
+  <td id="order_last_name_field"><input id="last_name" name="last_name" type="text" /></td>
+</tr>
+<tr id="order_email_row" valign="top">
+  <td id="order_email_label"><b>Email</b></td>
+  <td id="order_email_field"><input id="email" name="email" type="text" value="pete@peteson.com" /></td>
+</tr>
+<tr id="order_send_me_emails_row" valign="top">
+  <td id="order_send_me_emails_label"><b>Send Me Emails</b></td>
+  <td id="order_send_me_emails_field"><table>
+  <tr>
+    <td><input id="send_me_emails_1" name="send_me_emails" type="radio" value="1" /></td>
+    <td><label for="send_me_emails_1">Yes</label></td>
+  </tr>
+  <tr>
+    <td><input checked="checked" id="send_me_emails_0" name="send_me_emails" type="radio" value="0" /></td>
+    <td><label for="send_me_emails_0">No</label></td>
+  </tr>
+  </table></td>
+</tr>
+<tr id="order_address_row" valign="top">
+  <td id="order_address_label"><b>Address</b></td>
+  <td id="order_address_field"><input id="address" name="address" type="text" /></td>
+</tr>
+<tr id="order_state_row" valign="top">
+  <td id="order_state_label"><b>State</b></td>
+  <td id="order_state_field"><select id="state" name="state">
+  <option value="">-select-</option>
+  <option value="DJ">DJ</option>
+  <option value="EE">EE</option>
+  <option value="HI">HI</option>
+  <option value="IW">IW</option>
+  <option value="JS">JS</option>
+  <option value="JS">JS</option>
+  <option value="KS">KS</option>
+  <option value="NK">NK</option>
+  <option value="TY">TY</option>
+  <option value="UR">UR</option>
+  <option value="UW">UW</option>
+  <option value="YK">YK</option>
+  </select></td>
+</tr>
+<tr id="order_zipcode_row" valign="top">
+  <td id="order_zipcode_label"><b>Zipcode</b></td>
+  <td id="order_zipcode_field"><input id="zipcode" name="zipcode" type="text" /></td>
+</tr>
+<tr id="order_credit_card_row" valign="top">
+  <td id="order_credit_card_label"><b>Credit Card</b></td>
+  <td id="order_credit_card_field"><input id="credit_card" name="credit_card" type="text" /></td>
+</tr>
+<tr id="order_expiration_row" valign="top">
+  <td id="order_expiration_label"><b>Expiration</b></td>
+  <td id="order_expiration_field"><input id="expiration" name="expiration" type="text" /></td>
+</tr>
+<tr id="order_submit_row" valign="top">
+  <td align="center" colspan="2" id="order_submit_field"><input id="order_submit" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Place Order" /><input id="order_submit_2" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Cancel" /></td>
+</tr>
+</table>
+</form>
+</body>
+</html>

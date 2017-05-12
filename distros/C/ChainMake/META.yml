@@ -1,0 +1,37 @@
+---
+name: ChainMake
+version: 0.9.0
+author:
+  - 'Daniel Schroeer <schroeer@cpan.org>'
+abstract: Make targets with dependencies
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Clone: 0
+  Fcntl: 0
+  Tie::File: 0
+build_requires:
+  Config: 0
+  File::Touch: 0
+  Test::More: 0
+  Time::HiRes: 0
+recommends:
+  threads: 0
+provides:
+  ChainMake:
+    file: lib/ChainMake.pm
+    version: 0.9.0
+  ChainMake::Functions:
+    file: lib/ChainMake/Functions.pm
+    version: 0
+  ChainMake::Parallel:
+    file: lib/ChainMake/Parallel.pm
+    version: 0
+  ChainMake::Tester:
+    file: lib/ChainMake/Tester.pm
+    version: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

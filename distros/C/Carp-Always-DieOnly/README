@@ -1,0 +1,8 @@
+SYNOPSIS
+
+     % perl -MCarp::Always::DieOnly script.pl
+
+SEE ALSO
+
+    Carp::Always
+

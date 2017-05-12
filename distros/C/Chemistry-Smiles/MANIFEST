@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Smiles.pm
+t/1.t
+t/D-Ala.sm
+t/L-Ala.sm
+t/bicyclic%%.sm
+t/bicyclic%.sm
+t/bicyclic.sm
+t/bonds.sm
+t/misc.sm

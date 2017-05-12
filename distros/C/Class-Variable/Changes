@@ -1,0 +1,12 @@
+Revision history for Perl extension Class::Variable.
+
+1.002
+	- fixed problems with 5.21 warnings 'redundant'
+
+1.000
+	- first release
+
+0.01  Fri Jan 23 20:46:00 2015
+	- original version; created by h2xs 1.23 with options
+		-AX Class::Variable
+

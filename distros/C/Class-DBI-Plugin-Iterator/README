@@ -1,0 +1,34 @@
+NAME
+    Class::DBI::Plugin::Iterator - new Iterator for Class::DBI
+
+SYNOPSIS
+      package CD;
+      use base qw(Class::DBI);
+      __PACKAGE__->set_db(...);
+  
+      use Class::DBI::Plugin::Iterator;
+  
+      package main;
+      use CD;
+      my $itr = CD->retrieve_all;
+      my @discs = $itr->slice(0,9);
+  
+      my $new_it = $itr->slice(10,19);
+
+DESCRIPTION
+OPTION
+  prefetch
+
+      use Class::DBI::Plugin::Iterator prefetch => 5;
+
+  driver
+
+      use Class::DBI::Plugin::Iterator driver => 'mysql4';
+
+NOTES
+AUTHOR
+    Takuji ASAKURA, <asakura@weakpoint.jpn.org>
+
+SEE ALSO
+    the Class::DBI manpage, the Class::DBI::Iterator manpage
+

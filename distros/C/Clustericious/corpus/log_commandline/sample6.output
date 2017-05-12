@@ -1,0 +1,10 @@
+% perl sample6.pl 
+[WARN ] main warn  message
+[ERROR] main error message
+[FATAL] main fatal message
+
+% perl sample6.pl -v
+[INFO ] main info  message
+[WARN ] main warn  message
+[ERROR] main error message
+[FATAL] main fatal message

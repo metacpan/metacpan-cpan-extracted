@@ -1,0 +1,66 @@
+# -*- cperl -*-
+use strict;
+use Benchmark;
+
+# Create a new attribute type, and attach one string attribute of this type
+# to the current directory.
+# Check that it succeeded, and cleanup.
+# This requires that the string value is properly quoted.
+# This case tests a regression which was introduced at some point.
+#
+# This test case does not test the presence of triggers.
+
+use vars qw($ctx $tvob $tele);
+use constant MSWIN	=> $^O =~ /MSWin|Windows_NT/i ? 1 : 0;
+use constant CYGWIN	=> $^O =~ /cygwin/i ? 1 : 0;
+use Test::More tests => 16;
+select(STDERR); $| = 1; select(STDOUT); $| = 1;
+use ClearCase::Argv qw(chdir);
+use Argv 1.28; # for summary to work on perl 5.14+
+
+if (!defined do 'test.cfg') {
+  if ($@) {
+    die "$@\n";
+  }
+  warn "Failed to open 'test.cfg', using default values\n" if $!;
+}
+ClearCase::Argv->summary;      # start keeping stats
+ClearCase::Argv->ipc(1);
+my $ct = ClearCase::Argv->new({autochomp=>1});
+my $silent = $ct->clone({stdout=>0, stderr=>0});
+$silent->dbglevel(1) if @ARGV;
+$tvob = $ct->des(['-s'], 'vob:.')->qx unless $tvob;
+$tele = '.' unless $tele;
+my $wrap = $silent->clone({ct=>$ctx}) if $ctx;
+die "This test needs to be run in a view, in a vob\n"
+  unless $ct->ls([qw(-s -d)], $tele)->stderr(0)->qx;
+
+my @attype = sort $ct->lstype([qw(-kind attype -s -obs -invob)], $tvob)->qx;
+my $attype = @attype? $attype[$#attype] . 'Z' : 'FOO';
+$silent->mkattype(['-nc'], "$attype\@$tvob")->system and die "Aborted: $!\n";
+sub one_block {
+  my ($value, $mode) = @_;
+  ok(!$silent->mkattr(['-rep', $attype, $value], $tele)->system,
+     qq(String attribute set to '$value' ($mode mode, array syntax)));
+ SKIP: {
+    skip "No wrapper no fun", 1 unless $wrap;
+    ok(!$wrap->mkattr(['-rep', $attype, $value], $tele)->system,
+      qq(Wrapper: String attribute set to '$value' ($mode mode, array syntax)));
+  }
+}
+sub one_pass {
+  my $ipc = shift;
+  my $mode = $ipc? 'ipc' : 'fork';
+  $silent->ipc($ipc);
+  $wrap->ipc($ipc) if $wrap;
+  one_block(q("foo"), $mode);
+  one_block(q("O'Toole"), $mode);
+  one_block(q("*test*"), $mode);
+  one_block(q("Line one\nLine two"), $mode);
+}
+one_pass(0);
+one_pass(1);
+
+$silent->rmtype([qw(-f -rmall)], "attype:$attype")->system;
+
+print STDERR "\n", ClearCase::Argv->summary;   # print out the stats we kept

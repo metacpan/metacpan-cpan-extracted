@@ -1,0 +1,264 @@
+# NAME
+
+Catalyst::Plugin::URLMap - Mount a Plack application using Catalyst Configuration
+
+# SYNOPSIS
+
+    package MyApp::Web;
+
+    our $VERSION = '0.01';
+
+    use Moose;
+    use Catalyst qw/URLMap/;
+
+    extends 'Catalyst';
+
+    __PACKAGE__->config(
+      'Plugin::URLMap',
+      {
+
+        '/static', {
+          'File', {
+             root => __PACKAGE__->path_to(qw/share web static/),
+          },
+        },
+
+        '/git' => '+Gitalist',
+
+        '/mycustomapp', {
+          '+MyApp::CustomPlackApp', {
+            arg1 => 1,
+            arg2 => 2,
+          },
+        },
+
+        '/thumbnails', {
+          '/large' => '+MyApp::LargeThumbServer',
+          '/small' => '+MyApp::SmallThumbServer',
+        },
+
+      }
+    );
+
+    __PACKAGE__->setup;
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+Modern versions of [Catalyst](http://search.cpan.org/perldoc?Catalyst) use [Plack](http://search.cpan.org/perldoc?Plack) as the underlying engine to
+connect your application to an http server.  This means that you can take
+advantage of the full [Plack](http://search.cpan.org/perldoc?Plack) software ecosystem to grow your application
+and to better componentize and re-use your code.
+
+In some cases you may wish to 'mount' other plack applications to certain root
+URLs, and let that separate application handle requests to that path.  The
+common example is serving static files, as this is not something you normally
+want to subject to a full [Catalyst](http://search.cpan.org/perldoc?Catalyst) request cycle.  Here is how you might set
+this up with the current version of [Catalyst](http://search.cpan.org/perldoc?Catalyst):
+
+Example file is `myapp_web.psgi` in root of your [Catalyst](http://search.cpan.org/perldoc?Catalyst) application.
+
+    #!/usr/bin/env plackup
+
+    use strict;
+    use warnings;
+
+    use MyApp::Web;  ## Your subclass of 'Catalyst'
+    use Plack::Builder;
+    use Plack::App::File;
+
+    builder {
+
+      mount '/static' => Plack::App::File
+        ->new(root=>MyApp::Web->path_to(qw/share web static/))
+        ->to_app,
+
+      mount '/' => MyApp::Web->psgi_app;
+
+    };
+
+Here we are using our `psgi` file and some tools that come [Plack](http://search.cpan.org/perldoc?Plack) in order
+to mount [Plack::App::File](http://search.cpan.org/perldoc?Plack::App::File) to handle everything under `/static`.  You might
+prefer this to using [Catalyst::Plugin::Static::Simple](http://search.cpan.org/perldoc?Catalyst::Plugin::Static::Simple).  This is a nice, clean
+approach that cleanly separates your [Catalyst](http://search.cpan.org/perldoc?Catalyst) application from the other
+mounted [Plack](http://search.cpan.org/perldoc?Plack) applications.
+
+However there may be cases when the additional [Plack](http://search.cpan.org/perldoc?Plack) applications are more
+tightly associated with your [Catalyst](http://search.cpan.org/perldoc?Catalyst) application and you wish to express
+this association better (but still achieve a rational decoupling).  For example
+your mapped application may make heavy use of your [Catalyst](http://search.cpan.org/perldoc?Catalyst) configuration,
+as in the above example.  Or you might choose different mappings and mapped
+applications depending on the environment and wish to control this with
+Catalyst configuration.  In those cases you may want a way to express that URL
+mapping within [Catalyst](http://search.cpan.org/perldoc?Catalyst), and not externally, as in your `psgi` file.
+
+This plugin lets you mount [Plack](http://search.cpan.org/perldoc?Plack) applications via configuration. For example,
+the above mapping could be re-written as follows:
+
+    package MyApp::Web;
+    our $VERSION = '0.01';
+
+    use Moose;
+    use Catalyst qw/URLMap/;
+
+    extends 'Catalyst';
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/static', { 'File',
+          {root => __PACKAGE__->path_to(qw/share web static/)} },
+      });
+
+    __PACKAGE__->setup;
+    __PACKAGE__->meta->make_immutable;
+
+Then your `myapp_web.psgi` would simply become:
+
+    #!/usr/bin/env plackup
+
+    use strict;
+    use warnings;
+
+    use MyApp::Web;  ## Your subclass of 'Catalyst'
+    MyApp::Web->psgi_app;
+
+And we'd manage the URL mappings inside the Catalyst configuration and in your
+application class.
+
+You can of course use a configuration file and format (like Config::General)
+instead of hard coding your configuration into the main application class.
+This would allow you the ability to configure things differently in different
+environments (one of the key reasons to take this approach).
+
+The approach isn't 'either/or' and merits to each are apparent.  Choosing one
+doesn't preclude the other.
+
+We use [Plack::App::URLMap](http://search.cpan.org/perldoc?Plack::App::URLMap) under the hood to perform this work.
+
+# CONFIGURATION
+
+Configuration for this plugin should be a hashref under the top level key
+`Plugin::URLMap`, as in the following:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', \%maps);
+
+Where `\%maps` has keys that refer to URL paths off your application root
+(which is usually '/', but might be some other path if your [Catalyst](http://search.cpan.org/perldoc?Catalyst)
+application itself is mounted into another application) and has values that are
+either another hashref or a plain scalar.  In other words:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/path1' => $name_of_plack_app,
+        '/path2 => { $name_of_plack_app => \%init_args },
+      });
+
+Where `$name_of_plack_app` is a scalar referring to the package name of your
+[Plack](http://search.cpan.org/perldoc?Plack) class (basically any class that is initialized with `new` and has 
+a method called either `to_app` or `psgi_app`, which must return a subref
+that conforms to the PSGI specification) and where `%init_args` are key - value
+arguments passed to `new` at initialization time.
+
+`$name_of_plack_app` is loaded using the same technique as [Plack::Builder](http://search.cpan.org/perldoc?Plack::Builder),
+so if your application is under the [Plack::App](http://search.cpan.org/perldoc?Plack::App) namespace you can drop that
+prefix.  The following two configurations are essentially the same:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/static', { 'Plack::App::File',
+          {root => __PACKAGE__->path_to(qw/share web static/)} },
+      });
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/static', { 'File',
+          {root => __PACKAGE__->path_to(qw/share web static/)} },
+      });
+
+
+
+This means if you want to map an application under a different namespace, you
+will need (as in [Plack::Builder](http://search.cpan.org/perldoc?Plack::Builder)) to prefix `$name_of_plack_app` with a `+`
+as in the above and following example:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/git' => '+Gitalist',
+      });
+
+I believe this is well optimized for the most common cases, and it also is
+consistent with how [Catalyst](http://search.cpan.org/perldoc?Catalyst) plugins are loaded, so hopefully it will be
+a reasonable convention.
+
+## Deep URL Path Mapping
+
+There may be times when you wish to map urls more than one path level from the
+root.  For example you might wish to map the url `http://myapp.com/one/two/`
+from an application other than your main [Catalyst](http://search.cpan.org/perldoc?Catalyst) application.  Here's how
+you would do that:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/one' => {
+          '/two' => { '+MyApp::PlackApp', \%init_args },
+        },
+      });
+
+Basically if your `$name_of_plack_app` starts with a `/` we assume you are
+creating some sub-mappings and proceed like that.  You can add as many levels
+of submappings as you wish.
+
+## Mapping Pre-Initialized Plack Applications
+
+In some cases you may wish to map an already initialized [Plack](http://search.cpan.org/perldoc?Plack) application
+to a given URL mount.  You may do so by simply passing the instance as the
+value of the URL mount string key:
+
+    use Plack::App::File;
+    my $static = Plack::App::File->new(
+      root => __PACKAGE->path_to(qw/share static));
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/static' => $static,
+      });
+
+In this case, your object (such as `$static`) should support a method called
+`to_app` or `psgi_app`.
+
+## Mapping a subroutine reference
+
+Similarly to mapping a pre-initialized object, you can map a subroutine
+reference.  This subroutine reference should conform to the [PSGI](http://search.cpan.org/perldoc?PSGI)
+specification:
+
+    __PACKAGE__->config(
+      'Plugin::URLMap', {
+        '/hello_world' => sub {
+          my $env = shift;
+          return [ 200,
+            ['Content-Type' => 'text/plain'],
+            [ 'Hello World' ] ];
+        },
+      });
+
+## URL Mapping '/'
+
+The '/' mount mapping is reserved for your [Catalyst](http://search.cpan.org/perldoc?Catalyst) Application.  Trying to
+map this path will result in an error.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Plack](http://search.cpan.org/perldoc?Plack), [Plack::App::URLMap](http://search.cpan.org/perldoc?Plack::App::URLMap), [Catalyst](http://search.cpan.org/perldoc?Catalyst)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

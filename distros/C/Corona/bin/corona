@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use strict;
+use lib "lib";
+use Plack::Runner;
+
+sub version {
+    require Corona;
+    print "Corona $Corona::VERSION\n";
+}
+
+my $runner = Plack::Runner->new(server => 'Corona', env => 'deployment', version_cb => \&version);
+$runner->parse_options(@ARGV);
+$runner->run;
+
+__END__
+
+=head1 NAME
+
+corona - Corona launcher
+
+=head1 SYNOPSIS
+
+  corona --listen :9090
+
+C<corona> is basically an alias for C<plackup -s Corona -E
+deployment>. Run C<plackup -h> to see more options.
+
+=head1 SEE ALSO
+
+L<Corona> L<plackup>
+
+=cut

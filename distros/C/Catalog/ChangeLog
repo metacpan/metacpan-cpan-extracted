@@ -1,0 +1,616 @@
+Thu Jan 27 10:14:19 2000  Loic Dachary  <loic@senga.org>
+
+        * Catalog-1.02 release
+
+	* doc/catalog.texinfo: update dmoz documentation, rename troubleshooting
+	  into FAQ and add dmoz related entries.
+	
+	* bin/convert_dmoz.PL: update usage with .gz. Decrease number
+	  of white space emmited to keep the connection open (/10). 
+	  Ignore all categories with name containing non ascii printable
+	  characters. Until UTF8 is updated at dmoz it only leads to
+	  trouble.
+	  Generate .txt files instead of XML files. Load directly in 
+	  mysql with -load.
+	  -v option to see what gets fixed.
+	  -exclude to remove categories matching regexp.
+	  Trim space at end of category path: source of duplicates.
+
+	* lib/Catalog/mysql/schema.pm: path now 255 chars, 128 too short for
+	  dmoz.
+	
+	* examples/DMOZ: add example specific to dmoz, in separate database
+	  dmoz
+
+	* lib/Catalog/dmoz.pm: automatically create the dmoz catalog when 
+	  setup of the catalog structures in the dmoz database
+	
+	* INSTALL (Requires): update all versions. Kill platform specific
+	  instructions because they were out of date. Should be in separate
+	  files.
+
+	* INSTALL.apache (prefix): change instructions assuming apache-1.3.9
+	  and mod_perl-1.21.
+
+Mon Nov 15 12:59:31 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm (requests_check): fix typo : requests instead of request
+
+Sun Oct 24 15:51:19 1999 Loic Dachary  <loic@ceic.com>
+
+	* examples/*/sqledit.conf: HTMLDIR now belongs to install.conf
+
+Fri Oct 22 10:50:44 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/tools.pm (shell): change ksh to sh
+
+	* lib/Catalog/tools/main.pm (synopsis): remove non working options
+	  -log, -kill, -log_append
+
+Fri Oct 22 10:20:06 1999  Loic Dachary  <loic@ceic.com>
+
+	* INSTALL: add missing MYSQL_HOME doc
+
+Mon Oct 18 17:11:23 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm: fix vtable display bug (bad boundary test)
+
+Mon Sep 13 21:29:36 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (cedit_1): add _CATEGORYID_ tag
+
+Tue Sep 07 16:13:00 1999  Loic Dachary  <loic@ceic.com>
+
+        * Catalog-1.01 release
+
+        * lib/Bundle/Catalog.pm: removed version number associated to
+	  catalog. Will hopefully fix the fact that Catalog bundle was
+	  obsolete on CPAN. *sigh*.
+	
+        * doc/catalog.texinfo: add documentation for server side includes
+	  handling in templates.
+	
+	* example/Makefile (install): changed bugous ln -s ../*.conf to
+	  $(config_dir)/*.conf
+
+	* lib/Catalog/tools/sqledit.pm (selector): set default imageutil
+	  if not specified.
+
+	* conf/lib.pl (locate_cmds): get rid of unpredictable which command
+	  (Tim Bunce <Tim.Bunce@ig.co.uk>)
+
+	* lib/Bundle/Catalog.pm: require XML::Parser 2.26, fixes late memory
+	  deallocation bug found in 2.23.
+
+Tue Sep 07 13:14:52 1999  Loic Dachary  <loic@ceic.com>
+
+        * lib/Catalog/path.pm : implement _PATH{FILE,TEXT}<perl range>_ and
+	  update documentation.
+	
+	* bin/contribute.PL : rename bin/sengacontrib.PL
+
+Wed Sep 01 18:01:24 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm: use CGI() to prevent sub hidden overload 
+	  (Graham Barr <gbarr@pobox.com>)
+
+Wed Aug 18 11:20:04 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/tools.pm: patch for recursive sub templates 
+	  (Graham Barr <gbarr@pobox.com>)
+
+Thu Aug 12 11:44:27 1999  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm: vertical table (style=vtable) (Graham Barr <gbarr@pobox.com>)
+
+1999-07-16  Loic Dachary  <loic@ceic.com>
+
+	* doc/catalog.texinfo (cedit.html): added _PATHTEXT_ ("Otis Gospodnetic" <otis@DOMINIS.com>)
+
+1999-07-13  Loic Dachary  <loic@ceic.com>
+
+	* Installation bug fixes ("Otis Gospodnetic" <otis@DOMINIS.com>)
+
+1999-07-07  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm (imagedisplay): missing db() indirection
+
+	* bin/contribute.PL: now stand alone + fix minor version bug sprintf("%02d"
+
+1999-07-03  Loic Dachary  <loic@ceic.com>
+
+        * Catalog-1.00 release
+
+	* Move to version 1.00 to avoid version problems with CPAN
+	
+	* Added php3 directory
+
+1999-07-02  Loic Dachary  <loic@ceic.com>
+
+        * Catalog-0.19 release
+
+	* lib/Catalog/implementation.pm (pathcheck): trap insertion errors, just issue a warning.
+
+1999-07-01  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/external.pm (extractor): make it error resistant. If loading of a piece
+	fails, issue a warning and continue.
+
+	* bin/convert_dmoz.PL: changed description from char(255) to text
+
+	* bin/contribute.PL (main): -commit runs make clean realclean if -f Makefile 
+
+	* lib/Catalog.pm (csearch_param2select_categories): add the query_mode parameter, modify
+	documentation. Default search is now simple AltaVista search.
+
+	* lib/Catalog.pm (cdump_confirm): save dump and dumplocation
+
+	* lib/Catalog.pm (csearch): implement the 'static' search mode + documentation.
+
+	* lib/Catalog.pm (cedit_1): User message error is now printed if category path cannot be found.
+
+1999-06-30  Tim Bunce <Tim.Bunce@ig.co.uk>
+
+	* lib/Catalog/db/mysql.pm: avoid taint problem
+
+	* lib/Catalog/tools/cgi.pm: fix significant security problem
+
+	* lib/Catalog/tools/sqledit.pm: if called with no path_info or params
+	then redirect browser to $cgi->url . "/" to get a working directory
+	instead of an error.
+	Also set $|=0 at the start of each request; gauge() will set $|=1 if needed.
+
+1999-06-18  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/tools/sqledit.pm (confedit): / now forbidden in file name. 
+	No dir arg allowed. These were system wide security problems if sqledit.conf does
+	not define context_allow.r
+
+1999-06-16  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (csearch_param2select_records): change to Text-Query-SQL instead
+	of obsolete Text-Query-Advanced-SQL
+
+1999-06-07  Tim Bunce <Tim.Bunce@ig.co.uk>
+
+	* bin/convert_dmoz.PL: Added tinyint priority field to database
+	to hold priority from dmoz data (but not actually implemented
+	extraction of priority value from dmoz data).
+
+	* lib/Catalog.pm: Improved clarity and layout of control panel.
+
+	* lib/Catalog/db.pm: Changed eval "" to eval {}.
+
+	* lib/Catalog/db/mysql.pm: Fixed english language dependency.
+
+	* lib/Catalog/tools/sqledit.pm: Fixed and simplified verbose
+	option and trace handling.
+
+	* lib/Catalog/tools/tools.pm: Added _CURPAGE_ so templates can
+	say "Page _CURPAGE_ of _MAXPAGES_.".
+
+	* t/mysql.pl: Changed to actually check that system() calls worked.
+
+1999-06-01  Loic Dachary  <loic@ceic.com>
+
+	* conf/mysql.pl (dbconnect): use 'base' param instead of hardwired
+	mysql
+
+	* lib/Catalog/implementation.pm (category_count_1): fix missing
+	!symlink
+
+1999-05-31  Loic Dachary  <loic@ceic.com>
+
+	* Catalog::Query is now Text::Query::Advanced::SQL (distributed
+	on www.senga.org/Text-Query-Advanced-SQL/). Get it and install
+	it.
+
+1999-05-28  Loic Dachary  <loic@ceic.com>
+
+	* conf/mysql.pl: moved version_check of DBD::mysql in conf/mysql.pl
+	instead of Makefile.PL
+
+	* t/lib.pl : load <db_type>.pl according to db.conf
+
+	* t/mysql.pl : create
+
+	* Makefile.PL: remove test override (CORE:: warnings disapeared)
+
+	* conf/Makefile.PL: Isolate conf/mysql.pl from conf/Makefile.PL
+	cleanup lib.pl, function for env2var, move check_version from
+	Makefile.PL to conf/lib.pl.
+
+1999-05-28  Tim Bunce <Tim.Bunce@ig.co.uk>
+
+	* Makefile.PL: modified ptags target.
+
+	* doc/catalog.texinfo: documented new pre_fill and post_fill
+	template parameters.
+
+	* lib/Catalog.pm: Minor code tidy-ups for greater clarity.
+
+	* lib/Catalog/db/mysql.pm: select(): only execute seperate
+	query for count if the original query didn't fetch all rows.
+	Else use the number of fetched rows as the count.
+
+	* lib/Catalog/tools/sqledit.pm: Enabling unbuffered output
+	disabled by default and moved to guage(). Minor code tidy-ups
+	for greater clarity. Minor efficiency improvements.
+
+	* lib/Catalog/tools/tools.pm: template_parse() adds 'filename'
+	and 'name' elements to template hash. Eval of params no done in
+	null package. template_fill() supports new per_fill and post_fill
+	template hook params (see docs). Also maintains stack of parent
+	templates when evaluating sub-templates.
+
+1999-05-27  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (csearch_param2select): remove boolean parameter
+	(csearch_param2select_records): plugged Catalog::Query::mysql in
+	place of crappy parser.
+
+	* lib/Catalog/Query/mysql.pm: create. Changed query syntax
+	to advanced AltaVista.
+
+1999-05-24  Tim Bunce <Tim.Bunce@ig.co.uk>
+
+	* conf/Makefile.PL: support mysql binary release dir structure
+
+	* t/lib.pl: support mysql binary release dir structure
+
+	* Makefile.PL: modified ptags target
+
+	* lib/Catalog.pm: Clarify wording of search pop-up menu.
+	Fix uninitialized value warning.
+
+	* lib/Catalog/implementation.pm: removed redundant sql join from
+	category_count_1().
+
+	* lib/Catalog/db/mysql.pm: Updated code to avoid warnings
+	generated by next version of DBD::mysql. Minor performance
+	improvements.
+
+	* lib/Catalog/tools/cgi.pm: Added qw(:compile) to "use CGI" to
+	workaround a problem with $cgi->path_info failing to AUTOLOAD.
+
+	* bin/convert_dmoz.PL: Enable content and structure files to be
+	read while still gzipped. Added minor performance optimization.
+
+1999-05-21    <ecila40@interdev>
+
+	* lib/Catalog/implementation.pm (select_linked_categories): add
+	  missing info is null with not find_in_set.
+
+1999-05-20    <ecila40@interdev>
+
+	* lib/Catalog/implementation.pm (cdate_count_1_api): 
+	  fix where generation (where instead of and)
+	
+1999-05-18  Loic Dachary  <loic@ceic.com>
+
+	* Catalog-0.10 release
+
+	* Fixed wrong use + added connect_error_handler in db.pm/sqledit.pm
+
+1999-05-17  Loic Dachary  <loic@ceic.com>
+
+	* Catalog-0.9 release
+
+	* lib/Catalog.pm (initialize): initialization encoding bug fix thanks to wojtekz@cnt.pl
+
+	* doc/catalog.texinfo: add _PATH[0-9]+_ documentation
+
+	* lib/Catalog/mysql/schema.pm: changed login name length 16 -> 32 for dmoz in auth tables
+
+1999-05-15  Loic Dachary  <loic@ceic.com>
+
+	* Catalog-0.8 release
+
+	* doc/catalog.texinfo (dmoz.org): better documentation for loading dmoz
+
+	* lib/Catalog.pm, lib/Catalog/implementation.pm : extract non HTML code from Catalog.pm -> implementation.pm
+
+	* lib/Catalog/dmoz.pm : custom import form, simpler and more comments. Separate conversion and loading.
+
+1999-05-14  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm: dump directory is created if it does not exist
+
+	* mysql.pm is now a member of sqledit.conf, not base class
+
+	* created db.pm, wrapping mysql.pm chosing the database type according to
+	  db.conf
+
+	* Catalog::mysql Catalog::tools::mysql Catalog::dmoz::mysql now contain tables declarations
+	  for mysql. First step to database independance. 
+
+	* INSTALL: added USE_CONFIG to reuse existing configuration
+
+	* conf/Makefile.PL: add home in mysql.conf (base install directory) bound to MYSQL_HOME,
+	  updated mysql.pm and t/lib.pl accordingly.
+
+
+1999-05-13  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog/external.pm (Catalog): user specified catalog name overrides catalog name in file
+
+	* INSTALL: added freebsd31 + simplify use of CPAN
+
+	* cgi-bin/Makefile (.PL): Non GNU make need .SUFFIXES before implicit rule
+
+	* Makefile.PL: now show version number of related packages
+
+	* INSTALL.apache (prefix): removed rewrite because bugous sometimes and not mandatory
+
+	* Makefile.PL (MY::postamble): removed cvs_diff_tag and cvs_commit, replaced by contribute
+
+	* lib/Bundle/Catalog.pm: added Catalog itself since it made his way into CPAN
+
+1999-05-13  Tim Bunce  <Tim.Bunce@ig.co.uk>
+
+	* Makefile.PL: version_check prints version number of modules.
+	Added ptags target to generate tags file for most source files.
+
+	* conf/Makefile: when installed .conf files already exists: give
+	message and display a diff.
+
+	* Catalog.pm: make error.html output more readable for large errors
+	(esp with $::opt_error_stack true). Use multi-arg form of system()
+	for security. Minor improvements to some error messages.
+
+	* lib/Catalog/external.pm: Fix typo on error message.
+    The "create table" statement now allows table names with digits.
+
+	* lib/Catalog/tools/mysql.pm: Comment out two s//\\0/g regex that
+	caused the catalog to fail (using 5.005_02). Added db_bin_dir config
+	value to specify path to mysqldump.
+
+	* lib/Catalog/tools/sqledit.pm: The verbose cgi param can now also
+	be used to enable DBI->trace levels.
+
+	* t/lib.pl: Improve auto-selection of mysqld location
+
+	* t/01catalog.t: minor change to improve failure message (that
+	was triggered by the s//\\0/g bug above).
+
+
+1999-04-30  Tim Bunce  <Tim.Bunce@ig.co.uk>
+
+	* t/lib.pl: Improve auto-selection of mysqld location
+
+1999-04-30  Loic Dachary  <loic@ceic.com>
+
+	* CONTRIBUTIONS: create contributions guidelines
+
+	* bin/contribute.PL: script that capture contribution methodology
+
+	* lib/Catalog.pm: separate functions for select in walk, simplify
+	select order (Tim Bunce Tim.Bunce@ig.co.uk).
+
+	* lib/Catalog/path.pm: fix bug (Tim Bunce Tim.Bunce@ig.co.uk)
+
+	* lib/Makefile.PL: entries for CVS handling (Tim Bunce Tim.Bunce@ig.co.uk)
+
+	* lib/Catalog/tools/sqledit.pm: verbose > 1 => error_stack = 1 (Tim Bunce Tim.Bunce@ig.co.uk)
+
+1999-04-27  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm: add terse comments for each function
+
+	* lib/Catalog/path.pm: new, move all path manipulation routines
+	from Catalog.pm to path.pm. 
+
+	* lib/Catalog.pm: Added Catalog.conf instructions
+	path_last_link and path_root_constant. Allow per catalog name
+	specification of all path_* instructions in Catalog.conf
+
+	* lib/Catalog/path.pm: _PATH_ _PATH[0-9]+_ _PATHFILE_ _PATHFILE[0-9]+_
+	implemented.
+
+	* lib/Catalog.pm: fix bug in cdump, _PATH_ was not using script_name()
+
+1999-04-22  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (cpathfile): added _PATHFILE_ to cedit/cbrowse
+
+1999-04-14  Loic Dachary  <loic@ceic.com>
+
+	* Catalog-0.5 release
+
+	* doc/catalog.texinfo : update documentation
+
+1999-04-13  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm : added cimport.html cexport.html and associated 
+	actions. Added start theme in control_panel.
+
+1999-04-12  Loic Dachary  <loic@ceic.com>
+
+	* complete rebuild of Makefiles & configuration mechanism
+
+	* conf/install.conf: created for install parameters, loaded by sqledit
+
+1999-04-09  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm: clarify and cache cinfo() results
+
+	* lib/Catalog.pm: fix counter efficient SQL requests
+
+1999-04-08  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm: added gauge for lengthy process
+
+	* finish XML load/unload 
+
+1999-04-06  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (string2words): add encoding option
+
+	* Makefile.PL: add HOST env variable
+
+1999-03-25  Loic Dachary  <loic@ceic.com>
+
+	* lib/Catalog.pm (cimport_real): implement RDF import
+
+	* lib/Catalog.pm (cedit_1): add missing pathcheck
+
+	* lib/Catalog.pm : change escapeHTML by myescapeHTML for &acute;
+
+1999-03-19  Loic Dachary  <loic@loic.ceic.com>
+
+	* Makefile.PL: require perl-5.005
+
+1999-03-18  Ecila 4.10  <ecila40@newsun>
+
+	* lib/Catalog.pm: fix ' and " in category names
+
+	* lib/Catalog.pm: fix escapeHTML because it didn't escape the '
+
+1999-03-16  Loic Dachary  <loic@loic.ceic.com>
+
+	* Catalog-0.4 release
+
+1999-03-15  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/catalog.texinfo: fully comment the example provided
+
+1999-03-11  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/Makefile (catalog_toc.html): Fix nested table bug with texi2html
+
+	* example/Makefile : use a separate database for the example
+
+1999-03-10  Loic Dachary  <loic@loic.ceic.com>
+
+	* Makefile.PL: added config.cache and CGIPATH
+
+	* example: create a fully functional example that demonstrate the
+	typical use of catalog.
+
+	* doc/catalog.texinfo: update the documentation for csearch
+
+	* lib/Catalog.pm: fix bugs
+
+1999-03-09  root  <root@localhost.localdomain>
+
+	* lib/Catalog.pm: implement csearch 
+
+1999-03-08  root  <root@transparens-1.clients.easynet.fr>
+
+	* doc/catalog.texinfo: update for cdump & pathcontext
+	
+	* lib/Catalog.pm: cosmetic changes to control panel + access to intuitive navigation
+
+	* lib/Catalog.pm: implement cdump (add dump and dumplocation fields)
+	The catalog table has two new fields:
+	alter table catalog add dump varchar(255);
+	alter table catalog add dumplocation varchar(255);
+
+	* lib/Catalog.pm: pathcontext_params instruction in catalog.conf
+
+	* lib/Catalog.pm: if category renamed, update catalog_path
+
+	* lib/Catalog.pm: modify browsing, insert, delete to update catalog_path
+
+	* lib/Catalog.pm: add pathcontext intuitive navigation (catalog_path_<name> table)
+
+1999-02-26  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/catalog.texinfo (SQL editor configuration file): added nph option in 
+	sqledit.conf
+
+1999-02-24  Loic Dachary  <loic@loic.ceic.com>
+
+	* Catalog-0.3 release
+
+1999-02-23  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/catalog.texinfo: update documentation to reflect the cosmetic
+	changes of the interface. 
+	Document the chronological catalog capability.
+
+1999-02-22  Loic Dachary  <loic@loic.ceic.com>
+
+	* t/catalog.t: added tests for category edit and entry edit
+
+	* added images directory with clipart
+	
+	* conf/catalog.conf (htmlpath): added htmlpath option
+
+	* lib/Catalog.pm (searcher_links): added edit link for category and 
+	entries. 
+	Use images in category edit form.
+	Customize template for category browsing when creating a symbolic link.
+	Customize category edit/insert form.
+	
+	* doc/Makefile (catalog_toc.html): split to node instead of chapter
+
+	* Makefile.PL: added HTMLPATH
+
+	* Makefile.PL: HTMLDIR is now mandatory : used for images and examples
+
+1999-02-19  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/catalog.texinfo (Catalog editing): update screen shots and text 
+	to accomodate the new catalog insert/edit templates.
+	Fix a lot of typos.
+
+	* lib/Catalog.pm (ccontrol_panel): rewrite to get rid of clumsy
+	CGI formating functions.
+
+	* Customize insert/edit forms for catalogs
+
+1999-02-18  Loic Dachary  <loic@loic.ceic.com>
+
+	* lib/Catalog.pm(cbuild): added basic sanity checks 
+
+	* add action=_SCRIPT_ in evry form
+	
+	* rewrite test framework : use Test instead of TBone because std. 
+	Added fct to test memory eating. 
+
+	* t/catalog.t Write tests for all interactive actions.
+
+	* lib/Catalog.pm (cdate): fix inverted test
+	(cdate_index): fix date_sub -1 instead of date_sub 1
+
+1999-02-16  Loic Dachary  <loic@loic.ceic.com>
+
+	* lib/Catalog.pm (cbuild): fix bug side effect on @tablelist
+
+1999-02-09  Loic Dachary  <loic@loic.ceic.com>
+
+	* doc/Makefile (install_info): makeinfo breaks on @images, fix
+	(install_info): automatic update of info dir file
+
+	* t/catalog.t: rewrite the test framework, use ExtUtils::TBone. 
+	Use local mysqld to prevent trashing an existing base. 
+	Only one test, though.
+
+1999-02-08  Loic Dachary  <loic@loic.ceic.com>
+
+	* Catalog-0.2 release
+	
+	* doc/catalog.texinfo (Setup): simplify because AUTH prevents the first 
+	error panel. 
+
+	* INSTALL (Configuration): document AUTH var
+
+	* Makefile.PL (dbconnect): installation procedure now patch user and passwd
+
+1999-02-02  Loic DACHARY  <loic@home.ceic.com>
+
+	* add MANIFEST & dist stuff
+
+1999-02-02    <ecila40@interdev>
+
+	* doc/catalog.texinfo (Setup): fix beginning of chapter for easier
+		understanding when in the install process.
+
+	* Makefile.PL: Fix version checking
+
+	* Double check Catalog and mod_perl (Apache::Registry + Apache::DBI +
+		Apache::MaximumSize). Apparently does not leak. Didn't test
+		really though.
+
+	* Catalog-0.1 release

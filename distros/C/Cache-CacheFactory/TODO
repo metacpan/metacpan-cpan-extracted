@@ -1,0 +1,21 @@
+Future development:
+
+- documentation/cookbook for moving from Cache::Cache to Cache::CacheFactory.
+- Cache::CacheFactory::Expiry::Base->set_purge_order().
+- update_last_accessed_at option.
+- weaken_refs option to combine with no_deep_clone?
+- Other storage policies:
+  - Cache::BerkeleyDB
+    - requires BerkeleyDB.
+- Expiry policies:
+  - 'all' pruning policy - just clears entire cache on purge().
+  - 'entries' pruning policy - prune if there's more than X keys.
+- auto_purge options:
+  - Allow auto_purge on X set/get operations as well/instead of interval.
+- get/load callback functions?
+- refactor to complain about unhandled options to stop typo problems.
+- Add "performance" section to documentation.
+- optimize calls to foreach_*() functions:
+  - pass named function refs.
+  - don't call if no policies of that type.
+  - pre-count policy numbers to speed up check.

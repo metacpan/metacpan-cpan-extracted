@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+MediaWiki.xs
+ppport.h
+README
+t/CMS-MediaWiki.t
+lib/CMS/MediaWiki.pm
+META.yml                                 Module meta-data (added by MakeMaker)

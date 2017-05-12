@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Crypt/OpenSSL/Cloner.pm
+lib/Crypt/OpenSSL/Cloner/x509asn1.pm
+t/00_clone.t
+META.yml                                 Module meta-data (added by MakeMaker)

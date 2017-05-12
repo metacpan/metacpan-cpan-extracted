@@ -1,0 +1,52 @@
+Revision history for Perl extension Crypt::OpenSSL::EC.
+
+1.01  2015-01-29
+      Added some more tests.
+      Fixed crashes associated with get0_private_key and get0_group.
+
+0.9   2015-01-29
+      Fixed a problem where EC_KEY_get0_public_key did not duplicate the
+      returned EC_POINT, potentially causing a double free of the point and
+      subsequent crash. Reported by Dick Franks.
+
+0.8   2015-01-28
+      Omitted Changes for 0.7
+
+0.7   2015-01-28
+      Fixed problem where BIGNUMs were not blessed
+
+0.6   2015-01-07
+      Fixed a problem due to the fact that EC_GROUP_get0_generator returned a
+      pointer to an internal object with a EC_GROUP. The point is now
+      duplicated. Reported by Dick Franks.
+
+0.5   2013-08-23
+      Do not provide certain EC2M functions unless they are available in the
+      underlying OpenSSL (ie if OPENSSL_NO_EC2M is not defined): 
+      EC_GF2m_simple_method()
+      EC_GROUP_set_curve_GF2m()
+      EC_GROUP_get_curve_GF2m()
+      EC_GROUP_new_curve_GF2m()
+      EC_GROUP_get_trinomial_basis()
+      EC_GROUP_get_pentanomial_basis()
+      EC_POINT_set_affine_coordinates_GF2m()
+      EC_POINT_get_affine_coordinates_GF2m()
+      EC_POINT_set_compressed_coordinates_GF2m()
+
+0.4   2013-04-02
+      Added MSWin32.pl to enable correct build on MS Windows platform (with both GCC and MSVC
+      compiler). Contributed by kmx.
+
+0.3   2013-03-22
+      Updated author and distribution location details to airspayce.com
+
+0.2   2012-06-20
+      First public release
+
+0.1   2012-06-20
+      Autodestruction, OO support added.
+
+0.01  Thu Jun 14 08:19:57 2012
+	- original version; created by h2xs 1.23 with options
+		-n Crypt::OpenSSL::EC /usr/include/openssl/ec.h -L /usr/lib -lcrypt
+

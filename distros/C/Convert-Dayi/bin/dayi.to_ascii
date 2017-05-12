@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use utf8;
+use Convert::Dayi qw(as_ascii);
+use Encode;
+while( <STDIN> ) {
+    my $word = Encode::decode_utf8( $_ );
+    print as_ascii( $word );
+}

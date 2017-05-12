@@ -1,0 +1,30 @@
+---
+abstract: 'Add Config::Std support to CGI::Application'
+author:
+  - 'Stephen Cardie <stephenca@cpan.org>'
+build_requires:
+  English: 0
+  File::Spec: 0
+  Test::More: 0
+  Test::Most: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-Config-Std
+requires:
+  CGI::Application: 0
+  Config::Std: 0
+  Hash::Merge: 0.12
+  Sub::Exporter: 0.982
+  common::sense: 3.4
+version: 1.003

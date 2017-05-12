@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Le Garff Yoann <pe.weeble@yahoo.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.140640, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CTM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBI: '0'
+  Date::Calc: '6'
+  Exporter::Easy: '0'
+  Hash::Util: '0'
+  List::MoreUtils: '0'
+  POSIX: '0'
+  Perl::OSType: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  String::Util: '0'
+  Sub::Name: '0'
+  Try::Tiny: '0'
+  perl: '5.006001'
+resources: {}
+version: '0.18'

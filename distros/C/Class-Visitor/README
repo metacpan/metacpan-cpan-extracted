@@ -1,0 +1,93 @@
+$Id: README,v 1.1.1.1 1997/10/18 16:20:01 ken Exp $
+
+
+			    Class::Visitor
+
+		  Vistor and Iterator extensions to
+		 the Class::Template Perl module for
+		   use with container hierarchies.
+
+
+			     Ken MacLeod
+			 ken@bitsko.slc.ut.us
+
+INTRODUCTION
+
+    Class::Visitor extends the Class::Template Perl module with
+    implementations of the Visitor and Iterator design patterns for
+    multi-level container hierarchies.
+
+    See the file Changes for user-visible changes.  See ChangeLog for
+    detailed change descriptions.
+
+    Newer versions of this module can be found at
+    <ftp://ftp.uu.net/vendor/bitsko/gdo/>.
+
+    Copyright (C) 1997 Ken MacLeod
+    Class::Visitor is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+OVERVIEW
+
+    Class::Visitor defines object classes using ``templates''.
+    Templates define the members of the class and what data type they
+    contain (scalar, array, or hash).  Class::Template creates the
+    accessor methods for the members of the class, Class::Visitor
+    extends those methods with methods for ``visiting'' and iterating
+    over multiple levels of objects.
+
+    Iteration methods include `next', `parent', `root', returning the
+    delegate, or comparing equivalency of iterators.
+
+    Visitor methods include `accept' and `children_accept'.  Calling
+    `accept' on an object immediatly calls back to the visiting class
+    with a `visit_TYPE' method where TYPE is the type of this object.
+
+    Additional methods are defined for `push' and `pop' on class
+    members and an `as_string' method that returns the concatenation
+    of scalars contained in a class member.
+
+    See the man pages for Class::Visitor(3), Class::Iter(3), and
+    Class::Template(3) for details.
+
+    Visitors and Iterators are explained thoroughly in ``Design
+    Patterns: Elements of Reusable Object-Oriented Software'' by
+    Gamma, Helm, Johnson, and Vlissides, published by Addison-Wesley
+    (ISBN 0-201-63361-2).
+
+<http://st-www.cs.uiuc.edu/users/patterns/patterns.html>
+
+    For an example of Class::Visitor in action, see the Perl module
+    SGML::SPGrove.
+
+<ftp://ftp.uu.net/vendor/bitsko/gdo/>
+<http://www.perl.com/CPAN/modules/by-module/SGML/>
+
+INSTALLATION
+
+    Class::Visitor requires Perl 5 and Class::Template from the
+    Class-Eroot package.
+
+<http://www.perl.com>
+<http://www.perl.com/CPAN/modules/by-module/Class/Class-Eroot-19960603.tar.gz>
+
+    Installation of Class::Template must be done by hand.
+
+    Class::Visitor installs as a standard Perl module:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Class::Visitor includes an RedHat Package Manager (RPM) spec for
+    creating binary packages.  This spec is known to work with
+    PkgMaker for creating ``binary'' tars and Solaris packages.
+
+<ftp://ftp.uu.net/vendor/bitsko/pkgmaker/>
+
+    Prepackaged ``binaries'' for Class::Template and Class::Visitor
+    are available at the source distribution site:
+
+<ftp://ftp.uu.net/vendor/bitsko/gdo/binaries/>
+<ftp://ftp.uu.net/vendor/bitsko/sgml-toolbox/binaries/>

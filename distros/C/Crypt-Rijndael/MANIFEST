@@ -1,0 +1,26 @@
+_rijndael.c
+Changes
+COPYING
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+NEWS
+ppport.h
+rijndael.h
+Rijndael.pm
+Rijndael.xs
+t/00_load.t
+t/blocksize.t
+t/cbc.t
+t/cfb.t
+t/ctr.t
+t/ecb.t
+t/lib/mode.pl
+t/ofb.t
+t/pcbc.t
+t/rt/27632.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README

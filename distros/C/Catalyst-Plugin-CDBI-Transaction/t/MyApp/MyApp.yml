@@ -1,0 +1,2 @@
+--- #YAML:1.0
+dsn: dbi:SQLite:dbname=__HOME__/myapp.db

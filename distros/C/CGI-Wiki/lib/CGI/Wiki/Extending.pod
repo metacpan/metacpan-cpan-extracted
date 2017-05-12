@@ -1,0 +1,185 @@
+=head1 NAME
+
+Extending.pod - How to extend CGI::Wiki with your own plugins.
+
+=head1 LIMITATIONS
+
+The extension mechanism is currently only defined for database-backed
+setups, but since nobody has written any other kind of backend I think
+we're fine for now.
+
+=head1 THE SIMPLEST WAY
+
+You can extend L<CGI::Wiki> in a fairly simplified way without the use
+of plugins, by supplying a hash of metadata when you write a node. For
+example:
+
+  $wiki->write_node( $node, $content, $checksum,
+                     { postcode => $postcode }   );
+
+and on node retrieval you'll get it back again:
+
+  my %node = $wiki->retrieve_node( $node );
+  my $postcode = $node{metadata}{postcode}[0];
+
+You can supply more than one value for each type of metadata:
+
+  $wiki->write_node( $node, $content, $checksum,
+      { postcode => "W6 9PL",
+        category => [ "Thai Food", "Restaurant", "Hammersmith" ] } );
+
+And get back a list of nodes which have a given value for a given
+metadata type:
+
+  my @nodes = $wiki->list_nodes_by_metadata(
+      metadata_type  => "category",
+      metadata_value => "Hammersmith" );
+
+For anything more complicated you will need to write a plugin.
+
+=head1 PLUGIN BASE CLASS
+
+Plugins should inherit from C<CGI::Wiki::Plugin>. This base class
+provides the following methods to give access to a C<CGI::Wiki>
+object's backends:
+
+=over 4
+
+=item * C<datastore> - returns the store object
+
+=item * C<indexer> - returns the search object
+
+=item * C<formatter> - returns the formatter object
+
+=back
+
+If you want these methods to return anything useful then call
+
+  $wiki->register_plugin( plugin => $plugin);
+
+before calling say
+
+  my %node_data = $plugin->datastore->retrieve_node( "Foo" );
+
+=head1 CALLING API
+
+  my $plugin = CGI::Wiki::Plugin::Foo->new( ...any required args... );
+  $wiki->register_plugin( plugin => $plugin );
+
+  $wiki->write_node( "Test Node" ,"Test", $checksum,
+                     { foo_data => { a => "apple",
+                                     b => "banana" }
+                     } );
+
+  my $bee = $plugin->get_word( node => "Test Node", letter => "b" );
+
+or
+
+  my $plugin = OpenGuides::London::Underground->new;
+  $wiki->register_plugin( plugin => $plugin );
+  $wiki->write_node( "Hammersmith Station", "a station", $checksum,
+                     { tube_data => [
+                         { line => "Piccadilly",
+                           direction => "Eastbound",
+                           next_station => "Baron's Court Station"
+                         },
+                         { line => "Piccadilly",
+                           direction => "Westbound",
+                           next_station => "Acton Town Station"
+                         }
+                                    ]
+                      }
+                    );
+
+  # Put more data in, then
+
+  my @route = $plugin->find_route( from => "Holborn Station",
+                                   to   => "Acton Town Station" );
+
+
+=head1 STORE ACCESS
+
+A plugin named CGI::Wiki::Plugin::Foo may access the backend
+database directly like so:
+
+=over 4
+
+=item * Read-only access to any table
+
+=item * Read-write access to any table whose name begins with
+C<"p_" . $CGI::Wiki::Plugin::Foo::plugin_key . "_">
+
+C<$CGI::Wiki::Plugin::Foo::plugin_key> should be different from the
+keys of all other plugins. No, I haven't set anything up to ensure this.
+
+=back
+
+=head1 REQUIREMENTS FOR PLUGIN AUTHORS
+
+Either be database-agnostic, or state clearly in your docs which
+databases you support, and handle errors nicely.  Be aware that
+non-database backends may exist in the future.
+
+Be aware of whether you need to check for locks explicitly in
+different databases (see code of CGI::Wiki::Store::* to find out).
+
+=head1 REQUIRED METHODS
+
+=over 4
+
+=item B<on_register>
+
+Check that any tables you require are set up, and set them up if not.
+
+=back
+
+=head1 OPTIONAL METHODS
+
+=over 4
+
+=item B<post_write>
+
+This will be called every time a node is written, with the arguments like so:
+
+  $plugin->post_write( node     => $node_name,
+                       version  => $version_number,
+                       content  => $content,
+                       metadata => \%user_defined_metadata );
+
+This will happen after the node data is all written, but before any
+lock is released.
+
+We could probably reimplement the searches as plugins like this if we
+want to, but this will require writing extra backends for
+Search::InvertedIndex so it can work within the same database.
+
+The user-defined metadata will already have been stored in the backend
+but it is available here for you to do what you will with it.
+
+Its return value should be true on success and false on error.
+
+=item B<post_read>
+
+B<THIS IS NOT YET IMPLEMENTED.>
+
+This will be called every time a node is read, with the arguments like so:
+
+  $plugin->post_read( node     => $node_name,
+                      version  => $version_number,
+                      content  => $content,
+                      metadata => \%user_defined_metadata );
+
+It cannot affect the data returned to the caller. It should be used for its
+side-effects, for example tracking the number of times a given node is
+accessed.
+
+Its return value should be true on success and false on error.
+
+=back
+
+=head1 PLUGIN CONFLICTS
+
+What if we have more than one plugin registered? What if we change the
+mechanism to allow the plugins to change the data stored in the
+database/returned to the caller?
+

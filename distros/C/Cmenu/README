@@ -1,0 +1,111 @@
+#-------------------------------------------------------
+#
+# $Id: README,v 1.1.1.1 2001/04/07 18:43:45 devel Exp $
+#
+# Copyright (c) 1997, 1998  Edmund Mergl
+#
+#-------------------------------------------------------
+
+DESCRIPTION:
+------------
+
+This is version 1.1 of Cmenu
+
+Cmenu is a menuing system for perl scripts with a look and feel
+reminiscient of dialog - the command line utility
+
+
+COPYRIGHT:
+----------
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+
+REQUIREMENTS:
+-------------
+
+  - build, test and install Perl5 
+  - build, test and install Perl Module Curses.pm
+  - build, test and install Perl Module Wrap.pm
+
+
+PLATFORMS:
+----------
+
+  This release of perlDialog has been developed using Linux 2.2.
+  It has been tested using these terminals
+ 	linux console linuxm
+	xterm
+	Wyse 60 using VT100 emulation (tic file supplied)
+
+
+INSTALLATION:
+-------------
+
+0.   If you are not using Linux, read the source
+     There are a couple of tweaks you may need to do to get
+     some keys to respond correctly.
+     Look around line 475 in function menu_initialise,
+     Block 2 - methods 1,2 and 3
+     If you need methods 1 or 2, uncomment them and comment out 3
+     Sorry, I have nothing other than Linux here so do not know if 
+     these methods are still necessary.
+1.   perl Makefile.PL
+2.   make
+3.   demo
+4.   make install (should be done under root)
+
+
+TESTING:
+--------
+
+Run 'demo'.
+
+This runs the perl script 'demo'. Provided you run it in Cmenu's
+home directory it should be able to find Cmenu.pm without you
+having to install Cmenu with 'make install'
+
+
+DOCUMENTATION:
+--------------
+
+Detailed documentation can be found in the doc directory. Use
+	latex Cmenu.tex			# needs TeX
+	xdvi Cmenu.dvi			# needs XFree
+	dvips -f Cmenu.dvi|lpr		# needs dvips
+	a browser to read the html dir (doc/html)
+to process these files.
+
+Use 'perldoc Cmenu' after installation to read the documentation 
+included in the module itself for shorter function descriptions.
+
+EXTRA FILES
+-----------
+The following files have been included as extras
+   edit.txt	a help file used by demo
+   help.txt	a help file used by demo
+   cmenurc	a sample configuration file for hacking the default
+		behaviour of Cmenu. It can reside in several places
+			/etc/Cmenu/.cmenurc	System Wide
+			~/.cmenurc		User defaults
+			./cmenurc		Current deaults
+		Config files are checked in the above precedence
+		Read the file to see what it can do
+   vt100-wy.ti	A tic file for the terminfo database. It is for
+		a Wyse 60 (or equivalent) emulating a VT100. Extra
+		function keys have been mapped to default strings
+		so that Home and Page keys work. It is not perfect;
+		the Delete key is mislabelled, some hacks of function
+		keys may be required - at least its a start :)
+   contrib/*	these are a series of scripts and definitions which
+		create PostgreSQL databases and demonstrate Cmenu
+		in action with SQL commands. Needs a PostgreSQL perl
+		Module such as Pg or Postgres. Needs PostgreSQL as
+		well of course.
+
+---------------------------------------------------------------------------
+
+   Andy Ferguson <andy@moil.demon.co.uk>
+
+---------------------------------------------------------------------------

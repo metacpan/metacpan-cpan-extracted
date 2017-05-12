@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Class/Param.pm
+lib/Class/Param/Base.pm
+lib/Class/Param/Callback.pm
+lib/Class/Param/Compound.pm
+lib/Class/Param/Decorator.pm
+lib/Class/Param/Encoding.pm
+lib/Class/Param/Ordered.pm
+lib/Class/Param/Tie.pm
+MANIFEST			This list of files
+t/01-use.t
+t/02-pod.t
+t/04-base.t
+t/05-param.t
+t/06-encoding.t
+t/07-tie.t
+t/08-callback.t
+t/09-ordered.t
+META.yml
+Makefile.PL
+README

@@ -1,0 +1,197 @@
+1.32 -- Wed Oct 21 20:29:30 CDT 2009
+  * remove label INIT, not valid as of 5.11.0
+
+Change 739 on 2002/08/19 by <gbarr@pobox.com> (Graham Barr)
+
+	Dont generate PPD
+
+Change 738 on 2002/08/19 by <gbarr@pobox.com> (Graham Barr)
+
+	Dont depend on hash order in t/03seqof.t and try both possible
+	results
+
+Change 613 on 2001/04/10 by <gbarr@pobox.com> (Graham Barr)
+
+	Fix test for 5.7 (test result depends on hash order)
+
+Change 500 on 2000/04/30 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.31
+
+Change 499 on 2000/04/30 by <gbarr@pobox.com> (Graham Barr)
+
+	* Patch for tags >= 0x1f and new tests
+
+Change 493 on 2000/04/18 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.30
+
+Change 492 on 2000/04/18 by <gbarr@pobox.com> (Graham Barr)
+
+	added implementation for ber_tag()
+
+Change 463 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.29
+
+Change 462 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	added C<use bytes> for perl 5.6 and later
+
+Change 459 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Makefile.PL
+	- Corrected ABSTRACT
+
+Change 439 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.28
+
+Change 438 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	PPD stuff added to Makefile.PL
+
+Change 433 on 2000/03/29 by <gbarr@pobox.com> (Graham Barr)
+
+	POD updates from Chris Ridd <Chris.Ridd@messagingdirect.com>
+
+Change 421 on 2000/03/28 by <gbarr@pobox.com> (Graham Barr)
+
+	OBJ_ID had an extra .
+
+Change 338 on 1999/09/25 by <gbarr@pobox.com> (Graham Barr)
+
+	Applied patch from  Gennis Emerson <gemerson@vizdom.com> 
+	- doc updates
+	- fixes to snd/recv
+
+Change 336 on 1999/09/24 by <gbarr@pobox.com> (Graham Barr)
+
+	- Fix for unpacking into an array
+
+Change 295 on 1999/04/08 by <gbarr@pobox.com> (Graham Barr)
+
+	Release 1.26
+
+Change 279 on 1999/03/26 by <gbarr@pobox.com> (Graham Barr)
+
+	Applied a readability patch from Gisle Aas
+
+Change 278 on 1999/03/26 by <gbarr@pobox.com> (Graham Barr)
+
+	The start of support for indefinite length encoding.
+
+Change 277 on 1999/03/26 by <gbarr@pobox.com> (Graham Barr)
+
+	Add bind() call to t/07io.t to prevent hangs on some systems
+
+Change 251 on 1999/02/09 by <gbarr@pobox.com> (Graham Barr)
+
+	Added optional control argument to OPTIONAL
+
+Change 247 on 1999/02/05 by <gbarr@pobox.com> (Graham Barr)
+
+	Added CHOICE
+
+Change 246 on 1999/02/04 by <gbarr@pobox.com> (Graham Barr)
+
+	fixed read() to loop on sysread() until the correct number
+	of bytes are read
+
+Change 241 on 1998/12/23 by <gbarr@pobox.com> (Graham Barr)
+
+	- made error from ->read() more descrptive
+	- added t/07io.t
+	- added new types as sub-type of STRING
+	   ObjectDescriptor,	UTF8String,	NumericString,
+	   PrintableString	TeletexString,	T61String,
+	   VideotexString,	IA5String,	GraphicString,
+	   VisibleString,	ISO646String,	GeneralString,
+	   UTCTime,		GeneralizedTime
+	- added special time tags TimeUL TimeUZ TimeGL TimeGZ
+	- added BIT_STRING8 a special BIT_STRING that can only deal with
+	  multiples of 8 the data is passed directlry, not as a string of
+	  '1's and '0's like BIT_STRING
+	- added SET_OF as sub-type of SEQUENCE_OF
+	- enhanced IO routines for better performance
+	- protected eval{}'s against $SIG{__DIE__}
+
+Change 233 on 1998/11/09 by <gbarr@pobox.com> (Graham Barr)
+
+	Now created constant subs in the sub-class package for the tag
+	values and adds them to EXPORT_OK
+
+Change 227 on 1998/11/04 by <gbarr@pobox.com> (Graham Barr)
+
+	- local($SIG{__DIE__}) when using eval/die
+
+Change 233 on 1998/11/09 by <gbarr@pobox.com> (Graham Barr)
+
+	Now created constant subs in the sub-class package for the tag
+	values and adds them to EXPORT_OK
+
+Change 227 on 1998/11/04 by <gbarr@pobox.com> (Graham Barr)
+
+	- local($SIG{__DIE__}) when using eval/die
+
+*** Release 1.21
+
+Change 205 on 1998/10/21 by <gbarr@pobox.com> (Graham Barr)
+
+	dump and dumphex how accept a filehandle
+	
+	new dump sub with more readable output
+	
+	added support for BIT STRING
+
+Change 202 on 1998/10/16 by <gbarr@pobox.com> (Graham Barr)
+
+	30% speed improvement by remove use of method calls internally
+
+Change 193 on 1998/10/04 by <gbarr@pobox.com> (Graham Barr)
+
+	Convert::BER
+	- now works with 5.003
+
+Change 192 on 1998/09/26 by <gbarr@pobox.com> (Graham Barr)
+
+	- OPTIONAL can now optianlly encode, passing undef anywhere in the
+	  opList will cause the whole list not to be encoded
+	
+	- BER will no longer complain if passed undef as an argument, it
+	  will just do nothing.
+
+Change 174 on 1998/07/21 by <gbarr@pobox.com> (Graham Barr)
+
+	Added CORE:: prefixes to keep 5.005-beta quiet
+
+Tue Jun 16 1998 <gbarr@pobox.com> (Graham Barr)
+
+	t/00prim.t
+	- tweak to ensure test runs on the Mac
+
+Mon Jun  8 1998 <gbarr@pobox.com> (Graham Barr)
+
+	Added some tests to t/00prim.t
+	
+	Changed date in pod
+
+Sun Jun  7 1998 <gbarr@pobox.com> (Graham Barr)
+
+	more speed improvements, approx 30% faster encode
+	- changed to use an array instead of hash
+	- new num_length
+	- new pack_tag
+	- inlines some internal method calls
+
+
+	- speedup changes to num_length
+
+Sun Nov 30 1997 <gbarr@pobox.com> (Graham Barr)
+
+	- unpack_tag was not checking that it unpacked what was expected
+
+Wed Nov  5 1997 <gbarr@pobox.com> (Graham Barr)
+
+	Updated BER.pod
+

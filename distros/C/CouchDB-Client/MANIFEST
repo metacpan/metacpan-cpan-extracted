@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/CouchDB/Client.pm
+lib/CouchDB/Client/DB.pm
+lib/CouchDB/Client/DesignDoc.pm
+lib/CouchDB/Client/Doc.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/05-pod.t
+t/10-pod-coverage.t
+t/12-small-things.t
+t/15-client.t

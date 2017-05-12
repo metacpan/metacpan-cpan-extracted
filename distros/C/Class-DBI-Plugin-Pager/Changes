@@ -1,0 +1,62 @@
+Revision history for Class-DBI-Plugin-Pager
+
+0.566 Sun September 16 16:45:00 2012
+    - code repository moved to github
+    - pod changes
+
+0.564 Mon August 16 13:36:00 2012
+    - fixed version issues
+
+0.563 Mon August 16 03:54:00 2012
+    - maintainance release
+
+0.562_01 Mon August 13 00:25:00 2012
+    - maintainance developer release. fixing test case that was broken because SQL::Abstract
+        (patch from Ansgar Burchardt and Tim Retout)
+    - SQL::Abstract 1.61 is now required
+    - new co-maintainer Nikolay S. (~MAJESTIC)
+
+0.561 Sun July 31 15:10:00 2005
+    - avoid bug in Class::DBI::Plugin::AbstractCount 0.04 which dies if a WHERE clause 
+        includes keys that are not columns (specifically,  { 1 => 1 } ) (patch from 
+        Will Hawes)
+    - unspecified WHERE clause defaults to {} (equivalent to { 1 => 1 }, i.e. retrieve all)
+    - fixed warnings issued when less than a full set of positional arguments 
+        are supplied - reported by Ask Bjorn Hansen
+    - new dependency on Test::Warn
+
+0.56  Fri June 17 09:45:00 2005
+    - don't die, just warn (and don't install pager() method) in import()
+        if can't find the CDBI class (Chia-liang Kao - making it safe for 
+        perl -MClass::DBI::Plugin::Pager which some system uses to check if 
+        a module can be loaded). 
+
+0.55  Sat Jan 15 00:50:00 2005
+    - fixed _setup_pager() to pass $self->abstract_attr in the 
+      count_search_where() call (reported by forehead)
+    - added retrieve_all() method (requested by forehead)
+
+0.54  Fri Jan 14 23:10:00 2005
+    - can now pass the where clause as an ARRAYREF when using 
+      positional arguments (reported by Gabor Szabo)
+
+0.53  Fri Dec 17 22:25:00 2004
+    - caught up with changes in Data::Page v2 
+
+0.521 Fri Dec 10 17:00:00 2004
+    - fixed quoting bug in Build.PL (reported by Max Maischein)
+
+0.52 Thu Dec 9  23:10:00 2004
+    - patch to accept order_by arguments in the
+      same way as CDBI::AbstractSearch uses (Vince Veselosky)
+    - reorganised test files a bit, added POD tests
+
+0.51 Sat Oct 23 01:31:00 2004
+    - minor POD fixes, REALLY added LimitYX subclass
+
+0.5  Sat Oct 23 01:31:00 2004
+    - minor POD fixes, added LimitYX subclass
+
+0.4  Fri Oct 22 00:41:07 2004
+    - original version; created by h2xs 1.21 with options
+        -XAn Class::DBI::Plugin::Pager

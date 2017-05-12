@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+###########################################
+# make_modules - Make .pms for Rose abstraction
+# Mike Schilli, 2007 (m@perlmeister.com)
+###########################################
+use strict;
+use Sysadm::Install qw(:all);
+
+use Cache::Historical;
+
+my $c = Cache::Historical->new();
+$c->make_modules( module_dir => "." );

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Config-Lite.t
+t/Config-Lite2.t
+t/tconfig/tconfig.conf
+t/tconfig/t2config.conf
+lib/Config/Lite.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,94 @@
+---
+abstract: 'PerlScript/ASP on Catalyst'
+author:
+  - 'Steven Leung < sleung@cpan.org >'
+build_requires:
+  Catalyst::Plugin::Session: '0'
+  Catalyst::Plugin::Session::State::Cookie: '0'
+  Catalyst::Plugin::Session::Store::File: '0'
+  DateTime: '0'
+  ExtUtils::MakeMaker: '6.59'
+  File::Temp: '0'
+  HTTP::Headers: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Text::Lorem: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-ASP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  CatalystX::ASP:
+    file: lib/CatalystX/ASP.pm
+    version: '1.13'
+  CatalystX::ASP::Application:
+    file: lib/CatalystX/ASP/Application.pm
+  CatalystX::ASP::Compiler:
+    file: lib/CatalystX/ASP/Compiler.pm
+  CatalystX::ASP::Dispatcher:
+    file: lib/CatalystX/ASP/Dispatcher.pm
+  CatalystX::ASP::Exception::End:
+    file: lib/CatalystX/ASP/Exception/End.pm
+  CatalystX::ASP::GlobalASA:
+    file: lib/CatalystX/ASP/GlobalASA.pm
+  CatalystX::ASP::Parser:
+    file: lib/CatalystX/ASP/Parser.pm
+  CatalystX::ASP::Request:
+    file: lib/CatalystX/ASP/Request.pm
+  CatalystX::ASP::Response:
+    file: lib/CatalystX/ASP/Response.pm
+  CatalystX::ASP::Role:
+    file: lib/CatalystX/ASP/Role.pm
+  CatalystX::ASP::Server:
+    file: lib/CatalystX/ASP/Server.pm
+  CatalystX::ASP::Session:
+    file: lib/CatalystX/ASP/Session.pm
+  CatalystX::ASP::View:
+    file: lib/CatalystX/ASP/View.pm
+requires:
+  Carp: '0'
+  Catalyst: '5.90090'
+  Digest::MD5: '0'
+  File::Slurp: '0'
+  HTML::Entities: '0'
+  HTTP::Date: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  MooseX::Types::Path::Tiny: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Text::SimpleTable: '0'
+  Tie::Handle: '0'
+  Tie::Hash: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  URI::Escape: '0'
+  namespace::autoclean: '0'
+  namespace::clean: '0'
+  parent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/stvleung/CatalystX-ASP/issues
+  homepage: https://github.com/stvleung/CatalystX-ASP
+  repository: git://github.com/stvleung/CatalystX-ASP.git
+version: '1.13'
+x_contributors:
+  - 'Steven Leung <sleung@turnitin.com>'
+  - 'Steven Leung <stvleung@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,14 @@
+0.1 - 29-06-2014
+	- Initial release.
+
+0.2 - 04-08-2014
+	- Updated to validate the META.yml file.
+	- Broke out dependencies into "real" vs. "test".
+
+0.3 - 04-08-2014
+	- Fixed stupid typo related to build-dependencies.
+	- https://github.com/skx/CGI--Application--Plugin--AB/issues/1
+
+0.4 - 05-08-2014
+	- Documented minimum version of Perl, and license.
+

@@ -1,0 +1,21 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002004
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002003 2014-09-18T22:55:49Z
+
+0.002002 2014-09-18T18:01:19Z
+
+0.002001 2014-09-18T17:40:08Z
+
+0.002000 2014-09-16T12:25:41Z
+ [Changed / runtime requires]
+ - LMDB_File 0 → 0.006

@@ -1,0 +1,135 @@
+=head1 API CookBook
+
+This is a collection of recipes for mixing C and Perl objects, methods, and
+classes.  The reader should be familiar with the XS language and with the
+process of creating new extensions.  The XS language is described in
+L<perlxs>, and L<perlxstut> is a tutorial describing how to create new
+extensions.  The reader should also be familiar with Perl's internal data
+types and API macros and functions (i.e.  SV, HV, AV, SvIV, newRV) as
+described in L<perlguts> and L<perlcall>.
+
+=head2 Linking a C struct to a blessed or unblessed Perl object.
+
+Ex1 demonstrates how to write a Perl constructor in C.  The constructor
+allocates a C structure and creates an opaque Perl object to hold an address
+to the structure.  Methods are implemented in C and Perl sends messages to
+the opaque object.  A destructor for the opaque C struct is implemented in C.
+
+=head2 Creating and destroying objects.
+
+Ex1 and Ex6 demonstrate how to create and destroy object types that Perl
+doesn't know about, such as C structures.  Ex3 demonstrates the same with
+object types that Perl knows about, such as HV or AV types.  A destructor is
+needed only when Perl does not know about the object's type.
+
+=head2 Creating a Perl subclass of a C superclass.
+
+Ex1, Ex3, Ex4, and Ex6 implement Perl classes in C.  The test Ex1/t/test1.t
+demonstrates a Perl-based subclass of a C-based superclass and Ex3/t/test1.t
+and Ex4/t/test1.t demonstrate a C-based subclass of a C-based superclass.
+
+=head2 Creating a C subclass of a Perl superclass.
+
+This is similar to the C-based subclass of a C-based superclass example
+found in Ex4.
+
+=head2 Sharing a variable between Perl and C.
+
+Ex2 demonstrates how to let Perl and C share variables.  A variable can live
+in Perl or it can live in C.  A Perl tie() is demonstrated.
+
+=head2 Using a Perl hash object in C.
+
+Ex3 demonstrates how C can use a Perl hash object.  The hash can be a
+blessed or unblessed object and be created by Perl or by C.  Store and fetch
+operations are demonstrated.  The example shows how to control an object's
+refcount in a C-based constructor.
+
+=head2 Using a Perl array object in C.
+
+Ex4 demonstrates how C can use a Perl array object.  The array can be a
+blessed or unblessed object and be created by Perl or by C.  Push and pop
+operations are demonstrated.  The example shows how to control an object's
+refcount in a C-based constructor.
+
+=head2 Using a C array in Perl.
+
+This is best done by having a C function copy the C array into a Perl array
+or by supplying C functions that Perl can call to request each element of
+the array.  Consult the examples in Ex4 for using Perl array objects in C.
+
+=head2 Illuminating an opaque C object for Perl.
+
+Ex1 demonstrates a C struct with accessor functions for its fields.  This
+allows Perl to know the names of the structure fields and to access those
+fields.
+
+=head2 Illuminating an opaque Perl object for C.
+
+The Perl object will usually be an array object or a hash object.  Ex3 and
+Ex4 demonstrate how to fiddle these objects in C.
+
+=head2 Sending messages to Perl objects from C.
+
+This topic is addressed in detail in L<perlcall> but a twist is covered
+here.  The perlcall manpage assumes it has a reference to a blessed Perl
+scalar object.  Ex5 uses a Perl array object, and it's already been
+dereferenced by the typemap so the XSUB can fiddle the array.  To use the
+array object in a method call a reference must be created and the array
+object's reference count must be watched so it doesn't leak.
+
+=head2 Storing a Perl object inside a C object.
+
+Ex6 shows how to store a reference to a Perl object inside a C object.  The
+example discusses the reference counting issues for the Perl object; when to
+increment, when to decrement, and why.
+
+=head2 Creating double-typed Perl variables.
+
+Ex_SDV demonstrates a way to have a Perl scalar variable be
+context-sensitive.  In string context the variable will print a string and
+in numeric context the variable will print a number.  This is similar to the
+behavior of the C<$]> variable in Perl4.
+
+=head2 Sharing a char** type between C and Perl
+
+Ex8 shows two ways to share a char** type between C and Perl.  The first
+approach uses an opaque object and the second uses full illumination via
+XS_pack_* and XS_unpack_* functions.
+
+=head2 Linking Perl and C++ classes and objects.
+
+Ex7 demonstrates how to create a Perl interface to a C++ class.  The example
+shows how to create a Perl object which is linked to a C++ dynamic object.
+Constructors, destructors, and methods are demonstrated.
+
+The CalcCC example demonstrates how to create a Perl interface to a C++
+class which has superclasses.  In an inheritance hierarchy the subclass is
+said to possess the features of its superclasses.  All methods in the C++
+class's hierarchy are listed in the XS code.  These methods are treated as
+if they are part of the subclass (they are, in an OO sense).  This example
+also demonstrates how to add a Perl-based method to a C++ class.
+
+Set the C<$CC> variable in the Makefile.PL to your C++ compiler and then run
+the Makefile.PL.  Then type C<make perl> to get a new perl binary in the
+build directory.  The test suite will use this new perl binary.
+
+You can build dynamic-loading extensions if you have a Perl which has
+perlmain.c compiled with a C++ compiler.
+
+This requires 5.002.
+
+=head2 Knowing your typemap.
+
+It's a good idea to read the INPUT/OUTPUT maps for your type before using
+them.  An INPUT map which uses SvRV() is dereferencing to get to the
+object.  Some things, like perl_call_method(), as used in Ex5, don't want
+the object to be dereferenced and so you'll have to rebuild the reference
+with newRV().
+
+An OUTPUT map which uses newRV() will cause the object to have its reference
+count incremented.  Sometimes, as shown in the dropit() XSUB of Ex6, or the
+new() XSUB of Ex3, this effect of newRV() will have to be taken into
+account.  OUTPUT maps will almost always return the object wrapped in
+newRV().
+

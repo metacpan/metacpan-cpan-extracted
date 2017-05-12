@@ -1,0 +1,20 @@
+Revision history for Perl extension Compress::SelfExtracting.
+
+0.01  Wed May 22 09:20:17 2002
+	- original version; created by h2xs 1.21 with options
+		-APX Compress::SelfExtracting
+	- algorithms: LZSS, LZ77, LZW, bzip, Huffman
+
+0.02  Mon May 27 21:33:56 PDT 2002
+	- added 'zfile' to compress files.
+	- fixed to work with files larger than 8k (blocksize of
+          <> operator?).
+
+0.03 Tue May 28 08:10:25 PDT 2002
+	- minor POD tweak.
+	- better tests.
+	- shortened some decompressors.
+
+0.04 Mon Jul 29 08:24:19 PDT 2002
+	- add Filter::Simple to prereqs
+	- mo betta tests.

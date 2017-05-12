@@ -1,0 +1,18 @@
+Makefile.PL
+CHANGELOG
+README
+INSTALL
+MANIFEST
+LICENSE
+lib/Class/EHierarchy.pm
+t/01_init.t
+t/02_object_hierarchy.t
+t/03_class_hierarchy.t
+t/04_alias.t
+t/05_properties.t
+t/06_methods.t
+t/07_type_methods.t
+t/98_pod_coverage.t
+t/99_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

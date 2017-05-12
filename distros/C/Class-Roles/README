@@ -1,0 +1,46 @@
+Class::Roles
+------------
+
+0.30 - Fri Dec 12 06:13:30 UTC 2003
+0.20 - Tue Dec  9 05:39:56 UTC 2003 
+0.10 - about a week earlier
+
+
+BASICS
+------
+
+Class::Roles provides a role-based system of object-oriented programming.
+Either install the module and use the command:
+
+	$ perldoc Class::Roles
+
+or use this command (with pathnames changed to fit the perversions of your
+favored operating system):
+
+	$ perldoc lib/Class/Roles.pm
+
+or, if you're heroic and can read raw POD in situ, open the module above in
+your favorite text editor.  Let it not be said that you are bereft of choice.
+
+
+INSTALLATION
+------------
+
+Use Module::Build.  It's quite handy:
+
+	$ perl Build.PL
+	$ ./Build
+	$ ./Build test
+	$ sudo ./Build install
+
+Again, season to taste to match your desired shell, your paths, and whatever
+invocation grants you root-like powers on your computer as necessary.
+
+
+COPYRIGHT
+---------
+
+Copyright (c) chromatic 2003.  This program is licensed under the same terms as
+Perl itself.  There's no warranty.  That doesn't mean I won't fix bugs if they
+exist or add reasonable features, though.  You just have to report and request
+them.

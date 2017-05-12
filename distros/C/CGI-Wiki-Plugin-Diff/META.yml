@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Wiki-Plugin-Diff
+version:      0.09
+version_from: lib/CGI/Wiki/Plugin/Diff.pm
+installdirs:  site
+requires:
+    CGI::Wiki:                     0.44
+    Module::Optional:              0
+    VCS::Lite:                     0.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

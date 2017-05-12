@@ -1,0 +1,20 @@
+abstract: Utility using ImageMagick for Catalyst::Request::Upload
+author: Toru Yamaguchi
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: Catalyst-Plugin-Upload-Image-Magick
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 0
+  Catalyst::Exception: 0
+  Catalyst::Request::Upload: 0
+  Catalyst::Utils: 0
+  Class::Accessor::Fast: 0
+  File::Temp: 0
+  Image::Magick: 0
+  Image::Magick::Thumbnail::Fixed: 0
+version: 0.03

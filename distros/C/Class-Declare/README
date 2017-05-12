@@ -1,0 +1,1063 @@
+NAME
+    Class::Declare - Declare classes with public, private and protected
+    attributes and methods.
+
+SYNOPSIS
+      package My::Class;
+
+      use strict;
+      use warnings;
+      use base qw( Class::Declare );
+
+      __PACKAGE__->declare(
+
+        public     => { public_attr     => 42         }  ,
+        private    => { private_attr    => 'Foo'      }  ,
+        protected  => { protected_attr  => 'Bar'      }  ,
+        class      => { class_attr      => [ 3.141 ]  }
+        static     => { static_attr     => { a => 1 } }  ,
+        restricted => { restricted_attr => \'string'  }  ,
+        abstract   => 'abstract_attr'                    ,
+        friends    => 'main::trustedsub'                 ,
+        new        => [ 'public_attr' , 'private_attr' ] ,
+        init       => sub { # object initialisation
+                        ...
+                        1;
+                      }                                  ,
+        strict     => 0
+
+      );
+
+      sub publicmethod {
+        my $self = __PACKAGE__->public( shift );
+        ...
+      }
+
+      sub privatemethod {
+        my $self = __PACKAGE__->private( shift );
+        ...
+      }
+
+      sub protectedmethod {
+        my $self = __PACKAGE__->protected( shift );
+        ...
+      }
+
+      sub classmethod {
+        my $self = __PACKAGE__->class( shift );
+        ...
+      }
+
+      sub staticmethod {
+        my $self = __PACKAGE__->static( shift );
+        ...
+      }
+
+      sub restrictedmethod {
+        my $self = __PACKAGE__->restricted( shift );
+        ...
+      }
+
+      sub abstractmethod { __PACKAGE__->abstract }
+
+      1;
+
+      ...
+
+      my $obj = My::Class->new( public_attr => 'fish' );
+
+MOTIVATION
+    One of Perl's greatest strengths is it's flexible object model. You can
+    turn anything (so long as it's a reference, or you can get a reference
+    to it) into an object. This allows coders to choose the most appropriate
+    implementation for each specific need, and still maintain a consistent
+    object oriented approach.
+
+    A common paradigm for implementing objects in Perl is to use a blessed
+    hash reference, where the keys of the hash represent attributes of the
+    class. This approach is simple, relatively quick, and trivial to extend,
+    but it's not very secure. Since we return a reference to the hash
+    directly to the user they can alter hash values without using the
+    class's accessor methods. This allows for coding "short-cuts" which at
+    best reduce the maintainability of the code, and at worst may introduce
+    bugs and inconsistencies not anticipated by the original module author.
+
+    On some systems, this may not be too much of a problem. If the developer
+    base is small, then we can trust the users of our modules to Do The
+    Right Thing. However, as a module's user base increases, or the
+    complexity of the systems our module's are embedded in grows, it may
+    become desirable to control what users can and can't access in our
+    module to guarantee our code's behaviour. A traditional method of
+    indicating that an object's data and methods are for internal use only
+    is to prefix attribute and method names with underscores. However, this
+    still relies on the end user Doing The Right Thing.
+
+    Class::Declare provides mechanisms for module developers to explicitly
+    state where and how their class attributes and methods may be accessed,
+    as well as hiding the underlying data store of the objects to prevent
+    unwanted tampering with the data of the objects and classes. This
+    provides a robust framework for developing Perl modules consistent with
+    more strongly-typed object oriented languages, such as Java and C++,
+    where classes provide "public", "private", and "protected" interfaces to
+    object and class data and methods.
+
+DESCRIPTION
+    Class::Declare allows class authors to specify public, private and
+    protected attributes and methods for their classes, giving them control
+    over how their modules may be accessed. The standard object oriented
+    programming concepts of *public*, *private* and *protected* have been
+    implemented for both class and instance (or object) attributes and
+    methods.
+
+    Attributes and methods belong to either the *class* or an *instance*
+    depending on whether they may be invoked via class instances (class and
+    instance methods/attributes), or via classes (class methods/attributes
+    only).
+
+    Class::Declare uses the following definitions for *public*, *private*
+    and *protected*:
+
+    public
+        Public attributes and methods may be accessed by anyone from
+        anywhere. The term public is used by Class::Declare to refer to
+        instance attributes and methods, while the equivalent for class
+        attributes and methods are given the term class attributes and
+        methods.
+
+    private
+        Private attributes and methods may be accessed only by the class
+        defining them and instances of that class. The term private is used
+        to refer to instance methods and attributes, while the term static
+        refers to class attributes and methods that exhibit the same
+        properties.
+
+    protected
+        Protected attributes and methods may only be accessed by the
+        defining class and it's instances, and classes and objects derived
+        from the defining class. Protected attributes and methods are used
+        to define the interface for extending a given class (through normal
+        inheritance/derivation). The term protected is used to refer to
+        protected instance methods and attributes, while protected class
+        methods and attributes are referred to as restricted.
+
+        Note: since version 0.02, protected class methods and attributes are
+        refered to as *restricted*, rather than *shared*. This change was
+        brought about by the introduction of Class::Declare::Attributes and
+        then clash with the existing Perl threading attribute :shared. The
+        term *restricted* has been chosen to reflect that the use of these
+        methods and attributes is restricted to the family of classes
+        derived from the base class.
+
+    The separation of terms for class and instance methods and attributes
+    has been adopted to simplify class declarations. See declare() below.
+
+    Class attributes are regarded as constant by Class::Declare: once
+    declared they may not be modified. Instance attributes, on the other
+    hand, are specific to each object, and may be modified at run-time.
+
+    Internally, Class::Declare uses hashes to represent the attributes of
+    each of its objects, with the hashes remaining local to Class::Declare.
+    To the user, the objects are represented as references to scalars which
+    Class::Declare maps to object hashes in the object accessors. This
+    prevents users from accessing object and class data without using the
+    class's accessors.
+
+    The granting of access to attributes and methods is determined by
+    examining the *target* of the invocation (the first parameter passed to
+    the method, usually represented by $self), as well as the *context* of
+    the invocation (where was the call made and who made it, determined by
+    examining the caller() stack). This adds an unfortunate but necessary
+    processing overhead for Class::Declare objects for each method and
+    attribute access. While this overhead has been kept as low as possible,
+    it may be desirable to turn it off in a production environment.
+    Class::Declare permits disabling of the access control checks on a
+    per-module basis, which may greatly improve the performance of an
+    application. Refer to the *strict* parameter of declare() below for more
+    information.
+
+    Class::Declare inherits from Exporter, so modules derived from
+    Class::Declare can use the standard symbol export mechanisms. See
+    Exporter for more information.
+
+  Defining Classes
+    To define a Class::Declare-derived class, a package must first "use"
+    Class::Declare and inherit from it (either by adding it to the @ISA
+    array, or through "use base"). Then Class::Declare::declare() must be
+    called with the new class's name as its first parameter, followed by a
+    list of arguments that actually defines the class. For example:
+
+      package My::Class;
+
+      use strict;
+      use warnings;
+      use base qw( Class::Declare );
+
+      __PACKAGE__->declare( ... );
+
+      1;
+
+    Class::Declare::declare() is a class method of Class::Declare and has
+    the following call syntax and behaviour:
+
+    declare( [ *param* => *value* ] )
+        declare()'s primary task is to define the attributes of the class
+        and its instances. In addition, it supports options for defining
+        object initialisation code, friend methods and classes, and the
+        application of strict access checking. *param* may have one of the
+        following values:
+
+        *public*
+            *public* expects either a hash reference of attribute names and
+            default values, an array reference containing attribute names
+            whose default values will be "undef", or a single attribute name
+            whose value will default to "undef". These represent the public
+            attributes of this class. Class::Declare constructs accessor
+            methods within the class, with the same name as the attributes.
+            These methods are "lvalue" methods by default (see also
+            Attribute Modifiers below), which means that the attributes may
+            be assigned to, as well as being set by passing the new value as
+            an accessor's argument.
+
+            For example:
+
+              package My::Class;
+
+              use strict;
+              use warnings;
+              use base qw( Class::Declare );
+
+              __PACKAGE__->declare( public => { name => 'John' } );
+
+              1;
+
+              my $obj = My::Class->new;
+              print $obj->name . "\n";    # prints 'John'
+                    $obj->name = 'Fred';  # the 'name' attribute is now 'Fred'
+                    $obj->name( 'Mary' ); # the 'name' attribute is now 'Mary'
+
+            The default value of each attribute is assigned during the
+            object initialisation phase (see *init* and new() below). Public
+            attributes may be set during the object creation call:
+
+              my $obj = My::Class->new( name => 'Jane' );
+              print $obj->name . "\n"; # prints 'Jane'
+
+            *public* attributes are instance attributes and therefore may
+            only be accessed through class instances, and not through the
+            class itself.
+
+            Note that the declare() call for "My::Class" from above could
+            have been written as
+
+              __PACKAGE__->declare( public => [ qw( name ) ] );
+
+            or
+
+              __PACKAGE__->declare( public => 'name' );
+
+            In these cases, the attribute "name" would have had a default
+            value of "undef".
+
+        *private*
+            As with *public* above, but the attributes are private (i.e.
+            only accessible from within this class). If access is attempted
+            from outside the defining class, then an error will be reported
+            through die(). *Private* attributes may not be set in the call
+            to the constructor, and as with *public* attributes, are
+            instance attributes. See also *strict* and *friends* below.
+
+        *protected*
+            As with *private* above, but the attributes are protected (i.e.
+            only accessible from within this class, and all classes that
+            inherit from this class). Protected attributes are instance
+            attributes, and they may not be set in the call to the
+            constructor. See also *strict* and *friends* below.
+
+        *class*
+            This declares class attributes in the same manner as *public*
+            above. *class* attributes are not restricted to object
+            instances, and may be accessed via the class directly. The
+            accessor methods created by Class::Declare, however, are not
+            "lvalue" methods, and cannot, therefore, be assigned to. Nor can
+            the values be set through the accessor methods. They behave in
+            the same manner as values declared by "use constant" (except
+            they must be called as class or instance methods). *class*
+            attributes may not be set in the call to the constructor.
+
+        *static*
+            As with *class* attributes, except access to "static" attributes
+            is limited to the defining class and its objects. *static*
+            attributes are the class-equivalent of *private* instance
+            attributes. See also *friends*.
+
+        *restricted*
+            As with *class* attributes, except access to "restricted"
+            attributes is limited to the defining class and all classes that
+            inherit from the defining class, and their respective objects.
+            *restricted* attributes are the class-equivalent of *protected*
+            instance attributes. See also *friends*.
+
+        *abstract*
+            This declares the set of abstract methods provided by this
+            class, and will cause the generation of stub routines that die()
+            when invoked, ensuring derived classes define these methods.
+
+        *friends*
+            Here you may specify classes and methods that may be granted
+            access to the defining classes *private*, *protected*, *static*
+            and *restricted* attributes and methods. *friends* expects
+            either a single value, or a reference to a list of values. These
+            values may either be class names, or fully-qualified method
+            names (i.e. class and method name). When a call is made to a
+            private or protected method or attribute accessor, and a friend
+            has been declared, a check is performed to see if the caller is
+            within a friend package or is a friend method. If so, access is
+            granted. Otherwise, access is denied through a call to die().
+
+            Note that friend status may not be inherited. This is to avoid
+            scenarios such as the following:
+
+              package My::Class;
+
+              use strict;
+              use warnings;
+              use base qw( Class::Declare );
+
+              __PACKAGE__->declare( ...
+                                    friends => 'My::Trusted::Class' );
+              1;
+
+              package My::Trusted::Class;
+              ...
+              1;
+
+              package Spy::Class;
+
+              use strict;
+              use warnings;
+              use base qw( My::Trusted::Class );
+
+              sub infiltrate {
+                .. do things here to My::Class objects that we shouldn't
+              }
+
+              1;
+
+        *init*
+            This defines the object initialisation code, which is executed
+            as the last phase of object creation by new(). *init* expects a
+            "CODEREF" which is called with the first argument being the new
+            object being created by the call to new(). The initialisation
+            routine is expected to return a true value to indicate success.
+            A false value will cause new() to "die()" with an error. The
+            initialisation routines are invoked during object creation by
+            new(), after default and constructor attribute values have been
+            assigned.
+
+            If the inheritance tree of a class contains multiple *init*
+            methods, then these will be executed in reverse @ISA order to
+            ensure the primary base-class of the new class has the final say
+            on object initialisation (i.e. the class left-most in the @ISA
+            array will have it's *init* routine executed last). If a class
+            appears multiple times in an @ISA array, either through
+            repetition or inheritance, then it will only be executed once,
+            and as early in the *init* execution chain as possible.
+
+            Class::Declare uses a "CODEREF" rather than specifying a default
+            initialisation subroutine (e.g. "sub INIT { ... }") to avoid
+            unnecessary pollution of class namespaces. There is generally no
+            need for initialisation routines to be accessible outside of
+            new().
+
+        *new*
+            If *new* is defined, then it should contain a list (either a
+            single value or an array reference) of the instance attributes
+            (public, private or protected) that may be set in the call to
+            the constructor new(). This permits the exposure of protected
+            and private attributes during construction (and thus permitting
+            read-only protected and private attributes). *new* makes it
+            possible to do the following:
+
+              package My::Class;
+
+              use strict;
+              use warnings;
+              use base qw( Class::Declare );
+
+              __PACKAGE__->declare(
+
+                public  => { mypublic  => undef } ,
+                private => { myprivate => undef } ,
+                new     => [ qw( myprivate ) ]
+
+              );
+
+              1;
+
+              ...
+
+              my  $obj  = My::Class->new( myprivate => 1 );
+
+            Note that if *new* is specified in a call to declare() then only
+            those attributes listed in the value of *new* may be defined in
+            the call to the constructor new() (overriding the default
+            behaviour of allowing public attributes). In addition, the
+            attributes must be defined in this class, and not inherited.
+            This prevents unintended access such as:
+
+              public My::Class;
+
+              use strict;
+              use warnings;
+              use base qw( Class::Declare );
+
+              __PACKAGE__->declare(
+  
+                private => { myprivate => undef }
+
+              );
+
+              1;
+
+              ...
+
+              public Bad::Class;
+
+              use strict;
+              use warnings;
+              use base qw( My::Class );
+
+              __PACKAGE__->declare(
+
+                # this will throw an error with die()
+                new => 'myprivate'
+
+              );
+
+              1;
+
+        *strict*
+            If *strict* is set to *true*, then Class::Declare will define
+            class(), static(), restricted(), public(), private(), and
+            protected() methods (see "Class Methods" and "Object Methods"
+            below) within the current package that enforce the
+            class/static/restricted/public/private/protected relationships
+            in method calls.
+
+            If *strict* is set to *false* and defined (e.g. 0, not "undef"),
+            then Class::Declare will convert the above method calls to
+            no-ops, and no invocation checking will be performed. Note that
+            this conversion is performed for this class only.
+
+            By setting *strict* to "undef" (or omitting it from the call to
+            declare() altogether), Class::Declare will not create these
+            methods in the current package, but will rather let them be
+            inherited from the parent class. In this instance, if the
+            parent's methods are no-ops, then the child class will inherit
+            no-ops. Note that the public(), private(), etc methods from
+            Class::Declare enforce the public/private/etc relationships.
+
+            One possible use of this feature is as follows:
+
+              package My::Class;
+
+              use strict;
+              use warnings;
+              use base qw( Class::Declare );
+
+              __PACKAGE__->declare( public    => ...                ,
+                                    private   => ...                ,
+                                    protected => ...                ,
+                                    strict    => $ENV{ USE_STRICT } );
+
+              ...
+
+              1;
+
+            Here, during development and testing the environment variable
+            "USE_STRICT" may be left undefined, or set to true to help
+            ensure correctness of the code, but then set to false (e.g. 0)
+            in production to avoid the additional computational overhead.
+
+            Setting *strict* to *false* does not interfere with the
+            friends() method (see below). Turning strict access checking off
+            simply stops the checks from being performed and does not change
+            the logic of whether a class or method as been declared as a
+            friend of a given class.
+
+        Note:
+
+        *   declare() may be called only once per class to prevent class
+            redefinitions
+
+        *   attribute names specified in the call to declare() may not be
+            the same as class and instance methods already defined in the
+            class
+
+        *   attribute names must be unique for a class
+
+        If any of the above rules are violated, then declare() will raise an
+        error with die().
+
+  Creating Objects
+    Once a Class::Declare-derived class has been declared, instances of that
+    class may be created through the new() method supplied by
+    Class::Declare. new() may be called either as a class or an instance
+    method. If called as a class method, a new instance will be created,
+    using the class's default attribute values as the default values for
+    this instance. If new() is called as an instance method, the default
+    attribute values for the new instance will be taken from the invoking
+    instance. This may be used to clone Class::Declare-derived objects.
+
+    Class::Declare::new() has the following call syntax and behaviour:
+
+    new( [ *param* => *value* ] )
+        new() creates instances of Class::Declare objects. If a problem
+        occurs during the creation of an object, such as the failure of an
+        object initialisation routine, then new() will raise an error
+        through die().
+
+        When called as a class method, new() will create new instances of
+        the specified class, using the class's default attribute values. If
+        it's called as an instance method, then new() will clone the
+        invoking object.
+
+        new() accepts named parameters as arguments, where *param*
+        corresponds to a *public* attribute of the class of the object being
+        created. If an unknown attribute name, or a non-*public* attribute
+        name is specified, then new() will die() with an error. Public
+        attribute values specified in the call to new() are assigned after
+        the creation of the object, to permit over-riding of default values
+        (either class-default attributes or attributes cloned from the
+        invoking object).
+
+        new() can be extended to accept non-public instance attributes as
+        parameters through the specification of the *new* attribute of
+        declare() (see above). In this instance, only the attributes listed
+        in the definition of *new* in declare() will be accepted, and all
+        public attributes will only be accepted if contained within this
+        list.
+
+        If the calling class, or any of its base classes, has an object
+        initialisation routine defined (specified by the *init* parameter of
+        declare()), then these routines will be invoked in reverse @ISA
+        order, once the object's attribute values have been set. An
+        initialisation routine may only be called once per class per object,
+        so if a class appears multiple times in the @ISA array of the new
+        object's class, then the base class's initialisation routine will be
+        called as early in the initialisation chain as possible, and only
+        once (i.e. as a result of the right-most occurrence of the base
+        class in the @ISA array).
+
+        The initialisation routines should return a true value to indicate
+        success. If any of the routines fail (i.e. return a false value),
+        then new() will die() with an error.
+
+    When a new instance is created, instance attributes (i.e. *public*,
+    *private* and *protected* attributes) are cloned, so that the new
+    instance has a copy of the default values. For values that are not
+    references, this amounts to simply copying the value through assignment.
+    For values that are references, Storable::dclone() is used to ensure
+    each instance has it's own copy of the references data structure (the
+    structures are local to each instance).
+
+    However, if an instance attribute value is a "CODEREF", then new()
+    simply copies the reference to the new object, since "CODEREF"s cannot
+    be cloned.
+
+    Class attributes are not cloned as they are assumed to be constant
+    across all object instances.
+
+  Class Access Control Methods
+    Class::Declare provides the following class methods for implementing
+    *class*, *static* and *restricted* access control in class methods.
+    These methods may be called either through a Class::Declare-derived
+    class, or an instance of such a class.
+
+    Note that a *class* method is a *public* class method, a *static* method
+    is a *private* class method, and a *restricted* method is a *protected*
+    class method.
+
+    abstract( *target* )
+        Ensure a method is implemented, but throwing a fatal error (i.e.
+        die()'ing if called).
+
+    class( *target* )
+        Ensure a method is called as a class method of this package via the
+        *target*.
+
+          sub myclasssub {
+            my $self = __PACKAGE__->class( shift );
+            ...
+          }
+
+        A *class* method may be called from anywhere, and *target* must
+        inherit from this class (either an object or instance). If class()
+        is not invoked in this manner, then class() will die() with an
+        error.
+
+        See also the *strict* parameter for declare() above.
+
+    static( *target* )
+        Ensure a method is called as a static method of this package via
+        *target*.
+
+          sub mystaticsub {
+            my $self = __PACKAGE__->static( shift );
+            ...
+          }
+
+        A *static* method may only be called from within the defining class,
+        and *target* must inherit from this class (either an object or
+        instance). If static() is not invoked in this manner, then static()
+        will die() with an error.
+
+        See also the *strict* and *friends* parameters for declare() above.
+
+    restricted( *target* )
+        Ensure a method is called as a restricted method of this package via
+        *target*.
+
+          sub myrestrictedsub {
+            my $self = __PACKAGE__->restricted( shift );
+            ...
+          }
+
+        A *restricted* method may only be called from within the defining
+        class or a class that inherits from the defining class, and *target*
+        must inherit from this class (either an object or instance). If
+        restricted() is not invoked in this manner, then restricted() will
+        die() with an error.
+
+        See also the *strict* and *friends* parameters for declare() above.
+
+        Note: restricted() was called shared() in the first release of
+        Class::Declare. However, with the advent of
+        Class::Declare::Attributes, there was a clash between the use of
+        :shared as an attribute by Class::Declare::Attributes, and the Perl
+        use of :shared attributes for threading.
+
+  Instance Access Control Methods
+    Class::Declare provides the following instance methods for implementing
+    *public*, *private* and *protected* access control in instance methods.
+    These methods may only be called through a Class::Declare-derived
+    instance.
+
+    public( *target* )
+        Ensure a method is called as a public method of this class via
+        *target*.
+
+          sub mypublicsub {
+            my $self = __PACKAGE__->public( shift );
+            ...
+          }
+
+        A *public* method may be called from anywhere, and *target* must be
+        an object that inherits from this class. If public() is not invoked
+        in this manner, then public() will die() with an error.
+
+        See also the *strict* parameter for declare() above.
+
+    private( *target* )
+        Ensure a method is called as a private method of this class via
+        *target*.
+
+          sub myprivatesub {
+            my $self = __PACKAGE__->private( shift );
+            ...
+          }
+
+        A *private* method may only be called from within the defining
+        class, and *target* must be an instance that inherits from this
+        class. If private() is not invoked in this manner, then private()
+        will die() with an error.
+
+        See also the *strict* and *friends* parameters for declare() above.
+
+    protected( *target* )
+        Ensure a method is called as a protected method of this class via
+        *target*.
+
+          sub myprotectedsub {
+            my $self = __PACKAGE__->protected( shift );
+            ...
+          }
+
+        A *protected* method may only be called from within the defining
+        class or a class that inherits from the defining class, and *target*
+        must be an instance that inherits from this class. If protected() is
+        not invoked in this manner, then protected() will die() with an
+        error.
+
+        See also the *strict* and *friends* parameters for declare() above.
+
+  Destroying Objects
+    Object destruction is handled via the normal Perl "DESTROY()" method.
+    Class::Declare implements a "DESTROY()" method that performs clean-up
+    and house keeping, so it is important that any class derived from
+    Class::Declare that requires a "DESTROY()" method ensures that it
+    invokes it's parent's "DESTROY()" method, using a paradigm similar to
+    the following:
+
+      sub DESTROY
+      {
+        my $self = __PACKAGE__->public( shift );
+
+        ... do local clean-up here ..
+
+        # call the parent clean-up
+           $self->SUPER::DESTROY( @_ );
+      } # DESTROY()
+
+  Attribute Modifiers
+    By default Class::Declare class attributes ("class", "static", and
+    "restricted") are *read-only*, while instance attributes ("public",
+    "private", and "protected") are *read-write*. Class::Declare provides
+    two attribute modifiers, rw and ro for changing this behaviour, allowing
+    class attributes to be read-write, and instance attributes to be read
+    only.
+
+    The modifiers may be imported separately,
+
+      use Class::Declare qw( :read-only  );
+
+    or
+
+      use Class::Declare qw( ro );
+
+    or
+
+      use Class::Declare qw( :read-write );
+
+    or
+
+      use Class::Declare qw( rw );
+
+    or collectively, using the ":modifiers" tag.
+
+      use Class::Declare qw( :modifiers );
+
+    To use the modifiers, they must be incorporated into the attribute
+    definition for the class. For example:
+
+      package My::Class;
+
+      use strict;
+      use Class::Declare qw( :modifiers );
+      use vars           qw( @ISA );
+          @ISA = qw( Class::Declare );
+
+      __PACKAGE__->declare( class  => { my_class  => rw undef } ,
+                            public => { my_public => ro 1234  } );
+
+    Here, the attribute "my_class" has been declared *read-write* by rw,
+    permitting it's value to be changed at run time. The public attribute
+    "my_public" has been declared *read-only* by ro, preventing it from
+    being changed once set. Please note that although they may be marked as
+    *read-only*, public attributes may still be set during object creation
+    (i.e. in the call to new()). However, once set, the value may not be
+    changed.
+
+    rw  Declare a class attribute to be *read-write*, instead of defaulting
+        to read-only. Note that this has no effect on instance attributes as
+        they are read-write by default.
+
+    ro  Declare an instance attribute to be *read-only*, instead of
+        defaulting to read-write. Note that this has no effect on class
+        attributes as they are read-only by default.
+
+  Serialising Objects
+    Class::Declare objects may be serialised (and therefore cloned) by using
+    Storable. Class::Declare uses Storable::dclone() itself during object
+    creation to copy instance attribute values. However, Storable is unable
+    to serialise "CODEREF"s, and attempts to do so will fail. This causes
+    the failure of serialisation of Class::Declare objects that have
+    "CODEREF"s as attribute values. However, for cloning, Class::Declare
+    avoids this problem by simply copying "CODEREF"s from the original
+    object to the clone.
+
+  Miscellaneous Methods
+    The following methods are class methods of Class::Declare provided to
+    simplify the creation of classes. They are provided as convenience
+    methods, and may be called as either class or instance methods.
+
+    friend()
+        Returns *true* if the calling class or method is a friend of the
+        given class or object. That is, for a given object or class,
+        friend() will return *true* if it is called within the context of a
+        class or method that has been granted friend status by the object or
+        class (see *friend* in declare() above). A friend may access
+        *private*, *protected*, *static* and *restricted* methods and
+        attributes of a class and it's instances, but not of derived
+        classes.
+
+        friend() will return true for a given class or object if called
+        within that class. That is, a class is always it's own friend.
+
+        In all other circumstances, friend() will return *false*.
+
+          package Class::A;
+
+          my $object = Class::B;
+
+          sub somesub {
+            ...
+            $object->private_method   if ( $object->friend );
+            ...
+          }
+
+    dump( [ *param* => *value* ] )
+        Generate a textual representation of an object or class. Since
+        Class::Declare objects are represented as references to scalars,
+        Data::Dumper is unable to generate a meaningful dump of
+        Class::Declare-derived objects. dump() pretty-prints objects,
+        showing their attributes and their values. dump() obeys the access
+        control imposed by Class::Declare on it's objects and classes,
+        limiting it's output to attributes a caller has been granted access
+        to see or use.
+
+        dump() will always observe the access control mechanisms as
+        specified by Class::Declare::class(), Class::Declare::private(),
+        etc, and it's behaviour is not altered by the setting of *strict* in
+        declare() to be *false* (see declare() above). This is because
+        *strict* is designed as a mechanism to accelerate the execution of
+        Class::Declare-derived modules, not circumvent the intended access
+        restrictions of those modules.
+
+        dump() accepts the following optional named parameters:
+
+        *all*
+            If *all* is true (the default value), and none of the
+            attribute/method type parameters (e.g. *public*, *static*, etc)
+            have been set, then dump() will display all attributes the
+            caller has access to. If any of the attribute type parameters
+            have been set to true, then *all* will be ignored, and only
+            those attribute types specified in the call to dump() will be
+            displayed.
+
+        *class*
+            If *class* is true, then dump() will display only *class*
+            attributes of the invocant and their values, and all other types
+            of attributes explicitly requested in the call to dump() (the
+            *all* parameter is ignored). If the caller doesn't have access
+            to *class* methods, then dump() will die() with an error. If no
+            class attributes exist, and no other attributes have been
+            requested then "undef" is returned.
+
+        *static*
+            As with *class*, but displaying *static* attributes and their
+            values.
+
+        *restricted*
+            As with *class*, but displaying *restricted* attributes and
+            their values.
+
+        *public*
+            As with *class*, but displaying *public* attributes and their
+            values. Note that *public* attributes can only be displayed for
+            class instances. Requesting the dump() of public attributes of a
+            class will result in dump() die()ing with an error.
+
+        *private*
+            As with *public*, but displaying *private* attributes and their
+            values.
+
+        *protected*
+            As with *public*, but displaying *protected* attributes and
+            their values.
+
+        *friends*
+            If *friends* is true, then dump() will display the list of
+            friends of the invoking class or object.
+
+        *depth*
+            By default, dump() operates recursively, creating a dump of all
+            requested attribute values, and their attribute values (if they
+            themselves are objects). If *depth* is set, then *dump()* will
+            limit it's output to the given recursive depth. A depth of 0
+            will display the target's attributes, but will not expand those
+            attribute values.
+
+        *indent*
+            *indent* specifies the indentation used in the output of dump(),
+            and defaults to 4 spaces.
+
+        *backtrace*
+            If *backtrace* is true, the dump() will back-trace references if
+            they are encountered multiple times in the generation of the
+            dump() output. The back-trace is similar to the default
+            behaviour of Data::Dumper, where only the first instance of a
+            reference is shown in full, and all other occurences are
+            displayed as a link back to the original occurrence of that
+            reference. By default, *backtrace* is true.
+
+        If an attribute type parameter, such as *static* or *private*, is
+        set in the call to dump() then this only has effect on the target
+        object of the dump() call, and not any subsequent recursive calls to
+        dump() used to display nested objects.
+
+    hash( [ *param* => *value* ] )
+        Return a hash representing the values of the attributes of the class
+        or object (depending on how hash() is called. hash() supports the
+        same calling parameters as dump(), except for "friends" and
+        "indent"). hash() observes normal access control, only returning
+        attributes that the caller would normally have access to. "abstract"
+        attributes are returned with a value of "undef".
+
+        If called in a list context, hash() will return a hash, otherwise a
+        hash reference is returned.
+
+        Note: As of v0.10, hash() supports the *depth* parameter, and will,
+        by default, recurse to generate a hash of the entire object tree (if
+        derived from Class::Declare). If *depth* is set, then *hash()* will
+        limit it's output to the given recursive depth. A depth of 0 will
+        display the target's attributes, but will not expand those attribute
+        values. hash() will descend "ARRAY" and "HASH" references if asked
+        to recurse.
+
+    arguments( *args* => *default* )
+        A class helper method for handling named argument lists. In Perl,
+        named argument lists are supported by coercing a list into a hash by
+        assuming a key/value pairing. For example, named arguments may be
+        implemented as
+
+          sub mysub {
+            my  %args = @_;
+            ...
+          }
+
+        and called as
+
+          mysub( name => 'John' , age => 34 );
+
+        %args is now the hash with keys "name" and "age" and corresponding
+        values 'John' and 34 respectively.
+
+        So if named arguments are so easy to implement, why go to the
+        trouble of calling arguments()? To make your code more robust. The
+        above example failed to test whether there was an even number of
+        elements in the argument list (needed to flatten the list into a
+        hash), and it made no checks to ensure the supplied arguments were
+        expected. Does "mysub()" really want a name and age, or does it want
+        some other piece of information?
+
+        arguments() ensures the argument list can be safely flattened into a
+        hash, and raises an error indicating the point at which the original
+        method was called if it can't. Also, it ensures the arguments passed
+        in are those expected by the method. Note that this does not check
+        the argument values themselves, but merely ensures unknown named
+        arguments are flagged as errors.
+
+        arguments() also enables you to define default values for your
+        arguments. These values will be assigned when a named argument is
+        not supplied in the list of arguments.
+
+        The calling convention of arguments() is as follows (note, we assume
+        here that the method is in a Class::Declare-derived class):
+
+          sub mysub {
+            ...
+            my %args = $self->arguments( \@_ => { name => 'Guest user' ,
+                                                  age  => undef        } );
+            ...
+          }
+
+        Here, "mysub()" will accept two arguments, "name" and "age", where
+        the default value for "name" is 'Guest user', while "age" defaults
+        to "undef".
+
+        Alternatively, arguments() may be called in either of the following
+        ways:
+
+            my %args = $self->arguments( \@_ => [ qw( name age ) ] );
+
+        or
+
+            my %args = $self->arguments( \@_ => 'name' );
+
+        Here, the default argument values are "undef", and in the second
+        example, only the the single argument *name* will be recognized.
+
+        If *default* is not given (or is undef), then arguments() will
+        simply flatten the argument list into a hash and assume that all
+        named arguments are valid. If *default* is the empty hash (i.e.
+        "{}"), then no named arguments will be accepted.
+
+        If called in a list context, arguments() returns the argument hash,
+        while if called in a scalar context, arguments() will return a
+        reference to the hash. arguments() may be called as either a class
+        or instance method.
+
+    REVISION()
+        Extract the revision number from CVS revision strings. REVISION()
+        looks for the package variable $REVISION for a valid CVS revision
+        strings, and if found, will return the revision number from the
+        string. If $REVISION is not defined, or does not contain a CVS
+        revision string, then REVISION() returns "undef".
+
+          package My::Class;
+
+          use strict;
+          use base qw( Class::Declare );
+          use vars qw( $REVISION      );
+                       $REVISION = '$Revision: 1518 $';
+
+          ...
+
+          1;
+
+
+          print My::Class->REVISION;  # prints the revision number
+
+    VERSION( [ *required* ] )
+        Replacement for UNIVERSAL::VERSION(), that falls back to REVISION()
+        to report the CVS revision number as the version number if the
+        package variable $VERSION is not defined. If *required* is given,
+        then VERSION() will die if the *required* version is not less than
+        or equal to the current package version (or revision, if VERSION()
+        falls back to REVISION()). VERSION() will die if *required* is not a
+        valid version string.
+
+    has( *method* )
+        If this class directly implements the given *method*(), then return
+        a reference to this method. Otherwise, return false. This is similar
+        to UNIVERSAL::can(), which will return a reference if this class
+        either directly implements *method*(), or inherits it.
+
+    strict()
+        If this class is operating with strict access checking (i.e.
+        *strict* from declare() was not explicitly set to false in this
+        class or one of its parent classes) then strict() will return true,
+        otherwise return false.
+
+CAVEAT
+    Class::Declare has been designed to be thread-safe, and as such is
+    suitable for such environments as "mod_perl". However, it has not been
+    proven to be thread-safe. If you are coding in a threaded environment,
+    and experience problems with Class::Declare's behaviour, please let me
+    know.
+
+BUGS
+    The name. I don't really like Class::Declare as a name, but I can't
+    think of anything more appropriate. I guess it really doesn't matter too
+    much. Suggestions welcome.
+
+    Apart from the name, Class::Declare has no known bugs. That is not to
+    say the bugs don't exist, rather they haven't been found. The testing
+    for this module has been quite extensive (there are over 3000 test cases
+    in the module's test suite), but patches are always welcome if you
+    discover any problems.
+
+SEE ALSO
+    Class::Declare::Dump, Class::Declare::Attributes, Exporter, Storable,
+    perlboot, perltoot.
+
+AUTHOR
+    Ian Brayshaw, <ibb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2016 Ian Brayshaw. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

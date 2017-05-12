@@ -1,0 +1,23 @@
+Revision history for Perl extension Clutch
+
+0.05 2012/04/11
+    - add cascade method
+    - code refactoring
+    - some docs fixed
+    - Clutch::Utils rename to Clutch::Utils and hide from pause
+
+0.04 2012/03/22
+    - change protocol
+    - support request_multi(_background)
+    - remove Clutch::Admin
+    - no use DWR
+
+0.03 2012/01/25
+    - more fixed some dist problem.
+
+0.02 2012/01/24
+    - fixed some dist problem.
+
+0.01 2012/01/04
+    - original version.
+

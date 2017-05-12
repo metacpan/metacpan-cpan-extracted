@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cb46b901cb27d8f96eaf8823fa6c4da58ba6854c Changes
+SHA1 fda94122640f7271d2137288e6b8a46ab9f6b386 INSTALL
+SHA1 c715d20265d2931c7564fc64abfdc4f8ff33e297 LICENSE
+SHA1 076de889ef86ed8096fd9d410d2f9c3202705716 MANIFEST
+SHA1 b18a689f5c74d8ec6e6e41b9f6685703002a4994 META.json
+SHA1 b952c0f1e17d482a8b0aa47dc0ebf95a4d329be0 META.yml
+SHA1 6c07b57e53ce0fe7be996303f55c8e89e2f6c6b7 Makefile.PL
+SHA1 0a45b62fa79864704f09ce66e4ed9587fa91a77e README
+SHA1 1ec89bfe2e0c852536e301904042cc42afda97b3 dist.ini
+SHA1 212e69e4410f90f13098601d61a40a4430897660 lib/CatalystX/AuthenCookie.pm
+SHA1 8ca66c64a8a41ce304cc5beebfbdb9ea12f6d740 t/basic.t
+SHA1 efec1a9ced1ab09dff0098b65c441697b06dc61d t/lib/TestApp.pm
+SHA1 4fc4075d8272c971a62008ee62eaa5232c3da072 t/lib/TestApp/Controller/Root.pm
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 31cdf828739c1d4e76204c3c073effcdbb4243c7 t/release-pod-spell.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk149+YACgkQIgMCsV8qvRJPZQCfTx4jzQKbZfhc8eb0FDMlZpEy
+RmYAnRwgYVqcdKgKN64KS/gdcrvF9I+t
+=6tNM
+-----END PGP SIGNATURE-----

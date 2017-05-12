@@ -1,0 +1,32 @@
+This module provides a shared cache, using a memory mapped file. Very useful
+for mod_perl applications. If routines are provided which interact with the
+underlying data, access to the cache is completely transparent, and the module
+handles all the details of refreshing cache contents, and updating underlying
+data, if necessary.
+
+Changes between versions 0.10 and 0.11
+  Add 0.10's changes to this list
+
+Changes between versions 0.09 and 0.10
+  Check perl's version number in a way that works on perl 5.10
+
+Changes between versions 0.081 and 0.09
+  Behave correctly on systems which don't allow mmap()ing of locked files
+  Minor documentation improvements
+
+
+INSTALLING
+What you need to install this module:
+	Storable module
+	Test::More module (only used during testing)
+How to install
+	perl Makefile.PL
+	make
+	make install
+
+
+$Id: README,v 1.10 2008/04/15 09:47:46 pmh Exp $
+
+Copyright (C) Institute of Physics Publishing 2002-2008
+You may distribute under the terms of the GPL or the Artistic License,
+as distributed with Perl.

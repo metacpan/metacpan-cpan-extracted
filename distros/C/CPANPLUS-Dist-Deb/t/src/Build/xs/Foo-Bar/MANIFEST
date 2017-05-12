@@ -1,0 +1,9 @@
+bin/foobar.pl
+Build.PL
+CHANGES
+lib/Foo/Bar.pm
+lib/Foo/Bar.xs
+MANIFEST
+README
+test.pl
+META.yml

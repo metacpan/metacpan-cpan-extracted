@@ -1,0 +1,14 @@
+use strict;
+use warnings;
+BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+use lib 'Distar/lib';
+use Distar;
+
+manifest_include(
+    't/lib' => '.tt',
+    't/lib' => 'test',
+    't/root' => 'heart',
+);
+
+1;
+# vim: set ft=perl ts=8 sts=4 sw=4 tw=115 et :

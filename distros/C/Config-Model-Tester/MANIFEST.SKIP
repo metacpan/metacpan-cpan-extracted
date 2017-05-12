@@ -1,0 +1,12 @@
+^debian/
+~$
+\.ptkdb$
+\.old$
+dist.ini
+_build
+\.orig$
+^MYMETA
+blib
+wr_root
+\.rej$
+README.build-from-git

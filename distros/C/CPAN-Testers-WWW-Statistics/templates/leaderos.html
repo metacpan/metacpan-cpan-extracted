@@ -1,0 +1,39 @@
+[% 
+    title = osname _ ' Tester Leaderboard' ;
+    box_sites = 1 ;
+
+    crumb2_name = 'Tester Leaderboard' ;
+    crumb2_href = '/testers.html' ;
+    crumb1_name = osname ;
+%]
+
+<p>Click below to see alternative OS Leaderboards</p>
+<table class="col3" summary="Leaderboard Navigation">
+[% inx = 0 %]
+[% FOREACH item = osnames %]
+[% IF inx % 3 == 0 %]<tr>[% END %]
+<td><a href="/leaders/leaders-[% item.osname %]-all.html" title="[% item.ostitle %] Tester Leaderboard (All Months)">[% item.ostitle %]</a></td>
+[% inx = inx + 1 %]
+[% IF inx % 3 == 0 %]</tr>[% END %]
+[% END %]
+[% IF inx % 3 > 0 %]</tr>[% END %]
+</table>
+
+
+<h2>TOP TESTERS ON [% osname %]</h2>
+<table summary="[% osname %] Tester Leaderboard">
+<tr><th class="top" rowspan="2">POSITION</th><th class="top" colspan="3">SUBMISSIONS</th><th class="top" rowspan="2">TESTER</th></tr>
+<tr><th class="top">[% IF links.that %]<a href="[% links.that %]" title="[% osname %] Tester Leaderboard (Last Month)">[% headers.col1 %]</a>[% ELSE %][% headers.col1 %][% END %]</th>
+    <th class="top">[% IF links.this %]<a href="[% links.this %]" title="[% osname %] Tester Leaderboard (This Month)">[% headers.col2 %]</a>[% ELSE %][% headers.col2 %][% END %]</th>
+    <th class="top">[% IF links.all  %]<a href="[% links.all  %]" title="[% osname %] Tester Leaderboard (All Months)">All</a>[% ELSE %]All[% END %]</th></tr>
+[% pos = 1 %]
+[% FOREACH row = leaders %]
+<tr><td align="right">[% pos %]</td>
+    <td align="right">[% IF row.col1 ; THEN ; row.col1 ; ELSE ; '-' ; END %]</td>
+    <td align="right">[% IF row.col2 ; THEN ; row.col2 ; ELSE ; '-' ; END %]</td>
+    <td align="right">[% IF row.col3 ; THEN ; row.col3 ; ELSE ; '-' ; END %]</td>
+    <td>[% row.tester %]</td></tr>
+[% pos = pos + 1 %]
+[% END %]
+</table>
+

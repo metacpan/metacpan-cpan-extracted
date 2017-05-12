@@ -1,0 +1,48 @@
+[%
+ IF (!fname.defined);
+    THROW crud '"fname" must be defined in ' _ component.name;
+ END;
+ IF (     object
+      &&  form.metadata.show_related_fields 
+      &&  field.internal_value.length
+      &&  form.metadata.is_related_field( fname ) 
+      &&  !c.controller.primary_key.grep( "^$fname$" ).size
+    );
+  SET rel_info      = form.metadata.related_field( fname, object );
+  CALL rel_info.get_controller;
+  SET foreign_field = form.metadata.show_related_field_using( rel_info.foreign_class, fname );  
+  SET foreign_key   = rel_info.foreign_column_for(fname);
+  SET method        = rel_info.method;
+  
+  # default search since may be null or o2m
+  SET myurl         = c.uri_for( rel_info.controller.action_for('search'), { $foreign_key = field.internal_value } );
+
+  IF (foreign_field);
+    # show related record value literally
+    SET viewable_value  = object.$method.unique_value;
+    SET myval_uri_safe  = field.internal_value | uri;
+    
+    SET base_foreign_url = c.uri_for('/' _ rel_info.controller.path_prefix);
+    
+    # change to link directly to foreign object
+    # must check if controller isa REST controller as URI format is different
+    IF (rel_info.controller.isa('CatalystX::CRUD::REST'));
+        myurl = base_foreign_url _ '/' _ myval_uri_safe;
+    ELSE;
+        myurl = base_foreign_url _ '/' _ myval_uri_safe _ '/' _ (c.session.prefs.default_crud_action || 'view');
+    END;
+    
+    IF viewable_value.length;
+        "&nbsp;<a href='$myurl'>$viewable_value</a>";
+    END;
+  ELSE;
+     # show link to related record
+     SET viewable_value  = object.$method.unique_value;
+     IF !viewable_value.length;
+         viewable_value = 'Related record';
+     END;
+    "&nbsp;<a href='$myurl'>$viewable_value</a>";
+  END;
+  
+ END;
+%]

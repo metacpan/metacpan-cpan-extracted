@@ -1,0 +1,49 @@
+# NAME
+
+CPAN::Mini::Webserver - Search and browse Mini CPAN
+
+# VERSION
+
+version 0.58
+
+# SYNOPSIS
+
+    % minicpan_webserver
+
+# DESCRIPTION
+
+This module is the driver that provides a web server that allows you to search
+and browse Mini CPAN. See [minicpan\_webserver](http://search.cpan.org/perldoc?minicpan\_webserver) for details on its use.
+
+# CURRENT MAINTAINER
+
+Christian Walde <walde.christian@googlemail.com>
+
+# SUPPORT
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at [http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Mini-Webserver](http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Mini-Webserver).
+You will be notified automatically of any progress on your issue.
+
+## Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+[https://github.com/wchristian/cpan-mini-webserver](https://github.com/wchristian/cpan-mini-webserver)
+
+    git clone https://github.com/wchristian/cpan-mini-webserver.git
+
+# AUTHORS
+
+- Leon Brocard <acme@astray.com>
+- Christian Walde <walde.christian@googlemail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Christian Walde.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

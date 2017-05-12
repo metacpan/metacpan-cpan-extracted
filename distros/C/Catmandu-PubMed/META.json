@@ -1,0 +1,56 @@
+{
+   "abstract" : "Catmandu module for working with PubMed data",
+   "author" : [
+      "Wouter Willaert <wouterw@inuits.eu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-PubMed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.0302",
+            "Furl" : "0.41",
+            "Moo" : "1.000003",
+            "XML::LibXML::Simple" : "0.91",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Catmandu::Importer::PubMed" : {
+         "file" : "lib/Catmandu/Importer/PubMed.pm",
+         "version" : 0
+      },
+      "Catmandu::PubMed" : {
+         "file" : "lib/Catmandu/PubMed.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

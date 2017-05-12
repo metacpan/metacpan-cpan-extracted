@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  13362:
+    - 238
+name: ddcb21
+registers:
+  AF: 53933
+  AF_: 0
+  BC: 26350
+  BC_: 0
+  DE: 9199
+  DE_: 0
+  HL: 37014
+  HL_: 0
+  I: 0
+  IX: 13460
+  IY: 46787
+  PC: 4
+  R: 2
+  SP: 0

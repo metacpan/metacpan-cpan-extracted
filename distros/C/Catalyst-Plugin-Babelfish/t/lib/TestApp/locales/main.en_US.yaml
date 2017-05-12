@@ -1,0 +1,2 @@
+nails: 'I have #{test} ((nail|nails)):test'
+hello: Hello

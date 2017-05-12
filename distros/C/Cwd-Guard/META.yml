@@ -1,0 +1,45 @@
+---
+abstract: 'Temporary changing working directory (chdir)'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cwd-Guard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cwd::Guard:
+    file: lib/Cwd/Guard.pm
+    version: '0.05'
+requires:
+  Cwd: '0'
+  Exporter: '0'
+  if: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/kazeburo/Cwd-Guard/issues
+  homepage: https://github.com/kazeburo/Cwd-Guard
+  repository: git://github.com/kazeburo/Cwd-Guard.git
+version: '0.05'
+x_contributors:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+  - 'Slaven Rezic <slaven.rezic@idealo.de>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

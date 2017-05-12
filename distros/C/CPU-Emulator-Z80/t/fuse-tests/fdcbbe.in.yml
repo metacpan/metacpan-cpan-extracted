@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 200
+    - 190
+  15575:
+    - 161
+name: fdcbbe
+registers:
+  AF: 4403
+  AF_: 0
+  BC: 48886
+  BC_: 0
+  DE: 20569
+  DE_: 0
+  HL: 4233
+  HL_: 0
+  I: 0
+  IX: 54616
+  IY: 15631
+  PC: 0
+  R: 0
+  SP: 0

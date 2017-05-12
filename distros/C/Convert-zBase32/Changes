@@ -1,0 +1,12 @@
+Revision history for Perl extension Convert::zBase32.
+
+0.0200 Apr 12 2009
+    - POD tests
+
+0.0100 Apr 3 2009
+    - First release to the CPAN
+
+0.00_01  Wed Oct 17 21:05:45 2007
+	- original version; created by h2xs 1.23 with options
+		-B -X -n Convert::zBase32
+

@@ -1,0 +1,41 @@
+
+read_file filename
+write_file [par]
+abort_file
+
+# par-> 'uid':def 0, 'gid':def 0, 'mode':def 0644
+
+locate regexp
+incr N
+reset
+
+append str [str2 ...]
+insert str [str2 ...]
+replace_all str1 replacewith1 [str2 replacewith2 ...]
+
+eval exp
+eval_to regexp exp
+eval_n N exp
+eval_all exp
+eval_where regexp1 exp1 [regexp2 exp2 ...]
+
+delete_all regexp
+delete_to regexp
+delete_n N
+delete_file
+
+exist regexp
+
+comment regexp [comment [commentend]]
+comment_to regexp [comment [commentend]]
+comment_n N [comment [commentend]]
+
+uncomment regexp [comment [commentend]]
+uncomment_to regexp [comment [commentend]]
+uncomment_n N [comment [commentend]]
+
+is_XXXX	sunos sunos5 sunos4 freebsd linux debian hp aix
+	return: version
+
+append_file filename
+add_list prefix \@list [separator,def=: [newline_str]]

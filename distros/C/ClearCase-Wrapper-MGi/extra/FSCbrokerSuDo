@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+use strict;
+BEGIN {
+  delete @ENV{qw(IFS CDPATH PATH ENV BASH_ENV)};
+}
+
+# This is meant to be suid enabled
+# This is the version using sudo. There is an alternative version using ssh.
+
+my $fsc ='/usr/local/bin/fixsrccont';
+my $sudo = '/usr/bin/sudo';
+
+my $rc = 0;
+my %batch;
+for (@ARGV) {
+  push @{$batch{$1}}, $2 if /^(\w+?):(.*)$/;
+}
+for my $owner (keys %batch) {
+  my $arg = join '@@', @{$batch{$owner}}; # split on whitespace...
+  $rc |= ((getpwuid($<))[0] eq $owner)? system($fsc, $arg)
+    : system($sudo, '-u', $owner, $fsc, $arg);
+}
+exit $rc;

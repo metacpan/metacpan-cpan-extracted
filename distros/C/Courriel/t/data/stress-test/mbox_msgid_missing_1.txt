@@ -1,0 +1,36 @@
+From tomcat-user-return-33287-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Tue May 01 22:12:10 2001
+Return-Path: <tomcat-user-return-33287-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 21816 invoked by uid 500); 1 May 2001 22:11:52 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+Reply-To: tomcat-user@jakarta.apache.org
+list-help: <mailto:tomcat-user-help@jakarta.apache.org>
+list-unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+list-post: <mailto:tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 21510 invoked from network); 1 May 2001 22:11:33 -0000
+Received: from qmail5.vsto.net (HELO qmail5.visto.com) (209.185.20.135)
+  by h31.sny.collab.net with SMTP; 1 May 2001 22:11:33 -0000
+Received: (qmail 11444 invoked by alias); Received: from unknown (HELO mps2) (206.79.140.180) by 0 with SMTP; 1 May 2001 15:02:04 -0700
+Sender: dmitryr@visto.com
+Reply-To: DMITRYR@VISTO.COM
+From: "Dmitry Rogatkin" <DMITRYR@VISTO.COM>
+Subject: RE: Displaying images in wml
+Date: Tue, 01 May 2001 15:00:18 -0700
+X-Mailer: Visto
+To: tomcat-user@jakarta.apache.org
+MIME-Version: 1.0
+X-Mailer: Visto Server
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Rating: h31.sny.collab.net 1.6.2 0/1000/N
+
+Maybe you also know why using Nokia WAP device simulator I can see images=
+ when directly access Tomcat server, but when use WAP gateway, I always s=
+ee images as icons - "image not available".
+
+Dmitry R., dmitryr@visto.com
+Chief Architect, MetricStream.COM
+Santa Clara, CA
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb67
+registers:
+  AF: 12592
+  AF_: 0
+  BC: 3965
+  BC_: 0
+  DE: 18613
+  DE_: 0
+  HL: 52319
+  HL_: 0
+  I: 0
+  IX: 8451
+  IY: 25970
+  PC: 4
+  R: 2
+  SP: 0

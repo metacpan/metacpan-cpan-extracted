@@ -1,0 +1,21 @@
+#!/home/ben/software/install/bin/perl
+
+# Turn STDIN input into a C string text.
+
+use warnings;
+use strict;
+use Deploy::C 'convert_to_c_string';
+
+my $text;
+
+while (<STDIN>) {
+$text .= $_;
+}
+
+my $out = convert_to_c_string ($text);
+print $out;
+
+
+# Local variables:
+# mode: perl
+# End:

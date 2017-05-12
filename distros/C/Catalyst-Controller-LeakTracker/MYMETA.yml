@@ -1,0 +1,35 @@
+---
+abstract: 'Inspect leaks found by L<Catalyst::Plugin::LeakTracker>'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.88
+  Test::use::ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-LeakTracker
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::LeakTracker: 0
+  Catalyst::Runtime: 5.8
+  Data::Dumper: 0
+  Devel::Cycle: 0
+  Devel::Size: 0
+  Number::Bytes::Human: 0.07
+  Template::Declare: 0.42
+  YAML::XS: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/wreis/catalyst-controller-leaktracker
+version: 0.08

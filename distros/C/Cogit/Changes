@@ -1,0 +1,12 @@
+Revision history for Cogit
+  - Fix warning from all_shas
+    (Thanks Sergey Romanov for the fix and Philippe Bruhat for the report)
+    (Fixes GH#9 and GH#10)
+
+0.001001  2017-03-12 13:22:39-07:00 America/Los_Angeles
+  - Fix nested my declaration (Thanks for the heads up Slaven Rezić!)
+  - Switch ::Util to Sub::Exporter::Progressive
+
+0.001000  2014-04-19 00:57:35-05:00 CST6CDT
+  - Initial Release forked from Git::PurePerl (☦)
+

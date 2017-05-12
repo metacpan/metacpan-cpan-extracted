@@ -1,0 +1,52 @@
+[% WRAPPER 'view/en/layout.tt' %]
+
+<div class="span-8">
+
+ <h4>Network access allowed</h4>
+
+ [% IF msg_type == 'info' %]
+ <p class="info">[% msg_text %]</p>
+ [% END %]
+
+ [% IF msg_type == 'error' %]
+ <p class="error">[% msg_text %]</p>
+ [% END %]
+
+ <p class="info">Please logout after work!</p>
+
+ <form action="" method="post" accept-charset="UTF-8">
+  <fieldset>
+   <label for="logout">User: <strong>[% username %]</strong></label>
+   <br />
+   <br />
+   <input type="submit" value="Logout" id="logout" name="logout" />
+  </fieldset>
+ </form>
+
+ <h4>Problems and issues</h4>
+ <div class="box">
+  <p>Please contact the helpdesk at</p>
+  <ul>
+   <li>Office hours: Mon - Fri 08:00 - 18:00 clock</li>
+   <li>Phone: +49 (0) yyy/xx-zzzzz</li>
+  </ul>
+
+ </div>
+</div>
+
+<div class="prepend-1 span-15 last">
+
+ <h4>Welcome to the Network</h4>
+ <p class="box">
+  The network access is automatically disabled after a few minutes of inactivity.
+  Anyway, please logout after work!
+  This prevents, that other users may abuse your account for network access.
+  In order to find the logout page later, please set a bookmark now.
+  </p>
+
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

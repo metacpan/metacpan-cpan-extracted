@@ -1,0 +1,21 @@
+Revision history for Catmandu-Store-Resolver
+
+0.06  2017-02-20 13:45:49 UTC
+        - Added Catmandu::Fix::make_pid
+        - Renamed to Catmandu-Resolver
+
+0.05  2017-02-17 14:46:52 UTC
+        - Added PID as _id in the return value of the store
+
+0.04  2017-01-11 09:50:43 UTC
+	- Bugfix: don't die on 404
+
+0.03  2017-01-10 12:33:51 UTC
+        - Bugfix: 403 error on multiple submits
+        - Updated documentation
+
+0.02  2017-01-04 13:11:46 UTC
+	- Added support for PUT/POST/DELETE
+
+0.01  2017-01-03 11:15:45 UTC
+        - Initial release

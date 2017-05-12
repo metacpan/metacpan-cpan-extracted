@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Auth-Auto
+version:      1.21
+version_from: lib/CGI/Auth/Auto.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    CGI::Auth:                     0
+    CGI::Scriptpaths:              1.01
+    Cwd:                           0
+    Cwd::Ext:                      1.03
+    Data::Dumper:                  0
+    HTML::Template:                0
+    HTML::Template::Default:       0
+    LEOCHARRE::CLI:                1.09
+    LEOCHARRE::DEBUG:              1.06
+    Linux::usermod:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,25 @@
+Revision history for CPAN-Mini-FromList
+
+0.05    2012-01-10T21:07:00+0200
+    - typo fix in cpanmini-fromlist by Salve J. Nilsen
+
+
+0.04    2012-01-03T10:01:00+0200
+    - minor fix for cpanmini-fromlist by Salve J. Nilsen
+
+
+0.03    2011-08-13T10:03:59+0200
+    - applied patch from Jiří Pavlovský that should
+      fix cpanmini-fromlist
+    - switched to Dist::Zilla
+
+
+0.02	Wed Apr  9 10:25:55 CEST 2008
+    - fiddled with docs
+    - added prereq to Build.PL
+    - imported into svn
+    
+
+0.01   Sat Apr  5 13:52:14 CEST 2008
+    - first release, live from Oslo QA Hackathon
+

@@ -1,0 +1,21 @@
+Changes
+lib/Catalyst/Helper/Model/SWISH.pm
+lib/Catalyst/Model/SWISH.pm
+Makefile.PL
+MANIFEST
+README
+t/01-swish.t
+t/Catalyst-Model-SWISH.t
+t/MySWISH/lib/MySWISH.pm
+t/MySWISH/lib/MySWISH/Controller/Root.pm
+t/MySWISH/lib/MySWISH/Model/SWISH.pm
+t/MySWISH/lib/MySWISH/View/TT.pm
+t/MySWISH/Makefile.PL
+t/MySWISH/myswish.yml
+t/MySWISH/root/search.tt
+t/MySWISH/script/myswish_server.pl
+t/MySWISH/script/myswish_test.pl
+t/pod-coverage.t
+t/pod.t
+t/test.html
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,68 @@
+{
+   "abstract" : "OpenSSL support for LWP",
+   "author" : [
+      "A. Sinan Unur <nanis@cpan.org>",
+      "David Landgren",
+      "Joshua Chamas",
+      "Gisle Aas"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "lwp",
+      "lwp-useragent",
+      "openssl",
+      "https"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-SSLeay",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.19",
+            "Try::Tiny" : "0.19"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.280205",
+            "Getopt::Long" : "0",
+            "Path::Class" : "0.26",
+            "Try::Tiny" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "6.02",
+            "MIME::Base64" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/nanis/Crypt-SSLeay"
+      }
+   },
+   "version" : "0.72",
+   "x_build" : {
+      "recommends" : {
+         "Devel::CheckLib" : "0.99"
+      }
+   }
+}

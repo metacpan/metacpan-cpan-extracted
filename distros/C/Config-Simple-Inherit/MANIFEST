@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Config/Simple/Inherit.pm
+t/00-load.t
+t/10_inherit.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/simplified_inherit_again.ini  
+t/simplified_inherit.ini
+t/simplified.ini

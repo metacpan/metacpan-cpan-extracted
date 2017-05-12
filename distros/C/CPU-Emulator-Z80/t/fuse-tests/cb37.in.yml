@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 55
+  28246:
+    - 248
+name: cb37
+registers:
+  AF: 17152
+  AF_: 0
+  BC: 55228
+  BC_: 0
+  DE: 37171
+  DE_: 0
+  HL: 28246
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

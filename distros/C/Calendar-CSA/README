@@ -1,0 +1,76 @@
+
+Legal information:
+
+    Copyright (c) 1997 Kenneth Albanowski. All rights reserved.
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+    Note: The CDE, which includes the CSA libraries and headers, is licensed
+    by its owner, and no part of the CDE or CSA libraries or headers may be
+    distibuted in violation of that license.
+
+    Please do not distribute binaries of this module if it would violate
+    such a license.
+
+Useful information:
+
+    This module provides Perl access to data using the X/Open Calendaring
+    and Scheduling API, which is used by the Common Desktop Environment
+    (CDE) Calendar Manager, and the Sun Calendar Manager. The CDE is
+    available for most UNIX platforms, and provides a friendly and
+    standardized graphical user interface. As the CDE is formed in part by
+    licensed software, it is not freely available, and must be purchased,
+    either implictly as part of your OS, or explictly, as in RedHat's
+    TriTeal CDE for Linux.
+
+    To build this module, execute these commands:
+
+        perl Makefile.PL
+        make
+        make test
+
+    And, if the test is successfull, install (possibly as root) via:
+	
+        make install
+
+	If all went successfully, your perl installation now has a new
+	'Calendar::CSA' module, with which you can access Calendar Manager data.
+	
+    As this module operates by communicating with the CSA server, that RPC
+    server must be configured (and possibly running) for this module to
+    operate (and for the test to have a chance of working.)
+    
+    Also, it is quite possible the test will fail for some miscellaneous
+    reason (guessing the wrong username or machine name, or an unimplemented
+    function) that would not prevent you using the module.
+
+Documentation information:
+
+    At this time, no documentation is available, unfortunately. The test.pl
+    file contains, at the end, some code that demonstrates what can be done,
+    but no formal documentation is provided. For the most part, the calling
+    conventions and the data returned are very similar to the CSA C
+    functions.
+
+Technical information:
+
+    To build this module, you must have the CSA libraries and headers, which
+    possibly may not be included with your base CDE installation. The key
+    libraries are csa, and possibly DtSvc. The only header required is
+    csa/csa.h. Makefile.PL assumes these exist in -L/usr/dt/lib, and
+    -I/usr/dt/include.  The names might differ (in which case Makefile.PL
+    and Csa.xs will need to be modified), but the files must be present
+    somewhere.
+    
+    The callback mechanism has been completely untested (I was unable to
+    provoke any callbacks.)
+    
+    "We apologize for the inconvenience."
+
+Other information:
+
+    This module was written by Kenneth Albanowski <kjahds@kjahds.com>, with
+    considerable assistance by Bharat Mediratta
+    <Bharat.Mediratta@Corp.Sun.COM>. It would not existed at all save for
+    the generous donation by Red Hat software of a copy of the TriTeal CDE
+    Developers Edition for Linux.

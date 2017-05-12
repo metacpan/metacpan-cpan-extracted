@@ -1,0 +1,26 @@
+Overview of changes in Cairo::GObject 1.004
+===========================================
+
+* Makefile.PL: Fix specification of requirements in the META files
+
+Overview of changes in Cairo::GObject 1.003
+===========================================
+
+* Makefile.PL: add 'meta-spec' and 'license' keys to META_MERGE block to enable the expanded metadata display on MetaCPAN 
+
+Overview of changes in Cairo::GObject 1.002
+===========================================
+
+* Makefile.PL: added CPAN::Meta::Spec v2 block to META_MERGE
+* LICENSE: updated FSF address
+* README: updated contact/mailing list/git info
+
+Overview of changes in Cairo::GObject 1.001
+===========================================
+
+* Require Cairo 1.080 for the cairo_region_t converters.
+
+Overview of changes in Cairo::GObject 1.000
+===========================================
+
+* Initial release.

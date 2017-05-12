@@ -1,0 +1,19 @@
+---
+abstract: 'Yet-another argument processor, designed to provide a standard method for parsing constructor arguments'
+author: []
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-YAARG
+provides:
+  Config::YAARG:
+    file: lib/Config/YAARG.pm
+    version: 0.023
+requires:
+  Class::ISA: 0
+  TAP::Harness: 0
+version: 0.023

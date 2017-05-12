@@ -1,0 +1,13 @@
+abstract: Transparently choose a provider class with an automatic facade
+author: Gaal Yahas, C<< <gaal at forum2.org> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: MIT
+name: Class-TransparentFactory
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.6.0
+version: 0.02

@@ -1,0 +1,15 @@
+<div id="cpac_outer" class="cpac_box">
+  [% IF cpac.g.title %]
+    <div id="cpac_content">
+      [% content %]
+    </div>
+  [% ELSE %]
+    <div id="cpac_header">
+      [% content %]
+    </div>
+  [% END %]
+    
+    <div id="cpac_footer">
+        Powered by [% cpac.g.version %]
+    </div>
+</div> <!-- box -->

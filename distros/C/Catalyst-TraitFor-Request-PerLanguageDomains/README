@@ -1,0 +1,67 @@
+NAME
+    Catalyst::TraitFor::Request::PerLanguageDomains - Language detection for
+    Catalyst::Requests
+
+SYNOPSIS
+        package MyApp;
+
+        use Moose;
+        use namespace::autoclean;
+
+        use Catalyst;
+        use CatalystX::RoleApplicator;
+
+        extends 'Catalyst';
+
+        __PACKAGE__->apply_request_class_roles(qw/
+            Catalyst::TraitFor::Request::PerLanguageDomains
+        /);
+
+        __PACKAGE__->config(
+            'TraitFor::Request::PerLanguageDomains' => {
+                default_language => 'de',
+                selectable_language => ['de','en'],
+            }
+        );
+
+        __PACKAGE__->setup;
+
+        # Config::General style:
+        <TraitFor::Request::PerLanguageDomains>
+            default_language de
+            selectable_language de
+            selectable_language en
+        </Catalyst::Request>
+
+DESCRIPTION
+    Extends Catalyst::Request objects with a "$ctx->request->language"
+    method for language detection.
+
+METHODS
+  language
+        my $language = $ctx->request->language;
+
+    Returns a string that is the two digit code ISO for the request
+    language.
+
+    The following things are checked to find the request language, in order:
+
+    *   The lang part of the domain (e.g. de from de.example.org)
+
+    *   The "language" key set in the session (if Catalyst::Plugin::Session
+        is loaded)
+
+    *   The "Accept-Language" header of the request.
+
+SEE ALSO
+    CatalystX::RoleApplicator, I18N::AcceptLanguage.
+
+AUTHOR
+      Stephan Jauernick <stephan@stejau.de>
+
+LICENSE
+    This software is copyright (c) 2009 by Stephan Jauernick.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

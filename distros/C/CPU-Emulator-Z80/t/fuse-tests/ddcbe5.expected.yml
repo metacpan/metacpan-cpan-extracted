@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  27298:
+    - 62
+name: ddcbe5
+registers:
+  AF: 22476
+  AF_: 0
+  BC: 21777
+  BC_: 0
+  DE: 9878
+  DE_: 0
+  HL: 47166
+  HL_: 0
+  I: 0
+  IX: 27312
+  IY: 3728
+  PC: 4
+  R: 2
+  SP: 0

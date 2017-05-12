@@ -1,0 +1,33 @@
+NAME
+    CatalystX::Dispatcher::AsGraph - Create a graph from Catalyst dispatcher
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        use CatalystX::Dispatcher::AsGraph;
+
+        my $graph = CatalystX::Dispatcher::AsGraph->new(
+            appname => 'MyApp',
+            output  => 'myactions.png',
+        );
+        $graph->run;
+
+DESCRIPTION
+    CatalystX::Dispatcher::AsGraph create a graph for a Catalyst application
+    using his dispatcher.
+
+    At the time, only private actions are graphed.
+
+SEE ALSO
+    <http://www.catalystframework.org/calendar/2009/14>
+
+AUTHOR
+      franck cuny <franck@lumberjaph.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by franck cuny.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

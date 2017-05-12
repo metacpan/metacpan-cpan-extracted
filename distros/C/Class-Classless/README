@@ -1,0 +1,135 @@
+README for Class::Classless
+                                        Time-stamp: "2000-05-13 19:40:59 MDT"
+
+[Excerpted from the POD...]
+
+NAME
+     Class::Classless -- framework for classless OOP
+
+SYNOPSIS
+       use strict;
+       use Class::Classless;
+       my $ob1 = $Class::Classless::ROOT->clone;
+       $ob1->{'NAME'} = 'Ob1';
+       $ob1->{'stuff'} = 123;
+       $ob1->{'Thing'} = 789;
+
+       my $ob2 = $ob1->clone;
+       $ob2->{'NAME'} = 'Ob2';
+
+       printf "ob1 stuff: <%s>\n", $ob1->{'stuff'};
+       printf "ob2 stuff: <%s>\n", $ob2->{'stuff'};
+       printf "ob1 Thing: <%s>\n", $ob1->{'Thing'};
+       printf "ob2 Thing: <%s>\n", $ob2->{'Thing'};
+
+       $ob1->{'METHODS'}{'zaz'} =  sub {
+          print "Zaz! on ", $_[0]{'NAME'}, "\n";
+       };
+
+       $ob1->zaz;
+       $ob2->zaz;
+       $ob1->EXAMINE;
+       $ob2->EXAMINE;
+
+     This prints the following:
+
+         ob1 stuff: <123>
+         ob2 stuff: <123>
+         ob1 Thing: <789>
+         ob2 Thing: <>
+         Zaz! on Ob1
+         Zaz! on Ob2
+         <Class::Classless::X=HASH(0x200236f4)>
+            'stuff', 123,
+            'NAME', 'Ob1',
+            'Thing', 789,
+            'METHODS', { 'zaz', 'CODE(0x20068360)' },
+            'PARENTS', [ 'ROOT' ],
+         <Class::Classless::X=HASH(0x2002cb48)>
+            'stuff', 123,
+            'NAME', 'Ob2',
+            'METHODS', {  },
+            'PARENTS', [ 'Ob1' ],
+
+OVERVIEW
+     In class-based OOP frameworks, methods are applicable to
+     objects by virtue of objects belonging to classes that
+     either provide those methods, or inherit them from classes
+     that do.
+
+     In classless OOP frameworks (AKA delegation-and-prototypes
+     frameworks), what methods an object is capable of is
+     basically an attribute of that object.  That is, in Perl
+     terms: instead of methods being entries in the symbol table
+     of the package/class the object belongs to, they are entries
+     in a hash table inside the object.  Inheritance is
+     implemented not by having classes inheriting from other
+     classes (via ISA lists), but by having objects inherit from
+     other objects (via PARENTS lists).
+
+     In class-based OOP frameworks, you get new objects by
+     calling constructors.  In a classless framework, you get new
+     objects by copying ("cloning") an existing object -- and the
+     new clone becomes a child (inheritor) of the original
+     object.  (Where do you get the one original object?  The
+     language provides one, which has no parents, and which
+     contains some general purpose methods like "clone".)
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Class::Classless doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Class::Classless, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Class::Classless in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Classless.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Class directory in your
+MacPerl site_lib or lib directory, and move Classless.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Class::Classless should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Class::Classless is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+Copyright (c) 1999, 2000 Sean M. Burke.  All rights reserved.
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+AUTHOR
+     Sean M. Burke, sburke@cpan.org

@@ -1,0 +1,127 @@
+#!../../../perl
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Pop up the opening label.
+popupLabel (["<C></16/B>Workman Database Editor.", "",
+		"<C></24/B>Written By Mike Glover"]);
+
+# Set a default name for the workman database.
+my $workmandb = $ENV{'HOME'} . "/.workmandb";
+
+# Open up the database and read in the contents.
+my @cdList = readWorkmanDatabase ($workmandb);
+
+# Let the user play with the given information.
+playWithWorkManDatabase (@cdList);
+
+#
+# This allows the user to manipulate the workman database.
+#
+sub playWithWorkManDatabase
+{
+}
+
+#
+# This reads in the current contents of the workman database.
+#
+sub readWorkmanDatabase
+{
+   my $filename	= shift;
+   my @contents	= ();
+   my $count	= 0;
+   my $x	= 0;
+
+   # Return if we can't open the file.
+   return if !(open (FILE, $filename));
+
+   # Slurp in the file.
+   my @workmandb = <FILE>;
+   chomp @workmandb;
+
+   # Strip out the contents of the database.
+   for ($x=0; $x < $#workmandb; $x++)
+   {
+      # Remove comments and empty lines.
+      next if $workmandb[$x] =~ /^#/;
+      next if $workmandb[$x] =~ /^$/;
+
+      # Is this a start of a CD listing.
+      if ($workmandb[$x] =~ /^tracks (\d*)/)
+      {
+         my $trackCount	= $1;
+         my $trackLine	= $workmandb[$x++];
+         my $cdName	= $workmandb[$x++];
+         my $artist	= $workmandb[$x++];
+         my @tracks	= ();
+         my $current	= 0;
+
+         # Get each track from the database.
+         for ($current=0; $current < $trackCount; $current++)
+         {
+            push (@tracks, $workmandb[$x++]);
+         }
+         $x--;
+
+         # Create the database object and put it onto the stack.
+         my $object = new WorkManData ($trackLine, $cdName, $artist, @tracks);
+
+         # Put it onto the stack.
+         push (@contents, $object);
+      }
+   }
+   return @contents;
+}
+
+#
+# This writes out a workman database.
+#
+sub writeWorkManData
+{
+}
+
+#########################################
+package WorkManData;
+
+#
+# This creates a new object.
+#
+sub new
+{
+   my ($type, $trackLine, $cdName, $artist, @tracks) = @_;
+   my @trackInfo = ();
+   my @indexInfo = ();
+   my $self = {};
+
+   # Split the trackline apart.
+   my ($junk, $trackCount, @index) = split (/\s+/, $trackLine);
+
+   # Clean off the garbage from the track lines.
+   for ($x=0; $x <= $#tracks; $x++)
+   {
+      # Strip out the track name.
+      ($trackName = $1) if $tracks[$x] =~ /^track\s+(.*)/;
+
+      # If there is no track name, then provide a default answer.
+      if ($trackName ne "")
+      {
+         push (@trackInfo, $trackName);
+      }
+      else
+      {
+         push (@trackInfo, "No Track Name Given");
+      }
+   }
+
+   # Store the info in the object.
+   ($self->{'Artist'} = $1) if $artist =~ /^artist\s+(.*)/;
+   ($self->{'CDName'} = $1) if $cdName =~ /^cdname\s+(.*)/;
+   $self->{'Tracks'} = \@trackInfo;
+   $self->{'Index'} = \@indexInfo;
+   
+   return bless $self;
+}

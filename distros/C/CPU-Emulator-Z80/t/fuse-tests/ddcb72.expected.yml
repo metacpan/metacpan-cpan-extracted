@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb72
+registers:
+  AF: 45405
+  AF_: 0
+  BC: 61924
+  BC_: 0
+  DE: 39300
+  DE_: 0
+  HL: 51195
+  HL_: 0
+  I: 0
+  IX: 52773
+  IY: 50614
+  PC: 4
+  R: 2
+  SP: 0

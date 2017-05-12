@@ -1,0 +1,14 @@
+This is the Debian package for the ClamAV-Client CPAN distribution, which is
+available from <http://search.cpan.org/dist/ClamAV-Client>.
+
+(C) 2004-2005 Julian Mehnle <julian@mehnle.net>.  Julian Mehnle is the upstream
+author as well as the maintainer of the Debian package.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as Perl or Courier themselves, that is under the terms of either the GNU
+General Public License (version 2 or later) or the Artistic License.
+
+On Debian GNU/Linux systems, the complete text of these licenses can be found
+in these files:
+  /usr/share/common-licenses/GPL
+  /usr/share/common-licenses/Artistic

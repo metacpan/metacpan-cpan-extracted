@@ -1,0 +1,29 @@
+---
+abstract: 'FCGI::Engine script for Catalyst'
+author:
+  - 'Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>.'
+build_requires:
+  Catalyst::Runtime: 5.80015
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Script-FCGI-Engine
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  FCGI::Engine: 0
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://somewhere.com/myproject.git
+version: 0.003

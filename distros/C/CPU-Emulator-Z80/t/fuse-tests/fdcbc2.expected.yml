@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  23225:
+    - 195
+name: fdcbc2
+registers:
+  AF: 44326
+  AF_: 0
+  BC: 23149
+  BC_: 0
+  DE: 50018
+  DE_: 0
+  HL: 5833
+  HL_: 0
+  I: 0
+  IX: 18778
+  IY: 23340
+  PC: 4
+  R: 2
+  SP: 0

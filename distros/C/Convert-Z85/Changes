@@ -1,0 +1,46 @@
+Revision history for Perl module Convert-Z85
+
+1.001001 2016-03-10
+
+  - Use $Config{perlpath} (rather than $^X) for tests
+
+  - Documentation tweaks and other minor cleanups
+
+0.004002 2014-11-14
+
+  - "Fix" Windows test failures
+
+0.004001 2014-11-13
+
+  - Add '--wrap' option to z85_convert
+
+0.003003 2014-11-13
+
+  - Fix z85_convert util to print trailing newline on encode
+
+  - Improved z85_convert tests
+
+0.003002 2014-11-06
+
+  - Fix z85_convert util to pull file name from ARGV if --file option is
+    missing
+
+0.003001 2014-11-01
+
+  - Add 'z85_convert' command line frontend
+
+  - Drop 'strictures' dependency
+
+0.002001 2014-10-10
+
+  - Add 'pad => 1' encode/decode option for padding with zeros
+
+  - Return empty strings if passed same
+
+0.001002 2014-09-28
+
+  - Explicitly require parent.pm
+
+0.001001 2014-09-28
+
+  - Initial release

@@ -1,0 +1,125 @@
+DESCRIPTION
+
+    This module defines some common arguments and settings. Complete::*
+    modules should use the default from these settings, to make it
+    convenient for users to change some behaviors globally.
+
+    The defaults are optimized for convenience and laziness for user typing
+    and might change from release to release.
+
+ $Complete::Common::OPT_CI => bool (default: from COMPLETE_OPT_CI or 1)
+
+    If set to 1, matching is done case-insensitively.
+
+    In bash/readline, this is akin to setting completion-ignore-case.
+
+ $Complete::Common::OPT_WORD_MODE => bool (default: from
+ COMPLETE_OPT_WORD_MODE or 1)
+
+    If set to 1, enable word-mode matching.
+
+    Word mode matching is normally only done when exact matching fails to
+    return any candidate. To give you an idea of how word-mode matching
+    works, you can run Emacs and try its completion of filenames (C-x C-f)
+    or function names (M-x). Basically, each string is split into words and
+    matching is tried for all available word even non-adjacent ones. For
+    example, if you have dua-d and the choices are (dua-tiga, dua-empat,
+    dua-lima-delapan) then dua-lima-delapan will match because d matches
+    delapan even though the word is not adjacent. This is convenient when
+    you have strings that are several or many words long: you can just type
+    the starting letters of some of the words instead of just the starting
+    letters of the whole string (which might need to be quite long before
+    producing a unique match).
+
+ $Complete::Common::OPT_CHAR_MODE => bool (default: from
+ COMPLETE_OPT_CHAR_MODE or 1)
+
+    If set to 1, enable character-mode matching.
+
+    This mode is like word-mode matching, except it works on a
+    character-by-character basis. Basically, it will match if a word
+    contains any letters of the string in the correct order. For example,
+    ap will match ap, amp, slap, or cramp (but will not match pa or pram).
+
+    Character-mode matching is normally only done when exact matching and
+    word-mode fail to return any candidate.
+
+ $Complete::Common::OPT_FUZZY => int (default: from COMPLETE_OPT_FUZZY or
+ 1)
+
+    Enable fuzzy matching (matching even though there are some spelling
+    mistakes). The greater the number, the greater the tolerance. To
+    disable fuzzy matching, set to 0.
+
+    Fuzzy matching is normally only done when exact matching, word-mode,
+    and char-mode matching fail to return any candidate.
+
+ $Complete::Common::OPT_MAP_CASE => bool (default: from
+ COMPLETE_OPT_MAP_CASE or 1)
+
+    This is exactly like completion-map-case in readline/bash to treat _
+    and - as the same when matching.
+
+    All Complete::Path-based modules (like Complete::File,
+    Complete::Module, or Complete::Riap) respect this setting.
+
+ $Complete::Common::OPT_EXP_IM_PATH => bool (default: from
+ COMPLETE_OPT_EXP_IM_PATH or 1)
+
+    Whether to "expand intermediate paths". What is meant by this is
+    something like zsh: when you type something like cd /h/u/b/myscript it
+    can be completed to cd /home/ujang/bin/myscript.
+
+    All Complete::Path-based modules (like Complete::File,
+    Complete::Module, or Complete::Riap) respect this setting.
+
+ $Complete::Common::OPT_DIG_LEAF => bool (default: from
+ COMPLETE_OPT_DIG_LEAF or 1)
+
+    (Experimental) When enabled, this option mimics what's seen on GitHub.
+    If a directory entry only contains a single subentry, it will directly
+    show the subentry (and subsubentry and so on) to save a number of tab
+    presses.
+
+    Suppose you have files like this:
+
+     a
+     b/c/d/e
+     c
+
+    If you complete for b you will directly get b/c/d/e (the leaf).
+
+    This is currently experimental because if you want to complete only
+    directories, you won't get b or b/c or b/c/d. Need to think how to
+    solve this.
+
+ENVIRONMENT
+
+ COMPLETE_OPT_CI => bool
+
+    Set default for $Complete::Common::OPT_CI.
+
+ COMPLETE_OPT_FUZZY => int
+
+    Set default for $Complete::Common::OPT_FUZZY.
+
+ COMPLETE_OPT_WORD_MODE => bool
+
+    Set default for $Complete::Common::OPT_WORD_MODE.
+
+ COMPLETE_OPT_MAP_CASE => bool
+
+    Set default for $Complete::Common::OPT_MAP_CASE.
+
+ COMPLETE_OPT_EXP_IM_PATH => bool
+
+    Set default for $Complete::Common::OPT_EXP_IM_PATH.
+
+ COMPLETE_OPT_DIG_LEAF => bool
+
+    Set default for $Complete::Common::OPT_DIG_LEAF.
+
+SEE ALSO
+
+    Complete
+

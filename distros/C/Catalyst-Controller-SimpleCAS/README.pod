@@ -1,0 +1,147 @@
+=head1 NAME
+
+Catalyst::Controller::SimpleCAS - General-purpose content-addressed storage (CAS) for Catalyst
+
+=head1 SYNOPSIS
+
+ use Catalyst::Controller::SimpleCAS;
+ ...
+
+=head1 DESCRIPTION
+
+This controller provides a simple content-addressed storage backend for Catalyst applications. 
+
+This module was originally developed within L<RapidApp> before being extracted into its own module.
+This is a preliminary version which matches what was in RapidApp (and is still rough around the
+edges, poor test coverage, incomplete docs, etc). Subsequent versions will be polished better, as 
+well as have API changes and improvements... 
+
+Other than for RapidApp itself, it is not suggested that this module be used yet in production...
+
+
+=head1 ATTRIBUTES
+
+=head2 store_class
+
+Object class to use for the Store backend. Defaults to 
+C<Catalyst::Controller::SimpleCAS::Store::File>
+
+=head2 store_path
+
+Directory/path to be used by the Store. Defaults to C<cas_store> within the Catalyst home directory.
+
+=head2 Store
+
+Actual object instance of the Store. By default this object is built using the C<store_class> (by 
+calling C<new()>) with the C<store_path> supplied to the constructor.
+
+=head1 PUBLIC ACTIONS
+
+=head2 upload_content
+
+Upload new content to the CAS and return the sha1 checksum in the body to be able to access it later. 
+Because of the CAS design, the system automatically deduplicates, and will only ever store
+a single copy of a given unique piece of content in the Store. 
+
+=head2 fetch_content
+
+Fetch existing content from the CAS according its sha1 checksum. 
+
+Example:
+
+  GET /simplecas/fetch_content/fdb379f7e9c8d0a1fcd3b5ee4233d88c5a4a023e
+
+The system attempts to identify the content type and sets the MIME type accordingly. Additionally,
+an optional filename argument can be also be supplied in the URL
+
+  GET /simplecas/fetch_content/fdb379f7e9c8d0a1fcd3b5ee4233d88c5a4a023e/somefile.txt
+
+The main reason this is supported is simply for more human-friendly URLs. The name is not stored
+or validated in any way. If supplied, this does nothing other than being used to set the 
+content-disposition:
+
+  Content-Disposition: attachment; filename="somefile.txt"
+
+When there is no filename second arg supplied, the content-disposition is set like this:
+
+  Content-Disposition: inline;filename="fdb379f7e9c8d0a1fcd3b5ee4233d88c5a4a023e"
+
+
+=head2 upload_file
+
+Works like C<upload_content>, but returns a JSON packet with additional metadata/information in
+the body.
+
+=head2 upload_image
+
+Works like C<upload_file>, but with some image-specific functionality, including client-supplied
+max width and height values supplied as the first and second args, respectively. For example,
+a POST I<upload> with I<Filedata> containing an image, and declared max size of 800x600 uses a
+URL like:
+
+  POST /simplecas/upload_image/800/600
+
+When the image is larger than the max width or height, I<if> the optional dependency 
+L<Image::Resize> is available (which requires L<GD>) it is used to resize the image, preserving
+height/width proportions accordingly, and the new, resized image is what is stored in the CAS.
+Otherwise, the image is not resized, but resized dimensions are returned in the JSON packet
+so the client can generate an C<img> tag for display.
+
+Originally, L<Image::Resize> was a standard dependency, but this can be a PITA to get installed
+with all of the dependencies of L<GD>.
+
+=head2 upload_echo_base64
+
+This does nothing but accept a standard POST/Filedata upload and return it as base64 in a JSON
+packet within the JSON/object key C<echo_content>.
+
+=head1 METHODS
+
+=head2 Content
+
+Not usually called directly
+
+=head2 add_resize_image
+
+Not usually called directly
+
+=head2 add_size_info_image
+
+Not usually called directly
+
+=head2 safe_filename
+
+Not usually called directly
+
+=head2 uri_find_Content
+
+Not usually called directly
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Catalyst>
+
+=item *
+
+L<Catalyst::Controller>
+
+=item * 
+
+L<RapidApp>
+
+=back
+
+=head1 AUTHOR
+
+Henry Van Styn <vanstyn@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by IntelliTree Solutions llc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

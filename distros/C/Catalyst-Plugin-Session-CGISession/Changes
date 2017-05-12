@@ -1,0 +1,22 @@
+Revision history for Catalyst-Plugin-Session-CGISession
+
+0.04   Tue Nov  1 22:26:00 2005
+       Corrected goof where the setup() routine left $self in arguments
+         which were then passed to NEXT (reported by Jules Bean)
+
+0.03   Thu Sep  8 16:53:00 2005
+       Added session_delete() to access CGI::Session::delete() 
+         (requested by Schwabe)
+
+0.02   Mon Sep  5 22:27:00 2005
+       Fixed more POD issues; ready for release
+
+0.1.3  Mon Sep  5 19:05:00 2005
+       Fixed POD issues; added description
+
+0.1.2  Sun Sep  4 23:13:00 2005
+       Added CGI::Session passthru methods, e.g. param(), expire()
+
+0.1.1  Sat Sep  3 17:30:00 2005
+       Initial release.
+

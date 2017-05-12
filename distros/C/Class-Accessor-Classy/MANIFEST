@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Class/Accessor/Classy.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/02-report.t
+t/03-class.t
+t/04-list.t
+t/05-set-get.t
+t/lvalue.t

@@ -1,0 +1,58 @@
+2002-10-08  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* Listman/exporter.pm: we need to import Carp symbols to use
+	"croak".
+
+	* Listman.pm (set_db_name): new function.
+	(set_user_infos): new function.
+	(set_host_infos): new function.
+	- version number set to 0.05
+
+2002-09-17  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* Listman.pm (_prepare_record): - to avoid errors with DBI
+	insertions, we need to escape the simple quotes...
+	- version number bumped to 0.04
+
+2002-08-16  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* CGI/Listman.pm: version 0.03
+
+	* CGI/Listman/dictionary/term.pm: see below.
+
+	* CGI/Listman/selection.pm: see below.
+
+	* CGI/Listman/line.pm: see below.
+
+	* CGI/Listman/exporter.pm: see below.
+
+	* CGI/Listman/dictionary.pm: see below.
+
+	* CGI/Listman.pm: all calls to "die" replace with calls to
+	"croak".
+
+	* CGI/Listman/exporter.pm (save_file): don't print anything to
+	STDERR.
+
+2002-08-09  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* Listman.pm (set_key): we should not permit the modification of a
+	term's key (yet) so once it's defined it can't be changed.
+
+	* test.pl: conformity to CPAN recommendations.
+
+	* Listman.pm (set_separator): removed references to the
+	"$config::" namespace and added the ability to specify the
+	separator character with this method and as the second parameter
+	of the new method.
+
+2002-08-06  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* Listman.pm (_dbi_setup): initial work and bugfixes for real
+	databases support (mysql).
+	* Revision 0.01
+
+2002-08-04  Wolfgang Sourdeau  <wolfgang@contre.com>
+
+	* Listman.pm: Initial revision 0.00
+

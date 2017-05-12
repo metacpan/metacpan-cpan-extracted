@@ -1,0 +1,82 @@
+#!/usr/bin/perl --
+
+use strict;
+use Data::Dumper;
+use Getopt::Std;
+use vars qw[%opts];
+
+use JSON::RPC::Common::Procedure::Call;
+use JSON;
+use HTTP::Request;
+use LWP::UserAgent;
+
+getopts( 'hedu:m:p:', \%opts );
+
+$opts{'p'} ||= '3000';
+$opts{'v'} ||= '1.0';
+$opts{'u'} ||= 'http://127.0.0.1:'.$opts{p}.'/rpc';
+$opts{'m'} ||= 'echo.echo';
+$opts{'h'} and die usage();
+
+### ok, so we can't actually get this object *ANY OTHER*
+
+my @args    = $opts{'e'} ? eval "@ARGV" : @ARGV;
+my $req = JSON::RPC::Common::Procedure::Call->inflate({
+        version=>$opts{'v'},
+		method => $opts{'m'},
+		id     => 1,
+		params => \@args,
+});
+
+my $req_string = to_json($req->deflate);
+print $req_string, $/ if $opts{'d'};
+
+my $req = HTTP::Request->new( POST => $opts{'u'} );
+$req->header( 'Content-Length'  => length($req_string) );
+$req->header( 'Content-Type'    => 'application/json' );
+$req->content( $req_string );
+my $ua = LWP::UserAgent->new;
+my $res = $ua->request( $req );
+
+unless ($res->is_success) {
+    print "\n\n-----------------Error-----------\n";
+    print $res->status_line."\n";
+    exit -1;
+}
+
+print "\n\n-----------------Output-----------\n";
+my $resp;
+
+eval { $resp = JSON::from_json( $res->content ) };
+
+die "Response is not JSON string. Error : $@" if $@;
+
+print ref $resp ? Dumper( $resp  ) : "Error: $resp";
+
+sub usage {
+    return qq[
+Usage:
+
+    $0 [-d] [-e] [-p PORT] [-u URL] [-m METHOD] ARG, [ARG,...]
+
+    Does an jsonrpc call against an jsonrpc server, 
+    giving you back the output.
+
+Options:
+    -p  Port number to connect to. Defaults to $opts{p}.
+    -u  Full url to post to. Defaults to:
+        $opts{u}
+    -m  Method call to execute. Defaults to $opts{m}
+    -d  Enable debug mode. This prints the sent and 
+        received json.
+    -e  Eval \@ARGV before providing it as input to the
+        server. This allows you to created more complicated
+        arguments, than the default simple list.
+    -h  Show this usage message
+    
+Example:   
+    $0 -p 1234 foo bar
+    $0 -m complicated.method -e '{ key => value }'
+    
+    \n];
+}    

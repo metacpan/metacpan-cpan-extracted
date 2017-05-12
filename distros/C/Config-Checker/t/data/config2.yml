@@ -1,0 +1,27 @@
+---
+EVAL_REPLACE:
+  %TOP%: 	$opts{path_to_t}
+---
+PTT: %TOP%
+ephemeral: this is what you do not see
+---
+INCLUDE: %TOP%/data/config2a.yml
+REPLACE:
+  bear: teddy
+  ribbit: frog
+---
+INCLUDE:
+  - %TOP%/data/config2b.yml
+  - %TOP%/data/config2c.yml
+---
+NO_REPLACE: bear
+OVERRIDE_FROM:
+  - %TOP%/data/config2d.yml
+---
+NO_REPLACE:
+  - ribbit
+  - %TOP%
+---
+furry2: bear
+pond2: ribbit
+path2: %TOP%

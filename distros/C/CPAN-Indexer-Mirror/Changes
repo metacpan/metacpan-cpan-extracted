@@ -1,0 +1,16 @@
+Changes for Perl extension CPAN-Indexer-Mirror
+
+0.05 Tue 23 Sep 2008
+	- Write all files atomically
+
+0.04 Mon  8 Sep 2008
+	- Randomise the mirror order each time we generate it
+
+0.03 Mon  8 Sep 2008
+	- Add a version to the format
+
+0.02 Sat  6 Sep 2008
+	- Canonicalise the URIs
+
+0.01 Sat  6 Sep 2008
+	- Created initial version

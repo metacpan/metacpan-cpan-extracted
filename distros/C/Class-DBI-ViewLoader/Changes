@@ -1,0 +1,31 @@
+Changes document for Class::DBI::ViewLoader
+
+0.06 - Mon 14 Dec 2015
+	- Fix copmilation on modern perl
+
+0.05 - Mon Feb 13 2006
+	- Added support for Class::DBI::Loader's left_base_classes option
+        - Added Class::DBI::ViewLoader::Auto - simplified interface
+        - Added capacity to change default column accessor and mutator names
+	- Moved mock database tests to DBD::Mock
+	- Fixed potential bug with concurrency
+
+0.04 - Fri, 28 Oct 2005
+	- Fixed bug whereby any row containing a null evaluated to false in
+	  boolean context
+	- Added Test::Pod and Test::Pod::Coverage tests
+	- Minimised use of string eval
+
+0.03 - Fri, 02 Sep 2005
+	- Eliminated unnecessary AUTOLOAD method
+	- Made view_to_class public
+	- Switched to using DBI's parse_dsn method for parsing DBI DSNs
+	- Improved error checking in set_dsn
+
+0.02 - Fri, 12 Aug 2005
+	- Added Class::DBI::Loader compatibility
+	- Added base_classes and import_classes
+	- Added documentation for driver writers
+
+0.01 - Wed, 03 Aug 2005
+	- initial version

@@ -1,0 +1,49 @@
+Catalyst-View-GD-Barcode version 0.03
+=====================================
+
+NAME
+
+  Catalyst::View::GD::Barcode - make it easy to use GD::Barcode in Catalyst's View
+
+SYNOPSIS
+
+  Set string to be converted to barcode.
+
+    $c->stash->{'barcode_string'} = '123456';
+
+  Set barcode type. The default is 'EAN13'.
+
+    $c->stash->{'barcode_type'} = 'NW7';
+    
+	COOP2of5 | Code39 | EAN13 | EAN8 | IATA2of5 | ITF | Industrial2of5 | Matrix2of5 | NW7
+  
+  Set barcode size option.
+
+	$c->stash->{'barcode_size'} = 10;
+
+	When the number of digit is insufficient, it buries by 0.
+  
+  Set any other GD::Barcode options.
+
+    $c->stash->{'barcode_option'} = {NoText => 1}
+
+  Print the barcode.
+
+    $c->forward('Catalyst::View::GD::Barcode');
+
+CHANGES
+  Explanation of Japanese is changed into English  v0.02
+
+DEPENDENCIES
+
+ This module requires these other modules and libraries:
+
+  GD::Barcode
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Toshimitsu Yanagisawa
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.

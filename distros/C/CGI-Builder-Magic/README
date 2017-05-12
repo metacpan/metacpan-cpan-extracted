@@ -1,0 +1,36 @@
+CGI-Builder-Magic README File
+=============================
+
+
+Description
+-----------
+
+This module transparently integrates C<CGI::Builder> and C<Template::Magic> in a very handy, powerful and flexible framework that can save you a lot of coding, time and resources.
+    
+Installation
+------------
+
+0.  Prerequisites:
+- CGI::Builder    >= 1.31
+- Template::Magic >= 1.36
+
+1. CPAN installation
+
+    perl -MCPAN -e 'install CGI::Builder::Magic'
+
+If you want to install all the extensions and prerequisites of the CBF, all in one easy step:
+
+    perl -MCPAN -e 'install Bundle::CGI::Builder::Complete'
+
+2. Standard installation
+- from the directory where this file is located, type:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+--
+Domizio Demichelis perl.4pro.net
+2004-07-04

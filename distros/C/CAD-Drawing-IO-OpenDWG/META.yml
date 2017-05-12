@@ -1,0 +1,21 @@
+---
+name: CAD-Drawing-IO-OpenDWG
+version: 0.22
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: Accessor methods for OpenDWG toolkit wrapper
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Drawing: 0.26
+  CAD::Drawing::IO::DWGI: 0.12
+  Test::More: 0
+provides:
+  CAD::Drawing::IO::OpenDWG:
+    file: lib/CAD/Drawing/IO/OpenDWG.pm
+    version: 0.22
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

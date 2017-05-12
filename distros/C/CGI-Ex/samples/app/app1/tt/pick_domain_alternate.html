@@ -1,0 +1,15 @@
+[% PROCESS "header.tt" title => "Pick Domain" %]
+
+<span class=error>We're sorry - the domain [% domain %] is not available.</span><br>
+Please choose from the following domains...
+
+<form name=[% form_name %] action=[% script_name %] method=post>
+
+[%- FOR d IN domains %]
+<input type=radio name=domain value="[% d.html %]"> [% d.html %]<br>
+[%- END %]
+<input type=submit value="Signup Domain"><br>
+
+</form>
+
+[% PROCESS "footer.tt" %]

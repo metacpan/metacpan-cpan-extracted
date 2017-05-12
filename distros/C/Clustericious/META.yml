@@ -1,0 +1,65 @@
+---
+abstract: 'A framework for RESTful processing systems.'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  File::chdir: '0'
+  PlugAuth::Lite: '0'
+  Test2::Suite: '0.000060'
+  Test::Clustericious::Cluster: '0.35'
+  Test::More: '0.94'
+  Test::Script: '1.10'
+  Test::Warn: '0'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.010001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clustericious
+no_index:
+  directory:
+    - example
+    - share
+  file:
+    - lib/Clustericious/Config/Plugin.pm
+    - lib/Clustericious/Util.pm
+recommends:
+  Cpanel::JSON::XS: '0'
+  EV: '0'
+  PerlX::Maybe::XS: '0'
+requires:
+  Capture::Tiny: '0'
+  Data::Rmap: '0'
+  DateTime::Format::DateParse: '0'
+  DateTime::Format::ISO8601: '0'
+  File::HomeDir: '0.91'
+  File::ReadBackwards: '0'
+  File::ShareDir: '0'
+  File::Which: '0'
+  Hash::Merge: '0'
+  JSON::MaybeXS: '0'
+  List::MoreUtils: '0'
+  Log::Log4perl: '0'
+  Log::Log4perl::Appender::TAP: '0.02'
+  MojoX::Log::Log4perl: '0'
+  Mojolicious: '7.31'
+  Path::Class: '0.26'
+  PerlX::Maybe: '0.003'
+  Sub::Exporter: '0'
+  Sub::Identify: '0.05'
+  Term::Prompt: '0'
+  YAML::XS: '0'
+  autodie: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/clustericious/Clustericious/issues
+  homepage: https://metacpan.org/pod/Clustericious
+  repository: git://github.com/clustericious/Clustericious.git
+version: '1.24'
+x_serialization_backend: 'YAML::Tiny version 1.70'

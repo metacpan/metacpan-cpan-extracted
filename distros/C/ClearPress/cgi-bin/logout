@@ -1,0 +1,29 @@
+#!/usr/bin/perl -T
+#########
+# Author:        rmp
+# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: logout 348 2010-01-04 13:02:42Z zerojinx $
+# Source:        $Source$
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/cgi-bin/logout $
+#
+use strict;
+use warnings;
+use ClearPress::authdecor qw($AUTH_COOKIE);
+
+our $VERSION = do { my ($r) = q$Revision: 348 $ =~ /(\d+)/smx; $r; };
+
+my $decor  = ClearPress::authdecor->new();
+my $cgi    = $decor->cgi();
+my $cookie = $cgi->cookie(
+                          -name    => $AUTH_COOKIE,
+                          -value   => q[],
+                          -expires => '-1d',
+                         );
+$decor->username(q[]);
+print qq[Set-Cookie: $cookie\n];
+if($ENV{HTTP_REFERER} !~ m{/logout}smix) {
+  print qq[Location: $ENV{HTTP_REFERER}\n];
+}
+print $decor->header();
+print q[<h2>You have logged out</h2>];
+print $decor->footer();

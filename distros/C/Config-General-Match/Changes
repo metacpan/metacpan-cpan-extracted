@@ -1,0 +1,20 @@
+Revision history for Config-General-Match
+
+0.05    2005-Jul-30
+        - added pointer to Config::Context, which supercedes this module
+
+0.04    2005-Mar-12
+        - updated copyright dates in pod
+        - fixed error in docs regarding Data::Dumper
+
+0.03    2005-Jan-29
+        - Switched to Module::Build
+        - first CPAN release
+
+0.02    2005-Jan-27
+        - Minor packaging fixes
+        - Test suite now uses warnings
+
+0.01    2005-Jan-27
+        First released version
+

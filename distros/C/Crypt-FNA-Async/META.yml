@@ -1,0 +1,22 @@
+---
+name: Crypt-FNA-Async
+version: 0.10
+author:
+  - 'Mario Rossano aka Anak <software@netlogicalab.com>'
+abstract: Crypt::FNA::Async - allow parallel encryption/decryption with Crypt::FNA and threads
+license: perl
+build_requires:
+  Test::More: 0
+generated_by: my hand
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  Crypt::FNA::Async:
+    file: lib/Crypt/FNA/Async.pm
+    version: 0.10
+requires:
+  Crypt::FNA: 0.48
+resources:
+  license: http://dev.perl.org/licenses/
+  homepage: http://www.netlogica.it

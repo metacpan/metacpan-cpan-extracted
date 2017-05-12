@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::X509::CRL.
+
+0.01  Mon Jan  1 14:49:54 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Crypt::X509::CRL
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Plugin::Account::AutoDiscovery.
+
+0.01  Thu Aug 11 03:59:40 2005
+	- original version; created by h2xs 1.23 with options
+		-XA Catalyst::Plugin::Account::AutoDiscovery
+

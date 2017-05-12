@@ -1,0 +1,20 @@
+Revision history for Crypt-FNA-Async
+
+0.10    26/05/2011 12:30
+	added Build.PL to Makefile.PL  for greater compatibility
+
+0.08    24/05/2011 11:44
+        fixed synchronous management where the threads are not supported
+	fixed check Crypt::FNA: return error to $self->message (code 22 - Crypt::FNA not present)
+
+0.04    18/05/2011 14:32
+        Added synchronous management where the threads are not supported
+	Added check Crypt::FNA
+	
+0.02    17/05/2011 12:20
+        POD correction
+        new internal method make_fna_object
+        modified makefile for dependency
+
+0.01    16/05/2011 12:20
+        parallel encryption/decryption files on a multicore cpu using threads

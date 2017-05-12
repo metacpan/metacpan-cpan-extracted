@@ -1,0 +1,74 @@
+NAME
+    Catalyst::View::JavaScript::Minifier::XS - Minify your served JavaScript
+    files
+
+VERSION
+    version 2.102000
+
+SYNOPSIS
+     # creating MyApp::View::JavaScript
+     ./script/myapp_create.pl view JavaScript JavaScript::Minifier::XS
+
+     # in your controller file, as an action
+     sub js : Local {
+        my ( $self, $c ) = @_;
+
+        # loads root/js/script1.js and root/js/script2.js
+        $c->stash->{js} = [qw/script1 script2/];
+
+        $c->forward('View::JavaScript');
+     }
+
+     # in your html
+     <script type="text/javascript" src="/js"></script>
+
+DESCRIPTION
+    Use your minified js files as a separated catalyst request. By default
+    they are read from "$c->stash->{js}" as array or string. Also note that
+    this does not minify the javascript if the server is started in
+    development mode.
+
+CONFIG VARIABLES
+    stash_variable
+      sets a different stash variable from the default "$c->stash->{js}"
+
+    js_dir
+      Directory containing your javascript files. If a relative path is
+      given, it is taken as relative to your app's root directory. If a
+      false value is passed to js_dir then no directory is used.
+
+      default : js
+
+    subinclude
+      setting this to true will take your js files (stash variable) from
+      your referer action
+
+       # in your controller
+       sub action : Local {
+          my ( $self, $c ) = @_;
+
+          # load exclusive.js only when /action is loaded
+          $c->stash->{js} = "exclusive";
+       }
+
+      This could be very dangerous since it's using
+      "$c->forward($c->request->headers->referer)". It doesn't work with the
+      index action!
+
+      default : false
+
+SEE ALSO
+    JavaScript::Minifier::XS
+
+AUTHORS
+    *   Ivan Drinchev <drinchev (at) gmail (dot) com>
+
+    *   Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Ivan Drinchev <drinchev (at)
+    gmail (dot) com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

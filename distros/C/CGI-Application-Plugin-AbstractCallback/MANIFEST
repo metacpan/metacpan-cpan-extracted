@@ -1,0 +1,11 @@
+Changes
+lib/CGI/Application/Plugin/AbstractCallback.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_core.t
+t/10_init_hook.t
+t/lib/CGI/Application/Plugin/AbstractCallback/Test/Core.pm
+t/lib/CGI/Application/Plugin/AbstractCallback/Test/InitHook.pm
+t/lib/CGI/Application/Plugin/AbstractCallback/Test/InitSetter.pm

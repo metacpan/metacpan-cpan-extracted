@@ -1,0 +1,11 @@
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$
+^blib/
+^pm_to_blib$
+^CGI-Kwiki-
+^mykwiki/
+^mod_kwiki/
+^inc/SCRIPTS/
+^t/kwiki/
+\B.svn\b

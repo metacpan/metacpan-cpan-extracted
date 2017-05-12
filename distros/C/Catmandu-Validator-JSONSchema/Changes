@@ -1,0 +1,7 @@
+Revision history for Catmandu-Validator-JSONSchema
+
+0.11  2016-04-06 08:42:47 CEST
+    - use JSON::Validator instead of old package JSON::Schema
+
+0.1  2014-07-02
+    - initial release

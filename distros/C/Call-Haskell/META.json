@@ -1,0 +1,65 @@
+{
+   "abstract" : "Call Haskell functions from Perl",
+   "author" : [
+      "Wim Vanderbauwhede  <Wim.Vanderbauwhede@mail.be>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Call-Haskell",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "2.54",
+            "Inline" : "0.78",
+            "Inline::C" : "0.73",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wimvanderbauwhede/Perl-Call-Haskell/issues"
+      },
+      "homepage" : "https://github.com/wimvanderbauwhede/Perl-Call-Haskell",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wimvanderbauwhede/Perl-Call-Haskell.git",
+         "web" : "https://github.com/wimvanderbauwhede/Perl-Call-Haskell"
+      }
+   },
+   "version" : "v0.2.1"
+}
+

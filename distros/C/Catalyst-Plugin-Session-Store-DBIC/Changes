@@ -1,0 +1,65 @@
+Revision history for Catalyst-Plugin-Session-Store-DBIC
+
+0.14  Sat Jul 27 12:29:00 PST 2013
+   - Fix repository metadaa. RT#87249
+
+0.13  Fri Jun 14 17:30:00 BST 2013
+    - Don't use %ENV for passing data structures to tests.
+	  This fixes the tests on Perl 5.18, which stringifies %ENV values
+ 	  immediately. RT#86148
+
+0.12  Thu Aug  4 23:56:00 BST 2011
+        - Changed a test case to be less picky about the actual text captured
+          from warnings.  This was done to support some changes introduced by
+          the Catalyst -> PSGI port.
+
+0.11  Fri Oct 16 15:04:07 CEST 2009
+        - Convert to new session config key.
+
+0.10  Tue Jul  7 13:00:27 CEST 2009
+        - Depend on a recent Store::Delegate for the NEXT -> MRO::Compat
+          switch.
+
+0.09  Wed Mar 31 16:35:52 CEST 2009
+        - Port from NEXT to MRO::Compat (Florian Ragwitz).
+        - Remove tests relying on the deprecated DBIx::Class::DB
+          (Florian Ragwitz).
+
+0.08  Wed Nov 26 10:02:52 EST 2008
+        - Workaround possible errors with Storable::thaw and empty
+          strings (thanks to kevin montuori for suggesting a fix)
+
+0.07  Wed Sep 24 17:08:34 EDT 2008
+        - Code was silently truncating storage to MySQL, rendering the
+          session unreadable. Patched to check DBIx::Class size from
+          column_info (if available)
+        - Wrap find_or_create calls in a transaction to (hopefully)
+          avoid issues with duplicate flash rows
+
+0.06  Sat Sep 16 15:42:50 EDT 2006
+        - Convert to Catalyst::Plugin::Session::Store::Delegate (with
+          help from nothingmuch)
+
+0.05  Mon Jul 31 16:58:32 EDT 2006
+        - Bump Catalyst::Plugin::Session dependency (tests use
+          session_is_valid)
+        - Fix a possible bug with passing an empty string to
+          Storable::thaw
+
+0.04  Sat Jul 29 23:02:27 EDT 2006
+        - Catalyst::Plugin::Session 0.06 saves the session expiration
+          before the sesssion, so make sure the session row is created then
+        - Minor cleanup to get_session_data and store_session_data
+          methods
+        - Use delete instead of delete_all to avoid object inflation
+          penalty in delete_session_data and delete_expired_sessions
+        - Use 'select' to fetch only the desired field from the database
+
+0.03  Mon Mar  6 21:17:38 EST 2006
+        - Check the configuration earlier for a dbic_class value
+
+0.02  Sat Mar  4 15:55:30 EST 2006
+        - Minor documentation update
+
+0.01  Sat Mar  4 13:02:28 EST 2006
+        - Initial revision

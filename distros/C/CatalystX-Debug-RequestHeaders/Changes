@@ -1,0 +1,6 @@
+0.002 2010-04-09
+ - Change repository to Catalyst git
+ - Fix required Catalyst version number.
+
+0.001 2010-03-28
+ - Initial release

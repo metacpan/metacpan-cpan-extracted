@@ -1,0 +1,12 @@
+Revision history for Catalyst-ResponseHelpers
+
+1.02  2016-09-14 09:37:39 PDT
+        - Add a FromByteString() helper analogous to FromCharString()
+
+1.01  2016-08-11 14:15:56 PDT
+        - Use 204 No Content when no message is provided to Ok().  204 No
+          Content is more accurate and also means that that commonly-used
+          Catalyst::Action::RenderView won't interfere.
+
+1.00  2016-06-14 10:00:50 PDT
+        - Initial release

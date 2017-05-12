@@ -1,0 +1,92 @@
+#!/usr/bin/perl -T
+
+use warnings;
+use strict;
+use lib qw(lib);
+use Getopt::Long;
+use Readonly;
+
+BEGIN {
+  $ENV{DOCUMENT_ROOT} = './htdocs';
+}
+
+use ClearPress::controller;
+
+use GrandKids::view::error;
+use GrandKids::util;
+
+use GrandKids::view::child;
+use GrandKids::model::child;
+use GrandKids::view::family;
+use GrandKids::model::family;
+
+our $VERSION = q[468];
+Readonly::Scalar our $PORT => 8080;
+
+my $opts = {};
+GetOptions($opts, qw(port=s));
+my ($port) = ($opts->{port} || $PORT) =~ /(\d+)/smx;
+
+GrandKids::sa->new($port)->run;
+
+0;
+
+package GrandKids::sa;
+use base qw(HTTP::Server::Simple::CGI);
+use strict;
+use warnings;
+use Data::Dumper;
+use Carp;
+use English qw(-no_match_vars);
+
+sub handle_request {
+  my ($self, $cgi) = @_;
+
+  my $EXTN = {
+	      css  => 'text/css',
+	      xml  => 'text/xml',
+	      gif  => 'image/gif',
+	      png  => 'image/png',
+	      jpg  => 'image/jpeg',
+	      txt  => 'text/plain',
+	      html => 'text/html',
+              js   => 'text/javascript',
+	     };
+
+  my $util = GrandKids::util->new({
+				   cgi => $cgi,
+				  });
+
+  my ($fn) = "htdocs$ENV{REQUEST_URI}" =~ m|([a-z\d_/\.\-%]+)|mix;
+  $fn      =~ s|\.\./||smxg;
+
+  if(-f $fn) {
+    print "HTTP/1.0 200 OK\n";
+    my ($ext) = $fn =~ /\.([^\.]+)$/smx;
+
+    my $type  = $EXTN->{lc $ext} || 'application/octet-stream';
+    print qq(Content-type: $type\n\n);
+    carp qq(Serving static file $fn as $ext / $type);
+    open my $fh, $fn or croak "Opening $fn: $ERRNO";
+    while(<$fh>) {
+      print;
+    }
+    close $fh or croak "Closing $fn: $ERRNO";
+
+  } else {
+    print "HTTP/1.0 200 OK\n";
+
+    ClearPress::controller->handler($util);
+  }
+
+  return 1;
+}
+
+sub print_banner {
+  my $self = shift;
+  print q[GrandKids development server up and running at http://localhost:].$self->port()."/\n";
+  return 1;
+}
+
+1;
+ 

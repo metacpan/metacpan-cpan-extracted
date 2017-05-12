@@ -1,0 +1,34 @@
+---
+name: Crypt-Rot47
+version: 0.06
+author: ["Zachary Blair <zblair@cpan.org>"]
+abstract: 'Encryption and decryption of ASCII text using the Rot47 substitution cipher.'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  ExtUtils::MakeMaker: 0
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+requires:
+  perl: 5.006
+no_index:
+  directory:
+    - t
+provides:
+  Crypt::Rot47:
+    file: lib/Crypt/Rot47.pm
+    version: 0.06
+keywords:
+  - rot47
+  - encrypt
+  - decrypt
+  - cryptography
+  - cipher
+  - obfuscate
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

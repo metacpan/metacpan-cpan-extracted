@@ -1,0 +1,40 @@
+msgid "New"
+msgstr "新規"
+
+msgid "Detail"
+msgstr "詳細"
+
+msgid "Edit"
+msgstr "編集"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "List"
+msgstr "一覧"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "Update"
+msgstr "更新"
+
+msgid "Login"
+msgstr "ログイン"
+
+msgid "Logout"
+msgstr "ログアウト"
+
+msgid "TinyUrl_class_name"
+msgstr "TinyURL"
+
+msgid "TinyUrl_id"
+msgstr "ID"
+
+msgid "TinyUrl_disable"
+msgstr "削除"
+
+msgid "TinyUrl_long_url"
+msgstr "URL"
+
+

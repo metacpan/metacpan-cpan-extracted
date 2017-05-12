@@ -1,0 +1,201 @@
+Revision history for Constant::Export::Lazy
+
+0.17 2016-07-15 21:10:49
+
+   - Fix grammar & POD formatting in POD.
+
+0.16 2016-07-14 15:29:51
+
+   - My changes in 0.15 broke things for anyone using this package in
+     conjunction with UNIVERSAL. See the end of the section discussing
+     wrap_existing_import in the documentation for more details.
+
+0.15 2016-06-01 13:42:03
+
+   - Continue the change I made in 0.14 and replace the remaining
+     occurrences of manual CODE symbol table munging with ->can()
+     where possible.
+
+0.14 2015-12-09 13:40:03
+
+   - Simplify a lot of special cases around CODE / constant.pm
+     generated constants by using more generic syntax to call our
+     constants.
+
+     We now just use ->can($name)->() instead of all this manual
+     munging of the symbol table.
+
+0.13 2014-12-27 21:23:06
+
+    - Fix a long-standing bug of being unable to define constants from
+      sub-packages at "call" time.
+
+      If you were in the callback for YourExporter::CONSTANT and
+      required a module that also used YourExporter module to get some
+      YourExporter::UNRELATED_CONSTANT we wouldn't create that symbol
+      for that module and we'd most likely die at compile-time.
+
+      The reason for this is that we had a really naïve notion of when
+      we should be interning constants purely based on whether we were
+      in a nested "call" subroutine. Now we keep track of what
+      constants packages want and intern those symbols they request.
+
+    - We now use FATAL "recursion" warnings in Constant::Export::Lazy,
+      if we've gone above perl's built-in recursion limit of 100 we'd
+      rather die early than slowly exhaust all the memory on the
+      system and have the OOM killer kill us when this happens.
+
+    - Get rid of the Constant::Export::Lazy::Ctx::new()
+      method. Instead we just bless directly into the package, this is
+      just a nano-optimization.
+
+    - Add a new test to see if we're actually defining constants, this
+      test piggy-backs on the warnings emitted when our constant
+      subroutines are overridden.
+
+    - Clarify & reword some POD & inline comments.
+
+0.12 2014-12-19 09:44:37
+
+    - Added COPYRIGHT AND LICENSE section to pod, with standard "as perl"
+      boilerplate.
+
+    - Specified min perl version 5.6.0 in both code and metadata.
+
+    - I don't know if this software actually works in 5.6.0, but
+      you're welcome to try. All changes in this release brought to
+      you by Neil Bowers via
+      https://github.com/avar/constant-export-lazy/pull/2.
+
+0.11 2014-12-01 21:03:29
+
+    - This release only has changes to make the test suite more
+      portable, nothing else.
+
+    - Solve RT #95756 with the help of SPROUT, now we use B:: to test
+      if we actually generated constants instead of using
+      Data::Dump::Streamer.
+
+    - We're also more forgiving about failures in our B::Deparse
+      tests, and skip those tests on platforms where shelling out to
+      -MO=Deparse doesn't work.
+
+    - We now have no non-core test Prereqs. We just need a stock
+      v5.8.0 to have all the prereqs we need, and in theory this
+      module should work & run the test suite as far back as 5.000
+      with the right test prereqs installed.
+
+0.10 2014-11-05 10:44:33
+
+    - The symbol exporter we were using was too eager and would export
+      the entire *GLOB of a given constant we were exporting. So as an
+      unintended side-effect exporting the constant CONST would also
+      defined $FOO, @FOO, %FOO etc. in that package. Now instead we'll
+      only export &FOO.
+
+      Upgrading to this release could cause compile-time errors in
+      existing code that implicitly relies on Constant::Export::Lazy
+      to define these package-level symbols, but those cases should
+      reveal genuine bugs. Code that doesn't rely on that side-effect
+      should work as before.
+
+0.09 2014-11-01 18:24:11
+
+    - Attempt to future-proof how we define the constant subs for
+      possible future perl core changes, see the "Is it time to
+      separate pad names from SVs?" thread on perl5-porters. No
+      functional changes for currently released perls.
+
+    - Minor POD fixes from a couple of patches sent in via RT #99956
+      and pull request #1 on GitHub.
+
+0.08 2014-08-29 10:57:41
+
+    - Improve the error message we show when we can't find a constant,
+      now actually mention the constant we can't find.
+
+    - This module actually worked on 5.8, but I recently broke 5.8
+      support by adding a test that used 5.10 features, that's now
+      fixed and we'll skip that test on <5.10 (it's just for testing
+      the synopsis, not core functionality).
+
+0.07 2014-05-06 21:51:39
+
+    - No code changes at all. Just added tests to show that defining
+      constant subs like I'm doing it doesn't work under 5.19.x (see
+      "Re: How about having a recommended way to add constant subs
+      dynamically?" on perl5-porters) --
+      http://code.activestate.com/lists/perl5-porters/206929/
+
+      I'll fix that in future releases, but first I want to get some
+      test coverage on how defining constants works (or doesn't work)
+      on different perl versions.
+
+0.06 2014-03-10 21:14:32
+
+    - Test & documentation for the API of private_name_munger
+
+    - Trivial POD formatting error fix, no code changes at all.
+
+    - Other POD rewording/documentation fixes / additions.
+
+0.05 2014-02-23 16:37:00
+
+    - Fix a minor failing test failing due to making an assumption
+      about the internal workings of constant.pm that worked in 5.19.*
+      but not in earlier perl versions.
+
+0.04 2014-02-22 14:28:35
+
+    - This is a major release
+
+    - Add support for a buildargs callback. This can be used to add
+      support for export tags, or to map the parameters to import() in
+      any other way you can think of.
+
+    - A new private_name_munger option is now available both globally
+      and locally per-constant. This can be used to obscure the
+      internal names of generated constants, to avoid hard to track
+      down errors related to using lazy constants someone else might
+      define for you (and then suddenly stop doing so).
+
+    - When using the wrap_existing_import option the $ctx->call()
+      method wouldn't work with some constant.pm-generated
+      subroutines. This has now been exhaustively fixed.
+
+    - After a lot of playing around with test coverage the test
+      coverage of this module is now 100%. A few minor bugs were fixed
+      in the process of achieving this.
+
+    - Some minor documentation improvements, mainly rewording existing
+      sentences.
+
+0.03 2013-09-15 15:36:42
+
+    - Fix trivial POD errors I didn't spot in the 0.02 release.
+
+0.02 2013-09-15 15:28:10
+
+    - Huge release with lots of new features and bugfixes.
+
+    - Added an 'after' callback.
+
+    - Added a 'stash' method / option.
+
+    - Don't re-generate constants if someone subclasses the consatnt
+      exporter.
+
+    - Only export constant when explicitly requested, not everything
+      we $ctx->call(...). Removes leaks in the API.
+
+    - Correct behavior for skipping the interning of constants in the
+      stash during override *only* for those constants we're
+      overriding, not everything else.
+
+    - Add tests for interop with constant.pm
+
+    - Huge POD rewrite and lots of tests / examples added.
+
+0.01 2013-08-30 12:32:23
+
+    - Initial version

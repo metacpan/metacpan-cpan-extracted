@@ -1,0 +1,25 @@
+Class::Trait 
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries outside of the core modules
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2005 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

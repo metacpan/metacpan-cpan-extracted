@@ -1,0 +1,168 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Closure::Explicit
+at lib/Closure/Explicit.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Closure::Explicit - check coderefs for variable capture
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+ use Closure::Explicit qw(callback);
+
+ {
+   package Example;
+   sub new { my $class = shift; bless {}, $class }
+   sub method { my $self = shift; print "In method\n" }
+ }
+ my $self = Example->new;
+ # This will raise an exception due to the reference to $self
+ eval {
+   my $code = callback {
+     $self->method;
+   };
+ };
+ # This will not raise the exception because $self is whitelisted
+ my $code = callback {
+   $self->method;
+ } [qw($self)];
+ # This will wrap the coderef so we can pass a weakened copy of $self
+ my $code = callback {
+   my $self = shift;
+   $self->method;
+ } weaken => [qw($self)];
+
+=head1 DESCRIPTION
+
+Attempts to provide some very basic protection against unintentional
+capturing of lexicals in a closure.
+
+For example, code such as the following risks creating cycles which
+mean the top-level object is never freed:
+
+ sub some_method {
+   my $self = shift;
+   $self->{callback} = sub { $self->other_method }
+ }
+
+and this can in turn lead to memory leaks.
+
+=head1 API STABILITY
+
+The main L</callback> function is not expected to change in future versions,
+so as long as you use this:
+
+ use Closure::Explicit qw(callback);
+
+to import the function into your local namespace, or fully-qualify it using
+
+ Closure::Explicit::callback { ... }
+
+then you should have no problems with future versions of this module.
+
+However, it is highly likely that a future version will also start exporting
+a differently-named function with a better interface.
+
+=head1 EXPORTS
+
+=head2 callback
+
+Checks the given coderef for potential closure issues, raising an exception if any
+are found and returning the coderef (or a wrapped version of it) if everything is
+okay.
+
+The first parameter is the block of code to run. This is protoyped as C< & > so
+you can replace the usual 'sub { ... }' with 'callback { ... }'. If you already
+have a coderef, you can pass that using C< &callback($code, ...) >, but please
+don't.
+
+Remaining parameters are optional - you can either pass a single array, containing
+a list of the B<names> of the variables that are safe to capture:
+
+ callback { print "$x\n" } [qw($x)];
+
+or a list of named parameters:
+
+=over 4
+
+=item * weaken => [...] - list of B<variable names> which will be copied, weakened
+via L<Scalar::Util/weaken>, then prepended to the parameter list available in @_
+in your code block
+
+=item * allowed => [...] - list of B<variable names> to ignore if used in the code,
+same behaviour as passing a single arrayref
+
+=back
+
+For example, a method call might look like this:
+
+ my $code = callback {
+   my $self = shift;
+   $self->method(@_);
+ } weaken => [qw($self)];
+
+although L<curry::weak> would be a much cleaner alternative there:
+
+ my $code = $self->curry::weak::method;
+
+You can mix C<weaken> and C<allowed>:
+
+ my $x = 1;
+ my $code = callback {
+   shift->method(++$x);
+ } weaken => [qw($self)], allowed => [qw($x)];
+
+=head2 lint
+
+Runs checks on the given coderef. This is used internally and not exported,
+but if you just want to get a list of potential problems for a coderef,
+call this:
+
+ my @errors = lint($code, allowed => [qw($x)]);
+
+It's unlikely that the C<weaken> parameter will work when calling this
+function directly - this may be fixed in a future version.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<curry> - provides a convenient interface for creating callbacks
+
+=item * L<PadWalker> - does most of the real work behind this module
+
+=item * L<Test::RefCount> - convenient testing for reference counts, makes
+cycles easier to detect in test code
+
+=item * L<Devel::Cycle> - reports whether cycles exist and provides useful
+diagnostics when any are found
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2013. Licensed under the same terms as Perl itself.

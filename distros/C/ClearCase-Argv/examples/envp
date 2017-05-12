@@ -1,0 +1,13 @@
+## Demonstrates how to modify the environment for a child process
+## in instance scope. Run as "perl envp <vob-tag>".
+## Note: this will not work in "ipc mode" since there's no
+## (easy) way to modify the child process's environment.
+
+use ClearCase::Argv;
+ClearCase::Argv->attropts;
+
+my $ct = ClearCase::Argv->new;
+$ct->lsco([qw(-avobs -cvi -s)]);
+$ct->dbglevel(1);
+$ct->envp({%ENV, CLEARCASE_AVOBS => shift || '.'});
+$ct->system;

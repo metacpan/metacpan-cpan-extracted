@@ -1,0 +1,15 @@
+---
+abstract: 'Yet another blowfish algorithm'
+author:
+  - 'Rodrigo de Oliveira <rodrigolive@gmail.com>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092450'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-Blowfish-Mod
+requires:
+  Carp: 0
+  MIME::Base64: 0
+  Test::More: 0
+version: 0.04

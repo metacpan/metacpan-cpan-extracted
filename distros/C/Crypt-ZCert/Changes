@@ -1,0 +1,40 @@
+Revision history for Perl module Crypt-ZCert
+
+0.003002 2015-07-17
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+0.003001 2014-11-23
+
+  - Make ->generate_keypair available as a class method
+
+0.002005 2014-11-21
+
+  - Depend on newer Path::Tiny (for ->chmod)
+
+0.002004 2014-11-08
+
+  - Switch to FFI::CheckLib for dynamic lib check
+
+0.002003 2014-10-27
+
+  - Depend on newer List::Objects::WithUtils to guarantee TO_ZPL availability
+
+0.002002 2014-10-26
+
+  - Documentation & test fixes
+
+0.002001 2014-10-26
+
+  - Provide 'export_zcert' method for returning generated certs
+
+  - Add 'ignore_existing =>' constructor opt to allow overwriting existing
+    certificates
+
+  - Fix missing file warn/die behavior
+
+  - Return invocant from ->commit
+
+0.001001 2014-10-25
+
+  - Initial release

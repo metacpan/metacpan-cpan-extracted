@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb94
+registers:
+  AF: 60928
+  AF_: 0
+  BC: 36683
+  BC_: 0
+  DE: 10289
+  DE_: 0
+  HL: 53926
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,7 @@
+Changelog for the Perl extension CPAN::Index
+
+0.02 Tue 26 Sep 2006
+	- Completed unit tests for the loaders
+
+0.01 Tue  9 May 2006
+	- Created initial version

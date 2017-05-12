@@ -1,0 +1,70 @@
+NAME
+    Catalyst::Action::Serialize::Data::Serializer - Serialize with
+    Data::Serializer
+
+SYNOPSIS
+       package MyApp::Controller::Foo;
+
+       use Moose;
+       use namespace::autoclean;
+
+       BEGIN { extends 'Catalyst::Controller' }
+
+       __PACKAGE__->config(
+           'default'   => 'text/x-yaml',
+           'stash_key' => 'rest',
+           'map'       => {
+               'text/x-yaml'        => 'YAML',
+               'application/json'   => 'JSON',
+               'text/x-data-dumper' => [ 'Data::Serializer', 'Data::Dumper' ],
+           },
+       );
+
+DESCRIPTION
+    This module implements a serializer for use with "Data::Dumper" and
+    others. It was factored out of Catalyst::Action::REST because it is
+    unlikely to be widely used and tends to break tests, be insecure, and is
+    generally weird. Use at your own risk.
+
+AUTHOR
+    Adam Jacob <adam@stalecoffee.org>, with lots of help from mst and
+    jrockway
+
+    Marchex, Inc. paid me while I developed this module.
+    (<http://www.marchex.com>)
+
+CONTRIBUTORS
+    Tomas Doran (t0m) <bobtfish@bobtfish.net>
+
+    John Goulah
+
+    Christopher Laco
+
+    Daisuke Maki <daisuke@endeworks.jp>
+
+    Hans Dieter Pearcey
+
+    Brian Phillips <bphillips@cpan.org>
+
+    Dave Rolsky <autarch@urth.org>
+
+    Luke Saunders
+
+    Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
+    J. Shirley <jshirley@gmail.com>
+
+    Gavin Henry <ghenry@surevoip.co.uk>
+
+    Gerv http://www.gerv.net/
+
+    Colin Newell <colin@opusvl.com>
+
+    Wallace Reis <wreis@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2006-2013 the above named AUTHOR and CONTRIBUTORS
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

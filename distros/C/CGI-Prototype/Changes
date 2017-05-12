@@ -1,0 +1,31 @@
+Revision history for Perl extension CGI::Prototype.
+
+0.9054   Sat Jul 30 10:17:04 PDT 2011
+	 Remove "defined" from "defined %Foo::Bar::" for empty package test.
+
+0.9053	 Wed May 11 20:50:22 EDT 2005
+	 Add CGI::_reset_globals() so that this works with mod_perl-like places
+
+0.9052  Wed Apr  6 10:50:26 PDT 2005
+	Broke out CGI::Prototype::Mecha as a separate distro
+
+0.9051  Sat Mar 26 09:42:29 PST 2005
+	Add dependency on modern LWP for Mecha
+	Add Test::Pod and Test::Pod::Coverage
+
+0.9050  Wed Mar 23 15:34:13 PST 2005
+	add ->prototype_enter, ->prototype_leave, ->initialize_CGI
+	move CGI init into ->initialize_CGI
+        add ->engine_config
+        Fix CGI::Prototype::Mecha to deal with multipart form post
+        (thanks to new CGI.pm, argh.)
+	add ->interstitial, ->config_interstitial_param
+
+0.90  Wed Dec  1 10:26:44 PST 2004
+      Refactor from monolith, pulling out CGI::Prototype::Hidden
+      Add tests and docs
+      Add CGI::Prototype::Mecha
+      First public release
+
+0.8x  [circa summer 2004]
+      CGI::Prototype version from client

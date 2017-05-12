@@ -1,0 +1,41 @@
+Revision history for Perl extension CGI::Wiki::Plugin::Diff.
+
+0.09  Sat Jan  7 2006
+    - 0.08 missed out a change on dependencies as Module:::Optional needed.
+
+0.08  Sat Dec 31 2005
+    - Fixed trailing whitespace problem (OpenGuides Trac ticket 73)
+    - Made Params::Validate dependency optional
+    - Added pod and pod coverage tests
+
+0.07  Sat Jun 26 2004
+    - Fixed Dom's problem with trailing newlines, or rather the
+      handling of undef passed in parameters to line_number
+      and intradiff.
+
+0.06  Sat May 15 2004
+    - Looked at Earle's "false positive" problem with word matching
+    - Made internal method calls visible, hence subclassable
+    - changed to use Params::Validate for validation
+
+0.05  Thu Dec 18 2003
+    - Corrected another bug in the diffing. Was not correctly
+      handling words that did not have an immediately following space.
+
+0.04  Thu Dec 18 2003
+    - Use VCS::Lite::Delta->hunks method call instead of 
+      breaking encapsulation (needs VCS::Lite 0.05)
+    - Allow selection of metadata variables
+    - Fix a bug with <BR /> tags not being handled
+
+0.03  Sun Dec 07 2003
+    - Fix sort order for multiple metadata entries. This was
+      causing tests to fail on some platforms.
+
+0.02  Sat Dec 06 2003
+    - Remove absorb of trailing punctuation in words as it's
+      more trouble than it's worth. Fix dependency on CGI::Wiki.
+
+0.01  Sat Nov 15 2003
+    - Migrated from OpenGuides::Diff.pm
+

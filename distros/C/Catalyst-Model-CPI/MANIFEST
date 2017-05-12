@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Catalyst/Model/CPI.pm
+t/01app.t
+t/20live.t
+t/lib/TestApp.pm
+t/lib/TestApp/Model/CPI.pm
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

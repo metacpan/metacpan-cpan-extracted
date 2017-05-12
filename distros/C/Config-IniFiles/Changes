@@ -1,0 +1,465 @@
+2.94        2016-11-29
+    * Move to GitHub.
+        - for better visibility, collaboration, and CI options.
+    * Apply a patch/pull-request from Peter from Debian with some corrections
+    for typos:
+        - https://github.com/shlomif/perl-Config-IniFiles/pull/1
+        - https://rt.cpan.org/Ticket/Display.html?id=119001
+        - Thanks!
+
+2.93        2016-07-24
+    * Add [MetaJSON] and META.json to the distribution.
+        - Pull-request by Kent Fredric - thanks!
+            - https://bitbucket.org/shlomif/perl-config-inifiles/pull-requests/5/ship-metajson-with-metajson/diff
+
+2.92        2016-06-17
+    * Hopefully fix tests with read/write test01.ini:
+        - http://www.cpantesters.org/cpan/report/121523be-341c-11e6-9fc5-14bfbd15da07
+    * Some cleanups and modernisations to the tests.
+
+2.91        2016-06-03
+    * Set minimal version of List::Util in the requires and in the code.
+        - Reported by some CPAN testers.
+
+2.90        2016-06-02
+    * Convert to Dist-Zilla with some induced enhancements.
+
+2.89        2016-05-03
+    * Abort if print returns false.
+        - See https://rt.cpan.org/Ticket/Display.html?id=114140
+            - "WriteConfig nullifies the file in case of no space left on disk"
+
+2.88        2015-07-10
+    * Apply speedup patch from James Rouzier.
+        - https://bitbucket.org/shlomif/perl-config-inifiles/pull-request/4/avoid-searching-through-all-the-sections/commits
+        - Avoids it being O(n^2).
+
+2.87        2015-06-16
+    * Replace List::MoreUtils with List::Util-1.33-or-above.
+        - We only used any() and none() which exist in List::Util too now.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=104764
+        - Thanks to DBOOK for the report.
+    * Fix handling of trailing comments which contain their delimiters twice.
+        - E.g: "key=val ; comment ; further comment".
+        - https://rt.cpan.org/Ticket/Display.html?id=105255
+        - Thanks to Rohan Carly for the report and a test case.
+
+2.86        2015-04-14
+    * Hopefully fix tests in perls less than 5.14
+        - Failed on CPAN Tester reports such as:
+        - http://www.cpantesters.org/cpan/report/88707ece-e22d-11e4-a1d1-8536eb4f9f07
+        - Thanks to Slaven Rezic for pointing it to me.
+
+2.85        2015-04-13
+    * Convert "Changes" (= this file) to CPAN::Changes.
+        - Added t/cpan-changes.t in the process.
+    * Add OLD-Changes.txt for the old changes' log.
+
+2.84        2015-04-13
+
+    * Fix https://rt.cpan.org/Public/Bug/Display.html?id=103496
+        - Improperly update while using _write_config_with_a_made_fh
+        - Thanks to JORISD for the report, a proposed patch and a test case.
+
+2.83        2014-01-27
+
+    * Add a LICENSE file and section.
+        - Kwalitee.
+
+    * Minimum version is now perl-5.8.0.
+        - CPANTS Kwalitee.
+
+2.82        2013-05-21
+
+    * Add t/style-trailing-space.t .
+        - Remove trailing space.
+
+2.81        2013-05-16
+
+    * Add the CopySection method to copy a section.
+        - Thanks to James Rouzier.
+
+2.80        2013-05-14
+
+    * Add the RenameSection method to rename a section.
+        - Thanks to James Rouzier.
+
+2.79        2013-05-6
+
+    * Fix test failures with Pod-Simple-3.28:
+        - http://www.cpantesters.org/cpan/report/98f9d3a8-b557-11e2-9adc-3d5fc1508286
+
+2.78        2012-10-21
+
+    * Fix https://rt.cpan.org/Public/Bug/Display.html?id=80259:
+        - Warnings on undefined value in length in perl-5.10.x.
+
+2.77        2012-06-21
+
+    * Bump the List::MoreUtils dependency to '0.33'.
+        - https://rt.cpan.org/Ticket/Display.html?id=77930
+        - Thanks to TJENNESS for the report.
+
+2.76        2012-06-15
+
+    * Correct the documentation regarding the syntax of calling ->WriteConfig(),
+    which always accepts a mandatory filename and not just
+    "->WriteConfig(-delta => 1)".
+        - Thanks to the Mageia Linux QA team at:
+            - https://bugs.mageia.org/show_bug.cgi?id=6024#c17
+
+2.75        2012-05-25
+
+    * Add "=encoding utf8" to the POD of lib/Config/IniFiles.pm
+        - The POD contained wide characters and it is now an error in
+        with recent Test::Pod and Pod::Simple.
+        - See for example: http://www.cpantesters.org/cpan/report/89000ebe-a5bc-11e1-a439-fa78ab6c2661
+
+2.74        2012-05-24
+
+    * Made sure .ini files are output on Win32 with CR-LF pairs.
+        - Thanks to Ben Johnson for reporting the bug and for a preliminary
+        test script.
+        - Add t/32mswin-outputs-contain-crs.t
+
+2.73        2012-05-14
+
+    * Regression bug fix: temporary file creation error should generate a warning
+    and return undef() instead of throwing an exception.
+        - https://rt.cpan.org/Ticket/Display.html?id=77039
+        - Thanks to Adam D. Barrat for noticing that, and Gregor Herrmann
+        from Debian for reporting this issue.
+
+2.72        2012-05-5
+
+    * More refactoring.
+
+    * Now requiring Fcntl (which is a core module) for SEEK_SET() and SEEK_CUR().
+
+    * Update the contact information on the POD.
+
+    * Maintainer’s special birthday (5-May) release.
+
+2.71        2012-05-2
+
+    * SECURITY BUG FIX: Config::IniFiles used to write to a temporary filename
+    with a predictable name ("${filename}-new") which opens the door for potential
+    exploits.
+
+    * Now requiring List::MoreUtils (for any() and other functions), File::Temp
+    and File::Basename .
+
+    * Add "use warnings;" to lib/Config/IniFiles.pm .
+
+    * More refactoring.
+
+2.70        2012-04-6
+
+    * Fix the test dependency (in the new t/31comments_with_spaces.t test)
+    on IO::stringy (now writing it to a file).
+        - This caused some CPAN Testers failures such as:
+            - http://www.cpantesters.org/cpan/report/c16b9978-7f40-11e1-9d6f-f6dbfa7543f5
+
+    * Modernized some of the open() calls in the test files.
+        - three args open, lexcial file handles, etc.
+
+2.69        2012-04-5
+
+    * Fix https://sourceforge.net/tracker/?func=detail&aid=3388382&group_id=6926&atid=106926
+        - "Trailing comments with whitespace are not recognised"
+        - Thanks to briconaut for the report and to rbowen for the patch and test.
+
+    * Add the method ->OutputConfigToFileHandle which is a more explicit and
+    safer version of ->OutputConfig.
+        - ->OutputConfig now uses it.
+        - all existing tests pass, and a new test was added to
+        t/15store-and-retrieve-here-doc-terminator.t .
+
+    * Started refactoring the code.
+        - Expand tabs to spaces.
+        - many other small changes.
+
+2.68        2011-06-21
+
+    * Typo correction: https://rt.cpan.org/Ticket/Display.html?id=69003
+
+2.67        2011-06-21
+
+    * Made sure that parameters with empty values will be written to the file.
+        - Fixes https://rt.cpan.org/Public/Bug/Display.html?id=68554 .
+
+2.66        2011-01-29
+
+    * Add support for the handle_trailing_comment option to support trailing
+    comments at the end of a param=value line.
+        - Fixes https://rt.cpan.org/Public/Bug/Display.html?id=43843 .
+        - Original patch by Peter Xu.
+        - Some comments and corrections of the patch by Shlomi Fish (the current
+        Config-IniFiles maintainer.)
+
+2.65        2010-11-25
+
+    * Replaced calls to File::Temp's tempfile() with those to its tempdir()
+    followed by File::Spec->catfile() - hopefully fixes the CPAN smoking failures
+    on Win32.
+
+2.64        2010-11-20
+
+    * Fixed https://rt.cpan.org/Ticket/Display.html?id=63177
+        - tag-release.pl was installed into lib/Config by EU-MM. Converted the
+        Makefile.PL to a wrapper around Build.PL by using Module-Build's
+        create_makefile_pl='small' instead of create_makefile_pl='traditional' .
+
+2.63        2010-11-19
+
+    * Fixed https://rt.cpan.org/Ticket/Display.html?id=63079 by
+    refactoring/bug-fixing the main module into the _OutputParam method, which
+    handles the output of multi-line and single-line parameters with all the edge
+    cases.
+        - The reported problem was that EOT was encountered again in certain cases
+        in the output string, and now we make sure the program always avoid it. The
+        reappearance of the bug was caused due to duplicate code, which was now
+        eliminated.
+
+2.62        2010-11-19
+
+    * Applied a modified version of Steven Haryanto's commit
+    ac6ace8bf09fabba4e6ea3b2826ff13cd30507bc :
+        - When writing config with fallback section, also omit the fallback
+        section header, like the original file. Also, change
+        t/19param-found-outside-section.t a bit to not require IO::Scalar and use
+        File::Temp instead (we are testing WriteConfig anyway).
+        - Shlomi Fish fixed unless'es to if's and converted a do { ... } if call to
+        a block conditional, as well as made the open statements on t/19param
+        more secure.
+
+    * Add -nomultiline option.
+        -Applied a modified version of Steven Haryanto's commit
+        2181f438d40b54c290a2dda5627a244c6e467a7b
+
+2.61        2010-11-14
+
+    * Correct the opening comment on t/26scalar-filehandle.t to point to the right
+    bug URL and to include the title of the bug
+        - https://rt.cpan.org/Ticket/Display.html?id=54997 - this is the right
+        URL.
+
+    * Correct the check in t/26scalar-filehandle.t - it should check that Perl
+    is above 5.8.x - not that IO::Scalar is available, because we use
+    open my $fh, "<", \$buffer;
+
+2.60        2010-11-13
+
+    * Made t/19param-found-outside-section.t pass in case IO::Scalar is not
+    installed.
+        - We got many failing test reports due to that, like:
+        - http://www.cpantesters.org/cpan/report/eb3df0f4-eeb7-11df-b934-9430e12b63f3
+
+2.59        2010-11-12
+
+    * Applied a patch from "sharyanto" about enabling the -fallback parameter
+    to new for items outside any section.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=62944
+
+    * Add the tag-release.pl file to tag a release.
+
+2.58        2010-05-17
+
+    * Incorporated a fix for some broken POD.
+        - https://rt.cpan.org/Ticket/Display.html?id=51617
+        - Thanks to Frank Wiegand for reporting it.
+
+    * Got rid of \r/carriage-returns's in lib/Config/IniFiles.pm .
+        - It interfered with applying a patch.
+
+    * Applied a patch to get rid of indirect object notation in the documentation
+    and code ("new Config::IniFiles") and replace it with Config::IniFiles->new().
+        - https://rt.cpan.org/Ticket/Display.html?id=57536
+        - Thanks to Tom Molesworth for the patch.
+
+2.57        2010-03-1
+
+    * Fixed failure to read the ini file contents from a filehandle made out of a
+      scalar
+        - https://rt.cpan.org/Ticket/Display.html?id=45997
+        - Applied a patch by Nicolas Mendoza - thanks!
+
+2.56        2009-12-31
+
+    * Hopefully fixed the skip() in t/07misc.t
+        - https://rt.cpan.org/Public/Bug/Display.html?id=53238
+        - It was skip($num, $label) instead of skip($label, $num) and it
+        lacked a "SKIP:" label.
+
+2.55        2009-12-22
+
+    * Refactoring the tests:
+        - Converted t/05hash.t to Test::More and modernised it.
+        - Converted t/06oo.t to Test::More and modernised it.
+        - Testing: extracted t/lib/Config/IniFiles/TestPaths.pm.
+        - Converted t/10delta.t to Test::More and modernised it.
+        - Add the t_unlink method.
+
+2.54        2009-11-18
+
+    * Adapted t/25line-endings.t to perl-5.6.x .
+        - http://www.nntp.perl.org/group/perl.cpan.testers/2009/11/msg6026936.html
+        - Failure there.
+        - did that by replacing open ">:raw" with "binmode()".
+
+2.53        2009-11-13
+
+    * Converted t/01basic.t to Test::More and modernised it.
+    * Converted t/02weird.t to Test::More and modernised it.
+    * Converted t/04import.t to Test::More and modernised it.
+    * Applied a patch from Steffen Heinrich (SHE) for:
+        - https://rt.cpan.org/Ticket/Display.html?id=51445
+        - included t/25line-endings.t
+            - modified a little.
+
+2.52        2009-06-28
+
+    * Added more keys to Build.PL (author, etc.)
+    * Added resources and keywords to META.yml.
+    * Converted t/00load.t to Test-More.
+    * No longer chdir()-ing into "t" in t/00load.t
+    * Got rid of the "new Config::IniFiles" syntax in the tests.
+    - replaced with Config::IniFiles->new().
+    - see "Perl Best Practices", "Programming Perl", 3rd Edition
+
+2.51        2009-06-8
+
+    * Fixed "#46721: $config->exists() does not pay attention to -nocase => 1"
+    - https://rt.cpan.org/Ticket/Display.html?id=46721
+
+2.50        2009-05-31
+
+    * Fixed the POD for SetParameterEOT:
+    - https://rt.cpan.org/Ticket/Display.html?id=28375
+    * Added t/pod.t and t/pod-coverage.t and fixed the problems they pointed:
+    - Removed some trailing pod.
+        - http://rt.cpan.org/Ticket/Display.html?id=46549
+    - Documented the ->OutputConfig() method.
+
+2.49        2009-05-2
+
+    * Fixed bug https://rt.cpan.org/Public/Bug/Display.html?id=45209 :
+    - Makefile.PL lacked the empty "PL_FILES" directive.
+
+    * Fixed bug https://rt.cpan.org/Ticket/Display.html?id=45588 :
+    - Failure to read ini file contents from a scalar (via "IO::Scalar").
+    - added t/23scalar-ref.t
+
+2.48        2009-04-7
+
+    * Fixed bug https://rt.cpan.org/Ticket/Display.html?id=30402 :
+    - Trailing comments at the end of the file are not written.
+    - added a test (t/22trailing-comment-lines.t ) and a test file.
+
+    * Reverted the fix to bug #34067 ( "Multiline values returned as array
+    references in tied hash interface"), as it could potentially break a lot
+    of old code, and was not such a good idea, and was less preferable from
+    interface-sanity reasons.
+
+    * Documented the old API in regards to bug #34067 - see above.
+
+2.47        2009-01-21
+
+    * Fixed bug https://rt.cpan.org/Ticket/Display.html?id=34067 :
+    - Multiline values returned as array references in tied hash interface
+    - This was as opposed to the documentation.
+    - added t/21multiline-values-in-tied.t and fixed some older tests.
+
+    * Moved the eval'ed debugging code (_assert_invariants) to its own module,
+    without the eval so the perl-5.6.2 will be happy. Now explicitly use'ing it
+    from t/lib where appropriate. See for example:
+    - http://www.nntp.perl.org/group/perl.cpan.testers/2009/01/msg3101788.html
+
+2.46        2009-01-17
+
+    * Added regression tests for bug #1720915
+    - https://sourceforge.net/tracker/index.php?func=detail&aid=1720915&group_id=6926&atid=106926
+    - the bug seems to be fixed in trunk.
+
+    * Added a regression test for RT #36584
+    - https://rt.cpan.org/Ticket/Display.html?id=36584
+    - the bug seems to be fixed in trunk.
+
+    * Added a regression test for RT #36309
+    - https://rt.cpan.org/Ticket/Display.html?id=36309
+    - Testing for allowedcommentchars.
+    - the bug seems to be fixed in trunk.
+
+    * Converted t/03comments.t to Test::More and did other cleanups in preparation
+    of solving a few bugs.
+
+    * Now GetSectionComment does the documented behaviour in scalar context and
+    returns the string joined by newlines:
+    - https://rt.cpan.org/Ticket/Display.html?id=8612
+
+    * Now GetParameterComment returns the right thing in scalar context (joined
+    by newlines). It was documented and tested.
+    - https://rt.cpan.org/Ticket/Display.html?id=8612
+
+2.45        2008-12-27
+
+    * Fixed bug #1230339:
+    - https://sourceforge.net/tracker/index.php?func=detail&aid=1230339&group_id=6926&atid=106926
+    - Can't store and retrive "\nEOT\n"
+    - Fixed by checking for the existence of the here-doc terminator in the
+    string, and if so appending more characters.
+
+    * Fixed bug #1565180
+    - https://sourceforge.net/tracker/index.php?func=detail&aid=1565180&group_id=6926&atid=106926
+    - -nocase breaks -default.
+    - If a default-values section is specified, then -nocase did not look it up
+    if it's not lowercase.
+
+    * Fixed bug #1831654
+    - https://sourceforge.net/tracker/index.php?func=detail&aid=1831654&group_id=6926&atid=106926
+    - multiline-values are tainted.
+    - Added a test as t/17untainted-multiline-values.t
+
+2.44        2008-12-25
+
+    * Eliminated an assignment of $VERSION into itself to "get rid of warnings".
+    Only caused warnings at Build.PL, and is unnecessary now that we
+    "use vars".
+
+2.43        2008-12-4
+
+    * Placed IniFiles.pm under lib/Config/IniFiles.pm.
+
+    * Added a Build.PL file for the distribution.
+
+    * Moved the ChangeLog to its own file - Changes.
+
+    * Made the README contain the useful information and nothing else - previously
+    it was a copy of the module's entire POD.
+
+    * Added a regression test for:
+
+    https://sourceforge.net/tracker/index.php?func=detail&aid=778593&group_id=6926&atid=106926
+
+    When copying tied-hashes representing sections with multiline values as
+    keys, one used to get a reference instead of a copy. This was fixed in SVN
+    but not in CPAN.
+
+    * Added a test for opening an empty file, inspired by:
+
+    https://sourceforge.net/tracker/index.php?func=detail&aid=927111&group_id=6926&atid=106926
+
+    * Added a fix for this bug:
+
+    https://sourceforge.net/tracker/index.php?func=detail&aid=767913&group_id=6926&atid=106926
+
+    With a test that I wrote myself: in list context, ->val() returned the list
+    containing (undef()) if there was no such key. Now returning the empty
+    list which evaluates to false.
+
+    * Added a test for bug
+
+        "[ 2030786 ] Brackets within values are treated as section headers"
+
+    It seems to be fixed on SVN.
+

@@ -1,0 +1,17 @@
+Revision history for Perl extension Enurl.
+
+0.01  Tue Dec 22 18:15:22 1998
+	- original version; created by h2xs 1.18
+
+1.04
+	- fixed the stupid {par => [val1,val2,val3]} bug.
+
+1.05
+	- you may specify the parameter separator and the set of characters that should be left unencoded.
+	- I have renamed the module from Enurl to CGI::Enurl !
+
+1.06
+	- don't remember
+
+1.07
+	- fixed some numerical warnings

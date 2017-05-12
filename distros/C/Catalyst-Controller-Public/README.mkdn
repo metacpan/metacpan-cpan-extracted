@@ -1,0 +1,98 @@
+# TITLE
+
+Catalyst::Controller::Public - mount a public url to files in your Catalyst project
+
+# SYNOPSIS
+
+    package MyApp::Controller::Public;
+
+    use Moose;
+    extends 'Catalyst::Controller::Public';
+
+    __PACKAGE__->meta->make_immutable;
+
+Will create an action that from URL 'localhost/public/a/b/c/d.js' will serve
+file $c->{root} . '/public' . '/a/b/c/d.js'.  Will also set content type, length
+and Last-Modified HTTP headers as needed.  If the file does not exist, will not
+match (allowing possibly other actions to match).
+
+You can create a URL for a static file programmtically via the following:
+
+    sub myaction :Local {
+      my ($self, $c) = @_;
+      my $static_url = $c->uri_for(controller('Public')->uri_args('example.txt'));
+    }
+
+# DESCRIPTION
+
+This is a simple controller that uses [Catalyst::ActionRole::Public](https://metacpan.org/pod/Catalyst::ActionRole::Public)
+to create a single public folder for you webapplication, doing as much
+of the right thing as possible.  Useful for starting a new project, although
+I imagine as time goes on you'll probably want something stronger.
+
+This controller doesn't do anything like compile LESS to CSS, etc.  If you
+are looking for that you might find [Catalyst::Controller::SimpleCAS](https://metacpan.org/pod/Catalyst::Controller::SimpleCAS) has
+more power for what you wish.  This is really aimed at helping people move
+away from [Catalyst::Plugin::Static::Simple](https://metacpan.org/pod/Catalyst::Plugin::Static::Simple) which I really don't want
+to support anymore :)
+
+# METHODS
+
+This controller defines the following methods
+
+## uri\_args
+
+Used as a helper to correctly generate a URI.  For example:
+
+    sub myaction :Local {
+      my ($self, $c) = @_;
+      my $static_url = $c->uri_for(controller('Public')
+        ->uri_args('example.txt'));
+    }
+
+# ATTRIBUTES
+
+This controller defines the following configuration attributes.  They
+are pretty much all just wrappers for the same configuration options for
+the [Catalyst::ActionRole::Public](https://metacpan.org/pod/Catalyst::ActionRole::Public)
+
+## at
+
+Template used to control how we build the path to find your public file.
+You probably want to leave this alone if you are seeking the most simple
+thing (which this controller is aimed at).  See the documentation for 'At'
+over in [Catalyst::ActionRole::Public](https://metacpan.org/pod/Catalyst::ActionRole::Public) if you really need to mess with this
+(and you might want the increased control that action role gives you anyway.
+
+## content\_types
+
+Content types that we allow to be served.  By default we allow all standard
+types (might be more than you want, if your public directory contains things
+you don't want the public to see.
+
+## show\_debugging
+
+Enabled developer debugging output.  Default to 0 (false, no debugging).  Change
+to 1 if you want extended debugging info.
+
+## cache\_control
+
+Used to set the Cache-Control HTTP header (useful for caching your static assets).
+
+Example values "public, max-age=600"
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Controller](https://metacpan.org/pod/Catalyst::Controller), [Plack::App::Directory](https://metacpan.org/pod/Plack::App::Directory),
+[Catalyst::Controller::Assets](https://metacpan.org/pod/Catalyst::Controller::Assets).  [Catalyst::Controller::SimpleCAS](https://metacpan.org/pod/Catalyst::Controller::SimpleCAS)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,20 @@
+Class-DBI-Cascade-Plugin-Nullify is a cascading nullify strategy (i.e. 'on delete set null') that will nullify any related Class::DBI objects.
+
+THIS MODULE IS NOT LONGER DEVELOPED. Please consider Rose::DB::Object as a alternative to Class::DBI.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2010 Xufeng (Danny) Liang
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

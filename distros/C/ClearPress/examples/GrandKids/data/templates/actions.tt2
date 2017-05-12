@@ -1,0 +1,7 @@
+
+<h1>GrandKids</h1>
+<ul id="actions">
+ <li>[<a href="[% SCRIPT_NAME %]/child/">List children</a>]</li> <li>[<a href="[% SCRIPT_NAME %]/family/">List families</a>]</li>
+ <li>[<a href="[% SCRIPT_NAME %]/child/;add">Add child</a>]</li> <li>[<a href="[% SCRIPT_NAME %]/family/;add">Add family</a>]</li>
+</ul>
+ 

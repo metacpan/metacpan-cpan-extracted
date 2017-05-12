@@ -1,0 +1,9 @@
+MANIFEST			This list of files
+Makefile.PL
+TODO
+Changes
+lib/CPANPLUS/Shell/Curses.pm
+t/0-basic.t
+t/1-pod.t
+README
+META.yml                                 Module meta-data (added by MakeMaker)

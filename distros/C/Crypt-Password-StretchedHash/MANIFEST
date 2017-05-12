@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Crypt/Password/StretchedHash.pm
+lib/Crypt/Password/StretchedHash/HashInfo.pm
+t/00_compile.t
+t/01_crypt.t
+t/02_verify.t
+t/03_hashinfo.t
+t/04_with_hashinfo.t
+t/lib/TestHashInfo.pm
+META.yml
+MANIFEST

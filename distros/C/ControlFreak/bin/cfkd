@@ -1,0 +1,304 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Spec();
+
+BEGIN {
+    if (-f File::Spec->catfile(qw(lib ControlFreak.pm))) {
+        require Find::Lib;
+        Find::Lib->import('lib');
+    }
+}
+
+use Getopt::Long;
+use AnyEvent();
+use AnyEvent::Socket();
+
+use ControlFreak;
+use Carp;
+use Pod::Usage;
+use POSIX 'SIGTERM';
+
+my %options = ();
+
+GetOptions(
+    "a|address=s"     => \$options{address},
+    "d|daemon"        => \$options{daemon},
+    "t|trap"          => \$options{trap},
+    "home=s"          => \$options{home},
+    "log-config-file" => \$options{log_config_file},
+
+    'h|help'          => \$options{help},
+    'm|man'           => \$options{man},
+);
+
+pod2usage(1)             if $options{help};
+pod2usage(-verbose => 2) if $options{man};
+
+my $ctrl;
+
+## make home, and export it in ENV
+my $home = $options{home} || File::Spec->catdir($ENV{HOME}, '.controlfreak');
+mkdir $home unless -d $home;
+$ENV{CFKD_HOME} = $home;
+
+## specify a default address in the form of a unix socket in $home
+$options{address} = "unix:$home/sock"
+    unless $options{address};
+
+my $log_config_file = $options{log_config_file};
+if (! $log_config_file) {
+    ## look at the default location and create it if it doesn't exist
+    $log_config_file = File::Spec->catfile($home, "log.config");
+    unless (-f $log_config_file) {
+        open LC, ">$log_config_file"
+            or croak "Cannot create $log_config_file: $!";
+        print LC ${ ControlFreak::Logger->default_config };
+        close LC;
+        chmod 0622, $log_config_file;
+    }
+}
+
+daemonize() if $options{daemon};
+
+my $unix = ControlFreak::Util::parse_unix($options{address});
+
+my $host;
+my $service;
+if ($unix) {
+    $host = "unix/";
+    $service = $unix;
+}
+else {
+    ($host, $service) = AnyEvent::Socket::parse_hostport(
+        $options{address},
+        '11311',
+    );
+}
+
+$ctrl = ControlFreak->new(
+    log_config_file => $log_config_file,
+    home            => $home,
+);
+
+my $console = ControlFreak::Console->new(
+    host    => $host,
+    service => $service,
+    ctrl    => $ctrl,
+);
+
+my $w = AnyEvent->signal(signal => "USR1", cb => sub {
+    $ctrl->log->safe_reinit;
+});
+
+$ctrl->set_console($console);
+$ctrl->console->start;
+
+## probably need to deal with signals
+AnyEvent->condvar->recv;
+
+sub daemonize {
+    my $pid;
+    my $sess_id;
+
+    ## Fork and exit parent
+    if ($pid = fork) { exit 0; }
+
+    ## Detach ourselves from the terminal
+    croak "Cannot detach from controlling terminal"
+        unless $sess_id = POSIX::setsid();
+
+    ## Prevent possibility of acquiring a controlling terminal
+    $SIG{'HUP'} = 'IGNORE';
+    if ($pid = fork) { exit 0; }
+
+    ## Change working directory
+    ## to avoid locking a network filesystem or something
+    chdir "/";
+
+    ## Clear file creation mask
+    umask 0;
+
+    ## Close open file descriptors
+    close(STDIN);
+    close(STDOUT);
+    close(STDERR);
+
+    ## Reopen stderr, stdout, stdin to /dev/null
+    open(STDIN,  "+>/dev/null");
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+
+    trap_sigs();
+}
+
+sub trap_sigs {
+    ## catch signals
+    $SIG{HUP} = $SIG{INT} = $SIG{TERM} = sub {
+        my $sig = shift;
+        return unless $ctrl;
+        $ctrl->log->error("Got signal $sig");
+        return if $options{trap};
+        $ctrl->shutdown;
+        $SIG{TERM} = 'IGNORE';
+        kill -(SIGTERM), getpgrp 0; ## kill our group
+        exit;
+    };
+    $SIG{__DIE__} = sub {
+        my $error = shift || "";
+        return if $^S;
+        $ctrl->log->fatal($error);
+    };
+    $SIG{__WARN__} = sub {
+        my $warn = shift;
+        $ctrl->log->warn($warn);
+    }
+}
+
+__END__
+
+=head1 NAME
+
+cfkd - the supervisor process for ControlFreak
+
+=head1 SYNOPSIS
+
+cfkd [options]
+
+Options:
+
+ --home=<directory>  Path to cfkd home directory [default: $HOME/.controlfreak]
+ -a, --address=<socket address>
+                     Path to UNIX socket file or address of INET socket
+                     e.g: unix:/tmp/cfkd.sock or localhost:11311
+                     [default: $home/sock]
+
+ -l, --log-config-file=<file>
+                     Path to cfkd log config file, cfkd will attempt to create
+                     a default config file if the file doesn't exist.
+                     [default: $home/log.config]
+
+ -d, --daemon        Run as a daemon
+ -t, --trap          Trap and ignore normal signals (ignored unless -d)
+
+ -h, --help          Help
+ -m, --man           More help
+
+=head1 OPTIONS
+
+Please see L<SYNOPSIS>.
+
+=head1 DESCRIPTION
+
+B<cfkd> supervises other processes, making sure there are up or down
+when you want to, and provides flexible logging facility for those
+services.
+
+=head1 SAMPLE CONFIG
+
+  service memcached cmd = /usr/bin/memcached -p 11211
+  service memcached ignore_stderr = 1
+  service memcached tags = prod
+  service memcached-test cmd = /usr/bin/memcached -p 12221
+  service memcached tags = test,optional
+  service perlbal cmd = /usr/bin/perlbal -c /etc/perlbal.conf
+  service perlbal tags = prod
+
+  socket fcgisock address = 127.0.0.1:8080
+  socket fcgisock listen_qsize = 1024
+
+  ## webNNN share a common socket through their stdin
+  service web001 cmd = /usr/bin/plackup -a /home/www/app.psgi -s FCGI
+  service web001 tie_stdin_to = fcgisock
+  service web001 tags = prod,webs
+
+  service web002 cmd = /usr/bin/plackup -a /home/www/app.psgi -s FCGI
+  service web002 tie_stdin_to = fcgisock
+  service web002 tags = prod,webs
+
+  # start random stuff
+  command up svc memcached
+  command up svc perlbal
+
+
+=head1 SAMPLE LOG CONFIG
+
+B<ControlFreak> works with L<Log::Log4perl> framework which is incredibly
+flexible. You might have to install additional modules to get the
+most of your logging experience (let's say if you want to be notified by
+Instant Message of services going down).
+
+There are two categories of logger:
+
+=over 4
+
+=item the main logger
+
+This is the logger used by B<ControlFreak> itself, it allows to finely control
+what do you want to log from what's happening in C<cfkd>.
+
+=item the service logger
+
+This is a serie of loggers used by the different services. All services will
+get by default their C<stdout> and C<stderr> aggregated and logged, unless
+you specify the C<ignore_stderr> and C<ignore_stdout> options.
+
+Each log event gets assigned the following log category:
+
+  service.$service_name.$type
+
+Where C<$service_name> is the name of your service ("worker001", "perlbal")
+and $type is either C<err> or C<out>.
+
+Obviously messages going to C<stderr> will be logged at level C<ERROR> while
+messages on C<stdout> will be logged at C<INFO> level.
+
+=back
+
+=head2 Service cspec/placeholder
+
+B<ControlFreak> defines a special cspec C<%S> representing the service
+pid. (which only makes sense in the service logger).
+
+=head2 Log Config Sample 2
+
+    ## logs everything under cfk's home
+    log4perl.rootLogger=DEBUG, LOGFILE
+
+    log4perl.appender.LOGFILE=Log::Log4perl::Appender::File
+    log4perl.appender.LOGFILE.filename=/home/user/.controlfreak/cfkd.log
+    log4perl.appender.LOGFILE.mode=append
+    log4perl.appender.LOGFILE.layout=PatternLayout
+    log4perl.appender.LOGFILE.layout.ConversionPattern=%d [%S] %p %c - %m%n
+
+=head2 Log Config Sample 2
+
+    # daemon log to the main log
+    log4perl.rootLogger=DEBUG, LOGFILE
+
+    # all services to service logs...
+    log4perl.logger.service=DEBUG, SVCFILE
+    log4perl.additivity.service = 0
+
+    # ...but gearman errors are also going to the screen
+    log4perl.logger.service.gearmand=ERROR, SCREEN
+
+    log4perl.appender.SCREEN=Log::Log4perl::Appender::Screen
+    log4perl.appender.SCREEN.layout=PatternLayout
+    log4perl.appender.SCREEN.layout.ConversionPattern=[gearman] %p %c - %m%n
+
+    log4perl.appender.LOGFILE=Log::Log4perl::Appender::File
+    log4perl.appender.LOGFILE.filename=/tmp/main.log
+    log4perl.appender.LOGFILE.mode=append
+    log4perl.appender.LOGFILE.layout=PatternLayout
+    # %S = service pid
+    log4perl.appender.LOGFILE.layout.ConversionPattern=%S %p %L %c - %m%n
+
+    log4perl.appender.SVCFILE=Log::Log4perl::Appender::File
+    log4perl.appender.SVCFILE.filename=/tmp/services.log
+    log4perl.appender.SVCFILE.mode=append
+    log4perl.appender.SVCFILE.layout=PatternLayout
+    log4perl.appender.SVCFILE.layout.ConversionPattern=%S %p %L %c - %m%n
+
+=cut

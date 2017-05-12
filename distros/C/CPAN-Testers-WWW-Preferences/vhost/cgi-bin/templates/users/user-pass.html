@@ -1,0 +1,44 @@
+[% 
+    title = "Change Password" ;
+
+    crumb1_name = 'Change Password' ;
+%]
+
+[% IF errmess %]<div class="box"><p class="alert">[% errmess %]</p></div>[% END %]
+<div class="box">
+    <p>Please use the following rules to create your new password:</p>
+    <ul>
+    <li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.</li>
+    <li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.</li>
+    <li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.</li>
+    <li>No whitespace characters allowed.</li>
+    </ul>
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="user-chng" />
+<input type="hidden" name="userid" value="[% user.userid %]" />
+
+<div class="box">
+    <table width="100%">
+
+	<tr><th>Display Name</th>
+        <th></th>
+        <td><b>[% user.name %]</b></td>
+    </tr>
+    <tr><th width="150">Your Current Password</th>
+        <th width="10"></th>
+        <td><input type="password" name="effect1" size="20" /></td>
+    </tr>
+    <tr><th>New Password</th>
+        <th></th>
+        <td><input type="password" name="effect2" size="20" /></td>
+    </tr>
+    <tr><th>Retype New Password</th>
+        <th></th>
+        <td><input type="password" name="effect3" size="20" /></td>
+    </tr>
+	  <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+</div>
+</form>

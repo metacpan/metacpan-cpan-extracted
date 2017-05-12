@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+Build.PL
+MANIFEST
+README
+lib/Calendar/Simple.pm
+t/test.t
+t/pod.t
+t/no_dt.t
+t/pod_coverage.t
+t/date_span.t
+bin/pcal
+META.yml                                 Module meta-data (added by MakeMaker)

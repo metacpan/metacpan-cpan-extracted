@@ -1,0 +1,28 @@
+---
+abstract: 'Catalyst plugin to restart server '
+author:
+  - 'John Napiorkowski <john.napiorkowski@takkle.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-AutoRestart
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.90005
+  MRO::Compat: 0.07
+  Proc::ProcessTable: 0.41
+  Text::SimpleTable: 0.03
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jgoulah/Catalyst-Plugin-AutoRestart.git
+version: 0.96

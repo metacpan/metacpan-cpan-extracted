@@ -1,0 +1,26 @@
+.fieldholder {
+  float: left;
+  margin-right: 1em;
+}
+
+.fieldholder .label {
+  font-weight: bold;
+}
+
+input {
+  font-family: courier, monospace;
+  padding: 2px;
+}
+
+hr {
+  clear: both;
+}
+
+.editform {
+  border: 1px solid black;
+  background-color: #ccc;
+  overflow: auto;
+  width: 500px;
+  padding: 1em;
+}
+

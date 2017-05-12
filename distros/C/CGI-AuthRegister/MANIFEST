@@ -1,0 +1,22 @@
+# <? read_starfish_conf(); &generate_header; !>
+#+
+# file: MANIFEST
+# CGI::AuthRegister - Simple CGI Authentication and Registration in Perl
+# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+# $Date: $
+# $Id: $
+#-
+README
+MANIFEST
+META.yml
+starfish.conf
+Changes
+Makefile.PL
+starfish.conf
+test.pl
+#<? echo "$ModuleNameBase.pm" !>
+#+
+AuthRegister.pm
+#-
+examples/1/index.cgi
+examples/2/index.cgi

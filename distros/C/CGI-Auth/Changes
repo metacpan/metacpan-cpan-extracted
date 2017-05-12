@@ -1,0 +1,36 @@
+$Id: Changes,v 1.8 2004/01/28 07:04:02 cmdrwalrus Exp $
+
+Revision history for CGI::Auth.
+
+3.00	27 January 2004
+	- Version numbers are now restricted to major.minor, to be a proper 'floating point' number, as suggested in perlmodlib.
+	- I had to increase the major version number because of it.  From now on, CPAN.pm should have no problems discerning which version is newer.
+	- The session file name can now be passed to new() in the 'sessfile' parameter, so that it can be stored in a CGI::Session variable (or something else) and doesn't *have* to be passed by cookies or CGI parameters.
+
+2.4.4	10 January 2004
+	Added two methods: sfparam_name and sfparam_value, for a more flexible way of passing the session file parameter around.
+
+2.4.3	30 October 2003
+	Added MD5 hashes for hidden data (i.e., passwords) instead of 'crypt'.  This is enabled with the '-md5pwd' config option and if enabled is in effect globally.  When the switch is made from crypted data to MD5 hashes, the user data file will need to be recreated.
+	Now allows CGI scripts to use the 'prune' function, if the '-cgiprune' option is given.
+	CGI::Simple is now supported--just pass a CGI::Simple object ref instead of a CGI one.  CGI::Simple is a drop-in replacement of CGI.pm with all of its CGI-related functionality but without the HTML generation features.
+	User data file delimiter character is no longer a pipe (|) because it is a regex special character.  The separator is now a colon (:), so user data files will need to be updated to reflect this--simply changing all pipes to colons should do the trick.
+
+2.4.2	5 August 2003
+	Added ability to specify options for HTML::Template, by passing -logintmpl either as a hashref or an existing HTML::Template object.
+	Also edited the POD a bit.
+
+2.4.1	17 July 2003
+	Some documentation edits.
+	Added a simple test suite.
+
+2.4	27 March 2003
+	Added storing of IP address in session file.  Now sessions cannot be hijacked from another location.
+
+2.3	Sat Aug 31, 2002
+	Added support for HTML::Template templates
+	Fixed a few bugs.
+
+2.2	Mon Aug 19, 2002
+	Converted to h2xs in preparation for uploading to CPAN.
+

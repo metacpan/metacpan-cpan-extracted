@@ -1,0 +1,21 @@
+[% 
+    title = "Browse author by letter " _ letter ;
+    box_help  = 1 ;
+
+    crumb2_name = 'Authors' ;
+    crumb2_href = '/' ;
+    crumb1_name = letter ;
+%]
+
+<p>Here are all the CPAN authors that start with the letter [% letter %]:</p>
+<table class="col3" >
+[% inx = 0 %]
+[% FOREACH item = authors.sort %]
+[% IF inx % 3 == 0 %]<tr>[% END %]
+<td><a href="/author/[% letter %]/[% item %].html">[% item %]</a></td>
+[% inx = inx + 1 %]
+[% IF inx % 3 == 0 %]</tr>[% END %]
+[% END %]
+[% IF inx % 3 > 0 %]</tr>[% END %]
+</table>
+

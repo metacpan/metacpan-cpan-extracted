@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+cacheperl.patch
+bench.t
+lib/Cache/BDB.pm
+lib/Cache/BDB.pod
+t/00-load.t
+t/01-load.t
+t/02-api.t
+t/03-lock.t
+t/03-lock-env.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

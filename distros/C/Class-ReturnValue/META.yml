@@ -1,0 +1,18 @@
+--- 
+abstract: A smart return value object
+author: Jesse Vincent <jesse@bestpractical.com>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Class-ReturnValue
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Devel::StackTrace: 0
+  Test::More: 0
+version: 0.55

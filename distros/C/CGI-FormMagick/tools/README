@@ -1,0 +1,8 @@
+These tools may be useful to FormMagick developers and/or users.
+
+extract-phrases.pl	Extracts TITLE, LABEL and DESCRIPTION strings
+			from a FormMagick XML file, ready for
+			translation to another language
+
+mergetrans.pl		Merges two translation files together, eg
+			./mergetrans.pl en.txt fr.txt

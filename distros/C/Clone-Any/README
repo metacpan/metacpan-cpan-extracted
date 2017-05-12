@@ -1,0 +1,63 @@
+NAME
+    Clone::Any - Select an available recursive-copy function
+
+SYNOPSIS
+      use Clone::Any qw(clone);
+  
+      $a = { 'foo' => 'bar', 'move' => 'zig' };
+      $b = [ 'alpha', 'beta', 'gamma', 'vlissides' ];
+      $c = new Foo();
+  
+      $d = clone($a);
+      $e = clone($b);
+      $f = clone($c);
+
+DESCRIPTION
+    This module checks for several different modules which can provide a
+    clone() function to make deep copies of Perl data structures.
+
+  Clone Interface
+
+    The clone function makes recursive copies of nested hash, array, scalar
+    and reference types, including tied variables and objects.
+
+    The clone() function takes a scalar argument to copy. To duplicate
+    lists, arrays or hashes, pass them in by reference. e.g.
+
+      my $copy = clone(\@array);    my @copy = @{ clone(\@array) };
+      my $copy = clone(\%hash);     my %copy = %{ clone(\%hash) };
+
+  Multiple Implementations
+
+    Depending on which modules are available, this may load Clone,
+    Clone::PP, Util, Storable, or Class::MakeMethods::Utility::Ref. If none
+    of those modules are available, it will "croak".
+
+SEE ALSO
+    For the various implementations, see the Clone manpage, the Clone::PP
+    manpage, the Storable manpage, the Util manpage, and the
+    Class::MakeMethods::Utility::Ref manpage.
+
+    See the Devel::UseAnyFunc manpage for the underlying module loader and
+    exporter functionality.
+
+CREDITS AND COPYRIGHT
+    Developed by Matthew Simon Cavalletto at Evolution Softworks. More free
+    Perl software is available at "www.evoscript.org".
+
+    You may contact the author directly at "evo@cpan.org" or
+    "simonm@cavalletto.org".
+
+    To report bugs via the CPAN web tracking system, go to
+    "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone-Any" or send mail to
+    "Dist=Clone-Any#rt.cpan.org", replacing "#" with "@".
+
+    Copyright 2003 Matthew Simon Cavalletto.
+
+    Orignally inspired by Clone by Ray Finch with contributions from
+    chocolateboy. Portions Copyright 2001 Ray Finch. Portions Copyright 2001
+    chocolateboy.
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
+

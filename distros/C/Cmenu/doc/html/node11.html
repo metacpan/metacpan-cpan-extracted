@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>menu_display</TITLE>
+<META NAME="description" CONTENT="menu_display">
+<META NAME="keywords" CONTENT="Cmenu">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Cmenu.css">
+
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html180"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html176"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html170"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html178"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html181"
+  HREF="node12.html">Processing return Values</A>
+<B> Up:</B> <A NAME="tex2html177"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html171"
+  HREF="node10.html">menu_item</A>
+ &nbsp <B>  <A NAME="tex2html179"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00055000000000000000">
+menu_display</A>
+</H2> 
+Activate a menu and let Cmenu do the menu navigation. This call will return user selections depending on the type of menu items included in the menu. Dealing with the return value can be quite complicated for complex menus.
+
+<P>
+It is normally called as
+
+<P>
+<DIV ALIGN="CENTER">
+$sel = &amp;menu_display(``User prompt'',start_item);
+
+</DIV> 
+
+<P>
+<DL>
+<DT><STRONG>$sel</STRONG></DT>
+<DD>This will contain user responses; it will always be terminated by separator character so chop it off with
+<DIV ALIGN="CENTER">
+chop($sel);
+
+</DIV>
+Generally this return value will contain a list of values which need further processing (see below).
+</DD>
+<DT><STRONG>User prompt</STRONG></DT>
+<DD>(mandatory) a string which will be displayed at the foot of the screen
+</DD>
+<DT><STRONG>start_item</STRONG></DT>
+<DD>(optional) which menu option should be highlighted at the start. This allows your script to keep track of where it was in a menu. If it is not provided, the first item in a menu will be highlighted.
+</DD>
+</DL>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html182"
+  HREF="node12.html">Processing return Values</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+Andy Ferguson (AFC)
+2001-10-20
+</ADDRESS>
+</BODY>
+</HTML>

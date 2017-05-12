@@ -1,0 +1,4 @@
+<!-- Single form using Catalyst::Controller::FormBuilder render style -->
+
+<!-- Render whatever form is in the FormBuilder object -->
+[% FormBuilder.render %]

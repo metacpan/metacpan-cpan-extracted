@@ -1,0 +1,30 @@
+<h1>Menu</h1>
+
+[% IF loggedin %]
+
+      <ul>
+[% FOREACH item = menus.2.data %]
+    [% IF item.4 <= user.access %]
+        <li><a href="[% item.3 %]" title="[% item.2 %] pages"><span>[% item.2 %]</span></a></li>
+    [% END %]
+[% END %]
+
+        <li><a href="[% cgipath %]/pages.cgi?act=user-logout" title="Logout"><span>Logout</span></a></li>
+      </ul>
+
+[% ELSE %]
+
+<ul>
+[% FOREACH item = menus.3.data %]
+    [% IF item.4 <= user.access %]
+        <li><a href="[% item.3 %]" title="[% item.2 %] pages"><span>[% item.2 %]</span></a></li>
+    [% END %]
+[% END %]
+</ul>
+
+<ul>
+  <li><a href="http://static.cpantesters.org[% crosslink %]">Static Website</a></li>
+  <li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+</ul>
+
+[% END %]

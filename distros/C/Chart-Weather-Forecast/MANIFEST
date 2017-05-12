@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Chart/Weather/Forecast.pm
+lib/Chart/Weather/Forecast/Temperature.pm
+t/author-critic.t
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

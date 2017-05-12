@@ -1,0 +1,19 @@
+---
+name: Catalyst-Plugin-Geography
+version: 0.01
+author:
+  - |-
+    Christian Hansen, C<ch@ngmedia.com>
+    Marcus Ramberg, C<mramberg@cpan.org>
+abstract: Retrieve geographical information
+license: perl
+requires:
+  Geography::Countries: 0
+  IP::Country::Fast: 0
+provides:
+  Catalyst::Plugin::Geography:
+    file: lib/Catalyst/Plugin/Geography.pm
+    version: 0.01
+  Catalyst::Plugin::Geography::Implementation:
+    file: lib/Catalyst/Plugin/Geography/Implementation.pm
+generated_by: Module::Build version 0.26

@@ -1,0 +1,51 @@
+{
+   "abstract" : "Catalyst helper function for translating jqGrid search parameters",
+   "author" : [
+      "Scott R. Keszler <keszler@srkconsulting.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-TraitFor-Controller-jQuery-jqGrid-Search",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Moose::Role" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::TraitFor::Controller::jQuery::jqGrid::Search" : {
+         "file" : "lib/Catalyst/TraitFor/Controller/jQuery/jqGrid/Search.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://app.srkconsulting.com/repos/jqGridSearch/"
+      }
+   },
+   "version" : "0.02"
+}

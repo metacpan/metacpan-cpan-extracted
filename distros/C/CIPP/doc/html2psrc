@@ -1,0 +1,24 @@
+body {
+        font-size: 10pt;
+        font-family: Helvetica;
+}
+h1 {
+	font-size: 16pt;
+}
+h2 {
+	font-size: 12pt;
+}
+big {
+	font-size: 12pt;
+}
+header {
+	center: "CIPP Reference Documentation, Copyright (c) dimedis GmbH, All Rights Reserved";
+}
+footer {
+	odd-right: "CIPP Reference Documentation - Page $N";
+	even-right: "CIPP Reference Documentation - Page $N";
+}
+margin {
+        left: 5cm;
+}
+

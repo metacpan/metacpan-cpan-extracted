@@ -1,0 +1,10 @@
+    [% PROCESS cms/yui/base.tt %]
+    [% # YUI stuff first %]
+    [% FOREACH sheet IN YUI.css.unique %]
+     <link rel="stylesheet" type="text/css"
+           href="[% YUI.url %]/[% YUI.version %]/[% sheet %].css" />
+    [% END %]
+    [% FOREACH js IN YUI.js.unique %]
+     <script type="text/javascript" 
+         src="[% YUI.url %]/[% YUI.version %]/[% js %].js"></script>
+    [% END %]

@@ -1,0 +1,9 @@
+Changes
+lib/Class/WeakSingleton.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/10use.t
+t/11basic.t

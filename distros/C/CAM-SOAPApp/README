@@ -1,0 +1,58 @@
+CAM::SOAPApp - SOAP application framework
+
+
+LICENSE
+
+Copyright 2006 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+The standard Perl library for creating SOAP services is SOAP::Lite.
+While powerful, that module is nearly incomprehensible and downright
+idiosyncratic.  Here comes CAM::SOAPApp to the rescue!  We built this
+package while writing our SOAP client implememtation for Flash, and
+found it to be a huge time saver.  We also used it to debug Apple
+Safari and Sherlock issues, enabling those broken tools to be good
+web-service citizens.
+
+This module implements a handy framework for deploying SOAP services.
+It inherits all of the simplifications allowed by CAM::App.  Combined
+with CAM::SOAPClient, CAM::SOAPApp can define a fully contained and
+fault-tolerant client-server solution.  It also works well with any
+SOAP implementation that can talk to SOAP::Lite -- and some that can't!
+
+This package works around several different flaws in various SOAP and
+HTTP implementations, using 'lenient' mode.  These solutions are very
+valuable, let alone the rest of the module.
+
+Note that the packages that you create for SOAP methods SHOULD NOT
+subclass from this class!  That would be a security problem.  Please
+see the example in the documentation for the right way to use the
+CAM::SOAPApp module.  The regression tests implement a simple but
+full-featured client and server running on localhost.

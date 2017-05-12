@@ -1,0 +1,82 @@
+{
+   "abstract" : "Config::ENV supported Multi ENV",
+   "author" : [
+      "Hiroyoshi Houchi <git@hixi-hyi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-ENV-Multi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Clear" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Config::ENV::Multi" : {
+         "file" : "lib/Config/ENV/Multi.pm",
+         "version" : "0.03"
+      },
+      "Config::ENV::Multi::ConfigInstance" : {
+         "file" : "lib/Config/ENV/Multi.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hixi-hyi/p5-Config-ENV-Multi/issues"
+      },
+      "homepage" : "https://github.com/hixi-hyi/p5-Config-ENV-Multi",
+      "repository" : {
+         "url" : "git://github.com/hixi-hyi/p5-Config-ENV-Multi.git",
+         "web" : "https://github.com/hixi-hyi/p5-Config-ENV-Multi"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:HIXI",
+   "x_contributors" : [
+      "Tanaka Tatsuya <ta.ts.yt@gmail.com>"
+   ]
+}

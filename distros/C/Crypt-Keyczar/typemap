@@ -1,0 +1,6 @@
+Crypt::Keyczar::AesEngine	T_PTROBJ
+Crypt::Keyczar::HmacEngine	T_PTROBJ
+Crypt::Keyczar::RsaPrivateKeyEngine	T_PTROBJ
+Crypt::Keyczar::RsaPublicKeyEngine	T_PTROBJ
+Crypt::Keyczar::DsaPrivateKeyEngine	T_PTROBJ
+Crypt::Keyczar::DsaPublicKeyEngine	T_PTROBJ

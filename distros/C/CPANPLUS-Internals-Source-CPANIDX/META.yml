@@ -1,0 +1,28 @@
+---
+abstract: 'CPANIDX source implementation'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPANPLUS-Internals-Source-CPANIDX
+requires:
+  CPANPLUS: 0.9001
+  File::Fetch: 0
+  File::Spec: 0
+  Locale::Maketext::Simple: 0
+  Module::Load::Conditional: 0
+  Params::Check: 0
+  Parse::CPAN::Meta: 0
+  perl: v5.6.0
+resources:
+  homepage: http://github.com/bingos/cpanplus-internals-source-cpanidx/tree
+  repository: git://github.com/bingos/cpanplus-internals-source-cpanidx.git
+version: 0.04

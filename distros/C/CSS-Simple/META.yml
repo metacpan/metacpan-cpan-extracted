@@ -1,0 +1,23 @@
+---
+abstract: 'Interface through which to read/write/manipulate CSS files while respecting the cascade order'
+author:
+  - 'Kevin Kamel <kamelkev@mailermailer.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CSS-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Tie::IxHash: '0'
+version: '3223'

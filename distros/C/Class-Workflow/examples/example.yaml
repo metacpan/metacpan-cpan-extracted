@@ -1,0 +1,57 @@
+---
+# data not under the key "workflow" is ignored.
+# In this example I use 'misc' to predeclare
+# an alias to some code I'll be using later.
+misc:
+  set_owner_to_current_user: &setowner !perl/code: |
+    {
+      my ( $self, $instance, $c ) = @_;
+      # set the owner to the user applying the
+      # transition (see Class::Workflow::Context)
+      return { owner => $c->user };
+    }
+workflow:
+  initial_state: new
+  states:
+    - name: new
+      transitions:
+        # you can store transition
+        # information inline:
+        - name    : reject
+          to_state: rejected
+        # or symbolically, defining
+        # in the transitions section
+        - accept
+    - name: open
+      transitions:
+        - name    : reassign
+          to_state: unassigned
+          # clear the "owner" field in the instance
+          set_fields:
+            owner: ~
+        - name    : claim_fixed
+          to_state: awaiting_approval
+    - name: awaiting_approval
+      transitions:
+        - name    : resolved
+          to_state: closed
+        - name    : unresolved
+          to_state: open
+    - name: unassigned
+      transitions:
+        - name    : take
+          to_state: open
+          # to dynamically set instance
+          # you do something like this:
+          body_sets_fields: 1
+          body            : *setowner
+    # these two are end states
+    - closed
+    - rejected
+  # we now need to define
+  # the "accept" transition
+  transitions:
+    - name            : accept
+      to_state        : open
+      body_sets_fields: 1
+      body            : *setowner

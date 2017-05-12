@@ -1,0 +1,21 @@
+Revision history for Crypt-PerfectPaperPasswords
+
+0.01    2007-11-17
+        - Initial release.
+
+0.02    2007-11-17
+        - Oops - included missing MANIFEST items
+
+0.03    2007-11-17
+        - Removed BigInt silliness
+
+0.04    2007-11-17
+        - Sigh. Fixed t/000-load.t
+
+0.05    2007-11-17
+        - pppp command line tool working
+        - Optional Math::BigInt support for big keys
+
+0.06    2009-05-29
+        - migrate to GitHub
+        - switch from EUMM to MB

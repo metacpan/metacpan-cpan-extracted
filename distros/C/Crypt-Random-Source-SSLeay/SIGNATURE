@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 af2d0a12eda7c4b26bd3f6761ac817be36a8401e MANIFEST
+SHA1 606bd6424682249397d63caf905f651178a4d6cc MANIFEST.SKIP
+SHA1 15404ccc81b09e16bf6f3f63203c7a431d42c4e2 META.yml
+SHA1 08f81870f1071be75f9ccaf50678ea7458a021ad Makefile.PL
+SHA1 0e734d38a3204c60ae5dcb79a8bbd78bec334537 lib/Crypt/Random/Source/SSLeay.pm
+SHA1 6a65423b537e94bafefbb59b720fc007b48e056c lib/Crypt/Random/Source/Strong/SSLeay.pm
+SHA1 883d68bad9b26fe584a77834d8830b106f0d6415 lib/Crypt/Random/Source/Weak/SSLeay.pm
+SHA1 7437445a3bb6588940bbe5047e6915d7b5774418 t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAksNZcgACgkQVCwRwOvSdBgueACgtqW18CMTo4q/Z0vnsPW7gxJ6
+SNIAn3sfuNClPEcMeYRqxmZIBjMjR3SR
+=ZGUi
+-----END PGP SIGNATURE-----

@@ -1,0 +1,29 @@
+---
+abstract: 'A cache of indifferent quality'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Digest::SHA: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cache-Meh
+requires:
+  Carp: '0'
+  File::Copy: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  Storable: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Cache-Meh
+  homepage: https://metacpan.org/dist/Cache-Meh
+  repository: git://github.com/mrallen1/Cache-Meh.git
+version: '0.04'

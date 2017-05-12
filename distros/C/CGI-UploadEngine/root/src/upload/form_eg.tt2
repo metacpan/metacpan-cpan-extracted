@@ -1,0 +1,17 @@
+[% META title = 'File upload form example' %]
+<form action='[% action_url %]' method='POST'>
+<table cellspacing="2" cellpadding="0" width="600">
+      <tr>
+           <td width='35%' valign='center' style='font-size:12; text-align:right; background-color:#F7E2D9; padding-right:10; height:22;'> Select file </td>
+           <td width='65%' valign='center' style='font-size:12; height:22;'> [% file_upload %] </td>
+      </tr>
+      <tr>
+           <td valign='center' style='font-size:12; text-align:right; background-color:#F7E2D9; padding-right:10; height:22;'> Your fields here </td>
+           <td valign='center' style='font-size:12; height:22;'> <input type='text' size='50' name='other' id='other' value=''> </td>
+      </tr>
+      <tr>
+           <td valign='center' style='font-size:12; height:22;'> &nbsp; </td>
+           <td valign='center' style='font-size:12; height:22;'> <input type="submit"> </td>
+      </tr>
+</table>
+</form>

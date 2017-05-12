@@ -1,0 +1,30 @@
+---
+abstract: 'Base class for virtual base classes.'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Virtual
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp::Assert: '0.1'
+  Class::Data::Inheritable: '0.02'
+  Class::ISA: '0.31'
+  Test::More: '0.5'
+resources:
+  bugtracker: https://github.com/schwern/Class-Virtual/issues
+  homepage: https://metacpan.org/release/Class-Virtual
+  repository: https://github.com/schwern/Class-Virtual
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

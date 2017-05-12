@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb01
+registers:
+  AF: 4256
+  AF_: 0
+  BC: 46066
+  BC_: 0
+  DE: 46208
+  DE_: 0
+  HL: 61285
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

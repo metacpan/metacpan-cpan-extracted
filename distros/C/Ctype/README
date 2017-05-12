@@ -1,0 +1,25 @@
+Ctype version 0.02
+==================
+
+Ctype is a module that provides character classification.  It has a 
+plain interface (accesible through the functions with the same names as 
+the ones in the C library) and an OO interface.  
+
+NOTE: Though this module will probably find some use, since it is _very_ 
+small, it serves as a good example of how to make an XS/Perl module with 
+OO/regular interfaces.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  (None)

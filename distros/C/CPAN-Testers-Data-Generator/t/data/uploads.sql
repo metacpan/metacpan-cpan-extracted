@@ -1,0 +1,1 @@
+INSERT INTO `uploads` (uploadid,type,author,dist,version,filename,released) VALUES (206879,'backpan','BARBIE','CPAN-Testers-WWW-Statistics','1.06','CPAN-Testers-WWW-Statistics-1.06.tar.gz',1376821046);

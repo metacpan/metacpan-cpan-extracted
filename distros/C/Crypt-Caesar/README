@@ -1,0 +1,28 @@
+NAME
+    Crypt::Caesar - Decrypt rot-N strings
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SYNOPSIS
+        use Crypt::Caesar;
+        print caesar("Vn tjp xvi nzz, do rjmfn.\n");
+
+DESCRIPTION
+    This module is based on the caesar program from the bsdgames package,
+    made by Stan King and John Eldridge, based on the algorithm suggested by
+    Bob Morris.
+
+  "caesar"
+    This is the only function this package provides. It is exported by
+    default and prototyped ($).
+
+AUTHOR
+    Juerd
+

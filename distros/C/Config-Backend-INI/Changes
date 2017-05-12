@@ -1,0 +1,24 @@
+0.12 INI.pm contained a print statement for debugging purposes.
+
+0.11 INI.pm contained one variable that was 'my'-ed out of scope.
+
+0.10 Set and Del will now immediatly update the INI file.
+
+0.09 Changed a testcase to have multiple lines for a value.
+
+0.08 Changed namespace from Conf::INI -> Config::Backend::INI.
+
+0.07 Wrong prerequisite Tie::Cfg has to be Config::IniFiles.
+     Flaw in testscript. Deleted wrong entry from ini file.
+
+0.06 Changed backend to Config::IniFiles. And added 'del' method.
+
+0.03 Documentation: Conf::SQL was named Conf::SQL - the *file* backend...
+	is now Conf::SQL - the SQL backend...
+
+0.02 Changed the interface for Conf::SQL.
+
+0.01  Mon Mar 29 14:36:50 2004
+	- original version; created by h2xs 1.22 with options
+		-X Conf
+

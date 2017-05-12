@@ -1,0 +1,19 @@
+---
+name: CPAN-Porters
+version: 0.03
+author:
+  - 'This document is maintained by Gabor Szabo <gabor@pti.co.il>'
+abstract: Description on how to created binary packages from CPAN distributions
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.47
+provides:
+  CPAN::Porters:
+    file: lib/CPAN/Porters.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

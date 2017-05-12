@@ -1,0 +1,25 @@
+---
+abstract: 'Helpers to set the current model or view instance'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-CurrentComponents
+requires:
+  Catalyst: '5.90060'
+  Moo: '2.003000'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-Plugin-CurrentComponents/issues
+  homepage: https://github.com/jjn1056/Catalyst-Plugin-CurrentComponents
+  repository: https://github.com/jjn1056/Catalyst-Plugin-CurrentComponents.git
+version: '0.007'
+x_serialization_backend: 'YAML::Tiny version 1.69'

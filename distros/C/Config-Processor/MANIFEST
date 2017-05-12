@@ -1,0 +1,33 @@
+Changes
+examples/etc/db.json
+examples/etc/db_connectors/default.yml
+examples/etc/db_connectors/default_test.yml
+examples/etc/dirs.yml
+examples/example.pl
+lib/Config/Processor.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-base.t
+t/01-accessors.t
+t/02-processing.t
+t/03-exceptions.t
+t/04-pod-coverage.t
+t/etc/bar_A.json
+t/etc/bar_B.jsn
+t/etc/foo_A.yaml
+t/etc/foo_B.yml
+t/etc/includes/moo_A.yml
+t/etc/includes/moo_B.json
+t/etc/includes/moo_C.yml
+t/etc/invalid.json
+t/etc/invalid.yml
+t/etc/jar.json
+t/etc/moo.yml
+t/etc/yar.yml
+t/etc/yar_A.yml
+t/etc/yar_B.yml
+t/etc/yar_C.yml
+t/etc/zoo.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

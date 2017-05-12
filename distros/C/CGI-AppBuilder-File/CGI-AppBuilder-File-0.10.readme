@@ -1,0 +1,101 @@
+NAME
+    CGI::AppBuilder::File - File module
+
+SYNOPSIS
+      use CGI::AppBuilder::File;
+
+      my $ab = CGI::AppBuilder::File->new(
+         'ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my ($q, $ar, $ar_log) = $ab->start_app($0, \%ARGV);
+      my $fn = 'test.txt';
+      print $ab->disp_file($fn, $ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  disp_file ($fn, $ar)
+    Input variables:
+
+      $q    - CGI object
+      $ar   - array ref for parameters
+      $fn   - file name
+      $rt   - whether to return the text to caller
+      $st   - search text
+
+    Variables used or routines called: N/A
+
+    How to use:
+
+      print     $self->disp_file($ar,'test.txt');
+      my $txt = $self->disp_file($ar,'test.txt',1);
+
+    Return: none or text
+
+  prt_bin_file ($fn)
+    Input variables:
+
+      $fn   - file name
+
+    Variables used or routines called: N/A
+
+    How to use:
+
+      print     $self->prt_bin_file('test.tar');
+
+    Return: none or text
+
+  copy_file ($f1, $f2, $txt)
+    Input variables:
+
+      $f1   - source file name
+      $f2   - target file name
+      $txt  - text to be appended to $f2
+
+    Variables used or routines called:
+
+      File::Copy 
+        copy - copy files
+
+    How to use:
+
+      my $f1 = 'text1.txt';
+      my $f2 = 'text1.out';
+      # duplicate the file and add 'quit' in the end
+      $self->copy_file($f1, $f2, 'quit');
+
+    Return: none
+
+HISTORY
+    *   Version 0.10
+
+        This version extracts the disp_form method from CGI::Getopt class,
+        inherits the new constructor from CGI::AppBuilder, and adds new
+        methods of replace_named_variables, explode_variable, and
+        explode_html.
+
+    *   Version 0.20
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 252:
+        You forgot a '=back' before '=head1'
+

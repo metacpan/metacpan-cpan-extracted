@@ -1,0 +1,32 @@
+Revision history for Perl extension Crypt::License::Util
+
+2.00  Sun Sep 22 16:15:16 PDT 2002
+	change group name to Crypt
+
+1.01  Tue Jan 23 16:28:22 PST 2001
+	add method chain2prevLicense
+
+1.00  Tue Jan 23 09:41:32 PST 2001
+	**** Compatibility Change ****
+	Dropped the $ptr2_License in method 'path2License' and
+	cause the method to instantiate the pointer if needed.
+
+	Method 'exportNext2' converted to take an array of
+	modules rather than a single argument.
+
+	Method 'requireLicense4'  converted to take an array
+	of modules rather than a single argument.
+
+	Add method 'requirePrivateLicense4' to instantiate
+	a list of private modules.
+
+	Add method 'modules4privateList' to add private
+	modules to the 'private' value scalar.
+	
+0.02  Sun Jan 21 17:03:34 PST 2001
+	add method 'exportNext2' to auto install License pointer
+	in modules which inherit methods from their caller
+
+0.01  Fri Jan 19 18:18:52 PST 2001
+	- original version; created by h2xs 1.20 with options
+		-cn 

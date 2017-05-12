@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml
+TODO
+Makefile.PL
+README
+lib/Chemistry/File/InternalCoords.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/hydrogen.t
+t/water.t

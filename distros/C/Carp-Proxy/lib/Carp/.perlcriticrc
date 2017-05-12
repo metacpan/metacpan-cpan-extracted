@@ -1,0 +1,26 @@
+# -*- fundamental -*-
+
+severity = brutal
+verbose  = 9
+
+#----- I find these policies to always be bogus
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitCascadingIfElse]
+[-ControlStructures::ProhibitCStyleForLoops]
+[-ControlStructures::ProhibitPostfixControls]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::ProhibitExplicitReturnUndef]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-TestingAndDebugging::ProhibitNoStrict]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-ValuesAndExpressions::RequireConstantVersion]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+[Documentation::RequirePodSections]
+lib_sections = BUGS AND LIMITATIONS | DEPENDENCIES | DESCRIPTION | EXPORTS | LICENSE AND COPYRIGHT | METHODS | NAME | SEE ALSO | SUPPORT | SYNOPSIS

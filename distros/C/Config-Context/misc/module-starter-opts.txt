@@ -1,0 +1,2 @@
+
+    $ module-starter --mb --module=Config::Context --author="Michael Graham" --email=mag-perl@occamstoothbrush.com

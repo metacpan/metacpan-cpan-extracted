@@ -1,0 +1,13 @@
+Revision history for Class-DBI-Audit
+
+0.01    Mon Apr 23 09:50:53 EDT 2007
+        First version.
+
+0.02    Tue Aug 14 09:00:45 EDT 2007
+        Fixed prerequisites, added Makefile.PL
+
+0.04    Tue Sep  2 15:31:47 EDT 2008
+        Fixed META.yml
+        added Carp clucks outside of transactions
+        Don't audit nulls during inserts
+

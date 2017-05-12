@@ -1,0 +1,20 @@
+1.02  Thu Sep 15 2005  Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+	* Switched from ExtUtils::MakeMaker to Module::Build.
+	* Added dependencies on Class::DBI 0.96 (thanks to MJH <mjh@liminalflux.net
+	  for the suggestion)
+	* Updated the README documentation.
+	* Changed the environment variables used for testing.
+	* Fixed testing so that tests are skipped when optional prerequisites are
+	  not installed.
+	* Removed Class::DBI::DDL::mysql as it did nothing.
+	
+1.01  Thu Dec 11 2003  Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+	* Initial release version.
+	* Support for PostgreSQL and MySQL tested.
+	* Contains public methods: create_table, drop_table, column_definition,
+	  index_definition.
+	* Includes support for helper packages with methods: pre_create_table,
+	  post_create_table, pre_drop_table, post_drop_table.
+

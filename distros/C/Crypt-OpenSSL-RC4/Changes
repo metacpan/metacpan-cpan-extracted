@@ -1,0 +1,16 @@
+Revision history for Perl extension Crypt::OpenSSL::RC4
+
+0.04 Fri Aug 16 08:27:51 JST 2013
+
+    - re-release
+
+0.03 Fri Aug 16 08:27:51 JST 2013
+
+    - minor packaging fixes
+
+0.02
+
+        - initial release to cpan
+
+0.01    Thu Dec 11 22:15:54 2008
+        - original version

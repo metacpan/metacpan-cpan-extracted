@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-Method-Auto
+version: 1.00
+author:
+  - Bernhard Bauer, E<lt>bauerb@in.tum.deE<gt>
+abstract: Turn subroutine calls into class method calls
+license: perl
+generated_by: Module::Build version 0.261, without YAML.pm

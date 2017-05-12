@@ -1,0 +1,8 @@
+0.03
+    - No longer uses NEXT (rbo)
+
+0.02
+    - Improve resilience of test suite to changes in Catalyst (Will Hawes)
+
+0.01
+    - Initial release

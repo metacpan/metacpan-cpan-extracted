@@ -1,0 +1,194 @@
+NAME
+
+       JIS8 - Source code filter for JIS8 script (Imitation JPerl)
+
+SYNOPSIS
+
+    In your script:
+
+      use JIS8;
+
+    At command prompt:
+
+      perl  yourscript.pl  wild*  *card  and  '*quote*'  on MSWin32
+
+DESCRIPTION
+
+      This software is "JPerl on the Modern Perl" written by Perl.
+      This software treats JIS8 directly. Therefore, there is not UTF8 flag.
+
+INSTALLATION BY MAKE (for UNIX like system)
+
+To install this software by make, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALLATION WITHOUT MAKE (for DOS like system)
+
+To install this software without make, type the following:
+
+   perl pMakefile.PL    --- pMakefile.PL makes "pmake.bat" only, and ...
+   pmake.bat
+   pmake.bat test
+
+   pmake.bat install    --- install to current using Perl
+
+   pmake.bat dist       --- make distribution package
+   pmake.bat ptar.bat   --- make perl script "ptar.bat"
+
+DEPENDENCIES
+
+This software requires perl5.00503 or later.
+
+LICENSE AND COPYRIGHT
+
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+MAINTAINER
+
+This project was originated by INABA Hitoshi <ina@cpan.org>.
+
+JIS X 0201 (2013.07.07 23:58:00 JST). In Wikipedia: The Free Encyclopedia.
+Retrieved from
+http://en.wikipedia.org/wiki/JIS_X_0201
+
+JIS X 0201, a Japanese Industrial Standard developed in 1969 (then called JIS
+C 6220 until the JIS category reform), was the first Japanese electronic
+character set to become widely used. It is either 7-bit encoding or 8-bit
+encoding, although 8-bit encoding is dominant for modern use. The full name of
+this standard is 7-bit and 8-bit coded character sets for information
+interchange.
+
+The first 96 codes comprise an ASCII variant, while the second 96 character
+codes represent the phonetic Japanese katakana signs. Since the encoding does
+not provide any way to express hiragana or kanji, it is only capable of
+expressing simplified written Japanese. Nevertheless, it is possible to express,
+at least phonetically, the full range of sounds in the language. In the 1980s,
+this was acceptable for media such as text mode computer terminals, telegrams,
+receipts or other electronically handled data.
+
+Implementation details
+
+The first 96 codes in JIS comprise a Japanese variant of ISO 646, or ASCII with
+backslash (\) and tilde (~) replaced by yen (\) and overline (> ), while the
+second 96 codes consist mainly of katakana. Control characters are specified in
+JIS X 0211.
+
+JIS X 0201 was supplanted by subsequent encodings such as Shift JIS (which
+combines this standard and JIS X 0208) and later Unicode.
+
+The substitution of the yen symbol for backslash can make paths on DOS and
+Windows-based computers with Japanese support display strangely, like
+"C:\Program Files\", for example. Another similar problem is C programming
+language's control characters of string literals, like printf("Hello, world.\n");.
+
+
+* ALGORITHM #1
+
+ When the character is taken out of the octet string, it is necessary to
+distinguish a single octet character and the multiple octet character.
+The distinction is done only by first octet.
+
+    Single octet code is:
+      0x00-0xFF
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+* ALGORITHM #2
+
+Against algorithm.1, when the range of the character by tr/// is specified,
+only the following character codes are effective.
+
+    Single octet code is:
+      0x00-0xFF
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+SEE ALSO
+
+perl, JIS8.pm, Ejis8.pm, jacode.pl
+

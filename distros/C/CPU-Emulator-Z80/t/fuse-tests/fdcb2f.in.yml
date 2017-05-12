@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 41
+    - 47
+  5857:
+    - 24
+name: fdcb2f
+registers:
+  AF: 65414
+  AF_: 0
+  BC: 62146
+  BC_: 0
+  DE: 40751
+  DE_: 0
+  HL: 51526
+  HL_: 0
+  I: 0
+  IX: 24544
+  IY: 5816
+  PC: 0
+  R: 0
+  SP: 0

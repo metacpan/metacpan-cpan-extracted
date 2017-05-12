@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 151
+    - 76
+  34531:
+    - 99
+name: ddcb4c
+registers:
+  AF: 1336
+  AF_: 0
+  BC: 48227
+  BC_: 0
+  DE: 61569
+  DE_: 0
+  HL: 2645
+  HL_: 0
+  I: 0
+  IX: 34636
+  IY: 32931
+  PC: 0
+  R: 0
+  SP: 0

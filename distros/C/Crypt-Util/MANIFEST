@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Crypt/Util.pm
+lib/Crypt/Util.pmc
+lib/Digest/MoreFallbacks.pm
+lib/Digest/MultiHash.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/basic.t
+t/digest.t
+t/encoding.t
+t/encrypt.t
+t/exported.t
+t/multihash.t
+t/tamper.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

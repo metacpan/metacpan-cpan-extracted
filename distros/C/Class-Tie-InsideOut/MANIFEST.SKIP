@@ -1,0 +1,31 @@
+# Avoid version control files.
+_darcs\b
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\.git
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib$
+\bMYMETA\.
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Avoid Distributions
+
+Class-Tie-InsideOut-\d.*
+\binc/

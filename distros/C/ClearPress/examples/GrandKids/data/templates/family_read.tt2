@@ -1,0 +1,19 @@
+
+[<a href="[% model.id_family %];edit">Edit</a>]
+<h2>family </h2>
+<table>
+ <tr><th>address</th><td>[% model.address %]</td></tr>
+ <tr><th>city</th><td>[% model.city %]</td></tr>
+ <tr><th>name</th><td>[% model.name %]</td></tr>
+ <tr><th>state</th><td>[% model.state %]</td></tr>
+ <tr><th>zip</th><td>[% model.zip %]</td></tr>
+
+</table>
+
+[% PROCESS child_list.tt2 %]
+
+
+
+ [<a href="[% SCRIPT_NAME %]/child/;add?id_family=[% model.id_family %]">Add child</a>]
+
+ 

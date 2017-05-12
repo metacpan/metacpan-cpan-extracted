@@ -1,0 +1,94 @@
+package Convert::IBM390;        # -*-perl-*-
+
+use strict;
+use Carp;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+require Exporter;
+
+@ISA = qw(Exporter);
+@EXPORT = qw();
+@EXPORT_OK = qw(asc2eb eb2asc eb2ascp packeb unpackeb
+   hexdump set_codepage set_translation);
+$VERSION = '0.29';
+
+%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+
+#------------ These tables are now defined in IBM390.xs.
+#------------ Kept here for historical purposes only.
+#my ($a2e_table, $e2a_table);
+#$a2e_table = pack "H512",
+# "00010203372d2e2f1605150b0c0d0e0f101112133c3d322618193f271c1d1e1f".
+# "405a7f7b5b6c507d4d5d5c4e6b604b61f0f1f2f3f4f5f6f7f8f97a5e4c7e6e6f".
+# "7cc1c2c3c4c5c6c7c8c9d1d2d3d4d5d6d7d8d9e2e3e4e5e6e7e8e9ade0bd5f6d".
+# "79818283848586878889919293949596979899a2a3a4a5a6a7a8a9c04fd0a107".
+# "202122232425061728292a2b2c090a1b30311a333435360838393a3b04143eff".
+# "41aa4ab19fb26ab5bbb49a8ab0caafbc908feafabea0b6b39dda9b8bb7b8b9ab".
+# "6465626663679e687471727378757677ac69edeeebefecbf80fdfefbfcbaae59".
+# "4445424643479c4854515253585556578c49cdcecbcfcce170dddedbdc8d8edf";
+#
+#$e2a_table = pack "H512",
+# "000102039c09867f978d8e0b0c0d0e0f101112139d0a08871819928f1c1d1e1f".
+# "808182838485171b88898a8b8c050607909116939495960498999a9b14159e1a".
+# "20a0e2e4e0e1e3e5e7f1a22e3c282b7c26e9eaebe8edeeefecdf21242a293b5e".
+# "2d2fc2c4c0c1c3c5c7d1a62c255f3e3ff8c9cacbc8cdcecfcc603a2340273d22".
+# "d8616263646566676869abbbf0fdfeb1b06a6b6c6d6e6f707172aabae6b8c6a4".
+# "b57e737475767778797aa1bfd05bdeaeaca3a5b7a9a7b6bcbdbedda8af5db4d7".
+# "7b414243444546474849adf4f6f2f3f57d4a4b4c4d4e4f505152b9fbfcf9faff".
+# "5cf7535455565758595ab2d4d6d2d3d530313233343536373839b3dbdcd9da9f";
+#------------ End of tables.
+
+
+# Print an entire string in hexdump format, 32 bytes at a time
+# (like a sysabend dump).
+sub hexdump {
+ my ($String, $startad, $charset) = @_;
+ $startad ||= 0;
+ $charset ||= "ascii";
+ my ($i, $j, $d, $str, $pri, $hexes);
+ my @outlines = ();
+ my $L = length($String);
+#   Generate a printable version of the string.
+ my $pri_ex;
+ if ($charset =~ m/ebc/i) {
+    $pri_ex = '$pri = eb2ascp $str;';
+ } else {
+    $pri_ex = '($pri = $str) =~ tr/\\000-\\037\\177-\\377/ /;';
+ }
+ for ($i = 0; $i < $L; $i += 32) {
+    $str = substr($String, $i,32);
+#   Generate a printable version of the string.
+    eval $pri_ex;
+    $hexes = unpack("H64", $str);
+    $hexes =~ tr/a-f/A-F/;
+    if (($L - $i) < 32) {   # Pad with blanks if necessary.
+       $pri = pack("A32", $pri);
+       $hexes = pack("A64", $hexes);
+    }
+    $d = sprintf("%06X: ", $startad + $i);
+    for ($j = 0; $j < 64; $j += 8) {
+       $d .= substr($hexes, $j, 8) . " ";
+       $d .= " " if $j == 24;
+    }
+    $d .= " *$pri*\n";
+    push @outlines, $d;
+ }
+ return @outlines;
+}
+
+sub version {
+ return "Convert::IBM390 version $VERSION XS+C";
+}
+
+#---------------------------------------------------------------------
+# Use XSLoader if available, otherwise DynaLoader:
+
+eval {
+  require XSLoader;
+  XSLoader::load('Convert::IBM390', $VERSION);
+  1;
+} or do {
+  require DynaLoader;
+  push @ISA, 'DynaLoader';
+  bootstrap Convert::IBM390 $VERSION;
+};

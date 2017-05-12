@@ -1,0 +1,4 @@
+
+0.03 - November 25, 2009
+
+The module was corrected to work better with the latest version of Mail::Builder::Simple, that uses Email::Sender for sending email (and not Email::Send).

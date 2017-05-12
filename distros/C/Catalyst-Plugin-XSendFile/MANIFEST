@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/XSendFile.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/02_basic.t
+t/03_with_staticsimple.t
+t/lib/TestApp.pm
+t/lib/TestApp/root/cpan.jpg
+t/pod-coverage.t
+t/pod.t
+Todo
+META.yml

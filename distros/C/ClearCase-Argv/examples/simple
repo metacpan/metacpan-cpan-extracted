@@ -1,0 +1,65 @@
+##########################################################################
+# This file shows a number of simple uses for ClearCase::Argv.
+# It can be run as a script or cherrypicked for code nuggets.
+##########################################################################
+
+use ClearCase::Argv qw(ctsystem);
+ClearCase::Argv->attropts;
+
+# Here is the simplest possible use of ClearCase::Argv.
+# First, show the functional style:
+
+ctsystem('pwv');
+
+# Next, the equivalent in verbose OO style:
+
+my $ct = ClearCase::Argv->new;
+$ct->prog('pwv');
+$ct->system;
+
+# Or if you prefer that as a one-liner:
+
+ClearCase::Argv->new->prog('pwv')->system;
+
+# Which can be simplified still further:
+
+ClearCase::Argv->pwv->system;
+
+# Now let's turn on verbosity ...
+
+ClearCase::Argv->dbglevel(1);
+
+# ... and repeat the previous command
+
+ClearCase::Argv->pwv->system;
+
+# Try running this with CtCmd (will only work if CtCmd is installed):
+
+ClearCase::Argv->pwv->ctcmd(2)->system;
+
+# And also with IPC mode.
+
+ClearCase::Argv->pwv->ipc(2)->system;
+
+# New section ...
+print "\n", '='x60, "\n", "Flags:\n", '='x60, "\n";
+
+# Now we show how to pass flags. Flags are specified as a simple list
+# but the list is placed within [] to make it an "array ref". This helps
+# us distinguish flags from arguments.
+
+ClearCase::Argv->pwv(['-s', '-wdview'])->system;
+
+# New section ...
+print "\n", '='x60, "\n", "Capturing results:\n", '='x60, "\n";
+my @results;
+
+# Now we'll capture the output by using qx() (the `` operator).
+
+@results = ClearCase::Argv->pwv(['-s'])->qx;
+print @results;
+
+ClearCase::Argv->autochomp(1);
+
+@results = ClearCase::Argv->pwv(['-s'])->qx;
+print '=', @results, "=\n";

@@ -1,0 +1,52 @@
+CAM::Template::Cache - Template files with database storage
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module extends the CAM::Template search-and-replace API with
+support for caching the resulting filled text in a database.  This
+relies on the exitence of a DBI-friendly database, but does have a
+pair of convenience functions to help with the creation and support of
+the cache table in that database.
+
+This module is useful for creating dynamic documents that are
+resource-expensive but do not change too often, like the front page of
+a news site.  It is also useful for a collection of dynamic documents
+that are easier to generate all at once than individually, like
+multi-page results of a complex search.
+
+Much to my surprise, I did not find anything in CPAN that does quite
+what this module does, even after looking at Cache::Cache and DBIx::*.
+
+This module most closely resembles some combination of HTML::Template
+with Cache::Cache via DBI.

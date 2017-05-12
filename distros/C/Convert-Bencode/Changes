@@ -1,0 +1,8 @@
+Revision history for Perl module Convert::Bencode
+
+1.01 Wed Jun 25 21:49:13 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+1.03 Mon Oct 6 16:50:19 2003
+	- added no locale to insure sort function operates properly
+	- added use bytes as suggested by Michael Graff

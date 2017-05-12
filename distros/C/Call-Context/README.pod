@@ -1,0 +1,48 @@
+=encoding utf-8
+
+=head1 NAME
+
+Call::Context - Sanity-check calling context
+
+=head1 SYNOPSIS
+
+    use Call::Context;
+
+    sub gives_a_list {
+
+        #Will die() if the context is not list.
+        Call::Context::must_be_list();
+
+        return (1, 2, 3);
+    }
+
+    gives_a_list();             #die()s: incorrect context (void)
+
+    my $v = gives_a_list();     #die()s: incorrect context (scalar)
+
+    my @list = gives_a_list();  #lives
+
+=head1 DISCUSSION
+
+If your function only expects to return a list, then a call in some other
+context is, by definition, an error. The problem is that, depending on how
+the function is written, it may actually do something expected in testing, but
+then in production act differently.
+
+=head1 FUNCTIONS
+
+=head2 must_be_list()
+
+C<die()>s if the calling function is itself called outside list context.
+(See the SYNOPSIS for examples.)
+
+=head1 EXCEPTIONS
+
+This module throws instances of C<Call::Context::X>. C<Call::Context::X> is
+overloaded to stringify; however, to keep memory usage low, C<overload> is not
+loaded until instantiation.
+
+=head1 REPOSITORY
+
+https://github.com/FGasper/p5-Call-Context
+

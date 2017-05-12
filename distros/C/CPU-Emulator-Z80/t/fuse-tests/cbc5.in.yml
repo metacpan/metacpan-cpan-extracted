@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 197
+  16647:
+    - 204
+name: cbc5
+registers:
+  AF: 16384
+  AF_: 0
+  BC: 50711
+  BC_: 0
+  DE: 1948
+  DE_: 0
+  HL: 16647
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

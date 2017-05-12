@@ -1,0 +1,21 @@
+Crypt_MatrixSSL3_Sess *         T_PTROBJ_SPECIAL
+Crypt_MatrixSSL3_Keys *         T_PTROBJ_SPECIAL
+Crypt_MatrixSSL3_SessID *       T_PTROBJ_SPECIAL
+Crypt_MatrixSSL3_HelloExt *     T_PTROBJ_SPECIAL
+
+INPUT
+T_PTROBJ_SPECIAL
+        if (!SvOK($arg))
+                $var = NULL;
+        else if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = INT2PTR($type, tmp);
+        }
+        else
+                croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\");
+
+OUTPUT
+T_PTROBJ_SPECIAL
+        sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);
+        SvREADONLY_on(SvRV($arg));
+

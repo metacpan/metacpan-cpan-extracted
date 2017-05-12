@@ -1,0 +1,10 @@
+Revision history for Crypt-RS14_PP
+
+0.01    2015-03-03
+        First version, released on an unsuspecting world.
+
+0.02    2015-03-19
+        Fixed bugs in handling of $VERSION and in handling of parameters
+
+0.03    2016-01-06
+        Rework tests, fix bug in encrypt()

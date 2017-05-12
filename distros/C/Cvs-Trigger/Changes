@@ -1,0 +1,16 @@
+######################################################################
+Revision history for Perl extension Cvs::Trigger
+
+0.04  2009/03/22
+    (ms) Skip tests on platforms which don't have cvs installed.
+
+0.03  2008/03/25
+    (ms) removed init() from Cvs::Temp new()
+    (ms) fixed problem with messages containing a single quote
+    (ms) compatible with cvs 1.12.* (needs rebuilding admin CVSROOT)
+
+0.02  2008/02/10
+    (ms) test suite fixes to cope with File::Path changes
+
+0.01  2006/04/06
+    (ms) Where it all began.

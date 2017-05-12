@@ -1,0 +1,13 @@
+Revision history for Perl extension Cache::KyotoTycoon::REST
+
+0.03
+
+        - [INCOMPATIBLE CHANGE] $r->get() should not use wantarray(). It make me confusion.
+        - added multiple database support
+
+0.02
+
+        - micro optimization
+
+0.01    Fri Oct  8 17:23:30 2010
+        - original version

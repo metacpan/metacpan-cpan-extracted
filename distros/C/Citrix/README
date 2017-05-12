@@ -1,0 +1,46 @@
+NAME
+   Citrix - Query and Control UNIX Citrix sessions
+
+DESCRIPTION
+
+Citrix::* modules make it possible to query and control
+sessions on a UNIX Citrix server from a UNIX/Linux based client machine.
+Lacking better Citrix provided C-API the Citrix::* modules are using
+remote shell (rsh) and Citrix command line utilities to query sessions.
+
+SYNOPSIS
+   use Citrix;
+   # Path for Citrix command line utilities
+   $Citrix::binpath = '/some/where/else/bin';
+   # Load Citrix Config
+   Citrix::loadconfig('citrix.conf.pl');
+   my $farms = getfarms('idx' => 1);
+   # Get Honolulu Farm Context to work with
+   my $fc = $farms->{'honolulu'};
+   # Initiate SessionSet (no queries performed yet)
+   my $ss = Citrix::SessionSet->new($fc);
+   
+   # Recall Farm Context of current Session set
+   my $fc = $ss->farmctx();
+   
+   # Query Users sessions
+   my $user = "memrsmith";
+   $ss->mysess($user);
+   print(Dumper($ss));
+
+   # Get single session on host by session ID
+   my $hostsess = "it-hono-01:6987";
+   my $sess = $ss->getsession($hostsess);
+   
+AUTHOR
+
+Olli Hollmen, ohollmen@broadcom.com
+
+TODO
+
+Load configs from DB
+
+   my $dbh = DBI->connect("dbi:SQLite:dbname=mycitrix_config.db","","");
+   # Load Citrix Farms from Database
+   my $farms = Citrix::load_db($dbh);
+ 

@@ -1,0 +1,90 @@
+=head1 NAME
+
+CCCP::ConfigXML - load XML config files or string
+
+=head1 SYNOPSIS
+
+Load XML file. Example:
+
+    # foo_config.xml
+        <foo>
+            <name>TestApp</name>
+            <component name="Controller::Foo">
+                <foo>bar</foo>
+            </component>
+            <model name="Baz">
+                <qux>Stop!</qux>
+            </model>
+        </foo>
+    # bar_config.xml    
+        <bar>
+            <val>x1</val>
+            <val>x2</val>
+            <val>x3</val>
+            <val>x4</val>
+        </bar>
+    # baz_config.xml    
+        <foo>
+            <model name="Bar">
+                <qux>Go!</qux>
+            </model>
+        </foo>
+        
+In your code:
+
+    use CCCP::ConfigXML;
+    # or if you want singletone
+    use CCCP::ConfigXML as => 'singletone';
+    
+    # like XML::Bare
+    my $cnf = CCCP::ConfigXML->new( file => ['foo_config.xml', 'bar_config.xml'] );
+    
+    # now, you can read
+    $cnf->{foo}->{name}->{value};                        # TestApp
+    $cnf->{foo}->{component}->{foo}->{value};            # bar
+    $cnf->{foo}->{component}->{name}->{value};           # Controller::Foo    
+    $cnf->{foo}->{model}->{qux}->{value}                 # Stop!
+    
+    $cnf->add_file(baz_config.xml);
+    $cnf->{foo}->{model}->{qux}->{value}                 # Go!
+    
+=head1 DESCRIPTION
+
+Simple and usefull wrapper on L<XML::Bare> and L<Hash::Merge::Simple>.
+
+=head1 METHODS
+
+=head2 new(file => [...list xml-files...], text => [...list xml-string...], @param_parse)
+
+Constructor. All arguments are optional.
+@param_parse - another parametrs for L<XML::Bare>
+
+=head2 add_file($file[, @param_parse])
+
+Extend instance from $file.
+
+=head2 add_text($xml_str[, @param_parse])
+
+Extend instance from xml-string.
+
+=head1 PACKAGE VARIABLES
+
+=head2 $CCCP::ConfigXML::like_singletone
+
+By default 0.
+Set true when
+
+    use CCCP::ConfigXML as => 'singletone';
+    # or
+    use CCCP::ConfigXML;
+    CCCP::ConfigXML->import(as => 'singletone');
+    # or :)
+    $CCCP::ConfigXML::like_singletone = 1;
+
+When value is true, then C<new> returns a singleton if this is possible.
+
+=head1 AUTHOR
+
+mr.Rico <catamoose at yandex.ru>
+
+=cut

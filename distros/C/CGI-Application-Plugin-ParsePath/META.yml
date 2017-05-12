@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-ParsePath
+version:             0.01
+abstract:            populate query parameters by parsing the
+license:             ~
+author:              
+    - Dan Horne <dhorne@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    CGI::Application:              4.01
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

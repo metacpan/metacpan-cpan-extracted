@@ -1,0 +1,280 @@
+This package requires at least perl5.005.  You're on your own before
+then.
+
+1) Make sure you've got the prerequisites
+
+1.1) Make sure perl has been built.  
+
+1.2) Make sure you have a Curses C library installed.  Either original 
+     BSD Curses or newer Ncurses will do.  Pdcurses (public domain Curses
+     code that works in DOS, Windows, and X11) almost works.  See
+     PDCURSES section below.
+
+2) Chdir into the Curses source directory (which you unpacked from the
+   .tgz file you downloaded from CPAN)
+
+3) Want to see if maybe the package can autoconfigure itself?  It's
+   pretty dumb about it, but give it a try and skip to (5).
+
+4) Configure the build for your system.
+
+4.1)
+
+   Look in the "hints" directory to see if any of the hint files are
+   appropriate to your machine's OS.  If so, symlink or copy it to the
+   file "c-config.h" in the current ("Curses") directory.  If not,
+   copy "hints/c-none.h" to "c-config.h" in the current directory.
+   Then edit "c-config.h" and follow the directions.  If you have to
+   "roll your own", be sure to save a copy.  A "make clean" will
+   delete "c-config.h".  If you "rolled your own", please send me a
+   copy so I can include it in future distributions (see
+   "hints/c-isc.h" for an example of a user-contributed "c-config.h").
+
+4.2)
+
+   Curses has an interface header file named form.h.  If on your system
+   this is in a system header file directory such as /usr/include, you
+   have a problem.  That's because Perl also has a file named form.h
+   in a directory that is searched before the system directories in the
+   compile of the Perl Curses module.
+
+   So you'll have to fix that.  It's better to have your Curses stuff
+   in its own directory.  /usr/include/ncurses is conventional.  Move
+   all your Curses header files (curses.h, ncurses.h, form.h, menu.h,
+   panel.h) into this directory.  If you use /usr/include/ncurses,
+   Makefile.PL will find them there.  Otherwise, set the _CFLAGS
+   environment variables below accordingly.
+
+   Alternatively, you can just edit c-config.h, after running
+   Makefile.PL.  Replace the line
+
+     #include <form.h>
+
+   with something like
+
+     #include "/usr/include/form.h"
+
+   explicitly specifying the Ncurses version of form.h.
+
+   You can ignore all this if you're not building forms capability
+   into the Perl Curses module (by specifying "FORMS" as an option to
+   Makefile.PL below).
+
+4.3)
+
+   Set environment variables telling the compiler and linker where your
+   Curses C libraries are:
+
+      CURSES_CFLAGS: -I and -D options needed at compile time for access to
+        the basic Curses library (libcurses).
+      CURSES_LDFLAGS: -L and -l options needed at link time for access to 
+        the basic Curses library (libcurses).  (this really
+        must be only -L and -l options; Makefile.PL parses it.  Furthermore,
+        there can't be any space between the -L or -l and its value).
+
+      CURSES_PANEL_CFLAGS
+      CURSES_PANEL_LDFLAGS
+      CURSES_MENU_CFLAGS
+      CURSES_MENU_LDFLAGS
+      CURSES_FORM_CFLAGS
+      CURSES_FORM_LDFLAGS
+
+      These are analogous, but for the panel, menu, and form specialty
+      Curses libraries, respectively.
+
+   You can set these in your shell and export them, e.g.
+
+      export CURSES_CFLAGS="-I/usr/include/ncurses"
+      export CURSES_LDFLAGS="-L/usr/lib/ncurses -lncurses"
+
+   Or you can set them right on the 'perl Makefile.PL' command.
+
+
+5) perl Makefile.PL [PANELS] [MENUS] [FORMS]  [options]
+
+   PANELS means to include Curses panel function.
+
+   MENUS means to include Curses menu functions.
+
+   FORMS means to include Curses form function.
+
+   For PANELS, MENUS, and FORMS, you must have the associated C library on
+   your system (libpanel, libmenu, libform).  Choosing one of these options
+   without having the library will prevent this package from compiling.
+
+   Currently, PANELS, MENUS, and FORMS don't work for the BSD 
+   hints files (c-*.bsd.h), because I'm not aware of any panel, menu,
+   or form libraries for BSD curses.
+
+   This package needs the perl header files.  If you've already
+   installed perl, the "Makefile.PL" will magically know where they
+   are.  If you haven't installed perl, you may need to tell the
+   "Makefile.PL" where the header files are.  You can do this with the
+   "PERL_SRC=<source directory>" option.
+
+     perl Makefile.PL PERL_SRC=/local/src/perl
+
+   The "Makefile.PL", as with just about every other perl module, uses
+   the "ExtUtils::MakeMaker" package to generate a make file (named
+   "Makefile").  I highly recommend reading the "ExtUtils::MakeMaker"
+   man page, as there are lots of neat options you can specify.
+
+   If Makefile.PL tells you that it can't do something (it prints out
+   "I'm sorry" and some more stuff), then you'll need to go back to
+   step (4) and try configuring by hand.
+
+6) make
+
+   `make' will first run a perl script called `test.syms' that investigates
+   what the Curses libraries are like on your system and records the
+   results in the file "CursesDef.h".
+
+   test.syms is very brittle -- it works via test compiles, and if any
+   number of things goes wrong with the test compile, it makes bad
+   assumptions, usually that you don't have a certain function in your
+   Curses library.  If test.syms tells you it can't find functions that
+   you think you have, run test.syms manually with the -v (verbose) option.
+   That will show you the error messages from the test compiles and you
+   can figure out what's going wrong and fix it.  Typically, you'll find
+   that you need to do better on your CURSES_* environment variables
+   (see above).
+
+   Alternatively, if you see that test.syms is picking the wrong
+   values, you can edit "CursesDef.h" by hand and follow the
+   directions.  If you have to "roll your own", be sure to save a
+   copy.  A "make clean" will delete "CursesDef.h".
+
+   `make' will then try to compile "Curses.c".  If you get any
+   undefined curses symbols, it means that your curses really doesn't
+   have those functions, and you should edit "CursesDef.h" and/or
+   "c-config.h" and change the #define to #undef for that function.
+
+   If you get other compile errors, it is probably because the curses
+   include file and the perl include files are conflicting.  You'll
+   have to figure out what's wrong and add proper C code to
+   "c-config.h".  See "hints/c-sunos.sysv.h" for an example of how to
+   do this.
+
+7) Test the distribution:
+
+   perl demo
+   perl gdc
+   perl demo2       [stuff that has a 50/50 chance of showing up right]
+   perl demo.panel  [if you enabled panel function]
+   perl demo.menu   [if you enabled menu function]
+   perl demo.form   [if you enabled form function]
+
+   "gdc" is a digital clock ported from the "ncurses" distribution.
+
+   As mentioned in the "README", the demo is not intended to be an
+   exhaustive test of all the possible Curses functions.  If it
+   doesn't do all the functions correctly, it may be a Curses bug or
+   it may be a problem with your system's "libcurses.a".  There's no
+   getting around the fact that you need to be conversant in how your
+   system's "libcurses.a" works to be able to use Curses most
+   effectively.
+
+   For "demo", you can try:
+
+   make cdemo
+
+   This will try to compile a pure-C version of the "demo".  If you
+   see the same errors in it that you see in "demo", it means there's
+   a bug in your libcurses.
+   
+8) Doing a :
+
+   make install
+
+   will install everything in the "standard" perl places, just like
+   stuff from the base perl distribution.
+
+9) Enjoy!
+
+   If your enjoyment is ruined (:-) because the module doesn't work
+   right, peruse the Curses pod document (located at the end of
+   "Curses.pm") for incompatibilities with other Perl programs.  Also
+   check the end of the "README" for problems that may exist for your
+   particular libcurses.a or operating system.
+
+
+HP-UX
+-----
+
+HP-UX has two Curses libraries.  According to HP:
+
+  Libraries libcur_colr.a and libcur_colr.sl, and commands
+  captoinfo_colr, infocmp_colr, tput_colr, and tic_colr are
+  part of HP-UX Color-Curses package used for color-management.
+
+And there is apparently also a library with the standard names.
+The Curses Perl module builds using the standard library by default.
+If you want to use the "color" versions, set the CURSES_CFLAGS and
+CURSES_LDFLAGS environment variables accordingly.
+
+HP recommends using the HP ANSI C compiler for everything but
+compiling the kernel, but the one for compling the kernel is the
+default.  (Seems ridiculous, but an HP user said so).  I don't know
+what difference it makes for the Perl Curses module, but if you
+want to use the ANSI compiler, add this to Makefile.PL's arguments:
+
+  CC=/opt/ansic/bin/cc
+
+
+PDCURSES
+--------
+
+Pdcurses is a public domain Curses implementation that works on DOS,
+OS/2, Win32, and X11.  http://pdcurses.sourceforge.net .
+
+Dave C reported success using Perl Curses with Pdcurses on Windows
+in September 2007.  He gave these notes:
+
+  Environment:
+    Perl Version 5.8.1 built for MSWin32-x86-multi-thread
+    MSVS 2003 Visual C++ 7
+    Windows XP
+    Perl module Curses-1.16
+    Pdcurses 3.3
+
+  Instructions:
+
+  - Set environment variables (for Perl Curses Makefile.PL):
+
+      CURSES_CFLAGS='-Ic:\dev\pdc33'
+      CURSES_LDFLAGS='-Lc:\dev\pdc33 pdcurses.lib'
+    
+  -  Build and Test
+
+       > Makefile.PL
+       > nmake test
+
+       ignore MOUSE_MOVED redefined warning
+       MOUSE_MOVED is never used in Curses 1.16
+
+  - Install:
+
+       > nmake install
+
+
+  - Test:
+
+       demo, demo2, demo.panel scripts successfully run
+
+       > nmake cdemo
+       > cdemo
+
+
+Alexandr Ciornii on September 22, 2006, reported that he had some success
+using Perl Curses with Pdcurses, with these notes:
+
+    I've encountered several problems with it:
+    
+    1. 'pdcurses.h' does not exist; only 'curses.h'.  Renamed it.
+    2. 'curses.h' also defines chtype and attr_t.  Commented out there.
+    3. 'curses.h' also defines SCREEN.  Commented out in 'CursesTyp.h'.
+    4. `perl demo` fails
+    
+        Curses function 'TIESCALAR' called with too few arguments at
+        C:\cpan\Curses-1.14\blib\lib/Curses.pm line 82.
+        Compilation failed in require at demo line 11.

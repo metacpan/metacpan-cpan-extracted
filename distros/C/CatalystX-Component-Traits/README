@@ -1,0 +1,113 @@
+NAME
+    CatalystX::Component::Traits - Automatic Trait Loading and Resolution
+    for Catalyst Components
+
+SYNOPSIS
+        package Catalyst::Model::SomeModel;
+        with 'CatalystX::Component::Traits';
+
+        package MyApp::Model::MyModel;
+        use parent 'Catalyst::Model::SomeModel';
+
+        package MyApp;
+
+        __PACKAGE__->config('Model::MyModel' => {
+            traits => ['SearchedForTrait', '+Fully::Qualified::Trait']
+        });
+
+DESCRIPTION
+    Adds a "COMPONENT" in Catalyst::Component method to your Catalyst
+    component base class that reads the optional "traits" parameter from app
+    and component config and instantiates the component subclass with those
+    traits using "new_with_traits" in MooseX::Traits from
+    MooseX::Traits::Pluggable.
+
+TRAIT SEARCH
+    Trait names qualified with a "+" are taken to be full package names.
+
+    Unqualified names are searched for, using the algorithm described below.
+
+  EXAMPLE
+    Suppose your inheritance hierarchy is:
+
+        MyApp::Model::MyModel
+        Catalyst::Model::CatModel
+        Catalyst::Model
+        Catalyst::Component
+        Moose::Object
+
+    The configuration is:
+
+        traits => ['Foo']
+
+    The package search order for "Foo" will be:
+
+        MyApp::TraitFor::Model::CatModel::Foo
+        Catalyst::TraitFor::Model::CatModel::Foo
+
+  A MORE PATHOLOGICAL EXAMPLE
+    For:
+
+        My::App::Controller::AController
+        CatalystX::Something::ControllerBase::SomeController
+        Catalyst::Controller
+        Catalyst::Model
+        Catalyst::Component
+        Moose::Object
+
+    With:
+
+        traits => ['Foo']
+
+    Search order for "Foo" will be:
+
+        My::App::TraitFor::Controller::SomeController::Foo
+        CatalystX::Something::TraitFor::Controller::SomeController::Foo
+
+    The "Base" after (M|V|C) is automatically removed.
+
+TRAIT MERGING
+    Traits from component class config and app config are automatically
+    merged if you set the "_trait_merge" attribute default, e.g.:
+
+        has '+_trait_merge' => (default => 1);
+
+    You can remove component class config traits by prefixing their names
+    with a "-" in the app config traits.
+
+    For example:
+
+        package Catalyst::Model::Foo;
+        has '+_trait_merge' => (default => 1);
+        __PACKAGE__->config->{traits} = [qw/Foo Bar/];
+
+        package MyApp;
+        __PACKAGE__->config->{'Model::Foo'}{traits} = [qw/-Foo Baz/];
+
+    Will load the traits:
+
+        Bar Baz
+
+AUTHOR
+    Rafael Kitover, "<rkitover@cpan.org>"
+
+CONTRIBUTORS
+    Tomas Doran, "<bobtfish@bobtfish.net>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalystx-component-traits at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CatalystX-Component-Trai
+    ts>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Matt S. Trout and Tomas Doran helped me with the current design.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2014, Rafael Kitover
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

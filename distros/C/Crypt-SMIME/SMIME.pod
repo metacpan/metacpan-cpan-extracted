@@ -1,0 +1,290 @@
+=encoding utf-8
+
+=head1 NAME
+
+Crypt::SMIME - S/MIME message signing, verification, encryption and decryption
+
+
+=head1 SYNOPSIS
+
+  use Crypt::SMIME;
+
+  my $plain = <<'EOF';
+  From: alice@example.org
+  To: bob@example.com
+  Subject: Crypt::SMIME test
+
+  This is a test mail. Please ignore...
+  EOF
+
+  my $smime = Crypt::SMIME->new();
+  $smime->setPrivateKey($privkey, $crt);
+  # $smime->setPublicKey([$icacert]); # if need be.
+
+  my $signed = $smime->sign($plain);
+  print $signed;
+
+=head1 DESCRIPTION
+
+This module provides a class for handling S/MIME messages. It can sign, verify,
+encrypt and decrypt messages. It requires libcrypto (L<http://www.openssl.org>).
+
+
+=head1 EXPORTS
+
+No symbols are exported by default. The following symbols can
+optionally be exported:
+
+
+=over
+
+=item C<NO_CHECK_CERTIFICATE>
+
+See L</check()>.
+
+
+=item C<FORMAT_SMIME>
+
+=item C<FORMAT_ASN1>
+
+=item C<FORMAT_PEM>
+
+See L</extractCertificates()>.
+
+
+=item C<:constants>
+
+Export all of the above.
+
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item new()
+
+  my $smime = Crypt::SMIME->new();
+
+The constructor takes no arguments.
+
+
+=item setPrivateKey()
+
+  $smime->setPrivateKey($key, $crt);
+  $smime->setPrivateKey($key, $crt, $password);
+
+Store a private key and its X.509 certificate into the instance. The private key
+will be used for signing and decryption. Note that this method takes a PEM
+string, not a name of a file which contains a key or a certificate.
+
+
+The private key and certificate must be encoded in PEM format. The method dies
+if it fails to load the key.
+
+
+=item setPrivateKeyPkcs12()
+
+  $smime->setPrivateKeyPkcs12($key, $pkcs12);
+  $smime->setPrivateKeyPkcs12($key, $pkcs12, $password);
+
+Load a private key and its X.509 certificate from PKCS#12 into the instance.
+The private key will be used for signing and decryption. The method dies if
+it fails to load PKCS12.
+
+
+=item setPublicKey()
+
+  $smime->setPublicKey($crt);
+  $smime->setPublicKey([$crt1, $crt2, ...]);
+
+Store one or more X.509 certificates into the instance. The public keys will be
+used for signing, verification and encryption.
+
+
+The certificates must be encoded in PEM format. The method dies if it fails to
+load the certificates.
+
+
+=item setPublicKeyStore()
+
+  $smime->setPublicKeyStore($path, ...);
+
+Set the paths of file or directory containing trusted certificates.
+The certificate stores will be used for verification.
+
+
+The method dies if it fails to load the certificate stores.
+
+
+=item sign()
+
+  $signed_mime = $smime->sign($raw_mime);
+
+Sign a MIME message and return an S/MIME message. The signature is always
+detached.
+
+
+Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
+top-level of the MIME message. C<Subject> header will be copied to both of the
+plain text part and the top-level for mail clients which can't properly handle
+S/MIME messages.
+
+
+The resulting message will be tainted if any of the original MIME
+message, the private key or its certificate is tainted.
+
+
+=item signonly()
+
+  $sign = $smime->signonly($prepared_mime);
+
+Generate a signature from a MIME message. The resulting signature is encoded in
+Base64. The MIME message to be passed to this method should be preprocessed
+beforehand by the prepareSmimeMessage() method. You would rarely need to call
+this method directly.
+
+
+The resulting signature will be tainted if any of the original MIME
+message, the private key or its certificate is tainted.
+
+
+=item prepareSmimeMessage()
+
+  ($prepared_mime, $outer_header)
+      = $smime->prepareSmimeMessage($source_mime);
+
+Preprocess a MIME message to be signed. C<$prepared_mime> will be a string
+containing the processed MIME message, and C<$outer_header> will be a string
+that is a list of headers to be moved to the top-level of MIME message. You
+would rarely need to call this method directly.
+
+
+The entity body of C<$source_mime> will be directly copied to
+C<$prepared_mime>. Any headers of C<$source_mime> except C<Content-*>, C<MIME-*>
+and C<Subject> will be copied to C<$prepared_mime>, and those excluded headers
+will be copied to C<$outer_header>. Note that the C<Subject> header will be
+copied to both side exceptionally.
+
+
+=item check()
+
+  use Crypt::SMIME qw(:constants);
+
+  $source_mime = $smime->check($signed_mime);
+  $source_mime = $smime->check($signed_mime, $flags);
+
+Verify a signature of S/MIME message and return a MIME message. The method dies
+if it fails to verify it.
+
+
+When the option C<Crypt::SMIME::NO_CHECK_CERTIFICATE> is given as
+C<$flags>, the signer's certificate chain is not verified. The default
+value for C<$flags> is C<0>, which performs all the verifications.
+
+
+The resulting message will be tainted if the original S/MIME message,
+the C<$flags>, or at least one public key is tainted.
+
+
+=item encrypt()
+
+  $encrypted_mime = $smime->encrypt($raw_mime);
+
+Encrypt a MIME message and return a S/MIME message.
+
+
+Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
+top-level of the MIME message. C<Subject> header will be copied to both of the
+plain text part and the top-level for mail clients which can't properly handle
+S/MIME messages.
+
+
+The resulting message will be tainted if the original MIME message or
+at least one public key is tainted.
+
+
+=item decrypt()
+
+  $decrypted_mime = $smime->decrypt($encrypted_mime);
+
+Decrypt an S/MIME and return a MIME message. This method dies if it fails to
+decrypt it.
+
+
+The resulting message will be tainted if any of the original S/MIME
+message, the private key or its certificate is tainted.
+
+
+=item isSigned()
+
+  $is_signed = $smime->isSigned($mime);
+
+Return true if the given string is a signed S/MIME message. Note that if the
+message was encrypted after signing, this method returns false because in that
+case the signature is hidden in the encrypted message.
+
+
+=item isEncrypted()
+
+  $is_encrypted = $smime->isEncrypted($mime);
+
+Return true if the given string is an encrypted S/MIME message. Note that if the
+message was signed with non-detached signature after encryption, this method
+returns false because in that case the encrypted message is hidden in the
+signature.
+
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item extractCertificates()
+
+  use Crypt::SMIME qw(:constants);
+
+  @certs = @{Crypt::SMIME::extractCertificates($data)};
+  @certs = @{Crypt::SMIME::extractCertificates($data, FORMAT_SMIME)};
+
+Get all X.509 certificates (and CRLs, if any) included in S/MIME
+message or PKCS#7 object $data. Optional C<$type> parameter may
+specify type of data:
+C<Crypt::SMIME::FORMAT_SMIME> (default) for S/MIME message;
+C<Crypt::SMIME::FORMAT_ASN1> for binary format;
+C<Crypt::SMIME::FORMAT_PEM> for PEM format.
+
+
+=item getSigners()
+
+  @certs = @{Crypt::SMIME::getSigners($data)};
+  @certs = @{Crypt::SMIME::getSigners($data, $type)};
+
+Get X.509 certificates of signers included in S/MIME message or PKCS#7 object.
+Optional $type parameter may specify type of data.
+
+
+Note that any public keys returned by this function are not verified.
+check() should be executed to ensure public keys are valid.
+
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2006-2014 YMIRLINK Inc. All Rights Reserved.
+
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+
+Bug reports and comments to: tl@tripletail.jp
+
+
+=for comment
+Local Variables:
+mode: cperl
+End:
+

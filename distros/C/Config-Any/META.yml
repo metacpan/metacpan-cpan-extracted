@@ -1,0 +1,26 @@
+---
+abstract: 'Load configuration from different file formats, transparently'
+author:
+  - 'Joel Bernstein <rataxis@cpan.org>'
+build_requires:
+  Test::More: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Any
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Module::Pluggable::Object: '3.6'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Any
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/p5sagit/Config-Any.git
+version: '0.32'
+x_authority: cpan:RATAXIS
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

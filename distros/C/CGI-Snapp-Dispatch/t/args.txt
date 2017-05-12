@@ -1,0 +1,8 @@
+<html>
+<head>
+<title>Customised error document file</title>
+</head>
+<body>
+Customised error document file
+</body>
+</html>

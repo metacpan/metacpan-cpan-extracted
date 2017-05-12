@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+example.pl
+lib/Convert/Translit.pm
+lib/Convert/rfc1345
+lib/Convert/substitutes
+t/test.t

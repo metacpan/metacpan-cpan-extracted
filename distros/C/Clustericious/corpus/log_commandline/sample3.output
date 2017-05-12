@@ -1,0 +1,12 @@
+% perl sample3.pl 
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample3.pl -q
+
+% perl sample3.pl --error
+[ERROR] error message
+[FATAL] fatal message
+

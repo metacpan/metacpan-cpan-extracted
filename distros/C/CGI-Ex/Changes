@@ -1,0 +1,426 @@
+2.44
+    2015-10-7
+        * Restoring the version number in several modules
+        * Updated the copyright year to 2015
+
+2.43
+    2015-10-1
+        * Fixing POD errors
+        * Restoring the README that got lost in 2.42
+
+2.42
+    2014-12-10
+        * Adding protection to location bounces to stop potential XSS vulnerabilities
+
+2.41
+    2014-06-12
+        * Restoring a tab character in Makefile.PL so that make can run again
+
+2.40
+    2012-12-17
+        * Validation fixes for regex based keys
+        * Allow for HTML5 types
+        * Make sure that default values always stringify
+        * App find_hook now returns a list
+
+2.38
+    2012-03-02
+        * No functional changes, just fixes for newer versions of perl that have changed the way that "is" works.
+
+2.37
+    2012-02-09
+        * (Validate) Make match_2 work in the javascript layer (as shown in perldoc)
+        * (Validate) Add int, uint, and num types with range checking on int and uint
+        * (Validate) Allow for custom => sub { my ($k, $v) = @_; die "Always fail\n" } to pass the result of the failure via the value of die.
+        * (Validate) Allow for custom_js:function (args) { throw "Always fail ("+args.value+")" } which passes the error message of the test as the fail message
+        * (Validate) Allow for type, enum, and equals to short circuit (don't run match, compare, length, or custom checks if type fails)
+        * (App) Fix the test suite to not require installation of CGI
+        * (App) Add CGI::Ex::App::Constants module supporting constants as a source of documentation
+        * (App) Allow for access to constants via use CGI::Ex::App qw(:App); or use MyApp qw(:App);
+
+2.36
+    2010-06-10
+        * (Auth) Make delete_cookie always delete, even for session Apps.
+
+2.35
+    2010-05-24
+        * (Auth) More robust cookie reading and writing and deleting.
+        * Workaround CGI::Cookie->parse weird empty cookie implementation.
+        * (Auth) Allow cookie_domain to be modified more gracefully.
+        * (Auth) Consider case with multiple cookies for the same name.
+
+2.34
+    2010-04-23
+        * (Auth) Don't attempted to decode base64 armor unless use_base64
+
+2.33
+    2010-04-01
+        * (Auth) Allow for custom form user vs valid cookie check
+
+2.32
+    2010-02-25
+        * (Validate) Allow for default to be an arrayref
+
+2.31
+    2010-02-24
+        * (Auth) allow for secure flag via cookie_secure
+        * Allow validate.js to use change and blur on individual elements
+        * Allow validate.js to not strip trailing whitespace on change
+        * (Validate) Allow more items in local parts
+        * (Ex) Make sure make_form doesn't die on non-arrayref keys
+
+2.27
+    2008-09-15
+        * (App) Fix morph history during errors or other direct morph calls
+        * (App) Allow for step=foo/bar to look for file foo/bar.html
+        * (App) Allow for step=foo/bar to use internal name of foo__bar
+        * (App) Allow for step=foo/bar to morph to package App::Foo::Bar
+        * (Validate) Added the set_all_hook and clear_all_hook in validate.js
+        * (Validate) Streamline validate
+        * (Validate) Added generate_form to Validate
+        * (App) Added hooks in App to generate_form
+        * (Validate) Allow for "error" parameter in validation that is the general error message
+        * (Auth) Allow passing filename in Auth login_header, login_form, login_script and login_footer
+        * (Auth) Allow verify_token to be easily overridable
+        * (Auth) Allow passing cookie_domain, cookie_path, cookie_no_expires (force session cookie) in Auth for much more granular control
+        * (Auth) Allow for passing user without password to verify user matches a previously set cookie
+        * (App) Remove allow_nested_morph since allow_morph is more than capable of filling this role
+        * (App) Allow step name to be "jumped" to even if not in the path
+        * (App) Make jump unmorph if in the middle of lineage, deprecates some early morph cases.
+        * (Auth) Don't blank out form user field on failure (fixed bug in Auth login_hash_common)
+        * (App) Cleanup run_hook_as
+        * (App) Allow path_info_map to have second argument be a code ref that is passed form and matches
+        * (Validate) validate.js updates to make in sync more with Validate.pm (such as fields and order are synonymous)
+        * (Validate) Make validation names prettier by default
+
+2.26
+     2008-07-21
+        * (App) Error handling bug again (accept refs in $@ again)
+
+2.25
+     2008-07-08
+        * (Validate) Fix bugs in was_valid checking of Validate
+        * (JSONDump) Quote more keys in JSONDump
+        * (App) Allow for passing a coderef instead of the step name to run_hook
+        * (App) Handle fatal errors more gracefully
+        * (App) Make morph and unmorph calls be hooks
+        * (App) Allow allow_morph to return 2 (which requires a morph)
+        * (App) Add run_hook_as functionality
+
+2.24
+     2008-02-26
+        * Allow for smith.name
+        * Simplify some code in App.
+        * Allow for post_navigate to get called even in case of error.
+        * Added morph_base to App
+        * Added validate_when_data hook.
+        * Added samples/app/app1 which is a path based application
+
+2.23
+     2007-12-20
+        * Add the onevent load option - make sure validate_if figures into dependencies
+        * Add was_valid, had_error, and was_checked validation options
+        * Add vif_disable option.
+        * Pass more information to clear/set hooks using named args
+
+2.22
+     2007-12-14
+        * Allow for no errors with a username of "0"
+        * Run hash_form hook before others so dump_history shows it in order of use
+        * Fix Validate error with passing in the field name
+        * Simplify and modernize validate.js
+        * Add onevent: change, blur and submit types.
+        * Add hooks and better overriding to valiate.js
+        * Cleanup Validate.pm pod
+        * Be sure Conf json read requires JSON
+
+2.21
+     2007-10-18
+        * Add logout_hook to Auth
+        * Remove key_payload
+        * Only accept payload from cram styles
+        * Added disable_simple_cram to enforce protecting server generated payloads
+
+2.20
+     2007-10-08
+        * Added success_hook and failure_hook to Auth (not documented)
+        * Fix precedence issue in conf reading in App (thanks to Krassimir Berov)
+        * Fix bug in validate.js with LOCAL_PART matching (thanks to Thomas den Braber)
+        * Add support for clear_on_error to validate.js (thanks to Thomas den Braber)
+
+2.19
+     2007-10-05
+        * Make verify_token more granualar in Auth
+        * Added parse_token method and/or property
+        * Added verify_password method and/or property
+        * Added verify_payload method and/or property
+        * Fix filename based conf reading in App
+        * Added check_valid_auth, handle_success, handle_failure
+           key_loggedout, bounce_on_logout to Auth.
+
+2.18
+     2007-07-24
+        * Merry Pioneer Day - http://en.wikipedia.org/wiki/Pioneer_Day_(Utah)
+        * Allow for check_valid_auth in App
+        * Allow for set_cookie, delete_cookie, location_bounce to be overridden in Auth
+        * Add get_valid_auth to the history
+        * Massive refactor of CGI::Ex::App
+        * Rename conf_ext to ext_conf to be similar to ext_print and ext_val
+        * Add undocumented conf_die_on_fail (which defaults to true)
+        * Fix bug in handle_error
+        * Allow empty hashrefs passed to Validate - (broken in 2.17)
+        * Add tests to help with Devel::Cover coverage.
+
+2.17
+      2007-06-26
+        * Add load_conf and conf* methods to App to allow for easier external configuration
+        * Add more documentation
+        * Allow print_content_type('text/html', 'utf-8')
+        * Allow App to pass mimetime and charset to print_out.
+        * Update path methods.
+
+2.16
+      2007-06-21
+        * Add default __error step which is called by default handle_error method.
+        * Default base_dir_abs to '.'
+
+2.15
+      2007-06-20
+        * Fix some warning issues with the Recipe sample in App
+        * Cleanup require_auth interface in App (you will want to
+          double check if you have overwritten require_auth in your
+          application to make sure your implementation is still compatible)
+        * Require latest Template::Alloy
+
+2.14
+      2007-06-12
+        * Moved CGI::Ex::Template to Template::Alloy
+        * Template::Alloy is now required as a dependency
+        * Update some portions of App POD.
+
+2.13
+      2007-05-21
+        * Added full support for HTML::Template and HTML::Template::Expr.
+        * Added missing HTML::Template::Expr vmethods.
+        * Added support for using Text vmethods as top level items.
+        * Added SYNTAX configuration item.
+        * Added V2EQUALS configuration item.
+        * Broke Extra and HTE out to its own area.
+        * Added many more tests.
+        * Allow QR_PRIVATE to be false.
+
+
+2.12
+      2007-05-11
+        * Add STAT_TTL
+        * Add NEGATIVE_STAT_TTL
+        * Add WRAPPER configuation
+        * Add ERROR and ERRORS configuration
+        * Cleanup handling of PRE_PROCESS and POST_PROCESS
+        * Add more tests for the file operations
+        * Cleanup some potential argument issues on cached USE and THROW
+
+2.11   2007-05-07
+        * Add more samples to App synopsis.
+        * Add VIEW directive support to Template.
+        * Update data storage to more easily support TT2 parsers.
+        * Add regex support in Template.
+        * Add CONFIG directive in Template.
+        * Better error reporting.
+        * Allow parser to parse all TT2 tests in TT2 test suite.
+        * Add V2PIPE configuration to provide backward support for TT2 non-inline pipes.
+        * Add vmethod url.
+        * Cleanup argument parsing to be more compatible with TT2.
+
+2.10   2007-04-27
+        * Allow for fully regex grammar based engine.
+        * Move to generic operator parse tree.  All constructs are now only arrayrefs.
+            This should allow for easy porting to other languages.
+        * Allow for nested tags [% "[% 2 %]" | eval %].
+        * Added back in references in Template - but fast and simple.
+        * Allow for regex based TAGS.
+        * Allow for "unquoted" in TAGS.
+        * Catch parsing bug in "1 - + 2" in Template.
+        * Fix minor bug in Template qw() construct.
+        * Re-added ANYCASE support.
+        * Added V1DOLLAR support.
+        * Remove GROUP support from CGI::Ex::Validate.
+        * Allow for crypted passwords to work in Auth.
+
+2.09   2007-04-05
+        * Add more documentation about file paths
+        * Allow for base_dir_abs to return a single value, or an arrayref of values, or
+          a coderef that returns a single value or arrayref.
+        * Allow CGI::Ex send_status to work on mod_perl2.
+        * Add tests to cover all virtual methods in CGI::Ex::Template.
+        * Bring all virtual methods into line with TT2.18
+
+2.08   2007-03-02
+        * Allow for digits passed to %*s patterns in format, and fmt or CGI::Ex::Template
+        * Fix bug in validate.js to allow for non-existant fields (with replace)
+        * Warn clean in Validate.pm for non-existant field (with replace)
+        * Fix bug in validate.js with trim_control_chars - was broken entirely
+        * Add no_tag_splitting flag to JSONDump
+        * Allow for more types of numbers to be quoted in JSONDump
+        * Add path_info_map_base method to CGI::Ex::App
+        * Add path_info_map hook to CGI::Ex::App
+        * Updated and added much documentation to CGI::Ex::App
+
+2.07   2007-01-30
+        * Add clear_app method which flushes items pertaining to navigation.
+        * Allow for CGI::Ex::Template PLUGIN_BASE to be a scalar OR an arrayref.
+        * Add sort keys to DUMP directive
+        * Add trim_control_chars as a validate directive
+        * Allow for . in the QR_PRIVATE of Template
+        * Add dump_parse_expr to CGI::Ex::Template
+        * Fix JSONDump to handle more number cases
+        * Fix JSONDump to output more IE friendly JS
+        * Allow fill to work only with form elements with attributes
+
+2.06   2006-07-21
+        * Allow for JSONDump to swap --> to --"+">
+        * Fix memory issue in App with closures
+        * Remove weak_copy routine from Template (memory issue)
+
+2.05   2006-07-19
+        * Allow for CGI::Ex to be compatible with Mandrake and Fedora mod_perl 2, as well as debian mod_perl2
+          and older mod_perl1.
+        * Allow for CGI::Ex::Dump to localize the Data::Dumper options to not stomp on anybody elses toes.
+        * Update various perldoc bugs
+        * Fix JSONDump of \t and \r
+        * Change .as to .fmt to coincide with Perl6 (.as is still there - just not documented)
+
+2.04   2006-07-10
+        * Allow for items not in group order to get added to validation correctly in CGI::Ex::Validate.
+        * Add samples/index.cgi
+        * Fix samples/app/cgi_ex_* to actually work.
+        * Added CGI::Ex::JSONDump
+        * Change Validate to use JSONDump instaed of JSON
+        * Various perldoc and other bug fixes.
+        * Removed CGI-Ex.spec - use cpan2rpm or cpan2deb instead.
+
+2.03   2006-06-10
+        * Fix the associativity of operators in Template to match perl
+        * Allow for multiple prefix operators.
+        * Change name of parse_variable to parse_expr
+        * Change name of get_variable to play_expr
+
+2.02   2006-06-08
+        * Fix the yaml tests
+        * Add failed_sleep to Auth
+        * Various pod fixes
+        * Allow for conf_read and write errors to die - we really do need to have those bubble up.
+        * Fix all tests
+        * Allow for validate.js to work with existing onsubmit handlers of forms
+        * Added "as" virtual methods to Template
+        * Added Virtual Objects to Template
+        * Added self modifiers (*= etc) to Template
+        * Added increment and decrement (++ --) to Template
+        * Allow for scientific notation and hexidecimal in Template
+        * Added int, rand and random virtual methods to Template
+
+2.01   2006-05-31
+        * Added App refine_path hook.
+        * Added App destroy method.
+        * Fix CGI::Ex::Template perldoc.
+
+2.00   2006-05-30
+        * Added CGI::Ex::Template and test suites
+        * Allow for CGI::Ex::Template to be fully TT2 syntax compliant
+        * Re-implementation of CGI::Ex::Auth
+        * Allow for step to be automatically untainted during loop in CGI::Ex::App
+        * Fix base_dir_rel to work with "" as the dir in CGI::Ex::App
+        * Bug fixes in CGI::Ex::Fill
+        * Better perldoc in CGI::Ex::Fill
+        * Add named parameter function called fill in CGI::Ex::Fill
+        * DProfd CGI::Ex::Conf for improvements
+        * DProfd CGI::Ex::Validate for improvements
+        * Added conf_read and conf_write methods for Conf
+        * Cleanup of all of the test
+        * Add missing tests
+        * Add Array Prototype fixes from Eamon Daly
+        * Add examples and cleanup to CGI::Ex::App
+        * Cleanup hooks in App (add fill_args and template_args)
+        * Change run_hook syntax in App
+        * Add dump_history with more history information
+        * Integrate CGI::Ex::Auth with App
+
+1.14   2005-02-28
+        * Bug fix in validate (OR's were not working)
+        * Allow for checking for package existence without require in App
+        * Add hash_swap
+        * Add hash_base
+        * Add add_to_ methods for swap, fill, form, common, and errors
+        * Swap the run_hook order of step and hookname
+        * Allow for untaint in CGI::Ex::Validate
+        * Allow for !field in equals of CGI::Ex::Validate
+        * Allow for return of names in CGI::Ex::Validate
+        * Allow CGI::Ex to work better with CGI/mod_perl1/mod_perl2
+        * Fix required => 0 in javascript
+
+1.13   2004-12-02
+        * Show more App perldoc examples
+        * Fix some App path bugs
+        * Add more app hooks
+        * Cleanup app code
+        * Allow for Conf to write to each of the types
+
+1.12   2004-11-10
+        * Show more App perldoc examples
+        * Fix some App path bugs
+        * Change some App method names
+        * Allow for App js_validation
+        * Allow for App validation redirection
+
+1.11   2004-11-08
+        * Let file path dependent tests succeed
+        * Allow for next current and previous steps in App
+        * Couple of warn cleans in App
+
+1.10   2004-11-05
+        * Make CGI::Ex::App->print really work with Template
+        * Fix very large javascript variable swapping bug
+        * Numerous upgrades to App
+        * Fix module access in CGI::Ex
+        * Allow validate to populate what_was_validated array
+        * Allow for App to cleanup crossed references
+
+1.00   2004-04-23
+        * Added set_path method
+        * Added Auth module
+        * Fix validate.js for select-multiple
+        * Fix validate.js for max_values
+        * Add min_in_set and max_in_set types for validate
+        * Add default for validate (sets default value)
+
+0.99   2004-03-22
+        * Allow swap_template to be called with one argument
+        * Added extended examples in t/samples/cgi_ex_*
+        * Remove dependency on CGI::Util (doesn't exists on some perls)
+        * A few fixes on App
+        * Added set_form
+        * Updated tests
+
+0.98   2004-03-19
+        * Multiple fixes in Fill module
+        * Updates on perldocs (thanks to Simon Bellwood for bug reports)
+        * Addition of Dump (debug) module
+        * Addition of Die module
+        * Addition of App module
+
+0.97   2004-03-05
+        * Allow for custom_js type
+        * Fix unshift, shift, and push in ie 5.0
+        * Fix type CC in validate.js
+        * Allow for duplicate field definitions
+
+0.96   2003-11-26
+	* Fix for pos not resetting in CGI::Ex::Fill
+        * Fix for general items set in self not being passed to generate_js
+        * Workaround for yaml_load.js |- not properly trimming whitespace
+
+0.94   2003-11-26
+	* Javascript functionality is in.
+
+0.0    2003-11-01
+	* Version 0.0 checked in

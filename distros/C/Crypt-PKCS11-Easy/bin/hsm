@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+# PODNAME: hsm
+# ABSTRACT: simple example script to perform various HSM operations
+
+use v5.16.3;
+use strictures;
+use Path::Tiny;
+use Log::Any::Adapter 'Stdout', log_level => 'info';
+use Getopt::Long qw/:config no_ignore_case bundling/;
+use IO::Prompter;
+use Crypt::PKCS11::Easy;
+
+my $opt = {module => 'libsofthsm2'};
+
+my $getopt = GetOptions $opt, 'debug|d!', 'config|c=s', 'pass_file|p=s',
+  'module|m=s', 'key|k=s', 'sign!', 'verify!', 'slot_info!', 'slot=i',
+  'token=s', 'digest', 'hsm_info';
+
+die "Commandline error\n" unless $getopt;
+
+if ($opt->{debug}) {
+    Log::Any::Adapter->set('Stdout', log_level => 'debug');
+}
+
+if ($opt->{hsm_info}) {
+    my $hsm  = Crypt::PKCS11::Easy->new($opt);
+    my $info = $hsm->get_info;
+    printf "    Manufacturer: %s\n",    $info->{manufacturerID};
+    printf "         Library: %s %s\n", $info->{libraryDescription},
+      $info->{libraryVersion};
+    printf "Cryptoki version: %s\n", $info->{cryptokiVersion};
+    exit;
+}
+
+if ($opt->{slot_info}) {
+    use DDP;
+    my $hsm = Crypt::PKCS11::Easy->new($opt);
+    if (defined $opt->{slot}) {
+        my $slot = $hsm->get_slot(id => $opt->{slot});
+        p $slot;
+        exit;
+    } elsif (defined $opt->{token}) {
+        my $slot = $hsm->get_slot(token => $opt->{token});
+        p $slot;
+        exit;
+    }
+
+    my $slots = $hsm->get_slots;
+    p $slots;
+    for my $slot (@$slots) {
+        my $mechs = $hsm->get_mechanisms($slot->{id});
+        p $mechs;
+    }
+
+    exit;
+}
+
+if ($opt->{digest}) {
+    my $file   = path shift @ARGV;
+    my $hsm    = Crypt::PKCS11::Easy->new($opt);
+    my $digest = $hsm->digest(file => $file, mech => 'SHA256');
+
+    say unpack('H*', $digest);
+    exit;
+}
+
+if ($opt->{pass_file}) {
+    $opt->{pin} = path $opt->{pass_file};
+} else {
+    $opt->{pin} = sub { prompt 'Enter PIN: ', -echo => '*' };
+}
+
+die "You must specify a key\n" unless $opt->{key};
+
+if ($opt->{verify}) {
+    $opt->{function} = 'verify';
+    my $hsm = Crypt::PKCS11::Easy->new($opt);
+
+    die "Where is the sig file?" unless scalar @ARGV > 0;
+    my $sig_file = path shift @ARGV;
+    die "No such file $sig_file: $!\n" unless $sig_file->is_file;
+    my $data_file = $sig_file->sibling($sig_file->basename(qr/\.sig.*$/));
+
+    say "Attempting to verify $data_file with signature in $sig_file";
+    die "No such file $sig_file: $!\n" unless $sig_file->is_file;
+
+    my $sig;
+
+    # binary or ascii?
+    if ($sig_file =~ /\.bin$/) {
+        say 'Loading binary sig';
+        $sig = $sig_file->slurp_raw;
+    } else {
+        say 'Loading ascii sig';
+        $sig = $hsm->decode_signature(file => $sig_file);
+    }
+
+    my $v = $hsm->verify(file => $data_file, sig => $sig);
+    say 'Validation ' . ($v ? 'OK' : 'FAILED');
+
+} elsif ($opt->{sign}) {
+    my $hsm = Crypt::PKCS11::Easy->new($opt);
+
+    die "Sign what file?" unless scalar @ARGV > 0;
+    my $file = path shift @ARGV;
+    die "No such file $file: $!\n" unless $file->is_file;
+    say "Sign $file with key $opt->{key}";
+    my $sig = $hsm->sign_and_encode(file => $file);
+    my $sig_file = $file->sibling($file->basename . '.sig');
+    say "Outputting signature to $sig_file";
+    $sig_file->spew($sig);
+} else {
+    die "sign or verify";
+}

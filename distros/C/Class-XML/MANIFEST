@@ -1,0 +1,21 @@
+ARTISTIC
+Build.PL
+GPL
+lib/Class/XML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MyTest/HasAttrs.pm
+MyTest/MultiChild.pm
+MyTest/New.pm
+MyTest/SingleChild.pm
+MyTest/SuperAttrs.pm
+MyTest/TopNode.pm
+README
+t/00attr.t
+t/01child.t
+t/02new.t
+t/03children.t
+t/04relation.t
+t/05inherit.t
+t/06search.t

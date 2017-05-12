@@ -1,0 +1,117 @@
+{
+    use Cheater::Parser::Util qw( parse_included_file );
+}
+
+spec: statement(s) eof
+        { $item[1] }
+
+eof: /^\Z/
+
+statement: table_definition /;?/ { $item[1] }
+         | rows_definition ';' { $item[1] }
+         | type_definition ';' { $item[1] }
+         | include_statement ';' { $item[1] }
+         | table_assignment ';' { $item[1] }
+         | <error>
+
+table_assignment: table_name '=' <commit> table_name
+            { [ 'table_assign', $item[1], $item[4] ] }
+                | <error?> <reject>
+
+include_statement: 'include' <commit> file_name
+        { ['include', parse_included_file($item[3], $thisline)] }
+        | <error?> <reject>
+
+file_name: string
+
+table_name: identifier
+
+table_definition: 'table' <commit> table_name '('
+            column_definition(s)
+        ')'
+            { ['table', $item[3], $item[5]] }
+        | <error?> <reject>
+
+column_definition:
+      column_name 'references' <commit> qualified_column attribute(s?) ';'
+            { [ $item[1], 'refs', $item[4], $item[5] ] }
+    | column_name type domain(?) attribute(s?) ';'
+            { [$item[1], $item[2], $item[3], $item[4] ] }
+    | column_name '=' column_name ';' { [$item[1], '=', $item[3]] }
+    | <error?> <reject>
+
+column_name: identifier
+
+type: identifier
+
+attribute: 'unique' | 'unsigned' | 'asc' | 'desc'
+    | 'not' <commit> 'null' { "$item[1] $item[3]" }
+    | 'for' string { ['for', $item{string}] }
+    | <error?> <reject>
+
+domain: enum
+      | atom { [ $item[1] ] }
+
+enum: '{' <commit> atom(s? /,/) '}'
+        { $item[3] }
+    | <error?> <reject>
+
+atom: range
+    | number
+    | regex
+    | string
+    | int
+
+string: "'" <commit> /(?:[^']|\\.)*/ "'"
+        { eval "'$item[3]'" }
+      | '"' <commit> /(?:[^"]|\\.)*/ '"'
+        { eval qq{"$item[3]"} }
+
+qualified_column: table_name '.' <commit> column_name
+        { [$item[1], $item[4]] }
+    | <error?> <reject>
+
+rows_definition: /\d+/ <commit> table_name
+                    { ['rows', $item[1], $item[3]] }
+               | <error?> <reject>
+
+type_definition: 'type' <commit> type '=' type domain(?) attribute(s?)
+                    {
+                        ['type', $item[3], $item[4], $item[5], $item[6]] }
+               | <error?> <reject>
+
+regex: /\/(?:[^\\\/]|\\.)*\//
+        { my $regex = 'qr' . $item[1];
+          my $re = eval $regex;
+          if ($@) {
+              die "Bad regex on line $prevline: $regex: $@";
+          }
+          $re
+        }
+
+range: number '..' <commit> number
+        { ['nrange', $item[1], $item[4]] }
+     | date '..' <commit> date
+        { ['drange', $item[1], $item[4]] }
+     | time '..' <commit> time
+        { ['trange', $item[1], $item[4]] }
+     | datetime '..' <commit> datetime
+        { ['dtrange', $item[1], $item[4]] }
+     | <error?> <reject>
+
+date: /\b\d{4}-\d{2}-\d{2}\b/
+
+time: /\b\d{2}:\d{2}:\d{2}\b/
+    | /\b\d{2}:\d{2}\b(?!:)/ { "$item[1]:00" }
+
+datetime: date time { "$item[1] $item[2]" }
+
+number: real
+      | int
+
+real: /-?\d+\.\d+\b/
+
+int: /-?\d+\b/
+
+identifier: /[A-Za-z]\w*/
+

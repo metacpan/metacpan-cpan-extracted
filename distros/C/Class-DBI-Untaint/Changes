@@ -1,0 +1,9 @@
+Revision history 
+
+1.00 Tue Sep  6 19:23:13 UTC 2005
+	- Cope properly with valid but false values (Domm)
+
+0.01 Fri Mar  5 16:50:28 GMT 2004
+	- Created this
+
+

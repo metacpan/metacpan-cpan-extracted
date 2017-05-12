@@ -1,0 +1,77 @@
+CSS::DOM, version 0.16
+
+This module implements a CSS-specific subset of the interfaces
+described in the W3C DOM specification.
+
+
+RECENT CHANGES
+
+0.016
+-----
+• Work around an incompatible  change  in  Encode  2.77  (RT  #107221,
+  #107043).
+• Specify Encoding in POD.  Thanks to Gregor Herrmann for  the  patch
+  (RT #85955).
+
+0.015
+-----
+• compute_style  no longer produces an  uninitialized  warning  under
+  some circumstances (RT #79855).
+• A minor backtracking bug in CSS::DOM::PropertyParser has been fixed.
+
+0.014
+-----
+• The full text of the licence is now included  in  the  distribution.
+  Thanks to Ville Skyttä for providing  it  (RT  #60770).
+• A few pod syntax errors have been corrected, thanks to Nicholas Bam-
+  ber (RT #63388).
+• CSS::DOM::PropertyParser  has been fixed to work with  perl  5.13.8
+  and higher.
+• New getStringValue method of CSS::DOM::Value::Primitive
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    perl -MCPAN -e "install CSS::DOM"
+
+    cpan CSS::DOM
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl 5.8.2 or later, and the following modules:
+
+• Exporter 5.57 or later
+• Encode 2.10 or later
+• Clone 0.09 or later
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc CSS::DOM
+
+Or try using man (it's faster, in my experience):
+
+    man CSS::DOM
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-15 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl. The full text of the license can be
+found in the LICENSE file included with this module.

@@ -1,0 +1,12 @@
+Changes
+lib/Catalyst/Plugin/Static.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01use.t
+t/02static.t
+t/03pod.t
+t/04podcoverage.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+META.yml                                 Module meta-data (added by MakeMaker)

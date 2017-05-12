@@ -1,0 +1,60 @@
+{
+   "abstract" : "Xorg configuration model for Config::Model",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Model-Xorg",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config::Model" : "2.087",
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Model::CursesUI" : "0",
+            "Config::Model::TkUI" : "0"
+         },
+         "requires" : {
+            "App::Cme" : "0",
+            "Config::Model" : "2.070",
+            "Exception::Class" : "0",
+            "Log::Log4perl" : "1.11",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Xorg"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/config-model-xorg.git",
+         "web" : "http://github.com/dod38fr/config-model-xorg"
+      }
+   },
+   "version" : "1.113",
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

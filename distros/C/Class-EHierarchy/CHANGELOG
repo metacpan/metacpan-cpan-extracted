@@ -1,0 +1,37 @@
+CHANGELOG
+
+v2.00 (2017/01/23)
+==================
+--Complete rewrite
+--New API
+
+v0.93 (2013/07/06)
+==================
+--Modified DESTROY method to call all superclass _deconstruct methods
+  from the bottom up
+
+v0.92 (2013/06/18)
+==================
+--Added more relationship methods
+--Added alias functionality
+--Updated & improved documentation
+--Bumped minimum required perl to 5.8.3
+
+v0.91 (2012/01/30)
+==================
+--Added automated loading of methods, properties, and default property
+  values via class variables
+--Fixed bug where every object created rewraps scoped methods in the 
+  class symbol table
+--Improved documentation with better examples and explanations
+
+v0.90 (2011/08/18)
+==================
+--Completely rewritten into something (hopefully) more useful than the
+  original incarnation.  Completely breaks old API and loses some
+  functionality, while gaining some new functionality.  Possibly more
+  congruent with the actual OOP concepts it claims to follow.
+
+v0.06 (2003/03/18)
+==================
+--Old version.  Should be ashamed of itself.  May it die in obscurity.

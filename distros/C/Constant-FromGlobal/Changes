@@ -1,0 +1,46 @@
+Revision history for perl module Constant::FromGlobal
+
+0.09 2016-08-08 NEILB
+    - Added a link to Adam Kennedy's original blog post on use.perl.org,
+      which inspired this module. Thanks to BOOK, who showed me that
+      the original URL can be mapped to something which works.
+
+0.08 2015-11-03 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini, so releases will include a META.json
+    - Tag and push to github on release
+    - Fixed typo and tightened up formatting of the SEE ALSO doc section.
+
+0.07 2014-10-12
+    - Added new testsuites that cover all the types of constraints / coercions
+    - Extended the documentation with more intro material, and descriptions of
+      all of the type constraints / coercions.
+    - Renamed github repo to match CPAN dist name (my personal convention),
+      so update reference to repo in doc.
+
+0.06 2014-10-11
+    - You couldn't declare multiple constants in the way shown in the doc.
+      Thanks to Алексей Суриков (KSURI) for the pull request.
+
+0.05 2014-01-07
+    - Switched to Dist::Zilla
+
+0.04 2014-01-05
+    - Added Carp, constant and warnings as explicit prereqs in Makefile.PL
+    - Added README
+    - Specified 5.8.0 as the min version of Perl (in Makefile.PL and module)
+
+0.03 2013-07-14
+    - Added information about license and repository to Makefile.PL,
+      so it will appear in metadata.
+    - License and repository now mentioned in the pod as well.
+
+0.02 2013-07-14
+    - Neil Bowers taken over as maintainer
+    - Constants in main:: namespace don't need MAIN_ prefix on
+      environment variables. Suggested by Burak Gürsoy
+    - Added this Changes file.
+    - Documentation improvements
+
+0.01 2009-11-05
+    - first release from Yuval Kogman

@@ -1,0 +1,26 @@
+#
+# ala Bourne shell
+#
+
+one=1
+two=2
+three=3
+#immediate comment
+
+    # indented comment
+
+oracle_user=oracle
+ORACLE_SID=testdb
+ORACLE_HOME=/oracle/orahome1
+Oracle_Data=/oracle/orahome1/oradata
+
+# skip this $oracle_user comment
+
+spacing='    pre-spaces'
+trailing="end-spaces     "
+
+reuse=$spacing
+
+# damn French knights
+if you say so="   No! Now go away!   "
+

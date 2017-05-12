@@ -1,0 +1,23 @@
+<h1>[% thing.title %]</h1>
+<p>[% thing.description %]</p>
+
+[% FOREACH rel IN factory.relationships(thing.moniker, 'has_many') %]
+
+	[% method = rel.key %]
+	[% foreign_moniker = rel.value %]
+
+	<h2>[% factory.plural(foreign_moniker) %]</h2>
+	[% relatives = thing.$method %]
+	[% IF relatives %]
+		[% FOREACH x IN relatives %]
+			<p>[% IF x == highlight %]<b>[% ELSE %]<a href="[% config.url %]?[% x.moniker %]=[% x.id %]">[% END %]
+				[% x.title %]
+			[% IF x == highlight %]</b>[% ELSE %]</a>[% END %]
+			[% IF x.description %]<br>[% x.description %][% END %]</p>
+		[% END %]
+	[% ELSE %]
+		<p>No [% method %].</p>
+	[% END %]
+	
+	<p><a href="[% config.url %]?[% foreign_moniker %]=new&[% thing.moniker %]=[% thing.id %]">Add a [% foreign_moniker %] to [% thing.title %]</a></p>
+[% END %]

@@ -1,0 +1,15 @@
+The following people have contributed their blood and sweat to make
+Catalyst::View::HTML::Zoom happen. Thanks everyone!
+
+    * Thomas 't0m' Doran
+    
+        - Wrote the initial version and starting point
+
+    * Oliver 'ocharles' Charles
+    
+        - Improved t0m's initial work and took over as maintainer
+
+    * John 'jnap' Napiorkowski
+        
+        - Refactored most of the internals to make the view more workable
+          and customizable in different projects

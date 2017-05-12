@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/couchdb-utils
+dist.ini
+lib/CouchDB/Utils.pm
+lib/CouchDB/Utils/App.pm
+lib/CouchDB/Utils/App/Command/dump.pm
+lib/CouchDB/Utils/App/Command/load.pm

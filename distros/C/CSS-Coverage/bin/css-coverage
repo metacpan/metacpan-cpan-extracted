@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+# PODNAME: CSS::Coverage on the command line
+use strict;
+use warnings;
+use CSS::Coverage;
+
+@ARGV >= 2 or die "usage: $0 foo.css bar.html[, baz.html ...]\n";
+
+my ($css_file, @html_files) = @ARGV;
+
+my $coverage = CSS::Coverage->new(
+    css       => $css_file,
+    documents => \@html_files,
+);
+
+my $report = $coverage->check;
+my @selectors = $report->unmatched_selectors;
+exit 0 if !@selectors;
+
+print "Unmatched selectors (" . scalar(@selectors) . "):\n";
+for my $selector (@selectors) {
+    print "  $selector\n";
+}
+exit 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CSS::Coverage on the command line
+
+=head1 VERSION
+
+version 0.04
+
+=head1 AUTHOR
+
+Shawn M Moore <code@sartak.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

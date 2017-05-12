@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:18">
+<CategoryList total_results="1" page_size="10" page_number="1" shown_results="1">
+<CategoryData category_id="science" parent_id="">
+<Name>Science</Name>
+<Details summary="" depth="0" element_count="27530" />
+<SubCategories>
+<SubCategory id="science.sociology" />
+<SubCategory id="science.physics" />
+<SubCategory id="science.mineralogy" />
+<SubCategory id="science.chemistry" />
+<SubCategory id="science.astronomy" />
+<SubCategory id="science.geography" />
+<SubCategory id="science.paleontology" />
+<SubCategory id="science.botany" />
+<SubCategory id="science.biology" />
+<SubCategory id="science.psychology" />
+<SubCategory id="science.mathematics" />
+<SubCategory id="science.philosophy" />
+<SubCategory id="science.economics" />
+<SubCategory id="science.political_science" />
+<SubCategory id="science.earth_sciences" />
+<SubCategory id="science.social_sciences" />
+<SubCategory id="science.computer_science" />
+</SubCategories>
+</CategoryData>
+</CategoryList>
+</ISBNdb>

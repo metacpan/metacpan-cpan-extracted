@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fda6
+registers:
+  AF: 38292
+  AF_: 0
+  BC: 16571
+  BC_: 0
+  DE: 14146
+  DE_: 0
+  HL: 28657
+  HL_: 0
+  I: 0
+  IX: 44328
+  IY: 26011
+  PC: 3
+  R: 2
+  SP: 0

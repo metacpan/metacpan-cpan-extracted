@@ -1,0 +1,58 @@
+Class-AutoClass
+
+This is yet another module that generates standard 'get' and 'set'
+methods for Perl classes.  It also handles initialization of object
+and class data from parameter lists or defaults, and arranges for
+object creation and initialization to occur in top-down, textbook
+order even in the presence of multiple inheritance.
+
+CAUTION: This module is old. We use it internally, and while it works
+well for our purposes, we urge new users to heed the warnings in the
+documentation.  This release brings the CPAN version of the module
+up-to-date relative to our internal version, something we should have
+done long ago.  We do not expect further releases of this code base,
+except for bug fixes.  Future development, if any, will entail a
+redesign building on newer CPAN modules.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Class::AutoClass
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-AutoClass
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Class-AutoClass
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Class-AutoClass
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-AutoClass/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

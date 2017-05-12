@@ -1,0 +1,177 @@
+Changes for the CPAN Testers Wiki website
+=========================================
+
+1.12    2016-01-02
+        - added missing template.
+
+1.11    2016-01-02
+        - upgrade to Labyrinth-5.32.
+        - upgrade to Labyrinth-Plugin-Core-5.19.
+        - added Labyrinth-Plugin-CPAN-3.55.
+        - added CPAN Testers sponsor random adverts.
+
+1.10    2015-02-12
+        - upgrade to Labyrinth-5.24.
+        - added Admin site links.
+        - removed Perl promotions links.
+
+1.09    2014-09-30
+        - fixed license fields in META.json to be lists.
+        - added documentation about the CPAN Testers Fund.
+        - extended META test suite.
+
+1.08    2014-08-16
+        - fixed distribution name in metadata.
+
+1.07    2014-02-23
+        - updated templates.
+        - minified CSS.
+        - sponsors list now built from JSON.
+        - upgrade to Labyrinth-Plugin-Wiki 1.04.
+        - upgrade to Labyrinth-5.20
+        - upgrade to Labyrinth-Plugin-Core-5.14
+
+1.06    2013-04-28
+        - change file dates changed to meet W3CDTF standards.
+        - upgrade to Labyrinth 5.16.
+        - adjusted search box on side panel.
+        - added sumhits.pl for hits table cleaning.
+
+1.05    2012-05-06
+        - upgrade to Labyrinth 5.12.
+        - upgrade to Labyrinth-Plugin-Core 5.10.
+        - removed social media bar due to dubious practices.
+        - added CPAN Testers Sponsors.
+        - added minimum perl version (5.006).
+        - fixed test pre-requisites.
+        - reworked Makefile.PL for clarity.
+
+1.04    2011-08-18
+        - revised banner logo image by Jon 'JJ' Allen.
+
+1.03    2011-07-13
+        - upgrade to Labyrinth 5.09.
+        - update layout to include an update notification.
+        - added labels to forms for WAI WCAG v2.0 compliance.
+        - added new social media bar
+
+1.02    2011-06-19
+        - added Terms & Conditions page/link.
+        - switch to using a Gravatar for user profiles.
+        - some XHTML template fixes.
+        - upgrade to Labyrinth 5.07.
+        - upgrade to Labyrinth-Plugin-Core 5.07.
+        - upgrade to Labyrinth-Plugin-Wiki 1.02.
+
+1.01    2011-05-08
+        - typo fixes
+        - added vhosts.conf
+        - URL pattern match fixes.
+        - now redirect on save.
+        - changed menu links to use masked links.
+        - upgrade to Labyrinth-Plugin-Wiki 1.01.
+
+1.00    2011-04-01
+        - upgrade to Labyrinth 5.04.
+        - upgrade to Labyrinth-Plugin-Core 5.06.
+        - upgrade to Labyrinth-Plugin-Wiki 1.00.
+        - package for CPAN release.
+
+0.19    2010-12-01
+        - activated SetHits
+
+0.18    2010-09-29
+        - repositioned site boxes to avoid text and logo clashing.
+
+0.17    2010-09-17
+        - upgrade to Labyrinth v5.00 (CORE only)
+        - added links to Metabase and Labyrinth.
+
+0.16    2010-03-13
+        - upgrade to Labyrinth v4.17 (CORE only)
+        - fixed user admin for ban/hide/show/delete actions.
+        - fixed rollback on history.
+
+0.15    2010-01-14
+        - added Analysis to site family lists.
+
+0.14    2009-06-12
+        - fixed user registration, thanks to Tony Cook for spotting.
+
+0.13    2009-05-17
+        - fix to uninitialised $html variable in MLUtils.pm.
+        - fixed search box input field in parserules.ini
+        - upgrade to Labyrinth v4.16
+        - incorporated new layout design
+
+0.12    2008-10-15
+        - cleanup of parserules.ini entries.
+        - cleanup of XHTML entities.
+        - underlying path and DB changes from cpantest => cpanwiki.
+        - switched to storing passwords using SHA1 encryption.
+
+0.11    2008-10-07
+        - update copyright dates.
+        - fixed an number of RSS generation issues.
+        - added validation for RSS configuration settings.
+        - added rssfeeds.pl to generate RSS 2.0 and Atom 1.0 feeds for
+          the last 10 Recent Changes.
+        - fixed CSS settings for wikitext edit box.
+
+0.10    2008-10-06
+        - fix to avoid uninitialised variable errors (Wiki.pm)
+        - upgrade to Labyrinth v4.15
+        - overhauled TinyMCE features allowed.
+        - fixed CSS for top quote and header boxes.
+        - fix get session to find guest userid if using default login.
+        - update sessions table.
+        - XHTML fixes.
+        - fixed MLUtils.pm to account for XHTML compliance.
+
+0.09    2007-12-28
+        - user list and adminlist fixes (thanks to Andreas König)
+        - whitespace clean up in code
+        - Change comment now starts blank
+        - reset_request not clearing remaining actions
+        - missing template for badmail
+
+0.08    2007-12-03
+        - upgrade to Labyrinth v4.12
+        - fixed user-edit functionality (thanks to Slaven)
+        - fixed wiki-page links to just use /wiki/ instead (short URLs)
+        - added ability to go back to the last page you were on when logging
+          in. (thanks to David Golden for requesting this)
+
+0.07    2007-08-28
+        - further minor cleanups in the user templates
+        - added basic and all version searching (was missing! oops!)
+        - fixed user-login success
+        - fixed utf8 bug in clean_attr_text (MLUtils.pm)
+
+0.06    2007-07-02
+        - cleaned user side of public and admin templates
+        - fixed password obscurity in registration
+
+0.05    2007-06-22
+        - diff error message handling
+        - reduce header height from 150px to 100px
+
+0.04    2007-06-03
+        - fix MLUtils.pm bug
+        - got diff working
+        - got recent changes entries dropdown working
+
+0.03    2007-05-24
+        - login fix
+        - email constraint should be 'emails'
+
+0.02    2007-05-22
+        - fix to regex matching
+        - <pre> to the list not requiring an empty <p> before it.
+        - if a page is not in the index, add it correctly
+        - improvements to the regex patterns
+        - added the !!code!! for inline code text
+        - added cpan/perldoc/user/image/media to wikilinks
+
+0.01    2007-05-09
+        - First released version, based on Labyrinth v4.06

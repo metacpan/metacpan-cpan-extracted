@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/CGI/Application/Plugin/RequireSSL.pm
+t/01-standard_call.t
+t/02-protected_rm.t
+t/03-protected-module.t
+t/pod-coverage.t
+t/pod.t
+t/lib/MyTestApp2.pm
+t/lib/MyTestApp.pm

@@ -1,0 +1,43 @@
+
+PERL=perl
+YAPP=yapp -v
+CP=$(PERL) -MExtUtils::Command -e cp
+RM_F=$(PERL) -MExtUtils::Command -e rm_f
+
+PARSER= -m CORBA::IDL::Parser
+
+all: Parser30.pm Parser24.pm Parser23.pm Parser22.pm Parser21.pm Parser20.pm ParserXp.pm
+	$(RM_F) Parser.pm
+
+Parser20.pm: Parser20.yp
+	$(YAPP) $(PARSER) Parser20.yp
+	$(CP) Parser.pm Parser20.pm
+
+Parser21.pm: Parser21.yp
+	$(YAPP) $(PARSER) Parser21.yp
+	$(CP) Parser.pm Parser21.pm
+
+Parser22.pm: Parser22.yp
+	$(YAPP) $(PARSER) Parser22.yp
+	$(CP) Parser.pm Parser22.pm
+
+Parser23.pm: Parser23.yp
+	$(YAPP) $(PARSER) Parser23.yp
+	$(CP) Parser.pm Parser23.pm
+
+Parser24.pm: Parser24.yp
+	$(YAPP) $(PARSER) Parser24.yp
+	$(CP) Parser.pm Parser24.pm
+
+Parser30.pm: Parser30.yp
+	$(YAPP) $(PARSER) Parser30.yp
+	$(CP) Parser.pm Parser30.pm
+
+ParserXp.pm: ParserXp.yp
+	$(YAPP) $(PARSER) ParserXp.yp
+	$(CP) Parser.pm ParserXp.pm
+
+clean:
+	$(RM_F) Parser??.pm
+	$(RM_F) Parser*.output
+

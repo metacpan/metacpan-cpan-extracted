@@ -1,0 +1,23 @@
+Revision history for Class-Monkey
+
+0.007   28-05-2012
+        It was a bit annoying having to ask Class::Monkey to 'use' a module when I didn't want it to. You can now use canpatch qw<mod1 mod2 ...> to tell Class::Monkey you want to patch these modules, but don't actually use them.
+
+0.006   25-04-2012
+        No real changes, but I was naughty and left some stuff in the code I used for debugging.. tsk.
+
+0.005   24-04-2012
+        Added no warnings 'redefine'. New 'tweak' method created for those who need to use Class::Monkey in Moose-type projects. Using the attribute '-tweak' when you "use" Class::Monkey will ensure it exports only the tweak and 'haz' method (Use 'haz' in place of 'extends').
+
+0.004   09-04-2012
+        Added 'exports' method to export an existing subroutine to a patched class or instance.
+
+0.003   04-04-2012
+        Removed pod tests that were failing
+
+0.002   03-04-2012
+        You can now pass instances to all hooks. So instead of using a constant to modify an entire class, simply pass it an instance instead and it will modify only that.
+
+0.001   02-04-2012
+        First version, released on an unsuspecting world.
+

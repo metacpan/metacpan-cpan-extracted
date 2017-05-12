@@ -1,0 +1,9 @@
+Revision history for Perl extension Crypt::Rijndael::MySQL.
+
+0.02  Fri Jul  2 01:59:44 MSD 2010
+        - fixed a syntax error in Makefile.PL
+
+0.01  Tue Jun 29 18:07:43 2010
+	- original version; created by h2xs 1.23 with options
+		-X Crypt::Rijndael::MySQL
+

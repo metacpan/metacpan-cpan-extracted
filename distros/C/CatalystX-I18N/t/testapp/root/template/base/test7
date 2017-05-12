@@ -1,0 +1,12 @@
+<div>[% 1024 | number('bytes') %]</div>
+<div>[% 12 | number('number') %]</div>
+<div>[% -12.2 | number('number') %]</div>
+<div>[% 22 | number('price') %]</div>
+<div>[% -23 | number('price') %]</div>
+<div>[% 233634.23 | number('price') %]</div>
+<div>[% -12.2 | number() %]</div>
+<div>[% -12.2 | number('number',3,3) %]</div>
+<div>[% 'string4' | maketext(4) %]</div>
+<div>[% 'string4' | maketext(1) %]</div>
+<div>[% sortlist.lsort().join(',') %]</div>
+<div>[% sortlist.sort().join(',') %]</div>

@@ -1,0 +1,109 @@
+NAME
+    CPAN::Patches - patch CPAN distributions
+
+SYNOPSIS
+        cd Some-Distribution
+        cpan-patches list
+        cpan-patches patch
+        cpan-patches --patch-set $HOME/cpan-patches-set list
+        cpan-patches --patch-set $HOME/cpan-patches-set patch
+
+DESCRIPTION
+    This module allows to apply custom patches to the CPAN distributions.
+
+    See the patch and update_debian entries elsewhere in this document for a
+    detail description how.
+
+    See http://github.com/jozef/CPAN-Patches-Example-Set for example
+    generated Debian patches set folder.
+
+PROPERTIES
+  patch_set_locations
+    An array ref of folders where are the distribution patches located.
+    Default is Sys::Path->sharedstatedir/cpan-patches/set which is
+    /var/lib/cpan-patches/set on Linux.
+
+  verbose
+    Turns on/off some verbose output. By default it is on.
+
+METHODS
+  new()
+    Object constructor.
+
+  BUILD
+    All plugins (Moose roles) from `CPAN::Patches::Plugin::*' will be
+    loaded.
+
+  patch
+    Apply all patches that are listed in .../module-name/patches/series.
+
+cpan-patch commands
+  cmd_list
+    Print out list of all patches files.
+
+  cmd_patch
+    Apply all patches to the current CPAN distribution.
+
+INTERNAL METHODS
+  get_patch_series($module_name)
+    Return an array of patches filenames for given `$module_name'.
+
+  get_module_folder($module_name)
+    Returns a folder that exists in one of the `patch_set_locations' for a
+    given `$module_name'.
+
+  clean_meta_name($name)
+    Returns lowercased :: by - substituted and trimmed module name.
+
+  read_meta([$path])
+    Reads a META.yml or META.json from `$path'. If `$path' is not provided
+    than tries to read from current folder.
+
+  read_meta_intrusive
+    Generates and reads the META.yml using Build.PL or Makefile.PL.
+
+CONTRIBUTORS
+    The following people have contributed to the CPAN::Patches by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advises, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+            Slaven Rezić
+
+AUTHOR
+    jozef@kutej.net, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-cpan-patches at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Patches. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CPAN::Patches
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Patches
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/CPAN-Patches
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/CPAN-Patches
+
+    * Search CPAN
+        http://search.cpan.org/dist/CPAN-Patches/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

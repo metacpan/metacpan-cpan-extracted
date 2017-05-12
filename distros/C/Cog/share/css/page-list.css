@@ -1,0 +1,29 @@
+div.page-list table {
+    width: 100%;
+}
+
+div.page-list th {
+    text-align: left;
+}
+
+div.page-list td.size {
+    text-align: right;
+    padding-right: 20px;
+}
+
+div.page-list th.size {
+    text-align: right;
+    padding-right: 20px;
+}
+
+div.page-list td.duration {
+    text-align: right;
+    padding-right: 20px;
+    font-style: italic;
+    font-size: smaller;
+}
+
+div.page-list th.duration {
+    text-align: right;
+    padding-right: 20px;
+}

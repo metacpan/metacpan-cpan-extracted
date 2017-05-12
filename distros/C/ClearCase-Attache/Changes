@@ -1,0 +1,6 @@
+Revision history for Perl extension ClearCase::Attache.
+
+0.01  Tue Nov 27 11:14:34 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n ClearCase::Attache
+

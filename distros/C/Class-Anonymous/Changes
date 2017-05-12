@@ -1,0 +1,11 @@
+Revision history for Perl module Class-Anonymous
+
+0.03 2015-09-02
+  - Fix location of error for method dispatch (missing) error
+
+0.02 2015-09-02
+  - Fix borked documentation
+
+0.01 2015-09-02
+  - Initial release
+

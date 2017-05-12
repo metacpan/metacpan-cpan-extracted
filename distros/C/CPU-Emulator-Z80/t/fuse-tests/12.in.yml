@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 18
+name: 12
+registers:
+  AF: 22016
+  AF_: 0
+  BC: 0
+  BC_: 0
+  DE: 32768
+  DE_: 0
+  HL: 0
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

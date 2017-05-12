@@ -1,0 +1,46 @@
+Revision history for CGI-Application-Plugin-DBIx-Class
+
+1.000101  2012-11-17 15:35:24 CST6CDT
+  - Put MetaYAML back in dist
+
+1.000100  2011-05-20 15:40:42 CST6CDT
+  - Merge 1.000000 and 0.100210 ... frew fail
+
+1.000000  2011-05-20 15:35:33 CST6CDT
+  - Remove dep on CGI::Application::Plugin::DBH
+  - Fix terrible leak
+
+0.100210  2010-01-21 19:54:05 CST6CDT
+       - Get rid of some warnings and fix my silly labelling for newer versions
+         of perl
+
+0.100180  2010-01-18 22:24:54 CST6CDT
+       - I am so bad at this.  Fix deps.
+
+0.100160  2010-01-16 16:44:37 CST6CDT
+       - Fix broken build (world writable bits, windows--)
+
+0.093011 Wed Oct 28 13:05:00 CDT 2009
+       - Yet another dependancy fix
+
+0.093010 Wed Oct 28 00:00:00 CDT 2009
+       - Allow for arrayrefs in simple_search
+
+0.093000 Tue Oct 27 06:45:00 CDT 2009
+       - Configurable page size
+       - Clarify some pod
+
+0.092900 Sat Oct 17 01:15:00 CDT 2009
+       - Stop using BUILD_REQUIRES as it causes build failures most of the time
+       - Basic pod fixes
+
+0.092830 Sat Oct 10 01:47:00 CDT 2009
+       - Add more missing deps
+       - Fix width of example code in POD
+
+0.092801 Tue Oct 06 22:38:00 CDT 2009
+       - Add missing build requires directives
+
+0.092800 Tue Oct 06 15:32:00 CDT 2009
+       - Initial Release
+

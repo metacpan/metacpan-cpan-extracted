@@ -1,0 +1,12 @@
+language: perl
+perl:
+  - "5.16"
+  - "5.14"
+  - "5.12"
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.net#nephia"
+    on_success: change
+    on_failure: always
+

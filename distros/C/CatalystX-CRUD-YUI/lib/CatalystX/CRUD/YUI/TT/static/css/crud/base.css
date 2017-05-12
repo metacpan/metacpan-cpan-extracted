@@ -1,0 +1,256 @@
+/* overall page layout */
+
+body {
+    text-align:left;
+    font-size: 12px;
+}
+
+/* UMN colors for links */
+a {
+    color: #7A0019;
+    text-decoration: none;
+    border-bottom: 1px dotted #7a0019;
+}
+
+a:hover {
+    color: #333;
+    border-bottom: 1px dotted #666;
+}
+
+#crud-menu {
+    float: left;
+    width: 200px;
+    height: 100%;
+    border-top: 2px solid #7a0019;
+    border-left: 0.5px solid #aaa;
+    padding: 4px 0 0 0;
+    margin: 0;
+}
+
+#crud-search {
+    margin: 2px;
+    font-size: 95%;
+}
+
+#crud-links {
+    background-color: #eee;
+    font-size: 95%;
+}
+
+#crud-links li {
+    list-style-image:none;
+    list-style-position:outside;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+#crud-links li.first {
+    padding: 2px 2px 2px 6px;
+    background-color: #7a0019;
+    color: #fff;
+    margin-top: 0.25em;
+}
+
+#crud-links li a {
+    display:block;
+    padding:2px 2px 2px 10px;
+}
+
+#crud-links li a:hover {
+    color: #222;
+    background: #ffdd77;
+    /* cursor:pointer; */
+}
+
+#crud-links li a.selected {
+    color: #222;
+    background: transparent url(http://yui.yahooapis.com/2.6.0/build/assets/skins/sam/menuitem_submenuindicator.png) no-repeat scroll right center;
+    background-color: #fff;
+    font-weight:bold;
+    cursor: default;
+}
+
+#crud-body {
+    padding: 0.5em;
+    margin-left: 200px;
+    border-top: 2px solid #7a0019;
+    border-left: 1px solid #aaa;
+    height: 100%;
+}
+
+#relTabs div.rel {
+    padding: 0.5em;
+    background-color: #eee;
+    border:1px solid #aaa;
+}
+
+#crud-footer {
+    clear: both;
+    text-align: center;
+    font-size: 90%;
+    background-color: #f5f5f5;
+    color: #666;
+    margin-top: 12px;
+    border: 1px solid #aaa;
+    padding: 4px;
+}
+
+#crud-buttons {
+    padding: 8px;
+    border-top: 1px dotted #7a0019;
+}
+
+.chooser {
+    margin-top: 1em;
+}
+
+.title
+{
+    font-weight: bold;
+    font-size: 110%;
+}
+
+.center
+{
+    text-align: center;
+}
+
+a.box,
+button.box
+{
+    color: #7A0019;
+    text-decoration: none;
+    padding: 4px;
+    background-color: #fff;
+    border: 1px solid #7A0019;
+}
+
+a.box
+{
+    padding: 5px;
+}
+
+.button {
+    background-color: #fff;
+    color: #7a0019;
+    padding: 2px;
+    border: 1px outset #7a0019;
+}
+
+/* button.button gets extra 1px anyway */
+a.button {
+    padding: 3px;
+}
+
+.button:hover {
+    color: #111;
+    background-color: #ffdd77;
+    cursor: pointer;
+    border: 1px inset #7a0019;
+}
+
+
+#main a:hover,
+a.box:hover,
+.crud a:hover,
+button.box:hover
+{
+    background-color: #ffdd77;
+    cursor:pointer;
+}
+
+.xls_link {
+    margin: 8px 0;
+}
+
+span.error, div.error
+{
+    font-size:95%;
+    color:red;
+    padding: 8px;
+}
+
+.red { color: red }
+
+.hidden
+{
+    display: none;
+}
+
+
+#results
+{
+    margin: 1em;
+}
+
+#head
+{
+    margin: 0;
+    border: 1px solid #7a0019;
+    background-color: #ffcc33;
+}
+
+#welcome
+{
+    float: left;
+    padding: 6px 12px 6px 12px;
+    font-size: 140%;
+    font-weight: bold;
+}
+
+#quicksearch {
+    float: right;
+    margin: 2px;
+    padding: 4px 16px 4px 16px;
+    background-color: #7a0019;
+}
+
+#quicksearch input[type=text]
+{
+    font-family: Monaco, 'Andale Mono', fixed, monospace;
+    padding: 2px;
+    position: static;
+}
+
+
+div.related_object_matrix
+{
+    margin: 1em;
+}
+
+div.related_object_matrix caption
+{
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 4px;
+}
+
+#yui_history_iframe {
+    position:absolute;
+    top:0; left:0;
+    width:1px; height:1px;
+    visibility:hidden;
+}
+ 
+.temp_hiliter {
+    background-color: #fff3b3;
+}
+
+
+
+div.links {
+    margin: 0.25em;
+    padding: 0.25em;
+}
+
+div.links li {
+    display: inline;
+    list-style-type: none;
+}
+
+div.padded {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 1em;
+}

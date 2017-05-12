@@ -1,0 +1,2 @@
+model = Systemd
+config_dir = ~/.config/systemd/user/

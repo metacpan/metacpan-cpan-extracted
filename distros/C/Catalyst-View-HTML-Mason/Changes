@@ -1,0 +1,43 @@
+Revision history for Catalyst-View-HTML-Mason
+
+0.19      2015-01-03 18:53:06-06:00 America/Chicago
+
+ * Fix tests so that they work on more recent Perl releases
+ * Added a test around the 5.90080+ UTF-8 support.
+ * A few docs around encoding
+
+0.18      2011-05-27 08:57:34 Europe/Berlin
+
+ * Bump dependencies on Capture::Tiny and Catalyst::Helper to 0.10 and 1.33,
+   respectively. This fixes occasional failures in t/helper.t.
+
+0.17      2011-05-15 12:48:31 Europe/Berlin
+
+ * Better documentation for the globals attribute.
+
+0.16      2011-05-03 10:03:08 America/Los_Angeles
+
+ * fixed exceptions.t to pass with Catalyst 5.89+ (Dave Rolsky)
+
+0.15      2010-10-01 17:23:44 PST8PDT
+
+ * fixed handling of globals attr when it is just a single string
+
+0.11      2010-09-24 19:39:49 PST8PDT
+
+ * add missing build dep on Catalyst::Helper
+
+0.10      2010-09-23 18:27:39 PST8PDT
+
+ * Fixed helper class (rbuels)
+ * Added docs for render method (rafl)
+ * Miscellaneous doc cleanup (rafl)
+
+0.02     Aug 20, 2010
+
+ * Added missing dep on Catalyst::Action::RenderView (rbuels)
+
+0.01     Aug 18, 2010
+
+ * First version, released on an unsuspecting world (rafl)
+

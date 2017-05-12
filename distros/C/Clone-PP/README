@@ -1,0 +1,90 @@
+NAME
+    Clone::PP - Recursively copy Perl datatypes
+
+SYNOPSIS
+      use Clone::PP qw(clone);
+  
+      $item = { 'foo' => 'bar', 'move' => [ 'zig', 'zag' ]  };
+      $copy = clone( $item );
+
+      $item = [ 'alpha', 'beta', { 'gamma' => 'vlissides' } ];
+      $copy = clone( $item );
+
+      $item = Foo->new();
+      $copy = clone( $item );
+
+    Or as an object method:
+
+      require Clone::PP;
+      push @Foo::ISA, 'Clone::PP';
+  
+      $item = Foo->new();
+      $copy = $item->clone();
+
+DESCRIPTION
+    This module provides a general-purpose clone function to make deep
+    copies of Perl data structures. It calls itself recursively to copy
+    nested hash, array, scalar and reference types, including tied variables
+    and objects.
+
+    The clone() function takes a scalar argument to copy. To duplicate
+    arrays or hashes, pass them in by reference:
+
+      my $copy = clone(\@array);    my @copy = @{ clone(\@array) };
+      my $copy = clone(\%hash);     my %copy = %{ clone(\%hash) };
+
+    The clone() function also accepts an optional second parameter that can
+    be used to limit the depth of the copy. If you pass a limit of 0, clone
+    will return the same value you supplied; for a limit of 1, a shallow
+    copy is constructed; for a limit of 2, two layers of copying are done,
+    and so on.
+
+      my $shallow_copy = clone( $item, 1 );
+
+    To allow objects to intervene in the way they are copied, the clone()
+    function checks for a couple of optional methods. If an object provides
+    a method named "clone_self", it is called and the result returned
+    without further processing. Alternately, if an object provides a method
+    named "clone_init", it is called on the copied object before it is
+    returned.
+
+BUGS
+    Some data types, such as globs, regexes, and code refs, are always
+    copied shallowly.
+
+    References to hash elements are not properly duplicated. (This is why
+    two tests in t/dclone.t that are marked "todo".) For example, the
+    following test should succeed but does not:
+
+      my $hash = { foo => 1 }; 
+      $hash->{bar} = \{ $hash->{foo} }; 
+      my $copy = clone( \%hash ); 
+      $hash->{foo} = 2; 
+      $copy->{foo} = 2; 
+      ok( $hash->{bar} == $copy->{bar} );
+
+    To report bugs via the CPAN web tracking system, go to
+    "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone-PP" or send mail to
+    "Dist=Clone-PP#rt.cpan.org", replacing "#" with "@".
+
+SEE ALSO
+    For a faster implementation in XS, see the clone entry in the Clone
+    manpage, the clone entry in the Util manpage, or <Storable/dclone>.
+
+CREDITS AND COPYRIGHT
+    Developed by Matthew Simon Cavalletto at Evolution Softworks. More free
+    Perl software is available at "www.evoscript.org".
+
+    Copyright 2003 Matthew Simon Cavalletto. You may contact the author
+    directly at "evo@cpan.org" or "simonm@cavalletto.org".
+
+    Code initially derived from Ref.pm. Portions Copyright 1994 David Muir
+    Sharnoff.
+
+    Interface based by Clone by Ray Finch with contributions from
+    chocolateboy. Portions Copyright 2001 Ray Finch. Portions Copyright 2001
+    chocolateboy.
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
+

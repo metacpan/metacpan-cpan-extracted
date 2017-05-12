@@ -1,0 +1,56 @@
+Revision history for Catalyst-Plugin-Log-Dispatch
+
+0.121 Thu Feb 24 21:50:43 JST 2011
+    - What was I thinking wrong PID erased.
+    
+0.12  Wed Oct  6 19:33:48 JST 2010
+    - move Catalyst version check to setup method.
+     ( Thank you for Matt S Trout )
+    - It corresponded to the output of the millisecond the format. 
+      It is a copy from Log::Dispatch::Config. It is clumsy.
+    - "Thunk" was changed into "Thank". I am foolish.
+    
+0.11  Wed May 20 17:24:30 JST 2009
+    - It corresponded to the change in "NEXT" of "Catalyst 5.8".
+      ( Thank you for Moritz Onken )
+      
+0.10  Sun Apr 26 02:04:12 JST 2009
+    - It corresponded to the change of Catalyst 5.8..
+      ( Thank you for hensley and Moritz Onken )
+    - Support XML format config. ( hash is changed into array )
+      ( Thank you and sorry, Sam Kaufman. I had forgetten it. )
+      
+0.09  Fri Feb 15 14:49:01 JST 2008
+    - The function used by _fluash was changed from log_message into log.
+      As a result, the setting of the log level came to operate correctly. 
+      ( Thank you for Yu Isobe )
+      
+0.08  Wed Jan 23 16:18:30 JST 2008
+    - The $Log::Dispatch::Config::CallerDepth was correctly changed with a local.
+      ( Thank you for typester )
+      
+0.071 Thu Dec  6 18:38:00 2007 JST
+    - 0.07 was not able to be up-loaded to CPAN why.
+
+0.07  Thu Nov  8 02:35:22 2007 JST
+    - Add to Makefile.PL pre-require UNIVERSAL::require
+    - Fix Settlement of Catalyst::Log ( Thank you Dave Rolsky )
+    
+0.06  Fri Feb  2 17:10:03 2007 JST
+    - Bug Fix for Catalyst 5.65 Support
+    
+0.05  Mon Jun 22 20:16:10 2007 JST
+    - Real Support Catalyst 5.65
+    - Support Log::Dispatch 2.13
+    
+0.04  Fri Dec 22 03:37:47 2006 JST
+    - delete timestamp_callback and linebreak_callback.
+    - support format option of Log::Dispatch::Config.
+    - It corresponds to a correct method of "_flush".
+    
+0.03  Thu Dec 21 22:53:05 2006 JST
+    - Initial release
+    
+0.01  Wed Dec 20 00:52:05 2006 JST
+    - First cut.
+

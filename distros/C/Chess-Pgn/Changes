@@ -1,0 +1,15 @@
+Revision history for Perl extension Chess::Pgn.
+
+0.01  Fri Dec 15 23:17:33 2000
+	- original version; created by h2xs 1.20 with options
+		-XA -n Chess::Pgn
+      Version tested with 2 pgn file with 3751 games 
+      
+0.02  sam déc 16 02:26:16 CET 2000
+
+    - PlyCount, BlackElo, WhiteElo added
+    - support extra white lines in the games
+    
+0.03 sam déc 16 14:28:40 CET 2000
+
+	- Minor bug corrected

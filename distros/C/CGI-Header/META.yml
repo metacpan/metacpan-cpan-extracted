@@ -1,0 +1,39 @@
+---
+abstract: 'Handle CGI.pm-compatible HTTP header properties'
+author:
+  - 'Ryo Anazawa (anazawa@cpan.org)'
+build_requires:
+  CGI::Simple: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::MockTime: 0
+  Test::More: 0.98
+  Test::Output: 0
+  Test::Pod: 1.45
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CGI::Header
+name: CGI-Header
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  CGI: 3.51
+  Carp: 1.10
+  parent: 0
+  perl: 5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/anazawa/p5-CGI-Header
+version: 0.63

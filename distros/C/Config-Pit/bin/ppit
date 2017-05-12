@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use FindBin;
+use Path::Class;
+use YAML;
+use File::Temp;
+use Pod::Usage;
+
+use lib file( $FindBin::RealBin, '..', 'lib' )->stringify;
+use Config::Pit;
+
+({
+    get    => \&Config::Pit::pipe,
+    set    => \&pit_set,
+    switch => \&pit_switch,
+}->{(shift || '')} || \&pod2usage )->($ARGV[1]);
+
+__END__
+
+=head1 NAME 
+
+ppit - pit for perl
+
+=head1 SYNOPSIS
+
+    $ ppit [get|set|switch] <value>
+    $ ppit help
+
+ Options:
+        get <name>        => Get values of <name>.
+        set <name>        => Config values of name with $EDITOR.
+        switch <profile>  => Switch profile to <profile>.
+        help              => show this manual
+
+=head1 DESCRIPTION
+
+pit command for Perl
+
+=head1 AUTHOR
+
+Kazuhiro Osawa
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<http://lowreal.rubyforge.org/pit/>
+L<Config::Pit>
+
+=cut
+

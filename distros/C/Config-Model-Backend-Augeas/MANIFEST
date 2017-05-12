@@ -1,0 +1,15 @@
+augeas-box/etc/hosts
+augeas-box/etc/ssh/sshd_config
+Build.PL
+ChangeLog
+lib/Config/Model/Backend/Augeas.pm
+lib/Config/Model/models/Itself/ConfigWR.d/augeas-backend.pl
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/augeas_backend.t
+t/augeas_from_scratch.t
+t/model_extension.t
+t/pod.t
+t/test_model.pl

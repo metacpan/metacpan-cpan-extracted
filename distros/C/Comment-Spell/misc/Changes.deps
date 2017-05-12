@@ -1,0 +1,21 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / runtime requires]
+ - IO::Scalar
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.001001 2014-09-28T04:36:41Z
+ [Changed / runtime requires]
+ - Pod::Wordlist 0 → 1.07

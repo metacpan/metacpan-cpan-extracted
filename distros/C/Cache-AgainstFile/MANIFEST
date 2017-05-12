@@ -1,0 +1,22 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Cache/AgainstFile.pm
+lib/Cache/AgainstFile/Base.pm
+lib/Cache/AgainstFile/Memory.pm
+lib/Cache/AgainstFile/Storable.pm
+lib/Cache/AgainstFile/CacheModule.pm
+lib/Cache/AgainstFile/Null.pm
+t/CacheAgainstFile.t
+t/CacheAgainstFile-Storable.t
+t/CacheAgainstFile-Storable-Win32.t
+t/CacheAgainstFile-Memory.t
+t/CacheAgainstFile-CacheModule.t
+t/CacheAgainstFile.lib
+t/pod_coverage.t
+
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

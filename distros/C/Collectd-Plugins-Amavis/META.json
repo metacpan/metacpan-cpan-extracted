@@ -1,0 +1,50 @@
+{
+   "abstract" : "collectd plugin for reading amavisd-new performance counters",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Collectd-Plugins-Amavis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BerkeleyDB" : "0",
+            "Collectd" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Collectd-Plugins-Amavis@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Collectd-Plugins-Amavis"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/Collectd-Plugins-Amavis",
+         "web" : "https://github.com/benningm/Collectd-Plugins-Amavis.git"
+      }
+   },
+   "version" : "1.001"
+}
+

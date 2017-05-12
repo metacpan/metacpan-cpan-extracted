@@ -1,0 +1,56 @@
+The source files in this distribution are
+Copyright (C) 2000-2003 Peter Behroozi and are
+licensed for use under the same terms as Perl itself.
+
+CGI::SecureState
+
+NOTE: If you are upgrading from the 0.2x series, you must read the documentation
+or risk FIRE, DISASTER, or SUDDEN DEATH from upper management when they
+realize that all your scripts have nasty warnings at the top.  Perhaps yours
+are more relaxed than that, but now that I have your attention, read the
+documentation anyway as it contains important updates.
+
+
+CGI::SecureState is a module that provides a transparent and secure way to
+maintain state between HTTP requests.  It was originally written to resemble
+CGI::Persistent as closely as possible.  To install CGI::SecureState, all you
+should have to do is the standard
+
+% perl Makefile.PL
+% make
+% make install
+
+Then test the installation:
+
+% make test
+
+and everything should work.
+
+This assumes that you have the following:
+Long file names (at least 27 chars): needed to ensure remote ticket
+	authenticity.
+
+Crypt::Blowfish: it couldn't be called "Secure" without.  At some point in
+	the future (as better algorithms become available), this
+	requirement may be changed.  Tested with versions 2.06, 2.09.
+
+Digest::SHA1: for super-strong (160 bit) hashing of data.  It is used in
+	key generation and filename generation.  Tested with versions 1.03,
+        2.01.
+
+CGI: it couldn't be called "CGI" without.  Should not be a problem as it
+	comes standard with Perl 5.004 and above.
+
+Fcntl:  for file flags that are portable (like LOCK_SH and SEEK_SET).  Comes
+	with Perl.
+
+File::Spec: for concatenating directories and filenames in a portable way.
+	Comes with Perl.
+
+Perl: Hmmm.  Tested with stable releases from v5.005_03 to v5.8.0.
+	There may be several bugs induced by lower versions of Perl, which
+	are not limited to the failure to compile, the failure to behave
+	properly, or the mysterious absence of your favorite pair of lemming
+	slippers.  The author is exempt from wrongdoing and liability,
+	especially if you decide to use CGI::SecureState with a version of Perl
+	less than 5.005_03.

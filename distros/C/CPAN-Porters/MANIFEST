@@ -1,0 +1,11 @@
+Build.PL
+MANIFEST			This list of files
+t/pod.t
+t/pod-coverage.t
+t/use.t
+
+lib/CPAN/Porters.pm
+Makefile.PL
+README
+META.yml
+CHANGES

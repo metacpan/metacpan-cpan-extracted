@@ -1,0 +1,54 @@
+1999-12-30  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* lib/CGI/PrintWrapper.pm, Changes: Doc updates.
+
+1999-12-29  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/03args.t, lib/CGI/PrintWrapper.pm, README:
+	Can now use any of CGI's constructors, not just the 0/1 argument ones.
+
+1999-11-22  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* lib/CGI/PrintWrapper.pm: Added cgi method.
+
+	* README: Updated docs.
+
+1999-11-19  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* lib/CGI/PrintWrapper.pm:
+	Can initialize object and it inits the underlying CGI object.
+
+1999-11-18  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/03args.t: Test calling CGI methods.
+
+	* MANIFEST, README:
+	Can initialize now, and invoke CGI methods w/o printing results.
+
+	* lib/CGI/PrintWrapper.pm:
+	Updated docs slightly, mostly to bump the release number for the
+	README file change to propagate in CPAN, but also to give credit to
+	DataCraft.
+
+1999-11-17  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* README: Textify README.
+
+1999-11-15  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* README: Fix missing README.
+
+	* lib/CGI/PrintWrapper.pm: Added version.
+
+	* MANIFEST: Docs & testing ok.
+
+	* t/02print.t: All 8 work.
+
+	* lib/CGI/PrintWrapper.pm: Documentation!
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, lib/CGI/PrintWrapper.pm, t/01load.t:
+	New file.
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, lib/CGI/PrintWrapper.pm, t/01load.t:
+	Printing with CGI.
+

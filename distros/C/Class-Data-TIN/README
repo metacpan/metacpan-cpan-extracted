@@ -1,0 +1,29 @@
+Class/Data/TIN version 0.01
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Class::Data::TIN implements Translucent Inheritable Nonpolluting Class Data.
+
+The thing I don't like with Class::Data::Inheritable or the implementations suggested in perltootc is that you end up with lots of accessor routines in your namespace.
+
+Class::Data::TIN works around this "problem" by storing the Class Data in its own namespace (mirroring the namespace and @ISA hierarchies of the modules using it) and supplying the using packages with (at this time) three meta-accessors called C<get_classdata> (or just C<get>), C<set_classdata> (C<set>) and C<append_classdata> (C<append>). It achieves this with some black magic (namespace munging & evaling).
+
+Take a look at test.pl for some examples.
+
+COPYRIGHT AND LICENCE
+
+Class::Data::TIN is Copyright (c) 2001,2002 Thomas Klausner, ZSI.
+All rights reserved.
+
+You may use and distribute this module according to the same terms
+that Perl is distributed under
+
+Thomas Klausner, domm@zsi.at, http://domm.zsi.at

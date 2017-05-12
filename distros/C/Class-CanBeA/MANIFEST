@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+README
+CHANGELOG
+lib/Class/CanBeA.pm
+t/lib/Class/CanBeA/Daughter.pm
+t/lib/Class/CanBeA/Parent.pm
+t/lib/Class/CanBeA/Son.pm
+t/lib/Class/CanBeA/Grandchild.pm
+t/00_tests.t
+t/pod-coverage.t
+t/pod.t
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

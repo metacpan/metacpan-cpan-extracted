@@ -1,0 +1,255 @@
+body.loading {
+  div.messages { @include opacity(0.4); }
+}
+
+body.ios-input-focus {
+  nav.bar { display: none; }
+  div.messages { padding-bottom: $bodyGutterSmall; }
+  form.input { position: static; }
+}
+
+nav.bar {
+  background: $sidebarBackground;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $navHeight;
+  z-index: $navBarZindex;
+  overflow: hidden;
+  border-bottom: $borderSeperator;
+
+  img { vertical-align: middle; }
+
+  a, a:active {
+    color: #000;
+    text-decoration: none;
+    padding: 0 4px;
+    height: $navHeight;
+    line-height: $navHeight - 2;
+    display: block;
+    float: left;
+    position: relative;
+  }
+
+  a b { bottom: 1px; }
+
+  a.convos { padding-left: $bodyGutterSmall; }
+  a.conversation { color: #666; }
+  a.goto-anything.overlapping { border-left: $borderSeperator; }
+  ul.conversations { height: $navHeight; }
+
+  .right {
+    background: $sidebarBackground; // required when right overlap conversation list
+    position: absolute;
+    top: 0;
+    right: 0;
+    a, a:active { font-size: 1.2em; width: 2em; text-align: center; }
+  }
+
+  a:hover, a:active { background-color: $hoverBackground; }
+  a.active { background-color: $activeBackground; }
+}
+
+form.input {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: $borderSeperator;
+
+  input {
+    background: $sidebarBackground;
+    width: 100%;
+    padding: 8px $bodyGutterSmall;
+    font-size: $fontSize + 2;
+
+    &, :focus { border: 0; }
+    &.disabled, &[disabled] { background-color: #eee; }
+
+    @media (min-width: $responsiveWidth) { height: $navHeight; }
+    @media (max-width: $responsiveWidth) { &[disabled] { display: none; } }
+  }
+}
+
+// unread messages count
+nav.bar a b, form.goto-anything b {
+  background: #e5e5e5;
+  color: #888;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: normal;
+  padding: 0 3px;
+  position: absolute;
+  right: 2px;
+  @include border-radius(3px);
+}
+
+nav.bar a.mention b, form.goto-anything a.mention b {
+  background: #d53;
+  color: #fff;
+}
+
+div.messages {
+  $avatarWidth: 40px;
+
+  padding-top: $navHeight + 4;
+  padding-bottom: $navHeight + 8;
+
+  li {
+    display: block;
+    position: relative;
+    padding: 4px $bodyGutterSmall;
+    overflow: hidden;
+
+    &.hidden { display: none !important; }
+
+    @media (min-width: $responsiveWidth) {
+      padding-right: ($sidebarWidth + $bodyGutterSmall);
+      &.form { margin-left: $avatarWidth + $bodyGutterSmall; }
+    }
+
+    div.question { padding-left: $avatarWidth + $bodyGutterSmall; }
+    img.avatar, i.avatar { float: left; max-width: $avatarWidth; font-size: $avatarWidth; }
+    > h3 { font-size: 1em; color: #467; line-height: 1.2em; margin: 0; }
+    > h3, div.content, div.embed { margin-left: $avatarWidth + $bodyGutterSmall; }
+    div.content { max-width: $messageWidth; line-height:1.4em; }
+    div.whitespace {  white-space: pre-wrap; }
+    div.embed {
+      img { max-height: 220px; border: 2px solid #bbb; @include border-radius(8px); margin: 8px 0; }
+    }
+    span.actions { float: right; } // used in javascript
+    div.timestamp {
+      float: right;
+      height: 16px;
+      overflow: visible;
+      color: #999;
+      font-size: .85em;
+    }
+  }
+
+  li.help, li.channel-list {
+    dt { float: left; width: auto; padding-right: 5px; }
+    dd { color: #666; margin: 0; }
+    dd:before { content: '- '; }
+  }
+
+  li.channel-list {
+    input { width: 100%; }
+    dd { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+
+  li.history-starting-point {
+    border-top: 2px dotted #eaa;
+  }
+
+  li.same-nick {
+    padding-top: 0;
+    > h3, .avatar { display: none; }
+  }
+
+  li.message.channel.highlight { background: #fee; }
+  li.message.action div.content { padding-top: $bodyGutter; }
+  li.message.action.same-nick div.content { padding-top: 0; }
+  li.message.action div.content a { font-weight: normal; text-decoration: none; }
+  li.message.pending div.content { color: #888; }
+  li.message.pending > h3 { color: #ccc; }
+  li.message.error {
+    background: lighten($errorColor, 40%);
+    div.timestamp { color: #fee; }
+    > h3 { color: #333; }
+  }
+  li.nick-change, li.nick-joined, li.nick-kicked, li.nick-parted, li.nick-quit, li.notice, li.topic, li.whois {
+    color: #999;
+    padding-top: 2px;
+    a { color: #999; }
+  }
+  li.nick-change, li.nick-parted, li.nick-quit {
+    .content b { font-weight: normal; }
+  }
+
+  li a.go-forward-in-history { display: block; float: left; }
+}
+
+form.sidebar-right,
+div.sidebar-right {
+  background: $sidebarBackground;
+  color: #333333;
+  position: fixed;
+  top: $navHeight;
+  right: -($sidebarWidth + 10);
+  bottom: ($navHeight + 1);
+  overflow: auto;
+  width: $sidebarWidth;
+  padding-bottom: $bodyGutter;
+  z-index: ($navBarZindex - 1);
+  border-left: $borderSeperator;
+
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: $responsiveWidth) {
+    bottom: 0;
+  }
+
+  @include prefix(transition-property, right);
+  @include prefix(transition-duration, 200ms);
+  @include prefix(transition-timing-function, ease);
+  &.active { right: 0; z-index: ($navBarZindex - 2); }
+
+  button.link {
+    background: transparent;
+    border: 0;
+    width: 100%;
+    padding: 6px 8px;
+    text-align: left;
+    display: block;
+    overflow: visible; /* shrinkwrap the text in <IE7 */
+    cursor: pointer;
+    -moz-user-select: text;
+  }
+
+  select, input { width: 100%; }
+  hr { margin: $formGroupPadding; padding: 0; }
+
+  a { padding: 2px 8px; color: #666; position: relative; }
+  a span.message { font-size: 0.9em; padding: 0; @include ellipsis(); }
+  a b { top: 9px; }
+
+  a:hover, a:focus, button.link:hover, button.link:focus {
+    background-color: $hoverBackground;
+    color: #000;
+  }
+
+  a:focus { outline: 1px solid #ccc; }
+
+  li.unread a { background-color: rgba(204, 100, 40, 0.18); color: #000; }
+  li.unread a:focus, li.unread a:hover { background-color: rgba(204, 100, 40, 0.10); }
+
+  .create { display: none; }
+  .howto { padding: 1em 0; color: #666; font-size: 0.9em; }
+
+  h3 { font-size: 1em; margin: 0; };
+  h3, a, div.form-group {
+    text-decoration: none;
+    display: block;
+    padding: $formGroupPadding;
+  }
+
+  ul ul li {
+    a, button.link {
+      background-image: url(../image/fa-caret-right.png);
+      background-position: 9px 50%;
+      background-repeat: no-repeat;
+      padding-left: $bodyGutter;
+    }
+  }
+}
+
+@media print {
+  nav, .sidebar-right, form.input {
+    display: none;
+    overflow: hidden;
+    right: -1000px;
+    width: 1px;
+  }
+}

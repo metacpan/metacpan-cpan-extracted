@@ -1,0 +1,32 @@
+Revision history for CPAN-Reporter-Smoker-Safer
+
+0.04	2010-12-16
+	* ==> CHANGED DEFAULT min_reports value to 0, since it's takes extra
+	  time and bandwidth to fetch and parse all the .yaml files to get
+	  a count of the reports.
+	* min_days_old fixed -- no longer requires a http fetch
+	* min_reports fixed -- refactored to use yaml from www.cpantesters.org
+	* updated deps in Makefile.PL
+	* POD updates
+	* Added logic to __filter() to exclude if already smoked.
+	  This is same check that CPAN::Reporter::Smoker does, just sooner.
+	  Added dep of CPAN::Reporter::History
+	* Updated tests to be more runtime & bandwidth friendy ... specifically
+	  wrt to min_reports checks.
+
+0.03    2009-01-31
+        * added safer=>{preview=>1} option for debugging/testing.
+        * added t/start.t
+        * POD updates
+
+0.02    2009-01-22
+        * Removed ExtUtils::MakeMaker 6.48 and perl 5.6.1 version restrictions.
+        * Refactored __filter to use Barbie's new http://www.cpantesters.org/cgi-bin/reports-text.cgi api.
+            This allowed for the removal of the my*() hack functions.
+        * In the default __filter(), unknown upload date or reports counts are treated as untrusted.
+        * API change -- changed the custom params to start() from safer__foo=>val key/value pairs to safer=>{}.
+        * Pod updates.
+
+0.01    2009-01-20
+        * Initial release.
+

@@ -1,0 +1,23 @@
+Revision history for Perl extension CopyTree::VendorProof.
+
+
+0.0013  Thu Jun  7 09:09:00 2012
+	- documentation spelling / wording / formatting updates; verion 0.0012 includes incorrect/confusing
+		-explanation of subclasses write_from_memory and copy_local_files
+			-the two subclasses has default overwrite, and only acts on the destination if 
+				-is_fd on said destination returns 'f' or 'pd'.
+					-in case of 'f', methods overwrites the existing file
+					-in case of 'pd', methods renames the basename of original file to the destination name
+			-this behavior is modeled after CopyTree:VendorProof::LocalFileOp, whose code has
+			-not changed from version 0.0011 to 0.0013 (only documentation did)
+	- this version changed involked review on modules SharePoint::SOAPHandler and Livelink::DAV
+	- rookie mistake / oversight
+	- contains no code changes (none since version 0.0011)
+
+0.0012  Wed Jun  6 09:09:00 2012
+	- documentation spelling / wording / formatting updates
+
+0.0011  Thu Aug 18 10:41:05 2011
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -Xa -v0.0011 -nCopyTree::VendorProof -O
+

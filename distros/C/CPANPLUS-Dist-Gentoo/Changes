@@ -1,0 +1,150 @@
+Revision history for CPANPLUS-Dist-Gentoo
+
+0.12    2012-06-15 10:45 UTC
+        + Add : The current portage tree timestamp is now checked during
+                initialization against the one corresponding to the portage
+                tree in use when gentooisms were generated. This works best
+                when POSIX::strptime is installed, but it is not explicitely
+                required in order to keep boostrapping this module easy.
+        + Chg : The default cpan-to-gentoo version mapping has been changed
+                to the new saner scheme now used by most ebuilds in the default
+                portage tree.
+        + Chg : When the 'overlay' option is unspecified, it now defaults to
+                the first overlay listed in PORTDIR_OVERLAY.
+        + Fix : Gentoo versions x.y.z.0 are now rightfully considered greater
+                than x.y.z.
+                Thanks Torsten Veller for bringing this to my attention.
+        + Fix : Leading zeros in version components of Gentoo versions are now
+                handled correctly.
+                Thanks Torsten Veller for bringing this to my attention.
+        + Fix : Gentoo versions with a zero as suffix or revision index are
+                now also handled correctly.
+        + Upd : Update gentooisms.
+        + Tst : t/99-kwalitee.t will be skipped when only problematic versions
+                of its dependencies are available.
+
+0.11    2010-12-16 18:15 UTC
+        + Add : configure_requires dependencies are now listed in the DEPEND
+                section of the ebuild (in addition to RDEPEND dependencies).
+        + Add : The gengentooisms script has been vastly improved. It is now
+                mostly autonomous.
+        + Chg : The module won't initialize if "emerge --info" doesn't return
+                a zero status or if IPC::Cmd can't capture buffers.
+        + Chg : The default ebuild description has been made more informative.
+        + Doc : The dist options were all clearly documented.
+        + Fix : The complete specification for Gentoo ebuild names and
+                version numbers (as documented in
+                http://devmanual.gentoo.org/ebuild-writing/file-format) has
+                been implemented.
+                In particular, this fixes dependencies on Text-Tabs+Wrap.
+        + Fix : Gentooisms were extended to also cover discrepancies between
+                Gentoo and CPAN version numbers.
+                In particular, this fixes dependencies on ExtUtils-CBuilder,
+                ExtUtils-ParseXS, Module-Build and Time-HiRes (and many more).
+        + Fix : Versioned atom dependencies now correctly mirror the versions
+                specified in the CPAN prerequisites. They used to forcefully
+                require the latest available distribution.
+        + Fix : The module no longer croaks when handling dists without a META
+                file.
+                This fixes RT #63819.
+        + Fix : Cycles in the dependency graph are now solved by specifying
+                recursive dependencies in the PDEPEND ebuild section.
+                This allows the module to finally generate emergeable ebuilds
+                for CPANPLUS and CPANPLUS-Dist-Build, thus making
+                CPANPLUS::Dist::Gentoo actually bootstrappable.
+        + Fix : Warnings for distributions with unknown licenses.
+        + Rem : %CPANPLUS::Dist::Gentoo::Maps::gentooisms is no longer directly
+                available. Use CPANPLUS::Dist::Gentoo::Maps::name_c2g() instead.
+        + Tst : Improved coverage.
+        + Upd : Update gentooisms.
+
+0.10    2010-04-17 14:25 UTC
+        + Add : If a distribution specifies a dependency on a specific perl
+                version in its META file, the ebuild dependency on dev-lang/perl
+                will take it into account.
+        + Fix : Placeholders ebuilds are now deleted when an exception is thrown
+                or the build process is interrupted by Ctrl-C.
+        + Upd : Update gentooisms.
+
+0.09    2009-11-29 14:20 UTC
+        + Add : A default header.
+        + Add : Redundant dependencies are simplified to a minimal set.
+        + Chg : The 'requires' dependencies now go into RDEPEND.
+                DEPEND is set to RDEPEND for now.
+        + Doc : A section describing how to bootstrap CPANPLUS and
+                CPANPLUS::Dist::Gentoo has been added.
+        + Fix : dist-options (like the overlay) were not correctly propagated
+                through recursive calls.
+        + Fix : Work around Kwalitee test misfailures.
+        + Upd : One more gentooism : NTLM.
+
+0.08    2009-09-04 18:50 UTC
+        + Add : Map licenses advertised in the DSLIP or the META file to their
+                Gentoo counterparts.
+        + Chg : CPANPLUS::Dist::Gentoo has much less public methods and imports.
+        + Chg : Don't generate a new ebuild if there's already one available at
+                prepare time (unless --force is used).
+        + Chg : Vast cleanup of the internals.
+        + Fix : Missing dependencies in generated ebuilds (since 0.06).
+        + Fix : Stop bailing out if a prerequisite couldn't have been found in
+                the module tree (such as Config).
+        + Fix : Allow ebuilds whose version is exactly the one required by the
+                dependency. This was really stupid of me to let this slip.
+
+0.07    2009-07-01 08:55 UTC
+        + Upd : Update gentooisms.
+
+0.06    2009-02-14 18:15 UTC
+        + Chg : The new CPANPLUS::Dist::Gentoo::Maps holds the gentooisms and
+                provides routines for converting CPAN versions to Gentoo.
+                version.pm is longer required.
+        + Chg : Generate ebuild for the current dist before recursing.
+        + Fix : Prevent infinite loop when forcing a distribution with recursive
+                dependencies.
+        + Fix : Remove duplicated dependencies from DEPEND.
+        + Upd : Resources in META.yml.
+        + Tst : Test gentooisms and version mappings.
+
+0.05    2009-01-25 00:30 UTC
+        + Add : Many more gentooisms, and a script to generate them.
+        + Add : Get the default values of options from emerge --info's output: 
+                - the overlay from PORTDIR_OVERLAY ;
+                - the keywords from ACCEPT_KEYWORDS ;
+                - the distdir from DISTDIR ;
+                - the main portage tree from PORTDIR.
+        + Chg : Search in the portage tree for the category (including virtuals)
+                each dependency belongs, and state it explictely in the ebuild's
+                DEPEND. This change was made necessary because portage recently
+                stopped accepting non-existent atoms in || ( ) constructs.
+        + Fix : Append our overlay to the ones specified in PORTDIR_OVERLAY (if
+                it's not listed yet) when running commands.
+
+0.04    2008-12-06 17:05 UTC
+        This release was motivated by Kent Fredric's suggestions in RT #41483.
+        Many thanks to him.
+        + Add : The --dist-opts 'header' and 'footer', that respectively prepend
+                and append any text to the ebuilds.
+        + Add : The samples/g-cpanp shell script (don't forget to set the proper
+                keywords).
+        + Add : Add 'SRC_TEST="do"' in the ebuids so that tests are run when
+                'test' is set in FEATURES.
+        + Fix : Only the modules in the modules list were fetchable.
+
+0.03    2008-11-29 18:45 UTC
+        + Add : --force regenerates ebuilds.
+        + Fix : Flaky perl -> portage version conversion.
+        + Fix : Prerequisites weren't relinked through gentooisms.
+        + Fix : Generating Manifests with user-defined distdir and overlay.
+        + Upd : META.yml spec updated to 1.4.
+
+0.02_01 2008-05-26 22:35 UTC
+        + Add : The 'keywords' option.
+        + Chg : From now, the portage category is perl-gcpanp, for consistency
+                with g-cpan.
+        + Fix : Empty emerge command.
+        + Fix : Missing '-C' to the uninstall command.
+        + Fix : Removed an useless debug message.
+
+0.01    2008-05-20 18:10 UTC
+        First version, released on an unsuspecting world.
+

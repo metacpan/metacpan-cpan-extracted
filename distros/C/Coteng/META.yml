@@ -1,0 +1,59 @@
+---
+abstract: 'Lightweight Teng'
+author:
+  - 'y_uuki <yuki.tsubo@gmail.com>'
+build_requires:
+  DBD::SQLite: '0'
+  Exporter::Lite: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Coteng
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Coteng:
+    file: lib/Coteng.pm
+    version: '0.11'
+  Coteng::DBI:
+    file: lib/Coteng/DBI.pm
+  Coteng::DBI::db:
+    file: lib/Coteng/DBI.pm
+  Coteng::DBI::st:
+    file: lib/Coteng/DBI.pm
+  Coteng::QueryBuilder:
+    file: lib/Coteng/QueryBuilder.pm
+requires:
+  Class::Accessor::Lite::Lazy: '0'
+  DBI: '1.630'
+  DBIx::Sunny: '0.21'
+  Module::Load: '0'
+  SQL::Maker: '1.12'
+  SQL::NamedPlaceholder: '0.03'
+  Scope::Container: '0'
+  Scope::Container::DBI: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/yuuki/Coteng/issues
+  homepage: https://github.com/yuuki/Coteng
+  repository: git://github.com/yuuki/Coteng.git
+version: '0.11'
+x_authority: cpan:YUUKI
+x_contributors:
+  - 'nonylene <cookie.speaker@gmail.com>'
+x_static_install: 1

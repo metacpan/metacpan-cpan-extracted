@@ -1,0 +1,4 @@
+name: Template
+version: 1
+deps:
+  - ViewTT

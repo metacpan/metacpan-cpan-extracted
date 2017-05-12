@@ -1,0 +1,55 @@
+Readme file for Chart::Plot 
+  - Plot two dimensional data in an image.
+
+I wrote Chart::Plot to create images of some simple graphs of two
+dimensional data. The other graphing interface modules to GD.pm I saw
+on CPAN either could not handle negative data, or could only chart
+evenly spaced horizontal data. (If you have evenly spaced or nonmetric
+horizontal data and you want a bar or pie chart, you should try the
+GD::Graph and Chart::* modules, available on CPAN.)
+
+Chart::Plot will plot multiple data sets in the same graph, each with
+negative or positive values in the independent or dependent
+variables. Each dataset can be a scatter graph (data are represented
+by graph points only) or with lines connecting successive data points,
+or both. Colors and dashed lines are supported, as is scientific
+notation (1.7E10). Axes are scaled and positioned automatically and
+5-10 ticks are drawn and labeled on each axis.
+
+You must have already installed the GD.pm library by Lincoln Stein,
+available on CPAN or at
+  http://stein.cshl.org/WWW/software/GD/
+Early versions of GD (1.19 and earlier) supported only gif format; 
+more recent versions support only png format. Version 1.27 also supports 
+jpeg format. All these versions are still available. Chart::Plot will 
+draw either gif or png by default depending on your version of GD, and 
+will draw jpeg if you request and it is available.
+
+This is a beta software and has not received exhaustive testing, but it
+seems to mostly work ok. Tick labels when using scientific notation
+seem to run together too often. There are a several features that it
+doesn't have but should, and the code could be improved in a few
+places. I will try to maintain compatibility of the public interface
+if there are future versions.
+
+Installation: unzip and untar the distribution and move into its
+directory. Then the usual
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+'make test' will produce a few simple images, saved in files in
+the current directory. I can't think of anything that could go wrong
+unless you don't have GD.pm installed, but the file 'test.pl' does
+offer a couple of examples. It also reports your current version of GD
+and the image format(s) it supports, but this could later change if GD 
+is up(down)graded.
+
+There is also a sample cgi script, demo.cgi (which uses CGI.pm) that I
+have used as a front end to Chart::Plot, but please don't write asking
+me how to install a cgi script. At present time of writing, you can try 
+it at http://www.pobox.com/~smorton/modules/
+
+Sanford Morton <smorton@pobox.com>

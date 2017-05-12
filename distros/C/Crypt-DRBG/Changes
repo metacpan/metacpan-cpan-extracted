@@ -1,0 +1,9 @@
+Revision history for Crypt-DRBG
+
+0.000002 2016-02-03
+         * Don't call new on Math::BigInt unnecessarily.
+		 * Fix test failure on old Digest::SHA.
+		 * Fix breakage on older versions of Math::BigInt.
+
+0.000001 2015-11-28
+         * Initial release.

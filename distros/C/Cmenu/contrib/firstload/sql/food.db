@@ -1,0 +1,13 @@
+DROP TABLE food;
+DROP SEQUENCE food_foodid_seq;
+CREATE TABLE food (
+	foodid	SERIAL,
+	foodcat	INT NOT NULL,
+	food	TEXT,
+	base	INT,
+	unit	INT,
+	cost	FLOAT,
+	stock	INT,
+	buy	INT DEFAULT 0,
+	update	TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,111 @@
+Revision history for Chess-Rep-Coverage
+
+0.1101 2014-08-30
+    - Fixed POD
+
+0.11  2014-02-13
+    - Removed dependence upon Imager.
+    - Special-cased attacking pawns to show diagonal movement
+    - Improved dist.ini
+
+0.1003 2012.12.10
+    - Added Test::PodSpelling to dist.ini and fixed spelling errors.
+    - Replaced is_deeply() tests with ok() for arrayrefs.
+
+0.1002 2012.03.25
+    - Removed Imager write test.
+
+0.1001 2012.03.21
+    - Removed the -T from tests.
+    - Vastly improved POD in the C-R-C-Imager package.
+    - Improved eg/from-pgn comment.
+
+0.10 2012.03.18
+    - Add a handy example of PGN processing.
+    - Show the animated "Immortal" game on the Imager POD.
+    - Enhance SEE ALSO section.
+    - Fix C-R-C-Imager SYNOPSIS instructions.
+
+0.0901 2012.03.17
+    - Adjust the attack/protect concentric circles to make them more visually obvious.
+    - Simplified the default status colors and regenerated the example images.
+
+0.09 2012.03.17
+    - Add an Imager subclass and graphical board.
+    - Show colored move, threat and protection status.
+    - Reversed ASCII coverage board positions and markers to conform to convention.
+
+0.0802 2012.02.20
+    - Fix documentation
+    - Make cover() a private method.
+
+0.0801 2012.02.19
+    - Fix documentation
+
+0.08 2012.02.19
+    - Implemented the special case logic for kings.
+    - Modularized duplicated code.
+
+0.0701 2012.02.19
+    - Updated dist.ini
+    - Added tests for new statuses and the board() method.
+
+0.07 2012.02.19
+    - Added a cover() accessor.
+    - Compute the "is_protected_by" and "is_threatened_by" status for each piece.
+    - Compute the "can_move_here" status for each piece by player.
+    - Render an ASCII status board.
+
+0.0601 2012.02.15
+    - Removed nested duplicate.
+
+0.06 2012.02.15
+    - Made protection work properly.
+
+0.05_01 2010.01.30
+    - Refactored for Dist::Zilla.
+    - Rewrote and tried to fix the protects list...
+
+0.0403 2009.01.23
+    - Fixed the t/boilerplate code.
+
+0.0402 2009.01.23
+    - Fixed the coverage() moves code.
+    - Enhanced existing test but normalized them and added pod coverage.
+
+0.0401 2008.08.04
+    - This is a subclass Chess::Rep.e. Chess::Coverage).
+
+0.04 2008.08.03
+    - Cleaned syntax and optimized looping a bit.
+    - Made the test actually test coverage.
+
+0.03 2008.08.03
+    - Improved the occupant naming.
+    - Replaced _get_allowed_moves() with map grep status().
+
+0.02 2008.08.02
+    - Refactored to accommodate the new Chess::Rep API.
+
+0.01 2008.08.02
+    - Fixed the moves array computation.
+    - Added the crucial, final "1;" # Oops!
+
+0.01 2008.08.02
+    - Scrapped everything but the interface when I saw that the
+      Chess::Rep module could do what I wanted with less code and in
+      a fraction of the execution speed.
+
+0.00_4 2007.07.02
+    - Fixed the coverage() function.
+
+0.00_3 2007...?
+
+0.00_2 2007.04.07
+    - Lifted the "line_is_open" and "move_is_legal" functions of the
+      Chess module and modified them, ever so slightly, for coverage
+      analysis.
+
+0.00_1 2007.03.10
+    - Began the de-crustification, simplification, cleanup, rewrite of
+      the old Games::Chess::Coverage packages.

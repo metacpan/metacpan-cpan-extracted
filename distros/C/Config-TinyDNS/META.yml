@@ -1,0 +1,30 @@
+---
+abstract: "Manipulate tinydns' data file"
+author:
+  - 'Ben Morrow <ben@morrow.me.uk>'
+build_requires:
+  Test::Exception: 0
+  Test::Exports: 1
+  Test::More: 0.65
+  Test::NoWarnings: 1.00
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-TinyDNS
+provides:
+  Config::TinyDNS:
+    file: lib/Config/TinyDNS.pm
+    version: 1
+requires:
+  Exporter::NoWork: 0
+  File::Slurp: 0
+  List::MoreUtils: 0
+  perl: 5.010
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 1

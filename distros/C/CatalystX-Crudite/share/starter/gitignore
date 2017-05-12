@@ -1,0 +1,10 @@
+<% dist_file %>.db
+META.yml
+MYMETA.json
+MYMETA.yml
+Makefile
+blib/
+inc/
+.DS_Store
+*.swp
+*.un~

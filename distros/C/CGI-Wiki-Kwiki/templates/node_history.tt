@@ -1,0 +1,29 @@
+[%# The page for viewing the revision history of a node
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>[% site_name %] - History of [% node_name %]</h1>
+
+<ul>
+[% FOREACH revision = history %]
+  <li>Version [% revision.version %]:
+      <a href="[% cgi_url %]?node=[% node_param %]&version=[% revision.version %]">View</a> |
+      <a href="[% cgi_url %]?node=[% node_param %]&version=[% revision.version %]&diffversion=[% version %]">Diff</a> .....
+      [% revision.modified %]
+      [% IF revision.username %]
+        by <a href="[% cgi_url %]?node=[% revision.username | uri %]">[% revision.username %]</a>
+      [% END %]
+      [% IF revision.comment %]
+        <b>[[% revision.comment %]]</b>
+      [% END %]
+  </li>
+[% END %]
+</ul>
+
+<hr />
+<p>
+  <a class="menu" href="[% cgi_url %]?node=[% node_param %]">View current revision</a>
+</p>
+
+[% INCLUDE footer.tt %]

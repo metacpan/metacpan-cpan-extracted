@@ -1,0 +1,5 @@
+Tasks to perform:
+
+Consider adding a routine to set cookies and possibly other common
+headers. Perhaps put such optional extras into a separate module.
+Decide whether to tighten validation of cookie names.

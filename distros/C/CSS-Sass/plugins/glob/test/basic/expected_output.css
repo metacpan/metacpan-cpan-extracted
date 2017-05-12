@@ -1,0 +1,26 @@
+top {
+  main: head; }
+
+.lib1 {
+  footer: true; }
+
+.lib1 {
+  header: true; }
+
+.lib1 {
+  deep: true; }
+
+.lib1 {
+  global: true; }
+
+.lib1 {
+  xyz: true; }
+
+.lib2 {
+  footer: true; }
+
+.lib2 {
+  header: true; }
+
+bottom {
+  main: foot; }

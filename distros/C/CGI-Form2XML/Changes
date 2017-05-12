@@ -1,0 +1,27 @@
+Revision history for Perl extension CGI::Form2XML.
+
+1.6		Fri 30 Sep 14:40:57 BST 2016 
+		- Add CGI to PREREQ_PM as it was removed from 5.22
+
+1.5		Fri 30 Sep 12:18:33 BST 2016
+		- Fix https://github.com/jonathanstowe/CGI-Form2XML/issues/1
+		- Modernise some perl idioms ('our', 'use base')
+		- Modernise the Makefile.PL
+
+1.4		Mon Oct 16 14:13:35 BST 2006
+		- Moved to subversion.
+		- Moved stuff around
+		- added POD tests
+		- added example
+
+1.3		Sun Jul 28 11:10:35 BST 2002
+		- Fixed teeny POD bug discovered by new CPAN search.
+
+1.2		Sat May 25 10:06:53 BST 2002
+		- Version released to CPAN
+
+0.01	Tue Apr 30 07:49:57 2002
+		- original version; created by h2xs 1.21 with options
+		-AXn CGI::Form2XML -b5.5.0
+
+

@@ -1,0 +1,32 @@
+Date: Wed, 25 Apr 2007 09:41:05 +0000
+From: dojo-interest-request@dojotoolkit.org
+To: archive_dojo-interest_dojotoolkit.org@grokbase.com
+Subject: confirm 1cdd89380e8211bacdd93cad6715f55137e3264e
+
+Your membership in the mailing list Dojo-interest has been disabled
+due to excessive bounces The last bounce received from you was dated
+25-Apr-2007.  You will not get any more messages from this list until
+you re-enable your membership.  You will receive 3 more reminders like
+this before your membership in the list is deleted.
+
+To re-enable your membership, you can simply respond to this message
+(leaving the Subject: line intact), or visit the confirmation page at
+
+    http://dojotoolkit.org/mailman/confirm/dojo-interest/1cdd89380e8211bacdd93cad6715f55137e3264e
+
+
+You can also visit your membership page at
+
+    http://dojotoolkit.org/mailman/options/dojo-interest/archive_dojo-interest_dojotoolkit.org%40grokbase.com
+
+
+On your membership page, you can change various delivery options such
+as your email address and whether you get digests or not.  As a
+reminder, your membership password is
+
+    sp1nc1ty
+
+If you have any questions or problems, you can contact the list owner
+at
+
+    dojo-interest-owner@dojotoolkit.org

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style type="text/css">
+
+a[class="special"]:active,
+a[class="special"]:focus,
+a[class="special"]:visited {
+ color: #FF0000;
+}
+
+a[class="special"]:hover {
+ color: #FF00FF;
+}
+
+p::before { 
+    content: "H";
+}
+
+p::after { 
+    content: ",";
+}
+
+::selection {
+  background: #000000;
+}
+
+:target {
+  border: 2px solid #000000;
+}
+
+div > p:first-line {
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+div > p:first-of-type a:link {
+  color: #222222;
+}
+
+div > p:first-of-type a {
+  color: #DDAADD;
+}
+
+div > p:first-of-type a:visited {
+  color: #AAAADD;
+}
+
+a:last-of-type {
+  color: #EEDDAA;
+}
+
+div > p:first-letter {
+  font-size: 30px;
+}
+
+form:only-of-type {
+  background-color: #F0F000;
+  padding: 30px;
+}
+
+a:not(.special), form p {
+  color: #FF0000;
+}
+
+:root input[type=submit] {
+  background: #3858A3;
+}
+
+input[type=submit]:hover {
+  background: #1D3B7D;
+}
+
+input[type=submit]:active {
+  border: 3px solid #BB0000;
+}
+
+form:only-of-type p::before {
+  content: none;
+}
+
+form p::after {
+  content: "!!!!";
+}
+
+input[type="checkbox"]:checked ~ p {
+  display:none;
+}
+
+input:not(:optional) ~ span.first {
+  background-color: #0000FF;
+  color: #FFFFFF;
+}
+
+:root body {
+  margin: 20px;
+}
+
+input:nth-of-type(2n) ~ span {
+  color: #AAFFEE;
+}
+
+</style>
+</head>
+<body>
+  <a class="special" href="#tips">Visit the Useful Tips Section</a>
+  <div>Within a div <p>or within a paragraph <a href="#">or within a link</a></p></div>
+  <ul>
+    <li>Some text would be here</li>
+    <li>Some other text would be here</li>
+  </ul>	
+  <a id="tips">Useful Tips Section</a>
+  <form>
+    <input type="checkbox" name="vehicle" value="Bike" required><span class="first">I have a bike</span><br>
+    <input type="checkbox" name="vehicle" value="Motorcycle" optional><span>I have a motorcycle</span><br>
+    <input type="submit" value="Submit">
+    <p>Complete the form</p>
+  </form>  
+</body>
+</html>

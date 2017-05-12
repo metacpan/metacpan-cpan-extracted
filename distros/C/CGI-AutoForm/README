@@ -1,0 +1,54 @@
+CGI-AutoForm version 1.05
+=========================
+
+There are many CGI form abstractions available, (e.g. CGI.pm).  A unique and
+powerful advantage with this abstraction is that it can be tied closely with a
+database schema. Each group of fields in the form can represent a database
+table (or view) and the table/column properties and constraints are
+automagically discovered so your DBA can make DDL changes that will be
+immediately reflected in the HTML forms (no duplication of the data dictionary
+in your code).
+
+All user/operator input is checked tightly against database constraints and
+there is built-in magic to provide convenient select lists, etc, and to enforce
+a discreet set of valid values against unique/primary keys in lookup tables.
+This means referential integrity even for MySQL. Metadata in MySQL's SET and
+ENUM types are also supported.  This also gives the operator a chance to
+correct mistakes with helpful hints instead of just getting a meaningless db
+error code.
+
+This design allows you to get secure, database-driven web apps up and running is as little as a few
+hours. See Cruddy! for an implementation
+http://www.thesmbexchange.com/cruddy/index.html
+
+Another advantage this abstraction provides is the separation of presentation
+and style using style sheets and having human-friendly presentation This is
+made possible with the help of the DBIx::IO abstraction, please refer to it for
+further details.  attributes stored in a database table that can be managed by
+non-engineers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBIx::IO
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2008 Reed Sandberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

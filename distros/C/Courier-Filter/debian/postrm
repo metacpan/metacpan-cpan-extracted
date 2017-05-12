@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+mode=$1
+
+case "$mode" in
+  purge )
+    rm /etc/courier/filters/courier-filter-perl.conf
+    ;;
+esac
+
+#DEBHELPER#

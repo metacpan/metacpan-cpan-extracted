@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Catalyst-Plugin-Acme-LOLCAT
+version:             0.03
+abstract:            ~
+license:             ~
+author:              
+    - Ashley Pond V <ashley@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Acme::LOLCAT:                  0
+    Catalyst:                      5.6
+    HTML::TokeParser:              2
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

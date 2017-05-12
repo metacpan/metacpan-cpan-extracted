@@ -1,0 +1,73 @@
+Classic::Perl, version 0.06
+
+This reinstates features deleted in recent versions of perl.
+
+The features we currently provide are:
+
+• split to @_ in void and scalar context. This feature was removed in
+  perl 5.11. With this module, you can have it back.
+
+• $* - This was removed in perl 5.9.
+
+• $[ - This was removed in perl 5.15.3 and reinstated in 5.15.5. This
+  may be removed from  Classic::Perl  (and then reinstated if  it  is
+  again removed from Perl).
+
+
+RECENT CHANGES
+
+0.06
+----
+• Fixed the split feature to work in threaded 5.22 and higher.
+
+0.05
+----
+• Fixed tests to work in 5.8 and 5.6.
+
+0.04
+----
+• Fixed a crashing bug that occurred with ||= in 5.9 and higher.
+• Fixed the changes file;  I somehow got one from a different  branch
+  in the 0.03 release, listing changes that never happened.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN  module  or
+the cpan script:
+
+    perl -MCPAN -e "install Classic::Perl"
+
+    cpan Classic::Perl
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl 5 or higher.
+
+
+DOCUMENTATION
+
+After installing,  you can find documentation for these modules  with
+the perldoc command.
+
+    perldoc Classic::Perl
+
+Or try using man (it’s faster, in my experience):
+
+    man Classic::Perl
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2010-16, Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

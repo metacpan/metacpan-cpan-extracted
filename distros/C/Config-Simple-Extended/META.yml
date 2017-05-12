@@ -1,0 +1,31 @@
+---
+abstract: 'Extend Config::Simple w/ Configuration Inheritance, chosen by URL'
+author:
+  - 'Hugh Esco <hesco@campaignfoundations.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Simple-Extended
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Simple: 0
+  Data::Dumper: 0
+  File::PathInfo: 0
+  FindBin: 0
+  Test: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  UNIVERSAL: 0
+version: 0.16

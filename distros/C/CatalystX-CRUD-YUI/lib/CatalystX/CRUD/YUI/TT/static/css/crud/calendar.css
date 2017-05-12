@@ -1,0 +1,16 @@
+
+span.calendar_container {
+    position: absolute;
+    zoom: normal;
+    padding: 6px;
+    width: 200px;   /* wider than calendar itself */
+    /* margin-top: -6px; */
+}
+
+.yui-skin-sam .yui-calcontainer {
+    background-color: #f2f2f2;
+}
+
+img.calendar {
+    vertical-align: top;
+}

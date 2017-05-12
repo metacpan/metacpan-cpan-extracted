@@ -1,0 +1,21 @@
+---
+name: Catalyst-Plugin-DefaultEnd
+version: 0.08
+author:
+  - 'Marcus Ramberg <marcus@thefeed.no>'
+abstract: DEPRECATED Sensible default end action.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.2
+configure_requires:
+  Module::Build: 0.34
+provides:
+  Catalyst::Plugin::DefaultEnd:
+    file: lib/Catalyst/Plugin/DefaultEnd.pm
+    version: 0.08
+generated_by: Module::Build version 0.34
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

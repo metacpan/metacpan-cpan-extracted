@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE phrasebook [
+	       <!ELEMENT phrasebook (dictionary)*>              
+	       <!ELEMENT dictionary (phrase)*>
+               <!ATTLIST dictionary name CDATA #REQUIRED>
+               <!ELEMENT phrase (#PCDATA)>
+               <!ATTLIST phrase name CDATA #REQUIRED>
+]>
+<phrasebook>
+ <dictionary name="EN">
+
+  <phrase name="HELLO_WORLD">
+            Hello World!!!
+  </phrase>
+  <phrase name="THE_HOUR">
+            The time now is $hour. 
+  </phrase>
+  <phrase name="ADDITION">
+            add $a and $b and you get $c
+  </phrase>
+  <!-- my name is the same in English and in Dutch. -->
+  <phrase name="THE_AUTHOR">
+            Rani Pinchuk
+  </phrase>
+ </dictionary>
+
+ <dictionary name="FR">
+  <phrase name="HELLO_WORLD">
+              Bonjour le Monde!!!
+  </phrase>
+  <phrase name="THE_HOUR">
+            Il est maintenant $hour. 
+  </phrase>
+  <phrase name="ADDITION">
+            $a + $b = $c
+  </phrase>
+ </dictionary>
+
+ <dictionary name="NL">
+  <phrase name="HELLO_WORLD">
+            Hallo Wereld!!!
+  </phrase>
+  <phrase name="THE_HOUR">
+            Het is nu $hour. 
+  </phrase>
+  <phrase name="ADDITION">
+            $a + $b = $c
+  </phrase>
+ </dictionary>
+</phrasebook>

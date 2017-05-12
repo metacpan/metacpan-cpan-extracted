@@ -1,0 +1,33 @@
+---
+abstract: 'Adjusts the response Content-Type'
+author:
+  - 'Maintainer and contributor of various features - David Dorward (dorward) C<< <david@dorward.me.uk> >>'
+build_requires:
+  Catalyst::Action::RenderView: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-ContentNegotiation-XHTML
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 0
+  Catalyst::View::TT: 0
+  HTTP::Negotiate: 0
+  MRO::Compat: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-View-ContentNegotiation-XHTML.git
+version: 1.103

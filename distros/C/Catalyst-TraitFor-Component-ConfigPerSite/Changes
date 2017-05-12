@@ -1,0 +1,47 @@
+Revision history for Perl extension Catalyst::TraitFor::Component::ConfigPerSite.
+0.12  8 Jan 2013
+	Fix bug 82021, allow just 1 per-site config, fallback to default for others
+
+0.11  8 Jan 2013
+	Added repo and license metadata, cleaned up whitespace
+
+0.10  25 March 2012
+	yet another test prereq
+
+0.09  24 March 2012
+       remove un-used deps from test code
+
+0.08  22 March 2012
+       - yet more missing pre-reqs, and metadata *sigh*
+
+0.07  16 Mar 2012
+       - added hopefully the last missing pre-reqs to Makefile.PL
+
+0.06  14 Mar 2012
+       - updated Makefile.PL with required module for testing
+
+0.05  28 Feb 2012
+       - cleaned up code
+       - added example scripts (incl patch from Tomas Doran)
+       - fixed paths in config (patch from Tomas Doran)
+       - added test for 3rd site
+       - added pod
+
+0.04  28 August 2011
+       - removed old files from MANIFEST
+       - Pod indentation fixes from Christiaan Kras
+
+0.03  9 Feb 2011
+       - added missing files for tests
+       - Dedicated to Smyler(s) who won the 2009 London.pm Christmas Cryptic Crossword
+
+0.02  27 Dec 2010
+       - now inherits top level configuration sections (but not configuration within sections)
+       - replaced hardcoded/pattern matched component names in code
+       - only get component configuration in components
+       first release to CPAN
+       Dedicated to Smylers
+
+0.01  Wed Nov 10 23:10:25 2010
+	- original version;
+

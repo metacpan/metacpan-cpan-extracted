@@ -1,0 +1,54 @@
+Changes for Crypt-JWT distribution
+
+0.018   2016/08/31
+        - doc fixes
+        - file perms fixes
+
+0.017   2016/06/03
+        - doc fixes
+
+0.016   2016/05/12
+        - require CryptX-0.034 (jws_no_key.t fails with older versions)
+
+0.015   2016/05/12
+        - fix broken test jws_no_key.t
+
+0.014   2016/05/04
+        - using Base64 en/decoding routines from CryptX also in tests
+
+0.013   2016/05/03
+        - fix misused utf8:stuff
+        - fix 5.8.* compatibility
+        - using Base64 en/decoding routines from CryptX
+
+0.012   2016/05/02
+        - JWS is now able to use the key from jwk header
+        - added support for Flattened JSON serialization (for both JWS and JWE)
+
+0.011   2015/10/22
+        - switch to JSON::MaybeXS https://github.com/DCIT/perl-Crypt-JWT/pull/1
+
+0.010   2015/07/07
+        - INCOMPATIBLE CHANGE: 'key' param of decode_jwt and encode_jwt:
+          PEM/DER/JWK-JSON key strings are not passed as scalars but
+          as a reference to scalar (see examples in documentation)
+        - decode_jwt: kid_keys now strictly checks kty (key type)
+
+0.009   2015/07/04
+        - decode_jwt: verify_iat default changed to 0
+        - encode_jwt: auto_typ removed
+        - improved tests
+
+0.008   2015/07/04
+        - decode_jwt: new parameter - ignore_claims
+        - fix related to nbf, iat, exp checks
+
+0.007   2015/07/04
+        - decode_jwt: new parameter - kid_keys
+
+0.006   2015/07/03
+        - after many changes first candidate for stable API
+        - incomplete tests
+
+0.001   2015/06/30
+        - initial version

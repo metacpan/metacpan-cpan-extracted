@@ -1,0 +1,593 @@
+#! /usr/local/bin/perl
+
+require 5.004;
+
+use CGI qw(:html escapeHTML);
+use ClearCase::Argv;
+use Cwd qw(cwd);
+use Net::SMTP;
+use File::Basename qw(fileparse);
+use Getopt::Long;
+
+ClearCase::Argv->attropts;	# parse -/dbg=1 et al
+
+my $prog = (split('/', $0))[-1];
+
+sub usage {
+   my $status = shift;
+   select($status ? STDERR : STDOUT);
+   print <<EOF;
+Usage: $prog [flags] pname-in-vob ...
+Flags: [default]
+   -help	Show this message
+   -auto	Read command line(s) from attributes on \$0
+   -avobs	Traverse all VOBs
+   -filter /RE/	In -auto mode, skip reports not matching this Perl pattern
+   -mail	Send results via email [stdout]
+   -empty	Send mail even for projects with no changes [skip]
+   -branch br   Show changes on specified branches [all]
+   -cview	Limit search to versions visible in the working view
+   -name <patt> Limit search to elements matching <pattern>.
+   -to addr,...	Specify mail distribution [\$LOGNAME]
+   -inhtml      Output to be embedded in existing HTML; skip headers/footers
+   -plain       Generate plain-text output [HTML]
+   -view tag	Work in specified view [current]
+   -since  date	Changes since specified date, eg 10-Oct.8:00 ['yesterday']
+   -before date	No changes after specified date [none]
+   -report n	Specify that this report is to be marked as #n [none]
+   -type d|f	Restrict changes found to files or directories [either]
+   -user login  Show changes only by specified user(s) [all]
+   -fhref href  Format changed files as <A HREF=<href>file</A>
+   -domain d	Specify a domain name to be used for mail addresses
+
+Use "perldoc $0" for full documentation.
+EOF
+   exit $status;
+}
+
+use strict;
+
+# Make sure $0 is the full path to this executable.
+$0 = join('/', cwd(), $0) unless $0 =~ m%^[/\\]%;
+
+my %opt;
+GetOptions(\%opt, qw(auto avobs before=s branches|brtypes=s@ name=s
+		    cview domain=s empty filter=s
+		    fhref=s down=s help inhtml mail! plain report=s
+		    since=s to=s type=s@ user=s@ view=s)) || exit 2;
+
+usage(0) if $opt{help};
+usage(2) if @ARGV && $opt{auto};
+usage(2) if @ARGV && $opt{avobs};
+
+$opt{mail} = 1 if !defined($opt{mail}) && $opt{to}; # -mail is implied by -to
+
+$opt{filter} =~ s%^/(.*)/$%$1% if $opt{filter}; # so RE can be given as /RE/
+
+# Make a cleartool object to work through
+my $ct = ClearCase::Argv->new({-autochomp=>1, -autofail=>1});
+
+# Determine the working view. This should be a simple main/LATEST cspec.
+my $vtag = $opt{view};
+if (!$vtag) {
+    if ($ENV{CLEARCASE_ROOT}) {
+	$vtag = (split '/', $ENV{CLEARCASE_ROOT})[-1];
+    } elsif ($0 =~ m%^/view/([^/]+)/%) {
+	$vtag = $1;
+    }
+}
+die "$prog: Error: no view context specified\n" unless $vtag;
+
+# If in auto mode, act as our own harness and fire off command lines
+# based on CCrxx attributes.
+if ($opt{auto}) {
+    # Check the CC attributes on this script for all attributes
+    # matching /^CCr*/.  These control what we will do from here.
+    my @ccrs = $ct->desc([qw(-aattr -all)], "$0@@")->qx;
+    my(%reports, %subs);
+    for my $attr (@ccrs[2..$#ccrs]) {
+	my($key, $val, $name);
+	(undef, $key, $val) = split(/[\s=]+/, $attr, 3);
+	next unless $key =~ s/^CCr//;
+	$val =~ s/^"(.*)"$/$1/;
+	next if $val =~ m%^#%;	# allow a report to be commented out
+	if ($key =~ /^(\d+)/) {
+	    my $rpt = $1;
+	    next if $opt{filter} && ($rpt !~ /$opt{filter}/);
+	    $reports{$rpt} = $val;
+	} elsif ($key =~ /^[^_]*_(.*)/) {
+	    $subs{$1} = $val;
+	}
+    }
+    my $rc = 0;
+    for (sort {$a <=> $b} keys %reports) {
+	my $name = $_;
+	while ($reports{$name} =~ /\{(\w+)\}/) {
+	    my $sub = $1;
+	    $reports{$name} =~ s/\{$sub\}/$subs{$sub}/g
+			    || die "$prog: Error: no match for {$sub}";
+	}
+	my $explicit = "-report $name -view $vtag";
+	if (defined($opt{mail}) && !$opt{mail}) {
+	    $explicit .= ' -nomail';
+	} elsif ($opt{mail}) {
+	    $explicit .= $opt{to} ? " -to $opt{to}" : ' -mail';
+	}
+	$explicit .= ' -plain' if $opt{plain};
+	$explicit .= " -domain $opt{domain}" if $opt{domain};
+	$explicit .= ' -avobs' if $opt{avobs};
+	my $cmd = "$^X -S $0 $reports{$name} $explicit";
+	$cmd = "set -x; $cmd" if $ct->dbglevel || $opt{filter};
+	$rc ||= system $cmd;
+    }
+    exit $rc;
+}
+
+# Determine some "ct find" predicates for time slice and user.
+# We want all changes since this date, default to 'midnight yesterday'
+my $Since = $opt{since} || -1;
+if ($Since =~ /^(?:now)?[+-]\d+$/i) {
+   $Since =~ s%^now%%i;
+   my @s = localtime(time + (24*60*60 * $Since));
+   my @mon = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+   $Since = sprintf "%02d-%3s-%04d.00:00:00", $s[3], $mon[$s[4]], $s[5]+1900;
+}
+my $Pred = "created_since($Since)";
+my $Before = $opt{before} || 0;		# but not after this date (if given)
+if ($Before =~ /^(?:now)?[+-]\d+$/i || $Before == 0) {
+   $Before =~ s%^now%%i;
+   my @n = localtime(time + (24*60*60 * $Before));
+   my @mon = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+   $Before = sprintf "%02d-%3s-%04d.%02d:%02d:00",
+      $n[3], $mon[$n[4]], $n[5]+1900, $n[2], $n[1];;
+}
+$Pred .= " && !created_since($Before)" if $opt{before};
+if ($opt{user}) {
+   $Pred .= ' && (';
+   for (@{$opt{user}}) {
+      for (split(/[\s,]+/)) {
+	 $Pred .= "created_by($_)";
+	 $Pred .= ' || ';
+      }
+   }
+   $Pred =~ s/\s+\|\|\s$/)/;
+}
+
+# Must go into "ipc" or "ctcmd" mode in order to retain setview/cd/etc state.
+$ct->ipc(3);
+
+# First we need a view to work through.
+$ct->setview($vtag)->system;
+
+my(%Changers, %Files);
+
+# Obtain the list of public vobs so we can later map a dir to its vob.
+my @PublicVobs = map {(m%^..(\S+)%)[0]} grep /\bpublic\b/, $ct->lsvob->qx;
+
+# Makes tail -f of output file easier when testing.
+$| = 1;
+
+# If no branches specified, report on all.
+my @branches = $opt{branches} ? map {split /,/} join(',', @{$opt{branches}}) :
+				qw[(ALL)];
+
+@ARGV = @PublicVobs if !@ARGV || $opt{avobs};
+
+my $title = "[$opt{report}]: " if $opt{report};
+my $es = @branches > 1 ? 'es' : '';
+my $tbranches = join(',', @branches);
+$title .= "Changes on branch$es $tbranches in ";
+$title .= $opt{avobs} ? '(ALL VOBS)' : "@ARGV";
+if ($opt{since} || $opt{before}) {
+    $title .= ' ';
+    $title .= "before $Before" if $opt{before};
+    $title .= ' and ' if $opt{before} && $opt{since};
+    $title .= "since $Since" if $opt{since};
+} else {
+    chomp(my $date = `date '+%a %d-%b-%y'`);
+    $title .= " for $date";
+}
+
+for my $dir (@ARGV) {
+    # Map the requested directory into its containing vob.
+    my $vob;
+    for (@PublicVobs) { $vob = $_, last if $dir =~ m%$_% };
+    die "$prog: Error: no VOB found for $dir\n" unless $vob;
+
+    # Now the vob needs to be mounted and the child process must
+    # be cd-ed to the the appropriate area within it. This assumes
+    # the $vtag view has /main/LATEST access to it.
+    $ct->mount($vob)->system if ! -d "/view/$vtag/$vob/lost+found";
+    $ct->cd($dir)->system;
+
+    # Get the basic list of modified elements.
+    # It's faster to get all elements in the vob using ct find -all
+    # and grep out what we don't want than to do what might seem
+    # more natural: "ct find ." alone.
+    my $find;
+    my @sel = qw(. -all);
+    push(@sel, '-name', qq("$opt{name}")) if $opt{name};
+    if ($opt{type}) {
+	push(@sel, '-type', $opt{type}->[0]);
+    } else {
+	push(@sel, qw(-type fd));
+    }
+    push(@sel, '-cview') if $opt{cview};
+    if ($branches[0] eq '(ALL)') {
+	$find = "find @sel -ver '$Pred' -print";
+    } else {
+	$find = "find @sel -ver '(brtype($branches[0])";
+	for (@branches[1..$#branches]) { $find .= " || brtype($_)" }
+	$find .= ") && $Pred' -print";
+    }
+
+    # Now, for each changed elem we run two 'cleartool describe' cmds:
+    # one to get the data on the elem itself and another for the comment.
+    for my $version (sort grep m%$dir%, $ct->argv($find)->qx) {
+
+	# Ignore zero-branches and checked-out elements.
+	$version =~ m+/CHECKEDOUT$|/0$+ && next;
+
+	# Skip anything in a 'private' subdirectory.
+	$version =~ m+/private/|/trigtest/+ && next;
+
+	# Get the raw data about this version and clean it up a bit.
+	my($line) = $ct->desc([qw(-fmt %d===%u===%Fu===%a===%l===%En@@%Sn)],
+			                                      $version)->qx;
+	next if $?;
+	my($date, $username, $fullname, $attrs, $labels, $xpn) =
+	                                                 split /===/, $line;
+
+	# Separate the version-extended pathname into path and version.
+	my($pn, $vers) = ($xpn =~ m%(.*)@@(.*)%);
+
+	# Due to a bug in ClearCase/NT, changes made on NT sometimes
+	# come over as being by 'username', not by 'fullname' (ie the
+	# 1st passwd field instead of the 5th, because CC doesn't map
+	# it at checkin time). So we work around that here.
+	if (my $tmp = (getpwnam(lc($fullname)))[5]) {
+	    $fullname = $tmp;
+	}
+
+	# Normalize the fullname since we'll be using it as part of a key.
+	$fullname =~ s/,.*//;
+	$fullname =~ s/[\s.]+/ /g;
+
+	# Make an entry for this user indicating that we've seen him/her.
+	$Changers{lc($fullname)} = $fullname;
+
+	# Simplify the pathname to remove version-extended subdirs
+	# for readability: '$cpn' is 'cleaned pathname'.
+	(my $cpn = $pn) =~ s%@@.*?/\d+/%/%g; 
+	#$cpn =~ s%(@@)?/main/.*?(CHECKEDOUT\.)?\d+/%/%g;
+
+	# Get the comment and format it correctly.
+	my $cmt = $ct->desc([qw(-fmt %c)], $version)->qx;
+	next if $?;
+
+	# "Paragraph mode" - causes chomp to remove multiple trailing \n
+	{ local $/ = ''; chomp $cmt; }
+
+	# If the comment contains a line ending with ~p we
+	# consider it to be intentionally private.
+	# Useful when testing triggers etc.
+	next if $cmt =~ /~p$/mi;
+
+	# Ignore attributes users aren't interested in.
+	{ local $^W=0; $attrs =~ s/(,\s)?_\w+=".+?"(,\s)?/$2/g; }
+
+	# Now we use the {who,attrs,comment} as the key in a
+	# a hash pointing to the names of changed files.
+	# Show the date for each change, unless it's guaranteed
+	# to be yesterday.
+
+	# Strip years and seconds from date; nobody cares about that.
+	$date =~ s/^(\d+-\w+)-\d+\.(\d+:\d+):\d+/$1.$2/;
+
+	# Build up the line to print for this modified file.
+	# Labels go at the end because there might not be any.
+	my $ln;
+	if ($opt{plain}) {
+	    $ln = sprintf("%-60s  - %-16s  %-14s  %s",
+	    $cpn, $vers, $date, $labels);
+	} else {
+	    my($base,$path,$ext) = fileparse($cpn, '\..*?');
+	    if ($opt{fhref}) {
+		my $flnk;
+		if (-f "/view/$vtag$pn@@/main/0") {
+		    $flnk = qq($path<a href="$opt{fhref}?file=/view/$vtag$pn\@\@$vers" target="_blank"><b>$base</b></a><a href="$opt{fhref}?render=yes&file=/view/$vtag$pn\@\@$vers" target="_blank"><b>$ext</b></a>);
+		} else {
+		    $flnk = font({color=>"green"}, $cpn);
+		}
+		my $dlnk = qq(<a href="$opt{fhref}?diff=/view/$vtag$pn\@\@$vers" target="_blank">$vers</a>);
+		$ln = sprintf("%-60s  - %-16s  %-14s  %s",
+					    $flnk, $dlnk, $date, $labels);
+	    } else {
+		$ln = sprintf("%-60s  - %-16s  %-14s  %s",
+			    $path . b($base . $ext), $vers, $date, $labels);
+	    }
+	}
+
+	# Strip any trailing spaces
+	$ln =~ s/\s+$//;
+
+	# Now push the modified line onto its comment's bucket.
+	push(@{$Files{$username,$fullname,$attrs,$cmt}}, $ln);
+    }
+}
+
+# At this point we have a database (in %Files) of all changes found.
+# Format and print this data, in HTML or plain text, to stdout or to mail,
+# as requested.
+{
+    # We collect all the output and put it in an array, then print or
+    # mail it later.  Done this way so we can add "wanderers" to the
+    # mailing list.
+    my(@Plain, @Html) = ();
+
+    my $indent = ' 'x3;			# the amount to indent output by
+
+    # Certain header info for the case when we're not sending mail.
+    push(@Plain, "\n$indent * $title *\n\n") if $opt{plain} && !$opt{mail};
+    push(@Html, html(), title($title), "<BODY BGCOLOR='#F0F0F0'><BR>\n")
+							if !$opt{inhtml};
+    push(@Html, font({size=>2, face=>"arial, helvetica"}) . "\n");
+
+    # If no changes, skip to the next report and give output only if asked
+    if (! keys %Files) {
+	if ($opt{empty}) {
+	    if (! $opt{mail}) {
+		print "\n$indent(No changes)\n\n";
+		next;
+	    }
+	    my @to = split /,/, $opt{to} || $ENV{LOGNAME};
+	    for (@to) { $_ .= "\@$opt{domain}" if $opt{domain} && !/@/ }
+	    my $smtp = Net::SMTP->new('mailhost');
+	    die "$prog: Net::SMTP->new failed" unless $smtp;
+	    $smtp->debug(1) if $ct->dbglevel > 1;
+	    $smtp->mail($ENV{LOGNAME}) || die "$prog: Net::SMTP failed";
+	    $smtp->to(@to) || die "$prog: Net::SMTP failed";
+	    $smtp->data() || die "$prog: Net::SMTP failed";
+	    $smtp->datasend(qq(To: @to\n)) || die "$prog: Net::SMTP failed";
+	    $smtp->datasend("Subject: [No Changes] $title\n");
+	    $smtp->datasend("\n") || die "$prog: Net::SMTP failed";
+	    $smtp->dataend() || die "$prog: Net::SMTP failed";
+	    $smtp->quit || die "Net::SMTP failed";
+	}
+	next;
+    }
+
+    ####################################################################
+    # Now we know there were changes, so it's time to generate a report.
+    ####################################################################
+
+    # Report Header information
+    # can easily get into a real browser to navigate the changes.
+    if ($opt{mail} && !$opt{fhref}) {
+	push(@Html, "<P></P>\n");
+	if ($opt{cview}) {
+	    my $cwv = $ct->pwv(['-s'])->qx;
+	    push(@Html, qq(Changes visible in ClearCase view <I>cwv</I> ));
+	} else {
+	    push(@Html, qq(Changes on ClearCase branch <I>@branches</I> ));
+	}
+	push(@Html, qq(since <I>$Since</I>));
+	push(@Html, qq( and before <I>$Before</I>));
+	if (@ARGV > 1) {
+	    push(@Html, qq( within VOB directories:\n));
+	} else {
+	    push(@Html, qq( within VOB directory:\n));
+	}
+	push(@Html, qq(<I>\n));
+	for (@ARGV) {
+	    push(@Html, " $_");
+	    push(@Html, ',') unless $_ eq $ARGV[-1];
+	}
+	push(@Html, qq(</I>\n));
+	push(@Html, qq(<P></P><HR><HR>\n));
+    }
+
+    my $cset = 0;
+
+    my $prev;
+    for my $key (sort keys %Files) {
+	my($username, $fullname, $attrs, $comment) = split(/$;/, $key);
+
+	# One separator between each change.
+	push(@Html, "\n<HR>\n") if defined($prev);
+
+	# Turn the changer's name into a mailto URL.
+	if ($opt{fhref}) {
+	    require URI::Escape;
+	    my $mailname = $username;
+	    # ($mailname = $fullname) =~ s%\s+%.%g;	# a common convention
+	    if ($opt{domain} && $mailname !~ /@/) {
+		$mailname .= "\@$opt{domain}";
+	    }
+	    my $subj = $comment || '[No comment]';
+	    $subj =~ s/\n.*/ .../s;
+	    $subj =~ s/^(.{50}\S*).*/$1 .../;
+	    $subj = URI::Escape::uri_escape("Re: your change '$subj'");
+	    $fullname = qq(<a href="mailto:$mailname\?subject=$subj">$fullname</a>);
+	}
+
+	push(@Plain, "By $fullname");
+	push(@Html, "By " . font({color=>"blue"}, $fullname));
+
+	if ($attrs) {
+	    push(@Plain, " $attrs");
+	    push(@Html, escapeHTML(" $attrs"));
+	}
+	push(@Plain, "\n");
+	push(@Html, "\n");
+
+	# Push each modified line onto the output stacks.
+	for my $line (sort @{$Files{$key}}) {
+	    push(@Plain, "$indent$line\n");
+	    push(@Html, "<BR>\n" . $line);
+	}
+
+	# Push comment onto Html stack.
+	if ($comment) {
+	    push(@Html, "\n<P>\n", font({color=>'red', size=>3},
+	    pre(i(escapeHTML($comment)))));
+	} else {
+	    push(@Html, "\n<P>\n", font({color=>'red', size=>3},
+	    pre(b(escapeHTML('[No comment]')))));
+	}
+
+	if ($opt{down}) {
+	    push(@Html, "<a name='$cset'></a>");
+	    my $nxt = ++$cset;
+	    push(@Html, qq(<a href='#$nxt'><img src='$opt{down}'></a>));
+	}
+
+	# Push comment (destructively) onto Plain stack.
+	$comment ||= "[No comment]\n";
+	$comment =~ s/\n/\n$indent> /gs;
+	push(@Plain, "\n$indent> $comment\n\n\n");
+
+	$prev = $fullname;
+    }
+
+    if ($opt{fhref} && $opt{mail}) {
+	(my $base = $opt{fhref}) =~ s%servlet.*%%;
+	push(@Html, "\n<HR><B>Generate a <A HREF=$base>custom report</A> here.</B>\n");
+	push(@Html, "<P></P>\n");
+    }
+
+    push(@Html, qq(<HR></BODY></HTML>\n)) if !$opt{inhtml};
+
+    # Now dump the output to either the mailer or stdout, as requested.
+    if ($opt{mail}) {
+	my $ttype = $opt{plain} ? 'plain' : 'html';
+	my @to = split /,/, $opt{to} || $ENV{LOGNAME};
+	for (@to) { $_ .= "\@$opt{domain}" if $opt{domain} && !/@/ }
+	my @body = $opt{plain} ? @Plain : @Html;
+	my $smtp = Net::SMTP->new('mailhost');
+	die "$prog: Net::SMTP->new failed" unless $smtp;
+	$smtp->debug(1) if $ct->dbglevel > 1;
+	$smtp->mail($ENV{LOGNAME}) || die "$prog: Net::SMTP->mail failed";
+	my @ok = $smtp->to(@to, {SkipBad => 1});
+	# If any addressees were unknown ...
+	if (@ok < @to) {
+	    my %diffs = map {$_ => 1} @to;
+	    for (@ok) {
+		delete $diffs{$_};
+	    }
+	    warn "$prog: Warning: bad addresses: @{[keys %diffs]}";
+	}
+	$smtp->data() || die "$prog: Net::SMTP failed";
+	$smtp->datasend("To: @to\n") || die "$prog: Net::SMTP failed";
+	$smtp->datasend("Subject: $title\n");
+	$smtp->datasend(qq(Content-Type: text/$ttype\n));
+	$smtp->datasend("\n");
+	$smtp->datasend(@body) || die "$prog: Net::SMTP failed";
+	$smtp->dataend() || die "$prog: Net::SMTP failed";
+	$smtp->quit || die "$prog: Net::SMTP failed";
+    } else {
+	print $opt{plain} ? @Plain : @Html;
+	print "\n";
+    }
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+CCreport - Perl script to generate a ClearCase changes report
+
+=head1 SYNOPSIS
+
+  # Generate a report of changes on any branch since yesterday in /vobs/src
+  CCreport /vobs/src
+
+  # ... on branch 'foo'
+  CCreport -branch foo /vobs/src
+
+  # ... on multiple branches
+  CCreport -branches foo,boo,bar /vobs/src
+
+  # ... looking only for *.c files
+  CCreport -branches foo,boo,bar -name '*.c' /vobs/src
+
+  # ... and mail it to tom, dick, and harry at here.com
+  CCreport -branch foo -to tom,dick,harry -domain here.com /vobs/src
+
+  # Specify a view to work through and a starting date ...
+  CCreport -view admin -since 24-Mar /vobs_src
+
+  # ... and an ending date
+  CCreport -view admin -since 24-Mar -before 29-Mar /vobs_src
+
+  # ... output plaintext instead of HTML
+  CCreport -view admin -plain -since 24-Mar /vobs_src
+
+  # Traverse multiple vob areas, show changes on any branch
+  CCreport /vobs_src/proj1 /vobs/doc/proj1/html
+
+  # Traverse all VOBs, ignoring changes to dirs
+  CCreport -type f -avobs
+
+  # Run in I<automatic> mode, driven by attributes on self
+  CCreport -auto
+
+  # Run in auto mode but issue only reports #3 and #4
+  CCreport -auto -filter /[34]/
+
+=head1 DESCRIPTION
+
+This script traverses the specified ClearCase VOB areas and outputs a
+report of changes made, formatted with their comments, version numbers,
+etc. The listing can be restricted by timeslice, user(s), branch, and
+so on via command-line flags (use -help for a summary). By default
+the output is HTML-formatted but plain text is an option.
+
+Note that "VOB areas" means any directory tree within VOB space, not
+necessarily the entire VOB.
+
+A special I<automatic mode> is supported. When passed the C<-auto> flag
+it will examine C<$0> to find attributes on itself. Attributes with
+names of the form "CCrxx" where xx is an integer are considered to be
+command lines to be executed in numerical order. Attributes of the form
+"CCr_foo" define substitutions. For example:
+
+    CCr1 = "-branch main -to {dev},{adm} /vobs/src /vobs/doc"
+    CCr2 = "-branch bugbranch -to {qa},{adm} /vobs/src"
+    CCr_adm = "tom,dick,harry"
+    CCr_dev = "susan,mary"
+    CCr_qa = "jeff,chris"
+
+will generate two reports and mail them to the development and qa
+groups respectively, with copies of all going to {adm}.
+
+=head PORTING
+
+I've only ever used this on Solaris. It I<should> run more or less
+unmodified on other UNIX/ClearCase/Perl5.004 platforms. There is
+approximately zero chance it will work on Windows without some porting
+effort. Note: though it doesn't run on Windows, it does have code to
+deal with interop mode, i.e. to correctly report changes that were made
+in a different region.
+
+=head1 DEBUGGING
+
+Run with B<-/dbg=1> to see debug output.
+
+=head1 AUTHOR
+
+David Boyce <dsb@cleartool.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998,1999,2000 David Boyce. All rights reserved.  This
+Perl program is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), ClearCase::Argv, Argv
+
+=cut

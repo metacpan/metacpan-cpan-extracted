@@ -1,0 +1,19 @@
+[% 
+    link = distribution
+    crosslink = '/distro/' _ letter _ '.html'
+
+    htmltitle = 'Unknown distribution "' _ distribution _ '"'
+    title = htmltitle
+
+    crumb3_name = 'Distributions' ;
+    crumb3_href = '/' ;
+    crumb2_name = letter ;
+    crumb2_href = '/distro/' _ crumb2_name ;
+    crumb1_name = distribution ;
+%]
+
+<p>Sorry, but that distribution is currently unknown within the system. If this is a distribution 
+that has only recently been uploaded to PAUSE, it may take a few hours before the backend database
+is updated with the appropriate information. If this is the case, please try this link again 
+later</p>
+

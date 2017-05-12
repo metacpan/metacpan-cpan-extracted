@@ -1,0 +1,11 @@
+Changes
+FIELDS.pm
+MANIFEST
+Makefile.PL
+README
+TODO
+t/01load.t
+t/02use.t
+t/03struct.t
+t/04fields.t
+t/05misc.t

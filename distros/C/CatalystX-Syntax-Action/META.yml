@@ -1,0 +1,32 @@
+---
+abstract: 'Semantically meaningful Catalyst Actions with signatures'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst::Runtime: 5.80
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Moose: 2.0007
+  Test::More: 0.98
+  namespace::autoclean: 0.12
+  syntax: 0.003
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Syntax-Action
+requires:
+  B::Hooks::EndOfScope: 0.09
+  Carp: 0
+  Devel::Declare: 0.006004
+  parent: 0.225
+  perl: 5.008008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CatalystX-Syntax-Action
+  homepage: http://search.cpan.org/dist/CatalystX-Syntax-Action/
+  repository: git://github.com/jjn1056/CatalystX-Syntax-Action.git
+version: 0.01

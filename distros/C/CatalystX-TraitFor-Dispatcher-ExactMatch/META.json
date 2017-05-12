@@ -1,0 +1,70 @@
+{
+   "abstract" : "handle trailing slashes properly",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-TraitFor-Dispatcher-ExactMatch",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.80",
+            "CatalystX::RoleApplicator" : "0",
+            "Moose::Role" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "CatalystX::TraitFor::Dispatcher::ExactMatch" : {
+         "file" : "lib/CatalystX/TraitFor/Dispatcher/ExactMatch.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=CatalystX-TraitFor-Dispatcher-ExactMatch"
+      },
+      "homepage" : "https://metacpan.org/release/CatalystX-TraitFor-Dispatcher-ExactMatch",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-catalystx-traitfor-dispatcher-exactmatch.git",
+         "web" : "https://github.com/tobyink/p5-catalystx-traitfor-dispatcher-exactmatch"
+      }
+   },
+   "version" : "0.003"
+}

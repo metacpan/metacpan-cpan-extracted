@@ -1,0 +1,25 @@
+Revision history for Perl extension CGI::Session::Driver::odbc.
+
+1.05  Sun Feb 21 12:54:39 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.04  Tue Feb 16 13:47:00 2010
+	- Update required modules in Build.PL and Makefile.PL, based on
+		feedback from CPAN testers. Specifically, add DBI, since
+		CGI::Session does not require it.
+
+1.03  Wed Feb 10 13:52:38 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.02  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.01  Thu Mar 13 14:02:00 2008
+    - Allow the sessions table's id and a_session columns to be renamed. See POD for details
+    - This module depends on CGI::Session::Driver::DBI V 4.21
+	- Fix faults datestamps in this file, and generate Changelog.ini
+
+1.00  Wed May 17 16:00:00 2006
+	- Original version

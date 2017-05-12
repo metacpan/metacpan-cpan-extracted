@@ -1,0 +1,217 @@
+Revision history for Perl extension Class::Framework.
+
+0.12  Sun Jan 23 21:02:35 CST 2005
+
+ - Fixed a bug in the container() method, which was only returning
+   valid results for delayed objects, not auto-created ones. [Spotted
+   by Sebastian Willert]
+
+0.11  Wed Mar  3 21:34:51 CST 2004
+
+ - Fixed a bug in the code that detects whether Scalar::Util is
+   loadable. [Spotted by Michael Alan Dorman]
+
+0.10  Thu Mar  6 16:06:47 CST 2003
+
+ - The dump_parameters() method will now output the default values (if
+   any) of parameters that haven't been explicitly set.
+
+0.09  Mon Feb 10 13:12:40 CST 2003
+
+ - Use Carp::croak() instead of die() in most places when throwing a
+   fatal error.
+
+ - Fixed a problem in dump_parameters() in which attributes from
+   superclasses weren't getting dumped.
+
+ - The valid_params() method now always returns a hashref, possibly
+   empty (when initialization hasn't happened yet), instead of
+   sometimes returning undef.
+
+ - Added experimental support for "decorator" classes, via the
+   decorates() method.
+
+ - Fixed the credits in the AUTHOR section to better reflect reality.
+
+ - Added a Module::Build-style Build.PL script for installation.
+
+0.08  Thu Aug 29 17:11:20 EST 2002
+
+ - Added the dump_parameters() method, which returns a hash reference
+   containing a set of parameters that should be sufficient to
+   re-create the given object using its class's C<new()> method (under
+   normal/simple circumstances).
+
+0.07  Tue Jul 23 00:34:34 PDT 2002
+
+ - Fix a bug in passing contained objects rather than using the
+   defaultly created one. [found by Ilya Martynov <ilya@martynov.org>]
+
+ - Calling container() when Scalar::Util is not installed now triggers
+   a fatal error instead of returning undef
+
+ - Get rid off the %ALLOWED_CACHE memoization, since it wasn't working
+   properly.  It could be done, but not as easily, so maybe it's a
+   future project. [consistent prodding by Dave Rolsky]
+
+ - Replace guts of get_contained_object_spec() and validation_spec()
+   with an _iterate_ISA() internal method.  This fixes a bug in
+   validation_spec() in which subclasses weren't overriding superclass
+   validation_spec()s.
+
+ - Make valid_params() a standard get/set accessor method.
+
+ - Document that valid_params() should only be called as a class
+   method, not object method.
+
+ - Improve the output of the show_containers() method.
+
+ - Calling contained_objects() twice on the same package wasn't
+   properly clearing previous entries.
+
+0.06  Wed Jul 17 17:06:10 EST 2002
+
+ - Memoize the get_contained_object_spec(), validation_spec(), and
+   allowed_params() methods.  This can give a big speed boost when
+   methods are called repeatedly, for example when using factory
+   methods.  All memoization caches are cleared when valid_params() or
+   contained_objects() is called.  The only known pitfall in the
+   caching is that a class that dynamically changes its @ISA will
+   probably mess things up.  Idea by Dave Rolsky.
+
+ - Use 'scalar validate_with()' inside new(), which may be faster.
+   Idea by Dave Rolsky.
+
+ - short-circuit create_contained_objects() if there are no contained
+   objects to create.  Idea by Dave Rolsky.
+
+ - return a reference from create_contained_objects() rather than a
+   list of key/value pairs.  This lets us pass it directly to validation
+   routines.
+
+ - Use the qr// format for regexes in the all_specs() method.
+
+ - Improve the docs for allowed_params() - it's a class method (not an
+   instance method), and it accepts a list of arguments that can
+   affect the return value.
+
+ - Don't copy as many hashes internally.  Pass by reference.
+
+ - Fixed some POD formatting problems.
+
+ - Now requires Params::Validate version 0.23
+
+0.05  Thu Jun 27 16:53:41 EST 2002
+
+ - Fixed a problem in create_contained_objects() in which a 'foo_class'
+   parameter wouldn't get properly passsed to all the contained objects
+   that needed to see it.
+
+ - Added a documentation section "Scenario" explaining the main benefits
+   of using the module.
+
+ - Improved the output of show_containers(), notably the names of
+   delayed classes
+
+ - Merge $self->{container}{delayed} into $self->{container}{contained},
+   with a 'delayed' property.  This allows simplification of the rest of
+   the code in several places, notably the show_containers() routine.
+
+ - Simplify show_containers() a little, and make it more accurate on
+   contained objects' classes
+
+ - Fixed a doc error in the first example
+
+ - Added a bit in the first doc paragraph, saying that any of the
+   Mason objects can be replaced by a subclass.
+
+ - Added an internal comment about the strategy inside the
+   allowed_params method.
+
+ - Simplified the allowed_params method internally.
+
+ - Got rid of special-casing to check for circular containment
+   relationships.  This seemed to have been added for HTML::Mason, but
+   all Mason tests (as well as all Class::Container tests) still pass
+   when I remove it.
+
+0.04  Wed Jun 26 19:15:26 EST 2002
+
+ - Add the show_containers() method, which should be a godsend during
+   debugging.
+
+ - Convert contained_objects() string specs to hashes upon input, rather
+   than checking them every time they're used later in the code.
+
+ - Change " if (%args)" to " if (keys %args)", which is more officially
+   correct (though both would work in this particular case).
+
+0.03  Fri Jun 21 17:44:37 EST 2002
+
+ - Subclasses can now override contained_objects settings of their
+   superclass (previously it was backwards).
+
+ - Let call_method() accept arbitrary additional parameters, don't
+   force them into a hash.
+
+ - Added contained_class() method.
+
+ - Use new contained_class() method inside call_method().
+
+ - delayed_object_class() shouldn't be settable, it'll mess up the
+   parameters accepted.
+
+ - The 'container' parameter shouldn't be shared among containers the way
+   other parameters are.
+
+ - Made create_delayed_object() a little more efficient by not shifting
+   things off @_ - just pass @_ to the next new() method.
+
+ - Don't check for $contained_class->can('allowed_params'), check for
+   $contained_class->isa(__PACKAGE__).
+
+ - Clarified a few error messages.
+
+ - Clarified documentation and removed a couple of doc errors.
+
+
+0.02  Wed Jun 19 10:52:48 AEST 2002
+ - Made Scalar::Util a little more optional - the container() method
+   is just a no-op if it's not around.
+
+ - Use Params::Validate 0.18 new validate_with() method to set a
+   meaningful subroutine name in error messages
+
+ - Added the delayed_object_class() method
+
+ - Documented how delayed objects are declared and created [Dave
+   Rolsky]
+
+ - Added some tests for the above stuff
+
+ - Various documentation spruce-ups
+
+0.01_05  Fri May 10 15:29:46 AEST 2002
+ - If a container has two contained classes that both need to see a
+   parameter of the same name, it will now be passed to both.  Previously
+   it was passed to one of them, randomly.
+
+ - Added 2 tests for the above.
+
+ - Added 4 tests to make sure class names can be properly overridden.
+
+ - Got rid of _make_contained_object() method.
+
+ - Changed the (undocumented) get_contained_objects() method to
+   get_contained_object_spec().
+
+ - Added the container() method, to get a reference to the thingy that
+   created you.  Uses weak references if Scalar::Util is available.
+
+ - Consolidated all Container metadata in $self->{container} (subject to
+   change to {_container} or something).
+
+ - Added call_method() method.
+
+0.01  Wed Mar 20 19:33:40 2002
+ - original version, based on HTML::Mason::Container

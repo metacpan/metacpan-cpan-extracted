@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Bundle/Cheat/Sheet.pm
+lib/Cheat/Meta.pm
+lib/Cheat/Meta/Spec.pod
+lib/Cheat/Sheet/Test.agi
+lib/Cheat/Sheet/Test.perl
+lib/Cheat/Sheet/Test.pod
+lib/Cheat/Sheet/Util.agi
+lib/Cheat/Sheet/Util.perl
+lib/Cheat/Sheet/Util.pod
+MANIFEST
+README
+t/00.load.t
+META.yml

@@ -1,0 +1,143 @@
+2006-06-02  CAIDA Perl development team  <cpan@caida.org>
+	* All modules
+	1) fixed image links in docs to point to caida website
+(release 3.1)
+
+2006-06-01  CAIDA Perl development team  <cpan@caida.org>
+	* All modules
+	1) general update of documentation
+	* Graph/Gnuplot.pm
+	1) Fixed bug in png output for newer versions of gnuplot
+	2) Added SVG support 
+	3) Output to STDOUT by setting 'output file' to undef
+
+2001-10-24  CAIDA Perl development team  <cpan@caida.org>
+	
+	* All modules
+	1) Corrected/updated the email addresses for the Chart-Graph
+	   listserv.
+	2) Changed the convention for setting the debug and save temporary
+	   files flag to be consistent with CoralReef and other CAIDA
+	   applications.  Setting: $Chart::Graph::debug = 1 will turn on
+	   debugging for any module and $Chart::Graph::save_tmpfiles = 1
+	   will do the same for saving temporary files.
+	3) Converted all documentation to Perl POD format.
+	4) Expanded the number of test case examples.
+	5) Fixed bug in creation of temporary files that prevented more
+	   than one graph to be created at time within a given Perl script.
+	6) Moved the graphic files produced in the 'make test' phase of
+	   the install into the subdirectory 'test_results' so that they
+	   won't clutter the installation directory but are available for
+	   inspection.
+	7) Changed the output of each test file so that when a test is
+	   skipped, an explicit message is given reporting that.
+
+	* Graph/Gnuplot.pm
+	1) Added recognition and creation of png files.
+	2) improved timescale resolution.
+	3) added a uts_normalize option to work around a gnuplot bug.
+	4) Replaced out of date and awkward html documentation with Perl
+	   standard POD documentation.
+	5) Implemented date/time handling as currently used by Gnuplot as
+	   part of the standard options of Graph/Gnuplot.pm.  Added global
+	   options for input and output to support syntax as Gnuplot
+	   implements date/time.  Included details on date/time handling
+	   in documentation.
+	
+	* Graph/Xmgrace.pm
+	1) Fixed the handling of data options that were lists of options.
+	   This made the bar charts options work correctly among other
+	   options. 
+	2) fixed DESTROY error that prevented this module from running
+	   under Perl 5.6.
+	3) fixed bug that prevented column data entry format from working. 
+	4) fixed bug that caused the test run for Xmgrace to fail even if
+	   the run of the Xmgrace application was a success.
+	5) Updated syntax in Xmgrace.pm to run consistently under Perl 5.6
+	6) Created a new hash to handle options of Xmgrace that consist of
+	   lists of options and provided new infrastructure for checking user
+	   choices against lists of options.
+	6) Cleaned up the way internal errors where handled.
+	6) Replaced out of date and awkward html documentation with Perl
+	   standard POD documentation.
+
+	* Graph/xrt2d and Graph/xrt3d
+	1) fixed bugs that resulted in the path location of xrt binaries
+	   not being stored in a place where Perl wrapper could subsequently
+	   retrieve it.
+	2) Replaced out of date and awkward html documentation with Perl
+	   standard POD documentation.
+	3) Fixed bugs in the way global symbol spaces where used so that
+	   paths to various applications weren't lost between subroutine
+	   calls.
+	4) Added support to Graph/xrt3d to read data from a file instead
+	   of a matrix.
+	5) Changed the way images were converted from one raster format to
+	   another.  Changed Graph/xrt2d and Graph/xrt3d to use either
+	   Imagemagick or Netpbm for making image conversions.  Expanded
+	   the number of supported image formats to include: Postscript,
+	   X-window (xwd), JPEG, and PNG.
+	
+
+
+2000-04-25  Esmond Lee  <e3lee@ipn.caida.org>
+ 	
+	* Graph/Gnuplot.pm
+	1) added option to handle extra options
+	2) added option to support errorbars
+	3) added option to support unix time stamps on the x axis
+
+	* Graph/Xmgrace.pm
+	1) completed preliminary release version
+
+1999-08-26  Esmond Lee  <e3lee@ipn.caida.org>
+ 	
+	* Graph/Gnuplot.pm
+	1) setting $Chart::Graph::debug = 1 now increases 
+	   debug messages
+	2) setting $Chart::Graph::save_tmpfiles = 1 now preserves 
+	   temp files
+		
+1999-05-21  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph/Gnuplot.pm: 
+	1) added option to print out default x2y2 tics
+	2) setting $Chart::Graph::debug = 1 now preserves 
+	   temp files
+
+1999-04-26  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm (\$xvfb):
+ 	1) made a working test suite
+	2) all distribution files are in place
+	3) many bugs have been fixed
+
+1999-04-19  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm :
+	1) fixed bug with $ENV{TMPDIR} being overwritten
+	2) split Graph.pm into Chart::Graph, Chart::Graph::Utils,
+	   Chart::Graph::Gnuplot, Chart::Graph::Xrt3d
+	3) fixed typos in documentation
+
+1999-04-05  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm : 
+	1) added POD documentation to the end of file
+	2) using $VERSION = 1.0 for the first release.
+        3) made updates to documentation
+	
+1999-03-31  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm : This is the first entry in the changelog. 
+	1) added /usr/dt/lib to LD_LIBRARY_PATH for the xrt 
+	   binary "graph". graph has rouble finding libMrm
+	2) now searches environment variable TMPDIR for a 
+	   place to store temporary files. Will default to 
+	   "/tmp" if TMPDIR is not defined.
+	3) fixed bugs in programs not found in the search path
+	   i.e. Graph.pm will only search for programs needed
+	   by gnuplot if gnuplot() is called. It will exit if
+	   a necessary program is not found.
+	4) added missing calls to carp for abnormal exits.
+

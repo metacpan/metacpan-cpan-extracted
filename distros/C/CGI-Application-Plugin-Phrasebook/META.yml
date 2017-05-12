@@ -1,0 +1,23 @@
+---
+name: CGI-Application-Plugin-Phrasebook
+version: 0.02
+author:
+  - Stevan Little E<lt>stevan@iinteractive.comE<gt>
+abstract: A CGI::Application plugin for Data::Phrasebook
+license: perl
+requires:
+  CGI::Application: 0
+  Carp: 0
+  Data::Phrasebook: 0
+  Scalar::Util: 0
+build_requires:
+  CGI: 0
+  File::Spec: 0
+  FindBin: 0
+  Test::Exception: 0.21
+  Test::More: 0.47
+provides:
+  CGI::Application::Plugin::Phrasebook:
+    file: lib/CGI/Application/Plugin/Phrasebook.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

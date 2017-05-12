@@ -1,0 +1,12 @@
+Revision history for Perl extension Crypt::OOEnigma.
+
+0.1 - An object-oriented Perl Enigma machine
+  21 Apr 02
+   
+0.2 - Minor bugfix. Perl 5.8.0 generated a warning where there was none.
+  04 Oct 02
+
+0.3 - Major bugfix for Crypt::OOEnigma::Rotor.  Perl 5.8.0 does not sort hash
+values() by key, which rotate() relied upon.
+  04 Oct 02
+

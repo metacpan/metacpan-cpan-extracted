@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Session/Flash.pm
+t/00_sanity.t
+t/01_flash.t
+t/99_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

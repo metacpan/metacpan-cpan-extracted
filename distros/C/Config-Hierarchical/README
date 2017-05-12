@@ -1,0 +1,19 @@
+Config::Hierarchical
+===========
+
+Implements a configuration variable container. The variables can be set in
+different, prioritized, categories within the container. This module can be used
+to, IE, implement configuration variable handling in a build system.
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

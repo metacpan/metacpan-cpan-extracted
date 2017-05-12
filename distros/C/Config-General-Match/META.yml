@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Config-General-Match
+version: 0.05
+author:
+  - Michael Graham <mag-perl@occamstoothbrush.com>
+abstract: ! >-
+  Add C<< <Location> >> and C<< <LocationMatch> >> style matching to
+  Config::General
+license: perl
+requires:
+  Config::General: 0
+  Hash::Merge: 0
+  Test::More: 0
+provides:
+  Config::General::Match:
+    file: lib/Config/General/Match.pm
+    version: 0.05
+generated_by: Module::Build version 0.2607

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Compress-BraceExpansion, version
+0.1.7:
+
+  create a human-readable compressed string suitable for shell brace expansion
+
+This software is Copyright (c) 2009 by Alex White.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+

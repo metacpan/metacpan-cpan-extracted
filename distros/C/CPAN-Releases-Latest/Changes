@@ -1,0 +1,59 @@
+Revision history for Perl module CPAN::Releases::Latest
+
+0.08 2017-03-06 NEILB
+    - Changed the MetaCPAN source to use _source filtering rather
+      than fields, as a recent change to MetaCPAN::Client stopped the
+      old code from working. gh#1 reported by Paul Johnson.
+    - Skip releases that don't have a download_url specified.
+      This shouldn't really happen, but we're currently getting a few
+      of these. Have reported as a bug in MetaCPAN API.
+
+0.07 2015-11-06 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so releases will contain a META.json
+    - Updated xt/release/05-live-test.t -- it was referring to old
+      releases that have been removed from CPAN since 0.06.
+
+0.06 2014-05-22
+    - The data for the index is now built by a plugin, with the default
+      plugin being for MetaDATA. Suggested by BARBIE.
+    - Added a distribution_iterator() method, which lets you iterate over
+      the index dist by dist. For each dist you get one or two releases.
+
+0.05_01 2014-04-30
+    - Changed to model where the data for the index is retrieved by a plugin,
+      and moved the MetaCPAN-specific code to be the default plugin.
+      Suggested by BARBIE in RT#95196. This is a bit of quick hack,
+      which is why it's a developer release :-)
+
+0.05 2014-04-18
+    - Moved t/03-live-test.t into xt/release - it was taking a long time to
+      run for some people. Now I'll just run that test when releasing.
+      Thanks to KENTNL for RT#94829.
+    - Croak if we're presented with a data file which has a later format
+      revision than the running version of the module supports.
+    - Croak if we're passed a file to use, and it's in an earlier format.
+    - Added a release test for the scenario where the cached file is in
+      a previous format version, but within max_age. Make sure we rebuild cache.
+
+0.04 2014-04-16
+    - MetaCPAN::Client 1.001001 had a fix which means we can now use its
+      iterator interface, instead of using the Elasticsearch scroller.
+      Thanks to Mickey.
+    - Added more documentation.
+
+0.03 2014-04-15
+    - I was using '//' but only requiring perl 5.006. Switched it to '||',
+      as I could safely use it in that situation. Thanks again CPAN Testers.
+
+0.02 2014-04-14
+    - Split _build_cached_index() into two separate private methods,
+      one for getting the info from MetaCPAN, and the other for building
+      the cached index.
+    - Added a live test, t/03-live-test.t
+    - Added description of max_age parameter to new()
+    - Added a SEE ALSO section to the doc
+
+0.01 2014-04-12
+    - First release to CPAN
+

@@ -1,0 +1,57 @@
+.cgi_app_bold_gold
+{
+	background-color: 7f7f7f;
+	color: ffd700;
+	font-weight: bold;
+}
+
+.cgi_app_box
+{
+border-color: rgb(120,172,255);
+border-style: solid;
+border-width: 1px 1px 1px 1px;
+}
+
+.cgi_app_heading
+{
+	background-color: 3cb371;
+	color: ffd700;
+	font-size: 2em;
+	font-weight: bold;
+}
+
+.cgi_app_no_submit
+{
+background-color: white;
+border: none;
+color: rgb(0,66,174);
+font-size: 8pt;
+font-weight: bold;
+text-align: left;
+}
+
+.cgi_app_red
+{
+color: red;
+}
+
+.cgi_app_shade_1
+{
+background-color: rgb(240,240,240);
+}
+
+.cgi_app_shade_2
+{
+background-color: rgb(220,220,220);
+}
+
+.cgi_app_submit
+{
+background-color: white;
+border: none;
+color: rgb(0,66,174);
+font-size: 8pt;
+font-weight: bold;
+text-align: left;
+text-decoration: underline;
+}

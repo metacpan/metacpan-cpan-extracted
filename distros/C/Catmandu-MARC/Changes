@@ -1,0 +1,274 @@
+Revision history for Catmandu-MARC
+
+1.10  2017-05-02 11:48:37 CEST
+  - Adding support for nested_arrays and subspecs in marc_spec
+  
+1.09  2017-03-27 11:29:28 CEST
+  - Supporting forced arrays for $prepend, $append, $first, $last and any digits in the path
+
+1.08  2017-03-06 09:55:53 CET
+  - Fixed broken $append mapping and added many more tests
+  - Adding a Wiki page with all mapping rules for marc_map and marc_spec
+  - Support dollar ($) to indicate subfields in marc_map
+  - Support period (.) to indicate a field wildard in marc_map
+  - Adding more tests
+
+1.07  2017-03-01 09:03:25 CET
+  - A marc_map(...,...,pluck:1,split:1) will return *all* the subfields specified in the path (undef when they don't exist in the MARC)
+
+1.06  2017-01-31 14:57:19 CET
+  - Adding support for inline marc_spec
+  - Updated POD
+
+1.05  2017-01-19 16:05:10 CET
+  - Adding Carsten Klee's MARC::Spec contribution
+  - Adding Carsten as contributor
+  - Buffering record in XML exporter for better serialization speed
+
+1.04  2017-01-18 09:23:26 CET
+  - Skipping new lines in ALEPHSEQ exports
+
+1.03  2016-11-03 08:48:19 CET
+  - Adding a Catmandu::MARC::Tutorial
+  - Fixing a bug in the marc_has_many
+
+1.02  2016-10-15 11:18:48 CEST
+  - Fixing bug when accessing subfields 0 in MARC
+
+1.01  2016-09-27 16:35:19 CEST
+  - Bug version
+
+1.00_03  2016-09-15 11:26:03 CEST
+  - Fixing dependency problems
+  - Deleting unused modules
+  - Fixing zero-padded tags treated as numbers bug
+
+1.00_02  2016-09-14 14:20:47 CEST
+  - Making default MARC importer the same as default MARC exporter (ISO)
+  - Deprecation notice for USMARC
+  - Adding marc_has and marc_has_many fixes
+
+1.00_01  2016-07-14 09:33:22 CEST
+  - Refactoring nearly all of the emit code into Catmandu::MARC module
+  - Deprecating Catmandu::Fix::Inline::marc_*
+  - Adding more pod
+  - The -record option isn't available anymore
+  - By default all marc_map will create a single array when using the split:1 option
+  - A 'nested_arrays' option to create a list of list when using split:1
+  - Fixing bug in searching for all subfields except...
+  - Adding references to MARC::Spec
+
+0.219  2016-06-23 16:40:11 CEST
+  - Fixed importing from MARC as string in a Perl script
+  - Adding more POD
+  - Make all Catmandu::Fix inlineable
+
+0.218  2016-06-14 14:05:32 CEST
+  - Fixing marc_map for inline fixes
+
+0.217  2016-06-14 09:48:59 CEST
+  - Fixed dependency on Catmandu 1.0201 for Inlineable
+
+0.216  2016-06-13 16:57:49 CEST
+  - Fixed indicator-2 selection bug
+  - Fixed marc_map value bug
+  - Support for the value in the inline fixes
+  - Fixing combinations of substring and split
+  - Fixing array in array bugs when using split and $append combinations
+
+0.215  2016-02-22 09:57:07 CET
+  - Supporting ISO alias for USMARC importer and exporter
+  - Fixing MicroLIF importer
+  - Making Catmandu::MARC forwards compatible with Catmandu 1.0
+  - Adding a pretty option for XML
+
+0.214  2015-11-03 11:46:22 CET
+  - Maintenance release skipping buggy Catmandu versions
+
+0.213  2015-09-30 16:00:11 CEST
+  - Adding support for setting anf adding JSON paths
+
+0.212  2015-09-29 11:07:13 CEST
+  - Fixed marc_each single execution bug
+
+0.211  2015-08-31 16:17:42 CEST
+  - Fixed POD spelling
+  - Adding marc_each bind
+
+0.210  2015-05-20 11:23:46 CEST
+  - Optimizing Aleph sequentials exports
+  - Fixed round tripping of Aleph sequential
+  - Fixing marc_in_json
+  - Adding support for marc_in_json back to catmandu marc mapping
+
+0.209  2015-02-20 13:39:05 CET
+  - Fixed value feature
+
+0.208  2015-02-04 20:16:39 CET
+  - Fixing CLI arguments and options bug #12
+  - Adding support for double encoded subfields
+
+0.207  2015-01-09 10:02:48 CET
+  - Fixed: Parser "RAW" and fix "marc_map": got field content twice #12
+  - Removed double generator fix magic for command line support
+
+0.206  2014-10-21 12:01:35 CEST
+  - Adding pluck support
+
+0.205  2014-06-23 21:18:06 CEST
+  - Fixed collection bug in the MARC exporter
+
+0.204  2014-06-11 07:41:39 BST
+  - Need Catmandu 0.9202 to get the delegations working properly
+
+0.203  2014-05-30 17:37:37 CEST
+  - Adding marc_set fix
+  - Making marc_map and marc_set indicator aware
+  - Supporting deletion of subfields for marc_remove
+  - Fixing EOF bug in RAW importer
+
+0.202  2014-05-29 19:46:40 CEST
+  - Fixing the catmandu command line fixes bug
+
+0.201  2014-05-29 09:11:24 CEST
+  - Adding the MARC::Parser::RAW and updating the pod
+
+0.2  2014-05-28 15:24:03 CEST
+  - Refactoring MARC import and export parsers and serializers
+  - Add importers for MARCMaker, MARC-in-JSON and MARC::Catmandu
+  - Add Lint based validator for USMARC
+  - Add exporters for USMARC, MARCMaker and MARC-in-JSON
+
+0.117  2014-05-23 12:06:40 CEST
+  - Adding more documentation hints
+  - Fixing the marc_match (deleting temporary keys)
+
+0.116  2014-05-23 09:31:14 CEST
+  - Switched to Dist::Milla
+
+0.115   2014-05-22
+  - Fixed broken MANIFEST
+
+0.114   2014-05-20
+  - Adding the if marc_match condition
+
+0.112   2014-04-03
+  - Adding the new files to the manifest :-/
+
+0.112   2014-04-03
+  - Adding the inline marc_remove fix
+
+0.111   2014-03-19
+  - fixed marc_add test to reflect the correct number of tests
+
+0.110   2014-03-18
+  - adding support for marc_add fixes
+
+0.109   2014-03-14
+  - in response to popular request adding Aleph sequential export support
+
+0.108   2014-03-11
+  - all Catmandu::Exporter::MARC methods should be instance and class methods to make marc_xml work
+
+0.107   2014-03-04
+  - adding Robin Sheat as contributor
+  - bumping version to resolve verson conflict at CPAN
+
+0.106   2014-03-03
+  - allow for non-standard system identifier fields
+
+0.105   2014-02-11
+  - handle Aleph FMT tags
+
+0.104   2013-12-20
+  - Exporter::MARC now skips also skips empty strings by default
+  - improved marc_map pod
+
+0.103   2013-12-18
+  - Exporter::MARC skips undef (sub)fields by default
+
+0.102   2013-12-10
+  - Importer::MARC skips empty fields
+
+0.101   2013-12-04
+  - fix importer tests
+
+0.1     2013-12-03
+  - consume MARC::Record objects
+
+0.09    2013-10-31
+  - fixed export formatting bug
+
+0.08    2013-09-27
+  - inline marc_map
+
+0.07    2013-09-17
+  - fixed the underscore subfields in non-control fields
+  - adding backwards compatibility
+
+0.06    2013-06-28
+  - marc_remove fix
+  - marc_map -split option
+
+0.05    2013-06-19
+  - marc_map exclude subfields syntax
+
+0.0401  2013-06-17
+  - remove given/when statements
+
+0.04    2013-06-14
+  - faster marc_xml fix
+
+0.0304  2013-03-26
+  - import confess
+
+0.0303  2013-03-13
+  - fix MARCXML namespace
+
+0.0302  2013-03-13
+  - fix perl version im marc_map test
+
+0.0301  2013-03-12
+  - safe substr outside string in marc_map
+
+0.03    2013-02-26
+  - compile marc_map fix
+
+0.0201  2013-02-07
+  - fix dependencies
+
+0.02    2013-02-05
+  - MARCXML exporter
+  - make MARC record key configurable everywhere
+
+0.0109  2013-02-01
+  - fix MARC21 xml export
+
+0.0108  2013-01-22
+  - fix leader in xml export
+
+0.0107  2013-01-11
+  - fix creation of undef value with nonexisting $append key
+
+0.0106  2012-11-09
+  - fix _id field value
+
+0.0105  2012-10-10
+  - fix missing uppercase subfield datafield
+
+0.0104  2012-10-09
+  - only allow alphanumeric fields in MARCXML export
+  - utf8 fixes
+
+0.0103  2012-06-14
+  - add configurable identifier field (default 001)
+  - add virtual '_' to every field to make USMARC|MicroLIF|XML and ALEPHSEQ output equal
+
+0.0102  2012-05-25
+  - fix indicator bug
+
+0.0101  2012-05-16
+  - fix control field bug
+
+0.01    2012-05-04
+  - initial release

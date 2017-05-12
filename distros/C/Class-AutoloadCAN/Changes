@@ -1,0 +1,35 @@
+Revision history for Perl extension UNIVERSAL::AUTOLOAD_CAN.
+
+0.01  Sat Apr  9  4:30 PDT 2005
+        - Wrote module and released on CPAN.
+
+0.02  Sat Apr  9 17:40 PDT 2005
+        - Fixed a bug where errors were reported on the wrong line.
+	- Added comment in code explaining a surprising argument order.
+
+0.03  Sat Apr  9 23:20 PDT 2005
+        - Added strict.  Originally this was left out because of how many
+	  symbolic references there are, but adding it caught one accidental
+	  global.  (Which could have led to an object having a longer life
+	  than expected.)
+	- Removed an internal debugging hook (installed/_installed) that I
+	  used in development.
+	- Thanks to a suggestion from Joshua Jore (diotalevi on perlmonks)
+	  I noticed that Module::Build has "traditional" that I can use
+	  instead of "passthrough", thereby removing the dependency that
+	  users have Module::Build installed.
+	- Cleaned up the AUTOLOAD stuff.  I find it bizarre that if I
+	  assign a typeglob to your classes AUTOLOAD, $AUTOLOAD is set in
+	  my class when that is called.  Convenient, but bizarre.
+	- I only need to call the original UNIVERSAL::can on a call to can,
+	  not to AUTOLOAD.  (If you reach AUTOLOAD, you know that it will
+	  fail to find anything with the original UNIVERSAL::can.)
+	- Removed use of no warnings.  Together with the "traditional" change
+	  this should make my module work on Perl 5.005_04.
+	- While I'm at it, use a backwards compatibility trick.  This module
+  	  now has a chance of working all of the way back to 5.003.
+	- I had not duplicated all of Perl's message on missing methods.
+	  Improved compatibility and added tests.
+	- Changed the order of testing for CAN and checking installed.  The
+	  new order is likely to be slightly more efficient.  Not that
+	  anything else about this module is efficient...

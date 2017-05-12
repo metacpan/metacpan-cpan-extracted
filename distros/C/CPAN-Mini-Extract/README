@@ -1,0 +1,145 @@
+NAME
+    CPAN::Mini::Extract - Create CPAN::Mini mirrors with the archives
+    extracted
+
+SYNOPSIS
+      # Create a CPAN extractor
+      my $cpan = CPAN::Mini::Extract->new(
+          remote         => 'http://mirrors.kernel.org/cpan/',
+          local          => '/home/adam/.minicpan',
+          trace          => 1,
+          extract        => '/home/adam/.cpanextracted',
+          extract_filter => sub { /\.pm$/ and ! /\b(inc|t)\b/ },
+          extract_check  => 1,
+      );
+      
+  # Run the minicpan process
+      my $changes = $cpan->run;
+
+DESCRIPTION
+    "CPAN::Mini::Extract" provides a base for implementing systems that
+    download "all" of CPAN, extract the dists and then process the files
+    within.
+
+    It provides the same syncronisation functionality as CPAN::Mini except
+    that it also maintains a parallel directory tree that contains a
+    directory located at an identical path to each archive file, with a
+    controllable subset of the files in the archive extracted below.
+
+  How does it work
+    "CPAN::Mini::Extract" starts with a CPAN::Mini local mirror, which it
+    will optionally update before each run. Once the CPAN::Mini directory is
+    current, it will scan both directory trees, extracting any new archives
+    and removing any extracted archives no longer in the minicpan mirror.
+
+EXTENDING
+    This class is relatively straight forward, but may evolve over time.
+
+    If you wish to write an extension, please stay in contact with the
+    maintainer while doing so.
+
+METHODS
+  new
+    The "new" constructor is used to create and configure a new CPAN
+    Processor. It takes a set of named params something like the following.
+
+      # Create a CPAN processor
+      my $Object = CPAN::Mini::Extract->new(
+          # The normal CPAN::Mini params
+          remote         => 'ftp://cpan.pair.com/pub/CPAN/',
+          local          => '/home/adam/.minicpan',
+          trace          => 1,
+          
+      # Additional params
+          extract        => '/home/adam/explosion',
+          extract_filter => sub { /\.pm$/ and ! /\b(inc|t)\b/ },
+          extract_check  => 1,
+          );
+
+    minicpan args
+        "CPAN::Mini::Extract" inherits from CPAN::Mini, so all of the
+        arguments that can be used with CPAN::Mini will also work with
+        "CPAN::Mini::Extract".
+
+        Please note that "CPAN::Mini::Extract" applies some additional
+        defaults beyond the normal ones, like turning "skip_perl" on.
+
+    offline
+        Although useless with CPAN::Mini itself, the "offline" flag will
+        cause the CPAN synchronisation step to be skipped, and only any
+        extraction tasks to be done. (False by default)
+
+    extract
+        Provides the directory (which must exist and be writable, or be
+        creatable) that the tarball dists should be extracted to.
+
+    extract_filter
+        "CPAN::Mini::Extract" allows you to specify a filter controlling
+        which types of files are extracted from the Archive. Please note
+        that ONLY normal files are ever considered for extraction from an
+        archive, with any directories needed created automatically.
+
+        Although by default "CPAN::Mini::Extract" only extract files of type
+        .pm, .t and .pl from the archives, you can add a list of additional
+        things you do not want to be extracted.
+
+        The filter should be provided as a subroutine reference. This sub
+        will be called with $_ set to the path of the file. The subroutine
+        should return true if the file is to be extracted, or false if not.
+
+          # Extract all .pm files, except those in an include directory
+          extract_filter => sub { /\.pm$/ and ! /\binc\b/ },
+
+    extract_check
+        The main extraction process is done as each new archive is
+        downloaded, but occasionally in a process this long-running
+        something may go wrong and you can end up with archives not
+        extracted.
+
+        In addition, sometimes the processing of the extracted archives is
+        destructive and will result in them being deleted each run.
+
+        Once the mirror update has been completed, the "extract_check"
+        keyword forces the processor to go back over every tarball in the
+        mirror and double check that it has a corrosponding extracted
+        directory.
+
+    extract_force
+        For cases in which the filter has been changed, the "extract_flush"
+        boolean flag can be used to forcefully delete and re-extract every
+        extracted directory.
+
+    Returns a new "CPAN::Mini::Extract" object, or dies on error.
+
+  run
+    The "run" methods starts the main process, updating the minicpan mirror
+    and extracted version, and then launching the PPI Processor to process
+    the files in the source directory.
+
+    Returns the number of changes made to the local minicpan and extracted
+    directories, or dies on error.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Mini-Extract>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    CPAN::Mini
+
+COPYRIGHT
+    Funding provided by The Perl Foundation.
+
+    Copyright 2005 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,30 @@
+inc
+{
+    inc1
+    {
+        inc1-inner
+        {
+            {
+                foo1    xxx
+            }
+
+            {
+                foo2    xxxxxxxxxxxxxx
+            }
+        }
+    }
+
+    inc2
+    {
+    }
+}
+
+foo1
+{
+    @inherit            .#inc/inc1 .#inc/inc2
+}
+
+foo2
+{
+    @inherit            .#inc/inc1 .#inc/inc2
+}

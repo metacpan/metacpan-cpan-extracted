@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use strict;
+
+# Only needed to find modules in the dist archive.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+
+use Config::Param;
+
+
+my $p = Config::Param::get
+(
+	{ info=>'Config::Param test program that accepts any parameter given, also being verbose about that', version=>'1.0.0', accept_unknown=>2, verbose=>1 },
+);

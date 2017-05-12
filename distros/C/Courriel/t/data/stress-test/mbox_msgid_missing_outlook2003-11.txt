@@ -1,0 +1,75 @@
+From tomcat-user-return-87994-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Fri Jan 02 20:22:23 2004
+Return-Path: <tomcat-user-return-87994-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 81482 invoked from network); 2 Jan 2004 20:22:23 -0000
+Received: from daedalus.apache.org (HELO mail.apache.org) (208.185.179.12)
+  by minotaur-2.apache.org with SMTP; 2 Jan 2004 20:22:23 -0000
+Received: (qmail 94497 invoked by uid 500); 2 Jan 2004 20:21:53 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 94477 invoked by uid 500); 2 Jan 2004 20:21:53 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 94464 invoked from network); 2 Jan 2004 20:21:53 -0000
+Received: from unknown (HELO mx.sh-solutions.de) (80.190.247.134)
+  by daedalus.apache.org with SMTP; 2 Jan 2004 20:21:53 -0000
+Received: from gb143.stw.stud.uni-saarland.de ([134.96.82.158] helo=shs1)
+        by mx.sh-solutions.de with asmtp (Exim 4.30)
+        id 1AcW4Q-0004dw-E3
+        for tomcat-user@jakarta.apache.org; Fri, 02 Jan 2004 21:38:58 +0100
+From: "SH Solutions" <info@sh-solutions.de>
+To: "'Tomcat Users List'" <tomcat-user@jakarta.apache.org>
+Subject: AW: what *really* happens when you reload or stop/start a webapp?
+Date: Fri, 2 Jan 2004 21:24:40 +0100
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Office Outlook, Build 11.0.5510
+In-Reply-To: <bt4huh$asj$1@sea.gmane.org>
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.3790.0
+Thread-Index: AcPRa8tb4+5NqzIsTQSYL27a25+7KQAAYdAg
+X-Authenticated-Sender:*@sh-solutions.de
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+Hi
+
+> No, this is just an example.  What I'd like to know is if stop/start or
+reload has the same effect on a webapp as actually shutting down tomcat and
+starting it back up.
+
+When you stop an webapp, its classloader is discarded. Therefor every
+information held by you classes is discarded.
+Whey you restart an webapp, a new classloader is instantiated for that
+webapp and every class is loaded from scratch. Static vars and such are
+all-new.
+
+Problems occur, if you pass references of you classes to elements outside
+you classloader (in example by using shared libraries).
+In that case, the classes referenced from outside your webapp cannot be
+discarded due to javas typesafe pointers.
+This might result in the existence of the same static variable in two
+classloaders. Remember that these are two distinct variables.
+Even worse, if you manage to get the reference in the old classloader from
+the shared library it won't be even the same type as it was before since
+Classes loaded from different classloaders are type-different.
+
+Hence avoid to even try to find a way to make information persistent to
+webapp reloads without writing them somewhere outside the VM.
+
+HTH
+
+Steffen
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+

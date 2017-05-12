@@ -1,0 +1,19 @@
+This is a demo program.  It contains a small english polish dictionary..
+very small.  Interesting words include (in english):-
+
+	car
+	fog
+	I
+
+From which you should be able to find most of the rest (try translating car
+with
+
+	transword.pl english car
+
+then translate the result with 
+
+	transword.pl polish <result>
+
+P.S. It will no doubt annoy my Polish friends and associates, but I've cut out
+the 8-bit accent characters in this, so mgla should actually be mg\la in TeX
+notation.

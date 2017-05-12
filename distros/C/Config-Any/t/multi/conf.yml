@@ -1,0 +1,11 @@
+---
+name: TestApp
+Model:
+    Model::Baz:
+        qux: xyzzy
+---
+name2: TestApp2
+Model2:
+    Model::Baz2:
+        qux2: xyzzy2
+

@@ -1,0 +1,106 @@
+# NAME
+
+Catalyst::Plugin::Session::Store::Cookie - Store session data in the cookie
+
+# SYNOPSIS
+
+    package MyApp;
+
+    use Catalyst qw/
+      Session
+      Session::State::Cookie
+      Session::Store::Cookie
+    /;
+
+    my %store_config = (
+      'Plugin::Session' => {
+        storage_cookie_name => ...,
+        storage_cookie_expires => ...,
+        storage_secret_key => ...,
+    );
+
+    __PACKAGE__->config('Plugin::Session::Store::Cookie' => \%store_config);
+    __PACKAGE__->setup;
+
+# DESCRIPTION
+
+What's old is new again...
+
+Store session data in the client cookie, like in 1995.  Handy when you don't
+want to setup yet another storage system just for supporting sessions and
+authentication. Can be very fast since you avoid the overhead of requesting and
+deserializing session information from whatever you are using to store it.
+Since Sessions in [Catalyst](https://metacpan.org/pod/Catalyst) are global you can use this to reduce per request
+overhead.  On the other hand you may just use this for early prototying and
+then move onto something else for production.  I'm sure you'll do the right
+thing ;)
+
+The downsides are that you can really only count on about 4Kb of storage space
+on the cookie.  Also, that cookie data becomes part of every request so that
+will increase overhead on the request side of the network.  In other words a big
+cookie means more data over the wire (maybe you are paying by the byte...?)
+
+Also there are some questions as to the security of this approach.  We encrypt 
+information with [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure) so you should review that and the
+notes that it includes.  Using this without SSL/HTTPS is not recommended.  Buyer
+beware.
+
+In any case if all you are putting in the session is a user id and a few basic
+things this will probably be totally fine and likely a lot more sane that using
+something non persistant like memcached.  On the other hand if you like to dump
+a bunch of stuff into the user session, this will likely not work out.
+
+**NOTE** Since we need to store all the session info in the cookie, the session
+state will be set at ->finalize\_headers stage (rather than at ->finalize\_body
+which is the default for session storage plugins).  What this means is that if
+you use the streaming or socket interfaces ($c->response->write, $c->response->write\_fh
+and $c->req->io\_fh) your session state will get saved early.  For example you
+cannot do this:
+
+    $c->res->write("some stuff");
+    $c->session->{key} = "value";
+
+That key 'key' will not be recalled when the session is recovered for the following
+request.  In general this should be an easy issue to work around, but you need
+to be aware of it.
+
+# CONFIGURATION
+
+This plugin supports the following configuration settings, which are stored as
+a hash ref under the configuration key 'Plugin::Session::Store::Cookie'.  See
+["SYNOPSIS"](#synopsis) for example.
+
+## storage\_cookie\_name
+
+The name of the cookie that stores your session data on the client.  Defaults
+to '${$myapp}\_sstore' (where $myappp is the lowercased version of your application
+subclass).  You may wish something less obvious.
+
+## storage\_cookie\_expires
+
+How long before the cookie that is storing the session info expires.  defaults
+to '+1d'.  Lower is more secure but bigger hassle for your user.  You choose the
+right balance.
+
+## storage\_secret\_key
+
+Used to fill the 'secret\_key' initialization parameter for [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure).
+Don't let this be something you can guess or something that escapes into the
+wild...
+
+There is no default for this, you need to supply.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Plugin::Session](https://metacpan.org/pod/Catalyst::Plugin::Session), [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

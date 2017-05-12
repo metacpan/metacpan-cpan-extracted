@@ -1,0 +1,20 @@
+Revision history for Perl extension Class::Delegate.
+
+0.01  Tue Oct 24 13:44:00 2000
+    - original version; created by h2xs 1.19
+
+0.02  Thu Oct 26 10:46:16 EDT 2000
+    - Added support for set_owner()
+
+0.03  Tue Oct 31 18:34:53 EST 2000
+    - Added support for @PUBLIC
+
+0.04 ???
+    - Fell through the cracks
+
+0.05  Fri Dec 22 23:45:00 EST 2000
+    - Updated copyright information, polished up documentation
+
+0.06 Wed Dec 27 15:17:15 EST 2000
+    - Added README
+

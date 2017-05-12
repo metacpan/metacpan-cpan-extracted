@@ -1,0 +1,27 @@
+---
+abstract: 'Merges configurations from different sources'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires:
+  Test::Most: '0'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-From
+requires:
+  Config::Any: '0.26'
+  DBIX::Class: '0.082820'
+  Hash::Merge: '0.200'
+  Module::Load: '0.32'
+  Moose: '2.1404'
+  Moose::Util::TypeConstraints: '2.1404'
+  MooseX::MarkAsMethods: '0.15'
+  YAML: '1.15'
+version: '0.05'

@@ -1,0 +1,12 @@
+\.bak$
+~$
+^Makefile(.old)?$
+^MANIFEST.SKIP$
+#$
+^\.git
+^blib/
+^debian/
+-stamp$
+perltidy.pl
+\.perltidyrc
+^Crypt-Password

@@ -1,0 +1,67 @@
+Revision history for Perl extension CGI::Wiki::Simple.
+
+0.12 20030405
+  - Fixed a bug in test 30 (Thanks to Kate for detecting it and supplying a patch)
+  - eliminated a warning from CGI::Application when changing the runmode
+    (now the runmode is set through the predefined hook instead)
+
+0.11 20030404
+  - Fixed a nasty bug in the RecentChanges plugin
+  - added two wiki maintenance tools :
+      - dump-wiki.pl - creates nodeballs
+      - simple-user-setup.pl - can now setup any database and can create nodeballs
+  - added capability to load nodeballs into the wiki
+
+0.10 20030404
+  - Setup is now implemented for all supported databases
+  - Setup is now testing for all configured test databases
+
+0.09 20030402
+  - Missed updating the changes file
+  - More tests
+  - Automagic setup routine (for SQLite)
+
+0.08 20030401
+  - Second cleanup release :
+  - Fixed unquoted prerequisites in Makefile.PL (Perl 5.8.0 complains)
+  - Made header/footer/stylesheet configurable if no templates are used
+  - RecentChanges plugin now actually works
+  - The scripts in bin/ are now checked whether they actually compile
+  - Massive thanks to Kate L. Pugh and Podmaster who tested the previous
+    release and reported all those nasty errors that either slipped
+    my test setup or I didn't have tests for, or were simply neglected
+    by me.
+
+0.07 20030331
+  - Cleanup release :
+  - fixed README
+  - fixed missing prerequisite Test::Without::Module
+  - added automagic setup for SQLite via CGI::Wiki::Simple::Setup
+
+0.06 20030330
+  - imported into cvs
+  - First release on CPAN
+  - Added default content and a setup routine for SQLite.
+  - The rest of the setup routines (for the other databases) will follow later
+  - Maybe database connection should be centralized for the (two) kinds of
+    scripts that deal with it ?
+
+0.05 ????
+  - Was released on corion.net
+  - But I don't know anymore what I changed
+
+0.04 20030203
+  - Redid plugin architecture - plugins now return raw HTML.
+  - NodeList plugin now has regular expressions to select what nodes get shown (and which parts of them).
+  - Added tests for the plugin structure
+  - Added tests for all synopses and examples, available via Test::Inline
+
+0.03 200301??
+  - Added plugin architecture
+  - Added static page plugin
+  - Added node list plugin
+
+0.02 200301??
+
+0.01  Tue Jan 28 18:43:30 2003
+  - original version; created by ExtUtils::ModuleMaker 0.204

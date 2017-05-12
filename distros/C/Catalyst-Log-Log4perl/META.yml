@@ -1,0 +1,31 @@
+---
+abstract: 'DEPRECATED (see Log::Log4perl::Catalyst)'
+author:
+  - 'Adam Jacob, C<adam@stalecoffee.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Log-Log4perl
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.60
+  Data::Dump: 0
+  Log::Log4perl: 1.04
+  MRO::Compat: 0
+  Params::Validate: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/historical/Catalyst-Log-Log4perl
+version: 1.06

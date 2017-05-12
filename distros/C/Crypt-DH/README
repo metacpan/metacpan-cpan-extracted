@@ -1,0 +1,125 @@
+NAME
+    Crypt::DH - Diffie-Hellman key exchange system
+
+SYNOPSIS
+        use Crypt::DH;
+        my $dh = Crypt::DH->new;
+        $dh->g($g);
+        $dh->p($p);
+
+        ## Generate public and private keys.
+        $dh->generate_keys;
+
+        $my_pub_key = $dh->pub_key;
+
+        ## Send $my_pub_key to "other" party, and receive "other"
+        ## public key in return.
+
+        ## Now compute shared secret from "other" public key.
+        my $shared_secret = $dh->compute_secret( $other_pub_key );
+
+DESCRIPTION
+    *Crypt::DH* is a Perl implementation of the Diffie-Hellman key exchange
+    system. Diffie-Hellman is an algorithm by which two parties can agree on
+    a shared secret key, known only to them. The secret is negotiated over
+    an insecure network without the two parties ever passing the actual
+    shared secret, or their private keys, between them.
+
+THE ALGORITHM
+    The algorithm generally works as follows: Party A and Party B choose a
+    property *p* and a property *g*; these properties are shared by both
+    parties. Each party then computes a random private key integer
+    *priv_key*, where the length of *priv_key* is at most (number of bits in
+    *p*) - 1. Each party then computes a public key based on *g*,
+    *priv_key*, and *p*; the exact value is
+
+        g ^ priv_key mod p
+
+    The parties exchange these public keys.
+
+    The shared secret key is generated based on the exchanged public key,
+    the private key, and *p*. If the public key of Party B is denoted
+    *pub_key_B*, then the shared secret is equal to
+
+        pub_key_B ^ priv_key mod p
+
+    The mathematical principles involved insure that both parties will
+    generate the same shared secret key.
+
+    More information can be found in PKCS #3 (Diffie-Hellman Key Agreement
+    Standard):
+
+        http://www.rsasecurity.com/rsalabs/pkcs/pkcs-3/
+
+USAGE
+    *Crypt::DH* implements the core routines needed to use Diffie-Hellman
+    key exchange. To actually use the algorithm, you'll need to start with
+    values for *p* and *g*; *p* is a large prime, and *g* is a base which
+    must be larger than 0 and less than *p*.
+
+    *Crypt::DH* uses *Math::BigInt* internally for big-integer calculations.
+    All accessor methods (*p*, *g*, *priv_key*, and *pub_key*) thus return
+    *Math::BigInt* objects, as does the *compute_secret* method. The
+    accessors, however, allow setting with a scalar decimal string, hex
+    string (^0x), Math::BigInt object, or Math::Pari object (for backwards
+    compatibility).
+
+  $dh = Crypt::DH->new([ %param ]).
+    Constructs a new *Crypt::DH* object and returns the object. *%param* may
+    include none, some, or all of the keys *p*, *g*, and *priv_key*.
+
+  $dh->p([ $p ])
+    Given an argument *$p*, sets the *p* parameter (large prime) for this
+    *Crypt::DH* object.
+
+    Returns the current value of *p*. (as a Math::BigInt object)
+
+  $dh->g([ $g ])
+    Given an argument *$g*, sets the *g* parameter (base) for this
+    *Crypt::DH* object.
+
+    Returns the current value of *g*.
+
+  $dh->generate_keys
+    Generates the public and private key portions of the *Crypt::DH* object,
+    assuming that you've already filled *p* and *g* with appropriate values.
+
+    If you've provided a priv_key, it's used, otherwise a random priv_key is
+    created using either Crypt::Random (if already loaded), or /dev/urandom,
+    or Perl's rand, in that order.
+
+  $dh->compute_secret( $public_key )
+    Given the public key *$public_key* of Party B (the party with which
+    you're performing key negotiation and exchange), computes the shared
+    secret key, based on that public key, your own private key, and your own
+    large prime value (*p*).
+
+    The historical method name "compute_key" is aliased to this for
+    compatibility.
+
+  $dh->priv_key([ $priv_key ])
+    Returns the private key. Given an argument *$priv_key*, sets the
+    *priv_key* parameter for this *Crypt::DH* object.
+
+  $dh->pub_key
+    Returns the public key.
+
+AUTHOR
+    Benjamin Trott (cpan:BTROTT) <ben+cpan@stupidfool.org>
+
+    Brad Fitzpatrick (cpan:BRADFITZ) <brad@danga.com>
+
+CONTRIBUTORS
+    BinGOs - Chris Williams (cpan:BINGOS) <chris@bingosnet.co.uk>
+
+    Mithaldu - Christian Walde (cpan:MITHALDU)
+    <walde.christian@googlemail.com>
+
+COPYRIGHT
+    Copyright (c) 2012 the Crypt::DH "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

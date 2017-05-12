@@ -1,0 +1,67 @@
+{
+   "abstract" : "a generic connection to a hierarchical-structured data set",
+   "author" : [
+      "Scott Hardin <mrscotty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Connector",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config::Std" : "0",
+            "Config::Versioned" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "ExtUtils::MakeMaker" : "6.59",
+            "Net::SSL" : "0",
+            "Template" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Std" : "0",
+            "Config::Versioned" : "0.5",
+            "DBI" : "0",
+            "Net::LDAP" : "0",
+            "Net::SSL" : "0",
+            "Proc::SafeExec" : "0",
+            "Template" : "0",
+            "Text::CSV_XS" : "0",
+            "YAML" : "0"
+         },
+         "requires" : {
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.21"
+}

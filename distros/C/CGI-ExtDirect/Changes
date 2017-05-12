@@ -1,0 +1,84 @@
+3.21_001 Mon Jun 15 22:04:46 PDT 2015
+    - Require CGI 4.20+ if it's over 4.0; trying to work around Win32 test failures
+
+3.20  Tue Mar 31 21:46:14 PDT 2015
+    - Updated to support call metadata feature in RPC::ExtDirect 3.20
+    - Added unit tests
+    - RPC::ExtDirect depdendency bumped to 3.20
+    - CGI::Test dependency bumped to 1.100
+
+3.12  Sun Jan 18 12:10:53 PST 2015
+    - Updated CDN links in examples to Ext JS 4.2.1 instead of
+      outdated and no longer supported 4.0.2a.
+    - No code changes.
+
+3.11  Mon Oct 27 17:41:48 PDT 2014
+    - Suppress list context warning in CGI.pm 4.08+
+    - RPC::ExtDirect dependency bumped to 3.02
+    - CGI::Test dependency bumped to 1.000
+
+3.10  Fri Sep  5 22:46:40 PDT 2014
+    - Windows compatibility
+    - CGI::Test dependency bumped to 0.50
+
+3.01  Fri Jun 20 19:46:26 PDT 2014
+    - Fixed test failures due to missing heredoc closing tags
+      in test scripts
+    - Some documentation touch-ups
+
+3.00  Thu Jun 12 18:19:37 PDT 2014
+    - Updated to accommodate for the changes in RPC::ExtDirect 3.0
+    - Many bug fixes, the bulk of the test data moved to the core
+    - More documentation
+
+2.03  Tue Jun 10 20:02:18 PDT 2014
+    - Fixed a bug in CGI header handling that made HTTP response
+      output to be mangled sometimes with Perls 5.18+
+
+2.02  Thu Jun 21 10:27:33 2012
+    - Fixed a bug in t/05_env.t
+
+2.01  Wed Jun 20 18:37:54 2012
+    - Minor documentation tweaks.
+
+2.00  Mon Jun 18 14:15:11 2012
+    - Updated code, documentation and test suite to accommodate
+      for new features in RPC::ExtDirect 2.00.
+
+1.12  Thu Jun  7 13:41:33 2012
+    - Fixed a bug in handling uploaded files: CGI.pm below 3.41
+      did not have "handle" method in its "lightweight file handle"
+      objects, which CGI::ExtDirect relied on.
+      Somehow this bug only manifested itself in Perl 5.10.0.
+
+    - Fixed Makefile.PL to produce BUILD_REQUIRES only for 
+      ExtUtils::MakeMaker that support it (>=6.55).
+
+    - Bumped RPC::Dependency to freshly released 1.30.
+
+1.11  Mon May 20 18:54:05 2012
+    - Bumped CGI::Test dependency to version 0.3 which should not
+      fail its tests anymore. Moved it to BUILD_REQUIRES section.
+
+      Bumped RPC::ExtDirect dependency version to 1.21.
+
+      Added repository and bugtracker attributes to Makefile.PL.
+
+      Updated README a bit.
+
+      No code changes this time.
+
+1.10  Mon Oct 17 00:21:42 2011
+    - Fixed a (small) bug: extType parameter in form-based remoting
+      calls was not caught and cleaned out before passing data hash
+      to Method for execution.
+
+      Removed CGI::Test notice from README; I am now maintainer of
+      that module and CPAN distribution should be straightened
+      already.
+
+1.01  Tue Oct  4 21:35:06 2011
+    - Bumped required RPC::ExtDirect version to 1.20.
+
+1.00  Sat Oct  1 20:59:11 2011
+	- original version.

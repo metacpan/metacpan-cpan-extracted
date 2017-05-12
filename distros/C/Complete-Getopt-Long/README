@@ -1,0 +1,20 @@
+SYNOPSIS
+
+    See Getopt::Long::Complete for an easy way to use this module.
+
+DESCRIPTION
+
+SEE ALSO
+
+    Getopt::Long::Complete
+
+    Complete
+
+    Complete::Bash
+
+    Other modules related to bash shell tab completion: Bash::Completion,
+    Getopt::Complete.
+
+    Perinci::CmdLine - an alternative way to easily create command-line
+    applications with completion feature.
+

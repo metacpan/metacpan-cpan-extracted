@@ -1,0 +1,26 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 112
+    - 83
+name: fd70
+registers:
+  AF: 9847
+  AF_: 0
+  BC: 13253
+  BC_: 0
+  DE: 49372
+  DE_: 0
+  HL: 9775
+  HL_: 0
+  I: 0
+  IX: 54236
+  IY: 9121
+  PC: 0
+  R: 0
+  SP: 0

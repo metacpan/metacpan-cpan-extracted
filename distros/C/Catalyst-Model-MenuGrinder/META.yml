@@ -1,0 +1,25 @@
+---
+abstract: 'A Catalyst model base-class for using WWW::MenuGrinder'
+author:
+  - 'Andrew Rodland <andrew@cleverdomain.org.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.31'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Model-MenuGrinder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst: '5.8'
+  Module::Runtime: '0.014'
+  Moose: '0'
+  Scope::Guard: '0'
+  WWW::MenuGrinder: '0.04'
+version: '0.07'

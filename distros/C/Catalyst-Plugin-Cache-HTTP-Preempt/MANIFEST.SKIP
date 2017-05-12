@@ -1,0 +1,14 @@
+.git/
+blib
+pm_to_blib
+MANIFEST.bak
+MANIFEST.SKIP~
+cover_db
+Makefile$
+Makefile.old$
+^Catalyst-Plugin-Cache-HTTP-Preempt-
+^.gitignore
+~$
+\.bak$
+\b(xt\b)?inc\b
+

@@ -1,0 +1,56 @@
+{
+   "abstract" : "A Modern Perl interface to CyberSource's SOAP API.",
+   "author" : [
+      "Amiri Barksdale <amiri@arisdottle.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Checkout-CyberSource-SOAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::CreditCard" : 0,
+            "Moose" : 0,
+            "SOAP::Lite" : 0,
+            "Time::HiRes" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.008_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::Moose" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/amiri/Checkout--CyberSource--SOAP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/amiri/Checkout--CyberSource--SOAP.git",
+         "web" : "http://github.com/amiri/Checkout--CyberSource--SOAP"
+      }
+   },
+   "version" : "0.07"
+}
+

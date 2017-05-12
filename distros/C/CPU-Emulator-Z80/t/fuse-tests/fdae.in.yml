@@ -1,0 +1,28 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 174
+    - 9
+  33281:
+    - 203
+name: fdae
+registers:
+  AF: 41178
+  AF_: 0
+  BC: 48167
+  BC_: 0
+  DE: 9595
+  DE_: 0
+  HL: 21641
+  HL_: 0
+  I: 0
+  IX: 64089
+  IY: 33272
+  PC: 0
+  R: 0
+  SP: 0

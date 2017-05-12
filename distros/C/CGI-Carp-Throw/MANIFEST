@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Carp-Throw.t
+t/carp_to_browser.cgi
+t/carp_wo_browser.cgi
+t/cluck_to_browser.cgi
+t/just_cluck.cgi
+t/no_err.cgi
+t/throw_to_browser.cgi
+t/throw_to_browser_cl.cgi
+t/throw_to_browser_bare.cgi
+t/throw_to_browser_from_sub.cgi
+t/RunThrowCGI.pm
+examples/example1.cgi
+examples/example2.cgi
+lib/CGI/Carp/Throw.pm
+META.yml                                 Module meta-data (added by MakeMaker)

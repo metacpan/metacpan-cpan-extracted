@@ -1,0 +1,43 @@
+CPAN-Mini-Inject-Remote
+
+This module supplies a command mcpani_remote that allows remote interaction with
+a CPAN::Mini repository through a CPAN::Mini::Inject::Server instance
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CPAN::Mini::Inject::Remote
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Mini-Inject-Remote
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CPAN-Mini-Inject-Remote
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CPAN-Mini-Inject-Remote
+
+    Search CPAN
+        http://search.cpan.org/dist/CPAN-Mini-Inject-Remote/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Christopher Mckay
+
+This program is released under the following license: restrictive
+

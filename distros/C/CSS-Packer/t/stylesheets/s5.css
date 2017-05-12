@@ -1,0 +1,31 @@
+@media        screen  {
+ @import  url(sheet2.html );
+foo {
+  asdf:asdf;
+  ew:12;
+}
+bar
+{
+  content: "a\n  b\
+    asdf";
+
+}
+}
+
+/* from http://www.positioniseverything.net/easyclearing.html */
+/* from http://www.positioniseverything.net/easyclearing.html */
+.clearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE-mac \*/
+/* Hides from IE-mac \*/
+* html .clearfix {height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Catalyst-TraitFor-Model-DBIC-Schema-ResultRoles
+version:            0.011
+abstract:           Automatically applying Moose Roles to Result-Classes at BUILD time
+author:
+    - Lukas Thiemeier <lukast@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.56
+    Test::More:           0.96
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Module::Find:         0.10
+    Moose:                1.21
+    namespace::autoclean:  0.11
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

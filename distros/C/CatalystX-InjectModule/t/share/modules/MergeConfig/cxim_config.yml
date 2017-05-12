@@ -1,0 +1,10 @@
+name: MergeConfig
+version: 1
+
+TestArray:
+  - A
+  - B
+
+TestHash:
+  A:
+    B: 1

@@ -1,0 +1,88 @@
+{
+    "name": "CPAN-Testers-Data-Generator",
+    "version": "1.21",
+    "abstract": "CPAN Testers cpanstats Database Generator",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Config::IniFiles": "0",
+                "CPAN::Testers::Common::Article": "0.36",
+                "CPAN::Testers::Common::DBUtils": "0.03",
+                "CPAN::Testers::Fact::LegacyReport": "1.999001",
+                "CPAN::Testers::Fact::TestSummary": "1.999001",
+                "CPAN::Testers::Metabase::AWS": "1.999002",
+                "CPAN::Testers::Report": "1.999001",
+                "Data::FlexSerializer": "0",
+                "DateTime": "0",
+                "DateTime::Duration": "0",
+                "DBI": "0",
+                "DBD::mysql": "0",
+                "File::Basename": "0",
+                "File::Path": "0",
+                "File::Slurp": "0",
+                "Getopt::ArgvFile": "0",
+                "Getopt::Long": "0",
+                "HTML::Entities": "0",
+                "IO::File": "0",
+                "JSON": "0",
+                "Metabase": "1.003",
+                "Metabase::Fact": "0.023",
+                "Metabase::Resource": "0.023",
+                "Sereal": "0",
+                "Time::Local": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Database": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::Data::Generator": {
+            "file": "lib/CPAN/Testers/Data/Generator.pm",
+            "version": "1.21"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "homepage": "http://devel.cpantesters.org",
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-testers-data-generator.git",
+            "web": "http://github.com/barbie/cpan-testers-data-generator",
+            "type": "git"
+        }
+    }
+}

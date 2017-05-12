@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 57
+name: fd39
+registers:
+  AF: 9731
+  AF_: 0
+  BC: 29295
+  BC_: 0
+  DE: 40063
+  DE_: 0
+  HL: 52550
+  HL_: 0
+  I: 0
+  IX: 56389
+  IY: 21717
+  PC: 0
+  R: 0
+  SP: 56407

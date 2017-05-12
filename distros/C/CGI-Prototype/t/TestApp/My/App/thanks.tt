@@ -1,0 +1,2 @@
+Thanks for stopping by,
+[% self.param('first') | html %] [% self.param('last') | html %]!

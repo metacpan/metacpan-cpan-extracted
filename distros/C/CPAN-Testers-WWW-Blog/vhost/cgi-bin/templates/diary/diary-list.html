@@ -1,0 +1,79 @@
+[% 
+    htmltitle = 'News &amp; Views' ;
+    title = 'News & Views' ;
+
+    crumb1_name = 'News &amp; Views' ;
+%]
+
+[% IF mainarts %]
+[% FOREACH article = mainarts %]
+
+<div class="diaryhead">
+    <div class="posted">Posted by <a href="/user/[% article.data.userid %]" title="About [% article.data.name %]">[% article.data.name %]</a><br />on [% article.data.postdate %]</div>
+    <div class="titled"><a href="/diary/[% article.data.articleid %]" rel="bookmark" title="[% article.data.title %]">[% article.data.title %]</a></div>
+</div>
+
+<div class="diaryitem">
+
+    [% FOREACH item = article.body %]
+    [% IF item.type == 1 %]
+    [% IF item.align  %][% class = item.align %][% ELSE %][% class = "inline" %][% END %]
+    [% IF item.href %]
+        <div class="thumb[% item.align %]" >
+        <a href='[% item.href %]' title="[% item.tag %]"><img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+        [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% ELSE %]
+        <div class="thumb[% item.align %]" >
+        <img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+        [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% END %]
+    [% END %]
+    [% IF item.type == 2 %]
+        <div class="justified">[% item.body %]</div>
+    [% END %]
+    [% IF item.type == 3 %]
+        <div class="justified"><a href='[% item.href %]' title="[% item.tag | html %]">[% item.body %]</a></div>
+    [% END %]
+    [% END %]
+</div>
+
+    <div class="fileunder">
+    [% IF article.meta %]
+      File Under:
+      [% count = 0 %]
+      [% FOREACH meta = article.meta %]
+        [% IF count > 0 %]/[% END %]
+        <a href="/meta/[% meta %]" title="Meta search for '[% meta %]'">[% meta %]</a>
+        [% count = count + 1 %]
+      [% END %]
+      <br />
+    [% END %]
+      <a href="/diary/[% article.data.articleid %]#comments" title="View comments">
+      [% IF article.comments == 0 %]NO COMMENTS[% END %]
+      [% IF article.comments == 1 %]1 COMMENT[% END %]
+      [% IF article.comments > 1 %][% article.comments %] COMMENTS[% END %]
+      </a>
+    [% IF user.admin %]
+    | Edit | Delete
+    [% END %]
+    </div>
+
+[% END %]
+[% ELSE %]
+<p>Sorry, your search failed to find any blog entries :(</p>
+[% END %]
+
+[% IF archive.volumes %]
+<table class="prevnext" summary="Volume Navigation">
+<tr><td class="left">[% IF archive.volumes.prev %]&lt;&lt; <a href="/volume/[% archive.volumes.prev.volumeid %]" title="Read the archives from [% archive.volumes.prev.archdate %]">[% archive.volumes.prev.archdate %]</a> ([% archive.volumes.prev.counter %])[% END %]</td>
+    <td class="right">[% IF archive.volumes.next %]<a href="/volume/[% archive.volumes.next.volumeid %]" title="Read the archives from [% archive.volumes.next.archdate %]">[% archive.volumes.next.archdate %]</a> ([% archive.volumes.next.counter %]) &gt;&gt;[% END %]</td></tr>
+</table>
+[% END %]

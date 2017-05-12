@@ -1,0 +1,9 @@
+Revision history for Convert-CookingTimes
+
+0.02    2017-03-10
+        - Condense multiple steps with same required time into one step.
+
+0.01    2015-05-04
+        First version.
+        This is dedicated to my uncle Jamie - Robert James Precious, whose
+        funeral I'm attenting tomorrow.

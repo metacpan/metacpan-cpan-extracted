@@ -1,0 +1,19 @@
+% title "Edit $name";
+% stash sidebar => 'convos';
+<ul>
+  <li class="form">
+    <h2>Edit <%= $name %></h2>
+    %= include 'connection/form', in_storage => 1
+  </li>
+  <li>&nbsp;</li>
+  <li class="message network" data-network="<%= $network %>" data-target="">
+    %= timestamp
+    %= image '/image/avatar-convos.png', alt => '', class => 'avatar'
+    <h3>convos</h3>
+    <div class="content">Connection to <%= $network %> is <%= param('tls') ? 'secure' : 'not secure' %>.</div>
+  </li>
+  <li class="message network same-nick" data-network="<%= $network %>" data-target="">
+    %= timestamp
+    <div class="content">The connection is <%= param('state') || 'disconnected' %>.</div>
+  </li>
+</ul>

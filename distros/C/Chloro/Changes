@@ -1,0 +1,52 @@
+0.06     2011-07-29
+
+[BUG FIXES]
+
+- Fixed a bunch of doc errors, including the fact the
+  Chloro::ErrorMessage->text() method wasn't documented. These errors were all
+  reported by Mark Stratmen.
+
+
+0.05     2011-05-19
+
+[API CHANGE]
+
+- A custom extractor is now expected to return both the value of the field and
+  the parameter name(s) associated with the field in the form.
+
+- A repetition_key value for an empty group no longer appears in the result
+  value for that the repetition_key's field.
+
+[NEW FEATURES]
+
+- Added several methods:
+  Chloro::Group->get_field(),
+  Chloro::ResultSet->add_form_error()
+  Chloro::ResultSet->secure_raw_params(),
+  Chloro::Result::Field->param_names()
+  Chloro::Result::Field->add_error()
+  Chloro::Error::Field->result()
+
+- Chloro::Error::Field objects now have a weak reference to their associated
+  Chloro::Result::Field object, available via $error->result().
+
+
+0.04     2011-04-17
+
+- Fix an error that prevented some of the docs from being indexed.
+
+
+0.03     2011-04-17
+
+- Last release was still missing a dependency.
+
+
+0.02     2011-04-16
+
+- Why do I keep forgetting to include any prereqs when I first a new module? I
+  don't know, but I do.
+
+
+0.01     2011-04-16
+
+- First release upon an unsuspecting world.

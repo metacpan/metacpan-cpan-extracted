@@ -1,0 +1,7 @@
+
+<h2>child </h2>
+child saved ok. Click <a href="[% SCRIPT_NAME %]/child/[% model.id_child %]">here</a> to continue.
+<script type="text/javascript">
+ document.location.href="[% SCRIPT_NAME %]/child/[% model.id_child %]";
+</script>
+ 

@@ -1,0 +1,26 @@
+In this directory you will find a benchmark script "benchmark.pl"
+that will test the performance of all Crypt::CBC compatible 
+encryption modules available on CPAN at the time of this writing
+(November 2003).  Of course, it will only test those modules that
+are installed on your system.
+
+The results are writting into an HTML file "benchmark.html" (and
+other files linked from there).  The benchmarking is surely not
+bullet-proof but the results should give you an idea of the
+performance of the various modules on your(!) machine.  Please
+note, that the performance of all modules can vary a lot depending
+on the operating system and hardware.
+
+The file "benchmark.html" shipped with Crypt::Twofish_PP shows the
+results for one of my machines.  You should not over-estimate the
+absolute numbers but rather see the results as a whole and only
+compare the performance indicators relative to each other.
+
+For more reliable results you will probably increase the time 
+per test.  You can do that by modifying the constant "SECONDS"
+in the source code of "benchmark.pl".
+
+Improvements to the script (command-line options for more flexible
+usage?) are welcome!
+
+Guido Flohr

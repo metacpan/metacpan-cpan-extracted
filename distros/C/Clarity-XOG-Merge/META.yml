@@ -1,0 +1,36 @@
+---
+abstract: 'Merge several Clarity XML Open Gateway (XOG) files'
+author:
+  - 'Steffen Schwigon, C<< <ss5 at renormalist.net> >>'
+  - 'Steffen Schwigon <ss5@renormalist.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Clarity-XOG-Merge
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::Cmd: 0
+  Data::Dumper: 0
+  File::Find::Rule: 0
+  File::Temp: 0
+  Moose: 0
+  Test::Deep: 0
+  Test::More: 0
+  XML::Twig: 0
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Clarity-XOG-Merge
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/lhm/Clarity-XOG-Merge.git
+version: 1.001

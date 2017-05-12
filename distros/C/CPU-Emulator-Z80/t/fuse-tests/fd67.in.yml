@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 103
+name: fd67
+registers:
+  AF: 56186
+  AF_: 0
+  BC: 46091
+  BC_: 0
+  DE: 31576
+  DE_: 0
+  HL: 18941
+  HL_: 0
+  I: 0
+  IX: 9839
+  IY: 40571
+  PC: 0
+  R: 0
+  SP: 0

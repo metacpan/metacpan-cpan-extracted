@@ -1,0 +1,18 @@
+README
+
+CGI::Auth::Auto
+
+How to Install:
+--------------
+
+	perl Makefile.PL
+
+	make install
+
+	make clean
+
+Make sure you have CGI::Auth available on your server.
+
+Please forward comments, problems, etc to Leo Charre, leocharre at cpan dot org.
+
+

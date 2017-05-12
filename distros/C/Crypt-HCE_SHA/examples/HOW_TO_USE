@@ -1,0 +1,54 @@
+Server side (who you are sending your request to)
+
+
+use Server;
+
+$server = Server->new(Server => name_of_host_to_bind_too, Port => port_number,
+		      Queue => size_of_queue, SKey => 'shaReDSEcrET');
+
+
+LOOP:
+	while ($ready_to_read = $server->accept()) { # wait for next connection
+		@info = $server->recv();
+		# @info now contains all of the data sent from the client
+		# already de-crypted
+		# to send info back to the client
+		$server->send("information", "to send", "back", "to" "client");
+		$server->close();
+	}
+
+additional notes:
+
+name_of_host_to_bind_too is usually the dns name assigned to the local box or
+                         ip address
+
+port_number for port's under 1024 you must be root to open
+
+size_of_queue is the amount of backlog before a requested connection is rejected
+
+
+
+Client Side (who you are sending your request from)
+
+use Client;
+
+$client = Client->new(Server => name_of_server_to_connect_to, Port => port_number,
+		      SKey => 'shaReDSEcrET');
+
+$client->send("information", "to", "send", "to" "the server");
+@response = $client->recv();
+
+print "response = @response\n";
+
+
+additional notes:
+the Client module closes the connection after doing a recv.  So to have
+more than one exchange you need to issue a Client->new for each pair, or
+you can modify the Client->recv code
+  } else {
+	close ($self->{'Socket'});  # remove this line
+	return @response;
+  }
+
+if you modify the code you must close the socket yourself somewhere else
+       close ($client->{'Socket'});

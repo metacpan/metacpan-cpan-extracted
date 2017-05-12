@@ -1,0 +1,15 @@
+a:visited	{
+		 background-color: red;
+		border: 1px solid #000000;
+/*		 color: blue;          an internal comment */
+		 foo: "bar";
+		}
+foo.bar, baz		{
+		 font: monospace;
+		 color: black;
+		baz: url(la/la/la);
+		fop: url("la la la")
+		}
+foo.xyzzy, a p	{
+		 font: sans-serif;
+		}

@@ -1,0 +1,47 @@
+NAME
+    Class::Accessor::Fast::WithBuilder - Class::Accessor::Fast with lazy
+    defaults
+
+VERSION
+    0.0101
+
+DESCRIPTION
+    This module will require builders for each attribute defined. This means
+    that adding attributes with this module, is something like this code
+    from Moose:
+
+        has age => (
+            is => "ro", # or rw
+            lazy => 1,
+            builder => "_build_age",
+        );
+
+    NOTE: All builders will be called as late as possible.
+
+SYNOPSIS
+        package Foo;
+        use base qw(Class::Accessor::Fast::WithBuilder);
+
+        Foo->mk_accessors(qw( name age ));
+
+        sub _build_name { $_[0]->_croak("'name' attribute cannot be built!") }
+        sub _build_age { 0 }
+
+        print Foo->new->name; # BOOM!
+        print Foo->new->age; # Will print "0"
+        print Foo->new({ age => 123 })->age; # Will print "123"
+
+METHODS
+  make_accessor
+    See "make_accessor" in Class::Accessor
+
+  make_ro_accessor
+    See "make_ro_accessor" in Class::Accessor
+
+  make_wo_accessor
+    This is not implemented. (See "make_wo_accessor" in Class::Accessor)
+
+COPYRIGHT & LICENSE
+AUTHOR
+    Jan Henning Thorsen "jhthorsen at cpan.org"
+

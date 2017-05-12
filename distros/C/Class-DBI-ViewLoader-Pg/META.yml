@@ -1,0 +1,19 @@
+---
+name: Class-DBI-ViewLoader-Pg
+version: 0.05
+author:
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+abstract: Class::DBI::Viewloader implementation for Postgresql.
+license: perl
+requires:
+  Class::DBI::Pg: 0
+  Class::DBI::ViewLoader: 0.02
+  DBD::Pg: 1.31
+  DBI: 1.43
+build_requires:
+  Test::More: 0
+provides:
+  Class::DBI::ViewLoader::Pg:
+    file: lib/Class/DBI/ViewLoader/Pg.pm
+    version: 0.05
+generated_by: Module::Build version 0.2611

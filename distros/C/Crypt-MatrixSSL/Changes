@@ -1,0 +1,283 @@
+Revision history for Perl extension Crypt::MatrixSSL.
+
+0.01  Mon Jan 17 21:59:03 2005
+	- original version; created by h2xs 1.23 with options
+		--compat-version=5.6.0 -A -n Crypt::MatrixSSL
+
+0.02  Wed Feb 02 23:03:00 2005
+	- Corrected Makefile.PL to compile cleanly on Win32, Linux, and Macintosh - with generous help from Randy Kobes
+	- cleaned up the testing script
+	- included a sample script "mxgg.pl" which demonstrates getting data from an SSL web server
+	- fixed some documentation
+
+0.03  Thu Feb 03 15:42:00 2005
+	- Fixed the POD doc in MatrixSSL.pm to remove some commented-out code.
+	- included the (accidentally omitted in 0.02) source from "matrixssl-1-2-2.zip"
+
+0.04  Fri Feb  4 12:35:58 GMT 2005
+	- Some Win32 VC installs failed to compile without a define
+	- Some Linux installs failed to test without a library
+	- My Windows PC destroyed the CaSe of some important files during "make dist"
+
+0.05  Mon Mar 28 01:50:13 GMT 2005
+	- Updated to use matrixssl-1-2-4
+	- Scripted the header-file-adjustents so Win32 compilations properly "inline" future releases too
+
+0.06  Fri Apr 22 18:24:58 GMT 2005
+	- Updated to use matrixssl-1-2-5
+
+0.07  Wed May  4 23:28:55 GMT 2005
+	- Added matrixSslReadKeysMem (previously overlooked due to scarce documentation)
+
+1.73  Mon Feb 27 15:07:38 GMT 2006
+	- Update to support MatrixSSL 1.7.3
+	- Picked a new version number to match the new underlying MatrixSSL version number
+	- Updated matrixSslReadKeysMem API change (itextPass is now unused)
+	- added changes suggested by Alex Efros to mxgg.pl 
+	- added online testing (grabs https://www.google.com/)
+
+1.8   Fri Apr 7 10:04:57 GMT 2006
+	- Update to support MatrixSSL 1.8
+	- Improved the perl client SSL socket handshaking in the examples
+	- Did a mini-benchmark: MatrixSSL managed:-
+		- 200 complete SSL connections per second
+		- 7500 SSL transactions per second (on established SSL sockets)
+		- Server=Dual 2.66ghz Xeon Fedora4, Client=Dual 2.2ghz Xeon RedHat ES3, Max CPU Utilisation was 50%
+
+1.82  Sat Oct 28 14:10:11 GMT 2006
+        - Update to support MatrixSSL 1.82
+	- Included the following contributions from Alex Efros:-
+
+
+	01-online_test.patch:
+	* Refactored file name 't/online.enabled' into var.
+	* Moved unlink() to 'touch' logic to have everything related to this task
+	  in single place.
+	* Delete no-op:
+	    unless (defined $online_tests) {
+	* Replace global $online_tests with lexical.
+	* Removed needless '? 1 : 0' to have this line fit in 80 columns.
+	* Replaced global filehandle ENABLED with lexical $tmp.
+	* Replaced '|| die' with 'or die' which is generally more safe.
+
+
+	02-mxin_mxout_bugfix.patch:
+	* Typo fix.
+
+
+	03-mxfiles.patch:
+	* Added autogeneration of list with MatrixSSL object files to simplify
+	  upgrade to new MatrixSSL version (Linux only!).
+	* Old version of object files list for MatrixSSL 1-1-5 and 1-7-3 moved
+	  to separate files (probably they should be deleted?).
+
+
+	04-headers.patch:
+	* Updated matrixssl_win32_inline.
+	  Original code was written for MatrixSSL-1.2.5 which has single .h file:
+	  matrixSsl.h. Starting from version 1.7.3 MatrixSSL split matrixSsl.h into
+	  two files: matrixSsl.h and matrixCommon.h. Part of code which
+	  matrixssl_win32_inline fixes was left in matrixSsl.h, but another part of
+	  code was moved into matrixCommon.h.
+	  Also '#define SSLPUBLIC' was renamed to '#define MATRIXPUBLIC'.
+	  I've updated it to process both .h-files, and #include both .h-files in .xs.
+	* Rewrite matrixssl_win32_inline documentation.
+	* Deleted mxSsl.h.
+
+
+	05-xs_no_pod.patch:
+	* Deleted all POD from .xs because:
+	  - this documentation out of date;
+	  - it isn't good place for such documentation in .xs;
+	  - I don't think we need duplicate of official .pdf in POD.
+
+
+	06-MAX_CHAIN_LENGTH.patch:
+	* Increase MAX_CHAIN_LENGTH constant to allow usage of big package with
+	  root CA certificates (about 120 certificates).
+
+
+	07-export_const.patch:
+	* All hardcoded constants replaced by real constants from .h-files, both
+	  in .pm and .xs!
+	* All MatrixSSL functions exported into user's package.
+	* All constants from .h-files wrapped in .xs into functions and then
+	  exported into read-only scalars into user's package in .pm.
+	  Constant names are equal to MatrixSSL original names, i.e. without
+	  prefix "mx".
+	* Hash %mxSSL_ALERT_CODES replaced by two hashes %SSL_alertLevel and
+	  %SSL_alertDescription and these hashes also exported into user's package;
+	  constant 67/SSL_ALLOW_ANON_CONNECTION removed from hashes.
+	* Exporter module replaced by custom import() function in .pm (because
+	  Exporter is bloated, ugly, unable to export read-only scalars and it's
+	  main feature "tags" isn't needed in this module).
+	* Line
+	    if(flags!=0) {flags=SSL_FLAGS_SERVER;sessionId=0;}
+	  deleted from matrixSslNewSession() in .xs. It's user responsibility to use
+	  constant $SSL_FLAGS_SERVER and set $sessionId to 0.
+	* Added standard test: t/00.load.t
+	* Added test: t/export.t
+	* Added test: t/export-const.t
+	* Fixed test: t/Crypt-MatrixSSL.t to take advantage from exporting
+	  functions and constants.
+
+
+	08-export_const2.patch:
+	* Refactored constants added in 07-export_const.patch using ExtUtils::Constant.
+
+
+	09-xs_cleanup.patch:
+	* Small documentation typo fix in Makefile.PL.
+	* Export new constant SSL_MAX_PLAINTEXT_LEN because user need to know
+	  maximum length of message in matrixSslEncode() to split his huge
+	  message into many matrixSslEncode() calls and avoid SSL_ERROR/SSL_FULL.
+	* Now all public MatrixSSL functions supported - added these:
+	    matrixSslGetAnonStatus
+	    matrixSslAssignNewKeys
+	    matrixSslSetResumptionFlag
+	    matrixSslGetResumptionFlag
+	* INCOMPATIBLE API CHANGES! Removed 'privPass' param from matrixSslReadKeysMem()
+	  to have it interface compatible with MatrixSSL documentation.
+	* Added typemap to have perl support for MatrixSSL types ssl_t,
+	  sslKeys_t and sslSessionId_t. This make possible for perl/xsubpp to
+	  automatically generate _correct_ XS code for most functions without
+	  manual CODE: and OUTPUT: sections.
+	* Delete CODE: and/or OUTPUT: sections for all functions which can be
+	  automatically generated now.
+	* Renamed all function params to names used in MatrixSSL documentation:
+	    mxin    -> in
+	    mxout   -> out
+	    mxkeys  -> keys
+	    session -> ssl
+	    etc...
+	* Moved var declarations from CODE: to INIT: sections for ease reading.
+	* Functions order in .xs slightly changed to correspond with their order
+	  in MatrixSSL .pdf documentation - to ease comparing .xs and .pdf.
+	* Added new tests.
+	=========================
+	=== Unobvious changes ===
+	=========================
+	* Replaced hardcoded constants 18500 and 4100 for 'out' buffer size in
+	  matrixSslDecode() and matrixSslEncode*() functions to SSL_MAX_BUF_SIZE.
+	    >>> Probably SSL_MAX_RECORD_LEN should be used instead, but I'm not sure,
+	    >>> so I take SSL_MAX_BUF_SIZE which is 5 bytes larger...
+	* Use static 'out' buffer in matrixSslDecode() and matrixSslEncode*()
+	  instead of dirty sv_setpvn/SvCUR_set/SvGROW hacks on SV*.
+	* Removed all SvGROW() - AFAIK it isn't required and sv_{set,cat}pv*()
+	  will automatically grow SV* if needed.
+	* Replaced sv_setpvn() with sv_setpvn_mg() to support more perl magic.
+	    >>> I'm not sure, but I suppose this required for things like
+	    >>> Data::Alias which often used in proxy applications with in/out
+	    >>> buffers.
+	* INCOMPATIBLE CHANGES! Now matrixSslDecode() and matrixSslEncode*()
+	  functions will APPEND data into output buffer SV* instead of replacing it.
+	  This has sense for applications which use single output buffer both
+	  for sending data into socket and these functions.
+	* matrixSslReadKeys:
+	    * Changed params type from SV* to char*.
+	    * Removed logic which replace empty string with NULL.
+	* matrixSslReadKeysMem:
+	    * Removed logic which replace empty string with NULL.
+	* matrixSslFreeKeys:
+	    * Do not set 'keys' param to 0 after calling matrixSslFreeKeys().
+	* matrixSslDeleteSession:
+	    * Do not set 'ssl' param to 0 after calling matrixSslDeleteSession().
+	* matrixSslDecode:
+	    * Changed 'error', 'alertLevel' and 'alertDescription' params type
+	      from SV* to unsigned char*.
+	    * Removed logic which initialize 'error', 'alertLevel' and
+	      'alertDescription' to 0 before calling matrixSslDecode().
+	    * Bugfix: 'error', 'alertLevel' and 'alertDescription' was incorrectly
+	      set as _signed_ values using sv_setiv() which them all _unsigned_.
+	    * Removed logic which silently "define" output SV*.
+	* matrixSslEncode:
+	    * Removed dirty hack which "define" input buffer because SvPV() will
+	      make empty string from undef() automatically plus print warning.
+	    * Removed logic which silently "define" output SV*.
+	* matrixSslSetSessionOption:
+	    * Removed logic which forced 'arg' to NULL because it was needed
+	      only as workaround wrong 'arg' type char* (which magically convert
+	      undef to empty string and print warning).
+	* matrixSslSetCertValidator:
+	    * Bugfix: 'arg' type was int instead of void*.
+
+	About these changes. I sure it's good idea to do minimum operations in XS
+	level (unless XS used for rewriting some slow perl code in C, of course).
+	Library wrappers like Crypt::MatrixSSL should stick to original library
+	interface where possible - it somebody wanna make C library interface more
+	'cool and perlish' then it's much ease to do this in perl-level wrappers
+	in optional Crypt/MatrixSSL/Easy.pm module. With this patch only
+	difference from original MatrixSSL interface is in/out buffers in
+	matrixSslEncode*() and matrixSslDecode() functions - everything else work
+	exactly as described in MatrixSSL .pdf documentation.
+
+	1) Removed logic which replace empty string with NULL.
+	    >>> I've fixed XS so it will convert perl undef() into NULL and leave
+	    >>> defined strings as-is, i.e. empty perl string will be empty C string.
+	    >>> This happens not everythere, but only with params which CAN BE
+	    >>> NULL, according to MatrixSSL documentation. If user send undef()
+	    >>> as some other param, then he probably will see 'undefined' warning.
+	2) Do not set 'XXX' param to 0 after calling matrixSsl{Free,Delete}XXX().
+	    >>> This changes original MatrixSSL interface and I don't see any
+	    >>> reason why this 'feature' needed.
+	3) Removed logic which initialize 'error', 'alertLevel' and
+	   'alertDescription' to 0 before calling matrixSslDecode().
+	    >>> To avoid senseless 'undefined' warning I convert undefined values
+	    >>> in these params into number 0, but if these params already defined
+	    >>> numbers they will not be touched. If MatrixSSL doesn't initialize
+	    >>> them, then this IS the MatrixSSL's interface!
+	4) Removed logic which silently "define" input/output SV* buffers.
+	    >>> This is sort of 'always use strict/warnings' idea. User shouldn't
+	    >>> use undefined input/output buffers, and if he using them then he
+	    >>> will see 'undefined' warnings, which is GOOD THING.
+
+	Added certificates which I've created for new tests
+
+
+	10-callback.patch:
+	* Added constant $SSL_ALLOW_ANON_CONNECTION.
+	* Added support for certificate validation callback:
+	    matrixSslSetCertValidator($ssl, \&cb, $cb_arg);
+	    sub cb {
+	        my ($certInfo, $cb_arg) = @_;
+	        if ($certInfo->[0]{subject}{commonName} ne 'localhost') {
+	            return -1;                          # REJECT certificate
+	        }
+	        elsif ($certInfo->[0]{validate} == 1) {
+	            return 0;                           # ACCEPT certificate
+	        }
+	        else {
+	            return $SSL_ALLOW_ANON_CONNECTION;  # ACCEPT anon certificate
+	        }
+	    }
+
+
+	11-doc.patch:
+	* POD documentation in .pm added to complete MatrixSSL documentation
+	  (differences between original C interface and current Perl interface).
+	* Sample client&server scripts added.
+	* Minor fix in XS.
+	* MANIFEST updated to include all new files.
+
+
+	12-matrixssl_memleak.patch:
+	* Added patch for MatrixSSL which fix significant memory leak in loading
+	  certificates with unsupported extentions.
+
+
+1.83  Sun Apr 1 03:31:17 UTC 2007
+        - Update to support MatrixSSL 1.83
+	- Tested: builds OK on Linux (RedHat ES3), Mac (OS/X), and Windows (Vista)
+
+1.86  Tue Jan  6 03:50:06 UTC 2009
+        - Update to support MatrixSSL 1.8.6
+	- Removed SubjectAltName checking from appCertValidator (MatrixSSL 1.8.6 altered this functionality)
+	- added ca-certificates.crt (Sample bundle of current CA certs in common browsers)
+	- Added this code to detect the process memory usage under Mac OS/X, Linux, and Windows:
+		return(`ps -o'rss' -p $$` =~ /(\d+)/) if($^O=~/(^darwin$)/);        # Mac OS/X
+		if($^O=~/Win32/i) { my($m)=`tasklist /nh /fi "PID eq $$"` =~/.*\s([\d,]+)/; $m=~tr/,//d; return $m;}        # MSWin32
+		return (Cat('/proc/self/status') =~ /VmRSS:\s*(\d*)/)[0];           # Linux
+	- Included Crypt-MatrixSSL.ppd and a precompiled Win32 .dll in ../blib/ for PPM (windows users without C/C++ compilers)
+	- Tested: builds OK on Linux (RedHat AS4 + SUSE 10.3), Mac (OS/X darwin), and Windows (XP+VC6. Vista+VS.NET complies and runs, but the tests can't find the dll it just built - not sure why)
+
+

@@ -1,0 +1,77 @@
+=head1 NAME
+
+Catalyst::Manual::Monthly::2012::March::NotACatalystApp
+
+=head2 Why the Monthly is not a Catalyst App
+
+Back in the old days when web frameworks were new and shiny it made sense
+for developers to show off how the framework makes development quick easy
+and fun with little demonstration applications.  Create a blog in 5 minutes
+is the classic example.  the L<Catalyst Advent Calendar|http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/CatalystAdvent> code was
+another. And it served well for quite some time.
+
+So when the time came to retire the calendar and replace it with this
+monthly we needed some new infrastructure.  Well the obvious answer was to
+replace it with some new infrastructure.  At first thought you'd think that
+we might want to write a new Catalyst app.  But think again.
+
+Basically all we really want to do is to provide a location on the web
+where these articles appear.  Putting them into an RSS feed would also be
+handy.  Finally publishing that RSS feed onto their own page would be
+useful too.
+
+While we could use Catalyst to do this, why should we?  Given we've got a
+good packaging and distribution mechanism (the CPAN), and given we've got a
+CPAN browser with a nice API (L<MetaCPAN|http://metacpan.org>), and given
+we've got a nice documentation formatting mechanism (pod), that's already
+all we need.  We don't need Catalyst for this, because it's not especially
+big or complicated.  For big and complicated things like CPAN, a Catalyst
+application is a useful thing, which is why we've got
+L<MetaCPAN|http://metacpan.org>. To use an analogy, just because we've got
+a hydraulic nail gun (Catalyst) doesn't mean we should go about shooting
+everything we own with nails.
+
+But although we don't need a Catalyst application we do need volunteers.
+
+=head2 Making the Catalyst Monthly a Success
+
+Here's what we need to make the Catalyst Monthly a success:
+
+=over
+
+=item *
+
+Articles.  They can be longer (like last month's), or shorter (like this
+month's).  It shouldn't take more than an hour to write a decent-ish
+article based on work you've already done.  Remember there are always
+editors available to look at your work and fix writing issues.
+
+=item *
+
+Infrastructure.  We need an RSS feed created  based on the MetaCPAN
+API distribution, and/or from the Monthly's
+<Lhttp://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Manual-Monthly.git|git
+repository>.
+
+=item *
+
+Readers.  Commenters might be nice too.  But we can get them after we get
+the infrastructure up, maybe by exploiting the L<Disqus|http://disqus.com/>
+service.  We get more readers from having better infrastructure.
+
+=back
+
+Remember, Catalyst is glue to make web-like programing easy, efficient and
+DRY (don't repeat yourself).  It's not a universal nail gun for all of your
+programming problems.  It's the sign of a good web framework that it gets
+out of your way until you need it, then it allows you to accomodate your
+prior assumptions.
+
+=head3 AUTHORS AND COPYRIGHT
+
+Words and a little bit of code:
+Kieren Diment <zarquon@cpan.org>
+
+=head3 LICENCE
+
+This documentation can be redistributed it and/or modified  under the same terms as Perl itself.

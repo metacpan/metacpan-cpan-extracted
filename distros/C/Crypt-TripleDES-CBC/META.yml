@@ -1,0 +1,48 @@
+---
+abstract: 'Triple DES in CBC mode Pure implementation'
+author:
+  - 'Shantanu Bhadoria <shantanu@cpan.org> L<https://www.shantanubhadoria.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  Test::Most: 0.22
+  blib: 1.01
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.010
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-TripleDES-CBC
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Crypt::TripleDES::CBC:
+    file: lib/Crypt/TripleDES/CBC.pm
+    version: 0.006
+requires:
+  Crypt::DES: 0
+  Moose: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-crypt-tripledes-cbc/issues
+  homepage: https://metacpan.org/release/Crypt-TripleDES-CBC
+  repository: git://github.com/shantanubhadoria/perl-crypt-tripledes-cbc.git
+version: 0.006

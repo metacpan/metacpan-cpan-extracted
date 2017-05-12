@@ -1,0 +1,6 @@
+0.05 2097-12-08
+    - add prepare method. without this , generate error when you did not call $c->form();
+0.04 2007-12-08
+    - update wrong file to CPAN  because of typo of MANIFEST.
+0.03 2007-12-07 00:22
+    - release

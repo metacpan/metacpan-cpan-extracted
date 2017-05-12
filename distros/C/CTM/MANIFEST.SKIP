@@ -1,0 +1,8 @@
+~$
+\.bak$
+\.back$
+\.old$
+^\.git/
+^blib/
+^pm_to_blib$
+\#

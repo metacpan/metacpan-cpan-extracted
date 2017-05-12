@@ -1,0 +1,14 @@
+CAST5_PP.pm
+CAST5_PP/Tables.pm
+Changes
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+mkschedule
+README
+SIGNATURE
+t/1cast5.t
+t/2cbc.t
+t/3taint.t
+test/slowtest.pl
+test/speedtest.pl

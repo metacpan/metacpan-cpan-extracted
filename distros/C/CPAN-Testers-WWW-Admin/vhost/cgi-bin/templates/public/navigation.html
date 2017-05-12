@@ -1,0 +1,71 @@
+<h1>Menu</h1>
+
+<ul>
+<li><a href="/">Home</a></li>
+</ul>
+
+[% IF loggedin %]
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=user-logout">Logout</a></li>
+[% IF realm == 'tester' || (realm == 'admin' && !user.tester && !user.author) %]
+<li><a href="[% cgipath %]/pages.cgi?act=user-edit">Update Profile</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-pass">Change Password</a></li>
+[% END %]
+</ul>
+
+<ul>
+<li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+</ul>
+
+[% IF realm == 'tester' || (realm == 'admin' && user.tester) %]
+<h1>Tester Actions</h1>
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-list">List Marked Reports</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-browse">Browse by Date</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-distro">Browse by Distro</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-find">Find Report by GUID</a></li>
+[% IF realm == 'admin' && user.tester %]
+<li><a href="[% cgipath %]/pages.cgi?act=tester-profile">Update Profile</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-clear">Return to Admin</a></li>
+[% END %]
+</ul>
+
+[% ELSIF realm == 'pause' || (realm == 'admin' && user.author) %]
+<h1>Author Actions</h1>
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=author-list">List Marked Reports</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-browser">Browse by Date</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-distro">Browse by Distro</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-testers">Browse by Tester</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-find">Find Report by GUID</a></li>
+[% IF realm == 'admin' && user.author %]
+<li><a href="[% cgipath %]/pages.cgi?act=author-clear">Return to Admin</a></li>
+[% END %]
+</ul>
+
+[% ELSIF realm == 'admin' %]
+<h1>Admin Actions</h1>
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-list">List Marked Reports</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-admin">Be a Tester</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-admin">Be an Author</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-admin">User Profiles</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-merge">Merge Profiles</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-assign">Assign Addresses</a></li>
+</ul>
+[% END %]
+
+[% ELSE %]
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=tester-browse">Browse by Tester</a></li>
+</ul>
+
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=user-reg" rel="nofollow">Sign Up</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-tester" rel="nofollow">Tester Login</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-author" rel="nofollow">Author Login</a></li>
+</ul>
+<ul>
+<li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+</ul>
+[% END %]

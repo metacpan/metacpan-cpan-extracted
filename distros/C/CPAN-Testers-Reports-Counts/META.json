@@ -1,0 +1,50 @@
+{
+   "abstract" : "counts of CPAN Testers reports by month or year",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Testers-Reports-Counts",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Net::HTTP::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/CPAN-Testers-Reports-Counts",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/CPAN-Testers-Reports-Counts.git",
+         "web" : "https://github.com/neilbowers/CPAN-Testers-Reports-Counts"
+      }
+   },
+   "version" : "0.05"
+}
+

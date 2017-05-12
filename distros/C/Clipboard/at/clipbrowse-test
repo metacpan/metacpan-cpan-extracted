@@ -1,0 +1,19 @@
+#!/bin/sh
+PATH=scripts:$PATH
+PCBe='perl -Ilib -MClipboard -e'
+CB='perl -Ilib scripts/clipbrowse'
+# BROWSER="firefox -remote \"openURL(%s,new-tab)\""
+echo "# \$BROWSER == '$BROWSER'"
+echo "# Using $CB"
+$PCBe 'print qq[#  and $INC{"Clipboard.pm"}\n]'
+check() {
+    echo -n Checking "$1"
+    $PCBe 'Clipboard->copy($ARGV[0])' "$1" || exit 1
+    $CB || exit 1
+    echo ' ok'
+}
+check 'http://cpan.org'
+check cpan
+check "'"
+check '"'
+check '()*&#(*&$;$$!!!#$@#'

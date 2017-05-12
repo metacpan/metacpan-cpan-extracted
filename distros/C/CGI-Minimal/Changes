@@ -1,0 +1,140 @@
+1.29 21 Aug 2007 - Documentation fix to performance hints section.
+                   No functional changes.
+ 
+1.28 18 Aug 2007 - Improved mod_perl2 handling (patch courtesy of Jeremy Nixon).
+                    Added a ':no_subprocess_env' flag to suppress populating
+                    the %ENV environment hash. Added a 'subprocess_env'
+                    static class method to allow smooth co-existance of
+                    ModPerl2 scripts that use ':no_subprocess_env' with ModPerl2
+                    scripts that do not on the same server.
+
+1.27 25 May 2007 - Added example of a command line 'wrapper' script and
+                    of using environment variables as an alternate way
+                    to test scripts via the command line. Added example
+                    for use with FastCGI. Changed behavior for unsupported
+                    HTTP methods. The module used to 'croak' for unsupported
+                    methods, it now 'carp's instead and treats as a 'GET'
+                    (behavior change at suggestion of Roman Mashirov to support
+                    FastCGI better).
+
+ 1.26 06 Apr 2007 - Added decoding of Javascript/EMCAScript style unicode 
+                    escaped (%uxxxx form) parameter data (both to the main
+                    'param' method and to the 'url_decode'/'url_encode' methods)
+                    at the suggestion of Michael Kröll (the core code for
+                    this additional functionality is derived from CGI.pm).
+
+                    Fixed META.yml problems introduced with 1.25.
+
+                    Changed POD/POD Coverage tests to only execute if specifically requested
+
+                    Added examples directory and scripts
+
+ 1.25 20 Apr 2006 - Added 'allow_hybrid_post_get' class method. Tweaked file permissions.
+                    Added regression tests for hybrid forms.
+
+ 1.24 23 Sep 2005 - Added 'Carp' to install requirements. Extended build tests.
+                    Fixed multi-part form decoding bug in handling of degenerate MIME
+                    boundaries. Added fatal errors for mis-calling of param_mime
+                    and param_filename methods.
+
+ 1.23 18.Sep 2005 - Made Test::More optional in build tests. No functional changes.
+
+ 1.22 13.Sep 2005 - Changed POD tests to be more friendly to CPANTS.
+
+ 1.21 11.Sep 2005 - Fixed pod coverage test for compatibility with Perl 5.005.
+
+ 1.20 11.Sep 2005 - Fixed issue causing mod_perl to issue
+                    'Use of uninitialized value.' warnings.
+                    Extended build tests.
+
+ 1.19 10.Sep 2005 - Fixed POD Coverage test error.
+ 
+ 1.18 08.Sep 2005 - Adjusted prerequiste modules lists. Tweaked code for 'strict'.
+                    Extended regression tests to cover more of the code.
+ 
+ 1.17 04 Sep 2005 - More tweaks to regression tests to work around MS-Windows
+                    problems with binary file handles under Perl 5.6.1.
+                    Added 'Build.PL' support back in. Added POD tests.
+                    Minor documentation tweaks.
+
+ 1.16 12 Nov 2004 - Added CGI::Simple to the benchmarks table. Tweaked regresssion
+                    tests for MS-Windows. Added 'delete' and 'delete_all'
+                    methods and regression tests. Added ':preload' flag for
+                    preloading all sub-components at module 'use' time.
+                    Fixed bug introduced with 1.15 in param value setting code.
+
+ 1.15 09 Nov 2004 - Added more regression tests. Fixed url encoder to comply
+                    better with RFC2396. Tuned performance some more. Extended
+                    benchmarks table to cover more CGI form decoders.
+
+ 1.14 16 Oct 2004 - Tuned module load time (about a 40% improvement) and
+                    add performance tuning hints
+
+ 1.13 28 Sep 2004 - Removed support for Module::Build.
+ 
+ 1.12 25 Sep 2004 - Tweaked the default form parser to accept ';' as a field seperator
+                    in addition to '&'. Change suggested by Peter Karman.
+                    Eliminated the explicit application/sgml-form-urlencoded support
+                    as redundant (it still works, it is just not explicitly different
+                    than application/x-www-form-urlencoded support anymore).
+
+                    Adjusted the multipart form parser to be more robust against
+                    malformed MIME boundaries and the build tests to work around a
+                    bug in Perl 5.8.0 UTF8ness and split.
+
+                    Added documentation of command line script testing behavior.
+
+                    Tightened up the code to reduce size (went from 14.9K to 11K).
+
+                    Removed the 'sgml_safe_mode' redirect code since there
+                    was no exposed interface to it anyway.
+
+                    Squashed a bug where the global buffer might fail to initialize
+                    correctly for 0 byte POST forms (only impacted  use of the 'raw'
+                    method for POST use).
+
+                    Added regression test for form truncation
+
+                    Added LICENSE section to documentation
+
+                    Added Module::Build installation support
+
+ 1.11 28 Sep 2003 - Tweaked test script to avoid warnings about
+                    opening STDIN filehandle for writing. No functional
+                    changes.
+
+ 1.10 04 Apr 2003 - Added 'binmode STDIN' on module load to correct for
+                    windows defaulting to 7-bit filehandles. Fixed problem where
+                    split would fail on unusual MIME boundary strings.
+                    Problems noticed by Markus Wichitill.
+
+                    Deferred loading of 'Carp' unless actually needed.
+
+                    Small code cleanups.
+
+                    Removed big disclaimer from .pm and moved
+                    in pod to 'DISCLAIMERS' section
+
+                    Added tests
+
+ 1.09 19 Mar 2002 - Exposed CGI::Minimal::reset_globals class method to support non-
+                    mod_perl persistent execution environments.
+
+ 1.08 26 Jul 2001 - Added 'raw' method for obtaining a dump of the raw input buffer data
+                    without any parsing. Seperated POD docs into a distinct .pod file.
+
+ 1.07 01 Dec 2000 - Added capability of taking a GET style parameter string
+                    via STDIN if running at the command line.
+
+ 1.06 10 Apr 2000 - 'unfixed' use of quotemeta for splitting
+                    multi-part forms. 'split' seems broken
+                    according to the doc pages....
+
+ 1.05 03 Apr 2000 - Fixed breakage in 'param;' from 1.04 changes
+
+ 1.04 03 Apr 2000 - Added capability to set params via the param() method
+                    like 'CGI.pm' plus general code cleanup
+
+ 1.03 02 Mar 2000 - 'mod_perl' compatibility added
+
+ 1.02 09 Jun 1999 - Initial public release.

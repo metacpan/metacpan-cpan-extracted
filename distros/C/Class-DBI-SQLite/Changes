@@ -1,0 +1,47 @@
+Revision history for Perl extension Class::DBI::SQLite
+
+0.11  Thu Oct  6 02:47:28 UTC 2005
+        - Fixed test suite for Windows
+          [cpan #14939]
+
+0.10  Tue Aug 23 21:57:46 UTC 2005
+        - Fixed warnings when there's no PK found
+          (Thanks to William <william at knowmad.com>)
+
+0.09  Sat Apr 16 05:35:45 JST 2005
+	- Fixed some bugs in Multi PK support
+	  (Thanks to David Naughton)
+
+0.08  Thu Mar 17 18:17:34 JST 2005
+	- Kiss SQL::Parser goodbye
+	  (Markus Ramberg)
+
+0.07  Fri Jan 28 03:02:10 JST 2005
+	- Skip REFERENCES sql clause to bypass SQL::Parser's limitation
+	  (Sebastian Riedel)
+
+0.06  Tue Oct 19 16:44:39 JST 2004
+	- Removed debugging statement from the code.
+
+0.05  Tue Oct 19 16:44:39 JST 2004
+	- Fixed error in PRAGMA table_info(?) with newer DBD::SQLite
+	  http://rt.cpan.org/NoAuth/Bug.html?id=7794
+	  Thanks to Seth Gordon and Marcus Ramberg
+
+0.04  Mon Mar 15 20:56:38 JST 2004
+	- Added t/02_table.t in MANIFEST
+	  (Thanks to Tony Bowden)
+	- Added SQL::Dialects::AnyData to PREREQ_PM
+	
+0.03  Thu Feb  5 03:38:20 JST 2004
+	* Fixed bug that SQL::Parser barfs with TIMESTAMP column
+	  (Thanks to Aaron Straup Cope)
+	- Fixed test failure that columns() no longer preserves its order.
+
+0.02  Fri Aug  9 15:59:44 JST 2002
+	- Added tests to see commit() really works (needs Ima::DBI >= 0.27)
+	* Added set_up_table() method
+	  (Thanks to Tomohiro Ikebe <ikebe@cpan.org>)
+
+0.01  Sat Feb 23 22:49:15 2002
+	- original version

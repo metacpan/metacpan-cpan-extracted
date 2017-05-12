@@ -1,0 +1,10 @@
+.travis.yml
+Changes
+lib/Class/Base.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

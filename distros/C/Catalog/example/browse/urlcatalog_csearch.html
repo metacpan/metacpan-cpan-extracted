@@ -1,0 +1,58 @@
+<body bgcolor=#ffffff>
+<title>Search results for _TEXT_</title>
+
+<center>
+<form action=_SCRIPT_ method=POST>
+_HIDDEN_
+<input type=text size=40 name=text value='_TEXT-QUOTED_'>
+<input type=submit value='search'><br>
+_WHAT-MENU_
+</form>
+</center>
+<!-- start categories -->
+<center>Categories matching <b>_TEXT_</b> (_COUNT_)</center>
+<ul>
+<!-- start entry -->
+<li> <a href=_URL_>_PATHNAME_</a>
+<!-- end entry -->
+</ul>
+
+<!-- start pager -->
+Number of pages _MAXPAGES_
+<p>
+_PAGES_
+<!-- end pager -->
+<!-- end categories -->
+<!-- start nocategories -->
+<center>No category matches the search criterion</center>
+<!-- end nocategories -->
+
+<!-- start records -->
+
+<center>Records matching <b>_TEXT_</b> (_COUNT_)</center>
+
+<dl>
+<!-- start entry -->
+
+<!-- start category -->
+<p>
+<dt><b>Category</b> <a href=_URL_>_PATHNAME_</a>
+<!-- end category -->
+<p>
+<dt><a href='_URL-QUOTED_'>_COMMENT_</a>
+<dd>
+<a href='_URL-QUOTED_'>_URL_</a>
+<dd>
+<i><font size=-1>Created _CREATED_</font></i><br>
+<!-- end entry --> 
+</dl>
+
+<!-- start pager -->
+Number of pages _MAXPAGES_
+<p>
+_PAGES_
+<!-- end pager -->
+<!-- end records -->
+<!-- start norecords -->
+<center>No record matches the search criterion</center>
+<!-- end norecords -->

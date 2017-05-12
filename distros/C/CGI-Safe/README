@@ -1,0 +1,27 @@
+CGI-Safe version 1.24
+=====================
+
+Makes running the CGI environment safer by eliminating dangerous %ENV
+variables and presetting certain CGI.pm globals.  See POD for complete 
+details and use.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ CGI.pm 2.20 or newer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 by Curtis "Ovid" Poe <ovid [at] cpan [dot] org>, all rights
+reserved.  This program is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.

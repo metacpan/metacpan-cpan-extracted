@@ -1,0 +1,26 @@
+---
+abstract: 'Convert between RGB, CIEXYZ, CIELUV, CIELCh, HUSL, HUSLp color spaces'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Color-HUSL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Convert::Color: '0'
+  perl: '5.008009'
+resources:
+  repository: https://git.ieval.ro/?p=convert-color-husl.git
+version: '1.000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,12 @@
+use inc::Module::Install;
+name('Clipboard');
+author('Ryan King <rking@panoptic.com>');
+abstract('Cliboard - Copy and Paste with any OS');
+license('perl');
+version_from 'lib/Clipboard.pm';
+perl_version 5.006;
+requires 'Win32::Clipboard' if $^O =~ /mswin|cygwin/i;
+requires 'Mac::Pasteboard' if $^O =~ /macos|darwin/i;
+install_script("scripts/clip$_") for qw'join edit browse accumulate filter';
+check_nmake();
+WriteAll();

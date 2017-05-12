@@ -1,0 +1,40 @@
+CVS/Metrics
+===========
+
+    CVS::Metrics - Utilities for process cvs log
+
+    This module supplies 6 utilities :
+      - cvs_activity
+      - cvs_energy
+      - cvs_tklog (Tk)
+      - cvs_wxlog (wxWindows)
+      - cvs_current
+      - cvs_revbytag
+    and 2 CGI scripts :
+      - cgi_cvs_evolq
+      - cgi_cvs_evolr
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD, GD::Graph, Parse::RecDescent, Chart::Plot::Canvas
+
+COPYRIGHT AND LICENCE
+
+  (c) 2003-2010 Francois PERRAD, France. All rights reserved.
+
+  This library is distributed under the terms of the Artistic Licence.
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org
+

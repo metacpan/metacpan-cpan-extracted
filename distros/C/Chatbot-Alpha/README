@@ -1,0 +1,21 @@
+AiChaos Alpha Chatterbot Module
+-------------------------------
+
+Installation:
+
+	Extract the modules to your perl\lib\Chatbot folder.
+
+Usage:
+
+	See the POD data within Alpha.pm.
+
+Example:
+
+	This distribution comes with a test.pl (for testing) and a
+	testreply.txt (a simple reply file that tests all the features
+	of Alpha).
+
+-------------------------------
+
+Copyright (C) 2005 Casey Kirsle
+http://www.cuvou.com/

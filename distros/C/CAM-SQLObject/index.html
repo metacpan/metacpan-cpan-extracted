@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-SQLObject/index.html">
+<title>CAM-SQLObject</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-SQLObject</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-SQLObject-1.01-docs">v1.01</a>, 2005-04-22</p>
+
+
+
+<p>
+Subclasses of CAM:<!-- -->:SQLObject act as delegates for an SQL
+infrastructure implemented by CAM:<!-- -->:SQLManager XML files.  You name
+your SQL queries in the XML files (kind of like stored procedures) and
+call them by name from your SQLObject instance.  The data retrieved
+from or written to the database is reflected in the instance's data
+structure.  The goal of CAM:<!-- -->:SQLObject is to minimize the amount of
+programming needed to build a full-power interface to an SQL data
+record.
+</p>
+
+<p>
+This class is not meant to be instantiated directly.  Instead, it is
+intended to be the superclass of real database frontend objects.
+Those objects may add several get[field] and set[field] routines to
+act as accessors and mutators for the database fields.  Or, they can
+be very thin layers where all of the implementation is done in the SQL
+XML file.
+</p>
+
+<p>
+See CAM:<!-- -->:SQLManager for XML file examples and a DTD.
+</p>
+
+<p>
+The CPAN module that is most similar to CAM:<!-- -->:SQLObject is Class:<!-- -->:DBI.
+The main difference is that CAM:<!-- -->:SQLObject abstracts as much of the
+SQL away into external files as possible, while Class:<!-- -->:DBI embraces
+the SQL and internalizes it as much as possible.
+</p>
+
+<p>
+Advantages of CAM:<!-- -->:SQLObject vs. Class:<!-- -->:DBI:
+</p>
+
+<p>
+  * SQL commands are disconnected from the Perl code, allowing
+    database adjustments without rewriting code.
+  * Allows complex joins
+  * Allows Perl field names to be different from SQL column names
+  * Facilitates testing and benchmarking SQL queries
+</p>
+
+<p>
+Disadvantages of CAM:<!-- -->:SQLObject vs. Class:<!-- -->:DBI:
+</p>
+
+<p>
+  * Requires nearly all queries to be written out (almost no implicit
+    queries)
+  * Difficult to translate free-form searches from Perl to SQL
+  * Doesn't support foreign keys or triggers
+</p>
+
+<p>
+In summary, Class:<!-- -->:DBI is nice if you have simple tables that don't
+change format.  CAM:<!-- -->:SQLObject is better if you have a large
+collection of well-defined queries, or if your database might change,
+or if you need to keep an eye on all of the possible queries.
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-SQLObject-1.01.tgz">CAM-SQLObject-1.01.tgz</a>
+          (<a href="perl/CAM-SQLObject-1.01.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-SQLObject-1.01.zip">CAM-SQLObject-1.01.zip</a>
+          (<a href="perl/CAM-SQLObject-1.01.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-SQLObject-1.01-docs">CAM-SQLObject-1.01-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr 22 22:37:40 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-SQLObject-1.00.tgz">CAM-SQLObject-1.00.tgz</a>
+          (<a href="gpl/CAM-SQLObject-1.00.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-SQLObject-1.00.zip">CAM-SQLObject-1.00.zip</a>
+          (<a href="gpl/CAM-SQLObject-1.00.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-SQLObject-1.00.html">CAM-SQLObject-1.00.html</a>
+          
+        </td>
+        <td valign="top">Tue Sep 16 17:11:18 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-SQLObject-1.00.tgz">CAM-SQLObject-1.00.tgz</a>
+          (<a href="clotho/CAM-SQLObject-1.00.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-SQLObject-1.00.zip">CAM-SQLObject-1.00.zip</a>
+          (<a href="clotho/CAM-SQLObject-1.00.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-SQLObject-1.00.html">CAM-SQLObject-1.00.html</a>
+          
+        </td>
+        <td valign="top">Tue Sep 16 17:11:18 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

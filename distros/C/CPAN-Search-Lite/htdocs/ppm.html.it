@@ -1,0 +1,38 @@
+<html><meta http-equiv="content-type" content="text/html; charset=UTF-8"><base href="http://cpan.uwinnipeg.ca/htdocs/faqs/ppm.html">
+<!doctype HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- removed -->
+  <meta http-equiv="Content-Type" content="text/html ; CHARSET=UTF-8"><head>
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+  <title>Usando PPM</title>
+  </head>
+
+  <body>
+<br><div class=t4> Depositi di PPM</div>
+Consulti la documentazione che viene con 
+<a href="http://www.activestate.com/">ActivePerl</a>
+per i sensi generali per usando
+PPM. I pacchetti di PPM che compaiono qui possono essere 
+installati con il programma di utilit&agrave; di PPM. Per i pacchetti 
+di ActivePerl, dovreste appena potere installare il pacchetto come <code>install Package-Name</code> da parte delle coperture di PPM; per gli altri 
+pacchetti, potete dovere aggiungere la posizione indicata alla vostra 
+lista dei depositi:
+</p>
+<ul>
+<li><b>http://www.bribes.org/perl/ppm</b>, per <i>il deposito del Perl 5.6/5.8 del 
+www.bribes.org</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer</b>, per <i>il deposito del Perl 5.6 del 
+uwinnipeg</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58</b> (ActivePerl Builds &lt; 819) /
+<b>http://theoryx5.uwinnipeg.ca/ppms/</b> (ActivePerl Builds &gt;= 819),  
+per <i>il deposito del Perl 5.8 del 
+uwinnipeg</i></li>
+</ul>
+Assicurisi che utilizzate un deposito adatto per 
+la vostra versione del Perl (5.6 depositi per ActivePerl costruisce 
+6xx e 5.8 depositi per ActivePerl costruisce 8xx). Inoltre noti 
+che il nome del pacchetto che compare qui, basato sul nome di 
+distribuzione di CPAN, &egrave; quello da usare quando installa un 
+pacchetto; ci&ograve; spesso, ma non sempre, corrisponde al nome del 
+modulo principale nel pacchetto.
+</p>
+</body></html>

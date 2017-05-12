@@ -1,0 +1,150 @@
+NAME
+    Captive::Portal - Perl based solution for controlled network access
+
+ABSTRACT
+    A so called *Captive Portal* written in perl for Linux Gateways. For a
+    longer explanation see:
+
+    <http://en.wikipedia.org/wiki/Captive_Portal>
+
+DESCRIPTION
+    Captive::Portal a.k.a. CaPo is a hotspot solution for Linux Gateways.
+    CaPo is developed and in service at Ulm University for thousands of
+    concurrent users.
+
+    The main focus is scalability, performance, simple administration and
+    user-friendliness. The goals have been achieved by using scalable
+    technologies like ipset/iptables, FastCGI/CGI and a fine tuned
+    concurrent session handling based on the filesystem locking mechanism
+    without any need for an additional RDBMS.
+
+    CaPo is compatible with any FastCGI/CGI enabled HTTPS-server.
+
+ALGORITHM IN SHORT
+    1. Access Denied
+        Only selected protocols like DHCP/DNS/NTP/IMAPS/IPSec/... to
+        selected servers are allowed for unauthenticated clients.
+
+    2. Internal NAT redirect
+        HTTP-traffic on the gateways inside interface - from unauthenticated
+        clients - is redirected by an iptables(8) NAT-rule to a port the
+        HTTP-server is listening, e.g.
+
+         iptables -t nat -A PREROUTING -i eth1 -p tcp --dport 80 -j REDIRECT --to-port 5281
+
+    3. External HTTP redirect
+        The HTTP-server redirects the HTTP-request by a rewrite rule to an
+        HTTPS-request for the CaPo script *capo.fcgi* , e.g.
+
+         <VirtualHost *:5281>
+             RewriteEngine On
+             RewriteRule   .*  https://gateway.acme.org/capo/? [R,L]
+         </VirtualHost>
+
+         CLIENT REQUEST:
+
+            GET /foo/bar HTTP/1.1
+            Host: www.test.org
+
+         SERVER RESPONSE:
+
+            HTTP/1.1 302 Found
+            Location: https://gateway.acme.org/capo/
+
+    4. SESSION LOGIN
+        The *capo.fcgi* script, fired due to this redirected request, offers
+        a splash/login page. After successful login the firewall is
+        dynamically changed to allow this clients IP/MAC tuple for internet
+        access by ipset(8):
+
+            ipset add capo_sessions_ipset CLIENT_IP,CLIENT_MAC
+
+    5. SESSION LOGOUT
+        The capo.fcgi script offers a status/logout page. After successful
+        logout the firewall is dynamically changed to disallow this IP/MAC
+        tuple for internet access.
+
+            ipset del capo_sessions_ipset CLIENT_IP
+
+    6. SESSION IDLE
+        A cronjob fires periodically the capo-ctl.pl script checking for
+        idle or malformed sessions. Idle means, the client didn't send any
+        packet for a period of time (cfg param: IDLE_TIME = 10min). Clients
+        sending packets are registered via iptables/ipset in the
+        capo_activity_ipset.
+
+    7. COMFORTABLE SESSION REACTIVATION
+        For a short period of time (cfg param: KEEP_OLD_STATE_PERIOD = 1h)
+        the session is still on disc, but in IDLE state. If a client has
+        cookies enabled and a HTTP request matches the stored IP/MAC/COOKIE
+        data on disc, the session is reactivated without a login page.
+
+INSTALLATION
+    Please see the INSTALL file in this distribution.
+
+CONFIGURATION
+    The configuration file is searched in the following default places:
+
+        $ENV{CAPTIVE_PORTAL_CONFIG} ||
+        $Bin/../etc/local/config.pl ||
+        $Bin/../etc/config.pl
+
+LOGGING
+    Logging is handled by the Log::Log4perl module. The logging
+    configuration is searched in the following default places:
+
+        $ENV{CAPTIVE_PORTAL_LOG4PERL}   ||
+        $Bin/../etc/local/log4perl.conf ||
+        $Bin/../etc/log4perl.conf
+
+LOCAL ADAPTATION
+    The HTML files are generated from templates (Template-Toolkit syntax).
+    You should use the original template files as stanzas and put the
+    locally changed versions into the local template tree. The template
+    search order prefers the local templates.
+
+    The CSS is based on the wonderful blueprint css framework, see
+    <http://www.blueprintcss.org/>. Of course you may use your own styles if
+    needed.
+
+    The firewall rules and commands are also generated from template files.
+    Normally there is no need to change the firewall rules but it would be
+    possible to add some local needed additional rules without changing the
+    perl code. Be careful, you must understand the algorithm and the
+    different states. Best you ask the author for any modifications.
+
+I18N
+    There exists a template tree for each supported language. Some
+    system/error messages used by the program must also be translated for
+    the message catalog in the config file.
+
+SEE ALSO
+    Captive::Portal::Role::Config, capo.fcgi and capo-ctl.pl
+
+CREDITS
+    Most of the good parts have been implemented by many creative discussion
+    with my colleague Bernd Leibing.
+
+BUGS AND LIMITATIONS
+    There are no known problems with this module.
+
+    Please report any bugs or feature requests to "bug-captive-portal at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Captive-Portal>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+AUTHOR
+    Karl Gaissmaier, "<gaissmai at cpan.org>"
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2013 Karl Gaissmaier, all rights reserved.
+
+    This distribution is free software; you can redistribute it and/or
+    modify it under the terms of either:
+
+    a) the GNU General Public License as published by the Free Software
+    Foundation; either version 2, or (at your option) any later version, or
+
+    b) the Artistic License version 2.0.
+

@@ -1,0 +1,35 @@
+
+### Class::ArrayObjects - enum facilities for array based objects
+
+
+This module makes it easy to build classes using array based objects.
+It's main goal is to allow one to create less memory hungry programs,
+notably in memory-sensitive contexts such as mod_perl.
+
+It is fully documented so you may wish to read the doc for further
+details.
+
+It can be installed in the usual ways:
+
+ - from within the cpan shell (perl -MCPAN -e shell):
+
+   install Class::ArrayObjects
+
+ - after having downloaded it from CPAN, and extracted from its
+ archive:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note to Win32 users: there is currently no PPM for this package as it
+isn't necessary. Simply use one of the above methods, replacing make
+with nmake or whatever other make facility you have available (a fair
+number are available online for free).
+
+This module is licensed under the same terms as Perl itself.
+
+-- Robin Berjon <robin@knowscape.com>
+drug, n:
+  a substance that, injected into a rat, produces a scientific paper.

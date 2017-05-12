@@ -1,0 +1,12 @@
+<form action="%URL%?save" method="post">
+<div align="left">
+<input type="submit" value="Submit" >
+<input type="reset"  value="Reset" >
+%URL%
+</div>
+<font size="2.5">
+<textarea name="text" wrap="virtual" rows="20" cols="80">
+%TEXT%
+</textarea>
+</font>
+</form>

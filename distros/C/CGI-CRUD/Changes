@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::CRUD.
+
+1.06  Mon Jun  4 15:46:53 PDT 2012
+        - Add comma-separated list search capability
+
+1.05  Tue Jul  8 13:57:54 PDT 2008
+        - Release cleanup, documentation.
+
+1.03  Tue Nov 27 03:33:42 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.5.3 -n CGI::CRUD
+

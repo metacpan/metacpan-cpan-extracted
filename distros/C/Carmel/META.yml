@@ -1,0 +1,53 @@
+---
+abstract: 'CPAN Artifact Repository Manager'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Carmel
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CPAN::Common::Index: '0.006'
+  CPAN::Meta::Prereqs: '2.132830'
+  CPAN::Meta::Requirements: '2.129'
+  Carton: v1.0.26
+  Class::Tiny: '1.001'
+  ExtUtils::Install: '1.47'
+  ExtUtils::InstallPaths: '0'
+  File::Copy::Recursive: '0'
+  File::pushd: '1.009'
+  JSON: '0'
+  Menlo: '1.9000'
+  Module::CPANfile: '1.1000'
+  Module::CoreList: '0'
+  Module::Metadata: '1.000003'
+  Module::Runtime: '0.014'
+  Path::Tiny: '0.068'
+  Try::Tiny: '0.20'
+  perl: '5.012000'
+resources:
+  bugtracker: https://github.com/miyagawa/Carmel/issues
+  homepage: https://github.com/miyagawa/Carmel
+  repository: https://github.com/miyagawa/Carmel.git
+version: v0.1.34
+x_contributors:
+  - 'Jan Seidl <seidl@avast.com>'
+  - 'Jarrod Funnell <jfunnell@multiservice.com>'
+  - 'Scott Wiersdorf <scott@perlcode.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

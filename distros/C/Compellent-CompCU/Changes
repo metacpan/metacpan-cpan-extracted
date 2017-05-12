@@ -1,0 +1,20 @@
+Revision history for Perl extension Compellent::CompCU.
+
+0.01  Thu Mar 15 13:52:30 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n Compellent::CompCU
+
+0.02  Thu Mar 22 15:38:00 2012
+	- Fix to Makefile.PL to correct module name.
+
+0.03  Thu Mar 22 15:54:00 2012
+	- Added t/.
+
+0.04  Thu Mar 22 19:52:00 2012
+	- Removed extraneous files (svn and NetBeans stuff) that were accidently included.
+
+0.05  Thu Mar 22 20:10:00 2012
+	- Changed minimum required Perl version to 5.8.9. No language features newer than that were used.
+
+0.06  Fri Mar 23 23:06:00 2012
+	- Corrected dependency list in Makefile.PL.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::GAPI.
+
+0.01  Mon Aug 15 19:38:23 2005
+	- original version; created by h2xs 1.23 with options
+		-X Class::GAPI
+

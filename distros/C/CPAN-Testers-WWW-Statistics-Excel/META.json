@@ -1,0 +1,72 @@
+{
+    "name": "CPAN-Testers-WWW-Statistics-Excel",
+    "version": "0.06",
+    "abstract": "Scripts to create the CPAN Testers Statistics website",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Class::Accessor::Fast": "0",
+                "File::Basename": "0",
+                "File::Path": "0",
+                "Getopt::ArgvFile": "0",
+                "Getopt::Long": "0",
+                "HTML::Entities": "0",
+                "HTML::TokeParser": "0",
+                "IO::File": "0",
+                "Spreadsheet::WriteExcel": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "File::Slurp": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::WWW::Statistics::Excel": {
+            "file": "lib/CPAN/Testers/WWW/Statistics/Excel.pm",
+            "version": "0.06"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "homepage": "http://stats.cpantesters.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Statistics-Excel" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-testers-www-statistics-excel.git",
+            "web": "http://github.com/barbie/cpan-testers-www-statistics-excel",
+            "type": "git"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Plugin/Images.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/basic.t
+t/data/gorch.png
+t/data/one/foo.png
+t/data/three/keep
+t/data/two/bar.png
+t/lib/ImgTestApp.pm
+t/lib/ImgTestApp/Controller/Images.pm
+t/pod.t
+t/pod_coverage.t

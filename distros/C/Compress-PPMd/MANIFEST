@@ -1,0 +1,26 @@
+Buffer.hpp
+Changes
+Coder.hpp
+Constants2.h
+Constants.h
+Constants.h.PL
+Exception.hpp
+Makefile.PL
+MANIFEST
+Model.cpp
+Model.hpp
+PPMd.pm
+PPMd.xs
+ppport.h
+README
+SubAlloc.hpp
+SubAlloc_impl.hpp
+t/1_quijote.t
+t/0_use.t
+t/2_die.t
+t/3_rubbish.t
+t/4_pods.t
+typemap
+Types.hpp
+Wrapper.hpp
+META.yml                                 Module meta-data (added by MakeMaker)

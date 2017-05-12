@@ -1,0 +1,29 @@
+---
+abstract: 'retrieve configuration data from XML files by using XPath'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Refcount: 0
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.2808
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-XPath
+provides:
+  Config::XPath:
+    file: lib/Config/XPath.pm
+    version: 0.16
+  Config::XPath::Reloadable:
+    file: lib/Config/XPath/Reloadable.pm
+    version: 0.16
+requires:
+  XML::XPath: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.16

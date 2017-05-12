@@ -1,0 +1,158 @@
+NAME
+    Class::PObject - Simple framework for programming persistent objects
+
+SYNOPSIS
+    After loading Class::PObject with "use", we can declare a class:
+
+        pobject Person => {
+            columns     => ['id', 'name', 'email'],
+            datasource  => './data'
+        };
+
+    We can also declare the class in its own .pm file:
+
+        package Person;
+        use Class::PObject;
+        pobject {
+            columns     => ['id', 'name', 'email'],
+            datasource  => './data'
+        };
+
+    We can now create an instance of above Person, fill it with data, and
+    save it:
+
+        $person = new Person();
+        $person->name('Sherzod');
+        $person->email('sherzodr[AT]cpan.org');
+        $new_id = $person->save()
+
+    We can access the saved Person later, make necessary changes and save
+    back:
+
+        $person = Person->load($new_id);
+        $person->name('Sherzod Ruzmetov (The Geek)');
+        $person->save()
+
+    We can load multiple objects as well:
+
+        @people = Person->load();
+        for $person ( @people ) {
+            printf("[%02d] %s <%s>\n", $person->id, $person->name, $person->email)
+        }
+
+    or we can load all the objects based on some criteria and sort the list
+    by column name in descending order, and limit the results to only the
+    first 3 objects:
+
+        @people = Person->load(
+                        {name => "Sherzod"},
+                        {sort => "name", direction => "desc", limit=>3});
+
+    We can also seek into a specific point of the result set:
+
+        @people = Person->load(undef, {offset=>10, limit=>10});
+
+DESCRIPTION
+    Class::PObject is a simple class framework for programming persistent
+    objects in Perl. Such objects can store themselves into disk, and
+    restore themselves from disk.
+
+PHILOSOPHY
+    This section has been moved to Class::PObject::Philosophy.
+
+TODO
+    Class::PObject is not a tool for solving all the problems of the
+    Universe. It may be its success rather than its failure. I still want it
+    to do certain things, for I believe they are right down its alley.
+
+    * Multiple object joins
+        Currently "load()" and "fetch()" methods are used for querying a
+        single object. It would be ideal if we could select multiple objects
+        at a time through some *join* syntax.
+
+    * Column Indexes
+        While RDBMS drivers do not need this, db_file, csv and file drivers
+        will not be suitable for production environment until they do.
+
+        Column indexes are needed to retrieve more complex queries much
+        faster, without having to perform linear search. With aforementioned
+        drivers (especially file and csv) once number of records increases,
+        querying objects gets extremely processor intensive if more complex
+        "load()" and "fetch()" methods are used.
+
+    * SET Column types
+        Currently column types can be configured to be of *HAS-A*
+        relationship. It would be great if we could specify *HAS-MANY*
+        relationships. Following syntax is still to be implemented:
+
+            pobject Article => {
+                columns => ['id', 'title', 'authors'],
+                tmap    => {
+                    authors => ['Author']
+                }
+            };
+
+        Notice, *authors* field is set to be able to hold an array of
+        *Author* objects.
+
+NOTES
+    Pobjects try to cache the driver object for more extended periods than
+    pobject's scope permits them to. So a *global destructor* should be
+    applied to prevent unfavorable behaviors, especially under persistent
+    environments, such as mod_perl
+
+    Global variables that *may* need to be cleaned up are:
+
+    $Class::PObject::Driver::$drivername::__O
+        Where "$drivername" is the name of the driver used. If more than one
+        driver is used in your project, more of these variables may exist.
+        This variable holds particular driver object.
+
+    $ClassName::props
+        Holds the properties for this particular PObject named "$ClassName".
+        For example, if you created a pobject called *Person*, then it's
+        properties are stored in global variable "$Person::props".
+
+    For example, if our objects were using just a mysql driver, in our main
+    application we could've done something like:
+
+        END {
+            $Class::PObject::Driver::mysql::__O = undef;
+        }
+
+DRIVER SPECIFICATIONS
+    You can learn more about pobject driver specs in the following manuals:
+
+    Class::PObject::Driver
+        Base pobject driver specification. All the drivers are expected to
+        inherit from this class.
+
+    Class::PObject::Driver::DBI
+        Base pobject driver for all the DBI-related drivers. This inherits
+        from Class::PObject::Driver, but re-defines certain methods with
+        those more relevant to DBI drivers.
+
+    Class::PObject::Driver::DBM
+        Base pobject driver for all the DBM-related drivers. It inherits
+        from Class::PObject::Driver, and re-defines certain methods with
+        those more relevant to DBM
+
+COLUMN TYPE SPECIFICATIONS
+    You can learn more about column type specs from Class::PObject::Type,
+    which is also a base class of all the types.
+
+SEE ALSO
+    http://poop.sourceforge.net/, although little dated, provides brief
+    overview of available tools for programming Persistent Objects in Perl.
+    As of this writing, Class::PObject is still not mentioned.
+
+AUTHOR
+    Sherzod B. Ruzmetov, <sherzod@cpan.org>, http://author.handalak.com/
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2003 Sherzod B. Ruzmetov. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    2003/09/09 00:11:52

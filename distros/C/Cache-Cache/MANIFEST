@@ -1,0 +1,37 @@
+CHANGES
+COPYING
+CREDITS
+DISCLAIMER
+MANIFEST
+Makefile.PL
+README
+STYLE
+lib/Cache/BaseCache.pm
+lib/Cache/BaseCacheTester.pm
+lib/Cache/Cache.pm
+lib/Cache/CacheMetaData.pm
+lib/Cache/CacheSizer.pm
+lib/Cache/CacheTester.pm
+lib/Cache/CacheUtils.pm
+lib/Cache/FileBackend.pm
+lib/Cache/FileCache.pm
+lib/Cache/MemoryBackend.pm
+lib/Cache/MemoryCache.pm
+lib/Cache/Object.pm
+lib/Cache/NullCache.pm
+lib/Cache/SharedMemoryBackend.pm
+lib/Cache/SharedMemoryCache.pm
+lib/Cache/SizeAwareCache.pm
+lib/Cache/SizeAwareCacheTester.pm
+lib/Cache/SizeAwareFileCache.pm
+lib/Cache/SizeAwareMemoryCache.pm
+lib/Cache/SizeAwareSharedMemoryCache.pm
+t/1_test_cache_interface.t
+t/2_test_memory_cache.t
+t/3_test_file_cache.t
+t/4_test_shared_memory_cache.t
+t/5_test_size_aware_file_cache.t
+t/6_test_size_aware_memory_cache.t
+t/7_test_size_aware_shared_memory_cache.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

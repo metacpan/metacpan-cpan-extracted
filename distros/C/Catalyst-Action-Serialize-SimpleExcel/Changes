@@ -1,0 +1,21 @@
+Revision history for Catalyst-Action-Serialize-SimpleExcel
+
+0.015  2011-01-05 09:47:48
+    - Generate README file.
+
+0.014  2011-01-05 09:37:55
+    - Multiple worksheet support.
+
+0.013  2009-09-24 10:22:22
+    - Added $worksheet->keep_leading_zeros(1)
+
+0.012  2008-11-17 15:24:22 PDT
+    - Added automatic column widths support.
+
+0.011  2008-11-12 13:17:16 PDT
+    - First CPAN release, fixed Content-Type and used HashRefInflator in example
+      as jshirley suggested.
+
+0.01_01  2008-11-11 03:34:23 PDT
+    - svn deleted all my files then rebuilt it from screen scrollback buffers,
+      just as I was putting the finishing touches on the dist.

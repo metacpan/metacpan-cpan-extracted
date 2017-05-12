@@ -1,0 +1,120 @@
+Revision history for Perl package CAM::XML
+
+1.14  1 Feb 2006
+      [ENHANCEMENTS]
+      - Added deleteAttribute method
+      [INTERNALS]
+      - Refactoring documentation
+      - Perl::Critic compliance
+
+1.13  4 Oct 2005
+      [ENHANCEMENTS]
+      - Add more tests
+      [INTERNALS]
+      - Clean up code
+      - Refactor into three .pm files instead of one
+
+1.12  22 Apr 2005
+      [ENHANCEMENTS]
+      - Change license from GPL-only to Artistic/GPL
+      - Documentation
+
+1.11  15 Feb 2005
+      [ENHANCEMENTS]
+      - getInnerText method for text nodes
+      [FIXES]
+      - Bug in the XPath code where, e.g., "/tag[2]" was mishandled
+        The bug only manifested when both a tag and a selector were present
+        One or the other alone worked fine
+
+1.10  24 Nov 2004
+      [ENHANCEMENTS]
+      - Add more XPath support
+      - Add getAttributes method
+      [FIXES]
+      - $SIG{__WARN__} and $SIG{__DIE__} problems
+
+1.03  27 Sep 2004
+      [INCOMPATIBLE]
+      - Changed needed XML::Parser version from 2.27 to 2.30
+      [FIXES]
+      - Ampersands, etc, were not escaped when trying to output pretty XML
+      - "-textformat" argument to toString was broken
+
+1.02  7 Jun 2004
+      [ENHANCEMENTS]
+      - Add "-textformat" argument to toString
+
+1.01  1 Apr 2004
+      [FIXES]
+      - Clear the $SIG{__DIE__} handler before parsing XML
+
+1.00  18 Sep 2003 (first public release)
+      [INCOMPATIBLITIES]
+      - Change to Module::Build
+      - Release as GPL
+
+0.29  7 Aug 2003
+      [ENHANCEMENTS]
+      - Add setChildren() method
+
+0.28  7 Aug 2003
+      [ENHANCEMENTS]
+      - Added new methods getAttributeNames() and getChildNodes()
+      - Added new tests
+
+0.27  26 Jun 2003
+      [ENHANCEMENTS]
+      - Added getChildNode method
+      - Better file handling
+
+0.26  2 Jun 2003
+      [FIXES]
+      - Make parse() handle filenames correctly
+
+0.25  22 Apr 2003
+      [ENHANCEMENTS]
+      - Allow CAM::XML::Text objects to be add()ed
+
+0.24  21 Apr 2003
+      [INCOMPATIBILITIES]
+      - Use "-" prefixes for arguments to getNodes
+      [ENHANCEMENTS]
+      - Added getName
+      - Added getAttribute
+      - Added "-path" version of getNodes
+      - Added removeWhiteSpace
+      [FIXES]
+      - Repair and improve the getPathNodes()
+
+0.22  18 Mar 2003
+      [INCOMPATIBILITIES]
+      - Change property "attrs" to "attributes"
+      [ENHANCEMENTS]
+      - Added getNodes method
+      - Added getInnerText
+
+0.20  21 Feb 2003
+      [ENHANCEMENTS]
+      - Added parse()
+      - Make text elements be objects
+      - Tests
+      [FIXES]
+      - Don't alter data until we are writing it out
+        (i.e. live data structure should reflect input, not output)
+
+0.13  21 Feb 2003
+      [ENHANCEMENTS]
+      - Add formatting options to toString
+      - Tests
+
+0.12  20 Feb 2003
+      [FIXES]
+      - Support empty tags for output
+
+0.11  17 Jan 2003
+      [ENHANCEMENTS]
+      - Add CDATA option
+
+0.10  16 Jan 2003
+       Initial revision

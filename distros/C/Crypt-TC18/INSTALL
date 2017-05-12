@@ -1,0 +1,9 @@
+INSTALLATION
+
+To install Crypt::TC18, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

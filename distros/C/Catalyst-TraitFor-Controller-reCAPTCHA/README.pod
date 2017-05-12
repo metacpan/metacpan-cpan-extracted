@@ -1,0 +1,12 @@
+=head1 Catalyst::TraitFor::Controller::reCAPTCHA
+
+This is Catalyst::Controller::reCAPTCHA (http://search.cpan.org/dist/Catalyst-Controller-reCAPTCHA/)
+as a controller role instead of a base controller.
+
+Using this role, you get auto-ssl support and you can pass custom options to the Captcha::reCAPTCHA
+wrapped object.
+
+=head2 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

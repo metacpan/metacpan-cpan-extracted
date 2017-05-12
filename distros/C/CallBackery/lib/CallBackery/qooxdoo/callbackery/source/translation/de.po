@@ -1,0 +1,103 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: you@your.org\n"
+"POT-Creation-Date: 2016-06-30 11:39+0100\n"
+"PO-Revision-Date: 2016-06-30 11:39+0100\n"
+"Last-Translator: you <you@your.org>\n"
+"Language-Team: Team <yourteam@your.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: callbackery/ui/Footer.js:24
+msgid "Support"
+msgstr ""
+
+#: callbackery/ui/Footer.js:35 callbackery/ui/Login.js:129
+msgid "Implemented by %1"
+msgstr "Implementiert von %1"
+
+#: callbackery/ui/Footer.js:40 callbackery/ui/Login.js:131
+msgid "Version %1, %2%3"
+msgstr ""
+
+#: callbackery/ui/Login.js:23 callbackery/ui/Login.js:107
+msgid "Login"
+msgstr "Anmelden"
+
+#: callbackery/ui/Login.js:79
+msgid "Username"
+msgstr "Benutzer"
+
+#: callbackery/ui/Login.js:93
+msgid "Password"
+msgstr "Passwort"
+
+#: callbackery/ui/MsgBox.js:66
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: callbackery/ui/MsgBox.js:67
+msgid "Apply"
+msgstr "Anwenden"
+
+#: callbackery/ui/MsgBox.js:68
+msgid "OK"
+msgstr ""
+
+#: callbackery/ui/MsgBox.js:69
+msgid "Yes"
+msgstr "Ja"
+
+#: callbackery/ui/MsgBox.js:70
+msgid "No"
+msgstr "Nein"
+
+#: callbackery/ui/MsgBox.js:177
+msgid "RPC Error %1"
+msgstr "Kommunikations-Fehler %1"
+
+#: callbackery/ui/TabView.js:41
+msgid "Unsaved Data"
+msgstr "Nicht gespeicherte Daten"
+
+#: callbackery/ui/TabView.js:42
+msgid "This form contains unsaved data. Do you still want to switch?"
+msgstr ""
+"Dieses Formular enthält nicht gespeicherte Daten. Wollen Sie trotzdem "
+"umschalten?"
+
+#: callbackery/ui/form/Auto.js:72
+msgid "dd.MM.yyyy"
+msgstr ""
+
+#: callbackery/ui/plugin/Action.js:97 callbackery/ui/plugin/Action.js:129
+#: callbackery/ui/plugin/Action.js:218
+msgid "Validation Error"
+msgstr "Validierungsfehler"
+
+#: callbackery/ui/plugin/Action.js:98 callbackery/ui/plugin/Action.js:130
+#: callbackery/ui/plugin/Action.js:219
+msgid ""
+"The form can only be submitted when all data fields have valid content."
+msgstr ""
+"Dieses Formular kann nur abgeschickt werden, wenn alle Felder einen gültigen"
+" Inhalt haben."
+
+#: callbackery/ui/plugin/Action.js:144
+msgid "No Data"
+msgstr "Keine Daten."
+
+#: callbackery/ui/plugin/Action.js:153
+msgid "Download Exception"
+msgstr "Download Fehler."
+
+#: callbackery/ui/plugin/Action.js:240
+msgid "Upload Exception"
+msgstr "Upload Fehler"
+
+#: callbackery/ui/plugin/Html.js:50 callbackery/ui/plugin/Form.js:178
+msgid "Loading Form Data"
+msgstr "Daten werden geladen"

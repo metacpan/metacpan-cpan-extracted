@@ -1,0 +1,66 @@
+{
+   "abstract" : "Common class for CPAN::Testers clients",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Testers-Common-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Version" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Config::Perl::V" : "0",
+            "Devel::Platform::Info" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Fcntl" : "0",
+            "File::Glob" : "0",
+            "File::HomeDir" : "0.58",
+            "File::Path" : "0",
+            "File::Spec" : "3.19",
+            "IO::File" : "0",
+            "IPC::Cmd" : "0",
+            "Probe::Perl" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/garu/CPAN-Testers-Common-Client/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/garu/CPAN-Testers-Common-Client"
+      }
+   },
+   "version" : "0.13"
+}

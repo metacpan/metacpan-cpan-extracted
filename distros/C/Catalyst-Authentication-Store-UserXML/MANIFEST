@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Catalyst/Authentication/Store/UserXML.pm
+lib/Catalyst/Authentication/Store/UserXML/Folder.pm
+lib/Catalyst/Authentication/Store/UserXML/User.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_UserXML.t

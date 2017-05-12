@@ -1,0 +1,37 @@
+Since this is a complete rewrite of Cache-Perl 1.0
+this package is not declared stable and lacks some
+features:
+
+1) embedded SQL support. (should be really easy to do,
+   just like Cache::ObjectScript with the addition
+   of allowing bind-out variables.
+
+2) Cache Object support.
+   This should be easy, too.
+   I currently don't need it and Intersystems refuses
+   to give me important informations I would need
+   for that. Basically OO support means blessing a
+   Cache oid to a proxy class that "autoloads" methods
+   and allows access to "properties" by a tied hash.
+
+3) This distribution does not include cacpp, a tool
+   which creates .INC-Files out of Perl sources.
+   Call-Out (which is heavily used on > 100 machines)
+   is not documented here at all. I will add the
+   stuff later.
+
+4) I didn't added list_pack/list_unpack to the dist
+   because it doesn't support all types that Cache
+   supports - if Intersystems would provide exact
+   specifications I would add it.
+   It's interesting to note that list_pack is
+   different to $LISTBUILD because Perl supports
+   "undef". So while $LB() returns a single-element
+   list with a undef value, list_pack() returns an
+   empty string. list_pack(undef) == $LB().
+
+5) AFTER Intersystems fixes THEIR bugs:
+   - removing tty-fixup
+   - removing signal-fixup
+   - using delayed cache init on cperl
+

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Class/Measure.pm
+lib/Class/Measure/Length.pm
+t/00-compile.t
+t/00_measure.t
+t/01_length.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,33 @@
+package <tmpl_var name=prefix>::MainMenu;
+
+use base '<tmpl_var name=prefix>::CGIApp';
+use strict;
+use warnings;
+
+our $VERSION = '1.00';
+
+# -----------------------------------------------
+
+sub cgiapp_init
+{
+	my($self) = @_;
+
+	$self -> cgiapp_init_local();
+	$self -> run_modes(['main_menu']);
+
+} # End of cgiapp_init.
+
+# -----------------------------------------------
+
+sub main_menu
+{
+	my($self)     = @_;
+	my($template) = $self -> load_tmpl('main.menu.tmpl');
+
+	return $self -> output($template -> output() );
+
+} # End of main_menu.
+
+# -----------------------------------------------
+
+1;

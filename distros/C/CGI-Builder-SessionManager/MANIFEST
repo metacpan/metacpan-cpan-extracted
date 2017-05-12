@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00base.t
+lib/CGI/Builder/SessionManager.pm
+META.yml                                 Module meta-data (added by MakeMaker)

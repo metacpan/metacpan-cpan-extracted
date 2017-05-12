@@ -1,0 +1,15 @@
+Revision history for CGI-Application-Plugin-ExtJS
+
+1.000001  2012-11-17 16:25:48 CST6CDT
+       - Put MetaYAML back in dist
+
+1.000000  2012-11-09 17:21:38 CST6CDT
+       - Make HRI "just work"
+
+0.093200 Mon Nov 16 20:23:00 CDT 2009
+       - Fixed deps
+       - Added check to do the right thing if $rs is not paginated
+
+0.092820 Fri Oct 09 00:13:00 CDT 2009
+       - Initial Release
+

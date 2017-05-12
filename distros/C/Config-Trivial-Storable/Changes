@@ -1,0 +1,55 @@
+$Id: Changes 69 2014-05-23 10:27:30Z adam $
+
+Revision history for Perl extension Config::Trivial::Storable
+
+0.32   27 May 2014
+    -   Fix for Windows false positive test failures, only tested against
+        Strawberry Perl (RT #96002)
+    -   Module code unchanged
+
+0.31   23 May 2014
+    -   Final release after dev releases
+    -   Added LICENCE file. Note module is now Lesser GPL not GPL
+
+0.31_3 21 May 2014
+    -   Final prep for 0.31
+
+0.31_2 19 May 2014
+    -   Fix for RT #95343, where Perl 5.19.x appears to change behaviour
+        and additional pre-checks are required to detect "self" calls.
+
+0.31_1 02 May 2014
+    -   Minumum version of Perl 5.10 as I nolonger have access to
+        older perls
+    -   Build/test fixes
+    -   More tests
+    -   Switched to SVN from CVS
+    -   Added example code
+    -   Added rudimentory Module::Build built Makefile.PL
+    -   Changes to test auto-detection and skip rules (thanks to Corion)
+    -   Module code unchanged
+
+0.30 03 Feb 2007
+    -   Storing now controlled with set_storable_file method
+    -   PBP Guidelines adopted
+        -   POD Reordered in-line with PBP guidelines
+        -   Code swept with Perltidy
+        -   Used Perl::Critic to check for PBP deviations
+    -   Test suite updated
+        -   Updated for 0.60 version of Config::Trivial
+        -   Using MANTIFEST.SKIP to keep MANIFEST correct
+        -   Automatically testing the META.yml file
+        -   Improved test coverage
+    -   Crypto signature added
+
+0.20 05 Feb 2006
+    -   Fix Manifest bug (RT# 17439)
+    -   Fix t/80-warn.t bug (RT# 17443)
+    -   More and better tests
+    -   Fix for determining if the config file is the self file
+    -   Add new set_storable_file method
+    -   Run Code through Perltidy using PBP guidelines
+    -   Started work on magic retrieve
+
+0.10 01 Feb 2006
+    -   Created from Config::Trivial

@@ -1,0 +1,26 @@
+Revision history for Perl module CPAN::Mini::Devel::Recent
+
+0.07      2017-04-15 22:19:10-04:00 America/New_York
+
+  - Update metadata
+
+0.06      2011-01-05 22:11:01 EST5EDT
+
+  Bug fixes
+
+  - New compile tests should be more robust
+
+0.05      2010-08-11 17:31:44 EST5EDT
+
+  Bug fixes:
+
+  - Eliminated dependency on CPAN::Mini::Devel
+
+  Other:
+
+  - Switched to Dist::Zilla for distribution management
+    
+0.01 Tue Jun 30 19:15:22 EDT 2009
+
+  - initial release -- no guarantees that it works as promised
+

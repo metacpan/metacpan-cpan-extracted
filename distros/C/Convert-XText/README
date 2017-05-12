@@ -1,0 +1,45 @@
+Convert-XText version 0.01
+==========================
+
+RFC1891 defines the xtext encoding for delivery service notifications,
+to encode non-standard-ascii characters and special chars in a simple
+and fast, as well as easily reversible, way. It is also used for other
+purposes, like for proxied mail filters, where the charset used in the
+communication is known to be an 8bit ASCII dialect.
+
+The input data for encode_xtext simply converts all characters outside
+the range of chr(33) ("!") to chr(126) ("~"), as well as the
+plus ("+") and equal ("=") sign, into a plus sign followed by a two
+digit uppercase hexadecimal representation of the character code.
+
+For example, the I<"="> sign, ASCII 61 or \x3D, will be converted to
+B<+3D>.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+FOR Win32 / MSVC users
+
+   Replace "make" with "nmake" in the commands above.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Exporter.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Chr. Winter
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,3 @@
+@inherit    04.nconf
+-foo
+foo2        bar2

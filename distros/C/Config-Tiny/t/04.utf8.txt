@@ -1,0 +1,4 @@
+[utf8_data]
+Name  = Δ Lady
+Class = Reichwaldstraße
+Type  = Πηληϊάδεω Ἀχιλῆος

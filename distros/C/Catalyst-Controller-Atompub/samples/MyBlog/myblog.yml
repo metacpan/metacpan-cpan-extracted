@@ -1,0 +1,48 @@
+---
+name: MyBlog
+
+Controller::Service:
+    workspace:
+      - title: My Blog
+        collection:
+          - Controller::EntryCollection
+          - Controller::MediaCollection
+
+Controller::EntryCollection:
+    collection:
+        title: Diary
+        categories:
+          - fixed: yes
+            scheme: http://example.com/cats/big3
+            category:
+              - term: animal
+                label: animal
+              - term: vegetable
+                label: vegetable
+              - term: mineral
+                scheme: http://example.com/dogs/big3
+                label: mineral
+
+Controller::MediaCollection:
+    collection:
+        title: Photo
+        accept:
+          - image/png
+          - image/jpeg
+          - image/gif
+
+Model::DBIC:
+    schema_class: MyBlog::Model::Schema
+    connect_info:
+        - dbi:SQLite:dbname=test.db
+
+authentication:
+    dbic:
+        user_class:         DBIC::User
+        user_field:         username
+        password_field:     password
+        password_type:      hashed
+        password_hash_type: MD5
+    http:
+        type: basic
+        realm: My Blog

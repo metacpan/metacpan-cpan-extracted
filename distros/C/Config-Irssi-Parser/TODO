@@ -1,0 +1,4 @@
+* Write a better lexer, with better support for strings
+  and keeps track of the line number, for error messages.
+* Detect more errors in the parser.
+* More tests.

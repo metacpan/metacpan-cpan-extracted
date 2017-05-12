@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <title>ESTool kills raid superblock</title>
+
+</head><body>
+<h2>ESTool kills raid superblock</h2>
+
+<i>Hopefully useful information, use at your own risk</i>
+
+<h3>The Event</h3>
+<p>When one of my 2 samsung disks reported a "Offline uncorrectable"
+I had the idea I should use 
+<a href="http://www.samsung.com/global/business/hdd/support/utilities/ES_Tool.html"
+>samsungs estool</a> to check and possibly
+repair my disk. It came with a comfortable bootable cd image and 
+worked straight forward. So I checked both disks which were reported 
+OK. The major amount of space on these disks is used for an md raid1
+(md1 on sda3, sdb3) which holds the home directories. I rebooted and 
+said raid1 was gone.
+</p>
+
+<h3>What happened?</h3>
+<p>Rereading the text on the download page revealed that estool actually
+does write tests. In addition google told me that such an event 
+<a href="http://forum.ubuntuusers.de/topic/raid5-verschwunden/"
+  >had happened before</a>. It seems that estool
+implements the idea that some space beginning of the the 3rd
+partion is unused. 
+</p>
+
+<h3>Recovery</h3>
+<p>When I took a closer look at my system I found it was actualy working.
+On top of my /dev/md1 sits LVM2. Lvm had discovered sda3 and as sdb3 as
+identical physical volumes and had used one of them. Since it lookded 
+as if the data was still OK I started recreating the raid superblock. 
+<code>mdadm --create</code> only creates the superblock while leavin the
+content intact, so I did a
+</p><pre>
+mdadm --create /dev/md1 --assume-clean --level=raid1 --raid-devices=2 /dev/sda3 missing
+</pre><p> 
+on the disk that had not been used by lvm. Note that 
+<code>--assume-clean</code> is probably not necessary, but thats what 
+I did. After fscking the recreated 
+md device I added the second device to the array.
+</p><pre>
+mdadm --manage --add /dev/md1 /dev/sdb3
+</pre><p>
+This of course triggered a resync. Since the other disk had been
+in use in between this was unavoidable.
+</p>
+
+</body></html>
+
+

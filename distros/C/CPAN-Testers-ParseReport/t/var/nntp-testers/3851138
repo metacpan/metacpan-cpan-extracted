@@ -1,0 +1,220 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:3851138
+Return-Path: <mw487.yahoo.com@gmail.com>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 8233 invoked from network); 10 May 2009 01:39:25 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 10 May 2009 01:39:25 -0000
+Received: (qmail 4813 invoked by uid 225); 10 May 2009 01:39:25 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 4804 invoked by alias); 10 May 2009 01:39:24 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=DK_SIGNED,PERLBUG_CONF,SPF_PASS
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mail-gx0-f208.google.com (HELO mail-gx0-f208.google.com) (209.85.217.208)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Sat, 09 May 2009 18:39:17 -0700
+Received: by gxk4 with SMTP id 4so4291890gxk.2
+        for <cpan-testers@perl.org>; Sat, 09 May 2009 18:39:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:date:subject:from:to
+         :message-id:x-reported-via:mime-version:content-type
+         :content-transfer-encoding;
+        bh=X8h7fwMh+CIEUU/yEjCkEoKImMC9CLAv3KzEjUqZi/s=;
+        b=Jl18Ls4GxPAacBLTc21uchFsUpRUyb4idnQYKSaOFUgxb1hJJLIRR2Iew+2kR2styl
+         ChAcD0TiJ7IWKRSFjAERpapE5A6hj5v6JvQ8858ZKVnAoHkbqG+7fCnsbqZbTcRXh7X2
+         9cay202D01rhLPDG75f5bngwsyXpXUiOunE7E=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=date:subject:from:to:message-id:x-reported-via:mime-version
+         :content-type:content-transfer-encoding;
+        b=xxurzZEuTpoLQEbatCIxVZ85hEy0XjMiDcZGlA1yFrGsSF/+yhVS5wXcm8wvWX+2sa
+         NimNx92EvpfuIiqvjA/qaIOYktW/it51QBAtY6fjj2L3cpxV02U7HNVfm3VrIpRVfxBw
+         V1m/JnqBysZ1cbXXe3k/HvmuuYpn4L6GTsCGU=
+Received: by 10.90.31.8 with SMTP id e8mr4661089age.45.1241919552755;
+        Sat, 09 May 2009 18:39:12 -0700 (PDT)
+Received: from michaelwest16c2 (pool-72-78-62-106.phlapa.east.verizon.net [72.78.62.106])
+        by mx.google.com with ESMTPS id 30sm4157085agc.29.2009.05.09.18.39.11
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Sat, 09 May 2009 18:39:11 -0700 (PDT)
+Date: Sat, 9 May 2009 20:39:11 -0500
+Subject: PASS Cache-Memcached-1.26 cygwin-thread-multi-64int 1.5.25(0.15642)
+To: cpan-testers@perl.org
+Message-ID: <1241919551.428cFbd0.3988@michaelwest16c2>
+X-Reported-Via: Test::Reporter 1.53_03, via CPAN::Reporter 1.1705
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: mw487.yahoo.com@gmail.com
+
+This distribution has been tested as part of the CPAN Testers
+effort to test as many new uploads to CPAN as possible.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Brad Fitzpatrick,
+=20=20=20=20
+This is a computer-generated report for Cache-Memcached-1.26
+on perl 5.10.0 patch 34065, created by CPAN-Reporter-1.1705.=20
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester:=20
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from 'make test':
+
+/usr/bin/perl5.10.0.exe "-MExtUtils::Command::MM" "-e" "test_harness(0, 'bl=
+ib/lib', 'blib/arch')" t/*.t
+t/01_use..................ok
+t/02_keys.................skipped: No memcached instance running at 127.0.0=
+.1:11211
+t/03_stats................skipped: No memcached instance running at 127.0.0=
+.1:11211
+t/04_noreply..............skipped: No memcached instance running at 127.0.0=
+.1:11211
+t/05_reconnect_timeout....ok
+t/100_flush_bug...........ok
+All tests successful.
+Files=3D6, Tests=3D10,  6 wallclock secs ( 0.02 usr  0.09 sys +  0.68 cusr =
+ 1.23 csys =3D  2.02 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have=20=20
+    ------------- ---- ------
+    Storable      0    2.18=20=20
+    String::CRC32 0    1.4=20=20=20
+    Time::HiRes   0    1.9715
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING =3D 1
+    COMSPEC =3D C:\WINDOWS\system32\cmd.exe
+    NUMBER_OF_PROCESSORS =3D 1
+    PATH =3D /usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/cygdrive/c/WINDOW=
+S/system32:/cygdrive/c/WINDOWS:/cygdrive/c/WINDOWS/System32/Wbem:/cygdrive/=
+c/Program Files/jEdit:/cygdrive/c/strawberry/c/bin:/cygdrive/c/strawberry/p=
+erl/bin
+    PERL5LIB =3D /home/Administrator/.cpan/build/String-CRC32-1.4-qey7Op/bl=
+ib/arch:/home/Administrator/.cpan/build/String-CRC32-1.4-qey7Op/blib/lib
+    PERL5OPT =3D=20
+    PERL5_CPANPLUS_IS_RUNNING =3D 3988
+    PERL5_CPAN_IS_RUNNING =3D 3988
+    PERL5_MINISMOKEBOX =3D 0.14
+    PERL_EXTUTILS_AUTOINSTALL =3D --defaultdeps
+    PERL_MM_USE_DEFAULT =3D 1
+    PROCESSOR_IDENTIFIER =3D x86 Family 6 Model 15 Stepping 6, GenuineIntel
+    TEMP =3D /cygdrive/c/DOCUME~1/ADMINI~1/LOCALS~1/Temp
+    TERM =3D dumb
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X =3D /usr/bin/perl5.10.0.exe
+    $UID/$EUID =3D 500 / 500
+    $GID =3D 513 0 513 544 545
+    $EGID =3D 513 0 513 544 545
+
+Perl module toolchain versions installed:
+
+    Module              Have=20=20=20
+    ------------------- -------
+    CPAN                1.9304=20
+    Cwd                 3.2701=20
+    ExtUtils::CBuilder  0.21=20=20=20
+    ExtUtils::Command   1.16=20=20=20
+    ExtUtils::Install   1.52=20=20=20
+    ExtUtils::MakeMaker 6.50=20=20=20
+    ExtUtils::Manifest  1.56=20=20=20
+    ExtUtils::ParseXS   2.19_01
+    File::Spec          3.2702=20
+    Module::Build       0.32=20=20=20
+    Module::Signature   0.55=20=20=20
+    Test::Harness       3.14=20=20=20
+    Test::More          0.86=20=20=20
+    YAML                0.68=20=20=20
+    YAML::Syck          1.05=20=20=20
+    version             0.76=20=20=20
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0 patch 34065) config=
+uration:
+  Platform:
+    osname=3Dcygwin, osvers=3D1.5.25(0.15642), archname=3Dcygwin-thread-mul=
+ti-64int
+    uname=3D'cygwin_nt-5.1 reini 1.5.25(0.15642) 2008-06-12 19:34 i686 cygw=
+in '
+    config_args=3D'-de -Dmksymlinks -Dusethreads -Dmad=3Dy -Dusedevel'
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Ddefine
+    useithreads=3Ddefine, usemultiplicity=3Ddefine
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef
+    use64bitint=3Ddefine, use64bitall=3Dundef, uselongdouble=3Dundef
+    usemymalloc=3Dy, bincompat5005=3Dundef
+  Compiler:
+    cc=3D'gcc', ccflags =3D'-DPERL_USE_SAFE_PUTENV -U__STRICT_ANSI__ -fno-s=
+trict-aliasing -pipe -I/usr/local/include',
+    optimize=3D'-O3',
+    cppflags=3D'-DPERL_USE_SAFE_PUTENV -U__STRICT_ANSI__ -fno-strict-aliasi=
+ng -pipe -I/usr/local/include'
+    ccversion=3D'', gccversion=3D'3.4.4 (cygming special, gdc 0.12, using d=
+md 0.125)', gccosandvers=3D''
+    intsize=3D4, longsize=3D4, ptrsize=3D4, doublesize=3D8, byteorder=3D123=
+45678
+    d_longlong=3Ddefine, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D12
+    ivtype=3D'long long', ivsize=3D8, nvtype=3D'double', nvsize=3D8, Off_t=
+=3D'off_t', lseeksize=3D8
+    alignbytes=3D8, prototype=3Ddefine
+  Linker and Libraries:
+    ld=3D'g++', ldflags =3D' -Wl,--enable-auto-import -Wl,--export-all-symb=
+ols -Wl,--stack,8388608 -Wl,--enable-auto-image-base -L/usr/local/lib'
+    libpth=3D/usr/local/lib /usr/lib /lib
+    libs=3D-lgdbm -ldb -ldl -lcrypt -lgdbm_compat
+    perllibs=3D-ldl -lcrypt
+    libc=3D/usr/lib/libc.a, so=3Ddll, useshrplib=3Dtrue, libperl=3Dlibperl.a
+    gnulibc_version=3D''
+  Dynamic Linking:
+    dlsrc=3Ddl_dlopen.xs, dlext=3Ddll, d_dlsymun=3Dundef, ccdlflags=3D' '
+    cccdlflags=3D' ', lddlflags=3D' --shared  -Wl,--enable-auto-import -Wl,=
+--export-all-symbols -Wl,--stack,8388608 -Wl,--enable-auto-image-base -L/us=
+r/local/lib'=
+

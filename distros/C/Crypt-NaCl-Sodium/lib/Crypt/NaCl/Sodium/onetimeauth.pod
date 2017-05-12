@@ -1,0 +1,183 @@
+# PODNAME: Crypt::NaCl::Sodium::onetimeauth
+# ABSTRACT: One-time authentication (Poly1305)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::onetimeauth - One-time authentication (Poly1305)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_onetimeauth = Crypt::NaCl::Sodium->onetimeauth();
+
+    my ($msg, $key, $mac);
+
+    $msg = "First message";
+
+    # generate one-time secret key
+    $key = $crypto_onetimeauth->keygen();
+
+    # calculate authenticator
+    $mac = $crypto_onetimeauth->mac( $msg, $key );
+
+    # verify message
+    if ( $crypto_onetimeauth->verify($mac, $msg, $key) ) {
+        # verified OK
+    }
+
+=head1 DESCRIPTION
+
+The C<crypto_onetimeauth>'s L</mac>, viewed as a function of the message for a
+uniform random key, is designed to meet the standard notion of unforgeability
+after a single message. After the sender authenticates one message, an attacker
+cannot find authenticators for any other messages.
+
+The sender must not use this function to authenticate more than one message
+under the same key. Authenticators for two messages under the same key should be
+expected to reveal enough information to allow forgeries of authenticators on
+other messages.
+
+When multiple messages need to be authenticated use
+L<Crypt::NaCl::Sodium::auth>.
+
+=head1 METHODS
+
+=head2 keygen
+
+    my $key = $crypto_onetimeauth->keygen();
+
+Helper method to generate a random key to be used by C<$crypto_onetimeauth>.
+
+The length of the C<$key> equals L</KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 mac
+
+    my $mac = $crypto_onetimeauth->mac( $msg, $key );
+
+Computes the MAC of the C<$msg> using given C<$key>.
+
+The length of the C<$mac> equals L</BYTES>.
+
+B<NOTE:> Never use this method to authenticate more than one message
+under the same key.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 verify
+
+    unless ( $crypto_onetimeauth->verify( $mac, $msg, $key ) ) {
+        die "Impostor alert!";
+    }
+
+Verifies the integrity and authenticity of the C<$msg> using given C<$mac> and C<$key>.
+
+Method returns true if message has been verified, false otherwise.
+
+=head1 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx = $crypto_onetimeauth->init( $key );
+
+    $ctx->update( $msgX );
+    $ctx->update( $msgY )->update( $msgZ, ... );
+
+    my $mac = $ctx->final();
+
+    my $msgXYZ = join('', $msgX, $msgY, $msgZ, ...);
+    unless ( $crypto_onetimeauth->verify( $mac, $msgXYZ, $key) ) {
+        die "Impostor alert!";
+    }
+
+=head2 init
+
+    my $ctx = $crypto_onetimeauth->init( $key );
+
+Creates a context for multi-part computation using given C<$key> generated using
+L</keygen>.
+
+Returns C<Crypt::NaCl::Sodium::onetimeauth::stream> object which encapsulates
+the computation state of the algorithm.
+
+=head2 clone
+
+    while ( <> ) {
+        $ctx->update( $_ );
+        print "Line: $.: ", $ctx->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx> object, that contains the current computation
+state.
+
+=head2 update
+
+    $ctx->update( $msg, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx> object itself.
+
+=head2 final
+
+    my $mac = $ctx->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_onetimeauth->KEYBYTES;
+
+Returns the length of key.
+
+=head2 BYTES
+
+    my $mac_length = $crypto_onetimeauth->BYTES;
+
+Returns the length of MAC.
+
+=head1 SECURITY MODEL
+
+C<crypto_onetimeauth> uses I<Poly1305> authenticator, which is I<proven> to meet
+the standard notion of unforgeability after a single message.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Cryptography in NaCl|http://cr.yp.to/highspeed/naclcrypto-20090310.pdf>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

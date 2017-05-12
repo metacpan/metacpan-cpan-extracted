@@ -1,0 +1,6 @@
+This module was thrown together...sorry.
+
+1) Modify out_file() so it's not tied to puz2text().
+Considers all but one single letter as a word, which apparently
+doesn't conform to US Crossword rules (are there non-US rules?).
+2) Have a "strict" function that requires conformity to set of rules?

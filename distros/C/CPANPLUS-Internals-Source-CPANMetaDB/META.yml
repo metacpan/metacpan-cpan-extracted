@@ -1,0 +1,28 @@
+---
+abstract: 'CPAN Meta DB source implementation'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Jos Boumans <kane@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPANPLUS-Internals-Source-CPANMetaDB
+requires:
+  CPANPLUS: 0.9001
+  File::Fetch: 0
+  File::Spec: 0
+  Locale::Maketext::Simple: 0
+  Module::Load::Conditional: 0
+  Params::Check: 0
+  Parse::CPAN::Meta: 0
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/cpanplus-internals-source-cpanmetadb
+  repository: https://github.com/bingos/cpanplus-internals-source-cpanmetadb.git
+version: 0.06

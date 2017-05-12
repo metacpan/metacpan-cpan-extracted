@@ -1,0 +1,43 @@
+Revision history for Perl module Config::ApacheExtended
+
+0.01 Wed Dec 17 18:17:01 2003
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+1.11 Mon Dec 29 10:52:00 2003
+	- first release.
+
+1.12 Mon Dec 29 14:27:00 2003
+	- some minor changes
+		- added the ABSTRACT to pod
+		- Filled in the README file
+		- added META.yml (via MakeMaker)
+		- removed scripts/ from distribution
+
+1.13 Tue Jan 06 10:04:00 2004
+	- fixed dependancy declaration in Makefile.PL
+		This is because Carp prior to 5.8.0 does not have a version set
+		according to the CPAN Testing Collective.
+	- minor documentation changes
+
+1.14 Fri Jan 09 09:47:31 CST 2004
+	- fixed another dependancy problem (this one was IO::File)
+		another issue found by the CPAN Testing Collective.
+	- fixed issue caused by moving the version to its own file (VERSION)
+		this works, but I had not included the VERSION file in the distribution
+
+1.15 Mon Feb 16 15:07:10 CST 2004
+	- fixed an issue with quoting (May not be complete)
+		issue was concerning absolute paths.  They looked like a quote-like
+		construct to perl_quotelike.  So I had to replace perl_quotelike
+		directive in the grammar with a regular expression.  This means that
+		only ' & " are considered as quote characters.
+
+1.16 Fri Sep 17 10:48:40 CDT 2004
+	- Changed variable substitution
+		The change involved not "joining" the list of substituted
+		values with the "$LIST_SEPARATOR" value when the "@" is used
+		as the prefix.  Now when "@" prefix is used it will insert the
+		referenced values as a list.  The $v[x] syntax is still supported,
+		and if no index is given then the first value is still used.
+	- Added the long missing VARIABLE SUBSTITUTION section. (I thought it was there
+		honest)

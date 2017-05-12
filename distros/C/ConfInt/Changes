@@ -1,0 +1,13 @@
+Revision history for Perl extension ConfInt.
+
+0.01  Mon Dec  3 15:01:06 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n ConfInt
+
+1.0   Mon Dec  3 15:01:06 2001
+        - ConfInt source code written and added by Christian Gernhardt
+          Copyright (C) 2001 IBM Deutschland Entwicklungg GmbH, IBM Corporation
+
+1.0.1 Thu Feb  7 14:15:34 2002
+        - test.pl patch with the suggestions proposed by ASSAD Arnaud (thanks)
+          Copyright (C) 2001 IBM Deutschland Entwicklungg GmbH, IBM Corporation

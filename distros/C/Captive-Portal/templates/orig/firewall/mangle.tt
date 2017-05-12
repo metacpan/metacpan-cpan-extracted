@@ -1,0 +1,31 @@
+#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+# mangle rules
+#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+
+# mark all incoming traffic if destination IP is an active client
+iptables -t mangle -I PREROUTING ! -i [%- capture_if -%] -j capo_incoming
+iptables -t mangle -A PREROUTING ! -i [%- capture_if -%] -j ACCEPT
+
+# mark this client IP as active, needed for purging inactive clienst
+# and in order to allow all incoming traffic to active clients only
+iptables -t mangle -A PREROUTING -s [%- capture_net -%] -j capo_activity
+
+# now jump to ...
+iptables -t mangle -A PREROUTING -s [%- capture_net -%] -j capo_sessions
+iptables -t mangle -A PREROUTING -m mark --mark 1       -j ACCEPT
+
+# now jump to ...
+iptables -t mangle -A PREROUTING -s [%- capture_net -%] -j capo_open_map
+iptables -t mangle -A PREROUTING -m mark --mark 1       -j ACCEPT
+
+# now jump to ...
+iptables -t mangle -A PREROUTING -s [%- capture_net -%] -j capo_open_services
+iptables -t mangle -A PREROUTING -m mark --mark 1       -j ACCEPT
+
+# now jump to ...
+iptables -t mangle -A PREROUTING -s [%- capture_net -%] -j capo_open_clients
+iptables -t mangle -A PREROUTING -m mark --mark 1       -j ACCEPT
+
+# vim: sw=2 ft=sh

@@ -1,0 +1,104 @@
+NAME
+    Catalyst::Plugin::FormValidator::Simple::Auto - Smart validation with
+    FormValidator::Simple
+
+SYNOPSIS
+    Loading:
+
+        use Catalyst qw/
+          ConfigLoader
+          FormValidator::Simple
+          FormValidator::Simple::Auto
+          /;
+
+    myapp.yml:
+
+        validator:
+          profiles: __path_to(profiles.yml)__
+          messages: __path_to(messages.yml)__
+          message_format: <span class="error">%s</span>
+          # and other FormValidator::Simple config
+
+    profiles.yml:
+
+        # profiles.yml
+        action1:
+          param1:
+            - NOT_BLANK
+            - ASCII
+            - [ 'LENGTH', 4, 10 ]
+          param2:
+            - NOT_BLANK
+
+    Then, using in your action:
+
+        sub action1 : Global {
+            my ($self, $c) = @_;
+        
+        # $c->form($profile) already executed!
+            unless ($c->form->has_error) {
+                ...
+            }
+        }
+
+DESCRIPTION
+    This plugin provide auto validation to Plugin::FormValidator::Simple.
+
+    You can define validation profiles into config or YAML file, and no
+    longer have to write it in actions.
+
+BUNDLING ERROR MESSAGES
+    With 0.08 or earlier version, you need define validator profiles and
+    error messages in separately.
+
+    So, you had to write two settings like this:
+
+        # profiles.yml
+        action1:
+          param1:
+            - NOT_BLANK
+        
+    # messages.yml
+        action1:
+          param1:
+            NOT_BLANK: param1 is required!
+
+    It's bothered!
+
+    Since 0.09, you can place error messages in profiles config.
+
+    Above two configs is equals to:
+
+        # profiles.yml
+        action1:
+          param1:
+            - rule: NOT_BLANK
+              message: param1 is required!
+
+METHODS
+  validator_profile
+    An accessor for current profile name
+
+  form_messages
+  form_messages( 'key' );
+    Return error messages about current validator profile.
+
+    If the key isn't presented, return all messages as hash.
+
+EXTENDED METHODS
+  setup
+  prepare
+  forward
+ORIGINAL IDEA
+    Daisuke Maki <dmaki@cpan.org>
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

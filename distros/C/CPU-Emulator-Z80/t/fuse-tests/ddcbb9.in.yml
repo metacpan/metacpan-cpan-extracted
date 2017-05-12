@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 86
+    - 185
+  1466:
+    - 200
+name: ddcbb9
+registers:
+  AF: 24503
+  AF_: 0
+  BC: 43038
+  BC_: 0
+  DE: 58066
+  DE_: 0
+  HL: 16663
+  HL_: 0
+  I: 0
+  IX: 1380
+  IY: 18593
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Modules for handling RDF data within the Catmandu framework",
+   "author" : [
+      "Jakob Voß"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-RDF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.9209",
+            "RDF::LDF" : "0.19",
+            "RDF::NS" : "20140910",
+            "RDF::Query" : "2.913",
+            "RDF::Trine" : "1.013",
+            "RDF::aREF" : "0.25",
+            "perl" : "v5.13.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::LWP::UserAgent" : "0.025",
+            "Test::More" : "0.99"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-RDF/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-RDF",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-RDF.git",
+         "web" : "https://github.com/LibreCat/Catmandu-RDF"
+      }
+   },
+   "version" : "0.31",
+   "x_contributors" : [
+      "Jakob Voß <jakob.voss@gbv.de>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ]
+}
+

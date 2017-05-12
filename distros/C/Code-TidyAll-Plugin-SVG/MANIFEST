@@ -1,0 +1,17 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/Code/TidyAll/Plugin/SVG.pm
+t/00_compile.t
+t/fixme.t
+t/pod.t

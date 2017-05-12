@@ -1,0 +1,9 @@
+.cvsignore
+\.svn
+blib/
+\bCVS\b
+^Makefile$
+pm_to_blib
+_build
+^Build$
+~$

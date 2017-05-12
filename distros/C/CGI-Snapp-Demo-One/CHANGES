@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Snapp::Demo::One.
+
+1.02  Tue Sep 18 11:23:00 2012
+	- Make CGI::Snapp V 1.03 the pre-req.
+
+1.01  Tue Sep 18 11:23:00 2012
+	- Make CGI::Snapp V 1.02 the pre-req, up from V 1.00.
+
+1.00  Thu Mar  1 09:00:00 2012
+	  - Original version

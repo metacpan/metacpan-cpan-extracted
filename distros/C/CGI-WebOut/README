@@ -1,0 +1,68 @@
+CGI/WebOut
+==========
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+
+  # Simple CGI script (no 500 Apache error!)
+  use CGI::WebOut;
+  print "Hello world!"; # wow, we may NOT output Content-type!
+  # Handle output for {}-block
+  my $str=grab {
+    print "Hi there!\n";
+  };
+  $str=~s/\n/<br>/sg;
+  print $str;
+
+DESCRIPTION
+
+CGI::WebOut - Perl extension for handle CGI output (in PHP-style)
+
+This module is used to make CGI programmer's work more comfortable. 
+The main idea is to handle output stream (STDOUT) to avoid any data 
+to be sent to browser without Content-type header. Of cource,
+you may also send your own headers to browser using Header(). Any 
+errors will be printed at the bottom of page "in PHP-style". You may 
+also use Carp module together with CGI::WebOut.
+
+You may also handle any program block's output (using print etc.)
+and place it to the variable using grab {...} subroutine. It is a 
+very useful feature for lots of CGI-programmers.
+
+The last thing - support for try-catch "instruction". WARNING: this 
+is NOT tre real instruction, like map {...}, grep {...} etc.! Be careful
+with return instruction in try-catch blocks.
+
+Note: you may use CGI::WebOut not only for CGI scripts. In "non-CGI" 
+script headers are NOT output, and warnings are shown as plain-text. 
+grab {...}, try-catch etc. work as usual.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp, Exporter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) Dmitry Koterov <koterov at cpan dot org>
+http://www.dklab.ru/chicken/4.html

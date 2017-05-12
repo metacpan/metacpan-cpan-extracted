@@ -1,0 +1,7 @@
+test:
+    default_keynum: 1
+    none: correct password
+    1: correct password
+fail_test:
+    default_keynum: 1
+    1: wrong password

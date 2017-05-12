@@ -1,0 +1,92 @@
+{
+   "abstract" : "Full C JIT compiling using the Tiny C Compiler",
+   "author" : [
+      "David Mertens <dcmertens.perl@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "C-TinyCompiler",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::TinyCC" : "0.05",
+            "ExtUtils::CBuilder" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::TinyCC" : "0.05",
+            "Devel::PPPort" : "0",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::TinyCC" : "0.05",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "C::TinyCompiler" : {
+         "file" : "lib/C/TinyCompiler.pm",
+         "version" : "0.05"
+      },
+      "C::TinyCompiler::Callable" : {
+         "file" : "lib/C/TinyCompiler/Callable.pm",
+         "version" : "0.05"
+      },
+      "C::TinyCompiler::Perl" : {
+         "file" : "lib/C/TinyCompiler/Perl.pm"
+      },
+      "C::TinyCompiler::Perl::AV" : {
+         "file" : "lib/C/TinyCompiler/Perl/AV.pm",
+         "version" : "0.05"
+      },
+      "C::TinyCompiler::Perl::Croak" : {
+         "file" : "lib/C/TinyCompiler/Perl/Croak.pm",
+         "version" : "0.05"
+      },
+      "C::TinyCompiler::Perl::SV" : {
+         "file" : "lib/C/TinyCompiler/Perl/SV.pm",
+         "version" : "0.05"
+      },
+      "C::TinyCompiler::Perl::Typedefs" : {
+         "file" : "lib/C/TinyCompiler/Perl/Typedefs.pm"
+      },
+      "C::TinyCompiler::StretchyBuffer" : {
+         "file" : "lib/C/TinyCompiler/StretchyBuffer.pm"
+      },
+      "C::TinyCompiler::package" : {
+         "file" : "lib/C/TinyCompiler/package.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/run4flat/perl-TCC/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/run4flat/perl-TCC"
+      }
+   },
+   "version" : "0.05"
+}

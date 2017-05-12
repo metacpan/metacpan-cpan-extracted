@@ -1,0 +1,108 @@
+NAME
+    Convert::DUDE - Conversion between Unicode and DUDE
+
+SYNOPSIS
+      use Convert::DUDE ':all';
+
+      # handles 'dq--' prefix
+      $domain  = to_dude($utf8);
+      $utf8    = from_dude($domain);
+
+      # don't care about 'dq--' prefix
+      # not exported by default           
+      $dudestr = dude_encode($utf8);
+      $utf8    = dude_decode($dudestr);
+
+DESCRIPTION
+    This module provides functions to convert between DUDE (Differential
+    Unicode Domain Encoding) and Unicode encodings.
+
+    Quoted from http://www.i-d-n.net/draft/draft-ietf-idn-dude-02.txt
+
+      DUDE is a reversible transformation from a sequence of nonnegative
+      integer values to a sequence of letters, digits, and hyphens (LDH
+      characters).  DUDE provides a simple and efficient ASCII-Compatible
+      Encoding (ACE) of Unicode strings for use with Internationalized
+      Domain Names.
+
+FUNCTIONS
+    Following two functions are exported to your package when you use
+    Convert::DUDE.
+
+    to_dude
+          $domain = to_dude($utf8);
+
+        takes UTF8-encoded string, encodes it in DUDE and adds 'dq--' prefix
+        in front.
+
+    from_dude
+          $utf8 = from_dude($domain);
+
+        takes 'dq--' prefixed DUDE encoded string and decodes it to original
+        UTF8 strings.
+
+    Following two functions can be exported to your package when you import
+    them explicitly.
+
+    dude_encode
+          $dude = dude_encode($utf8);
+
+        takes UTF8-encoded string, encodes it in DUDE. Note that it doesn't
+        care about 'dq--' prefix.
+
+    dude_decode
+          $utf8 = dude_decode($dude);
+
+        takes DUDE encoded string and decodes it to original UTF8 strings.
+        Note that it doesn't care about 'dq--' prefix.
+
+    Those functions above may throw exeptions in case of error. You may have
+    to catch 'em with eval block.
+
+CLASS METHODS
+    prefix
+          $prefix = Convert::DUDE->prefix;
+          Convert::DUDE->prefix('xx--');
+
+        gets/sets DUDE prefix. 'dq--' for default.
+
+EXAMPLES
+    Here's a sample code which does RACE-DUDE conversion.
+
+      use Convert::RACE;
+      use Convert::DUDE;
+      use Unicode::String qw(utf16);
+               
+      my $race = "bq--aewrcsy";
+
+      eval {
+          my $utf16 = from_race($race);
+          my $dude = to_dude(utf16($utf16)->utf8);
+          print "RACE: $race => DUDE: $dude\n";
+      };
+
+      if ($@) {
+          warn "Conversion failed: $@";
+      }
+  
+CAVEATS
+    *   There's no constraints on the input. See internet draft for nameprep
+        about IDN input validation.
+
+TODO
+    *   Consider mixed-case annotation. See internet draft for DUDE for
+        details.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This module comes without warranty of any kind.
+
+SEE ALSO
+    the Convert::RACE manpage, http://www.i-d-n.net/,
+    http://www.i-d-n.net/draft/draft-ietf-idn-dude-02.txt, the
+    Unicode::String manpage, the Jcode manpage
+

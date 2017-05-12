@@ -1,0 +1,7 @@
+<C O="0" T="[1]" TL="2" V="12">
+    <P O="2" T="[UNIVERSAL 2]" TL="2" V="1" A="INTEGER">$integer1</P>
+    <P O="5" T="[UNIVERSAL 2]" TL="2" V="2" A="INTEGER">$integer2</P>
+    <C O="9" T="[UNIVERSAL 16]" TL="2" V="3" A="SEQUENCE">
+        <P O="11" T="[UNIVERSAL 10]" TL="2" V="1" A="ENUMERATED">$enumerated1</P>
+    </C O="14" T="[UNIVERSAL 16]" A="SEQUENCE" L="5">
+</C O="14" T="[1]" L="14">

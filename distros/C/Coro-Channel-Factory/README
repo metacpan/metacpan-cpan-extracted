@@ -1,0 +1,53 @@
+Coro::Channel::Factory version 1.00
+===================================
+
+NAME
+
+Coro::Channel::Factory - Factory for named Coro::Channel queues.
+
+SYNOPSIS
+
+   use Coro::Channel::Factory;
+
+   # Initialise factory
+   my $factory = Coro::Channel::Factory->new();
+
+   # Get a handle to a (possibly previously undeclared) Coro::Channel, and put 
+   # something..
+   my $channel = $factory->name('some channel name');
+   $channel->put($var);
+
+   # Interacting directly - no intermediate handle object..
+   $factory->name('some channel name')->put($other_var);
+   my $item = $factory->name('some channel name')->get;
+
+DESCRIPTION
+
+This module provides a very simple name-binding for Coro::Channel, removing the
+need to track individual Coro::Channel objects.
+
+As long as the Coro::Channel::Factory object is available, any named 
+Coro::Channel can be utilised.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   Coro
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Phillip O'Donnell <podonnell@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself, either Perl version 5.8.2 or, at your option, 
+any later version of Perl 5 you may have available.

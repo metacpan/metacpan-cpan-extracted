@@ -1,0 +1,27 @@
+---
+abstract: 'Simple Log4perl setup for Catalyst application'
+author:
+  - 'Peter Corlett <abuse@cabal.org.uk>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Log4perl-Simple
+requires:
+  List::Util: 0
+  Log::Log4perl::Catalyst: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.006
+version: 0.005

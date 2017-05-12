@@ -1,0 +1,273 @@
+<html>
+<style>
+.error {
+  color: red;
+  font-size: 75%;
+}
+</style>
+
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+if (location.search) {
+  document.writeln('<span style="color:green"><h1>Form Information submitted</h1></span>');
+}
+if (! document.validate) {
+  document.writeln('<span style="color:red"><h1>Missing document.validate</h1>Path to ../lib/CGI/Ex/validate.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.validate</h1></span>');
+}
+
+</script>
+
+
+<form name=a>
+<table cellspacing=0 cellpadding=3>
+<tr id=username_row>
+  <td valign=top>Username:</td>
+  <td><input type=text size=30 name=username></td>
+  <td id=username_img></td>
+  <td id=username_error class=error></td>
+</tr>
+<tr id=password_row>
+  <td valign=top>Password:</td>
+  <td><input type=password size=30 name=password><span id=password_strength style="font-size:smaller;color:blue"></span></td>
+  <td id=password_img></td>
+  <td id=password_error class=error></td>
+</tr>
+<tr id=password2_row>
+  <td valign=top>Verify Password:</td>
+  <td><input type=password size=30 name=password2></td>
+  <td id=password2_img></td>
+  <td id=password2_error class=error></td>
+</tr>
+<tr id=email_row>
+  <td valign=top>Email:</td>
+  <td><input type=text size=40 name=email></td>
+  <td id=email_img></td>
+  <td id=email_error class=error></td>
+  </td>
+</tr>
+<tr id=email2_row>
+  <td valign=top>Verify Email:</td>
+  <td><input type=text size=40 name=email2></td>
+  <td id=email2_img></td>
+  <td id=email2_error class=error></td>
+</tr>
+<tr id=state_row>
+  <td valign=top>State/Region:</td>
+  <td>
+    Specify State <input type=text size=2 name=state><br>
+    OR Region <input type=text size=20 name=region>
+  </td>
+  <td id=state_img></td>
+  <td id=state_error class=error></td>
+</tr>
+<tr id=enum_row>
+  <td valign=top>Enum Check:</td>
+  <td><input type=text size=10 name=enum></td>
+  <td id=enum_img></td>
+  <td id=enum_error class=error></td>
+</tr>
+<tr id=compare_row>
+  <td valign=top>Compare Check:</td>
+  <td><input type=text size=10 name=compare></td>
+  <td id=compare_img></td>
+  <td id=compare_error class=error></td>
+</tr>
+<tr id=checkone_row>
+  <td valign=top>Check one:</td>
+  <td>
+    <input type=checkbox name=checkone value=1> Foo<br>
+    <input type=checkbox name=checkone value=2> Bar<br>
+    <input type=checkbox name=checkone value=3> Baz<br>
+  </td>
+  <td id=checkone_img></td>
+  <td id=checkone_error class=error></td>
+</tr>
+<tr id=checktwo_row>
+  <td valign=top>Check two:</td>
+  <td>
+    <input type=checkbox name=checktwo value=1> Foo<br>
+    <input type=checkbox name=checktwo value=2> Bar<br>
+    <input type=checkbox name=checktwo value=3> Baz<br>
+  </td>
+  <td id=checktwo_img></td>
+  <td id=checktwo_error class=error></td>
+</tr>
+<tr><td colspan=2><hr></td></tr>
+<tr id=foo_row>
+  <td valign=top>Fill In two:</td>
+  <td>
+    <input type=text name=foo value="" size=30> Foo<br>
+    <input type=text name=bar value="" size=30> Bar<br>
+    <input type=text name=baz value="" size=30> Baz<br>
+  </td>
+  <td id=foo_img></td>
+  <td id=foo_error class=error></td>
+</tr>
+<tr><td colspan=2><hr></td></tr>
+<tr id=cplx_row>
+  <td valign=top>Complete:</td>
+  <td>
+    <input type=text name=cplx value="" size=8>
+    <input type=text name=cplx_a value="" size=8>
+    <input type=text name=cplx_b value="" size=8>
+  </td>
+  <td id=cplx_img></td>
+  <td id=cplx_error class=error></td>
+</tr>
+<tr>
+  <td colspan=2 align=right>
+    <input type=submit value=Submit>
+  </td>
+</tr>
+</table>
+</form>
+
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+document.validate_set_hook = function (args) {
+  if (!document.getElementById(args.key+'_img')) alert('cannot set '+args.key);
+  document.getElementById(args.key+'_img').innerHTML = '<span style="font-weight:bold;color:red">!</span>';
+  document.getElementById(args.key+'_row').style.background = '#ffdddd';
+};
+document.validate_clear_hook = function (args) {
+  if (!document.getElementById(args.key+'_img')) alert('cannot clear '+args.key);
+  if (args.was_valid) {
+   document.getElementById(args.key+'_img').innerHTML = '<span style="font-weight:bold;color:green">+</span>';
+   document.getElementById(args.key+'_row').style.background = '#ddffdd';
+  } else {
+   document.getElementById(args.key+'_img').innerHTML = '';
+   document.getElementById(args.key+'_row').style.background = '#fff';
+  }
+};
+document.validation = {
+  "group onevent": 'change,blur,submit',
+  "group no_confirm": 1,
+  "group no_alert": 1,
+  "group order": ["username", "password", "password2", "email", "email2", "state", "region", "s_r_combo", "enum", "compare", "checkone", "checktwo", "foo"],
+  username: {
+    name: "Username",
+    required: 1,
+    min_len: 3,
+    max_len: 30
+  },
+  password: {
+    name: "Password",
+    required: 1,
+    min_len: 6,
+    max_len: 30,
+    match: ["m/\\d/", "m/[a-z]/"],
+    match_error: "$name must contain both a letter and a number.",
+    custom_js: function (args) {
+      var v = args.value;
+      var n = 0;
+      if (v.match(/[a-z]/)) n++;
+      if (v.match(/[A-Z]/)) n++;
+      if (v.match(/[0-9]/)) n++;
+      var sym = v.match(/[ ~!@#$%^&*()_,.?{}\[\]]/) ? 1 : 0;
+      var s = (! v.length)   ? ''
+            : (v.length < 6) ? 'weak'
+            : (v.length < 7) ? (sym || n == 3)  ? 'ok' : 'weak'
+            : (v.length < 10) ? (n < 3 && ! sym) ? 'ok' : 'good'
+            : sym ? 'excellent' : 'good';
+      document.getElementById('password_strength').innerHTML = s;
+      if (s === 'weak') throw "Cannot use a weak password.  Try increasing the length or adding variation.";
+      return 1;
+    }
+  },
+  password2: {
+    validate_if: 'password was_valid',
+    vif_disable: 1,
+    name: "Verify password",
+    equals: "password",
+    equals_name: "password"
+  },
+  email: {
+    name: "Email",
+    required: 1,
+    max_len: 100,
+    type: 'email',
+    type_error: "$name must be a valid email address."
+  },
+  email2: {
+    validate_if: 'email was_valid',
+    vif_disable: 1,
+    name: "Verify email",
+    equals: "email",
+    equals_name: "email"
+  },
+  state: {
+    validate_if: ["state", "! region"],
+    match: "m/^\\w{2}$/",
+    match_error: "Please type a two letter state code."
+  },
+  region: {
+    validate_if: ["region", "! state"],
+    delegate_error: "state",
+    compare: "eq Manitoba",
+    compare_error: "For this test - the region should be Manitoba."
+  },
+  s_r_combo: {
+    field: "state",
+    delegate_error:   "state",
+    max_in_set:       "1 of state region",
+    max_in_set_error: "Specify only one of state and region.",
+    min_in_set:       "1 of state region",
+    min_in_set_error: "Specify one of state and region."
+  },
+  'enum': {
+    name: "Enum check",
+    'enum': ["one", "two", "three", "four"],
+    enum_error: "$name must be one of one, two, three, or four."
+  },
+  compare: {
+    required: 1,
+    required_error: "Please type a number",
+    type: 'num',
+    type_error: 'Please type a valid number',
+    name: "Compare check",
+    compare: ['> 99', '< 1000'],
+    compare_error: '$name must be greater than 99 and less than 1000.'
+  },
+  checkone: {
+    name: "Check one",
+    required: 1,
+    max_values: 1
+  },
+  checktwo: {
+    name: "Check two",
+    min_values: 2,
+    max_values: 2
+  },
+  foo: {
+    min_in_set: "2 of foo bar baz",
+    max_in_set: "2 of foo bar baz"
+  },
+  'm/^(c\\w+x)$/': {
+    required:1,
+    name: 'Field one'
+  },
+  'm/^(c\\w+x)_a$/': {
+    validate_if: '$1',
+    equals: '$1',
+    equals_name: 'field one',
+    delegate_error: '$1',
+    name: 'Field two'
+  },
+  'm/^(c\\w+x)_b$/': {
+    validate_if: '$1_a was_valid',
+    equals: '$1_a',
+    equals_name: 'field two',
+    delegate_error: '$1',
+    name: 'Field three'
+  }
+};
+if (document.check_form) document.check_form('a');
+// do this in javascript to let the real form through without js
+document.a.password2.disabled = true;
+document.a.email2.disabled = true;
+</script>
+
+</html>
+<script>window.onload = function () { document.a.username.focus() }</script>

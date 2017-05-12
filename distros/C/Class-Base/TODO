@@ -1,0 +1,7 @@
+* I think things like debug() and debugging() should be part of a 
+  Class::Base::Debug mixin, but for now they're in here.
+
+* Other mixins might include Class::Base::Factory for providing 
+  factory() and create() methods which interface to uhm, Class::Factory,
+  oh, I see Chris Winters has already written that, oh good... hmmm...
+

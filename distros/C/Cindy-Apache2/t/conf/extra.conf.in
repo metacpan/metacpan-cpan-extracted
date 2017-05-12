@@ -1,0 +1,18 @@
+# $Id: extra.conf.in 73 2014-09-26 21:18:06Z jo $
+
+# This should not be necessary, but it is. Why?
+PerlRequire @ServerRoot@/conf/modperl_inc.pl
+
+<Directory @DocumentRoot@/cindy/>
+# Configuration is done in .htaccess
+# SetEnv will be needed
+AllowOverride FileInfo
+</Directory>
+
+<Directory @DocumentRoot@/charset/>
+# Configuration is done in .htaccess
+# SetEnv will be needed
+AllowOverride FileInfo
+</Directory>
+
+# vim: ft=apache

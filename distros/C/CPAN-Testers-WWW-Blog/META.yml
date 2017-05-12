@@ -1,0 +1,49 @@
+--- #YAML:1.0
+name:                CPAN-Testers-WWW-Blog
+version:             1.13
+abstract:            The CPAN Testers Blog website
+author:
+  - Barbie <barbie@cpan.org>
+
+license:             artistic_2
+distribution_type:   module
+installdirs:         site
+
+requires:
+  perl:                               5.006
+  Labyrinth:                          5.32
+  Labyrinth::DIUtils::ImageMagick:    5.04
+  Labyrinth::Plugin::Core:            5.19
+  Labyrinth::Plugin::CPAN:            3.55
+  Labyrinth::Plugin::Articles::Diary: 1.05
+  Labyrinth::Plugin::Event:           1.04
+recommends:
+  Test::CPAN::Meta:                   0
+  Test::CPAN::Meta::JSON:             0
+  Test::Pod:                          1.00
+  Test::Pod::Coverage:                0.08
+build_requires:
+  IO::File:                           0
+  Test::More:                         0.70
+
+provides:
+  CPAN::Testers::WWW::Blog:
+    file:     lib/CPAN/Testers/WWW/Blog.pm
+    version:  1.13
+
+no_index:
+  directory:
+    - examples
+    - t
+    - vhost
+
+resources:
+  homepage:   http://blog.cpantesters.org
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Blog
+  repository: http://github.com/barbie/cpan-testers-www-blog
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: Hand 1.0

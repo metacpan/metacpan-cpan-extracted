@@ -1,0 +1,11 @@
+[% WRAPPER page.tt %]
+
+<h1>List books</h1>
+
+<ul>
+	[% FOREACH book IN books %]
+		<li><a href="[% c.uri_for(c.controller.action_for('edit'), book.id) %]">[% book.title %]</a></li>
+	[% END %]
+</ul>
+
+[% END %]

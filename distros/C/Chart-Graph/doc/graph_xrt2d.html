@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Chart::Graph::Xrt2d</title>
+<link rev="made" href="mailto:root@gohan24.freebsd.org" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#arguments">ARGUMENTS</a></li>
+	<ul>
+
+		<li><a href="#details_on_graphics_converter_options">DETAILS ON GRAPHICS CONVERTER OPTIONS</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#horizontal_bar_graph">HORIZONTAL BAR GRAPH</a></li>
+		<li><a href="#vertical_bar_graph">VERTICAL BAR GRAPH</a></li>
+	</ul>
+
+	<li><a href="#more_info">MORE INFO</a></li>
+	<li><a href="#contact">CONTACT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Chart::Graph::Xrt2d</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ #Include module
+ use Chart::Graph::Xrt2d qw(xrt2d);</pre>
+<pre>
+ # Function call
+ xrt2d(\%options,
+       [\%data_options1, \@data_set1],
+       [\%data_options2, \@data_set2],
+        .
+        .
+      );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module is unmaintained, it worked with Sitraka's XRT, and hasn't been
+tested against newer versions.</p>
+<p>Sitraka (now Quest) makes a number of graphics packages for UNIX systems.  XRT is
+a Motif-based commercial software product that has been adapted by
+CAIDA using a combination of C drivers and Perl function <em>xrt2d()</em>.
+The Perl function <em>xrt2d()</em> provides access to the two dimensional
+graphing capabilities of XRT from Perl.  To access the three dimensional
+graphing using XRT, use <em>xrt3d()</em> also supplied in the
+<em>Chart::Graph</em> package.</p>
+<p>
+</p>
+<hr />
+<h1><a name="arguments">ARGUMENTS</a></h1>
+<p>The options to <em>xrt2d()</em> are listed below.  Additional control over the
+resulting graph is possible by using the XRT application itself once
+the graph has been created.</p>
+<pre>
+ +--------------------------------------------------------------------------+
+ |                                OPTIONS                                   |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ +----------------+--------------------------+------------------------------+
+ |&quot;output file&quot;   |  (set your own)          | &quot;untitled-xrt2d.gif&quot;         |
+ |&quot;output type&quot;   |  &quot;ps&quot;,&quot;xwd&quot;, &quot;png&quot;, &quot;jpg&quot;| &quot;xwd&quot;                        |
+ |&quot;x-axis title&quot;  |  (set your own)          | &quot;x-axis&quot;                     |
+ |&quot;y-axis title&quot;  |  (set your own)          | &quot;y-axis&quot;                     |
+ |&quot;set labels&quot;    |  (set your own bar chart | none                         |
+ |                |   labels for each set of |                              |
+ |                |   data)                  |                              |
+ |&quot;point labels&quot;  |  (set your own labels for| none                         |
+ |                |   bars themselves)       |                              |
+ |&quot;misc labels&quot;   |  (misc annotation that   | none                         |
+ |                |   can be added to bar    |                              |
+ |                |   chart)                 |                              |
+ |&quot;x time&quot;        |  timescale if appropriate| &quot;0&quot;                          |
+ |&quot;invert&quot;        |  run bars horizontally   | &quot;0&quot; (vertically)             |
+ |                |  instead of vertically.  |                              |
+ |                |  1 = horizonally.        |                              |
+ |&quot;header&quot;        |  (set your own - can     | &quot;header&quot;                     |
+ |                |   be multiple lines)     |                              |
+ |&quot;footer&quot;        |  (set your own - can     | &quot;footer&quot;                     |
+ |                |   be multiple lines)     |                              |
+ |&quot;style&quot;         |  Style of chart - types  | &quot;bar&quot;                        |
+ |                |  include: bar, pie, area |                              |
+ |                |  stackedbar, stackedarea |                              |
+ +----------------+--------------------------+------------------------------+</pre>
+<p>The <em>xrt2d()</em> function only accepts data in one form.  <code>\@data_sets</code>:
+a one dimensional array with a prefix of data options.: 
+<code>[[\%data1_opts, \@data1], [\%data2_opts, \@data2], [\%data3_opts, \@data3]]</code>
+-- see example for more details on the syntax.</p>
+<p>The data options are listed below.</p>
+<pre>
+ +--------------------------------------------------------------------------+
+ |                             DATA OPTIONS                                 |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ +----------------+--------------------------+------------------------------+
+ | &quot;color&quot;        | Any valid web page color | none                         |
+ +----------------+--------------------------+------------------------------+</pre>
+<p>
+</p>
+<h2><a name="details_on_graphics_converter_options">DETAILS ON GRAPHICS CONVERTER OPTIONS</a></h2>
+<p>The xrt package supports only two graphics formats internally:
+Postscript and the X windows format XWD.  Additional raster graphics
+formats are supported with Chart::Graph by using one of two graphics
+converter packages: <em>Imagemagick</em> and <em>Netpbm</em>.</p>
+<p>If you need to install a converter package, <em>Imagemagick</em>
+<em><a href="http://www.imagemagick.org/">http://www.imagemagick.org/</a></em> is probably preferable
+simply for its comparatively simplicity.  It uses one program
+<em>convert</em> for all of it's conversion needs, so it is easy to manage
+and simple for Chart::Graph to use.  Many UNIX systems come with some
+collection of the <em>Netpbm</em> utilities already installed, thus users
+may be able to start using Chart::Graph without adding any additional
+converters.  Alas, it is unlikely any distributions would include all
+the converters for the newest graphics formats used by Chart::Graph.
+In that case it may still preferable to use <em>Imagemagick</em> simply for
+the sake of avoiding installing over 80 utilities that come with
+current distributions of <em>Netpbm</em>.  For more information on the
+current distribution of <em>Netpbm</em> go to the current website at:
+<em><a href="http://netpbm.sourceforge.net/">http://netpbm.sourceforge.net/</a></em></p>
+<p>The xrt package also allows for multiple header and footers with each
+graph.  As a result, instead of just the usual string, an array
+reference containing the multiple strings for the header and footer
+text.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>The following two examples show Chart::Graph::Xrt2d in different roles
+and producing different styles of output.</p>
+<p>
+</p>
+<h2><a name="horizontal_bar_graph">HORIZONTAL BAR GRAPH</a></h2>
+<p>The following example creates a two, two dimensional bars charts of
+fictitious stock data from rival restaurants that is displayed in a
+single graphic file <em>xrt2d-1.jpg</em>.</p>
+<pre>
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt2d qw(xrt2d);</pre>
+<pre>
+ # Call to xrt2d with two data sources.
+ xrt2d({&quot;output file&quot; =&gt; &quot;xrt2d-1.jpg&quot;,
+        &quot;output type&quot; =&gt; &quot;jpg&quot;,
+        &quot;set labels&quot;=&gt; [&quot;Joe's&quot;, &quot;Ralph's&quot;],
+        # Flip graph from vertical to horizontal
+        &quot;invert&quot; =&gt; 1,
+        &quot;point labels&quot; =&gt; [&quot;Jan/Feb&quot;, &quot;Mar/Apr&quot;, &quot;May/Jun&quot;, &quot;Jul/Aug&quot;,
+                         &quot;Sep/Oct&quot;, &quot;Nov/Dec&quot;],
+        &quot;x-axis title&quot; =&gt; &quot;Month's tracked&quot;,
+        &quot;y-axis title&quot; =&gt; &quot;Stock prices for Rival restaurant chains&quot;
+       },
+       [{&quot;color&quot; =&gt; &quot;MistyRose&quot;}, [&quot;8&quot;, &quot;13&quot;, &quot;20&quot;, &quot;45&quot;, &quot;50&quot;, &quot;100&quot;]],
+       [{&quot;color&quot; =&gt; &quot;#000000&quot;},   [&quot;75&quot;, &quot;50&quot;, &quot;25&quot;, &quot;25&quot;, &quot;50&quot;, &quot;75&quot;]]
+    )
+ )</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt2d-1.jpg"></center></p>
+<p><center><em>xrt2d-1.jpg</em></center></p><p>
+</p>
+<h2><a name="vertical_bar_graph">VERTICAL BAR GRAPH</a></h2>
+<p>The following example is simply a more elaborate instance of the first
+example. which produces the file <em>xrt2-2.gif</em>.  Note the relationship
+between sets and points.  Accidentally reversing the order will cause
+unpredicable results.
+
+</p>
+<pre>
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt2d qw(xrt2d);
+
+</pre>
+<pre>
+ xrt2d({&quot;output file&quot; =&gt; &quot;xrt2d-2.gif&quot;,
+                         &quot;output type&quot; =&gt; &quot;gif&quot;,
+                &quot;set labels&quot; =&gt; [&quot;set1&quot;, &quot;set2&quot;, &quot;set3&quot;, &quot;set4&quot;],
+                &quot;point labels&quot; =&gt; [&quot;point1&quot;, &quot;point2&quot;, &quot;point3&quot;]},
+                # Each entry here corresponds to a set
+                [{&quot;color&quot; =&gt; &quot;MistyRose&quot;}, [&quot;15&quot;, &quot;23&quot;, &quot;10&quot;]],
+                [{&quot;color&quot; =&gt; &quot;#0000FF&quot;}, [&quot;13&quot;, &quot;35&quot;, &quot;45&quot;]],
+                [{&quot;color&quot; =&gt; &quot;#00FF00&quot;}, [&quot;15&quot;, &quot;64&quot;, &quot;24&quot;]],
+                [{&quot;color&quot; =&gt; &quot;Navy&quot;}, [&quot;18&quot;, &quot;48&quot;, &quot;32&quot;]],
+      );
+
+</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt2d-2.gif"></center></p>
+<p><center><em>xrt2d-2.gif</em></center></p>
+
+<p>
+</p>
+<hr />
+<h1><a name="more_info">MORE INFO</a></h1>
+<p>For more information on XRT:
+
+</p>
+<pre>
+ <a href="http://www.quest.com/xrt_pds/">http://www.quest.com/xrt_pds/</a>
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="contact">CONTACT</a></h1>
+<p>Send email to <a href="mailto:graph-dev@caida.org">graph-dev@caida.org</a> is you have problems, questions,
+or comments. To subscribe to the mailing list send mail to
+<a href="mailto:graph-dev-request@caida.org">graph-dev-request@caida.org</a> with a body of ``subscribe <a href="mailto:your@email.com''">your@email.com''</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+ CAIDA Perl development team (cpan@caida.org)
+
+</pre>
+
+</body>
+
+</html>

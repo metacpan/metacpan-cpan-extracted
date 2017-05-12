@@ -1,0 +1,344 @@
+Revision history for CPAN-Testers-Data-Generator
+================================================
+
+1.21    2015-08-26
+        - uploads table now has a unique id as primary key.
+        - cpanstats, release_data and release_summary tables now include an 
+          uploadid field and index.
+
+1.20    2015-04-19
+        - fixed tail log searching.
+        - ensure we are parsing a CPAN::Testers::Report object.
+        - added examples/metabase-get.pl to check GUID entries. 
+
+1.19    2015-04-17
+        - fixed date/time timezone bug (thanks Slaven).
+
+1.18    2015-04-17
+        - added insertion of PASS report data into passreports table.
+        - added build-pass-reports.pl script to examples, for emergencies :)
+        - maintain history of Bucket changes.
+
+1.17    2014-09-11
+        - fixed license fields in META.json to be lists.
+
+1.16    2014-05-15
+        - move to using DateTime to calculate dates and times.
+        - fixed distribution name in META.
+        - fixed _get_createdate guid pattern matching.
+
+1.15    2014-03-23
+        - finally upgraded to Metabase-1.003.
+        - extended test suite.
+
+1.14    2014-03-22
+        - arch os no longer needs to decode JSON.
+
+1.13    2014-03-20
+        - enable mysql_auto_reconnect.
+        - updates from live fixes.
+
+1.12    2014-03-19
+        - specify the end timestamp when getting the guids in a date range.
+        - store complete report (using Sereal) in db as metabase.fact. Also 
+          retrieve and de-reference facts hash from 'fact' field, as 'report' 
+          field will be dropped once the 'fact' field is populated for all 
+          reports (including historical ones).
+        - rollback end timestamp (for now), until storage bug fixed.
+        - expand test suite.
+        - store perl6 reports with type=6. Amended to ignore these for the
+          moment, as this needs to be determined by different metadata.
+        - remove SQLite references.
+
+1.11    2013-09-08
+        - added Data::FlexSerializer functionality to compress reports.
+        - added missing prerequisite, Metabase::Resource.
+
+1.10    2013-05-12
+        - fixed skip test count.
+        - fixed cleanup of directory removal.
+
+1.09    2013-04-14
+        - date clarification for lookups.
+        - additional logging.
+        - added LICENSE file.
+        - added cleanup process in test suite.
+        - added Test::Database to test suite.
+
+1.08    2012-12-15
+        - fixes to make sure we move on if no reports processed.
+
+1.07    2012-12-06
+        - updated README
+        - rewritten generate method.
+
+1.06    2012-11-18
+        - removed JSON & RSS Recent code.
+        - fixed dates.
+
+1.05    2012-11-13
+        - parse message fix.
+        - disabled SQLite updates.
+        - new script:
+            bin/cpanstats-sqlite                (v0.01)
+        - script updates:
+            bin/cpanstats                       (v1.05)
+            bin/cpanstats-select                (v0.12)
+            bin/cpanstats-update                (v0.10)
+            bin/cpanstats-delete                (v0.15)
+
+1.04    2012-10-23
+        - script updates:
+            bin/cpanstats                       (v1.04)
+        - CHANGES => Changes.
+        - added tail feature.
+
+1.03    2012-10-21
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - AWS values are now configure settings, that can be overridden on the
+          command line.
+        - compensate for Amazon SimpleDB's brokeness with dates.
+        - added parse function for specific GUIDs.
+        - change file dates changed to meet W3CDTF standards.
+        - META tests no longer require specific versions.
+        - reworked Makefile.PL for clarity.
+        - License updated to Artistic License v2.0.
+        - added minimum perl version (5.006).
+        - added missing prerequisite.
+
+1.02    2012-04-01
+        - reworked regenerate functionality and script.
+        - reworked reparse functionality and script to use Metabase API.
+        - added handling of localonly and check options.
+        - updated script:
+            bin/cpanstats                       (v1.02)
+
+1.01    2012-01-22
+        - generator now builds a JSON and RSS file of the last n reports.
+        - added id to page_request insert (to speed up page builder).
+        - reworked regenerator to allow a file of guid/date ranges.
+        - update regenerate option and documentation:
+            bin/cpanstats                       (v1.01)
+        - added mappings for old badly formatted distributions.
+
+1.00    2010-11-14
+        - redesigned to use Metabase. All NNTP references removed.
+        - removed ignore and nostore options.
+        - added nonstop option.
+        - added error report mail alert, to highlight problems quickly
+        - improved validation of metabase results, due to the search sometimes
+          returning older reports!
+        - improved retrieval of tester fact
+        - scripts removed:
+            bin/articles-verify
+            bin/articles-view
+            bin/cpanstats-reparse
+            bin/cpanstats-verify
+            examples/cpanstats-convert
+        - added guid command line options and/or output:
+            bin/cpanstats-select                (v0.11)
+            bin/cpanstats-update                (v0.09)
+            bin/cpanstats-delete                (v0.14)
+        - major update of all SQL tables and databases
+            examples/cpanstats-createdb         (v0.02)
+        - added META.json
+        - added regenerate() and retrieve_report() methods.
+        - added regenerate option and documentation:
+            bin/cpanstats                       (v1.00)
+        - various data amendments, including _check_arch_os(), as the metabase
+          uses the raw data.
+        - new perl_version table incorporated to speed up perl version lookups.
+
+0.41    2010-03-18
+        - fixes to change the 'id' (was NNTP ID) to an auto incremental field.
+        - reworked logic to better fit latest changes.
+        - added repository to META.yml.
+        - documentation updates.
+
+0.40    2010-02-02
+        - fixes to accommodate GUID changes.
+        - added support for 'type' field.
+
+0.39    2010-01-30
+        - major update to include guid for Metabase/CT2.0.
+
+0.38    2009-10-19
+        - added functionality to update the osname table.
+        - added cpanstats DB schema to examples directory.
+
+0.37    2009-06-07
+        - added page request functionality.
+        - added release summary functionality.
+        - due to the recent expansion, the 12generate.t test script now needs
+          more complex logic. The intention is to use Test::Database for this,
+          but unfortunately T::D isn't stable enough to use yet. As such this
+          test script is now effectively disabled.
+
+0.36    2009-02-16
+        - clean up of pre-requisites.
+        - CPAN::Testers::Data::Generator::Article abstracted into its own
+          distribution CPAN-Testers-Common-Article.
+        - fixed scripts due to above:
+            bin/cpanstats         (v0.07)
+            bin/cpanstats-reparse (v0.10)
+
+0.35    2009-01-29
+        - updated patterns when extracting perl version (Article.pm).
+        - updated patterns when extracting osname (Article.pm).
+        - updated cannot connect to NNTP server error message.
+
+0.34    2009-01-12
+        - updated Copyright info, minor fixes and added 'Getopt::ArgvFile', if
+          not already used:
+            bin/articles-verify   (v0.03)
+            bin/articles-view     (v0.03)
+            bin/cpanstats         (v0.06)
+            bin/cpanstats-delete  (v0.13)
+            bin/cpanstats-reparse (v0.09)
+            bin/cpanstats-select  (v0.10)
+            bin/cpanstats-update  (v0.08)
+            bin/cpanstats-verify  (v0.24)
+        - added cpanstats-verify.sh to examples.
+        - added missing log file command line option to bin/cpanstats (v0.06).
+        - added missing prerequisites (thanks to CPANTS)
+
+0.33    2008-12-29
+        - updated help text to bin/cpanstats-verify  (v0.23)
+        - fix to stop existing records being reinserted.
+
+0.32    2008-12-19
+        - added progress option to bin/cpanstats-verify (v0.22)
+        - fixes to Article.pm to attempt to correct missing osnames and osvers.
+        - added articles scripts that have been used behind the scenes for
+          sometime:
+            bin/articles-verify   (v0.02)
+            bin/articles-view     (v0.02)
+
+0.31    2008-12-18
+        - name change to fit below the CPAN::Testers namespace.
+        - added epoch to date extraction from article.
+        - added filename reference from CPAN-DistnameInfo.
+        - added ability to provide SQL string in bin/cpanstats-select.
+        - added better command line option parsing to bin/cpanstats-reparse.
+        - convert to use CPAN::Testers::Common::DBUtils.
+        - added MySQL cpanstats database to codebase.
+        - new scripts added to examples to handle database creation:
+            examples/cpanstats-createdb (v0.01)
+            examples/cpanstats-convert  (v0.01)
+        - update to bin scripts with latest code changes:
+            bin/cpanstats         (v0.05)
+            bin/cpanstats-delete  (v0.12)
+            bin/cpanstats-reparse (v0.08)
+            bin/cpanstats-select  (v0.09)
+            bin/cpanstats-update  (v0.07)
+            bin/cpanstats-verify  (v0.21)
+
+0.30    2008-10-01
+        - ensure upload pattern matching is for the end of the string.
+        - add more option validation in bin/cpanstats-verify (v0.20).
+
+0.29    2008-09-19
+        - ignore any uploads that are not in a supported archive format used
+          for testing.
+
+0.28    2008-09-18
+        - added SQLite pragma 'auto_vacuum' to database creation.
+        - created an _init function to generate db/nntp objects in one place
+        - add --localonly option to help screen in bin/cpanstats-verify (v0.19)
+        - fixed test script to correctly do cmp_ok :)
+
+0.27    2008-09-11
+        - added 'grade' option to search in bin/cpanstats-select (v0.08)
+        - fixed help text in bin/cpanstats-update (v0.06)
+        - fixed test bug in 12generate.t (I can't count!)
+
+0.26    2008-09-02
+        - abstracted all database functionality out of Generator.pm into
+          Database.pm, including database creation. All scripts updated too.
+        - database links changed to reference CPAN Testers development site.
+        - corrections to the database schema in POD
+        - several POD updates across all files, including
+            bin/cpanstats         (v0.04)
+            bin/cpanstats-delete  (v0.11)
+            bin/cpanstats-reparse (v0.07)
+            bin/cpanstats-select  (v0.07)
+            bin/cpanstats-update  (v0.05)
+            bin/cpanstats-verify  (v0.18)
+        - fixed dependency in cpanstats
+        - consistently provided help|h and version|V options to all scripts
+        - fix to support old form of PAUSE uploads
+        - abstracted reparse code into Generator.pm from cpanstats-reparse
+        - more tests
+
+0.25    2008-08-28
+        - added POD about bugs and see also sections.
+        - fixed POD in scripts.
+        - added author to upload metadata, to save lookups elsewhere.
+        - renamed several supporting scripts:
+            delstats    => bin/cpanstats-delete (v0.10)
+            selectstats => bin/cpanstats-select (v0.06)
+            upstats     => bin/cpanstats-update (v0.04)
+            readstats   => bin/cpanstats-verify (v0.17)
+        - added further functionality to cpanstats-select.
+        - added bin/cpanstats-reparse (v0.06) to distribution
+        - added nostore option to not retain old articles in the articles
+          database.
+
+0.24    2008-08-19
+        - added bin/readstats (v0.16), bin/delstats (v0.09),
+          bin/selectstats (v0.05) and bin/upstats (v0.03) from the non-CPAN
+          cpanstats distribution.
+        - updated all scripts to use an options hash rather than individual
+          variables.
+        - added new Database.pm module to handle all local DB interaction.
+        - fixed test bug in t/12generate.t (thanks to Slaven Rezic).
+
+0.23    2008-08-18
+        - new maintainer: Barbie.
+        - major overhaul to draw in CPAN Testers Statistics code.
+        - added version to Article.pm.
+        - added ability to decode QuotedPrintable and Base64 (Article.pm)
+        - added functionality to parse the upload articles as well as the
+          report articles (Article.pm).
+        - added more reliable subject parsing.
+        - added more reliable Perl -V parsing.
+        - testers.db now renamed to cpanstats.db.
+        - news.db now renamed to articles.db.
+        - field names changed:
+            status => state,
+            distribution => dist,
+            archname => platform.
+        - new fields added: postdate,tester.
+        - fixed prerequisites in modules, Makefile.PL and META.yml.
+        - bin/cpan_www_testers_generate replaced with bin/cpanstats.pl
+        - added more test samples
+        - added more tests
+
+0.22    2005-02-03T15:27:41
+        - now includes perl + OS version in the testers.db
+        - use SQLite 3.0
+        - bin/cpan_www_testers_generate expanded to give more
+          flexibility for execution
+        - added Makefile.PL (as per TODO)
+        - added tests
+        - added more POD
+        - (thanks to Barbie)
+
+0.21    2004-03-07T18:31:35
+        - the NNTP cache now uses SQLite instead of DB_File
+        - rename Changes to CHANGES
+
+0.20    2003-08-13T21:52:06
+        - make sure to HTML escape everything
+        - design update, now with CSS
+        - Fix bug where reports are use A/AM/AMS/Crypt-TEA-1.22.tar.gz
+          instead of Crypt-TEA-1.22.tar.gz
+        - added a TODO
+        - sort using version, not Sort::Version
+        - renamed to CPAN::WWW::Testers::Generator
+        - included HISTORY section by Elaine Ashton
+        - moved examples/generate.pl to an installed script,
+          bin/cpan_www_testers_generate
+
+0.10    2003-07-31T23:09:25
+        - initial release

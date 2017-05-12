@@ -1,0 +1,276 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_option_info
+# ABSTRACT: Displays informations about a given option.
+
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use DBI;
+use CAD::Firemen;
+use CAD::Firemen::Common qw(
+  print2ColsRightAligned
+  testPassed
+  testFailed
+  printColored
+  printBlock
+  getInstallationPath
+  getInstallationConfigCdb
+  dbConnect);
+use CAD::Firemen::Load qw(loadCDB loadDatabase);
+
+
+my $showVersion = 0;
+my $verbose = 0;
+my $isRegex = 0;
+my $description = 0;
+my %options = ();
+my %defaultValues = ();
+my %descriptions = ();
+Getopt::Long::Configure ("bundling"), "auto_help";
+if(!GetOptions(
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'regex|r' => \$isRegex,
+  'description|d' => \$description
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+my $cdbUrl = shift;
+my $option = shift;
+my $structUrl = shift;
+my $dbh = undef;
+
+if(!defined($option)){
+  $option = $cdbUrl;
+  # if no cdb given, first try to use an existing database
+  $structUrl = getInstallationPath();
+  $dbh = dbConnect($structUrl, $verbose);
+  if(!$dbh){
+    # if $structUrl is empty, getInstallationConfigCdb let the user
+    # choose a path
+    $cdbUrl = getInstallationConfigCdb($structUrl);
+  }
+  else{
+    $cdbUrl = "";
+  }
+}
+
+if(!defined($dbh) && (!defined($cdbUrl) || $cdbUrl eq "")){
+  pod2usage(2);
+}
+
+if(!defined($option) || $option eq ""){
+  pod2usage(2);
+}
+
+$option = uc($option);
+
+if($verbose > 1){
+  if($dbh){
+    print "Database:      ". $dbh->{Name} ."\n";
+  }
+  print "CDB URL:       ". $cdbUrl ."\n";
+  print "Option:        ". $option ."\n";
+}
+
+if($cdbUrl ne ""){
+  my ($ref1, $ref2) = loadCDB($cdbUrl, $verbose);
+  my %cdb = %{$ref1};
+  my %errors = %{$ref2};
+  if(scalar(keys(%errors)) > 0){
+    testFailed("Load CDB");
+  }
+  else{
+    testPassed("Load CDB");
+  }
+  if($verbose > 0){
+    my @lines = sort { $a <=> $b } keys(%errors);
+    my $max = length($lines[scalar(@lines) - 1]);
+    foreach my $line (@lines){
+      printColored(sprintf("%". $max ."s", $line) .": ". $errors{$line} ."\n", "red");
+    }
+  }
+  if(scalar(keys(%errors)) > 0){
+    exit 1;
+  }
+
+  if($option eq "*"){
+   # display all options with values and exit
+   foreach my $key (sort(keys(%cdb))){
+    $options{$key} = $cdb{$key};
+   }
+  }
+  elsif($isRegex){
+    foreach my $opt (sort(keys(%cdb))){
+      if($opt =~ m/$option/){
+        $options{$opt} = $cdb{$opt};
+      }
+    }
+  }
+  elsif(exists($cdb{$option})){
+    $options{$option} = $cdb{$option};
+  }
+}
+elsif($dbh){
+  my $searchField = "UPPER(name)";
+  if($description){
+    $searchField = "UPPER(description)";
+  }
+  my $statement = "SELECT id, name, defaultValueId, description FROM options";
+  if($option ne "*"){
+    $statement .= " WHERE ". $searchField;
+    if($isRegex){
+      $statement .= " REGEXP '$option'";
+    }
+    else{
+      $statement .= "='$option'";
+    }
+  }
+  my ($ref1, $ref2, $ref3) = loadDatabase($dbh, $statement, $verbose);
+  %options = %{$ref1};
+  my %errors = %{$ref2};
+  %descriptions = %{$ref3};
+
+  if(scalar(keys(%errors)) > 0){
+    testFailed("Query Database");
+  }
+  else{
+    testPassed("Query Database");
+  }
+  if($verbose > 0){
+    my @lines = sort { $a <=> $b } keys(%errors);
+    my $max = length($lines[scalar(@lines) - 1]);
+    foreach my $line (@lines){
+      printColored(sprintf("%". $max ."s", $line) .": ". $errors{$line} ."\n", "red");
+    }
+  }
+  if(scalar(keys(%errors)) > 0){
+    exit 1;
+  }
+}
+
+if(scalar(keys(%options) < 1)){
+  print2ColsRightAligned("Option found", "FAILURE", "red");
+  exit 1;
+}
+print2ColsRightAligned("Option found", "SUCCESS", "green");
+
+
+foreach my $opt (sort(keys(%options))){
+  print $opt ."\n";
+  foreach my $value (sort(keys(%{$options{$opt}}))){
+    print "      ". $value;
+    if($options{$opt}->{$value}){
+      print " (Default)";
+    }
+    print "\n";
+  }
+  if(exists($descriptions{$opt})){
+    printBlock($descriptions{$opt}, 3);
+  }
+}
+
+END {
+  if(defined($dbh) && ($dbh != 0) && !$dbh->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_option_info - Displays informations about a given option.
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_option_info [options] [PATH_TO_CONFIG.CDB] OPTION_NAME
+
+This script searches the given CDB file for the given option.
+
+Options:
+
+  --help        -?            Prints this help.
+  --version                   Prints current version.
+  --verbose     -v            The verbose level. 0 - least output, 2 most output (Default: 0).
+  --regex       -r            The given OPTION_NAME should be treated as an regex.
+  --description -d            Search also within the description of the option.
+                              Only available, if a database can be queried.
+
+Normally you won't specify a cdb file. Just run fm_create_help before you run this script
+to create a database. If you do not want or cannot create a database for the installtion
+you want to use, specify a cdb file.
+If no cdb file is given, it tries to figure out the correct installation with help of $ENV{PATH}.
+
+Examples:
+
+  fm_option_info c:\proeWildfire4\text\config.cdb DISPLAY
+
+Or use the Wildcard to search display all options within the given file
+
+  fm_option_info c:\proeWildfire4\text\config.cdb *
+
+Or use regex syntax and let fm_option_info guess where the config.cdb is located
+
+  fm_option_info -r "^weld"
+
+=head1 DESCRIPTION
+
+C<fm_option_info> checks and displays whether the given option exists in the given cdb file. if it exists,
+the possible values of the option, are also shown.
+
+This parameter -Fs is translated with "Free String" by all scripts and modules of this distribution.
+Therefore fm_check_config only verifies, that those options does not have empty values.
+But this interpretation must not met the oppinion from the original manufacturer.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

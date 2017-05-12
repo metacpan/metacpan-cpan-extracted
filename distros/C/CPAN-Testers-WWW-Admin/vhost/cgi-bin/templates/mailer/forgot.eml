@@ -1,0 +1,13 @@
+To: "[% name %]" <[% email %]>
+From: CPAN Testers Webmaster <webmaster@cpantesters.org>
+Subject: CPAN Testers Reports Admin Registration
+
+Dear [% name %],
+
+This email is being sent to you, because someone (hopefully you) indicated that you had forgotten your password to The CPAN Testers Reports Admin website. We encrypt passwords for the site, so we cannot tell you your original password. As such we have generated a new password for you. Once you login to the site with your new password, you may change it to something more memorable.
+
+  password: [% password %]
+
+
+Regards,
+The CPAN Testers Administration Team

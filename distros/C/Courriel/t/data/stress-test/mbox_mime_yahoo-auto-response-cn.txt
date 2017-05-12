@@ -1,0 +1,84 @@
+From tomcat-user-return-122250-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Mon Feb 28 00:13:30 2005
+Return-Path: <tomcat-user-return-122250-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 51418 invoked from network); 28 Feb 2005 00:13:30 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur-2.apache.org with SMTP; 28 Feb 2005 00:13:30 -0000
+Received: (qmail 10335 invoked by uid 500); 28 Feb 2005 00:13:18 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 9968 invoked by uid 500); 28 Feb 2005 00:13:17 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 9952 invoked by uid 99); 28 Feb 2005 00:13:17 -0000
+X-ASF-Spam-Status: No, hits=3.9 required=10.0
+        tests=DNS_FROM_RFC_ABUSE,FROM_ENDS_IN_NUMS,NO_REAL_NAME,SUBJ_ILLEGAL_CHARS
+X-Spam-Check-By: apache.org
+Received-SPF: pass (hermes.apache.org: local policy includes SPF record at spf.trusted-forwarder.org)
+Received: from mta108.mail.cnb.yahoo.com (HELO mta108.mail.cnb.yahoo.com) (202.165.102.48)
+  by apache.org (qpsmtpd/0.28) with SMTP; Sun, 27 Feb 2005 16:13:15 -0800
+Date: Mon, 28 Feb 2005 08:13:11 +0800 (CST)
+From: sunjinsheng0604@yahoo.com.cn
+Subject: Yahoo! À´ÐÅ×Ô¶¯»Ø¸´
+To: tomcat-user@jakarta.apache.org
+MIME-Version: 1.0
+Content-Type: text
+X-Virus-Checked: Checked
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+ÄúºÃ£¡Äú¶ÔÕâ¸öÐÐÒµÓÐÐËÈ¤£¿×¬µ½Ç®À­Âð£¿²»·Á¿¼ÂÇ¿¼ÂÇÍÆ¹ãÎÒÃÇµÄ×¨Àû£¬ÔÛºÏ×÷Ö»×¬²»Åâ£¬ÈÃÄúÕæÕýµÄ°×ÊÖÆð¼Ò£¨Äú²»Í¶×ÊÔõÃ´»áÅâ£¿£©ÁªÏµ°¡£¡
+Èý¹«£º¹«¿ª£¬¹«Æ½ºÍ¹«ÕýÖ±½ÓÏúÊÛ8ÕÛ£¬×Ô¼º¿´°É ÎÒÃÇºÓÄÏÜþÑôÅóÓÑÓÚ´º»¨Ò²À´ºÏ×÷ÁË°¡ ËýµÄµç»°13137158831     ÎÒÃÇ¿ª·âµÄÅóÓÑÁõºìÏ¼´ó½ã ÊÖ»ú13937890987 Õ¬µç0378-5865295
+    http://sunjinsheng.anyp.cn ENGLISH  QQ66474435
++QQ88527227 TIVÑÌÌ¨ÉÌÃ³(µÚÒ»ÈË)»òÕß13542072734ÀîÉÐÆæ  +QQ44116005 Ææ£¨µÚ¶þÈË£© µç»°02368317916 Í¿Ôö +QQ252034688(µÚÈýÈË)ÊÖ»ú13570548822µç»°02085522738ºò½ú¶«+QQ2647
+29225globolÇþµÀ(µÚËÄÈË)·½±ã¸Û°ÄÒÔ¼°ËùÓÐ·±Ìå°æ±¾µÄÅóÓÑÔÄÀÀÇë½øÈë
+http://sunjinsheng.home.sunbo.net/
+
+µ±Ç°×¨ÀûºÏ×÷Ç¢Ì¸ÖÐ ¶ÔÎÒÃÇµÄ×¨ÀûÓÐÐËÈ¤µÄÅóÓÑÇëÉÔÎ¢ µÈµÈ ÍòÒ»Õâ¸öÇ¢Ì¸²»³É ÎÒÃÇÔÙÌ¸
+×¨ÀûºÏ×÷Ì¸³ÉÁË Ä¿Ç°¸÷¸öµØÇøµÄ´úÀí²»±ä ÏÖ³ÏÕÐÆäËûµØÇøµÄ¶À¼Ò´úÀí µç»°13938603662
+
+
+--------------------
+
+
+Original Message:
+
+
+X-YahooFilteredBulk: 219.146.223.41
+Authentication-Results: mta108.mail.cnb.yahoo.com
+  from=jakarta.apache.org; domainkeys=neutral (no sig)
+X-Originating-IP: [219.146.223.41]
+Return-Path: <tomcat-user@jakarta.apache.org>
+Received: from 219.146.223.41  (EHLO jakarta.apache.org) (219.146.223.41)
+  by mta108.mail.cnb.yahoo.com with SMTP; Mon, 28 Feb 2005 08:13:11 +0800
+From: tomcat-user@jakarta.apache.org
+To: sunjinsheng0604@yahoo.com.cn
+Subject: Hello
+Date: Mon, 28 Feb 2005 08:11:59 +0800
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0005_8F0CA16D.717EFEBC"
+X-Priority: 3
+X-MSMail-Priority: Normal
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0005_8F0CA16D.717EFEBC
+Content-Type: text/plain;
+        charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+
+The message contains Unicode characters and has been s
+_________________________________________________________
+DO YOU YAHOO!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

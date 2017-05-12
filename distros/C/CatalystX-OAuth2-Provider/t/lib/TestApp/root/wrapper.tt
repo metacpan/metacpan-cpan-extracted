@@ -1,0 +1,16 @@
+<html>
+<head><title>TestApp</title></head>
+<body>
+    <p>
+    [% IF c.user -%]
+        ([% c.user.id %] <a href='[% c.uri_for('/logout') %]'>logout</a>)
+    [% ELSE -%]
+        (Guess)
+    [% END -%]
+    </p>
+    <b>[% error_msg || c.flash.error_msg %]</b>
+    <div>
+        [% content %]
+    </div>
+</body>
+</html>

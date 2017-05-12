@@ -1,0 +1,23 @@
+---
+abstract: 'Runtime cgiapp info in a popup window'
+author:
+  - 'Rhesa Rozendaal <rhesa@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-DevPopup
+requires:
+  CGI::Application: 4.01
+  HTML::Template: 0
+  IO::Scalar: 0
+  Test::More: 0
+  Time::HiRes: 0
+resources:
+  repository: http://github.com/rhesa/cgi-application-plugin-devpopup
+version: 1.08

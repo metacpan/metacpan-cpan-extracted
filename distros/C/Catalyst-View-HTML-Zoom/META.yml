@@ -1,0 +1,24 @@
+---
+abstract: 'Catalyst view to HTML::Zoom'
+author:
+  - 'Oliver Charles <oliver.g.charles@googlemail.com>'
+build_requires:
+  Catalyst::Action::RenderView: 0.14
+  Catalyst::Runtime: 5.8
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-HTML-Zoom
+requires:
+  Class::MOP: 1.12
+  HTML::Zoom: 0.009
+  Moose: 1.21
+  Path::Class: 0.23
+  namespace::autoclean: 0.09
+version: 0.003

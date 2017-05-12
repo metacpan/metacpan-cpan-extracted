@@ -1,0 +1,14 @@
+Build.PL
+Changelog.ini
+CHANGES
+lib/Config/Tiny/Ordered.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_compile.t
+t/02_main.t
+t/98_pod.t
+t/99_pmv.t
+test.conf

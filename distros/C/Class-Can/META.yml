@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Class-Can
+version: 0.01
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: |-
+  inspect a class/method and say what it can do (and why)
+license: perl
+requires:
+  Devel::Symdump: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Class::Can:
+    file: lib/Class/Can.pm
+    version: 0.01
+generated_by: Module::Build version 0.25

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Helper/Model/Facebook.pm
+lib/Catalyst/Model/Facebook.pm
+t/00-load.t
+t/release-pod-syntax.t

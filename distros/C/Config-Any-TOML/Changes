@@ -1,0 +1,9 @@
+Revision history for Config-Any-TOML
+
+0.002     2013-12-03 13:34:51 Europe/London
+
+  - POD tidy and correct 'requires_any_of' method name
+
+0.001     2013-12-02 09:04:54 Europe/London
+
+  - Initial release

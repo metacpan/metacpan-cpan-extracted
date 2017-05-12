@@ -1,0 +1,60 @@
+{{{}
+{   "abstract" : "Disassemble the flow of a Z80 program",}
+{   "author" : [}
+{      "Paulo Custodio <pscust@cpan.org>"}
+{   ],}
+{   "dynamic_config" : 1,}
+{   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",}
+{   "license" : [}
+{      "unknown"}
+{   ],}
+{   "meta-spec" : {{}
+{      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",}
+{      "version" : "2"}
+{   }},}
+{   "name" : "CPU-Z80-Disassembler",}
+{   "no_index" : {{}
+{      "directory" : [}
+{         "t",}
+{         "inc"}
+{      ]}
+{   }},}
+{   "prereqs" : {{}
+{      "build" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "configure" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "runtime" : {{}
+{         "requires" : {{}
+{            "Asm::Z80::Table" : "0.02",}
+{            "Bit::Vector" : "7.1",}
+{            "CPU::Z80::Assembler" : "2.13",}
+{            "Carp" : "0",}
+{            "Class::XSAccessor" : "1.08",}
+{            "File::Basename" : "0",}
+{            "File::Slurp" : "9999.12",}
+{            "Getopt::Std" : "0",}
+{            "Test::More" : "0.96",}
+{            "Test::Output" : "0.16",}
+{            "Tie::File" : "0.96",}
+{            "perl" : "5.01"}
+{         }}}
+{      }}}
+{   }},}
+{   "release_status" : "stable",}
+{   "resources" : {{}
+{      "repository" : {{}
+{         "type" : "git",}
+{         "url" : "git://github.com/pauloscustodio/perl-CPU-Z80-Disassembler.git",}
+{         "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler"}
+{      }}}
+{   }},}
+{   "version" : "0.05",}
+{   "x_serialization_backend" : "JSON::PP version 2.27300"}
+{}}}

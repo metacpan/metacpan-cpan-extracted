@@ -1,0 +1,180 @@
+NAME
+    CGI::AppBuilder::Form - Configuration initializer
+
+SYNOPSIS
+      use CGI::AppBuilder::Form;
+
+      my $ab = CGI::AppBuilder::Form->new(
+         'ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my ($q, $ar, $ar_log) = $ab->start_app($0, \%ARGV);
+      print $ab->disp_form($q, $ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  disp_form ($q, $ar)
+    Input variables:
+
+      $q    - CGI object
+      $ar   - array ref for parameters
+
+    Variables used or routines called:
+
+      CGI::AppBuilder::Message
+        echo_msg - echo messages
+        set_param - get a parameter from hash array
+      CGI::AppBuilder::Config
+        eval_variables - replace value names with their values.
+
+    How to use:
+
+      my $ifn = 'myConfig.ini';
+      my ($q,$ar) = $s->get_inputs($ifn);
+      $self->disp_form($q, $ar);
+
+    Return: none
+
+    This method expects the following varialbes in $ar:
+
+      gk - GUI key items
+      gi - GUI items
+      gc - GUI columns
+      gf - GUI form
+      db - database connection varialbes (optional)
+      vars_keep - variables separated by comma for hidden variables
+      hr_form - hash ref containing attributes for <FORM> such as
+        -target = "main"
+
+    This method performs the following tasks:
+
+      1) checks whether GI, GC and GF variables being defined.
+      2) replaces AR, DB, GI, and GC variables with their contents
+      3) builds GF elements
+      4) add hidden variables
+      5) print the form
+
+  explode_html ($gi, $pr)
+    Input variables:
+
+      $gi   - a hash ref 
+      $pr   - a parameter hash ref
+
+    Variables used or routines called:
+
+      CGI::AppBuilder::Message
+        echo_msg - echo messages
+
+    How to use:
+
+      my $ifn = 'myConfig.ini';
+      my ($q,$ar) = $s->get_inputs($ifn);
+      $self->explote_html($ar->{gi}, $ar);
+
+    Return: none
+
+    This method enables a 'x' command in your GUI definition and processes
+    the complex elements in the hash ref. For instance, you have a GUI hash:
+
+      gi = {   # GUI Items
+        rts => ['rpt_src',['DataFax Generic','Study Specific'],
+             'DataFax Generic'],
+        xtd_rts => 'radio_group',
+        act1 => td('Action'),
+        act2 => td({-colspan=>'2',-align=>'center'},
+              gk->{opf} . submit('a','Go') . ' ' . submit('a','Update') .
+              ' ' . reset() ),
+        xcp_act => 'act1,act2',
+        act  => submit('a','Go') . ' ' . reset(),
+        }
+
+    and the method will copy (xcp_act) the results (HTML text) of
+    $gi->{act1} and and $gi->{act2} into one. The $gi->{xcp_act} will
+    contains the combined string.
+
+    The 'xtd_' instructs the method to use $gi->{rts} as arguments for the
+    method name in $gi->{xtd_rts}.
+
+  explode_variable ($xr, $i, $pr)
+    Input variables:
+
+      $xr - a hash ref such as the elements of gi,gk,gc,gf in 
+            GUI hash array 
+      $i  - one of gi, gk, gc and gf
+      $pr - a parameter hash ref containing the values for $i to be
+            used in $xr
+
+    Variables used or routines called:
+
+      CGI::AppBuilder::Message
+        echo_msg - echo messages
+
+    How to use:
+
+      my $ifn = 'myConfig.ini';
+      my ($q,$ar) = $s->get_inputs($ifn);
+      my $gi = $self->explode_variable($ar, 'gi', $ar);
+      my $gc = $self->explode_variable($ar, 'gc', $ar);
+
+    Return: hash or hash ref for $i.
+
+    This method replaces variable names with their values and HTML commands
+    with their results.
+
+  replace_named_variables ($ar, $vs, $ks)
+    Input variables:
+
+      $ar - a hash ref containing the elements of gi,gk,gc,gf in 
+            GUI hash array 
+      $vs - a list of variable names separated by comma such as 
+            'ar,db,gi,gk,gc'
+      $ks - a list of key elements separated by comma such as
+            'gk,gi,gc,gf'
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $ifn = 'myConfig.ini';
+      my ($q,$ar) = $s->get_inputs($ifn);
+      $self->replace_named_variables($ar, 'ar,db,gk,gi,gc','gk,gi,gc,gf');
+
+    Return: None.
+
+    This method replaces named variables with their values in $ar.
+
+HISTORY
+    *   Version 0.10
+
+        This version extracts the disp_form method from CGI::Getopt class,
+        inherits the new constructor from CGI::AppBuilder, and adds new
+        methods of replace_named_variables, explode_variable, and
+        explode_html.
+
+    *   Version 0.20
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 404:
+        You forgot a '=back' before '=head1'
+

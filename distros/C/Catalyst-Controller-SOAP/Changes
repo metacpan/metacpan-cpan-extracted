@@ -1,0 +1,138 @@
+releases/1.25 -- Sat, 3 Mar 2013 13:13:25 -0500
+  xxxxxx Daniel Ruoso <daniel@ruoso.com> META.yml was incorrectly in source control, versioned dependencies should be declared in Makefile.PL
+releases/1.24 -- Sat, 2 Mar 2013 13:13:25 -0500
+  2cf0e7 Daniel Ruoso <daniel@ruoso.com> Silence XML::Compile error in the test that we expect to fail
+  645cca2 Daniel Ruoso <daniel@ruoso.com> XML::Compile got smarter about Math::BigInt
+  c2e0e22 Daniel Ruoso <daniel@ruoso.com> Properly address the action class.
+  8667a3c Daniel Ruoso <daniel@ruoso.com> fix all qw as parentheses usages
+  013e22e Daniel Ruoso <daniel@ruoso.com>  _parse_attrs supports multiple returned attributes since 90017.
+  74beb80 Daniel Ruoso <daniel@ruoso.com> Updating changelog
+releases/1.23 -- Sun, 22 May 2011 13:56:49 -0400
+  e786107 Daniel Ruoso <daniel@ruoso.com> Bump version number
+  25eacfc Daniel Ruoso <daniel@ruoso.com> Documentation for Document/Literal-Wrapped
+  159b42f Daniel Ruoso <daniel@ruoso.com> Implements Document/Literal-Wrapped WSDL support
+releases/1.22 -- Mon, 24 May 2010 22:12:15 +0000
+  9b97de5 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] compatibilizes with newer XML::Compile::SOAP which appends "Response" and expects "Response" in rpc literal return (there is no spec for that, but it seems to be a common practice)
+releases/1.21 -- Fri, 14 May 2010 16:31:26 +0000
+  b498fcc ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> document dependency on moose
+releases/1.20 -- Mon, 3 May 2010 14:55:08 +0000
+  e8309b3 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] fixing the MANIFEST
+  ae5f46e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Add a new test for type-based messages. Use MRO::Compat instead of Class::C3
+releases/1.19 -- Tue, 9 Jun 2009 20:05:51 +0000
+  52cb228 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] prefixes the envelope because XML::LibXML doesnt handle unqualified elements properly;
+releases/1.18 -- Mon, 8 Jun 2009 21:21:27 +0000
+  bf8984c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] fix manifest
+  bbcfb86 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] dont set error 500 with SOAP Fault, setting 500 means a transport fault, not a processing fault. [C-C-SOAP] applies patch from kmx
+  fb7fd71 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] test for one way document literal
+releases/1.17 -- Fri, 5 Jun 2009 19:51:33 +0000
+  531cf70 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] marking next release
+  bdb437d ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Dont provide any return when no return is expected
+  9efbd83 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] fix the tests for win32
+releases/1.15 -- Fri, 29 May 2009 19:02:24 +0000
+  a4e77e0 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] bumping version number
+  bff7f63 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Should work with latest XML::Compile::SOAP - fix some namespace use problems;
+releases/1.14 -- Tue, 7 Apr 2009 14:11:16 +0000
+  cef0d4c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] use encode
+  8bde9bf ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] bumping the revision
+  3087841 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] fix utf8 bug, using a patch by kmx;
+releases/1.13 -- Thu, 26 Mar 2009 17:23:06 +0000
+  a1b244b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Fix tests, mark proper versioned dependencies... I hope the testers pass now...
+releases/1.12 -- Wed, 25 Mar 2009 12:29:06 +0000
+  3ee6d3d ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Fix declaration of pre-requisites. several FAILs have arrived in my mailbox...
+releases/1.11 -- Mon, 23 Mar 2009 13:38:52 +0000
+  1f9669f humph <humph@4ad37cd2-5fec-0310-835f-b3785c72a374> version bump, added myself as author
+  87b4062 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] merging branch that fixes to work with newer XML::Compile::SOAP
+  6e6ac22 humph <humph@4ad37cd2-5fec-0310-835f-b3785c72a374> fix for namespace issues with faults
+  71dfbf7 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] update email address in all files.
+  4cac5b5 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Improved debug output. Only stringify envelop once.
+  6c120d6 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> fixing the versioning schema...
+  6b9f36b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] marking release 0.10
+  5f29006 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] uses class::c3 maybe::next::method... call decoder only if there is one
+  46aff99 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Support other message types then request-response
+  387507e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Getting read of NEXT:: in favour of next::method
+  5a4dc2a ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] redefines _parse_attr to match the method as in the Controller.pm in trunk, while it is not released
+  94308f6 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Do not override the fault on uncatched exceptions, because if there is a fault, it means that we already know the cause
+releases/1.10 -- Mon, 5 May 2008 20:02:01 +0000
+  04df457 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] XML QName accepts names without prefixes. I will stop mangling with the prefixes here.
+  821655d ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] uses the same prefix as used by XML::Compile::SOAP
+  d7ed441 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Marking release 0.9
+releases/0.9 -- Wed, 30 Apr 2008 00:42:45 +0000
+  1409494 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Better support for literal messages
+  d56ecd9 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Get XML string before parsing so we can see invalid xml
+  a7f8827 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added logging of incoming and outgoing XML messages.
+  741103b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Now generates SOAP1.1 fault messages. It was generating SOAP1.2 even in the SOAP1.1 namespace.
+  dc7ce6f ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] forces "elements_qualified" on the schema writer.
+  a854165 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added documentation about using Catalyst::Test and WSDL files.
+  f85886c drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Fixed bracing style
+  4d99cad drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> - Fixed example for xml_compile options - Added debug information
+  e60cf77 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] The test failures are from a bad make dist... Will upload again, with a sane make dist now. Increasing version to 0.8
+  528ac0f ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Updating MANIFEST
+  2073b9c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Refactoring the documentation to give preference to the WSDL usage...
+  243513e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] FINALLY!!! Automatic RPC endpoint working...
+  7d8b2f5 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] config usage cleanup.
+  4f1f017 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] config usage cleanup.
+  4fcdc1c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Support for the WSDLPort attribute... Still some things to clear...
+  91eb3ee ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Setting VERSION to 0.6
+releases/0.8 -- Fri, 4 Apr 2008 11:15:37 +0000
+releases/0.7 -- Fri, 4 Apr 2008 11:15:37 +0000
+releases/0.6 -- Fri, 4 Apr 2008 11:15:37 +0000
+  2fdc200 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Fix misspelling in method call when adding additional wsdl files
+  101ca53 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added support for passing options to $wsdl->schemas->compile().
+  a336967 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Saving some changelog
+  c6bffbf ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Tests for Document/Literal-Wrapped working. Supports several wsdls and schemas in the config.
+  b74be6b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Document/Literal-Wrapped support (with a big ONLY FOR COMPATIBILTY REASONS disclaimer)... Test is still failing as the SOAPAction header seems to be lost in the test...
+  bbd7bf0 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Better support for RPC messages, tests including an example of a RPC-Literal service, exception catching generating a SOAP Fault.
+  b3bda83 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Missing test files
+  50aa5eb ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Fixing dependencies and MANIFEST
+  8e376a7 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Now supports WSDL encoding/decoding of messages.
+releases/0.5 -- Wed, 16 Jan 2008 12:28:39 +0000
+releases/0.4 -- Wed, 16 Jan 2008 12:28:39 +0000
+releases/0.3 -- Wed, 16 Jan 2008 12:28:39 +0000
+  06ba77e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] some fixes thanks to kaare++
+  69bcc3a ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Using Namespace-aware lookup methods. Bump version to 0.1.2
+releases/0.2.0 -- Tue, 27 Nov 2007 11:04:51 +0000
+releases/0.10 -- Mon, 5 May 2008 20:02:01 +0000
+  04df457 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] XML QName accepts names without prefixes. I will stop mangling with the prefixes here.
+  821655d ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] uses the same prefix as used by XML::Compile::SOAP
+  d7ed441 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Marking release 0.9
+  1409494 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Better support for literal messages
+  d56ecd9 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Get XML string before parsing so we can see invalid xml
+  a7f8827 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added logging of incoming and outgoing XML messages.
+  741103b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Now generates SOAP1.1 fault messages. It was generating SOAP1.2 even in the SOAP1.1 namespace.
+  dc7ce6f ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] forces "elements_qualified" on the schema writer.
+  a854165 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added documentation about using Catalyst::Test and WSDL files.
+  f85886c drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Fixed bracing style
+  4d99cad drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> - Fixed example for xml_compile options - Added debug information
+  e60cf77 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] The test failures are from a bad make dist... Will upload again, with a sane make dist now. Increasing version to 0.8
+  528ac0f ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Updating MANIFEST
+  2073b9c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Refactoring the documentation to give preference to the WSDL usage...
+  243513e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] FINALLY!!! Automatic RPC endpoint working...
+  7d8b2f5 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] config usage cleanup.
+  4f1f017 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] config usage cleanup.
+  4fcdc1c ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Support for the WSDLPort attribute... Still some things to clear...
+  91eb3ee ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Setting VERSION to 0.6
+  2fdc200 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Fix misspelling in method call when adding additional wsdl files
+  101ca53 drew <drew@4ad37cd2-5fec-0310-835f-b3785c72a374> Added support for passing options to $wsdl->schemas->compile().
+  a336967 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Saving some changelog
+  c6bffbf ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Tests for Document/Literal-Wrapped working. Supports several wsdls and schemas in the config.
+  b74be6b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Document/Literal-Wrapped support (with a big ONLY FOR COMPATIBILTY REASONS disclaimer)... Test is still failing as the SOAPAction header seems to be lost in the test...
+  bbd7bf0 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Better support for RPC messages, tests including an example of a RPC-Literal service, exception catching generating a SOAP Fault.
+  b3bda83 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Missing test files
+  50aa5eb ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Fixing dependencies and MANIFEST
+  8e376a7 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-S] Now supports WSDL encoding/decoding of messages.
+  06ba77e ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] some fixes thanks to kaare++
+  69bcc3a ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] Using Namespace-aware lookup methods. Bump version to 0.1.2
+releases/0.1.2 -- Tue, 27 Nov 2007 11:04:51 +0000
+  8902c89 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn FINAL] marking new release fixing errors pointed by CPANTESTERS... This is the last commit made in the git repo...
+  d7fcd54 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn]  Thu Nov 22 18:26:32 2007 +0000 --  marking a new release and leaving RPCEncoded out of it.
+  cc9e85d ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn]  Wed Nov 21 18:33:13 2007 +0000 -- now do not depend on renderview in the test. Also declare the versioned dependency on the Catalyst::Runtime  The PostApp app is now used in a test..  Better README and Changes file..   Make the test more cross-platform..  marking a new release..
+  033ea66 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn] Thu Nov 15 09:59:28 2007 +0000 -- fixing naming of modules in documentation...  marking new release
+  939786b ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn]  Wed Nov 14 19:13:24 2007 +0000 -- trying to make the test POST to work, marking new release
+  5da72a7 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn] Wed Nov 14 14:22:14 2007 +0000 -- fixing the attribute parsing method. HTTPGet working, POST test failing because the post data is not reaching the destination...
+  95280c5 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn] Tue Nov 13 18:04:29 2007 +0000 -- Implements minimal response generation
+  5d43b89 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn] Tue Nov 13 17:10:53 2007 +0000 --  XML::DOM doesnt support namespaces, lets move to XML::LibXML instead
+  56c3490 ruoso <ruoso@4ad37cd2-5fec-0310-835f-b3785c72a374> [C-C-SOAP] [git2svn] Tue Nov 13 15:17:41 2007 +0000 -- initial revision
+releases/0.1.1 -- Mon, 26 Nov 2007 17:49:37 +0000
+releases/0.1 -- Mon, 26 Nov 2007 17:49:37 +0000
+releases/0.0.6 -- Mon, 26 Nov 2007 17:49:37 +0000
+releases/0.0.4 -- Mon, 26 Nov 2007 17:49:37 +0000

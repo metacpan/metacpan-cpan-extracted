@@ -1,0 +1,44 @@
+[%
+
+  title = 'Browse by Tester' ;
+
+  IF letter ;
+
+    crumb3_name = 'Authors' ;
+    crumb3_href = '/' ;
+    crumb2_name = 'Browse by Tester' ;
+    crumb2_href = '/authors/testers' ;
+    crumb1_name = letter ;
+
+  ELSE ;
+
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Tester' ;
+
+  END ;
+
+  box_help   = 1 ;
+  box_prefs  = 1 ;
+  javascript = 1 ;
+
+%]
+
+<p>
+<a href="/author/testers/9">9</a>
+[% FOREACH char = ['A' .. 'Z'] %]
+<a href="/author/testers/[% char %]">[% char %]</a>
+[% END %]
+</p>
+
+<p>Select the tester to view reports.</p>
+
+[% IF data.testers %]
+<ul>
+[% FOREACH d = data.testers %]
+<li><a href="/author/tester/[% d.testerid %]"">[% d.name %][% IF d.pause %] ([% d.pause %])[% END %]</a></li>
+[% END %]
+</ul>
+[% ELSE %]
+<p>Sorry, no testers found.</p>
+[% END %]

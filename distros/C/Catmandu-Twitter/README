@@ -1,0 +1,22 @@
+Twitter to Atom converter:
+
+ $ twitter2atom.pl '#elag2013' > feed.xml
+
+Twitter importer Catmandu style:
+
+Usage:
+
+use Catmandu::Importer::Twitter;
+
+my $x = Catmandu::Importer::Twitter->new(query => '#elag2013');
+
+$x->each(sub {  
+	my $obj = shift; 
+	print $obj->{text} , "\n";
+});
+
+or lazier via the command line
+
+$ catmandu data --from-importer Twitter --from-query '#elag2013' --into-exporter YAML
+
+See the Catmandu project for more examples: http://librecat.org

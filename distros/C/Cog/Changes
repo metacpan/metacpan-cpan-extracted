@@ -1,0 +1,36 @@
+0.11 Mon Jun  8 10:10:46 MDT 2015
+ - Fix image/ in `cog make`
+
+0.10 Mon Jun  8 06:07:54 MDT 2015
+ - Change default build root to be same as app root
+
+0.09 Sat Jun  6 13:09:22 PDT 2015
+ - Big refactor
+ - Make Cog just a web thing
+ - Remove database ambitions
+ - Supports Tinker and Tinker::App::YAMLTesting
+
+0.08 Sun Mar 15 07:18:53 PDT 2015
+ - Switch over to Zilla::Dist
+
+0.07
+ - Lots of changes and refactoring.
+ - Releasing now mostly to index Cog.pm to the Cog dist
+
+0.06
+ - Add missing prereqs
+ - Tons of work since last release
+ - Release for OSDC.tw
+
+0.05 Thu Dec 23 00:23:17 EST 2010
+ - Add a VERSION to Cog::Cog
+
+0.04 Wed Dec 22 15:17:53 EST 2010
+ - Get Cog::Cog indexed
+
+0.03 Mon Dec 20 22:26:56 EST 2010
+ - Left a console.log in js
+
+0.02 Mon Dec 20 22:16:59 EST 2010
+ - First Release
+

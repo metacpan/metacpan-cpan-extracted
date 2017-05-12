@@ -1,0 +1,39 @@
+---
+abstract: 'bootstrap a CPAN-able Catalyst component'
+author:
+  - '=head1 COPYRIGHT & LICENSE'
+build_requires:
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  File::pushd: 0
+  Test::Exception: 0
+  Test::TableDriven: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Starter
+no_index:
+  directory:
+    - inc
+    - lib/auto
+    - t
+requires:
+  Catalyst::Devel: 0
+  Catalyst::Runtime: 5.80015
+  File::Copy::Recursive: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  Moose: 0
+  Test::More: 0.88
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/catalystx-starter.git
+version: 0.07

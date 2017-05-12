@@ -1,0 +1,28 @@
+Cisco-Abbrev
+
+Cisco routers often produce abbreviated interface names in terse command
+output.  This module translates from the short name to the canonical
+interface name, and vice versa.  For example:
+
+	Fa3/1 --> FastEthernet3/1
+	FastEthernet3/1 --> Fa3/1
+
+This is useful for cross-referencing between router outputs that use both
+formats.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 kevin brintnall
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

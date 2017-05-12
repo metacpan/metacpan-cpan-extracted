@@ -1,0 +1,15 @@
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-Buffy','1.5','1177769034','LBROCARD','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('AI-NeuralNet-SOM','0.07','1211612835','DRRHO','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme','1.11111','1137626100','INGY','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-CPANAuthors-CodeRepos','0.080522','1211390902','ISHIGAKI','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-CPANAuthors-Japanese','0.090101','1230748955','ISHIGAKI','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-CPANAuthors-French','0.07','1225662681','SAPER','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-CPANAuthors-Canadian','0.0101','1225664601','ZOFFIX','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-BOPE','0.01','1222060546','GARU','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('AEAE','0.02','1139566791','JETEVE','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-Anything','0.02','1194827066','JJORE','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('AI-NeuralNet-BackProp','0.89','966496907','JBRYAN','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('AI-NeuralNet-Mesh','0.44','968964981','JBRYAN','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Acme-Brainfuck','1.1.1','1081268735','JALDHAR','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('AOL-TOC','0.340','966917420','JHARDING','1');
+INSERT INTO ixlatest ( dist, version, released, author, oncpan ) VALUES ('Abstract-Meta-Class','0.13','1227483540','ADRIANWIT','1');

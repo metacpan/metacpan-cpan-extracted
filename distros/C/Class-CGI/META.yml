@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-CGI
+version: 0.20
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: "Fetch objects from your CGI object"
+license: perl
+generated_by: Module::Build version 0.2704, without YAML.pm

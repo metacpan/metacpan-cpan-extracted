@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Catalyst/Log/Log4perlSimple.pm
+lib/Catalyst/Plugin/Log/Log4perlSimple.pm
+lib/Log/Log4perl/Appender/CatalystProxy.pm
+t/02pod.t
+t/03podcoverage.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,19 @@
+Revision history for Perl extension Class::DBI::FormBuilder::Plugin::Time::Piece.
+
+0.1     11 Oct 2005, 13:30
+        - new maintainer
+        - field() accepts correct args list - changed in CDBI-FB 0.47
+        - updated tests to match recent changes to form output - timestamp 
+            fields are readonly
+
+0.03  Jul 02 2005
+	- Handles "Add" form fields, that is, Class/empty form fields
+
+0.02  Jun 30 2005
+	- First Release
+	- Handles time, date, datetime, and timestamp types for MySQL only.
+
+0.01  Thu Jun 30 09:50:08 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Class::DBI::FormBuilder::Plugin::Time::Piece
+

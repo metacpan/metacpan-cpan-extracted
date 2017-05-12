@@ -1,0 +1,60 @@
+/* CatalystX::CRUD::YUI css */
+
+#help
+{
+    margin: 2em;
+    width: 600px;
+}
+
+#help div
+{
+    margin-bottom: 8px;
+}
+
+#help h2,
+#help h3
+{
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 4px;
+}
+
+#help h2
+{
+    font-size: 130%;
+}
+
+#help h3
+{
+    font-size: 120%;
+}
+
+#help ul
+{
+    margin: 1em;
+}
+
+#help ul li
+{
+    list-style-type: disc; /* default */
+    list-style-position: inside;
+}
+
+#help dl
+{
+    margin: 1em;
+}
+
+#help dl dt
+{
+    margin-left: 0.25em;
+    margin-bottom: 0.25em;
+    font-weight: bold;
+    font-size: 110%;
+}
+
+#help dl dd
+{
+    margin-left: 1em;
+    margin-bottom: 1em;
+}

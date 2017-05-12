@@ -1,0 +1,15 @@
+MANIFEST
+Changes
+Makefile.PL
+lib/CGI/CRUD/Output.pm
+lib/CGI/CRUD/TableIO.pm
+lib/CGI/CRUD/Table.pm
+lib/CGI/CRUD.pm
+t/CGI-CRUD.t
+README
+LICENSE
+lib/CGI/CRUD/ApacheOutputFastTemplate.pm
+lib/CGI/CRUD/CGIOutputFastTemplate.pm
+lib/CGI/CRUD/SkipperOutput.pm
+lib/CGI/CRUD/Skipper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

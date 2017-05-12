@@ -1,0 +1,508 @@
+NAME
+
+       GB18030 - Source code filter for GB18030 script (Imitation JPerl)
+
+SYNOPSIS
+
+    In your script:
+
+      use GB18030;
+
+    At command prompt:
+
+      perl  yourscript.pl  wild*  *card  and  '*quote*'  on MSWin32
+
+DESCRIPTION
+
+      This software is "JPerl on the Modern Perl" written by Perl.
+      We can write the script in GB18030.
+
+      This software treats GB18030 directly. Therefore, there is not UTF8 flag.
+
+INSTALLATION BY MAKE (for UNIX like system)
+
+To install this software by make, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALLATION WITHOUT MAKE (for DOS like system)
+
+To install this software without make, type the following:
+
+   perl pMakefile.PL    --- pMakefile.PL makes "pmake.bat" only, and ...
+   pmake.bat
+   pmake.bat test
+
+   pmake.bat install    --- install to current using Perl
+
+   pmake.bat dist       --- make distribution package
+   pmake.bat ptar.bat   --- make perl script "ptar.bat"
+
+DEPENDENCIES
+
+This software requires perl5.00503 or later.
+
+LICENSE AND COPYRIGHT
+
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+MAINTAINER
+
+This project was originated by INABA Hitoshi <ina@cpan.org>.
+
+GB 18030 IN WIKIPEDIA
+
+GB 18030 (2009.08.10 12:00:00 JST). In Wikipedia: The Free Encyclopedia.
+Retrieved from
+http://en.wikipedia.org/wiki/GB_18030
+
+GB18030 is the registered Internet name for the official character set of the
+People's Republic of China (PRC) superseding GB2312. This character set is
+formally called "Chinese National Standard GB 18030-2005: Information technology
+-- Chinese coded character set". GB means national standard in Chinese.
+The standard was published by the China Standard Press, Beijing, November 8, 2005.
+Only a portion of the standard is mandatory. Since May 1, 2006, support for the
+mandatory subset is officially required for all software products sold in the
+PRC. Due to its Unicode equivalence, GB18030 supports both simplified and
+traditional Chinese characters.
+
+An older version of the standard, known as "Chinese National Standard GB 18030-2000:
+Information Technology -- Chinese ideograms coded character set for information
+interchange -- Extension for the basic set", was published on March 17, 2000.
+The encoding scheme remains the same in the new version, except that two code
+points for the characters have been exchanged. More code points are now
+associated to characters due to update of Unicode, especially the appearance of
+CJK Unified Ideographs Extension B. Some characters used by ethnic minorities in
+China, such as Mongolian characters and Tibetan characters, have been added as
+well, which accounts for the renaming of the standard.
+
+GB18030 can be considered a Unicode Transformation Format (i.e. an encoding of
+all Unicode code points) that maintains compatibility with a legacy character set.
+Like UTF-8, GB18030 is a superset of ASCII and can represent the whole range of
+Unicode code points; in addition, it is also a superset of GB2312. GB18030 also
+maintains compatibility with Windows Codepage 936, sometimes known as GBK, which
+is Microsoft's extended version of GB2312, with the exception of the euro sign
+which is given a single byte code of 0x80 in Microsoft's later versions of GBK
+and a two byte code of A2 E3 in GB18030. GB 18030-2005 is also compatible with
+Chinese Internal Code Specification, Version 1.0, known as GBK 1.0, which is a
+slight extension of Windows Codepage 936 in 1995. Mapping to Unicode, however,
+has been modified for the 81 characters that were provisionally assigned a
+Unicode PUA code point in GBK 1.0 and that have later been encoded in Unicode.
+This is specified in Appendix E of GB 18030-2005. There are 14 characters in GB
+18030-2005 that are still mapped to Unicode PUA.
+
+Part of the mapping data is from a lookup table (similarly to GBK). The rest is
+calculated algorithmically. Unfortunately it also inherits the bad aspects of the
+legacy standards it's based on (most notably needing special code to safely find
+ASCII characters in a GB18030 sequence).
+
+Most major computer companies had already standardised on some version of Unicode
+as the primary format for use in their binary formats and OS calls. However, they
+mostly had only supported code points in the BMP originally defined in Unicode 1.0,
+which supported only 65,536 codepoints and was often encoded in 16 bits as UCS-2.
+
+The mandatory part of GB 18030-2005 consists of 1 byte and 2 byte encoding,
+together with 4 byte encoding for CJK Unified Ideographs Extension A.
+The corresponding Unicode code points of this subset lie entirely in the BMP.
+
+In a move of historic significance for software supporting Unicode, the PRC
+decided to mandate support of certain code points outside the BMP. This means
+that software can no longer get away with treating characters as 16 bit fixed
+width entities (UCS-2). Therefore they must either process the data in a variable
+width format (such as UTF-8 or UTF-16), which are the most common choices, or
+move to a larger fixed width format (such as UCS-4 or UTF-32). Microsoft made
+the change from UCS-2 to UTF-16 with Windows 2000.
+
+GB18030 Support
+
+Encoding
+
+Windows 2000 can support the GB18030 encoding if GB18030 Support Package [1] is
+installed. Windows XP can support it natively.
+More specifically, supporting the GB18030 encoding on Windows means that Code
+Page 54936 is supported by MultiByteToWideChar and WideCharToMultiByte. Due to
+the backward compatibility of the mapping, many files in GB18030 can be actually
+opened successfully as the legacy Code Page 936, that is GBK, even if the Code
+Page 54936 is not supported. However, that is only true if the file in question
+contains only GBK characters. Loading will fail or cause corrupted result if the
+file contains characters that do not exist in GBK (see below for examples).
+
+Glyphs
+
+GB18030 Support Package contains SimSun18030.ttc, a TrueType font collection file
+which combines two Chinese fonts, SimSun-18030 and NSimSun-18030.
+The SimSun 18030 font includes all the characters in Unicode 2.1 plus new characters
+found in the Unicode CJK Unified Ideographs Extension A section, but despite its
+name, it does not contain glyphs for all GB 18030 characters. Note that all
+(about a million) Unicode code points up to U+10FFFF can be encoded as GB 18030,
+hence "a font that fully supports GB 18030" would mean a font that contains glyphs
+for all Unicode characters, not only for CJK ones. HAN NOM A and HAN NOM B [2] are
+free fonts, which include all the characters in the Extension A and the Extension B,
+more exhaustive than SimSun-18030, or even than Simsun (Founder Extended), but
+they don't support all code points defined in Unicode 5.0.0 either.
+
+Technical details
+
+The four byte scheme can be thought of as consisting of two units, each of two bytes.
+Each unit has a similar format to a GBK two byte character but with a range of
+values for the second byte of 0x30..0x39 (the ASCII codes for decimal digits).
+The first byte has the range 0x81 to 0xFE, as before. This means that a string
+search routine that is safe for GBK should also be reasonably safe for GB18030
+(in much the same way that a basic byte-oriented search routine is reasonably
+safe for EUC).
+
+This gives a total of 1,587,600 (126 x 10 x 126 x 10) possible 4 byte sequences,
+which is easily sufficient to cover Unicode's 1,111,998 (17 x 65536 - 2048
+surrogates " 66 noncharacters) assigned and reserved code points. (Surrogates
+and noncharacters are considered designated but not assigned.)
+
+Unfortunately, to further complicate matters there are no simple rules to
+translate between a 4 byte sequence and its corresponding code point. Instead,
+codes are allocated sequentially (with the first byte containing the most
+significant part and the last the least significant part) only to Unicode code
+points that are not mapped in any other manner. For example:
+
+  U+00DE --> 81 30 89 37
+  U+00DF --> 81 30 89 38
+  U+00E0 --> A8 A4
+  U+00E1 --> A8 A2
+  U+00E2 --> 81 30 89 39
+  U+00E3 --> 81 30 8A 30
+
+"GB18030" IN THIS SOFTWARE
+
+ The "GB18030" in this software means widely codeset than general GB18030.
+This software use two algorithms to handle GB18030.
+
+* ALGORITHM #1
+
+ When the character is taken out of the octet string, it is necessary to
+distinguish a single octet character and the multiple octet character.
+
+    Single octet code is:
+      0x00-0x80 and 0xFF
+
+    Double octet code is:
+      First octet   0x81-0xFE
+      Second octet  0x00-0x2F and 0x3A-0xFF
+
+    Quadruple octet code is:
+      First octet   0x81-0xFE
+      Second octet  0x30-0x39
+      Third octet   0x81-0xFE
+      Fourth octet  0x00-0xFF (All octet)
+
+    MALFORMED single octet code is:
+      0x81-0xFE
+      * Final octet of string like first octet of multiple octet code
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0x80
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*| | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F| | | | | | | | | | | | | | | |*| 0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Double octet code
+            First octet                                     Second octet
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0| | | | | | | | | | | | | | | | |              0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0x2F
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1| | | | | | | | | | | | | | | | |              1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2| | | | | | | | | | | | | | | | |              2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3| | | | | | | | | | | | | | | | |              3| | | | | | | | | | |*|*|*|*|*|*| 0x3A-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4| | | | | | | | | | | | | | | | |              4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5| | | | | | | | | | | | | | | | |              5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6| | | | | | | | | | | | | | | | |              6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7| | | | | | | | | | | | | | | | |              7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                                                                Quadruple octet code
+            First octet                                     Second octet                                      Third octet                                     Fourth octet
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F                  0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0| | | | | | | | | | | | | | | | |              0| | | | | | | | | | | | | | | | |               0| | | | | | | | | | | | | | | | |              0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1| | | | | | | | | | | | | | | | |              1| | | | | | | | | | | | | | | | |               1| | | | | | | | | | | | | | | | |              1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2| | | | | | | | | | | | | | | | |              2| | | | | | | | | | | | | | | | |               2| | | | | | | | | | | | | | | | |              2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3| | | | | | | | | | | | | | | | |              3|*|*|*|*|*|*|*|*|*|*| | | | | | | 0x30-0x39     3| | | | | | | | | | | | | | | | |              3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4| | | | | | | | | | | | | | | | |              4| | | | | | | | | | | | | | | | |               4| | | | | | | | | | | | | | | | |              4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5| | | | | | | | | | | | | | | | |              5| | | | | | | | | | | | | | | | |               5| | | | | | | | | | | | | | | | |              5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6| | | | | | | | | | | | | | | | |              6| | | | | | | | | | | | | | | | |               6| | | | | | | | | | | | | | | | |              6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7| | | | | | | | | | | | | | | | |              7| | | | | | | | | | | | | | | | |               7| | | | | | | | | | | | | | | | |              7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8| | | | | | | | | | | | | | | | |               8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9| | | | | | | | | | | | | | | | |               9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A| | | | | | | | | | | | | | | | |               A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B| | | | | | | | | | | | | | | | |               B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C| | | | | | | | | | | | | | | | |               C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D| | | | | | | | | | | | | | | | |               D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E| | | | | | | | | | | | | | | | |               E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F| | | | | | | | | | | | | | | | |               F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+    *MALFORMED* Single octet code
+
+Final octet of string like first octet of multiple octet code
+
+Even if malformed, it is not ignored and not deleted automatically.
+For example, Egb18030::chop subroutine returns this octet.
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8| |M|M|M|M|M|M|M|M|M|M|M|M|M|M|M| 0x81-0xFE
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|M|M|M|M|M|M|M|M|M|M|M|M|M|M|M| |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+* ALGORITHM #2
+
+Against algorithm.1, when the range of the character by tr/// is specified, only the
+following character codes are effective.
+
+    Single octet code is:
+      0x00-0x80 and 0xFF
+
+    Double octet code is:
+      First octet   0x81-0xFE
+      Second octet  0x40-0x7E and 0x80-0xFE
+
+    Quadruple octet code is:
+      First octet   0x81-0xFE
+      Second octet  0x30-0x39
+      Third octet   0x81-0xFE
+      Fourth octet  0x30-0x39
+
+For instance, [\x81\x00-\x82\xFF] in script means [\x81\x82][\x40-\x7E\x80-\xFE].
+
+See also code table:
+
+         Single octet code
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x00-0x80
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8|*| | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F| | | | | | | | | | | | | | | |*| 0xFF
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                 Double octet code
+            First octet                                     Second octet
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F 
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0| | | | | | | | | | | | | | | | |              0| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1| | | | | | | | | | | | | | | | |              1| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2| | | | | | | | | | | | | | | | |              2| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3| | | | | | | | | | | | | | | | |              3| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4| | | | | | | | | | | | | | | | |              4|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x40-0x7E
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5| | | | | | | | | | | | | | | | |              5|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6| | | | | | | | | | | | | | | | |              6|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7| | | | | | | | | | | | | | | | |              7|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x80-0xFE
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+                                                                                Quadruple octet code
+            First octet                                     Second octet                                      Third octet                                     Fourth octet
+
+   0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F                  0 1 2 3 4 5 6 7 8 9 A B C D E F                 0 1 2 3 4 5 6 7 8 9 A B C D E F
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 0| | | | | | | | | | | | | | | | |              0| | | | | | | | | | | | | | | | |               0| | | | | | | | | | | | | | | | |              0| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 1| | | | | | | | | | | | | | | | |              1| | | | | | | | | | | | | | | | |               1| | | | | | | | | | | | | | | | |              1| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 2| | | | | | | | | | | | | | | | |              2| | | | | | | | | | | | | | | | |               2| | | | | | | | | | | | | | | | |              2| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 3| | | | | | | | | | | | | | | | |              3|*|*|*|*|*|*|*|*|*|*| | | | | | | 0x30-0x39     3| | | | | | | | | | | | | | | | |              3|*|*|*|*|*|*|*|*|*|*| | | | | | | 0x30-0x39
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 4| | | | | | | | | | | | | | | | |              4| | | | | | | | | | | | | | | | |               4| | | | | | | | | | | | | | | | |              4| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 5| | | | | | | | | | | | | | | | |              5| | | | | | | | | | | | | | | | |               5| | | | | | | | | | | | | | | | |              5| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 6| | | | | | | | | | | | | | | | |              6| | | | | | | | | | | | | | | | |               6| | | | | | | | | | | | | | | | |              6| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 7| | | | | | | | | | | | | | | | |              7| | | | | | | | | | | | | | | | |               7| | | | | | | | | | | | | | | | |              7| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8| | | | | | | | | | | | | | | | |               8| |*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| 0x81-0xFE    8| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ 9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9| | | | | | | | | | | | | | | | |               9|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              9| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A| | | | | | | | | | | | | | | | |               A|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              A| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B| | | | | | | | | | | | | | | | |               B|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              B| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C| | | | | | | | | | | | | | | | |               C|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              C| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D| | | | | | | | | | | | | | | | |               D|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              D| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E| | | | | | | | | | | | | | | | |               E|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|              E| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F| | | | | | | | | | | | | | | | |               F|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*| |              F| | | | | | | | | | | | | | | | |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+SEE ALSO
+
+perl, GB18030.pm, Egb18030.pm, jacode.pl
+

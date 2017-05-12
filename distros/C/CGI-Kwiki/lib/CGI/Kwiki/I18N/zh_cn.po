@@ -1,0 +1,427 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2002-07-16 17:27+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/CGI/Kwiki/Search.pm:40
+#. (scalar @results)
+msgid "%1 pages found"
+msgstr "找到了 %1 个页面"
+
+#: lib/CGI/Kwiki/Search.pm:37
+#. (scalar @results, $search)
+msgid "%1 pages found containing '%2'"
+msgstr "找到了 %1 个内含 '%2' 的页面"
+
+#: lib/CGI/Kwiki/Template.pm:516
+msgid "(Click the SAVE button after making changes)"
+msgstr "（更动后请按下储存按钮）"
+
+#: lib/CGI/Kwiki/Template.pm:490
+msgid "(You must be a site administrator to login)"
+msgstr "（站台管理员才能够登入）"
+
+#: lib/CGI/Kwiki/Changes.pm:32
+msgid "12 hours"
+msgstr "十二小时"
+
+#: lib/CGI/Kwiki/Changes.pm:34
+msgid "2 days"
+msgstr "两天"
+
+#: lib/CGI/Kwiki/Changes.pm:37
+msgid "2 weeks"
+msgstr "两星期"
+
+#: lib/CGI/Kwiki/Changes.pm:33
+msgid "24 hours"
+msgstr "二十四小时"
+
+#: lib/CGI/Kwiki/Changes.pm:35
+msgid "3 days"
+msgstr "三天"
+
+#: lib/CGI/Kwiki/Changes.pm:30
+msgid "3 hours"
+msgstr "三小时"
+
+#: lib/CGI/Kwiki/Changes.pm:39
+msgid "3 months"
+msgstr "三个月"
+
+#: lib/CGI/Kwiki/Changes.pm:31
+msgid "6 hours"
+msgstr "六小时"
+
+#: lib/CGI/Kwiki/I18N.pm:198
+msgid "???"
+msgstr "???"
+
+#: lib/CGI/Kwiki/I18N.pm:194 lib/CGI/Kwiki/Template.pm:261
+msgid "Blog"
+msgstr "部落格"
+
+#: lib/CGI/Kwiki/Template.pm:476
+msgid "Blog this page on SAVE"
+msgstr "储存后一并放进部落格里"
+
+#: lib/CGI/Kwiki/I18N.pm:196
+msgid "BrianIngerson"
+msgstr "布莱恩英格森"
+
+#: lib/CGI/Kwiki/Changes.pm:47
+#. ($range->[0])
+msgid "Changes in the last %1:"
+msgstr "最近%1内的变更"
+
+#: lib/CGI/Kwiki/Edit.pm:25
+msgid "Describe the new page here."
+msgstr "请在此输入新页面的内容。"
+
+#: lib/CGI/Kwiki/Plugin/Diff.pm:100
+#. ($self->backup->file_rev($page_id, $r1)
+msgid "Differences from revision %1 to %2:"
+msgstr "%1 版与 %2 版之间的差异:"
+
+#: lib/CGI/Kwiki/Template.pm:302 lib/CGI/Kwiki/Template.pm:433
+msgid "EDIT"
+msgstr "编辑"
+
+#: lib/CGI/Kwiki/Formatter.pm:495
+msgid "Go"
+msgstr "播放"
+
+#: lib/CGI/Kwiki/I18N.pm:191 lib/CGI/Kwiki/I18N.pm:197
+msgid "HomePage"
+msgstr "首页"
+
+#: lib/CGI/Kwiki/Template.pm:166 lib/CGI/Kwiki/Template.pm:171 lib/CGI/Kwiki/Template.pm:224 lib/CGI/Kwiki/Template.pm:229 lib/CGI/Kwiki/Template.pm:345 lib/CGI/Kwiki/Template.pm:350 lib/CGI/Kwiki/Template.pm:425
+msgid "Import"
+msgstr "汇入"
+
+#: lib/CGI/Kwiki/Edit.pm:128
+#. ($page_id_new)
+msgid "Invalid page name '%1'"
+msgstr "'%1' 是无效的页面名称"
+
+#: lib/CGI/Kwiki/Template.pm:273 lib/CGI/Kwiki/Template.pm:280 lib/CGI/Kwiki/Template.pm:282
+msgid "Kwiki Blog"
+msgstr "快纪部落格"
+
+#: lib/CGI/Kwiki/I18N.pm:200
+msgid "KwikiAbout"
+msgstr "关于快纪"
+
+#: lib/CGI/Kwiki/I18N.pm:201
+msgid "KwikiBackup"
+msgstr "备份快纪"
+
+#: lib/CGI/Kwiki/I18N.pm:202
+msgid "KwikiBlog"
+msgstr "快纪部落格"
+
+#: lib/CGI/Kwiki/I18N.pm:234
+msgid "KwikiCgiModule"
+msgstr "快纪CGI模块"
+
+#: lib/CGI/Kwiki/I18N.pm:237
+msgid "KwikiChangesModule"
+msgstr "快纪更动模块"
+
+#: lib/CGI/Kwiki/I18N.pm:226
+msgid "KwikiConfigModule"
+msgstr "快纪组态模块"
+
+#: lib/CGI/Kwiki/I18N.pm:227
+msgid "KwikiConfigYamlModule"
+msgstr "快纪YAML组态模块"
+
+#: lib/CGI/Kwiki/I18N.pm:235
+msgid "KwikiCookieModule"
+msgstr "快纪Cookie模块"
+
+#: lib/CGI/Kwiki/I18N.pm:203
+msgid "KwikiCustomization"
+msgstr "自订快纪"
+
+#: lib/CGI/Kwiki/I18N.pm:229
+msgid "KwikiDatabaseModule"
+msgstr "快纪数据库模块"
+
+#: lib/CGI/Kwiki/I18N.pm:231
+msgid "KwikiDisplayModule"
+msgstr "快纪显示模块"
+
+#: lib/CGI/Kwiki/I18N.pm:225
+msgid "KwikiDriverModule"
+msgstr "快纪驱动模块"
+
+#: lib/CGI/Kwiki/I18N.pm:232
+msgid "KwikiEditModule"
+msgstr "快纪编辑模块"
+
+#: lib/CGI/Kwiki/I18N.pm:213
+msgid "KwikiFastCGI"
+msgstr "快纪FastCGI"
+
+#: lib/CGI/Kwiki/I18N.pm:204
+msgid "KwikiFeatures"
+msgstr "快纪功能"
+
+#: lib/CGI/Kwiki/I18N.pm:205
+msgid "KwikiFit"
+msgstr "快纪订做"
+
+#: lib/CGI/Kwiki/I18N.pm:228
+msgid "KwikiFormatterModule"
+msgstr "快纪文字格式模块"
+
+#: lib/CGI/Kwiki/I18N.pm:206
+msgid "KwikiFormattingRules"
+msgstr "快纪文字格式语法"
+
+#: lib/CGI/Kwiki/I18N.pm:207
+msgid "KwikiHelpIndex"
+msgstr "快纪说明索引"
+
+#: lib/CGI/Kwiki/I18N.pm:208
+msgid "KwikiHotKeys"
+msgstr "快纪热键"
+
+#: lib/CGI/Kwiki/I18N.pm:209
+msgid "KwikiInstallation"
+msgstr "安装快纪"
+
+#: lib/CGI/Kwiki/I18N.pm:243
+msgid "KwikiJavascriptModule"
+msgstr "快纪Javascript模块"
+
+#: lib/CGI/Kwiki/I18N.pm:210
+msgid "KwikiKnownBugs"
+msgstr "已知的快纪瑕疵"
+
+#: lib/CGI/Kwiki/I18N.pm:211
+msgid "KwikiLogoImage"
+msgstr "快纪标帜图片"
+
+#: lib/CGI/Kwiki/I18N.pm:230
+msgid "KwikiMetadataModule"
+msgstr "快纪描述数据模块"
+
+#: lib/CGI/Kwiki/I18N.pm:212
+msgid "KwikiModPerl"
+msgstr "快纪ModPerl"
+
+#: lib/CGI/Kwiki/I18N.pm:224
+msgid "KwikiModule"
+msgstr "快纪模块"
+
+#: lib/CGI/Kwiki/I18N.pm:214 lib/CGI/Kwiki/Template.pm:177 lib/CGI/Kwiki/Template.pm:235 lib/CGI/Kwiki/Template.pm:356
+msgid "KwikiNavigation"
+msgstr "快纪导览"
+
+#: lib/CGI/Kwiki/I18N.pm:239
+msgid "KwikiNewModule"
+msgstr "快纪新建模块"
+
+#: lib/CGI/Kwiki/I18N.pm:240
+msgid "KwikiPagesModule"
+msgstr "快纪页面模块"
+
+#: lib/CGI/Kwiki/I18N.pm:215
+msgid "KwikiPod"
+msgstr "快纪简明文件"
+
+#: lib/CGI/Kwiki/I18N.pm:238
+msgid "KwikiPrefsModule"
+msgstr "快纪偏好模块"
+
+#: lib/CGI/Kwiki/I18N.pm:216
+msgid "KwikiPrivacy"
+msgstr "快纪隐私权"
+
+#: lib/CGI/Kwiki/Formatter.pm:245 lib/CGI/Kwiki/I18N.pm:217
+msgid "KwikiPrivatePage"
+msgstr "快纪私人页面"
+
+#: lib/CGI/Kwiki/I18N.pm:242
+msgid "KwikiScriptsModule"
+msgstr "快纪脚本模块"
+
+#: lib/CGI/Kwiki/I18N.pm:236
+msgid "KwikiSearchModule"
+msgstr "快纪搜寻模块"
+
+#: lib/CGI/Kwiki/I18N.pm:218
+msgid "KwikiSisters"
+msgstr "快纪姊妹站"
+
+#: lib/CGI/Kwiki/I18N.pm:219
+msgid "KwikiSlideShow"
+msgstr "快纪投影片展示"
+
+#: lib/CGI/Kwiki/Template.pm:537
+msgid "KwikiSlides"
+msgstr "快纪投影片"
+
+#: lib/CGI/Kwiki/I18N.pm:244
+msgid "KwikiSlidesModule"
+msgstr "快纪投影片模块"
+
+#: lib/CGI/Kwiki/I18N.pm:241
+msgid "KwikiStyleModule"
+msgstr "快纪样式模块"
+
+#: lib/CGI/Kwiki/I18N.pm:233
+msgid "KwikiTemplateModule"
+msgstr "快纪模版模块"
+
+#: lib/CGI/Kwiki/I18N.pm:220
+msgid "KwikiTodo"
+msgstr "快纪待办"
+
+#: lib/CGI/Kwiki/I18N.pm:221
+msgid "KwikiUpgrading"
+msgstr "升级快纪"
+
+#: lib/CGI/Kwiki/I18N.pm:222
+msgid "KwikiUserName"
+msgstr "快纪使用者名称"
+
+#: lib/CGI/Kwiki/Template.pm:305 lib/CGI/Kwiki/Template.pm:488
+msgid "LOGIN"
+msgstr "登入"
+
+#: lib/CGI/Kwiki/Template.pm:498
+msgid "LOGOUT"
+msgstr "注销"
+
+#: lib/CGI/Kwiki/I18N.pm:195
+msgid "New Page Name"
+msgstr "新的页面名称"
+
+#: lib/CGI/Kwiki/Plugin/Diff.pm:90
+msgid "No history"
+msgstr "没有任何纪录"
+
+#: lib/CGI/Kwiki/Template.pm:447 lib/CGI/Kwiki/Template.pm:520
+msgid "PREVIEW"
+msgstr "预览"
+
+#: lib/CGI/Kwiki/Edit.pm:131
+#. ($page_id_new)
+msgid "Page name '%1' already exists"
+msgstr "已经有名为 '%1' 的页面了"
+
+#: lib/CGI/Kwiki/Template.pm:479
+msgid "Permanently delete this page on SAVE"
+msgstr "按下储存时反而要把这一页永久删除"
+
+#: lib/CGI/Kwiki/I18N.pm:193
+msgid "Preferences"
+msgstr "偏好设定"
+
+#: lib/CGI/Kwiki/Template.pm:461
+msgid "Private"
+msgstr "私人"
+
+#: lib/CGI/Kwiki/Template.pm:459
+msgid "Protected"
+msgstr "保护"
+
+#: lib/CGI/Kwiki/Template.pm:457
+msgid "Public"
+msgstr "公开"
+
+#: lib/CGI/Kwiki/I18N.pm:192
+msgid "RecentChanges"
+msgstr "最近更动"
+
+#: lib/CGI/Kwiki/Plugin/Diff.pm:44
+#. (($self->script . '?' . $self->escape($page_id)
+msgid "Revision Diffs for <a href='%1'>%2</a>:"
+msgstr "显示<a href='%1'>%2</a>的修订版差异:"
+
+#: lib/CGI/Kwiki/Template.pm:444 lib/CGI/Kwiki/Template.pm:515
+msgid "SAVE"
+msgstr "储存"
+
+#: lib/CGI/Kwiki/Template.pm:155 lib/CGI/Kwiki/Template.pm:160 lib/CGI/Kwiki/Template.pm:213 lib/CGI/Kwiki/Template.pm:218 lib/CGI/Kwiki/Template.pm:289 lib/CGI/Kwiki/Template.pm:334 lib/CGI/Kwiki/Template.pm:339 lib/CGI/Kwiki/Template.pm:420
+msgid "Search"
+msgstr "搜寻"
+
+#: lib/CGI/Kwiki/CGI.pm:57
+msgid "SearchResults"
+msgstr "搜寻结果"
+
+#: lib/CGI/Kwiki/Template.pm:511
+msgid "Show changed message at bottom of display."
+msgstr "在页面最底下显示更动信息。"
+
+#: lib/CGI/Kwiki/Template.pm:512
+msgid "Show diff pulldown at bottom of display."
+msgstr "在页面最底下显示版本差异下拉式选单。"
+
+#: lib/CGI/Kwiki/Template.pm:513
+msgid "Show latest diff at bottom of display."
+msgstr "在页面最底下显示最后的版本差异。"
+
+#: lib/CGI/Kwiki/CGI.pm:57
+msgid "SiteMap"
+msgstr "全站总览"
+
+#: lib/CGI/Kwiki/Template.pm:530
+msgid "This is a protected page. Only the site administrator can edit it."
+msgstr "这一页被保护起来了。祇有站台管理员才能加以编辑。"
+
+#: lib/CGI/Kwiki/Template.pm:313
+msgid "This page last changed on [[% edit_time %]] by [[% edit_by %]]"
+msgstr "本页面最后由 [[% edit_by %]] 修改于 [[% edit_time %]]"
+
+#: lib/CGI/Kwiki/Slides.pm:13
+msgid "Title Goes Here"
+msgstr "请在此输入标题"
+
+#: lib/CGI/Kwiki/Template.pm:508
+msgid "UserName: &nbsp;"
+msgstr "使用者名称: &nbsp;"
+
+#: lib/CGI/Kwiki/Prefs.pm:64
+msgid "Username must be a valid wiki page (about yourself)."
+msgstr "使用者名称一定得要是个已经有效存在的围纪页面（可以是写著关于你自己信息的页面）。"
+
+#: lib/CGI/Kwiki/Template.pm:505
+msgid "Your [KwikiUserName] will be used to indicate who changed a page. This can be viewed in [[% changes_page %]]."
+msgstr "[快纪使用者名称]将会用来显示谁修改了某个页面。这项信息将被显示在[[% changes_page %]]里。"
+
+#: lib/CGI/Kwiki/Formatter.pm:116
+msgid "fullscreen"
+msgstr "全屏幕"
+
+#: lib/CGI/Kwiki/Changes.pm:29
+msgid "hour"
+msgstr "一小时"
+
+#: lib/CGI/Kwiki/Changes.pm:38
+msgid "month"
+msgstr "一个月"
+
+#: lib/CGI/Kwiki/Formatter.pm:110
+msgid "start"
+msgstr "开始"
+
+#: lib/CGI/Kwiki/Changes.pm:36
+msgid "week"
+msgstr "一星期"

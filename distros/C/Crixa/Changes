@@ -1,0 +1,179 @@
+0.13 2015-06-02
+
+  [BUG FIXES]
+
+  * Crixa now allows the message delivery_tag to be any non-negative integer
+    type as long as that type stringifies correctly.
+
+
+0.12 2015-04-22
+
+  [BUG FIXES]
+
+  * The latest Net::AMQP::RabbitMQ release made the message delivery_tag a
+    Math::UInt64 object, which broke Crixa. Fixed by Ran Eilam.
+
+
+0.11 2015-01-19
+
+  [ENHANCEMENTS]
+
+  * Implemented Crixa::Queue->consume(), a blocking API for waiting until
+    messages are received. Unlike the wait_for_message() method, this method
+    does not use a busy loop. Internally, it uses the poll() system call, so
+    it should be much kinder on your CPU.
+
+  * Added a Crixa::Message->consumer_tag() attribute. This will be set for
+    messages received via the new Crixa::Queue->consume() API.
+
+  [CHANGES]
+
+  * Crixa::Message->message_count() is no longer set for all messages, since
+    messages received via consume() have no message count.
+
+  [BUG FIXES]
+
+  * The docs said that the queue "auto_delete" parameter defaulted to false,
+    but it was actually defaulting to true. This was largely irrelevant given
+    that there past releases had no support for the consume()/recv() interface
+    in Crixa::Queue, but if you made a queue with Crixa and then used the
+    underlying mq object to call consume(), this would've been a problem.
+
+
+0.10 2014-11-17
+
+  [BACKWARDS INCOMPATIBILITIES]
+
+  * Renamed the Crixa->connected method to Crixa->is_connected. This matches
+    what Net::AMQP::RabbitMQ calls the method. For Test::RabbitMQ we call its
+    connected method internally.
+
+
+0.09 2014-11-13
+
+  [ENHANCEMENTS]
+
+  * Added a Crixa->connected method.
+
+  * Added an "mq" parameter for the Crixa->connect method that makes it easy
+    to mock the underlying RabbitMQ connection using Test::Net::RabbitMQ. Also
+    added some docs on mocking.
+
+  [BACKWARDS INCOMPATIBILITIES]
+
+  * The entirely undocumented Crixa::Engine::API role and the accompanying
+    Crixa::Engine::RabbitMQ class has been removed. This was a layer between
+    the Crixa object and the underlying RabbitMQ connection object (like
+    Net::AMQP::RabbitMQ) that was intended to support async operations in the
+    future. However, async operations can be done more simply by calling the
+    various non-blocking message receiving methods in an async callback.
+
+0.08 2014-11-12
+
+  [BUG FIXES]
+
+  * Almost none of the Crixa classes were made immutable, which makes them a
+    lot slower to construct. This is particularly bad for the Crixa::Message
+    class.
+
+0.07 2014-10-25
+
+  [ENHANCEMENTS]
+
+  * Added a Crixa::Queue->message_count method.
+
+0.06 2014-10-01
+
+  [BACKWARDS INCOMPATIBILITIES]
+
+  * Switched from using Net::RabbitMQ to Net::AMQP::RabbitMQ. The former no
+    longer passes its tests with recent versions of RabbitMQ.
+
+  * The Crixa class no longer has a ->channels method and it no longer stores
+    channels internally. Instead, you call $crixa->new_channel whenever you
+    want a new channel.
+
+  * The Crixa class no longer has ->queue or ->exchange methods. This was
+    convenient, but made the handling of channels really confusing. Instead,
+    you should create a channel and use that to create queues and exchanges.
+
+  * Removed the Crixa::Channel->publish method. Use Crixa::Exchange objects to
+    publish messages instead. If you really want to publish without an
+    exchange name, you can create an exchange object with an empty string as
+    its name.
+
+  * Removed the Crixa::Queue->publish method. This really doesn't make sense,
+    since you can't publish to queues. This method would only have worked with
+    certain configurations, and it would have been easy to create an
+    exchange/queue combination where calling Crixa::Queue->publish sent the
+    message to an entirely different queue.
+
+  * The Crixa::Exchange->queue method's "bindings" parameter has been renamed
+    to "routing_keys". This is a better match for how these things are
+    described in the RabbitMQ docs.
+
+  * Messages are now objects. See the Crixa::Message documentation for details.
+
+  [ENHANCEMENTS]
+
+  * Added complete documentation for every class. The docs try to explain
+    RabbitMQ concepts wherever appropriate.
+
+  * Added a Crixa::Exchange->delete method.
+
+  * Added a Crixa::Queue->delete method.
+
+  * Added a Crixa::Queue->bind method.
+
+  * All the settings that can be passed to the constructor for Exchange &
+    Queue objects are now available as object attributes. This includes things
+    like "durable", "auto_delete", etc.
+
+0.05 2014-04-08
+
+  * fix more pod warnings (Chris Prather)
+  * Fixed PodWeaver warnings, fixed Dist::Zilla problem with Changes file
+    (Torsten Raudssus)
+  * Adding support for port (Torsten Raudssus)
+
+0.04 2012-06-08
+
+  * fix a typo that Pod::Coverage caught just before release! (Chris Prather)
+  * add docs and an IO-Async example (Chris Prather)
+  * remove the channel calls we do not need anymore (Chris Prather)
+  * break out fetching the message from the queue (Chris Prather)
+  * add exchange() method to Crixa.pm that allows us to hide the channel
+    entirely if we want (Chris Prather)
+  * default queue bindings to an empty arrayref (Chris Prather)
+  * move fix a missing reference maker (Chris Prather)
+  * add the `$channel->ack()` to the callback. (Chris Prather)
+
+0.03 2012-04-10
+
+  * we just need to exclude ^perl5 (Chris Prather)
+  * Refactor the RabbitMQ Role into a Class (Chris Prather)
+  * update dist.ini to generate Changes (Chris Prather)
+
+0.02 2012-04-03
+
+  * exclude stuff that we accidentally released in 0.01 (Chris Prather)
+  * move to the Git NextVersion plugin (Chris Prather)
+
+0.01 2012-04-03
+
+  * add Crixa-* to gitignore (Chris Prather)
+  * add gitignore (Chris Prather)
+  * rename CRIXA_HOST to RABBITMQ_HOST in live tests (Chris Prather)
+  * clean up a little cruft (Chris Prather)
+  * make live tests *more* optional (Chris Prather)
+  * add some simple tests (Chris Prather)
+  * add some more pod stubs and some test stubs (Chris Prather)
+  * add inital pod (Chris Prather)
+  * kill podweaver (Chris Prather)
+  * fix a small potential bug (Chris Prather)
+  * finish adding the examples from RabbitMQ (Chris Prather)
+  * sweeping updates as we port the RabbitMQ examples over (Chris Prather)
+  * add README.md (Chris Prather)
+  * initial draft (Chris Prather)
+  * initial commit (Chris Prather)
+

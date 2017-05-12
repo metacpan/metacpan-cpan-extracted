@@ -1,0 +1,10 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Crypt-OFB
+version:      0.01
+version_from: OFB.pm
+installdirs:  site
+requires:
+    Crypt::ECB:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

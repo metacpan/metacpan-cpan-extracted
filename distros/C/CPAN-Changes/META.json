@@ -1,0 +1,65 @@
+{
+   "abstract" : "Read and write Changes files",
+   "author" : [
+      "Brian Cassidy <bricas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Changes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1",
+            "Test::Pod::Coverage" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Wrap" : "0.003",
+            "version" : "0.9906"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CPAN-Changes@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CPAN-API/CPAN-Changes.git",
+         "web" : "https://github.com/CPAN-API/CPAN-Changes"
+      },
+      "x_IRC" : "irc://irc.perl.org/#metacpan"
+   },
+   "version" : "0.400002",
+   "x_authority" : "cpan:BRICAS"
+}

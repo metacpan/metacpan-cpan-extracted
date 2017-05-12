@@ -1,0 +1,32 @@
+---
+abstract: 'Provides gofmt and go vet plugins for Code::TidyAll'
+author:
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-Go
+requires:
+  Code::TidyAll::Plugin: '0'
+  IPC::Run3: '0'
+  Moo: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/maxmind/Code-TidyAll-Plugin-Go.git
+version: '0.02'
+x_authority: cpan:MAXMIND
+x_contributors:
+  - 'Dave Rolsky <autarch@urth.org>'

@@ -1,0 +1,36 @@
+{
+   "abstract" : "Ameliorated interface to the CPAN",
+   "author" : [
+      "Jos Boumans <kane@cpan.org>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Module::Install version 0.650, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS",
+   "no_index" : {
+      "directory" : [
+         "lib/CPANPLUS/inc",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {},
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/jib/cpanplus-devel",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jib/cpanplus-devel"
+      }
+   },
+   "version" : "0.9166",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

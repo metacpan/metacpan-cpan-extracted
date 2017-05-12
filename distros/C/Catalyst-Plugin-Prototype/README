@@ -1,0 +1,36 @@
+NAME
+    Catalyst::Plugin::Prototype - Plugin for Prototype
+
+SYNOPSIS
+        # use it
+        use Catalyst qw/Prototype/;
+
+        # ...add this to your tt2 template...
+        [% c.prototype.library %]
+
+        # ...and use the helper methods...
+        <div id="view"></div>
+        <textarea id="editor" cols="80" rows="24"></textarea>
+        [% uri = base _ 'edit/' _ page.title %]
+        [% c.prototype.observe_field( 'editor', uri, { 'update' => 'view' } ) %]
+
+DESCRIPTION
+    Some stuff to make Prototype fun.
+
+    This plugin replaces Catalyst::Helper::Prototype.
+
+  METHODS
+   prototype
+        Returns a ready to use L<HTML::Prototype> object.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Helper
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

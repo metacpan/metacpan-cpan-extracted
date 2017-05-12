@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 155
+    - 45
+  46216:
+    - 68
+name: ddcb2d
+registers:
+  AF: 52776
+  AF_: 0
+  BC: 53934
+  BC_: 0
+  DE: 51646
+  DE_: 0
+  HL: 16950
+  HL_: 0
+  I: 0
+  IX: 46317
+  IY: 28131
+  PC: 0
+  R: 0
+  SP: 0

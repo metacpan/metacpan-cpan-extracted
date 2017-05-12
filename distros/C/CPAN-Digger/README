@@ -1,0 +1,164 @@
+Providing a deep view to the CPAN Perl packages
+or for any application written in Perl.
+
+WARNING: This is a very early version of the application.
+Most of the planned things won't work.
+
+The package contains both the tools to process
+and index the Perl code and the web interface
+for it.
+
+It is designed to be able to handle
+- a single perl script
+- a Perl application that lives in a directory tree
+- a mirror of CPAN
+
+
+Platforms:
+The application is being developer on Linux and Windows
+at the same time so it *should* work on both of them.
+
+
+
+SETUP
+=======
+Mirroring CPAN is done externally.
+For example by rsync:
+/usr/bin/rsync -av --delete ftp.funet.fi::CPAN /opt/cpan
+
+
+perl Makefile.PL
+make
+make test
+
+There is no need to run "make install"
+
+
+Scripts in the scripts/  directory
+=====================================
+cpan_digger.pl      - indexing CPAN tree or directory tree
+
+
+========================================
+Index CPAN:
+   save the results in the database and ceate static pages
+   - unzip file if it is not yet unzipped
+   - update database with the following information
+     distro:
+       name: Dist-Name
+       author: <pauseid>
+       modules: list of .pm files in lib/  (later also deal with pm files in root)
+   - generate html file from pod
+
+Search:
+  allow users to search in the database
+
+
+Server Layout:
+
+/dist/Dist-Name/      <- collected information about the most recent version of the distribution
+/dist/Dist-Name/pod/  <- The POD in HTML format
+/dist/Dist-Name/src/  <- The source in HTML format with syntax highlighting
+    (links to real source lead to the /src/<pauseid>/Dist-Name-1.02/ structure)
+
+/id/<pauseid>/       <- collected information about the author
+/id/<pauseid>/Dist-Name-1.02/     <- The POD in HTML format
+
+/src/<pauseid>/Dist-Name-1.02/    <- source code in plain text format (this is where we unzip the files)
+
+/pod/                 <- the documentation of the most recent perl in HTML marked up format
+/pod/perl_5_10_01/    <- the documentation of specific versions of perl in HTML marked up formate (Later)
+
+/q                    <- send queries here
+
+
+robots.txt
+
+set noindex on /id/pauseid/*  (but allow indexing /id/pauseid/ itself)
+set noindex on /src/
+set noindex on /pod/perl_5_10_01/ and similar
+
+
+TODO
+- allow the user to create all the dependencies of a list of packages and then see "what if I add this extra package?" 
+- check why are several versions of the same package processed (eg. Padre)
+- List all the licenses that were used in META files and list all the packages with the given license. List all packages without license
+
+- dist page:
+  - download link should be based on a configurable cpan server
+  - date of release
+  - add cpan faces: http://hexten.net/cpan-faces/
+  - add links to previous releases (see search.cpan.org)
+  - fetch and display number of bugs from RT (and explain why it is not there if the bugtracking is different)
+  - Other tools (grep and later diff between versions)
+  - fetch data from CPAN Testers and display PASS (146)   NA (1)   UNKNOWN (70)
+  - Rating: fetch data from CPANRATINGS and display the stars and the number of reviews
+  - For modules, fetch the one-line description and the version number from each one and display them
+  - Annotate POD - fetch the number of annotations and display the counter
+
+Be able to index
+  1) CPAN or local CPAN with injected files
+  2) @INC of current perl
+  3) list of directories (e.g. for the @INC of some other perl or file of
+     a project in a version control system)
+
+=========================================================
+Alternate plan:
+*) run CPAN mirror
+*) Collect distros:
+   Go over all the CPAN mirror directory get all the files.
+   For each file adds it to the database AUTHOR, distname, version, path,
+   date when we added to the database, date of the file. (see touch how to imitate old dates)
+TODO: go over the files reported as error, show them on the web site and think how to include them.
+
+*) Add search engine that can find packages based on their name - fetch always the latest
+TODO: show exact hits first
+TODO: show newest earlier
+
+TODO: *) Remove distros:
+    Go over all the distros in the database and check if they are still in the CPAN mirror.
+    If not, mark them as "removed" in the database.
+    Maybe also remove them from the extracted directory and
+    maybe remove them from the database.
+    or just mark them as "removed" in the database?
+
+*) Create a dynamic page for each author with data from the database and
+link the results to these pages. -
+Generating all the static pages took 75 min on my desktop so we are creating the pages
+dynamically for now.
+
+TODO
+*) Extract:
+    go over all the distros in the database and check if they have been extracted to the 'src' directory already
+    if not yet, then try to extract them
+    report distros that cannot be extracted (and don't try them again)
+*) Generate package/version distro pages:
+   Static or dynamic?
+   listing all the versions we have in the database
+
+*) Script that can process an individual distribution which is give as either a zip file
+   so we start with unzipping or an already open directory for projects and companies
+   that don't package as zip files.
+
+TODO: add a field to each distributions called "processed" which is a timestamp.
+Later processes can work on packages that were not yet processed or processedbefore time X.
+When displaying a distribution we can know if it was already processed at all and when?
+Maybe the processed does not need to be a timestamp but a version number?
+
+1) Run modes:
+   - on all CPAN
+     fill the author table
+     fill the distro table
+     unzip distributions
+   - on a specific project (not related to CPAN) (or on several projects)
+     unzip if needed or copy files
+2) In either cases
+   - collect data from META files and layout
+   - run POD2HTML
+   - generate SYN files (PPI)
+   - run Perl::Critic   (PPI)
+   - Generate Outline   (PPI)
+   - MinimumVersion     (PPI)
+
+Later we will add Ajax back to provide hints while the user types in the query.
+

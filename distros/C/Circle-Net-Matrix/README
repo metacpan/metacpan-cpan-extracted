@@ -1,0 +1,25 @@
+NAME
+
+    Circle::Net::Matrix - use Circle as a Matrix client
+
+SYNOPSIS
+
+    On the global tab:
+
+     /networks add -type matrix Matrix
+
+    On the newly-added "Matrix" tab:
+
+     /set homeserver example.com
+     /set user_id @me:example.com
+     /set access_token MDAxABCDE...
+    
+     /connect
+
+    (for now you'll have to log in and steal and access token from another
+    Matrix client; for example App::MatrixTool).
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Pure Perl Implementation of the Rijndael Cipher'
+author:
+  - 'Robert Stone <drzigman@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  MooseX::Params::Validate: '0'
+  Storable: '0'
+  String::Random: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Rijndael-PP
+requires:
+  Carp: '0'
+  Crypt::Random::Source: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Readonly: '0'
+  Smart::Comments: '0'
+  bytes: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/drzigman/crypt-rijndael-pp/issues
+  homepage: http://search.cpan.org/dist/Crypt-Rijndael-PP
+  repository: git://github.com/drzigman/crypt-rijndael-pp.git
+version: 0.3.0

@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="pgn.xsl"?>
+<!DOCTYPE CHESSGAMES SYSTEM "pgn.dtd">
+<CHESSGAMES NAME="BCC95 Games">
+		<GAME>
+		<TAGLIST>
+			<Event>Boise Chess Club Championship Reserve Section</Event>
+			<Site>Boise (ID)</Site>
+			<Date YEAR="1995" MONTH="02" DAY="28"/>
+			<Round>01</Round>
+			<White>Myers Hugh S (ID)</White>
+			<Black>Roland Jeffrey T (ID)</Black>
+			<Result GAMERESULT="BLACKWIN"/>
+			<ECO>C00</ECO>
+			<Opening>French: Labourdonnais variation</Opening>
+		</TAGLIST>
+		<GAMETEXT>
+			<MOVENUMBER>1</MOVENUMBER>
+			<MOVE>e4</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -</FENstr>
+			<MOVE>e6</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/4p3/8/4PP2/8/PPPP2PP/RNBQKBNR b KQkq f3</FENstr>
+			<MOVENUMBER>2</MOVENUMBER>
+			<MOVE>f4</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/4p3/8/4PP2/8/PPPP2PP/RNBQKBNR b KQkq f3</FENstr>
+			<MOVE>d5</MOVE>
+			<FENstr>rnbqkbnr/ppp2ppp/4p3/3p4/4PP2/8/PPPP2PP/RNBQKBNR w KQkq d6</FENstr>
+			<MOVENUMBER>3</MOVENUMBER>
+			<MOVE>e5</MOVE>
+			<POSITION FONT="Chess Maya" SIZE="4">
+				<ROW>1222222223</ROW>
+				<ROW>4tMvWlVmT5</ROW>
+				<ROW>4OoO +oOo5</ROW>
+				<ROW>4 + +o+ +5</ROW>
+				<ROW>4+ +oP + 5</ROW>
+				<ROW>4 + + P +5</ROW>
+				<ROW>4+ + + + 5</ROW>
+				<ROW>4pPpP +pP5</ROW>
+				<ROW>4RnBqKbNr5</ROW>
+				<ROW>7888888889</ROW>
+			</POSITION>
+			<FENstr>rnbqkbnr/ppp2ppp/4p3/3p4/4PP2/8/PPPP2PP/RNBQKBNR w KQkq d6</FENstr>
+			<MOVE>c5</MOVE>
+			<FENstr>rnbqkbnr/ppp2ppp/4p3/3pP3/5P2/8/PPPP2PP/RNBQKBNR b KQkq -</FENstr>
+			<MOVENUMBER>4</MOVENUMBER>
+			<MOVE>Nf3</MOVE>
+			<FENstr>rnbqkbnr/ppp2ppp/4p3/3pP3/5P2/8/PPPP2PP/RNBQKBNR b KQkq -</FENstr>
+			<MOVE>Nc6</MOVE>
+			<FENstr>rnbqkbnr/pp3ppp/4p3/2ppP3/5P2/8/PPPP2PP/RNBQKBNR w KQkq c6</FENstr>
+			<MOVENUMBER>5</MOVENUMBER>
+			<MOVE>d3</MOVE>
+			<FENstr>rnbqkbnr/pp3ppp/4p3/2ppP3/5P2/8/PPPP2PP/RNBQKBNR w KQkq c6</FENstr>
+			<MOVE>Be7</MOVE>
+			<FENstr>rnbqkbnr/pp3ppp/4p3/2ppP3/5P2/5N2/PPPP2PP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>6</MOVENUMBER>
+			<MOVE>Be2</MOVE>
+			<FENstr>rnbqkbnr/pp3ppp/4p3/2ppP3/5P2/5N2/PPPP2PP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>Nh6</MOVE>
+			<FENstr>r1bqkbnr/pp3ppp/2n1p3/2ppP3/5P2/5N2/PPPP2PP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>7</MOVENUMBER>
+			<MOVE>c3</MOVE>
+			<FENstr>r1bqkbnr/pp3ppp/2n1p3/2ppP3/5P2/5N2/PPPP2PP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>O-O</MOVE>
+			<FENstr>r1bqkbnr/pp3ppp/2n1p3/2ppP3/5P2/3P1N2/PPP3PP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>8</MOVENUMBER>
+			<MOVE>O-O</MOVE>
+			<FENstr>r1bqkbnr/pp3ppp/2n1p3/2ppP3/5P2/3P1N2/PPP3PP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>f6</MOVE>
+			<FENstr>r1bqk1nr/pp2bppp/2n1p3/2ppP3/5P2/3P1N2/PPP3PP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>9</MOVENUMBER>
+			<MOVE>exf6</MOVE>
+			<FENstr>r1bqk1nr/pp2bppp/2n1p3/2ppP3/5P2/3P1N2/PPP3PP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>Bxf6</MOVE>
+			<FENstr>r1bqk1nr/pp2bppp/2n1p3/2ppP3/5P2/3P1N2/PPP1B1PP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>10</MOVENUMBER>
+			<MOVE>d4</MOVE>
+			<FENstr>r1bqk1nr/pp2bppp/2n1p3/2ppP3/5P2/3P1N2/PPP1B1PP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>cxd4</MOVE>
+			<FENstr>r1bqk2r/pp2bppp/2n1p2n/2ppP3/5P2/3P1N2/PPP1B1PP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>11</MOVENUMBER>
+			<MOVE>cxd4</MOVE>
+			<FENstr>r1bqk2r/pp2bppp/2n1p2n/2ppP3/5P2/3P1N2/PPP1B1PP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>Qb6</MOVE>
+			<FENstr>r1bqk2r/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>12</MOVENUMBER>
+			<MOVE>Nc3</MOVE>
+			<FENstr>r1bqk2r/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>Bxd4+</MOVE>
+			<FENstr>r1bq1rk1/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQK2R w KQ -</FENstr>
+			<MOVENUMBER>13</MOVENUMBER>
+			<MOVE>Kh1</MOVE>
+			<FENstr>r1bq1rk1/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQK2R w KQ -</FENstr>
+			<MOVE>Bxc3</MOVE>
+			<FENstr>r1bq1rk1/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVENUMBER>14</MOVENUMBER>
+			<MOVE>bxc3</MOVE>
+			<FENstr>r1bq1rk1/pp2bppp/2n1p2n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVE>Ng4</MOVE>
+			<FENstr>r1bq1rk1/pp2b1pp/2n1pp1n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVENUMBER>15</MOVENUMBER>
+			<MOVE>Nd4</MOVE>
+			<FENstr>r1bq1rk1/pp2b1pp/2n1pp1n/2ppP3/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVE>Nxd4</MOVE>
+			<FENstr>r1bq1rk1/pp2b1pp/2n1pP1n/2pp4/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVENUMBER>16</MOVENUMBER>
+			<MOVE>cxd4</MOVE>
+			<FENstr>r1bq1rk1/pp2b1pp/2n1pP1n/2pp4/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVE>Nf6</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/2pp4/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVENUMBER>17</MOVENUMBER>
+			<MOVE>Ba3</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/2pp4/5P2/2PP1N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVE>Rf7</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/2pp4/3P1P2/2P2N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVENUMBER>18</MOVENUMBER>
+			<MOVE>Rb1</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/2pp4/3P1P2/2P2N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVE>Qd8</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/3p4/3p1P2/2P2N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVENUMBER>19</MOVENUMBER>
+			<MOVE>Bd3</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/3p4/3p1P2/2P2N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVE>Bd7</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/3p4/3P1P2/5N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVENUMBER>20</MOVENUMBER>
+			<MOVE>Qf3</MOVE>
+			<FENstr>r1bq1rk1/pp4pp/2n1pb1n/3p4/3P1P2/5N2/PP2B1PP/RNBQ1RK1 b - -</FENstr>
+			<MOVE>Bc6</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1pb1n/3p4/3P1P2/5N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVENUMBER>21</MOVENUMBER>
+			<MOVE>f5</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1pb1n/3p4/3P1P2/5N2/PP2B1PP/RNBQ1RK1 w - -</FENstr>
+			<MOVE>Ne4</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1pb1n/3p4/3P1P2/2N2N2/PP2B1PP/R1BQ1RK1 b - -</FENstr>
+			<MOVENUMBER>22</MOVENUMBER>
+			<MOVE>Bxe4</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1pb1n/3p4/3P1P2/2N2N2/PP2B1PP/R1BQ1RK1 b - -</FENstr>
+			<MOVE>dxe4</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/3b1P2/2N2N2/PP2B1PP/R1BQ1RK1 w - -</FENstr>
+			<MOVENUMBER>23</MOVENUMBER>
+			<MOVE>Qd1</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/3b1P2/2N2N2/PP2B1PP/R1BQ1RK1 w - -</FENstr>
+			<MOVE>exf5</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/3b1P2/2N2N2/PP2B1PP/R1BQ1R1K b - -</FENstr>
+			<MOVENUMBER>24</MOVENUMBER>
+			<MOVE>Rb2</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/3b1P2/2N2N2/PP2B1PP/R1BQ1R1K b - -</FENstr>
+			<MOVE>Qd5</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/5P2/2b2N2/PP2B1PP/R1BQ1R1K w - -</FENstr>
+			<MOVENUMBER>25</MOVENUMBER>
+			<MOVE>Rbf2</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/5P2/2b2N2/PP2B1PP/R1BQ1R1K w - -</FENstr>
+			<MOVE>e3</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/5P2/2P2N2/P3B1PP/R1BQ1R1K b - -</FENstr>
+			<MOVENUMBER>26</MOVENUMBER>
+			<MOVE>Re2</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p2n/3p4/5P2/2P2N2/P3B1PP/R1BQ1R1K b - -</FENstr>
+			<MOVE>Bb5</MOVE>
+			<FENstr>r1b2rk1/pp4pp/1qn1p3/3p4/5Pn1/2P2N2/P3B1PP/R1BQ1R1K w - -</FENstr>
+			<GAMETERMINATION GAMERESULT="BLACKWIN"/>
+		</GAMETEXT>
+	</GAME>
+		<GAME>
+		<TAGLIST>
+			<Event>Boise Club Championship, Reserve Section</Event>
+			<Site>Boise (ID)</Site>
+			<Date YEAR="1995" MONTH="??" DAY="??"/>
+			<Round>02</Round>
+			<White>Mc Clory Charles</White>
+			<Black>Myers Hugh S (ID)</Black>
+			<Result GAMERESULT="DRAW"/>
+			<ECO>A80</ECO>
+			<Opening>Dutch</Opening>
+		</TAGLIST>
+		<GAMETEXT>
+			<MOVENUMBER>1</MOVENUMBER>
+			<MOVE>d4</MOVE>
+			<FENstr>rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR w KQkq f6</FENstr>
+			<MOVE>f5</MOVE>
+			<FENstr>rnbqkbnr/ppppp1pp/8/5p2/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>2</MOVENUMBER>
+			<MOVE>Nf3</MOVE>
+			<FENstr>rnbqkbnr/ppppp1pp/8/5p2/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>Nf6</MOVE>
+			<FENstr>rnbqkb1r/ppppp1pp/5n2/5p2/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>3</MOVENUMBER>
+			<MOVE>e3</MOVE>
+			<FENstr>rnbqkb1r/ppppp1pp/5n2/5p2/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>e6</MOVE>
+			<FENstr>rnbqkb1r/ppppp1pp/5n2/5p2/3P4/4PN2/PPP2PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>4</MOVENUMBER>
+			<MOVE>Be2</MOVE>
+			<FENstr>rnbqkb1r/ppppp1pp/5n2/5p2/3P4/4PN2/PPP2PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>Be7</MOVE>
+			<FENstr>rnbqkb1r/pppp2pp/4pn2/5p2/3P4/4PN2/PPP2PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>5</MOVENUMBER>
+			<MOVE>c4</MOVE>
+			<FENstr>rnbqkb1r/pppp2pp/4pn2/5p2/3P4/4PN2/PPP2PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>d6</MOVE>
+			<FENstr>rnbqkb1r/pppp2pp/4pn2/5p2/3P4/4PN2/PPP1BPPP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>6</MOVENUMBER>
+			<MOVE>O-O</MOVE>
+			<FENstr>rnbqkb1r/pppp2pp/4pn2/5p2/3P4/4PN2/PPP1BPPP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>c6</MOVE>
+			<FENstr>rnbqk2r/ppppb1pp/4pn2/5p2/3P4/4PN2/PPP1BPPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>7</MOVENUMBER>
+			<MOVE>Nc3</MOVE>
+			<FENstr>rnbqk2r/ppppb1pp/4pn2/5p2/3P4/4PN2/PPP1BPPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>O-O</MOVE>
+			<FENstr>rnbqk2r/ppppb1pp/4pn2/5p2/2PP4/4PN2/PP2BPPP/RNBQK2R b KQkq c3</FENstr>
+			<MOVENUMBER>8</MOVENUMBER>
+			<MOVE>Bd3</MOVE>
+			<FENstr>rnbqk2r/ppppb1pp/4pn2/5p2/2PP4/4PN2/PP2BPPP/RNBQK2R b KQkq c3</FENstr>
+			<MOVE>d5</MOVE>
+			<FENstr>rnbqk2r/ppp1b1pp/3ppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>9</MOVENUMBER>
+			<MOVE>b3</MOVE>
+			<FENstr>rnbqk2r/ppp1b1pp/3ppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>h6</MOVE>
+			<FENstr>rnbqk2r/ppp1b1pp/3ppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQ1RK1 b kq -</FENstr>
+			<MOVENUMBER>10</MOVENUMBER>
+			<MOVE>h3</MOVE>
+			<FENstr>rnbqk2r/ppp1b1pp/3ppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQ1RK1 b kq -</FENstr>
+			<MOVE>Bd7</MOVE>
+			<FENstr>rnbqk2r/pp2b1pp/2pppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQ1RK1 w kq -</FENstr>
+			<MOVENUMBER>11</MOVENUMBER>
+			<MOVE>c5</MOVE>
+			<FENstr>rnbqk2r/pp2b1pp/2pppn2/5p2/2PP4/4PN2/PP2BPPP/RNBQ1RK1 w kq -</FENstr>
+			<MOVE>Be8</MOVE>
+			<FENstr>rnbqk2r/pp2b1pp/2pppn2/5p2/2PP4/2N1PN2/PP2BPPP/R1BQ1RK1 b kq -</FENstr>
+			<MOVENUMBER>12</MOVENUMBER>
+			<MOVE>Be2</MOVE>
+			<FENstr>rnbqk2r/pp2b1pp/2pppn2/5p2/2PP4/2N1PN2/PP2BPPP/R1BQ1RK1 b kq -</FENstr>
+			<MOVE>Nbd7</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2pppn2/5p2/2PP4/2N1PN2/PP2BPPP/R1BQ1RK1 w - -</FENstr>
+			<MOVENUMBER>13</MOVENUMBER>
+			<MOVE>Bb2</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2pppn2/5p2/2PP4/2N1PN2/PP2BPPP/R1BQ1RK1 w - -</FENstr>
+			<MOVE>Ne4</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2pppn2/5p2/2PP4/2NBPN2/PP3PPP/R1BQ1RK1 b - -</FENstr>
+			<MOVENUMBER>14</MOVENUMBER>
+			<MOVE>Rc1</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2pppn2/5p2/2PP4/2NBPN2/PP3PPP/R1BQ1RK1 b - -</FENstr>
+			<MOVE>g5</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2p1pn2/3p1p2/2PP4/2NBPN2/PP3PPP/R1BQ1RK1 w - -</FENstr>
+			<MOVENUMBER>15</MOVENUMBER>
+			<MOVE>b4</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2p1pn2/3p1p2/2PP4/2NBPN2/PP3PPP/R1BQ1RK1 w - -</FENstr>
+			<MOVE>Ndf6</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2p1pn2/3p1p2/2PP4/1PNBPN2/P4PPP/R1BQ1RK1 b - -</FENstr>
+			<MOVENUMBER>16</MOVENUMBER>
+			<MOVE>Nxe4</MOVE>
+			<FENstr>rnbq1rk1/pp2b1pp/2p1pn2/3p1p2/2PP4/1PNBPN2/P4PPP/R1BQ1RK1 b - -</FENstr>
+			<MOVE>fxe4</MOVE>
+			<FENstr>rnbq1rk1/pp2b1p1/2p1pn1p/3p1p2/2PP4/1PNBPN2/P4PPP/R1BQ1RK1 w - -</FENstr>
+			<MOVENUMBER>17</MOVENUMBER>
+			<MOVE>Nh2</MOVE>
+			<FENstr>rnbq1rk1/pp2b1p1/2p1pn1p/3p1p2/2PP4/1PNBPN2/P4PPP/R1BQ1RK1 w - -</FENstr>
+			<GAMETERMINATION GAMERESULT="DRAW"/>
+		</GAMETEXT>
+	</GAME>
+		<GAME>
+		<TAGLIST>
+			<Event>Boise Club Championship, Reserve Section</Event>
+			<Site>Boise (ID)</Site>
+			<Date YEAR="1995" MONTH="??" DAY="??"/>
+			<Round>03</Round>
+			<White>Nolan Robert H</White>
+			<Black>Myers Hugh S (ID)</Black>
+			<Result GAMERESULT="WHITEWIN"/>
+			<ECO>C41</ECO>
+			<Opening>King's pawn game</Opening>
+		</TAGLIST>
+		<GAMETEXT>
+			<MOVENUMBER>1</MOVENUMBER>
+			<MOVE>e4</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6</FENstr>
+			<MOVE>e5</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>2</MOVENUMBER>
+			<MOVE>Nf3</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>Nc6</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>3</MOVENUMBER>
+			<MOVE>Bc4</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>d6</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>4</MOVENUMBER>
+			<MOVE>Nc3</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>Bg4</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>5</MOVENUMBER>
+			<MOVE>h3</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>Bxf3</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -</FENstr>
+			<MOVENUMBER>6</MOVENUMBER>
+			<MOVE>Qxf3</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -</FENstr>
+			<MOVE>Qf6</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq -</FENstr>
+			<MOVENUMBER>7</MOVENUMBER>
+			<MOVE>Qd1</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq -</FENstr>
+			<MOVE>O-O-O</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N1P/PPPP1PP1/R1BQK2R b KQkq -</FENstr>
+			<MOVENUMBER>8</MOVENUMBER>
+			<MOVE>d3</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P1b1/2N2N1P/PPPP1PP1/R1BQK2R b KQkq -</FENstr>
+			<MOVE>Nge7</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2b1P/PPPP1PP1/R1BQK2R w KQkq -</FENstr>
+			<MOVENUMBER>9</MOVENUMBER>
+			<MOVE>O-O</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2b1P/PPPP1PP1/R1BQK2R w KQkq -</FENstr>
+			<MOVE>Qg6</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2Q1P/PPPP1PP1/R1B1K2R b KQkq -</FENstr>
+			<MOVENUMBER>10</MOVENUMBER>
+			<MOVE>Be3</MOVE>
+			<FENstr>r2qkbnr/ppp2ppp/2np4/4p3/2B1P3/2N2Q1P/PPPP1PP1/R1B1K2R b KQkq -</FENstr>
+			<MOVE>f5</MOVE>
+			<FENstr>r3kbnr/ppp2ppp/2np1q2/4p3/2B1P3/2N2Q1P/PPPP1PP1/R1B1K2R w KQkq -</FENstr>
+			<MOVENUMBER>11</MOVENUMBER>
+			<MOVE>f3</MOVE>
+			<FENstr>r3kbnr/ppp2ppp/2np1q2/4p3/2B1P3/2N2Q1P/PPPP1PP1/R1B1K2R w KQkq -</FENstr>
+			<MOVE>f4</MOVE>
+			<FENstr>r3kbnr/ppp2ppp/2np1q2/4p3/2B1P3/2N4P/PPPP1PP1/R1BQK2R b KQkq -</FENstr>
+			<MOVENUMBER>12</MOVENUMBER>
+			<MOVE>Bf2</MOVE>
+			<FENstr>r3kbnr/ppp2ppp/2np1q2/4p3/2B1P3/2N4P/PPPP1PP1/R1BQK2R b KQkq -</FENstr>
+			<MOVE>Qg5</MOVE>
+			<FENstr>2kr1bnr/ppp2ppp/2np1q2/4p3/2B1P3/2N4P/PPPP1PP1/R1BQK2R w KQ -</FENstr>
+			<MOVENUMBER>13</MOVENUMBER>
+			<MOVE>Nd5</MOVE>
+			<FENstr>2kr1bnr/ppp2ppp/2np1q2/4p3/2B1P3/2N4P/PPPP1PP1/R1BQK2R w KQ -</FENstr>
+			<MOVE>Ng6</MOVE>
+			<FENstr>2kr1bnr/ppp2ppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQK2R b KQ -</FENstr>
+			<MOVENUMBER>14</MOVENUMBER>
+			<MOVE>Kh1</MOVE>
+			<FENstr>2kr1bnr/ppp2ppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQK2R b KQ -</FENstr>
+			<MOVE>Be7</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQK2R w KQ -</FENstr>
+			<MOVENUMBER>15</MOVENUMBER>
+			<MOVE>c3</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQK2R w KQ -</FENstr>
+			<MOVE>Nh4</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQ1RK1 b - -</FENstr>
+			<MOVENUMBER>16</MOVENUMBER>
+			<MOVE>Rg1</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np1q2/4p3/2B1P3/2NP3P/PPP2PP1/R1BQ1RK1 b - -</FENstr>
+			<MOVE>Qh5</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np2q1/4p3/2B1P3/2NP3P/PPP2PP1/R1BQ1RK1 w - -</FENstr>
+			<MOVENUMBER>17</MOVENUMBER>
+			<MOVE>Qa4</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np2q1/4p3/2B1P3/2NP3P/PPP2PP1/R1BQ1RK1 w - -</FENstr>
+			<MOVE>Nxf3</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np2q1/4p3/2B1P3/2NPB2P/PPP2PP1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>18</MOVENUMBER>
+			<MOVE>Nxe7+</MOVE>
+			<FENstr>2kr1b1r/ppp1nppp/2np2q1/4p3/2B1P3/2NPB2P/PPP2PP1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Nxe7</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4pp2/2B1P3/2NPB2P/PPP2PP1/R2Q1RK1 w - f6</FENstr>
+			<MOVENUMBER>19</MOVENUMBER>
+			<MOVE>Be6+</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4pp2/2B1P3/2NPB2P/PPP2PP1/R2Q1RK1 w - f6</FENstr>
+			<MOVE>Rd7</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4pp2/2B1P3/2NPBP1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>20</MOVENUMBER>
+			<MOVE>Qxd7+</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4pp2/2B1P3/2NPBP1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Kb8</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4p3/2B1Pp2/2NPBP1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>21</MOVENUMBER>
+			<MOVE>Bg4</MOVE>
+			<FENstr>2kr1b1r/ppp1n1pp/2np2q1/4p3/2B1Pp2/2NPBP1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<GAMETERMINATION GAMERESULT="WHITEWIN"/>
+		</GAMETEXT>
+	</GAME>
+		<GAME>
+		<TAGLIST>
+			<Event>Boise Club Championship, Reserve Section</Event>
+			<Site>Boise (ID)</Site>
+			<Date YEAR="1995" MONTH="??" DAY="??"/>
+			<Round>04</Round>
+			<White>Myers Hugh S (ID)</White>
+			<Black>Peterson Lance R (??)</Black>
+			<Result GAMERESULT="WHITEWIN"/>
+			<ECO>C40</ECO>
+			<Opening>Latvian: Fraser defence</Opening>
+		</TAGLIST>
+		<GAMETEXT>
+			<MOVENUMBER>1</MOVENUMBER>
+			<MOVE>e4</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6</FENstr>
+			<MOVE>e5</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>2</MOVENUMBER>
+			<MOVE>Nf3</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>f5</MOVE>
+			<FENstr>rnbqkbnr/pppp2pp/8/4pp2/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq f6</FENstr>
+			<MOVENUMBER>3</MOVENUMBER>
+			<MOVE>Nxe5</MOVE>
+			<FENstr>rnbqkbnr/pppp2pp/8/4pp2/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq f6</FENstr>
+			<MOVE>Nc6</MOVE>
+			<FENstr>rnbqkbnr/pppp2pp/8/4Np2/4P3/8/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>4</MOVENUMBER>
+			<MOVE>Qh5+</MOVE>
+			<FENstr>rnbqkbnr/pppp2pp/8/4Np2/4P3/8/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>g6</MOVE>
+			<FENstr>r1bqkbnr/pppp2pp/2n5/4Np2/4P3/8/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>5</MOVENUMBER>
+			<MOVE>Nxg6</MOVE>
+			<FENstr>r1bqkbnr/pppp2pp/2n5/4Np2/4P3/8/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>Nf6</MOVE>
+			<FENstr>r1bqkbnr/pppp2pp/2n5/4Np1Q/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVENUMBER>6</MOVENUMBER>
+			<MOVE>Qxf5</MOVE>
+			<FENstr>r1bqkbnr/pppp2pp/2n5/4Np1Q/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVE>d5</MOVE>
+			<FENstr>r1bqkbnr/pppp3p/2n3p1/4Np1Q/4P3/8/PPPP1PPP/RNB1KB1R w KQkq -</FENstr>
+			<MOVENUMBER>7</MOVENUMBER>
+			<MOVE>Qg5</MOVE>
+			<FENstr>r1bqkbnr/pppp3p/2n3p1/4Np1Q/4P3/8/PPPP1PPP/RNB1KB1R w KQkq -</FENstr>
+			<MOVE>Rg8</MOVE>
+			<FENstr>r1bqkbnr/pppp3p/2n3N1/5p1Q/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVENUMBER>8</MOVENUMBER>
+			<MOVE>Bb5</MOVE>
+			<FENstr>r1bqkbnr/pppp3p/2n3N1/5p1Q/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVE>Rxg6</MOVE>
+			<FENstr>r1bqkb1r/pppp3p/2n2nN1/5p1Q/4P3/8/PPPP1PPP/RNB1KB1R w KQkq -</FENstr>
+			<MOVENUMBER>9</MOVENUMBER>
+			<MOVE>Qe5+</MOVE>
+			<FENstr>r1bqkb1r/pppp3p/2n2nN1/5p1Q/4P3/8/PPPP1PPP/RNB1KB1R w KQkq -</FENstr>
+			<MOVE>Qe7</MOVE>
+			<FENstr>r1bqkb1r/pppp3p/2n2nN1/5Q2/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVENUMBER>10</MOVENUMBER>
+			<MOVE>Qxe7+</MOVE>
+			<FENstr>r1bqkb1r/pppp3p/2n2nN1/5Q2/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVE>Bxe7</MOVE>
+			<FENstr>r1bqkb1r/ppp4p/2n2nN1/3p1Q2/4P3/8/PPPP1PPP/RNB1KB1R w KQkq d6</FENstr>
+			<MOVENUMBER>11</MOVENUMBER>
+			<MOVE>Bxc6+</MOVE>
+			<FENstr>r1bqkb1r/ppp4p/2n2nN1/3p1Q2/4P3/8/PPPP1PPP/RNB1KB1R w KQkq d6</FENstr>
+			<MOVE>bxc6</MOVE>
+			<FENstr>r1bqkb1r/ppp4p/2n2nN1/3p2Q1/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVENUMBER>12</MOVENUMBER>
+			<MOVE>exd5</MOVE>
+			<FENstr>r1bqkb1r/ppp4p/2n2nN1/3p2Q1/4P3/8/PPPP1PPP/RNB1KB1R b KQkq -</FENstr>
+			<MOVE>cxd5</MOVE>
+			<FENstr>r1bqkbr1/ppp4p/2n2nN1/3p2Q1/4P3/8/PPPP1PPP/RNB1KB1R w KQq -</FENstr>
+			<MOVENUMBER>13</MOVENUMBER>
+			<MOVE>g3</MOVE>
+			<FENstr>r1bqkbr1/ppp4p/2n2nN1/3p2Q1/4P3/8/PPPP1PPP/RNB1KB1R w KQq -</FENstr>
+			<MOVE>Bf5</MOVE>
+			<FENstr>r1bqkbr1/ppp4p/2n2nN1/1B1p2Q1/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>14</MOVENUMBER>
+			<MOVE>d3</MOVE>
+			<FENstr>r1bqkbr1/ppp4p/2n2nN1/1B1p2Q1/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVE>Ng4</MOVE>
+			<FENstr>r1bqkb2/ppp4p/2n2nr1/1B1p2Q1/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>15</MOVENUMBER>
+			<MOVE>h3</MOVE>
+			<FENstr>r1bqkb2/ppp4p/2n2nr1/1B1p2Q1/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVE>Re6+</MOVE>
+			<FENstr>r1bqkb2/ppp4p/2n2nr1/1B1pQ3/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>16</MOVENUMBER>
+			<MOVE>Kf1</MOVE>
+			<FENstr>r1bqkb2/ppp4p/2n2nr1/1B1pQ3/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVE>Ne5</MOVE>
+			<FENstr>r1b1kb2/ppp1q2p/2n2nr1/1B1pQ3/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>17</MOVENUMBER>
+			<MOVE>Nc3</MOVE>
+			<FENstr>r1b1kb2/ppp1q2p/2n2nr1/1B1pQ3/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVE>c6</MOVE>
+			<FENstr>r1b1kb2/ppp1Q2p/2n2nr1/1B1p4/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>18</MOVENUMBER>
+			<MOVE>Bd2</MOVE>
+			<FENstr>r1b1kb2/ppp1Q2p/2n2nr1/1B1p4/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVE>Nf3</MOVE>
+			<FENstr>r1b1k3/ppp1b2p/2n2nr1/1B1p4/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>19</MOVENUMBER>
+			<MOVE>Bf4</MOVE>
+			<FENstr>r1b1k3/ppp1b2p/2n2nr1/1B1p4/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVE>Kd7</MOVE>
+			<FENstr>r1b1k3/ppp1b2p/2B2nr1/3p4/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>20</MOVENUMBER>
+			<MOVE>Kg2</MOVE>
+			<FENstr>r1b1k3/ppp1b2p/2B2nr1/3p4/4P3/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVE>Nd4</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/2p2nr1/3p4/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>21</MOVENUMBER>
+			<MOVE>Rac1</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/2p2nr1/3p4/4P3/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVE>Re8</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/2p2nr1/3P4/8/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>22</MOVENUMBER>
+			<MOVE>Be3</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/2p2nr1/3P4/8/8/PPPP1PPP/RNB1K2R b KQq -</FENstr>
+			<MOVE>Bc5</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/5nr1/3p4/8/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>23</MOVENUMBER>
+			<MOVE>Na4</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/5nr1/3p4/8/8/PPPP1PPP/RNB1K2R w KQq -</FENstr>
+			<MOVE>Bd6</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/5nr1/3p4/8/6P1/PPPP1P1P/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>24</MOVENUMBER>
+			<MOVE>Bxd4</MOVE>
+			<FENstr>r1b1k3/p1p1b2p/5nr1/3p4/8/6P1/PPPP1P1P/RNB1K2R b KQq -</FENstr>
+			<MOVE>Bb8</MOVE>
+			<FENstr>r3k3/p1p1b2p/5nr1/3p1b2/8/6P1/PPPP1P1P/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>25</MOVENUMBER>
+			<MOVE>Nc5+</MOVE>
+			<FENstr>r3k3/p1p1b2p/5nr1/3p1b2/8/6P1/PPPP1P1P/RNB1K2R w KQq -</FENstr>
+			<MOVE>Kc8</MOVE>
+			<FENstr>r3k3/p1p1b2p/5nr1/3p1b2/8/3P2P1/PPP2P1P/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>26</MOVENUMBER>
+			<MOVE>Nxe6</MOVE>
+			<FENstr>r3k3/p1p1b2p/5nr1/3p1b2/8/3P2P1/PPP2P1P/RNB1K2R b KQq -</FENstr>
+			<MOVE>Rxe6</MOVE>
+			<FENstr>r3k3/p1p1b2p/6r1/3p1b2/6n1/3P2P1/PPP2P1P/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>27</MOVENUMBER>
+			<MOVE>Rhe1</MOVE>
+			<FENstr>r3k3/p1p1b2p/6r1/3p1b2/6n1/3P2P1/PPP2P1P/RNB1K2R w KQq -</FENstr>
+			<MOVE>Rg6</MOVE>
+			<FENstr>r3k3/p1p1b2p/6r1/3p1b2/6n1/3P2PP/PPP2P2/RNB1K2R b KQq -</FENstr>
+			<MOVENUMBER>28</MOVENUMBER>
+			<MOVE>Re8+</MOVE>
+			<FENstr>r3k3/p1p1b2p/6r1/3p1b2/6n1/3P2PP/PPP2P2/RNB1K2R b KQq -</FENstr>
+			<MOVE>Kb7</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3p1b2/6n1/3P2PP/PPP2P2/RNB1K2R w KQq -</FENstr>
+			<MOVENUMBER>29</MOVENUMBER>
+			<MOVE>Be5</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3p1b2/6n1/3P2PP/PPP2P2/RNB1K2R w KQq -</FENstr>
+			<MOVE>Bxe5</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3p1b2/6n1/3P2PP/PPP2P2/RNB2K1R b q -</FENstr>
+			<MOVENUMBER>30</MOVENUMBER>
+			<MOVE>Rxe5</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3p1b2/6n1/3P2PP/PPP2P2/RNB2K1R b q -</FENstr>
+			<MOVE>Rg5</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3pnb2/8/3P2PP/PPP2P2/RNB2K1R w q -</FENstr>
+			<MOVENUMBER>31</MOVENUMBER>
+			<MOVE>f4</MOVE>
+			<FENstr>r3k3/p1p1b2p/4r3/3pnb2/8/3P2PP/PPP2P2/RNB2K1R w q -</FENstr>
+			<GAMETERMINATION GAMERESULT="WHITEWIN"/>
+		</GAMETEXT>
+	</GAME>
+		<GAME>
+		<TAGLIST>
+			<Event>Boise Club Championship, Reserve Section</Event>
+			<Site>Boise (ID)</Site>
+			<Date YEAR="1995" MONTH="??" DAY="??"/>
+			<Round>05</Round>
+			<White>McGarvey James H (ID)</White>
+			<Black>Myers Hugh S (ID)</Black>
+			<Result GAMERESULT="WHITEWIN"/>
+			<ECO>C62</ECO>
+			<Opening>Ruy Lopez: old Steinitz defence, semi-Duras variation</Opening>
+		</TAGLIST>
+		<GAMETEXT>
+			<MOVENUMBER>1</MOVENUMBER>
+			<MOVE>e4</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6</FENstr>
+			<MOVE>e5</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVENUMBER>2</MOVENUMBER>
+			<MOVE>Nf3</MOVE>
+			<FENstr>rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -</FENstr>
+			<MOVE>Nc6</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVENUMBER>3</MOVENUMBER>
+			<MOVE>Bb5</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -</FENstr>
+			<MOVE>d6</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>4</MOVENUMBER>
+			<MOVE>d4</MOVE>
+			<FENstr>r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>exd4</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>5</MOVENUMBER>
+			<MOVE>Nxd4</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>Bd7</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B2p3/3PP3/5N2/PPP2PPP/RNBQK2R b KQkq d3</FENstr>
+			<MOVENUMBER>6</MOVENUMBER>
+			<MOVE>Be3</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B2p3/3PP3/5N2/PPP2PPP/RNBQK2R b KQkq d3</FENstr>
+			<MOVE>Nf6</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B6/3pP3/5N2/PPP2PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>7</MOVENUMBER>
+			<MOVE>f3</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B6/3pP3/5N2/PPP2PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>Be7</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B6/3NP3/8/PPP2PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVENUMBER>8</MOVENUMBER>
+			<MOVE>O-O</MOVE>
+			<FENstr>r1bqkbnr/ppp2ppp/2np4/1B6/3NP3/8/PPP2PPP/RNBQK2R b KQkq -</FENstr>
+			<MOVE>O-O</MOVE>
+			<FENstr>r2qkbnr/pppb1ppp/2np4/1B6/3NP3/8/PPP2PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVENUMBER>9</MOVENUMBER>
+			<MOVE>Nc3</MOVE>
+			<FENstr>r2qkbnr/pppb1ppp/2np4/1B6/3NP3/8/PPP2PPP/RNBQK2R w KQkq -</FENstr>
+			<MOVE>a6</MOVE>
+			<FENstr>r2qkbnr/pppb1ppp/2np4/1B6/3NP3/4B3/PPP2PPP/RN1QK2R b KQkq -</FENstr>
+			<MOVENUMBER>10</MOVENUMBER>
+			<MOVE>Be2</MOVE>
+			<FENstr>r2qkbnr/pppb1ppp/2np4/1B6/3NP3/4B3/PPP2PPP/RN1QK2R b KQkq -</FENstr>
+			<MOVE>h6</MOVE>
+			<FENstr>r2qkb1r/pppb1ppp/2np1n2/1B6/3NP3/4B3/PPP2PPP/RN1QK2R w KQkq -</FENstr>
+			<MOVENUMBER>11</MOVENUMBER>
+			<MOVE>f4</MOVE>
+			<FENstr>r2qkb1r/pppb1ppp/2np1n2/1B6/3NP3/4B3/PPP2PPP/RN1QK2R w KQkq -</FENstr>
+			<MOVE>Re8</MOVE>
+			<FENstr>r2qkb1r/pppb1ppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1QK2R b KQkq -</FENstr>
+			<MOVENUMBER>12</MOVENUMBER>
+			<MOVE>Bf3</MOVE>
+			<FENstr>r2qkb1r/pppb1ppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1QK2R b KQkq -</FENstr>
+			<MOVE>Qc8</MOVE>
+			<FENstr>r2qk2r/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1QK2R w KQkq -</FENstr>
+			<MOVENUMBER>13</MOVENUMBER>
+			<MOVE>h3</MOVE>
+			<FENstr>r2qk2r/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1QK2R w KQkq -</FENstr>
+			<MOVE>Nxd4</MOVE>
+			<FENstr>r2qk2r/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1Q1RK1 b kq -</FENstr>
+			<MOVENUMBER>14</MOVENUMBER>
+			<MOVE>Bxd4</MOVE>
+			<FENstr>r2qk2r/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1Q1RK1 b kq -</FENstr>
+			<MOVE>b5</MOVE>
+			<FENstr>r2q1rk1/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1Q1RK1 w - -</FENstr>
+			<MOVENUMBER>15</MOVENUMBER>
+			<MOVE>e5</MOVE>
+			<FENstr>r2q1rk1/pppbbppp/2np1n2/1B6/3NP3/4BP2/PPP3PP/RN1Q1RK1 w - -</FENstr>
+			<MOVE>dxe5</MOVE>
+			<FENstr>r2q1rk1/pppbbppp/2np1n2/1B6/3NP3/2N1BP2/PPP3PP/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>16</MOVENUMBER>
+			<MOVE>fxe5</MOVE>
+			<FENstr>r2q1rk1/pppbbppp/2np1n2/1B6/3NP3/2N1BP2/PPP3PP/R2Q1RK1 b - -</FENstr>
+			<MOVE>Nh7</MOVE>
+			<FENstr>r2q1rk1/1ppbbppp/p1np1n2/1B6/3NP3/2N1BP2/PPP3PP/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>17</MOVENUMBER>
+			<MOVE>Bxa8</MOVE>
+			<FENstr>r2q1rk1/1ppbbppp/p1np1n2/1B6/3NP3/2N1BP2/PPP3PP/R2Q1RK1 w - -</FENstr>
+			<MOVE>Qxa8</MOVE>
+			<FENstr>r2q1rk1/1ppbbppp/p1np1n2/8/3NP3/2N1BP2/PPP1B1PP/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>18</MOVENUMBER>
+			<MOVE>Qf3</MOVE>
+			<FENstr>r2q1rk1/1ppbbppp/p1np1n2/8/3NP3/2N1BP2/PPP1B1PP/R2Q1RK1 b - -</FENstr>
+			<MOVE>Be6</MOVE>
+			<FENstr>r2q1rk1/1ppbbpp1/p1np1n1p/8/3NP3/2N1BP2/PPP1B1PP/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>19</MOVENUMBER>
+			<MOVE>a3</MOVE>
+			<FENstr>r2q1rk1/1ppbbpp1/p1np1n1p/8/3NP3/2N1BP2/PPP1B1PP/R2Q1RK1 w - -</FENstr>
+			<MOVE>c5</MOVE>
+			<FENstr>r2q1rk1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1B3/PPP1B1PP/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>20</MOVENUMBER>
+			<MOVE>Qxa8</MOVE>
+			<FENstr>r2q1rk1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1B3/PPP1B1PP/R2Q1RK1 b - -</FENstr>
+			<MOVE>Rxa8</MOVE>
+			<FENstr>r2qr1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1B3/PPP1B1PP/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>21</MOVENUMBER>
+			<MOVE>Bf2</MOVE>
+			<FENstr>r2qr1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1B3/PPP1B1PP/R2Q1RK1 w - -</FENstr>
+			<MOVE>Bf5</MOVE>
+			<FENstr>r2qr1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB2/PPP3PP/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>22</MOVENUMBER>
+			<MOVE>Nd5</MOVE>
+			<FENstr>r2qr1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB2/PPP3PP/R2Q1RK1 b - -</FENstr>
+			<MOVE>Bf8</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB2/PPP3PP/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>23</MOVENUMBER>
+			<MOVE>c3</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB2/PPP3PP/R2Q1RK1 w - -</FENstr>
+			<MOVE>Rc8</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>24</MOVENUMBER>
+			<MOVE>Bh4</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p1np1n1p/8/3NPP2/2N1BB1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Bd3</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p2p1n1p/8/3nPP2/2N1BB1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>25</MOVENUMBER>
+			<MOVE>Rfe1</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p2p1n1p/8/3nPP2/2N1BB1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVE>g5</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p2p1n1p/8/3BPP2/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>26</MOVENUMBER>
+			<MOVE>Bf2</MOVE>
+			<FENstr>r1q1r1k1/1ppbbpp1/p2p1n1p/8/3BPP2/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Rc6</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p2p1n1p/1p6/3BPP2/2N2B1P/PPP3P1/R2Q1RK1 w - b6</FENstr>
+			<MOVENUMBER>27</MOVENUMBER>
+			<MOVE>Rad1</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p2p1n1p/1p6/3BPP2/2N2B1P/PPP3P1/R2Q1RK1 w - b6</FENstr>
+			<MOVE>Bc2</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p2p1n1p/1p2P3/3B1P2/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>28</MOVENUMBER>
+			<MOVE>Rd2</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p2p1n1p/1p2P3/3B1P2/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Bb3</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p4n1p/1p2p3/3B1P2/2N2B1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>29</MOVENUMBER>
+			<MOVE>Ne3</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p4n1p/1p2p3/3B1P2/2N2B1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVE>a5</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p4n1p/1p2P3/3B4/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>30</MOVENUMBER>
+			<MOVE>Rd8</MOVE>
+			<FENstr>r1q1r1k1/2pbbpp1/p4n1p/1p2P3/3B4/2N2B1P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>b4</MOVE>
+			<FENstr>r1q1r1k1/2pbbppn/p6p/1p2P3/3B4/2N2B1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>31</MOVENUMBER>
+			<MOVE>Nf5</MOVE>
+			<FENstr>r1q1r1k1/2pbbppn/p6p/1p2P3/3B4/2N2B1P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVE>Rc7</MOVE>
+			<FENstr>B1q1r1k1/2pbbppn/p6p/1p2P3/3B4/2N4P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVENUMBER>32</MOVENUMBER>
+			<MOVE>Nxh6+</MOVE>
+			<FENstr>B1q1r1k1/2pbbppn/p6p/1p2P3/3B4/2N4P/PPP3P1/R2Q1RK1 b - -</FENstr>
+			<MOVE>Kg7</MOVE>
+			<FENstr>q3r1k1/2pbbppn/p6p/1p2P3/3B4/2N4P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVENUMBER>33</MOVENUMBER>
+			<MOVE>Nf5+</MOVE>
+			<FENstr>q3r1k1/2pbbppn/p6p/1p2P3/3B4/2N4P/PPP3P1/R2Q1RK1 w - -</FENstr>
+			<MOVE>Kg6</MOVE>
+			<FENstr>q3r1k1/2pbbppn/p6p/1p2P3/3B4/2N2Q1P/PPP3P1/R4RK1 b - -</FENstr>
+			<MOVENUMBER>34</MOVENUMBER>
+			<MOVE>g4</MOVE>
+			<FENstr>q3r1k1/2pbbppn/p6p/1p2P3/3B4/2N2Q1P/PPP3P1/R4RK1 b - -</FENstr>
+			<MOVE>bxa3</MOVE>
+			<FENstr>q3r1k1/2p1bppn/p3b2p/1p2P3/3B4/2N2Q1P/PPP3P1/R4RK1 w - -</FENstr>
+			<MOVENUMBER>35</MOVENUMBER>
+			<MOVE>bxa3</MOVE>
+			<FENstr>q3r1k1/2p1bppn/p3b2p/1p2P3/3B4/2N2Q1P/PPP3P1/R4RK1 w - -</FENstr>
+			<MOVE>c4</MOVE>
+			<FENstr>q3r1k1/2p1bppn/p3b2p/1p2P3/3B4/P1N2Q1P/1PP3P1/R4RK1 b - -</FENstr>
+			<MOVENUMBER>36</MOVENUMBER>
+			<MOVE>Nd6</MOVE>
+			<FENstr>q3r1k1/2p1bppn/p3b2p/1p2P3/3B4/P1N2Q1P/1PP3P1/R4RK1 b - -</FENstr>
+			<MOVE>Be7</MOVE>
+			<FENstr>q3r1k1/4bppn/p3b2p/1pp1P3/3B4/P1N2Q1P/1PP3P1/R4RK1 w - c6</FENstr>
+			<MOVENUMBER>37</MOVENUMBER>
+			<MOVE>Rg8+</MOVE>
+			<FENstr>q3r1k1/4bppn/p3b2p/1pp1P3/3B4/P1N2Q1P/1PP3P1/R4RK1 w - c6</FENstr>
+			<MOVE>Kh6</MOVE>
+			<FENstr>Q3r1k1/4bppn/p3b2p/1pp1P3/3B4/P1N4P/1PP3P1/R4RK1 b - -</FENstr>
+			<MOVENUMBER>38</MOVENUMBER>
+			<MOVE>Nxf7#</MOVE>
+			<FENstr>Q3r1k1/4bppn/p3b2p/1pp1P3/3B4/P1N4P/1PP3P1/R4RK1 b - -</FENstr>
+			<GAMETERMINATION GAMERESULT="WHITEWIN"/>
+		</GAMETEXT>
+	</GAME>
+</CHESSGAMES>

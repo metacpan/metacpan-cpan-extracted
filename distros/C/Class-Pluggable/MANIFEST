@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/Pluggable.pm
+t/Class-Pluggable.t
+META.yml                                 Module meta-data (added by MakeMaker)

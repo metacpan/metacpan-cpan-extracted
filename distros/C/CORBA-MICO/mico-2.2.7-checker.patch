@@ -1,0 +1,18 @@
+--- mico/orb/any.cc.checker	Sat Jun 12 17:33:12 1999
++++ mico/orb/any.cc	Sat Jun 12 17:31:16 1999
+@@ -2068,6 +2068,7 @@
+ {
+     Any &me = (Any &)*this;
+ 
++    me.prepare_read ();
+     if (me.checker->tc()->kind () != tk_objref) {
+ 	me.rewind ();
+ 	return FALSE;
+@@ -2086,6 +2087,7 @@
+ {
+     Any &me = (Any &)*this;
+ 
++    me.prepare_read ();
+     if (me.checker->tc()->kind () != tk_abstract_interface) {
+         me.rewind ();
+         return FALSE;

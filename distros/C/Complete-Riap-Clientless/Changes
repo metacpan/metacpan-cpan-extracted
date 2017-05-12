@@ -1,0 +1,12 @@
+Revision history for Complete-Riap-Clientless
+
+0.002   2017-01-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Specify x_alt_for prereq to Complete::Riap.
+
+
+0.001    2017-01-01 (PERLANCAR)
+
+         - First release.

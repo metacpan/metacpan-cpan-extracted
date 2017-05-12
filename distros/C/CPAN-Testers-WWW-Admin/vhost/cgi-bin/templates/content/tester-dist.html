@@ -1,0 +1,18 @@
+[%
+
+    title = 'Browse by Distribution' ;
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    ELSE ; crumb2_name = 'Tester' ; END ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Distribution' ;
+
+%]
+
+<p>Enter the name of a distribution, which you have submitted reports for.</p>
+
+<form method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-dist" />
+<p>Distribution: <input type="text" name="dist" value="" size="40" /> <input type="submit" value='GO!' /></p>
+</form>
+
+[% IF errmess %]<p class="alert">[% errmess %]</p>[% END %]

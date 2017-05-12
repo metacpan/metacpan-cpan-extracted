@@ -1,0 +1,6 @@
+Coro::State			T_CORO_STATE
+
+INPUT
+
+T_CORO_STATE
+	$var = SvSTATE ($arg);

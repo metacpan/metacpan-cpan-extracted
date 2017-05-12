@@ -1,0 +1,19 @@
+Revision history for Perl extension Cache::Swifty.
+
+0.07  Tue May 20 21:00:00 2008
+	- check whether swifty is installed in Makefile.PL
+
+0.06  Wed Oct 10 16:00:00 2007
+	- handle cases where the DESTROY function is called more than once
+	- add destructor
+
+0.05  Tue Sep 25 00:00:00 2007
+	- follow version up of swifty (support for checksum and refresh_before)
+
+0.03  Tue Sep 18 00:00:00 2007
+	- follow version up of swifty
+	- optimization and minor API changes
+	- support for storing arrays and hashes
+	
+0.02  Wed Sep 12 00:00:00 2007
+	- initial release

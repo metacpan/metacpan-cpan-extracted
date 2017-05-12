@@ -1,0 +1,11 @@
+/* CatalystX::CRUD::YUI css */
+
+@import "crud/base.css";
+@import "crud/help.css";
+@import "crud/livegrid.css";
+@import "crud/panel.css";
+@import "crud/form.css";
+@import "crud/datatable.css";
+@import "crud/pager.css";
+@import "crud/menu.css";
+@import "crud/tabview.css";

@@ -1,0 +1,4 @@
+after you rm -rf /usr/local/Cache-Static/cache you NEED a 
+comma-load-and-store-doc on every store you
+care about, or all freshness checks will return FALSE!
+(unless you have specified the -0 modifier)

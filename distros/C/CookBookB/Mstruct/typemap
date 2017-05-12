@@ -1,0 +1,3 @@
+TYPEMAP
+
+Mystruct *	T_PACKED

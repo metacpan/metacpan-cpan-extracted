@@ -1,0 +1,46 @@
+NAME
+    CPAN::Mini::Live - Keep CPAN Mini up to date
+
+SYNOPSIS
+      # have a ~/.minicpanrc:
+      # (change local to where you want the mirror)
+      remote: http://cpan.cpantesters.org/
+      exact_mirror: 1
+      force: 0
+      trace: 0
+      class: CPAN::Mini::Live
+      local: /home/acme/Public/minicpanlive/
+
+      # then run the minicpan command:
+      % minicpan
+      updating mirror...
+      and live...
+
+DESCRIPTION
+    CPAN::Mini creates a minimal mirror of CPAN and is very useful indeed.
+    However, to keep the mirror up to date, you must continually run
+    minicpan. This module makes minicpan block and listen for live updates,
+    thus keeping your minicpan live.
+
+    This is an experimental module. Let's see how it works out.
+
+    It works by having a backend running CPAN::Mini::Live::Publish which
+    publishes file updates and deletions to FriendFeed.
+
+    CPAN::Mini::Live first make sures it is up to date and then listens to
+    these updates using the FriendFeed real-time API so your minicpan will
+    be kept up to date in real time.
+
+    You have to use the same mirror as the backend code,
+    <http://cpan.cpantesters.org/>.
+
+SEE ALSO
+    CPAN::Mini.
+
+COPYRIGHT
+    Copyright (C) 2009, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

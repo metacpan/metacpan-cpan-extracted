@@ -1,0 +1,44 @@
+##########################################################################
+#                                                                        #
+# © Copyright IBM Corporation 2001, 2004. All rights reserved.           #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# William Spurlin - Initial version and framework                        #
+#                                                                        #
+# Xue-Dong Chen - Maintenance and defect fixes                           #
+#                                                                        #
+##########################################################################
+package Win32C_O;
+
+sub MY::c_o {
+             '
+.SUFFIXES:	.conf .lib
+
+.conf.lib:
+	perl autoDef $<
+	$(AR) /machine:i386 /def:$*.def
+	
+.c$(OBJ_EXT):
+	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.c
+
+.cpp$(OBJ_EXT):
+	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.cpp
+
+.cxx$(OBJ_EXT):
+	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.cxx
+
+.cc$(OBJ_EXT):
+	$(CCCMD) $(CCCDLFLAGS) -I$(PERL_INC) $(DEFINE) $*.cc
+
+
+    ';
+    }
+
+
+
+
+1;

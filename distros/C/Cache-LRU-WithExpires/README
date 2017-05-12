@@ -1,0 +1,27 @@
+NAME
+    Cache::LRU::WithExpires - can set an expiration for the Cache::LRU
+
+SYNOPSIS
+      use Cache::LRU::WithExpires;
+
+      my $cache = Cache::LRU::WithExpires->new;
+      $cache->set('foo', 'bar', 1);
+      sleep 2;
+      $cache->get('foo'); # undef
+
+DESCRIPTION
+    Cache::LRU::WithExpires is a can set an expiration for the Cache::LRU.
+
+AUTHOR
+    xaicron <xaicron {at} cpan.org>
+
+COPYRIGHT
+    Copyright 2012 - xaicron
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Cache::LRU
+

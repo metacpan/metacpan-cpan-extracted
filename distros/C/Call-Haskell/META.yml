@@ -1,0 +1,33 @@
+---
+abstract: 'Call Haskell functions from Perl'
+author:
+  - 'Wim Vanderbauwhede  <Wim.Vanderbauwhede@mail.be>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Call-Haskell
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Digest::MD5: '2.54'
+  Inline: '0.78'
+  Inline::C: '0.73'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/wimvanderbauwhede/Perl-Call-Haskell/issues
+  homepage: https://github.com/wimvanderbauwhede/Perl-Call-Haskell
+  repository: https://github.com/wimvanderbauwhede/Perl-Call-Haskell.git
+version: v0.2.1

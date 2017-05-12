@@ -1,0 +1,103 @@
+2014-10-02  Eduardo Santiago <esm@cpan.org>
+	* Release 2.09
+	* Bug 99244: don't require CGI.pm for test suite
+
+2012-02-14  Eduardo Santiago <esm@cpan.org>
+	* Release 2.08
+	* test suite fix
+
+2012-02-12  Eduardo Santiago <esm@cpan.org>
+	* Release 2.07
+	* Bug 83283: don't use expensive $` and $'
+	* Bug 28111: add LICENSE, and META.yml
+	* Disable on Windows
+
+2012-12-03  Eduardo Santiago <esm@cpan.org>
+	* Release 2.06
+
+	* Bug 81602: test suite changes to handle new perl5.17
+	  hash key randomization
+
+2011-07-12  Eduardo Santiago <esm@cpan.org>
+	* Release 2.05
+
+	* Bug 62263: last attempt got it wrong. Try again.
+
+2011-07-12  Eduardo Santiago <esm@cpan.org>
+	* Release 2.04
+
+	* Bug 62263: test suite changes to handle new perl5.14
+	  regex compilation
+
+2010-08-02  Eduardo Santiago <esm@cpan.org>
+	* Release 2.03
+
+	* Test suite changes for new perl5.10 warning behavior.
+
+2010-08-01  Eduardo Santiago <esm@cpan.org>
+	* Release 2.02
+
+	* No actual changes; just moved Alert.pm into lib/CGI to
+	  conform to best practices, and got the test suite working
+	  without relying on internals of CGI.pm.
+
+2004-12-13  Eduardo Santiago  <esm@ascend.gingerbear.org>
+
+	* Release 1.08
+
+	* Alert.pm:
+	  Bug 8033 - check $^S properly.  Again, thanks to Don At
+	  See-Pan Dot Org for finding this and providing a patch.
+
+	* Alert.pm: PHEW!  Finally!  Configurable user output.  The
+	  message shown to the remote (web) user is now configurable.
+	  Feature Request 7788.  Thanks to Don At See-Pan Dot Org for
+	  the idea.
+
+2004-10-11  Eduardo Santiago  <esm@ascend.gingerbear.org>
+
+	* Alert.pm:
+	  Eek!  @Hide is wrong: it won't detect a simple name like 'password'
+	  (that is, if it starts with 'passw' instead of being 'mumble-passw').
+
+2004-06-10  Eduardo Santiago  <esm@ascend.gingerbear.org>
+
+	* Alert.pm:
+	  when displaying CGI params, only default to '' if param is undef!
+	  Otherwise, we show zero (0) as ''.
+
+2004-03-09  Eduardo Santiago  <esm@ascend.gingerbear.org>
+
+	* Alert.pm:
+	  $http_host - split into two: a _full_ portion, and an
+	  _email hostname_ one.  The difference is that the full one
+	  might have colon-port (:80, :8080, ...).  That's important
+	  for showing the full URL in the subject line, but a major
+	  bad thing to say "From: <nobody@foo.com:80>".
+
+2004-03-06  Eduardo Santiago <esm@pobox.com>
+	* Release 1.05
+
+2004-03-05  Eduardo Santiago <esm@pobox.com>
+	* Alert.pm: include $HTTP_HOST in email From: header, to
+	  help differentiate between virtual hosts
+
+2004-03-04  Eduardo Santiago <esm@pobox.com>
+	* Alert.pm: new exportable function http_die(), provides
+	  simple way for caller to emit an HTTP error (404, 500, ...)
+
+2003-11-07  Eduardo Santiago <esm@pobox.com>
+	* Release 1.02
+
+2003-10-02  Eduardo Santiago <esm@pobox.com>
+
+	* Alert.pm: new functionality: if called with 'hide=qr/xxx/'
+	  on the import line, exclude CGI params matching /xxx/ from
+	  generated email.  Used to avoid sending sensitive info
+	  (passwords, credit card numbers) over unencrypted email.
+
+	* t/02hide.t: new test, for above functionality
+
+2003-07-31  Eduardo Santiago  <esm@pobox.com>
+
+	* Release 1.00

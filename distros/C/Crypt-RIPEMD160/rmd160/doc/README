@@ -1,0 +1,36 @@
+This directory contains a description and software for the RIPEMD-160 and 
+RIPEMD-128 hash functions. The implementations are written for the sole
+purpose of documentation. No optimization whatsoever is performed: only
+readability and portability were kept in mind.  
+
+
+ripemd160.ps.gz: description of RIPEMD-160 and RIPEMD-128. This has also
+been published in Fast Software Encryption, LNCS 1039, D. Gollmann (Ed.),
+pp. 71-82. This version differs from the published version in that a figure
+has been added, four small mistakes in the pseudo-code of Appendix A
+have been corrected, and the order in which the permutations pi and rho^i
+are applied in Section 3 have been exchanged. In addition, the hash value
+of the message consisting of 1 million 'a' characters has been added to
+Appendix B for both RIPEMD-160 and RIPEMD-128.
+
+rmd160.c: source code for RIPEMD-160
+
+rmd160.h: include file for RIPEMD-160. Make sure that the types byte, word
+and dword are respectively 8, 16, and 32-bit unsigned quantities.
+
+rmd128.c: source code for RIPEMD-128
+
+rmd128.h: include file for RIPEMD-128. Make sure that the types byte, word,
+and dword are respectively 8, 16, and 32-bit unsigned quantities.
+
+hashtest.c: driver for both RIPEMD-160 and RIPEMD-128. Default is
+RIPEMD-160. For compilation with rmd128.c define RMDsize=128.
+Command line arguments of hashtest: any combination of 
+   filename  -- compute hash code of file read binary
+   -sstring  -- print string & hashcode
+   -t        -- perform time trial
+   -x        -- execute standard test suite, ASCII input
+A bug in the RMDonemillion() function of this driver has been corrected. 
+ 
+Any comments on the description or the implementation can be mailed to
+antoon.bosselaers@esat.kuleuven.ac.be 

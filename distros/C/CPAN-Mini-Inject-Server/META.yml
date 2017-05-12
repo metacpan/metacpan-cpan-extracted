@@ -1,0 +1,33 @@
+---
+abstract: 'Inject into your CPAN mirror from over there'
+author:
+  - 'Christopher Mckay <potatohead@potatolan.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Mini-Inject-Server
+provides:
+  CPAN::Mini::Inject::Server:
+    file: lib/CPAN/Mini/Inject/Server.pm
+    version: 0.03
+  CPAN::Mini::Inject::Server::Dispatch:
+    file: lib/CPAN/Mini/Inject/Server/Dispatch.pm
+    version: 0.03
+recommends:
+  CGI::Application::Dispatch::Server: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+requires:
+  CGI::Application: 0
+  CGI::Application::Dispatch: 0
+  CGI::Application::Plugin::AutoRunmode: 0
+  CPAN::Mini::Inject: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-DBI-utf8
+version: 0.2
+author:
+  - Tom Insam <tinsam@fotango.com>
+abstract: A Class:::DBI subclass that knows about UTF-8
+license: perl
+generated_by: Module::Build version 0.2609, without YAML.pm

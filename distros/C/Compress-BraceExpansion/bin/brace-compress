@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+use strict;
+
+our $VERSION = '0.1.7';
+
+
+use Compress::BraceExpansion;
+use Data::Dumper;
+
+#
+#_* Command Line Options
+#
+my $usage =<<END_USAGE;
+
+Given a list of similar strings, create a human-readable compressed
+string suitable for shell brace expansion.  For more information, see
+the documentation for the perl module Compress::BraceExpansion.
+
+brace-compress [-d] string1 string2 [string3] ...
+cat foo | brace-compress [-d]
+
+    -d = enable internal debugging information
+
+brace-compress -h
+
+    display this help page
+
+
+
+END_USAGE
+
+my $debug;
+if ( @ARGV ) {
+    if ( $ARGV[0] =~ m|^\-+d| ) {
+        $debug = 1;
+        shift @ARGV;
+    }
+    elsif ( $ARGV[0] =~ m|^\-+h| ) {
+        die $usage;
+    }
+}
+
+my @strings;
+
+if ( @ARGV ) {
+    @strings = @ARGV;
+}
+else {
+    while ( <> ) {
+        push @strings, split /\s+/;
+    }
+}
+
+#
+#_* Main
+#
+
+my $compressor = Compress::BraceExpansion->new( @strings );
+
+if ( $debug ) {
+    $compressor->enable_debug();
+}
+
+print $compressor->shrink( );
+exit;

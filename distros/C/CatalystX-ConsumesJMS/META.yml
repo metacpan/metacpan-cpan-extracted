@@ -1,0 +1,47 @@
+---
+abstract: 'role for components providing Catalyst actions consuming messages'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Component: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Controller::JMS: '0'
+  Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Test: '0'
+  Config::General: '0'
+  Data::Printer: '0'
+  HTTP::Request::Common: '0'
+  Moose: '2.0801'
+  MooseX::MethodAttributes::Role: '0'
+  Net::Stomp::Frame: '0'
+  Test::Fatal: '0'
+  Test::Most: '0'
+  Test::Plack::Handler::Stomp: '0'
+  lib: '0'
+  ok: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-ConsumesJMS
+no_index:
+  directory:
+    - t/lib
+requires:
+  Catalyst::Controller::JMS: '0'
+  Catalyst::Utils: '0'
+  Module::Runtime: '0'
+  Moose: '2.0801'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: git://github.com/dakkar/CatalystX-ConsumesJMS.git
+version: '1.08'

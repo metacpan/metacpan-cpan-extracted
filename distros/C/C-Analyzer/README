@@ -1,0 +1,15 @@
+pod2text C::Analyzer.pm > README
+
+Follow these steps to Install C::Analyzer module onto your system
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+for more details about usage try
+pod2html ./lib/Analyzer.pm > Analyzer.html
+
+Sreekanth Kocharlakota

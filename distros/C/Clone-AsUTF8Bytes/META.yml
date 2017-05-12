@@ -1,0 +1,25 @@
+---
+abstract: 'recursively copy Perl data converting to UTF-8 bytes'
+author:
+  - 'Mark Fowler <mark@twoshortplanks.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Clone-AsUTF8Bytes
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone-AsUTF8Bytes
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/2shortplanks/Clone
+version: 0.34

@@ -1,0 +1,9 @@
+Revision history for CGI-Application-Plugin-Authentication-Driver-DBIC
+
+0.01    Tue Apr 25 10:20:21 EDT 2007
+        First upload to CPAN.
+
+0.02    Tue May 29 23:26:07 EDT 2007
+        Added a 'use lib' to tests so that the test modules could be 
+        properly found.  Thanks Joenio Marques da Costa <joenio@gmail.com>
+        (Closes rt.cpan.org: #27318, #27319)

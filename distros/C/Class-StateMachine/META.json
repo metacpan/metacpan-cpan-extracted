@@ -1,0 +1,48 @@
+{
+   "abstract" : "define classes for state machines",
+   "author" : [
+      "Salvador Fandino <sfandino@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-StateMachine",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Peek" : "0",
+            "Hash::Util" : "0",
+            "MRO::Define" : "0.01",
+            "Package::Stash" : "0.29",
+            "Scalar::Util" : "0",
+            "Sub::Name" : "0.05",
+            "Test::More" : "0",
+            "mro" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.24"
+}

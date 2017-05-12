@@ -1,0 +1,101 @@
+__WAIT_STATUS					T_PTROBJ
+__WAIT_STATUS *					T_PTROBJ
+__compar_d_fn_t					T_PTROBJ
+__compar_fn_t					T_PTROBJ
+__extension__ extern lldiv_t			T_PTROBJ
+__extension__ extern long long int		T_PTROBJ
+__extension__ extern unsigned int		T_PTROBJ
+__extension__ extern unsigned long long int	T_PTROBJ
+__extension__ long long int			T_PTROBJ
+__extension__ unsigned long long int		T_PTROBJ
+__fd_mask					T_PTROBJ
+__fsid_t					T_OPAQUE_STRUCT
+__fsid_t *					T_PTROBJ
+__locale_t					T_PTROBJ
+__pthread_list_t				T_OPAQUE_STRUCT
+__pthread_list_t *				T_PTROBJ
+__sigset_t					T_OPAQUE_STRUCT
+__sigset_t *					T_PTROBJ
+char *							T_PV
+char * __restrict				T_PTROBJ
+char * const * __restrict			T_PTROBJ
+char ** __restrict				T_PTROBJ
+const __sigset_t * __restrict			T_OPAQUE_STRUCT
+const char *					T_PTROBJ
+const char * __restrict				T_PTROBJ
+const struct timespec * __restrict		T_PTROBJ
+const uint8_t *					T_PV
+const void *					T_PTROBJ
+const wchar_t * __restrict			T_PTROBJ
+div_t						T_OPAQUE_STRUCT
+div_t *						T_PTROBJ
+double * __restrict				T_PTROBJ
+fd_set						T_OPAQUE_STRUCT
+fd_set *					T_PTROBJ
+fd_set * __restrict				T_OPAQUE_STRUCT
+int *						T_PTROBJ
+int * __restrict				T_PTROBJ
+int32_t * __restrict				T_PTROBJ
+ldiv_t						T_OPAQUE_STRUCT
+ldiv_t *					T_PTROBJ
+lldiv_t						T_OPAQUE_STRUCT
+lldiv_t *					T_PTROBJ
+long double					T_NV
+long int					T_PTROBJ
+long int * __restrict				T_PTROBJ
+long long int					T_PTROBJ
+pthread_barrier_t				T_OPAQUE_STRUCT
+pthread_barrier_t *				T_PTROBJ
+pthread_barrierattr_t				T_OPAQUE_STRUCT
+pthread_barrierattr_t *				T_PTROBJ
+pthread_cond_t					T_OPAQUE_STRUCT
+pthread_cond_t *				T_PTROBJ
+pthread_condattr_t				T_OPAQUE_STRUCT
+pthread_condattr_t *				T_PTROBJ
+pthread_mutex_t					T_OPAQUE_STRUCT
+pthread_mutex_t *				T_PTROBJ
+pthread_mutexattr_t				T_OPAQUE_STRUCT
+pthread_mutexattr_t *				T_PTROBJ
+pthread_rwlock_t				T_OPAQUE_STRUCT
+pthread_rwlock_t *				T_PTROBJ
+pthread_rwlockattr_t				T_OPAQUE_STRUCT
+pthread_rwlockattr_t *				T_PTROBJ
+struct __pthread_internal_list *		T_PTROBJ
+struct __pthread_mutex_s			T_OPAQUE_STRUCT
+struct __pthread_mutex_s *			T_PTROBJ
+struct drand48_data *				T_PTROBJ
+struct drand48_data * __restrict		T_OPAQUE_STRUCT
+struct random_data *				T_PTROBJ
+struct random_data * __restrict			T_OPAQUE_STRUCT
+struct timeval * __restrict			T_OPAQUE_STRUCT
+uint32_t					T_UV
+uint8_t *					T_PV
+uint8_t					T_UV
+union wait *					T_PTROBJ
+unsigned int *					T_PTROBJ
+unsigned long int				T_PTROBJ
+unsigned long long int				T_PTROBJ
+unsigned short int				T_PTROBJ
+unsigned short int *				T_PTROBJ
+void ( * __func ) ( int __status, void * __arg )	T_PTROBJ
+void ( * __func ) ( void )			T_PTROBJ
+void **						T_PTROBJ
+wchar_t * __restrict				T_PTROBJ
+#############################################################################
+INPUT
+T_OPAQUE_STRUCT
+	if (sv_derived_from($arg, \"${ntype}\")) {
+	    STRLEN len;
+	    char  *s = SvPV((SV*)SvRV($arg), len);
+
+	    if (len != sizeof($var))
+		croak(\"Size %d of packed data != expected %d\",
+			len, sizeof($var));
+	    $var = *($type *)s;
+	}
+	else
+	    croak(\"$var is not of type ${ntype}\")
+#############################################################################
+OUTPUT
+T_OPAQUE_STRUCT
+	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));

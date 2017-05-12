@@ -1,0 +1,44 @@
+NAME
+    Convert::Base32 - Encoding and decoding of base32 strings
+
+SYNOPSIS
+      use Convert::Base32;
+
+      $encoded = encode_base32("\x3a\x27\x0f\x93");
+      $decoded = decode_base32($encoded);
+
+DESCRIPTION
+    This module provides functions to convert string from / to Base32
+    encoding, specified in RACE internet-draft. The Base32 encoding is
+    designed to encode non-ASCII characters in DNS-compatible host name
+    parts.
+
+    See http://www.ietf.org/internet-drafts/draft-ietf-idn-race-03.txt for
+    more details.
+
+FUNCTIONS
+    Following functions are provided; like "MIME::Base64", they are in
+    @EXPORT array. See the Exporter manpage for details.
+
+    encode_base32($str)
+        Encode data by calling the encode_base32() function. This function
+        takes a string to encode and returns the encoded base32 string.
+
+    decode_base32($str)
+        Decode a base32 string by calling the decode_base32() function. This
+        function takes a string to decode and returns the decoded string.
+
+        This function might throw the exceptions such as "Data contains
+        non-base32 characters", "Length of data invalid" and "PADDING number
+        of bits at the end of output buffer are not all zero".
+
+AUTHOR
+        Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+SEE ALSO
+        http://www.ietf.org/internet-drafts/draft-ietf-idn-race-03.txt, the
+        MIME::Base64 manpage, the Convert::RACE manpage.
+

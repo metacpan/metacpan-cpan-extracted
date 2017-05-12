@@ -1,0 +1,11 @@
+<SOFTPKG NAME="Crypt-MatrixSSL" VERSION="1,86,0,0">
+    <TITLE>Crypt-MatrixSSL</TITLE>
+    <ABSTRACT>Perl extension for SSL and TLS using MatrixSSL.org </ABSTRACT>
+    <AUTHOR>C. N. Drake &lt;christopher@pobox.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+        <CODEBASE HREF="Crypt-MatrixSSL-1.86.zip" />
+	<INSTALL>perl -e "use Config;$v='xcopy /ERY Crypt-MatrixSSL-1.86\\ppm';`${v}html\\* """$Config{installhtmldir}""" `; `${v}blib\\arch\\*.* """$Config{installsitelib}""" `; `${v}blib\\lib\\*.* """$Config{installsitelib}""" `;"</INSTALL>
+    </IMPLEMENTATION>
+</SOFTPKG>

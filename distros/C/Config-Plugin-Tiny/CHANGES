@@ -1,0 +1,9 @@
+Revision history for Perl extension Config::Plugin::Tiny.
+
+1.01  Sat Nov 17 10:31:00 2012
+	- Use File::Spec -> catfile('t', 'x.pl') instead of 't/x.pl' in tests and in POD.
+	- Remove references to CGI::Snapp::Plugin::Forward and CGI::Snapp::Plugin::Redirect from the docs,
+		since they are now part of CGI::Snapp.
+
+1.00  Mon Feb 27 10:09:44 2012
+	  - Original version

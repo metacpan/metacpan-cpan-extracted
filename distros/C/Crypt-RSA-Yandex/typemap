@@ -1,0 +1,2 @@
+TYPEMAP
+CCryptoProviderRSA *	O_OBJECT

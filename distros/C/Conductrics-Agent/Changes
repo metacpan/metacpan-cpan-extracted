@@ -1,0 +1,10 @@
+#
+
+0.004  2016/09/25:
+
+    - substituted JSON::Any (deprecated) with JSON::MaybeXS
+    - added Conductrics::Client in this package to define, create and delete agents on Conductrics service.
+    - decide() accepts same number of args but it supports Multi-Faceted decisions with or without names.
+    - get_decisions() for decision point already defined
+    - removed Modern::Perl and now more older version of perl are supported but this is not a excuse to avoid upgrade your Perl.
+    - more tests

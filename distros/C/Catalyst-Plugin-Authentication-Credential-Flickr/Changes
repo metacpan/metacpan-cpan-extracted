@@ -1,0 +1,24 @@
+Revision history for Perl module Catalyst::Plugin::Authentication::Credential::Flickr
+
+0.05 2006-12-07T12:29:33+09:00
+    - added missing prereq, UNIVERSAL::require
+
+0.04 2006-12-06T18:52:04+09:00
+    - fixed failing test with latest version of Test::MockObject
+      (Reported by Tatsuhiko Miyagawa)
+
+0.03 2006-01-15T16:48:56+09:00
+    - added pod test
+    - fixed doc
+
+0.02 2006-01-12T02:10:47+09:00
+    - added basic test
+
+0.01_03 2005-12-12T22:01:08+09:00
+    - fixed some bug. (thanks to nothingmuch)
+
+0.01_02 2005-12-12T15:33:58+09:00
+    - separated auth_restore_flickr from authenticate_flickr.
+
+0.01_01 2005-12-12T06:29:19+09:00
+    - original version;

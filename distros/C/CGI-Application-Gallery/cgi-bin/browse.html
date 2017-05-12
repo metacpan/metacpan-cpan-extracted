@@ -1,0 +1,45 @@
+
+
+<TMPL_IF CURRENT_PAGE>
+<div>
+<p><TMPL_IF PREVIOUS_PAGE><a href="?rm=browse&current_page=<TMPL_VAR PREVIOUS_PAGE>">previous page</a> : </TMPL_IF>
+<TMPL_IF CURRENT_PAGE>Page <TMPL_VAR CURRENT_PAGE></TMPL_IF>
+<TMPL_IF NEXT_PAGE> : <a href="?rm=browse&current_page=<TMPL_VAR NEXT_PAGE>">next page</a></TMPL_IF>
+</p>
+<p>
+<a href="?entries_per_page=5">[5pp]</a> : 
+<a href="?entries_per_page=10">[10pp]</a> : 
+<a href="?entries_per_page=25">[25pp]</a> 
+</p>
+</div>
+</TMPL_IF>
+
+
+
+
+
+
+<div>
+
+<table cellspacing="0" cellpadding="4" width="100%">
+<tr>
+<TMPL_LOOP NAME="LS"> <td><a href="?rm=view&rel_path=<TMPL_VAR REL_PATH>"><img src="?rm=thumbnail&rel_path=<TMPL_VAR REL_PATH>"></a></td>
+<TMPL_IF CLOSEROW></tr>
+<tr>
+</TMPL_IF>
+</TMPL_LOOP>
+</tr></table>
+
+
+<div>
+<h5>Directories</h5>
+<ul>
+<TMPL_IF REL_BACK><li><a href="?rm=browse&rel_path=<TMPL_VAR REL_BACK>">Parent Directory</a></li></TMPL_IF>
+<TMPL_LOOP NAME="LSD">
+<li><a href="?rm=browse&rel_path=<TMPL_VAR REL_PATH>"><TMPL_VAR FILENAME></a></li>
+</TMPL_LOOP>
+</ul>
+</div>
+
+
+

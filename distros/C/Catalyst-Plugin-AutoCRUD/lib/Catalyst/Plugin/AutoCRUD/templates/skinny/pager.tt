@@ -1,0 +1,32 @@
+[% IF cpac_skinny_pager %]
+[% USE url('', cpac.g.filter_params) %]
+[% SET args = "&" %]
+[% SET args = args _ "sort=" _ cpac_skinny_sortby _ "&" IF cpac_skinny_sortby %]
+[% SET args = args _ "dir="  _ cpac_skinny_dir  _ "&" IF cpac_skinny_dir  %]
+
+<p class="cpac_pager">
+    [% IF cpac_skinny_limit == 'all' %]
+        <a class="cpac_link" href="?[% url %][% args %]limit=20">show in pages</a>
+    [% ELSE %]
+        [% IF cpac_skinny_pager.first_page == cpac_skinny_pager.last_page %]
+            Page: <span class="cpac_current-page">1</span>
+        [% ELSE %]
+            [% FOR num IN [cpac_skinny_pager.first_page .. cpac_skinny_pager.last_page];
+                IF num == cpac_skinny_pager.current_page;
+                    '<span class="cpac_current-page">' _ num _ '</span>';
+                ELSE;
+                    IF (cpac_skinny_pager.current_page - 2) <= num && (cpac_skinny_pager.current_page + 2) >= num
+                            OR num == cpac_skinny_pager.last_page OR num == cpac_skinny_pager.first_page;
+                        '<a class="cpac_link" href="' %]?[% url %][% args %][% 'limit=' _
+                            (cpac_skinny_limit ? cpac_skinny_limit : 20) _ '&page=' _ num _ '">' _ num _ '</a>';
+                    ELSE;
+                        '&middot;';
+                    END;
+                END;
+            END %]
+            <a class="cpac_link" href="?[% url %][% args %]limit=all">show all</a>
+        [% END %]
+    [% END %]
+</p>
+[% END %]
+

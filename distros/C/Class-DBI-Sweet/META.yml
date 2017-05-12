@@ -1,0 +1,38 @@
+---
+abstract: lib/Class/DBI/Sweet.pm
+author:
+  - 'Christian Hansen <ch@ngmedia.com>'
+  - 'Matt S Trout <mstrout@cpan.org>'
+  - 'Andy Grundman <andy@hybridized.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-DBI-Sweet
+provides:
+  Class::DBI::Sweet:
+    file: lib/Class/DBI/Sweet.pm
+    version: 0.11
+  Class::DBI::Sweet::SQL::Abstract:
+    file: lib/Class/DBI/Sweet.pm
+    version: 0
+  Class::DBI::Sweet::Topping:
+    file: lib/Class/DBI/Sweet/Topping.pm
+    version: 0
+recommends:
+  Data::UUID: 0
+requires:
+  Class::DBI: v3.0.12
+  DBD::SQLite: 1.08
+  DBI: 0
+  Data::Page: 0
+  List::Util: 0
+  SQL::Abstract: 1.55
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

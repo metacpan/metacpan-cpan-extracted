@@ -1,0 +1,13 @@
+Revision history for Perl extension Chipcard::CTAPI.
+
+Version 0.2 (Jun 2003):
+-----------------------
+
+- Changed the way a card's memory size is calculated to support 256kbit
+  cards. (Thanks to Heiko Abraham)
+
+Version 0.1 (Jan 2003):
+-----------------------
+
+Initial public release.
+

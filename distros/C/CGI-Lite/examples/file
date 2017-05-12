@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+# Simply displays the key/value pairs. Here is how the output
+# would look for multipart/form-data forms:
+#
+#     full_name = Foo Bar
+#     picture = 812186386__bar.gif
+#     readme = 812186386__bar.txt
+#
+# As of v1.8, CGI::Lite no longer returns the entire path name for
+# uploaded files.
+
+use strict;
+use warnings;
+
+use CGI::Lite;
+
+my $cgi = CGI::Lite->new;
+my $dir = '/var/tmp';
+$cgi->set_directory ($dir) or die "Cannot use directory $dir.\n";
+
+# We're ignoring the returned value.
+$cgi->parse_form_data;
+print "Content-type: text/plain", "\n\n";
+$cgi->print_data;
+
+exit;

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb53
+registers:
+  AF: 24121
+  AF_: 0
+  BC: 22174
+  BC_: 0
+  DE: 63341
+  DE_: 0
+  HL: 35014
+  HL_: 0
+  I: 0
+  IX: 44613
+  IY: 25150
+  PC: 4
+  R: 2
+  SP: 0

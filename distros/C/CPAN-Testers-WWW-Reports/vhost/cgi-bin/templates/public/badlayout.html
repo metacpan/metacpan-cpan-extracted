@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+
+<title>CPAN Testers Reports: [% htmltitle || title | html %]</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="title"       content="CPAN Testers Reports" />
+<meta name="author"      content="Barbie" />
+<meta name="language"    content="en" />
+<meta name="keywords"    content="perl, cpan, test, testing, tester, testers, reports, smoke, smoker, black box, automated, automation" />
+<meta name="description" content="Report listings of distributions and authors from reports submitted by the CPAN Testers community, who automatically black box test submissions to Perl's CPAN code repository" />
+
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_setup.css" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_text.css" />
+
+[% IF rss %]<link  rel="alternate" type="application/rss+xml" title="CPAN Testers RSS" href="[% rss %]" />[% END %]
+[% IF rss2 %]<link rel="alternate" type="application/rss+xml" title="CPAN Testers RSS - NO PASS" href="[% rss2 %]" />[% END %]
+
+<!--
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-1826389-16");
+pageTracker._trackPageview();
+</script>
+-->
+
+[% IF distribution %]
+	<script type="text/javascript" src="/js/OpenThought.js"></script>
+	<script type="text/javascript" src="/static/distro/[% distribution.substr(0, 1) %]/[% distribution %].js"></script>
+	<script type="text/javascript" src="/js/cssrules.js"></script>
+	<script type="text/javascript" src="/js/cpan-testers-dist.js"></script>
+
+[% ELSIF author %]
+	<script type="text/javascript" src="/js/OpenThought.js"></script>
+	<script type="text/javascript" src="/static/author/[% author.substr(0, 1) %]/[% author %].js"></script>
+	<script type="text/javascript" src="/js/cssrules.js"></script>
+	<script type="text/javascript" src="/js/cpan-testers-author.js"></script>
+
+[% ELSE %]
+	<script type="text/javascript" src="/js/cssrules.js"></script>
+
+[% END -%]
+
+</head>
+<body [% onload %] >
+
+<body>
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->      
+    <div class="header">
+      
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/">CPAN Testers Reports</a></h1>
+          <h3>www.cpantesters.org</h3>
+          <h2>[% htmltitle || title %]</h2>
+        </div>
+    
+        [% INCLUDE "public/box-sites.html" %]
+      </div>
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <ul>
+          <li><a href="/">Home</a></li>
+          [% IF crumb3_name %]<li><a href="[% crumb3_href %]">[% crumb3_name %]</a></li>[% END %]
+          [% IF crumb2_name %]<li><a href="[% crumb2_href %]">[% crumb2_name %]</a></li>[% END %]
+          <li>[% crumb1_name %]</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- For alternative headers END PASTE here -->
+
+    <!-- B. MAIN -->
+    <div class="main">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+        [% INCLUDE "public/box-menu.html" %]
+        [% IF box_prefs ; THEN ; INCLUDE "public/box-prefs.html"   ; END %]
+        [% IF box_help  ; THEN ; INCLUDE "public/box-help.html"    ; END %]
+        [% IF box_summ  ; THEN ; INCLUDE "public/box-summary.html" ; END %]
+
+      </div>
+ 
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">[% title %]</h1>
+        <div class="column1-unit">
+
+          [% body %]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    [% INCLUDE "public/footer.html" %]
+
+  </div> 
+
+</body>
+</html>

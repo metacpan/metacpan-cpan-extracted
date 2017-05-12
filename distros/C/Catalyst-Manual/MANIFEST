@@ -1,0 +1,46 @@
+Changes
+lib/Catalyst/Manual.pm
+lib/Catalyst/Manual/About.pod
+lib/Catalyst/Manual/Actions.pod
+lib/Catalyst/Manual/CatalystAndMoose.pod
+lib/Catalyst/Manual/Components.pod
+lib/Catalyst/Manual/Cookbook.pod
+lib/Catalyst/Manual/Deployment.pod
+lib/Catalyst/Manual/Deployment/Apache/FastCGI.pod
+lib/Catalyst/Manual/Deployment/Apache/mod_perl.pod
+lib/Catalyst/Manual/Deployment/DevelopmentServer.pod
+lib/Catalyst/Manual/Deployment/FastCGI.pod
+lib/Catalyst/Manual/Deployment/IIS/FastCGI.pod
+lib/Catalyst/Manual/Deployment/lighttpd/FastCGI.pod
+lib/Catalyst/Manual/Deployment/nginx/FastCGI.pod
+lib/Catalyst/Manual/Deployment/SharedHosting.pod
+lib/Catalyst/Manual/DevelopmentProcess.pod
+lib/Catalyst/Manual/ExtendingCatalyst.pod
+lib/Catalyst/Manual/Internals.pod
+lib/Catalyst/Manual/Intro.pod
+lib/Catalyst/Manual/Tutorial.pod
+lib/Catalyst/Manual/Tutorial/01_Intro.pod
+lib/Catalyst/Manual/Tutorial/02_CatalystBasics.pod
+lib/Catalyst/Manual/Tutorial/03_MoreCatalystBasics.pod
+lib/Catalyst/Manual/Tutorial/04_BasicCRUD.pod
+lib/Catalyst/Manual/Tutorial/05_Authentication.pod
+lib/Catalyst/Manual/Tutorial/06_Authorization.pod
+lib/Catalyst/Manual/Tutorial/07_Debugging.pod
+lib/Catalyst/Manual/Tutorial/08_Testing.pod
+lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD.pod
+lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD/09_FormBuilder.pod
+lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD/09_FormFu.pod
+lib/Catalyst/Manual/Tutorial/09_AdvancedCRUD/09_FormHandler.pod
+lib/Catalyst/Manual/Tutorial/10_Appendices.pod
+lib/Catalyst/Manual/WritingPlugins.pod
+maint/bump-version
+maint/Makefile.include
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-use.t
+t/author/pod-coverage.t
+t/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

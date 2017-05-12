@@ -1,0 +1,209 @@
+Version 1.4207: Sun May 3 2015
+- Fix bug introduced in user_specified_filehandle.t by last release
+- Add standard tests
+
+Version 1.4206: Sat May 2 2015
+- Prevent CPAN from indexing private-lib
+- Again try to silence subroutine redefined warnings in File::Slurp.
+  http://www.cpantesters.org/cpan/report/9373ce6a-e71a-11e4-9f23-cdc1e0bfc7aa
+
+Version 1.4205: Mon Apr 20 2015
+- Improve support for parallel test execution
+- Don't install private Module::Install extension. Thanks to Paul Howarth
+  <paul@city-fan.org> for the bug report in another module.
+  https://rt.cpan.org/Ticket/Display.html?id=103482
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+- Require File::Slurp instead of including it, to avoid potential problems
+  like this:
+  http://www.cpantesters.org/cpan/report/86a0145a-e52b-11e4-a1d1-8536eb4f9f07
+
+Version 1.4204: Sun Apr 12 2015
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+- Fix excessive warnings about signal handlers. Thanks to "festinare" for the
+  patch. https://code.google.com/p/cgi-cache/issues/detail?id=1
+
+Version 1.4203: Sat Apr 4 2015
+- Make test script more compatible with automated testing
+- Improve the speed test and make it separate from the normal functional
+  tests. Thanks to Gregor Hermann <gregoa@cpan.org> for observing that the
+  speed test was flaky.
+
+Version 1.4202: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+
+Version 1.4201 Tue Jul 15 2008:
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Cleaned up the contradictory licensing. (Now just GPL instead of GPL in one
+	place, Perl artistic in another, "all rights reserved" in yet another.)
+- Moved hosting to Google Code
+
+Version 1.4200 Mon Mar 14 2005:
+- Fixed a bug where the user-specified max cache size was not being honored,
+  and an unbounded cache was used instead. (Thanks to Christoph C. Cemper
+  <cgicache@cemper.com> for finding the bug and providing the fix.)
+- Fixed a bug where the default_expires_in time interval was not being set
+  correctly.
+- Changed the default behavior of default_expires_in so that cache entries
+  never expire.
+
+Version 1.4142:
+- Fixed a bug in t/timed_tests.t that would be revealed by Perl 5.6.x. (Thanks
+  to Sebastien Aperghis-Tramoni <saper@cpan.org> for the bug report and
+  debugging assistance.)
+- Improved test reporting for, and robustness of, t/timed_tests.t
+
+Version 1.4141: wed Dec 22 2004
+- Fixed a bug in timed testing (Thanks to <nothingmuch@woobling.org> for the
+  bug report.)
+
+Version 1.4140: Tue Dec 21 2004
+- Improved test failure reporting
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Fixed some warnings and bugs in the two test cases.
+
+Version 1.41.3: Tue Sep 21 2004
+- Broke up test scripts
+- Switched to Test::More for better test reporting
+
+Version 1.41.2: Thu Sep 16 2004
+- Fixed broken dependency specification in Makefile.PL
+- Added missing inc/ files
+
+Version 1.41.1: Wed Sep 15 2004
+- Fixed module and changelog bug, where clear_cache() was clear() (William Kern
+  <wkern@pixelgate.net> reported this.)
+- Updated distribution to use Module::Install
+
+1.41 Wed Jun  9 13:50:09 EDT 2004
+- Now uses Tie::Restore instead my own version. It's a trivial dependency, but
+  reuse is good, right?
+- Updated Makefile.PL
+- Fixed an incompatibility with modules like CGI::Carp that override
+  CORE::GLOBALS::die, a new feature since about perl 5.6.1 (thanks to David
+  Link <dvlink@yahoo.com> for the bug report, and thanks to Anno Siegel
+  <anno4000@lublin.zrz.tu-berlin.de> for explaining the right way to override
+  CORE::die)
+- Fixed uninitialized variable warnings (patch by Isaac Miller
+  <isaac@soundscan.com>)
+- Fixed documentation typo (patch by Isaac Miller <isaac@soundscan.com>)
+
+1.40 Tue Nov  5 12:31:17 EST 2002
+- Added clear_cache() function to clear the cache. (Suggested by Adolfo
+  Santiago <chago@anothernet.com>)
+
+1.30 Thu Sep 26 13:01:32 EDT 2002
+- Added enable_output feature. (Feature request from Theo Petersen
+  <theo@summitdesign.net>.)
+- Verified SpeedyCGI compatibility. (Impetus from Theo Petersen
+  <theo@summitdesign.net>.)
+- Added a new section on use in persistent environments. (Impetus from Theo
+  Petersen <theo@summitdesign.net>.)
+- Corrected tie, tied, and untie syntax--apparently not a bug, although it
+  should have been. (Thanks to Benjamin Goldberg <goldbb2@earthlink.net> for
+  the suggestion.)
+
+1.21 Mon Feb 11 16:37:40 EST 2002
+- Fixed a documentation bug in the synopsis. (Thanks to Ken
+  <mitch@monger.net> for the report.)
+- Added a long-overdue credit to Terrance Brannon <princepawn@yahoo.com> in
+  the authors section of the POD. He had donated me the use of the CGI::Cache
+  namespace, and kindly allowed the current codebase to replace his.
+
+1.20 Fri Oct 19 11:51:19 EDT 2001
+- Added a FORCE_INSTALL option to Makefile.PL to skip warnings about
+  possibly incompatible versions.
+- Many thanks to Benjamin Goldberg <goldbb2@earthlink.net> for helping to
+  fix the tie'ing of STDOUT so that it works well with FastCGI. CGI::Cache
+  is now fully compatible with FastCGI and mod_perl, and no extra work needs
+  to be done on the part of the user. Thanks also to Pao-Hsi Huang
+  <doggy8088@mail2000.com.tw> for raising the issue.
+- Migrated over to Cache::Cache from File::Cache. The interface has changed
+  slightly, and is not fully backward compatible with previous versions.
+- Changed test script to use the same perl interpreter for testing as the
+  one that was used to run the test script itself. (Thanks to Honza
+  Pazdziora <adelton@informatics.muni.cz> for the patch.)
+- Added features to explictly identify the handles to monitor and the
+  handles upon which to output. This allows CGI::Cache to interoperate
+  better with other modules which attempt to bind to STDOUT and STDERR, and
+  allows the user to cache output to files.
+- Side-effects of CGI::Cache (tie'ing of handles, rebinding of warn() and
+  die()) now only occur when CGI::Cache is actually caching output.
+- CGI::Cache::start() now returns 0 instead of exiting after cached output
+  is printed. This provides better compatibility with persistent CGI scripts
+  implemented using mod_perl or FastCGI.
+- Added several new test cases
+
+1.10  Jul 30 11:08:00 EST 2001
+- Fixed ambiguous die() warnings under Perl 5.6
+- Added pause(), continue(), invalidate_cache_entry(), and buffer() methods.
+- Added test cases for new methods.
+
+1.03  Mon Jan 29 21:56:50 EST 2001
+- Now prevents caching of output for applications which call a $SIG{__DIE__}
+  that doesn't print to STDERR. An example of this type of application is
+  "CGI::Carp qw(fatalsToBrowser)"
+
+1.02  Mon Nov 13 00:07:24 EST 2000
+- Fixed issues to make module mod_perl compatible. (Thanks to Trevor
+  Henthorn <trevor@console.net> for the bug report.)
+- Fixed stop() documentation. (Thanks to Trevor Henthorn
+  <trevor@console.net> for the bug report.)
+- Moved development to SourceForge. 
+  (http://CGICache.sourceforge.net/)
+- Fixed warnings about tie under Perl 5.6. (Thanks to Douglas Wilson
+  <dougw@racesearch.com> for the report and fix suggestion)
+
+1.01  Mon Oct  2 18:18:25 EDT 2000
+- Maintenance handed over to David Coppit <david@coppit.org>. All
+  changes in this version are made by him.
+- Underlying caching is now handled by File::Cache. This allows for extra
+  features such as cache maximum sizes, transparent cache entry expiration,
+  etc.
+- The cache key can now be any data structure instead of just a simple
+  string. This means that one can just hand the CGI parameters directly to
+  CGI::Cache and it will figure out a suitable stringified cache key.
+- Because File::Cache now does most of the cache management automatically,
+  SetRoot, Expire, and ExpireLRU have been removed from the interface
+- Output is now cached and then printed as each print statement occurs.
+  Previously all the output would be dumped to STDOUT after the script
+  completed execution. (This helps the responsiveness of the CGI script for
+  browsers which can handle on-the-fly layout of web pages.)
+- Output is not cached if the script exits from an error condition.
+  Previously, a problem with the script would cause an empty document to be
+  cached.
+- A setup(\%options) subroutine has been added for setting up the details of
+  the cache.
+- The file mode parameter for most functions has been removed. Instead, the
+  file mode is set when initializing the module using the setup(\%options)
+  subroutine.
+
+1.00  Thu Jun 25 20:47:30 EST 1998
+- Added routine ExpireLRU() per suggestion from Daniel LaLiberte.
+
+0.99  Wed Jun 17 20:06:08 EST 1998
+- Added some modifications to the docs. There is a BUGS
+  piece of info wrt signals that kill your process and
+  make the module misbehave.
+- I added the Copyright info and license info as suggested
+  by the docs at /CPAN/modules/04pause.html. Those are
+  agreeable terms.
+- misc. formatting of docs.
+- hopefully ready for submission to PAUSE now... :-)
+
+0.98  Tue Jun  2 17:45:30 EST 1998
+- Took my existing CGI caching work and rolled it into
+  this module, hoping to get a first stab at working
+  distribution. I'm using a "closer-to 1.0" version,
+  as the guts of this module have already been around
+  and working for a while.
+
+0.01  Thu May 28 18:07:00 1998
+- original version; created by h2xs 1.18
+

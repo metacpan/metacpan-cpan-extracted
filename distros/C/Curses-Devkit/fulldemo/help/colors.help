@@ -1,0 +1,85 @@
+</R>Starting Colors in Cdk<!R>
+When Cdk is initialized with the </B>Cdk::init()<!B> function call, Cdk also
+initializes the color chart. This saves the programmer the trouble of doing 
+this. When the color table is initialized, 64 color pairs are created. A 
+color pair is a combination of foreground colors and background colors. 
+
+</R>Using Colors<!R>
+To turn on a color pair use the syntax \<\/XX> where XX is a numeric value 
+from 0 to 64. To turn off a color pair use the syntax \<\!XX> where XX is
+a numeric value from 0 to 64.
+
+The following table lists all the color pairs defined.
+
+<C><#UL><#HL(4)><#TT><#HL(11)><#TT><#HL(11)><#UR>
+<C><#VL></U>Pair <#VL> Foreground <#VL> Background <!U><#VL>
+<C><#VL>   0 <#VL></B/0> Default    <!B!0><#VL></B/0> Default    <!B!0><#VL>
+<C><#VL>   1 <#VL></B/1> White      <!B!1><#VL></B/1> White      <!B!1><#VL>
+<C><#VL>   2 <#VL></B/2> White      <!B!2><#VL></B/2> Red        <!B!2><#VL>
+<C><#VL>   3 <#VL></B/3> White      <!B!3><#VL></B/3> Green      <!B!3><#VL>
+<C><#VL>   4 <#VL></B/4> White      <!B!4><#VL></B/4> Yellow     <!B!4><#VL>
+<C><#VL>   5 <#VL></B/5> White      <!B!5><#VL></B/5> Blue       <!B!5><#VL>
+<C><#VL>   6 <#VL></B/6> White      <!B!6><#VL></B/6> Purple     <!B!6><#VL>
+<C><#VL>   7 <#VL></B/7> White      <!B!7><#VL></B/7> Cyan       <!B!7><#VL>
+<C><#VL></U>   8 <#VL></B/8> White      <!B!8><#VL></B/8> Black      <!B!8><!U><#VL>
+<C><#VL>   9 <#VL></B/9> Red        <!B!9><#VL></B/9> White      <!B!9><#VL>
+<C><#VL>  10 <#VL></B/10> Red        <!B!10><#VL></B/10> Red        <!B!10><#VL>
+<C><#VL>  11 <#VL></B/11> Red        <!B!11><#VL></B/11> Green      <!B!11><#VL>
+<C><#VL>  12 <#VL></B/12> Red        <!B!12><#VL></B/12> Yellow     <!B!12><#VL>
+<C><#VL>  13 <#VL></B/13> Red        <!B!13><#VL></B/13> Blue       <!B!13><#VL>
+<C><#VL>  14 <#VL></B/14> Red        <!B!14><#VL></B/14> Purple     <!B!14><#VL>
+<C><#VL>  15 <#VL></B/15> Red        <!B!15><#VL></B/15> Cyan       <!B!15><#VL>
+<C><#VL></U>  16 <#VL></B/16> Red        <!B!16><#VL></B/16> Black      <!B!16><!U><#VL>
+<C><#VL>  17 <#VL></B/17> Green      <!B!17><#VL></B/17> White      <!B!17><#VL>
+<C><#VL>  18 <#VL></B/18> Green      <!B!18><#VL></B/18> Red        <!B!18><#VL>
+<C><#VL>  19 <#VL></B/19> Green      <!B!19><#VL></B/19> Green      <!B!19><#VL>
+<C><#VL>  20 <#VL></B/20> Green      <!B!20><#VL></B/20> Yellow     <!B!20><#VL>
+<C><#VL>  21 <#VL></B/21> Green      <!B!21><#VL></B/21> Blue       <!B!21><#VL>
+<C><#VL>  22 <#VL></B/22> Green      <!B!22><#VL></B/22> Purple     <!B!22><#VL>
+<C><#VL>  23 <#VL></B/23> Green      <!B!23><#VL></B/23> Cyan       <!B!23><#VL>
+<C><#VL></U>  24 <#VL></B/24> Green      <!B!24><#VL></B/24> Black      <!B!24><!U><#VL>
+<C><#VL>  25 <#VL></B/25> Yellow     <!B!25><#VL></B/25> White      <!B!25><#VL>
+<C><#VL>  26 <#VL></B/26> Yellow     <!B!26><#VL></B/26> Red        <!B!26><#VL>
+<C><#VL>  27 <#VL></B/27> Yellow     <!B!27><#VL></B/27> Green      <!B!27><#VL>
+<C><#VL>  28 <#VL></B/28> Yellow     <!B!28><#VL></B/28> Yellow     <!B!28><#VL>
+<C><#VL>  29 <#VL></B/29> Yellow     <!B!29><#VL></B/29> Blue       <!B!29><#VL>
+<C><#VL>  30 <#VL></B/30> Yellow     <!B!30><#VL></B/30> Purple     <!B!30><#VL>
+<C><#VL>  31 <#VL></B/31> Yellow     <!B!31><#VL></B/31> Cyan       <!B!31><#VL>
+<C><#VL></U>  32 <#VL></B/32> Yellow     <!B!32><#VL></B/32> Black      <!B!32><!U><#VL>
+<C><#VL>  33 <#VL></B/33> Blue       <!B!33><#VL></B/33> White      <!B!33><#VL>
+<C><#VL>  34 <#VL></B/34> Blue       <!B!34><#VL></B/34> Red        <!B!34><#VL>
+<C><#VL>  35 <#VL></B/35> Blue       <!B!35><#VL></B/35> Green      <!B!35><#VL>
+<C><#VL>  36 <#VL></B/36> Blue       <!B!36><#VL></B/36> Yellow     <!B!36><#VL>
+<C><#VL>  37 <#VL></B/37> Blue       <!B!37><#VL></B/37> Blue       <!B!37><#VL>
+<C><#VL>  38 <#VL></B/38> Blue       <!B!38><#VL></B/38> Purple     <!B!38><#VL>
+<C><#VL>  39 <#VL></B/39> Blue       <!B!39><#VL></B/39> Cyan       <!B!39><#VL>
+<C><#VL></U>  40 <#VL></B/40> Blue       <!B!40><#VL></B/40> Black      <!B!40><!U><#VL>
+<C><#VL>  41 <#VL></B/41> Purple     <!B!41><#VL></B/41> White      <!B!41><#VL>
+<C><#VL>  42 <#VL></B/42> Purple     <!B!42><#VL></B/42> Red        <!B!42><#VL>
+<C><#VL>  43 <#VL></B/43> Purple     <!B!43><#VL></B/43> Green      <!B!43><#VL>
+<C><#VL>  44 <#VL></B/44> Purple     <!B!44><#VL></B/44> Yellow     <!B!44><#VL>
+<C><#VL>  45 <#VL></B/45> Purple     <!B!45><#VL></B/45> Blue       <!B!45><#VL>
+<C><#VL>  46 <#VL></B/46> Purple     <!B!46><#VL></B/46> Purple     <!B!46><#VL>
+<C><#VL>  47 <#VL></B/47> Purple     <!B!47><#VL></B/47> Cyan       <!B!47><#VL>
+<C><#VL></U>  48 <#VL></B/48> Purple     <!B!48><#VL></B/48> Black      <!B!48><!U><#VL>
+<C><#VL>  49 <#VL></B/49> Cyan       <!B!49><#VL></B/49> White      <!B!49><#VL>
+<C><#VL>  50 <#VL></B/50> Cyan       <!B!50><#VL></B/50> Red        <!B!50><#VL>
+<C><#VL>  51 <#VL></B/51> Cyan       <!B!51><#VL></B/51> Green      <!B!51><#VL>
+<C><#VL>  52 <#VL></B/52> Cyan       <!B!52><#VL></B/52> Yellow     <!B!52><#VL>
+<C><#VL>  53 <#VL></B/53> Cyan       <!B!53><#VL></B/53> Blue       <!B!53><#VL>
+<C><#VL>  54 <#VL></B/54> Cyan       <!B!54><#VL></B/54> Purple     <!B!54><#VL>
+<C><#VL>  55 <#VL></B/55> Cyan       <!B!55><#VL></B/55> Cyan       <!B!55><#VL>
+<C><#VL></U>  56 <#VL></B/56> Cyan       <!B!56><#VL></B/56> Black      <!B!56><!U><#VL>
+<C><#VL>  57 <#VL></B/57> Black      <!B!57><#VL></B/57> White      <!B!57><#VL>
+<C><#VL>  58 <#VL></B/58> Black      <!B!58><#VL></B/58> Red        <!B!58><#VL>
+<C><#VL>  59 <#VL></B/59> Black      <!B!59><#VL></B/59> Green      <!B!59><#VL>
+<C><#VL>  60 <#VL></B/60> Black      <!B!60><#VL></B/60> Yellow     <!B!60><#VL>
+<C><#VL>  61 <#VL></B/61> Black      <!B!61><#VL></B/61> Blue       <!B!61><#VL>
+<C><#VL>  62 <#VL></B/62> Black      <!B!62><#VL></B/62> Purple     <!B!62><#VL>
+<C><#VL>  63 <#VL></B/63> Black      <!B!63><#VL></B/63> Cyan       <!B!63><#VL>
+<C><#VL>  64 <#VL></B/64> Black      <!B!64><#VL></B/64> Black      <!B!64><#VL>
+<C><#LL><#HL(4)><#BT><#HL(11)><#BT><#HL(11)><#LR>
+
+<C><#HL(70)>
+<C>Document Created: November, 1995
+<C>Document Revised: January,  1996

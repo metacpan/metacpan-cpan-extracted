@@ -1,0 +1,28 @@
+---
+abstract: 'Compile LESS-stylesheet files (.less) using lessc'
+author:
+  - 'Masanori Ohgita (http://ohgita.info)'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CSS-LESS
+provides:
+  CSS::LESS:
+    file: lib/CSS/LESS.pm
+    version: v0.0.3
+requires:
+  File::Slurp: 0
+  File::Temp: 0
+  FindBin: 0
+  Test::Exception: 0
+  Test::More: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.3

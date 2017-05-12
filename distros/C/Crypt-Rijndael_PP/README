@@ -1,0 +1,107 @@
+NAME
+    Crypt::Rijndael_PP - Perl implementation of Rijndael
+
+DISCLAIMER
+    This is a pure perl implementation of the new AES Rijndael. You want to
+    use "Crypt::Rijndael" where available. This implementation is really
+    slow, but I am working on it.
+
+SYNOPSIS
+     # Functional style
+     use Crypt::Rijndael_PP ':all';
+
+     $key = '1234567890ABCDEF' x 4; # 256bit hex number
+
+     # keysize = 256bit, blocksize = 128bit
+     $c_txt = rijndael_encrypt($key, MODE_CBC, $data,  256, 128);
+     $p_txt = rijndael_decrypt($key, MODE_CBC, $c_txt, 256, 128);
+
+     # OO style
+     # same interface as Crypt::Rijndael
+     use Crypt::Rijndael_PP;
+
+     $cipher = Crypt::Rijndael_PP->new( pack('H*', $key), MODE_CBC );
+
+     $c_txt = $cipher->encrypt($data);
+     $p_txt = $cipher->decrypt($c_txt);
+
+DESCRIPTION
+    This modules shares the OO style interface with "Crypt::Rijndael" from
+    Rafael R. Sevilla.
+
+    *   Supported modes: Electronic CodeBook (MODE_ECB) and Cipher Block
+        Chaining (MODE_CBC). Please use "Crypt::CBC" for CBC-Mode, as my CBC
+        is not compatible with neither "Crypt::CBC" nor "Crypt::Rijndael"
+        and it is subject to change in the near future. When using
+        "Crypt::CBC" this module is 100% compatible to "Crypt::Rijndael" and
+        you can decrypt and encrypt your data with both modules!
+
+    *   Supported keysizes: 128, 192 and 256 (default)
+
+    *   Supported blocksizes: 128 (default), 192 and 256
+
+    If the size of the key does not match the given keysize then the key is
+    padded with "0" (hex) or truncated to the right size.
+
+    The last data block is padded with "\0" if it does not match a multiple
+    of the blocksize.
+
+    Warnings a raised in both cases.
+
+EXAMPLES
+    Using "Crypt::CBC"
+
+     use Crypt::CBC;
+
+     my $key = 'my secret key';
+     my $input = 'The answer is 42.';
+     my $cipher = new Crypt::CBC($key,'Rijndael_PP');
+
+     my $ciphertext = $cipher->encrypt($input);
+     my $plaintext  = $cipher->decrypt($ciphertext);
+
+     # - or -
+
+     #!/usr/local/bin/perl -w
+     #
+     # Usage: r.pl e "my secret key" < in > out
+     #
+     use strict;
+     use Crypt::CBC;
+     die "Usage: $0 mode([ed]) key\n" unless @ARGV == 2;
+     my $cipher = new Crypt::CBC($ARGV[1],'Rijndael_PP');
+     $cipher->start($ARGV[0]);
+     my $buffer;
+     while( read(STDIN, $buffer, 1024) ) {
+             print $cipher->crypt($buffer);
+     }
+     print $cipher->finish;
+
+LIMITATIONS
+    This implementation is really slow. I'm trying to tweak the performance
+    in coming releases.
+
+    CBC-Mode is not yet compatible to "Crypt::Rijndael". But you are advised
+    to use "Crypt::CBC" for this mode anyway.
+
+SEE ALSO
+    Crypt::Rijndael
+
+    Crypt::CBC
+
+    <http://csrc.nist.gov/encryption/aes/>
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+     Copyright 2001 Christian Lackas
+     Copyright 2000 Vincent Rijmen and Joan Daemen
+
+AUTHORS
+    The original algorithm was developed by Vincent Rijmen and Joan Daemen.
+
+    This release was made by Christian Lackas <delta@lackas.net>.
+    http://www.lackas.net/. It is based on the reference implementation for
+    the AES contest. At present I am working on a faster version.
+

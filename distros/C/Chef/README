@@ -1,0 +1,54 @@
+Chef
+
+WARNING
+
+This is a proof of concept - it shows the path for future integration, but all the steps are not complete. What remains:
+
+  * You cannot write Attribute or Definition files in Perl.
+  * At the moment, all your Perl recipes must live in the same cookbook.
+  * There is very little error handling. (ah, who am I kidding - there is none)
+
+SYNOPSIS
+
+This perl module allows you to write Chef recipes in perl rather than ruby.  You can learn more about Chef at http://wiki.opscode.com/display/chef.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+You will need this module installed on *every Chef client* that you intend to run perl recipes on.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Chef
+
+You can also look for information at:
+
+    Opscodes Ticket Tracking System:
+        http://tickets.opscode.com
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Chef
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Chef
+
+    Search CPAN
+        http://search.cpan.org/dist/Chef/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Adam Jacob
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

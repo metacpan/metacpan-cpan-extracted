@@ -1,0 +1,8 @@
+This module uses a standard CPAN install
+
+
+perl Makefile.PL
+make
+make test
+make install
+

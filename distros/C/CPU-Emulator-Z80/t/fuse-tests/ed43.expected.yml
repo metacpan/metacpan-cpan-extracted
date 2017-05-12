@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  21702:
+    - 50
+    - 39
+name: ed43
+registers:
+  AF: 55862
+  AF_: 0
+  BC: 10034
+  BC_: 0
+  DE: 37324
+  DE_: 0
+  HL: 38808
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 4
+  R: 2
+  SP: 24435

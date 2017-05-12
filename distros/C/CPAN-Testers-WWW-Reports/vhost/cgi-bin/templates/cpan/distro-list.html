@@ -1,0 +1,17 @@
+[% 
+    title = "Browse distribution by letter " _ letter ;
+    box_help  = 1 ;
+
+    crumb2_name = 'Distributions' ;
+    crumb2_href = '/' ;
+    crumb1_name = letter ;
+%]
+
+<p>Here are all the CPAN distributions that start with the letter [% letter %]:</p>
+<p>
+
+[% FOREACH dist = list.sort %]
+<a href="/distro/[% letter %]/[% dist %].html">[% dist %]</a><br />
+[% END %]
+
+</p>

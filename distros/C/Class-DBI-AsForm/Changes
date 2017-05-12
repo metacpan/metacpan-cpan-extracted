@@ -1,0 +1,35 @@
+Revision history for Perl extension Class::DBI::AsForm.
+
+2.42  Tue Sep  6 22:22:48 UTC 2005
+    - Switch tests to SQLite 
+
+2.41  Dec 27 2004
+    - Add rows & cols to textarea [Marcus Ramberg]
+
+2.4   Dec 27 2004
+    - Tony Bowden now maintainer
+    - switch to DBD::SQLite2 for tests
+
+2.3   Mon Jul 19 12:22:50 BST 2004
+    - Patch from Randall Lucas to fix textarea breakage
+    - The tests work too
+
+2.2   Sat Mar 20 17:36:02 GMT 2004
+    - use the ::Type plugin instead of that mysql ugliness.
+
+2.1   Thu Jan 29 14:51:31 GMT 2004
+    - 2.0 was a rewrite to use HTML::Element
+    - This release fixes cases where value => ""
+    - And makes "selected" work OK
+    - And deals with nulls in has-a relationships, since I managed to
+      forget about that again.
+    - Make the type detection stuff actually work. Hah.
+    - Yes, I know there's something mysql specific in there.
+
+1.1   Sat Jan 24 19:54:25 GMT 2004
+    - Deal with nulls in has-a relationships.
+
+0.01  Sat Sep 20 12:16:00 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Class::DBI::AsForm
+

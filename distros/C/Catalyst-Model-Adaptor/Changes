@@ -1,0 +1,39 @@
+Change history for Catalyst::Model::Adaptor
+
+0.10 23 Febuary 2011
+       - Allow callers pass some args at instance time
+
+0.09  4 August 2010
+       - Use Catalyst::Utils::ensure_class_loaded on the adapted class,
+         instead of eval/require, so that inner classes in already-loaded
+         packages will work.
+
+0.08   9 Febuary 2010
+       - Correctly built distribution. MANIFEST.SKIP fixed to avoid the issue
+         in future.
+
+0.07   9 Febuary 2010
+       - Catalyst::Runtime is a runtime dependency. RT#48842
+
+0.06   3 January 2010
+       - Fix a minor documentation problem. Reported by Cory Watson.
+
+0.05   7 August 2009
+       - Fix a minor documentation problem. Reported by Eric Prestemon.
+         (Closes RT#48487)
+       - Switch from Class::C3 to MRO::Compat.
+
+0.04   16 July 2008
+       - If no arguments are supplied, then construct new objects with {}
+         by default, rather than undef, as Moose classes fail if given undef.
+
+0.03   6 August 2008
+       - make TWMC optional, since it can't pass its test anymore
+
+0.02   11 April 2008
+       - a minor documentation change
+
+0.01   6 October 2007
+
+       - first version, released upon an unsuspecting comprehensive
+         archive network

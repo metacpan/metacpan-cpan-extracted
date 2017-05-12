@@ -1,0 +1,25 @@
+# _posit_to_named( ARGS, POSIT_NAMES )
+# This private method will take ARGS in positional format, as an array ref, and 
+# return a named version as a hash ref.  POSIT_NAMES is an array ref that is 
+# used as a translation table between the two formats.  The elements ot 
+# POSIT_NAMES are the new names for arguments at corresponding element numbers 
+# in ARGS.
+
+sub _posit_to_named {
+	my ($self, $ra_args, $ra_pn) = @_;
+	my %args_out = map { ( $ra_pn->[$_] => $ra_args->[$_] ) } (0..$#{$ra_args});
+	delete( $args_out{''} );  # remove unwanted elements
+	return( \%args_out );
+}
+
+# _named_to_posit( ARGS, POSIT_NAMES )
+# This private method will take ARGS in named format, as an hash ref, and return 
+# a positional version as an array ref.  POSIT_NAMES is an array ref that is 
+# used as a translation table between the two formats.  The elements ot 
+# POSIT_NAMES are matched with keys in ARGS and the values of ARGS are output in 
+# corresponding element numbers with POSIT_NAMES.
+
+sub _named_to_posit {
+	my ($self, $rh_args, $ra_pn) = @_;
+	return( [ map { $rh_args->{$ra_pn->[$_]} } (0..$#{$ra_pn}) ] );
+}

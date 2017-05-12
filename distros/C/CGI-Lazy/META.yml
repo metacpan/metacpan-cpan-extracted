@@ -1,0 +1,28 @@
+---
+abstract: 'Simple webdev framework for cgi applications, especially web frontends to databases.'
+author:
+  - 'Nik Ogura <nik.ogura@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Lazy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: 1.5
+  Digest::MD5: 2.3
+  HTML::Template: 2.9
+  JSON: 2.07
+  JavaScript::Minifier: 1.05
+  Tie::IxHash: 1.21
+  Time::HiRes: 1.86
+version: 1.10

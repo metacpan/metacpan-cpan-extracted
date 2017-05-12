@@ -1,0 +1,137 @@
+# NAME
+
+Catalyst::Plugin::ResponseFrom - Use the response of a public endpoint.
+
+# SYNOPSIS
+
+    package MyApp;
+    use Catalyst 'ResponseFrom';
+
+    MyApp->setup;
+
+    package MyApp::Controller::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use HTTP::Request::Common;
+
+    extends 'Catalyst::Controller';
+
+    sub as_http_request :Local {
+      my ($self, $c) = @_;
+      $c->redispatch_to(GET $c->uri_for($self->action_for('target')));
+    }
+
+    sub as_spec :Local {
+      my ($self, $c) = @_;
+      $c->redispatch_to('GET' => $c->uri_for($self->action_for('target')));
+    }
+
+    sub collect_response :Local {
+      my ($self, $c) = @_;
+      my $http_response = $c->http_response_from(GET => $c->uri_for($self->action_for('target')));
+    }
+
+    sub target :Local {
+      my ($self, $c) = @_;
+      $c->response->content_type('text/plain');
+      $c->response->body("This is the target action");
+    }
+
+# DESCRIPTION
+
+[Catalyst](https://metacpan.org/pod/Catalyst) allows you to forward to a private named actions, but there is no
+built in method to 'forward' to a public URL.  You might want to do this rather
+than (for example) issue a redirect.
+
+Additionally there is no 'subrequest' like feature (and [Catalyst::Plugin::Subrequest](https://metacpan.org/pod/Catalyst::Plugin::Subrequest)
+uses internal hacks to function).  There maye be cases, such as in testing, where
+it would be great to be able to issue a public URL request and collect the response.
+
+This plugin is an attempt to give you these features in a clean manner that does not
+rely on internal [Catalyst](https://metacpan.org/pod/Catalyst) details that are subject to change.  However you must be
+using a more modern version of [Catalyst](https://metacpan.org/pod/Catalyst) (the current requirement is 5.90060).
+
+# METHODS
+
+This plugin adds the following methods to your [Catalyst](https://metacpan.org/pod/Catalyst) application.  All methods
+share the same function signature (this approach and following documentation 'borrowed'
+from [Web::Simple](https://metacpan.org/pod/Web::Simple)):
+
+       my $psgi_response = $app->http_response_from(GET => '/' => %headers);
+       my $http_response = $app->http_response_from(POST => '/' => %headers_or_form);
+       $c->redispatch_to($http_request);
+    
+
+Accepts either an [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object or ($method, $path) and runs that
+request against the application, returning an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object.
+
+If the HTTP method is POST or PUT, then a series of pairs can be passed after
+this to create a form style message body. If you need to test an upload, then
+create an [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object by hand or use the `POST` subroutine
+provided by [HTTP::Request::Common](https://metacpan.org/pod/HTTP::Request::Common).
+
+If you prefix the URL with 'user:pass@' this will be converted into
+an Authorization header for HTTP basic auth:
+
+     my $res = $app->http_response_from(
+                 GET => 'bob:secret@/protected/resource'
+               );
+    
+
+If pairs are passed where the key ends in :, it is instead treated as a
+headers, so:
+
+       my $res = $app->http_response_from(
+                   POST => '/',
+                  'Accept:' => 'text/html',
+                   some_form_key => 'value'
+                 );
+    
+
+will do what you expect. You can also pass a special key of Content: to
+set the request body:
+
+       my $res = $app->psgi_response_from(
+                   POST => '/',
+                   'Content-Type:' => 'text/json',
+                   'Content:' => '{ "json": "here" }',
+                 );
+    
+
+## psgi\_response\_from
+
+Given a request constructed as described above, return the [PSGI](https://metacpan.org/pod/PSGI) response.
+This can be an Arrayref or Coderef.
+
+This is probably not that useful since you likely need to do additional work
+to get data out of it, but was the result of refactoring, and I can imagine
+a use case or two.
+
+## http\_response\_from
+
+## response\_from
+
+Returns the [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object returned by the request. 
+
+## redispatch\_to
+
+Uses the response giveing to the request and uses that to complete your
+response.  This also detaches so that calling this method effectively
+ends processing.  Basically use this when you decide you want the response
+to be that of a totally different URL on your application.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

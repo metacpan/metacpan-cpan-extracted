@@ -1,0 +1,51 @@
+NAME
+    CatalystX::Restarter::GTK - GTK based Catalyst server restarter.
+
+SYNOPSIS
+    Set environment variable CATALYST_RESTARTER to
+    CatalystX::Restarter::GTK. Then start server with -r (auto restart on
+    file changes) option.
+
+        export CATALYST_RESTARTER=CatalystX::Restarter::GTK
+        perl script/myapp_server -r
+
+    You can also create a shell script and add a shortcut to panel. This
+    avoids need of starting terminal.
+
+        #!/bin/bash
+        cd /home/username/myapp/trunk/
+        perl script/myapp_server.pl -r
+
+    To use this restarter for specific application only, set appropirate
+    envioronment variable.
+
+        MYAPP_RESTARTER=CatalystX::Restarter::GTK
+
+DESCRIPTION
+    This module provides GUI interface for controlling Catalyst server and
+    viewing console output generated. It captures both STDOUT and STDERR.
+
+    It shows a very small GUI window on desktop. It is set always on to by
+    default. You can drag window to any screen corner for convenience.
+
+    The window displays server status. User can view console output and
+    manually restart server from menu.
+
+    Whenever any file of project is updated, developer can immediately check
+    server status without switching to console.
+
+NOTES
+    This module extends Catalyst::Restarter and depends on its _watcher and
+    _handle_events.
+
+AUTHOR
+    Dhaval Dhanani <mailto:dhaval070@gmail.com>
+
+LICENCE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+COPYRIGHT
+    This library is copyright (c) 2011 the above named AUTHOR and
+    CONSTRIBUTOR(s).
+

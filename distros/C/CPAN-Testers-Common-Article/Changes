@@ -1,0 +1,56 @@
+Revision history for CPAN-Testers-Common-Article
+================================================
+
+0.46    2014-09-07
+        - fixed license fields in META.json to be lists.
+        - added homepage to META files.
+        - fixed distribution name in metadata.
+        - catch exceptions from mail parsing.
+        - extended test suite.
+
+0.45    2014-07-19
+        - updated license and repository links.
+        - fixed distribution name in metadata.
+
+0.44    2012-11-18
+        - change to timegm() to provide consistent timestamps.
+
+0.43    2012-11-01
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - change file dates changed to meet W3CDTF standards.
+        - CHANGES to Changes.
+        - Artistic License v2 now sole license.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - added META.json & test script.
+        - added example script.
+        - more tests & samples.
+        - added accessors for OS patterns and fixes.
+        - added explicit LICENSE file.
+
+0.42    2010-04-12
+        - RC in perl version now classed as patch in rest of eco-system, thus
+          no need to add 'patched' text.
+
+0.41    2010-03-26
+        - added support for 'X-Test-Reporter-Perl' header to indicate a
+          release candidate (RC) version of perl.
+
+0.40    2010-01-03
+        - added raw, cooked, header and body methods.
+
+0.39    2009-11-02
+        - POD update, missing accessors.
+
+0.38    2009-10-17
+        - added even more regexes to try and extract Perl version.
+        - more pattern matches for osname
+
+0.37    2009-08-12
+        - added more regexes to try and extract Perl version.
+
+0.36    2009-02-12
+        - initial independent release.
+        - abstracted from CPAN-Testers-Data-Generator, as used by more than
+          that distribution, and sits more appropriately on its own. Hence why
+          the version number starts where it does :)

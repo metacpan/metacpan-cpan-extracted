@@ -1,0 +1,11 @@
+This file documents the revision history for Catalyst::Engine::Server.
+
+0.03  2005-00-00 00:00:00
+        - Fixed persistent connections in HTTP/1.1
+
+0.02  2005-05-26 14:41:00
+        - Improved timeout handling, defaults to 30s
+        - Fixed reverse lookups
+
+0.01  2005-05-24 18:43:00
+        - Initial release

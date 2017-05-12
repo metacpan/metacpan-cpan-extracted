@@ -1,0 +1,312 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Convert::Moji - objects to convert alphabets
+
+=head1 SYNOPSIS
+
+    
+    # Examples of rot13 transformers:
+    use Convert::Moji;
+    # Using a table
+    my %rot13;
+    @rot13{('a'..'z')} = ('n'..'z','a'..'m');
+    my $rot13 = Convert::Moji->new (["table", \%rot13]);
+    # Using tr
+    my $rot13_1 = Convert::Moji->new (["tr", "a-z", "n-za-m"]);
+    # Using a callback
+    sub rot_13_sub { tr/a-z/n-za-m/; return $_ }
+    my $rot13_2 = Convert::Moji->new (["code", \&rot_13_sub]);
+    # Then to do the actual conversion
+    my $out = $rot13->convert ("secret");
+    # You also can go backwards with
+    my $inverted = $rot13->invert ("frperg");
+    print "$out\n$inverted\n";
+    
+    
+
+
+produces output
+
+    frperg
+    secret
+
+
+(This example is included as L<F<rot13.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/rot13.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Convert::Moji version 0.09
+corresponding to git commit L<3715d9fda9f4eebccce92de4d9bbbcf94fbb1f28|https://github.com/benkasminbullock/Convert-Moji/commit/3715d9fda9f4eebccce92de4d9bbbcf94fbb1f28> released on Sun Mar 26 11:44:22 2017 +0900.
+
+=head1 DESCRIPTION
+
+Convert::Moji objects convert between different alphabets. For
+example, a Convert::Moji object can convert between Greek letters and
+the English alphabet, or convert between phonetic symbols in Unicode
+and a representation of them in ASCII.
+
+This started as a helper module for L<Lingua::JA::Moji>, where it is
+used for converting between various Japanese methods of writing. It
+was split out of that module to be a general-purpose converter for any
+alphabets.
+
+=head1 FUNCTIONS
+
+=head2 new
+
+    my $convert = Convert::Moji->new (["table", $mytable]);
+
+Create the object. The arguments are a list of array references, one
+for each conversion.
+
+Conversions can be chained together:
+
+    my $does_something = Convert::Moji->new (["table", $mytable],
+					     ["tr", $left, $right]);
+
+The array references must have one of the following keywords as their
+first argument.
+
+=over
+
+=item table
+
+After this comes one more argument, a reference to the hash containing
+the table. For example
+
+    
+    use Convert::Moji;
+    my %crazyhash = ("a" => "apple", "b" => "banana");
+    my $conv = Convert::Moji->new (["table", \%crazyhash]);
+    my $out = $conv->convert ("a b c");
+    my $back = $conv->invert ($out);
+    print "$out, $back\n";
+    
+
+
+produces output
+
+    apple banana c, a b c
+
+
+(This example is included as L<F<crazyhash.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/crazyhash.pl> in the distribution.)
+
+
+The hash keys and values can be any length.
+
+=item file
+
+After this comes one more argument, the name of a file containing some
+information to convert into a hash table. The file format is
+space-separated pairs, no comments or blank lines allowed. If the file
+does not exist or cannot be opened, the module prints an error
+message, and returns the undefined value.
+
+=item code
+
+After this comes one or two references to subroutines. The first
+subroutine is the conversion and the second one is the inversion
+routine. If you omit the second routine, it is equivalent to
+specifying "oneway".
+
+=item tr
+
+After this come two arguments, the left and right hand sides of a "tr"
+expression, for example
+
+     Convert::Moji->new (["tr", "A-Z", "a-z"])
+
+will convert upper to lower case. A "tr" is performed, and inversely
+for the invert case.
+
+=back
+
+Conversions, via "convert", will be performed in the order of the
+arguments to new. Inversions will be performed in reverse order of the
+arguments, skipping uninvertibles.
+
+=head3 Uninvertible operations
+
+If your conversion doesn't actually go backwards, you can tell the
+module when you create the object using a keyword "oneway":
+
+    my $uninvertible = Convert::Moji->new (["oneway", "table", $mytable]);
+
+Then the method C<$uninvertible->invert> doesn't do anything. You can
+also selectively choose which operations of a list are invertible and
+which aren't, so that only the invertible ones do something.
+
+=head3 Load from a file
+
+To load a character conversion table from a file, use
+
+Convert::Moji->new (["file", $filename]);
+
+In this case, the file needs to contain a space-separated list of
+items to be converted one into the other, such as
+
+    alpha α
+    beta β
+    gamma γ
+
+The file reading cannot handle comments or blank lines in the
+file. Examples of use of this format are L<Lingua::JA::Moji/kana2hw>,
+L<Lingua::JA::Moji/circled2kanji>, and
+L<Lingua::JA::Moji/bracketed2kanji>.
+
+=head2 convert
+
+After building the object, it is used to convert text with the
+"convert" method. The convert method takes one argument, a scalar
+string to be converted by the rules we specified with L</new>.
+
+This ignores (passes through) characters which it can't convert.
+
+=head2 invert
+
+This inverts the input.
+
+This takes two arguments. The first is the string to be inverted back
+through the conversion process, and the second is the type of
+conversion to perform if the inversion is ambiguous. This can take one
+of the following values
+
+=over
+
+=item first
+
+If the inversion is ambiguous, it picks the first one it finds.
+
+=item random
+
+If the inversion is ambiguous, it picks one at random.
+
+=item all
+
+In this case you get an array reference back containing either strings
+where the inversion was unambiguous, or array references to arrays
+containing all possible strings.
+
+=item all_joined
+
+Like "all", but you get a scalar with all the options in square
+brackets instead of lots of array references.
+
+=back
+
+The second argument part is only implemented for hash table based
+conversions, and is very likely to be buggy even then.
+
+=head1 FUNCTIONS
+
+These are helper functions for the module.
+
+=head2 length_one
+
+    # Returns false:
+    length_one ('x', 'y', 'monkey');
+    # Returns true:    
+    length_one ('x', 'y', 'm');
+
+Returns true if every element of the array has a length equal to one,
+and false if any of them does not have length one. The L</make_regex>
+function uses this to decide whether to use a C<[abc]> or a C<(a|b|c)>
+style regex.
+
+=head2 make_regex
+
+    my $regex = make_regex (qw/a b c de fgh/);
+
+    # $regex = "fgh|de|a|b|c";
+
+Given a list of strings, this makes a regular expression which matches
+any of the strings in the list, longest match first. Each of the
+elements of the list is quoted using C<quotemeta>. The regular
+expression does not contain capturing parentheses. 
+
+To convert everything in string C<$x> from the keys of C<%foo2bar> to
+its values,
+
+    
+    use Convert::Moji 'make_regex';
+    my $x = 'mad, bad, and dangerous to know';
+    my %foo2bar = (mad => 'max', dangerous => 'trombone');
+    my $regex = make_regex (keys %foo2bar);
+    $x =~ s/($regex)/$foo2bar{$1}/g;
+    print "$x\n";
+
+
+produces output
+
+    max, bad, and trombone to know
+
+
+(This example is included as L<F<trombone.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/trombone.pl> in the distribution.)
+
+
+For more examples, see the "joke" program at
+L<Data::Kanji::Kanjidic/english>, or L<this example
+program|https://www.lemoda.net/perl/make-romaji/make-romaji.pl> which
+converts Japanese kanji words into romaji using the output of Mecab.
+
+=head2 unambiguous
+
+    my $invertible = unambiguous (\%table));
+
+Returns true if all of the values in C<%table> are distinct, and false
+if any two of the values in C<%table> are the same. This is used by
+L</invert> to decide whether a table can be reversed.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Lingua::JA::Moji>
+
+Uses this module.
+
+=item L<Lingua::KO::Munja>
+
+Uses this module.
+
+=item L<Data::Munge/list2re>
+
+This is similar to L</make_regex> in this module.
+
+=back
+
+=head1 EXPORTS
+
+The functions L</make_regex>, L</length_one> and L</unambiguous> are
+exported on demand. There are no export tags.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Carp>
+
+Functions C<carp> and C<croak> are used to report errors.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2008-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

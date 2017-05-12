@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+###########################################
+# synopsis - determine the dependencies 
+#            of Log4perl just like on the
+#            CPAN::Unwind manpage
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+
+    use CPAN::Unwind;
+    
+    my $agent = CPAN::Unwind->new();
+    
+    my $resp = $agent->lookup("Log::Log4perl");
+    die $resp->message() unless $resp->is_success();
+    
+    my $deps = $resp->dependent_versions();
+    
+    for my $module (keys %$deps) {
+        printf "%30s: %s\n", $module, $deps->{$module};
+    }
+        # Prints:
+        #
+        #  Test::Harness: 2.03
+        #     Test::More: 0.45
+        #     File::Spec: 0.82
+        # File::Basename: 0
+        #           Carp: 0
+
+    print "Installation schedule:\n";
+    for($resp->schedule()) {
+        print "$_\n";
+    }
+        # Installation schedule:
+        # Carp
+        # File::Basename
+        # File::Spec
+        # Test::Harness
+        # Test::More
+        # Log::Log4perl
+

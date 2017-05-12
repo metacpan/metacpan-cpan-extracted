@@ -1,0 +1,117 @@
+Config::ApacheFormat 1.2
+========================
+
+CHANGES
+
+    - Nathan Wiger ported many features from Apache::ConfigFile in an
+      effort to combine the two modules.  These features include:
+
+        o The fix_booleans option, which allows automatic conversion
+          of yes/on/true to 1 and no/off/false to 0
+
+        o The expand_vars option, allowing reuse of previously-defined
+          directives as $directive
+
+        o The setenv_vars option, which will automatically place
+          variables defined via the SetEnv directive into the %ENV
+          hash
+
+        o The hash_directives option, which allows proper handling of
+          directives where the first value is really a key
+          (ex. AddHandler).
+
+        o The duplicate_directives option, which allows the programmer
+          to choose how duplicate directives are handled (by default
+          the last one is kept, allowing subsequent configs to
+          override earlier Includes)
+
+        o Support for multiple blocks with the same name.
+
+        o Support for include directories and multiple include files
+          on a single line
+
+        o The root_directive option, which allows the user to define a
+          root for that config file which is prepended to relative
+          Include paths.
+
+    - Added include_directives option to allow for differently named
+      Include directives.
+
+    - Removed deprecated support for the wrong spelling of
+      inheritance_support as inheritence_support.
+
+    - Fixed bug preventing mixed-case valid_directives and
+      valid_blocks from working.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Carp
+   Class::MethodMaker 1.08
+   Text::Balanced     1.89
+   File::Spec         0.82
+   Scalar::Util
+
+DESCRIPTION
+
+    This module is designed to parse a configuration file in the same syntax
+    used by the Apache web server (see http://httpd.apache.org for details).
+    This allows you to build applications which can be easily managed by
+    experienced Apache admins. Also, by using this module, you'll benefit
+    from the support for nested blocks with built-in parameter inheritance.
+    This can greatly reduce the amount or repeated information in your
+    configuration files.
+
+    A good reference to the Apache configuration file format can be found
+    here:
+
+       http://httpd.apache.org/docs-2.0/configuring.html
+
+    To quote from that document, concerning directive syntax:
+
+       Apache configuration files contain one directive per line. The
+       back-slash "\" may be used as the last character on a line to
+       indicate that the directive continues onto the next line. There must
+       be no other characters or white space between the back-slash and the
+       end of the line.
+
+       Directives in the configuration files are case-insensitive, but
+       arguments to directives are often case sensitive. Lines that begin
+       with the hash character "#" are considered comments, and are
+       ignored. Comments may not be included on a line after a configuration
+       directive. Blank lines and white space occurring before a directive
+       are ignored, so you may indent directives for clarity.
+
+    And block notation:
+
+       Directives placed in the main configuration files apply to the entire
+       server. If you wish to change the configuration for only a part of the
+       server, you can scope your directives by placing them in <Directory>,
+       <DirectoryMatch>, <Files>, <FilesMatch>, <Location>, and
+       <LocationMatch> sections. These sections limit the application of the
+       directives which they enclose to particular filesystem locations or
+       URLs. They can also be nested, allowing for very fine grained
+       configuration.
+
+    This module will parse actual Apache configuration files, but you will
+    need to set some options to non-default values. See the section on
+    "Parsing a Real Apache Config File" in the module documentation
+    for more details.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2002-2003 Sam Tregar
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl 5 itself.

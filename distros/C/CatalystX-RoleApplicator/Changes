@@ -1,0 +1,19 @@
+0.005 Thu, 30 Apr 2009 15:13:52 -0400
+
+  - forgot (again) to completely change names
+
+0.004 Thu, 30 Apr 2009 15:04:24 -0400
+
+  - renamed from Catalyst::App to CatalystX per mst's request
+
+0.003 Sun, 12 Apr 2009 20:37:43 -0400
+
+  - RelatedClassRoles changed its name, but I didn't change it everywhere
+
+0.002 Fri, 10 Apr 2009 19:21:23 -0400
+
+  - RelatedClassRoles changed its name
+
+0.001 Thu, 09 Apr 2009 17:56:09 -0400
+
+  - first release

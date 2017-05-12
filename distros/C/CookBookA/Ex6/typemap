@@ -1,0 +1,3 @@
+TYPEMAP
+container *	O_OBJECT
+AvObject *	O_AvRV

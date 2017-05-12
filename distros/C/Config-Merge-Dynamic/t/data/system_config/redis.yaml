@@ -1,0 +1,9 @@
+---
+
+server : 'localhost:6379'
+debug : 0
+encoding : utf8
+helper : 'redis'
+
+
+# do not delete next line

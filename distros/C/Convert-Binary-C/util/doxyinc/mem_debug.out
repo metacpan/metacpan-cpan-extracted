@@ -1,0 +1,14 @@
+Valid pointer assertion (0x400031C0) failed in Alloc.c(12)
+
+Summary Statistics:
+
+  Total allocs       : 1
+  Total frees        : 1
+  Max. memory blocks : 1
+  Max. memory usage  : 16 bytes
+
+  Smallest block     : 16 bytes
+  Largest block      : 16 bytes
+
+  Memory leakage     : 0 bytes
+

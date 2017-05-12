@@ -1,0 +1,19 @@
+* String values beginning or ending with spaces, or
+  containing commas or semicolons, must be enclosed in quotes.  DONE 
+
+* Unrecognized keys should be skipped.                          DONE
+
+* Unrecognized sections should be skipped.                      DONE
+
+* Binary characters (decimal ranges 0..31, 127..159) inside strings 
+  must be encoded. (Use hex representation.)                    DONE
+
+* Escape characters 
+  -- for hexadecimal                                            DONE
+  -- for octal DONE for hexadecimal escapes                     
+  -- for ansi sequences, such as "\n", "\t" , "\a"              DONE
+
+* Quote and backslash ("\", decimal code 92) characters
+
+* Continuation characters                                       NODE
+

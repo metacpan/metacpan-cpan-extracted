@@ -1,0 +1,23 @@
+[%
+   title="Licenses"
+   description=""
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF licenses  %]
+<p>
+The following licenses were found in the META.yml files.
+</p>
+
+<div id="licenses">
+<ul>
+[% FOR license IN licenses %]
+  <li><a href="/license/[% license %]">[% license %]</a></li>
+[% END %]
+</ul>
+</div>
+[% ELSE %]
+Sorry. We got confused and have not found the information about the licenses.
+[% END %]
+
+[% INCLUDE incl/footer.tt %]

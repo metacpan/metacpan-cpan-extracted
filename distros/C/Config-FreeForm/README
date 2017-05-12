@@ -1,0 +1,55 @@
+
+    Config::FreeForm
+
+I<Config::FreeForm> provides in-memory configuration data
+in a free-form manner. Many existing configuration modules
+attempt to provide some structure to your configuration
+data; in doing so, they force you to use their own
+configuration paradigm (association of keywords with values,
+etc.). Often this isn't what you need in a complex
+application--you need complete control over your configuration
+data, and you need the ability to structure it however you
+like. This is what I<Config::FreeForm> gives you.
+
+In I<Config::FreeForm> configuration data is stored as a
+Perl data structure. The logic behind this is that you know
+Perl--you shouldn't need to learn another little language
+to set up your configuration data, however simple that
+language may be.
+
+PREREQUISITES
+
+There are no prerequisite modules.
+
+INSTALLATION
+
+Installation is done as with most Perl modules by running these
+commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DOCUMENTATION
+
+Documentation is in the module itself in POD form. It will
+be installed automatically in the standard documentation
+directories on your local system. If you'd like a copy in
+HTML, visit
+
+    http://rhumba.pair.com/ben/perl/docs/perldoc/Config/FreeForm.html
+
+SUPPORT
+
+If you have any questions, code samples, bug reports, or
+feedback, please email them to:
+
+    ben@rhumba.pair.com
+
+COPYRIGHT
+
+(C) 2000 Benjamin Trott. All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

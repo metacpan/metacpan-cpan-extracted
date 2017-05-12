@@ -1,0 +1,11 @@
+# Required:
+app:
+  app_class: Tinker
+
+site:
+  name: Tinker with YAML
+  title: Tinker with YAML
+
+# Options:
+server:
+  port: 1234

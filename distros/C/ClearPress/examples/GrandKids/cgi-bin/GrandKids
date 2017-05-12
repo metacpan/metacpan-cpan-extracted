@@ -1,0 +1,25 @@
+#!/usr/bin/perl -T
+
+use warnings;
+use strict;
+use lib qw(lib);
+use ClearPress::controller;
+
+use GrandKids::util;
+use GrandKids::view::error;
+
+use GrandKids::view::child;
+use GrandKids::model::child;
+use GrandKids::view::family;
+use GrandKids::model::family;
+
+our $VERSION = q[468];
+
+main();
+0;
+
+sub main {
+  my $util = GrandKids::util->new();
+  ClearPress::controller->handler($util);
+}
+ 

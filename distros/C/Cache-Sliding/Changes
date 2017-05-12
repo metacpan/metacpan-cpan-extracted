@@ -1,0 +1,17 @@
+Revision history for Cache-Sliding
+
+v2.0.1  2016-03-01 00:38:12 EET
+	- Reformat doc.
+	- Fix fragile test.
+
+v2.0.0  2016-02-19 12:49:47 EET
+	- Switch to Dist::Milla.
+
+1.0.2   2013-10-03 16:28:57 EEST
+	- Remove MYMETA.*
+
+1.0.1	2012-05-13 06:01:33 EEST
+	- Fix requirements.
+
+1.0.0	2009-07-07 23:39:46 EEST
+	- Initial release.

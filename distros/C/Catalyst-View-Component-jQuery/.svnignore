@@ -1,0 +1,16 @@
+\.releaserc
+cover_db
+META.yml
+Makefile
+blib
+inc
+pm_to_blib
+MANIFEST
+MANIFEST.SKIP
+Makefile
+Makefile.old
+*.tar.gz
+*.tmp
+*.bak
+*.html
+Debian_CPANTS.txt

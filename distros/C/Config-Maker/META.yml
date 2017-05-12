@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-Maker
+version:      0.007
+version_from: lib/Config/Maker.pm
+installdirs:  site
+requires:
+    Parse::RecDescent:             1.80
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
+author:
+  - Jan Hudec <bulb.cz>
+abstract: File (especialy config) generation library.
+license: perl

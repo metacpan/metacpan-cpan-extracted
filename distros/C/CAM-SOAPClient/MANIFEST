@@ -1,0 +1,17 @@
+index.html
+Build.PL
+CHANGES
+lib/CAM/SOAPClient.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/client.t
+t/lib/Example.pm
+t/pod-coverage.t
+t/pod.t
+t/server.t
+t/soap.pl
+t/test.wsdl
+TODO

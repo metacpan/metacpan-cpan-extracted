@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/TraitFor/Request/BrowserDetect.pm
+t/basic.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

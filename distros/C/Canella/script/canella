@@ -1,0 +1,61 @@
+#!perl
+use strict;
+use Canella::CLI;
+
+Canella::CLI->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+canella - Frontend to Canella Deploy Tool
+
+=head1 SYNOPSIS
+
+    canella [-C num] [-s key=value ...] [ --mode=xxxx ] -c etc/deploy.pl role task [task ...]
+
+=head1 OPTIONS
+
+=head2 C< -c | --config > String
+
+Specifies the configuration file. Required.
+
+=head2 C< -C | --concurrency > Integer
+
+Specifies the number of coroutine threads to run concurrently.
+
+The default number for this option is 8
+
+=head2 C< --mode> String
+
+Changes the operation mode. 
+
+When "dump" mode is specified, dumps the tasks, roles, parameters, and config file name in JSON format.
+
+When "help" mode is specified, shows some help message describing the specified deploy file
+
+=head2 C< -s | --set > String '=' String
+
+Specifies parameters from the command line
+
+Given a config like:
+
+    task mytask => sub {
+        say get 'foo';
+    };
+
+Invoking canella like this will print ouf "bar":
+
+    canella -s foo=bar -c etc/deploy.pl mytask
+
+Note that -s allows you to override default variables set in the deploy file:
+
+    set foo => 1;
+    task mytask => sub {
+        say get 'foo';
+    };
+
+    canella -s foo=bar -c etc/deploy.pl mytask
+    # prints "bar"
+
+=cut

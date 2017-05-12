@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-I18N
+version:             0.03
+abstract:            I18N and L10N methods for CGI::App
+license:             ~
+author:              
+    - Lyle Hopkins <webmaster@cosmicperl.com>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    CGI::Application:              1
+    I18N::LangTags:                0.3
+    Locale::Maketext::Simple:      0.14
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

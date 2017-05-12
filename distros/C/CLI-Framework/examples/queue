@@ -1,0 +1,454 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+# ---- EXECUTION ----
+My::Queue->run(); # Launch command
+
+#~~~~~~~~~~~~~~~~~~~~~~~
+#my $app = My::Queue->new();
+
+## Set queue properties...
+#@ARGV = qw( property set --even );              $app->run(); # even numbers
+#my $regex = qr/\d{3,}/;
+#@ARGV = (qw( property set ), "--regex=$regex"); $app->run(); # 3 or more digits
+#
+## List queue properties...
+#@ARGV = qw( property list ); $app->run();
+#
+## Enqueue items...
+#@ARGV = qw( e 1 );      $app->run();
+#@ARGV = qw( e asfioj ); $app->run();
+#@ARGV = qw( e 3 );      $app->run();
+#@ARGV = qw( e four );   $app->run();
+#@ARGV = qw( e 998 );    $app->run();
+#@ARGV = qw( e x );      $app->run();
+#@ARGV = qw( e 1001292 );$app->run();
+#@ARGV = qw( e 1001293 );$app->run();
+#
+## Print queue contents...
+#@ARGV = qw( p );        $app->run();
+
+###################################
+
+# ---- APPLICATION CLASS ----
+package My::Queue;
+use base qw( CLI::Framework );
+
+use strict;
+use warnings;
+
+use Storable 2.05 qw( store retrieve );
+
+my $model;          # Model class for queue
+my $serialize;
+my $storable_file;  # File for serializing queue
+
+# NOTE: In this example, My::Queue::Model is defined inline.  In the "real
+# world", it should be in separate package file.  In that case, the following
+# 'use' line would be needed:
+#
+# use My::Queue::Model;
+
+sub usage_text {
+    # The usage_text() hook in the Application Class is meant to return a
+    # usage string describing the whole application.
+    qq{
+    $0 [--verbose|v]: 
+
+    OPTIONS:
+        --verbose -v:   be vebose
+
+    ARGUMENTS (subcommands):
+        console:        run interactively
+        cmd-list:       list available commands
+        enqueue:        add item to queue
+        dequeue:        remove item from queue
+        print:          print contents of queue
+        property:       work with queue properties
+    }
+}
+
+sub option_spec {
+    # The option_spec() hook in the Application class provides the option
+    # specification for the whole application.
+    [ 'verbose|v'       => 'be verbose' ],
+    [ 'qin|i=s'         => 'start by loading a saved queue stored from a previous session' ],
+    [ 'qout|o=s'        => 'optional file to use for serializing the queue' ],
+}
+
+sub validate_options {
+    # The validate_options() hook can be used to ensure that the application
+    # options are valid.
+    my ($self, $opts) = @_;
+    
+    # ...nothing to check for this application
+}
+
+sub command_map {
+    # In this *list*, the command names given as keys will be bound to the
+    # command classes given as values.  This will be used by CLIF as a hash
+    # initializer and the command_map_hashref() method will be provided to
+    # return a hash created from this list for convenience.
+    console     => 'CLI::Framework::Command::Console',
+    alias       => 'CLI::Framework::Command::Alias',
+    'cmd-list'  => 'CLI::Framework::Command::List',
+    enqueue     => 'My::Queue::Command::Enqueue',
+    dequeue     => 'My::Queue::Command::Dequeue',
+    print       => 'My::Queue::Command::Print',
+    property    => 'My::Queue::Command::Property',
+}
+
+sub command_alias {
+    # In this list, the keys are aliases to the command names given as values
+    # (the values should be found as "keys" in command_map()).
+    sh  => 'console',
+
+    e   => 'enqueue',
+    add => 'enqueue',
+
+    d   => 'dequeue',
+
+    prop=> 'property',
+
+    p   => 'print',
+}
+
+sub init {
+    # This initialization is performed once for the application (default
+    # behavior).
+    my ($self, $opts) = @_;
+
+    # Get (new or saved) model object...
+    if( $opts->{'qin'} ) {
+        { no warnings;
+          local $Storable::Eval = 1;          # (support coderefs for deserialization)
+          $model = retrieve( $opts->{'qin'} );
+        }
+    }
+    else {
+        $model = My::Queue::Model->new();
+    }
+    # Store model object in shared cache...
+    $self->cache->set( 'model' => $model );
+
+    # Set file for storage of serialized queue...
+    if( $opts->{'qout'} ) {
+        $serialize = 1;
+        $storable_file = $opts->{'qout'};
+    }
+    return 1;
+}
+
+END { # Check if we should serialize queue before exiting...
+    if( $serialize ) {
+        { no warnings;
+          $Storable::Deparse = 1;                 # (support coderefs for serialization)
+        }
+        eval { my $result = store( $model, $storable_file ) };
+        if( $@ ) {
+            warn 'Storable error while trying to serialize model '.
+                  "object: $!";
+        }
+    }
+}
+
+# ---- COMMAND: Enqueue ----
+package My::Queue::Command::Enqueue;
+use base qw( CLI::Framework::Command );
+
+use strict;
+use warnings;
+
+sub usage_text {
+    # The usage_text() hook in a Command Class is meant to return a usage
+    # string describing only a particular command.
+    q{
+    enqueue [--tag=<tag1> [--tag=<tag2> [...] ] ] <item1> [<item2> ... <itemN>]: add item(s) to queue
+    }
+}
+
+sub validate {
+    # The Command Class can override the validate() hook to catch invalid
+    # command requests prior to run().  If the command request is invalid, the
+    # hook should throw an exception with a descriptive error message.
+    my ($self, $cmd_opts, @args) = @_;
+
+    die "No arguments given.  Usage:" . $self->usage_text() . "\n" unless @args;
+}
+
+sub option_spec {
+    # The option_spec() hook in the Command Class provides the option
+    # specification for a particular command.
+    [ 'tag=s@'   => 'item tag'  ],
+}
+
+sub run {
+    # This is usually where the "real" work is done.
+    my ($self, $opts, @args) = @_;
+
+    my $model = $self->cache->get( 'model' );
+
+    for my $item (@args) {
+        my $item_id = $model->enqueue( $item );
+        my $tags = $opts->{tag};
+        for my $tag ( @$tags ) {
+            $model->add_tag_to_item( $item_id, $tag )
+        }
+    }
+    return '';
+}
+
+# ---- COMMAND: Dequeue ----
+package My::Queue::Command::Dequeue;
+use base qw( CLI::Framework::Command );
+
+use strict;
+use warnings;
+
+sub usage_text {
+    q{
+    dequeue: remove item from queue
+    }
+}
+
+sub run {
+    my ($self, $opts, @args) = @_;
+
+    my $model = $self->cache->get( 'model' );
+    my $item = $model->dequeue();
+    return $item->{data};
+}
+
+# ---- COMMAND: Print ----
+package My::Queue::Command::Print;
+use base qw( CLI::Framework::Command );
+
+use strict;
+use warnings;
+
+sub usage_text {
+    q{
+    print [--ids|i] [--tags|t] [--all|a]: print contents of queue
+
+    OPTIONS
+        --ids:  print ids of each item
+        --tags: print tags of each item
+        --all:  print both ids and tags of each item
+    }
+}
+
+sub option_spec {
+    [ 'ids|i'   => 'print item ids' ],
+    [ 'tags|t'  => 'print item tags' ],
+    [ 'all|a'   => 'print all data about items' ],
+}
+
+sub run {
+    my ($self, $opts, @args) = @_;
+
+    my $model = $self->cache->get( 'model' );
+    my @items = $model->items();
+
+    $opts->{all} && do{ $opts->{ids} = $opts->{tags} = 1 };
+
+    my $format = "%10s";                    # show data
+    $format .= " (id=%s)" if $opts->{ids};  # show ids?
+    $format .= " tags:%s" if $opts->{tags}; # show tags?
+    $format .= "\n";
+    my $output;
+    for my $item (@items) {
+        my @parts = $item->{data};                  # show data
+        push @parts, $item->{id}                    # show ids?
+            if defined $opts->{ids};
+        push @parts, join( ',', @{$item->{tags}} )  # show tags?
+            if defined $opts->{tags};
+        $output .= sprintf $format, @parts;
+    }
+    return $output;
+}
+
+# ---- COMMAND: Property ----
+package My::Queue::Command::Property;
+use base qw( CLI::Framework::Command );
+
+use strict;
+use warnings;
+
+sub subcommand_alias {
+    # "Master commands" can set aliases for subcommands.  The list returned
+    # by subcommand_alias() will be used as a hash initializer.  Keys are the
+    # aliases and values are the full subcommand names.
+    l => 'list',
+    s => 'set',
+}
+
+# This command is a "master command" to subcommands (defined below).  As such,
+# its run() method is not called upon dispatch of a subcommand.  The
+# notify_of_subcommand_dispatch() method gives the master command an
+# opportunity to hook into the dispatch process and do something before its
+# subcommand is dispatched.
+sub notify_of_subcommand_dispatch {
+    my ($self, $subcommand, $cmd_opts, @args) = @_;
+
+    print __PACKAGE__.'::notify...()'.' about to run '.ref $subcommand, "\n";
+
+    # For demonstration, the following causes the currenly-active queue
+    # properties to be printed prior to each request to set a queue property:
+    if( (ref $subcommand) eq 'My::Queue::Command::Property::Set' ) {
+        my $list = $self->manufacture( 'My::Queue::Command::Property::List' );
+        $list->set_cache( $self->cache() );
+        my $out = $list->run(); chomp $out;
+
+        print '(before setting new property, the following queue properties '.
+        "are in effect: $out)\n\n";
+    }
+}
+
+sub usage_text {
+    q{
+    property: work with queue properties
+
+    ARGUMENTS (subcommands)
+        list:   list queue properties
+        set:    set queue properties
+    }
+}
+
+# ---- SUBCOMMAND: Property List ----
+package My::Queue::Command::Property::List;
+use base qw( My::Queue::Command::Property );
+
+use strict;
+use warnings;
+
+sub usage_text {
+    q{
+    property list: list queue properties
+    }
+}
+
+sub run {
+    my ($self, $opts, @args) = @_;
+    my $model = $self->cache->get( 'model' );
+    my $output = 'properties: {' . join(',', $model->get_properties) . "}\n";
+    return $output;
+}
+
+# ---- SUBCOMMAND: Property Set ----
+package My::Queue::Command::Property::Set;
+use base qw( My::Queue::Command::Property );
+
+use strict;
+use warnings;
+
+sub usage_text {
+    q{
+    property set: set queue properties
+
+    OPTIONS
+        --regex=<regular expression that all future queue members must satisfy>
+        --evens: only allow even integers in queue from now on
+    }
+}
+
+sub option_spec {
+    [ 'regex=s' => 'require regex validation of items in queue' ],
+    [ 'evens'   => 'only allow even integers in queue' ],
+}
+
+sub run {
+    my ($self, $opts, @args) = @_;
+
+    my $model = $self->cache->get( 'model' );
+
+    $model->set_property(
+        regex => sub { $_[0] =~ /$opts->{regex}/ }
+    ) if $opts->{regex};
+
+    $model->set_property(
+        even => sub { $_[0] =~ /^\d+$/ && $_[0] % 2 == 0 }
+    ) if $opts->{'evens'};
+
+    return;
+}
+
+###################################
+#
+#      MODEL CLASS
+#
+###################################
+
+# This is used for demonstration purposes; in reality, something more useful
+# such as a SQLite database might be used.
+
+package My::Queue::Model;
+
+use strict;
+use warnings;
+use Carp;
+
+sub new {
+    my ($class) = @_;
+    bless { _items => [], _properties => {} }, $class;
+}
+
+sub add_tag_to_item {
+    my ($self, $id, $tag) = @_;
+
+    return unless defined $id && defined $tag;
+
+    my @a = @{ $self->{_items} };
+    my ($entry) = (grep { $_->{id} == $id } @a);
+    push @{ $entry->{tags} }, $tag;
+
+    return 1;
+}
+
+sub enqueue {
+    my ($self, $item) = @_;
+
+    return unless $item;
+
+    my $id = _id($item);
+
+    # Ensure item satisfies all queue properties...
+    for my $p ( values %{ $self->{_properties} } ) {
+        $p->($item) || return;
+    }
+    push @{ $self->{_items} }, { id => $id, data => $item, tags => [] };
+    return $id;
+}
+
+sub _id {
+    my $str = shift;
+    my @s = split //, $str;
+    return join( '', map { ord $_ } @s );
+}
+
+sub dequeue { shift @{ $_[0]->{_items} } }
+
+sub items { @{$_[0]->{_items}} }
+
+sub get_properties { keys %{$_[0]->{_properties}} }
+
+sub set_property {
+    my ($self, $name, $code) = @_;
+    croak "queue property must be a CODE ref" unless ref $code eq 'CODE';
+    $self->{_properties}->{$name} = $code;
+    return 1;
+}
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Demonstration of a CLIF application that utilizes some of CLIF's more advanced
+features.
+
+=cut

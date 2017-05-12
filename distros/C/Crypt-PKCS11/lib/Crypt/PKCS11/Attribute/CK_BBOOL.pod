@@ -1,0 +1,85 @@
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11::Attribute::CK_BBOOL - A CK_BBOOL PKCS #11 attribute.
+
+=head1 SYNPOSIS
+
+  # Create an attribute module with a CK_BBOOL value
+  package Crypt::PKCS11::Attribute::Token;
+  use base qw(Crypt::PKCS11::Attribute::CK_BBOOL);
+  use Crypt::PKCS11 qw(:constant);
+  sub type () { CKA_TOKEN }
+
+  # Use the attribute
+  my $attribute = Crypt::PKCS11::Attribute::Token->new;
+  $attribute->set(1);
+
+=head1 DESCRIPTION
+
+A PKCS #11 attribute containing a CK_BBOOL value.
+
+=head1 METHODS
+
+See also L<Crypt::PKCS11::Attribute> for the base module methods.
+
+=over 4
+
+=item $attribute = $attribute->set ($bool)
+
+Sets the CK_BBOOL value within the attribute. May croak on error and returns
+itself on success.
+
+=over 4
+
+=item $bool
+
+Must be defined and set to true (!0) or false (0).
+
+=back
+
+=item $bool = $attribute->get
+
+Return the CK_BBOOL value within the attribute or undef if not set.
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

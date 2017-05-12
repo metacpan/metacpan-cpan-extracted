@@ -1,0 +1,52 @@
+{
+   "abstract" : "Add hooks on methods from other classes",
+   "author" : [
+      "Pierre Denis <pdenis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Hook",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0",
+            "warnings::register" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::Simple" : "0",
+            "constant" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Class-Hook",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Class-Hook.git",
+         "web" : "https://github.com/neilb/Class-Hook"
+      }
+   },
+   "version" : "0.05"
+}
+

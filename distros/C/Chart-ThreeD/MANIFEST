@@ -1,0 +1,6 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Chart/ThreeD/Pie.pm
+pie.pl

@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Chart::Graph::Xmgrace</title>
+<link rev="made" href="mailto:root@gohan24.freebsd.org" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#arguments">ARGUMENTS</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#general_example">GENERAL EXAMPLE</a></li>
+		<li><a href="#nonstacking_regions">NON-STACKING REGIONS</a></li>
+		<li><a href="#multiple_data_sets_in_matrix_form">MULTIPLE DATA SETS IN MATRIX FORM</a></li>
+	</ul>
+
+	<li><a href="#more_info">MORE INFO</a></li>
+	<li><a href="#contact">CONTACT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Chart::Graph::Xmgrace</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use Chart::Graph::Xmgrace qw(xmgrace);
+ xmgrace(\%global_options, [\%data_set_options, \@matrix],
+                           [\%data_set_options, \@x_column, \@y_column],
+                           [\%data_set_options, &lt; filename &gt;], ... );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The function <code>xmgrace()</code> is part of the module Chart::Graph that lets
+you generate graphs on the fly in perl. It was written as a front-end
+application to Xmgrace for hassle-free generation of graphs. <code>xmgrace()</code>
+can be supplied with many of the same options and arguments that can
+be given to Xmgrace (the UNIX program that evolved from xmgr). For
+more information on Xmgrace see the end of this documentation.</p>
+<p>
+</p>
+<hr />
+<h1><a name="arguments">ARGUMENTS</a></h1>
+<p>Xmgrace has a great deal of options for the overall appearance of a
+graph.  Chart::Graph::Xmgrace provides control over an essential
+subset of them.  Others can be easily changed by saving the file using
+the <code>grace output file</code> option and then manipulating the file
+directing in Xmgrace.</p>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                             GLOBAL OPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |&quot;title&quot;            |   (set your own title)         | &quot;untitled&quot;            |
+ |&quot;subtitle&quot;         |   (set your own subtitle)      | &quot;untitled&quot;            |
+ |&quot;type of graph&quot;    |   &quot;XY chart&quot;, &quot;XY graph&quot;,      | &quot;XY graph&quot;            |
+ |                   |   &quot;Bar chart&quot;, &quot;Bar graph&quot;     |                       |
+ |&quot;output type&quot;      |   &quot;png&quot;                        | &quot;png&quot;                 |
+ |&quot;output file&quot;      |   (set your own output file)   | &quot;untitled-grace.png&quot;  |
+ |&quot;grace output file&quot;|   (set your own grace output   | &quot;untitled-grace.agr&quot;  |
+ |                   |    file)                       |                       |
+ |&quot;x-axis label&quot;     |   (set your own label)         | &quot;x-axis&quot;              |
+ |&quot;y-axis label&quot;     |   (set your own label)         | &quot;y-axis&quot;              |
+ |&quot;x2-axis label&quot;    |   (set your own label)         | undefined             |
+ |&quot;y2-axis label&quot;    |   (set your own label)         | undefined             |
+ |&quot;logscale x&quot;       |   &quot;0&quot; or &quot;1&quot;                   | undefined             |
+ |&quot;logscale y&quot;       |   &quot;0&quot; or &quot;1&quot;                   | undefined             |
+ |&quot;xtics&quot;            |   (set your own ticks) look at | undefined             |
+ |                   |    example                     |                       |
+ |&quot;ytics&quot;            |   (set your own ticks) look at | undefined             |
+ |                   |    example                     |                       |
+ +-------------------+--------------------------------+-----------------------+</pre>
+<p>In Xmgrace each set of data has it's own options.  Because Xmgrace is
+so complex.  a sub-hash of options is needed for all the options
+associated with each data set.  For that reason, only a few data
+options are noted here.</p>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                           DATA SET OPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |&quot;title&quot;            |    (set your own title)        | &quot;&quot;                    |
+ |&quot;options&quot;          |    \%sub_options               |(depends on graph type)|
+ |&quot;data format&quot;      |    &quot;matrix&quot;,&quot;columns&quot;,&quot;file&quot;   | &quot;&quot;                    |
+ |&quot;hidden&quot;           |    &quot;true&quot; or &quot;false&quot;           | &quot;false&quot;               |
+ +-------------------+--------------------------------+-----------------------+</pre>
+<p>Data can be presented to Chart::Graph::Xmgrace Gnuplot in one of three
+formats for the convenience of the user:</p>
+<pre>
+ \@matrix: an array reference of [x,y] pairs of data</pre>
+<p>Alternatively:</p>
+<pre>
+ \@x_column, \@y_column: two array references of data of equal length.
+ \@x_column is the x-axis data. \@y_column is the y-axis data.</pre>
+<p>Finally, data can be stored in a file as a parameter to be read into
+<code>Chart::Graph::Xmgrace</code>.</p>
+<p>since xmgrace allows for many data set options, options is a hash of
+suboptions (%sub_options below).</p>
+<pre>
+    %sub_options = (
+                     &quot;symbol&quot; =&gt; \%symbol_options,
+                     &quot;line&quot; =&gt; \%line_options,
+                     &quot;baseline&quot; =&gt; \%baseline_options,
+                     &quot;dropline&quot; =&gt; \%dropline_options,
+                     &quot;fill&quot; =&gt; \%fill_options,
+                     &quot;avalue&quot; =&gt; \%avalue_options
+                     &quot;errorbar&quot; =&gt; \%errorbar_options,
+                   );</pre>
+<p>There are seven types of suboptions as listed below and described in detail in the following tables.</p>
+<ul>
+<li></li>
+symbol options
+<p></p>
+<li></li>
+line options
+<p></p>
+<li></li>
+baseline options
+<p></p>
+<li></li>
+dropline options
+<p></p>
+<li></li>
+fill options
+<p></p>
+<li></li>
+annotated value options
+<p></p>
+<li></li>
+errorbar options
+<p></p></ul>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                           SYMBOL SUBOPTIONS:                               |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;type&quot;           |      &quot;0&quot;...&quot;11&quot;                |    &quot;none&quot;             |
+ |                   |      (look at symbol table)    |                       |
+ |  &quot;size&quot;           |      (set own size)            |    &quot;1.000000&quot;         |
+ |  &quot;color&quot;          |      (look at color table)     |    &quot;auto&quot;             |
+ |  &quot;pattern&quot;        |      &quot;0&quot;...&quot;31&quot;                |    &quot;1&quot;                |
+ |  &quot;fill color&quot;     |      &quot;0&quot;...&quot;31&quot;                |    &quot;1&quot;                |
+ |  &quot;fill pattern&quot;   |      &quot;0&quot;...&quot;31&quot;                |    &quot;1&quot;                |
+ |  &quot;linewidth&quot;      |      (set own linewidth)       |    &quot;1.0&quot; (max. value) |
+ |  &quot;linestyle&quot;      |      &quot;0&quot;...&quot;9&quot;                 |    &quot;1&quot;                |
+ |  &quot;symbol char&quot;    |      (not implemented)         |    &quot;65&quot;               |
+ |  &quot;char font&quot;      |      (not implemented)         |    &quot;0&quot;                |
+ |  &quot;skip&quot;           |      &quot;0&quot; or &quot;1&quot;                |    &quot;0&quot;                |
+ +-------------------+--------------------------------+-----------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                            LINE SUBOPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;type&quot;           |      (look at line type)       |    &quot;1&quot;                |
+ |  &quot;linestyle&quot;      |      (look at line style)      |    &quot;1&quot;                |
+ |  &quot;linewidth&quot;      |      (set own width)           |    &quot;1.0&quot; (max. value) |
+ |  &quot;color&quot;          |      (look at color table)     |    &quot;auto&quot;             |
+ |  &quot;pattern&quot;        |      &quot;0&quot;...&quot;31&quot;                |    &quot;1&quot;                |
+ +-------------------+--------------------------------+-----------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                        BASELINE SUBOPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;type&quot;           |      (look at baseline table)  |     &quot;0&quot;               |
+ |  &quot;status&quot;         |      &quot;on&quot; or &quot;off&quot;             |     &quot;off&quot;             |
+ +----------------------------------------------------------------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                        DROPLINE SUBOPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;status&quot;         |      &quot;on&quot; or &quot;off&quot;             |      &quot;off&quot;            |
+ +-------------------+--------------------------------+-----------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                            FILL SUBOPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;type&quot;           | &quot;as polygon&quot; or &quot;to baseline&quot;  |      &quot;as polygon&quot;     |
+ |  &quot;rule&quot;           | &quot;winding&quot; or &quot;even-odd&quot;        |      &quot;winding&quot;        |
+ |  &quot;color&quot;          | (look at color table)          |      &quot;auto&quot;           |
+ |  &quot;pattern&quot;        | &quot;0&quot;...&quot;31&quot;                     |      &quot;1&quot;              |
+ +----------------------------------------------------------------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                          AVALUE SUBOPTIONS:                                |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;status&quot;         |  &quot;on&quot; or &quot;off&quot;                 |      &quot;off&quot;            |
+ |  &quot;type&quot;           |  &quot;X&quot;,&quot;Y&quot;,&quot;XY&quot;,&quot;string&quot;,&quot;Z&quot;     |      &quot;XY&quot;             |
+ |  &quot;char size&quot;      |  (set your own size)           |      &quot;1.000000&quot;       |
+ |  &quot;font&quot;           |  &quot;0&quot;..&quot;13&quot;                     |      &quot;0&quot;              |
+ |  &quot;color&quot;          |  (look at color table)         |      &quot;auto&quot;           |
+ |  &quot;rot&quot;            |  (set own angle)               |      &quot;0&quot;              |
+ |  &quot;format&quot;         |  &quot;0&quot;...&quot;31&quot;                    |      &quot;1&quot;              |
+ |  &quot;prec&quot;           |  &quot;0&quot;...&quot;9&quot;                     |      &quot;3&quot;              |
+ |  &quot;prepend&quot;        |  (set your own prepend)        |      &quot;&quot;               |
+ |  &quot;append&quot;         |  (set your own apppend)        |      &quot;&quot;               |
+ |  &quot;offset&quot;         |  [&quot;own value&quot;, &quot;own value&quot;]    |      &quot;[0.00, 0.00]&quot;   |
+ +----------------------------------------------------------------------------+</pre>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                          ERRORBAR SUBOPTIONS:                              |
+ +-------------------+--------------------------------+-----------------------+
+ |     NAME          |         OPTIONS                |        DEFAULT        |
+ +-------------------+--------------------------------+-----------------------+
+ |  &quot;status&quot;         |  &quot;on&quot; or &quot;off&quot;                 |  &quot;off&quot;                |
+ |  &quot;place&quot;          |  &quot;normal&quot;,&quot;opposite&quot;,&quot;both&quot;    |  &quot;normal&quot;             |
+ |  &quot;color&quot;          |  (look at color table)         |  &quot;auto&quot;               |
+ |  &quot;pattern&quot;        |  &quot;0&quot;...&quot;31&quot;                    |  &quot;1&quot;                  |
+ |  &quot;size&quot;           |  (set your own size)           |  &quot;1.000000&quot;           |
+ |  &quot;font&quot;           |  &quot;0&quot;..&quot;13&quot;                     |  &quot;0&quot;                  |
+ |  &quot;linewidth&quot;      |  (set own width)               |  &quot;1.0&quot; (max. value)   |
+ |  &quot;linestyle&quot;      |  (look at line type)           |  &quot;1&quot;                  |
+ |  &quot;riser linewidth&quot;|  (set own riser linewidth)     |  &quot;1.0&quot;                |
+ |  &quot;riser linestyle&quot;|  (look at line type)           |  &quot;1&quot;                  |
+ |&quot;riser clip status&quot;|  &quot;on&quot; or &quot;off&quot;                 |  &quot;off&quot;                |
+ |&quot;riser clip length&quot;|  (set own clip length)         |  &quot;0.100000&quot;           |
+ +----------------------------------------------------------------------------+</pre>
+<p>The suboptions above use the arguments listed below.</p>
+<pre>
+ +----------------------------------------------------------------------------+
+ |                              SYMBOL TYPE:                                  |
+ +--------+-------+--------+------+-------+--------+--------------------------+
+ | SYMBOL | VALUE | SYMBOL | TYPE | VALUE | SYMBOL | VALUE                    |
+ +--------+-------+--------+------+-------+--------+--------------------------+
+ |  none  |  &quot;0&quot;  |triangle|  up  |  &quot;4&quot;  |  plus  |  &quot;8&quot;                     |
+ | circle |  &quot;1&quot;  |triangle| left |  &quot;5&quot;  |   x    |  &quot;9&quot;                     |
+ | square |  &quot;2&quot;  |triangle| down |  &quot;6&quot;  |  star  |  &quot;10&quot;                    |
+ | diamond|  &quot;3&quot;  |triangle| right|  &quot;7&quot;  |  char  |  &quot;11&quot;                    |
+ +--------+-------+--------+------+-------+--------+--------------------------+</pre>
+<pre>
+ +-----------------------------------------------------------------+
+ |                             LINE TYPE                           |
+ +------------------------+-------+------------------------+-------+
+ |  LINE TYPE             | VALUE |          LINE TYPE     | VALUE |
+ +------------------------+-------+------------------------+-------+
+ |     none               |  &quot;0&quot;  |          right stairs  |  &quot;3&quot;  |
+ |   straight             |  &quot;1&quot;  |            segments    |  &quot;4&quot;  |
+ | left stairs            |  &quot;2&quot;  |           3-segments   |  &quot;5&quot;  |
+ +------------------------+-------+------------------------+-------+</pre>
+<pre>
+ +-----------------------------------------------------------------+
+ |                             LINE STYLE                          |
+ +------------------------+-------+------------------------+-------+
+ |  LINE STYLE            | VALUE |         LINE STYLE     | VALUE |
+ +------------------------+-------+------------------------+-------+
+ |       none             |  &quot;0&quot;  |     solid              |  &quot;1&quot;  |
+ |       dotted           |  &quot;2&quot;  |     en-dash            |  &quot;3&quot;  |
+ |       em-dash          |  &quot;4&quot;  |     dot-en dash        |  &quot;5&quot;  |
+ |       dot-em dash      |  &quot;6&quot;  |     dot-en-dot dash    |  &quot;7&quot;  |
+ |       en-dot-en dash   |  &quot;8&quot;  |                        |       |
+ +------------------------+-------+------------------------+-------+</pre>
+<pre>
+ +-----------------------------------------------------------------+
+ |                             COLORS                              |
+ +-------+-----+-------+-----+--------+-----+-----------+----------+
+ | COLOR |VALUE| COLOR |VALUE| COLOR  |VALUE| COLOR     |  VALUE   |
+ | white | &quot;0&quot; | blue  | &quot;4&quot; | violet | &quot;8&quot; | indigo    |   &quot;12&quot;   |
+ | black | &quot;1&quot; | yellow| &quot;5&quot; | cyan   | &quot;9&quot; | maroon    |   &quot;13&quot;   |
+ | red   | &quot;2&quot; | brown | &quot;6&quot; | magenta| &quot;10&quot;| turquoise |   &quot;14&quot;   |
+ | green | &quot;3&quot; | grey  | &quot;7&quot; | orange | &quot;11&quot;| dark green|   &quot;15&quot;   |
+ +-------+-----+-------+-----+--------+-----+-----------+----------+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>The following three examples show the various capabilities of the
+Chart::Graph interface to the Xmgrace program.</p>
+<p>
+</p>
+<h2><a name="general_example">GENERAL EXAMPLE</a></h2>
+<p>The following example produces the file <em>xmgrace1.png</em> and contains
+three kinds of data plots.  The first plot is an XY plot using
+triangles for the presentation style and rightstairs lines.  The
+second plot is also an XY plot using lines andtriangle symbols.  The
+last plot is a bar graph.</p>
+<pre>
+  # Include modules
+  use Chart::Graph::Xmgrace qw(xmgrace);
+
+</pre>
+<pre>
+  xmgrace( { &quot;title&quot; =&gt; &quot;Example of a XY Chart&quot;,
+             &quot;subtitle&quot; =&gt;&quot;optional subtitle&quot;,
+             &quot;type of graph&quot; =&gt; &quot;XY chart&quot;,
+             &quot;output type&quot; =&gt; &quot;png&quot;,
+             &quot;output file&quot; =&gt; &quot;xmgrace1.png&quot;,
+             &quot;x-axis label&quot; =&gt; &quot;my x-axis label&quot;,
+             &quot;y-axis label&quot; =&gt; &quot;my y-axis label&quot;,
+             &quot;logscale y&quot; =&gt; &quot;1&quot;,
+             &quot;xtics&quot; =&gt; [ [&quot;one&quot;, &quot;1&quot;], [&quot;two&quot;, &quot;2&quot;], [&quot;three&quot;, &quot;3&quot;] ],
+             &quot;ytics&quot; =&gt; [ [&quot;one&quot;, &quot;1&quot;], [&quot;two&quot;, &quot;2&quot;], [&quot;three&quot;, &quot;3&quot;] ],
+             &quot;grace output file&quot; =&gt; &quot;xmgrace1.agr&quot;,
+           },
+
+</pre>
+<pre>
+           [ { &quot;title&quot; =&gt; &quot;XY presentation data1&quot;,
+               &quot;set presentation&quot; =&gt; &quot;XY&quot;,
+               &quot;options&quot; =&gt; {
+                           &quot;line&quot; =&gt; {
+                                      &quot;type&quot; =&gt; &quot;1&quot;,
+                                      &quot;color&quot; =&gt; &quot;8&quot;,
+                                      &quot;linewidth&quot; =&gt; &quot;1&quot;,
+                                      &quot;linestyle&quot; =&gt; &quot;3&quot;,
+                                     },
+                           &quot;symbol&quot; =&gt; {
+                                        &quot;symbol type&quot; =&gt; &quot;6&quot;,
+                                        &quot;color&quot; =&gt; &quot;1&quot;,
+                                        &quot;fill pattern&quot; =&gt; &quot;1&quot;,
+                                        &quot;fill color&quot; =&gt; &quot;1&quot;,
+                                       },
+                           &quot;fill&quot; =&gt; {
+                                      &quot;type&quot; =&gt; &quot;0&quot;,
+                                     },
+                          },
+               &quot;data format&quot; =&gt; &quot;matrix&quot;,
+             },
+
+</pre>
+<pre>
+             [ [1,2],
+               [2,4],
+               [3,6],
+               [4,8],
+               [5,10],
+               [6,12],
+               [7,14],
+               [8,16],
+               [9,18],
+               [10,20] ]
+           ],
+
+</pre>
+<pre>
+           [ { &quot;title&quot; =&gt; &quot;XY presentation data2&quot;,
+               &quot;options&quot; =&gt; {
+                           &quot;line&quot; =&gt; {
+                                      &quot;type&quot; =&gt; &quot;2&quot;,
+                                      &quot;color&quot; =&gt; &quot;4&quot;,
+                                     },
+                           &quot;symbol&quot; =&gt; {
+                                        &quot;symbol type&quot; =&gt; &quot;1&quot;,
+                                        &quot;color&quot; =&gt; &quot;1&quot;,
+                                        &quot;fill pattern&quot; =&gt; &quot;3&quot;,
+                                        &quot;fill color&quot; =&gt; &quot;5&quot;,
+                                       },
+                           &quot;fill&quot; =&gt; {
+                                      &quot;type&quot; =&gt; &quot;0&quot;,
+                                     }
+                          },
+               &quot;data format&quot; =&gt; &quot;columns&quot;,
+             },
+             [
+              [1,2,3,4,5,6,7,8,9,10],
+              [3,6,9,12,15,18,21,24,27,30],
+             ]  
+           ],
+
+</pre>
+<pre>
+           [ { &quot;title&quot; =&gt; &quot;BAR presentation data3&quot;,
+               &quot;set presentation&quot; =&gt; &quot;BAR&quot;,
+               &quot;data format&quot; =&gt; &quot;file&quot;}, &quot;sample&quot;],
+
+</pre>
+<pre>
+       );
+
+</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace1.png"></center></p>
+<p><center><em>xmgrace1.png</em></center></p>
+
+<p>
+</p>
+<h2><a name="nonstacking_regions">NON-STACKING REGIONS</a></h2>
+<p>The following shorter example shows how Xmgrace handles regions
+without stacking the graphs (the default for Xmgrace is to not stack
+data.)
+
+</p>
+<pre>
+  # Include modules
+  use Chart::Graph::Xmgrace qw(xmgrace);
+
+</pre>
+<pre>
+  xmgrace({&quot;title&quot; =&gt; &quot;Example of a XY graph&quot;,
+           &quot;subtitle&quot; =&gt; &quot;optional subtitle&quot;,
+           &quot;type of graph&quot; =&gt; &quot;XY graph&quot;,
+           &quot;output type&quot; =&gt; &quot;png&quot;,
+           &quot;output file&quot; =&gt; &quot;xmgrace2.png&quot;,
+           &quot;grace output file&quot; =&gt; &quot;xmgrace2.agr&quot;,
+           &quot;x-axis label&quot; =&gt; &quot;my x-axis label&quot;,
+           &quot;y-axis label&quot; =&gt; &quot;my y-axis label&quot;
+          },
+          [{&quot;title&quot; =&gt; &quot;data&quot;,
+            &quot;options&quot; =&gt; {
+                          &quot;fill&quot; =&gt; { &quot;type&quot; =&gt; &quot;2&quot; },
+                         },
+            &quot;data format&quot; =&gt; &quot;file&quot;
+           },
+           &quot;sample&quot;
+          ],
+         );
+
+</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace2.png"></center></p>
+<p><center><em>xmgrace2.png</em></center></p>
+
+<p>
+</p>
+<h2><a name="multiple_data_sets_in_matrix_form">MULTIPLE DATA SETS IN MATRIX FORM</a></h2>
+<p>The following example shows how to graph more complicated datasets
+using the Chart-Graph interface to Xmgrace.  It produces the file
+<em>xmgrace3.png</em>.The numbers from this example were generated from the
+script that created it and saved using the standard Perl module
+Data-Dumper.
+
+</p>
+<pre>
+  # Include modules
+  use Chart::Graph::Xmgrace qw(xmgrace);
+
+</pre>
+<pre>
+        xmgrace({'y-axis label' =&gt; 'Percent of widgets',
+                 'output file' =&gt; 'xmgrace3.png',
+                 'type of graph' =&gt; 'Bar chart',
+                 'output type' =&gt; 'png',
+                 'title' =&gt; 'Percent of widgets',
+                 'grace output file' =&gt; 'xmgrace3.agr',
+                 'subtitle' =&gt; 'Data collected from 07/24/2001 to 08/01/2001',
+                 'x-axis label' =&gt; 'Date of data sampling'
+                },
+                [{'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget A'
+                 },
+                 [
+                  [ '2001-07-24',  '32.58' ],
+                  [ '2001-07-25',  '30.4291287386216'  ],
+                  [ '2001-07-26',  '34.4106463878327'  ],
+                  [ '2001-07-27',  '34.44'        ],
+                  [ '2001-07-28',  '37.4482270936458' ],
+                  [ '2001-07-29',  '37.8769479862376'  ],
+                  [ '2001-07-30',  '34.9437860832574'  ],
+                  [ '2001-07-31',  '36.0707388962293'  ],
+                  [ '2001-08-01',  '40.0591353996737'  ]
+                 ]
+                ],
+                [{'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget B'
+                 },
+                 [
+                  [ '2001-07-24',  '29.13'  ],
+                  [ '2001-07-25',  '30.8192457737321'  ],
+                  [ '2001-07-26',  '29.1775065039023'  ],
+                  [ '2001-07-27',  '29.82'             ],
+                  [ '2001-07-28',  '28.9221133447823'  ],
+                  [ '2001-07-29',  '28.5772110908723'  ],
+                  [ '2001-07-30',  '29.2109794388737'  ],
+                  [ '2001-07-31',  '26.8624860250025'  ],
+                  [ '2001-08-01',  '8.442088091354'    ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget C'
+                 },
+                 [
+                  [ '2001-07-24', '15.42'        ],
+                  [ '2001-07-25', '17.2251675502651' ],
+                  [ '2001-07-26', '15.6093656193716' ],
+                  [ '2001-07-27', '16.02'            ],
+                  [ '2001-07-28', '14.526719870694'  ],
+                  [ '2001-07-29', '15.1791135397693' ],
+                  [ '2001-07-30', '16.8337891218475' ],
+                  [ '2001-07-31', '16.3227970322187' ],
+                  [ '2001-08-01', '17.7304241435563' ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget D'
+                 },
+                 [
+                  [ '2001-07-24', '7.61'  ],
+                  [ '2001-07-25', '7.80234070221066' ],
+                  [ '2001-07-26', '7.82469481689013' ],
+                  [ '2001-07-27', '7.57'            ],
+                  [ '2001-07-28', '7.72805333872108'  ],
+                  [ '2001-07-29', '7.34669095324833' ],
+                  [ '2001-07-30', '7.95097741314697' ],
+                  [ '2001-07-31', '10.7226344140665'  ],
+                  [ '2001-08-01', '12.9282218597064'  ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget E'
+                 },
+                 [
+                  [  '2001-07-24', '10.75'  ],
+                  [  '2001-07-25', '9.53285985795739'  ],
+                  [  '2001-07-26', '8.375025015009'    ],
+                  [  '2001-07-27', '7.79'           ],
+                  [  '2001-07-28', '6.32387109809072'  ],
+                  [  '2001-07-29', '6.90143695608177'  ],
+                  [  '2001-07-30', '6.26962422769169'  ],
+                  [  '2001-07-31', '5.43754446590101'  ],
+                  [  '2001-08-01', '14.8960032626427'  ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget F'
+                 },
+                 [
+                  [  '2001-07-24', '3.16'         ],
+                  [  '2001-07-25', '2.68080424127238'   ],
+                  [  '2001-07-26', '3.08184910946568'   ],
+                  [  '2001-07-27', '2.85'           ],
+                  [  '2001-07-28', '2.78816042024447'  ],
+                  [  '2001-07-29', '2.6006881198138'   ],
+                  [  '2001-07-30', '3.0892332624329'   ],
+                  [  '2001-07-31', '3.02876308567944'  ],
+                  [  '2001-08-01', '3.02814029363785'  ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget G'
+                 },
+                 [
+                  [ '2001-07-24',  '1.14'      ],
+                  [ '2001-07-25',  '1.28038411523457'  ],
+                  [ '2001-07-26',  '1.26075645387232'  ],
+                  [ '2001-07-27',  '1.33'              ],
+                  [ '2001-07-28',  '2.09112031518335'  ],
+                  [ '2001-07-29',  '1.27504553734062'  ],
+                  [ '2001-07-30',  '1.43826597791958'  ],
+                  [ '2001-07-31',  '1.31110885252566'  ],
+                  [ '2001-08-01',  '2.76305057096248'  ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget H'
+                 },
+                 [
+                  [ '2001-07-24', '0.09'          ],
+                  [ '2001-07-25', '0.110033009902971'  ],
+                  [ '2001-07-26', '0.150090054032419'  ],
+                  [ '2001-07-27', '0.07'             ],
+                  [ '2001-07-28', '0.111122335589453' ],
+                  [ '2001-07-29', '0.121432908318154' ],
+                  [ '2001-07-30', '0.121543603767852' ],
+                  [ '2001-07-31', '0.111799979672731' ],
+                  [ '2001-08-01', '0.0815660685154976']
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget I'
+                 },
+                 [
+                  [  '2001-07-24', '0.04'  ],
+                  [  '2001-07-25', '0.0500150045013504'  ],
+                  [  '2001-07-26', '0.0500300180108065'  ],
+                  [  '2001-07-27', '0.02'             ],
+                  [  '2001-07-28', '0.0303060915243964' ],
+                  [  '2001-07-29', '0.0607164541590771'  ],
+                  [  '2001-07-30', '0.0709004355312468'  ],
+                  [  '2001-07-31', '0.0203272690314056'  ],
+                  [  '2001-08-01', '0.0101957585644372'  ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget J'
+                 },
+                 [
+                  [ '2001-07-24', '0.03'  ],
+                  [ '2001-07-25', '0.0600180054016205'  ],
+                  [ '2001-07-26', '0.0400240144086452'  ],
+                  [ '2001-07-27', '0.08' ],
+                  [ '2001-07-28', '0.0202040610162643'   ],
+                  [ '2001-07-29', '0.0303582270795386'   ],
+                  [ '2001-07-30', '0.0607718018839259'   ],
+                  [ '2001-07-31', '0.0609818070942169'   ],
+                  [ '2001-08-01', '0.0203915171288744'   ]
+                 ]
+                ],
+                [
+                 {
+                  'data format' =&gt; 'matrix',
+                  'title' =&gt; 'Widget K'
+                 },
+                 [
+                  [ '2001-07-24', '0.05' ],
+                  [ '2001-07-25','0.0100030009002701' ],
+                  [ '2001-07-26','0.0200120072043226' ],
+                  [ '2001-07-27', '0.01'             ],
+                  [ '2001-07-28','0.0101020305081321' ],
+                  [ '2001-07-29', '0.0303582270795386' ],
+                  [ '2001-07-30',  '0.010128633647321'  ],
+                  [ '2001-07-31',  '0.0508181725785141' ],
+                  [ '2001-08-01',  '0.0407830342577488' ]
+                 ]
+                ]
+               ) # xmgrace call
+
+</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace3.png"></center></p>
+<p><center><em>xmgrace3.png</em></center></p>
+
+<p>
+</p>
+<hr />
+<h1><a name="more_info">MORE INFO</a></h1>
+<p>For more information on Xmgrace, please see the Xmgrace web page:
+
+</p>
+<pre>
+ <a href="http://plasma-gate.weizmann.ac.il/Grace">http://plasma-gate.weizmann.ac.il/Grace</a>
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="contact">CONTACT</a></h1>
+<p>Send email to <a href="mailto:graph-dev@caida.org">graph-dev@caida.org</a> is you have problems, questions,
+or comments. To subscribe to the mailing list send mail to
+<a href="mailto:graph-dev-request@caida.org">graph-dev-request@caida.org</a> with a body of ``subscribe <a href="mailto:your@email.com''">your@email.com''</a>
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+ CAIDA Perl development team (cpan@caida.org)
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<pre>
+ xmgrace(1).
+
+</pre>
+
+</body>
+
+</html>

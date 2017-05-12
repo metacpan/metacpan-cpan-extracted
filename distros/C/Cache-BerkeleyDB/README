@@ -1,0 +1,92 @@
+Cache::BerkeleyDB(3)  User Contributed Perl Documentation Cache::BerkeleyDB(3)
+
+
+
+NNAAMMEE
+       Cache::BerkeleyDB -- implements the Cache::Cache interface.
+
+DDEESSCCRRIIPPTTIIOONN
+       This module implements the Cache interface provided by the Cache::Cache
+       family of modules written by DeWitt Clinton. It provides a practically
+       drop-in replacement for Cache::FileCache.
+
+       As should be obvious from the name, the backend is based on BerkeleyDB.
+
+SSYYNNOOPPSSIISS
+         use Cache::BerkeleyDB;
+
+         my $cache = new Cache::BerkeleyDB( { 'namespace' => 'MyNamespace',
+                                              'default_expires_in' => 600 } );
+
+         See Cache::Cache for the usage synopsis.
+
+MMEETTHHOODDSS
+       See Cache::Cache for the API documentation. Only changes relative to
+       the standard methods are mentioned below.
+
+       CClleeaarr(( [[$$ccaacchhee__rroooott]] ))
+           See Cache::Cache, with the optional _$_c_a_c_h_e___r_o_o_t parameter.
+
+       PPuurrggee(( [[$$ccaacchhee__rroooott]] ))
+           See Cache::Cache, with the optional _$_c_a_c_h_e___r_o_o_t parameter.
+
+       SSiizzee(( [[$$ccaacchhee__rroooott]] ))
+           See Cache::Cache, with the optional _$_c_a_c_h_e___r_o_o_t parameter.
+
+OOPPTTIIOONNSS
+       See Cache::Cache for standard options.  Additionally, options are set
+       by passing in a reference to a hash containing any of the following
+       keys:
+
+       _c_a_c_h_e___r_o_o_t
+           The location in the filesystem that will hold the BDB files repre-
+           senting the cache namespaces.  Defaults to /tmp unless explicitly
+           set.
+
+       _u_m_a_s_k
+           The umask which will be active when any cache files are created.
+           Defaults to 002. Note that this will have no effect on existing
+           files.
+
+PPRROOPPEERRTTIIEESS
+       See Cache::Cache for default properties.
+
+       ((ggeett||sseett))__ccaacchhee__rroooott
+           Acessor pair for the option _c_a_c_h_e___r_o_o_t - see description above.
+
+SSEEEE AALLSSOO
+       Cache::Cache
+       Cache::FileCache
+       BerkeleyDB
+       Cache::BerkeleyDB_Backend
+
+TTOODDOO
+       (1) The current version (0.03) uses the framework provided by the
+       Cache::Cache family of modules quite heavily. In particular, it relies
+       on Cache::BaseCache and Cache::Object for much of its functionality.
+       This has obvious advantages; it means, however, that the extra speed
+       gained by switching from the flat files of Cache::FileCache to a Berke-
+       leyDB backend is much reduced compared with a top-to-bottom implementa-
+       tion utilizing the latter's strengths to the full. Currently the speed
+       gain relative to Cache::FileCache is in the range of 200% to 350%; I'm
+       confident this can be increased significantly.
+
+       (2) Since each cache namespace is represented as a separate BDB file,
+       operating with (very) many namespaces in the same process may get you
+       in trouble. While this has not been verified yet, it may make this ver-
+       sion unsuitable for some uses, such as in an HTML::Mason environment
+       under mod_perl. Future versions will probably implement multiple names-
+       paces in the same file.
+
+       (3) The current version is Unix-specific. That will probably change.
+
+AAUUTTHHOORR
+       Baldur Kristinsson <bk@mbl.is>, January 2006.
+
+        Copyright (c) 2006 Baldur Kristinsson. All rights reserved.
+        This program is free software; you can redistribute it and/or
+        modify it under the same terms as Perl itself.
+
+
+
+perl v5.8.7                       2006-02-02              Cache::BerkeleyDB(3)

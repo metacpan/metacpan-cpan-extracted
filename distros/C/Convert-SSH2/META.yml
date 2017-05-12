@@ -1,0 +1,41 @@
+---
+abstract: 'Convert SSH2 RSA keys to other formats'
+author:
+  - 'Mark Allen <mrallen1@yahoo.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Convert-SSH2
+provides:
+  Convert::SSH2:
+    file: lib/Convert/SSH2.pm
+    version: 0.01
+  Convert::SSH2::Format::Base:
+    file: lib/Convert/SSH2/Format/Base.pm
+    version: 0.01
+  Convert::SSH2::Format::PKCS1:
+    file: lib/Convert/SSH2/Format/PKCS1.pm
+    version: 0.01
+  Convert::SSH2::Format::PKCS8:
+    file: lib/Convert/SSH2/Format/PKCS8.pm
+    version: 0.01
+requires:
+  Class::Load: 0.13
+  Convert::ASN1: 0
+  File::Slurp: 0
+  MIME::Base64: 0
+  Math::BigInt: 0
+  Moo: 0.009013
+  Try::Tiny: 0
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mrallen1/Convert-SSH2.git
+version: 0.01

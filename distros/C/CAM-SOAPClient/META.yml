@@ -1,0 +1,24 @@
+---
+name: CAM-SOAPClient
+version: 1.17
+author:
+  - 'Clotho Advanced Media, I<cpan@clotho.com>'
+abstract: SOAP interaction tools
+license: perl
+resources:
+  license: perl://dev.perl.org/licenses/
+requires:
+  SOAP::Lite: 0.55
+build_requires:
+  IO::Socket: 1.00
+  Test::More: 0.01
+recommends:
+  CAM::SOAPApp: 1.03
+provides:
+  CAM::SOAPClient:
+    file: lib/CAM/SOAPClient.pm
+    version: 1.17
+generated_by: Module::Build version 0.2706
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,19 @@
+BER.pm
+BER.pod
+ChangeLog
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00prim.t
+t/01basic.t
+t/02seq.t
+t/03seqof.t
+t/04comp.t
+t/05class.t
+t/06opt.t
+t/07io.t
+t/08tag.t
+t/09hightags.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

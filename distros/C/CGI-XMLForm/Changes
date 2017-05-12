@@ -1,0 +1,56 @@
+Revision history for Perl extension CGI::ToXML.
+
+0.10  Tue Jun 8 1999
+	- Fixed stupid NT CRLF's... Grrr... (thanks Tim)
+	
+0.09  Mon Jun 7 1999
+	- Bug fix for when typing a / in the form field
+
+0.08  Internal bug fix release
+
+0.07  Wed Jan 27 1999
+	- Speed improvements. Now faster than XML::XQL (DOM) for all cases
+	- Some minor bug fixes
+	- Fixes to Stream mode
+
+0.06  Fri Jan 22 1999
+	- "Pretty" XML fixed.
+	- Removed ToCGI - that was a dumb name!
+	- Fixed - the module was actually totally broken, except
+    	in a mod-perl environment where we'd already included
+		XML::Parser at the server level.
+
+0.05  Thu Jan 21 1999
+	- Used parse_params again. For some reason $self->query_string
+	  isn't in the order it's recieved from the browser. Grr.
+	- Renamed to CGI::XMLForm after discussion with J.Eisenzopf.
+	- Added readXML function.
+	- tries to make "pretty" XML. Fails <g>.
+	- Encoding should have been ISO-8859-1. Duh!
+
+0.04  Thu Jan 14 1999
+	- Fixed bug in relative (parent) paths
+	- Added xml encoding="ISO-8859-2"
+	- Don't overload parse_params any more - that could be problematic.
+	- Don't allow people to enter entities in forms any more (always
+	  encodes & as &amp; from now on, even if followed by \w+;).
+	- Thought very hard about rewriting to be neater,
+		but didn't bother in the end ;-) Next version maybe!
+
+0.03  Wed Jan 06 1999
+	- Syntax updates
+	- Allow relative paths
+	- Improved docs
+	- Improved examples
+	- Some bug fixes
+	- Properly deal with fixed entities (&,<,>,',")
+	- Properly subclasses CGI.pm
+
+0.02  Wed Dec 30 11:50:00 1998
+	- Updated to use the XSL style syntax
+	- Added some more docs
+	- Added example files
+
+0.01  Mon Dec 21 16:48:48 1998
+	- original version; created by h2xs 1.18
+

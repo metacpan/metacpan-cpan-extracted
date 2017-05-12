@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd4d
+registers:
+  AF: 20687
+  AF_: 0
+  BC: 58313
+  BC_: 0
+  DE: 39310
+  DE_: 0
+  HL: 56226
+  HL_: 0
+  I: 0
+  IX: 50421
+  IY: 51145
+  PC: 2
+  R: 2
+  SP: 0

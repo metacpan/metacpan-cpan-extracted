@@ -1,0 +1,69 @@
+1999-02-05  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* lib/CGI/Screen.pm: Replaced the 'screen_' prefix used to
+	indicate the CGI variable carrying function name to
+	'screen_function'. The old prefix caused spurious warnings as
+	spotted by Julian Morrison.
+
+Sun Jul 26 16:13:21 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* t/import.t, t/method.t: tests will work with some older CGI.pm
+	 Versions also.
+
+	* lib/CGI/Screen.pm (AUTOLOAD): Did propagate destroy.
+	
+Sun Jul 12 18:29:43 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CGI/Screen.pm (_set_screen): Added dont_cut_loops flag.
+	(t): Test with CGI.pm-2.42 regression tests. Snarfed some of the
+ 	tests to make cpan-testers happy ;-)
+
+Fri Jul 10 21:52:38 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CGI/Screen.pm (_set_screen): Jumps to the same screen are
+ 	not added to the history any more.
+	(url_to_screen): Does not care about passed parameters any
+ 	more. Bad braino :-(
+
+Sun Jun 28 09:39:19 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CGI/Screen.pm (AUTOLOAD): Now actually generates the code.
+  	Should speed up calls for freqently used methods like
+ 	->TD. Especially when used with mod_perl.
+	(url_to_screen, link-to_screen): Now take additional parameters to
+ 	encode in the url.
+	(_set_screen): Now saves up to seven back screens to support
+ 	sensible backing out a dead ends.
+	(_set_screen): Now prefers *_data methods.
+	(import): Experimental support for importing CGI.pm stuff
+
+Tue Dec 30 09:49:58 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CGI/Screen.pm (link_to_screen): renamed to url_to_screen.
+	link_to_screen now returns a complete anchor.
+
+Mon Dec 29 18:44:24 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* eg/screen: Calls constructor vie C<__PACKAGE__->new> as
+ 	suggested by Andreas Koenig.
+
+	* lib/CGI/Screen.pm: Documentation uses C<__PACKAGE__->new>
+
+Mon Dec 29 10:26:42 1997  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Makefile.PL: Added new VERSION algorithm and 'README' preop.
+
+	* MANIFEST: Removed test.pl, added README.
+
+	* screen (gif_data): Produces now GIF even if GD is missing.
+
+	* lib/CGI/Screen.pm: Added copyright notice and documentation for
+ 	data screens
+
+	* CGI-Screen.prj : moved 'screen' to 'eg' subdirectory
+
+Revision history for Perl extension CGI::Screen.
+
+0.01  Sun Nov 30 17:04:06 1997
+	- original version; created by h2xs 1.18
+

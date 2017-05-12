@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 100
+  60052:
+    - 12
+name: cb64
+registers:
+  AF: 43264
+  AF_: 0
+  BC: 41829
+  BC_: 0
+  DE: 49163
+  DE_: 0
+  HL: 60052
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

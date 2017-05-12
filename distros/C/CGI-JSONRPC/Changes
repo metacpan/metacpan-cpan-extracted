@@ -1,0 +1,67 @@
+Revision history for Perl extension CGI::JSONRPC.
+
+0.11 Wed Feb 27 10:40:00 PST 2008
+     - Only test against mod_perl if it is installed
+0.10 Tue Feb 26 11:00:00 PST 2008
+     - Clean up a few more tests
+     - Tagged the ::Session stuff as unstable until buggyd has a chance
+       to look
+0.09 Mon Feb 25 15:00:00 PST 2008
+     - Made the path <-> class translation a little bit more resilient
+     - Split up some code
+     - Got the unit tests working again.
+0.08 Thu Feb 14 10:55:00 PST 2008
+     - Added a "DontDispatch" attribute that can be used to prevent
+       methods from being called from the web.
+     - Made a few error messages a bit more secure.
+0.07 Fri Feb  8 13:15:00 PST 2008
+     - Apply the changes I made to the old JSONRPC.js to the new Base.js,
+       PROPERLY THIS TIME...!!!
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - ...
+0.06 Thu Feb  7 15:03:00 PST 2008
+     - Get rid of old JSONRPC.js
+     - Apply the changes I made to the old JSONRPC.js to the new Base.js
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - I will not release code I haven't tested to CPAN
+       - ...
+0.05 Thu Feb  7 09:28:00 PST 2008
+     - Files were missing from MANIFEST... eeeeeek!
+0.04 Fri Feb  1 10:45:00 PST 2008
+     - Fixed a bug on the javascript side; it wasn't using the right object
+       when it called back!
+0.03 Tue Mar 21 11:34:40 PST 2006
+     - Added Session dispatchers
+     - Added base classes for JSONRPC & Session to easy development of
+       handler objects
+     - Cleaned up some error handling
+0.03  Fri Mar 17 10:45:00 2006
+    - s/new_from_jsonrpc/jsonrpc_new/ so that it's consistent with other 
+      calls in this module [buggyd]
+    - modified bang line in example cgi to use env otherwise tests fail
+      when a user's own perl should be used [buggyd]
+    - made examples httpd.conf work without mod_perl [crakrjack]
+    - generate README from POD [crakrjack]
+
+0.02  Tue Mar 14 14:49:00 2006
+    - Renamed distro from Apache2::JSONRPC to CGI::JSONRPC
+      this shouldn't have gotten the same version number but it's out
+      now...
+
+0.02  Sun Mar 12 09:34:00 2006
+    - Added GET handler that returns JSONRPC javascript to the client
+    - Improved Create_Class JavaScript
+    - Added documentation
+
+0.01  Thu Mar  9 12:55:11 2006
+	- original version; created by h2xs 1.23 with options
+		-AXP -b 5.6.0 Apache2::JSONRPC

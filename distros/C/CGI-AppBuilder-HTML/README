@@ -1,0 +1,107 @@
+NAME
+    CGI::AppBuilder::HTML - generating HTML Codes
+
+SYNOPSIS
+      use CGI::AppBuilder::HTML;
+
+      my $ab = CGI::AppBuilder::HTML->new(
+         'ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my ($q, $ar, $ar_log) = $ab->start_app($0, \%ARGV);
+      print $ab->disp_form($q, $ar);
+
+DESCRIPTION
+    This class provides methods for randering HTNL codes.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  disp_top ($q, $ar)
+    Input variables:
+
+      $q  - CGI object
+      $ar - parameter hash array
+
+    How to use:
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+  disp_frd ($q, $ar)
+    Input variables:
+
+      $q  - CGI object
+      $ar - parameter hash array
+
+    How to use:
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+  disp_index ($q, $ar)
+    Input variables:
+
+      $q  - CGI object
+      $ar - parameter hash array
+
+    How to use:
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+  disp_left ($q, $ar)
+    Input variables:
+
+      $q  - CGI object
+      $ar - parameter hash array
+
+    How to use:
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+  disp_linkedfiles ($q, $ar)
+    Input variables:
+
+      $q  - CGI object
+      $ar - parameter hash array
+      $pr - array ref for a list of file names
+      $rt - whether to return the HTML codes
+
+    How to use:
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+HISTORY
+    *   Version 0.10
+
+        This version includes the frame_set method.
+
+    *   Version 0.20
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 594:
+        You forgot a '=back' before '=head1'
+

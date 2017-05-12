@@ -1,0 +1,348 @@
+#!/usr/bin/perl -Tw
+#Copyright 1998-1999, Randall Maas.  All rights reserved.  This program is free
+#software; you can redistribute it and/or modify it under the same terms as
+#PERL itself.                                                                   
+
+=head1 NAME
+
+DNS-find-free -- an example tool to help find free spots in your DNS table
+
+=head1 DESCRIPTION
+
+This is a tool to help find some unallocated DNS addresses in your files.
+There are two methods of operation: either by specifying the kind of
+unallocated space you would like to find, or to employ a script files that
+specifies this information.  Currently the only format of the script file is
+the SWIP format.  In addition, if a SWIP file is employed, an ARIN End User IP
+Request report can be generated from a template.  The report, with some
+editing, can be sent to ARIN afterwards.
+
+=head1 Command Line Parameters and Options
+
+=over 1
+
+=item C<--arin-input >F<FILE>
+
+=item C<--arin-input=>F<FILE>
+
+This indicates that an ARIN End User IP Request file contains the parameters.
+(See L<http://www.arin.net/templates/networktemplate.txt> for details on how
+this file is formatted)
+
+=item C<--num >I<NUM>
+
+=item C<--num=>I<NUM>
+
+This is the number of address blocks to find.  The block size is whatever your
+DNS table happens to use.
+
+=item C<--swip-input >F<FILE>
+
+=item C<--swip-input=>F<FILE>
+
+This specifies the template SWIP file for a network record.  SWIP files are not
+generated without a template.  (See L<http://rs.arin.net/pub/swiptemplate.txt>
+for details on this file is formatted.)
+
+=item C<--swip-output >F<FILE>
+
+=item C<--swip-output=>F<FILE>
+
+This specifies the output SWIP file for a network record.  If this parameter is
+not specified, but an input template is, the generated SWIP file will be
+directed to standard out.  SWIP files are not generated without a template.
+See the C<--swip-input> option. 
+
+=back
+
+=head2 Records modified in the SWIP file
+
+Not every field in the SWIP file is modified, but the following fields are:
+
+=over 1
+
+=item C<fname>
+
+This field is determined by the C<Name (Last, First)> field in the ARIN file.
+
+=item C<lname>
+
+This field is determined by the C<Name (Last, First)> field in the ARIN file.
+
+=item C<mbox>
+
+The information for this field is gathered from the C<E-Mailbox> field in the
+ARIN file.
+
+=item C<mname>
+
+This field is determined by the C<Name (Last, First)> field in the ARIN file.
+
+=item C<ntenum>
+
+This field is determined by finding the end of a free slot in the DNS tables
+
+=item C<ntname>
+
+The information for this field is determined by the C<Network name> field in
+the ARIN file.
+
+=item C<ntsnum>
+
+This field is determined by finding the start of a free slot in the DNS tables.
+
+=item C<org>
+
+The information for this field is gathered from the C<Name of Organization>
+field in the ARIN file.
+
+=item C<phne>
+
+This fields setting is gathered from the C<Phone Number> field in the ARIN
+file.
+
+=back
+
+
+=head1 Files
+
+=head1 See Also
+
+L<CfgTie::CfgArgs> for more information on the standard parameters
+L<named(8)>
+
+=head1 Notes
+
+=head2 Author
+
+Randall Maas (L<randym@acm.org>)
+
+=cut
+
+local %MyArgs;
+my $Prg="DNS-find-free";
+use CfgTie::TieNamed;
+use CfgTie::CfgArgs qw(Fatal Err);
+use CfgTie::Cfgfile;
+
+sub is_tainted {not eval {my @r = join('',@_),kill 0; 1;};}
+
+# --- Help and Other query Information ----------------------------------------
+sub Help
+{
+   print "CfgNamed allows you to change settings for your DNS server\n".
+	"\nUSAGE: CfgNamed [OPTIONS]\n";
+   print "\nSpecific operations:\n".
+	"\t    --xref\tCross references the primary and reverse DNS tables\n";
+   print CfgTie::CfgArgs::Help(),"\n";
+}
+
+sub Warranty ()
+{
+   print "No warranty.\n"
+}
+
+sub Copyright ()
+{
+   print "$Prg\nCopyright 1998-1999, Randall Maas.  All rights reserved.  ".
+    "This program is free\nsoftware; you can redistribute it and/or modify ".
+    "it under the same terms as PERL itself.\n\n";
+}
+
+# --- Argument Parsing Stuff --------------------------------------------------
+sub ParseArgs 
+{
+   my $X = shift;
+   CfgTie::CfgArgs::do($X,"num=s","arin-input=s","swip-input","swip-output");
+#   if (!scalar keys %{$X})
+#     {
+#        print "Try '$Prg --help' for more information\n";
+#        exit -1;
+#     }
+
+   if (exists $X->{'help'})      {Help;}
+   if (exists $X->{'copyright'}) {Copyright;}
+   if (exists $X->{'warranty'})  {Warranty;}
+   if (exists $X->{'help'})      {exit -1;}
+}
+
+# Parse the arguments
+ParseArgs(\%MyArgs);
+
+# Validate the basic arguments
+my $NeedToExit=0;
+if (exists $MyArgs{'arin-input'} && !-e $MyArgs{'arin-input'})
+  {
+     Err(FILE_NEXIST,$MyArgs{'arin-input'});
+     $NeedToExit=1;
+  }
+if (exists $MyArgs{'swip-input'} && !-e $MyArgs{'swip-input'})
+  {
+     Err(FILE_NEXIST,$MyArgs{'swip-input'});
+     $NeedToExit=1;
+  }
+if (exists $MyArgs{'swip-output'})
+  {
+     if (!exists $MyArgs{'swip-input'})
+       {
+          print STDER, "--swip-input is required for --swip-output to work\n";
+          $NeedToExit=1;
+       }
+
+     if (-e $MyArgs{'swip-output'})
+       {
+          Err(FILE_EXISTS,$MyArgs{'swip-output'});
+          $NeedToExit=1;
+       }
+  }
+
+if ($NeedToExit) {die "$Prg: Exiting due to fatal errors\n";}
+
+# --- Beginning of work -------------------------------------------------------
+my %SReq;
+
+if (exists $MyArgs{'arin-input'})
+  {ARIN_Scan(\%SReq,$MyArgs{'arin-input'});}
+
+if (!exists $MyArgs{'num'}) {$MyArgs{'num'}=1;}
+
+my %DNS;
+if (exists $MyArgs{'file'})
+  {tie %DNS, CfgTie::TieNamed,$MyArgs{'file'};}
+else
+  {tie %DNS, CfgTie::TieNamed;}
+
+# 
+# Validate the joining set-up
+my (%Users, $Id,@Groups);
+
+if (!exists $DNS{'primary'})
+  {
+     print "No primary tables...\n";
+     exit(-1);
+  }
+
+my $PDNS = $DNS{'primary'};
+
+my @PList = grep {/\.in-addr\.arpa$/i && !/0\.0\.127\.in-addr\.arpa$/i}
+	keys %{$PDNS};
+
+#Res is the list of results.  Key is the address space
+#Value is the starting address in that space that works
+my %Res;
+foreach  my $I (@PList)
+{
+   my $A = find_first_free($PDNS->{$I},$MyArgs{'num'});
+   if (defined $A) {$Res{$I}=$A;}
+}
+
+if (scalar keys %Res) 
+  {
+     print "We found ", scalar keys %Res, " possible address spaces that work\n";
+     foreach my $I (sort keys %Res) {print "in $I start with $Res{$I}\n";}
+  }
+ else
+  {print "Sorry, none of the address spaces work\n";}
+
+if (exists $MyArgs{'swip-output'})
+{
+    SWIP_Gen(\%SReq, $MyArgs{'swip-input'}, $MyArgs{'swip-output'});
+}
+
+
+#Find the first free rang in the address block
+sub find_first_free($$)
+{
+   my ($A,$Num)=@_;
+   for(my $I=1; $I<255-$Num+1;$I++)
+    {
+       #Check to see if the first item is already used
+       if (exists $A->{$I}) {next;}
+
+       #Okay, the first item is not already used.. check the next few
+       my $T=0;
+       for(my $J=$I+1; $J<$I+$Num; $J++)
+        {
+	    if (exists $A->{$J}) {$T=1;}
+        }
+       if (!$T) {return $I;}
+    }
+
+   undef;
+}
+
+sub ARIN_scan($$)
+{
+   #Scans an ARIN file, placing the relevant information in S
+   #Example: ARIN_Scan(\%MyHash,'file');
+   my ($S,$Name)=@_;
+
+   if (!-e $Name) {Fatal(FILE_NEXIST, $Name);}
+
+   my $ARIN=$FNum++;
+   open ARIN, "<$Name";
+
+   while (<ARIN>)
+    {
+	  if (/ARIN-handle.*:\s*([\w\d].*)\s*$/i)    {$S->{Handle} =$1;}
+       elsif (/Network\s+name.*:\s*([\w\d].*)\s*/i)  {$S->{NetName}=$1;}
+       elsif (/Name\s+of\s+Organization.*:([\w\d].*)\s*$/i) {$S->{Org}=$1;}
+       elsif (/Name\s+\(Last.*:\s(\w+)[\s,]+(\w+)\s+(\w+)/i)
+	 {$S->{LName}=$1; $S->{FName}=$2; $S->{MName}=$3;}
+       elsif (/Name\s+\(Last.*:\s(\w+)[\s,]+(\w+)/i)
+         {$S->{LName}=$1; $S->{FName}=$2;}
+       elsif (/Phone\s+Number.*:\s*([\d\-\.\(\)]+)/i){$S->{Phone}=$1;}
+       elsif (/Mailbox.*:\s*([^\s\n]+)/i)            {$S->{MBox}=$1;}
+    }
+
+   close ARIN;
+}
+
+sub SWIP_gen ($$)
+{
+   # Uses the information in S to modify a supplied SWIP template
+
+   my ($S,$InName, $OutName)=@_;
+
+   #Check the input again.
+   if (!-e $InName) {Fatal(FILE_NEXIST,$InName);}
+
+   my $SWIP=$FNum++;
+   my $R;
+   open SWIP, "<$InName";
+   while (<SWIP>)
+    {
+          if (/^(\s*ntname:\s*)/i && exists $S->{NetName})
+            {$R .= $1.$S->{NetName}."\n";}
+       elsif (/^(\s*ntsnum:\s*)/i && exists $S->{NetSNum})
+            {$R .= $1.$S->{NetSNum}."\n";}
+       elsif (/^(\s*ntenum:\s*)/i && exists $S->{NetENum})
+            {$R .= $1.$S->{NetENum}."\n";}
+       elsif (/^(\s*org:\s*)/i    && exists $S->{Org})
+            {$R .= $1.$S->{Org}."\n";}
+       elsif (/^(\s*nihandl:\s*)/i&& exists $S->{Handle})
+            {$R .= $1.$S->{Handle}."\n";}
+       elsif (/^(\s*lname:\s*)/i  && exists $S->{LName})
+            {$R .= $1.$S->{LName}."\n";}
+       elsif (/^(\s*fname:\s*)/i  && exists $S->{FName})
+            {$R .= $1.$S->{FName}."\n";}
+       elsif (/^(\s*fname:\s*)/i  && exists $S->{MName})
+            {$R .= $1.$S->{MName}."\n";}
+       elsif (/^(\s*phne:\s*)/i   && exists $S->{Phone})
+            {$R .= $1.$S->{Phone}."\n";}
+       elsif (/^(\s*mbox:\s*)/i   && exists $S->{MBox})
+            {$R .= $1.$S->{MBox}."\n";}
+       else {$R.=$_;}
+    }
+   close SWIP;
+
+   if (!defined $R) {die "Nothing generated!\n";}
+
+   #We double check for the output file again.  We do not allow overwriting an
+   #existing file.  We wait as long as possible to help reduce the inherent
+   #race codntion.
+   if (-e $OutName) {Fatal(FILE_EXISTS), $OutName);}
+   open SWIP, ">$OutName" or Fatal(FILE_CANTCREATE, $OutName);
+   print $R;
+   close SWIP;
+}

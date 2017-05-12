@@ -1,0 +1,47 @@
+---
+abstract: 'Run mode to handle a file upload and return a JSON response'
+author:
+  - 'Nicholas Bamber <nicholas@periapt.co.uk>'
+build_requires:
+  CGI::Application::Plugin::JSON: 0
+  File::Temp: 0
+  Test::CGI::Multipart: 0
+  Test::Image::GD: 0
+  Test::More: 0.94
+  Test::NoWarnings: 0
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - CGI::Application
+  - 'File upload'
+  - 'Image resizing'
+  - HTML
+  - 'YUI rich text editor'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-AJAXUpload
+provides:
+  CGI::Application::Plugin::AJAXUpload:
+    file: lib/CGI/Application/Plugin/AJAXUpload.pm
+    version: v0.0.3
+  Data::FormValidator::Filters::ImgData:
+    file: lib/Data/FormValidator/Filters/ImgData.pm
+    version: v0.0.3
+requires:
+  CGI: 3.41
+  CGI::Application: 0
+  Data::FormValidator: 0
+  Exporter: 0
+  GD: 0
+  Perl6::Slurp: 0
+  Readonly: 0
+  autodie: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/periapt/CGI-Application-Plugin-AJAXUpload/tree
+version: v0.0.3

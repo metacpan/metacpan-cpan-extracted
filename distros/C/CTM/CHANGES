@@ -1,0 +1,90 @@
+* 0.09 et moins (STABLE) :
+    * < 23/03/2014 - tests.
+* 0.10 (STABLE) :
+    * 24/03/2014 - premiere version stable.
+* 0.11 (STABLE) :
+    * 25/03/2014 - support de Control-M EM v6.
+    * 25/03/2014 - mise en place du module _BIMServices dont le constructeur est une methode de Control-M EM::BIM.
+    * 31/03/2014 - methodes du module _BIMServices misent en place.
+    * 07/04/2014 - modifications des methodes liees au module Control-M EM::BIM et aux services : la recuperation des services se fait desormais dynamiquement via l'active net.
+    * 17/04/2014 - refonte de la doc POD du module et d'une partie de la gestion des erreurs via Carp.
+    * 23/04/2014 - gestion des jobs supprimes du plan via la cle 'delete_flag' (booleen) et avec le parametre 'handleDeletedJobs' de la methode getCurrentServices() et de ses derives.
+* 0.12 (STABLE) :
+    * 24/04/2014 - renommage du module _BIMServices en _WorkOnServices.
+    * 24/04/2014 - refonte de l'espace de nom du module (Control-M EM::BIM -> CTM::EM::BIM::ServicesAPI) et de son nom (BIM.pm -> ServicesAPI.pm).
+* 0.13 (STABLE) :
+    * 07/05/2014 - ajout de la methode getSOAPEnvelope() au module _WorkOnServices.
+    * 07/05/2014 - securisation des objets via Hash::Util et ajout d'un mutateur (setPublicProperty()) pour les proprietes publiques des objets.
+    * 09/05/2014 - ajout de la methode getProperty().
+* 0.14 (STABLE) :
+    * 09/05/2014 - module CTM::EM::BIM::ServicesAPI::Common fonctionnel. Contient les fonctions/methodes _setObjProperty(), _myErrorMessage(), getProperty(), setPublicProperty() et clearError().
+    * 09/05/2014 - heritage de certaines fonctions pour les modules CTM::EM::BIM::ServicesAPI et _WorkOnServices depuis CTM::EM::BIM::ServicesAPI::Common.
+    * 20/05/2014 - ajout du parametre "verbose" a la methode new().
+    * 20/05/2014 - ajout de la methode refresh() au module _WorkOnServices.
+* 0.15 (STABLE) :
+    * 22/05/2014 - refonte de l'espace de nom pour les modules CTM::* (CTM::Base, CTM::ReadEM, CTM::ReadEM::_workOnBIMServices).
+    * 22/05/2014 - certaines fonctions privees deviennent accessibles (_myOsIsUnix(), ...).
+* 0.161 (STABLE) :
+    * 26/05/2014 - ajout du parametre 'forStatus' a la methode getCurrentServices().
+    * 26/05/2014 - POD revue pour l'upload des modules sur le CPAN.
+* 0.161 (STABLE) :
+    * 26/05/2014 - correction de quelques bugs relatifs a la methode $_setObjProperty->().
+* 0.162 (STABLE) :
+    * 26/05/2014 - heritage d'AUTOLOAD depuis CTM::Base.
+* 0.17 (STABLE) :
+    * 30/05/2014 - ajout des modules CTM::ReadEM::_workOnAlarms, CTM::ReadEM::_workOnExceptionAlerts et CTM::Base::subClass + impacts majeurs sur les modules CTM::ReadEM, CTM::Base et  CTM::ReadEM::_workOnBIMServices.
+* 0.171 (STABLE)
+    * 31/05/2014 - correction de quelques erreurs dans la POD de CTM::ReadEM et ajout du tag ':all' (%EXPORT_TAG) a ce meme module.
+* 0.172 (STABLE)
+    * 01/06/2014 - correction de la methode protegee _refresh().
+    * 01/06/2014 - correction de plusieurs erreurs pour les methodes getAlarms() et getExceptionAlerts() (parametre 'severity').
+    * 01/06/2014 - limitation de l'utilisation de regex (gain de performance tres faible).
+* 0.173 (STABLE)
+    * 02/06/2014 - apport des parametres "limit" et "timeSort" aux methodes getAlarms() et getExceptionAlerts() ainsi qu'a leurs derives.
+    * 02/06/2014 - amelioration de la verification de certains parametres pour les methodes new() et get*.
+* 0.174 (STABLE)
+    * 02/06/2014 - correction de la methode protegee _refresh().
+* 0.175 (STABLE)
+    * 02/06/2014 - appelle de la methode unshiftError() lors de l'appelle des methodes getAlerts(), getProblematicsJobs() et getSOAPEnvelope().
+* 0.176 (STABLE)
+    * 23/06/2014 - ajout des methodes destinees a la gestion des alarmes/alertes dans les modules CTM::ReadEM::WorkOnAlarms et CTM::ReadEM::WorkOnExceptionAlerts.
+    * 23/06/2014 - correction de quelques erreurs.
+    * 23/06/2014 - mis a jour de la POD.
+* 0.177 (STABLE)
+    * 30/06/2014 - correction des requetes SQL DELETE.
+* 0.1771 (STABLE)
+    * 12/07/2014 - utilisation Perl:OSType et de Try::Tiny.
+    * 18/07/2014 - correction typo sur la methode CTM::ReadEM::WorkOnExceptionAlerts::refresh() et sur l'utilisation de substr() dans CTM::Base.
+    * 18/07/2014 - ajout du test 01init.t et d'un script d'exemple (get_bim_services.pl).
+    * 18/07/2014 - prise en compte du champ 'DAYTIME' avec ses variations (+/-) dans la fonction privee $_calculStartEndDayTimeInPosixTimestamp->() (fonctionnalite experimentale).
+    * 20/08/2014 - utilisation des modules List::MoreUtils et Date::Calc.
+* 0.18 (STABLE)
+    * 10/09/2014 - ajout de methodes de 'filtrage' (modification de l'objet) (keepItemsWithAnd() et keepItemsWithOr()) aux modules existants.
+    * 12/09/2014 - ajout d'une methode de clonage (clone() a travers $_clone() qui requiert le module Storable) pour les sous-modules de CTM::ReadEM.
+    * 13/09/2014 - modification des methodes countItems(), getItems(), getSOAPEnvelope() (modifs + -> generateSOAPEnvelope()), _getFromRequest(), _setSerials() et _refresh() (-> resetAndRefresh()).
+    * 24/09/2014 - mise a jour du Makefile.PL.
+    * 03/10/2014 - correction de typos, ajout de placeholders sur la quasi-totalite des requetes SQL des modules CTM et ajout de la methode publique getErrors().
+    * 24/10/2014 - Renommage de la methode getCurrentServices() en getCurrentBIMServices(), de la methode workOnCurrentServices() en workOnCurrentBIMServices() et du module CTM::ReadEM::WorkOnBIMServices en CTM::ReadEM::WorkOnCurrentBIMServices.
+    * 24/10/2014 - ajout des fonctions _myVerboseMessage() et _myUsageMessage(), des methodes protegees _tagAtWork() et _tagAtRest() et utilisation du module Sub::Name. Mise en place de constantes afin de regrouper plusieurs informations a propos d'informations internes aux modules CTM::*.
+    * 24/10/2014 - correction de nombreux typos.
+    * 24/10/2014 - modification des fonctions getExprFor* et des methodes keep* en raison de la fonctionnalite 'lexical_topic' (my $_) qui ne sera probablement pas integree a Perl de maniere stable.
+    * 24/10/2014 - mise a jour de la POD.
+    * 27/10/2014 - _myVerboseMessage() devient la methode _invokeVerbose(). Ajout de nombreuses methodes protegees/privees et de constantes pour les proprietes les plus importantes et utilisees dans les classes (principalement les proprietes privees).
+    * 27/10/2014 - ajout de la methode publique getParams() pour les sous-modules de CTM::ReadEM.
+    * 27/10/2014 - refonte de la POD.
+    * 29/10/2014 - suppression de la methode generateSOAPEnvelope(). generateSOAPEnvelope
+    * 30/10/2014 - DBMSTimeout -> DBMSConnectTimeout. Passage de la methode protegee _parentClass() en methode publique getParentClass(). getSessionIsConnected() -> getisSessionSeemAlive()
+* 0.181 (A VENIR)
+    * 01/11/2014 - mise en place des modules CTM, CTM::Base::MainClass et de la classe CTM::ReadServer (cette derniere ne fait rien pour le moment) et reorganisation partielle du code.
+    * 05/11/2014 - amelioration des methods keep* et des fonctions liees. Voir modifications de la POD.
+    * 05/11/2014 - amelioration de la methode _setSerials et des methodes publiques liees. Ces methodes ont desormais aussi un impact sur les donees de l'objet.
+* 0.19 (A VENIR)
+    * xx/xx/xxxx - ajout de classes/modules CTM::ReadEM::Work*::Items (un objet par item).
+* 0.191 (A VENIR)
+    * xx/xx/xxxx - ajout de methodes et des modules destines au requetage sur le Control-M CM (composants du Control-M EM uniquement).
+* 0.20 (A VENIR)
+    * xx/xx/xxxx - utilisation d'un ORM (DBIx::Class ou Rose::DB::Object).
+    * xx/xx/xxxx - implementation d'un timeout pour les appels DBI (execute(), do(), ...) probablement avec DBIx::Timeout.
+    * xx/xx/xxxx - debut de la mise a disposition de la classe CTM::ReadServer et de ses sous-modules.
+* 0.21 (A VENIR)
+    * xx/xx/xxxx - refonte via Moose.

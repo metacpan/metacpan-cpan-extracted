@@ -1,0 +1,232 @@
+Revision history for Config-AutoConf
+
+0.314	2017-03-30
+	- _get_extra_linker_flags: add library dirs
+
+0.313	2016-04-11
+	- release 0.312_001 without further changes
+
+0.312_001	2016-04-07
+	- fix "check_member" test (RT#113271)
+	- update Copyright notice
+	- add license files
+	- improve compile_if_else/link_if_else by proving whether object
+	  or binary file (compile result) exists
+	- fix some typos and other POD quirks
+	- Update README.md from updated POD
+
+0.311	2015-03-17
+	- fix check_member(s) - patch by jddurand
+
+0.310	2015-02-20
+	- Fix some typographical errors (by Peter Pentchev <roam@ringlet.net>)
+	- bump copyright timestamps
+	- add ribasushi to acknowledgements
+	- improve/correct meta information
+	- improve bundled POD
+
+0.309	2014-12-31
+	- Remove the -arch removal for Mac OS X.
+
+0.308	2014-12-26
+	- deal with "no C compiler available" properly (see RT#101121)
+
+0.307	2014-12-14
+	- no Changes since 0.306_002
+
+0.306_002	2014-12-08
+	- fix perl_api_link test for broken environments of some windows
+	  testers
+
+0.306_001	2014-12-01
+	- indent source as requested via issue#4 by Dave Rolsky
+	- consolidate check_... function on_*_true/false parameters
+	  (Thanks to Peter Rabbitson for being sounding board)
+	- introduce more Perlish tests whether XS build is sane:
+	  check_produce_xs_build, check_produce_loadable_xs_build
+	  (Thanks to Peter Rabbitson for being sounding board)
+	- extensive refactoring with some API modifcations (warned
+	  users via mail and issue#5)
+
+0.305	2014-06-12
+	- skip compiler based tests when compiler seems weird
+	- add check_sane_xs composition as discussed on cpan-workers@
+
+0.304	2014-06-01
+	- improve dealing with whitespaces in path's of programs
+	- reorder -lperl and $Config{perllibs} - let's see if that covers
+	  all smokers
+	- some minor speed improvements (micro-optimization, but ...)
+
+0.303	2014-05-29
+	- fix perl-api check for threaded perl's (by using XSUB.h)
+	- fix non-transient linking situations in perl link check
+	- cleanup temporary test dependecies
+
+0.302	2014-05-27
+	- fix for snooping smoke targets
+	- deal with older ExtUtils::MakeMaker versions (can't handle multiple
+	  authors)
+	- fix double "-lm" in negative test of libmath
+
+0.301	2014-05-26
+	- Adding log-file output tee'ing as proposed by H.Merijn Brand and
+	  rewrote tests against that API. Make perl.h compile test not TODO
+	  for smokers.
+
+0.300	2014-05-20
+	- add some code to tests to inspect the massive fail of 0.28
+	- include compiler invocation in log on failure
+	- add support for appending to logfiles (see t/ for examples)
+	- tidy Makefile.PL a bit and try to improve smoke results
+
+0.29	2014-05-19
+	- make perl extension tests optional - add support to analyse
+	  is scheduled for 0.300
+
+0.28	2014-05-18
+	- fix perl 5.6 support
+	- improve existing prog checks when binaries with default ars are
+	  returned
+	- honor environment variables as GNU Autoconf does
+	- add additional check_prog_... support fox lex and sed - most
+	  other checks aren't suitable until a reasonable "postamble"
+	  support is provided
+	- add support to prove whether perl development environment is
+	  "sane" (as far that can be told)
+	- add checks to prove for pureperl build
+
+0.27    2014-04-25
+        - fix broken Changes
+        - add some fixes for older Perls
+
+0.26    2014-04-23
+        - Fix pkg-config test as it's intended (allow testing without
+          pkg-config binary)
+        - fix C::AC complains about unset results
+
+0.25   2014-04-14
+        - Fix settings test that would complain with a duplicate plan
+          when no PkgConfig was present.
+
+0.24   2014-04-11
+        - Fix lost dependencies during Makefile.PL update
+        - add even core dependencies to support older Perls
+        - adjust $LIBEXT/$EXEEXT initialization to support HP-UX/HPPA
+
+0.23   2014-04-10
+        - bring back to 5.6 (Peter 'Ribasushi' Rabbitson)
+        - introduce pkg-config based checks (Jens 'Sno' Rehsack)
+        - fix spurious invocation issues (Jens 'Sno' Rehsack)
+        - Changes reformatted as per CPAN::Changes::Spec
+
+0.22   2012-12-11
+         - Flag some more tests as TODO.
+
+0.21   2012-12-02
+         - Flag -lm tests as 'TODO' as they might fail in some Windows
+           machines
+
+0.20   2012-11-09
+         - Add stdint.h into check_default_headers
+         - Make POD tests author only.
+
+0.19   2012-02-07
+         - Added new method, check_lm
+
+0.18   2012-02-02
+         - msg_methods msg prefix can be configured.
+         - Added new methods: (Jens Rehsack)
+           check_alignof_type, check_alignof_types, check_sizeof_type,
+           check_sizeof_types, compute_int, lang_build_bool_test,
+           check_dirent_header, push_compiler_flags, push_includes,
+           push_libraries, push_library_paths, push_link_flags,
+           push_preprocess_flags.
+
+0.17    2012-01-04
+        - Re-fixed tests that do not run in <= v5.010
+
+0.17_02 2012-01-03
+        - Fixed tests that do not run on older Perl version.
+
+0.17_01 2012-01-02
+        - New object oriented interface (Jens Rehsack)
+        - Added new methods: (Jens Rehsack)
+          cache_val, check_all_headers, check_cached, check_decl,
+          check_decls, check_default_headers, check_lib, check_member,
+          check_members, check_stdc_headers, check_type, check_types,
+          compile_if_else, define_var, lang_build_program, lang_call,
+          link_if_else, msg_checking, msg_error, msg_failure,
+          msg_notice, msg_result, msg_warn, pop_lang, push_lang,
+          search_libs, write_config_h
+        - check_headers rewritten (Jens Rehsack)
+        - Use proper 'extern "C"' code
+
+0.16    2010-09-23
+        - Config::AutoConf::Linker moved to ExtUtils::LibBuilder.
+
+0.15    2010-05-08
+        - Config::AutoConf::Linker more silent.
+
+0.14    2010-02-14
+        - Added rewind to Linker.pm module. This code is still under heavy tests.
+
+0.13    2009-06-02
+        - First stable release with code to detect how to build a C dynamic library.
+
+0.12_3  2009-06-01
+        - Trying other way arround to change LD_LIBRARY_PATH under
+          t/04, that was failing under FreeBSD.
+
+0.12_2  2009-05-19
+	- Added t/04 that was missing from MANIFEST
+
+0.12_1	2009-05-18
+	- Added code to detect how to build a library. 
+          It is a big, really big hack. Still not documented.
+
+0.11	2009-01-09
+	- check_prog with better support for Windows machines.
+
+0.10    2008-09-03
+	- Removed the tilde on my name, from Makefile.PL.
+	  Was generating some weird results on VMS and Solaris.
+
+0.09    2008-04-23
+	- Added 'check_headers?' methods to check for C heading files;
+	- fixed the deletion of .c files created by failing tests;
+	- Require perl 5.8.1 and ExtUtils::CBuilder 0.23
+
+0.08    2008-03-29
+	- require a 5.8 Perl 
+
+0.07	2008-03-19
+	- re-factored some tests to make them Win-aware
+
+0.06	2008-03-19
+	- added -quiet option to ExtUtils::CBuilder for less noise when 
+	  detecting things.
+
+0.05	2008-03-18
+	- added 'check_prog_yacc' method to check for a yacc implementation
+	  (see POD)
+
+0.04	2008-03-18
+	- adapt to new ExtUtils::CBuilder API
+
+0.03	2005-08-12
+	- Added 'check_file' and 'check_files' methods (kind of stupid methods)
+
+0.02	2005-02-14
+	- Moved from ExtUtils:: to Config::
+
+Previous releases
+	- Added 'check_prog' method to check for executable program
+	- Added 'check_progs' method to check for a list of programs
+	- Added 'check_prog_awk' method to check for an awk implementation
+	- Added 'check_prog_egrep' method to check for an egrep implementation
+	- first indexable version -- I need to use this module somewhere else;
+	- using ExtUtils::CBuilder to compile test;
+	- version correcting test for Mac OS-X (thanks, Michael Schwern);
+	- using Config module to get CC value and EXE extension;
+	- using ExtUtils::CBuilder (well take advantage of it later);

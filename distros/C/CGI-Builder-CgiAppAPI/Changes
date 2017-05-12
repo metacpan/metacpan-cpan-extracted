@@ -1,0 +1,58 @@
+CGI-Builder-CgiAppAPI Latest Versions Changes
+
+Version 1.27
+- Removed the internal use of lvalue assigments incompatible with
+  the perl-bug #17663 (Perl 5 Debugger doesn't handle properly lvalue
+  sub assignment)
+
+Version 1.26
+- Changed prerequisites to CGI::Builder 1.3, OOTools 2
+- Updated tests and POD to the new OOTools 2 behaviour.
+- A few minor changes
+
+Version 1.25
+- Changed prerequisites to CGI::Builder 1.26
+- Removed the SH, PH and OH constant from code
+- A few minor changes in the Makefile.PL and the POD
+
+Version 1.24
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+
+Version 1.23
+- Added the not page_content_check() condition before using
+  AUTOLOAD page handler
+
+Version 1.22
+- Minor POD changes
+
+Version 1.21
+- Changed Makefile.PL version check
+- Minor POD changes
+
+Version 1.2
+- Updated POD according to the latest changes in Apache::CGI::Builder
+- Changed the prerequisite C::B version to 1.2
+- Some internal changes to be more consistent with new 1.2 version
+
+Version 1.12
+- Eliminated useless 'use CGI::Application::Plus::Util' statement from
+  a few tests that caused failure on machines where CGI::Application::Plus
+  was not installed.
+
+Version 1.11
+- This version contains the real 1.1 files: the 1.1 distribution
+  file was a wrong outdated file. Sorry for the mismatch.
+
+Version 1.1
+- Adapted the test suite to the new 1.1 features
+- A few changes and default fixes
+
+Version 1.01
+- Mirrored CGI::Builder 1.01 fixing
+- Minor POD fixes
+
+Version 1.0
+- First public release

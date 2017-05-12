@@ -1,0 +1,36 @@
+Revision history for CGI-Application-NetNewsIface
+
+0.0203  2015-12-28
+    - Update away from old E-mail.
+
+0.0202  2014-01-26
+    - Add a repository to the META.yml/META.json.
+
+0.0201  2014-01-26
+    - Add missing prereq ("DBI") - Kwalitee.
+    - Add separate LICENSE.
+    - Stop shipping the Makefile.PL.
+    - Add t/cpan-changes.t and t/style-trailing-space.t .
+
+0.02    2008-06-08
+    - Added the init_cache__mysql() function to initialize a MySQL cache.
+      A MySQL-based cache works fine from what I tried.
+    - Added a meaningful main page and an about-this-app page.
+    - Added XML-RSS to the deps.
+
+0.0101  2006-05-13
+    - Bumped version to 0.0101
+    - First stable release.
+
+0.0100_02    2006-05-06
+    - Added the cache for making the threads' lookup faster.
+        - Currently DBI and DBD::SQLite only.
+    - Added a thread display to the individual article view.
+
+0.0100_01    2006-04-16
+    - Now installing the templates.
+        - Added the configured templates' directory to the tt_include_path.
+
+0.0100_00    2006-04-16
+    - First version, released on an unsuspecting world.
+

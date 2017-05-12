@@ -1,0 +1,108 @@
+#!./perl
+
+##########################################################################
+#                                                                        #
+# © Copyright IBM Corporation 2001, 2004. All rights reserved.           #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# Xue-Dong Chen - Creation and framework.                                #
+#                                                                        #
+# William Spurlin - defect fixes                                         #
+#                                                                        #
+# Seichii Tatsukawa - Windows dll linking and symbolic entrypoints       #
+#                                                                        #
+##########################################################################
+
+#api input: libatriaxxx, xxx.def, func1,func2,....funcx.
+#api output: xxx.def file
+
+$| = 1;
+
+$debug = $ENV{AUTODEF_DEBUG};
+
+open(CONFIG, $ARGV[0])||die "Missing conf file $ARGV[0]\n";
+while(<CONFIG>){
+    chop $_;
+    $_ || next;
+    next if /^\s*\#/;
+    unless($_ =~ /\w*#/){
+	   ($varname, $varval) = split("=", $_,2);
+	   $$varname = $varval;        #this is where you get $funcs
+	   if($varname eq 'DeBug'){
+	       $debug =1;
+	   }
+	   if($debug){print "\t $varname = $$varname\n";}
+       }
+}
+
+#funcs, defName, libName are defined in the .conf file
+@funcArray = split(/\s/,$funcs);
+$libDir = getLibDir();
+
+open DefFile, ">$defName" || die " Can't open $defName";
+print DefFile "LIBRARY $libName\n"; #first two lines of .def file
+print DefFile "EXPORTS\n";
+my $ordinal;
+for $funcName (@funcArray){
+    $ordinal = getOrdinal($funcName);
+    if($ordinal != -1){       #each exports ordinal
+        if ($funcName eq 'cmdsyn_proc_table') {
+            print DefFile "\t$funcName=_$funcName\tDATA\n";
+            print STDERR "ordinal: \t$funcName=_$funcName\n" if $debug;
+        }
+        else {
+            print DefFile "\t$funcName=_$funcName\n";
+            print STDERR "ordinal: \t$funcName=_$funcName\n" if $debug;
+        }
+    }else{
+	die "getOrdinal failed on $funcName\n";
+    }
+}
+close(DefFile);
+
+1;
+
+sub getLibDir{
+    if($ENV{'CLEARCASEHOME'}){
+	return ($ENV{'CLEARCASEHOME'} . "\\bin\\") ;
+    }elsif($ENV{'ATRIAHOME'}){
+	return ($ENV{'ATRIAHOME'} . "\\bin\\") ;
+    }elsif($ENV{'PATH'}){  
+	@aa = split(/;/,$ENV{'PATH'});
+	for(@aa){
+	    if($_ =~ /ClearCase\\bin/i){
+		return ($_ . "\\") ;
+	    }
+	}
+    }else{
+	die "Haven't set ClearCase path\n";
+    }
+}
+
+sub getOrdinal{
+    my $name =shift;
+    $libFP = $libDir.$libName . '.dll';
+    my $line = "";
+
+    $cmd = "dumpbin /exports \"$libFP\" ";
+    print STDERR "Dumpbin command: $cmd\n" if $debug;
+
+    @screen = `$cmd`;
+    for(@screen){
+	if(/$name/){
+	    $line = $_;
+	    last; #as break in C
+	}
+    }
+    if($line){
+	$line=~ tr/[0-9]/x/c;  #change all the non-digit to x
+	$line=~ tr/x/y/s;      #squeeze to multiple x to single y
+	@aa = split(/y/,$line); #split the string to digit array
+	return $aa[1];          #take the second one as ordinal
+    }
+    return -1;
+}

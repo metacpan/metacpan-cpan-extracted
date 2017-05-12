@@ -1,0 +1,32 @@
+0.07    Fri Apr 29 13:22:00 BST 2011
+        - Fix test failures by not using Test::use::ok
+
+0.06    Fri Dec 11 01:16:00 GMT 2009
+        - Significant updates to generated skeleton to use new features.
+          - Makefile.PL requires a reasonable version of Module::Install with
+            working auto_install
+          - Generated TestApp uses Catalyst 5.80
+          - Generated scripts for TestApp use Catalyst::ScriptRunner
+          - Generated compontent uses Moose and namespace::autoclean
+          - Pod tests generated moved to t/author
+          - M::I::AuthorRequires and M::I::AuthorTests used to run Pod tests.
+
+        - Moved application skeleton into the lib/auto directory so that
+          Module::Install's shonky install_share isn't used.
+
+0.05    Sun Dec 23 02:22:00 CST 2007
+        - cleanup the generated Makefile.PL
+
+0.04    Tue Sep  4 04:44:40 CDT 2007
+        - add T::W::M::C to the generated prereqs
+
+0.03    AGAIN ON THE SAME DAY
+        - indent generated POD so that search.cpan doesn't get confused
+        - no functional changes
+
+0.02    same day as 0.01!
+        - add no_index to the data dir, so PAUSE accepts the upload
+        - no functional changes
+
+0.01    Mon Sep  3 CDT 2007
+        - first release, world that doesn't suspect it, blah blah blah

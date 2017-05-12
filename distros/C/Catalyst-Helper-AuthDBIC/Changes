@@ -1,0 +1,43 @@
+0.17 24 Nov 2011
+     - Fix tests if Test::WWW::Mechanize::Catalyst isn't installed.
+0.16 12 Feb 2010
+     - Fix relationships/ keys in database so that we don't just blindly use auto-increment primary keys.
+0.15 15th Jan 2010
+0.14 Jul 9 2010
+     - Added missing dependency to fix cpantesters failure
+0.13 Jul 6 2010
+     - Fixed hard coded / for dir path to make things work in Windows (thanks Curtiss Jewel and rfulbrig RT #57648)
+0.12 Feb 20 2010
+     - applied patch from RT #47226 thanks to kmx
+     - apply patch from RT #54533 thanks to alfston pinto
+     - update for DBIx::Class::Schema::Loader 0.05
+0.11 Jan 31 2010
+     - Add parent.pm to dependencies.
+     - Make TWMC optional and do not run mech tests if it's not installed.
+0.10 Aug 27 2009
+     - Fix RT #49036 (thanks Tsvetozar Penov)
+0.09 Jun 18 2009
+     - Fix RT # 47075 (thanks KMX)
+0.08 May 28 2009
+     - Fix issue with Directory::Scratch in t/02-usage.t (thanks G.Wade Johnson)
+0.07 September 25 2008
+     - Don't want to generate templates unless using password cred.
+0.06 September 24 2008
+     - Moved from DBIx::Class::DigestColumns to DBIx::Class::EncodedColumn
+     - Added option for password or http credentials.
+0.05 Tue Sep 2 2008
+     - Bug fix for Multi::Level::App::Names
+     - Addition of model config to .conf file
+     - Changed from CatalystX starter to Module::Starter proper (make
+       installdeps now works)
+0.04 Mon Sep 1  2008
+     - Another stupid bug removed in Schema creation for Multi::Level::AppNames
+0.03 Mon Sep 1  2008
+     - Remove the UNIVERSAL::require dep
+     - Fix app_name to do the right thing with Multi::Level::AppNames
+0.02 Sun Aug 31 2008
+     - Changed Auth::Schema to $appname::Auth::Schema
+     - Added user admin scripts to script/myapp_adduser.pl
+0.01 Wed Aug 20
+     - Initial very rough release
+

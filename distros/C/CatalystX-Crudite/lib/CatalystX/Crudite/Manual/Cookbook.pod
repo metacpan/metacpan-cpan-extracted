@@ -1,0 +1,44 @@
+=head1 NAME
+
+CatalystX::Crudite::Manual::Cookbook - Miscellaneous recipes
+
+=head1 Introduction
+
+In all recipes, replace strings like C<MyApp>, C<myapp> and C<MYAPP> with the
+appropriately cased versions of your actual web application name.
+
+=head1 Using multiple configurations
+
+Problem: You want to use several configurations, for example, for testing,
+    staging and production environments.
+
+Solution: Use the standard C<Catalyst::Plugin::ConfigLoader> mechanisms.
+
+Create a configuration file C<myapp_test.yaml>:
+
+    Model::DB:
+        connect_info:
+            dsn: "DBI:Pg:database=myapp_test;host=localhost"
+            user: foobar
+            password: foobar
+
+and another file C<myapp_stage.yaml>:
+
+    Model::DB:
+        connect_info:
+            dsn: "DBI:Pg:database=myapp_stage;host=localhost"
+            user: foobar
+            password: foobar
+
+And so on for each of your deployment environments. Now you can choose which
+configuration file to use by setting a special environment variable to the file
+name suffix:
+
+    export MYAPP_CONFIG_LOCAL_SUFFIX=test
+    export MYAPP_CONFIG_LOCAL_SUFFIX=stage
+
+The configuration in these files overrides your global configuration that is
+stored in C<lib/MyApp.pm>.
+
+=cut
+

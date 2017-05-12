@@ -1,0 +1,98 @@
+[% 
+    link = '<a href="http://search.cpan.org/dist/' _ distribution _ '">' _ distribution _ "</a>"
+    crosslink = '/distro/' _ letter _ '/' _ distribution _ '.html'
+
+    rss = distribution _ '.rss'
+    onload = 'onload="init()"'
+    htmltitle = 'Reports for ' _ distribution
+    title = 'Reports for ' _ link
+
+    box_prefs = 1 ;
+    box_summ  = 1 ;
+
+    crumb3_name = 'Distributions' ;
+    crumb3_href = '/' ;
+    crumb2_name = letter ;
+    crumb2_href = '/distro/' _ crumb2_name ;
+    crumb1_name = distribution ;
+%]
+
+<input type="hidden" id="dist_pref" name="dist" value="[% distribution %]" />
+
+<div class="orange_buttons">
+<a rel="nofollow" href="[% distribution %].json">JSON</a>
+<a rel="nofollow" href="[% distribution %].rss" >RSS</a>
+<a rel="nofollow" href="[% distribution %].yaml">YAML</a>
+</div>
+
+[% IF processed %]<p>This page was last updated on <strong>[% processed %]</strong>.</p>[% END %]
+
+[% IF update %]
+<div class="ud">
+<p>Please note that this page is in an update queue, and as such the latest data may not be currently available.</p>
+</div>
+[% END %]
+
+<noscript>
+<div class="nv">
+<p><strong>THIS SITE REQUIRES YOUR BROWSER TO HAVE JAVASCRIPT ENABLED</strong></p>
+<p>Due to the high volume of reports, in order to more easily manage the
+display listings, Javascript is used to filter the reports displayed.</p>
+<p>If you wish to view the static version of this page, please 
+<a href="http://static.cpantesters.org/distro/[% letter %]/[% distribution %].html">click here</a>.</p>
+</div>
+</noscript>
+
+[% IF stats_poff %]
+<h2>PASS Summary</h2>
+<p>The following table lists the most recent version of [% distribution %] to 
+have had at least one PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+
+<div class="container">
+<table class="test_results">
+<tr><th><img src="/images/headings/perlversion.png" alt="Perl Version" /></th>
+[% FOREACH os IN stats_oses %]
+<th><img src="/images/headings/[% IF os ; THEN ; os | lower ; ELSE ; 'blank' ; END %].png" alt="[% os %]" /></th>
+[% END %]
+</tr>
+[% FOREACH perl IN stats_poff %]
+[% IF perl != '0' %]
+<tr>
+<td><small>[% perl %]</small></td>
+[% FOREACH oses IN stats_oses %]
+[% os = oses | lower %]
+[% IF stats.$perl.$os.version %]<td class="PASS"><small>[% stats.$perl.$os.version %]</small></td>[% ELSE %]<td></td>[% END %]
+[% END %]
+</tr>
+[% END %]
+[% END %]
+</table>
+</div>
+
+<p>See also: Full PASS statistics for <a href="http://pass.cpantesters.org/distro/[% letter %]/[% distribution %].html">[% distribution %]</a></p>
+[% END %]
+
+<h2>Selected Reports</h2>
+<p>This page details the test reports submitted for the CPAN distribution [% link %].</p>
+<p>To view individual reports, please click the grade text associated with each report.</p>
+
+<p><strong>Module version:</strong> <select name="version" id="version" onChange="displayReports();"></select></p>
+
+<div id="modulehead"></div>
+
+    <table class="test_results">
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Perl version</th>
+          <th>OS name</th>
+          <th>OS version</th>
+          <th>Architecture</th>
+        </tr>
+      </thead>
+      <tbody id="report_data">
+	  <tr><td colspan="5">Data loading please wait ....</td></tr>
+      </tbody>
+    </table>

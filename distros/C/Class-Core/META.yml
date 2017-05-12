@@ -1,0 +1,25 @@
+---
+abstract: 'Class wrapper system providing parameter typing, logging, and class auto-instanitation.'
+author:
+  - 'David Helkowski <cpan@codechild.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Core
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Exporter: 0
+  Test::More: 0
+  XML::Bare: 0.48
+version: 0.04

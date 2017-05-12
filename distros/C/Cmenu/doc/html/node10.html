@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>menu_item</TITLE>
+<META NAME="description" CONTENT="menu_item">
+<META NAME="keywords" CONTENT="Cmenu">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Cmenu.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html168"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html164"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html158"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html166"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html169"
+  HREF="node11.html">menu_display</A>
+<B> Up:</B> <A NAME="tex2html165"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html159"
+  HREF="node9.html">menu_init</A>
+ &nbsp <B>  <A NAME="tex2html167"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00054000000000000000">
+menu_item</A>
+</H2>
+Creates a menu item; the main element of the module. Called like this;
+<DIV ALIGN="CENTER">
+menu_item("menu text","label",$type,"tag","format");
+
+</DIV>
+
+<P>
+<DL>
+<DT><STRONG>menu text</STRONG></DT>
+<DD>(mandatory) the menu's descriptive text
+</DD>
+<DT><STRONG>label</STRONG></DT>
+<DD>a text label associated with the menu item; unless over-ridden, this will be returned when an option is selected
+</DD>
+<DT><STRONG>$type</STRONG></DT>
+<DD>the type of a menu item controlling its rendering and behaviour
+<DL>
+<DT><STRONG>0 default</STRONG></DT>
+<DD>simple menu option returning the label if selected
+</DD>
+<DT><STRONG>1 numeric</STRONG></DT>
+<DD>instead of text labels, offers numeric options
+</DD>
+<DT><STRONG>2 radio list</STRONG></DT>
+<DD>a radio list selects ONLY one from a list
+</DD>
+<DT><STRONG>3 check list</STRONG></DT>
+<DD>a check list select any (including none) from a list
+</DD>
+<DT><STRONG>4 data label</STRONG></DT>
+<DD>a regular label usually used to accompany data fields for information only
+</DD>
+<DT><STRONG>5 display</STRONG></DT>
+<DD>a right-aligned label for data information fields
+</DD>
+<DT><STRONG>6 alpha-edit</STRONG></DT>
+<DD>an editable textfield
+</DD>
+<DT><STRONG>7 numeric-edit</STRONG></DT>
+<DD>an editable numeric field
+</DD>
+<DT><STRONG>8 encoded</STRONG></DT>
+<DD>for fields from a database it is often convenient to display a descriptive label but requiring a different return value
+</DD>
+<DT><STRONG>9 spacer</STRONG></DT>
+<DD>like a comment, create a spacre-line in the menu
+</DD>
+</DL>
+</DD>
+<DT><STRONG>tag</STRONG></DT>
+<DD>only used in some item types to contains alternate return values (type 8) or indicate active list selections (types 2 or 3)
+</DD>
+<DT><STRONG>format</STRONG></DT>
+<DD>for editable fields specifies the field size and numeric formating; phrased as a space seperate list like <B>"25 2 0"</B> which has field-width 25 and 2 decimal places. (I forget why I wanted the third digit)
+</DD>
+</DL>
+
+<P>
+For a demonstration of all these options and how to use them in real menus, run and play with the included <B>demo</B> script.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html168"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html164"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html158"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html166"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html169"
+  HREF="node11.html">menu_display</A>
+<B> Up:</B> <A NAME="tex2html165"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html159"
+  HREF="node9.html">menu_init</A>
+ &nbsp <B>  <A NAME="tex2html167"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Andy Ferguson (AFC)
+2001-10-20
+</ADDRESS>
+</BODY>
+</HTML>

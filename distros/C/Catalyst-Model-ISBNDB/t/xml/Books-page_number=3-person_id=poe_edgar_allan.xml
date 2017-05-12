@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:25Z">
+<BookList total_results="252" page_size="10" page_number="3" shown_results="10">
+<BookData book_id="complete_works_of_edgar_allan_poe_the_virginia_edition" isbn="0404094007">
+<Title>Complete Works of Edgar Allan Poe: The Virginia Edition</Title>
+<TitleLong>Complete Works of Edgar Allan Poe: The Virginia Edition (17 vol set)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="ams_pr_inc">Ams Pr Inc</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Hardcover; 2002-05" dewey_decimal_normalized="" lcc_number="" change_time="2006-08-30T14:56:40Z" price_time="2006-10-08T07:55:20Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Complete Works of Edgar Allan Poe. Salesman's Sample" store_url="http://isbndb.com/x/book/complete_works_of_edgar_allan_poe_the_virginia_edition/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:50:57Z" currency_rate="1" price="37.5" />
+<Price store_isbn="" store_title="Complete Works of Edgar Allan Poe: The Virginia Edition (17 vol set)" store_url="http://isbndb.com/x/book/complete_works_of_edgar_allan_poe_the_virginia_edition/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:50:58Z" currency_rate="1" price="77.88" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="criticism_a06" isbn="0585051836">
+<Title>Criticism</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:18:21Z" price_time="2006-10-08T07:55:23Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085979 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_literature">American literature</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:18:21Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-criticism_a06-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="diddling" isbn="0585051860">
+<Title>Diddling</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:20:06Z" price_time="2006-10-08T07:55:26Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085982 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:20:06Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-diddling-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="east_and_agamemnon_and_the_fall_of_the_house_of_usher" isbn="0714536105">
+<Title>East; [and], Agamemnon; [and], The fall of the house of Usher</Title>
+<TitleLong></TitleLong>
+<AuthorsText>[by] Steven Berkoff</AuthorsText>
+<PublisherText publisher_id="j_calder_distributed_by_calder">London : J. Calder : [Distributed by Calder and Boyars], 1977.</PublisherText>
+<Details dewey_decimal="" physical_description_text="139 p. : ill. ; 21 cm. --" language="eng" edition_info="£4.95" dewey_decimal_normalized="" lcc_number="PR6052" change_time="2004-09-12T08:54:39Z" price_time="2006-10-08T07:55:30Z" />
+<Summary></Summary>
+<Notes>Agamemnon and The fall of the house of Usher have been adapted from the originals.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="East and Other Plays (Playscript ; 78)" store_url="http://isbndb.com/x/book/east_and_agamemnon_and_the_fall_of_the_house_of_usher/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:50:58Z" currency_rate="1" price="9.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Arizona" last_update="2004-09-12T08:54:39Z" marc_url="http://isbndb.com/x/libdata/isbndb-127-east_and_agamemnon_and_the_fall_of_the_house_of_usher-20040912.mrc" />
+<MARC library_name="University of Colorado, Boulder" last_update="2005-12-20T22:23:19Z" marc_url="http://isbndb.com/x/libdata/isbndb-311-east_and_agamemnon_and_the_fall_of_the_house_of_usher-20051220.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="berkoff_steven">Berkoff, Steven</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poes_tales_of_mystery_and_madness" isbn="0689848374">
+<Title>Edgar Allan Poe's Tales of Mystery and Madness</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, Gris Grimly</AuthorsText>
+<PublisherText publisher_id="atheneum">Atheneum</PublisherText>
+<Details dewey_decimal="" physical_description_text="7.3&quot;x9.3&quot;x0.6&quot;; 144 pages; 1.2 lb" language="" edition_info="Hardcover; 2004-09-01" dewey_decimal_normalized="" lcc_number="" change_time="2004-12-29T23:39:51Z" price_time="2006-10-08T07:55:35Z" />
+<Summary>A sweet little cat drives a man to insanity and murder.... The grim death known as the plague roams a masquerade ball dressed in red.... A dwarf seeks his final revenge on his captors.... A sister calls to her beloved twin from beyond the grave.... Prepare yourself. You are about to enter a world where you will be shocked, terrified, and, though you'll be too scared to admit it at first, secretly thrilled. Here are four tales -- The Black Cat, The Masque of the Red Death, Hop-Frog, and The Fall of the House of Usher -- by the master of the macabre, Edgar Allan Poe. The original tales have been ever so slightly dismembered -- but, of course, Poe understood dismemberment very well. And he would shriek in ghoulish delight at Gris Grimly's gruesomely delectable illustrations that adorn every page. So prepare yourself. And keep the lights on.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-21T06:41:51Z" currency_rate="1" price="17.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780689848377" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-22T19:05:21Z" currency_rate="1" price="13.01" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=87438078&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-22T19:05:23Z" currency_rate="1" price="12.73" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:50:59Z" currency_rate="1" price="13.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="12.83" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="12.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="12.74" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="10.69" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="10.61" />
+<Price store_isbn="" store_title="Edgar Allan Poes Tales M" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:01Z" currency_rate="1" price="11.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:01Z" currency_rate="1" price="11.75" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D36414538%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:04Z" currency_rate="1" price="10.5" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0689848374&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="17.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:28Z" currency_rate="1" price="18.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:28Z" currency_rate="1" price="13.46" />
+<Price store_isbn="" store_title="Edgar Allan Poes Tales of Mystery and Madness Product 2609902" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2609902&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:44Z" currency_rate="1" price="11.82" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poes_tales_of_mystery_and_madness/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:35Z" currency_rate="1" price="13.36" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_childrens_books_literature_classics_by_age_genera">Amazon.com -- Children's Books -- Literature -- Classics by Age -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_science_fiction__aaaa0">Amazon.com -- Children's Books -- Literature -- Science Fiction, Fantasy, Mystery &amp; Horror -- Spine-Chilling Horror</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_short_story_collection">Amazon.com -- Children's Books -- Literature -- Short Story Collections</Subject>
+<Subject subject_id="amazon_com_horror_united_states">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_childrens_books_ages_9_12_general">Amazon.com -- Children's Books -- Ages 9-12 -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_series_classics_scribners_illustr">Amazon.com -- Children's Books -- Series -- Classics -- Scribner's Illustrated Classics</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="grimly_gris">Grimly, Gris</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a05" isbn="0806908203">
+<Title>Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited by Brod Bagert; illustrated by Carolynn Cobleigh</AuthorsText>
+<PublisherText publisher_id="sterling_pub_co">New York : Sterling Pub. Co., c1995.</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="48 p. : col. ill. ; 27 cm." language="eng" edition_info="$14.95" dewey_decimal_normalized="811.3" lcc_number="" change_time="2003-11-01T07:30:25Z" price_time="2006-10-08T07:55:39Z" />
+<Summary>A collection of thirteen poems and eight prose selections  from larger works.</Summary>
+<Notes>"A Magnolia Editions book"--T.p. verso.
+
+Includes index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-07-06T11:10:02Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780806908205" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-06T11:10:02Z" currency_rate="1" price="2.1" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe " store_url="http://www.biblio.com/details.php?dcx=63335491&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-06T11:10:02Z" currency_rate="1" price="1.82" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="11.21" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:00Z" currency_rate="1" price="10.55" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe (Poetry For Young People)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:01Z" currency_rate="1" price="1.65" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe (Poetry For Young People)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:01Z" currency_rate="1" price="1.65" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe (Poetry For Young People)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:01Z" currency_rate="1" price="10.17" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:02Z" currency_rate="1" price="9.21" />
+<Price store_isbn="" store_title="Poetry for Young People: Edgar Allan Poe (Poetry for Young People)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:02Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Edgar Allen Poe" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30163708%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="9.65" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0806908203&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:29Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a05/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="11.21" />
+<Price store_isbn="" store_title="Poetry for Young People Edgar Allan Poe Product 314863" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.314863&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:50Z" currency_rate="1" price="9.83" />
+</Prices>
+<Subjects>
+<Subject subject_id="childrens_poetry_american">Children's poetry, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Boulder Public Library (Boulder, CO)" last_update="2003-11-01T07:30:25Z" marc_url="http://isbndb.com/x/libdata/isbndb-11-edgar_allan_poe_a05-20031031.mrc" />
+<MARC library_name="Jeffersonville Township Public Library (Jeffersonville, IN)" last_update="2004-07-25T11:35:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-96-edgar_allan_poe_a05-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="bagert_brod">Bagert, Brod</Person>
+<Person person_id="cobleigh_carolynn">Cobleigh, Carolynn</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a07" isbn="0841411468">
+<Title>Edgar Allan Poe</Title>
+<TitleLong>Edgar Allan Poe; a centenary tribute</TitleLong>
+<AuthorsText>by William P. Trent [and others] Edited by Heinrich Ewald Buchholz</AuthorsText>
+<PublisherText publisher_id="folcroft_library_editions">[Folcroft, Pa.] Folcroft Library Editions, 1972 [c1910]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="102 p. illus. 23 cm." language="eng" edition_info="(lib. bdg.)" dewey_decimal_normalized="818.309" lcc_number="PS2635" change_time="2003-11-04T05:29:52Z" price_time="2006-09-08T14:23:32Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849">Poe, Edgar Allan,1809-1849</Subject>
+<Subject subject_id="authors_american_19th_century_biography">Authors, American -- 19th century -- Biography</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Indiana University" last_update="2003-11-04T05:29:52Z" marc_url="http://isbndb.com/x/libdata/isbndb-49-edgar_allan_poe_a07-20031103.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="trent_william_peterfield">Trent, William Peterfield</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a26" isbn="0517092905">
+<Title>Edgar Allan Poe</Title>
+<TitleLong>Edgar Allan Poe: sixty-seven tales</TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="gramercy_books">New York : Gramercy Books ; 1990.</PublisherText>
+<Details dewey_decimal="" physical_description_text="xii, 753 p. ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PS2603" change_time="2004-07-27T00:09:25Z" price_time="2006-10-03T19:41:10Z" />
+<Summary></Summary>
+<Notes>Previously published as: Works of Edgar Allan Poe. 1985.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-02T00:53:58Z" currency_rate="1" price="13.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="0.62" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="13.99" />
+<Price store_isbn="" store_title="" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=3033619" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="11.89" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:45Z" currency_rate="1" price="9.88" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780517092903" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30088165%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="12.59" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="13.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales The Narrative of Arthur Gordon Pym of Nantucket/the Raven and Other Poems" store_url="46152057&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="10.49" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:46Z" currency_rate="1" price="8.1" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="10.49" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Sixty-Seven Tales" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="0.78" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="11.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="13.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe Sixty Seven Tales" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0517092905&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:47Z" currency_rate="1" price="13.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe Sixty-Seven Tales Product 419599" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.419599&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:34:48Z" currency_rate="1" price="9.79" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a26/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-03T19:41:10Z" currency_rate="1" price="13.99" />
+</Prices>
+<Subjects>
+<Subject subject_id="detective_and_mystery_stories_american">Detective and mystery stories, American</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Arizona" last_update="2004-07-27T00:09:25Z" marc_url="http://isbndb.com/x/libdata/isbndb-127-edgar_allan_poe_a26-20040726.mrc" />
+<MARC library_name="North Carolina (Coastal) Database" last_update="2006-03-02T03:20:57Z" marc_url="http://isbndb.com/x/libdata/isbndb-122-edgar_allan_poe_a26-20060301.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a27" isbn="0517053586">
+<Title>Edgar Allan Poe</Title>
+<TitleLong>Edgar Allan Poe: sixty-seven tales</TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="gramercy_books">New York : Gramercy Books ; 1990.</PublisherText>
+<Details dewey_decimal="" physical_description_text="xii, 753 p. ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PS2603" change_time="2004-07-27T00:09:26Z" price_time="2006-10-04T21:19:44Z" />
+<Summary></Summary>
+<Notes>Previously published as: Works of Edgar Allan Poe. 1985.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="14.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Works, Deluxe Edition" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="30.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Works, Deluxe Edition" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="12.53" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=2619746" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="16.99" />
+<Price store_isbn="" store_title="Selected Works" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0517053586&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="19.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="14.11" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Works, Deluxe Edition" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="12.75" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe: Sixty-Seven Tales: One Complete Novel and Thirty-One Poems: Complete and Unabridged" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="8.94" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="14.29" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Works, Deluxe Edition" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="14.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Works, Deluxe Edition" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:43Z" currency_rate="1" price="19.99" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:44Z" currency_rate="1" price="19.99" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780517053584" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:44Z" currency_rate="1" price="9.44" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:44Z" currency_rate="1" price="6" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:45Z" currency_rate="1" price="14.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:45Z" currency_rate="1" price="82.5" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30088120%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:45Z" currency_rate="1" price="12.91" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe: Sixty-seven Tales: One Complete Novel and Thirty-one Poems: Complete and Unabridged" store_url="92683855&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:04:46Z" currency_rate="1" price="8.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe Selected Works Deluxe Edition Product 419660" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.419660&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:04:49Z" currency_rate="1" price="18.39" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe - Poe, Edgar Allan *NEW" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:34:46Z" currency_rate="1" price="10.76" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a27/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T21:19:44Z" currency_rate="1" price="19.99" />
+</Prices>
+<Subjects>
+<Subject subject_id="detective_and_mystery_stories_american">Detective and mystery stories, American</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Arizona" last_update="2004-07-27T00:09:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-127-edgar_allan_poe_a27-20040726.mrc" />
+<MARC library_name="North Carolina (Coastal) Database" last_update="2006-03-02T03:20:57Z" marc_url="http://isbndb.com/x/libdata/isbndb-122-edgar_allan_poe_a27-20060301.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a40" isbn="0785814531">
+<Title>Edgar Allan Poe</Title>
+<TitleLong>Edgar Allan Poe: Complete Tales &amp; Poems</TitleLong>
+<AuthorsText>Edgar Allan Poe, Wilbur Stewart Scott (Introduction)</AuthorsText>
+<PublisherText publisher_id="castle_books">Castle Books</PublisherText>
+<Details dewey_decimal="" physical_description_text="842 pages" language="" edition_info="Hardcover; 2002" dewey_decimal_normalized="" lcc_number="" change_time="2005-10-25T15:22:07Z" price_time="2006-09-14T05:04:01Z" />
+<Summary>This collection of 73 short stories and 48 poems includes such masterpieces as The Fall of the House of Usher, The Purloined Letter, The Tell-Tale Heart, The Raven, and Murders in the Rue Morgue.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-07-27T14:53:04Z" currency_rate="1" price="12.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe Tales &amp; Poems (2002) Like New" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-12T04:25:14Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="12.93" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="9.74" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="6" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="7.29" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="11.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:03:59Z" currency_rate="1" price="11.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:04:00Z" currency_rate="1" price="6.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:04:00Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780785814535" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:04:00Z" currency_rate="1" price="7.71" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-14T05:04:00Z" currency_rate="1" price="9.1" />
+<Price store_isbn="" store_title="Edgar Allan Poe Complete Tales &amp; Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a40/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-14T05:04:00Z" currency_rate="1" price="9.52" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tale &amp; Poems" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33832871%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-14T05:04:01Z" currency_rate="1" price="11.69" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Tales &amp;amp; Poems " store_url="http://www.biblio.com/details.php?dcx=87642270&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T05:04:01Z" currency_rate="1" price="9.99" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="scott_wilbur_j">Scott, Wilbur J.</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

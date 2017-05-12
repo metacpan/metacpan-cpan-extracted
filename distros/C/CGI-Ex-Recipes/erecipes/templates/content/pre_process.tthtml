@@ -1,0 +1,22 @@
+[%
+#setting up variables,blocks,macros,etc which are available for all templates 
+base_url         = app.cgix.object.url( base=1 );
+relative_url     = app.cgix.object.url( relative=1 );
+install_path_url = script_name.replace( relative_url _ '.*$','');
+url              = app.cgix.object.url();
+dbh              = app.dbh;
+today            = app.strftmime("%Y-%m-%d ", app.now);
+
+#load some plugin
+USE menu = Menu({recurse => 5});
+
+%] 
+[%#
+    well some macros allso
+-%]
+[%- MACRO option( item ) BLOCK; %]
+<option value="[% item.id %]">[% item.title %]</option>
+[% END -%]
+[%- MACRO optgroup( optlist ) BLOCK; -%]
+
+[%- END -%]

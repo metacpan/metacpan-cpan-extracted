@@ -1,0 +1,18 @@
+
+module Cplx
+{
+	struct Complex
+	{
+		float	re;
+		float	im;
+	};
+
+	interface CalcCplx
+	{
+		Complex Add(in Complex val1, in Complex val2);
+
+		Complex Sub(in Complex val1, in Complex val2);
+	};
+};
+
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "Convert between perl data structures and ASN.1 encoded packets",
+   "author" : [
+      "Graham Barr <gbarr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-ASN1",
+   "no_index" : {
+      "directory" : [
+         "lib/Convert/ASN1",
+         "t",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "1.997",
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbarr/perl-Convert-ASN1/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/perl-Convert-ASN1.git",
+         "web" : "https://github.com/gbarr/perl-Convert-ASN1"
+      }
+   },
+   "version" : "0.27"
+}
+

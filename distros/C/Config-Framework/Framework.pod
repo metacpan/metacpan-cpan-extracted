@@ -1,0 +1,658 @@
+=head1	NAME
+
+Config::Framework - handy one-stop shopping for (most) of your configuration file needs.
+
+=head1	SYNOPSIS
+
+#create a new object, load two configuration files and decrypt the passwords.
+my $Object = new Config::Framework(
+	Files		=> ['ApplicationCfg.xml','UserCfg.xml'],
+	GetSecure	=> 1
+) || die $Config::Framework::errstr;
+
+
+#change some data in one of the loaded configs
+$Object->{'UserCfg'}->{'backgroundColor'} = '#00CCFF';
+
+#write that change back to the file you loaded it from
+$Object->WriteConfig(configNamespace => "UserCfg") || die $Object->{'errstr'};
+
+#Define a new configuration namespace
+%{ $Object->{'newConfig'} } = (
+	'configNamespace'	=> "newConfig",
+	'protectNamespace'	=> 1,
+	'Version'			=> 1,
+	#arbitrary data keys follow
+	'backgroundColor'	=> '#006699',
+	'getRecords'		=> 10,
+	'followLinks'		=> 1,
+	'someThing'			=> "in a bag"
+);
+
+#Write your new configuration data out to an encrypted file
+#under the application's ApplicationFramework directory
+$Object->WriteConfig(
+	configNamespace	=> "newConfig",
+	Encrypt			=> 1,
+	Crypt			=> "Rijndael",
+	Key				=> "l33tp4sw3rd"
+	File			=> "$Object->{'FrameworkDir'}/newConfig.xml"
+) || die $Object->{'errstr'};
+
+=head1	OVERVIEW
+
+At long last I have decided to re-write the documentation for Config::Framework, in a manner which
+should be comprehensible by people other than myself. I would like to offer my sincerest appologies
+to anyone who tried to comprehend the sprawling stream-of-consiousness rant that was the previous
+'documentation'. I'm sorry, I wasn't trying to make you insane. Now on with the show.
+
+Ok so what is Config::Framework?
+It's a handy module for dealing with situations where you need your program to be able to load 
+external data from a file that controls how your program operates. I'm talking about configuration
+files here. So what do you do in a situation like that? Well you figure out a format to store your
+configuration parameters in, then write routines to read that format and put it some sort of 
+meaningful data structure, and to write data from the data structure back out to the file.
+
+Wouldn't it be nice if someone defined a standard config file format so that you wouldn't need
+to write your own parser? Well in the end, all a config file really is, is an arbitrary data
+structure expressed in in ascii. A standard way of serializing data structures in ascii you say?
+That sounds a bit like XML! Well the Data::DumpXML module will serialize perl data structures
+into XML and restore them for you, and you could certainly dump that to a file easily enough.
+
+Ok getting to the point. The main thing that Config::Framework does for you is to define a standard
+data structure (or at least some standard guidelines for your data structure) and then front-ends
+Data::DumpXML so that you can arbitrarily dump and restore these data structures to files.
+
+While we're at it, Config::Framework aspires to be your 'one-stop-shop' for config-type-stuff, by
+helping you stay organized in the way you handle external configuration data.
+
+
+
+=head1	Directories
+
+When it comes to your program needing to load external files, things can quickly get messy.
+Config::Framework helps you stay organized with this by defining a directory structure that you
+can use for all of your programs.
+
+=head2	The Virtual Root
+
+Config::Framework defines something called the 'virtual root'. This is a master directory underneath
+which all of your programs, and all of the things that they might need to load or operate correctly
+would live. 
+
+When you first build the Config::Framework module, the Makefile.PL will prompt you to enter a
+directory to use for your Virtual Root. This will be the default Virtual Root for all objects that
+you create. That is whenever you create a new Config::Framework object, unless you specify a 
+different Virtual Root (via the 'v_root' option) the directory you entered when you were building
+the module will be your Virtual Root.
+
+Let me give you a quick example of why this is important. I had a rather large group of perl
+programs, some of which I had written, others which i had inherited from others. All of them lived
+beneath a certain directory structure which was allocated for my department by the unix help-desk.
+Almost all of these programs had one file or annother which they would need to load to run, all of
+the paths were hard-coded. One day help-desk decided to change our directory. Mass confusion, and 
+one REALLY LONG night of me picking through all of the programs trying to change hard-coded file
+paths ensued. Had I been using Config::Framework, all I would have needed to do was rebuild the
+module with a new virtual root. Well that's the story of why I started development on this module.
+Aaaah yes, those were good times ...
+
+=head2	The Config Location
+
+Under the Virtual Root, Config::Framework defines a subdirectory, beneath which it is presumed
+you will be keeping all of your configuration files. This is referred to as the "Config Location"
+or $object->{'config_loc'}. As with the Virtual Root, you will be prompted for a default config
+location when you build the module. You can override the default config location by specifying
+the 'config_loc' option at instantiation. When you load a configuration file, Config::Framework
+will look for it here first (unless otherwise specified). Generally speaking, you should put 
+"Global" configuration data here, that is, configuration data that all programs might use.
+
+=head2	The Framework Directory
+
+Beneath the Config Location, Config::Framework expects to see a subdirectory named
+"ApplicationFrameworks". Beneath that should be subdirectories for various programs. For instance,
+if I had a program called "Skeletor" and it needed a configuration file called "Skeletors_Config.xml",
+a gif called "trogdor.gif", and a berkley DB file called Skel.db, I would create a directory under
+the Virtual Root in the Config Location under the ApplicationFrameworks directory called Skeletor,
+and I'd put Skeletors_Config.xml, trogdor.gif, and Skel.db in there. Sounds confusing. It isn't
+here's annother go at that:
+
+Virtual Root 	= /prod
+Config Location	= config
+
+cd /prod/config/ApplicationFrameworks/Skeletor;
+ls;
+Skeletors_Config.xml	trogdor.gif		Skel.db
+
+Got it? Ok so every program that needs to load specific external files should have a directory 
+beneath the ApplicationFrameworks directory that corresponds to it's program name. In that directory
+is where you should put everything that the program might need to load. Things that multiple programs
+might need to load should be put at the root level of the config location.
+
+When you load a config file with Config::Framework, the second place it looks (after the config
+location) is the subdirectory of ApplicationFrameworks that corresponds to the program's name.
+
+
+
+=head1	Access to your data!
+
+Ok so that pretty much lays out how things are kept organized in the filesystem. How about
+organizing access to all these gobbs of data? I'm glad you asked, 'cause I was gonna tell you anyhow.
+You might recall that I mentioned earlier that the heart of Config::Framework was a standard data
+structure for your configuration data which is serialized and stored in a file, and then miraculously
+restored to perl data-structure-hood via the Data::DumpXML facility. Before I lay out exatly what
+that standard data structure is (well actually it's pretty much just some guidelines), let me tell
+you about a really cool name I came up with: "configNamespace". This really cool, complicated
+sounding thing is a word I came up with to describe the concept of having more than one set of
+configuration data resident in the Config::Framework object at one time. For instance, I may have a 
+global configuration file that holds some general purpose data like the hostname of my oracle server
+and the port that my SSL server listens on. Stuff that lots of programs might want to know. In 
+annother config file, I might have some application specific data like the maximum number of multiple
+process for this program I want to have running at once, and a regular expression matching record
+numbers for a certain database. I would want to have them both loaded with my Config::Framework
+object at the same time, so I needed to come up with a way that I could differentiate between the
+two sets of config data. So what I did was to make each config file define a 'configNamespace' under
+which it resides in the Config::Framework object. That's a fancy ways of saying it's a string that
+happens to be a hash key in the object. This is a key concept for using Config::Framework. For 
+instance, back in my example, I could make the global config file define the configNamespace 'global',
+and the application specific file define the configNamespace 'myApp'. So to access the global data
+I would look under $object->{'global'} and for the app specific data I would look under 
+$object->{'myApp'}.
+
+
+
+
+=head1	The Data Structure
+
+Well like I said this is more of a guideline than it is a standard. Only the mandatory parts are,
+well mandatory. The rest is just a suggestion. For instance, you don't need to include information
+about the autors or module dependancies, However, if you WANTED to include that information, this is
+how I suggest that you do it. Ok, strap on your perl hats, here we go:
+
+The data structure is basically a giant hash:
+
+%DATA	= (
+	
+	## Mandatory Information ########################
+
+	#the configNamspace to load this data under in the Config::Framework object
+	'configNamespace'	=> $configNamespace,
+	
+	#throw an error if this configNamespace is attempted to be overwritten (by loading
+	#annother config with the same configNamespace) if set to non-zero value.
+	'protectNamespace'	=> 1 | 0,
+	
+	#revision of this configuration
+	'Version'			=> $version_number,
+	
+	
+	## Optional Config Meta Data ####################
+	
+	#date corresponding to the last revision of this configuration
+	'Date'				=> $date_in_epoch_format,
+	
+	#automatically load these files and nest their configNamespaces underneath this one.
+	'children'			=> [$file_name, $file_name, ... ]
+	
+	
+	## Author Data ##################################
+	
+	#name of the lead developer for this project
+	'Lead Developer'		=> $lead_developer_name,
+	
+	#lead developer's email address
+	'Lead Developer Email'	=> $lead_developer_email,
+	
+	#the others in the development team
+	'Developers'			=> [ 'array','of','other','developers' ],
+	
+	
+	## Program Specific Keys ########################
+	
+	#would go here. Any goofy thing you want.
+	
+);
+
+And that's pretty much it.
+
+
+
+=head1	Passwords
+
+Passwords are one special kind of config data that programs frequently need to load. For instance,
+do you have a program that needs to talk to a database? How about one which needs to talk to an
+SSL Website? Well then it probably needs to have a username and password. It's kind of bad form to
+have passwords and usernames hard-coded into programs. Especially if you have lots of programs, then
+you have both the nightmare of updating all of the hard-coded passwords in each program when the 
+password gets changed, as well as the security risk of having a password in perhaps tens or hundreds
+of individual files. One option is to stick those usernames and passwords in a configuration file
+or course, so that many programs can access the same file. However, you've still got your passwords 
+hanging out 'in the nude' in a file somewhere waiting to be discovered. Config::Framework provides 
+some built-in options to help you, if not eliminate, to at least to mitigate that risk.
+
+Config::Framework knows how to decrypt a file encrypted with any of the Crypt::* modules
+which is Crypt::CBC compliant. When you specify the 'GetSecure' option at object instantiation, 
+Config::Framework knows to look for a file called 'passwds.xml' located at the root level of the 
+config directory.
+
+When you build Config::Framework, the Makefile.PL will ask you for a Crypt::* module to use to
+and a passphrase to use to decrypt and encrypt this file. Sure, the passphrase is still 'in the nude'
+somewhere buried in your perl distributions lib/ directory, and theoretically, someone could go
+digging through that directyory, and find the passphrase, then use it to get all of the passwords in
+your passwds.txt. However, it's better than nothing. Like I said this mitigates the risk a bit, it
+dosen't eliminate it. At the moment there really aren't any good systems available to perl to handle
+passwords securely. At least this way, you have your password access abstracted a bit, so when 
+something like that comes along, we can add support to Config::Framework.
+
+
+=head1	Logging / Alerts
+
+Ok something that's not config file related, but is none-the-less important, and so is therefore
+included in the one-stop-shop that is Config::Framework is the ability to keep log files, and to let
+someone know when something bad has happened with your program.
+
+When you build Config::Framework, you are prompted to enter the email address of someone who
+should be notified when a program using Config::Framework dies unexpectedly. This is a bit misleading.
+An alert will not be sent to this address automatically, you must catch your own exceptions and 
+call the AlertAdmin function with your alert message.
+
+As with all of the other default parameters gathered durring the build process, this address can
+be overridden at object instantiation. To override the admin address send a new email address on the
+'admin' object at instatiation.
+
+Config::Framework also provides support for appending messages to alert files via the 'Log' method.
+
+
+
+
+
+
+=head1	Alrighty Then
+Ok so that's pretty much what Config::Framework does. How about the specifics?
+Read on courageous programmer!
+
+
+
+=head1	new	(constructor)
+
+This creates a new Config::Framework
+
+my $object = new Config::Framework( [options] ) || die $Config::Framework::errstr
+
+=head2	options
+
+=over
+
+=item	program
+
+This is the 'name' of the program. This defailts to the name of the executable file if you don't
+specify it explicitly.
+
+=item	v_root
+
+This is the 'Virtual Root': the directory under which all of the external things your program will 
+need to live happily reside. (See above section: 'Virtual Root'). If not specified explicitly, this
+value defaults to the virtual root specified when the module wad built.
+
+=item	config_loc
+
+This is the directory beneath 'v_root' which contains all Config::Framework loadable config files
+as well as the ApplicationFramework directories (see above section 'The Config Location'). If not 
+specified explicitly, this value defaults to the 'config_loc' specified when the module was built.
+
+=item	sendmail
+
+This is the path to the sendmail executable, which we pipe directly to when sending alerts via the
+AlertAdmin method. If not explicitly defined, this value defaults to the path to sendmail given when
+the module was built.
+
+=item	admin
+
+This is the email address of the person whom we should send email alerts to by deefault when the
+AlertAdmin method is called. If not explicitly defined, this value defaults to the admin address 
+given when the module was built.
+
+=item	Crypt
+
+This is the Crypt::* module to use when encrypting or decrypting encrypted configuration files, such
+as the infamous passwds.txt. (See the 'Passwords' section above). Keep in mind that whatever Crypt::*
+module you specify must be Crypt::CBC compliant, and of course, you must have it installed already!
+If not explicitly defined, this value defaults to the Crypt::* module specified when the module was
+built.
+
+=item	Key
+
+This would be the passphrase to use when encrtpying or decrpting encrypted configuration files,
+again, such as that infamous passwds.txt (see 'Passwords' section above). If not explicitly defined,
+this value defaults to the passphrase given when the module was built.
+ 
+=item	EnvExportList
+
+This is a sticky-wicket, thrown in for backward compatibility. This is an array conaining a list of
+strings which are data keys which you would like to have exported to the shell environment. There
+are 5 default members of this list:
+	'SYBASE',
+	'ORACLE_HOME',
+	'ORACLE_SID',
+	'ARTCPPORT',
+	'LD_LIBRARY_PATH'
+This means that if you happen to have defined any of these options, either explicity at 
+instantiation, or through the build process as a default option, the values associated with these
+options will be exported to your sheel environment. Mucking with this is hardly ever worthwhile, if
+you're looking for a quick and easy way to export stuff to the shell environment, check out the 
+'Export' option.
+
+
+=item	Export
+
+This is a hash refrence of variable names and values that you would like to have exported to the 
+processes shell environment. For example to set the 'BLAH' variable to "ain't it grand?", you could
+do this:
+
+$object = new Config::Framework( Export => { 'BLAH' => "ain't it grand?" } );
+
+=item	SYBASE
+
+if you have a sybase client libraries installed, and you would like to set the environment variable
+SYBASE to this value, you can specify it here and it will be exported. (it's part of the default
+'EnvExportLIst'). If you don't explicity define this, and you did define it duirring the build
+process, it will be exported to your shell environment by default. This is meant to be the path to
+the Sybase client library distribution.
+
+=item	ORACLE_HOME
+
+the path to the oracle client librarry distribution. Like SYBASE, this is in the default 
+EnvExportList, so if you define it, expect for it to be exported to the processes shell environment
+
+=item	ORACLE_SID
+
+the SID of an oracle database you would like to connect to. A default member of EnvExportList
+(see above).
+
+=item	ARTCPPORT
+
+the port that you would like to talk to a Remedy ARS server on. A default member of EnvExportList
+(see above).
+
+=item	LD_LIBRARY_PATH
+
+linker library path. believe it or not, you need to have this defined for a whole lot of things to
+run correctly under *nix. So if you defined a library location under v_root when you were building
+the module, this will be exported to the processes shell environment. You can also, obviously 
+specify it explicitly here.
+
+=item	GetSecure
+
+If set to a non-zero value, this will cause Config::Framework to automatically load and decrypt the
+encrypted config file 'passwds.txt' under v_root/config_loc.
+
+=item	File
+
+This is a list of config files to load before returning the object. Well this can either be a string
+containing one file name, or an array reference contaiing multiple file names. Keep in mind that
+each file must define it's own unique configNamespace for this to work correctly.
+
+=item	LoadChildren
+
+if set to a non-zero value will automatically load all child configs specified in any config that
+is loaded into the object. The default value for this object is 1. To override this behaviour, just
+set the option to 0.
+
+=back
+
+
+
+=head1	LoadConfig
+
+This loads a configuration file into the object under the configNamespace specified in the file.
+If there is already data loaded under this configNamespace in the object, and the protectNamespace
+option is set in the existing config data, an error will be thrown.
+
+$object->LoadConfig(File => $file_name) || die $object->{'errstr'};
+
+=head2	options
+
+=over
+
+=item	File
+
+this should be a string containing the filename of the file containing configuration data that you
+would like to load. The file is looked for in the following locations: IF the file exists as you have
+specified it (that is if you specified the full path to some file, and it exists there) then the 
+file will be loaded. Otherwise, if it exists in the root level of v_root/config_loc (the location for
+global configuration files) it will be loded from there. Else if it exists in
+v_root/config_loc/ApplicationFrameworks/$object->{'program'} (where $object->{'program'} is the name
+of the program (see 'new (constructor)' above), then it loaded from that directory. Lastly, if
+the file is not found in any of those locations, we look in the home directorry of the user executing
+the process (this is determined via $ENV{'HOME'}). Using this precendenc allowes a great deal of
+flexibility ... just remember to keep tour config file names unique! ;-)
+
+=item	configNamespace
+
+IF the file you are loading DOES NOT specify it's own configNamespace, you can specify one explicity
+in the function call using this parameter. This should be a string you would like to use for the 
+configNamespace-less file you are loading.
+
+=item	Parent
+
+you may specify a parent namespace under which to nest the configNamespace of the file you are
+loading. For instance. If I have an application called 'Daleks' which has a config file with a
+configNamespace of 'Dalek' and a user preferences file which specifies the configNamespace
+'usersDalekConfig', then I might do something like:
+
+
+$object->LoadCondfig(
+	File	=> "usersDalekConfig.xml",
+	Parent	=> "Dalek"
+);
+
+this would load the user-specific config file UNDER the 'Dalek' configNamespace, so that I could 
+access the user-specific data thusly
+
+$object->{'Dalek'}->{'usersDalekConfig'}->{'someKey'};
+
+=item	Crypt
+
+LoadConfig has the capability to decrypt and load config files encrypted via one of the CBC compliant
+Crypt::* modules. This option specifies the Crypt::* subclass that you would like to use to decrypt
+the specified config file (presuming it is encrypted). For instance, if you wanted to load 
+the file "mySecretConfig.xml" which was encrypted using the Crypt::Rijndael module you would do
+something like:
+
+$object->LoadConfig(
+	File	=> "mySecretConfig.xml",
+	Crypt	=> "Rijndael",
+	Key		=> $mySecretKey
+) || die $object->{'errstr'};
+
+NOTE: this option defaults to the Crypt::* subclass specified when the module was built, if not
+explicitly defined either at this function call or at object instantiation.
+
+=item	Key
+
+(see Crypt option above). This is the passphrase to be used to decrypt the configuration file using
+the Crypt::* subclass specified on the 'Crypt' option.
+
+NOTE: this option defaults to the passphrase specified when the module was built, if not
+explicitly defined either at this function call or at object instantiation.
+
+=back
+
+
+
+=head1	WriteConfig 
+
+This will write the data under some configNamespace in the object to the file it was loaded out of, 
+or alternately to a different specified file. Encrypted data is handled transparently.
+
+$object->WriteConfig(configNamespace => "usersDalekConfig.xml") || die $object->{'errstr'};
+
+=head2	options
+
+=over
+
+=item	configNamespace (required)
+
+This should be a string indicating the configNamespace that you want to dump back into the spcified
+file. Obviously, the configNamespace that you specify must already exist in the current object.
+
+=item	File
+
+This is the file that you want to write the data contained in the specified 'configNamespace' back
+out to. If this option is not specified explicitly, then the file from which the specified 
+configNamespace was loaded is used. The same file location precidence that is used in LoadConfig
+is maintained here. That if the file as specified is not writeable, then we look first under
+v_root/config_loc, then v_root/config_loc/ApplicationFrameworks/$object->{'program'} and lastly
+in the user's home directory.
+
+=item	Encrypt
+
+if set to a non-zero value, this will cause the file which is being written out to be encrypted with
+either the specified Key and Crypt or the default options given when the module was built.
+NOTE: setting this option is not necessary if you are writing data back to a file which was encrypted
+when you originally loaded it, this option is only necesary if you are encrypting a file which was
+not previously encrypted, or if you are creating a new encrypted file.
+
+=item	Crypt
+
+This should be the CBC compliant Crypt::* subclass that you would like to use encrypt the data.
+If not specified, this option defaults to the value givne when the module was built. For more 
+information, see ReadConfig.
+
+=item	Key
+
+This should be a string contining the passphrase you want to use to encrypt the data with the
+specified CBC compliant Crypt::* subclass. For more information, see ReadConfig.
+
+=back
+
+
+
+=head1	LoadXMLConfig
+
+This function will load any specified file in the Data::DumpXML DTD. If a binary file is specified
+it is presumed to be encrypted. Encrypted files are decrypted using either a specified Crypt::*
+module and passphrase, or the default options specified when the module was built. Data is returned
+via a hash reference, and is NOT loaded directly into the object.
+
+$data = $object->LoadXMLConfig(File => "path/to/some/file.xml") || die $object->{'errstr'};
+
+This is the backend to LoadConfig which handles inserting config data into the object under the
+correct configNamespace, and also handles child configs and nested namespaces. If you just want to
+get some raw data out of a file in the Data::DumpXML dtd, which might possibly be encrypted using 
+a Crypt::* module which is CBC compliant, then this is the method you're looking for.
+
+=head2	options
+
+=over
+
+=item	File
+
+again, this is a string containing the complete path to and name of the file you would like to load.
+No location precidence mathing occurs here, you must specify the entire path and file you want to 
+load.
+
+=item	Crypt
+
+This would be the CBC compliant Crypt::* subclass that you would like to use to decrypt the given 
+file, presuming it is, in fact, encrypted. (See LoadConfig method)
+
+=item	Key
+
+This would be the passphrase you'd like to use to decrypt the (presumably encrypted) config data 
+using the CBC compliant Crypt::* sublcass you specified above. (see LoadConfig method)
+
+=back
+
+
+
+=head1	AlertAdmin
+
+This will email an alert to the address specified by either the 'To' option, or the default address
+specified when the object was built. Additionally, the method can optionally copy the message to a
+group of addresses, log the message to a file, or call the die() routine. This is accomplished
+via a piped shell process which calls the sendmail binary. If we are unable to open a pipe to the
+sendmail process, as a last resort we will attempt to append the specified message to a logfile
+located at v_root/var/log/last_resort.log.
+
+$object->AlertAdmin(
+	Message	=> "I can't log in to the database, bailing out!",
+	Log		=> "copy/this/message/to/my/log/file.txt",
+	Die		=> 1
+) || die $object->{'errstr'};
+
+=head2	options
+
+=over
+
+=item	To	(optional)
+
+a string containing the address to send the 'Message' to, or alternately, a reference to an array
+containing a list of multiple addresses to use. If not explicitly specified, this option defaults to
+the admin address given when the module was built.
+
+=item	Message	(required)
+
+a string (possibly a very long one) which contains the data you would like to send.
+
+=item	Log
+
+if specified, this will cause the method to attempt to append the 'Message' to the specified
+log file, tagged with the current date and time.
+
+=item	Die
+
+if set to a non-zero value, this will cause the program to terminate itself after sending the
+'Message'
+
+=item	ENV
+
+if set to a non-zero value, this will cause the method to append the entire contents of the global
+%ENV hash to the end of the 'Message'
+
+=back
+
+
+
+=head1	Log
+
+This will append the given 'Message' to the specified 'Log' file. The log file is presumed to
+live beneath v_root somewhere. If you want to use system-wide loging locations, you might want to
+use sym-links to accomplish that.
+
+TO DO: add syslog support via Net::Syslog or Sys::Syslog so that messages can be logged to a remote
+syslog server or put in the machine's local syslog. That's far less ghetto than appending messages 
+via the open >> method.
+
+$object->Log(
+	Message	=> "hey, I wasn't able open that file, moving on to the next one!",
+	Log		=> "path/under/v_root/to/my/log/file.txt"
+) || die $object->{'errstr'};
+
+=head2	options
+
+=over
+
+=item	Log
+
+this should be the complete path to (starting under v_root) and name of the file you want to put log 
+messages in.
+
+=item	Echo
+
+if set to a non-zero value, this will cause the 'Message' to be warn'd to the console in addition to
+being appended to the file. (good for debug modes).
+
+=item	Message
+
+this is the message you would like to have placed in the log file. The message will be prepended with
+the date and time in epoch format, enclosed in brackets. For instance the call above would result
+in something like this appearining in the file "path/under/v_root/to/my/log/file.txt":
+
+[1064852564]: hey, I wasn't able open that file, moving on to the next one!
+
+=item	Die
+
+if set to a non-zero value, this will cause the process to terminate after writing the message to
+the specified log file.
+
+=back

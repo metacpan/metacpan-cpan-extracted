@@ -1,0 +1,174 @@
+package Chloro::Manual::Groups;
+
+# ABSTRACT: Repeatable groups in forms
+
+
+
+=pod
+
+=head1 NAME
+
+Chloro::Manual::Groups - Repeatable groups in forms
+
+=head1 VERSION
+
+version 0.06
+
+=head1 WHAT'S A REPEATABLE GROUP?
+
+Chloro provide a feature called "repeatable groups", or just "groups", in
+forms.
+
+The idea is simple. It's quite common to have a group of fields in your form
+that you want to repeat. Maybe you want to offer a fixed number of
+repetitions, or you might let the user add additional groups through
+Javascript.
+
+A good example would be phone numbers. The group might consist of a select
+field for phone numbers types (Home, Mobile, Work) and a text input for the
+phone number itself.
+
+Processing this sort of data can be tricky. You need to associate each group
+with a specific phone number, and you need to distinguish new phone numbers
+from updates to existing numbers.
+
+Chloro supports all of this through the use of groups.
+
+=head1 GROUP DEFINITION
+
+A group consists of a "repetition field" and a set of repeatable fields. The
+repetition field is a field that contains the keys that define each
+group. Typically, this will be some combination of database ids and
+identifiers for new fields.
+
+Here's a group definition for our phone number group:
+
+    group phone_number => (
+        repetition_key => 'phone_number_id',
+        (
+            field phone_number_type => (
+                isa      => 'Int',
+                required => 1,
+            ),
+        ),
+        (
+            field phone_number => (
+                isa      => 'NonEmptyStr',
+                required => 1,
+            ),
+        ),
+    );
+
+The extra parentheses around the field definition are simply there so that the
+first C<field()> subroutine call doesn't consume everything that comes after
+it.
+
+The corresponding HTML for phone number group might look something like this:
+
+    <div class="phone-number">
+      <input name="phone_number_id" type="hidden" value="42" />
+
+      <select name="phone_number.42.phone_number_type">
+        <option value="1">Home</option>
+        <option value="2">Mobile</option>
+      </select>
+
+      <input name="phone_number.42.phone_number" type="text" />
+    </div>
+
+    <div class="phone-number">
+      <input name="phone_number_id" type="hidden" value="59" />
+
+      <select name="phone_number.59.phone_number_type">
+        <option value="1">Home</option>
+        <option value="2">Mobile</option>
+      </select>
+
+      <input name="phone_number.59.phone_number" type="text" />
+    </div>
+
+If we provided Javascript to add new phone numbers, it could repeat all of
+these fields, replacing the C<phone_number_id> with something like "new1",
+"new2", etc.
+
+=head1 EMPTY GROUPS
+
+If you provide a Javascript mechanism to add or delete groups, it's possible
+that you'll end up with groups that don't actually have any useful data.
+
+By default, a group is empty if I<all> of its fields are empty. However, you
+can define a custom C<is_empty_checker> to decide if a group has data or not.
+
+In our example above, it would be possible to have a group that just contains
+a type, but no phone number. In that case, we want to check for a phone number
+to determine whether a group is empty:
+
+    package MyApp::Form::Contact;
+
+    group phone_number => (
+        ...,
+        is_empty_checker => '_phone_number_is_empty',
+    );
+
+    sub _phone_number_is_empty {
+        my $self   = shift;
+        my $params = shift;
+        my $prefix = shift;
+        my $group  = shift;
+
+        my $key = "$prefix.phone_number";
+
+        return defined $params->{$key} && length $params->{$key};
+    }
+
+The C<is_empty_checker> is called as a method on the form object. It receives
+three arguments.
+
+The first argument are the parameters passed to the C<< $form->process() >>
+method.
+
+The second is the group's prefix, which is a combination of the group name and
+one of the values in the C<repetition_key>, something like "phone_number.42".
+
+The third argument is the L<Chloro::Group> object for this group.
+
+=head1 GROUP RESULTS
+
+Grouped field data is handled differently from regular fields when generating
+results. When you call C<< $resultset->results_as_hash() >>, you'll get a data
+structure back like this:
+
+    {
+        phone_number_id => [ 42, 59 ],
+        phone_number => {
+            42 => {
+                phone_number_type => 1,
+                phone_number      => '783-555-1236',
+            },
+            59 => {
+                phone_number_type => 2,
+                phone_number      => '524-555-5619',
+            },
+    }
+
+No matter how many phone numbers are present, the C<phone_number_id> field
+(our C<repetition_key>) will always contain an array reference. The values for
+the C<repetition_key> field will not include keys for empty groups.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

@@ -1,0 +1,169 @@
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use Encode;
+use Test::More;
+use Catalyst::Test 'TestApp';
+use JSON::MaybeXS 1.003000 ':legacy';
+
+plan tests => 47;
+
+BEGIN {
+    no warnings 'redefine';
+    if ( $Catalyst::VERSION < 5.89 ) {
+        *Catalyst::Test::local_request = sub {
+            my ( $class, $request ) = @_;
+
+            require HTTP::Request::AsCGI;
+            my $cgi = HTTP::Request::AsCGI->new( $request, %ENV )->setup;
+
+            $class->handle_request;
+
+            return $cgi->restore->response;
+        };
+    } else {
+        *Catalyst::Test::local_request => sub {
+            my ( $class, $request ) = @_;
+            my $app = ref($class) eq "CODE" ? $class : $class->_finalized_psgi_app;
+
+            my $ret;
+            require Plack::Test;
+            Plack::Test::test_psgi(
+                app    => sub { $app->(%{ $_[0] }) },
+                client => sub { $ret = shift->($request) },
+            );
+            return $ret;
+        };
+
+    }
+}
+
+my $entrypoint = "http://localhost/foo";
+
+{
+    my $request = HTTP::Request->new( GET => $entrypoint );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->code, 200, 'Response Code' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+
+    my $data = from_json($response->content);
+    is $data->{json_foo}, "bar";
+    is_deeply $data->{json_baz}, [ 1, 2, 3 ];
+    ok ! $data->{foo}, "doesn't return stash that doesn't match json_";
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo2" );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->code, 200, 'Response Code' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+
+    my $data = from_json($response->content);
+    is_deeply( $data, [1, 2, 3] );
+}
+
+{
+    my $request = HTTP::Request->new( GET => $entrypoint . "?cb=foobar" );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->code, 200, 'Response Code' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+
+    my $body = $response->content;
+    ok $body =~ s/^foobar\((.*?)\);$/$1/sg, "wrapped in a callback";
+
+    my $data = from_json($body);
+    is $data->{json_foo}, "bar";
+    is_deeply $data->{json_baz}, [ 1, 2, 3 ];
+    ok ! $data->{foo}, "doesn't return stash that doesn't match json_";
+}
+
+{
+    my $request = HTTP::Request->new( GET => $entrypoint . "?cb=foobar%28" );
+
+    ok( my $response = request($request), 'Request' );
+    like $response->header('X-Error'), qr/Invalid callback parameter/,;
+}
+
+{
+  ##
+    my $request = HTTP::Request->new( GET => "http://localhost/foo3" );
+
+    ok( my $response = request($request), 'Request' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+    ok decode('utf-8', $response->content);
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo4" );
+
+    ok( my $response = request($request), 'Request' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=euc-jp' ] );
+    ok decode('euc-jp', $response->content);
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo3" );
+    $request->header("User-Agent", "Safari");
+
+    ok( my $response = request($request), 'Request' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+    my $bom = substr $response->content, 0, 3;
+    is $bom, "\xEF\xBB\xBF";
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo3" );
+    $request->header("User-Agent", "Safari");
+
+    ok( my $response = request($request), 'Request' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+    my $bom = substr $response->content, 0, 3;
+    is $bom, "\xEF\xBB\xBF";
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo3" );
+    $request->header("X-Prototype-Version", "1.5");
+
+    ok( my $response = request($request), 'Request' );
+    ok $response->header('X-JSON');
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo5" );
+    $request->header("X-Prototype-Version", "1.5");
+
+    ok( my $response = request($request), 'Request' );
+    ok !$response->header('X-JSON');
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/foo6" );
+
+    ok( my $response = request($request), 'Request' );
+    my $data = from_json($response->content);
+    is $data->{foo}, "fake";
+}
+
+{
+    my $request = HTTP::Request->new( GET => "http://localhost/warnmsg" );
+
+    ok( my $response = request($request), 'Request' );
+    ok( $response->is_success, 'Response Successful 2xx' );
+    is( $response->code, 200, 'Response Code' );
+    is_deeply( [ $response->content_type ], [ 'application/json', 'charset=utf-8' ] );
+
+    my $data = from_json($response->content);
+    is $data->{json_foo}, "bar";
+    is_deeply $data->{json_baz}, [ 1, 2, 3 ];
+    is $data->{'foo'}, 'barbarbar';
+}

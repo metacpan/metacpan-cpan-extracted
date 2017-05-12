@@ -1,0 +1,73 @@
+README for Class::DBI::Loader::Informix
+
+Introduction
+===========
+
+This package provides a Class::DBI::Loader implementation and a Class::DBI
+sub class that will enable these modules to work nicely with the Informix
+database management system.
+
+Prerequisites
+=============
+
+This module requires Class::DBI, Class::DBI::Loader and DBD::Informix 
+(and all of their prerequisites) to operate.  It has been tested with
+the versions specified in the Makefile.PL.
+
+Installation
+============
+
+Install the module by executing the following in the directory where you have
+unpacked the module distribution:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You may need to use a different program than make on various different OS.
+
+You will need to run the last step as a user with sufficient permissions to
+create files in the Perl library directories - if you require the module to
+be installed in an alternative location then you should run the first step as:
+
+   perl Makefile.PL PREFIX=/my/library/directory
+
+You will need to then specify the appropriate location with :
+
+   use lib '/my/library/directory';
+
+
+BUGS
+====
+
+This has only tested with IDS 9.40.UC2E1 and 10.UC5 and could well be using
+specific features of those databases.  If reporting a bug please
+specify the server version that use are using. 
+
+
+SUPPORT
+=======
+
+All bug reports and patches should be made via RT at:
+
+   bug-Class-DBI-Loader-Informix@rt.cpan.org
+
+That way I'm less likely to ignore them.
+
+
+AUTHOR
+======
+
+Jonathan Stowe <jns@gellyfish.com>
+
+
+COPYRIGHT AND LICENSE
+=====================
+
+This library is free software and comes with no warranty whatsoever.
+
+It can be distributed under the same terms as Perl itself.
+
+Copyright (c) 2006 Jonathan Stowe
+

@@ -1,0 +1,114 @@
+NAME
+    README - README for FormBuilder 3.0, please also see Changes
+
+DESCRIPTION
+    I hate form generation and validation because the majority of the
+    process is tedious and mindless. In addition to being boring, there is
+    too much room for simple error, which could render your application
+    insecure or just plain useless.
+
+    So I wrote FormBuilder to try and get rid rid of the stoopid parts, as
+    well as take care of some tricky parts. As a result, you can build a
+    complete application with something like this:
+
+        use CGI::FormBuilder;
+
+        # Assume we did a DBI query to get existing values
+        my $dbval = $sth->fetchrow_hashref;
+
+        # First create our form
+        my $form = CGI::FormBuilder->new(
+                        fields   => [qw(name email phone gender)],
+                        header   => 1,
+                        method   => 'POST',
+                        values   => $dbval,
+                        validate => {
+                           email => 'EMAIL',
+                           phone => '/^1?-?\d{3}-?\d{3}-?\d{4}$/',
+                        },
+                        required => 'ALL',
+                        stylesheet => '/path/to/style.css',
+                   );
+
+        # Change gender field to have options
+        $form->field(name => 'gender', options => [qw(Male Female)] );
+
+        if ($form->submitted && $form->validate) {
+            # Get form fields as hashref
+            my $fields = $form->fields;
+
+            # Do something to update your data (you would write this)
+            do_data_update($fields->{name}, $fields->{email},
+                           $fields->{phone}, $fields->{gender});
+
+            # Show confirmation screen
+            print $form->confirm;
+        } else {
+            # Print out the form
+            print $form->render;
+        }
+
+    That simple bit of code would print out an entire form, laid out in a
+    table. Your default database values would be filled in from the DBI
+    hashref. It would also handle stickiness across multiple submissions
+    correctly, and it will also be able to tell if it's been submitted.
+    Finally, it will do both JavaScript and server-side validation too.
+
+KEY FEATURES
+    Here's the main stuff that I think is cool:
+
+  Input field abstraction
+    You simply define your fields and their values, and this module will
+    take care of figuring out the rest. FormBuilder will automatically
+    generate the appropriate input fields (input, select, radio, etc), even
+    changing any JavaScript actions appropriately.
+
+  Easy handling of defaults
+    Just specify a hash of values to use as the defaults for your fields.
+    This will be searched case-insensitively and displayed in the form.
+    What's more, if the user enters something via the CGI that overrides a
+    default, when you use the "field()" method to get the data you'll get
+    the correct value.
+
+  Correct stickiness
+    Stickiness is a PITA. FormBuilder correctly handles even multiple values
+    selected in a multiple select list, integrated with proper handling of
+    defaults.
+
+  Multiple submit mode support
+    Related to the above, FormBuilder allows you to reliably tell whether
+    the person clicked on the "Update" or "Delete" button of your form,
+    normally a big pain.
+
+  Robust field validation
+    Form validation sucks, and this is where FormBuilder is a big help. It
+    has tons of builtin patterns, and will even generate gobs of JavaScript
+    validation code for you. You can specify your own regexps as well, and
+    FormBuilder will correctly check even multivalued inputs.
+
+  Template driver support
+    FormBuilder can natively "drive" several major templating engines,
+    including "HTML::Template", "Template Toolkit", and "Text::Template". if
+    you want to build a form application with a template in less that 20
+    lines of Perl, FormBuilder is for you.
+
+SUPPORT
+    If this is your first time using FormBuilder, you should check out the
+    website for tutorials and examples at <http://formbuilder.org>.
+
+    You should also consider joining the google group at
+    <http://groups.google.com/group/perl-formbuilder>. There are some pretty
+    smart people on the list that can help you out.
+
+    Have fun!
+
+INSTALLATION
+    For details on installation, please read the file "INSTALL".
+
+AUTHOR
+    Copyright (c) Nate Wiger <http://nateware.com>. All Rights Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

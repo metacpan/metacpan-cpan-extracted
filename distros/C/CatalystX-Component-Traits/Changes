@@ -1,0 +1,61 @@
+Revision history for CatalystX::Component::Traits
+
+0.19 2014-01-13 10:03:31
+    - remove newline from ABSTRACT
+
+0.18 2014-01-11 15:54:11
+    - convert to dzil
+
+0.17 2014-01-02 13:32:00
+    - Fix RT#91014
+
+0.16 2010-08-26 19:07:00
+    - Neglected to bump the version in last release.
+
+0.15 2010-08-25 19:09:00
+    - Change excludes to -excludes when using MooseX::Traits::Pluggable
+      to avoid the deprecation warning.
+    - Change primary repository URI in metadata
+
+0.14  2009-11-08 05:43:37
+    - minor code cleanup
+
+0.13  2009-11-07 21:14:11
+    - Fix merging singular traits rather than lists of traits.
+
+0.12  2009-10-30 16:47:15
+    - add support for root-level components
+
+0.11  2009-10-30 14:25:56
+    - fix bug with apps named CatalystX::<something>
+
+0.10  2009-08-27 10:47:08
+    - bump dep on MooseX::Traits::Pluggable
+
+0.09  2009-08-26 12:50:44
+    - fix trait merge bug (when not merging)
+
+0.08  2009-07-29 23:39:30
+    - Require Module::Pluggable 3.9 to avoid test failures.
+    - More verbose error when traits cannot be found, including full search path.
+
+0.07  2009-07-26 15:11:55
+    - fix incompatibility with perl 5.8
+
+0.06  2009-07-20 21:44:13
+    - configurable trait merging support
+
+0.05  2009-07-17 23:46:43
+    - Correctly pass the application class into component constructors
+
+0.04  2009-07-16 13:01:02
+    - updated algorithm to handle CatalystX:: namespaced things
+
+0.03  2009-06-15 16:11:11
+    - changed trait search algorithm to the one agreed to on #catalyst-dev
+
+0.02  2009-06-14 17:08:55
+    - fix for namespaced apps
+
+0.01  2009-06-13 22:30:38
+    - first release

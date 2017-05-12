@@ -1,0 +1,14 @@
+Build.PL
+ChangeLog
+INSTALL
+lib/Class/DBI/Pageset.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-new.t
+t/01-pageset.t
+t/02-pageset-html.t
+t/96-kwalitee.t
+t/98-pod.t
+t/99-podcoverage.t

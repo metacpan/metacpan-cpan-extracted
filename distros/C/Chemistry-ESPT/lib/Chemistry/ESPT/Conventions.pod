@@ -1,0 +1,51 @@
+=head1 B<ESPT Programming Conventions>
+
+=head1 B<============================>
+
+=over 5
+
+=item Atoms:
+
+All atoms are stored as atomic symbols.  If the atomic number is required
+use the atomconvert method at that time.
+
+=item Energies:
+
+In fchk files, always use Total energy as the EELEC.
+
+=item File contents:
+
+Each ESS file is assumed to contain the results from only one calculation
+unless the calculation was an Opt Freq run.
+
+=item Pragmas:
+
+All ESPT objects must conform to the use strict and use warnings pragmas.
+
+=item Loops & counters:
+
+Use scalar(@array) or $#array rather than counters when at all possible.
+If a counter must be employed use the generic $counter rather than creating
+a new variable.
+
+=item MO Occupations
+
+All MO occupations are stored as 0, 1, 2, or a real number for fractional
+values.  Conversion to more chemical values such as "Occ." or "Virt."
+should be done elsewhere.  
+
+=item Object data:
+
+Each ESPT object is a Hash. Each Hash key should contain either a scalar 
+value or a tensor of scalar values.  Hashes of Hashes should be avoided
+as this requires significant modification to the get routine.
+
+=item Units:
+
+All values are stored internally in atomic units with the exception of 
+coordinates, which are stored in angstroms. Unit conversion should be 
+done in the program employing ESPT modules.
+
+=back
+
+=cut

@@ -1,0 +1,24 @@
+README
+Changes
+MANIFEST
+COPYING
+COPYING.Artistic
+COPYING.GNU
+Makefile.PL
+perlmulticore.h
+t/00_load.t
+t/01_run.t
+t/02_freeze.t
+t/03_freeze_best.t
+LZF.pm
+LZF.xs
+lzfP.h
+lzf_c.c
+lzf_d.c
+lzf_c_best.c
+
+debian/control
+debian/changelog
+debian/rules
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

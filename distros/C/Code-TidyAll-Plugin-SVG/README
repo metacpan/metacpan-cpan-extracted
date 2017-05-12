@@ -1,0 +1,47 @@
+NAME
+    Code::TidyAll::Plugin::SVG - optimize SVG files with tidyall
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+       In configuration:
+
+       [SVG]
+       select = **/*.svg
+       style = cvs
+
+DESCRIPTION
+    Uses XML::Twig to optimize internal structure of SVG files.
+
+CONFIGURATION
+    style
+        Indentation style (as defined by XML::Twig.
+
+        Recommmended values are indented (more compact) or cvs (nicer for
+        line-based revision control systems).
+
+    indent
+        Indentation string.
+
+        Default is a single TAB (i.e. `\t`).
+
+    comments
+        How to treat comments (as defined by XML::Twig.
+
+        Default is to keep comments.
+
+SEE ALSO
+    Code::TidyAll
+
+    XML::Twig
+
+AUTHOR
+    Jonas Smedegaard <dr@jones.dk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014-2016 by Jonas Smedegaard.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+

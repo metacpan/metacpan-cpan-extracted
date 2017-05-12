@@ -1,0 +1,14 @@
+=head1 NAME
+
+Catalog - Resources catalog management and display
+
+=head1 DESCRIPTION
+
+Catalog is the cgi-bin interface to all the functionalities. 
+For a complete documentation about Catalog, see the installed
+HTML documentation or the on-line documentation at http://www.senga.org/.
+
+=head1 AUTHOR
+
+Loic Dachary (loic@senga.org) http://www.senga.org/
+

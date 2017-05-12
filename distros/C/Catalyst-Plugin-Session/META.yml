@@ -1,0 +1,32 @@
+---
+abstract: 'Generic Session plugin - ties together server side storage and client side state required to maintain session data.'
+author:
+  - 'Andy Grundman'
+build_requires:
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::MockObject: 1.01
+distribution_type: module
+generated_by: 'Module::Install version 0.78'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.7010
+  Digest: 0
+  File::Spec: 0
+  File::Temp: 0
+  MRO::Compat: 0
+  Object::Signature: 0
+  Test::More: 0
+  Tie::RefHash: 1.34
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.20

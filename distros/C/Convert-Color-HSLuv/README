@@ -1,0 +1,41 @@
+Convert-Color-HSLuv version 1.000001
+===================================
+
+HSLuv is a human-friendly color space designed for perceptual
+uniformity. HPLuv is a derivative of HSLuv that also provides an
+uniform chroma map at the expense of only including pastel
+(desaturated) colors.
+
+This distribution includes modules for dealing with the following
+color spaces:
+
+* CIE 1931 XYZ          :: Convert::Color::XYZ
+* CIE 1976 (L*, u*, v*) :: Convert::Color::LUV
+* CIE LCh               :: Convert::Color::LCh
+* HSLuv                 :: Convert::Color::HSLuv
+* HPLuv                 :: Convert::Color::HPLuv
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Convert::Color
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

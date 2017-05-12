@@ -1,0 +1,9 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+MP.pm
+t/00_load.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module meta-data (added by MakeMaker)

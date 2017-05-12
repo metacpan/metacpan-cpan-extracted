@@ -1,0 +1,13 @@
+# This file documents the revision history for Perl extension Catalyst-TraitFor-Request-QueryFromJSONY
+
+0.002 - 2015-10-01
+  - Make it easier when you have more then 'q' as JSONY parameters.
+  - removed 'has_query_data' method since its no longer useful (could be a
+    breaking change for you but easy to work around).
+  - Add some callbacks to handle common exception conditions, like when
+    JSONY can't parse the values, or the value doesn't exist.
+  - Change to Moo from Moose (won't have any impact on code now, but if
+    Catalyst ever moves bits to Moo, this we be better preparation).
+
+0.001 - 2015-08-05
+  - First Release 

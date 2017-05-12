@@ -1,0 +1,62 @@
+Revision history for Perl extension CSS::Minifier::XS.
+
+0.09        Wed Oct 31 13:00 PDT 2013
+    - RT #85350; retain WS around "+" and "-" operators, so that we don't break
+      the "calc()" function by accident.
+      Thanks to Philipp Soehnlein
+    - RT #60239; remove WS around ">" and "~" selector combinators
+      Thanks to Jacob R.
+    - RT #60238; remove units on zero values (e.g. "0px" -> "0")
+      Thanks to Jacob R.
+    - RT #85896 and #79792; allow builds on Perls older than 5.8.8
+      Thanks to Michael Robinton
+
+0.08        Tue Nov  2 22:25 PDT 2010
+    - Bump Perl requirement to 5.8.8; oldest release with Newxz()
+
+0.07        Wed Jul 21 21:09 PDT 2010
+    - RT #39978; use 'Newxz/Safefree' instead of 'malloc/free' for memory
+      allocation.  Thanks to Kenichi Ishigaki.
+
+0.06        Wed Jul 21 20:44 PDT 2010
+    - RT #59549; '(' should retain leading WS, as needed for @media queries.
+      Thanks to Mike Cardwell.
+
+0.05        Fri Apr 23 22:29 PDT 2010
+    - Switch to Git
+
+0.04        Thu Aug  6 22:03 PDT 2009
+    - fix invalid "L<text|scheme:...>" POD sequence
+
+0.03        Wed Jul 16 23:22 PDT 2008
+    - RT #36557: Nasty segfault on minifying comment-only css input.
+      Turned out to be *any* input that minified to "nothing" caused the
+      segfault, and only in certain Perl versions.
+
+0.02        Tue May  6 00:16 PDT 2008
+    - rebuild packages; EU::MM borked my META.yml
+
+0.01        Mon May  5 15:15 PDT 2008
+    - no changes from 0.01_06, but is non-devel
+
+0.01_06     Wed Oct 31 20:39 PDT 2007
+    - retain whitespace after ")" characters; MSIE needs the whitespace, even
+      though the W3 validator considers the results valid CSS.
+
+0.01_05     Sat Oct 20 22:52 PDT 2007
+    - don't use "strcasestr()"; not available on Solaris
+
+0.01_04     Wed Oct 17 15:57 PDT 2007
+    - fix t/02-minify.t so it doesn't try to "use_ok()" before issuing a test
+      plan
+
+0.01_03     Tue Oct 16 19:45 PDT 2007
+    - don't use "strndup()"; not available on all systems
+    - we require Perl 5.006; update Build.PL and XS.pm to denote this
+
+0.01_02     Tue Oct 16 12:18 PDT 2007
+    - relocate the XS file so that its picked up properly by EU::MM when
+      running "perl Makefile.PL" to do a build.
+
+0.01_01     Mon Oct 15 22:11 PDT 2007
+    - initial public version

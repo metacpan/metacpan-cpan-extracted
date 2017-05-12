@@ -1,0 +1,21 @@
+NAME
+    CPAN::Webserver - Browse and search CPAN locally
+
+SYNOPSIS
+      % cpan_webserver
+
+DESCRIPTION
+    This module allows you to browse and search a CPAN mirror. It
+    automatically tries to find a locally-configured CPAN mirror using
+    CPAN::Mirror::Finder.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2011, Leon Brocard.
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

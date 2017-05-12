@@ -1,0 +1,16 @@
+benchmark/all.pl
+Changes
+lib/Cache/Swifty.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Swifty.xs
+t/00base.t
+t/01tiny.t
+t/02small.t
+t/03medium.t
+t/04refresh.t
+t/pod-coverage.t
+typemap
+META.yml

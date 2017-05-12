@@ -1,0 +1,40 @@
+Config-Find
+===========
+
+Config::Find implements a set of heuristics to find the
+configuration files for your applications in an OS dependant
+and friendly manner.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    File::HomeDir
+    File::Which
+    File::Spec
+    Test::More
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2015 Salvador Fandiño García
+Copyright 2015 by Barbie (barbie@missbarbell.co.uk)
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+
+

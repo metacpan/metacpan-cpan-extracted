@@ -1,0 +1,61 @@
+#
+# $Id: SlayMakefile,v 2.4 2007/10/09 10:14:11 eserte Exp $
+#
+
+{
+	use lib "lib";
+	use CPAN::Kwalify;
+	use Data::Dumper;
+	use Kwalify qw(validate);
+	if (eval { require YAML::XS; 1 }) {
+		YAML::XS->import('LoadFile');
+	} elsif (eval { require YAML::Syck; 1 }) {
+		YAML::Syck->import('LoadFile');
+	} else {
+		die "Could not find a YAML::xxxx::LoadFile to import";
+	}
+}
+
+all:
+
+dd-prefs: { map { s{\.yml$}{.dd}; $_ } glob("distroprefs/*.yml lib/CPAN/Kwalify/distroprefs.yml") }
+
+%.dd: %.yml
+	{
+		my($self, $target) = @_;
+		(my $base = $target) =~ s{\.dd$}{};
+		my $file = $base . ".yml";
+	       	print STDERR "$base...\n";
+		my @y = LoadFile($file);
+		open my $ofh, ">", "$target~" or die $!;
+		print $ofh Data::Dumper->new(\@y)->Indent(1)->Useqq(1)->Purity(1)->Sortkeys(1)->Dump or die $!;
+		close $ofh or die $!;
+		rename "$target~", $target or die $!;
+		return; # note: return value gets printed!
+	}
+
+validate:
+	{
+		my $errors = 0; my $files = 0; my $perrors = 0;
+		my $distroprefs_path = $INC{"CPAN/Kwalify.pm"};
+		$distroprefs_path =~ s{\.pm$}{/distroprefs.yml};
+		my $schema = LoadFile($distroprefs_path);
+		for my $yml (glob("distroprefs/*.yml")) {
+			$files++;
+			my $data = eval { LoadFile($yml) };
+			if (!$data or $@) {
+				$perrors++;
+				warn "Parse error in $yml: '$@'\n";
+				next;
+			}
+			$errors++ if (!validate($schema, $data));
+		}
+		if ($perrors||$errors) { die "Found $perrors parse errors and $errors validate errors in $files files" }
+		else { "Validation OK ($files files).\n" }
+	}
+
+# Local Variables:
+# mode: cperl
+# cperl-indent-level: 8
+# indent-tabs-mode: t
+# End:

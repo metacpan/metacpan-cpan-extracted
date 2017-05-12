@@ -1,0 +1,51 @@
+=head1 NAME
+
+Catalyst::Manual::Deployment::SharedHosting - Deploying Catalyst on Shared Hosting
+
+=head1 Catalyst on shared hosting
+
+So, you want to put your Catalyst application out there for the whole
+world to see, but you don't want to break the bank. There is an answer -
+if you can get shared hosting with FastCGI and a shell, you can install
+your Catalyst app in a local directory on your shared host. First, run
+
+    perl -MCPAN -e shell
+
+and go through the standard CPAN configuration process. Then exit
+without installing anything. Next, download the latest L<local::lib>
+package and follow its 'bootstrap' instructions to get it installed
+and the local configuration added to your C<< ~/.bashrc >>.
+
+Now log out, then back in again (or run C<". .bashrc"> if you
+prefer).
+
+Now you can install the modules you need using CPAN as normal; they will
+be installed into your local directory, and Perl will pick them up.
+Finally, change into the root directory of your virtual host, and
+symlink your application's script directory:
+
+    cd path/to/mydomain.com
+    ln -s ~/lib/MyApp/script script
+
+And add the following lines to your .htaccess file (assuming the server
+is setup to handle .pl as fcgi - you may need to rename the script to
+myapp_fastcgi.fcgi and/or use a SetHandler directive):
+
+  RewriteEngine On
+  RewriteCond %{REQUEST_URI} !^/?script/myapp_fastcgi.pl
+  RewriteRule ^(.*)$ script/myapp_fastcgi.pl/$1 [PT,L]
+
+Now C<http://mydomain.com/> should now Just Work. Congratulations, now
+you can tell your friends about your new website. 
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

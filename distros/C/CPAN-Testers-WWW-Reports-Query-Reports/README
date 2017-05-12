@@ -1,0 +1,124 @@
+CPAN-Testers-WWW-Reports-Query-Reports
+======================================
+
+This distribution queries the CPAN Testers website and retrieves a data set. 
+For a date request, the data set returned relates to the ids that can be 
+retrieved for that date. A range request will return the records for the 
+requested IDs.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  JSON::XS
+  WWW::Mechanize
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm, CPANPLUS or cpanminus as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+Initially released during the 2012 QA Hackathon in Paris.
+
+SYNOPSIS
+
+  # establish the object
+  my $query = CPAN::Testers::WWW::Reports::Query::Reports->new;
+
+  # get list of ids for a particular date
+  my $result = $query->date(
+      '2012-02-08' # must be YYYY-MM-DD format
+  );
+
+  # $query is a hash ref
+  print "From: $result->{from}, To: $result->{to}, Range: $result->{range}\n";
+
+  # $result->{list} is an array of the actual ids posted for the given date.
+  # note that this list may not include all ids within $result->{range}.
+  print "List: " . join(', ',@{$result->{list}}) . "\n";
+
+
+  # get metabase for a range of ids
+  my $result = $query->range(
+      '20080300-20120330'
+
+      # '20120330'  # just get <id>
+      # '20120330-' # from <id> until the latest [see caveat]
+      # '-20120330' # previous <n> reports up to <id> [see caveat]
+      # '-'         # the latest <n> reports [see caveat]
+  );
+
+  # $result is a hash ref, with the reports ids as the top level keys
+  my @ids = sort keys %$result;
+  my $id  = $ids[0];
+  print "id = $id, dist = '$result->{$id}{dist}', version = '$result->{$id}{version}'\n";
+
+
+  # get the raw data for all results, or a specific version if supplied
+  my $data = $query->raw;
+
+  # get the last error
+  my $error = $query->error;
+
+Note that when using the range parameter, at most only 2500 records will be
+returned. This is to avoid accidental requests for all records!
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Query-Reports
+
+CPAN TESTERS FUND
+
+CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.
+
+In early 2012 the Enlightened Perl Organisation very kindly set-up a
+CPAN Testers Fund within their donatation structure, to help the project
+cover the costs of servers and services.
+
+If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+https://members.enlightenedperl.org/drupal/donate-cpan-testers
+
+If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.
+
+Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+http://iheart.cpantesters.org
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions http://www.missbarbell.co.uk.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2012-2014 Barbie for Miss Barbell Productions
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

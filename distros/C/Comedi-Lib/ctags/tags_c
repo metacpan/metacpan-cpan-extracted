@@ -1,0 +1,52 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+lib_cancel	src/Lib.c	/^int lib_cancel(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_close	src/Lib.c	/^int lib_close(comedi_t *dev)$/;"	f
+lib_data_read	src/Lib.c	/^int lib_data_read(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_data_read_delayed	src/Lib.c	/^int lib_data_read_delayed(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_data_read_hint	src/Lib.c	/^int lib_data_read_hint(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_data_write	src/Lib.c	/^int lib_data_write(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_dio_bitfield2	src/Lib.c	/^int lib_dio_bitfield2(comedi_t *dev, unsigned int subdev,$/;"	f
+lib_dio_config	src/Lib.c	/^int lib_dio_config(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_dio_get_config	src/Lib.c	/^int lib_dio_get_config(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_dio_read	src/Lib.c	/^int lib_dio_read(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_dio_write	src/Lib.c	/^int lib_dio_write(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_do_insn	src/Lib.c	/^int lib_do_insn(comedi_t *dev, HV *insn_ref)$/;"	f
+lib_do_insnlist	src/Lib.c	/^int lib_do_insnlist(comedi_t *dev, HV *insnlist_ref)$/;"	f
+lib_errno	src/Lib.c	/^int lib_errno()$/;"	f
+lib_fileno	src/Lib.c	/^int lib_fileno(comedi_t *dev)$/;"	f
+lib_find_range	src/Lib.c	/^int lib_find_range(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_find_subdevice_by_type	src/Lib.c	/^int lib_find_subdevice_by_type(comedi_t *dev, int type, unsigned int start)$/;"	f
+lib_get_board_name	src/Lib.c	/^const char *lib_get_board_name(comedi_t *dev)$/;"	f
+lib_get_buffer_contents	src/Lib.c	/^int lib_get_buffer_contents(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_buffer_offset	src/Lib.c	/^int lib_get_buffer_offset(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_buffer_size	src/Lib.c	/^int lib_get_buffer_size(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_driver_name	src/Lib.c	/^const char *lib_get_driver_name(comedi_t *dev)$/;"	f
+lib_get_max_buffer_size	src/Lib.c	/^int lib_get_max_buffer_size(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_maxdata	src/Lib.c	/^lsampl_t lib_get_maxdata(comedi_t *dev, unsigned int subdev,$/;"	f
+lib_get_n_channels	src/Lib.c	/^int lib_get_n_channels(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_n_ranges	src/Lib.c	/^int lib_get_n_ranges(comedi_t *dev, unsigned int subdev, unsigned int chan)$/;"	f
+lib_get_n_subdevices	src/Lib.c	/^int lib_get_n_subdevices(comedi_t *dev)$/;"	f
+lib_get_range	src/Lib.c	/^HV *lib_get_range(comedi_t *dev, unsigned int subdev, unsigned int chan,$/;"	f
+lib_get_read_subdevice	src/Lib.c	/^int lib_get_read_subdevice(comedi_t *dev)$/;"	f
+lib_get_subdevice_flags	src/Lib.c	/^int lib_get_subdevice_flags(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_subdevice_type	src/Lib.c	/^int lib_get_subdevice_type(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_get_version_code	src/Lib.c	/^int lib_get_version_code(comedi_t *dev)$/;"	f
+lib_get_write_subdevice	src/Lib.c	/^int lib_get_write_subdevice(comedi_t *dev)$/;"	f
+lib_lock	src/Lib.c	/^int lib_lock(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_loglevel	src/Lib.c	/^int lib_loglevel(int level)$/;"	f
+lib_mark_buffer_read	src/Lib.c	/^int lib_mark_buffer_read(comedi_t *dev, unsigned int subdev,$/;"	f
+lib_mark_buffer_written	src/Lib.c	/^int lib_mark_buffer_written(comedi_t *dev, unsigned int subdev,$/;"	f
+lib_maxdata_is_chan_specific	src/Lib.c	/^int lib_maxdata_is_chan_specific(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_open	src/Lib.c	/^comedi_t *lib_open(const char *fn)$/;"	f
+lib_perror	src/Lib.c	/^void lib_perror(const char *str)$/;"	f
+lib_poll	src/Lib.c	/^int lib_poll(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_range_is_chan_specific	src/Lib.c	/^int lib_range_is_chan_specific(comedi_t *dev, unsigned int subdev)$/;"	f
+lib_set_buffer_size	src/Lib.c	/^int lib_set_buffer_size(comedi_t *dev, unsigned int subdev, unsigned int size)$/;"	f
+lib_set_max_buffer_size	src/Lib.c	/^int lib_set_max_buffer_size(comedi_t *dev, unsigned int subdev,$/;"	f
+lib_strerror	src/Lib.c	/^const char *lib_strerror(int errnum)$/;"	f
+lib_unlock	src/Lib.c	/^int lib_unlock(comedi_t *dev, unsigned int subdev)$/;"	f

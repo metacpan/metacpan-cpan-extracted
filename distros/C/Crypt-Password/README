@@ -1,0 +1,34 @@
+README for Crypt::Password
+==========================
+
+This is just a wrapper for perl's crypt(), which can do everything you would
+probably want to do to store a password, but this is supposed to provide the
+various uses easier.
+
+Installing
+----------
+The application is designed to be installed like a CPAN module; so use
+the usual:
+
+  perl Makefile.PL
+  make
+  sudo make install
+
+The CPAN module dependencies will be highlighted during the first
+command. If you do not have 'sudo' installed, you can use:
+
+  su root -c make install
+
+License and credits
+-------------------
+This software development is sponsored and directed by New Zealand
+Registry Services, http://www.nzrs.net.nz/
+
+The work is being carried out by Catalyst IT,
+http://www.catalyst.net.nz/
+
+Copyright (c) 2009, NZ Registry Services.  All Rights Reserved.  This
+software may be used under the terms of the Artistic License 2.0.
+Note that this license is compatible with both the GNU GPL and
+Artistic licenses.  A copy of this license is supplied with the
+distribution in the file COPYING.txt.

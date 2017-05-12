@@ -1,0 +1,74 @@
+CPAN::Testers::Fact::PlatformInfo
+=================================
+
+This distribution stores the platform information of the machine ruuning the 
+CPAN Testers smoker.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Carp
+  Metabase::Fact::Hash
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm shell or CPANPLUS shell as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+SYNOPSIS
+
+  # assume $report is a hash of a test report created using a CPAN Testers
+  # smoker, which generates metadata for the platform.
+ 
+  my $fact = CPAN::Testers::Fact::PlatformInfo->new(
+    resource => 'cpan:///distfile/RJBS/CPAN-Metabase-Fact-0.001.tar.gz',
+    content     => {
+      osname        => $report->{platform_info}{osname}     ,
+      archname      => $report->{platform_info}{archname}   ,
+      osvers        => $report->{platform_info}{osvers}     ,
+      oslabel       => $report->{platform_info}{oslabel}    ,
+      is32bit       => $report->{platform_info}{is32bit}    ,
+      is64bit       => $report->{platform_info}{is64bit}    ,
+      osflag        => $report->{platform_info}{osflag}     ,
+      codename      => $report->{platform_info}{codename}   ,
+      kernel        => $report->{platform_info}{kernel}
+    },
+  );
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org.
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Fact-PlatformInfo
+
+AUTHORS
+  Barbie (BARBIE) <barbie@cpan.org>
+  Brian McCauley (NOBULL) <nobull67@gmail.com>
+  Colin Newell (NEWELLC) F<http://colinnewell.wordpress.com/>
+  Jon 'JJ' Allen (JONALLEN) <jj@jonallen.info>
+
+COPYRIGHT AND LICENSE
+
+  Copyright © 2011-2014 Birmingham Perl Mongers
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

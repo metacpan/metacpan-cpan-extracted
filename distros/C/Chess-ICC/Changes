@@ -1,0 +1,6 @@
+Revision history for Perl extension Chess::ICC.
+
+0.01  Wed Jul 31 02:19:51 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-A -X -n Chess::ICC
+

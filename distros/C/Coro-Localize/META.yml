@@ -1,0 +1,26 @@
+---
+abstract: 'Localize variables to a coroutine'
+author:
+  - 'Rebecca Turner <becca@referencethis.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Coro-Localize
+recommends:
+  Syntax::Feature: 0
+requires:
+  Coro: 0
+  Data::Alias: 0
+  Devel::Declare: 0
+  common::sense: 0
+resources:
+  bugtracker: https://github.com/iarna/Coro-Localize/issues
+  homepage: https://github.com/iarna/Coro-Localize
+  repository: https://github.com/iarna/Coro-Localize.git
+version: 0.1.2

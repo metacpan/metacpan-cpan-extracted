@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Chess/GameClock/GameClock.pm
+lib/Chess/GameClock/GclkCounter.pm 
+lib/Chess/GameClock/GclkData.pm 
+lib/Chess/GameClock/GclkDisplay.pm 
+lib/Chess/GameClock/GclkSettings.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+lib/Chess/GameClock/eg/testPack.pl
+META.yml

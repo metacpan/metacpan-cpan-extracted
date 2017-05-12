@@ -1,0 +1,10 @@
+Revision history for Perl extension Class::Data::TIN.
+
+0.02  2002-02
+	- changed how new gets the data
+
+
+0.01  Sun Dec  9 21:50:44 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n Class::Data::TIN
+

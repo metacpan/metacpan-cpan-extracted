@@ -1,0 +1,2 @@
+CGI::Struct::XS is perl xs module for parsing complex params names of http forms.
+It's fully compatible with CGI::Struct, but 3-15 times faster.

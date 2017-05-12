@@ -1,0 +1,21 @@
+Changes
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+VERSION
+bin/yacg
+eg/xyzcg
+lib/Config/Generator.pm
+lib/Config/Generator/Config.pm
+lib/Config/Generator/Crontab.pm
+lib/Config/Generator/File.pm
+lib/Config/Generator/Hook.pm
+lib/Config/Generator/Random.pm
+lib/Config/Generator/Schema.pm
+lib/Config/Generator/Template.pm
+lib/Config/Generator/Util.pm
+lib/Config/Generator/XML.pm
+t/1xml.t
+t/3pod.t
+t/4podcov.t

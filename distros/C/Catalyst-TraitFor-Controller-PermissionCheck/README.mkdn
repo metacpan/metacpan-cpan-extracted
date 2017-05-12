@@ -1,0 +1,108 @@
+# NAME
+
+Catalyst::TraitFor::Controller::PermissionCheck - Provides an opinionated method for verifying permissions on a per-action basis by inspecting the user.
+
+# VERSION
+
+version 0.04
+
+# SYNOPSIS
+
+    package MyApp::Controller::Something;
+
+    use Moose;
+
+    BEGIN { extends 'Catalyst::Controller'; }
+
+    # Include the role here
+    with 'Catalyst::TraitFor::Controller::PermissionCheck';
+
+    __PACKAGE__->config(
+        permissions => {
+            'some_action' => [ qw/List Of Permissions Required/ ],
+        },
+        # Deny everything, requires all actions have permissions.
+        # allow_by_default => 1 only checks if a permission entry exists
+        allow_by_default => 0,
+    );
+
+    # Your root chain must be called 'setup'. This is convention must be
+    # followed if you want to use this module.
+    sub setup : Chained('/something_that_sets_permissions') PathPart('') CaptureArgs(0) {
+        my ( $self, $c ) = @_;
+        # Permissions must be in $c->stash->{context}->{permissions}
+        # and you can set them here. The module only looks at the keys
+        # of the hash.
+        $c->stash->{context}->{permissions} = {
+            'Admin' => 1,
+            'Super Admin' => 1,
+        }
+    }
+
+    sub some_action : Chained('setup') Args(0) {
+        my ( $self, $c ) = @_;
+        $c->res->body('Only accessible if permissions are ok');
+    }
+
+    sub permission_denied : Private {
+        my ( $self, $c ) = @_;
+        $c->res->status(403);
+        $c->res->body('GTFO');
+        $c->detach;
+    }
+
+    no Moose;
+    1;
+
+# ATTRIBUTES
+
+## permissions
+
+Configuration hash that is keyed by action name and should point to an
+array ref of required permissions.
+
+Set via config:
+
+    __PACKAGE__->config(
+        permissions => {
+            'action_name' => [ qw/Permission List/ ]
+        }
+    );
+
+## allow_by_default
+
+A boolean configuration option to control whether this module should restrict
+everything or let things go and only check permissions if they exist in
+the permissions hash.
+
+# METHODS
+
+## fetch_permissions
+
+Retrieve a hashref of permissions. This may be overridden to allow alternate
+sources of permissions, but by default it looks in
+$c->stash->{context}->{permissions}.
+
+## setup
+
+Before setup is called, this role inspects
+`$c->stash->{context}->{permissions}` for applicable roles.
+
+It confirms permissions to access the action. This only works with
+[Catalyst::DispatchType::Chained](http://search.cpan.org/perldoc?Catalyst::DispatchType::Chained) and will walk the entire chain and verify
+access checks at each level.
+
+# CONTRIBUTORS
+
+Andrew Nelson
+
+# AUTHOR
+
+J. Shirley <jshirley@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

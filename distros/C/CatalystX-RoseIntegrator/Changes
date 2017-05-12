@@ -1,0 +1,6 @@
+0.02   20-09-07 19:40:00
+    Changed 'recommended' to 'required' for Catalyst::View::TT
+    Changed name from Catalyst::Controller::Rose::Simple to CatalystX::RoseIntegrator
+
+0.01   02-09-07 00:00:00
+    First working version originally based on Catalyst::Controller::FormBuilder

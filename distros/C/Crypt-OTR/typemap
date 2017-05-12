@@ -1,0 +1,4 @@
+TYPEMAP
+
+CryptOTRUserState     T_PTR
+Crypt::OTR::PublicKey T_PTROBJ

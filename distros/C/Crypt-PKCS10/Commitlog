@@ -1,0 +1,216 @@
+Commit log for Crypt-PKCS10, most recent first
+
+- Add dieOnError option to new(), die if new() has an error in void context
+
+- Filter OpenSSL's "WARNNG: can't open config file' message"
+
+- Merge pull request #15 from tlhackque/master
+
+- Make support for signature verification and ECC keys optional, fix APIv0 stringify and add new() options
+
+- Cosmetic: Wrap long form SSL configuration display for automated testing
+
+- Merge pull request #14 from tlhackque/master
+
+- Improve support for automated testing
+
+- Merge pull request #13 from tlhackque/master
+
+- Encode PEM with max line length of 64. Fix test failures on some editions of Perl 5.8.8
+
+- Trial release 1.7_01
+
+- Address dependency on Crypt::PK::ECC versions, add getAPIversion, as_string & fix length decode
+
+- Merge pull request #12 from tlhackque/master
+
+- Release version 1.7
+
+- Allow new() to open a  file by name & accept options in a hashref.
+
+- Improve argument checking, update tests & optionally relax PEM constraints.
+
+- Verify CSR signature in new() by default.  Provide checkSignature().
+
+- Include whitespace in PEM used for test
+
+- Provide example of signature verification and CSR dump.
+
+- Protect stringify from exceptions and old API versions.
+
+- Add detail to stringify for public key and signature.
+
+- Optionally return all available curve detail from ECC keys using subjectPublicKeyParams(1)
+
+- Provide enhanced info for ECC keys.
+
+- Fix registerOID, add tests. Finish signature(2).
+
+- Add test for ECC CSR signature verification
+
+- Test DSA signature verification and implement ECDSA signature extraction.
+
+- add signatureParams accessor
+
+- Add certificationRequest() and signature(1) to enable signature verification
+
+- More OIDs from RFC5480, add curve25519 and curve448 placeholders
+
+- Implement subjectPublicKeyParams, more EC and DSA OIDs
+
+- Remove Data::Dumper from 03_ecc.t
+
+- Release edits for V1.6
+
+- Merge branch 'master' of https://github.com/gknocke/Crypt-PKCS10
+
+- Merge pull request #8 from mbartosch/master
+
+- added tests for ECDSA requests
+
+- support CSRs with ECDSA keys
+
+- Version 1.6
+
+- Release version 1.4
+
+- Fixes for README generation
+
+- Packaging updates
+
+- Sign distributions, fix some file permissions
+
+- Developer Release V1.4_04
+
+- RT#111374 Hash randomization in newer Perls causes test failures
+
+- Fix build Kwalitee issues
+
+- Developer Release V1.4_03
+
+- Accept numeric OIDs as input. Test and doc upgrades
+
+- Add tests for stringify
+
+- Add method tests, reformat some very wide lines
+
+- Updated tests and (mostly) related fixes
+
+- Clean up and enhance POD, update README
+
+- Return keyUsage as an array in API v1
+
+- More enhanced key usage OIDs
+
+- Handle null subject
+
+- Update dependencies &  README
+
+- Fine tune string output, overload stringify
+
+- ASN1 corrections, bad request handling, file handle input, better conversions & internal updates
+
+- Developer Release 1.4_02
+
+- Cert policy optimizations
+
+- Add certificate policy decode, name2oid. Cleanup and bug fixes.
+
+- Developer Release 1.4_01
+
+- Warn if setAPIversion is not called before calling any class method.
+
+- Replace internal use of attributes()
+
+- Provide useful attribute information with API v1, add GN/SN abbrevs in DNs
+
+- Add Dist::Zilla config to METAdata
+
+- Add 'based-on' credits from old README
+
+- Update build to Dist::Zilla
+
+- Add more OIDs. Generate OID doc automagically. Support API with standard names
+
+- Merge pull request #6 from tlhackque/master
+
+- Parse the ASN.1 declaration once, not once per field.
+
+- Allow retrieval of BasicConstraints
+
+- Add tests for proper decoding of subjectAltName extension, including iPAddresses
+
+- Finish minor optimization of iPAddress conversion to text
+
+- Convert iPAddresses to strings
+
+- Tentatively add subjectAltName per request
+
+- Merge pull request #3 from tlhackque/master
+
+- Fix typo in previous commit.
+
+- Add more Netscape OIDs
+
+- Support for (old,but still used) Netscape extensions
+
+- Tweak subject() for clarity
+
+- UID has Hungarian userID; crash in certificateTemplate
+
+- Add more tests
+
+- Support UID in domain name
+
+- Remove redundant test in registerOID
+
+- Add registerOID() and regularize domainComponent()
+
+- Merge pull request #2 from tlhackque/master
+
+- csrRequest was erroneously returning junk after ASN.1 structure
+
+- RT # 110820 part 3
+
+- RT 110820 Part 2: extract CSR
+
+- Preliminary patches for RT#110820
+
+- version 1.3
+
+- version change to 1.2
+
+- Add generic method extensionValue
+
+- ommit unknown or damaged extensions
+
+- manual merge
+
+- dealing with multivalued keys
+
+- Update for the accessor methods
+
+- Version 1.0
+
+- POD added
+
+- Merge pull request #1 from mbartosch/master
+
+- code cleanup
+
+- private mathods start with an underscore
+
+- added POD documentation stubs
+
+- rearranged base tests
+
+- cleanup module distribution
+
+- List of OIDs expanded
+
+- small bugfix in test
+
+- Readme and test added
+
+- Parses PKCS10 requests to perl data structure
+

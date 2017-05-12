@@ -1,0 +1,2 @@
+$var2 = 22;
+rewrite('/inner/rw2', 22);

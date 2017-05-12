@@ -1,0 +1,19 @@
+Changes
+lib/Config/Perl.pm
+lib/Data/Undump/PPI.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00_smoke.t
+t/10_basic.t
+t/20_undump.t
+t/21_undump_files_dump.t
+t/30_errors_warns.t
+t/80_wishlist.t
+t/90_author_critic.t
+t/91_author_pod.t
+t/92_author_cover.t
+t/Config_Perl_Testlib.pm
+t/perlcriticrc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

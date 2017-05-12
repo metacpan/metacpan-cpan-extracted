@@ -1,0 +1,22 @@
+---
+abstract: 'Use DateTime Objects As Columns'
+author:
+  - 'Copyright (c) 2005 Daisuke Maki <dmaki@cpan.org>. All rights reserved.'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-DBI-Plugin-DateTime
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::DBI: 0
+  DateTime: 0
+  Module::Pluggable: 0
+version: 0.05

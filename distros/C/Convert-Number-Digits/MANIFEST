@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/digits.pl
+lib/Convert/Number/Digits.pm
+t/01digits.t

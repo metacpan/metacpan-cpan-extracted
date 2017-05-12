@@ -1,0 +1,31 @@
+---
+abstract: 'Compress response'
+author:
+  - 'Yiyi Hu C<yiyihu@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  HTTP::Request::Common: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Compress
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Compress::Bzip2: 2
+requires:
+  Catalyst::Runtime: '5.80001'
+  Compress::Zlib: 0
+  MRO::Compat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-Compress/trunk/
+version: '0.006'

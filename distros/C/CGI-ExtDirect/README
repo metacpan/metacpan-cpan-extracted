@@ -1,0 +1,59 @@
+CGI::ExtDirect
+==============
+
+    This module provides an RPC::ExtDirect gateway implementation for CGI
+    compatible Web server environments. This includes both traditional CGI
+    scripts that start up anew for each HTTP request, as well as more modern
+    CGI environments in which a script is started once and then persists
+    through the lifetime of a server process.
+
+    CGI::ExtDirect can be used wth Perl versions 5.6 and newer with many Web
+    servers; it was tested successfully with Apache/mod_perl, pure Perl
+    server based on HTTP::Server::Simple (RPC::ExtDirect::Server), and
+    various other HTTP server environments.
+
+    If you are not familiar with Ext.Direct, more information can be found
+    in RPC::ExtDirect::Intro.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test
+        make install
+
+EXAMPLES
+
+    See included Ext JS examples for ideas on what Ext.Direct is and how to
+    use it in CGI applications. The examples are not installed along with
+    the CGI::ExtDirect module, and are only available in the `examples/'
+    directory of the CPAN distribution.
+
+    To run examples type the following in the CGI::ExtDirect tarball
+    directory:
+
+        cd examples
+        perl p5httpd
+
+    Note that these examples do not require CGI::ExtDirect to be installed
+    so you can try them beforehand. That said, CGI::ExtDirect depends on
+    RPC::ExtDirect being available in `@INC' so if you don't want to install
+    either module, unpack RPC::ExtDirect and CGI::ExtDirect tarballs to the
+    same directory and use `$PERL5LIB' to point to RPC::ExtDirect location:
+
+        cd examples
+        PERL5LIB=../../RPC-ExtDirect-3.xx/lib perl p5httpd
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2011-2016 Alex Tokarev <tokarev@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+    Included Ext JS examples are copyright (c) 2011, Sencha Inc. Example
+    code is used and distributed under GPL 3.0 license as provided by Sencha
+    Inc. See http://www.sencha.com/license. Ext JS is available for download
+    at http://www.sencha.com/products/extjs/
+

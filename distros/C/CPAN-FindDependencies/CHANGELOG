@@ -1,0 +1,72 @@
+2.47    2017-04-13      Make tests pass on perl 5.26
+
+2.46    2016-09-21      Increase timeout for running Makefile.PL, to
+                          cope with really slow machines with pitiful
+                          I/O
+
+2.45    2016-09-07      No functional changes, bump the required version
+                          of YAML::Tiny to cope with some modern META.yml
+                          files
+
+2.44    2015-07-21      No functional changes, just fixing tests which
+                          broke with modern dependencies on old perl
+
+2.43    2015-04-26      Make segfault go away on Windows
+
+2.42    2013-05-25      Bugfix to cope with inconsistent hash ordering
+
+2.41    2012-09-03      Patched to work through HTTP proxies
+
+2.4     2012-05-27      Fix for RT 65001, 02packages being corrupted
+                          by LWP::Simple::get being too damned clever
+                          for its own good
+
+2.34    2010-05-29      Parallel testing didn't work on Windows;
+                        SKIP if Makefile.PL times out but shouldn't have
+
+2.33    2010-03-12      Optionally report on required module versions
+
+2.32    2009-04-27      Make sure we always chdir() back again in Makefile.PL
+                          handler, even if Bad Juju happens, see reports
+                          3755239 and 3761690
+
+2.31    2009-04-24      Update version dependency on Parse::CPAN::Packages
+                          to avoid a bug in its interaction with the latest
+                          Moose
+                        Switch from YAML to YAML::Tiny
+
+2.3     2009-04-16      Makefile.PL now times out
+
+2.22    2009-04-15      Script tests now skip on Windows - script works,
+                          but tests don't.  If you care, Patches Welcome
+
+2.21    2009-04-15      Fix bug in cpandeps script - CPAN::Config might
+                          not exist, but wasn't being used anyway.  Thanks
+                          to Andreas Koenig
+
+2.2     2009-04-14      Add stuff to see 'recommended' modules, thanks to
+                          Georg Oechsler
+
+2.1     2009-04-11      Add Ian Tegebo's patch to get deps from Makefile.PL
+
+2.0     2007-12-13      Add caching;
+                        Uses cached data for testing, so tests are less
+                          fragile;
+                        Add maxdepth param
+
+1.99_01 2007-12-03      This version was a re-write;
+                        No longer supports searching by distribution;
+                        Switch to Parse::CPAN::Packages from CPAN.pm;
+                        Much better core module detection;
+                        Perl version option;
+                        Added docs to cpandeps script
+
+1.1     2007-11-07      Error checking in 'cpandeps' script
+                        Added 'build_requires' support
+
+1.02    2007-07-19      Now installs 'cpandeps' script;
+                        Added 'nowarnings'
+
+1.01    2007-08-19      Updated dependency to CPAN.pm 1.9102
+
+1.0     2007-08-17      Original release

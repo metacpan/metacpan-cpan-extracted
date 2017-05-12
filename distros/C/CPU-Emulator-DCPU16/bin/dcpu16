@@ -1,0 +1,130 @@
+#!perl 
+
+use strict;
+use warnings;
+use CPU::Emulator::DCPU16;
+
+my $debug         = 0;
+my $assemble      = 0;
+my $disassemble   = 0;
+my $limit         = 0;
+my $penalty       = 0;
+my $full_mem      = 0;
+my $console_start = 0;
+my $console_end   = 0;
+ 
+
+=head1 NAME
+
+dcpu16 - an assembler, disassembler and emulator for Notch's DCPU-16 virtual CPU for the game 0x10c
+
+=head1 USAGE
+    
+    # Run an object file through the emulator
+    dcpu16 <object file> 
+    
+    # Run an object file through the emulator and dump CPU state at each clock tick
+    dcpu16 --debug <object file> 
+
+    # Run an assembler file through the emulator
+    dcpu16 <assembler file ending in .dasm or .dasm16>
+    
+    # Decompile an object file to an assembler file
+    dcpu16 --disassemble <object file>
+    # .. or round trip an assembler file
+    dcpu16 --disassemble <assembler file ending in .dasm or .dasm16>
+    
+    # Compile an assembler file to an object file
+    dcpu16 --assemble <assembler file> > <object file>
+    
+    # Run a file and limit the number of instructions
+    dcpu16 --limit 20 <file> 
+
+    # Run a file and simulate a 2ms penalty for each cycle
+    dcpu16 --penalty 2 <file>
+    
+    # Allow a program to run past the last instruction that was loaded
+    # (therefore allowing programs to rewrite themselves larger)
+    dcpu --full_memory <file>
+    
+    # Run the CPU with a console device mapped from 0x8000 to 0x817f
+    dcpu16 --console 32768 33151 alphabet.dasm
+
+=cut
+
+while ($ARGV[0] =~ s/^-+//) {
+    my $arg = shift;
+    if ($arg eq "disassemble") {
+        $disassemble = 1;
+    } elsif ($arg eq "assemble") {
+        $assemble = 1;
+    } elsif ($arg eq "debug") {
+        $debug = 1;
+    } elsif ($arg eq "full_memory") {
+        $full_mem = 1;
+    } elsif ($arg eq "limit") {
+        die "You must pass an argument to limit\n" unless @ARGV;
+        $limit = shift;
+    } elsif ($arg eq "penalty") {
+        die "You must pass an argument to penalty\n" unless @ARGV;
+        $penalty = shift;   
+    } elsif ($arg eq "console") {
+        die "You must pass a start address\n" unless @ARGV;
+        $console_start = shift;
+        die "You must pass an end address\n" unless @ARGV;
+        $console_end   = shift;
+    } else {
+        die "Unkown argument '$arg'\n";
+    }
+}
+
+
+my $file    = shift || die "You must pass in a object file";
+
+open(my $fh, "<", $file) || die "Couldn't read file $file: $!";
+my $program = do { local $/=undef; <$fh> };
+close($fh);
+
+$program    = CPU::Emulator::DCPU16::Assembler->assemble($program) if $file =~ /\.dasm(16)?$/ || $assemble;  
+
+do { print CPU::Emulator::DCPU16::Disassembler->dump($program); exit(0) } if $disassemble;
+do { print $program;                                            exit(0) } if $assemble;
+
+# Create a new CPU and load a file
+my $cpu = CPU::Emulator::DCPU16->load($program);
+$cpu->map_device('CPU::Emulator::DCPU16::Device::Console', $console_start, $console_end) if defined $console_start;
+
+# Run it ...
+$cpu->run(debug => $debug, limit => $limit, cycle_penalty => $penalty, full_memory => $full_mem);
+
+=head1 SEE ALSO
+
+The Perl modules:
+
+L<CPU::Emulator::DCPU16>
+
+L<CPU::Emulator::DCPU16::Assembler>
+
+L<CPU::Emulator::DCPU16::Disassembler>
+
+The Spec:
+
+http://0x10c.com/doc/dcpu-16.txt
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT
+
+Copyright 2011 - Simon Wistow
+
+Released under the same terms as Perl itself.
+
+=head1 DEVELOPMENT
+
+Latest development version available from
+
+https://github.com/simonwistow/CPU-Emulator-DCPU16
+
+=cut

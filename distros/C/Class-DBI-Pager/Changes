@@ -1,0 +1,31 @@
+Revision history for Perl extension Class::DBI::Pager
+
+0.08  2006-03-01T08:48:12Z
+        - Support Data::Page::Navigation (thanks to tokuhirom)
+
+0.07  Thu Oct  6 02:43:43 UTC 2005
+        - Fixed test suite for Windows
+          [cpan #14937]
+
+0.06  Thu Sep  2 21:30:55 JST 2004
+	* Fixed problem with has_many()
+	  (Thanks to Rhesa Rozendaal)
+
+0.05  Wed Dec 17 15:45:35 JST 2003
+	* added entries_on_this_page
+	  (Thanks to Naoya Ito)
+
+0.04  Thu Feb 20 21:03:56 JST 2003
+	* require Class::DBI >= 0.90
+
+0.03  Fri Aug 23 03:04:05 JST 2002
+	- Fixed tests so it doesn't inherit from C::D::SQLite
+
+0.02  Fri Aug 16 22:13:39 JST 2002
+	* Fixed bug with DESTROY handled by AUTOLOAD
+	* Added previous_page, next_page in sync with Data::Page 0.13
+	  (Thanks to Leon Brocard <acme@astray.com>)
+	- onto CPAN
+
+0.01  Thu Aug 15 23:18:22 2002
+	- original version

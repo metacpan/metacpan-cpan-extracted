@@ -1,0 +1,312 @@
+Revision history for Catalyst-Manual
+
+5.9009 - 2014-12-13
+    - fixed a new error in the manual regarding "component" -> "components"
+      (RT#99131, RT#100597, RT#100767)
+
+5.9008 - 2014-07-26
+    - misc small documentation tweaks (thanks Karen Etheridge, Matthew
+      Horsfall, Andreas Marienborg, Dagfinn Ilmari Mannsåker, David
+      Steinbrunner, Gerda Shank, Jesse)
+
+5.9007 2013-05-06
+    - Fix pod warnings (RT#83398 - thanks, Paul Waring!)
+    - Fix repository metadata (thanks, Lars Dɪᴇᴄᴋᴏᴡ)
+
+5.9006 2012-11-08
+    - fix bad =head1 (Kennedy Clark)
+
+5.9005 2012-11-01
+    - Fix minor typos RT 78545, thanks Joe Axford
+    - Update auth class name RT 77322 Thanks Joe Axford
+    - Fix typo RT #77247 Thanks John Deighan
+
+5.9004 4th May 2012
+    - PSGI Compat changes
+    - Small code changes (thanks sockmonk)
+    - Small changes to Manual::Components
+
+5.9003 17 Feb 2012
+    - Mention PSGI in Manual::Ingro RT 74872 (thanks William Blunn).
+    - Better docs of :Global inspired by RT 74869 (thanks William Blunn)
+    - Highlight the importance of uncommenting the template line in the
+      list action
+    - Clarify docs for nginx in non-root - a trailing slash on the
+      location block is very much needed.
+    - Clarified Data::Dumper usage.  RT#71410 Thanks to Bill Corr
+    - Mention Chef deployment in Manual::Deployment (thanks to Alexey
+      Melezhik)
+
+5.9002 3 Sept 2011
+    - Tutorial
+        - Switch to 'catalyst' vs. 'root' user in VM
+        - Add notes about X Windows installation
+        - Misc small adjustments
+
+5.9001 2 Sept 2011
+    - Tutorial:
+        - Migrate Tutorial to use of a downloadable Virtual Machine
+        - Switch tutorial to Catalyst::Plugin::StatusMessage (vs. flash
+            and query parameters)
+        - Switch to use of local::lib
+        - Add "next chapter links" (RT #31164)
+        - Test all the tutorial code and make sure it's all working
+        - Lots of other Tutorial cleanup
+        - Update to Catalyst 5.9 and latest versions of all modules
+        - Clean up RT ticket queue (#68379, 68377, 68376, etc.)
+    - Other misc fixes/changes
+
+
+5.9000 16 Aug 2011
+    - Copy editing to make more sense in deployment documentation.
+
+5.8901 7 Aug 2011 - TRIAL RELEASE
+    - Added Catalyst::Manual::Deployment containing the documentation
+      which used to be in Catalyst::Engine::*, updated for the
+      new PSGI engine.
+
+5.8008 2 Aug 2011
+    - Tutorial chaper 3
+      - Remove note about hacking tests to require MyApp so that MyApp->path_to
+        works. Application components should compile independently, and
+        therefore explain this and show configuring components from the
+        app class.
+
+    - Tutorial appendix
+      - Fix confusing mix of singular and plural table names in the MySQL
+        section to be plural, as per the rest of the tutorial.
+
+    - Cookbook
+      - Remove suggestion to generate RSS feeds using Template Toolkit.
+        This is a horrible idea, and it's very very easy to generate an
+        invalid feed.
+
+5.8007 29 Feb 2011
+    - Tutorial
+      - Switch to use of DBIx::Class::PassphraseColumn for hashed & salted
+        passwords. It's much more flexible than the previously used
+        DBIx::Class::EncodedColumn.
+
+5.8006 29 Feb 2011
+    - Fix metadata to refer to the new git repository
+    - Cookbook
+      - Small fixes and typos
+    - Tutorial
+      - Various typo fixes.
+      - RT #57989: typo
+      - RT #61486: correct instructions for MySQL
+      - RT #62095: prevent XSS
+      - RT #62095: persistent message on /login
+      - RT #63057: typo
+      - RT #64087: typos
+      - RT #64126: Use precise name of licence
+      - RT #64126: typos
+      - RT #67820: fix relationship decleration
+      - Do not recommend FastMmap
+    - DevelopmentProcess
+      - RT #62610: typo
+
+5.8005 27 Oct 2010
+    - Tutorial:
+        - Add DATABASE CONFIG SWITCHING USING MULTIPLE CONFIG FILES section
+        - Critical bugfix on index page.
+5.8004 17 Feb 2010
+    - Tutorial:
+        - Add foreign key support for SQLite
+            (huge thanks to Caelum for that and other good edits!)
+        - Add "Quick Start" to Intro (Chapter 1)
+        - Switch to use of "-r" to auto-restart the dev svr
+        - Update for latest available Debian package versions
+        - Switch to individual files for example code vs. tarballs
+        - Switch to 'done_testing' and shorter 'prove' args for testing chapter
+        - Misc typo fixes
+    - Other:
+        - Minor Cookbook edits
+
+5.8003 28 Dec 2009
+    - Variety of typo fixes
+    - Fix incorrectness re :Global and :Local
+    - Update DevelopmentProcess.pod
+
+5.8002 15 Nov 2009
+    - Update tutorial to match latest prepacked versions in Debian 5
+    - Add FormHandler branch (with thanks to gshank!)
+    - Misc cleanup/freshing up of tutorial.
+    - Fix indenting issue (with thanks to Kiffin Gish)
+    - Integrate tome fix branch (with thanks to tome!)
+    - Add a "negative" test to confirm that test02 does not have an admin create link
+    - Integrate sqlite3 clarification and link by wolfman2000 from tutorial_role_updates branch
+    - Fix Pod typos in ::Internals (RT#51488)
+    - Fix Pod typos in the Cookbook (RT#51466)
+    - Fix a Test::Pod failure and make Debian happier.
+    - Typo fixes from garu
+    - Misc minor and/or typo fixes
+
+5.8001 06 Oct 2009
+    - Tutorial
+        - Fix RT #46760
+        - Fix RT #46618
+        - Fix cat-install script URL
+        - Fix typos
+        - Replace reference to deprecated CatalystX::ListFramework::Builder
+          with Catalyst::Plugin::AutoCRUD
+    - Other
+        - Lots of updates thanks to t0m
+        - Update development process / core team docs
+        - Cookbook fixes WRT authorization
+        - Better description of application setup process
+        - Fix some links
+        - Normalise spacing
+
+5.8000 27 May 2009
+    - Tutorial:
+        - Update for Catalyst 5.80
+        - Update to "depluralize" the database names (big thanks to Kiffin Gish!)
+        - Switch back to including numbers in chapter names (for proper sorting)
+        - Add section to Ch 4: "Moving Complicated View Code to the Model"
+        - Add section to Ch 3: "RenderView's 'dump_info' Feature"
+        - Misc fixes and updates (thanks to Anne Wainwright)
+    - Other:
+        - Add some 5.8 and Moose-specific material to the new CatalystAndMoose.pod
+            (thanks to t0m and Sebastian Willert)
+
+5.7021  8 May 2009
+    - Tutorial:
+        - Switch to SimpleDB for auth
+        - Switch to use of DBIx::Class::EncodedColumn for hashed & salted passwords
+        - Re-write PostgreSQL section in appendix
+        - Remove "create=dynamic" and only cover "create=static" for DBIC helper
+    - Other:
+        - Rewrite / clean up a big chunk of Catalyst::Manual::Intro (Ian Wells)
+        - There is no Catalyst::Config, fix reference to it. (t0m)
+        - Misc minor adjustments
+
+5.7020  12 Mar 2009
+    - Tutorial:
+        - Fix errors in FormFu chapter
+
+5.7019  11 Mar 2009
+    - Tutorial:
+        - Change from the use of "part" to refer to each .pod file for the
+            tutorial in favor of the more intuitive word "chapter."  "Part"
+            was just to ambiguous (e.g., does "prior part" refer to the prior
+            .pod file or the prior section in the current .pod file).
+        - Move use of "load_namespaces" for DBIC from BasicCRUD to
+            MoreCatalystBasics
+        - Update the "Table of Contents" in Tutorial.pod to match the current
+            sections
+        - Fix a few typos
+
+5.7018  8 Mar 2009
+    - Tutorial:
+        - Add a new section to BasicCRUD covering more advanced features of
+            DBIC ("EXPLORING THE POWER OF DBIC")
+        - Convert from Ubuntu to Debian 5 live CD as the recommended way to do
+            the tutorial (all code and examples updated and tested to match)
+        - Removed Catalyst::Plugin::Authorization::ACL from Authorization.pod
+            in favor of a "chained and model-based" approach
+        - More conversion to Chained dispatch
+        - Suggestions and fixes with thanks to mintywalker@gmail.com
+        - DBIC-related updates in MoreCatalystBasics
+        - Fix misplaced "=over 4" in previous release
+        - Reword warning about not using GET for delete based on input from kd
+        - Lots of other small adjustments
+
+5.7017  28 Feb 2009
+    - Tutorial:
+        - Main change = adding Chained dispatch starting in BasicCRUD (Part 4)
+        - Change FormFu tutorial to not use deprecated methods (Del Merritt)
+        - MoreCatalystBasics - Additional clarification about TTSite
+          (Del Merritt)
+        - Tutorial::Authorization - Corrects the ACL for "/books/delete"
+                                  - Additional comments
+          (Del Merritt)
+        - Tutorial::AdvancedCRUD::FormFu - suggest how the intrepid user
+          might now proceed, having completed the Tutorial. (Del Merritt)
+        - Fix typo in Authorization section (RT #42091)
+        - Fix typo in BasicCRUD (RT #42034)
+        - Resolve outstanding typo and suggestions in MoreCatalystBasics (RT #41491)
+        - Fix DBIC create for MySQL in Appendix (Jarom)
+    - Other:
+        - Misc minor updates
+        - Add some "getting started" links to the Catalyst::Manual page
+
+5.7016  28 Dec 2008
+    - Tutorial:
+        - Updates to make Parts 8 & 9 run correctly
+        - Adjust URLs for final config tarballs
+        - Add note about changes across different C::Devel on how plugins enabled
+        - Misc minor updates
+
+5.7015  15 Dec 2008
+    - Tutorial:
+        - Remove TTSite from Tutorial (thanks to dhoss for the help)
+        - Update Tutorial for Ubuntu 8.10 (therefore update to
+          Cat v5.7014, C::Devel v1.07, DBIC v0.08010, etc.)
+        - Reorganize MoreCatalystBasics.pod so user is able to run
+          the app the first time much earlier and build on it from
+          there (running the app each time along the way)
+        - Update URL for latest copy in SVN to match new location of repo
+    - Other:
+        - Misc typo fix
+        - Change use of Class::C3 to MRO::Compat, as rafl tells me
+            this is best practice, and gives you native next::method in
+            5.10. (t0m)
+
+5.7014   04 Nov 2008
+    - Remove a reference to a FOREACH loop that did not exist (RT #39046)
+    - Changed some Template Toolkit links to perldoc links (RT #38354)
+    - Fix Template Toolkit website link (RT #37574)
+    - Fix part numbering (RT #37963)
+    - Improvements to the ACCEPT_CONTEXT docs in Manual::Intro
+    - Happy Election Day, America!
+
+5.7013   09 Jul 2008
+    - revert to use Catalyst qw/@plugins/ style
+
+5.7012   29 May 2008
+    - Expurgation of all use of default :Private and index :Private in favour
+      of default :Path and index :Path :Args(0)
+    - Expurgation of all yaml as configuration format
+    - Major updates to tutorial, thanks hkclark and gerda
+
+5.7011   16 May 2008
+    - added warnings and poiinters to newer examples in HTML::Widget,
+      and Authentication parts of the tutorial.
+    - pod fix (RT #32636)
+
+5.701004 09 Apr 2008
+    - rename placeholder back to Manual.pm, this will probably trigger
+      a ppm bug but that's ppm's problem
+
+5.701003 08 Oct 2007
+    - Patch to Cookbook from bits.
+
+5.701002 25 Aug 2007
+
+5.701001 17 Aug 2007
+    - Changes to mocation of lib/Catalyst/Manual.pod to
+      lib/Catalyst/ManualPlaceholder.pm to keep cpan indexer happy.
+
+5.700704 08 Aug 2007
+    - Updated mailing list addresses to scsys.co.uk domains
+
+5.700703
+    - Cookbook: Updated development server deployment instructions, and
+      included a better description of the POE engine.
+
+5.700702 26 April 2007
+    - Switch to Module::Install
+
+5.700701 19 April 2007
+    - Removal of WritingPlugins. ExtendingCatalyst is now the main resource
+      for extensions to the framework and the application.
+
+5.700501 10 November 2006
+    - Matches Catalyst-Runtime 5.7005
+
+5.700401 07 November 2006
+    - First release to CPAN; matches Catalyst-Runtime 5.7004.
+
+5.700301 20 October 2006
+    - Splitting manual into its own distro

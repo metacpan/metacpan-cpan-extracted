@@ -1,0 +1,11 @@
+FastTemplate.pm
+MANIFEST
+Makefile.PL
+README
+t/instantiate.t
+t/parse_append.t
+t/parse_simple.t
+t/parse_slurp.t
+t/parse_strict.t
+templates/all.tpl
+templates/row.tpl

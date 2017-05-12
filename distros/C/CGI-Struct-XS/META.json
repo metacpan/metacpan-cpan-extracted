@@ -1,0 +1,46 @@
+{
+   "abstract" : "Build structures from CGI data. Fast.",
+   "author" : [
+      "Dmitry Smal <mialinx@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Struct-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Storable" : "0",
+            "Test::Deep" : "0",
+            "Test::Deep::NoTest" : "0",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.04"
+}

@@ -1,0 +1,8 @@
+ToDo list for CSS-Flip package.
+
+* Transformation of orientations from horizontal-tb to vertical-rl/lr.
+
+  - There is an experimental implementation for vertical-rl by EPUB project:
+    L<http://www.epubcafe.jp/download>.
+
+$$

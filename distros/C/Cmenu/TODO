@@ -1,0 +1,28 @@
+****************************************************************************
+Cmenu.pm -- Perl Menu Support Facility 
+
+                    ******  ******     *****   ******
+                    ******  ******     ******  ******
+                      **    **  **     **  **  **  **
+                      **    ******     ******  ******
+                      **    ******     *****   ******
+
+ Version: 1.1
+****************************************************************************
+
+
+***** improve field checking especially for numeric formats
+      generally numeric data entry is very poor
+
+***   add explicit field locations for data templates
+
+*     add arrow pointer instead of bounce bar for really dumb terminals
+
+**    add multicolumn facility
+
+**    move button specs to menu_init routine
+	its too tedious trying to manage this with menu_button_set calls
+	also need to be able to hack button responses
+
+**    need to be able to deal with edit fields which are wider than the
+	space available in the editing window or span multiple lines

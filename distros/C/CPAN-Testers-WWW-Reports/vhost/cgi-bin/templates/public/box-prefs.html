@@ -1,0 +1,63 @@
+<h1>Preferences</h1>
+<h2>Grade:</h2>
+<select id="grade_pref" name="grade" onchange="check_grade(this)">
+<option value="0">All Reports</option>
+<option value="1">PASS ONLY</option>
+<option value="2">FAIL ONLY</option>
+<option value="3">NA ONLY</option>
+<option value="4">UNKNOWN ONLY</option>
+</select>
+
+<h2>Availability:</h2>
+<select id="oncpan_pref" name="oncpan" onchange="check_oncpan(this)">
+<option value="0">All Distributions</option>
+<option value="1">On CPAN ONLY</option>
+<option value="2">BACKPAN ONLY</option>
+</select>
+
+<h2>Dist Maturity</h2>
+<select id="distmat_pref" name="distmat" onchange="check_distmat(this)">
+<option value="0">All Releases</option>
+<option value="1">Official ONLY</option>
+<option value="2">Development ONLY</option>
+</select>
+
+<h2>Perl Maturity</h2>
+<select id="perlmat_pref" name="perlmat" onchange="check_perlmat(this)">
+<option value="0">All Versions</option>
+<option value="1">Official ONLY</option>
+<option value="2">Development ONLY</option>
+</select>
+
+<h2>Patched Perl</h2>
+<select id="patches_pref" name="patches" onchange="check_patches(this)">
+<option value="0">Include Patches</option>
+<option value="1">Exclude Patches</option>
+<option value="2">Patches ONLY</option>
+</select>
+
+<h2>Perl Version</h2>
+<select id="perlver_pref" name="perlver" onchange="check_perlver(this)">
+<option value="ALL">ALL</option>
+[% FOREACH item = perlvers %]
+<option value="[% item %]">[% item %]</option>
+[% END %]
+</select>
+
+<h2>OS Name</h2>
+<select id="osname_pref" name="osname" onchange="check_osname(this)">
+<option value="ALL">ALL</option>
+[% FOREACH item = osnames.sort %]
+<option value="[% item %]">[% osnames.$item %]</option>
+[% END %]
+</select>
+
+<ul>
+<li><a id="PermLink" href="#">Link to this page with the above options</a></li>
+<li><a href="/home/prefs.html">Change Cookie Preferences</a></li>
+</ul>
+
+<p>The preferences act as filters to the data available in the reports listed, 
+as well as the summary graph below.</p>
+<p>If you don't see the reports you expect to see, please considering altering 
+the preferences above before filing a fault report for the site.</p>

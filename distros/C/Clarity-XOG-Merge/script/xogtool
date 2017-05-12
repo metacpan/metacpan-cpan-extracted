@@ -1,0 +1,116 @@
+#! /usr/bin/env perl
+
+use Clarity::XOG;
+Clarity::XOG->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+xogtool - Frontend tool to Clarity::XOG::Merge
+
+=head1 ABOUT
+
+This is a Clarity XOG tool. Its primary usecase is merging I<XOG>
+project files. See C<xogtool help merge> for more details.
+
+
+=head1 SYNOPSIS
+
+=head2 merge
+
+This provides the core functionality of the tool.
+
+ xogtool merge [-dfiov] [long options...]
+
+Merge Clarity project files.
+
+You either specify the files to merge or it finds all C<*.xml> files
+either in local directory or the directory you specified with B<-i>.
+
+Specify an output file with B<-o>, default is C<XOGMERGE.xml> in
+current directory. If you want to force overwrite an existing output
+file without asking then specify B<-f>.
+
+During the process a temporary directory is created, used, and cleaned
+up at the end.
+
+To self-test the xogtool use the C<xogtool selftest>.
+
+Options:
+
+=over 4
+
+=item -o|--out <FILENAME>
+
+Write result to that file
+
+=item -i|--in <SUBDIR>
+
+Search default input files in that subdir
+
+=item -v|--verbose
+
+Be verbose
+
+=item -d|--debug
+
+Output debugging info
+
+=item -f|--force
+
+Force overwrite of existing output file.
+
+=back
+
+=head2 selftest
+
+ xogtool selftest 
+
+Built-in self test.
+
+Merge some self-contained dummy xml files into a temporary result file
+and executes plausibility checks.
+
+This is to check for general working, like XML parsing, create and
+cleanup temp files, etc.
+
+Expected output is some 'ok' lines and number of tests, eg. '1..4'.
+
+=head2 help
+
+ xogtool <subcommand> [options]* [files]*
+
+Available commands:
+
+  commands: list the application's commands
+      help: display a command's help screen
+     merge: merge several files
+  selftest: built-in self test
+
+=head2 commands
+
+Lists the available subcommands. Basically the same as C<help>.
+
+=head1 AUTHOR
+
+Steffen Schwigon, C<< <ss5 at renormalist.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-clarity-xog-merge
+at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Clarity-XOG-Merge>. I
+will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2011 Steffen Schwigon, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,29 @@
+---
+abstract: 'Enable Plack Middleware via Configuration'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Test: 0
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Plack::App::File: 0
+  Plack::Middleware::Static: 0
+  Test::Most: 0.25
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-EnableMiddleware
+requires:
+  Catalyst::Utils: 0
+  Moose::Role: 0
+  Plack::Util: 0
+  Scalar::Util: 0
+  Text::SimpleTable: 0
+  namespace::autoclean: 0
+version: 0.006

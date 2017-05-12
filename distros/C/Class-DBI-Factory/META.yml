@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-Factory
+version:      0.994
+version_from: lib/Class/DBI/Factory.pm
+installdirs:  site
+requires:
+    AppConfig:                     0
+    Class::DBI:                    0.96
+    Email::Send:                   0
+    Error:                         0
+    Ima::DBI:                      0.33
+    Test::Exception:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

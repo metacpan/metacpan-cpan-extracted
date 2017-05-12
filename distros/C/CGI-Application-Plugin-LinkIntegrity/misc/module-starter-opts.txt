@@ -1,0 +1,2 @@
+
+  $ module-starter --mb --module=CGI::Application::Plugin::LinkIntegrity --author="Michael Graham" --email=mag-perl@occamstoothbrush.com

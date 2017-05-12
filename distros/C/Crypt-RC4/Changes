@@ -1,0 +1,19 @@
+Revision history for Perl extension Crypt::RC4.
+
+2.02 12-Dec-2001
+	- Initialized $x and $y to make the code warnings-compliant.
+	- Converted globals to instance variables so that
+	  the OO interface can work correctly;
+	  added tests to ensure that.
+	- Eliminated modification of return value from unpack.
+	- Increased efficiency on long messages.
+	- Fixed buggy tests.
+	- Added some documentation and tests.
+
+2.01 28-Nov-2001 16:12:14
+	- removed use of "our" to make Crypt::RC4 
+	  compatible with earlier versions of perl
+	- stripped ^M's out of .pm file
+
+2.0  23-Nov-2001 13:02:26
+	- added OO interface

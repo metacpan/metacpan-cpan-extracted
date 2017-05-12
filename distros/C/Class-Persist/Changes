@@ -1,0 +1,7 @@
+0.02	Monday 23rd August, 2004
+	Improved the code example in SYNOPSIS
+	Frobbed search to take no query, and documented the order_by parameter.
+	Tweaked ->set to set multiple key/value pairs in one call.
+
+0.01	Thursday 15th July, 2004
+	Initial CPAN release

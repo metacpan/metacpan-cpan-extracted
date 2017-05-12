@@ -1,0 +1,15 @@
+name: foo
+method: post
+javascript: 0
+
+fields:
+
+    foo_one:
+        label: Foo One
+        type:  text
+
+    foo_two:
+        label: Foo Two
+        type:  text
+
+submit: Save Foo

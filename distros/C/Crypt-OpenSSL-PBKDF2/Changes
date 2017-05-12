@@ -1,0 +1,16 @@
+Revision history for Perl extension Crypt::OpenSSL::PBKDF2.
+
+0.01  Sat May 29 13:11:01 2010
+	- original release
+
+0.02  Thu Nov 11 19:58:35 2010
+	- some docs corrections
+
+0.03  Sat Jul 11 23:47:13 2015
+	- re-licensed under dual-licensing
+	  (GNU GPLv2+ or Artistic License)
+
+0.04  Sun Aug 02 00:18:07 2015
+	- added derive_bin function
+	- updated docs
+	- updated tests (w RFC7060 vectors)

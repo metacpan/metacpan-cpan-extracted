@@ -1,0 +1,26 @@
+Changes
+lib/Compress/BGZF.pm
+lib/Compress/BGZF/Reader.pm
+lib/Compress/BGZF/Writer.pm
+Makefile.PL
+MANIFEST
+README.md
+LICENSE
+t/bgzf_fh.t
+t/bgzf_obj.t
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/corpus/long_chunks
+t/corpus/long_chunks.gz
+t/corpus/long_chunks.gz.gzi
+t/corpus/lorem
+t/corpus/lorem.gz
+t/corpus/lorem.gz.gzi
+t/corpus/lorem_long
+t/corpus/lorem_long.gz
+t/corpus/lorem_long.gz.gzi
+bin/bgzip.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

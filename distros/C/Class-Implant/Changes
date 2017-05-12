@@ -1,0 +1,10 @@
+Revision history for Perl extension Class::Implant.
+
+0.01  2009/4/2
+    - implement main function: implant()
+
+    - original version; 
+        + created by h2xs 1.23 partially with options 
+                -X -n Class::Implant
+        + created by dzil 1.004 partially
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Catalyst model for Lucy.'
+author:
+  - 'Catalyst-Model-Lucy <logie@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-Lucy
+requires:
+  Catalyst::Model: 0
+  File::Spec: 0
+  FindBin: 0
+  Lucy: 0
+  Moo: 0
+version: 0.001

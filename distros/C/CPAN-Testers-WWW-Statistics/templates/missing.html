@@ -1,0 +1,37 @@
+[% 
+    title = 'Missing In Action' ;
+    box_sites = 1
+
+    crumb1_name = 'Missing In Action' ;
+%]
+
+<p>Since setting up the ability for CPAN authors to receive daily summary reports, the CPAN Testers server has received the
+occasional bounce back, when the destination mail server has rejected an email from the CPAN Testers. To avoid continually
+receiving these bounce backs, we disable sending to these addresses. This then means that these users no longer receive
+any daily summaries or individual reports from the CPAN Testers preferences system.</p>
+<p>If your PAUSE id is listed below, please take the time to check how your <a href="http://pause.perl.org/" title="PAUSE account">PAUSE account</a>
+is set up, as you may have inadvertantly provided an mispelt address, or perhaps an old email address is listed that requires
+updating. Or it is quite possible that need to set your PAUSE account to allow receipt of email. Once logged into PAUSE, 
+under the 'Account' menu heading, click 'Edit Account Info'. Here you can enter a visible email address, a secret email
+address and set how redirect works. Regards the latter, if you select 'Neither Nor' this will disable your ability to
+receive CPAN Testers emails, RT bug tickets and potentially anyone wishing to contact you regarding your modules. If it is
+your intention to not receive these emails, please ensure your modules provide some means for users to contact you.</p>
+<p>Once your pause redirect is corrected as appropriate, please contact <a href="mailto:barbie@cpan.org" title="contact Barbie">me</a> 
+and I will remove you from the list below, and re-enable the CPAN Testers summaries for you.</p>
+
+<h2>Missing In Action</h2>
+
+<div class="boxer flat">
+<table summary="Missing In Action">
+<tr><th class="top">PAUSE</th><th class="top">Timestamp</th><th class="top">Reason</th></tr>
+[% IF missing %]
+[% FOREACH item = missing %]
+<tr><th class="side">[% item.pauseid %]</th><td class="timestamp1">[% item.timestamp %]</td><td>[% item.reason %]</td></tr>
+[% END %]
+[% ELSE %]
+<tr><td colspan="3">All PAUSE ids accounted for.</td></tr>
+[% END %]
+</table>
+</div>
+
+<p>Note: The timestamp indicates the time of the last received bounce back email.</p>

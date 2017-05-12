@@ -1,0 +1,72 @@
+{
+   "abstract" : "unAPI webservice based on Catmandu",
+   "author" : [
+      "Jakob Voß"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-Plack-unAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.037"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.9204",
+            "Plack" : "1.0",
+            "Plack::App::unAPI" : "0.61",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Moo" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbv/Catmandu-Plack-unAPI/issues"
+      },
+      "homepage" : "https://github.com/gbv/Catmandu-Plack-unAPI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gbv/Catmandu-Plack-unAPI.git",
+         "web" : "https://github.com/gbv/Catmandu-Plack-unAPI"
+      }
+   },
+   "version" : "0.11",
+   "x_contributors" : [
+      "Jakob Voss <voss@gbv.de>"
+   ]
+}
+

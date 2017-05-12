@@ -1,0 +1,48 @@
+NAME
+    Catalyst::Plugin::XMLRPC - Dispatch XMLRPC methods with Catalyst
+
+SYNOPSIS
+        # Include it in plugin list
+        use Catalyst qw/XMLRPC/;
+
+        # Public action to redispatch somewhere in a controller
+        sub entrypoint : Global {
+            my ( $self, $c ) = @_;
+
+            # Redispatch to XMLRPC methods by calling this method
+            $c->xmlrpc;
+        }
+
+        # Methods with XMLRPC attribute in any controller
+        sub echo : XMLRPC('myAPI.echo') {
+            my ( $self, $c, @args ) = @_;
+            return RPC::XML::fault->new( 400, "No input!" ) unless @args;
+            return join ' ', @args;
+        }
+
+        sub add : XMLRPC {
+            my ( $self, $c, $a, $b ) = @_;
+            return $a + $b;
+        }
+
+DESCRIPTION
+    This plugin allows your controller class to dispatch XMLRPC methods from
+    its own class.
+
+METHODS
+  $c->xmlrpc
+    Call this method from a controller action to set it up as a endpoint.
+
+  setup_dispatcher
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Helper, RPC::XML
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de" Marcus Ramberg, "mramberg@cpan.org"
+    Christian Hansen Yoshinori Sano Michiel Ootjers Jos Boumans
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

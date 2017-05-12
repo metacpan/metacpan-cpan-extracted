@@ -1,0 +1,129 @@
+-*- mode: text;-*-
+
+Revision history for Perl module CGI::Session::Auth
+
+$Id: Changes 34 2008-01-03 19:29:06Z geewiz $
+
+1.06 (2008-01-03)
+
+    Changes:
+    
+    - Added t/dbi.t test module
+    
+    - Modified the test modules slightly to run under Mac OS X with a current
+      Test::More.
+    
+    Fixes:
+    
+    - Removed Mac OS X resource fork files from the tarball.
+    
+    1.05 (2007-09-02)
+
+	Changes:
+	
+	- Session ID will be created with _session->name() instead of CGISESSID
+	  (Thanks to Oliver Paukstadt)
+
+	Fixes:
+	
+	- Documentation wrongly referenced a parameter "lvprefix". Corrected to 
+	  "LoginVarPrefix". (Thanks to Jonathon Wyza)
+	
+1.04 (2006-01-17)
+
+	Changes:
+	
+	- fixed missing parentheses in Auth/DBI.pm
+	- fixed copy-and-paste errors in exaples/testapp-dbi.pl
+	- some minor changes
+	
+1.02 (2005-10-09)
+
+	 Changes:
+	 
+	 - Made another distribution with proper version numbers.
+
+1.0 (2005-10-03)
+
+	Changes:
+
+	- Added the parameter 'EncryptPW' to CGI::Session::Auth::DBI to
+	  activate the handling of MD5-encrypted passwords.
+
+	- Worked Jess' suggestions into the docs
+
+0.23
+    Changes:
+    - Small changes in the POD sections
+    Fixes:
+    - Finally applied Daniels Patch to uniqueUserId
+    - Fixed trailing newline in _readUserFile (thanks to Gregory
+      Ramsperger)
+    
+0.22
+	I applied the wrong patch on DBI.pm. This version should work.
+
+0.20
+    I finally included the patch that Cees Heek sent me 11/2003 -- I'm
+    really sorry for the incredible delay.
+
+    Additions:
+    - File.pm: group support
+    Fixes:
+    - DBI.pm: fixed wrong error handling call
+    - DBI.pm: SQL calls use placeholders to avoid SQL injection attacks
+
+0.16
+	Corrected call to _info() in Auth/DBI.pm
+	
+0.15
+	Patch by Cees Hek <cees@crtconsulting.ca> to allow for using CGI::Simple as
+	a lightweight replacement for CGI
+	
+0.14
+	Additions:
+	- File.pm: new subclass using file based storage
+	Changes:
+	- Auth.pm: Renamed method 'init()' to 'authenticate()'
+	- Auth.pm: Renamed method 'checkUsername()' to 'hasUsername()'
+	- Auth.pm: Renamed method 'checkGroup()' to 'isGroupMember()'
+	- Auth.pm: Renamed method 'debug()' to '_debug()'
+	- Auth.pm: Renamed method 'info()' to '_info()'
+	- Auth.pm: Improved POD section.
+	- DBI.pm: Improved POD section.
+	Fixes:
+	- Makefile.PL: modules CGI and CGI::Session added to prerequisites
+	
+0.13
+	Sorry, I totally forgot to "make test"!
+
+0.12
+	Changes:
+	- Auth.pm: renamed constructor parameter 'DoIPAuth' to 'IPAuth'
+	- Auth.pm: made logging optional by new constructor parameter 'Log'
+	Fixes:
+	- Makefile.PM: added prerequisites
+	- DBI.pm: fixed call of missing _getProfile(), replaced by _extractProfile()
+		
+0.11 
+	- Changes:
+		- Auth.pm: replaced _sendSessionCookie() with sessionCookie()
+			for it can't be the job of the module to send the cookie, 
+			the application has to take care of that.
+		
+0.10  2003-09-16 23:52:12
+	- alpha version of CGI::Session::Auth
+		- fake class, works with only one user account: guest/guest
+		- authentication by login (username/password)
+		- minimum documentation
+	- alpha version of CGI::Session::Auth::DBI
+		- configurable database backend
+		- authentication by login (username/password)
+		- automatic authentication by remote IP address (CIDR)
+		- minimum documentation
+	- added some alibi tests
+	- added example scripts
+
+0.01  2003-09-12 11:23:13
+	- original version; created by h2xs 1.22 with options
+		-XA -n CGI::Session::Auth

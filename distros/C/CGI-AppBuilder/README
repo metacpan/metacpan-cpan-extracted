@@ -1,0 +1,77 @@
+NAME
+    CGI::AppBuilder - CGI Application Builder
+
+SYNOPSIS
+      use CGI::AppBuilder;
+
+      my $cg = CGI::AppBuilder->new('ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my $ar = $cg->get_inputs;
+
+DESCRIPTION
+    There are already many application builders out there. Why you need
+    another one? Well, if you are already familiar with CGI::Builder or
+    CGI::Application, this one will provide some useful methods to you to
+    read your configuration file and pre-process your templates. Please read
+    on.
+
+   new (ifn => 'file.cfg', opt => 'hvS:')
+    Input variables:
+
+      $ifn  - input/initial file name. 
+      $opt  - options for Getopt::Std
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $ca = new CGI::AppBuilder;      # or
+       my $ca = CGI::AppBuilder->new;     # or
+       my $ca = CGI::AppBuilder->new(ifn=>'file.cfg',opt=>'hvS:'); # or
+       my $ca = CGI::AppBuilder->new('ifn', 'file.cfg','opt','hvS:');
+
+    Return: new empty or initialized CGI::AppBuilder object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      $self->{ifn} = ""
+      $self->{opt} = 'hvS:';
+
+HISTORY
+    *   Version 0.10
+
+        This version is to extract out the app methods from CGI::Getopt
+        class. It was too much for CGI::Getopt to include the start_app,
+        end_app, build_html_header, and disp_form methods.
+
+          0.11 Rewrote start_app method so that content-type can be changed.
+          0.12 Moved disp_form to CGI::AppBuilder::Form,
+               moved build_html_header to CGI::AppBuilder::Header, and 
+               imported all the methods in sub-classes into this class.
+
+    *   Version 1.0001
+
+        Removed start_app and end_app to CGI::AppBuilder::Apps module.
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 ~ 2015 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 155:
+        You forgot a '=back' before '=head1'
+

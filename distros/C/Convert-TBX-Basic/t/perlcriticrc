@@ -1,0 +1,8 @@
+severity = 4
+top = 5
+exclude = Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords ControlStructures::ProhibitCascadingIfElse RegularExpressions::RequireExtendedFormatting
+
+[ControlStructure::ProhibitPostfixControls]
+severity = 4
+allow = if unless
+theme = iffy

@@ -1,0 +1,144 @@
+Compress-AsciiFlate version 1.00
+================================
+
+NAME
+
+Compress::AsciiFlate - deflates text, outputs text not binary
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+
+SYNOPSIS
+
+	use Compress::AsciiFlate;
+	my $af = new Compress::AsciiFlate;
+	my $text = 'some words some words some words';
+	$af->deflate($text);
+	print $text; # prints: "some words _1 _2 _1 _2"
+	$af->inflate($text);
+	print $text; # now prints: "some words some words some words"
+	
+	print $af->olength; # original length: 33
+	print $af->dlength; # deflated length: 23
+	print $af->difference; # 10
+	print $af->ratio; # 0.696969696969697
+	print $af->ratio(3); # 0.697
+	print $af->percentage; # 69.69
+	print $af->percentage(4); # 69.697
+	print $af->count; # how many different words: 2
+	print join(' ',$af->table); # _1 some _2 words
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DESCRIPTION
+
+Compress::AsciiFlate provides methods to deflate text to a non-binary state.  The resulting
+text will retain one copy of each word so that it is still searchable, say, in a database field.
+This also means one can store the deflated text in a non-binary field and perform case-
+insensitive searches if required.
+
+The core algorithm is very similar to the LZW algorithm.  It works in the following way:
+
+	deflating...
+		if this word exists in my table:
+			output the code from my table
+		else 
+			store the word with the next code and output the word
+		
+	deflating
+		if this word is a code that exists in my table:
+			output the word from my table
+		else
+			store the word with the next code and output the word
+		
+A couple of details... the codes that are output are TEXT.  The codes are 62ary using
+0-9, A-Z and a-z as digits.  The codes are prepended by an underscore in the output
+to distinguish them from normal words.  If there are normal words in the source that
+happen to start with underscores, they too are prepended by another underscore to 
+distinguish them from codes.  So if every word in your source was different and started
+with an underscore, the "delfated" version would be larger!  
+
+Since the minimum length of a code is 2, the underscore and one digit, words below 
+a length of 3 are not encoded.  In fact, the algorithm checks to see that the code is
+actually shorter than the word so that, firstly, the output is not larger than the input
+and, secondly, codes are not wasted on words of the same size.
+
+METHODS
+
+	$af = new Compress::AsciiFlate(? lite ?)  OR  $af2 = $af->new(? lite ?)
+
+new() creates a new Compress::AsciiFlate object and returns it.  If the argument
+'lite' is also supplied, the object will not store the table it creates during de/inflation.
+
+	$af->deflate($text|@text)
+
+Deflates the text in the scalar or array supplied.  If an array is supplied, the same table is
+use for all of it's elements.  This could mean that most of the table is constructed after the
+first element of the array, and you wil save a lot more space.  But it also means that you
+must supply the elements in the same order when deflating.  The table created is stored
+unless 'lite' has been specified (see new()).
+
+	$af->inflate($text|@text)
+
+Undoes the work of deflate() on a scalar or array. The table created is stored unless 'lite' 
+has been specified (see new()).
+
+	$original_length = $af->olength
+
+Returns the original length of the text related to the last call to inflate or deflate.
+
+	$deflated_length = $o->dlength
+
+Returns the deflated length of the text related to the last call to inflate or deflate.
+
+	$length_difference = $o->difference
+
+Returns the length of the reduction in size related to the last call to inflate or deflate.
+
+	$compression_ratio = $o->ratio(? $decimal_places ?)
+
+Returns the compression ratio related to the last call to inflate or deflate.
+Accepts an optional argument to specify a number of decimal places.  If this argument
+is not specified, the number of decimal places is not modified.
+
+	$compression_percentage = $o->percentage(? $decimal_places ?)
+
+Returns the compression ratio related to the last call to inflate or deflate as a percentage.
+Accepts an optional argument to specify a number of decimal places.  If this argument
+is not specified, the number of decimal places defaults to 2.
+
+	$count = $o->count
+
+Returns the number of table entries in the table created by the last call to inflate or deflate, 
+which is equivalent to the number of different "words" in the original text.
+
+	%table = $o->table
+
+Returns the table that was created with the last call to inflate or deflate, unless 'lite' was
+specified in new(), in which case no table is stored.
+
+AUTHOR
+
+Jimi-Carlo Bukowski-Wills <jimi@webu.co.uk>
+
+SEE ALSO
+
+Compress::LZW
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Jimi-Carlo Bukowski-Wills
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

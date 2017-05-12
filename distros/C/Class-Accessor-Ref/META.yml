@@ -1,0 +1,19 @@
+--- 
+abstract: Access members by reference
+author: -2007 Gaal Yahas.
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.65
+license: MIT
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Class-Accessor-Ref
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0.10
+version: 0.05

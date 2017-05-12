@@ -1,0 +1,17 @@
+bin/tbx2utx
+bin/utx2tbx
+Build.PL
+lib/Convert/TBX/UTX.pm
+MANIFEST			This list of files
+README.md
+t/base_test_TBX.t
+t/base_test_UTX.t
+t/Corpus/Sample.tbx
+t/Corpus/Sample.utx
+t/script_Tests.t
+t/TestUTX_TBX.pm
+t/UTX-TBX/convertTBX.t
+t/UTX-TBX/convertUTX.t
+Makefile.PL
+META.yml
+META.json

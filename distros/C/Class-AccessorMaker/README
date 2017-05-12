@@ -1,0 +1,12 @@
+To install this module please proceed in taking the following steps:
+
+Of course thy shall not do the first three steps whilst beeing a
+root-user!
+
+perl Makefile.PL
+make
+make test
+su root -c "make install"
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+And you can ignore the 'su root -c' bit :-)

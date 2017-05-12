@@ -1,0 +1,9 @@
+0.03  Fri, 07 May 2010 03:50:57 +0200
+  * Improve distribution metadata.
+  * Stop depending on build requirements at runtime.
+
+0.02  Tue, 01 Dec 2009 00:31:41 +0000
+  * Bump Catalyst dependency to 5.80
+
+0.01  Sun, 08 Nov 2009 13:53:46 +0100
+  * Initial release.

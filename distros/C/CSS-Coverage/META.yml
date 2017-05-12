@@ -1,0 +1,25 @@
+---
+abstract: 'Confirm that your CSS matches your DOM'
+author:
+  - 'Shawn M Moore <code@sartak.org>'
+build_requires:
+  Data::Section: 0.100270
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CSS-Coverage
+requires:
+  CSS::SAC: 0
+  HTML::Selector::XPath: 0
+  HTML::TreeBuilder::XPath: 0
+  Moose: 2.08
+resources:
+  homepage: https://github.com/sartak/CSS-Coverage
+  repository: https://github.com/sartak/CSS-Coverage.git
+version: 0.04

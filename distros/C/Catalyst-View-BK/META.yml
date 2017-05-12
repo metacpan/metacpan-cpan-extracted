@@ -1,0 +1,27 @@
+---
+name: Catalyst-View-BK
+version: 0.1
+author:
+  - Jeremy Wall
+abstract: Catalyst View using the Bricklayer::Templater engine
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bricklayer::Templater: 0.9.4
+  Catalyst: 5.7
+  Catalyst::View: 0
+  NEXT: 0
+  perl: 5.6
+build_requires:
+  Test::More: 0.7
+provides:
+  Catalyst::Helper::View::BK:
+    file: lib/Catalyst/Helper/View/BK.pm
+  Catalyst::View::BK:
+    file: lib/Catalyst/View/BK.pm
+    version: 0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,42 @@
+Revision history for Perl extension Crypt::OpenSSL::PKCS10.
+
+0.16  Mon Oct 17 09:36:48 PDT 2016
+        - OpenSSL 1.1.0 support (thanks Petr Písar)
+
+0.15  Fri Aug  7 23:12:46 PDT 2015
+        - UTF-8 subject support. (Adam Osuchowski)
+        - get_pubkey() Returns the PEM encoding of the PKCS10 public key. (David Dick)
+
+0.14  Wed Sep 16 11:49:00 PDT 2014
+        - SHA-256 signature default. SHA-1 signatures are no longer considered safe, and SHA-256 replaces it. (Jan Ingvoldstad)
+
+0.13  Wed Apr 16 12:12:00 PDT 2014
+        - added support for NID_subject_key_identifier (Brad Davidson)
+
+0.12  Thu Aug 20 23:40:00 PDT 2013
+        - Fixed missing test prerequisite in MANIFEST.
+
+0.11  Thu Aug 19 14:40:00 PDT 2013
+        - Load CSR from PEM files. Read subject and keyinfo from a PKCS10 object. (Bug #87893 thanks to smile)
+
+0.10  Thu Jul 19 10:51:00 PDT 2013
+        - Fixed an undefined variable in the tests (Bug #87049).
+
+0.08  Thu Mar 01 21:52:00 PDT 2013
+        - Added support for raw custom extensions (thanks to Brad Davidson).
+
+0.07  Thu Sep 27 11:19:41 PDT 2012
+        - Changed default hash algorithm for signing from MD5 to SHA1.
+
+0.05  Sun Feb 19 23:31:45 2006
+	- Now subject can contain oids too (like /C=RO/O=UTI/OU=ssi/2.5.4.9=my street)
+
+0.04  <unreleased>
+	- Require perl 5.8.0 (to work on older OS)
+
+0.03  Fri Jan 22 21:24:45 2006
+	- less memory leaks, but still there are some :(
+
+0.01  Fri Jan 20 21:24:45 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Mytest

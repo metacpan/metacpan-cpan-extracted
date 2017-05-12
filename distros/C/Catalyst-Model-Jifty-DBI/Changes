@@ -1,0 +1,37 @@
+Revision history for Catalyst-Model-Jifty-DBI
+
+0.06 2009/04/28
+  - switched from NEXT to MRO::Compat
+  - removed UNIVERSAL::require dependency
+
+0.05 2008/03/22
+  - prepare implicit Collections before loading any Records
+    so as not for JDBI to fail to create relationships
+
+0.04 2008/03/21
+  - bumped up the version requirement of Test::UseAllModules to 0.09
+  - added ->trace method
+
+0.03 2007/11/27
+  - *** INCOMPATIBLE API CHANGE ***
+  - By the request of Matt S. Trout, ISHIGAKI took over this
+    namespace and replaced the origianl Catalyst-Model-Jifty-DBI
+    (written by Marcus Ramberg; 0.01 released on 2006-06-26) 
+    with the former Catalyst-Model-JDBI-Schemas to avoid future
+    confusion. Note that this version has backward incompatibility.
+
+  - added default_handle_name to cache the name internally.
+  - schema_base is a model name you create by default.
+
+Revision history for Catalyst-Model-JDBI-Schemas
+
+0.02 2007/11/27
+  - added missing Test::UseAllModules dependency; no code changes
+
+0.01 2007/11/26
+  - initial release
+
+Revision history for original Catalyst-Model-Jifty-DBI (by Marcus Ramberg)
+
+0.01 2006-06-26 14:21:00
+    - Initial release

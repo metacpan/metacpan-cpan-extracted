@@ -1,0 +1,8 @@
+Revision history for Perl extension Chemistry::Canonicalize
+
+0.11  Sun May 10 2009
+        - Increase atom limit. Use Math::BigInt for prime number multiplications
+          to avoid overflows (Liliana Felix Avila).
+0.10  Wed Jun 16 2004
+	- First CPAN release
+

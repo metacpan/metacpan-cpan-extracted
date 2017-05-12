@@ -1,0 +1,42 @@
+Sat, 30 Jul 2011 21:54:28 +0300  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.10.
+* Do not revisit already-edited objects unless specifically requested (RJBS)
+* Remove one level of subroutine calling when recursing (RJBS)
+* Eliminate a bug whereby nodes were visited multiple times even when they
+  should have been skipped by existing safeguards (RJBS)
+
+Tue, 22 Mar 2011 09:23:10 +0200  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.09.
+* Do not descend into branches we've seen, in cyclical structures. (RJBS)
+* Do not expose private recursor arguments via the public API.
+
+Thu, 10 May 2007 19:24:11 +0300  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.08.
+* Make license more visible.
+
+Tue, 04 Apr 2006 16:06:50 +0300  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.06.
+* Another bogosity fix, thanks Gabor Szabo for the test.
+
+Fri, 31 Mar 2006 10:32:00 +0200  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.05.
+* The fix from 0.04 was bogus. Detract bogosity.
+* Native filehandles are GLOBs, but their ARRAY slots are not defined.
+  This was causing crashes, so guard against that case.
+* Clean up closures generating editors. The module is now marginally faster
+  but the code is hopefully clearer.
+* Clean up docs and tests.
+
+
+Fri, 31 Mar 2006 00:44:56 +0200  Gaal Yahas  <gaal@forum2.org>
+
+* This be 0.04.
+* Don't warn on undef values when using custom editor (closes: #6153).
+* Tests. Thanks, Gabor Szabo!
+
+

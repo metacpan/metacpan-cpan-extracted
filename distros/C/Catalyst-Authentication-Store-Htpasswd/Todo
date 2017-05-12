@@ -1,0 +1,7 @@
+. Test Paths to htpasswd which start with / should be taken from root, not the app root.
+. Better docs
+. Test configurable user class
+. Test configurable username field.
+. Configurable password field.
+. Test autoload
+. Test stringification

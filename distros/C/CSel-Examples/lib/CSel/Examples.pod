@@ -1,0 +1,157 @@
+package CSel::Examples; # just to make PodWeaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: CSel examples
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CSel::Examples - CSel examples
+
+=head1 VERSION
+
+This document describes version 0.001 of CSel::Examples (from Perl distribution CSel-Examples), released on 2016-09-01.
+
+=head1 EXAMPLES
+
+=head2 Examples against object trees
+
+=head2 Examples against regular data structures
+
+The CSel expressions given below will work if you use it with
+L<Data::CSel::WrapStruct> or the CLI's L<jsonsel> or L<yamlsel> or L<ddsel>.
+
+Given this data structure:
+
+ [
+     [1,2,3,4,5,6,7,8,9,10],
+     [11,12,13,14,15,16,17,18,19,20],
+     [21,22,23,24,25,26,27,28,29,30],
+     [31,32,33,34,35,36,37,38,39,40],
+     [41,42,43,44,45,46,47,48,49,50],
+     [51,52,53,54,55,56,57,58,59,60],
+     [61,62,63,64,65,66,67,68,69,70],
+     [71,72,73,74,75,76,77,78,79,80],
+     [81,82,83,84,85,86,87,88,89,90],
+     [91,92,93,94,95,96,97,98,99,100]
+ ]
+
+This expression:
+
+ Scalar[value>95]
+
+will give this result:
+
+ 96
+ 97
+ 98
+ 99
+ 100
+
+This expression:
+
+ Scalar[value>95][value<98]
+
+will give this result:
+
+ 96
+ 97
+
+This expression:
+
+ Array:has(Scalar[value >= 90])
+
+will give this result:
+
+ [81,82,83,84,85,86,87,88,89,90]
+ [91,92,93,94,95,96,97,98,99,100]
+
+Given this data structure:
+
+ {
+   "store" : {
+      "bicycle" : [
+         {
+            "color" : "red",
+            "price" : 19.95
+         }
+      ],
+      "book" : [
+         {
+            "category" : "reference",
+            "author" : "Nigel Rees",
+            "title" : "Sayings of the Century",
+            "price" : 8.95
+         },
+         {
+            "category" : "fiction",
+            "author" : "Evelyn Waugh",
+            "title" : "Sword of Honour",
+            "price" : 12.99
+         },
+         {
+            "category" : "fiction",
+            "author" : "Herman Melville",
+            "title" : "Moby Dick",
+            "isbn" : "0-553-21311-3",
+            "price" : 8.99
+         },
+         {
+            "category" : "fiction",
+            "author" : "J. R. R. Tolkien",
+            "title" : "The Lord of the Rings",
+            "isbn" : "0-395-19395-8",
+            "price" : 22.99
+         }
+      ]
+   }
+ }
+
+This expression:
+
+ Hash[has_key("color")]
+
+will give this result:
+
+ {"color":"red", "price":19.95}
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/CSel-Examples>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-CSel-Examples>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=CSel-Examples>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Data::CSel>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

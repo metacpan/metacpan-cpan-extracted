@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Store::Cache.
+
+0.01  Sat Jul 21 14:45:57 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::Plugin::Session::Store::Cache
+

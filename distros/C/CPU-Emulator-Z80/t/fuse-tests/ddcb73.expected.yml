@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb73
+registers:
+  AF: 8564
+  AF_: 0
+  BC: 22829
+  BC_: 0
+  DE: 62470
+  DE_: 0
+  HL: 57887
+  HL_: 0
+  I: 0
+  IX: 25666
+  IY: 53080
+  PC: 4
+  R: 2
+  SP: 0

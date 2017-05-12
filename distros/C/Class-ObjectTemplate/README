@@ -1,0 +1,67 @@
+Class::ObjectTemplate
+---------------------
+
+This package contains Perl extension for an optimized template builder
+base class.
+
+This module was first described in the O'Reilly book "Advanced Perl
+Programming" by Sriram Srinivasan. 
+
+Versions
+--------
+
+The original code from the book is available as version 0.1. Only
+minor changes were made (mainly addition of Makefile.PL and
+test.pl). There are some inheritance problems with this version.
+
+Version 0.2 fixes the inheritance problems. Later versions add nicer
+POD documentation, and various code improvements.
+
+Verifying the Release 
+---------------------
+
+The current maintainer, Jason E. Stewart (jason@openinformatics.com),
+signs every release with his GnuPG public key. This is to help you
+ensure that you are installing only officially sanctioned code, from
+the official maintainer. By downloading the source code and signature
+from one location (possibly open to attack) and the public key from an
+official key server, you greatly reduce the chance of installing
+software that is dangerous to you.
+
+Getting the Public key 
+
+You can use any keyserver you wish, such as www.keyserver.net, and
+search for jason@openinformatics.com
+
+Using PGP to verify the code
+
+   1. Add the key to your keyring: pgpk -a key_file
+   2. Verify the source code file pgpv <<Source-File>> <<Source-File>>.asc
+   3. If you receive any other response than: Good signature,
+      something went wrong, so don't trust the file. 
+
+
+Using GnuPG to verify the code 
+
+   1. Import the key to your keyring: gpg --import key_file
+   2. Verify the source code file gpg --verify <<Source-File>>
+      <<Source-File>>.asc 
+   3. If you receive any other response than: gpg: Good signature,
+      something went wrong, so don't trust the file. 
+
+Authors
+-------
+
+Copyright 1998-2002 Jason E. Stewart
+Copyright 1997 Sriram Srinivasan
+
+License
+-------
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Bugs
+----
+
+Please report and bugs to jason@openinformatics.com

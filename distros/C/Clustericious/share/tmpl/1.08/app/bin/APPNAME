@@ -1,0 +1,9 @@
+% my $class = shift;
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Clustericious::Commands;
+
+$ENV{MOJO_APP} ||= '<=% $class %>';
+Clustericious::Commands->start;

@@ -1,0 +1,56 @@
+NAME
+    Catalyst::Plugin::Charsets::Japanese - Japanese specific charsets
+    handler
+
+SYNOPSIS
+        use Catalyst 'Charsets::Japanese';
+
+        # set charset
+        MyApp->config->{charsets} = 'UTF-8';
+
+        # you can set two charsets.
+        # one is for inner, another is for output response.
+
+        MyApp->config->{charsets} = {
+            in  => 'EUC-JP',
+            out => 'Shift_JIS',
+        };
+
+DESCRIPTION
+    Japanese usually use the charsets, UTF-8, EUC-JP, and Shift_JIS, when
+    they develop web applications. This module allows you to deal with
+    things related to Japanese charset automatically.
+
+charsets
+    This plugin implements 'charsets' accessor to context object.
+
+        sub default : Private {
+            my( $self, $c ) = @_;
+
+            # charset's name. UTF-8, EUC-JP, Shift_JIS
+            my $inner_charset = $c->charsets->in->name;
+
+            # charset's abbreviation. utf8, euc, shiftjis
+            my $inner_abbrev  = $c->charsets->in->abbreviation;
+
+            # Jcode method's name. utf8, euc, sjis
+            my $inner_method  = $c->charsets->in->method;
+
+            # and you can get information about charset for output response.
+            my $outer_charset = $c->charsets->out->name;
+        }
+
+SEE ALSO
+    Jcode
+
+    Catalyst
+
+    Catalyst::Plugin::Charsets::Japanese::Nihongo.pod
+
+AUTHOR
+    Lyo Kato <lyo.kato@gmail.com<gt>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,93 @@
+
+
+     * NAME
+     * VERSION
+     * SYNOPSIS
+     * DESCRIPTION
+     * METHODS
+     * DEPENDENCIES
+     * BIBLIOGRAPHY
+     * AUTHOR
+     __________________________________________________________________________
+   
+                                          NAME
+                                            
+   Crypt::Random - Cryptographically Secure, True Random Number Generator.
+     __________________________________________________________________________
+   
+                                        VERSION
+                                            
+ $Revision: 1.1.1.1 $
+ $Date: 2001/06/21 15:34:49 $
+     __________________________________________________________________________
+   
+                                        SYNOPSIS
+                                            
+ use Crypt::Random qw( makerandom );
+ my $r = makerandom ( Size => 512, Strength => 1 );
+     __________________________________________________________________________
+   
+                                      DESCRIPTION
+                                            
+   Crypt::Random is an interface module to the /dev/random device found on most
+   modern Unix systems. The /dev/random driver gathers environmental noise from
+   various non-deterministic sources including inter-keyboard timings and
+   inter-interrupt timings that occur within the operating system environment.
+   
+   The /dev/random driver maintains an estimate of true randomness in the pool and
+   decreases it every time random strings are requested for use. When the estimate
+   goes down to zero, the routine blocks and waits for the occurrence of
+   non-deterministic events to refresh the pool.
+   
+   The /dev/random kernel module also provides another interface, /dev/urandom,
+   that does not wait for the entropy-pool to recharge and returns as many bytes
+   as requested. /dev/urandom is considerably faster at generation compared to
+   /dev/random, which should be used only when very high quality randomness is
+   desired.
+     __________________________________________________________________________
+   
+                                        METHODS
+                                            
+   makerandom()
+          Generates a random number of requested bitsize in base 10. Following
+          arguments can be specified.
+          
+        Size
+                Bitsize of the random number.
+                
+        Strength 0 || 1
+                Value of 1 implies that /dev/random should be used for requesting
+                random bits while 0 implies /dev/urandom.
+                
+        Device
+                Alternate device to request random bits from.
+                
+   makerandom_itv()
+          Generates a random number in the specified interval. In addition to the
+          arguments to makerandom() following attributes can be specified.
+          
+        Lower
+                Inclusive Lower limit.
+                
+        Upper
+                Exclusive Upper limit.
+     __________________________________________________________________________
+   
+                                      DEPENDENCIES
+                                            
+   Crypt::Random needs Math::Pari 2.001802 or higher. As of this writing, the
+   latest version of Math::Pari isn't available from CPAN. Fetch it from
+   ftp://ftp.math.ohio-state.edu/pub/users/ilya/perl/modules/
+     __________________________________________________________________________
+   
+                                      BIBLIOGRAPHY
+                                            
+    1. random.c by Theodore Ts'o. Found in drivers/char directory of the Linux
+       kernel sources.
+    2. Handbook of Applied Cryptography by Menezes, Paul C. van Oorschot and Scott
+       Vanstone.
+     __________________________________________________________________________
+   
+                                         AUTHOR
+                                            
+   Vipul Ved Prakash, <mail@vipul.net>

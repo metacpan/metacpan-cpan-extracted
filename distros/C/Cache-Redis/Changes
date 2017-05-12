@@ -1,0 +1,44 @@
+Revision history for Perl extension Cache::Redis
+
+0.13 2015-07-13T10:08:42Z
+    - fix argument check in `set()`
+
+0.12 2015-07-07T12:54:14Z
+    - update set to return redis response messages (dnmfarrell++)
+    - `set` accepts callback (dnmfarrell++)
+
+0.11 2015-04-15T03:47:42Z
+    - update packaging
+    - refactor tests
+
+0.10 2014-03-28T08:05:19Z
+    - Fix bug in get_multi
+
+0.09 2014-03-28T06:39:09Z
+    - Add redis option (soh335++)
+
+0.08 2014-03-28T03:46:20Z
+    - Add get_multi, set_multi method (soh335++)
+
+0.07 2013-10-16T18:02:23Z
+    - Add `redis_class` constructor option (EXPERIMENTAL)
+
+0.06 2013-09-01T11:06:20Z
+    - Add serializer `JSON`
+
+0.05 2013-05-09T02:38:06Z
+    - Do not run test case when redis-server command is not available
+
+0.04 2013-05-07T10:31:33Z
+    - fixup packaging and dependencies.
+
+0.03 2013-05-07T06:44:39Z
+    - Fix remove method bug. (didn't care namespace)
+    - remove method returns removed value.
+    - Switch to Minilla
+
+0.02    Mon Apr  1 04:46:01 2013
+    - default serializer turn to Storable **incompatible change**
+
+0.01    Sun Mar 31 16:34:33 2013
+    - original version

@@ -1,0 +1,333 @@
+=head1 NAME
+
+Crypt::NSS::X509::Certificate - NSS Certificate functions
+
+=head1 SYNOPSIS
+
+  use 5.10.1;
+  use Perl6::Slurp;
+
+  use Crypt::NSS::X509;
+
+  my $cert = Crypt::NSS::X509::Certificate->new(slurp('derfile'));
+
+  say $cert->subject();
+  say $cert->issuer();
+
+  my $valid = $cert->verify_cert();
+
+  if ( ! $cert->match_name('www.testdomain') ) {
+    # Domain does not match certificate information
+    exit(1);
+  }
+
+=head1 ABSTRACT
+
+Perl interface for the certificate access parts of the NSS API.
+
+=head1 DESCRIPTION
+
+This class gives access to most of the certificate handling
+functions of NSS. For information on how to load and initialize the
+NSS library, please refer to L<Crypt::NSS::X509>.
+
+=head1 FUNCTIONS
+
+=head2 CONSTRUCTORS
+
+=over 4
+
+=item new ( DERSTRING )
+
+Creates a new NSS::Certificate object from the provided der-encoded
+certificate string.
+
+The function croaks with the NSS error in case NSS cannot parse or
+import the certificate
+
+=item new_from_pem ( STRING )
+
+Creates a new NSS::Certificate object from the pem-encoded certificate
+string. Behaves exactly as new ( ).
+
+=item new_from_nick ( STRING )
+
+Creates a new NSS::Certificate object from the certificate database
+given a certificate nickname. Returns undef if no fitting certificate
+could be found.
+
+=back
+
+=head2 ACCESSORS
+
+=over 4
+
+=item subject
+
+Returns the certificate subject as string.
+
+=item issuer
+
+Returns the certificate issuer as string.
+
+=item serial
+
+Returns the hex-encoded serial number of the certificate.
+
+=item notBefore
+
+Returns the not before time as a string.
+
+=item notAfter
+
+Returns the notAfter tine as a string.
+
+=begin comment
+commented because not supported good by all nss versions.
+
+=item email
+
+Returns the certificate email address (if present).
+
+=end comment
+
+=item subj_alt_name
+
+Returns the certificate subject alternative name (if present).
+May croak if the extension field in the certificate is invalid.
+
+=item version
+
+Returns the certificate version number.
+
+=item common_name
+
+Returns the most specific common name specified in the certificate
+subject.
+
+=item country_name
+
+Returns the country name specified in the certificate subject.
+
+=item business_category
+
+Returns the business category of the certificate if present.
+
+=item ev_incorporation_country
+
+Returns the extended validation country if present.
+
+=item ev_incorporation_locality
+
+Returns the extended validation locality if present.
+
+=item ev_incorporation_state
+
+Returns the extended validation incorporation state if present.
+
+=item extension_oids
+
+Returns the oids of the present extension
+
+=item locality
+
+Locality given in certificate subject.
+
+=item locality_name
+
+Locality name given in certificate subject.
+
+=item org_name
+
+Organization name given in certificate subject.
+
+=item org_unit_name
+
+Organizational unit name given in certificate subject.
+
+=item policy
+
+Returns the certificate policy.
+
+=item postal_code
+
+Returns the postal code from the subject, if present.
+
+=item state_name
+
+Returns the name of the state from the subject if present.
+
+=item street_address
+
+Returns the street address from the subject is present.
+
+=item subject_serial
+
+Returns the serial from the subject. Note this does not necessarily have to be the same as the serial given outside the subject of the certificate.
+
+=item is_root
+
+Returns true if NSS thinks that the certificate is a root (selfsigned)
+certificate and false otherwise.
+
+=item sig_alg_name
+
+Returns the name of the signature algorithm.
+
+=item key_alg_name
+
+Returns the name of the encryption algorithm.
+
+=item bit_length
+
+Bit length of the certificate key
+
+=item public_key
+
+Hex representation of the public key of the certificate (also available
+under the name C<modulus>, for historical reasons
+
+=item modulus
+
+Alias for public_key.
+
+=item nickname
+
+Return the NSS certificate nickname.
+
+=item dbnickname
+
+Return the NSS certificate database nickname.
+
+=item raw_spki
+
+Return the encoded subject public key info part of the certificate.
+Can be used for uniquely identifying a public key (after hashing).
+
+=item exponent
+
+RSA exponent of the public key of the certificate. Croaks, if the certificate
+does not contain an RSA key, so check first using C<key_alg_name>.
+
+=item curve
+
+Name of the EC-curve used in the certificate. Croaks if the certificate is
+not an EC-certificate.
+
+=item fingerprint_md5
+
+Hex-encoded md5 fingerprint of the certificate
+
+=item fingerprint_sha1
+
+Hex-encoded sha1 fingerprint of the certificate
+
+=item fingerprint_sha256
+
+Hex-encoded sha256 fingerprint of the certificate
+
+=item der
+
+Return the der-encoded certificate
+
+=back
+
+=head2 VERIFICATION FUNCTIONS
+
+These functions allow verification of certificate chains. Please note that
+for most of them a database has to be used and a root-certificate list has
+to be loaded. See L<Crypt::NSS::X509>.
+
+There are several different verification functions, because the NSS
+library offers a variety of methods to validate certificates. You probably
+want to either use C<verify_certificate> or C<verify_pkix>.
+
+=over 4
+
+=item match_name ( HOSTNAME )
+
+Return true is NSS considers the hostname to be valid for the certificate.
+Returns false otherwise.
+
+=item verify_certificate( [TIME], [USAGE] )
+
+Returns 1 if the certificate can be validated up to a root-certificate.
+Otherwise returns the numeric NSS error code. Time can contain the unix
+timestamp of the verification time. Usage can contain a the certificate
+usage - usually certUsageSSLServer is assumed.
+
+=item verify_cert ( [TIME], [USAGE] )
+
+Same as C<verify_certificate>, just using the verify_cert NSS function
+instead of the verify_certificate NSS function.
+
+This is (basically) the verification function that is used by Firefox
+at the moment (they add a few more special checks in the Firefox codebase).
+
+=item verify_certificate_pkix( [TIME], [USAGE] )
+
+Same as C<verify_certificate>, just using the PKIX library for validation by
+using CERT_SetUsePKIXForValidation.
+
+=item verify_certificate_log( [TIME], [USAGE] )
+
+Same verification as in C<verify_certificate>; however this function returns
+an empty list in case of success. In case of error, a list of hashes is returned.
+The hash contains the certificate that generated the error and the error code.
+
+This allows to see which certificate in a certificate chain was responsible
+for preventing the validation of the chain. If several errors occur, the list
+may contain several hashes with differing error codes.
+
+=item verify_certificate_pkix_log( [TIME], [USAGE] )
+
+Like verify_certificate_log, just using the PKIX library for validation by
+using CERT_SetUsePKIXForValidation.
+
+=item verify_cert_log ( [TIME], [USAGE] )
+
+Same as C<verify_certificate_log>, just using the verify_cert NSS function
+instead of the verify_certificate NSS function.
+
+=item verify_pkix ( [TIME], [USAGE], [TRUSTED CERT LIST )
+
+Returns 1 if the certificate can be validated up to a root-certificate using
+the CERT_PKIXVerifyCert function. Otherwise returns the numeric NSS error code.
+This function is (basically) used by Chrome to validate certificates.
+
+Trusted cert list can contain a L<NSS::CertList>, of trusted certificates.
+Please note that it is not a good idea to just load all root-certificates into
+a NSS::CertList and try to validate using this function, without using a NSS
+database backend; chain validation does not work correctly in that case.
+
+=item verify_pkix_aia ( [TIME], [USAGE], [TRUSTED CERT LIST )
+
+Same as verify_pkix, but tries to retrieve missing intermediate certificates using
+the Authority Information Access (AIA) field in the certificate (if present).
+
+=item get_cert_chain_from_cert( [TIME], [USAGE] )
+
+Get a L<Crypt::NSS::X509::CertList> containing the certificate chain up to a root-certificate
+for the current certificate.
+
+=back
+
+
+=head1 AUTHOR
+
+Johanna Amann, E<lt>johanna@icir.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012 by Johanna Amann
+
+This Library Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+The library contains source code of the Mozilla Network Security Services; for
+NSS license information please see http://www.mozilla.org/projects/security/pki/
+nss/.
+
+=cut
+

@@ -1,0 +1,44 @@
+Chemistry-File-InternalCoords
+
+Internal coordinates (z-matrix) molecule format reader/writer
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+PREREQUISITES
+
+  Chemistry-Mol
+  Chemistry-InternalCoords
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Chemistry::File::InternalCoords
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Chemistry-File-InternalCoords
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chemistry-File-InternalCoords
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Chemistry-File-InternalCoords
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Chemistry-File-InternalCoords
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 David Westbrook
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

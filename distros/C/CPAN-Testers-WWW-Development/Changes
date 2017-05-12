@@ -1,0 +1,63 @@
+Changes for the CPAN Testers Development website
+================================================
+
+2.11    2016-04-22
+        - helps to include the javascript for the sponsors!
+
+2.10    2016-04-22
+        - removed Birmingham.pm from footer.
+        - added sponsors block in side panel.
+        - added README.
+
+2.09    2015-04-19
+        - added Reports links.
+        - removed /tree from GitHub links.
+        - added Admin site entry.
+
+2.08    2015-04-19
+        - paths updated for github, and switches from s.p.o to metacpan.
+        - removed link references to cpanstats SQLite database.
+        - Preferences and Development links updated.
+        - added cpanminus sub-section.
+
+2.07    2015-04-18
+        - added LICENSE, META.yml & META.json.
+        - reworked Makefile.PL for clarity.
+        - change file dates changed to meet W3CDTF standards.
+        - migrated script to official module.
+        - added CPAN Testers Admin family site links.
+        - added test suite.
+        - finally released to CPAN!
+
+2.06    2011-08-18
+        - revised banner logo image by Jon 'JJ' Allen.
+        - added rel="nofollow" to database downloads.
+        - added links for Wiki and Blog packages.
+        - added intro for Devel and Preferences packages.
+
+2.05    2010-09-24
+        - added Metabase and Labyrinth links.
+        - repositioned site boxes to avoid text and logo clashing.
+
+2.04	2010-06-06
+    	- updated with all new sections and links.
+
+2.03	2010-01-14
+        - added quote.html
+        - added Analysis to site family lists.
+
+2.02	2009-07-18
+        - added Release Summary database entry.
+        - added Reports Parser entry.
+        - added Reports Mailer entry.
+        - added VERSION template variable based on script version.
+
+2.01	2009-06-03
+        - added attributions to HTML.
+        - fixed CSS issues for IE (thanks to JJ).
+
+2.00	2009-05-22
+    	- redesign, based on a design by Wolfgang.
+
+1.00	2008-09-01
+	    - First released version, based on a design by Arcsin.

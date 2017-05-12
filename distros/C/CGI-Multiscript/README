@@ -1,0 +1,31 @@
+CGI-Multiscript version 0.73
+============================
+
+A Perl Module that allows for multiscript programming from Perl scripts.
+The program will allow Perl, Python, Ruby or Shell or any other language to coexist in the same multiscript. 
+Multiscript files can be executed by importing the CGI::Multiscript library and invoking different methods.
+Multiscripts contain programming languages that can be assigned attributes and are dillineated by tags. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Nathan Ross
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,113 @@
+{
+   "abstract" : "Drive Config::AutoConf with an INI file",
+   "author" : [
+      "Jean-Damien Durand <jddpause@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Config-AutoConf-INI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Config::AutoConf" : "0.313",
+            "File::Spec" : "0",
+            "File::Temp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::AutoConf" : "0.313",
+            "Config::Tiny::Ordered" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Config::AutoConf::INI" : {
+         "file" : "lib/Config/AutoConf/INI.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Config-AutoConf-INI@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-AutoConf-INI"
+      },
+      "homepage" : "https://metacpan.org/release/Config-AutoConf-INI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jddurand/perl-config-autoconf-ini.git",
+         "web" : "https://github.com/jddurand/perl-config-autoconf-ini"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:JDDPAUSE",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

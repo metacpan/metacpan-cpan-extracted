@@ -1,0 +1,10 @@
+0.02    2011-03-10
+
+- Fix test failure on machines with a 32 bit time_t.
+
+
+0.01    2011-03-09
+
+- This is the same code as Catalyst::Plugin::AuthenCookie, but done as a role
+  rather than an old-style Catalyst plugin. If you're using the plugin module
+  you should switch to this one.

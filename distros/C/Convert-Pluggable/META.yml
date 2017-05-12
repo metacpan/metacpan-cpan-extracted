@@ -1,0 +1,35 @@
+---
+abstract: 'convert between various units of measurement'
+author:
+  - 'bradley andersen <bradley@pvnp.us>'
+build_requires:
+  Data::Dump: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  Math::Round: '0'
+  Switch: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Pluggable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Float: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  JSON: '0'
+  Math::Round: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Switch: '0'
+version: '0.0322'

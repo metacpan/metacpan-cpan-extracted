@@ -1,0 +1,349 @@
+Revision history for Clustericious
+
+1.24      2017-04-27 08:37:08 -0400
+  - Mojolicious 7.31 compat
+  - Drop support for older versions of Mojolicious
+
+1.23      2017-03-14 10:59:27 -0400
+  - More Mojolicious deprecation workarounds
+
+1.22      2016-11-28 14:28:57 -0500
+  - Fixes for Perls that do not have '.' in @INC
+  - the -l option for 'clustericious daemon' overrides any value
+    if any in the config
+
+1.21      2016-07-20 14:45:16 -0400
+  - Mojo 7.x compatability
+  - Fixes to Test::Clustericious::Log#log_context
+  - autodata defaults to JSON instead of throwing an exception now.
+
+1.20      2016-04-22 13:40:57 -0400
+  - Added Clustericious::Log::CommandLine
+  - Compatability with Mojolicious 6.58
+
+1.19      2016-03-28 12:13:34 -0400
+  - make hypnotoad test a dev only test
+
+1.18      2016-03-24 15:49:47 -0400
+  - Documentation fixes
+  - Fix bug where errors from mojo were not being decoded correctly
+    in PlugAuth plugin
+  - make plackup test a dev only test
+
+1.17      2016-03-14 12:18:27 -0400
+  - removed stragler deprecated use of auth_ua
+
+1.16      2016-02-03 10:34:37 -0500
+  - removed deprecated Test::Clustericious
+  - removed deprecated config files with .yml extension
+  - removed deprecated config from calar
+  - removed deprecated method Clustericious::Config->dump_as_yaml
+  - removed deprecated method Clustericious::Config->set_singleton
+  - removed deprecated JSON configurations
+  - removed deprecated generate mbd_app command
+  - removed deprecated config item simple_auth
+  - removed deprecated Clustericious::Controller->render_text and ->render_json
+  - removed deprecated helpers base_tag and auth_ua
+  - removed deprecated Clustericious::RouteBuilder::Proxy
+  - removed deprecated Clustericious::Config::Plugin
+  - removed deprecated use of Clustericious::App->init_logging as a class method
+
+1.15      2016-01-21 17:41:26 -0500
+  - Mojo 6.41 compatability
+
+1.14      2016-01-03 10:39:31 -0500
+  - Clustericious::Client#_config is now a public method named
+    Clustericious::Client#config.  The older form is now an alias
+    of the new one, but may be removed in the future, but not before
+    February 29, 2016.
+  - Clustericious::Client#client is now renamed to #ua
+    The old attribute may be removed in the fiture, but not before
+    February 29, 2016.
+  - Added helper client which returns either a Clustericious::Client
+    or YourApp::Client
+
+1.12      2015-12-19 15:40:15 -0700
+  - Add hooks for custom en/decoders
+
+1.11      2015-12-10 09:03:13 -0500
+  - Clustericious::RouteBuilder::Proxy is deprecated and will be removed on
+    or after January 31, 2016.  Consider using Mojolicious::Plugin::Proxy
+    instead
+  - restored t/command_generate.t as regular test
+  - Added 'clustericious which' command
+  - Applications now get a default URL unique on a per application,
+    perl user basis.
+  - Clustericious::RouteBuilder::Common is now
+    Clustericious::Plugin::CommonRoutes and is a Mojo plugin
+  - Plugin search order has changed to prefer Clustericious::Plugin
+    over Mojolicious::Plugin.
+  - "simple_auth" in configuration has long since been deprecated
+    it will now croak.
+  - Clustericious::App:#dump_api is deprecated and will be removed
+    on or after January 31, 2016.
+  - Clustericious::App:#dump_api_table is deprecated and will be removed
+    on or after January 31, 2016.
+  - Clustericious::Template was removed.  You probably were not
+    using it.
+  - Clustericious::Controller#render_text and #render_json are deprecated
+    and will be removed on or after January 31, 2016
+
+1.10      2015-12-07 06:56:57 -0500
+  - Marking problematic test t/command_generate.t as dev only
+
+1.09      2015-12-06 20:19:20 -0500
+  - Removed old test t/command_configurepath.t which stopped
+    working and was replaced anyhow by t/command_configpath.t
+  - Clustericious::Log now uses the same config path as
+    Clustericious::Config, as you might expect it should
+
+1.08      2015-12-06 14:05:39 -0500
+  - Test::Clustericious is deprecated.  Use Test::Clustericious::Cluster instead.
+    Test::Clustericious will be removed on or after January 31, 2016
+  - Configs with .yml extension are deprecated and will be removed on or after January 31, 2016
+  - Fixed bug where stop command didn't work with default hypnotoad config
+  - Fixed bug where plackup command didn't work.
+  - The /status route now returns the actual URL, not the configured one.
+    Among other things, this means that if you start a service withe the mojo
+    daemon command using the -l option, you will get the correct URL in the status
+    body.
+  - Reworked start / stop commands and added examples and documentation.
+  - Added Test::Clustericious::Command for testing clustericious commands.
+    Interface to be documented better later.
+  - The status command now exits with 2 if the service is not
+    up, and 0 if it is.
+  - Clustericious daemon command now defaults to configured url
+  - Added morbo command to run morbo with the configured url by default
+
+1.07      2015-12-02 11:27:28 -0500
+  - Fixed bug in Clustericious::Config on MSWin32 (thanks to chorny for the report gh#23)
+
+1.06      2015-11-29 12:40:03 -0500
+  - Clustericious::Log correctly sets the category
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+1.05      2015-11-20 08:58:24 -0500
+  - Mojolicious 6.32 compatability (change to test only)
+  - Loading configuration from a relative or absolute pathname
+    is now supported, so long as the filename ends in .conf
+    or .yml.
+  - Loading a configuration from a scalar and JSON configuration
+    files are deprecated and will be removed on or after January 31, 2016
+    (ie Clustericious::Config->new(\"{'a':1}")
+  - Clustericious::Config methods set_singleton and dump_as_yaml are
+    now deprecated and will issue a warning when used.  They will be
+    removed but not before January 31, 2016.
+  - Migrate from JSON::XS to JSON::MaybeXS
+  - Much less pollution of Clustericious::Config.
+  - Added some testing functions to Test::Clustericious::Log
+    previously it simply redirected logging to TAP via
+    Log::Log4perl::Appender::TAP (which it still does).
+  - Generally improved documentation coverage for Test::Clustericious::Log
+
+1.04      2015-11-17 10:36:15 -0500
+  - Fixed bug where using a single string as start_mode
+    (instead of a list) would crash the configuration.
+  - Remove /util/etc from configuration search paths.
+    This was specific to our usage, and as it turned
+    out we wern't even using it.
+  - Added config helpers 'address', 'public_address'
+    and 'interface'.  See Clustericious::Config::Helpers.
+
+1.03      2015-11-11 07:07:52 -0500
+  - By default use a sane "hypnotoad" configuration
+    for start_mode, if it isn't specified.
+  - Clustericious::Config default values can be a
+    code reference.  The code reference will be
+    evaluated to determine the default value if it
+    isn't provided by the configuration file.
+
+1.02      2015-11-03 13:01:00 -0500
+  - Re-release of Clustericious 1.01 due to errors in
+    the release process
+  - Better integration with Test::Clustericious::Cluster
+    allows you to test with Clustericious::Client objects
+    without replacing their Mojo::UserAgent objects.
+  - Clustericious::Client user agent string will now include the
+    Clustericious and App versions so that they can be easier
+    to identify in logs.  Example for Yars:
+    "Clustericious::Client/1.01 Yars/1.11"
+  - A number of small Mojolicious compatability fixes
+  - You can now customize client objects as they are created
+    for local needs by creating class method
+     Clustericious::Client::Locak->local($client)
+    this change is experimental (and otherwise undocumented)
+    and may be removed refactored in the future.
+
+1.00      2015-05-07 07:29:55 America/New_York
+  - Documentation updates.
+
+0.9946    2015-04-29 03:59:58 America/New_York
+  - Test::Clustericious now recognizes JSON with a charset
+    (needed for Mojo 6.08+ compat)
+
+0.9945    2015-03-18 01:38:01 America/New_York
+  - Remove dep on File::Slurp which is considered broken
+
+0.9944    2015-03-13 03:51:13 America/New_York
+  - Require Mojolicious 6.x or better
+
+0.9943    2015-03-13 03:45:58 America/New_York
+  - Mojolicious 6.x comptability
+
+0.9942    2015-01-29 12:31:45 America/New_York
+  - Remove render_not_found and render_exception compat methods
+    in Clustericious::Controller.  It was causing infinite loop
+    when using recent versions of Mojolicious
+  - Fixed a number of warnings that are revealed in newer versions
+    of Perl and Mojolicious
+
+0.9941    2014-12-30 12:26:40 America/New_York
+  - Production release identical to 0.9940_04
+
+0.9940_04 2014-12-29 11:35:15 America/New_York
+  - require Mojolicious 5.40 (fixes GH#11)
+    typo'd this version in the last version
+  - test suite now uses Test::Clustericious::Log in some places
+    to avoid paluting production logs/your screeen
+  - remove the use of #!/usr/bin/env perl
+    as it can confuse some environments with multiple
+    perls.  If you need to run clustericious from its source
+    base use "perl -Ilib bin/clustericious" instead
+
+0.9940_03 2014-12-28 21:48:53 America/New_York
+  - require Mojolicious 5.40 (fixes GH#11)
+
+0.9940_02 2014-12-19 16:30:07 America/New_York
+  - make Log::Log4perl::Appender::TAP a dep
+    (needed for Test::Clustericious::Log)
+
+0.9940_01 2014-12-19 15:11:37 America/New_York
+  - merge Clustericious::Client into this distro
+  - merge Clustericious::Log into this distro
+  - merge Clustericious::Config into this distro
+
+0.9940    2014-12-11 10:18:51 America/New_York
+  - fixed hypnotoad incompatability introduced in recent version of mojo
+
+0.9939    2014-12-09 13:04:49 America/New_York
+  - make render_not_found and render_exception (hopefully) future proof for
+    Mojolicious 6.x
+
+0.9938    2014-12-09 10:36:39 America/New_York
+  - do not implicitly use Mojo::JSON
+    if you need it in your app make sure you use it yourself
+
+0.9937    2014-07-09 11:19:14 America/New_York
+  - fix installer bug where application templates were not being installed
+
+0.9936    2014-04-09 12:12:52 America/New_York
+  - remove test harness detection
+
+0.9935    2014-01-09 15:31:55 America/New_York
+  - explicitly require Mojolicious 4.31 (required for non-blocking authentication)
+  - remove support for Mojo 3.x
+
+0.9934    2014-01-07 17:16:24 America/New_York
+  - updates for this week's round of Mojolicious deprecations
+  - non-blocking authentication
+
+0.9932    2013-12-16 12:15:29 America/New_York
+  - don't call log as a class method for compatibility with recent Mojos
+
+0.9931    2013-10-26 08:53:17 America/New_York
+  - Mojo 4.50 deprecation compatability (compat with both >= 4.50 and < 4.50 without warnings)
+
+0.9930    2013-08-31 20:36:02 America/New_York
+  - added 'clustericious configure' command
+  - migrate to Dist::Zilla
+
+0.9929  Sat Jul 20 09:22:26 EDT 2013
+	- require Clustericious::Log 0.14
+	
+0.9928_01 Thu Jul 18 16:47:43 EDT 2013
+        - rm debug
+
+0.9928  Wed Jul 10 22:07:29 EDT 2013
+        - added configtest command a la apache
+        - allow for a null app
+
+0.9927  Sun Jun 30 18:20:31 EDT 2013
+        - rm dep on YAML::Syck
+
+0.9926  Tue Jun 25 12:13:35 EDT 2013
+        - Update project metadata
+
+0.9925  Fri Jun 14 15:59:13 EDT 2013
+        - Use PlugAuth::Lite for plugauth testing
+        - requires Clustericious::Config 0.17 for Test::Clustericious::Config;
+        - rm Clustericious::Plugin::PlugAuth->skip_auth
+          see t/subreq.t for a different way to do this
+
+0.9924  Thu Jun  6 07:58:50 EDT 2013
+        - documentation
+
+0.9923  Wed Jun  5 13:36:56 EDT 2013
+        - fixed some documentation typos
+
+0.9922  Wed Jun  5 13:08:14 EDT 2013
+        - documentation enhacements
+        - don't include utility in distribution
+
+0.9921  Unknown
+         - support for MSWin32
+         - rm Makefile.PL
+
+0.9920  Unknown
+         - Mojolicious 4.0 compatability
+
+0.9919   Fri May 10 19:27:40 EDT 2013
+         - fix meta data
+
+0.9915   Tue Mar 26 08:17:59 EDT 2013
+         - plugin hook for autodata to add encodings
+
+0.9914   Tue Mar 26 08:03:44 EDT 2013
+          Avoid timeouts in test and use $c->ua in simpleauth plugin.
+
+0.9913   Wed Mar 13 11:50:51 EDT 2013
+          Allow cross origin resource sharing by default.
+
+0.9912   Fri Feb 22 10:39:52 EST 2013
+          Fixed autodatahandler when charset is in content-type..
+
+0.9911   Fri Feb 15 09:58:40 EST 2013
+          Fixed tests for mojo 3.85 compatibility
+
+0.9910   Thu Feb  7 15:04:10 EST 2013
+          Mojolicious 3.84 compatibility
+
+0.9909   Thu Dec 20 11:13:29 PST 2012
+          Plugauth compatibility
+
+0.9908   Thu Nov 29 12:51:20 EST 2012
+          Added 'generate app', fixed 'generate client'.
+
+0.9907   Wed Nov 28 13:57:01 EST 2012
+          Improved proxy support
+
+0.9906   Fri Oct 26 13:29:52 EDT 2012
+          Support "PlugAuth" in SimpleAuth plugin (gollis)
+
+0.9905    Mon Oct 22 11:29:31 EDT 2012
+          - fixed tests interacting with Rose-Planter
+
+0.9904    Thu Oct 18 13:15:52 EDT 2012
+          - fixed /api when there is no Rose
+
+0.9903    Mon Oct 15 15:26:40 EDT 2012
+          - simpleauth plugin enhancements (gollis)
+          - /api/:table (gollis)
+
+0.9902    Fri Aug 17 13:58:46 EDT 2012
+          'generate client' command
+
+0.9901    Thu Aug 16 11:57:02 EDT 2012
+          first release
+
+

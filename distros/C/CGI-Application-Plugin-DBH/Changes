@@ -1,0 +1,46 @@
+Revision history for Perl extension CGI::Application::Plugin::DBH
+
+4.04      2013-11-24 17:32:50 America/Chicago
+
+   - Fix various Dist::Zilla conversion errors
+
+4.03      2013-11-23 10:28:14 America/Chicago
+
+   - Fix warning RT#73776 (Arthur Axel 'fREW' Schmidt)
+   - Fix some typos (David Steinbrunner)
+
+4.02      2013-11-11 13:24:41 America/Chicago
+
+   - Fix missing dep on DBD::Mock (Arthur Axel 'fREW' Schmidt)
+
+4.01 Fri Jan 18 22:29:42 EST 2013
+    [No Significant Changes]
+    - Rework test for an existing database handle to avoid test failures
+      related to DBD::Mock. We depend on Test::MockObject now instead.
+
+    Some other minor code clean-ups:
+    - "use parent" instead of "use base"
+    - use "our" instead of "use vars"
+
+4.00 Thu Nov  3 16:59:28 EST 2005
+    - Added support for configuring through a callback. This can be used to
+      create a connection on your own, and still have it be lazy loaded.
+      This was requested for use with connect_cached().
+
+3.00 Thu Mar 17 20:07:32 EST 2005
+    - Added support for auto-configuring the handle through the instance
+      script or environment variables. (Thilo Planz).
+
+2.00 Wed Oct  6 21:21:55 EST 2004
+	- Added support for multiple handles and named handles. The API is
+	  completely backwards compatible with the existing behavior.  (Tony Fraser)
+
+1.00 Wed Sep  8 19:15:44 EST 2004
+    - Bumped version for release to CPAN
+
+0.02 Sun Sep  5 12:05:50 EST 2004
+    - Added support for initializing with an existing database handle.
+
+0.01  Sat Sep  4 21:54:31 EST 2004
+	- initial release
+

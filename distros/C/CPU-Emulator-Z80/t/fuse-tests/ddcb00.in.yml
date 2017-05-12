@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 13
+    - 0
+  7598:
+    - 161
+name: ddcb00
+registers:
+  AF: 15461
+  AF_: 0
+  BC: 61668
+  BC_: 0
+  DE: 2513
+  DE_: 0
+  HL: 25707
+  HL_: 0
+  I: 0
+  IX: 7585
+  IY: 61583
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,12 @@
+This is Class::Delegate, a class that eases the job of using object
+delegation.  See `perldoc Class::Delegate' for usage information and
+examples.  There are also some simple examples in test.pl.
+
+Please send all comments, bug reports, and patches to kstar@cpan.org.
+
+Copyright
+
+    Copyright (c) 2000 Smith Renaud, Inc.
+    This module is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.
+

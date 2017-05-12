@@ -1,0 +1,29 @@
+0.100166  2013-07-17 14:49:38 Asia/Bangkok
+
+    - Re-implemented ignorePath and added a test for it working.
+    - Add expose_stash config for exposing parts of the stash to handlers
+    - redirect + die now correctly sets status as 500, it no longer preserves
+      the 302
+
+0.100165  2011-10-29 21:44:00 Europe/Berlin
+
+    - Added Version to Action and Log
+
+0.100163  2011-10-29 21:18:00 Europe/Berlin
+
+    - Added ignorePath option
+
+0.100162  2011-10-29 00:31:50 Europe/Oslo
+
+    - Some POD cleanup
+    - Link to C:A:RV:ErrorHandler::Action::Email by [Stefan
+      Profanter]
+    - Add a enable config option, to override the debug check
+      [zdk]
+
+0.100161  2011-01-20 09:12:41 Europe/Oslo
+    - Fix a problem with + to load fully namespaced stuff
+      [Philip Karlsson]
+
+0.100160  2010-01-16 06:50:51 Europe/Oslo
+    - Fixing the last release, which was utterly broken.

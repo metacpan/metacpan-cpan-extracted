@@ -1,0 +1,42 @@
+\documentclass{beamer}
+
+\usepackage[german]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{graphics}
+\usepackage{wasysym}
+
+\usepackage{beamerthemeWarsaw}
+
+% Aufzählungen generell schrittweise anzeigen
+\beamerdefaultoverlayspecification{<+->}
+
+% nächsten Punkt in Aufzählungsliste hellgrau darstellen
+\beamersetuncovermixins{\opaqueness<1>{5}}{\opaqueness<2->{5}}
+
+% Abschalten der Navigationsleiste
+% \beamertemplatenavigationsymbolsempty
+
+% Seitenzahlen in Fußzeile einfügen
+%\setbeamertemplate{footline}[frame number]
+
+\lstset{
+  language=Perl,
+  showstringspaces=false,
+  basicstyle=\footnotesize,
+% numbers=left,
+% stepnumber=1
+}
+
+\title{ClassLoader}
+\author{Frank Seitz}
+\date{}
+
+\begin{document}
+\frame{\titlepage}
+\input classloader_wiki.tex
+\end{document}
+    
+% eof

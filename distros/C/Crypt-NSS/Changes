@@ -1,0 +1,49 @@
+Revision history for Perl extension NSS.
+
+0.04  2008-10-22
+    - LWPCompat now overrides configure so http_configure in Net::HTTP::Methods gets called correctly.
+    - LWPCompat now also sets $Net::HTTPS::SSL_SOCKET_CLASS for you on import.
+    - Net::NSS::SSL now has a $DefaultURL global that can be set to override default behavior of setting
+      verification URL to what PeerHost says.
+    - Now really supports verification hooks. Also a "built-in-ignore" hook exists to skip verification.
+    - Read now sets passed buffer to an empty string if 0 bytes was read instead of to undefined.
+      
+0.03  2008-10-13
+    - read() and write() in Net::NSS::SSL now actually suppots length and offsets as documented.
+    - Use "selfserv" instead of SSLsample "server" as it's getting removed in NSS 3.12 + 1 release.
+    - Default to use US export suite instead of International.
+    - More options to Net::NSS::SSL/new and docs for it
+    - Fixes to LWPCompat and client certs
+    
+0.02  2008-10-06
+    - Added missing INSTALL file
+    - (set|get)_default_pkcs11_pin_arg in Crypt::NSS::PKCS11 has been replaced with a global
+      variable $Crypt::NSS::PKCS11::DefaultPinArg
+    - Wrote docs for Net::NSS::SSL/new
+    - Now really supports user defined client certificate hooks
+    
+0.01  2008-10-05
+    - Initial non-development release
+    - Updated docs
+    - More tests
+    - Added INSTALL instructions
+    - and more of NSS API bridged
+
+0.01_04  2008-10-04
+    - Read and write to sockets
+    - Some API changes
+    - Start on callbacks
+    
+0.01_03  2008-09-27
+    - More updates to SSL sockets
+    - The correct name is Crypt::NSS (bad Claes for not checking CPAN)
+    - Added missing license file
+    
+0.01_02  2008-09-26
+    - Updates on SSL bindings
+    - Renamed to Crypto::NSS
+    
+0.01_01  2008-09-23
+	- original version; created by h2xs 1.23 with options
+		-c -f -A -n NSS -b 5.6.2
+

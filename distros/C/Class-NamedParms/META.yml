@@ -1,0 +1,14 @@
+---
+name: Class-NamedParms
+version: 1.06
+author:
+  - Benjamin Franz <snowhare@nihongo.org>
+abstract: A lightweight base class for checked get/set property accessors
+license: perl
+requires:
+  Carp: 0
+provides:
+  Class::NamedParms:
+    file: lib/Class/NamedParms.pm
+    version: 1.06
+generated_by: Module::Build version 0.261

@@ -1,0 +1,8 @@
+# Columns, separated by tabs
+# o Myadmin Username
+# o Myadmin Password
+# o Resource name
+# o Resource username
+# o Resource password
+
+Ron Savage	ron	some-db	root	pass

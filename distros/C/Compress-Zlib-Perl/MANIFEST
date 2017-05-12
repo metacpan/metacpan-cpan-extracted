@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+Perl.pm
+README
+t/inflate.t
+t/Artistic
+t/ArtisticZ
+t/Copying
+t/CopyingZ
+META.yml                                Module meta-data (added by MakeMaker)

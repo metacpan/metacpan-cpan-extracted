@@ -1,0 +1,60 @@
+Changes for Perl extension CPAN-Mini-Visit
+
+1.15 Tue 30 Oct 2012
+	- Upgrading to Module::Install::DSL 1.06
+	- Updating copyright to 2012
+
+1.14 Fri 11 Nov 2011
+	- Moving to a production version.
+	- Force dependency on new Locale::Maketext to rid ourself of some
+	  troublesome and annoying warnings.
+
+0.13 Wed 30 Mar 2011
+	- Clean out mentions of the 'skip' option; this functionality can be 
+	  achieved by passing a sub to the 'ignore' option
+	- Allow PAUSE ids to include extra characters
+
+0.12_01 Wed 23 Mar 2011
+	- Upgrading to Module::Install::DSL 1.00
+	- Move sorting into separate sub to allow subclassing (Alexandr Ciornii)
+	- Fixed the disfunctional acme => 1 implementation
+
+0.11 Mon 20 Jul 2009
+	- Add Harvey to the module blacklist
+
+0.10 Wed  8 Jul 2009
+	- Squelch errors resulting from the bad handling of other errors
+	- Add support for two levels of warnings
+
+0.09 Wed  8 Jul 2009
+	- Try harder to squelch warnings and errors
+
+0.08 Fri 26 Jun 2009
+	- Attempt to repair directories with broken permissions
+
+0.07 Fri 26 Jun 2009
+	- Fix the warnings flag
+	- Add a 'prefer_bin' param to set $Archive::Extract::PREFER_BIN
+
+0.06 Wed 24 Jun 2009
+	- Fixing text filters
+	- Adding support for the 'random' constructor param
+
+0.05 Tue 23 Jun 2009
+	- Including .zip files
+	- Including .tar.bz2 files
+	- Adding ->warnings options (off by default)
+	- Adding explicit skips for three pathalogical files
+
+0.04 Tue  2 Jun 2009
+	- Including .tgz files
+
+0.03 Wed 27 May 2009
+	- Adding integration with CPAN::Mini
+
+0.02 Sun 17 May 2009
+	- Adding customisable filters
+	- Adding maximum 3 meg archive size limit
+
+0.01 to be released
+	- Creating initial implementation

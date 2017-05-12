@@ -1,0 +1,14 @@
+Revision history for Perl extension CGI::Application::Plugin::Cache::File.
+
+0.01  Tue Jul 21 07:29:18 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n CGI::Application::Plugin::Cache::File
+
+0.2     2009-07-21
+        Forced increment to re-upload
+
+0.3     2009-07-21
+        Fixed mistakes in POD
+
+0.4     2009-07-22
+        Fixed Cache::File Makefile prereq, fixed POD typo

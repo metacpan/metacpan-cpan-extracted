@@ -1,0 +1,212 @@
+#!/usr/bin/env perl
+#
+# cfgver - Configuration Version Reporter
+#
+# This utility reports the current configuration version and may
+# also be used to check whether a given version number exists in
+# the database.
+#
+# Optionally, it will also dump the configuration keys and values for
+# the given version (or latest, if no version is specified).
+#
+
+use Config::Versioned;
+use Getopt::Long;
+use Data::Dumper;
+
+our $req_cm_err;
+
+BEGIN {
+    eval 'require Config::Merge;';
+    $req_cm_err = $@;
+}
+
+my $opt_version;
+my $opt_dbpath;
+my $opt_format;
+my $opt_authorname;
+my $opt_authormail;
+my $opt_help;
+
+#
+# The MyConfig package is for importing with Config::Merge
+#
+package MyConfig;
+use Moose;
+extends 'Config::Versioned';
+use Data::Dumper;
+
+sub new {
+    my ($this) = shift;
+    my $class = ref($this) || $this;
+    my $params = shift;
+
+    $this->SUPER::new($params);
+
+}
+
+sub parser {
+    my $self     = shift;
+    my $params   = shift;
+    warn "DEBUG: parser params=", Dumper($params), "\n";
+    my $dirname = ref($params->{path}) eq 'ARRAY' ? $params->{path}->[0] : $params->{path};
+
+    my $cm    = Config::Merge->new($dirname);
+    my $cmref = $cm->();
+
+    my $tree = $self->cm2tree($cmref);
+
+    $params->{comment} = 'import from ' . $dirname . ' using Config::Merge';
+
+    if ( not $self->commit( $tree, $params ) ) {
+        die "Error committing import from $dirname: $@";
+    }
+}
+
+sub cm2tree {
+    my $self = shift;
+    my $cm   = shift;
+    my $tree = {};
+    if ( ref($cm) eq 'HASH' ) {
+        my $ret = {};
+        foreach my $key ( keys %{$cm} ) {
+            $ret->{$key} = $self->cm2tree( $cm->{$key} );
+        }
+        return $ret;
+    }
+    elsif ( ref($cm) eq 'ARRAY' ) {
+        my $ret = {};
+        my $i   = 0;
+        foreach my $entry ( @{$cm} ) {
+            $ret->{ $i++ } = $self->cm2tree($entry);
+        }
+        return $ret;
+    }
+    else {
+        return $cm;
+    }
+}
+
+package main;
+
+my $help = <<EOF;
+cfgver - Config::Versioned cli
+
+This command accesses the internal configuration repository used by the
+Config::Versioned module.
+
+SYNOPSIS
+
+    cfgver [options]
+
+    cfgver export [options] [KEY]
+
+OPTIONS
+
+--dbpath    Name of directory containing internal config repository.
+            [default is cfgver.git]
+
+--version   Specific version identifier to retrieve.
+            [default is current version]
+
+--format    Output format for dumping values. [not implemented]
+
+--author    When importing, this is the name of the author to use
+            for the commit
+
+--mail      When importing, this is the mail address of the author to use
+            for the commit
+
+COMMANDS
+
+By default, the version identifier is displayed.
+
+The 'export' command causes the keys and values for the given version
+to be displayed. Optionally, a key may be specified, in which case
+only the values for that key are displayed.
+
+EOF
+
+my $result = GetOptions(
+    'dbpath=s'  => \$opt_dbpath,
+    'version=s' => \$opt_version,
+    'format=s'  => \$opt_format,
+    'author=s' => \$opt_authorname,
+    'mail=s'    => \$opt_authormail,
+    'help'      => \$opt_help,
+);
+
+if ($opt_help) {
+    die $help, "\n";
+}
+
+my $command = 'version';
+
+if (@ARGV) {
+    $command = shift @ARGV;
+}
+
+if ( not $opt_dbpath ) {
+    die "Error: dbpath must be specified\n";
+}
+
+my %params = ();
+
+$params{dbpath} = $opt_dbpath if $opt_dbpath;
+$params{version} = $opt_version if $opt_version;
+
+$params{commit_time} = DateTime->now;
+$params{author_name} = $opt_authorname || $ENV{USER};
+$params{author_mail} = $opt_authormail || $ENV{USER} . '@localhost';
+
+if ( $command eq 'version' ) {
+    my $cfg = Config::Versioned->new( \%params );
+    if ( not $cfg ) {
+        die "Error: unable to create Config::Versioned object: $@";
+    }
+    print $cfg->version($opt_version), "\n";
+}
+elsif ( $command eq 'export' ) {
+    my $cfg = Config::Versioned->new( \%params );
+    if ( not $cfg ) {
+        die "Error: unable to create Config::Versioned object: $@";
+    }
+    my $key = shift @ARGV;
+
+    if ($key) {
+        foreach my $val ( $cfg->get($key) ) {
+            print $val, "\n";
+        }
+    }
+    else {
+        my $dump = $cfg->dumptree($opt_version);
+
+        foreach my $key ( sort keys %{$dump} ) {
+            print $key, ':  ', $dump->{$key}, "\n";
+        }
+    }
+
+}
+elsif ( $command eq 'import' ) {
+    if ( $req_cm_err ) {
+        die "Error: Config::Merge needed for import";
+    }
+    my $source = shift @ARGV;
+    if ( not $source ) {
+        die "Error: no source directory specified\n";
+    }
+    elsif ( not -d $source ) {
+        die "Error: source directory '$source' not found\n";
+    }
+    $params{path} = [split /:/, $source];
+    my $cfg = MyConfig->new( \%params );
+    if ( not $cfg ) {
+        die "Error: unable to create Config::Versioned object: $@";
+    }
+
+
+}
+else {
+    die "Error: unknown command '$command'\n";
+}
+

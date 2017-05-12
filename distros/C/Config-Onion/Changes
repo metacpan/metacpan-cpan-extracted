@@ -1,0 +1,34 @@
+1.007   2016-10-13
+- Added ability to delete settings from hashes by overriding them with the
+  value "!DELETE!"
+
+1.006   2016-02-02
+- Workaround for Config::Any bug(?) in use_ext  (Docs state that it will ignore
+  files with unrecognized extensions; actual behavior is to die)
+
+1.005   2016-01-17
+- Allow passing parameters to Config::Any
+
+1.004   2014-05-09
+- Changed prefix_key from a global setting to a per-instance property
+
+1.003   2014-05-09
+- Fixed Perl 5.8 compatibility
+- Fixed POD syntax error
+
+1.002   2014-05-08
+- Added "prefix structure" capability
+
+1.001   2013-04-02
+- Added missing test-depends on YAML
+
+1.000   2013-04-29
+- Added Override layer
+- Removed Perl 5.10 dependency from Config::Onion::Simple
+
+0.003   2013-03-23
+- Added Config::Onion::Simple
+
+0.002   2012-12-03
+- Initial release
+

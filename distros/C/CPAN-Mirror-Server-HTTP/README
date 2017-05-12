@@ -1,0 +1,26 @@
+NAME
+    CPAN::Mirror::Server::HTTP - Simple HTTP server for serving a CPAN
+    mirror
+
+VERSION
+    version 0.04
+
+SYNPOSIS
+      #!/usr/bin/perl
+      use strict;
+      use warnings;
+      use CPAN::Mirror::Server::HTTP;
+      CPAN::Mirror::Server::HTTP->run();
+
+  "run"
+    This method is called by cpanmirrorhttpd to do all the work.
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

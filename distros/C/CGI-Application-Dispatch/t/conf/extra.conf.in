@@ -1,0 +1,33 @@
+<Location /app1>
+    SetHandler  perl-script
+    PerlHandler CGI::Application::Dispatch
+</Location>
+
+<Location /app2>
+    SetHandler  perl-script
+    PerlHandler CGI::Application::Dispatch
+    PerlSetVar  CGIAPP_DISPATCH_PREFIX  MyApp
+</Location>
+
+<Location /app3>
+    SetHandler  perl-script
+    PerlHandler CGI::Application::Dispatch
+    PerlSetVar  CGIAPP_DISPATCH_PREFIX  MyApp
+    PerlSetVar  CGIAPP_DISPATCH_DEFAULT /module_name/rm2
+</Location>
+
+<Location /app4>
+    SetHandler  perl-script
+    PerlHandler MyApp::Dispatch
+</Location>
+
+<Location /app5>
+    SetHandler  perl-script
+    PerlHandler MyApp::DispatchTable
+</Location>
+
+<Location /http_method>
+    SetHandler perl-script
+    PerlHandler MyApp::DispatchRest
+</Location>
+

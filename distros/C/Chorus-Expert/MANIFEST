@@ -1,0 +1,19 @@
+Changes
+lib/Chorus/Engine.pm
+lib/Chorus/Expert.pm
+lib/Chorus/Frame.pm
+lib/Chorus/Sample/Cursors.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/02-manifest.t
+t/03-pod.t
+t/10-Frame-get.t
+t/12-Frame-set.t
+t/13-Frame-delete.t
+t/14-Frame-getZ-getN.t
+t/15-Frame-fmatch.t
+t/16-Frame-weaken.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

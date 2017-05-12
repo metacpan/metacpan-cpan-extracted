@@ -1,0 +1,30 @@
+Revision history for Code-Embeddable
+
+0.05    2015-06-18 (PERLANCAR)
+
+	- [Removed] Move stacktrace_printer to its own dist
+	  Devel-Confess-Tiny.
+
+
+0.04    2015-06-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add tests for import & stacktrace_printer.
+
+
+0.03    2015-06-18 (PERLANCAR)
+
+        - Rename module/dist from Function-Embeddable to Code-Embeddable.
+
+        - Add embeddable routine: stacktrace_printer.
+
+
+0.02    2015-06-17 (PERLANCAR)
+
+	- Add functions: uniq, shuffle, pick, pick_n.
+
+
+0.01    2015-06-17 (PERLANCAR)
+
+        - First release.

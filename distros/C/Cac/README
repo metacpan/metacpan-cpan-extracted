@@ -1,0 +1,291 @@
+NAME
+    Cac - Integration of Intersystems Cache Database into Perl
+
+SYNOPSIS
+      use Cac qw(:lowlevel :highlevel);
+      _CacEval '$ZV'; print _CacConvert();
+  
+    This module and all modules in the Cac::-Domain require a perl that has
+    Cache fully embedded. (such a binary is a dual-binary that is a Perl and
+    a Cache binary at the same time. Usually there is a softlink (ln -s
+    cache cperl) so you don't need to use cache --perl anymore, it works the
+    following way:
+
+    use:
+
+      o cache --perl [perl options ]    and you start perl with embedded cache
+      o cperl [ perl options ]          and you get perl with embedded cache
+      o cache [ cache options ]         and you get cache with embedded perl
+
+    For backward compatibility with older versions of Cache-Perl
+
+      o cache -perl [ perl options ]
+  
+    is still supported but this feature is deprecated. Use "--perl" instead
+    of "-perl".
+
+    Note: Most of this stuff is the low-level Interface, you normally don't
+    need it, except maybe CacEval and CacExecute.
+
+      o use Cac::ObjectScript     - for embedded ObjectScript support
+      o use Cac::Global           - for high-performance global access (bulk support)
+      o use Cac::Routine          - for calling routines and functions
+      o use Cac::Bind             - for bidirectional binding of COS Variables to Perl variables
+      o use Cac::Util             - for utility functions and helpers
+
+DESCRIPTION
+     * This module provides full access to most Cache call-in functions.
+     * You should not use the call-in function without exactly knowing what you are doing
+     * These function are not exported by default and prepended by a underscore (that means internal).
+     * All functions are perlified - you pass a single string if Cache expects a counted string
+     * You don't need to check for errors. Most functions raise exceptions on error: use eval { }; to catch them
+     * Only "A" functions are supported, no "W". "W" is NOT Unicode anyway, Intersystems simply lies to you.
+
+User Interface for Cache Functions
+    CacEval $expr
+         Evaluates a ObjectScript expression and returns its result
+         Exception: yes
+         Note: This function is slow because it has to preserve terminal settings
+
+    CacExecute $stmt
+         Executes a ObjectScript command and returns nothing.
+         Exception: yes
+         Note: This function is slow because it has to preserve terminal settings
+ 
+Cache Call-In High-Level Functions
+    The high-level functions can be imported by: use Cache ':highlevel';
+
+    _CacAbort [ CACHE_CTRLC | CACHE_RESJOB ]
+         See Cache specification.
+         Exception: Yes
+         Note: Don't use it.
+
+    $ctx = _CacContext()
+         See Cache specification.
+         Exception: No
+
+    $value = _CacConvert()
+         See Cache specification.
+         Exception: Yes
+         Note: This function calls CacConvert(CACHE_ASTRING, ...)
+
+    $value = _CacConvert2()
+         This routine uses CacType() to ask for the type of TOS and
+         tries to get the value the fastest way possible.
+
+         Exception: Yes
+
+    _CacCtrl($bitmap)
+         See Cache specification
+         Exception: Yes
+
+    $converted = _CacCvtIn($string, $table)
+         See Cache specification
+         Exception: Yes
+
+    $converted = _CacCvtOut($string, $table)
+         See Cache specification
+         Exception: Yes
+
+    _CacEnd()
+         See Cache specification
+         Exception: Yes
+         Note: You should NEVER EVER call this! even POSIX::_exit(1); is prefered.
+
+    $error = _CacError()
+         See Cache specification
+         Exception: Yes (if a double fault happens)
+         Note: No need to call this because every error is reported by croak.
+
+    $errorstring = _CacErrxlate($errornum)
+         See Cache specification
+         Exception: No (if the call to CacheErrxlate fails, undef is returned)
+
+    _CacEval $string
+         See Cache specification
+         Exception: Yes
+
+    _CacExecute $string
+         See Cache specification
+         Exception: Yes
+
+    $prompt = _CacPrompt()
+         See Cache specification
+         Exception: Yes
+         Note: Experts call this functions only by accident. :)
+
+    _CacSignal $number
+         See Cache specification
+         Exception: Yes
+         Note: Think and you will find out that you don't want it in most cases.
+
+    _CacStart($flags, $timeout, $princin, $princout)
+         See Cache specification
+         Exception: Yes
+         Note: Don't call it. It's already done. Say simply thanks :)
+
+    $type = _CacType()
+         See Cache specification
+         Exception: No (ahm, check the return value for errors)
+
+Cache Low-Level Call-In Functions
+     The low-level functions can be imported by:
+     use Cac ':lowlevel';
+
+    Use it only IF:
+
+      * you know how to use gdb
+      * you want to corrupt the database
+      * you never use a condom anyway :)
+      * you know what gmngen/checksum/mdate is made for :)
+
+    _CacCloseOref $oref
+         See Cache specification
+         Exception: Yes
+
+    _CacDoFun $rflags, $numargs
+         See Cache specification
+         Exception: Yes, please.
+
+    _CacDoRtn $rflags, $numargs
+         See Cache specification
+         Exception: Oui
+
+    _CacExtFun $rflags, $numargs
+         See Cache specification
+         Exception: Da
+
+    _CacGetProperty()
+         See Cache specification
+         Exception: Yes, sir.
+
+    _CacGlobalGet $numsubscipt, $die_or_empty
+         See Cache specification
+         Exception: yup
+
+    _CacGlobalSet $numsubscript
+         See Cache specification
+         Exception: yup, on weekends only.
+
+    _CacIncrementCountOref $oref
+         See Cache specification
+         Exception: ja
+
+    _CacInvokeClassMethod $numarg
+         See Cache specification
+         Exception: si
+
+    _CacPop $arg
+         Not implemented
+         Exception: yes
+
+    $val = _CacPopDbl()
+         See Cache specification
+         Exception: yes
+
+    $val = _CacPopInt()
+         See Cache specification
+         Exception: yes
+
+    $string = _CacPopList()
+         Currently not implemented
+         Exception: yes
+
+    $oref = _CacPopOref()
+         See Cache specification
+         Exception: yes
+
+    $str = _CacPopStr()
+         See Cache specification
+         Exception: yes
+
+    $ptr = _CacPopPtr()
+         Not Implemented
+         Exception: yes
+
+    _CacPushClassMethod $classname, $methodname, [$flag]/
+         See Cache specification
+         Exception: /bin/true
+         Note: flag defaults to 0
+
+    _CacPushDbl $double
+         See Cache specification
+         Exception: yes
+
+    $rflags = _CacPushFunc $tag, $routine;
+         See Cache specification
+         Exception: yes
+
+    $rflags = _CacPushFuncX $tag, $offset, $env, $routine;
+         See Cache specification
+         Exception: yes
+
+    _CacPushGlobal $global
+         See Cache specification
+         Exception: yes
+
+    _CacPushGlobalX $global, $env
+         See Cache specification
+         Exception: yes
+
+    _CacPushInt $i
+         See Cache specification
+         Exception: yes
+
+    _CacPushList $string
+         See Cache specification
+         Exception: yes
+
+    _CacPushMethod $oref, $methodname, [$flag]
+         See Cache specification
+         Exception: yes
+         Note: $flag defaults to 0
+
+    _CacPushOref $oref
+         See Cache specification
+         Exception: yes
+
+    _CacPushProperty $oref, $property
+         See Cache specification
+         Exception: yes
+
+    _CacPushPtr $value
+         See Cache specification
+         Exception: yes
+
+    $rflags = _CacPushRtn $tag, $routine
+         See Cache specification
+         Exception: yes
+
+    $rflags = _CacPushRtnX $tag, $offset, $env, $routine
+         See Cache specification
+         Exception: yes
+
+    _CacPushStr $string
+         See Cache specification
+         Exception: yes
+
+    _CacSetProperty()
+         See Cache specification
+         Exception: yes
+
+    _CacUnPop()
+         See Cache specification
+         Exception: yes
+
+SEE ALSO
+    Cac::ObjectScript, Cac::Global, Cac::Routine, Cac::Util, Cac::Bind.
+
+AUTHOR
+     Stefan Traby <stefan@hello-penguin.com>
+     http://hello-penguin.com
+
+COPYRIGHT
+     Copyright 2001,2003,2004 by KW-Computer Ges.m.b.H Graz, Austria
+     Copyright 2001,2002,2003,2004 by Stefan Traby <stefan@hello-penguin.com>
+
+LICENSE
+     This module is licenced under LGPL
+     (GNU LESSER GENERAL PUBLIC LICENSE)
+     see the LICENSE-file in the toplevel directory of this distribution.
+

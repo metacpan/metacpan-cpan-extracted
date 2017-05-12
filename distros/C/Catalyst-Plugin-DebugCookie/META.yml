@@ -1,0 +1,33 @@
+---
+abstract: 'Catalyst plugin to turn on '
+author:
+  - 'John Goulah       <jgoulah@cpan.org>'
+build_requires:
+  Catalyst::Action::RenderView: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Config::General: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-DebugCookie
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.7014
+  Digest::MD5: 0
+  MRO::Compat: 0.07
+  Sub::Exporter: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.999004

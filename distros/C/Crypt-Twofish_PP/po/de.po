@@ -1,0 +1,27 @@
+# German translations for Crypt-Twofish_PP.
+# Copyright (C) 2003 Guido Flohr <guido@imperia.net>.
+# This file is distributed under the same license as Crypt-Twofish_PP.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Crypt-Twofish_PP 0.16\n"
+"Report-Msgid-Bugs-To: Guido Flohr <guido@imperia.net>\n"
+"POT-Creation-Date: 2003-11-27 16:23+0100\n"
+"PO-Revision-Date: 2003-11-26 21:00+0100\n"
+"Last-Translator: Guido Flohr <Guido.Flohr@imperia.net>\n"
+"Language-Team: German <guido@imperia.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../lib/Crypt/Twofish_PP.pm:1012
+msgid "Usage:"
+msgstr "Benutzung:"
+
+#: ../lib/Crypt/Twofish_PP.pm:1021
+#, perl-brace-format
+msgid "wrong key length {keylength}: key must be 16, 24 or 32 bytes long"
+msgstr ""
+"Falsche Schlüssellänge {keylength}: Schlüssel muss 16, 24 oder 32 Bytes lang "
+"sein"

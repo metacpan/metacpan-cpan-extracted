@@ -1,0 +1,91 @@
+$VAR1 = {
+          'room' => [
+                      bless( {
+                               '+' => [
+                                        [
+                                          'room',
+                                          '12053'
+                                        ]
+                                      ],
+                               'cluster' => [],
+                               'clusteroff' => 'everyhost -q -x poweroff',
+                               'crit' => '30',
+                               'gap' => '',
+                               'measure' => '',
+                               'panic' => '35',
+                               'poweroff' => 'poweroff',
+                               'room' => '12053',
+                               'servers' => [
+                                              'server_A'
+                                            ],
+                               'systems' => [
+                                              'server_C'
+                                            ],
+                               'tell' => [
+                                           'root'
+                                         ],
+                               'token' => '/var/cache/tempcheck/token',
+                               'warn' => '24'
+                             }, 'Config::Nested::Section' ),
+                      bless( {
+                               '+' => [
+                                        [
+                                          'room',
+                                          '12011'
+                                        ]
+                                      ],
+                               'cluster' => [],
+                               'clusteroff' => 'everyhost -q -x poweroff',
+                               'crit' => '30',
+                               'gap' => '',
+                               'measure' => '',
+                               'panic' => '35',
+                               'poweroff' => 'poweroff',
+                               'room' => '12011',
+                               'servers' => [
+                                              'server_B'
+                                            ],
+                               'systems' => [
+                                              'server_B'
+                                            ],
+                               'tell' => [
+                                           'root'
+                                         ],
+                               'token' => '/var/cache/tempcheck/token',
+                               'warn' => '22'
+                             }, 'Config::Nested::Section' ),
+                      bless( {
+                               '+' => [
+                                        [
+                                          'room',
+                                          '12000'
+                                        ]
+                                      ],
+                               'cluster' => [
+                                              'server_D'
+                                            ],
+                               'clusteroff' => 'everyhost -q -x poweroff',
+                               'crit' => '30',
+                               'gap' => '',
+                               'measure' => '',
+                               'panic' => '35',
+                               'poweroff' => 'poweroff',
+                               'room' => '12000',
+                               'servers' => [
+                                              'server_D',
+                                              'server_E',
+                                              'server_F'
+                                            ],
+                               'systems' => [
+                                              'server_D',
+                                              'server_E',
+                                              'server_F'
+                                            ],
+                               'tell' => [
+                                           'root'
+                                         ],
+                               'token' => '/var/cache/tempcheck/token',
+                               'warn' => '22'
+                             }, 'Config::Nested::Section' )
+                    ]
+        };

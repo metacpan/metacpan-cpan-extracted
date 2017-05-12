@@ -1,0 +1,45 @@
+
+#
+#     Schemas for IDL to WSDL CORBA Namespace
+#
+
+default namespace = "http://www.omg.org/IDL-WSDL/1.0/"
+
+SourceIDL =
+	## IDL/WSDL Mapping Info 
+	element SourceIDL { 
+		element source { xsd:string },
+		element version { xsd:string } 
+	}
+
+SourceRepositoryID =
+	## IDL Mapped Repository ID
+	element SourceRepositoryID {
+		element repositoryID { xsd:string },
+		element version { xsd:string }
+	}
+
+ObjectReference =
+	element url { xsd:anyURI }+
+
+CORBA.TypeCode =
+	element definition { xsd:anyURI },
+	element typename { xsd:string }
+
+any = element * { (attribute * { text } | text | any)* }
+
+CORBA.Any =
+	element type { CORBA.TypeCode },
+	element value { any }
+
+CORBA.completion_status = 
+	"COMPLETED_YES" | "COMPLETED_NO" | "COMPLETED_MAYBE" 
+
+CORBA.SystemException = 
+	element minor { xsd:unsignedInt },
+	element completion_status { CORBA.completion_status } 
+
+_VALREF =
+	# empty attribute used for null semantics, i.e., value graph end nodes
+	attribute ref { xsd:IDREF }?
+

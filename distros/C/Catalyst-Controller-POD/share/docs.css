@@ -1,0 +1,59 @@
+.pod html, .pod body, .pod dl, .pod dt, .pod dd, .pod ul, .pod ol, .pod li, .pod h1, .pod h2, .pod h3, .pod h4, .pod h5, .pod h6, .pod pre, .pod form, .pod fieldset, .pod input, .pod p, .pod blockquote, .pod th, .pod td
+{
+    margin: 5px;
+    padding: 5px;
+}
+
+#permalink {
+    margin: 5px;
+    padding: 5px;
+    float: right;
+}
+
+.pod ol {
+    list-style: decimal;
+    margin-left:40px;
+
+}
+
+.pod ul {
+    list-style: disc;
+    padding-left: 20px;
+}
+
+.pod pre {
+    margin-left: 20px;
+}
+
+.icon-expand-all
+{
+    background-image: url(resources/expand-all.gif) ! important;
+}
+
+.icon-collapse-all
+{
+    background-image: url(resources/collapse-all.gif) ! important;
+}
+
+.search-item {
+    font:normal 11px tahoma, arial, helvetica, sans-serif;
+    padding:3px 10px 3px 10px;
+    border:1px solid #fff;
+    border-bottom:1px solid #eeeeee;
+    white-space:normal;
+    color:#555;
+}
+.search-item span {
+    display:block;
+    float: right;
+    font-size: 10px;
+    width: 120px;
+    color:#222;
+}
+
+.search-item h3 {
+    font-weight:bold;
+    display: inline;
+    margin:0 0 0 0;
+    clear:none;
+}

@@ -1,0 +1,85 @@
+From victori@lamer0.com Thu Feb 1 00:27:51 2007
+Date: Thu, 1 Feb 2007 00:28:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="1180908984.D1c61bD.9667";
+ charset="us-ascii"
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+In-Reply-To: <9e0a28690701311127w4131c2cn546682e3cd487fc3@mail.gmail.com>
+Errors-To: catalyst-bounces@lists.rawmode.org
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+References: <200612271208.42815.mark@itsolve.co.uk>
+ <45926EB1.2040007@cpan.org>
+ <9e0a28690701310723p2db99e58tab1f82e1824a0abd@mail.gmail.com>
+ <6053700D-69B0-40F2-BED8-3587EB4A9ACC@trout.me.uk>
+ <9e0a28690701311127w4131c2cn546682e3cd487fc3@mail.gmail.com>
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+Message-ID: <75AB7D73-107D-4CE2-A286-7BB8E3C55ACB@lamer0.com>
+X-BeenThere: catalyst@lists.rawmode.org
+Subject: [Catalyst] FormBuilder + C::C::Formbuilder memory leak fixes
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+ <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Sender: catalyst-bounces@lists.rawmode.org
+Precedence: list
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>
+ <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+From: Victor Igumnov <victori@lamer0.com>
+
+
+--1180908984.D1c61bD.9667
+Date: Sun, 3 Jun 2007 15:16:24 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+
+To see the impact of the memory leak.
+
+Run broken.pl first which will run formbuilder against your installed
+version.
+It will create a new formbuilder instance over and over, watch top -o
+size as it grows to 100-200 megs in just a few seconds.
+
+Now run fixed.pl  - works great don't it? No memory leaks what so ever.
+
+I have also included a CatTest catalyst project which uses
+C::C::FormBuilder. With everything patched up the process stays at
+~14 megs while being hammered by ab -n 900 -c 100 http://localhost:
+3000/.
+
+So the question is am I the only one using formbuilder? This leak was
+very obvious.
+
+All tests pass for both projects.
+
+http://temp.fabulously40.com/~victori/CGI-FormBuilder-3.05-memfix.tbz
+
+-victor
+
+
+--1180908984.D1c61bD.9667
+Date: Sun, 3 Jun 2007 15:16:24 -0700
+MIME-Version: 1.0
+Content-Type: text/html; name="attachment-0001.htm"; charset="us-ascii"
+Content-Disposition: attachment; filename="attachment-0001.htm"
+
+<tt>
+&lt;HTML&gt;&lt;BODY&nbsp;style=&quot;word-wrap:&nbsp;break-word;&nbsp;-khtml-nbsp-mode:&nbsp;space;&nbsp;-khtml-line-break:&nbsp;after-white-space;&nbsp;&quot;&gt
+;&lt;DIV&gt;To&nbsp;see&nbsp;the&nbsp;impact&nbsp;of&nbsp;the&nbsp;memory&nbsp;leak.&lt;/DIV&gt;&lt;DIV&gt;&lt;BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt
+;&lt;/DIV&gt;&lt;DIV&gt;Run&nbsp;broken.pl&nbsp;first&nbsp;which&nbsp;will&nbsp;run&nbsp;formbuilder&nbsp;against&nbsp;your&nbsp;installed&nbsp;version.&lt;/DIV&gt
+;&lt;DIV&gt;It&nbsp;will&nbsp;create&nbsp;a&nbsp;new&nbsp;formbuilder&nbsp;instance&nbsp;over&nbsp;and&nbsp;over,&nbsp;watch&nbsp;top&nbsp;-o&nbsp;size&nbsp;as&nbs
+p;it&nbsp;grows&nbsp;to&nbsp;100-200&nbsp;megs&nbsp;in&nbsp;just&nbsp;a&nbsp;few&nbsp;seconds.&lt;/DIV&gt;&lt;DIV&gt;&lt;BR&nbsp;class=&quot;khtml-block-placeholde
+r&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;Now&nbsp;run&nbsp;fixed.pl&nbsp;-&nbsp;works&nbsp;great&nbsp;don't&nbsp;it?&nbsp;No&nbsp;memory&nbsp;leaks&nbsp;what&nbsp;so&nbs
+p;ever.&lt;/DIV&gt;&lt;DIV&gt;&lt;BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;I&nbsp;have&nbsp;also&nbsp;included&nbsp;a&nbsp;CatTe
+st&nbsp;catalyst&nbsp;project&nbsp;which&nbsp;uses&nbsp;C::C::FormBuilder.&nbsp;With&nbsp;everything&nbsp;patched&nbsp;up&nbsp;the&nbsp;process&nbsp;stays&nbsp;at&
+nbsp;~14&nbsp;megs&nbsp;while&nbsp;being&nbsp;hammered&nbsp;by&nbsp;ab&nbsp;-n&nbsp;900&nbsp;-c&nbsp;100&nbsp;&lt;A&nbsp;href=&quot;http://localhost:3000&quot;&gt;
+http://localhost:3000&lt;/A&gt;/.&nbsp;&lt;/DIV&gt;&lt;DIV&gt;&lt;BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;So&nbsp;the&nbsp;ques
+tion&nbsp;is&nbsp;am&nbsp;I&nbsp;the&nbsp;only&nbsp;one&nbsp;using&nbsp;formbuilder?&nbsp;This&nbsp;leak&nbsp;was&nbsp;very&nbsp;obvious.&lt;/DIV&gt;&lt;DIV&gt;&l
+t;BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;All&nbsp;tests&nbsp;pass&nbsp;for&nbsp;both&nbsp;projects.&lt;/DIV&gt;&lt;DIV&gt;&lt;
+BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;A&nbsp;href=&quot;http://temp.fabulously40.com/~victori/&quot;&gt;http://temp.fabul
+ously40.com/~victori/&lt;/A&gt;&lt;FONT&nbsp;class=&quot;Apple-style-span&quot;&nbsp;face=&quot;Lucida&nbsp;Grande&quot;&gt;CGI-FormBuilder-3.05-memfix.tbz&lt;/FON
+T&gt;&lt;/DIV&gt;&lt;DIV&gt;&lt;BR&nbsp;class=&quot;khtml-block-placeholder&quot;&gt;&lt;/DIV&gt;&lt;DIV&gt;-victor&lt;/DIV&gt;&lt;BR&gt;&lt;/BODY&gt;&lt;/HTML&gt;
+</tt>
+
+--1180908984.D1c61bD.9667--

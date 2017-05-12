@@ -1,0 +1,38 @@
+[%
+    passmatrix = 1
+
+    title = 'Welcome'
+
+    crumb1_name = 'Welcome' ;
+%]
+
+[% USE Comma -%]
+
+<h1>Overall PASS Statistics</h1>
+
+<p>List of perl versions that have at least one PASSing test reports in the database, along
+with the number of distributions and the total number of test reports.</p>
+
+<p><a href="/perl_platforms.html">Perl/platform cross reference</a></p>
+
+<p>See <a href="http://www.perlmonks.org/?node_id=586506">discussion on PerlMonks</a>.
+See also the <a href="http://stats.cpantesters.org/">CPAN Testers Statistics</a>.</p>
+
+<div class="container">
+<table class="test_results">
+<tr>
+  <th>Perl version</th>
+  <th>Perl+platform</th>
+  <th>Distro count</th>
+  <th>Report count</th>
+</tr>
+[% FOREACH p IN perls %]
+ <tr>
+   <td><a href="/perl_[% p.perl %].html">[% p.perl %]</a></td> 
+   <td><a href="/perl_[% p.perl %]_platforms.html">[% p.perl %]</a></td> 
+   <td>[% p.distro_count | comma %]</td>
+   <td>[% p.report_count | comma %]</td>
+ </tr>
+[% END %]
+</table>
+</div>

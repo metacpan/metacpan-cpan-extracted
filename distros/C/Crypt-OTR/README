@@ -1,0 +1,5 @@
+Perl wrapper around libotr - see http://www.cypherpunks.ca/otr/README-libotr-3.2.0.txt
+
+This module is experimental and unfinished, not yet recommended for important systems.
+
+You can find documentation on CPAN at http://search.cpan.org/perldoc?Crypt::OTR

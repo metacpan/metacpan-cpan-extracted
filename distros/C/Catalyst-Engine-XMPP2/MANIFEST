@@ -1,0 +1,11 @@
+
+t/TestApp/lib/TestApp/Controller/Root.pm
+t/TestApp/lib/TestApp/Controller/Foo.pm
+t/TestApp/lib/TestApp.pm
+t/TestApp.t
+Changes
+Makefile.PL
+README
+MANIFEST
+lib/Catalyst/Engine/XMPP2.pm
+META.yml                                 Module meta-data (added by MakeMaker)

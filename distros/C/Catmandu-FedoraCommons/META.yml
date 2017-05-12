@@ -1,0 +1,44 @@
+---
+abstract: 'Low level Catmandu interface to the Fedora Commons REST API'
+author:
+  - =over
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Pod: '1.49'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-FedoraCommons
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9301'
+  Data::Validate::Type: v1.5.1
+  Data::Validate::URI: '0.06'
+  HTTP::Request::Common: '6.04'
+  IO::Socket::SSL: '2.015'
+  RDF::Trine: '1.014'
+  Test::JSON: '0.11'
+  XML::LibXML: '2.0121'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-FedoraCommons/issues
+  homepage: https://github.com/LibreCat/Catmandu-FedoraCommons
+  repository: https://github.com/LibreCat/Catmandu-FedoraCommons.git
+version: '0.274'
+x_contributors:
+  - 'njfranck <njfranck@ca20c521.ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

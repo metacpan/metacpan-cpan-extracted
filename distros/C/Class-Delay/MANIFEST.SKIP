@@ -1,0 +1,7 @@
+blib
+_build
+Makefile
+Build
+~$
+t/test.db
+\.svn

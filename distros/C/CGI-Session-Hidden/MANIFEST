@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README.txt
+lib/CGI/Session/Driver/hidden.pm
+lib/CGI/Session/Hidden.pm
+t/01_load.t
+t/02_simple.t
+t/cgi-bin/foo.pl
+t/conf/extra.last.conf.in
+t/zy_pod_coverage.t
+t/zz_pod.t

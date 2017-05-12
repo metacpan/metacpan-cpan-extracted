@@ -1,0 +1,8 @@
+
+CLI::Gwrapper/
+--------------
+
+Place Command Line Interface (CLI) graphical wrappers plugins (and any
+supporting modules) in this directory.
+
+See WxGrid.pm and Wx/ for an example.

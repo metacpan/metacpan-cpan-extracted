@@ -1,0 +1,99 @@
+Revision history for Compress-Snappy
+
+0.24  Tue May 12 19:16:28 UTC 2015
+    - Allowed 'magical' input.
+    - Integrated latest csnappy source.
+
+0.23  Sat Feb  8 03:56:15 UTC 2014
+    - Added Devel::CheckLib to configure_requires, instead of bundling it.
+
+0.22  Wed Sep 25 19:03:40 UTC 2013
+    - Restored compatibility with perl 5.6.
+
+0.21  Fri Sep 20 06:31:33 UTC 2013
+    - Added fix for DragonFlyBSD.
+    - Integrated latest csnappy source for change in block size.
+    - Updated ppport.h.
+
+0.20  Mon Apr  1 04:03:58 UTC 2013
+    - Integrated latest csnappy source for windows fix. (RT #83778)
+
+0.19  Sat Sep  8 17:56:50 UTC 2012
+    - Allowed overloaded objects to be stringified.
+
+0.18  Fri Mar 16 20:46:00 UTC 2012
+    - Integrated latest csnappy source for ARMv5 fixes.
+
+0.17  Wed Mar 14 21:38:13 UTC 2012
+    - Integrated latest csnappy source for portability fixes.
+
+0.16  Wed Mar 14 02:08:35 UTC 2012
+    - Added test for __builtin_ctz for improved performance.
+    - Integrated latest csnappy source.
+
+0.15  Sun Mar 11 21:32:16 UTC 2012
+    - Optimized decompress function to stop decoding the stream header twice.
+
+0.14  Fri Mar  2 04:31:51 UTC 2012
+    - Integrated latest csnappy source for portability fix (RT #72859) and
+      better performance.
+    - Updated benchmarks.
+
+0.13  Mon Jan  2 23:55:02 UTC 2012
+    - Removed -Wall compiler flag because it is not portable.
+      It was also overriding CCFLAGS instead of updating it. (RT #73604)
+    - Fixed portability issue with sizeof(void). (RT #72859)
+    - Updated ppport.h.
+
+0.12  Fri Apr 29 05:56:00 UTC 2011
+    - No changes; promoted last development version to stable.
+
+0.11_2  Wed Apr 20 04:23:32 UTC 2011
+    - Added possible fix for Darwin PowerPC.
+
+0.11_1  Tue Apr 19 00:22:22 UTC 2011
+    - Added possible fix for PowerPC 64-bit.
+
+0.11  Mon Apr 18 09:41:57 UTC 2011
+    - Added proper fix for Cygwin.
+
+0.10_1  Thu Apr 14 02:41:16 UTC 2011
+    - Added possible fix for Cygwin.
+
+0.10  Mon Apr 11 19:11:08 UTC 2011
+    - Promoted last development version to stable as it now works on Linux.
+
+0.09_1  Mon Apr 11 17:26:50 UTC 2011
+    - Integrated latest csnappy source to try to track down Linux failure.
+
+0.09  Sun Apr 10 21:06:04 UTC 2011
+    - Integrated latest csnappy source for PPC and Windows fixes.
+
+0.08  Fri Apr  8 06:48:16 UTC 2011
+    - Improved benchmark script and added benchmarks to the Pod.
+
+0.07  Tue Apr  5 23:32:35 UTC 2011
+    - Improved speed by avoiding an extra string copy.
+
+0.06  Mon Apr  4 07:10:20 UTC 2011
+    - Added support for big endian systems.
+
+0.05  Sat Apr  2 07:46:53 UTC 2011
+    - Fixed test so it actually tested this distribution.
+    - Added explicit request for ppport to provide SvPvbyte function.
+
+0.04  Fri Apr  1 22:19:43 UTC 2011
+    - Fixed XS version number for 5.6.2 compatibility.
+
+0.03  Thu Mar 31 18:00:34 UTC 2011
+    - Added support for scalar ref input, as previously documented.
+    - Fixed functions to return empty string, not undef, when input is empty.
+    - Added possible fix for Win32 multiplicity.
+
+0.02  Wed Mar 30 00:53:02 UTC 2011
+    - Fixed memory leak.
+    - Added uncompress alias.
+    - Added benchmarking script.
+
+0.01  Tue Mar 29 14:28:14 UTC 2011
+    - Initial distribution.

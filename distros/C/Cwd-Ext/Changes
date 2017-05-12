@@ -1,0 +1,15 @@
+2009-08-26 13:45  cvs
+
+	* Makefile.PL, lib/Cwd/Ext.pm: Cleaned up documentation. Made sure
+	  to state the license is perl.  Included README, Changes.
+
+2007-08-06 15:59  cvs
+
+	* MANIFEST, Makefile.PL, lib/Cwd/Ext.pm, t/0.t, t/a/junk.txt:
+	  Initial revision
+
+2007-08-06 15:59  cvs
+
+	* MANIFEST, Makefile.PL, lib/Cwd/Ext.pm, t/0.t, t/a/junk.txt: init
+	  import
+

@@ -1,0 +1,43 @@
+---
+abstract: 'Build Your Application Instance Programatically'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-AppBuilder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  CatalystX::AppBuilder:
+    file: lib/CatalystX/AppBuilder.pm
+    version: '0.00011'
+requires:
+  Catalyst: '5.80024'
+  Moose: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/colinnewell/CatalystX-AppBuilder/issues
+  homepage: https://github.com/colinnewell/CatalystX-AppBuilder
+  repository: git://github.com/colinnewell/CatalystX-AppBuilder.git
+version: '0.00011'
+x_contributors:
+  - 'Colin Newell <colin.newell@gmail.com>'
+  - 'Colin Newell <colin@opusvl.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'

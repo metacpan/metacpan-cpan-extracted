@@ -1,0 +1,116 @@
+[% 
+
+  rawlink = '' ;
+
+  IF article.dist ; THEN ;
+    link = '<a href="http://search.cpan.org/dist/' _ article.dist _ '">' _ article.dist _ '-' _ article.version _ "</a>" ;
+    backlink = '/distro/' _ article.letter _ '/' _ article.dist _ '.html?version=' _ article.version ;
+
+    crumb2_name = 'Reports' ;
+    crumb2_href = '/' ;
+
+    IF article.guid ; THEN ;
+      crumb1_name = article.guid ;
+      rawlink = '/cpan/report/' _ article.guid _ '?raw=1' ;
+
+      htmltitle = 'Report for ' _ article.dist _ '-' _ article.version ;
+      title     = 'Report for ' _ link ;
+
+    ELSE ;
+      crumb1_name = article.id ;
+      rawlink = '/cpan/report/' _ article.id _ '?raw=1' ;
+
+      htmltitle = 'Report for ' _ article.dist _ '-' _ article.version ;
+      title     = 'Report for ' _ link ;
+    END ;
+
+  ELSIF article.article ; THEN ;
+    link = '' ;
+    backlink = '' ;
+
+    title     = 'Report ' _ article.id ;
+    htmltitle = title ;
+
+    crumb2_name = 'Reports' ;
+    crumb2_href = '/' ;
+    crumb1_name = article.id ;
+
+  ELSE ;
+    link = '' ;
+    backlink = '' ;
+    rawlink = '' ;
+
+    title     = 'Report not found';
+    htmltitle = title ;
+    IF article.guid ; THEN ;
+      refresh   = '300;url=/cpan/report/' _ article.guid ;
+    ELSE ;
+      refresh   = '300;url=/cpan/report/' _ article.id ;
+    END ;
+
+    crumb2_name = 'Reports' ;
+    crumb2_href = '/' ;
+    crumb1_name = article.id ;
+
+  END
+%]
+
+[% IF article.dist %]
+
+  <!-- NNTP article -->
+  [% IF article.nntp %]
+
+    [% IF article.raw %]
+<pre>[% article.article %]</pre>
+    [% ELSE %]
+      <div class="orange_buttons">
+      [% IF rawlink  %]<a rel="nofollow" href="[% rawlink %]" rel="nofollow">Raw</a>[% END %]
+      [% IF backlink %]<a rel="nofollow" href="[% backlink %]">Back</a>[% END %]
+      </div>
+
+<pre>
+From: <strong>[% article.from %]</strong>
+Subject: <strong>[% article.subject %]</strong>
+Date: <strong>[% article.date %]</strong>
+
+[% article.body %]
+</pre>
+    [% END %]
+
+  <!-- Metabase article -->
+  [% ELSE %]
+
+    [% IF article.raw %]
+<pre>
+From: <strong>"[% article.author %]" &lt;[% article.from %]&gt;</strong>
+Subject: <strong>[% article.subject %]</strong>
+Date: <strong>[% article.created %]</strong>
+
+[% article.article %]
+</pre>
+    [% ELSE %]
+      <div class="orange_buttons">
+      [% IF rawlink  %]<a rel="nofollow" href="[% rawlink %]" rel="nofollow">Raw</a>[% END %]
+      [% IF backlink %]<a rel="nofollow" href="[% backlink %]">Back</a>[% END %]
+      </div>
+
+<pre>
+From: <strong>[% article.author %]</strong>
+Subject: <strong>[% article.subject %]</strong>
+Date: <strong>[% article.created %]</strong>
+
+[% article.article %]
+</pre>
+    [% END %]
+
+  [% END %]
+
+<!-- no report -->
+[% ELSE %]
+
+<p>Sorry, but that report isn't currently stored locally. If this is a very recently submitted
+report, please note that replication between the metabase server and the cpantesters server
+can take several minutes. Please try again in 10-15 minutes. Alternatively this page will
+refresh every 5 minutes until the report is available.</p>
+
+[% END %]

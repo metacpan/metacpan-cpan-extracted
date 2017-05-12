@@ -1,0 +1,7 @@
+name = "Coteng"
+authority = "cpan:YUUKI"
+badges = ['travis', 'coveralls']
+
+module_maker="ModuleBuildTiny"
+[Metadata]
+x_static_install = 1

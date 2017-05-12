@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Class/TLB.pm
+lib/Class/TLB/Dummy.pm
+t/00-load.t
+t/01-register.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

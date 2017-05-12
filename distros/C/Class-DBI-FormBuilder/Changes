@@ -1,0 +1,242 @@
+Revision history for Class-DBI-FormBuilder
+
+0.483   Thu 22 June, 2013 19:19
+				- moved DBI::Test to Class::DBI::FormBuilder::DBI::Test to free up the namespace
+
+0.481   Mon 12 Dec, 2005 23:23
+        - store instance in CDBI::FB::Meta::Table::instance(), to make the instance() 
+            method work efficiently (Brendan Bank)
+
+0.48    Mon  21 Nov, 2005 22:00
+        - removed deprecated table/column metainfo methods - go via table_meta() instead
+        - detect nullable columns in form_has_a() and don't make the column required 
+            if nullable
+        - add a 'n/a' option in _field_options() if the field is nullable
+        - altered use constant usage to work with Perl 5.6.1 (Barbie) 
+        - fixed diag message in 00-load.t (Barbie)
+
+0.47    Mon  26 Sept, 2005 10:40
+        - new 'options_sorters' argument - a hashref, keyed by field name, with values 
+            being coderefs used to sort the options lists in has_a, has_many, and might_have 
+            fields
+        - pass the CDBI-FB class as an extra argument to has_a plugins
+        - timestamp processor defaults to READONLY instead of DISABLED
+        
+
+0.46    Fri  23 Sept, 2005 22:55
+        - added _update_many_to_many() (Ron McClain). 
+        - don't set up validation on has_many fields. This needs to be addressed, 
+            but the current code was choking on has_many fields
+
+0.451   Tues 23 August, 2005 12:00
+        - form_process_extras now only operates on fields listed in the new process_extras 
+            argument. This will become a hashref soon, the same as process_fields, containing 
+            field processors. 
+            
+        - As a consequence, the __SKIP_PROCESS_EXTRAS__ flag has gone away. 
+            
+        - some field processors set in form_builder_defaults can set values into the form, which 
+            is bad for a search_form, so search_form now clears them out - currently in a slightly 
+            expensive way, revisit this when CGI::FB 3.03 is released
+
+0.45    Fri 19 August, 2005 15:50
+        - re-factored metadata methods into 2 new classes: CDBI::FB::Meta::Table and
+            CDBI::FB::Meta::Column 
+        - deprecated column_meta(), column_type() and db_order_columns(), they'll be deleted soon
+        
+        - bug fix - order_by field in search_form() includes the cmp field and the order_by field 
+            itself as possible sort criteria - patch from Dave Howorth
+            
+        - added 'columns' alias to 'validate' entry in auto-validation spec
+        
+        - added __SKIP_PROCESS_EXTRAS__ flag, checked in form_process_extras() 
+
+0.44    Sat 13 Aug 2005, 00:35
+        - added NoTextAreas post-processor
+        - accepts the name of a built-in post-processor in the 'post_process' argument, 
+            as well as a coderef
+        - the +VALUE processor sets the value to the default for the column from the database, 
+            if there is no value in the column and the column is NOT NULL
+            
+        - added db_order_columns() as a public method
+            
+
+0.432   Tues 9 Aug  2005, 9:55
+        - minor pod fixes
+
+0.431   Tues 9 Aug  2005, 9:55
+        - removed some out of date pod
+
+0.43    Tues 9 Aug  2005, 1:20
+        - added as_multiform() method
+        - added create_from_multiform() method
+        
+        - added post_processor architecture (e.g. for pretty-printing)
+        - added PrettyPrint post-processor
+        - added form_final(), which applies field processors in the '__FINAL__' slot 
+            of process_fields
+
+0.421   Wed  3 Aug  2005, 23:55
+        - skip annoying tests in 51.related.t
+
+0.42    Wed  3 Aug  2005, 23:50
+        - changed to using column objects throughout, and stringifying them via $column->mutator 
+            or $column->accessor whenever a field name is required (pointed out by Dave Howorth)
+            - PROBABLY STILL BROKEN THOUGH - works fine unless you are customising your CDBI accessors,
+                which was the point, but should be fixed in the next release
+        - added column_meta() and column_type() methods as public methods
+        - plugins now receive a column object instead of a field name
+        - processors now receive a column object as an extra argument (used by +VALUE)
+        - changed to retain values as objects wherever they are supplied as objects, and stringifying 
+            just before sending to CGI::FB
+        - added pretty-printing feature
+
+0.41    Tues  2 Aug  2005, 23:40
+        - added _load_meta() method to access lots of column metadata via DBI:
+            - removed requirement to load Class::DBI::Plugin::Type
+            - fixed _db_order_columns() 
+            - support MySQL SET columns in _get_col_options_for_enumlike() without needing the 
+                patch to CDBI::mysql
+        - removed the code that sets the 'required' field list to the list in a 'Required' column
+            group - this has been deprecated for a while
+            
+            
+        - added TIMESTAMP processor. form_timestamp now uses this instead of DISABLED, so it can be easily 
+            replaced
+        - added +SET_$foo($bar) processor
+        - deprecated +SET_VALUE($value) processor - use +SET_value($value)
+        - altered the precedence rules for processors - a custom non '+' processor will have the effect 
+            of dropping all auto-generated processors, so that only the custom processors run. '+' 
+            processors are run in addition to automatically set processors.
+        
+        - re-organised POD
+
+0.4   Fri 22 July 2005, 23:00
+        - added +READONLY processor - note this also sets the class of the input field to 'ReadOnly'
+        - added +DISABLED processor - note this also sets the class of the input field to 'Disabled'
+        - added +SET_VALUE($value) processor
+        - added +ADD_FIELD processor
+        - added +NULL processor
+        
+        - added 'timestamp' to @BASIC_FORM_MODIFIERS, and form_timestamp method 
+            which defaults to the DISABLED preprocessor
+        - added 'process_extras' to @BASIC_FORM_MODIFIERS, with form_process_extras method
+        
+        - fixed _get_type to detect column type for related fields
+        - much more sophisticated chaining of preprocessors
+        - the default is for fields not to be required (CGI::FB defaults to required, if a field has 
+            a validation spec, but in CDBI::FB, *all* fields have a validation spec)
+
+0.3511 Thur 21 Jul, 2005 09:00
+        - added 'int' entry to ValidMap (reported by Dave Kamholz)
+
+0.351  Wed  20 Jul, 2005 01:00
+        - cleaned up code in _db_order_columns - still not understanding 
+            the empty 'All' group issue though
+        - factored out calculation of field names for form_has_many() and form_might_have() into 
+            _multiplicity_fields()
+
+0.3502 Mon  18 Jul, 2005 23:15
+        - added test for _db_order_columns fatal error when looking up 
+            implicitly defined 'All' column group. Still returns an empty list, 
+            so haven't got this one figured out yet, but at least the $@ is not 
+            being propagated further than expected.
+
+0.3501 Sun  17 Jul, 2005 22:30
+        - POD: re-arranged and fixed a few bits and pieces
+
+0.35   Sun  17 Jul, 2005 15:30
+        - implemented field pre-processing architecture
+
+0.3453 Sun  17 Jul, 2005 13:30
+        - improved subclassability by storing the CDBI::FB (sub)class on the 
+            caller, and then using that instead of __PACKAGE__
+
+0.3452 Sat  16 Jul, 2005 22:30
+        - half fixed _db_order_columns bug. The internal lookup could die 
+            for the 'All' group if this group was not set up explicitly. 
+            Looks like Maypole (via CDBI::Loader?) normally does set this up 
+            explicitly, but hand-rolled setups normally will not. The fix will 
+            return the columns for the 'All' group (via CDBI->columns( 'All' ) 
+            in non-db order if the group is not defined explicitly.
+            Reported by dkamholz.
+        - highlighted Class::DBI::Plugin::Type issue in GOTCHAS (reported by dkamholz)
+        - add 'our $pager' declaration to pager template (reported by dkamholz)
+        
+        
+
+0.3451 Thur 14 Jul, 2005 13:40
+        - removed restriction on setting keepextras to 1
+
+0.345  Thur 14 Jul, 2005 10:00
+        - only add pk fields to forms built for objects, not for 
+            classes or searches. Empty pk hidden fields were being submitted 
+            as empty strings rather than undef in some situations.
+        - renamed form_hidden() to form_pks()    
+
+0.3441 Wed  13 Jul, 2005 23:10
+        - an extra test
+
+0.344  Wed  13 Jul, 2005 23:00
+        - don't send undefs to create() for columns not represented in form data
+
+0.343  Wed  13 Jul, 2005 13:24
+        - previous fix was broken if caller tries to set keepextras to 1. Now 
+            we just croak, the proper fix is to remove pks from validation, or 
+            figure out what fields are required and set that explicitly.
+
+0.342  Wed  13 Jul, 2005 10:45
+        - fixed bug where keepextras set by caller were overridden in _get_args
+            (reported by David Kamholz)
+        - added big warning about as_form_with_related to pod.
+
+0.341  Mon  11 Jul, 2005 09:45
+        - fixed rt link
+        - tests now correctly bail if DBD::SQLite2 is not available
+
+0.34   Fri   1 Jul, 2005 16:30
+        - update_from_form_with_related() is beginning to work
+
+0.33   Thur 30 Jun, 2005 11:00
+        - some pod formatting fixes
+        - spot of refactoring inside _splice_form
+        - basic untested brobably broken update_from_form_with_related() added
+        - multiple pk hidden fields bug still not fixed
+
+0.32   Wed  29 Jun, 2005 15:00
+        - lots of refactoring in form_* methods
+        - fixed disappearance of has_many fields
+        - as_form_with_related seems to be rendering forms correctly now
+            - except for multiple pk hidden fields bug
+            (haven't tried processing submitted forms yet)
+        - added plugin architecture (by James Tolley)
+        - added dependency on UNIVERSAL::require
+
+0.31   Tues 28 Jun, 2005 15:00
+        - as_form_with_related getting better
+
+0.3_1  Tues 28 Jun, 2005 10:00
+        - first code for as_form_with_related     
+        - new dependency on List::Util
+
+0.3    Fri 24 Jun, 2005 14:20
+        - added automatic configuration of validation settings
+        - new dependency on Class::DBI::Plugin::Type
+
+0.2    Tues 14 Jun, 2005 23:10
+        - added search_opt_cmp and search_opt_order_by options to search_form and 
+            search_where_from_form
+        - has_a fields are now automatically added to the required list
+
+0.121  Sun  12 Jun, 2005 13:20
+        - included 34.might_have.t in MANIFEST
+
+0.12   Sat  11 Jun, 2005 23:50
+        - added might_have support
+
+0.11   Fri  10 Jun, 2005 12:00
+        - POD fixes
+
+0.1    Thur  9 Jun, 2005 22:45
+        First version, released on an unsuspecting world.
+

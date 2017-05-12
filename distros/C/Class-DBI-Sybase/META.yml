@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-Sybase
+version:      0.5
+version_from: Sybase.pm
+installdirs:  site
+requires:
+    Class::DBI:                    3.0.11
+    Test::More:                    0.05
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

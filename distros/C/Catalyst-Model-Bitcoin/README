@@ -1,0 +1,60 @@
+Catalyst-Helper-Model-Bitcoin version 0.02
+==========================================
+
+This us a Catalyst model class that interfaces with Bitcoin Server
+via JSON RPC. Visit Bitcoin website at http://www.bitcoin.org
+
+SYNOPSIS
+
+Use the helper to add a Bitcoin model to your application:
+
+   ./script/myapp_create.pl model BitcoinServer Bitcoin
+
+After new model created, edit config:
+
+   # ./lib/MyApp/Model/BitcoinServer.pm
+   __PACKAGE__->config(
+     uri => 'http://rpcuser:rpcpassword@localhost:8332',
+   );
+
+In controller:
+
+   # Get address object (see Finance::Bitcoin::Address)
+   my $address = $c->model('BitcoinServer')->find($address_string);
+
+   # Send coins to address.
+   $c->model('BitcoinServer')->send_to_address($address_string, $amount);
+
+   # Generate new address to receive coins.
+   my $new_address_string = $c->model('BitcoinServer')->get_new_address();
+
+   # Get current wallet balance.
+   my $balance = $c->model('BitcoinServer')->get_balance();
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  http://www.bitcoin.org
+  https://github.com/hippich/Catalyst--Model--Bitcoin
+  Catalyst
+  Finance::Bitcoin
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Pavel Karoukin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

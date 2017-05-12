@@ -1,0 +1,10 @@
+Revision history for Catalyst-Model-PayPal-IPN
+
+0.04  2013-06-27 20:44:00
+    - Fix RT#86482
+
+0.03  2013-02-25 14:12:00
+    - Fix pod tests
+
+0.02  2009-05-01 22:55:12
+    - First release.

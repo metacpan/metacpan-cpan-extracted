@@ -1,0 +1,88 @@
+NAME
+    CPAN::Metrics - Create and maintain a Perl::Metrics database for all of
+    CPAN
+
+SYNOPSIS
+      # Do a CPAN::Metrics run
+      my $metrics = CPAN::Metrics->new(
+          remote  => 'http://mirrors.kernel.org/cpan/',
+          local   => '/home/adam/.minicpan',
+          extract => '/home/adam/.cpanmetrics',
+          metrics => '/home/adam/.cpanmetrics/metrics.sqlite',
+      )->run;
+
+DESCRIPTION
+    "CPAN::Metrics" is a combination of CPAN::Mini and Perl::Metrics.
+
+    It lets you pull out all of CPAN (for various definitions of "all") and
+    run Perl::Metrics on it to generate massive amounts of metrics data on
+    the 16,000,000 lines of code in CPAN.
+
+  Resource Usage
+    While it might make it relatively easy to write the code to "process all
+    of CPAN", make no mistake that it's going to take you LOT of computing
+    resources to do it. And especially so the first time.
+
+    To do a single run should require 1-10 gigabytes of disk space, up to
+    several hundred megabytes of memory, and hours (or days) of CPU time.
+
+    The result will be a SQLite database containing somewhere between
+    several hundred thousand and several million rows of metrics data.
+
+    What you do with the metrics after that is up to you.
+
+METHODS
+new
+    The "new" constructor creates a new CPAN metrics processor.
+
+    Although it is created as an object, due to Perl::Metrics you can only
+    create a single object within a single process. (I think)
+
+    It takes a variety of different parameters.
+
+    minicpan arguments
+
+    Returns a new "CPAN::Metrics" object, or dies on error.
+
+  run
+    The "run" method launches the CPAN metrics processor. It will syncronize
+    its minicpan mirror from the remote server, expanding any new archives,
+    and removing old ones. Once updated, the directory will be reindexed at
+    update it in the metricsdatabase, and any required processing done to
+    add the resulting metrics needed.
+
+    And then (a "very" long time later) it will stop. :)
+
+    Oh, and return true. Any errors will cause an exception (i.e. die)
+
+TO DO
+    - Improve Perl::Metrics to add needed things
+
+    - Improve CPAN::Metrics::Extract to add needed things
+
+    - Improve CPAN::Metrics to add needed things
+
+    - Get all three of the above to use accessors
+
+    - Possibly consider intentionally disabling caching so that we don't end
+    up with a multi-multi-gigabyte parse cache.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Metrics>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

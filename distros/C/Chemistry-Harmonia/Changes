@@ -1,0 +1,56 @@
+Revision history for Perl extension Chemistry::Harmonia.
+
+0.118  2013-05-18
+	- Fixed the subroutine prepare_mix() for Perl v5.17.x, v5.18.0 ("Hash randomization")
+	- Fixed tests of the subroutine stoichiometry() for Perl v5.17.x, v5.18.0 ("Hash randomization")
+
+0.111  2013-05-18
+	- Fixed tests for new subroutine stoichiometry()
+
+0.11  2013-05-17
+	- Added new powerfull subroutine stoichiometry()
+	- Added new subroutine brutto_formula()
+	- Fixed a problem with the 0 for C0, H0, N0, P0 and others to-> {Co CO}, {Ho HO}...
+	- Removing of points in late of the formulas
+	- Added tests, examples into documentation
+	- README revised
+	- Refused to use the module Regexp::Common (due to a problem of unpredictable changes. Replaced it a my pure perl code)
+	- High-speed optimization
+	- Algorithm of OSE recognition is refined
+	- Correction and optimization of sub 'good_formula'
+
+0.08  2011-12-05T11:11:11+02:00
+    [In sub 'oxidation_state']
+	- high-speed optimization in 2 times;
+	- algorithm of OSE recognition is refined;
+    [Correction and optimization of sub 'good_formula']
+	- 1, !, | -> l/I/i for I, Al, Cl, Tl, Li, Bi, Ni, Si
+	- Aq, Hq, Mq, Rq, Sq -> Ag, Hg, Mg, Rg, Sg;
+	- Q -> O
+	- $ -> s
+	- And many others optimizations;
+	- New tests are added.
+
+0.0777  2011-06-15T22:22:22+02:00
+    - add to Makefile.PL modules Test::LongString & Test::Pod
+
+0.07  2011-06-12T22:22:22+02:00
+    - 'good_formula' subroutine is added.
+    - 'prepare_mix' subroutine is added.
+    - 'class_cir_brutto' subroutine is added.
+    - 'ttc_reaction' subroutine is added.
+    - Protesting over 22,100 unique inorganic reactions.
+    - For 'oxidation_state' is considerable refined the algorithm.
+    - Protesting over 6,200 well and few know unique inorganic substances.
+    - For 'parse_chem_mix' is considerable refined the algorithm.
+    - Numerous errors are eliminated and others.
+    - The documentation is added.
+    - Tests for all subroutines are added and optimized the existing.
+
+0.06* 2010-12-10
+    Top secret version. For internal use.
+
+0.05  2010-12-07T16:40:17+02:00
+    - original version; created by h2xs 1.23 with options
+	-XAn Chemistry::Harmonia
+    - The first official version.

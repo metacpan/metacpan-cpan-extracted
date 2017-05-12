@@ -1,0 +1,58 @@
+---
+abstract: 'Compare dependencies between releases using CPAN::Meta.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Meta-Prereqs-Diff
+provides:
+  CPAN::Meta::Prereqs::Diff:
+    file: lib/CPAN/Meta/Prereqs/Diff.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Addition:
+    file: lib/CPAN/Meta/Prereqs/Diff/Addition.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Change:
+    file: lib/CPAN/Meta/Prereqs/Diff/Change.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Downgrade:
+    file: lib/CPAN/Meta/Prereqs/Diff/Downgrade.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Removal:
+    file: lib/CPAN/Meta/Prereqs/Diff/Removal.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Role::Change:
+    file: lib/CPAN/Meta/Prereqs/Diff/Role/Change.pm
+    version: '0.001004'
+  CPAN::Meta::Prereqs::Diff::Upgrade:
+    file: lib/CPAN/Meta/Prereqs/Diff/Upgrade.pm
+    version: '0.001004'
+requires:
+  CPAN::Meta::Prereqs: '2.120620'
+  CPAN::Meta::Requirements: '2.120620'
+  Carp: '0'
+  Moo: '1.000008'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/CPAN-Meta-Prereqs-Diff/issues
+  homepage: https://github.com/kentnl/CPAN-Meta-Prereqs-Diff
+  repository: https://github.com/kentnl/CPAN-Meta-Prereqs-Diff.git
+version: '0.001004'

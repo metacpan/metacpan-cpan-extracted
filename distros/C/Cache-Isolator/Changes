@@ -1,0 +1,7 @@
+Revision history for Perl extension Cache::Isolator
+
+0.02    Fri May 20 10:57:26 2011
+        - fixed test. memcached can't run as root without the -u switch
+
+0.01    Fri Feb 18 15:30:15 2011
+        - original version

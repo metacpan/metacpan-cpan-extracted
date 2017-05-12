@@ -1,0 +1,207 @@
+NAME
+    CatalystX::Declare - EXPERIMENTAL Declarative Syntax for Catalyst
+    Applications
+
+SYNOPSIS
+  Application
+        use CatalystX::Declare;
+    
+        application MyApp::Web with Static::Simple {
+    
+            $CLASS->config(name => 'My Declarative Web Application');
+        }
+
+    See also: CatalystX::Declare::Keyword::Application, "class" in
+    MooseX::Declare
+
+  Controllers
+        use CatalystX::Declare;
+
+        controller MyApp::Web::Controller::Foo
+              with MyApp::Web::ControllerRole::Bar {
+        
+            use MooseX::Types::Moose qw( Str );
+        
+        
+            has welcome_message => (
+                is          => 'rw',
+                isa         => Str,
+                required    => 1,
+                lazy_build  => 1,
+            );
+        
+            method _build_welcome_message { 'Welcome' }
+        
+        
+            action base under '/' as '';
+        
+            under base {
+            
+                final action welcome {
+                    $ctx->response->body( $self->welcome_message );
+                }
+            }
+        }
+
+    See also: CatalystX::Declare::Keyword::Controller,
+    CatalystX::Declare::Keyword::Action,
+    CatalystX::Declare::Keyword::Component, "class" in MooseX::Declare
+
+  Roles
+        use CatalystX::Declare;
+
+        controller_role MyApp::Web::ControllerRole::Bar {
+
+            use MyApp::Types qw( Username );
+
+
+            around _build_welcome_message { $self->$orig . '!' }
+
+            after welcome (Object $ctx) {
+
+                $ctx->response->body(join "\n",
+                    $ctx->response->body,
+                    time(),
+                );
+            }
+
+
+            final action special_welcome (Username $name) under base {
+
+                $ctx->response->body('Hugs to ' . $name);
+            }
+        }
+
+    See also: CatalystX::Declare::Keyword::Role,
+    CatalystX::Declare::Keyword::Action, "class" in MooseX::Declare
+
+  Views
+        use CatalystX::Declare;
+
+        view MyApp::Web::View::TT
+            extends Catalyst::View::TT {
+
+            $CLASS->config(
+                TEMPLATE_EXTENSION => '.html',
+            );
+        }
+
+    See also: CatalystX::Declare::Keyword::View,
+    CatalystX::Declare::Keyword::Component, "class" in MooseX::Declare
+
+  Models
+        use CatalystX::Declare;
+
+        model MyApp::Web::Model::DBIC::Schema
+            extends Catalyst::Model::DBIC::Schema {
+
+            $CLASS->config(
+                schema_class => 'MyApp::Schema',
+            );
+        }
+
+    See also: CatalystX::Declare::Keyword::Model,
+    CatalystX::Declare::Keyword::Component, "class" in MooseX::Declare
+
+DESCRIPTION
+    This module is EXPERIMENTAL
+
+    This module provides a declarative syntax for Catalyst applications. Its
+    main focus is currently on common and repetitious parts of the
+    application, such as the application class itself, controllers, and
+    controller roles.
+
+  Not a Source Filter
+    The used syntax elements are not parsed via source filter mechanism, but
+    through Devel::Declare, which is a much less fragile deal to handle and
+    allows extensions to mix without problems. For example, all keywords
+    added by this module are separete handlers.
+
+  Syntax Documentation
+    The documentation about syntax is in the respective parts of the
+    distribution below the "CatalystX::Declare::Keyword::" namespace. Here
+    are the manual pages you will be interested in to familiarize yourself
+    with this module's syntax extensions:
+
+    CatalystX::Declare::Keyword::Application
+    CatalystX::Declare::Keyword::Action
+    CatalystX::Declare::Keyword::Controller
+    CatalystX::Declare::Keyword::Role
+    CatalystX::Declare::Keyword::View
+    CatalystX::Declare::Keyword::Model
+
+    Things like models, views, roles for request or response objects, can be
+    built declaratively with MooseX::Declare, which is used to additionally
+    provide keywords for "class", "role", "method" and the available method
+    modifier declarations. This allows for constructs such as:
+
+        use CatalystX::Declare;
+
+        class Foo {
+
+            method bar { 23 }
+        }
+
+        controller MyApp::Web::Controller::Baz {
+
+            final action qux under '/' { 
+                $ctx->response->body(Foo->new->bar) 
+            }
+        }
+
+SEE ALSO
+  For Usage Information
+    These links are intended for the common user of this module.
+
+    Catalyst::Runtime
+    Catalyst::Devel
+    Catalyst::Manual
+        Although you probably already know Catalyst, since you otherwise
+        probably wouldn't be here, I include these links for completeness
+        sake.
+
+    Moose
+        The powerful modern Perl object orientation implementation that is
+        used as basis for Catalyst. MooseX::Declare, on which
+        CatalystX::Declare is based, provides a declarative syntax for
+        Moose.
+
+    MooseX::Declare
+        We inherit almost all functionality from MooseX::Declare to allow
+        the declaration of traditional classes, roles, methods, modifiers,
+        etc. Refer to this documentation first for syntax elements that
+        aren't part of CatalystX::Declare.
+
+    MooseX::Method::Signatures
+        This isn't directly used, but MooseX::Declare utilises this to
+        provide us with method and modifier declarations. For extended
+        information on the usage of methods, especially signatures, refer to
+        this module after looking for an answer in the MooseX::Declare
+        documentation.
+
+  For Developer Information
+    This section contains links relevant to the implementation of this
+    module.
+
+    Devel::Declare
+        You could call this is the basic machine room that runs the
+        interaction with perl. It provides a way to hook into perl's source
+        code parsing and change small parts on a per-statement basis.
+
+    MooseX::MethodAttributes
+        We use this module to easily communicate the action attributes to
+        Catalyst. Currently, this is the easiest solution for now but may be
+        subject to change in the future.
+
+AUTHOR
+    Robert 'phaylon' Sedlacek, <rs@474.at>
+
+    With contributions from, and many thanks to:
+
+    Florian Ragwitz
+    John Napiorkowski
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as perl itself.
+

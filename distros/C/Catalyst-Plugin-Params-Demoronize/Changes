@@ -1,0 +1,25 @@
+Revision history for Perl extension Catalyst::Plugin::Params::Demoronize
+
+1.14 - Fri Nov  5 16:10:13 CDT 2010
+ - switch to MRO::Compat (RT #54653)
+ - switch to Dist::Zilla
+
+1.13 - Tue Nov 17 15:31:14 CST 2009
+ - fix warnings from undefined strings,
+   courtesy of Cory Watson <gphat@cpan.org>
+ - update MANIFEST
+
+1.12 - Wed Apr 29 12:14:51 CDT 2009
+ - add unicode tests, also courtesy of Chisel
+
+1.11 - Mon Apr 27 16:02:55 CDT 2009
+ - fix failing tests, thanks to the patch provided by
+   Chisel Wright <chisel@cpan.org>
+
+1.1 - Tue Feb 17 14:20:05 CST 2009
+ - major fixes to the unicode portion of the conversion,
+   courtesy of Cory Watson <gphat@cpan.org>
+
+1.0 - Thu Nov 20 12:51:37 CST 2008
+ - initial release
+

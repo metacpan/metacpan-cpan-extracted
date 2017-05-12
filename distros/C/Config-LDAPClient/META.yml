@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Config-LDAPClient
+version:            0.01
+abstract:           parse system configuration for LDAP client settings.
+author:
+    - Michael Fowler <mfowler@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Moose:                0
+    MooseX::AttributeHelpers:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

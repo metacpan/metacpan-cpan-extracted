@@ -1,0 +1,9 @@
+Revision history for Class-Storage
+
+0.03    2015-06-22 19:34:00
+    - Fixed required versions of perl and misc packages
+0.02    2015-06-19 01:45:00
+    - Fixed bugs in perldoc (after seeing it in metacpan)
+0.01    2015-06-19 00:15:00
+    - First version, released on an unsuspecting world.
+

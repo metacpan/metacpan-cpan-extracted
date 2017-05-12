@@ -1,0 +1,3189 @@
+=head1 NAME
+
+CGI::Ex::App - Anti-framework application framework.
+
+=head1 SYNOPSIS
+
+A basic example:
+
+    -------- File: /cgi-bin/my_cgi --------
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+
+    __PACKAGE__->navigate;
+    exit;
+
+    sub main_file_print {
+        return \ "Hello World!";
+    }
+
+Properly put content in an external file...
+
+    -------- File: /cgi-bin/my_cgi --------
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+
+    __PACKAGE__->navigate;
+
+    sub template_path { '/var/www/templates' }
+
+
+    -------- File: /var/www/templates/my_cgi/main.html --------
+
+    Hello World!
+
+Adding substitutions...
+
+    -------- File: /cgi-bin/my_cgi --------
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+
+    __PACKAGE__->navigate;
+
+    sub template_path { '/var/www/templates' }
+
+    sub main_hash_swap {
+        my $self = shift;
+        return {
+            greeting => 'Hello',
+            date     => sub { scalar localtime },
+        };
+    }
+
+
+    -------- File: /var/www/templates/my_cgi/main.html --------
+
+    [% greeting %] World! ([% date %])
+
+
+Add forms and  validation (inluding javascript validation)...
+
+    -------- File: /cgi-bin/my_cgi --------
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+
+    __PACKAGE__->navigate;
+
+    sub template_path { '/var/www/templates' }
+
+    sub main_hash_swap { {date => sub { scalar localtime }} }
+
+    sub main_hash_fill {
+        return {
+            guess => 50,
+        };
+    }
+
+    sub main_hash_validation {
+        return {
+            guess => {
+                required => 1,
+                compare1       => '<= 100',
+                compare1_error => 'Please enter a value less than 101',
+                compare2       => '>  0',
+                compare2_error => 'Please enter a value greater than 0',
+            },
+        };
+    }
+
+    sub main_finalize {
+        my $self   = shift;
+        my $form   = $self->form;
+
+        $self->add_to_form({was_correct => ($form->{'guess'} == 23)});
+
+        return 0; # indicate to show the page without trying to move along
+    }
+
+
+    -------- File: /var/www/templates/my_cgi/main.html --------
+
+    <h2>Hello World! ([% date %])</h2>
+
+    [% IF was_correct %]
+       <b>Correct!</b> - The number was [% guess %].<br>
+    [% ELSIF guess %]
+       <b>Incorrect</b> - The number was not [% guess %].<br>
+    [% END %]
+
+    <form name="[% form_name %]" method="post">
+
+    Enter a number between 1 and 100: <input type="text" name="guess"><br>
+    <span id="guess_error" style="color:red">[% guess_error %]</span><br>
+
+    <input type="submit">
+    </form>
+
+    [% js_validation %]
+
+
+There are infinite possibilities.  There is a longer "SYNOPSIS" after
+the process flow discussion and more examples near the end of this
+document.  It is interesting to note that there have been no databases
+so far.  It is very, very difficult to find a single database
+abstraction that fits every model.  CGI::Ex::App is Controller/Viewer
+that is somewhat Model agnostic and doesn't come with any default
+database abstraction.
+
+=head1 DESCRIPTION
+
+Fill in the blanks and get a ready made web application.
+
+This module is somewhat similar in spirit to CGI::Application,
+CGI::Path, and CGI::Builder and any other "CGI framework."  As with
+the others, CGI::Ex::App tries to do as much of the mundane things, in
+a simple manner, without getting in the developer's way.  However,
+there are various design patterns for CGI applications that
+CGI::Ex::App handles for you that the other frameworks require you to
+bring in extra support.  The entire CGI::Ex suite has been taylored to
+work seamlessly together.  Your mileage in building applications may
+vary.
+
+If you build applications that submit user information, validate it,
+re-display it, fill in forms, or separate logic into separate modules,
+then this module may be for you.  If all you need is a dispatch
+engine, then this still may be for you.  If all you want is to look at
+user passed information, then this may still be for you.  If you like
+writing bare metal code, this could still be for you.  If you don't want
+to write any code, this module will help - but you still need to
+provide your key actions and html.
+
+One of the great benefits of CGI::Ex::App vs. Catalyst or Rails style
+frameworks is that the model of CGI::Ex::App can be much more abstract.
+And models often are abstract.
+
+=head1 DEFAULT PROCESS FLOW
+
+The following pseudo-code describes the process flow
+of the CGI::Ex::App framework.  Several portions of the flow
+are encapsulated in hooks which may be completely overridden to give
+different flow.  All of the default actions are shown.  It may look
+like a lot to follow, but if the process is broken down into the
+discrete operations of step iteration, data validation, and template
+printing the flow feels more natural.
+
+=head2 navigate
+
+The process starts off by calling ->navigate.
+
+    navigate {
+        eval {
+            ->pre_navigate
+            ->nav_loop
+            ->post_navigate
+        }
+        # dying errors will run the ->handle_error method
+
+        ->destroy
+    }
+
+=head2 nav_loop
+
+The nav_loop method will run as follows:
+
+    nav_loop {
+        ->path (get the array of path steps)
+            # ->path_info_map_base (method - map ENV PATH_INFO to form)
+            # look in ->form for ->step_key
+            # make sure step is in ->valid_steps (if defined)
+
+        ->pre_loop($path)
+            # navigation stops if true
+
+        foreach step of path {
+
+            ->require_auth (hook)
+                # exits nav_loop if true
+
+            ->morph (hook)
+                # check ->allow_morph (hook)
+                # ->morph_package (hook - get the package to bless into)
+                # ->fixup_after_morph if morph_package exists
+                # if no package is found, process continues in current file
+
+            ->path_info_map (hook - map PATH_INFO to form)
+
+            ->run_step (hook)
+
+            ->refine_path (hook)
+                # only called if run_step returned false (page not printed)
+                ->next_step (hook) # find next step and add to path
+                ->set_ready_validate(0) (hook)
+
+            ->unmorph (hook)
+                # ->fixup_before_unmorph if blessed to current package
+
+            # exit loop if ->run_step returned true (page printed)
+
+        } end of foreach step
+
+        ->post_loop
+            # navigation stops if true
+
+        ->default_step
+        ->insert_path (puts the default step into the path)
+        ->nav_loop (called again recursively)
+
+    } end of nav_loop
+
+=head2 run_step (hook)
+
+For each step of the path the following methods will be run
+during the run_step hook.
+
+    run_step {
+        ->pre_step (hook)
+            # skips this step if true and exit nav_loop
+
+        ->skip (hook)
+            # skips this step if true and stays in nav_loop
+
+        ->prepare (hook - defaults to true)
+
+        ->info_complete (hook - ran if prepare was true)
+            ->ready_validate (hook)
+                ->validate_when_data (hook)
+                # returns false from info_complete if ! ready_validate
+            ->validate (hook - uses CGI::Ex::Validate to validate form info)
+                ->hash_validation (hook)
+                   ->file_val (hook)
+                       ->vob_path (defaults to template_path)
+                       ->base_dir_rel
+                       ->name_module
+                       ->name_step
+                       ->ext_val
+            # returns true if validate is true or if nothing to validate
+
+        ->finalize (hook - defaults to true - ran if prepare and info_complete were true)
+
+        if ! ->prepare || ! ->info_complete || ! ->finalize {
+            ->prepared_print
+                ->hash_base (hook)
+                ->hash_common (hook)
+                ->hash_form (hook)
+                ->hash_fill (hook)
+                ->hash_swap (hook)
+                ->hash_errors (hook)
+                # merge form, base, common, and fill into merged fill
+                # merge form, base, common, swap, and errors into merged swap
+                ->print (hook - passed current step, merged swap hash, and merged fill)
+                     ->file_print (hook - uses base_dir_rel, name_module, name_step, ext_print)
+                     ->swap_template (hook - processes the file with Template::Alloy)
+                          ->template_args (hook - passed to Template::Alloy->new)
+                     ->fill_template (hook - fills the any forms with CGI::Ex::Fill)
+                          ->fill_args (hook - passed to CGI::Ex::Fill::fill)
+                     ->print_out (hook - print headers and the content to STDOUT)
+
+            ->post_print (hook - used for anything after the print process)
+
+            # return true to exit from nav_loop
+        }
+
+        ->post_step (hook)
+            # exits nav_loop if true
+
+    } end of run_step
+
+It is important to learn the function and placement of each of the
+hooks in the process flow in order to make the most of CGI::Ex::App.
+It is enough to begin by learning a few common hooks - such as
+hash_validation, hash_swap, and finalize, and then learn about other
+hooks as needs arise.  Sometimes, it is enough to simply override the
+run_step hook and take care of processing the entire step yourself.
+
+Because of the hook based system, and because CGI::Ex::App uses
+sensible defaults, it is very easy to override a little or a lot which
+ends up giving the developer a lot of flexibility.
+
+Additionally, it should be possible to use CGI::Ex::App with the other
+frameworks such as CGI::Application or CGI::Prototype.  For these you
+could simple let each "runmode" call the run_step hook of CGI::Ex::App
+and you will instantly get all of the common process flow for free.
+
+=head1 MAPPING URI TO STEP
+
+The default out of the box configuration will map URIs to steps as follows:
+
+    # Assuming /cgi-bin/my_app is the program being run
+
+   URI:  /cgi-bin/my_app
+    STEP: main
+    FORM: {}
+    WHY:  No other information is passed.  The path method is
+          called which eventually calls ->default_step which
+          defaults to "main"
+
+   URI:  /cgi-bin/my_app?foo=bar
+    STEP: main
+    FORM: {foo => "bar"}
+    WHY:  Same as previous example except that QUERY_STRING
+          information was passed and placed in form.
+
+   URI:  /cgi-bin/my_app?step=my_step
+    STEP: my_step
+    FORM: {step => "my_step"}
+    WHY:  The path method is called which looks in $self->form
+          for the key ->step_key (which defaults to "step").
+
+   URI:  /cgi-bin/my_app?step=my_step&foo=bar
+    STEP: my_step
+    FORM: {foo => "bar", step => "my_step"}
+    WHY:  Same as before but another parameter was passed.
+
+   URI:  /cgi-bin/my_app/my_step
+    STEP: my_step
+    FORM: {step => "my_step"}
+    WHY:  The path method is called which called path_info_map_base
+          which matched $ENV{'PATH_INFO'} using the default regex
+          of qr{^/(\w+)$} and place the result in
+          $self->form->{$self->step_key}.  Path then looks in
+          $self->form->{$self->step_key} for the initial step. See
+          the path_info_map_base method for more information.
+
+   URI:  /cgi-bin/my_app/my_step?foo=bar
+    STEP: my_step
+    FORM: {foo => "bar", step => "my_step"}
+    WHY:  Same as before but other parameters were passed.
+
+   URI:  /cgi-bin/my_app/my_step?step=other_step
+    STEP: other_step
+    FORM: {step => "other_step"}
+    WHY:  The same procedure took place, but when the PATH_INFO
+          string was matched, the form key "step" already existed
+          and was not replaced by the value from PATH_INFO.
+
+The remaining examples in this section are based on the assumption
+that the following method is installed in your script.
+
+    sub my_step_path_info_map {
+        return [
+            [qr{^/\w+/(\w+)/(\d+)$}, 'foo', 'id'],
+            [qr{^/\w+/(\w+)$}, 'foo'],
+            [qr{^/\w+/(.+)$}, 'anything_else'],
+        ];
+    }
+
+   URI:  /cgi-bin/my_app/my_step/bar
+    STEP: my_step
+    FORM: {foo => "bar"}
+    WHY:  The step was matched as in previous examples using
+          path_info_map_base.  However, the form key "foo"
+          was set to "bar" because the second regex returned
+          by the path_info_map hook matched the PATH_INFO string
+          and the corresponding matched value was placed into
+          the form using the keys specified following the regex.
+
+   URI:  /cgi-bin/my_app/my_step/bar/1234
+    STEP: my_step
+    FORM: {foo => "bar", id => "1234"}
+    WHY:  Same as the previous example, except that the first
+          regex matched the string.  The first regex had two
+          match groups and two form keys specified.  Note that
+          it is important to order your match regexes in the
+          order that will match the most data.  The third regex
+          would also match this PATH_INFO.
+
+   URI:  /cgi-bin/my_app/my_step/some/other/type/of/data
+    STEP: my_step
+    FORM: {anything_else => 'some/other/type/of/data'}
+    WHY:  Same as the previous example, except that the third
+          regex matched.
+
+   URI:  /cgi-bin/my_app/my_step/bar?bling=blang
+    STEP: my_step
+    FORM: {foo => "bar", bling => "blang"}
+    WHY:  Same as the first sample, but additional QUERY_STRING
+          information was passed.
+
+   URI:  /cgi-bin/my_app/my_step/one%20two?bar=three%20four
+    STEP: my_step
+    FORM: {anything_else => "one two", bar => "three four"}
+    WHY:  The third path_info_map regex matched.  Note that the
+          %20 in bar was unescaped by CGI::param, but the %20
+          in anything_else was unescaped by Apache.  If you are
+          not using Apache, this behavior may vary.  CGI::Ex::App
+          doesn't decode parameters mapped from PATH_INFO.
+
+See the path method for more information about finding the initial step
+of the path.
+
+The form method calls CGI::Ex::form which uses CGI::param to retrieve
+GET and POST parameters.  See the form method for more information on
+how GET and POST parameters are parsed.
+
+See the path_info_map_base method, and path_info_map hook for more information
+on how the path_info maps function.
+
+Using the following code is very useful for determing what hooks have
+taken place:
+
+   use CGI::Ex::Dump qw(debug);
+
+   sub post_navigate {
+       my $self = shift;
+       debug $self->dump_history, $self->form;
+   }
+
+=head1 ADDING DATA VALIDATION TO A STEP
+
+CGI::Ex::App uses CGI::Ex::Validate for its data validation.  See CGI::Ex::Validate
+for more information about the many ways you can validate your data.
+
+The default hash_validation hook returns an empty hashref.  This means that passed
+in data is all valid and the script will automatically call the step's finalize method.
+
+The following shows how to add some contrived validation to a step called "my_step".
+
+    sub my_step_hash_validation {
+        return {
+            username => {
+                required    => 1,
+                match       => 'm/^(\w+)$/',
+                match_error => 'The $field field may only contain word characters',
+                max_len     => 20,
+            },
+            password => {
+                required => 1,
+                max_len  => 15,
+            },
+            password_verify => {
+                validate_if => 'password',
+                equals      => 'password',
+            },
+            usertype => {
+                required => 1,
+                enum     => [qw(animal vegetable mineral)],
+            },
+        };
+    }
+
+The step will continue to display the html form until all of the fields pass
+validation.
+
+See the hash_validation hook and validate hook for more information about how
+this takes place.
+
+=head1 ADDING JAVASCRIPT DATA VALIDATION TO A STEP
+
+You must first provide a hash_validation hook as explained in the previous section.
+
+Once you have a hash_validation hook, you would place the following tags
+into your HTML template.
+
+    <form name="[% form_name %]" method="post">
+    ...
+    </form>
+    [% js_validation %]
+
+The "form_name" swap-in places a name on the form that the javascript returned by
+the js_validation swap-in will be able to find and check for validity.
+
+See the hash_validation, js_validation, and form_name hooks for more information.
+
+Also, CGI::Ex::validate.js allows for inline errors in addition to or in replacement
+of an alert message.  To use inline errors, you must provide an element in your
+HTML document where this inline message can be placed.  The common way to do it is as
+follows:
+
+    <input type="text" name="username"><br>
+    <span class="error" id="username_error">[% username_error %]</span>
+
+The span around the error allows for the error css class and it provides a location
+that the Javascript validation can populate with errors.  The [% username_error %] provides
+a location for errors generated on the server side to be swapped in.  If there was no error
+the [% username_error %] tag would default to "".
+
+=head1 ADDING ADDITIONAL TEMPLATE VARIABLES
+
+All variables returned by the hash_base, hash_common, hash_form, hash_swap, and
+hash_errors hooks are available for swapping in templates.
+
+The following shows how to add variables using the hash_swap hook on the step "main".
+
+    sub main_hash_swap {
+        return {
+            color   => 'red',
+            choices => [qw(one two three)],
+            "warn"  => sub { warn @_ },
+        };
+    }
+
+You could also return the fields from the hash_common hook and they
+would be available in both the template swapping as well as form
+filling.
+
+See the hash_base, hash_common, hash_form, hash_swap, hash_errors,
+swap_template, and template_args hooks for more information.
+
+The default template engine used is Template::Alloy.  The default
+interface used is TT which is the Template::Toolkit interface.
+Template::Alloy allows for using TT documents, HTML::Template
+documents, HTML::Template::Expr documents, Text::Tmpl documents, or
+Velocity (VTL) documents.  See the L<Template::Alloy> documentation
+for more information.
+
+=head1 ADDING ADDITIONAL FORM FILL VARIABLES
+
+All variables returned by the hash_base, hash_common, hash_form, and hash_fill hooks
+are available for filling html fields in on templates.
+
+The following shows how to add variables using the hash_fill hook on the step "main".
+
+    sub main_hash_fill {
+        return {
+            color   => 'red',
+            choices => [qw(one two three)],
+        };
+    }
+
+You could also return the fields from the hash_common hook and they would be available
+in both the form filling as well as in the template swapping.
+
+See the hash_base, hash_common, hash_form, hash_swap, hash_errors, fill_template, and
+fill_args hooks for more information.
+
+The default form filler is CGI::Ex::Fill which is similar to HTML::FillInForm but
+has several benefits.  See the CGI::Ex::Fill module for the available options.
+
+=head1 FINDING TEMPLATES AND VALIDATION FILES
+
+CGI::Ex::App tries to help your applications use a good template directory layout, but allows
+for you to override everything.
+
+External template files are used for storing your html templates and
+for storing your validation files (if you use externally stored
+validation files).
+
+The default file_print hook will look for content on your file system,
+but it can also be completely overridden to return a reference to a
+scalar containing the contents of your file (beginning with version 2.14
+string references can be cached which makes templates passed this way
+"first class" citizens).  Actually it can return
+anything that Template::Alloy (Template::Toolkit compatible) will
+treat as input.  This templated html is displayed to the user during
+any step that enters the "print" phase.
+
+Similarly the default file_val hook will look for a validation file on
+the file system, but it too can return a reference to a scalar
+containing the contents of a validation file.  It may actually return
+anything that the CGI::Ex::Validate get_validation method is able to
+understand.  This validation is used by the default "info_complete"
+method for verifying if the submitted information passes its specific
+checks.  A more common way of inlining validation is to return a
+validation hash from a hash_validation hook override.
+
+If the default file_print and file_val hooks are used, the following methods
+are employed for finding templates and validation files on your filesystem (they
+are also documented more in the HOOKS AND METHODS section.
+
+=over 4
+
+=item template_path
+
+Absolute path or arrayref of paths to the base templates directory.  Defaults to
+base_dir_abs which defaults to ['.'].
+
+=item base_dir_rel
+
+Relative path inside of the template_path directory where content can be found.  Default "".
+
+=item name_module
+
+Directory inside of base_dir_rel where files for the current CGI (module) will be
+stored.  Default value is $ENV{SCRIPT_NAME} with path and extension removed.
+
+=item name_step
+
+Used with ext_print and ext_val for creating the filename that will be looked for
+inside of the name_module directory.  Default value is the current step.
+
+=item ext_print and ext_val
+
+Filename extensions added to name_step to create the filename looked for
+inside of the name_module directory.  Default is "html" for ext_print and "val"
+for ext_val.
+
+=back
+
+It may be easier to understand the usage of each of these methods by showing
+a contrived example.  The following is a hypothetical layout for your templates:
+
+    /home/user/templates/
+    /home/user/templates/chunks/
+    /home/user/templates/wrappers/
+    /home/user/templates/content/
+    /home/user/templates/content/my_app/
+    /home/user/templates/content/my_app/main.html
+    /home/user/templates/content/my_app/step1.html
+    /home/user/templates/content/my_app/step1.val
+    /home/user/templates/content/another_cgi/main.html
+
+In this example we would most likely set values as follows:
+
+    template_path /home/user/templates
+    base_dir_rel  content
+    name_module   my_app
+
+The name_module method defaults to the name of the running program, but
+with the path and extension removed.  So if we were running
+/cgi-bin/my_app.pl, /cgi-bin/my_app, or /anypath/my_app, then
+name_module would default to "my_app" and we wouldn't have to
+hard code the value.  Often it is wise to set the value anyway so
+that we can change the name of the cgi script without effecting
+where template content should be stored.
+
+Continuing with the example and assuming that name of the step that
+the user has requested is "step1" then the following values would be
+returned:
+
+    template_path /home/user/templates
+    base_dir_rel  content
+    name_module   my_app
+    name_step     step1
+    ext_print     html
+    ext_val       val
+
+    file_print    content/my_app/step1.html
+    file_val      /home/user/templates/content/my_app/step1.val
+
+The call to the template engine would look something like
+the following:
+
+    my $t = $self->template_obj({
+        INCLUDE_PATH => $self->template_path, # defaults to base_dir_abs
+    });
+
+    $t->process($self->file_print($step), \%vars);
+
+The template engine would then look for the relative file
+inside of the absolute paths (from template_path).
+
+The call to the validation engine would pass the absolute
+filename that is returned by file_val.
+
+The name_module and name_step methods can return filenames with
+additional directories included.  The previous example could
+also have been setup using the following values:
+
+    template_path /home/user/templates
+    base_dir_rel
+    name_module   content/my_app
+
+In this case the same values would be returned for the file_print and file_val hooks
+as were returned in the previous setup.
+
+=head1 SYNOPSIS (A LONG "SYNOPSIS")
+
+This example script would most likely be in the form of a cgi, accessible via
+the path http://yourhost.com/cgi-bin/my_app (or however you do CGIs on
+your system.  About the best way to get started is to paste the following
+code into a cgi script (such as cgi-bin/my_app) and try it out.  A detailed
+walk-through follows in the next section.  There is also a longer recipe
+database example at the end of this document that covers other topics including
+making your module a mod_perl handler.
+
+    ### File: /var/www/cgi-bin/my_app (depending upon Apache configuration)
+    ### --------------------------------------------
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+    use CGI::Ex::Dump qw(debug);
+
+    __PACKAGE__->navigate;
+    # OR
+    # my $obj = __PACKAGE__->new;
+    # $obj->navigate;
+
+    exit;
+
+    ###------------------------------------------###
+
+    sub post_navigate {
+        # show what happened
+        debug shift->dump_history;
+    }
+
+    sub main_hash_validation {
+        return {
+            'general no_alert'   => 1,
+            'general no_confirm' => 1,
+            'group order' => [qw(username password password2)],
+            username => {
+                required => 1,
+                min_len  =>  3,
+                max_len  => 30,
+                match    => 'm/^\w+$/',
+                match_error => 'You may only use letters and numbers.',
+            },
+            password => {
+                required => 1,
+                min_len  => 6,
+            },
+            password2 => {
+                equals => 'password',
+            },
+        };
+    }
+
+    sub main_file_print {
+        # reference to string means ref to content
+        # non-reference means filename
+        return \ "<h1>Main Step</h1>
+          <form method=post name=[% form_name %]>
+          <input type=hidden name=step>
+          <table>
+          <tr>
+            <td><b>Username:</b></td>
+            <td><input type=text name=username><span style='color:red' id=username_error>[% username_error %]</span></td>
+          </tr><tr>
+            <td><b>Password:</b></td>
+            <td><input type=text name=password><span style='color:red' id=password_error>[% password_error %]</span></td>
+          </tr><tr>
+            <td><b>Verify Password:</b></td>
+            <td><input type=text name=password2><span style='color:red' id=password2_error>[% password2_error %]</span></td>
+          </tr>
+          <tr><td colspan=2 align=right><input type=submit></td></tr>
+          </table>
+          </form>
+          [% js_validation %]
+        ";
+    }
+
+    sub main_finalize {
+        my $self = shift;
+
+        if ($self->form->{'username'} eq 'bar') {
+            $self->add_errors(username => 'A trivial check to say the username cannot be "bar"');
+            return 0;
+        }
+
+        debug $self->form, "Do something useful with form here in the finalize hook.";
+
+        ### add success step
+        $self->add_to_swap({success_msg => "We did something"});
+        $self->append_path('success');
+        $self->set_ready_validate(0);
+        return 1;
+    }
+
+    sub success_file_print {
+        \ "<div style=background:lightblue>
+           <h1>Success Step - [% success_msg %]</h1>
+           Username: <b>[% username %]</b><br>
+           Password: <b>[% password %]</b><br>
+           </div>
+          ";
+    }
+
+    __END__
+
+Note: This example would be considerably shorter if the html file
+(file_print) and the validation file (file_val) had been placed in
+separate files.  Though CGI::Ex::App will work "out of the box" as
+shown it is more probable that any platform using it will customize
+the various hooks to their own tastes (for example, switching print to
+use a templating system other than Template::Alloy).
+
+=head1 SYNOPSIS STEP BY STEP
+
+This section goes step by step over the previous example.
+
+Well - we start out with the customary CGI introduction.
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use base qw(CGI::Ex::App);
+    use CGI::Ex::Dump qw(debug);
+
+Note:  the "use base" is not normally used in the "main" portion of a script.
+It does allow us to just do __PACKAGE__->navigate.
+
+Now we need to invoke the process:
+
+    __PACKAGE__->navigate;
+    # OR
+    # my $obj = __PACKAGE__->new;
+    # $obj->navigate;
+    exit;
+
+Note: the "exit" isn't necessary - but it is kind of nice to infer
+that process flow doesn't go beyond the ->navigate call.
+
+The navigate routine is now going to try and "run" through a series of
+steps.  Navigate will call the ->path method which should return an
+arrayref containing the valid steps.  By default, if path method has
+not been overridden, the path method will default first to the step
+found in form key named ->step_name, then it will fall to the contents
+of $ENV{'PATH_INFO'}.  If navigation runs out of steps to run it will
+run the step found in ->default_step which defaults to 'main'.  So the
+URI '/cgi-bin/my_app' would run the step 'main' first by default.  The
+URI '/cgi-bin/my_app?step=foo' would run the step 'foo' first.  The
+URI '/cgi-bin/my_app/bar' would run the step 'bar' first.
+
+CGI::Ex::App allows for running steps in a preset path or each step may
+choose the next step that should follow.  The navigate
+method will go through one step of the path at a time and see if it is
+completed (various methods determine the definition of "completed").
+This preset type of path can also be automated using the CGI::Path
+module.  Rather than using a preset path, CGI::Ex::App also has
+methods that allow for dynamic changing of the path, so that each step
+can determine which step to do next (see the goto_step, append_path,
+insert_path, and replace_path methods).
+
+During development it would be nice to see what happened during the
+course of our navigation.  This is stored in the arrayref contained in
+->history.  There is a method that is called after all of the navigation
+has taken place called "post_navigate".  This chunk will display history after we
+have printed the content.
+
+    sub post_navigate {
+        debug shift->dump_history;
+    } # show what happened
+
+Ok.  Finally we are looking at the methods used by each step of the path.  The
+hook mechanism of CGI::Ex::App will look first for a method ${step}_${hook_name}
+called before falling back to the method named $hook_name.  Internally in the
+code there is a call that looks like $self->run_hook('hash_validation', $step).  In
+this case the step is main.  The dispatch mechanism finds our method at the following
+chunk of code.
+
+    sub main_hash_validation { ... }
+
+The process flow will see if the data is ready to validate.  Once it is ready
+(usually when the user presses the submit button) the data will be validated.  The
+hash_validation hook is intended to describe the data and will be tested
+using CGI::Ex::Validate.  See the CGI::Ex::Validate perldoc for more
+information about the many types of validation available.
+
+    sub main_file_print { ... }
+
+The navigation process will see if user submitted information (the form)
+is ready for validation.  If not, or if validation fails, the step needs to
+be printed.  Eventually the file_print hook is called.  This hook should
+return either the filename of the template to be printed, or a reference
+to the actual template content.  In this example we return a reference
+to the content to be printed (this is useful for prototyping applications
+and is also fine in real world use - but generally production applications
+use external html templates).
+
+A few things to note about the template:
+
+First, we add a hidden form field called step.  This will be filled in
+automatically at a later point with the current step we are on.
+
+We provide locations to swap in inline errors.
+
+    <span style="color:red" id="username_error">[% username_error %]</span>
+
+As part of the error html we name each span with the name of the error.  This
+will allow for us to have Javascript update the error spots when the javascript
+finds an error.
+
+At the very end we add the TT variable [% js_validation %].  This swap in is
+provided by the default hash_base hook and will provide for form data to be
+validated using javascript.
+
+Once the process flow has deemed that the data is validated, it then calls
+the finalize hook.  Finalize is where the bulk of operations should go.
+We'll look at it more in depth.
+
+    sub main_finalize {
+        my $self = shift;
+        my $form = $self->form;
+
+At this point, all of the validated data is in the $form hashref.
+
+        if ($form->{'username'} eq 'bar') {
+            $self->add_errors(username => 'A trivial check to say the username cannot be "bar"');
+            return 0;
+        }
+
+It is most likely that though the data is of the correct type and formatting,
+it still isn't completely correct.  This previous section shows a hard coded
+test to see if the username was 'bar'.  If it was then an appropriate error will
+be set, the routine returns 0 and the run_step process knows that it needs to
+redisplay the form page for this step.  The username_error will be shown inline.
+The program could do more complex things such as checking to see if the username
+was already taken in a database.
+
+        debug $form, "Do something useful with form here in the finalize hook.";
+
+This debug $form piece is simply a place holder.  It is here that the program would
+do something useful such as add the information to a database.
+
+        ### add success step
+        $self->add_to_swap({success_msg => "We did something"});
+
+Now that we have finished finalize, we add a message that will be passed to the template
+engine.
+
+        $self->append_path('success');
+        $self->set_ready_validate(0);
+
+The program now needs to move on to the next step.  In this case we want to
+follow with a page that informs us we succeeded.  So, we append a step named "success".
+We also call set_ready_validate(0) to inform the navigation control that the
+form is no longer ready to validate - which will cause the success page to
+print without trying to validate the data.  It is normally a good idea
+to set this as leaving the engine in a "ready to validate" state can result
+in an recursive loop (that will be caught).
+
+        return 1;
+    }
+
+We then return 1 which tells the engine that we completed this step successfully
+and it needs to move on to the next step.
+
+Finally we run the "success" step because we told it to.  That step isn't
+ready to validate so it prints out the template page.
+
+For more of a real world example, it would be good to read the sample recipe db
+application included at the end of this document.
+
+=head1 AVAILABLE METHODS / HOOKS
+
+CGI::Ex::App's dispatch system works on the principles of hooks (which
+are essentially glorified method lookups).  When the run_hook method
+is called, CGI::Ex::App will look for a corresponding method call for
+that hook for the current step name.  It is perhaps easier to show than
+to explain.
+
+If we are calling the "print" hook for the step "edit" we would call
+run_hook like this:
+
+    $self->run_hook('print', 'edit', $template, \%swap, \%fill);
+
+This would first look for a method named "edit_print".  If it is unable to
+find a method by that name, it will look for a method named "print".  If it
+is unable to find this method - it will die.
+
+If allow_morph is set to true, the same methods are searched for but it becomes
+possible to move some of those methods into an external package.
+
+See the discussions under the methods named "find_hook" and "run_hook" for more details.
+
+Some hooks expect "magic" values to be replaced.  Often they are
+intuitive, but sometimes it is easy to forget.  For example, the
+finalize hook should return true (default) to indicate the step is
+complete and false to indicate that it failed and the page should be
+redisplayed.  You can import a set of constants that allows for human
+readible names.
+
+    use CGI::Ex::App qw(:App__finalize);
+    OR
+    use MyAppPkg qw(:App__finalize); # if it is a subclass of CGI::Ex::App
+
+This would import the following constants:
+App__finalize__failed_and_show_page (0),
+App__finalize__finished_and_move_to_next_step => (1 - default), and
+App__finalize__finished_but_show_page ("" - still false).  These
+constants are provided by CGI::Ex::App::Constants which also contains
+more options for usage.
+
+The following is the alphabetical list of methods and hooks.
+
+=over 4
+
+=item allow_morph (hook)
+
+Should return true if this step is allowed to "morph" the current App
+object into another package.  Default is false.  It is passed a single
+argument of the current step.  For more granularity, if true value is
+a hash, the step being morphed to must be in the hash.
+
+If the returned value is "1", and the module doesn't exist, then the
+App will continue to run blessed into the current package.  If there
+is an error requiring the module or if the module doesn't exist and
+the return value is "2" (true but not 1), then App will die with the
+appropriate error.
+
+To enable morphing for all steps, add the following:
+(Packages that don't exists won't be morphed to)
+
+    sub allow_morph { 1 }
+
+To force morphing for all steps add the following:
+
+    sub allow_morph { 2 }
+
+To enable morph on specific steps, do either of the following:
+
+    sub allow_morph {
+        return {
+            edit => 1,
+            delete => 2, # must morph
+        };
+    }
+
+    # OR
+
+    sub allow_morph {
+        my ($self, $step) = @_;
+        return 1 if $step eq 'edit';
+        return 2 if $step eq 'delete';
+        return;
+    }
+
+See the morph "hook" for more information.
+
+=item append_path (method)
+
+Arguments are the steps to append.  Can be called any time.  Adds more
+steps to the end of the current path.
+
+=item auth_args (method)
+
+Should return a hashref that will be passed to the auth_obj method
+which should return a CGI::Ex::Auth compatible object.
+It is augmented with arguments that integrate it into CGI::Ex::App.
+
+See the get_valid_auth method and the CGI::Ex::Auth documentation.
+
+    sub auth_args {
+        return {
+            login_header => '<h1>My login header</h1>',
+            login_footer => '[% TRY %][% INCLUDE login/login_footer.htm %][% CATCH %]<!-- [% error %] -->[% END %]',
+            secure_hash_keys => [qw(aaaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbb ccccccccccccccccccccccc 2222222222222)],
+            # use_blowfish => 'my_blowfish_key',
+        };
+    }
+
+=item auth_data (method)
+
+Contains authentication data stored during the get_valid_auth method.
+The data is normally blessed into the CGI::Ex::Auth::Data package which
+evaluates to false if there was an error and true if the authentication
+was successful - so this data can be defined but false.
+
+See the get_valid_auth method.
+
+=item auth_obj (method)
+
+Passed auth_args.  Should return a CGI::Ex::Auth compatible object.  Default
+is to call CGI::Ex::Auth->new with the passed args.
+
+=item base_dir_abs (method)
+
+Used as the absolute base directory to find template, validation and conf files.
+It may return a single value or an arrayref of values, or a coderef that
+returns an arrayref or coderef of values.  You may pass base_dir_abs
+as a parameter in the arguments passed to the "new" method.
+
+Default value is ['.'].
+
+For example, to pass multiple paths, you would use something
+similar to the following:
+
+    sub base_dir_abs {
+        return ['/my/path/one', '/some/other/path'];
+    }
+
+The base_dir_abs value is used by template_path along with the
+base_dir_rel, name_module, name_step, ext_print and ext_values for
+determining the values returned by the default file_print and file_val
+hooks.  See those methods for further discussion.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+The base_dir_abs method is also used as the default value for conf_path and vob_path.
+
+=item base_dir_rel (method)
+
+Added as a relative base directory to content under the base_dir_abs directory.
+
+Default value is "".
+
+The template_path method is used as top level where template includes may
+pull from, while the base_dir_rel is directory relative to the template_path
+where the content files will be stored.
+
+A value for base_dir_rel may passed as a parameter in the arguments passed
+to the new method.
+
+See the template_path and base_dir_abs methods for more discussion.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+=item cleanup_user (method)
+
+Used as a hook during get_valid_auth.  Allows for cleaning
+up the username.  See the get_valid_auth method.
+
+    sub cleanup_user {
+        my ($self, $user) = @_;
+        return lc $user;
+    }
+
+=item clear_app (method)
+
+If the same CGI::Ex::App based object is used to run multiple
+navigate sessions, the clear_app method should be called which
+will attempt to clear as much session information as it can.
+The following items will be cleared:
+
+    cgix
+    vob
+    form
+    cookies
+    stash
+    path
+    path_i
+    history
+    _morph_lineage_start_index
+    _morph_lineage
+    hash_errors
+    hash_fill
+    hash_swap
+    hash_common
+
+=item conf (method)
+
+Used by default in init_from_conf if load_conf returns true.
+Will try to read the file returned by the conf_file method
+using the object returned by conf_obj using that object's read
+method.  If conf_validation returns a non-empty hashref, the
+conf hash will be validated using $self->vob->validate (see the
+validate method).
+
+This method may be used for other purposes as well (including when
+load_conf is false)..
+
+Caches results in $self->{'conf'}.
+
+If the conf_file can't be found, the method will die unless
+conf_die_on_fail returns 0 (defaults to true).
+
+=item conf_args
+
+Used by conf_obj.
+
+Defaults to $self->{'conf_args'} which defaults to {}.  Will have
+paths => $self->conf_path added before passing to CGI::Ex::Conf->new.
+
+=item conf_file (method)
+
+Used by conf for finding the configuration file to load.  Defaults
+to $self->{'conf_file'} which defaults $self->name_module with the extention
+returned by $self->ext_conf added on.  For example, if name_module
+returns "my_app" and ext_conf returns "ini" the value returned will
+be "my_app.ini".
+
+The value returned can absolute.  If the value will be searched for
+in the paths passed to conf_obj.
+
+The ext_conf may be any of those extentions understood by CGI::Ex::Conf.
+
+=item conf_obj
+
+Used by the conf method to load the file returned by conf_file.  Defaults
+to conf_obj which defaults to loading args from conf_args, adding in paths
+returned by conf_path, and calling CGI::Ex::Conf->new.
+
+Any object that provides a read method that returns a hashref can be used.
+
+=item conf_path
+
+Defaults to $self->{'conf_path'} which defaults to base_dir_abs.  Should be
+a path or an arrayref of paths to look the configuration file returned by
+conf_file when that file is not absolute.
+
+=item conf_validation
+
+Used by default conf method.
+Defaults to an empty hashref.  If non-empty hashref is passed, the
+hashref returned by conf_obj->read will be validated using the hashref
+returned by conf_validation.
+
+=item current_step (method)
+
+Returns the current step that the nav_loop is functioning on.
+
+=item default_step (method)
+
+Step to show if the path runs out of steps.  Default value is the
+'default_step' property which defaults to 'main'.
+
+If nav_loop runs of the end of the path (runs out of steps), this
+method is called, the step is added to the path, and nav_loop calls
+itself recursively.
+
+=item destroy (method)
+
+Called at the end of navigate after all other actions have run.  Can
+be used for undoing things done in the ->init method called during
+the ->new method.
+
+=item dump_history (method)
+
+Show simplified trace information of which steps were called, the
+order they were called in, the time they took to run, and a brief list
+of the output (to see the full response returned by each hook, pass a
+true value as the only argument to dump_history -
+$self->dump_history(1)).  Indentation is also applied to show which
+hooks called other hooks.
+
+
+The first line shows the amount of time elapsed for the entire
+navigate execution.  Subsequent lines contain:
+
+    Step   - the name of the current step.
+    Hook   - the name of the hook being called.
+    Found  - the name of the method that was found.
+    Time   - the total elapsed seconds that method took to run.
+    Output - the response of the hook - shown in shortened form.
+
+Note - to get full output responses - pass a true value to
+dump_history - or just call ->history.  Times displayed are to 5
+decimal places - this accuracy can only be provided if the Time::HiRes
+module is installed on your system (it will only be used if installed).
+
+It is usually best to print this history during the post_navigate
+method as in the following:
+
+    use CGI::Ex::Dump qw(debug);
+    sub post_navigate { debug shift->dump_history }
+
+The following is a sample output of dump_history called from the
+sample recipe application at the end of this document.  The step
+called is "view".
+
+    debug: admin/Recipe.pm line 14
+    shift->dump_history = [
+            "Elapsed: 0.00562",
+            "view - require_auth - require_auth - 0.00001 - 0",
+            "view - run_step - run_step - 0.00488 - 1",
+            "    view - pre_step - pre_step - 0.00003 - 0",
+            "    view - skip - view_skip - 0.00004 - 0",
+            "    view - prepare - prepare - 0.00003 - 1",
+            "    view - info_complete - info_complete - 0.00010 - 0",
+            "        view - ready_validate - ready_validate - 0.00004 - 0",
+            "    view - prepared_print - prepared_print - 0.00441 - 1",
+            "        view - hash_base - hash_base - 0.00009 - HASH(0x84ea6ac)",
+            "        view - hash_common - view_hash_common - 0.00148 - HASH(0x8310a20)",
+            "        view - hash_form - hash_form - 0.00004 - HASH(0x84eaa78)",
+            "        view - hash_fill - hash_fill - 0.00003 - {}",
+            "        view - hash_swap - hash_swap - 0.00003 - {}",
+            "        view - hash_errors - hash_errors - 0.00003 - {}",
+            "        view - print - print - 0.00236 - 1",
+            "            view - file_print - file_print - 0.00024 - recipe/view.html",
+            "                view - name_module - name_module - 0.00007 - recipe",
+            "                view - name_step - name_step - 0.00004 - view",
+            "            view - swap_template - swap_template - 0.00161 - <html> ...",
+            "                view - template_args - template_args - 0.00008 - HASH(0x865abf8)",
+            "            view - fill_template - fill_template - 0.00018 - 1",
+            "                view - fill_args - fill_args - 0.00003 - {}",
+            "            view - print_out - print_out - 0.00015 - 1",
+            "    view - post_print - post_print - 0.00003 - 0"
+    ];
+
+=item error_step (method)
+
+Defaults to "__error".  The name of a step to run should a dying error
+be caught by the default handle_error method.  See the handle_error method.
+
+=item exit_nav_loop (method)
+
+This method should not normally used but there is no problem with
+using it on a regular basis.  Essentially it is a "goto" that allows
+for a long jump to the end of all nav_loops (even if they are
+recursively nested).  This effectively short circuits all remaining
+hooks for the current and remaining steps.  It is used to allow the
+->goto_step functionality.  If the application has morphed, it will be
+unmorphed before returning.  Also - the post_navigate method will
+still be called.
+
+=item ext_conf
+
+Used by the default conf_file method.  Defaults to $self->{'ext_conf'} which
+defaults to 'pl' meaning that the read configuration file should return a
+valid perl hashref.
+
+=item ext_print (method)
+
+Added as suffix to "name_step" during the default file_print hook.
+
+Default value is 'html'.
+
+For example, if name_step returns "foo" and ext_print returns "html"
+then the file "foo.html" will be searched for.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+=item ext_val (method)
+
+Added as suffix to "name_step" during the default file_val hook.
+
+Default value is 'val'.
+
+For example, if name_step returns "foo" and ext_val returns "val"
+then the file "foo.val" will be searched for.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+=item fill_args (hook)
+
+Returns a hashref of args that will be passed to the CGI::Ex::Fill::fill.
+It is augmented with the template to swap and the fill hash.  This
+could be useful if you needed to only swap a particular form on the template
+page.  Arguments are passed directly to the fill function.
+
+   sub fill_args { {target => 'my_form'} }
+
+=item fill_template (hook)
+
+Arguments are a template and a hashref.  Takes the template that was
+prepared using swap_template, and swaps html form fields using the
+passed hashref.  Overriding this method can control the fill behavior.
+
+Calls the fill_args hook prior to calling CGI::Ex::Fill::fill
+
+=item file_print (hook)
+
+Returns a filename of the content to be used in the default print
+hook.  Adds method base_dir_rel to hook name_module, and name_step and
+adds on the default file extension found in $self->ext_print which
+defaults to the property $self->{ext_print} which will default to
+".html".  Should return a filename relative to template_path that can be
+swapped using Template::Alloy, or should be a scalar reference to
+the template content that can be swapped.  This will be used by the
+hook print.
+
+    sub template_path { '/var/www/templates' }
+    sub base_dir_rel  { 'content' }
+    sub name_module   { 'recipe' }
+    sub ext_print     { 'html' } # default
+
+    # ->file_print('this_step')
+    # would return 'content/recipe/this_step.html'
+    # the template engine would look in '/var/www/templates'
+    # for a file by that name
+
+It may also return a reference to a string containing the html template.
+This is useful for prototyping applications and/or keeping all of
+the data for the application in a single location.
+
+=item file_val (hook)
+
+Returns a filename containing the validation.  Performs the same as
+file_print, but uses ext_val to get the extension, and it adds
+vob_path (which defaults to template_path which defaults to
+base_dir_abs) onto the returned value (file_print is relative to
+template_path, while file_val is fully qualified with vob_path).  If
+vob_path returns an arrayref of paths, then each path is checked for
+the existence of the file.
+
+The file should be readable by CGI::Ex::Validate::get_validation.
+
+This hook is only necessary if the hash_validation hook has not been
+overridden.
+5B
+This method an also return a hashref containing the validation - but
+then you may have wanted to override the hash_validation hook.
+
+=item finalize (hook)
+
+Defaults to true. Used to do whatever needs to be done with the data once
+prepare has returned true and info_complete has returned true.  On failure
+the print operations are ran.  On success navigation moves on to the next
+step.
+
+This is normally were there core logic of a script will occur (such as
+adding to a database, or updating a record).  At this point, the data
+should be validated.  It is possible to do additional validation
+and return errors using code such as the following.
+
+    if (! $user_is_unique) {
+        $self->add_errors(username => 'The username was already used');
+        return 0;
+    }
+
+=item find_hook (method)
+
+Called by run_hook.  Arguments are a hook name, a step name.  It
+should return an arrayref containing the code_ref to run, and the
+name of the method looked for.  It uses ->can to find the appropriate
+hook.
+
+    my $code = $self->find_hook('finalize', 'main');
+    ### will look first for $self->main_finalize;
+    ### will then look  for $self->finalize;
+
+This system is used to allow for multiple steps to be in the same
+file and still allow for moving some steps out to external sub classed
+packages (if desired).
+
+If the application has successfully morphed via the morph method and
+allow_morph then it is not necessary to add the step name to the
+beginning of the method name as the morphed packages method will
+override the base package (it is still OK to use the full method name
+"${step}_hookname").
+
+See the run_hook method and the morph method for more details.
+
+=item first_step (method)
+
+Returns the first step of the path.  Note that first_step may not be the same
+thing as default_step if the path was overridden.
+
+=item forbidden_step (method)
+
+Defaults to "__forbidden".  The name of a step to run should the current
+step name be invalid, or if a step found by the default path method
+is invalid.  See the path method.
+
+=item form (method)
+
+Returns a hashref of the items passed to the CGI.  Returns
+$self->{form} which defaults to CGI::Ex::get_form.
+
+=item form_name (hook)
+
+Return the name of the form to attach the js validation to.  Used by
+js_validation.
+
+=item get_pass_by_user (method)
+
+This method is passed a username and the authentication object.  It
+should return the password for the given user.  See the get_pass_by_user
+method of CGI::Ex::Auth for more information.  Installed as a hook
+to the authentication object during the get_valid_auth method.
+
+=item get_valid_auth (method)
+
+If require_auth hook returns true on any given step then get_valid_auth will be called.
+
+It will call auth_args to get some default args to pass to
+CGI::Ex::Auth->new.  It augments the args with sensible defaults that
+App already provides (such as form, cookies, and template facilities).
+It also installs hooks for the get_pass_by_user, cleanup_user, and verify_user
+hooks of CGI::Ex::Auth.
+
+It stores the $auth->last_auth_data in $self->auth_data for later use.  For
+example, to get the authenticated user:
+
+    sub require_auth { 1 }
+
+    sub cleanup_user {
+        my ($self, $user) = @_;
+        return lc $user;
+    }
+
+    sub get_pass_by_user {
+        my ($self, $user) = @_;
+        my $pass = $self->some_method_to_get_the_pass($user);
+        return $pass;
+    }
+
+    sub auth_args {
+        return {
+            login_header => '<h1>My login header</h1>',
+            login_footer => '[% TRY %][% INCLUDE login/login_footer.htm %][% CATCH %]<!-- [% error %] -->[% END %]',
+        };
+    }
+
+    sub main_hash_swap {
+        my $self = shift;
+        my $user = $self->auth_data->{'user'};
+        return {user => $user};
+    }
+
+Successful authentication is cached for the duration of the
+nav_loop so multiple steps will run the full authentication routine
+only once.
+
+Full customization of the login process and the login template can
+be done via the auth_args hash.  See the auth_args method and
+CGI::Ex::Auth perldoc for more information.
+
+=item goto_step (method)
+
+This method is not normally used but can solve some difficult issues.
+It provides for moving to another step at any point during the
+nav_loop.  Once a goto_step has been called, the entire nav_loop will
+be exited (to simply replace a portion of a step, you can simply
+run_hook('run_step', 'other_step')).  The method goto_step effectively
+short circuits the remaining hooks for the current step.  It does
+increment the recursion counter (which has a limit of ->recurse_limit
+- default 15).  Normally you would allow the other hooks in the loop
+to carry on their normal functions and avoid goto_step.  (Essentially,
+this hook behaves like a goto method to bypass everything else and
+continue at a different location in the path - there are times when it
+is necessary or useful to do this).
+
+The method jump is an alias for this method.
+
+Goto_step takes a single argument which is the location in the path to
+jump to.  This argument may be either a step name, the special strings
+"FIRST, LAST, CURRENT, PREVIOUS, OR NEXT" or the number of steps to
+jump forward (or backward) in the path.  The default value, 1,
+indicates that CGI::Ex::App should jump to the next step (the default
+action for goto_step).  A value of 0 would repeat the current step
+(watch out for recursion).  A value of -1 would jump to the previous
+step.  The special value of "LAST" will jump to the last step.  The
+special value of "FIRST" will jump back to the first step.  In each of
+these cases, the path array returned by ->path is modified to allow
+for the jumping (the path is modified so that the path history is not
+destroyed - if we were on step 3 and jumped to one, that path would
+contain 1, 2, 3, *1, 2, 3, 4, etc and we would be at the *).  If a
+step name is not currently on the path, it will be replace any remaining
+steps of the path.
+
+    # goto previous step (repeat it)
+    $self->goto_step($self->previous_step);
+    $self->goto_step('PREVIOUS');
+    $self->goto_step(-1);
+
+    # goto next step
+    $self->goto_step($self->next_step);
+    $self->goto_step('NEXT');
+    $self->goto_step(1);
+    $self->goto_step;
+
+    # goto current step (repeat)
+    $self->goto_step($self->current_step);
+    $self->goto_step('CURRENT');
+    $self->goto_step(0);
+
+    # goto last step
+    $self->goto_step($self->last_step);
+    $self->goto_step('LAST');
+
+    # goto first step (repeat it)
+    $self->goto_step($self->first_step);
+    $self->goto_step('FIRST');
+
+=item handle_error (method)
+
+If anything dies during execution, handle_error will be called with
+the error that had happened.  Default action is to try running the
+step returned by the error_step method.
+
+=item hash_base (hook)
+
+A hash of base items to be merged with hash_form - such as pulldown
+menus, javascript validation, etc.  It will now also be merged with
+hash_fill, so it can contain default fillins as well.  It can be
+populated by passing a hash to ->add_to_base.  By default a sub
+similar to the following is what is used for hash_common.  Note the
+use of values that are code refs - so that the js_validation and
+form_name hooks are only called if requested:
+
+    sub hash_base {
+        my ($self, $step) = @_;
+        return $self->{hash_base} ||= {
+            script_name   => $ENV{SCRIPT_NAME},
+            js_validation => sub { $self->run_hook('js_validation', $step) },
+            form_name     => sub { $self->run_hook('form_name', $step) },
+        };
+    }
+
+=item hash_common (hook)
+
+Almost identical in function and purpose to hash_base.  It is
+intended that hash_base be used for common items used in various
+scripts inheriting from a common CGI::Ex::App type parent.  Hash_common
+is more intended for step level populating of both swap and fill.
+
+=item hash_errors (hook)
+
+Called in preparation for print after failed prepare, info_complete,
+or finalize.  Should contain a hash of any errors that occurred.  Will
+be merged into hash_form before the pass to print.  Each error that
+occurred will be passed to method format_error before being added to
+the hash.  If an error has occurred, the default validate will
+automatically add {has_errors =>1}.  To the error hash at the time of
+validation.  has_errors will also be added during the merge in case the
+default validate was not used.  Can be populated by passing a hash to
+->add_to_errors or ->add_errors.
+
+=item hash_fill (hook)
+
+Called in preparation for print after failed prepare, info_complete,
+or finalize.  Should contain a hash of any items needed to be filled
+into the html form during print.  Items from hash_form, hash_base, and
+hash_common will be layered together.  Can be populated by passing a
+hash to ->add_to_fill.
+
+By default - forms are sticky and data from previous requests will try
+and populate the form.  You can use the fill_template hook to disable
+templating on a single page or on all pages.
+
+This method can be used to pre-populate the form as well (such as on an
+edit step).  If a form fails validation, hash_fill will also be called
+and will only want the submitted form fields to be sticky.  You can
+use the ready_validate hook to prevent pre-population in these cases as
+follows:
+
+    sub edit_hash_fill {
+        my $self = shift;
+        my $step = shift;
+        return {} if $self->run_hook('ready_validate', $step);
+
+        my %hash;
+
+        ### get previous values from the database
+
+        return \%hash;
+    }
+
+=item hash_form (hook)
+
+Called in preparation for print after failed prepare, info_complete,
+or finalize.  Defaults to ->form.  Can be populated by passing a hash
+to ->add_to_form.
+
+=item hash_swap (hook)
+
+Called in preparation for print after failed prepare, info_complete,
+or finalize.  Should contain a hash of any items needed to be swapped
+into the html during print.  Will be merged with hash_base,
+hash_common, hash_form, and hash_errors.  Can be populated by passing
+a hash to ->add_to_swap.
+
+The hash will be passed as the second argument to swap_template.
+
+=item hash_validation (hook)
+
+Returns a hash of the validation information to check form against.
+By default, will look for a filename using the hook file_val and will
+pass it to CGI::Ex::Validate::get_validation.  If no file_val is
+returned or if the get_validation fails, an empty hash will be returned.
+Validation is implemented by ->vob which loads a CGI::Ex::Validate object.
+
+=item history (method)
+
+Returns an arrayref which contains trace history of which hooks of
+which steps were ran.  Useful for seeing what happened.  In general -
+each line of the history will show the current step, the hook
+requested, and which hook was actually called.
+
+The dump_history method shows a short condensed version of this
+history which makes it easier to see what path was followed.
+
+In general, the arrayref is free for anything to push onto which will
+help in tracking other occurrences in the program as well.
+
+=item info_complete (hook)
+
+Calls the ready_validate hook to see if data is ready to validate.  If
+so it calls the validate hook to validate the data.  Should make
+sure the data is ready and valid.  Will not be run unless
+prepare returns true (default).
+
+=item init (method)
+
+Called by the default new method.  Allows for any object
+initilizations that may need to take place.  Default action does
+nothing.
+
+=item init_from_conf (method)
+
+Called by the default new method.  If load_conf is true, then the
+conf method will be called and the keys returned will be added to
+the $self object.
+
+This method is called after the init method.  If you need to further
+fix up values added during init_from_conf, you can use the pre_navigate
+method.
+
+=item insert_path (method)
+
+Arguments are the steps to insert.  Can be called any time.  Inserts
+the new steps at the current path location.
+
+=item is_authed (method)
+
+Returns true if the object has successful authentication data.  It
+returns false if the object has not been authenticated.
+
+=item js_uri_path (method)
+
+Return the URI path where the CGI/Ex/yaml_load.js and
+CGI/Ex/validate.js files can be found.  This will default to
+"$ENV{SCRIPT_NAME}/js" if the path method has not been overridden,
+otherwise it will default to "$ENV{SCRIPT_NAME}?step=js&js=" (the
+latter is more friendly with overridden paths).  A default handler for
+the "js" step has been provided in "js_run_step" (this handler will
+nicely print out the javascript found in the js files which are
+included with this distribution.  js_run_step will work properly with the
+default "path" handler.
+
+=item js_validation (hook)
+
+Will return Javascript that is capable of validating the form.  This
+is done using the capabilities of CGI::Ex::Validate and
+CGI::Ex::JSONDump.  This will call the hook hash_validation which will
+then be encoded into json and placed in a javascript string.  It will
+also call the hook form_name to determine which html form to attach
+the validation to.  The method js_uri_path is called to determine the
+path to the appropriate validate.js files.  In order to make use of
+js_validation, it must be added to the variables returned by either
+the hash_base (default), hash_common, hash_swap or hash_form hook (see
+examples of hash_base used in this doc).
+
+=item jump (method)
+
+Alias for the goto_step method.
+
+=item last_step (method)
+
+Returns the last step of the path.
+
+=item load_conf (method)
+
+Defaults to ->{load_conf} which defaults to false.  If true, will
+allow keys returned by the conf method to be added to $self during
+the init_from_conf method.
+
+Enabling this method allows for out-of-the-box file based configuration.
+
+=item morph (method)
+
+Allows for temporarily "becoming" another object type for the
+execution of the current step.  This allows for separating some steps
+out into their own packages.
+
+Morph will only run if the method allow_morph returns true.
+Additionally if the allow_morph returns a hash ref, morph will only
+run if the step being morphed to is in the hash.  Morph also passes
+the step name to allow_morph.
+
+The morph call occurs at the beginning of the step loop.  A
+corresponding unmorph call occurs before the loop is exited.  An
+object can morph several levels deep.  For example, an object running
+as Foo::Bar that is looping on the step "my_step" that has allow_morph
+= 1, will do the following:
+
+    Call the morph_package hook (which would default to returning
+    Foo::Bar::MyStep in this case)
+
+    Translate this to a package filename (Foo/Bar/MyStep.pm) and try
+    and require it, if the file can be required, the object is blessed
+    into that package.
+
+    Call the fixup_after_morph method.
+
+    Continue on with the run_step for the current step.
+
+At any exit point of the loop, the unmorph call is made which
+re-blesses the object into the original package.
+
+Samples of allowing morph:
+
+    sub allow_morph { 1 } # value of 1 means try to find package, ok if not found
+
+    sub allow_morph { {edit => 1} }
+
+    sub allow_morph { my ($self, $step) = @_; return $step eq 'edit' }
+
+=item morph_package (hook)
+
+Used by morph.  Return the package name to morph into during a morph
+call.  Defaults to using the current object type as a base.  For
+example, if the current object running is a Foo::Bar object and the
+step running is my_step, then morph_package will return
+Foo::Bar::MyStep.
+
+Because of the way that run_hook works, it is possible that several
+steps could be located in the same external file and overriding morph_package
+could allow for this to happen.
+
+See the morph method.
+
+=item name_module (hook)
+
+Return the name (relative path) that should be pre-pended to name_step
+during the default file_print and file_val lookups.  Defaults to
+the value in $self->{name_module} which in turn defaults to the name
+of the current script.
+
+    cgi-bin/my_app.pl  =>  my_app
+    cgi/my_app         =>  my_app
+
+This method is provided so that each cgi or mod_perl application can
+have its own directory for storing html for its steps.
+
+See the file_print method for more information.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+=item name_step (hook)
+
+Return the step (appended to name_module) that should used when
+looking up the file in file_print and file_val lookups.  Defaults to
+the current step.
+
+See the section on FINDING TEMPLATES for further discussion.
+
+=item nav_loop (method)
+
+This is the main loop runner.  It figures out the current path
+and runs all of the appropriate hooks for each step of the path.  If
+nav_loop runs out of steps to run (which happens if no path is set, or if
+all other steps run successfully), it will insert the ->default_step into
+the path and run nav_loop again (recursively).  This way a step is always
+assured to run.  There is a method ->recurse_limit (default 15) that
+will catch logic errors (such as inadvertently running the same
+step over and over and over because there is either no hash_validation,
+or the data is valid but the set_ready_validate(0) method was not called).
+
+=item navigate (method)
+
+Takes a class name or a CGI::Ex::App object as arguments.  If a class
+name is given it will call the "new" method to instantiate an object
+by that class (passing any extra arguments to the new method).  All
+returns from navigate will return the object.
+
+The method navigate is essentially a safe wrapper around the ->nav_loop
+method.  It will catch any dies and pass them to ->handle_error.
+
+This starts the process flow for the path and its steps.
+
+=item navigate_authenticated (method)
+
+Same as the method navigate but calls ->require_auth(1) before
+running.  It will only work if the navigate_authenticated method
+has not been overwritten. See the require_auth method.
+
+=item new (class method)
+
+Object creator.  Takes a hashref of arguments that will become the
+initial properties of the object.  Calls the init method once the
+object has been blessed to allow for any other initilizations.
+
+    my $app = MyApp->new({name_module => 'my_app'});
+
+=item next_step (hook and method)
+
+As a method it returns the next step in the path - if the path
+has more steps left.
+
+It is also used as a hook by the refine_path hook.  If there is no
+more steps, it will call the next_step hook to try and find a step to
+append to the path.
+
+=item path (method)
+
+Return an arrayref (modifiable) of the steps in the path.  For each
+step the run_step hook and all of its remaining hooks will be run.
+
+Hook methods are looked up and ran using the method "run_hook" which
+uses the method "find_hook" to lookup the hook.  A history of ran
+hooks is stored in the array ref returned by $self->history.
+
+If path has not been defined, the method will look first in the form
+for a key by the name found in ->step_key.  It will then look in
+$ENV{'PATH_INFO'}.  It will use this step to create a path with that
+one step as its contents.  If a step is passed in via either of these
+ways, the method will call valid_steps to make sure that the step
+is valid (by default valid_steps returns undef - which means that
+any step is valid).  Any step beginning with _ can not be passed in
+and are intended for use on private paths.  If a non-valid step is
+found, then path will be set to contain a single step of ->forbidden_step.
+
+For the best functionality, the arrayref returned should be the same
+reference returned for every call to path - this ensures that other
+methods can add to the path (and will most likely break if the
+arrayref is not the same).
+
+If navigation runs out of steps to run, the default step found in
+default_step will be run.  This is what allows for us to default
+to the "main" step for many applications.
+
+=item path_info_map (hook)
+
+Used to map path_info parts to form variables.  Similar to the
+path_info_map_base method.  See the path_info_map_base method
+for a discussion of how to use this hook.
+
+=item path_info_map_base (method)
+
+Called during the default path method.  It is used to custom map portions
+of $ENV{'PATH_INFO'} to form values.  If should return an arrayref of
+arrayrefs where each child arrayref contains a regex qr with match parens
+as the first element of the array.  Subsequent elements of the array are
+the key names to store the corresponding matched value from the regex under.
+The outer arrayref is iterated until it one of child arrayrefs matches
+against $ENV{'PATH_INFO'}.  The matched values are only added to the form if
+there is not already a defined value for that key in the form.
+
+The default value returned by this method looks something like the following:
+
+   sub path_info_map_base {
+       return [[qr{^/(\w+)}, $self->step_key]];
+   }
+
+This example would map the following PATH_INFO string as follows:
+
+   /my_step
+
+   # $self->form->{'step'} now equals "my_step"
+
+The following is another example:
+
+   sub path_info_map_base {
+       return [
+           [qr{^/([^/]+)/(\w+)}, 'username', $self->step_key],
+           [qr{^/(\w+)}, $self->step_key],
+       ];
+   }
+
+   # the PATH_INFO /my_step
+   # still results in
+   # $self->form->{'step'} now equals "my_step"
+
+   # but with the PATH_INFO /my_user/my_step
+   # $self->form->{'step'} now equals "my_step"
+   # and $self->form->{'username'} equals "my_user"
+
+In most cases there is not a need to override the path_info_map_base
+method, but rather override the path_info_map hook for a particular step.
+When the step is being run, just before the run_step hook is called, the
+path_info_map hook is called.  The path_info_map hook is similar to
+the path_info_map_base method, but is used to allow step level manipulation
+of form based on elements in the $ENV{'PATH_INFO'}.
+
+   sub my_step_path_info_map {
+       return [[qr{^/my_step/(\w+)$}, 'username']];
+   }
+
+   # the PATH_INFO /my_step/my_user
+   # results in
+   # $self->form->{'step'} equal to "my_step" because of default path_info_map_base
+   # and $self->form->{'username'} equals "my_user" because of my_step_path_info_map
+
+The section on mapping URIs to steps has additional examples.
+
+=item post_loop (method)
+
+Ran after all of the steps in the loop have been processed (if
+prepare, info_complete, and finalize were true for each of the steps).
+If it returns a true value the navigation loop will be aborted.  If it
+does not return true, navigation continues by then inserting the step
+$self->default_step and running $self->nav_loop again (recurses) to
+fall back to the default step.
+
+=item post_navigate (method)
+
+Called from within navigate.  Called after the nav_loop has finished
+running but within the eval block to catch errors.  Will only run if
+there were no errors which died during the nav_loop process.
+
+It can be disabled from running by setting the _no_post_navigate
+property.
+
+If per-step authentication is enabled and authentication fails,
+the post_navigate method will still be called (the post_navigate
+method can check the ->is_authed method to change behavior).  If
+application level authentication is enabled and authentication
+fails, none of the pre_navigate, nav_loop, or post_navigate methods
+will be called.
+
+=item post_print (hook)
+
+A hook which occurs after the printing has taken place.  Is only run
+if the information was not complete.  Useful for cases such as
+printing rows of a database query after displaying a query form.
+
+=item post_step (hook)
+
+Ran at the end of the step's loop if prepare, info_complete, and
+finalize all returned true.  Allows for cleanup.  If a true value is
+returned, execution of navigate is returned and no more steps are
+processed.
+
+=item pre_loop (method)
+
+Called right before the navigation loop is started (at the beginning
+of nav_loop).  At this point the path is set (but could be modified).
+The only argument is a reference to the path array.  If it returns a
+true value - the navigation routine is aborted.
+
+=item pre_navigate (method)
+
+Called at the very beginning of the navigate method, but within the
+eval block to catch errors.  Called before the nav_loop method is
+started.  If a true value is returned then navigation is skipped (the
+nav_loop is never started).
+
+=item pre_step (hook)
+
+Ran at the beginning of the loop before prepare, info_compelete, and
+finalize are called.  If it returns true, execution of nav_loop is
+returned and no more steps are processed..
+
+=item prepare (hook)
+
+Defaults to true.  A hook before checking if the info_complete is true.
+Intended to be used to cleanup the form data.
+
+=item prepared_print (hook)
+
+Called when any of prepare, info_complete, or finalize fail.  Prepares
+a form hash and a fill hash to pass to print.  The form hash is primarily
+intended for use by the templating system.  The fill hash is intended
+to be used to fill in any html forms.
+
+=item previous_step (method)
+
+List the step previous to this one.  Will return '' if there is no previous step.
+
+=item print (hook)
+
+Take the information generated by prepared_print, format it using
+swap_template, fill it using fill_template and print it out using
+print_out.  Default incarnation uses Template::Alloy which is
+compatible with Template::Toolkit to do the swapping.  Arguments are:
+step name (used to call the file_print hook), swap hashref (passed to
+call swap_template), and fill hashref (passed to fill_template).
+
+During the print call, the file_print hook is called which should
+return a filename or a scalar reference to the template content is
+
+=item print_out (hook)
+
+Called with the finished document.  Should print out the appropriate headers.
+The default method calls $self->cgix->print_content_type and then
+prints the content.
+
+The print_content_type is passed $self->mimetype (which defaults to
+$self->{'mimetype'} which defaults to 'text/html') and $self->charset
+(which defaults to $self->{'charset'} which defaults to '').
+
+=item ready_validate (hook)
+
+Should return true if enough information is present to run validate.
+Default is to look if $ENV{'REQUEST_METHOD'} is 'POST'.  A common
+usage is to pass a common flag in the form such as 'processing' => 1
+and check for its presence - such as the following:
+
+    sub ready_validate { shift->form->{'processing'} }
+
+Changing the behavior of ready_validate can help in making wizard type
+applications.
+
+You can also use the validate_when_data hook to change the behavior of
+ready_validate.  If valiate_when_data returns true, then
+ready_validate will look for keys in the form matching keys that are
+in hash_validation - if they exist ready_validate will be true.  If
+there are no hash_validation keys, ready_validate uses its default
+behavior.
+
+=item refine_path (hook)
+
+Called at the end of nav_loop.  Passed a single value indicating
+if there are currently more steps in the path.
+
+The default implementation returns if there are still more steps
+in the path.  Otherwise, it calls the next_step hook and appends
+it to the path with the append_path method, and then calls
+the set_ready_validate hook and passes it 0.
+
+This allows you to simply put
+
+    sub edit_next_step { '_edit_success' }
+
+In your code and it will automatically do the right thing and
+go to the _edit_success step.
+
+=item recurse_limit (method)
+
+Default 15.  Maximum number of times to allow nav_loop to call itself.
+The recurse level will increase every time that ->goto_step is called, or if
+the end of the nav_loop is reached and the process tries to add the
+default_step and run it again.
+
+If ->goto_step is used often - the recurse_limit will be reached more
+quickly.  It is safe to raise this as high as is necessary - so long
+as it is intentional.
+
+Often the limit is reached if a step did not have a validation hash,
+or if the set_ready_validate(0) method was not called once the data
+had been successfully validated and acted upon.
+
+=item replace_path (method)
+
+Arguments are the steps used to replace.  Can be called any time.
+Replaces the remaining steps (if any) of the current path.
+
+=item require_auth (hook)
+
+Defaults to self->{require_auth} which defaults to undef.
+If called as a method and passed a single value of 1, 0, or undef it will
+set the value of $self->{require_auth} to that value.  If set to a true
+value then any subsequent step will require authentication (unless its
+hook has been overwritten).
+
+Any of the following ways can be used to require authentication on
+every step.
+
+    # Example one
+    sub require_auth { 1 }
+
+    # Example two
+    __PACKAGE__->navigate_authenticated; # instead of __PACKAGE__->navigate;
+
+    # Example three
+    __PACKAGE__->new({require_auth => 1}->navigate;
+
+    # Example four
+    sub init { shift->require_auth(1) }
+
+Because it is called as a hook, the current step is passed as the
+first argument.  If the hook returns false, no authentication will be
+required on this step.  If the hook returns a true, non-hashref value,
+authentication will be required via the get_valid_auth method.  If the
+method returns a hashref of stepnames to require authentication on,
+the step will require authentication via the get_valid_auth method if
+the current step is in the hashref.  If authentication is required and
+succeeds, the step will proceed.  If authentication is required and
+fails at the step level the current step will be aborted,
+authentication will be asked for (the post_navigate method will still
+be called).
+
+For example you could add authentication to the add, edit, and delete
+steps in any of the following ways:
+
+    # Example one
+    sub require_auth { {add => 1, edit => 1, delete => 1} }
+
+    # Example two
+    sub add_require_auth    { 1 }
+    sub edit_require_auth   { 1 }
+    sub delete_require_auth { 1 }
+
+    # Example three
+    sub require_auth {
+        my ($self, $step) = @_;
+        return 1 if $step && $step =~ /^(add|edit|delete)$/;
+        return 0;
+    }
+
+If however you wanted to require authentication on all but one or two methods
+(such as requiring authentication on all but a forgot_password step) you could do
+either of the following:
+
+    # Example one
+    sub require_auth {
+        my ($self, $step) = @_;
+        return 0 if $step && $step eq 'forgot_password';
+        return 1; # require auth on all other steps
+    }
+
+    # Example two
+    sub require_auth { 1 } # turn it on for all steps
+
+    sub forgot_password_require_auth { 0 } # turn it off
+
+See the get_valid_auth method for what occurs should authentication be required.
+
+There is one key difference from the 2.14 version of App.  In 2.14 and
+previous versions, the pre_navigate and post_navigate methods would
+not be called if require_auth returned a true non-hashref value.  In
+version 2.15 and later, the 2.15 pre_navigate and post_navigate
+methods are always called - even if authentication fails.  Also in 2.15
+and later, the method is called as a hook meaning the step is passed in.
+
+=item run_hook (method)
+
+Arguments are a hook name and the step to find the hook for.  Calls
+the find_hook method to get a code ref which it then calls and returns
+the result passing any extra arguments to run_hook as arguments to the
+code ref.
+
+Each call to run_hook is logged in the arrayref returned by the
+history method.  This information is summarized in the dump_history
+method and is useful for tracing the flow of the program.
+
+The run_hook method is part of the core of CGI::Ex::App.  It allows
+for an intermediate layer in normal method calls.  Because of
+run_hook, it is possible to logically override methods on a step by
+step basis, or override a method for all of the steps, or even to
+break code out into separate modules.
+
+=item run_hook_as (method)
+
+Similar to run_hook - but allows for temporarily running a
+hook in another package.
+
+    sub blah_morph_package { 'SomeOther::Module' }
+    my $hash = $self->run_hook_as('hash_swap', 'blah'); # runs as SomeOther::Module
+
+    # OR
+
+    my $hash = $self->run_hook_as('hash_swap', 'step', 'SomeOther::Module');
+
+Note that the second form will use 'SomeOther::Module' as the step name
+which will be somewhat misleading in looking up names.
+
+=item run_step (hook)
+
+Runs all of the hooks specific to each step, beginning with pre_step
+and ending with post_step (for a full listing of steps, see the
+section on process flow).  Called after ->morph($step) has been run.
+If this hook returns true, the nav_loop is exited (meaning the
+run_step hook displayed a printed page).  If it returns false, the
+nav_loop continues on to run the next step.
+
+This hook performs the same base functionality as a method defined in
+CGI::Applications ->run_modes.  The default run_step method provides
+much more granular control over the flow of the CGI.
+
+=item set_path (method)
+
+Arguments are the steps to set.  Should be called before navigation
+begins.  This will set the path arrayref to the passed steps.
+
+This method is not normally used.
+
+=item set_ready_validate (hook and method)
+
+Sets that the validation is ready (or not) to validate.  Should set the value
+checked by the hook ready_validate.  Has no affect if validate_when_data
+flag is set.
+
+The following would complement the "processing" flag example given in
+ready_validate description:
+
+    sub set_ready_validate {
+        my $self = shift;
+        my ($step, $is_ready) = (@_ == 2) ? @_ : (undef, shift);
+        if ($is_ready) {
+            $self->form->{'processing'} = 1;
+        } else {
+            delete $self->form->{'processing'};
+        }
+        return $is_ready;
+    }
+
+Note that for this example the form key "processing" was deleted.  This
+is so that the call to fill in any html forms won't swap in a value of
+zero for form elements named "processing."
+
+Also note that this method may be called as a hook as in
+
+    $self->run_hook('set_ready_validate', $step, 0)
+    # OR
+    $self->set_ready_validate($step, 0);
+
+Or it can take a single argument and should set the ready status
+regardless of the step as in:
+
+    $self->set_ready_validate(0);
+
+=item skip (hook)
+
+Ran at the beginning of the loop before prepare, info_complete, and
+finalize are called.  If it returns true, nav_loop moves on to the
+next step (the current step is skipped).
+
+=item stash (method)
+
+Returns a hashref that can store arbitrary user space data without
+worrying about overwriting the internals of the application.
+
+=item step_key (method)
+
+Should return the keyname that will be used by the default "path"
+method to look for in the form.  Default value is 'step'.
+
+=item swap_template (hook)
+
+Takes the template and hash of variables prepared in print, and
+processes them through the current template engine Template::Alloy.
+
+Arguments are the template and the swap hashref.  The template can be
+either a scalar reference to the actual content, or the filename of
+the content.  If the filename is specified - it should be relative to
+template_path (which will be used to initialize INCLUDE_PATH by
+default).
+
+The default method will create a template object by calling the
+template_args hook and passing the returned hashref to the
+template_obj method.  The default template_obj method returns a
+Template::Alloy object, but could easily be swapped to use a
+Template::Toolkit based object.  If a non-Template::Toolkit compatible
+object is to be used, then the swap_template hook can be overridden to
+use another templating engine.
+
+For example to use the HTML::Template engine you could override the swap_template
+method as follows:
+
+    use HTML::Template;
+
+    sub swap_template {
+        my ($self, $step, $file, $swap) = @_;
+
+        my $type = UNIVERSAL::isa($file, 'SCALAR') ? 'scalarref'
+                 : UNIVERSAL::isa($file, 'ARRAY')  ? 'arrayref'
+                 : ref($file)                      ? 'filehandle'
+                 :                                   'filename';
+
+        my $t = HTML::Template->new(source => $file,
+                                    type   => $type,
+                                    path   => $self->template_path,
+                                    die_on_bad_params => 0,
+                                    );
+
+        $t->param($swap);
+
+        return $t->output;
+    }
+
+Uou could also simply do the following to parse the templates using
+HTML::Template::Expr syntax.
+
+    sub template_args {
+        return {SYNTAX => 'hte'};
+    }
+
+For a listing of the available syntaxes, see the current L<Template::Alloy> documentation.
+
+=item template_args (hook)
+
+Returns a hashref of args that will be passed to the "new" method of Template::Alloy
+The method is normally called from the swap_template hook.  The swap_template hook
+will add a value for INCLUDE_PATH which is set equal to template_path, if the INCLUDE_PATH
+value is not already set.
+
+The returned hashref can contain any arguments that Template::Alloy
+would understand.
+
+    sub template_args {
+        return {
+            PRE_CHOMP => 1,
+            WRAPPER   => 'wrappers/main_wrapper.html',
+        };
+    }
+
+See the L<Template::Alloy> documentation for a listing of all possible configuration arguments.
+
+=item template_obj (method)
+
+Called from swap_template.  It is passed the result of template_args
+that have had a default INCLUDE_PATH added via template_path.  The
+default implementation uses Template::Alloy but can easily be changed
+to use Template::Toolkit by using code similar to the following:
+
+    use Template;
+
+    sub template_obj {
+        my ($self, $args) = @_;
+        return Template->new($args);
+    }
+
+=item template_path (method)
+
+Defaults to $self->{'template_path'} which defaults to base_dir_abs.  Used by
+the template_obj method.
+
+=item unmorph (method)
+
+Allows for returning an object back to its previous blessed state if
+the "morph" method was successful in morphing the App object.  This
+only happens if the object was previously morphed into another object
+type.  Before the object is re-blessed the method fixup_before_unmorph
+is called.
+
+See allow_morph and morph.
+
+=item valid_steps (method)
+
+Called by the default path method.  Should return a hashref of path
+steps that are allowed.  If the current step is not found in the hash
+(or is not the default_step or js_step) the path method will return a
+single step of ->forbidden_step and run its hooks.  If no hash or undef is
+returned, all paths are allowed (default).  A key "forbidden_step"
+containing the step that was not valid will be placed in the stash.
+Often the valid_steps method does not need to be defined as arbitrary
+method calls are not possible with CGI::Ex::App.
+
+Any steps that begin with _ are also "not" valid for passing in via the form
+or path info.  See the path method.
+
+Also, the pre_step, skip, prepare, and info_complete hooks allow for validating
+the data before running finalize.
+
+=item validate (hook)
+
+Passed the form from $self->form.  Runs validation on the information
+contained in the passed form.  Uses CGI::Ex::Validate for the default
+validation.  Calls the hook hash_validation to load validation hashref
+(an empty hash means to pass validation).  Should return true if the
+form passed validation and false otherwise.  Errors are stored as a
+hash in $self->{hash_errors} via method add_errors and can be checked
+for at a later time with method has_errors (if the default validate
+was used).
+
+There are many ways and types to validate the data.  Please see the
+L<CGI::Ex::Validate> module.
+
+Upon success, it will look through all of the items which were
+validated, if any of them contain the keys append_path, insert_path,
+or replace_path, that method will be called with the value as
+arguments.  This allows for the validation to apply redirection to the
+path.  A validation item of:
+
+    {field => 'foo', required => 1, append_path => ['bar', 'baz']}
+
+would append 'bar' and 'baz' to the path should all validation succeed.
+
+=item validate_when_data (hook)
+
+Defaults to "validate_when_data" property which defaults to false.  Called
+during the ready_validate hook.  If returns true, ready_validate will look
+for keys in the form matching keys that are in hash_validation - if they exist
+ready_validate will be true.  If there are no hash_validation keys, ready_validate
+uses its default behavior.
+
+=item verify_user (method)
+
+Installed as a hook to CGI::Ex::App during get_valid_auth.  Should return
+true if the user is ok.  Default is to always return true.  This can be
+used to abort early before the get_pass_by_user hook is called.
+
+     sub verify_user {
+         my ($self, $user) = @_;
+         return 0 if $user eq 'paul'; # don't let paul in
+         return 1;                    # let anybody else in
+     }
+
+=back
+
+=head1 HOW DO I SET COOKIES, REDIRECT, ETC
+
+Often in your program you will want to set cookies or bounce to a differnt URL.
+This can be done using either the builtin CGI::Ex object or the built in
+CGI object.  It is suggested that you only use the CGI::Ex methods as it will
+automatically send headers and method calls under cgi, mod_perl1, or mod_perl2.
+The following shows how to do basic items using the CGI::Ex object returned by
+the ->cgix method.
+
+=over 4
+
+=item printing content-type headers
+
+    ### CGI::Ex::App prints headers for you,
+    ### but if you are printing custom types, you can send your own
+    $self->cgix->print_content_type;
+    # SAME AS
+    # $self->cgix->print_content_type('text/html');
+
+=item setting a cookie
+
+    $self->cgix->set_cookie({
+        -name    => "my_key",
+        -value   => 'Some Value',
+        -expires => '1y',
+        -path    => '/',
+    });
+
+=item redirecting to another URL
+
+    $self->cgix->location_bounce("http://somewhereelse.com");
+    $self->exit_nav_loop; # normally should do this to long jump out of navigation
+
+=item making a QUERY_STRING
+
+    my $data  = {foo => "bar", one => "two or three"};
+    my $query = $self->cgix->make_form($data);
+    # $query now equals "foo=bar&one=two%20or%20three"
+
+=item getting form parameters
+
+    my $form = $self->form;
+
+In this example $form would now contain a hashref of all POST and GET parameters
+passed to the server.  The form method calls $self->cgix->get_form
+which in turn uses CGI->param to parse values.  Fields with multiple passed
+values will be in the form of an arrayref.
+
+=item getting cookies
+
+    my $cookies = $self->cookies;
+
+In this example $cookies would be a hashref of all passed in cookies.  The
+cookies method calls $self->cgix->get_cookies which in turn uses CGI->cookie
+to parse values.
+
+=back
+
+See the CGI::Ex and CGI documentation for more information.
+
+=head1 COMPARISON TO OTHER APPLICATION MODULES
+
+The concepts used in CGI::Ex::App are not novel or unique.  However, they
+are all commonly used and very useful.  All application builders were
+built because somebody observed that there are common design patterns
+in CGI building.  CGI::Ex::App differs in that it has found more common design
+patterns of CGI's than other application builders and tries to get in the way
+less than others.
+
+CGI::Ex::App is intended to be sub classed, and sub sub classed, and each step
+can choose to be sub classed or not.  CGI::Ex::App tries to remain simple
+while still providing "more than one way to do it."  It also tries to avoid
+making any sub classes have to call ->SUPER:: (although that is fine too).
+
+And if what you are doing on a particular is far too complicated or custom for
+what CGI::Ex::App provides, CGI::Ex::App makes it trivial to override all behavior.
+
+There are certainly other modules for building CGI applications.  The
+following is a short list of other modules and how CGI::Ex::App is
+different.
+
+=over 4
+
+=item C<CGI::Application>
+
+Seemingly the most well know of application builders.
+CGI::Ex::App is different in that it:
+
+  * Uses Template::Toolkit compatible Template::Alloy by default.
+      CGI::Ex::App can easily use another toolkit by simply
+      overriding the ->swap_template method.
+      CGI::Application uses HTML::Template.
+  * Offers integrated data validation.
+      CGI::Application has had custom plugins created that
+      add some of this functionality.  CGI::Ex::App has the benefit
+      that validation is automatically available in javascript as well.
+  * Allows the user to print at any time (so long as proper headers
+      are sent.  CGI::Application requires data to be pipelined.
+  * Offers hooks into the various phases of each step ("mode" in
+      CGI::Application lingo).  CGI::Application provides only ->runmode
+      which is only a dispatch.
+  * Support for easily jumping around in navigation steps.
+  * Support for storing some steps in another package.
+  * Integrated authentication
+  * Integrated form filling
+  * Integrated PATH_INFO mapping
+
+CGI::Ex::App and CGI::Application are similar in that they take care
+of handling headers and they allow for calling other "runmodes" from
+within any given runmode.  CGI::Ex::App's ->run_step is essentially
+equivalent to a method call defined in CGI::Application's ->run_modes.
+The ->run method of CGI::Application starts the application in the same
+manner as CGI::Ex::App's ->navigate call.  Many of the hooks around
+CGI::Ex::App's ->run_step call are similar in nature to those provided by
+CGI::Application.
+
+=item C<CGI::Prototype>
+
+There are actually many similarities.  One of the nicest things about
+CGI::Prototype is that it is extremely short (very very short).  The
+->activate starts the application in the same manner as CGI::Ex::App's
+->navigate call.  Both use Template::Toolkit as the default template
+system (CGI::Ex::App uses Template::Alloy which is TT compatible).
+CGI::Ex::App is differrent in that it:
+
+  * Offers more hooks into the various phases of each step.
+  * Support for easily jumping around in navigation steps.
+  * Support for storing only some steps in another package.
+  * Integrated data validation
+  * Integrated authentication
+  * Integrated form filling
+  * Integrated PATH_INFO mapping
+
+=back
+
+
+=head1 SIMPLE EXTENDED EXAMPLE
+
+The following example shows the creation of a basic recipe
+database.  It requires the use of DBD::SQLite, but that is all.
+Once you have configured the db_file and template_path methods
+of the "recipe" file, you will have a working script that
+does CRUD for the recipe table.  The observant reader may ask - why
+not use Catalyst or Ruby on Rails?  The observant programmer will
+reply that making a framework do something simple is easy, but making
+it do something complex is complex and any framework that tries to
+do the those complex things for you is too complex.  CGI::Ex::App
+lets you write the complex logic but gives you the ability to
+not worry about the boring details such as template engines,
+or sticky forms, or cgi parameters, or data validation.  Once
+you are setup and are running, you are only left with providing
+the core logic of the application.
+
+    ### File: /var/www/cgi-bin/recipe (depending upon Apache configuration)
+    ### --------------------------------------------
+    #!/usr/bin/perl -w
+
+    use lib qw(/var/www/lib);
+    use Recipe;
+    Recipe->navigate;
+
+
+    ### File: /var/www/lib/Recipe.pm
+    ### --------------------------------------------
+    package Recipe;
+
+    use strict;
+    use base qw(CGI::Ex::App);
+    use CGI::Ex::Dump qw(debug);
+
+    use DBI;
+    use DBD::SQLite;
+
+    ###------------------------------------------###
+
+    sub post_navigate {
+        # show what happened
+        debug shift->dump_history;
+    }
+
+    sub template_path { '/var/www/templates' }
+
+    sub base_dir_rel { 'content' }
+
+    sub db_file { '/var/www/recipe.sqlite' }
+
+    sub dbh {
+        my $self = shift;
+        if (! $self->{'dbh'}) {
+            my $file   = $self->db_file;
+            my $exists = -e $file;
+            $self->{'dbh'} = DBI->connect("dbi:SQLite:dbname=$file", '', '',
+                                          {RaiseError => 1});
+            $self->create_tables if ! $exists;
+        }
+        return $self->{'dbh'};
+    }
+
+    sub create_tables {
+        my $self = shift;
+
+        $self->dbh->do("CREATE TABLE recipe (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title VARCHAR(50) NOT NULL,
+            ingredients VARCHAR(255) NOT NULL,
+            directions VARCHAR(255) NOT NULL,
+            date_added VARCHAR(20) NOT NULL
+        )");
+    }
+
+    ###----------------------------------------------------------------###
+
+    sub main_info_complete { 0 }
+
+    sub main_hash_swap {
+        my $self = shift;
+
+        my $s = "SELECT id, title, date_added
+                   FROM recipe
+                  ORDER BY date_added";
+        my $data = $self->dbh->selectall_arrayref($s);
+        my @data = map {my %h; @h{qw(id title date_added)} = @$_; \%h} @$data;
+
+        return {
+            recipies => \@data,
+        };
+    }
+
+    ###----------------------------------------------------------------###
+
+    sub add_name_step { 'edit' }
+
+    sub add_hash_validation {
+        return {
+            'group order' => [qw(title ingredients directions)],
+            title => {
+                required => 1,
+                max_len  => 30,
+            },
+            ingredients => {
+                required => 1,
+                max_len  => 255,
+            },
+            directions => {
+                required => 1,
+                max_len  => 255,
+            },
+        };
+    }
+
+    sub add_finalize {
+        my $self = shift;
+        my $form = $self->form;
+
+        my $s = "SELECT COUNT(*) FROM recipe WHERE title = ?";
+        my ($count) = $self->dbh->selectrow_array($s, {}, $form->{'title'});
+        if ($count) {
+            $self->add_errors(title => 'A recipe by this title already exists');
+            return 0;
+        }
+
+        $s = "INSERT INTO recipe (title, ingredients, directions, date_added)
+              VALUES (?, ?, ?, ?)";
+        $self->dbh->do($s, {}, $form->{'title'},
+                               $form->{'ingredients'},
+                               $form->{'directions'},
+                               scalar(localtime));
+
+        $self->add_to_form(success => "Recipe added to the database");
+
+        return 1;
+    }
+
+    ###----------------------------------------------------------------###
+
+    sub edit_skip { shift->form->{'id'} ? 0 : 1 }
+
+    sub edit_hash_common {
+        my $self = shift;
+        return {} if $self->ready_validate;
+
+        my $sth  = $self->dbh->prepare("SELECT * FROM recipe WHERE id = ?");
+        $sth->execute($self->form->{'id'});
+        my $hash = $sth->fetchrow_hashref;
+
+        return $hash;
+    }
+
+    sub edit_hash_validation { shift->add_hash_validation(@_) }
+
+    sub edit_finalize {
+        my $self = shift;
+        my $form = $self->form;
+
+        my $s = "SELECT COUNT(*) FROM recipe WHERE title = ? AND id != ?";
+        my ($count) = $self->dbh->selectrow_array($s, {}, $form->{'title'}, $form->{'id'});
+        if ($count) {
+            $self->add_errors(title => 'A recipe by this title already exists');
+            return 0;
+        }
+
+        $s = "UPDATE recipe SET title = ?, ingredients = ?, directions = ? WHERE id = ?";
+        $self->dbh->do($s, {}, $form->{'title'},
+                               $form->{'ingredients'},
+                               $form->{'directions'},
+                               $form->{'id'});
+
+        $self->add_to_form(success => "Recipe updated in the database");
+
+        return 1;
+    }
+
+    ###----------------------------------------------------------------###
+
+    sub view_skip { shift->edit_skip(@_) }
+
+    sub view_hash_common { shift->edit_hash_common(@_) }
+
+    ###----------------------------------------------------------------###
+
+    sub delete_skip { shift->edit_skip(@_) }
+
+    sub delete_info_complete { 1 }
+
+    sub delete_finalize {
+        my $self = shift;
+        $self->dbh->do("DELETE FROM recipe WHERE id = ?", {}, $self->form->{'id'});
+
+        $self->add_to_form(success => "Recipe deleted from the database");
+        return 1;
+    }
+
+    1;
+
+    __END__
+
+
+
+    File: /var/www/templates/content/recipe/main.html
+    ### --------------------------------------------
+    <html>
+    <head>
+    <title>Recipe DB</title>
+    </head>
+    <h1>Recipe DB</h1>
+
+    [% IF success %]<span style="color:darkgreen"><h2>[% success %]</h2></span>[% END %]
+
+    <table style="border:1px solid blue">
+    <tr><th>#</th><th>Title</th><th>Date Added</th></tr>
+
+    [% FOR row IN recipies %]
+    <tr>
+      <td>[% loop.count %].</td>
+      <td><a href="[% script_name %]/view?id=[% row.id %]">[% row.title %]</a>
+        (<a href="[% script_name %]/edit?id=[% row.id %]">Edit</a>)
+      </td>
+      <td>[% row.date_added %]</td>
+    </tr>
+    [% END %]
+
+    <tr><td colspan=2 align=right><a href="[% script_name %]/add">Add new recipe</a></td></tr>
+    </table>
+
+    </html>
+
+
+    File: /var/www/templates/content/recipe/edit.html
+    ### --------------------------------------------
+    <html>
+    <head>
+    <title>[% step == 'add' ? "Add" : "Edit" %] Recipe</title>
+    </head>
+    <h1>[% step == 'add' ? "Add" : "Edit" %] Recipe</h1>
+
+    <form method=post name=[% form_name %]>
+    <input type=hidden name=step>
+
+    <table>
+
+    [% IF step != 'add' ~%]
+    <tr>
+      <td><b>Id:</b></td><td>[% id %]</td></tr>
+      <input type=hidden name=id>
+    </tr>
+    <tr>
+      <td><b>Date Added:</b></td><td>[% date_added %]</td></tr>
+    </tr>
+    [% END ~%]
+
+    <tr>
+      <td valign=top><b>Title:</b></td>
+      <td><input type=text name=title>
+          <span style='color:red' id=title_error>[% title_error %]</span></td>
+    </tr>
+    <tr>
+      <td valign=top><b>Ingredients:</b></td>
+      <td><textarea name=ingredients rows=10 cols=40 wrap=physical></textarea>
+          <span style='color:red' id=ingredients_error>[% ingredients_error %]</span></td>
+    </tr>
+    <tr>
+      <td valign=top><b>Directions:</b></td>
+      <td><textarea name=directions rows=10 cols=40 wrap=virtual></textarea>
+          <span style='color:red' id=directions_error>[% directions_error %]</span></td>
+    </tr>
+    <tr>
+      <td colspan=2 align=right>
+          <input type=submit value="[% step == 'add' ? 'Add' : 'Update' %]"></td>
+    </tr>
+    </table>
+    </form>
+
+    (<a href="[% script_name %]">Main Menu</a>)
+    [% IF step != 'add' ~%]
+      (<a href="[% script_name %]/delete?id=[% id %]">Delete this recipe</a>)
+    [%~ END %]
+
+    [% js_validation %]
+
+    </html>
+
+
+    File: /var/www/templates/content/recipe/view.html
+    ### --------------------------------------------
+    <html>
+    <head>
+    <title>[% title %] - Recipe DB</title>
+    </head>
+    <h1>[% title %]</h1>
+    <h3>Date Added: [% date_added %]</h3>
+
+    <h2>Ingredients</h2>
+    [% ingredients %]
+
+    <h2>Directions</h2>
+    [% directions %]
+
+    <hr>
+    (<a href="[% script_name %]">Main Menu</a>)
+    (<a href="[% script_name %]/edit?id=[% id %]">Edit this recipe</a>)
+
+    </html>
+
+    ### --------------------------------------------
+
+Notes:
+
+The dbh method returns an SQLite dbh handle and auto creates the
+schema.  You will normally want to use MySQL or Oracle, or Postgres
+and you will want your schema to NOT be auto-created.
+
+This sample uses hand rolled SQL.  Class::DBI or a similar module
+might make this example shorter.  However, more complex cases that
+need to involve two or three or four tables would probably be better
+off using the hand crafted SQL.
+
+This sample uses SQL.  You could write the application to use whatever
+storage you want - or even to do nothing with the submitted data.
+
+We had to write our own HTML (Catalyst and Ruby on Rails do this for
+you).  For most development work - the HTML should be in a static
+location so that it can be worked on by designers.  It is nice that
+the other frameworks give you stub html - but that is all it is.  It
+is worth about as much as copying and pasting the above examples.  All
+worthwhile HTML will go through a non-automated design/finalization
+process.
+
+The add step used the same template as the edit step.  We did
+this using the add_name_step hook which returned "edit".  The template
+contains IF conditions to show different information if we were in
+add mode or edit mode.
+
+We reused code, validation, and templates.  Code and data reuse is a
+good thing.
+
+The edit_hash_common returns an empty hashref if the form was ready to
+validate.  When hash_common is called and the form is ready to
+validate, that means the form failed validation and is now printing
+out the page.  To let us fall back and use the "sticky" form fields
+that were just submitted, we need to not provide values in the
+hash_common method.
+
+We use hash_common.  Values from hash_common are used for both
+template swapping and filling.  We could have used hash_swap and
+hash_fill independently.
+
+The hook main_info_complete is hard coded to 0.  This basically says
+that we will never try and validate or finalize the main step - which
+is most often the case.
+
+=head1 SEPARATING STEPS INTO SEPARATE FILES
+
+It may be useful sometimes to separate some or all of the steps of an
+application into separate files.  This is the way that CGI::Prototype
+works.  This is useful in cases were some steps and their hooks are
+overly large - or are seldom used.
+
+The following modifications can be made to the previous "recipe db"
+example that would move the "delete" step into its own file.  Similar
+actions can be taken to break other steps into their own file as well.
+
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add the following line:
+    ### --------------------------------------------
+
+    sub allow_morph { 1 }
+
+
+    ### File: /var/www/lib/Recipe/Delete.pm
+    ### Remove the delete_* subs from lib/Recipe.pm
+    ### --------------------------------------------
+    package Recipe::Delete;
+
+    use strict;
+    use base qw(Recipe);
+
+    sub skip { shift->edit_skip(@_) }
+
+    sub info_complete { 1 }
+
+    sub finalize {
+        my $self = shift;
+        $self->dbh->do("DELETE FROM recipe WHERE id = ?", {}, $self->form->{'id'});
+
+        $self->add_to_form(success => "Recipe deleted from the database");
+        return 1;
+    }
+
+
+Notes:
+
+The hooks that are called (skip, info_complete, and finalize) do not
+have to be prefixed with the step name because they are now in their
+own individual package space.  However, they could still be named
+delete_skip, delete_info_complete, and delete_finalize and the
+run_hook method will find them (this would allow several steps with
+the same "morph_package" to still be stored in the same external
+module).
+
+The method allow_morph is passed the step that we are attempting to
+morph to.  If allow_morph returns true every time, then it will try
+and require the extra packages every time that step is ran.  You could
+limit the morphing process to run only on certain steps by using code
+similar to the following:
+
+    sub allow_morph { return {delete => 1} }
+
+    # OR
+
+    sub allow_morph {
+        my ($self, $step) = @_;
+        return ($step eq 'delete') ? 1 : 0;
+    }
+
+The CGI::Ex::App temporarily blesses the object into the
+"morph_package" for the duration of the step and re-blesses it into the
+original package upon exit.  See the morph method and allow_morph for more
+information.
+
+=head1 RUNNING UNDER MOD_PERL
+
+The previous samples are essentially suitable for running under flat CGI,
+Fast CGI, or mod_perl Registry or mod_perl PerlRun type environments.  It
+is very easy to move the previous example to be a true mod_perl handler.
+
+To convert the previous recipe example, simply add the following:
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add the following lines:
+    ### --------------------------------------------
+
+    sub handler {
+        Recipe->navigate;
+        return;
+    }
+
+
+    ### File: apache2.conf - or whatever your apache conf file is.
+    ### --------------------------------------------
+    <Location /recipe>
+        SetHandler perl-script
+        PerlHandler Recipe
+    </Location>
+
+Notes:
+
+Both the /cgi-bin/recipe version and the /recipe version can co-exist.
+One of them will be a normal cgi and the other will correctly use
+mod_perl hooks for headers.
+
+Setting the location to /recipe means that the $ENV{SCRIPT_NAME} will
+also be set to /recipe.  This means that name_module method will
+resolve to "recipe".  If a different URI location is desired such as
+"/my_cool_recipe" but the program is to use the same template content
+(in the /var/www/templates/content/recipe directory), then we would
+need to explicitly set the "name_module" parameter.  It could be done
+in either of the following ways:
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add the following line:
+    ### --------------------------------------------
+
+    sub name_module { 'recipe' }
+
+    # OR
+
+    sub init {
+        my $self = shift;
+        $self->{'name_module'} = 'recipe';
+    }
+
+In most use cases it isn't necessary to set name_module, but it also
+doesn't hurt and in all cases it is more descriptive to anybody who is
+going to maintain the code later.
+
+=head1 ADDING AUTHENTICATION TO THE ENTIRE APPLICATION
+
+Having authentication is sometimes a good thing.  To force
+the entire application to be authenticated (require a valid username
+and password before doing anything) you could do the following.
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add
+    ### --------------------------------------------
+
+    sub get_pass_by_user {
+        my $self = shift;
+        my $user = shift;
+        my $pass = $self->lookup_and_cache_the_pass($user);
+        return $pass;
+    }
+
+
+    ### File: /var/www/cgi-bin/recipe (depending upon Apache configuration)
+    ### Change the line with ->navigate; to
+    ### --------------------------------------------
+
+    Recipe->navigate_authenticated;
+
+    # OR
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add
+    ### --------------------------------------------
+
+    sub require_auth { 1 }
+
+    # OR
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add
+    ### --------------------------------------------
+
+    sub init { shift->require_auth(1) }
+
+See the require_auth, get_valid_auth, and auth_args methods for more information.
+Also see the L<CGI::Ex::Auth> perldoc.
+
+=head1 ADDING AUTHENTICATION TO INDIVIDUAL STEPS
+
+Sometimes you may only want to have certain steps require
+authentication.  For example, in the previous recipe example we
+might want to let the main and view steps be accessible to anybody,
+but require authentication for the add, edit, and delete steps.
+
+To do this, we would do the following to the original example (the
+navigation must start with ->navigate.  Starting with ->navigate_authenticated
+will cause all steps to require validation):
+
+    ### File: /var/www/lib/Recipe.pm
+    ### Same as before but add
+    ### --------------------------------------------
+
+    sub get_pass_by_user {
+        my $self = shift;
+        my $user = shift;
+        my $pass = $self->lookup_and_cache_the_pass($user);
+        return $pass;
+    }
+
+    sub require_auth { {add => 1, edit => 1, delete => 1} }
+
+We could also enable authentication by using individual hooks as in:
+
+    sub add_require_auth    { 1 }
+    sub edit_require_auth   { 1 }
+    sub delete_require_auth { 1 }
+
+Or we could require authentication on everything - but let a few steps in:
+
+    sub require_auth { 1 }      # turn authentication on for all
+    sub main_require_auth { 0 } # turn it off for main and view
+    sub view_require_auth { 0 }
+
+That's it.  The add, edit, and delete steps will now require authentication.
+See the require_auth, get_valid_auth, and auth_args methods for more information.
+Also see the L<CGI::Ex::Auth> perldoc.
+
+=head1 THANKS
+
+The following corporation and individuals contributed in some part to
+the original versions.
+
+    Bizhosting.com  - giving a problem that fit basic design patterns.
+
+    Earl Cahill     - pushing the idea of more generic frameworks.
+
+    Adam Erickson   - design feedback, bugfixing, feature suggestions.
+
+    James Lance     - design feedback, bugfixing, feature suggestions.
+
+    Krassimir Berov - feedback and some warnings issues with POD examples.
+
+=head1 LICENSE
+
+This module may be distributed under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Paul Seamons <perl at seamons dot com>
+
+=cut

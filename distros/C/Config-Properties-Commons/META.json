@@ -1,0 +1,77 @@
+{
+   "abstract" : "Read and write Apache Commons Configuration style Properties",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "java",
+      "properties",
+      "apache",
+      "common",
+      "config"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Properties-Commons",
+   "no_index" : {
+      "directory" : [
+         ".author",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0.14",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "2.12",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "0",
+            "Params::Validate" : "1.03",
+            "String::Util" : "0",
+            "Text::Wrap" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Properties::Commons" : {
+         "file" : "lib/Config/Properties/Commons.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-config-properties-commons/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-config-properties-commons",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-config-properties-commons.git"
+      }
+   },
+   "version" : "v1.0.1"
+}

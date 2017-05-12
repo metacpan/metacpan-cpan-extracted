@@ -1,0 +1,30 @@
+Class::StructTemplate and Class::Persistent::StructTemplate
+
+Class::StructTemplate and Class::Persistent::StructTemplate define interfaces
+which allow the user to create a class in a similar way to Class::Struct which
+is serializable to a database using a plugin module. Currently, a plugin for
+MySQL is included in this distribution, but this will change in a short time.
+
+Class::StructTemplate extends Class::Struct and Class::DBI in the sense that
+it works correctly with data-items that are references to other
+Class::StructTemplate derived classes. Those aren't Data::Dumper-ed into the
+table that the original class uses, but are saved to their respective
+positions. A reference to the class is saved. Loading an entry takes these
+references into account, meaning that database structures can easily be
+mapped to memory. The delete operator does internal housekeeping (in the sense
+of garbage-collection), so that referenced entries that aren't referenced by
+any other module are deleted automatically.
+
+This module is currently version 0.01 (at the time of writing), and as such
+still alpha software. The author makes absolutely no claim as to the
+workability or the usability of this module (yes, that's a disclaimer!!!).
+If you feel like contributing or patching this code, please contact
+heikowu@cpan.org.
+
+There is currently no (I mean none) documentation of the interface; if you
+like, look at manager.pm and test.pl to see how it's done or stick with me
+for another week, in which I hope I'll have the time to write some pod... :)
+
+Copyright (C) 2000 by Heiko Wundram (heikowu@cpan.org).
+
+Written on: 26.12.2000 (12/26/2000 if you like... :))

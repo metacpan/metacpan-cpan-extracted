@@ -1,0 +1,10 @@
+<h1>hello</h1>
+
+<p>This is a very simple browser whose only purpose is to demonstrate that it is quite easy to create an application with Class::DBI::Factory.</p>
+
+[% FOREACH c = factory.classes %]
+<p>
+	<a href="[% config.url %]?moniker=[% c %]"><b>[% factory.plural(c) %]</b></a><br>
+	[% factory.description(c) %]
+</p>
+[% END %]

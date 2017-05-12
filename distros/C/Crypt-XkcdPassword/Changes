@@ -1,0 +1,68 @@
+Crypt-XkcdPassword
+==================
+
+Created:      2012-02-02
+Home page:    <https://metacpan.org/release/Crypt-XkcdPassword>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Crypt-XkcdPassword>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.009	2014-09-13
+
+ - A bunch of refactoring common stuff into Crypt::XkcdPassword::Words,
+   which is a role that must now be consumed by word list classes.
+ - Added: Crypt::XkcdPassword::Words::sys
+   Matt S Trout++
+ - The `passphrase` tool can now generate more than one phrase per
+   invocation.
+ - The `words` attribute is now a blessed object, not a class name.
+
+0.008	2014-09-13
+
+ [ Packaging ]
+ - Fix issue tracker metadata so that 'NOBODY' doesn't show up in CREDITS
+   file for reporting some bugs.
+
+0.007	2014-09-10
+
+ - Added: Bundle `passphrase` command-line tool.
+ - Don't depend on Role::Commons.
+ - General tidying.
+ - Support for Perl 5.8.
+
+0.006	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.005	2013-05-21
+
+ - Any::Moose -> Moo + Types::Standard; smartmatch -> match::smart;
+   Class::Load -> Module::Runtime.
+
+0.004	2012-07-06
+
+ - Added: EN::Roget word list.
+ - Switch from Moo to Any::Moose.
+
+0.003	2012-03-06
+
+ [ Documentation ]
+ - Crypt::XkcdPassword::Examples
+
+ [ Packaging ]
+ - Require Perl 5.10.1 (Unicode in 5.10.0 is too broken).
+
+ [ Other ]
+ - Added: Provide a $filter parameter to make_password.
+   Fixes RT#74684.
+   Fixes RT#74685.
+   <https://rt.cpan.org/Public/Bug/Display.html?id=74684>
+   <https://rt.cpan.org/Public/Bug/Display.html?id=74685>
+
+0.002	2012-02-03
+
+ [ Bug Fixes ]
+ - Forgot to run mo-inline in 0.001, creating an undeclared dependency on
+   Mo. Have switched to Moo now anyway, and declared that as a dependency.
+
+0.001	2012-02-02	Initial release

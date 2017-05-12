@@ -1,0 +1,57 @@
+PerlIDS (CGI::IDS)
+
+Perl Website Intrusion Detection System (XSS, CSRF, SQLI, LFI etc.)
+
+Version 1.0217 - based on and tested against the filter tests of
+PHPIDS https://phpids.org rev. 1409
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::IDS
+
+You can also look for information at:
+
+    GitHub
+        https://github.com/hinnerk-a/perlids
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-IDS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-IDS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-IDS
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-IDS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2014 Hinnerk Altenburg
+
+PerlIDS is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PerlIDS is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with PerlIDS.  If not, see <http://www.gnu.org/licenses/>.

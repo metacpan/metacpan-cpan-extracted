@@ -1,0 +1,11 @@
+SYNOPSIS
+
+     use Complete::Locale qw(complete_locale);
+    
+     my $res = complete_locale(word => 'id');
+     # -> ['id_ID.utf8']
+
+SEE ALSO
+
+    Complete
+

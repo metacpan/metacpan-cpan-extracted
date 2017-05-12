@@ -1,0 +1,17 @@
+Changes
+lib/Catalyst/Helper/View/PDF/API2.pm
+lib/Catalyst/View/PDF/API2.pm
+lib/Template/Plugin/Catalyst/View/PDF/API2.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-livetest.t
+t/lib/script/testapp_server.pl
+t/lib/script/testapp_test.pl
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/root/pdf_templates/test_pdf.tt
+t/lib/TestApp/View/PDF/API2.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

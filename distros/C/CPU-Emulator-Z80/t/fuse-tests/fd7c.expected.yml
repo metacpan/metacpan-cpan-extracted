@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd7c
+registers:
+  AF: 50728
+  AF_: 0
+  BC: 37884
+  BC_: 0
+  DE: 41940
+  DE_: 0
+  HL: 56478
+  HL_: 0
+  I: 0
+  IX: 8620
+  IY: 50711
+  PC: 2
+  R: 2
+  SP: 0

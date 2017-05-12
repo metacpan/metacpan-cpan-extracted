@@ -1,0 +1,391 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use CAM::DBF;
+
+our $VERSION = '1.02';
+
+##no critic
+
+if (@ARGV < 2)
+{
+   die(
+       "Syntax: $0 <DBF file> <command> [<arg> ...] [<command [<arg> ...]]\n" .
+       "Commands:\n" .
+       "   fixheaderbytes\n" .
+       "      Recompute the the number of bytes in the header by explicitly\n".
+       "      reading to the end of the column data\n" .
+       "   fixrecordbytes\n" .
+       "      Recompute the the number of bytes per record\n" .
+       "   fixnumrecords\n" .
+       "      Recompute the the number of records in the file.  The header\n" .
+       "      size and the record bytes must be correct.\n" .
+       "   info\n" .
+       "      Print a summary of the file metadata\n" .
+       "   columns\n" .
+       "      Validate and output the column description\n" .
+       "   row <rownum>\n" .
+       "      Print the contents of a record, counting from 0\n" .
+       "   rows <rowlist>\n" .
+       "      Print the contents of a set of records.  The list should be\n" .
+       "      comma-separated, with ranges (like '3-7') allowed.  Open ended\n" .
+       "      ranges (like '7-') work as you would expect\n" .
+       "   rawrow <rownum>\n" .
+       "      Print the raw contents of a record, counting from 0\n" .
+       "   rawrows <rowlist>\n" .
+       "      Print the raw contents of a set of records.  The list should be\n" .
+       "      like in 'rows' above.\n" .
+       "   countdeletes\n" .
+       "      Print the number of rows flagged to be deleted\n" .
+       "   countnondeletes\n" .
+       "      Print the number of rows not flagged to be deleted\n" .
+       "   matchregions <matchvalue> <bytesbefore> <bytesafter>\n" .
+       "      Print regions of the file around a matching substring\n" .
+       "   matchrows <colname> <colvalue>\n" .
+       "      Print the rows where the specified column has the specified value\n" .
+       "   corruptrows\n" .
+       "      Tries to find corrupt data by looking in the deleted column for values\n" .
+       "      other than ' ' or '*'.  Prints a count of the matches\n" .
+       "   corruptdata\n" .
+       "      Checks that all number, date and logical fields have valid values.\n" .
+       "      Prints a count of the rows with bad data\n" .
+       "   showcorruptrows\n" .
+       "      Displays the rows that the 'corruptrows' command flags as corrupt\n" .
+       "\n" .
+       "NOTES:\n" .
+       " * If more than one of the 'fix' commands are used, they must be used\n" .
+       "   in this order: fixheaderbytes, fixrecordbytes, fixnumrecords\n" .
+       " * The 'fix' commands should occur before any others (naturally)\n" .
+       "");
+}
+
+my $filename = shift;
+
+my $dbffile;
+## Don't use the tie -- it is slower...
+#tie($dbffile, "dbftie", $filename);
+{
+   local *FILE;
+   local($/) = undef;
+   if (!open(FILE, $filename))
+   {
+      die "Failed to read $filename\n";
+   }
+   $dbffile = <FILE>;
+   close(FILE);
+}
+
+my $dbf = new CAM::DBF($filename);
+if (!$dbf)
+{
+   die "Failed to read $filename\n";
+}
+
+while (@ARGV > 0)
+{
+   my $cmd = shift || "";
+   if ($cmd eq "fixrecordbytes")
+   {
+      my $len = $dbf->computeRecordBytes();
+      if ($len != $dbf->nRecordBytes())
+      {
+         print "Correct record length: $$dbf{nrecordbytes} -> $len\n";
+         $dbf->{nrecordbytes} = $len;
+      }
+   }
+   elsif ($cmd eq "fixheaderbytes")
+   {
+      my $len = $dbf->computeHeaderBytes();
+      if ($len != $dbf->nHeaderBytes())
+      {
+         print "Correct header length: $$dbf{nheaderbytes} -> $len\n";
+         $dbf->{nheaderbytes} = $len;
+         $dbf = new CAM::DBF($dbf->{filename}, "r", ignoreHeaderBytes => 1);
+      }
+   }
+   elsif ($cmd eq "fixnumrecords")
+   {
+      my $n = $dbf->computeNumRecords();
+      if ($n != $dbf->nrecords())
+      {
+         print "Correct number of records: $$dbf{nrecords} -> $n\n";
+         $dbf->{nrecords} = $n;
+      }
+   }
+   elsif ($cmd eq "info")
+   {
+      print "File: $filename\n";
+      print "Header Size: " . $dbf->nHeaderBytes() . " bytes\n";
+      print "Record Size: " . $dbf->nRecordBytes() . " bytes\n";
+      print "Records: " . $dbf->nrecords() . "\n";
+      print "Total Size: " . ($dbf->nHeaderBytes()+ ($dbf->nRecordBytes()*$dbf->nrecords())) . " bytes\n";
+      print "Actual Size: " . (-s $filename) . " bytes\n";
+   }
+   elsif ($cmd eq "columns")
+   {
+      $dbf->validateColumns();
+      my @widths = (16,4,6,3,7);
+      my $format = join(" ", map {"%-${_}s"} @widths) . "\n";
+      printf($format, "Name", "Type", "Length", "Dec", "Bytes"); # header
+      print(join(" ", map {"-"x$_} @widths), "\n");     # dashes
+      my $offset = 1;
+      foreach my $c (0 .. $dbf->nfields()-1)
+      {
+         printf($format, $dbf->fieldname($c), $dbf->fieldtype($c), 
+                $dbf->fieldlength($c), $dbf->fielddecimals($c), 
+                $offset."-".($offset+$dbf->fieldlength($c)-1));
+         $offset += $dbf->fieldlength($c);
+      }
+   }
+   elsif ($cmd eq "rawrow")
+   {
+      my $row = getArg("Missing row number\n");
+      printRawRow($dbf, $dbffile, $row);
+   }
+   elsif ($cmd eq "rawrows")
+   {
+      my $rows = getArg("Missing row number(s)\n");
+      $rows = &makeRowList($dbf, $rows);
+
+      foreach my $row (split /,/, $rows)
+      {
+         printRawRow($dbf, $dbffile, $row);
+      }
+   }
+   elsif ($cmd eq "row")
+   {
+      my $row = getArg("Missing row number\n");
+      printRow($dbf, $row);
+   }
+   elsif ($cmd eq "rows")
+   {
+      my $rows = getArg("Missing row number(s)\n");
+      $rows = &makeRowList($dbf, $rows);
+
+      foreach my $row (split /,/, $rows)
+      {
+         print "------------------\n";
+         printRow($dbf, $row);
+      }
+      print "------------------\n";
+   }
+   elsif ($cmd eq "countdeletes")
+   {
+      my $count = 0;
+      my $len = $dbf->nRecordBytes();
+      for (my $i = 0; $i < $dbf->nrecords(); $i++)
+      {
+         my $offset = $dbf->nHeaderBytes()+$i*$len;
+         $count++ if (substr($dbffile, $offset, 1) ne " ");
+      }
+      print "$count deleted row" . ($count == 1 ? "" : "s") . "\n";
+   }
+   elsif ($cmd eq "countnondeletes")
+   {
+      my $count = 0;
+      my $len = $dbf->nRecordBytes();
+      for (my $i = 0; $i < $dbf->nrecords(); $i++)
+      {
+         my $offset = $dbf->nHeaderBytes()+$i*$len;
+         $count++ if (substr($dbffile, $offset, 1) eq " ");
+      }
+      print "$count non deleted row" . ($count == 1 ? "" : "s") . "\n";
+   }
+   elsif ($cmd eq "matchregion" || $cmd eq "matchregions")
+   {
+      my $value = getArg("Missing match value");
+      my $before = getArg("Missing before value");
+      my $after = getArg("Missing after value");
+
+      my $length = $after + length($value);
+      my $i = $dbf->nHeaderBytes();
+      while (($i = index($dbffile, $value, $i)) > 0)
+      {
+         my $offset = $i-$dbf->nHeaderBytes();
+         my $row = int($offset / $dbf->nRecordBytes());
+         my $byte = $offset - $row * $dbf->nRecordBytes();
+         print "index $i (row $row + byte $byte)\n";
+         print substr($dbffile, $i-$before, $length),"\n";
+         $i++;
+      }
+   }
+   elsif ($cmd eq "matchrow" || $cmd eq "matchrows")
+   {
+      my $column = getArg("Missing column name");
+      my $value = getArg("Missing column value");
+
+      my $matches = 0;
+      for (my $iRow=0; $iRow < $dbf->nrecords(); $iRow++)
+      {
+         my $H_row = $dbf->fetchrow_hashref($iRow);
+         next if (!$H_row); # deleted data
+
+         if ($iRow == 0 && (!exists $H_row->{$column}))
+         {
+            die("Column $column does not exist in $filename\n" .
+                "Try $0 $filename columns\n");
+         }
+         if ($H_row->{$column} && $H_row->{$column} eq $value)
+         {
+            printRawRow($dbf, $dbffile, $iRow);
+            $matches++;
+         }
+      }
+      print "$matches match" . ($matches == 1 ? "" : "es") . "\n";
+   }
+   elsif ($cmd eq "showcorruptrows")
+   {
+      my $count = 0;
+      my $len = $dbf->nRecordBytes();
+      for (my $i = 0; $i < $dbf->nrecords(); $i++)
+      {
+         my $offset = $dbf->nHeaderBytes()+$i*$len;
+         my $value = substr($dbffile, $offset, 1);
+         if ($value ne " " && $value ne "*")
+         {
+            print "row ".($i+1)."\n";
+            print substr($dbffile, $offset, $dbf->nRecordBytes()), "\n";
+         }
+      }
+   }
+   elsif ($cmd eq "corruptrows")
+   {
+      my $count = 0;
+      my $nulls = 0;
+      my $len = $dbf->nRecordBytes();
+      for (my $i = 0; $i < $dbf->nrecords(); $i++)
+      {
+         my $offset = $dbf->nHeaderBytes()+$i*$len;
+         my $value = substr($dbffile, $offset, 1);
+         $count++ if ($value ne " " && $value ne "*");
+         $nulls++ if ($value eq "\x00");
+      }
+      print "$count corrupted row" . ($count == 1 ? "" : "s") . "\n";
+      print "  $nulls of them contain" . ($nulls == 1 ? "s" : "") . " a value of null\n" if ($nulls);
+   }
+   elsif ($cmd eq "corruptdata")
+   {
+      my $count = 0;
+      my $nf = $dbf->nfields();
+      my @numbers = grep {$dbf->fieldtype($_) eq "number"} 0 .. $nf-1;
+      my @dates = grep {$dbf->fieldtype($_) eq "number"} 0 .. $nf-1;
+      my @bools = grep {$dbf->fieldtype($_) eq "number"} 0 .. $nf-1;
+
+      my $len = $dbf->nRecordBytes();
+      for (my $i = 0; $i < $dbf->nrecords(); $i++)
+      {
+         my $bad = 0;
+         my $data = $dbf->fetchrow_arrayref($i);
+         foreach my $j (@bools)
+         {
+            $bad++ if ($data->[$j] !~ /^tfyn10$/i)
+         }
+         foreach my $j (@numbers)
+         {
+            $bad++ if ($data->[$j] !~ /^[\- \d\.]+$/)
+         }
+         foreach my $j (@dates)
+         {
+            $bad++ if ($data->[$j] !~ /^\d+\/\d+\/\d+$/)
+         }
+         my $offset = $dbf->nHeaderBytes()+$i*$len;
+         my $value = substr($dbffile, $offset, 1);
+         $count++ if ($bad);
+      }
+      print "$count corrupted data row" . ($count == 1 ? "" : "s") . "\n";
+   }
+   else
+   {
+      die "unknown command $cmd\n";
+   }
+}
+
+sub printRawRow
+{
+   my $dbf = shift;
+   my $dbffile = shift;
+   my $row = shift;
+
+   my $len = $dbf->nRecordBytes();
+   my $offset = $dbf->nHeaderBytes()+$row*$len;
+   my $out = substr($dbffile, $offset, $len);
+   $out =~ s/([^\x20-\xFE])/"\\x".hex(ord($1))/ge;
+   print "$row $out\n";
+}
+
+sub printRow
+{
+   my $dbf = shift;
+   my $row = shift;
+
+   my $hash = $dbf->fetchrow_hashref($row);
+   print map({"  $_: " . (defined $hash->{$_} ? $hash->{$_} : "(null)") . "\n"} $dbf->fieldnames());
+}
+
+sub getArg
+{
+   my $error = shift;
+
+   if (!defined $ARGV[0])
+   {
+      die $error;
+   }
+   return shift @ARGV;
+}
+
+sub makeRowList
+{
+   my $dbf = shift;
+   my $rows = shift;
+
+   $rows =~ s/[^\d\-,]//g;  # clean
+   $rows =~ s/^,+//g;  # clean
+   $rows =~ s/,+$//g;  # clean
+   $rows =~ s/(\d+)-(\d+)/join",",$1..$2/ge;
+   $rows =~ s/-(\d+)/join",",1..$1/ge;
+   $rows =~ s/(\d+)-/join",",$1..$dbf->nrecords()/ge;
+   return $rows;
+}
+
+package dbftie;
+
+sub TIESCALAR
+{
+   my $pkg = shift;
+   my $filename = shift;
+   return bless({
+      value => undef,
+      filename => $filename,
+      isRead => undef,
+   }, $pkg);
+}
+
+sub FETCH
+{
+   my $self = shift;
+   if (!$self->{isRead})
+   {
+      local *FILE;
+      local($/) = undef;
+      print STDERR "reading file\n";
+      if (!open(FILE, $filename))
+      {
+         die "Failed to read $filename\n";
+      }
+      $self->{value} = <FILE>;
+      close(FILE);
+      $self->{isRead} = 1;
+   }
+   $self->{value};
+}
+
+sub STORE
+{
+   die "Can't store";
+}
+
+sub DESTROY
+{
+   # no-op
+}

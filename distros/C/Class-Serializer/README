@@ -1,0 +1,41 @@
+Class-Serializer
+
+This module does its best efforts to serialize the in-memory state of a class
+into runable code.
+
+The most important thing, however is to keep in mind that this module is highly
+experimental. There are no guarantees whatsoever about the generated code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Class::Serializer
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-Serializer
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Class-Serializer
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Class-Serializer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Nilson Santos Figueiredo Junior
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

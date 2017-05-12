@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+Path.pm
+README
+t/00base.t
+t/01real.t
+t/02filepath.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,88 @@
+Revision history for Perl extension CGI::Debug.
+
+2000-12-28
+
+   Release 1.00
+
+   Tested with perl v5.7.0
+
+   New email address of autor
+
+
+2000-04-24
+
+   Release 0.07
+
+   Changes for perl v5.6.0
+
+   require perl 5.004_05
+
+   supporting perl binary in nonstandard place
+
+   enhancing test suit
+
+
+1999-11-07
+
+   Release 0.06
+
+   The module can't work with mod_perl. Now, it won't try, and
+   will send a warning to STDERR.
+
+   Will now use Mail::Send instead of MIME::Lite in the hope of
+   broader platform support.
+
+   Added a test suite (of 42 tests)
+
+   Will now not use CGI.pm for generating HTML
+
+   Updated the POD
+
+
+1999-05-11
+
+   Release 0.05
+
+   Fixed bad spelling:
+   s/enviroment/environment/g in module and POD
+
+
+1999-05-09
+
+   Release 0.04
+
+   Changed wording in POD
+
+   Fixed bug in the Control->to action determination. "to =>
+   'browser'", etc, wasn't working in 0.03.
+
+   Handled errors from MIME::Lite and added info about it i POD
+
+   Added "set => { error_document => 'redirection_url' } }"
+
+
+
+1999-04-23
+
+   Release 0.03
+
+   Changed priority for configuration sources
+
+   Added Makefile
+
+
+
+1999-04-21
+
+   Release 0.02
+
+   Added mail function
+
+   Debugged header control
+
+   Added documentation
+
+
+1999-03-24
+
+   Release 0.01

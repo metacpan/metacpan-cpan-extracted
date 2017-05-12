@@ -1,0 +1,10 @@
+Revision history for Perl extension Catalyst::Plugin::HTML::Scrubber
+
+0.02  Fri Jul 09 11:01:45 2010
+        - moose-ified
+        - support html_scrub method
+        - add tests
+
+0.01  Mon Oct 24 16:56:40 2005
+        - first release
+

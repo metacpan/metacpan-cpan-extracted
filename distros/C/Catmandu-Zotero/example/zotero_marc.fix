@@ -1,0 +1,172 @@
+#
+# Example how to transform Zotero data into MARC
+#
+# Requires: 
+# 
+#   - Catmandu 0.9403(dev-branch) or better
+#   - Catmandu-MARC 0.213 or better
+#   - Catmandu-Zotero 0.05 or better
+#
+# Usage:
+# 
+#  $ catmandu convert Zotero --groupID <key> to MARXML --type XML --fix zotero.fix 
+#
+# Author:
+#   Patrick Hochstenbach <Patrick . Hochstenbach @ UGent . be>
+#
+
+# Data cleaning...
+vacuum()
+
+do visitor() 
+  replace_all(scalar,"(\r|\n)"," ")
+  replace_all(scalar,"\s+"," ")
+  trim(scalar)
+end
+
+# Ex Libris ALEPH specific fields
+marc_add('FMT',_:BK)
+marc_add('LDR',_:"00000cam a22002771  4500")
+
+marc_add('001',_:$._id)
+
+if exists(data.dateModified)
+    replace_all(data.dateModified,'\D','')
+    append(data.dateModified,".0")
+    marc_add('005',_:$.data.dateModified)
+end
+
+if exists(data.dateAdded)
+    copy_field(data.dateAdded,f008.$append)
+    replace_all(f008.0,'\D','')
+    substring(f008.0,2,6)
+
+    add_field(f008.$append,"s")
+
+    if all_match(data.date,".*\d{4}.*")
+      copy_field(data.date,_date)
+      replace_all(_date,".*(\d{4}).*","$1")
+      copy_field(_date,f008.$append)
+    else
+      add_field(f008.$append,"????")
+    end
+
+    add_field(f008.$append,"------------------------")
+
+    if all_match(data.language,"^\w{3}.*")
+      copy_field(data.language,_lang)
+      downcase(_lang)
+      substring(_lang,0,3)
+      copy_field(_lang,f008.$append)
+    else
+      add_field(f008.$append,"eng")
+    end
+
+    add_field(f008.$append,"--")
+
+    join_field(f008,'')
+
+    marc_add('008',_:$.f008)
+end
+
+marc_add('020',a:$.data.ISBN)
+marc_add('022',a:$.data.ISSN)
+marc_add('024',a:$.data.DOI)
+
+marc_add('040',a:$.data.libraryCatalog)
+marc_add('041',a:$.data.language)
+
+marc_add('245',a:$.data.title)
+marc_add('246',a:$.data.shortTitle)
+
+marc_add('250',a:$.data.edition)
+marc_add('260',a:$.data.place
+              ,b:$.data.publisher
+              ,b:$.data.distributor
+              ,b:$.data.network
+              ,b:$.data.institution
+              ,b:$.data.studio
+              ,c:$.data.date)
+
+marc_add('300',a:$.data.artworkMedium
+              ,a:$.data.audioRecordingFormat
+              ,a:$.data.videoRecordingFormat
+              ,a:$.data.interviewMedium
+              ,c:$.data.artworkSize
+              ,c:$.data.runningTime)
+
+marc_add('520',a:$.data.abstractNote)
+marc_add('540',a:$.data.rights)
+
+do list(path:data.tags,var:loop)
+ marc_add('650',a:$.loop.tag)
+end
+
+do list(path:data.creators,var:loop)
+   copy_field(loop.lastName,loop.c.$append)
+   add_field(loop.c.$append,", ")
+   copy_field(loop.firstName,loop.c.$append)
+   join_field(loop.c,"")
+   marc_add('700',a:$.loop.c,e:$.loop.creatorType)
+end
+
+set_array(yvip)
+
+if exists(data.volume)
+  add_field(yvip.$append,"Vol. ")
+  copy_field(data.volume,yvip.$append)
+end
+
+if exists(data.issue)
+  add_field(yvip.$append,"no. ")
+  copy_field(data.issue,yvip.$append)
+end
+
+if exists(data.reportNumber)
+  add_field(yvip.$append,"no. ")
+  copy_field(data.reportNumber,yvip.$append)
+end
+
+if exists(data.seriesNumber)
+  add_field(yvip.$append,"no. ")
+  copy_field(data.seriesNumber,yvip.$append)
+end
+
+if exists(data.pages)
+  add_field(yvip.$append,"p. ")
+  copy_field(data.pages,yvip.$append)
+end
+
+if exists(yvip.0)
+  join_field(yvip," ")
+else
+  remove_field(yvip)
+end 
+
+marc_add('733',a:$.data.conferenceName
+              ,a:$.data.bookTitle
+              ,a:$.data.publicationTitle
+              ,a:$.data.forumTitle
+              ,a:$.data.dictionaryTitle
+              ,a:$.data.encyclopediaTitle
+              ,a:$.data.seriesTitle
+              ,a:$.data.series
+              ,a:$.data.blogTitle
+              ,a:$.data.programTitle
+              ,a:$.data.websiteTitle
+              ,t:$.data.proceedingsTitle
+              ,g:$.yvip)
+
+marc_add('852',j:$.data.callNumber)
+
+marc_add('856',u:$.data.url,z:url)
+marc_add('856',u:$.links.alternate.href,z:alternate)
+marc_add('856',u:$.links.self.href,z:zotero)
+
+do list(path:children,var:loop)
+   marc_add('856',u:$.loop.data.url,z:$.loop.data.title)
+end
+
+marc_add('920',a:$.data.itemType)
+
+retain(_id,record)

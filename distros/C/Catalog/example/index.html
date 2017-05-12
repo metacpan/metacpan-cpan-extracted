@@ -1,0 +1,68 @@
+<html>
+<body bgcolor=#ffffff>
+<title>Catalog example</title>
+<center><h3>Catalog example</h3></center>
+This example has been designed to demonstrate the most typical usage of Catalog.
+More information about Catalog can be found in <a href=catalog_toc.html>the documentation</a>.
+<p>
+Two subdirectories of the cgi-bin directory contain the configuration files for this example.
+<br>
+The subdirectory <b>admin</b> contains a configuration suited for the 
+administrator of the catalog.
+<br>
+The subdirectory <b>browse</b> contains a configuration for browsing 
+the catalog, all other operations are forbiden.
+<p>
+The <b>catalog_example</b> database has been created when installing the Catalog package (only
+if it does not already exists) and contains all the catalogs used in this example.
+
+<dl>
+<p>
+<dt><a href='_CGIPATH_/admin/Catalog?context=ccontrol_panel'>Control panel</a>
+<dd>The default control panel, without any customization.
+
+<p>
+<dt><a href='_CGIPATH_/DMOZ/dmoz?context=ccontrol_panel'>DMOZ Control panel</a>
+<dd>The control panel to handle a DMOZ catalog. The basic Catalog functions are specialized
+to fit the needs of a DMOZ Catalog as found on <a href=http://www.dmoz.org/>http://www.dmoz.org/</a>.
+
+<p>
+<dt><a href='_CGIPATH_/admin/Catalog?context=cedit&name=urlcatalog&id=1&style=urlcatalog'>Edit URL catalog</a>
+<dd>Demonstrates the customization of the catalog editing interface. 
+templates.conf is used to map template file names. Templates used : 
+<ul> 
+<li>cedit.html (urlcatalog_cedit.html)
+<li>csearch.html (urlcatalog_csearch.html)
+</ul>
+
+<p>
+<dt><a href='_CGIPATH_/browse/Catalog/'>Browse URL catalog (urlcatalog)</a>
+<dd>Demonstrates the customization of the catalog browsing interface. This example uses intuitive 
+URLs (the URL shows the current category) but the same customization may be used with URLs containing
+regular cgi-bin parameters. templates.conf is used to map template file names. Templates used : 
+<ul>
+<li>cbrowse_root.html (urlcatalog_cbrowse_root.html)
+<li>cbrowse.html (urlcatalog_cbrowse.html)
+<li>csearch.html (urlcatalog_csearch.html)
+</ul>
+
+<p>
+<dt><a href='_CGIPATH_/browse/Catalog?context=cbrowse&name=urldate'>Chronoligical history of the URL catalog (urldate)</a>
+<dd>Demonstrates the customization of chronological browsing. The date field used is the creation time.
+<ul>
+<li>cdate_default.html
+<li>cdate_year.html
+<li>cdate_month.html
+<li>cdate_day.html
+</ul>
+
+<p>
+<dt><a href='_CGIPATH_/browse/Catalog?context=cbrowse&name=urlalpha'>Alphabetical URL catalog (urlalpha)</a>
+<dd>Demonstrates the customization of alphabetical browsing. The comment field is used for lexicographic
+ordering.
+<ul>
+<li>calpha_root.html
+<li>calpha.html
+</ul>
+
+</html>

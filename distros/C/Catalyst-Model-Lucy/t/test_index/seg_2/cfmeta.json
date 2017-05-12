@@ -1,0 +1,57 @@
+{
+  "files": {
+    "documents.dat": {
+      "length": "40",
+      "offset": "0"
+    },
+    "documents.ix": {
+      "length": "32",
+      "offset": "40"
+    },
+    "highlight.dat": {
+      "length": "2",
+      "offset": "72"
+    },
+    "highlight.ix": {
+      "length": "32",
+      "offset": "80"
+    },
+    "lexicon-1.dat": {
+      "length": "7",
+      "offset": "112"
+    },
+    "lexicon-1.ix": {
+      "length": "4",
+      "offset": "120"
+    },
+    "lexicon-1.ixix": {
+      "length": "8",
+      "offset": "128"
+    },
+    "lexicon-2.dat": {
+      "length": "7",
+      "offset": "136"
+    },
+    "lexicon-2.ix": {
+      "length": "4",
+      "offset": "144"
+    },
+    "lexicon-2.ixix": {
+      "length": "8",
+      "offset": "152"
+    },
+    "postings-1.dat": {
+      "length": "6",
+      "offset": "160"
+    },
+    "postings-2.dat": {
+      "length": "6",
+      "offset": "168"
+    },
+    "postings.skip": {
+      "length": "0",
+      "offset": "176"
+    }
+  },
+  "format": "2"
+}

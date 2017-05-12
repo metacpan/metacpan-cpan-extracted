@@ -1,0 +1,6 @@
+2002-05-24 17:43  eassaly
+
+	*
+	modules/handler/src/ca/masq/fido/handler/useraccountmanagement/GetUserProfileResponse_UnitTest.java:
+	Created tests for GetUserProfileResponse class
+

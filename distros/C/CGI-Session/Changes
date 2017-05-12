@@ -1,0 +1,472 @@
+CGI::Session Change Log
+=====================================================================
+
+4.48 - July 11th, 2011
+    No code changes.
+
+    * INTERNAL: quit using "use diagnostics;" to avert some test failures
+
+4.47 - July 8th, 2011
+    No code changes.
+
+    * DOCS: minor POD fixes (Rene Mayorga and Nicholas Bamber)
+
+4.46 - July 8th, 2011
+    No code changes.
+
+    * INTERNAL: More packaging fixes.
+
+4.45 - July 1st, 2011
+    No code changes.
+
+   * INTERNAL: Fix packaging problem with 4.44.
+
+4.44 - June 6th, 2011
+
+   * FIX: Fix 5.14 compatibility issue (Walt Arstingstall)
+   * DOCS: Clarify docs for static ID generator (oalders)   
+
+4.43 - Saturday, December 11, 2010
+
+    * FIX: Avoid deleting unmatched sessions when calling find() when ip_match is enabled.
+        Closes RT#47795. Thanks to m-uchino, Ron Savage, and Mark Stosberg
+
+    * NEW: new public ip_match() method is available, primarily for use with find(). (Ron Savage, Mark Stosberg)
+
+    * DOCS: UTF8 related documentation was updated. 
+
+    * INTERNAL: Don't add _SESSION_EXPIRE_LIST to internal hash unless we need to.
+                RT#51192, Thanks to Pavel V. Rochnyack, Ron Savage, Mark Stosberg
+    * INTERNAL: Avoid calling sprintf() in CGI::Session::ErrorHandler, fixing RT#48733
+        Solves taint error for Perl V 5.10.0. All well-written code will have
+        been using errstr() to retrieve errors anyway so this change will not
+        affect any code which obeys the API. (Peter Kaminsk, Ron Savage, Mark Stosberg)
+    * INTERNAL: The undocumented 4th parameter to load() has changed its meaning.  
+	* INTERNAL: Test suite improvements. (Ron Savage, Mark Stosberg)
+
+4.42 - Wednesday, August 26, 2009
+    No code changes.
+    * DOCUMENTATION: Fix broken links in documentation and tests. (RT##49020) 
+
+4.41 - Friday, March 20, 2009
+    * FIX: RT#43290. In CGI::Session::Driver::sqlite, ensure database handle is still defined in DESTROY()
+           before calling ping(). For more detail see RT#35925 as discussed under V 4.31 below.
+    * DOCUMENTATION: Add comments about using the header() method to set the charset to 'utf-8'.
+
+4.40 - Friday, January 2, 2009
+    No code changes.
+    * DOCUMENTATION: Clarify that users should use the mailing list
+        for support, instead of e-mailing the maintainers directly. 
+
+4.39 - Monday, December 15, 2008
+    No code changes.
+    * INTERNAL: Expand the discussion of auto-flushing in the POD. (Ron Savage, Mark Stosberg)
+    * INTERNAL: Re-organize the documentation a bit. 
+
+4.38 - Friday, October 31, 2008
+    * INTERNAL: Rename SimpleObjectClass to CGI::Session::Test::SimpleObjectClass 
+                to avoid namespace ownership issue (Mark Stosberg). 
+    * INTERNAL: We now list CGI.pm 3.26 or greater as a dependency. You are still  
+                welcome to use other query objects, but this version of CGI.pm
+                fixes a bug in the strictness of HTTP expiration times, which
+                Safari in particular is sensitive to. So, if you are using
+                CGI.pm, you should upgrade to at least this version.  RT#34216,
+                thanks to Astar, Michael Hampton, Ron Savage and Mark Stosberg. 
+    * INTERNAL: return explicit values in _set_status and _unset_status 
+                (RT#39201, Mario Domgoergen, Mark Stosberg) 
+
+    * FIX: RT#37877: The storable serializer wasn't properly inheriting the 'errstr'
+           method. This could have resulted an error like:
+           "Can't locate errstr via package "CGI::Session::Serialize::storable"
+           Thanks to Michael Greenish, Mark Stosberg.  
+    * FIX: RT#40405 reported a case where the default serializer would have a problem after the user
+      	   set a parameter's value to undef, in certain circumstances.
+    	   A test file was kindly provided by cowomally[...]nullium.net.
+    	   The fix was spelled out by Matt LeBlanc
+    * FIX: RT#39679 pointed out a simplification in method remove() in CGI::Session::Driver::file.
+      	   By calling _file() instead of duplicating code, we get the benefit of extra error checking.
+      	   Thanx to Sergiy Borodych for noticing this
+    * FIX: Stop using the return value of delete() in t/find.t. This means that when the patch
+	  	   provided in RT#37752 is applied, t/find.t will not start failing
+
+4.37 - Wednesday, October 22, 2008
+    * INTERNAL: Patch Makefile.PL and Build.PL to request that SimpleObjectClass not be indexed. 
+
+4.36 - Friday, September 12, 2008
+    * FIX: The sample code for find() had 2 errors in it:
+           o It assumed delete() returned a meaningful value, which it doesn't
+           o It did not follow the call to delete() with a (recommended) call to flush()
+           o Thanks to Mario Domgoergen for the report, RT#39201
+
+4.35 - Tuesday, July 15, 2008
+    * FIX: Fix the bug fix for error propagation from 4.34, RT#37628
+    * FIX: Reset errors when creating a new object. Previously, errors from   
+           a previous object could show up in the current object. 
+    * INTERNAL - Patch Build.PL and Makefile.PL to run Module::Metadata::Changes's ini.report.pl,
+           if available, to regenerate Changelog.ini from this file (Changes), when creating a makefile.
+
+4.34 - Sunday, July 13, 2008
+    * SECURITY: Patch CGI::Session::Driver::file to stop \ and / characters being used in
+           session ids and hence in file names. These characters, possibly combined with '..',
+           could have been used to access files outside the designated session file directory.
+           Reported by TAN Chew Keong of vuln.sg.
+    * FIX: Patch CGI::Session to propagate error upwards when _load_pluggables() fails.
+           See RT#37628 and http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=490198.
+    * INTERNAL: Ship a machine-readable version of this file under the name Changelog.ini.
+           The latter file is generated by ini.report.pl, which is shipped with Module::Metadata::Changes.
+           The reason Changelog.ini does not contain a separate section for each version in this file
+           is that some of the versions documented below have no datestamp, and ini.report.pl does not create
+           fake datestamps.
+
+4.33 - Monday, July 7, 2008
+    * FIX: Patch CGI::Session::Driver::mysql to replace 'REPLACE INTO ...' with
+           'INSERT INTO ... ON DUPLICATE KEY UPDATE ...'. See RT#37069.
+           Thanks to Steve Kirkup for the patch. I (Ron) installed MySQL V 5.0.51a for testing.
+           Note: http://dev.mysql.com/doc/refman/5.0/en/releasenotes-cs-5-0-45.html and similar docs
+           list various MySQL errors fixed recently for the above new syntax. Also, the new version
+           is now much more like the Postgres code, which is another reason it has been adopted.
+    * FIX: t/mysql.t used to test setting the global variable $CGI::Session::MySQL::TABLE_NAME.
+           The test for this (in t/mysql.t) was introduced in V 4.00_09.
+           However, since V 4.29_1, changes to CGI::Session::Driver's new() method mean
+           this way of setting the session table's name no longer works, and so the variable
+           $CGI::Session::MySQL::TABLE_NAME is now not used. Hence it has been removed.
+           Code in CGI::Session::Driver::DBI used to set $class::TABLE_NAME for all database drivers.
+           This code has also been removed. Moral: Don't use global variables.
+           Call $session = CGI::Session -> new(..., ..., (TableName => 'new_name'}) or,
+           after creating the object, call $session -> table_name('new_name').
+           To retrieve the name, call $name = $session -> table_name().
+
+4.32 - Tuesday, June 17, 2008
+    * FIX: Packaging of 4.31 release was botched. 
+
+4.31 - Tuesday, June 10, 2008
+    * FIX: Patch CGI::Session::Driver::DBI to check that the DBI handle still exists before trying
+           to ping it. This handles the case where the DBI object is destroyed before the session object.
+           See RT#35925.
+    * FIX: Patch CGI::Session::Driver::DBI's remove() which still hard-coded the column name 'id' instead
+           of using the new feature which allows the user to specify the name of the column. See RT#36235.
+    * FIX: Patch POD yet again to emphasize that an explicit call to destroy() should be followed by
+           explicit call to flush(), in particular in the case where the program is not exiting and
+           hence auto-flushing is not activated. Sections patched are 'A Warning about Auto-flushing'
+           and the docs for delete(). See RT#34668.
+
+4.30 - Friday, April 25, 2008
+
+    * FIX: Patch POD for CGI::Session in various places, to emphasize even more that auto-flushing is
+           unreliable, and that flush() should always be called explicitly before the program exits.
+           The changes are a new section just after SYNOPSIS and DESCRIPTION, and the PODs for flush(),
+           and delete(). See RT#17299 and RT#34668
+    * NEW: Add t/new_with_undef.t and t/load_with_undef.t to explicitly demonstrate the effects of
+           calling new() and load() with various types of undefined or fake parameters. See RT#34668
+    * FIX: Patch POD for new() and load() to clarify the result of calling these with undef, or with
+           an initialized CGI object with an undefined or fake CGISESSID. See RT#34668.
+           Specifically: You are strongly advised to run the old-fashioned
+           'make test TEST_FILES=t/new_with_undef.t TEST_VERBOSE=1' or the new-fangled
+           'prove -v t/new_with_undef.t', for both new*.t and load*.t, and examine the output
+    * FIX: Patch POD in various tiny ways to improve the grammar
+
+4.29_2 - Thursday, March 27, 2008
+
+    * FIX: stop ExtUtils::MakeMaker trying to create Build.PL (Ron Savage)
+    * FIX: Disable trying to use utf8 in tests. (Ron Savage) Ref RT#21981, RT#28516
+
+4.29_1 - Saturday, March 15, 2008
+
+    Special Thanks to Ron Savage who did the bulk of the work to put this release together. 
+
+    * FIX: Patch CGI::Session to fix RT#29138 (Patch by Barry Friedman)
+    * NEW: Add a note to CGI::Session's POD referring to utf8 problems, and include references
+           to RT#21981 (Reported by erwan) and RT#28516 (Reported by jasoncrowther)
+    * FIX: Patch CGI::Session::Driver::DBI.pm to fix RT#24601 (Patch by latypoff)
+    * FIX: Patch CGI::Session::Driver::DBI.pm to fix RT#24355 (Reported by fenlisesi, patch by Ron Savage)
+	* NEW: Add t/bug24285.t to ensure session data files are created properly when the user specifies a
+           directory other than /tmp (Reported by William Pearson RT#24285, patch by Ron Savage)
+    * FIX: Patch t/ip_matches.t and t/bug21592.t to remove test files left in /tmp, to fix RT#29969
+           (Reported by ANDK, patch by Ron Savage)
+    * FIX: Patch POD for CGI::Session::Driver::file to clarify how to use the option to change the
+           file name pattern used to created session files (Report by appleaday RT#33635,
+           patch by Ron Savage)
+    * FIX: Patch CGI::Session::Driver::sqlite to add sub DESTROY to fix RT#32932
+           (Patch by Alexander Batyrshin, corrected by Ron Savage)
+    * FIX: Remove CGI::Session::Seralize::json and t/g4_dbfile_json.t until such time as this code
+           can be made to work reliably. Both JSON::Syck and JSON::XS have been tried, and in both
+           cases t/g4_dbfile_json.t dies horribly (but differently). Patch POD for CGI::Session to
+           remove references to JSON. RT#25325 (Reported by bkw, patch by Ron Savage)
+    * NEW: Patch CGI::Session's POD and load() to allow the session/cookie name default of CGISESSID
+           to be overridden. (Patch by Lee Carmichael RT#33437, reformatted by Ron Savage). Lee has
+           also patched t/name.t to test the new functionality
+    * NEW: Split CGI::Session::Serialize::yaml out into its own distro. Get it hot from CPAN!
+    * NEW: Add Build.PL for Module::Build users. This also requires adding PL_FILES => {}
+           to Makefile.PL to beat ExtUtils::MakeMaker over the head, otherwise it executes
+           'perl Build.PL Build'
+    * NEW: Support specification of both the id column name and the a_session column name in the
+           sessions table, by extending the options acceptable in CGI::Session->new(..,..,{here}).
+           Allow:   {TableName => 'session',  IdColName => 'my_id', DataColName => 'my_data'}.
+           Default: {TableName => 'sessions', IdColName => 'id',    DataColName => 'a_session'}.
+           Allow any 1, 2 or 3 of these options. Missing keys default as specified.
+           (Patch by Chris RT#2224. Implemented differently by Ron Savage). Supported drivers:
+           o MySQL (native to CGI::Session)
+           o ODBC (separate distro, CGI::Session::Driver::odbc V 1.01)
+           o Oracle (separate distro, CGI::Session::Driver::oracle V 1.01)
+           o Postgres (native)
+           o SQLite (native)
+
+4.20 - Monday, December 4, 2006
+
+    * INTERNAL: No Changes since 4.20_1. Declaring stable. 
+
+4.20_1 - Friday, November 24, 2006
+
+    * FIX: -ip_match now works even when it's not the last import item. (RT#21779)
+    * FIX: In the PostgreSQL driver, a race condition is when storing is now worked around. (Mark Stosberg)
+    * FIX: Added important clarification and example to MySQL driver docs that the session column
+           needs to be defined as a primary key to avoid duplicate sessions. (Justin Simoni, Mark Stosberg)
+    * FIX: The default serializer now works correctly with certain data structures. (RT#?) (Matt LeBlanc)
+    * FIX: A documentation bug in find() was fixed (Matt LeBlanc)
+    * FIX: Documented how to declare a database handle to be used on demand, which was introduced
+           in 4.04. (Mark Stosberg)
+    * FIX: Connections made with SQLite now disconnect only when appropriate, instead of always. 
+           This addresses a symptom seen as "attempt to prepare on inactive database handle"
+           (Jaldhar Vyas, Sherzod, Mark Stosberg)
+    * FIX: Args to the constructor for CGI::Session and the drivers are now always shallow
+           copied rather than used directly, to prevent modification. 
+           (RT#21952, Franck Porcher, Sherzod, Mark Stosberg)
+    * FIX: The documentation for expire($param, $time) was made more explicit
+           (pjf, Mark Stosberg) 
+    * NEW: Added recommended use of flush() to the Synopsis (Michael Renner, RT#22333)
+    * NEW: Added links to Japanese translations of the documentation (Makio Tsukamoto)
+           http://digit.que.ne.jp/work/index.cgi?Perldoc/ja
+    * INTERNAL: Update test to workaround YAML versions less than 0.58. (Matt LeBlanc)
+    * INTERNAL: param() code was refactored for clarity (Mark Stosberg, Ali ISIK, RT#21782)
+    * INTERNAL: new() and load() were refactored (Ali Isik)
+    * INTERNAL: renamed some environment variables used for testing (Ron Savage)
+    * INTERNAL: Multi key-value syntax of param() now always returns number of keys
+      successfully processed, 0 if no key/values were processed. 
+
+4.14 - Sunday, June 11, 2006
+
+    * NEW: The find() command now has better documentation. (Ron Savage, Matt LeBlanc)
+    * FIX: find() no longer changes the access or modified times (RT#18442) (Matt LeBlanc)
+    * FIX: param() called with two parameters now returns the value set, if any (RT#18912) (Matt LeBlanc)
+    * FIX: driver, serializer, and id generator names are now untainted (RT#18873) (Matt LeBlanc)
+    * INTERNAL: automatic flushing has been documented to be unreliable, although
+      it was recommended in the past. Automatic flushing can be affected adversely 
+      in persistent environments and in some cases by third party software. There are 
+      also some cases in which flushing happened automatically in 3.x, but quit working
+      with 4.x. See these tickets for details.
+
+       http://rt.cpan.org/Ticket/Display.html?id=17541
+       http://rt.cpan.org/Ticket/Display.html?id=17299
+
+4.13 - Wednesday, April 12, 2006
+
+    * FIX: Applied patch to fix cookie method (RT#18493,Nobuaki ITO)
+    * FIX: Berkeley DB 1.x exhibits a bug when used in conjunction with O_NOFOLLOW. Because of this,
+      we've removed it from the db_file driver. It will still attempt to stop symlinks but the
+      open itself has dropped the flag. (Matt LeBlanc)
+    * FIX: json and yaml db_file tests now check for the presence of DB_File. (Matt LeBlanc)
+
+4.12 - Friday, April 7, 2006
+
+    * SECURITY: Fix possible SQL injection attack. (RT#18578, DMUEY)
+
+4.11 - Friday, March 31, 2006
+    
+    * FIX: Since 4.10, using name() as a class method was broken. This has
+      been fixed, and regression tests for both uses have been added. (Matt LeBlanc)
+
+4.10 - Tuesday, March 28, 2006
+
+    * SECURITY: Hopefully this settles all of the problems with symlinks. Both the file
+      and db_file drivers now use O_NOFOLLOW with open when the file should exist and
+      O_EXCL|O_CREAT when creating the file. Tests added for symlinks. (Matt LeBlanc)
+    * SECURITY: sqlite driver no longer attempts to use /tmp/sessions.sqlt when no
+      Handle or DataSource is specified. This was a mistake from a security standpoint
+      as anyone on the machine would then be able to create and therefore insert data
+      into your sessions. (Matt LeBlanc)
+    * NEW: name is now an instance method (RT#17979) (Matt LeBlanc)
+
+4.09 - Friday, March 16th, 2006
+
+    * SECURITY: Applying security patch from: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=356555 (Julien Danjou)
+
+4.08 - Thursday, March 15th, 2006
+
+    * FIX: DESTROY was sometimes wiping out exception handling. RT#18183, Matt LeBlanc.
+    * SECURITY: Resolve some issues in: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=356555
+      - db_file and file now check for symlinks either explicitly or by using O_EXCL on sysopen
+      - file creation umask defaults to 660
+    * NEW: db_file and file drivers now accepts a UMask option. (Matt LeBlanc)
+    * INTERNAL: test suite clean up (Tyler MacDonald)
+
+4.07 - Thursday, March 9th, 2006
+
+    * INTERNAL: MANIFEST update to fix release.
+
+4.06 - Wednesday, March 3rd, 2006
+
+    * INTERNAL: MANIFEST update to fix release.
+
+4.06 - Wednesday, March 8th, 2006
+
+    * FIX: some stray warnings when flushing:  "Use of uninitialized value in numeric eq (==)" (RT#14603)
+    * NEW: JSON and YAML serializers (Tyler MacDonald)
+    * INTERNAL: CGI::Session::Test::Default accepts a "skip" argument,
+      listing tests that should be skipped. (Tyler)
+
+4.05 - Friday, March 3rd, 2006
+    * FIX: Race condition fixed when writing to session files (RT#17949)
+
+4.04 - Wednesday, March 01, 2006
+    * NEW: File driver now has option to disable flock (for those running
+      Win 9x, VMS, MacPerl, VOS and RISC OS). (Matt LeBlanc)
+    * FIX: If DBI driver was initialized using 'Handle', Driver::DBI::init()
+      returned false, and Driver::new() thought init faild and kept returning
+      undef. The problem was fixed by making sure Driver::DBI::init() returned
+      true. (Sherzod)
+    * Added .*cgisess.* to disclude cgisess.db, cgisess.id, and any session
+      files created in the t directory. (Matt LeBlanc)
+    * FIX: File driver now respects $CGI::Session::File::FileName for 3.9x
+      compatibility. (Matt LeBlanc)
+    * FIX: Default serializer now properly handles data structures that appear
+      more than once in the serialized data structure (before it'd result in data
+      structures that were equivalent but did not have the same address). (Matt LeBlanc)
+    * FIX: File driver now localizes the filehandle to avoid any possibility
+      of extended locking in persistent environments (Matt LeBlanc)
+    * FIX: File driver now locks the file when retrieving the session data (Matt LeBlanc)
+    * NEW: DBI Drivers now support a lazy loaded database handle. This is useful with the
+      CGI::Application plugin system. If the session is never used, the database handle may not
+      not need to be created. The syntax is to use a code ref:
+        Handle => sub {DBI->connect} (Mark Stosberg)
+
+    Finally, be aware that since 4.0 some people have reported problems with
+    the auto-flushing code. There may be an unresolved. You always  call
+    flush() to be safe. Input or code contributions for the issue are
+    appreciated. Some related tickets include:
+
+    http://rt.cpan.org/Public/Bug/Display.html?id=14604
+    http://rt.cpan.org/Public/Bug/Display.html?id=16861
+    http://rt.cpan.org/Public/Bug/Display.html?id=17541
+    http://rt.cpan.org/Public/Bug/Display.html?id=17299
+
+4.03 - Wednesday, October 05, 2005
+    * FIX: automatic flushing did not work if session object was global
+    * FIX: Default serializer can now serialize objects (Matt LeBlanc)
+    * INTERNAL: SQLite driver no longer needs MIME::Base64 for encoding (Matt LeBlanc)
+
+4.02 - Friday, September 02, 2005
+    * FIX: remote_addr() was missing (RT #14414])
+
+4.01 - Thursday, September 01, 2005
+    * FIX: Minor POD fix
+
+4.00 - Wednesday, August 31, 2005
+
+    *** NOTE ***
+    The 4.0 release represents a major overhaul of the CGI::Session code base.
+    Care has been taken to be 100% compatible with applications developed with 3.x.
+    However, you are encouraged to run regression tests with your own applications
+    before using this in production.
+
+    * NEW: PostgreSQL driver enhanced to work better with binary serializers (Matt LeBlanc)
+    * FIX: update to un tainting in default serializer to make "-T" happy (Matt LeBlanc)
+    * FIX: CGI::Session (qw/-ip_match/), a 3.x feature, works again (Shawn Sorichetti)
+    * INTERNAL: Improved documentation shown during "make", which explains how to run
+      database-driven tests. (Mark Stosberg)
+    * FIX: to support binary serializers SQLite driver uses MIME::Base64 (Sherzod Ruzmetov)
+
+4.00_09 - Thursday, July 21, 2005
+
+    * CHANGE: Starting with 4.0, it will no longer work to use the syntax of
+      CGI::Session::DriverName(). This hasn't been a documented API since CGI::Session 2.94,
+      released in August, 2002.
+    * FIX: documented etime(), which was present in 3.x (Mark Stosberg)
+    * FIX: Added code, test and docs to make $CGI::Session::File::FileName work,
+      for 3.x compatibility. (Mark Stosberg)
+    * FIX: Providing an expire time like "-10" now works (Mark Stosberg)
+    * FIX: Restored close() method, for 3.x compatibility. (Mark Stosberg)
+    * FIX: Make ->clear('email') work, for 3.95 compatibility (Mark Stosberg)
+    * FIX: Added back is_new() for compatibility with 3.95. (Mark Stosberg)
+    * FIX: Support for CGI::Simple is confirmed, resolving RT#6141 (Mark Stosberg)
+    * FIX: Add code and tests for $CGI::Session::MySQL::TABLE_NAME, which worked in 3.x (Mark Stosberg)
+
+    * DOCS: CGI::Session now has a public Subversion repository, thanks to Jason Crome.
+      See the bottom of the CGI::Session docs for details.
+
+4.00_08 - Tuesday, March 15, 2005
+
+    * FIX: Changes made in 4.00_07 rolled back
+
+4.00_07 - Sunday, March 13, 2005
+
+    * FIX: overloaded objects are now stored properly
+
+4.00_06 - Thursday, February 24, 2005
+
+    * FIX (?): a test script was failing on Win32
+    * FIX: inaccurate error reporting in load()
+
+4.00_05 - Tuesday, February 22, 2005
+
+    * FIX: case insensitivity was not enforced properly in CGI::Session::parse_dsn()
+
+4.00_04 - Wednesday, February 16, 2005
+
+    * FIX: Minor fix in tests suits and error-checking routines of
+      serializers and id-generators
+
+4.00_03 - Friday, February 11, 2005
+
+    * NEW: CGI::Session::find() introduced
+    * NEW: traverse() introduced into drivers to support CGI::Session::find()
+    * DOCS: More complete driver specs documented
+
+4.00_02 - Wednesday, February 09, 2005
+
+    * FIX: race conditions in Driver/file.pm pointed out by Martin Bartosch
+
+4.00_01 - Wednesday, February 09, 2005
+
+    * NEW: load() - constructor method to prevent unnecessary session creations
+    * NEW: is_expired() - method to intercept expired sessions
+    * NEW: is_empty() - to intercept requests for un existing sessions
+    * NEW: more optimized source code
+    * NEW: updated and improved driver specs
+    * NEW: standard testing framework
+    * NEW: 'sqlite' driver
+
+3.12
+
+    * cache() method introduced, which is normally used by library drivers to
+      cache certain value within the single process
+    * Apache::Session-like tie interface supported (EXPERIMENTAL!)
+    * trace() and tracemsg() methods added for debugging purposes
+
+3.8
+
+    * Abbreviations in DSN parameters are supported via Text::Abbrev.
+    * Automatic api3 detection makes "-api3" switch obsolete
+    * Experimental "-frozen" switch added, but not yet functional.
+    * sync_param() utility function added
+    * header() replacement to CGI::header() added, which outputs
+      proper HTTP headers with session information
+    * Private data records have been documented.
+    * Bug in clear() kept failing if passed no arguments to be cleared.
+
+3.x
+
+    * Ability to choose between serializers, drivers and id generators
+      while creating the session object. Supported via '-api3' switch.
+    * New serializers added: Storable, FreezeThaw in addition to Default.
+    * New ID generator added: Incr, which generates auto incrementing
+      id numbers, in addition to MD5
+    * "-ip_match" switch enabled for additional security
+    * Expire() method is fully functional
+    * Ability to expire certain session parameters
+    * Better documented drivers specifications
+    * Main documentation is split into two:
+        1) CGI::Session and 2) CGI::Session::Tutorial
+    * Bug in POD documentation is fixed (thanks to Graham Barr)
+
+
+$Id$

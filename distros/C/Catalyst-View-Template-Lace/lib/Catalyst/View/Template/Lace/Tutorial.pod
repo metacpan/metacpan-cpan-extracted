@@ -1,0 +1,440 @@
+=head1 Overview
+
+You should review the documentation at L<Catalyst::View::Template::Lace> and it would be helpful to have
+reviewed the documentation at L<Template::Lace> as well, much of which will overlap in this tutorial.
+
+Given a L<Catalyst> project called L<MyApp> (located $HOME/lib/MyApp.pm) setup in the normal way lets see an example template ($HOME/lib/MyApp/View/user.html)
+
+    <html>
+      <head>
+        <title>User Info</title>
+      </head>
+        <body>
+          <dl id='user'>
+            <dt>Name</dt>
+            <dd id='name'> -NAME- </dd>
+            <dt>Age</dt>
+            <dd id='age'> -AGE- </dd>
+            <dt>Motto</dt>
+            <dd id='motto'> -MOTTO- </dd>
+          </dl>
+        </body>
+    </html>
+
+The most basic template for Template::Lace is just plain old HTML.  No placeholders, loop commands, etc.  Less logic than even the 'logic-less' Mustache!
+
+So you have to be thinking, there must be some way to tie data into this template?  And you'd be correct.  In addition to the template you need a view class that define a template model.  Here's an view class to go along with the HTML template we just looked at.
+
+    package  MyApp::View::User;
+
+    use Moo;
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole',
+      'Template::Lace::Model::AutoTemplate';
+
+    has [qw/age name motto/] => (is=>'ro', required=>1);
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      $dom->dl('#user', +{
+        age=>$self->age,
+        name=>$self->name,
+        motto=>$self->motto});
+    }
+
+    1;
+
+When this view class gets used (for example in a Catalyst controller as given below) the method process_dom is called and is passed a  DOM version of the template.  You can then run directives on it to change the DOM and bind it to instance data associated with an instance of the view class.  In the example above we could translate the commands in process_dom to something like: "Find the first tag 'dl' that has an id of 'user', and then find the three tags with an id of 'age', 'name', and 'motto' respectively.  For each of those three tags set the content value to be the value of attributes 'age', 'name', and 'motto'."
+
+Unlike a more traditional template system like Template::Toolkit, we don't mix display logic into the template.  Instead we have a separate class that contains those instructions.  By default this class is the same as the View class, although you can set the 'model_class' attribute to point to any class that does L<Template::Lace::ModelRole>. The upside of this approach is you end up with very clean templates, and you can express your view logic in a full language like Perl instead of whatever mini language your template system supports.  The possible downsides can include an initial higher learning curve and the possibility your display logic gets complex and hard to match to the template (although good use of components I think will reduce this problem significantly; as shown below).  Lets see how you might call this view class from a controller in Catalyst:
+
+    package MyApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    extends 'Catalyst::Controller';
+
+    sub display :Path('') {
+      my ($self, $c) = @_;
+      $c->view('User',
+        name => 'John',
+        age => 42,
+        motto => 'Why Not?')
+        ->http_ok;  
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+Here you can see we are calling the view and passing it the required attributes.  Attributes can also come from application configuration (or even the stash, if you are using the role L<Catalyst::View::Template::Lace::Role::ArgsFromStash>).  In this example the values are hard coded but you can probably see it would be just as easy to pull the values from a database.  Additionally we also call the method http_ok which is a helper method that takes the rendered view and sets it up as the response (with a HTTP status code of 200 OK; the Catalyst view for this automatically sets the text/html content-type).  When run it would produce a response like:
+
+    <html>
+      <head>
+        <title>
+          User Info
+        </title>
+      </head>
+      <body id="body">
+        <dl id="user">
+          <dt>
+            Name
+          </dt>
+          <dd id="name">
+            John
+          </dd>
+          <dt>
+            Age
+          </dt>
+          <dd id="age">
+            42
+          </dd>
+          <dt>
+            Motto
+          </dt>
+          <dd id="motto">
+            Why Not?
+          </dd>
+        </dl>
+      </body>
+    </html>
+
+This is the bare basics of Template::Lace but there's a ton of other features and ways to better manage the complexity of your display logic.  I'm going to leave you with a short taste of what a more complex template with components might look like.  Here's a template that contains a form with an input controls, as well as a footer and 'master' layout.  Its job is to display a list of Todo items.
+
+($HOME/lib/MyApp/View/list.html):
+
+    <view-master title=\'title:content'
+        css=\'@link'
+        meta=\'@meta'
+        body=\'body:content'>
+      <html>
+        <head>
+          <title>Things To Do</title>
+          <link href="/static/summary.css" rel="stylesheet"/>
+          <link href="/static/core.css" rel="stylesheet"/>
+        </head>
+        <body>
+          <view-form id="newtodo" fif='$.form.fif' errors='$.form.errors'>
+            <view-input id='item'
+                label="Todo"
+                name="item"
+                type="text" />
+          </view-form>
+          <ol id='todos'>
+            <li> -What To Do?- </li>
+          </ol>
+          <view-footer copydate='$.copywrite' />
+        </body>
+      </html>
+    </view-master>
+
+The main view class for this template is just handling the bit where we layout the Todo items.  Everything else on this page is delegated to a component.  Here's the class:
+
+    package  MyApp::View::List;
+
+    use Moo;
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole',
+      'Template::Lace::Model::AutoTemplate';
+
+    has [qw/form items copywrite/] => (is=>'ro', required=>1);
+
+    sub time { return scalar localtime }
+
+    sub prepare_dom {
+      my ($class, $dom, $merged_args) = @_;
+
+      # Add some meta-data
+      $dom->at('head')
+        ->prepend_content("<meta startup='${\$self->time}'>");
+    }
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      $dom->ol('#todos', $self->items);
+    }
+
+So this is matching the tag 'ol' with an id of 'todos' and filling it with the list of items in attribute 'items'.  The 'ol' method helper is smart enough to know that if you are assigning a list to an 'ol' tag we want to loop over the list and create 'li' tags based on the template. This makes using L<Template::Lace> easy for doing a lot of the more common display work like filling loops and content. 
+
+You might have noticed this view class added a new method compared to the earlier example C<prepare_dom>.  Generally when you render a response what you care about is all the things that are unique to that response.  However sometimes you want to add a few static things to your template, things that never change on a per result basis.  Or maybe you want to prerender somethign that's expensive and you don't want the overhead for each request.  In that case you can modify the base DOM using C<prepare_dom>, which gets called only once at application startup. Since each request gets a clone of the base DOM for the template, anything you change in C<prepare_dom> becomes part of all your responses for this view.  In this example we added a C<meta> tag to the template head which contains some useful debugging information.
+
+So what about the components such as 'view-master', and 'view-footer'?  There's a few different ways to declare components in L<Template::Lace> (at core a component is just an object that expects methods 'create' and 'process_dom') but for the L<Catalyst> adaptor we added the ability to use any existing view (that does L<Template::Lace::ModelRole>) as a component.  This makes organizing your components for reuse easy and takes good advantage of Catalyst features.  Lets start by looking at an simple component, C<view-footer>.  This was declared in the core template with the following line:
+
+    <view-footer copydate='$.copywrite' />
+
+When L<Catalyst> is processing a view it follows the tree of components which have been added to it (component discovery and setup happen once at the setup stage, so that effort is a one time startup cost).  When it processes the component it calls the associated view and passes to it arguments you declare as attributes in the HTML tag (it also passes any additional arguments that might exist in configuration).  We discover the view name with a simple convention of 'ucfirst' on the name part of the component tag (in this case 'footer' becomes 'Footer').  In addition we prepare the attributes by passing information from the containing view.  In this case we set the value of 'copydate' to the value of '$self->copywrite' which is an attribution on the List view.  We call the view and get its response; then we replace the entire HTML node matching the component with that response.  So you could roughly translate that component declaration to:
+
+    my $footer_dom = $c->view('Footer', copydate=>$self->copywrite)->get_processed_dom;
+
+And the View class for this looks like:
+
+    package  MyApp::View::Footer;
+
+    use Moo;
+
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole';
+
+    has copydate => (is=>'ro', required=>1);
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      $dom->at('#copy')
+        ->append_content($self->copydate);
+    }
+
+    sub template {
+      my $class = shift;
+      return q[
+        <section id='footer'>
+          <hr/>
+          <p id='copy'>copyright </p>
+        </section>
+      ];
+    }
+
+    1;
+
+One thing to note, we put the actual HTML template in a method 'template' instead of using the role L<Template::Lace::Model::AutoTemplate> and a stand alone file.  Its your choice but for these small components I like to keep all the code in one file.  In any case there's a clear interface that the component is requiring and a clear method to map information from the containing view to the component. When run example output of this component would be:
+
+        <section id='footer'>
+          <hr/>
+          <p id='copy'>copyright 201</p>
+        </section>
+
+Lets look at a somewhat more complex component, 'view-form'.  Here's the class:
+
+    package  MyApp::View::Form;
+
+    use Moo;
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole';
+
+
+    has [qw/id fif errors content/] => (is=>'ro', required=>0);
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      $dom->at('form')
+        ->attr(id=>$self->id)
+        ->content($self->content);      
+    }
+
+    sub template {
+      my $class = shift;
+      return q[<form></form>];
+    }
+
+    1;
+
+Now, this component is different from the view-footer component since it contains additional HTML nodes (for example it contains the 'view-input' component but it could contain any mix of HTML and components).  When we render this component we want to make sure that 'inner' content doesn't disappear.  Luckly when we call to create and render a component we automatically pass an argument 'content' which is the inner content of the component.  You don't need to declare it as an attribut in the component HTML, you just need to capture it with an attribute called 'content' as in the example above.  This is very similar to the WRAPPER concept you might take advantage of in many other template systems such as Template::Toolkit.  This component also takes two additional attributes 'fif' and 'errors' which it doesn't use itself.  As we will see those are consumed by the inner component children, the 'view-input' component. Here's the code for the 'view-input' component:
+
+    package  MyApp::View::Input;
+
+    use Moo;
+    use Patterns::UndefObject::maybe;
+
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole';
+
+    has [qw/id label name type container model/] => (is=>'ro');
+
+    has value => (
+      is=>'ro',
+      lazy=>1,
+      default=>sub { $_[0]->container->maybe::fif->{$_[0]->name} },
+    );
+
+    has errors => (
+      is=>'ro',
+      lazy=>1,
+      default=>sub { $_[0]->container->maybe::errors->{$_[0]->name} },
+    );
+
+    sub process_dom {
+      my ($self, $dom) = @_;
+      
+      # Set Label content
+      $dom->at('label')
+        ->content($self->label)
+        ->attr(for=>$self->name);
+
+      # Set Input attributes
+      $dom->at('input')->attr(
+        type=>$self->type,
+        value=>$self->value,
+        id=>$self->id,
+        name=>$self->name);
+
+      # Set Errors or remove error block
+      if($self->errors) {
+        $dom->ol('.errors', $self->errors);
+      } else {
+        $dom->at("div.error")->remove;
+      }
+    }
+
+    sub template {
+      my $class = shift;
+      return q[
+        <link href="css/main.css" />
+        <style id="min">
+          div { border: 1px }
+        </style>
+        <div class="field">
+          <label>LABEL</label>
+          <input />
+        </div>
+        <div class="ui error message">
+          <ol class='errors'>
+            <li>ERROR</li>
+          </ol>
+        </div>
+      ];
+    }
+
+    1;
+
+So there's a lot going on here!    When run this will ask its containing component (in this case the view-form component) for its value and any errors.  The view-form component, BTW got its values from the containing view, via attributes in the template (fif='$.form.fif' and errors='$.form.errors' ).  It will then use that value to setup the input tag and populate and error messages; otherwise we delete the error messages block. The entire result will be inserted into the original template at the same node point as occupied by the component.
+
+This example is not intended to propose a best practice but just to show how components can interact with one another.  You might decide its simpler for the child components to get their arguments directly from the containing model, for example.  Or you could take advantage of how a parent component can supply arguments to a child during creation instead.
+
+There's one more component at work in this example, the 'view-master' component.  This is intended to be an example of a type of master page wrapper that controls the overall basic structure of many pages on on website.  Lets look again at the top of its declaration:
+
+    <view-master title=\'title:content'
+        css=\'@link'
+        meta=\'@meta'
+        body=\'body:content'>
+
+So this component declares four arguments, but how are the values for these arguments populated?  In this case the '\' prepended to the value indicates that the value is a reference to a node (or nodes) in the contained DOM.  The idea here is that the 'view-master' component is a type of overlay that replaces the original template, but picks out some parts of it and sticks them into itself.  In this case we are getting the content of the 'title' and 'body' tags, as well as the array of css and meta tags inside the original DOM.  That information is passed to the 'view-master' component which then overlays the original DOM. Lets look at that view class:
+
+    package  MyApp::View::Master;
+
+    use Moo;
+    extends 'Catalyst::View::Template::Lace';
+    with 'Template::Lace::ModelRole';
+
+    has title => (is=>'ro', required=>1);
+    has css => (is=>'ro', required=>1);
+    has meta => (is=>'ro', required=>1);
+    has body => (is=>'ro', required=>1);
+
+    sub on_component_add {
+    my ($self, $dom) = @_;
+    $dom->title($self->title)
+      ->head(sub { $_->append_content($self->css->join) })
+      ->head(sub { $_->prepend_content($self->meta->join) })
+      ->body(sub { $_->at('h1')->append($self->body) })
+      ->at('#header')
+        ->content($self->title);
+    }
+
+    sub template {
+    my $class = shift;
+    return q[
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <meta content="width=device-width, initial-scale=1" name="viewport" />
+          <title>Page Title</title>
+          <link href="/static/base.css" rel="stylesheet" />
+          <link href="/static/index.css" rel="stylesheet"/ >
+        </head>
+        <body id="body">
+          <h1 id="header">Intro</h1>
+        </body>
+      </html>        
+      ];
+    }
+
+    1;
+
+If you are looking carefully you have noticed instead of a 'process_dom' method we have a 'on_component_add' method.  We could do this with 'process_dom' but that method runs for every request and since this overlay contains no dynamic request bound information its more efficient to run it once ('on_component_add' runs once at setup time; the change it makes becomes part of the base DOM which is cloned for every following request).  So 'on_component_add' is like 'prepare_dom' except it allows a component to modify the DOM of the view that is calling it instead of its own.
+
+What might a controller that is invoking all this look like?
+
+    package MyApp::Controller::List;
+
+    use warnings;
+    use strict;
+    use base 'Catalyst::Controller';
+
+    sub display :Path('') Args(0) {
+      my ($self, $c) = @_;
+      $c->view('List',
+        copywrite => 2015,
+        form => {
+          fif => {
+            item => 'milk',
+          },
+          errors => {
+            item => ['too short', 'too similar it existing item'],
+          }
+        },
+        items => [
+          'Buy Milk',
+          'Walk Dog',
+        ],
+      )->http_ok;
+    }
+
+    1;
+
+Here's a sample of the actual result, rendering all the components (you can peek at the repository which has all the code for these examples to see how it all works)
+
+    <html>
+      <head>
+        <meta startup="Fri Mar 31 08:43:24 2017">
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1" name="viewport">
+        <title>
+          Things To Do
+        </title>
+        <link href="/static/base.css" rel="stylesheet" type="text/css">
+        <link href="/css/input.min.css" rel="stylesheet" type="text/css">
+        <script src="/js/input.min.js" type="text/javascript"></script>
+      </head>
+      <body id="body">
+        <h1>
+          Things To Do
+        </h1>
+        <form id="newtodo">
+          <div class="field">
+            <label for="item">Todo</label> <input id="item" name="item" type="text" value="milk">
+          </div>
+          <div class="ui error message">
+            <ol class="errors">
+              <li>too short
+              </li>
+              <li>too similar it existing item
+              </li>
+            </ol>
+          </div>
+         </form>
+        <ol id="todos">
+          <li>Buy Milk
+          </li>
+          <li>Walk Dog
+          </li>
+        </ol>
+        <section id="footer">
+          <hr>
+          <p id="copy">
+            copyright 2015
+          </p>
+        </section>
+      </body>
+    </html>
+
+So even though we have a page with a lot happening, we can write a view class that focuses just on the primary task (display the list of Todos) and let components handle the other work.  A complex template can be logically divided into clear chunks, each dedicated to one function. I believe this leads to well organized and concise templates that are maintainable over the long term.
+
+=head1 Summary
+
+This has been an overview of L<Template::Lace>.  There's a ton more you can do with this, but this is the essential bits.  If interested see the Github repository; feel free to fork and contribute!  
+
+L<https://github.com/jjn1056/Template-Lace>
+
+also see Perl Catalyst, a MVC framework for web development: L<https://metacpan.org/release/Catalyst-Runtime>
+and Perl (L<https://www.perl.org>)
+
+=cut
+

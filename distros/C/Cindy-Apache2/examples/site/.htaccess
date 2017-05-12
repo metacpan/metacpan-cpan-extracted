@@ -1,0 +1,12 @@
+# $Id: .htaccess 69 2013-01-27 14:59:35Z jo $
+
+# If the visible text is not usable as a file name
+# the description can be used
+AddDescription "What's this?" 10_About.shtml
+# If you don't want to change the file name, this is also helpful
+AddDescription "Deutschsprachig" 05_Gesundheit
+
+# Do not show the technical files in the index
+IndexIgnore tec images
+
+

@@ -1,0 +1,103 @@
+#!/usr/bin/perl -w
+# 315NqwR: ptok created by Pip@CPAN.Org to be a simple curses PipTime clOcK.
+# Keyz: 'F' toggles display Format.       'S' rotates update Speed.
+#       'B' toggles visual spectrum Bars. 'C' Clears screen after every draw.
+#       'P' enters Passwd exit mode.      'X' or 'Q' eXits.
+use strict; use Math::BaseCnv qw(:all); use Time::PT; use Curses::Simp; use Time::DaysInMonth;
+my $mjvr = 1; my $mnvr = 0; my $ptvr = 'A6GDCOD'; my $auth = 'Pip Stuart <Pip@CPAN.Org>'; my $name = $0; $name =~ s/.*\///;
+my $ptim; my @fldz; my @lasf; my @text; my @fclr; my $parm = ''; my $clea = 0; my $keey = -1; my $sped =  0.987;
+my $barz =  0; my $bilt =  0; my $bchr = '#';                    my $pwex = 1; my $pwnd = ''; my $pswd = 'poop';
+my $simp = tie(@text, 'Curses::Simp', 'flagaudr' => 0, 'flagcntr' => 0, 'flagprin' => 0); my $barh = int(($simp->Hite() - 8) / 7) - 1;
+my @limz = (63, 12, 31, 23); my @bclz = ('R', 'O', 'Y', 'G', 'C', 'B', 'P'); my @spdz = (0, 0.015, 0.151, 0.987); # old speed progression: 0.016,0.064,0.256
+tie(@fclr, 'Curses::Simp::FClr', $simp); @fclr = (' ' x 20  . 'ROYGCBP ');
+while((!$pwex && lc($keey) ne 'x' && lc($keey) ne 'q' && ord($keey) != 27) || ( $pwnd !~ /$pswd$/)){          # toggle clear      flag
+  if   (lc($keey) eq 'c'){    $clea ^=   1;                                                                                             }
+  elsif(   $keey  eq 'B'){ if($bchr eq 'Û') { $bchr        = '@'; }                                           # toggle Bars  char flag
+                           else             { $bchr        = 'Û'; }                                                                     }
+  elsif(   $keey  eq 'b'){ if($barz ^=   1) { $simp->FlagMaxi(1); }                                           # toggle bars       flag
+                           else             { $simp->Hite(    1); } $simp->ShokScrn(2); $simp->Draw();                                  }
+  elsif(lc($keey) eq 'p' && !$pwex){ $simp->Mesg('titl' => '', 'wait' => 3, 'flagprsk' => 0, 'Changed to PassWd EXit mode'); $pwex = 1; }
+  elsif(lc($keey) eq 's'){ for(0..$#spdz){ if($sped == $spdz[$_]){ if($_ == $#spdz){ $sped = $spdz[0];      } # cycle speed
+                                                                   else            { $sped = $spdz[$_ + 1]; } last; } }                 }
+  elsif(lc($keey) eq 'f'){ if(length($parm)){ $parm =   ''; $fclr[0] = ' ' x 20 .          'ROYGCBP ';      }
+                           else             { $parm = 'pt'; $fclr[0] = 'YYY OOO YY GGWCCWBBWPP RRRR ';      }                           }
+  elsif(lc($keey) eq 'i'){                                                      $simp->Mesg('type' => 'info', # Display an Info dialog window
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+ 
+$name was written to be my primary clock
+ 
+  Shout out to Keith && all the LBox.Org crew.  Thanks to Beppu-san
+for being a good friend.  I hope you find $name useful.  Please don't
+hesitate to let me know if you app-ree-see-ate it or if you'd like
+me to add something for you.  I'd be glad to improve it given new 
+suggestions.  Please support FSF.Org && EFF.Org.  Thanks.  TTFN.
+ 
+                                                       -Pip\n \n");                                                                     }
+  elsif(lc($keey) eq 'h' || $keey eq '?' || $keey eq 'KEY_F1'){                 $simp->Mesg('type' => 'help', # HELP!
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+
+                        Global Keys:                                
+  h         - displays this Help screen                             
+  f         - toggles compressed / expanded Format                  
+  b         - toggles Bars mode                                     
+  B         - toggles Bars character ('Û' or '\@')                   
+  s         - rotates update Speed                                  
+  c         - Clear screen before each draw update                  
+
+                        System Stuff:
+       ?/H/F1  - Help  :  i - Info  :  x/q/Esc - eXit");                                                                                }
+  $ptim = Time::PT->new();
+  if(exists(    $ENV{'TZ' }) && $ENV{'TZ'} eq 'UTC'){
+    my $DST   = 0; # Daylight Savings Time module or tst here?
+       $DST   = $ENV{'DST'} if(exists($ENV{'DST'}));
+       $ptim -=     '8000'; $ptim += '1000' if($DST);
+      #$ptim -=   '110000' if($ptim->D() eq '0'); # subtract a day && month if day became zero around DST
+    if(  $ptim->D() eq '0'){ $ptim->M(b64(b10($ptim->M() - 1)));
+      if($ptim->M() eq '0'){ $ptim->Y(b64(b10($ptim->Y() - 1))); $ptim->M(12);}
+         $ptim->D(days_in(2000 + $ptim->Y(),  $ptim->M()     ));              } }
+  @fldz = split(//, $ptim); @lasf = @fldz unless(@lasf);
+  if(length($parm)){ $text[0] = $ptim->expand(); }#{`pt $parm`; }
+  else             { $text[0] = ' ' x 20 . join('', @fldz); }
+  $simp->{'_wind'}->clear() if($clea);
+  if(  $barz){
+    if($bilt){ my $blin = $bchr x $simp->Widt();
+      for(my $i    = 0; $i < 7; $i++){ if($lasf[$i] ne $fldz[$i]){
+          my $timz = int(($simp->Widt() / 64.0) *  b10($fldz[$i]));
+          my $line = $bclz[$i] x $timz;
+        if(  $i   >= 4 || b10($fldz[$i]) < $limz[$i]){
+          if($i   <  4){
+             $timz = int(($simp->Widt() / 64.0) * ($limz[$i] - b10($fldz[$i])));
+            if   ($i == 1){ $line     .=          'B'  x $timz; }   # special month case
+            elsif($i == 2){ $line     .=          'w'  x $timz; }   # special day   case
+            else          { $line     .= lc($bclz[$i]) x $timz; } } # year && hour
+          elsif(b10($fldz[$i]) < 59){                               # min,sec,frm
+             $timz = int(($simp->Widt() / 64.0) * (59 - b10($fldz[$i])));
+             $line.=  lc( $bclz[$i]) x $timz; } }
+        $line     .= 'b' if(length($fclr[-1]) < (2 * $simp->Widt()));
+          my $indx = 1 + ($i * ($barh+1)); for($indx..($indx+$barh)){ $fclr[$_] = $line; } $simp->Draw();
+      } }    @lasf = @fldz; }
+    else     {
+      for(my $i    = 0; $i < 7; $i++){
+        push(@text, $bchr x $simp->Widt()) for(0..$barh); my $timz = int(($simp->Widt() / 64.0) * b10($fldz[$i]));
+        push(@fclr, $bclz[$i] x $timz);
+        if(  $i     >= 4 || b10($fldz[$i]) < $limz[$i]){
+          if($i     <  4){
+             $timz = int(($simp->Widt() / 64.0) * ($limz[$i] - b10($fldz[$i])));
+            if   ($i == 1){ $fclr[-1] .=          'B'  x $timz; }   # special month case
+            elsif($i == 2){ $fclr[-1] .=          'w'  x $timz; }   # special day   case
+            else          { $fclr[-1] .= lc($bclz[$i]) x $timz; } } # year && hour
+          elsif(b10($fldz[$i]) < 59){                               # min,sec,frm
+            $timz = int(($simp->Widt() / 64.0) * (59 - b10($fldz[$i])));
+            $fclr[-1] .= lc($bclz[$i]) x $timz; } }
+        if(length($fclr[-1]) < (2 * $simp->Widt())){ $fclr[-1] .= 'b'; }
+        for(1..$barh){ push(@fclr, $fclr[-1]); }
+      }
+      push(@text, 'The YEAR   in RED    is a spectrum from 2000 to 2063.');
+      push(@text, 'The MONTH  in ORANGE is a spectrum from    1 to   12 (January  to December).');
+      push(@text, 'The DAY    in YELLOW is a spectrum from    1 to   31.');
+      push(@text, 'The HOUR   in GREEN  is a spectrum from    0 to   23 (Midnight to 11 PM).');
+      push(@text, 'The MINUTE in CYAN   is a spectrum from    0 to   59.');
+      push(@text, 'The SECOND in BLUE   is a spectrum from    0 to   59.');
+      push(@text, 'The 60th   in PURPLE is a spectrum from    0 to   59.'); push(@fclr, $bclz[$_]) foreach(0..$#bclz); $simp->Draw(); $bilt = 1; }
+  } $simp->Draw(); $simp->Wait($sped) if($sped); $keey = $simp->GetK(); if($pwex){ $pwnd .= $keey if($keey ne '-1');
+                                                                                   $pwnd  = ''    if($keey eq  'x'); } }

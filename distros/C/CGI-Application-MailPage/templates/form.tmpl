@@ -1,0 +1,142 @@
+<html>
+<head>
+<title>Mail A Page To A Friend</title>
+<form method="post">
+<input type="hidden" name="rm" value="send_mail" />
+<input type="hidden" name="page" value="<tmpl_var escape='html' name='page'>" />
+</head>
+
+<style type="text/css">
+  td { 
+    background-color: #dddddd; 
+}
+  td.label { 
+    text-align: right; 
+    vertical-align: top; 
+    width: 50%; 
+    font-weight: bold;
+}
+  td.input { 
+    text-align: left; 
+    vertical-align: top; 
+    width: 50%;
+}
+  font {
+    color: #000000; 
+    font-size: 10pt;
+}
+  font.alert { 
+    font-size:12pt; 
+    color: red;
+}
+</style>
+
+<body>
+
+
+<table border="0" width="90%" align="center" cellspacing="3" cellpadding="5">
+<tr>
+   <td colspan="2" align="center">
+   <h2>Mail A Page To Your Friends</h2>
+   <tmpl_if any_errors>
+     <p class="alert">
+        Your submission has errors. Please correct the following:
+        <ul>
+          <tmpl_if error_name>
+            <li>
+              <tmpl_if missing_name>
+                Please fill in your name in the form below.
+              <tmpl_else>
+                That name is too long or contains unnacceptable characters.
+              </tmpl_if>
+            </li>
+          </tmpl_if>
+          <tmpl_if error_from_email>
+            <li>
+              <tmpl_if missing_from_email>
+                Please fill in your email address in the form below.
+              <tmpl_else>
+                That is not a valid email address.
+              </tmpl_if>
+            </li>
+          </tmpl_if>
+          <tmpl_if error_to_emails>
+            <li>
+              <tmpl_if missing_to_emails>
+                Please fill in your friends' email addresses in the form below.
+              <tmpl_else>
+                One of your friend's email addresses is not valid or you have
+                exceeded the limit of emails to send.
+              </tmpl_if>
+            </li>
+          </tmpl_if>
+          <tmpl_if error_subject>
+            <li>
+              <tmpl_if missing_subject>
+                Please enter a Subject for the email in the form below.
+              <tmpl_else>
+                That Subject is too long or contains unnacceptable characters.
+              </tmpl_if>
+            </li>
+          </tmpl_if>
+          <tmpl_if error_note>
+            <li>Sorry, that note is too long!</li>
+          </tmpl_if>
+          <tmpl_if error_format>
+            <li>That is not an acceptable format!</li>
+          </tmpl_if>
+        </ul>
+     <p>
+   </tmpl_if>
+   <h4>Just fill out the form below and click on <input type="submit" value="Send Email" />.<br />Fields marked with a <font class="alert">*</font> are required.</h4>
+   </td>
+</tr>
+
+
+<tr>
+    <td class="label"><font class="alert">*</font><font <tmpl_if error_name>class="alert"</tmpl_if>>Your Full Name:</font></td>
+    <td class="input"><input type="text" name="name" size="40" value="<tmpl_var escape='html' name='name'>" /></td>
+</tr>
+
+<tr>
+    <td class="label"><font class="alert">*</font><font <tmpl_if error_from_email>class="alert"</tmpl_if>> Your Email Address:</font></td>
+    <td class="input"><input type="text" name="from_email" size="40" value="<tmpl_var escape='html' name='from_email'>" /></td>
+</tr>
+
+<tr>
+    <td class="label"><font class="alert">*</font><font <tmpl_if error_to_emails>class="alert"</tmpl_if>> Your Friend's Email Addresses:</font><br />
+        (separate with spaces, commas and linebreaks)</td>
+    <td class="input"><textarea name="to_emails" rows="3" cols="40"><tmpl_var to_emails></textarea></td>
+</tr>
+
+<tr>
+<td class="label"><font class="alert">*</font><font <tmpl_if error_subject>class="alert"</tmpl_if>> Subject For The Email:</font></td>
+<td class="input"><input type="text" name="subject" size="40" value="<tmpl_var escape='html' name='subject'>" /></td>
+</tr>
+
+<tr>
+    <td class="label"><font <tmpl_if error_note>class="alert"</tmpl_if>>Extra Note To Put In The Email:</font><br /></td>
+    <td class="input"><textarea name="note" rows="3" cols="40"><tmpl_var note></textarea></td>
+</tr>
+
+<tr>
+    <td class="label"><font class="alert">*</font><font <tmpl_if error_format>class="alert"</tmpl_if>> What To Send:</font><br />
+        (This determines what your friends will see in the email we send.  The default is 
+        usually the best choice unless you know that your friends can't view attachments.)</td>
+    <!--<td class="input"><tmpl_var format_selector></td>-->
+    <td class="input">
+      <select name="format">
+        <tmpl_loop format_options>
+          <option value="<tmpl_var value escape=HTML>"><tmpl_var label escape=HTML></option>
+        </tmpl_loop>
+      </select>
+    </td>
+</tr>
+
+<tr>
+    <td align="center" colspan="2"><input type="submit" value="Send Email" /></td>
+</tr>
+
+</table>
+</form>
+</html>

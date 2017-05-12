@@ -1,0 +1,31 @@
+NAME
+    CPAN::Test::Dummy::Perl5::Make::PerlReq::Fail - CPAN Test Dummy that
+    fails to find a required version of Perl
+
+SYNOPSIS
+         use CPAN::Test::Dummy::Perl5::Make::PerlReq::Fail;
+
+DESCRIPTION
+    This test dummy lists Perl 6 as a requirement. It is designed to test
+    how CPAN and related tools handle failing Perl requirements.
+
+USAGE
+    Not intended for any real use.
+
+SEE ALSO
+    *   CPAN
+
+AUTHOR
+    David A. Golden (DAGOLDEN)
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2009 by David A. Golden. All rights reserved.
+
+    Licensed under the same terms as Perl itself.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

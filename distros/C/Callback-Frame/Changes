@@ -1,0 +1,25 @@
+1.102   2016-03-07
+  * Fixed broken SEE ALSO link (thanks Mohammad Anwar)
+  * frame_void and frame_try_void features that let you create
+    new frames in void contexts that can't access the contexts
+    that were available when they were created.
+
+1.101   2015-01-14
+  * Mistake in documentation: The way it suggested to wrap an
+    existing callback in a frame wouldn't work.
+
+1.100   2014-02-20
+  * frame_try/frame_catch and frame_local features
+
+1.003   2013-02-27
+  * Remove MYMETA from distribution
+  * Add license and github meta info
+  * Document how to use from libraries
+  * Misc doc edits
+
+0.2   2012-06-26
+  * Much better local implementation
+  * Better docs
+
+0.1   2012-06-17
+  * Initial release

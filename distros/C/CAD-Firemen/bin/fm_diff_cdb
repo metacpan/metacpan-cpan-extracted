@@ -1,0 +1,577 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_diff_cdb
+# ABSTRACT: Analyzes and displays the differences between two cdb files.
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use List::Util qw[max];
+use CAD::Firemen;
+use CAD::Firemen::Common qw(:PRINTING getInstallationPath getInstallationConfigCdb dbConnect);
+use CAD::Firemen::Load qw(loadCDB loadDatabase);
+use CAD::Firemen::Analyze qw(compare);
+use CAD::Firemen::Change;
+
+
+sub convertToHtml{
+  my $string = shift;
+  $string =~ s/</&lt;/g;
+  $string =~ s/>/&gt;/g;
+  return $string;
+}
+
+my $showVersion = 0;
+my $verbose = 0;
+my $printAdded = 0;
+my $printRemoved = 0;
+my $printChanged = 0;
+my $description = 0;
+my $html = undef;
+my $htmlFileHandle = undef;
+my $useDatabase = 0;
+my $dbhOld;
+my $dbhNew;
+my %newOptions = ();
+my %oldOptions = ();
+my %removedOptions = ();
+my %addedOptions = ();
+my %changedOptions = ();
+my %duplicatedOptions  = ();
+my %newDescriptions = ();
+my %oldDescriptions = ();
+
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions(
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'added|a' => \$printAdded,
+  'removed|r' => \$printRemoved,
+  'changed|c' => \$printChanged,
+  'description|d' => \$description,
+  'html|h=s' => \$html
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+if(defined($html)){
+  if($html eq ""){
+    print "Empty html file specified\n";
+    pod2usage(2);
+  }
+  $printAdded = 1;
+  $printRemoved = 1;
+  $printChanged = 1;
+  $description = 1;
+  if(!open($htmlFileHandle, ">", $html)){
+    print "Could not create html file ". $html ."\n";
+    exit 2;
+  }
+}
+
+my $oldUrl = shift;
+my $newUrl = shift;
+
+if(!defined($oldUrl) && (!defined($newUrl))){
+  # running in database mode
+  $oldUrl = getInstallationPath();
+  $newUrl = getInstallationPath();
+  $useDatabase = 1;
+}
+elsif(!defined($newUrl)){
+  $newUrl = $oldUrl;
+  if($description){
+    $oldUrl = getInstallationPath();
+    $useDatabase = 1;
+  }
+  else{
+    $oldUrl = getInstallationConfigCdb();
+  }
+}
+
+if(!defined($oldUrl) || $oldUrl eq ""){
+  pod2usage(2);
+}
+
+if(!defined($newUrl) || $newUrl eq ""){
+  pod2usage(2);
+}
+
+if($useDatabase){
+  $dbhOld = dbConnect($oldUrl, $verbose);
+  $dbhNew = dbConnect($newUrl, $verbose);
+  if(!defined($dbhOld) || !defined($dbhNew)){
+    pod2usage(2);
+  }
+}
+
+if($verbose > 1){
+  if($useDatabase){
+    print "Old database:       ". $dbhOld->{Name} ."\n";
+    print "New database:       ". $dbhNew->{Name} ."\n";
+  }
+  else{
+    print "Old CDB File:       ". $oldUrl ."\n";
+    print "New CDB File:       ". $oldUrl ."\n";
+  }
+}
+
+if($useDatabase){
+  my ($ref1, $ref2, $ref3) = loadDatabase($dbhOld, "SELECT * FROM options", $verbose);
+  %oldOptions = %{$ref1};
+  my %errors1 = %{$ref2};
+  %oldDescriptions = %{$ref3};
+  ($ref1, $ref2, $ref3) = loadDatabase($dbhNew, "SELECT * FROM options", $verbose);
+  %newOptions = %{$ref1};
+  my %errors2 = %{$ref2};
+  %newDescriptions = %{$ref3};
+
+  if(scalar(keys(%errors1))){
+    testFailed("Load first database");
+    if($verbose > 0){
+      print "Errors while loading ". $dbhOld->{Name} .":\n";
+      my @lines = sort { $a <=> $b } keys(%errors1);
+      my $max = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        printColored(sprintf("%". $max ."s", $line) .": ". $errors1{$line} ."\n", "red");
+      }
+    }
+    exit 1;
+  }
+  if(scalar(keys(%errors2))){
+    testFailed("Load second database");
+    if($verbose > 0){
+      print "Errors while loading ". $dbhNew->{Name} .":\n";
+      my @lines = sort { $a <=> $b } keys(%errors2);
+      my $max = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        printColored(sprintf("%". $max ."s", $line) .": ". $errors2{$line} ."\n", "red");
+      }
+    }
+    exit 1;
+  }
+  print2ColsRightAligned("Found old options in ". $dbhOld->{Name},  scalar(keys(%oldOptions)), "green");
+  print2ColsRightAligned("Found new options in ". $dbhNew->{Name},  scalar(keys(%newOptions)), "green");
+}
+else{
+  my ($ref1, $ref2) = loadCDB($oldUrl, $verbose);
+  %oldOptions = %{$ref1};
+  my %errors1 = %{$ref2};
+  ($ref1, $ref2) = loadCDB($newUrl, $verbose);
+  %newOptions = %{$ref1};
+  my %errors2 = %{$ref2};
+
+  if(scalar(keys(%errors1))){
+    testFailed("Load first CDB");
+    if($verbose > 0){
+      print "Errors while parsing ". $oldUrl .":\n";
+      my @lines = sort { $a <=> $b } keys(%errors1);
+      my $max = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        printColored(sprintf("%". $max ."s", $line) .": ". $errors1{$line} ."\n", "red");
+      }
+    }
+    exit 1;
+  }
+  if(scalar(keys(%errors2))){
+    testFailed("Load second CDB");
+    if($verbose > 0){
+      print "Errors while parsing ". $newUrl .":\n";
+      my @lines = sort { $a <=> $b } keys(%errors2);
+      my $max = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        printColored(sprintf("%". $max ."s", $line) .": ". $errors2{$line} ."\n", "red");
+      }
+    }
+    exit 1;
+  }
+  print2ColsRightAligned("Found old options in ". $oldUrl,  scalar(keys(%oldOptions)), "green");
+  print2ColsRightAligned("Found new options in ". $newUrl,  scalar(keys(%newOptions)), "green");
+}
+
+my ($ref1, $ref2, $ref3, $ref4) = compare(\%oldOptions, \%newOptions);
+%addedOptions = %{$ref1};
+%changedOptions = %{$ref2};
+%removedOptions = %{$ref3};
+%duplicatedOptions = %{$ref4};
+my @duplicatedKeys = sort(keys(%duplicatedOptions));
+my @removedKeys = sort(keys(%removedOptions));
+my @addedKeys = sort(keys(%addedOptions));
+my @changedKeys = sort(keys(%changedOptions));
+
+if($html){
+  print $htmlFileHandle "<html>\n";
+  print $htmlFileHandle "  <head>\n";
+  print $htmlFileHandle "    <title>Changed options from ". $oldUrl ." to ". $newUrl ."</title>\n";
+  print $htmlFileHandle "    <style>\n";
+  print $htmlFileHandle "      div.body {\n";
+  print $htmlFileHandle "        width: 100em;\n";
+  print $htmlFileHandle "        margin: 0 auto;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      dt {\n";
+  print $htmlFileHandle "        font-weight: bold;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      dd {\n";
+  print $htmlFileHandle "        margin-bottom: 1em;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      #added dl dt {\n";
+  print $htmlFileHandle "        color: #008C4F;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      #removed dl dt {\n";
+  print $htmlFileHandle "        color: #8C1C00;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      #changed dl dt {\n";
+  print $htmlFileHandle "        color: #8C8C8C;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      dd p {\n";
+  print $htmlFileHandle "        margin-top: 0;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      li.valueDefault{\n";
+  print $htmlFileHandle "        text-decoration: underline;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      thead tr td {\n";
+  print $htmlFileHandle "        font-weight: bold;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      #content {\n";
+  print $htmlFileHandle "        border-spacing: 0;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      #content td {\n";
+  print $htmlFileHandle "        width: 25%;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      td.added a {\n";
+  print $htmlFileHandle "        color: #008C4F;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      td.removed a {\n";
+  print $htmlFileHandle "        color: #8C1C00;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      td.changed a {\n";
+  print $htmlFileHandle "        color: #8C8C8C;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      a:hover {\n";
+  print $htmlFileHandle "        color: #808080;\n";
+  print $htmlFileHandle "        text-decoration: underline;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "\n";
+  print $htmlFileHandle "      a {\n";
+  print $htmlFileHandle "        color: black;\n";
+  print $htmlFileHandle "        text-decoration: none;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "      .toclink {\n";
+  print $htmlFileHandle "        font-weight: normal;\n";
+  print $htmlFileHandle "        font-size: 10pt;\n";
+  print $htmlFileHandle "      }\n";
+  print $htmlFileHandle "    </style>\n";
+  print $htmlFileHandle "  </head>\n";
+  print $htmlFileHandle "  <body>\n";
+  print $htmlFileHandle "    <div class=\"body\">\n";
+  print $htmlFileHandle "      <h1>Changed options from ". $oldUrl ." to ". $newUrl ."</h1>\n";
+  print $htmlFileHandle "      <a id=\"toc\"></a>\n";
+  print $htmlFileHandle "      <table id=\"content\">\n";
+  print $htmlFileHandle "        <thead>\n";
+  print $htmlFileHandle "          <tr>\n";
+  print $htmlFileHandle "            <td><a href=\"#duplicatedSection\">Duplicates (".  scalar(@duplicatedKeys) .")</a></td>\n";
+  print $htmlFileHandle "            <td><a href=\"#addedSection\">Added (".  scalar(@addedKeys) .")</a></td>\n";
+  print $htmlFileHandle "            <td><a href=\"#removedSection\">Removed</a> (".  scalar(@removedKeys) .")</td>\n";
+  print $htmlFileHandle "            <td><a href=\"#changedSection\">Changed</a> (".  scalar(@changedKeys) .")</td>\n";
+  print $htmlFileHandle "          </tr>\n";
+  print $htmlFileHandle "        </thead>\n";
+  print $htmlFileHandle "        <tbody>\n";
+  for(my $i = 0; $i < max(scalar(@duplicatedKeys), scalar(@removedKeys), scalar(@addedKeys), scalar(@changedKeys)); $i++){
+    print $htmlFileHandle "          <tr>\n";
+    if($i < scalar(@duplicatedKeys)){
+      print $htmlFileHandle "            <td class=\"duplicated\"><a href=\"#duplicated". $duplicatedKeys[$i] ."\">". $duplicatedKeys[$i] ."</a></td>\n";
+    }
+    else{
+      print $htmlFileHandle "            <td></td>\n";
+    }
+    if($i < scalar(@addedKeys)){
+      print $htmlFileHandle "            <td class=\"added\"><a href=\"#added". $addedKeys[$i] ."\">". $addedKeys[$i] ."</a></td>\n";
+    }
+    else{
+      print $htmlFileHandle "            <td></td>\n";
+    }
+    if($i < scalar(@removedKeys)){
+      print $htmlFileHandle "            <td class=\"removed\"><a href=\"#removed". $removedKeys[$i] ."\">". $removedKeys[$i] ."</a></td>\n";
+    }
+    else{
+      print $htmlFileHandle "            <td></td>\n";
+    }
+    if($i < scalar(@changedKeys)){
+      print $htmlFileHandle "            <td class=\"changed\"><a href=\"#changed". $changedKeys[$i] ."\">". $changedKeys[$i] ."</a></td>\n";
+    }
+    else{
+      print $htmlFileHandle "            <td></td>\n";
+    }
+    print $htmlFileHandle "          </tr>\n";
+  }
+  print $htmlFileHandle "        </tbody>\n";
+  print $htmlFileHandle "      </table>\n";
+  print $htmlFileHandle "      <div id=\"duplicates\" class=\"category\">\n";
+  print $htmlFileHandle "        <h2><a id=\"duplicatedSection\"></a>Duplicates (". scalar(@duplicatedKeys) ." Options)</h2>\n";
+  print $htmlFileHandle "        <dl>\n";
+}
+print2ColsRightAligned("Duplicates", scalar(@duplicatedKeys));
+if($verbose > 0 || $printAdded || $printChanged ||$printRemoved){
+  my $max = maxLength(@duplicatedKeys) + 2;
+  foreach my $opt (@duplicatedKeys){
+    my $message = sprintf("%-". $max ."s", $opt) ." ". $duplicatedOptions{$opt} ."\n";
+    if($html){
+      print $htmlFileHandle "          <dt><a id=\"duplicated". $opt ."\"></a>". $message ." <span class=\"toclink\">(<a href=\"#toc\">Table of content</a>)</span></dt>\n";
+    }
+    printColored($message, "red");
+    if($description && exists($newDescriptions{$opt})){
+      if($html){
+        print $htmlFileHandle "          <dd>". $newDescriptions{$opt} ."</dd>\n";
+      }
+      printBlock($newDescriptions{$opt}, 3);
+    }
+  }
+}
+if($html){
+  print $htmlFileHandle "        </dl>\n";
+  print $htmlFileHandle "      </div>\n";
+}
+
+# print out the results
+if($html){
+  print $htmlFileHandle "      <div id=\"removed\" class=\"category\">\n";
+  print $htmlFileHandle "        <h2><a id=\"removedSection\"></a>Removed (". scalar(@removedKeys) ." Options)</h2>\n";
+  print $htmlFileHandle "        <dl>\n";
+}
+print2ColsRightAligned("Removed", scalar(@removedKeys));
+if(($verbose > 0) || $printRemoved){
+  foreach my $option (@removedKeys){
+    if($html){
+      print $htmlFileHandle "          <dt><a id=\"removed". $option ."\"></a>". $option ." <span class=\"toclink\">(<a href=\"#toc\">Table of content</a>)</span></dt>\n";
+    }
+    printColored($option ."\n", "RED");
+    if($description && exists($oldDescriptions{$option})){
+      if($html){
+        print $htmlFileHandle "          <dd>". convertToHtml($oldDescriptions{$option}) ."</dd>\n";
+      }
+      printBlock($oldDescriptions{$option}, 3);
+    }
+  }
+}
+if($html){
+  print $htmlFileHandle "        </dl>\n";
+  print $htmlFileHandle "      </div>\n";
+}
+
+# print out the results
+if($html){
+  print $htmlFileHandle "      <div id=\"added\" class=\"category\">\n";
+  print $htmlFileHandle "        <h2><a id=\"addedSection\"></a>Added (". scalar(@addedKeys) ." Options)</h2>\n";
+  print $htmlFileHandle "        <dl>\n";
+}
+print2ColsRightAligned("Added", scalar(@addedKeys));
+if(($verbose > 0) || $printAdded){
+  foreach my $option (@addedKeys){
+    if($html){
+      print $htmlFileHandle "          <dt><a id=\"added". $option ."\"></a>". $option ." <span class=\"toclink\">(<a href=\"#toc\">Table of content</a>)</span></dt>\n";
+      print $htmlFileHandle "          <dd>\n";
+    }
+    printColored($option ."\n", "GREEN");
+    if($description && exists($newDescriptions{$option})){
+      if($html){
+        print $htmlFileHandle "            <p class=\"description\">". convertToHtml($newDescriptions{$option}) ."</p>\n";
+      }
+      printBlock($newDescriptions{$option}, 3);
+    }
+    my @addedLines = keys(%{$newOptions{$option}});
+    if($html && exists($newOptions{$option}) && scalar(@addedLines) > 0){
+      print $htmlFileHandle "            <div class=\"values\">Values:\n";
+      print $htmlFileHandle "              <ul class=\"values\">\n";
+      foreach my $value (sort(keys(%{$newOptions{$option}->{$addedLines[0]}}))){
+        my $class = "";
+        if($newOptions{$option}->{$addedLines[0]}->{$value}){
+          $class = "valueDefault";
+        }
+        print $htmlFileHandle "                <li class=\"". $class ."\">". $value ."</li>\n";
+      }
+      print $htmlFileHandle "              </ul>\n";
+      print $htmlFileHandle "            </div>\n";
+    }
+    if($html){
+      print $htmlFileHandle "          </dd>\n";
+    }
+  }
+}
+if($html){
+  print $htmlFileHandle "        </dl>\n";
+  print $htmlFileHandle "      </div>\n";
+}
+
+# print out the results
+if($html){
+  print $htmlFileHandle "      <div id=\"changed\" class=\"category\">\n";
+  print $htmlFileHandle "        <h2><a id=\"changedSection\"></a>Changed (". scalar(@changedKeys) ." Options)</h2>\n";
+  print $htmlFileHandle "        <dl>\n";
+}
+print2ColsRightAligned("Changed", scalar(@changedKeys));
+if(($verbose > 0) || $printChanged){
+  my $max = maxLength(@changedKeys) + 2;
+  my $indentRegex = "\n". sprintf("%". $max ."s", "");
+  foreach my $option (@changedKeys){
+    my $info = $changedOptions{$option}->changeDescription();
+    if($html){
+      print $htmlFileHandle "          <dt><a id=\"changed". $option ."\"></a>". $option ." <span class=\"toclink\">(<a href=\"#toc\">Table of content</a>)</span><dt>\n";
+      print $htmlFileHandle "          <dd>\n";
+      print $htmlFileHandle "            <p class=\"info\">". convertToHtml($info) ."</p>\n";
+    }
+    $info =~ s/\n/$indentRegex/gs;
+    printColored(sprintf("%-". $max ."s", $option .": "), "YELLOW");
+    print $info ."\n";
+    if($description){
+      if(exists($newDescriptions{$option})){
+        if($html){
+          print $htmlFileHandle "            <p class=\"description\">". convertToHtml($newDescriptions{$option}) ."</p>\n";
+        }
+        printBlock($newDescriptions{$option}, 3);
+      }
+      elsif(exists($oldDescriptions{$option})){
+        if($html){
+          print $htmlFileHandle "            <p class=\"description\">". convertToHtml($oldDescriptions{$option}) ."</p>\n";
+        }
+        printBlock($oldDescriptions{$option}, 3);
+      }
+    }
+    if($html){
+      print $htmlFileHandle "          </dd>\n";
+    }
+  }
+}
+if($html){
+  print $htmlFileHandle "        </dl>\n";
+  print $htmlFileHandle "      </div>\n";
+}
+
+END {
+  if($html){
+    print $htmlFileHandle "    </div>\n";
+    print $htmlFileHandle "  </body>\n";
+    print $htmlFileHandle "</html>\n";
+    if($htmlFileHandle){
+      close($htmlFileHandle);
+    }
+  }
+  if(defined($dbhNew) && ($dbhNew != 0) && !$dbhNew->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+  if(defined($dbhOld) && ($dbhOld != 0) && !$dbhOld->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_diff_cdb - Analyzes and displays the differences between two cdb files.
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_diff_cdb [options] [-h output.html] [PATH_TO_OLD_CONFIG.CDB] PATH_TO_NEW_CONFIG.CDB
+
+Options:
+
+  --help             -?  Prints this help.
+  --version              Prints current version.
+  --verbose          -v  The verbose level. 0 - least output, 2 most output (Default: 0).
+  --added            -a  Print added options (Regardless of verbose level).
+  --removed          -r  Print removed options (Regardless of verbose level).
+  --changed          -c  Print changed options (Regardless of verbose level)
+  --description      -d  Displays the description of each printed option. Thereofe
+                         This options does not need two paths to a CDB file, but two
+                         different installation paths. In this case, you can call it
+                         also without any path
+  --html             -h  Creates a html file with the removed and added options. It also
+                         contains the descriptions and the default values of the added
+                         options. Enables -a, -r, -c and -d additionally.
+
+If no first cdb file is given, it tries to figure out the correct installation with help of $ENV{PATH}.
+
+Example:
+
+  fm_diff_cdb -ar c:\proeWildfire4\text\config.cdb c:\proeWildfire5\text\config.cdb
+
+Or to use databases:
+
+  fm_diff_cdb
+
+Or
+
+  fm_diff_cdb -d
+
+Or
+
+  fm_diff_cdb -d c:\proeWildfire4 c:\proeWildfire5
+
+Or
+
+  fm_diff_cdb -h c:\fm_diff.html
+
+=head1 METHODS
+
+=head2 convertToHtml
+
+Replaces all HTML special characters with their HTML Entitiy.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

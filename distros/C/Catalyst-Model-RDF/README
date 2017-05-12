@@ -1,0 +1,70 @@
+NAME
+    Catalyst::Model::RDF - RDF model class for Catalyst based on
+    RDF::Trine::Model.
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        # on the shell
+        $ myapp_create.pl model RDF
+
+        # in myapp.conf
+        <Model::RDF>
+            format turtle
+
+            <namespaces>
+                rdf  http://www.w3.org/1999/02/22-rdf-syntax-ns\#
+                dct  http://purl.org/dc/terms/
+            </namespaces>
+
+            # see documentation for RDF::Trine::Store, this structure
+            # gets passed verbatim to `new_with_config'.
+            <store>
+                storetype DBI
+                name      myapp
+                dsn       dbi:Pg:dbname=rdf
+                user      rdfuser
+                password  suparsekrit
+            </store>
+        </Model::RDF>
+
+DESCRIPTION
+    Catalyst::Model::RDF is a thin proxy around RDF::Trine::Model. It can be
+    initialized using the Catalyst configuration file or method. The
+    following parameters are currently recognized:
+
+    namespaces
+    format
+        Any name found in "serializer_names" in RDF::Trine::Serializer (as
+        of this writing, this consists of "ntriples", "nquads", "rdfxml",
+        "rdfjson", "turtle" and "ntriples-canonical").
+
+    store
+        A hash reference (or configuration file equivalent) that will be
+        passed directly to "new_with_config" in RDF::Trine::Store.
+
+METHODS
+    In addition to proxying RDF::Trine::Model, this module implements the
+    following accessors:
+
+  format
+    Get or set the default format (see RDF::Trine::Serializer).
+
+  store
+    Retrieve the RDF::Trine::Store object underpinning the model.
+
+  serializer
+    Serialize the $model to RDF/$format, returning the result as a string.
+
+AUTHORS
+    *   Thiago Rondon <thiago@aware.com.br>
+
+    *   Dorian Taylor <dorian@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Thiago Rondon.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

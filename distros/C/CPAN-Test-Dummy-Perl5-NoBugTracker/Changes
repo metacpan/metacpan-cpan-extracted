@@ -1,0 +1,4 @@
+Changes for Perl extension CPAN::Test::Dummy::NoBugTracker
+
+1.00 Sat  8 May 2010
+	- Created initial implementation

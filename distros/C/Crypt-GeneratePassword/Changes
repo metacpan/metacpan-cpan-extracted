@@ -1,0 +1,34 @@
+Revision history for Perl module Crypt::GeneratePassword
+
+0.05 2015-11-14 NEILB
+    - Updated github repo URL after changing my github username
+    - Added [MetaJSON] to dist.ini so META.json is included in releases
+    - Doc: changed usage of "local $^W" to "no warnings 'redefine'"
+    - Fixed a couple of typos in the doc
+    - Dropped usage of "use vars"
+    - Module didn't have the required final "1;" or equivalent.
+      Was only by luck it had been.
+
+0.04 2014-06-12 NEILB
+    - Fixed bug that would occasionally generate a division by zero
+      in word() and word3(). RT#42832
+    - Fixed mistake in doc for word() and word3()
+      Thanks to Smylers for RT#11787.
+    - Switched to Dist::Zilla
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Moved test.pl to t/01-require.t and simplified it
+    - Added real tests for chars(), word() and word3()
+    - Added github repo to pod
+    - Added package statement and use strict & warnings in ::de and ::en
+    - Tell dzil that the language model modules are binary, so they won't
+      be parsed with PPI, which takes 5+ minutes on my laptop.
+
+0.03 2003-09-09 JWALT
+    - added a custom RNG hook
+
+0.02 2002-09-13 JWALT
+    - fixed minor bug causing problems with perl 5.005
+
+0.01 2002-09-03 JWALT
+    - initial revision
+

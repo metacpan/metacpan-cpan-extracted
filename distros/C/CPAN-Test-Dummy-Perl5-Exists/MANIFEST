@@ -1,0 +1,10 @@
+Changes
+lib/CPAN/Test/Dummy/Perl5/Exists.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/99-author.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

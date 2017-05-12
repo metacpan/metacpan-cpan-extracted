@@ -1,0 +1,10 @@
+^MYMETA.yml$
+^\.git
+^blib/
+^_build/
+^Build$
+.*-.*\.tar\.gz$
+^Color-Calc-.*
+.*\.bak$
+^HTML$
+^X$

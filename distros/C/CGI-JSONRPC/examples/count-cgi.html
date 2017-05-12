@@ -1,0 +1,17 @@
+<html>
+ <head>
+  <title>Hello, world.</title>
+  <script type="text/javascript" src="/jsonrpc-test/jsonrpc-session.cgi"></script>
+  <script type="text/javascript" src="/jsonrpc-test/jsonrpc-session.cgi/Count"></script>
+ 
+  <script type="text/javascript">
+    var inc = new Count;
+    inc.ID = 1;
+  </script>
+ </head>
+ <body>
+  <h1>Counting.....</h1>
+  <input type="button" onClick="inc.increment()" value="counting we will go..." />
+  <input type="button" onClick="inc.notincrement()" value="NOT counting we will go..." />
+ </body>
+</html>

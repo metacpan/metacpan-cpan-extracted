@@ -1,0 +1,7 @@
+Changes for 0.02    Thu Oct  5 15:40:37 CEST 2006
+=================================================
+* Fix test failures on case-sensitive filesystems
+
+Changes for 0.01    Fri Sep  8 11:23:41 CEST 2006
+=================================================
+* Initial release   

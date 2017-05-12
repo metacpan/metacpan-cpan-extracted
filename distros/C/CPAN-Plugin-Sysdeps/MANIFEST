@@ -1,0 +1,21 @@
+Changes
+lib/CPAN/Plugin/Sysdeps.pm
+lib/CPAN/Plugin/Sysdeps/Mapping.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+script/cpan-sysdeps
+script/test-sysdeps-roundtrip
+t/basic.t
+t/code.t
+t/filtuninst.t
+t/instcmd.t
+t/lib/TestUtil.pm
+t/mapping/code.pl
+t/mapping/fail_likelinuxdistro.pl
+t/mapping/sample.pl
+t/sample.t
+t/traverse.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

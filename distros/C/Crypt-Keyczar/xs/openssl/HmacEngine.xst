@@ -1,0 +1,169 @@
+#include "xs/openssl.h"
+
+MODULE = Crypt::Keyczar	PACKAGE = Crypt::Keyczar::HmacEngine
+
+
+Crypt::Keyczar::HmacEngine
+new(class, type, key)
+	SV *class
+	const char *type
+	SV *key
+	CODE:
+	{
+	    unsigned char *k;
+	    STRLEN l;
+	    const EVP_MD *md;
+	    PERL_UNUSED_VAR(class);
+
+	    ENGINE_load_builtin_engines();
+	    ENGINE_register_all_complete();
+
+	    if (strcasecmp(type, "SHA1") == 0) {
+                md = EVP_sha1();
+            }
+            else if (strcasecmp(type, "SHA224") == 0) {
+                 md = EVP_sha224();
+            }
+            else if (strcasecmp(type, "SHA256") == 0) {
+                 md = EVP_sha256();
+            }
+            else if (strcasecmp(type, "SHA384") == 0) {
+                 md = EVP_sha384();
+            }
+            else if (strcasecmp(type, "SHA512") == 0) {
+                 md = EVP_sha512();
+            }
+            else {
+	        croak("unsupported digest name: %s", type);
+	    }
+
+	    Newz(0, RETVAL, 1, struct Crypt__Keyczar__HmacEngine_class);
+	    RETVAL->context = HMAC_CTX_new();
+
+	    k = (unsigned char *)SvPV(key, l);
+            HMAC_Init_ex(RETVAL->context, k, l, md, NULL);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+void
+DESTROY(self)
+	Crypt::Keyczar::HmacEngine self
+	CODE:
+	{
+	    if (self->context != NULL) {
+	        HMAC_CTX_free(self->context);
+                self->context = NULL;
+	    }
+	    Safefree(self);
+            self = NULL;
+	}
+
+
+int
+digest_size(self)
+	Crypt::Keyczar::HmacEngine self
+	CODE:
+	{
+	    RETVAL = EVP_MD_size(EVP_MD_CTX_md((const EVP_MD_CTX *)self->context));
+	}
+	OUTPUT:
+	    RETVAL
+
+
+void
+update(self, ...)
+	Crypt::Keyczar::HmacEngine self
+	CODE:
+	{
+	    int i;
+	    SV *data;
+	    STRLEN l;
+	    unsigned char *in;
+
+	    for (i = 1; i < items; i++) {
+	        data = ST(i);
+	        in = (unsigned char *)SvPV(data, l);
+	        HMAC_Update(self->context, (const unsigned char *)in, l);
+            }
+	}
+
+
+SV *
+sign(self)
+	Crypt::Keyczar::HmacEngine self
+	CODE:
+	{
+	    unsigned char md[EVP_MAX_MD_SIZE];
+	    unsigned int l;
+
+	    HMAC_Final(self->context, md, &l);
+            RETVAL = newSVpv((const char *)md, l);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+int
+verify(self, mac)
+	Crypt::Keyczar::HmacEngine self
+	SV *mac
+	CODE:
+	{
+	    unsigned char md[EVP_MAX_MD_SIZE];
+	    unsigned int l;
+	    STRLEN in_l;
+	    unsigned char *in;
+
+	    in = (unsigned char *)SvPV(mac, in_l);
+	    if (in_l != EVP_MD_size(EVP_MD_CTX_md((const EVP_MD_CTX *)self->context))) {
+	        RETVAL = 0;
+	    }
+	    else {
+	        HMAC_Final(self->context, md, &l);
+	        RETVAL = (memcmp(md, in, in_l) == 0);
+	    }
+	}
+	OUTPUT:
+	    RETVAL
+
+
+int
+is_supported(class, type)
+	SV *class
+	const char *type
+	CODE:
+	{
+            PERL_UNUSED_VAR(class);
+
+	    if (strcasecmp(type, "SHA1") == 0) {
+                RETVAL = 1;
+            }
+#if defined(SHA224_DIGEST_LENGTH)
+            else if (strcasecmp(type, "SHA224") == 0) {
+                RETVAL = 1;
+            }
+#endif
+#if defined(SHA256_DIGEST_LENGTH)
+            else if (strcasecmp(type, "SHA256") == 0) {
+                RETVAL = 1;
+            }
+#endif
+#if defined(SHA384_DIGEST_LENGTH)
+            else if (strcasecmp(type, "SHA384") == 0) {
+                RETVAL = 1;
+            }
+#endif
+#if defined(SHA512_DIGEST_LENGTH)
+            else if (strcasecmp(type, "SHA512") == 0) {
+                RETVAL = 1;
+            }
+#endif
+            else {
+	        RETVAL = 0;
+            } 
+	}
+	OUTPUT:
+	    RETVAL
+

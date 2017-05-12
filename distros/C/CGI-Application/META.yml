@@ -1,0 +1,36 @@
+---
+abstract: 'Framework for building reusable web-applications'
+author:
+  - 'Jesse Erlbaum <jesse@erlbaum.net>'
+  - 'Mark Stosberg <mark@summersault.com>'
+  - 'with the help of many others!'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application
+no_index:
+  file: []
+provides:
+  CGI::Application:
+    file: lib/CGI/Application.pm
+    version: 4.50
+  CGI::Application::Mailform:
+    file: lib/CGI/Application/Mailform.pm
+    version: 0
+recommends:
+  CGI::PSGI: 0.09
+requires:
+  CGI: 0
+  Carp: 0
+  Class::ISA: 0
+  HTML::Template: 0
+  Test::More: 0.47
+resources:
+  license: http://dev.perl.org/licenses/
+version: 4.50

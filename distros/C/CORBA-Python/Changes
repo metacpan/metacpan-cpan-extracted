@@ -1,0 +1,104 @@
+Revision history for Perl extension CORBA::Python.
+
+2.66  Thu Dec 18 12:30:00 2008
+	- fix setter for Union
+	- fix Constant when Python package (option -J)
+
+2.65  Mon Aug 25 18:30:00 2008
+	- fix many memory leak with C/Python (thank to S. Royen)
+
+2.64  Wed Jul 16 18:30:00 2008
+	- add Vi & Emacs macros
+
+2.63  Thu Feb 21 18:30:00 2008
+	- generate C with less warning
+
+2.62  Wed Feb 20 18:30:00 2008
+	- generate C with less warning
+
+2.61  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+
+2.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+0.41  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+	- cpyemb.pm: add GIL management for multi-threaded application
+
+0.40  Mon Aug 13 08:30:00 2007
+	- some pylint cleanup
+	- remove pyemb.pm (merged in class.pm)
+	- some Perl Best Practices
+
+0.39  Mon Jun 18 08:30:00 2007
+	- fix in PyIDL/rpc_giop.py
+
+0.38  Tue Jun 05 12:30:00 2007
+	- class.pm : fully qualified import (option -J)
+	- server.pm : fix corba_id call
+	- PyIDL/rpc_giop.py : fix socket fragmentation
+
+0.37  Mon May 14 08:30:00 2007
+	- cpyemb.pm: handles SystemException
+
+0.36  Fri Apr 13 12:30:00 2007
+	- allow None for empty sequence of char or octet
+
+0.35  Thu Apr 12 12:30:00 2007
+	- improve the check of string parameter
+
+0.34  Tue Mar 27 12:30:00 2007
+	- class.pm: fix server import
+
+0.33  Thu Mar 15 12:30:00 2007
+	- generate __ne__ when already __eq__
+
+0.32  Mon Mar  5 21:30:00 2007
+	- PyIDL: some fix
+
+0.31  Tue Jan 16 12:30:00 2007
+	- cpyemb.pm: avoid conflit name between operation parameter and struct member
+	- cpy.pm: strdup (embedded)
+
+0.30  Tue Nov  9 15:30:00 2006
+	- client.pm : improve inheritance (TargetAddress)
+
+0.29  Tue Oct 10 12:30:00 2006
+	- improve typedef (Python & C/Python)
+
+0.28  Fri Aug 25 18:30:00 2006
+	- fix nested typedef in C/Python
+	- corba_id & serial_uid become class method
+
+0.27  Thu Aug  3 12:30:00 2006
+	- fix import search
+
+0.26  Tue Aug  1 12:30:00 2006
+	- support module reopenning for C
+
+0.25  Fri Mar 10 12:30:00 2006
+	- add some assert() in C/Python
+
+0.24  Thu Feb 16 22:30:00 2006
+	- class.pm : replace range by xrange
+	- class.pm : add getter for Union
+
+0.23  Tue Nov 29 09:30:00 2005
+	- idl2pyemb.pl : use mode client with literal
+
+0.22  Mon Nov 28 22:30:00 2005
+	- Makefile.PL : install module PyIDL
+	- class.pm : improve demarshal sequence or array of char or octet
+	- literal.pm bug : scoping of constant (in array_size)
+	- cpy.pm : typedef PYOBJ_FROM call constructor
+	- cdr.py & rpc_giop.py : SystemException in CORBA module
+	- giop.py : regenerated
+
+0.21  Sat Oct 15 09:30:00 2005
+	- some improvements for non basic types
+
+0.20  Tue Aug 16 22:30:00 2005
+	- first release on CPAN
+

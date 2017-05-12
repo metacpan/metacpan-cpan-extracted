@@ -1,0 +1,79 @@
+---
+abstract: 'Common library for searching CPAN modules, authors and distributions'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  Test::Deep: '0'
+  Test::FailWarnings: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150002'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Common-Index
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  CPAN::Common::Index:
+    file: lib/CPAN/Common/Index.pm
+    version: '0.006'
+  CPAN::Common::Index::LocalPackage:
+    file: lib/CPAN/Common/Index/LocalPackage.pm
+    version: '0.006'
+  CPAN::Common::Index::MetaDB:
+    file: lib/CPAN/Common/Index/MetaDB.pm
+    version: '0.006'
+  CPAN::Common::Index::Mirror:
+    file: lib/CPAN/Common/Index/Mirror.pm
+    version: '0.006'
+  CPAN::Common::Index::Mux::Ordered:
+    file: lib/CPAN/Common/Index/Mux/Ordered.pm
+    version: '0.006'
+requires:
+  CPAN::DistnameInfo: '0'
+  CPAN::Meta::YAML: '0'
+  Carp: '0'
+  Class::Tiny: '0'
+  File::Basename: '0'
+  File::Fetch: '0'
+  File::Temp: '0.19'
+  HTTP::Tiny: '0'
+  IO::Uncompress::Gunzip: '0'
+  Module::Load: '0'
+  Path::Tiny: '0'
+  Search::Dict: '1.07'
+  Tie::Handle::SkipHeader: '0'
+  URI: '0'
+  parent: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/CPAN-Common-Index/issues
+  homepage: https://github.com/dagolden/CPAN-Common-Index
+  repository: https://github.com/dagolden/CPAN-Common-Index.git
+version: '0.006'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'

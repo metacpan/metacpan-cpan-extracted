@@ -1,0 +1,23 @@
+abstract: "Replication from single master to multiple slaves "
+author: Hans Dieter Pearcey <hdp@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: Class-DBI-Replicated
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Class::DBI::Pg: 0
+  Class::DBI::mysql: 0
+requires: 
+  Class::Accessor::Class: 0
+  Class::DBI: 3.0.1
+  Class::Data::Inheritable: 0
+  Params::Validate: 0.74
+  Sub::Install: 0
+  perl: 5.6.0
+version: 0.040

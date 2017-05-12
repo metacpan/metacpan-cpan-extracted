@@ -1,0 +1,108 @@
+@chapter Safety & Security
+@section Safety
+@subheading Undoing changes to the configuration
+Since undoing a modification is a critical functionality, this module is
+designed to allow this:
+@enumerate
+@item The destructive changes (delete or modifying and existing value) are not
+committed until the END phase of execution.
+
+@item Changes done to the text files are done in a way so that original file
+is not replaced until after the text file has been completed.
+
+@item All aspects that employ text files support the use of the @code{Rcs}
+module and checking these text files.
+
+@end enumerate
+
+The last item requires an add-on module, and user experience with RCS to
+undo changes.  There is some prototyping of an additional method to complete
+this, and make it possible in a programmatic fashion.  The plan is to allow
+tagging of configuration sets...
+
+@itemize @bullet
+@item <tag, @{<file,version>@}>
+@item Ability to rollback (undo) changes.
+@item go back to $tag versions, or
+@item revert all the settings associated with $tag to what the were before
+@end itemize
+
+@section Security
+Much of the environment manager package is agnostic about security -- it does
+not try apply much of its view of security, nor does it try to undermine
+standard security models.   Here are the basics:
+@enumerate
+@item None of the modules in the standard distribution attempt to switch
+to another user or group, except to make the real UID and GID the same as the
+effective UID and GID.  This is for SUID/SGID programs, and this switch is
+done when opening files for reading, writing, appending, or anything else.
+These are returned to their previous settings after the file is closed.
+
+The switch is done to cover the following kinds of scenarios.  Lets say there
+is a SUID program to let some people do a particular task, but the task is
+SUID'd to root.  The effective UID would be root, but all of the files the
+create here will be owned by the normal user.  This is to prevent anyone
+other than (say) root from creating or changing files (and contents) that
+are or will be owned by root --  which would be bad to let happen.
+Alternatively, lets say the admin login in as root (the user id really is
+root),  but as temporarily switch effective user ids to help a user out.
+We don't let any files with critical configuration information
+get owned by the user -- not for an instant.
+
+@c EXCEPT in the command line module, where
+@c it only attempts to switch to the user and group requested
+
+@item The potential replacement files are initially created with the current
+real user & group priviledges, as described above.  These are changed to match
+the target configuration file's priviledges; if (and only if) they match, then
+the replacement configuration file will be migrated in.  A very nice article
+appeared recently in Dr. Dobbs Journal that describes this method,
+@url{http://www.ddj.com/articles/1999/9901/9901h/9901h.htm}
+
+@item The environment manager employs @code{system}, and @code{popen}, which
+have known issues with SGID, SUID programs and others.
+@end enumerate
+
+By logical extension, the security of your system with respect to the things
+the environment manager touches are:
+@enumerate
+@item The effective and actual user and group ids at execution time.  Sticky
+bits, SGID, SUID, and executing as root should be carefully considered.  (SUID
+is to be avoided even more than SUID). There are alternative ways, some of
+which are discussed below.
+
+@item The execution ID and group of the system service programs and daemons
+that use the configuration files.  It is strongly advised (from both
+experience, and logical security) that none of the service daemons be allowed
+to operate as root user ID or root group ID.  One alternative is to assign
+daemons their own user ID and a common group ID.
+
+@item The permissions set on the configuration files.  In general, none of the
+service processes or daemons should be allowed to modify their configuration
+files; at the least, not unless executed specifically, and carefully by an
+administrator.  Instead, it is advised that both world and group permissions
+to the configuration files not have write (or execute!) access.  The
+configuration files group should be the same as the daemon's group, with read
+permission enabled for the group.  The owner of the configuration files should
+a user (preferably not root) other than the daemon's user id, and may have
+write access.  Alternatively, if SGID methods are used (and the configuration
+files are allowed group write access), be sure that the daemons execute as a
+different group id.   This way, control of who may modify the configuration
+files can be carefully maintained, and not by anyone who may subvert the
+daemon.
+@end enumerate
+
+These suggestions are an operational definition of the @dfn{principle of least
+priviledge}.
+
+@c FUTURE TEXT
+@c processes it touches or employs ... These have been documented in each
+@c mmodule & a full list of the distribution is included in the appendix
+@c These, in some cases, should be allowed to modify the configuration files,
+@c atleast under controlled circumstances
+
+
+@heading Requirements
+
+If you wish to use the revision control aspects, you will need the RCS module
+for Perl (from CPAN).

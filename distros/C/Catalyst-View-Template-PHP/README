@@ -1,0 +1,58 @@
+Catalyst-View-Template-PHP
+==========================
+
+Use PHP as a templating system within Catalyst.
+
+This view allows you to pass PHP scripts into a
+PHP interpreter within the Catalyst framework.
+
+If you have to ask, this module is probably not for you.
+Not everyone will have to ask.
+
+INSTALLATION
+
+This module requires a PHP interpreter and the PHP module
+(a Perl module for embedding a PHP interpreter in a Perl
+program) v0.14. If the correct version of PHP is not available
+from CPAN, you can get it from github.
+
+   git://github.com/dk/p5-php.git
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Catalyst::View::Template::PHP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-View-Template-PHP
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Catalyst-View-Template-PHP
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Catalyst-View-Template-PHP
+
+    Search CPAN
+        http://search.cpan.org/dist/Catalyst-View-Template-PHP/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-2013 Marty O'Brien
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

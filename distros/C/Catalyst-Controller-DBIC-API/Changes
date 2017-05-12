@@ -1,0 +1,220 @@
+Revision history for Catalyst-Controller-DBIC-API: 2.006002
+
+2.006002  2014-08-26 12:31:27+02:00 Europe/Vienna
+ - Fix missing Data::Printer test requirement
+
+2.006001  2014-08-25 18:27:26+02:00 Europe/Vienna
+ - Fix links to ::Request::Context
+ - Add support for the -and, -not and -or operators (RT93864)
+
+2.005001  2014-01-13 21:43:59+01:00 Europe/Vienna
+ - Fixed test failures with JSON 2.90 (RT#90188, thanks Samuel Kaufman!)
+ - Fixed generate_rs to set model to contents of stash->{class} if present
+   (thanks Alex Howarth)
+ - Use Catalyst's http method matching for REST instead of
+   ActionRole, whose feature went into core in 5.90013, and
+   MatchRequestMethod, whose feature went into 5.90020
+ - Documentation improvements
+
+2.004004 2012-11-21T12:20:41Z Europe/Vienna
+ - Fixed test failures in t/[rest,rpc]/item.t on newer HTTP::Message
+   versions
+ - Don't wrap the SQLite test schema DDL queries in a transaction to
+   suppress DBIx::Class warnings
+ - Added diagnostic messages to tests that trigger DBIx::Class warnings
+
+2.004003 2011-12-19T14:41:59Z Europe/Vienna
+ - Fixed test failure in generic.t with Moose > 2.02
+
+2.004002 2011-10-24T15:48:55Z Europe/Vienna
+ - Use the column accessor instead of set_column when inserting new objects
+ - Allow setting the result_class to undef to prevent the usage of
+   HashRefInflator
+
+2.004001 2011-08-19T16:17:53Z Europe/Vienna
+ - Changed stored_model and stored_result_source attributes to methods for
+   ACCEPT_CONTEXT/Catalyst::Component::InstancePerContext compatibility
+
+2.003002 2011-05-09T12:30:01Z Europe/Vienna
+ - Added has_errors method
+ - Fixed tests to succeed with newer DBIx::Class and Moose versions
+ - Fixed controller instantiation failures with Moose 2 in relation to
+   prefetch
+
+2.003001 2011-02-16T17:52:37Z Europe/Vienna
+ - Use JSON instead of JSON::Any to get rid of the CPAN Testers failures
+   when only JSON::Syck is available
+
+2.002004 2011-01-13T19:22:20Z Europe/Vienna
+ - Renamed Visitor to Validator::Visitor to conform with
+   Data::DPath::Validator and moved it into a separate file
+ - Fixed failure because of Data::DPath >=0.41 by not using
+   MooseX::Role::BuildInstanceOf for the validator attributes (RT#64673)
+ - Added result_class and stash_key attributes to enable their
+   configuration in the controller (RT#63686)
+
+2.002003 2010-09-16T10:44:40Z Europe/Vienna
+ - Added REST and RPC delete_bulk tests
+ - Fixed RPC delete_bulk not working at all
+ - Added REST and RPC update_bulk tests
+ - Removed useless RPC index action
+ - Fixed static configured page attribute not being used (RT#56226)
+ - Test use_json_boolean true
+ - Fixed search attribute generation for nonexistent relationships
+ - Remove trailing newlines from error messages
+
+2.002002 2010-08-03T14:40:50Z Europe/Vienna
+ - Fixed search for related columns overwriting existing params in
+   generate_column_parameters
+ - Use column accessor for updating an existing object instead of passing
+   the new values to update. This enables the column accessors to do
+   additional work (for example with method modifiers).
+ - Fixed t/rpc/list.t error message regex to pass with Moose version >=1.05
+ - Fixed pod coverage and added a test for it
+
+2.002001 2010-04-01T01:41:11Z Europe/Berlin
+ - PLEASE THOROUGHLY TEST AS SOME BEHAVIOR MAY HAVE BEEN ALTERED SUBTLY
+   WHEN DEALING WITH BULK VS SINGLE ACTIONS
+ - Remove debugging code and other noise from tests
+ - Fixed some typos and code cleanups
+ - Added possibility to fetch a single object by id using 'item'
+ - Added item_root attribute which defaults to 'data' and is used as data
+   root for 'item'
+ - Break out bulk actions into their own methods for RPC
+ - Restore identifer vs. no identifer for REST chains
+ - Chain dispatching has now been fixed to not be as hackish as before
+ - Shift around where the current resultset is set, setup() now does
+   /nothing/ by default other than be a chain anchor
+ - Tests added for updating related keys via REST
+ - generate_rs is now used to get the default resultset inside
+   inflate_request
+ - No longer uses Catalyst::Action::REST to do dispatching instead uses
+   ActionRole and MatchRequestMethod
+
+2.001003 2010-02-12T19:01:56Z America/Chicago
+ - Fill out some coercions to allow more complex search criteria (like sort
+   order)
+ - Promote the helper functions into full methods
+ - Allow iterative customization by breaking down the save_objects into
+   several discrete steps
+ - Make sure those steps also include $c
+
+2.001002 2010-02-09T01:01:57Z America/Chicago
+ - Fixed missing requirement for MooseX::Types::Structured
+ - Fixed MooseX::Aliases usage (we don't any more)
+ - Object inflation during end was broken out into its own method:
+   each_object_inflate
+ - Enable offset based paging
+
+2.001001 2010-02-07
+ - THIS RELEASE GUARANTEES TO BREAK BACKWARDS COMPATIBILITY
+ - Merge create and update into update_or_create
+ - object is much advanced now, identifier can be omitted and data_root in
+   the request is interpreted
+ - Because of the above one object or several is now possible for update or
+   create
+ - Create and update object validation now happens iteratively
+ - Creates and updates can be mixed inside a single bulk request
+ - All modifying actions on the database occur within an all-or-nothing
+   transaction
+ - Much of the DBIC search parameter munging is properly moved to the
+   RequestArguments role in the form of a trigger on 'search' to populate
+   'search_parameters' and 'search_attributes' which correspond directly to
+   ->search($parameters, $attributes)
+ - Error handling is now much more consistent, using Try::Tiny everywhere
+   possible
+ - Tests are now modernized and use JSON::Any
+ - Extending is now explicitly done via Moose method modifiers
+ - The only portion of the stash in use is to allow runtime definition of
+   create/update_allows
+ - list is now broken down into several steps:
+   + list_munge_parameters
+   + list_perform_search
+   + list_format_output
+   + row_format_output (which is just a passthrough per row)
+ - Search can now take an array of hashrefs to give the ability to use the
+   default 'OR' 
+ - By default search_parameters is an ArrayRef[HashRef] which is pertinent
+   to list_munge_parameters
+ - More thorough documentation of the various bits and pieces.
+ - Documentation now uses Pod::Weaver and Plugin::PodWeaver (weaver.ini
+   added)
+ - The distribution is now managed by Dist::Zilla
+ - And some more likely forgotten
+
+1.004002 2010-01-14
+ - Implement 'as' as a complement to 'select'
+ - CGI::Expand'ed search parameters are now also JSON decoded + test
+ - Fixed pod for parameters using a json string which shouldn't be
+   surrounded by single quotes
+ - Use next instead of NEXT in RPC
+ - Moved sub object from RPC/REST to Base to DRY This will break your code
+   if you subclass from REST and had relied on the action name 'object'
+ - Check for defined objects before returning them for create/update
+
+1.004001 2010-01-04
+ - Allow for more complex prefetch_allows (multiple keys in hash)
+ - Skip non-existant parameters in deserialization
+ - Fixed whitespace to use spaces instead of tabs
+ - Fixed pod to not use the config attributes from before 1.004
+ - Fixed prefetch_allows check to properly handle nested attrs + test
+
+1.004000 2009-12-22
+ - Moosify
+ - Move validation for *_exposes/*_allows to Data::DPath::Validator
+ - Reorganize internals to use Moose and roles
+ - Allow maximum configuration for what request parameters are named
+ - Properly handle JSON boolean values
+ - Earlier and more consistent validation of configuration and request
+   parameters
+
+1.003004 2009-12-09
+ - Database errors are also handled for searches + tests
+ - Totalcount isn't included in the response if a db error occurs while
+   fetching data
+ - Converted no_plan tests to done_testing (required Test::More 0.88)
+
+1.003003 2009-11-16
+ - Database errors are properly handled + test
+ - Fixed isa redefined warnings
+ - Fixed bug preventing compat with future Catalyst::Action::Deserialize
+   versions
+
+1.003002 2009-07-22
+ - Added totalcount to paged list responses
+ - Fixed some tests weren't run in t/rpc/list.t
+ - Fixed wrong setup_dbic_args_method error message
+
+1.003001 2009-07-17
+ - Minor fix to prevent failing test
+
+1.003000 2009-05-19
+ - Added prefetch support
+ - Refactored to ensure all request params accept JSON, CGI::Expand or
+   standard params
+ - Doc improvements
+
+1.002000 2009-03-18
+ - Better error handing when unable to parse search arg
+ - Added setup_dbic_args_method config option
+ - Added list_search_exposes config option
+ - Removed duplicate tests in t/rpc/list.t and t/rest/list.t
+ - Fixed searches on columns which have a rel with the same name and vice
+   versa
+ - Added search by json
+ - Added pagination support
+
+1.001000 2008-07-23
+ - Added setup_list_method configuration flag (jshirley)
+ - Added support for setting config params in stash
+ - Added list_grouped_by, list_count and list_ordered_by config attributes
+ - Fixed bug with behaviour of list_returns
+
+1.000002 Unknown
+ - Fixed lack of deserialization under RPC
+
+1.000001 2008-06-29
+ - Improved docs
+
+1.000000 2008-06-28
+ - Released

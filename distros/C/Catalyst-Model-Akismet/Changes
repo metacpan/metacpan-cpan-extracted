@@ -1,0 +1,17 @@
+Revision history for Catalyst::Model::Akismet
+
+0.04
+        Fix Pod synopsis (RT#63615)
+
+        Use MRO::Compat rather than Class:C3 for perl 5.10+
+
+0.03
+        Apply Catalyst::Component::InstancePerContext as a Moose
+        role, rather than inheriting from it, so that this model
+        works with Catalyst 5.80
+        
+0.02    2007-08-07
+        Add missing dependency on C3
+
+0.01    2007-03-07:
+		Initial release. Based on S3 Model

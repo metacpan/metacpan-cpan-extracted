@@ -1,0 +1,255 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>PASS Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/05.html">Postings from May 2008</a>
+
+<h2>PASS Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release</h2>
+
+
+
+
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>srezic</b><br/>
+<div class="h_name">Date:</div> May  9, 2008 11:13<br/>
+<div class="h_name">Subject:</div> PASS Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.10.0, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.10.0t &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....ok
+t/02-script..........ok
+t/03-yaml............ok
+t/04-fork............ok
+t/05-prompt..........ok
+t/06-anydump.........ok
+t/07-tsay............ok
+t/08-unit............ok
+t/09-noyaml..........ok
+All tests successful.
+Files=9, Tests=60,  7 wallclock secs ( 2.00 cusr +  3.71 csys =  5.71 CPU)
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.72
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/TermReadKey-2.30-WLpFrB/blib/arch:/usr/local/src/CPAN/build/TermReadKey-2.30-WLpFrB/blib/lib:/usr/local/src/CPAN/build/with-0.01-ch52xv/blib/arch:/usr/local/src/CPAN/build/with-0.01-ch52xv/blib/lib:/usr/local/src/CPAN/build/Sub-Prototype-Util-0.08-3rLJ3L/blib/arch:/usr/local/src/CPAN/build/Sub-Prototype-Util-0.08-3rLJ3L/blib/lib:/usr/local/src/CPAN/build/Unix-SavedIDs-0.3.1-sU9XCn/blib/arch:/usr/local/src/CPAN/build/Unix-SavedIDs-0.3.1-sU9XCn/blib/lib:/usr/local/src/CPAN/build/MasonX-Resolver-WidgetFactory-0.004-EvTVtT/blib/arch:/usr/local/src/CPAN/build/MasonX-Resolver-WidgetFactory-0.004-EvTVtT/blib/lib:/usr/local/src/CPAN/build/MasonX-Resolver-Multiplex-0.001-GsFbTM/blib/arch:/usr/local/src/CPAN/build/MasonX-Resolver-Multiplex-0.001-GsFbTM/blib/lib:/usr/local/src/CPAN/build/HTML-Mason-1.39-yKeUgo/blib/arch:/usr/local/src/CPAN/build/HTML-Mason-1.39-yKeUgo/blib/lib:/usr/local/src/CPAN/build/Class-Container-0.12-LgTYS2/blib/arch:/usr/local/src/CPAN/build/Class-Container-0.12-LgTYS2/blib/lib:/usr/local/src/CPAN/build/Params-Validate-0.91-54pVjV/blib/arch:/usr/local/src/CPAN/build/Params-Validate-0.91-54pVjV/blib/lib:/usr/local/src/CPAN/build/Exception-Class-1.24-vV4L8A/blib/arch:/usr/local/src/CPAN/build/Exception-Class-1.24-vV4L8A/blib/lib:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-WHzmJ4/blib/arch:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-WHzmJ4/blib/lib:/usr/local/src/CPAN/build/Devel-StackTrace-1.18-OoTnxu/blib/arch:/usr/local/src/CPAN/build/Devel-StackTrace-1.18-OoTnxu/blib/lib:/usr/local/src/CPAN/build/Cache-Cache-1.05-1teeCJ/blib/arch:/usr/local/src/CPAN/build/Cache-Cache-1.05-1teeCJ/blib/lib:/usr/local/src/CPAN/build/Error-0.17012-HBVY1f/blib/arch:/usr/local/src/CPAN/build/Error-0.17012-HBVY1f/blib/lib:/usr/local/src/CPAN/build/HTML-Widget-Factory-0.067-bP7bgB/blib/arch:/usr/local/src/CPAN/build/HTML-Widget-Factory-0.067-bP7bgB/blib/lib:/usr/local/src/CPAN/build/UNIVERSAL-require-0.11-mMWhsS/blib/arch:/usr/local/src/CPAN/build/UNIVERS!
+ AL-requi
+re-0.11-mMWhsS/blib/lib:/usr/local/src/CPAN/build/Package-Generator-0.102-NGrj6r/blib/arch:/usr/local/src/CPAN/build/Package-Generator-0.102-NGrj6r/blib/lib:/usr/local/src/CPAN/build/HTML-Tree-3.23-jvNwO4/blib/arch:/usr/local/src/CPAN/build/HTML-Tree-3.23-jvNwO4/blib/lib:/usr/local/src/CPAN/build/WWW-TarPipe-0.01-hmeagf/blib/arch:/usr/local/src/CPAN/build/WWW-TarPipe-0.01-hmeagf/blib/lib:/usr/local/src/CPAN/build/String-TT-0.02-vRyXvG/blib/arch:/usr/local/src/CPAN/build/String-TT-0.02-vRyXvG/blib/lib:/usr/local/src/CPAN/build/Test-TableDriven-0.02-aCHFI5/blib/arch:/usr/local/src/CPAN/build/Test-TableDriven-0.02-aCHFI5/blib/lib:/usr/local/src/CPAN/build/Test-use-ok-0.02-o5BUU4/blib/arch:/usr/local/src/CPAN/build/Test-use-ok-0.02-o5BUU4/blib/lib:/usr/local/src/CPAN/build/PadWalker-1.7-f5gNnu/blib/arch:/usr/local/src/CPAN/build/PadWalker-1.7-f5gNnu/blib/lib:/usr/local/src/CPAN/build/PPIx-Grep-v0.0.4-KeUMZk/blib/arch:/usr/local/src/CPAN/build/PPIx-Grep-v0.0.4-KeUMZk/blib/lib:/usr/local/src/CPAN/build/Test-Deep-0.100-4yFQ4U/blib/arch:/usr/local/src/CPAN/build/Test-Deep-0.100-4yFQ4U/blib/lib:/usr/local/src/CPAN/build/Test-NoWarnings-0.084-GpA8iM/blib/arch:/usr/local/src/CPAN/build/Test-NoWarnings-0.084-GpA8iM/blib/lib:/usr/local/src/CPAN/build/Test-Tester-0.107-gknQ8J/blib/arch:/usr/local/src/CPAN/build/Test-Tester-0.107-gknQ8J/blib/lib:/usr/local/src/CPAN/build/PPIx-Shorthand-v1.0.0-N1FYEe/blib/arch:/usr/local/src/CPAN/build/PPIx-Shorthand-v1.0.0-N1FYEe/blib/lib:/usr/local/src/CPAN/build/String-Format-1.14-PICR7S/blib/arch:/usr/local/src/CPAN/build/String-Format-1.14-PICR7S/blib/lib:/usr/local/src/CPAN/build/Readonly-1.03-01odie/blib/arch:/usr/local/src/CPAN/build/Readonly-1.03-01odie/blib/lib:/usr/local/src/CPAN/build/PPI-1.201-dEYU6C/blib/arch:/usr/local/src/CPAN/build/PPI-1.201-dEYU6C/blib/lib:/usr/local/src/CPAN/build/Task-Weaken-1.02-u02flL/blib/arch:/usr/local/src/CPAN/build/Task-Weaken-1.02-u02flL/blib/lib:/usr/local/src/CPAN/build/List-MoreUtils-0.21-m7Ollt/blib/arch:/usr/local/src/CPAN/build/List-Mor!
+ eUtils-0
+.21-m7Ollt/blib/lib:/usr/local/src/CPAN/build/Test-SubCalls-1.07-p5Ck0t/blib/arch:/usr/local/src/CPAN/build/Test-SubCalls-1.07-p5Ck0t/blib/lib:/usr/local/src/CPAN/build/Hook-LexWrap-0.20-hOsOuj/blib/arch:/usr/local/src/CPAN/build/Hook-LexWrap-0.20-hOsOuj/blib/lib:/usr/local/src/CPAN/build/Clone-0.28-yoa7zS/blib/arch:/usr/local/src/CPAN/build/Clone-0.28-yoa7zS/blib/lib:/usr/local/src/CPAN/build/Test-ClassAPI-1.04-ocKoWt/blib/arch:/usr/local/src/CPAN/build/Test-ClassAPI-1.04-ocKoWt/blib/lib:/usr/local/src/CPAN/build/Class-Inspector-1.22-w3eMl4/blib/arch:/usr/local/src/CPAN/build/Class-Inspector-1.22-w3eMl4/blib/lib:/usr/local/src/CPAN/build/Test-Object-0.07-EzG4AC/blib/arch:/usr/local/src/CPAN/build/Test-Object-0.07-EzG4AC/blib/lib:/usr/local/src/CPAN/build/IO-String-1.08-CJRN1l/blib/arch:/usr/local/src/CPAN/build/IO-String-1.08-CJRN1l/blib/lib:/usr/local/src/CPAN/build/File-Remove-1.40-AsUrEo/blib/arch:/usr/local/src/CPAN/build/File-Remove-1.40-AsUrEo/blib/lib:/usr/local/src/CPAN/build/Template-Plugin-ListOps-1.03-oCSOGa/blib/arch:/usr/local/src/CPAN/build/Template-Plugin-ListOps-1.03-oCSOGa/blib/lib:/usr/local/src/CPAN/build/Template-Toolkit-2.19-56rd5X/blib/arch:/usr/local/src/CPAN/build/Template-Toolkit-2.19-56rd5X/blib/lib:/usr/local/src/CPAN/build/AppConfig-1.66-tDdW0b/blib/arch:/usr/local/src/CPAN/build/AppConfig-1.66-tDdW0b/blib/lib:/usr/local/src/CPAN/build/Term-TUI-1.22-LezbuG/blib/arch:/usr/local/src/CPAN/build/Term-TUI-1.22-LezbuG/blib/lib:/usr/local/src/CPAN/build/Set-Files-1.03-xG8gsx/blib/arch:/usr/local/src/CPAN/build/Set-Files-1.03-xG8gsx/blib/lib:/usr/local/src/CPAN/build/Number-Ops-1.02-q9QXvD/blib/arch:/usr/local/src/CPAN/build/Number-Ops-1.02-q9QXvD/blib/lib:/usr/local/src/CPAN/build/Math-SigFigs-1.07-LPgAns/blib/arch:/usr/local/src/CPAN/build/Math-SigFigs-1.07-LPgAns/blib/lib:/usr/local/src/CPAN/build/List-Parseable-1.03-OhpOXt/blib/arch:/usr/local/src/CPAN/build/List-Parseable-1.03-OhpOXt/blib/lib:/usr/local/src/CPAN/build/Sort-DataTypes-2.02-Hyq5bz/blib/arch:/usr/local/src/CPAN/buil!
+ d/Sort-D
+ataTypes-2.02-Hyq5bz/blib/lib:/usr/local/src/CPAN/build/Date-Manip-5.52-qEUDEK/blib/arch:/usr/local/src/CPAN/build/Date-Manip-5.52-qEUDEK/blib/lib:/usr/local/src/CPAN/build/Data-NDS-1.02-79IKmq/blib/arch:/usr/local/src/CPAN/build/Data-NDS-1.02-79IKmq/blib/lib:/usr/local/src/CPAN/build/Test-Pod-1.26-byTvTX/blib/arch:/usr/local/src/CPAN/build/Test-Pod-1.26-byTvTX/blib/lib:/usr/local/src/CPAN/build/Algorithm-Permute-0.12-W46n1j/blib/arch:/usr/local/src/CPAN/build/Algorithm-Permute-0.12-W46n1j/blib/lib:/usr/local/src/CPAN/build/Test-Pod-Coverage-1.08-ZJTOvu/blib/arch:/usr/local/src/CPAN/build/Test-Pod-Coverage-1.08-ZJTOvu/blib/lib:/usr/local/src/CPAN/build/Pod-Coverage-0.19-QahPpH/blib/arch:/usr/local/src/CPAN/build/Pod-Coverage-0.19-QahPpH/blib/lib:/usr/local/src/CPAN/build/Devel-Symdump-2.08-oT3Syq/blib/arch:/usr/local/src/CPAN/build/Devel-Symdump-2.08-oT3Syq/blib/lib:/usr/local/src/CPAN/build/Scalar-Vec-Util-0.01-MH3aqE/blib/arch:/usr/local/src/CPAN/build/Scalar-Vec-Util-0.01-MH3aqE/blib/lib:/usr/local/src/CPAN/build/PerlIO-locale-0.05-XpqCDL/blib/arch:/usr/local/src/CPAN/build/PerlIO-locale-0.05-XpqCDL/blib/lib:/usr/local/src/CPAN/build/POE-Component-Client-CouchDB-0.03-NcWNW6/blib/arch:/usr/local/src/CPAN/build/POE-Component-Client-CouchDB-0.03-NcWNW6/blib/lib:/usr/local/src/CPAN/build/POE-Component-Client-HTTP-0.83-5GeVzD/blib/arch:/usr/local/src/CPAN/build/POE-Component-Client-HTTP-0.83-5GeVzD/blib/lib:/usr/local/src/CPAN/build/libwww-perl-5.812-cNPk34/blib/arch:/usr/local/src/CPAN/build/libwww-perl-5.812-cNPk34/blib/lib:/usr/local/src/CPAN/build/HTML-Parser-3.56-WH6vyQ/blib/arch:/usr/local/src/CPAN/build/HTML-Parser-3.56-WH6vyQ/blib/lib:/usr/local/src/CPAN/build/HTML-Tagset-3.20-50ao7W/blib/arch:/usr/local/src/CPAN/build/HTML-Tagset-3.20-50ao7W/blib/lib:/usr/local/src/CPAN/build/POE-Component-Client-Keepalive-0.1001-EZdjt3/blib/arch:/usr/local/src/CPAN/build/POE-Component-Client-Keepalive-0.1001-EZdjt3/blib/lib:/usr/local/src/CPAN/build/POE-Component-Client-DNS-1.00-02jeMw/blib/arch:/usr/local/src/CP!
+ AN/build
+/POE-Component-Client-DNS-1.00-02jeMw/blib/lib:/usr/local/src/CPAN/build/Net-DNS-0.63-GQV6tw/blib/arch:/usr/local/src/CPAN/build/Net-DNS-0.63-GQV6tw/blib/lib:/usr/local/src/CPAN/build/Digest-HMAC-1.01-iUBLKx/blib/arch:/usr/local/src/CPAN/build/Digest-HMAC-1.01-iUBLKx/blib/lib:/usr/local/src/CPAN/build/Digest-SHA1-2.11-hOf3KX/blib/arch:/usr/local/src/CPAN/build/Digest-SHA1-2.11-hOf3KX/blib/lib:/usr/local/src/CPAN/build/Net-IP-1.25-NeZbfm/blib/arch:/usr/local/src/CPAN/build/Net-IP-1.25-NeZbfm/blib/lib:/usr/local/src/CPAN/build/URI-1.36-FzLPw7/blib/arch:/usr/local/src/CPAN/build/URI-1.36-FzLPw7/blib/lib:/usr/local/src/CPAN/build/JSON-2.09-N7SKkO/blib/arch:/usr/local/src/CPAN/build/JSON-2.09-N7SKkO/blib/lib:/usr/local/src/CPAN/build/POE-Component-AI-MegaHAL-1.14-zDz8Vt/blib/arch:/usr/local/src/CPAN/build/POE-Component-AI-MegaHAL-1.14-zDz8Vt/blib/lib:/usr/local/src/CPAN/build/AI-MegaHAL-0.06-zJBCJw/blib/arch:/usr/local/src/CPAN/build/AI-MegaHAL-0.06-zJBCJw/blib/lib:/usr/local/src/CPAN/build/POE-1.0001-gZuDiz/blib/arch:/usr/local/src/CPAN/build/POE-1.0001-gZuDiz/blib/lib:/usr/local/src/CPAN/build/SVN-Notify-Filter-Watchers-0.08-8tkuiT/blib/arch:/usr/local/src/CPAN/build/SVN-Notify-Filter-Watchers-0.08-8tkuiT/blib/lib:/usr/local/src/CPAN/build/SVN-Notify-2.73-MbiYP3/blib/arch:/usr/local/src/CPAN/build/SVN-Notify-2.73-MbiYP3/blib/lib:/usr/local/src/CPAN/build/File-Stat-Moose-0.02-RqWH1O/blib/arch:/usr/local/src/CPAN/build/File-Stat-Moose-0.02-RqWH1O/blib/lib:/usr/local/src/CPAN/build/Exception-System-0.0901-YGljxG/blib/arch:/usr/local/src/CPAN/build/Exception-System-0.0901-YGljxG/blib/lib:/usr/local/src/CPAN/build/Moose-0.43-EOwFpi/blib/arch:/usr/local/src/CPAN/build/Moose-0.43-EOwFpi/blib/lib:/usr/local/src/CPAN/build/Sub-Exporter-0.979-IFJ0kg/blib/arch:/usr/local/src/CPAN/build/Sub-Exporter-0.979-IFJ0kg/blib/lib:/usr/local/src/CPAN/build/Data-OptList-0.103-1DpNaN/blib/arch:/usr/local/src/CPAN/build/Data-OptList-0.103-1DpNaN/blib/lib:/usr/local/src/CPAN/build/Sub-Install-0.924-2DWrFD/blib/arch:/usr/local/src/CP!
+ AN/build
+/Sub-Install-0.924-2DWrFD/blib/lib:/usr/local/src/CPAN/build/Params-Util-0.31-Lil2E5/blib/arch:/usr/local/src/CPAN/build/Params-Util-0.31-Lil2E5/blib/lib:/usr/local/src/CPAN/build/Class-MOP-0.55-et5QK6/blib/arch:/usr/local/src/CPAN/build/Class-MOP-0.55-et5QK6/blib/lib:/usr/local/src/CPAN/build/MRO-Compat-0.05-2Bvz5K/blib/arch:/usr/local/src/CPAN/build/MRO-Compat-0.05-2Bvz5K/blib/lib:/usr/local/src/CPAN/build/Sub-Name-0.03-v9QZtF/blib/arch:/usr/local/src/CPAN/build/Sub-Name-0.03-v9QZtF/blib/lib:/usr/local/src/CPAN/build/Test-Exception-0.27-Y9oLZc/blib/arch:/usr/local/src/CPAN/build/Test-Exception-0.27-Y9oLZc/blib/lib:/usr/local/src/CPAN/build/Sub-Uplevel-0.1901-7UphqY/blib/arch:/usr/local/src/CPAN/build/Sub-Uplevel-0.1901-7UphqY/blib/lib:/usr/local/src/CPAN/build/Test-LongString-0.11-ThspLO/blib/arch:/usr/local/src/CPAN/build/Test-LongString-0.11-ThspLO/blib/lib:/usr/local/src/CPAN/build/Exception-Died-0.01-URhDXD/blib/arch:/usr/local/src/CPAN/build/Exception-Died-0.01-URhDXD/blib/lib:/usr/local/src/CPAN/build/Test-Unit-Lite-0.0904-vLYnwr/blib/arch:/usr/local/src/CPAN/build/Test-Unit-Lite-0.0904-vLYnwr/blib/lib:/usr/local/src/CPAN/build/Exception-Warning-0.01-neqsKt/blib/arch:/usr/local/src/CPAN/build/Exception-Warning-0.01-neqsKt/blib/lib:/usr/local/src/CPAN/build/Exception-Base-0.16-kUuQMM/blib/arch:/usr/local/src/CPAN/build/Exception-Base-0.16-kUuQMM/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 54951
+    PERL5_CPAN_IS_RUNNING = 54951
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 39391,54951
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.10.0t
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.2501   
+    ExtUtils::CBuilder  0.21     
+    ExtUtils::Command   1.13     
+    ExtUtils::Install   1.44     
+    ExtUtils::MakeMaker 6.42     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.18_02  
+    File::Spec          3.2501   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       2.64     
+    Test::More          0.72     
+    YAML                0.66     
+    YAML::Syck          0.99     
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd-thread-multi
+    uname='freebsd biokovo.herceg.de 6.1-release freebsd 6.1-release #0: sun may 7 04:32:43 utc 2006 root@opus.cse.buffalo.edu:usrobjusrsrcsysgeneric i386 '
+    config_args='-D usethreads=define -Dprefix=/usr/perl5.10.0t -Dusemymalloc=n -D cc=ccache cc -Dgccansipedantic -Duse64bit -de -D hintfile=myfreebsd'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=define, usemultiplicity=define
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='ccache cc', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include',
+    optimize='-O2 -mtune=athlon64 -pipe',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='3.4.4 [FreeBSD] 20050518', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='ccache cc', ldflags ='-pthread -Wl,-E  -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lcrypt
+    perllibs=-lm -lcrypt
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  
+    <li><b>
+      PASS Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release</b>
+      by srezic</li> 
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

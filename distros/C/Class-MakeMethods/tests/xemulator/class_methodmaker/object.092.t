@@ -1,0 +1,55 @@
+#!/usr/local/bin/perl
+
+package Y;
+sub new { bless { foo => 'foo', bar => 'bar' }, shift; }
+sub foo { shift->{'foo'}; }
+sub bar {
+  my ($self, $new) = @_;
+  defined $new and $self->{'bar'} = $new;
+  $self->{'bar'};
+}
+
+package X;
+
+BEGIN { unshift @INC, ( $0 =~ /\A(.*?)[\w\.]+\z/ )[0] }
+use Test;
+
+use Class::MakeMethods::Emulator::MethodMaker
+  object  => [
+	      'Y' => 'a',
+	      'Y' => [ qw / b c d / ],
+	      'Y' => {
+		      slot => 'e',
+		      forward => [ qw / foo / ],
+		     },
+	      'Y' => {
+		      slot => 'f',
+		      comp_mthds => [ qw / bar / ],
+		     },
+	     ];
+
+sub new { bless {}, shift; }
+my $o = new X;
+
+TEST { 1 };
+
+TEST { ref $o->a eq 'Y' };
+TEST { ref $o->b eq 'Y' };
+
+my $y = new Y;
+TEST { $o->c($y); };
+TEST { $o->c eq $y };
+TEST { ref $o->c eq 'Y' };
+
+TEST { ref $o->e eq 'Y' };
+
+TEST { $o->foo eq 'foo' };
+TEST { $o->bar('bar') };
+TEST { $o->bar eq 'bar' };
+
+TEST { $o->e->foo eq $o->foo };
+
+exit 0;
+
+
+

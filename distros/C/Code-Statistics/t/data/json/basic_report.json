@@ -1,0 +1,271 @@
+
+================================================================================
+============================ Code Statistics Report ============================
+================================================================================
+
+
+================================================================================
+                                  RootDocument
+================================================================================
+
+averages
+ccomp: 3.66
+lines: 29
+sdepth: 0
+size: 248
+
+
+                                     ccomp
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      1   1     9    71      0  625 2.45
+data/shelltest/basic_collect/OneSub.pm        1   1     1    10      0   73 0.27
+data/shelltest/basic_collect/Empty.pm         1   1     1     6      0   46 0.27
+--------------------------------------------------------------------------------
+
+
+                                     lines
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      1   1     9    71      0  625 2.45
+data/shelltest/basic_collect/OneSub.pm        1   1     1    10      0   73 0.34
+data/shelltest/basic_collect/Empty.pm         1   1     1     6      0   46 0.21
+--------------------------------------------------------------------------------
+
+
+                                      size
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      1   1     9    71      0  625 2.52
+data/shelltest/basic_collect/OneSub.pm        1   1     1    10      0   73 0.29
+data/shelltest/basic_collect/Empty.pm         1   1     1     6      0   46 0.19
+--------------------------------------------------------------------------------
+
+
+================================================================================
+                                     Block
+================================================================================
+
+averages
+ccomp: 2.71
+lines: 6.47
+sdepth: 5.42
+size: 69.42
+
+
+                                     ccomp
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6  22     9    20      2  234 3.32
+data/shelltest/basic_collect/SomeSubs.pm      7  12     8    17      4  207 2.95
+data/shelltest/basic_collect/SomeSubs.pm      8  12     7    15      6  188 2.58
+data/shelltest/basic_collect/SomeSubs.pm      9  12     6    13      8  169 2.21
+data/shelltest/basic_collect/SomeSubs.pm     10  12     5    11     10  150 1.84
+data/shelltest/basic_collect/SomeSubs.pm     11  16     4     9     12  127 1.47
+data/shelltest/basic_collect/SomeSubs.pm     12  20     3     7     14  100 1.11
+data/shelltest/basic_collect/SomeSubs.pm     13  24     2     5     16   69 0.74
+data/shelltest/basic_collect/SomeSubs.pm     67  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     63  13     1     3      2   15 0.37
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6  10     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     14  28     1     3     18   34 0.37
+data/shelltest/basic_collect/SomeSubs.pm     27  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     31  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     35  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     39  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     43  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     47  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     51  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     55  13     1     3      2   15 0.37
+--------------------------------------------------------------------------------
+
+
+                                     lines
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6  22     9    20      2  234 3.09
+data/shelltest/basic_collect/SomeSubs.pm      7  12     8    17      4  207 2.63
+data/shelltest/basic_collect/SomeSubs.pm      8  12     7    15      6  188 2.32
+data/shelltest/basic_collect/SomeSubs.pm      9  12     6    13      8  169 2.01
+data/shelltest/basic_collect/SomeSubs.pm     10  12     5    11     10  150 1.70
+data/shelltest/basic_collect/SomeSubs.pm     11  16     4     9     12  127 1.39
+data/shelltest/basic_collect/SomeSubs.pm     12  20     3     7     14  100 1.08
+data/shelltest/basic_collect/SomeSubs.pm     13  24     2     5     16   69 0.77
+data/shelltest/basic_collect/SomeSubs.pm     67  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     63  13     1     3      2   15 0.46
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6  10     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     14  28     1     3     18   34 0.46
+data/shelltest/basic_collect/SomeSubs.pm     27  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     31  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     35  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     39  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     43  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     47  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     51  13     1     3      2   15 0.46
+data/shelltest/basic_collect/SomeSubs.pm     55  13     1     3      2   15 0.46
+--------------------------------------------------------------------------------
+
+
+                                     sdepth
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm     14  28     1     3     18   34 3.32
+data/shelltest/basic_collect/SomeSubs.pm     13  24     2     5     16   69 2.95
+data/shelltest/basic_collect/SomeSubs.pm     12  20     3     7     14  100 2.58
+data/shelltest/basic_collect/SomeSubs.pm     11  16     4     9     12  127 2.21
+data/shelltest/basic_collect/SomeSubs.pm     10  12     5    11     10  150 1.84
+data/shelltest/basic_collect/SomeSubs.pm      9  12     6    13      8  169 1.47
+data/shelltest/basic_collect/SomeSubs.pm      8  12     7    15      6  188 1.11
+data/shelltest/basic_collect/SomeSubs.pm      7  12     8    17      4  207 0.74
+data/shelltest/basic_collect/SomeSubs.pm     67  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     63  13     1     3      2   15 0.37
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6  10     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm      6  22     9    20      2  234 0.37
+data/shelltest/basic_collect/SomeSubs.pm     27  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     31  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     35  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     39  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     43  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     47  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     51  13     1     3      2   15 0.37
+data/shelltest/basic_collect/SomeSubs.pm     55  13     1     3      2   15 0.37
+--------------------------------------------------------------------------------
+
+
+                                      size
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6  22     9    20      2  234 3.37
+data/shelltest/basic_collect/SomeSubs.pm      7  12     8    17      4  207 2.98
+data/shelltest/basic_collect/SomeSubs.pm      8  12     7    15      6  188 2.71
+data/shelltest/basic_collect/SomeSubs.pm      9  12     6    13      8  169 2.43
+data/shelltest/basic_collect/SomeSubs.pm     10  12     5    11     10  150 2.16
+data/shelltest/basic_collect/SomeSubs.pm     11  16     4     9     12  127 1.83
+data/shelltest/basic_collect/SomeSubs.pm     12  20     3     7     14  100 1.44
+data/shelltest/basic_collect/SomeSubs.pm     13  24     2     5     16   69 0.99
+data/shelltest/basic_collect/SomeSubs.pm     14  28     1     3     18   34 0.49
+data/shelltest/basic_collect/SomeSubs.pm     67  13     1     3      2   15 0.22
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6  10     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     27  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     31  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     35  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     39  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     43  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     47  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     51  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     55  13     1     3      2   15 0.22
+data/shelltest/basic_collect/SomeSubs.pm     59  13     1     3      2   15 0.22
+--------------------------------------------------------------------------------
+
+
+================================================================================
+                                      Sub
+================================================================================
+
+averages
+ccomp: 1.61
+lines: 4.30
+sdepth: 1
+size: 44.30
+
+
+                                     ccomp
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6   1     9    20      1  255 5.57
+data/shelltest/basic_collect/SomeSubs.pm     67   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     63   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     59   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     55   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     51   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     47   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     43   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     39   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     35   1     1     3      1   27 0.62
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6   1     1     3      1   24 0.62
+data/shelltest/basic_collect/SomeSubs.pm     27   1     1     3      1   27 0.62
+data/shelltest/basic_collect/SomeSubs.pm     31   1     1     3      1   27 0.62
+--------------------------------------------------------------------------------
+
+
+                                     lines
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6   1     9    20      1  255 4.64
+data/shelltest/basic_collect/SomeSubs.pm     67   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     63   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     59   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     55   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     51   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     47   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     43   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     39   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     35   1     1     3      1   27 0.70
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6   1     1     3      1   24 0.70
+data/shelltest/basic_collect/SomeSubs.pm     27   1     1     3      1   27 0.70
+data/shelltest/basic_collect/SomeSubs.pm     31   1     1     3      1   27 0.70
+--------------------------------------------------------------------------------
+
+
+                                      size
+top ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/SomeSubs.pm      6   1     9    20      1  255 5.76
+data/shelltest/basic_collect/SomeSubs.pm     67   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     63   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     59   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     55   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     51   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     47   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     43   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     39   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     35   1     1     3      1   27 0.61
+--------------------------------------------------------------------------------
+
+bottom ten
+Path                                       Line Col Ccomp Lines Sdepth Size Dev.
+--------------------------------------------------------------------------------
+data/shelltest/basic_collect/OneSub.pm        6   1     1     3      1   24 0.54
+data/shelltest/basic_collect/SomeSubs.pm     27   1     1     3      1   27 0.61
+data/shelltest/basic_collect/SomeSubs.pm     31   1     1     3      1   27 0.61
+--------------------------------------------------------------------------------
+

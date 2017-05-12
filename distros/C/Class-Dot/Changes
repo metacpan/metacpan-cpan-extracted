@@ -1,0 +1,159 @@
+Revision history for Class-Dot
+
+1.5.0 Sat  Nov 03 22:05:33 GMT+2 2007 [asksh@cpan.org]
+
+    - 2.0_04 backported as 1.5.0.
+
+2.0_04 Wed Oct 31 16:20:10 GMT+2 2007 [asksh@cpan.org]
+
+    - New feature: You can now do chained accessors by using the -chained use
+      option. Example:
+
+        package Person;
+        use Class::Dot qw(-new -chained :std);
+
+        property name  => isa_String;
+        property email => isa_String;
+        property age   => isa_Int;
+
+        package main;
+
+        my $person = Person->new()
+            ->set_name('Ask')
+            ->set_email('asksh@cpan.org')
+            ->set_age(25);
+
+2.0_03 Tue Oct 30 01:19:37 GMT+2 2007 [asksh@cpan.org]
+
+    - New and more readable SYNOPSIS.
+
+    - A perl.vim syntax highlighting file for vim that also highlights
+      'property' in contrib/vim/syntax. Read contrib/vim/README for more
+      information.
+
+    - Types separated from Class::Dot and moved into Class::Dot::Types.
+
+2.0_02 Mon Oct 29 18:08:12 GMT+2 2007 [asksh@cpan.org]
+
+    - License changed to the Modified BSD license,
+      however if you ask me nicely I might give you permission to use
+      it with another license.
+
+    - Now using Module::Install instead of Module::Build.
+      (there was problems with using version::qv with M::B).
+
+    - New test script to make sure we are compatible with older perls.
+      (Right now we try to make it work with perl 5.6.0, but if we like something
+      that is not supported in 5.6.0 we will leave it for 5.8.1).
+
+    - Had to move ./Build wikidoc functionality into it's own script. (Since
+      we're not using Module::Build anymore).
+
+    - I've started signing the distribution with my PGP key.
+
+    - Bumped the META version we ensure specification for to 1.3. (was 1.2).
+
+* Changed to BSD license.
+
+2.0_01 Sun Oct 28 17:16:32 GMT+2 2007 [asksh@cpan.org]
+
+    - Code cleanup.
+
+    - Class::Dot now installs new methods to the object it creates:
+
+        - __setattr__($self, $attribute_name, $value):
+        
+        Set a object attribute. This is great for those times when you want to
+        do this:
+    
+            my %some_default_values = (
+                'foo' => 'bar',
+                'bar' => 'baz',
+                'xuzzy' => 'fuzzy',
+            );
+    
+            while (my ($attr_name, $attr_value) = each %some_default_values) {
+            my $set_attribute = 'set_' . $attr_name;
+            if ($object->can($set_attribute)) {
+                $object->$set_attribute( $attr_value );
+                }
+            }
+    
+
+        This isn't very pretty, so that's why you now can do this:
+
+            while (my ($attr_name, $attr_value) = each %some_default_values) {
+                $object->__setattr__($attr_name, $attr_value);
+            }
+
+
+        - $val = __getattr__($self, $attribute_name)
+
+        Get an attributes value.
+
+        - $bool = __hasattr__($self, $attribute_name)
+
+        Returns true if $self has the attribute $attribute_name.
+
+    - Now you can't do this anymore;
+
+        $object->{attribute} = $value;
+
+    because now the attributes are better hidden in the object's hash.
+    You can probably find out how they are saved by doing keys %{ $object },
+    but we _recommend against accessing that hash directly_!.
+
+    
+    - Now you can override properties simply by writing;
+
+        property name => isa_String('foo');
+
+        sub name {
+            my ($self) = @_;
+            warn 'Accessing name property';
+            return $self->__getattr__('name');
+        }
+
+        sub set_name {
+            my ($self, $new_name) = @_;
+            warn $self->__getattr__('name') . " is changing name to $new_name";
+            $self->__setattr__('name', $new_name);
+            return;
+        }
+
+    instead of using after_property_get() and after_property_set().
+
+    (Note: Just be sure not to use property() in a BEGIN block, you have to use
+    after_property_* to do that!)
+
+1.0.5  Mon Oct 01 17:13:03 GMT+2 2007 [asksh@cpan.org]
+    -  isa_File added (a Filehandle).
+    -  isa_Code added (a code reference).
+    -  Added import option: -rebuild.
+       If you return something blessed from your BUILD method and -rebuild
+       option is set, it will set $self to that.
+
+1.0.4  Thu Sep 20 16:30:11 GMT+2 2007 [asksh@cpan.org]
+    -  The created constructor (when using -new import tag option) didn't
+       search ISA properly while setting properties using options to new().
+    -  isa_Data now sets default value properly.
+
+
+1.0.3  Thu Sep 12 16:55:48 GMT+2 2007 [asksh@cpan.org]
+    -  isa_Int and isa_String set the initial value to 0 and q{} when no
+       default value was defined, this resulted in `defined $property` to
+       return true.
+
+1.0.2  Tue Sep 12 10:13:04 GMT+2 2007 [asksh@cpan.org]
+    -  Subversion now hosted at googlecode.
+       http://class-dot.googlecode.comsearch
+
+1.0.1  Tue Sep 11 24:36:32 GMT+2 2007 [asksh@cpan.org]
+    -  isa_Object no longer automaticly makes new objects if the property is
+       not set. If you want that, use: isa_Object('My::Class', auto => 1);
+    -  Fixed problems with isa_Object where it would try to make
+       a new instance even though no default class was defined.
+
+0.0.1  Sun Sep  9 02:22:58 GMT+2 2007 [asksh@cpan.org]
+       Initial release.
+

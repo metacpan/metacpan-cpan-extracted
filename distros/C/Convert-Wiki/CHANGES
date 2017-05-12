@@ -1,0 +1,45 @@
+Revision history for Perl extension Convert::Wiki.
+
+2004-12-24 v0.01 Tels 22 tests
+  * original version; created by h2xs 1.23 with options
+    --force -A -X -n Convert::Wiki -b 5.6.1 --skip-autoloader
+  * basicobject/code structure and layout is there, plus tests and some doc
+  * examples/txt2wiki
+
+2004-12-24 v0.02 Tels 52 tests
+  * first working version that can actually convert a txt file
+  * add doc about METHODS and examples in pm files
+  * Wiki: add docs about internal workings
+  * Wiki: implement from_txt(), as_wiki() and clear(), debug()
+  * Wiki: from_txt() calls clear prior to taking input
+  * Wiki, Node: error() can set a new error message
+  * Node: add types "mono", "line" and "item"
+  * Node: complain about unknown types
+  * added Item.pm, Line.pm, Mono.pm
+  * Wiki: added options 'debug' and 'interlink' (not working yet)
+
+2004-12-25 v0.03 Tels 82 tests
+  * License is GPL
+  * Wiki: add nodes()
+  * Node: add link(), next(), prev(), prev_by_type()
+  * Wiki: moved from_txt() to Convert/Wiki/Txt.pm
+  * fixes a lot in text recognition code that broke many simple examples
+  * use Test::Differences for some generic text => wiki tests
+  * use prev_by_type() to correct levels of headlines (first headline,
+    headline right after another headline)
+  * use _remove_me() to remove "line" nodes right at start and for
+    headlines
+
+2004-12-26 v0.04 Tels 83 tests
+  * txt2wiki: add command line options: debug, interlink, input, output
+  * txt2wiki: add pod with instructions and synopsis
+  * Node: add interlink()
+  * supports (inter)linking phrases and URls
+
+2004-12-26 v0.05 Tels 83 tests
+  * linking phrases at the very start of a node was broken (this
+    also broke linking entire headlines)
+  * use Text::Format: remove linebreaks from paragraphs, and then rewrap them
+    for output. This also fixes links in paragraphs were the phrase spans
+    multiple lines.
+

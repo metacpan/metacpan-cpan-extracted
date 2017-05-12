@@ -1,0 +1,6 @@
+Revision history for Perl extension Convert::PerlRef2String.
+
+0.01  Tue Jul 19 16:24:57 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Convert::PerlRef2String
+

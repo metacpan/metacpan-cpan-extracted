@@ -1,0 +1,85 @@
+NAME
+    Acme::Colour - additive and subtractive human-readable colours
+
+SYNOPSIS
+      # light
+      $c = Acme::Colour->new("black");
+      $colour = $c->colour; # black
+      $c->add("red");   # $c->colour now red
+      $c->add("green"); # $c->colour now yellow
+
+      # pigment
+      $c = Acme::Colour->new("white");
+      $c->mix("cyan");    # $c->colour now cyan
+      $c->mix("magenta"); # $c->colour now blue
+
+DESCRIPTION
+    The Acme::Colour module mixes colours with human-readable names.
+
+    There are two types of colour mixing: the mixing of lights and the
+    mixing of pigments. If one take two differently coloured beams of light
+    and projects them on to a screen, the mixing of these lights occurs
+    according to the principle of additive colour mixing. If one mixes two
+    differently coloured paints they mix according to the principle of
+    subtractive colour mixing.
+
+METHODS
+  new()
+    The new() method creates a new colour. It takes an optional argument
+    which is the initial colour used:
+
+      $c = Acme::Colour->new("black");
+
+  colour()
+    The colour() method returns the current colour. Note that
+    stringification of the colour object magically returns the colour too:
+
+      $colour = $c->colour; # black
+      print "The colour is $c!\n";
+
+  add()
+    The add() method performs additive mixing on the colour. It takes in the
+    colour to add in:
+
+      $c->add("red");
+
+  mix()
+    The mix() method performs subtractive mixing on the colour. It takes in
+    the colour to mix in:
+
+      $c->mix("cyan");
+
+ALTERNATIVE INTERFACE
+    There is an alternative interface to this module which overloads string
+    quoting. This is very cute, but is not recommended in production code.
+    Strings containing colour names magically get converted into
+    Acme::Colour objects and additive and subtractive mixing is performed on
+    these "strings" using "+" and "-":
+
+      use Acme::Colour constants => 1; # note special invocation
+
+      my $red = "red";            # now an Acme::Colour object
+      my $green = "green";        # likewise
+      my $yellow = $red + $green; # add()s the two colours
+
+      my $cyan = "cyan";           # now an Acme::Colour object
+      my $magenta = "magenta";     # likewise
+      my $blue = $cyan - $magenta; # mix()es the two colours
+
+NOTES
+    A good explanation of colour and colour mixing is available at:
+    http://www.photoshopfocus.com/cool_tips/tips_color_basics_p1.htm
+
+    This module throws an exception upon unknown colours.
+
+    No, "colour" is not a typo.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2002-3, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

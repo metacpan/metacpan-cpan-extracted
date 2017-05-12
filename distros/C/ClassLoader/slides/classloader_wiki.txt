@@ -1,0 +1,178 @@
+==== Zweck ====
+
+<[center]
+Lade Klassen automatisch, wenn sie benötigt werden
+[center]>
+
+==== Klassisches Laden ====
+
+<[code][basicstyle=\tiny]
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Sbit;
+use Sbit::I18n;
+use Sbit::Function;
+use Sbit::Web::Cgi;
+use Sbit::Web::Browser;
+use Sbit::Web::Session;
+use Sbit::Web::Html::Form;
+use Sbit::Web::Html::Popup;
+use Sbit::Web::Html::Progress;
+use Sbit::Web::Html::Subpage;
+use Sbit::Web::Html::Table;
+use Sbit::Web::Html::Widget;
+use Sbit::Dbms::Database;
+use Sbit::Dbms::Table;
+use Sbit::Image::Gd;
+use Sbit::Image::Magick;
+use Sbit::Plot::Diagram;
+use Sbit::Plot::Diagram::Colorbar;
+use Sbit::Io::Import;
+use Sbit::Io::Export;
+use Sbit::Exception;
+# ...noch mehr Module
+
+# das Programm
+...
+[code]>
+
+==== Automatisches Laden ====
+
+<[code][basicstyle=\tiny]
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use ClassLoader;
+
+# das Programm
+...
+[code]>
+
+==== Vorteile ====
+
+* keine use-Aufrufe mehr schreiben
+* Klassen werden erst geladen, wenn sie benötigt werden
+* die Startzeit des Programms verkürzt sich
+* ggf. weniger Speicherbedarf
+
+==== Zeitpunkt des Ladens ====
+
+Wann wird eine Klasse "benötigt"? \pause
+
+Antwort: Beim ersten Methodenaufruf.
+
+==== Klassenmethode ====
+
+<[block]{Aufruf einer Klassenmethode}
+<[code]
+my $obj = My::Class->new; # loads My/Class.pm
+[code]>
+[block]>
+
+==== Objektmethode ====
+
+<[block]{Aufruf einer Objektmethode}
+<[code][numbers=left]
+my $obj = bless {a=>1, b=>2},'My::Class';
+my $val = $obj->get('a'); # loads My/Class.pm
+[code]>
+[block]>
+
+==== Voraussetzungen für Autoladbarkeit ====
+
+Klasse ist nach Perl-Konventionen implementiert, d.h.
+
+# jede Klasse in einem eigenen Modul (.pm-Datei)
+# Modulpfad entspricht Klassenname
+# die Klasse lädt ihre Basisklassen selbständig
+
+==== Beispiel: Definition einer autoladbaren Klasse ====
+
+<[block]{My/Class.pm}
+<[code][numbers=left]
+package My::Class;
+use base qw/<BASECLASSES>/;
+
+<METHODS>
+
+1;
+[code]>
+[block]>
+
+==== ??? ====
+
+<[center]
+Wie funktioniert das?
+[center]>
+
+==== Methodensuche in Perl ====
+
+# die Klasse selbst
+# alle Basisklassen (Tiefensuche über @ISA)
+# UNIVERSAL
+# AUTOLOAD() in 1-3
+
+==== Implementierung Klasse ClassLoader ====
+
+Definition
+
+<[block]
+<[code][numbers=left]
+package ClassLoader;
+push @UNIVERSAL::ISA,'ClassLoader';
+
+sub AUTOLOAD {
+    ...
+}
+
+1;
+[code]>
+[block]>
+
+==== Implementierung AUTOLOAD-Methode====
+
+<[block]{}
+<[code][numbers=left]
+sub AUTOLOAD {
+    my $this = shift;
+    # @_: Methodenargumente
+[<2-7>
+    my ($class,$sub) = our $AUTOLOAD =~ /^(.*)::(\w+)$/;]
+[<3-7>    return if $sub !~ /\[^A-Z\]/; # return if DESTROY]
+[<4-7>
+    eval "use $class";]
+[<5-7>    if ($@) {
+        <EXCEPTION: Modul kann nicht geladen werden>
+    }]
+[<6-7>
+    unless ($this->can($sub)) {
+        <EXCEPTION: Methode existiert nicht>
+    }]
+[<7-7>
+    return $this->$sub(@_);
+}]
+[code]>
+[block]>
+
+==== Fallstricke ====
+
+* abweichender Modulpfad ==> per @use@ laden
+* mehrere Klassen per Modul ==> per @use@ laden
+* Module aus Funktionen ==> per @autouse@ oder @use@ laden
+* autom. Laden per import() nicht möglich
+
+==== Unproblematisch ====
+
+* sonstige AUTOLOAD-Methoden stören ''nicht''
+* keine Performance-Einbuße
+
+==== CPAN ====
+
+<[block]{}
+http://search.cpan.org/$\sim$fseitz/ClassLoader/
+[block]>

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use 5.008;
+use strict;
+use warnings;
+use CPAN::WWW::Top100::Generator 0.10 ();
+
+our $VERSION = '0.10';
+
+my $dir = $ARGV[0];
+unless ( $dir ) {
+	die "Did not provide a build directory";
+}
+
+CPAN::WWW::Top100::Generator->new(
+	dir => $dir,
+)->run;

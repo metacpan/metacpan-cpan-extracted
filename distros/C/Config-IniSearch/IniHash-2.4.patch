@@ -1,0 +1,22 @@
+--- IniHash.pm.orig	2003-08-04 00:29:42.000000000 -0500
++++ IniHash.pm	2003-08-04 00:34:14.000000000 -0500
+@@ -131,7 +131,8 @@
+ 		open $IN, $file or return undef;
+ 	}
+ 
+-	my ($lc,$uc) = ( $opt{forName} eq 'lc', $opt{forName} eq 'uc');
++	my ($lc,$uc) = ( $opt{forName} eq 'lc', $opt{forName} eq 'uc')
++        if defined $opt{forName};
+ 	my $forValue = $opt{forValue};
+ 
+ 	$hash->{'__SECTIONS__'} = [] if $opt{sectionorder};
+@@ -229,7 +230,8 @@
+ 	my $IN = gensym();
+ 	tie *$IN, 'IO::Scalar', \$text;
+ 
+-	my ($lc,$uc) = ( $opt{forName} eq 'lc', $opt{forName} eq 'uc');
++	my ($lc,$uc) = ( $opt{forName} eq 'lc', $opt{forName} eq 'uc')
++        if defined $opt{forName};
+ 	my $forValue = $opt{forValue};
+     while (<$IN>) {
+         /^\s*;/ and next;

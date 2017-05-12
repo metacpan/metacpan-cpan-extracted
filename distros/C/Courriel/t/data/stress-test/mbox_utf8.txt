@@ -1,0 +1,74 @@
+From catalyst-bounces@lists.rawmode.org  Mon Jan  9 09:03:05 2006
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by smtp.mazrmail.com (8.12.11/8.12.11) with ESMTP id k09F34CF000596
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Mon, 9 Jan 2006 09:03:04 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EvyNR-0003nh-97; Mon, 09 Jan 2006 15:52:05 +0100
+Received: from mail.gmx.net ([213.165.64.21])
+        by rawmode.org with smtp (Exim 4.52) id 1EvyNK-0000zA-QL
+        for catalyst@lists.rawmode.org; Mon, 09 Jan 2006 15:52:03 +0100
+Received: (qmail invoked by alias); 09 Jan 2006 14:58:36 -0000
+Received: from xdsl-84-44-230-207.netcologne.de (EHLO klangraum)
+        [84.44.230.207]
+        by mail.gmx.net (mp035) with SMTP; 09 Jan 2006 15:58:36 +0100
+X-Authenticated: #163624
+Date: Mon, 9 Jan 2006 15:58:47 +0100
+From: "A. Pagaltzis" <pagaltzis@gmx.de>
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+Subject: Re: [Catalyst] View::TT FILTERS and utf-8
+Message-ID: <20060109145847.GD19213@klangraum>
+Mail-Followup-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+References: <25861274-FBBF-4223-A4EB-DE59EB39579B@simplicidade.org>
+        <11A4821D-78DB-11DA-BF33-000A95719C94@sedition.com>
+        <3390cd220601060640q1c24d653u@mail.gmail.com>
+        <4f352aae0601060732r6e61bab9x@mail.gmail.com>
+        <20060106155339.GD30697@central.redice.net>
+        <3390cd220601090513h4e3e2d40g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3390cd220601090513h4e3e2d40g@mail.gmail.com>
+User-Agent: Mutt/1.4.2.1i
+X-Y-GMX-Trusted: 0
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+
+Hi Bernard,
+
+* Bernard FRIT <bernard.frit@gmail.com> [2006-01-09 15:40]:
+>Even if setting up charset to iso-8559-1 solved the problem, I
+>'m concerned by the fact that the output is not html safe. It
+>produces chars > 127 in place of escaped html chars as
+>&eacute;...
+
+â<80><9c>HTML safe?â<80><9d> If the charset is ISO-8859-1, you can â<80><9c>safelyâ<80><9d> use
+all characters from ISO-8859-1. That includes accented characters
+and umlauts. Escaping all characters > 127 is only necessary if
+the encoding is US-ASCII.
+
+Note that the default encoding for text/html, if none other is
+explicitly specified, is ISO-8859-1â<80>¦
+
+Regards,
+--
+Aristotle Pagaltzis // <http://plasmasturm.org/>
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst

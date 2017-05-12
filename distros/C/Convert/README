@@ -1,0 +1,62 @@
+Convert/Cyr version 0.01
+========================
+
+ABSTRACT
+    Convert::Cyr, chcp - change cyrillic code page of a text.
+
+NAME
+    Convert::Cyr, chcp - Perl module for change cyrillic code page 
+    of a text.
+
+SYNOPSIS
+      use Convert::Cyr qw(chcp);
+      $converted_string=chcp($string, $maxlen, $from, $to);
+
+DESCRIPTION
+    chcp takes as the first argument a string that is to be converted.
+    It returns the converted string. Second argument is the lenght of
+    the string. Third is the source codepage. Forth is the target codepage.
+
+    Original description from PHP function:
+
+    convert_cyr_string (string str, string from, string to)
+    "This function returns the given string converted from one Cyrillic 
+    character set to another. The from and to arguments are single 
+    characters that represent the source and target Cyrillic character sets." 
+
+    The supported types are: 
+	k - koi8-r 
+	w - windows-1251 
+	i - iso8859-5 
+	a - x-cp866 
+	d - x-cp866 
+	m - x-mac-cyrillic 
+	z - translit
+
+INSTALLATION
+   To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+None
+
+COPYRIGHT AND LICENCE
+
+Portions Copyright (c) 2001 Konstantin Doulepov <kdoulepov@eur.ko.com>
+Portions Copyright (c) 1999, 2000 The PHP Group. All rights reserved.
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+AUTHOR
+    Konstantin Doulepov <kdoulepov@eur.ko.com>. With code integrated
+    that was in PHP function of "cyr_convert" (Kirill Maximov <kir@rus.net>).

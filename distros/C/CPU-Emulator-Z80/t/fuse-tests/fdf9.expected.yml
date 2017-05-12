@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdf9
+registers:
+  AF: 49760
+  AF_: 0
+  BC: 39214
+  BC_: 0
+  DE: 54596
+  DE_: 0
+  HL: 26619
+  HL_: 0
+  I: 0
+  IX: 47710
+  IY: 13718
+  PC: 2
+  R: 2
+  SP: 13718

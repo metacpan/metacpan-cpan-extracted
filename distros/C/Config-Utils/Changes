@@ -1,0 +1,33 @@
+0.06 2015-10-01T12:34:02+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.05 2014-09-01T00:01:07+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Fix LICENSE file.
+ - Rewrite B<> to C<> in doc for code parameters and methods.
+ - Update Module::Install to 1.10 version.
+
+0.04 2013-09-21
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Add Test::NoWarnings to tests.
+ - Add dependency for perl (based on Error::Pure).
+ - Add missing example from doc.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.03 2012-08-03
+ - Fix bug in hash_array and callbacks.
+ - Improve doc.
+ - Rename variables in code to better names.
+
+0.02 2012-08-03
+ - Add hash_array() subroutine.
+ - Code optimalization.
+
+0.01 2012-06-22
+ - First version.

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:44Z">
+<BookList total_results="252" page_size="10" page_number="16" shown_results="10">
+<BookData book_id="the_complete_stories_a13" isbn="0679417400">
+<Title>The Complete Stories</Title>
+<TitleLong>The Complete Stories (Everyman's Library (Cloth))</TitleLong>
+<AuthorsText>EDGAR ALLAN POE, </AuthorsText>
+<PublisherText publisher_id="everymans_library">Everyman's Library</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.4&quot;x8.3&quot;x1.9&quot;; 992 pages; 1.8 lb" language="" edition_info="Hardcover; 1993-01-11" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-11T21:55:39Z" price_time="2006-10-08T08:00:35Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780679417408" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-20T15:16:00Z" currency_rate="1" price="10.5" />
+<Price store_isbn="" store_title="Complete Stories" store_url="http://www.biblio.com/details.php?dcx=23382324&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-20T15:16:00Z" currency_rate="1" price="17" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-20T15:16:01Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="18.75" />
+<Price store_isbn="" store_title="The Complete Stories (Everyman's Library (Cloth))" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="11.69" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="17.87" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="17.65" />
+<Price store_isbn="" store_title="The Complete Stories (Everyman's Library (Cloth))" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="17" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="15.36" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="15.8" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="15.8" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30116494%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:20Z" currency_rate="1" price="14.49" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0679417400&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:44Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:49Z" currency_rate="1" price="18.75" />
+<Price store_isbn="" store_title="The Complete Stories Product 382348" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.382348&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:08Z" currency_rate="1" price="15.98" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_stories_a13/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:00:35Z" currency_rate="1" price="18.06" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_horror_united_states">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa1">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_united_states">Amazon.com -- Literature &amp; Fiction -- Short Stories -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_general">Amazon.com -- Literature &amp; Fiction -- Short Stories -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_complete_tales_and_poems" isbn="0140103848">
+<Title>The Complete Tales and Poems</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="gardners_books">Gardners Books</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Paperback; 1987-09-30" dewey_decimal_normalized="" lcc_number="" change_time="2006-06-06T01:50:51Z" price_time="2006-10-08T08:00:38Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Complete Tales &amp; Poems of Edgar Allan Poe The" store_url="http://www.biblio.com/details.php?dcx=7071316&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-06T01:50:59Z" currency_rate="1" price="31.59" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="28.82" />
+<Price store_isbn="" store_title="The Complete Tales and Poems of Edgar Allan Poe (Penguin Classics)" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:58Z" currency_rate="1" price="15.99" />
+<Price store_isbn="" store_title="The Complete Tales and Poems of Edgar Allan Poe (Penguin Classics)" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:58Z" currency_rate="1" price="22.02" />
+<Price store_isbn="" store_title="Poems" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Complete Tales and Poems of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:04Z" currency_rate="1" price="27.4" />
+<Price store_isbn="" store_title="The Complete Tales and Poems of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_complete_tales_and_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:04Z" currency_rate="1" price="27.4" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_complete_tales_of_mystery_and_imagination_the_narrative_" isbn="0706415523">
+<Title>The complete tales of mystery and imagination; The narrative of Arthur Gordon Pym; The Raven and other poems</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="octopus">London Octopus 1981</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="782p ill 25cm" language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="" change_time="2006-03-08T17:55:49Z" price_time="2006-10-08T08:00:41Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780706415520" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-08T17:55:57Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:58Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="The complete tales of mystery and imagination ; The narrative of Arthur Gordon Pym ; The raven and other poems (Treasury of world masterpieces)" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:58Z" currency_rate="1" price="0.21" />
+<Price store_isbn="" store_title="The complete tales of mystery and imagination ; The narrative of Arthur Gordon Pym ; The raven and other poems (Treasury of world masterpieces)" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:58Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="The complete tales of mystery and imagination ; The narrative of Arthur Gordon Pym ; The raven and other poems (Treasury of world masterpieces)" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:02Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Complete Tales of Mystery and Imagination; the Narrative of Arthur Gordon Pym; the Raven and Other Poems (Treasury of World Masterpieces)" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:05Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Complete Tales of Mystery and Imagination; The Narrative of Arthur Gordon Pym; The Raven and Other P" store_url="http://isbndb.com/x/book/the_complete_tales_of_mystery_and_imagination_the_narrative_/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:05Z" currency_rate="1" price="4.99" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="National Library of Scotland" last_update="2006-03-08T17:55:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-268-the_complete_tales_of_mystery_and_imagination_the_narrative_-20060308.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_complete_works_of_edgar_allan_poe" isbn="5551310973">
+<Title>The Complete Works of Edgar Allan Poe</Title>
+<TitleLong>The Complete Works of Edgar Allan Poe: Volume Three</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="digireads_com">Digireads.com</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Unknown Binding; 2004-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-10T10:41:37Z" price_time="2006-10-08T08:00:45Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_complete_works_of_edgar_allan_poe_tales" isbn="0781287561">
+<Title>The Complete Works of Edgar Allan Poe: Tales</Title>
+<TitleLong>The Complete Works of Edgar Allan Poe: Tales (Notable American Authors)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="reprint_services_corporation">Reprint Services Corporation</PublisherText>
+<Details dewey_decimal="" physical_description_text="6.0&quot;x2.8&quot;x9.5&quot;; 4.4 lb" language="" edition_info="Library Binding; 1845" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-10T10:41:37Z" price_time="2006-10-08T08:00:51Z" />
+<Summary>Improved formatting on some of Mr. Poe's Tales; also includes a couple of new ones.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-25T03:20:56Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-25T03:20:56Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="The Complete Works of Edgar Allan Poe: Tales (Notable American Authors)" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:59Z" currency_rate="1" price="125" />
+<Price store_isbn="" store_title="The Complete Works of Edgar Allan Poe: Tales (Notable American Authors)" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:59Z" currency_rate="1" price="52.31" />
+<Price store_isbn="" store_title="Complete Works of Edgar Allan Poe Volume 4" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="52" />
+<Price store_isbn="" store_title="Complete Works of Edgar Allan Poe Volume 4" store_url="http://isbndb.com/x/book/the_complete_works_of_edgar_allan_poe_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:05Z" currency_rate="1" price="62.05" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_conversation_of_eiros_and_charmion" isbn="0585065942">
+<Title>The conversation of Eiros and Charmion</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2611" change_time="2003-11-26T17:26:18Z" price_time="2006-10-08T08:00:54Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086155 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:18Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_conversation_of_eiros_and_charmion-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:08:33Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_conversation_of_eiros_and_charmion-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:30:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-the_conversation_of_eiros_and_charmion-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:35:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-the_conversation_of_eiros_and_charmion-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:51:35Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-the_conversation_of_eiros_and_charmion-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:30Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-the_conversation_of_eiros_and_charmion-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_descent_into_the_maelstrom" isbn="0585232873">
+<Title>The descent into the maelstrom</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="university_of_virginia_library">Charlottesville, Va. : University of Virginia Library, [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2003-11-07T06:45:10Z" price_time="2006-07-03T08:57:39Z" />
+<Summary></Summary>
+<Notes>The text for this netLibrary eBook was obtained from the University of Virginia Library Electronic Text Center.
+
+"Tales of mystery and imagination"--T.p.
+
+Electronic reproduction. Boulder, Colo. : NetLibrary, 2000. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>NetLibrary http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=2011082</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="whirlpools_fiction">Whirlpools -- Fiction</Subject>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="adventure_fiction">Adventure fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Rochester" last_update="2003-11-07T06:45:10Z" marc_url="http://isbndb.com/x/libdata/isbndb-198-the_descent_into_the_maelstrom-20031106.mrc" />
+<MARC library_name="Adelaide University (Adelaide, Australia)" last_update="2004-08-01T17:22:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-1-the_descent_into_the_maelstrom-20040801.mrc" />
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2006-02-21T03:14:01Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_descent_into_the_maelstrom-20060220.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_devil_in_the_belfry" isbn="082250281X">
+<Title>The devil in the belfry</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Pictures by George Overlie</AuthorsText>
+<PublisherText publisher_id="lerner_publications">Minneapolis, Lerner Publications [1974]</PublisherText>
+<Details dewey_decimal="" physical_description_text="[32] p. col. illus. 20 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-03-05T22:05:24Z" price_time="2005-05-26T18:53:18Z" />
+<Summary>The arrival of a devil in the borough of Vondervotteimittiss disrupts the perfectly regulated life of the inhabitants.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Devil in the Belfry (Seedling Book)" store_url="http://isbndb.com/x/book/the_devil_in_the_belfry/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-26T18:53:15Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="The Devil in the Belfry (Seedling Bks. )" store_url="http://isbndb.com/x/book/the_devil_in_the_belfry/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-26T18:53:15Z" currency_rate="1" price="4.22" />
+<Price store_isbn="" store_title="The Devil in the Belfry (Seedling Bks.)" store_url="http://isbndb.com/x/book/the_devil_in_the_belfry/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-26T18:53:16Z" currency_rate="1" price="4.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_devil_in_the_belfry/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-26T18:53:16Z" currency_rate="1" price="4.73" />
+</Prices>
+<Subjects>
+<Subject subject_id="time_fiction">Time -- Fiction</Subject>
+<Subject subject_id="devil_fiction">Devil -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Minneapolis Public Library" last_update="2004-03-05T22:05:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-91-the_devil_in_the_belfry-20040305.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="overlie_george">Overlie, George</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_devil_in_the_belfry_a01" isbn="0585051852">
+<Title>The devil in the belfry</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:19:38Z" price_time="2005-12-16T01:47:52Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085981 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:19:38Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-the_devil_in_the_belfry_a01-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_domain_of_arnheim" isbn="0585232881">
+<Title>The domain of Arnheim</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="university_of_virginia_library">Charlottesville, Va. : University of Virginia Library, 1993.</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2003-11-07T06:45:16Z" price_time="2006-02-21T03:14:10Z" />
+<Summary></Summary>
+<Notes>The text for this netLibrary eBook was obtained from University of Virginia Library Electronic Text Center.
+
+"Tales of mystery and imagination"--T.p.
+
+Electronic reproduction. Boulder, Colo. : NetLibrary, 2000. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>NetLibrary http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=2011083</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="inheritance_and_succession_fiction">Inheritance and succession -- Fiction</Subject>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="didactic_fiction">Didactic fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Rochester" last_update="2003-11-07T06:45:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-198-the_domain_of_arnheim-20031106.mrc" />
+<MARC library_name="Adelaide University (Adelaide, Australia)" last_update="2004-08-01T17:22:10Z" marc_url="http://isbndb.com/x/libdata/isbndb-1-the_domain_of_arnheim-20040801.mrc" />
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2006-02-21T03:14:07Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_domain_of_arnheim-20060220.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

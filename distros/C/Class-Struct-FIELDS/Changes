@@ -1,0 +1,65 @@
+Revision history for Perl extension Class::Struct::FIELDS.
+
+1.1 Sat Oct 14 07:28:56 2000
+	- Auto-stringify.
+	- EXPERIMENTAL: tied hashes and hashes whose elements must be
+	  IS-A certain packages.  THIS IS AN UNDOCUMENTED FEATURE, AND
+	  MAY BE REMOVED IN THE NEXT RELEASE (or made documented and
+	  supported).
+	- Try using AutoLoader again.  It works now.  Why?
+	- Tied support recognizes overrides.
+	- Hidden (_*) versions for tied ARRAY and HASH when caller
+	  uses overrides for these (e.g., sub Some::Class::FETCH).
+        - Corrected CREDITS.
+	- Renamed _object_{hash,array} to _{hash,array}_object to make
+	  AutoSplit happy.
+
+1.0 Mon Sep 25 10:36:31 2000
+	- Allow caller to declare subs that override access methods
+	  before they are defined.  This helps with coding.
+	- Fixed "use Class::Struct::FIELDS <implicit caller>"; the
+	  import had failed to erase the interposing stack frame, so
+	  &struct guessed wrong at the package to construct.
+	- Test all combinations of arguments for importing.
+	- Differentiate "struct CLASS, LIST" case from "struct LIST"
+	  (implicit CLASS) since one has an odd, the other an even
+	  number of arguments.  Document the change.
+	- Cleaned up diagnostics and their documentation.
+	- Fixed bug in UNIVERSAL::isa replacement where the sub failed
+	  for blessed objects, but worked for package names.
+	- Support "hidden" member access as helper for user overrides.
+	- EXPERIMENTAL: tied arrays and arrays whose elements must be
+	  IS-A certain packages.  THIS IS AN UNDOCUMENTED FEATURE, AND
+	  MAY BE REMOVED IN THE NEXT RELEASE (or made documented and
+	  supported).
+
+0.9 Sun Sep 24 11:15:26 2000
+	- Fixed member constructor for \Class case.
+	- Test all combinations of arguments for &struct (added some
+	  more since last set of tests).
+	- Fixed some cases where not returning a reference after
+	  assignment to a member.
+	- Fixed several bad diagnostics.
+	- Fixed several doc bugs and missing diagnostics.
+	- Fixed warnings enable/disable.
+
+0.8 Thu Sep 21 08:58:13 2000
+	- Fixed argument checking bug in &struct.  Updated
+	  documentation to reflect the change.
+	- Test all legal calls to 'struct' and creates an example
+	  object of each.
+	- Call 'struct' during import if there are arguments.
+
+0.7 Wed Sep 20 20:47:00 2000
+	- uploading to PAUSE.  Ready for debugging.
+
+0.2 - 0.6
+	- internal only versions
+
+0.1  Wed Sep 13 10:50:55 2000
+	- original version; created by h2xs 1.20 with options
+		-v 0.1 -n Class::Struct::FIELDS -X
+
+# Local Variables:
+# mode: auto-fill
+# End:

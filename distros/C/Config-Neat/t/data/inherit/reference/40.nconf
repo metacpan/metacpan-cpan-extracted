@@ -1,0 +1,51 @@
+inc1
+{
+    inc2
+    {
+        inc3
+        {
+            bar
+            {
+                baz    789
+            }
+        }
+    }
+}
+
+foo1
+{
+    inc2
+    {
+        inc3
+        {
+            bar
+            {
+                baz    789
+            }
+        }
+    }
+}
+
+foo2
+{
+    inc3
+    {
+        bar
+        {
+            baz        789
+        }
+    }
+}
+
+foo3
+{
+    bar
+    {
+        baz            789
+    }
+}
+
+foo4
+{
+    baz                789
+}

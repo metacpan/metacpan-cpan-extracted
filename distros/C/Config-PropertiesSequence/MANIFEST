@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Config-PropertiesSequence.t
+lib/Config/PropertiesSequence.pm
+META.yml                                 Module meta-data (added by MakeMaker)

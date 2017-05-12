@@ -1,0 +1,28 @@
+---
+name: Catalyst-Model-S3
+version: 0.03
+author:
+  - 'Dave Cardwell <dcardwell@cpan.org>'
+abstract: Catalyst model for Amazon's S3 web service
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Catalyst::Model: 0
+  Catalyst::Utils: 0
+  Class::C3: 0
+  Net::Amazon::S3: 0.31
+build_requires:
+  Test::More: 0
+provides:
+  Catalyst::Helper::Model::S3:
+    file: lib/Catalyst/Helper/Model/S3.pm
+    version: 0.01
+  Catalyst::Model::S3:
+    file: lib/Catalyst/Model/S3.pm
+    version: 0.03
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

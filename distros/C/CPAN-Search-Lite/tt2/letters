@@ -1,0 +1,12 @@
+<div class=t1>[% pages.browse %] [% pages.list.$mode %]</div><br />
+<center>
+<table class=chmenu><tr>
+[% FOREACH letter = ['A' .. 'Z'] %]
+<td><a href="[% home %]/[% mode %]/[% letter %]/">
+[% letter %]</a> </td>
+[% IF letter == 'M' %]
+</tr><tr>
+[% END -%]
+[% END -%]
+</tr></table>
+</center><br />

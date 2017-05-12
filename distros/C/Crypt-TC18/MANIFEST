@@ -1,0 +1,23 @@
+_tc18.c
+Changes
+comments.jpg
+contact.html
+contact.jpg
+examples/cbc-mode
+examples/ecb-mode
+examples/fileenc
+examples/pin-generator
+INSTALL
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/01.t
+t/02.t
+t/loading.t
+TC18.pm
+TC18.xs
+testvector.txt
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

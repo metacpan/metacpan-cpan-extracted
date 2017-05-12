@@ -1,0 +1,18 @@
+Revision history for CGI-List
+
+0.01    2007/10/17
+        First version, released on an unsuspecting world.
+0.02    2007/10/18
+        make test cerrection for mandatory modules.
+
+0.03    2008/01/07
+	Carp implementation for SQL errors
+	Support for custom events (onClick, onDblClick)
+	columns_headers_align function bug fix
+
+0.04	2008/02/11
+	Correct columns_align function to work properly
+
+0.05    2008/08/14
+        Add support for custom orders
+	Add support for uper group headers

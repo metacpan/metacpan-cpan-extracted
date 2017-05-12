@@ -1,0 +1,156 @@
+#!/usr/local/bin/perl -w
+
+# Copyright (c) 1999-2000, James H. Woodyatt
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   Redistributions of source code must retain the above copyright
+#   notice, this list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in
+#   the documentation and/or other materials provided with the
+#   distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+require 5.005;
+use strict;
+
+my ($topdir, $curdir);
+
+BEGIN {
+	use File::Basename qw(basename dirname);
+	use File::Spec;
+	use Cwd qw(cwd);
+
+	$0 = basename($0);
+	$topdir = $curdir = cwd;
+
+	while ($topdir ne File::Spec->rootdir()) {
+		last if -d File::Spec->catdir($topdir, 'Conjury');		
+		$topdir = dirname($topdir);
+	}
+
+	$topdir = File::Spec->canonpath($topdir);
+}
+
+use lib "$topdir";
+use Conjury::Core qw();
+
+&Conjury::Core::execute($topdir, $curdir);
+
+__END__
+
+=head1 NAME
+
+cast - The command line utility for Perl Conjury
+
+=head1 SYNOPSIS
+
+B<cast> S<[option] ... spell ...>
+
+=head1 DESCRIPTION
+
+The B<cast> utility is the command line interface for Perl Conjury, a general
+purpose software construction framework.
+
+It's really just a very short Perl script.  This is deliberate-- so that the
+need to change it will arise rarely if ever.  In this way, the opportunity for
+version skew introduced by B<cast> itself is minimized.
+
+All of the heavy lifting is actually done in the F<Conjury::Core> module--
+which is either installed in your Perl site library, or located in a F<Conjury>
+directory at the top of your source file hierarchy.
+
+The F<Conjury> directory is located by searching the current working directory
+first, then its parent directory, then its parent, and so on, until it reaches
+the root of the current working directory.
+
+Once it finds what it assumes is the top of the source file hierarchy and loads
+the F<Conjury::Core> module, it calls the C<Conjury::Core::execute> subroutine
+with two arguments: the top directory and the current working directory.
+
+If you using a variant of the core module from the distribution, then the rules
+for constructing software are called 'spells' and they are defined in files
+named 'Conjury.pl', which are just Perl language files that use the modules in
+the 'Conjury' namespace, as well as modules elsewhere in the Perl library.
+
+=head1 OPTIONS
+
+Since the arguments to B<cast> are actually parsed in the F<Conjury::Core>
+module, the set of options understood by the command line utility is completely
+extensible-- the options below are the ones implemented by the version provided
+in the distribution.
+
+=over 4
+
+=item B<--verbose>
+
+Explains the internal reasons for what is going on at every step.
+
+=item B<--force>
+
+Invokes the actions associated with each spell regardless of whether the
+associated products are out of date.  This has the effect of "forcing a
+recompile" of the products.
+
+=item B<--preview>
+
+Prints a description of the actions invoked for each spell instead of actually
+performing them.  This has the effect of "showing what will happen" in a
+non-destructive manner.
+
+=item B<--undo>
+
+Reverses the actions and the order in which they are performed.  With most
+spells, the action is to produce an output file, so the reverse of the action
+is typically to remove all the products of construction associated with the
+spells cast, i.e. the final and intermediate products.
+
+=item B<--define> E<lt>keyE<gt>
+
+=item B<--define> E<lt>keyE<gt>B<=>E<lt>valueE<gt>
+
+Assigns a value for the named key in an associative array that is available to
+spell definitions.  Values defined this way are not propagated to
+subprocesses.  (Use environment variables and %ENV for that purpose instead.)
+
+If the value is not specified, then the integer value '1' is used by default.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<Conjury.pl>
+
+The F<Conjury::Core> module provided with the distribution expects a source
+file named F<Conjury.pl> to contain Perl code that defines the "spells"
+associated with constructing software products from the associated source
+files.
+
+=back
+
+=head1 SEE ALSO
+
+More documentation is in L<Conjury>, L<Conjury::Core> and, of course, L<Perl>.
+
+=head1 AUTHOR
+
+James Woodyatt <F<jhw@wetware.com>>

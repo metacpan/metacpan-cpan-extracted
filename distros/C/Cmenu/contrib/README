@@ -1,0 +1,65 @@
+SQL Demo for perlCmenu
+=======================
+Contained here is a demo of SQL processing with perlCmenu
+Dealing with return values from complex editing screens
+can be tricky.
+
+Files List
+----------
+README		this file
+sqlmenu		the demonstration script
+
+firstload/address.make	script to make a PostgreSQL database
+firstload/food.make	script to make a PostgreSQL database
+
+firstload/data/*	data for databases
+firstload/sql/*		sql definitions for tables
+
+Installation
+------------
+0. Hack all files to suit your SQL engine
+   The provided files are for PostgreSQL
+
+1. Make sure your SQL engine is up and running
+
+2. Create a dbuser for the current user
+   Create a database called home
+
+3. Run address.make
+   Run food.make
+   These scripts create filled tables
+   Make sure the tables exist OK
+
+4. Make sure you have the Postgres module installed - this script
+   use Pg.pm - the module distributed with PostgreSQL v7.0.3+
+   There are other equivalent modules, such as Postgres and PgSQL;
+   the sqlmenu script will need changed if you use one of these
+
+5. If the SQL server is not on the localhost you can set
+   PGHOST to point to the server. Current user is used.
+
+6. Run the sqlmenu script
+
+These are fairly trivial databases though their data entry
+screens are not so trivial since they include radio lists
+with regular data fields. Using the menu itself should be 
+self-explanatory.
+
+The most awkward example is editing of phone number fields.
+This requires a text field with a radio list. Returned values
+might be
+  * no editing performed
+  * data field was edited
+  * only radio fields were edited
+So there are several checks that must be performed to figure
+which situation actually happened.
+Note that only one radio or check list is supported per menu. 
+A check list and a radio list can appear together but your
+script will need to be able to distinguish between the 
+relevant menu items.
+
+I know, this is not very pretty.
+
+Hope this helps
+
+Andy

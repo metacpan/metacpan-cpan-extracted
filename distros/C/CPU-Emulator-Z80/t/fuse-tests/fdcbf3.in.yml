@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 56
+    - 243
+  32200:
+    - 12
+name: fdcbf3
+registers:
+  AF: 27543
+  AF_: 0
+  BC: 22995
+  BC_: 0
+  DE: 62790
+  DE_: 0
+  HL: 30000
+  HL_: 0
+  I: 0
+  IX: 26224
+  IY: 32144
+  PC: 0
+  R: 0
+  SP: 0

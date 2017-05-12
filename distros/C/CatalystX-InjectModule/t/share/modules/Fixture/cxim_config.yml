@@ -1,0 +1,14 @@
+name: Fixture
+version: 1
+
+deps:
+  - DBIC
+
+dbix_fixtures:
+  conf:
+    debug: 0
+    config_dir: share/fixtures/1/conf/
+  populate:
+    users_roles:
+      directory: share/fixtures/1/users_roles/
+      no_deploy: 1

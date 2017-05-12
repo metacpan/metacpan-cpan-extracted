@@ -1,0 +1,22 @@
+[% 
+    title = "404 - PAGE NOT FOUND" ;
+
+    crumb1_name = '404 - PAGE NOT FOUND' ;
+%]
+
+<p>I'm sorry, we are unable to find the page you were looking for.</p>
+<p>If this was following a valid page request, please notify the site
+<a href="mailto:[% administrator %]">administrator</a>, and we will
+rectify the problem as soon as we can. When contacting us, please
+include the following information.</p>
+
+<div class="box">
+<ul>
+[% PERL %]
+    print "<li>IP = $ENV{REMOTE_ADDR}";
+    print "<li>URI = $ENV{REQUEST_URI}";
+    print "<li>QUERY = $ENV{QUERY_STRING}";
+    print "<li>REFER = $ENV{HTTP_REFERER}";
+[% END %]
+</ul>
+</div>

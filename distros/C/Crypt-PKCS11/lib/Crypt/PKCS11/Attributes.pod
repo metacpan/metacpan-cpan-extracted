@@ -1,0 +1,558 @@
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11::Attributes - PKCS #11 Attributes
+
+=head1 SYNPOSIS
+
+  use Crypt::PKCS11::Attributes;
+
+  my $publicKeyTemplate = Crypt::PKCS11::Attributes->new->push(
+      Crypt::PKCS11::Attribute::Encrypt->new->set(1),
+      Crypt::PKCS11::Attribute::Verify->new->set(1),
+      Crypt::PKCS11::Attribute::Wrap->new->set(1),
+      Crypt::PKCS11::Attribute::PublicExponent->new->set(0x01, 0x00, 0x01),
+      Crypt::PKCS11::Attribute::Token->new->set(1),
+      Crypt::PKCS11::Attribute::ModulusBits->new->set(768)
+  );
+
+=head1 DESCRIPTION
+
+Makes all PKCS #11 attributes available for use and the
+L<Crypt::PKCS11::Attributes> module itself is a container for multiple attributes
+usually used for templates when working with objects and keys.
+
+Attributes corresponds to a CKA type and a base attribute value, see the man
+page for the base attribute value module for information how to set/get the
+attributes value.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item Crypt::PKCS11::Attribute::Class
+
+A CKA_CLASS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Token
+
+A CKA_TOKEN with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Private
+
+A CKA_PRIVATE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Label
+
+A CKA_LABEL with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::Application
+
+A CKA_APPLICATION with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::ObjectId
+
+A CKA_OBJECT_ID with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::CertificateType
+
+A CKA_CERTIFICATE_TYPE with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Issuer
+
+A CKA_ISSUER with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::SerialNumber
+
+A CKA_SERIAL_NUMBER with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::AcIssuer
+
+A CKA_AC_ISSUER with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Owner
+
+A CKA_OWNER with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::AttrTypes
+
+A CKA_ATTR_TYPES with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Trusted
+
+A CKA_TRUSTED with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::CertificateCategory
+
+A CKA_CERTIFICATE_CATEGORY with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::JavaMidpSecurityDomain
+
+A CKA_JAVA_MIDP_SECURITY_DOMAIN with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Url
+
+A CKA_URL with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::HashOfSubjectPublicKey
+
+A CKA_HASH_OF_SUBJECT_PUBLIC_KEY with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::HashOfIssuerPublicKey
+
+A CKA_HASH_OF_ISSUER_PUBLIC_KEY with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::NameHashAlgorithm
+
+A CKA_NAME_HASH_ALGORITHM with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::CheckValue
+
+A CKA_CHECK_VALUE with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::KeyType
+
+A CKA_KEY_TYPE with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Subject
+
+A CKA_SUBJECT with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Id
+
+A CKA_ID with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Sensitive
+
+A CKA_SENSITIVE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Encrypt
+
+A CKA_ENCRYPT with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Decrypt
+
+A CKA_DECRYPT with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Wrap
+
+A CKA_WRAP with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Unwrap
+
+A CKA_UNWRAP with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Sign
+
+A CKA_SIGN with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::SignRecover
+
+A CKA_SIGN_RECOVER with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Verify
+
+A CKA_VERIFY with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::VerifyRecover
+
+A CKA_VERIFY_RECOVER with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Derive
+
+A CKA_DERIVE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::StartDate
+
+A CKA_START_DATE with the base of L<Crypt::PKCS11::Attribute::CK_DATE>.
+
+=item Crypt::PKCS11::Attribute::EndDate
+
+A CKA_END_DATE with the base of L<Crypt::PKCS11::Attribute::CK_DATE>.
+
+=item Crypt::PKCS11::Attribute::Modulus
+
+A CKA_MODULUS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::ModulusBits
+
+A CKA_MODULUS_BITS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::PublicExponent
+
+A CKA_PUBLIC_EXPONENT with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::PrivateExponent
+
+A CKA_PRIVATE_EXPONENT with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Prime1
+
+A CKA_PRIME_1 with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Prime2
+
+A CKA_PRIME_2 with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Exponent1
+
+A CKA_EXPONENT_1 with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Exponent2
+
+A CKA_EXPONENT_2 with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Coefficient
+
+A CKA_COEFFICIENT with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Prime
+
+A CKA_PRIME with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Subprime
+
+A CKA_SUBPRIME with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Base
+
+A CKA_BASE with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::PrimeBits
+
+A CKA_PRIME_BITS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Subprime::Bits
+
+A CKA_SUBPRIME_BITS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::SubPrimeBits
+
+A CKA_SUB_PRIME_BITS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::ValueBits
+
+A CKA_VALUE_BITS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::ValueLen
+
+A CKA_VALUE_LEN with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Extractable
+
+A CKA_EXTRACTABLE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Local
+
+A CKA_LOCAL with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::NeverExtractable
+
+A CKA_NEVER_EXTRACTABLE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::AlwaysSensitive
+
+A CKA_ALWAYS_SENSITIVE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::KeyGenMechanism
+
+A CKA_KEY_GEN_MECHANISM with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Modifiable
+
+A CKA_MODIFIABLE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::Copyable
+
+A CKA_COPYABLE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::EcdsaParams
+
+A CKA_ECDSA_PARAMS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::EcParams
+
+A CKA_EC_PARAMS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::EcPoint
+
+A CKA_EC_POINT with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::SecondaryAuth
+
+A CKA_SECONDARY_AUTH with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::AuthPinFlags
+
+A CKA_AUTH_PIN_FLAGS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::AlwaysAuthenticate
+
+A CKA_ALWAYS_AUTHENTICATE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::WrapWithTrusted
+
+A CKA_WRAP_WITH_TRUSTED with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::WrapTemplate
+
+A CKA_WRAP_TEMPLATE with the base of L<Crypt::PKCS11::Attribute::AttributeArray>.
+
+=item Crypt::PKCS11::Attribute::UnwrapTemplate
+
+A CKA_UNWRAP_TEMPLATE with the base of L<Crypt::PKCS11::Attribute::AttributeArray>.
+
+=item Crypt::PKCS11::Attribute::DeriveTemplate
+
+A CKA_DERIVE_TEMPLATE with the base of L<Crypt::PKCS11::Attribute::AttributeArray>.
+
+=item Crypt::PKCS11::Attribute::OtpFormat
+
+A CKA_OTP_FORMAT with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpLength
+
+A CKA_OTP_LENGTH with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpTimeInterval
+
+A CKA_OTP_TIME_INTERVAL with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpUserFriendlyMode
+
+A CKA_OTP_USER_FRIENDLY_MODE with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::OtpChallengeRequirement
+
+A CKA_OTP_CHALLENGE_REQUIREMENT with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpTimeRequirement
+
+A CKA_OTP_TIME_REQUIREMENT with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpCounterRequirement
+
+A CKA_OTP_COUNTER_REQUIREMENT with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpPinRequirement
+
+A CKA_OTP_PIN_REQUIREMENT with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::OtpCounter
+
+A CKA_OTP_COUNTER with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::OtpTime
+
+A CKA_OTP_TIME with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::OtpUserIdentifier
+
+A CKA_OTP_USER_IDENTIFIER with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::OtpServiceIdentifier
+
+A CKA_OTP_SERVICE_IDENTIFIER with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::OtpServiceLogo
+
+A CKA_OTP_SERVICE_LOGO with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::OtpServiceLogoType
+
+A CKA_OTP_SERVICE_LOGO_TYPE with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::Gostr3410Params
+
+A CKA_GOSTR3410_PARAMS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Gostr3411Params
+
+A CKA_GOSTR3411_PARAMS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::Gost28147Params
+
+A CKA_GOST28147_PARAMS with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::HwFeatureType
+
+A CKA_HW_FEATURE_TYPE with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::ResetOnInit
+
+A CKA_RESET_ON_INIT with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::HasReset
+
+A CKA_HAS_RESET with the base of L<Crypt::PKCS11::Attribute::CK_BBOOL>.
+
+=item Crypt::PKCS11::Attribute::PixelX
+
+A CKA_PIXEL_X with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::PixelY
+
+A CKA_PIXEL_Y with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Resolution
+
+A CKA_RESOLUTION with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::CharRows
+
+A CKA_CHAR_ROWS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::CharColumns
+
+A CKA_CHAR_COLUMNS with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::Color
+
+A CKA_COLOR with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::BitsPerPixel
+
+A CKA_BITS_PER_PIXEL with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::CharSets
+
+A CKA_CHAR_SETS with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::EncodingMethods
+
+A CKA_ENCODING_METHODS with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::MimeTypes
+
+A CKA_MIME_TYPES with the base of L<Crypt::PKCS11::Attribute::RFC2279string>.
+
+=item Crypt::PKCS11::Attribute::MechanismType
+
+A CKA_MECHANISM_TYPE with the base of L<Crypt::PKCS11::Attribute::CK_ULONG>.
+
+=item Crypt::PKCS11::Attribute::RequiredCmsAttributes
+
+A CKA_REQUIRED_CMS_ATTRIBUTES with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::DefaultCmsAttributes
+
+A CKA_DEFAULT_CMS_ATTRIBUTES with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::SupportedCmsAttributes
+
+A CKA_SUPPORTED_CMS_ATTRIBUTES with the base of L<Crypt::PKCS11::Attribute::ByteArray>.
+
+=item Crypt::PKCS11::Attribute::AllowedMechanisms
+
+A CKA_ALLOWED_MECHANISMS with the base of L<Crypt::PKCS11::Attribute::UlongArray>.
+
+=item Crypt::PKCS11::Attribute::VendorDefined
+
+A CKA_VENDOR_DEFINED with the base of L<Crypt::PKCS11::Attribute::CK_BYTE>.
+
+=item Crypt::PKCS11::Attribute::Value
+
+A CKA_VALUE with the base of L<Crypt::PKCS11::Attribute::Value>.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item $attributes = Crypt::PKCS11::Attributes->new
+
+Create a new attribute container object.
+
+=item $attributes = $attributes->push (...)
+
+Appends all arguments to the container, will croak unless each argument is a
+L<Crypt::PKCS11::Attribute>. Returns itself on success.
+
+=item $attribute = $attributes->pop
+
+Removes and returns the last attribute in the container or undef if there are
+none.
+
+=item $attribute = $attributes->shift
+
+Removes and returns the first attribute in the container or undef if there are
+none.
+
+=item $attributes = $attributes->unshift (...)
+
+Prepends all arguments to the container, will croak unless each argument is a
+L<Crypt::PKCS11::Attribute>. Returns itself on success.
+
+=item $attributes = $attributes->foreach ($cb)
+
+For each attribute in the container, call the given callback and supply it with
+the attribute. Will croak if no callback is given and returns itself on success.
+
+=item <...> = $attributes->all
+
+Returns a list of all attributes within the container without removing them from
+the container. Be carefull modifying the attributes since they will still be in
+the container.
+
+=back
+
+=head1 PRIVATE METHODS
+
+These are the private methods used within the module and should not be used
+elsewhere.
+
+=over 4
+
+=item $array_ref = $attributes->toArray
+
+Convert the container to an array reference in the format needed for the XS
+calls, see TEMPLATE ARGUMENT in L<Crypt::PKCS11::XS>. Croaks on error.
+
+=item $attributes = $attributes->fromArray ($array_ref)
+
+Fills the array with attributes from the array reference which must be in the
+format used by XS calls, see TEMPLATE ARGUMENT in L<Crypt::PKCS11::XS>. Croaks
+on error and returns itself on success.
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

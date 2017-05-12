@@ -1,0 +1,32 @@
+---
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Class: 0
+  Test::Mock::Redis: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CHI-Driver-Redis
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CHI: '0.36'
+  Moo: 0
+  Redis: '1.901'
+  URI: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rentrak/chi-driver-redis
+version: '0.10'

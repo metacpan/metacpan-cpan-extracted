@@ -1,0 +1,404 @@
+NAME
+    Class::Accessor::Complex - Arrays, hashes, booleans, integers, sets and
+    more
+
+VERSION
+    version 1.100880
+
+SYNOPSIS
+      package MyClass;
+      use base 'Class::Accessor::Complex';
+      __PACKAGE__
+          ->mk_new
+          ->mk_array_accessors(qw(an_array))
+          ->mk_hash_accessors(qw(a_hash))
+          ->mk_integer_accessors(qw(an_integer))
+          ->mk_class_hash_accessors(qw(a_hash))
+          ->mk_set_accessors(qw(testset))
+          ->mk_object_accessors('Some::Foo' => {
+              slot => 'an_object',
+              comp_mthds => [ qw(do_this do_that) ]
+          });
+
+DESCRIPTION
+    This module generates accessors for your class in the same spirit as
+    Class::Accessor does. While the latter deals with accessors for scalar
+    values, this module provides accessor makers for arrays, hashes,
+    integers, booleans, sets and more.
+
+    As seen in the synopsis, you can chain calls to the accessor makers.
+    Also, because this module inherits from Class::Accessor, you can put a
+    call to one of its accessor makers at the end of the chain.
+
+    The accessor generators also generate documentation ready to be used
+    with Sub::Documentation.
+
+METHODS
+  mk_new
+    Takes an array of strings as its argument. If no argument is given, it
+    uses "new" as the default. For each string it creates a constructor of
+    that name. The constructor accepts named arguments - that is, a hash -
+    and will set the hash values on the accessor methods denoted by the
+    keys. For example,
+
+        package MyClass;
+        use base 'Class::Accessor::Complex';
+        __PACKAGE__->mk_new;
+
+        package main;
+        use MyClass;
+
+        my $o = MyClass->new(foo => 12, bar => [ 1..5 ]);
+
+    is the same as
+
+        my $o = MyClass->new;
+        $o->foo(12);
+        $o->bar([1..5]);
+
+    The constructor will also call an "init()" method, if there is one.
+
+  mk_singleton
+    Takes an array of strings as its argument. If no argument is given, it
+    uses "new" as the default. For each string it creates a constructor of
+    that name.
+
+    This constructor only ever returns a single instance of the class. That
+    is, after the first call, repeated calls to this constructor return the
+    *same* instance. Note that the instance is instantiated at the time of
+    the first call, not before. Any arguments are treated as for "mk_new()".
+    Naturally, "init()" and any initializer methods are called only by the
+    first invocation of this method.
+
+  mk_scalar_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" This method can store a value in a slot and retrieve that value. If
+        it receives an argument, it sets the value. Only the first argument
+        is used, subsequent arguments are ignored. If called without a
+        value, the method retrieves the value from the slot.
+
+    *_clear, "clear_*"
+        Clears the value by setting it to undef.
+
+  mk_class_scalar_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods like those generated with "mk_scalar_accessors()", except that
+    it is a class scalar, i.e. shared by all instances of the class.
+
+  mk_concat_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" Like "mk_scalar_accessors()", but passing a value to the accessor
+        doesn't clear out the original value, but instead concatenates the
+        new value to the existing one. Thus, this kind of accessor is only
+        good for plain scalars.
+
+    *_clear, "clear_*"
+        Clears the value by setting it to undef.
+
+  mk_array_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" This method returns the list of values stored in the slot. If any
+        arguments are provided to this method, they *replace* the current
+        list contents. In an array context it returns the values as an array
+        and in a scalar context as a reference to the array. Note that this
+        reference is currently a direct reference to the storage; changes to
+        the storage will affect the contents of the reference, and
+        vice-versa. This behaviour is not guaranteed; caveat emptor.
+
+    *_push, "push_*"
+        Pushes the given elements onto the end of the array. Like perl's
+        "push()".
+
+    *_pop, "pop_*"
+        Pops one element off the end of the array. Like perl's "pop()".
+
+    *_shift, "shift_*"
+        Shifts one element off the beginning of the array. Like perl's
+        "shift()".
+
+    *_unshift, "unshift_*"
+        Unshifts the given elements onto the beginning of the array. Like
+        perl's "unshift()".
+
+    *_splice, "splice_*"
+        Takes an offset, a length and a replacement list. The arguments and
+        behaviour are exactly like perl's "splice()".
+
+    *_clear, "clear_*"
+        Deletes all elements of the array.
+
+    *_count, "count_*"
+        Returns the number of elements in the array.
+
+    *_set, "set_*"
+        Takes a list, treated as pairs of index => value; each given index
+        is set to the corresponding value. No return.
+
+    *_index, "index_*"
+        Takes a list of indices and returns a list of the corresponding
+        values. This is like an array slice.
+
+  mk_class_array_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods like those generated with "mk_array_accessors()", except that it
+    is a class hash, i.e. shared by all instances of the class.
+
+  mk_hash_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" Called with no arguments returns the hash stored in the slot, as a
+        hash in a list context or as a reference in a scalar context.
+
+        Called with one simple scalar argument it treats the argument as a
+        key and returns the value stored under that key.
+
+        Called with one array (list) reference argument, the array elements
+        are considered to be be keys of the hash. x returns the list of
+        values stored under those keys (also known as a *hash slice*.)
+
+        Called with one hash reference argument, the keys and values of the
+        hash are added to the hash.
+
+        Called with more than one argument, treats them as a series of
+        key/value pairs and adds them to the hash.
+
+    *_keys, "keys_*"
+        Returns the keys of the hash.
+
+    *_count, "count_*"
+        Returns the number of keys in the hash.
+
+    *_values, "values_*"
+        Returns the list of values.
+
+    *_exists, "exists_*"
+        Takes a single key and returns whether that key exists in the hash.
+
+    *_delete, "delete_*"
+        Takes a list and deletes each key from the hash.
+
+    *_clear, "clear_*"
+        Resets the hash to empty.
+
+  mk_class_hash_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods like those generated with "mk_hash_accessors()", except that it
+    is a class hash, i.e. shared by all instances of the class.
+
+  mk_abstract_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" When called, it either dies (if Error::Hierarchy is not installed)
+        or throws an exception of type
+        Error::Hierarchy::Internal::AbstractMethod (if it is installed).
+
+  mk_boolean_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    "*" If given a true value - in the Perl sense, i.e. anything except
+        "undef", 0 or the empty string - it sets the slot's value to 1,
+        otherwise to 0. If no argument is given, it returns the slot's
+        value.
+
+    *_set, "set_*"
+        Sets the slot's value to 1.
+
+    *_clear, "clear_*"
+        Sets the slot's value to 0.
+
+  mk_integer_accessors
+        __PACKAGE__->mk_integer_accessors(qw(some_counter other_index));
+
+    Takes a list of accessor base names (simple strings). For each string it
+    creates methods as described below, where "*" denotes the accessor base
+    name.
+
+    "*" A basic getter/setter that stores an integer value. Actually, it can
+        store any value, but when read back, it returns 0 if the value is
+        undef.
+
+    *_reset, "reset_*"
+        Resets the slot's value to 0.
+
+    *_inc, "inc_*"
+        Increments the value, then returns it.
+
+    *_dec, "dec_*"
+        Decrements the value, then returns it.
+
+    Example:
+
+      package Foo;
+
+      use base 'Class::Accessor::Complex';
+      __PACKAGE__->mk_integer_accessors(qw(score));
+
+    Then:
+
+      my $obj = Foo->new(score => 150);
+      my $x = $obj->score_inc;   # is now 151
+      $obj->score_reset;         # is now 0
+
+  mk_set_accessors
+    Takes an array of strings as its argument. For each string it creates
+    methods as described below, where "*" denotes the slot name.
+
+    A set is different from a list in that it can contain every value only
+    once and there is no order on the elements (similar to hash keys, for
+    example).
+
+    "*" If called without arguments, it returns the elements in the set. If
+        called with arguments, it puts those elements into the set. As such,
+        it is a wrapper over "*_insert()" and "*_elements()".
+
+    *_insert, "insert_*"
+        Inserts the given elements (arguments) into the set. If you pass an
+        array reference as the first argument, it is being dereferenced and
+        used instead.
+
+    *_elements, "elements_*"
+        Returns the elements in the set.
+
+    *_delete, "delete_*"
+        Removes the given elements from the list. The order in which the
+        elements are returned is not guaranteed.
+
+    *_clear, "clear_*"
+        Empties the set.
+
+    *_contains, "contains_*"
+        Given an element, it returns whether the set contains the element.
+
+    *_is_empty, "is_empty_*"
+        Returns whether or not the set is empty.
+
+    *_size, "size_*"
+        Returns the number of elements in the set.
+
+  mk_object_accessors
+        MyClass->mk_object_accessors(
+            'Foo' => 'phooey',
+            'Bar' => [ qw(bar1 bar2 bar3) ],
+            'Baz' => {
+                slot => 'foo',
+                comp_mthds => [ qw(bar baz) ]
+            },
+            'Fob' => [
+                {
+                    slot       => 'dog',
+                    comp_mthds => 'bark',
+                },
+                {
+                    slot       => 'cat',
+                    comp_mthds => 'miaow',
+                },
+            ],
+        );
+
+    The main argument should be a reference to an array. The array should
+    contain pairs of class => sub-argument pairs. The sub-arguments parsed
+    thus:
+
+    Hash Reference
+        See "Baz" above. The hash should contain the following keys:
+
+        "slot"
+            The name of the instance attribute (slot).
+
+        "comp_mthds"
+            A string or array reference, naming the methods that will be
+            forwarded directly to the object in the slot.
+
+    Array Reference
+        As for "String", for each member of the array. Also works if each
+        member is a hash reference (see "Fob" above).
+
+    String
+        The name of the instance attribute (slot).
+
+    For each slot "x", with forwarding methods "y()" and "z()", the
+    following methods are created:
+
+    "x" A get/set method, see "*" below.
+
+    "y" Forwarded onto the object in slot "x", which is auto-created via
+        "new()" if necessary. The "new()", if called, is called without
+        arguments.
+
+    "z" As for "y".
+
+    So, using the example above, a method, "foo()", is created, which can
+    get and set the value of those objects in slot "foo", which will
+    generally contain an object of class "Baz". Two additional methods are
+    created named "bar()" and "baz()" which result in a call to the "bar()"
+    and "baz()" methods on the "Baz" object stored in slot "foo".
+
+    Apart from the forwarding methods described above,
+    "mk_object_accessors()" creates methods as described below, where "*"
+    denotes the slot name.
+
+    "*" If the accessor is supplied with an object of an appropriate type,
+        will set set the slot to that value. Else, if the slot has no value,
+        then an object is created by calling "new()" on the appropriate
+        class, passing in any supplied arguments.
+
+        The stored object is then returned.
+
+    *_clear, "clear_*"
+        Removes the object from the accessor.
+
+  mk_forward_accessors
+        __PACKAGE__->mk_forward_accessors(
+            comp1 => 'method1',
+            comp2 => [ qw(method2 method3) ],
+        );
+
+    Takes a hash of mappings as its arguments. Each hash value is expected
+    to be either a string or an array reference. For each hash value an
+    accessor is created and forwarded to the accessor denoted by its
+    associated hash key.
+
+    In the example above, a call to "method1()" will be forwarded onto
+    "comp1()", and calls to "method2()" and "method3()" will be forwarded
+    onto "comp2()".
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Complex
+    >.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Class-Accessor-Complex/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Class-Accessor-Complex/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

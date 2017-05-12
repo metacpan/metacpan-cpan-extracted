@@ -1,0 +1,57 @@
+{
+   "abstract" : "Framework for building reusable web-applications",
+   "author" : [
+      "Jesse Erlbaum <jesse@erlbaum.net>",
+      "Mark Stosberg <mark@summersault.com>",
+      "with the help of many others!"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application",
+   "no_index" : {
+      "file" : []
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CGI::PSGI" : "0.09"
+         },
+         "requires" : {
+            "CGI" : 0,
+            "Carp" : 0,
+            "Class::ISA" : 0,
+            "HTML::Template" : 0,
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application" : {
+         "file" : "lib/CGI/Application.pm",
+         "version" : "4.50"
+      },
+      "CGI::Application::Mailform" : {
+         "file" : "lib/CGI/Application/Mailform.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "4.50"
+}

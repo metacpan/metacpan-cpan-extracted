@@ -1,0 +1,89 @@
+Revision history for Class::DBI::mysql.
+
+1.00  Sat Sep  3 21:44:31 UTC 2005
+	- Tweak test table SQL some more (RT#12763) for MySQL 5.0+
+	- Remove deprecated count() method
+
+0.23  2004-02-28
+	- Tweak SQL for test table to cope with stricter checks in later MySQL
+	  versions (thanks to CPAN Testers)
+
+0.22  2003-10-26
+	- Add 'autoinflate' method.
+
+0.21  2003-10-11
+	- Add create_table and drop_table methods (Michael Schwern)
+	- add INSTALL file (Mark Veltzer)
+
+0.19  2003-09-28
+	- Cope with various DESCRIBE TABLE outputs, hopefully.
+	- Bring back the untainting that had vanished (Kingsley Kerce)
+
+0.17  2003-08-13
+	- cope with new DESCRIBE TABLE output format in MySQL 4.1 [Ken Y Clark]
+
+0.16  2003-06-30
+	- removed search_match() and initials() which should be
+		implemented in any class that needs them.
+	- deprecated count() in favour of Class::DBI->count_all
+
+0.15  2003-05-30
+	- added DBD::mysql as a pre-req (thanks to Nicholas Clark)
+
+0.14  2003-03-28
+	- brought in line with Class::DBI 0.91
+ 	- no longer support CURDATE() etc. Much easier to implement
+		things like this in Class::DBI itself now.
+
+0.13  2002-03-09
+	- untaint the column names in set_up_table
+	- remove retrieve_all (now in Class::DBI itself)
+
+0.12  2001-11-09
+	- added column_type()
+
+0.11  2001-11-01
+	- added enum_vals()
+
+0.10  2001-10-07
+	- brought commit() into line with Class::DBI (needs 0.35)
+
+0.09  2001-10-05
+	- tweaks to commit() to cope with overloaded values
+		(temporary measure until this gets rolled into Ima::DBI)
+		[commit() still doesn't work with the latest Class::DBI features]
+
+0.08  2001-07-18
+	- 'initials' method had problem with DISTINCT and ORDER BY in older
+		MySQLs. Changed how it was implemented.
+
+0.07  2001-07-18
+	- added 'initials' method
+	- Moved to Test::More
+
+0.06  2001-07-08
+	- reversed order of set-up in set_up_table to specify PRIMARY
+		before ALL, to avoid bug in inheritance where it would add
+		PRIMARY to ALL, even if you were just about to change PRIMARY.
+	- fixed bug with those tighter restrictions!
+
+0.05  2001-07-07
+	- introduced tighter restrictions on tests for ORDER BY RAND
+		and FULLTEXT searching, which weren't implemented until 3.23.02
+	- added attributes() and search_range() [Thanks to Tatsuhiko Miyagawa]
+
+0.04  2001-06-23
+	- first CPAN release
+	- renamed to Class::DBI::mysql at the request of Michael Schwern
+
+0.03  2001-06-23
+	- fixed bug in test where, if the last table in the database
+		contained an underscore in its name, magically autoincrementing
+		the name would fail to give a valid table name.
+
+0.02  2001-06-14
+	- added support for CURDATE(), NOW()
+
+0.01  2001-05
+	- original version (Class::DBI::MySQL)
+

@@ -1,0 +1,21 @@
+Some notes about performance:
+
+* -Mblib is expensive (~0.4) seconds. Don't be fooled.
+
+* Startup time is the big bottleneck.
+
+  Rough breakdown of timings of 'client'
+
+  Time to start perl, ~0.1 sec
+  Time to load standard Perl libraries ~0.5 sec
+  Time to bootstrap MICO ~0.4
+
+  Total user time 1.25 seconds
+
+* Clearly, the thing that would make the most difference would
+  be speeding up the bootstrap process. It's not quite clear
+  why it takes that long, but for one thing, initializing 
+  typecodes and exceptions takes 0.15 seconds, so perhaps
+  that could be delayed and done on demand.
+
+

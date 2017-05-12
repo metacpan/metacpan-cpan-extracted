@@ -1,0 +1,47 @@
+{
+   "abstract" : "Perl interface to functions that assist in working\r\nwith salted hashes.\r",
+   "author" : [
+      "Sascha Kiefer, L<esskar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-SaltedHash",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-SaltedHash"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/campus-explorer/crypt-saltedhash.git",
+         "web" : "http://github.com/campus-explorer/crypt-saltedhash"
+      }
+   },
+   "version" : "0.09"
+}
+

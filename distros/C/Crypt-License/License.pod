@@ -1,0 +1,359 @@
+=head1 NAME
+
+Crypt::License - Perl extension to examine a license file.
+
+=head1 USEAGE
+
+There are two modes of operation:
+
+	use Crypt::License;1;
+	__END__
+	encrypted module here...
+
+The calling routine should define an anonymous hash pointed to by the
+variable $ptr2_License. i.e.
+
+ use vars qw( $ptr2_License );
+ $ptr2_License = {
+	'private'	=> 'name1, name2,...',	# use private key 
+						# module name
+	'path'		=> 'path to License file',
+ };
+ require licensed_module_name;
+
+Or, for nested modules, a reference pointer to point back to the originating
+module containing the License information.
+
+ use vars qw( $ptr2_License );
+ $ptr2_License = { 'next' => 'any value will do', };
+ require licensed_module_name;
+
+	Seconds remaining until License expiration are returned in
+	$ptr2_License{expires} unless there is no expiration
+
+	Warnings if any will be in $ptr2_License->{warn}
+
+	It is important the 'require' instead of 'use' loads the module
+	so that $ptr2_License is visible to the loader and not forgotton
+	in the case of mod-perl so don't enclose a in BEGIN{} block.
+
+	Version checking is not supported via 'use' like statement. It
+	can be done by examining the module contents.
+
+More automated setup can be accomplished with the Crypt::License::Util tools.
+
+  use Crypt::License::Util;
+  
+See Crypt::License::Util documentation for complete description
+
+The second module mode is for development use and just loads the module so its
+objects can be accessed;
+
+  use Crypt::License;
+
+  $time = Crypt::License::date2time(date string);
+
+  @file_text = Crypt::License::get_file(file_path);
+
+  $first_tag_number = Crypt::License::extract(\@file_text,\%parms);
+
+  Crypt::License::get_vals(\%parms);
+
+=head1 DESCRIPTION
+
+Crypt::License decodes an encrypted file and attempts to decrypt it by 
+first, looking for a hash pointer in the caller program called $ptr2_License.
+The hash contains the path to the License file and an optional 'private' key
+list of modules which will decrypt only with the 'private' key. B<OR>, a
+hash key of 'next' with no particular value that indicates to look to the
+next caller on the stack for the License pointer. If the pointer is not 
+present or the License file is not found successfully, then
+no further action is taken. If the License file is successfully opened, and
+the contents validated then the attached encrypted module is loaded and the
+seconds remaining until License expiration are returned or now() in the case
+of no expiration. Undef is returned for an expired license (module fails to
+load).
+
+=over 4
+
+=item This is what is in a certificate
+
+ License Text followed by:
+  
+ ID:	:unique licensee identifier, date code is fine
+ NAME:	:company or entity name
+ ADD1:	:address line 1
+ ADD2:	:address line 2
+ CITY:	:city
+ STATE:	:state or province
+ ZIP:	:postal code
+ CTRY:	:country
+ TEL:	:telephone number
+ FAX: 	fax number
+ CONT:	:contact person
+ MAIL:	:email addy of contact
+ ----------------------------------
+ SERV:	:http server name	* optional
+ HOST:	:hostname		* optional Sys::Hostname
+ USER:	:calling user		* optional
+ GROUP:	:calling group		* optional
+ HOME:	:called from within this path	* optional
+ ----------------------------------
+ DATE:	:creation date, mm-dd-yy | yyyy  or mmm dd yy | yyyy
+ EXP:	:expiration		* optional
+ KEY:	:hex key
+ PKEY:	:hex public key
+ ----------------------------------
+
+=item $time = Crypt::License::date2time(date string)
+
+Converts a string into a numeric time value as returned by the perl function
+'time' else 0;
+
+ * acceptable date formats
+	mm/dd/yy
+	mm-dd-yy
+	mm dd yy
+	month day year		month = text or digits
+	month day, year
+
+actually any combination of separators [/- ] will work
+commas are always deleted, white space compressed, etc...
+
+=item @file_text = Crypt::License::get_file(file_path)
+
+Takes the file path/name as its argument. Returns the stripped file contents
+suitable for MAC calculation in an array. On failure, returns an empty
+array.
+
+=item MAC calculation
+
+The MAC signature is created by taking the MD5 sum of the file less MAC the
+line (if present). Leading blank lines are removed, all tabs
+are converted to single spaces and trailing white space is snipped  to 
+avoid complications caused by cut and paste operations. MAC calculation is
+only done on the text portion of the file.
+
+=item $first_tag_num = Crypt::License::extract(\@file_text,\%parms)
+
+B<extract> takes an input array consisting of the lines of text in the License
+and returns the \%parms hash filled with the values present in the
+License file. The return value is the pointer to the first tag of the array.
+
+MAC calculation described above will only be done on the text portion of the
+array.
+
+=item Crypt::License::get_vals(\%parms,\%chk_vals)
+
+The following fields are returned to the %chk_vals hash from the host 
+platform unless the fields are not present in the License file:
+
+ SERV:	:http server name
+ HOST:	:hostname as returned by Sys::Hostname::hostname
+ USER:	:user
+ GROUP:	:user
+ HOME:	:server document root
+ EXP:	:time since epcoch time ins seconds
+
+=back
+
+=head1 TARGET MODULE PREPARATION
+
+The target module distribution for License encryption should be modified as
+follows:
+
+=over 4
+
+=item
+
+Copy makePOD.pl, makeCrypt.pl, mod_parser.pl, and TestCert.license 
+from the License distribution to the target distribution and include in 
+the target distribution MANIFEST.
+
+=item 
+
+Modify the t/test.t and/or test.pl scripts to include a 
+$ptr2_License hash.
+
+=item 
+
+Rename the target distribution XXXXX.pm file to XXXXX.PM and separate
+the pod documentation into a separate file.
+
+ makePOD.pl XXXXX.PM
+ 	will create XXXXX.pod, XXXXX.PM.nopod
+
+=item 
+
+Modify the Makefile.PL file as follows to include 'make crypt' and
+'make cryptdist' functions.
+
+ use ExtUtils::MakeMaker;
+ # See lib/ExtUtils/MakeMaker.pm for details of how to influence
+ # the contents of the Makefile that is written.
+
+ my $name	= 'Foo::ModuleName';
+ @_		= split('::',$name);
+ my $src	= $_[$#_] . '.PM';
+ my $target	= $_[$#_] . '.pm';
+ my $pod	= $name . '.3';
+
+ sub MY::top_targets {
+   package MY;   # add dependencies for .pm and xs files
+ ####>>> TABS required below, not spaces !!!
+   my $inherited = "
+ $target : $src
+	/bin/cp -p $src $target
+ " . shift->SUPER::top_targets(@_) . "
+ crypt :: 
+	./makeCrypt.pl $src $name " . q|$(INST_LIB)
+
+cryptdist : $(DISTVNAME).bin.tar$(SUFFIX)
+
+$(DISTVNAME).bin.tar$(SUFFIX) :: all crypt
+	$(RM_RF) $(DISTVNAME).bin
+	find blib -type f > delete.me~
+	echo -e "Makefile\nMakefile.PL" >>delete.me~
+	CRYPTIME=$(/bin/date +%Y%m%d%H%M.%S)
+	$(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) -MExtUtils::Manifest=manicopy,maniread \
+	-e "manicopy(maniread('delete.me~'),'$(DISTVNAME).bin', '$(DIST_CP)');"
+	cp | . $target . q| $(DISTVNAME).bin/| . $src . q|
+	cp | . $target . q| $(DISTVNAME).bin/| . $target . q|
+        touch +$(CRYPTIME) $(DISTVNAME).bin/| . $src . q|
+	touch +$(CRYPTIME) $(DISTVNAME).bin/| . $target . q|
+	$(TAR) $(TARFLAGS) $(DISTVNAME).bin.tar $(DISTVNAME).bin
+	$(COMPRESS) $(DISTVNAME).bin.tar
+	$(RM_RF) $(DISTVNAME).bin
+|;
+}
+
+ WriteMakefile(
+    'NAME'         => $name,
+    'VERSION_FROM' => $src,          # finds $VERSION
+    'PREREQ_PM'    => {},            # e.g., Module::Name => 1.1
+    'PM'           => {$target  => '$(INST_LIBDIR)/'.$target},
+    'MAN3PODS'     => {$pod     => {$pod => '$(INST_MAN3DIR)/'.$pod},
+    'pm_to_blib'   => {$target  => '$(INST_LIBDIR)/'.$target},
+    'clean'        => {FILES    => $target},
+    'dist'         => {COMPRESS => 'gzip', SUFFIX=>'gz'}
+ );
+
+ # NOTE: remove the MAN3PODS section if not applicable
+
+=item Make the module as follows:
+
+For the development environment.
+
+  perl Makefile.PL
+  make
+  make test
+  make crypt
+  make test --- again to verify it works crypted
+  make install
+  make dist
+  make cryptdist
+
+For the client environment:
+
+  tar -xzvf FOO-Whatever.bin.tar.gz
+  cd FOO-Whatever.bin
+  make install
+
+=back
+
+=head1 HINTS
+
+For installation with programs called by B<apache> that are installed using
+PerlModule or PerlRequire commands, there are several requirements.
+
+=over 4
+
+=item 1
+The server will need a License with a public key. The License needs to be
+loaded in the startup.pl script.
+
+=item 2
+The handlers loaded from the PerlRequire or PerlModule directives need a
+B<next> $ptr2_License so that on startup they will decrypt and when called
+from user space will point back to the user License.
+
+=item 3
+Any routine which calls handler directives needs a B<next> $ptr2_License
+even if the module is not actually loaded in the routine. i.e. some
+handlers, like Apache::AuthCookie, force the loading of the user's handlers
+so the call to 'use UserHandler' is unnecessary.
+
+=item 4
+Specifically for modules like Apache::AuthCookie, this module calls Licensed
+modules by virtue of the PerlRequire or PerlModule directives in the users
+config file. B<BECAUSE of this>, the AuthCookie module B<MUST> have a
+B<next> $ptr2_License inserted in the beginning statements.
+
+B<HINT> use the Crypt::License::Util routines to insert the necessary
+pointer after a standard module is "used" but before the code is called.
+
+  i.e.
+  use Apache;
+  use Apache::Constants qw(:common :response :http);
+  use Apache::AuthCookie;
+  use vars qw($VERSION @ISA);
+  $VERSION = 1.00;
+  @ISA = qw(Apache::AuthCookie);
+  use Crypt::License::Util;
+  exportNext2('Apache::AuthCookie');
+
+=item 5
+With all this accomplished, crypted modules should load and de-crypt without
+problem.
+
+=back
+
+=head1 EXPORT
+
+None by default.
+
+=head1 TOOLS
+
+  makeCert.pl	  makes a License document
+  makeLicenseMod.pl	makes only unsplit Licensed modules
+  makeCrypt.pl	  makes a split Licensed module
+  makePOD.pl	  separates POD from mixed module
+  mod_parser.pl	  used by makeCrypt, makePOD, makeLicenseMod
+
+=head1 AUTHOR
+
+Michael Robinton, michael@bizsystems.com
+
+=head1 COPYRIGHT
+
+=head1 COPYRIGHT and LICENSE
+
+  Copyright 2002 Michael Robinton, BizSystems.
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of either:
+
+  a) the GNU General Public License as published by the Free Software
+  Foundation; either version 1, or (at your option) any later version,
+
+  or
+
+  b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this
+module, in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+=head1 SEE ALSO
+
+L<Crypt::License::Notice(3)>, L<Crypt::License::Util(3)>
+
+=cut

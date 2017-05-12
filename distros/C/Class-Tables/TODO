@@ -1,0 +1,88 @@
+Forgive the format (or lack thereof) of this file, as it's mostly a
+stream-of-consciousness hodge-podge of random ideas.
+
+MISC
+
+Return dummy object on failure (a la DBIx::Simple) so that
+
+  $bob->department->name
+
+doesn't croak even if Bob doesn't have a department..
+
+Iterators for one-to-many? Unlikely...
+
+
+DEBUG
+
+  Class::Tables->dump;
+
+to dump the class definitions
+
+
+CLASS::DBI
+
+  use Class::Tables;
+  Class::Tables->dbh($dbh);
+
+  print Class::Tables->as_class_dbi;
+
+To print Class::DBI-equivalent skeleton code for the object classes?
+
+
+MANY-TO-MANY
+
+In a many-to-many mapping table, the additional primary key column
+shouldn't be required. We can detect such a table when there is no primary
+key detected, yet 2 or more foreign keys. To pull this off, we'll need
+infrastructure for multiple-key tables.
+
+
+MANY-TO-MANY
+
+Perhaps in scalar context, a reverse foreign key should return a special
+collection object that knows the IDs of all the objects.. That way we can
+"map" to do a many-to-many thing:
+
+  $album->tracks->song->name;
+  
+Although in this case, we may also want the info associated with the
+"track" table that's contained here:
+
+  print $_->track_num, $_->song->name for $album->tracks;
+
+So this might only prove useful when we have a relation (as in ER model)
+with no associated data... Just a basic many-to-many mapping table. 
+
+Of course for this, we'd need some naming scheme for many-to-many
+relationships! ;)
+  
+
+
+INFLATING/DEFLATING SIMPLE FIELDS
+
+At the risk of becoming more complicated than necessary, wouldn't it be
+cool to do something like this, instead of the method-overriding example
+in the pod:
+
+  ## currently:
+  {
+    package Employee;
+    sub ssn {
+      my $self = shift;
+      my $ssn = $self->SUPER::ssn(@_);
+      $ssn =~ s/(\d{3})(\d{2})(\d{4})/$1-$2-$3/;
+      return $ssn;
+    }
+  }
+  
+  ## new idea:
+  sub Employee::ssn : inflate {
+    s/(\d{3})(\d{2})(\d{4})/$1-$2-$3/;
+  }
+  sub Employee::ssn : deflate {
+    s/(\d{3})-(\d{2})-(\d{4})/$1$2$3/g;
+  }
+
+Might this be worth looking into?
+
+Update: not possible to declare the same sub twice with different attribs.

@@ -1,0 +1,14 @@
+MANIFEST
+README
+Makefile.PL
+lib/Class/DBI/Plugin/Iterator.pm
+lib/Class/DBI/Plugin/Iterator/mysql.pm
+lib/Class/DBI/Plugin/Iterator/mysql3.pm
+lib/Class/DBI/Plugin/Iterator/mysql4.pm
+lib/Class/DBI/Plugin/Iterator/subquery.pm
+lib/Class/DBI/Plugin/Iterator/Nihongo.pod
+t/01-iterator.t
+t/02-pager.t
+t/testlib/CDBase.pm
+t/testlib/Film.pm
+t/testlib/NewFilm.pm

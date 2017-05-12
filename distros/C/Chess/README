@@ -1,0 +1,31 @@
+Chess version 0.6.0
+===================
+
+Chess 0.6.0 is a complete rewrite of Chess based on bug reports I've received
+as well as a desire to produce something a lot less 'hack-ish' than 0.5.2.
+I read Damian Conway's excellent book "Object-Oriented Perl" as a refresher
+prior to starting work on this version, and I'm very please with the results.
+
+While this version is still in development, it's unlikely that I'm going to
+change anything here; rather, there are plans to add to this framework before
+ultimately producing a 1.0 version. The TODO file contains a list of features
+I'd like to see in 1.0. Please let me know if you can help with any of it.
+
+Happy hacking!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002, 2005 Brian Richardson. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

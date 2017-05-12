@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CloudPAN.pm
+t/00-compile.t
+t/01-basic.t
+t/02-persist.t
+t/release-pod-syntax.t
+weaver.ini

@@ -1,0 +1,388 @@
+=============
+What's to do?
+=============
+
+> Just one minor question: maybe an explicit hint in the documentation
+> would be useful, indicating that decoding any data that follows
+> dynamic elements will not give the expected results. To me, this
+> wasn't immediately clear from the documentation.
+
+
+* Test::RefCount
+
+for future releases (in no special order):
+------------------------------------------
+
+* >> Perhaps to make the documentation complete, it would help to add a
+  >> remark on opening, reading and writing incrementally and closing
+  >> binary files.
+  >
+  > Mmmmh, I'm not sure the C::B::C docs are the right place to add
+  > such documentation. Such documentation is better placed in the
+  > perl core.
+  
+  My error in communication.  I do not mean to document open, read
+  etc.  I just mean to provide some indication (e.g., via outline
+  example or just a sentence or so) on how one would read/write
+  binary files into/out-of structures.
+
+
+* encapsulate internal types better:
+
+    e.g. struct:
+
+      struct_push_declaration(struct, declaration);  /* real function call */
+      struct_size(struct);  /* as macro */
+
+* make Dimension tag influence offset during pack / unpack, but only if the
+  Dimtag is _not_ '*'. So the following is possible:
+
+    struct foo {
+      int count;
+      int length;
+      int val[1];
+    };
+
+    struct bar {
+      int count;
+      int length;
+      struct foo val[1];
+    };
+
+    tag('foo.val', Dimension => 'count');
+    tag('bar.val', Dimension => 'count');
+
+    pack('bar', {
+                  count  =>  2,
+                  length => 28,
+                  val    => [
+                              { count => 3, length => 12, val => [1, 2, 3] },
+                              { count => 2, length =>  8, val => [4, 5] },
+                            ],
+                })
+
+    <=> pack("I*", 2 3 1 2 3 2 4 5)
+
+  (OTOH, we just can't handle a real "length" (in bytes) properly. Or can
+  we if we use hooks?)
+
+  BIG PROBLEM: Alignment properties would (again...) fall into the scope of
+               the pack/unpack code, which is UGLY!!
+
+* OK, I've finally decided that this needs a complete redesign...
+
+  - We need some code in the ctlib to recursively walk types.
+    This way, we can greatly simplify the pack/unpack code.
+    We should also be possible to handle the problems with
+    the ByteOrder and Dimension tags more easily.
+
+  - We should try to move as much code as possible into the
+    ctlib. For example, sourcify can be completely separated
+    from any perl stuff. This way, we can probably simplify
+    the way towards a python/ruby/perl6/... version.
+
+  - If we introduce a new level of error handling, we can even
+    move all the stuff that usually croaks or warns into ctlib.
+
+  - Ideally, we have as few code as possible to use the perl api.
+
+  - Probably, we can even implent parts of the module in perl.
+
+  - Does it make sense to tag multiple levels of dimensions?
+    If so, we need to get rid of using a linked list for dimensions,
+    which I think is a good idea anyway. (Accessing dimensions sucks.)
+    We probably need some method then to compute the total number of
+    elements in the array.
+
+  - While we're at it, we should also try to address the problem
+    of handling pointer arithmetics, sizeof expressions (non-constant
+    expressions in general, type casts [which can be non-constant,
+    too, depending on what size you configure], and so on)
+    I think this is partly solved by the expression parser/evaluator
+    we need anyway to support the eval method.
+
+  - Perhaps we can also think about starting to collect data about
+    functions.
+
+* make clear in the docs that Dimension _only_ affects pack/unpack
+
+* support lexically scoped warnings (perldoc perllexwarn, perldoc warnings, see warnings.pm)
+
+* can we move the PODs for each function to xsubs/ ?
+
+* separate preprocessor object handling from ctlib/ctparse -> ctlib/preproc
+
+    make sure modification of Include / Define / Assert / ... updates the
+    preprocessor object immediately, so defined() and stuff will work
+
+* C::B::C::Cached -> have "CacheDefines" option?
+
+* Add assertions code
+
+* cleanup remaining warnings from ucpp (MS compiler)
+
+* make c99_* configurable?
+
+* Make util/memalloc threadsafe! (when TRACE is enabled)
+  ($Config{i_pthread})
+
+* !!!! mark the "threads" feature as deprecated !!!!
+
+* Implement a Pack tag that only works for structs and that
+  doesn't work recursively. Use this to get rid of the pack
+  member in Struct. Note in the docs that this doesn't work
+  recursively, that it is used to implement #pragma pack and
+  that it can be used to remove the packing from structs.
+
+* other tags:
+
+    ByteOrder         ->  not for bitfield members
+    Pack              ->  only for structs
+    UnsignedChars
+    UnsignedBitfields
+    OrderMembers      ->  only for structs
+    EnumType          ->  only for enums
+    Size              ->  only for integral types (not sure about this one)
+
+* it would be Really Cool if we had more information about the
+  parsed source code, i.e. functions, variables, etc.
+
+* support C99 initializers ?
+
+* test on windows
+
+* enable-format-check
+
+* have a look at the compiler option -mwords-little-endian (arm-gcc)
+  => arbitrary byte order
+
+* extend sizeof() to support size of bitfields with .bits notation
+  (returned as string)
+
+* do we need a GCC bitfields engine? (dcc, ...?)
+
+* test bitfields in bench.pl
+
+* add tags to bench.pl
+
+* compile with normal perl and -Wall will show some interesting
+  warnings (uninit, unused, ...)
+    => try gcc-4.1
+
+* add UnsignedBitfields probe to ccconfig (only for run mode, not
+  sure if compile mode is possible at all)
+
+* introduce UnsignedChars and UnsignedBitfields for native method?
+
+* see if the Microsoft algorithm can be improved?
+
+* add checks for bitfield behaviour to ccconfig
+
+* parser tests: negative array index => make parse error?
+
+* redirect stderr of test 901 (use same tricks as in D::PPP)
+
+* eliminate croak_gti()?
+
+* we need much better parser tests...
+
+* can we simplify _expressions in the parser with %prec ?
+
+* instrument both parser.y and pragma.y with %printers ?
+
+* improve errors with locations (see bison.pdf) ?
+
+* parse expressions into a tree
+
+   => write an optimizer for the tree that simplifies
+      constant arithmetics
+
+   => really short-circuit on boolean expressions
+
+* more 'basic type objects' tests
+
+* add 'indent' option to initializer()
+
+* add 'unnamed' => 0|1 to sourcify options
+
+* instrument fatal() to include file/line
+
+* what about CAN_UNALIGNED_ACCESS ?
+
+* use inline functions instead of macros where possible (for gcov)
+
+* more test coverage for the parser
+
+* use D::T::C for arg() method?
+
+* port docs to Text::GenDoc (release T::G first ;-)
+
+* handle Cray behaviour
+
+* support conversion to new 5.10 (un)pack templates
+
+* finish work on flexible array members (done?)
+
+  - make member() work better
+  - make complex.t introduce fams
+
+* is T_ALREADY_DUMPED thread-safe, or should we
+  rather use a hash to memorize the dumped types.
+
+* support for unsigned and 64-bit integer arithmetics
+
+    use ucpp's (reentrant) arith.c?
+
+* make cast operators work
+
+* on parse error, print parser stack?
+
+* patch ucpp to only warn about missing newline
+  termination
+
+* have an eval method that allows to evaluate a
+  constant C expression (including preprocessor
+  expansion), so
+
+    $c->parse( <<ENDC )
+    #define FOO 1
+    #define BAR 2
+    #define VALUE (2*FOO+BAR)
+    ENDC
+
+    print $c->eval("VALUE+2");
+
+  would then print 6.
+
+* update / cleanup test suite using Test::More
+
+* make sizeof/offsetof files plain text files and
+  parse them on the fly. get rid of 'do'
+
+* make offsetof test similar to sizeof test (sizeof.pl)
+
+* add tests for ccconfig (using a "virtual" compiler?)
+
+* add more floating point tests (NaN and stuff?)
+
+* support #pragma pack( (push|pop) [, id] [, pack] ) ?
+
+* what about
+
+    #define foobar 2
+    #pragma pack( push, foobar )
+
+* support gcc's __attribute__, at least for struct packing
+  (actually, this is worse than it seems, because it behaves
+  completely different than #pragma pack...)
+
+* support constant address arithmetics
+
+  - this is mainly needed for the offsetof C macro and
+    similar stuff, eg
+
+      enum { OFFSET = offsetof( struct foo, bar ) };
+
+    doesn't work yet. But I guess such construct is rarely
+    used.
+
+* cleanup unsafe values handling
+
+* support arbitrary byte order? ( ByteOrder => '13248756' )
+
+* add platform independent IEEE floating point support
+  (SoftFloat or sth. similar?)
+
+* have a definition() method?
+  Like typedef/compound/enum, but for all of 'em?
+
+* try to give a hint to where a parse error occured
+  COPY_LINE ?
+
+* maybe add DollarsInIdentifiers, AtSignsInIdentifiers?
+
+* add some warnings during parsing
+  - empty arrays in structs a[] (not at end of struct)
+
+* add tests for all preprocessor warnings/errors?
+
+* add a more complete preprocessor testsuite?
+
+* character arrays => strings?
+
+* perhaps bless (tie) long double SV's and store binary data (?)
+
+* sourcify only specific types (pass in a list of types) (?)
+
+* Subject: AW: C::B::C und h2ph/c2ph
+  From: "Dintelmann, Peter" <Peter.Dintelmann@Dresdner-Bank.com>
+  Date: Tue, 14 Dec 2004 14:20:39 +0100
+  Message-ID: <E9A2605289D8D7468B1A21EC24E59D2115AA12@naimucx5.muc.allianz>
+
+  Das Aufloesen der typedefs wuerde fuer mich persoenlich
+  die Lesbarkeit erleichtern und den Quelltext vereinfachen.
+  Im Beispiel "struct futmpx" hat man unter anderem mehrere
+  Faelle der Art
+
+      typedef int int32_t;
+
+      typedef int32_t pid32_t;
+
+      struct futmpx
+      {
+              char ut_user[32];
+              char ut_id[4];
+              char ut_line[32];
+              pid32_t ut_pid;
+              ... ... ...
+      };
+
+  und ich wuerde viel lieber gleich
+
+      struct futmpx
+      {
+              char ut_user[32];
+              char ut_id[4];
+              char ut_line[32];
+              int ut_pid;
+              ... ... ...
+      };
+
+  haben koennen (und auf die zwei typedefs verzichten).
+
+* add an object representing a single type?
+
+  - for example:
+
+      $p = new Convert::Binary::C;
+      $p->parse_file( 'some_code.h' );
+      $type = $p->get_type( 'type' );
+      $data = $type->unpack( $raw );
+
+    (no, I didn't think about how to name any of the new stuff ;)
+
+  - should use less memory
+  - should allow for serializing
+  - should allow for use with PerlIO layers (?)
+  - I have to think about that!!!
+  - Any suggestions are strongly appreciated!
+
+* Plugins for foreign function calls (function calls during
+  $c->eval(), when target platform == source platform)
+
+  - look at how gcc, lcc, tinyc abstract platforms
+
+  - Q: who loads the shared objects? (cbc/plugin)
+
+  - Q: do we need to remember globals? (if anyone
+       passes pointer to such globals to functions)
+
+  - Q: how do we pass data from perl space to those
+       function?
+
+  - plugin needs to do symbol lookup
+
+  - debug symbols?
+
+  - abstract debugging information / behaviour?
+

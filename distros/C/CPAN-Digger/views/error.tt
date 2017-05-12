@@ -1,0 +1,36 @@
+[%
+   title="Error"
+   description=""
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF no_such_module  %]
+<p>
+Sorry. I could not find any module called [% module %].
+</p>
+<p>
+We have to try harder.
+</p>
+[% END %]
+
+[% IF no_pod_found %]
+Sorry, no POD found for [% module %]
+[% END %]
+
+[% IF cannot_handle %]
+Hmm, sorry but we could not handle this request
+[% END %]
+
+[% IF no_directory_listing  %]
+Cannot provide directory listing
+[% END %]
+
+[% IF invalid_search %]
+Invalid search type: '[% what %]'
+[% END %]
+
+[% IF no_such_distribution %]
+We could not find a distribution called [% name %]
+[% END %]
+
+[% INCLUDE incl/footer.tt %]

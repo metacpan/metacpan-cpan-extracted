@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+# Simple example to dump all the cookies :-)
+
+use strict;
+use warnings;
+
+use CGI::Lite;
+
+my $cgi     = CGI::Lite->new;
+my %cookies = $cgi->parse_cookies;
+
+print "Content-type: text/plain", "\n\n";
+
+# We could also have used the method print_data, like so:
+#
+#     $cgi->print_data;
+#
+# instead of manually iterating through the data.
+
+while (my ($key, $value) = each %cookies) {
+    print "$key = $value\n";
+}
+
+exit;

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  960:
+    - 194
+name: fdcb29
+registers:
+  AF: 2944
+  AF_: 0
+  BC: 44994
+  BC_: 0
+  DE: 65190
+  DE_: 0
+  HL: 38008
+  HL_: 0
+  I: 0
+  IX: 12987
+  IY: 835
+  PC: 4
+  R: 2
+  SP: 0

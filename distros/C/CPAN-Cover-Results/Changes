@@ -1,0 +1,15 @@
+Revision history for Perl module CPAN::Cover::Results
+
+0.03 2014-10-09 NEILB
+    - Switched to using the live JSON file, rather than the staging one.
+    - Fixed errors in the SYNOPSIS code - was based on early prototype.
+    - The release iterator now skips entries that don't have any coverage data.
+
+0.02 2014-08-29
+    - Added link to talk about code coverage by Paul Johnson.
+    - Having an empty ABSTRACT comment in the main module source resulted in
+      a line of the SYNOPSIS being used for the abstract.
+
+0.01 2014-08-28
+    - First release to CPAN
+

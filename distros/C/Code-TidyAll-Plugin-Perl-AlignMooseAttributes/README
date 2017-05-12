@@ -1,0 +1,60 @@
+NAME
+    Code::TidyAll::Plugin::Perl::AlignMooseAttributes - Sort and align
+    Moose-style attributes with tidyall
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Code::TidyAll::Plugin::Perl::AlignMooseAttributes;
+
+DESCRIPTION
+    This tidyall plugin sorts and aligns consecutive Moose-style attribute
+    lines. e.g. this:
+
+        has 'namespace' => ( is => 'ro', isa => 'Str', default => 'Default' );
+        has 'expires_at' => ( is => 'rw', default => CHI_Max_Time );
+        has 'storage' => ( is => 'ro' );
+        has 'label' => ( is => 'rw', lazy_build => 1 );
+        has 'chi_root_class' => ( is => 'ro' );
+
+    becomes this:
+
+        has 'chi_root_class' => ( is => 'ro' );
+        has 'expires_at'     => ( is => 'rw', default => CHI_Max_Time );
+        has 'label'          => ( is => 'rw', lazy_build => 1 );
+        has 'namespace'      => ( is => 'ro', isa => 'Str', default => 'Default' );
+        has 'storage'        => ( is => 'ro' );
+
+    Only consecutive attributes, each on a single line, will be affected.
+    Multi-line attributes will not be affected.
+
+    This plugin has a preprocess step that hides these lines to prevent
+    perltidy from splitting them into multiple lines.
+
+SUPPORT AND DOCUMENTATION
+    Questions and feedback are welcome, and should be directed to the
+    author.
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Code-TidyAll-Plugin-Perl-AlignMooseAttributes
+        bug-code-tidyall-plugin-perl-alignmooseattributes@rt.cpan.org
+
+    The latest source code can be browsed and fetched at:
+
+        http://github.com/jonswar/perl-code-tidyall-plugin-perl-alignmooseattributes
+        git clone git://github.com/jonswar/perl-code-tidyall-plugin-perl-alignmooseattributes.git
+
+SEE ALSO
+    perltidy
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

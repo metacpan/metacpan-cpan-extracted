@@ -1,0 +1,571 @@
+NAME
+    CDDB.pm - a high-level interface to cddb protocol servers (freedb and
+    CDDB)
+
+VERSION
+    version 1.222
+
+SYNOPSIS
+      use CDDB;
+
+      ### Connect to the cddbp server.
+      my $cddbp = new CDDB(
+        Host  => 'freedb.freedb.org', # default
+        Port  => 8880,                # default
+        Login => $login_id,           # defaults to %ENV's
+      ) or die $!;
+
+      ### Retrieve known genres.
+      my @genres = $cddbp->get_genres();
+
+      ### Calculate cddbp ID based on MSF info.
+      my @toc = (
+        '1    0  2 37',           # track, CD-i MSF (space-delimited)
+        '999  1 38 17',           # lead-out track MSF
+        '1000 0  0 Error!',       # error track (don't include if ok)
+      );
+      my (
+        $cddbp_id,      # used for further cddbp queries
+        $track_numbers, # padded with 0's (for convenience)
+        $track_lengths, # length of each track, in MM:SS format
+        $track_offsets, # absolute offsets (used for further cddbp queries)
+        $total_seconds  # total play time, in seconds (for cddbp queries)
+       ) = $cddbp->calculate_id(@toc);
+
+      ### Query discs based on cddbp ID and other information.
+      my @discs = $cddbp->get_discs($cddbp_id, $track_offsets, $total_seconds);
+      foreach my $disc (@discs) {
+        my ($genre, $cddbp_id, $title) = @$disc;
+      }
+
+      ### Query disc details (usually done with get_discs() information).
+      my $disc_info     = $cddbp->get_disc_details($genre, $cddbp_id);
+      my $disc_time     = $disc_info->{'disc length'};
+      my $disc_id       = $disc_info->{discid};
+      my $disc_title    = $disc_info->{dtitle};
+      my @track_offsets = @{$disc_info->{offsets}};
+      my @track_seconds = @{$disc_info->{seconds}};
+      my @track_titles  = @{$disc_info->{ttitles}};
+      # other information may be returned... explore!
+
+      ### Submit a disc via e-mail. (Requires MailTools)
+
+      die "can't submit a disc (no mail modules; see README)"
+        unless $cddbp->can_submit_disc();
+
+      # These are useful for prompting the user to fix defaults:
+      print "I will send mail through: ", $cddbp->get_mail_host(), "\n";
+      print "I assume your e-mail address is: ", $cddbp->get_mail_address(), "\n";
+
+      # Actually submit a disc record.
+      $cddbp->submit_disc(
+        Genre       => 'classical',
+        Id          => 'b811a20c',
+        Artist      => 'Various',
+        DiscTitle   => 'Cartoon Classics',
+        Offsets     => $disc_info->{offsets},   # array reference
+        TrackTitles => $disc_info->{ttitles},   # array reference
+        From        => 'login@host.domain.etc', # will try to determine
+      );
+
+DESCRIPTION
+    CDDB protocol (cddbp) servers provide compact disc information for
+    programs that need it. This allows such programs to display disc and
+    track titles automatically, and it provides extended information like
+    liner notes and lyrics.
+
+    This module provides a high-level Perl interface to cddbp servers. With
+    it, a Perl program can identify and possibly gather details about a CD
+    based on its "table of contents" (the disc's track times and offsets).
+
+    Disc details have been useful for generating CD catalogs, naming mp3
+    files, printing CD liners, or even just playing discs in an automated
+    jukebox.
+
+    Despite the module's name, it connects to FreeDB servers by default.
+    This began at version 1.04, when cddb.com changed its licensing model to
+    support end-user applications, not third-party libraries. Connections to
+    cddb.com may still work, and patches are welcome to maintain that
+    functionality, but it's no longer officially supported.
+
+PUBLIC METHODS
+    new PARAMETERS
+        Creates a high-level interface to a cddbp server, returning a handle
+        to it. The handle is not a filehandle. It is an object. The new()
+        constructor provides defaults for just about everything, but
+        everything is overrideable if the defaults aren't appropriate.
+
+        The interface will not actually connect to a cddbp server until it's
+        used, and a single cddbp interface may actually make several
+        connections (to possibly several servers) over the course of its
+        use.
+
+        The new() constructor accepts several parameters, all of which have
+        reasonable defaults.
+
+        Host and Port describe the cddbp server to connect to. These default
+        to 'freedb.freedb.org' and 8880, which is a multiplexor for all the
+        other freedb servers.
+
+        Utf8 is a boolean flag. If true, utf-8 will be used when submitting
+        CD info, and for interpreting the data reveived. This requires the
+        Encode module (and probably perl version at least 5.8.0). The
+        default is true if the Encode module can be loaded. Otherwise, it
+        will be false, meaning we fall back to ASCII.
+
+        Protocol_Version sets the cddbp version to use. CDDB.pm will not
+        connect to servers that don't support the version specified here.
+        The requested protocol version defaults to 1 if Utf8 is off, and to
+        6 if it is on.
+
+        Login is the login ID you want to advertise to the cddbp server. It
+        defaults to the login ID your computer assigns you, if that can be
+        determined. The default login ID is determined by the presence of a
+        LOGNAME or USER environment variable, or by the getpwuid() function.
+        On Windows systems, it defaults to "win32usr" if no default method
+        can be found and no Login parameter is set.
+
+        Submit_Address is the e-mail address where new disc submissions go.
+        This defaults to 'freedb-submit@freedb.org'. Note, that testing
+        submissions should be done via "test-submit@freedb.org".
+
+        Client_Name and Client_Version describe the client software used to
+        connect to the cddbp server. They default to 'CDDB.pm' and CDDB.pm's
+        version number. If developers change this, please consult freedb's
+        web site for a list of client names already in use.
+
+        Debug enables verbose operational information on STDERR when set to
+        true. It's normally not needed, but it can help explain why a
+        program is failing. If someone finds a reproduceable bug, the Debug
+        output and a test program would be a big help towards having it
+        fixed. In case of submission, if this flag is on, a copy of the
+        submission e-mail will be sent to the *From* address.
+
+    get_genres
+        Takes no parameters. Returns a list of genres known by the cddbp
+        server, or undef if there is a problem retrieving them.
+
+    calculate_id TOC
+        The cddb protocol defines an ID as a hash of track lengths and the
+        number of tracks, with an added checksum. The most basic information
+        required to calculate this is the CD table of contents (the CD-i
+        track offsets, in "MSF" [Minutes, Seconds, Frames] format).
+
+        Note however that there is no standard way to acquire this
+        information from a CD-ROM device. Therefore this module does not try
+        to read the TOC itself. Instead, developers must combine CDDB.pm
+        with a CD library which works with their system. The AudioCD suite
+        of modules is recommended: it has system specific code for MacOS,
+        Linux and FreeBSD. CDDB.pm's author has used external programs like
+        dagrab to fetch the offsets. Actual CDs aren't always necessary: the
+        author has heard of people generating TOC information from mp3 file
+        lengths.
+
+        That said, see parse_cdinfo() for a routine to parse "cdinfo" output
+        into a table of contents list suitable for calculate_id().
+
+        calculate_id() accepts TOC information as a list of strings. Each
+        string contains four fields, separated by whitespace:
+
+        offset 0: the track number
+
+        Track numbers start with 1 and run sequentially through the number
+        of tracks on a disc. Note: data tracks count on hybrid audio/data
+        CDs.
+
+        CDDB.pm understands two special track numbers. Track 999 holds the
+        lead-out information, which is required by the cddb protocol. Track
+        1000 holds information about errors which have occurred while
+        physically reading the disc.
+
+        offset 1: the track start time, minutes field
+
+        Tracks are often addressed on audio CDs using "MSF" offsets. This
+        stands for Minutes, Seconds, and Frames (fractions of a second). The
+        combination pinpoints the exact disc frame where a song starts.
+
+        Field 1 contains the M part of MSF. It is ignored for error tracks,
+        but it still must contain a number. Zero is suggested.
+
+        offset 2: the track start time, seconds field
+
+        This field contains the S part of MSF. It is ignored for error
+        tracks, but it still must contain a number. Zero is suggested.
+
+        offset 3: the track start time, frames field
+
+        This field contains the F part of MSF. For error tracks, it contains
+        a description of the error.
+
+        Example track file. Note: the comments should not appear in the
+        file.
+
+             1   0  2 37  # track 1 starts at 00:02 and 37 frames
+             2   1 38 17  # track 2 starts at 01:38 and 17 frames
+             3  11 57 30  # track 3 starts at 11:57 and 30 frames
+             ...
+           999  75 16  5  # leadout starts at 75:16 and  5 frames
+
+        Track 1000 should not be present if everything is okay:
+
+          1000   0  0  Error reading TOC: no disc in drive
+
+        In scalar context, calculate_id() returns just the cddbp ID. In a
+        list context, it returns an array containing the following values:
+
+          (
+            $cddbp_id,
+            $track_numbers,
+            $track_lengths,
+            $track_offsets,
+            $total_seconds
+          ) = $cddbp->calculate_id(@toc);
+
+          print(
+            "cddbp ID      = $cddbp_id\n",        # b811a20c
+            "track numbers = @$track_numbers\n",  # 001 002 003 ...
+            "track lengths = @$track_lengths\n",  # 01:36 10:19 04:29 ...
+            "track offsets = @$track_offsets\n",  # 187 7367 53805 ...
+            "total seconds = $total_seconds\n",   # 4514
+          );
+
+        CDDBP_ID
+
+        The 0th returned value is the hashed cddbp ID, required for any
+        queries or submissions involving this disc.
+
+        TRACK_NUMBERS
+
+        The 1st returned value is a reference to a list of track numbers,
+        one for each track (excluding the lead-out), padded to three
+        characters with leading zeroes. These values are provided for
+        convenience, but they are not required by cddbp servers.
+
+        TRACK_LENGTHS
+
+        The 2nd returned value is a reference to a list of track lengths,
+        one for each track (excluding the lead-out), in HH:MM format. These
+        values are returned as a convenience. They are not required by cddbp
+        servers.
+
+        TRACK_OFFSETS
+
+        The 3rd returned value is a reference to a list of absolute track
+        offsets, in frames. They are calculated from the MSF values, and
+        they are required by get_discs() and submit_disc().
+
+        TOTAL_SECONDS
+
+        The 4th and final value is the total playing time for the CD, in
+        seconds. The get_discs() function needs it.
+
+    get_discs CDDBP_ID, TRACK_OFFSETS, TOTAL_SECONDS
+        get_discs() asks the cddbp server for a summary of all the CDs
+        matching a given cddbp ID, track offsets, and total playing time.
+        These values can be retrieved from calculade_id().
+
+          my @id_info       = $cddbp->calculate_id(@toc);
+          my $cddbp_id      = $id_info->[0];
+          my $track_offsets = $id_info->[3];
+          my $total_seconds = $id_info->[4];
+
+        get_discs() returns an array of matching discs, each of which is
+        represented by an array reference. It returns an empty array if the
+        query succeeded but did not match, and it returns undef on error.
+
+          my @discs = $cddbp->get_discs( $cddbp_id, $track_offsets, $total_seconds );
+          foreach my $disc (@discs) {
+            my ($disc_genre, $disc_id, $disc_title) = @$disc;
+            print(
+              "disc id    = $disc_id\n",
+              "disc genre = $disc_genre\n",
+              "disc title = $disc_title\n",
+            );
+          }
+
+        DISC_GENRE is the genre this disc falls into, as determined by
+        whoever submitted or last edited the disc. The genre is required
+        when requesting a disc's details. See get_genres() for how to
+        retrieve a list of cddbp genres.
+
+        CDDBP_ID is the cddbp ID of this disc. Cddbp servers perform fuzzy
+        matches, returning near misses as well as direct hits on a cddbp ID,
+        so knowing the exact ID for a disc is important when submitting
+        changes or requesting a particular near-miss' details.
+
+        DISC_TITLE is the disc's title, which may help a human to pick the
+        correct disc out of several close mathches.
+
+    get_discs_by_toc TOC
+        This function acts as a macro, combining calculate_id() and
+        get_discs() calls into one function. It takes the same parameters as
+        calculate_id(), and it returns the same information as get_discs().
+
+    get_discs_by_query QUERY_STRING
+        Fetch discs by a pre-built cddbp query string. Some disc querying
+        programs report this string, and get_discs_by_query() is a
+        convenient way to use that.
+
+        Cddb protocol query strings look like:
+
+          cddb query $cddbp_id $track_count @offsets $total_seconds
+
+    get_disc_details DISC_GENRE, CDDBP_ID
+        This function fetches a disc's detailed information from a cddbp
+        server. It takes two parameters: the DISC_GENRE and the CDDP_ID.
+        These parameters usually come from a call to get_discs().
+
+        The disc's details are returned in a reference to a fairly complex
+        hash. It includes information normally stored in comments. The most
+        common entries in this hash include:
+
+          $disc_details = get_disc_details( $disc_genre, $cddbp_id );
+
+        $disc_details->{"disc length"}
+
+        The disc length is commonly stored in the form "### seconds", where
+        ### is the disc's total playing time in seconds. It may hold other
+        time formats.
+
+        $disc_details->{discid}
+
+        This is a rehash (get it?) of the cddbp ID. It should match the
+        CDDBP_ID given to get_disc_details().
+
+        $disc_details->{dtitle}
+
+        This is the disc's title. I do not know whether it will match the
+        one returned by get_discs().
+
+        $disc_details->{offsets}
+
+        This is a reference to a list of absolute disc track offsets,
+        similar to the TRACK_OFFSETS returned by calculate_id().
+
+        $disc_details->{seconds}
+
+        This is a reference to a list of track length, in seconds.
+
+        $disc_details->{ttitles}
+
+        This is a reference to a list of track titles. These are the droids
+        you are looking for.
+
+        $disc_details->{"processed by"}
+
+        This is a comment field identifying the name and version of the
+        cddbp server which accepted and entered the disc record into the
+        database.
+
+        $disc_details->{revision}
+
+        This is the disc record's version number, used as a sanity check
+        (semaphore?) to prevent simultaneous revisions. Revisions start at 0
+        for new submissions and are incremented for every correction. It is
+        the responsibility of the submitter (be it a person or a program
+        using CDDB.pm) to provide a correct revision number.
+
+        $disc_details->{"submitted via"}
+
+        This is the name and version of the software that submitted this
+        cddbp record. The main intention is to identify records that are
+        submitted by broken software so they can be purged or corrected.
+
+        $disc_details->{xmcd_record}
+
+        The xmcd_record field contains a copy of the entire unprocessed
+        cddbp response that generated all the other fields.
+
+        $disc_details->{genre}
+
+        This is merely a copy of DISC_GENRE, since it's otherwise not
+        possible to determine it from the hash.
+
+    parse_xmcd_file XMCD_FILE_CONTENTS, [GENRE]
+        Parses an array ref of lines read from an XMCD file into the
+        disc_details hash described above. If the GENRE parameter is set it
+        will be included in disc_details.
+
+    can_submit_disc
+        Returns true or false, depending on whether CDDB.pm has enough
+        dependent modules to submit discs. If it returns false, you are
+        missing Mail::Internet, Mail::Header, or MIME::QuotedPrint.
+
+    get_mail_address
+        Returns what CDDB.pm thinks your e-mail address is, or what it was
+        last set to. It was added to fetch the default e-mail address so
+        users can see it and have an opportunity to correct it.
+
+          my $mail_from = $cddb->get_mail_address();
+          print "New e-mail address (or blank to keep <$mail_from>): ";
+          my $new_mail_from = <STDIN>;
+          $new_mail_from =~ s/^\s+//;
+          $new_mail_from =~ s/\s+$//;
+          $new_mail_from =~ s/\s+/ /g;
+          $mail_from = $new_mail_from if length $new_mail_from;
+
+          $cddbp->submit_disc(
+            ...,
+            From => $mail_from,
+          );
+
+    get_mail_host
+        Returns what CDDB.pm thinks your SMTP host is, or what it was last
+        set to. It was added to fetch the default e-mail transfer host so
+        users can see it and have an opportunity to correct it.
+
+          my $mail_host = $cddb->get_mail_host();
+          print "New e-mail host (or blank to keep <$mail_host>): ";
+          my $new_mail_host = <STDIN>;
+          $new_mail_host =~ s/^\s+//;
+          $new_mail_host =~ s/\s+$//;
+          $new_mail_host =~ s/\s+/ /g;
+          $mail_host = $new_mail_host if length $new_mail_host;
+
+          $cddbp->submit_disc(
+            ...,
+            Host => $mail_host,
+          );
+
+    parse_cdinfo CDINFO_FILE
+        Generates a table of contents suitable for calculate_id() based on
+        the output of a program called "cdinfo". CDINFO_FILE may either be a
+        text file, or it may be the cdinfo program itself.
+
+          my @toc = parse_cdinfo("cdinfo.txt"); # read cdinfo.txt
+          my @toc = parse_cdinfo("cdinfo|");    # run cdinfo directly
+
+        The table of contents can be passed directly to calculate_id().
+
+    submit_disc DISC_DETAILS
+        submit_disc() submits a disc record to a cddbp server. Currently it
+        only uses e-mail, although it will try different ways to send that.
+        It returns true or false depending on whether it was able to send
+        the submission e-mail.
+
+        The rest of CDDB.pm will work without the ability to submit discs.
+        While cddbp submissions are relatively rare, most CD collections
+        will have one or two discs not present in the system. Please submit
+        new discs to the system: the amazing number of existing discs got
+        there because others submitted them before you needed them.
+
+        submit_disc() takes six required parameters and two optional ones.
+        The parameters are named, like hash elements, and can appear in any
+        order.
+
+        Genre => DISC_GENRE
+
+        This is the disc's genre. It must be one of the genres that the
+        server knows. See get_genres().
+
+        Id => CDDBP_ID
+
+        This is the cddbp ID that identifies the disc. It should come from
+        calculate_id() if this is a new submission, or from
+        get_disc_details() if this is a revision.
+
+        Artist => DISC_ARTIST
+
+        This is the disc's artist, a freeform text field describing the
+        party responsible for the album. It will need to be entered from the
+        disc's notes for new submissions, or it can come from
+        get_disc_details() on subsequent revisions.
+
+        DiscTitle => DISC_TITLE
+
+        This is the disc's title, a freeform text field describing the
+        album. It must be entered from the disc's notes for new submissions.
+        It can come from get_disc_details() on subsequent revisions.
+
+        Offsets => TRACK_OFFSETS
+
+        This is a reference to an array of absolute track offsets, as
+        provided by calculate_id().
+
+        TrackTitles => TRACK_TITLES
+
+        This is a reference to an array of track titles, either entered by a
+        human or provided by get_disc_details().
+
+        From => EMAIL_ADDRESS
+
+        This is the disc submitter's e-mail address. It's not required, and
+        CDDB.pm will try to figure one out on its own if an address is
+        omitted. It may be more reliable to provide your own, however.
+
+        The default return address may not be a deliverable one, especially
+        if CDDB.pm is being used on a dial-up machine that isn't running its
+        own MTA. If the current machine has its own MTA, problems still may
+        occur if the machine's Internet address changes.
+
+        Host => SMTP_HOST
+
+        This is the SMTP host to contact when sending mail. It's not
+        required, and CDDB.pm will try to figure one out on its own. It will
+        look at the SMTPHOSTS environment variable is not defined, it will
+        try 'mail' and 'localhost' before finally failing.
+
+        Revision => REVISION
+
+        The revision number. Should be 1 for new submissions, and one higher
+        than the previous one for updates. The previous revision number is
+        available as the "revision" field in the hash returned by
+        get_disc_details().
+
+PRIVATE METHODS
+    Documented as being not documented.
+
+EXAMPLES
+    Please see the cddb.t program in the t (tests) directory. It exercises
+    every aspect of CDDB.pm, including submissions.
+
+COMPATIBILITY
+    CDDB.pm uses standard Perl modules. It has been tested at one point or
+    another on OS/2, MacOS and FreeBSD systems, as well as the systems
+    listed at:
+
+      http://testers.cpan.org/search?request=dist&dist=CDDB
+
+    If you want to submit disc information to the CDDB, you will need to
+    install two other modules:
+
+      Mail::Internet will allow CDDB.pm to send email submissions, and it
+      automagically includes Mail::Header.
+
+      MIME::QuotedPrint will allow CDDB.pm to send non-ASCII text
+      unscathed.  Currently only ISO-8859-1 and ASCII are supported.
+
+    All other features will work without these modules.
+
+KNOWN TEST FAILURES
+    The last test in the "make test" suite will try to send a sample
+    submission to the CDDB if MailTools is present. It expects to find an
+    SMTP host in the SMTPHOST environment variable. It will fall back to
+    "mail" if SMTPHOST doesn't exist. If neither works, the test will be
+    skipped. To see why it's skipped:
+
+      make test TEST_VERBOSE=1
+
+    Some of the tests (most notably numbers 25, 27 and 29) compare data
+    returned by a cddbp server against a stored copy of a previous query.
+    These tests fail occasionally since the database is constantly in flux.
+    Starting with version 1.00, the test program uses fuzzy comparisons that
+    should fail less. Version 1.04 saw even fuzzier comparisons. Please
+    report any problems so they can be fixed.
+
+LINKS
+  BUG TRACKER
+    https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=CDDB
+
+  REPOSITORY
+    http://github.com/rcaputo/cddb-perl
+    http://gitorious.org/cddb-freedb-perl
+
+  OTHER RESOURCES
+    http://search.cpan.org/dist/CDDB/
+
+CONTACT AND COPYRIGHT
+    Copyright 1998-2013 Rocco Caputo. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

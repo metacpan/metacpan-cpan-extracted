@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CatalystX/PSGIApp.pm
+t/lib/Support/does_not_have_method.pm
+t/lib/Support/has_method.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/test.t

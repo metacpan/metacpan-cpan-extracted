@@ -1,0 +1,33 @@
+Revision history for Perl extension Convert::Morse:
+
+0.06 2008-02-26 Tels 40 tests
+  * stop CPAN testers from sending me fail reports about 5.005
+  * fix bug #30583: Only converts up to first newline
+
+0.05 2007-02-02 Tels 40 tests
+  * update copyright and add license
+  * remove old cruft and modernize package and Makefile.PL
+  * bundle Module::Install
+  * add POD tests
+  * list requirement of perl 5.008001 in Makefile.PL
+    (anything older is untested and thus not supported!)
+  * added missing tokens for "!", and "@"
+  * document tokens() method
+
+0.04  2004-10-24 Tels 36 tests
+  * added missing tokens for ")", "+", and "="
+  * added SIGNATURE
+  * convert morsepm.t to Test::More
+  * remove needless /c in two regexps
+  * require Test::Simple v0.47 in PREREQ
+
+0.03  Mon Feb 19 18:17:02 2001
+  fixed the distribution by using 'make dist'
+
+0.02  Fri Dec  8 18:38:06 2000
+  added: test suite, error(), is_morse(), is_morsable()
+  fixed: some small bugs regarding spaces 
+
+0.01  Thu Nov 28 18:25:13 2000
+  original version
+

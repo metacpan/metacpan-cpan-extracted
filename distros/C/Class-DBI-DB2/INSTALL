@@ -1,0 +1,12 @@
+In order to run the tests you'll need a working connection to a db2 server running with permissions to create and delete tables.
+
+The connection information is taken from the following environment
+variables which you can set to control this behavior:
+
+schema:   ENV{DBD_DB2_SCHEMA}
+dbname:   ENV{DBD_DB2_DBNAME}
+user:     ENV{DBD_DB2_USER}
+password: ENV{DBD_DB2_PASSWD}
+table:    ENV{DBD_DB2_TABLE}
+
+If any variable is not set, you are prompted for a value.

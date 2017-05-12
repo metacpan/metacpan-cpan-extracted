@@ -1,0 +1,63 @@
+{
+   "abstract" : "Parse a Carp stack trace into an array of caller information with parsed arguments.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>",
+      "Kate Kirby <kate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Carp-Parse",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Carp::Parse" : {
+         "file" : "lib/Carp/Parse.pm",
+         "version" : "v1.0.7"
+      },
+      "Carp::Parse::CallerInformation" : {
+         "file" : "lib/Carp/Parse/CallerInformation.pm",
+         "version" : "v1.0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=carp-parse"
+      },
+      "homepage" : "https://metacpan.org/release/Carp-Parse",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/katekirby/Carp-Parse.git"
+      }
+   },
+   "version" : "v1.0.7"
+}

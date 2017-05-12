@@ -1,0 +1,11 @@
+<html><body> This Perl module makes the use of clearprompt(1) both
+simpler and more portable between UNIX and Windows.  It handles UNIX/NT
+quoting and path issues transparently, manages creation, reading, and
+deletion of temp files in text/list/file modes, manages trigger series
+prompting, allows capture of messages to dialog boxes and/or email, and
+adds a clearprompt_dir() function to prompt for a directory.  Note: a
+newer version may be present at
+<a href="http://www.perl.com/CPAN-local/modules/by-module/IPC/DSB/">
+http://www.perl.com/CPAN-local/modules/by-module/IPC/DSB/
+</a>.
+</body></html>

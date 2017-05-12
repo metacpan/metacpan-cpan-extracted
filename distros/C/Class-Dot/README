@@ -1,0 +1,326 @@
+NAME
+    Class::Dot - Simple and fast properties for Perl 5.
+
+VERSION
+    This document describes Class::Dot version v2.0.0 (beta 1).
+
+SYNOPSIS
+         package Animal::Mammal::Carnivorous::Cat;
+ 
+         use Class::Dot qw( :std );
+ 
+         # A cat's properties, with their default values and type of data.
+         property gender      => isa_String('male');
+         property memory      => isa_Hash;
+         property state       => isa_Hash(instinct => 'hungry');
+         property family      => isa_Array;
+         property dna         => isa_Data;
+         property action      => isa_Data;
+         property colour      => isa_Int(0xfeedface);
+         property fur         => isa_Array('short');
+ 
+          sub new {
+             my ($class, $gender) = @_;
+             my $self    = { }; # Must be anonymous hash for Class::Dot to work.
+             bless $self, $class;
+ 
+             $self->set_gender($gender);
+ 
+             warn sprintf('A new cat is born, it is a %s. Weeeeh!',
+                 $self->gender
+             );
+ 
+             return $self;
+         }
+ 
+         sub run {
+             while (1) {
+                 die if $self->state->{dead};
+             }
+         }
+ 
+         package main;
+ 
+         my $albert = new Animal::Mammal::Carnivorous::Cat('male');
+         $albert->memory->{name} = 'Albert';
+         $albert->state->{appetite} = 'insane';
+         $albert->set_fur([qw(short thin shiny)]);
+         $albert->set_action('hunting');
+ 
+         my $lucy = new Animal::Mammal::Carnivorous::Cat('female');
+         $lucy->memory->{name} = 'Lucy';
+         $lucy->state->{instinct => 'tired'};
+         $lucy->set_fur([qw(fluffy long)]);
+         $lucy->set_action('sleeping');
+ 
+         push @{ $lucy->family   }, [$albert];
+         push @{ $albert->family }, [$lucy  ];
+
+DESCRIPTION
+    Simple and fast properties for Perl 5.
+
+    "Class::Dot" also lets you define types for your properties, like Hash,
+    String, Int, File, Code, Array and so on.
+
+    All the types are populated with sane defaults, so you no longer have to
+    write code like this:
+
+        sub make_healthy {
+           my ($self) = @_;
+           my $state  = $self->state;
+           my $fur    = $self->fur;
+ 
+           $state ||= { }; # <-- you don't have to do this with class dot.
+           $fur   ||= [ ]; # <-- same with this.
+        }
+
+    Class::Dot can also create a default constructor for you if you pass it
+    the "-new" option on the use line:
+
+        use Class::Dot qw(-new :std);
+
+    If you pass a hashref to the constructor, it will use them as values for
+    the properties:
+
+        my $cat = Animal::Mammal::Carnivorous::Cat->new({
+           gender => 'male',
+           fur    => ['black', 'white', 'short'],
+        }
+
+    If you want to intialize something at object construction time you can!
+    Just define a method named "BUILD". "Class::Dot" will pass on the
+    instance and all the arguments that was sent to "new".
+
+        sub BUILD {
+           my ($self, $options_ref) = @_;
+ 
+           warn 'Someone created a ', ref $self;
+ 
+           return;
+        }
+
+    The return value of the "BUILD" method doesn't mean anything, that is
+    unleass you have to "-rebuild" option on. When the "-rebuild" option is
+    on, "Class::Dot" uses the return value of BUILD as the new object, so
+    you can create a abstract factory or similar:
+
+        use Class::Dot qw(-new -rebuild :std);
+ 
+        sub BUILD {
+           my ($self, $option_ref) = @_;
+ 
+           if (exists $options_ref->{delegate_to}) {
+              my $new_class = $options_ref->{delegate_to};
+              my $new_instasnce = $new_class->new($options_ref);
+ 
+              return $new_instance;
+           }
+ 
+           return;
+        }
+
+    A big value of using properties is that you can override them at a later
+    point to make them support additional functionality, like setting a
+    hardware flag, logging, etc. In Class::Dot you override a property
+    simply by defining their accessors:
+
+        property name => isa_String();
+ 
+        sub name {   # <-- overrides the get accessor
+           my ($self) = @_;
+ 
+           warn 'Acessing the name property';
+ 
+           return $self->__getattr__('name');
+        }
+ 
+        sub set_name { # <-- overrides the set accessor
+           my ($self, $new_name) = @_;
+ 
+           warn $self->__getattr__('name'), " changed name to $new_name!";
+ 
+           $self->__setattr__('name', $new_name);
+ 
+           return;
+        }
+
+    There is one exception where this won't work, though. That is if you
+    define a property in a "BEGIN" block. If you do that you have to use the
+    "after_property_get()" and "after_property_set()" functions:
+
+        BEGIN {
+           use Class::Dot qw(-new :std);
+           property name => isa_String();
+        }
+ 
+        after_property_get name => sub {
+           my ($self) = @_;
+ 
+           warn 'Acessing the name property';
+ 
+           return $self->__getattr__('name');
+        }; # <-- the semicolon is required here!
+ 
+        after_property_set name => sub {
+           my ($self, $new_name) = @_;
+ 
+           warn $self->__getattr__('name'), " changed name to $new_name!";
+ 
+           $self->__setattr__('name', $new_name);
+ 
+           return;
+        }; # <-- the semicolon is required here!
+
+    You can read more about "Class::Dot" in the Class::Dot::Manual::Cookbook
+    and Class::Dot::Manual::FAQ. (Not yet written for the 2.0 beta release).
+
+    Have a good time working with "Class::Dot", and please report any bug
+    you might find, or send feature requests. (although "Class::Dot" is not
+    meant to be Moose, it's meant to be simple and fast).
+
+SUBROUTINES/METHODS
+  CLASS METHODS
+   "property($property, $default_value)"
+    Example:
+
+         property foo => isa_String('hello world');
+ 
+         property bar => isa_Int(303);
+
+    will create the methods:
+
+         foo( )
+         set_foo($value)
+ 
+         bar( )
+         set_bar($value)
+
+    with default return values -hello world- and -303-.
+
+   "after_property_get($attr_name, \&code)"
+    Override the get accessor method for a property.
+
+    Example:
+
+        property name => isa_String;
+ 
+        after_property_get name => sub {
+           my ($self) = @_;
+ 
+           warn 'Accessing the name property of ' . ref $self;
+ 
+           return $self->__getattr__('name');
+        }; # <- needs the semi-colon at the end!
+
+   "after_property_set($attr_name, \&code)"
+    Override the set accessor method for a property.
+
+    Example:
+
+        property name => isa_String;
+ 
+        after_property_set name => sub {
+           my ($self, $new_name) = @_;
+ 
+           warn $self->__getattr__('name') . " is canging name to $new_name";
+ 
+           $self->__setattr__('name', $new_name);
+ 
+           return;
+        }; # <- needs the semi-colon at the end!
+
+   "isa_String($default_value)"
+    The property is a string.
+
+   "isa_Int($default_value)"
+    The property is a number.
+
+   "isa_Array(@default_values)"
+    The property is an array.
+
+   "isa_Hash(%default_values)"
+    The property is an hash.
+
+   "isa_Object($kind)"
+    The property is a object. (Does not really set a default value.).
+
+   "isa_Data()"
+    The property is of a not yet defined data type.
+
+   "isa_Code()"
+    The property is a subroutine reference.
+
+   "isa_File()"
+  INSTANCE METHODS
+   "->properties_for_class($class)"
+    Return the list of properties for a class/object that uses the powers.
+
+  PRIVATE CLASS METHODS
+   "_create_get_accessor($property, $default_value)"
+    Create the set accessor for a property. Returns a code reference to the
+    new setter method. It has to be installed into the callers package
+    afterwards.
+
+   "_create_set_accessor($property)"
+    Create the get accessor for a property. Returns a code reference to the
+    new getter method. It has to be installed into the callers package
+    afterwards.
+
+DIAGNOSTICS
+  * You tried to set a value with "foo()". Did you mean "set_foo()"
+    Self-explained?
+
+CONFIGURATION AND ENVIRONMENT
+    This module requires no configuration file or environment variables.
+
+DEPENDENCIES
+    *   version
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to bug-class-dot@rt.cpan.org,
+    or through the web interface at CPAN Bug tracker.
+
+SEE ALSO
+  Class::InsideOut
+AUTHOR
+    Ask Solem, ask@0x61736b.net.
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem ask@0x61736b.net.
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
+    # Local Variables: # mode: cperl # cperl-indent-level: 4 # fill-column:
+    78 # End: # vim: expandtab tabstop=4 shiftwidth=4 shiftround
+

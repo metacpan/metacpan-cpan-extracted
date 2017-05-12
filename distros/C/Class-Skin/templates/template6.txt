@@ -1,0 +1,2 @@
+<include src="a/included_template.txt">
+<if condition="a"     ><a href="#"></if>linked_bla<if condition="a"></a></if>

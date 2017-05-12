@@ -1,0 +1,8 @@
+To Install
+----------
+Run the following
+
+1. `perl Makefile.PL`
+2. `make install`
+
+

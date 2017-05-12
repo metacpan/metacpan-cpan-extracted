@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  6627:
+    - 181
+name: fdcb33
+registers:
+  AF: 40097
+  AF_: 0
+  BC: 11408
+  BC_: 0
+  DE: 53429
+  DE_: 0
+  HL: 11235
+  HL_: 0
+  I: 0
+  IX: 9873
+  IY: 6500
+  PC: 4
+  R: 2
+  SP: 0

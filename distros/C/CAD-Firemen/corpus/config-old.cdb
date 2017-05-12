@@ -1,0 +1,40 @@
+﻿# ASCII
+#
+2D_PALETTE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+THIS_OPTION_DOES_NOT_EXISTS_IN_NEW_CDB  ( -CDB )
+{
+   UNDOCKED
+   DOCKED
+}
+THIS_OPTION_DOES_NOT_EXISTS_IN_NEW_CDB_TOO  ( -CDB )
+{
+   YES
+   NO
+}
+ACIS_EXPORT_PARAMS  ( -Aw )
+{
+   YES
+   NO
+   MAYBE
+}
+# check that all options, but not values are stored in upper case
+# also trailing whitespaces are added here
+acis_export_units  ( -Aw )
+{
+   in  
+   ft   
+   cm   
+   MICRON
+   EFAULT
+}
+ACIS_OUT_VERSION  ( -Aw )
+{
+   4
+   5
+}
+DEPTHCUE_VALUE  ( -Aw )
+{
+}

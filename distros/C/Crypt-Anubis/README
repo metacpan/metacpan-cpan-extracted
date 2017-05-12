@@ -1,0 +1,29 @@
+Crypt::Anubis
+=============
+
+Anubis is a variable-length key, 128-bit block cipher designed by
+Vincent Rijmen and Paulo S. L. M. Barreto. Anubis was submitted as
+a NESSIE candidate.
+
+The default key length in this implementation is 128 bits.
+
+BONUS
+
+The C file, _anubis.c, is a standalone Anubis implementation. To
+compile it, type:
+
+        gcc -Wall _anubis.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque <jcduque (AT) lycos (DOT) com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

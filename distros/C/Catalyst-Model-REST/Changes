@@ -1,0 +1,97 @@
+Revision history for Catalyst-Model-REST
+
+0.27    2012-02-20 21:04:05 Europe/Copenhagen
+  - Move all functionality into Role::REST::Client.
+    This distribution is just a thin Catalyst::Model shell around that role
+
+0.26    2012-02-20 17:48:25 Europe/Copenhagen
+
+0.25    2012-02-17 20:47:06 Europe/Copenhagen
+  - JSON data can be a hashref or an arrayref (Thanks to Alex Howarth for reporting)
+
+0.24    2011-10-10 19:23:36 Europe/Copenhagen
+  - Better handling of the return content. Perhaps the content isn't
+    deserializable
+
+0.23    2011-10-09 16:19:03 Europe/Copenhagen
+
+0.22    2011-07-29 06:06:53 Europe/Copenhagen
+  - Fix error in GET call (Warming)
+
+0.21    2011-07-20 10:23:23 Europe/Copenhagen
+  - Changed Test requirement from JSON::XS to JSON
+  - Make serializer test more accurate
+
+0.20    2011-06-25 18:13:10 Europe/Copenhagen
+  - New args parameter for all REST calls
+
+0.19    2011-06-22 17:43:34 Europe/Copenhagen
+  - Fix calling errors and remove charset from content_type (warming)
+  - Catch (de)serialization errors
+
+0.18    2011-06-09 17:27:34 Europe/Copenhagen
+  - Uri escape parameters for all GET calls
+  - Fix test dependencies
+
+0.17    2011-06-07 14:33:13 Europe/Copenhagen
+  - Fix calling parameters for calling w/o content data
+  - Enhance documentation
+  - Remove dependency for Data::Serializable. Makes CMR code cleaner.
+
+0.16    2011-04-14 21:42:13 Europe/Copenhagen
+ - Add clientattr to be able to set HTTP::Tiny attributes
+ - Special casing application/x-www-form-urlencoded. Idea and test: Giovanni Pensa
+
+0.15    2011-03-29 21:20:27 Europe/Copenhagen
+ - Return an error if status 5XX
+
+0.14    2011-01-27 12:28:50 Europe/Copenhagen
+ - Replace LWP with HTTP::Tiny
+ - Internal refactoring of methods
+ - New options method
+
+0.13    2010-10-31 08:28:27 Europe/Copenhagen
+ - Force dzil to require the correct version of Data::Serialized
+
+0.12    2010-10-30 11:46:47 Europe/Copenhagen
+ - Make dzil do more
+ - Added test requirements to satisfy serialization tests
+
+0.11    26 October 2010
+ - Let dzil handle version numbers in source files
+ - Add JSON::XS to test requirements in dist.ini
+
+0.10    23 October 2010
+ - Use Dist::Zilla
+
+0.09    11 October 2010
+ - Allow for no data to be sent
+ - Include all methods, including DELETE
+
+0.08    7 October 2010
+ - *NB* The attribute "type" now uses the content-type, so valid values are
+   application/json, application/xml, application/yaml.
+   More may come if needed.
+
+0.07    5 October 2010
+ - Data::Serializable needs to be 0.40.1 for XML tests to pass
+
+0.06    3 October 2010
+ - Implements serializers through Data::Serializable. This makes it much easier
+   to add a new serializer if needed.
+
+0.05    30 September 2010
+ - Return a response object instead of a hashref from the REST methods
+
+0.04    29 September 2010
+ - Only deserialize if OK response
+
+0.03    29 September 2010
+ - Added code, response ro atributes
+
+0.02    26 September 2010
+ - Serializers, now two; json and yaml. Implemented as roles and controlled w/an enum
+   Makefile.PL rearranged
+
+0.01    23 September 2010
+ - First version, released on an unsuspecting world.

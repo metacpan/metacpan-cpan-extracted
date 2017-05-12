@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 30f37ca1d4dea966771ebdc161162f310542b3b3 Changes
+SHA1 a03bfc3c074b3b08086d5980f8afdf8cf4a27cec LICENSE
+SHA1 768062103f58d152e192df09e1d7023c4ae19032 MANIFEST
+SHA1 16921bcda07fa2b65fb542573e16f0bd801e45b5 META.json
+SHA1 08d9083e2f9326f67effea055e9516ebb21ca1c6 META.yml
+SHA1 6c37ed2e21e957fd62882337245b9e0313621823 Makefile.PL
+SHA1 f2105ed59e959be282c88164b7401c514e7b0aa1 README
+SHA1 44a6d37e54e2edab34e29c793b96051d6cd44e68 README.mkdn
+SHA1 99f82dbc00b151546b4eef2829b510ef4d9961a9 dist.ini
+SHA1 6a72cc70311b5272a76eeba354cff9b7b215b409 lib/Catalyst/Plugin/Session/PSGI.pm
+SHA1 348f359fabf6e1b820420d4c2fd0f17166c783d9 lib/Catalyst/Plugin/Session/State/PSGI.pm
+SHA1 ed90ece37c8ae5e772474a6202f7e6c32e2f68fa lib/Catalyst/Plugin/Session/Store/PSGI.pm
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 6ea81e3865946a14536f97ccc65fee4b218c8148 t/release-kwalitee.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFRL3D6h4j7xTiFuxERAlgMAKC4N2lxdOqyawYi/oYarLU7vWAiJgCgr/Wa
+BVhWBxJgFsH9tP1kfA3TXQE=
+=h1vs
+-----END PGP SIGNATURE-----

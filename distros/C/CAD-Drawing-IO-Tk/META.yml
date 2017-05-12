@@ -1,0 +1,24 @@
+---
+name: CAD-Drawing-IO-Tk
+version: 0.04
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: GUI I/O methods for CAD::Drawing
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Calc: 0.25
+  CAD::Drawing: 0.26
+  Test::More: 0
+  Tk::WorldCanvas: 1.2.7
+provides:
+  CAD::Drawing::IO::Tk:
+    file: lib/CAD/Drawing/IO/Tk.pm
+    version: 0.04
+  Tk::WorldCanvas:
+    file: lib/CAD/Drawing/IO/Tk.pm
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

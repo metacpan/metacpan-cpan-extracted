@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Color-Mix.t
+lib/Color/Mix.pm
+META.yml                                 Module meta-data (added by MakeMaker)

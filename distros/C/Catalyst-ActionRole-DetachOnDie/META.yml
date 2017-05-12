@@ -1,0 +1,23 @@
+---
+abstract: 'If something dies in a chain, stop the chain. DEPRECATED IN FAVOR OF CATALYST 5.90040'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-ActionRole-DetachOnDie
+requires:
+  Catalyst: 5.90006
+  Catalyst::Action::RenderView: 0.16
+  Catalyst::Controller::ActionRole: 0.15
+  Test::More: 0.98
+  Try::Tiny: 0.11
+resources:
+  repository: git://github.com/frioux/Catalyst-ActionRole-DetachOnDie.git
+version: 0.001006

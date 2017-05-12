@@ -1,0 +1,5 @@
+Revision history for Perl extension Crypt::SEED.
+
+0.01  Wed Sep  3 02:18:35 2008
+	- original version; created by h2xs 1.21 with options
+		-A -n Crypt::SEED

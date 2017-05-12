@@ -1,0 +1,89 @@
+NAME
+    Catalyst::Plugin::Upload::Audio::File - Get an Audio::File from an
+    upload
+
+SYNOPSIS
+        use Catalyst qw/Upload::Audio::File/;
+
+        if ( my $upload = $c->request->upload('file_to_upload') ) {
+            # The destination file must have the file extension intact
+            my $temp_file = "/tmp".$upload->filename;
+
+            # The new file location must be reflected into the $upload object
+            $upload->copy_to($temp_file);
+            $upload->filename($temp_file);
+
+            print "Got a file of length ".$upload->length."\n";
+            print "The bitrate is ".$upload->bitrate."\n";
+        }
+
+DESCRIPTION
+    Extends "Catalyst::Request::Upload" with "Audio::File".
+
+WARNING
+    Because `Catalyst::Request::Upload->filename` contains the name of the
+    file as the user uploaded it and -not- the name of a real file on disk,
+    and because `$upload->tempname` is a random string with no file
+    extension, you must copy the file with the file extension intact and
+    reflect the new file location back into the $upload object as
+    demonstrated in the Synopsis.
+
+METHODS
+    See Audio::File for more detailed descriptions of available methods.
+
+    All methods except "audio_file" return the scalar value of the file
+    property or "undef".
+
+    audio_file
+        The Audio::File object itself.
+
+    length
+        The length of the file.
+
+    bitrate
+        The bitrate of the file.
+
+    sample_rate
+        The sample rate of the file.
+
+    channels
+        The number of audio channels in the file.
+
+    title
+        The title from the file metadata ("tags").
+
+    artist
+        The artist name from the file metadata.
+
+    album
+        The album name from the file metadata.
+
+    comment
+        The comment from the file metadata.
+
+    genre
+        The genre from the file metadata.
+
+    year
+        The year from the file metadata.
+
+    track
+        The track number from the file metadata.
+
+    total
+        The total tracks from the file metadata.
+
+SEE ALSO
+    Audio::File
+
+AUTHOR
+    Nathaniel Heinrichs, "nheinric@cpan.org"
+
+LICENSE
+        Copyright (c) 2009 Nathaniel Heinrichs
+
+        Written while employed at Orinoco K.K., L<http://www.orinoco.jp>
+ 
+        This library is free software.
+        You can redistribute it and/or modify it under the same terms as perl itself.
+

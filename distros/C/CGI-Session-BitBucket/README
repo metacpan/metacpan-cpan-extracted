@@ -1,0 +1,6 @@
+CGI::Session::BitBucket is a CGI::Session driver to let you add session
+support to your program and not have to worry about where it will be 
+stored until you're ready for that part. 
+
+This is intended for people who don't even want to have the default
+tmp folder full of CGI::Session data.

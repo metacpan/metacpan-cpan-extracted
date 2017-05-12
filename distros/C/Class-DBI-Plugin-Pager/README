@@ -1,0 +1,30 @@
+Class-DBI-Plugin-Pager
+
+Adds a pager method to your class that can query using SQL::Abstract
+where clauses, and limit the number of rows returned to a specific subset.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+L<SQL::Abstract|SQL::Abstract>,
+L<Data::Page|Data::Page>,
+L<Class::DBI::Plugin::AbstractCount|Class::DBI::Plugin::AbstractCount>,
+L<Class::Accessor|Class::Accessor>,
+L<Class::Data::Inheritable|Class::Data::Inheritable>,
+L<Carp|Carp>.
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2004-2012 David R. Baird
+Copyright (C) 2012 Nikolay S. C<majestic@cpan.org>

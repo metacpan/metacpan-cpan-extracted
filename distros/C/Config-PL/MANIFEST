@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Config/PL.pm
+t/00_compile.t
+t/01_base.t
+t/02_use.t
+t/config/nest.pl
+t/config/ng.pl
+t/config/ok.pl
+t/dummy/config/ok.pl
+t/dummy/config/ok2.pl
+META.yml
+MANIFEST

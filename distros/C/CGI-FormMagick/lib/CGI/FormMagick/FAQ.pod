@@ -1,0 +1,91 @@
+=head1 NAME
+
+FormMagick FAQ - Frequently asked questions about FormMagick
+
+
+=head1 HOW DO I...
+
+=head2 How do I check that my XML is valid?
+
+In theory, you validate it against the DTD provided with the FormMagick
+distribution, using a suitable XML validation tool.  Unfortuneately we
+haven't found one yet, but when we do we'll write a script and
+distribute it with FormMagick.
+
+=head2 How do I customise the look and feel of my forms?
+
+Use cascading style sheets.  Take a look at the HTML source output by
+FormMagick, and you'll see that most things have a "label" attribute to
+make CSS easier. 
+
+=head2 How do I make my own validation routines?
+
+Simply create a routine in your CGI script which accepts the data to
+validate as an argument.  Have it return "OK" on success or a detailed
+error message on failure.
+
+    sub my_validation {
+        my $data = shift;
+        if ($data =~ /$some_pattern/) {
+            return "OK";
+        } else {
+            return "That looks wrong to me.";
+        }
+    }
+
+=head2 How do I add translations into another language?
+
+Use the C<lexicon> element in your XML.
+
+=head2 How do I do extra processing when a user clicks "Next"?
+
+Use a C<post-event> on the C<page> element.  Create a subroutine that does
+what you want:
+
+    sub process_credit_card {
+        my $cgi = shift;
+	my $cardnum = $cgi->param("cardnum");
+	my $response = do_processing($cardnum);
+	print "<p>$response</p>";
+    }
+
+=head2 How do I choose which page to go to based on user input?
+
+Use a C<page post-event> and set the value of the "wherenext" CGI
+parameter:
+
+    sub my_post_page_event {
+        my $cgi = shift;
+	if ($cgi->param("foo") eq "bar") {
+            $cgi->param(-name => "wherenext", -value => "GoToThisPageName")
+        } elsif ($cgi->param("had_enough") eq "Yes") {
+            $cgi->param(-name => "wherenext", -value => "Finish")
+        }
+    }
+
+=head1 TROUBLESHOOTING
+
+=head2 General troubleshooting tips
+
+Try turning on debugging:
+    
+    $f->debug(1);
+
+This will print out general debugging messages to the web page.
+
+=head2 Why isn't my data preserved from one page to the next?
+
+You probably need to make your C<session-tokens> directory writable and
+executable by the web server.  Either:
+
+    chown www session-tokens 
+       (assuming your webserver runs as the www user)
+    chmod 700 session-tokens
+
+Or...
+
+    chmod 777 session-tokens
+
+Note that the latter allows anyone on the system to write to this
+directory, and is a greater security risk than the former method.
+

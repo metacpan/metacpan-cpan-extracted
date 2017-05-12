@@ -1,0 +1,5 @@
+%loadplugin{feature::default_xs_typemap};
+
+%typemap{std::string};
+%typemap{dsrc::uint32}{simple};
+%typemap{dsrc::uint64}{simple};

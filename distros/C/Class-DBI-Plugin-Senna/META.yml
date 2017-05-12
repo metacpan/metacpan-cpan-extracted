@@ -1,0 +1,18 @@
+---
+name: Class-DBI-Plugin-Senna
+version: 0.01
+author:
+  - (c) Copyright 2005 by Daisuke Maki E<lt>dmaki@cpan.orgE<gt>
+abstract: Add Instant Fulltext Search Capability With Senna
+license: perl
+requires:
+  Class::DBI: 0
+  Senna: >= 0.05
+provides:
+  Class::DBI::Plugin::Senna:
+    file: lib/Class/DBI/Plugin/Senna.pm
+    version: 0.01
+  Class::DBI::Plugin::Senna::Iterator:
+    file: lib/Class/DBI/Plugin/Senna.pm
+    version: 0.01
+generated_by: Module::Build version 0.261

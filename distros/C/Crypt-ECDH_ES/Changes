@@ -1,0 +1,10 @@
+Revision history for Crypt-ECDH_ES
+
+0.003     2017-04-13 13:53:00+02:00 Europe/Amsterdam
+          - Don't use space padded strings in pack
+
+0.002     2017-04-12 23:51:48+02:00 Europe/Amsterdam
+          - Remove Win32::API from dependency list
+
+0.001     2015-08-07 02:36:07+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

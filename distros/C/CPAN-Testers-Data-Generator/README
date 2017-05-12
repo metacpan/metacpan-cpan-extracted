@@ -1,0 +1,90 @@
+CPAN-Testers-Data-Generator
+===========================
+
+This distribution downloads and summarizes the CPAN Testers metadata from the
+Metabase.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Config::IniFiles
+  CPAN::Testers::Common::Article
+  CPAN::Testers::Common::DBUtils
+  CPAN::Testers::Fact::LegacyReport
+  CPAN::Testers::Fact::TestSummary
+  CPAN::Testers::Metabase::AWS
+  CPAN::Testers::Report
+  Data::FlexSerializer
+  DateTime
+  DateTime::Duration
+  File::Basename
+  File::Path
+  File::Slurp
+  HTML::Entities
+  IO::File
+  JSON
+  Metabase
+  Metabase::Fact
+  Metabase::Resource
+  Time::Local
+
+  # underlying Database requirements
+  DBI
+  DBD::mysql
+  
+  # used by run scripts
+  Getopt::Long
+  Getopt::ArgvFile
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm shell or CPANPLUS shell as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator
+
+AUTHOR
+  It should be noted that the original code for this distribution began
+  life under another name. The original distribution generated data for
+  the original CPAN Testers website. However, in 2008 the code was
+  reworked to generate data in the format for the statistics data
+  analysis, which in turn was reworked to drive the redesign of the all
+  the CPAN Testers websites. To reflect the code changes, a new name was
+  given to the distribution.
+
+  CPAN-WWW-Testers-Generator
+    Original author:    Leon Brocard <acme@astray.com>   (C) 2002-2008
+    Current maintainer: Barbie       <barbie@cpan.org>   (C) 2008-2010
+
+  CPAN-Testers-Data-Generator
+    Original author:    Barbie       <barbie@cpan.org>   (C) 2008-2015
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2008-2015 Barbie for Miss Barbell Productions
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

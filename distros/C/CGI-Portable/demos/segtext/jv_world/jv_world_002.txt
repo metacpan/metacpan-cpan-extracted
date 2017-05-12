@@ -1,0 +1,25 @@
+sub property {
+	my $self = shift( @_ );
+	my ($key,$new_value) = $self->params_to_array(\@_,1,['key','value']);
+	if( defined( $new_value ) ) {
+		$self->{$key} = $new_value;
+	}
+	return( $self->{$key} );
+}
+
+sub make_html_tag {
+	my $self = shift( @_ );
+	my ($tag_name, $rh_params, $ra_text) = 
+		$self->params_to_array( \@_, 1, 
+		[ 'tag', 'params', 'text' ],
+		{ 'name' => 'tag', 'param' => 'params' } );
+	ref($rh_params) eq 'HASH' or $rh_params = {};
+	ref($ra_text) eq 'ARRAY' or $ra_text = [$ra_text];
+	return( join( '', 
+		"<$tag_name", 
+		(map { " $_=\"$rh_params->{$_}\"" } keys %{$rh_params}),
+		">",
+		@{$ra_text},
+		"</$tagname>",
+	) );
+}

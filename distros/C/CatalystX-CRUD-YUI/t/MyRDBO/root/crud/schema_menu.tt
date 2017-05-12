@@ -1,0 +1,39 @@
+[% SET menu = {
+  id => "schema_menu",
+  items => [
+        { href => "/crud", txt => "Home" },
+        {
+          href  => "/crud/test",
+          items => [
+                     {
+                       href  => "/crud/test/bar",
+                       items => [
+                                  { href => "/crud/test/bar/create", txt => "Create" },
+                                  { href => "/crud/test/bar/list", txt => "List" },
+                                  { href => "/crud/test/bar/search", txt => "Search" },
+                                ],
+                       txt   => "Bar",
+                     },
+                     {
+                       href  => "/crud/test/foo",
+                       items => [
+                                  { href => "/crud/test/foo/create", txt => "Create" },
+                                  { href => "/crud/test/foo/list", txt => "List" },
+                                  { href => "/crud/test/foo/search", txt => "Search" },
+                                ],
+                       txt   => "Foo",
+                     },
+                     {
+                       href  => "/crud/test/goo",
+                       items => [
+                                  { href => "/crud/test/goo/create", txt => "Create" },
+                                  { href => "/crud/test/goo/list", txt => "List" },
+                                  { href => "/crud/test/goo/search", txt => "Search" },
+                                ],
+                       txt   => "Goo",
+                     },
+                   ],
+          txt   => "Test",
+        },
+      ],
+}%]

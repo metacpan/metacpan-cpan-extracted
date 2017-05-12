@@ -1,0 +1,39 @@
+# PODNAME: Config::Model::models::Itself::CommonElement::Assert
+# ABSTRACT:  Configuration class Itself::CommonElement::Assert
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Itself::CommonElement::Assert - Configuration class Itself::CommonElement::Assert
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 code
+
+Perl instructions to test the value. $_ contains the value to test. C<$self> contains the value object. Use with care. I< Optional. Type string.  > 
+
+=head2 msg
+
+Warning message to show user. "$_" contains the bad value. Example "value $_ is bad". Leave blank or undef to use generated message. I< Optional. Type string.  > 
+
+=head2 fix
+
+Perl instructions to fix the value. These instructions may be triggered by user. $_ contains the value to fix.  $_ is stored as the new value once the instructions are done. C<$self> contains the value object. Use with care. I< Optional. Type string.  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

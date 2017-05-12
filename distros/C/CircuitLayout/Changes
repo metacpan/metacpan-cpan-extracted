@@ -1,0 +1,16 @@
+Revision history for Perl package CircuitLayout.
+        
+0.0.1  First cut
+
+0.0.2  ready for CPAN
+
+0.0.3  use Build instead of Make
+
+0.04   use Tk for display, changed version numbering to 
+       better work with build/cpanplus (#.#.# seems to wk 
+       well only for perl (e.g. 5.8.0)
+
+0.05   added pitches() for a DRC check I needed to do
+
+0.06   trying out Makefile.PL kludge to make CPAN happy
+

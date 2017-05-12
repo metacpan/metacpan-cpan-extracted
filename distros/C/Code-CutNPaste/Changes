@@ -1,0 +1,30 @@
+Revision history for Code-CutNPaste
+
+0.31    April 30, 2012
+        - Apply zdk's patch to fetch aref bug. Thanks!
+
+0.30    March 7, 2013 
+        - Removed B::Keywords. It wasn't necessary. Thanks to Vladimir
+          Timofeev and zdk whose work alerted me to the issue.
+        - Massive bump in version number due to, ironically, some cut-n-pasted
+          code :)
+
+0.04    December 23, 2012
+        - Provide C<noutf8> workaround for utf8/fork bug reported by Gabor
+          Szabo.
+
+0.03    December 19, 2012
+        - Show time information when in verbose mode.
+        - Fix broken threshold again!
+        - Fix misspelling of threshold
+
+0.02    December 10, 2012
+        - Add 'jobs' switch to allow parallel jobs to run
+        - Fix bug where we sometimes try to read the munged file before it's
+          written (the joys of parallel code!)
+        - Cleaned up report format in find_duplicate_perl binary
+        - Make the thresshold work
+
+0.01    December 9, 2012
+        Find duplicate code
+

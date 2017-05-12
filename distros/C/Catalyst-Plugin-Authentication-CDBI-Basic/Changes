@@ -1,0 +1,7 @@
+Revision history for Perl module Catalyst::Plugin::Authentication::CDBI::Basic
+
+0.02 2007-01-26 12:02:40 +09:00
+    - deprecated
+
+0.01 2005-11-02 03:47:42 +0900
+    - original version;

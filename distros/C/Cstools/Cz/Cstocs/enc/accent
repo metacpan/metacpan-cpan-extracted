@@ -1,0 +1,201 @@
+AE		A E
+Aabovedot	A
+Aacute		A
+Abreve		A
+Acircumflex	A
+Adiaeresis	A
+Agrave		A
+Amacron         A
+Aogonek		A
+Aring		A
+Atilde		A
+CH		C H
+Cacute		C
+Ccaron		C
+Ccedilla	C
+Dcaron		D
+Eabovedot       E
+Eacute		E
+Ecaron		E
+Ecircumflex	E
+Ediaeresis	E
+Egrave		E
+Emacron         E
+Eogonek		E
+Eth		D
+Gbreve		G
+Gcedilla        G
+IJ		I J
+Iabovedot	I
+Iacute		I
+Icircumflex	I
+Idiaeresis	I
+Igrave		I
+Imacron         I
+Iogonek         I
+Kcedilla        K
+Lacute		L
+Lcaron		L
+Lcedilla        L
+Lstroke		L
+Nacute		N
+Ncaron		N
+Ncedilla        N
+Ntilde		N
+OE		O E
+Oacute		O
+Ocircumflex	O
+Odiaeresis	O
+Odoubleacute	O
+Ograve		O
+Omacron         O
+Ooblique	O
+Ostroke         O
+Otilde		O
+Pt		P t
+Racute		R
+Rcaron		R
+Rcedilla        R
+Sacute		S
+Scaron		S
+Scedilla	S
+Ssharp		S S
+Tcaron		T
+Tcedilla	T
+Uacute		U
+Ucircumflex	U
+Udiaeresis	U
+Udoubleacute	U
+Ugrave		U
+Umacron         U
+Uogonek         U
+Uring		U
+Yacute		Y
+Ydiaeresis	Y
+Zabovedot	Z
+Zacute		Z
+Zcaron		Z
+aabovedot	a
+aacute		a
+abreve		a
+acircumflex	a
+acute		quoteright
+adiaeresis	a
+ae		a e
+agrave		a
+amacron		a
+anglequoteleftsingle	less
+anglequoterightsingle	greater
+aogonek		a
+aring		a
+atilde		a
+aunderscore	a
+brokenbar	bar
+bullet		asterisk
+cacute		c
+ccaron		c
+ccedilla	c
+cent		c
+ch		c
+copyright	parenleft c parenright
+dagger		bar
+dcaron		d
+diaeresis	quotedbl
+division	slash
+doubleacute	quotedbl
+doubledagger	bar
+eabovedot       e
+eacute		e
+ecaron		e
+ecircumflex	e
+ediaeresis	e
+egrave		e
+emacron         e
+emdash		minus minus minus
+endash		minus minus
+eogonek		e
+eth		d
+exclamdown	exclam
+fi              f i
+fl              f l
+forte		f
+fraction	slash
+gacute          g
+gbreve		g
+greaterequal	greater equal
+guillemotleft	greater greater
+guillemotright	less less
+hyphen		minus
+iacute		i
+icircumflex	i
+idiaeresis	i
+idotless        i
+igrave		i
+ij		i j
+imacron         i
+iogonek         i
+kcedilla        k
+lacute		l
+lcaron		l
+lcedilla        l
+lowerequal	less equal
+lstroke		l
+mu		u
+multiply	period
+nacute		n
+ncaron		n
+ncedilla        n
+notequal	exclam equal
+notsign		n o t
+ntilde		n
+oacute		o
+ocircumflex	o
+odiaeresis	o
+odoubleacute	o
+oe		o e
+ograve		o
+omacron         o
+onehalf		1 slash 2
+onequarter	1 slash 4
+oslash		o
+otilde		o
+ounderscore	o
+partaildifferential	d
+period3		period period period
+periodcentered	period
+permille	o slash o o
+plusminus	plus slash minus
+questiondown	question
+quoteleftdouble	quotedbl
+quotelowdouble	quotedbl
+quotelowsingle	quoteright
+racute		r
+rcaron		r
+rcedilla        r
+registered	parenleft r parenright
+sacute		s
+scaron		s
+scedilla	s
+ssharp		s s
+sterling	L
+tcaron		t
+tcedilla	t
+threequarters	3 slash 4
+trademark	parenleft T M parenright
+uacute		u
+ucircumflex	u
+udiaeresis	u
+udoubleacute	u
+ugrave		u
+umacron         u
+uogonek         u
+uring		u
+yacute		y
+ydiaeresis	y
+yen		y
+zabovedot	z
+zacute		z
+zcaron		z
+apostrophe	quoteright
+tilde		asciitilde
+grave		quoteleft

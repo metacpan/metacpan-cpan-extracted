@@ -1,0 +1,28 @@
+---
+abstract: 'Adjust parameters of authentication processes on the fly'
+author:
+  - 'Jay Kuri, C<< <jayk at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Realm-Adaptor
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::Authentication: 0.10003
+  Catalyst::Runtime: 0
+  Moose: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

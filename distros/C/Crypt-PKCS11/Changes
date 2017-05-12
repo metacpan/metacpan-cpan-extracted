@@ -1,0 +1,25 @@
+Crypt::PKCS11 history
+
+Release 1.03 2015-02-16
+ - Removed current Mutex implementation, will be reimplemented later on.
+   The Mutex interface is left in but most functions will croak if used.
+ - Fix XS bootstrap issues.
+ - Added documentation for the Perl interface to all PKCS #11 CK_* C structs.
+
+Release 1.02 2015-02-10
+ - Use memory functions as described in perlclib to eliminate WIN32 memory
+   problem when compiled with thread support (free wrong pool).
+
+Release 1.01 2015-02-06
+ - Changed attribute SubprimeBits to Subprime::Bits in order to not collide
+   with SubPrimeBits.
+
+Release 1.00 2015-02-06
+ - First stable release.
+
+Development release 0.99_02 2015-01-26
+ - Use common::sense.
+ - Removed CR from cryptoki.h to resolve compiling on Solaris 11.
+
+Development release 0.99_01 2015-01-22
+ - First developer release.

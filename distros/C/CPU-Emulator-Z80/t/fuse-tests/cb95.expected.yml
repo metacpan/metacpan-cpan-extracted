@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb95
+registers:
+  AF: 15360
+  AF_: 0
+  BC: 27378
+  BC_: 0
+  DE: 45661
+  DE_: 0
+  HL: 14075
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

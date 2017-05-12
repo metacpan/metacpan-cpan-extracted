@@ -1,0 +1,13 @@
+<form title="Hello" header="taint-head.tmpl" footer="foot.tmpl" post-event="say_hello">
+    <page name="Name">
+        <title>I'm the FormMagickian.</title>
+        <description>
+        If the title of this webpage (look at the top bar of the browser
+        window) says "I am taint-safe!", then untainting of templated headers and
+        footers works fine.
+        </description>
+        <field id="name" type="text" validation="nonblank">
+            <label>Your name?</label>
+        </field>
+    </page>
+</form>

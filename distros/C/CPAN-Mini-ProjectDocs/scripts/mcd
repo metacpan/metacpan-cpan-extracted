@@ -1,0 +1,227 @@
+#!/usr/bin/perl  -w
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+mcd - mini CPAN documentation browser
+
+=head1 DOCUMENTATION
+
+B<mcd> lets you search you CPAN mini for modules and display attractive HTML documentation in your browser.  This is
+useful if you don't have an internet connection available or you have a very slow connection.
+
+=head1 USAGE
+
+ $> mcd [-option] Module::Name
+
+=head1 EXAMPLES
+
+=over 2
+
+=item Generate and display a module's documentation in your browser:
+
+ $> mcd -d Module::Name
+
+=item Generate and display a module's documentation in lynx
+
+ $> mcd -d Module::Name -html_index -browser lynx
+
+=item Search for modules which names containing a specific string:
+
+ $> mcd -s string
+
+=item Match modules to regular expression:
+
+ $> mcd -s '\d0x'
+
+=back
+
+=head1 OPTIONS
+
+  'h|help'      display help
+  's|search'    search for modules
+  'b|browse'    generate and browse module ocumentation
+  'html_index'  generate a pure HTML index for text based browsers
+  'browser'     path to your browser or $ENV{BROWSER} or 'firefox'|'elinks'
+  'cpan_mini'   cpan mini location or $ENV{CPAN_MINI} or '/devel/cpan'
+
+=head1 EXIT STATUS
+
+0 if no error found.
+
+=head1 CAVEAT
+
+You can't use mcd to display core modules documentation. This is due to the fact that core modules come with
+Perl and are not in your CPAN mini repository although they are referenced in it! You can display the installed 
+core modules documentation with B<perldoc>.
+
+=head1 AUTHOR
+
+  Nadim ibn hamouda el Khemir
+  CPAN ID: NKH
+  mailto: nkh@cpan.org
+
+=head1 SEE ALSO
+
+L<CPAN::Mini::Webserver>, elinks
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+our $VERSION = '0.03' ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+use English ;
+use Getopt::Long ;
+use File::HomeDir ;
+
+use CPAN::Mini::ProjectDocs qw(generate_html get_module_distribution generate_cache search_modules) ;
+
+#---------------------------------------------------------------------------------------------------------
+
+my (@mcd_arguments) = @ARGV ;
+undef @ARGV ;
+
+mcd(@mcd_arguments) ;
+
+#---------------------------------------------------------------------------------------------------------
+
+sub mcd
+{
+
+#~ =head2 mcd(@arguments)
+
+#~ I<Arguments>
+
+#~ =over 2 
+
+#~ =item @arguments - 
+
+#~ =back
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions>
+
+#~ =cut
+
+my (@arguments) = @_ ;
+
+#----------------------------------
+
+my ($module, $search, $browse,$html_index, $user_defined_browser, $cpan_mini_user_location)  = get_options(@arguments) ;
+
+die "Error: You can only specify one of 'search' or 'browse'!\n" if $search && $browse ;
+
+my $cpan_mini = $cpan_mini_user_location || $ENV{CPAN_MINI} || '/devel/cpan' ;
+die "Can't find CPAN::Mini at '$cpan_mini'!" unless -e $cpan_mini ;
+
+my $mcd_cache = home() . '/.cpan_mini_pod2projdoc' ;
+mkdir $mcd_cache ;
+
+#----------------------------------
+
+generate_cache($cpan_mini, $mcd_cache) ;
+
+if($search)
+	{
+	search_modules($cpan_mini, $mcd_cache, $module) ;
+	}
+else
+	{
+	my $module_distribution = get_module_distribution($cpan_mini, $mcd_cache, $module) ;
+	
+	if(defined $module_distribution)
+		{
+		print "Found $module in '$module_distribution'.\n"  unless $search ;
+		
+		if($browse)
+			{
+			my $html_documentation_location = generate_html($cpan_mini, $mcd_cache, $module_distribution, $html_index) ;
+			
+			my $browser = $user_defined_browser || $ENV{BROWSER} || ($html_index ? 'elinks' : 'firefox') ;
+			system($browser, $html_documentation_location) == 0 or die "can't start browser!" ;
+			}
+		}
+	else
+		{
+		print "'$module' not found! Try the -s option.\n" ;
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+sub get_options
+{
+
+#~ =head2 get_options(@arguments)
+
+#~ Parses the command line for the module to search and user defined options.
+
+#~ I<Arguments>
+
+#~ =over 2 
+
+#~ =item @arguments - the command line arguments
+
+#~ =back
+
+#~ I<Returns> -  A list containing the module to search followed by the options accepted by this command
+
+#~ I<Exceptions> - exits if an invalid option is passed
+
+#~ =cut
+
+my (@arguments) = @_ ;
+local @ARGV = @arguments ;
+
+my ($search, $browse, $html_index, $user_defined_browser, $cpan_mini_user_location) ;
+
+unless
+	(
+	GetOptions
+		(
+		'h|help' => \&display_help,
+		's|search' => \$search,
+		'b|browse' => \$browse,
+		'browser=s' => \$user_defined_browser,
+		'html_index' => \$html_index,
+		'cpan_mini=s' => \$cpan_mini_user_location,
+		)
+	)
+	{
+	die "Error: Invalid Option! Try --help.\n" ;
+	}
+
+my $module = $ARGV[0] or die "Error: I need a module name on the command line! Try --help.\n" ;
+
+return ($module, $search, $browse, $html_index, $user_defined_browser, $cpan_mini_user_location) ;
+}
+
+#---------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+
+#~ =head2 display_help()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1>
+
+#~ =cut
+
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}
+

@@ -1,0 +1,22 @@
+examples/caBIOtest.pl
+examples/caDSRtest.pl
+examples/EVStest.pl
+html/architecture.jpg
+html/index.html
+html/intro.html
+html/Release_Notes.txt
+html/searching.html
+html/toc.html
+lib/CaCORE/ApplicationService.pm
+lib/CaCORE/CaBIO.pm
+lib/CaCORE/CaDSR.pm
+lib/CaCORE/CaDSR/UMLProject.pm
+lib/CaCORE/Common.pm
+lib/CaCORE/Common/Provenance.pm
+lib/CaCORE/EVS.pm
+lib/CaCORE/Security.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+Release_Notes.txt
+t/CaCORE.t

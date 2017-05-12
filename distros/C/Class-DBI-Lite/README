@@ -1,0 +1,95 @@
+NAME
+    Class::DBI::Lite - Lightweight ORM for Perl
+
+SYNOPSIS
+    Create some database tables:
+
+      create table artists (
+        artist_id integer primary key autoincrement,
+        artist_name varchar(100) not null
+      );
+      
+  create table cds (
+        cd_id integer primary key autoincrement,
+        artist_id integer not null,
+        cd_name varchar(100) not null
+      );
+
+
+      package My::Model;
+      
+  use base 'Class::DBI::Lite::mysql'; # Or ::SQLite, etc
+      
+  __PACKAGE__->connection( 'DBI:mysql:dbname:localhost', 'user', 'pass' );
+      
+  1;# return true:
+
+
+      package My::Artist;
+      
+  use base 'My::Model';
+      
+  __PACKAGE__->set_up_table('artists');
+      
+  __PACKAGE__->has_many(
+        cds =>
+          'My::CD' =>
+            'artist_id'
+      );
+      
+  1;# return true:
+
+
+      package My::CD;
+      
+  use base 'My::Model';
+      
+  __PACKAGE__->set_up_table('cds');
+      
+  __PACKAGE__->has_a(
+        artist =>
+          'My::Artist' =>
+            'artist_id'
+      );
+      
+  1;# return true:
+
+    Then, in your script someplace:
+
+      use My::Artist;
+      
+  my $artist = My::Artist->retrieve( 123 );
+      
+  foreach my $cd ( $artist->cds )
+      {
+        ...
+      }# end foreach()
+      
+  my $cd = $artist->add_to_cds( cd_name => "Attak" );
+      
+  print $cd->cd_name;
+      $cd->cd_name("New Name");
+      $cd->update();
+      
+  # Delete the artist and all of its CDs:
+      $artist->delete;
+
+DESCRIPTION
+    Sometimes Class::DBI is too crufty, and DBIx::Class is too much.
+
+    Enter Class::DBI::Lite.
+
+TODO
+    *   Complete tests
+
+    *   Examples
+
+    *   Documentation
+
+AUTHOR
+    Copyright John Drago <jdrago_999@yahoo.com>. All rights reserved.
+
+LICENSE
+    This software is Free software and may be used and redistributed under
+    the same terms as perl itself.
+

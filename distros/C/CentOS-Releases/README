@@ -1,0 +1,23 @@
+SYNOPSIS
+
+     use CentOS::Releases qw(list_centos_release);
+     my $res = list_centos_releases(detail=>1);
+     # raw data is in $CentOS::Releases::data;
+
+DESCRIPTION
+
+    This module contains list of CentOS releases. Data source is currently
+    at: https://github.com/perlancar/gudangdata-distrowatch
+    (table/centos_release) which in turn is retrieved from
+    http://distrowatch.com.
+
+SEE ALSO
+
+    Debian::Releases
+
+    Ubuntu::Releases
+
+    LinuxMint::Releases
+
+    RedHat::Releases
+

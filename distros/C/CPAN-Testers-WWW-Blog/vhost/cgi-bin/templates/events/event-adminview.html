@@ -1,0 +1,32 @@
+<h1>Event Preview</h1>
+
+[% IF preview.publish == 4 %]
+<p>Please note that archived events cannot edited.
+[% END %]
+
+<h2>[% preview.eventdate %] - [% preview.title %]</h2>
+<p> [% IF preview.venuelink %]<a href="[% preview.venuelink %]">[% preview.venue %],</a>
+    [% ELSE %][% preview.venue %],
+    [% END %]
+    [% IF preview.addresslink %]<br /><a href="[% preview.addresslink %]">[% preview.address %]</a>
+    [% ELSE %][% preview.address %]
+    [% END %]
+</p>
+
+[% preview.body %]
+
+    [% IF preview.talks %]
+    <h4>Scheduled Talks:</h4>
+    <ul title="currently scheduled talks">
+    [% FOREACH data = preview.talks %]
+    <li>[% data.talktitle %] [[% data.realname %]]</li>
+    [% END %]
+    </ul>
+    [% END %]
+
+[% IF preview.links %]
+<h4>Links:</h4>
+[% preview.links %]
+[% END %]
+
+[% event = preview ; INCLUDE "events/sponsor-view.html" %]

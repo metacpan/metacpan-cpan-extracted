@@ -1,0 +1,25 @@
+Scripts for Checking CPAN SHA Implementations
+=============================================
+
+The Perl scripts in this directory automate the checking of the following
+CPAN modules:
+
+	Digest::SHA
+	Digest::SHA1
+	Digest::SHA::PurePerl
+
+They run as many tests as possible for each module.
+
+To use them, first download and unzip the NIST test vectors by running
+the setup script as follows:
+
+	$ python setup-shavs.py
+
+Then, to check the Digest::SHA implementation for example, type:
+
+	$ perl digest-sha.pl
+
+Note: the checks for Digest::SHA and Digest::SHA1 complete very quickly,
+usually in well under 30 seconds.  However, an hour or more is required
+for Digest::SHA::PurePerl, due largely to the Monte tests which require
+100,000 digest computations each.

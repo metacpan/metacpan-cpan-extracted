@@ -1,0 +1,8 @@
+header:
+	package Bird;
+	use Creature;
+	@ISA=( "Creature" );
+
+variables:	# nothing needed
+	$a	# just a dummy
+

@@ -1,0 +1,38 @@
+Chromosome::Map version 0.01
+============================
+
+The Chromosome::Map permit has been developed to automatically
+generate chromosome map. You just have to define:
+  - a chromosome object (start, end, name, units)
+  - at least one track
+  - element objects (i.e. markers with name and location)
+
+Then, you add the track to the map object and add the elements
+to the track object. You can manage different type of tracks:
+markers tracks, interval track (i.e. for QTL interval) and 
+feature track (i.e. %GC content)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  the PERL GD module (v. 2.30)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Frédéric lecerf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

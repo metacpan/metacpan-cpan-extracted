@@ -1,0 +1,9 @@
+MANIFEST
+README
+Makefile.PL
+lib/Class/Exporter.pm
+t/Class-Exporter.t
+t/lib/MagicNumber.pm
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm

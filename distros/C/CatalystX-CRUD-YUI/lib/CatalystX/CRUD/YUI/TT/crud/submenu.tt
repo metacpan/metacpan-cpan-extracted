@@ -1,0 +1,27 @@
+[% # backwards compat
+    IF form_links.defined;
+        SubMenu = form_links;
+    END;
+%]
+[% IF SubMenu.size %]
+ <div class="links">
+  <ul id="submenu">
+  [% FOREACH item = SubMenu %]
+   <li>
+   [% IF item.iframe %]
+   <a class="button" href="#" 
+      onclick="YAHOO.crud.open_iframe_portal('[% item.href %]'); return false"
+      >[% item.text %]</a>
+   [% ELSIF item.http == 'POST' %]
+   <form class="inline" method="post" 
+        action="[% item.href %]"
+        [% IF item.confirm %]onclick="return confirm('[% item.confirm | html %]')"[% END %]
+        ><button class="button">[% item.text %]</button></form>
+   [% ELSE %]
+   <a class="button" href="[% item.href %]">[% item.text %]</a>
+   [% END %]
+   </li>
+  [% END %]
+  </ul>
+ </div>
+[% END %]

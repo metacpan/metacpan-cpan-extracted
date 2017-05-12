@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Application::Plugin::TT::LastModified:
+
+1.02    Fri Apr 23 22:26 PDT 2010
+    - Switch to Git
+
+1.01    Tue Apr 28 10:43 PDT 2009
+    - typo fix in POD
+
+1.00    Sun Sep 30 17:51 PDT 2007
+    - initial version

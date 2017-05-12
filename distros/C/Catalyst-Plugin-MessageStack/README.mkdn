@@ -1,0 +1,141 @@
+# NAME
+
+Catalyst::Plugin::MessageStack - A Catalyst plugin for gracefully handling messaging (and more) that follows the Post/Redirect/Get pattern.
+
+# VERSION
+
+version 0.03
+
+# DESCRIPTION
+
+This plugin offers persistent messaging (requiring [Catalyst::Plugin::Session](http://search.cpan.org/perldoc?Catalyst::Plugin::Session)
+or something with a compatible API, and preferably a model based on
+[Data::Manager](http://search.cpan.org/perldoc?Data::Manager).
+
+The messaging gracefully handles any redirects (so you can happily use the
+recommended Post/Redirect/Get pattern. See
+http://en.wikipedia.org/wiki/Post/Redirect/Get for more information.
+
+The [Message::Stack](http://search.cpan.org/perldoc?Message::Stack) is always accessible via the stash while the view is
+rendered, regardless of redirects.
+
+# METHODS
+
+## message($message)
+
+Add a new message to the stack.  The message can be a simple scalar value, which
+is created as an informational type.  Alternatively, if you want a different
+type attriute, simply call `$c->message` in this form:
+
+    $c->message({
+        type    => 'error', # Corresponds to a message stack 'level'
+        message => 'Your message string here'
+    });
+
+Called without any arguments, it simply returns the current message stack.
+
+You can also pass in a [Message::Stack::Message](http://search.cpan.org/perldoc?Message::Stack::Message)
+
+    $c->message(
+        Message::Stack::Message->new(
+            scope => 'some_scope', level => 'info',
+            msgid => 'some msg id'
+        )
+    );
+
+## has_messages
+
+Returns a true value if there are messages present in the stack. If you want
+to limit by scope, pass in the scope and it checks that.
+
+# CONFIGURATION
+
+For message storage, there are two configuration options: `stash_key` and 
+`flash_key`.  This define the locations in the stash to place the messages.
+
+To define the default type of message set the 'default_type' configuration key.
+
+Use is very simple:
+
+    $c->message('This is a message of the default type');
+    $c->message({ type => 'error', message => 'This is an error message' });
+
+Configuring is relatively straight forward, here are the defaults:
+
+    package MyApp;
+
+    use Catalyst qw/MessageStack/;
+
+    __PACKAGE__->config({
+        'Plugin::MessageStack' => {
+            stash_key    => 'messages',
+            flash_key    => '_message',
+            default_type => 'warning',
+            model        => 'DataManager', # optional, but will merge messages
+        }
+    });
+
+# INTEGRATION WITH DATA::MANAGER
+
+[Data::Manager](http://search.cpan.org/perldoc?Data::Manager) is an optional tool that this plugin plays well with. If you
+have a Data::Manager model in your application, set the model configuration
+key.
+
+Then, the messages that happen between Data::Manager and your application are
+unified and merged into the same stack.
+
+Additionally, the results from Data::Manager are preserved so you can continue
+the Post/Redirect/Get pattern.
+
+What this allows is very simple controller actions that look like:
+
+    sub handle_post : Local {
+        my ( $self, $c ) = @_;
+
+        # Always redirect, set it here.
+        $c->res->redirect( $c->uri_for_action('/my/object') );
+
+        my $results = $c->model('DataManager')
+            ->verify('my_scope', $c->req->params);
+
+        unless ( $results->success ) {
+            $c->message({
+                type => 'error',
+                message => 'You made a mistake on the form, fix it!'
+            });
+            $c->detach; # Halt! Go no further.
+        }
+
+        # Pass the valid and vetted values to your model:
+        $c->model('MyModel')->do_stuff({ $results->valid_values });
+        $c->message('Everything went swimmingly. Rejoice!');
+    }
+
+If results fail and you integrate Data::Manager, the results are present as
+well as messaging (defined by the scope, in the case above that is `my_scope`).
+
+Results are stored in the stash, keyed by scope. It looks something like this:
+
+    $c->stash->{results} = {
+        my_scope => Data::Verifier::Results->new(
+                ... # results, the fields and what not ...
+            )
+    };
+
+You have two distinct options in accessing the values. Either the originally
+supplied values or the values after filtering, munging, coercion from
+[Data::Verifier](http://search.cpan.org/perldoc?Data::Verifier).  The two methods are listed below:
+
+    $c->stash->{results}->{$scope}->get_original_value($field);
+    $c->stash->{results}->{$scope}->get_value($field);
+
+# AUTHOR
+
+J. Shirley <jshirley@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,139 @@
+Changes
+=======
+
+0.00023 2015-07-30T23:51:22Z
+    * Avoid reconnnecting when already disconnecting (PR #5)
+
+0.00022 2013-10-04T03:39:14Z
+    * Add new serializers (JSON, MessagePack)
+    * Update layout by switching to Minilla
+
+0.00021 - 19 Nov 2012
+    * Apply PR #3 to fix callbacks from leaking memory (Sawyer X)
+    * Apply PR #2 to fix 'deprecated use of qw() warnings (Sawyer X)
+    * Apply PR #1 to fix POD erros (Schuk)
+    * Add Travis CI hooks (only on repo)
+    * Add .gitignore (only on repo)
+
+0.00020 - 24 Sep 2010
+    * Fix incompatible hashing.
+    * Micro-optimizations.
+    * Add "contributing" section
+    * Updated benchmark script to also check for correctness. Broken
+      memcached clients actually looks faster, but they just don't
+      retrieve all the keys.
+
+0.00019 - 13 Sep 2010
+    * Release previous changes as 0.00019
+
+0.00018_04 - 12 Sep 2010
+    * Add Test::Exception in prereq (rt #61159)
+
+0.00018_03 - 05 Sep 2010
+    * Stupid Stupid Stupid typo for complex values.
+    * Some cleanup to remove old crud.
+    * Add Test::Requires as a requirement
+
+0.00018_02 - 30 Aug 2010
+    * Documentation
+    * Add Cache::Memcached compatibility tests
+
+    !!! BACKWARD INCOMPATIBLE CHANGES !!!
+    * Made many methods private.
+
+0.00018_01 - 30 Aug 2010
+    * Fix a problem with the regular server selection algorithm,
+      where the insertion order of the servers would change which
+      server gets selected. Reported by mdorman
+    * Re-enable an object based server selector (Selector), so that
+      the above change can be implemented cleanly
+    * Add Ketama hashing while we're at it.
+
+    !!! BACKWARD INCOMPATIBLE CHANGES !!!
+    * Removed protocol_class accessor.
+
+0.00018 - 29 Jul 2010
+    * Add flush_all() method (mdorman)
+    * Allow passing a condvar instead of a callback subroutine (mdorman)
+    * Add some tweaks along the way
+    
+0.00017 - 16 Jul 2010
+    * Fix docs.
+    * No code changes.
+
+0.00016 - 16 Jul 2010
+    * Rearrange tests
+    * Text protocol delete() wasn't finding the correct server.
+      Reported and fixed by Michael Alan Dorman
+    * Some minor tweaks
+
+0.00015 - 16 Mar 2010
+    * Explicitly include Storable
+
+0.00014 - 05 Mar 2010
+    * Fix bad case of confess()
+    * (Text protocol) Sometimes a GET just returns END... work around it
+
+0.00013 - 25 Feb 2010
+    * Fix t/100_commands.t -- if (1) you have EV.pm installed, AND (2)
+      your memcached server does not understand binary protocol, then
+      this test might fail with a segmentation fault. 
+      This probably results from something in the cleanup that I'm missing
+      to perform correctly, but I don't know what it is at the moment, so
+      this test will force AnyEvent to use AnyEvent::Impl::Perl.
+      If you have any pointers, patches are certainly appreciated!
+
+0.00012 - 25 Feb 2010
+    * Fix for when set operations (include set, add, and the like)
+      might cause the client to stall. This only happens if you are using
+      the text protocol.
+    * Also, the paramter passed to these callbacks were bogus. That's been
+      fixed too
+
+0.00011 - 22 Feb 2010
+    * Implement auto-reconnect
+    * Tests now use Test::Memcached
+
+0.00010 - 11 Feb 2010
+    * Fix get/get_multi
+
+0.00009 - 11 Feb 2010
+    * Fix docs
+    * Remove stray debug statement
+
+0.00008 - 11 Feb 2010
+    * Remove Hash object. It's just too much
+    * Implemented append/prepend
+    * Fix weired segfault
+    * Implement on_drain callback
+
+0.00007 - 10 Feb 2010
+    * Grrr, forgot to update MANIFEST.
+    * No code changes
+    * Add a README while we're at it
+
+0.00006 - 10 Feb 2010
+    * Protect/fix warn message when connection fails to succeed
+    * Add tests for it
+
+0.00005 - 10 Feb 2010
+    * Refactor queue usage, which significantly speeds things up
+    * Remove get_server and get_server_count
+    * Handle when arbitrary servers are unreacheable
+    * Fix t/200_stats.t to work when there are no memcached servers up
+
+0.00004 - 09 Feb 2010
+    * Allow hashrefs to the constructor
+    * Minor tweaks
+    * Add Compress::Zlib in recommends
+
+0.00003 - 09 Feb 2010
+    * Fix version() on binary protocol
+    * Some micro optimizations 
+
+0.00002 - 09 Feb 2010
+    * Add namespace support
+    * Remove all_servers(). Use servers() instead.
+
+0.00001 - 09 Feb 2010
+    * Initial release

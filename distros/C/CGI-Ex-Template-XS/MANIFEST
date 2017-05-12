@@ -1,0 +1,8 @@
+Changes
+lib/CGI/Ex/Template/XS.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+samples/bench_template.pl
+t/7_template_00_base.t
+META.yml                                 Module meta-data (added by MakeMaker)

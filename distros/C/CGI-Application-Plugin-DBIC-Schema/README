@@ -1,0 +1,118 @@
+NAME
+    CGI::Application::Plugin::DBIC::Schema - Easy DBIx::Class access from
+    CGI::Application, inspired by CGI::Application::Plugin::DBH.
+
+SYNOPSIS
+     use CGI::Application::Plugin::DBIC::Schema (qw/dbic_config schema resultset rs/);
+
+    sub cgiapp_init{
+
+            my $c = shift;
+
+            my $dsn = $c->param('dsn');
+            my $dbpw = $c->param('dbpw');
+            my $dbuser = $c->param('dbuser');
+
+            # Provide a default config.
+
+            $c->dbic_config({schema=>"My::DB",                  # DBIC class
+                             connect_info=>[$dsn,$dbuser,$dbpw] # use same args as DBI connect
+                            });
+
+            # Or, provide additional configs by name.
+
+            $c->dbic_config("another_config",
+                            {schema=>"My::Other::DB",
+                             connect_info=>[$dsn,$dbuser,$dbpw]
+                            });
+    }
+
+    sub setup {
+
+            my $c = shift;
+
+            $c->start_mode('runmode1');
+            $c->run_modes([qw/runmode1 runmode2/]);
+    }
+
+    sub runmode1 {
+
+            my $c = shift;
+
+            my $id = $c->param('id);
+            $c->resultset("My::DB::DemoTable")->find($id);
+            
+        # do something with the object ...
+
+            return "found it.";
+    }
+
+    sub runmode2 {
+
+            my $c = shift;
+            
+        $c->schema()->resultset("My::DB::DemoTable")
+                ->create({name=>"John Doe", address=>"Any Street"});
+
+            return "created it";
+    }
+
+DESCRIPTION
+    CGI::Application::Plugin::DBIC::Schema adds easy access to a
+    DBIx::Class::Schema to your CGI::Application modules. Lazy loading is
+    used to prevent a database connection from being made if the "schema"
+    method is not called during the request. In other words, the database
+    connection is not created until it is actually needed.
+
+METHODS
+  schema()
+    This method will return the default DBIx::Class::Schema instance if no
+    name is provided. Provide a schema name to retrieve an alternate schema.
+    The schema instance is created on the first call to this method, and any
+    subsequent calls will return the same instance.
+
+  dbic_config()
+    Used to provide your DBIx::Class::Schema class name, an optional config
+    name, and DBI connection parameters.
+
+    The recommended place to call "dbic_config" is in the "cgiapp_init"
+    stage of CGI::Application. If this method is called after the dbic()
+    method has already been accessed, then it will die with an error
+    message.
+
+  resultset
+    This method provides DBIx::Class::Resultset access.
+
+       # Use the default dbic schema via 'resultset'. 
+
+       $c->resultset("DBICT::Result::Test")->find($id);
+
+
+       # Or use a named config to access resultset via an alternative schema.
+
+       $c->resultset('another_config', "DBICT::Result::Test")->find($id);
+
+       # Or use alias short form, 'rs' with default config
+
+       $c->rs("DBICT::Result::Test")->find($id);
+
+       # Or use alias short form with alternate config/schema
+
+       $c->rs('yet_another_schema', "DBICT::Result::Test")->find($id);
+
+  rs
+    An alias to resultset
+
+SEE ALSO
+    DBIx::Class, Titanium, CGI::Application,CGI::Application::Plugin::DBH,
+    perl(1)
+
+AUTHOR
+    Gordon Van Amburg <gordon@minipeg.net>
+
+LICENSE
+    Copyright (C) 2009 Gordon Van Amburg <gordon@minipeg.net>
+
+    This library is free software. You can modify and or distribute it under
+    the same terms as Perl itself.
+

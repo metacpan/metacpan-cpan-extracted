@@ -1,0 +1,9 @@
+---
+ elements:
+   - name: id
+   - name: first
+     constraint: Required
+   - name: last
+     constraint: Required
+   - name: email
+     constraint: Required

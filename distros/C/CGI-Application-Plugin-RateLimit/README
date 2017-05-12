@@ -1,0 +1,38 @@
+CGI::Application::Plugin::RateLimit v1.0
+
+This module provides protection against a user calling a runmode too
+frequently.  A typical use-case might be a contact form that sends
+email.  You'd like to allow your users to send you messages, but
+thousands of messages from a single user would be a problem.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Application
+  Class::Accessor
+  Test::More
+
+Additionally, to run the full test suite you'll need:
+
+  DBI
+  DBD::SQLite
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Sam Tregar
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

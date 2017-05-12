@@ -1,0 +1,22 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+lib/Class/Multimethods.pm
+t/multimethods.t
+tutorial.html
+demo/demo.ambig.pl
+demo/demo.analyse.pl
+demo/demo.baseline.pl
+demo/demo.dump.pl
+demo/demo.extendtable.pl
+demo/demo.global.pl
+demo/demo.inittable.pl
+demo/demo.multi.pl
+demo/demo.newmulti.pl
+demo/demo.nonmulti.pl
+demo/demo.numstr.pl
+demo/demo.super.pl
+demo/demo.table.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

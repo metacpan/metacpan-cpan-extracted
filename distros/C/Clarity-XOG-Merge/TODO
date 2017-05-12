@@ -1,0 +1,82 @@
+-*- mode: org -*-
+
+* TODO Algorithm
+*** Annahme: n=3 files
+*** goal: 1+n pass maximum
+***** collect project/file mapping
+***** know which project in which files
+***** pass 1:
+******* file 1: collect all projects with 1 file
+******* file 2: collect all projects with 1 file
+******* file 3: collect all projects with 1 file
+***** pass 2:
+******* file 1: collect all projects with 2 files and file=1
+******* file 2: collect all projects with 2 files
+******* file 3: collect all projects with 2 files
+***** pass 3:  
+******* file 1: collect all projects with 3 files
+******* file 2: collect all projects with 3 files
+******* file 3: collect all projects with 3 files
+* TODO Algorithm 2
+*** Assumptions:
+***** n=3 files: TJ, PS, QA
+***** simplifications:
+******* data of *one* project can be handled in RAM
+********* else: stream not on Projects but on Ressources -> probably more passes
+******* only very few projects spanned over several organisations (TJ,PS,QA)
+********* else: many bucket files, but still ok
+*********** it's then ok to kill pass-1 and always write to buckets
+************* then we have two other passes:
+               1. collect projects in buckets (former pass-2)
+               2. add_buckets_to_final()
+*********** if not: other approach with 1+n passes
+************* 1 pass: collect projects per file
+************* then 1 pass foreach organisation, each pass over all 3 files
+************* result 4 passes vs. 2 passes
+*** goal: 2 passes maximum
+***** 1st pass: collect which projects in which files
+***** 2nd pass: go through all 3 files, write final+buckets, write buckets to final
+*** pass 1:
+***** foreach files
+******* xml::twig::callback_Project
+********* $PROJECT_FILE-Hash: "projectID+file"++
+*** pass 2:
+***** XML startblock
+***** foreach files
+******* callback_Project
+********* if keys $PROJECT_FILE-Hash{$project}{files} > 1
+*********** add_project_to_bucket($project)
+********* else
+*********** add_project_to_final($project)
+***** add_buckets_to_final()
+***** XML endblock
+*** functions:
+***** add_project_to_final:
+******* $project->flush(FINAL)
+***** add_project_to_bucket:
+******* open PROJECTFILE, ">>", "$projectID.bucket"
+******* $project->flush(PROJECTFILE)
+******* close PROJECTFILE
+***** add_buckets_to_final:
+******* foreach *.bucket
+********* open(PROJECTFILE)
+********* $project = new XML_Element("Project")
+********* xml::twig::callback_Project:
+*********** $project.set_att("name",      $cur.att("name")) unless $project.attr("name");
+*********** $project.set_att("projectID", $cur.att("name")) unless $project.attr("projectID");
+*********** foreach $cur.ressources:
+************* $project.add($resource)
+********* add_project_to_final($project);
+*** class:
+* TODO Bugs
+*** TODO Resource elements twice inside Project
+* TODO Project/CustomInformation?
+*** what if a project is spanned over several organisations?
+***** <Resource> elements are appended into one <Resources>
+***** what to do with all other elements besides the several <Resource> elements
+*** alternatives:
+***** ignore completely, throw away
+***** take all, by adding them all to surrounding (single) <Project>
+***** take whole <Project> element from first (unsorted, any) <Project>
+*** multiple?
+*** take first?

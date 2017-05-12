@@ -1,0 +1,74 @@
+
+###  CSS::SAC 0.08 - a SAC parser for Perl
+
+
+This module implements a SAC interface for Perl. It has a good deal
+of documentation already, with more to come. Please start by looking
+at the POD for CSS::SAC itself, you may also wish to have a look at
+CSS::SAC::Writer's code which exposes the interface expected from
+SAC handlers (which I will document in a spec'ish way soon). If you
+have any questions don't hesitate to contact me.
+
+While relatively stable, this module still has bugs and is currently
+considered early beta quality. The interface is fairly stable, but it
+may evolve. Should that happen, a deprecation cycle will happen over
+several releases (with warnings on deprecated methods in between).
+
+Currently it is rather slow. Performance is the things we'll start
+working on once enough bugs have been ironed out.
+
+Prerequisites
+=============
+
+Text::Balanced
+Class::ArrayObjects
+
+(both of which you can get from CPAN)
+
+
+Installation
+============
+
+It can be installed in the usual ways:
+
+ - from within the cpan shell (perl -MCPAN -e shell):
+
+   install Class::ArrayObjects
+
+ - after having downloaded it from CPAN, and extracted from its
+ archive:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note to Win32 users: there is currently no PPM for this package as it
+isn't necessary. Simply use one of the above methods, replacing make
+with nmake or whatever other make facility you have available (a fair
+number are available online for free).
+
+
+Support
+=======
+
+Support for CSS::Parser more or less discontinued when I started to
+work on this module, which unfortunately took its time in coming (not
+that long to actually code, but two intercontinental moves and various
+other things got in the way). This module is officially supported and
+CSS::Parser is officially deprecated. Thanks to all the people that
+provided patches, and sorry to all those that asked questions while I
+was away. You may contact me if you need anything.
+
+This module now has a mailing list part of the perl-css SourceForge
+project. The latest CVS version is also always available on SourceForge.
+
+  http://sourceforge.net/projects/perl-css/
+  http://lists.sourceforge.net/lists/listinfo/perl-css-devel
+
+This module is licensed under the same terms as Perl itself.
+
+-- Robin Berjon <robin@knowscape.com>
+Let us think the unthinkable, let us do the undoable. Let us prepare
+to grapple with the ineffable itself, and see if we may not eff it
+after all. -- Dirk Gently (Douglas Adams)

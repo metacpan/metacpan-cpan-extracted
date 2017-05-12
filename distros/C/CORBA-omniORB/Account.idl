@@ -1,0 +1,68 @@
+module Bank {
+
+  const long DAILY_MAX = 1000;
+
+  typedef char Face[6][10];
+  typedef fixed<16,2> Amount;
+
+  interface AcctCounter {
+    long next();
+    void destroy();
+  };
+
+  interface Account {
+    exception InsufficientFunds { Amount overdraft; };
+    
+    typedef sequence<short> numbers;
+
+    enum Color {
+      taupe, burgundy, chartreuse
+    };
+    struct Preferences {
+
+      Color favorite_color;
+      numbers lottery_numbers;
+      string nickname;
+    };
+
+    enum PrefType {
+      pt_color, pt_lotnum, pt_nickname
+    };
+
+    union Preference switch (PrefType) {
+      case pt_color: Color favorite_color;
+      case pt_lotnum: numbers lottery_numbers;
+      case pt_nickname: string nickname;
+    };
+    
+    attribute Preferences prefs;
+    attribute Face appearance;
+
+
+    void set_pref ( in Preference p );
+    Preference get_pref ( in PrefType t );
+    any get_pref_any ( in PrefType t );
+
+    void deposit( in Amount a );
+    void withdraw( in Amount a ) raises (InsufficientFunds);
+    long long add ( in long long a, in long long b );
+    Amount balance();
+    AcctCounter counter();
+    void server_exit ();
+
+    void set_new_get_old( inout string smth );
+
+    // DynamicAny test
+    enum da_enum {
+      da_enum_1, da_enum_2, da_enum_3
+    };
+    struct da_struct {
+      long		lval;
+      string		sval;
+      Amount		fval;
+      da_enum		enval;
+    };
+    any get_da_struct();
+
+  };
+};

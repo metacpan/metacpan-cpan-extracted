@@ -1,0 +1,10 @@
+Revision history for Catalyst-View-XML-Hash-LX
+
+0.04    Втр Авг 30 15:14:55 MSD 2011
+        fixed
+0.03    Sun Aug 21 14:55:51 MSD 2011
+        Support for 5.8 perl
+0.02    Tue Aug 18 20:23:27 MSD 2011
+        Added encoding support
+0.01    Tue Aug 02 17:28:00 PDT
+        Initial revision

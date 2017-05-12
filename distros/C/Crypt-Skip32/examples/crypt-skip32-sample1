@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Crypt::Skip32;
+
+# Create a cipher. Change the long hex string to your secret key.
+my $key         = pack("H20", "112233445566778899AA");
+my $cipher      = new Crypt::Skip32 $key; # Always 10 bytes!
+
+# Encrypt an unsigned integer (under 2^32) into an 8-digit hex string.
+my $number      = 3493209676;
+my $plaintext   = pack("N", $number);
+my $ciphertext  = $cipher->encrypt($plaintext); # Always 4 bytes!
+my $cipherhex   = unpack("H8", $ciphertext);
+print "$number encrypted and converted to hex: $cipherhex\n";
+
+# Decrypt an encrypted, hexified unsigned integer.
+my $ciphertext2 = pack("H8", $cipherhex);
+my $plaintext2  = $cipher->decrypt($ciphertext); # Always 4 bytes!
+my $number2     = unpack("N", $plaintext2);
+print "$cipherhex converted back and decrypted: $number2\n";

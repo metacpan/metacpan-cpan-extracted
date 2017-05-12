@@ -1,0 +1,1131 @@
+NAME
+    Config::Context - Add "<Location>" and "<LocationMatch>" style context
+    matching to hierarchical configfile formats such as Config::General,
+    XML::Simple and Config::Scoped
+
+VERSION
+    Version 0.10
+
+SYNOPSIS
+  Apache-style configs (via Config::General)
+        use Config::Context;
+
+        my $config_text = '
+
+            <Location /users>
+                title = "User Area"
+            </Location>
+
+            <LocationMatch \.*(jpg|gif|png)$>
+                image_file = 1
+            </LocationMatch>
+
+        ';
+
+        my $conf = Config::Context->new(
+            string        => $config_text,
+            driver        => 'ConfigGeneral',
+            match_sections => [
+                {
+                    name          => 'Location',
+                    match_type    => 'path',
+                },
+                {
+                    name          => 'LocationMatch',
+                    match_type    => 'regex',
+                },
+            ],
+        );
+
+        my %config = $conf->context('/users/~mary/index.html');
+
+        use Data::Dumper;
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => undef,
+        };
+
+        my %config = $conf->context('/users/~biff/images/flaming_logo.gif');
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => 1,
+        };
+
+  XML configs (via XML::Simple)
+        use Config::Context;
+
+        my $config_text = '
+            <opt>
+
+              <Location name="/users">
+                <title>User Area</title>
+              </Location>
+
+              <LocationMatch name="\.*(jpg|gif|png)$">
+                <image_file>1</image_file>
+              </LocationMatch>
+
+            </opt>
+        ';
+
+        my $conf = Config::Context->new(
+            string        => $config_text,
+            driver        => 'XMLSimple',
+            match_sections => [
+                {
+                    name          => 'Location',
+                    match_type    => 'path',
+                },
+                {
+                    name          => 'LocationMatch',
+                    match_type    => 'regex',
+                },
+            ],
+        );
+
+        my %config = $conf->context('/users/~mary/index.html');
+
+        use Data::Dumper;
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => undef,
+        };
+
+        my %config = $conf->context('/users/~biff/images/flaming_logo.gif');
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => 1,
+        };
+
+  Config::Scoped style configs
+        use Config::Context;
+
+        my $config_text = '
+            Location /users {
+                user_area = 1
+            }
+
+            LocationMatch '\.*(jpg|gif|png)$' {
+                image_file = 1
+            }
+        ';
+
+        my $conf = Config::Context->new(
+            string        => $config_text,
+            driver        => 'ConfigScoped',
+            match_sections => [
+                {
+                    name          => 'Location',
+                    match_type    => 'path',
+                },
+                {
+                    name          => 'LocationMatch',
+                    match_type    => 'regex',
+                },
+            ],
+        );
+
+        my %config = $conf->context('/users/~mary/index.html');
+
+        use Data::Dumper;
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => undef,
+        };
+
+        my %config = $conf->context('/users/~biff/images/flaming_logo.gif');
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => 1,
+        };
+
+DESCRIPTION
+  Introduction
+    This module provides a consistent interface to many hierarchical
+    configuration file formats such as Config::General, XML::Simple and
+    Config::Scoped.
+
+    It also provides Apache-style context matching. You can include blocks
+    of configuration that match or not based on run-time parameters.
+
+    For instance (using Config::General syntax):
+
+        company_name      = ACME
+        in_the_users_area = 0
+
+        <Location /users>
+            in_the_users_area = 1
+        </Location>
+
+    At runtime, if "Location" is within "/users", then the configuration
+    within the "<Location>" block is merged into the top level. Otherwise,
+    the block is ignored.
+
+    So if "Location" is "/users/gary", the configuration is reduced to:
+
+         {
+             company_name      => 'ACME',
+             in_the_users_area => 1,
+         }
+
+    But if "Location" is outside of the "/users" area (e.g.
+    "/admin/documents.html"), the configuration is reduced to:
+
+         {
+             company_name      => 'ACME',
+             in_the_users_area => 0,
+         }
+
+    The exact mechanics of how "Location" matches "/users" is extensively
+    customizable. You can configure a particular block to match based on
+    exact string matches, a substring, a path, or a regex.
+
+    This kind of context-based matching was inspired by Apache's
+    context-based configuration files.
+
+    Config::Context works with Apache-style config files (via
+    Config::General), XML documents (via XML::Simple), and Config::Scoped
+    config files. You select the type config file with the driver option to
+    new.
+
+    The examples in this document use Config::General (Apache-style) syntax.
+    For details on other configuration formats, see the documentation for
+    the appropriate driver.
+
+    For a real world example of Config::Context in action, see
+    CGI::Application::Plugin::Config::Context, which determines
+    configurations based on the URL of the request, the name of the Perl
+    Module, and the virtual host handling the web request.
+
+  The Default Section
+    Config values that appear outside of any block act like defaults. Values
+    in matching sections are merged with the default values. For instance:
+
+        private_area = 0
+        client_area  = 0
+
+        <Location /admin>
+            private_area = 1
+        </Location>
+
+        <Location /clients>
+            client_area  = 1
+        </Location>
+
+        # Admin Area URL
+        my %config = $conf->context('/admin/index.html');
+        use Data::Dumper;
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 1,
+            'client_area' => 0,
+        };
+
+        # Client Area URL
+        my %config = $conf->context('/clients/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 0,
+            'client_area'  => 1,
+        };
+
+        # Neither Client nor Admin
+        my %config = $conf->context('/public/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 0,
+            'client_area'  => 0,
+        };
+
+    When using the Config::Context::ConfigScoped driver, you must be careful
+    with the use of the default section, since Config::Scoped does its own
+    inheritance from the global scope into named sections. See the
+    documentation for Config::Context::ConfigScoped for more information.
+
+  Subsections are preserved
+    When a block matches, and its configuration is merged into the top
+    level, any subsections that it contained are preserved along with single
+    values. For instance:
+
+        # Default config
+        private_area = 0
+        client_area  = 0
+        <page_settings>
+            title       = "The Widget Emporium"
+            logo        = logo.gif
+            advanced_ui = 0
+        </page_settings>
+
+        # Admin config
+        <Location /admin>
+            private_area = 1
+            <page_settings>
+                title       = "The Widget Emporium - Admin Area"
+                logo        = admin_logo.gif
+                advanced_ui = 1
+            </page_settings>
+        </Location>
+
+        # Client config
+        <Location /clients>
+            client_area  = 1
+            <page_settings>
+                title = "The Widget Emporium - Wholesalers"
+                logo  = client_logo.gif
+            </page_settings>
+        </Location>
+
+        # Admin Area URL
+        my %config = $conf->context('/admin/index.html');
+
+        use Data::Dumper;
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'page_settings' => {
+                                'advanced_ui' => '1',
+                                'title' => 'The Widget Emporium - Admin Area',
+                                'logo' => 'admin_logo.gif'
+                               },
+            'private_area' => '1',
+            'client_area' => '0'
+        };
+
+        # Client Area URL
+        my %config = $conf->context('/clients/index.html');
+
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'page_settings' => {
+                                'advanced_ui' => '0',
+                                'title' => 'The Widget Emporium - Wholesalers',
+                                'logo' => 'client_logo.gif'
+                               },
+            'client_area' => '1',
+            'private_area' => '0'
+        };
+
+        # Neither Client nor Admin
+        my %config = $conf->context('/public/index.html');
+
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+
+            'page_settings' => {
+                                'advanced_ui' => '0',
+                                'title' => 'The Widget Emporium',
+                                'logo' => 'logo.gif'
+                               },
+            'client_area' => '0',
+            'private_area' => '0'
+
+        };
+
+  Multiple Sections Matching
+    Often more than one section will match the target string. When this
+    happens, the matching sections are merged together using the Hash::Merge
+    module. Typically this means that sections that are merged later
+    override the values set in earlier sections. (But you can change this
+    behaviour. See "Changing Hash::Merge behaviour" below.)
+
+    The order of merging matters. The sections are merged first according to
+    each section's merge_priority value (lowest values are merged first),
+    and second by the length of the substring that matched (shortest matches
+    are merged first). If you don't specify merge_priority for any section,
+    they all default to a priority of 0 which means all sections are treated
+    equally and matches are prioritized based soley on the length of the
+    matching strings.
+
+    When two sections have the same priority, the section with the shorter
+    match is merged first. The idea is that longer matches are more
+    specific, and should have precidence.
+
+    The order of sections in the config file is ignored.
+
+    For instance, if your config file looks like this:
+
+        <Dir /foo/bar/baz>
+            # section 1
+        </Dir>
+
+        <Path /foo>
+            # section 2
+        </Path>
+
+        <Dir /foo/bar>
+            # section 3
+        </Dir>
+
+        <Directory /foo/bar/baz/bam>
+            # section 4
+        </Directory>
+
+    ...and you construct your $conf object like this:
+
+        my $conf         = Config::Context->new(
+            driver         => 'ConfigGeneral',
+            match_sections => [
+                { name    => 'Directory',  match_type => 'path' merge_priority => 1 },
+                { name    => 'Dir',        match_type => 'path' merge_priority => 1 },
+                { name    => 'Path',       match_type => 'path' merge_priority => 2 },
+            ],
+        );
+
+    ...then the target string '/foo/bar/baz/bam/boom' would match all
+    sections the order of 1, 3, 4, 2.
+
+  Matching Context based on More than one String
+    You have different sections match against different run time values. For
+    instance, you could match some sections against the day of the week and
+    other sections against weather:
+
+        my $config = '
+
+        weekend    = 0
+        background = ''
+
+        <Day Saturday>
+            weekend = 1
+        </Day>
+
+        <Weekday Sunday>
+            weekend = 1
+        </Weekday>
+
+        <Weather sunny>
+            sky = blue
+        </Weather>
+
+        <Weather cloudy>
+            sky = grey
+        </Weather>
+        ';
+
+        my $conf = Config::Context->new(
+            driver         => 'ConfigGeneral',
+            match_sections => [
+                { name => 'Day',      section_type => 'day',     match_type => 'path' },
+                { name => 'Weekday',  section_type => 'day',     match_type => 'path' },
+                { name => 'Weather',  section_type => 'weather', match_type => 'regex' },
+            ],
+        );
+
+        my %config = $conf->context(day => 'Friday', weather => 'sunny');
+
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'weekend' => 0,
+            'sky'     => 'blue',
+        };
+
+        my %config = $conf->context(day => 'Sunday', weather => 'partially cloudy');
+
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+
+            'weekend' => 1,
+            'sky'     => 'grey',
+        };
+
+  Matching other path-like strings
+    You can use Config::Context to match other hierarchical strings besides
+    paths and URLs. For instance you could specify a path_separator of "::"
+    and use the path feature to match against Perl modules:
+
+        my $config_text = "
+
+            is_core_module 0
+            <Module NET::FTP>
+                is_core_module 1
+                author         Nathan Torkington
+            </Module>
+
+            <Module NET::FTPServer>
+                author Richard Jone
+            </Module>
+
+        ";
+
+        my $conf = Config::Context->new(
+            driver         => 'ConfigGeneral',
+            string         => $config_text,
+            match_sections => [
+                {
+                    name           => 'Module',
+                    path_separator => '::',
+                    match_type     => 'path',
+                },
+            ],
+        );
+
+        my %config = $conf->context('Net::FTP');
+
+        use Data::Dumper;
+        print Dumper(\%config);
+        --------
+        $VAR1 = {
+            'is_core_module' => 1,
+            'author'         => 'Nathan Torkington',
+        };
+
+  Nested Matching
+    You can have matching sections within matching sections:
+
+        <Site bookshop>
+            <Location /admin>
+                admin_area = 1
+            </Location>
+        </Site>
+        <Site recordshop>
+            <Location /admin>
+                admin_area = 1
+            </Location>
+        </Site>
+
+    Enable this feature by setting nesting_depth parameter to new, or by
+    calling "$conf->nesting_depth($some_value)".
+
+    Note: see the documentation of Config::Context::ConfigScoped for the
+    limitations of nesting with Config::Scoped files.
+
+CONSTRUCTOR
+  new(...)
+    Creates and returns a new Config::Context object.
+
+    The configuration can be read from a file, parsed from a string, or can
+    be generated from a perl data struture.
+
+    To read from a config file:
+
+        my $conf = Config::Context->new(
+            file           => 'somefile.conf',
+            driver         => 'ConfigGeneral',
+            match_sections => [
+               {  name  => 'Directory',  match_type => 'path' },
+            ],
+        );
+
+    To parse from a string:
+
+        my $text = '
+            in_the_users_area = 0
+            <Directory /users>
+                in_the_users_area = 1
+            </Directory>
+        ';
+
+        my $conf = Config::Context->new(
+            string         => $text,
+            driver         => 'ConfigGeneral',
+            match_sections => [
+               {  name => 'Directory',    match_type => 'path' },
+            ],
+        );
+
+    To generate from an existing Perl data structure:
+
+        my %config = (
+            'in_the_user_area' => '0'
+            'Location' => {
+                '/users' => {
+                    'in_the_user_area' => '1'
+                },
+            },
+        );
+
+        my $conf = Config::Context->new(
+            config         => \%config,
+            driver         => 'ConfigGeneral',
+            match_sections => [
+               {  name => 'Directory',    match_type => 'path' },
+            ],
+        );
+
+    The parameters to new are described below:
+
+   file
+    The config file.
+
+   string
+    A string containing the configuration to be parsed. If string is
+    specified then file is ignored.
+
+   config
+    A Perl multi-level data structure containing the configuration. If
+    config is specified, then both file and string are ignored.
+
+   driver
+    Which Config::Context driver should parse the config. Currently
+    supported drivers are:
+
+        driver            module name
+        ------            -----------
+        ConfigGeneral     Config::Context::ConfigGeneral
+        ConfigScoped      Config::Context::ConfigScoped
+        XMLSimple         Config::Context::XMLSimple
+
+   driver_options
+    Options to pass directly on to the driver. This is a multi-level hash,
+    where the top level keys are the driver names:
+
+        my $conf = Config::Context->new(
+            driver => 'ConfigScoped',
+            driver_options => {
+               ConfigGeneral => {
+                   -AutoLaunder => 1,
+               },
+               ConfigScoped = > {
+                   warnings => {
+                       permissions  => 'off',
+                   }
+               },
+            },
+        );
+
+    In this example the options under "ConfigScoped" will be passed to the
+    "ConfigScoped" driver. (The options under "ConfigGeneral" will be
+    ignored because "driver" is not set to 'ConfigGeneral'.)
+
+   match_sections
+    The match_sections parameter defines how Config::Context matches runtime
+    values against configuration sections.
+
+    match_sections takes a list of specification hashrefs. Each
+    specification has the following fields:
+
+    name
+        The name of the section. For a name of 'Location', the section would
+        look like:
+
+            <Location /somepath>
+            </Location>
+
+    match_type
+        Specifies the method by which the section strings should match the
+        target string.
+
+        The valid types of matches are 'exact', 'substring', 'regex',
+        'path', and 'hierarchical'
+
+        exact
+            The config section string matches only if it is equal to the
+            target string. For instance:
+
+                # somefile.conf
+                <Site mysite>
+                    ...
+                </Site>
+                ...
+
+                my $conf = Config::Context->new(
+                    driver         => 'ConfigGeneral'
+                    match_sections => [
+                        {
+                            name       => 'Site',
+                            match_type => 'exact',
+                        },
+                    ],
+                    file => 'somefile.conf',
+                );
+
+            In this case, only the exact string "mysite" would match the
+            section.
+
+        substring
+            The config section string is tested to see if it is a substring
+            of the target string. For instance:
+
+                # somefile.conf
+                <Location foo>
+                    ...
+                </Location>
+
+                ...
+
+                my $conf = Config::Context->new(
+                    driver         => 'ConfigGeneral'
+                    match_sections => [
+                        {
+                            name       => 'LocationMatch',
+                            match_type => 'substring',
+                        },
+                    ],
+                    file => 'somefile.conf',
+                );
+
+            In this case, the following target strings would all match:
+
+                /foo
+                big_foo.html
+                /hotfood
+
+        regex
+            The config section string is treated as a regular expression
+            against which the target string is matched. For instance:
+
+                # somefile.conf
+                <LocationMatch (\.jpg)|(\.gif)(\.png)$>
+                    Image = 1
+                </LocationMatch>
+
+                ...
+
+                my $conf = Config::Context->new(
+                    driver         => 'ConfigGeneral'
+                    match_sections => [
+                        {
+                            name       => 'LocationMatch',
+                            match_type => 'regex',
+                        },
+                    ],
+                    file        => 'somefile.conf',
+                );
+
+                my %config = $conf->context('banner.jpg');
+
+            The regex can contain any valid Perl regular expression. So to
+            match case-insensitively you can use the "(?i:)" syntax:
+
+                <LocationMatch (?i:/UsErS)>
+                    UserDir = 1
+                </LocationMatch>
+
+            Also note that the regex is not tied to the beginning of the
+            target string by default. So for regexes involving paths you
+            will probably want to do so explicitly:
+
+                <LocationMatch ^/users>
+                    UserDir = 1
+                </LocationMatch>
+
+        path
+            This method is useful for matching paths, URLs, Perl Modules and
+            other hierarchical strings.
+
+            The config section string is tested against the the target
+            string. It matches if the following are all true:
+
+            *   The section string is a substring of the target string
+
+            *   The section string starts at the first character of the
+                target string
+
+            *   In the target string, the section string is followed
+                immediately by path_separator or the end-of-string.
+
+            For instance:
+
+                # somefile.conf
+                <Location /foo>
+                </Location>
+
+                ...
+
+                my $conf = Config::Context->new(
+                    driver         => 'ConfigGeneral'
+                    match_sections => [
+                        {
+                            name       => 'LocationMatch',
+                            match_Type => 'path',
+                        },
+                    ],
+                    file        => 'somefile.conf',
+                );
+
+            In this case, the following target strings would all match:
+
+                /foo
+                /foo/
+                /foo/bar
+                /foo/bar.txt
+
+            But the following strings would not match:
+
+                /foo.txt
+                /food
+                /food/bar.txt
+                foo.txt
+
+        hierarchical
+            A synonym for 'path'.
+
+    path_separator
+        The path separator when matching hierarchical strings (paths, URLs,
+        Module names, etc.). It defaults to '/'.
+
+        This parameter is ignored unless the match_type is 'path' or
+        'hierarchical'.
+
+    section_type
+        Allows you to match certain sections against certain run time
+        values. For instance, you could match some sections against a given
+        filesystem path and some sections against a Perl module name, using
+        the same config file.
+
+            # somefile.conf
+            # section 1
+            <FileMatch \.pm$>
+                Perl_Module      = 1
+                Core_Module      = 1
+                Installed_Module = 0
+            </FileMatch>
+
+            # section 2
+            <FileMatch ^/.*/lib/perl5/site_perl>
+                Core_Module = 0
+            </FileMatch>
+
+            # section 3
+            # Note the whitespace at the end of the section name, to prevent File from
+            # being parsed as a stand-alone block by Config::General
+            <File /usr/lib/perl5/ >
+                Installed_Module = 1
+            </File>
+
+            # section 4
+            <Module NET::FTP>
+                FTP_Module = 1
+            </Module>
+
+            my $conf = Config::Context->new(
+                driver         => 'ConfigGeneral'
+                match_sections => [
+                    {
+                        name         => 'FileMatch',
+                        match_type   => 'regex',
+                        section_type => 'file',
+                    },
+                    {
+                        name         => 'File',
+                        match_type   => 'path',
+                        section_type => 'file',
+                    },
+                    {
+                        name         => 'Module',
+                        match_type   => 'path',
+                        separator    => '::',
+                        section_type => 'module',
+                    },
+                ],
+                file        => 'somefile.conf',
+
+                # need to turn off C-style comment parsing because of the
+                # */ in the name of section 2
+                driver_options => {
+                    ConfigGeneral => {
+                        -CComments => 0,
+                    }
+                },
+            );
+
+            my %config = $conf->context(
+                file   => '/usr/lib/perl5/site_perl/5.6.1/NET/FTP/Common.pm',
+                module => 'NET::FTP::Common',
+            );
+
+        This tests "/usr/lib/perl5/site_perl/5.6.1/NET/FTP/Common.pm"
+        against sections 1, 2 and 3 (and merging them in the order of
+        shortest to longest match, i.e. 1, 3, 2).
+
+        Then it tests 'NET::FTP::Common' against section 4 (which also
+        matches). The resulting configuration is:
+
+            use Data::Dumper;
+            print Dumper(\%config);
+            --------
+            $VAR1 = {
+                'Perl_Module'      => 1,
+                'Core_Module'      => 0,
+                'FTP_Module'       => 1,
+                'Installed_Module' => 1,
+            };
+
+        Another example:
+
+            my %config = $conf->context(
+                file   => '/var/www/cgi-lib/FTP/FTPServer.pm',
+                module => 'NET::FTPServer',
+            );
+
+        This tests "/var/www/cgi-lib/NET/FTPServer.pm" against sections 1, 2
+        and 3, and matches only against section 1. Then it matches
+        'NET::FTPServer' against section 4 (which does not match). The
+        result is:
+
+            use Data::Dumper;
+            print Dumper(\%config);
+            --------
+            $VAR1 = {
+                'Perl_Module'      => 1,
+                'Core_Module'      => 0,
+                'FTP_Module'       => 0,
+                'Installed_Module' => 0,
+            };
+
+        If a section_type is not specified in a match_sections block, then
+        target strings of a named type will not match it.
+
+        For another example, see "Matching Context based on More than one
+        String", above.
+
+        Matching by section_type is used in
+        CGI::Application::Plugin::Config::Context to determine
+        configurations based both on the URL of the request and of the name
+        of the Perl Module and runmode handling the request.
+
+    trim_section_names
+        By default, section names are trimmed of leading and trailing
+        whitespace before they are used to match. This is to allow for
+        sections like:
+
+            <Path /foo/bar/ >
+            </Path>
+
+        The whitespace at the end of the section name is necessary to
+        prevent Config::General's parser from thinking that the first tag is
+        an empty "<Path />" block.
+
+            <Path /foo/bar/>  # Config::General parses this as <Path />
+            </Path>           # Config::General now considers this to be spurious
+
+        If leading and trailing whitespace is significant to your matches,
+        you can disable trimming by setting trim_section_names to 0 or
+        "undef".
+
+    merge_priority
+        Sections with a lower merge_priority are merged before sections with
+        a higher merge_priority. If two or more sections have the same
+        merge_priority they are weighted the same and they are merged
+        according to the "best match" against the target string (i.e. the
+        longest matching substring).
+
+        See the description above under "Multiple Sections Matching".
+
+   nesting_depth
+    This option alows you to match against nested structures.
+
+        # stories.conf
+        <Story Three Little Pigs>
+            antagonist = Big Bad Wolf
+            moral      = obey the protestant work ethic
+        </Story>
+
+        <Location /aesop>
+            <Story Wolf in Sheep's Clothing>
+                antagonist = Big Bad Wolf
+                moral      = appearances are deceptive
+            </Story>
+        </Location>
+
+        <Story Little Red Riding Hood>
+            antagonist = Big Bad Wolf
+
+            <Location /perrault>
+                moral      = never talk to strangers
+            </Location>
+
+            <Location /grimm>
+                moral      = talk to strangers and then chop them up
+            </Location>
+        </Story>
+
+        my $conf = Config::Context->new(
+            match_sections => [
+                {
+                    name         => 'Story',
+                    match_type   => 'substring',
+                    section_type => 'story',
+                },
+                {
+                    name         => 'Location',
+                    match_type   => 'path',
+                    section_type => 'path',
+                },
+            ],
+            file          => 'stories.conf',
+            nesting_depth => 2,
+        );
+
+        $config = $conf->context(
+            story => 'Wolf in Sheep\'s Clothing',
+            path  => '/aesop/wolf-in-sheeps-clothing',
+        );
+
+        use Data::Dumper;
+        print Dumper($config);
+        --------
+        $VAR1 = {
+            'antagonist' => 'Big Bad Wolf',
+            'moral'      => 'appearances are deceptive'
+        };
+
+    You can also change the nesting depth by calling
+    "$self->nesting_depth($depth)" after you have constructed the
+    Config::Context object.
+
+   lower_case_names
+    Attempts to force all section and key names to lower case. If
+    lower_case_names is true, then the following sections would all match
+    'location':
+
+        <Location /somepath>
+        </Location>
+
+        <loCATtion /somepath>
+        </Location>
+
+        <lOcAtion /somepath>
+        </LOCATION>
+
+    Note: the "XMLSimple" driver does not support this option.
+
+   cache_config_files
+    Whether or not to cache configuration files. Enabled, by default. This
+    option is useful in a persistent environment such as "mod_perl". See
+    "Config File Caching" under "ADVANCED USAGE", below.
+
+   stat_config
+    If config file caching is enabled, this option controls how often the
+    config files are checked to see if they have changed. The default is 60
+    seconds. This option is useful in a persistent environment such as
+    "mod_perl". See "Config File Caching" under "ADVANCED USAGE", below.
+
+METHODS
+  raw()
+    Returns the raw configuration data structure as read by the driver,
+    before any context matching is performed.
+
+  context( $target_string )
+    Returns the merged configuration of all sections matching
+    $target_string, according to the rules set up in match_sections in
+    new(). All match_sections are included, regardless of their
+    section_type.
+
+  context( $type => $target_string )
+    Returns the merged configuration matching $target_string, based only the
+    match_sections that have a section_type of $type.
+
+  context( $type1 => $target_string1, $type2 => $target_string2 )
+    Returns the merged configuration of all sections of section_type $type1
+    matching $target_string1 and all sections of section_type $type2
+    matching $target_string2.
+
+    The order of the parameters to context() is retained, so $type1 sections
+    will be matched first, followed by $type2 sections.
+
+  context( )
+    If you call context without parameters, it will return the same
+    configuration that was generated by the last call to context.
+
+    If you call context in a scalar context, you will receive a reference to
+    the config hash:
+
+        my $config = $conf->context($target_string);
+        my $value  = $config->{'somekey'};
+
+    In a list context, context returns a hash:
+
+        my %config = $conf->context($target_string);
+        my $value  = $config{'somekey'};
+
+  files
+    Returns a list of all the config files read, including any config files
+    included in the main file.
+
+  nesting_depth()
+    Changes the default nesting depth, for matching nested structures. See
+    the nesting_depth parameter to new.
+
+  clear_file_cache
+    Clears the internal file cache. Class method.
+
+        Config::Context->clear_file_cache;
+        $conf->clear_file_cache;
+
+ADVANCED USAGE
+  Config File Caching
+    By default each config file is read only once when the conf object is
+    first initialized. Thereafter, on each init, the cached config is used.
+
+    This means that in a persistent environment like mod_perl, the config
+    file is parsed on the first request, but not on subsequent requests.
+
+    If enough time has passed (sixty seconds by default) the config file is
+    checked to see if it has changed. If it has changed, then the file is
+    reread.
+
+    If the driver supports it, any included files will be checked for
+    changes along the main file. If you use Config::General, you must use
+    version 2.28 or greater for this feature to work correctly.
+
+    To disable caching of config files pass a false value to the
+    cache_config_files parameter to new, e.g:
+
+        my $conf = Config::Context->new(
+            cache_config_files => 0,
+            # ... other options here ...
+        );
+
+    To change how often config files are checked for changes, change the
+    value of the stat_config paramter to init, e.g.:
+
+        my $conf = Config::Context->new(
+            stat_config => 1, # check the config file every second
+            # ... other options here ...
+        );
+
+    Internally the configuration cache is implemented by a hash, keyed by
+    the absolute path of the configuration file. This means that if you have
+    two applications running in the same process that both use the same
+    configuration file, they will use the same cache.
+
+    However, matching is performed on the config retrieved from the cache,
+    so the two applications could each use different matching options
+    creating different configurations from the same file.
+
+  Changing Hash::Merge behaviour
+    Matching sections are merged together using the Hash::Merge module. If
+    you want to change how this module does its work you can call
+    subroutines in the Hash::Merge package directly. For instance, to change
+    the merge strategy so that earlier sections have precidence over later
+    sections, you could call:
+
+        # Note American Spelling :)
+        Hash::Merge::set_behavior('RIGHT_PRECEDENT')
+
+    You should do this before you call context().
+
+    For more information on how to change merge options, see the Hash::Merge
+    docs.
+
+AUTHOR
+    Michael Graham, "<mag-perl@occamstoothbrush.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-config-context@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Michael Graham, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Builder-LogDispatch
+version:      0.1
+version_from: lib/CGI/Builder/LogDispatch.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    CGI::Builder:                  1.11
+    Date::Format:                  0
+    Log::Dispatch:                 2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

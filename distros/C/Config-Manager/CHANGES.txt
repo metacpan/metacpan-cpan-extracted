@@ -1,0 +1,135 @@
+                   =========================================
+                     Package "Config::Manager" Version 1.7
+                   =========================================
+
+
+             Copyright (c) 2003 by Steffen Beyer & Gerhard Albers.
+                             All rights reserved.
+
+
+Version history:
+----------------
+
+Version 1.7   13.07.2003
+
+ +  Added SPECIAL configuration constants HOUR, MIN, SEC and WDAY
+ +  Added mention of showchain.pl to the Config::Manager manpage
+ +  Corrected the description of "MakeDir()" in File.pm
+ +  Script showchain.pl doesn't pipe output via "more" anymore
+ +  Removed excessive indentation from the output of showconf.pl
+ +  Now 'source' and 'line' attributes for $[SPECIAL]{HOME} and
+    $[SPECIAL]{WHOAMI} are properly set
+
+Version 1.6   28.06.2003
+
+ Config::Manager::Report:
+
+ +  The name and path of the default logfile can now be influenced
+    (the "singleton()" class method now passes arguments to "new()")
+ +  Changed the default path and filename of logfile objects
+    (now uses the user login to discriminate further)
+ +  Adapted the test suite accordingly
+ +  Functions "Normalize()" and "MakeDir()" are now physically
+    located in Config::Manager::Report
+ +  The constructor now automatically creates the logfile's path
+    (with "MakeDir()") if necessary
+ +  Added new import targets ":aux" and ":ALL" (":aux" contains
+    "Normalize" and "MakeDir", ":ALL" contains ":all" and ":aux")
+
+ Config::Manager::File:
+
+ +  Functions "Normalize()" and "MakeDir()" are now imported from
+    Config::Manager::Report and re-exported
+ +  Function "Normalize()" now also supports relative paths
+
+ Config::Manager::Conf:
+
+ +  Added the method "get_files()" to get the list of configuration
+    files which led to the current configuration object, in the
+    order they were read in
+ +  Changed the method "get_all()", it now returns a list of
+    anonymous arrays containing a flag, the name, the value, the
+    source file and line number of each configuration constant
+ +  Adapted the test suite accordingly
+
+ scripts:
+
+ +  Added the script "showchain.pl" to show the chain of
+    configuration files which are read in for a given
+    scope and user
+ +  Changed the script "showconf.pl" to also show the file
+    of origin and line number of each configuration constant
+
+Version 1.5   09.06.2003
+
+ +  Added constant $[SPECIAL]{PERL} which contains $^X
+
+Version 1.4   18.05.2003
+
+ +  Changed some wordings in Config::Manager::Report
+ +  Fixed syntax error in Config::Manager::SendMail
+ +  Improved the overview manual page "Config::Manager"
+ +  Added "Normalize()" and "MakeDir()" to Config::Manager::File
+ +  Added missing documentation parts to Config::Manager::File
+ +  Config::Manager::File now localizes all global Perl variables
+ +  Config::Manager::File now uses file locking (flock)
+ +  Added new prerequisite "Fcntl" to Makefile.PL
+ +  Removed the pointless file histories from all modules
+
+Version 1.3   01.05.2003
+
+ +  Replaced MD5 with Digest::MD5
+ +  Made some cosmetic changes to error messages
+    in Config::Manager::Conf
+ +  Changed the test suite accordingly
+ +  Fixed the broken images from version 1.2
+
+Version 1.2   26.04.2003
+
+ Config::Manager::Conf:
+
+ +  Simplified and slightly corrected the code
+
+ Config::Manager::Report:
+
+ +  Does not automatically and forcibly produce
+    a stack trace for errors and fatal messages anymore
+ +  Now allows you to provide your own path and filename
+    for log files; the previous behaviour continues to
+    be the default if you don't
+ +  Added a running number to the generated filename
+    to make it unique even when log files are created
+    in rapid succession; also added the year number
+ +  Fixed some subtle bugs
+ +  Now returns error messages instead of dying
+ +  Now an inventory of all log files is kept which
+    allows to close them all reliably at shutdown time
+ +  Added a new "close()" method
+ +  Now uses "Symbol" instead of "IO::File" (should
+    therefore be slightly faster to load)
+
+ General:
+
+ +  Added the script "showconf.pl", a more versatile
+    replacement for "listconf.pl"
+ +  Changed all messages returned by this distribution
+    from German to English (the documentation continues
+    to be largely in German, though)
+ +  Removed obsolete test driver code
+ +  Changed "Makefile.PL" (IO::File => Symbol)
+ +  Changed the documentation accordingly
+ +  Changed the test suite accordingly
+
+Version 1.1   14.02.2003
+
+ +  Added more documentation
+ +  Added missing license files
+ +  Added working example configuration files
+ +  Added another test file
+
+Version 1.0   05.02.2003
+
+ +  First release.
+
+----------------------------------------------------------------------------
+

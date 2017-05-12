@@ -1,0 +1,591 @@
+NAME
+    Catalyst::Plugin::Authentication - Infrastructure plugin for the
+    Catalyst authentication framework.
+
+SYNOPSIS
+        use Catalyst qw/
+            Authentication
+        /;
+
+        # later on ...
+        $c->authenticate({ username => 'myusername',
+                           password => 'mypassword' });
+        my $age = $c->user->get('age');
+        $c->logout;
+
+DESCRIPTION
+    The authentication plugin provides generic user support for Catalyst
+    apps. It is the basis for both authentication (checking the user is who
+    they claim to be), and authorization (allowing the user to do what the
+    system authorises them to do).
+
+    Using authentication is split into two parts. A Store is used to
+    actually store the user information, and can store any amount of data
+    related to the user. Credentials are used to verify users, using
+    information from the store, given data from the frontend. A Credential
+    and a Store are paired to form a 'Realm'. A Catalyst application using
+    the authentication framework must have at least one realm, and may have
+    several.
+
+    To implement authentication in a Catalyst application you need to add
+    this module, and specify at least one realm in the configuration.
+
+    Authentication data can also be stored in a session, if the application
+    is using the Catalyst::Plugin::Session module.
+
+    NOTE in version 0.10 of this module, the interface to this module
+    changed. Please see "COMPATIBILITY ROUTINES" for more information.
+
+INTRODUCTION
+  The Authentication/Authorization Process
+    Web applications typically need to identify a user - to tell the user
+    apart from other users. This is usually done in order to display private
+    information that is only that user's business, or to limit access to the
+    application so that only certain entities can access certain parts.
+
+    This process is split up into several steps. First you ask the user to
+    identify themselves. At this point you can't be sure that the user is
+    really who they claim to be.
+
+    Then the user tells you who they are, and backs this claim with some
+    piece of information that only the real user could give you. For
+    example, a password is a secret that is known to both the user and you.
+    When the user tells you this password you can assume they're in on the
+    secret and can be trusted (ignore identity theft for now). Checking the
+    password, or any other proof is called credential verification.
+
+    By this time you know exactly who the user is - the user's identity is
+    authenticated. This is where this module's job stops, and your
+    application or other plugins step in.
+
+    The next logical step is authorization, the process of deciding what a
+    user is (or isn't) allowed to do. For example, say your users are split
+    into two main groups - regular users and administrators. You want to
+    verify that the currently logged in user is indeed an administrator
+    before performing the actions in an administrative part of your
+    application. These decisions may be made within your application code
+    using just the information available after authentication, or it may be
+    facilitated by a number of plugins.
+
+  The Components In This Framework
+   Realms
+    Configuration of the Catalyst::Plugin::Authentication framework is done
+    in terms of realms. In simplest terms, a realm is a pairing of a
+    Credential verifier and a User storage (Store) backend. As of version
+    0.10003, realms are now objects that you can create and customize.
+
+    An application can have any number of Realms, each of which operates
+    independent of the others. Each realm has a name, which is used to
+    identify it as the target of an authentication request. This name can be
+    anything, such as 'users' or 'members'. One realm must be defined as the
+    default_realm, which is used when no realm name is specified. More
+    information about configuring realms is available in the configuration
+    section.
+
+   Credential Verifiers
+    When user input is transferred to the Catalyst application (typically
+    via form inputs) the application may pass this information into the
+    authentication system through the "$c->authenticate()" method. From
+    there, it is passed to the appropriate Credential verifier.
+
+    These plugins check the data, and ensure that it really proves the user
+    is who they claim to be.
+
+    Credential verifiers compatible with versions of this module 0.10x and
+    upwards should be in the namespace
+    "Catalyst::Authentication::Credential".
+
+   Storage Backends
+    The authentication data also identifies a user, and the Storage backend
+    modules use this data to locate and return a standardized
+    object-oriented representation of a user.
+
+    When a user is retrieved from a store it is not necessarily
+    authenticated. Credential verifiers accept a set of authentication data
+    and use this information to retrieve the user from the store they are
+    paired with.
+
+    Storage backends compatible with versions of this module 0.10x and
+    upwards should be in the namespace "Catalyst::Authentication::Store".
+
+   The Core Plugin
+    This plugin on its own is the glue, providing realm configuration,
+    session integration, and other goodness for the other plugins.
+
+   Other Plugins
+    More layers of plugins can be stacked on top of the authentication code.
+    For example, Catalyst::Plugin::Session::PerUser provides an abstraction
+    of browser sessions that is more persistent per user.
+    Catalyst::Plugin::Authorization::Roles provides an accepted way to
+    separate and group users into categories, and then check which
+    categories the current user belongs to.
+
+EXAMPLE
+    Let's say we were storing users in a simple Perl hash. Users are
+    verified by supplying a password which is matched within the hash.
+
+    This means that our application will begin like this:
+
+        package MyApp;
+
+        use Catalyst qw/
+            Authentication
+        /;
+
+        __PACKAGE__->config( 'Plugin::Authentication' =>
+                    {
+                        default => {
+                            credential => {
+                                class => 'Password',
+                                password_field => 'password',
+                                password_type => 'clear'
+                            },
+                            store => {
+                                class => 'Minimal',
+                                users => {
+                                    bob => {
+                                        password => "s00p3r",
+                                        editor => 'yes',
+                                        roles => [qw/edit delete/],
+                                    },
+                                    william => {
+                                        password => "s3cr3t",
+                                        roles => [qw/comment/],
+                                    }
+                                }
+                            }
+                        }
+                    }
+        );
+
+    This tells the authentication plugin what realms are available, which
+    credential and store modules are used, and the configuration of each.
+    With this code loaded, we can now attempt to authenticate users.
+
+    To show an example of this, let's create an authentication controller:
+
+        package MyApp::Controller::Auth;
+
+        sub login : Local {
+            my ( $self, $c ) = @_;
+
+            if (    my $user     = $c->req->params->{user}
+                and my $password = $c->req->params->{password} )
+            {
+                if ( $c->authenticate( { username => $user,
+                                         password => $password } ) ) {
+                    $c->res->body( "hello " . $c->user->get("name") );
+                } else {
+                    # login incorrect
+                }
+            }
+            else {
+                # invalid form input
+            }
+        }
+
+    This code should be self-explanatory. If all the necessary fields are
+    supplied, call the "authenticate" method on the context object. If it
+    succeeds the user is logged in.
+
+    The credential verifier will attempt to retrieve the user whose details
+    match the authentication information provided to "$c->authenticate()".
+    Once it fetches the user the password is checked and if it matches the
+    user will be authenticated and "$c->user" will contain the user object
+    retrieved from the store.
+
+    In the above case, the default realm is checked, but we could just as
+    easily check an alternate realm. If this were an admin login, for
+    example, we could authenticate on the admin realm by simply changing the
+    "$c->authenticate()" call:
+
+        if ( $c->authenticate( { username => $user,
+                                 password => $password }, 'admin' ) ) {
+            $c->res->body( "hello " . $c->user->get("name") );
+        } ...
+
+    Now suppose we want to restrict the ability to edit to a user with an
+    'editor' value of yes.
+
+    The restricted action might look like this:
+
+        sub edit : Local {
+            my ( $self, $c ) = @_;
+
+            $c->detach("unauthorized")
+              unless $c->user_exists
+              and $c->user->get('editor') eq 'yes';
+
+            # do something restricted here
+        }
+
+    (Note that if you have multiple realms, you can use
+    "$c->user_in_realm('realmname')" in place of "$c->user_exists();" This
+    will essentially perform the same verification as user_exists, with the
+    added requirement that if there is a user, it must have come from the
+    realm specified.)
+
+    The above example is somewhat similar to role based access control.
+    Catalyst::Authentication::Store::Minimal treats the roles field as an
+    array of role names. Let's leverage this. Add the role authorization
+    plugin:
+
+        use Catalyst qw/
+            ...
+            Authorization::Roles
+        /;
+
+        sub edit : Local {
+            my ( $self, $c ) = @_;
+
+            $c->detach("unauthorized") unless $c->check_user_roles("edit");
+
+            # do something restricted here
+        }
+
+    This is somewhat simpler and will work if you change your store, too,
+    since the role interface is consistent.
+
+    Let's say your app grows, and you now have 10,000 users. It's no longer
+    efficient to maintain a hash of users, so you move this data to a
+    database. You can accomplish this simply by installing the DBIx::Class
+    Store and changing your config:
+
+        __PACKAGE__->config( 'Plugin::Authentication' =>
+                        {
+                            default_realm => 'members',
+                            members => {
+                                credential => {
+                                    class => 'Password',
+                                    password_field => 'password',
+                                    password_type => 'clear'
+                                },
+                                store => {
+                                    class => 'DBIx::Class',
+                                    user_model => 'MyApp::Users',
+                                    role_column => 'roles',
+                                }
+                            }
+                        }
+        );
+
+    The authentication system works behind the scenes to load your data from
+    the new source. The rest of your application is completely unchanged.
+
+CONFIGURATION
+        # example
+        __PACKAGE__->config( 'Plugin::Authentication' =>
+                    {
+                        default_realm => 'members',
+
+                        members => {
+                            credential => {
+                                class => 'Password',
+                                password_field => 'password',
+                                password_type => 'clear'
+                            },
+                            store => {
+                                class => 'DBIx::Class',
+                                user_model => 'MyApp::Users',
+                                role_column => 'roles',
+                            }
+                        },
+                        admins => {
+                            credential => {
+                                class => 'Password',
+                                password_field => 'password',
+                                password_type => 'clear'
+                            },
+                            store => {
+                                class => '+MyApp::Authentication::Store::NetAuth',
+                                authserver => '192.168.10.17'
+                            }
+                        }
+                    }
+        );
+
+    NOTE: Until version 0.10008 of this module, you would need to put all
+    the realms inside a "realms" key in the configuration. Please see
+    "COMPATIBILITY CONFIGURATION" for more information
+
+    use_session
+        Whether or not to store the user's logged in state in the session,
+        if the application is also using Catalyst::Plugin::Session. This
+        value is set to true per default.
+
+        However, even if use_session is disabled, if any code touches
+        $c->session, a session object will be auto-vivified and session
+        Cookies will be sent in the headers. To prevent accidental session
+        creation, check if a session already exists with if ($c->sessionid)
+        { ... }. If the session doesn't exist, then don't place anything in
+        the session to prevent an unecessary session from being created.
+
+    default_realm
+        This defines which realm should be used as when no realm is provided
+        to methods that require a realm such as authenticate or find_user.
+
+    realm refs
+        The Plugin::Authentication config hash contains the series of realm
+        configurations you want to use for your app. The only rule here is
+        that there must be at least one. A realm consists of a name, which
+        is used to reference the realm, a credential and a store. You may
+        also put your realm configurations within a subelement called
+        'realms' if you desire to separate them from the remainder of your
+        configuration. Note that if you use a 'realms' subelement, you must
+        put ALL of your realms within it.
+
+        You can also specify a realm class to instantiate instead of the
+        default Catalyst::Authentication::Realm class using the 'class'
+        element within the realm config.
+
+        Each realm config contains two hashes, one called 'credential' and
+        one called 'store', each of which provide configuration details to
+        the respective modules. The contents of these hashes is specific to
+        the module being used, with the exception of the 'class' element,
+        which tells the core Authentication module the classname to
+        instantiate.
+
+        The 'class' element follows the standard Catalyst mechanism of class
+        specification. If a class is prefixed with a +, it is assumed to be
+        a complete class name. Otherwise it is considered to be a portion of
+        the class name. For credentials, the classname 'Password', for
+        example, is expanded to
+        Catalyst::Authentication::Credential::Password. For stores, the
+        classname 'storename' is expanded to:
+        Catalyst::Authentication::Store::storename.
+
+METHODS
+  $c->authenticate( $userinfo [, $realm ])
+    Attempts to authenticate the user using the information in the $userinfo
+    hash reference using the realm $realm. $realm may be omitted, in which
+    case the default realm is checked.
+
+  $c->user( )
+    Returns the currently logged in user, or undef if there is none.
+    Normally the user is re-retrieved from the store. For
+    Catalyst::Authentication::Store::DBIx::Class the user is re-restored
+    using the primary key of the user table. Thus user can throw an error
+    even though user_exists returned true.
+
+  $c->user_exists( )
+    Returns true if a user is logged in right now. The difference between
+    user_exists and user is that user_exists will return true if a user is
+    logged in, even if it has not been yet retrieved from the storage
+    backend. If you only need to know if the user is logged in, depending on
+    the storage mechanism this can be much more efficient. user_exists only
+    looks into the session while user is trying to restore the user.
+
+  $c->user_in_realm( $realm )
+    Works like user_exists, except that it only returns true if a user is
+    both logged in right now and was retrieved from the realm provided.
+
+  $c->logout( )
+    Logs the user out. Deletes the currently logged in user from "$c->user"
+    and the session. It does not delete the session.
+
+  $c->find_user( $userinfo, $realm )
+    Fetch a particular users details, matching the provided user info, from
+    the realm specified in $realm.
+
+        $user = $c->find_user({ id => $id });
+        $c->set_authenticated($user); # logs the user in and calls persist_user
+
+  persist_user()
+    Under normal circumstances the user data is only saved to the session
+    during initial authentication. This call causes the auth system to save
+    the currently authenticated user's data across requests. Useful if you
+    have changed the user data and want to ensure that future requests
+    reflect the most current data. Assumes that at the time of this call,
+    $c->user contains the most current data.
+
+  find_realm_for_persisted_user()
+    Private method, do not call from user code!
+
+INTERNAL METHODS
+    These methods are for Catalyst::Plugin::Authentication INTERNAL USE
+    only. Please do not use them in your own code, whether application or
+    credential / store modules. If you do, you will very likely get the
+    nasty shock of having to fix / rewrite your code when things change.
+    They are documented here only for reference.
+
+  $c->set_authenticated( $user, $realmname )
+    Marks a user as authenticated. This is called from within the
+    authenticate routine when a credential returns a user. $realmname
+    defaults to 'default'. You can use find_user to get $user
+
+  $c->auth_restore_user( $user, $realmname )
+    Used to restore a user from the session. In most cases this is called
+    without arguments to restore the user via the session. Can be called
+    with arguments when restoring a user from some other method. Currently
+    not used in this way.
+
+  $c->auth_realms( )
+    Returns a hashref containing realmname -> realm instance pairs. Realm
+    instances contain an instantiated store and credential object as the
+    'store' and 'credential' elements, respectively
+
+  $c->get_auth_realm( $realmname )
+    Retrieves the realm instance for the realmname provided.
+
+  $c->update_user_in_session
+    This was a short-lived method to update user information - you should
+    use persist_user instead.
+
+  $c->setup_auth_realm( )
+OVERRIDDEN METHODS
+  $c->setup( )
+SEE ALSO
+    This list might not be up to date. Below are modules known to work with
+    the updated API of 0.10 and are therefore compatible with realms.
+
+  Realms
+    Catalyst::Authentication::Realm
+
+  User Storage Backends
+    Catalyst::Authentication::Store::Minimal
+    Catalyst::Authentication::Store::DBIx::Class
+    Catalyst::Authentication::Store::LDAP
+    Catalyst::Authentication::Store::RDBO
+    Catalyst::Authentication::Store::Model::KiokuDB
+    Catalyst::Authentication::Store::Jifty::DBI
+    Catalyst::Authentication::Store::Htpasswd
+
+  Credential verification
+    Catalyst::Authentication::Credential::Password
+    Catalyst::Authentication::Credential::HTTP
+    Catalyst::Authentication::Credential::OpenID
+    Catalyst::Authentication::Credential::Authen::Simple
+    Catalyst::Authentication::Credential::Flickr
+    Catalyst::Authentication::Credential::Testing
+    Catalyst::Authentication::Credential::AuthTkt
+    Catalyst::Authentication::Credential::Kerberos
+
+  Authorization
+    Catalyst::Plugin::Authorization::ACL,
+    Catalyst::Plugin::Authorization::Roles
+
+  Internals Documentation
+    Catalyst::Plugin::Authentication::Internals
+
+  Misc
+    Catalyst::Plugin::Session, Catalyst::Plugin::Session::PerUser
+
+DON'T SEE ALSO
+    This module along with its sub plugins deprecate a great number of other
+    modules. These include Catalyst::Plugin::Authentication::Simple,
+    Catalyst::Plugin::Authentication::CDBI.
+
+INCOMPATABILITIES
+    The realms-based configuration and functionality of the 0.10 update of
+    Catalyst::Plugin::Authentication required a change in the API used by
+    credentials and stores. It has a compatibility mode which allows use of
+    modules that have not yet been updated. This, however, completely mimics
+    the older api and disables the new realm-based features. In other words
+    you cannot mix the older credential and store modules with realms, or
+    realm-based configs. The changes required to update modules are
+    relatively minor and are covered in
+    Catalyst::Plugin::Authentication::Internals. We hope that most modules
+    will move to the compatible list above very quickly.
+
+COMPATIBILITY CONFIGURATION
+    Until version 0.10008 of this module, you needed to put all the realms
+    inside a "realms" key in the configuration.
+
+        # example
+        __PACKAGE__->config( 'Plugin::Authentication' =>
+                    {
+                        default_realm => 'members',
+                        realms => {
+                            members => {
+                                ...
+                            },
+                        },
+                    }
+        );
+
+    If you use the old, deprecated "__PACKAGE__->config( 'authentication' )"
+    configuration key, then the realms key is still required.
+
+COMPATIBILITY ROUTINES
+    In version 0.10 of Catalyst::Plugin::Authentication, the API changed.
+    For app developers, this change is fairly minor, but for Credential and
+    Store authors, the changes are significant.
+
+    Please see the documentation in version 0.09 of
+    Catalyst::Plugin::Authentication for a better understanding of how the
+    old API functioned.
+
+    The items below are still present in the plugin, though using them is
+    deprecated. They remain only as a transition tool, for those sites which
+    can not yet be upgraded to use the new system due to local
+    customizations or use of Credential / Store modules that have not yet
+    been updated to work with the new API.
+
+    These routines should not be used in any application using realms
+    functionality or any of the methods described above. These are for
+    reference purposes only.
+
+  $c->login( )
+    This method is used to initiate authentication and user retrieval.
+    Technically this is part of the old Password credential module and it
+    still resides in the Password class. It is included here for reference
+    only.
+
+  $c->default_auth_store( )
+    Return the store whose name is 'default'.
+
+    This is set to "$c->config( 'Plugin::Authentication' => { store => #
+    Store} )" if that value exists, or by using a Store plugin:
+
+        # load the Minimal authentication store.
+        use Catalyst qw/Authentication Authentication::Store::Minimal/;
+
+    Sets the default store to
+    Catalyst::Plugin::Authentication::Store::Minimal.
+
+  $c->get_auth_store( $name )
+    Return the store whose name is $name.
+
+  $c->get_auth_store_name( $store )
+    Return the name of the store $store.
+
+  $c->auth_stores( )
+    A hash keyed by name, with the stores registered in the app.
+
+  $c->register_auth_stores( %stores_by_name )
+    Register stores into the application.
+
+  $c->auth_store_names( )
+  $c->get_user( )
+SUPPORT
+    Please use the rt.cpan.org bug tracker, and git patches are wecome.
+
+    Questions on usage should be directed to the Catalyst mailing list or
+    the #catalyst irc channel.
+
+AUTHORS
+    Yuval Kogman, "nothingmuch@woobling.org" - original author
+
+    Jay Kuri, "jayk@cpan.org" - Large rewrite
+
+PRIMARY MAINTAINER
+    Tomas Doran (t0m), "bobtfish@bobtfish.net"
+
+ADDITIONAL CONTRIBUTORS
+    Jess Robinson
+    David Kamholz
+    kmx
+    Nigel Metheringham
+    Florian Ragwitz "rafl@debian.org"
+    Stephan Jauernick "stephanj@cpan.org"
+    Oskari Ojala (Okko), "perl@okko.net"
+    John Napiorkowski (jnap) "jjnapiork@cpan.org"
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2005 - 2012 the Catalyst::Plugin::Authentication
+    "AUTHORS", "PRIMARY MAINTAINER" and "ADDITIONAL CONTRIBUTORS" as listed
+    above.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

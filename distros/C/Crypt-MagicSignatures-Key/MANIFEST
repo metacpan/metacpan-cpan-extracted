@@ -1,0 +1,23 @@
+lib/Crypt/MagicSignatures/Key.pm
+t/01-basic.t
+t/02-bendiken-rsa.t
+t/03-crypt-rsa.t
+t/04-magicsig-hjfreyer.t
+t/05-sivy-salmon.t
+t/06-minime.t
+t/07-sporkmonger-magicsig.t
+t/08-proudhon.t
+t/09-rsavs.t
+t/10-sign-verify.t
+t/11-node-ostatus.t
+t/12-key-gen.t
+t/14-object.t
+t/15-to_string.t
+t/16-ostatus2-gem.t
+Readme.pod
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

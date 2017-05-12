@@ -1,0 +1,9 @@
+name: MergeConfig
+
+CatalystX::InjectModule:
+  debug: 0
+  path:
+    - t/share/modules
+  inject:
+    - MergeConfig
+  persistent_dir: t/var/

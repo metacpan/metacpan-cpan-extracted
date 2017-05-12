@@ -1,0 +1,43 @@
+Installation instructions for FormMagick 0.3.1
+
+PRE-REQUISITES
+
+You need a metric buttload of modules for this to work.  Here's the
+basic list:
+
+	CGI::Persistent
+	Persistence::Object::Simple
+	XML::Parser
+	Text::Template
+	Locale::Maketext
+
+The following are required by certain validation routines.  If you don't
+use the validation routine (given in parentheses) you won't need the
+module.
+
+	Time::ParseDate			(date)
+	Geography::States		(US_state)
+	Net::IPv4ADDR			(ip_address)
+	Locale::Country			(iso_country_code)
+
+You'll also need a web server configured to run CGIs.
+
+INSTALLATION
+
+Install as for any CPAN module (hopefully).  Let me know if this doesn't
+work or you have any trouble... this is the first theoretically
+CPAN-ready version of this module, and we're not sure if it's quite
+right.
+
+COMMON PROBLEMS
+
+Q. My perl modules are installed in /usr/local, and testfm.pl isn't seeing them. 
+
+A. Look in /etc/rc.d/init.d (on Redhat machines) or /etc/init.d (on Debian machines)
+for the script that starts apache. Make sure that the PATH is set there
+so that it looks for perl in /usr/local/bin before it looks in /usr/bin.
+
+
+VERSION INFO
+
+Document version: $Id: INSTALL,v 1.11 2001/03/06 22:14:17 skud Exp $

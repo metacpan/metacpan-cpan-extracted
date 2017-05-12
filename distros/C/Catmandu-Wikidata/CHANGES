@@ -1,0 +1,25 @@
+Changelog for Catmandu-Wikidata
+
+0.06 2014-06-25T12:44:02
+ - improved wd_simple fix [Jakob Voss]
+
+0.05 2014-04-23T19:32:25
+ - fix #4 by ugrading dependency [Jakob Voss]
+ - build status image as svg [Jakob Voss]
+ - documentation [Jakob Voss]
+
+0.04 2014-04-23T08:13:49
+ - extended and renamed fixes [Jakob Voss]
+
+0.03 2014-04-22T18:34:37
+ - version number [Jakob Voss]
+ - extended based on getJSON [Jakob Voss]
+
+0.02 2013-12-09T09:26:08
+ - added wdata_simplify_claims fix [Jakob Voss]
+ - renamed wdata_limit_language to wdata_retain_language [Jakob Voss]
+ - documentation [Jakob Voss]
+
+0.01 2013-12-04T10:09:46
+ - initial draft [Jakob Voss]
+

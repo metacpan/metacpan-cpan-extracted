@@ -1,0 +1,32 @@
+Class-DBI-MockDBD
+=================
+
+This package provides a Class::DBI subclass allowing you to 'Mock' a database
+for testing and/or debugging purposes, using DBD::Mock, via some additional
+API methods.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::DBI
+  DBD::Mock
+  Class::Data::Inheritable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by aaron trevena
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

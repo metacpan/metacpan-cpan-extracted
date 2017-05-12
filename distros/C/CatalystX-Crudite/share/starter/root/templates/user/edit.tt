@@ -1,0 +1,5 @@
+[% crud_page_header(header_create_or_edit('user')) %]
+
+<p><a href="[% uri('User', 'list') %]" class="btn btn-danger">Cancel</a></p>
+
+[% form.render %]

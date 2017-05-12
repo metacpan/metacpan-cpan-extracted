@@ -1,0 +1,500 @@
+# PODNAME: Crypt::NaCl::Sodium::auth
+# ABSTRACT: Secret-key message authentication (HMAC-SHA256, HMAC-SHA512, HMAC-SHA512/256 )
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::auth - Secret-key message authentication (HMAC-SHA256, HMAC-SHA512, HMAC-SHA512/256 )
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_auth = Crypt::NaCl::Sodium->auth();
+
+    my ($key, $mac, $msg);
+
+    ## Alice
+    ########
+
+    # Alice generates secret key
+    $key = $crypto_auth->keygen();
+
+    # ... and shares it with Bob
+    send_to( Bob => { key => $key } );
+
+    # now Alice and Bob can start communicating
+
+    # Alice's message to Bob
+    $msg = "Hi Bob!";
+
+    # MAC guarantees message integrity and authenticity
+    $mac = $crypto_auth->mac( $msg, $key );
+
+    # we can now send unencrypted message to Bob
+    send_to( Bob => { msg => $msg } );
+
+    # and MAC confirming that Alice has wrote it
+    send_to( Bob => { mac => $mac } );
+
+    ## Bob
+    ########
+
+    # Bob receives the secret key from Alice
+    $key = receive_for( Bob => 'key' );
+
+    # Bob is now ready to receive first message from Alice
+    $msg = receive_for( Bob => 'msg' );
+
+    # and the MAC
+    $mac = receive_for( Bob => 'mac' );
+
+    # Bob can now confirm that Alice has sent the message
+    unless ( $crypto_auth->verify( $mac, $msg, $key ) ) {
+        die "Impostor alert!";
+    }
+
+    # now we know that Alice is talking to us - time to reply
+    $msg = "Hello Alice!";
+
+    $mac = $crypto_auth->mac( $msg, $key );
+
+    # Alice will get our reply and the MAC
+    send_to( Alice => { msg => $msg } );
+    send_to( Alice => { mac => $mac } );
+
+    ## Alice
+    ########
+
+    # receiving the reply
+    $msg = receive_for( Alice => 'msg' );
+    $mac = receive_for( Alice => 'mac' );
+
+    # and Alice can now confirm that it is from Bob
+    unless ( $crypto_auth->verify( $mac, $msg, $key ) ) {
+        die "Impostor alert!";
+    }
+
+    # NOTE: send_to() and receive_for() and user functions providing transport of
+    # messages
+
+=head1 DESCRIPTION
+
+Secret-key authentication allows to compute the authentication tag (also known
+as Message Authentication Code) that verifies the integrity and authenticity of
+the message to those who share the secret key.
+
+For the same message the same key will always product the same output.
+
+Unencrypted messages and their MACs can be made public, while the key should
+remain secret.
+
+=head1 METHODS
+
+=head2 keygen
+
+    my $key = $crypto_auth->keygen();
+
+Helper method to generate a random key to be used by C<$crypto_auth>.
+
+The length of the C<$key> equals L</KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 mac
+
+    my $mac = $crypto_auth->mac( $msg, $key );
+
+Computes the MAC of the C<$msg> using given C<$key>.
+
+The length of the C<$mac> equals L</BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 verify
+
+    unless ( $crypto_auth->verify( $mac, $msg, $key ) ) {
+        die "Impostor alert!";
+    }
+
+Verifies the integrity and authenticity of the C<$msg> using given C<$mac> and C<$key>.
+
+Method returns true if message has been verified, false otherwise.
+
+=head1 ADVANCED USAGE
+
+Single pass and streaming API keyed message authentication using I<HMAC-SHA-256>,
+I<HMAC-SHA-512> and I<HMAC-SHA-512/256> are described below.
+
+=head2 HMAC-SHA-256
+
+=head3 hmacsha256_keygen
+
+    my $key256 = $crypto_auth->hmacsha256_keygen();
+
+Helper method to generate a random key to be used by C<$crypto_auth>.
+
+The length of the C<$key256> equals L</HMACSHA256_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha256
+
+    my $mac256 = $crypto_auth->hmacsha256( $msg, $key256 );
+
+Computes the MAC of the C<$msg> using given C<$key256>.
+
+The length of the C<$mac256> equals L</HMACSHA256_BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha256_verify
+
+    unless ( $crypto_auth->hmacsha256_verify( $mac256, $msg, $key256 ) ) {
+        die "Impostor alert!";
+    }
+
+Verifies the integrity and authenticity of the C<$msg> using given C<$mac256> and
+C<$key256>.
+
+Method returns true if message has been verified, false otherwise.
+
+B<NOTE:> this function supports a key of arbitrary length, allowing it to be
+used with the multi-part API.
+
+=head3 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx256 = $crypto_auth->hmacsha256_init( $key );
+
+    $ctx256->update( $msgX );
+    $ctx256->update( $msgY )->update( $msgZ, ... );
+
+    my $mac256 = $ctx256->final();
+
+    my $msgXYZ = join('', $msgX, $msgY, $msgZ, ...);
+    unless ( $crypto_auth->hmacsha256_verify( $mac256, $msgXYZ, $key) ) {
+        die "Impostor alert!";
+    }
+
+=head4 hmacsha256_init
+
+    my $ctx256 = $crypto_auth->hmacsha256_init( $key );
+
+Creates a context for multi-part computation using given C<$key>.
+
+B<NOTE:> this function supports a key of arbitrary length. Key larger then the
+block size gets reduced to C<sha256($key)>.
+
+Returns C<Crypt::NaCl::Sodium::auth::hmacsha256stream> object which encapsulates
+the computation state of the I<HMAC-SHA-256> algorithm.
+
+=head4 clone
+
+    while ( <> ) {
+        $ctx256->update( $_ );
+        print "Line: $.: ", $ctx256->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx256> object, that contains the current computation
+state.
+
+=head4 update
+
+    $ctx256->update( $msgX, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx256> object itself.
+
+=head4 final
+
+    my $mac256 = $ctx256->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 HMAC-SHA-512
+
+=head3 hmacsha512_keygen
+
+    my $key512 = $crypto_auth->hmacsha512_keygen();
+
+Helper method to generate a random key to be used by C<$crypto_auth>.
+
+The length of the C<$key512> equals L</HMACSHA512_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha512
+
+    my $mac512 = $crypto_auth->hmacsha512( $msg, $key512 );
+
+Computes the MAC of the C<$msg> using given C<$key512>.
+
+The length of the C<$mac512> equals L</HMACSHA512_BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha512_verify
+
+    unless ( $crypto_auth->hmacsha512_verify( $mac512, $msg, $key512 ) ) {
+        die "Impostor alert!";
+    }
+
+Verifies the integrity and authenticity of the C<$msg> using given C<$mac512> and
+C<$key512>.
+
+Method returns true if message has been verified, false otherwise.
+
+B<NOTE:> this function supports a key of arbitrary length, allowing it to be
+used with the multi-part API.
+
+=head3 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx512 = $crypto_auth->hmacsha512_init( $key );
+
+    $ctx512->update( $msgX );
+    $ctx512->update( $msgY )->update( $msgZ, ... );
+
+    my $mac512 = $ctx512->final();
+
+    my $msgXYZ = join('', $msgX, $msgY, $msgZ, ...);
+    unless ( $crypto_auth->hmacsha512_verify( $mac512, $msgXYZ, $key) ) {
+        die "Impostor alert!";
+    }
+
+=head4 hmacsha512_init
+
+    my $ctx512 = $crypto_auth->hmacsha512_init( $key );
+
+Creates a context for multi-part computation using given C<$key>.
+
+B<NOTE:> this function supports a key of arbitrary length. Key larger then the
+block size gets reduced to C<sha512($key)>.
+
+Returns C<Crypt::NaCl::Sodium::auth::hmacsha512stream> object which encapsulates
+the computation state of the I<HMAC-SHA-512> algorithm.
+
+=head4 clone
+
+    while ( <> ) {
+        $ctx512->update( $_ );
+        print "Line: $.: ", $ctx512->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx512> object, that contains the current computation
+state.
+
+=head4 update
+
+    $ctx512->update( $msgX, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx512> object itself.
+
+=head4 final
+
+    my $mac512 = $ctx512->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 HMAC-SHA-512/256
+
+=head3 hmacsha512256_keygen
+
+    my $key512256 = $crypto_auth->hmacsha512256_keygen();
+
+Helper method to generate a random key to be used by C<$crypto_auth>.
+
+The length of the C<$key512256> equals L</HMACSHA512256_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha512256
+
+    my $mac512256 = $crypto_auth->hmacsha512256( $msg, $key512256 );
+
+Computes the MAC of the C<$msg> using given C<$key512256>.
+
+The length of the C<$mac512256> equals L</HMACSHA512256_BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 hmacsha512256_verify
+
+    unless ( $crypto_auth->hmacsha512256_verify( $mac512256, $msg, $key512256 ) ) {
+        die "Impostor alert!";
+    }
+
+Verifies the integrity and authenticity of the C<$msg> using given C<$mac512256> and
+C<$key512256>.
+
+Method returns true if message has been verified, false otherwise.
+
+B<NOTE:> this function supports a key of arbitrary length, allowing it to be
+used with the multi-part API.
+
+=head3 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx512256 = $crypto_auth->hmacsha512256_init( $key );
+
+    $ctx512256->update( $msgX );
+    $ctx512256->update( $msgY )->update( $msgZ, ... );
+
+    my $mac512256 = $ctx512256->final();
+
+    my $msgXYZ = join('', $msgX, $msgY, $msgZ, ...);
+    unless ( $crypto_auth->hmacsha512256_verify( $mac512256, $msgXYZ, $key) ) {
+        die "Impostor alert!";
+    }
+
+=head4 hmacsha512256_init
+
+    my $ctx512256 = $crypto_auth->hmacsha512256_init( $key );
+
+Creates a context for multi-part computation using given C<$key>.
+
+B<NOTE:> this function supports a key of arbitrary length. Key larger then the
+block size gets reduced to C<sha512($key)>.
+
+Returns C<Crypt::NaCl::Sodium::auth::hmacsha512256stream> object which encapsulates
+the computation state of the I<HMAC-SHA-512/256> algorithm.
+
+=head4 clone
+
+    while ( <> ) {
+        $ctx512256->update( $_ );
+        print "Line: $.: ", $ctx512256->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx512256> object, that contains the current computation
+state.
+
+=head4 update
+
+    $ctx512256->update( $msgX, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx512256> object itself.
+
+=head4 final
+
+    my $mac512256 = $ctx512256->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_auth->KEYBYTES;
+
+Returns the length of key.
+
+=head2 HMACSHA256_KEYBYTES
+
+    my $key256_length = $crypto_auth->HMACSHA256_KEYBYTES;
+
+Returns the length of key for I<HMAC-SHA-256> algorithm.
+
+=head2 HMACSHA512_KEYBYTES
+
+    my $key512_length = $crypto_auth->HMACSHA512_KEYBYTES;
+
+Returns the length of key for I<HMAC-SHA-512> algorithm.
+
+=head2 HMACSHA512256_KEYBYTES
+
+    my $key512256_length = $crypto_auth->HMACSHA512256_KEYBYTES;
+
+Returns the length of key for I<HMAC-SHA-512/256> algorithm.
+
+=head2 BYTES
+
+    my $mac_length = $crypto_auth->BYTES;
+
+Returns the length of MAC.
+
+=head2 HMACSHA256_BYTES
+
+    my $mac256_length = $crypto_auth->HMACSHA256_BYTES;
+
+Returns the length of MAC for I<HMAC-SHA-256> algorithm.
+
+=head2 HMACSHA512_BYTES
+
+    my $mac512_length = $crypto_auth->HMACSHA512_BYTES;
+
+Returns the length of MAC for I<HMAC-SHA-512> algorithm.
+
+=head2 HMACSHA512256_BYTES
+
+    my $mac512256_length = $crypto_auth->HMACSHA512256_BYTES;
+
+Returns the length of MAC for I<HMAC-SHA-512/256> algorithm.
+
+=head1 SECURITY MODEL
+
+C<crypto_auth> does not make any promises regarding I<strong> unforgeability;
+perhaps one valid authenticator can be converted into another valid authenticator
+for the same message. C<crypto_auth> also does not make any promises regarding
+I<truncated unforgeability>.
+
+Default value for L</HMACSHA512_KEYBYTES> is C<32>, while RFC4868 recommends using
+C<64> bytes when used as authentication/integrity mechanism. The C<*_init()>
+functions however support keys of any length.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Secret-key message authentication: crypto_auth|http://nacl.cr.yp.to/auth.html>
+
+=item * L<Using HMAC-SHA-256, HMAC-SHA-384, and HMAC-SHA-512 with IPsec|https://tools.ietf.org/html/rfc4868>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

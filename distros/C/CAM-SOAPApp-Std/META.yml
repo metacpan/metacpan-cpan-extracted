@@ -1,0 +1,16 @@
+---
+name: CAM-SOAPApp-Std
+version: 1.03
+author:
+  - Clotho Advanced Media, I<cpan@clotho.com>
+abstract: Clotho standard SOAP tools
+license: perl
+requires:
+  CAM::SOAPApp: 1.00
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::SOAPApp::Std:
+    file: lib/CAM/SOAPApp/Std.pm
+    version: 1.03
+generated_by: Module::Build version 0.2609

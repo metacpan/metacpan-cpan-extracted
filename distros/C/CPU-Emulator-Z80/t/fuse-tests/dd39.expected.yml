@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd39
+registers:
+  AF: 34665
+  AF_: 0
+  BC: 41780
+  BC_: 0
+  DE: 55197
+  DE_: 0
+  HL: 23012
+  HL_: 0
+  I: 0
+  IX: 43876
+  IY: 19592
+  PC: 2
+  R: 2
+  SP: 64074

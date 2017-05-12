@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb8e
+registers:
+  AF: 7936
+  AF_: 0
+  BC: 5131
+  BC_: 0
+  DE: 46226
+  DE_: 0
+  HL: 25511
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

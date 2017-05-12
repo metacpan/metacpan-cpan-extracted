@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+app.psgi
+dist.ini
+lib/Catalyst/Authentication/Credential/Upstream/Headers.pm
+t/00-compile.t
+t/basic.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/release-eol.t
+t/release-pod-syntax.t

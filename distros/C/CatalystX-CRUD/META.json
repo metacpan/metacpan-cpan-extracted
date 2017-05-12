@@ -1,0 +1,57 @@
+{
+   "abstract" : "CRUD framework for Catalyst applications",
+   "author" : [
+      "Peter Karman <perl@peknet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-CRUD",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Component::ACCEPT_CONTEXT" : "0.06",
+            "Catalyst::Exception" : "0",
+            "Catalyst::Runtime" : "5.80024",
+            "Data::Dump" : "0",
+            "Data::Pageset" : "0",
+            "MRO::Compat" : "0.1",
+            "Moose" : "0",
+            "MooseX::Emulate::Class::Accessor::Fast" : "0",
+            "Path::Class::File" : "0",
+            "Search::QueryParser::SQL" : "0.01",
+            "Sort::SQL" : "0.07",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/karpet/catalystx-crud"
+      }
+   },
+   "version" : "0.57"
+}

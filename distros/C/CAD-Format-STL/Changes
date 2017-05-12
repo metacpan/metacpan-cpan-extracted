@@ -1,0 +1,14 @@
+Revision history for CAD-Format-STL
+
+v0.2.1 2010-04-04
+
+  * fix part->new facets bug [RT 56138]
+
+v0.0.1 2008-10-17
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/CAD-Format-STL/trunk
+
+vim:ts=2:sw=2:et:sta

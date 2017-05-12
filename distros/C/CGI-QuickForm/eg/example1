@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+
+# $Id: quickemailform,v 1.9 2000/04/23 14:04:36 root Exp root $
+
+# Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+# WARNING - this program is provided as an example of QuickForm use and not as
+# an example of production quality CGI code - it may not be secure. 
+
+use strict ;
+
+use CGI qw( :standard :html3 ) ;
+use CGI::QuickForm ;
+
+my @lang = qw( cy de en es fr he ) ;
+my $lang = $lang[int rand @lang] ; # A different language every invocation!
+
+my $header;
+if ( $lang ne 'he' ) {
+    $header = header() . start_html( -title => 'Email Example' ); 
+}
+else {
+    $header = header( -charset => 'windows-1255' ) . 
+	      start_html( -lang => 'hebrew', -title => 'Email Example' ) .  
+	      qq{<div dir="RTL">}; 
+}
+
+show_form(
+    -HEADER	   => $header . h3( 'Email Example' ),
+    -LANGUAGE      => $lang, 
+    -TITLE         => 'Test Form',
+    -REQUIRED_HTML => 
+        '<span style="font-family:helvetica;font-size:24pt;color:GREEN">?</span>',
+    -INVALID_HTML  => 
+        '<span style="font-family:helvetica;font-size:24pt;color:RED">!</span>',
+    -ACCEPT        => \&on_valid_form, 
+    -TABLE_OPTIONS => 'bgcolor="#EEEEEE"',
+    -SPACE         => 1,
+    -FIELDS        => [
+        {
+            -LABEL    => 'Forename',
+        },
+        {
+            -LABEL    => 'Surname',
+            -REQUIRED => 1,
+        },
+        {
+            -LABEL    => 'Age',
+            -VALIDATE => &mk_valid_number( 3, 130 ), 
+        },
+    ],
+) ;
+
+
+sub on_valid_form {
+
+    my $forename = param( 'Forename' ) ;
+    my $surname  = param( 'Surname' ) ;
+    my $age      = param( 'Age' ) ;
+
+=pod Commented out
+    eval {
+        open MAIL, "|/usr/lib/sendmail -t" or 
+        die "Failed to pipe to sendmail: $!\n" ;
+        print MAIL <<__EOT__ ;
+From: test\@localhost
+To: root\@localhost
+Subject: Quick Email Form Test
+
+Forename: $forename
+Surname:  $surname
+Age:      $age
+__EOT__
+    } ;
+=cut
+    if( $@ ) {
+        print
+            header,
+            start_html( 'Test Form Data Error' ),
+            p( 'Unfortunately an error occurred' ),
+            p( $@ ),
+            ;
+    }
+    else {
+        print
+            header,
+            start_html( 'Test Form Data Accepted' ),
+            h3( 'Test Form Data Accepted' ),
+            p( "Thank you $forename for your data." ),
+            ;
+    }
+    print
+        qq{<a href="/perl/quickform.html#examples">QuickForm examples</a>},
+        end_html ;
+}
+
+sub mk_valid_number {
+    my( $min, $max ) = @_ ;
+
+    sub { not $_[0] or ( $min <= $_[0] and $_[0] <= $max ) } ;
+}
+
+

@@ -1,0 +1,26 @@
+Revision history for Perl module Catalyst::Authentication::Credential::Authen::Simple
+
+0.09      2012-10-26 00:51:55 Europe/Madrid
+    - "Changes" file fixed
+    - Version not hardcoded in modules
+0.08      2012-10-25 19:39:02 Europe/Madrid
+    - Fix for #67929: Invalid META.yml
+    - Released using Dist::Zilla
+0.07 Mon Nov 16 19:07:00 2009
+    - Tests where failing because parent wasn't in Makefile.PL
+0.06 Wed Nov 04 13:39:00 2009
+    - Modify test suite to not use actions in application classes
+      (Patch by Inigo Tejedor Arrondo) (RT #50672)
+    - Added Copyright information for Debian compliance (RT #50708)
+0.05 Fri Apr 24 19:42:00 2009
+    - use Catalyst::Utils::ensure_class_loaded instead of Module::Load (RT #44778)
+0.04 Thu Apr 23 20:12:00 2009
+    - If Catalyst logger is compatible with Authen::Simple classes, then use the
+      Catalyst logger to do the logging. Tests and docs updated to reflect that.
+      (RT #44778)
+0.03 Wed Apr 01 21:02:00 2009
+    - updated a couple of $c->log->debug(..) to $c->log->debug(..) if $c->debug;
+0.02 Sun Aug 02 17:20:00 2008
+    - use strict and use warnings
+0.01 Sat Jun 28 13:31:03 2008
+    - original version; created by ExtUtils::ModuleMaker 0.51

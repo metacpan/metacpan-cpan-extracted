@@ -1,0 +1,1 @@
+.plus{width:calc(100px + 10%)}.minus{width:calc(100% - 30px)}.times{width:calc(60px * 2)}.divide{width:calc(100% / 2)}

@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7 -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/05.html">Postings from May 2008</a>
+
+<h2>PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</h2>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/05/msg1495127.html">Thread Previous</a>
+
+
+ | 
+
+
+<a href="/group/perl.cpan.testers/2008/05/msg1463345.html">Thread Next</a>
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>andreas.koenig.gmwojprw</b><br/>
+<div class="h_name">Date:</div> May  8, 2008 17:38<br/>
+<div class="h_name">Subject:</div> PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.8.8 patch 33243, created by CPAN-Reporter-1.1404. 
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/maint-5.8/pBxK9vV/perl-5.8.8@33243/bin/perl &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious......ok
+t/02-script............ok
+t/03-yaml..............ok
+t/04-fork..............ok
+t/05-prompt............ok
+t/06-anydump...........ok
+t/07-tsay..............ok
+t/08-unit..............ok
+t/09-noyaml............ok
+All tests successful.
+Files=9, Tests=60,  4 wallclock secs ( 0.07 usr  0.02 sys +  2.98 cusr  0.42 csys =  3.49 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.80
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LANG = de_DE.UTF-8
+    PATH = /usr/lib/ccache:/home/sand/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/usr/local/perl/bin:/usr/X11/bin:/sbin:/usr/sbin
+    PERL5LIB = 
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 18189
+    PERL5_CPAN_IS_RUNNING = 18189
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /usr/bin/zsh
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/src/perl/repoperls/installed-perls/maint-5.8/pBxK9vV/perl-5.8.8@33243/bin/perl
+    $UID/$EUID = 1005 / 1005
+    $GID = 1005 1005
+    $EGID = 1005 1005
+
+Perl module toolchain versions installed:
+
+    Module              Have   
+    ------------------- -------
+    CPAN                1.92_61
+    Cwd                 3.27   
+    ExtUtils::CBuilder  0.23   
+    ExtUtils::Command   1.14   
+    ExtUtils::Install   1.50   
+    ExtUtils::MakeMaker 6.44   
+    ExtUtils::Manifest  1.51_01
+    ExtUtils::ParseXS   2.18   
+    File::Spec          3.27   
+    Module::Build       0.2808 
+    Module::Signature   0.55   
+    Test::Harness       3.09   
+    Test::More          0.80   
+    YAML                0.66   
+    YAML::Syck          1.04   
+    version             0.74   
+
+
+--
+
+Summary of my perl5 (revision 5 version 8 subversion 8 patch 33243) configuration:
+  Platform:
+    osname=linux, osvers=2.6.22-1-k7, archname=i686-linux-64int
+    uname='linux k75 2.6.22-1-k7 #1 smp sun jul 29 15:15:55 utc 2007 i686 gnulinux '
+    config_args='-Dprefix=/home/src/perl/repoperls/installed-perls/maint-5.8/pBxK9vV/perl-5.8.8@33243 -Dinstallusrbinperl=n -Uversiononly -Dusedevel -des -Ui_db -Duse64bitint'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=undef use5005threads=undef useithreads=undef usemultiplicity=undef
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=define use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='4.1.2 20061115 (prerelease) (Debian 4.1.1-21)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib /usr/lib64
+    libs=-lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=/lib/libc-2.7.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.7'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -O2 -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/05/msg1495127.html">Thread Previous</a>
+
+
+ | 
+
+
+<a href="/group/perl.cpan.testers/2008/05/msg1463345.html">Thread Next</a>
+
+
+
+<ul>
+
+
+  
+  <ul>
+  
+  
+    <li><!-- #1495127 --><a href="/group/perl.cpan.testers/2008/05/msg1495127.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><b>
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</b>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1463345 --><a href="/group/perl.cpan.testers/2008/05/msg1463345.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1478381 --><a href="/group/perl.cpan.testers/2008/05/msg1478381.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1487124 --><a href="/group/perl.cpan.testers/2008/05/msg1487124.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1451287 --><a href="/group/perl.cpan.testers/2008/05/msg1451287.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1423917 --><a href="/group/perl.cpan.testers/2008/05/msg1423917.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1437272 --><a href="/group/perl.cpan.testers/2008/05/msg1437272.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1509437 --><a href="/group/perl.cpan.testers/2008/05/msg1509437.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1514267 --><a href="/group/perl.cpan.testers/2008/05/msg1514267.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1423923 --><a href="/group/perl.cpan.testers/2008/05/msg1423923.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1433375 --><a href="/group/perl.cpan.testers/2008/05/msg1433375.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1423910 --><a href="/group/perl.cpan.testers/2008/05/msg1423910.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1467394 --><a href="/group/perl.cpan.testers/2008/05/msg1467394.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+  
+  
+    <li><!-- #1455329 --><a href="/group/perl.cpan.testers/2008/05/msg1455329.html">
+      PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7</a>
+      by andreas.koenig.gmwojprw</li> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</ul>
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,59 @@
+{
+   "abstract" : "CPANTS Kwalitee Report.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANTS-Kwalitee-Report",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0.2304",
+            "LWP::Simple" : "6.15",
+            "List::Util" : "1.33",
+            "Module::CPANTS::Analyse" : "0.97",
+            "Module::CPANTS::Kwalitee" : "0.97",
+            "Moo" : "2.000000",
+            "MooX::Options" : "4.023",
+            "Parse::CPAN::Packages" : "2.40",
+            "XML::RSS::Parser" : "4.0",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/CPANTS-Kwalitee-Report.git",
+         "web" : "https://github.com/manwar/CPANTS-Kwalitee-Report"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

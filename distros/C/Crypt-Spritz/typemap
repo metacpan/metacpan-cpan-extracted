@@ -1,0 +1,7 @@
+Crypt::Spritz				T_SPRITZ
+
+INPUT
+
+T_SPRITZ
+	$var = get_state ($arg);
+

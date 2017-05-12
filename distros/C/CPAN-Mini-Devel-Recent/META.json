@@ -1,0 +1,105 @@
+{
+   "abstract" : "Create CPAN::Mini mirror with recent developer releases",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Mini-Devel-Recent",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "1.92",
+            "CPAN::HandleConfig" : "0",
+            "CPAN::Mini" : "0.567",
+            "CPAN::Tarzip" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "3.27",
+            "File::Temp" : "0.20",
+            "YAML::Syck" : "1.07",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "3.27",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Mini::Devel::Recent" : {
+         "file" : "lib/CPAN/Mini/Devel/Recent.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/CPAN-Mini-Devel-Recent/issues"
+      },
+      "homepage" : "https://github.com/dagolden/CPAN-Mini-Devel-Recent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/CPAN-Mini-Devel-Recent.git",
+         "web" : "https://github.com/dagolden/CPAN-Mini-Devel-Recent"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,86 @@
+NAME
+    Convert::BinHex - extract data from Macintosh BinHex files
+
+    *ALPHA WARNING: this code is currently in its Alpha release. Things may
+    change drastically until the interface is hammered out: if you have
+    suggestions or objections, please speak up now!*
+
+SYNOPSIS
+    Simple functions:
+
+        use Convert::BinHex qw(binhex_crc macbinary_crc);
+
+        # Compute HQX7-style CRC for data, pumping in old CRC if desired:
+        $crc = binhex_crc($data, $crc);
+
+        # Compute the MacBinary-II-style CRC for the data:
+        $crc = macbinary_crc($data, $crc);
+
+
+    Hex to bin, low-level interface. Conversion is actually done via an
+    object (the section on "Convert::BinHex::Hex2Bin") which keeps internal
+    conversion state:
+
+        # Create and use a "translator" object:
+        my $H2B = Convert::BinHex->hex2bin;    # get a converter object
+        while (<STDIN>) {
+    	print $STDOUT $H2B->next($_);        # convert some more input
+        }
+        print $STDOUT $H2B->done;              # no more input: finish up
+
+
+    Hex to bin, OO interface. The following operations *must* be done in the
+    order shown!
+
+        # Read data in piecemeal:
+        $HQX = Convert::BinHex->open(FH=>\*STDIN) || die "open: $!";
+        $HQX->read_header;                  # read header info
+        @data = $HQX->read_data;            # read in all the data
+        @rsrc = $HQX->read_resource;        # read in all the resource
+
+
+    Bin to hex, low-level interface. Conversion is actually done via an
+    object (the section on "Convert::BinHex::Bin2Hex") which keeps internal
+    conversion state:
+
+        # Create and use a "translator" object:
+        my $B2H = Convert::BinHex->bin2hex;    # get a converter object
+        while (<STDIN>) {
+    	print $STDOUT $B2H->next($_);        # convert some more input
+        }
+        print $STDOUT $B2H->done;              # no more input: finish up
+
+
+    Bin to hex, file interface. Yes, you can convert *to* BinHex as well as
+    from it!
+
+        # Create new, empty object:
+        my $HQX = Convert::BinHex->new;
+
+        # Set header attributes:
+        $HQX->filename("logo.gif");
+        $HQX->type("GIFA");
+        $HQX->creator("CNVS");
+
+        # Give it the data and resource forks (either can be absent):
+        $HQX->data(Path => "/path/to/data");       # here, data is on disk
+        $HQX->resource(Data => $resourcefork);     # here, resource is in core
+
+        # Output as a BinHex stream, complete with leading comment:
+        $HQX->encode(\*STDOUT);
+
+
+    PLANNED!!!! Bin to hex, "CAP" interface. *Thanks to Ken Lunde for
+    suggesting this*.
+
+        # Create new, empty object from CAP tree:
+        my $HQX = Convert::BinHex->from_cap("/path/to/root/file");
+        $HQX->encode(\*STDOUT);
+
+
+DESCRIPTION
+    BinHex is a format used by Macintosh for transporting Mac files safely
+    through electronic mail, as short-lined, 7-bit, semi-compressed data
+    streams. Ths module provides a means of converting those data streams
+    back into into binary data.
+

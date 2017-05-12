@@ -1,0 +1,262 @@
+January 8, 2011 - 0.78
+    - no code changes, fixed packaging glitch
+
+January 6, 2011 - 0.77
+    - ISHIGAKI took over the maintenance.
+    - fixed several dependencies.
+    - resolved RT #51890: POD nit.
+    - removed unauthorized PPM files
+
+August 4, 2006 - 0.76
+    - don't use Module::MakefilePL::Parse, as CPAN.pm reports
+      there's no maintainer. Instead, use a parse_MakefilePL
+      routine based on Module::CPANTS::Generator::Prereq.
+    - drop requirement of PPM, and instead use XML::SAX::ExpatXS
+      as XML parser.
+    - don't die if META.yml file can't be loaded.
+    - ignore indexing of SpreadSheet-WriteExcel-WebPivot2,
+      as CPAN::DistnameInfo thinks WebPivot2 is the
+      version number of SpreadSheet-WriteExcel.
+    - use Module::MakefilePL::Parse to extract prerequisite
+      information if META.yml isn't present.
+    - add CPAN::Search::Lite::Version (in C::S::L::Util)
+      to compare distribution versions, borrowed from
+      CPAN::Version, and drop Sort::Versions requirement
+    - as ActiveState recently changed the way they serve
+      the ppm summary files from their server, change
+      CPAN::Search::Lite::PPM to fetch and parse package.lst or
+      searchsummary.ppm files.
+    - insert an "mtime" field in the reps table to record
+      the last modified time of a package.lst or searchsummary.ppm
+      file from a ppm server, so as to avoid downloading
+      and parsing files which have been seen in an earlier run.
+    - use Pod::Xhtml to convert the pod to html format. This has
+      a major advantage of allowing one to insert text before
+      and after the opening <body> tag and before the closing
+      </body> tags, so as not to have to edit the files
+      afterwards. Related to this, split off the html generation
+      into C::S::L::HTML, and call it last in the indexing procedure,
+      so as to be able to resolve links to the docs of modules
+      already indexed.
+    - change relative ranking of search terms when such terms
+      have spaces, so that a module search for, eg, 'Net SMTP',
+      will weight Net::SMTP more. 
+
+February 26, 2006 - 0.74
+    - add documentation, pragma, and Perl6 chapters
+    - if there are no results in the data structure for a
+      ppm repository, skip updating that repository
+    - adjust method of generating tests via Apache::Test
+      to accomodate recent Apache::Test changes
+    - add requirement of Apache2::SOAP and PPM
+    - update build/gen_conf script to use Apache2:: namespace
+ 
+August 9, 2005 - 0.71
+    - add user option, via a cookie, to override language
+      choice coming from browser setting.
+    - add method to search by subchapter name.
+    - in doing searches, add a score to use when sorting
+      results so that, roughly, $name =~ m/^$query_term/ will
+      score higher, and subsequently appear earlier on in list.
+    - a method in the search for distributions wasn't
+      preserving the order of the search results returned
+      by the database; this has now been fixed.
+    - the score based on the relevance of the search term
+      in the abstract or full CPAN name was used incorrectly
+      in sorting the results; this is now fixed.
+
+June 30, 2005 - 0.68
+    - remove use of Apache2.pm in the Apache2/ tests
+    - add PAR::WebStart functionality to launch applications
+      to install CPAN and ppm packages
+    - fix bug whereby relevant CHECKSUMS file wasn't found
+      if the distribution was under a subdirectory in the
+      CPAN id directory
+
+May 4, 2005 - 0.66
+    - honor 'provides' field in META.yml file to provide
+      list of packages/files the distribution supplies.
+    - when updating a distribution, check that the existing
+      modules in the dists table are present in the updated
+      distribution, and delete them if they're not.
+    - add Portugese translations (thanks to Alberto Simoes)
+    - fix mod_perl handlers to use new namespace introduced
+      in RC5 of mp2. Note that all Apache::* modules are
+      now named Apache2::*.
+    - assume utf-8 data in mod_perl handlers
+
+April 7, 2005 - 0.64
+    - when extracting files from a distribution, honor
+      the file, directory, and package entries of the no_index
+      field in a META.yml file to ignore indexing
+    - introduce the environment variable CSL_CONFIG_FILE as
+      an optional means to specify the configuration file
+    - when reindexing, set no_ppm = 1, so as to not index ppm
+    - die when reading the configuration file unless only the
+      expected parameters are specified
+    - introduce an "ignore" field in the configuration file
+      to specify distribution(s) to ignore when indexing
+    - add a "src" field to the module table to specify if the
+      source of the module is available
+    - introduce a pod_split option that allows one to write 2 sets
+      of html docs; once containing just the pod (from pod2html), and
+      the other containing the complete source as generated through
+      Perl::Tidy (which is usually quite large) (suggested by
+      Sebastian Aperghis-Tramoni)
+    - enclose all of META.yml files in <PRE> tags, as the
+      html formatting is often off (suggested by Sebastian Aperghis-Tramoni)
+    - use Perl::Tidy to generate html documentation; this includes
+      formatting of the actual code at the bottom of the html page,
+      and thus we extract all of the module from the archive, and
+      not just the pod as before (suggested by Sebastian Aperghis-Tramoni)
+    - rather than have some of the translations done in separate tt2
+      pages, move all the translations into C::S::L::Lang::*.pm, and
+      pass a language-specific data structure into one set of
+      tt2 pages (suggested by Sebastian Aperghis-Tramoni)
+    - add module, distribution, author, or chapter name in title
+      of tt2 page, when specified (suggested by Sebastian Aperghis-Tramoni)
+    - start split of DBI functionality into separate modules:
+      C::S::L::DBI and C::S::L::DBI::*
+    - add option to reindex a distribution
+    - have search results for modules and distributions return
+      their chapter information
+    - have search results for modules and distributions ordered 
+      also by their score when matching the abstract
+    - add a md5 column to the dists table to record the MD5
+      checksum from the CPAN CHECKSUMS file (suggested by Chris Dolan)
+    - add auto-incrementing primary keys to the ppms, chaps, and
+      reqs tables
+    - add two new tables, reps and chapters, to record respectively
+      the chapter names and repository names
+    - add a script, build/fix_db.pl, to alter the tables based on
+      previous versions of C::S::L to agree with the current version
+    - change the way custom Apache directives are invoked so as to
+      work with the current RC1 of mod_perl 2 
+    - add a build/rss.pl script to generate an rss feed
+
+Sept 22, 2004 - 0.59
+    - various translation improvements
+         French: Isabelle Hernandez <isa at panix.com>
+         German: Florian Greb <greb at inf.fu-berlin.de>
+         Italian: Enrico Sorcinelli <bepi at modperl.it>
+         Spanish: Joaquin Ferrero <explorer at joaquinferrero.com>
+    - add script to automatically generate dslip.html information
+      page in different languages, contributed by Briac Pilpre
+      <briac at pilpre.com>)
+    - add checks of Apache::Test, SOAP::Lite, mod_perl, and
+      libapreq2 in Makefile.PL, which are optional modules in principle,
+      but needed to run various web services for the database.
+    - split the modules into a lib/ and Apache2/ directory,
+      so as to be able to run "Test" tests under lib/ and
+      "Apache::Test" tests under Apache2/.
+    - add a test suite, which requires a "test" database (of user
+     "test") already set up, plus Apache::Test to test web services.
+    - add a simple configuration script to set up the configuration
+      file used by csl_index to create and update the database,
+      as well as some sample Apache directives.
+    - for the Apache directives to set up the database connection,
+      interpret the lack of a password directive to mean no password
+      is required.
+    - for a search term of a module or distribution which results
+      in one match, supply the "subletter" information.
+    - remove some leading and trailing spaces in the information
+      gathered from the CPAN indices for author full names and
+      chapter ids.
+    - in the example Apache directives, indicate that CPAN ids
+      can contain numbers, as well as letters and the '-' sign.
+    - when a distribution is scheduled for deletion from the
+      database, remove it's pod and html docs as well, if present.
+
+Sept 4, 2004 - 0.55
+    - use AI::Categorizer to guess at a category for unassigned
+      modules/distributions, based on the learning from existing
+      categorized modules. There are two new options available
+      in the [CPAN] section of the configuration file:
+         - cat_threshold: a number between 0 and 1 used as a threshold
+           for assigning categories
+         - no_cat: to not use this feature
+    - bump up length of module names stored in the mods table,
+      as some modules were longer than this
+    - if there is only one result available for a link from a "letter"
+      page of modules/distributions or a chapter page, redirect to
+      that page directly, rather than show a page with one link
+    - present the date and file size associated with distributions
+      in different languages
+    - (greatly) improved translations:
+         French: Isabelle Hernandez <isa at panix.com>
+                 Arnaud Assad <arnaud at underlands.org>
+         German: Florian Greb <greb at inf.fu-berlin.de>
+         Italian: Enrico Sorcinelli <bepi at modperl.it>
+         Spanish: Joaquin Ferrero <explorer at joaquinferrero.com>
+      Thanks!
+    - add ppminfo.cgi, a soap server script now used by PPM::Make
+      to get module/distribution/author info.
+    - switch to Lingua::Stem for the stemming algorithm used
+      in the text searches
+
+July 29, 2004 - 0.53
+    - fix bug where an error message, for example, in a regular
+      expression query was getting cached across requests.
+    - introduce presentation of results in different languages,
+      based on the language preference of the web browser.
+      This entails some changes in the config/header/footer tt2
+      pages, as well as provision of the rest of the pages in
+      a translated form.
+    - introduce stemming (from Text::English) when doing a text
+      search of the module/distribution abstracts; this is an
+      experiment to see if better search results are obtained.
+
+June 14, 2004 - 0.47
+    - fix bug in Query.pm to return an array if requested.
+
+June 2, 2004 - 0.46
+    - fix bug where some updates weren't being recorded properly
+      when they involved a change in module author
+
+April 15, 2004 - 0.45
+    - add custom Apache2 configuration directives for
+      mod_perl 2 based modules, rather than having to edit
+      the files
+    - add mod_perl 2 SOAP-based services (requires Apache2::SOAP,
+      which is a mod_perl 2 aware version of Apache::SOAP of the
+      SOAP-Lite distribution), and provide examples within
+      bin/csl_soap and bin/perldocs.
+
+March 19, 2004 - 0.25
+    - add perldocs, a soap-enhanced Pod::Perldoc to fetch from
+      remote repository modules pods not available on local system.
+
+March 13, 2004 - 0.23
+    - when calling CPAN::Search::Lite::Query->new(), accept as an argument
+      max_results => $max_results, specifying the maximum number
+      of results to return.
+    - fix a bug where $max_results was being applied to more than
+      just user queries (which it now does).
+    - move declaration of Template::Toolkit object to a package
+      variable in the mod_perl handlers, so as to cache it.
+    - move declaration of CPAN::Search::Lite::Query object to
+      a package variable in the mod_perl handlers, so as to cache it.
+
+March 10, 2004 - 0.20
+    - ensure the labelled INSTALL and README files for a distribution
+      are not possible .pm files.
+    - add a fix_links method to Populate.pm to fix the links in the
+      generated html files. The reason for this is that when the html
+      file are created no cache is used, to maintain consistency between
+      updates, and so links to packages outside a given package may
+      be wrong. This method queries the database to see what module
+      docs are really present, and asjusts the links accordingly
+      (or removes them, if they're not present).
+
+Mar 7, 2004 - 0.15
+    - trim whitespace from query term, and remove quotes and
+      backslashes
+    - verify presence of table id before updating tables
+    - check for validity of regular expression query term
+    - direct to main page if query term is empty
+    - various checks to avoid warnings about uninitialized
+      hash elements
+    - documentation fixes
+      
+Feb 29, 2004 - 0.1
+    - initial release

@@ -1,0 +1,23 @@
+Build.PL
+Changes
+lib/Clone/Closure.pm
+lib/Clone/Closure.xs
+MANIFEST			This list of files
+META.yml
+ppport.h
+t/00use.t
+t/01sv.t
+t/02rv.t
+t/03av.t
+t/03scalar.t
+t/04hv.t
+t/04tie.t
+t/05cv.t
+t/06mg.t
+t/06refcnt.t
+t/07magic.t
+t/07rx.t
+t/dclone.t
+t/dump.pl
+t/Foo.pm
+t/tied.pl

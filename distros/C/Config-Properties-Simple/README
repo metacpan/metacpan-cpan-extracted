@@ -1,0 +1,30 @@
+Config/Properties/Simple
+========================
+
+This package provides a simple access to properties configuration
+files mixin functionality in packages Config::Properties and
+Config::Find.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Config::Properties
+  Condig::Find
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

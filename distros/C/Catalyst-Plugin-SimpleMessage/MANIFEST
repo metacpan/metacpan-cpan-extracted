@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Catalyst/Plugin/SimpleMessage.pm
+t/01_use.t
+t/02_status_message.t
+t/03_custom_config.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp2.pm
+t/lib/TestApp2/Controller/Root.pm

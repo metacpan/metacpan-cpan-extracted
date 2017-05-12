@@ -1,0 +1,148 @@
+#!D:/Perl/bin/perl
+use strict;
+use warnings;
+use CPAN::Search::Lite::Query;
+use CPAN::Search::Lite::Util qw($query_info);
+use Getopt::Long;
+my ($module, $dist, $cpanid, $help);
+my ($db, $user, $passwd, $max_results);
+
+my $rc = GetOptions('module=s' => \$module,
+                    'dist=s' => \$dist,
+                    'cpanid=s' => \$cpanid,
+                    'db=s' => \$db,
+                    'user=s' => \$user,
+                    'passwd=s' => \$passwd,
+                    'help' => \$help);
+
+if ($help or not ($module or $dist or $cpanid)) {
+    print <<"END";
+
+Find information on CPAN module name, distribution, or author id.
+Usage:
+   $^X $0 --db database --user nobody --passwd me --module  Mod::Name
+   $^X $0 --db database --user nobody --passwd me --dist  Distname
+   $^X $0 --db database --user nobody --passwd me --cpanid  CPANID
+   $^X $0 --help
+END
+    exit(1);
+}
+
+die "Please supply the database, user, and password"
+  unless ($db and $user and $passwd);
+$max_results ||= 200;
+
+my $query = CPAN::Search::Lite::Query->new(db => $db,
+                                           user => $user,
+                                           passwd => $passwd,
+                                           max_results => $max_results);
+my ($results, $fields);
+
+RESULTS : {
+  $module and do {
+    $fields = [qw(mod_name mod_abs mod_vers dist_name cpanid dist_file)];
+    $query->query(mode => 'module', name => $module, fields => $fields);
+    $results = $query->{results};
+    if (not $results) {
+      print qq{\nNo module by name of "$module" was found.\n};
+      print qq{Error: $query->{error}\n} if $query->{error};
+    }
+    else {
+      print << "EOI";
+
+Module: $results->{mod_name}
+Abstract: $results->{mod_abs}
+Version: $results->{mod_vers}
+Distribution: $results->{dist_name}
+CPAN author: $results->{cpanid}
+CPAN file: $results->{dist_file}
+
+EOI
+        }
+    last RESULTS;
+  };
+  $dist and do {
+    $fields = [qw(dist_name dist_abs dist_vers cpanid dist_file size birth)];
+    $query->query(mode => 'dist', name => $dist, fields => $fields);
+    $results = $query->{results};
+    if (not $results) {
+      print qq{\nNo distribution by name of "$dist" was found.\n};
+      print qq{Error: $query->{error}\n} if $query->{error};
+    }
+    else {
+      print << "EOI";
+
+Distribution: $results->{dist_name}
+Abstract: $results->{dist_abs}
+Version: $results->{dist_vers}
+CPAN author: $results->{cpanid}
+CPAN file: $results->{dist_file}
+Size: $results->{size} bytes
+Last modified: $results->{birth}
+
+EOI
+   }
+    last RESULTS;
+  };
+  $cpanid and do {
+    $fields = [qw(cpanid fullname email)];
+    $query->query(mode => 'author', name => $cpanid, fields => $fields);
+    $results = $query->{results};
+    if (not $results) {
+      print qq{\nNo cpanid by name of "$cpanid" was found.\n};
+      print qq{Error: $query->{error}\n} if $query->{error};
+    }
+    else {
+      print << "EOI";
+
+CPANID: $results->{cpanid}
+Full Name: $results->{fullname}
+email: $results->{email}
+
+EOI
+    }
+    last RESULTS;
+  };
+}
+
+__END__
+
+=head1 NAME
+
+csl_query - example command-line interface to C<CPAN::Search::Lite::Query>
+
+=head1 DESCRIPTION
+
+This script provides an example command-line interface
+to C<CPAN::Search::Lite::Query>. It can be used as
+
+   perl csl_query --db database --user nobody --passwd me --module  Mod::Name
+   perl csl_query --db database --user nobody --passwd me  --dist  Distname
+   perl csl_query --db database --user nobody --passwd me  --cpanid  CPANID
+
+which will provide, respectively, some information
+on the requested module name, distribution name, or
+CPAN id. The options
+
+=over 3
+
+=item --db database
+
+The name of the database used.
+
+=item --user nobody
+
+The user under which to connect as.
+
+=item --passwd me
+
+The password to use for this user.
+
+=back
+
+=head1 SEE ALSO
+
+L<CPAN::Search::Lite::Query>.
+
+=cut
+

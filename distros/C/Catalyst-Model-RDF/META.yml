@@ -1,0 +1,31 @@
+---
+abstract: 'RDF model class for Catalyst based on RDF::Trine::Model.'
+author:
+  - 'Thiago Rondon <thiago@aware.com.br>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  Catalyst: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+  base: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-RDF
+requires:
+  Catalyst::Model: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  RDF::Trine::Model: 0
+resources:
+  bugtracker: http://github.com/thiagorondon/Catalyst-Model-RDF/issues
+  repository: git://github.com/thiagorondon/Catalyst-Model-RDF
+version: 0.03

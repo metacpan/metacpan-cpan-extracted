@@ -1,0 +1,52 @@
+Newsgroups: perl.cpan.uploads
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.uploads:13394
+Return-Path: <root@pause.perl.org>
+Mailing-List: contact cpan-uploads-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-uploads@perl.org
+Received: (qmail 16429 invoked from network); 29 Oct 2008 21:28:30 -0000
+Received: from x1a.develooper.com (HELO x1.develooper.com) (216.52.237.111)
+  by x6.develooper.com with SMTP; 29 Oct 2008 21:28:30 -0000
+Received: (qmail 4763 invoked by uid 225); 29 Oct 2008 21:28:29 -0000
+Delivered-To: cpan-uploads@perl.org
+Received: (qmail 4754 invoked by alias); 29 Oct 2008 21:28:29 -0000
+X-Spam-Status: No, hits=0.0 required=8.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from pause.fiz-chemie.de (HELO pause.perl.org) (195.149.117.110)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Wed, 29 Oct 2008 14:28:27 -0700
+Received: from pause.perl.org (localhost.localdomain [127.0.0.1])
+	by pause.perl.org (8.13.8/8.13.8/Debian-3) with ESMTP id m9TLSL8M001914;
+	Wed, 29 Oct 2008 22:28:21 +0100
+Received: (from root@localhost)
+	by pause.perl.org (8.13.8/8.13.8/Submit) id m9TLSK4P001913;
+	Wed, 29 Oct 2008 22:28:21 +0100
+Date: Wed, 29 Oct 2008 22:28:21 +0100
+Message-ID: <200810292128.m9TLSK4P001913@pause.perl.org>
+MIME-Version: 1.0
+Subject: CPAN Upload: S/SA/SAPER/Acme-CPANAuthors-French-0.06.tar.gz
+Content-Type: Text/Plain; Charset=UTF-8
+Reply-To: cpan-uploads@perl.org
+To: cpan-testers@perl.org, cpan-uploads@perl.org
+Content-Transfer-Encoding: 8bit
+Approved: news@nntp.perl.org
+From: upload@pause.perl.org (PAUSE)
+
+The uploaded file
+
+    Acme-CPANAuthors-French-0.06.tar.gz
+
+has entered CPAN as
+
+  file: $CPAN/authors/id/S/SA/SAPER/Acme-CPANAuthors-French-0.06.tar.gz
+  size: 5102 bytes
+   md5: ee430b5918c08ccd19c2973deda4fffa
+
+No action is required on your part
+Request entered by: SAPER (Sébastien Aperghis-Tramoni)
+Request entered on: Wed, 29 Oct 2008 21:27:40 GMT
+Request completed:  Wed, 29 Oct 2008 21:28:19 GMT
+
+Thanks,
+-- 
+paused, v1047

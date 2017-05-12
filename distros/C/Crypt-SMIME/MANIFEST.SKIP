@@ -1,0 +1,16 @@
+~$
+\.tar\.gz$
+(^|/)\.svn(/|$)
+^\.hg(/|$)
+^\.hgignore$
+^\.hgtags$
+^blib(/|$)
+^const-.*?\.inc$
+^Makefile$
+^Makefile\.old$
+^MANIFEST\.bak$
+(^|/)MYMETA\.
+^pm_to_blib$
+^SMIME\.bs$
+^SMIME\.c$
+^SMIME\.o$

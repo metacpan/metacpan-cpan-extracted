@@ -1,0 +1,24 @@
+If Coro causes segfaults a lot on calls to libc functions, the cause is
+probably a glibc compiled for i386 and kernel 2.2 (for example, debian
+only supplies 2.2 and 2.6-optimized libraries, not 2.4).
+
+Glibc contains a bug that causes any program linked against pthreads AND
+using coroutines (of any kind, not only Coro, but including most userspace
+thread libraries like gnu-pth) or alternate stacks to segfault on calls to
+pthread functions. And glibc happens to do a lot of these calls.
+
+(Even if your perl is not compiled against pthreads, e.g. Time::HiRes links
+against -lrt, which drags in pthreads. The same is true for other modules,
+so watch out).
+
+The bug is rather difficult to fix. This is not a problem, however, since
+glibcs compiled for linux-2.4 use a much more efficient method to locate
+their data, which happens to work with coroutines.
+
+So the easy fix is to install a libc which was compiled for linux-2.4 (or
+2.6) using the "--enable-kernel=2.4 i586-pc-linux-gnu" configure options.
+
+WARNING: This libc will no longer run on linux-2.2 or lower!
+
+UPDATE: Time::HiRes in current perl snapshots does no longer link against
+-lrt. That still means you need to patch it until 5.9.x gets out.

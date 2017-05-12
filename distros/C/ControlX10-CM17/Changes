@@ -1,0 +1,36 @@
+
+	- pre CPAN format release by Bruce Winter for MisterHouse
+	- package name = cm17.pm
+
+-------------------------------------------------------------
+Revision history for Perl extension HomeAutomation::X10::CM17.
+
+0.02  Fri Sep 10 23:36:56 1999
+	- original version; created by h2xs 1.18
+	- h2xs -A -X -n "HomeAutomation::X10::CM17"
+	- add send_cm17 wrapper
+	- test.pl is cross-platform version of test_cm17_xxx script
+
+0.03  Sat Sep 11 15:44:07 CDT 1999
+	- update Bruce Winter's email addresses
+	- rename test.pl to eg_cm17.plx and create new test.pl
+	- Add README and README.txt
+	- Makefile.PL simplifications for Win32
+
+0.04  Sun Sep 12 17:10:31 CDT 1999
+	- Add EXPORTS to pod
+
+-------------------------------------------------------------
+Revision history for Perl extension ControlX10::CM17.
+
+0.05  Wed Sep 29 11:46:04 1999
+	- Convert to CPAN-approved namespace
+
+0.06  Mon Oct 11 14:32:49 CDT 1999
+	- Allow programmed dim commands
+	- revise Makefile.PL, create t and eg subdirectories
+
+0.07  Sun Jan 30 18:15:04 CST 2000 <Birthisel>
+	- move send_cm17 method to @EXPORT
+	- update mailing list data to sourceforge
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Carp::Perror.
+
+0.01  Fri Apr 11 15:42:13 2014
+	- original version; created by h2xs 1.23 with options
+		-AX -n Carp::Perror
+0.02  Tue Jun 24 23:41:59 2014
+	- change perror() to a alias of pexit()

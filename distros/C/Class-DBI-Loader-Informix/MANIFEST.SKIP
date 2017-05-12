@@ -1,0 +1,8 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^Build$
+^_build/
+\.svn

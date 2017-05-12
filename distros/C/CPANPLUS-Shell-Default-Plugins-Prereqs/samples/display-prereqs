@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use CPANPLUS::Shell qw[Default];
+my $shell = CPANPLUS::Shell->new;
+
+$shell->dispatch_on_input(
+                    input => '/prereqs show .',
+                    noninteractive => 1
+				);

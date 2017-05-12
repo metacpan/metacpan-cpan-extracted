@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use strict;
+
+# Only needed to find modules in the dist archive.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+
+# actual example code
+
+use Config::Param;
+
+my $p = Config::Param::get
+(
+	{
+		 version=>'0.0.1'
+		,lazy=>1
+		#,verbose=>1
+		,info=> <<EOT
+just a quick hack to demonstrate Config::Param
+
+usage:
+	$0 [parameters] whatever
+
+We have this long info string just to show that Config::Param picks the tagline and usage info from it. This is not mandatory.
+EOT
+	},[
+		 [ 'para', 0, 'p', 'A parameter.' ]
+		,[ 'meter', 'I got value but no help text, neither short name.' ]
+	]
+);
+
+print "I could have done some work with '$p->{para}' and '$p->{meter}'.\n";

@@ -1,0 +1,100 @@
+NAME
+    Config::Auto - Magical config file parser
+
+SYNOPSIS
+      use Config::Auto;
+
+      # Not very magical at all.
+      my $config = Config::Auto::parse("myprogram.conf", format => "colon");
+
+      # Considerably more magical.
+      my $config = Config::Auto::parse("myprogram.conf");
+
+      # Highly magical.
+      my $config = Config::Auto::parse();
+
+DESCRIPTION
+    This module was written after having to write Yet Another Config File
+    Parser for some variety of colon-separated config. I decided "never
+    again".
+
+    When you call "Config::Auto::parse" with no arguments, we first look at
+    $0 to determine the program's name. Let's assume that's "snerk". We look
+    for the following files:
+
+        snerkconfig
+        ~/snerkconfig
+        /etc/snerkconfig
+        snerk.config
+        ~/snerk.config
+        /etc/snerk.config
+        snerkrc
+        ~/snerkrc
+        /etc/snerkrc
+        .snerkrc
+        ~/.snerkrc
+        /etc/.snerkrc
+
+    We take the first one we find, and examine it to determine what format
+    it's in. The algorithm used is a heuristic "which is a fancy way of
+    saying that it doesn't work." (Mark Dominus.) We know about colon
+    separated, space separated, equals separated, XML, Perl code, Windows
+    INI, BIND9 and irssi style config files. If it chooses the wrong one,
+    you can force it with the "format" option.
+
+    If you don't want it ever to detect and execute config files which are
+    made up of Perl code, set "$Config::Auto::DisablePerl = 1".
+
+    Then the file is parsed and a data structure is returned. Since we're
+    working magic, we have to do the best we can under the circumstances -
+    "You rush a miracle man, you get rotten miracles." (Miracle Max) So
+    there are no guarantees about the structure that's returned. If you have
+    a fairly regular config file format, you'll get a regular data structure
+    back. If your config file is confusing, so will the return structure be.
+    Isn't life tragic?
+
+    Here's what we make of some common Unix config files:
+
+    /etc/resolv.conf:
+
+        $VAR1 = {
+              'nameserver' => [ '163.1.2.1', '129.67.1.1', '129.67.1.180' ],
+              'search' => [ 'oucs.ox.ac.uk', 'ox.ac.uk' ]
+            };
+
+    /etc/passwd:
+
+        $VAR1 = {
+              'root' => [ 'x', '0', '0', 'root', '/root', '/bin/bash' ],
+              ...
+            };
+
+    /etc/gpm.conf:
+
+        $VAR1 = {
+              'append' => '""',
+              'responsiveness' => '',
+              'device' => '/dev/psaux',
+              'type' => 'ps2',
+              'repeat_type' => 'ms3'
+            };
+
+    /etc/nsswitch.conf:
+
+        $VAR1 = {
+              'netgroup' => 'nis',
+              'passwd' => 'compat',
+              'hosts' => [ 'files', 'dns' ],
+              ...
+        };
+
+TODO
+    BIND9 and irssi file format parsers currently don't exist. It would be
+    good to add support for "mutt" and "vim" style "set"-based RCs.
+
+AUTHOR
+    Simon Cozens, "simon@cpan.org"
+
+LICENSE
+    AL&GPL.
+

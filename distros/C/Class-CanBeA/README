@@ -1,0 +1,8 @@
+A module to find all the subclasses of a named class.
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

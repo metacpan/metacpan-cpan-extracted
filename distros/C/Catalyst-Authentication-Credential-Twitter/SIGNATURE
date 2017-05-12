@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 10b8bcbe03d0cf6855794443dadcf339c68d6ad7 AUTHOR_PLEDGE
+SHA1 9fca449b4fb75e2b790dc5205c1aa156c27b4c29 CONTRIBUTORS
+SHA1 c174b24c5768ebfaa394fa0e8b438c4d2666f750 Changes
+SHA1 6a7b2179156f381eeda0f894d7eef03bb76f7571 INSTALL
+SHA1 8ac7c0ccac45b0468f74e24504f6ee1cc80433e1 LICENSE
+SHA1 a3ed64e7f78c6a4dbc3d23c08756904f2b2aaee1 MANIFEST
+SHA1 81e0aca41ff49e1f4fa3815706a5c50b07a4eeaf META.json
+SHA1 436ce7a1507eb8024d0128a9cac449fa3a672238 META.yml
+SHA1 c1b53f422125586b938f5c21230cff2adec8108b Makefile.PL
+SHA1 5b3edb07ceae6d90ad4b3ee85b7bce8df38b7b30 README
+SHA1 3adef2ac2532f4a0f85b5ea5e73ea4a09994b194 README.mkdn
+SHA1 6099ff720bb245f971a21334d232308056bb1918 cpanfile
+SHA1 d882c9e4f2bb1cf504c6d9d914f4e720cdc9c169 doap.xml
+SHA1 b30da66712c3b5af913d29c04c9cee4606225df1 lib/Catalyst/Authentication/Credential/Twitter.pm
+SHA1 9fa5e2192609c6b30736bafe50f32940ce9b99ff t/00-compile.t
+SHA1 5f2e6526c388b17b53facb6c646b3d3658956bf8 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 e923679a1bbd8eb8f727e46f5906af25de27ec97 t/03podcoverage.t.disabled
+SHA1 f50a5b33841b3f5184e4b012b506e96b2dc64e29 t/basic_app.t
+SHA1 71b562c704a8cea6a730054737c8bd1e44575d35 t/fail_callback.t
+SHA1 fef3bbb597e3a0344843ecf194b9423881050b1b t/lib/TestApp.pm
+SHA1 e71ef08a355a1c7d864a380f3354e1dee30fd1f6 t/lib/TestApp/Controller/Root.pm
+SHA1 a507499eb734aefb423d06c91e941bf1020ccddc t/lib/TestApp2.pm
+SHA1 ba8c2123a974845cda80a7bc651407b3060a56dc t/lib/TestApp2/Controller/Root.pm
+SHA1 913f8dba0ebfbdc2754452c2c75649b716bff22c t/no_per_user.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlkNFicACgkQ34Hwf+GwC4w7sQCfTPsLCePuZZBwNJPK9cVJiegx
+R2oAmweLAXrte4qWQS9SuJRhy2zg7tYt
+=WGr8
+-----END PGP SIGNATURE-----

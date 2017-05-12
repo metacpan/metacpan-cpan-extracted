@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/CDB/TinyCDB/Wrapper.pm
+t/00-module.t
+t/01-code.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,34 @@
+[% title = "Browse distribution by letter " _ letter %]
+<div id="doc" class="yui-t5">
+  <div id="hd"><h1><a href="/">CPAN Testers</a>: [% title %]</h1></div>
+  <div id="bd">
+    <div id="yui-main">
+      <div class="yui-a">
+      <div class="hd">
+
+        <p>Below are the CPAN distributions that start with the letter 
+        [% letter %] for which we have test reports:</p>
+        <table class="col3">
+        [% inx = 0 %]
+        [% FOREACH item = list.sort %]
+        [% IF inx % 1 == 0 %]<tr>[% END %]
+        <td><a href="/static/distro/[% item.substr(0,1) %]/[% item %].html">[% item %]</a></td>
+        [% inx = inx + 1 %]
+        [% IF inx % 1 == 0 %]</tr>[% END %]
+        [% END %]
+        [% IF inx % 1 > 0 %]</tr>[% END %]
+        </table>
+
+      </div>
+      </div>
+    </div>  
+
+    <div class="yui-b">
+
+      [% INCLUDE "public/box-help.html" %]
+      [% INCLUDE "public/box-sites.html" %]
+
+    </div>
+  </div>
+  [% INCLUDE "public/footer.html" %]
+</div>

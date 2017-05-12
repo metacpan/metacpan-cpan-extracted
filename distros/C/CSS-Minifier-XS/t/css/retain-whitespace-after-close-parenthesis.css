@@ -1,0 +1,9 @@
+/* we retain whitespace after a ')', -unless- its at the end of a rule */
+.retained {
+    background: url(foo.gif) no-repeat;
+}
+.minimized {
+    background: url(foo.gif) ;
+}
+.also-minimized {
+    background: url(foo.gif) }

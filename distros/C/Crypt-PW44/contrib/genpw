@@ -1,0 +1,2 @@
+#!/bin/sh
+perl -e 'use Crypt::PW44 qw(generate);printf "%s\n",generate(pack(Ll,int(rand(2**32)),int(rand(2**16))),3);'

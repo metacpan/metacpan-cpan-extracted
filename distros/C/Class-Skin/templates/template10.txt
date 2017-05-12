@@ -1,0 +1,15 @@
+<html>
+
+<ref>
+<if condition="is_not_published">
+  <font color=red>Het document werd niet geselecteerd voor publicatie</font>
+</if>
+<elsif condition="is_empty">
+  <font color=red>Tijdens deze publicatie werd geen overeenstemmend document gevonden</font>
+</elsif>
+<else>
+  <include src="template11.txt">
+</else>
+</ref>
+
+</html>

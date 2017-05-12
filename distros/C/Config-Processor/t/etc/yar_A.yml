@@ -1,0 +1,4 @@
+param1_1: "yar_A:${jar.param5.1.param5_2_1}"
+param1_2: { var: moo.param3 }
+param1_3: { include: includes/moo_A.yml }
+

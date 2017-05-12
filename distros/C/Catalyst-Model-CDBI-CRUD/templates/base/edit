@@ -1,0 +1,11 @@
+<form action="[% base _ c.request.action _ '/do_edit/' _ item.id%]"
+    method="post">
+    [% FOR column = item.columns %]
+        [% NEXT IF column == item.primary_column %]
+        [% column %]<br/>
+        [% item.to_field(column).as_XML %]<br/>
+    [% END %]
+    <input type="submit" value="Edit"/>
+<form/>
+<br/>
+<a href="[% base _ c.request.match _ '/list' %]">List</a>

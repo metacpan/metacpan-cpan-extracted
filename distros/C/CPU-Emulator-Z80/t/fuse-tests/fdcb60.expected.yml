@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb60
+registers:
+  AF: 5401
+  AF_: 0
+  BC: 36144
+  BC_: 0
+  DE: 17396
+  DE_: 0
+  HL: 50782
+  HL_: 0
+  I: 0
+  IX: 7732
+  IY: 35908
+  PC: 4
+  R: 2
+  SP: 0

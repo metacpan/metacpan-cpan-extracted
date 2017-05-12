@@ -1,0 +1,9 @@
+              SET A, 0x0
+:loop         SET B, 0x21    ; SET B to be 0x21 (i.e chr !)
+              ADD B, A       ; SET B to be 0x21 + incrementer
+              SET C, 0x8000  ; 0x8000 is the base of the console device
+              ADD C, A       ; SET up the offset into the console device
+              SET [C], B     ; SET the memory in the console device
+              ADD A, 1       ; Increment A
+              IFN B, 0x7e    ; Check to see if we've gone past chr ~ 
+                 SET PC, loop

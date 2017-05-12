@@ -1,0 +1,36 @@
+Changes
+=======
+
+0.00007 15 Dec 2009
+  * Enable "auto" by default. To surpress, set auto: 1 in your config
+
+0.00006 04 Aug 2009
+  * localize() can now be passed arguments in the form of
+        $loc->localize( $key, \@args )
+    This allows TT to pass in a arrayref as the argument to the localize method.
+
+  * This is done in the Plugin level, as I don't see how else you would
+    encounter a situation where you cannot convert an array ref to an array.
+
+0.00005 07 May 2009
+  * Make use of Class::C3::Adopt::NEXT
+
+0.00004 14 Apr 2009
+  * Add languages config parameter
+
+0.00003 04 Mar 2009
+  * Doc fix. Catalyst::Plugin::Data::Localize /is/ now compatible with
+    Catalyst::Plugin::I18N (AFAIK), and so does not require any
+    special handling for Catalyst::Controller::HTML::FormFu, which it
+    previously stated.
+
+0.00002 04 Mar 2009
+  * Add language(), loc() for compatibility
+  * Remove debug statement
+
+0.00001 20 Feb 2009
+  * Protect initialization code when/if the model gets called during
+    setup time.
+
+0.00001_01 20 Feb 2009
+  * Initial release

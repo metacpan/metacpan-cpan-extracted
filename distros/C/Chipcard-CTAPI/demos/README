@@ -1,0 +1,9 @@
+This directory contains a bunch of demo applications for Chipcard::CTAPI.
+
+Be aware that they will only work after installing Chipcard::CTAPI using
+"make install" in the toplevel distribution archive directory.
+
+These demos don't really excel in user friendliness and error handling. 
+Instead, they should demonstrate how chipcard-aware applications can 
+easily be crafted in Perl when using Chipcard::CTAPI.
+

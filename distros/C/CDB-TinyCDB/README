@@ -1,0 +1,44 @@
+CDB-TinyCDB version 0.05
+=====================
+
+Perl extension for TinyCDB library to cdb databases.
+
+TinyCDB library
+
+Please note that TinyCDB needs to be installed before installing this module.
+
+Ubuntu .deb packages are available (libcdb-dev)
+
+Installation from sources
+ * Fetch the latest source code from
+ http://www.corpit.ru/mjt/tinycdb.html
+
+ * Extract and cd to the tinycdb dir
+
+ * Install shared library
+
+ make clean piclib
+ sudo make install-piclib
+
+ * Install headers and cdb itself
+ make clean 
+ sudo make install
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Alex J. G. Burzyński, <ajgb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:s="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:hello="http://example.com/hello"
+    xmlns="http://example.com/hello"
+    targetNamespace="http://example.com/hello">
+
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://example.com/hello">
+      <s:element minOccurs="0" maxOccurs="1" name="who" type="s:string"/>
+      <s:element minOccurs="0" maxOccurs="1" name="greeting" type="s:string"/>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="AskGreeting">
+    <wsdl:part name="who" element="hello:who"/>
+    <wsdl:part name="greeting" element="hello:greeting"/>
+  </wsdl:message>
+  <wsdl:message name="GiveGreeting">
+    <wsdl:part name="greeting" element="hello:greeting"/>
+  </wsdl:message>
+  <wsdl:portType name="Greeting">
+    <wsdl:operation name="Greet">
+      <wsdl:input message="hello:AskGreeting"/>
+      <wsdl:output message="hello:GiveGreeting"/>
+    </wsdl:operation>
+    <wsdl:operation name="Shout">
+      <wsdl:input message="hello:AskGreeting"/>
+      <wsdl:output message="hello:GiveGreeting"/>
+    </wsdl:operation>
+    <wsdl:operation name="Blag">
+      <wsdl:input message="hello:AskGreeting"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Greeting" type="hello:Greeting">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+    <wsdl:operation name="Greet">
+      <soap:operation soapAction="http://example.com/Greet" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://example.com/hello"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://example.com/hello"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Shout">
+      <soap:operation soapAction="http://example.com/Shout" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://example.com/hello"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="http://example.com/hello"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Blag">
+      <soap:operation soapAction="http://example.com/Blag" />
+      <wsdl:input>
+        <soap:body use="literal" namespace="http://example.com/hello"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreetService">
+    <wsdl:port name="Greet" binding="hello:Greeting">
+      <soap:address location="http://localhost:3000/doclitwrapped/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

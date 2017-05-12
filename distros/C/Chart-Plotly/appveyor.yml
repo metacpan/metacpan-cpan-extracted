@@ -1,0 +1,52 @@
+version: build-{build}
+
+clone_depth: 50
+
+environment:
+  PERL_CPANM_OPT: "--notest --force --skip-satisfied"
+
+platform:
+  - x64
+
+install:
+  - cmd: >-
+      choco install curl
+
+      curl -O http://strawberryperl.com/download/5.24.0.1/strawberry-perl-5.24.0.1-64bit-PDL.zip
+
+      choco install unzip
+
+      mkdir C:\strawberry
+
+      unzip -qq strawberry-perl-5.24.0.1-64bit-PDL.zip -d C:\strawberry
+      
+      set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+   
+      gcc -v
+
+      g++ -v
+
+      perl -V
+        
+      perl -e"require CPAN;CPAN::Shell->notest('install','App::cpanminus');"
+      
+      cpanm Compiler::Lexer
+
+      cpanm Pod::Weaver::Section::Contributors Data::Table Data::Frame List::Flatten 
+
+      cpanm Dist::Zilla
+
+      choco install git
+
+      dzil authordeps --missing | cpanm
+
+      dzil listdeps --author --missing | cpanm
+
+      dzil listdeps --missing | cpanm
+
+build_script:
+  - "dzil build" 
+
+test_script:
+  - "dzil test"
+

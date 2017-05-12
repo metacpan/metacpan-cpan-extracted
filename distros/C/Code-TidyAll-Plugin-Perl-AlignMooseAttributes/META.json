@@ -1,0 +1,50 @@
+{
+   "abstract" : "TidyAll plugin to sort and align Moose-style attributes",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Code-TidyAll-Plugin-Perl-AlignMooseAttributes",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll" : "0.04",
+            "List::Util" : 0,
+            "Text::Aligner" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-code-tidyall-plugin-perl-alignmooseattributes@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Code-TidyAll-Plugin-Perl-AlignMooseAttributes"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-code-tidyall-plugin-perl-alignmooseattributes.git",
+         "web" : "https://github.com/jonswar/perl-code-tidyall-plugin-perl-alignmooseattributes"
+      }
+   },
+   "version" : "0.01"
+}
+

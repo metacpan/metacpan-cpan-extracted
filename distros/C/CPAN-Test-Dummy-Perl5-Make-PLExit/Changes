@@ -1,0 +1,10 @@
+Revision history for CPAN-Test-Dummy-Perl5-Make-PLExit
+
+1.01 Sat Nov  3 00:56:22 EDT 2007
+    
+    - add pointless tests so I don't lower my average Kwalitee for releasing a
+      module that is designed to fail
+
+1.00 Thu Sep 27 05:57:29 EDT 2007
+
+     - started as copy of CPAN-Test-Dummy-Perl5-Make-FailLate

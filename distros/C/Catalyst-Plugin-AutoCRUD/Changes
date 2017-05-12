@@ -1,0 +1,679 @@
+2.200002  2015-02-14
+
+  * Fix access to stash in TT view
+
+2.200001  2015-01-06
+
+  * Fix version numbers for CPAN
+
+2.200000  2015-01-06
+
+  * [#30] Fix JavaScript truncates some valid bigint values (trinitum)
+  * Alert users to RapidApp and maintenance status for AutoCRUD
+
+2.143070  2014-11-03 21:12:29 Europe/London
+
+  * [#98448] Remove FATAL => all from warnings import (ANDK)
+
+2.142820  2014-10-09 13:26:50 Europe/London
+
+  * [#98954] Fix malformed tests missing foreign/self prefix
+
+2.141940  2014-07-13 10:22:41 Europe/London
+
+  * extjs from the CDN over HTTPS (mendel)
+  * Fix deprecation warning from SQL::Translator
+
+2.131210  2013-05-01 21:12:25 Europe/London
+
+  * Support Oracle LIKE syntax properly (tunakermit)
+
+2.131060  2013-04-16 13:00:35 Europe/London
+
+  * Revert c9a134b (#20) squash table names
+
+2.130410  2013-02-10 14:17:38 Europe/London
+
+  * Set default Template Toolkit template encoding to be UTF-8 (N. Arakawa)
+
+2.123610  2012-12-26 13:15:42 Europe/London
+
+  * Do not squash case in table names (MySQL support - J.A. Marshall, closes #20)
+
+2.123480  2012-12-13 21:17:34 Europe/London
+
+  * Fix test schema to have valid accessor name for 'rights owner' col
+
+2.123270  2012-11-22 23:01:26 Europe/London
+
+  [ENHANCEMENTS]
+
+  * Support for hook-systems such as DBIC::AuditLog and DBIC::Journal (SineSwiper, closes #24)
+
+2.122460  2012-09-02 12:58:11 Europe/London
+
+  [BUG FIXES]
+
+  * Bug with is_nullable = false + default = '' (SineSwiper, closes #22)
+
+2.122400  2012-08-27 13:34:48 Europe/London
+
+  [BUG FIXES]
+
+  * On column value retrieval, don't squash "0" (int or char) to "" (piotr)
+
+2.120250  2012-01-25 23:00:17 Europe/London
+
+  [BUG FIXES]
+
+  * Depend on DBIx::Class 0.08127 (rt.cpan #74320 and #74283, M. Rusko)
+  * Depend on DBD::SQLite (rt.cpan #74133, Todd R.)
+
+2.113450  2011-12-11 15:12:52 Europe/London
+
+  [ENHANCEMENTS]
+
+  * Change /static for /cpacstatic to play nice with Plugin::Static (Caelum)
+
+2.113270  2011-11-23 22:56:43 Europe/London
+
+  [BUG FIXES]
+
+  * Add and Update were not passing through the ExtJS DisplayEngine
+
+2.113020_005 2011-10-29 20:09:01 Europe/London
+
+  [BUG FIXES]
+
+  * Set prelude in POD to fix the position of PURPOSE section
+  * Typos in POD
+
+2.113020_004 2011-10-29 19:42:16 Europe/London
+
+  [ENHANCEMENTS]
+
+  * New manual pages for Troubleshooting, DBIC Tips, and Limitations
+  * Frontend now called DisplayEngine (except for config)
+  * Backend now called StorageEngine (except for config)
+  * User can specify "backends" in config for non-DBIC storage
+  * Always forward() to DisplayEngine, for consistency
+  * Template Toolkit now configured to PRE_CHOMP for source readability
+  * wrapper.tt template is factored out into five parts, easier overriding
+
+  [BUG FIXES]
+
+  * Clearing the ExtJS2 filters also now clears "Browse" link params
+  * Works when there are no sources within a DB schema
+  * Skinny template was using old stashed metadata var names
+
+2.112890_003 2011-10-16 11:02:30 Europe/London
+
+  [BUG FIXES]
+
+  * Hidden table must not be linked to from an FK hyperlink icon
+
+2.112890_002 2011-10-16 10:43:02 Europe/London
+
+  [NEW FEATURES]
+
+  * Add hyperlink icon from any FK to the related table+record
+  * Support DBIC Dynamic Default components such as DBIx::Class::TimeStamp
+
+  [ENHANCEMENTS]
+
+  * Display alert message when table data load fails (Getty)
+  * Implement separate create() and update() in DBIC backend (davewood)
+
+  [BUG FIXES]
+  
+  * Fix for hidden table configuration (F. Elliott)
+  * Fix for when m2m gets generated with same name as existing rel
+
+2.112830_001 2011-10-10 20:59:11 Europe/London
+
+  [ENHANCEMENTS]
+
+  * Non virtual (DBIx::Class) Views have better displayed names
+  * Two new Demo Apps to highlight other features
+
+  [BUG FIXES]
+
+  * Fix multiple schema bug reported by Julien Gilles
+  * Demo App now runs under modern Catalyst::ScriptRunner
+  * Unchecking checkboxes now updates the database correctly
+
+2.112780-TRIAL  2011-10-06 00:43:33 Europe/London
+
+  [NEW FEATURES]
+
+  * Full support for both composite and compound primary keys
+  * Can set filters on has_many and many_to_many type relations
+  * URI query string can pre-set filter(s): cpac_filter.$col=$val
+  * Support for tables with no primary key (possibly read-only)
+  * Support for columns with names that are not Perl identifiers
+
+  * Support for Views (in DBIx::Class, both virtual and non-virtual)
+  * DBIx::Class proxy columns are displayed and can be edited
+  * Support custom accessor names on DBIx::Class columns
+
+  [ENHANCEMENTS]
+
+  * Delete dialog boxes use the "friendly" row display_name
+  * Tables can have multiple relations to the same table
+  * Tables can have relations to themselves
+  * Auto-increment columns are not displayed on the Add/Edit form
+  * Default behaviour to hide "uninteresting" columns (e.g. links)
+  * Default sort column is the first unhidden column
+
+  [DEPRECATIONS]
+
+  * The list_returns config option is no longer supported
+  * No longer can edit "reverse" relations (has_one, might_have)
+
+  [OTHER]
+
+  * A new "backend" infrastructure has been implemented. This uses
+    SQL::Translator as an abstraction between the frontend render
+    engine (templates) and the storage engine (such as DBIx::Class).
+    It ought to be possible to deploy AutoCRUD on top of any other
+    storage engine which can provide a table/column-like interface.
+
+  [TODO]
+
+  * Document the new features
+  * Document the backend architecture and APIs
+
+1.110731  2011-03-14 20:14:06 Europe/London
+
+  * Fix example DemoApp to hide package name from PAUSE
+
+1.110730  2011-03-14 09:24:22 Europe/London
+
+  * Avoid dieing in the presence of relations whose target class is missing
+
+1.110471  2011-02-16 23:13:52 Europe/London
+
+  * Fix Dist::Zilla config to include full dependencies list
+
+1.110470  2011-02-16 23:02:18 Europe/London
+
+  * Port to Dist::Zilla
+  * Fix encoding on AJAX (shirirulestheworld rt.cpan #58483)
+
+libcatalyst-plugin-autocrud-perl (0.71_02) UNRELEASED; urgency=low
+
+  * Rename all uses of lf to cpac (legacy ListFramework references)
+  * Make stash use much more polite - use cpac_* namespacing
+  * Add dumpmeta_html endpoint which dumps metadata to HTML
+  * Support for dispatched storage backends via site_conf backend
+  * Add http_charset param to override the (new) default of utf-8
+  * Filter output for HTML entities in skinny frontnend
+  * DBIC ResultSource::View results in a CUD operations being disabled
+  * [temporary] fix for rt.cpan #56250 Views have no primary key(s)
+  * fix for rt.cpan #56795 non-DBIC models can blow up when instantiated
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 02 May 2010 16:43:20 +0100
+
+libcatalyst-plugin-autocrud-perl (0.68) UNRELEASED; urgency=low
+
+  * Fix access of schema method via model not to assume proxying (thx nigel) 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed, 13 Jan 2010 00:04:57 +0000
+
+libcatalyst-plugin-autocrud-perl (0.67) UNRELEASED; urgency=low
+
+  * rt.cpan#52297 fix demo app to work under Catalyst 5.8 (thanks t0m!!)
+  * also allow demo app to try to work if AutoCRUD is not installed
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 01 Dec 2009 21:52:58 +0000
+
+libcatalyst-plugin-autocrud-perl (0.66) UNRELEASED; urgency=low
+
+  * fix for FK short circuit against integer data type 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 29 Nov 2009 14:09:00 +0000
+
+libcatalyst-plugin-autocrud-perl (0.65) UNRELEASED; urgency=low
+
+  * reset button now only reloads grid data, not whole page 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 29 Nov 2009 11:32:05 +0000
+
+libcatalyst-plugin-autocrud-perl (0.64) UNRELEASED; urgency=low
+
+  * add button to reset grid settings (sort, page, limit)
+  * fix paging when page size is not the default of 10
+  * fix bug in field names for add/edit not using headings setting
+  * fix delete test to not try to delete record in constraint
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 28 Nov 2009 20:21:20 +0000
+
+libcatalyst-plugin-autocrud-perl (0.63) UNRELEASED; urgency=low
+
+  * fix for limit param being duplicated in skinny frontend 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 23 Nov 2009 21:26:50 +0000
+
+libcatalyst-plugin-autocrud-perl (0.62) UNRELEASED; urgency=low
+
+  * add "columns" and "headings" site conf; "list_returns" now deprecated.
+  * add icon in Javascript frontend linking to non-JS skinny version 
+  * skinny frontend now has the schema and source selection pages
+  * skinny supports "limit" param if you want to hack the page size
+  * add icons to skinny view for refresh, source picker, link to JS view
+  * add site config to dumpmeta
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 22 Nov 2009 17:16:53 +0000
+
+libcatalyst-plugin-autocrud-perl (0.61) UNRELEASED; urgency=low
+
+  * enable the /browse functionality
+  * fix bug in /browse where it was accidentally being a sticky setting
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 19 Nov 2009 20:44:16 +0000
+
+libcatalyst-plugin-autocrud-perl (0.59) UNRELEASED; urgency=low
+
+  * fix bug on filtering of FK when using real FK value (thanks denny) 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 17 Nov 2009 19:04:44 +0000
+
+libcatalyst-plugin-autocrud-perl (0.58) UNRELEASED; urgency=low
+
+  * fix test so it does not trip up on FK constraint and delete
+  * fix deps to make sure a JSON module is installed
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 16 Nov 2009 17:29:27 +0000
+
+libcatalyst-plugin-autocrud-perl (0.57) UNRELEASED; urgency=low
+
+  * can add /browse to any url to get a read-only non-javascript
+    list view supporting sorting and paging
+  * the frontend skin used by /browse can be set as the default for a
+    site by using frontend=skinny in the site config
+  * fix mistake in tests SQL causing sqlite to bail out 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 09 Nov 2009 08:40:09 +0000
+
+libcatalyst-plugin-autocrud-perl (0.56) UNRELEASED; urgency=low
+
+  * Added an optimization to full-text searches on related records;
+    sample queries reduced to about 15% of previous time taken :-)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 05 Nov 2009 23:41:23 +0000
+
+libcatalyst-plugin-autocrud-perl (0.55) UNRELEASED; urgency=low
+
+  * POD improvements 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 05 Nov 2009 22:52:40 +0000
+
+libcatalyst-plugin-autocrud-perl (0.54) UNRELEASED; urgency=low
+
+  * POD improvements, add a troubleshooting section
+  * emit two more log messages about error conditions in belongs_to
+    configurations which will cause AutoCRUD to break (thanks denny)
+  * update SQL in example demo app to include a has_one relationship
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 05 Nov 2009 15:34:08 +0000
+
+libcatalyst-plugin-autocrud-perl (0.53) UNRELEASED; urgency=low
+
+  * filter on FK now offers drop-down list of related records,
+    or you can enter some text and that will perform a slower full search
+  * use DBIx:Class prefetch and join on belongs_to/has_one/might_have
+  * add "(REF)" text to headings of has_one/might_have columns
+  * emit log message about belongs_to relations which are is_nullable
+    but do not have a join_type set (causes missing rows with join)
+  * fix bug in handling of numeric filter values - now stringified
+  * tighten up the discovery of each relation type, add metadata hints
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 03 Nov 2009 19:51:38 +0000
+
+libcatalyst-plugin-autocrud-perl (0.51) UNRELEASED; urgency=low
+
+  * implement filtering on FK columns (has_one and belongs_to)
+  * implement working sorting for FK columns (has_one and belongs_to)
+  * add/edit drop-down select for related records now pages properly
+  * allow clearing of FK value in add/edit form, if nullable
+  * allow belongs_to to use a custom accessor name (i.e. not be a filter)
+  * tests and docs updated for above
+  * fix when list_returns is not used at all - default back to old behaviour
+  * fix create_allowed=no such that add/edit hides the extra tabs
+  * fix hash form of list_returns ignores missing value #50221
+  * fix sometimes missing DB name which was not being cached #45180
+  * remove Google Groups link - full of spam!
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 31 Oct 2009 20:38:43 +0000
+
+libcatalyst-plugin-autocrud-perl (0.49) UNRELEASED; urgency=low
+
+  * [rt.cpan #49262] Editing text columns should result in textarea
+  * Small tweak to the iso8601 processing to handle float seconds.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 03 Sep 2009 00:32:11 +0100
+
+libcatalyst-plugin-autocrud-perl (0.48) UNRELEASED; urgency=low
+
+  * Comment out some debugging lines
+  * Add LIKE hint for MySQL (thanks to H. Frayman)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 24 Aug 2009 12:23:57 +0100
+
+libcatalyst-plugin-autocrud-perl (0.47) UNRELEASED; urgency=low
+
+  * short term release (?) until Catalyst::View::JSON is fixed
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 23 Aug 2009 09:26:20 +0100
+
+libcatalyst-plugin-autocrud-perl (0.46) UNRELEASED; urgency=low
+
+  * [rt.cpan #48836] fixes to list_returns use so that DB updates actually work
+  * [rt.cpan #46207] work around use of {accessor} attr on column
+  * [rt.cpan #48530] support column names with space characters
+  * [rt.cpan #48083] search should reset the pager page
+  * [rt.cpan #46121] fix lower case search to use ILIKE instead of lower()
+  * search on numeric fields is exact instead of LIKE
+  * make sure list_returns overridden column headings are used in edit form as well
+  * fix to promotion of list-only version of list_returns so it works like _2title
+  * fixes to extjs code to correct true/false return values in AJAX
+  * fix for NULL numeric fields being submitted to DB as empty strings
+  * debugging log improvements
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 20 Aug 2009 23:51:12 +0100
+
+libcatalyst-plugin-autocrud-perl (0.45) UNRELEASED; urgency=low
+
+  * tooltips now no longer line wrap, nor time out on display
+  * fix bug in list_returns col name override use
+  * rename all html ids and classes to be app specific names so as not to clash
+  * allow inclusion of extra TT paths at start for local overrides
+  * add (cosmetic only) create_allowed functionality
+  * Update docs with new features
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 21 Jul 2009 20:01:48 +0100
+
+libcatalyst-plugin-autocrud-perl (0.44) UNRELEASED; urgency=low
+
+  * fix a bug in t/40-plugin.t 
+  * correct heinous crime of having the wrong config section name everywhere :(
+  * add -f flag to demo app on mst's suggestion
+  * fix bug in extjs2 option handling, and add tests for that
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 09 Apr 2009 13:21:44 +0100
+
+libcatalyst-plugin-autocrud-perl (0.43) UNRELEASED; urgency=low
+
+  * just fix some documentation typos
+  * tweak an eval'd package so PAUSE doesn't see it
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 09 Apr 2009 11:16:52 +0100
+
+libcatalyst-plugin-autocrud-perl (0.42) UNRELEASED; urgency=low
+
+  * this is a new dist forked from my own CatalystX::ListFramework::Builder
+  * resolve RT.cpan#44019 by checking whether moniker can be converted to model
+  * Metadata now cached in the Model's class data
+  * new global config in <Catalyst::Plugin::AutoCRUD> space
+  * new config option basepath as an alternative to action->base->PathPart
+  * AJAX now uses a more RPC-like url scheme
+  * foreign table data link (magnifying glass) not shown if there's no data there
+  * default pathpart is now 'autocrud' so plugin should integrate better
+  * added 'hidden' option to conf which can be applied to a schema or source
+  * added 'delete_allowed', 'update_allowed' (also create) and 'list_returns'
+  * default for extjs2 option is to now use the CacheFly hosted libs :-)
+  * column header names can be overridden via the 'list_returns' option
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 28 Mar 2009 18:43:48 +0000
+
+libcatalystx-listframework-builder (0.41) UNRELEASED; urgency=low
+
+  * resolve rt.cpan#41225 not escaping quote chars in default values 
+  * resolve rt.cpan#42352 Uses 'true'/'false' for booleans instead of 1/0
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 07 Feb 2009 17:36:36 +0000
+
+libcatalystx-listframework-builder (0.39) UNRELEASED; urgency=low
+
+  * t/44 failed when missing Lingua module, also spurious deps (RT#42300) 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 11 Jan 2009 14:11:29 +0000
+
+libcatalystx-listframework-builder (0.38) UNRELEASED; urgency=low
+
+  * Switch from Class::C3 to MRO::Compat for new Perl/Catalyst (reported by Laust)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Wed, 31 Dec 2008 14:44:02 +0000
+
+libcatalystx-listframework-builder (0.37) UNRELEASED; urgency=low
+
+  * Fix for bug reported when adding new rows (RT#41974) 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 30 Dec 2008 23:08:08 +0000
+
+libcatalystx-listframework-builder (0.36) UNRELEASED; urgency=low
+
+  * Switch table Go to: picker to be plain HTML+JS rather than ExtJS because
+    it wasn't rendering properly
+  * "Table name" is either ->from or Source Class name
+  * Support for many_to_many rels - the target table's data is displayed
+  * Bundled a customized demo server application for instant play-time
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 11 Sep 2008 23:19:41 +0100
+
+libcatalystx-listframework-builder (0.35) UNRELEASED; urgency=low
+
+  * Add ExtJS Cookie support - stores grid attributes such as col order and
+    page size on per-table basis (thanks to Laust for the feature heads-up)
+  * Move some of the templates around in the filesystem
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  6 Sep 2008 23:43:35 +0100
+
+libcatalystx-listframework-builder (0.34) UNRELEASED; urgency=low
+
+  * Fix RT #38993 - AJAX::_sfy not handling undefined $row values 
+  * Fix RT #38990 - Don't pass undef (or anything) for auto-increment columns
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu,  4 Sep 2008 17:58:08 +0100
+
+libcatalystx-listframework-builder (0.33) UNRELEASED; urgency=low
+
+  * Fix bug in use of $c->model with unqualified component names 
+  * Check for many_to_many in record stringification
+  * Update POD to more clearly show extjs is served from /static/ (thanks claco)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 31 Aug 2008 16:43:33 +0100
+
+libcatalystx-listframework-builder (0.32) UNRELEASED; urgency=low
+
+  * Cannot test autoloading until the new release of Schema::Loader is out 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 31 Aug 2008 00:30:05 +0100
+
+libcatalystx-listframework-builder (0.31) UNRELEASED; urgency=low
+
+  * Scans Models and loads any which are DBICish, Model::LFB::DBIC now optional
+  * Supports multiple Schema (databases) being loaded
+  * "Home" page with selector for databases and tables
+  * Will load Schema on the fly from DB if schema_class is not provided
+  * Allow Static handler to serve CSS (add mime type)
+  * Filter/search row is now added server-side rather than via ExtJS hacks -
+    this is much cleaner, simpler to implement, and allows grid resizing to work
+  * Move stylesheets from being in-line TT files, to their own served CSS
+  * Add header and footer information to all pages
+  * Remove ExtJS ViewPort, and render Grid directly to a Div
+  * Split javascript sources into more templates, as they've grown quite large
+  * Update POD to describe new use cases
+  * Change License to Artistic/GPL (previously only GPL2, by mistake)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 28 Aug 2008 15:15:32 +0100
+
+libcatalystx-listframework-builder (0.29) UNRELEASED; urgency=low
+
+  * Bug fix for missing commas in templated javascript (thanks to nigel)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 26 Aug 2008 14:04:00 +0100
+
+libcatalystx-listframework-builder (0.28) UNRELEASED; urgency=low
+
+  * Better handling of timstamps & DateTime obj - using the Ext xdatetime extension
+  * Migrate to Module::Install (from ExtUtils::MakeMaker)
+  * Change built-in static handler to be generic and not just for images
+  * Rename ajax call get_stringified to list_stringified
+  * Ship test suite (watch the sucker blow!)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 23 Aug 2008 21:13:30 +0100
+
+libcatalystx-listframework-builder (0.27) UNRELEASED; urgency=low
+
+  * Fix for expanding grid dealing with viewport resize (reported by redspike)
+  * New test suite, about one third done (tests basics, and the list action)
+  * Fix for use as plugin with existing TT View + RenderView (thanks to karpet and abraxxa)
+  * Add metadata dumper action, in support of testing
+  * Fix the helloworld template to have an HTML tag
+  * Remove unecessary check for !=0 on params in the list AJAX call (has ||= already)
+  * Remove unused params from TT view
+  * Use c.config.extjs2 in templates rather than c.extjs2 (report by abraxxa)
+  * Small tidying to templates used for main page output 
+  * Friendly error page if Javascript is disabled in the client browser (report by malcolm)
+  * Fix exists bug in Metadata.pm (thanks to abraxxa)
+  * Better support for Result Class names with underscores (report by abraxxa)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 22 Aug 2008 13:00:54 +0100
+
+libcatalystx-listframework-builder (0.25) UNRELEASED; urgency=low
+
+  * Grid expands to show rows until it needs a scrollbar
+  * Delete column uses tooltip for text
+  * Fix for form's combobox (related) search to be case insensitive
+  * Nuke all the c.base usage in favour of c.uri_for
+  * Change all component namespace into LFB::
+    Your DBIC Model's config *must* change from Model::DBIC to Model::LFB::DBIC
+  * Config var for ExtJS lib location changed from javascript to extjs2
+    Your App config *must* change from using "javascript" to "extjs2"
+  * Application is now relocateable and useable as a plugin (see POD for details)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 19 Aug 2008 14:40:05 +0100
+
+libcatalystx-listframework-builder (0.24) UNRELEASED; urgency=low
+
+  * CSS fix for IE so that tabbed form with fieldset works properly
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 17 Aug 2008 20:53:15 +0100
+
+libcatalystx-listframework-builder (0.23) UNRELEASED; urgency=low
+
+  * More Javascript fixes (for IE, and using JSLint)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 17 Aug 2008 16:21:49 +0100
+
+libcatalystx-listframework-builder (0.22) UNRELEASED; urgency=low
+
+  * Fix trailing JS list comma problem in IE (reported by Laust Frederiksen)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 17 Aug 2008 15:05:07 +0100
+
+libcatalystx-listframework-builder (0.21) UNRELEASED; urgency=low
+
+  * Now print more useful error on missing/unknown table w/ links to tables
+  * Text in delete column is more useful (refs PK val) rather than "Delete"
+  * Deprecate stringify in favour of display_name
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu, 14 Aug 2008 00:13:29 +0100
+
+libcatalystx-listframework-builder (0.19) UNRELEASED; urgency=low
+
+  * Change system to be a Catalyst Plugin on the recommendation of mst
+  * Small tweaks to controller action suggested by jhthorsen
+  * POD updates to use Config::General rather than YAML (again, thanks mst)
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue, 12 Aug 2008 23:31:42 +0100
+
+libcatalystx-listframework-builder (0.18) UNRELEASED; urgency=low
+
+  * Some great input from jhthorsen helped refactor the bootstrapping
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 10 Aug 2008 08:43:40 +0100
+
+libcatalystx-listframework-builder (0.17) UNRELEASED; urgency=low
+
+  * Fix for has_one, might_have situations where the PK val is user-supplied 
+  * POD tweaks
+  * Fix the crappy test. Need to write proper tests when API is more stable.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat,  9 Aug 2008 13:12:50 +0100
+
+libcatalystx-listframework-builder (0.16) UNRELEASED; urgency=low
+
+  * Fix to help people using ConfigLoader plugin >= 0.20 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Thu,  7 Aug 2008 13:14:20 +0100
+
+libcatalystx-listframework-builder (0.15) UNRELEASED; urgency=low
+
+  * Stop fiddling linebreaks in TT - will come back to this one
+  * Move switch for field type options into TT
+  * POD updates
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Tue,  5 Aug 2008 14:07:30 +0100
+
+libcatalystx-listframework-builder (0.14) UNRELEASED; urgency=low
+
+  * Added top toolbar on the suggestion of tomboh, to reduce clutter 
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun,  3 Aug 2008 22:56:17 +0100
+
+libcatalystx-listframework-builder (0.13) UNRELEASED; urgency=low
+
+  * Add selector for num of displayed rows (default 10)
+  * Disable menu on the Delete and Multi columns (Laust Frederiksen)
+  * Align images to middle of text (delete and related data cells)
+  * Filter search is now case insensitive
+  * Clean up some of the qtip handling
+  * Considerable, major refactoring of the whole distribution
+  * As a result of above, no longer compatible with formdef files
+  * No more ListFramework object - metadata is all stored in the stash
+  * Delete sequence is modal whilst AJAX delete is being called
+  * Overhaul relations parsing so that might_have and has_one now work if set
+  * Improved rendering of boolean type in list view using tick/cross images
+  * Improved presentation of a few field types in the form (bool, dates)
+  * Fix for missing checkbox fields as per the HTML spec
+  * Rudimentary data import/export filtering for some types eg bool,date
+  * Comment out TT:XS stash use
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun,  3 Aug 2008 20:08:45 +0100
+
+libcatalystx-listframework-builder (0.12) UNRELEASED; urgency=low
+
+  * Added columns for one_to_many relations using a tooltip to show data
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Mon, 21 Jul 2008 21:04:33 +0100
+
+libcatalystx-listframework-builder (0.08) UNRELEASED; urgency=low
+
+  * Enforce rebuild of formdef on each hit otherwise it gets confused 
+  * Remove requirement on Perl version in Core.pm
+  * Added a drop-down listbox to the status bar with links to other DB tables
+  * Added version string to the toolbar
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sun, 20 Jul 2008 10:54:31 +0100
+
+libcatalystx-listframework-builder (0.07) UNRELEASED; urgency=low
+
+  * Refactored to remove Util.pm which was legacy stuff from ListFramework.pm
+  * Simplified the Controlller by using a begin() action
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Sat, 19 Jul 2008 17:04:37 +0100
+
+libcatalystx-listframework-builder (0.06) UNRELEASED; urgency=low
+
+  * Removed Helpers which was a hang-over from the other ListFramework.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 18 Jul 2008 23:41:00 +0100
+
+libcatalystx-listframework-builder (0.05) UNRELEASED; urgency=low
+
+  * Initial release on an unsuspecting world.
+    For more details see the TODO file.
+
+ -- Oliver Gorwits <oliver.gorwits@oucs.ox.ac.uk>  Fri, 18 Jul 2008 23:13:16 +0100

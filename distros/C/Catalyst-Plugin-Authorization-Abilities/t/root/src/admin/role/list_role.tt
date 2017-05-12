@@ -1,0 +1,19 @@
+<h1 class="caps">list all roles</h1>
+
+<table>
+<tr><th>ID</th><th>Name</th><th>Active</th><th></th><th></th></tr>
+[% WHILE ( role=roles.next ) -%]
+  <tr>
+  <td>[% role.id %]</td>
+  <td>[% role.name %]</td>
+  <td>[% role.active %]</td>
+  <td><a href="[% c.uri_for('/admin/role/') %][% role.id %]/edit">Edit</a></td>
+  <td><a href="[% c.uri_for('/admin/role/') %][% role.id %]/del">Delete</a></td>
+  </tr>
+[% END %]
+</table>
+<br />
+<ul>
+<li><a href="[% c.uri_for('/admin/role/add') %]">Add a role</a></li>
+<li><a href="[% c.uri_for('/admin/') %]">Return to administration</a></li>
+</ul>

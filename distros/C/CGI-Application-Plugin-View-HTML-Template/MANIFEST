@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/01-simple.t
+test/templates/test.tmpl
+lib/CGI/Application/Plugin/View/HTML/Template.pm
+META.yml                                 Module meta-data (added by MakeMaker)

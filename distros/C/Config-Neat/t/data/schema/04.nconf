@@ -1,0 +1,9 @@
+path {
+    some_key        foo  bar  baz
+    some_key_2      `foo  bar  baz`
+}
+
+path2 {
+    some_key        foo  bar  baz
+    some_key_2      `foo  bar  baz`
+}

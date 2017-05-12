@@ -1,0 +1,171 @@
+#!perl
+
+# PODNAME: yactool
+#ABSTRACT: A simple command-line tool for CPANPLUS::YACSmoke
+
+use strict;
+use warnings;
+use CPANPLUS::YACSmoke qw(:all);
+use Pod::Usage;
+use Getopt::Long;
+
+my $test;
+my $mark;
+my $purge;
+my $flush;
+my $reindex;
+
+GetOptions( 'test', \$test, 'mark', \$mark, 'purge', \$purge, 'flush', \$flush, 'reindex', \$reindex )
+	or pod2usage;
+
+if ( $reindex ) {
+  reindex();
+  exit 0;
+}
+
+if ( $test ) {
+  test( @ARGV );
+  exit 0;
+}
+
+if ( $mark ) {
+  mark( @ARGV );
+  exit 0;
+}
+
+if ( $purge ) {
+  purge( @ARGV );
+  exit 0;
+}
+
+if ( $flush ) {
+  flush( @ARGV );
+  exit 0;
+}
+
+pod2usage;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yactool - A simple command-line tool for CPANPLUS::YACSmoke
+
+=head1 VERSION
+
+version 1.02
+
+=head1 SYNOPSIS
+
+ yactool [options]
+
+ Options:
+   --test	- test distributions
+   --mark	- mark distributions
+   --purge	- purge distributions
+   --flush	- flush distributions
+   -reindex - reindex CPANPLUS indices
+
+=head1 DESCRIPTION
+
+yactool is a simple command-line tool for L<CPANPLUS::YACSmoke>.
+
+=head1 SWITCHES
+
+=over
+
+=item C<--test>
+
+  yactool --test
+
+  yactool --test R/RR/RRWO/Some-Dist-0.01.tar.gz
+
+Runs tests on CPAN distributions. Arguments should be paths of
+individual distributions in the author directories.  If no arguments
+are given, it will download the F<RECENT> file from CPAN and use that.
+
+By default it uses L<CPANPLUS> configuration settings. If L<CPANPLUS> is set
+not to send test reports, then it will not send test reports.
+
+=item C<--mark>
+
+  yactool --mark Some-Dist-0.01
+
+  yactool --mark Some-Dist-0.01 fail
+
+Retrieves the test result in the database, or changes the test result.
+
+It can be useful to update the status of a distribution that once
+failed or was untestable but now works, so as to test modules which
+make use of it.
+
+Grades can be one of (case insensitive):
+
+  aborted  = tests aborted (uninstallable prereqs or other failure in test)
+  pass     = passed tests
+  fail     = failed tests
+  unknown  = no tests available
+  na       = not applicable to platform or installed libraries
+  ungraded = no grade (test possibly aborted by user)
+  none     = undefines a grade
+  ignored  = package was ignored (a newer version was tested)
+
+=item C<--purge>
+
+  yactool --purge
+
+  yactool --purge Some-Dist-0.01
+
+Purges the entries from the local cpansmoke database. The criteria for purging
+is that a distribution must have a more recent version, which has previously
+been marked as a C<PASS>. However, if one or more distributions are passed as a
+parameter list, those specific distributions will be purged.
+
+=item C<--flush>
+
+  yactool --flush
+
+  yactool --flush all
+
+  yactool --flush old
+
+Removes unrequired build directories from the designated CPANPLUS build
+directory. Note that this deletes directories regardless of whether the
+associated distribution was tested.
+
+Default flush is 'all'. The 'old' option will only delete the older
+distributions, of multiple instances of a distribution.
+
+Note that this cannot be done reliably using last access or modify time, as
+the intention is for this distribution to be used on any OS that CPANPLUS
+is installed on. In this case not all OSs support the full range of return
+values from the stat function.
+
+=item C<--reindex>
+
+  yactool --reindex
+
+Make L<CPANPLUS> reload its indices.
+
+=back
+
+=head1 SEE ALSO
+
+L<CPANPLUS::YACSmoke>
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Chris Williams, Jos Boumans, Robert Rothenberg and Barbie.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

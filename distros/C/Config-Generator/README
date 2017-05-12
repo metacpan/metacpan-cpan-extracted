@@ -1,0 +1,51 @@
+Config-Generator
+
+The goal of this collection of modules is to ease the generation of low-level
+configuration files from high-level configuration items and templates.
+
+The main idea is to define an abstraction of whatever needs to be generated
+(for instance a messaging broker), to validate this abstraction with a strict
+schema (using the Config::Validator module) and to generate all the different
+files that are needed. The final files are simply generated (overwritten). If
+you need to modify existing files preserving their contents, you should use
+other tools such as Augeas.
+
+This is beta software with incomplete documentation. Use it at your own risks!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this package using the
+perldoc command:
+
+    yacg --manual
+    perldoc Config::Generator
+    perldoc Config::Generator::Config
+    perldoc Config::Generator::Crontab
+    perldoc Config::Generator::File
+    perldoc Config::Generator::Hook
+    perldoc Config::Generator::Random
+    perldoc Config::Generator::Schema
+    perldoc Config::Generator::Template
+    perldoc Config::Generator::Util
+    perldoc Config::Generator::XML
+
+You can also find an example of a wrapper script in the eg directory.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2013-2016
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

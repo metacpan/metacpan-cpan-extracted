@@ -1,0 +1,29 @@
+---
+abstract: 'Declare RESTful API for CGI::Application'
+author:
+  - 'Aku Kauste <aku@cpan.org>'
+build_requires:
+  CGI::Application: 0
+  CGI::Application::PSGI: 0
+  CGI::PSGI: 0
+  Plack::Builder: 0
+  Test::More: 0
+  Test::WWW::Mechanize::PSGI: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-DeclareREST
+requires:
+  CGI::Application: 4.50
+  Exporter: 0
+  REST::Utils: 0
+  Routes::Tiny: 0.11
+  strict: 0
+  warnings: 0
+version: 0.01

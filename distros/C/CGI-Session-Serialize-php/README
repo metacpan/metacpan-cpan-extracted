@@ -1,0 +1,47 @@
+NAME
+       CGI::Session::Serialize::php - PHP serializer for CGI::Session
+
+DESCRIPTION
+       This library can be used by CGI::Session to serialize session data. It
+       is a wrapper around the "PHP::Session::Serializer::PHP". Use of this
+       serializer allows common session data storage when writing Web
+       Applications in both Perl and PHP. NOTE: you will need to store the
+       Session ID in your PHP session data structure as
+       $_SESSION['_SESSION_ID'] = session_id(); as the return from the
+       "thaw()" method is checked for it's existance. "CGI::Session" will
+       croak with the error "Invalid data structure returned from thaw()" if
+       it is not seen.	Don't forget to add 'serializer:php' to your
+       "CGI::Session" initialiaztion string.  =head1 METHODS
+
+       freeze($class, \%session_data_hash)
+	   Receives two arguments. First is the class name, the second is the
+	   session data to be serialized.  Should return serialized string on
+	   success, undef on failure.  Error message should be set using
+	   "set_error()|CGI::Session::ErrorHandler/"set_error()""
+
+       thaw($class, $php_serialized_string)
+	   Receives two arguments. First is the class name, second is the
+	   "PHP" serialized data string.  Should return deserialized session
+	   data structure on success, undef on failure.  Error message should
+	   be set using "set_error()|CGI::Session::ErrorHandler/"set_error()""
+
+SEE ALSO
+       "CGI::Session", "PHP::Session::Serializer::PHP".
+
+COPYRIGHT
+	Copyright (c) 2012 Ian McWilliam <kaosgnt@gmail.com>
+
+	Permission to use, copy, modify, and distribute this software for any
+	purpose with or without fee is hereby granted, provided that the above
+	copyright notice and this permission notice appear in all copies.
+
+	THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+	WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+	MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+	ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+	WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+	ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+	OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+AUTHOR
+	Ian McWilliam <kaosagnt@tpg.com.au>

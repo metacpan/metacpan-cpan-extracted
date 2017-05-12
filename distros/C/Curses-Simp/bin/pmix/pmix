@@ -1,0 +1,369 @@
+#!/usr/bin/perl -w
+# 26GK6RK: pmix (orig:mixr) by PipStuart<Pip@CPAN.Org> as Curses interactive interface which wraps `ximp`||`amixer`||`alsactl` to best `aumix`&&`alsamixer`;
+# 3CT7asP: renamd orig mixr to pmix (as complement to ximp); pmix has 2 main modes: mini with only:Vol,CD,PCM meters && full for all working mixer devices;
+# 2du: support more than 0..100 limit ranges && vertical scrolling for better handling many ALSA options
+#   add stereo balance mode as alternative to separate L/R sliders,
+#   add color file reading for:  item foreground background  ('-' = default),
+#     item: (active|axis|handle|hotkey|menu|play|record|track)
+#     colr: (black|red|green|yellow|blue|magenta|cyan|white|[krgybmcw])
+#   add interactive recoloring (using Simp::CPik) which saves to .rc,
+#   handle term resize events  (using Simp once supported),
+#   handle mouse events        (using Simp once supported),
+use strict; use warnings; use Curses::Simp; my $mixr = eval("use Audio::Mixer; 1") || 0; # Audio::Mixer is not full-featured so`ximp`tends2Bbetter
+my $mjvr = 1; my $mnvr = 0; my $ptvr = 'A82IP82'; my $name = $0; $name =~ s/.*\///; my $auth = 'Pip Stuart <Pip@CPAN.Org>';
+my @dopt =('vol', 'cd', 'pcm' ); my @optz = @dopt; my %omap; my %limz; # Dfalt mode && initial device options
+my %slut =(   '!'=>1,    '@'=>2,    '#'=>3,    '$'=>4,    '%'=>5,    '^'=>6,    '&'=>7,    '*'=>8,    '('=>9,    ')'=>0); # ShftLkUpTabl (4NumbKeyz,shudBin k8)
+my %valz =('wich'=>0, 'mode'=>0, 'mute'=>0, 'dig1'=>1, 'alll'=>0, 'only'=>0, 'ster'=>0, 'ltrt'=>0, 'recf'=>1, 'titl'=>0, 'info'=>0, 'cnin'=>1); # pmix valz
+my @bsbr =("-[-vol-(left)-'-|-[00%]-(R)-*muted*-(right)-vol-]",  # BaSe unselected[0] && selected[1] slider BaR texts to build @chrz from where 1st chr on ech
+           '={=vol=(LEFT)="=I=(00%)=[P]=@MUTED@=(RIGHT)=vol=}'); #   line is basic bar-chr wich then delimits:
+my @bsfc =('wgwOOOwwwwwwwwrwBwwwwwwwbcbwwwwwwwwwcccccccwOOOwg',  #     legc  TextString  txlt tikc sldc pcst rpst mutd txrt  TextString  regc
+           'WGWYYYWPPPPPPWBWPWGGGGGWCYCWWWWWWWWWCCCCCCCWYYYWG'); # BaSe Fore && Back un[0] && selected[1] slider Colors correspond to texts in @bsbr;
+my @bsbc =('kkkbbbkbbbbbbkkkbkKKKKKkpppkKKKKKKKkbbbbbbbkbbbkk',
+           'kkkpppkbbbbbbkkkpkrrrrrkgggkKKKKKKKkpppppppkpppkk'); my @chrz =();my @setz =();my $cnam = ''; # dynamic unselected && selected slider charz&&colors
+my @bkst =();my %sdvz =();my %recp =();my @text =();my @fclr =();my @bclr =();my $simp;my $chgr = '';my $keey = '';my $idle = 0;my $oidl = 0;my $dela = 0.1;
+sub FindChgr{my $chmx = `which ximp`  ;chomp(   $chmx); my $test = ''; # Find the best /dev/mixer Changer available
+             my $aumx = `which aumix` ;chomp(   $aumx);
+             my $almx = `which amixer`;chomp(   $almx);
+  if   (-e $almx){ $cnam =    'almx'  ; $chgr = $almx ;                            } # pref ALSA's `amixer` ahead of othrz
+  elsif(-e $chmx){ $cnam =    'ximp'  ; $chgr = $chmx ;                            }
+  elsif(-e $aumx){ $cnam =    'aumx'  ; $chgr = $aumx ;                            }
+  elsif(   $mixr){ $cnam =    'mixr'  ; $chgr = 'mixr';Audio::Mixer::init_mixer(); }
+  else           { die "Need ximp in your path!!!\n";              }
+  if($cnam eq 'ximp' || $cnam eq 'aumx'){#print 'Testing for valid mixer device...'; # die if no /dev/mixer
+    system("$chgr 2&>/tmp/testmixr.txt");
+    open(TEST, '<', '/tmp/testmixr.txt'); $test = join('',<TEST>); close TEST;
+    unlink(         '/tmp/testmixr.txt'); if($test =~ /unable to open/i){ die "No /dev/mixer found!!! =(\n"; }#else{ print "found!\n"; }
+  } }
+sub GeneBase{ # Generate Base bars && colors from templates
+  my $sndx = shift; my $ltxt; my $lfcl; my $lbcl; my $tmp0; my $tmp1; my @newc;
+  if(!$bsbr[$sndx + 2]){ # load @chrz first by splitting templates
+    $chrz[$sndx]{'barc'} = substr($bsbr[$sndx], 0, 1);
+    @newc = split(/$chrz[$sndx]{'barc'}+/, $bsbr[$sndx]);
+    $tmp0 = 0; $tmp1 = 1; # use as color index && field length
+    $chrz[$sndx]{'brfc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'brbc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'legc'} =             $newc[1];
+    $tmp0 += $tmp1;     $tmp1 = length($newc[1]);
+    $chrz[$sndx]{'lgfc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'lgbc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[2]);
+    $chrz[$sndx]{'txfc'} = substr($bsfc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'txbc'} = substr($bsbc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'txlt'} =             $newc[3];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[3]);
+    $chrz[$sndx]{'tlfc'} = substr($bsfc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'tlbc'} = substr($bsbc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'tikc'} =             $newc[4];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[4]);
+    $chrz[$sndx]{'tifc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'tibc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'sldc'} =             $newc[5];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[5]);
+    $chrz[$sndx]{'sdfc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'sdbc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'pcst'} =             $newc[6];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[6]);
+    $chrz[$sndx]{'pcfc'} = substr($bsfc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'pcbc'} = substr($bsbc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'rpst'} =             $newc[7];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[7]);
+    $chrz[$sndx]{'rpfc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'rpbc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'rpcf'} = substr($chrz[$sndx]{'rpfc'}, 1, 1);
+    $chrz[$sndx]{'rpcb'} = substr($chrz[$sndx]{'rpbc'}, 1, 1);
+    $chrz[$sndx]{'mutd'} =             $newc[8];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[8]);
+    $chrz[$sndx]{'txrt'} =             $newc[9];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[9]);
+    $chrz[$sndx]{'trfc'} = substr($bsfc[$sndx], $tmp0, 1);
+    $chrz[$sndx]{'trbc'} = substr($bsbc[$sndx], $tmp0, 1);
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[10]);
+    $chrz[$sndx]{'regc'} =             $newc[11];
+    $tmp0 += $tmp1 + 1; $tmp1 = length($newc[11]);
+    $chrz[$sndx]{'rgfc'} = substr($bsfc[$sndx], $tmp0, $tmp1);
+    $chrz[$sndx]{'rgbc'} = substr($bsbc[$sndx], $tmp0, $tmp1);
+    # gen static bars
+    $ltxt = $chrz[$sndx]{'barc'} x $simp->Widt(); # fill bar chars
+    $lfcl = $chrz[$sndx]{'brfc'} x $simp->Widt();
+    $lbcl = $chrz[$sndx]{'brbc'} x $simp->Widt();
+    for my $tint (1..8){ # draw ticks on 11 intervals
+      $tmp0 = int($simp->Widt() / 100 * (11 * $tint));
+      $tmp1 = length($chrz[$sndx]{'tikc'});
+      substr($ltxt, $tmp0, $tmp1, $chrz[$sndx]{'tikc'});
+      substr($lfcl, $tmp0, $tmp1, $chrz[$sndx]{'tifc'});
+      substr($lbcl, $tmp0, $tmp1, $chrz[$sndx]{'tibc'}); }
+    $tmp1 = length($chrz[$sndx]{'legc'}); # add left edge
+    substr($ltxt, 0, $tmp1, $chrz[$sndx]{'legc'});
+    substr($lfcl, 0, $tmp1, $chrz[$sndx]{'lgfc'});
+    substr($lbcl, 0, $tmp1, $chrz[$sndx]{'lgbc'});
+    $tmp1 = length($chrz[$sndx]{'regc'}); # add right edge
+    substr($ltxt, -$tmp1, $tmp1, $chrz[$sndx]{'regc'});
+    substr($lfcl, -$tmp1, $tmp1, $chrz[$sndx]{'rgfc'});
+    substr($lbcl, -$tmp1, $tmp1, $chrz[$sndx]{'rgbc'});
+    if($simp->Widt() > (((length($_)+1)*2) + length($chrz[$sndx]{'pcst'}))){ # will center percent text fit?
+      $tmp1 = length($chrz[$sndx]{'pcst'}); # add center percent text
+      $tmp0 = int(($simp->Widt() - $tmp1 - 2) / 2.0);
+      substr($ltxt, $tmp0, $tmp1, $chrz[$sndx]{'pcst'});
+      substr($lfcl, $tmp0, $tmp1, $chrz[$sndx]{'pcfc'} x $tmp1);
+      substr($lbcl, $tmp0, $tmp1, $chrz[$sndx]{'pcbc'} x $tmp1); }
+    $bsbr[$sndx + 2] = $ltxt;
+    $bsfc[$sndx + 2] = $lfcl;
+    $bsbc[$sndx + 2] = $lbcl;
+  } }
+sub DrawBarz{ # Draw the latest mixer slider Bars
+  my $sndx; my $ltxt;my $lfcl; @text = (); @fclr = (); @bclr = (); my $tmp0; my $tmp1; my $lbcl; my $widt = $simp->Widt(); my $sopt; my $isst; # clear all
+  if($valz{'titl'}){ push(@text, " $name v$mjvr.$mnvr.$ptvr - by $auth"); push(@bclr, ' ');
+                     push(@fclr, ' ' . 'G'x length($name) . ' W' . 'Y'x length($mjvr) . 'W' . 'C'x length($mnvr) . 'WROYGCBP B WW CCC CCCCCC WGGGWYYYYWCCCW');}
+  if($valz{'info'}){ my $info = ''; $info = `$chgr :iv` if($cnam eq 'ximp'); $info =~ s/(^Device:|\n.*$)//g; my $hlfw = int($widt/2); my $blnx;
+    #f($cnam eq 'almx'){$info = `lspci | grep "audio controller"`; $info =~ s/^.*audio controller: //; } # ALSA utils don't seem to output good CardInfo! =(
+    if($cnam eq 'almx'){ open(IPAC,'<','/proc/asound/cards');<IPAC>;$info= <IPAC>;close(IPAC);chomp($info);$info =~ s/^\s+//; }
+    if(!$valz{'titl'} || length($text[-1])+ length(         "CardInfo:$info")> $widt){ push(@text, "CardInfo:$info"); push(@bclr, ' ');
+                                                                                       push(@fclr, 'BBBBBBBBWY'); }
+    else{ # CardInfo can fit on titl line so...
+      if($valz{'cnin'}&& length($text[-1])< $hlfw && length("CardInfo:$info")< $hlfw){ $blnx =' 'x ($hlfw-length($text[-1])); } # Center : else RtJustify below
+      else                                                                           { $blnx =' 'x ($widt-length($text[-1])-length("CardInfo:$info")); }
+                                $text[-1] .=                                           $blnx     . "CardInfo:$info";
+                                $fclr[-1] .=                                           $blnx     . 'BBBBBBBBWY'; } }
+  for(@optz){ # build a text && color line for each device
+    for(my $chan = 0; $chan < ($valz{'ster'} + 1); $chan++){
+      if((!$chan       || $sdvz{$_}) && # must be valid stereo device to loop
+         ($_ ne 'dig1' || $valz{'dig1'})){ # && dig1 is messed up sometimes
+        $setz[$chan]{$_} =  0 unless(exists($setz[$chan]{$_}) &&
+                                    defined($setz[$chan]{$_}));
+        $setz[$chan]{$_} = 99 if($setz[$chan]{$_} > 99);
+        $sndx = 0; # selected index
+        $sndx = 1 if(  $valz{'alll'} ||
+                     ( $_ eq $optz[$valz{'wich'}] &&
+                      (!$valz{'ster'} || $chan == $valz{'ltrt'})));
+        GeneBase($sndx) if(!$bsbr[$sndx + 2]);
+        $ltxt = $bsbr[$sndx + 2]; # load bases (generated statics)
+        $lfcl = $bsfc[$sndx + 2];
+        $lbcl = $bsbc[$sndx + 2];
+        $sopt = $_;                     $isst = 0;
+        if($valz{'ster'} && $sdvz{$_}){ $isst = 1;
+          if($chan){ $_ .= $chrz[$sndx]{'txrt'}; }
+          else     { $_ .= $chrz[$sndx]{'txlt'}; } }
+        $tmp0 = length($_);               # left edge text
+        $tmp1 = length($chrz[$sndx]{'legc'});
+                                substr($ltxt, $tmp1, $tmp0, $_);
+        if   (      $chan     ){substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'trfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'trbc'} x $tmp0); }
+        elsif(      $isst     ){substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'tlfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'tlbc'} x $tmp0); }
+        else                   {substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'txfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'txbc'} x $tmp0); }
+        if($widt > (($tmp0 + 1) * 2)){   # will right text fit?
+          $tmp1 = $widt - $tmp0 - length($chrz[$sndx]{'regc'});
+                                substr($ltxt, $tmp1, $tmp0, $_);
+          if   (    $chan     ){substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'trfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'trbc'} x $tmp0); }
+          elsif(    $isst     ){substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'tlfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'tlbc'} x $tmp0); }
+          else                 {substr($lfcl, $tmp1, $tmp0, $chrz[$sndx]{'txfc'} x $tmp0);
+                                substr($lbcl, $tmp1, $tmp0, $chrz[$sndx]{'txbc'} x $tmp0); }
+          if($widt > (((length($_) + 1) * 2) + length($chrz[$sndx]{'pcst'}))){ # will center percent text fit?
+            $_ = $sopt; $_ = sprintf("%02d", $setz[$chan]{$_}); $tmp0 = 0; # below: supplant tmp muted txt && align muted with percent && record fields
+            if(($valz{'mute'}) || ($valz{'only'} && $_ ne $optz[$valz{'wich'}])){ $_ = $chrz[$sndx]{'mutd'}; $tmp0 = 1; }
+            $tmp0 += int((($widt - 3) - length($_))/2.0); substr($ltxt, $tmp0, length($_), $_);
+            if($_ eq $chrz[$sndx]{'mutd'}){               substr($lfcl, $tmp0, length($_), $chrz[$sndx]{'pcfc'} x length($_)); # below:flag next record section
+                                                          substr($lbcl, $tmp0, length($_), $chrz[$sndx]{'pcbc'} x length($_)); $tmp0 = -1; } # not to draw
+            if($valz{'recf'}){ $_ = $sopt; # restore original text from before percent or muted
+              if($tmp0 != -1 && $recp{$_}){# for input devices
+                 $tmp0 +=  4; $tmp1= length($chrz[$sndx]{'rpst'}); substr($lbcl, $tmp0, $tmp1, $chrz[$sndx]{'rpbc'}); # rite of cntr Record flag
+                substr($ltxt, $tmp0, $tmp1, $chrz[$sndx]{'rpst'}); substr($lfcl, $tmp0, $tmp1, $chrz[$sndx]{'rpfc'});
+                 $tmp0++;     $tmp1= length($recp{$_}           ); substr($lbcl, $tmp0, $tmp1, $chrz[$sndx]{'rpcb'});
+                substr($ltxt, $tmp0, $tmp1, $recp{$_}           ); substr($lfcl, $tmp0, $tmp1, $chrz[$sndx]{'rpcf'});
+                if($recp{$_} eq 'R'){ # special bright R even on unselected
+                  $tmp1 = uc(substr( $chrz[$sndx]{'rpcf'}, 0, 1)); substr($lfcl, $tmp0,     1, $tmp1               );
+                  $tmp1 = uc(substr( $chrz[$sndx]{'rpcb'}, 0, 1)); substr($lbcl, $tmp0,     1, $tmp1               ); } } } } }
+        $_ = $sopt; # restore original optn in case stereo clobbered it
+        $tmp0 = int(($setz[$chan]{$_}/100.0) * $widt); # position slider bar
+        $tmp1 = length($chrz[$sndx]{'sldc'});
+        substr($ltxt, $tmp0, $tmp1, $chrz[$sndx]{'sldc'}        ); push(@text, $ltxt);
+        substr($lfcl, $tmp0, $tmp1, $chrz[$sndx]{'sdfc'} x $tmp1); push(@fclr, $lfcl);
+        substr($lbcl, $tmp0, $tmp1, $chrz[$sndx]{'sdbc'} x $tmp1); push(@bclr, $lbcl); } } }
+  $simp->Draw(); }
+sub ChngBarz{ AlllBarz() if $valz{'alll'}; SaveSetz(); }
+sub SaveSetz{ for(keys(%{$setz[0]})){                                             my $parm = $setz[0]{$_}; # write current slider settings to mixer devices
+    if   ($cnam eq 'mixr'){for(Audio::Mixer::get_mixer_params()){ Audio::Mixer::set_cval($_, $setz[0]{$_}, $setz[1]{$_}); } } # Audio::Mixer stuff
+    elsif($cnam eq 'ximp'){$parm .= " $setz[1]{$_}" if($valz{'ster'} && $sdvz{$_});                                     `$chgr       $_  $parm`; }
+    elsif($cnam eq 'aumx'){                                                                                             `$chgr       $_  $parm`; }
+    elsif($cnam eq 'almx'){$parm .= ",$setz[1]{$_}" if($valz{'ster'} && $sdvz{$_});$_ = $omap{$_} if(exists($omap{$_}));`$chgr sset '$_' $parm`; } } }
+sub LoadSetz{ my $curr; my @linz  = (); my $ctrl; my %adat; # obtain current mixer settings
+  if($cnam eq 'mixr'){ # Audio::Mixer stuff
+    for(Audio::Mixer::get_mixer_params()){ ($setz[0]{$_}, $setz[1]{$_})= Audio::Mixer::get_cval($_); #  `aumix -q`     #    `ximp -a`
+      $curr = Audio::Mixer::get_param_val($_);                                                       # vol 38, 38      #      vol: 38% / 38%
+      $sdvz{$_} = 0;                                                                                 # speaker 66, 66  #  speaker:    66%
+      $sdvz{$_} = 1 if($curr & 0x10000);                                                             # line 38, 38, P  #     line: 38% / 38% - P
+      $recp{$_} = ''; } # don't know how to test recordability here                                  # mic 0, 0, P     #      mic:    00%    - P
+  }elsif(      $cnam eq 'almx'){ $curr = `$chgr   `; @linz  = split /\n/, $curr; for(@linz){
+      if   (/^Simple mixer control '([^']+)',(\d+)/                                       ){my            $tctl = $ctrl; $ctrl = $1;
+        if(defined(          $tctl         )         && exists($adat{$tctl})              ){my $sctl = lc($tctl); $sctl =~ s/\s+//g;
+          $sctl = 'vol'   if($tctl eq 'Master'); $omap{$sctl} = $tctl if($sctl ne $tctl);
+          if(   exists($adat{$tctl}{'pchn'})         &&                                        # load completed mixer control on 0..? scale
+                exists($adat{$tctl}{'pbgn'})         && $adat{$tctl}{'pbgn'} ==     0     &&   # should someday add better support for 0..255 && othr >100
+                exists($adat{$tctl}{'pend'})         && $adat{$tctl}{'pend'} >=     0     ){$sdvz{   $sctl} = 0; $recp{$sctl} = '';
+            if(        $adat{$tctl}{'pchn'} eq 'Mono'                                     ){$setz[0]{$sctl} = $setz[1]{$sctl} = $adat{$tctl}{'pmon'}; }
+            else                                                                           {$setz[0]{$sctl} =                   $adat{$tctl}{'pfrl'};
+              $sdvz{         $sctl} = 1;                                                    $setz[1]{$sctl} =                   $adat{$tctl}{'pfrr'}; } }
+          elsif(exists($adat{$tctl}{'cchn'})         &&                                        # not sure how to handle capture settings diff from playback yet
+                exists($adat{$tctl}{'cbgn'})         && $adat{$tctl}{'cbgn'} ==     0     &&
+                exists($adat{$tctl}{'cend'})         && $adat{$tctl}{'cend'} ==   100     ){$sdvz{   $sctl} = 0; $recp{$sctl} = '';
+            if(        $adat{$tctl}{'cchn'} eq 'Mono'                                     ){$setz[0]{$sctl} = $setz[1]{$sctl} = $adat{$tctl}{'cmon'}; }
+            else                                                                           {$setz[0]{$sctl} =                   $adat{$tctl}{'cfrl'};
+              $sdvz{         $sctl} = 1;                                                    $setz[1]{$sctl} =                   $adat{$tctl}{'cfrr'}; } } } }
+      elsif(/^  Playback channels: (Mono|Front Left - Front Right)/                       ){$adat{$ctrl}{'pchn'} = $1; }
+      elsif(/^  Capture channels: (Mono|Front Left - Front Right)/                        ){$adat{$ctrl}{'cchn'} = $1; }
+      elsif(/^  Limits: (Playback |Capture )?(\d+) - (\d+)( Capture (\d+) - (\d+))?/      ){$adat{$ctrl}{'plbk'} = $adat{$ctrl}{'capt'} =  0;
+                                                                                            $adat{$ctrl}{'plbk'} =  1 if( defined($1)  && $1 eq 'Playback ');
+                                                                                            $adat{$ctrl}{'pbgn'} = $adat{$ctrl}{'cbgn'} = $2;
+                                                                                            $adat{$ctrl}{'pend'} = $adat{$ctrl}{'cend'} = $3;
+                                                                                            $adat{$ctrl}{'capt'} =  1 if((defined($1)  && $1 eq 'Capture ') ||
+                                                                                                                                                defined($4));
+                                                                                            $adat{$ctrl}{'cbgn'} = $5                        if(defined($4));
+                                                                                            $adat{$ctrl}{'cend'} = $6                        if(defined($4));}
+      elsif(/^  Mono: (Playback |Capture )?(\d+)(\s+|\[[^\]]+\])*(Capture (\d+))?/        ){$adat{$ctrl}{'pmon'} = $adat{$ctrl}{'cmon'} = $2;
+                                                                                                                   $adat{$ctrl}{'cmon'} = $5 if(defined($4));}
+      elsif(/^  Front Left: (Playback |Capture )?(\d+)(\s+|\[[^\]]+\])*( Capture (\d+))?/ ){$adat{$ctrl}{'pfrl'} = $adat{$ctrl}{'cfrl'} = $2;
+                                                                                                                   $adat{$ctrl}{'cfrl'} = $5 if(defined($4));}
+      elsif(/^  Front Right: (Playback |Capture )?(\d+)(\s+|\[[^\]]+\])*( Capture (\d+))?/){$adat{$ctrl}{'pfrr'} = $adat{$ctrl}{'cfrr'} = $2;
+                                                                                                                   $adat{$ctrl}{'cfrr'} = $5 if(defined($4));}}
+  }else{ if   ($cnam eq 'ximp'){ $curr = `$chgr  a`; }
+         elsif($cnam eq 'aumx'){ $curr = `$chgr -q`; } @linz = split /\n/, $curr; for(@linz){
+      if(/^\s*(\w+):?\s+(\d+)((,|%\s+\/)\s+(\d+))?((,|%\s+-)\s+([RP]))?/i){ $sdvz{$1} =  0; $recp{$1} = '';  $setz[0]{$1} = $setz[1]{$1} =      $2          ;
+        if(defined($5)){                                                    $sdvz{$1} =  1;                                 $setz[1]{$1} =         $5       ;
+          unless($valz{'ster'}){                                                                             $setz[0]{$1} = $setz[1]{$1} = int(($2+$5)/ 2.0);}}
+                                                                                            $recp{$1} = $8 if(defined($8)); } } }
+  for(my $dndx=$#dopt;$dndx;$dndx--){ splice(@dopt,$dndx,1) unless(exists($omap{$dopt[$dndx]}) || exists($sdvz{$dopt[$dndx]}));}@optz=@dopt if(!$valz{'mode'});
+}
+sub SaveValz{ # save current levels to a resource file
+    open(RCFL, '>',    "$ENV{'HOME'}/.${name}rc"); for(sort(keys(%{$setz[0]}))){ print RCFL "$_:$setz[0]{$_}:$setz[1]{$_}\n"; } close(RCFL); }
+sub LoadValz{ # load resource file into current levels
+  my @fldz = (); if(-e "$ENV{'HOME'}/.${name}rc"){
+    open(RCFL, '<',    "$ENV{'HOME'}/.${name}rc"); for(<RCFL>){ @fldz = split /:/;
+      if($valz{'ster'}){ $setz[0]{$fldz[0]} = $fldz[1];
+                         $setz[1]{$fldz[0]} = $fldz[2]; }
+      else             { $setz[0]{$fldz[0]} = $setz[1]{$fldz[0]} = int(($fldz[1]+$fldz[2])/2.0); } }
+    close(RCFL); $valz{'mute'} = 0;    $valz{'only'}  = 0; SaveSetz(); } }
+sub ToglMode{    $valz{'wich'} = 0; if($valz{'mode'} ^= 1){ @optz = sort(keys(%{$setz[0]})); } # toggle the full or small default option device display mode
+                                    else                  { @optz =             @dopt      ; } }
+sub ToglMute{ if($valz{'mute'} ^= 1){ for(keys(%{$setz[0]})){ $bkst[0]{$_} = $setz[0]{$_}; $setz[0]{$_} = 0; # toggle muting (bkup cur lvlz 4 l8r restor8n)
+                                                              $bkst[1]{$_} = $setz[1]{$_}; $setz[1]{$_} = 0; } }
+              else                  { for(keys(%{$bkst[0]})){ $setz[0]{$_} = $bkst[0]{$_};
+                                                              $setz[1]{$_} = $bkst[1]{$_}; } } ChngBarz(); }
+sub ToglAlll{ $valz{'alll'} ^= 1; ChngBarz(); } # lock slider across all chans
+sub ToglTitl{ $valz{'titl'} ^= 1; ChngBarz(); } # display title bar
+sub ToglInfo{ $valz{'info'} ^= 1; ChngBarz(); } # display info bar
+sub ToglCnIn{ $valz{'cnin'} ^= 1; ChngBarz(); } # display info bar centered / rt-justified
+sub ToglRecf{ $valz{'recf'} ^= 1; ChngBarz(); } # show valid input channels
+sub ToglOnly{ $valz{'only'} ^= 1; for(keys(%{$setz[0]})){ # toggle muting all channels but the current one
+    if($_ ne $optz[$valz{'wich'}]){ if($valz{'only'}){ $bkst[0]{$_} = $setz[0]{$_}; $bkst[1]{$_} = $setz[1]{$_};
+                                                       $setz[0]{$_} = $setz[1]{$_}= $valz{'alll'}=            0; }
+                                    else             { $setz[0]{$_} = $bkst[0]{$_}; $setz[1]{$_} = $bkst[1]{$_}; } } } ChngBarz(); }
+sub ToglSter{ $valz{'ster'} ^= 1; $valz{'ltrt'} = 0; ChngBarz(); } # Stereo
+sub AlllBarz{ # synchronize all bar levels with the currently selected one
+  for(@optz){ $setz[0]{$_} = $setz[1]{$_} = $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]}; } }
+sub AsinReco{ # Assign the current input device to be the Recording source
+  if($recp{$optz[$valz{'wich'}]}){
+    if   ($cnam eq 'mixr'){ Audio::Mixer::set_source($optz[$valz{'wich'}]); }
+    elsif($cnam eq 'ximp'){ `$chgr :r$optz[$valz{'wich'}]`; } ChngBarz(); } }
+sub AsinChan{ my $chan = shift || return; # Assign a particular channel as the selected one
+  for($valz{'wich'} = 0; $valz{'wich'} < @optz; $valz{'wich'}++){ last if($optz[$valz{'wich'}] eq $chan); } }
+sub ShowInfo{ # Display an Info dialog window
+  $simp->Mesg('type' => 'info',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+ 
+$name was inspired by alsamixer, aumix, mmix, && mmixer
+ 
+ Shout out to Keith && all the LBox.Org crew. Thanks to Beppu-san for
+being a good friend. I hope you find $name useful. Please don't
+hesitate to let me know if you app-ree-see-ate it or if you'd like
+me to add something for you. I'd be glad to improve it given new
+suggestions. Please support FSF.Org && EFF.Org. Thanks. TTFN.
+ 
+                                                       -Pip
+ 
+"); }
+sub ShowHelp{ # uhh
+  $simp->Mesg('type' => 'help',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+
+                        Global Keys:                                
+  h         - displays this Help screen                             
+  b         - toggles Big mode (with all channel options)           
+  S         - toggles Stereo mode (for all channels that support it)
+  m         - toggles Muting                                        
+  o         - toggles current channel as Only audible channel       
+  a         - toggles locked slider bar across All channels         
+  t         - toggles display   of Title bar                        
+  I         - toggles display   of soundcard device Info            
+  C         - toggles Centering of soundcard device info            
+  s         - Save all current channel values to ~/.${name}rc       
+  l         - Load ~/.${name}rc into current channel values         
+  r         - set current channel to Record mode if valid input     
+  v         - jump to Volume channel                                
+  c         - jump to Cd channel                                    
+  p         - jump to Pcm channel                                   
+ Down Arrow - go to next channel                                    
+ Up   Arrow - go to previous channel                                
+ Left Arrow - lower channel level                                   
+ RightArrow - raise channel level                                   
+  0..9      - jump to (n * 11)% of channel (must shift for jump up) 
+ Home       - same as '0'                                           
+
+                        System Stuff:
+       ?/H/F1  - Help  :  i - Info  :  x/q/Esc - eXit"); }                                      FindChgr(); # verify valid /dev/mixer && chngr B4 mkng new scrn
+$simp = tie(@text, 'Curses::Simp', '_flagaudr' => 0   );                                        LoadSetz();
+        tie(@fclr, 'Curses::Simp::FClr', $simp);                                               #ToglSter() if($cnam eq 'almx');
+        tie(@bclr, 'Curses::Simp::BClr', $simp);                                                DrawBarz();
+while(!defined($keey) || ($keey !~ /^[xq]$/i && ord($keey) != 27)){ $keey = $simp->GetK($dela); LoadSetz(); $oidl = $idle;
+  if(defined($keey)){
+    if   (   $keey  eq ' ' ||
+          lc($keey) eq 'a'){ ToglAlll(); }
+    elsif(lc($keey) eq 'b'){ ToglMode(); }
+    elsif(lc($keey) eq 'm'){ ToglMute(); }
+    elsif(lc($keey) eq 'o'){ ToglOnly(); }
+    elsif(lc($keey) eq 't'){ ToglTitl(); }
+    elsif(   $keey  eq 'I'){ ToglInfo(); }
+    elsif(   $keey  eq 'C'){ ToglCnIn(); }
+    elsif(   $keey  eq 'R'){ ToglRecf(); }
+    elsif(   $keey  eq 'S'){ ToglSter(); }
+    elsif(   $keey  eq 's'){ SaveValz(); }
+    elsif(   $keey  eq 'l'){
+      if(lc($simp->Mesg('titl' => 'Are you SURE you want to Load?',
+                        'pres' => 'Yes/No')) eq 'y') { LoadValz(); } }
+    elsif(   $keey  eq 'L'){ # L adds 'line' temporarily to small options
+      $valz{'alll'} =   0;   ChngBarz();
+      $optz[@dopt]  = 'line' unless($valz{'mode'});
+      AsinChan('line'); }
+    elsif(   $keey  eq 'i'){ ShowInfo(); }
+    elsif(   $keey  eq 'r'){ AsinReco(); }
+    elsif(lc($keey) eq 'v'){ AsinChan('vol'); }
+    elsif(   $keey  eq 'c'){ AsinChan('cd' ); }
+    elsif(lc($keey) eq 'p'){ AsinChan('pcm'); }
+    elsif(   $keey  =~ /^\d$/){ # handle number keys
+      if($setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]} > int($keey * 11)){
+        $setz[ $valz{'ltrt'}]{$optz[$valz{'wich'}]} = int($keey * 11); ChngBarz(); }
+    } elsif( $keey  =~ /^[!@#\$%^&*()]$/){ # handle shifted number keys
+      $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]} = int($slut{$keey} * 11); ChngBarz();
+    } elsif($keey eq 'KEY_LEFT' ){
+      $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]}-- if $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]}; ChngBarz();
+    } elsif($keey eq 'KEY_RIGHT'){
+      $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]}++ if $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]} < 99; ChngBarz();
+    } elsif($keey eq 'KEY_HOME' ){
+      $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]} = 0; ChngBarz();
+    } elsif($keey eq 'KEY_END'  ){ # END is dangerous to ears && speakers
+      my $sure = $simp->Mesg('titl' => '!*WARNING*!  END can be loud!  Are you SURE?', 'pres' => 'Yes/No');
+      if($sure =~ /y/i){ $setz[$valz{'ltrt'}]{$optz[$valz{'wich'}]} = 99; ChngBarz(); }
+    } elsif($keey eq 'KEY_UP'   || lc($keey) eq 'k'){
+      if($valz{'ster'} && $sdvz{$optz[$valz{'wich'}]} &&  $valz{'ltrt'}){ $valz{'ltrt'} = 0; }
+      else                                                              { $valz{'wich'} = @optz if $valz{'wich'} == 0; $valz{'wich'}--;
+                                                                          $valz{'ltrt'} = 1 if($valz{'ster'} && $sdvz{$optz[$valz{'wich'}]}); }
+    } elsif($keey eq 'KEY_DOWN' || lc($keey) eq 'j'){
+      if($valz{'ster'} && $sdvz{$optz[$valz{'wich'}]} && !$valz{'ltrt'}){ $valz{'ltrt'} = 1; }
+      else                                                              { $valz{'wich'}++; $valz{'wich'} = 0 if $valz{'wich'} == @optz;
+                                                                          $valz{'ltrt'} = 0; }
+    } elsif(lc($keey) eq 'h'    || lc($keey) eq '?'|| $keey eq 'KEY_F1'){ ShowHelp();
+    } elsif($keey eq '-1'){ if($idle < 32){ $dela = 0.1; }
+                            else          { $dela = 2;   } $idle += $dela; } }
+  $idle = 0 if($idle == $oidl); DrawBarz(); } Audio::Mixer::close_mixer() if($cnam eq 'mixr'); # reset idle timer if a key was pressed

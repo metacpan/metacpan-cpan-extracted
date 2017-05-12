@@ -1,0 +1,13 @@
+Revision history for Catalyst::Plugin::Authentication::Store::RDBO
+
+0.002 2007-01-12
+  - fixed Changes file
+  - fixed ::User::obj(), thanks to John Siracusa
+
+  DO NOT USE V0.001 - IT JUST DOES NOT WORK
+
+0.001 2007-01-12
+  - first release to CPAN
+
+0.01 Sun Apr  9 12:43:31 2006
+  - Initial release.  Created by ExtUtils::ModuleMaker 0.44.

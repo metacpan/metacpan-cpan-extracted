@@ -1,0 +1,148 @@
+-*- org -*-
+
+This is where I keep all of my notes about CPANPLUS-Dist-Arch and try
+to keep track of what I want to do next.
+
+* TODO Use the new --nocheck option for makepkg to skip tests
+* cpan2aur
+** TODO Package Release Incrementing                                   :IDEA:
+   I need finer control over incrementing package releases. Sometimes
+   I need to force a rebuild of a package. If I don't increment the
+   release number and I upload the package, AUR ignores it.
+** DONE Possible version sorting bug                                    :BUG:
+   A new version sorting algorithm was recently added to cpan2aur.
+   I noticed that checking the following packages for a new
+   version does not work properly:
+   - Devel::GlobalDestruction
+   - Class::MOP
+
+   [2011-02-02 Wed] Could not reproduce.
+** TODO Make sure to disable PKGDEST if it is set                       :BUG:
+* Makedepends Separation
+  I would like to properly filter dependencies into 'makedepends' of
+  the packages which are not required to run the perl module. This
+  includes things like test scripts.
+** DONE perl-class-method-modifiers makedepends                         :BUG:
+   Why is perl-text-exception not filtered into makedepends like it
+   should be? http://aur.archlinux.org/packages.php?ID=20124.
+
+   For some reason it had not been uploaded after I generated the
+   package with the new rules.
+** DONE Read 'build_requires' from META.yml                            :IDEA:
+   Since I implemented the use of 'configure_requires' from the
+   META.yml I might as well use 'build_requires' as well.
+* TODO Multi-line package descriptions aren't read properly             :BUG:
+  - perl-debug-showoff :: http://aur.archlinux.org/packages.php?ID=43824
+  - perl-data-taxi :: Seems to have a trailing newline
+                      http://aur.archlinux.org/packages.php?ID=33774
+* DONE Convert perl versions                                            :BUG:
+  Perl versions listed in requirements of Makefile.PL is in the
+  decimal format whereas the 'perl' package versions are given in the
+  dotted decimal format.
+
+* cpan2aur for woldrich                                                 :BUG:
+
+> makepkg -s -f
+==> WARNING: Sudo can not be found. Will use su to acquire root privileges.
+==> Making package: perl-file-lscolor 0.124-1 (Sun Feb  6 17:33:19 CET 2011)
+==> Checking Runtime Dependencies...
+==> Checking Buildtime Dependencies...
+==> Retrieving Sources...
+  -> Found File-LsColor-0.124.tar.gz
+==> Validating source files with md5sums...
+    File-LsColor-0.124.tar.gz ... Passed
+==> Extracting Sources...
+  -> Extracting File-LsColor-0.124.tar.gz with bsdtar
+==> Entering fakeroot environment...
+==> Starting build()...
+Checking if your kit is complete...
+Looks good
+Writing Makefile for File::LsColor
+rm -f \
+	  blib/script/ls_color 
+rm -f \
+	  *.a core \
+	  core.[0-9] blib/arch/auto/File/LsColor/extralibs.all \
+	  core.[0-9][0-9] LsColor.bso \
+	  pm_to_blib.ts core.[0-9][0-9][0-9][0-9] \
+	  LsColor.x  \
+	  perl tmon.out \
+	  *.o pm_to_blib \
+	  blib/arch/auto/File/LsColor/extralibs.ld blibdirs.ts \
+	  core.[0-9][0-9][0-9][0-9][0-9] *perl.core \
+	  core.*perl.*.? Makefile.aperl \
+	  perl LsColor.def \
+	  core.[0-9][0-9][0-9] mon.out \
+	  libLsColor.def perlmain.c \
+	  perl.exe so_locations \
+	  LsColor.exp 
+rm -rf \
+	  File-LsColor-* blib 
+mv Makefile Makefile.old > /dev/null 2>&1
+rm -f \
+	  Makefile.old Makefile 
+rm -rf \
+	  File-LsColor-0.124 
+Checking if your kit is complete...
+Looks good
+Writing Makefile for File::LsColor
+cp lib/File/LsColor.pm blib/lib/File/LsColor.pm
+cp bin/ls_color blib/script/ls_color
+/usr/bin/perl -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/ls_color
+Manifying blib/man1/ls_color.1
+Manifying blib/man3/File::LsColor.3pm
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00-load.t .......... ok   
+t/01-pod.t ........... ok   
+t/02-pod-coverage.t .. ok   
+All tests successful.
+Files=3, Tests=4,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.14 cusr  0.01 csys =  0.19 CPU)
+Result: PASS
+ERROR: ld.so: object 'libfakeroot.so' from LD_PRELOAD cannot be preloaded: ignored.
+Password: 
+Installing /tmp/scp1/aaaa/pkg/usr/share/perl5/vendor_perl/File/LsColor.pm
+Installing /tmp/scp1/aaaa/pkg/usr/share/man/man1/ls_color.1
+Installing /tmp/scp1/aaaa/pkg/usr/share/man/man3/File::LsColor.3pm
+Installing /tmp/scp1/aaaa/pkg/usr/bin/vendor_perl/ls_color
+Appending installation info to /tmp/scp1/aaaa/pkg/usr/lib/perl5/core_perl/perllocal.pod
+[17:33:23] t/00-load.t .......... ok       19 ms                        
+[17:33:23] t/01-pod.t ........... ok       10 ms                        
+[17:33:23] t/02-pod-coverage.t .. ok        9 ms
+[17:33:23]
+All tests successful.
+Files=3, Tests=4,  0 wallclock secs ( 0.04 usr  0.00 sys +  0.14 cusr  0.02 csys =  0.20 CPU)
+Result: PASS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ERROR: Can't create '/tmp/scp1/aaaa/pkg/usr/lib/perl5/vendor_perl/auto/File/LsColor'
+Do not have write permissions on '/tmp/scp1/aaaa/pkg/usr/lib/perl5/vendor_perl/auto/File/LsColor'
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ at -e line 1
+make: *** [pure_vendor_install] Error 13
+find: cannot delete `/tmp/scp1/aaaa/pkg/usr/lib/perl5/core_perl/perllocal.pod': Permission denied
+    Aborting...
+
+> find pkg -printf "%m %P\n"
+755 
+755 usr
+755 usr/lib
+755 usr/lib/perl5
+755 usr/lib/perl5/core_perl
+644 usr/lib/perl5/core_perl/perllocal.pod
+755 usr/lib/perl5/vendor_perl
+755 usr/lib/perl5/vendor_perl/auto
+755 usr/lib/perl5/vendor_perl/auto/File
+755 usr/lib/perl5/vendor_perl/auto/File/LsColor
+644 usr/lib/perl5/vendor_perl/auto/File/LsColor/.packlist
+755 usr/share
+755 usr/share/perl5
+755 usr/share/perl5/vendor_perl
+755 usr/share/perl5/vendor_perl/File
+444 usr/share/perl5/vendor_perl/File/LsColor.pm
+755 usr/share/man
+755 usr/share/man/man3
+444 usr/share/man/man3/File::LsColor.3pm
+755 usr/share/man/man1
+444 usr/share/man/man1/ls_color.1
+755 usr/bin
+755 usr/bin/vendor_perl
+555 usr/bin/vendor_perl/ls_color

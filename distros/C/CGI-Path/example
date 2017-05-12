@@ -1,0 +1,96 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+{
+  my $self = Mailer->new({
+    htm             => {
+      'mailer/page2' => qq|
+<title>confirm page</title>
+[% IF mailer_error %]
+<table>
+<tr><td>You had the following error: [% mailer_error %]</td></tr>
+</table>
+[% END %]
+<form method=post action=$ENV{SCRIPT_NAME}$ENV{PATH_INFO}>
+<table>
+[% SET keys = ['from', 'to', 'subject', 'body'] %]
+[% FOREACH key = keys %]
+<tr><td>[% key %]</td><td>[% \$key %]</td></tr>
+[% END %]
+</table>
+<input name=page2_submitted type=hidden value=1>
+<input type=submit>
+</form>
+        |,
+      'mailer/page3' => qq|
+<title>success!</title>
+Your attempt to send the message has been a success.<br>
+Start <a href="$ENV{SCRIPT_NAME}$ENV{PATH_INFO}">again</a>
+      |,
+    },
+    magic_fill_hash => {
+      to       => 'cahille@yahoo.com',
+      from     => 'earl@spack.net',
+      subject  => 'subject from [% localtime %]',
+      body     => 'body from [% time %]',
+    },
+    val_extension   => 'yaml',
+    validate_refs   => {
+      page1 => {
+        to      => { required => 1},
+        from    => { required => 1},
+        subject => { required => 1},
+        body    => { required => 1},
+      },
+      page2 => {
+        page2_submitted => { required => 1},
+      },
+      page3 => {
+        page3_submitted => { required => 1},
+      },
+    },
+  });
+  $self->navigate;
+}
+
+
+package Mailer;
+
+use strict;
+use CGI::Path;
+use base qw(CGI::Path);
+
+sub base_include_path {
+  return "/home/earl/tt";
+}
+
+sub path_hash {
+  return {
+    initial_step  => 'page1',
+    page1         => 'page2',
+    page2         => 'page3',
+  };
+}
+
+sub page2_post_validate {
+  my $self = shift;
+  use Net::SMTP;
+
+  my $smtp = Net::SMTP->new('localhost', Debug => 1);
+
+  $smtp->mail($ENV{USER});
+  $smtp->to($self->form->{to});
+
+  $smtp->data();
+  $smtp->datasend("To: " . $self->form->{to} . "\n");
+  $smtp->datasend("From: " . $self->form->{from} . "\n");
+  $smtp->datasend("Subject: " . $self->form->{subject} . "\n\n");
+  $smtp->datasend($self->form->{body});
+  my $return = $smtp->dataend();
+
+  $smtp->quit;
+  return $return;
+}
+
+1;

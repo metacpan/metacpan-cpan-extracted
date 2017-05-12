@@ -1,0 +1,33 @@
+CGI::AppToolkit
+
+An object-oriented application development framework, employing the Model-View-Controller design pattern as a key part of it's methodology. A more complete description can be found at:
+
+http://www.heavyhosting.net/AppToolkit/
+
+PLEASE NOTE: This software is considered beta-quality software. The API should be stable, but it *may* change in future versions in incompatible ways. All such changes will be documented.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+CHANGELOG
+
+2002-06-17 - Version 0.5
+  This is the first public release of this package.
+  
+
+AUTHOR
+
+Rob Giseburt (rob@heavyhosting.net)
+
+
+LEGAL HASSLE
+
+Copyright (C)2002 Robert Giseburt. All rights reserved. This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,18 @@
+[%
+
+    title = 'Browse by Distribution' ;
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Distribution' ;
+
+%]
+
+<p>Click on a distribution below to list the reports submitted for that distribution.
+Please note that with over 6 million reports to process, selections from this page
+can take a little while to return. Please be patient</p>
+
+<ul>
+[% FOREACH d = data.dists %]
+<li><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% d %]">[% d %]</a></li>
+[% END %]
+</ul>

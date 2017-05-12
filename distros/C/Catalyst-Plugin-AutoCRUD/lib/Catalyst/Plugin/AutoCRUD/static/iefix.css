@@ -1,0 +1,9 @@
+.x-fieldset-header {
+    padding-left: 2px;
+    padding-top: 2px;
+}
+
+.x-fieldset-header-text {
+    padding-left: 25px;
+    white-space: 'nowrap';
+}

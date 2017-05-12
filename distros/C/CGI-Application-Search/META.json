@@ -1,0 +1,67 @@
+{
+   "abstract" : "Base class for CGI::App Swish-e site engines",
+   "author" : [
+      "Michael Peters <mpeters@plusthree.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Search",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CGI::Application::Plugin::AnyTemplate::Driver::TemplateToolkit" : 0,
+            "Template" : 0,
+            "Test::Class" : 0,
+            "Test::LongString" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "4",
+            "CGI::Application::Plugin::AnyTemplate" : 0,
+            "Capture::Tiny" : "0.06",
+            "Cwd" : 0,
+            "Data::Page" : "1",
+            "Encode" : 0,
+            "File::Slurp" : "9999.13",
+            "File::Spec" : 0,
+            "File::Spec::Functions" : 0,
+            "HTML::FillInForm" : "1.04",
+            "Number::Format" : 0,
+            "POSIX" : 0,
+            "SWISH::API" : "0.04",
+            "Search::Tools::HiLiter" : "0.12",
+            "Text::Context" : "3.5",
+            "Time::HiRes" : 0,
+            "Time::Piece" : 0,
+            "Unicode::Normalize" : 0,
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Search" : {
+         "file" : "lib/CGI/Application/Search.pm",
+         "version" : "1.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.14"
+}

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Application-Plugin-RateLimit
+version:      1.0
+version_from: RateLimit.pm
+installdirs:  site
+requires:
+    CGI::Application:              4
+    Class::Accessor:               0.25
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

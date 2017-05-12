@@ -1,0 +1,25 @@
+<h1 class="caps">list all users</h1>
+
+<table>
+<tr><th>ID</th><th>Username</th><th>Roles</th><th>Active</th><th></th></tr>
+[% WHILE (user=users.next) -%]
+  <tr>
+  <td>[% user.id %]</td>
+  <td>[% user.username %]</td>
+  <td>
+    [% FOREACH role IN user.user_roles -%]
+    [% role.name %]
+    [% END %]
+  </td>
+  <td>[% user.active %]</td>
+  <td><a href="[% c.uri_for('/admin/user/') %][% user.id %]/edit">Edit</a></td>
+  <td><a href="[% c.uri_for('/admin/user/') %][% user.id %]/del">Delete</a></td>
+  </tr>
+[% END %]
+</table>
+<br />
+
+<ul>
+<li><a href="[% c.uri_for('/admin/user/add') %]">Add a user</a></li>
+<li><a href="[% c.uri_for('/admin/') %]">Return to administration</a></li>
+</ul>

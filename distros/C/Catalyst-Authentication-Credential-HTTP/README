@@ -1,0 +1,142 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::HTTP - HTTP Basic and
+    Digest authentication for Catalyst.
+
+SYNOPSIS
+        use Catalyst qw/
+            Authentication
+            Authentication::Store::Minimal
+            Authentication::Credential::HTTP
+        /;
+
+        __PACKAGE__->config->{authentication}{http}{type} = 'any'; # or 'digest' or 'basic'
+        __PACKAGE__->config->{authentication}{users} = {
+            Mufasa => { password => "Circle Of Life", },
+        };
+
+        sub foo : Local {
+            my ( $self, $c ) = @_;
+
+            $c->authorization_required( realm => "foo" ); # named after the status code ;-)
+
+            # either user gets authenticated or 401 is sent
+
+            do_stuff();
+        }
+
+        # with ACL plugin
+        __PACKAGE__->deny_access_unless("/path", sub { $_[0]->authenticate_http });
+
+        sub end : Private {
+            my ( $self, $c ) = @_;
+
+            $c->authorization_required_response( realm => "foo" );
+            $c->error(0);
+        }
+
+DESCRIPTION
+    This moduule lets you use HTTP authentication with
+    Catalyst::Plugin::Authentication. Both basic and digest authentication
+    are currently supported.
+
+    When authentication is required, this module sets a status of 401, and
+    the body of the response to 'Authorization required.'. To override this
+    and set your own content, check for the "$c->res->status == 401" in your
+    "end" action, and change the body accordingly.
+
+  TERMS
+    Nonce
+        A nonce is a one-time value sent with each digest authentication
+        request header. The value must always be unique, so per default the
+        last value of the nonce is kept using Catalyst::Plugin::Cache. To
+        change this behaviour, override the
+        "store_digest_authorization_nonce" and
+        "get_digest_authorization_nonce" methods as shown below.
+
+METHODS
+    authorization_required %opts
+        Tries to "authenticate_http", and if that fails calls
+        "authorization_required_response" and detaches the current action
+        call stack.
+
+        This method just passes the options through untouched.
+
+    authenticate_http %opts
+        Looks inside "$c->request->headers" and processes the digest and
+        basic (badly named) authorization header.
+
+        This will only try the methods set in the configuration. First
+        digest, then basic.
+
+        See the next two methods for what %opts can contain.
+
+    authenticate_basic %opts
+    authenticate_digest %opts
+        Try to authenticate one of the methods without checking if the
+        method is allowed in the configuration.
+
+        %opts can contain "store" (either an object or a name), "user" (to
+        disregard %the username from the header altogether, overriding it
+        with a username or user %object).
+
+    authorization_required_response %opts
+        Sets "$c->response" to the correct status code, and adds the correct
+        header to demand authentication data from the user agent.
+
+        Typically used by "authorization_required", but may be invoked
+        manually.
+
+        %opts can contain "realm", "domain" and "algorithm", which are used
+        to build %the digest header.
+
+    store_digest_authorization_nonce $key, $nonce
+    get_digest_authorization_nonce $key
+        Set or get the $nonce object used by the digest auth mode.
+
+        You may override these methods. By default they will call "get" and
+        "set" on "$c->cache".
+
+CONFIGURATION
+    All configuration is stored in
+    "YourApp->config->{authentication}{http}".
+
+    This should be a hash, and it can contain the following entries:
+
+    store
+        Either a name or an object -- the default store to use for HTTP
+        authentication.
+
+    type
+        Can be either "any" (the default), "basic" or "digest".
+
+        This controls "authorization_required_response" and
+        "authenticate_http", but not the "manual" methods.
+
+    authorization_required_message
+        Set this to a string to override the default body content
+        "Authorization required."
+
+RESTRICTIONS
+    When using digest authentication, this module will only work together
+    with authentication stores whose User objects have a "password" method
+    that returns the plain-text password. It will not work together with
+    Catalyst::Authentication::Store::Htpasswd, or
+    Catalyst::Plugin::Authentication::Store::DBIC stores whose "password"
+    methods return a hashed or salted version of the password.
+
+AUTHORS
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+    Jess Robinson
+
+    Sascha Kiefer "esskar@cpan.org"
+
+SEE ALSO
+    RFC 2617 (or its successors), Catalyst::Plugin::Cache,
+    Catalyst::Plugin::Authentication
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005-2006 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

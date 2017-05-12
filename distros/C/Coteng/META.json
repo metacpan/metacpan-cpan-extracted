@@ -1,0 +1,100 @@
+{
+   "abstract" : "Lightweight Teng",
+   "author" : [
+      "y_uuki <yuki.tsubo@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Coteng",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite::Lazy" : "0",
+            "DBI" : "1.630",
+            "DBIx::Sunny" : "0.21",
+            "Module::Load" : "0",
+            "SQL::Maker" : "1.12",
+            "SQL::NamedPlaceholder" : "0.03",
+            "Scope::Container" : "0",
+            "Scope::Container::DBI" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Exporter::Lite" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Coteng" : {
+         "file" : "lib/Coteng.pm",
+         "version" : "0.11"
+      },
+      "Coteng::DBI" : {
+         "file" : "lib/Coteng/DBI.pm"
+      },
+      "Coteng::DBI::db" : {
+         "file" : "lib/Coteng/DBI.pm"
+      },
+      "Coteng::DBI::st" : {
+         "file" : "lib/Coteng/DBI.pm"
+      },
+      "Coteng::QueryBuilder" : {
+         "file" : "lib/Coteng/QueryBuilder.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yuuki/Coteng/issues"
+      },
+      "homepage" : "https://github.com/yuuki/Coteng",
+      "repository" : {
+         "url" : "git://github.com/yuuki/Coteng.git",
+         "web" : "https://github.com/yuuki/Coteng"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:YUUKI",
+   "x_contributors" : [
+      "nonylene <cookie.speaker@gmail.com>"
+   ],
+   "x_static_install" : 1
+}

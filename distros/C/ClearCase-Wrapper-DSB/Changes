@@ -1,0 +1,65 @@
+Revision history for Perl extension ClearCase::Wrapper::DSB.
+
+1.01 Fri Jan 25 09:38:23 EST 2002
+	- original version
+	  Much of the original content of ClearCase::Wrapper has
+	  been split out into this overlay module.
+
+1.02 Thu Jan 31 10:50:30 EST 2002
+	- Added 'eclipse' extension.
+	- Added 'edattr -view' feature.
+
+1.03 Mon Feb  4 11:12:09 EST 2002
+	- Added 'ct lsregion -curr' feature.
+	- Added 'ct catcs -attr -all' feature.
+
+1.04 Tue Feb  5 13:20:36 EST 2002
+	- Fixed inappropriate dependency on CtCmd in workon.
+	- Cleaned/speeded up 'edattr -view' feature.
+
+1.05 Fri Mar  1 10:45:40 EST 2002
+	- Cleaned up 'eclipse' extension.
+
+1.06 Tue May  7 10:22:32 EDT 2002
+	- Minor formatting improvements.
+	- Added -needed flag to setcs.
+
+1.07 Fri Oct 18 12:10:40 EDT 2002
+	- Override 'rmelem' to flush the view cache when done.
+	- Override 'update' to add -quiet flag (suppress "Loading ..." msgs)
+	- New 'protectview' command by analogy with 'protectvob'.
+	  Doesn't yet support -chown or -chgrp, just -add and -delete.
+
+1.08 Tue Feb  4 21:10:35 EST 2003
+	- Added -chown/chgrp/-chmod plus -tag and -replace to protectview.
+
+1.09 Tue Jul 22 10:56:06 EDT 2003
+	- Fixed contact data.
+
+1.10 Thu Mar 10 11:30:00 EST 2005
+	- Added "describe -par/ents" feature.
+
+1.11 Mon Mar 14 00:00:51 EST 2005
+	- Cleanups occasioned by port to new environment.
+	  Worked around an apparent bug in 5.6.1: the statement
+	  "local $0 = ..." causes the user's PATH to be trashed such
+	  that $ENV{PATH} looks ok but "system qw(printenv PATH)"
+	  doesn't. It's hard to see how that could be my bug but
+	  in any case it's not a problem in more modern Perls so
+	  I just worked around it.
+
+1.12 Fri Oct  7 09:30:58 EDT 2005
+	- Fix bug reported by anonymous user. ClearCase::Argv
+	  renamed the ->cleartool method to ->find_cleartool;
+	  this module forgot to track that change till now.
+	  This caused "ct setcs -clone <view-tag>" to fail.
+
+1.13 Wed Mar 29 11:42:37 EST 2006
+	- Fixed a minor warning in "ct lock".
+
+1.14 Thu May 13 17:09:45 EDT 2010
+	- Fixed a file-mode bug in "ct reco/recheckout".
+	- Pushed recursion support up into ClearCase::Wrapper for
+	  use by other overlay modules.
+	- Tweaked indenting in show usage functions
+

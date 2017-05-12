@@ -1,0 +1,42 @@
+Revision history for COPS-Client
+
+0.06	2nd Feb 2015
+	Thanks to Evers Chen to integrate into Cisco removed bug that
+	applied auth, reserved,commit when unneeded and cause gate set
+	failure.  Any subtype 2 is now set to remove these extensions.
+
+0.05	19th October 2012
+	Thanks to David Wang at CableVision for finding and help
+	resolve some envelope issues and TimeSet and VolumeSet problems.
+
+	volume_set and timebase_set have been changed to be simpler as well.
+
+	Examples are
+
+	$cops_client->volume_set( 3000000000 );
+	$cops_client->timebase_set( 60 );
+
+	Fixed a possible non initialised variable error.
+	Update 7-1 Template to include the correct pragma
+
+0.04	14th May 2012
+	Added support for
+
+		6.5.6 Procedures for Modifying a Gate
+
+		Thanks to a patch from Ivan Prostran
+		
+
+0.03    4th August 2010
+        Added
+	rks_set
+	decode_radius_attribute
+
+0.02	15th July 2010
+	Completely made a mess of the test routines and left in tests
+	which would fail on a fresh system and omitted a 64bit test
+
+0.01    10th Jult 2010
+        First version, very alpha but Man page, examples included
+	See MAN page for review of bugs and current exceptions
+

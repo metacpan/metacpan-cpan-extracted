@@ -1,0 +1,9 @@
+Makefile.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Class/DBI/Cascade/Plugin/Nullify.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,45 @@
+---
+abstract: 'A searchable store backed by Elasticsearch'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Store-Elasticsearch
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CQL::Parser: '1.12'
+  Catmandu: '1.04'
+  Cpanel::JSON::XS: '3.0213'
+  Moo: '1.0'
+  Search::Elasticsearch: '1.14'
+  namespace::clean: '0.24'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Store-Elasticsearch/issues
+  homepage: https://github.com/LibreCat/Catmandu-Store-Elasticsearch
+  repository: https://github.com/LibreCat/Catmandu-Store-Elasticsearch.git
+version: '0.0509'
+x_contributors:
+  - 'Dave Sherohman <Dave.Sherohman@ub.lu.se>'
+  - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+  - 'Robin Sheat <robin@catalyst.net.nz>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

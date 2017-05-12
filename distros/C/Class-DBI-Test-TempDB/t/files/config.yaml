@@ -1,0 +1,54 @@
+--- #YAML:1.0
+schema:
+  procedures: {}
+  tables:
+    car:
+      comments: |-
+        MySQL dump 9.10
+        Host: localhost    Database: test
+        ------------------------------------------------------
+        Server version	4.0.15
+        Table structure for table `car`
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: ~
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        id:
+          data_type: int
+          default_value: ~
+          extra: {}
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 11
+        make:
+          data_type: varchar
+          default_value: NULL
+          extra: {}
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: make
+          order: 2
+          size:
+            - 255
+      indices: []
+      name: car
+      options:
+        - TYPE: MyISAM
+      order: 1
+  triggers: {}
+  views: {}

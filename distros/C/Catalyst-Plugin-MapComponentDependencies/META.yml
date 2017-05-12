@@ -1,0 +1,24 @@
+---
+abstract: 'Allow components to depend on other components'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst::Test: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-MapComponentDependencies
+requires:
+  Catalyst: '5.90090'
+  Moose: '2.0602'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-Plugin-MapComponentDependencies/issues
+  homepage: https://github.com/jjn1056/Catalyst-Plugin-MapComponentDependencies
+  repository: https://github.com/jjn1056/Catalyst-Plugin-MapComponentDependencies.git
+version: '0.009'

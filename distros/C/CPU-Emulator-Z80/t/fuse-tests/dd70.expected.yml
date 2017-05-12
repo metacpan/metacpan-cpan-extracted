@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  1520:
+    - 254
+name: dd70
+registers:
+  AF: 53407
+  AF_: 0
+  BC: 65024
+  BC_: 0
+  DE: 8990
+  DE_: 0
+  HL: 12780
+  HL_: 0
+  I: 0
+  IX: 1530
+  IY: 60050
+  PC: 3
+  R: 2
+  SP: 0

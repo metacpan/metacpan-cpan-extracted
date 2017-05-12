@@ -1,0 +1,65 @@
+=encoding euc-jp
+=head1 名前
+
+Class::DBI::Plugin::Iterator - Class::DBI用の（ちゃんとした）イテレータ
+
+=head1 概要
+
+  package CD;
+  use base qw(Class::DBI);
+  __PACKAGE__->set_db(...);
+  
+  use Class::DBI::Plugin::Iterator;	# ←これを追加
+  
+  package main;
+  use CD;
+  my $itr = CD->retrieve_all;		# この時点ではデータを取得しない
+  my @discs = $itr->slice(0,9);		# この時点でデータを10件取得する
+  
+  my $new_it = $itr->slice(10,19);	# Class::DBI::Iteratorオブジェクトを返す
+
+=head1 説明
+
+Class::DBI の標準のイテレータはマッチした全部の行を取得してしまいますが、Class::DBI::Plugin::Iterator を使えば一部だけ取得するようになります。
+
+このイテレータは基本的には Class::DBI::Iterator と同じように動作します。
+（いくつかの拡張をしています）
+
+スカラーコンテキスト以外の時は、通常通りの結果を返します。
+
+=head1 オプション
+
+=head2 prefetch
+
+先読みする件数を指定する。
+
+  use Class::DBI::Plugin::Iterator prefetch => 5;	# 5件の先読みをする
+
+=head2 driver
+
+データベース特有の機能を使った Class::DBI::Plugin::Iterator のサブクラスを指定する。
+
+  use Class::DBI::Plugin::Iterator driver => 'mysql4';	# MySQL4用のものを使う
+
+
+=head1 注意
+
+LIMIT ... OFFSET ... 構文を使っているので、それが使えないデータベースでは使えません。
+そういうときは、対応するような Class::DBI::Plugin::Iterator::* サブクラスを作ると良いでしょう。
+現在は MySQL3.x 用と MySQL4.x 用を同梱しています。
+（Class::DBI::Plugin::Iterator::mysql3、Class::DBI::Plugin::Iterator::mysql4）
+
+countを取得するSQLがエラーになる場合、全件取得して件数を返します。
+countしたときに極端にパフォーマンスが落ちる場合は、このケースかもしれません。
+
+また、ひょっとするとうまく動かない SQL があるかもしれません。
+
+=head1 著者
+
+Takuji ASAKURA, E<lt>asakura@weakpoint.jpn.orgE<gt>
+
+=head1 参照
+
+L<Class::DBI>, L<Class::DBI::Iterator>
+
+=cut

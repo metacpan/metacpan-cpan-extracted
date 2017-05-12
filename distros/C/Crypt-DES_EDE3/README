@@ -1,0 +1,31 @@
+$Id: README,v 1.1.1.1 2001/09/15 03:24:02 btrott Exp $
+
+This is Crypt::DES_EDE3, a module implementing Triple-DES EDE
+(encrypt-decrypt-encrypt) encryption and decryption.
+
+PREREQUISITES
+
+    * Crypt::DES
+
+INSTALLATION
+
+Crypt::DES_EDE3 installation is straightforward. If your cpan shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Crypt::DES_EDE3'
+
+If you don't like that, you can download the distribution; the
+latest version on CPAN can be found in
+
+    ftp://ftp.cpan.org/pub/CPAN/authors/id/B/BT/BTROTT/
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Benjamin Trott / ben@rhumba.pair.com

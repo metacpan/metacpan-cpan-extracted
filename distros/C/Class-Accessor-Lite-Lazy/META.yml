@@ -1,0 +1,42 @@
+---
+abstract: 'Class::Accessor::Lite with lazy accessor feature'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.8, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Accessor-Lite-Lazy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Class::Accessor::Lite::Lazy:
+    file: lib/Class/Accessor/Lite/Lazy.pm
+    version: 0.03
+requires:
+  Carp: 0
+  Class::Accessor::Lite: 0.05
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/motemen/Class-Accessor-Lite-Lazy/issues
+  homepage: https://github.com/motemen/Class-Accessor-Lite-Lazy
+  repository: git://github.com/motemen/Class-Accessor-Lite-Lazy
+version: 0.03

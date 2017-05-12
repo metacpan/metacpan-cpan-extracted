@@ -1,0 +1,15 @@
+SYNOPSIS
+
+     use Complete::Man qw(complete_manpage complete_manpage_section);
+    
+     my $res = complete_manpage(word => 'gre');
+     # -> ['grep', 'grep-changelog', 'greynetic', 'greytiff']
+    
+     # only from certain section
+     $res = complete_manpage(word => 'gre', section => 1);
+     # -> ['grep', 'grep-changelog', 'greytiff']
+    
+     # complete section
+     $res = complete_manpage_section(word => '3');
+     # -> ['3', '3perl', '3pm', '3readline']
+

@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+
+
+
+<title>CPAN Testers Reports: Report for Template-Plugin-Ligature-0.03</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="title"       content="CPAN Testers Reports" />
+<meta name="author"      content="Barbie" />
+<meta name="language"    content="en" />
+<meta name="keywords"    content="perl, cpan, test, testing, tester, testers, reports, smoke, smoker, black box, automated, automation" />
+<meta name="description" content="Report listings of distributions and authors from reports submitted by the CPAN Testers community, who automatically black box test submissions to Perl's CPAN code repository" />
+
+
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout_wide.css" />
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-1826389-16");
+pageTracker._trackPageview();
+</script>
+
+<script type="text/javascript">
+function goThere(loc) {
+  window.location.href=loc;
+}
+</script>
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+    Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body>
+  
+  <div class="page-container">
+
+    
+    <div class="main">
+ 
+      
+      <div class="main-content">
+
+        
+        <h1 class="pagetitle">Report for <a href="http://search.cpan.org/dist/Template-Plugin-Ligature">Template-Plugin-Ligature-0.03</a></h1>
+        <div class="column1-unit">
+
+          
+  
+          <div class="orange_buttons">
+      <a rel="nofollow" href="/cpan/report/e8af99f8-362a-11e1-9d6f-f6dbfa7543f5?raw=1" rel="nofollow">Raw</a>      <a rel="nofollow" href="/distro/T/Template-Plugin-Ligature.html?version=0.03">Back</a>      </div>
+
+<pre>
+From: <strong>Chris Williams (BINGOS)</strong>
+Subject: <strong>FAIL Template-Plugin-Ligature-0.03 v5.12.4 FreeBSD</strong>
+Date: <strong>2012-01-03T16:49:31Z</strong>
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+
+Dear PATCH,
+
+This is a computer-generated error report created automatically by
+CPANPLUS, version 0.9115. Testers personal comments may appear
+at the end of this report.
+
+
+Thank you for uploading your work to CPAN.  However, it appears that
+there were some problems testing your distribution.
+
+TEST RESULTS:
+
+Below is the error stack from stage 'make test':
+
+[MSG] [Tue Jan  3 16:49:31 2012] Building Template-Plugin-Ligature
+
+[ERROR] [Tue Jan  3 16:49:31 2012] MAKE TEST failed:
+# Testing Template::Plugin::Ligature 0.03, Perl 5.012004, /usr/home/cpan/pit/thr/perl-5.12.4/bin/perl
+t/00-load.t .. ok
+Template process failed: html_entity error - cannot locate Apache::Util or HTML::Entities
+FAILED 8:  - template text 3 process FAILED: [% 'offloading floral offices re...
+FAILED 9:  - (obviously did not match expected)
+t/filter.t ... 
+Failed 2/9 subtests 
+
+Test Summary Report
+-------------------
+t/filter.t (Wstat: 0 Tests: 9 Failed: 2)
+  Failed tests:  8-9
+Files=2, Tests=10,  0 wallclock secs ( 0.02 usr  0.01 sys +  0.12 cusr  0.05 csys =  0.21 CPU)
+Result: FAIL
+Failed 1/2 test programs. 2/10 subtests failed.
+BEGIN failed--compilation aborted at -e line 1.
+ 
+[MSG] [Tue Jan  3 16:49:31 2012] DEFAULT 'proceed_on_test_failure' HANDLER RETURNING 'sub return value'
+
+PREREQUISITES:
+
+Here is a list of prerequisites you specified and versions we
+managed to load:
+
+	  Module Name                        Have     Want
+	  Template                           2.22     2.07
+	  Test::More                         0.98     0.41
+	  Text::Ligature                     0.02     0.02
+	  parent                            0.223        0
+
+Perl module toolchain versions installed:
+	Module Name                        Have
+	CPANPLUS                         0.9115
+	CPANPLUS::Dist::Build              0.60
+	Cwd                                3.33
+	ExtUtils::CBuilder             0.280202
+	ExtUtils::Command                  1.16
+	ExtUtils::Install                  1.55
+	ExtUtils::MakeMaker                6.62
+	ExtUtils::Manifest                 1.60
+	ExtUtils::ParseXS                  3.11
+	File::Spec                         3.33
+	Module::Build                    0.3800
+	Test::Harness                      3.23
+	Test::More                         0.98
+	version                            0.95
+
+******************************** NOTE ********************************
+The comments above are created mechanically, possibly without manual
+checking by the sender.  As there are many people performing automatic
+tests on each upload to CPAN, it is likely that you will receive
+identical messages about the same problem.
+
+If you believe that the message is mistaken, please reply to the first
+one with correction and/or additional informations, and do not take
+it personally.  We appreciate your patience. :)
+**********************************************************************
+
+Additional comments:
+
+
+This report was machine-generated by CPANPLUS::Dist::YACSmoke 0.66.
+Powered by minismokebox version 0.54
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    PATH = /sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/home/cpan/bin
+    PERL5LIB = :/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/arch
+    PERL5_CPANPLUS_IS_RUNNING = 49937
+    PERL5_CPANPLUS_IS_VERSION = 0.9115
+    PERL5_MINISMOKEBOX = 0.54
+    PERL5_YACSMOKE_BASE = /usr/home/cpan/pit/thr/conf/perl-5.12.4
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /usr/local/bin/bash
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    Perl: $^X = /usr/home/cpan/pit/thr/perl-5.12.4/bin/perl
+    UID:  $&lt;  = 1002
+    EUID: $&gt;  = 1002
+    GID:  $(  = 1002 1002
+    EGID: $)  = 1002 1002
+
+
+-------------------------------
+
+
+--
+
+Summary of my perl5 (revision 5 version 12 subversion 4) configuration:
+   
+  Platform:
+    osname=freebsd, osvers=9.0-rc3, archname=amd64-freebsd-thread-multi
+    uname='freebsd fremen 9.0-rc3 freebsd 9.0-rc3 #0: sun dec 4 08:56:36 utc 2011 root@farrell.cse.buffalo.edu:usrobjusrsrcsysgeneric amd64 '
+    config_args='-des -Dprefix=/usr/home/cpan/pit/thr/perl-5.12.4 -Dusethreads'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=define, usemultiplicity=define
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=define, use64bitall=define, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include',
+    optimize='-O',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include'
+    ccversion='', gccversion='4.2.1 20070831 patched [FreeBSD]', gccosandvers=''
+    intsize=4, longsize=8, ptrsize=8, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=16
+    ivtype='long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=8, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags ='-pthread -Wl,-E  -fstack-protector -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lgdbm -lm -lcrypt
+    perllibs=-lm -lcrypt
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib -fstack-protector'
+
+
+Characteristics of this binary (from libperl): 
+  Compile-time options: MULTIPLICITY PERL_DONT_CREATE_GVSV
+                        PERL_IMPLICIT_CONTEXT PERL_MALLOC_WRAP USE_64_BIT_ALL
+                        USE_64_BIT_INT USE_ITHREADS USE_LARGE_FILES
+                        USE_PERLIO USE_PERL_ATOF USE_REENTRANT_API
+  Built under freebsd
+  Compiled at Dec 31 2011 18:31:52
+  %ENV:
+    PERL5LIB=&quot;:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/arch:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/lib:/usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/arch&quot;
+    PERL5_CPANPLUS_IS_RUNNING=&quot;49937&quot;
+    PERL5_CPANPLUS_IS_VERSION=&quot;0.9115&quot;
+    PERL5_MINISMOKEBOX=&quot;0.54&quot;
+    PERL5_YACSMOKE_BASE=&quot;/usr/home/cpan/pit/thr/conf/perl-5.12.4&quot;
+    PERL_EXTUTILS_AUTOINSTALL=&quot;--defaultdeps&quot;
+    PERL_MM_USE_DEFAULT=&quot;1&quot;
+  @INC:
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/AppConfig-1.66/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Toolkit-2.22/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Sub-Uplevel-0.22/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Tree-DAG_Node-1.06/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Test-Warn-0.23/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Text-Ligature-0.02/blib/arch
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/lib
+    /usr/home/cpan/pit/thr/conf/perl-5.12.4/.cpanplus/5.12.4/build/Template-Plugin-Ligature-0.03/blib/arch
+    /usr/home/cpan/pit/thr/perl-5.12.4/lib/site_perl/5.12.4/amd64-freebsd-thread-multi
+    /usr/home/cpan/pit/thr/perl-5.12.4/lib/site_perl/5.12.4
+    /usr/home/cpan/pit/thr/perl-5.12.4/lib/5.12.4/amd64-freebsd-thread-multi
+    /usr/home/cpan/pit/thr/perl-5.12.4/lib/5.12.4
+    .</pre>
+    
+  
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+      <div class="blank"></div>
+      </div>
+    </div>
+      
+          
+    <div class="footer">
+    <p>
+    The CPAN Testers server is supported and funded by <a href="http://birmingham.pm.org">Birmingham Perl Mongers</a>.<br />
+    CPAN Testers Reports v is powered by <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> v<br />
+    All data and statistics are &#169; 1999-2011 CPAN Testers, and available under the Artistic License 2.0. Comments and design patches to barbie@cpan.org.</p><p>
+    The CPAN Testers Family: <br />
+      <a href="http://blog.cpantesters.org">Blog</a>          &#8226;
+      <a href="http://www.cpantesters.org">Reports</a>        &#8226;
+      <a href="http://wiki.cpantesters.org">Wiki</a>          &#8226;
+      <a href="http://stats.cpantesters.org">Statistics</a>   &#8226;
+      <a href="http://pass.cpantesters.org">PASS Matrix</a>   &#8226;
+      <a href="http://prefs.cpantesters.org">Preferences</a>  &#8226;
+      <a href="http://metabase.cpantesters.org">Metabase</a>  &#8226;
+      <a href="http://devel.cpantesters.org">Development</a>  &#8226;
+      <a href="http://deps.cpantesters.org">Dependencies</a>  &#8226;
+      <a href="http://matrix.cpantesters.org">Matrix</a>      &#8226;
+      <a href="http://analysis.cpantesters.org">Analysis</a></p>
+    <p>
+    CPAN Testers, supporting the Perl programming language since 1999.</p>
+</div>
+   
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+[%# cms html flavor header file %]
+ <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>[% cmspage.title || name %]</title>
+    <link rel="shortcut icon" href="[% CMS.static %]/favicon.ico" 
+          type="image/x-icon" />
+
+    [% PROCESS cms/wrappers/html/cms/yui_header.tt %]
+    [% PROCESS cms/wrappers/html/cms/cms_header.tt %]    
+    [% # local css and js %]
+    [% PROCESS cms/wrappers/html/head_maker.tt %]
+        
+ </head>

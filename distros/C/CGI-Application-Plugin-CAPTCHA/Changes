@@ -1,0 +1,17 @@
+Revision history for CGI-Application-Plugin-CAPTCHA
+0.04    01/07/2011
+        Added GitHub repo link
+        Fixed module dependencies.
+
+0.03    01/04/2011
+        Forgot to add Digest::SHA1 to list of dependencies.
+        
+0.02    01/04/2011
+        Skip some tests if Test::WWW::Mechanize is not available (RT#17146, by ZACKSE)
+        Test tweaks
+        Fixed various issues with Module::Build settings (thanks chorny!)
+        Plugged ugly security hole (thanks, Cees!)
+
+0.01    Sometime in 2005....
+        First version, released on an unsuspecting world.
+

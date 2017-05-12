@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 59
+    - 244
+  5949:
+    - 225
+name: ddcbf4
+registers:
+  AF: 14098
+  AF_: 0
+  BC: 8089
+  BC_: 0
+  DE: 18531
+  DE_: 0
+  HL: 18398
+  HL_: 0
+  I: 0
+  IX: 5890
+  IY: 49218
+  PC: 0
+  R: 0
+  SP: 0

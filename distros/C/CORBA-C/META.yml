@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                CORBA-C
+version:             2.62
+abstract:            IDL compiler to C include file
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:     
+    CORBA::IDL:                    2.6
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Francois PERRAD (francois.perrad@gadz.org)

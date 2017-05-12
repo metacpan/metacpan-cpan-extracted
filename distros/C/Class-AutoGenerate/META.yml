@@ -1,0 +1,18 @@
+--- 
+abstract: Automatically generate code upon require or use
+author: 
+  - Andrew Sterling Hanenkamp C<< <hanenkamp@cpan.org> >>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Class-AutoGenerate
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.8.0
+version: 0.05

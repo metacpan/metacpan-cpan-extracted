@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::CBC;    # CBC automatically loads TC18 for us
+
+my $key = pack "H16", "0001020304050607";
+my $IV = pack "H32", "0123456789abcdef0123456789abcdef";
+
+my $cipher = Crypt::CBC->new({'key' => $key,
+                              'cipher' => 'TC18',
+                              'iv' => $IV,
+                              'regenerate_key' => 1,
+                              'padding' => 'standard',
+                              'prepend_iv' => 0
+                            });
+
+my $plaintext1 = pack "H32", "000102030405060708090a0b0c0d0e0f";
+print "plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1 : ", unpack("H*", $ciphertext1), "\n";
+
+my $plaintext2 = $cipher->decrypt($ciphertext1);
+print "plaintext2  : ", unpack("H*", $plaintext2), "\n";
+

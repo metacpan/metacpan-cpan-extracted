@@ -1,0 +1,137 @@
+# PODNAME: Crypt::NaCl::Sodium::shorthash
+# ABSTRACT: Short-input hashing (SipHash-2-4)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::shorthash - Short-input hashing (SipHash-2-4)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    # for converting to 64-bit integers
+    use Math::BigInt;
+
+    my $crypto_shorthash = Crypt::NaCl::Sodium->shorthash();
+
+    my ($key, $mac, $msg);
+
+    # generate secret key
+    $key = $crypto_shorthash->keygen();
+
+    # list of short file names for which we are computing the checksums
+    my @files = ...;
+
+    for my $file ( @files ) {
+        my $mac = $crypto_shorthash->mac( $file, $key );
+
+        # MAC is 64-bit string
+        print "$file\t", $mac->to_hex, "\n";
+
+        # which can be converted to 64-bit integer
+        print "$file\t", Math::BigInt->from_hex($mac->to_hex), "\n";
+    }
+
+=head1 DESCRIPTION
+
+Many applications and programming language implementations were
+recently found to be vulnerable to denial-of-service
+attacks when a hash function with weak security guarantees,
+such as I<Murmurhash 3>, was used to construct a hash table.
+
+In order to address this, C<crypto_shorthash> outputs short but
+unpredictable (without knowing the secret key) values suitable
+for picking a list in a hash table for a given key.
+
+This function is optimized for short inputs.
+
+The output of this function is only 64 bits. Therefore, it
+should not be considered collision-resistant.
+
+Use cases:
+
+=over 4
+
+=item * Hash tables
+
+=item * Probabilistic data structures such as Bloom filters
+
+=item * Integrity checking in interactive protocols
+
+=back
+
+=head1 METHODS
+
+=head2 keygen
+
+    my $key = $crypto_shorthash->keygen();
+
+Helper method to generate a random key to be used by C<$crypto_shorthash>.
+
+The length of the C<$key> equals L</KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 mac
+
+    my $mac = $crypto_shorthash->mac( $msg, $key );
+
+Computes the MAC of the C<$msg> using given C<$key>.
+
+The length of the C<$mac> equals L</BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_shorthash->KEYBYTES;
+
+Returns the length of key.
+
+=head2 BYTES
+
+    my $mac_length = $crypto_shorthash->BYTES;
+
+Returns the length of MAC.
+
+=head1 SECURITY MODEL
+
+C<crypto_shorthash> uses I<SipHash-2-4> pseudorandom hash optimized for speed on
+short messages.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<SipHash: a fast short-input PRF|https://131002.net/siphash/>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

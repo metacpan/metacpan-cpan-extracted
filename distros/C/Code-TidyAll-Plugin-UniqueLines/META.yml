@@ -1,0 +1,37 @@
+---
+abstract: 'Remove duplicate lines from a file'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-UniqueLines
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Code::TidyAll::Plugin: '0'
+  List::Util: '1.45'
+  Moo: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/oalders/code-tidyall-plugin-uniquelines/issues
+  homepage: https://github.com/oalders/code-tidyall-plugin-uniquelines
+  repository: https://github.com/oalders/code-tidyall-plugin-uniquelines.git
+version: '0.000003'
+x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

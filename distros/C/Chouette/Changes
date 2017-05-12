@@ -1,0 +1,12 @@
+0.102   2017-02-13
+  * Doc updates
+  * Pass name into AET::Server constructor so you can see which
+    process is which in ps output.
+
+0.101   2017-02-12
+  * Allow passing options to checkout
+  * Doc updates
+  * Minor bugfixes
+
+0.100   2017-02-10
+  * Initial CPAN release

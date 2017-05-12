@@ -1,0 +1,49 @@
+ConfInt.pm, Version 1.0.1
+
+NAME ConfInt
+
+	ConfInt - Perl extension for calculating the confidence interval of
+		  meassured values.
+ 
+SYNOPSIS
+ 
+	use ConfInt;
+	ConfInt([ARGUMENT_1],[ARGUMENT_2]);
+ 
+DESCRIPTION
+ 
+	This module calculates and returns the relative error of the turned
+	over values. ConfInt needs two things to be turned over: 1st is the
+	width of the confidence interval. 2nd is the reference to an array
+	including the values.
+	Supported confidence interval width:
+ 
+        0.7             (+/- 0.35) ; probability of 0.65
+        0.6             (+/- 0.30) ; probability of 0.70
+        0.5             (+/- 0.25) ; probability of 0.75
+        0.4             (+/- 0.20) ; probability of 0.80
+        0.3             (+/- 0.15) ; probability of 0.85
+        0.2             (+/- 0.10) ; probability of 0.90
+        0.1             (+/- 0.05) ; probability of 0.95
+        0.05            (+/- 0.025); probability of 0.975
+        0.02            (+/- 0.01) ; probability of 0.99
+        0.01            (+/- 0.005); probability of 0.995
+ 
+EXAMPLE:
+                use ConfInt;
+                @ValueArray = (1,1,1,1,1,2,3,2,1,1,1,1,2,1);
+                $ReturnValue = &ConfInt::ConfInt(0.05,\@ValueArray);
+                print "$ReturnValue";
+ 
+EXPORT
+ 
+	Returns the relative error of a summary of values.
+ 
+ 
+AUTHOR
+ 
+	written by Christian Gernhardt <christian.gernhardt@web.de>
+ 
+COPYRIGHT
+ 
+	Copyright (C) 2001 IBM Deutschland Entwicklung GmbH, IBM Corporation

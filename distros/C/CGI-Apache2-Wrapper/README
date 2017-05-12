@@ -1,0 +1,45 @@
+Certain modules, such as CGI::Ajax and
+JavaScript::Autocomplete::Backend,
+require a minimal CGI.pm-compatible module to provide certain methods,
+such as param() to fetch parameters. The standard module to
+do this is of course L<CGI.pm>; however, especially in a mod_perl
+environment, there may be concerns with the resultant memory footprint.
+This module provides various CGI.pm-compatible methods via
+mod_perl2 and librapreq2, and as such, it may be a viable
+alternative in a mod_perl scenario.
+
+Note that this module is not a drop-in replacement for
+CGI.pm, as only a select few methods that naturally arise
+in mod_perl2 and libapreq2 are provided. As well as providing
+CGI.pm-compatible methods to other modules, one of the
+main intents here is to assist development of porting 
+CGI applications over to mod_perl2 and libapreq2 and/or
+for use in writing applications
+that are to be used in either a cgi or mod_perl environment. However,
+for applications that are intended only for mod_perl, it is recommended
+that the native interface to mod_perl2 and libapreq2 be used, as
+this module will add some overhead. 
+
+See the documentation for CGI::Apache2::Wrapper for details.
+
+Installation proceeds through the usual
+   perl Makefile.PL
+   $MAKE
+   $MAKE test
+   $MAKE install
+or, if Module::Build is available,
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+A ppm package for Win32 users of ActivePerl 8xx can be installed
+by adding http://theoryx5.uwinnipeg.ca/ppms/ to your list
+of repositories and then issuing the command
+   C:\> ppm install CGI-Apache2-Wrapper
+The corresponding repository for ActivePerl 10xx is
+http://cpan.uwinnipeg.ca/PPMPackages/10xx/.
+
+This software is copyright 2007 by Randy Kobes
+<r.kobes@uwinnipeg.ca>. Use and
+redistribution are under the same terms as Perl itself;
+see http://www.perl.com/pub/a/language/misc/Artistic.html.

@@ -1,0 +1,15 @@
+---
+name: Catalyst-Plugin-Markdown
+version: 0.01
+author:
+  - 'Christopher H. Laco, <claco@chrislaco.com>'
+abstract: Markdown for Catalyst
+license: perl
+requires:
+  Catalyst: 5.30
+  Text::Markdown: 1.0.2
+provides:
+  Catalyst::Plugin::Markdown:
+    file: lib/Catalyst/Plugin/Markdown.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

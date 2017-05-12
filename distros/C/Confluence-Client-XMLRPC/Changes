@@ -1,0 +1,26 @@
+
+2.5       2014-05-01 21:38:00 Europe/Berlin
+	- INCOMPATIBLE CHANGE: make updatePage() behave like the API method of 
+	  that name does
+	- New method updateOrStorePage() that behaves like updatePage() did
+	- Automatically choose the newest available API depending on the Confluence
+	  version (unless a specific version is explicitly requested)
+	- Use updatePage() API method if available (>= Confluence 2.10) and fall
+	  back to shim otherwise
+	- New shim for getPageSummary() for older Confluence versions
+	- Bugfix: Do not create Boolean RPC arguments based on substring matches,
+	  compare complete strings instead (reported by russt [at] releasetools.org)
+	- Many documentation improvements
+	- "local"ize Data::Dumper global configuration variables
+	- Cache serverInfo and return cached value for subsequent calls to 
+	  getServerInfo() method
+
+2.4       2014-04-06 00:49:34 Europe/Berlin
+	- Significantly reworked the documentation
+
+2.3       2014-01-12 20:04:16 Europe/Berlin
+	- Provide ways to set the version of the Confluence API to use 
+
+2.2       2013-02-13 22:29:06 Europe/Berlin
+	- Took Confluence.pm from https://confluence.atlassian.com/display/DISC/Perl+XML-RPC+client;
+		renamed it, added some POD and reformatted the source; no functional changes

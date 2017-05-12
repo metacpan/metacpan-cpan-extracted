@@ -1,0 +1,8 @@
+0.002 2009-12-03
+  - Clean up docs and tests.
+  - Explicitly doesn't work with CatalystX::Component::Traits as you'd
+    never need to use this from config.
+
+0.001 2009-12-03
+  - Initial version
+

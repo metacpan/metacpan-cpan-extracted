@@ -1,0 +1,43 @@
+NAME
+    Class::XSAccessor::Compat - Class::Accessor::Fast compatible interface
+    for Class::XSAccessor
+
+SYNOPSIS
+    Use it like you would use "Class::Accessor::Fast". But MUCH faster.
+
+DESCRIPTION
+    "Class::XSAccessor::Compat" implements a compatibility layer for
+    Class::Accessor::Fast on top of Class::XSAccessor.
+
+    It should work exactly the same way as "Class::Accessor::Fast".
+
+SEE ALSO
+    *   Class::XSAccessor
+
+    *   Class::Accessor::Fast
+
+    *   Class::Accessor::Fast::XS
+
+        ... which is a fork of "Class::XSAccessor" and provides the same
+        interface as this module. But it doesn't have the same maintenance
+        and optimization level as "Class::XSAccessor" itself.
+
+    *   Class::Accessor
+
+ACKNOWLEDGMENT
+    This module was inspired by and based on Ruslan Zakirov's
+    "Class::Accessor::Fast::XS" module. That, in turn was heavily based on
+    an old version of "Class::XSAccessor".
+
+AUTHOR
+    Steffen Mueller <smueller@cpan.org>
+
+    chocolateboy <chocolate@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+

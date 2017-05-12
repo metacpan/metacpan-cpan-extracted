@@ -1,0 +1,51 @@
+=head1 Features of CSS::Prepare
+
+There are some extra features that CSS::Prepare uses when parsing your style
+sheets.
+
+=head2 Chunking content
+
+When optimising it can be useful to specifically chunk your content (see
+L<Separate parts of the output> for more on this). This can be done by
+marking the end of any rule sets you need to be chunked separately with a
+comment containing just two or more hyphens.
+
+    li { margin: 0; }
+    /* -- */
+    h1 { margin: 0; }
+
+=head2 Verbatim comments
+
+Sometimes you actually need to include a comment in the output, for things such as stating licensing terms. Any block-level comment with an exclamation
+mark as the very first character in the comment is preserved in the output,
+just with the exclamation mark removed.
+
+=over
+
+=item input:
+
+    /*! 'Museo' Font by Jos Buivenga (exljbris) 
+     * -> www.exljbris.com */
+    @font-face {
+        font-family:            'Museo';
+        ...
+    }
+    
+=item output:
+    
+    /* 'Museo' Font by Jos Buivenga (exljbris) 
+     * -> www.exljbris.com */
+    @font-face{font-family:'Museo';...}
+
+=back
+
+=head2 Verbatim blocks
+
+Any CSS that cssprepare does not understand is automatically discarded. If you
+need to include some rule sets that the parser does not understand, you can do
+this by starting them with a special marker comment and ending with a chunk
+marker, and cssprepare will just pass the content through unchanged.
+
+    /*! verbatim */
+    #problematic { border-radius: 5px; }
+    /* -- */

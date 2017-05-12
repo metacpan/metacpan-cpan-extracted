@@ -1,0 +1,23 @@
+---
+name: Class-Accessor-Classy
+version: v0.9.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: accessors with minimal inheritance
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Build: 0.28
+  Test::More: 0
+  version: 0
+configure_requires:
+  Module::Build: 0.3401
+provides:
+  Class::Accessor::Classy:
+    file: lib/Class/Accessor/Classy.pm
+    version: v0.9.1
+generated_by: Module::Build version 0.3401
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

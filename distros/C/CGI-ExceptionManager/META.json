@@ -1,0 +1,59 @@
+{
+   "abstract" : "DebugScreen with detach!",
+   "author" : [
+      "Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-ExceptionManager",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : "0",
+            "perl" : "5.00800"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::ExceptionManager" : {
+         "file" : "lib/CGI/ExceptionManager.pm",
+         "version" : "0.06"
+      },
+      "CGI::ExceptionManager::StackTrace" : {
+         "file" : "lib/CGI/ExceptionManager/StackTrace.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

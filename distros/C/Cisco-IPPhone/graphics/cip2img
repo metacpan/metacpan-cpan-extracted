@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+# Convert a cip file back to a regular image
+
+use strict;
+use integer;
+use IO::File;
+use GD;
+
+die "Usage: $0 <in file> <out file> <width> <height>\n"
+    unless @ARGV == 4;
+
+my ($file, $out, $width, $height) = @ARGV;
+
+my $file = new IO::File $file;
+my $data = <$file>;
+$file->close;
+
+# Convert back to bits
+my @hex_data = split(//, $data);
+my @data;
+for (my $i = 0; $i < @hex_data; $i+=2)
+{
+    push @data, hex($hex_data[$i+1])%4;
+    push @data, hex($hex_data[$i+1])/4;
+    push @data, hex($hex_data[$i])%4;
+    push @data, hex($hex_data[$i])/4;
+}
+
+my $img = new GD::Image($width, $height);
+my @colors = ($img->colorAllocate(255, 255, 255),
+	      $img->colorAllocate(170, 170, 170),
+	      $img->colorAllocate(85, 85, 85),
+	      $img->colorAllocate(0, 0, 0));
+my $x;
+my $y;
+foreach (@data)
+{
+    $img->setPixel($x, $y, $colors[$_]);
+    $x++;
+    if ($x == $width)
+    {
+	$y++;
+	$x = 0;
+    }
+}
+
+$out =~ /\.([^\.]+)$/;
+my $out = new IO::File ">$out";
+eval("print \$out \$img->$1");
+$out->close;

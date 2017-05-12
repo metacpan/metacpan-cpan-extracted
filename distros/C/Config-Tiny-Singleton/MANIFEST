@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_main.t
+t/lib/Test/Config/Singleton.pm
+lib/Config/Tiny/Singleton.pm
+META.yml                                 Module meta-data (added by MakeMaker)

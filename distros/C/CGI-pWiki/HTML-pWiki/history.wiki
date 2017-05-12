@@ -1,0 +1,12 @@
+
+The original WikiWikiWeb was written by Ward Cunningham
+of the portland pattern repository.
+
+A version of it was studied by Markus Peter and is
+maintained by him at the http://jos.org/ site.
+
+That version was modified by
+<a href=http://mozilla.devel.org/noreg/moz/people.cgi/BobRacko>Bob Racko</a>
+for the KeheiWiki and was studied by me.
+
+I wanted a real Perl Module - so I wrote one.

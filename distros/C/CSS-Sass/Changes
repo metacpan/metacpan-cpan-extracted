@@ -1,0 +1,226 @@
+CSS::Sass (3.4.5)
+
+  * Bumped libsass version to latest 3.4 stable branch (3.4.4)
+  * Improve Makefile.PL to check gcc version (and other fixes)
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Tuw, 09 Apr 2017 01:16:37 +0100
+
+CSS::Sass (3.4.4)
+
+  * Bumped libsass version to temporary 3.4 stable branch
+  * Re-added gcc 4.4 compatibility for libsass (cpan release only)
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Tuw, 07 Mar 2017 15:36:05 +0200
+
+CSS::Sass (3.4.3)
+
+  * Meta files once again got corrupted!?
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Min, 20 Feb 2017 09:51:23 +0200
+
+CSS::Sass (3.4.2)
+
+  * Fix build issue with plugins on OSX (#28)
+  * Fix plugin loader when plugins are disabled
+  * Update all plugins to their latest versions
+  * Improve spec runner to cover all warnings and errors
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Wed, 15 Feb 2017 01:02:58 +0200
+
+CSS::Sass (3.4.1)
+
+  * Update to latest LibSass release (3.4.3)
+  * Remove undocumented `resolve_file` function
+  * Bundle experimental LibSass plugins (alpha)
+  * Improve command line utility for plugins
+  * Fix tests due to wrong skip count (Perl < 5.12)
+  * Fix AND/OR operations and enable test case
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Wed, 11 Jan 2017 14:18:43 +0200
+
+CSS::Sass (3.4.0)
+
+  * Update to latest LibSass release (3.4.0)
+  * Add source-map-file-urls option to cli
+  * Change cli options to be case sensitive
+  * Fix issue connected to EUMM bugfix
+  * Update spec runner for nested options
+  * Enable error spec tests again
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Sat, 10 Dec 2016 17:23:09 +0200
+
+CSS::Sass (3.3.6)
+
+  * Fix issue with ExtUtils::MakeMaker 7.12+
+  * Add gcc 4.4 compatibility for libsass
+
+CSS::Sass (3.3.5)
+
+  * Fix spec runner to pass on linux (unicode issue)
+  * Fix broken unicode test comparing on some systems
+  * Add missing test dependency in meta files (YAML::XS)
+  * Update README for Module::Build to ExtUtils::MM switch
+
+CSS::Sass (3.3.4)
+
+  * Update to latest LibSass dev release (pre 3.3.7)
+  * Fix build edge case with EUMM 7.16 (@genehack)
+  * Remove duplicate "m" arg from psass (@dracos)
+
+CSS::Sass (3.3.3)
+
+  * Update to latest LibSass release (3.3.6)
+
+CSS::Sass (3.3.2)
+
+  * Update to latest LibSass release (3.3.5)
+
+CSS::Sass (3.3.1)
+
+  * Update to latest LibSass release (3.3.4)
+
+CSS::Sass (3.3.0)
+
+  * Update to latest LibSass release (3.3.3)
+  * Update spec test runner for error specs
+  * Use LibSass functions for compare operations
+  * Switch `Module::Build` with `ExtUtils::MakeMaker`
+  * Improve unicode handling with command line utility
+
+CSS::Sass (3.3.0-rc1)
+
+  * Update to latest libsass release (3.3.0-rc1)
+  * Implement native operations for sass values
+  * Add missing `source-map-root` context option
+  * Move build to more portable ExtUtils::MakeMaker
+
+CSS::Sass (3.2.2)
+
+  * Update to latest libsass release (3.2.4)
+  * Rename CSS::Sass::Type to CSS::Sass::Value
+  * Old namespace is still supported ("linked")
+  * Add more overload operators for sass values
+
+CSS::Sass (3.2.1)
+
+  * Update some outdated documentation
+  * Add missing version file for libsass
+  * Silence some compiler warnings
+
+CSS::Sass (3.2.0)
+
+  * Update to latest libsass release (3.2.0)
+  * Add options for remaining output styles
+  * Add indent and linefeed config options
+  * Add benchmark option to command line tool
+  * Add watcher option to recompile on changes
+  * Refactor for libsass context option initializing
+  * Expose `resolve_file` function on the C-API
+  * Add experimental API for multiple importers
+  * Add highly experimental API for custom headers
+
+CSS::Sass (3.1.0)
+
+  * Updates to latest libsass version (3.1.0)
+  * Changed to use new C-API (sass_context.h)
+  * Changed omit_src_map_url to no_src_map_url
+  * Implement custom importers (experimental)
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Fri, 02 Jan 2015 04:10:28 +0100
+
+CSS::Sass (3.0.2)
+
+  * Updates to latest libsass version (3.0.2)
+  * Add new source map embedding features
+  * Implements source-map-embed option
+  * Implements source-map-contents option
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Wed, 05 Nov 2014 02:46:05 +0100
+
+CSS::Sass (3.0.1)
+
+  * Adds latest libsass changes (3.0.0)
+  * Reimplemented and improved CSS::Sass::Type
+  * Fixes memory leaks introduced in 3.0.0
+  * Fixes building on various platforms
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Sat, 25 Oct 2014 14:04:37 +0200
+
+CSS::Sass (3.0.0)
+
+  * Updates to latest libsass (3.0.0)
+  * Implements libsass source maps options
+  * Exports libsass sass2scss function
+  * Adds minimal command line utility
+  * Adds complete sass-spec test suite
+  * Adds CSS::Sass::Type::Map for maps
+  * Adds Travis CI (continous integration)
+  * Adds coveralls.io (code coverage metrics)
+
+ -- Marcel Greter <perl-libsass@ocbnet.ch>  Sat, 25 Oct 2014 14:00:47 +0200
+
+CSS::Sass (0.8.1)
+
+  * Add requirement for Class::Accessor::Fast to Build.PL. One day it will
+    pass tests on cpantesters.
+
+ -- David Caldwell <david@porkrind.org>  Thu, 03 Oct 2013 16:52:17 -0700
+
+CSS::Sass (0.8.0)
+
+  * Fix building on Strawberry Perl (Marcel Greter).
+
+ -- David Caldwell <david@porkrind.org>  Fri, 27 Sep 2013 14:43:36 -0700
+
+CSS::Sass (0.7.0)
+
+  * Fix Sass functions so that you may have more than 1 at a time (Dan
+    Thomas).
+
+ -- David Caldwell <david@porkrind.org>  Tue, 13 Aug 2013 11:08:34 -0700
+
+CSS::Sass (0.6.0)
+
+  * Add Sass functions implemented in Perl.
+
+ -- David Caldwell <david@porkrind.org>  Sat, 22 Jun 2013 13:10:04 -0700
+
+CSS::Sass (0.5.0)
+
+  * Fix build issue on OpenSolaris.
+  * Fix include path issue on Windows.
+  * Fix XS loading issue on older Perls.
+
+ -- David Caldwell <david@porkrind.org>  Fri, 21 Jun 2013 10:58:42 -0700
+
+CSS::Sass (0.4.0)
+
+  * Fix building on Mac OS X 10.7.
+  * Update to latest libsass code.
+
+ -- David Caldwell <david@porkrind.org>  Mon, 17 Jun 2013 11:01:50 -0700
+
+CSS::Sass (0.3.0)
+
+  * Fix building on Linux/GCC.
+  * Stop including Makefile.PL.
+
+ -- David Caldwell <david@porkrind.org>  Mon, 17 Jun 2013 01:45:45 -0700
+
+CSS::Sass (0.2.0)
+
+  * Don't try to pass clang options to non-clang compilers.
+
+ -- David Caldwell <david@porkrind.org>  Sat, 15 Jun 2013 03:14:37 -0700
+
+CSS::Sass (0.1.0)
+
+  * Rename module.
+
+ -- David Caldwell <david@porkrind.org>  Wed, 29 May 2013 23:59:30 -0700
+
+Text::Sass::XS (0.1.0)
+
+  * Initial release.
+
+ -- David Caldwell <david@porkrind.org>  Wed, 29 May 2013 19:23:13 -0700

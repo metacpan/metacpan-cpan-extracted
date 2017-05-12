@@ -1,0 +1,135 @@
+From mason-users-admin@lists.sourceforge.net  Thu Nov  3 13:54:17 2005
+Return-Path: <mason-users-admin@lists.sourceforge.net>
+Received: from lists-outbound.sourceforge.net (lists-outbound.sourceforge.net [66.35.250.225])
+        by s69759.xenosight.com (8.12.11/8.12.11) with ESMTP id jA3JsGDS014689
+        for <archive_mason-users_lists.sourceforge.net@mazrmail.com>; Thu, 3 Nov 2005 13:54:16 -0600
+Received: from sc8-sf-list1-b.sourceforge.net (sc8-sf-list1-b.sourceforge.net [10.3.1.7])
+        by sc8-sf-spam1.sourceforge.net (Postfix) with ESMTP
+        id DB08089AAA; Thu,  3 Nov 2005 11:49:18 -0800 (PST)
+Received: from sc8-sf-mx2-b.sourceforge.net ([10.3.1.92] helo=mail.sourceforge.net)
+        by sc8-sf-list1.sourceforge.net with esmtp (Exim 4.30)
+        id 1EXl4N-0000L8-0g
+        for mason-users@lists.sourceforge.net; Thu, 03 Nov 2005 11:48:19 -0800
+Received: from xproxy.gmail.com ([66.249.82.196])
+        by mail.sourceforge.net with esmtp (Exim 4.44)
+        id 1EXl4L-0005Hp-Rn
+        for mason-users@lists.sourceforge.net; Thu, 03 Nov 2005 11:48:19 -0800
+Received: by xproxy.gmail.com with SMTP id h29so600761wxd
+        for <mason-users@lists.sourceforge.net>; Thu, 03 Nov 2005 11:48:15 -0800 (PST)
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+        s=beta; d=gmail.com;
+        h=received:message-id:date:from:sender:to:subject:cc:in-reply-to:mime-version:content-type:references;
+        b=lohminCmnPywDj4LOBR93LCRpYAjZQpCotbVEMp17pwihrAULjl+pElexOKcWh3fvhVyXnijnYe2AxBON5u0kYAMzefNCMWI2UvJfJi9/Dka/UmR
+jIR+A3lRjNUtz0WCyakuA+BupRSPlVvbDKvIXg9AaZTyQhPZVBtd5weOhW8=
+Received: by 10.70.65.17 with SMTP id n17mr1063197wxa;
+        Thu, 03 Nov 2005 11:48:15 -0800 (PST)
+Received: by 10.70.60.2 with HTTP; Thu, 3 Nov 2005 11:48:15 -0800 (PST)
+Message-ID: <87f4e9820511031148q7e120c00p56e1d0ee826d9c15@mail.gmail.com>
+From: Jason Kohles <email@jasonkohles.com>
+To: nav navlan <navidunreal@yahoo.com>
+Subject: Re: [Mason] apache configuration
+Cc: mason-users@lists.sourceforge.net
+In-Reply-To: <20051103163704.95845.qmail@web60322.mail.yahoo.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+        boundary="----=_Part_13569_27871202.1131047295900"
+References: <20051103163704.95845.qmail@web60322.mail.yahoo.com>
+X-Spam-Score: 0.2 (/)
+X-Spam-Report: Spam Filtering performed by sourceforge.net.
+        See http://spamassassin.org/tag/ for more details.
+        Report problems to http://sf.net/tracker/?func=add&group_id=1&atid=200001
+        0.0 RCVD_BY_IP             Received by mail server with no name
+        0.0 SF_CHICKENPOX_PERIOD   BODY: Text interparsed with .
+        0.0 SF_CHICKENPOX_SLASH    BODY: Text interparsed with /
+        0.0 SF_CHICKENPOX_AT       BODY: Text interparsed with @
+        0.0 SF_CHICKENPOX_APOSTROPHE BODY: Text interparsed with '
+        0.1 HTML_40_50             BODY: Message is 40% to 50% HTML
+        0.0 HTML_MESSAGE           BODY: HTML included in message
+Sender: mason-users-admin@lists.sourceforge.net
+Errors-To: mason-users-admin@lists.sourceforge.net
+X-BeenThere: mason-users@lists.sourceforge.net
+X-Mailman-Version: 2.0.9-sf.net
+Precedence: bulk
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/mason-users>,
+        <mailto:mason-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: Main user's list for Mason <mason-users.lists.sourceforge.net>
+List-Post: <mailto:mason-users@lists.sourceforge.net>
+List-Help: <mailto:mason-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/mason-users>,
+        <mailto:mason-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=mason-users>
+X-Original-Date: Thu, 3 Nov 2005 14:48:15 -0500
+Date: Thu, 3 Nov 2005 14:48:15 -0500
+
+------=_Part_13569_27871202.1131047295900
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+On 11/3/05, nav navlan <navidunreal@yahoo.com> wrote:
+>
+> Hi,
+> Is it necessary to have ServerRoot and DocumentRoot same in order to make
+> Mason work perfectly? I have seen that somewhere mason book.
+>  I mean something like this:
+> ServerRoot "/home/www"
+> DocumentRoot "/home/www/htdocs"
+>   My setting is like following right now,
+> ServerRoot "/etc/httpd"
+> DocumentRoot "/var/www/html"
+>
+
+No, it's not necessary, and it's probably not a good idea, the way
+you have it now is the way that most people do it, with the server
+configuration outside the document root.
+
+--
+Jason Kohles
+email@jasonkohles.com - http://www.jasonkohles.com/
+"A witty saying proves nothing." -- Voltaire
+
+------=_Part_13569_27871202.1131047295900
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+On 11/3/05, <b class=3D"gmail_sendername">nav navlan</b> &lt;<a href=3D"mai=
+lto:navidunreal@yahoo.com">navidunreal@yahoo.com</a>&gt; wrote:<div><span c=
+lass=3D"gmail_quote"></span><blockquote class=3D"gmail_quote" style=3D"bord=
+er-left: 1px solid rgb(204, 204, 204); margin: 0pt 0pt 0pt 0.8ex; padding-l=
+eft: 1ex;">
+<div>Hi,</div>
+<div>Is it necessary to have ServerRoot and DocumentRoot same in order
+to make Mason work perfectly? I have seen that somewhere mason book.</div>
+<div>&nbsp;</div>
+<div>I mean something like this:</div>
+<div>ServerRoot &quot;/home/www&quot;<br>DocumentRoot &quot;/home/www/htdoc=
+s&quot;</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+<div>My setting is like following right now,</div>
+<div>ServerRoot &quot;/etc/httpd&quot;<br>DocumentRoot &quot;/var/www/html&=
+quot;</div></blockquote><div><br>
+No, it's not necessary, and it's probably not a good idea, the way&nbsp; <b=
+r>
+
+you have it now is the way that most people do it, with the server configur=
+ation outside the document root.<br>
+</div></div><br>-- <br>Jason Kohles<br><a href=3D"mailto:email@jasonkohles.=
+com">email@jasonkohles.com</a> - <a href=3D"http://www.jasonkohles.com/">ht=
+tp://www.jasonkohles.com/</a><br>&quot;A witty saying proves nothing.&quot;=
+&nbsp;&nbsp;-- Voltaire
+<br>
+
+------=_Part_13569_27871202.1131047295900--
+
+
+-------------------------------------------------------
+SF.Net email is sponsored by:
+Tame your development challenges with Apache's Geronimo App Server. Download
+it for free - -and be entered to win a 42" plasma tv or your very own
+Sony(tm)PSP.  Click here to play: http://sourceforge.net/geronimo.php
+_______________________________________________
+Mason-users mailing list
+Mason-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/mason-users

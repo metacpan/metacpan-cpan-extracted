@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+Mmap.pm
+Mmap.xs
+README
+Todo
+cmmtest
+ppport.h
+t/01simple.t
+t/02entries.t
+t/03corrupt.t
+t/04utf8.t
+t/05keep.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

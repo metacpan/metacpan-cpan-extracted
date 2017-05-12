@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/Cache-Memcached-XS.t
+lib/Cache/Memcached/XS.pm
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

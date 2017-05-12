@@ -1,0 +1,26 @@
+---
+abstract: 'A CGI::Session driver for ODBC'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0.94
+  Test::Pod: 1.41
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Session-Driver-odbc
+provides:
+  CGI::Session::Driver::odbc:
+    file: lib/CGI/Session/Driver/odbc.pm
+    version: 1.05
+requires:
+  CGI::Session: 4.42
+  Carp: 0
+  DBI: 1.609
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.05

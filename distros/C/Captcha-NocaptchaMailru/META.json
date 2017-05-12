@@ -1,0 +1,43 @@
+{
+   "abstract" : "Module for working with Nocaptcha Mail.Ru service",
+   "author" : [
+      "Oleg Kovalev <man0xff@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captcha-NocaptchaMailru",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2",
+            "LWP::UserAgent" : "5",
+            "URI::Escape" : "3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0"
+}

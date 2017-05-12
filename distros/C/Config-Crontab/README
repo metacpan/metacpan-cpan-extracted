@@ -1,0 +1,158 @@
+Config/Crontab
+==============
+
+Config::Crontab reads and writes (and pretty-prints) your crontab(5)
+files. It is compatible with Vixie-style crontabs (and all subsets,
+including Solaris' SysV-style crontabs).
+
+Config::Crontab has a simple, object-oriented syntax. Crontab files
+are broken into "blocks" (paragraphs, each separated by two or more
+newlines); the Block is the basic unit of a Config::Crontab object.
+
+You can re-order entire blocks within a crontab file, re-order lines
+within blocks (there are three types of lines: comments, environment
+settings, and crontab commands or events), remove blocks or lines
+within blocks, add new blocks or lines within blocks, etc. See the
+Config::Crontab manpage for full details.
+
+Config::Crontab will do basic regular expression syntax checks; it
+won't allow obvious garbage (e.g., 'F * * * * /bin/bar' would fail
+since 'F' is not valid), but it won't check for nonsensical entries
+such as '10-2 * * * * /bin/bar' (the minute range specified is
+invalid). However, if you attempt to commit an invalid crontab, the
+'write' method will return undef and the 'error' method will be set
+(with the output of crontab(1)) if the crontab is rejected by the
+crontab program.
+
+EXAMPLES
+
+Example 1:
+==========
+
+Consider this example of parsing a crontab, re-schedule a cron event,
+and commit the changes. Given:
+
+    30 5 * * 1-5 /bin/foo
+
+we want to re-schedule the event to run at 4:30a instead. Here is one
+way, creating an B<Event> object:
+
+    my $ct = new Config::Crontab; $ct->read;
+    my ($event) = $ct->select(-command_re => '/bin/foo');
+    $event->hour(4);
+    $ct->write;
+
+and here is a shortcut to do the same thing:
+
+    my $ct = new Config::Crontab; $ct->read;
+    ($ct->select(-command_re => '/bin/foo'))->hour(4);
+    $ct->write;
+
+Example 2:
+==========
+
+The following example is equivalent to 'crontab -l':
+
+    $ct = new Config::Crontab; $ct->read; print $ct->dump;
+
+Example 3:
+==========
+
+The following example is equivalent to 'crontab -u joe -l':
+
+    $ct = new Config::Crontab( -owner => 'joe' );
+    $ct->read;
+    print $ct->dump;
+
+You can even copy crontabs from one user to another:
+
+    ## must be run as root or other privileged user
+    $ct = new Config::Crontab( -owner => 'joe' );
+    $ct->read;
+    $ct->owner('sherman');
+    $ct->write;
+
+Example 4:
+==========
+
+You may also make a backup of your crontab:
+
+    $ct = new Config::Crontab; $ct->read;
+    $ct->file('mycrontab.bak'); $ct->write;
+
+You can also disable an entire block of commands. Consider the
+following crontab file:
+
+    # refresh apache duds
+    1 0 * * * kill -1 `ps -x | egrep 'Master:.+? \(https?d\)' | awk '{print $1}'`
+
+    # in-house stats files
+    0 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c online.config -v
+    2 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c police.config -v
+    4 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c scott.config -v
+    6 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c tubbing.config -v
+    8 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c perlcode.config -v
+    10 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c fritzen.config -v
+    12 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c josh.config -v
+    14 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c rhett.config -v
+
+    # do log files
+    0 3 * * * $HOME/usr/bin/movelogs.pl -v -k -a
+
+we want to turn off all the stats processing. So we do this:
+
+    $ct = new Config::Crontab; $ct->read;
+    $ct->block($ct->select(-command_re => 'mkstats'))->active(0);
+    $ct->write;
+
+and here's another way:
+
+    $ct = new Config::Crontab; $ct->read;
+    $_->active(0) for $ct->select(-command_re => 'mkstats');
+    $ct->write;
+
+Notice all the mkstats lines are commented out:
+
+    # refresh apache duds
+    1 0 * * * kill -1 `ps -x | egrep 'Master:.+? \(https?d\)' | awk '{print $1}'`
+
+    # in-house stats files
+    #0 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c online.config -v
+    #2 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c police.config -v
+    #4 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c scott.config -v
+    #6 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c tubbing.config -v
+    #8 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c perlcode.config -v
+    #10 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c fritzen.config -v
+    #12 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c josh.config -v
+    #14 1 * * * $HOME/usr/bin/mkstats2.3/mkstats.pl -c rhett.config -v
+
+    # do log files
+    0 3 * * * $HOME/usr/bin/movelogs.pl -v -k -a
+
+Re-activating these lines is a matter of setting active to 'true':
+
+    $ct = new Config::Crontab; $ct->read;
+    $ct->block($ct->select(-command_re => 'mkstats'))->active(1);
+    $ct->write;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License.
+
+Copyright (C) 2003-2005 Scott Wiersdorf. All Rights Reserved.

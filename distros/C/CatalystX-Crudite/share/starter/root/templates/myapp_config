@@ -1,0 +1,16 @@
+[%- MACRO crud_page_header(arg_title) BLOCK -%]
+    <div class="page-header">
+        <h1>[% arg_title %]</h1>
+    </div>
+[%- END -%]
+
+[%- MACRO hierarchy_table(arg_contents) BLOCK -%]
+    <table class="table table-bordered table-nonfluid">
+    [% WHILE arg_contents.size %]
+        <tr>
+            <td><b>[% arg_contents.shift %]</b></td>
+            <td>[% arg_contents.shift %]</td>
+        </tr>
+    [% END %]
+    </table>
+[%- END -%]

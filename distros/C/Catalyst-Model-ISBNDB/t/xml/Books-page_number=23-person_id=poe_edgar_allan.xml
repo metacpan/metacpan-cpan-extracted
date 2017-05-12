@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:53Z">
+<BookList total_results="252" page_size="10" page_number="23" shown_results="10">
+<BookData book_id="the_science_fiction_of_edgar_allan_poe" isbn="0140431063">
+<Title>The Science Fiction of Edgar Allan Poe</Title>
+<TitleLong>The Science Fiction of Edgar Allan Poe (Penguin English Library)</TitleLong>
+<AuthorsText>Edgar Allen Poe, Harold Beaver (Editor)</AuthorsText>
+<PublisherText publisher_id="penguin_classics">Penguin Classics</PublisherText>
+<Details dewey_decimal="" physical_description_text="464 pages" language="" edition_info="Paperback; 1976-12-09" dewey_decimal_normalized="" lcc_number="" change_time="2006-03-06T19:43:16Z" price_time="2006-10-08T08:03:35Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780140431063" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-04T13:07:30Z" currency_rate="1" price="7.7" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-04T13:08:18Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-04T13:08:18Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:25Z" currency_rate="1" price="10.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:25Z" currency_rate="1" price="1.25" />
+<Price store_isbn="" store_title="Science Fiction of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:26Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:26Z" currency_rate="1" price="4.9" />
+<Price store_isbn="" store_title="The Science Fiction of Edgar Allan Poe (Penguin English Library)" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="14" />
+<Price store_isbn="" store_title="The Science Fiction of Edgar Allan Poe (Penguin English Library)" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="0.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:29Z" currency_rate="1" price="1.85" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:29Z" currency_rate="1" price="10.71" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:40Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30017231%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:06Z" currency_rate="1" price="12.6" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0140431063&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:30Z" currency_rate="1" price="14" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:37Z" currency_rate="1" price="10.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:56:37Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Science Fiction of Edgar Allan Poe Product 516565" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.516565&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:58:08Z" currency_rate="1" price="13.16" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_science_fiction_of_edgar_allan_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:03:35Z" currency_rate="1" price="14" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of California (MELVYL)" last_update="2006-05-04T13:07:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-the_science_fiction_of_edgar_allan_poe-20060504.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="beaver_harold_lowther">Beaver, Harold Lowther</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_selected_writings_of_edgar_allan_poe" isbn="0393972852">
+<Title>The selected writings of Edgar Allan Poe</Title>
+<TitleLong>The selected writings of Edgar Allan Poe authoritative texts, backgrounds and contexts, criticism</TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="norton">Norton 2003</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-09-24T17:08:47Z" price_time="2006-10-08T08:03:38Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-13T03:04:37Z" currency_rate="1" price="14.15" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-13T03:04:37Z" currency_rate="1" price="11.5" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe : Authoritative Texts, Backgrounds and Contexts, Criticism " store_url="http://www.biblio.com/details.php?dcx=40540260&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-13T03:04:40Z" currency_rate="1" price="11.82" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780393972856" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-13T03:04:40Z" currency_rate="1" price="10.3" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe (Norton Critical Edition Series)" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-13T03:04:40Z" currency_rate="1" price="11.65" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:26Z" currency_rate="1" price="15.53" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="14.71" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="14.71" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe (Norton Critical Editions)" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="16.35" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe (Norton Critical Editions)" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="10.8" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:29Z" currency_rate="1" price="24.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:41Z" currency_rate="1" price="14.07" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30370860%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:08Z" currency_rate="1" price="16" />
+<Price store_isbn="" store_title="The Selected Writings of Edgar Allan Poe: Authoritative Texts, Backgrounds and Contexts, Criticism" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:39Z" currency_rate="1" price="14.41" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_selected_writings_of_edgar_allan_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:03:38Z" currency_rate="1" price="17.6" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_criticism_and_interpretation">Poe, Edgar Allan,1809-1849 -- Criticism and interpretation</Subject>
+<Subject subject_id="fantasy_literature_american">Fantasy literature, American</Subject>
+<Subject subject_id="fantasy_literature_american_history_and_criticism">Fantasy literature, American -- History and criticism</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-08-16T23:56:22Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_selected_writings_of_edgar_allan_poe-20040816.mrc" />
+<MARC library_name="LIBRIS -- Swedish Union Catalog" last_update="2004-09-24T17:08:47Z" marc_url="http://isbndb.com/x/libdata/isbndb-197-the_selected_writings_of_edgar_allan_poe-20040924.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="thompson_gary_richard">Thompson, Gary Richard</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_short_fiction_of_edgar_allan_poe" isbn="025206125X">
+<Title>The short fiction of Edgar Allan Poe</Title>
+<TitleLong>The short fiction of Edgar Allan Poe: an annotated edition</TitleLong>
+<AuthorsText>edited by Stuart Levine and Susan Levine</AuthorsText>
+<PublisherText publisher_id="university_of_illinois_press">Urbana : University of Illinois Press, 1990, c1976.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xxxvii, 633 p. : ill. ; 23 cm." language="eng" edition_info="(alk. paper)" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2004-07-21T06:40:51Z" price_time="2006-10-08T08:03:45Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. xxxi-xxxvii).</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-01-26T16:17:49Z" currency_rate="1" price="9.53" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-01-26T16:17:49Z" currency_rate="1" price="21.8" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: An Annotated Edition" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="21.62" />
+<Price store_isbn="" store_title="Short Fiction of Edgar Allen Poe: an Annotated Edition" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="19.95" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: AN ANNOTATED EDITION" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:28Z" currency_rate="1" price="24.95" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: AN ANNOTATED EDITION" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:28Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:29Z" currency_rate="1" price="19.08" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:42Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: An Annotated Edition" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30033648%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:10Z" currency_rate="1" price="22.45" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: An Annotated Edition" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=025206125X&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:36Z" currency_rate="1" price="24.95" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe: An Annotated Edition" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:44Z" currency_rate="1" price="18.71" />
+</Prices>
+<Subjects>
+<Subject subject_id="detective_and_mystery_stories_american">Detective and mystery stories, American</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Worcester Polytechnic Institute" last_update="2004-07-21T06:40:51Z" marc_url="http://isbndb.com/x/libdata/isbndb-239-the_short_fiction_of_edgar_allan_poe-20040720.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_short_fiction_of_edgar_allan_poe_a01" isbn="0672514621">
+<Title>The short fiction of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>An annotated edition by Stuart and Susan Levine</AuthorsText>
+<PublisherText publisher_id="bobbs_merrill">Indianapolis, Bobbs-Merrill, c1976.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xxxvii, 633 p. illus. 24 cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="PZ3" change_time="2004-08-01T10:16:12Z" price_time="2006-10-08T08:03:48Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe " store_url="90195459&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:12:45Z" currency_rate="1" price="3.79" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe (the Library of Literature, Ll-40)" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="3.74" />
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe (The Library of literature, LL-40)" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:28Z" currency_rate="1" price="4.25" />
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe (The Library of literature, LL-40)" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:42Z" currency_rate="1" price="3.79" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Deakin University" last_update="2004-08-01T10:16:12Z" marc_url="http://isbndb.com/x/libdata/isbndb-185-the_short_fiction_of_edgar_allan_poe_a01-20040801.mrc" />
+<MARC library_name="University of Victoria (Victoria, BC)" last_update="2005-02-27T01:13:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-66-the_short_fiction_of_edgar_allan_poe_a01-20050226.mrc" />
+<MARC library_name="University of Arkansas, Fayetteville" last_update="2005-03-11T06:09:39Z" marc_url="http://isbndb.com/x/libdata/isbndb-143-the_short_fiction_of_edgar_allan_poe_a01-20050310.mrc" />
+<MARC library_name="California State University, Hayward" last_update="2005-11-02T17:35:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-26-the_short_fiction_of_edgar_allan_poe_a01-20051102.mrc" />
+<MARC library_name="Hamilton College (Clinton, NY)" last_update="2005-11-15T23:07:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-186-the_short_fiction_of_edgar_allan_poe_a01-20051115.mrc" />
+<MARC library_name="University of California (MELVYL)" last_update="2006-03-13T22:32:13Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-the_short_fiction_of_edgar_allan_poe_a01-20060313.mrc" />
+<MARC library_name="Acadia University" last_update="2006-04-29T15:53:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-2-the_short_fiction_of_edgar_allan_poe_a01-20060429.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_short_fiction_of_edgar_allan_poe_a02" isbn="0672610329">
+<Title>The short fiction of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>An annotated edition by Stuart and Susan Levine</AuthorsText>
+<PublisherText publisher_id="bobbs_merrill">Indianapolis, Bobbs-Merrill, c1976.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xxxvii, 633 p. illus. 24 cm." language="eng" edition_info="(pbk.)" dewey_decimal_normalized="813.3" lcc_number="PZ3" change_time="2004-08-01T10:16:14Z" price_time="2006-10-08T08:03:51Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe " store_url="42794855&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:12:46Z" currency_rate="1" price="4.65" />
+<Price store_isbn="" store_title="The Short Fiction of Edgar Allan Poe (the Library of Literature, Ll-40) By Poe" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:27Z" currency_rate="1" price="4.65" />
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe (The Library of literature, LL-40)" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:28Z" currency_rate="1" price="3.79" />
+<Price store_isbn="" store_title="The short fiction of Edgar Allan Poe (The Library of literature, LL-40)" store_url="http://isbndb.com/x/book/the_short_fiction_of_edgar_allan_poe_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:42Z" currency_rate="1" price="3.79" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Deakin University" last_update="2004-08-01T10:16:14Z" marc_url="http://isbndb.com/x/libdata/isbndb-185-the_short_fiction_of_edgar_allan_poe_a02-20040801.mrc" />
+<MARC library_name="University of Victoria (Victoria, BC)" last_update="2005-02-27T01:13:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-66-the_short_fiction_of_edgar_allan_poe_a02-20050226.mrc" />
+<MARC library_name="University of Arkansas, Fayetteville" last_update="2005-03-11T06:09:39Z" marc_url="http://isbndb.com/x/libdata/isbndb-143-the_short_fiction_of_edgar_allan_poe_a02-20050310.mrc" />
+<MARC library_name="California State University, Hayward" last_update="2005-11-02T17:35:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-26-the_short_fiction_of_edgar_allan_poe_a02-20051102.mrc" />
+<MARC library_name="Hamilton College (Clinton, NY)" last_update="2005-11-15T23:07:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-186-the_short_fiction_of_edgar_allan_poe_a02-20051115.mrc" />
+<MARC library_name="University of California (MELVYL)" last_update="2006-03-13T22:32:13Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-the_short_fiction_of_edgar_allan_poe_a02-20060313.mrc" />
+<MARC library_name="Acadia University" last_update="2006-04-29T15:53:26Z" marc_url="http://isbndb.com/x/libdata/isbndb-2-the_short_fiction_of_edgar_allan_poe_a02-20060429.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_sphinx" isbn="058505228X">
+<Title>The sphinx</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:47Z" price_time="2006-10-08T08:03:55Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086024 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:47Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_sphinx-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_tell_tale_heart_a01" isbn="0871917726">
+<Title>The tell-tale heart</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; illustrated by Byron Glasser</AuthorsText>
+<PublisherText publisher_id="creative_education">Mankato, Minn. : Creative Education, c1980.</PublisherText>
+<Details dewey_decimal="[Fic]" physical_description_text="31 p. : ill. ; 23 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PZ7" change_time="2004-03-12T20:58:03Z" price_time="2006-10-04T20:45:43Z" />
+<Summary>The murder of an old man is revealed by the continuing beating of his heart.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:22Z" currency_rate="1" price="21.67" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Creative Classic Series) [Library Binding] By Poe, Edgar" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:22Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Tell-Tale Heart " store_url="47638418&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:22Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Creative Classic Series)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:22Z" currency_rate="1" price="2.75" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Creative Classic Series)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:23Z" currency_rate="1" price="10.3" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780871917720" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T18:35:24Z" currency_rate="1" price="5.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-04T18:35:26Z" currency_rate="1" price="13.11" />
+</Prices>
+<Subjects>
+<Subject subject_id="murder_fiction">Murder -- Fiction</Subject>
+<Subject subject_id="crime_fiction">Crime -- Fiction</Subject>
+<Subject subject_id="horror_stories">Horror stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-03-12T20:58:03Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_tell_tale_heart_a01-20040312.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="glaser_byron">Glaser, Byron</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_tell_tale_heart_a03" isbn="0585010307">
+<Title>The tell-tale heart</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="project_gutenberg">Champaign, Ill. (P.O. Box 2782), Champaign 61825) : Project Gutenberg, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-07T17:51:17Z" price_time="2005-06-07T17:52:04Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,2000.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1062500 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2005-06-07T17:51:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_tell_tale_heart_a03-20050607.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_tell_tale_heart_a04" isbn="0553212281">
+<Title>The Tell-Tale Heart</Title>
+<TitleLong>The Tell-Tale Heart (Bantam Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="bantam_classics">Bantam Classics</PublisherText>
+<Details dewey_decimal="" physical_description_text="448 pages" language="" edition_info="Paperback; 1983-02-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-08-28T13:14:52Z" price_time="2006-09-16T19:51:41Z" />
+<Summary>Edgar Allan Poe remains the unsurpassed master of works of mystery and madness in this outstanding collection of Poe's prose and poetry are sixteen of his finest tales, including "The Tell-Tale Heart", "The Murders in the Rue Morgue", "The Fall of the House of Usher," "The Pit and the Pendulum," "William Wilson," "The Black Cat," "The Cask of Amontillado," and "Eleonora". Here too is a major selection of what Poe characterized as the passion of his life, his poems - "The Raven," "Annabel Lee," Ulalume," "Lenore," "The Bells," and more, plus his glorious prose poem "Silence - A Fable" and only full-length novel, The Narrative of Arthur Gordon Pym.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-24T20:47:05Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-24T20:47:05Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="4.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="4.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:38Z" currency_rate="1" price="4.76" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30098806%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="5.35" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings by Edgar Allen Poe" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780553212280" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tell-Tale Heart and Other Writings" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Tell-Tale Heart (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings by Edgar A. P..." store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="0.1" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=38611.180&amp;type=14&amp;subid=0&amp;bnid=3034549" store_id="overstock" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:39Z" currency_rate="1" price="5.06" />
+<Price store_isbn="" store_title="The Tell-Tale Heart " store_url="http://www.biblio.com/details.php?dcx=75602465&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-16T19:51:40Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings" store_url="http://isbndb.com/x/book/the_tell_tale_heart_a04/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:40Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings Product 405829" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.405829&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-16T19:51:41Z" currency_rate="1" price="4.76" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Louisiana at Monroe" last_update="2006-06-24T20:47:01Z" marc_url="http://isbndb.com/x/libdata/isbndb-126-the_tell_tale_heart_a04-20060624.mrc" />
+<MARC library_name="Colgate University (Hamilton, NY)" last_update="2006-09-16T19:51:37Z" marc_url="http://isbndb.com/x/libdata/isbndb-43-the_tell_tale_heart_a04-20060916.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_tell_tale_heart_a05" isbn="1594561877">
+<Title>The Tell-Tale Heart</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="booksurge_classics">BookSurge Classics</PublisherText>
+<Details dewey_decimal="" physical_description_text="18 pages" language="" edition_info="Paperback; 2004-02-02" dewey_decimal_normalized="" lcc_number="" change_time="2006-01-14T13:30:19Z" price_time="2006-10-08T08:04:53Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

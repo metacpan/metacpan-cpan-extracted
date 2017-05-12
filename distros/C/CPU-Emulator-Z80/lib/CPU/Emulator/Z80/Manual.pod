@@ -1,0 +1,239 @@
+# $Id: Manual.pod,v 1.1 2008/03/02 19:33:24 drhyde Exp $
+=head1 NAME
+
+CPU::Emulator::Z80::Manual
+
+=head1 DESCRIPTION
+
+CPU::Emulator::Z80 implements a Z80 emulator.  See its manpage for
+nitty-gritty details about interfacing with it.  This manpage, by
+contrast, serves as a HOWTO.
+
+=head1 WHAT ELSE DO I NEED?
+
+First of all, you need perl 5.6.  You will also need a few extra
+perl modules.  Those will be automatically installed for you if
+you use the CPAN.pm module to install this.
+
+If you want to write your own software that uses this module, then
+you will need to know how to program a Z80 processor.  The rest
+of this document assumes that you do.
+
+=head1 HOW DO I CREATE A CPU?
+
+    my $cpu = CPU::Emulator::Z80->new();
+
+This will initialise it with 64K of banked memory attached, and
+set all registers to zero.  If you want a different memory model,
+then pass a CPU::Emulator::Memory object to the constructor
+using the 'memory' parameter:
+
+    my $cpu = CPU::Emulator::Z80->new(
+        memory => CPU::Emulator::Memory->new(
+            size => 0x4000,
+            file => 'memory.ram'
+        )
+    );
+
+Generally, the default is what you want, but note that the default
+configuration does *not* backup the CPU's RAM to a file.  Note that
+if you define your own memory, it *must* be little-endian.
+
+=head1 HOW DO IT GET A PROGRAM INTO MEMORY
+
+The hard way, which is also most suitable for very small hacks, is
+to peek() and poke() the memory directly.  You can get at the memory
+using the memory() method.
+
+Alternatively, you can initialise RAM from a file by creating your
+own memory object, or from a string by passing a scalar with the
+'memory' parameter:
+
+    my $cpu = CPU::Emulator::Z80->new(
+        memory => 'blob of impenetrable binary gibberish'
+    );
+
+If you are using banked memory then you can bank() a ROM image file.
+
+=head1 HOW DO I RUN A PROGRAM?
+
+After loading a program into memory, use the run() method.  With
+no parameters it will run forever, starting wherever the PC points.
+Pass a number to it and it will run for that many instructions.
+
+Note that the repeating instructions like LDIR count as several
+instructions.  That's because they are really just a non-repeating
+instruction, plus a conditional decrement of PC, so the same
+instruction gets executed several times.  This is the correct
+behaviour.
+
+The astute reader will have noticed that you can single-step your
+Z80 programs with run(1), and consequently stop "half way through"
+a repeating instruction.
+
+The run() method will also terminate if it executes a STOP instruction.
+
+=head1 WHAT THE HELL IS THE 'STOP' INSTRUCTION?
+
+It's something I added cos it's useful for emulators.  It's a three
+byte instruction, the first two bytes being any combination of
+0xDD and 0xFD, the third being 0x00.  Strictly speaking this breaks
+compatibility with real Z80s, as the two byte prefix is legal but
+stupid.  If this is a problem for you please contact me and we can
+try to find a work-around.
+
+You can tell the difference between the CPU stopping because it
+reached a STOP instruction and for any other reason by using the
+stopped() method.
+
+=head1 HOW DO I GET DATA OUT?
+
+The hard way (which, again, is also the most suitable for small hacks)
+is to peek() the memory directly.  You can also inspect register
+contents:
+
+    print "A register is ".$cpu->register('A')->get();
+
+See also "I/O and Interrupts" below.
+
+=head1 HOW DO I ALTER A RUNNING PROGRAM?
+
+You can poke() values into memory at any time.  You can also fiddle
+with registers' values:
+
+    $cpu->register('BC')->set(0xBEEF);
+    $cpu->register('F')->set(0);
+
+The flags register can, as well as being set to a numeric value,
+have its individual bits twiddled:
+
+    $cpu->register('F')->setZ(0);  # set the Z flag to 0 (false)
+    $cpu->register('F')->setZ();   # set the Z flag (set defaults to 1)
+    $cpu->register('F')->resetZ(); # reset the Z flag
+    $cpu->register('F')->getZ();   # get the Z flag (true or false)
+
+There is a full set (ha ha) of set/get/reset methods for each flag bit,
+accessed by appending the flag's name to the method name.  Flags are:
+
+=over
+
+=item S - sign
+
+=item Z - zero
+
+=item H - half-carry
+
+=item P - parity or overflow
+
+=item N - negative
+
+=item C - carry
+ 
+=back
+
+and also the undocumented bits 3 and 5 of the register:
+
+=over
+
+=item 3 - bit 3 (with the least-significant bit being bit 0)
+
+=item 5 - bit 5
+
+=back
+
+It's worth noting that bits 3 and 5 are emulated correctly, so
+don't go storing anything in them that you care about.
+
+=head1 I/O and INTERRUPTS
+
+=head2 INTERRUPTS
+
+For now, only IM 1 and NMIs are supported.  You can generate a
+non-maskable interrupt using the nmi() method, and a maskable
+interrupt using the interrupt() method.
+
+The nmi() method will execute a CALL 0x0066 immediately after
+the current instruction has completed.  Note that maskable
+interrupts are disabled until either an EI instruction or you reach
+RETN, at which point maskable interrupts will be restored to whatever
+state they were in when nmi()  was called.
+
+If maskable interrupts are enabled (they are disabled at power-on)
+then the interrupt() method will return true, and the next
+instructions will be DI and RST 0x38.  You will need to re-enable
+interrupts at the earliest opportunity in your interrupt handler.
+
+Because only IM 1 is supported, interrupts can't tell the CPU what
+to do.  This means that you'll have to write your own interrupt
+handler that polls any I/O devices you have defined.
+
+Given that interrupts need to be generated by calling a method from
+perl, and that the run() method doesn't normally return, you will
+need to find some way of generating them asychronously.
+
+=head2 INPUT
+
+You can create an input device using the add_input_device() method.
+
+=head2 OUTPUT
+
+You can create an output device using the add_output_device() method.
+
+=head2 AN EXAMPLE
+
+Here's an example of how to make the keyboard available to the
+emulator.  It generates an interrupt every 0.1 seconds, and also
+feeds key-presses into a buffer.  The input function for port 0xC001
+in the emulator will return values from that buffer, and that for
+port 0xC000 will return how many values are in the buffer.
+
+    use Time::HiRes qw(setitimer ITIMER_REAL);
+    use Term::ReadKey;
+    
+    ...
+
+    my @kb_buffer;
+    $cpu->add_input_device(
+        address  => 0xC000,
+        function => sub { $#kb_buffer + 1 }
+    );
+    $cpu->add_input_device(
+        address  => 0xC001,
+        function => sub { shift(@kb_buffer) || 0 }
+    );
+    setitimer(ITIMER_REAL, 1, 0.1); # after 1 sec, int every 0.1 sec
+    $SIG{ALRM} = sub {
+        my $key = ReadKey(-1);
+        push @kb_buffer, $key if($key);
+        $cpu->interrupt();
+    };
+
+    ReadMode 'noecho';
+    ReadMode 'cbreak';
+    $cpu->run();
+    $SIG{ALRM} = 'IGNORE';
+    ReadMode'normal';
+
+=head1 SEE ALSO
+
+L<CPU::Emulator::Z80>
+
+L<CPU::Emulator::Memory>
+
+L<CPU::Z80::Assembler>
+
+=head1 AUTHOR, LICENCE and COPYRIGHT
+
+Copyright 2008 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+This documentation is free-as-in-speech.  It may be used,
+distributed and modified under the terms of the Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, whose
+text you may read at
+L<http://creativecommons.org/licenses/by-sa/2.0/uk/>.
+
+=head1 CONSPIRACY
+
+This is also free-as-in-mason documentation.
+
+=cut

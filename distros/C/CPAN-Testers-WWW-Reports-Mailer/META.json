@@ -1,0 +1,95 @@
+{
+    "name": "CPAN-Testers-WWW-Reports-Mailer",
+    "version": "0.37",
+    "abstract": "CPAN Testers Reports Mailer",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Compress::Zlib": "0",
+                "Config::IniFiles": "0",
+                "Class::Accessor::Fast": "0",
+                "CPAN::Testers::Common::DBUtils": "0.03",
+                "CPAN::Testers::Common::Utils": "0",
+                "CPAN::Testers::Fact::LegacyReport": "0",
+                "CPAN::Testers::Fact::TestSummary": "0",
+                "Data::Dumper": "0",
+                "Data::FlexSerializer": "0",
+                "DBI": "0",
+                "DBD::mysql": "0",
+                "Email::Address": "0",
+                "Email::Simple": "0",
+                "File::Basename": "0",
+                "File::Path": "0",
+                "File::Slurp": "0",
+                "Getopt::ArgvFile": "0",
+                "Getopt::Long": "0",
+                "IO::File": "0",
+                "JSON": "0",
+                "LWP::UserAgent": "0",
+                "Math::Random::MT": "0",
+                "Metabase::Resource": "0",
+                "MIME::Base64": "0",
+                "MIME::QuotedPrint": "0",
+                "Path::Class": "0",
+                "Parse::CPAN::Authors": "0",
+                "Template": "0",
+                "Time::Piece": "0",
+                "version": "0",
+                "WWW::Mechanize": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::More": "0.70",
+                "Test::Trap": "0"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Database": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::WWW::Reports::Mailer": {
+            "file": "lib/CPAN/Testers/WWW/Reports/Mailer.pm",
+            "version": "0.37"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "homepage": "http://devel.cpantesters.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Mailer" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-testers-www-reports-mailer.git",
+            "web": "http://github.com/barbie/cpan-testers-www-reports-mailer",
+            "type": "git"
+        }
+    }
+}

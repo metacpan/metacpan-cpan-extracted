@@ -1,0 +1,116 @@
+# --8<--8<--8<--8<--
+#
+# Copyright (C) 2006 Smithsonian Astrophysical Observatory
+#
+# This file is part of CIAO-Lib-Param
+#
+# CIAO-Lib-Param is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# CIAO-Lib-Param is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the 
+#       Free Software Foundation, Inc. 
+#       51 Franklin Street, Fifth Floor
+#       Boston, MA  02110-1301, USA
+#
+# -->8-->8-->8-->8--
+
+=head1 NAME
+
+CIAO::Lib::Param::Error - package error information for CIAO::Lib::Param
+
+=head1 SYNOPSIS
+
+  eval { 
+    ... calls to CIAO::Lib::Param ...
+  };
+  if ( my $e = $@ )
+  {
+     .. manipulations of $e ..
+  }
+
+
+=head1 DESCRIPTION
+
+Depending upon how an error is generated, the cxcparam library returns
+error information which contains multiple fields.  The underlying
+library returns errors in two fashions:
+
+=over
+
+=item 1
+
+returning an integer error code
+
+=item 2
+
+generating a text message and bailing out
+
+=back
+
+In the second case, the error should be considered fatal, as
+the library's data structures are left in an indeterminate state.
+
+In order to simplify error interactions, the Perl interface always
+throws an exception via croak upon error.  For simple applications,
+not catching the exception (by doing nothing) will cause the
+application to terminate.
+
+For more fine-grained error handling, more information is required.
+To that end, CIAO::Lib::Param throws a CIAO::Lib::Param::Error object,
+which resolves to a printable string when used in the appropriate
+context.  Otherwise, it can be used to obtain more information about
+the error.
+
+=head2 Methods
+
+=over
+
+=item error
+
+This is the message printed when the object is used in a scalar
+context.  It constructed either from C<errstr> or from C<errmsg>, if
+the latter is defined.
+
+=item errno
+
+This is a cxcparam standard error code.  See the cxcparam source
+code for more information on what the error codes mean.
+
+=item errstr
+
+This is the standard description associated with the cxcparam errors.
+
+=item errmsg
+
+If the cxcparam library reported an error via the second path
+mentioned above, this will return the generated message, else it
+returns undef.  This method can be used to determine if the
+application should attempt to recover from an error.
+
+=back
+
+=head1 SEE ALSO
+
+CIAO::Lib::Param
+
+=head1 AUTHOR
+
+Diab Jerius, E<lt>djerius@cpanE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by the Smithsonian Astrophysical Observatory
+
+This code is released under the GNU General Public License.  You may
+find a copy at <http://www.fsf.org/copyleft/gpl.html>.
+
+=cut
+

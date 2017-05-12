@@ -1,0 +1,94 @@
+--- #YAML:1.0
+name:                CPAN-Testers-WWW-Reports
+version:             3.57
+abstract:            The CPAN Testers Reports website
+author:
+  - Barbie <barbie@cpan.org>
+
+license:             artistic_2
+distribution_type:   module
+installdirs:         site
+
+requires:
+  perl:                               5.006
+  Class::Accessor::Fast:              0
+  Clone:                              0
+  CPAN::Testers::Common::Article:     0
+  CPAN::Testers::Common::Utils:       0
+  CPAN::Testers::Fact::LegacyReport:  0
+  CPAN::Testers::Fact::TestSummary:   0
+  Cwd:                                0
+  Data::Dumper:                       0
+  Data::FlexSerializer:               0
+  Email::Address:                     0
+  File::Find::Rule:                   0
+  File::Path:                         0
+  File::Slurp:                        0
+  GD::Graph::lines:                   0
+  GD::Graph::colour:                  0
+  Getopt::Long:                       0
+  HTML::Entities:                     0
+  JSON::XS:                           0
+  Labyrinth:                          5.27
+  Labyrinth::DIUtils::ImageMagick:    5.04
+  Labyrinth::Plugin::Core:            5.18
+  Labyrinth::Plugin::CPAN:            3.51
+  Labyrinth::Plugin::Requests:        1.00
+  Metabase::Resource:                 0
+  Sort::Versions:                     0
+  Time::Local:                        0
+  version:                            0
+  WWW::Mechanize:                     0
+  XML::RSS:                           0
+  YAML::XS:                           0
+recommends:
+  Test::CPAN::Meta:                   0
+  Test::CPAN::Meta::JSON:             0
+  Test::Pod:                          1.00
+  Test::Pod::Coverage:                0.08
+build_requires:
+  IO::File:                           0
+  Test::More:                         0.70
+
+provides:
+  CPAN::Testers::WWW::Reports:
+    file:     lib/CPAN/Testers/WWW/Reports.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Authors:
+    file:     lib/Labyrinth/Plugin/CPAN/Authors.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Builder:
+    file:     lib/Labyrinth/Plugin/CPAN/Builder.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Distros:
+    file:     lib/Labyrinth/Plugin/CPAN/Distros.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Monitor:
+    file:     lib/Labyrinth/Plugin/CPAN/Monitor.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Release:
+    file:     lib/Labyrinth/Plugin/CPAN/Release.pm
+    version:  3.57
+  Labyrinth::Plugin::CPAN::Report:
+    file:     lib/Labyrinth/Plugin/CPAN/Report.pm
+    version:  3.57
+  Labyrinth::Plugin::Metabase::Parser:
+    file:     lib/Labyrinth/Plugin/Metabase/Parser.pm
+    version:  3.57
+
+no_index:
+  directory:
+    - examples
+    - t
+    - vhost
+
+resources:
+  homepage:   https://www.cpantesters.org
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports
+  repository: http://github.com/barbie/cpan-testers-www-reports
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

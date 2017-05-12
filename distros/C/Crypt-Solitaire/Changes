@@ -1,0 +1,10 @@
+Revision history for Perl extension Crypt::Solitaire.
+
+2.0   Wed Nov 28 16:12:31 2001
+	- removed ^M's from .pm file
+	- added OO interface
+1.02  Fri Apr 28 11:50:25 2000
+	- minor modifications, moved Pontifex() from @EXPORT to @EXPORT_OK
+0.01  Mon Nov 22 11:10:05 1999
+	- original version; created by h2xs 1.19
+

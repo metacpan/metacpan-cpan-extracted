@@ -1,0 +1,27 @@
+Crypt::TC18
+===========
+
+TC18 is 128-bit block cipher that accepts a 64-bit key, designed by
+Tom St. Denis. TC18 is also known as XSM.
+
+BONUS
+
+The C file, _tc18.c, is a standalone TC18 implementation. To
+compile it, type:
+
+        gcc -Wall -DTEST _tc18.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Julius C. Duque. Please read contact.html for
+details on how to contact the author.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

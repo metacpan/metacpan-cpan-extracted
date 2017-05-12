@@ -1,0 +1,61 @@
+CGI-FormBuilder-Config-Simple
+
+This module exists to synthesize the abstractions of
+CGI::FormBuilder with those of Config::Simple to make it nearly
+possible to deploy a working form and database application by
+simply configuring an ini file.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	sudo make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::FormBuilder::Config::Simple
+
+The author is available for contract work and welcomes your
+inquiries to extend this module, or to use it or not in your
+next development project.
+	http://www.CampaignFoundations.com/
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-FormBuilder-Config-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-FormBuilder-Config-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-FormBuilder-Config-Simple
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-FormBuilder-Config-Simple/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Hugh Esco
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 dated June, 1991 or at your option
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is available in the source tree;
+if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

@@ -1,0 +1,6 @@
+Revision history for Config-Cascade
+
+0.01    4/9/04 - billn
+        First version, released on an unsuspecting world.
+0.02	4/11/04 - billn
+	Fixed a potential race condition in file handling, localized a couple filehandles.

@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><!-- TMPL_VAR name="title" --></title>
+    <style type="text/css">
+body {
+    font-family: Arial, sans-serif;
+    font-size: small;
+    background: #f0f0f0;
+}
+
+#contentwrapper {
+    width: 755px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1 {
+    font-size: x-large;
+    background: #555;
+    color: #fff;
+    padding: 5px;
+    margin: 3px;
+}
+
+#header {
+    background: #fff;
+    border: 1px solid #b0b0b0;
+}
+
+.parent {
+    background: #fff;
+    padding: 3px;
+    border: 1px solid #e0e0e0;
+}
+
+h2 {
+    font-size: large;
+    padding: 3px;
+    border-bottom: 1px dotted #b0b0b0;
+}
+
+.info {
+    float: left;
+    width: 230px;
+    background: #fff;
+    color: #fff;
+    border: 1px solid #b0b0b0;
+    margin-bottom: 1em;
+}
+
+h3 {
+    font-size: medium;
+    text-align: center;
+    background: #777;
+    margin: 3px;
+    padding: 1em;
+}
+
+.info p {
+    margin: 0;
+}
+
+.info a {
+    font-weight: bold;
+    text-decoration: none;
+    display: block;
+    background: #e0e0e0;
+    text-align: center;
+    color: #111;
+    margin: 3px;
+    padding: 1em;
+}
+
+.info a:hover {
+    color: #e0e0e0;
+    background: #444;
+}
+
+.photos {
+    list-style-type: none;
+    padding-left: 0;
+    margin-left: 31px;
+}
+
+.gallery .photos {
+    margin-left: 260px;
+}
+
+.photos li {
+    float: left;
+    margin-left: 6px;
+
+}
+
+.photos img {
+    border: 0;
+}
+
+.photos a {
+    margin-bottom: 1em;
+    display: block;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 3px;
+}
+
+.photos a:hover {
+    background: #fafafa;
+    border: 1px solid #aaa;
+}
+
+.gallery, h2, #footer {
+    clear: left;
+}
+
+#footer {
+    border-top: 1px solid #b0b0b0;
+}
+
+#footer p {
+    text-align: right;
+    font-size: small;
+    font-weight: bold;
+    color: #555;
+    padding: 5px;
+    margin: 3px;
+}
+
+#footer a {
+    text-decoration: none;
+    color: #6f6f6f;
+}
+    </style>
+</head>
+<body>
+<div id="contentwrapper">
+    <div id="header">
+        <h1><!-- TMPL_VAR name="title" --></h1>
+    </div>
+<!-- TMPL_IF name="parent" -->
+    <p class="parent"><a href="<!-- TMPL_VAR name="script_name" -->?dir=<!-- TMPL_VAR NAME="parent" ESCAPE="URL" -->">Up a level</a></p>
+<!-- /TMPL_IF -->
+<!-- TMPL_IF name="galleries" -->
+    <h2>Galleries</h2>
+<!-- TMPL_LOOP name="galleries" -->
+    <div class="gallery">
+        <div class="info">
+            <h3><!-- TMPL_VAR name="title" --></h3>
+            <p><a href="<!-- TMPL_VAR name="script_name" -->?dir=<!-- TMPL_VAR NAME="dir" ESCAPE="URL" -->">View all photos...</a></p>
+        </div>
+        <ul class="photos">
+    <!-- TMPL_LOOP name="photos" -->
+            <li><a href="<!-- TMPL_VAR name="script_name" -->?mode=view&amp;photo=<!-- TMPL_VAR NAME="filename" ESCAPE="URL" -->"><img src="<!-- TMPL_VAR name="script_name" -->?mode=thumb&amp;photo=<!-- TMPL_VAR NAME="filename" ESCAPE="URL" -->" width="<!-- TMPL_VAR NAME="thumb_size" -->" height="<!-- TMPL_VAR NAME="thumb_size" -->" /></a></li>
+    <!-- /TMPL_LOOP -->
+        </ul>
+    </div>
+<!-- /TMPL_LOOP -->
+<!-- /TMPL_IF -->
+<!-- TMPL_IF name="photos" -->
+    <h2>Photos in <!-- TMPL_VAR NAME="gallery_name" --></h2>
+    <ul class="photos">
+    <!-- TMPL_LOOP name="photos" -->
+        <li><a href="<!-- TMPL_VAR name="script_name" -->?mode=view&amp;photo=<!-- TMPL_VAR NAME="filename" ESCAPE="URL" -->"><img src="<!-- TMPL_VAR name="script_name" -->?mode=thumb&amp;photo=<!-- TMPL_VAR NAME="filename" ESCAPE="URL" -->" width="<!-- TMPL_VAR NAME="thumb_size" -->" height="<!-- TMPL_VAR NAME="thumb_size" -->" /></a></li>
+    <!-- /TMPL_LOOP -->
+    </ul>
+<!-- /TMPL_IF -->
+    <div id="footer">
+        <p>Powered by <a href="http://search.cpan.org/dist/CGI-Application-PhotoGallery/">CGI::Application::PhotoGallery</a></p>
+    </div>
+</div>
+</body>
+</html>

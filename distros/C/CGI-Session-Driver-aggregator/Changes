@@ -1,0 +1,13 @@
+Revision history for Perl extension CGI::Session::Driver::aggregator.
+
+0.04  Tue Apr 18 17:49:20 2017
+	- Support perl 5.10 or later.
+
+0.03  Wed Dec 14 9:35:24 2006
+        - Fix a bug storing datas in the adding order. (should be reversed)
+
+0.02  Wed Dec 13 23:29:24 2006
+        - Rewrite POD
+
+0.01  Wed Dec 13 20:29:24 2006
+        - The first release

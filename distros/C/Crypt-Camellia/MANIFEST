@@ -1,0 +1,15 @@
+Camellia.xs
+Changes
+MANIFEST
+Makefile.PL
+README
+camellia-GPL-1.2.0/COPYING
+camellia-GPL-1.2.0/README
+camellia-GPL-1.2.0/camellia.c
+camellia-GPL-1.2.0/camellia.h
+lib/Crypt/Camellia.pm
+t/00-basic.t
+t/01-CBC.t
+t/02-test-vectors-simple.t
+t/03-test-vectors-full.t
+META.yml                                 Module meta-data (added by MakeMaker)

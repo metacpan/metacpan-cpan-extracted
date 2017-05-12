@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  5839:
+    - 123
+name: fd75
+registers:
+  AF: 51414
+  AF_: 0
+  BC: 27300
+  BC_: 0
+  DE: 6158
+  DE_: 0
+  HL: 58235
+  HL_: 0
+  I: 0
+  IX: 719
+  IY: 5924
+  PC: 3
+  R: 2
+  SP: 0

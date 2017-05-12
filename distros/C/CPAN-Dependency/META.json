@@ -1,0 +1,54 @@
+{
+   "abstract" : "Analyzes CPAN modules and generates their dependency tree",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Dependency",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : 0,
+            "Test::More" : 0,
+            "Test::Warn" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0.82",
+            "DBD::SQLite" : "1.0",
+            "DBI" : "1.0",
+            "File::Slurp" : "9999.12",
+            "File::Spec" : 0,
+            "Module::CoreList" : "2.12",
+            "YAML" : "0.66"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Dependency" : {
+         "file" : "lib/CPAN/Dependency.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.16"
+}

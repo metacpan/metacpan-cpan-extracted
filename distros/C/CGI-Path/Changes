@@ -1,0 +1,54 @@
+Revision history for Perl extension CGI-Path.
+
+1.12  Sat Nov 20 16:56:00 2004
+  - probably don't need Is
+1.11  Tue Nov 13 15:57:00 2004
+  - Thanks to Paul Seamons
+  - don't access form directly in generate_form
+  - use form_keyname instead of word form
+  - call ->session with a hash_ref instead of calling save
+1.10  Wed Mar 31 12:19:00 2004
+  - skip comments on conf reader
+  - using the code ref that can returns instead of just using it as a test
+  - don't want to add an extension on something that already has an extension
+  - printing xml content type for xml pages
+  - don't show errors unless fresh form info exists
+  - splitting on , for magic_fill stuff
+  - adding path_info to uber_form
+  - splitting on \0 for form values
+1.09  Wed Feb 12 11:49:00 2004
+  - trying to account for abandoned sessions
+1.08  Mon Feb 09 14:27:00 2004
+  - get rid of Is
+1.07  Mon Feb 09 14:24:00 2004
+  - trying to show history only if the browser supports document.open
+  - changing to my_content_type to avoid renaming warnings
+  - adding magic_fill_regardless
+  - adding validate_new_hash method
+  - also checking $step on jump around stuff
+  - saving _printed_pages when it gets wiped
+  - pushing $_ onto the _extant_info stuff
+  - adding pre_val to the history even if the method wasn't called
+  - accounting for $show_errors in validate_proper
+  - only doing the post_val call if validation up to that point has passed
+  - using delete on session stuff instead of setting = to undef
+1.06  Tue Jan 27 12:41:00 2004
+  - getting handle_unvalidated_keys working
+  - adding a handle_unvalidated_keys and handle_jump_around to the perldoc
+  - adding _submit as a not_real_key
+1.05  Thu Jan 08 11:58:00 2004
+  - working on the perldoc
+1.04  Thu Jan 08 10:16:00 2004
+  - added magic_fill and trying to get it to work nicely with fill and form
+  - added a little perldoc about magic_fill
+  - handle_jump_around should make resubmitting  pages work a little better
+  - added preload method to try and be more mod_perl friendly
+  - errors moved to error
+  - getting ref stuff worked out on processing
+1.02  Tue Dec 16 13:00:00 2003
+  - better create page functionality, allow for htm and val in object, CGI::Ex integration
+1.01  Wed Oct 22 10:54:50 2003
+  - changing a couple methods to reasonable defaults
+1.00  Mon Oct 20 17:14:39 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n CGI-Path

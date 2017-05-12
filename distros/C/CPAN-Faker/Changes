@@ -1,0 +1,40 @@
+Revision history for CPAN-Faker
+
+0.010     2013-10-22 19:02:09 America/New_York
+          adapt to new Module::Faker
+
+0.009     2013-08-01 22:53:53 America/New_York
+          do not require source dir to be +w (thanks, Randy Stauner!)
+
+0.008     2013-01-30 20:11:09 America/New_York
+          06perms.txt.gz is now generated
+
+0.007     2011-04-18 14:30:02 Europe/Amsterdam
+          require Module::Faker 0.008 for .dist files
+
+          more aggressively make_path the destination as needed
+
+0.006     2011-04-17 17:43:52 Europe/Amsterdam
+          produce a sorted 02packages
+
+          add the cpanfaker program
+
+          slightly improved validation of arguments
+
+0.005     2011-04-16 14:31:59 Europe/Amsterdam
+          write an 06perms.txt
+
+0.004     2008-05-07
+          add more public interface and documentation (HDP, RJBS)
+          most of this work is to allow construction of the indices without
+          using a source dir or the make_cpan method
+
+0.003     2008-04-28
+          promote (by renaming) write_modlist_index and write_package index
+
+0.002     2008-03-15
+          add some documentation
+
+0.001     2008-03-14
+          first revision, basically no documentation or tests, but hey! at
+          least I got it out the door

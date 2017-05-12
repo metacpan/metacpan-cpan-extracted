@@ -1,0 +1,99 @@
+0.12     2014-01-25
+
+0.11     2012-01-29
+
+- Fix handling of non-zero value as min value in Y axis.
+
+
+0.10   2011-05-17
+
+- Fix failing Pie.t test. Reported by Lukas Thiemeier. RT #68264.
+
+
+0.09   2009-07-02
+
+- Remove bogus options to Moose attributes (optional => 1).
+
+
+0.08   2008-09-01
+
+- Updates to work with the latest Moose and MooseX modules.
+
+* Chart::OFC::Pie now accepts a label_style attribute instead of
+  label_color. Based on a patch by Josh McAdams.
+
+- Chart::OFC::Area was reversing opacity and color in its
+  output. Patch by Josh McAdams.
+
+- Added Chart::OFC::Dataset::Scatter. Mostly based on a patch by Josh
+  McAdams.
+
+- Added Chart::OFC::Dataset::HighLowClose. Mostly based on a patch by
+  Josh McAdams.
+
+- Added Chart::OFC::Dataset::Candle. Mostly based on a patch by Josh
+  McAdams.
+
+
+0.07   2008-03-13
+
+* This release requires Open Flash Chart 1.9.7 in order to function
+  100% properly. Use it with older versions at your own risk of bugs.
+
+- Prefixed all type names with Chart::OFC::Type:: in order to prevent
+  type name pollution.
+
+- Enabled links for all datasets, though this only works with Pie,
+  Line, and Bar charts. I think that before OFC 1.9.7, this only
+  worked with Pie charts. Based on a patch by Justin Hawkins.
+
+
+0.06   2008-02-24
+
+- Fix test failures with most recent Moose.
+
+
+0.05   2008-01-25
+
+- Fixed axis_color for Chart::OFC::XAxis color. Setting this caused an
+  exception when you later called as_ofc_data() on your
+  chart. Reported by Ovid. RT #32576.
+
+
+0.04   2008-01-19
+
+* This release requires Open Flash Chart 1.9.6 in order to function
+  100% properly. Use it with older versions at your own risk of bugs.
+
+- OFC 1.9.6 allows commas in text to be escaped so that they do not
+  interfere with the data formatting (which is
+  comma-separated). Chart::OFC now does this escaping.
+
+- Allow Line datasets to contain undef in the values array. These will
+  simply be skipped in the resulting line. Based on a patch from Brett
+  Gardner.
+
+- Fixed a doc error that set Dataset was a subclass of a nonexistent
+  class. Reported by Ron Savage. RT #32113.
+
+- Added Chart::OFC::Dataset::SketchBar to support the new sketch bar
+  style in OFC 1.9.6.
+
+
+0.03   2007-12-18
+
+- Previous releases were missing a prereq declaration for
+  List::MoreUtils.
+
+- No code changes in this release.
+
+
+0.02   2007-11-16
+
+- This release is identical to 0.01, but should hide my monkey patch
+  to Graphics::ColorNames from PAUSE.
+
+
+0.01   2007-11-16
+
+- First version, released on an unsuspecting world.

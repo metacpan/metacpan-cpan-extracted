@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 172
+  65450:
+    - 9
+name: cbac
+registers:
+  AF: 9216
+  AF_: 0
+  BC: 35453
+  BC_: 0
+  DE: 11436
+  DE_: 0
+  HL: 65450
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

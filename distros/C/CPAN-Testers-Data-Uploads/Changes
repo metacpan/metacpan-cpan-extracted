@@ -1,0 +1,90 @@
+Revision history for CPAN-Testers-Data-Uploads
+==============================================
+
+0.21    2014-09-14
+        - fixed license fields in META.json to be lists.
+        - updated resources links in META.yml.
+        - extended META testing.
+
+0.20    2013-08-25
+        - fix to allow dists with version 0.
+
+0.19    2012-11-28
+        - fixed test suite when Test::Database is not installed.
+
+0.18    2012-11-26
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - CHANGES => Changes.
+        - change file dates changed to meet W3CDTF standards.
+        - Artistic License v2 now sole license.
+        - added META.json.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - more tests.
+        - journal file now configurable.
+        - check available drivers for backups.
+
+0.17    2011-02-15
+        - removed delete file test, as Win32 can't cope.
+        - added journalling to speed up backup generation.
+
+0.16    2010-12-13
+        - new table 'uploads_failed' to record those distribution uploads that
+          do not parse using CPAN::DistnameInfo.
+        - now require CPAN::DistnameInfo-0.10 or above.
+
+0.15    2010-11-29
+        - fixed UpdateIndex SQL query.
+        - dropped fast reindex, due to flaw in design.
+        - reworked reindex to better manage reindexing by author.
+        - added more command line and API options.
+
+0.14    2010-02-04
+        - fixed repository and bugtracker links in META.yml.
+
+0.13    2009-12-09
+        - added Archive::Zip as a dependency for testing.
+
+0.12    2009-11-05
+        - added fast reindex functionality
+        - improved speed of index lookup
+        - added more POD descriptions of methods.
+
+0.11    2009-11-02
+        - update to logging messages
+        - slight change to update to avoid unnecessary SQL updates.
+        - attempt to catch missing index updates when updating CPAN entries.
+
+0.10    2009-10-12
+        - added oncpan field to ixlatest to further improve table lookups.
+
+0.09    2009-08-17
+        - fixed indexing bug.
+
+0.08    2009-08-15
+        - reworked reindexing to be less dramatic.
+        - added example for reindexing.
+
+0.07    2009-05-19
+        Added an index lookup table, and tables now resides within the
+        cpanstats database for easier cross-table queries.
+
+0.06    2009-02-15
+        - added missing README file
+
+0.05    2009-02-15
+        - added missing DBD prerequisites.
+
+0.04    2009-02-13
+        - changed to more formal package release.
+
+0.03    2008-12-29
+        - renamed Article reference.
+
+0.02    2008-11-18
+        - added multiple backup mechanism.
+        - added documentation.
+        - abstracted sources into configuration file.
+
+0.01    2008-11-10
+        - initial release

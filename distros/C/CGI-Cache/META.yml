@@ -1,0 +1,41 @@
+---
+abstract: 'Perl extension to help cache output of time-intensive CGI scripts'
+author:
+  - 'Broc Seib.'
+build_requires:
+  Error: 0
+  ExtUtils::MakeMaker: 6.36
+  File::Slurp: 0
+  Test::Compile: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  URI::Escape: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CGI::Cache
+name: CGI-Cache
+no_index:
+  directory:
+    - inc
+    - private-lib
+    - t
+requires:
+  Cache::Cache: 0
+  File::Path: 0
+  File::Spec: 0
+  Storable: 0
+  Tie::Restore: 0
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Cache
+  homepage: https://github.com/coppit/cgi-cache
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/coppit/cgi-cache
+version: '1.4207'

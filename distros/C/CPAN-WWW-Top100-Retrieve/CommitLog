@@ -1,0 +1,65 @@
+==================================================
+Changes from 2013-11-06 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2014-11-06 17:54:46 +0000
+------------------------------------------
+
+  Change: f223abe4eaf16a1c7121dc3f23accda2900dc0c2
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-06 09:31:59 +0000
+
+    dont use base and fix pod stuff 
+
+  Change: 2e58b448e7fe887e5cfbf8d6a16d4f37a7b38ffe
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-06 09:29:28 +0000
+
+    updates to misc files 
+
+  Change: 565331cc3a18a057a0bbbaf036164f207d5dd771
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2012-01-14 21:23:22 +0000
+
+    various POD tweaks 
+
+  Change: 206491e920dedcd70101396e94720eccac2c6908
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-06-21 18:38:21 +0000
+
+    start of dzilification 
+
+  Change: afb62fcf7132561d31d4ea86da2a76716f3fadb1
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-04 16:07:15 +0000
+
+    new cpan distro 
+
+  Change: d2cef48eaf658f8b8831a7ffe7ad13f2fbbbce2a
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-04 15:59:12 +0000
+
+    add more docs 
+
+  Change: 38f39bf0c4b215a6f8025e7d790be344ce67aa81
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-04 15:40:35 +0000
+
+    more tweaks 
+
+  Change: e3abe7d07f1d30b2d05c62d267a7d744994d8b05
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-04 15:31:58 +0000
+
+    more work 
+
+  Change: 7e4925fc6c236e0877eba784be77f02db75cb990
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-04 11:22:01 +0000
+
+    initial skeleton 
+
+================
+End of releases.
+================

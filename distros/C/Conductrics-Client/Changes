@@ -1,0 +1,5 @@
+#
+
+0.001  2016/09/25:
+
+    - Conductrics::Client in this package to define, create and delete agents on Conductrics service.

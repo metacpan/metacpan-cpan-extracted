@@ -1,0 +1,151 @@
+[%# RelOpts hash has the following supporting keys:
+
+* skip
+
+Hashref of method names. If a relationship method exists in the hash,
+it is skipped.
+
+* alias
+
+Hashref of method name to method name. If a relationship method appears
+as a hash key, its corresponding value should be another relationship
+method name. 'alias' can be used with 'skip'
+to mask some methods or make "foo" act like "bar".
+
+* lock
+
+Hashref of method names. If a relationship method exists in the hash,
+no link is created for the "Create association from 'method_name'" feature.
+
+* order
+
+Arrayref of relationship names in the order they should appear. Defaults
+to all relationships, sorted alphabetically by label.
+
+# end doc
+%]
+[%
+
+# don't bother if we do not have any relationships
+IF (!form.metadata.relationships.size);
+    RETURN;
+END;
+
+# EDITMODE is global flag indicating whether user may edit.
+CALL yui.show_remove_button(EDITMODE);
+
+# TODO since we use tabs, only load livegrids when they are selected
+SET Tabs = [];
+SET activeTab = 0;
+SET RelsToShow = [];
+SET RelsCreateLinks = [];
+DEFAULT RelOpts = {};
+SET rel_order = [];
+IF RelOpts.order;
+    rel_order = RelOpts.order;
+ELSE;
+    rel_order = form.metadata.relationships.sort_by('label');
+END;
+FOREACH rel IN rel_order;
+    NEXT IF rel.type && rel.type == 'foreign key';
+    NEXT IF rel.type && rel.type == 'many to one';
+    NEXT IF rel.type && rel.type == 'one to one';
+    
+    SET rel_info = form.metadata.relationship_info( rel );
+    NEXT IF rel_info.foreign_class == form.metadata.object_class;    
+    SET method = rel_info.method;
+    NEXT IF RelOpts.skip.exists( method );
+    
+    IF (RelOpts.alias.exists( method ));
+        SET old_info = rel_info;
+        rel_info = form.metadata.relationship_info( RelOpts.alias.item( method ) );
+        method = rel_info.method;
+        rel_info.label = old_info.label;
+    END;
+    
+    activeTab = activeTab + 1;
+    SET tabLabel  = method;
+    SET thisLabel = rel_info.label || method;
+    SET thisTabActive = 0;
+    IF (!form.metadata.default_selected && activeTab == 1);
+        thisTabActive = 1;
+    ELSIF (form.metadata.default_selected == tabLabel);
+        thisTabActive = 1;
+    END;
+    
+    # create the tab structure
+    Tabs.push({ 
+        label   => thisLabel,
+        id      => tabLabel _ 'Tab',
+        active  => thisTabActive,
+    });
+    
+    # in case we have not yet initialized the controller instance
+    SET rel_controller = rel_info.get_controller;
+    
+    SET livegrid = yui.livegrid({
+            'results'       => object, 
+            'controller'    => rel_controller, 
+            'form'          => rel_controller.form(c),
+            'method_name'   => method,
+            'field_names'   => rel_controller.form(c).metadata.field_methods,
+            'c'             => c,
+    });
+        
+    SET base_url       = c.uri_for('/' _ rel_controller.path_prefix);
+    SET map_params     = {};
+    SET map_to         = '';
+    SET m2m_url        = '';
+    SET m2m_map_to_url = '';
+    SET authz_controller = rel_controller;
+    IF (rel_info.type == 'many to many');
+        m2m_url         = c.uri_for('/' _ rel_controller.path_prefix, 'livegrid_create_form');
+        m2m_map_to_url  = c.uri_for('/' _ c.controller(rel_info.map_class_controller_class).path_prefix);
+        authz_controller = c.controller(rel_info.map_class_controller_class);
+    ELSE;
+        FOREACH local_col IN rel_info.cmap.keys.sort;
+            SET fk          = rel_info.cmap.$local_col;
+            map_params.$fk  = object.$local_col;
+        END;
+        IF (map_params.keys.size == 1);
+            map_to = rel_info.cmap.each.1;
+        ELSE;
+            #THROW crud '"map_to" not yet supported for multiple-column FKs in ' _ component.name;
+            map_to = rel_info.cmap.values.join(';;');
+        END;
+    END;
+            
+    USE create_new_url    = url(base_url _ "/create", map_params);  
+    USE export_as_xls_url = url(base_url _ "/search", map_params);
+    export_as_xls_url     = export_as_xls_url _ '&cxc-fmt=xls&cxc-no_page=1';
+    
+    SET num_fields        = rel_controller.field_names(c).size;
+    SET rowclick_action   = c.session.prefs.default_crud_action || 'view';
+    IF (EDITMODE);
+        rowclick_action   = 'edit';
+    END;
+    IF (LIVEGRID_FORM_SIZE > num_fields && EDITMODE && !map_form_url);   # experimental
+        rowclick_action = 'livegrid_edit_form';
+    END;
+    
+    RelsToShow.push({
+        'authz_controller'  => authz_controller,
+        'method'            => method,
+        'livegrid'          => livegrid,
+        'rel_info'          => rel_info,
+        'map_to'            => map_to,
+        'map_params'        => map_params,
+        'm2m_url'           => m2m_url,
+        'num_fields'        => num_fields,
+        'rowclick_action'   => rowclick_action,
+        'base_url'          => base_url,
+        'm2m_map_to_url'    => m2m_map_to_url,
+        'create_new_url'    => create_new_url,
+        'export_as_xls_url' => export_as_xls_url,
+        'thisLabel'         => thisLabel,
+        'tabLabel'          => tabLabel,
+    });
+    
+END;
+
+%]

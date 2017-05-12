@@ -1,0 +1,36 @@
+NAME
+    CGI::Application::FastCGI - for using CGI::Application under FastCGI
+
+SYNOPSIS
+      # In "WebApp.pm"...
+      package WebApp;
+      use base qw(CGI::Application::FastCGI);
+      sub setup {
+        ...
+      }
+      1;
+
+      # In "webapp.fcgi"...
+      use WebApp;
+      my $webapp = WebApp->new;
+      $webapp->run;
+
+DESCRIPTION
+    Inherit this module instead of CGI::Application if you want to run your
+    cgi programs based on CGI::Application under FastCGI.
+
+NOTES
+    Note that cgiapp_init() will be called only once under lifecycle of
+    FastCGI. setup() will also only be called once. (you should not be doing
+    magical things in 'setup'.) So if you want to do something for every
+    REQUESTS, you should write the logic in cgiapp_prerun().
+
+SEE ALSO
+    CGI::Application, FCGI
+
+AUTHOR
+    Naoya Ito <naoya@naoya.dyndns.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,23 @@
+<form title="Checkboxes" header="head.tmpl" footer="foot.tmpl" post-event="done">
+    <page name="Food">
+        <title>Food</title>
+        <field id="fries" type="checkbox" checked="1">
+            <label>Would you like fries with that?</label>
+        </field>
+        <field id="ketchup" type="checkbox">
+            <label>How about ketchup?</label>
+        </field>
+    </page>
+    <page name="Clothes">
+        <title>Clothes</title>
+        <field id="hat" type="checkbox" checked="1">
+            <label>Hat</label>
+        </field>
+        <field id="shoes" type="checkbox">
+            <label>Shoes</label>
+        </field>
+        <field id="gloves" type="checkbox">
+            <label>Gloves</label>
+        </field>
+    </page>
+</form>

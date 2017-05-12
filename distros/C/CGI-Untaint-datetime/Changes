@@ -1,0 +1,11 @@
+Revision history for Perl extension CGI::Untaint::datetime
+
+0.06 Tue Sep 06 15:21:00 2005
+    - Include pod tests to please cpants.
+    - Also document is_valid :)
+0.05 Thu Dec 16 17:01:00 2004
+    - Include a Makefile.pl to please edward
+0.04 Wed Dec 1 14:29:00 2004
+    - Don't warn if string is shorter than datetime
+0.03 Wed Dec 1 13:34:00 2004
+    - Ooops, forgot the README.

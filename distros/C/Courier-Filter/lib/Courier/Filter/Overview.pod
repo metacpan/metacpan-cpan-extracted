@@ -1,0 +1,492 @@
+#
+# Courier::Filter::Overview
+#
+# (C) 2003-2008 Julian Mehnle <julian@mehnle.net>
+# $Id: Overview.pod 210 2008-03-21 19:30:31Z julian $
+#
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+Courier::Filter::Overview - Architectural and administrative overview of
+Courier::Filter
+
+=head1 DESCRIPTION
+
+Courier::Filter is a purely Perl-based mail filter framework for the Courier
+MTA.
+
+=head2 The Courier MTA's B<courierfilter> interface
+
+Courier offers an interface for daemon-style processes to act as mail filters,
+called B<courierfilter>s.  For every incoming mail message, right after the
+DATA command in the SMTP transaction phase has completed, Courier calls every
+registered mail filter through a UNIX domain socket the filter is listening
+on, and feeds it the file names of the incoming message and one or more control
+files.  The mail filter processes the message and its control file(s), and
+returns an SMTP-style status response.  If the status response is a positive
+("2xx") one, Courier accepts the message.  Otherwise, Courier rejects the
+message using the returned response code and text.  For details about the
+courierfilter interface, see L<courierfilter>.
+
+=head2 About B<Courier::Filter>
+
+Courier::Filter implements the courierfilter interface as a framework for mail
+filter modules that frees modules from the duties of creating and handling the
+UNIX domain sockets, waiting for connections from Courier, and reading and
+parsing message and control files.  Thus, authors of filter modules can
+concentrate on writing the actual filter logic without having to care about
+things that can easily be abstracted and can be performed by the framework.
+
+Courier::Filter allows multiple filter modules to be installed, and filter
+modules can be stacked and grouped hierarchically, and even a module's polarity
+can be reversed, so some modules can be used for explicitly I<accepting>
+messages while others are used in the traditional way for I<rejecting>
+messages.
+
+=head2 Courier::Filter compared to other courierfilter implementations
+
+There are some alternative implementations of the courierfilter interface:
+
+=over
+
+=item I<Writing your own standalone courierfilter>
+
+If you need an ultra-high performance mail filter, writing a standalone
+courierfilter in C/C++ is a good choice.  You will have maximum freedom for
+optimizing your filter for performance and resource consumption.  But
+regardless of which language you use, you will have to implement all the UNIX
+domain socket and connection handling and message and control file processing
+yourself.  And you don't get the modularity and module grouping capabilities
+for free either.
+
+=item I<courierperlfilter>
+
+Courier brings a sample Perl-based courierfilter called B<courierperlfilter>.
+It is a C executable that employs Perl embedding (see L<perlembed>) to execute
+a Perl script for every incoming message, which is about as performant as the
+purely Perl-based Courier::Filter.  But for every Perl-based courierfilter you
+want to run, you have to use a separate instance of courierperlfilter, or
+implement your own modularity and module grouping.  Also, the included template
+Perl script is not very modular in itself, and Courier::Filter's message and
+control file parsing features are missing.
+
+=item I<pythonfilter>
+
+B<pythonfilter> by Gordon Messmer is a purely Python-based, modular, threaded
+courierfilter framework, similar to Courier::Filter.  If you primarily speak
+Python, this is clearly your choice.  pythonfilter also provides infrastructure
+to filter modules for modifying messages, even with versions of Courier prior
+to 0.57.1, which did not directly allow global mail filters to modify messages.
+As of version 1.1, pythonfilter supports only a linear topology in the
+configuration of its filter modules.
+
+=back
+
+=head2 Using Courier::Filter
+
+First, Courier::Filter (of course) and the filter modules that you plan to use
+for filtering your incoming mail need to be installed somewhere in your Perl
+include path (see the last lines of `perl -V`).  You may also need to adjust
+the B<Courier::Config> class (in C<Courier/Config.pm>) to reflect your system's
+paths.  As for the filter modules, you can either use prepared ones (see
+L</"Bundled Courier::Filter modules"> for a list of modules that come with
+Courier::Filter), or you can write your own (see L</"How filter modules
+work">).
+
+Second, you need to create a configuration file for Courier::Filter.
+Courier::Filter usually seeks for it at
+C</etc/courier/filters/courier-filter-perl.conf> (see L<Courier::Config> on how
+to configure that).  This file is a Perl snippet that must C<use> the filter
+modules you want to use, and then fill in the C<$options> global variable with
+the desired configuration options, instantiating filter modules and loggers as
+required.
+
+If you plan to use non-ASCII string literals in your configuration file, it
+should be encoded in UTF-8 (which is the native internal character encoding of
+Perl 5.8+ and Courier::Filter), and if it is, it I<must> do C<use utf8>.  (It
+is possible for the configuration file to be encoded differently, but you
+still I<must> explicitly specify the used encoding, see L<encoding> for how to
+do that.)
+
+For example, this is how a simple configuration file could look like:
+
+    use utf8;
+    
+    use Courier::Filter::Logger::File;
+    use Courier::Filter::Module::Header;
+    
+    $options = {
+        logger      => Courier::Filter::Logger::File->new(
+            file_name   => '/var/log/courier-filter-perl.log',
+            timestamp   => 1
+        },
+        
+        modules     => [
+            Courier::Filter::Module::Header->new(
+                fields      => {
+                    subject     => qr/fuzzybuzzy/
+                },
+                response    => 'No fuzzybuzzy, please!'
+            )
+        ]
+    };
+
+These options will be used when creating the C<Courier::Filter> object.  For a
+detailed explanation of supported configuration options and how filter modules
+can be grouped, even hierarchically, see L<Courier::Filter/"new()">.
+
+Third, you need to make Courier aware of Courier::Filter by installing a
+symlink in C</etc/courier/filters/active/> pointing to the
+C<courier-filter-perl> executable (which is used for bootstrapping
+Courier::Filter):
+
+    $ ln -s $PATH_TO/courier-filter-perl /etc/courier/filters/active/
+
+Finally, you may start (or restart) Courier::Filter (including any other
+installed courierfilters; Courier must of course already be running):
+
+    $ sudo courierfilter restart
+
+In syslog, you should see the following message and no further error messages:
+
+    Jan 24 01:42:15 yourhost courierfilter: Starting courier-filter-perl
+
+Any errors occurring while Courier::Filter is running will appear in syslog as
+well.  A broken filter module will not crash Courier::Filter, but will record
+any Perl error messages in syslog, and I<reject> incoming mail messages with a
+I<temporary> status code, so as not to enable attackers to circumvent the
+configured Courier::Filter mail filtering.
+
+=head2 How filter modules work
+
+Filter modules are Perl classes that are derived from the class
+B<Courier::Filter::Module>.  See L<perlobj> for an explanation of Perl's object
+orientation features.
+
+Filter modules are to be instantiated in the C<courier-filter-perl.conf>
+configuration file, with either B<normal polarity> (the default) or B<inverse
+polarity>.  Then, for every incoming mail message, Courier::Filter asks each
+configured filter module in turn for consideration of the message's
+acceptability.
+
+Every module tries to match its filter criteria against the current message,
+yielding a so-called I<match result>, which can be either an B<explicit match>,
+an B<implicit mismatch>, or an B<explicit mismatch>.  (Filter modules usually
+never return an I<explicit> mismatch, but only an I<implicit> one; see
+L</"Writing filter modules"> if you want to know why.)
+
+According to the filter module's polarity, the match result is then translated
+into a so-called I<acceptability result>, which can be either an B<explicit
+reject>, an B<implicit accept>, or an B<explicit accept>.
+
+This is how I<match results> are translated into I<acceptability results> under
+normal and inverse polarity:
+
+     polarity | match result      | acceptability result
+    ----------+-------------------+----------------------
+              | explicit match    | explicit reject
+     normal   | implicit mismatch | implicit accept
+              | explicit mismatch | explicit accept
+    ----------+-------------------+----------------------
+              | explicit match    | explicit accept
+     inverse  | implicit mismatch | implicit accept
+              | explicit mismatch | explicit reject
+
+Generally, Courier::Filter interprets the acceptability result as follows:
+
+=over
+
+=item *
+
+If a module states an B<explicit reject> for the current message,
+Courier::Filter aborts the consideration process and rejects the message.
+
+=item *
+
+If a module states an B<implicit accept>, Courier::Filter continues the
+consideration process with the next module in turn.
+
+=item *
+
+If a module states an B<explicit accept>, Courier::Filter skips the rest of the
+group of modules and assumes the whole group to be an B<implicit accept>.
+
+=back
+
+If no B<explicit reject> has occured when Courier::Filter finishes asking all
+filter modules, the message is accepted.
+
+(For details on how to use advanced I<filter module grouping>, see the
+description of the C<modules> option in L<Courier::Filter/"new()">.)
+
+Abstracting the concept of a "match" from the concept of "acceptance" makes it
+possible to use filter modules with normal polarity for "black-listing" certain
+message characteristics, and filter modules with inverse polarity for
+"white-listing", while still allowing all modules to be written in a uniform
+sense of logic.  That is, there are no dedicated "accepting" and "rejecting"
+modules, but only "matching" modules.  (E.g. there are no "HeaderAccept" and
+"HeaderReject" modules, but only a "Header" module.)
+
+=head2 Writing filter modules
+
+The main objective of Courier::Filter is to make it very easy to write new
+filter modules, so while the previous section described how filter modules work
+in general, we will now look at the details of writing your own filter modules.
+From here on you really should know what you are doing, so if you are not
+familiar with Perl's object orientation features, now is the time to read
+L<perlobj> plus any documents referenced from there.
+
+As already mentioned, filter modules are Perl classes derived from the class
+B<Courier::Filter::Module>, which is an abstract base class and thus cannot be
+instantiated itself.
+
+To ask a filter module for consideration of the message, Courier::Filter calls
+C<$module-E<gt>consider()>, passing a B<Courier::Message> object.
+C<$module-E<gt>consider()> (if not overrided from B<Courier::Filter::Module>)
+then calls C<$module-E<gt>match()>, passing through the message object.
+
+The C<match()> method really is where a filter module decides whether a message
+matches the filter criteria, and this is usually the only method of
+B<Courier::Filter::Module> that needs to be overrided.  That method may use any
+configuration information from the filter module object (see
+L<Courier::Filter::Module>, and of course your own class), and any information
+from the message object (see L<Courier::Message>).
+
+If a filter module wants to call external commands using C<system()>, or
+functions from Perl modules that directly operate on files, it can efficiently
+bypass the message and control files processing features of Courier::Message by
+using the message object's C<control_file_names> and C<file_name> properties
+only.
+
+Finally, after the message has been examined, C<match()> must return a I<match
+result> of...
+
+=over
+
+=item B<true>
+
+if the module wants to state an B<explicit match> (the first return value being
+the SMTP status response I<text>, an optional second one being the SMTP status
+response I<code>),
+
+=item B<undef>
+
+if the module wants to state an B<implicit mismatch>, that is, indifference of
+whether the message should be accepted or rejected,
+
+=item B<false>
+
+if the module wants to state an B<explicit mismatch>.
+
+=back
+
+C<consider()> then translates the I<match result> into a I<acceptability
+result> as described in L</"How filter modules work">.
+
+C<match()> should usually never return an I<explicit> mismatch (B<false>), but
+an I<implicit> one (B<undef>) instead for the message to pass I<this filter
+module>, while still allowing any further modules to I<explicitly> reject
+(under normal polarity) or accept (under inverse polarity) the message.  See
+the description of the C<modules> option in L<Courier::Filter/"new()"> for
+specifics on how Courier::Filter uses acceptability results.
+
+=head2 A sample HeaderSimple filter module
+
+Now let's see in practice how to write a simple filter module.  For instance,
+we will create a simple variant of the C<Header> module that matches a
+specified message header field against a specified string.  Let's call it
+C<HeaderSimple>.
+
+First, we create a Perl module for the class
+B<Courier::Filter::Module::HeaderSimple>, with the file name
+C<Courier/Filter/Module/HeaderSimple.pm>.  (That is, you need to install the
+file C<HeaderSimple.pm> in the proper place in your Perl include path.)
+
+Second, in that Perl module, we state the package/class name, and the name of
+the base class, which is usually B<Courier::Filter::Module>:
+
+    package Courier::Filter::Module::HeaderSimple;
+    use base qw(Courier::Filter::Module);
+
+Third, we override the C<match()> method by defining a rudimentary C<match>
+sub:
+
+    sub match {
+        my ($self, $message) = @_;
+
+        # ...
+    }
+
+The first argument of the C<match()> method is (as usual in Perl's object
+orientation model) the module object itself, which provides access to its
+configuration options.  The second argument is the message object that is to be
+examined.  The ellipsis ("...") is where we will place our own filter logic.
+
+Now, we expect our module to be instantiated like this:
+
+    Courier::Filter::Module::HeaderSimple->new(
+        field       => 'subject',
+        value       => 'viagra',
+        response    => 'Go away, spammer!'
+    )
+
+which makes the configuration options available from the hash keys
+C<$self-E<gt>{field}>, C<$self-E<gt>{value}>, and C<$self-E<gt>{response}>.
+
+We want to test whether the configured header field of the message matches the
+configured value, and if so, return the configured response, so we write:
+
+    return $self->{response}
+        if $message->header($self->{field}) =~ m/\Q$self->{value}\E/;
+    return undef;
+        # otherwise.
+
+That's it.  This is how the complete filter module looks like:
+
+    package Courier::Filter::Module::HeaderSimple;
+    use base qw(Courier::Filter::Module);
+    
+    sub match {
+        my ($self, $message) = @_;
+    
+        return $self->{response}
+            if $message->header($self->{field}) =~ m/\Q$self->{value}\E/;
+        return undef;
+            # otherwise.
+    }
+
+=head2 Testing Courier::Filter modules
+
+You may dry-test filter modules using the C<test-filter-module> utility.  See
+its manpage for details.
+
+You may also switch any or all installed filter modules into "testing" mode so
+you can test them without risking messages being actually rejected.  See
+L<Courier::Filter/"new()"> and L<Courier::Filter::Module/"new()">.
+
+=head2 Bundled Courier::Filter modules
+
+The following prepared filter modules are included with this version of
+Courier::Filter:
+
+=over
+
+=item L<I<BlankBody>|Courier::Filter::Module::BlankBody>
+
+Detection of messages with blank bodies (symptom of stupid spammers)
+
+=item L<I<DNSBL>|Courier::Filter::Module::DNSBL>
+
+Checking of the calling MTA's IP address against one or more DNS black-lists
+
+=item L<I<SPF>|Courier::Filter::Module::SPF>
+
+SPF (Sender Policy Framework) authorization checking of the calling MTA's IP
+address against the envelope sender domain (classic inbound SPF checking)
+
+=item L<I<SPFout>|Courier::Filter::Module::SPFout>
+
+SPF authorization checking of the local system's IP address against the
+envelope sender domain (so-called outbound SPF checking)
+
+=item L<I<Envelope>|Courier::Filter::Module::Envelope>
+
+Literal and reg-exp matching of one or more RFC 2821 message envelope fields
+
+=item L<I<Header>|Courier::Filter::Module::Header>
+
+Literal and reg-exp matching of one or more RFC 2822 message header fields
+
+=item L<I<FakeDate>|Courier::Filter::Module::FakeDate>
+
+Detection of implausible and malformed "Date" and "Resent-Date" header fields
+
+=item L<I<ClamAVd>|Courier::Filter::Module::ClamAVd>
+
+Malware detection using the ClamAV anti-virus scanner
+
+=item L<I<SpamAssassin>|Courier::Filter::Module::SpamAssassin>
+
+Spam detection using SpamAssassin
+
+=item L<I<Parts>|Courier::Filter::Module::Parts>
+
+=item I<MIMEParts> (DEPRECATED)
+
+Size and MD5 sum matching of message (MIME multipart and ZIP archive) parts
+
+=item L<I<SendCopy>|Courier::Filter::Module::SendCopy>
+
+Pseudo-filter for sending message copies to additional recipients
+
+=back
+
+=head2 Bundled Courier::Filter loggers
+
+The following prepared loggers are included with this version of
+Courier::Filter:
+
+=over
+
+=item L<I<IOHandle>|Courier::Filter::Logger::IOHandle>
+
+Logging to I/O handles
+
+=item L<I<Syslog>|Courier::Filter::Logger::Syslog>
+
+Logging to syslog (based on the B<IOHandle> logger)
+
+=item L<I<File>|Courier::Filter::Logger::File>
+
+Logging to files (based on the B<IOHandle> logger)
+
+=back
+
+=head1 SEE ALSO
+
+L<courier-filter-perl>, L<test-filter-module>,
+L<Courier::Filter>, L<Courier::Filter::Module>, L<Courier::Message>,
+L<Courier::Config>
+
+=head1 REFERENCES
+
+=over
+
+=item The B<courierfilter> interface
+
+L<http://www.courier-mta.org/courierfilter.html>
+
+=item B<courierperlfilter>
+
+L<http://www.courier-mta.org/courierperlfilter.html>
+
+=item B<pythonfilter>
+
+L<http://phantom.dragonsdawn.net/~gordon/courier-patches/courier-pythonfilter/>
+
+=back
+
+=head1 AVAILABILITY and SUPPORT
+
+The latest version of Courier::Filter is available on CPAN and at
+L<http://www.mehnle.net/software/courier-filter>.
+
+Support is usually (but not guaranteed to be) given by the author, Julian
+Mehnle <julian@mehnle.net>, preferably through the Courier MTA's courier-users
+mailing list <courier-users@lists.sourceforge.net>, which is subscribable
+through L<http://lists.sourceforge.net/lists/listinfo/courier-users>.
+
+=head1 AUTHOR and LICENSE
+
+Courier::Filter is Copyright (C) 2003-2008 Julian Mehnle <julian@mehnle.net>.
+All rights reserved.
+
+Courier::Filter is free software.  You may use, modify, and distribute it under
+the same terms as Perl itself, i.e. under the GNU GPL or the Artistic License.
+
+=cut
+
+# vim:tw=79

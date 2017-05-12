@@ -1,0 +1,15 @@
+<html>
+<title>User Info</title>
+Please update your info and hit "Submit".
+<tmpl_var js-head>
+<p>
+<tmpl_var form-start><tmpl_var form-state>
+Enter your name: <tmpl_var field-name>
+<select name="color" multiple>
+    <tmpl_loop loop-color>
+    <option value="<tmpl_var value>" <tmpl_var selected>><tmpl_var label></option>
+    </tmpl_loop>
+</select>
+FYI, your dress size is <tmpl_var value-size><br>
+<tmpl_var form-reset> <tmpl_var form-submit>
+<tmpl_var form-end>

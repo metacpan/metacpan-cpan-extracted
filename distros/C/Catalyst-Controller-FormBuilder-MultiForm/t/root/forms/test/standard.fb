@@ -1,0 +1,15 @@
+name: standard
+method: post
+javascript: 0
+
+fields:
+
+    standard_one:
+        label: Standard One
+        type:  text
+
+    standard_two:
+        label: Standard Two
+        type:  text
+
+submit: Save Foo

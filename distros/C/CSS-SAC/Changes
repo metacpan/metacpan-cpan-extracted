@@ -1,0 +1,60 @@
+Revision history for Perl extension CSS::SAC.
+
+0.08  Sun Jul 5 21:47 2008
+        - Some kwalitee fixes
+
+0.06  Sun Oct 19 21:47 2004
+        - Module now maintained by Bjoern Hoehrmann
+        - More accurate behavior wrt to namespace declarations
+
+0.05  2003-07-07 19:56
+	- changed some code (it's not really a bugfix, it changes from a
+	  bug to a less likely one -- a real fix will come later) thanks
+	  to a report and patch from Briac Pilpré.
+	- fixed a bug to parse attr(color, color) correctly, thanks to
+	  Bjoern Hoehrmann.
+
+0.04  Sat Jul 06 16:13 2001
+	- fixed a bug in Text::Balanced that caused blocks to be
+	incorrectly extracted when they contained backslashed followed by
+	a newline. As a result Text::Balanced 1.84 is now required.
+	- fixed a bug which caused some backslash escapes to fail in IDENT
+	tokens (thanks to Bjoern Hoehrmann)
+	- fixed a stupid precedence bug in the RGB regex and the float regex
+	(patch by Steffen Goeldner)
+	- HTML end comments didn't work properly (Steffen Goeldner)
+	- @import looked for uri instead of url (Steffen Goeldner)
+	- added the possibility to parse properties that start with a '-'.
+	I don't think that's too spec clean, but a lot of people seem to want
+	those as extensions in various browsers (suggested by BH).
+	- added _ to the IDENT characters (it's in CSS2 Errata)
+	- fixed @page parsing (patch by SG)
+
+0.03  Mon Apr 23 16:44:16 2001
+	- switched all to Class::ArrayObjects (which used to be CSS::SAC::Helpers::ArrayObjects)
+	- provide both standard and perlified names for methods
+	- added lots of documentation (can still be improved, suggestions
+	welcome)
+	- removed SACPrinter and replaced it with CSS::SAC::Writer, more
+	flexible
+	- fixed a number of small bugs here and there
+	- fixed a serious bug whereby it was possible to tokenize two
+	selectors in a row without a combinator (it now is seen as a fatal
+	error but perhaps it should just flag an error (and keep on
+	parsing)
+	- the parser was creating negative conditions, something that I
+	don't think really exists in the spec. It should have been
+	creating negative selectors, which it now does.
+
+0.02-i  04/03/2001  alpha mark II
+	- added SelectorLists
+	- started to add some things to make the interface closer to the
+	spec for those who prefer that, while maintaining the perlishness
+	for the others
+
+0.01-i  04/03/2001 alpha mark I
+	- initial tests and limited public release
+	- refoundation of the entire CSS::Parser into CSS::SAC
+
+before  22/10/1999 and previously
+	- the ugly and broken CSS::Parser (now obsolete)

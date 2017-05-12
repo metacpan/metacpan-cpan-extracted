@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  50826:
+    - 60
+name: ddcb8c
+registers:
+  AF: 42533
+  AF_: 0
+  BC: 60721
+  BC_: 0
+  DE: 14662
+  DE_: 0
+  HL: 15580
+  HL_: 0
+  I: 0
+  IX: 50850
+  IY: 31446
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,39 @@
+Revision history for Perl extension Compress::PPMd.
+
+0.11  10 Oct 2005
+	- select the right linker (bug reported by Ed Wildgoose).
+	- add Test::Pod test.
+	- set prototype behaviour in XS file.
+
+0.10  28 Feb 2004
+	- corrected bug in test 3_rubbish.t
+
+0.09  13 Feb 2004
+	- set linker to g++
+
+0.08  15 May 2003
+	- now compiles on Windows with MSVC
+
+0.07  5 Apr 2003
+	- corrected header Buffer.hpp that broke compilation on
+	  NetBSD/Sparc
+
+0.05  28 Mar 2003
+	- examples in synopsis corrected
+
+0.04  28 Mar 2003
+	- license statement in README corrected
+
+0.03  27 Mar 2003
+	- require recent MakeMaker to use C++ compiler.
+
+0.02  Sun Mar 23 2003
+	- added methods for interface compatibility with
+	  Compress::Zlib
+	- docs corrections
+
+
+0.01  Mon Mar 17 19:32:24 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Compress::PPMd
+

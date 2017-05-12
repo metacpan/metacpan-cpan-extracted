@@ -1,0 +1,43 @@
+NAME
+    CGI::Carp::StackTrace - install a Devel::StackTrace::AsHTML error screen
+    for your CGI app
+
+SYNOPSIS
+        use Sys::Hostname 'hostname';
+
+        my $IS_PRODUCTION;
+
+        BEGIN {
+            $IS_PRODUCTION = hostname() eq 'prod_server';
+
+            require CGI::Carp::StackTrace if not $IS_PRODUCTION;
+        }
+
+DESCRIPTION
+    Add a modern error screen to your CGI application, like
+    Plack::Middleware::StackTrace.
+
+    Uses CGI::Carp in conjunction with Devel::StackTrace::WithLexicals and
+    Devel::StackTrace::AsHTML.
+
+SEE ALSO
+    *   Devel::StackTrace
+
+    *   Devel::StackTrace::WithLexicals
+
+    *   Devel::StackTrace::AsHTML
+
+    *   CGI::Carp
+
+    *   Plack::Middleware::StackTrace
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+
+ACKNOWLEDGEMENTS
+    Thanks to Dave Rolsky for Devel::StackTrace and Miyagawa for
+    Devel::StackTrace::AsHTML.
+
+    Some code in this module is stolen from Miyagawa's
+    Plack::Middleware::StackTrace.
+

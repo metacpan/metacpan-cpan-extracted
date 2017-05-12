@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/"><version>1.1</version><numberOfRecords>23</numberOfRecords><records><record><recordSchema>MARC21-xml</recordSchema><recordPacking>xml</recordPacking><recordData><slim:record xmlns:slim="http://www.loc.gov/MARC21/slim" type="Bibliographic">
+    <slim:leader>01817nas a2200577 c 4500</slim:leader>
+    <slim:controlfield tag="001">011197684</slim:controlfield>
+    <slim:controlfield tag="003">DE-101</slim:controlfield>
+    <slim:controlfield tag="005">20120124100526.0</slim:controlfield>
+    <slim:controlfield tag="007">tu</slim:controlfield>
+    <slim:controlfield tag="008">991119c19619999ne b||p|  ||| 0||||0ger c</slim:controlfield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-101</slim:subfield>
+      <slim:subfield code="a">011197684</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-600</slim:subfield>
+      <slim:subfield code="a">207680-9</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="022" ind1=" " ind2=" ">
+      <slim:subfield code="a">0031-4056</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="029" ind1="a" ind2="a">
+      <slim:subfield code="a">0031-4056</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="029" ind1="a" ind2="c">
+      <slim:subfield code="a">1873-1511</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="030" ind1=" " ind2=" ">
+      <slim:subfield code="a">PDBLAM</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="035" ind1=" " ind2=" ">
+      <slim:subfield code="a">(DE-599)ZDB207680-9</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="035" ind1=" " ind2=" ">
+      <slim:subfield code="a">(OCoLC)243419229</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="040" ind1=" " ind2=" ">
+      <slim:subfield code="a">9001</slim:subfield>
+      <slim:subfield code="b">ger</slim:subfield>
+      <slim:subfield code="c">DE-101</slim:subfield>
+      <slim:subfield code="d">1241</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="041" ind1=" " ind2=" ">
+      <slim:subfield code="a">ger</slim:subfield>
+      <slim:subfield code="a">eng</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="044" ind1=" " ind2=" ">
+      <slim:subfield code="c">XA-NL</slim:subfield>
+      <slim:subfield code="c">XA-DE</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="082" ind1="0" ind2="4">
+      <slim:subfield code="8">1\x</slim:subfield>
+      <slim:subfield code="a">631.4605</slim:subfield>
+      <slim:subfield code="q">DE-101</slim:subfield>
+      <slim:subfield code="2">22/ger</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="083" ind1="7" ind2=" ">
+      <slim:subfield code="a">630</slim:subfield>
+      <slim:subfield code="q">DE-101</slim:subfield>
+      <slim:subfield code="2">22sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="083" ind1="7" ind2=" ">
+      <slim:subfield code="a">570</slim:subfield>
+      <slim:subfield code="a">610</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">22sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">630</slim:subfield>
+      <slim:subfield code="q">DE-101</slim:subfield>
+      <slim:subfield code="2">sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">12</slim:subfield>
+      <slim:subfield code="2">ssgn</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">570</slim:subfield>
+      <slim:subfield code="a">610</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">WA 15000</slim:subfield>
+      <slim:subfield code="2">rvk</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="085" ind1=" " ind2=" ">
+      <slim:subfield code="8">1\x</slim:subfield>
+      <slim:subfield code="b">631.46</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="085" ind1=" " ind2=" ">
+      <slim:subfield code="8">1\x</slim:subfield>
+      <slim:subfield code="z">1</slim:subfield>
+      <slim:subfield code="s">05</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="210" ind1="1" ind2="0">
+      <slim:subfield code="a">Pedobiologia</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="210" ind1="1" ind2="0">
+      <slim:subfield code="a">PEDOBIOLOGIA (JENA)</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="245" ind1="1" ind2="0">
+      <slim:subfield code="a">Pedobiologia</slim:subfield>
+      <slim:subfield code="b">international journal of soil biology</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1="3" ind2=" ">
+      <slim:subfield code="a">Amsterdam</slim:subfield>
+      <slim:subfield code="a">Boston, Mass.</slim:subfield>
+      <slim:subfield code="a">Jena</slim:subfield>
+      <slim:subfield code="a">London</slim:subfield>
+      <slim:subfield code="a">New York, NY</slim:subfield>
+      <slim:subfield code="a">Oxford</slim:subfield>
+      <slim:subfield code="a">Paris</slim:subfield>
+      <slim:subfield code="a">Philadelphia, Pa.</slim:subfield>
+      <slim:subfield code="a">San Diego, Ca.</slim:subfield>
+      <slim:subfield code="a">St. Louis, Mo.</slim:subfield>
+      <slim:subfield code="b">Elsevier</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1=" " ind2=" ">
+      <slim:subfield code="a">Jena</slim:subfield>
+      <slim:subfield code="b">Fischer</slim:subfield>
+      <slim:subfield code="c">anfangs</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1=" " ind2=" ">
+      <slim:subfield code="a">Jena</slim:subfield>
+      <slim:subfield code="a">Stuttgart [u.a.]</slim:subfield>
+      <slim:subfield code="b">Fischer</slim:subfield>
+      <slim:subfield code="c">früher</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1=" " ind2=" ">
+      <slim:subfield code="a">Jena</slim:subfield>
+      <slim:subfield code="b">Urban &amp; Fischer</slim:subfield>
+      <slim:subfield code="c">-2003</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="300" ind1=" " ind2=" ">
+      <slim:subfield code="c">28 cm</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="362" ind1="0" ind2=" ">
+      <slim:subfield code="a">1.1961/62 -</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="363" ind1="0" ind2="1">
+      <slim:subfield code="8">1.1\x</slim:subfield>
+      <slim:subfield code="i">1961/62</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="501" ind1=" " ind2=" ">
+      <slim:subfield code="a">Ungezählte Beil. ab 2011: Supplement</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="515" ind1=" " ind2=" ">
+      <slim:subfield code="a">Ersch. 6x jährl.</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="546" ind1=" " ind2=" ">
+      <slim:subfield code="a">Zsfassungen in dt. u. engl. Sprache</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="650" ind1=" " ind2="7">
+      <slim:subfield code="0">(DE-588)4007358-0</slim:subfield>
+      <slim:subfield code="0">(DE-101)040073580</slim:subfield>
+      <slim:subfield code="a">Bodenbiologie</slim:subfield>
+      <slim:subfield code="2">gnd</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="655" ind1=" " ind2="7">
+      <slim:subfield code="a">Zeitschrift</slim:subfield>
+      <slim:subfield code="2">gnd</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="689" ind1="0" ind2="0">
+      <slim:subfield code="0">(DE-588)4007358-0</slim:subfield>
+      <slim:subfield code="0">(DE-101)040073580</slim:subfield>
+      <slim:subfield code="D">s</slim:subfield>
+      <slim:subfield code="a">Bodenbiologie</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="689" ind1="0" ind2="1">
+      <slim:subfield code="A">f</slim:subfield>
+      <slim:subfield code="a">Zeitschrift</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="689" ind1="0" ind2=" ">
+      <slim:subfield code="5">DE-101</slim:subfield>
+      <slim:subfield code="5">DE-101</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="775" ind1="0" ind2="8">
+      <slim:subfield code="i">Online-Ausg.</slim:subfield>
+      <slim:subfield code="t">Pedobiologia</slim:subfield>
+      <slim:subfield code="w">(DE-600)2049235-2</slim:subfield>
+      <slim:subfield code="w">(DE-101)021904251</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="889" ind1=" " ind2=" ">
+      <slim:subfield code="w">(DE-101)946240299</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="925" ind1="r" ind2=" ">
+      <slim:subfield code="a">ra</slim:subfield>
+    </slim:datafield>
+  </slim:record></recordData><recordPosition>21</recordPosition></record><record><recordSchema>MARC21-xml</recordSchema><recordPacking>xml</recordPacking><recordData><slim:record xmlns:slim="http://www.loc.gov/MARC21/slim" type="Bibliographic">
+    <slim:leader>01037nas a2200253 c 4500</slim:leader>
+    <slim:controlfield tag="001">016305078</slim:controlfield>
+    <slim:controlfield tag="003">DE-101</slim:controlfield>
+    <slim:controlfield tag="005">20050524195025.0</slim:controlfield>
+    <slim:controlfield tag="007">tu</slim:controlfield>
+    <slim:controlfield tag="008">991121d19591959xx u||p|  ||| 1||||0rus c</slim:controlfield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-101</slim:subfield>
+      <slim:subfield code="a">016305078</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-600</slim:subfield>
+      <slim:subfield code="a">1100293-1</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="035" ind1=" " ind2=" ">
+      <slim:subfield code="a">(DE-599)ZDB1100293-1</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="040" ind1=" " ind2=" ">
+      <slim:subfield code="a">9001</slim:subfield>
+      <slim:subfield code="b">ger</slim:subfield>
+      <slim:subfield code="c">DE-101</slim:subfield>
+      <slim:subfield code="d">9999</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="041" ind1=" " ind2=" ">
+      <slim:subfield code="a">rus</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="044" ind1=" " ind2=" ">
+      <slim:subfield code="c">XA-SUHH</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="082" ind1="7" ind2="4">
+      <slim:subfield code="a">570</slim:subfield>
+      <slim:subfield code="a">580</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">22sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">570</slim:subfield>
+      <slim:subfield code="a">580</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="111" ind1="2" ind2=" ">
+      <slim:subfield code="0">(DE-588)3749-7</slim:subfield>
+      <slim:subfield code="0">(DE-101)000037494</slim:subfield>
+      <slim:subfield code="a">Vsesojuznaja Konferencija po Fotosintezu</slim:subfield>
+      <slim:subfield code="4">aut</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="245" ind1="1" ind2="0">
+      <slim:subfield code="a">Doklady na ... Vsesojuznoj Konferencii po Fotosintezu / Akademija Nauk SSSR, Otdelenie Biologičeskich Nauk ; Moskovskij Gosudarstvennyj Universitet Im. M. V. Lomonosova, Biologo-Počvennyj Fakul'tet</slim:subfield>
+      <slim:subfield code="b">= Reports of ... All-Union Conference on Photosynthesis / Biological Section of USSR Academy of Sciences and Biology-Soil Department of Moscow State University</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1="3" ind2=" ">
+      <slim:subfield code="a">Moskva</slim:subfield>
+      <slim:subfield code="b">Akad.</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="362" ind1="0" ind2=" ">
+      <slim:subfield code="a">2.1957(1959) nachgewiesen</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="546" ind1=" " ind2=" ">
+      <slim:subfield code="a">In kyrill. Schr</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="591" ind1=" " ind2=" ">
+      <slim:subfield code="a">Aut.RZK</slim:subfield>
+    </slim:datafield>
+  </slim:record></recordData><recordPosition>22</recordPosition></record><record><recordSchema>MARC21-xml</recordSchema><recordPacking>xml</recordPacking><recordData><slim:record xmlns:slim="http://www.loc.gov/MARC21/slim" type="Bibliographic">
+    <slim:leader>01098nas a2200253 c 4500</slim:leader>
+    <slim:controlfield tag="001">01216822X</slim:controlfield>
+    <slim:controlfield tag="003">DE-101</slim:controlfield>
+    <slim:controlfield tag="005">20070502180702.0</slim:controlfield>
+    <slim:controlfield tag="007">tu</slim:controlfield>
+    <slim:controlfield tag="008">991119d19391939xxuu||p|  ||| 0||||0||| c</slim:controlfield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-101</slim:subfield>
+      <slim:subfield code="a">01216822X</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="016" ind1="7" ind2=" ">
+      <slim:subfield code="2">DE-600</slim:subfield>
+      <slim:subfield code="a">395622-2</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="035" ind1=" " ind2=" ">
+      <slim:subfield code="a">(DE-599)ZDB395622-2</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="040" ind1=" " ind2=" ">
+      <slim:subfield code="a">9001</slim:subfield>
+      <slim:subfield code="b">ger</slim:subfield>
+      <slim:subfield code="c">DE-101</slim:subfield>
+      <slim:subfield code="d">9001</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="044" ind1=" " ind2=" ">
+      <slim:subfield code="c">XD-US</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="082" ind1="7" ind2="4">
+      <slim:subfield code="a">630</slim:subfield>
+      <slim:subfield code="a">640</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">22sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="084" ind1=" " ind2=" ">
+      <slim:subfield code="a">630</slim:subfield>
+      <slim:subfield code="a">640</slim:subfield>
+      <slim:subfield code="q">DE-600</slim:subfield>
+      <slim:subfield code="2">sdnb</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="110" ind1="2" ind2=" ">
+      <slim:subfield code="0">(DE-588)340075-X</slim:subfield>
+      <slim:subfield code="0">(DE-101)003400751</slim:subfield>
+      <slim:subfield code="a">International Society of Soil Science</slim:subfield>
+      <slim:subfield code="b">Commission for Soil Biology</slim:subfield>
+      <slim:subfield code="4">aut</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="245" ind1="1" ind2="0">
+      <slim:subfield code="a">Proceedings of the Third Commission of the International Society of Soil Science</slim:subfield>
+      <slim:subfield code="c">Commission 3 of the International Society of Soil Science</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="246" ind1="1" ind2="3">
+      <slim:subfield code="i">Nebent.</slim:subfield>
+      <slim:subfield code="a">Transactions of the Third Commission of the International Society of Soil Science</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="246" ind1="1" ind2="3">
+      <slim:subfield code="i">Nebent.</slim:subfield>
+      <slim:subfield code="a">Comptes rendus de la Troisième Commission de l'Association International de la Science du Sol</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="246" ind1="1" ind2="3">
+      <slim:subfield code="i">Nebent.</slim:subfield>
+      <slim:subfield code="a">Verhandlungen der Dritten Kommission der Internationalen Bodenkundlichen Gesellschaft</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="260" ind1="3" ind2=" ">
+      <slim:subfield code="a">Camden, NJ</slim:subfield>
+      <slim:subfield code="b">[s.n.]</slim:subfield>
+    </slim:datafield>
+    <slim:datafield tag="362" ind1="0" ind2=" ">
+      <slim:subfield code="a">1939 nachgewiesen</slim:subfield>
+    </slim:datafield>
+  </slim:record></recordData><recordPosition>23</recordPosition></record></records><nextRecordPosition>24</nextRecordPosition><echoedSearchRetrieveRequest><version>1.1</version><query>tit=soil and biology</query><xQuery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/><startRecord>21</startRecord><recordSchema>MARC21-xml</recordSchema></echoedSearchRetrieveRequest><extraResponseData><accountOf xmlns="">Zeitschriftendatenbank (ZDB)</accountOf></extraResponseData></searchRetrieveResponse>

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Building and promoting images a xen cloud",
+   "author" : [
+      "Peter Blair <pblair@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Conan",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Rsync" : "0.42",
+            "Test::More" : "0.1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      }
+   },
+   "provides" : {
+      "Conan" : {
+         "file" : "lib/Conan.pm",
+         "version" : "v0.0.4"
+      },
+      "Conan::Configure::Xen" : {
+         "file" : "lib/Conan/Configure/Xen.pm",
+         "version" : 0
+      },
+      "Conan::Deploy" : {
+         "file" : "lib/Conan/Deploy.pm",
+         "version" : 0
+      },
+      "Conan::Promote" : {
+         "file" : "lib/Conan/Promote.pm",
+         "version" : 0
+      },
+      "Conan::Promote::Xen" : {
+         "file" : "lib/Conan/Promote/Xen.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.4"
+}

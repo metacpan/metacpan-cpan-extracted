@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-AutoForm.t
+lib/CGI/AutoForm.pm
+lib/CGI/AutoForm/Session.pm
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

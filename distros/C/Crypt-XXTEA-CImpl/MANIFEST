@@ -1,0 +1,11 @@
+Changes
+CImpl.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Crypt-XXTEA-CImpl.t
+lib/Crypt/XXTEA/CImpl.pm
+xxcrypt.h
+xxcrypt.c
+META.yml                                 Module meta-data (added by MakeMaker)

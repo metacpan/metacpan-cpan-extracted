@@ -1,0 +1,66 @@
+NAME
+    CGI::Header::PSGI - Generate PSGI-compatible response header arrayref
+
+SYNOPSIS
+      use CGI::PSGI;
+      use CGI::Header::PSGI;
+
+      my $app = sub {
+          my $env    = shift;
+          my $query  = CGI::PSGI->new( $env );
+          my $header = CGI::Header::PSGI->new( query => $query );
+        
+          my $body = do {
+              # run CGI.pm-based application
+          };
+
+          return [
+              $header->finalize,
+              [ $body ]
+          ];
+      };
+
+VERSION
+    This document refers to CGI::Header::PSGI 0.54001.
+
+DESCRIPTION
+    This module can be used to convert CGI.pm-compatible HTTP header
+    properties into PSGI response header array reference.
+
+    This module requires your query class is orthogonal to a global variable
+    %ENV. For example, CGI::PSGI adds the "env" attribute to CGI.pm, and
+    also overrides some methods which refer to %ENV directly. This module
+    doesn't solve those problems at all.
+
+  METHODS
+    This class inherits all methods from CGI::Header::Adapter.
+
+    Adds the following methods to the superclass:
+
+    $header->status_code
+        Returns HTTP status code.
+
+          my $code = $header->status_code; # => 200
+
+    Overrides the following method of the superclass:
+
+    ($status_code, $headers) = $header->finalize
+        Behaves like "CGI::PSGI"'s "psgi_header" method. Return the status
+        code and PSGI header array reference of this response.
+
+          $header->finalize;
+          # => (
+          #     200,
+          #     [ 'Content-Type' => 'text/plain' ]
+          # )
+
+SEE ALSO
+    CGI::Emulate::PSGI
+
+AUTHOR
+    Ryo Anazawa (anazawa@cpan.org)
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

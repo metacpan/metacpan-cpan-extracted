@@ -1,0 +1,61 @@
+=head1 NAME
+
+Catalyst::Manual::DevelopmentServer - Development server deployment
+
+The development server is a mini web server written in Perl. However, if
+you supply the C<-f> option to the development server, it will load the
+higher performance L<Starman> server, which can be used as an
+application server with a lightweight proxy web server at the front.
+
+=head1 Setup
+
+=head2 Start up the development server
+
+   script/myapp_server.pl -p 8080 -k -f --pidfile=/tmp/myapp.pid
+
+You will probably want to write an init script to handle stop/starting
+the app using the pid file.
+
+=head2 Configuring Apache
+
+Make sure mod_proxy is enabled and add:
+
+    # Serve static content directly
+    DocumentRoot /var/www/MyApp/root
+    Alias /static /var/www/MyApp/root/static
+
+    ProxyRequests Off
+    <Proxy *>
+        Order deny,allow
+        Allow from all
+    </Proxy>
+
+    # Need to specifically stop these paths from being passed to proxy
+    ProxyPass /static !
+    ProxyPass /favicon.ico !
+
+    ProxyPass / http://localhost:8080/
+    ProxyPassReverse / http://localhost:8080/
+
+    # This is optional if you'd like to show a custom error page
+    # if the proxy is not available
+    ErrorDocument 502 /static/error_pages/http502.html
+
+You can wrap the above within a VirtualHost container if you want
+different apps served on the same host.
+
+=head2 Other web servers
+
+The proxy configuration above can also be replicated with a different
+frontend server or proxy, such as varnish, nginx, or lighttpd. 
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

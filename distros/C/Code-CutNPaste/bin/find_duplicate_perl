@@ -1,0 +1,187 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Code::CutNPaste;
+use Getopt::Long;
+
+GetOptions(
+    'window=i'      => \my $window,
+    'exact'         => \my $exact,
+    'ignore=s@'     => \my @ignore,
+    'show_warnings' => \my $show_warnings,
+    'jobs=i'        => \( my $jobs = 1 ),
+    'noutf8'        => \my $noutf8,
+    'threshold=s'   => \my $threshold,
+) or die "Bad options";
+
+my ( @dirs, @files );
+foreach my $arg (@ARGV) {
+    if ( -d $arg ) {
+        push @dirs => $arg;
+    }
+    elsif ( -f $arg ) {
+        push @files => $arg;
+    }
+    else {
+        warn "Don't know what to do with '$arg'. Ignoring";
+    }
+}
+if ( !@dirs and !@files ) {
+    @dirs = 'lib';
+}
+
+my %renamed = (
+    renamed_vars => 1,
+    renamed_subs => 1,
+);
+if ($exact) {
+    %renamed = ();
+}
+
+my $cutnpaste = Code::CutNPaste->new(
+    dirs          => \@dirs,
+    files         => \@files,
+    ignore        => \@ignore,
+    window        => $window,
+    verbose       => 1,
+    noutf8        => $noutf8,
+    show_warnings => $show_warnings,
+    jobs          => $jobs,
+    threshold     => $threshold,
+    %renamed,
+);
+my $duplicates = $cutnpaste->duplicates;
+
+foreach my $duplicate (@$duplicates) {
+    my ( $left, $right ) = ( $duplicate->left, $duplicate->right );
+    printf <<'END', $left->file, $left->line, $right->file, $right->line;
+___________________________________________________________________________
+
+Possible duplicate code found
+Left:  %s line %d
+Right: %s line %d
+
+END
+    my $report = "    " . $duplicate->report;
+    $report =~ s/\n/\n    /g;
+    print "$report\n";
+}
+
+__END__
+
+=head1 NAME
+
+find_duplicate_perl
+
+=head1 SYNOPSIS
+
+ find_duplicate_perl lib some_other_dir some_file.pl
+
+=head1 DESCRIPTION
+
+Takes a list of directories and files as arguments and searches for duplicate
+Perl code in all files it finds there. For directories, we (currently) match
+files ending in C<.pm>, C<.pl> and C<.t>. This limitation can be avoided by
+passing in the list of files directly ... or submitting a patch.
+
+Because the program can take a long time to run, we use L<Term::ProgressBar>
+to track the progress. Note that even though it shows an ETA (estimated time
+of arrival) for how long we'll take to run, this number is often wildly
+inaccurate and is there to make you feel better.
+
+=head1 OPTIONS
+
+ --window=$window     Set minimum number of lines to look for duplicate code (default 5)
+ --exact              If used, will ignore renamed variables and subs
+ --ignore=$regex      A regex of duplicate code snippets to ignore (may be repeated)
+ --show_warnings      If for some reason a file cannot load, use this to show the reason why
+ --jobs=$num_jobs     Number of jobs to run (default 1)
+ --threshold=$percent Between 0 and 1. % of lines which must match C<\w> (default .75)
+ --noutf8             Disables loading of utf8::all.
+
+=over 4
+
+=item * C<--window=5>
+
+Takes an integer argument.
+
+By default, we compare five lines of code per file with five lines of code in
+other files. You can use this option to change the window size. For example to
+be very agressive:
+
+ --window 3
+=item * C<--exact>
+
+Takes no arguments.
+
+By default, we ignore differences in variable names and subroutine names. The
+following will be considered duplicates:
+
+     return $url;                  |     return $table;
+ }                                 | }
+ sub _build_external_urls {        | sub run {
+     my($self) = @_;               |     my($self) = @_;
+     my $request = $self->request; |     my $request = $self->request
+
+You may pass the C<--exact> flag to say that variable names and subroutine
+names must match exactly.
+
+=item * C<--ignore='Exception->throw\("Undefined url:'>
+
+Takes a string argument. String will be interpreted as a regex.
+
+Used to pass I<regular expressions> which, if matching a block of duplicate
+code, will cause that block to B<not> be reported as duplicated. You may
+repeat this switch, if needed. This is very useful when you have large blocks
+of auto-generated code.
+
+=item * C<--show_warnings>
+
+Takes no arguments.
+
+When we're looking for duplicates, we normalize the program layout via a
+customized version of L<B::Deparse>. Sometimes we cannot load our target
+program (for example, if it does not compile). A brief warning will be
+emitted. You can pass C<--show_warnings> to get the full warning, if needed.
+
+=item * C<--jobs=4>
+
+Takes an integer argument.
+
+By default we only use one job. If you pass an integer to this, we will
+attempt to launch (C<fork>) that many jobs. We use L<Parallel::ForkManager>
+for this. This can dramatically speed up a search for duplicate code.
+
+=item * C<--threshold=.5>
+
+Takes a floating point argument between 0 and 1, inclusive.
+
+The C<--threshold> represents a percentage. If a duplicate section of code is
+found, the percentage number of lines of code containing "word" characters
+must exceed the threshold. This is done to prevent spurious reporting of
+chunks of code like this:
+
+         };          |         };
+     }               |     }
+     return \@data;  |     return \@attrs;
+ }                   | }
+ sub _confirm {      | sub _execute {
+
+The above code has only 40% of its lines containing word (C<qr/\w/>)
+characters, and thus will not be reported.
+
+=item * C<--noutf8>
+
+Boolean. Default false.
+
+Due to a bug in Perl, the following code crashes Perl in Windows:
+
+ perl -e "use open qw{:encoding(UTF-8) :std}; fork; "
+ perl -e "open $f, '>:encoding(UTF-8)', 'temp.txt'; fork"
+ perl -e "use utf8::all; fork"
+
+By passing the C<noutf8> flat, we avoid loading L<utf8::all>. This may cause
+undesirable results.
+
+=back

@@ -1,0 +1,141 @@
+0.44  Sat Mar  1 23:26:12 GMT 2014
+
+  - Resolve RT#91891 an edge-case with equal and space format detection
+
+0.42  Tue Feb  7 16:46:38 GMT 2012
+
+  - Add a test fstab file instead of relying on the vagaries of system ones
+
+0.40  Mon Feb  6 21:19:29 2012
+
+    - Resolve RT 74711 reported by David Oswald
+      ( Calling Config::Auto::parse while $_ aliases a constant value throws exception )
+
+0.38  Mon Aug  8 21:38:10 2011
+
+    - Resolve RT 69984 reported by Thomas Johnson
+      ( Array handling regression when using equals format )
+
+0.36  Fri Jul  1 14:38:57 2011
+
+    - Fix for RT 68913 reported by Michael Lackhoff
+      ( config files with DOS line endings do not work in Linux )
+
+0.34  Tue Mar  8 15:02:06 2011
+
+    - Apply patch from Andrew Ruthven RT #66460
+      ( also Debian Bug # 617305 )
+
+0.32  Wed Feb 23 21:25:09 2011
+
+    - Fix a regression with space separated format
+      reported by Karel Petera RT #66050
+
+0.30	Sun Jan 23 22:51:22 2011
+
+    - Apply a fix from Nigel Horne RT #65019
+
+0.29_02 Thu Mar 12 12:39:03 2009
+
+    - Not all versions of XML::Parser deal well with an IO::String filehandle;
+      pass the value in as string instead
+    - Fix a broken XML test
+    - Remove stray $DB::single = 1
+    - Don't delete XML tests, skip them
+
+0.29_01 Wed Mar 11 13:51:31 2009
+
+    - Address #44018: Speed enhancements to only load modules if they are
+      actually needed. By Lyle Hopkins
+    - Address #32927: Hash key being assigned to $1 instead of $_
+    - Address #28608: Quoted parameters in Config::Auto
+      parsing now properly splits on quoted words, shell like
+    - Address #27686: an odd config format could throw uninitialized
+      value warnings
+    - Guts of Config::Auto rewritten to allow access to data in various
+      stages.
+    - Updates prereq list
+    - Increased test coverage
+
+0.20    Sat Apr  7 15:13:51 2007
+
+    - Address #25732: Close filehandles after parsing
+      Config::Auto wasn't closing it's filehandles after
+      reading from them. Now it does.
+
+0.18    Wed Jun 28 12:22:29 2006
+
+    - Address #19938 which states that calling parse()
+      on an xml config without XML::Simple installed
+      dies ungracefully. As of this version, better
+      diagnostics will be provided.
+
+0.17    Tue May  2 14:41:18 2006
+
+    - Improved YAML autodetection [#18241]
+
+0.15_01 Thu Aug 11 17:00:50 2005
+
+    - Added experimental YAML support
+
+0.14    Thu Aug 11 16:27:50 2005
+
+    - Fix uninitialized value warning
+    - Fix pod error
+    - Files under /etc we're not properly detected
+    - Fix casing of 'perl' in the Formats section of the pod
+    - Make formats be accepted in any casing
+
+
+0.13    Tue Jul 26 16:35:37 2005
+
+    - Add optional path support
+    - update test suite to test::more
+    - split tests by different formats
+    - Patch supplied by ssoriche@coloredblocks.net, tweaked and applied
+
+
+0.12    Thu Mar 10 14:58:06 2005
+
+    - extend do() diagnostics for perl files
+    - extend documentation
+
+0.11    Wed Nov 10 11:35:41 2004
+
+    - fix small thinko in file finding logic.
+
+0.10    Tue Aug 17 14:34:41 2004
+
+    - added support for fixed config file name.
+
+0.07 ???
+
+    - added support for '/usr/local/etc/'
+
+0.06    Sat Feb 21 13:21:43 2004
+
+    - fix a bug in tr/// on a string
+
+0.05    Tue Feb 10 13:16:59 2004
+
+    - Fix so that a config file is magically found when the program
+        is started with a full pathname as well
+
+0.04    Sun Sep  7 19:28:40 2003
+
+    - Jos Boumans took maintainership
+    - XML::Simple is now an optional module
+
+0.03    Sun Aug  4 09:51:42 2002
+
+    - INI files patch by Garrett Rooney
+
+0.02    Thu Jul  4 17:20:13 2002
+
+    - I always screw up the README.
+
+
+0.01  Wed Jul  3 15:00:16 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Config::Auto
+

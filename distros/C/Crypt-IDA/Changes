@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::IDA.
+
+0.01  Sat Jul 25 00:55:39 2009
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.8.8 -n Crypt::IDA
+

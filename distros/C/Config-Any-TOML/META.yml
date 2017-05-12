@@ -1,0 +1,44 @@
+---
+abstract: 'Load TOML config files'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Any-TOML
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Config::Any::TOML:
+    file: lib/Config/Any/TOML.pm
+    version: 0.002
+requires:
+  Config::Any::Base: 0
+  TOML: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/mjemmeson/config-any-toml/issues
+  homepage: https://metacpan.org/release/Config-Any-TOML
+  repository: git://github.com/mjemmeson/config-any-toml.git
+version: 0.002

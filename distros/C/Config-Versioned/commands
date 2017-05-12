@@ -1,0 +1,72 @@
+#!/opt/local/bin/gmake -f
+#
+# This script was taken from the CPAN Parallel::SubFork project
+#
+# vim: syntax=Makefile
+
+ 
+# Local installation place
+DEST=target
+ 
+VERSION=$(shell perl -le "print `grep '^our $$VERSION =' lib/Config/Versioned.pm`")
+PACKAGE=Config-Versioned
+#EMAIL=$(shell git config --global user.email)
+EMAIL=mrscotty@cpan.org
+PAUSE_USER=mrscotty
+ 
+.PHONY: info
+info:
+	@echo "EMAIL   ${EMAIL}"
+	@echo "VERSION ${VERSION}"
+	@echo "PACKAGE ${PACKAGE}"
+
+# Note: the local install works best with perlbrew (i.e.: without sudo)
+.PHONY: install
+install:
+	perl Makefile.PL && make test && make install
+ 
+.PHONY: dist
+dist: ${PACKAGE}-${VERSION}.tar.gz
+${PACKAGE}-${VERSION}.tar.gz:
+	perl Makefile.PL && make manifest && make && make dist
+ 
+ 
+.PHONY: distcheck
+distcheck: dist
+	make distcheck
+ 
+ 
+.PHONY: test
+test:
+	perl Makefile.PL && make && make test
+ 
+ 
+.PHONY: tag
+tag:
+	git tag "${VERSION}"
+ 
+ 
+.PHONY: push
+push:
+	git push --tags origin master
+ 
+ 
+.PHONY: upload
+upload: dist
+	cpan-upload -verbose -mailto "${EMAIL}" -user "${PAUSE_USER}" "${PACKAGE}-${VERSION}.tar.gz"
+ 
+ 
+.PHONY: release
+release: clean test dist distcheck tag push upload
+	@echo "Release ${PACKAGE} ${VERSION} done."
+ 
+ 
+.PHONY: clean
+clean:
+	- [ -f make ] && make clean  > /dev/null 2>&1 || true
+	-rm -f Makefile.old 2> /dev/null || true
+	-rm -rf ${PACKAGE}-*/ 2> /dev/null || true
+	-rm ${PACKAGE}-*.tar.gz 2> /dev/null || true
+	-rm -f pm_to_blib 2> /dev/null || true
+	-rm -rf blib 2> /dev/null || true
+

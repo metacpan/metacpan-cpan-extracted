@@ -1,0 +1,13 @@
+Revision history for Catalyst-Plugin-BuildURI
+
+0.1    2009-01-18T07:43:54
+       - fixed version format
+       - patched from http://catalyst.g.hatena.ne.jp/ikasam_a/20061227/1167157627
+         thx by ikasam_a
+
+0.0.2  Fri Dec 15 22:32:34 2006
+       - Add error handling
+
+0.0.1  Tue Oct 31 01:50:48 2006
+       - Initial release.
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution CatalystX-Controller-Verifier,
+version 0.02:
+
+  Moose Role for verifying request parameters on a per action basis.
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

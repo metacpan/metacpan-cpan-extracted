@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb6a
+registers:
+  AF: 23313
+  AF_: 0
+  BC: 153
+  BC_: 0
+  DE: 13560
+  DE_: 0
+  HL: 16022
+  HL_: 0
+  I: 0
+  IX: 62033
+  IY: 37822
+  PC: 4
+  R: 2
+  SP: 0

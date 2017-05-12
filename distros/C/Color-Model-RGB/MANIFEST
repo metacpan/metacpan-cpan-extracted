@@ -1,0 +1,11 @@
+Changes
+ignore.txt
+lib/Color/Model/RGB.pm
+Makefile.PL
+MANIFEST
+README
+t/00-basic.t
+t/01-operator.t
+t/02-bitoprt.t
+t/03-blender.t
+META.yml                                 Module meta-data (added by MakeMaker)

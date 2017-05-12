@@ -1,0 +1,89 @@
+Revision history for Perl extension Cache::KyotoTycoon
+
+0.16 2015-02-02T01:12:53Z
+
+    commit 7490ed6222a762809707d4b10530098eaa61d8e8
+    Author: ktat <ktat.is@gmail.com>
+    Date:   Sat Jan 31 16:35:21 2015 +0900
+
+        fix test for match. match returns hash ref.
+
+    commit b19e204f3f4f0493a9ee2f24e05317700f162fbd
+    Author: ktat <ktat.is@gmail.com>
+    Date:   Sat Jan 31 16:32:53 2015 +0900
+
+        change call argument from match_regex to match_similar for match_similar method
+
+0.15 2013-08-13T21:36:12Z
+
+    - implemented match_* methods
+
+0.14 2013-03-15T07:29:05
+
+    - [BUG FIX] Allow 'db' parameter in constructor argument
+      (Reported by Noritaka Okabe)
+
+0.13
+
+    - fixed testing issue with recent Test-TCP
+      https://github.com/tokuhirom/test-tcp/issues/3
+      (reported by ktat++)
+    - And modernized package
+
+0.12
+
+    - $cursor->get() returns $xt.(tokuhirom)
+    - doc enhancements(tokuhirom)
+
+0.11
+
+    - display better error message.
+
+0.10
+
+    - $kt->get() returns $xt on list context.
+
+0.09
+
+        - fixed documenation issue
+
+0.08
+
+        - switch WWW::Curl::Easy to Furl.
+          Because Furl is ...
+            better interface
+            fast enough
+            portable
+            not requires external library
+            run with pure perl
+
+0.07
+
+        - fixed documentation issue.
+
+0.06
+
+        - [INCOMPATIBLE CHANGE] TSVRPC::Client->call() is no longer returns status_line
+        - micro optimization around curl.
+
+0.05
+
+        - better error message on TSVRPC::Client.
+
+0.04
+
+        - default encoding for TSVRPC is Base64.
+        - added benchmark code.
+        - fixed docs
+
+0.03
+
+        - [INCOMPATIBLE CHANGE] TSVRPC::Client->call() now returns plain array instead of TSVRPC::Response for better performance.
+        - remove fucking unused code.
+
+0.02
+
+        - change namespace to Cache::KyotoTycoon
+
+0.01    Fri Oct  8 19:18:17 2010
+        - original version

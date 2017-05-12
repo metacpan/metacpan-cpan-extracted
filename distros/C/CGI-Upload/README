@@ -1,0 +1,165 @@
+NAME
+    CGI::Upload - CGI class for handling browser file uploads
+
+SYNOPSIS
+     use CGI::Upload;
+
+     my $upload = CGI::Upload->new;
+
+     my $file_name = $upload->file_name('field');
+     my $file_type = $upload->file_type('field');
+
+     $upload->mime_magic('/path/to/mime.types');
+     my $mime_type = $upload->mime_type('field');
+
+     my $file_handle = $upload->file_handle('field');
+
+DESCRIPTION
+    This module has been written to provide a simple and secure manner by
+    which to handle files uploaded in multipart/form-data requests through a
+    web browser. The primary advantage which this module offers over
+    existing modules is the single interface which it provides for the most
+    often required information regarding files uploaded in this manner.
+
+    This module builds upon primarily the CGI and File::MMagic modules and
+    offers some tidy and succinct methods for the handling of files uploaded
+    via multipart/form-data requests.
+
+METHODS
+    The following methods are available through this module for use in CGI
+    scripts and can be exported into the calling namespace upon request.
+
+    new This object constructor method creates and returns a new CGI::Upload
+        object. In previously versions of CGI::Upload, a mandatory argument
+        of the CGI object to be used was required. This is no longer
+        necessary due to the singleton nature of CGI objects.
+
+        As an experiment, you can now use any kind of CGI.pm like module.
+        The requirements are that it has to support the ->param method and
+        the ->upload method returning a file handle. You can use this
+        feature in two ways, either providing the name of the module or an
+        already existing object. In the former case, CGI::Upload will try to
+        *require* the correct module and will *croak* if cannot load that
+        module. It has been tested with CGI.pm and CGI::Simple.
+
+        We tested it with CGI::Simple 0.075.
+
+        It is known to break with version 0.071 of CGI::Simple so we issue
+        our own die in such case.
+
+        Examples:
+
+         use CGI::Upload;
+         CGI::Upload->new({ query => "CGI::Simple"});
+
+        or
+
+         use CGI::Upload;
+         use CGI::Simple;
+         $CGI::Simple::DISABLE_UPLOADS = 0;   # you have to set this before creating the instance
+         my $q = new CGI::Simple;
+         CGI::Upload->new({ query => $q});
+
+    query
+        Returns the CGI object used within the CGI::Upload class.
+
+    file_handle('field')
+        This method returns the file handle to the temporary file containing
+        the file uploaded through the form input field named 'field'. This
+        temporary file is generated using the new_tmpfile method of IO::File
+        and is anonymous in nature, where possible.
+
+    file_name('field')
+        This method returns the file name of the file uploaded through the
+        form input field named 'field' - This file name does not reflect the
+        local temporary filename of the uploaded file, but that for the file
+        supplied by the client web browser.
+
+    file_type('field')
+        This method returns the file type of the file uploaded as specified
+        by the filename extension - Please note that this does not
+        necessarily reflect the nature of the file uploaded, but allows CGI
+        scripts to perform cursory validation of the file type of the
+        uploaded file.
+
+    mime_magic('/path/to/mime.types')
+        This method sets and/or returns the external magic mime types file
+        to be used for the identification of files via the mime_type method.
+        By default, MIME identification is based upon internal mime types
+        defined within the File::MMagic module.
+
+        See File::MMagic for further details.
+
+    mime_type('field')
+        This method returns the MIME type of the file uploaded through the
+        form input field named 'field' as determined by file magic numbers.
+        This is the best means by which to validate the nature of the
+        uploaded file.
+
+        See File::MMagic for further details.
+
+BUGS
+    Please report bugs on RT:
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Upload>
+
+TODO
+    Explain why there is no 100% tests coverage...
+
+    Give inteligent error message when user forgets to add
+    enctype="multipart/form-data" in the upload form.
+
+    Add better MIME magic support (see request on RT)
+
+    Test if multiple file uploads are supported and fix this if they are
+    not.
+
+    Apache::Request support
+
+    CGI::Minimal support
+
+    Example code from Mark Stosberg (CGI::Uploader):
+
+      if ($q->isa('CGI::Simple') ) {
+               $fh = $q->upload($filename); 
+               $mt = $q->upload_info($filename, 'mime' );
+
+               if (!$fh && $q->cgi_error) {
+                       warn $q->cgi_error && return undef;
+               }
+       }
+       elsif ( $q->isa('Apache::Request') ) {
+                my $upload = $q->upload($file_field);
+                    $fh = $upload->fh;
+                    $mt = $upload->type;
+       }
+       # default to CGI.pm behavior
+       else {
+               $fh = $q->upload($file_field);
+               $mt = $q->uploadInfo($fh)->{'Content-Type'} if $q->uploadInfo($fh);
+
+               if (!$fh && $q->cgi_error) {
+                       warn $q->cgi_error && return undef;
+               }
+       }
+
+SEE ALSO
+    CGI, File::MMagic, HTTP::File
+
+COPYRIGHT
+    Copyright 2002-2004, Rob Casey, rob.casey@bluebottle.com
+
+AUTHOR
+    Original author: Rob Casey, rob.casey@bluebottle.com
+
+    Current mainainer: Gabor Szabo, gabor@pti.co.il
+
+    Thanks to
+
+    Mark Stosberg for suggestions.
+
+    and to the CPAN Testers for testing.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

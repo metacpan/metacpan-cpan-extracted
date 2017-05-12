@@ -1,0 +1,9 @@
+	LD A,1
+%include 't/data/include.z80' ignored
+	LD A,3
+#include "t/data/include.z80" ignored
+	LD A,5
+INCLUDE <t/data/include.z80> ignored
+	LD A,7
+INCLUDE t/data/include.z80 ignored
+	LD A,8

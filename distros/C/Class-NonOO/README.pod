@@ -1,0 +1,152 @@
+=head1 NAME
+
+Class::NonOO - Use methods as functions with an implicit singleton
+
+=head1 VERSION
+
+v0.4.1
+
+=head1 SYNOPSYS
+
+In a module:
+
+  package MyModule;
+
+  use Class::NonOO;
+
+  ...
+
+  sub my_method {
+     my ($self, @args) = @_;
+     ...
+  }
+
+  as_function
+    export => [ 'my_method' ], # methods to export
+    args   => [ ];             # constructor args
+
+The module can be be used with a function calling style:
+
+  use MyModule;
+
+  ...
+
+  my_method(@args);
+
+=head1 INSTALLATION
+
+See
+L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>.
+
+=head2 Required Modules
+
+This distribution requires Perl v5.10.1.
+
+This distribution requires the following modules:
+
+=over 4
+
+=item * L<List::MoreUtils>
+
+=item * L<Package::Stash>
+
+=item * L<Test::Most>
+
+=back
+
+This distribution recommends the following modules:
+
+=over 4
+
+=item * L<Package::Stash::XS>
+
+=back
+
+=head1 RECENT CHANGES
+
+=head2 Bug Fixes
+
+=over 4
+
+=item * 
+
+Fix tests to work with older versions of Moo.
+
+=back
+
+=head2 Documentation
+
+=over 4
+
+=item * 
+
+Update copyright year to 2016.
+
+=back
+
+See the F<Changes> file for a longer revision history.
+
+=head1 DESCRIPTION
+
+This module allows you to turn a class into a module that exports
+methods as functions that use an implicit singleton.  This allows you
+to provide a "hybrid" object-oriented/functional interface.
+
+=head1 EXPORTS
+
+=head2 C<as_function>
+
+  as_function
+    export      => [ ... ], # @EXPORT
+    export_ok   => [ ... ], # @EXPORT_OK (optional)
+    export_tags => { ... }, # %EXPORT_TAGS (optional)
+    args        => [ ... ], # constructor args (optional)
+    global      => 0;       # no global state (default)
+
+This wraps methods in a function that checks the first argument. If
+the argument is an instance of the class, then it assumes it is a
+normal method call.  Otherwise it assumes it is a function call, and
+it calls the method with the singleton instance.
+
+If the C<export> option is omitted, it will default to the contents of
+the C<@EXPORT> variable. The same holds for the C<export_ok> and
+C<export_tags> options and the C<@EXPORT_OK> and C<%EXPORT_TAGS>
+variables, respectively.
+
+Note that this will not work properly on methods that take an instance
+of the class as the first argument.
+
+By default, there is no global state. That means that there is a
+different implicit singleton for each namespace.  This offers some
+protection when the state is changed in one module, so that it does
+not affect the state in another module.
+
+If you want to enable global state, you can set C<global> to a true
+value.  This is not recommended for CPAN modules.
+
+You might work around this by using something like
+
+  local %MyClass::_DEFAULT_SINGLETONS;
+
+but this is not recommended.  If you need to modify state and share it
+across modules, you should be passing around individual objects
+instead of singletons.
+
+=head1 SEE ALSO
+
+L<Class::Exporter> is a similar module.
+
+=head1 AUTHOR
+
+Robert Rothenberg, C<< <rrwo at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015-2016 Robert Rothenberg.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+

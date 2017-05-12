@@ -1,0 +1,23 @@
+0.000005 Fri Apr  9 01:08:13 BST 2010
+
+ - Change official repository to Catalyst git.
+ - Call the heavy part of the code less often
+ - Fix // url rewrite bug
+ - Accept relative 'X-Request-Base' headers
+
+0.000004 Wed Oct 14 12:04:02 BST 2009
+
+ - Apply the specified path and scheme to $c->req->uri, update POD.
+
+0.000003
+
+ - Update POD, include one line summary in Name
+
+0.000002
+
+ - Always apply the Request base to $c->req->base, not just on assignment.
+
+0.000001
+
+ - Initial version.
+

@@ -1,0 +1,74 @@
+{
+   "abstract" : "Simple initialization for command-line scripts",
+   "author" : [
+      "Len Budney <len.budney@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CLI-Startup",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Trap" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.33"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::INI::Writer" : "0",
+            "Config::Tiny" : "0",
+            "JSON::Any" : "0",
+            "XML::Simple" : "0",
+            "YAML::Any" : "0"
+         },
+         "requires" : {
+            "Class::Std" : "0.01",
+            "Clone" : "0",
+            "Config::Any" : "0",
+            "Data::Dumper" : "0",
+            "English" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::HomeDir" : "0.97",
+            "Getopt::Long" : "2.38",
+            "Hash::Merge" : "0",
+            "List::Util" : "0",
+            "Pod::Text" : "3.01",
+            "Symbol" : "0",
+            "Text::CSV" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "CLI::Startup" : {
+         "file" : "lib/CLI/Startup.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.17"
+}

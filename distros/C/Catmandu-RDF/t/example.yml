@@ -1,0 +1,7 @@
+---
+'http://example.org':
+    a: rdfs_Resource
+    dc_title: BÄR@
+    dc_extent: 42^xs_integer
+    'http://example.org/foo': bär@en
+...

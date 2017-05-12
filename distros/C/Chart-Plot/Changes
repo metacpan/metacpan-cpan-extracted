@@ -1,0 +1,42 @@
+Revision history for Perl module Chart::Plot
+
+v 0.0 - 08 March 1998 
+        - first version
+v 0.01 - 09 March 1998; 
+         - _getOM reports >= max instead of >;
+         - fixed bug in setData() data check
+v 0.02 - 10 March 1998; 
+         - changed error handling in setData() (public method) which
+           now returns undef on success and sets $self->error ;
+         - changed legend to title (public method)
+         - adjusted horizontal tick labels up a bit
+v 0.03 - 15 March 1998
+         - added colors and dashed line options to dataset graph style
+         - added option to pass dataset as two arrays (@xdata, @ydata)
+         - added hack for case om == max
+v 0.04 - 15 March 1998
+         - added general purpose setGraphOptions()
+v 0.05 - 18 March 1998
+         - added synopsis to pod
+         - added getBounds()
+         - Hor axis label is set below and right centered or justified.
+         - additional vertical offset if title is present; larger font
+v 0.06 - 22 March 1998
+         - removed title, offset and axis label methods in favor of
+           setGraphOptions()
+         - added getBounds()
+v 0.07 - 29 May 1998
+         - finally put into standard h2xs form
+         - added check for tick step too small
+         - changed data validity check to permit scientific notation
+           but this invites awful looking tick labels
+v 0.08 - 15 Dec 1998
+         - added access to GD object: getGDobject() and data2pxl() 
+v 0.09 - 26 July 1999
+         - added custom tick labels: xTickLabels, yTickLabels
+         - added binmode() to install test and demo script
+v 0.10 - 22 May 2000
+         - added @_image_types and image_type() to use gif, jpeg or png
+           according to local version of GD; modified draw() and _init()
+v 0.11 - 04 April 2001
+         - fixed bug in draw() to enable jpeg's

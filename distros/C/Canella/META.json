@@ -1,0 +1,112 @@
+{
+   "abstract" : "Simple Deploy Tool A La Cinnamon",
+   "author" : [
+      "Daisuke Maki <daisuke@endeworks.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.2",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Canella",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Coro" : "0",
+            "Guard" : "0",
+            "Hash::MultiValue" : "0",
+            "IPC::Run" : "0",
+            "JSON" : "0",
+            "Log::Minimal" : "0",
+            "Moo" : "0",
+            "Net::OpenSSH" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Canella" : {
+         "file" : "lib/Canella.pm",
+         "version" : "0.05"
+      },
+      "Canella::BlockGuard" : {
+         "file" : "lib/Canella/BlockGuard.pm"
+      },
+      "Canella::CLI" : {
+         "file" : "lib/Canella/CLI.pm"
+      },
+      "Canella::Context" : {
+         "file" : "lib/Canella/Context.pm"
+      },
+      "Canella::DSL" : {
+         "file" : "lib/Canella/DSL.pm"
+      },
+      "Canella::Exec::Local" : {
+         "file" : "lib/Canella/Exec/Local.pm"
+      },
+      "Canella::Exec::Remote" : {
+         "file" : "lib/Canella/Exec/Remote.pm"
+      },
+      "Canella::Log" : {
+         "file" : "lib/Canella/Log.pm"
+      },
+      "Canella::Role" : {
+         "file" : "lib/Canella/Role.pm"
+      },
+      "Canella::Task" : {
+         "file" : "lib/Canella/Task.pm"
+      },
+      "Canella::TaskRunner" : {
+         "file" : "lib/Canella/TaskRunner.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/p5-Canella/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/p5-Canella",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-Canella.git",
+         "web" : "https://github.com/lestrrat/p5-Canella"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

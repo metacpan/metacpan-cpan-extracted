@@ -1,0 +1,183 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $VERSION = '0.03';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+cpanstats-writeexcel - helper script to map tester addresses to real people.
+
+=head1 SYNOPSIS
+
+  perl cpanstats-writeexcel
+        [--path|p=<directory>]  \
+        [--log|l=<file>]   \
+        [--logclean]
+
+=head1 DESCRIPTION
+
+Using the cpanstats database, the latest 01mailrc.txt file and the addresses
+file, the script tries to match unmatched tester addresses to either a cpan
+author or an already known tester.
+
+For the remaining addresses, an attempt at pattern matching is made to try and
+identify similar addresses in the hope they can be manually identified.
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use lib qw(./lib);
+use CPAN::Testers::WWW::Statistics::Excel;
+use Getopt::ArgvFile default=>1;
+use Getopt::Long;
+
+# -------------------------------------
+# Variables
+
+my (%options);
+my %defaults = (
+    'path'      => '/var/www/cpanstats',
+    'log'       => 'logs/cpanstats.log',
+    'logclean'  => 1
+);
+
+my @files = (
+    { source => '/osmatrix-month-wide.html',        target => '/osmatrix-month.xls' },
+    { source => '/osmatrix-full-wide.html',         target => '/osmatrix-full.xls' },
+    { source => '/osmatrix-full-month-wide.html',   target => '/osmatrix-full-month.xls' },
+    { source => '/osmatrix-wide.html',              target => '/osmatrix.xls' },
+
+    { source => '/pmatrix-month-wide.html',         target => '/pmatrix-month.xls' },
+    { source => '/pmatrix-full-wide.html',          target => '/pmatrix-full.xls' },
+    { source => '/pmatrix-full-month-wide.html',    target => '/pmatrix-full-month.xls' },
+    { source => '/pmatrix-wide.html',               target => '/pmatrix.xls' },
+);
+
+# -------------------------------------
+# Program
+
+init_options();
+
+my $x = CPAN::Testers::WWW::Statistics::Excel->new(
+            logfile     => $options{'log'},
+            logclean    => $options{'logclean'});
+
+my $files (@files) {
+    $x->create( 
+        source      => $options{'path'} . $files->{source},
+        target      => $options{'path'} . $files->{target});
+}
+
+# -------------------------------------
+# Subroutines
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item init_options
+
+Prepare command line options
+
+=cut
+
+sub init_options {
+    GetOptions( \%options,
+        'path|p=s',
+        'log|l=s',
+        'logclean',
+        'help|h'
+    );
+
+    _help(1) if($options{help});
+
+    # use defaults if none provided
+    for my $opt (qw(path log logclean)) {
+        $options{$opt} = _defined_or( $options{$opt}, $defaults{$opt} );
+    }
+
+    _help(1,"path is not accessible [$options{path}].")   unless(-r $options{$opt});
+
+}
+
+sub _help {
+    my ($full,$mess) = @_;
+
+    print "\n$mess\n\n" if($mess);
+
+    if($full) {
+        print "\n";
+        print "Usage:$0 [--help|h] \\\n";
+        print "         [--path|p=<directory>] \\\n";
+        print "         [--log|l=<file>] \\\n";
+        print "         [--logclean=[0|1]] \n\n";
+
+#              12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        print "This program checks for unknown tester addresses.\n";
+
+        print "\nFunctional Options:\n";
+        print "  [--path=<directory>]   # path to output directory\n";
+        print "  [--log=<file>]         # path/file to log file\n";
+        print "  [--logclean=[0|1]]     # append (0) or overwrite (1) logfile\n";
+
+        print "\nOther Options:\n";
+        print "  [--help]               # this screen\n";
+
+        print "\nFor further information type 'perldoc $0'\n";
+    }
+
+    print "$0 v$VERSION\n";
+    exit(0);
+}
+
+sub _defined_or {
+    while(@_) {
+        my $value = shift;
+        return $value   if(defined $value);
+    }
+
+    return;
+}
+
+__END__
+
+=back
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to the RT Queue (see below).
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Statistics
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::Data::Generator>,
+L<CPAN::Testers::WWW::Reports>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2009-2013 Barbie for Miss Barbell Productions.
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.
+
+=cut

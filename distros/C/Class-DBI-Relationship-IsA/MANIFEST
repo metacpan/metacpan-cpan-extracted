@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+CREDITS
+TODO
+BUGS
+examples/Address/DBI.pm
+examples/Address.pm
+examples/Place.pm
+examples/myaddress.pl
+t/Class-DBI-Relationship-IsA.t
+lib/Class/DBI/Relationship/IsA.pm
+META.yml                                 Module meta-data (added by MakeMaker)

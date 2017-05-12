@@ -1,0 +1,26 @@
+---
+abstract: 'DEPRECATED Dispatch XMLRPC methods with Catalyst'
+author:
+  - 'Sebastian Riedel, C<sri@oook.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-XMLRPC
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.66
+  RPC::XML: 0.69
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/historical/Catalyst-Plugin-XMLRPC/
+version: 2.01

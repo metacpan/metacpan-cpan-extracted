@@ -1,0 +1,19 @@
+==============================
+2012-08-21 10:29:54 +0100 0.04
+==============================
+
+  commit eced7df11a7db389c57e3613bd4c9512074aba29
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Aug 21 10:29:54 2012 +0100
+  
+    Bump to version 0.04
+
+  commit 0d6546b540e1d57ea4bf52cae8d02f3749a94838
+  Author: David Leadbeater <dgl@dgl.cx>
+  Date:   Mon Aug 20 16:44:18 2012 +0200
+  
+    Handle HEAD requests, fixes usage with minicpan 
+
+====================================
+End of changes in the last 1825 days
+====================================

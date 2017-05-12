@@ -1,0 +1,15 @@
+TYPEMAP
+TCCState*    T_PTR
+TCCStateObj* TCC_STATE_OBJ
+
+INPUT
+TCC_STATE_OBJ
+	if(sv_derived_from($arg, \"C::TinyCompiler\")) {
+		HV * obj_hash = (HV*)SvRV($arg);
+		SV** var_ptr = hv_fetchs(obj_hash, \"_state\", 0);
+		if (var_ptr == 0) croak(\"Unable to retrieve tcc state!\");
+		$var = INT2PTR($type,SvIV(*var_ptr));
+	}
+	else {
+		croak(\"$var is not of type C::TinyCompiler\");
+	}

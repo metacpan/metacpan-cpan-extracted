@@ -1,0 +1,127 @@
+NAME
+    Cocoa::BatteryInfo - Getting battery informations on your Mac
+
+SYNOPSIS
+    Get battery informations
+
+        use Cocoa::BatteryInfo;
+    
+        # get information for first battery source
+        my $info = Cocoa::BatteryInfo->current_info;
+    
+        # get information for all battery sources
+        my @sources = Cocoa::BatteryInfo->sources;
+        for my $source (@sources) {
+            my $info = Cocoa::BatteryInfo->current_info($source);
+            ...
+        }
+    
+        # get estimated time remaining until all power sources are empty
+        my $sec = Cocoa::BatteryInfo->time_remaining_estimate;
+
+    Get battery related notifications with Cocoa::EventLoop
+
+        use Cocoa::BatteryInfo;
+        use Cocoa::EventLoop;
+    
+        Cocoa::BatteryInfo::low_battery_handler {
+            # called when the battery time remaining drops into a warnable level.
+            my $warning_level = Cocoa::BatteryInfo->battery_warning_level;
+            ...
+        };
+    
+        Cocoa::BatteryInfo::time_remaining_handler {
+            # called when the power source(s) time remaining changes.
+            my $remaining_sec = Cocoa::BatteryInfo->time_remaining_estimate;
+            ...
+        };
+    
+        # run event loop
+        Cocoa::EventLoop->run;
+
+DESCRIPTION
+    This module provides several functions to get battery information about
+    your Mac computers. Optionally this module also supports some
+    notifications (low battery notifications, time remaining change
+    notifications) with Cocoa::EventLoop.
+
+    This module requires Mac OS X 10.7 or later because it depends new IOKit
+    APIs.
+
+CLASS METHODS
+  info($source_name : Str)
+        my $info = Cocoa::BatteryInfo->info;
+        # or
+        my $info = Cocoa::BatteryInfo->info($source_name);
+
+    Returns readable information about the specific power source.
+
+    If $source_name is not set, returns first source information. If system
+    doesn't have any battery, returns nothing.
+
+  sources()
+        my @sources = Cocoa::BatteryInfo->sources;
+
+    Returns list of power sources that connected to current machine.
+
+  time_remaining_estimate()
+        my $sec = Cocoa::BatteryInfo->time_remaining_estimate;
+
+    Returns 'unknown' if the OS cannot determine the time remaining. Returns
+    'unlimited' if the system has an unlimited power source.
+
+    Otherwise returns estimated time remaining until all power sources are
+    empty (in seconds).
+
+  battery_warning_level()
+        my $level = Cocoa::BatteryInfo->battery_warning_level;
+
+    Indicates whether the system is at a low battery warning level.
+
+    $level is one of following levels:
+
+    *   Cocoa::BatteryInfo::LowBatteryWarningNone (== 1) (No battery
+        warnings)
+
+    *   Cocoa::BatteryInfo::LowBatteryWarningEarly (== 2) (Early battery
+        warnings)
+
+    *   Cocoa::BatteryInfo::LowBatteryWarningFinal (== 3) (Final battery
+        warnings)
+
+CALLBACKS
+  low_battery_handler($callback :CodeRef)
+    Register low battery event handler called when the battery time
+    remaining drops into a warnable level.
+
+  time_remaining_handler($callback :CodeRef)
+    Register time remaining event handler called when the power source(s)
+    time remaining changes.
+
+NOTICE
+    Callbacks listed above do nothing without under the Cocoa's event loop.
+
+    To work those callbacks correctly, you have to use this module with
+    Cocoa::EventLoop:
+
+        use Cocoa::EventLoop;
+        use Cocoa::BatteryInfo;
+    
+        Cocoa::BatteryInfo::low_battery_handler {
+            # do something;
+        };
+    
+        Cocoa::EventLoop->run;
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2012 Daisuke Murase. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

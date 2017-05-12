@@ -1,0 +1,22 @@
+---
+name: Class-Inflate
+version: 0.07
+author:
+  - 'kolibrie <kolibrie@cpan.org>'
+abstract: Inflate HASH Object from Values in Database
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Devel::Messenger: 0
+build_requires:
+  DBD::SQLite: 0
+  Test::Debugger: 0
+provides:
+  Class::Inflate:
+    file: lib/Class/Inflate.pm
+    version: 0.07
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

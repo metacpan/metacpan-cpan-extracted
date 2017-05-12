@@ -1,0 +1,276 @@
+2012-11-01  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.5.6:
+	* MANIFEST
+	- remove blib/
+
+2012-11-01  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.5.5:
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- add an extra pair of parens, thanks ANDK
+
+2010-05-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.5.4:
+	* t/perlcritic.t
+	- check $ENV{TEST_CRITIC} whether to execute this test
+
+2008-10-19  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.5.3:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- fix a minor bug of 0.5.2
+
+2008-10-19  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.5.2:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- apply eval to parse Atom Entry
+
+2008-04-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.5.1:
+	- re-upload since previous version was failed
+
+2008-04-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.5.0:
+	* Makefile.PL
+	- use Module::Install
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- introduce make_collection_uri() method to change the
+	  collection URI
+	- assign $self->entry_resource before calling
+	  $self->make_entry_uri
+	* lib/Catalyst/Helper/Controller/Atompub/Base.pm
+	- fix get() to utilize $controller->make_collection_uri()
+	- collection information is dynamically generated and not
+	  cached
+	* lib/Catalyst/Helper/Controller/Atompub/Base.pm
+	- service document is not cached and $controller->service() is
+	  removed
+	* samples/OurBlogs
+	- show how to change collection URIs
+
+2008-04-03  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.4.3:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- revert /feed/id format to URI
+
+2008-03-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.4.2:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- remove duplicated 'my'
+
+2008-03-25  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.4.1:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- change //id format like tag:diveintomark.org,2004-05-27:/archives/2004/05/27/howto-atom-linkblog
+	- set //entry/id only if id is not defined
+
+2008-03-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.4.0:
+	* lib/
+	- major refactoring
+	- change coding conventions
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- enable returning 204 (No Content) on PUT
+	- write how to change the collection URI in POD
+	* lib/Catalyst/Helper/Controller/Atompub/Base.pm
+	- use Class::Accessor::Fast instead of Class::Accessor::Lvalue::Fast
+
+2008-02-29  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.7:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- add //entry/author/name and //entry/title if not exist
+
+2008-02-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.6:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- remove '/' from LocalRegex of edit_uri()
+
+2008-02-25  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.5:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- specify error message on missing If-match header, thanks Keith
+
+2008-02-19  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.4:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- remove query from URI for member resources
+	- add some characters to LocalRegex of edit_uri()
+
+2008-02-15  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.3:
+	* lib/Catalyst/Helper/Controller/Atompub/Base.pm
+	- fix a bug in parsing arguments
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	- throw an error if HTTP body doesn't exist
+	- set //entry/summary in Media Link Entries
+	- add checks for some undef variables
+	* samples/MyBlog/lib/MyBlog/Controller/Html.pm
+	- add checks for some undef variables
+	* samples/MyBlog/lib/MyBlog/Controller/MediaCollection.pm
+	- overwrite //entry/content/@src and @type in Media Link
+	  Entries
+	* samples/MyBlog/t/01.t
+	- add tests for //entry/content/@src and @type in Media Link
+	  Entries
+
+2008-01-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.2:
+	* Build.PL
+	- fix dependency
+
+2007-12-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.1:
+	* lib/Catalyst/Helper/Controller/Atompub/Base.pm
+	- fix a bug in error method
+
+2007-12-08  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.3.0:
+	* lib/Catalyst/Helper/Controller/Atompub/Collection.pm
+	  lib/Catalyst/Helper/Controller/Atompub/Service.pm
+	- new helper classes
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- parse method attributes by using Text::CSV (multiple
+	  attributes are allowed, like ":Atompub(create, update)")
+	* Build.PL
+	- fix dependency
+
+2007-12-07  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.2.4:
+	* MANIFEST
+	- add samples/*/atom.db
+
+2007-12-07  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.2.3:
+	* samples/
+	- change database to SQLite3 from MySQL
+	- remove unnecessary POD
+
+2007-11-29  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.2.2:
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- unquote If-Match/If-None-Match values
+	  thanks Marumoto
+
+2007-11-19  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.2.1:
+	* samples
+	- insert line feeds at package lines to hide package name from
+	  PAUSE.
+	* samples/MyBlog
+	- don't authenticate for HEAD
+
+2007-11-17  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.2.0:
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- fix a bug to respond 405 when unknown HTTP method 
+          received
+	- process HEAD requests
+	* samples/MyBlog
+	- add //link[@rel=service]
+	- redirect to /html if a path is not defined
+
+2007-10-02  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+        * release 0.1.8:
+	* Build.PL
+	- specify the version of Catalyst::Plugin::Static::Simple
+
+2007-09-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.7:
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- modify POD slightly
+
+2007-09-27  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.6:
+	* lib/Catalyst/Controller/Atompub/Base.pm
+	- modify error handling
+
+2007-09-26  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.5:
+	* lib/Catalyst/Controller/Atompub/Service
+	- don't set Content-Type and body if already set
+	* lib/Catalyst/Controller/Atompub/Base
+	- modify error handling
+
+2007-09-18  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.4:
+	* samples/MyBlog
+	- add /feed/link[@type=alternate]
+	* Build.PL
+	- fix dependency
+
+2007-09-16  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.3:
+	* Makefile.PL
+	- build_class => Module::Build
+
+2007-09-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.2:
+	* samples/MyBlog
+	- don't update atom:updated in a Media Link Entry when the
+	  corresponding Media Resource is updated
+
+2007-09-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.1:
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- fix POD on cache control
+
+2007-09-14  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.1.0:
+	- thanks Tim for testing
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- don't check If-Match on DELETE
+	- move an accessor for edited to the parent module
+	  Catalyst::Controller::Atompub::Collection
+	* samples/MyBlog
+	- update app:edited and atom:updated in a Media Link Entry when
+	  the corresponding Media Resource is updated
+	- change DB schema
+
+2007-09-12  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.3:
+	* samples/MyBlog
+	- returns 404 at MyBlog/Controller/Root.pm
+	* lib/Catalyst/Controller/Atompub/Collection.pm
+	- rewrite make_edit_uri in POD
+
+2007-09-11  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.2:
+	* samples/MyAtom
+	- rename sample application to MyAtom from MyApp
+
+2007-09-10  Takeru INOUE  <takeru.inoue _ gmail.com>
+
+	* release 0.0.1: created by Module::Starter

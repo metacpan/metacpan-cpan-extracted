@@ -1,0 +1,16 @@
+Changes
+lib/Crypt/X509.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/aj.cer
+t/aj2.cer
+t/allianz_root.cer
+t/Crypt-X509.t
+t/new_root_ca.cer
+t/subca_2.cer
+t/telesec_799972029.crt
+t/verisign.der
+t/dsacert.der
+t/pgpextension.der

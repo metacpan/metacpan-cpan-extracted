@@ -1,0 +1,82 @@
+
+#---------------------------------------------------------- -*-perl-*-
+# Code common to both XS and pure Perl versions:
+#---------------------------------------------------------------------
+# Validate mapping table (and 'pack' it if necessary):
+
+sub prepare_mapping {
+  return unless defined $_[0];
+
+  return if length $_[0] == 256;
+
+  unless ($_[0] =~ /[^0-9A-Fa-f\s]/) {
+    $_[0] =~ s/\s+//g;          # Delete whitespace
+
+    unless (length($_[0]) % 2) {
+      $_[0] = pack('H*', $_[0]);
+
+      return if length $_[0] == 256;
+    } # end unless we have an odd number of digits
+  } # end unless string doesn't look like hexadecimal
+
+  croak("$_[1] is not valid");
+} # end prepare_mapping
+
+#---------------------------------------------------------------------
+# Find the inverse of a mapping table (must be 1-to-1):
+
+sub invert_mapping {
+  my @orig = unpack('C256', $_[0]);
+
+  my @new = (undef) x 256;
+
+  foreach my $i (0 .. 255) {
+    $new[$orig[$i]] = $i;
+  }
+
+  if (grep { not defined $_ } @new) {
+    croak("Translation is not 1-to-1;" .
+          " you must supply both ASCII->EBCDIC and EBCDIC->ASCII mappings");
+  }
+
+  pack('C256', @new);
+} # end invert_mapping
+
+#---------------------------------------------------------------------
+# Set a user-specified translation table:
+
+sub set_translation {
+  my ($a2e_table, $e2a_table, $e2ap_table) = @_;
+
+  prepare_mapping($a2e_table,  'ASCII->EBCDIC mapping');
+  prepare_mapping($e2a_table,  'EBCDIC->ASCII mapping');
+  prepare_mapping($e2ap_table, 'EBCDIC->printable ASCII mapping');
+
+  if (not defined $a2e_table) {
+    croak("Neither ASCII->EBCDIC nor EBCDIC->ASCII mapping was defined")
+        unless defined $e2a_table;
+    $a2e_table = invert_mapping($e2a_table);
+  } elsif (not defined $e2a_table) {
+    $e2a_table = invert_mapping($a2e_table);
+  }
+
+  if (not defined $e2ap_table) {
+    $e2ap_table = $e2a_table;
+    $e2ap_table =~ s/[^\w.<(+|&!\$*)\\;\-\/,\%>\?\`:#\@\'=\"~\[\]\{\}]/ /g;
+  }
+
+  _set_translation($a2e_table, $e2a_table, $e2ap_table);
+} # end set_translation
+
+#---------------------------------------------------------------------
+sub set_codepage {
+  my $codepage = $_[0];
+
+  eval "use Convert::IBM390::$codepage;";
+  croak "Unable to set code page $codepage: $@" if $@;
+}
+
+#=====================================================================
+1;
+
+__END__

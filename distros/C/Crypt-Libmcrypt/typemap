@@ -1,0 +1,7 @@
+MCRYPT						T_PTROBJ
+const char *					T_PTROBJ
+const char * ( * get_error ) ( void )		T_PTROBJ
+int *						T_PTROBJ
+void ( * mutex_lock ) ( void )			T_PTROBJ
+void ( * mutex_unlock ) ( void )		T_PTROBJ
+void ( * set_error ) ( const char * )		T_PTROBJ

@@ -1,0 +1,40 @@
+Class::DBI::Cacheable version 0.01
+==================================
+
+package YourApp::DB;
+use base 'Class::DBI::Cacheable';
+__PACKAGE__->set_db( Main => 'dbi:Pg:dbname=database', 'username', 'password' );
+
+Class::DBI::Cacheable transparently provides cache support to your Class::DBI
+framework, with setting, getting and removing of cache entries handled for you.
+This can drastically increase performance of applications that use Class::DBI
+extensively, since repeated retrievals of the same data from a database is
+prevented.
+
+Class::DBI::Cacheable is highly configurable to your application; see the
+documentation for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBI
+CLASS
+Class::DBI
+Cache::Cache
+Cache::FileCache
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

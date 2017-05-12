@@ -1,0 +1,67 @@
+
+NAME
+       CHI::Driver::Ping - Cache data in the Ether.
+
+SYNOPSIS
+         use CHI;
+
+         $< == 0 or exec 'sudo', $0, @ARGV; # sending ICMPs requires root priv
+
+         system 'sysctl', '-w', 'net.ipv4.icmp_ratelimit=100000';
+
+         my $cache = CHI->new( driver => 'Ping', ip => 74.125.73.105 ); # google IP
+
+DESCRIPTION
+       Tap into the Ether.  Optimize for CPU or storage?  Fuck that.
+
+       If you thought the Cloud was awesome, just wait until you try storing
+       your data in the Ether.
+
+       Inspired by Delay Line Memory,
+       <http://en.wikipedia.org/wiki/Delay_line_memory>, this modules stores
+       data by transmitting it through a medium known to have a delay and
+       waiting for it to come back again, whereupon it both returns it and
+       retransmits it out again.
+
+       It seems rather pointless and silly to bother with spinning metal oxide
+       covered platters or billions of tiny capacitors when data can be stored
+       in the air between the Earth and sattelites, in ordinary copper wire,
+       and in easy to extrude lengths of glass fiber.
+
+ATTRIBUTES
+       ip  Who to send all of the ICMP ECHOPINGs to.
+
+       namespace
+           Not currently used (XXX).
+
+TODO
+       CIDR block of hosts to use, or a list, or something.  Even better, scan
+       the network for hosts that are up and build this dynamically.  For
+       extra points, find hosts with a lot of hops to them.
+
+       namespace. XXX.
+
+       remove. XXX.
+
+       purge. XXX.
+
+BUGS
+       0.00000001
+           Initial; github dev version.  Requires root privilege.
+
+Authors
+       CHI::Driver::Ping by Scott Walters (scott@slowass.net) with suggestions
+       from Brock Wilcox (awwaiid@thelackthereof.org).
+
+       Uses code stolen from Net::Ping by bbb@cpan.org (Rob Brown),
+       colinm@cpan.org (Colin McMillen), bronson@trestle.com (Scott Bronson),
+       karrer@bernina.ethz.ch (Andreas Karrer), pmarquess@bfsec.bt.co.uk (Paul
+       Marquess), and mose@ns.ccsn.edu (Russell Mosemann).  These folks shall
+       remain blameless for my actions.
+
+COPYRIGHT & LICENSE
+       Copyright (c) Scott Walters (scrottie) 2011
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+

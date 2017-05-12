@@ -1,0 +1,33 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/omega/catalyst-plugin-devel-moduleversions"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.093400",
+   "version" : "0.100330",
+   "name" : "Catalyst-Plugin-Devel-ModuleVersions",
+   "author" : [
+      "Andreas Marienborg <andremar@cpan.org>"
+   ],
+   "license" : "perl",
+   "requires" : {
+      "Test::MockObject" : "0",
+      "Getopt::Long" : "0",
+      "base" : "0",
+      "FindBin" : "0",
+      "Pod::Usage" : "0",
+      "ExtUtils::MakeMaker" : 0,
+      "TestApp" : "0",
+      "ok" : "0",
+      "Test::More" : "0",
+      "Catalyst" : "0",
+      "Test::WWW::Mechanize::Catalyst" : "0",
+      "mro" : "0",
+      "MRO::Compat" : "0",
+      "Catalyst::Test" : "0"
+   },
+   "abstract" : "Dump your loaded module versions to the debug-screen"
+}

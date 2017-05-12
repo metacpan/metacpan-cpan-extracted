@@ -1,0 +1,43 @@
+<h2>Image List</h2>
+
+<div class="boxer">
+<table class="blocker">
+<tr><td>
+    <form action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name='act' value='imgs-admin' />
+    <p>Search by Type: [% ddtypes %] <input type="submit" value='GO' />
+    | <a href="[% cgipath %]/pages.cgi?act=imgs-admin">view all</a>
+    | <a href="[% cgipath %]/pages.cgi?act=imgs-add">create an image</a>
+    </form>
+</td></tr>
+</table>
+</div>
+
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>ID</th>
+    <th>Tag</th>
+    <th>Type</th>
+    <th>Actions</th>
+</tr>
+
+[% IF data %]
+[% FOREACH item = data %]
+
+<tr>
+    <td>[% item.imageid %]</td>
+    <td>[% item.tag %]</td>
+    <td>[% item.typename %]</td>
+    <td nowrap="nowrap"><a href='[% cgipath %]/pages.cgi?act=imgs-delete&amp;item=[% item.imageid %]'>delete</a> | <a href='[% cgipath %]/pages.cgi?act=imgs-edit&amp;item=[% item.imageid %]'>edit</a></td>
+</tr>
+
+[% END %]
+[% ELSE %]
+<tr><td colspan="4" align="center">No images currently available.</td></tr>
+[% END %]
+
+</table>
+</div>
+

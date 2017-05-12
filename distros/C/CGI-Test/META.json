@@ -1,0 +1,58 @@
+{
+   "abstract" : "CGI regression test framework",
+   "author" : [
+      "Alex Tokarev <tokarev@cpan.org>",
+      "Steven Hilton <mshiltonj@mshiltonj.com>",
+      "Raphael Manfredi <Raphael_Manfredi@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Test",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTML::TreeBuilder" : "0",
+            "HTTP::Message" : "0",
+            "Storable" : "1.00",
+            "URI" : "1.10",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nohuhu/CGI-Test/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/nohuhu/CGI-Test"
+      }
+   },
+   "version" : "1.111"
+}

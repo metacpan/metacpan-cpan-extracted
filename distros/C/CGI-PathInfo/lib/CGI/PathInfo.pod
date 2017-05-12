@@ -1,0 +1,298 @@
+
+=head1 NAME
+
+CGI::PathInfo - A lightweight CGI processing package for using PATH_INFO like GET method form parameters
+
+=head1 SYNOPSIS
+
+ use CGI::PathInfo;
+
+ my $path_info = CGI::PathInfo->new;
+ my ($form_field_value) = $path_info->param('some_field_name');
+
+=head1 DESCRIPTION
+
+Provides a micro-weight equivalent to the CPAN CGI.pm module
+that permits the use of the CGI environment
+variable 'PATH_INFO' as a functional equivalent to
+the GET method 'QUERY_STRING'. This lets you use 'extra' URL
+path information as CGI parameters.
+
+For example, lets say you have a CGI script at URL
+http://localhost/cgi-bin/myscript
+
+If you were to call it as:
+
+http://localhost/cgi-bin/myscript/some-thing/another-something/
+
+your webserver should place '/some-thing/another-thing/' into the
+PATH_INFO environment variable when your script is run. CGI::PathInfo
+lets you treat that information as if it were ordinary CGI form data.
+
+An Example:
+
+You call http://localhost/cgi-bin/myscript/some-thing/another-something/
+on your webserver. 'myscript' contains:
+
+  #!/usr/bin/perl -Tw
+
+  use strict;
+  use CGI::PathInfo;
+
+  my $path_info = CGI::PathInfo->new;
+  my $some      = $path_info->param('some'};
+  my $another   = $path_info->param('another');
+
+At this point '$some' should contain the value 'thing' and
+'$another' should contain the value 'something'.
+
+This is B<independant> of the use of ordinary CGI parameters. It is perfectly OK
+to use I<both> the PATH_INFO and normal CGI parameters at the same time.
+
+Example:
+
+You call http://localhost/cgi-bin/myscript/some-thing/another-something/?a=b
+on your webserver. 'myscript' contains:
+
+  #!/usr/bin/perl -Tw
+
+  use strict;
+  use CGI::PathInfo;
+  use CGI::Minimal;
+
+  my $path_info = CGI::PathInfo->new;
+  my $some      = $path_info->param('some'};
+  my $another   = $path_info->param('another');
+
+  my $cgi       = CGI::Minimal->new;
+  my $a_value   = $cgi->param('a');
+
+At this point '$some' should contain the value 'thing',
+'$another' should contain the value 'something'. and
+'$a_value' should contain the value 'b'.
+
+Rather than attempt to address every possible need of a CGI
+programmer, it provides the _minimum_ functions needed for CGI such
+as parameter decoding, URL encoding and decoding.
+
+The parameters decoding interface is somewhat compatible with the
+CGI.pm module. No provision is made for generating HTTP or HTML
+on your behalf - you are expected to be conversant with how
+to put together any HTML or HTTP you need.
+
+CGI::PathInfo is compatible with ModPerl 1 in addition to normal CGI.
+
+=head1 CHANGES
+
+ 1.03 2008.07.22 - Updated for ModPerl2 compatibility
+
+ 1.02 2005.10.08 - Extended test coverage to 100% of code, fixed bug
+                   with the 'stripleadingslash', 'striptrailingslash'
+                   code, added documentation of all instantation parameters
+                   to 'new' method, fixed missing 'Build.PL' declaration
+                   in MANIFEST. Fixed mis-calls of 'croak' after delayed
+                   load in error paths.
+
+ 1.01 2005.09.30 - Seperated POD into .pod file. Added more build tests.
+                   Added Build.PL, META.yml, GPL_License.txt,
+                   Artistic_License.txt, LICENSE. Deferred loading
+                   of Carp and HTML::Entities unless needed.
+
+                   Removed dependency on 'vars'. Fixed error in output
+                   HTML from the 'calling_parms_table' method.
+
+                   Extended documentation to explain what the module
+                   is used for more clearly.
+
+ 1.00 2000.07.21 - Initial public release.
+
+=head1 METHODS
+
+=over 4
+
+=item new;
+
+Creates a new instance of the CGI::PathInfo object and decodes
+any 'PATH_INFO' parameters.
+
+Example:
+
+ use CGI::PathInfo;
+
+ my $path_info = CGI::PathInfo->new;
+
+The defaults are for the parameters to be seperated by '/' characters
+with name/value pairs linked by '-' and with leading or trailing
+'/' characters ignored.
+
+  Example:
+
+   $ENV{'PATH_INFO'} = '/yesterday-monday/tomorrow-wednesday/';
+
+   decodes to
+
+    'yesterday' -> 'monday'
+
+    'tomorrow'  -> 'wednesday'
+
+Values are read using the 'param' method.
+
+Any of the defaults may be overridden by specifying them in the
+invokation of 'new'.
+
+Example:
+
+  my $path_info = CGI::PathInfo->new({  Eq                 => '=',
+                                        SplitOn            => '&',
+                                        StripLeadingSlash  => 0,
+                                        StripTrailingSlash => 0,
+                });
+
+The C<Eq> parameter declares the key/value seperator, C<SplitOn>
+declares the parameter tuples seperator, C<StripLeadingSlash> turns
+on (or off) the stripping of '/' characters from the front of the
+path, C<StripTrailingSlash> does the same for the end of the path string.
+
+It is probably a Bad Idea (tm) to set the Eq or SplitOn
+values to a letter or a number (A-Za-z0-9) unless you
+are a wizard at encodings.
+
+The defaults were chosen to maximize the likelyhood that CGI
+backed URLs will be crawled by search engines and that
+MSIE won't try something stupid because of a '.tla' on a URL.
+
+=back
+
+=over 4
+
+=item param([$fieldname]);
+
+Called as C<$path_info-E<gt>param();> it returns the list of all defined
+parameter fields in the same order they appear in the data in
+PATH_INFO.
+
+Called as C<$path_info-E<gt>param($fieldname);> it returns the value (or
+array of values for multiple occurances of the same field name) assigned
+to that $fieldname. If there is more than one value, the values are
+returned in the same order they appeared in the data from user agent.
+
+If called in a scalar context when several values are present for
+specified parameter, the *first* value will be returned.
+
+Examples:
+
+  my (@form_fields) = $path_info->param;
+
+  my (@multi_pick_field) = $path_info->param('pick_field_name');
+
+  my ($form_field_value) = $path_info->param('some_field_name');
+
+You can also use the param method to set param values to new values.
+These values will be returned by this CGI::PathInfo object
+as if they had been found in the originally processed PATH_INFO data. This
+will not affect a seperately created instance of CGI::PathInfo.
+
+Examples:
+
+    $path_info->param( 'name' => 'Joe Shmoe' );
+
+    $path_info->param({ 'name' => 'Joe Shmoe', 'birth_date' => '06/25/1966' });
+
+    $path_info->param({ 'pick_list' => ['01','05','07'] });
+
+=back
+
+=over 4
+
+=item calling_parms_table;
+
+Returns a formatted HTML table containing all the PATH_INFO parameters
+for debugging purposes
+
+Example:
+
+  print $path_info->calling_parms_table;
+
+=back
+
+=over 4
+
+=item url_encode($string);
+
+Returns a URL encoding of the input string.
+Anything except 0-9a-zA-Z is escaped to %xx form.
+
+The idea is to reserve all other characters for potential use
+as parameter or key/value seperators.
+
+Example:
+
+ my $url_encoded_string = $path_info->url_encode($string);
+
+=back
+
+=over 4
+
+=item url_decode($string);
+
+Returns URL *decoding* of input string (%xx substitutions
+are decoded to their actual values).
+
+Example:
+
+ my $url_decoded_string = $path_info->url_decode($string);
+
+=back
+
+=head1 BUGS
+
+None known.
+
+=head1 TODO
+
+Extend build tests. Investigate ModPerl2 compatibility.
+
+=head1 AUTHORS
+
+Benjamin Franz <snowhare@nihongo.org>
+
+=head1 VERSION
+
+1.03 - released 2008.07.22
+
+=head1 COPYRIGHT
+
+Copyright (c) Benjamin Franz and FreeRun Technologies. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=cut
+

@@ -1,0 +1,37 @@
+NAME
+
+    Catmandu::RIS - Catmandu modules for working with RIS data
+
+SYNOPSIS
+
+      catmandu convert RIS < input.txt
+      
+      # Use the --human option to translate RIS tags into human readable strings
+      catmandu convert RIS --human 1 < input.txt
+    
+      # Provide a comma separated mapping file to translate RIS tags
+      catmandu convert RIS --human mappings/my_tags.txt < input.txt
+
+Author
+
+    Nicolas Steenlant
+
+CONTRIBUTOR
+
+    Vitali Peil
+
+    Patrick Hochstenbach
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Catmandu, Catmandu::Exporter, Catmandu::Importer
+
+ for other bibliographic formats
+
+    Catmandu::BibTeX
+

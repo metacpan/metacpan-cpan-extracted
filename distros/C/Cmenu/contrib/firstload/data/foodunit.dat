@@ -1,0 +1,14 @@
+INSERT INTO foodunit VALUES(1,'each','unit',0,1);
+INSERT INTO foodunit VALUES(2,'g','grammes',2,1);
+INSERT INTO foodunit VALUES(3,'kg','kilogrammes',3,1);
+INSERT INTO foodunit VALUES(4,'L','litre',5,1000);
+INSERT INTO foodunit VALUES(5,'cc','cc',5,1);
+INSERT INTO foodunit VALUES(6,'ml','ml',5,0.1);
+INSERT INTO foodunit VALUES(7,'cl','cl',5,1);
+INSERT INTO foodunit VALUES(8,'g','',1,1);
+INSERT INTO foodunit VALUES(9,'g','',1,1);
+
+INSERT INTO foodunit VALUES(10,'oz','ounce',2,28.5);
+INSERT INTO foodunit VALUES(11,'lb','pound',2,454.5);
+INSERT INTO foodunit VALUES(12,'pt','pint',5,660);
+INSERT INTO foodunit VALUES(13,'fl.oz','Fluid oz.',5,33);

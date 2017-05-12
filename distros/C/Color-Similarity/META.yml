@@ -1,0 +1,28 @@
+---
+name: Color-Similarity
+version: 0.01
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: common interface to different Color::Similarity::* modules
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Graphics::ColorObject: 0.5.0
+  Module::Build: 0.2607
+  Test::More: 0.48
+  perl: 5.6.0
+provides:
+  Color::Similarity:
+    file: lib/Color/Similarity.pm
+    version: 0.01
+  Color::Similarity::Lab:
+    file: lib/Color/Similarity/Lab.pm
+    version: 0.01
+  Color::Similarity::RGB:
+    file: lib/Color/Similarity/RGB.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

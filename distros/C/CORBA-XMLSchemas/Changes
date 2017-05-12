@@ -1,0 +1,56 @@
+Revision history for Perl extension CORBA::XMLSchemas.
+
+2.62  Wed Feb 13 12:30:00 2008
+	- fix RT 33183 (SOAP binding of User exception), thanks to Ashley Burston
+
+2.61  Mon Nov 26 12:30:00 2007
+	- fix RT 30893 (SOAP binding of System exception)
+
+2.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+0.42  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+0.41  Wed Nov 23 22:30:00 2005
+	- better inheritance of valuetype
+
+0.40  Mon May  2 22:30:00 2005
+	- CORBA to WSDL/SOAP Interworking Specification, Version 1.1 February 2005
+	- and many improvements
+
+0.21  Mon Jun  7 08:30:00 2004
+	- better support of 'import'
+
+0.20  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+
+0.13  Tue Mar 16 08:30:00 2004
+	- add a corba.xsd file
+	- wsdl.pm : url ended by '/'
+	- wsdl.pm : <part> to <wsdl:part>
+	- xsdname.pm : corba:ObjectReference
+	- wsdl.pm : add xmlns:corba in <definitions>
+
+0.12  Mon Mar  8 12:30:00 2004
+	- xsd.pm : bug
+	- wsdl.pm : bug
+
+0.11  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+
+0.10  Thu Feb 19 18:30:00 2004
+	- compatible with CORBA::IDL 2.20
+	- add option -h (display help)
+	- add option -v (display version)
+
+0.03  Mon Jan  5 12:30:00 2004
+
+0.02  Mon Nov 17 12:30:00 2003
+	- first release
+
+0.01  Sun Sep 21 11:57:47 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n CORBA::XMLSchemas
+

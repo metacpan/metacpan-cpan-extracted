@@ -1,0 +1,37 @@
+Apache/ChildExit version 0.1
+==============================
+
+DESCRIPTION
+
+Apache::Registry has a curious design feature that executes END blocks
+repeatedly.  This feature was probably intended so that script writers 
+can easily add clean-up routines.   However, this feature changes the 
+intended behavior of most modules.
+
+Apache::ChildExit allows scripters to postpone running END blocks until 
+the ChildExit stage of an Apache process.
+
+For more information, see the documentation in the file ChildExit.pm.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+The Makefile.PL variable $APACHE_HOME should be confirmed before starting.
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ModPerl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Jim Schueler  jschueler@tqis.com
+

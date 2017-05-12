@@ -1,0 +1,48 @@
+<script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // email: standard text, hidden, password, or textarea box
+    var email = form.elements['email'].value;
+    if (email != null && email != "" && ! email.match(/^[\w\-\+\._]+\@[a-zA-Z0-9][-a-zA-Z0-9\.]*\.[a-zA-Z]+$/)) {
+        alertstr += '- Invalid entry for the "Email" field\n';
+        invalid++;
+        invalid_fields.push('email');
+    }
+    // first_name: standard text, hidden, password, or textarea box
+    var first_name = form.elements['first_name'].value;
+    if (first_name == null || first_name === "") {
+        alertstr += '- Invalid entry for the "First Name" field\n';
+        invalid++;
+        invalid_fields.push('first_name');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+<noscript><span class="fb_invalid">Please enable Javascript or use a newer browser.</span></noscript>
+<p>Fields that are <span class="fb_required">highlighted</span> are required.</p>
+<form action="TEST" class="fb_form" method="get" onsubmit="return validate(this);">
+<div class="fb_state"><input id="_submitted" name="_submitted" type="hidden" value="1" /></div>
+<table class="fb">
+<tr>
+  <td class="fb_label">Email</td>
+  <td class="fb_field"><input class="fb_input" id="email" name="email" type="text" value="nate@wiger.org" /></td>
+</tr>
+<tr>
+  <td class="fb_label"><span class="fb_required">First Name</span></td>
+  <td class="fb_field"><input class="fb_input" id="first_name" name="first_name" type="text" value="Nate" /></td>
+</tr>
+<tr>
+  <td class="fb_submit" colspan="2"><input class="fb_button" id="_submit" name="_submit" type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>

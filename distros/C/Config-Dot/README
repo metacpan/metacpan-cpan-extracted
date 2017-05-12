@@ -1,0 +1,185 @@
+NAME
+    Config::Dot - Module for simple configure file parsing.
+
+SYNOPSIS
+     my $cnf = Config::Dot->new(%params);
+     my $struct_hr = $cnf->parse($string);
+     $cnf->reset;
+     my $serialized = $cnf->serialize;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "callback"
+
+                     Callback code for adding parameter.
+                     Callback arguments are:
+                     $key_ar - Reference to array with keys.
+                     $value - Key value.
+                     Default is undef.
+
+            *       "config"
+
+                     Reference to hash structure with default config data.
+                     This is hash of hashes structure.
+                     Default value is reference to blank hash.
+
+            *       "set_conflicts"
+
+                     Set conflicts detection as error.
+                     Default value is 1.
+
+    "parse($string_or_array_ref)"
+             Parse string $string_or_array_ref or reference to array $string_or_array_ref.
+             Use $INPUT_RECORD_SEPARATOR variable to split lines.
+             Returns hash structure with configuration.
+
+    "reset()"
+             Reset content in class (config parameter).
+             Returns undef.
+
+    "serialize()"
+             Serialize 'config' hash to output.
+             Use $INPUT_RECORD_SEPARATOR variable to join lines.
+             Returns string with serialized configuration.
+
+PARAMETER_FILE
+     # Comment.
+     # blabla
+
+     # White space.
+     /^\s*$/
+
+     # Parameters.
+     # Key must be '[-\w\.:,]+'.
+     # Separator is '='.
+     key=val
+     key2.subkey.subkey=val
+
+ERRORS
+     new():
+             Bad 'config' parameter.
+             Parameter 'callback' isn't code reference.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     parse():
+             Bad key '%s' in string '%s' at line '%s'.
+             From Config::Utils::hash():
+                      Conflict in '%s'.
+
+     serialize():
+             Unsupported stay with newline in value.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot;
+     use Dumpvalue;
+
+     # Object.
+     my $struct_hr = Config::Dot->new->parse(<<'END');
+     key1=value1
+     key2=value2
+     key3.subkey1=value3
+     END
+
+     # Dump
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues($struct_hr);
+
+     # Output:
+     # 0  HASH(0x84b98a0)
+     #    'key1' => 'value1',
+     #    'key2' => 'value2',
+     #    'key3' => HASH(0x8da3ab0)
+     #       'subkey1' => 'value3',
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot;
+
+     # Object with data.
+     my $c = Config::Dot->new(
+             'config' => {
+                     'key1' => {
+                             'subkey1' => 'value1',
+                     },
+                     'key2' => 'value2',
+             },
+     );
+
+     # Serialize.
+     print $c->serialize."\n";
+
+     # Output:
+     # key1=subkey1.value1
+     # key2=value2
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot;
+     use Dumpvalue;
+
+     # Object.
+     my $struct_hr = Config::Dot->new(
+             'callback' => sub {
+                    my ($key_ar, $value) = @_;
+                    if ($key_ar->[0] eq 'key3' && $key_ar->[1] eq 'subkey1'
+                            && $value eq 'value3') {
+
+                            return 'FOOBAR';
+                    }
+                    return $value;
+             },
+     )->parse(<<'END');
+     key1=value1
+     key2=value2
+     key3.subkey1=value3
+     END
+
+     # Dump
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues($struct_hr);
+
+     # Output:
+     # 0  HASH(0x84b98a0)
+     #    'key1' => 'value1',
+     #    'key2' => 'value2',
+     #    'key3' => HASH(0x8da3ab0)
+     #       'subkey1' => 'FOOBAR',
+
+DEPENDENCIES
+    Class::Utils, Config::Utils, English, Error::Pure, Readonly.
+
+SEE ALSO
+    Config::Utils
+        Common config utilities.
+
+REPOSITORY
+    <https://github.com/tupinek/Config-Dot>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.07
+

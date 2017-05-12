@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Class-Workflow
+version:            0.11
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Compare:  0
+    Moose:          0.37
+    MooseX::Clone:  0
+    Set::Object:    1.19
+    Test::More:     0
+    Test::use::ok:  0
+    YAML::Syck:     0.82
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

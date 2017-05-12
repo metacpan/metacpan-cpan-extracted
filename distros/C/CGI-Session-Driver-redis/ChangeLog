@@ -1,0 +1,34 @@
+Revision history for Perl extension CGI::Session::Driver::redis.
+
+0.1 - Tue 20 July 2010
+        - Initial release.
+
+0.2  Wed 21 July 2010
+        - Added 'Expires' option to constructor.
+        - Updated POD
+
+0.3  Tue 27 Aug 2013
+        - Expire the key correctly.
+        - See rt.cpan.org #88032.
+
+0.4 - 20-06-2014
+        - Migrated to git, and link to github.com.
+        - Added more style-tests.
+        - Implemented missing `traverse` method,
+          allowing CGI::Session::find to operate
+
+0.5 - 05-08-2014
+        - Updated Makefile.PL to list license.
+        - Updated Makefile.PL to list build/run dependencies.
+
+0.5.1 - 26-10-2014
+        - Updated Makefile.PL to duplicate "TEST_REQUIRES" as "BUILD_REQUIRES".
+        - Minor POD updates.
+
+0.6 - 09-05-2015
+        - Simplified the whitespace removal from keys.
+        - Updated copyright year.
+
+0.7 - 27-02-2016
+        - Added missing build-dependency on File::ShareDir::Install
+		- Updated copyright year.

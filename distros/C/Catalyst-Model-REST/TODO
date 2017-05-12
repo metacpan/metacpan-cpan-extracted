@@ -1,0 +1,11 @@
+0.01 - 0.05: Alpha
+0.06 - 0-10; Beta
+	Api and internals may still change, but changes are smaller now.
+
+Misc
+- Error handling
+  Handle situation when getting non-decoded content back
+- Serializers
+  Is it possible to send json and receive yaml? Should I handle it?
+- Find a way to overwrite request object so it will be possible to use in 
+  controller tests (?)

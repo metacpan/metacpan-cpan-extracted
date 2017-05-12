@@ -1,0 +1,11 @@
+These tests are taken from the FUSE emulator:
+  http://fuse-emulator.sourceforge.net/
+
+The files tests.in and tests.expected are the Z80 tests as supplied
+with FUSE version 0.9.0.  The *.yml files are those test inputs and
+outputs converted to YAML.
+
+I am very grateful to Philip Kendall for letting me use them.
+
+The complete original FUSE distribution can be found here:
+  http://sourceforge.net/project/showfiles.php?group_id=91293

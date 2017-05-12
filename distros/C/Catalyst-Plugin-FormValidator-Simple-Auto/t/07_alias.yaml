@@ -1,0 +1,8 @@
+action1:
+    param1: &param1
+        - rule: NOT_BLANK
+          message: blank
+
+action2:
+    param1: *param1
+

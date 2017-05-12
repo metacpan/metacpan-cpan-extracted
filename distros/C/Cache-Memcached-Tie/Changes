@@ -1,0 +1,7 @@
+Revision history for Perl extension Cache::Memcached::Tie.
+
+0.06  неділя, 19 квітня 2009 19:53:27 +0400
+    - added missing Memd.pm
+0.01  Tue Mar 21 14:35:33 2006
+	- original version
+

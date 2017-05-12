@@ -1,0 +1,10 @@
+There are two modules implementing the XTEA block cipher, Crypt-XTEA and
+Crypt-XTEA_PP. In their current versions, as of March 2016 that is
+Crypt-XTEA-0.0107 and Crypt-XTEA_PP-0.0106, the way blocksize() and keysize()
+are implemented, they don't work on my platform (perl 5.22.1 on cygwin64 on
+Windows 7). blocksize() and keysize() are implemented as constants with values
+$KEY_SIZE and $BLOCK_SIZE. Now it seems to me, they are defined before $KEY_SIZE
+and $BLOCK_SIZE are initialized. This results in returning undef whenever
+Crypt::ECB calls keysize() or blocksize(). I have provided small patches which
+replace "use constant keysize => $KEY_SIZE" with "sub keysize { $KEY_SIZE }"
+(and the same for blocksize), like other cipher modules do.

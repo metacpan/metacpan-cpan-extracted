@@ -1,0 +1,35 @@
+104440|104440-b19f-3f77-b713-d32bba55d77f|unknown|200310|kriegjcb@mi.ruhr-uni-bochum.de ((Jost Krieger))|AI-NeuralNet-Mesh|0.44|sun4-solaris|5.8.1|solaris|2.8|200310061151
+1396564|1396564-b19f-3f77-b713-d32bba55d77f|unknown|200805|srezic@cpan.org|Acme-Buffy|1.5|i386-freebsd|5.5.5|freebsd|6.1-release|200805022114
+1544358|1544358-b19f-3f77-b713-d32bba55d77f|na|200805|jj@jonallen.info ("JJ")|AI-NeuralNet-SOM|0.07|darwin-2level|5.8.3|darwin|7.9.0|200805290833
+1587804|1587804-b19f-3f77-b713-d32bba55d77f|na|200806|jj@jonallen.info ("JJ")|AI-NeuralNet-SOM|0.07|darwin-2level|5.8.1|darwin|7.9.0|200806030648
+1717321|1717321-b19f-3f77-b713-d32bba55d77f|na|200806|srezic@cpan.org|Abstract-Meta-Class|0.10|i386-freebsd|5.5.5|freebsd|6.1-release|200806171653
+1994346|1994346-b19f-3f77-b713-d32bba55d77f|unknown|200808|srezic@cpan.org|AI-NeuralNet-SOM|0.02|i386-freebsd|5.6.2|freebsd|6.1-release|200808062212
+2538246|2538246-b19f-3f77-b713-d32bba55d77f|fail|200811|bingos@cpan.org|Acme-CPANAuthors-French|0.06|i386-freebsd-thread-multi-64int|5.8.8|freebsd|6.2-release|200811021014
+2549071|2549071-b19f-3f77-b713-d32bba55d77f|fail|200811|bingos@cpan.org|Acme-CPANAuthors-French|0.07|OpenBSD.i386-openbsd-thread-multi-64int|5.8.8|openbsd|4.2|200811042025
+2603754|2603754-b19f-3f77-b713-d32bba55d77f|fail|200811|JOST@cpan.org ("Josts Smokehouse")|AI-NeuralNet-SOM|0.02|i86pc-solaris-64int|5.8.8 patch 34559|solaris|2.11|200811122105
+2613077|2613077-b19f-3f77-b713-d32bba55d77f|fail|200811|srezic@cpan.org|Acme-Buffy|1.5|i386-freebsd|5.8.9|freebsd|6.1-release-p23|200811132053
+2725989|2725989-b19f-3f77-b713-d32bba55d77f|pass|200812|stro@cpan.org|Acme-CPANAuthors-Canadian|0.0101|MSWin32-x86-multi-thread|5.10.0|MSWin32|5.00|200812011303
+2959417|2959417-b19f-3f77-b713-d32bba55d77f|pass|200812|rhaen@cpan.org (Ulrich Habel)|Abstract-Meta-Class|0.11|MSWin32-x86-multi-thread|5.10.0|MSWin32|5.1|200812301529
+2964284|2964284-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme|1.11111|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901010443
+2964285|2964285-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme-Buffy|1.5|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901010443
+2964537|2964537-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme-CPANAuthors-CodeRepos|0.080522|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901010609
+2964541|2964541-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme-CPANAuthors-Japanese|0.080522|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901010611
+2965412|2965412-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme-Brainfuck|1.1.1|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901010929
+2965930|2965930-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|AI-NeuralNet-BackProp|0.89|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901011103
+2965931|2965931-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|AI-NeuralNet-Mesh|0.44|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901011103
+2966360|2966360-b19f-3f77-b713-d32bba55d77f|pass|200901|cpan@sourcentral.org ("Oliver Paukstadt")|AI-NeuralNet-SOM|0.07|s390x-linux|5.10.0|linux|2.6.16.60-0.31-default|200901010542
+2966429|2966429-b19f-3f77-b713-d32bba55d77f|pass|200901|cpan@sourcentral.org ("Oliver Paukstadt")|Acme-BOPE|0.01|s390x-linux|5.8.8|linux|2.6.16.60-0.31-default|200901010558
+2966541|2966541-b19f-3f77-b713-d32bba55d77f|pass|200901|cpan@sourcentral.org ("Oliver Paukstadt")|Acme-CPANAuthors-Canadian|0.0101|s390x-linux-thread-multi|5.8.8|linux|2.6.18-92.1.18.el5|200901010628
+2966560|2966560-b19f-3f77-b713-d32bba55d77f|fail|200901|cpan@sourcentral.org ("Oliver Paukstadt")|Acme-CPANAuthors-French|0.07|s390x-linux-thread-multi|5.8.8|linux|2.6.18-92.1.18.el5|200901010635
+2966567|2966567-b19f-3f77-b713-d32bba55d77f|pass|200901|cpan@sourcentral.org ("Oliver Paukstadt")|Acme-CPANAuthors-CodeRepos|0.080522|s390x-linux|5.10.0|linux|2.6.16.60-0.31-default|200901010638
+2966771|2966771-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|AEAE|0.02|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901011502
+2967174|2967174-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|AOL-TOC|0.340|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901011645
+2967432|2967432-b19f-3f77-b713-d32bba55d77f|fail|200901|andreas.koenig.gmwojprw@franz.ak.mind.de|Acme-CPANAuthors-French|0.07|x86_64-linux|5.10.0|linux|2.6.24-1-amd64|200901011038
+2967647|2967647-b19f-3f77-b713-d32bba55d77f|pass|200901|imacat@mail.imacat.idv.tw|Acme-Anything|0.02|x86_64-linux-thread-multi-ld|5.10.0|linux|2.6.24-etchnhalf.1-amd64|200901011830
+2969433|2969433-b19f-3f77-b713-d32bba55d77f|pass|200901|CPAN.DCOLLINS@comcast.net|Abstract-Meta-Class|0.11|i686-linux-thread-multi|5.10.0|linux|2.6.24-19-generic|200901010115
+2969661|2969661-b19f-3f77-b713-d32bba55d77f|pass|200901|CPAN.DCOLLINS@comcast.net|Abstract-Meta-Class|0.11|i686-linux-thread-multi|5.10.0|linux|2.6.24-19-generic|200901010303
+2969663|2969663-b19f-3f77-b713-d32bba55d77f|pass|200901|CPAN.DCOLLINS@comcast.net|Abstract-Meta-Class|0.11|i686-linux-thread-multi|5.10.0|linux|2.6.24-19-generic|200901010303
+2970367|2970367-b19f-3f77-b713-d32bba55d77f|pass|200901|CPAN.DCOLLINS@comcast.net|Abstract-Meta-Class|0.11|i686-linux-thread-multi|5.11.0 patch GitLive-blead-163-g28b1dae|linux|2.6.24-19-generic|200901010041
+2975969|2975969-b19f-3f77-b713-d32bba55d77f|pass|200901|rhaen@cpan.org (Ulrich Habel)|Acme-CPANAuthors-Japanese|0.090101|MSWin32-x86-multi-thread|5.10.0|MSWin32|5.1|200901021220
+3000001|3000001-b19f-3f77-b713-d32bba55d77f|fail|200901|cpan@sourcentral.org ("Oliver Paukstadt")|App-Maisha|0.01|s390x-linux-thread-multi|5.8.8|linux|2.6.18-92.1.18.el5|200901010635
+3000002|3000002-b19f-3f77-b713-d32bba55d77f|pass|200901|cpan@sourcentral.org ("Oliver Paukstadt")|App-Maisha|0.01|s390x-linux|5.10.0|linux|2.6.16.60-0.31-default|200901010638

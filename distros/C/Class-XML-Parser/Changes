@@ -1,0 +1,5 @@
+v0.9    Initial release
+
+v0.901	No code changes.
+        Modified tests to skip validation tests if XML::Checker::Parser
+        not installed.

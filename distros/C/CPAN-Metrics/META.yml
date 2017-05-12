@@ -1,0 +1,22 @@
+---
+abstract: 'Create and maintain a Perl::Metrics database for all of CPAN'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>, L<http://ali.as/>'
+distribution_type: module
+generated_by: 'Module::Install version 0.73'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: CPAN::Metrics
+name: CPAN-Metrics
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CPAN::Mini::Extract: 1.19
+  File::HomeDir: 0.69
+  Perl::Metrics: 0.08
+  perl: 5.005
+version: 0.08

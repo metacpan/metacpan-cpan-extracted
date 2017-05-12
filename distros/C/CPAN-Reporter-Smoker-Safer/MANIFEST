@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/CPAN/Reporter/Smoker/Safer.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+t/__filter.t
+t/__installed_dists.t
+t/start.t
+META.yml                                 Module meta-data (added by MakeMaker)

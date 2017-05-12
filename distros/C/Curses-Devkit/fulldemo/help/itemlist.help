@@ -1,0 +1,271 @@
+</R>Purpose<!R>
+The Cdk Itemlist widget allows the user to select a value from a list. This
+widget is very much like a 1 line scrolling list.
+
+</R>Construction Options<!R>
+A itemlist widget is defined using the following syntax. The variable
+</B>$itemlistObject<!B> contains the reference to the itemlist object.
+$itemlistObject = new Cdk::Itemlist ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Label       Required            Scalar     The label of the itemlist field.
+List        Required            Array Ref  The list of items to choose from.
+Default     0                   Scalar     The default choice.
+Xpos        Center              Scalar     This is the position of the window on the X axis.
+Ypos        Center              Scalar     This is the position of the window on the Y axis.
+Lpos        Left                Scalar     This is the position of the label in the window.
+Box         True                Scalar     This boolean states whether the dialog box will have a box drawn around it.
+Shadow      False               Scalar     This boolean states whether the dialog box will have a shadow on the box.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The
+following example demonstrates how to activate a itemlist widget.
+$returnValue = $itemlistObject->activate ();
+
+The variable </B>$returnValue<!B> contains a scalar value which represents the
+integer value of the corresponding item from the list.
+
+</B>inject<!B>
+This function injects a single character into the widget. The following
+examples demonstrates how to call the inject method.
+<C></B>$itemlistObject->inject ( options );
+
+The options are defined in the following table.
+</U>Option      Default Value       Type       Purpose<!U>
+Shadow      Required             Scalar     The character to inject into the widget.
+
+If you are injecting a special character into the widget, then you can
+use a pre-defined value to represent the key.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+</B>set<!B>
+Sets or resets certain attributes or features of the widget. The following
+demonstrates how to call the set method from the itemlist field.
+$itemlistObject->set ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+List        Required            Arry Ref   The list of items to choose from.
+Default     0                   Scalar     The default choice.
+Box         True                Scalar     Changes the current value of the box flag.
+
+</B>bind<!B>
+The bind method binds keys to events. The binding is specific to the individual
+objects. The following example demonstrates how to call the bind method.
+$itemlistObject->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Key         Required            Scalar     This is the character to bind the event to.
+Function    Required            Scalar     This is the name of the callback function.
+
+</B>preProcess<!B>
+The </B>preProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+preProcess method.
+<C></B>$itemlistObject->preProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a pre-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$itemlistObject->preProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+If the pre-process function returns a value of 0 the key hit will
+not be injected into the widget. This allows the programmer to
+selectively pick which characters will or will not get injected
+into the widget.
+
+The </B>postProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+postProcess method.
+<C></B>$itemlistObject->postProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a post-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$itemlistObject->postProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+$itemlistObject->draw ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Box         True                Scalar     Draws the window with a box around it.
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+$itemlistObject->erase ();
+
+</B>raise<!B>
+The raise method raises the widget to the top of the screen. This means if there
+were any widgets obscuring part of the view, raising the object would bring the
+complete object into view. The following example demonstrates how to call the 
+raise method.
+$itemlistObject->raise();
+
+</B>lower<!B>
+The lower method lowers the object so it doesn't obscure the view of any other 
+objects. The following example demonstrates how to call the lower method.
+$itemlistObject->lower();
+
+</B>register<!B>
+The register method registers the object to the default screen. This does </R>NOT<!R>
+have to be called since the objects are registered automatically. This method
+should be called if the </B>unregister<!B> method was called. The following
+example demonstrates how to call the register method.
+$itemlistObject->register();
+
+</B>unregister<!B>
+The unregister method should be called when a widget, which is part of the
+default screen, needs to be taken away temporarily. This does not delete or free
+the object, it just unmaps it from any future screen refreshes. The object can
+be registered by calling the </B>register<!B> method. The following example
+demonstrates how to call the unregister method.
+$itemlistObject->unregister();
+
+</B>getwin<!B>
+This method returns a pointer to the window of the object. Not much use for this
+yet. It will be useful in the future when the drawing methods are added. The
+following example demonstrates how to call the getwin method.
+$itemlistObject->getwin();
+
+</R>Default Key Bindings<!R>
+</U>Key               Action<!U>
+Up Arrow          Displays the next item in the list.
+Right Arrow       Displays the next item in the list.
+Space             Displays the next item in the list.
++                 Displays the next item in the list.
+n                 Displays the next item in the list.
+Down Arrow        Displays the previous item in the list.
+Left Arrow        Displays the previous item in the list.
+-                 Displays the previous item in the list.
+p                 Displays the previous item in the list.
+d                 Sets the list to the default choice.
+D                 Sets the list to the default choice.
+0                 Sets the list to the first choice in the list.
+$                 Sets the list to the last choice in the list.
+Return            Returns the current information in the field and exits the widget.
+Tab               Returns the current information in the field and exits the widget.
+CTRL-N            Returns the current information in the field and exits the widget.
+CTRL-R            Refreshes the screen.
+
+</R>Tips & Tricks<!R>
+None.
+
+</R>Physical Restrictions<!R>
+</U>Restriction                    Value<!U>
+Maximum number of items.       500
+
+</R>Example Use Of The Widget<!R>
+
+#!/usr/local/bin/perl
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create a new itemlist object.
+@list = qw (January Feburary March April May June July August September November December);
+$month	= new Cdk::Itemlist ( 'Label' => "Pick a month: ", 'List' => \@list);
+
+# Activate the object.
+$choice = $month->activate();
+
+# Exit Cdk.
+Cdk::end();
+
+# Print out the results.
+print "\n\n\n\n";
+print "You selected: <$choice>\n";
+--------------------------------------------------------------------------------
+                       Document Created: June, 1995
+                       Document Revised: November, 1995

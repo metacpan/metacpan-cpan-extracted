@@ -1,0 +1,14 @@
+Revision history for Perl extension CGIS.
+
+1.6 Wednesday, March 12, 2003
+    * urlf() and session_id() as well as session_dir() methods introduced. 
+
+1.5 Tue Dec 18
+	  * CGI object created with CGIS will have session id
+  	  in its parameter list by default, thus $cgi->self_url()
+	    will output the url with session id fields appended to them
+
+1.4  Tue Dec 17 12:40:53 2002
+    * original version; created by h2xs 1.21 with options
+      -AXn CGIS
+

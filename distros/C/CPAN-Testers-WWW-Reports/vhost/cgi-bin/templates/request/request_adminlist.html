@@ -1,0 +1,54 @@
+[% 
+    title = "Request Admin" ;
+
+    crumb2_name = 'Request' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=req-admin' ;
+    crumb1_name = 'Admin' ;
+%]
+
+
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click request to add, amend or delete options.
+<p><a href="[% cgipath %]/pages.cgi?act=req-add">add a new request</a>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='req-admin' />
+
+<div class="box">
+<table class="blocker">
+<tr>
+    <th>Act</th>
+    <th>Actions</th>
+    <th>Layout</th>
+    <th>Content</th>
+    <th>OnSuccess</th>
+    <th>OnError</th>
+    <th>OnFailure</th>
+<!--
+    <th>Secure</th>
+    <th>Rewrite</th>
+-->
+    <th>Select</th>
+</tr>
+[% FOREACH record = data %]
+<tr>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=req-edit&amp;requestid=[% record.requestid %]">[% record.section %]-[% record.command %]</a></td>
+    <td>[% IF record.actions   %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.layout    %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.content   %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.onsuccess %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.onerror   %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.onfailure %]Yes[% ELSE %][% END %]</td>
+<!--
+    <td>[% IF record.secured   %]Yes[% ELSE %][% END %]</td>
+    <td>[% IF record.rewrite   %]Yes[% ELSE %][% END %]</td>
+-->
+    <td><input type="checkbox" name="LISTED" value="[% record.requestid %]" /></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<p>
+<input type="submit" name='doaction' value='Delete' />
+</form>

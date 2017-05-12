@@ -1,0 +1,247 @@
+=pod
+
+=head1 NAME
+
+CGI::Application::Gallery - image gallery module 
+
+=head1 DESCRIPTION
+
+I must have coded fifty different image gallery scripts in the last 10 years.
+I think doing this in CGI::Application has staying power.
+
+This is in development- but is fully usable. At this point, you will have to view/isnpect or use
+the included browse.html and view.html HTML::Template files.
+
+=head2 PROS
+
+Uses cgi application, HTML::Template, etc. Uses a lot of code from stable, good packages.
+Presentation is TOTALLY separated from back-end, and from content.
+You can make this look like whatever you want, pixel precision art of minimal text layout.
+
+Simple drop in, you create your hirerarchy of stuff, and the program takes care of the rest.
+
+=head2 CONS
+
+Uses cgi application, HTML::Template, etc. Uses a lot of code from stable, good packages.
+Could be clunky- doesn't feel like it, but.. I know these packages have a lot of stuff utterly unused
+here.
+If you don't have root access, you will need to know how to use cpan command line.
+
+=head1 RUNMODES
+
+
+=head2 browse
+
+View gallery thumbs.
+
+=head2 view
+
+View a single image.
+
+=head2 thumbnail
+
+Needs in query string= ?rm=thumbnail&rel_path=/gallery/1.jpg&restriction=40x40
+Please see CGI::Application::Plugin::Thumbnail.
+
+=cut
+
+
+
+
+
+
+=head1 LOOK AND FEEL
+
+All templates are provided hard coded.
+You can override the look and feel simply by creating templates on disk.
+The are all L<HTML::Template> objects.
+This is done via L<CGI::Appplication::Plugin::TmplInnerOuter>
+
+=head2 OVERRIDING MAIN TEMPLATE
+
+The main template is :
+
+   <html>
+   <body>
+   <div>
+   <TMPL_LOOP FEEDBACK>
+   <p><small><TMPL_VAR FEEDBACK></small</p>
+   </TMPL_LOOP>
+   </div>
+   
+   <div>
+   <TMPL_VAR BODY>
+   </div>
+   </body>
+   </html>
+
+If you create a main.html file with at least the template variable <TMPL_VAR BODY>, it will override the hard coded one 
+shown above.
+
+This may be enough for your customizing needs. 
+If you want more read on..
+
+
+
+=head2 OVERRIDING VIEW TEMPLATE
+
+When you click to see medium view, the 'view' runmode.. the template you want to create will be called 'view.html'.
+
+It shoudl contain something like:
+
+ <p><a href="<TMPL_VAR REL_BACK>">back</a></p>
+ <h1><TMPL_VAR REL_PATH></h1>
+ <p><img src="?rm=thumbnail&rel_path=<TMPL_VAR REL_PATH>&thumbnail_restriction=350x350"></p>
+ <p><a href="<TMPL_VAR REL_PATH>">full view</p> 
+
+Shown above is default template.
+Obviously the deafault is seen there as 350x350, if you want your view to be 500x500, just change the text in your
+template. IT'S THAT EASY! Bless HTML::Template!!!!!!
+
+You notice this template has no html header and footer.
+That's beacuse it is inserted into the <TMPL_VAR BODY> tag of main.
+
+
+
+=head2 OVERRIDING BROWSE TEMPLATE
+
+This one is more complex. Simply create a browse.html template file and place this in it:
+
+   <!-- begin pager -->
+	<TMPL_IF CURRENT_PAGE>
+	<div>
+	<p><TMPL_IF 
+      PREVIOUS_PAGE><a href="?rm=browse&current_page=<TMPL_VAR PREVIOUS_PAGE>">previous page</a> : </TMPL_IF>
+	<TMPL_IF CURRENT_PAGE>Page <TMPL_VAR CURRENT_PAGE></TMPL_IF>
+	<TMPL_IF NEXT_PAGE> : <a href="?rm=browse&current_page=<TMPL_VAR NEXT_PAGE>">next page</a></TMPL_IF>
+	</p>
+	<p>
+	<a href="?entries_per_page=5">[5pp]</a> : 
+	<a href="?entries_per_page=10">[10pp]</a> : 
+	<a href="?entries_per_page=25">[25pp]</a> 
+	</p>
+	</div>
+	</TMPL_IF>
+   <!-- end pager -->
+	
+
+   <!--begin thumbnails -->
+	<div>	
+	<table cellspacing="0" cellpadding="4" width="100%">
+	<tr>
+	<TMPL_LOOP 
+      NAME="LS"> <td><a href="?rm=view&rel_path=<TMPL_VAR REL_PATH>"><img src="?rm=thumbnail&rel_path=<TMPL_VAR REL_PATH>"></a></td>
+	<TMPL_IF CLOSEROW></tr>
+	<tr>
+	</TMPL_IF>
+	</TMPL_LOOP>
+	</tr></table>
+   <!-- end thumbnails -->
+
+
+   <!-- beign subdirs -->	
+	<div>
+	<h5>Directories</h5>
+	<ul>
+	<TMPL_IF 
+      REL_BACK><li><a href="?rm=browse&rel_path=<TMPL_VAR REL_BACK>">Parent Directory</a></li></TMPL_IF>
+	<TMPL_LOOP NAME="LSD">
+	<li><a href="?rm=browse&rel_path=<TMPL_VAR REL_PATH>"><TMPL_VAR FILENAME></a></li>
+	</TMPL_LOOP>
+	</ul>
+	</div>
+   <!-- end subdirs -->
+
+=head2 WHERE SHOULD main.html view.html AND browse.html GO?
+
+When you start your app:
+
+   
+   use CGI::Application::Gallery;
+
+   my $g = new CGI::Application::Gallery( 
+      TMPL_PATH => 'tmpl/',
+   );
+   $g->run;
+
+
+
+=head1 API
+
+=head2 METHODS
+
+=head3 new()
+
+ my $g = new CGI::Application::Gallery( 
+	PARAMS => { 
+		rel_path_default => '/',
+		entries_per_page_min => 4,
+		entries_per_page_max => 100,
+		entries_per_page_default => 10,		
+	},
+ );
+
+Shown are the default parameters.
+
+
+
+=head2 entries_total()
+
+=head2 entries_per_page()
+
+=head2 current_page()
+
+=head2 pager()
+
+returns Data::Page object
+
+=head2 lsfa()
+
+returns abs paths of only image files in current dir
+
+=cut
+
+
+
+
+=for later
+
+sub _gallery_docroot {
+   my $self = shift;
+   if ( defined $self->param('rel_path_default') and $self->param('rel_path_default') ){
+      return $ENV{DOCUMENT_ROOT}.'/'.$self->param('rel_path_default');
+   }
+   
+   return $ENV{DOCUMENT_ROOT};
+}
+
+=cut
+
+
+
+=head1 PREREQUISITES
+
+CGI::Application
+CGI::Application::Plugin::Session
+CGI::Application::Plugin::Forward
+CGI::Application::Plugin::AutoRunmode
+CGI::Application::Plugin::Feedback
+CGI::Application::Plugin::Stream
+CGI::Application::Plugin::Thumbnail
+CGI::Application::Plugin::TmplInnerOuter
+File::PathInfo::Ext
+Data::Page
+File::Path
+Smart::Comments
+Carp
+
+=head1 BUGS
+
+Yes. Please email author.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut
+

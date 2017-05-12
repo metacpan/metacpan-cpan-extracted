@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 100
+name: fd64
+registers:
+  AF: 31502
+  AF_: 0
+  BC: 58260
+  BC_: 0
+  DE: 35365
+  DE_: 0
+  HL: 52703
+  HL_: 0
+  I: 0
+  IX: 38788
+  IY: 8470
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,24 @@
+---
+abstract: 'a minimalistic variant of Class::Accessor'
+author:
+  - 'Copyright (C) 2008 - 2010 Kazuho Oku'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Accessor-Lite
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/kazuho/p5-Class-Accessor-Lite
+version: '0.08'

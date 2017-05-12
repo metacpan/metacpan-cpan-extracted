@@ -1,0 +1,52 @@
+Revision history for Perl extension Catalyst::View::TT::ForceUTF8.
+
+0.13 Tue Feb 3 14:50:00 2009
+  - fixed typo on document Not->Now
+
+0.12 Mon Feb 2 16:17:00 2009
+  - Added description as DEPRECATED.
+    See Also: http://dev.catalystframework.org/wiki/gettingstarted/tutorialsandhowtos/using_unicode
+
+0.11 Mon Feb 2 10:26:00 2009
+  - Patch from Larry Leszczynski.
+    added config value PARSER, PRE_CHOMP, POST_CHOMP.
+    Thanks to Larry.
+
+0.10 Wed Jan 28 16:23:00 2009
+  - Patch from Larry Leszczynski.
+    Now it works with $c->stash->{additional_template_paths}.
+    Thanks to Larry.
+
+0.09 Tue May 20 18:02:00 2008
+  - added EVAL_PERL configuration requested by Marius Kjeldahl
+
+0.08  San Apr 29 01:30:00 2007
+  - bugfix: fix the syntax error and a basic test. Sorry for this awful mistake...
+
+0.07  Fri Apr 27 15:13:00 2007
+  - bugfix: this module didin't hand config-params(COMPILE_EXT and COMPILE_DIR) over to provider.
+  - New config 'DEFAULT_ENCODING' comes for Template::Provider::Encoding 0.08.
+    Thanks to fbis.
+
+  - switched to Module::Install
+
+0.06  Thu May 18 12:02:00 2006
+  - bugfix: INCLUDE_PATH couldn't be passed correctly
+            when using ConfigLoader (Thanks to Hideo Kimura)
+
+    Updated Makefile.PL to require the latest version of Template::Provider::Encoding
+
+0.05  Tue Mar 7 02:46:45 2006
+  - fixed typo
+    add pod test
+
+0.04  Mon Mar 6 20:46:45 2006
+  - fixed bug when using STRICT_CONTENT_TYPE
+
+0.03  Fri Mar 3 20:46:45 2006
+  - added helper
+
+0.01  Wed Mar  1 20:46:45 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A Catalyst::View::TT::ForceUTF8
+

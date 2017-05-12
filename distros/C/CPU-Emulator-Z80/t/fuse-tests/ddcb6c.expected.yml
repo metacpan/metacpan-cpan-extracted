@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb6c
+registers:
+  AF: 56633
+  AF_: 0
+  BC: 7966
+  BC_: 0
+  DE: 49633
+  DE_: 0
+  HL: 3751
+  HL_: 0
+  I: 0
+  IX: 15905
+  IY: 62788
+  PC: 4
+  R: 2
+  SP: 0

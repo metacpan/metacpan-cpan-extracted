@@ -1,0 +1,35 @@
+Color::Calc
+===========
+
+The "Color::Calc" module implements simple calculations with RGB
+colors. This can be used to create a full color scheme from a few
+colors.
+
+The module is useful for CGI (or embedded perl) programmes that
+create HTML or CSS output. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Graphics::ColorNames
+
+The following modules are optional:
+
+  Graphics::ColorObject
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2004-2010 Claus Färber
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 

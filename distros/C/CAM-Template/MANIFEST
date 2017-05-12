@@ -1,0 +1,12 @@
+index.html
+Build.PL
+ChangeLog
+lib/CAM/Template.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/pod-coverage.t
+t/pod.t
+t/template.t

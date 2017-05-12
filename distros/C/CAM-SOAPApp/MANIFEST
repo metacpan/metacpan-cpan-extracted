@@ -1,0 +1,14 @@
+index.html
+Build.PL
+CHANGES
+lib/CAM/SOAPApp.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Example/Server.pm
+t/lenient.t
+t/pod-coverage.t
+t/pod.t
+t/server.t

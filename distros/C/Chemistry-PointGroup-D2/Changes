@@ -1,0 +1,6 @@
+Revision history for Perl extension Chemistry::PointGroup::D2.
+
+0.01  Sun Feb 19 10:21:03 2006
+	- original version; created by h2xs 1.22 with options
+		-AX -n Chemistry::PointGroup::D2
+

@@ -1,0 +1,32 @@
+Crypt-U2F-Server version 0.31
+=============================
+
+This is an ALPHA level version of Crypt::U2F::Server. Please
+see the documentation in the POD of the modules
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Yubico's libu2f-server library
+installed to build and use:
+
+  https://developers.yubico.com/libu2f-server/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014-2015 by Rene Schickbauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

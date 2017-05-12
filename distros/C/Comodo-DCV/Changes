@@ -1,0 +1,10 @@
+Revision history for Perl module Comodo::DCV
+
+0.01 Mon Apr  4 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55
+
+0.02 Mon Dec 19 2016
+    - Fix failing test
+
+0.03 Tue Dec 20 2016
+    - Fix pre-5.14 compatibility

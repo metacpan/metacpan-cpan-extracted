@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<doc attr="value">
+  <field1>foo</field1>
+  <field1>bar</field1>
+  <bar>
+    <doz>baz</doz>
+  </bar>
+</doc>

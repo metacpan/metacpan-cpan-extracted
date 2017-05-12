@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                CORBA-IDL
+version:             2.64
+abstract:            CORBA-IDL 3.0 parser
+license:             ~
+author:              
+    - Francois PERRAD (francois.perrad@gadz.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Digest::SHA1:                  0
+    Math::BigInt:                  1.66
+    Parse::Yapp:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

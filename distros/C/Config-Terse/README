@@ -1,0 +1,25 @@
+Config::Terse
+==============
+
+Config::Terse is laconic configuration files parser.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Config::Terse requires the following non-core perl modules:
+
+    Carp for error reporting.
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2013 Vladi Belperchinov-Shabanski <cade@cpan.org> <cade@bis.bg>

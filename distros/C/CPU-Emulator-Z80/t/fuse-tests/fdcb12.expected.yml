@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  34200:
+    - 79
+name: fdcb12
+registers:
+  AF: 19977
+  AF_: 0
+  BC: 14885
+  BC_: 0
+  DE: 20247
+  DE_: 0
+  HL: 48327
+  HL_: 0
+  I: 0
+  IX: 3454
+  IY: 34103
+  PC: 4
+  R: 2
+  SP: 0

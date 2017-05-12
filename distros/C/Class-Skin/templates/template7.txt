@@ -1,0 +1,2 @@
+$url_path
+<a href="#"><img src="$url_path/images/spacer.gif" border="0"></a>

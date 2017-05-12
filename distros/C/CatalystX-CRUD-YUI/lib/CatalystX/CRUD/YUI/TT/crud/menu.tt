@@ -1,0 +1,70 @@
+[%# dynamic menu. Algorithm based on the example in the badger book. %]
+[%
+    # YUI flyout menus
+    # menu object looks like:
+    # menu = {
+    #   items = [
+    #       { href = '/uri/some/where', txt = 'Some Where', class = 'active' },
+    #       { href = '/uri/some/else' , txt = 'Some Else',
+    #           items = [
+    #               { href = '/uri/some/else/1', txt = 'Some Else 1' },
+    #               { href = '/uri/some/else/2', txt = 'Some Else 2' }
+    #               ]
+    #       }
+    #   ],
+    #   id = 'navmenu'  # default - optional key
+    # }
+    # c.uri_for is run on every href, so plain uris are ok.
+    #
+    # NOTE that we INCLUDE in order to localize vars each time.
+    
+    SET depth      = 1;
+%]
+
+<div id="[% menu.id || 'vert_menu' %]" class="yuimenubar yuimenubarnav">
+ <div class="bd">
+  <ul class="first-of-type">
+  [% INCLUDE menu_items items = menu.items %]
+  </ul><!-- end [% menu.id || 'vert_menu' %] -->
+ </div>
+</div>
+
+[% BLOCK menu_items -%]
+ [% FOR i = items -%]
+ [%- IF depth == 1 # horiz menu needs different class values -%]
+ <li class="yuimenubaritem first-of-type">
+  [%- IF i.exists('items') -%]
+  <span class="[% i.class %] yuimenubaritemlabel" >[% i.txt %]</span>
+  [%- ELSE -%]
+  <a class="[% i.class %] yuimenubaritemlabel" href="[% c.uri_for(i.href) %]">[% i.txt %]</a>
+  [%- END -%]
+ [%- ELSIF depth == 2 # first submenu is not clickable if items (sub menus) exist -%]
+ <li class="yuimenuitem">
+  [%- IF !i.exists('items') -%]
+  <a class="[% i.class %] yuimenuitemlabel" href="[% c.uri_for(i.href) %]">[% i.txt %]</a>
+  [%- ELSE -%]
+  <span class="[% i.class %] yuimenuitemlabel">[% i.txt %]</span>
+  [%- END -%]
+ [%- ELSE -%]
+ <li class="yuimenuitem">
+  <a class="[% i.class %] yuimenuitemlabel" href="[% c.uri_for(i.href) %]">[% i.txt %]</a>
+ [%- END -%]
+  [%- IF i.exists('items') -%]
+   <div class="yuimenu">
+    <div class="bd">
+     <ul class="first-of-type">
+    [%- INCLUDE menu_items
+        items = i.items
+        depth = depth + 1
+        -%]
+     </ul>
+    </div>
+   </div>
+  [% ELSIF loop.last -%]
+   [% depth = depth - 1 -%]
+  [% END -%]
+ </li>
+ [% END -%]
+[% END %]
+
+

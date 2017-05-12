@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdb6
+registers:
+  AF: 65452
+  AF_: 0
+  BC: 13577
+  BC_: 0
+  DE: 54986
+  DE_: 0
+  HL: 45418
+  HL_: 0
+  I: 0
+  IX: 41113
+  IY: 57197
+  PC: 3
+  R: 2
+  SP: 0

@@ -1,0 +1,15 @@
+Revision history for Perl extension Chart::Plot::Canvas.
+
+0.04  Wed Jun  1 22:30:00 2011
+	- add Chart::Plot::Canvas::Tagged (code from CVS::Metrics::TaggedChart)
+
+0.03  Fri Oct 19 18:30:00 2007
+	- some Perl Best Practices
+
+0.02  Tue Apr 22 12:30:00 2003
+	- first release
+
+0.01  Sat Apr 19 12:15:20 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n Chart::Plot::Canvas
+

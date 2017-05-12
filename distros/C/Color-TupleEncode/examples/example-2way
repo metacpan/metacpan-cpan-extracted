@@ -1,0 +1,246 @@
+#!/bin/env perl
+
+=head1 NAME
+
+example-2way - convert a single 3-tuple into a color using a different implementation
+
+=head1 SYNOPSIS
+
+  # report values, do not generate an image
+  example-2way [ -tuple a,b,c ]
+               [ -options {saturation=>{-power=>1,min=>0.1,max=>1}} ]
+               [ -verbose ]
+
+=head1 DESCRIPTION
+
+Uses L<Color::TupleEncode> to encode a 3-tuple into a color using the C<Color::TupleEncode::2Way> encoding scheme.
+
+=head1 OPTIONS
+
+=head2 C<-tuple a,b>
+
+Optionally, pass in the 2-tuple as a CSV list using C<-tuple>.
+
+If this option is not used, a random tuple will be encoded.
+
+=head2 C<-options HASH>
+
+Pass options to the encoder using a C<HASH> string that can be C<eval>ed to a hash reference. For example,
+
+  -options {saturation=>{-power=>1,min=>0.1,max=>1}}
+
+=head2 C<-verbose>
+
+Report the options used in the encoding.
+
+=head1 SEE ALSO
+
+L<Color::TupleEncode>, L<Color::TupleEncode::Baran>, L<Color::TupleEncode::2Way>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-color-tupleencode at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Color-TupleEncode>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Martin Krzywinski, C<< <martin.krzywinski at gmail.com> >>
+
+=cut
+
+use strict;
+use warnings FATAL=>"all";
+
+use Carp;
+use Config::General;
+use Cwd qw(getcwd abs_path);
+use File::Basename;
+use FindBin;
+use Getopt::Long;
+use Pod::Usage;
+use lib "$FindBin::RealBin";
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/lib";
+
+use Graphics::ColorObject;
+use Color::TupleEncode qw(tuple_asHSV tuple_asRGBhex tuple_asRGB255);
+
+our (%OPT,%CONF,$conf);
+our $VERSION = 0.01;
+
+_parse_config();
+
+my $method = "Color::TupleEncode::2Way";
+
+my $options = { eval $CONF{options} };
+if($@) {
+  confess "Could not parse the option string: $@";
+}
+
+# parse the tuple
+my @tuple = split(",",$CONF{tuple});
+
+# convert to HSV
+my @hsv   = tuple_asHSV(tuple=>\@tuple,method=>$method,options=>$options);
+
+# convert to RGB (0-255)
+my @rgb   = tuple_asRGB255(tuple=>\@tuple,method=>$method,options=>$options);
+
+# convert to RGB hex
+my $hex   = tuple_asRGBhex(tuple=>\@tuple,method=>$method,options=>$options);
+
+# report
+printinfo("The 2-tuple",sprintf("a = %.3f b = %.3f",@tuple),"encodes to");
+printinfo();
+printinfo(sprintf("H %3d S %4.2f V %4.2f",@hsv));
+printinfo(sprintf("R %3d G %4d B %4d",@rgb));
+printinfo(sprintf("HEX %s",$hex));
+
+if($CONF{verbose}) {
+  my $encoder = Color::TupleEncode->new(options=>$options,
+					method=>"Color::TupleEncode::2Way",
+					tuple=>\@tuple);
+  printinfo();
+  printinfo("Options for encoder");
+  printinfo();
+  printdumper({$encoder->get_options});
+}
+
+sub validateconfiguration {
+  if(! $CONF{tuple}) {
+    $CONF{tuple} = join(",",map {rand()} (0..1));
+  }
+  $CONF{options} ||= "";
+}
+
+################################################################
+#
+# *** DO NOT EDIT BELOW THIS LINE ***
+#
+################################################################
+
+sub _parse_config {
+  my $dump_debug_level = 3;
+  GetOptions(\%OPT, 
+	     "options=s",
+	     "verbose",
+	     "tuple=s",
+	     "help","man","debug:i");
+  pod2usage() if $OPT{help};
+  pod2usage(-verbose=>2) if $OPT{man};
+  loadconfiguration($OPT{configfile});
+  populateconfiguration(); # copy command line options to config hash
+  validateconfiguration(); 
+  if(defined $CONF{debug} && $CONF{debug} == $dump_debug_level) {
+    $Data::Dumper::Indent    = 2;
+    $Data::Dumper::Quotekeys = 0;
+    $Data::Dumper::Terse     = 0;
+    $Data::Dumper::Sortkeys  = 1;
+    $Data::Dumper::Varname = "OPT";
+    printdumper(\%OPT);
+    $Data::Dumper::Varname = "CONF";
+    printdumper(\%CONF);
+    exit;
+  }
+}
+
+sub populateconfiguration {
+  for my $var (keys %OPT) {
+    $CONF{$var} = $OPT{$var};
+  }
+  repopulateconfiguration(\%CONF);
+}
+
+sub repopulateconfiguration {
+  my $root     = shift;
+  for my $key (keys %$root) {
+    my $value = $root->{$key};
+    if(ref($value) eq "HASH") {
+      repopulateconfiguration($value);
+    } elsif (ref($value) eq "ARRAY") {
+      for my $item (@$value) {
+        repopulateconfiguration($item);
+      }
+    } elsif(defined $value) {
+      while($value =~ /__([^_].+?)__/g) {
+        my $source = "__" . $1 . "__";
+        my $target = eval $1;
+        $value =~ s/\Q$source\E/$target/g;
+      }
+      $root->{$key} = $value;
+    }
+  }
+}
+
+################################################################
+#
+#
+
+sub loadconfiguration {
+  my $file = shift;
+  if(defined $file) {
+    if(-e $file && -r _) {
+      # provided configuration file exists and can be read
+      $file = abs_path($file);
+    } else {
+      confess "The configuration file [$file] passed with -configfile does not exist or cannot be read.";
+    }
+  } else {
+    # otherwise, try to automatically find a configuration file
+    my ($scriptname,$path,$suffix) = fileparse($0);
+    my $cwd     = getcwd();
+    my $bindir  = $FindBin::RealBin;
+    my $userdir = $ENV{HOME};
+    my @candidate_files = (
+			   "$cwd/$scriptname.conf",
+			   "$cwd/etc/$scriptname.conf",
+			   "$cwd/../etc/$scriptname.conf",
+			   "$bindir/$scriptname.conf",
+			   "$bindir/etc/$scriptname.conf",
+			   "$bindir/../etc/$scriptname.conf",
+			   "$userdir/.$scriptname.conf",
+			   );
+    my @additional_files = (
+
+			   );
+    for my $candidate_file (@additional_files,@candidate_files) {
+      #printinfo("configsearch",$candidate_file);
+      if(-e $candidate_file && -r _) {
+	$file = $candidate_file;
+	#printinfo("configfound",$candidate_file);
+	last;
+      }
+    }
+  }
+  if(defined $file) {
+    $OPT{configfile} = $file;
+    $conf = new Config::General(
+				-ConfigFile=>$file,
+				-IncludeRelative=>1,
+				-ExtendedAccess=>1,
+				-AllowMultiOptions=>"yes",
+				-LowerCaseNames=>1,
+				-AutoTrue=>1
+			       );
+    %CONF = $conf->getall;
+  }
+}
+
+sub printdebug {
+  my ($level,@msg) = @_;
+  my $prefix = "debug";
+  if(defined $CONF{debug} && $CONF{debug} >= $level) {
+    printinfo(sprintf("%s[%d]",$prefix,$level),@_);
+  }
+}
+
+sub printinfo {
+  print join(" ",@_),"\n";
+}
+
+sub printdumper {
+  use Data::Dumper;
+  print Dumper(@_);
+}
+

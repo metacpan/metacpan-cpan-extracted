@@ -1,0 +1,10 @@
+perl-capstone v0.2 (2015-07-19)
+    - Implementation of Capstone API :
+         * cs_open
+         * cs_disasm (CS_OPT_DETAILS not implemented)
+         * cs_version
+         * cs_support
+         * cs_option
+
+perl-capstone v0.1 (2015-07-18)
+    - Initial commit

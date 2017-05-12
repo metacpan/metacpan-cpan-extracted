@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 42f39f1774965a7e5b70935f2129af5a5abe200d Build.PL
+SHA1 550f1f5b04dd35203b6fd816a4d0afa1216cf488 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 9e4a28ebb53a8268a698d9585c2c928e2a2a2124 MANIFEST
+SHA1 026b001d6b7df28940684d2823a76e9fa34daacd META.yml
+SHA1 e86245b6a930636e230cc7607c02cdabe7d1e2fc Makefile.PL
+SHA1 82cdabe3ead04d4088bc5159349e8d6c5a881b2f README
+SHA1 24e4d833c0ab13b1f1a136d052bb28a3d9f24e9a lib/Class/ClassDecorator.pm
+SHA1 5149c7ea5c53b23e39e5b1219f08880c5dd09181 t/01-load.t
+SHA1 d46467b4c2b530bda63bda7b268cb2387652b3c0 t/02-decorate.t
+SHA1 cd86d6acae2261c5911f1a4e7d512b988db603bd t/03-hierarchy.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+
+iD8DBQE/pF7V+4tbS/niBUoRAqK2AKCEQ50si20Pd+ZqeY0ODasD6d4JCACgrK6b
+Xf3hehyJRGJjFSWsP8FLs1U=
+=hSYO
+-----END PGP SIGNATURE-----

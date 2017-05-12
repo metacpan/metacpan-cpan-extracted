@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+bin/minicpan-fromlist
+dist.ini
+lib/CPAN/Mini/FromList.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

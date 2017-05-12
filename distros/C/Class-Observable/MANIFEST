@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/Observable.pm
+t/class_observable.t
+t/inherited.t
+t/DeeJay.pm
+t/Song.pm
+
+META.yml                                Module meta-data (added by MakeMaker)

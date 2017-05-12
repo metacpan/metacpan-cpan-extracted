@@ -1,0 +1,40 @@
+Revision history for Config-Strict
+
+0.07    01-26-2010
+        - Require Test::More 0.88 for done_testing()
+        - Rename get_param/set_param/unset_param to get/set/unset
+        - Add support for anonymous code blocks in Anon
+
+0.06    01-21-2010
+        - Fixed deep.t test plan which resulted in failed tests without
+          Test::Deep
+
+0.05    01-20-2010
+        - Added user-defined class-registered types (register_types method)
+        - Added UserConstraints.pm utility class for bare code blocks
+        - Now validating required parameter names
+        - Renamed 'Custom' to 'Anon' (parameter key)
+        - Removed all Moose importation from tests
+
+0.04    01-19-2010
+        - Removed Moose
+
+0.03    01-18-2010
+        - Eliminated bare coderefs until a wrapper is written to allow the
+          registration of named custom D::C::S constraints.
+        - Made user-created type properly registered in the Moose type registry 
+          and used by Moose to validate 'params' hash.
+        - Added param_is_required, unset_param methods
+        - Added validate method
+        - Renamed param_set to param_is_set
+        - Added more underlying data accessors 
+          (param_hash,param_array,all_set_params)
+        - Updated pod, test cases
+
+0.02    01-18-2010
+        - Renamed param_validator to get_profile
+        - Updated pod
+
+0.01    01-17-2010
+        Initial Release.
+

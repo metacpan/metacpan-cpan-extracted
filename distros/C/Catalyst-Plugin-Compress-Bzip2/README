@@ -1,0 +1,26 @@
+NAME
+    Catalyst::Plugin::Compress::Bzip2 - DEPRECATED Bzip2 response
+
+SYNOPSIS
+        use Catalyst qw[Compress::Bzip2];
+        # NOTE - DEPRECATED, supported for legacy applications,
+        #        but use Catalyst::Plugin::Compress in new code.
+
+DESCRIPTION
+    DEPRECATED - supported for legacy applications, but use
+    Catalyst::Plugin::Compress in new code.
+
+    Bzip2 compress response if client supports it.
+
+METHODS
+  finalize
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

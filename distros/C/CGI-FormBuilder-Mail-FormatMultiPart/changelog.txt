@@ -1,0 +1,12 @@
+1.0.6   corrected Module::Build error in Build.PL
+
+1.0.5   fixed parsing of %ENV values for mail output
+
+1.0.4   screwed up parsing of %ENV, apparently.
+
+1.0.3	removed real mail test unless you explicitly set env params
+
+1.0.1	improvements to testing, should build under windoze.
+		can use environment vars FB_FMP_SMTP and FB_FMP_EMAIL
+		as the smtp and email arguments.
+

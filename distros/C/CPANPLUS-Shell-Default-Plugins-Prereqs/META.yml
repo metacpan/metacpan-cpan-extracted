@@ -1,0 +1,28 @@
+---
+abstract: 'Plugin for CPANPLUS to automate the installation of prerequisites without installing the module'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires:
+  CPANPLUS::Dist::Build: 0
+  IO::CaptureOutput: 1.1102
+  Module::Build: 0.36
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPANPLUS-Shell-Default-Plugins-Prereqs
+provides:
+  CPANPLUS::Shell::Default::Plugins::Prereqs:
+    file: lib/CPANPLUS/Shell/Default/Plugins/Prereqs.pm
+    version: 0.10
+requires:
+  CPANPLUS: 0.77
+  File::Spec: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

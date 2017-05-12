@@ -1,0 +1,30 @@
+---
+name: CGI-Widget-Tabs
+version: 1.14
+author:
+  - 'Koos Pol E<lt>koos_pol@raketnet.nlE<gt>'
+abstract: Create tab widgets in HTML
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  HTML::Entities: 0
+  URI::Escape: 0
+build_requires:
+  Test::Distribution: 1.14
+  Test::More: 0
+provides:
+  CGI::Widget::Tabs:
+    file: lib/CGI/Widget/Tabs.pm
+    version: 1.14
+  CGI::Widget::Tabs::Heading:
+    file: lib/CGI/Widget/Tabs/Heading.pm
+    version: 1.00
+  CGI::Widget::Tabs::Style:
+    file: lib/CGI/Widget/Tabs/Style.pm
+    version: 1.00
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

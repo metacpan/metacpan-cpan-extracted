@@ -1,0 +1,305 @@
+2012-05-19: version 1.30
+
+	* Fix buck2sock corruption that causes errors like
+	  "No map found matching for GLOB" or "No sock found for" (hachi@cpan.org)
+	    https://rt.cpan.org/Ticket/Display.html?id=62872
+
+	* Fix t/05_reconnect_timeout.t to not fail on networks that fast-reject
+	  TEST-NET-1 https://rt.cpan.org/Ticket/Display.html?id=74500
+
+	* Fix warning about undefined value in GetParser.pm (kost@ropnet.ru)
+	    https://rt.cpan.org/Ticket/Display.html?id=31067
+
+	* Add documentation of connect_timeout and select_timeout
+	    https://rt.cpan.org/Ticket/Display.html?id=30904
+
+2010-06-17: version 1.29
+
+	* fix warnings spew if calling stats on a down server
+
+	* fix buck2sock confusion (Eddie Canales)
+
+	* quell ipv6-related warning
+	  https://rt.cpan.org/Ticket/Display.html?id=51761
+	
+2009-10-21: version 1.28
+
+	* IPv6 support (https://rt.cpan.org/Ticket/Display.html?id=50577)
+
+	* Add Encode.pm requirement to Makefile.PL for perl 5.6.x (Ask).
+
+2009-09-22: version 1.27
+
+	* Fix get() with utf-8 keys  (athomason)
+
+	* "stats malloc" command is gone in 1.4; remove those tests (athomason)
+
+	* Add append/prepend support (dormando)
+	
+	* Fix occasional failure in the 100_flush_bug.t test (Ask Bjørn Hansen)
+
+2009-05-04: version 1.26
+
+	* don't include "stats sizes" by default in the stats method,
+	  as that can hang big servers for a few seconds (Brad Fitzpatrick)
+	
+2009-05-02: version 1.25
+
+	* Clear @buck2sock when calling disconnect_all.  (Dennis Stosberg,
+	  [rt.cpan.org #45560]
+	
+	* Reconnects to a dead connection shouldn't happen every time when the
+	  connection has never succeded. Apply the dead timeout to sockets that
+	  never even came up. Add a test.
+
+	* Warn when trying to put undef values into memcache.
+	  (Henry Lyne <hlyne@livejournalinc.com>)
+	
+	* flush_all now only returns success if there is a proper reply from all
+	  servers - Yann Kerherve <yann@sixapart.com>
+	
+	* 'noreply' support from Tomash Brechko <tomash.brechko@gmail.com>
+
+	* various test updates from Ronald J Kimball <rkimball@pangeamedia.com>
+
+2007-07-17: version 1.24
+
+	* update the stats method, including tests for it
+	  (Ronald J Kimball <rkimball+memcached@pangeamedia.com>)
+
+	* arguments to 'new' constructor can be %hash or $hashref now
+	  (previously was only $hashref)
+
+	* work around a Perl segfault (Matthieu PATOU <mp@oxado.com>)
+	  see http://lists.danga.com/pipermail/memcached/2007-June/004511.html
+
+2007-06-19: version 1.23
+
+	* add 'remove' as an alias for 'delete' (Dave Cardwell <dave@davecardwell.co.uk>)
+
+2007-06-18: version 1.22
+
+	* lost connection handling broken due to wrong %sock_map indexing
+	  http://rt.cpan.org/Public/Bug/Display.html?id=27181
+	  fix from RHESA
+
+	* let parser_class be configured as a constructor option,
+	  defaulting to XS if available, else regular.  (unless
+	  $ENV{NO_XS} is set, in which case the default is regular)
+
+2007-05-02: version 1.21
+
+	* new faster optional interface for GetParser subclasses.  doing
+	  this release so upcoming Cache::Memcached::GetParserXS can
+	  depend on this.  otherwise this release isn't interesting.
+
+2007-04-16: version 1.20
+
+        * fix "Warning produced when flush_all called" from CDENT
+	  http://rt.cpan.org/Public/Bug/Display.html?id=22181
+
+	* support access via unix domain sockets. (Nathan Neulinger <nneul@umr.edu>)
+
+	* abstract out response parsing into own class, and add XS-module
+	  detection, so if you have the XS (C) version, things'll be faster.
+	  that part's not done yet.
+
+2006-07-03
+	* don't use dual scalar/glob sockets.  makes it all profilable
+	  again under SmallProf, DProf, and Devel::Profiler, all three
+	  of which used to barf on those weird sockets previously
+	* only init_buckets once, when servers are changed
+	* don't call sock_to_host and get_sock as much:  cache closer
+	  in get_multi
+	* more internal caching (buck2sock, etc)
+	* fast paths for namespaces/single sock/etc in a few more places
+	* general micro-speedups all over
+
+2006-06-27
+	* patch from Maxim Dounin <mdounin@rambler-co.ru> to fix a typo
+	  which caused no_rehash flag to not work.
+	* release 1.18
+
+2006-04-29
+	* flush_all command from Patrick Michael Kane <modus-memcache@pr.es.to>
+	* document namespaces
+	* release 1.17
+
+2006-04-29
+	* fix stats method (people have only been asking since 2004  :-/)
+	* add tests
+	* move Memcached to lib/Cache directory to be more CPAN-friendly
+	* release 1.16
+
+2005-09-20
+	* configurable connect delays and callback on connect failure (brad)
+	* release 1.15
+
+2005-08-09
+        * _connect_sock never works in blocking mode because of a bug in setting
+	the default timeout. (Gaal)
+
+2004-07-27
+	* release 1.14
+
+2004-07-27
+	* kill buggy, slow ord() _hashfunc, replace with crc32.
+	  this adds String::CRC32 as a dependency.  thanks to
+	  everybody's feedback on the mailing list.
+
+2004-07-19
+	* don't use pos() because it doesn't seem to work in
+	  taint mode.  use $+[0] instead.  (Dave Evans <..@djce.org.uk>)
+
+2004-06-19
+	* support multiple paths to memcache nodes (Brad)
+	  see 'set_pref_ip'
+
+2004-05-30
+	* release version 1.13
+
+2004-05-26 (Whitaker <whitaker@danga.com>)
+	* quiet warning
+
+2004-05-25 (Whitaker <whitaker@danga.com>)
+	* get_multi shouldn't modify caller's @_
+
+2004-05-18 (Michael <ged@danga.com>)
+	* namespace support
+	* use fields
+
+2004-05-16 (Alexei Kozlov <kozlov@w-m.ru>)
+	* remove warnings with vec
+
+2004-04-09 (brad)
+	* in perl 5.6, trap errors dethawing 5.8 storable objects
+	  and instead treat it like a cache miss
+
+2004-04-01
+	* use $! and not %! for perl 5.6 compat (Dave Evans <..@djce.org.uk>)
+	* don't mark whole IP dead anymore when a node is down (Jason Titus <jtitus@postini.com>)
+	* start version numbering (Jamie McCarthy <jamie@mccarthy.vg>)
+
+2004-03-09 (Brad/Avva)
+	* _oneline can return more than one line (but always on a line break),
+	  so caller must decide when it's really time to quit.  had to modify
+	  run_command to know that.  (which is used by stats)
+
+2004-03-05 (Dave Evans <..@djce.org.uk>)
+	* Here's a really trivial patch for the Perl binding,
+	Cache::Memcached.  The bug is that the module assumes that the
+	currently select()ed filehandle is STDOUT, but this might not be
+	the case.  So this patch ensures that the select()ed filehandle is
+	preserved, not forced to STDOUT.
+
+2004-02-29 (Brad)
+	* add readonly option
+
+2004-02-27 (Avva)
+	* Cleaner handling of the case when _oneline is called without a
+	  line parameter (i.e. not to send anything, just read a line from
+	  the socket).  Make it depend on $line being defined only,
+	  regardless of its content (thanks Brad!).
+
+2004-02-25 (Avva)
+	* Asyncify all I/O, finally get rid of alarm() yuckiness, unify all
+	  one-liner command/responses into a single internal API.
+	
+2004-02-17
+	* document in POD the delete method
+	
+2004-02-03
+	* fix bug with 2k read boundaries falling in the middle
+	  of "VALUE ..." or "END" lines, thus halting future
+	  parsing and responses.  (eek!)
+	* version 1.0.12
+	
+2003-12-01
+	* merge stats/stats_reset patch from Jamie McCarthy
+	* trailing whitespace cleanup
+
+2003-11-08
+	* work on Solaris/BSD where there's no MSG_NOSIGNAL.
+	  the expense is extra syscalls to change the local
+	  SIGPIPE handler all the time.  in the future, it'd 
+	  be nice to have an option so Solaris/BSD callers
+	  can say, "Hey, I've turned off SIGPIPE globally,
+	  don't worry about it."
+
+2003-10-26
+	* add a test file, so automated CPAN test hosts are happy
+	* check MSG_NOSIGNAL immediately on module load, not on use,
+	  so Solaris dies early.  (still on TODO to fix, but better
+	  to fail loudly)
+	* version 1.0.11
+
+2003-10-25
+	* version 1.0.10, rename to Cache::Memcached, upload to CPAN
+	
+2003-10-18
+	* implement read/write timeouts everywhere. Now the client shouldn't
+          hang if the server machine goes down unexpectedly. (avva)
+
+2003-10-16
+	* use Storable::nfreeze instead of freeze, so hosts from different
+	  architectures can all use the same data.  (all must use Perl, though.
+	  the different memcache APIs all store/pickle/serialize data differently)
+	  Suggestion by Jason Titus <jtitus@postini.com>
+	
+2003-10-06
+	* fix _incrdecr to return complete number, not just first
+	  digit (thanks to Ryan T. Dean)
+	* release version 1.0.9
+
+2003-10-04
+	* document expiration times in POD (thanks to Tim Bunce
+	  for noting the omission)
+	* release version 1.0.8
+	
+2003-10-03
+	* add connect timeout of 0.25s, for dead host detection.
+	  We had 1 second a couple revs ago, but lost it when
+	  ditching IO::Socket module.  (avva)
+	
+2003-10-02
+	* fix _incrdecr with explicit-hashvalue keys (whitaker)
+	
+2003-10-01
+	* add run_command API call.  TODO: document, and document
+	  the $exptime on the setters
+		  
+2003-09-30
+	* use send instead of print, so we can set MSG_NOSIGNAL
+	  and not get SIGPIPES, which avoids 3 syscalls of localizing
+	  $SIG{PIPE} and sends everything at once, instead of 4k
+	  stdio chunks.  in review:  stdio buffered in, send unbuffered
+	  out.  TODO:  setvbuf so reads are buffered at more than 4k.
+
+2003-09-29
+	* yet faster parsing
+	* switch to stdio/perlio instead of raw io: more correct,
+	  simpler parsing code.
+
+2003-09-28
+	* prevent some warnings
+	* faster get() call that doesn't use get_multi()
+	* optimizations for single-server case
+	* use socket APIs directly, instead of uber-slow IO::* modules
+	* new faster _load_items parsing
+	
+2003-09-04	
+	* emit debug when set/add/replace fails, in addition to succeed
+      
+Version 1.0.7
+	-- compression support (Brad Whitaker)
+	
+Version 1.0.6
+	-- incr/decr client support
+	-- make delete optionally take second argument (server now supports
+	   a delay time on delete)
+	-- doc updates from Jamie McCarthy
+	-- better hashing after dead host detection:  new requests go to different
+	   remaining hosts, instead of all to the same one.
+
+Version 1.0.2
+	-- initial release, about.

@@ -1,0 +1,56 @@
+NAME
+    Crypt::GOST - The GOST Encryption Algorithm
+
+SYNOPSIS
+    use Crypt::GOST;
+
+    $cipher = Crypt::GOST->new($key);
+
+    $ciphertext = $cipher->encrypt($plaintext);
+
+    $plaintext = $cipher->decrypt($ciphertext);
+
+DESCRIPTION
+    GOST 28147-89 is a 64-bit symmetric block cipher with a 256-bit
+    key developed in the former Soviet Union. Some information on it
+    is available at <URL:http://vipul.net/gost/>.
+
+    This module implements GOST encryption. It supports the Crypt::CBC
+    interface, with the functions described below. It also provides
+    an interface that is backwards- compatible with Crypt::GOST 0.41,
+    but its use in new code is discouraged.
+
+  Functions
+
+    blocksize
+        Returns the size (in bytes) of the block (8, in this case).
+
+    keysize
+        Returns the size (in bytes) of the key (32, in this case).
+
+    new($key)
+        This creates a new Crypt::GOST object with the specified key.
+
+    encrypt($data)
+        Encrypts blocksize() bytes of $data and returns the
+        corresponding ciphertext.
+
+    decrypt($data)
+        Decrypts blocksize() bytes of $data and returns the
+        corresponding plaintext.
+
+SEE ALSO
+    Crypt::CBC, Crypt::Twofish, Crypt::TEA
+
+ACKNOWLEDGEMENTS
+    Vipul Ved Prakash
+        For writing Crypt::GOST 0.41, and reviewing the current
+        version.
+
+AUTHOR
+    Abhijit Menon-Sen <ams@wiw.org>
+
+    Copyright 2001 Abhijit Menon-Sen. All rights reserved.
+
+    This software is distributed under the terms of the Artistic
+    License <URL:http://ams.wiw.org/code/artistic.txt>.

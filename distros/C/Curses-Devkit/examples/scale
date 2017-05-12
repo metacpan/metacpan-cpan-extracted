@@ -1,0 +1,36 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Scale Widget
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the scale object.
+my $scale = new Cdk::Scale ('Label' => "</5>Pick A Number: ",
+				'Low' => 1,
+				'High' => 10);
+
+# Activate the object.
+my $number = $scale->activate ();
+
+# Check the results.
+if (!defined $number)
+{
+   popupLabel (["<C>Escape hit. No number selected."]);
+}
+else
+{
+   popupLabel (["<C>You selected $number"]);
+}
+
+# Exit Cdk.
+Cdk::end();
+
+# Print out the info.
+print "\n\n\n";
+print "Number Chosen: $number\n";

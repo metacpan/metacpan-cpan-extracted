@@ -1,0 +1,45 @@
+CGI::Form2XML README
+====================
+
+CGI::Form2XML is designed to render the parameters of a CGI Request as an
+XML document in a similar way to CGI::XML or CGI::XMLForm, however it does
+so to a fixed schema (which is included with the distribution).  It was
+defined for a particular application and was released in the hope that it
+might prove useful for someone else.  However if more flexibility is
+required in the contruction of the XML you probably want to look at one
+of the other modules described.
+
+The original intent of this module was to pass the results of a form
+submission to a Message Oriented Middleware application and thence to a
+processing application (or applications) in order to be able to capture
+data on a web site in a loosely coupled manner.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires that the CGI module is present - however as this
+has been part of the standard distribution since 5.004.04 I don't think
+this is a problem.
+
+SUPPORT AND REPORTING BUGS
+
+Please send all bug reports, patches, suggestions and flames to the author
+via the github issues https://github.com/jonathanstowe/CGI-Form2XML/issues
+or if you'd rather by email (jns@gellyfish.co.uk).
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 - 2016 Jonathan Stowe 
+
+This module can be used and distributed under the same terms as Perl itself.
+Details of the Perl licence can be found in the file README in the source 
+distribution.
+

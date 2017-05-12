@@ -1,0 +1,53 @@
+{
+   "abstract" : "load a configuration directory tree containing\nYAML, JSON, XML, Perl, INI or Config::General files AND alter it in runtime.",
+   "author" : [
+      "Meettya <meettya@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Merge-Dynamic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.2",
+            "Config::Merge" : "1.01",
+            "YAML::XS" : "0.35",
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Merge::Dynamic" : {
+         "file" : "lib/Config/Merge/Dynamic.pm",
+         "version" : "0.141"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Meettya/Config-Merge-Dynamic/"
+      }
+   },
+   "version" : "0.141"
+}

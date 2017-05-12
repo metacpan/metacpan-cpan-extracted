@@ -1,0 +1,34 @@
+[% PROCESS "form_macros.tt" %]
+[% MACRO list_row_columns(item) BLOCK; %]
+            [%
+            FOR column = crud.model.list_columns;
+                list_row_column(item, column);
+            END;
+            %]
+[% END; %]
+
+
+
+[% MACRO list_row_column(item, column) BLOCK; %]
+                <td>
+                [% IF column == crud.model.columns('Stringify'); %]
+                   <a href="[% c.uri_for_controller('view', item.id) %]">[% item.$column | html %]</a>
+                [% ELSE; %]
+                    [% form_field_item(column, item.$column, ['view', item.$column.id], '') %]
+                [% END; %]
+                </td>
+[% END; %]
+
+
+
+[% MACRO list_additional_column_headings(item) BLOCK; %]
+[% END; %]
+
+
+
+[% MACRO list_actions(item) BLOCK; %]
+                <a href="[% c.uri_for_controller('view', item.id) %]">View</a>
+                <a href="[% c.uri_for_controller('edit', item.id) %]">Edit</a>
+                <a href="[% c.uri_for_controller('delete', item.id) %]">Delete</a>
+[% END; %]
+

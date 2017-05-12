@@ -1,0 +1,171 @@
+NAME
+    Catalyst::Plugin::I18N::Request - A plugin for localizing/delocalizing
+    paths and parameters.
+
+SYNOPSIS
+        package My::App;
+    
+        use Catalyst qw( ConfigLoader Static::Simple I18N I18N::Request );
+    
+        1;
+    
+        ...
+    
+        package My::App::Controller::Root;
+    
+        use base qw( Catalyst::Controller );
+    
+        sub search : Private {
+            my ($self, $c) = @_;
+            my $searchTerms = $c->req->param('searchTerms');
+            # yadda, yadda, yadda...
+        }
+    
+        ...
+    
+        French:
+        
+            Requested as:
+                GET /recherche?terms_de_recherche=Pirates HTTP/1.0
+                Accept-Language: fr
+            
+            Dispatched as:
+                GET /search?searchTerms=Pirates HTTP/1.0
+                Accept-Language: fr
+            
+            $c->uri_for('/search'):
+                http://localhost/recherche
+        
+        German:
+        
+            Requested as:
+                GET /suche?searchTerms=Pirates HTTP/1.0
+                Accept-Language: de
+            
+            Dispatched as:
+                GET /search?searchTerms=Pirates HTTP/1.0
+                Accept-Language: de    
+            
+            $c->uri_for('/search'):
+                http://localhost/suche
+
+DESCRIPTION
+    This plugin is designed to work alongside Catalyst::Plugin::I18N in
+    order to provide localization / delocalization of request paths and
+    request parameter names.
+
+DELOCALIZATION
+    Delocalization occurs when a request is first received, before any
+    dispatching takes place. Delocalization assumes that there may exist
+    paths or parameter names within the request which do not correlate to
+    actual names used within the application itself. When functioning
+    properly, this plugin will allow users to activate an action called
+    'search' using:
+
+        'recherche' (French requests)
+        'suche'     (German requests)
+         etc...
+
+    This relies on the localize method provided to the application by
+    Catalyst::Plugin::I18N. For the above examples to work, the following
+    localizations must occur:
+
+        Key                       | Localized text  | Language
+        ==========================================================
+        PATH_delocalize_recherche | search          | French
+        PATH_delocalize_suche     | search          | German
+
+    That is, $c->localize('PATH_delocalize_recherche') must return 'search'.
+    A very similar behaviour applies to parameter names within the query
+    string. The keys for these delocalizations begin with
+    'PARAMETER_delocalize_' instead of 'PATH_delocalize_'.
+
+LOCALIZATION
+    Localization involves taking paths and parameter names and replacing
+    them with values which make more sense to users speaking the requested
+    language. In the above example, 'search' may not look intuitive to
+    German users. Out of the box, this plugin allows you to localize these
+    values transparently via the standard $c->uri_for and
+    $c->request->uri_with methods which are already standard features of the
+    Catalyst framework.
+
+    Like delocalization, this functionality depends upon the $c->localize
+    method. However, PATH_delocalize_ is replaced with PATH_localize and
+    PARAMETER_delocalize_ is replaced with PARAMETER_localize_.
+
+        Key                  | Localized text  | Language
+        ==========================================================
+        PATH_localize_search | recherche       | French
+        PATH_localize_search | suche           | German
+
+METHODS
+  setup ( )
+    Allows Catalyst::Request to localize the results of calls to uri_with.
+
+  prepare ( )
+    Overrides Catalyst's "prepare" method to push the context object to the
+    request object.
+
+  uri_for ( $path [, @args ] [, \%query_values ] )
+    Calls the native uri_for, but proceeds to localize the resulting path
+    and query values.
+
+  localize_uri ( $uri )
+    Localizes a URI using the current context.
+
+  localize_path ( $path )
+    Localizes all components of the provided path.
+
+  delocalize_path ( $path )
+    Delocalizes all components of the provided path.
+
+  transform_parameters ( \%parameters, $transformer )
+    Transforms the given parameter names using the given transformer. The
+    transformer may be one of the following:
+
+    *   A CODE reference which accepts the context object as the first
+        argument and a parameter name as the second argument.
+
+    *   The name of a particular accessor that can be called on the context
+        object, accepting a parameter name as the argument.
+
+  localize_parameters ( \%parameters )
+    Localizes the keys within a hash of parameters.
+
+  delocalize_parameters ( \%parameters )
+    Delocalizes the keys within a hash of parameters.
+
+  prepare_path ( )
+    Delocalizes the requested path.
+
+  prepare_parameters ( )
+    Delocalizes the requested parameter names.
+
+  localize_path_component ( $delocalized )
+    Localizes a component of a path.
+
+  delocalize_path_component ( $localized )
+    Delocalizes a component of a path.
+
+  localize_parameter_name ( $delocalized )
+    Localizes a parameter name.
+
+  delocalize_parameter_name ( $localized )
+    Delocalizes a parameter name.
+
+SEE ALSO
+    *   Catalyst::Plugin::I18N
+
+    *   Catalyst
+
+AUTHORS
+    Adam Paynter <adapay@cpan.org>
+
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2012 by Adam Paynter, Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

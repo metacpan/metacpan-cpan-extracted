@@ -1,0 +1,11 @@
+index.html
+ChangeLog
+Build.PL
+LICENSE
+MANIFEST
+Makefile.PL
+lib/CAM/Session.pm
+test.pl
+README
+META.yml
+

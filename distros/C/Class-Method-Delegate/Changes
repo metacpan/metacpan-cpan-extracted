@@ -1,0 +1,8 @@
+Revision history for Perl extension Class::Method::Delegate.
+
+0.01  Thu Aug 30 11:18:11 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Class::Method::Delegate -b 5.10.0
+
+0.02  Fri Sep 07 09:00:39 2012
+  - check that the method passed as the delegate returns a blessed reference

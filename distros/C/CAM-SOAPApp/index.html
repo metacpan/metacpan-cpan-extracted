@@ -1,0 +1,247 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-SOAPApp/index.html">
+<title>CAM-SOAPApp</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-SOAPApp</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-SOAPApp-1.06-docs">v1.06</a>, 2006-02-21</p>
+
+
+<p>
+The standard Perl library for creating SOAP services is SOAP:<!-- -->:Lite.
+While powerful, that module is nearly incomprehensible and downright
+idiosyncratic.  Here comes CAM:<!-- -->:SOAPApp to the rescue!  We built this
+package while writing our SOAP client implememtation for Flash, and
+found it to be a huge time saver.  We also used it to debug Apple
+Safari and Sherlock issues, enabling those broken tools to be good
+web-service citizens.
+</p>
+
+<p>
+This module implements a handy framework for deploying SOAP services.
+It inherits all of the simplifications allowed by CAM:<!-- -->:App.  Combined
+with CAM:<!-- -->:SOAPClient, CAM:<!-- -->:SOAPApp can define a fully contained and
+fault-tolerant client-server solution.  It also works well with any
+SOAP implementation that can talk to SOAP:<!-- -->:Lite -- and some that can't!
+</p>
+
+<p>
+This package works around several different flaws in various SOAP and
+HTTP implementations, using 'lenient' mode.  These solutions are very
+valuable, let alone the rest of the module.
+</p>
+
+<p>
+Note that the packages that you create for SOAP methods SHOULD NOT
+subclass from this class!  That would be a security problem.  Please
+see the example in the documentation for the right way to use the
+CAM:<!-- -->:SOAPApp module.  The regression tests implement a simple but
+full-featured client and server running on localhost.
+</p>
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-SOAPApp-1.06.tgz">CAM-SOAPApp-1.06.tgz</a>
+          (<a href="perl/CAM-SOAPApp-1.06.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-SOAPApp-1.06.zip">CAM-SOAPApp-1.06.zip</a>
+          (<a href="perl/CAM-SOAPApp-1.06.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-SOAPApp-1.06-docs">CAM-SOAPApp-1.06-docs</a>
+          
+          
+        </td>
+        <td valign="top">Tue Feb 21 10:39:39 2006</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-SOAPApp-1.05.tgz">CAM-SOAPApp-1.05.tgz</a>
+          (<a href="perl/CAM-SOAPApp-1.05.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-SOAPApp-1.05.zip">CAM-SOAPApp-1.05.zip</a>
+          (<a href="perl/CAM-SOAPApp-1.05.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-SOAPApp-1.05-docs">CAM-SOAPApp-1.05-docs</a>
+          
+          
+        </td>
+        <td valign="top">Mon May  9 14:47:40 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-SOAPApp-1.04.tgz">CAM-SOAPApp-1.04.tgz</a>
+          (<a href="gpl/CAM-SOAPApp-1.04.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-SOAPApp-1.04.zip">CAM-SOAPApp-1.04.zip</a>
+          (<a href="gpl/CAM-SOAPApp-1.04.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-SOAPApp-1.04-docs">CAM-SOAPApp-1.04-docs</a>
+          
+          
+        </td>
+        <td valign="top">Wed Jun  2 17:27:51 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-SOAPApp-1.04.tgz">CAM-SOAPApp-1.04.tgz</a>
+          (<a href="clotho/CAM-SOAPApp-1.04.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-SOAPApp-1.04.zip">CAM-SOAPApp-1.04.zip</a>
+          (<a href="clotho/CAM-SOAPApp-1.04.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-SOAPApp-1.04-docs">CAM-SOAPApp-1.04-docs</a>
+          
+          
+        </td>
+        <td valign="top">Wed Jun  2 17:27:51 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-SOAPApp-1.03.tgz">CAM-SOAPApp-1.03.tgz</a>
+          (<a href="gpl/CAM-SOAPApp-1.03.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-SOAPApp-1.03.zip">CAM-SOAPApp-1.03.zip</a>
+          (<a href="gpl/CAM-SOAPApp-1.03.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-SOAPApp-1.03.html">CAM-SOAPApp-1.03.html</a>
+          
+          
+        </td>
+        <td valign="top">Mon Sep 15 18:16:04 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-SOAPApp-1.03.tgz">CAM-SOAPApp-1.03.tgz</a>
+          (<a href="clotho/CAM-SOAPApp-1.03.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-SOAPApp-1.03.zip">CAM-SOAPApp-1.03.zip</a>
+          (<a href="clotho/CAM-SOAPApp-1.03.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-SOAPApp-1.03.html">CAM-SOAPApp-1.03.html</a>
+          
+          
+        </td>
+        <td valign="top">Mon Sep 15 18:16:04 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

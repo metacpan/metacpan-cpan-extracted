@@ -1,0 +1,22 @@
+Build.PL
+Changes
+INSTALL
+lib/Colloquy/Data.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+NOTICE
+README
+t/01pod.t
+t/02pod_coverage.t
+t/13test.t
+t/14test.t
+t/data1.3/lists.lua
+t/data1.3/users.lua
+t/data1.4/lists/girlsonly
+t/data1.4/lists/perl
+t/data1.4/lists/vent
+t/data1.4/users/jane
+t/data1.4/users/john
+TODO

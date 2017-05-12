@@ -1,0 +1,49 @@
+{
+   "abstract" : "Perl bindings to the DSRC compression library",
+   "author" : [
+      "Jeremy Volkening <jdv*at*base2bio*dot*com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Compress-DSRC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::Typemaps::ObjectMap" : "0",
+            "ExtUtils::XSpp" : "0.18",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.07",
+            "Module::Build" : "0.42",
+            "Module::Build::WithXSpp" : "0.14"
+         }
+      }
+   },
+   "provides" : {
+      "Compress::DSRC" : {
+         "file" : "lib/Compress/DSRC.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jvolkening/p5-Compress-DSRC"
+      }
+   },
+   "version" : "0.003"
+}

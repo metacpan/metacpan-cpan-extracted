@@ -1,0 +1,7 @@
+<script type="text/javascript">
+/* <![CDATA[ */
+    if (YAHOO.crud.HISTORY && YAHOO.crud.HISTORY.length > 0) {
+        YAHOO.crud.init_histories();    // must come after ALL History modules are registered
+    }
+/* ]]> */    
+</script>

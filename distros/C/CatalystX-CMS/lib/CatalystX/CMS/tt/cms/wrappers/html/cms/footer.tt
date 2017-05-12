@@ -1,0 +1,8 @@
+[%# cms html flavour footer %]
+ <div id="footer">
+   Powered by
+   &nbsp;
+   <a href="https://svn.msi.umn.edu/sw/perl/CatalystX-CMS">CatalystX::CMS</a>
+   &nbsp;and&nbsp;
+   <a href="http://developer.yahoo.com/yui/">YUI</a>
+ </div> <!-- End footer -->

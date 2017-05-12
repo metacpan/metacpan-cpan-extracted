@@ -1,0 +1,57 @@
+---
+abstract: 'Read and write a subset of YAML for CPAN Meta files'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0.19'
+  IO::Dir: '0'
+  JSON::PP: '0'
+  Test::More: '0.88'
+  base: '0'
+  lib: '0'
+  perl: '5.008001'
+  utf8: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Meta-YAML
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  CPAN::Meta::YAML:
+    file: lib/CPAN/Meta/YAML.pm
+    version: '0.018'
+requires:
+  B: '0'
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  Scalar::Util: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Toolchain-Gang/YAML-Tiny/issues
+  homepage: https://github.com/Perl-Toolchain-Gang/CPAN-Meta-YAML
+  repository: https://github.com/Perl-Toolchain-Gang/CPAN-Meta-YAML.git
+version: '0.018'
+x_authority: cpan:DAGOLDEN

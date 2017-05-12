@@ -1,0 +1,15 @@
+---
+    seq:
+        # tests that are not parallel-ready (will run in isolation)
+        - seq:
+            - **
+            - t/02drop.t
+            - t/03info.t
+            - t/04search.t
+            - t/04search_everything.t
+            - t/05meta_new.t
+            - t/05meta_update.t
+        # tests that can run in parallel
+        - par:
+            # wildcard for everything else
+            - **

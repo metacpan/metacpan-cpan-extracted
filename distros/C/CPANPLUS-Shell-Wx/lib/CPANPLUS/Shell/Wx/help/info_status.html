@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>wxCPAN :: Information Pane :: Status Tab</title>
+</head>
+<body>
+<h1>Status Tab</h1>
+<img src="images/info_status.png"/>
+<p>This tab displays status information for the selected module. Despite its elements, it stores no data from the user. As with the other panels, press the 'Check Values' button to fill the appropriate fields. Note: They are automatically filled after any action is performed on a module from the Actions tab. The fields are as follows:</p>
+<ul>
+    <li><a href="#insttype">Installer Type</a></li>
+    <li><a href="#extract">Extract Location</a></li>
+    <li><a href="#dlloc">Downlaod Location</a></li>
+    <li><a href="#checkloc">Checksum Location</a></li>
+    <li><a href="#checkval">Checksum Value</a></li>
+    <li><a href="#createdok">Created OK</a></li>
+    <li><a href="#sigok">Signature Check OK</a></li>
+    <li><a href="#uninstok">Uninstalled OK</a></li>
+    <li><a href="#instok">Installed OK</a></li>
+    <li><a href="#checkok">Checksum OK</a></li>
+</ul>
+
+<h2 id="#insttype">Installer Type</h2>
+<p>The installer type used for this distribution. Will be one of 'makemaker' or 'build'. This determines whether CPANPLUS::Dist::MM or CPANPLUS::Dist::Build will be used to build this distribution.</p>
+
+<h2 id="#extract">Extract Location</h2>
+<p>The directory this distribution was extracted to.</p>
+
+<h2 id="#dlloc">Downlaod Location</h2>
+<p>The location this distribution was fetched to.</p>
+
+<h2 id="#checkloc">Checksum Location</h2>
+<p>The location of this distributions CHECKSUMS file.</p>
+
+<h2 id="#checkval">Checksum Value</h2>
+<p>The checksum value this distribution is expected to have.</p>
+
+<h2 id="#createdok">Created OK</h2>
+<p>Flag indicating if the create call was done successfully.</p>
+
+<h2 id="#sigok">Signature Check OK</h2>
+<p>Flag indicating, if a signature check was done, whether it was OK or not.</p>
+
+<h2 id="#uninstok">Uninstalled OK</h2>
+<p>Flag indicating if an uninstall call was done successfully.</p>
+
+<h2 id="#instok">Installed OK</h2>
+<p>Flag indicating if the install call was done successfully.</p>
+
+<h2 id="#checkok">Checksum OK</h2>
+<p>Flag indicating if the checksums check was done successfully.</p>
+
+</body>
+</html>

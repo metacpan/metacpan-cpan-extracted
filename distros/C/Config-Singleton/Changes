@@ -1,0 +1,19 @@
+Revision history for Config-Singleton
+
+0.005     2014-07-02 19:13:13-04:00 America/New_York
+        - try to stop ignoring the "filename" argument in -setup
+
+0.004     2013-09-28 20:36:16 America/New_York
+          update butracker and repo (thanks, David Steinbrunner)
+
+0.003     2013-06-20 15:51:27 America/New_York
+          ditch Module::Install
+
+          use YAML::XS instead of YAML::Syck
+
+0.002     2013-04-25
+          ditch autoinstall
+
+0.001     2008-02-25
+          first public release, at long last
+

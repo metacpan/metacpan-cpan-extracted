@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  
+      Schemas for IDL to WSDL CORBA Namespace
+  
+-->
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" ns="http://www.omg.org/IDL-WSDL/1.0/" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="SourceIDL">
+    <element name="SourceIDL">
+      <a:documentation>IDL/WSDL Mapping Info </a:documentation>
+      <element name="source">
+        <data type="string"/>
+      </element>
+      <element name="version">
+        <data type="string"/>
+      </element>
+    </element>
+  </define>
+  <define name="SourceRepositoryID">
+    <element name="SourceRepositoryID">
+      <a:documentation>IDL Mapped Repository ID</a:documentation>
+      <element name="repositoryID">
+        <data type="string"/>
+      </element>
+      <element name="version">
+        <data type="string"/>
+      </element>
+    </element>
+  </define>
+  <define name="ObjectReference">
+    <oneOrMore>
+      <element name="url">
+        <data type="anyURI"/>
+      </element>
+    </oneOrMore>
+  </define>
+  <define name="CORBA.TypeCode">
+    <element name="definition">
+      <data type="anyURI"/>
+    </element>
+    <element name="typename">
+      <data type="string"/>
+    </element>
+  </define>
+  <define name="any">
+    <element>
+      <anyName/>
+      <zeroOrMore>
+        <choice>
+          <attribute>
+            <anyName/>
+          </attribute>
+          <text/>
+          <ref name="any"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="CORBA.Any">
+    <element name="type">
+      <ref name="CORBA.TypeCode"/>
+    </element>
+    <element name="value">
+      <ref name="any"/>
+    </element>
+  </define>
+  <define name="CORBA.completion_status">
+    <choice>
+      <value>COMPLETED_YES</value>
+      <value>COMPLETED_NO</value>
+      <value>COMPLETED_MAYBE</value>
+    </choice>
+  </define>
+  <define name="CORBA.SystemException">
+    <element name="minor">
+      <data type="unsignedInt"/>
+    </element>
+    <element name="completion_status">
+      <ref name="CORBA.completion_status"/>
+    </element>
+  </define>
+  <define name="_VALREF">
+    <optional>
+      <!-- empty attribute used for null semantics, i.e., value graph end nodes -->
+      <attribute name="ref">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+  </define>
+</grammar>

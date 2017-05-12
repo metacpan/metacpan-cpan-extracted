@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Model::Sedna.
+
+0.01  Fri Jan 15 11:00:43 2010
+	- original version; created by h2xs 1.23 with options
+		-cfn Catalyst::Model::Sedna
+

@@ -1,0 +1,5 @@
+ - use Test::More (suggested by Trelane)
+ - caller() should return correct values (see Hook::LexWrap)
+ - tests for methods constructor
+ - more documentation
+ - write about it on http://patternsinperl.com/

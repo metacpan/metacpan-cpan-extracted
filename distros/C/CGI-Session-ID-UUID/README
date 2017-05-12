@@ -1,0 +1,19 @@
+CGI::Session::ID::UUID
+======================
+
+ABSTRACT
+
+CGI::Session::ID::UUID is a CGI::Session driver to generate identifiers
+based on DCE 1.1 and ISO/IEC 11578:1996 compliant Universally Unique
+Identifiers (UUID). This module requires a reasonable UUID generator.
+For this it either requires the OSSP::uuid (preference) or Data::UUID
+(alternative) modules to be installed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+

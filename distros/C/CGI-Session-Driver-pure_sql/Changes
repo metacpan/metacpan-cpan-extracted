@@ -1,0 +1,66 @@
+Revision history for Perl module CGI::Session::Driver::pure_sql
+
+0.70 Thu Apr  1 21:43:32 EDT 2010
+  [BUG FIXES]
+  * Fix a bug when a cookie is present but the DB row is missing. (RT#28027)
+
+  [INTERNALS]
+  * Try to make tests pass in all time zones by explicitly setting $ENV{TZ}
+
+0.62 Thu May 10 09:38:47 EDT 2007
+  [INTERNALS]
+  * create Makefile.PL differently, for automated testing (RT#27006)
+
+0.61 Mon May  7 09:31:45 EDT 2007
+  [BUG FIXES]
+  * Tests were fixed to reference sql_abstract, not SQLAbstract .
+   (Thanks to David Cantrell for the test report)
+
+0.60 Thu May  3 17:53:32 EDT 2007
+ [ENHANCEMENTS]
+ * Overhauled for CGI::Session 4.x Driver spec.
+   NO LONGER COMPATIBLE as a 3.x driver.
+
+0.54 Wed Apr 27 16:39:19 EST 2005
+  [BUG FIXES]
+  * The 'duration' field wasn't being populated.
+
+  [INTERNALS]
+  * Test updates to work with the date syntax of PostgreSQL 8.0 as well as 7.1
+  * Some more tests
+
+0.53  Sun Dec 19 17:19:20 EST 2004
+    - No code changes.
+    - A potential fix was added some some tests that failed if they were run
+      in a time zone different than my own... (2nd try!)
+
+0.52 Sun Dec  5 17:54:31 EST 2004
+    - No code changes.
+    - A potential fix was added some some tests that failed if they were run
+      in a time zone different than my own...
+
+0.51 Sun Oct 31 16:20:41 EST 2004
+    - Bug fix: Fixed bug that caused creation times to creep forward,
+      due to a "local time" versus "GMT" bug. New tests added for this
+      case as well. (Thanks to Matt Christian for initial debugging).
+
+    - Cleaned up internal use of "end_time" versus "duration". (Mark Stosberg)
+
+0.30 Tues Feb 10 2003
+    - No code changes. Simply declaring 'stable enough' to not be a developer release anymore.
+
+0.23_01 Tues Oct 28 2003
+    [BUG FIXES]
+    - Force the serializer to be SQLAbstract, which is the only choice known to work
+
+0.22_01 Mon Oct 27 2003
+    [BUG FIXES]
+    - Fixed table name defaulting to 'sessions'. New test added for this case.
+
+0.21_01 Sun Sep 14 20:32:41 2003
+    - Updated with suggestions with from Markus and prepared for CPAN
+
+0.01 Sun Aug 24 19:56:48 2003
+    - original version; created by ExtUtils::ModuleMaker 0.32
+
+vim:ft=changelog

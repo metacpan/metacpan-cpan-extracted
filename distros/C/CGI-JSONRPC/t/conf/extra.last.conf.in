@@ -1,0 +1,9 @@
+
+<IfModule mod_perl.c>
+    <Perl >
+       use lib "@ServerRoot@/../lib";
+    </Perl>
+</IfModule>
+
+Include @ServerRoot@/../examples/httpd.conf
+Alias   /jsonrpc-test   @ServerRoot@/../examples

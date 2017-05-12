@@ -1,0 +1,93 @@
+0.14 2008-08-01
+
+- Add a simple cache for column methods inside the object.
+
+
+0.13 2006-07-21
+
+- Class::AlzaboWrapper::Cusor->next() will die with a useful error
+message if it encounters a table for which there is no corresponding
+class.
+
+- Use Exception::Class exceptions instead of die(), so all errors
+should include a stack trace.
+
+- The tests foolishly assumed you had MySQL available. Now the tests
+try to use MySQL or Postgres, whichever is available. Reported by Joe
+McMahon.
+
+
+0.12  2005-10-22
+
+- Having a function Class::AlzaboWrapper::Cursor() and a class named
+Class::AlzaboWrapper::Cursor apparently confuses the heck out of the
+Perl interpreter.  Renamed Cursor() to NewCursor().  The former
+method name, cursor(), works as well.
+
+
+0.11  2005-10-21
+
+- Fix a number of methods which were accidentally broken in 0.10.
+
+
+0.10  2005-10-21
+
+* This release deprecates a number of methods, though it should be
+backwards compatible with previous versions.
+
+* Instead of having Class::AlzaboWrapper insert itself as a parent
+class for classes which import it, you are encouraged to "use base
+'Class::AlzaboWrapper'".
+
+* Instead of passing a table to the import, you are encouraged to call
+SetAlzaboTable() and MakeColumnMethods().
+
+* A number of class methods have been renamed to use StudlyCaps, such
+as Table(), AlzaboAttributes(), etc.  The old lower_case versions
+still work.  See the docs for details.
+
+- Added a next_as_hash method to Class::AlzaboWrapper::Cursor.  Patch
+by Eric Waters.
+
+- Allow create() to take extra parameters just like new() does, so
+that when _init() is eventually called it can work the same way for
+both create() and new().
+
+
+0.06  2004-09-23
+
+- The cursor object new method now accepts a constructor_method
+argument.
+
+
+0.05  2004-06-25
+
+- Added a new method, alzabo_attributes(), which can be called to find
+out what methods were created by calling import.  Also added
+_record_attribute_creation() so a custom subclass can record that it
+created an attribute method.
+
+
+0.04  2004-04-23
+
+- The last release broke the table_to_class() method (note to self:
+tests would be good).
+
+
+0.03  2004-04-23
+
+- Make the table() method work in subclasses of classes which inherit
+from Class::AlzaboWrapper.
+
+
+0.02  2004-01-26
+
+- Make it possible to subclass this class by providing caller and base
+parameters to import.
+
+
+0.01  2003-05-03
+
+- Initial release
+
+

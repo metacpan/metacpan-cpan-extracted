@@ -1,0 +1,15 @@
+
+no_index: 
+  directory: 
+    - inc
+    - t
+generated_by: Module::Install version 0.54
+distribution_type: module
+version: 0.27
+name: Class-Spiffy
+author: "Ingy d\xC3\xB6t Net <ingy@cpan.org>"
+license: perl
+requires: 
+  Scalar::Util: 0
+  perl: 5.6.1
+abstract: Spiffy Perl Interface Framework For You

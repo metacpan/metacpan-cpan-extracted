@@ -1,0 +1,12 @@
+#!/usr/bin/perl -Tw
+
+use strict;
+use FCGI;
+use CGI::Minimal;
+
+my $request = FCGI::Request();
+while($request->Accept() >= 0) {
+    CGI::Minimal::reset_globals(); 
+    my $value = CGI::Minimal->new->param('a');
+    print "Status: 200 OK\015\012Content-Type: text/plain\015\012\015\012a = $value\n";
+}

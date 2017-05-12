@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+use strict;
+
+#This script demostrates the use of the object oriented interface
+#that the Chemistry::Elements module provides.  At the prompt you
+#can enter a Z, name, or chemical symbol to create an Elements
+#object.  Once you have an object you can define your own methods
+#through which you associate data with the object.
+
+use Chemistry::Elements qw();
+
+print "> ";
+
+#you can specify a Z, name, or symbol.
+#case does not matter since the module should figure it out
+while( <STDIN> )
+	{
+	chomp $_;
+
+	my $obj = new Chemistry::Elements $_;
+
+	print "no object could be created\n> " unless ref $obj;
+	next unless ref $obj;
+
+	#accessor methods for the Element object
+	my $Z      = $obj->Z;
+	my $name   = $obj->name;
+	my $symbol = $obj->symbol;
+	
+	#this is just to demonstrate defining your own method
+	$obj->pretend_method($obj->Z / 3.2);
+	my $MM = $obj->pretend_method;
+
+	print "$Z,$name,$symbol,$MM\n> ";
+	
+	}

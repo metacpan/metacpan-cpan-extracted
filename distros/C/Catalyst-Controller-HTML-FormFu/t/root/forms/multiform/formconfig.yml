@@ -1,0 +1,15 @@
+---
+id: formconfig
+params_ignore_underscore: 1
+
+crypt_args:
+  -key: 'my secret'
+
+forms:
+  -
+    element:
+      name: page1
+
+  -
+    element:
+      name: page2

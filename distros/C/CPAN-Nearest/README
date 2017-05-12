@@ -1,0 +1,127 @@
+    ____ ____   _    _   _         _   _                          _   
+   / ___|  _ \ / \  | \ | |  _ _  | \ | | ___  __ _ _ __ ___  ___| |_ 
+  | |   | |_) / _ \ |  \| | (_|_) |  \| |/ _ \/ _` | '__/ _ \/ __| __|
+  | |___|  __/ ___ \| |\  |  _ _  | |\  |  __/ (_| | | |  __/\__ \ |_ 
+   \____|_| /_/   \_\_| \_| (_|_) |_| \_|\___|\__,_|_|  \___||___/\__|
+                                                                      
+
+
+This is the README for CPAN::Nearest version 0.13.
+
+CPAN::Nearest is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+CPAN::Nearest - find the nearest module to a given name.
+
+This module provides a way of searching for CPAN modules whose name
+may be misspelt. For example, if a user accidentally types
+"Lingua::Stopwords" when looking for the module "Lingua::StopWords",
+the common cpan clients will not be able to function:
+
+    cpan Lingua::Stopwords
+
+gives
+
+    Warning: Cannot install Lingua::Stopwords, don't know what it is.
+    Try the command
+
+    i /Lingua::Stopwords/
+
+    to find objects with matching identifiers.
+
+and
+
+    cpanm Lingua::Stopwords
+
+gives
+
+    ! Finding Lingua::Stopwords on cpanmetadb failed.
+    ! Finding Lingua::Stopwords on search.cpan.org failed.
+    ! Finding Lingua::Stopwords () on mirror http://www.cpan.org failed.
+    ! Couldn't find module or a distribution Lingua::Stopwords ()
+
+CPAN::Nearest supplies a spelling-mistake tolerant search for the most
+similar name, intended for people making tools like "cpan", "cpanm",
+"pm-uninstall", and anything else which needs to use the CPAN
+packages list. CPAN::Nearest was written to be fast enough for
+practical use.
+
+CPAN::Nearest was inspired by the helpful "git" version control
+system, which provides suggestions for spelling mistakes.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?CPAN::Nearest
+    * http://metacpan.org/release/CPAN-Nearest
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc CPAN::Nearest
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.0 or later.
+
+To install the module from CPAN, use
+
+    cpan CPAN::Nearest
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm CPAN::Nearest
+
+To install the module from the source file, CPAN-Nearest-0.13.tar.gz,
+follow this sequence of commands:
+
+    tar xfz CPAN-Nearest-0.13.tar.gz
+    cd CPAN-Nearest-0.13
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/nearest-module/issues>,
+
+or if you want to alter the source code of CPAN::Nearest, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/nearest-module>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Fri Jan 13 10:25:31 2017.
+
+-----------------------------------------------------------------------------

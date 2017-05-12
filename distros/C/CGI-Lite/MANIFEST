@@ -1,0 +1,30 @@
+CHANGES				Revision History
+examples/cookies		Example 1
+examples/file			Example 2
+examples/get_post		Example 3
+examples/post			Example 4
+examples/print			Example 5
+examples/reference		Example 6
+examples/upload			Example 7
+lib/CGI/Lite.pm			CGI::Lite Module
+LICENSE				Licence details
+Makefile.PL			Makefile Generator
+MANIFEST			This File
+README				Readme File
+t/basic.t
+t/cookie.t
+t/forms.t
+t/good_upload.txt
+t/large_file_upload.txt
+t/mime_upload.txt
+t/post_stdin.txt
+t/post_text.txt
+t/upload_no_files.txt
+t/upload_no_headers.txt
+t/upload_no_trailing_files.txt
+t/uploads.t
+TODO				Future work?
+xt/release/kwalitee.t
+xt/release/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

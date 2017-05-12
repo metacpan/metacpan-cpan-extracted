@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Slurp;
+use File::Spec::Functions;
+
+sub fixone {
+  my ($dir, $oid0, $oidbr, $oidprv) = split /@/, shift;
+  my $match = $oid0;
+  $match =~ y/:\.//d;
+  opendir DIR, $dir or return;
+  my ($f) = grep /\Q$match\E/, readdir DIR;
+  closedir DIR;
+  return unless $f;
+  $f = catfile($dir, $f);
+  my @cnt = read_file($f, err_mode => 'carp');
+  return unless @cnt;
+  return unless $cnt[2] =~ /^\^B \Q$oidbr\E (\w+) 0 0$/;
+  my $brid = $1;
+  my $ver;
+  for (@cnt[3..$#cnt]) {
+    if (/^\^V \Q$oidprv\E (\w+ \w+) \w+$/) {
+      $ver = $1;
+      last;
+    }
+  }
+  return unless $ver;
+  $cnt[2] = "^B $oidbr $brid $ver\n";
+  my $perm = (stat($f))[2];
+  chmod($perm | 0600, $f) or return;
+  write_file($f, @cnt);
+  chmod($perm, $f);
+}
+
+for (split /@@/, $ARGV[0]) {
+  fixone($_);
+}

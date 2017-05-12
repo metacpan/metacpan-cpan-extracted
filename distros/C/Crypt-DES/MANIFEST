@@ -1,0 +1,11 @@
+COPYRIGHT
+DES.pm
+DES.xs
+MANIFEST
+README
+Makefile.PL
+_des.c
+_des.h
+test.pl
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

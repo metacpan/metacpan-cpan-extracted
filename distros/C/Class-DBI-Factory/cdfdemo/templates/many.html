@@ -1,0 +1,26 @@
+<h1>[% factory.plural(moniker) %]</h1>
+
+<p>[% factory.description(moniker) %]</p>
+
+[% sortby = input.sortby || 'title' %]
+[% sortorder = input.sortorder || 'asc' %]
+[% step = input.step || 10 %]
+[% startat = input.startat || 0 %]
+
+[% list = factory.list(moniker, 
+	'sortby', sortby,
+	'sortorder', sortorder,
+	'step', step,
+	'startat', startat,
+) %]
+
+[% FOREACH item IN list.contents %]
+
+    <p><a href="[% config.url %]?[% item.moniker %]=[% item.id %]">[% item.title %]</a><br>
+    [% item.description %]
+    </p>
+
+[% END %]
+
+[% PROCESS "furniture/pagination.html" %]
+[% PROCESS "furniture/add.html" %]

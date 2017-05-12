@@ -1,0 +1,94 @@
+Revision history for CGI-Application-Plugin-MessageStack
+
+Wed Sep 20 11:41:20 EDT 2006  Jason@Purdy.INFO
+  * 0.34
+   * Updated test suite with CAP::TT change
+
+Fri Mar 31 10:15:16 EST 2006  Jason@Purdy.INFO
+  * 0.33
+   * Added support for arrayrefs for the -scope parameter
+   * Updated scope testing plan & files
+
+Wed Oct  5 10:03:50 EDT 2005  Jason@Purdy.INFO
+  * 0.32
+   * Fixed test file for TT (bad failures for versions < 0.09)
+   * Added CAP-TT 0.09 to Build.PL (recommends)
+     - Thanks, Shawn!
+   * Fixed test files in case someone doesn't have CAP-Session installed
+
+Thu Sep 29 09:32:52 EDT 2005  Jason@Purdy.INFO
+  * 0.31
+   * Added Makefile.PL to MANIFEST so CPAN.pm & cpanplus will
+     pick it up & tests will pass
+   * Moved CAP-Session from required to recommends since developer
+     can opt to not use it.
+   * Updated docs
+
+Fri Sep 23 22:36:56 EDT 2005  Jason@Purdy.INFO
+  * 0.30
+   * Added param name overrides in capms_config
+   * Added optional session in capms_config
+   * Added test scripts
+   * Changed default loop param name to CAP_Messages (no preceding underscores)
+   * Updated docs
+
+Fri Sep 23 15:55:02 EDT 2005  Jason@Purdy.INFO
+  * 0.21
+   * Added __END__ to module
+   * Added create_makefile_pl to Build.PL
+   * Updated docs
+
+Fri Sep 23 14:30:59 EDT 2005  Jason@Purdy.INFO
+  * 0.20
+   * Added capms_config w/ support for automatic_clearing
+   * Added test script for automatic_clearing
+   * Added test case for non-automatic_clearing (02-check_output.t)
+   * Updated cgiapp requirement to 4 in Build.PL
+   * Added any orphan cgisess files in the test dir to cleanup
+
+Fri Sep 23 12:36:28 EDT 2005  Jason@Purdy.INFO
+  * 0.12
+   * Added a TODO section
+   * Fixed a minor doc bug
+
+Fri Sep 23 10:35:50 EDT 2005  Jason@Purdy.INFO
+  * 0.11_rc1
+   * added template toolkit test
+   * added branch in callback code to support different var. name for TT
+   * updated docs
+
+Thu Sep 22 14:18:23 EDT 2005  Jason@Purdy.INFO
+  * 0.10_rc3
+   * minor changes to the docs - ready to roll now!
+
+Thu Sep 22 13:58:48 EDT 2005  Jason@Purdy.INFO
+  * 0.10_rc2
+   * added README creation to Build.PL
+   * removed static README
+   * changed version number in module
+
+Thu Sep 22 13:54:41 EDT 2005  Jason@Purdy.INFO
+  * 0.10_rc1
+   * first release-worthy version of the plugin
+   * fully functional
+   * test cases for all public API's
+
+Thu Sep 15 18:45:11 EDT 2005  Jason@Purdy.INFO
+  * first_test
+   * Got the first test case in place and working
+
+Tue Sep 13 21:18:28 EDT 2005  Jason@Purdy.INFO
+  * testplan
+   * added testplan doc
+
+Tue Sep 13 21:17:44 EDT 2005  Jason@Purdy.INFO
+  * docs
+   * Added proper documentation
+  
+
+Tue Sep 13 15:56:59 EDT 2005  Jason@Purdy.INFO
+  * initial_2
+
+Tue Sep 13 15:55:45 EDT 2005  Jason@Purdy.INFO
+  * skeleton
+   * This is just the basic skeleton that Module::Starter gave me

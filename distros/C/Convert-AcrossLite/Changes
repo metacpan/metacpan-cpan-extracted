@@ -1,0 +1,62 @@
+Revision history for Perl extension Convert::AcrossLite.
+
+0.01  Fri Aug  9 23:46:31 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Convert::AcrossLite
+
+0.02  Fri Sep  27 14:10:58 2002
+	- Added out_file method
+
+0.03  Tue Oct  08 10:11:21 2002
+	- Added parse_file method
+	- Added is_parsed method
+	- Added get_rows method
+	- Added get_columns method
+	- Added get_solution method
+	- Added get_diagram method
+	- Added get_title method
+	- Added get_author method
+	- Added get_copyright method
+	- Added get_across_clues method
+	- Added get_down_clues method
+	- Fixed examples/acrosslite-convert1.pl
+        - Added examples/acrosslite-convert3.pl
+
+0.04  Thu Oct  17 14:32:58 2002
+	- Added get_across_down method
+	- Added get_across method
+	- Added get_down method
+        - Added eg/acrosslite-convert4.pl
+	- Renamed 'examples' directory to 'eg'
+
+0.05  Thu Oct  17 17:12:59 2002
+	- Added eg/puz2xml.pl
+
+0.06  Fri Oct  18 15:09:34 2002
+	- Fixed logic problem in get_across()
+	- Fixed logic problem in get_down()
+        - Now return empty string instead of null
+          if no title, author or copyright found
+
+0.07  Fri Feb  06 15:22:26 2004
+	- Fixed bug in get_across() and get_down() that would
+          include '.' in final row or column as part of solution.
+
+0.08 - Tue May 10 14:33:12 CDT 2005
+         - Removed $apos, $dpos, $mcount declarations from _parse_file
+           Not used
+         - Fixed typo in get_down() and get_across()
+           Changed is_parse to is_parsed
+         - Modified logic to fix bugs in get_across() and get_down()
+           Some puzzles weren't coverting correctly 
+
+0.09 - Mon Nov 13 21:36:34 CST 2006
+         - Used module-starter
+         - Changed C<eq '-'> to C<ne '.'> so filled-in puzzles will parse
+           Patch from Ed Santiago
+         - Removed get_solution_two() - Not used
+         - Removed get_nonstandard()  - Not used
+         - Removed set_nonstandard()  - Not used
+
+0.10 - Tue Nov 14 09:22:51 CST 2006
+         - Fixed typo in README

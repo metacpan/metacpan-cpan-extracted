@@ -1,0 +1,65 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the character binding features of the
+# Perl5/Cdk extension.
+#
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# This callback fills the entry field with a filename.
+sub callback
+{
+   my $entryObj = shift @_;
+
+   # Generate a list of files in the current directory.
+   my @files = <*>;
+   my $filelist	= new Cdk::Scroll ('Title' => "<C></U>Pick A File",
+					'Height' => 10,
+					'Width' => 20,
+					'List' => \@files);
+
+   # Activate the scrolling list.
+   my $itemPicked = $filelist->activate ();
+   undef $filelist;
+
+   # Set the filename.
+   $entryObj->set ('Min' => 0, 'Max' => 255, 'Value' => $files[$itemPicked]);
+
+   # Redraw the entry field.
+   $entryObj->draw();
+}
+
+# Create a new entry object.
+my $title = ["", "<C>Type in a filename or",
+		"<C>Press </B>?<!B> to get a list.", ""];
+$filename = new Cdk::Entry ('Label' => "Filename: ",
+				'Title' => $title,
+				'Width' => 20,
+				'Min' => 0,
+				'Max' => 256);
+
+# Create a key binding.
+my @mesg = ("<C>Hi Mike", "<C></U>How Are You?");
+$filename->bind ('Key' => "KEY_TAB", 'Function' => sub {main::callback ($filename);});
+
+# Activate the object.
+my $file = $filename->activate();
+
+# Check the results.
+if (! defined $file)
+{
+   popupLabel (["<C>Escape hit, no filename entered."]);
+}
+else
+{
+   popupLabel (["<C>You typed in the filename ($file)"]);
+}
+
+# Exit Cdk.
+Cdk::end();

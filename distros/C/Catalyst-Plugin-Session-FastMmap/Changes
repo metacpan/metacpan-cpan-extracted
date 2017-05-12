@@ -1,0 +1,49 @@
+Revision history for Perl extension Catalyst::Plugin::Session::FastMmap.
+
+0.13 Tue Feb 09 03:12:00 GMT 2010
+        - Deprecation notice added.
+        - Fix C3 merge errors (RT#49058)
+        - Change from NEXT to MRO::Compat
+        - Remove cookie expiriation since it introduced a bug.
+        - expanded documentation
+
+0.12 Thu May 26 00:37:00 EDT 2005
+        - Seconds it should be.
+
+0.11 Thu May 26 00:00:00 EDT 2005
+        - Fixed expire bug
+
+0.10 Mon May 23 22:35:41 EDT 2005
+        - expire cookie at same time as session (Jesse Sheidlower)
+        
+0.09  Mon Apr 18 22:00:00 2005
+        - s/output/body/ (Frank Wiegand)
+
+0.08  Sun Apr 17 00:00:00 2005
+        - Cleaned docs
+        - Added POD tests.
+        - Fixed arguments to Cache::FastMmap.
+          IMPORTANT: The config parmeters has changed, backwards incompatible.
+
+0.07  Wed Mar 28 21:17:00 2005
+        - Fixed urlrewrite on redirect.
+
+0.06  Wed Mar 09 00:48:00 2005
+        - Added option for disabling url rewrite
+        - Documented config options
+
+0.05  Tue Mar 08 12:39:00 2005
+        - fix bug with old sessions after server restart.
+        -  Fixed useless warning on missing output
+
+0.04  Wed Feb 16 22:00:00 2005
+        - added tempdir support (Marcus Ramberg)
+
+0.03  Wed Feb 16 22:00:00 2005
+        - added config parameters (Marcus Ramberg)
+
+0.02  Tue Feb 01 02:00:00 2005
+        - better url rewriting
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

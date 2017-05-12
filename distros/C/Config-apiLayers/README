@@ -1,0 +1,65 @@
+Config::apiLayers
+===============================
+
+Used as a base module or on its own to manage configuration properties of an
+application. Its default behavior is to auto-prototype property attributes.
+Validators can be used to validate values to be set. Configuration can be used
+with C<Getopt::Long> and C<Getopt::LongUsage> for obtaining configuration.
+
+Properties that are imported or directly configured can be stored in one or
+multiple layers, and do not immediately affect each other. When retrieved, the
+values of properties are obtained from the layers in a top-down fashion.
+
+The values of properties can also be functions. When the value is retrieved, the
+function is executed which can be used to combine multiple property values
+together, or do smoething entirely different.
+
+
+EXAMPLE
+
+    # Configure an instance
+    my $cfg = new Config::apiLayers({
+        autoproto => 1,
+        attributes => [qw(length, width, area)]
+    });
+    # Set the default values (the first layer is layer number 0)
+    $cfg->config({
+        data => {
+            'length' => 6,
+            'width' => 10,
+            'area' => sub {
+                my $cfg = shift;
+                return ($cfg->apicall('length') * $cfg->apicall('width'))
+            }
+        }
+    });
+    # Perform the computation
+    $cfg->length(5);
+    $cfg->width(8);
+    my $area = $cfg->area;  # $area == 40
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+None.
+This module is Pure Perl.
+This module does not use AUTOLOAD.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2015 Russell E Glaue,
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

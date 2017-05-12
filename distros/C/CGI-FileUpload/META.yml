@@ -1,0 +1,32 @@
+---
+name: CGI-FileUpload
+version: 0.03
+author:
+  - 'Alexandre Masselot <alexandre.masselot@genebio.com>'
+abstract: 'A module to upload file through CGI asynchrnously, know where the upload status and get back the file from a third parties on the server'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 0
+  File::Spec: 0
+  File::Temp: 0
+  Object::InsideOut: 0
+  Util::Properties: 0.14
+  perl: 5.6.1
+build_requires:
+  Test::More: 0
+recommends:
+  CGI::Carp: 0
+  File::Basename: 0
+  File::Glob: 0
+provides:
+  CGI::FileUpload:
+    file: lib/CGI/FileUpload.pm
+    version: 0.03
+  CGI::FileUpload::Manager:
+    file: lib/CGI/FileUpload/Manager.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

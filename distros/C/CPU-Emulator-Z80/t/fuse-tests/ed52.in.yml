@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 82
+name: ed52
+registers:
+  AF: 64599
+  AF_: 0
+  BC: 8136
+  BC_: 0
+  DE: 18358
+  DE_: 0
+  HL: 55932
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

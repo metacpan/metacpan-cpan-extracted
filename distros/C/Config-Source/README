@@ -1,0 +1,64 @@
+Config-Source
+
+This module allows defining and loading multiple sources to generate a configuration. 
+
+Sometimes you want a configuration initially provided by your application, but partially or 
+fully redefined at multiple locations. You can have a default configuration
+distributed with your program and under your control as developer. 
+On the first startup you want to generate a user configuration file to 
+store individual relevant data. And for the administration, you want to provide a 
+central configuration file indented to specify shared resources. You may also 
+want a file which is only loaded on debug sessions.
+
+This module uses Perl data structures for representing your configuration. It can also assure, 
+that you only work with a true copy of the data.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Source
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Source
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config-Source
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config-Source
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-Source/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Tarek Unger
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+

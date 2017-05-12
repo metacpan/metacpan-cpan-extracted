@@ -1,0 +1,49 @@
+Config::KeyValue
+
+I frequently need to share configuration information between /bin/sh, Perl 
+and Ruby scripts.  While Perl and Ruby can easily support configuration files
+in a variety of formats, shell scripts are more limited.  To work around that,
+I've taken to defaulting to simple "KEY=VALUE" formatted configuration files.
+These can be sourced by the shell scripts while also being easily interpreted
+by Perl and Ruby.  This library is a Perl module for reading these simple
+configuration files.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::KeyValue
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-KeyValue
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config-KeyValue
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config-KeyValue
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-KeyValue/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 blair christensen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,45 @@
+% perl sample2.pl 
+[ERROR] test error message
+[FATAL] test fatal message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample2.pl -q
+
+% perl sample2.pl -v
+[INFO ] test info  message
+[WARN ] test warn  message
+[ERROR] test error message
+[FATAL] test fatal message
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample2.pl -q SampleModule
+[ERROR] error message
+[FATAL] fatal message
+
+% perl sample2.pl -q -v SampleModule
+[INFO ] test info  message
+[WARN ] test warn  message
+[ERROR] test error message
+[FATAL] test fatal message
+
+% perl sample2.pl -q -d SampleModule
+[DEBUG] test debug message
+[INFO ] test info  message
+[WARN ] test warn  message
+[ERROR] test error message
+[FATAL] test fatal message
+
+% perl sample2.pl -v -d SampleModule
+[DEBUG] test debug message
+[INFO ] test info  message
+[WARN ] test warn  message
+[ERROR] test error message
+[FATAL] test fatal message
+[INFO ] info  message
+[WARN ] warn  message
+[ERROR] error message
+[FATAL] fatal message

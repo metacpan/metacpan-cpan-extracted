@@ -1,0 +1,51 @@
+{
+   "abstract" : "general purpose configuration generator",
+   "author" : [
+      "Lionel Cons <lionel.cons@cern.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Generator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "0",
+            "Config::Validator" : "1.2",
+            "Digest::MD5" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "No::Worries" : "1.1",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Pod::Usage" : "0",
+            "XML::Parser" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0"
+}

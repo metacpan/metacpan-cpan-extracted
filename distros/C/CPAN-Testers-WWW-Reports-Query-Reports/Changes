@@ -1,0 +1,45 @@
+Revision history for CPAN-Testers-WWW-Reports-Query-Reports
+===========================================================
+
+0.10	2014-12-02
+        - added 'cannot connect' to skip reasons.
+        - ping fix for Cygwin.
+
+0.09	2014-10-09
+        - realignment of bad data tests.
+        - added timeout skips.
+        - added non-live tests.
+
+0.08	2014-09-28
+        - fixed license fields in META.json to be lists.
+        - added homepage to META resources.
+        - README rewritten.
+        - added documentation about the CPAN Testers Fund.
+        - extended META & functional test suites.
+
+0.07	2013-04-14
+	    - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - change file dates changed to meet W3CDTF standards.
+        - upgraded to Test-CPAN-Meta-JSON
+        - added LICENSE file.
+        - reworked Makefile.PL for clarity.
+
+0.06	2012-04-13
+	    - added skips in the event the site is down.
+
+0.05	2012-04-09
+	    - better error handling.
+
+0.04	2012-04-06
+	    - added ping test & skip if no network.
+
+0.03	2012-04-05
+	    - missed JSON::XS from prereq lists :(
+	    - added META.json (and test script)
+
+0.02    2012-03-31
+	    - now with the correct README!
+
+0.01    2012-03-30
+        - First release
+

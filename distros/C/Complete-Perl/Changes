@@ -1,0 +1,39 @@
+Revision history for Complete-Perl
+
+0.05    2016-10-18 (PERLANCAR)
+
+        - [Incompatible change] Rename functions for consistency:
+          complete_perl_builtin_symbol{s,}, complete_perl_builtin_function{s,}.
+
+
+0.04    2016-10-18 (PERLANCAR)
+
+        - Add functions: complete_perl_builtin_symbols,
+          complete_perl_builtin_functions.
+
+        - Fix Rinci metadata (forgot to set result_naked=1).
+
+
+0.03    2015-12-08 (PERLANCAR)
+
+        - [Bugfix] complete_perl_version: Fix behavior when dev is not specified
+          (don't search dev versions, unless when we don't find any matches).
+
+
+0.02    2015-12-07 (PERLANCAR)
+
+	- Add function: complete_perl_version.
+
+
+0.01    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.00    2014-07-02 (SHARYANTO)
+
+        - First release, no implementation yet.

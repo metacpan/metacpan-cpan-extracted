@@ -1,0 +1,347 @@
+NAME
+    Crypt::NaCl::Sodium - NaCl compatible modern, easy-to-use library for
+    encryption, decryption, signatures, password hashing and more
+
+VERSION
+    version 1.0.8.0
+
+SYNOPSIS
+        use Crypt::NaCl::Sodium qw( :utils );
+
+        my $crypto = Crypt::NaCl::Sodium->new();
+
+        ##########################
+        ## Secret-key cryptography
+
+        # Secret-key authenticated encryption (XSalsa20/Poly1305 MAC)
+        my $crypto_secretbox = $crypto->secretbox();
+
+        # Secret-key message authentication (HMAC-SHA256, HMAC-SHA512, HMAC-SHA512/256 )
+        my $crypto_auth = $crypto->auth();
+
+        # Authenticated Encryption with Additional Data (ChaCha20/Poly1305 MAC, AES256-GCM)
+        my $crypto_aead = $crypto->aead();
+
+        ##########################
+        ## Public-key cryptography
+
+        # Public-key authenticated encryption (Curve25519/XSalsa20/Poly1305 MAC)
+        my $crypto_box = $crypto->box();
+
+        # Public-key signatures (Ed25519)
+        my $crypto_sign = $crypto->sign();
+
+        ##########################
+        ## Hashing
+
+        # Generic hashing (Blake2b)
+        my $crypto_generichash = $crypto->generichash();
+
+        # Short-input hashing (SipHash-2-4)
+        my $crypto_shorthash = $crypto->shorthash();
+
+        ##########################
+        ## Password hashing (yescrypt)
+
+        my $crypto_pwhash = $crypto->pwhash();
+
+        ##########################
+        ## Advanced
+
+        # SHA-2 (SHA-256, SHA-512)
+        my $crypto_hash = $crypto->hash();
+
+        # One-time authentication (Poly1305)
+        my $crypto_onetimeauth = $crypto->onetimeauth();
+
+        # Diffie-Hellman (Curve25519)
+        my $crypto_scalarmult = $crypto->scalarmult();
+
+        # Stream ciphers (XSalsa20, ChaCha20, Salsa20, AES-128-CTR)
+        my $crypto_stream = $crypto->stream();
+
+        ##########################
+        ## Utilities
+
+        # convert binary data to hexadecimal
+        my $hex = bin2hex($bin);
+
+        # convert hexadecimal to binary
+        my $bin = hex2bin($hex);
+
+        # constant time comparision of strings
+        memcmp($a, $b, $length ) or die '$a ne $b';
+
+        # constant time comparision of large numbers
+        compare($x, $y, $length ) == -1 and print '$x < $y';
+
+        # overwrite with null bytes
+        memzero($a, $b, ...);
+
+        # generate random number
+        my $num = random_number($upper_bound);
+
+        # generate random bytes
+        my $bytes = random_bytes($count);
+
+        ##########################
+        ## Guarded data storage
+
+        my $locker = Data::BytesLocker->new($password);
+        ...
+        $locker->unlock();
+        print $locker->to_hex();
+        $locker->lock();
+
+DESCRIPTION
+    Crypt::NaCl::Sodium provides bindings to libsodium - NaCl compatible
+    modern, easy-to-use library for encryption, decryption, signatures,
+    password hashing and more.
+
+    It is a portable, cross-compilable, installable, packageable fork of
+    NaCl <http://nacl.cr.yp.to/>, with a compatible API, and an extended API
+    to improve usability even further.
+
+    Its goal is to provide all of the core operations needed to build
+    higher-level cryptographic tools.
+
+    The design choices emphasize security, and "magic constants" have clear
+    rationales.
+
+    And despite the emphasis on high security, primitives are faster
+    across-the-board than most implementations of the NIST standards.
+
+    Crypt::NaCl::Sodium uses Alien::Sodium that tracks the most current
+    releases of libsodium.
+
+METHODS
+  new
+        my $crypto = Crypt::NaCl::Sodium->new();
+
+    Returns a proxy object for methods provided below.
+
+  secretbox
+        # Secret-key authenticated encryption (XSalsa20/Poly1305 MAC)
+        my $crypto_secretbox = Crypt::NaCl::Sodium->secretbox();
+
+    Read Crypt::NaCl::Sodium::secretbox for more details.
+
+  auth
+        # Secret-key authentication (HMAC-SHA512/256 and advanced usage of HMAC-SHA-2)
+        my $crypto_auth = Crypt::NaCl::Sodium->auth();
+
+    Read Crypt::NaCl::Sodium::auth for more details.
+
+  aead
+        # Authenticated Encryption with Additional Data (ChaCha20/Poly1305 MAC, AES256-GCM)
+        my $crypto_aead = Crypt::NaCl::Sodium->aead();
+
+    Read Crypt::NaCl::Sodium::aead for more details.
+
+  box
+        # Public-key authenticated encryption (Curve25519/XSalsa20/Poly1305 MAC)
+        my $crypto_box = Crypt::NaCl::Sodium->box();
+
+    Read Crypt::NaCl::Sodium::box for more details.
+
+  sign
+        # Public-key signatures (Ed25519)
+        my $crypto_sign = Crypt::NaCl::Sodium->sign();
+
+    Read Crypt::NaCl::Sodium::sign for more details.
+
+  generichash
+        # Generic hashing (Blake2b)
+        my $crypto_generichash = Crypt::NaCl::Sodium->generichash();
+
+    Read Crypt::NaCl::Sodium::generichash for more details.
+
+  shorthash
+        # Short-input hashing (SipHash-2-4)
+        my $crypto_shorthash = Crypt::NaCl::Sodium->shorthash();
+
+    Read Crypt::NaCl::Sodium::shorthash for more details.
+
+  pwhash
+        # Password hashing (yescrypt)
+        my $crypto_pwhash = Crypt::NaCl::Sodium->pwhash();
+
+    Read Crypt::NaCl::Sodium::pwhash for more details.
+
+  hash
+        # SHA-2 (SHA-256, SHA-512)
+        my $crypto_hash = Crypt::NaCl::Sodium->hash();
+
+    Read Crypt::NaCl::Sodium::hash for more details.
+
+  onetimeauth
+        # One-time authentication (Poly1305)
+        my $crypto_onetimeauth = Crypt::NaCl::Sodium->onetimeauth();
+
+    Read Crypt::NaCl::Sodium::onetimeauth for more details.
+
+  scalarmult
+        # Diffie-Hellman (Curve25519)
+        my $crypto_scalarmult = Crypt::NaCl::Sodium->scalarmult();
+
+    Read Crypt::NaCl::Sodium::scalarmult for more details.
+
+  stream
+        # Stream ciphers (XSalsa20, ChaCha20, Salsa20, AES-128-CTR)
+        my $crypto_stream = Crypt::NaCl::Sodium->stream();
+
+    Read Crypt::NaCl::Sodium::stream for more details.
+
+FUNCTIONS
+        use Crypt::NaCl::Sodium qw(:utils);
+
+    Imports all provided functions.
+
+  bin2hex
+        my $hex = bin2hex($bin);
+
+    Returns converted $bin into a hexadecimal string.
+
+  hex2bin
+        my $hex = "41 : 42 : 43";
+        my $bin = hex2bin($hex, ignore => ": ", max_len => 2 );
+        print $bin; # AB
+
+    Parses a hexadecimal string $hex and converts it to a byte sequence.
+
+    Optional arguments:
+
+    *   ignore
+
+        A string of characters to skip. For example, the string ": " allows
+        columns and spaces to be present at any locations in the hexadecimal
+        string. These characters will just be ignored.
+
+        If unset any non-hexadecimal characters are disallowed.
+
+    *   max_len
+
+        The maximum number of bytes to return.
+
+    The parser stops when a non-hexadecimal, non-ignored character is found
+    or when "max_len" bytes have been written.
+
+  memcmp
+        memcmp($a, $b, $length ) or die "\$a ne \$b for length: $length";
+
+    Compares strings in constant-time. Returns true if they match, false
+    otherwise.
+
+    The argument $length is optional if variables are of the same length.
+    Otherwise it is required and cannot be greater then the length of the
+    shorter of compared variables.
+
+    NOTE: "memcmp" in Data::BytesLocker provides the same functionality.
+
+        $locker->memcmp($b, $length) or die "\$locker ne \$b for length: $length";
+
+  compare
+        compare($x, $y, $length ) == -1 and print '$x < $y';
+
+    A constant-time version of "memcmp", useful to compare nonces and
+    counters in little-endian format, that plays well with "increment".
+
+    Returns -1 if $x is lower then $y, 0 if $x and $y are identical, or 1 if
+    $x is greater then $y. Both $x and $y are assumed to be numbers encoded
+    in little-endian format.
+
+    The argument $length is optional if variables are of the same length.
+    Otherwise it is required and cannot be greater then the length of the
+    shorter of compared variables.
+
+    NOTE: "compare" in Data::BytesLocker provides the same functionality.
+
+        $locker->compare($y, $length) == -1 and print "\$locker < \$y for length: $length";
+
+  memzero
+        memzero($a, $b, ...);
+
+    Replaces the value of the provided stringified variables with "null"
+    bytes. Length of the zeroed variables is unchanged.
+
+  random_number
+        my $num = random_number($upper_bound);
+
+    Returns an unpredictable number between 0 and optional $upper_bound
+    (excluded). If $upper_bound is not specified the maximum value is
+    0xffffffff (included).
+
+  increment
+        increment($nonce, ...);
+
+    NOTE: This function is deprecated and will be removed in next version.
+    Please use "increment" in Data::BytesLocker.
+
+    Increments an arbitrary long unsigned number(s) (in place). Function
+    runs in constant-time for a given length of arguments and considers them
+    to be encoded in little-endian format.
+
+  random_bytes
+        my $bytes = random_bytes($num_of_bytes);
+
+    Generates unpredictable sequence of $num_of_bytes bytes.
+
+    The length of the $bytes equals the value of $num_of_bytes.
+
+    Returns Data::BytesLocker object.
+
+VARIABLES
+  $Data::BytesLocker::DEFAULT_LOCKED
+        use Crypt::NaCl::Sodium;
+        $Data::BytesLocker::DEFAULT_LOCKED = 1;
+
+    By default all values returned from the provided methods are unlocked
+    Data::BytesLocker objects. If this variable is set to true then the
+    returned objects are locked and require calling "unlock" in
+    Data::BytesLocker before accessing.
+
+SEE ALSO
+    *   Crypt::NaCl::Sodium::secretbox - Secret-key authenticated encryption
+        (XSalsa20/Poly1305 MAC)
+
+    *   Crypt::NaCl::Sodium::auth - Secret-key message authentication
+        (HMAC-SHA256, HMAC-SHA512, HMAC-SHA512/256 )
+
+    *   Crypt::NaCl::Sodium::aead - Authenticated Encryption with Additional
+        Data (ChaCha20/Poly1305 MAC, AES256-GCM)
+
+    *   Crypt::NaCl::Sodium::box - Public-key authenticated encryption
+        (Curve25519/XSalsa20/Poly1305 MAC)
+
+    *   Crypt::NaCl::Sodium::sign - Public-key signatures (Ed25519)
+
+    *   Crypt::NaCl::Sodium::generichash - Generic hashing (Blake2b)
+
+    *   Crypt::NaCl::Sodium::shorthash - Short-input hashing (SipHash-2-4)
+
+    *   Crypt::NaCl::Sodium::pwhash - Password hashing (yescrypt)
+
+    *   Crypt::NaCl::Sodium::hash - SHA-2 (SHA-256, SHA-512)
+
+    *   Crypt::NaCl::Sodium::onetimeauth - One-time authentication
+        (Poly1305)
+
+    *   Crypt::NaCl::Sodium::scalarmult - Diffie-Hellman (Curve25519)
+
+    *   Crypt::NaCl::Sodium::stream - Stream ciphers (XSalsa20, ChaCha20,
+        Salsa20, AES-128-CTR)
+
+    *   Data::BytesLocker - guarded data storage
+
+    *   libsodium <http://jedisct1.gitbooks.io/libsodium> - libsodium
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

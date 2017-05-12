@@ -1,0 +1,24 @@
+Revision history for Perl extension Convert::NLS_DATE_FORMAT.
+
+0.06  Sat Jan 2 22:23:49 2016 -0500
+	- Escape braces in regexp to make Perl 5.22+ happy.
+	  (Thank you Debian Perl Group)
+
+0.05  Tue Jan 17 22:23:40 2012
+	- changed ~~ to =~ for compatibility with older versions of Perl
+
+0.04  Mon Jan 16 15:09:56 2012
+	- remove quotes from quoted strings within oracle formats
+	  (Thank you Yanick Champoux)
+
+0.03  Tue Oct 11 20:48:56 2011
+	- added ability to specify subsecond granularity
+	  (Thank you Jon Bjornstad and Zefram)
+
+0.02  Fri Nov  3 14:54:52 2006
+	- cleaned up for CPAN
+
+0.01  Wed Apr 20 10:16:36 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Convert::nls_date_format -b 5.6.0
+

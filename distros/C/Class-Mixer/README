@@ -1,0 +1,47 @@
+Class-Mixer version 0.5
+========================
+
+This module is designed to solve a problem which occurs when using inheritance
+to mixin behaviors into a class hierarchy.  The dependencies between a large
+number of mixin modules may be complex, making it tricky to get the base 
+classes to inherit in the right order.  
+
+Then if you have class Main which gets the inheritance right, and you want
+to add a class Mixin which needs to go in the middle of the 
+inheritance, you cannot simply do C<package NewMain; use base qw(Main Mixin);>
+because Mixin will be put at the end of the inheritance chain.
+
+Also, if you have a class Foo::Better which enhances the Foo behavior,
+the same problem occurs trying to mixin Foo::Better.  And it is even worse
+if some classes have done C<use base 'Foo';> to try to enforce the correct
+hierarchy.
+
+This module solves the problems by implementing a dependency-based hierarchy.
+You declare the relations between the classes, and an order of inheritance
+which will support those relations is determined automatically.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::C3
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by John Williams
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

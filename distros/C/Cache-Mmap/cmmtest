@@ -1,0 +1,96 @@
+#!/usr/local/bin/perl-journals
+
+# cmmtest: test of mmapped cache
+# $Id: cmmtest,v 1.5 2003/12/23 11:46:31 pmh Exp $
+
+use Cache::Mmap;
+use Data::Dumper;
+use strict;
+
+# These will be read from the file if it already exists
+my %options=(
+  buckets => 11,
+  bucketsize => 200,
+  strings => 1,
+);
+
+my %escape=(
+  "\n" => '\n',
+  "\r" => '\r',
+  "\t" => '\t',
+  "\\" => '\\\\',
+);
+
+
+my $filename='.cache';
+$filename=shift if @ARGV;
+my $cache=Cache::Mmap->new($filename,\%options)
+  or die;
+
+print "Strings: ",$cache->strings,"\n";
+# Read user commands from STDIN
+$|=1;
+print "cmmtest: ";
+while(<>){
+  my($cmd,$key,$value)=/^([<>0?\-k])(?:\s+(\S+)(?:\s+(.*))?)?\s+$/
+    or do{ warn "Invalid command\n"; next; };
+  
+  if($cmd eq '<'){
+    # Read
+    if($value ne ''){
+      warn "Unexpected stuff after key\n";
+      next;
+    }
+    my($found,$val)=$cache->read($key);
+    if(!$found){
+      print "No such value\n";
+    }elsif(defined $val){
+      if($cache->{strings}){
+        $val=~s/([^\40-\176\\])/$escape{$1} || sprintf '\\x{%02x}',ord $1/ge;
+      }else{
+	$val=Dumper($val);
+      }
+      print "=> $val\n";
+    }else{
+      print "Undefined value\n";
+    }
+  }elsif($cmd eq '>'){
+    # Write
+    if($cache->write($key,$cache->strings ? $value : \$value)){
+      print "OK\n";
+    }else{
+      warn "Can't write value\n";
+    }
+  }elsif($cmd eq '-'){
+    # delete
+    my($found,$val)=$cache->delete($key);
+    if(!$found){
+      print "No such value\n";
+    }elsif(defined $val){
+      $val=Dumper($val) unless $cache->strings;
+      print "=  ok[$val]\n";
+    }else{
+      warn "Undefined value\n";
+    }
+  }elsif($cmd eq '0'){
+    # clear
+    $cache->quick_clear();
+    print "OK\n";
+  }elsif($cmd eq 'k'){
+    print map "  $_\n",$cache->entries;
+    print "OK\n";
+  }elsif($cmd eq '?'){
+    # exists
+    my($found,$val)=$cache->read($key);
+    if($found){
+      print "=  yes\n";
+    }else{
+      print "=  no\n";
+    }
+  }else{
+    warn "Unknown command: $cmd\n";
+  }
+}continue{
+  print "cmmtest: ";
+}
+

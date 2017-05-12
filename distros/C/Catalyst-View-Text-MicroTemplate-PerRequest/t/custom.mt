@@ -1,0 +1,1 @@
+$fname:<?= $fname ?>,$age:<?= $age ?>

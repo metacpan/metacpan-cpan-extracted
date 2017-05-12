@@ -1,0 +1,38 @@
+---
+abstract: "Support for the 'trail' special action"
+author:
+  - 'Norbert Buchmuller, C<< <norbi at nix.hu> >>'
+build_requires:
+  Catalyst::Test: 0
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  HTTP::Request::Common: 5.824
+  Path::Class: 0.16
+  Test::Deep: 0.103
+  Test::Differences: 0.4801
+  Test::More: 0.92
+  Test::Most: 0.21
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-SpecialAction-Trail
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst: 5.80007
+  Moose: 1.08
+  namespace::autoclean: 0.09
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mendel/Catalyst-Plugin-SpecialAction-Trail.git
+version: 0.01

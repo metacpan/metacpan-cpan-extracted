@@ -1,0 +1,9 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+QChemOut.pm
+ethane.out
+t/pod.t
+t/qchemout.t
+META.yml                                 Module meta-data (added by MakeMaker)

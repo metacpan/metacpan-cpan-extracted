@@ -1,0 +1,23 @@
+
+<h2>family </h2>
+<form method="post" action="[% SCRIPT_NAME %]/family/">
+ <ul>  <li>
+   <label for="address">address</label>
+   <input type="text" id="address" name="address" value="[% model.address %]" />
+  </li>  <li>
+   <label for="city">city</label>
+   <input type="text" id="city" name="city" value="[% model.city %]" />
+  </li>  <li>
+   <label for="name">name</label>
+   <input type="text" id="name" name="name" value="[% model.name %]" />
+  </li>  <li>
+   <label for="state">state</label>
+   <input type="text" id="state" name="state" value="[% model.state %]" />
+  </li>  <li>
+   <label for="zip">zip</label>
+   <input type="text" id="zip" name="zip" value="[% model.zip %]" />
+  </li>
+ </ul>
+ <input type="submit" value="Add" />
+</form>
+ 

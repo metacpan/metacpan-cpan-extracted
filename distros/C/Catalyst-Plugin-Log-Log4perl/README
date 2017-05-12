@@ -1,0 +1,8 @@
+Catalyst::Plugin::Log::Log4perl - Catalyst plugin to initialize Log::Log4perl from the application's configuration
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

@@ -1,0 +1,35 @@
+REQUIRED/RECOMMENDED PACKAGES:
+prerequisites:
+Storable;            #in base perl distro as of 5.6.1 (or earlier)
+Digest::MD5;         #in the future, Digest::SHA1, etc. could be used
+                     #for a marginal decrease in collisions at a speed
+                     #cost - eventually this will be a conf file option
+ExtUtils::MakeMaker; #only needed for build process, can be removed after
+
+recommended:
+Fcntl                #increases logging speed by a factor of ~30
+
+optional (depends on your usage):
+DBI, XML::Comma, HTML::Mason
+	presence of these modules activates the appropriate helper modules
+	when you "use Cache::Static;"
+
+if you are happy to let Makefile.PL auto-detect extensions and wrappers:
+	perl Makefile.PL ; make ; make test && $SUDO make install
+
+otherwise, specify any extensions/wrappers you want to exclude on the
+Makefile.PL command line, e.g. to exclude HTML::Mason support:
+	perl Makefile.PL -x=HTML::Mason (rest of args)
+
+Note that if experiemental supports for a module, but it is not included
+in the default build, you can similarly enable it:
+   perl Makefile.PL +x=DBI (rest of args)
+
+Note you can also disable hmc, which is an HTML::Mason::Compiler that
+tries to determine what physical files HTML::Mason relies on.
+You probably want to exclude this functionality by passing -x=hmc if
+you have overridden any HTML::Mason classes. Note that this leaves
+HTML_Mason_Util::cache_it availble:
+	perl Makefile.PL -x=hmc (rest of args)
+
+

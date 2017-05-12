@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/DBI/Loader/Oracle.pm
+t/00-load.t
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t

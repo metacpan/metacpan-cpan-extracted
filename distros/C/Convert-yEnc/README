@@ -1,0 +1,107 @@
+Convert/yEnc version 1.06
+======================
+
+A yEnc decoder, with database of file parts
+
+Convert::yEnc decodes yEncoded files and writes them to disk. File
+parts are saved to a temporary directory; when all parts of a file
+have been received, the completed file is moved to its final location.
+
+Convert::yEnc maintains a database of partially received files, called
+the RC database. The RC database is loaded from disk when a
+Convert::yEnc object is created, and saved to disk when the object is
+DESTROY'd.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   IO::File
+   Set::IntSpan
+
+
+CHANGES
+
+1.06    2013 Jan 31
+	unit test fix
+
+1.05    2013 Jan 29
+	unit test fix
+
+1.04    2010 Jun 20
+	unit test fix
+
+1.03    2008 Jan 31
+	Convert::yEnc::Decoder
+	- die on print failure
+
+	Convert::yEnc::Entry.pm
+	- fixed a warning
+
+1.02	2004 Oct 28
+	Convert::yEnc
+	- fixed a warning
+
+	Convert::yEnc::Entry.pm
+	- fixed a warning
+
+	t/Decoder.t
+	- invoke $Config{perlpath}, not 'perl'
+
+	t/Entry.t
+	- more tests
+
+1.01	2003 Nov 26
+	Convert::yEnc
+	- fixed _complete()
+	- use warnings
+
+	Convert::yEnc::Decode.pm
+	- go faster
+	- use warnings
+
+	Convert::yEnc::RC.pm
+	- use warnings
+
+	Convert::yEnc::Entry.pm
+	- use warnings
+
+1.00	2002 Nov 13
+	Initial version
+
+
+TODO
+
+XS implementation of Convert::yEnc::Decoder::_line
+CRCs
+Encoding
+
+Send suggestions, bugs, etc. to swmcd@world.std.com
+
+
+
+ACKNOWLEDGMENTS
+
+Laurent Caprani <laurent.caprani@laposte.net>
+Jason   Hudgins <thanatos@incantations.net>
+Eric    Young   <eay@pobox.com>
+John    Gilbert <jgilbert@biomail.ucsd.edu>
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2013 by Steven McDougall.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,42 @@
+Class-PINT version 0.01
+=======================
+
+Class::PINT is an implementation of selected Tangram, and other OOPF
+related features on top of Class::DBI.
+
+** WARNING - this release is a proof of concept, use at your own risk **
+
+The goal of PINT is to provide some of the power and flexibility of
+Tangram with the maturity, transparency and extensibility of CDBI.
+I also hope we can provide a place where more useful and adventurous
+patchs, subclasses and plugins can be organised and integrated into
+a usable package.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Class::DBI
+URI::Encode
+
+COPYRIGHT AND LICENCE
+
+Licensed for use, modification and distribution under the Artistic
+and GNU GPL licenses.
+
+Copyright (C) 2004 by Aaron J Trevena <aaron@droogs.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

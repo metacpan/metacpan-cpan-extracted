@@ -1,0 +1,39 @@
+Convert::IBM390 -- functions for manipulating mainframe data
+
+Convert::IBM390 is a Perl module.  It supplies various functions that
+you may find useful when messing with IBM System/3[679]0 data.  See the
+POD documentation in the module, or "man Convert::IBM390" after you have
+installed it.
+
+asc2eb, eb2asc, eb2ascp:  ASCII/EBCDIC conversion
+packeb, unpackeb:  pack/unpack and convert an EBCDIC record
+hexdump:  dump memory in an MVS-like format
+
+Recent changes:
+
+0.23 - Added 'Z' option for unsigned zoned decimal.
+0.24 - Minor corrections to POD.
+0.25 - Use setenv() rather than putenv() for Linux.
+0.26 - Allow user-specified translation tables. Removed SMF timestamps.
+0.27 - Minor housekeeping changes.
+0.28 - Added 'V' option to unpackeb.
+0.29 - Added 'V' option to unpackeb, perl version.
+
+Copyright © 2001 Geoffrey Rommel.  This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl
+itself. 
+
+
+How to Install
+==============
+
+This distribution includes both Perl/XS/C and Perl-only versions of the
+module.  See INSTALL for how to figure out which one is better for you
+and how to install it.
+
+
+Geoffrey Rommel
+Nazareth Consulting, Inc.
+GROMMEL@cpan.org
+
+September 1999

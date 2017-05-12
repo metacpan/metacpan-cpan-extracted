@@ -1,0 +1,22 @@
+language: perl
+sudo: false
+
+compiler:
+  - clang
+  - gcc
+
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+
+install:
+  # Deal with dependencies
+  - cpanm --installdeps --verbose .
+script:
+  - perl Makefile.PL
+  - make -j5
+  - make test
+  - make install

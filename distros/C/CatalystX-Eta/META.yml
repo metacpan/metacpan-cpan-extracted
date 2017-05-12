@@ -1,0 +1,54 @@
+---
+abstract: "Mostly, Controller's Moose::Roles for easy CRUD/Validation API's"
+author:
+  - 'Renato CRON <rentocron@cpan.org>'
+build_requires:
+  Catalyst::Authentication::Store::DBIx::Class: '0'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Plugin::Authentication: '0'
+  Catalyst::Plugin::Authorization::Roles: '0'
+  Catalyst::Plugin::ConfigLoader: '0'
+  Catalyst::Plugin::Static::Simple: '0'
+  Catalyst::Runtime: '5.90080'
+  DBIx::Class::PassphraseColumn: '0'
+  DBIx::Class::TimeStamp: '0'
+  Data::Diver: '0'
+  Data::Manager: '0'
+  Data::Verifier: '0'
+  JSON::MaybeXS: '0'
+  MooseX::MarkAsMethods: '0'
+  MooseX::NonMoose: '0'
+  MooseX::Types::Email: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-Eta
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catalyst::Controller::REST: '0'
+  DBIx::Class: '0'
+  Moose::Role: '0'
+  Stash::REST: '0.06'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/AwareTI/CatalystX-Eta/issues
+  homepage: https://github.com/AwareTI/CatalystX-Eta
+  repository: https://github.com/AwareTI/CatalystX-Eta.git
+version: '0.08'
+x_contributors:
+  - 'Renato CRON <renato.cron@gmail.com>'
+  - 'RenatoCRON <renato.cron@gmail.com>'

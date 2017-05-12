@@ -1,0 +1,63 @@
+CGI-Application-Plus Latest Versions Changes
+
+
+Version 1.21
+- a few CPANTS fixes
+
+Version 1.2
+- Updated tests and POD to the new OOTools 2 behaviour.
+- A few minor changes
+
+Version 1.19
+- Removed the - now outdated - note in the Makefile.PL
+
+Version 1.18
+- Added a note in the Makefile.PL
+
+Version 1.17
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.16
+- Minor POD changes
+
+Version 1.15
+- Changed Makefile.PL version check
+
+version 1.14
+- Added note about the CGI Builder Framework
+- Fixed error in example for prerun_mode
+- Fixed error in passing dfv_default in CheckRM
+
+version 1.13
+- Changes in POD
+- Fixed outdated Bundle informations
+
+Version 1.12
+- added APPENDIX POD section
+
+Version 1.11
+- Fixed Apache::Application::Magic::tm_template() unintended redundancy:
+  (now the tm_template property maintains its default)
+- Fixed a '0' string bug that was affecting the test mode
+  (only when $ENV{CGI_APP_OUTPUT_ONLY}==1)
+- Fixed tm_path alias, now it's lvalue too
+
+Version 1.1
+- Added new CGI::Application::Magic::qparam() property group accessor
+- Added new CGI::Application::Magic::tm_object property accessor
+- Added new CGI::Application::Magic::tm_new_object() method
+- Added Apache::Application::Plus module
+- Added Apache::Application::Magic module
+- POD fixes and updates
+
+Version 1.02
+- Makefile changes
+- POD fixes and updates
+
+Version 1.01
+- Makefile changes
+
+Version 1.0
+- First public release

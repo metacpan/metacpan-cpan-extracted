@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Frame.
+
+1.0  Tue Jun 28 15:23:37 2005
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Class::Frame -b 5.6.0
+

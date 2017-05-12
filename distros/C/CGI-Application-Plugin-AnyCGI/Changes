@@ -1,0 +1,8 @@
+Revision history for CGI::Application::Plugin::AnyCGI
+
+0.02    Wed, 6 August 2008 08:42:47 GMT    
+        - corrected typo in POD
+
+0.01    Mon, 4 August 2008 13:34:06 GMT
+        - initial release
+

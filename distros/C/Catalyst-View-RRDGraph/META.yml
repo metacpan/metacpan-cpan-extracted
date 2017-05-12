@@ -1,0 +1,26 @@
+---
+abstract: 'RRD Graph View Class'
+author:
+  - 'Jose Luis Martinez Torres <jlmartin@cpan.org>'
+build_requires:
+  Catalyst::Test: 0
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-RRDGraph
+requires:
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Runtime: 5.7
+  MRO::Compat: 0
+resources:
+  bugtracker: https://github.com/miquelruiz/Catalyst-View-RRDGraph/issues
+  homepage: http://metacpan.org/release/Catalyst-View-RRDGraph/
+  repository: git://github.com/miquelruiz/Catalyst-View-RRDGraph.git
+version: 0.10

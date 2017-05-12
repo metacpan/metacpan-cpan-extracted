@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+ <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+  <title>[% c.config.name %]</title>
+
+  <link rel="shortcut icon" 
+        href="[% c.uri_for('/') %]favicon.ico" type="image/x-icon" />
+              
+  [% PROCESS page_head_maker.tt %]
+  
+  <style type="text/css">
+  body {
+    font-family: helvetica;
+  }
+  .alt {
+    background-color: #eee;
+  }
+  tr {
+    padding: 4px;
+  }
+  td {
+    padding: 6px;
+  }
+  </style>
+              
+ </head>
+ <body >

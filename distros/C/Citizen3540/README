@@ -1,0 +1,37 @@
+                       Device::Citizen3540 version 0.61
+              (A simple POS dot matrix printer control module)
+
+  Copyright 2006 Scott Peshak <speshak@gmail.com> This program is free
+  software; you may redistribute it and/or modify it under the same terms as
+  Perl itself.
+
+  I welcome bug reports and patches for this package at speshak@gmail.com.
+
+INTRODUCTION
+  This module was written to allow simple use of a Citizen iDP3540 printer
+  that I picked up.  This printer is a typical POS (Point of Sale) reciept
+  printer.  The module supports most of the text operations of the printer.
+  In the future I may be inspired to implement the graphics features, but
+  don't hold me to that.
+
+  See the POD documentation for complete details, features, and usage.
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+  You'll probably need to do the last as root.  If instead you wish to
+  install the module by hand, simply copy it into a directory named Device 
+  in your Perl library directory.
+
+THANKS
+	Iowa State University for selling surplus hardware for dirt cheap.
+	(Otherwise I would not have this printer to play with)
+
+	Larry Wall for making programming more fun than should be allowed.

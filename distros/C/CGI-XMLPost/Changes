@@ -1,0 +1,16 @@
+Revision history for Perl extension CGI::XMLPost.
+
+1.6 Fri 30 Sep 16:59:47 BST 2016
+		- General modernisation, no new features.
+
+1.5 Fri May 12 11:29:30 BST 2006
+        - Use sysread to work on Windows
+
+1.4 Tue Mar 30 17:57:15 BST 2004
+        - Fixed bogus XML declaration
+
+1.3 Wed Jun 18 09:55:01 BST 2003
+        - Added as_xpath() method.
+
+1.2 Sun May 26 13:58:02 BST 2002
+	- Version uploaded to CPAN

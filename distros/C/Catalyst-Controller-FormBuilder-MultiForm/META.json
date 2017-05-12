@@ -1,0 +1,57 @@
+{
+   "abstract" : "Multiple forms per template with Catalyst::Controller::FormBuilder",
+   "author" : [
+      "Danny Warren <danny@dannywarren.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Controller-FormBuilder-MultiForm",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::View::TT" : "0.44",
+            "Class::Inspector" : "1.16",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Simple" : "0.44",
+            "Test::WWW::Mechanize::Catalyst" : "0.37"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Catalyst::View::TT" : "0.44",
+            "HTML::Template" : "2.95",
+            "Mason" : "2.24"
+         },
+         "requires" : {
+            "Catalyst::Controller::FormBuilder" : "0.06",
+            "Catalyst::Runtime" : "5.7"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dannywarren/Catalyst-Controller-FormBuilder-MultiForm",
+      "repository" : {
+         "url" : "https://github.com/dannywarren/Catalyst-Controller-FormBuilder-MultiForm"
+      }
+   },
+   "version" : "0.03"
+}

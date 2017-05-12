@@ -1,0 +1,17 @@
+0.7 (2004-06-24)
+================
+
+	- fixed case insensitive search
+
+0.6 (2004-02-17)
+================
+
+	- Group modules by disto
+	- Check for updates in the beginning
+	- minor fixes
+
+0.5 (2003-10-06)
+================
+
+	- make use of Curses::UIs color feature
+	- some additional messages

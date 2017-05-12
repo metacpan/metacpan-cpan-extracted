@@ -1,0 +1,10 @@
+TYPEMAP
+RC4_KEY*      T_RC4
+
+INPUT
+T_RC4
+    $var = XS_STATE(RC4_KEY*, $arg);
+
+OUTPUT
+T_RC4
+    XS_STRUCT2OBJ($arg, "Crypt::OpenSSL::RC4", $var);

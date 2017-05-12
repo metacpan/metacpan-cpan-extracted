@@ -1,0 +1,44 @@
+---
+abstract: 'Create a Dependencies::Stats section detailing summarized differences'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  CPAN::Changes::Release: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Changes-Group-Dependencies-Stats
+provides:
+  CPAN::Changes::Group::Dependencies::Stats:
+    file: lib/CPAN/Changes/Group/Dependencies/Stats.pm
+    version: '0.002008'
+recommends:
+  Moo: '1.000008'
+requires:
+  CPAN::Changes: '0.30'
+  CPAN::Changes::Group: '0'
+  CPAN::Meta::Prereqs::Diff: '0'
+  Carp: '0'
+  Moo: '0'
+  MooX::Lsub: '0'
+  charnames: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/CPAN-Changes-Group-Dependencies-Stats/issues
+  homepage: https://github.com/kentnl/CPAN-Changes-Group-Dependencies-Stats
+  repository: https://github.com/kentnl/CPAN-Changes-Group-Dependencies-Stats.git
+version: '0.002008'

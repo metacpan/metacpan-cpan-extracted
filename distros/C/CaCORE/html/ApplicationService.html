@@ -1,0 +1,171 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::ApplicationService</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#applicationservice">ApplicationService</a></li>
+	<ul>
+
+		<li><a href="#synopsis">Synopsis</a></li>
+		<li><a href="#operations">Operations</a></li>
+		<li><a href="#description">Description</a></li>
+		<ul>
+
+			<li><a href="#search_via_applicationservice_queryobject__">Search via ApplicationService-&gt;<code>queryObject()</code></a></li>
+			<li><a href="#nested_search">Nested Search</a></li>
+			<li><a href="#result_set_control">Result Set Control</a></li>
+			<li><a href="#limitations">Limitations</a></li>
+		</ul>
+
+		<li><a href="#support">SUPPORT</a></li>
+		<li><a href="#author">AUTHOR</a></li>
+		<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="applicationservice">ApplicationService</a></h1>
+<p>CaCORE::ApplicationService is a utility class that encapsulates webservice invocation to caCORE server. ApplicationService object follows the Singleton pattern, in that each program will ONLY contain one instance of such class. The URL being passed to the instance method is the service endpoint of the caCORE webservice. If no such URL is provided in the program, it will default to the caCORE production server, &quot;http://cabio.nci.nih.gov/cacore30/ws/caCOREService&quot;. The ApplicationService class exposes two methods: queryObject and query for search. The ApplicationService is the fundamental class that all other search methods utilizes.</p>
+<p>
+</p>
+<h2><a name="synopsis">Synopsis</a></h2>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$appsvc</span> <span class="operator">=</span> <span class="variable">CaCORE::ApplicationService</span><span class="operator">-&gt;</span><span class="variable">instance</span><span class="operator">(</span>
+        <span class="string">"http://cabio.nci.nih.gov/cacore32/ws/caCOREService"</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$gene</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">CaCORE::CaBIO::Gene</span><span class="operator">;</span>
+  <span class="variable">$gene</span><span class="operator">-&gt;</span><span class="variable">setSymbol</span><span class="operator">(</span><span class="string">"NAT2"</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">@chromos</span> <span class="operator">=</span> <span class="variable">$appsvc</span><span class="operator">-&gt;</span><span class="variable">queryObject</span><span class="operator">(</span><span class="string">"CaCORE::CaBIO::Chromosome"</span><span class="operator">,</span> <span class="variable">$gene</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="operations">Operations</a></h2>
+<p>The following methods are supported in CaCORE::ApplicationService:</p>
+<ul>
+<li>
+<p><code>instance(url)</code>: returns the ApplicationService instance. &quot;url&quot; is the service endpoint to a caCORE server. Example url: &quot;http://cabio.nci.nih.gov/cacore30/ws/caCOREService&quot;.</p>
+</li>
+<li>
+<p><code>queryObject(targetPath, sourceObject)</code>: invoke caCORE server to search for domain objects. This method returns at most 1000 objects because caCORE webservice automatically trims the result set to 1000 if actual result set is greater than 1000.</p>
+</li>
+<li>
+<p><code>query(targetPath, sourceObject, startIndex, requestSize)</code>: invoke caCORE server to search for domain objects. Allows for specifying the return result set.</p>
+</li>
+</ul>
+<p>Description of parameters used in the above functions:</p>
+<ul>
+<li>
+<p><code>url</code>: the service endpoint to a caCORE server. Example url: &quot;http://cabio.nci.nih.gov/cacore30/ws/caCOREService&quot;.</p>
+</li>
+<li>
+<p><code>targetPath</code>: can be either a fully qualified target object name, such as &quot;CaCORE::CaBIO::Gene&quot;; or a series of comma separated fully qualified object names indicating a navigational path, such as &quot;CaCORE::CaBIO::Taxon,CaCORE::CaBIO::Chromosome&quot;. This navigational path specifies the relationship to traverse when retrieving the target objects.</p>
+</li>
+<li>
+<p><code>sourceObject</code>: is the search criteria that specifies the search starting point.</p>
+</li>
+<li>
+<p><code>startIndex</code> (for method &quot;query&quot; only): allows for control of the starting index of the result set. When presented, requestSize must also be present.</p>
+</li>
+<li>
+<p><code>requestSize</code> (for method &quot;query&quot; only): defines the requested size. Server trims the return result to the requested size before returns. If the result set is smaller than the requested size, the result set is returned without trimming.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="description">Description</a></h2>
+<p>
+</p>
+<h3><a name="search_via_applicationservice_queryobject__">Search via ApplicationService-&gt;<code>queryObject()</code></a></h3>
+<p>This following example retrieves all Chromosomes whose associated genes have a symbol of &quot;NAT2&quot; using the direct and basic search function of ApplicationService-&gt;queryObject(). This <code>queryObject()</code> function encapsulates the webservice invocation to the caCORE server, and converts the returned XML into list of Chromosome objects. Parameter 1 indicates target class, Chromosome, to be retrieved. Parameter 2 indicates search criteria. In this case, is the gene associated with the chromosome.</p>
+<pre>
+  <span class="keyword">use</span> <span class="variable">CaCORE::ApplicationService</span><span class="operator">;</span>
+  <span class="keyword">use</span> <span class="variable">CaCORE::CaBIO</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$gene</span> <span class="operator">=</span> <span class="variable">new</span> <span class="variable">CaCORE::CaBIO::Gene</span><span class="operator">;</span>
+  <span class="variable">$gene</span><span class="operator">-&gt;</span><span class="variable">setSymbol</span><span class="operator">(</span><span class="string">"NAT2"</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">$appsvc</span> <span class="operator">=</span> <span class="variable">CaCORE::ApplicationService</span><span class="operator">-&gt;</span><span class="variable">instance</span><span class="operator">(</span>
+        <span class="string">"http://cabio.nci.nih.gov/cacore32/ws/caCOREService"</span><span class="operator">);</span>
+  <span class="keyword">my</span> <span class="variable">@chromos</span> <span class="operator">=</span> <span class="variable">$appsvc</span><span class="operator">-&gt;</span><span class="variable">queryObject</span><span class="operator">(</span><span class="string">"CaCORE::CaBIO::Chromosome"</span><span class="operator">,</span> <span class="variable">$gene</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h3><a name="nested_search">Nested Search</a></h3>
+<p>The first parameter in the search method can be constructed as a &quot;navigation path&quot; that reflects how these objects are related to the target object. This example retrieves all the Taxons related to the Chromosomes that are related to a Gene object:</p>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@taxons</span> <span class="operator">=</span> <span class="variable">$appsvc</span><span class="operator">-&gt;</span><span class="variable">queryObject</span><span class="operator">(</span>
+        <span class="string">"CaCORE::CaBIO::Taxon,CaCORE::CaBIO::Chromosome"</span><span class="operator">,</span> <span class="variable">$gene</span><span class="operator">);</span>
+  <span class="keyword">foreach</span> <span class="keyword">my</span> <span class="variable">$tx</span> <span class="operator">(</span><span class="variable">@taxons</span><span class="operator">){</span>
+    <span class="keyword">print</span> <span class="string">"id= "</span> <span class="operator">.</span> <span class="variable">$tx</span><span class="operator">-&gt;</span><span class="variable">getId</span> <span class="operator">.</span> <span class="string">" scientificName="</span> <span class="operator">.</span> <span class="variable">$tx</span><span class="operator">-&gt;</span><span class="variable">getScientificName</span> <span class="operator">.</span><span class="string">"\n"</span><span class="operator">;</span>
+  <span class="operator">}</span>
+</pre>
+<p>
+</p>
+<h3><a name="result_set_control">Result Set Control</a></h3>
+<p>Depending on the search criteria, a search may yield a large result set, which cause slower response time and increase the likelihood of failure. A throttle mechanism is provided by:</p>
+<pre>
+  ApplicationService-&gt;query(targetClassName, knownSourceObject, 
+                startingIndex, requestedSize)</pre>
+<p>In the following example:
+  Parameter 1 indicates name of the target object, Gene, to be retrieved
+  Parameter 2 indicates search criteria. In this case, is the chromosome associated with the genes.
+  Parameter 3 indicates the requested start index, 10
+  Parameter 4 indicates the requested size, 20</p>
+<pre>
+  <span class="keyword">my</span> <span class="variable">@geneSet</span> <span class="operator">=</span> <span class="variable">$appsvc</span><span class="operator">-&gt;</span><span class="variable">query</span><span class="operator">(</span><span class="string">"CaCORE::CaBIO::Gene"</span><span class="operator">,</span> <span class="variable">$chromo1</span><span class="operator">,</span> <span class="number">10</span><span class="operator">,</span> <span class="number">20</span><span class="operator">);</span>
+</pre>
+<p>This will retrieve related Gene objects from a Chromosome object, the result set starts from index number 10, and contains up to 20 Gene objects.</p>
+<p>
+</p>
+<h3><a name="limitations">Limitations</a></h3>
+<p>By default, when calling ApplicationService-&gt;queryObject, the caCORE server automatically trim the resultset to 1000 objects if the there more than 1000. So in reality, if you want to retrieve anything beyond 1000, you must use ApplicationService-&gt;query.</p>
+<p>
+</p>
+<h2><a name="support">SUPPORT</a></h2>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.</p>
+<p>
+</p>
+<h2><a name="author">AUTHOR</a></h2>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;</p>
+<p>
+</p>
+<h2><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h2>
+<p>The CaCORE Software License, Version 1.0</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

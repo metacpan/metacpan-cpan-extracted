@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution CGI-Application-Plugin-TT-Any,
+version 0.110080:
+
+  load CGI::Application::Plugin::TT with any TT-compatible class
+
+This software is Copyright (c) 2011 by Christian Walde.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+

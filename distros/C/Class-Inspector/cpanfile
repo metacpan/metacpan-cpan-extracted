@@ -1,0 +1,25 @@
+requires "File::Spec" => "0.80";
+requires "perl" => "5.006";
+
+on 'test' => sub {
+  requires "Test::More" => "0.94";
+  requires "perl" => "5.006";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.006";
+};
+
+on 'develop' => sub {
+  requires "FindBin" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};

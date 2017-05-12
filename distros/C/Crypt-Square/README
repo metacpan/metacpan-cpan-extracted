@@ -1,0 +1,31 @@
+Crypt::Square
+=============
+
+Square is a 128-bit block cipher that accepts a 128-bit key. Designed
+by Joan Daemen, Vincent Rijmen, and Lars Knudsen, Square is the
+predecessor of Rijndael, aka the Advanced Encryption Standard.
+
+BONUS
+
+The C file, _square.c, is a standalone Square implementation. To
+compile it, type:
+
+        gcc -Wall -DLITTLE_ENDIAN _square.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+Note that this implementation has been rigged and tested only on the
+Intel platform, and thus, it could give wrong results for non-Intel
+processors.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque <jcduque (AT) lycos (DOT) com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

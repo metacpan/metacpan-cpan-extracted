@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+
+# The PGN archive files must exist even if zero-length for this
+# program to prepend to them.
+
+use strict;
+use Chess::Games::DotCom;
+use Data::Dumper;
+use File::Butler;
+#use File::Temp qw/ tempfile / ;
+use Log::Agent;
+use Log::Agent::Driver::File;
+use Log::Agent::Priorities qw(:LEVELS);
+$Log::Agent::Debug=10;
+
+logconfig(-driver =>
+     Log::Agent::Driver::File->make(
+         -prefix      => $0,
+         -showpid     => 1,
+         -channels    => {
+             'error'  => "$0.err",
+             'output' => "$0.out",
+             'debug'  => "$0.dbg",
+         },
+     )
+ );
+
+# Where the PGN files for game of day and puzzle of day are kept
+my $PGN_DIR = "."; # "$ENV{HOME}/chess";
+
+logdbg NOTICE, "PGN_DIR: $PGN_DIR";
+
+# Don't touch %sub :)
+
+my %sub = 
+  (
+   pod => 'puzzle_of_day',
+   god => 'game_of_day'
+  );
+
+# The names of the PGN files to prepend to as a function of the input
+# command-line parameter
+
+my %perm_file = map {
+  ($_ => "$PGN_DIR/$sub{$_}.pgn")
+} (keys %sub);
+
+logdbg NOTICE, "pgn output files: " . Dumper(\%perm_file);
+
+# Start of Code
+
+sub usage {
+
+<<EOUSAGE
+
+This script returns the 
+
+   Game   of Day (god) or
+   Puzzle of Day (pod)
+
+   USAGE: 
+     $0 (pod|god)
+
+EOUSAGE
+
+}
+
+my $podgod = shift or logdie usage;
+
+$podgod =~ /^(p|g)od$/ or logdbg NOTICE,  usage;
+
+#my ($fh, $tempfile) = tempfile ( $podgod . "XXXX" , SUFFIX => '.pgn' );
+#close $fh;
+
+my $tempfile = 'tempfile.pgn';
+
+no strict 'refs';
+my $SUB = $sub{$podgod};
+
+$SUB->($tempfile);
+
+# Create the perm file name
+
+my $perm_file = $perm_file{$podgod};
+
+logdbg 'notice:4', "WRITING $perm_file FROM $tempfile";
+
+open T, $tempfile or die "error: $!";
+
+my @T = <T>;
+
+-e $perm_file or create_perm_file($perm_file);
+
+Butler($perm_file, 'prepend', \@T) or logdie $!;
+
+sub create_perm_file  {
+
+  my $file = shift;
+  open F,  ">$file" or die $!;
+  close F;
+
+}

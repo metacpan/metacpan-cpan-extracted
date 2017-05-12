@@ -1,0 +1,33 @@
+NAME
+       Catalyst::View::PDF::API2 - Create PDF files from Catalyst using
+       Template Toolkit templates
+
+VERSION
+       Version 0.01
+
+SYNOPSIS
+
+       Cloned by Catalyst::View::PDF::Reuse
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+SEE ALSO
+
+Catalyst::View::PDF::Reuse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 NonSoLoSoft - http://www.nonsolosoft.com/
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

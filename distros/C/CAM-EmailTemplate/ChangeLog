@@ -1,0 +1,82 @@
+2005-04-22 22:04  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/EmailTemplate.pm: v0.92 Relicense
+
+2004-04-09 17:43  chris
+
+	* Build.PL, lib/CAM/EmailTemplate.pm: Add envelope sender
+	  functionality from Preston
+
+2003-09-16 14:47  chris
+
+	* Build.PL, COPYRIGHT, EmailTemplate.pm, LICENSE, MANIFEST,
+	  Makefile.PL, README, index.html, test.pl,
+	  lib/CAM/EmailTemplate.pm: v0.90 Update for new build and license
+	  infrastructure
+
+2003-03-09 10:00  chris
+
+	* EmailTemplate.pm: Trivial doc update
+
+2003-01-06 17:58  chris
+
+	* COPYRIGHT, MANIFEST, README: v0.15 prep for release
+
+2003-01-06 15:41  chris
+
+	* EmailTemplate.pm: Clean up documentation
+
+2003-01-06 15:22  chris
+
+	* EmailTemplate.pm: Get rid of the new() method, which didn't do
+	  anything important anyway.
+
+2003-01-06 11:15  chris
+
+	* EmailTemplate.pm, test.pl: Update the test program, stealing
+	  ideas from CAM::EmailTemplate::SMTP
+
+2003-01-01 22:56  chris
+
+	* EmailTemplate.pm: v0.12 Split up incoming To field
+
+2002-12-31 15:25  chris
+
+	* EmailTemplate.pm: Add -i flag for sendmail (to ignore lone dots)
+
+2002-12-19 15:32  chris
+
+	* EmailTemplate.pm: Fix two more typos (still v0.11)
+
+2002-12-19 15:30  chris
+
+	* test.pl: Fix typo (still v0.11)
+
+2002-12-19 15:22  chris
+
+	* EmailTemplate.pm: v0.11 Break out deliver() function to allow
+	  overriding
+
+2002-09-23 16:07  chris
+
+	* EmailTemplate.pm: Add example template
+
+2002-09-23 15:58  chris
+
+	* test.pl: Fix mistake in test script
+
+2002-09-23 15:55  chris
+
+	* EmailTemplate.pm, test.pl: Fixes, docs, test program
+
+2002-09-23 14:19  chris
+
+	* EmailTemplate.pm, MANIFEST, Makefile.PL, test.pl: Initial
+	  revision
+
+2002-09-23 14:19  chris
+
+	* EmailTemplate.pm, MANIFEST, Makefile.PL, test.pl: initial
+	  creation
+

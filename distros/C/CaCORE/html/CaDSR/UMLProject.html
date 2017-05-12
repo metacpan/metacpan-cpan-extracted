@@ -1,0 +1,1005 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::CaDSR::UMLProject</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#attributetypemetadata">AttributeTypeMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_attributetypemetadata">ATTRIBUTES of AttributeTypeMetadata</a></li>
+		<li><a href="#associations_of_attributetypemetadata">ASSOCIATIONS of AttributeTypeMetadata</a></li>
+	</ul>
+
+	<li><a href="#project">Project</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_project">ATTRIBUTES of Project</a></li>
+		<li><a href="#associations_of_project">ASSOCIATIONS of Project</a></li>
+	</ul>
+
+	<li><a href="#semanticmetadata">SemanticMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_semanticmetadata">ATTRIBUTES of SemanticMetadata</a></li>
+		<li><a href="#associations_of_semanticmetadata">ASSOCIATIONS of SemanticMetadata</a></li>
+	</ul>
+
+	<li><a href="#subproject">SubProject</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_subproject">ATTRIBUTES of SubProject</a></li>
+		<li><a href="#associations_of_subproject">ASSOCIATIONS of SubProject</a></li>
+	</ul>
+
+	<li><a href="#typeenumerationmetadata">TypeEnumerationMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_typeenumerationmetadata">ATTRIBUTES of TypeEnumerationMetadata</a></li>
+		<li><a href="#associations_of_typeenumerationmetadata">ASSOCIATIONS of TypeEnumerationMetadata</a></li>
+	</ul>
+
+	<li><a href="#umlassociationmetadata">UMLAssociationMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_umlassociationmetadata">ATTRIBUTES of UMLAssociationMetadata</a></li>
+		<li><a href="#associations_of_umlassociationmetadata">ASSOCIATIONS of UMLAssociationMetadata</a></li>
+	</ul>
+
+	<li><a href="#umlattributemetadata">UMLAttributeMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_umlattributemetadata">ATTRIBUTES of UMLAttributeMetadata</a></li>
+		<li><a href="#associations_of_umlattributemetadata">ASSOCIATIONS of UMLAttributeMetadata</a></li>
+	</ul>
+
+	<li><a href="#umlclassmetadata">UMLClassMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_umlclassmetadata">ATTRIBUTES of UMLClassMetadata</a></li>
+		<li><a href="#associations_of_umlclassmetadata">ASSOCIATIONS of UMLClassMetadata</a></li>
+	</ul>
+
+	<li><a href="#umlgeneralizationmetadata">UMLGeneralizationMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_umlgeneralizationmetadata">ATTRIBUTES of UMLGeneralizationMetadata</a></li>
+		<li><a href="#associations_of_umlgeneralizationmetadata">ASSOCIATIONS of UMLGeneralizationMetadata</a></li>
+	</ul>
+
+	<li><a href="#umlpackagemetadata">UMLPackageMetadata</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_umlpackagemetadata">ATTRIBUTES of UMLPackageMetadata</a></li>
+		<li><a href="#associations_of_umlpackagemetadata">ASSOCIATIONS of UMLPackageMetadata</a></li>
+	</ul>
+
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="attributetypemetadata">AttributeTypeMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::AttributeTypeMetadata - Perl extension for AttributeTypeMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::AttributeTypeMetadata is a Perl object representation of the
+CaCORE AttributeTypeMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_attributetypemetadata">ATTRIBUTES of AttributeTypeMetadata</a></h2>
+<p>The following are all the attributes of the AttributeTypeMetadata object and their data types:</p>
+<dl>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_valuedomaindatatype">valueDomainDataType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_valuedomainlongname">valueDomainLongName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_attributetypemetadata">ASSOCIATIONS of AttributeTypeMetadata</a></h2>
+<p>The following are all the objects that are associated with the AttributeTypeMetadata:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fsemanticmetadata_3a">Instance of <a href="#semanticmetadata">SemanticMetadata</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticMetadataCollection</code> to get a collection of associated SemanticMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftypeenumeration_3a">Instance of <a href="#typeenumeration">TypeEnumeration</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTypeEnumerationCollection</code> to get a collection of associated TypeEnumeration.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvaluedomain_3a">Collection of <a href="#valuedomain">ValueDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValueDomain</code> to get the associated ValueDomain.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="project">Project</a></h1>
+<p>CaCORE::CaDSR::UMLProject::Project - Perl extension for Project.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::Project is a Perl object representation of the
+CaCORE Project object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_project">ATTRIBUTES of Project</a></h2>
+<p>The following are all the attributes of the Project object and their data types:</p>
+<dl>
+<dt><strong><a name="item_description">description</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_longname">longName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_shortname">shortName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_version">version</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_project">ASSOCIATIONS of Project</a></h2>
+<p>The following are all the objects that are associated with the Project:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fumlassociationmetadata_3a">Instance of <a href="#umlassociationmetadata">UMLAssociationMetadata</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLAssociationMetadataCollection</code> to get a collection of associated UMLAssociationMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fumlattributemetadata_3a">Instance of <a href="#umlattributemetadata">UMLAttributeMetadata</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLAttributeMetadataCollection</code> to get a collection of associated UMLAttributeMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fumlclassmetadata_3a">Instance of <a href="#umlclassmetadata">UMLClassMetadata</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLClassMetadataCollection</code> to get a collection of associated UMLClassMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fumlpackagemetadata_3a">Instance of <a href="#umlpackagemetadata">UMLPackageMetadata</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLPackageMetadataCollection</code> to get a collection of associated UMLPackageMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fclassificationscheme_3a">Collection of <a href="#classificationscheme">ClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassificationScheme</code> to get the associated ClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsubproject_3a">Instance of <a href="#subproject">SubProject</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSubProjectCollection</code> to get a collection of associated SubProject.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="semanticmetadata">SemanticMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::SemanticMetadata - Perl extension for SemanticMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::SemanticMetadata is a Perl object representation of the
+CaCORE SemanticMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_semanticmetadata">ATTRIBUTES of SemanticMetadata</a></h2>
+<p>The following are all the attributes of the SemanticMetadata object and their data types:</p>
+<dl>
+<dt><strong><a name="item_conceptcode">conceptCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_conceptdefinition">conceptDefinition</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_conceptname">conceptName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_isprimaryconcept">isPrimaryConcept</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_order">order</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_orderlevel">orderLevel</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_semanticmetadata">ASSOCIATIONS of SemanticMetadata</a></h2>
+<p>The following are all the objects that are associated with the SemanticMetadata:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fconcept_3a">Collection of <a href="#concept">Concept</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConcept</code> to get the associated Concept.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="subproject">SubProject</a></h1>
+<p>CaCORE::CaDSR::UMLProject::SubProject - Perl extension for SubProject.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::SubProject is a Perl object representation of the
+CaCORE SubProject object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_subproject">ATTRIBUTES of SubProject</a></h2>
+<p>The following are all the attributes of the SubProject object and their data types:</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_name">name</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_subproject">ASSOCIATIONS of SubProject</a></h2>
+<p>The following are all the objects that are associated with the SubProject:</p>
+<dl>
+<dt><strong>Instance of <a href="#umlpackagemetadata">UMLPackageMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLPackageMetadataCollection</code> to get a collection of associated UMLPackageMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fclassschemeclassschemeitem_3a">Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fproject_3a">Collection of <a href="#project">Project</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProject</code> to get the associated Project.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="typeenumerationmetadata">TypeEnumerationMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::TypeEnumerationMetadata - Perl extension for TypeEnumerationMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::TypeEnumerationMetadata is a Perl object representation of the
+CaCORE TypeEnumerationMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_typeenumerationmetadata">ATTRIBUTES of TypeEnumerationMetadata</a></h2>
+<p>The following are all the attributes of the TypeEnumerationMetadata object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_permissiblevalue">permissibleValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_valuemeaning">valueMeaning</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_typeenumerationmetadata">ASSOCIATIONS of TypeEnumerationMetadata</a></h2>
+<p>The following are all the objects that are associated with the TypeEnumerationMetadata:</p>
+<dl>
+<dt><strong>Instance of <a href="#semanticmetadata">SemanticMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticMetadataCollection</code> to get a collection of associated SemanticMetadata.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="umlassociationmetadata">UMLAssociationMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::UMLAssociationMetadata - Perl extension for UMLAssociationMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::UMLAssociationMetadata is a Perl object representation of the
+CaCORE UMLAssociationMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_umlassociationmetadata">ATTRIBUTES of UMLAssociationMetadata</a></h2>
+<p>The following are all the attributes of the UMLAssociationMetadata object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_isbidirectional">isBidirectional</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcehighcardinality">sourceHighCardinality</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcelowcardinality">sourceLowCardinality</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcerolename">sourceRoleName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targethighcardinality">targetHighCardinality</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targetlowcardinality">targetLowCardinality</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targetrolename">targetRoleName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_umlassociationmetadata">ASSOCIATIONS of UMLAssociationMetadata</a></h2>
+<p>The following are all the objects that are associated with the UMLAssociationMetadata:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fobjectclassrelationship_3a">Collection of <a href="#objectclassrelationship">ObjectClassRelationship</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getObjectClassRelationship</code> to get the associated ObjectClassRelationship.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#project">Project</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProject</code> to get the associated Project.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#semanticmetadata">SemanticMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticMetadataCollection</code> to get a collection of associated SemanticMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourceumlclassmetadata_3a">Collection of <a href="#sourceumlclassmetadata">SourceUMLClassMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceUMLClassMetadata</code> to get the associated SourceUMLClassMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftargetumlclassmetadata_3a">Collection of <a href="#targetumlclassmetadata">TargetUMLClassMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTargetUMLClassMetadata</code> to get the associated TargetUMLClassMetadata.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="umlattributemetadata">UMLAttributeMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::UMLAttributeMetadata - Perl extension for UMLAttributeMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::UMLAttributeMetadata is a Perl object representation of the
+CaCORE UMLAttributeMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_umlattributemetadata">ATTRIBUTES of UMLAttributeMetadata</a></h2>
+<p>The following are all the attributes of the UMLAttributeMetadata object and their data types:</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_fullyqualifiedname">fullyQualifiedName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_umlattributemetadata">ASSOCIATIONS of UMLAttributeMetadata</a></h2>
+<p>The following are all the objects that are associated with the UMLAttributeMetadata:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fumlclassmetadata_3a">Collection of <a href="#umlclassmetadata">UMLClassMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getUMLClassMetadata</code> to get the associated UMLClassMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fattributetypemetadata_3a">Collection of <a href="#attributetypemetadata">AttributeTypeMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getAttributeTypeMetadata</code> to get the associated AttributeTypeMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fdataelement_3a">Collection of <a href="#dataelement">DataElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDataElement</code> to get the associated DataElement.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#project">Project</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProject</code> to get the associated Project.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#semanticmetadata">SemanticMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticMetadataCollection</code> to get a collection of associated SemanticMetadata.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="umlclassmetadata">UMLClassMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::UMLClassMetadata - Perl extension for UMLClassMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::UMLClassMetadata is a Perl object representation of the
+CaCORE UMLClassMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_umlclassmetadata">ATTRIBUTES of UMLClassMetadata</a></h2>
+<p>The following are all the attributes of the UMLClassMetadata object and their data types:</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>fullyQualifiedName</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_umlclassmetadata">ASSOCIATIONS of UMLClassMetadata</a></h2>
+<p>The following are all the objects that are associated with the UMLClassMetadata:</p>
+<dl>
+<dt><strong>Instance of <a href="#umlassociationmetadata">UMLAssociationMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLAssociationMetadataCollection</code> to get a collection of associated UMLAssociationMetadata.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#umlattributemetadata">UMLAttributeMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLAttributeMetadataCollection</code> to get a collection of associated UMLAttributeMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fumlgeneralizationmetadata_3a">Collection of <a href="#umlgeneralizationmetadata">UMLGeneralizationMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getUMLGeneralizationMetadata</code> to get the associated UMLGeneralizationMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fumlpackagemetadata_3a">Collection of <a href="#umlpackagemetadata">UMLPackageMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getUMLPackageMetadata</code> to get the associated UMLPackageMetadata.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fobjectclass_3a">Collection of <a href="#objectclass">ObjectClass</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getObjectClass</code> to get the associated ObjectClass.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#project">Project</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProject</code> to get the associated Project.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#semanticmetadata">SemanticMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticMetadataCollection</code> to get a collection of associated SemanticMetadata.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="umlgeneralizationmetadata">UMLGeneralizationMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::UMLGeneralizationMetadata - Perl extension for UMLGeneralizationMetadata.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::UMLGeneralizationMetadata is a Perl object representation of the
+CaCORE UMLGeneralizationMetadata object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_umlgeneralizationmetadata">ATTRIBUTES of UMLGeneralizationMetadata</a></h2>
+<p>The following are all the attributes of the UMLGeneralizationMetadata object and their data types:
+
+</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_umlgeneralizationmetadata">ASSOCIATIONS of UMLGeneralizationMetadata</a></h2>
+<p>The following are all the objects that are associated with the UMLGeneralizationMetadata:
+
+</p>
+<dl>
+<dt><strong>Collection of <a href="#objectclassrelationship">ObjectClassRelationship</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getObjectClassRelationship</code> to get the associated ObjectClassRelationship.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsuperumlclassmetadata_3a">Collection of <a href="#superumlclassmetadata">SuperUMLClassMetadata</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSuperUMLClassMetadata</code> to get the associated SuperUMLClassMetadata.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="umlpackagemetadata">UMLPackageMetadata</a></h1>
+<p>CaCORE::CaDSR::UMLProject::UMLPackageMetadata - Perl extension for UMLPackageMetadata.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::UMLProject::UMLPackageMetadata is a Perl object representation of the
+CaCORE UMLPackageMetadata object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_umlpackagemetadata">ATTRIBUTES of UMLPackageMetadata</a></h2>
+<p>The following are all the attributes of the UMLPackageMetadata object and their data types:
+
+</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_umlpackagemetadata">ASSOCIATIONS of UMLPackageMetadata</a></h2>
+<p>The following are all the objects that are associated with the UMLPackageMetadata:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#umlclassmetadata">UMLClassMetadata</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getUMLClassMetadataCollection</code> to get a collection of associated UMLClassMetadata.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#project">Project</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProject</code> to get the associated Project.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsubproject_3a">Collection of <a href="#subproject">SubProject</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSubProject</code> to get the associated SubProject.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>The CaCORE Software License, Version 1.0
+
+</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.
+
+</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.
+
+</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.
+
+</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.
+
+</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

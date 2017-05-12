@@ -1,0 +1,102 @@
+[% 
+    IF users.data.userid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = data.realname _ ' (' _ editmode _ ')' ;
+
+    crumb4_name = 'Admin' ;
+    crumb4_href = '/' ;
+    crumb3_name = 'User' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=user-admin' ;
+    crumb2_name = data.realname ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=user-adminedit&amp;userid=' _ data.userid ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% IF thanks %]<p>User saved successfully.</p>[% END %]
+<p>Fields marked '*' are mandatory fields and must be completed.<p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.<p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-save" />
+<input type="hidden" name="userid" value="[% IF data.userid %][% data.userid %][% ELSE %]0[% END %]" />
+
+<div class="box">
+    <table width="100%">
+    <tr><th>Display Name *</th>
+        <th class="alert">[% data.realname_err %]</th>
+        <td><input type="text" name="realname" value="[% data.realname %]" size="50" /></td>
+    </tr>
+    <tr><th width="150">Email *</th>
+        <th class="alert">[% data.email_err %]</th>
+        <td><input type="text" name="email" value="[% data.email %]" size="50" /></td>
+    </tr>
+    <tr><th width="150">PAUSE ID</th>
+        <th class="alert">[% data.nickname_err %]</th>
+        <td colspan="3"><input type="text" name="nickname" value="[% data.nickname %]" size="40" /></td>
+    </tr>
+[% IF newuser %]
+    <tr><th>Password *</th>
+        <th class="alert">[% data.europe_err %]</th>
+        <td><input type="text" name="europe" value="[% data.europe %]" size="50" /></td>
+    </tr>
+[% END %]
+
+    <tr><th>Realm</th>
+        <th class="alert">[% data.realm_err %]</th>
+        <td>[% data.ddrealms %]</td>
+    </tr>
+
+	<tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+</div>
+</form>
+
+[% IF !newuser %]
+
+[% IF data.realm == 'tester' %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-remove" />
+<input type="hidden" name="userid" value="[% data.userid %]" />
+<input type="hidden" name="testerid" value="[% data.userid %]" />
+<div class="box">
+<table width="100%">
+<tr><th width="150">Registered Emails</th>
+    <td width="10"></td>
+    <td>[% IF data.confirmed %]
+			[% FOREACH mail = data.confirmed %]<input type="checkbox" name="MAILS" value="[% mail.email %]" /> [% mail.email %]<br />[% END %]
+			<input type="submit" name="submit" value="DELETE" />
+			[% ELSE %]n/a[% END %]</td>
+</tr>
+</table>
+</div>
+</form>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-submit" />
+<input type="hidden" name="userid" value="[% data.userid %]" />
+<input type="hidden" name="testerid" value="[% data.userid %]" />
+<div class="box">
+<table width="100%">
+<tr><th width="150">Register Email</th>
+    <td width="10" class="alert">[% data.confirm_err %]</td>
+    <td><input type="text"   id="email" name="email"     value="[% data.confirm %]" size="40" onkeypress="populate_emails( event )" />
+        <p>If you have submitted reports from multiple addresses, please confirm each in turn to add them to this account.</p>
+        <div id="email_list"></div>
+    </td>
+</tr>
+<tr><th></th><td></td><td><input type="submit" name="submit" value="ADD" /></td></tr>
+</table>
+</div>
+</form>
+
+[% END %]
+
+<p align="center"><br />
+  <a href="[% cgipath %]/pages.cgi?act=user-pass&amp;userid=[% data.userid %]">change password</a>
+| <a href="[% cgipath %]/pages.cgi?act=user-acl&amp;userid=[% data.userid %]">change access rights</a>
+[% END %]

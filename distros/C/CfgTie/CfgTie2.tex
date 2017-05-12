@@ -1,0 +1,3767 @@
+
+@node  bytype,  alphabetical,  bykind, Modules
+@section Categories
+@menu
+
+* bin::
+* CfgTie::
+* Secure::
+@end menu
+
+
+@node  alphabetical, ,  bytype, Modules
+@section Alphabetical
+@menu
+
+* CfgAliases::
+* CfgNamed::
+* CfgTie-CfgArgs::
+* CfgTie-Cfgfile::
+* CfgTie-filever::
+* CfgTie-TieAliases::
+* CfgTie-TieGeneric::
+* CfgTie-TieGroup::
+* CfgTie-TieHost::
+* CfgTie-TieMTab::
+* CfgTie-TieNamed::
+* CfgTie-TieNet::
+* CfgTie-TiePh::
+* CfgTie-TieProto::
+* CfgTie-TieRCService::
+* CfgTie-TieRealm::
+* CfgTie-TieRsrc::
+* CfgTie-TieServ::
+* CfgTie-TieShadow::
+* CfgTie-TieUser::
+* DNS-find-free::
+* mail-validate::
+* Secure-File::
+* sys.cgi::
+@end menu
+
+
+@c 290
+@node bin, CfgTie,  ,  bytype
+@chapter bin
+@section bin 
+@menu
+
+* CfgAliases::
+* CfgNamed::
+* DNS-find-free::
+* mail-validate::
+* sys.cgi::
+@end menu
+
+@c 319
+@node CfgAliases, CfgNamed,  , bin
+@section CfgAliases
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgAliases --- a tool to help change you email @file{/etc/aliases} settings
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+
+@subheading DESCRIPTION
+
+This is a tool to help modify and keep your @file{/etc/aliases} file up to date.
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+
+@subheading COMMAND LINE PARAMETERS
+
+@cindex COMMAND LINE PARAMETERS
+
+The parameters are a broken down into three categories:
+
+@table @asis
+
+@item Specifying groups, users, and people
+@cindex Specifying groups, users, and people
+
+@code{--user}, @code{--group}
+
+@item Adding, changing, removing, or retrieving entries
+@cindex Adding, changing, removing, or retrieving entries
+
+@code{--add}, @code{--delete}, @code{--fetch}, @code{--join}, @code{--remove}, @code{--rename},
+@code{--set}
+
+@end table
+
+@subsubheading Specifying Groups, Users, People
+
+@cindex Specifying Groups, Users, People
+
+@table @asis
+
+@item @code{--user=}@emph{NAME}
+@vindex @code{--user=}@emph{NAME}
+
+@item @code{--user }@emph{NAME}
+@vindex @code{--user }@emph{NAME}
+
+This specifies the user name.
+
+@item @code{--group=}@emph{NAME}
+@vindex @code{--group=}@emph{NAME}
+
+@item @code{--group }@emph{NAME}
+@vindex @code{--group }@emph{NAME}
+
+This specifies the group name
+
+@end table
+
+@subsubheading Adding, Changing, Removing, or Retrieving Entries.
+
+@cindex Adding, Changing, Removing, or Retrieving Entries.
+
+The following specify how to change various entries.  Typically they can not be
+intermixed on the same command line.  (Exceptions are noted.)
+
+@table @asis
+
+@item @code{--add }@emph{ADDRESS}
+@vindex @code{--add }@emph{ADDRESS}
+
+@item @code{--add=}@emph{ADDRESS}
+@vindex @code{--add=}@emph{ADDRESS}
+
+This will add the @emph{ADDRESS} (user, group, etc.) to a mail group.  The group
+must be specified with the @code{--group} option above.
+
+@item @code{--delete }@emph{NAME}
+@vindex @code{--delete }@emph{NAME}
+
+@item @code{--delete=}@emph{NAME}
+@vindex @code{--delete=}@emph{NAME}
+
+This will remove the mail @emph{alias}(es) specified by @emph{NAME}.  It will also remove
+from any mail @emph{alias}(es) (or groups) any @emph{member}(s) that matches @emph{NAME}.  @emph{NAME}
+may be a regular expression.  (Can be used with @code{--remove} and @code{--rename}).
+
+@item @code{--fetch }@emph{NAME}
+@vindex @code{--fetch }@emph{NAME}
+
+@item @code{--fetch=}@emph{NAME}
+@vindex @code{--fetch=}@emph{NAME}
+
+This will retrieve the list of recipients in the mail group @emph{NAME}.  If @emph{NAME}
+is a regular expression, information will retrieved for every group that matches
+the pattern.
+
+@item @code{--join}
+@vindex @code{--join}
+
+@item @code{--join }@emph{GROUP}
+@vindex @code{--join }@emph{GROUP}
+
+@item @code{--join=}@emph{GROUP}
+@vindex @code{--join=}@emph{GROUP}
+
+@item @code{--join }@emph{GROUP1},@emph{GROUP2},...
+@vindex @code{--join }@emph{GROUP1},@emph{GROUP2},...
+
+@item @code{--join=}@emph{GROUP1},@emph{GROUP2},...
+@vindex @code{--join=}@emph{GROUP1},@emph{GROUP2},...
+
+The current or effective user will be added to a mail @emph{group}(s).  If no groups 
+are specified with this option, it must be specified using the @code{--group} option
+above.  Multiple @code{--join}s may be used on a command line.
+
+@item @code{--remove }@emph{NAME}
+@vindex @code{--remove }@emph{NAME}
+
+@item @code{--remove=}@emph{NAME}
+@vindex @code{--remove=}@emph{NAME}
+
+Like @code{delete} above, this will remove the mail @emph{group}(s) specified by @emph{NAME}.
+@emph{NAME} may be a regular expression.  (Can be used with @code{--delete} and
+@code{--rename})
+
+@item @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+@vindex @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+
+This will change all of the occurrences or references that match @emph{NAME-OLD} to
+the newer form of @emph{NAME-NEW}.  This may be a group name, and / or members of a
+group.  This may be a regular expression, similar to;
+@example
+        s/NAME-OLD/NAME-NEW/
+@end example
+
+@item @code{--set} @emph{NAME}=@emph{MEMBERS}
+@vindex @code{--set} @emph{NAME}=@emph{MEMBERS}
+
+This will create a mail group called @emph{NAME} with a set of specified members
+@emph{MEMBERS}.
+(Can be used with @code{--delete} and  @code{--remove}).
+
+@end table
+
+@subheading FILES
+
+@file{/etc/aliases}
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-CfgArgs::	
+ for more information on the standard parameters
+
+@end menu
+the @emph{aliases}(5) manpage
+the @emph{sendmail}(8) manpage
+
+@subheading NOTES
+
+@subsubheading Author
+
+@cindex Author
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgNamed.pod".
+
+
+@c 319
+@node CfgNamed, DNS-find-free, CfgAliases, bin
+@section CfgNamed
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgNamed --- a tool to help change your DNS settings
+
+@subheading DESCRIPTION
+
+This is a tool to help modify and keep your DNS server files up to date.
+
+@subheading COMMAND LINE PARAMETERS
+
+@cindex COMMAND LINE PARAMETERS
+
+The parameters are a broken down into three categories:
+
+@table @asis
+
+@item Retrieving entries
+@cindex Retrieving entries
+
+@code{--fetch}, @code{--list-forward}, @code{--list-primaries},
+@code{--list-reverse}, @code{--list-secondaries}
+
+@item Adding, changing, removing entries
+@cindex Adding, changing, removing entries
+
+@code{--delete},
+@code{--remove}, @code{--rename},
+@code{--set}
+
+@item Cleanliness
+@cindex Cleanliness
+
+@code{--xref}
+
+@end table
+
+@subsubheading Retrieving Entries
+
+@cindex Retrieving Entries
+
+@table @asis
+
+@item @code{--fetch }@emph{NAME}
+@vindex @code{--fetch }@emph{NAME}
+
+@item @code{--fetch=}@emph{NAME}
+@vindex @code{--fetch=}@emph{NAME}
+
+This will retrieve the list of recipients in the group @emph{NAME}.  If @emph{NAME}
+is a regular expression, information will retrieved for every group that matches
+the pattern.
+
+@item @code{--list-forward}
+@vindex @code{--list-forward}
+
+This will retrieve the list of name to address domains being served.
+
+@item @code{--list-primaries}
+@vindex @code{--list-primaries}
+
+This will retrieve the list of primary domains being served.
+
+@item @code{--list-reverse}
+@vindex @code{--list-reverse}
+
+This will retrieve the list of reverse DNS domains (address to name) being
+served.
+
+@item @code{--list-secondaries}
+@vindex @code{--list-secondaries}
+
+This will retrieve the list of secondary domains being served.
+
+@end table
+
+@subsubheading Adding, Changing, or Removing Entries.
+
+@cindex Adding, Changing, or Removing Entries.
+
+The following specify how to change various entries.  Typically they can not be
+intermixed on the same command line.  (Exceptions are noted.)
+
+@table @asis
+
+@item @code{--comment }@emph{NAME}=@emph{TEXT}
+@vindex @code{--comment }@emph{NAME}=@emph{TEXT}
+
+This will add a comment record (TXT) describing the named machine.
+
+@item @code{--delete }@emph{NAME}
+@vindex @code{--delete }@emph{NAME}
+
+@item @code{--delete=}@emph{NAME}
+@vindex @code{--delete=}@emph{NAME}
+
+This will remove the @emph{alias}(es) specified by @emph{NAME}.  It will also remove
+from any mail @emph{alias}(es) (or groups) any @emph{member}(s) that matches @emph{NAME}.  @emph{NAME}
+may be a regular expression.  (Can be used with @code{--remove} and @code{--rename}.)
+
+@item @code{--remove }@emph{NAME}
+@vindex @code{--remove }@emph{NAME}
+
+@item @code{--remove=}@emph{NAME}
+@vindex @code{--remove=}@emph{NAME}
+
+Like @code{delete} above, this will remove the mail @emph{group}(s) specified by @emph{NAME}.
+@emph{NAME} may be a regular expression.  (Can be used with @code{--delete} and
+@code{--rename}.)
+
+@item @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+@vindex @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+
+This will change all of the occurrences or references that match @emph{NAME-OLD} to
+the newer form of @emph{NAME-NEW}.  This may be a group name, and / or members of a
+group.  This may be a regular expression, similar to:
+@example
+        s/NAME-OLD/NAME-NEW/
+@end example
+
+@item @code{--set} @emph{NAME}=@emph{MEMBERS}
+@vindex @code{--set} @emph{NAME}=@emph{MEMBERS}
+
+This will create a group called @emph{NAME} with a set of specified members
+@emph{MEMBERS}.
+(Can be used with @code{--delete} and  @code{--remove}.)
+
+@end table
+
+@subsubheading Cleanliness
+
+@cindex Cleanliness
+
+@table @asis
+
+@item @code{--xref}
+@vindex @code{--xref}
+
+@item @code{--xref }@emph{FWD-NAME-SPACE}
+@vindex @code{--xref }@emph{FWD-NAME-SPACE}
+
+This will have the reverse and forward namespaces properly cross referenced and
+up to date.
+
+@end table
+
+@subheading FILES
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-CfgArgs::	
+ for more information on the standard parameters
+
+@end menu
+the @emph{named}(8) manpage
+
+@subheading NOTES
+
+@subsubheading Author
+
+@cindex Author
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "DNS-find-free.pod".
+
+
+@c 319
+@node DNS-find-free, mail-validate, CfgNamed, bin
+@section DNS-find-free
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+DNS-find-free --- an example tool to help find free spots in your DNS table
+
+@subheading DESCRIPTION
+
+This is a tool to help find some unallocated DNS addresses in your files.
+There are two methods of operation: either by specifying the kind of
+unallocated space you would like to find, or to employ a script files that
+specifies this information.  Currently the only format of the script file is
+the SWIP format.  In addition, if a SWIP file is employed, an ARIN End User IP
+Request report can be generated from a template.  The report, with some
+editing, can be sent to ARIN afterwards.
+
+@subheading COMMAND LINE PARAMETERS AND OPTIONS
+
+@cindex COMMAND LINE PARAMETERS AND OPTIONS
+
+@table @asis
+
+@item @code{--arin-input }@file{FILE}
+@vindex @code{--arin-input }@file{FILE}
+
+@item @code{--arin-input=}@file{FILE}
+@vindex @code{--arin-input=}@file{FILE}
+
+This indicates that an ARIN End User IP Request file contains the parameters.
+(See @url{http://www.arin.net/templates/networktemplate.txt} for details on how
+this file is formatted)
+
+@item @code{--num }@emph{NUM}
+@vindex @code{--num }@emph{NUM}
+
+@item @code{--num=}@emph{NUM}
+@vindex @code{--num=}@emph{NUM}
+
+This is the number of address blocks to find.  The block size is whatever your
+DNS table happens to use.
+
+@item @code{--swip-input }@file{FILE}
+@vindex @code{--swip-input }@file{FILE}
+
+@item @code{--swip-input=}@file{FILE}
+@vindex @code{--swip-input=}@file{FILE}
+
+This specifies the template SWIP file for a network record.  SWIP files are not
+generated without a template.  (See @url{http://rs.arin.net/pub/swiptemplate.txt}
+for details on this file is formatted.)
+
+@item @code{--swip-output }@file{FILE}
+@vindex @code{--swip-output }@file{FILE}
+
+@item @code{--swip-output=}@file{FILE}
+@vindex @code{--swip-output=}@file{FILE}
+
+This specifies the output SWIP file for a network record.  If this parameter is
+not specified, but an input template is, the generated SWIP file will be
+directed to standard out.  SWIP files are not generated without a template.
+See the @code{--swip-input} option. 
+
+@end table
+
+@subsubheading Records modified in the SWIP file
+
+@cindex Records modified in the SWIP file
+
+Not every field in the SWIP file is modified, but the following fields are:
+
+@table @asis
+
+@item @code{fname}
+@vindex @code{fname}
+
+This field is determined by the @code{Name (Last, First)} field in the ARIN file.
+
+@item @code{lname}
+@vindex @code{lname}
+
+This field is determined by the @code{Name (Last, First)} field in the ARIN file.
+
+@item @code{mbox}
+@vindex @code{mbox}
+
+The information for this field is gathered from the @code{E-Mailbox} field in the
+ARIN file.
+
+@item @code{mname}
+@vindex @code{mname}
+
+This field is determined by the @code{Name (Last, First)} field in the ARIN file.
+
+@item @code{ntenum}
+@vindex @code{ntenum}
+
+This field is determined by finding the end of a free slot in the DNS tables
+
+@item @code{ntname}
+@vindex @code{ntname}
+
+The information for this field is determined by the @code{Network name} field in
+the ARIN file.
+
+@item @code{ntsnum}
+@vindex @code{ntsnum}
+
+This field is determined by finding the start of a free slot in the DNS tables.
+
+@item @code{org}
+@vindex @code{org}
+
+The information for this field is gathered from the @code{Name of Organization}
+field in the ARIN file.
+
+@item @code{phne}
+@vindex @code{phne}
+
+This fields setting is gathered from the @code{Phone Number} field in the ARIN
+file.
+
+@end table
+
+@subheading FILES
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-CfgArgs::	
+ for more information on the standard parameters
+
+@end menu
+the @emph{named}(8) manpage
+
+@subheading NOTES
+
+@subsubheading Author
+
+@cindex Author
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "mail-validate.pod".
+
+
+@c 319
+@node mail-validate, sys.cgi, DNS-find-free, bin
+@section mail-validate
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+mail-validate --- A CfgTie example that checks /var/spool/mail for errors
+
+@subheading SYNOPSIS
+@example
+        mail-validate
+@end example
+
+@subheading DESCRIPTION
+
+This is an example of how CfgTie might be used.  It just checks out the mail
+spool (/var/spool/mail) and makes some recommendations.
+
+@subheading FILES
+
+@file{/var/spool/mail}
+
+@flindex mail, /var/spool/mail
+
+@flindex var, /var/spool/mail
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "misspellings.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "sys.pod".
+
+
+@c 319
+@node sys.cgi,  , mail-validate, bin
+@section sys.cgi
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+sys.cgi --- An example CGI script to browse configuration space via CfgTie
+
+@subheading SYNPOSIS
+
+@cindex SYNPOSIS
+@example
+        http://www.mydomain.com/sys.cgi/user/joeuser
+        http://www.mydomain.com/sys.cgi/users
+        http://www.mydomain.com/sys.cgi/groups
+@end example
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "README.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "test.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "group.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "dojoin.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CHANGES.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CONTRIB.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgTie.info-1.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgTie.info-2.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgTie.info-3.pod".
+
+
+
+
+@c 290
+@node CfgTie, Secure, bin,  bytype
+@chapter CfgTie
+@section CfgTie 
+@menu
+
+* CfgTie-CfgArgs::
+* CfgTie-Cfgfile::
+* CfgTie-filever::
+* CfgTie-TieAliases::
+* CfgTie-TieGeneric::
+* CfgTie-TieGroup::
+* CfgTie-TieHost::
+* CfgTie-TieMTab::
+* CfgTie-TieNamed::
+* CfgTie-TieNet::
+* CfgTie-TiePh::
+* CfgTie-TieProto::
+* CfgTie-TieRCService::
+* CfgTie-TieRealm::
+* CfgTie-TieRsrc::
+* CfgTie-TieServ::
+* CfgTie-TieShadow::
+* CfgTie-TieUser::
+@end menu
+
+@c 319
+@node CfgTie-CfgArgs, CfgTie-Cfgfile,  , CfgTie
+@section CfgTie-CfgArgs
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::CfgArgs} --- Configuration module for parsing commandline arguments
+
+@subheading SYNOPSIS
+
+This module is meant to help create useful configuration tools and utilities.
+
+@subheading DESCRIPTION
+
+A tool to allow many of your computer's subsystems to be configured.  This
+module parses commandline arguments.  It is provided to help create a
+standardized lexicon.
+
+@subsubheading Scope controls and settings
+
+@cindex Scope controls and settings
+
+To specify how much of your system should be affected by the change in
+settings:
+@example
+  --scope=session|application|user|group|system
+@end example
+
+In addition, each of the individual parts can specified (instead of their
+defaults):
+
+@table @asis
+
+@item @code{--application=}@emph{NAME}
+@vindex @code{--application=}@emph{NAME}
+
+@item @code{--application }@emph{NAME}
+@vindex @code{--application }@emph{NAME}
+
+This specifies the application.
+
+@item @code{--user=}@emph{NAME}
+@vindex @code{--user=}@emph{NAME}
+
+@item @code{--user }@emph{NAME}
+@vindex @code{--user }@emph{NAME}
+
+This specifies the user name.
+
+@item @code{--group=}@emph{NAME}
+@vindex @code{--group=}@emph{NAME}
+
+@item @code{--group }@emph{NAME}
+@vindex @code{--group }@emph{NAME}
+
+This specifies the group name.
+
+@end table
+
+@subsubheading Operations on variables
+
+@cindex Operations on variables
+
+The specific operation to be done:
+@example
+        --op=set|unset|remove|delete|exists|fetch|get|copy|rename
+@end example
+
+or:
+@example
+        --copy   name1=name2 name3=name4 ...
+        --exists name1 name2 name3 ...
+        --test   name1=value1 name2=value2 ...
+        --unset  name1 name2 ...
+@end example
+
+@table @asis
+
+@item @code{--delete }@emph{NAME}
+@vindex @code{--delete }@emph{NAME}
+
+@item @code{--delete=}@emph{NAME}
+@vindex @code{--delete=}@emph{NAME}
+
+This will remove the entry specified by @emph{NAME}.  @emph{NAME} may be a regular
+expression.
+
+@item @code{--fetch }@emph{NAME}
+@vindex @code{--fetch }@emph{NAME}
+
+@item @code{--fetch=}@emph{NAME}
+@vindex @code{--fetch=}@emph{NAME}
+
+This will retrieve the information associated with @emph{NAME}.  If @emph{NAME} is a
+regular expression, information will retrieved for every entry that matches the
+pattern.
+
+@item @code{--remove }@emph{NAME}
+@vindex @code{--remove }@emph{NAME}
+
+@item @code{--remove=}@emph{NAME}
+@vindex @code{--remove=}@emph{NAME}
+
+Like @code{delete} above, this will remove the entry specified by @emph{NAME}.  @emph{NAME}
+may be a regular expression.
+
+@item @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+@vindex @code{--rename} @emph{NAME-NEW}=@emph{NAME-OLD}
+
+This will change all of the occurrences or references that match @emph{NAME-OLD} to
+the newer form of @emph{NAME-NEW}.  This may be a regular expression, similar to;
+@example
+        s/NAME-OLD/NAME-NEW/
+@end example
+
+@item @code{--set} @emph{NAME}=@emph{VALUE}
+@vindex @code{--set} @emph{NAME}=@emph{VALUE}
+
+This will create an entry called @emph{NAME} with a setting of @emph{VALUE}.
+
+@end table
+
+The variable names are optional, and can be explicitly specified:
+@example
+        --name
+@end example
+
+Otherwise it is assumed to be the first no flag parameter.
+
+Similarly, the value can be specified
+@example
+        --value
+@end example
+
+@subsubheading Other flags
+
+@cindex Other flags
+
+@table @asis
+
+@item @code{--file }FILE
+@vindex @code{--file }FILE
+
+@item @code{--file=}FILE
+@vindex @code{--file=}FILE
+
+This specifies the configuration file to employ.  If none is specified, the
+default for the particular subsystem will be used instead.  
+
+@item @code{--comment }COMMENT
+@vindex @code{--comment }COMMENT
+
+@item @code{--comment=}COMMENT
+@vindex @code{--comment=}COMMENT
+
+This provides a text comment on what changes are being made.
+
+@end table
+@example
+        -n,
+        --dry-run,
+        --just-print
+        --recon
+@end example
+
+With these flags, the utility program @emph{should not modify any files}.
+Instead, it should merely document what changes it would make, what programs
+it would run, etc.
+@example
+        --copyright
+        --help
+        --info
+        --information
+        --manual
+        --verbose
+        --version
+        --warranty
+@end example
+
+@subsubheading Exit value
+
+@cindex Exit value
+
+If the operation exists the return value is zero, otherwise it is nonzero.
+
+@subsubheading Return from parsing
+
+@cindex Return from parsing
+
+The hash return:
+@example
+   @{
+      SCOPE=> session,application,user,group,system
+      OP  => COPY, RENAME, STORE, DELETE, FETCH, or EXISTS
+      KEY =>
+      VALUE=>
+   @}
+@end example
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieUser.pod".
+
+
+@c 319
+@node CfgTie-Cfgfile, CfgTie-filever, CfgTie-CfgArgs, CfgTie
+@section CfgTie-Cfgfile
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::Cfgfile} --- An object to help interface to configuration files
+
+@subheading SYNOPSIS
+
+Helps interface to the text based configuration files commonly used in Unix
+
+@subheading DESCRIPTION
+
+This is a fairly generic interface to allow many configuration files to be
+used as hash ties.  @emph{Note: This is not intended to be called by user programs,
+but by modules wishing to reuse a template structure!}
+@example
+   package mytie;
+   require CfgTie::Cfgfile;
+@end example
+@example
+   @@ISA = qw(CfgTie::Cfgfile);
+@end example
+
+The major methods:
+
+@code{new(}@emph{$filepath}, @emph{@@Extra stuff}@code{)}
+
+or
+
+@code{new(}@emph{$RCS-Object}, @emph{@@Extra stuff}@code{)}
+
+@table @asis
+
+@item filepath
+@cindex filepath
+
+If defined, this is the path to the configuration file to be opened.
+
+@item RCS-Object
+@cindex RCS-Object
+
+If defined, this is an RCS object (or similar) that will control how to check
+in and check out the configuration file.  See RCS Perl module for more details
+on how to create this object (do not use the same instance for each
+configuration file!).  Files will be checked back in when the @code{END} routine is
+called.  If a @code{filepath} is specified, it will override the one previously
+set with the RCS object.  If no @code{filepath} is specified, but the RCS has one
+specified, it will be used instead.
+
+@end table
+
+@subsubheading The derived object
+
+@cindex derived object
+
+Your derived object may need to provide the following methods:
+
+@table @asis
+
+@item @code{scan}
+@vindex @code{scan}
+
+This is called when the file is first tied in.  It should scan the file,
+placing the associated contents into the @code{@{Contents@}} key.
+
+@item @code{format}(@emph{key},@emph{contents})
+@vindex @code{format}(@emph{key},@emph{contents})
+
+This formats a single entry to be stored in a file.  This is used for when a
+value can be stored simply.
+
+@item @code{cfg_begin}
+@vindex @code{cfg_begin}
+
+If this method is defined, it is called just before the configuration file
+will be modified.
+
+@item @code{cfg_end}
+@vindex @code{cfg_end}
+
+If this method is defined, it is called after the configuration file has
+changed.  It can be used, for instances, to rebuild a binary database, restart
+a service, or email Martians.
+
+@item @code{makerewrites}
+@vindex @code{makerewrites}
+
+This is called just before the configuration file will be rewritten.  It
+should return a reference to a function that is used to transform the current
+control file into the new one.  This transforming function is called
+for each line in the configuration file while it is being rewritten. 
+
+@end table
+
+@subsubheading Object methods you can use
+
+@cindex Object methods you can use
+
+@code{Comment_Add} This appends the string to the list of comments that will be
+logged for this revision (assuming that a Revision Control object was used).
+
+@code{Queue_Store($key,$val)} This queues (for later) the transaction that
+@emph{key} should be associated with @emph{val}.  The queue is employed to synchronize
+all of the settings with the stored settings on disk.
+
+@code{Queue_Delete($key)} This queues (for later) the transaction that any value
+associated with @emph{key} should be removed.
+
+@code{RENAME(\%rules)} This method will move through the whole table and make a
+series of changes.  It may:
+
+@table @asis
+
+@item Remove some entries, based upon their keys
+@cindex Remove some entries, based upon their keys
+
+@item Rename the keys from some entries
+@cindex Rename the keys from some entries
+
+@item Change the contents of the keys, possibly removing portions
+@cindex Change the contents of the keys, possibly removing portions
+
+@end table
+
+@code{\%rules} is the set of rules that governs will be changed in name and what
+will be removed.  It is an associative array (hash) of a form like:
+@example
+        @{
+            PATTERN1 => "",
+            PATTERN2 => REWRITE,
+        @}
+@end example
+
+@code{PATTERN1 = }
+Two things will happen with a rule like this:
+
+@table @asis
+
+@item Every key in the table that matches the pattern will be removed
+@cindex Every key in the table that matches the pattern will be removed
+
+@item Any element (of an entry) that matches the pattern will be removed
+@cindex Any element (of an entry) that matches the pattern will be removed
+
+@end table
+
+@code{PATTERN2 = REWRITE}
+In this case the rewrite indicates what should replace the pattern:
+
+@itemize @bullet
+
+@item
+
+Every key that matches the pattern will be rewritten and replace with a
+new key.
+
+@item
+
+Any element (of an entry) that matches the pattern will be modified to
+match the rewrite rule.
+
+@end itemize
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-TieAliases::	
+   
+* CfgTie-TieGeneric::	
+ 
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieHost::	
+      
+* CfgTie-TieMTab::	
+    
+* CfgTie-TieNamed::	
+
+
+* CfgTie-TieNet::	
+       
+* CfgTie-TiePh::	
+      
+* CfgTie-TieProto::	
+
+
+* CfgTie-TieRCService::	
+ 
+* CfgTie-TieRsrc::	
+    
+* CfgTie-TieServ::	
+
+
+* CfgTie-TieShadow::	
+    
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+Additions that do not change any previously established values are reflected
+immediately (and @file{newaliases} is run as appropriate).  Anything which changes
+a previously established value, regardless of whether or not it has been
+committed, are queue'd for later.  This queue is used to rewrite the file when
+@code{END} is executed.
+
+@flindex newaliases, newaliases
+
+@flindex newaliase, newaliases
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieGeneric.pod".
+
+
+@c 319
+@node CfgTie-filever, CfgTie-TieAliases, CfgTie-Cfgfile, CfgTie
+@section CfgTie-filever
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::filever --- a simple module for substituting newer versions into a file system.
+
+@subheading SYNOPSIS
+
+This module allows a newer version of file to be safely placed into the file system.
+
+@subheading DESCRIPTION
+
+This is a set of utilities for manipulating files.
+
+@subsubheading @code{File's_Rotate} (@emph{$Old, $New})
+
+@cindex @code{File's_Rotate} (@emph{$Old, $New})
+
+This is the file space equivalent to the variable exchange or swap.  The
+@emph{old} file will be renamed (with a .old extension) and the @emph{new} file will
+be renamed to @emph{old}.  This is extremely useful for many semi-critical
+functions, where modifying the file directly will cause unpredictable results.
+Instead, the preferred method is to modify @emph{old} sending the results to
+@emph{new} in the background and then doing a @emph{very} quick switcheroo.
+
+It preserves the permissions and ownership of the original file.
+
+If this routine fails, it will make an attempt to restore things to their
+original state and return.
+
+@strong{Return Value}: 0 on success, -1 on error;
+
+@subsubheading @code{Roll(}@emph{path},@emph{depth},@emph{sep}@code{)}
+
+@cindex @code{Roll(}@emph{path},@emph{depth},@emph{sep}@code{)}
+
+This convert the specified files into a backup file (the original file is
+renamed, so you had better have something to put there).
+
+@table @asis
+
+@item @emph{Depth}
+@cindex @emph{Depth}
+
+(optional) Controlls the number of backup copies
+
+@item @emph{Sep}
+@cindex @emph{Sep}
+
+(optional) Controlls the seperator between the main name and the backup
+number
+
+@end table
+
+The defaults for @emph{depth} and @emph{sep} are controlled by following two variables
+in the package:
+
+@table @asis
+
+@item @code{RollDepth}
+@vindex @code{RollDepth}
+
+Controlls the number of of older versions that are kept around as backup
+copies.
+@emph{@code{[}Default: 4@code{]}}
+
+@item @code{RollSep}
+@vindex @code{RollSep}
+
+Controls the separator between the file name and the backup number.
+@emph{@code{[}Default: }@code{~}@emph{@code{]}}
+
+@end table
+
+@subsubheading @code{RCS_path (}@emph{RCSObj},@emph{path}@code{)}
+
+@cindex @code{RCS_path (}@emph{RCSObj},@emph{path}@code{)}
+
+For the given RCS object, this sets the working directory and the file.
+
+@subsubheading find_by_user
+
+@cindex find_by_user
+
+This function attempts to locate all of the files in the system that are owned
+by the specified users.  It takes the following parameters:
+
+@table @asis
+
+@item @code{Base}
+@vindex @code{Base}
+
+@code{Base} can be a string to the base path or a reference to a list of base
+paths to search.
+
+@end table
+
+Return Value:
+
+@table @asis
+
+@item @code{undef} if there was an error
+@vindex @code{undef} if there was an error
+
+@item otherwise the list of file that matched
+@cindex otherwise the list of file that matched
+
+@end table
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieShadow.pod".
+
+
+@c 319
+@node CfgTie-TieAliases, CfgTie-TieGeneric, CfgTie-filever, CfgTie
+@section CfgTie-TieAliases
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieAliases --- an associative array of mail aliases to targets
+
+@subheading SYNOPSIS
+
+Makes it easy to manage the mail aliases (@file{/etc/aliases}) table as a hash.
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+@example
+   tie %mtie,'CfgTie::TieAliases'
+@end example
+@example
+   #Redirect mail for foo-man to root
+   $mtie@{'foo-man'@}=['root'];
+@end example
+
+@subheading DESCRIPTION
+
+This Perl module ties to the @file{/etc/aliases} file so that things can be
+updated on the fly.  When you tie the hash, you are allowed an optional
+parameter to specify what file to tie it to.
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+@example
+   tie %mtie,'CfgTie::TieAliases'
+@end example
+
+or
+@example
+   tie %mtie,'CfgTie::TieAliases',I<aliases-like-file>
+@end example
+
+or
+@example
+   tie %mtie,'CfgTie::TieAliases',I<revision-control-object>
+@end example
+
+@subsubheading Methods
+
+@cindex Methods
+
+@code{ImpGroups} will import the various groups from @file{/etc/group} using
+@code{CfgTie::TieGroup}.  It allows an optional code reference to select which
+groups get imported.  This code is passed a reference to each group and needs
+to return nonzero if it is to be imported, or zero if it not to be imported.
+For example:
+
+@flindex group, /etc/group
+
+@flindex etc, /etc/group
+@example
+   (tied  %mtie)->ImpGroups
+        @{
+           my $T=shift;
+           if ($T->@{'id@} < 100) @{return 0;@}
+           return 1;
+        @}
+@end example
+
+@subsubheading Format of the @file{/etc/aliases} file
+
+@cindex Format of the @file{/etc/aliases} file
+
+The format of the @file{/etc/aliases} file is poorly documented.  The format that
+@code{CfgTie::TieAliases} understands is documented as follows:
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+
+@table @asis
+
+@item @code{#}@emph{comments}
+Anything after a hash mark (@code{#}) to the end of the line is treated as a
+comment, and ignored.
+
+@item @emph{text}@code{:}
+@cindex @emph{text}@code{:}
+
+The letters, digits, dashes, and underscores before a colon are treated as
+the name of an alias.  The alias will be expanded to whatever is on the
+line after the colon.  (Each of those is in turn expanded).
+
+@item @code{:include:}@emph{file}
+@vindex @code{:include:}@emph{file}
+
+Any element of the alias list that includes @code{:include:} indicates that the
+specified file should be read from.  The file may only specify user names or
+email addresses.  Several include directives may used in the aliase.  It is not
+clear which of these files is the preferred file to modify.
+
+@item Continuation lines
+@cindex Continuation lines
+
+Any line that starts with a space is a continuation of the previous line.
+
+@end table
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+Not all changes to are immediately reflected to the specified file.  See the
+
+@menu
+
+* CfgTie-Cfgfile::	
+ module for more information
+
+@end menu
+
+@subheading FILES
+
+@file{/etc/aliases}
+
+@flindex aliases, /etc/aliases
+
+@flindex etc, /etc/aliases
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+    
+* CfgTie-TieRCService::	
+
+
+* CfgTie-TieGeneric::	
+ 
+* CfgTie-TieGroup::	
+ 
+* CfgTie-TieHost::	
+
+
+* CfgTie-TieNamed::	
+   
+* CfgTie-TieNet::	
+ 
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+   
+* CfgTie-TieServ::	
+  
+* CfgTie-TieShadow::	
+
+
+* CfgTie-TieUser::	
+
+
+@end menu
+
+the @emph{aliases}(5) manpage
+the @emph{newaliases}(1) manpage
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieGroup.pod".
+
+
+@c 319
+@node CfgTie-TieGeneric, CfgTie-TieGroup, CfgTie-TieAliases, CfgTie
+@section CfgTie-TieGeneric
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieGeneric --- A generic hash that automatically binds others
+
+@subheading SYNOPSIS
+
+This is an associative array that automatially ties other configuration hashes
+
+@subheading DESCRIPTION
+
+This is a tie to bring other ties together automatically so you, the busy
+programmer and/or system administrator, don't have to.  The related Perl
+module is not loaded unless it is needed at runtime.
+@example
+        my %gen;
+        tie %gen, 'CfgTie::TieGeneric';
+@end example
+
+@subsubheading Primary, or well-known, keys
+
+@cindex Primary, or well-known, keys
+
+@table @asis
+
+@item @code{env}
+@vindex @code{env}
+
+This refers directly to the @code{ENV} hash.
+
+@item @code{group}
+@vindex @code{group}
+
+@item @code{mail}
+@vindex @code{mail}
+
+This is a special key.  It forms a hash, with subkeys.  See below for more
+information
+
+@item @code{net}
+@vindex @code{net}
+
+This is a special key.  It forms a hash with additional subkeys. See
+below for more details.
+
+@item @code{user}
+@vindex @code{user}
+
+This is a link to the @code{TieUser} module (
+@menu
+
+* CfgTie-TieUser::	
+).
+
+@end menu
+
+@item @emph{Composite}
+@cindex @emph{Composite}
+
+Composite primary keys are just like absolute file paths.  For example, if
+you wanted to do something like this:
+@example
+        my %lusers = $gen@{'user'@};
+        my $Favorite_User = $lusers@{'mygirl'@};
+@end example
+
+You could just do:
+@example
+        my $Favorite_User = $gen@{'/users/mygirl'@};
+@end example
+
+@item others...
+@cindex others...
+
+These are the things automatically included in.  This will be described below.
+
+@end table
+
+@subsubheading Subkeys for @code{mail}
+
+@cindex Subkeys for @code{mail}
+
+@table @asis
+
+@item @code{aliases}
+@vindex @code{aliases}
+
+
+@menu
+
+* CfgTie-TieAliases::	
+ 
+
+@end menu
+
+@end table
+
+@subsubheading Subkeys for @code{net}
+
+@cindex Subkeys for @code{net}
+
+@table @asis
+
+@item @code{host}
+@vindex @code{host}
+
+
+@menu
+
+* CfgTie-TieHost::	
+
+
+@end menu
+
+@item @code{service}
+@vindex @code{service}
+
+
+@menu
+
+* CfgTie-TieServ::	
+
+
+@end menu
+
+@item @code{protocol}
+@vindex @code{protocol}
+
+
+@menu
+
+* CfgTie-TieProto::	
+
+
+@end menu
+
+@item @code{addr}
+@vindex @code{addr}
+
+
+@menu
+
+* CfgTie-TieNet::	
+
+
+@end menu
+
+@end table
+
+@subsubheading How other ties are automatically bound
+
+@cindex How other ties are automatically bound
+
+Other keys are automatically (if it all possible) brought in using the
+following procedure:
+
+@enumerate 
+@item
+If it is something already linked to it, that thingy is automatically returned (of course).
+
+@cindex If it is something already linked to it, that thingy is automatically returned (of course).
+
+@item
+If the key is simple, like @file{AABot}, we will try to @code{use AABot;} If that works we will tie it and return the results.
+
+@cindex If the key is simple, like @file{AABot}, we will try to @code{use AABot;} If that works we will tie it and return the results.
+
+@item
+If the key is more complex, like @file{/OS3/Config}, we will try to see if @code{OS3} is already tied (and try to tie it, like above, if not).  If that works, we will just look up @code{Config} in that hash.  If it does not work, we will try to @code{use} and @code{tie} @code{OS3::Config}, @code{OS3::TieConfig}, and @code{OS3::ConfigTie}.  If any of those work, we return the results.
+
+@cindex If the key is more complex, like @file{/OS3/Config}, we will try to see if @code{OS3} is already tied (and try to tie it, like above, if not).  If that works, we will just look up @code{Config} in that hash.  If it does not work, we will try to @code{use} and @code{tie} @code{OS3::Config}, @code{OS3::TieConfig}, and @code{OS3::ConfigTie}.  If any of those work, we return the results.
+
+@item
+Otherwise, @code{undef} will be returned.
+
+@vindex Otherwise, @code{undef} will be returned.
+
+@end enumerate
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGroup::	
+ 
+* CfgTie-TieHost::	
+
+
+* CfgTie-TieMTab::	
+    
+* CfgTie-TieNamed::	
+ 
+* CfgTie-TieNet::	
+
+
+* CfgTie-TiePh::	
+      
+* CfgTie-TieProto::	
+ 
+* CfgTie-TieRCService::	
+
+
+* CfgTie-TieRsrc::	
+    
+* CfgTie-TieServ::	
+  
+* CfgTie-TieShadow::	
+
+
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieServ.pod".
+
+
+@c 319
+@node CfgTie-TieGroup, CfgTie-TieHost, CfgTie-TieGeneric, CfgTie
+@section CfgTie-TieGroup
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieGroup --- an associative array of group names and ids to information
+
+@subheading SYNOPSIS
+
+Makes the groups database available as regular hash
+@example
+        tie %group,'CfgTie::TieGroup'
+        $group@{'myfriends'@}=['jonj', @@@{$group@{'myfriends'@}];
+@end example
+
+or
+@example
+        tie %group,'CfgTie::TieGroup', 'mygroupfile'
+@end example
+
+@subheading DESCRIPTION
+
+This is a straight forward hash tie that allows us to access the user group
+database sanely.
+
+It cross ties with the user package and the mail packages
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programmers:
+
+@table @asis
+
+@item @code{tie %group,'CfgTie::TieGroup'}
+@vindex @code{tie %group,'CfgTie::TieGroup'}
+
+@code{$group@{$name@}} will return a hash reference of the named group information.
+
+@item @code{tie %group_id,'CfgTie::Group_id'}
+@vindex @code{tie %group_id,'CfgTie::Group_id'}
+
+@code{$group_id@{$id@}} will return a HASH reference for the specified group.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given group entry has the following information assoicated with it:
+
+@table @asis
+
+@item @code{name}
+@vindex @code{name}
+
+@item @code{id}
+@vindex @code{id}
+
+@item @code{members}
+@vindex @code{members}
+
+A list reference to all of the users that are part of this group.
+
+@item @code{_members}
+@vindex @code{_members}
+
+A list reference to all of the users that are explicitly listed in the
+@file{/etc/group} file.
+
+@flindex group, /etc/group
+
+@flindex etc, /etc/group
+
+@end table
+
+Plus an (probably) obsolete fields:
+
+@table @asis
+
+@item @code{Password}
+@vindex @code{Password}
+
+This is the encrypted password, but will probably be obsolete.
+
+@end table
+
+Each of these entries can be modified (even deleted), and they will be
+reflected in the overall system.  Additionally, the programmer can set any
+other associated key, but this information will only be available to a running
+Perl script.
+
+@subsubheading Additional Routines
+
+@cindex Additional Routines
+
+@table @asis
+
+@item @code{(tied %MyHash)-}files()>
+@cindex @code{(tied %MyHash)-}files()>
+
+Returns a list of files employed.
+
+@item @code{&CfgTie::TieGroup'status()}
+@findex @code{&CfgTie::TieGroup'status()}
+
+@item @code{&CfgTie::TieGroup_id'status()}
+@findex @code{&CfgTie::TieGroup_id'status()}
+
+Will return @code{stat} information on the group database.
+
+@end table
+
+@subsubheading Miscellaneous
+
+@cindex Miscellaneous
+
+@code{$CfgTie::TieGroup_rec'groupmod} contains the path to the program @file{groupmod}.
+This can be modified as required.
+
+@flindex groupmod, groupmod
+
+@flindex groupmo, groupmod
+
+@code{$CfgTie::TieGroup_rec'groupadd} contains the path to the program @file{groupadd}.
+This can be modified as required.
+
+@flindex groupadd, groupadd
+
+@flindex groupad, groupadd
+
+@code{$CfgTie::TieGroup_rec'groupdel} contains the path to the program @file{groupdel}.
+This can be modified as required.
+
+@flindex groupdel, groupdel
+
+@flindex groupde, groupdel
+
+@subheading FILES
+
+@file{/etc/passwd}
+@file{/etc/group}
+@file{/etc/gshadow}
+@file{/etc/shadow}
+
+@flindex passwd, /etc/passwd
+
+@flindex etc, /etc/passwd
+
+@flindex group, /etc/group
+
+@flindex etc, /etc/group
+
+@flindex gshadow, /etc/gshadow
+
+@flindex etc, /etc/gshadow
+
+@flindex shadow, /etc/shadow
+
+@flindex etc, /etc/shadow
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+      
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieHost::	
+      
+* CfgTie-TieMTab::	
+    
+* CfgTie-TieNamed::	
+
+
+* CfgTie-TieNet::	
+       
+* CfgTie-TiePh::	
+      
+* CfgTie-TieProto::	
+
+
+* CfgTie-TieRCService::	
+ 
+* CfgTie-TieRsrc::	
+    
+* CfgTie-TieServ::	
+
+
+* CfgTie-TieShadow::	
+    
+* CfgTie-TieUser::	
+
+
+@end menu
+
+the @emph{group}(5) manpage
+the @emph{passwd}(5) manpage
+the @emph{shadow}(5) manpage
+the @emph{groupmod}(8) manpage
+the @emph{groupadd}(8) manpage
+the @emph{groupdel}(8) manpage
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some group information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieHost.pod".
+
+
+@c 319
+@node CfgTie-TieHost, CfgTie-TieMTab, CfgTie-TieGroup, CfgTie
+@section CfgTie-TieHost
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::TieHost} --- This accesses the hosts tables.
+
+@subheading SYNOPSIS
+
+This is an associative array that allows the hosts tables to be configured
+easily.
+@example
+        tie %host,'CfgTie::TieHost';
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the host database
+sanely.
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programmers:
+
+@table @asis
+
+@item @code{tie %host,'CfgTie::TieHost'}
+@vindex @code{tie %host,'CfgTie::TieHost'}
+
+@code{$host@{$name@}} will return a hash reference of the named host information.
+
+@item @code{tie %host_addr,'CfgTie::TieHost_addr'}
+@vindex @code{tie %host_addr,'CfgTie::TieHost_addr'}
+
+@code{$host_addr@{$addr@}} will return a hash reference for the specified host.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given host entry has the following information assoicated with it:
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+Host name
+
+@item @code{Aliases}
+@vindex @code{Aliases}
+
+Other names for this host
+
+@item @code{AddrType}
+@vindex @code{AddrType}
+
+The type of address 
+
+@item @code{Length}
+@vindex @code{Length}
+
+@item @code{Addrs}
+@vindex @code{Addrs}
+
+A list reference of addresses.  You will need something like
+@example
+       ($a,$b,$c,$d) = unpack('C4',$Addr);
+@end example
+
+to get the address out sanely.
+
+@end table
+
+Additionally, the programmer can set any other associated key, but this
+information will only be available to a running Perl script.
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+ 
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieMTab::	
+    
+* CfgTie-TieNamed::	
+   
+* CfgTie-TieNet::	
+
+
+* CfgTie-TiePh::	
+      
+* CfgTie-TieProto::	
+   
+* CfgTie-TieRCService::	
+
+
+* CfgTie-TieRsrc::	
+    
+* CfgTie-TieServ::	
+    
+* CfgTie-TieShadow::	
+
+
+* CfgTie-TieUser::	
+
+
+@end menu
+
+the @emph{host}(5) manpage
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some host information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieNamed.pod".
+
+
+@c 319
+@node CfgTie-TieMTab, CfgTie-TieNamed, CfgTie-TieHost, CfgTie
+@section CfgTie-TieMTab
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::TieMTab} --- an associative array of mount entries
+
+@subheading SYNOPSIS
+
+makes the mount table available as a regular hash:
+@example
+    tie %MTab, 'CfgTie::TieMTab';
+    tie %MTab, 'CfgTie::TieMTab_dev';
+@end example
+
+@subheading DESCRIPTION
+
+The keys are path and devices. 
+
+The values are always list references.  The lists are one of two forms.  For
+local path, the list is of the form:
+@example
+    [$device, $path, $type, $options]
+@end example
+
+Other paths not in the mount table are of the form
+@example
+    [$device]
+@end example
+
+The form of @emph{device} varies from system to system.  It is usually the device
+specified in the mount table.  NFS and other network mounts are of the form
+@emph{host:path}.  @code{amd} devices are different, and (at the time of this writing)
+their form isn't known.
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+This requires @code{Quota} to work.  You can get it from CPAN.
+
+@subheading FILES
+
+@table @asis
+
+@item @file{/etc/mtab}
+@cindex @file{/etc/mtab}
+
+(on many machines)
+
+@item @file{/proc/mounts}
+@cindex @file{/proc/mounts}
+
+(on Linux machines)
+
+@end table
+
+@subheading SEE ALSO
+
+
+@menu
+
+* Quota::	
+
+
+@end menu
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "File.pod".
+
+
+@c 319
+@node CfgTie-TieNamed, CfgTie-TieNet, CfgTie-TieMTab, CfgTie
+@section CfgTie-TieNamed
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::TieNamed} --- A tool to help configure the name daemon (BIND DNS server)
+
+@subheading SYNOPSIS
+
+This is a PERL module to help make it easy to configure the DNS name server
+
+@subheading DESCRIPTION
+
+This is a tie hash to the NAMED configuration files.  You use it as follows:
+@example
+   tie %named, 'CfgTie::TieNamed','/path/to/named.boot';
+   $named = CfgTie::TieNamed->new('/path/to/named.boot');
+@end example
+
+These will set up a hash (@emph{named}) to the named configuration files.  It will
+used the specified @file{named.boot} file.
+
+@flindex named.boot, named.boot
+
+@flindex named.boo, named.boot
+@example
+   tie %named, 'CfgTie::TieNamed';
+   $named = CfgTie::TieNamed->new();
+@end example
+
+These will set up a hash (@emph{named}) to the named configuration files.  The
+files will be automatically determined from the system startup scripts.
+
+@subsubheading Examples
+
+@cindex Examples
+
+Lets say you would like to name a bunch of machines (like modems) with a base
+name and a number.  The number part needs to be the same as the same as the
+last number in the IP address.  You know these go in a domain like,
+"wikstrom.pilec.rm.net" which is a zone for your name server:
+@example
+      tie %DNS, 'CfgTie::TieNamed';
+      my $Tbl = $DNS->@{'primary'@}->@{'wikstrom.pilec.rm.net'@};
+      my $N=10; #Ten modems;
+      my $prefix="usr2-port";
+      my $ip_start=11;
+      for (my $i = 0; $i < $N; $i++)
+      @{
+         #Insert the address record in the table
+         $Tbl->@{$prefix.$i@}->@{'A'@} = "127.221.19.".($i+$ip_start);
+      @}
+@end example
+@example
+      #Finally make sure that the reverse name space is up to date
+      (tied %DNS)->RevXRef('wikstrom.pilec.rm.net','19.221.127.in-addr.arpa');
+@end example
+
+Even the address to name mapping will be kept up to date.
+        
+
+@subsubheading The basic structure of the named configuration table
+
+@cindex basic structure of the named configuration table
+
+@table @asis
+
+@item @code{bogusns}
+@vindex @code{bogusns}
+
+A list of name server addresses to ignore.
+
+@item @code{cache}
+@vindex @code{cache}
+
+See the @emph{named}(8) manpage for a description
+
+@item @code{check-names}
+@vindex @code{check-names}
+
+@item @code{directory}
+@vindex @code{directory}
+
+This specifies the working directory of the @file{named} server, and is used in
+determining the location of the associated files.
+
+@flindex named, named
+
+@flindex name, named
+
+@item @code{forwarders}
+@vindex @code{forwarders}
+
+A list of other servers' addresses on the site that can be used for recursive
+look up.
+
+@item @code{limit}
+@vindex @code{limit}
+
+Controls operational parameters of the @file{named} server.  See below.
+
+@flindex named, named
+
+@flindex name, named
+
+@item @code{options}
+@vindex @code{options}
+
+The list of options the @file{named} server should adhere to.
+
+@flindex named, named
+
+@flindex name, named
+
+@item @code{primary}
+@vindex @code{primary}
+
+This maps to a an associative array of name spaces we are primary for.  See
+below for more details on this is handled.
+
+@item @code{secondary}
+@vindex @code{secondary}
+
+This maps to a an associative array of name spaces we are secondary for.
+
+@item @code{sortlist}
+@vindex @code{sortlist}
+
+See the @emph{named}(8) manpage for a description
+
+@item @code{xfrnets}
+@vindex @code{xfrnets}
+
+The list of networks which are allowed to request zone transfers.  If not
+present, all hosts on all networks are.
+
+@end table
+
+Others may be set as well, but they are for backwards compatibility and should
+be changed to the more appopriate form.  See the @emph{named}(8) manpage for more information.
+
+@subsubheading Extra methods for the configuration table
+
+@cindex Extra methods for the configuration table
+
+These are various methods you can use.  Of course, you will need an object
+reference you can use for the remaining methods.  Note that if you tied the
+variable, you will want to use code sorta like:
+@code{my $Obj = tied %CfgTie::TieNamed;}
+
+@code{RevSpaces} Is the list of the reverses addresses spaces that the server is
+primary for (except loopback)
+
+@code{FwdSpaces} Is the list of name spaces the server is primary for (except the
+loopback and reverse name spaces)
+
+@code{RevXRef($}@emph{fwd}@code{,$}@emph{rev}@code{)} This will check that reverse look up is up
+to date with the primary look up.  It will add reverse entries as appropriate
+(if there is one missing, or the value is correct).  It will not change a
+reverse entry if there are multiple names with the same address entry.
+@emph{rev} is optional, but this method will return (with a 0) if it is not
+specified and there is more than one reverse name space.
+@emph{fwd} is optional, but this method will return (with a 0) if it is not
+specified and there is more than one primary name space.
+Returns the number of entries changed or added.
+
+@emph{Note:} This also derives any other methods from the @code{CfgTie::Cfgfile} module
+(
+@menu
+
+* CfgTie-Cfgfile::	
+).
+
+@end menu
+
+@subsubheading The basic structure of a primary name space table
+
+@cindex basic structure of a primary name space table
+
+The @code{$named-}>@code{@{primary@}} entry refers to a associative arrays.  The
+keys are the domain names that are to be server.  ie,
+@example
+   my %mydom = $name->@{primary@}->@{'mydomain.com'@};
+@end example
+
+These associations in turn refer to a table of names and their respective
+attributes.  The keys to this table are the machine names.  
+
+The values associated keys are hash references to domain name records.  This
+in turn refers to another (confused yet?) associative array.  The keys of
+this table are the DNS attribute names.  The values associated with the key
+are list references, usually a set of possible values for the given attribute
+and name pair.  The most common ones are:
+
+@table @asis
+
+@item @code{A}
+This is a list reference to all of the physical addresses the given machine
+name has.
+
+@item @code{NS}
+@vindex @code{NS}
+
+This is a list reference to all of the servers that can serve as domain name
+servers.
+
+@item @code{CNAME}
+@vindex @code{CNAME}
+
+This is a list reference to all of the real names the given machine
+name has.
+
+@item @code{SOA}
+@vindex @code{SOA}
+
+Has a list reference with the following structure
+@code{HOSTDATAFROM MAILADDR SERIAL REFRESH RETRY EXPIRE MinTTL}
+The Serial number is automatically updated for each table that is changed.
+The format is guessed (from various date formats include YYYYMMDD, YYYYDDD,
+and others), and properly incremented or set.
+
+@item @code{PTR}
+@vindex @code{PTR}
+
+This is a list reference to the real name of a given machines address.
+
+@item @code{TXT}
+@vindex @code{TXT}
+
+Each element of this list refers to a string describing the domain or name.
+
+@item @code{WKS}
+@vindex @code{WKS}
+
+@item @code{HINFO}
+@vindex @code{HINFO}
+
+@end table
+
+@subsubheading Extra methods table
+
+@cindex Extra methods table
+
+@code{DblLinks} This looks for entries with both a @code{A} and a @code{CNAME} entry.
+@emph{Keep} controls whether to keep the @code{A} or the @code{CNAME} entry; the default
+is to keep the @code{A} entry (and delete the @code{CNAME} entry).  Returns a count
+of all the records that were modified.
+
+@emph{Note:} This also derives any other methods from the @code{CfgTie::Cfgfile} module
+(
+@menu
+
+* CfgTie-Cfgfile::	
+).
+
+@end menu
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+
+
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+   
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieHost::	
+    
+* CfgTie-TieMTab::	
+      
+* CfgTie-TieNet::	
+
+
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+   
+* CfgTie-TieRCService::	
+ 
+* CfgTie-TieRsrc::	
+<
+
+* CfgTie-TieServ::	
+
+
+* CfgTie-TieShadow::	
+  
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading CAVAETS
+
+@cindex CAVAETS
+
+Much of the information is cached and the file is updated at the end.  The
+@code{named} process will sent the @code{SIGHUP} signal to restart and reload the
+configuration files.
+
+The reverse name file can not be automatically created... Only modified.
+
+The SOA records in the named configuration files are not easy to change.
+
+Changing the file name or directory currently does not move the files in the
+file system
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieNet.pod".
+
+
+@c 319
+@node CfgTie-TieNet, CfgTie-TiePh, CfgTie-TieNamed, CfgTie
+@section CfgTie-TieNet
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieNet --- A module to tie in the net database
+
+@subheading SYNOPSIS
+@example
+        tie %net,'CfgTie::TieNet'
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the net database
+sanely.
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programmers:
+
+@table @asis
+
+@item @code{tie %net,'CfgTie::TieNet'}
+@vindex @code{tie %net,'CfgTie::TieNet'}
+
+@code{$net@{$name@}} will return a hash reference of the named net information
+
+@item @code{tie %net_addr,'CfgTIe::TieNet_addr'}
+@vindex @code{tie %net_addr,'CfgTIe::TieNet_addr'}
+
+@code{$net_addr@{$addr@}} will return a hash reference for the specified network
+address.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given net entry has the following information assoicated with it:
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+net name
+
+@item @code{Aliases}
+@vindex @code{Aliases}
+
+A list reference for other names for this net
+
+@item @code{AddrType}
+@vindex @code{AddrType}
+
+The type of address
+
+@item @code{Addr}
+@vindex @code{Addr}
+
+The address
+
+@end table
+
+Additionally, the programmer can set any other associated key, but this
+information will only available to the running Perl script.
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+
+
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+ 
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieHost::	
+    
+* CfgTie-TieNamed::	
+   
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+   
+* CfgTie-TieServ::	
+    
+* CfgTie-TieShadow::	
+
+
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some net information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TiePh.pod".
+
+
+@c 319
+@node CfgTie-TiePh, CfgTie-TieProto, CfgTie-TieNet, CfgTie
+@section CfgTie-TiePh
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::TiePh} --- a ph phonebook server configuration tool
+
+@subheading SYNOPSIS
+
+Makes it easy to manage the ph phonebook server configuration files as a hash.
+@example
+   tie %myhash, 'ph'
+@end example
+@example
+   %myhash@{who@}->@{Person@}
+@end example
+
+@subheading DESCRIPTION
+
+This is a file to help configure the @file{ph} program.
+
+@flindex ph, ph
+
+@flindex p, ph
+@example
+   tie %myhash, 'ph'
+@end example
+@example
+   %myhash@{who@}->@{Person@}
+   %myhash@{who@}->@{Phone@}
+@end example
+
+@subsubheading Methods
+
+@cindex Methods
+
+This inherits any methods from the @code{CfgTie::Cfgfile} module
+(
+@menu
+
+* CfgTie-Cfgfile::	
+)
+
+@end menu
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+   
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+  
+* CfgTie-TieHost::	
+    
+* CfgTie-TieMTab::	
+
+
+* CfgTie-TieNamed::	
+  
+* CfgTie-TieNet::	
+     
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+  
+* CfgTie-TieRCService::	
+ 
+* CfgTie-TieRsrc::	
+
+
+* CfgTie-TieServ::	
+   
+* CfgTie-TieShadow::	
+ 
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgArgs.pod".
+
+
+@c 319
+@node CfgTie-TieProto, CfgTie-TieRCService, CfgTie-TiePh, CfgTie
+@section CfgTie-TieProto
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieProto, CfgTie::TieProto_num --- Ties the protocol number file to a
+ PERL hash
+
+@subheading SYNOPSIS
+@example
+        tie %proto, 'CfgTie::TieProto';
+        print $proto@{'tcp'@};
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the protocol
+number database sanely.
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programmers:
+
+@table @asis
+
+@item @code{tie %proto,'CfgTie::TieProto'}
+@vindex @code{tie %proto,'CfgTie::TieProto'}
+
+@code{$proto@{$name@}} will return a hash reference of the named protocol
+information
+
+@item @code{tie %proto_num,'CfgTie::TieProto_num'}
+@vindex @code{tie %proto_num,'CfgTie::TieProto_num'}
+
+@code{$proto_num@{$num@}} will return a hash reference for the specified protocol
+number.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given proto entry has the following information assoicated with it:
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+proto name
+
+@item @code{Aliases}
+@vindex @code{Aliases}
+
+A list reference for other names for this proto
+
+@item @code{Number}
+@vindex @code{Number}
+
+The protocol number
+
+@end table
+
+Additionally, the programmer can set any other associated key, but this
+information will only be available to the running Perl script.
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+ 
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+   
+* CfgTie-TieHost::	
+ 
+* CfgTie-TieNamed::	
+
+
+* CfgTie-TieNet::	
+     
+* CfgTie-TiePh::	
+   
+* CfgTie-TieProto::	
+
+
+* CfgTie-TieServ::	
+    
+* CfgTie-TieShadow::	
+  
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some proto information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "filever.pod".
+
+
+@c 319
+@node CfgTie-TieRCService, CfgTie-TieRealm, CfgTie-TieProto, CfgTie
+@section CfgTie-TieRCService
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieRCService --- A module to manage Unix services
+
+@subheading SYNOPSIS
+@example
+   my %RC;
+   tie %RC, 'CfgTie::TieRCService';
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward interface to the control scripts in @@file@{/etc/rc?.d@}
+This package helps manage these system services.  The tie hash is structured
+like so:
+@example
+   @{
+       $Service_Name => $Service_Ref,
+   @}
+@end example
+
+@code{$Service_Ref} is a hash reference; the details will be covered in the next
+section.  @code{(tied $Service_Ref)} can also be treated as an object to control
+the service.  That is covered in the @emph{Service Methods} section.
+
+While fetching from the structure, and deleting services is supported (and
+reflected to the system), directly storing new services is not.  Currently
+the method to do this is:
+@example
+        (tied %RC)->add('mynewservice');
+@end example
+
+This will add the new service (to be managed as well as available) to the
+run-levels.  The start and kill scripts will be linked into each appropriate
+run-level.  The script should already exist (in the proper format) in
+@file{/etc/rc.d/init.d} or equivalent.
+
+@flindex init.d, /etc/rc.d/init.d
+
+@flindex etc, /etc/rc.d/init.d
+
+@subsubheading The Service hash reference
+
+@cindex Service hash reference
+@example
+   @{
+      levels   => [], 
+      defaults => [],
+      category => [],
+      pid  => $pid,
+      path =>,
+      description =>,
+      start_priority=>,
+      stop_priority =>,
+   @}
+@end example
+
+@code{levels} refers to a list used to determine if the service is present for a
+given run-level.
+The scope of changes this list is @emph{system-wide}.  It is persistent across
+boots.
+Example:
+    
+    my $listref = (tied %@{$RC@{'atd'@}@})->@emph{levels()};
+@example
+    if ($L < scalar @@@{$listref@} && $listref->[$L])
+      @{print "present at run level $L\n";@}
+@end example
+
+@subsubheading Service Methods
+
+@cindex Service Methods
+
+@code{new($service_name,$path)} @emph{path} is optional, and may refer either to the
+folder containing the relevant control script, or may refer to the control
+script itself.
+
+@code{start}  will start the service (if not already started).
+The scope of this action is @emph{system-wide}.
+Example: @code{$Obj-}>@code{start();}
+
+@code{stop} will stop the service (if running).
+The scope of this action is @emph{system-wide}.
+Example: @code{$Obj-}>@code{stop();}
+
+@code{restart} will restart the service, effectively stopping it (if it is
+running) and then starting it.
+The scope of this action is @emph{system-wide}.
+Example: @code{$Obj-}>@code{restart();}
+
+@code{status}
+The scope of this action is limited to a single @emph{session}.
+
+@code{reload}
+The scope of this action is @emph{system-wide}.
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+This can not create a new service start/kill script.  At best this can only
+modify an existing one, or link it into the init folders.
+
+@subheading BUGS
+
+Requires @code{/sbin/chkconfig} to work.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieAliases.pod".
+
+
+@c 319
+@node CfgTie-TieRealm, CfgTie-TieRsrc, CfgTie-TieRCService, CfgTie
+@section CfgTie-TieRealm
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{CfgTie::TieRealm} --- Ties configuration variables to various HTTP servers
+
+@subheading SYNOPSIS
+
+Makes it easy to manage a variety of web servers thru one.
+
+@subheading CAVAETS
+
+@cindex CAVAETS
+
+It is not able to modify the main realms configuration file.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieMTab.pod".
+
+
+@c 319
+@node CfgTie-TieRsrc, CfgTie-TieServ, CfgTie-TieRealm, CfgTie
+@section CfgTie-TieRsrc
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieRsrc --- an associative array of resources and their usage limits
+
+@subheading SYNOPSIS
+
+This module makes the resource limits available as a regular hash
+@example
+        tie %Resources,'CfgTie::TieRsrc'
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the user database
+sanely.
+
+The resource limits for the system.
+Note: this requires that @code{BSD::Resource} be installed.
+
+It is a hash reference.  The keys may be any of @code{cpu}, @code{data}, @code{stack},
+@code{core}, @code{rss}, @code{memlock}, @code{nproc}, @code{nofile}, @code{open_max}, @code{as}, @code{vmem},
+@code{nlimits}, @code{infinity}.  The values are always list references of the form:
+@example
+                [$soft, $hard]
+@end example
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+ 
+* CfgTie-TieAliases::	
+  
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+
+* CfgTie-TieHost::	
+     
+* CfgTie-TieMTab::	
+
+
+* CfgTie-TieNamed::	
+
+* CfgTie-TieNet::	
+      
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+
+* CfgTie-TieRCService::	
+
+* CfgTie-TieServ::	
+
+
+* CfgTie-TieShadow::	
+
+
+@end menu
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieRealm.pod".
+
+
+@c 319
+@node CfgTie-TieServ, CfgTie-TieShadow, CfgTie-TieRsrc, CfgTie
+@section CfgTie-TieServ
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieServ --- A HASH tie that allows access the service port database
+
+@subheading SYNOPSIS
+@example
+        tie %serv,'CfgTie::TieServ';
+        print $serv@{'smtp'@};
+@end example
+
+@subheading DESCRIPTION
+
+This is a straight forward HASH tie that allows us to access the service
+port database sanely.
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programers:
+
+@table @asis
+
+@item @code{tie %serv,'CfgTie::TieServ'}
+@vindex @code{tie %serv,'CfgTie::TieServ'}
+
+@code{$serv@{$name@}} will return a HASH reference of the named service
+information
+
+@item @code{tie %serv_port,'CfgTie::TieServ_port'}
+@vindex @code{tie %serv_port,'CfgTie::TieServ_port'}
+
+@code{$serv_port@{$port@}} will return a HASH reference for the specified service
+port.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given serv entry has the following information assoicated with it:
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+Service name
+
+@item @code{Aliases}
+@vindex @code{Aliases}
+
+A list reference for other names for this service
+
+@item @code{Port}
+@vindex @code{Port}
+
+The port number
+
+@item @code{Protocol}
+@vindex @code{Protocol}
+
+The protocol name
+
+@end table
+
+Additionally, the programmer can set any
+other associated key, but this information will only available to running
+PERL script.
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+  
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieHost::	
+   
+* CfgTie-TieNamed::	
+ 
+* CfgTie-TieNet::	
+
+
+* CfgTie-TiePh::	
+     
+* CfgTie-TieProto::	
+ 
+* CfgTie-TieShadow::	
+
+
+* CfgTie-TieUser::	
+
+
+@end menu
+
+@subheading CAVAETS
+
+@cindex CAVAETS
+
+The current version does cache some service information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieProto.pod".
+
+
+@c 319
+@node CfgTie-TieShadow, CfgTie-TieUser, CfgTie-TieServ, CfgTie
+@section CfgTie-TieShadow
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieShadow --- an associative array of user names to password information
+
+@subheading SYNOPSIS
+
+This module makes the shadow database available as a regular hash.
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the shadow
+password database sanely.
+
+@subsubheading Ties
+
+@cindex Ties
+
+This tie is available for programmers:
+
+@code{tie %shadow,'CfgTie::TieShadow'}
+
+@code{$shadow@{$name@}} will return a hash reference of the named shadow information
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given shadow entry has the following information associated with it (the
+keys are case-insensitive):
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+Login name
+
+@item @code{Password}
+@vindex @code{Password}
+
+The encrypted password
+
+@item @code{Last}
+@vindex @code{Last}
+
+Last time it was changed
+
+@item @code{Min}
+@vindex @code{Min}
+
+The minimum number of days before a change is allowed
+
+@item @code{Max}
+@vindex @code{Max}
+
+Maximum number of days before a change in passowrds is required
+
+@item @code{Warn}
+@vindex @code{Warn}
+
+The number of days before expiration that they will receive a warning
+
+@item @code{Inactive}
+@vindex @code{Inactive}
+
+The number of days before an account is inactive
+
+@item @code{Expires}
+@vindex @code{Expires}
+
+The date the account expires on
+
+@item @code{Inactive}
+@vindex @code{Inactive}
+
+The number of days after a password expires that the account is considered
+inactive and expires
+
+@end table
+
+Each of these entries can be modified (even deleted), and they will be
+reflected in the overall system.  Additionally, the programmer can set any
+other associated key, but this information will only available to the running
+Perl script.
+
+@subsubheading Additional Routines
+
+@cindex Additional Routines
+
+@table @asis
+
+@item @code{&CfgTie::TieShadow'status()}
+@findex @code{&CfgTie::TieShadow'status()}
+
+@item @code{&CfgTie::TieShadow_id'status()}
+@findex @code{&CfgTie::TieShadow_id'status()}
+
+Will return @code{stat} information on the shadow database.
+
+@end table
+
+@subsubheading Miscellaneous
+
+@cindex Miscellaneous
+
+@code{$CfgTie::Tiehadow_rec'usermod} contains the path to the program @file{usermod}.
+This can be modified as required.
+
+@flindex usermod, usermod
+
+@flindex usermo, usermod
+
+@code{$CfgTie::TieShadow_rec'useradd} contains the path to the program @file{useradd}.
+This can be modified as required.
+
+@flindex useradd, useradd
+
+@flindex userad, useradd
+
+@code{$CfgTie::TieShadow_rec'userdel} contains the path to the program @file{userdel}.
+This can be modified as required.
+
+@flindex userdel, userdel
+
+@flindex userde, userdel
+
+@subheading FILES
+
+@file{/etc/passwd}
+@file{/etc/group}
+@file{/etc/shadow}
+
+@flindex passwd, /etc/passwd
+
+@flindex etc, /etc/passwd
+
+@flindex group, /etc/group
+
+@flindex etc, /etc/group
+
+@flindex shadow, /etc/shadow
+
+@flindex etc, /etc/shadow
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+  
+* CfgTie-TieAliases::	
+ 
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+
+
+* CfgTie-TieHost::	
+  
+* CfgTie-TieNamed::	
+  
+* CfgTie-TieNet::	
+
+
+* CfgTie-TiePh::	
+    
+* CfgTie-TieProto::	
+  
+* CfgTie-TieServ::	
+
+
+* CfgTie-TieShadow::	
+ 
+* CfgTie-TieUser::	
+
+
+@end menu
+
+the @emph{group}(5) manpage
+the @emph{passwd}(5) manpage
+the @emph{shadow}(5) manpage
+the @emph{usermod}(8) manpage
+the @emph{useradd}(8) manpage
+the @emph{userdel}(8) manpage
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some shadow information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieRCService.pod".
+
+
+@c 319
+@node CfgTie-TieUser,  , CfgTie-TieShadow, CfgTie
+@section CfgTie-TieUser
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+CfgTie::TieUser --- an associative array of user names and ids to information
+
+@subheading SYNOPSIS
+
+makes the user database available as a regular hash.
+@example
+        tie %user,'CfgTie::TieUser'
+        print "randym's full name: ", $user@{'randym'@}->@{gcos@}, "\n";
+@end example
+
+@subheading DESCRIPTION
+
+This is a straightforward hash tie that allows us to access the user database
+sanely.
+
+It cross ties with the groups packages and the mail packages
+
+@subsubheading Ties
+
+@cindex Ties
+
+There are two ties available for programmers:
+
+@table @asis
+
+@item @code{tie %user,'CfgTie::TieUser'}
+@vindex @code{tie %user,'CfgTie::TieUser'}
+
+@code{$user@{$name@}} will return a hash reference of the named user information.
+
+@item @code{tie %user_id,'CfgTie::TieUser_id'}
+@vindex @code{tie %user_id,'CfgTie::TieUser_id'}
+
+@code{$user_id@{$id@}} will return a hash reference for the specified user.
+
+@end table
+
+@subsubheading Structure of hash
+
+@cindex Structure of hash
+
+Any given user entry has the following information assoicated with it (the
+keys are case-insensitive):
+
+@table @asis
+
+@item @code{Name}
+@vindex @code{Name}
+
+Login name
+
+@item @code{GroupId}
+@vindex @code{GroupId}
+
+The principle group the user belongs to.
+
+@item @code{Id}
+@vindex @code{Id}
+
+The user id number that they have been assigned.  It is possible for many
+different user names to be given the same id.  However, changing the id for
+the user (i.e., setting it to a new one) has one of two effects.  If
+@code{user'Chg_FS} is set 1, then all the files in the system owned by that id
+will changed to the new id in addition to changing the id in the system table.
+Otherwise, only the system table will be modified.
+
+@item @code{Comment}
+@vindex @code{Comment}
+
+@item @code{Home}
+@vindex @code{Home}
+
+The user's home folder
+
+@item @code{LOGIN_Last}
+@vindex @code{LOGIN_Last}
+
+This is the information from the last time the user logged in.  It is an
+array reference to data like:
+@example
+        [$time, $line, $from_host]
+@end example
+
+@item @code{Shell}
+@vindex @code{Shell}
+
+The user's shell
+
+@item @code{AuthMethod}
+@vindex @code{AuthMethod}
+
+The authentication method if other than the default.  (Note: This can be set,
+but currently can't get fetched.)
+
+@item @code{ExpireDate}
+@vindex @code{ExpireDate}
+
+The date the account expires on.
+(Note: this can be set, but currently can't be fetched.)
+
+@item @code{Inactive}
+@vindex @code{Inactive}
+
+The number of days after a password expires.
+(Note: this can be set, but currently can't be fetched.)
+
+@item @code{Priority}
+@vindex @code{Priority}
+
+The scheduling priority for that user.
+(Note: this requires that @code{BSD::Resource} be installed.)
+
+@item @code{Quota}
+@vindex @code{Quota}
+
+@item @code{RUsage}
+@vindex @code{RUsage}
+
+The process resource consumption by the user.
+Note: This requires that @code{BSD::Resource} be installed.
+
+Returns a list reference of the form:
+@example
+   [$usertime, $systemtime, $maxrss,  $ixrss,   $idrss,  $isrss,  $minflt,
+    $majflt,   $nswap,      $inblock, $oublock, $msgsnd, $msgrcv, $nsignals,
+    $nvcsw, $nivcsw]
+@end example
+
+@end table
+
+Plus two (probably) obsolete fields:
+
+@table @asis
+
+@item @code{Password}
+@vindex @code{Password}
+
+This is the encrypted password, but will probably be obsolete.
+
+@item @code{GCOS}
+@vindex @code{GCOS}
+
+@emph{General Electric Comprehensive Operating System} or
+@emph{General Comprehensive Operating System}
+field
+
+This is now the user's full name under many Unix's, incl. Linux.
+
+@end table
+
+Each of these entries can be modified (even deleted), and they will be
+reflected in the overall system.  Additionally, the programmer can set any
+other associated key, but this information will only be available to the
+running Perl script.
+
+@subsubheading Configuration Variables
+
+@cindex Configuration Variables
+
+@subsubheading Additional Routines
+
+@cindex Additional Routines
+
+@table @asis
+
+@item @code{&CfgTie::TieUser'stat()}
+@findex @code{&CfgTie::TieUser'stat()}
+
+@item @code{&CfgTie::TieUser_id'stat()}
+@findex @code{&CfgTie::TieUser_id'stat()}
+
+Will return @code{stat}-like statistics information on the user database.
+
+@end table
+
+@subsubheading Adding or overiding methods for user records
+
+@cindex Adding or overiding methods for user records
+
+Lets say you wanted to change the default HTML handling to a different method.
+To do this you need only include code like the following:
+@example
+   package CfgTie::TieUser_rec;
+   sub HTML($)
+   @{
+      my $self=shift;
+      "<h1>".$Self->@{name@}."</h1>\n".
+      "<table border=0><tr><th align=right>\n".
+        join("</td></tr>\n<tr><th align=right>",
+          map @{$_."</th><td>".$self->@{$_@}@} (sort keys %@{$self@})
+       </td></tr><lt></table>C<\n>";
+   @}
+@end example
+
+If, instead, you wanted to add your own keys to the user records, 
+@code{CfgTie::TieUser::add_scalar(}@emph{$Name},@emph{$Package}@code{)}
+Lets you add scalar keys to user records.  The @emph{Name} specifies the key name
+to be used; it will be made case-insensitve.  The @emph{Package} specifies the name
+of the package to be used when tie'ing the key to a value.  (The @code{TIESCALAR}
+is passed the user id as a parameter).
+
+@code{CfgTie::TieUser::add_hash(}@emph{$Name},@emph{$Package}@code{)}
+Lets you add hash keys to user records.  The @emph{Name} specifies the key name
+to be used; it will be made case insensitve.  The @emph{Package} specifies the name
+of the package to be used when tie'ing the key to a value.  (The @code{TIEHASH}
+is passed the user id as a parameter).
+
+@subsubheading Miscellaneous
+
+@cindex Miscellaneous
+
+@code{$CfgTie::TieUser_rec'usermod} contains the path to the program @file{usermod}.
+This can be modified as required.
+
+@flindex usermod, usermod
+
+@flindex usermo, usermod
+
+@code{$CfgTie::TieUser_rec'useradd} contains the path to the program @file{useradd}.
+This can be modified as required.
+
+@flindex useradd, useradd
+
+@flindex userad, useradd
+
+@code{$CfgTie::TieUser_rec'userdel} contains the path to the program @file{userdel}.
+This can be modified as required.
+
+@flindex userdel, userdel
+
+@flindex userde, userdel
+
+Not all keys are supported on all systems.
+
+This may transparently use a shadow tie in the future.
+
+@subsubheading When the changes are reflected to /etc/passwd
+
+@cindex When the changes are reflected to /etc/passwd
+
+@subheading FILES
+
+@file{/etc/passwd}
+@file{/etc/group}
+@file{/etc/shadow}
+
+@flindex passwd, /etc/passwd
+
+@flindex etc, /etc/passwd
+
+@flindex group, /etc/group
+
+@flindex etc, /etc/group
+
+@flindex shadow, /etc/shadow
+
+@flindex etc, /etc/shadow
+
+@subheading SEE ALSO
+
+
+@menu
+
+* CfgTie-Cfgfile::	
+ 
+* CfgTie-TieAliases::	
+  
+* CfgTie-TieGeneric::	
+
+
+* CfgTie-TieGroup::	
+
+* CfgTie-TieHost::	
+     
+* CfgTie-TieMTab::	
+
+
+* CfgTie-TieNamed::	
+
+* CfgTie-TieNet::	
+      
+* CfgTie-TiePh::	
+
+
+* CfgTie-TieProto::	
+
+* CfgTie-TieRCService::	
+
+* CfgTie-TieRsrc::	
+
+
+* CfgTie-TieServ::	
+ 
+* CfgTie-TieShadow::	
+
+
+@end menu
+
+the @emph{group}(5) manpage
+the @emph{passwd}(5) manpage
+the @emph{shadow}(5) manpage
+the @emph{usermod}(8) manpage
+the @emph{useradd}(8) manpage
+the @emph{userdel}(8) manpage
+
+@subheading CAVEATS
+
+@cindex CAVEATS
+
+The current version does cache some user information.
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "TieRsrc.pod".
+
+
+
+@c 290
+@node Secure,  , CfgTie,  bytype
+@chapter Secure
+@section Secure 
+@menu
+
+* Secure-File::
+@end menu
+
+@c 319
+@node Secure-File,  ,  , Secure
+@section Secure-File
+
+
+@c --- From file: - -------------------------
+
+@subheading NAME
+
+
+@code{Secure::File} --- A module to open or create files within suid/sgid files
+
+@subheading SYNOPSIS
+@example
+    use Secure::File;
+    my $SF = new Secure::File;
+    $SF->open();
+@end example
+@example
+    my $NF = new Secure::File, 'myfile';
+@end example
+
+@subheading DESCRIPTION
+
+@code{open}  This checks that both the effective and real  user / group ids have
+sufficient permissions to use the specified file.  (Standard @code{open} calls only
+check the effective ids).  @code{Secure::File} also checks that the file we
+open, really is the same file we checked ids on.
+
+If the file already exists, @code{open} will fail.
+
+@subheading WARNING <==============================================================>
+
+@cindex WARNING <==============================================================>
+
+E<DO NOT TRUST THIS MODULE>.  Every effort has been made to make this module
+useful, but it can not make a secure system out of an insecure one.  It can not
+read the programers mind.  
+
+@subheading AUTHOR
+
+Randall Maas (@email{randym@@acm.org}, @url{http://www.hamline.edu/~rcmaas/})
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "MANIFEST.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "todo.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "install.pod".
+
+
+@c TeXInfo document produced by pod2texinfo version 1.1
+@c from "CfgAliases.pod".
+
+

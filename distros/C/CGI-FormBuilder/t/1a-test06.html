@@ -1,0 +1,51 @@
+<script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // ticket: standard text, hidden, password, or textarea box
+    var ticket = form.elements['ticket'].value;
+    if (ticket == null || ! ticket.match(/^\d+$/)) {
+        alertstr += '- Invalid entry for the "Ticket" field\n';
+        invalid++;
+        invalid_fields.push('ticket');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+<noscript><font color="#cc0000"><b>Please enable Javascript or use a newer browser.</b></font></noscript>
+<p>Fields that are <b>highlighted</b> are required.</p>
+<form action="TEST" method="post" onsubmit="return validate(this);">
+<div><input id="_submitted" name="_submitted" type="hidden" value="1" /></div>
+<div><input id="replacement" name="replacement" type="hidden" value="TRUE" />
+<input id="action" name="action" type="hidden" value="Unsubscribe" />
+<input id="name" name="name" type="hidden" value="Pete Peteson" />
+<input id="email" name="email" type="hidden" value="pete@peteson.com" />
+<input id="extra" name="extra" type="hidden" value="junk" />
+<input id="other_test" name="other_test" type="hidden" value="_other_other_test" /></div>
+<table>
+<tr valign="top">
+  <td><b>Ticket</b></td>
+  <td><input id="ticket" name="ticket" type="text" value="111" /></td>
+</tr>
+<tr valign="top">
+  <td>User</td>
+  <td><input id="user" name="user" type="text" value="pete" /></td>
+</tr>
+<tr valign="top">
+  <td>Part Number</td>
+  <td><input id="part_number" name="part_number" type="text" /></td>
+</tr>
+<tr valign="top">
+  <td align="center" colspan="2"><input id="_submit" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Update" /><input id="_submit_2" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Delete" /><input id="_submit_3" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Cancel" /></td>
+</tr>
+</table>
+</form>

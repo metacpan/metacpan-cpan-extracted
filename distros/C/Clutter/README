@@ -1,0 +1,27 @@
+perl-Clutter :: Perl bindings for the Clutter 1.x API
+=====================================================
+
+This module allows you to use the Clutter library from Perl to create dynamic,
+compelling, and portable graphical user interfaces, using a Perlish and object
+oriented API.
+
+* Installation
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  # make install
+
+* Dependencies
+
+perl-Clutter depends on the Clutter C library:
+
+  - clutter-1.0 >= 1.0.0
+
+and on the following Perl modules:
+
+  - Glib::Object::Introspection >= 0.002
+
+* Author and license
+
+Copyright © 2006-2012  Emmanuele Bassi <ebassi@gnome.org>

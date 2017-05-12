@@ -1,0 +1,27 @@
+name:                   search
+fields:
+  -  keywords:
+        name:
+            en:         Look for
+        type:           text
+        min_length:     3
+        max_length:     150
+  -  type:
+        name:
+            en:         Search in
+        type:           list
+        display:        select
+        options:        []
+        default:        'all_notices'
+  -  source:
+        name:
+            en:         Publication
+        type:           list
+        display:        select
+        options:        ''
+        default:        ''
+  - date_limit:
+        type:           list
+        display:        select
+        options:        date_limit
+        default:        0

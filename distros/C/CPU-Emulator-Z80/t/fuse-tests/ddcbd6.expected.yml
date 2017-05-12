@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  24301:
+    - 119
+name: ddcbd6
+registers:
+  AF: 2539
+  AF_: 0
+  BC: 30365
+  BC_: 0
+  DE: 32263
+  DE_: 0
+  HL: 20985
+  HL_: 0
+  I: 0
+  IX: 24323
+  IY: 25216
+  PC: 4
+  R: 2
+  SP: 0

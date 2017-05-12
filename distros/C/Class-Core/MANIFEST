@@ -1,0 +1,10 @@
+Core.pm
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Basic.t
+t/hash.pl
+t/hash.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

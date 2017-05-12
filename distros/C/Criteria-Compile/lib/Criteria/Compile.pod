@@ -1,0 +1,430 @@
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  Copyright (C) 2011 - Anthony J. Lucas - kaoyoriketsu@ansoni.com
+
+=pod
+
+=head1 NAME
+
+Criteria::Compile - Describe wanted objects/data using grammar
+
+=head1 SYNOPSIS
+
+    #users can use common grammar to specify their criteria
+    search_things(title_is => 'EXAMPLE TITLE', author_like => qr/Anthony.*/);
+
+
+    #write the subroutine by using this module
+    sub search_things {
+
+        #build the criteria object
+        my $criteria = Criteria::Compile->new(@_);
+
+        #once we're ready, export it as an anonymous subroutine
+        $criteria = $criteria->export_sub;
+
+        #filter objects using the exported sub (calls ->title and ->author)
+        return grep $criteria->($_), @things;
+    }
+
+
+
+=head1 DESCRIPTION
+
+This module provides an easy framework to compile "wanted" subroutines by describing simple data structures and objects using custom grammar. 
+Users can supply criteria using a set of basic grammar rules. Functionality can also be extended by defining custom grammar-handlers to construct the necessary logic. 
+A number of useful grammars are provided out-of-the-box.
+
+Reading the notes section of this document is advised!
+
+
+=over 2
+
+=item I<Objects and data-types>
+
+This package by default works with object methods. You can handle different object and data access methods by switching access modes, or by defining new ones. See L</access_mode> and L</define_access_mode> for more information.
+
+=back
+
+=cut
+
+
+=head1 KEY CONCEPTS
+
+
+=head2 What is grammar?
+
+A grammar is a type of operation that can be used to describe an object. 
+The simplest example of this is the 'is' grammar, which equates to an C<eq> comparison.
+
+    Criteria::Compile->new(title_is => 'TITLE-HERE');
+
+The criteria above matches when an object's C<title> method C<eq>'s C<TITLE-HERE>. 
+In a similar fashion, the 'like' grammar compares an object attribute against a C<Regexp>.
+
+
+=over 2
+
+=item B<Dynamic Grammar> I<(3)*>
+
+A dynamic grammar is, as with C<is> above, grammar which dynamically operates on object attributes by acting as a pre or post-fix. 
+All of the default grammar built-in to this module is defined as dynamic grammar.
+
+=item B<Static Grammar> I<(1)*>
+
+A static grammar is an operation with pre-defined operands.
+These are useful for simplifying complex operations, or operating on information that is derived from different or multiple sources.
+These will mainly become useful when subclassing this module for use on specific object types (e.g. an EmployeeCriteria class with custom logic).
+
+=item B<Chained Grammar> I<(2)*>
+
+Chained grammar is the same as dynamic grammar with the special-case of being processed before dynamic grammar.
+Typically, this behaviour is used to do something clever before redispatching to the real dynamic handler using L</resolve_dispatch>.
+
+=back
+
+I<* = precedence order in the case of multiple-matching definitions>
+
+
+=cut
+
+
+
+=head1 PUBLIC CONSTANTS
+
+The following constants are provided by this package:
+
+=head2 Grammar Types
+
+Tokens used to indicate grammar types to the various subroutines in this module, such as L</define_grammar>.
+
+=over 2
+
+=item B<C<TYPE_STATIC>>
+
+=item B<C<TYPE_DYNAMIC>>
+
+=item B<C<TYPE_CHAINED>>
+
+=back
+
+=cut
+
+=head2 Access Types
+
+Tokens used to indicate an access mode, for use with L</access_mode> etc.
+
+=over 2
+
+=item B<C<ACC_OBJECT>>
+
+=item B<C<ACC_HASH>>
+
+=back
+
+=cut
+
+
+=head1 METHODS
+
+=head2 new
+
+    $inst = Criteria::Compile->new();
+    $inst = Criteria::Compile->new(%custom_criteria);
+    
+This is the constructor for new C<Criteria::Compile> objects.
+Optionally takes a key-value list of criteria, which will be passed to L</add_criteria>.
+
+
+=head2 add_criteria
+
+    our $exe_file_check = Criteria::Compile->new();
+
+    #check the value returned by the filename method of objects ends in '.exe'
+    $exe_file_check->add_criteria(filename_like => qr/\.exe$/);
+    
+Adds criteria to be applied. This is inherently an AND operation in the context of adding multiple criteria.
+This method takes a criteria pattern and the value accepted by the grammar. In this case, the 'like' grammar expects a C<Regexp>.
+
+
+=head2 exec
+
+    #match exe files
+    $exe_file_check->exec($fh)
+        ? print 'Found EXE file!'
+        : print 'Does not meet the criteria for an EXE file!';
+
+Executes the criteria on the supplied object ad-hoc. Takes a single argument which is the object to be evaluated.
+Returns a boolean indicating whether the criteria were met.
+
+
+=head2 export_sub
+
+    my $sub = $inst->export_sub;
+
+This method returns an anonymous subroutine which will internally execute the C<exec> method on a value supplied to it.
+This method takes no arguments.
+
+
+=head2 compile
+
+    #alter already in-use criteria
+    $inst->add_criteria(name_like => qr/^Ben.*/);
+    #force a re-compile
+    $inst->compile();
+
+This methods forces a re-compile of the instance's criteria. This can be used to alter or recycle instances.
+This method takes an optional single argument, which is a C<HASHREF> containing additional criteria to be added with the special behaviour that they will not be stored, and will be forgotten on subsequent calls to compile
+
+=head2 access_mode
+
+    $inst->access_mode(Criteria::Compile::ACC_HASH)
+    $inst->access_mode(Criteria::Compile::ACC_OBJECT)
+
+Switches the current access mode used to examine values. Defaults to C<ACC_OBJECT>.
+Access modes accepted by default are:
+
+=over 2
+
+=item C<ACC_HASH>
+
+This mode accesses fields / attributes as keys using perl hash access. This token is available as a constant.
+
+=item C<ACC_OBJECT>
+
+This mode accesses fields / attributes as object methods. This token is available as a constant. 
+
+=back
+
+=cut
+
+
+=head2 define_access_mode
+
+    $inst->define_access_mode('MODE_TOKEN', $getter)
+
+Defines a new object / data access mode. Takes 2 arguments, the mode token, which is the string which will be passed to L</access_mode> to activate this mode, and a C<SUBREF> to the "getter" implementation. The getter implementation is a subroutine which has the signature:
+
+    $sub->($object, $attribute)
+
+The subroutine must return a value corresponding to the object's attribute when called, or C<undef>.
+
+
+=head2 define_grammar
+
+    package MySubclass;
+    use parent qw( Criteria::Compile );
+
+    sub _init {
+        my $self = shift;
+        return 0 unless $self::SUPER->_init(@_);
+        
+        #add a new grammar
+        $self->define_grammar($match, $handler);
+        #add a new chained grammar
+        $self->define_grammar($match, $handler, $self->TYPE_CHAINED);
+        return 1;
+    }
+
+Defines a new grammar for use in criteria.
+Takes the match pattern, the name of the handler sub as a string or C<CODEREF>, and a final optional type flag which indicates the grammar type (Defaults to C<TYPE_DYNAMIC>).
+
+See L</"List of Default Grammar"> for a list of already-available grammars.
+See L</"Defining Custom Grammar"> for more information on grammar types.
+
+
+=head2 resolve_dispatch
+
+    #this statement says "tell me how to handle title_is"
+    my ($handler, @handler_arguments) = $self->resolve_dispatch('title_is');
+
+    #let's compile it with a value!
+    my $sub = $handler->($value, @handler_arguments);
+
+    #use it as a single standalone criteria!
+    $sub->($object);
+
+Takes a criteria key, and returns the handler C<CODEREF> and the arguments required to compile the criteria using it, minus the criteria's value which needs to be prepended to the list before use.
+This method is intended for internal usage within this module and subclasses.
+
+
+
+=head1 GRAMMAR
+
+=head2 List of Default Grammar
+
+=over 2
+
+=item B<C<(.*)_is>>
+
+    name_is => 'Anthony'
+
+Evaluates the value of the field corresponding to match group 1 against the value supplied, using C<eq>
+
+=item B<C<(.*)_like>>
+
+    address_like => qr/.*London.*/
+
+Evaluates the value of the field corresponding to match group 1 against a C<Regexp> value supplied, using C<=~>
+
+=item B<C<(.*)_greater_than>>
+
+    score_greater_than => 20
+
+Evaluates the value of the field corresponding to match group 1 is greater than the supplied C<number>, using C<>> 
+
+=item B<C<(.*)_less_than>>
+
+    score_less_than => 20
+
+Evaluates the value of the field corresponding to match group 1 is less than the supplied C<number>, using C<<> 
+
+=item B<C<(.*)_in>>
+
+    age_in => [16..25]
+
+Evaluates whether the value of the field corresponding to match group 1 exists in the supplied C<ARRAYREF>, using C<eq> 
+
+=item B<C<(.*)_matches>>
+
+    user_matches => \%allowed_users
+
+Evaluates the value of the field corresponding to match group 1 against the value supplied, using C<~~> (smart match). See L<perlsyn> for more detail on smart matching.
+
+=back
+
+=cut
+
+
+=head2 Defining Custom Grammar
+
+A good practise when starting to use this module (or pattern, more precicely) will be to automatically create a subclass of this module for every new object type you develop.
+I do this because it allows anyone working with my new object / data type to easily deal with them in a simple and consistent way. Another side-effect you may notice is that this provides a great deal of encapsulation, allowing you to keep the details of exactly how to extract complex data from your objects within a package you control, should that be necessary.
+
+As every object or data type has very diferrent uses, there will be a need to define custom grammar specific to your objects or data structures.
+This may mean a 'near' grammar which calculates distance, or a 'related_to' grammar that checks a person's family records.
+
+There are 3 parts to custom grammar definitions, the match pattern, the grammar handler, and the grammar type. The match pattern is a C<Regexp> which determines how users can access your new grammar, in which case the handler will be called and must return an anonymous subroutine which can execute the check. The grammar handler is only called once, during L<"compilation"|/compile>. The grammar type is one of the L<constants provided|/"PUBLIC CONSTANTS">. 
+
+A simple example of this would be the definition of the 'is' grammar. 
+
+    #DISCLAIMER: Although functional, this is not the actual implementation of 'is'.
+
+    #GRAMMAR MAPPING
+    $inst->define_grammar(qw/^(.*)_is$/, 'is_handler',
+        Criteria::Compile::TYPE_DYNAMIC);
+
+    #Note: Grammar in this module is defined by decorating an instance.
+    #It is recommended to override the init method should you wish to subclass or extend this package.
+
+    #HANDLER
+    sub is_handler {
+
+        my ($context, $value, $attribute) = @_;
+        return unless ($attribute);
+
+        #for example, in: filename_is => 'something.txt'
+        #attribute will be match group 1 from the match pattern (filename)
+        #value is the value supplied to add_criteria ('something.txt')
+
+        #return a subroutine which will 'eq' against the $attribute method of objects passed in
+        return sub {
+
+            my $object = $_[0];
+            if (ref($object) {
+                my $obj_value = $object->$attribute;
+                return ($obj_value eq $value);
+            }
+            return 0;
+        };
+    }
+
+
+=head2 Defining Chained Grammar
+
+There is no special magic to chained grammar, only the expectation that the grammar's handler will internally re-dispatch to another grammar handler after making whatever changes are needed to the operands. See L</resolve_dispatch> for more information on re-dispatching.
+
+A simple example of a chained grammar would be a 'data' grammar which accesses a sub-object like below.
+It would allow a user to prefix criteria like 'content_is' as 'data_content_is' to include sub-objects as part of your criteria.
+
+
+
+    #GRAMMAR MAPPING
+    $inst->define_grammar(qw/^data_(.*)$/, 'data_chandler',
+        Criteria::Compile::TYPE_CHAINED);
+
+    #Note: Grammar in this module is defined by decorating an instance.
+    #It is recommended to override the init method should you wish to subclass or extend this package.
+
+    #HANDLER    
+    sub data_chandler {
+
+        my ($self, $value, $real_crit) = @_;
+
+        #lookup the real handler, with our prefix removed
+        my ($real_sub, @args) = $self->resolve_dispatch($real_crit);
+
+        #get the criteria subroutine from the real handler
+        return unless ($real_sub);
+        return unless ($real_sub = $self->$real_sub($value, @args));
+
+        #return a subroutine which will extract the data from the object to operate on
+        #and then call the real criteria subroutine
+        return sub {
+
+            my $object = $_[0];
+            my $data = $object->data();
+
+            #pass the object's data on to the real subroutine
+            return $real_sub->($data);
+        };
+    }
+
+Note: If speed matters, chained grammar is not for you. In such cases, use static or dynamic grammar, as you can flatten (hard-code) logic down to a single subroutine call for improved speed.
+
+
+
+=head1 MORE EXAMPLES
+
+See this distribution's C<examples> directory.
+
+=head1 EXPORT
+
+None by default.
+
+=head1 NOTES
+
+=head2 This looks slow!
+
+This module makes extensive use of anonymous subroutines and closures, and some developers have expressed that this looks slow to them. These developers have typically heard that B<"Perl subroutines are slow">, possibly even neglecting the readability and maintainability of their applications based on inaccurate assumptions.
+
+The built-in grammar in this module add around 3 calls per criterion. That's a 15 call overhead for running 5 criteria on 3 objects. To put this into perspective, calling C<< ->now >> from the DateTime package causes B<25 calls>. There's almost zero chance that the cost of using this module has any real impact on your application's performance.
+
+There are very few instances where the cost of performing any such optimisation to flatten the call-stack during the L<compile> method does not almost completely outweigh any slight performance gains, if not turning out slower. Even if your handlers were tiny, using simple Perl operators, you would need to run the same criteria without compiling a new one 100,000 times in a tight loop to see a 100 millisecond gain.
+
+In the end, don't believe me, I could be wrong about your application and/or hardware environment. Benchmark!
+ 
+
+=head2 This is "slow"!
+
+This module is I<"slow">-er than it could be, as each criterion causes at least 2 subroutine calls per-check. In the future there may be a cross-compatible L<B> or XS-based variation of this module if I find the time (or anyone reading this, feel free to write it!). As yet, the speed has not been an issue for me, but there may well be a time in the future I will to want to use this for heavier or faster processing (or both!).
+
+=head1 SEE ALSO
+
+Nothing to see here!
+
+
+=head1 AUTHOR
+
+A. J. Lucas, E<lt>kaoyoriketsu@ansoni.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 - Anthony J. Lucas
+
+This is free software; you can redistribute it and/or modify it under the same terms as perl itself.
+
+
+
+=cut

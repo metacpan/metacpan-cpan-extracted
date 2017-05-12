@@ -1,0 +1,26 @@
+---
+abstract: 'Interface for Cisco Management'
+author:
+  - 'Michael Vincent <vin at vinsworld dot com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cisco-SNMP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::IPv6Addr: 0.2
+  Net::SNMP: 0
+  Socket: 0
+  Sys::Hostname: 0
+  Test::Simple: 0
+version: 1.02

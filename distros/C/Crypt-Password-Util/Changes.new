@@ -1,0 +1,120 @@
+Revision history for Crypt-Password-Util
+
+0.17    2016-01-21 (PERLANCAR)
+
+	- crypt() now tries BCRYPT first on OpenBSD (with reasonable value of
+	  cost), or SSHA512 (with reasonable value of rounds) on other systems,
+	  then it falls back to MD5-CRYPT and CRYPT.
+
+        - Switch to Bytes::Random::Secure.
+
+
+0.16    2016-01-21 (PERLANCAR)
+
+	- Recognize bcrypt variants $2y$ and $2b$ used in OpenBSD.
+
+
+0.15    2016-01-20 (PERLANCAR)
+
+	- Support rounds=... option in SSHA256 & SSHA512.
+
+
+0.14    2016-01-20 (PERLANCAR)
+
+        - Recognize extended DES crypt (EXT-DES).
+
+        - [test] Move crypt() support test to another dist (Acme-Test-crypt).
+
+        - [doc] Mention some other modules.
+
+
+0.13    2016-01-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Testing] Add diagnostics message to show what crypt() produces.
+
+
+0.12    2015-01-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix sample output in Synopsis.
+
+
+0.11     2015-01-31 (PERLANCAR)
+
+         - crypt_type(): Add option $detail to return detailed information as a
+           hash (thanks Doyle Young).
+
+         - [doc] Add links for each crypt type for users to find out more
+           information (thanks Doyle Young).
+
+
+0.10     2015-01-25 (PERLANCAR)
+
+         - No functional changes.
+
+         - [dzil] Rebuild with MakeMaker instead of ModuleBuild.
+
+         - [Refactoring] Move list of crypt types to a hash variable to make it
+           easier to add new types.
+
+
+0.09     2013-03-01 (SHARYANTO)
+
+         - Detect BCRYPT encoding ($2$ and $2a$).
+
+         - Mention Authen::Passphrase.
+
+
+0.08     2012-09-06 (SHARYANTO)
+
+         - Use UUID::Random::Patch::UseMRS for more secure salt.
+
+
+0.07     2012-09-06 (SHARYANTO)
+
+         - No functional changes. Fix salt generation (used + instead of .). Add
+           more tests.
+
+
+0.06     2012-09-06 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add function: crypt().
+
+
+0.05     2012-09-06 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - CRYPT: salt can be non-base64 digits.
+
+
+0.04     2012-09-06 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - SSHA256 and SSHA512 allows up to 16 characters of salt, not 8 like in
+           MD5-CRYPT.
+
+
+0.03     2012-09-06 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add function: crypt_type().
+
+         - Support SSHA256 and PLAIN-MD5 crypts.
+
+
+0.02     2012-09-06 (SHARYANTO)
+
+         - No functional changes. Add 'apr1' example in Synopsis.
+
+
+0.01     2012-09-06 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::Test::Input::Custom.
+
+0.03  Nov 12, 2008
+        - add support for encoding
+
+0.02  Sep 16, 2008
+        - mime-type was not being properly set on request
+
+0.01  Wed Jun 25 15:33:48 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn CGI::Test::Input::Custom
+

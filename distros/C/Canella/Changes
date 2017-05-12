@@ -1,0 +1,45 @@
+Revision history for Perl extension Canella
+
+0.05 2013-07-09T01:37:33Z
+    - Add doc($section, $string) DSL, which allows you to include
+      arbitrary documentation in your deploy file
+    - Add --mode=help to describe the deploy file
+    - Add task($name, %args) DSL that allows more parameters to be
+      passed in, including the description of the task, which can be
+      viewed via --mode=help
+    - Change the way the deploy file is evaluated, so that the caller
+      namespace (Canella::Context) is not polluted
+
+0.04 2013-07-08T00:48:55Z
+    - Add sudo(\&block) DSL, so you can do stuff like
+        sudo {
+            run "...";
+            run "...";
+        }
+
+    or even
+        remote {
+            sudo {
+                run "...";
+            }
+        }
+
+0.03 2013-07-05T05:22:53Z
+    - Add call($task_name) DSL, so you can do stuff like
+
+        task foo => sub {
+            call 'bar', 'baz';
+        };
+        task bar => sub { ... };
+        task baz => sub { ... };
+
+0.02 2013-07-05T01:27:47Z
+    - Document --mode=dump
+    - Overridden parameters are now set BEFORE the deploy file is evaluated.
+    - Changed prototypes for get/set DSL functions to avoid accidental
+      slurping of proceeding statements
+
+0.01 2013-07-04T12:39:15Z
+
+    - original version
+

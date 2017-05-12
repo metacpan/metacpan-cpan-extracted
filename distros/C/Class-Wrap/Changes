@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Wrap.
+
+0.01  Wed Mar 12 22:31:23 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -b5.6.0 -n Class::Wrap
+

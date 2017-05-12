@@ -1,0 +1,156 @@
+Revision history for Class-Load
+
+0.24     2017-04-10 21:12:31Z
+    - fix test to handle altered Test::Without::Module exception message
+      (PR#2, Paul Howarth)
+
+0.23     2015-06-25
+    - remove use of namespace::clean
+
+0.22     2014-08-16
+    - document some of the caveats to using this module, and refer to
+      Module::Runtime as an alternative
+
+0.21     2014-02-09
+    - repository moved to the github moose organization
+
+0.20     2012-07-15
+
+- Same as the most recent 0.19, but with a new version number.
+
+0.19     2012-07-15
+
+- Uploaded by Dave Rolsky, not realizing 0.19 was already used
+
+- The load_class() subroutine now returns the class name on success. Requested
+  by Caleb Cushing. RT #76931.
+
+- Exceptions and errors from Class::Load no longer contain references to line
+  numbers in Class::Load or Module::Runtime. This applies to exceptions thrown
+  by load_class, load_first_existing_class, and load_optional_class, as well
+  as the error returned by try_load_class.
+
+- Exceptions are now croaked properly so they appear to come from the calling
+  code, not from an internal subroutine. This makes the exceptions look more
+  like the ones thrown by Perl's require. RT #68663.
+
+0.19     2012-04-03
+
+- Uploaded by doy (Jesse Luehrs)
+
+- No changes, reupload to fix indexing.
+
+0.18     2012-02-18
+
+- Require Package::Stash 0.14+. Fixes RT #75095. Reported by Zefram.
+
+0.17     2012-02-12
+
+- A bug in Class::Load caused test failures when Module::Runtime 0.012 was
+  used with Perl 5.8.x. Reported by Zefram. RT #74897. ( Jesse Luehrs )
+
+0.16     2012-02-12
+
+- Require Module::Runtime 0.012, which has a number of useful bug fixes.
+
+0.15     2012-02-08
+
+- Small test changes to accomodate latest version of
+  Module::Implementation. There's no need to upgrade if you're already using
+  0.14
+
+0.14     2012-02-06
+
+- Use Module::Implementation to handle loading the XS or PP versions of the
+  code. Using this module fixes a few bugs.
+
+- Under taint mode, setting an implementation in the CLASS_LOAD_IMPLEMENTATION
+  env var caused a taint error.
+
+- An invalid value in the CLASS_LOAD_IMPLEMENTATION env var is now detected
+  and reported immediately. No attempt is made to load an invalid
+  implementation.
+
+0.13     2011-12-22
+
+- Fix some bugs with our use of Try::Tiny. This could cause warnings on some
+  systems with Class::Load::XS wasn't installed. Fixes RT #72345.
+
+0.12     2011-10-25
+
+- Depend on Module::Runtime 0.011+. This fixes problems with Catalyst under
+  Perl 5.8 and 5.10.
+
+0.11     2011-10-04
+
+- Don't accept package names that start with a digit. ( Jesse Luehrs )
+
+- Rewrote some of the guts to use Module::Runtime, rather than reimplementing
+  its functionality. ( Jesse Luehrs )
+
+0.10     2011-09-06
+
+- Make sure the $@ localization doesn't hide errors - invalid module name
+  errors were being suppressed on perls before 5.14. ( Jesse Luehrs )
+
+0.09     2011-09-05
+
+- Fix is_class_loaded to ignore $ISA (but still look for @ISA) when trying to
+  determine whether a class is loaded. ( Jesse Luehrs )
+
+- Lots of internals cleanup. ( Jesse Luehrs )
+
+0.08     2011-08-15
+
+- The previous version was missing a prereq declaration for
+  Data::OptList. Reported by Daisuke Maki and Mark Hedges. RT #70285.
+
+0.07     2011-08-15
+
+- All this module's subroutines now accept optional parameters for a module so
+  you can write something like - load_class( 'Foo', { -version => 42 } )
+
+- There is now a Class::Load::XS distro available on CPAN which implements
+  some of this module's code in XS for speed. This code was originally written
+  by Goro Fuji and Florian Ragwitz for Class::MOP. You need to install this
+  distro explicitly if you want the XS implementation.
+
+- Added a load_first_existing_class subroutine based, mostly borrowed from
+  Class::MOP.
+
+- Fixed a bug where a package with a version object in its $VERSION would not
+  be seen as loaded. Reported by Chris Prather.
+
+0.06     2010-11-15
+
+- BACK COMPAT CHANGE: Remove $Class::Load::ERROR in favor of a contextual
+  return value. ( Jesse Luehrs )
+
+- Add load_optional_class($class) that fails only if there is a problem with
+  the attempted-to-load $class. ( Kent Fredric )
+
+- Force internal require to try-again if we are SURE the class is not
+  there. This produces reliable errors. ( Kent Fredric )
+
+- Replace Test::Exception with Test::Fatal ( Kent Fredric )
+
+0.05     2009-09-02
+
+- Cargo-cult Class::MOP's is_class_loaded so we work on 5.10
+
+0.04     2008-11-09
+
+- No changes
+
+0.03     2008-11-09
+
+- Dist fix
+
+0.02     2008-11-09
+
+- Declare dependency on Test::Exception
+
+0.01     2008-08-13
+
+- First version, released on an unsuspecting world.
+

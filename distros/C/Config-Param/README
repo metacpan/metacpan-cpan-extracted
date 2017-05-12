@@ -1,0 +1,43 @@
+=head1 ABOUT
+
+This archive contains the distribution Config-Param
+
+It contains a comprehensive Module for program configuration from command line or configuration files, including handling of usual boilerplate behaviour like printing help message and exit.
+
+Have a look at the example scripts under examples/ to get started. Tip: start with calling
+
+	examples/simple -h
+
+The script examples/quick_and_dirty is about as minimal as it gets, other variants are more elaborate.
+
+Each script using the module can also generate POD from the parameter specification (and from there, the world is open with possibilities;-).
+
+We don't want to repeat what can be reformatted programmatically, right?
+
+There is one normal executable program, scripts/paramorama, that is installed alongside the module(s). It is a tool to work with the configuration files for other programs and can come in handy indeed. You could consider it a poor-mans text data base, even, as it basically retrieves and stores values from self-describing human-readable text files.
+
+About the overly long module version, conceptually, this is standard dotted-decimal: major.minor.bugfix . It's just filled up to 3 digits for minor and bugfix, then the middle dot removed. It's safer with Perl that way.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Param
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2004-2012 Thomas Orgis
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

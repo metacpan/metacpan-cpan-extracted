@@ -1,0 +1,62 @@
+NAME
+    Catalyst::Engine::HTTP::POE - Single-threaded multi-tasking Catalyst
+    engine (deprecated in favor of HTTP::Prefork)
+
+SYNOPIS
+        CATALYST_ENGINE='HTTP::POE' script/yourapp_server.pl
+        
+    # Prefork 5 children
+        CATALYST_POE_MAX_PROC=6 CATALYST_ENGINE='HTTP::POE' script/yourapp_server.pl
+
+DEPRECATED
+    This engine has been deprecated. Please consider using
+    Catalyst::Engine::HTTP::Prefork instead.
+
+DESCRIPTION
+    This engine allows Catalyst to process multiple requests in parallel
+    within a single process. Much of the internal Catalyst flow now uses POE
+    yield calls. Application code will still block of course, but all I/O,
+    header processing, and POST body processing is handled asynchronously.
+
+    A good example of the engine's power is the
+    Catalyst::Plugin::UploadProgress demo application, which can process a
+    file upload as well as an Ajax polling request at the same time in the
+    same process.
+
+    This engine requires at least Catalyst 5.67.
+
+RESTART SUPPORT
+    As of version 0.05, the -r flag is supported and the server will restart
+    itself when any application files are modified.
+
+PREFORKING
+    As of version 0.05, the engine is able to prefork a set number of child
+    processes to distribute requests. Set the CATALYST_POE_MAX_PROC
+    environment variable to the total number of processes you would like to
+    run, including the parent process. So, to prefork 5 children, set this
+    value to 6. This value may also be set by modifying yourapp_server.pl
+    and adding max_proc to the options hash passed to YourApp->run().
+
+DEBUGGING
+    To enable trace-level debugging, set the environment variable
+    CATALYST_POE_DEBUG.
+
+    At any time you can get a dump of the internal state of the engine by
+    sending a USR1 signal to the running process.
+
+EXPERIMENTAL STATUS
+    This engine should still be considered experimental and likely has bugs,
+    however as it's only intended for development, please use it and report
+    bugs.
+
+    The engine has been tested with the UploadProgress demo, the Streaming
+    example, and one of my own moderately large applications. It also fully
+    passes the Catalyst test suite.
+
+AUTHOR
+    Andy Grundman, <andy@hybridized.org>
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

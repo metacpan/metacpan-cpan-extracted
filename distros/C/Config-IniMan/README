@@ -1,0 +1,297 @@
+Config::IniMan - INI file manager object style preserved format and sort order.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+Tie::IxHash
+
+SYNOPSIS
+
+        use Config::IniMan;
+        
+        # Create the config object and load it from a file
+        my $config = Config::IniMan->new("sample.ini");
+        
+        # Create the config object and load it from a file with specific encoding
+        my $config = Config::IniMan->new("sample.ini", "utf8");
+        
+        # Create empty config object
+        my $config = Config::IniMan->new();
+        
+        # then load the config file
+        $config->read("sample.ini");
+        
+        #read file in specific encoding
+        $config->read("sample.ini", "utf8");
+        
+        # parameters values can be obtained as object methods. getter/setter style.
+        # get the parameter 'website' value from current or default section.
+        my $value = $config->website; 
+        # same as
+        my $value = $config->get("website"); 
+        # set parameter 'website' value as a setter object method
+        $config->website("http://mewsoft.com"); 
+        
+        # get parameter value from default or current section
+        my $value = $config->get("name"); 
+        # get parameter value from a section
+        my $value = $config->get("section", "name");
+        # get parameter value from a section and return default value if it does not exist
+        my $value = $config->get("section", "name", "default");
+        
+        # change parameter value in the current or default section
+        $config->set("name", "value");
+        # change parameter value in a section
+        $config->set("section", "name", "value");
+
+        # add a new section at the end of the file
+        $config->add_section("section");
+        
+        #set current active section
+        $config->section(); # set current section to default section
+        $config->section("section");
+        # set current section and get a parameter value from it.
+        $value = $config->section("section")->get("name");
+        
+        # get entire section as a hash reference
+        $section = $config->get_section();# default section
+        $section = $config->get_section("section");
+        print $section->{"merchant"};
+        
+        # get all sections names
+        @sections = $config->sections();
+        
+        # get all section params
+        @params = $config->section_params("section");
+
+        # get all section values
+        @params = $config->section_values("section");
+
+        #delete section params
+        $config->delete("section", @name);
+        
+        #delete entire section
+        $config->delete_section("section");
+        
+        #check if parameter exists
+        $found  = $config->exists("name"); # check parameter name exists in the current section.
+        $found  = $config->exists("section", "name");
+        
+        #check if section exists
+        $found  = $config->section_exists("section");
+        
+        #Returns entire ini file contents in memory as single string with format preserved.
+        $ini_data = $config->as_string();
+        
+        #writes entire ini contents in memory to a file.
+        $config->write(); # save changes to the currently loaded file.
+        $config->write("newfile"); # save as a new file.
+        $config->write("newfile", "utf8"); # save as a new file in different encoding.
+
+DESCRIPTION
+
+This module reads and writes INI files in object style and preserves original files sort order, comments, empty lines, and multi lines parameters.
+
+It is basically built on the top of using the Tie::IxHash module which implements Perl hashes that preserve the order in which the hash elements were added. The order is not affected when values corresponding to existing sections or parameters are changed.
+
+New sections will be added to the end of the current file contents and new parameters will be added to the end of the current section.
+INI Format Sample
+
+        ;default section without name. this line is a comment
+        #this line also is another comment
+        title=Hellow world
+        name=Ahmed Amin Elsheshtawy
+        email=support@mewsoft.com
+        website=http://www.mewsoft.com
+        ;
+        ;line below is empty line and is allowed
+
+        ;database settings
+        [database]
+        name=blog
+        user=user1234
+        password=blog1234
+
+        ;admin login
+        [admin]
+        username=admin
+        password=admin123
+
+        # paypal account setting
+        [payment]
+        merchant=paypal
+        email=support@mewsoft.com
+
+        [multil-line-data]
+        ftp_msg=This is the ftp address of the domain where\
+        the software will be installed. Either use domain name\
+        or IP address, for example ftp.yourdomain.com is the \
+        ftp address and 234.453.213.32 is the IP number.
+        ;
+        [lastlogin]
+        time=5/9/2014=Friday
+        ;
+        # utf8 Arabic section
+        [عربى]
+        الأسم=أحمد امين الششتاوى
+
+new()
+
+        use Config::IniMan;
+
+        # Create the config object and load it from a file
+        my $config = Config::IniMan->new("sample.ini");
+
+        # Create the config object and load it from a file with specific encoding
+        my $config = Config::IniMan->new("sample.ini", "utf8");
+
+        # Create empty config object
+        my $config = Config::IniMan->new();
+
+        # then load the config file
+        $config->read("sample.ini");
+
+        #read file in specific encoding
+        $config->read("sample.ini", "utf8");
+
+Create the config object and load it from a file if provided with specific encoding.
+read()
+
+        use Config::IniMan;
+
+        # Create empty config object
+        my $config = Config::IniMan->new();
+
+        # then load the config file
+        $config->read("sample.ini");
+
+        #read file in specific encoding
+        $config->read("sample.ini", "utf8");
+
+Read and parse ini file contents in specific encoding.
+encoding()
+
+        $encoding = $config->encoding();
+        $config->encoding("utf8"); # set encoding
+
+Gets and sets the default file read and write encoding.
+clear()
+
+        $config->clear();
+
+Deletes entire file contents from memory. Does not save to the file.
+get()
+
+        $value = $config->get("name"); # get parameter value from default or current section
+        $value = $config->get("section", "name");
+        $value = $config->get("section", "name", "default");
+
+        # parameters values can be obtained as object methods. getter/setter style.
+        # get the parameter 'website' value from current or default section.
+        my $value = $config->website; 
+        # same as
+        my $value = $config->get("website"); 
+        # set parameter 'website' value as a setter object method
+        $config->website("http://mewsoft.com"); 
+
+Gets parameter value. Returns the value of a parameter by its name. If you pass only the parameter name, it will search within the current section or the default section. You can pass also a default value to be returned if parameter does not exist.
+set()
+
+        $config->set("name", "value"); # sets parameter value in the current or default section
+        $config->set("section", "name", "value");
+
+        # set parameter 'website' value as a setter object method
+        $config->website("http://mewsoft.com");
+
+Sets parameter value. Adds new section if section does not exist. This method is chained.
+add_section()
+
+        $config->add_section("section");
+
+Adds new section to the end of the file if it does not exist. This method is chained.
+section()
+
+        $config->section(); # set current section to default section
+        $config->section("section");
+        # set current section and get a parameter value from it.
+        $value = $config->section("section")->get("name");
+
+Sets current active section. If empty section name is passed, will set the default section as current one. This method is chained.
+get_section()
+
+        $section = $config->get_section();# default section
+        $section = $config->get_section("section");
+        print $section->{"email"};
+
+Returns entire section as a hash ref if exists.
+sections()
+
+        @sections = $config->sections();
+
+Returns array of sections names in the same sorted order in the file.
+section_params()
+
+        @params = $config->section_params("section");
+
+Returns array of section parameters names in the same sorted order in the file.
+section_values()
+
+        @values = $config->section_values(); # get current or default section values
+        @values = $config->section_values("section");
+
+Returns array of section parameters values in the same sorted order in the file.
+delete()
+
+        $config->delete("section", @name);
+
+Delete section parameters. This method is chained.
+delete_section()
+
+        $config->delete_section();# delete default section
+        $config->delete_section("section");
+
+Delete entire section if it exist. This method is chained.
+exists()
+
+        $found  = $config->exists("name"); # check parameter name exists in the current section.
+        $found  = $config->exists("section", "name");
+
+Checks if parameter exists. If no section passed, it will check in the current of default section.
+section_exists()
+
+        $found  = $config->section_exists("section");
+
+Checks if section exists.
+as_string()
+
+        $ini_data = $config->as_string();
+
+Returns entire ini file contents in memory as single string with format preserved.
+write()
+
+        $config->write(); # save changes to the currently loaded file.
+        $config->write("newfile"); # save as a new file.
+        $config->write("newfile", "utf8"); # save as a new file in different encoding.
+
+Writes entire ini file contents in memory to file.
+Bugs
+
+This project is available on github at https://github.com/mewsoft .
+SEE ALSO
+
+Config::Tiny Config::IniFiles Config::INI Config::INIPlus Config::Any Config::General
+AUTHOR
+
+Ahmed Amin Elsheshtawy, احمد امين الششتاوى <support@mewsoft.com> Website: http://www.mewsoft.com
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Dr. Ahmed Amin Elsheshtawy support@mewsoft.com, http://www.mewsoft.com
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

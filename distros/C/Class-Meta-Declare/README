@@ -1,0 +1,51 @@
+Class-Meta-Declare
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DESCRIPTION
+
+IMPORTANT:  you want this class or Class::Meta if you need an introspection
+API for your classes.  If you do not need this, these modules are overkill.
+
+This class provides an alternate interface for Class::Meta.
+
+Class::Meta is a useful module which allows one to create Perl classes which
+support introspection (also known as reflection).  Typically Perl classes,
+when created, don't supply a lot of metadata.  Helper functions which are
+imported show up when you call $object->can($method).  Private, protected and
+trusted methods are not readily supported.  Fetching a list of attributes or
+methods is a haphazard affair.  Class::Meta solves that by building the
+classes for you and allowing you to fetch a class object:
+
+  my $class_object = $object->my_class;
+
+  foreach my $attribute ( $class_object->attributes ) {
+      print $attribute->name, "\n";
+  }
+  foreach my $method ( $class_object->methods ) {
+      print $method->name, "\n";
+  }
+
+If you've set up your class correctly, these properties are now easy to
+discover.
+
+Unfortunately, many find the Class::Meta interface to be a bit clumsy.  This
+Class::Meta::Declare allows you to declare your entire class in a single
+argument list to the constructor and have the class built for you
+automatically.  Further, reasonable defaults are provided for just about
+everything.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Curtis "Ovid" Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,583 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial::01_Intro - Catalyst Tutorial - Chapter 1: Introduction
+
+
+=head1 OVERVIEW
+
+This is B<Chapter 1 of 10> for the Catalyst tutorial.
+
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
+
+=over 4
+
+=item 1
+
+B<01_Introduction>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
+
+=item 3
+
+L<More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
+
+=item 4
+
+L<Basic CRUD|Catalyst::Manual::Tutorial::04_BasicCRUD>
+
+=item 5
+
+L<Authentication|Catalyst::Manual::Tutorial::05_Authentication>
+
+=item 6
+
+L<Authorization|Catalyst::Manual::Tutorial::06_Authorization>
+
+=item 7
+
+L<Debugging|Catalyst::Manual::Tutorial::07_Debugging>
+
+=item 8
+
+L<Testing|Catalyst::Manual::Tutorial::08_Testing>
+
+=item 9
+
+L<Advanced CRUD|Catalyst::Manual::Tutorial::09_AdvancedCRUD>
+
+=item 10
+
+L<Appendices|Catalyst::Manual::Tutorial::10_Appendices>
+
+=back
+
+
+=head1 DESCRIPTION
+
+This tutorial provides a multi-part introduction to the Catalyst Web
+Framework. It seeks to provide a rapid overview of many of its most
+commonly used features. The focus is on the real-world best practices
+required in the construction of nearly all Catalyst applications.
+
+Although the primary target of the tutorial is users new to the Catalyst
+framework, experienced users may wish to review specific sections (for
+example, how to use DBIC for their model classes, how to add
+authentication and authorization to an existing application, and/or
+form management).
+
+The most recent code for the tutorial is included on the Tutorial Virtual
+Machine you can download from:
+
+L<http://cattut.shadowcat.co.uk/>
+
+See L</STARTING WITH THE TUTORIAL VIRTUAL MACHINE> below for
+instructions getting and using the VM.
+
+Should you wish to download the code directly, you get pull it via the
+following command (note: will probably be switching to git soon):
+
+    svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/ CatalystTutorial
+
+This will download the most recent code for each chapter of the
+tutorial into the CatalystTutorial directory on your machine.
+
+These reference implementations are provided so that when you follow
+the tutorial, you can use the code to ensure that your system is set up
+correctly (which shouldn't be an issue if you use the Tutorial Virtual
+Machine), :-) and that you have not inadvertently made any typographic
+errors, or accidentally skipped part of the tutorial.
+
+B<NOTE: You can use any Perl-supported OS and environment to run
+Catalyst.> It should make little or no difference to Catalyst's
+operation, B<but this tutorial has been written using the Debian-based
+Tutorial Virtual Machine> that you can download and use to work through
+the full tutorial step by step.  B<WE STRONGLY RECOMMEND THAT YOU USE
+THE VIRTUAL MACHINE IMAGE TO WORK THROUGH THE TUTORIAL> to avoid issues
+that may crop up if you are working with a different configuration.  We
+have tested the Tutorial Virtual Machine to make sure all of the
+examples work correctly, but it is hard to guarantee this on other
+platforms and versions.
+
+If you would prefer to install directly from CPAN and not use the
+Tutorial Virtual machine, you can download the example program and all
+the necessary dependencies to your local machine by installing the
+C<Task::Catalyst::Tutorial> distribution:
+
+     cpan Task::Catalyst::Tutorial
+
+This will also test to make sure the dependencies are working.  If you
+have trouble installing these, please ask for help on the #catalyst
+IRC channel, or the Catalyst mailing list.
+
+Subjects covered by the tutorial include:
+
+=over 4
+
+=item * 
+
+A simple application that lists and adds books.
+
+=item *
+
+The use of L<DBIx::Class> (DBIC) for the model (including
+some of the more advanced techniques you will probably want to use in
+your applications).
+
+=item * 
+
+How to write CRUD (Create, Read, Update, and Delete) operations in
+Catalyst.
+
+=item *
+
+Authentication ("auth").
+
+=item * 
+
+Role-based authorization ("authz").
+
+=item * 
+
+Attempts to provide an example showing current (5.9) Catalyst
+practices.
+
+=item * 
+
+The use of Template Toolkit (TT).
+
+=item * 
+
+Useful techniques for troubleshooting and debugging Catalyst
+applications.
+
+=item * 
+
+The use of SQLite as a database (with code also provided for MySQL and
+PostgreSQL).  (Note: Because we make use of the DBIx::Class Object
+Relational Mapping [ORM] layer, out our application will be database
+agnostic and can easily be used by any of the databases supported by
+DBIx::Class.)
+
+=item * 
+
+The use of L<HTML::FormFu> or L<HTML::FormHandler>
+for automated form processing and validation.
+
+=back
+
+This tutorial makes the learning process its main priority.  For
+example, the level of comments in the code found here would likely be
+considered excessive in a "normal project."  Because of their contextual
+value, this tutorial will generally favor inline comments over a
+separate discussion in the text.  It also deliberately tries to
+demonstrate multiple approaches to various features (in general, you
+should try to be as consistent as possible with your own production
+code).
+
+Furthermore, this tutorial tries to minimize the number of controllers,
+models, TT templates, and database tables.  Although this does result in
+things being a bit contrived at times, the concepts should be applicable
+to more complex environments.  More complete and complicated example
+applications can be found at
+L<http://wiki.catalystframework.org/wiki/resources/catalystexamples> and
+in the C<examples> area of the Catalyst Subversion repository at
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/>.
+
+
+=head1 STARTING WITH THE TUTORIAL VIRTUAL MACHINE
+
+The steps below briefly outline how you can download the Tutorial
+Virtual Machine.  This document uses the term "host machine" to refer to
+the physical machine where you will run the virtualization software and
+boot up the VM.  The terms "guest machine" or just "VM" refer to the
+virtual machine itself -- the thing where you actually do the tutorial
+(and that you boot up on the "host machine").
+
+B<Note:> Throughout the tutorial, we will shows the UNIX shell prompt as
+"C<$>".  If you are using the Tutorial VM, the prompt will really be
+"C<catalyst@catalyst:~$>" (where "C<~"> will change to show your
+current directory), but we will keep it short and just use "C<$>".
+
+
+=over 4
+
+=item 1 
+
+Download a Tutorial Virtual Machine image from
+L<http://cattut.shadowcat.co.uk/>
+
+B<A big thanks to Shadowcat Systems for hosting the virtual machines>
+B<(and everything else they do for the Perl community)!>
+
+=item 2
+
+Uncompress the image on the "host machine":
+
+    MAINCOMPUTER:~$ tar zxvf CatalystTutorial.tgz
+
+=item 3
+
+Boot the virtual machine using a tool like VMWare Player
+L<http://www.vmware.com/products/player> or VirtualBox
+L<http://www.virtualbox.org/>.
+
+=item 4
+
+Once you get a login prompt, enter the username B<catalyst> and a
+password for C<catalyst>.  You should now be at a prompt that looks
+like:
+
+    catalyst login: catalyst
+    Password: catalyst
+    ...
+    catalyst@catalyst:~$
+
+=item 5
+
+Type "C<ifconfig>" to get the IP address assigned to the virtual
+machine.  You should get output along the lines of:
+
+    eth0  Link encap:Ethernet  HWaddr 00:01:22:3b:45:69
+          inet addr:192.168.0.12  Bcast:192.168.0.255  Mask:255.255.255.0
+    ...
+
+You want the IP address on the second line below the C<eth0> interface.
+The image it design to automatically use a DHCP-assigned address.
+
+
+Try to ping this IP address from your "host machine" (main desktop):
+
+
+    MAINCOMPUTER:~$ ping 192.168.0.12
+    PING 192.168.0.12 (192.168.0.12) 56(84) bytes of data.
+    64 bytes from 192.168.0.12: icmp_req=1 ttl=255 time=4.97 ms
+    64 bytes from 192.168.0.12: icmp_req=2 ttl=255 time=3.43 ms
+    ...
+
+
+B<Note:> The ping above is being originated B<from> your B<host machine>
+(main desktop) and going B<to> your guest B<virtual machine>, not the
+other way around.
+
+If you are not seeing a valid IP address or it's not responding to pings
+(for example, you get error messages along the lines of "Request timed
+out", "100% packet loss", or "Destination Host Unreachable"), there
+could be a few network-related issues you might need to sort out.  See
+the section below L</Sorting Out Virtual Machine Network-Related Issues>
+for additional information and troubleshooting advice.
+
+B<Note:> Remember this IP address... you will be using it throughout the
+tutorial.
+
+
+=item 6
+
+B<From your main desktop machine>, open an SSH client and connect to the
+IP address found in the previous step.  You should get a login prompt
+(accept the SSH key if you get a warning message about that).  Login
+with the same username and password as we used in Step 4: B<catalyst> /
+B<catalyst>
+
+    catalyst login: catalyst
+    Password: catalyst
+    ...
+    catalyst@catalyst:~$
+
+
+=item 7
+
+B<Using the SSH session>, change to the sample code directory for
+Chapter 3 included with the Tutorial Virtual Machine and start the
+Catalyst Development Server:
+
+    $ cd Final/Chapter03/MyApp
+    $ perl script/myapp_server.pl
+
+=item 8
+
+B<From your main desktop machine> (the "host machine"), open a web
+browser and go to B<http://A.B.C.D:3000/>, where C<A.B.C.D> is the IP
+address to your virtual machine that you looked up in Step 5.  For
+example, if your virtual machine is using the IP address
+C<192.168.0.12>, you would put the following URL into your web browser:
+
+    http://192.168.0.12:3000/
+
+Make sure you don't forget the B<:3000> to use port 3000 instead of the
+usual port 80 that is used by HTTP by default.
+
+You should get a Catalyst Welcome Screen.  If you do, feel free to jump
+right in to L<Chapter 2|Catalyst::Manual::Tutorial::02_CatalystBasics>
+of the tutorial.  If you don't go get the Catalyst Welcome Screen, go
+back and carefully check each of the steps above.
+
+=item 9
+
+B<Optional:> Also, to reduce download size, the Tutorial VM just
+includes a minimal command-line environment.  You are free to use
+Debian's very capable C<apt> package manager to install other packages.
+You will first want to pull the apt cache files with C<aptitude update>
+(or C<apt-get update> if you prefer apt-get).
+
+The VI/VIM editor is already installed on the Tutorial Virtual Machine.
+In order to reduce the size of the download, Emacs is not pre-installed.
+Since people obviously have very strong opinions about which editor is
+best, :-) fortunately it's very easy to install Emacs:
+
+    $ sudo aptitude update
+    $ sudo aptitude install emacs
+
+In general, it is expected that people will
+boot up the Tutorial VM on their main desktop (the "host machine" using
+the terminology above) and then use that main desktop machine to SSH and
+web browse into the "guest VM" as they work through the tutorial.  If
+you wish to install X Windows (or any other packages), just use the
+C<aptitude> (or C<apt-get>) Debian commands.
+
+For example, to install X Windows with Fluxbox (a lightweight
+WindowManager -- it is great for things like this tutorial since it's
+about 1/10th the size of other common X Windows environments), you can
+do:
+
+    $ sudo aptitude update
+    $ sudo aptitude install xorg fluxbox iceweasel
+
+And then start X Windows from the B<VM Console> with this command:
+
+    $ startx
+
+Note that if you want to start Fluxbox from an SSH session, you can use
+the C<sudo dpkg-reconfigure x11-common> and select "anybody" from the
+menu.  Otherwise, you will need to be on the actual "VM console" to
+start it.
+
+If you have a preference for the Gnome desktop environment, you can do:
+
+    $ sudo aptitude update
+    $ sudo aptitude install gnome iceweasel
+    $
+    $ # You can reboot or start with 'startx', we will just reboot here
+    $ reboot
+
+For KDE, just substitute the package name "C<kde>" for "C<gnome>" above.
+
+    $ sudo aptitude install kde iceweasel
+
+Note that C<iceweasel> is basically used to install Firefox on Debian
+boxes.  You can start it under X Windows with either the C<firefox>
+command or the C<iceweasel> command (or use the menus).  You can get
+more information on Iceweasel at L<http://wiki.debian.org/Iceweasel>.
+
+Also, you might need to add more memory to your virtual machine if you
+want to run X Windows (or other tools that might require additional
+memory).  Consult the documentation of your virtualization software
+for instructions on how to do this (it's usually pretty simple).
+
+
+=back
+
+
+You may note that the Tutorial Virtual Machine uses L<local::lib> so
+that the Perl modules are run from ~/perl5 (in this case,
+/home/catalyst/perl5) vs. the usual location of your "system Perl".  We
+recommend that you also consider using this very handy module.  It can
+greatly ease the process of maintaining and testing different
+combinations or Perl modules across development, staging, and production
+servers.  (The "relocatable Perl" feature can also be used to run
+both the modules B<and> Perl itself from your home directory [or any
+other directory you chose]).
+
+B<Note>: Please provide feedback on how the Virtual Machine approach for
+the tutorial works for you.  If you have suggestions or comments, you
+can reach the author through the email address at the bottom of this
+page or via an RT ticket at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
+
+
+
+=head2 Sorting Out Virtual Machine Network-Related Issues
+
+In general, using a virtual machine to work through the tutorial is
+*much* easier than trying to do it in other environments, especially if
+you are new to Catalyst (or Perl or CPAN or ...).  However, it's
+possible that you could run into a few network-related issues.  The good
+news is that there is lots of information about the issue available via
+search engines on the Internet.  Here is some background information to
+get you started.
+
+In Step 5 of the prior section above, we assumed that a "Bridged Mode"
+configuration and DHCP will work (it should for most people).  If DHCP
+is not working or is not available in your location, most virtual
+machine "host" environments let you select between one of several
+different types of networking between the "guest" and the "host"
+machine.
+
+    1) Bridged
+    2) NAT
+    3) Local host only
+
+The Tutorial Virtual Machine defaults to "Bridged" -- this should result
+in the VM acting like another device on your network that will get a
+different DHCP IP address than the host machine.  The advantage of this
+approach, is that you can easily SSH and web browse to the guest virtual
+machine.  In general, this is the best option if you want to be able to
+boot up the VM and then use your SSH client and web browser from your
+main machine to connect into the virtual machine.
+
+In some environments, you might have better luck with "NAT" (Network
+Address Translation) mode.  With this configuration, the guest VM shares
+the same IP address as the host machine.  The downside of this approach
+is that special configuration is required if you want to be able to SSH
+or web browse to the guest VM.  The NAT option should automatically
+allow the VM "outbound connection" (e.g., to the Internet if you want to
+install additional Debian packages), but it requires special
+configuration if you want to get "inbound connections" that go from some
+other machine (including the "host machine") into the VM.  Some virtual
+machine host environments let you configure a "static NAT" or "port
+forwarding" to reach the guest OS, but others omit this functionality.
+
+Note: NAT mode can work fine if you install X Windows and do the whole
+tutorial locally on the actual VM vs. using SSH and a web browser from
+your host machine.
+
+"Local host only" mode let's the guest VM and the host machine talk on a
+"private subnet" that other devices in your network cannot reach.  This
+can work as long as you don't need to go from the VM to the Internet
+(for example, to install other Debian packages).
+
+
+Consult the documentation on your virtual machine host environment for
+help configuring the options above.  Here are some links that might
+help:
+
+=over 4
+
+=item *
+
+L<http://vmfaq.com/entry/34/>
+
+=item *
+
+L<http://www.vmware.com/support/pubs/player_pubs.html>
+
+=item *
+
+L<http://www.virtualbox.org/manual/ch06.html>
+
+=back
+
+
+
+
+=head1 VERSIONS AND CONVENTIONS USED IN THIS TUTORIAL
+
+This tutorial was built using the following resources. Please note that
+you may need to make adjustments for different environments and versions
+(note that trailing zeros in version numbers are not significant and may
+get dropped with some techniques for viewing them; for example, Catalyst
+v5.80020 might show up as 5.8002):
+
+=over 4
+
+=item * 
+
+Debian 6 (Squeeze)
+
+=item * 
+
+Catalyst v5.90002
+
+=item *
+
+Catalyst::Devel v1.34
+
+=item * 
+
+DBIx::Class v0.08195
+
+=item *
+
+Catalyst::Model::DBIC::Schema v0.54
+
+=item *
+
+Template Toolkit v2.22
+
+
+=item *
+
+HTML::FormFu -- v0.09004
+
+=item * 
+
+B<NOTE:> You can check the versions you have installed with the
+following command (note the slash before the space):
+
+    perl -M<_mod_name_>\ 999
+
+or:
+
+    perl -M<_mod_name_> -e 'print "$<_mod_name_>::VERSION\n"'
+
+For example:
+
+    perl -MCatalyst::Devel\ 999
+
+or:
+
+    perl -MCatalyst::Devel -e 'print "$Catalyst::Devel::VERSION\n";'
+
+=item * 
+
+This tutorial will show URLs in the format of C<http://localhost:3000>,
+but if you are running your web browser from outside the Tutorial
+Virtual Machine, you will want to substitute the IP address of your VM
+for the C<localhost> in the URLs (again, you can get the IP address for
+eth0 from the C<ifconfig> command).  For example, if your VM has an
+IP address of 192.168.0.12, you will want to use a base URL of
+C<http://192.168.0.12:3000>.  Note that the development server
+defaults to port 3000 (you can change with the "-p" option on the
+command line).
+
+B<Please Note:> Depending on the web browser you are using, you might
+need to hit C<Shift+Reload> or C<Ctrl+Reload> to pull a fresh page when
+testing your application at various points (see
+L<http://en.wikipedia.org/wiki/Wikipedia:Bypass_your_cache> for a
+comprehensive list of options for each browser).
+
+Also, the C<-k> B<keepalive option> to the development server can be
+necessary with some browsers (B<especially Internet Explorer>).
+
+=back
+
+
+=head1 DATABASES
+
+This tutorial will primarily focus on SQLite because of its simplicity
+of installation and use; however, modifications in the script required
+to support MySQL and PostgreSQL will be presented in the Appendix.
+
+B<Note:> One of the advantages of using tools like Catalyst and DBIC is
+that applications become much more database independent.  As such, you
+will notice that only the C<.sql> files used to initialize the database
+change between database systems: most of the code generally remains the
+same.
+
+
+You can jump to the next chapter of the tutorial here:
+L<Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Feel free to contact the author for any errors or suggestions, but the
+best way to report issues is via the CPAN RT Bug system at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
+
+Copyright 2006-2011, Kennedy Clark, under the
+Creative Commons Attribution Share-Alike License Version 3.0
+(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).

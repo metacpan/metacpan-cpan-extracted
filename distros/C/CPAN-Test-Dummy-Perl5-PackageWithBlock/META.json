@@ -1,0 +1,65 @@
+{
+   "abstract" : "A dummy distribution to test package-block statements in the CPAN ecosystem",
+   "author" : [
+      "Thomas Sibley <trs@bestpractical.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.1, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-PackageWithBlock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.017"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock/issues"
+      },
+      "homepage" : "https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock.git",
+         "web" : "https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Thomas Sibley <tsibley@cpan.org>"
+   ]
+}
+

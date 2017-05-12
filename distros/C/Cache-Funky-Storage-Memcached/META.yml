@@ -1,0 +1,17 @@
+abstract: Cache::Funky  Memcached Storage.
+author: Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Cache-Funky-Storage-Memcached
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cache::Funky: 0
+  Cache::Funky::Storage: 0
+  Cache::Memcached: 0
+  Test::More: 0
+  Test::Spelling: 0
+version: 0.07

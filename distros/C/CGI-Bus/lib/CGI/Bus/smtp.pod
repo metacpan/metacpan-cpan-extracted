@@ -1,0 +1,86 @@
+=head1 NAME
+
+CGI::Bus::smtp - simple SMTP sender
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->smtp(-server=>'localhost')->mailsend(...);
+
+=head1 DESCRIPTION
+
+
+This module is a simple SMTP sender.
+Uses L<Net::SMTP|Net/SMTP>.
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 SLOTS
+
+=over
+
+=item -domain
+
+Default mail domain, for usernames without '@'
+
+
+=item -host
+
+SMTP server name or address
+
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+=item addrtr ( address ) -> translated
+
+Translates address given if needed.
+Removed backslashes, adds C<-domain>...
+
+
+=item mailsend ( ?from, ?\@to, row,... ) - > success
+
+Sends message, catenating rows via "\n". If 'from' or 
+'to' argument undefined, values are searched within rows of message 
+as 'From:', 'Sender:', 'To:'. If array reference 'to' occurs in place of 
+message row, it will be converted to 'To:' MIME string.
+
+
+=item smtp ( option => value ) -> new SMTP object
+
+Creates and returns new L<Net::SMTP|Net/SMTP> object
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+=head2 20/12/2001 - 22/12/2001
+
+=item New:
+
+Implemented and Documented.
+
+
+=item ToDo:
+
+Review.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

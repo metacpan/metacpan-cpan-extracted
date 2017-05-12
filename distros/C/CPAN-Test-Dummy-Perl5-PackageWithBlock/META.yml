@@ -1,0 +1,32 @@
+---
+abstract: 'A dummy distribution to test package-block statements in the CPAN ecosystem'
+author:
+  - 'Thomas Sibley <trs@bestpractical.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.017
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.1, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Test-Dummy-Perl5-PackageWithBlock
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.014000
+resources:
+  bugtracker: https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock/issues
+  homepage: https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock
+  repository: https://github.com/tsibley/CPAN-Test-Dummy-Perl5-PackageWithBlock.git
+version: 0.03
+x_contributors:
+  - 'Thomas Sibley <tsibley@cpan.org>'

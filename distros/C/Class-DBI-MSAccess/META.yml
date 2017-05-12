@@ -1,0 +1,16 @@
+---
+name: Class-DBI-MSAccess
+version: 0.10.2
+author:
+  - Michael Hendricks  <michael@palmcluster.org>
+abstract: Extensions to Class::DBI for MS Access
+license: perl
+requires:
+  Class::DBI: 0
+build_requires:
+  Test::More: 0
+provides:
+  Class::DBI::MSAccess:
+    file: lib/Class/DBI/MSAccess.pm
+    version: 0.10.2
+generated_by: Module::Build version 0.2611

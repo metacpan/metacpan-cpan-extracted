@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="Config-LotusNotes" VERSION="0,34,0,0">
+  <TITLE>Config-LotusNotes</TITLE>
+  <ABSTRACT>Access Lotus Notes/Domino configuration</ABSTRACT>
+  <AUTHOR>Harald Albers &lt;albers@cpan.org&gt;</AUTHOR>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.8" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.10" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.10" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.12" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0" />
+    <DEPENDENCY NAME="Config::IniHash" VERSION="0" />
+    <REQUIRE NAME="File-HomeDir" VERSION="0" />
+    <REQUIRE NAME="Config::IniHash" VERSION="0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x64-multi-thread-5.12" />
+    <CODEBASE HREF="Config-LotusNotes-0.34.tar.gz" />
+    <PROVIDE NAME="Config::LotusNotes" VERSION="0.34" />
+    <PROVIDE NAME="Config::LotusNotes::Configuration" VERSION="0.34" />
+  </IMPLEMENTATION>
+</SOFTPKG>

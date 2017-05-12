@@ -1,0 +1,8 @@
+#!/bin/sh
+
+(cd .. ; start-servers.sh)
+
+idl --no-codegen-c++ --feed-ir hello.idl
+imr create Hello library `pwd`/server.s? IDL:Hello:1.0 
+
+perl -Mblib perl-client local: 

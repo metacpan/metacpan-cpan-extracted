@@ -1,0 +1,17 @@
+[% crud_page_header('<% resource_name %>s') %]
+
+<p>
+    [% create_button(uri('<% resource_name %>', 'create')) %]
+</p>
+
+[% WRAPPER datatable columns = [ 'Name', 'Actions' ] %]
+    [% FOREACH <% resource_symbol %> = <% resource_symbol %>s %]
+    <tr>
+        <td>[% <% resource_symbol %>.name %]</td>
+        <td>
+            [% edit_button(uri('<% resource_name %>', 'edit', <% resource_symbol %>.id)) %]
+            [% delete_button(uri('<% resource_name %>', 'delete', <% resource_symbol %>.id), <% resource_symbol %>.is_used) %]
+        </td>
+    </tr>
+    [% END %]
+[% END %]

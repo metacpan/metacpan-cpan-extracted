@@ -1,0 +1,189 @@
+NAME
+    CGI::AppBuilder::TaskForms - Create or display Task froms
+
+SYNOPSIS
+      use CGI::AppBuilder::TaskForms;
+
+      my $sec = CGI::AppBuilder::TaskForms->new();
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  disp_new($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  form_allin1 ($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  get_ids ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_iso_version ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_rids ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_meddra_version ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_studyid ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_jobid ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_hjobid ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_dblinks ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+  get_htmlrpts ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: array/hash array or its ref
+
+HISTORY
+    *   Version 0.10
+
+        This version extracted from jp2.pl on 09/08/2010.
+
+    *   Version 0.20
+
+          09/21/2010 (htu): start this PM
+          10/16/2010 (htu): added get_jobid and get_hjobid
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2009 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 649:
+        You forgot a '=back' before '=head1'
+

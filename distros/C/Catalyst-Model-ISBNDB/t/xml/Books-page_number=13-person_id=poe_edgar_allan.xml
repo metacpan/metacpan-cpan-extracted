@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:39Z">
+<BookList total_results="252" page_size="10" page_number="13" shown_results="10">
+<BookData book_id="tales_of_mystery_imagination_a01" isbn="1580866778">
+<Title>Tales of mystery &amp; imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>from the stories by Edgar Allan Poe; retold by Tony Allan; with introduction and notes by Anthony Marks; illustrated by Barry Jones</AuthorsText>
+<PublisherText publisher_id="edc_pub">Tulsa, Okla. : EDC Pub., 2004.</PublisherText>
+<Details dewey_decimal="" physical_description_text="124 p. : ill. ; 20 cm." language="eng" edition_info="(lib.) :$12.95" dewey_decimal_normalized="" lcc_number="" change_time="2006-03-09T05:06:29Z" price_time="2006-10-08T07:59:22Z" />
+<Summary>This book is a retelling of some of Poe's classic tales of terror, including "The Masque of the Red Death," "The Pit and the Pendulum," "The Telltale Heart," "The Fall of the House of Usher," and other tales.</Summary>
+<Notes>4-8Medialog, Inc.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="horror_fiction">Horror fiction</Subject>
+<Subject subject_id="short_stories">Short stories</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Clive Public Library  (Clive, Iowa)" last_update="2006-03-09T05:06:29Z" marc_url="http://isbndb.com/x/libdata/isbndb-57-tales_of_mystery_imagination_a01-20060308.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="allan_tony">Allan, Tony</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="jones_barry_e">Jones, Barry E.</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_mys_imag_port_house" isbn="0517643030">
+<Title>Tales of mystery &amp; imagination</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe; illustrated by Arthur Rackham</AuthorsText>
+<PublisherText publisher_id="portland_house_illustrated_cla">New York : Portland House Illustrated Classics, 1987.</PublisherText>
+<Details dewey_decimal="[Fic]" physical_description_text="317 p., [22] leaves of plates : ill. (some col.) ; 24 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PS2612" change_time="2005-03-14T08:40:04Z" price_time="2006-10-08T07:59:26Z" />
+<Summary>Presents an anthology of tales of horror and the supernatural.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Remarkable Names of Real People  or  How to Name Your Baby" store_url="29996053&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:09:29Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780517643037" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:09:29Z" currency_rate="1" price="2.05" />
+<Price store_isbn="" store_title="Tales of Mystery and Imagination by Edgar Allan Poe ..." store_url="http://isbndb.com/x/book/tales_of_mys_imag_port_house/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:41:54Z" currency_rate="1" price="3" />
+<Price store_isbn="" store_title="Tales Of Mys &amp; Imag Port House" store_url="http://isbndb.com/x/book/tales_of_mys_imag_port_house/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:42Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="Tales of Mys &amp; Imag Port House" store_url="http://isbndb.com/x/book/tales_of_mys_imag_port_house/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales Of Mys &amp; Imag Port House" store_url="http://isbndb.com/x/book/tales_of_mys_imag_port_house/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:53Z" currency_rate="1" price="2.24" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+<Subject subject_id="childrens_stories_american">Children's stories, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Louisiana Tech University (Ruston, LA)" last_update="2005-03-14T08:40:04Z" marc_url="http://isbndb.com/x/libdata/isbndb-74-tales_of_mys_imag_port_house-20050314.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="rackham_arthur">Rackham, Arthur</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_suspense" isbn="0895772256">
+<Title>Tales of Suspense</Title>
+<TitleLong>Tales of Suspense (Illus)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="readers_digest_assn">Readers Digest Assn</PublisherText>
+<Details dewey_decimal="" physical_description_text="271 pages" language="" edition_info="Hardcover; 1986-06-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-08-21T03:48:17Z" price_time="2006-10-08T07:59:29Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780895772251" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-19T15:58:55Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Tales of Suspense " store_url="http://www.biblio.com/details.php?dcx=60267835&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-19T15:59:00Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Tales of Suspense (Illus)" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:42Z" currency_rate="1" price="0.41" />
+<Price store_isbn="" store_title="Tales of Suspense (Illus)" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:42Z" currency_rate="1" price="3.98" />
+<Price store_isbn="" store_title="Tales of Suspense (Illus)" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of suspense" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Suspense (Illus)" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:53Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_suspense/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:05Z" currency_rate="1" price="9.71" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tales_of_terror_and_detection" isbn="0486287440">
+<Title>Tales of Terror and Detection</Title>
+<TitleLong>Tales of Terror and Detection (Dover Thrift Editions)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="dover_publications">Dover Publications</PublisherText>
+<Details dewey_decimal="" physical_description_text="96 pages" language="" edition_info="Paperback; 1995-10-04" dewey_decimal_normalized="" lcc_number="" change_time="2005-12-03T05:24:21Z" price_time="2006-10-08T07:59:32Z" />
+<Summary>5 stories engagingly reveal Poe’s virtuoso gifts for both crime detection and the macabre. Two of his most famous tales, "The Mystery of Marie Roget" and "The Purloined Letter" introduce C. Auguste Dupin, the first fictional detective. "William Wilson" is a chilling tale of crime and evil. Also included: two tales of terror: "MS. Found in a Bottle" and "The Oblong Box."</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Tales of Terror and Detection " store_url="http://www.biblio.com/details.php?dcx=14759447&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-03T12:29:17Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780486287447" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-12-03T12:29:19Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-12-03T12:29:23Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="3.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:43Z" currency_rate="1" price="3.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:44Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:44Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Terror and Detection (Dover Thrift Editions)" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:46Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Tales of Terror and Detection (Dover Thrift Editions)" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:46Z" currency_rate="1" price="3.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:54Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30084101%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:03Z" currency_rate="1" price="2.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:07Z" currency_rate="1" price="1.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:54:07Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tales of Terror and Detection Product 425397" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.425397&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:29Z" currency_rate="1" price="1.88" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/tales_of_terror_and_detection/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:59:32Z" currency_rate="1" price="2" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tale_of_jerusalem" isbn="058505231X">
+<Title>Tale of Jerusalem</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:49Z" price_time="2006-10-08T07:59:36Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086027 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="jerusalem_fiction">Jerusalem -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-tale_of_jerusalem-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="tamerlane" isbn="0585052328">
+<Title>Tamerlane</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:51Z" price_time="2006-10-08T07:59:39Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,2001.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086028 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="timur_1336_1405">Timur,1336-1405</Subject>
+<Subject subject_id="death_poetry">Death -- Poetry</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:51Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-tamerlane-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="ten_great_mysteries" isbn="059043344X">
+<Title>Ten great mysteries</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe; edited with an introduction by Groff Conklin; illustrated by Irv Docktor</AuthorsText>
+<PublisherText publisher_id="scholastic_book_services">New York : Scholastic Book Services, c1989.</PublisherText>
+<Details dewey_decimal="" physical_description_text="vii, 210, [8] p. : ill. ; 17 cm." language="eng" edition_info="$2.95" dewey_decimal_normalized="" lcc_number="" change_time="2004-03-14T08:33:27Z" price_time="2006-09-14T14:47:10Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Ten Great Mysteries by Edgar Allan Poe" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Ten Great Mysteries by Edgar Allan Poe" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Ten Great Mysteries by Edgar Allan Poe" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Ten Great Mysteries By Edgar Allan Poe" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Ten Great Mysteries of Edgar Allan Poe" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:48Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Ten Great Mysteries by Edgar Allan Poe" store_url="http://www.biblio.com/details.php?dcx=1778542&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:51Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780590433440" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:54Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:41:54Z" currency_rate="1" price="1.95" />
+<Price store_isbn="" store_title="Ten Great Mysteries by Edgar Allan Poe by Edgar Alla..." store_url="http://isbndb.com/x/book/ten_great_mysteries/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-14T14:44:39Z" currency_rate="1" price="0.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+<Subject subject_id="short_stories_american">Short stories, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Milwaukee Public Library" last_update="2004-03-14T08:33:27Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-ten_great_mysteries-20040314.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="conklin_groff">Conklin, Groff</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_adventures_of_hans_pfaall" isbn="0382091019">
+<Title>The adventures of Hans Pfaall</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Alan Poe; adapted for young readers by Vincent Buranelli; illustrated by Hieronimus Fromm</AuthorsText>
+<PublisherText publisher_id="silver_burdett_co">Morristown, N.J. : Silver Burdett Co., 1985.</PublisherText>
+<Details dewey_decimal="" physical_description_text="26 p., [1] leaf of plates : col. ill. ; 26 cm." language="eng" edition_info="(soft)" dewey_decimal_normalized="" lcc_number="" change_time="2006-09-01T00:03:44Z" price_time="2006-09-01T00:03:52Z" />
+<Summary>A messenger arrives in Rotterdam and claims that Hans Pfaal traveled to the moon in a newspaper balloon.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Adventures of Hans Pfaall" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:47Z" currency_rate="1" price="2.93" />
+<Price store_isbn="" store_title="The Adventures of Hans Pfaall" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:47Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:48Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780382091018" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:48Z" currency_rate="1" price="3.08" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:51Z" currency_rate="1" price="2.93" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:52Z" currency_rate="1" price="2.93" />
+</Prices>
+<Subjects>
+<Subject subject_id="netherlands_fiction">Netherlands -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Alabama, Birmingham" last_update="2006-09-01T00:03:44Z" marc_url="http://isbndb.com/x/libdata/isbndb-79-the_adventures_of_hans_pfaall-20060831.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="buranelli_vincent">Buranelli, Vincent</Person>
+<Person person_id="fromm_hieronimus">Fromm, Hieronimus</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_adventures_of_hans_pfaall_a01" isbn="0382090950">
+<Title>The adventures of Hans Pfaall</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Alan Poe; adapted for young readers by Vincent Buranelli; illustrated by Hieronimus Fromm</AuthorsText>
+<PublisherText publisher_id="silver_burdett_co">Morristown, N.J. : Silver Burdett Co., 1985.</PublisherText>
+<Details dewey_decimal="" physical_description_text="26 p., [1] leaf of plates : col. ill. ; 26 cm." language="eng" edition_info="(lib. bdg.)" dewey_decimal_normalized="" lcc_number="" change_time="2006-09-01T00:03:46Z" price_time="2006-09-01T00:03:55Z" />
+<Summary>A messenger arrives in Rotterdam and claims that Hans Pfaal traveled to the moon in a newspaper balloon.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Adventures of Hans Pfaall" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:48Z" currency_rate="1" price="4.95" />
+<Price store_isbn="" store_title="The Adventures of Hans Pfaall (Classics for Kids)" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-09-01T00:03:48Z" currency_rate="1" price="7.25" />
+<Price store_isbn="" store_title="The Adventures of Hans Pfaall (Classics for Kids)" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:48Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780382090950" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:50Z" currency_rate="1" price="5.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_adventures_of_hans_pfaall_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-01T00:03:51Z" currency_rate="1" price="5" />
+</Prices>
+<Subjects>
+<Subject subject_id="netherlands_fiction">Netherlands -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Alabama, Birmingham" last_update="2006-09-01T00:03:46Z" marc_url="http://isbndb.com/x/libdata/isbndb-79-the_adventures_of_hans_pfaall_a01-20060831.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="buranelli_vincent">Buranelli, Vincent</Person>
+<Person person_id="fromm_hieronimus">Fromm, Hieronimus</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_angel_of_the_odd" isbn="0585065918">
+<Title>The angel of the odd</Title>
+<TitleLong>The angel of the odd an extravaganza</TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2003-11-26T17:26:13Z" price_time="2006-06-30T01:53:57Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086152 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="angels_fiction">Angels -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:13Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_angel_of_the_odd-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:07:27Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_angel_of_the_odd-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:31:04Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-the_angel_of_the_odd-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:34:57Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-the_angel_of_the_odd-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:51:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-the_angel_of_the_odd-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-the_angel_of_the_odd-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

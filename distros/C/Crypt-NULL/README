@@ -1,0 +1,48 @@
+NAME
+    Crypt::NULL - NULL Encryption Algorithm
+
+SYNOPSIS
+    use Crypt::NULL;
+
+    $null = Crypt::NULL->new($key);
+
+    $ciphertext = $null->encrypt($plaintext);
+
+    $plaintext = $null->decrypt($ciphertext);
+
+DESCRIPTION
+    The NULL Encryption Algorithm is a symmetric block cipher described
+    in RFC 2410 by Rob Glenn and Stephen Kent.
+
+    This module implements NULL encryption. It supports the Crypt::CBC
+    interface, with the following functions.
+
+  Functions
+
+    blocksize
+        Returns the size (in bytes) of the block (16, in this case).
+
+    keysize
+        Returns the size (in bytes) of the key (16, in this case).
+
+    new($key)
+        This creates a new Crypt::NULL object with the specified key.
+
+    encrypt($data)
+        Encrypts blocksize() bytes of $data and returns the
+        corresponding ciphertext.
+
+    decrypt($data)
+        Decrypts blocksize() bytes of $data and returns the
+        corresponding plaintext.
+
+SEE ALSO
+    Crypt::CBC, Crypt::TEA, Crypt::Blowfish
+
+AUTHOR
+    Abhijit Menon-Sen <ams@wiw.org>
+
+    Copyright 2001 Abhijit Menon-Sen. All rights reserved.
+
+    This software is distributed under the terms of the Artistic License
+    <URL:http://ams.wiw.org/code/artistic.txt>.

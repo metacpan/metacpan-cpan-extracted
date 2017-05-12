@@ -1,0 +1,31 @@
+=head1 NAME
+
+Class::AutoDB::Collection - Compare two collection definitions and
+maintain differences
+
+=head1 SYNOPSIS
+
+This is a helper class for Class::AutoDB::Registry to to process
+differences between in-memory and saved registries
+
+ use Class::AutoDB::CollectionDiff;
+ use Class::AutoDB::Collection;
+ my $diff=new Class::AutoDB::CollectionDiff
+   (-baseline=>$saved, -change=>$in_memory);
+ if ($diff->is_sub) {               # is new collection subset of saved one?
+   $registry=$saved_registry;       # if so, use saved one
+ } elsif  ($diff->is_different) {   # else get changes
+   my %new_keys=$diff->new_keys;    # 
+   my @expanded_collections=$diff->expanded_collections;
+ } else {
+   die “New collection inconsistent with old”;
+ }
+
+=head1 DESCRIPTION
+
+This class compares two collection definitions and records their
+differences. The first collection is considered the baseline, and
+differences are reported relative to it. This class I<does not talk to
+the database>.
+
+=cut

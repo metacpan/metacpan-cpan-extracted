@@ -1,0 +1,20 @@
+TODO list for Perl module Catalyst::Model::SVN:
+
+Pre 0.12 release:
+   - Document external config..
+   - Sort out ->revision and ->repository methods properly.
+   - Sort out revision handling, there are various 'special' names in SVN,  
+     deal with them (and document).
+   - Find out how other classes do it / what the proper way to merge config 
+     is, and do that.
+
+Pre 0.13 release:
+    - Fix propget inefficiency? ( Turn item returned by cat into an object? )
+
+Pre 0.14 release:
+	- Test resolve_copy in some more unusual situations
+	- Test resolve_copy across multiple moves
+	- Add helpers tests
+
+Future:
+    - Add write support

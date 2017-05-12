@@ -1,0 +1,4 @@
+name = "Cikl-RabbitMQ"
+license = "lgpl_3_0"
+badges = ["travis"]
+no_github_issues = true

@@ -1,0 +1,24 @@
+<html>
+<head>
+<title>cgiapp messagestack output template</title>
+<style type="text/css">
+   .INFO {
+     font-weight: bold;
+   }
+   .ERROR {
+     color: red;
+   }
+</style>
+</head>
+<body>
+
+<p>hello world</p>
+
+<!-- TMPL_LOOP NAME="MyOwnLoopName" -->
+   <div class="<!-- TMPL_VAR NAME="MyOwnClassificationName" -->">
+     <!-- TMPL_VAR NAME="MyOwnMessageName" -->
+   </div>
+<!-- /TMPL_LOOP -->
+
+</body>
+</html>

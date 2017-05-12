@@ -1,0 +1,12 @@
+% perl sample5.pl 
+main warn  message
+main error message
+main fatal message
+
+% perl sample5.pl -q
+
+% perl sample5.pl -v
+main info  message
+main warn  message
+main error message
+main fatal message

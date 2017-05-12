@@ -1,0 +1,9 @@
+0.102 2007-07-01
+
+- Fixed issue with null characters
+- Added test for this and wide characters
+- Removed requirement for Devel::Size
+
+0.1  2006-10-20
+
+- Initial release

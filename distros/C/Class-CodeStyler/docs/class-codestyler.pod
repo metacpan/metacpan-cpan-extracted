@@ -1,0 +1,382 @@
+=pod 
+
+=head1 NAME
+
+Class::CodeStyler - Perl extension for code generation program formatting and execution.
+
+
+=head1 SYNOPSIS
+
+  use Class::CodeStyler;
+
+  # Create a new Perl program codestyle object...
+  my $p2 = Class::CodeStyler::Program::Perl->new();
+  $p2->code("sub function_operator");
+  $p2->open_block();
+  $p2->code("my \$self = shift;");
+  $p2->code("my \$arg1 = shift;");
+  $p2->code("my \$arg2 = shift;");
+  $p2->code("return \$arg1->eq(\$arg2);");
+  $p2->close_block();
+
+  # prepare() will produce the text for the program...
+  $p2->prepare();
+
+  # print will return the produced text...
+  print $p2->print();
+
+  # Create another Perl program codestyle object...
+  my $p = Class::CodeStyler::Program::Perl->new(program_name => 'testing.pl', tab_size=>4);
+  $p->open_block();
+  $p->code("package MyBinFun;");
+
+  # Set the bookmark 'subs'...
+  $p->bookmark('subs');
+  $p->indent_off();
+  # The following comment line will appear un-indented...
+  $p->comment("Some comment line..."); 
+  $p->indent_on();
+
+  # Add the code from $p2 object to $p codestyle object...
+  $p->add($p2);
+  
+  # and anther codestyle object...
+  my $p3 = Class::CodeStyler::Program::Perl->new();
+  $p3->code("sub function_operator_2");
+  $p3->open_block();
+  $p3->code("my \$self = shift;");
+  $p3->code("my \$arg1 = shift;");
+  $p3->code("my \$arg2 = shift;");
+  $p3->code("return \$arg1->eq(\$arg2);");
+  $p3->close_block();
+  
+  # Jump to the bookmark position 'subs'...
+  $p->jump('subs');
+ 
+  # Add the code from $p3 codestyle object to $p object at the bookmark position...
+  $p->add($p3);
+
+  # Return to the last position prior to last jump...
+  $p->return();
+
+  # Add a divider line...
+  $p->divider();
+
+  # Add a comment line...
+  $p->comment('Next function follows...');
+  
+  my $p4 = Class::CodeStyler::Program::Perl->new();
+  $p4->code("sub function_operator_3");
+  $p4->open_block();
+  $p4->code("my \$self = shift;");
+  $p4->code("my \$arg1 = shift;");
+  $p4->code("my \$arg2 = shift;");
+  $p4->code("return \$arg1->eq(\$arg2);");
+  $p4->close_block();
+  $p->add($p4);
+  $p->close_block();
+  
+  # Process the $p codestyle object to produce the code text...
+  $p->prepare();
+
+  # Print the produced code text...
+  print $p->print();
+
+  # The following is displayed to stdout...
+
+  >{
+  >    package MyBinFun;
+  >    sub function_operator_2
+  >    {
+  >      my $self = shift;
+  >      my $arg1 = shift;
+  >      my $arg2 = shift;
+  >      return $arg1->eq($arg2);
+  >    }
+  >    # BOOKMARK ---- subs
+  >#Some comment line...
+  >    sub function_operator
+  >    {
+  >      my $self = shift;
+  >      my $arg1 = shift;
+  >      my $arg2 = shift;
+  >      return $arg1->eq($arg2);
+  >    }
+  >    ----------------------------------------------------------------------
+  >    #Next function follows...
+  >    sub function_operator_3
+  >    {
+  >      my $self = shift;
+  >      my $arg1 = shift;
+  >      my $arg2 = shift;
+  >      return $arg1->eq($arg2);
+  >    }
+  >}
+
+  # display() will output the code text with line numbers prefixed on each line...
+  $p->display();
+
+  # Save the code text in the program_file...
+  $p->save();
+
+  # Run the syntax checker for the produced program text...
+  $p->syntax_check();
+
+  # execute the generated program file, passing on any stdin. Process control will pass on to 
+  # the generated program...
+  $p->exec(); 
+
+
+=head1 DESCRIPTION
+
+F<Class::CodeStyler> is an object oriented API to be used by code-gererators in producing formatted code (Perl, C, other). The produced code file can also be syntax checked, displayed with line numbers, executed, and eval'd. Code can be inserted anywhere in the generated program using a system of bookmarks and jumps. 
+
+
+=cut --------------------------------------------------------------------------------
+
+=head1 FUNCTION REFERENCE
+
+=head2 F<Constructor>
+
+Use the I<new()> function to construct a F<CodeStyle> object. The following properties may be specified:
+
+
+=over
+
+=over
+
+=item F<program_name>
+
+A I<program_name> must be specified before the generated code text can be I<saved>, I<executed>, I<eval'd>, or I<syntax checked>.
+
+
+=item F<suppress_comments>
+
+Set this property to non-zero to suppress the inclusion of comment text in the generated code text.
+
+
+=item F<tab_size>
+
+If F<tab_type> is C<'spaces'> then the F<tab_size> indicates the number of spaces per I<indent>. If F<tab_type> is C<'hard'> then the F<tab_size> specifies the number of I<tabs> per I<indent>.
+
+
+=item F<tab_type>
+
+Specify C<'spaces'> or C<'hard'>. Defaults to C<'spaces'>.
+
+
+=item F<divider_length>
+
+Specify the length in characters of the I<divider> text line. The default length is I<70>.
+
+
+=item F<divider_char>
+
+Specify the character to be used when printing a I<divider> line. The default character is C<->.
+
+
+=item F<debug>
+
+Turn on I<debug> messages printed to I<stderr>.
+
+
+=back
+
+=back
+
+
+=head2 F<code>
+
+Add the code text specified in the argument.
+
+
+=head2 F<open_block>
+
+
+Begin a new block using the bracket characters pecified in the argument (defaults to C<{>). The code that follows will be indented.
+
+
+=head2 F<close_block>
+
+
+End the block. Move back one indent and print the appropriate closing bracket.
+
+
+=head2 F<over>
+
+
+Increase the indent by the number specified in the argument (default is one).
+
+
+=head2 F<back>
+
+
+Decrease the indent by the size specified in the last F<over()>.
+
+
+=head2 F<indent_off>
+
+
+Turn off indenting. The code that follows and up to the F<indent_on()> will appear without any indentation.
+
+
+=head2 F<indent_on>
+
+
+Turn on indenting.
+
+
+=head2 F<add>
+
+
+Add the F<CodeStyle> object or objects that are specified in the arguments to this F<CodeStyle> object.
+
+
+=head2 F<anchor_set>
+
+=head2 F<anchor_return>
+
+
+Set an I<anchor> with the F<anchor_set()> function, and return to the last set I<anchor> with the F<anchor_return()> function.
+
+
+=head2 F<bookmark>
+
+
+Set the bookmark at the current position with the name as specified by the argument.
+
+
+=head2 F<jump>
+
+
+Jump to the position bookmarked with the name as specified in the argument.
+
+
+=head2 F<return>
+
+
+Return to the last position prior to the previous F<jump()>.
+
+
+=head2 F<newline_on>
+
+
+Turn on I<newline>. A newline will be added after every code addition code.
+
+
+=head2 F<newline_off>
+
+
+Turn off I<newline>.
+
+
+=head2 F<comment>
+
+
+Add a I<comment> line. The appropriate language comment prefix will be prefixed.
+
+
+=head2 F<divider>
+
+
+Add a I<divider> line to the code text.
+
+
+=head2 F<clear>
+
+
+Clear the I<prepared> code text. Whenever the F<CodeStyle> object has been modified after a F<prepare>, the F<clear> function must be called before I<preparing> again.
+
+
+=head2 F<prepare>
+
+
+Process the F<CodeStyle> object and produce the code text ready for printing.
+
+
+=head2 F<print>
+
+
+Print the code text to stdout.
+
+
+=head2 F<save>
+
+
+Save the generated code text to the file as specified in the F<program_name> member.
+
+
+=head2 F<display>
+
+
+Display the generated code text to stdout with line numbers.
+
+
+=head2 F<syntax_check>
+
+
+Check the syntax of the generated program.
+
+
+=head2 F<exec>
+
+
+Execute the generated program. The generated program will be executed in place of this (caller) program.
+
+
+=head2 F<run>
+
+Execute the generated program and wait for return.
+
+
+=head2 F<eval>
+
+
+Execute the generated program with the Perl F<eval> function.
+
+
+=cut --------------------------------------------------------------------------------
+
+=head1 PREREQUISITES
+
+
+F<Class::STL::Containers> version 0.18 or above is required.
+
+
+=cut --------------------------------------------------------------------------------
+
+=head1 SEE ALSO
+
+
+
+=cut --------------------------------------------------------------------------------
+
+=head1 AUTHOR
+
+m gaffiero, E<lt>gaffie@users.sourceforge.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright E<copy>1999-2007, Mario Gaffiero. All Rights Reserved.
+
+
+This file is part of Class::CodeStyler(TM).
+
+
+Class::CodeStyler is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+
+Class::CodeStyler is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+
+You should have received a copy of the GNU General Public License
+along with Class::CodeStyler; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+
+=cut

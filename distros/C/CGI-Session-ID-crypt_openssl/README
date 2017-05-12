@@ -1,0 +1,42 @@
+NAME
+    CGI::Session::ID::crypt_openssl - CGI::Session ID driver for generating
+    IDs based on Crypt::OpenSSL::Random
+
+VERSION
+    Version 1.02
+
+SYNOPSIS
+        use CGI::Session;
+        $session = CGI::Session->new('id:crypt_openssl', undef);
+
+DESCRIPTION
+    Use this module to generate hexadecimal IDs generated with
+    Crypt::OpenSSL::Random for CGI::Session objects. This library does not
+    require any arguments. Use this module to generate security IDs with a
+    high level of randomnes.
+
+  METHODS
+    generate_id()
+        This subroutine is calling by the CGI::Session Module to generate an
+        ID for the session.
+
+AUTHOR
+    Helmut Weber, "<helmut.weber at bitbetrieb.de>"
+
+CREDITS
+    My Sweetheart Sabrina and my lovely childs Jolina and Marcella
+
+    Mark Stosberg for the great support
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013 bitbetrieb. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+    CGI::Session, Digest::MD5, Crypt::OpenSSL::Random
+

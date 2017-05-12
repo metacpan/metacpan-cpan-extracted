@@ -1,0 +1,14 @@
+<h2>Preview: [% preview.data.title %]</h2>
+
+[% IF preview.data.snippet %]
+        <table width="100%">
+        <tr><th>[% preview.data.title %]</th></tr>
+        <tr><td>
+[% IF preview.data.link %]<img class="left" src="[% webpath %]/[% preview.data.link %]" [% IF item.resize %]width="100"[% END %] alt="[% preview.data.tag %]" align="right" style="padding:0 0px 0 4px" />[% END %]
+[% preview.data.snippet %] ... <a href='[% cgipath %]/pages.cgi?act=arts-main&amp;name=[% preview.data.quickname %]' title='read more about [% preview.data.title %]'><i>more</i></a>
+        </td></tr>
+        </table>
+[% END %]
+
+[% block = preview.body %]
+[% INCLUDE "articles/arts-block.html" %]

@@ -1,0 +1,10 @@
+my $torun = shift(@ARGV);
+
+if ($torun) {
+    utime time, time, $torun;
+    sleep 1;
+    my $pid = `$ENV{SPEEDY} $torun`;
+    sleep 1;
+    print $pid;
+}
+print "$$\n";

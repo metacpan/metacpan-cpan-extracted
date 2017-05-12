@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  35958:
+    - 189
+name: fdcbd1
+registers:
+  AF: 24056
+  AF_: 0
+  BC: 63421
+  BC_: 0
+  DE: 38036
+  DE_: 0
+  HL: 18791
+  HL_: 0
+  I: 0
+  IX: 44288
+  IY: 35941
+  PC: 4
+  R: 2
+  SP: 0

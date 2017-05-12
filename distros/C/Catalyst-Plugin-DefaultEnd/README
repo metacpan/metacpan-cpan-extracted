@@ -1,0 +1,36 @@
+NAME
+    Catalyst::Plugin::DefaultEnd - DEPRECATED Sensible default end action.
+
+SYNOPSIS
+        use Catalyst qw/-Debug DefaultEnd/;
+
+WARNING
+    This module is deprecated, and should not be used in new applications.
+
+    Please use Catalyst::Action::RenderView instead. It is preserved here
+    for backwards compatibility reasons.
+
+DESCRIPTION
+    This action implements a sensible default end action, which will forward
+    to the first available view, unless status is set to 3xx, or there is a
+    response body. It also allows you to pass dump_info=1 to the url in
+    order to force a debug screen, while in debug mode.
+
+    If you have more than 1 view, you can specify which one to use with the
+    'view' config setting.
+
+METHODS
+    end The default end action, you can override this as required in your
+        application class, normal inheritance applies.
+
+AUTHOR
+    Marcus Ramberg <marcus@thefeed.no>
+
+COPYRIGHT
+    Copyright (c) 2005 - 2009 the Catalyst::Plugin::DefaultEnd "AUTHOR" as
+    listed above.
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

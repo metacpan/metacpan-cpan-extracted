@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Cache/Method.pm
+lib/Test/Cache/Method.pm
+minil.toml
+t/cache_method.t
+META.yml
+MANIFEST

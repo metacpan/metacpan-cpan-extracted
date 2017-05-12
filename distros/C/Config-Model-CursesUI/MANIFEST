@@ -1,0 +1,9 @@
+ChangeLog
+MANIFEST			This list of files
+META.yml
+README
+Build.PL
+lib/Config/Model/CursesUI.pm
+t/curses_ui.t
+t/test_model.pm
+META.json

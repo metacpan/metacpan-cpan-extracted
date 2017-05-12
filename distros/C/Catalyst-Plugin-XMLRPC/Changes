@@ -1,0 +1,31 @@
+Revision history for Perl extension Catalyst::Plugin::XMLRPC
+
+2.01
+        - Added DEPRECATION notice is this code is not maintained.
+        - Fixed copyright notice.
+
+2.00
+        - Fixed unknown method error (sheriff)
+        - Added XMLRPC Action class
+
+1.00  Sat Apr 08 00:00:00 2005
+        - Everything changed
+
+0.06  Sun Nov 20 00:00:00 2005
+        - Added live tests
+
+0.05  Sun Nov 20 00:00:00 2005
+        - Fixed bugs
+
+0.04  Fri Nov 11 00:00:00 2005
+        - updated for Catalyst 5.5
+
+0.03  Sun May 15 00:00:00 2005
+        - added failure handling
+
+0.02  Sat Apr 23 23:00:00 2005
+        - changed namespace handling, now fooBar.barFoo will be
+          dispatched to fooBarbarFoo() in the actual class
+
+0.01  Thu Apr 07 16:00:00 2005
+        - original version.

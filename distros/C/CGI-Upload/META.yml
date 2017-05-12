@@ -1,0 +1,23 @@
+---
+name: CGI-Upload
+version: 1.11
+author:
+  - 'Rob Casey <rob.casey@bluebottle.com>'
+abstract: CGI class for handling browser file uploads
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 2.47
+  Carp: 0
+  File::MMagic: 1.16
+  HTTP::BrowserDetect: 0.97
+  Test::More: 0
+provides:
+  CGI::Upload:
+    file: lib/CGI/Upload.pm
+    version: 1.11
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

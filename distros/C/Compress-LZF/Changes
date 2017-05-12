@@ -1,0 +1,150 @@
+Revision history for Perl extension Compress::LZF
+
+3.8  Tue Jun 30 01:50:27 CEST 2015
+	- update liblzf to version 3.8 (no bugfixes).
+	- support perl multicore specification (http://perlmulticore.schmorp.de/)
+          for compression and decompression.
+	- dynamically allocate space for best compression, instead of allocating
+          it on the stack.
+
+3.7  Sun Aug 25 20:12:58 CEST 2013
+	- update liblzf to version 3.7 (speedups, no bugfixes).
+        - add _best versions that use lzf_c_best.
+
+3.43 Mon Dec 29 09:46:17 CET 2008
+	- port to perls that pointlessly have enabled windows process
+          emulation on unix (broguht to my attention by Guillaume Rousse).
+
+3.42 Wed Dec 17 01:35:47 CET 2008
+        - grr, require_pv doesn't work either, roll our own.
+	- name the correct function serialiser function name
+          in error messages.
+
+3.41 Tue Sep 23 01:59:02 CEST 2008
+	- it would be nice if the fact that load_module eats
+          the module name were documented :(, in any case,
+          switching to require_pv fixes all the mysterious
+          crashes.
+	- be more forgiving instead of crashing when the
+          serialiser doesn't return a string.
+
+3.4  Fri Sep  5 17:27:10 CEST 2008
+	- update to liblzf-3.4.
+
+3.11 Wed Jan  9 22:43:17 CET 2008
+	- add PUTBACK/SPAGAIN around need_storable calls, fixing
+          a potential stack change problem when loading the serialiser.
+
+3.1  Fri Nov 30 11:35:47 CET 2007
+	- update to liblzf-3.1.
+
+2.0  Tue Nov 13 22:49:57 CET 2007
+	- update to liblzf-3.0.
+
+1.9  Fri Nov  2 13:34:21 CET 2007
+	- require perl 5.008.
+        - updated to liblzf version 2.1.
+
+1.8  Wed Apr 18 14:40:20 CEST 2007
+	- properly downgrade all scalars to octet form when
+          required.
+        - strings potentially containing non-latin1 characters
+          get frozen via the serialiser.
+
+1.71 Fri Feb 16 23:09:04 CET 2007
+	- fix memory leak when feeding illegal data to decompress.
+        - allocate hash dynamically - slower, but having 256k of stack
+          is not ubiquitiously available.
+
+1.7  Wed Sep 27 17:52:39 CEST 2006
+	- fix buffer overflows in decompress header.
+
+1.65 Fri Jul  7 17:42:12 CEST 2006
+	- upgrade to liblzf-1.6.
+
+1.6  Sat Oct  1 03:34:11 CEST 2005
+        - now really allow non-Storable serialisers.
+
+1.52 Sat Oct  1 03:23:52 CEST 2005
+	- changed mstore to net_mstore default.
+
+1.51 Thu Apr 14 18:59:03 CEST 2005
+	- upped compress size limit from 64MB to 2GB (reported
+          by Jan Sundberg, who actually ran into the limit :).
+        - *blush*, changed Zev-Limpel to Lempel-Ziv... funny that
+          nobody spotted thta braino.
+
+1.5   Tue Mar  8 21:04:23 CET 2005
+	- upgraded to liblzf-1.5 (faster, slightly worse compression).
+
+1.401 Thu Mar  3 18:00:52 CET 2005
+	- upgraded to liblzf-1.401.
+	- change of contact address.
+
+1.4   Wed Dec 15 08:09:33 CET 2004
+	- upgraded to liblzf-1.4.
+
+1.0   Mon May  3 20:25:07 CEST 2004
+	- yet another minor reference copying vs. inc bug.
+
+0.1046 Fri Jan 17 08:14:30 CET 2003
+	- added debian files, realized that debians package management
+          is quite useless.
+
+0.1045 Thu Sep  5 23:54:11 CEST 2002
+	- always make a stringified copy of the argument for
+          sfreeze, so the assertion "sfreeze makes a string out
+          of it's argument" holds even for integers.
+        - "simple" objects now include PVIV and PVNV.
+
+0.1044 Thu Sep  5 06:44:13 CEST 2002
+	- MINOR: add set_serializer interface.
+
+0.1043 Sat May 18 23:40:01 CEST 2002
+	- bugfix when freezing non-SVt_PV-PV's.
+        - thanks to all cpan-testers ;)
+
+0.1042 Fri May 17 22:09:08 CEST 2002
+	- removed some debugging code that kept sfreeze from properly
+
+0.1041 Wed Apr 10 05:12:47 CEST 2002
+	- sthaw now returns a copy of it's argument instead of the argument
+          itself in the pass-through case, as this is the required semantics
+          for perl.
+
+0.104 Tue Mar 26 18:48:02 CET 2002
+	- fix more logic bugs. never wrote functions with such contorted
+          logic :( maybe I should just ignore the idea of saving single bytes
+          whereever possible to make this module much cleaner...
+
+0.103 Sun Mar  3 05:39:00 CET 2002
+	- try to handle magical objects that are no references
+          by creating a referebce to them and passing this ref to
+          storable.
+
+0.102 Wed Feb 27 21:50:18 CET 2002
+	- handle magic in sfreeze.
+
+0.101 Fri Feb 22 01:15:25 CET 2002
+	- handle magic in sthaw.
+
+0.1   Thu Sep 27 18:50:11 CEST 2001
+	- compress/decompress considered stable.
+        - added sfreeze, sfreeze_c and sfreeze_cr.
+
+0.05  Thu Jan 25 12:47:36 CET 2001
+	- uncompress leaked memory. doh!
+
+0.04  Tue Jan 16 13:21:14 CET 2001
+	- fix silly beginners 32/64 bit mistake.
+
+0.03  Sat Jan 13 19:19:15 CET 2001
+	- small testsuite fix (use Compress::LZF instead of LZV1!).
+
+0.02  Thu Jan  4 05:51:26 CET 2001
+	- upgraded to liblzf-0.2
+
+0.01
+	- improved version of Compress::LZV1, better compression, saner format
+          freeer license, faster code...
+

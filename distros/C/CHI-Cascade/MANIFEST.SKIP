@@ -1,0 +1,12 @@
+\.komodoproject$
+\bblib\b
+Makefile\.old$
+^pm_to_blib$
+\.git
+^Makefile$
+^Notes\.txt$
+\.bak$
+^CHI-Cascade-.*?/
+\.tar\.gz$
+MYMETA\.json
+MYMETA\.yml

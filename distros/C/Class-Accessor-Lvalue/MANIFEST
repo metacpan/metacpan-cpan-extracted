@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+META.yml
+NINJA
+lib/Class/Accessor/Lvalue.pm
+lib/Class/Accessor/Lvalue/Fast.pm
+t/lval.t
+t/lval-fast.t
+t/lval-core.pl

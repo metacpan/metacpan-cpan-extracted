@@ -1,0 +1,8 @@
+$Id: ToDo,v 1.4 2001/07/12 07:38:26 btrott Exp $
+
+Add SSH2 public key format. Much like SSH2 private keys, they are
+encoded in an SSH blob ('OpenSSH'), then Base64-encoded.
+
+Fingerprints.
+
+Standardize on Comment interface.

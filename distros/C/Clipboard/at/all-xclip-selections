@@ -1,0 +1,15 @@
+#!/usr/bin/perl -w
+# prove that Clipboard::Xclip will dig around through the selections until it
+# finds something.
+use strict;
+use lib 'lib';
+use Clipboard;
+use Test::More 'no_plan';
+
+for (Clipboard::Xclip->all_selections) {
+    my $str = "$_ paste worked\n\nwith double-newlines, even.";
+    Clipboard::Xclip->copy_to_selection($_, $str);
+    my $actual = Clipboard->paste;
+    is $actual, $str, "$_ test";
+    Clipboard::Xclip->copy_to_selection($_, '');
+}

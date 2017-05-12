@@ -1,0 +1,73 @@
+########################################
+# this series tests handling of 'partially' deleted objects:
+#  objects still exist in collections, but are NULL in _AutoDB
+# not sure this can really happen, but...
+# this script gets object containing Oids to deleted objects
+# objects created and stored by del.011.20.put
+########################################
+use t::lib;
+use strict;
+use Carp;
+use Test::More;
+use autodbTestObject;
+
+use Class::AutoDB;
+use delUtil; use Person; use Student; use Place; use School; use Thing;
+
+my $autodb=new Class::AutoDB(database=>testdb); # open database
+isa_ok($autodb,'Class::AutoDB','class is Class::AutoDB - sanity check');
+
+my($jane)=$autodb->get(collection=>'Person',name=>'Jane');
+report_fail
+  (ref $jane,'objects exist - probably have to rerun put script',__FILE__,__LINE__);
+# test contained objects before fetch
+my $mit=$jane->school;		# mit should be Oid
+ok_objcache($mit,'Oid','School','school starts as Oid',__FILE__,__LINE__);
+my @hobbies=@{$jane->hobbies};
+ok_objcache($hobbies[0],'Oid','Thing',
+	    '1st hobby starts as Oid', __FILE__,__LINE__);
+ok_objcache($hobbies[1],'Oid','Thing',
+	    '2nd hobby starts as Oid', __FILE__,__LINE__);
+# fetch, then retest contained objects
+my $ok=1;
+my $mit_name=eval {$mit->name;};
+if ($@) {
+  $ok&&=report_fail
+    (scalar $@=~/Trying to access deleted object of class \S+ via method name/,
+     "\$mit->name confessed but with wrong message: $@",__FILE__,__LINE__);
+  $ok&&=ok_objcache
+    ($mit,'OidDeleted','School',
+     '$mit->name did not fetch object',__FILE__,__LINE__,'no_report_pass');
+  report_pass($ok,'school fetched as OidDeleted');
+} else {
+  $ok&&=report_fail
+    (0,"\$mit->name was supposed to confess but did not",__FILE__,__LINE__);
+}
+my $ok=1;
+my $rowing_desc=eval {$hobbies[0]->desc;};
+if ($@) {
+  $ok&&=report_fail
+    (scalar $@=~/Trying to access deleted object of class \S+ via method desc/,
+     "\$rowing->desc confessed but with wrong message: $@",__FILE__,__LINE__);
+  $ok&&=ok_objcache
+    ($hobbies[0],'OidDeleted','Thing',
+     '$rowing->desc did not fetch object',__FILE__,__LINE__,'no_report_pass');
+  report_pass($ok,'1st hobby fetched as OidDeleted');
+} else {
+  $ok&&=report_fail
+    (0,"\$rowing->desc was supposed to confess but did not",__FILE__,__LINE__);
+}
+my $ok=1;
+my $go_desc=eval {$hobbies[1]->desc;};
+$ok&&=report_fail
+  (!$@,"\$go->desc was not supposed to confess but did with message: $@",
+     __FILE__,__LINE__);
+$ok&&=report_fail
+  ($go_desc eq 'go',
+   "desc method returned correct value. Expected 'go'. Got $go_desc",__FILE__,__LINE__);
+$ok&&=ok_objcache
+  ($hobbies[1],'object','Thing',
+     '\$rowing->desc did not fetch object',__FILE__,__LINE__,'no_report_pass');
+report_pass($ok,'2nd hobby fetched as object');
+
+done_testing();

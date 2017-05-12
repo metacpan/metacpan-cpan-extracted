@@ -1,0 +1,204 @@
+#!/usr/dim/bin/perl
+
+use lib "/usr/projects/CIPP3/lib";
+
+use strict;
+use FileHandle;
+use File::Basename;
+use File::Copy;
+use File::Find;
+use Getopt::Std;
+use Data::Dumper;
+
+use Cwd;
+use CIPP::Runtime::NewSpirit;
+
+$| = 1;
+
+my $COPYRIGHT = <<__EOC;
+cipp-link-static - Copyright (c) 2003 dimedis GmbH, All Rights Reserved
+__EOC
+
+my $USAGE = <<__EOU;
+
+Usage: cipp-link-static { [-r dir] | file ... }
+
+       -r dir     process recursively all files in the given directory
+       file ...   or link explicitly all given files
+
+       This program links all needed includes statically into
+       CIPP CGI programs.
+
+__EOU
+
+main: {
+	print $COPYRIGHT;
+
+	my %opt;
+	my $opt_ok = getopts ('r:', \%opt);
+	
+	my $rec_dir = $opt{r};
+	
+	if ( not $opt_ok or ( $rec_dir and @ARGV ) or
+	     (not $rec_dir and not @ARGV ) ) {
+		print $USAGE;
+		exit 1;
+	}
+	
+	my $files;
+	if ( not $rec_dir ) {
+		$files = \@ARGV;
+	} else {
+		my @files;
+		find ( sub {
+			push @files, $File::Find::name
+				if $File::Find::name =~ /\.cgi$/;
+		}, $rec_dir );
+		$files = \@files;
+	}
+
+	foreach my $file ( @{$files} ) {
+		copy ( $file, "$file.bak" ) if not -f "$file.bak";
+		print "\n* linking $file ";
+		link_static ( file => $file);
+	}
+
+	print "\n";
+	
+}
+
+sub link_static {
+	my %par = @_;
+	my ($file) = @par{'file'};
+
+	my $cwd = cwd();
+	$0 = "$cwd/$file";	# NewSpirit::Project->init uses $0
+
+	my $tmp_file = "$file.tmp";
+
+	my $read_fh  = FileHandle->new;
+	open ($read_fh, $file)         or die "can't read $file";
+
+	my $project;
+	my $request;
+	my %inserted_includes;
+	my $insert_include_code;
+	my $line;
+	
+	# read input file and collect include code
+
+	while (<$read_fh>) {
+		# collect already inserted includes
+		if ( /CIPP::Runtime::Request->add_include_subroutine/ ) {
+			# parse file
+			$line = <$read_fh>;
+			my ($file) = $line =~ /=>\s+['"](.*?)['"]/;
+			$inserted_includes{$file} = 1;
+			next;
+		}
+
+		# init project
+		if ( /CIPP::Runtime::NewSpirit::Project->init/ ) {
+			# parse project name
+			$line = <$read_fh>;
+			my ($project_name) = $line =~ /=>\s+['"](.*?)['"]/;
+
+			# parse back_prod_path
+			$line = <$read_fh>;
+			my ($back_prod_path) = $line =~ /=>\s+['"](.*?)['"]/;
+
+			CIPP::Runtime::NewSpirit::Project->init (
+			        project        => $project_name,
+			        back_prod_path => $back_prod_path,
+			);
+
+			$project = CIPP::Runtime::NewSpirit::Project->handle (
+				project => $project_name,
+			);
+			next;
+		}
+
+		# create request object
+		if ( /_cipp_project->new_request/ ) {
+			# parse program name
+			$line = <$read_fh>;
+			my ($program_name) = $line =~ /=>\s+['"](.*?)['"]/;
+
+			$request = $project->new_request (
+				program_name => $program_name,
+				mime_type    => "text/html",
+			);
+			next;
+		}
+
+		# collect includes
+		if ( /request->call_include_subroutine/ ) {
+			# parse file
+			$line = <$read_fh>;
+			my ($file) = $line =~ /=>\s+['"](.*?)['"]/;
+			next if $inserted_includes{$file};
+			$inserted_includes{$file} = 1;
+			my $full_path = $request->resolve_inc_filename (
+				file => $file,
+			);
+			my $fh = FileHandle->new;
+			open ($fh, $full_path) or die "can't read $full_path";
+			my $perl_code;
+			while ( <$fh> ) {
+				last if /^sub/;
+			}
+			$perl_code = $_;
+			while ( <$fh> ) {
+				$perl_code .= $_;
+			}
+			close $fh;
+			$insert_include_code .=
+				"\n".
+				"CIPP::Runtime::Request->add_include_subroutine (\n".
+				"\tfile => '$file',\n".
+				"\tcode => $perl_code".
+				");\n";
+			print ".";
+		}
+	}
+
+	chdir $cwd;
+
+	if ( $insert_include_code ) {
+		my $write_fh = FileHandle->new;
+		open ($write_fh, ">$tmp_file") or die "can't write $tmp_file";
+
+		# insert include code somewhere at the top of the file
+		seek ($read_fh, 0, 0);
+
+		my $code_inserted;
+		while ( <$read_fh> ) {
+			if ( not $code_inserted and /^\$_cipp_project->new_request/ ) {
+				print $write_fh $_;
+				my $line = <$read_fh>;
+				print $write_fh $line;
+				$line = <$read_fh>;
+				print $write_fh $line;
+				$line = <$read_fh>;
+				print $write_fh $line;
+				print $write_fh $insert_include_code;
+				$code_inserted = 1;
+				next;
+			}
+			print $write_fh $_;
+		}
+		
+		close $write_fh;
+		close $read_fh;
+		
+		rename ($tmp_file, $file);
+		chmod 0775, $file;
+		link_static ( file => $file );
+	} else {
+		close $read_fh;
+	}
+
+	1;
+}
+
+1;

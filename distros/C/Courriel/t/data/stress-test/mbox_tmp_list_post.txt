@@ -1,0 +1,95 @@
+From catalyst-bounces@lists.rawmode.org  Fri Jan  6 10:33:24 2006
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by smtp.mazrmail.com (8.12.11/8.12.11) with ESMTP id k06GXNVv008488
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Fri, 6 Jan 2006 10:33:24 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EuuMf-00052H-Hc; Fri, 06 Jan 2006 17:22:53 +0100
+Received: from nproxy.gmail.com ([64.233.182.201])
+        by rawmode.org with esmtp (Exim 4.52) id 1EuuMc-0002wF-B0
+        for catalyst@lists.rawmode.org; Fri, 06 Jan 2006 17:22:50 +0100
+Received: by nproxy.gmail.com with SMTP id o25so1276103nfa
+        for <catalyst@lists.rawmode.org>; Fri, 06 Jan 2006 08:29:29 -0800 (PST)
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=beta; d=gmail.com;
+        h=received:message-id:date:from:to:subject:in-reply-to:mime-version:content-type:content-transfer-encoding:content-disposition:references;
+        b=IGpoedvVJI6lY4VdTP4CaVuTqRb44RVmYaKwSCQDYjhMsTm3ns5QZy9vH8ID9SSHjoSdJU55+O5Vhlgco6QwvZtoxie+tNJUBsJaGfsHO6wOs3ShuOnudKD7L6AiEdBa07/2p+2d/Y9F+qQaVHJ3KvvCYhj+QJbomKRlWTZFLn8=
+Received: by 10.48.30.17 with SMTP id d17mr765926nfd;
+        Fri, 06 Jan 2006 08:29:27 -0800 (PST)
+Received: by 10.48.42.12 with HTTP; Fri, 6 Jan 2006 08:29:27 -0800 (PST)
+Message-ID: <3390cd220601060829y34db5d25t@mail.gmail.com>
+Date: Fri, 6 Jan 2006 17:29:27 +0100
+From: Bernard FRIT <bernard.frit@gmail.com>
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+Subject: Re: [Catalyst] View::TT FILTERS and utf-8
+In-Reply-To: <4f352aae0601060732r6e61bab9x@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Disposition: inline
+References: <25861274-FBBF-4223-A4EB-DE59EB39579B@simplicidade.org>
+        <11A4821D-78DB-11DA-BF33-000A95719C94@sedition.com>
+        <3390cd220601060640q1c24d653u@mail.gmail.com>
+        <4f352aae0601060732r6e61bab9x@mail.gmail.com>
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Content-Transfer-Encoding: 8bit
+X-MIME-Autoconverted: from quoted-printable to 8bit by smtp.mazrmail.com id k06GXNVv008488
+
+2006/1/6, Carl Franks <fireartist@gmail.com>:
+> > The problem occurs only when using mod_perl.
+>
+> I suggest you view the pages using a tool which lets you view the full
+> response header, as well  as the body - it sounds like apache might be
+> adding an encoding header that is messing things up.
+>
+> Compare the response header between responses from mod_perl and the
+> standalone server (or some other webserver).
+
+mod-perl header :
+
+Date: Fri, 06 Jan 2006 16:23:25 GMT
+Server: Apache/1.3.33 (Unix) mod_perl/1.29 mod_gzip/1.3.19.1a
+PHP/4.3.10 mod_ssl/2.8.22 OpenSSL/0.9.6m
+X-Catalyst: 5.61
+Set-Cookie: session=bdd8c9d3a5a5d333d072bfeff7f27af874ff101e8d7529d3804c92c55475300e;
+path=/; expires=Fri, 06-Jan-2006 17:23:25 GMT
+Content-Length: 25944
+Keep-Alive: timeout=15, max=99
+Connection: Keep-Alive
+Content-Type: text/html;
+
+200 OK
+
+builtin server :
+
+Connection: close
+Date: Fri, 06 Jan 2006 16:22:59 GMT
+Content-Length: 27091
+Content-Type: text/html;
+path=/; expires=Fri, 06-Jan-2006 17:22:59 GMT
+Status: 200
+X-Catalyst: 5.61
+
+200 OK
+
+I can't figure out any significant difference.
+--
+Bernard FRIT
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst
+

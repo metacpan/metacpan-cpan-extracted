@@ -1,0 +1,58 @@
+{
+   "openid" : null,
+   "country" : "IL",
+   "profile" : [
+      {
+         "id" : "123",
+         "name" : "act"
+      },
+      {
+         "id" : "afoxon_stack",
+         "name" : "stackoverflow"
+      },
+      {
+         "id" : "afoxon_irc",
+         "name" : "irc"
+      },
+      {
+         "id" : "afoxon_git",
+         "name" : "github"
+      },
+      {
+         "id" : "afoxon_link",
+         "name" : "linkedin"
+      },
+      {
+         "id" : "afoxon_monk",
+         "name" : "perlmonks"
+      },
+      {
+         "id" : "afoxon_tweet",
+         "name" : "twitter"
+      }
+   ],
+   "website" : [
+      "http://afoxon.com/"
+   ],
+   "donation" : [
+      {
+         "name" : "paypal",
+         "id" : "afoxon@pp.com"
+      }
+   ],
+   "region" : null,
+   "blog" : [
+      {
+         "feed" : [
+            "http://afoxon.com/blog.rss"
+         ],
+         "url" : [
+            "http://afoxon.com/"
+         ]
+      }
+   ],
+   "email" : [
+      "afoxon@gmail.com"
+   ],
+   "city" : "Perlistan"
+}

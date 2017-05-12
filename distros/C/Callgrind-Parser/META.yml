@@ -1,0 +1,28 @@
+---
+abstract: 'Parses Callgrind output file into a hashref representing the call tree of the source program'
+author:
+  - 'Dave Mueller <dave@perljedi.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Spec: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Callgrind-Parser
+requires:
+  Carp: '0'
+  Exporter: '0'
+  base: '0'
+  perl: v5.14.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/perljedi/callgrind-parser
+  repository: https://github.com/perljedi/callgrind-parser.git
+version: '0.002'

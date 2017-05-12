@@ -1,0 +1,55 @@
+			ClearCase::Region Version 1.00
+
+Copyright (c) 2003 Les Paul.
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+The documentation for this extension can be found in the docs directory.
+Please read this documentation to understand how to make these extensions
+work in your environment.
+
+The Log::Log4perl module must be installed to used these extensions.
+
+To configure this module, cd to the directory that contains this README file
+and type the following:
+
+	perl Makefile.PL
+
+Alternatively, if you plan to install ClearCase::region somewhere other than
+your system's perl library directory. You can type something like this:
+
+	perl Makefile.PL PREFIX=/home/me INSTALLDIRS=perl
+
+Then to build you run make.
+
+	make
+
+You can then test the module by typing:
+
+	make test
+
+If you have write access to the installation directories, you may then
+install by typing:
+
+	make install
+
+There are some sample programs in the examples directory.
+This directory contains the Region.cfg and Vob.cfg sample files that must
+be customized for your ClearCase environment (see docs).
+The Region.cfg and Vob.cfg files should be installed in one of the @INC
+directories.
+Assuming your current directory is examples, you can test your install
+by executing:
+
+    perl -I. Region_test
+
+or
+
+	perl -I. Vob_test
+
+The scripts in the examples directory use Log4perl configuration files that
+get installed along with the modules.  These configuration files are
+co_backup.conf, main_cos.conf, Region_test.conf and Vob_test.conf.  These
+*.conf files will create a log named 'test.log' in the current directory
+whenever the corresponding script is executed.

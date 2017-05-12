@@ -1,0 +1,9 @@
+[%# YUI logger %]
+ [% IF c.config.yui_logger %]
+ <div id="yuiLogger" style="padding-left:2em;font-size:100%;width:90%"></div>
+ <script type="text/javascript">
+  /* <![CDATA[ */
+ var myLogReader = new YAHOO.widget.LogReader("yuiLogger", { width:'400px' });
+  /* ]]> */
+ </script>
+ [% END %]

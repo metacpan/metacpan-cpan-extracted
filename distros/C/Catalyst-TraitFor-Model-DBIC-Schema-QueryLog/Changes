@@ -1,0 +1,10 @@
+Revision history for Perl extension Catalyst-TraitFor-Model-DBIC-Schema-QueryLog
+
+0.03    2010.01.13
+        querylog_args (RT 53634)
+
+0.02    2009.06.17
+        POD fix
+
+0.01    2009.06.16
+        a start

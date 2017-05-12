@@ -1,0 +1,37 @@
+NAME
+    Class::DBI::Sweet::More - More sweet Class::DBI::Sweet
+
+SYNOPSIS
+        package MyApp::DBI;
+        use base 'Class::DBI::Sweet::More'; # change from Class::DBI::Sweet
+
+        ...
+
+        # LEFT OUTER JOIN
+        MyApp::CD->has_many(tags => 'MyApp::Tag', {join_type => 'LEFT'});
+        MyApp::CD->might_have(liner_notes
+            => 'MyApp::LinerNotes' => qw/notes/)->{args}{join_type} = 'LEFT';
+
+        # This is selected not to have tags.
+        my @cds = MyApp::CD->search({'tags' => undef});
+
+        # This succeeds even without liner_notes.
+        my ($cd) = MyApp::CD->search( { ... },
+                           { prefetch => [ qw/liner_notes/ ] } );
+
+        # This is selected to have tags of Blue and Cheesy.
+        my @cds = MyApp::CD->search({'tags.tag' => {-and => [qw/ Blue Cheesy /]} });
+
+DESCRIPTION
+    Class::DBI::Sweet::More provides OUTER JOIN (and has_many table's search
+    option '-and') to "Class::DBI::Sweet".
+
+AUTHOR
+    ASAKURA Takuji, "<asakura.takuji+cpan at gmail.com>"
+
+COPYRIGHT & LICENSE
+    Copyright 2006 ASAKURA Takuji, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,77 @@
+Calendar::List
+==============
+
+DESCRIPTION
+
+This distribution consists of two modules, Calendar::List and
+Calendar::Functions.
+
+Calendar::List is intended to be used to return a simple list, hash or
+scalar of calendar dates. This is achieved by the use of two functions,
+calendar_list and calendar_selectbox. The former allows a return of a
+list of dates and a hash of dates, whereas the later returns a scalar
+containing a HTML code snippet for use as a HTML Form field select box.
+
+Calendar::Functions is intended to provide numerous support functions
+for other date and/or calendar functions, which are also used by
+Calendar::List.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Clone
+  Tie::IxHash
+
+The distribution requires at least one of the following modules:
+
+  Time::Local
+  Date::ICal
+  DateTime
+
+For epoch printing the distribution requires:
+
+  Time::Piece
+
+For testing purposes, the following modules are desirable, but not essential:
+
+  Test::Pod
+  Test::Pod::Coverage
+  Pod::Coverage
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-List
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT AND LICENSE
+
+Copyright © 2003-2014 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

@@ -1,0 +1,16 @@
+---
+name: CGI-Dispatcher-Simple
+version: 0.01
+author:
+  - Daisuke Murase <typester@cpan.org>
+abstract: Simple CGI Dispacher by PATH_INFO
+license: perl
+requires:
+  CGI: 0
+  Carp: 0
+  Class::Accessor::Fast: 0
+provides:
+  CGI::Dispatcher::Simple:
+    file: lib/CGI/Dispatcher/Simple.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

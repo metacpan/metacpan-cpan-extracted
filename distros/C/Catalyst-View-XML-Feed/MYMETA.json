@@ -1,0 +1,57 @@
+{
+   "abstract" : "Catalyst view for RSS, Atom, or other XML feeds",
+   "author" : [
+      "Mark A. Stratman <stratman@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-XML-Feed",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.80015",
+            "Catalyst::Test" : "0",
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Scalar::Util" : "0",
+            "XML::Feed" : "0.43",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mstratman/Catalyst-View-XML-Feed.git"
+      }
+   },
+   "version" : "0.08"
+}

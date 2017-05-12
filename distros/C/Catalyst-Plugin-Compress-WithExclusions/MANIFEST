@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/Catalyst/Plugin/Compress/WithExclusions.pm
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

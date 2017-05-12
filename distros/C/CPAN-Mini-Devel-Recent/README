@@ -1,0 +1,62 @@
+NAME
+    CPAN::Mini::Devel::Recent - Create CPAN::Mini mirror with recent
+    developer releases
+
+VERSION
+    version 0.07
+
+SYNOPSIS
+        $ minicpan -c CPAN::Mini::Devel::Recent
+
+DESCRIPTION
+    CPAN::Mini::Devel::Recent is similar to CPAN::Mini::Devel, except it
+    uses the "RECENT-*" index files on CPAN, which are updated more
+    frequently than the "indices/find-ls.gz" file that CPAN::Mini::Devel
+    uses.
+
+    Normally, CPAN::Mini creates a minimal CPAN mirror with the latest
+    version of each distribution, but excluding developer releases (those
+    with an underscore in the version number, like 0.10_01).
+
+    CPAN::Mini::Devel::Recent enhances CPAN::Mini to include the latest
+    developer and non-developer release in the mirror. For example, if
+    Foo-Bar-0.01, Foo-Bar-0.02, Foo-Bar-0.03_01 and Foo-Bar-0.03_02 are on
+    CPAN, only Foo-Bar-0.02 and Foo-Bar 0.03_02 will be mirrored. This is
+    particularly useful for creating a local mirror for smoke testing.
+
+    Unauthorized releases will also be included if they resemble a
+    distribution name already in the normal CPAN packages list.
+
+    There may be errors retrieving very new modules if they are indexed but
+    not yet synchronized on the mirror.
+
+USAGE
+    See CPAN::Mini.
+
+SEE ALSO
+    * CPAN::Mini * CPAN::Mini::Devel
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/CPAN-Mini-Devel-Recent/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/CPAN-Mini-Devel-Recent>
+
+      git clone https://github.com/dagolden/CPAN-Mini-Devel-Recent.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

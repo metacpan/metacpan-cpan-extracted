@@ -1,0 +1,56 @@
+Revision History for Captcha-noCAPTCHA
+======================================
+
+v0.14 2016-12-27
+----------------
+
+commit 0473f3fa9bc23320409377f43053acd75f86e1d4
+Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+    Auto generate MANIFEST file using dzil plugin [Manifest]
+
+commit 8ddab9a8a385fcd2a4815740f3c7a24bf0f6687b
+Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+    Auto generate META.yml file using dzil plugin [MetaYAML]
+
+v0.13 2016-12-26
+----------------
+
+commit 4c6f914132ade87f99306e2584c736087ad3d06a
+Author: Chuck Larson <chuck@chlarson.com>
+
+    updated README.md
+
+commit c74d94cc779ecfe2a16bc4aa0bcb7b756fe3643a
+Author: Michael Schout <mschout@gkg.net>
+
+    add response() accessor that returns most recent response
+
+v0.12 2016-02-25
+----------------
+
+commit e811739b884708481f5b1753a0d4f2eac54ffa8b
+Author: Chuck Larson <chuck@chlarson.com>
+
+    Added noscript option to README.md
+
+commit 5f9b552407777b1966297b3affadae556200fecc
+Merge: be007ac 4b25001
+Author: Chuck Larson <chuck-github@chlarson.com>
+
+    Merge pull request #4 from adamherzog/add-noscript-option
+
+commit 4b25001576e6bb8fc7832307a447b1ae966d8f4f
+Author: Adam Herzog <adam@adamherzog.com>
+
+    Add noscript option and rendering.
+
+commit b8cce68b184c61c85c7b6b714cd29f14c723ad52
+Author: Adam Herzog <adam@adamherzog.com>
+
+    Fix incorrect cmp_ok() test; replace with is().
+
+===================================
+End of changes in the last 365 days
+===================================

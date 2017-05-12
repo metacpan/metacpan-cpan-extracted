@@ -1,0 +1,32 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Grid with DirectStore Example</title>
+
+    <link rel="stylesheet" type="text/css" href="http://extjs.cachefly.net/ext-3.3.1/resources/css/ext-all.css" />
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="http://extjs.cachefly.net/ext-3.3.1/ext-all.js"></script>
+    <script type="text/javascript" src="/api/src"></script>
+    <script type="text/javascript" src="/static/App.js"></script>
+    <script type="text/javascript" src="/static/writer.js"></script>
+    <script type="text/javascript" src="/static/UserForm.js"></script>
+    <script type="text/javascript" src="/static/UserGrid.js"></script>
+
+    <!-- Common Styles for the examples -->
+    <link rel="stylesheet" type="text/css" href="/static/examples.css" />
+    <link rel="stylesheet" type="text/css" href="/static/silk.css" />
+</head>
+<body>
+<h1>Ext.data.DirectStore Example</h1>
+<p>This example shows how to implement a Writer for your Store.  A Writer-enabled Store frees you from having to manually compose Ajax requests
+to perform CRUD actions on a Store.</p>
+<p>Note that the js is not minified so it is readable. See <a href="/static/writer.js">writer.js</a>, <a href="/static/UserForm.js">UserForm.js</a> and
+<a href="/static/UserGrid.js">UserGrid.js</a>.</p>
+
+<div class="container" style="width:500px">
+    <div id="user-form"></div>
+    <div id="user-grid"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+=head1 IMPORTANT NOTE
+
+THIS module is called "ClearCase::Argv". There is a DIFFERENT module
+called simply "Argv". ClearCase::Argv depends on (requires) Argv. More
+precisely, ClearCase::Argv is a subclass of Argv. Therefore, you must
+download and install BOTH in order for ClearCase::Argv to work.  This
+naming has confused quite a few people so I highlight it here.
+
+=head1 README
+
+Though ClearCase::Argv is itself pretty small, it represents the
+I<"Grand Unification"> of some of my other ClearCase-related modules.
+The module itself is fully documented in the standard POD format; this
+file is an accompanying overview and chronology.
+
+=head1 SUMMARY OF FEATURES
+
+=over 4
+
+=item * Interoperability/Portability
+
+Using B<ClearCase::Argv> can enhance portability of scripts between
+UNIX and Windows by providing versions of I<system>, I<exec>, and I<qx>
+(aka backquotes) which behave the same on Windows as on UNIX.  Ok,
+almost the same. This includes automatically quoting arguments to
+protect them from the C<cmd.exe> shell, automatically converting
+/-separated pathnames to \, etc. These features can keep a lot of hair
+out of your script (and on your head).
+
+=item * Optional Co-Process for Speed
+
+For any script which uses ClearCase::Argv, the 'ipc' class method
+
+	ClearCase::Argv->ipc;
+
+will start B<cleartool> as a co-process and arrange to send all
+subsequent system/exec/qx commands to it instead of forking a new child
+process each time. This can speed up scripts by anywhere between 1
+(i.e. not at all) and 10 times by my measurements.
+
+=item * CtCmd Interface for Speed
+
+As an alternative to IPC mode, ClearCase::Argv can also be told to
+process commands via B<ClearCase::CtCmd>.
+
+=item * Convenience Features
+
+Many convenience features are provided by the replacement
+system/exec/qx functions. These include:
+
+    1. 'autochomp' mode (chomps lines automatically, natch)
+    2. 'autofail' mode (exit on child process failure)
+    3. 'noexec' mode (print cmds without executing, like make -n)
+    4. 'xargs' mode (breaks up long cmd lines to avoid system limits)
+
+plus a few more.
+
+=item * No Major Investment
+
+It's easy to convert an existing script to use ClearCase::Argv or
+back.  Just add a 'use ClearCase::Argv' line and change all instances
+of backquotes to C<qv()> and remove any existing Win32-porting hackery.
+To go back to native style, either change C<qv()> to C<qx()>
+(I<backquotes are generally deprecated in favor of qx anyway>), or add
+a line like:
+
+	sub qv { qx(@_) }
+
+And remove the 'use ClearCase::Argv' line of course.
+
+=item * Option Processing
+
+There's a great deal of option-processing power inherited from the
+base class, much more in fact than most users will care about. Look
+in the PODs for more.
+
+=item * Cygwin Support
+
+Version 1.43 introduces experimental support for Cygwin on Windows
+platforms. This is meant to be installed on the Cygwin perl, and
+used under it (and not the Windows installation of perl).
+
+The new support concerns the conversion of paths between Windows
+and Cygwin syntaxes, as well as the standardization of end-of-lines
+conventions.  It is particularly useful under a ClearCase::Wrapper.
+
+On Windows, cleartool uses, for interactive functions, devices which
+are not supported on cygwin terminals. Interactive behaviours will
+thus appear to 'hang', and should therefore be avoided. Wrappers may
+work around most, but not all, cases.
+
+Cygwin support implies a post-processing of cleartool output. Over
+I<exec>, this is only supported in the I<ipc> mode.
+
+=back
+
+=head1 CHRONOLOGY
+
+=head2 IPC::ClearTool
+
+I wrote B<IPC::ClearTool> to manage B<cleartool> as a co-process for
+reasons of speed. I.e. instead of doing a fork/exec for each
+B<cleartool> command it forks just one process in the background and
+sends all B<cleartool> commands down to it. This is much (possibly up
+to 10 times) faster.  Unfortunately B<IPC::ClearTool> suffered from a
+few paradigmatic flaws:
+
+=over 4
+
+=item *
+
+It didn't work on Windows, where there's no such thing as a fork or
+a true "child" process.
+
+=item *
+
+The interface was/is strange and a little clunky. Not too surprising
+considering that UNIX requires 3 different APIs C<(system, exec, and
+backquotes)> to handle child processes; jamming all that functionality
+into one API is awkward.
+
+=item *
+
+Due to the above, any script written to the B<IPC::ClearTool> API was
+non-portable to Windows and hard to convert back to traditional
+system/exec/qx. Thus converting an existing tool to B<IPC::ClearTool>
+required a substantial commitment of time, and using it at all meant a
+substantial commitment of faith.
+
+=back
+
+I was able to "port" C<IPC::ClearTool> to Windows by calling in to the
+ClearCase Automation Library (CAL), a COM interface first available in
+ClearCase 4.0.  But the other issues remained, until ...
+
+=head2 Argv
+
+I also had a ClearCase/Perl module called B<ClearCase::Ct>.  This was a
+wrapper that ran on top of B<cleartool> to extend its functionality
+and/or allow site policies to be established at the wrapper level. But
+it suffered from an ugly programming model too (do we sense a trend
+here?). In particular it was necessary to do lots of shifting,
+grepping, splicing, and quoting of @ARGV, leading to terribly
+spaghetti-like code in places, especially when you throw in the need
+for UNIX/Windows portability and different shell-quoting rules. So
+extensions written to the B<ClearCase::Ct> "API" tended to resemble a
+nest of ifdefs.
+
+So I set out to rewrite C<ClearCase::Ct>. The first step was to write a
+support module (eventually called B<Argv>) to hide all the @ARGV
+machinations under an OO interface. Argv has plenty of its own docs so
+I won't go into it here, but suffice it to say it provides lots of ways
+to slice and dice an arg vector.  In fact it provides much more parsing
+power than almost anyone would ever need, so while this was its
+original reason for existence it's the least interesting to most.
+
+However, B<Argv> also has I<execution methods>, i.e. you can execute
+your Argv object via C<$obj->system()> or C<$obj->qx()>. Handling
+platform differences (quoting, pathname separators, etc.) in B<Argv>
+seemed like a natural extension, so I added that. This lead to
+convenience methods like C<$obj->autochomp> (should be obvious) and
+C<$obj->qxargs> (implements xargs-like behavior to ensure that system
+limits aren't exceeded), etc.
+
+At this point I realized that though the parsing features had a tiny
+constituency, the portability abstraction of the I<execution methods>
+might be of interest to more users. So in order to make that more
+accessible I added a B<functional interface>, allowing the single line
+
+    use Argv qw(system exec qv);
+
+to overrride the Perl builtins with Argv's relatively platform-
+independent versions. Note: I<qv> is used because Perl doesn't allow
+C<qx()>, which is itself a synonym for backquotes, to be overridden.
+Bottom line, adding the above line - plus converting C<`cmd`> to
+C<qv("cmd")> - buys a lot of UNIX/Win32 portability.
+
+I eventually did get around to rewriting I<ClearCase::Ct>; the
+new module is called B<ClearCase::Wrapper>.
+
+=head2 ClearCase::Argv
+
+Note that B<Argv> itself has nothing to do with ClearCase. So I made a
+little subclass of B<Argv> to tune it for use with B<cleartool>, since I
+write a lot of Perl/ClearCase code.  Originally, B<ClearCase::Argv>
+simply extended B<Argv> to prepend the word "cleartool" to all arg
+vectors. Thus, while
+
+    Argv->new('ls', -l');
+
+represents an C<"ls -l"> command,
+
+    ClearCase::Argv->new('ls', -l')->system;
+
+would run C<"cleartool ls -l">, and it understands that the 'program' part
+of the command line is "cleartool ci" (or more properly qw(cleartool ci)).
+
+The I<functional interface> of I<Argv> is exposed through
+B<ClearCase::Argv>, and it's also extended to support methods called
+B<ctsystem(), ctexec(), and ctqx()> which automatically prepend
+'cleartool'. E.g.:
+
+	my @views = ccqx(lsview -s);
+
+Attributes can be set through the functional interface like this:
+
+	my @views = ccqx({autochomp=>1, dbglevel=>0}, lsview -s);
+
+=head1 GRAND UNIFICATION
+
+Then one day I got an email question from Mark Scandariato of
+Lucent:
+
+    Do you have any plan to use IPC-ClearTool within ClearCase-Ct? (I'd
+    hate to duplicate anything already underway.)
+
+I replied that I didn't but it got me to thinking about whether
+C<ClearCase::Argv> could be taught to send its commands to a
+co-process.  A few days later I got a chance to play with it and it
+came together with surprising ease. This is the big connection that
+makes it all pretty neat, IMHO, since you get improved speed,
+portability, and ease of use in one package. Without having to make a
+major commitment of rewriting code.
+
+Then, years later, I found a way to achieve the same co-process
+capability without needing the IPC::ClearTool module. This is way
+simpler and easier to maintain, and proves the value of the
+ClearCase::Argv abstraction layer since the change was achieved without
+affecting users. At this point IPC::ClearTool is obsolete, though I
+have not yet removed it from CPAN since some people still use it.
+
+So, bottom line, C<ClearCase::Argv> now can be told to execute
+cleartool commands via the traditional C<process spawning> model OR via
+the specialty APIs (B<IPC> or B<ClearCase::CtCmd>).  Writing to the
+ClearCase::Argv API sets you free from that decision until runtime.
+
+=head1 TESTING
+
+Some regression testing cases were extracted from the main test.pl, which
+is meant as a fast smoke test, into an C<r> sub-directory.
+
+They are accessible one by one with e.g.:
+C<make test TEST_FILE=r/setup>
+or better: C<perl -Mblib r/cygwin>

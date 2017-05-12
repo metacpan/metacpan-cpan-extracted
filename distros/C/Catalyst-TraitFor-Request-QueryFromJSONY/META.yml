@@ -1,0 +1,26 @@
+---
+abstract: 'Support deeply structured Query parameters using JSONY'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst::Test: '0'
+  Data::Dumper: '0'
+  HTTP::Request::Common: '0'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-TraitFor-Request-QueryFromJSONY
+requires:
+  JSONY: '0'
+  Moo: '2.000002'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-TraitFor-Request-QueryFromJSONY/issues
+  homepage: https://github.com/jjn1056/Catalyst-TraitFor-Request-QueryFromJSONY
+  repository: https://github.com/jjn1056/Catalyst-TraitFor-Request-QueryFromJSONY.git
+version: '0.002'

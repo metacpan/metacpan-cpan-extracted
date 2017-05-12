@@ -1,0 +1,12 @@
+2010-08-26 - 0.04
+    * Use native traits instead of MX::AttributeHelpers (Pedro Melo).
+
+2009-07-06 - 0.03
+    * Turn it into a proper role.
+
+2009-06-27 - 0.02
+    * added 'Module::Find' to test requisites
+
+2009-05-20 - 0.01
+    * Initial release
+

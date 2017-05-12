@@ -1,0 +1,109 @@
+NAME
+    Convert::AnyBase - Convert (encode/decode) numbers to and from an
+    arbitrary base
+
+VERSION
+    Version 0.010
+
+SYNOPSIS
+        use Convert::AnyBase
+
+        # A hex encoder/decoder
+        my $hex = Convert::AnyBase->new( set => '0123456789abcdef', normalize => sub { lc } )
+        $hex->encode( 10 )  # a
+        $hex->encode( 100 ) # 64
+        $hex->decode( 4d2 ) # 1234
+
+        # A Crockford encoder/decoder (http://www.crockford.com/wrmg/base32.html)
+        Convert::AnyBase->new( set => ( join '', 0 .. 9, 'a' .. 'h', 'j', 'k', 'm', 'n', 'p' .. 't', 'v', 'w', 'x', 'y', 'z' ),
+            normalize => sub { s/[oO]/0/g; s/[iIlL]/1/g; lc }, # o, O => 0 / i, I, l, L => 1
+        )
+
+DESCRIPTION
+    Convert::AnyBase is a tool for converting numbers to and from arbitrary
+    symbol sets.
+
+USAGE
+  $converter = Convert::AnyBase->new( ... )
+    Create a new converter for the given base. The arguments are:
+
+        set     A string representing the base 'alphabet'. Each character is a different symbol for the base.
+                The length of the string is the base of the system. The 0-value is the first character, the
+                1-value is the second character, etc. For example, hexadecimal would be represented by the following:
+        
+                '0123456789abcdef'
+
+        normalize   A code reference for normalizing a string before decoding. The code should operate on $_
+                    and return the sanitized string. The normalizer can be used to consistently lowercase, 
+                    uppercase, or canocalize input, etc. A normalizer for Crockford (base 32):
+                
+                    sub {
+                            s/[oO]/0/g;     # Translate o/O to 0
+                            s/[iIlL]/1/g;   # Translate i/I/l/L to 1
+                            lc;             # Lowercase and return the result
+                        }
+
+  $string = $converter->encode( <number> )
+    Encode <number> into a string
+
+  $number = $converter->decode( <string> )
+    Decode <string> into a number
+
+  Convert::AnyBase->hex
+    A hex converter
+
+  Convert::AnyBase->decimal
+    A decimal (string) converter
+
+  Convert::AnyBase->crockford
+    A Crockford converter
+
+SEE ALSO
+    Encode::Base32::Crockford
+
+    Convert::BaseN
+
+    Math::BaseCnv
+
+    Math::NumberBase
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-convert-anybase at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Convert-AnyBase>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Convert::AnyBase
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-AnyBase>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Convert-AnyBase>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Convert-AnyBase>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Convert-AnyBase/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

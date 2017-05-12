@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::Khazad;
+
+my $key = pack "H32", "00112233445566778899aabbccddeeff";
+my $cipher = new Crypt::Khazad $key;
+
+print "blocksize : ", $cipher->blocksize, " bytes \n";
+print "keysize   : ", $cipher->keysize, " bytes \n";
+
+print "\n";
+
+my $plaintext1 = pack "H16", "0123456789abcdef";
+print "old plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1     : ", unpack("H*", $ciphertext1), "\n";
+
+my $decrypted1 = $cipher->decrypt($ciphertext1);
+print "new plaintext1  : ", unpack("H*", $decrypted1), "\n";
+
+print "\n";
+
+my $plaintext2 = pack "H16", "fedcba9876543210";
+print "old plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+my $ciphertext2 = $cipher->encrypt($plaintext2);
+print "ciphertext2     : ", unpack("H*", $ciphertext2), "\n";
+
+my $decrypted2 = $cipher->decrypt($ciphertext2);
+print "new plaintext2  : ", unpack("H*", $decrypted2), "\n";
+
+print "\n";
+
+my $anotherkey = "0123456789abcdef";   # must be 16 bytes long
+my $plaintext3 = "01234567";  # must be 8 bytes long
+
+print "old plaintext3  : $plaintext3\n";
+
+my $ciphertext3 = $cipher->encrypt($plaintext3);
+print "ciphertext3     : $ciphertext3\n";
+
+my $decrypted3 = $cipher->decrypt($ciphertext3);
+print "new plaintext3  : $decrypted3\n";
+

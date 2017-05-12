@@ -1,0 +1,60 @@
+NAME
+    Class::Accessor::Fast::Contained - Fast accessors with data containment
+
+VERSION
+    This document refers to version 1.01 of Class::Accessor::Fast::Contained
+
+SYNOPSIS
+     package Foo;
+     use base qw(Class::Accessor::Fast::Contained);
+
+     # The rest is the same as Class::Accessor::Fast
+
+DESCRIPTION
+    This module does two things differently to the venerable
+    Class::Accessor::Fast :
+
+    *   Fields are stored at arms-length within a single hash value of
+        $self, rather than directly in the $self blessed referent.
+
+    *   "new()" allows mixin into an existing object, rather than creating
+        and returning a new blessed hashref. To do this, just call something
+        like:
+
+         my $self = Some::Other::Class->new;
+         $self = $self->Class::Accessor::Fast::Contained::new;
+
+        Note that the mixin code only supports objects which use a blessed
+        hash reference or a blessed typeglob reference.
+
+        An alias "setup()" is available which does the same as "new()" but
+        might make more sense if being used in this way.
+
+DEPENDENCIES
+    Other than the standard Perl distribution, you will need the following:
+
+    *   Class::Accessor
+
+BUGS
+    If you spot a bug or are experiencing difficulties that are not
+    explained within the documentation, please send an email to
+    oliver@cpan.org or submit a bug to the RT system (http://rt.cpan.org/).
+    It would help greatly if you are able to pinpoint problems or even
+    supply a patch.
+
+SEE ALSO
+    Class::Accessor
+
+AUTHOR
+    Oliver Gorwits "<oliver.gorwits@oucs.ox.ac.uk>"
+
+ACKNOWLEDGEMENTS
+    Thanks to Marty Pauly and Michael G Schwern for Class::Accessor and its
+    tests, which I've shamelessly borrowed for this distribution.
+
+COPYRIGHT & LICENSE
+    Copyright (c) The University of Oxford 2008.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

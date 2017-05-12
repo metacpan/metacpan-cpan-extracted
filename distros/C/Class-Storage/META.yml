@@ -1,0 +1,25 @@
+---
+abstract: 'pack objects by removing blessing so they can be unpacked back'
+author:
+  - 'Peter Valdemar MÃ¸rch <peter@morch.com>'
+build_requires:
+  Clone: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Storage
+provides:
+  Class::Storage:
+    file: lib/Class/Storage.pm
+    version: '0.03'
+requires:
+  perl: '5.010'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: '0.03'

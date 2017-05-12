@@ -1,0 +1,74 @@
+Classgen-3.03						(12/2000)
+
+Purpose:
+========
+Simplifies creation, manipulation and usage of complex objects.
+
+Benefits:
+=========
+	* you can focus completely on the intended functions of your object
+	
+	* objects are stored in separate ASCII-files (<file>.pm and <file>_gs.pm)
+	* objects can be edited later
+	* specifying objects instance variables is enough 
+	  to implement basic functionality
+	  
+	* structures for inheritance are prepared by default
+	* a perldoc skelton is provided for each object
+	
+
+Description:
+===========
+classgen is a script that allows you to create a Perl-object from
+a simple control-file. In the control file you basically specify
+the internal instance-variables this object should have. classgen
+then generates ASCII-source code (package) for you, which contains:
+
+	* a new() - method with the variables blessed to an {}
+	* accessor- and manipulator-methods for all these variables
+	* a specific() - method; it serves as a skelton for you to
+	  edit further object-specific methods as you need them
+	* a perldoc-skelton at the end
+	
+3.03:	* accessor and manipulator methods are stored separated as _gs.pm files
+3.03:	* .pm and _gs.pm are saved into the /archive directory first
+3.03:	* if you created a MANIFEST file via h2xs, the _gs.pm file is added 
+3.03:	* the version is set to 1.00 automatically	
+
+
+Installation:
+=============
+To install classgen 'gunzip' and 'tar xvf' the .gz file in a directory
+of your choice. Next run from this directory:
+
+	perl Makefile.PL
+	make
+	make install (as root)
+
+There are a few examples in examples/ which include how to extend the 
+generated object for inheritance from base-classes.
+
+
+Examples:
+=========
+The /examples directory provides code and explainations on:
+
+	* how to get started
+	* how to implement inheritance with classgen
+	* how to introduce different peanuts-characters by inheritance
+	* how to establish associations between different classes
+
+
+In the spirit of UML,
+Michael Schlueter	email: mschlue@cpan.org
+
+------------------------------------------------------------------------
+
+Feedback given on Classgen-3.01:
+
+Hi, Michael,
+ 
+Thanks for the wonderful "classgen" utility, it saves
+me a lot of typing. (...)
+
+Lieting Yu (lieting@mailconcept.com)   28.6.2000

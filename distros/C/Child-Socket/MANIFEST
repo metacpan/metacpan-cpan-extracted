@@ -1,0 +1,12 @@
+Build.PL
+lib/Child/IPC/Socket.pm
+lib/Child/Link/IPC/Socket.pm
+lib/Child/Link/IPC/Socket/Parent.pm
+lib/Child/Link/IPC/Socket/Proc.pm
+lib/Child/Socket.pm
+MANIFEST			This list of files
+META.yml
+README
+t/Import.t
+t/Socket.t
+META.json

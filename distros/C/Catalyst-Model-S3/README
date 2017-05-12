@@ -1,0 +1,94 @@
+NAME
+    Catalyst::Model::S3 - Catalyst model for Amazon's S3 web service
+
+SYNOPSIS
+        # Use the helper to add an S3 model to your application...
+        script/myapp_create.pl create model S3 S3
+        
+    
+    # lib/MyApp/Model/S3.pm
+        
+    package MyApp::Model::S3;
+        
+    use base qw/ Catalyst::Model::S3 /;
+        
+    __PACKAGE__->config(
+            aws_access_key_id     => 'your_access_key_id',
+            aws_secret_access_key => 'your_secret_access_key',
+            secure                => 0,  # optional: default 0  (false)
+            timeout               => 30, # optional: default 30 (seconds)
+        );
+        
+    1;
+        
+    
+    # In a controller...
+        my $s3 = $c->model('S3');
+        print ref($s3);  # Net::Amazon::S3
+
+DESCRIPTION
+    This is a Catalyst model class that interfaces with Amazon's Simple
+    Storage Service. See the Net::Amazon::S3 documentation for a description
+    of the methods available. For more on S3 visit:
+    <http://aws.amazon.com/s3>
+
+METHODS
+  ->new()
+    Instantiate a new Net::Amazon::S3 Model. See Net::Amazon::S3's new
+    method for the options available.
+
+  ACCEPT_CONTEXT
+    Return the Net::Amazon::S3 object. Called automatically via
+    "$c->model('S3');"
+
+SEE ALSO
+    Catalyst, Catalyst::Helper::Model::S3, Net::Amazon::S3
+
+DEPENDENCIES
+    *   Carp
+
+    *   Catalyst::Model
+
+    *   Catalyst::Utils
+
+    *   Class::C3
+
+    *   Net::Amazon::Simple
+
+BUGS
+    Please report any bugs or feature requests to "bug-catalyst-model-s3 at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-S3>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Model::S3
+
+    You may also look for information at:
+
+    *   Catalyst::Model::S3
+
+        <http://perlprogrammer.co.uk/modules/Catalyst::Model::S3/>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Model-S3/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-S3>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Model-S3/>
+
+AUTHOR
+    Dave Cardwell <dcardwell@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Dave Cardwell. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

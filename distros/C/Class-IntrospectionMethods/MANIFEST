@@ -1,0 +1,26 @@
+ChangeLog
+Makefile.PL
+Catalog.pm
+IntrospectionMethods.pm
+Parent.pm
+Legacy.pod
+README
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+t/catalog.t
+t/catalog_new_style.t
+t/get_set.t
+t/hash.t
+t/list.t
+t/meta_catalog.t
+t/meta_parent.t
+t/new.t
+t/object.t
+t/object_list.t
+t/object_tie_hash.t
+t/object_tie_list.t
+t/parent_new_style.t
+t/tie_hash.t
+t/tie_list.t
+t/tie_scalar.t
+t/tie_tie_hash.t

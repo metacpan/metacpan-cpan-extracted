@@ -1,0 +1,16 @@
+The future of Cdk has in it a number of additions. Here is a composite list
+of things to come:
+
+</R>General<!R>
+<B=*>Would like to have a captive shell, so commands can be spawned via Cdk. 
+     This would allow Cdk to run commands and trap the output.
+<B=*>I am presently working on creating a tree widget.
+
+</R>New Features/Widgets<!R>
+<B=*>Possible Editor to place widgets...
+<B=*>Full range of drawing routines.
+
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995
+<C>Document Revised: June,     1996

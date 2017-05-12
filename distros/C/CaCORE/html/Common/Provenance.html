@@ -1,0 +1,630 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::Common::Provenance</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#internetsource">InternetSource</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_internetsource">ATTRIBUTES of InternetSource</a></li>
+		<li><a href="#associations_of_internetsource">ASSOCIATIONS of InternetSource</a></li>
+	</ul>
+
+	<li><a href="#provenance">Provenance</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_provenance">ATTRIBUTES of Provenance</a></li>
+		<li><a href="#associations_of_provenance">ASSOCIATIONS of Provenance</a></li>
+	</ul>
+
+	<li><a href="#publicationsource">PublicationSource</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_publicationsource">ATTRIBUTES of PublicationSource</a></li>
+		<li><a href="#associations_of_publicationsource">ASSOCIATIONS of PublicationSource</a></li>
+	</ul>
+
+	<li><a href="#researchinstitutionsource">ResearchInstitutionSource</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_researchinstitutionsource">ATTRIBUTES of ResearchInstitutionSource</a></li>
+		<li><a href="#associations_of_researchinstitutionsource">ASSOCIATIONS of ResearchInstitutionSource</a></li>
+	</ul>
+
+	<li><a href="#source">Source</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_source">ATTRIBUTES of Source</a></li>
+		<li><a href="#associations_of_source">ASSOCIATIONS of Source</a></li>
+	</ul>
+
+	<li><a href="#sourcereference">SourceReference</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_sourcereference">ATTRIBUTES of SourceReference</a></li>
+		<li><a href="#associations_of_sourcereference">ASSOCIATIONS of SourceReference</a></li>
+	</ul>
+
+	<li><a href="#urlsourcereference">URLSourceReference</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_urlsourcereference">ATTRIBUTES of URLSourceReference</a></li>
+		<li><a href="#associations_of_urlsourcereference">ASSOCIATIONS of URLSourceReference</a></li>
+	</ul>
+
+	<li><a href="#webservicessourcereference">WebServicesSourceReference</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_webservicessourcereference">ATTRIBUTES of WebServicesSourceReference</a></li>
+		<li><a href="#associations_of_webservicessourcereference">ASSOCIATIONS of WebServicesSourceReference</a></li>
+	</ul>
+
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="internetsource">InternetSource</a></h1>
+<p>CaCORE::Common::Provenance::InternetSource - Perl extension for InternetSource.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::InternetSource is a Perl object representation of the
+CaCORE InternetSource object.</p>
+<p>InternetSource extends from domain object <a href="#source">Source</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_internetsource">ATTRIBUTES of InternetSource</a></h2>
+<p>The following are all the attributes of the InternetSource object and their data types:</p>
+<dl>
+<dt><strong><a name="item_ownerinstitution">ownerInstitution</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_ownerpersons">ownerPersons</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourceuri">sourceURI</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_internetsource">ASSOCIATIONS of InternetSource</a></h2>
+<p>The following are all the objects that are associated with the InternetSource:</p>
+<p>
+</p>
+<hr />
+<h1><a name="provenance">Provenance</a></h1>
+<p>CaCORE::Common::Provenance::Provenance - Perl extension for Provenance.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::Provenance is a Perl object representation of the
+CaCORE Provenance object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_provenance">ATTRIBUTES of Provenance</a></h2>
+<p>The following are all the attributes of the Provenance object and their data types:</p>
+<dl>
+<dt><strong><a name="item_evidencecode">evidenceCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_fullyqualifiedclassname">fullyQualifiedClassName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_immediatesourceid">immediateSourceId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_objectidentifier">objectIdentifier</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_originalsourceid">originalSourceId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_supplyingsourceid">supplyingSourceId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_transformation">transformation</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_provenance">ASSOCIATIONS of Provenance</a></h2>
+<p>The following are all the objects that are associated with the Provenance:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fimmediatesource_3a">Collection of <a href="#immediatesource">ImmediateSource</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getImmediateSource</code> to get the associated ImmediateSource.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2foriginalsource_3a">Collection of <a href="#originalsource">OriginalSource</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOriginalSource</code> to get the associated OriginalSource.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourcereference_3a">Collection of <a href="#sourcereference">SourceReference</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceReference</code> to get the associated SourceReference.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsupplyingsource_3a">Collection of <a href="#supplyingsource">SupplyingSource</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSupplyingSource</code> to get the associated SupplyingSource.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="publicationsource">PublicationSource</a></h1>
+<p>CaCORE::Common::Provenance::PublicationSource - Perl extension for PublicationSource.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::PublicationSource is a Perl object representation of the
+CaCORE PublicationSource object.</p>
+<p>PublicationSource extends from domain object <a href="#source">Source</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_publicationsource">ATTRIBUTES of PublicationSource</a></h2>
+<p>The following are all the attributes of the PublicationSource object and their data types:</p>
+<dl>
+<dt><strong><a name="item_authors">authors</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_endpage">endPage</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_startpage">startPage</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_title">title</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_volume">volume</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_year">year</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_publicationsource">ASSOCIATIONS of PublicationSource</a></h2>
+<p>The following are all the objects that are associated with the PublicationSource:</p>
+<p>
+</p>
+<hr />
+<h1><a name="researchinstitutionsource">ResearchInstitutionSource</a></h1>
+<p>CaCORE::Common::Provenance::ResearchInstitutionSource - Perl extension for ResearchInstitutionSource.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::ResearchInstitutionSource is a Perl object representation of the
+CaCORE ResearchInstitutionSource object.</p>
+<p>ResearchInstitutionSource extends from domain object <a href="#source">Source</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_researchinstitutionsource">ATTRIBUTES of ResearchInstitutionSource</a></h2>
+<p>The following are all the attributes of the ResearchInstitutionSource object and their data types:</p>
+<dl>
+<dt><strong><a name="item_institutionaddress">institutionAddress</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_institutiondepartment">institutionDepartment</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_institutionname">institutionName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_institutionpersons">institutionPersons</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_researchinstitutionsource">ASSOCIATIONS of ResearchInstitutionSource</a></h2>
+<p>The following are all the objects that are associated with the ResearchInstitutionSource:</p>
+<p>
+</p>
+<hr />
+<h1><a name="source">Source</a></h1>
+<p>CaCORE::Common::Provenance::Source - Perl extension for Source.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::Source is a Perl object representation of the
+CaCORE Source object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_source">ATTRIBUTES of Source</a></h2>
+<p>The following are all the attributes of the Source object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_name">name</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_source">ASSOCIATIONS of Source</a></h2>
+<p>The following are all the objects that are associated with the Source:</p>
+<p>
+</p>
+<hr />
+<h1><a name="sourcereference">SourceReference</a></h1>
+<p>CaCORE::Common::Provenance::SourceReference - Perl extension for SourceReference.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::SourceReference is a Perl object representation of the
+CaCORE SourceReference object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_sourcereference">ATTRIBUTES of SourceReference</a></h2>
+<p>The following are all the attributes of the SourceReference object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_reference">reference</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcereferencetype">sourceReferenceType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_sourcereference">ASSOCIATIONS of SourceReference</a></h2>
+<p>The following are all the objects that are associated with the SourceReference:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fprovenance_3a">Instance of <a href="#provenance">Provenance</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getProvenanceCollection</code> to get a collection of associated Provenance.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="urlsourcereference">URLSourceReference</a></h1>
+<p>CaCORE::Common::Provenance::URLSourceReference - Perl extension for URLSourceReference.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::URLSourceReference is a Perl object representation of the
+CaCORE URLSourceReference object.</p>
+<p>URLSourceReference extends from domain object <a href="#sourcereference">SourceReference</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_urlsourcereference">ATTRIBUTES of URLSourceReference</a></h2>
+<p>The following are all the attributes of the URLSourceReference object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_sourceurl">sourceURL</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_urlsourcereference">ASSOCIATIONS of URLSourceReference</a></h2>
+<p>The following are all the objects that are associated with the URLSourceReference:
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="webservicessourcereference">WebServicesSourceReference</a></h1>
+<p>CaCORE::Common::Provenance::WebServicesSourceReference - Perl extension for WebServicesSourceReference.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::Common::Provenance::WebServicesSourceReference is a Perl object representation of the
+CaCORE WebServicesSourceReference object.
+
+</p>
+<p>WebServicesSourceReference extends from domain object <a href="#sourcereference">SourceReference</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_webservicessourcereference">ATTRIBUTES of WebServicesSourceReference</a></h2>
+<p>The following are all the attributes of the WebServicesSourceReference object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_request">request</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_webservicessourcereference">ASSOCIATIONS of WebServicesSourceReference</a></h2>
+<p>The following are all the objects that are associated with the WebServicesSourceReference:
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>The CaCORE Software License, Version 1.0
+
+</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.
+
+</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.
+
+</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.
+
+</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.
+
+</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+---
+abstract: 'DBIx::Class::Schema Model Class'
+author:
+  - 'Brandon L Black C<blblack at gmail.com>'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.59
+  Storable: 0
+  Test::Exception: 0
+  Test::More: 0.94
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-DBIC-Schema
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Catalyst::Helper::Model::DBIC::Schema:
+    file: lib/Catalyst/Helper/Model/DBIC/Schema.pm
+    version: 0.65
+  Catalyst::Model::DBIC::Schema:
+    file: lib/Catalyst/Model/DBIC/Schema.pm
+    version: 0.65
+  Catalyst::TraitFor::Model::DBIC::Schema::Caching:
+    file: lib/Catalyst/TraitFor/Model/DBIC/Schema/Caching.pm
+  Catalyst::TraitFor::Model::DBIC::Schema::PerRequestSchema:
+    file: lib/Catalyst/TraitFor/Model/DBIC/Schema/PerRequestSchema.pm
+  Catalyst::TraitFor::Model::DBIC::Schema::Replicated:
+    file: lib/Catalyst/TraitFor/Model/DBIC/Schema/Replicated.pm
+  Catalyst::TraitFor::Model::DBIC::Schema::SchemaProxy:
+    file: lib/Catalyst/TraitFor/Model/DBIC/Schema/SchemaProxy.pm
+requires:
+  Carp::Clan: 0
+  Catalyst::Component::InstancePerContext: 0
+  Catalyst::Runtime: 5.80005
+  CatalystX::Component::Traits: 0.14
+  DBIx::Class: 0.08114
+  DBIx::Class::Schema::Loader: 0.04005
+  Hash::Merge: 0
+  List::MoreUtils: 0
+  Module::Runtime: 0.012
+  Moose: 1.12
+  MooseX::MarkAsMethods: 0.13
+  MooseX::NonMoose: 0.16
+  MooseX::Types: 0
+  MooseX::Types::LoadableClass: 0.009
+  Tie::IxHash: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0.09
+  namespace::clean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Model-DBIC-Schema.git
+version: 0.65

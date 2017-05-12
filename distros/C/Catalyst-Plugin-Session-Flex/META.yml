@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Plugin-Session-Flex
+version:      0.07
+version_from: Flex.pm
+installdirs:  site
+requires:
+    Apache::Session::Flex:         0
+    Catalyst:                      2.99
+    Class::Accessor::Fast:         0
+    Class::Data::Inheritable:      0
+    Digest::MD5:                   0
+    URI:                           0
+    URI::Find:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

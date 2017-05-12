@@ -1,0 +1,9 @@
+Revision history for Context
+
+0.02    13 Jul 2013
+        Added split persistence
+        Added delete_property and lookup methods
+
+0.01    13 Apr 2013
+        First version, released on an unsuspecting world.
+

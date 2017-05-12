@@ -1,0 +1,17 @@
+Revision history for Perl extension Config::ReadAndCheck.
+
+0.04  Mon Feb 04 21:20 2013
+	- The 'have to be a LIST reference' syntax bug fixed
+
+0.03  Mon Mar 10 23:59:59 2003
+	- The 'ParseGetline' syntax bug fixed
+
+0.02  Wed Feb 19 23:00:00 2003
+	- The Process function now can pass error message to the parser.
+	- Licence changed
+
+0.01  Sun Jul 14 23:30:00 2002
+	- original version; created by h2xs 1.21 with options
+		-AXcfn UniLog
+
+

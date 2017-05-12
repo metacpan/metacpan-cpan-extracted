@@ -1,0 +1,55 @@
+NAME
+    CGI::Application::Emulate::PSGI - a legacy-code-friendly PSGI adapter
+    for CGI::Application
+
+SYNOPSIS
+    Create a PSGI application from a CGI::Application project:
+
+        # if using CGI::Application
+        my $psgi_app = CGI::Application::Emulate::PSGI->handler(sub {
+            my $webapp = WebApp->new();
+            $webapp->run();
+        });
+
+        # if using CGI::Application::Dispatch
+        my $psgi_app = CGI::Application::Emulate::PSGI->handler(sub {
+            WebApp::Dispatch->dispatch();
+        });
+
+    See plackup for options for running a PSGI application.
+
+DESCRIPTION
+    CGI::Application::Emulate::PSGI allows a project based on
+    CGI::Application to run as a PSGI application. Differences from
+    CGI::Application::PSGI are:
+
+    uses CGI.pm directly instead of CGI::PSGI
+        CGI::Application::PSGI (that uses CGI::PSGI) does not support
+        programs calling CGI.pm in func-style (like CGI::virtual_host()).
+        CGI::Application::Emulate::PSGI sets up environment variables so
+        that code using CGI.pm will work. Both approaches explictly use
+        CGI.pm as the query object.
+
+    compatible with CGI::Application::Dispatch
+        The interface of CGI::Application::Emulate::PSGI is different from
+        CGI::Application::PSGI, and is compatible with
+        CGI::Application::Dispatch.
+
+    headers are parsed and re-generated.
+        This difference is in favor of CGI::Application::PSGI, which more
+        directly generates the HTTP headers in PSGI format. This module
+        requires additional processing: First CGI::Application builds the
+        full response including the headers and body, then we parse the
+        final result back into the header and body format called for by the
+        PSGI spec.
+
+AUTHOR
+    Kazuho Oku <kazuhooku@gmail.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    CGI::Application::PSGI, CGI
+

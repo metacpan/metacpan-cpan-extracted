@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  52813:
+    - 34
+name: fdcb0f
+registers:
+  AF: 8740
+  AF_: 0
+  BC: 10953
+  BC_: 0
+  DE: 60523
+  DE_: 0
+  HL: 25873
+  HL_: 0
+  I: 0
+  IX: 51514
+  IY: 52792
+  PC: 4
+  R: 2
+  SP: 0

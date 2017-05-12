@@ -1,0 +1,40 @@
+Class-Tiny-Antlers
+==================
+
+Created:      2013-08-29
+Home page:    <https://metacpan.org/release/Class-Tiny-Antlers>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Class-Tiny-Antlers>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.023	2014-09-18
+
+ [ Packaging ]
+ - Add IRC link.
+ - Add explicit dependency on Perl 5.6.
+ - Rebuilt package with newer Dist::Inkt to resolve minor packaging issues.
+
+0.022	2013-09-05
+
+ [ Packaging ]
+ - Add 'test requires' dependency on Test::Requires - oh, the irony!
+ - Demote Role::Tiny and Class::Method::Modifiers from 'runtime recommends'
+   dependencies to 'runtime suggests', but 'test recommends'.
+
+0.021	2013-09-05
+
+ - Actually inherit from Class::Tiny. This means that your class doesn't
+   need to `use` both Class::Tiny and Class::Tiny::Antlers; just `use
+   Class::Tiny::Antlers`.
+ - Added: Optionally export `before`, `after` and `around` keywords,
+   powered by an optional dependency on Class::Method::Modifiers.
+ - Added: Provide a `get_all_attribute_specs_for` method for attribute
+   introspection.
+ - Make the dependency on Role::Tiny optional again.
+ - Take advantage of Class::Tiny's new(ish) `create_attributes` method.
+ - Updated: Requires Class::Tiny 0.006.
+
+0.020	2013-08-30
+
+ - Eliminate dependency on Package::Stash.
+
+0.019	2013-08-30	Initial release; split from Moops 0.018

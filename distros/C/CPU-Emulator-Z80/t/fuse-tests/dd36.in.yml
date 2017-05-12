@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 54
+    - 53
+    - 181
+name: dd36
+registers:
+  AF: 30428
+  AF_: 0
+  BC: 9520
+  BC_: 0
+  DE: 20824
+  DE_: 0
+  HL: 34685
+  HL_: 0
+  I: 0
+  IX: 46534
+  IY: 36156
+  PC: 0
+  R: 0
+  SP: 0

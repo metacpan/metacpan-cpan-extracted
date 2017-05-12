@@ -1,0 +1,41 @@
+Code-Splice version 0.01
+========================
+
+Removes the contents of a subroutine (usually an anonymous subroutine created
+just for the purpose) and splices in into the program elsewhere.
+
+The body of the "code { }" block are extracted from the subroutine and 
+inserted in a place in the code specified by the call to the "splice()" 
+function.  Where the new code is spliced in, the old code is spliced out.
+The "package" and "method" arguments are required and tell the thing how to 
+find the code to be modified.
+
+See the POD, please.
+
+INSTALLATION
+
+To install this module type the following (after untar-ing it and cd-ing into
+the directory, of course):
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  B::Generate.  The one on CPAN doesn't build cleanly but mine should:
+
+  http://search.cpan.org/CPAN/authors/id/S/SW/SWALTERS/B-Generate-1.06_1.tar.gz
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Scott Walters and Brock Wilcox
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

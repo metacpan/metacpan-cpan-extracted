@@ -1,0 +1,237 @@
+---
+abstract: "It's new $module"
+author:
+  - 'Wes Young (wesyoung.me)'
+build_requires:
+  Test::Class: 0.41
+  Test::Deep: 0
+  Test::Exception: 0.32
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.12.0, CPAN::Meta::Converter version 2.120921'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cikl
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cikl:
+    file: lib/Cikl.pm
+    version: v0.5.1
+  Cikl::AddressBuilder:
+    file: lib/Cikl/AddressBuilder.pm
+    version: 0
+  Cikl::Client:
+    file: lib/Cikl/Client.pm
+    version: 0
+  Cikl::Client::Factory:
+    file: lib/Cikl/Client/Factory.pm
+    version: 0
+  Cikl::Client::Transport:
+    file: lib/Cikl/Client/Transport.pm
+    version: 0
+  Cikl::Codecs::CodecRole:
+    file: lib/Cikl/Codecs/CodecRole.pm
+    version: 0
+  Cikl::Codecs::JSON:
+    file: lib/Cikl/Codecs/JSON.pm
+    version: 0
+  Cikl::DataTypes::Asn:
+    file: lib/Cikl/DataTypes/Asn.pm
+    version: 0
+  Cikl::DataTypes::Email:
+    file: lib/Cikl/DataTypes/Email.pm
+    version: 0
+  Cikl::DataTypes::Fqdn:
+    file: lib/Cikl/DataTypes/Fqdn.pm
+    version: 0
+  Cikl::DataTypes::Integer:
+    file: lib/Cikl/DataTypes/Integer.pm
+    version: 0
+  Cikl::DataTypes::Ipv4:
+    file: lib/Cikl/DataTypes/Ipv4.pm
+    version: 0
+  Cikl::DataTypes::Ipv4Cidr:
+    file: lib/Cikl/DataTypes/Ipv4Cidr.pm
+    version: 0
+  Cikl::DataTypes::LowerCaseStr:
+    file: lib/Cikl/DataTypes/LowerCaseStr.pm
+    version: 0
+  Cikl::DataTypes::PortList:
+    file: lib/Cikl/DataTypes/PortList.pm
+    version: 0
+  Cikl::DataTypes::Url:
+    file: lib/Cikl/DataTypes/Url.pm
+    version: 0
+  Cikl::EventBuilder:
+    file: lib/Cikl/EventBuilder.pm
+    version: 0
+  Cikl::Logging:
+    file: lib/Cikl/Logging.pm
+    version: 0
+  Cikl::Models::Address::asn:
+    file: lib/Cikl/Models/Address/asn.pm
+    version: 0
+  Cikl::Models::Address::email:
+    file: lib/Cikl/Models/Address/email.pm
+    version: 0
+  Cikl::Models::Address::fqdn:
+    file: lib/Cikl/Models/Address/fqdn.pm
+    version: 0
+  Cikl::Models::Address::ipv4:
+    file: lib/Cikl/Models/Address/ipv4.pm
+    version: 0
+  Cikl::Models::Address::ipv4_cidr:
+    file: lib/Cikl/Models/Address/ipv4_cidr.pm
+    version: 0
+  Cikl::Models::Address::url:
+    file: lib/Cikl/Models/Address/url.pm
+    version: 0
+  Cikl::Models::AddressRole:
+    file: lib/Cikl/Models/AddressRole.pm
+    version: 0
+  Cikl::Models::Event:
+    file: lib/Cikl/Models/Event.pm
+    version: 0
+  Cikl::Smrt:
+    file: lib/Cikl/Smrt.pm
+    version: v0.5.1
+  Cikl::Smrt::AutoDecodableRole:
+    file: lib/Cikl/Smrt/AutoDecodableRole.pm
+    version: 0
+  Cikl::Smrt::Broker:
+    file: lib/Cikl/Smrt/Broker.pm
+    version: 0
+  Cikl::Smrt::ClientBroker:
+    file: lib/Cikl/Smrt/ClientBroker.pm
+    version: 0
+  Cikl::Smrt::DecoderRole:
+    file: lib/Cikl/Smrt/DecoderRole.pm
+    version: 0
+  Cikl::Smrt::Decoders::AutoDecoder:
+    file: lib/Cikl/Smrt/Decoders/AutoDecoder.pm
+    version: 0
+  Cikl::Smrt::Decoders::Gzip:
+    file: lib/Cikl/Smrt/Decoders/Gzip.pm
+    version: 0
+  Cikl::Smrt::Decoders::Null:
+    file: lib/Cikl/Smrt/Decoders/Null.pm
+    version: 0
+  Cikl::Smrt::Decoders::Zip:
+    file: lib/Cikl/Smrt/Decoders/Zip.pm
+    version: 0
+  Cikl::Smrt::FeedParserConfig:
+    file: lib/Cikl/Smrt/FeedParserConfig.pm
+    version: 0
+  Cikl::Smrt::Fetcher:
+    file: lib/Cikl/Smrt/Fetcher.pm
+    version: 0
+  Cikl::Smrt::Fetchers:
+    file: lib/Cikl/Smrt/Fetchers.pm
+    version: 0
+  Cikl::Smrt::Fetchers::File:
+    file: lib/Cikl/Smrt/Fetchers/File.pm
+    version: 0
+  Cikl::Smrt::Fetchers::Http:
+    file: lib/Cikl/Smrt/Fetchers/Http.pm
+    version: 0
+  Cikl::Smrt::HandlerRole:
+    file: lib/Cikl/Smrt/HandlerRole.pm
+    version: 0
+  Cikl::Smrt::Handlers::Alexa:
+    file: lib/Cikl/Smrt/Handlers/Alexa.pm
+    version: 0
+  Cikl::Smrt::Handlers::ConfigBasedHandler:
+    file: lib/Cikl/Smrt/Handlers/ConfigBasedHandler.pm
+    version: 0
+  Cikl::Smrt::Parser:
+    file: lib/Cikl/Smrt/Parser.pm
+    version: 0
+  Cikl::Smrt::ParserHelpers::XPathMapping:
+    file: lib/Cikl/Smrt/ParserHelpers/XPathMapping.pm
+    version: 0
+  Cikl::Smrt::ParserHelpers::XPathRegexMapping:
+    file: lib/Cikl/Smrt/ParserHelpers/XPathRegexMapping.pm
+    version: 0
+  Cikl::Smrt::Parsers:
+    file: lib/Cikl/Smrt/Parsers.pm
+    version: 0
+  Cikl::Smrt::Parsers::ParseCsv:
+    file: lib/Cikl/Smrt/Parsers/ParseCsv.pm
+    version: 0
+  Cikl::Smrt::Parsers::ParseDelim:
+    file: lib/Cikl/Smrt/Parsers/ParseDelim.pm
+    version: 0
+  Cikl::Smrt::Parsers::ParseJson:
+    file: lib/Cikl/Smrt/Parsers/ParseJson.pm
+    version: 0
+  Cikl::Smrt::Parsers::ParseTxt:
+    file: lib/Cikl/Smrt/Parsers/ParseTxt.pm
+    version: 0
+  Cikl::Smrt::Parsers::ParseXPath:
+    file: lib/Cikl/Smrt/Parsers/ParseXPath.pm
+    version: 0
+  Cikl::Util::TimeHelpers:
+    file: lib/Cikl/Util/TimeHelpers.pm
+    version: 0
+requires:
+  AnyEvent: 7.05
+  Config::Simple: 4.58
+  Coro: 6.31
+  Cwd: 3.40
+  DateTime: 0.70
+  DateTime::Format::DateParse: 0.05
+  DateTime::Format::Strptime: 1.54
+  Encode: 2.44
+  File::Spec: 3.40
+  File::Type: 0.22
+  Getopt::Long: 0
+  IO::Uncompress::Unzip: 2.02
+  JSON::XS: 2.34
+  LWP::Protocol::https: 6.03
+  LWP::UserAgent: 6.02
+  LWPx::ParanoidAgent: 1.09
+  List::MoreUtils: 0.33
+  Log::Log4perl: 0
+  MIME::Base64: 3.13
+  MIME::Lite: 3.027
+  Mail::RFC822::Address: 0.3
+  Module::Pluggable: 3.9
+  Mouse: v2.0.0
+  Net::SSLeay: 1.43
+  Regexp::Common: 2.122
+  Regexp::Common::net::CIDR: 0.02
+  Storable: 2.27
+  Text::CSV_XS: 1.00
+  Text::Table: 1.127
+  Time::HiRes: 1.972101
+  Try::Tiny: 0.11
+  XML::LibXML: 1.89
+  namespace::autoclean: 0
+  perl: 5.014
+resources:
+  bugtracker: https://github.com/cikl/p5-Cikl/issues
+  homepage: https://github.com/cikl/p5-Cikl
+  repository: git://github.com/cikl/p5-Cikl.git
+version: 0.5.1
+x_contributors:
+  - 'Kevin Benton <blak111@gmail.com>'
+  - 'Aaron K. Reffett <akreffett@cert.org>'
+  - 'Matt Carothers <macaroth@t5.sie.isc.org>'
+  - 'Wes Young <github@barely3am.com>'
+  - 'Gabriel Iovino <giovino@gmail.com>'
+  - 'Wes Young <wes@barely3am.com>'
+  - 'Mike Ryan <falter@gmail.com>'

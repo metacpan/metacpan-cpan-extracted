@@ -1,0 +1,27 @@
+.perlcriticrc
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+ignore.txt
+lib/Carp/Parse.pm
+lib/Carp/Parse/CallerInformation.pm
+t/00-load.t
+t/10-parse_stack_trace-single_quotes.t
+t/11-parse_stack_trace-double_quotes.t
+t/12-parse_stack_trace-incorrect_args.t
+t/CallerInformation/00-load.t
+t/CallerInformation/10-new.t
+t/CallerInformation/20-get_line.t
+t/CallerInformation/30-get_arguments_string.t
+t/CallerInformation/40-get_arguments_list.t
+t/manifest.t
+t/module_versions.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

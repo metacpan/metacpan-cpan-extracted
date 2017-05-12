@@ -1,0 +1,40 @@
+TYPEMAP
+cmark_node *        T_NODE
+cmark_iter *        T_ITER
+cmark_parser *      T_PARSER
+const char *        T_UTF8
+char *              T_UTF8
+# The custom OUTPUT for T_IV generates better code than the default.
+# It looks like this is due to weirdness in ExtUtils::ParseXS which creates
+# suboptimal code for "targetable" return types.
+int                 T_IV
+long                T_IV
+cmark_node_type     T_IV
+cmark_event_type    T_IV
+
+INPUT
+T_NODE
+    $var = (cmark_node*)S_sv2c(aTHX_ $arg, \"CommonMark::Node\", 16, cv,
+                               \"$var\");
+T_ITER
+    $var = (cmark_iter*)S_sv2c(aTHX_ $arg, \"CommonMark::Iterator\", 20, cv,
+                               \"$var\");
+T_PARSER
+    $var = (cmark_parser*)S_sv2c(aTHX_ $arg, \"CommonMark::Parser\", 18, cv,
+                                 \"$var\");
+T_UTF8
+    $var = SvPVutf8_nolen($arg)
+
+OUTPUT
+T_NODE
+    $arg = S_node2sv(aTHX_ $var);
+T_ITER
+    sv_setref_pv($arg, \"CommonMark::Iterator\", $var);
+T_PARSER
+    sv_setref_pv($arg, \"CommonMark::Parser\", $var);
+T_UTF8
+    $arg = newSVpv($var, 0);
+    SvUTF8_on($arg);
+T_IV
+    $arg = newSViv((IV)$var);
+

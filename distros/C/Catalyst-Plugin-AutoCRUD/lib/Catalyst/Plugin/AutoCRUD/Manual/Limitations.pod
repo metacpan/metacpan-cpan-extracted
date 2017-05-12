@@ -1,0 +1,29 @@
+=head1 NAME
+
+Catalyst::Plugin::AutoCRUD::Manual::Limitations - Noted Limitations
+
+=head1 Time Zone settings are lost during SELECT/UPDATE
+
+Database fields of types such as (PostgreSQL) C<timestamp with time zone> will
+be displayed with a date and time picker, but you'll lose the time zone's UTC
+offset value, sorry. This could be fixed and retained through an improved UI
+widget, for example.
+
+=head1 Performance on large datasets with relations
+
+Take care when providing access to large datasets. If the user choses to view
+I<all> records (in the ExtJS2 frontend), and these records have relations,
+many additional rows will be fetched from the database when AutoCRUD follows
+those relations. The response of the site is likely to be severely degraded.
+
+This is by design, as the purpose of this plugin is first and foremost to
+provide administrators and developers with easy access to data sources. The
+author is happy if you wish to install the plugin for end-users, but please
+bear in mind the above limitation.
+
+One possible workaround for L<DBIx::Class> storage is to create new ResultSet
+classes which omit defining the relations (and even some data columns, if you
+wish). Configure AutoCRUD with a Site which hides all ResultSet classes except
+these, and then unecessary data will not be retrieved nor relations followed.
+
+=cut

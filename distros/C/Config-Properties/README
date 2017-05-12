@@ -1,0 +1,50 @@
+Config::Properties
+==================
+
+Description
+-----------
+
+Config::Properties is a near implementation of the java.util.Properties API.
+It is designed to allow easy reading, writing and manipulation of Java-style
+property files.
+
+The format of a Java-style property file is that of a key-value pair seperated
+by either whitespace, the colon (:) character, or the equals (=) character.
+Whitespace before the key and on either side of the seperator is ignored.
+	
+Lines that begin with either a hash (#) or a bang (!) are considered comment
+lines and ignored.
+
+A backslash (\) at the end of a line signifies a continuation and the next
+line is counted as part of the current line (minus the backslash, any whitespace
+after the backslash, the line break, and any whitespace at the beginning of the next line).
+
+When a property file is saved it is in the format "key=value" for each line.
+
+Read the POD documentation for more fine details!
+
+Installation
+------------
+
+> perl Makefile.PL
+> make
+
+... and if you like
+
+> make test
+
+... and then
+
+> make install
+> perldoc Config::Properties
+
+
+Copyright
+---------
+
+Copyright (c) 2001 Randy Jay Yarger. All Rights Reserved.
+Copyright (c) 2002 Craig Manley
+Copyright (c) 2003-2009, 2011-2012, 2014-2015 Salvador Fandiño <sfandino@yahoo.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

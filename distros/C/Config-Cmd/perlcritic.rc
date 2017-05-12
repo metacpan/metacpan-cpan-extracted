@@ -1,0 +1,47 @@
+# see all options by running
+#   perlcritic --profile-proto
+
+# globals
+# use colour in the output
+color=1
+
+#--------------------------------------------------------------
+# Dist::Zilla adds $VERSION code block in teh beginning of the file so
+# these two need to be silenced:
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 4
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 4
+
+
+# #--------------------------------------------------------------
+# # I think these are less important, so only load when asked
+# 
+# [Variables::ProhibitPackageVars]
+# severity = 2
+# 
+# [ControlStructures::ProhibitPostfixControls]
+# allow = if unless  # My custom configuration
+# severity = cruel   # Same as "severity = 2"
+# 
+# #--------------------------------------------------------------
+# # Give these policies a custom theme.  I can activate just
+# # these policies by saying `perlcritic -theme larry`
+# 
+# [Modules::RequireFilenameMatchesPackage]
+# add_themes = larry
+# 
+# [TestingAndDebugging::RequireTestLables]
+# add_themes = larry curly moe
+# 
+# #--------------------------------------------------------------
+# # I do not agree with these at all, so never load them
+# 
+# [-NamingConventions::Capitalization]
+# [-ValuesAndExpressions::ProhibitMagicNumbers]
+# 
+# #--------------------------------------------------------------
+# # For all other Policies, I accept the default severity,
+# # so no additional configuration is required for them.

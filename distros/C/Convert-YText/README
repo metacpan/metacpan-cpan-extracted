@@ -1,0 +1,39 @@
+NAME
+    Convert::YText - Quotes strings suitably for rfc2822 local part
+
+    Convert::YText converts strings to and from "YText", a format inspired
+    by xtext defined in RFC1894, the MIME base64 and quoted-printable types
+    (RFC 1394). The main goal is encode a UTF8 string into something safe
+    for use as the local part in an internet email address (RFC2822).
+
+    By default spaces are replaced with "+", "/" with "~", the
+    characters "A-Za-z0-9_.-" encode as themselves, and everything
+    else is written "=USTR=" where USTR is the base64 (using
+    "A-Za-z0-9_." as digits) encoding of the unicode character
+    code. The encoding is configurable; perldoc Convert::YText for
+    more information.
+
+AUTHOR
+    David Bremner, <ddb@cpan.org>
+
+REPOSITORY
+
+    git://gitolite.debian.net/convert-ytext.git
+
+COPYRIGHT
+    Copyright (C) 2011 David Bremner. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, namely:
+
+    a) the GNU General Public License as published by the Free
+    Software Foundation; either version 1, or (at your option) any
+    later version, or
+
+    b) the "Artistic License".
+
+ACKNOWLEDGEMENTS
+
+Thanks all the folks on #debian-perl for their help, and to especially
+jawnsy for encouraging me to OO-ize the module.
+

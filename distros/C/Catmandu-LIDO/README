@@ -1,0 +1,83 @@
+NAME
+
+    Catmandu::LIDO - Modules for handling LIDO data within the Catmandu
+    framework
+
+SYNOPSIS
+
+    Command line client catmandu:
+
+      catmandu convert LIDO to JSON --fix lido.fix < data/lido.xml > data/lido.json
+    
+      catmandu convert JSON to LIDO --fix lido.fix < data/lido.json > data/lido.xml
+
+    See documentation of modules for more examples.
+
+DESCRIPTION
+
+    Catmandu::LIDO contains modules to handle LIDO, an XML Schema for
+    contributing content to cultural heritage repositories.
+
+AVAILABLE MODULES
+
+    Catmandu::Exporter::LIDO
+
+      Serialize LIDO data
+
+    Catmandu::Importer::LIDO
+
+      Parse LIDO data
+
+ Custom Fixes
+
+    Catmandu::Fix::lido_actor
+
+    Catmandu::Fix::lido_baseid
+
+    Catmandu::Fix::lido_baseid
+
+    Catmandu::Fix::lido_basename
+
+    Catmandu::Fix::lido_basevalue
+
+    Catmandu::Fix::lido_classification
+
+    Catmandu::Fix::lido_date
+
+    Catmandu::Fix::lido_descriptivenote
+
+    Catmandu::Fix::lido_inscription
+
+    Catmandu::Fix::lido_objectmeasurements
+
+    Catmandu::Fix::lido_term
+
+SEE ALSO
+
+    This module is based on Catmandu, Lido::XML and XML::Compile
+
+AUTHORS
+
+    Patrick Hochstenbach, patrick.hochstenbach at ugent.be
+
+    Matthias Vandermaesen, matthias.vandermaesen at
+    vlaamsekunstcollectie.be
+
+    Pieter De Praetere, pieter at packed.be
+
+CONTRIBUTORS
+
+    Patrick Hochstenbach, patrick.hochstenbach at ugent.be
+
+    Pieter De Praetere, pieter at packed.be
+
+    Matthias Vandermaesen, matthias.vandermaesen at
+    vlaamsekunstcollectie.be
+
+COPYRIGHT AND LICENSE
+
+    The Perl software is copyright (c) 2016 by PACKED vzw, VKC vzw and
+    Patrick Hochstenbach. This is free software; you can redistribute it
+    and/or modify it under the same terms as the Perl 5 programming
+    language system itself.
+

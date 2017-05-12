@@ -1,0 +1,106 @@
+Revision history for PerlIDS
+
+1.0217  2014-05-27
+        Fix failing test
+
+1.0216  2014-05-25
+        Update docs
+
+1.0215  2014-05-25
+        Publishing repository on GitHub
+
+1.0214  2011-08-19
+        Sanitizing 'Malformed UTF-8 character (fatal)' with the new CGI::IDS::Whitelist::make_utf_8()
+        Updated new URL to PHPIDS
+
+1.0213  2011-08-05
+        Catching 'Malformed UTF-8 character (fatal)' error
+        Some code cleanup
+
+1.0212  2010-06-11
+        Updated filter set and converters to PHPIDS 0.6.4 (rev. 1409)
+
+1.0211  2010-04-08
+        Increased test coverage
+
+1.021   2010-04-07
+        Documentation and comment fixes
+
+1.02    2010-04-06
+        Extracted CGI::IDS::Whitelist for separately using the whitelist check
+        Updated filter set and converters to PHPIDS rev. 1374
+
+1.0118  2010-02-22
+        Added XML::Parser to build_requires due to cpantesters' FAILs on some systems
+        Fixed base64 warning in testForFalseAlerts
+
+1.0117  2010-02-16
+        Updated filter set and converters to PHPIDS rev. 1373
+        Improvements on strip_tags()
+        Thanks to Johan Nilsson for bug reports:
+        - Fixed code sample in documentation
+        - preg_replace(): Fixed undef warning in regex-double-execution
+        - preg_replace(): Escape $ if it's not prefix of a substitution variable like $1
+
+1.0116  2009-04-29
+        Added twitter account
+        Updated filter set and converters to PHPIDS rev. 1276
+
+1.0115  2009-04-17
+        Updated filter set and converters to PHPIDS rev. 1274
+
+1.0114  2009-03-24
+        Dropped utf8 pragmas, thanks to Merten Falk
+        Updated filter set and converters to PHPIDS rev. 1255
+
+1.0113  2009-03-18
+        Updated filter set and converters to PHPIDS rev. 1250
+
+1.0112  2009-03-11
+        Updated filter set and converters to PHPIDS rev. 1245
+
+1.0111  2009-03-04
+        Updated filter set and converters to PHPIDS rev. 1240
+
+1.0110  2009-02-10
+        Updated filter set and converters to PHPIDS rev. 1235
+
+1.0109  2009-02-06
+        Updated filter set and converters to PHPIDS rev. 1228
+
+1.0108  2009-01-30
+        Updated filter set and converters to PHPIDS rev. 1274
+
+1.0107  2009-01-20
+        Updated filter set and converters to PHPIDS rev. 1221
+
+1.0106  2009-01-13
+        Updated filter set and converters to PHPIDS rev. 1219
+
+1.0105  2009-01-06
+        Updated filter set and converters to PHPIDS rev. 1215
+        Improved Synopsis example
+
+1.0104  2008-12-02
+        Updated filter set to PHPIDS rev. 1158
+
+1.0103  2008-11-07
+        Updated to PHPIDS rev. 1152
+        Fixed args handling and backslash escaping in sub preg_replace()
+        Shortened substitution in sub urlencode()
+
+1.0102  2008-11-07
+        Removed XML::SAX from requirements, it didn't help with the Solaris bug.
+        Improved documentation.
+        Added Test::Pod::Coverage
+
+1.0101  2008-11-06
+        Fixed XMLin() bug on Solaris, now requiring XML::SAX that is independent to external OS libraries.
+        Fixed links in documentation.
+        Updated filter set to PHPIDS rev. 1149
+
+1.01    2008-11-04
+        Fixed README.
+
+1.00    2008-11-04
+        First CPAN release.

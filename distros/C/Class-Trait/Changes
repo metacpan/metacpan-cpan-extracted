@@ -1,0 +1,90 @@
+Revision history for Perl extension Class::Trait.
+
+0.31 Jan 3, 2010 (bug fixes)
+    - Normalized version numbers.
+    - Fixed lvalue bug which broke the debugger and profiler. [rt#23709]
+    - Fixed 'defined %hash' bug which broke bleadperl. [rt#23709]
+
+0.30 Oct 18, 2009
+    - Added deprecation notice.  No new features or bug fixes are intended.
+
+0.22 Oct 25, 2006
+    - Fixed bug where does() failed when inherited.  Reported by Romano
+      Daniel.
+    - Cleaned up the MANIFEST
+
+0.21 Feb. 15, 2006
+    - Suppressed "void" warnings for mod_perl in the INIT phase.
+
+0.20 Nov. 26, 2005
+    - Added ability to apply traits at runtime to instances and classes
+    - Changed 'die' to 'croak'
+    - Renumbered tests.
+    - Made most private subs in Class::Trait begin with an underscore.
+    - Eliminated subtle bug where reusing a trait with excluded methods could
+      fail.  It doubtful anyone would ever encounter this, but still ...
+
+0.11 Nov. 19, 2005
+    - Added tests to ensure that failure messages were correct.
+    - Fixed bug where not all conflicting methods were being recognized.
+    - If only a single method is to be excluded, you may specify the method
+      name without having to wrap it in an array reference.
+    - Clean up debugging code.  Only call debug() if needed.
+    - Only use Data::Dumper if debugging.
+    - Eliminated "uninitialized" warning when Class::Trait can't determine the
+      package a method originated it.
+    - Added "BUGS" section to documentation.  All known bugs have easy 
+      workarounds.
+
+0.10 Nov. 17, 2005
+    - BUG FIX:  Traits only provide methods defined in the trait.
+      Imported subroutines are no longer "provided".
+    - Reformatted
+    - Add Module::Build support
+
+0.07 Nov. 16, 2005
+    *** API CHANGE ***
+    - "is" is no longer exported.  Instead, programmers have the option of
+      renaming the "does" method to something more suitable for their needs.
+
+0.06 Nov. 15, 2005
+    - Renamed "is" method to "does".  This is the same method name used with
+      Perl 6 roles and avoids conflicts with Test::More::is().
+        - &is is now offically deprecated, it will be removed after a few 
+          more releases
+        - Thanks to Curtis "Ovid" Poe for this code change
+
+0.05 Sept. 14, 2005
+    - fixed a bug in TEquality::isExactly
+    - fixed Class::Trait::Reflection, it was loading Class::Trait
+      in the wrong way
+    - fixed path handling for Class::Trait, now uses File::Spec to
+      create cross platform paths.
+    - fixed the loading of traits with :: in them, this used to fail
+           use Class::Trait qw(My::Trait);
+      it works now. Thanks to Yuval Kogman <nothingmuch@woobling.org>
+      for finding the issue.
+    - SUPER:: handling now dispatches properly. Thanks to 
+      Roman Daniel for the code and tests.
+
+0.04 May 24, 2004
+    - Added a default Trait Library which for now only contains 
+      3 traits; TEquality, TComparable, TPrintable. See their
+      documentation for more details on them. If these names are
+      given, they are loaded from the trait's library.
+
+0.03  Wed April 28th 2004
+    - made this workable with mod_perl and reduced dependence on
+      the INIT block. I am not 100% happy with it yet though, so 
+      there will be further changes coming.
+
+0.02  Mon April 19th 2004
+    - Made "is" method search depth first down the Trait tree
+      instead of just checking the top level trait and subtraits.
+    - Spruced up the test suite alot, adding about 121 new tests.
+    - Cleaned up some documentation issues. And updated anything 
+      that needed it.
+
+0.01  Sun Mar 7 08:09:00 EST 2004
+	- first release of Class::Trait 0.01
+

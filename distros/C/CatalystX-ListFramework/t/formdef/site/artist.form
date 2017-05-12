@@ -1,0 +1,16 @@
+{
+ display => {
+                default => [
+                             {id=>'aid', heading => 'Ref.'},
+                             {id=>'aborn'},
+                             {id=>'acombined_name'},
+                           ],
+            },
+
+ search => [
+            {id=>'apn', heading=>'Pseudonym'},
+           ],
+
+
+}
+

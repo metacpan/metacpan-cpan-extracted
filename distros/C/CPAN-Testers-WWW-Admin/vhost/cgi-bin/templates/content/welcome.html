@@ -1,0 +1,109 @@
+[% 
+    title = 'Welcome' ;
+
+  IF realm == 'author' || (realm == 'admin' && user.author) ; THEN ;
+
+    INCLUDE "content/welcome-author.html" ;
+
+    title = 'Author Administration' ;
+
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Administration' ;
+
+  ELSIF realm == 'tester' || (realm == 'admin' && user.tester) ; THEN ;
+
+    INCLUDE "content/welcome-tester.html" ;
+
+    title = 'Tester Administration' ;
+
+    crumb2_name = 'Tester' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Administration' ;
+
+  ELSIF realm == 'admin' ; THEN ;
+
+    INCLUDE "content/welcome-admin.html" ;
+
+    title = 'Site Administration' ;
+
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Site Administration' ;
+
+  ELSE ;
+
+    title = 'Welcome' ;
+
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Welcome' ;
+
+%]
+
+<p>This website is to enable authors and testers to highlight when reports have
+been sent in error.<p>
+
+<p>For authors, if you feel a report has been sent in error, please login using 
+your PAUSE account details, and highlight the reports that you feel should not 
+have been recorded within the CPAN Testers system. An email will then be sent 
+to the tester in each case, who will be asked to verify the removal of these 
+reports. In the event of the tester being unresponsive, please contact a member 
+of the administration team. However, please leave at least 1 week between 
+marking the report and contacting the administration team.</p>
+
+<p>For testers, you will need to register your email address(es) to an account
+within this website. Register as a tester, and for each email address you have
+submitted reports for, you can confirm (via a challenge / response mechanism)
+and verify you are the owner of that email address. Once that email address has
+been verified you may mark reports you have sent for removal.</p>
+
+<p>In both cases, if you require assistance you may contact the administration 
+team or send an email to the 
+<a href="http://lists.perl.org/list/cpan-testers-discuss.html">CPAN Testers 
+Discussion mailing list</a>, where other members of the CPAN Testers community 
+may be able to advise you of any issue.</p>
+
+<h2>The Administration Team</h2>
+
+<!--
+<p>The administration team currently consists of:</p>
+
+<ul>
+<li><a href="http://search.cpan.org/~BARBIE">Barbie</a></li>
+<li><a href="http://search.cpan.org/~DAGOLDEN">David Golden</a></li>
+</ul>
+-->
+
+<p>To contact the administration team, please send an email to admin &lt;at> 
+cpantesters.org. Please do not email us individually unless you are unable to
+get an initial response from the admin address.</p>
+
+
+<h2>The CPAN Testers Fund</h2>
+
+<p>CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.</p>
+
+<p>In early 2012 the <a href="https://members.enlightenedperl.org">Enlightened 
+Perl Organisation</a> very kindly set-up a
+<a href="https://members.enlightenedperl.org/drupal/donate-cpan-testers">CPAN 
+Testers Fund</a> within their donatation structure, to help the project
+cover the costs of servers and services.</p>
+
+<p>If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+<ul><li><a href="https://members.enlightenedperl.org/drupal/donate-cpan-testers">Donate 
+to The CPAN Testers Fund</a></li></ul>
+
+<p>If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.</p>
+
+<p>Our full list of current sponsors can be found at our 
+<a href="http://iheart.cpantesters.org">I &hearts; CPAN Testers</a> site.</p>
+
+[% END %]

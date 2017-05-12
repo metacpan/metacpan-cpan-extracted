@@ -1,0 +1,25 @@
+Revision history for Cache-Cascade
+
+0.07      2016-05-05 22:48:46Z
+          - switch from Any::Moose to Moo
+
+0.06      2016-02-09 02:18:32Z
+          - convert packaging to Dist::Zilla
+
+0.05      2009-04-24
+          - use Any::Moose instead of Squirrel
+
+0.04      2008-06-26
+          - Remove tt usage, replace with more traditional means (the .pmc keeps
+            failing)
+          - use Squirrel instead of Moose
+          - use namespace::clean
+
+0.03      2008-02-28
+          - Unbreak release
+
+0.02      2008-02-28
+          - Fix handling of false but defined values in get_and_float_result thanks to Stephen Caldwell
+
+0.01      2006-06-20
+          - Initial release

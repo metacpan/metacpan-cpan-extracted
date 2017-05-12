@@ -1,0 +1,23 @@
+Revision history for Perl module CatalystX::Fastly::Role::Response:
+
+0.07 Fri 18 Nov 2016 20:41:42 GMT
+	- Pod cleanup
+
+0.06 Mon 17 Oct 2016 19:14:48
+	- Even set private when there is no current Cache-Control set
+
+0.05 Fri 14 Oct 2016 16:22:24
+	- Correct cdn_no_cache() - set 'private' on Cache-Control
+
+0.04 Tue  6 Sep 2016 18:19:26 BST
+    - Add `use` for autopreq to make tests pass
+
+0.03 Mon  5 Sep 2016 21:12:54 BST
+    - be nice with finalize_headers and change to a 'before'
+
+0.02 Mon  5 Sep 2016 19:36:12 BST
+    - Remove purge methods as MooseX::Fastly::Role could be used directly
+    - Cleanup pod
+
+0.01 Sat  3 Sep 2016 20:48:51 BST
+    - Initial release

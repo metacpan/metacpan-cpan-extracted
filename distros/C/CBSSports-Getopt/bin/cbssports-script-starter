@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use CBSSports::Getopt;
+use File::Basename qw(basename);
+
+our $VERSION = $CBSSports::Getopt::VERSION;
+
+my $opts = GetOptions( 'd|description=s', 'f|force' );
+my ($script_name) = @ARGV;
+Usage() unless $script_name;
+
+if ( -e $script_name && !$opts->{force} ) {
+    warn "$script_name already exists\n";
+    exit;
+}
+
+my $template = _prepare_template( $opts, $script_name );
+open my $fh, '>', $script_name or die "Cannot open $script_name for writing";
+print $fh $template;
+close $fh;
+
+sub _prepare_template {
+    my ($opts,$script_name) = @_;
+
+    my @template_lines = <DATA>;
+    my $template = join( '', @template_lines );
+    my $name = basename( $script_name );
+    my $description = $opts->{description} || 'PLEASE ADD SCRIPT DESCRIPTION';
+
+    $template =~ s/\!\!\!\=/\=/gs;
+    $template =~ s/\$SCRIPTNAME\$/$name/gs;
+    $template =~ s/\$DESCRIPTION\$/$description/gs;
+    $template =~ s/__END__.+$//gs;
+    $template =~ s/THEEND/__END__/gs;
+
+    return $template;
+}
+
+__DATA__
+#!/usr/bin/perl
+use strict;
+use warnings;
+use CBSSports::Getopt;
+
+our $VERSION = '1.0';
+
+my $opts = GetOptions(   );
+
+THEEND
+
+!!!=head1 Name
+
+$SCRIPTNAME$ - $DESCRIPTION$
+
+!!!=head1 Usage
+
+$SCRIPTNAME$ [-v]
+
+!!!=head1 Options
+
+  -v --verbose   Incremental verbose (-v -v -v, verbose=3);
+  -h --help      Print this usage statement and exit.
+  -H --man       Print the complete documentation and exit.
+     --version   Display version and exit.
+
+__END__
+
+=head1 Name
+
+cbs-script-starter - A Template for Any New CBSSports Perl Script
+
+=head1 Usage
+
+cbssports-script-starter [-v] [-d "DESCRIPTION"] SCRIPT-NAME
+
+=head1 Options
+
+  -d --description  Script description (for pod)
+  -f --force        Overwrite exisiting script.
+  -v --verbose      Incremental verbose (-v -v -v, verbose=3);
+  -h --help         Print this usage statement and exit.
+  -H --man          Print the complete documentation and exit.
+     --version      Display version and exit.
+          
+=head1 Examples
+
+=head2 Creating a new script
+
+  cbssports-script-starter -d "Reads Your Mind and Executes Doit Scripts in the Past" doneit
+

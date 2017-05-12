@@ -1,0 +1,17 @@
+intermittent failure line 35 0232stop.t
+
+look for memory leaks with Devel::ObjectTracker or other Devel:: tool
+
+fix and add test for dup tag detection
+
+fix group 0 and/or level 0 
+
+move Kernel::db into Util
+
+remove extra Storable uses
+
+finish pod
+
+clean out cruft -- look for "package junk;" and "XXX"
+
+turn off asserts

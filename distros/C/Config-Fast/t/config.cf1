@@ -1,0 +1,22 @@
+#
+# standard config file
+#
+one     1
+two     2
+three   3
+
+support nate@wiger.org
+website http://nate.wiger.org
+
+date    today don\'t you know
+time    $date 11:31
+
+ANIMALS Rhino, Giraffe, Magical Elephant
+mixedCase   no\$problemo
+
+Total   Grand total is \$14.59
+
+# inserted by @DEFINE
+yes     $no
+no      $yes
+

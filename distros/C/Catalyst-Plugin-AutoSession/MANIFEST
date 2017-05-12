@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+lib/Catalyst/Plugin/AutoSession.pm
+META.yml                                 Module meta-data (added by MakeMaker)

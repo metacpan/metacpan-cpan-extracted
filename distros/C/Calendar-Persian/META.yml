@@ -1,0 +1,35 @@
+---
+abstract: 'Interface to Persian Calendar.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+  XML::SemanticDiff: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Calendar-Persian
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Calendar::Persian:
+    file: lib/Calendar/Persian.pm
+    version: '0.35'
+requires:
+  Calendar::Plugin::Renderer: '0.12'
+  Date::Persian::Simple: '0.17'
+  Moo: '2.000000'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Calendar-Persian.git
+version: '0.35'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

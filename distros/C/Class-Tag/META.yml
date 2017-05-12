@@ -1,0 +1,21 @@
+---
+abstract: 'programmatically label (mark) classes, methods, roles and modules with meta-data tags (key/value pairs) and query those tags'
+author:
+  - 'Alexandr Kononoff (L<mailto:parsels@mail.ru>)'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Tag
+provides:
+  Class::Tag:
+    file: lib/Class/Tag.pm
+    version: 0.10
+requires:
+  perl: 5.000
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

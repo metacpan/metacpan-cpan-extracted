@@ -1,0 +1,266 @@
+=pod
+
+=head1 NAME
+
+ControlFreak Tutorial
+
+=head1 INSTALLATION
+
+ControlFreak should work on all unixes and maybe more, only Mac OS X and Linux
+have been tested.
+
+=head2 Requirements
+
+Notable ControlFreak requirements are:
+
+=over 4
+
+=item * AnyEvent
+
+(recent versions 5.202+)
+
+=item * EV (libev interface)
+
+Though it's not stricly necessary, this is really recommended, ControlFreak
+hasn't been tested thoroughly with other Event loops.
+
+=item * Log4perl
+
+This is the logging backend of ControlFreak.
+
+=item * JSON::XS
+
+=item * Object::Tiny
+
+=item * Try::Tiny
+
+=item * Params::Util
+
+=back
+
+=head2 cpanm
+
+Other instructions will come later, when ControlFreak will be on CPAN.
+
+  # install cpanm (see App::cpanminus documentation for details)
+  cd ~/bin
+  wget http://xrl.us/cpanm
+  chmod +x cpan
+
+  ## install cpan version
+  cpanm ControlFreak
+
+  ## install bleeding edge
+  cpanm http://github.com/yannk/ControlFreak/tarball/master
+
+=head1 BASICS
+
+When ControlFreak daemon C<cfkd> is started, it opens a management socket
+that allows operators and programs to sennd instructions to the daemon.
+
+The daemon duty is to fork and exec services, making sure that they are
+running or stopped according to commands received. C<cfkd> is also
+configured with logging capabilities, in such way that STDOUT and STDERR
+of the services it has the responsibities of, aren't lost.
+
+=head1 SIMPLE EXAMPLE
+
+=head2 Start cfkd with a config file and use cfkctl
+
+    # run in the background:
+    $ cfkd -d
+
+    # alternatively, run cfkd in it's own shell/term in the foreground:
+    $ cfkd
+
+You can know use C<cfkctl> to inspect C<cfkd> status. This control script
+connects by default to a unix socket at C</tmp/cfkd.sock>.
+
+  $ perl cfkctl status
+  # nothing! Expectingly there is no service declared in cfkd
+
+  # declare a new svc1 service with a 'sleep 100' as the command
+  $ cfkctl load - <<END
+  service svc1 cmd=sleep 100
+  END
+
+  $ perl cfkctk status
+  stopped svc1
+
+  # let's start the service we have
+  $ cfkctl start svc1
+  $ cfkctl status
+  running svc1                   2 seconds ago (Wed Nov 11 16:16:09 2009)
+  $ cfkctl stop svc1
+  $ cfkctl status
+  stopped svc1                   3 seconds ago (Wed Nov 11 16:17:07 2009)
+
+=head2 How it works
+
+Let's connect directly to the management port, it will give you a glimpse of
+the internals
+
+  $ socat readline unix:/tmp/cfkd.sock
+
+(Note that you can configure a tcp port instead so that you can telnet into it)
+
+Now type "C<command status>", the server will respond with OK or ERROR (in
+the rest of this extract the line after OK or ERROR is a line we type in
+the telnet/socat session).
+
+  command status
+  svc1    stopped                 1257985027
+  OK
+
+The management port takes the input stream of your commands as litteral
+configurations. There is no difference if you were typing this in the previous
+config file. So let's declare a new service C<svc2>:
+
+  service svc2 cmd=sleep 10
+  OK
+  command start service svc2
+  done 1
+  OK
+  command status
+  svc2    starting         1257985558
+  svc1    stopped               1257985027
+  OK
+
+If you wait a little (the time for sleep 10 to complete) you'll see:
+
+  command status
+  svc2    stopped              1257985567
+  svc1    stopped               1257985027
+  OK
+
+Both services have now completed their task. Of course there are options
+to make a service restart automatically once it finishes. But note that
+if a service exists abnormally it is restarted unless you specify otherwise.
+(See rest of documentation for all the options of services lifecycle
+management).
+
+=head2 When a service dies or exit abnormally
+
+  $ cfkctl up svc1 # make sure svc1 is up
+  # kill it!
+  $ kill -9 `cfkctl pid svc1`
+  $ cfkctl status
+  running svc1                   2 seconds ago (Wed Nov 11 16:45:43 2009
+
+As you can see the service is running for 2 seconds. It obviously has been
+restarted.
+
+=head2 Logging
+
+By default ControlFreak creates a $HOME/.controlfreak directory in which
+it logs the main events that happened:
+
+  $ tail ~/.controlfreak/cfkd.log
+  - INFO 947 ControlFreak.Logger - child svc1 exited
+  - INFO 75 ControlFreak.Logger - new connection to admin from unix/:/Users/yann/.controlfreak/sock
+  - INFO 846 ControlFreak.Logger - starting svc1
+  - INFO 114 ControlFreak.Logger - Console exiting
+  - INFO 75 ControlFreak.Logger - new connection to admin from unix/:/Users/yann/.controlfreak/sock
+  - INFO 114 ControlFreak.Logger - Console exiting
+  - ERROR 966 ControlFreak.Logger - child terminated abnormally 9: Received signal 9
+  - INFO 846 ControlFreak.Logger - starting svc1
+
+The fact that svc1 was abruptly killed was logged as well as the information
+that ControlFreak restarted it (behaviour you can alter via config, of course).
+
+  # default config file
+  $ cat ~/.controlfreak/log.config
+  log4perl.rootLogger=INFO, ALL
+  log4perl.appender.ALL=Log::Log4perl::Appender::File
+  log4perl.appender.ALL.filename=sub { $ENV{CFKD_HOME} . "/cfkd.log" }
+  log4perl.appender.ALL.mode=append
+  log4perl.appender.ALL.layout=PatternLayout
+  # %S = service pid
+  log4perl.appender.ALL.layout.ConversionPattern=%S %p %L %c - %m%n
+
+You can alter this configuration as much as you want and send USR1 signal
+to C<cfkd> to instruct it to reload this configuration and alter the logging
+behavior.
+
+The pattern layout configuration is better understood if you refer to this
+page: L<http://search.cpan.org/~mschilli/Log-Log4perl-1.25/lib/Log/Log4perl/Layout/PatternLayout.pm>
+
+Note that C<%S> is a custom placeholder representing the pid of the service if
+it exists.
+
+Logging is as flexible as Log4perl allows, which means it's very flexible.
+Also, you can log STDERR and STDOUT of each services independently (see rest of
+documentation), so that you never miss something that allows you to better
+understand why something is not working the way it should.
+
+=head1 SHARING SOCKETS (use ControlFreak as a prefork server)
+
+Another strength of ControlFreak is the ability it has to open a local socket
+and by mean of fork-and-exec, share that socket with multiple services
+(of the same type most likely).
+
+The classical situation is a bunch of web workers all accepting connections
+on 0.0.0.0:8080, the kernel efficiently distribute the connections to
+these workers who don't have to worry about managing this socket at all.
+
+In an environment where you have a lot of web nodes behind a light proxy
+(like L<Perlbal> or many others) it can greatly simplify the maintenance
+of your web cluster. You just have to declare in Perlbal's nodefile one
+node per server. (10.0.0.100:8080, 10.0.0.101:8080, ...) which hides
+a number or actual workers. Of course you manage the number of active workers
+using ControlFreak.
+
+(TODO: example)
+
+=head1 SHARING MEMORY - Benefit from Unix Copy-On-Write Effect
+
+B<ControlFreak> ships with a Perl proxy only. If you want to share memory
+for ruby/python you have to implement a proxy in this language (which
+is not very complicated).
+
+Because we don't want to load a tons of stuff in C<cfkd> process, and because
+we want to keep C<cfkd> very stable anyway, we use an intermediary process:
+a Proxy, whose job is to transparently manage a bunch of children services
+as if they were directly under C<cfkd> control.
+
+(TODO: example)
+
+=head1 SECURITY
+
+By default ControlFreak management port creates a unix domain socket,
+but you can open a TCP socket as well. In both cases, but especially
+in the later you have to be careful with the security implications:
+
+You don't want to allow anyone to create a C<svc 0wned cmd="rm -rf /">
+service...
+
+Similarly be careful not to expose the log configuration in a way that
+would allow untrusted users to alter it.
+
+=head1 TAGGING SERVICES
+
+The config file and commands issued to the management port are intentionally
+kept very simple. There is no loop mechanism allowing you to declare: "I want
+10 of these web workers". The rationale is that if you really need that you
+can build it yourself on top of C<ControlFreak>. To help in the process, and
+to help managing all these similar services, a tag system is provided.
+
+The idea is very simple, you can attach a number of tags to services, and
+can refer to services using those tags.
+
+Here is a very simple example:
+
+  service web1 cmd=sleep 100
+  service web1 tags=web,prod
+
+  service web2 cmd=sleep 100
+  service web2 tags=web
+
+  service web3 cmd=sleep 100
+  service web3 tags=web,stage
+
+  # the leading '@' refers to services by tag
+  $ cfkctl start @web
+  $ cfkctl status @prod
+  running web1                   6 seconds ago (Wed Nov 11 17:30:17 2009)
+

@@ -1,0 +1,10 @@
+Revision history for Perl extension Catalyst::Plugin::Redirect.
+
+0.02  Sat Jun 07 22:04:04 2006
+	-fix get_baseurl
+		use $c->req->base->host and $c->req->base->port instead of $ENV{'HTTP_HOST'}.
+
+0.01  Sat Nov 19 03:38:31 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::Plugin::Redirect
+

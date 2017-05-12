@@ -1,0 +1,105 @@
+Revision history for Catalyst-Plugin-Authentication-Store-DBIx-Class
+
+0.1506 2014-04-02
+       * Fix doc bugs. RT#87372
+       * Fix calling User->can() as a class method. RT#90715
+       * Fix Catalyst tutorial link. RT#47043
+
+0.1505 2013-06-10
+       * Fix RT#82944 - test fails on perl >= 5.17.3
+
+       * Return undef if there isn't a user. This will cause an exception
+          but a more helpful exception (probably from DBIC) than the inability
+          to call a method in this code.
+
+0.1504  2012-10-05
+        * Make use_userdata_from_session use inflate_result since this is
+          already-stored data, not a "new" object being created
+
+0.1503  2011-12-08
+        * Change docs to show $c->config('Plugin::Authentication' => {...
+          rather than $c->config->{authentication}. The new key, and method
+          rather than hash access style are both preferred and recommended.
+
+0.1502  2011-08-24
+        * Switch repository to git (fREW Schmidt)
+
+0.1501  2011-06-17
+        * If use_userdata_from_session isn't set, then don't store more
+          fields than we need in the session -- only the fields we need to
+          load the object from the DB again.
+
+0.1500  2010-11-16
+        * Allow specifying a fully loaded DBIC result in addition to resultsets
+          of which only the first row is considered.
+
+0.1401  2010-11-16
+        * Fix call to ->load which was not passing $c
+
+0.1400  2010-09-01
+        * Make can() work as well as AUTOLOADing.
+
+0.1300  2010-06-16
+        * Support columns with accessors that aren't the column name.
+        * Fix some documentation typos.
+        * Stop failing horribly when running the tests in parallel.
+        * Default to not running pod tests for users, even if the
+          required modules for that are available.
+
+0.1200  2010-04-10
+        Release 0.1100 as a stable version without further modifications.
+
+0.1100  2010-03-29 - development release
+        Support compound primary keys for looking up users.
+
+0.1083  2010-03-03
+        Tweaking exception message to better explain what people did wrong when
+            they pass bad columns to authenticate.
+
+0.1082  2008-10-27
+        Documentation tweak to clarify user_class, store_user_class etc.
+
+0.108   2008-09-25
+        Adding SimpleDB realm to simplify basic auth configuration
+        Changing user_class to user_model, per req. by mst to avoid confusing newbies.
+
+0.107   2008-09-29
+        Fix the typo in exception during authenticate
+        Doc fixes and clarifications
+        Added missing dependency on Catalyst::Model::DBIC::Schema to Makefile.PL
+
+
+0.105   2008-03-19
+        Throw an exception if no fields are provided during authenticate
+           - better than retrieving a random user.
+           - still possible to do an empty search by using searchargs
+
+0.104   2008-02-15
+        Added ability to avoid DB hits when restoring from session
+
+0.103   2008-02-07
+        Added missing DBIx::Class dependancy in Makefile.PL so
+        that the damn test bots stop emailing me.
+
+0.102   2008-01-23
+        Catalyst::Authentication::Store::DBIx::Class::User
+          - Explicitly call auto_create() against resultset()
+          - Explicitly call auto_update() against _user()
+          - Document the above
+
+0.101   2007-12-02
+        Implemented basic auto_update_user and auto_create_user support
+
+0.10    2007-07-07 3pm CST
+        Proper handling of missing id_field config (load from primary_key)
+        Throw exception if id_field specified does not exist
+        Full test suite added.  (based loosely on old DBIC store)
+
+0.03    XXX
+        Switch to Module::Install
+
+0.02    2006-12-16 2pm CST
+        Rewritten to use proper accessors and clean up to match updated C::P::Authentication class naming
+
+0.01    2006-11-10
+        First version, worked internally, completely undocumented

@@ -1,0 +1,63 @@
+CGI_Lite v1.8
+-------------
+
+You can use this module to decode form and query information, 
+including file uploads, as well as cookies in a very simple 
+manner; you need not concern yourself with the actual details 
+behind the decoding process.
+
+Here are the changes for this version:
+
+  Removed $` and $' from the code, and "optimized" an important regexp.
+  As a result, the module is much more efficient. Fixed a minor bug in 
+  multipart boundary parsing. Corrected an error when storing a key that 
+  has multiple values which caused more than one array to be allocated. 
+  Just a note: if you call get_multiple_values method with a scalar
+  value, the method no longer returns an undef, but the value itself.
+  
+  As of this version, you can pass a request method (optional) to the 
+  parse_form_data method. This gives you a bit more flexibility when 
+  dealing with forms.
+
+  The set_file_type method now works as it should. In earlier versions,
+  CGI_Lite created "handles" in all cases. Added the close_all_files
+  method to close uploaded files that are opened as a result of passing
+  "handle" to set_file_type.
+
+  The print_form_data and print_cookie_data are deprecated as of this
+  version, but have not been removed (for compatibility reasons). It's 
+  better to use the print_data method, which prints the key/value pairs 
+  in the order they were parsed. As a side effect of this change,
+  if you want to parse form data and cookies in an application,
+  you have to create two instances of the CGI_Lite object, which
+  only makes sense.
+
+  Added the get_ordered_keys method which will return the list
+  of _keys_ in the order in which they were parsed. Modified the
+  wrap_textarea method; it now works properly.
+
+  Also, added the add_mime_type, remove_mime_type and get_mime_types
+  methods to deal with EOL translation based on MIME types. Added
+  the filter_filename method to alter the way in which uploaded
+  files are named. Added the add_timestamp method which allows you 
+  to turn off timestamps on uploaded files. NOTE: CGI_Lite no longer 
+  returns the full path of the uploaded file, but simply, the file name.
+
+  Added a set of miscellaneous functions: browser_escape, url_encode,
+  url_decode, is_dangerous, escape_dangerous_chars. CGI_Lite now handles
+  errors better; you can use the newly implemented is_error, and 
+  get_error_message methods. I've bought back the return_error
+  method, which you can use to return errors to the browser and
+  exit. However, this method no longer outputs the HTTP header,
+  as it did in versions prior to v1.7.
+
+  In addition, this version allows you to debug your CGI scripts
+  "offline" by letting you pass query information through standard
+  input. I got this idea from CGI.pm, though it's handled a bit
+  differently. Thanks Lincoln!
+
+Enjoy!
+
+Shishir Gundavaram
+shishir@ora.com
+May 10, 1997

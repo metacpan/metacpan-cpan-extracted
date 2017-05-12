@@ -1,0 +1,26 @@
+Revision history for Perl extension Cookie-Baker-XS
+
+0.07 2016-09-21T01:32:30Z
+
+    - Allow quoted cookie values, as per RFC 6265. #5
+
+0.06 2015-06-29T05:59:14Z
+
+    - just bump up version. PP requires newer version number
+
+0.05 2015-06-10T16:56:06Z
+
+    - use MakeMaker for better cross-compiling support #2
+
+0.04 2014-11-19T01:19:39Z
+
+    - add 0 terminate
+
+0.03 2014-02-26T13:48:42Z
+
+    - add test
+
+0.02 2014-02-26T02:54:28Z
+
+    - original version
+

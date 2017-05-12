@@ -1,0 +1,25 @@
+Revision history for Common-Routine
+
+0.0.5 2016-03-24T01:22:14
+ [Yan Xueqing]
+ - Fix some bug of test file
+
+0.0.4 2016-03-23T09:57:19Z
+ [Yan Xueqing]
+ - Modified Name in readme file
+
+0.0.3 2016-03-23T08:41:14Z
+ [Yan Xueqing]
+ - Fixed test bug that most European languages use a comma representing
+   decimal point
+
+0.0.2 2016-03-23T02:26:36Z
+ [Yan Xueqing]
+ - Remove redunctant dependencies
+
+0.0.1 2016-03-23T02:18:43Z
+ [Yan Xueqing]
+ - Auto commited by dzil with version 0.0.1 at 23-Mar-2016
+ - Add some comment functions
+ - Initialize gitrepo with `dzil new`
+

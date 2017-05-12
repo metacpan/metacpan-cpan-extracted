@@ -1,0 +1,7 @@
+Add constraints to <transform/>
+
+Add alternate binary operators to <source/> and
+  <transform/> (>=, soundex matches, etc)
+
+Perform type checking when source.target is
+  defined

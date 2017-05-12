@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                CORBA-Python
+version:             2.66
+abstract:            IDL compiler to Python mapping
+license:             ~
+author:              
+    - Francois PERRAD (francois.perrad@gadz.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CORBA::C:                      2.6
+    CORBA::IDL:                    2.6
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Convert-ASN1-asn1c
+version:            0.07
+abstract:           A perl module to convert ASN1 to XML and back, using the
+author:
+    - Timo Schneider <timos@informatik.tu-chemnitz.de>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    ExtUtils::MakeMaker:  0
+    File::Slurp:          0
+    File::Which:          0
+    FindBin:              0
+    IPC::Run:             0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

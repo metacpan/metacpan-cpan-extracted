@@ -1,0 +1,249 @@
+==================================================
+Changes from 2014-08-19 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.2 at 2016-08-18 23:15:29 +0000
+----------------------------------------
+
+  Change: f90b8876a61dbcf75c1c1d24027a6be1e9fc5cb1
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 16:14:58 +0000
+
+    README regenerated for 1.2 release. 
+
+  Change: bfea9ce99b57357554df8e1b9a4b80f0115beb8f
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-18 16:12:28 +0000
+
+    Upgrade the release tooling preferences. 
+
+  Change: 9de85d543c779d9c1e51be12e692226bfa440664
+  Author: Kevin M. Goess <kgoess@craigslist.org>
+  Date : 2016-08-18 15:36:01 +0000
+
+    allow add'l validation for pwprompt 
+
+----------------------------------------
+version 1.1 at 2016-08-18 01:12:44 +0000
+----------------------------------------
+
+  Change: e57b793d88a77339feaf62124b19f915d12c0629
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-17 18:12:44 +0000
+
+    Release 1.1 - Echoing Sysloggian Bane
+
+    Added a noecho option to text_input which disables terminal echo and
+    refrains from Term::ReadLine magic.
+
+    Added pwprompt() to prompt a user for a password. Modified prompt() to
+    detect /passw(or)?d/i in a prompt and switch automatically to pwprompt.
+
+    Added a 'no_syslog' option to output to replace '_skip_syslog' which was a
+    hidden feature. This allows a user to ensure certain messages never go to
+    syslog.
+
+    Updated documentation to reflect the current state of affairs. 
+
+  Change: d6a0815fbf61eb5326458ac75839f25ecc826969
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-20 22:56:33 +0000
+
+    Dist::Zilla and Pod::Weaver configs updated. 
+
+  Change: 9257aed38de09b194dd3327c2e3c31107449689e
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-02-20 15:41:03 +0000
+
+    - Fix broken link in the README.mkdn file. 
+
+----------------------------------------
+version 1.0 at 2016-02-19 20:40:09 +0000
+----------------------------------------
+
+  Change: 51aad9acc121aaff07c30ab7a722e00208463017
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-19 20:40:09 +0000
+
+    Version 1.0 release 
+
+  Change: 798a83da59d66409f518f29bb8ca5160df7a1dfb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-19 20:29:37 +0000
+
+    Version 1.0 time. 
+
+  Change: 8a2bd515c056a2d997f061488558d17c1d678a68
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-19 12:27:27 +0000
+
+    Fix warnings around undefined values in certain instances. 
+
+----------------------------------------
+version 0.9 at 2016-02-02 22:32:24 +0000
+----------------------------------------
+
+  Change: d1d157aaf8af474943b830cb523f4aa091bc8c6a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-02-02 22:32:24 +0000
+
+    Version 0.9 release bump 
+
+  Change: eb98a12979d4e3e2c48a79965fbaa95540e3837e
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-02-02 14:28:24 +0000
+
+    Fix minimum verion of Term::ANSIColor and the authordeps in dist.ini. 
+
+  Change: 9b6e5543264e18f5266173923487b4f1940fbea4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 23:11:20 +0000
+
+    Fixing more authordeps. 
+
+  Change: 2903baadfebbb42f787335f26a0675c4176c4d89
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 23:07:03 +0000
+
+    Authordeps updated. 
+
+  Change: 8b2702bffb208b41ed89b365486a34e0edba403b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 22:59:42 +0000
+
+    Adding TravisCI to the project. 
+
+  Change: 8cc582b7c30fc004ff60f12703542c0a7bc55f25
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-10-29 22:56:49 +0000
+
+    Updates to dist.ini for better Prereqs and current tests. 
+
+----------------------------------------
+version 0.8 at 2015-05-10 16:47:06 +0000
+----------------------------------------
+
+  Change: 21630ed3fbc2928615ec631fc183366793677f9d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-05-10 18:47:06 +0000
+
+    Formatting fixes on the README.mkdn 
+
+  Change: 08b85a8b052e8df952ba61c21d51bfc73b387e4d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-05-10 18:46:09 +0000
+
+    * Added --debug-class to control what debug output you see. This is
+
+    useful for developers, you can see everything with --debug-class=all *
+    Added syslog output support with several options:
+
+    --syslog - enables syslog output
+
+    --syslog-tag - default is the program name
+
+    --syslog-facility - facility to use, default is local0
+
+    --syslog-debug - enable syslogging of debug messages
+
+    If using --data-file, data rows do not go to syslog. * Distribution Fixes:
+
+    - examples/01-simple-output.pl is more forthcoming about what's
+
+    happening
+
+    - Test::EOL replaces EOLTest
+
+    - Version Bump 
+
+----------------------------------------
+version 0.7 at 2014-09-13 14:11:24 +0000
+----------------------------------------
+
+  Change: c7c39762025dd90f3a293da921e5efd0f2ff6bc9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-09-13 16:11:24 +0000
+
+    Version Bump for 0.7 
+
+  Change: 5c7ecf5de9351b8bf7a41a263d94793804413fc7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-09-13 16:05:49 +0000
+
+    Documentation updates for the added features. Added some simple exmaples
+    for testing the changes. 
+
+  Change: 8d2483a05b75e3da6dd0b2db1463d7ac7939dd1d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-09-13 16:05:49 +0000
+
+    Enable "sticky" output mode to allow output to be replayed at the end of
+    the program. 
+
+  Change: 27eca9ec43f96c429b0b1a8a65cb2dd8740fca31
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-09-13 15:58:33 +0000
+
+    Fix the handling of "default" options in calls to prompt(); 
+
+  Change: 2191559cc43598999b02e63850a4d326b634f705
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-09-13 15:51:04 +0000
+
+    Added alias of '-v' for --verbose to be more compatible. 
+
+  Change: d2e862fe70bb49245c9acc768b07a5841a66f1b9
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-02 20:24:28 +0000
+
+    Version 0.6 release. 
+
+  Change: ad80542344b7dfd8b7a20c3b254888e988080603
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2014-08-13 23:21:04 +0000
+
+    Conversion to Dist::Zilla 5 
+
+----------------------------------------
+version 0.6 at 2014-09-02 18:23:31 +0000
+----------------------------------------
+
+  Change: b4af62f53b5cca602d2ceaf0ec97bc10713ab1e2
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2014-09-02 20:23:31 +0000
+
+    Version 0.6 release. 
+
+  Change: b8c71e8303add527915e7a2de175528afd7d74b4
+  Author: Kang-min Liu <gugod@gugod.org>
+  Date : 2014-08-11 15:33:19 +0000
+
+    fix the display of selection range that is off-by-one on prompt.
+
+    A trivial example to demostrate the error:
+
+    [~/src/CLI-Helpers]
+
+    > perl -Ilib -MCLI::Helpers=:all -e 'prompt("pick one", menu =>
+    ["a".."e"])'
+
+    pick one
+
+    1. a
+
+    2. b
+
+    3. c
+
+    4. d
+
+    5. e
+
+    Selection (1-6):
+
+    ^-- wrong 
+
+================================================
+Plus 5 releases after 2014-08-19 00:00:00 +0000.
+================================================

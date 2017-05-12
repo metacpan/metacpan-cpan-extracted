@@ -1,0 +1,41 @@
+---
+abstract: 'Catalyst view to resize images for thumbnails'
+author:
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-Thumbnail
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Catalyst::Helper::View::Thumbnail:
+    file: lib/Catalyst/Helper/View/Thumbnail.pm
+    version: '0.03'
+  Catalyst::View::Thumbnail:
+    file: lib/Catalyst/View/Thumbnail.pm
+    version: '0.03'
+requires:
+  Catalyst::View: '0'
+  ExtUtils::MakeMaker: '6.42'
+  Image::Info: '0'
+  Imager: '0'
+  Test::More: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/Altreus/Catalyst-View-Thumbnail/issues
+  homepage: https://github.com/Altreus/Catalyst-View-Thumbnail
+  repository: https://github.com/Altreus/Catalyst-View-Thumbnail.git
+version: '0.03'

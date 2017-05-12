@@ -1,0 +1,85 @@
+{
+   "abstract" : "Verify requirements in a CPAN::Meta object",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Meta-Check",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Prereqs" : "2.132830",
+            "CPAN::Meta::Requirements" : "2.121",
+            "Exporter" : "0",
+            "Module::Metadata" : "1.000023",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Env" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.88",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Meta::Check" : {
+         "file" : "lib/CPAN/Meta/Check.pm",
+         "version" : "0.014"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-cpan-meta-check at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Check"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/cpan-meta-check.git",
+         "web" : "https://github.com/Leont/cpan-meta-check"
+      }
+   },
+   "version" : "0.014",
+   "x_contributors" : [
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
+}
+

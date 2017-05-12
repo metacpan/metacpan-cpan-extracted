@@ -1,0 +1,50 @@
+From ubuntuser@nburmandesign Wed Jan 19 00:48:13 2005
+Received: from shawidc-mo1.cg.shawcable.net ([24.71.223.10]
+        helo=pd2mo2so.prod.shaw.ca)
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1Cr9dV-00017L-Ba
+        for ubuntu-users@lists.ubuntu.com; Wed, 19 Jan 2005 00:48:13 -0600
+Received: from pd5mr1so.prod.shaw.ca
+        (pd5mr1so-qfe3.prod.shaw.ca [10.0.141.232]) by l-daemon
+        (Sun ONE Messaging Server 6.0 HotFix 1.01 (built Mar 15 2004))
+        with ESMTP id <0IAJ00FW3XKCSF10@l-daemon> for
+        ubuntu-users@lists.ubuntu.com; Tue, 18 Jan 2005 23:48:12 -0700 (MST)
+Received: from pn2ml6so.prod.shaw.ca ([10.0.121.150])
+        by pd5mr1so.prod.shaw.ca (Sun ONE Messaging Server 6.0 HotFix 1.01
+        (built Mar
+        15 2004)) with ESMTP id <0IAJ00FSBXKC7F90@pd5mr1so.prod.shaw.ca> for
+        ubuntu-users@lists.ubuntu.com; Tue, 18 Jan 2005 23:48:12 -0700 (MST)
+Received: from 192.168.0.102
+        (S01060011952d0eb5.cg.shawcable.net [68.146.15.111])
+        by l-daemon (iPlanet Messaging Server 5.2 HotFix 1.18 (built Jul 28
+        2003)) with ESMTP id <0IAJ00M8HXKCQB@l-daemon> for
+        ubuntu-users@lists.ubuntu.com; Tue, 18 Jan 2005 23:48:12 -0700 (MST)
+Date: Tue, 18 Jan 2005 23:48:07 -0700
+From: nicholas <ubuntuser@nburmandesign>
+To: Ubuntu Users mailing list <ubuntu-users@lists.ubuntu.com>
+Message-id: <1106117287.10627.3.camel@localhost.localdomain>
+MIME-version: 1.0
+X-Mailer: Evolution 2.0.2
+Content-type: text/plain
+Content-transfer-encoding: 7bit
+X-Mailman-Approved-At: Wed, 02 Feb 2005 12:15:14 -0600
+Subject: after apt-get, how to run libgmp3?
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: Ubuntu Help and User Discussions <ubuntu-users@lists.ubuntu.com>
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Wed, 19 Jan 2005 06:48:13 -0000
+
+According to Synaptic I have a n encoder called libgmp3 on my system. I
+ran 'sudo apt-get install libgmp3' - now what? how do i use it?
+Apparently its an mp3 encoder.
+
+Nicholas

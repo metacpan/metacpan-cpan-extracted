@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::DBI::Loader::Sybase.
+
+0.02  Thu Nov  2 15:51:26 EST 2006
+      - fix to work with Class::DBI v3.0.15 & Class::DBI::Sybase v0.5
+
+0.01  Tue Feb 22 15:56:03 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Class::DBI::Loader::Sybase
+

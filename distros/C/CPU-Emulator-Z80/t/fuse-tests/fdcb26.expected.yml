@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  54433:
+    - 126
+name: fdcb26
+registers:
+  AF: 22573
+  AF_: 0
+  BC: 3609
+  BC_: 0
+  DE: 53879
+  DE_: 0
+  HL: 49023
+  HL_: 0
+  I: 0
+  IX: 25860
+  IY: 54500
+  PC: 4
+  R: 2
+  SP: 0

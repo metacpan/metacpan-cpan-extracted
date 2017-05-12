@@ -1,0 +1,20 @@
+---
+abstract: 'Catalyst authentication credentials from HTTP headers'
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires:
+  Catalyst::Plugin::Authorization::Roles: 0.08
+  Test::WWW::Mechanize::Catalyst: 0.52
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Credential-Upstream-Headers
+requires:
+  Catalyst: 5.80
+  Moose: 2.00
+version: 0.02

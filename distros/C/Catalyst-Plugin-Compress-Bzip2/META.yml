@@ -1,0 +1,14 @@
+---
+name: Catalyst-Plugin-Compress-Bzip2
+version: 0.01
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+abstract: Bzip2 response
+license: perl
+requires:
+  Compress::Bzip2: 0
+provides:
+  Catalyst::Plugin::Compress::Bzip2:
+    file: lib/Catalyst/Plugin/Compress/Bzip2.pm
+    version: 0.01
+generated_by: Module::Build version 0.2609

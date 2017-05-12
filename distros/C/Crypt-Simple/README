@@ -1,0 +1,57 @@
+DESCRIPTION
+    Maybe you have a web application and you need to store some session data
+    at the client side (in a cookie or hidden form fields) but you don't
+    want the user to be able to mess with the data. Maybe you want to save
+    secret information to a text file. Maybe you have better ideas of what
+    to do with encrypted stuff!
+
+    This little module will convert all your data into nice base64 text that
+    you can save in a text file, send in an email, store in a cookie or web
+    page, or bounce around the Net. The data you encrypt can be as simple or
+    as complicated as you like.
+
+CHANGES
+    Version 0.05 had a few missing subroutine bodies, so quite a few things
+    didn't work!  I'm now practising what I preach, and have written some tests!
+
+INTERNALS
+    "Crypt::Simple" is really just a wrapper round a few other useful Perl
+    modules: you may want to read the documentation for these modules too.
+
+    We use "FreezeThaw" to squish all your data into a concise textual
+    representation. We use "Compress::Zlib" to compress this string, and
+    then use "Crypt::Blowfish" in a home-brew CBC mode to perform the
+    encryption. Somewhere in this process we also add a MD5 digest (using
+    "Digest::MD5"). Then we throw the whole thing through "MIME::Base64" to
+    produce a nice bit of text for you to play with.
+
+    Decryption, obviously, is the reverse of this process.
+
+WARNING
+    Governments throughout the world do not like encryption because it makes
+    it difficult for them to look at all your stuff. Each country has a
+    different policy designed to stop you using encryption: some governments
+    are honest enough to make it illegal; some think it is a dangerous
+    weapon; some insist that you are free to encrypt, but only evil people
+    would want to; some make confusing and contradictory laws because they
+    try to do all of the above.
+
+    Although this modules itself does not include any encryption code, it
+    does use another module that contains encryption code, and this
+    documentation mentions encryption. Downloading, using, or reading this
+    modules could be illegal where you live.
+
+AUTHOR
+    Marty Pauley <marty@kasei.com>
+
+COPYRIGHT
+      Copyright (C) 2001 Kasei Limited
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,283 @@
+CGI/ProgressBar version 0.01
+============================
+
+NAME
+    CGI::ProgressBar - CGI.pm sub-class with a progress bar object
+
+SYNOPSIS
+            use strict;
+            use warnings;
+            use CGI::ProgressBar qw/:standard/;
+            $| = 1; # Do not buffer output
+            print header,
+                    start_html(
+                            -title=>'A Simple Example',
+                            -style=>{
+                                    -src  => '', # You can override the bar style here
+                                    -code => '', # or inline, here.
+                            }
+                    ),
+                    h1('A Simple Example'),
+                    p('This example will update a JS/CSS progress bar.'),
+                    progress_bar( -from=>1, -to=>100 );
+            # We're set to go.
+            for (1..10){
+                    print update_progress_bar;
+                    # Simulate being busy:
+                    sleep 1;
+            }
+            # Now we're done, get rid of the bar:
+            print hide_progress_bar;
+            print p('All done.');
+            print end_html;
+            exit;
+
+DESCRIPTION
+    This module provides a progress bar for web browsers, to keep end-users
+    occupied when otherwise nothing would appear to be happening.
+
+    It aims to require that the recipient client have a minimum of
+    JavaScript 1.0, HTML 4.0, ancd CSS/1, but this has yet to be tested.
+
+    All feedback would be most welcome. Address at the end of the POD.
+
+  DEPENDENCIES
+            CGI
+
+  EXPORT
+            progress_bar
+            update_progress_bar
+            hide_progress_bar
+
+USE
+    The module sub-classes CGI.pm, providing three additional methods (or
+    functions, depending on your taste), each of which are detailed below.
+
+    Simply replace your "use CGI qw//;" with "use CGI::ProgressBar qw//;".
+
+    Make sure you are aware of your output buffer size: "$|=$smothingsmall".
+
+    Treat each new function as any other CGI.pm HTML-producing routine with
+    the exception that the arguments should be supplied as in OOP form. In
+    other words, the following are all the same:
+
+            my $html = $query->progress_bar;
+            my $html = progress_bar;
+            my $html = progress_bar(from=>1, to=>10);
+            my $html = $query->progress_bar(from=>1, to=>10);
+            my $html = $query->progress_bar(-to=>10);
+
+    This will probably change if someone would like it to.
+
+FUNCTIONS/METHODS
+  FUNCTION/METHOD progress_bar
+    Returns mark-up that instantiates a progress bar. Currently that is HTML
+    and JS, but perhaps the JS ought to go into the head.
+
+    The progress bar itself is an object in this class, stored in the
+    calling ("CGI") object - specifically in the field "progress_bar", which
+    we create. (TODO: Make this field an array to allow multiple bars per
+    page.)
+
+    from
+    to  Values which the progress bar spans. Defaults: 0, 100.
+
+    orientation
+        If set to "vertical" displays the bar as a strip down the screen;
+        otherwise, places it across the screen.
+
+    blocks
+        The number of blocks to appear in the progress bar. Default: 10. You
+        probably want to link this to "from" and "to" or better still, leave
+        it well alone: it may have been a mistake to even include it.
+        "steps" is an alias for this attribute.
+
+    width
+    height
+        The width and height of the progress bar, in pixels. Cannot accept
+        percentages (yet). Defaults: 400, 20, unless you specify
+        "orientation" as "vertical", in which case this is reversed.
+
+    gap The amount of space between blocks, in pixels. Default: 1.
+
+    label
+        Supply this parameter with a true value to have a numerical display
+        of progress. Default is not to display it.
+
+    layer_id
+        Most HTML elements on the page have "id" attributes. These can be
+        accessed through the "layer_id" field, which is a hash with the
+        follwoing keys relating to the "id" value:
+
+    mycss
+        Custom CSS to be written inline (ugh) after any system CSS.
+
+        form
+            The "form" which contains everything we display.
+
+        container
+            The "div" containing everything we display.
+
+        block
+            This value is used as a prefixed for the "id" of each block of
+            the bar, with the suffix being a number incremented from 1.
+
+        number
+            The digits being updated as the bar progresses, if the option is
+            enabled.
+
+  FUNCTION/METHOD update_progress_bar
+    Updates the progress bar.
+
+  FUNCTION/METHOD hide_progress_bar
+    Hides the progress bar.
+
+CSS STYLE CLASS EMPLOYED
+    You can add CSS to be output into the page body (ugh) in the "mycss"
+    field. Bear in mind that the width and height settings are
+    programatically assigned.
+
+    pblib_bar
+    A "DIV" containing the whole progress bar, including any accessories
+    (such as the label). The only attribute used by this module is "width",
+    which is set dynamically. The rest is up to you. A good start is:
+
+            padding:    2 px;
+            border:     solid black 1px;
+            text-align: center;
+
+    pblib_block_off, pblib_block_on
+    An individual block within the status bar. The following attributes are
+    set dynamically: "width", "height", "margin-right".
+
+    pblib_number
+    Formatting for the "label" text (part of which is actually an "input
+    type='text'" element. "border" and "text-align" are used here, and the
+    whole appears centred within a "table".
+
+BUGS, CAVEATS, TODO
+    One bar per page
+        This may change.
+
+    Parameter passing doesn't match CGI.pm
+        But it will in the next release if you ask me for it.
+
+    "colors" not implimented
+        I'd like to see here something like the "Tk::ProgressBar::colors";
+        not because I've ever used it, but because it might be cool.
+
+    Horizontal orientation only
+        You can get around this by adjusting the CSS, but you'd rather not.
+        And even if you did, the use of "-label" might not look very nice
+        unless you did something quite fancy. So the next version (or so)
+        will support an "-orientation" option.
+
+    Inline CSS and JS
+        Because it's easiest for me. I suppose some kind of over-loading of
+        the "CGI::start_html" would be possible, but then I'd have to check
+        it, and maybe update it, every time CGI.pm was updated, which I
+        don't fancy.
+
+CGI UPLOAD HOOK
+        I'm not convinced it works yet, even in CGI.pm verion 3.15.
+
+        If anyone knows otherwise, please mail me: I have spent an hour on
+        the below, and it seems that the hook is called more times than
+        necessary....
+
+  PROCESS
+        The script has to both upload and process a file.
+
+        The hook script is called when the object is constructed, thus
+        before any headers can be output. There the hook needs to output its
+        own headers, and we only output headers for the 'select file' page
+        when the hook has not been called.
+
+        The first tiem the hook is called, then, it outputs HTTP headers and
+        begins the page. This is fine.
+
+        The next time it is called, it outputs the JS call to update the
+        progress bar. This is fine.
+
+        The problem is that the hook seems to be called many more times than
+        necessary.
+
+  SOURCE
+            #!/usr/local/bin/perl
+            use warnings;
+            use strict;
+
+            use CGI::ProgressBar qw/:standard/;
+            $| = 1; # Do not buffer output
+
+            my $data;
+            my $hook_called;
+            my $cgi = CGI->new(\&bar_hook, $data);
+
+            if (not $hook_called){
+                    print $cgi->header,
+                    $cgi->start_html( -title=>'A Simple Example', ),
+                    $cgi->h1('Simple Upload-hook Example');
+            }
+
+            print $cgi->start_form( -enctype=>'application/x-www-form-urlencoded'),
+                    $cgi->filefield( 'uploaded_file'),
+                    $cgi->submit,
+                    $cgi->end_form,p;
+
+            if ($cgi->param('uploaded_file')){
+                    print 'uploaded_file: '.param('uploaded_file');
+            }
+
+            sub bar_hook {
+                    my ($filename, $buffer, $bytes, $data) = @_;
+                    if (not $hook_called){
+                            print header,
+                            start_html( -title=>'Simple Upload-hook Example', ),
+                            h1('Uploading'),
+                            p(
+                                    "Have to read <var>$ENV{CONTENT_LENGTH}</var> in blocks of <var>$bytes</var>, total blocks should be ",
+                                    ($ENV{CONTENT_LENGTH}/$bytes)
+                            ),
+                            progress_bar( -from=>1, -to=>($ENV{CONTENT_LENGTH}/$bytes), -debug=>1 );
+                            $hook_called = 1;
+                    } else {
+                            # Called every $bytes, I would have thought.
+                            # But calls seem to go on much longer than $ENV{CONTENT_LENGTH} led me to believe they ought:
+                            print update_progress_bar;
+                            print "$ENV{CONTENT_LENGTH} ... $total_bytes ... $hook_called ... div="
+                            .($hook_called/$total_bytes)
+                            ."<br>"
+                    }
+                    sleep 1;
+                    $hook_called += $total_bytes;
+            }
+
+            print $cgi->hide_progress_bar;
+            if ($hook_called){
+                    print p('All done after '.$hook_called.' calls');
+            }
+            print $cgi->end_html;
+            exit;
+
+AUTHOR
+    Lee Goddard "lgoddard -in- cpan -dat- org", "cpan -ut- leegoddard -dut-
+    net"
+
+  COPYRIGHT
+    Copyright (C) Lee Goddard, 2002, 2003, 2005. All Rights Reserved. This
+    software is made available under the same terms as Perl itself. You may
+    use and redistribute this software under the same terms as Perl itself.
+
+KEYWORDS
+    HTML, CGI, progress bar, widget
+
+SEE ALSO
+    perl. CGI, Tk::ProgressBar,
+
+MODIFICATIONS
+    25 March 2004: Updated the POD.
+
+    16 December 2005: Updated the default styles.
+
+

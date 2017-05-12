@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Config-Apt-Sources
+version:             0.10
+abstract:            Parse and manipulate apt sources
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    Test::Warn:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Ian Kilgore <iank@cpan.org>

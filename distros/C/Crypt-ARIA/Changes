@@ -1,0 +1,13 @@
+Release history for Crypt::ARIA
+
+0.004     2013-11-28 12:11:15 Asia/Seoul
+          add Crypt::CBC >= 2.31 condition to test.
+
+0.003     2013-11-26 22:13:46 Asia/Seoul
+          Fix POD.
+
+0.002     2013-11-26 15:16:44 Asia/Seoul
+          Fix POD. Fix testing Crypt::CBC
+
+0.001     2013-11-26 12:26:09 Asia/Seoul
+          First release

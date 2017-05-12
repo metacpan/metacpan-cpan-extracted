@@ -1,0 +1,43 @@
+Revision history for Complete-File
+
+0.42    2016-10-20 (PERLANCAR)
+
+	- Fix Rinci metadata, forgot to shallow copy 'args' too.
+
+
+0.41    2016-10-19 (PERLANCAR)
+
+	- Allow specifying more than one filter options.
+
+        - complete_file(): Add filter option: exclude_dir, file_ext_filter.
+
+
+0.40    2016-05-09 (PERLANCAR)
+
+	- Convert filenames to Unicode strings instead of just octets, to
+	  properly display Unicode filenames.
+
+
+0.39    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21
+
+        - [Removed] For more consistent user experience, remove options
+	  ci/fuzzy/map_case/exp_im_path/dig_leaf, users are now encouraged to
+	  set this behavior globally via Complete::Common.
+
+
+0.38    2015-11-06 (PERLANCAR)
+
+	- Add complete_dir().
+
+
+0.37    2015-09-20 (PERLANCAR)
+
+	- Add fuzzy matching.
+
+
+0.36    2015-09-16 (PERLANCAR)
+
+        - First release, split from Complete-Util to avoid circular dependencies
+          (Complete-Path is adding fuzzy matching, which uses Complete::Util).

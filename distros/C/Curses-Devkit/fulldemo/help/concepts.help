@@ -1,0 +1,38 @@
+   There are a few concepts that have to be understood before effecitively 
+writing applications using the Perl5 Cdk extension. This document will try 
+to clear the air on any 'funny' behavior you may experience using Cdk.
+
+</U>Screens<!U>
+   Cdk uses a concept of a screen. When a widget is created it
+automagically registers itself with the screen. When it dies it 
+automagically removes itself from the screen. If at any time you refresh 
+the screen, and a widget appears that you don't want, it means it is still 
+registered.
+
+</U>Stricter Variable Localization<!U>
+   If you want a widget to remove itself from the screen, you can use the
+Perl command </R>undef<!R> to destroy the widget object by hand. The easiest
+method to do this is to use strict variable localization. (ie: only have the
+widget variables exist as long as you need them to)
+
+</U>Widget Mapping<!U>
+   Widget mapping is performed by the Cdk function </R>Cdk::refreshCdkScreen()<!R>.
+This function remaps all the widgets it knows about. This almost
+eradicates the need to call the object methods draw and erase. These are 
+included to remain as consistent and flexible as the C version.
+
+</U>Character Input<!U>
+   To get character input yourself, the function </R>Cdk::getch()<!R> was
+added. Though it is not meant to replace the standard method of getting
+characters in Perl, it can be used still. The main reason why I included
+this was to be consistent with Curses.
+
+</U>Raw Mode<!U>
+   You can put the terminal into raw mode by calling </R>Cdk::raw()<!R>. This
+allows you to interrupt special control characters like <CTRL>c, <CTRL>d
+and <CTRL>z. To get out of raw mode call </R>Cdk::noraw()<!R>. This will
+restore the terminal back.
+
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995

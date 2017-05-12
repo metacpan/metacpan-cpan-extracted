@@ -1,0 +1,374 @@
+**************************************
+Date: Sun Jan 20 11:41:18 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_23
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Makefile.PL 
+
+--------------------------------------
+Log Message:
+Changed the creation of dist files again. This time everything should
+work.
+**************************************
+Date: Wed Jan  9 23:59:23 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_22
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Makefile.PL 
+
+--------------------------------------
+Log Message:
+Recorrected distribution stuff. Needs `dists' so CVS does not try to
+dive into that :-( .
+**************************************
+Date: Wed Jan  9 23:55:36 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_21
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Makefile.PL 
+
+--------------------------------------
+Log Message:
+Creation of distribution improved.
+**************************************
+Date: Wed Jan  9 23:09:03 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_20
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm MANIFEST Makefile.PL test.pl 
+
+--------------------------------------
+Log Message:
+Made it Free Software. Documentation improved. Actual values are part
+of the error message.
+**************************************
+Date: Tue Jan  8 01:01:27 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_19
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Moved some ideas to `TODO'. Whitespace is permitted in type
+descriptions.
+**************************************
+Date: Tue Jan  8 00:00:14 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_18
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Some small changes.
+**************************************
+Date: Mon Jan  7 23:21:17 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_17
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Tested parameter lists.
+**************************************
+Date: Mon Jan  7 18:44:12 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_16
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Fixed export stuff. `is_a' may now be imported as expected.
+**************************************
+Date: Mon Jan  7 11:01:34 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_15
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+`is_a' added. Export is missing.
+**************************************
+Date: Mon Jan  7 02:18:36 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_14
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Ahm... Now: Complex interaction between references and list types
+tested.
+**************************************
+Date: Mon Jan  7 01:27:53 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_13
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	test.pl 
+
+--------------------------------------
+Log Message:
+Complex interaction of references and list types tested.
+**************************************
+Date: Mon Jan  7 01:26:58 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_12
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Alternative, array, and hash type tested.
+**************************************
+Date: Sun Jan  6 23:16:57 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_11
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm 
+
+--------------------------------------
+Log Message:
+Code moved around.
+**************************************
+Date: Sun Jan  6 23:12:13 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_10
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+All simple types implemented and tested.
+**************************************
+Date: Sun Jan  6 18:42:41 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_9
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+All tests for simple types implemented. Tested.
+**************************************
+Date: Sun Jan  6 17:13:21 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_8
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm test.pl 
+
+--------------------------------------
+Log Message:
+Improved error handling. Still untested.
+**************************************
+Date: Sun Jan  6 16:25:40 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_7
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Makefile.PL 
+
+--------------------------------------
+Log Message:
+Debugging.
+**************************************
+Date: Sun Jan  6 15:59:18 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_6
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm MANIFEST Makefile.PL global.log 
+
+--------------------------------------
+Log Message:
+Corrected `global.log' and the log messages. Added a hint about using
+code from `Carp::Assert'. Moved `test.pl' up where it is expected by
+the generated `Makefile'. `$VERSION' set automatically. Improved
+`Makefile.PL' to work with `lcvs'.
+**************************************
+Date: Sun Jan  6 03:36:33 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_5
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm 
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure/t
+In directory rosalu:/home/stefan/prog/Carp_Ensure/t
+
+Modified Files:
+	test.pl 
+
+--------------------------------------
+Log Message:
+Developed further. Base construction done.
+**************************************
+Date: Sun Jan  6 01:12:07 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_4
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure
+In directory rosalu:/home/stefan/prog/Carp_Ensure
+
+Modified Files:
+	Ensure.pm tag.log 
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp_Ensure/t
+In directory rosalu:/home/stefan/prog/Carp_Ensure/t
+
+Modified Files:
+	test.pl 
+
+--------------------------------------
+Log Message:
+Very first tests did work.
+**************************************
+Date: Sat Jan  5 23:56:09 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_3
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp-Ensure
+In directory rosalu:/home/stefan/prog/Carp-Ensure
+
+Modified Files:
+	Ensure.pm 
+
+--------------------------------------
+Log Message:
+Wrote down ideas and some documentation.
+**************************************
+Date: Sat Jan  5 21:38:52 MET 2002
+Author: stefan
+Tag: Carp_Ensure_1_2
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp-Ensure
+In directory rosalu:/home/stefan/prog/Carp-Ensure
+
+Added Files:
+	Ensure.pm MANIFEST Makefile.PL 
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp-Ensure/t
+In directory rosalu:/home/stefan/prog/Carp-Ensure/t
+
+Added Files:
+	test.pl 
+
+--------------------------------------
+Log Message:
+Ran `h2xs -X -n Carp::Ensure -A' and moved results to top level. Moved
+`test.pl' to new directory `t' as recommended. Replaced `Changes' by a
+symbolic link to `global.log'. Corrected `MANIFEST'.
+**************************************
+Date: Sat Jan  5 21:34:57 MET 2002
+Author: stefan
+
+--------------------------------------
+Update of /home/stefan/vault/sm/Carp-Ensure/t
+In directory rosalu:/home/stefan/prog/Carp-Ensure/t
+
+
+--------------------------------------
+Log Message:
+Directory /home/stefan/vault/sm/Carp-Ensure/t added to the repository
+

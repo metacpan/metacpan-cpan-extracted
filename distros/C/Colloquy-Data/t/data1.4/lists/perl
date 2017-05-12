@@ -1,0 +1,10 @@
+return {
+  description = "For perl chat",
+  created = "Sat Nov  5 22:04:49 2005",
+  members = { "neech", "zoe", "goolies", "tims", "pkent", "botbot", "milky", "tomc", "flux", },
+  listname = "perl",
+  masters = { },
+  owner = "neech",
+  flags = "P",
+  used = 1132529518,
+}

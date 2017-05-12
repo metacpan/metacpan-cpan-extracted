@@ -1,0 +1,62 @@
+NAME
+    Catalyst::Plugin::Cache::Store::FastMmap - DEPRECATED - FastMmap cache
+    store for Catalyst::Plugin::Cache.
+
+SYNOPSIS
+        # instead of using this plugin, you can now do this:
+
+        use Catalyst qw/
+            Cache
+        /;
+
+        __PACKAGE__->config( cache => {
+            backend => {
+                class => "Cache:FastMmap",
+                share_file => "/path/to/file",
+                cache_size => "16m",
+            },
+        });
+
+STATUS
+    This plugin is deprecated because Cache::FastMmap no longer needs to be
+    wrapped to store plain values. It is still available on the CPAN for
+    backwards compatibility and will still work with newer versions of
+    Cache::FastMmap with a slight performance degredation.
+
+DESCRIPTION
+    This store plugin is a bit of a wrapper for Cache::FastMmap.
+
+    While you could normally just configure with
+
+        backend => {
+            class => "Cache::FastMmap",
+            share_file => ...,
+        }
+
+    Cache::FastMmap can't store plain values by default. This module ships
+    with a subclass that will wrap all values in a scalar reference before
+    storing.
+
+    This store plugin will try to provide a default "share_file" as well,
+    that won't clash with other apps.
+
+CONFIGURATION
+    See "CONFIGURATION" in Catalyst::Plugin::Cache for a general overview of
+    cache plugin configuration.
+
+    This plugin just takes a hash reference in the backend field and passes
+    it on to Cache::FastMmap.
+
+SEE ALSO
+    Catalyst::Plugin::Cache, Cache::FastMmap.
+
+AUTHOR
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+COPYRIGHT & LICENSE
+    Copyright (c) Yuval Kogman, 2006. All rights reserved.
+
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself, as well as under the terms of the
+    MIT license.
+

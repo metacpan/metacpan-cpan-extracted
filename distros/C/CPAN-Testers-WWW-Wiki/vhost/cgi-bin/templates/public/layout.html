@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+
+  <title>[% iname | html %]</title>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  <meta http-equiv="Content-Language" content="en-gb" />
+  <meta name="Generator"          content="Labyrinth" />
+  <meta name="keywords"           content="perl,cpan,testing,testers" />
+  <meta name="description"        content="CPAN Testers Wiki for information about automated testing of CPAN Perl distributions" />
+  <meta name="copyright"          content="Copyright (C) 2007-2012 CPAN Testers" />
+
+[% IF redirect %]
+
+  <meta http-equiv="refresh" content="0;url=[% redirect %]">
+
+</head>
+<body>
+<p>saving...</p>
+
+[% ELSE %]
+  <link rel="alternate"  type="application/atom+xml" title="Atom"    href="http://wiki.cpantesters.org/rss/atom-1.0.xml" />
+  <link rel="alternate"  type="application/rss+xml"  title="RSS 2.0" href="http://wiki.cpantesters.org/rss/rss-2.0.xml" />
+
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2-setup.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2-text.css" />
+
+  [% INCLUDE "public/analytics.html" %]
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+  <script type="text/javascript" src="[% webpath %]/js/wiki.js"></script>
+  [% IF user.access > 4 %]
+  <script type="text/javascript" src="[% webpath %]/js/admin.js"></script>
+  [% END %]
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+    Original CSS/XHTML Template Design by Wolfgang.
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+    Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+       <div class="ribbon-wrapper-green"><div class="ribbon-green"><a href="http://iheart.cpantesters.org">I <span class="alert">&hearts;</span> CPAN Testers</a></div></div>
+
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->
+    <div class="header">
+
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/">[% iname %]</a></h1>
+          <h3>wiki.cpantesters.org</h3>
+          <h2>[% title %]</h2>
+        </div>
+
+        [% INCLUDE "public/box-sites.html" %]
+      </div>
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <div id="breadcrumbs">
+        <ul>
+          <li><a href="/">Home</a></li>
+          [% IF crumb3_name %]<li><a href="[% crumb3_href %]">[% crumb3_name %]</a></li>[% END %]
+          [% IF crumb2_name %]<li><a href="[% crumb2_href %]">[% crumb2_name %]</a></li>[% END %]
+          <li>[% crumb1_name %]</li>
+        </ul>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- B. MAIN -->
+    <div class="main">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+        [% INCLUDE "public/sidebar.html" %]
+
+        <br />
+        <br />
+        <br />
+        <h2>Edsger Dijkstra:</h2>
+        <p><em>"Program testing can be used to show the presence of bugs, but never to show their absence!"</em></p>
+
+      </div>
+
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <div id="iheart-banner">
+        [% INCLUDE "public/banner.html" %]
+        </div>
+
+        <div id="tooltip" class="update20110712">
+          <p><strong>Upgrade Notice</strong></p>
+          <p>The CPAN Testers Wiki site has been upgraded since you last accessed the site.
+          Please press the F5 key or CTRL-R to refresh your browser cache to use the latest javascript and CSS files.</p>
+        </div>
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">[% title %]</h1>
+        <div class="column1-unit">
+
+          [% body %]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+    </div>
+
+    <!-- C. FOOTER AREA -->
+    [% INCLUDE "public/footer.html" %]
+
+  </div>
+
+  <p class="footnote"><a href="/wiki/Terms">Terms &amp; Conditions</a></p>
+
+  </div>
+
+  <script type="text/javascript" src="/js/iheart.js"></script>
+<script>
+    $().ready(function () {
+        $('.sponsor').on('click', function () {
+            $(this).find('img.logo').toggle();
+            $(this).find('div.info').toggle();
+        });
+    });
+</script>
+
+[% END %]
+
+</body>
+</html>

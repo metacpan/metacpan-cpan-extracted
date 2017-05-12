@@ -1,0 +1,31 @@
+[% 
+    title = 'Find A Tester' ;
+    box_sites = 1
+
+    crumb1_name = 'Find A Tester' ;
+%]
+
+<form method="post" action="/cgi-bin/cpanmail.cgi">
+<table class="matrix" summary="Find A Tester">
+<tr><th class="nntp"><label for="id">ID/GUID:</label></th>
+    <td><input type="text" id="id" name="id" value="" size="20" /></td>
+    <td><input type="submit" name="SEARCH" value="SEARCH" /></td>
+</tr>
+</table>
+</form>
+
+<p>This form is purely to be used by distribution authors to obtain the address of a tester.</p>
+<p>If this form is seen to generate spam attacks on testers, further anti-spam restrictions 
+will be put into place. Please use with care.</p>
+
+<h3>What ID/GUID do I use?</h3>
+<p>If you're new to CPAN Testers, then you may not be aware of what ID or GUID to use here.
+Currently CPAN Testers reports are publicly available via the CPAN Testers Reports site, using
+a unique ID used by 'cpanstats' database or a GUID used by the Metabase data store. Either of
+these can be used to perform a lookup. The ID or GUID is displayed via the report display on
+the CPAN Testers Reports site.</p>
+<p>The examples below highlight the ID and GUID in URLs you are likely to see:</p>
+<ul>
+<li>http://www.cpantesters.org/cpan/report/<span class="emphasis">7019327</span></li>
+<li>http://www.cpantesters.org/cpan/report/<span class="emphasis">07019335-b19f-3f77-b713-d32bba55d77f</span></li>
+</ul>

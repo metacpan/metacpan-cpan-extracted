@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/mimetic
+lib/Crypt/Mimetic.pm
+lib/Crypt/Mimetic/CipherSaber.pm
+lib/Crypt/Mimetic/None.pm
+lib/Crypt/Mimetic/TEA.pm
+lib/Error/Mimetic.pm
+test.pl

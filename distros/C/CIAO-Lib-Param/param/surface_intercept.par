@@ -1,0 +1,151 @@
+#----------------------------------------------------------------------------
+# surf_no:
+#
+#    The surface number for the optic (normally 1 for the paraboloid)
+#
+surf_no,i,a,1,,,"surface number"
+#
+#----------------------------------------------------------------------------
+# input:
+#
+#    The name of the file/stream for the input BPipe
+#
+input,s,a,"stdin",,,"input file"
+#
+#----------------------------------------------------------------------------
+# output:
+#
+#    The name of the file/stream for the output BPipe
+#
+output,s,a,"stdout",,,"output file"
+#
+#----------------------------------------------------------------------------
+# logfile:
+#
+#    The name of the file to contain the raytrace summary and error messages
+#
+logfile,s,a,"surf_1.lis",,,"log file"
+#
+#----------------------------------------------------------------------------
+# gi_filename:
+#
+#    The name of the OSAC-style 'gi' file
+#
+gi_filename,s,a,"g_perfect.gi",,,"GI file"
+#
+#----------------------------------------------------------------------------
+# dfm_filename:
+#
+#    The name of the deformation file for the surface
+#    (Fourier-Legendre 'cogen' coefficients, or spline coefficients)
+#
+#    By convention, the following file suffixes are used:
+#       .DFR - 'cogen' coefficients
+#       .SPL - spline  coefficients
+#
+dfm_filename,s,a,"perfect.DFR",,,"deformation file"
+#
+#----------------------------------------------------------------------------
+# dfm_scale:
+#
+# Scale deformation (and the theta and z derivatives) by a constant.
+# Normally should be set to 1.0 (no scaling)
+#
+dfm_scale,r,a,1.0,,,"deformation scale parameter"
+#
+#----------------------------------------------------------------------------
+# theta0:
+#
+# Reference clocking angle for the optic.  theta0 is in degrees;
+# a positive clocking rotates the optic such that a fiducial mark
+# on the +X axis (SAO raytrace coordinates) towards the +Y axis.
+#
+# The SAO raytrace coordinates are:
+#   Z axis: parallel to the nominal optical axis.  Z increases from
+#           the mirror towards the focal plane.
+#   Y axis: "up"
+#   X axis: completes a right-handed coordinate system.
+#
+theta0,r,a,0.0,,,"clocking angle for optic"
+#
+#----------------------------------------------------------------------------
+# do_osac_reflect:
+#
+#    [WARNING:  This switch is not active yet.]
+#
+#    If do_osac_reflect is set to 'yes', frSAOdrat will locate the
+#    ray-surface intercept and reflect the rays according to the
+#    complex dielectric constant read in from the ".gi" file.
+#
+#    If do_osac_reflect is set to 'no', frSAOdrat will locate the
+#    ray-surface intercept but will *not* reflect the ray.  The
+#    ray will be reflected by another "reflect" module.
+#
+do_osac_reflect,b,a,yes,,,"yes: reflect the ray; no: just find intercept"
+#
+#----------------------------------------------------------------------------
+# onlygoodrays:  
+#
+#    If onlygoodrays is set to 'yes', only those rays which 
+#    have reflected off each optic (so far) will be passed along the pipeline.
+#    If onlygoodrays is set to 'no', ghost rays will also be passed.
+#    Ghost rays include nonreflected rays and rays which miss at least
+#    one optical surface.  The position and direction of the ghost ray
+#    correspond to the ray position/direction just after the last
+#    successful reflection.
+#
+#    Rays which are marked bad by SAOdrat for
+#    other reasons (e.g., left stop errors, negative pathlength errors, ...)
+#    are not considered to be ghost rays and are not passed.
+#
+onlygoodrays,b,a,yes,,,"yes to pass only good rays"
+#
+#---------------------------------------------------------------------------
+# dfm2_filename:
+#
+#    The name of the second deformation file for the surface
+#    (Fourier-Legendre 'cogen' coefficients)
+#
+#    By convention, the following file suffix is used:
+#       .DFR - 'cogen' coefficients
+#
+dfm2_filename,s,a,"perfect.DFR",,,"deformation file"
+#
+#----------------------------------------------------------------------------
+# dfm2_scale:
+#
+# Scale deformation (and the theta and z derivatives) by a constant
+#       for the second deformation.
+# Normally should be set to 1.0 (no scaling)
+#
+dfm2_scale,r,a,1,,,"deformation scale parameter"
+#
+#----------------------------------------------------------------------------
+# theta02:
+# Reference clocking angle for the optic for the second deformation.
+# theta0 is in degrees;
+# a positive clocking rotates the optic such that a fiducial mark
+# on the +X axis (SAO raytrace coordinates) towards the +Y axis.
+#
+# The SAO raytrace coordinates are:
+#   Z axis: parallel to the nominal optical axis.  Z increases from
+#           the mirror towards the focal plane.
+#   Y axis: "up"
+#   X axis: completes a right-handed coordinate system.
+#
+theta02,r,a,0.0,,,"clocking angle for optic"
+#  
+#-----------------------------------------------------------------------------
+# dfm_type:
+#
+#    Deformation type to be applied:
+#       0 for spline only, 
+#       1 for Legendre/Fourier only,
+#       2 for both spline and Legendre/Fourier
+# 
+dfm_type,i,a,1,,,"deformation type"
+#-----------------------------------------------------------------------------
+help,b,a,no,,,"print help and exit?"
+debug,s,a,"",,,"debug flags"
+version,b,a,no,,,"print version and die?"
+mode,s,h,"lh",,,"mode"

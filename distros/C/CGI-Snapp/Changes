@@ -1,0 +1,84 @@
+Revision history for Perl extension CGI::Snapp.
+
+2.01  2016-09-11T11:01:00
+	- Add the directory of the new version of CGI::Snapp (i.e. ./lib) to the @INC used by
+		"$^X $script" (in t/lib/CGI/Snapp/RunScript.pm) by changing that string to
+		"$^X -Ilib $script". This stops the tests defaulting to any version of CGI::Snapp
+		already installed, and thus forces all tests run by t/test.t to use this new version.
+		I found this issue by eventually noticing that in my conversion from Hash::FieldHash to
+		Moo I had installed a faulty copy of CGI::Snapp whose default value of send_output was
+		0 instead of 1. Only by deleting the installed version and manually running some tests
+		both via 'prove -lv ...' and via 'perl -Ilib ...' did I find the typo.
+
+2.00  2016-09-04T12:10:00
+	- Hash::FieldHash has been replaced by Moo.
+		By default Moo has no XS. And since Hash::FieldHash had an XS component, this switch to Moo
+		may help some users there too.
+		Also note, from the Moo docs: 'If a new enough version of Class::XSAccessor is available,
+		it will be used ...'.
+	- Adopt new repo structure. This includes changing the licence from Artistic to Perl. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Adopt patch to t/lib/CGI/Snapp/RunScript from twata. See RT#81241. With thanx.
+
+1.08  2013-08-29T17:17:00
+	- Update pre-reqs in general, and in particular for Proc::Fork (0.71 to 0.802).
+		The aim here is to attack the problem Alexandr is having with the tests hanging under MS Windows.
+	- Use Data::Dumper::Concise and uncomment all the 'diag' calls in t/params.pl, in case I need the output
+		to diagnose the random failures on recent Perls, which Andreas thinks are related to hash
+		randomization issues. I would be a great relief to understand exactly what this problem really is.
+
+1.07  2013-08-28T14:30:00
+	- t/test.t: Clean up usage of arrayref 'v' array, to make test more reliable.
+		Thanx to Alexandr Ciornii. See RT#81241.
+	- t/params.pl: Sort all hashes (yes, keys and values) and arrays to make comparisons more reliable
+		in the presence of hash key randomization, even with Test::Deep's cmp_deeply.
+		This has been causing ocassional test failues for CPAN testers.
+		Thanx to Andreas Koenig.
+
+1.06  2013-08-20T12:30:00
+	- Switch from Test::More.is_deeply() to Test::Deep.cmp_deeply().
+		This is to avoid hash key randomization issues.
+
+1.05  2013-06-13T12:44:00
+	- Patch t/test.t so that when Test::Pod is not installed, we expect 0 test results from t/pod.t.
+
+1.04  2013-06-12T16:38:00
+	- Rename CHANGES to Changes as per CPAN::Changes::Spec.
+	- Add a test of add_header() to t/headers.pl.
+	- Update corresponding test count in t/test.t.
+	- Change sub log():
+		From: $myself -> logger -> $level($s)        if ($myself && $myself -> logger)
+		To:   $myself -> logger -> log($level => $s) if ($myself && $myself -> logger)
+		The reason for this is that if your logger is derived from another class or role, that class
+		or role had to provide not just the log() method, but all of debug(), info(), notice(), warning(),
+		warn(), error(), err(), critical(), crit(), alert(), emergency() and emerg(), just in case any
+		of them are needed.
+		I should not have used that design, because it forces other code to provide too much complexity.
+	- Update licence to perl_5. See https://metacpan.org/module/CPAN::Meta::Spec.
+	- Add a note to the POD for header_type(), about the HTTP status being set to 200 when the header type
+		has been set to 'none'.
+	- Add a note to the FAQ about explicitly outputting a header when using Ajax (at least with jQuery).
+
+1.03  2012-11-17T10:31:00
+	- Use File::Spec -> catfile('t', 'x.pl') instead of 't/x.pl' in tests.
+		This should solve RT#81241 reported by CHORNY under MS Windows.
+
+1.02  2012-09-17T11:38:00
+	- Add CGI::PSGI to the pre-reqs (Andreas Koenig).
+	- Change (in Build.PL) configure_requires{Module::Build} from 0.3800 to 0, after adapting advice from
+		 Andreas Koenig.
+	- Roll the source of CGI::Snapp::Plugin::Forward into CGI::Snapp.
+		See also t/forward.t and t/lib/CGI/Snapp/ForwardTest.pm.
+		Update docs.
+	- Roll the source of CGI::Snapp::Plugin::Redirect into CGI::Snapp.
+		See also t/redirect.t and t/lib/CGI/Snapp/RedirectTest.pm.
+		Update docs.
+
+1.01  2012-04-08T10:40:00
+	- Shift some code from run() into _determine_(cgi|psgi)_output().
+	- Add PSGI-specific code, sub as_psgi(), and make some changes to run() using $self -> _psgi().
+	- Add t/psgi.basic.pl.
+	- Also test via CGI::Snapp::Dispatch's t/psgi.args.t.
+
+1.00  2012-02-27T10:09:44
+	- Original version

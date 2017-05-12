@@ -1,0 +1,9 @@
+Revision history for Class-DBI-Plugin-Backtickify
+
+0.02    Tues 24 May 2005 16:20
+        - use Class::ISA instead of messing around with storing the caller 
+            in its own classdata.
+
+0.01    Tues 24 May 2005 15:00
+        First version, released on an unsuspecting world.
+

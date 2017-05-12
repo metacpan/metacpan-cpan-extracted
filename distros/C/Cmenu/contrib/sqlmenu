@@ -1,0 +1,828 @@
+#!/usr/bin/perl
+#
+# Last updated Time-stamp: <01/04/07 18:31:56 devel>
+#
+# Foody Menu
+# ----------
+
+
+# Packages to use
+# Curses for colour and character positioning
+use Curses;
+use Pg;
+use Cmenu;
+
+
+# #### VARIABLES ########################################################
+
+# ---< setup database structures >--------------------------------------
+# Setip database variables
+$sqlhost=$ENV{PGHOST};
+if(length($sqlhost)<1) { $sqlhost="localhost";}
+$sqldbase="home";
+$sqluser=$ENV{USER};
+
+$conn=Pg::setdbLogin($sqlhost,'','','',$sqldbase,$sqluser,'');
+if($conn->status != PG_CONNECTION_OK) {
+    print "Failed to connect to Postgres Server\n";
+    print "  Server $sqlhost\n";
+    print "  User   $sqluser\n";
+    print "  Dbase  $sqldbase\n";
+    print "Postgres reports ".$conn->errorMessage."\n";
+    die;
+}
+
+$last_option=0;
+
+# ---< setup variables for addressbook >--------------------------------
+# Types of Phone number
+@pt = ();
+
+$result=$conn->exec("SELECT * FROM addcat WHERE addcat=1 ORDER BY addctype");
+$numrows=$result->ntuples();
+for($i=0;$i<$numrows;$i++) {
+  @row=$result->fetchrow;
+  $pt[$i]=$row[2];
+}
+
+# Types of address
+@at = ();
+$result=$conn->exec("SELECT * FROM addcat WHERE addcat=2 ORDER BY addctype");
+$numrows=$result->ntuples();
+for($i=0;$i<$numrows;$i++) {
+  @row=$result->fetchrow;
+  $at[$i]=$row[2];
+}
+
+# pgSQL proper field names for UPDATE
+@sql=();
+$sql[0]="addressid";
+$sql[1]="addforename";
+$sql[2]="addsurname";
+$sql[3]="addorg";
+$sql[4]="addstreet";
+$sql[5]="addtownland";
+$sql[6]="addtown";
+$sql[7]="addpostcode";
+$sql[8]="addcounty";
+$sql[9]="addcountry";
+$sql[10]="addphone1";
+$sql[11]="addptype1";
+$sql[12]="addphone2";
+$sql[13]="addptype2";
+$sql[14]="addphone3";
+$sql[15]="addptype3";
+$sql[16]="addphone4";
+$sql[17]="addptype4";
+$sql[18]="addtype";
+$sql[19]="addemail";
+$sql[20]="addnote";
+$sql[21]="addupdate";
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+
+# Setup the screen to handle curses and colour
+&menu_initialise("Family Databases","Do It Right The First Time");
+
+# <<<< main menu >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+do {
+  &menu_init("Foody Database","Select Application");
+  &menu_button_set(2,"");
+  
+  &menu_item("Address Book","address");
+  &menu_item("Food Shopping","food");
+  
+  chop($sel=&menu_display("Choose your option",$last_option));
+
+ SUB_MENU: for($sel) {
+    /address/ && do {
+      if(&addressmenu eq "%EMPTY%") { $sel="%EMPTY%"; redo SUB_MENU; } else {
+      $last_option=0;
+	$sel="NOP";
+	last SUB_MENU;
+      }
+    };
+    /food/ && do {
+      &foodmenu;
+      $last_option=1;
+      last SUB_MENU;
+    };
+    /show/ && do {
+      &menu3;
+      $last_option=2;
+      last SUB_MENU;
+    };
+    /print/ && do {
+      &menu4;
+      $last_option=3;
+      last SUB_MENU;
+    };
+  };
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+
+# <<<< terminating >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+menu_terminate("Reached the end safely");
+
+# #### END ##############################################################
+
+# ===< addressmenu >=====================================================
+# List an addressbook and allows editing of data fields and stuff
+sub addressmenu {
+
+  $last_option=0;
+
+  do {
+    &menu_button_set(1,"Select");
+    &menu_button_set(2,"");
+    &menu_button_set(3,"Exit");
+
+    &menu_init("Family Addressbok","Select Application");
+    
+    &menu_item("Forename List","forename");
+    &menu_item("Surname List","surname");
+    &menu_item("Edit Address","edit");
+    &menu_item("New Address","new");
+    
+    
+    chop($sel=&menu_display("Choose your option",$last_option));
+    
+  SUB_MENU: for($sel) {
+      /forename/ && do {
+	if(&addforename eq "%EMPTY%") { return("%EMPTY%"); }
+      $last_option=0;
+	last SUB_MENU;
+      };
+      /surname/ && do {
+	if(&addsurname eq "%EMPTY%") { return("%EMPTY%"); }
+      $last_option=1;
+	last SUB_MENU;
+      };
+      /edit/ && do {
+	if(&addedit eq "%EMPTY%") { return("%EMPTY%"); }
+      $last_option=2;
+	last SUB_MENU;
+      };
+      /new/ && do {
+	if(&addnew eq "%EMPTY%") { return("%EMPTY%"); }
+      $last_option=3;
+	last SUB_MENU;
+      };
+    };
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  return($sel);
+}
+
+# ---< forename >--------------------------------------------------------
+sub addforename {
+  my ($sel);
+  
+  do {
+    &menu_init("Phone list by Forename","You can Search by pressing a Letter");
+    &menu_button_set(2,"");
+    
+    $result=$conn->exec("SELECT addressid,addforename,addsurname,addphone1 FROM address ORDER BY addforename");
+    $numrows=$result->ntuples();
+    for($i=0;$i<$numrows;$i++) {
+      @row=$result->fetchrow;
+      &menu_item($row[2]." ".$row[3],$row[1],8,$row[0]);
+    }
+    
+    chop($sel=&menu_display("Choose a Name"));
+    if(($sel eq "%EMPTY%")||($sel eq "%UP%")) { return($sel); } 
+
+    $result=$conn->exec("SELECT * FROM address WHERE addressid = $sel");
+    if(!$result) {
+      &menu_show("No such Address","I was unable to find any address for ID $sel!","HELP");
+    } else {
+      @row=$result->fetchrow;
+      
+      &menu_init("Details for $row[1] $row[2]","Use page keys to see the next page");
+      
+      &menu_item($row[1]." ".$row[2],"Name",8);
+      &menu_item($row[3],"Organisation",8);
+      &menu_item($row[4],"Street",8);
+      &menu_item($row[5],"Townland",8);
+      &menu_item($row[6],"Town",8);
+      &menu_item($row[7],"Postcode",8);
+      &menu_item($row[8],"County",8);
+      &menu_item($row[9],"Country",8);
+      &menu_item("Numbers","Phone",9);
+      &menu_item($row[10],$pt[$row[11]],8);
+      &menu_item($row[12],$pt[$row[13]],8);
+      &menu_item($row[14],$pt[$row[15]],8);
+      &menu_item($row[16],$pt[$row[17]],8);
+      &menu_item($at[$row[18]],"Type",8);
+      &menu_item($row[19],"eMail",8);
+      &menu_item($row[21],"Date stamp",8);
+      
+      $sel=&menu_display("List");
+      chop($sel);
+    }
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  return($sel);
+}
+
+# ---< surname >---------------------------------------------------------
+sub addsurname {
+  my ($sel);
+
+  do {
+    &menu_init("Phone list by Surname","You can Search by pressing a Letter");
+    &menu_button_set(2,"");
+    
+    $result=$conn->exec("SELECT addressid,addforename,addsurname,addphone1 FROM address ORDER BY addsurname");
+    $numrows=$result->ntuples();
+    for($i=0;$i<$numrows;$i++) {
+      @row=$result->fetchrow;
+      &menu_item($row[1]." ".$row[3],$row[2],8,$row[0]);
+    }
+    
+    chop($sel=&menu_display("Choose a Name"));
+    if(($sel eq "%EMPTY%")||($sel eq "%UP%")) { return($sel); } 
+    
+    $result=$conn->exec("SELECT * FROM address WHERE addressid = $sel");
+    if(!$result) {
+      &menu_show("No such Address","I was unable to find any address for ID $sel!","HELP");
+    } else {
+      @row=$result->fetchrow;
+      
+      &menu_init("Details for $row[1] $row[2]","Use page keys to see the next page");
+      
+      &menu_item($row[1]." ".$row[2],"Name",8);
+      &menu_item($row[3],"Organisation",8);
+      &menu_item($row[4],"Street",8);
+      &menu_item($row[5],"Townland",8);
+      &menu_item($row[6],"Town",8);
+      &menu_item($row[7],"Postcode",8);
+      &menu_item($row[8],"County",8);
+      &menu_item($row[9],"Country",8);
+      &menu_item("Numbers","Phone",9);
+      &menu_item($row[10],$pt[$row[11]],8);
+      &menu_item($row[12],$pt[$row[13]],8);
+      &menu_item($row[14],$pt[$row[15]],8);
+      &menu_item($row[16],$pt[$row[17]],8);
+      &menu_item($at[$row[18]],"Type",8);
+      &menu_item($row[19],"eMail",8);
+      &menu_item($row[21],"Dated",8);
+      
+      $sel=&menu_display("List");
+      chop($sel);
+    }
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  return($sel);
+}
+
+# ---< edit address >----------------------------------------------------
+sub addedit {
+  my ($sel);
+  my @fields=();
+  my @data = ();
+  my $last_record = 0;
+
+  do {
+    &menu_button_set(1,"Edit");
+    &menu_button_set(3,"Exit");
+
+    &menu_init("Edit an Address","You can Search by pressing a Letter");
+    &menu_button_set(2,"");
+    
+    $result=$conn->exec("SELECT addressid,addforename,addsurname,addphone1 FROM address ORDER BY addforename");
+    $numrows=$result->ntuples();
+    for($i=0;$i<$numrows;$i++) {
+      @row=$result->fetchrow;
+      &menu_item($row[2]." ".$row[3],$row[1],8,$row[0]);
+      if($row[0]==$last_record) { $last_option=$i; }
+    }
+    
+    chop($sel=&menu_display("Choose a Name to Edit",$last_option));
+    if(($sel eq "%EMPTY%")||($sel eq "%UP%")) { return($sel); } 
+    $last_record=$sel;
+
+    $result=$conn->exec("SELECT * FROM address WHERE addressid = $sel");
+    if(!$result) {
+      &menu_show("No such Address","I was unable to find any address for ID $sel!","HELP");
+    } else {
+      @row=$result->fetchrow;
+      for($i=0;$i<=21;$i++) {
+	$data[$i]=$row[$i];
+      }
+      $last_option=0;
+      do {
+	  &menu_button_set(1,"Edit");
+	  &menu_button_set(3,"Accept");
+
+	  &menu_init("Details for $data[1] $data[2]","Use page keys to see the next page. Select <Accept> button or press <RIGHT> to accept changes");
+      
+	  &menu_item($data[1],"Forename",6,1,"15 0 0");
+	  &menu_item($data[2],"Surname",6,2,"15 0 0");
+	  &menu_item($data[3],"Organisation",6,3,"30 0 0");
+	  &menu_item($data[4],"Street",6,4,"30 0 0");
+	  &menu_item($data[5],"Townland",6,5,"25 0 0");
+	  &menu_item($data[6],"Town",6,6,"25 0 0");
+	  &menu_item($data[7],"Postcode",6,7,"12 0 0");
+	  &menu_item($data[8],"County",6,8,"20 0 0");
+	  &menu_item($data[9],"Country",6,9,"20 0 0");
+	  &menu_item("Numbers","Phone",9); 
+	  &menu_item($data[10],$pt[$data[11]],8,10);
+	  &menu_item($data[12],$pt[$data[13]],8,12);
+	  &menu_item($data[14],$pt[$data[15]],8,14);
+	  &menu_item($data[16],$pt[$data[17]],8,16);
+	  &menu_item($at[$data[18]],"Type",8,18);
+	  &menu_item($data[19],"eMail",6,19,"30 0 0");
+	  &menu_item($data[21],"Dated",8);
+      
+	  $sel=&menu_display("List",$last_option);
+	  chop($sel);
+	  #     &menu_show("Editing","Your editing sequence produced this sequence >$sel<");
+	  @fields=split(/$Cmenu::menu_sep/,$sel);
+	  $sel=$fields[0];
+
+	EDIT_FIELD:for ($sel) {
+	    /10/ && do {
+	      # menu for phone 1
+	      ($data[10],$data[11])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	      $last_option=10;
+	      $sel="NOP";
+	      last EDIT_FIELD;
+	    };
+	    /12/ && do {
+	      # menu for phone 2
+	      ($data[12],$data[13])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	      $sel="NOP";
+	      $last_option=11;
+	      last EDIT_FIELD;
+	    };
+	    /14/ && do {
+	      # menu for phone 3
+	      ($data[14],$data[15])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	      $sel="NOP";
+	      $last_option=12;
+	      last EDIT_FIELD;
+	    };
+	    /16/ && do {
+	      # menu for phone 4
+	      ($data[16],$data[17])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	      $sel="NOP";
+	      $last_option=13;
+	      last EDIT_FIELD;
+	    };
+	    /18/ && do {
+	      # menu for address type
+	      $data[18]=&edittype($data[18],$data[1]." ".$data[2]);
+	      $sel="NOP";
+	      $last_option=14;
+	      last EDIT_FIELD;
+	    };
+	    # We get here through regular navigation
+	    for($i=1;$i<$#fields;$i++) {
+	      ($field,$contents)=split(/$Cmenu::menu_sepn/,$fields[$i]);
+	      $data[$field]=$contents;
+	    }
+	  };
+	} until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+    }
+    if($sel eq "%UP%") {
+      # update record changes 
+      $query="UPDATE address SET ";
+      for($i=1;$i<=19;$i++) {
+	if(($i==11)||($i==13)||($i==15)||($i==17)||($i==18)) {
+	  $query=$query."$sql[$i] = $data[$i],";
+	} else {
+	  $query=$query."$sql[$i] = '$data[$i]',";
+	}
+      }
+      $query=$query."$sql[21] = CURRENT_TIMESTAMP WHERE addressid = $data[0]";
+      $result=$conn->exec($query) 
+	  or &menu_show("Failed Update","Error reported as\n$Postgres::error","HELP");
+    }
+    $sel="";
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  return($sel);
+}
+
+# ---< new address >-----------------------------------------------------
+sub addnew {
+  my ($sel);
+  my @fields=();
+  my @data = ();
+  my $last_record = 0;
+
+  # Initialise a blank record
+  for($i=0;$i<=21;$i++) {
+    if(($i==11)||($i==13)||($i==15)||($i==17)||($i==18)) {
+      $data[$i]=0;
+    } else {
+      $data[$i]="";
+    }
+  }
+  $last_option=0;
+
+  do {
+    &menu_button_set(1,"Edit");
+    &menu_button_set(3,"Accept");
+    
+    &menu_init("Details for $data[1] $data[2]","Use page keys to see the next page. Select <Accept> button or press <RIGHT> to accept changes");
+    
+    &menu_item($data[1],"Forename",6,1,"15 0 0");
+    &menu_item($data[2],"Surname",6,2,"15 0 0");
+    &menu_item($data[3],"Organisation",6,3,"30 0 0");
+    &menu_item($data[4],"Street",6,4,"30 0 0");
+    &menu_item($data[5],"Townland",6,5,"25 0 0");
+    &menu_item($data[6],"Town",6,6,"25 0 0");
+    &menu_item($data[7],"Postcode",6,7,"12 0 0");
+    &menu_item($data[8],"County",6,8,"20 0 0");
+    &menu_item($data[9],"Country",6,9,"20 0 0");
+    &menu_item("Numbers","Phone",9); 
+    &menu_item($data[10],$pt[$data[11]],8,10);
+    &menu_item($data[12],$pt[$data[13]],8,12);
+    &menu_item($data[14],$pt[$data[15]],8,14);
+    &menu_item($data[16],$pt[$data[17]],8,16);
+    &menu_item($at[$data[18]],"Type",8,18);
+    &menu_item($data[19],"eMail",6,19,"30 0 0");
+    &menu_item($data[21],"Dated",8);
+    
+    $sel=&menu_display("List",$last_option);
+    chop($sel);
+    #     &menu_show("Editing","Your editing sequence produced this sequence >$sel<");
+    @fields=split(/$Cmenu::menu_sep/,$sel);
+    $sel=$fields[0];
+    
+  EDIT_FIELD:for ($sel) {
+      /10/ && do {
+	# menu for phone 1
+	($data[10],$data[11])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	$last_option=10;
+	$sel="NOP";
+	last EDIT_FIELD;
+      };
+      /12/ && do {
+	# menu for phone 2
+	($data[12],$data[13])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	$sel="NOP";
+	$last_option=11;
+	last EDIT_FIELD;
+      };
+      /14/ && do {
+	# menu for phone 3
+	($data[14],$data[15])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	$sel="NOP";
+	$last_option=12;
+	last EDIT_FIELD;
+      };
+      /16/ && do {
+	# menu for phone 4
+	($data[16],$data[17])=split(/~/,&editphone($data[10],$data[11],$data[1]." ".$data[2]));
+	$sel="NOP";
+	$last_option=13;
+	last EDIT_FIELD;
+      };
+      /18/ && do {
+	# menu for address type
+	$data[18]=&edittype($data[18],$data[1]." ".$data[2]);
+	$sel="NOP";
+	$last_option=14;
+	last EDIT_FIELD;
+      };
+      # We get here through regular navigation
+      for($i=1;$i<$#fields;$i++) {
+	($field,$contents)=split(/$Cmenu::menu_sepn/,$fields[$i]);
+	$data[$field]=$contents;
+      }
+    };
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  if($sel eq "%UP%") {
+    # create a new changes 
+    $query="INSERT INTO address VALUES (NEXTVAL('address_addressid_seq'),";
+    for($i=1;$i<=19;$i++) {
+      if(($i==11)||($i==13)||($i==15)||($i==17)||($i==18)) {
+	$query=$query."$data[$i],";
+      } else {
+	$query=$query."'$data[$i]',";
+      }
+    }
+    $query=$query."CURRENT_TIMESTAMP)";
+    $result=$conn->exec($query) 
+      or &menu_show("Failed Create","Error  reported as\n$Postgres::error","HELP");
+    $sel="";
+  }
+  return("");
+}
+
+# ---< editphone >---------------------------------------------------
+# Routine to give a menu to edit a phone number in the Address Database
+sub editphone {
+  my ($number,$type,$name) = @_;
+  my ($set,$i); 
+  my @fields = ();
+
+  &menu_init("Edit Phone Number $number","Change the number for $name and indicate its type");
+
+  &menu_item($number,"Number",6,0,"15 0 0"); 
+  # Radio buttons for type of phone line
+  for($i=0;$i<=3;$i++) {
+    if($type == $i ) {
+      &menu_item($pt[$i],$i+1,2,1);
+    } else {
+      &menu_item($pt[$i],$i+1,2,0);
+    }
+  }
+
+  $set=&menu_display("Edit Phone Number");
+  @fields=split(/$Cmenu::menu_sep/,$set);
+  if($fields[0] eq "%EMPTY%") {
+    $set=$number."~".$type;
+  } else {
+    # Breakout the number if it has been changed
+    if(index($fields[1],$Cmenu::menu_sepn)>0) {
+      (undef,$fields[1])=split(/$Cmenu::menu_sepn/,$fields[1]);
+      $set=$fields[1]."~".($fields[2]-1);
+    } else {
+      $set=$number."~".($fields[1]-1);
+    }
+  }
+  return($set);
+}
+
+# ---< edittype >---------------------------------------------------
+# Edit family type
+sub edittype {
+  my ($type,$name) = @_;
+  my ($set,$i); 
+  my @fields = ();
+
+  &menu_init("Edit Address Type","Select the Address Type for $name and press <SPACE>, it is currently $at[$type]");
+
+  # Radio buttons for type of phone line
+  for($i=0;$i<=9;$i++) {
+    if($type == $i ) {
+      &menu_item($at[$i],$i+1,2,1);
+    } else {
+      &menu_item($at[$i],$i+1,2,0);
+    }
+  }
+
+  $set=&menu_display("Edit Address Type",$type);
+  @fields=split(/$Cmenu::menu_sep/,$set);
+  if($fields[0] eq "%EMPTY%") {
+    $set=$type;
+  } else {
+    $set=($fields[1]-1);
+  }
+  return($set);
+}
+# ===< end of addressmenu >=============================================
+
+# ===< foodmenu >====================================================
+# Main Foody Menu
+sub foodmenu {
+  my ($cat,$head,$newresult,$i);
+  my @hacks = ();
+
+  $last_option=0;
+
+  do {
+    &menu_button_set(1,"Select");
+    &menu_button_set(2,"");
+    &menu_button_set(3,"Exit");
+
+    &menu_init("Food Database","Select Application");
+    
+    &menu_item("Add to Shopping List","shopadd");
+    &menu_item("Show Shopping List","shopshow");
+    &menu_item("Print Shopping List","shopprint");
+    &menu_item("Empty Shopping List","shopclear");
+    &menu_item("Add an Item","foodadd");
+    
+    
+    chop($sel=&menu_display("Choose your option",$last_option));
+    
+  SUB_MENU: for($sel) {
+      /shopadd/ && do {
+	do {
+	  $cat=&fooditem();
+	  if($cat>0) {
+	    $head=&getcat($cat);
+	    $result=$conn->exec("SELECT * FROM food WHERE foodcat = $cat ORDER BY food");
+	    $numrows=$result->ntuples();
+	    if($numrows<=0) {
+	      &menu_show("No Records","There are no items in the category\n$head","HELP");
+	    } else {
+	      &menu_init("Shopping Trolley","Select the items to buy for $head");
+	      
+	      for($i=0;$i<$numrows;$i++) {
+		@row=$result->fetchrow;
+		&menu_item($row[2],$row[0],3,$row[7]);
+	      }
+	      $sel=menu_display("Select Items");
+	      
+	      @hacks=();
+	      @hacks=split(/$Cmenu::menu_sep/,$sel);
+	      $sel=$hacks[0];
+	      if($sel ne "%EMPTY%") {
+		# clear old values
+		$result=$conn->exec("SELECT foodid FROM food WHERE foodcat = $cat");
+		$numrows=$result->ntuples();
+		for($i=0;$i<$numrows;$i++) {
+		  @row=$result->fetchrow;
+		  $newresult=$conn->exec("UPDATE food SET buy = 0 WHERE foodid = $row[0]");
+		}
+		# now set new values
+		if($#hacks>0) {
+		  for($i=1;$i<=$#hacks;$i++) {
+		    $result=$conn->exec("UPDATE food SET buy = 1 WHERE foodid = $hacks[$i]");
+		  }
+		}
+	      }
+	    }
+	  }
+	} until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+	if($sel eq "%UP%") { $sel= ""; }
+	$last_option=0;
+	last SUB_MENU;
+      };
+      /shopshow/ && do {
+	$result=$conn->exec("SELECT * FROM food WHERE buy > 0");
+	$numrows=$result->ntuples();
+	if($numrows<=0) {
+	  &menu_show("No Records","No items have been flagged for purchase","HELP");
+	} else {
+	  $cat=0;
+	  &menu_init("Shopping List","Buy these items");
+	  for($i=0;$i<$numrows;$i++) {
+	    @row=$result->fetchrow;
+	    if($row[1]!=$cat) {
+	      $head=&getcat($row[1]);
+	      $cat=$row[1];
+	    }
+	    &menu_item($row[2],$head,4);
+	  }
+	  &menu_display("");
+	}
+	$last_option=1;
+	last SUB_MENU;
+      };
+      /shopprint/ && do {
+	$result=$conn->exec("SELECT * FROM food WHERE buy > 0 ORDER BY foodcat");
+	$numrows=$result->ntuples();
+	if($numrows<=0) {
+	  &menu_show("No Records","No items have been flagged for purchase","HELP");
+	} else {
+	  open(OUT,">/tmp/foodout");
+	  print OUT "Shopping List\n-------------\n";
+	  $cat=0;
+	  &menu_init("Shopping List","Buy these items");
+	  for($i=0;$i<$numrows;$i++) {
+	    @row=$result->fetchrow;
+	    if($row[1]!=$cat) {
+	      $head=&getcat($row[1]);
+	      $cat=$row[1];
+	    }
+	    &menu_item($row[2],$head);
+	    printf(OUT "%d %s %s\n",$i,$head,$row[2]);
+	  }
+	  close(OUT);
+	  $sel=&menu_display("Press OK to Print");
+	  chop($sel);
+	  if(($sel eq "%EMPTY%")||($sel eq "%UP%")) {
+	    $sel="";
+	  } else {
+	    &menu_popup("Printing","Sending Data to Printer");
+	    system("lpr -Pbj /tmp/foodout");
+	    system("rm /tmp/foodout");
+	    &menu_popup();
+	  }
+	}
+	$last_option=2;
+	last SUB_MENU;
+      };
+      /shopclear/ && do {
+	&menu_popup("Removing all Flagged Items","Clearing Shopping List");
+	$result=$conn->exec("SELECT * FROM food WHERE buy > 0");
+	$numrows=$result->ntuples();
+	for($i=0;$i<$numrows;$i++) {
+	  @row=$result->fetchrow;
+	  $clear=$conn->exec("UPDATE food SET buy = 0, update = CURRENT_TIMESTAMP WHERE foodid = $row[0]");
+	}
+	$last_option=3;
+	&menu_popup();
+	last SUB_MENU;
+      };
+      /foodadd/ && do {
+	$cat=&fooditem();
+	if($cat>0) {
+	  $head=getcat($cat);
+	  &menu_init("New Item","Add new item to category $head");
+	  &menu_item($cat,"Category",4);
+	  &menu_item($food,"Item",6,$cat,"20 0 0");
+	  $sel=&menu_display("Edit Item",2);
+	  chop($sel);
+	  @hacks=split(/$Cmenu::menu_sep/,$sel);
+	  if($hacks[0] ne "%EMPTY%") {
+	    (undef,$head)=split(/$Cmenu::menu_sepn/,$hacks[1]);
+	    $result=$conn->exec("INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),$cat,'$head')");
+	  }
+	}
+	$sel="";
+	$last_option=4;
+	last SUB_MENU;
+      };
+    };
+  } until(($sel eq "%EMPTY%")||($sel eq "%UP%"));
+  return($sel);
+}
+
+# ---< fooditem >----------------------------------------------------
+sub fooditem {
+  my($class,$classt);
+
+  &menu_init("Query Database","Select Food Category");
+  $result=$conn->exec("SELECT * FROM foodcat WHERE foodcat < 10");
+  $numrows=$result->ntuples();
+  for($i=0;$i<$numrows;$i++) {
+    @row=$result->fetchrow;
+    &menu_item($row[1],$row[0]);
+  }
+  $sel=&menu_display("Choose a Category");
+  chop($sel);
+
+  if(($sel ne "%EMPTY%")&&($sel ne "%UP%")) {
+    $class=$sel;
+    $result=$conn->exec("SELECT * FROM foodcat WHERE foodcat =$sel");
+    @row=$result->fetchrow;
+    $classt=@row[1];
+    
+    $sel=$sel*10;
+    &menu_init("Query Database","Select from $classt");
+    $result=$conn->exec("SELECT * FROM foodcat WHERE foodcat >= $sel AND foodcat < ($sel+10)");
+    $numrows=$result->ntuples();
+    for($i=0;$i<$numrows;$i++) {
+      @row=$result->fetchrow;
+      &menu_item(@row[1],@row[0]);
+    }
+    
+    $sel=&menu_display("Choose a Category");
+    chop($sel);
+  }
+  return($sel);
+}
+
+# ---< getcat >----------------------------------------------------
+# Get long category name for a category
+sub getcat {
+  my ($cat) = @_;
+  my ($result);
+  my @row = ();
+  my ($name);
+  
+  $result=$conn->exec("SELECT cat FROM foodcat WHERE foodcat = $cat LIMIT 1");
+  @row=$result->fetchrow;
+  $name=$row[0];
+  use integer;
+  $x=$cat/10;
+#  &menu_show("Hi","We are lloking for category $cat which is $name\n but what is its primary category?\n Could it be using ord($cat) $x \nor $cat/10 $y","HELP");
+
+  $result=$conn->exec("SELECT cat FROM foodcat WHERE foodcat = $x LIMIT 1");
+  @row=$result->fetchrow;
+  $name=$row[0].",".$name;
+  return($name);
+}
+
+# ===< menu >====================================================
+sub menu {
+
+  do {
+    &menu_init("Foody Database","Select Application");
+    &menu_button_set(2,"");
+    
+    &menu_item("Address Book","address");
+    &menu_item("Food Shopping","food");
+    
+    chop($sel=&menu_display("Choose your option"));
+    
+  SUB_MENU: for($sel) {
+      /address/ && do {
+	&addressmenu;
+	last SUB_MENU;
+      };
+      /food/ && do {
+	&foodmenu;
+	last SUB_MENU;
+      };
+      /show/ && do {
+	&menu3;
+	last SUB_MENU;
+      };
+      /print/ && do {
+	&menu4;
+	last SUB_MENU;
+      };
+      /%UP%/ && do {
+	$sel="%EMPTY%";
+	last SUB_MENU;
+      };
+    };
+  } until($sel eq "%EMPTY%");
+}
+# ===< menu >====================================================

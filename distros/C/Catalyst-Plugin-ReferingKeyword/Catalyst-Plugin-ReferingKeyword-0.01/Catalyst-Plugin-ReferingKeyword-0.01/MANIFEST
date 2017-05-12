@@ -1,0 +1,27 @@
+.cvsignore
+Catalyst-Plugin-ReferingKeyword-0.01/Changes
+Catalyst-Plugin-ReferingKeyword-0.01/inc/Module/AutoInstall.pm
+Catalyst-Plugin-ReferingKeyword-0.01/inc/Module/Install.pm
+Catalyst-Plugin-ReferingKeyword-0.01/inc/Module/Install/AutoInstall.pm
+Catalyst-Plugin-ReferingKeyword-0.01/inc/Module/Install/Fetch.pm
+Catalyst-Plugin-ReferingKeyword-0.01/MANIFEST
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Plugin/ReferingKeyword.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t
+t/pod-coverage.t
+t/pod.t

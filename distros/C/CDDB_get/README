@@ -1,0 +1,50 @@
+NAME
+
+  CDDB - Read the CDDB entry for an audio CD in your drive
+
+DESCRIPTION
+
+  This module/script gets the CDDB info for an audio cd. You need
+  LINUX, SUNOS or *BSD, a cdrom drive and an active internet connection
+  in order to do that.
+
+INSTALLATION
+
+  Run "perl Makefile.pl" as usual. ("make", "make install" next)
+
+LICENSE & DISCLAIMER
+
+  This library is released under the same conditions as Perl, that
+  is, either of the following:
+
+  a) the GNU General Public License Version 2 as published by the 
+  Free Software Foundation,
+
+  b) the Artistic License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+  the GNU General Public License or the Artistic License for more details.
+
+  You should have received a copy of the Artistic License with this
+  Kit, in the file named "Artistic".  If not, I'll be glad to provide one.
+
+  You should also have received a copy of the GNU General Public License
+  along with this program, in the file names "Copying"; if not, write to 
+  the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, 
+  MA 02111-1307, USA.
+
+  If you use this library in a commercial enterprise, you are invited,
+  but not required, to pay what you feel is a reasonable fee to the
+  author, who can be contacted at armin@xos.net
+
+AUTHOR & COPYRIGHT
+
+  (c) 2003 Armin Obersteiner <armin(at)xos(dot)net>
+
+SEE ALSO
+
+  perl(1), Linux: <file:/usr/include/linux/cdrom.h>,
+  Solaris: <file:/usr/include/sys/cdio.h>.                
+

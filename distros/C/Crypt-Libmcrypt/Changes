@@ -1,0 +1,19 @@
+Revision history for Perl extension Crypt::Libmcrypt.
+0.0.1  Thu Feb  9 18:48:57 2017
+        - original version; created by h2xs 1.23 with options
+                -a -b 5.6.0 -c -d -n Crypt::Mcrypt -O --use-new-tests mutils/mcrypt.h
+ 
+1.0.0 Thu Feb 9 21:46:00 2017
+        - add more macro exports.
+1.0.1     2017-02-12 19:08:44+08:00 Asia/Shanghai 
+        - remove "use vars" in pm, fix pod , add meta.json
+1.0.2     2017-02-14 00:07:11+08:00 Asia/Shanghai
+        - remove Autoloader dependency
+1.0.3     2017-02-15 23:01:11+08:00 Asia/Shanghai
+	- complete rewrite
+
+1.0.4     2017-02-16 12:23:26+08:00 Asia/Shanghai
+        - replace AutoLoader with SelfLoader
+1.0.5     2017-02-17 17:17:35+08:00 Asia/Shanghai
+        - include a local copy of mcrypt.h header
+

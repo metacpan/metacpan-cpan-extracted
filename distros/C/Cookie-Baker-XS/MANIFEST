@@ -1,0 +1,14 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+XS.xs
+cpanfile
+lib/Cookie/Baker/XS.pm
+minil.toml
+ppport.h
+t/00_compile.t
+t/01_basic.t
+META.yml
+MANIFEST

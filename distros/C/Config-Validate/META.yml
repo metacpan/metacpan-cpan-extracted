@@ -1,0 +1,30 @@
+--- 
+abstract: Validate data structures generated from
+author: 
+  - Clayton O'Neill
+build_requires: 
+  Test::Class: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Config-Validate
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Config::General: 0
+  Data::Path: 0
+requires: 
+  Carp::Clan: 0
+  Clone::PP: 0
+  Data::Validate::Domain: 0
+  List::MoreUtils: 0
+  Object::InsideOut: 0
+  Params::Validate: 0
+  Scalar::Util: 1.1
+  perl: 5.8.5
+version: 0.2.6

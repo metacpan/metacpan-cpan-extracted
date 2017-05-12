@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name: Class-Accessor-Lvalue
+version: 0.11
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor: 0
+  Want: 0
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Class::Accessor::Lvalue:
+    file: lib/Class/Accessor/Lvalue.pm
+    version: 0.11
+  Class::Accessor::Lvalue::Fast:
+    file: lib/Class/Accessor/Lvalue/Fast.pm
+  Class::Accessor::Lvalue::Tied:
+    file: lib/Class/Accessor/Lvalue.pm
+    version: 0.11
+generated_by: Module::Build version 0.21

@@ -1,0 +1,65 @@
+NAME
+    Code::Crypt - Encrypt your code
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+     use Code::Crypt;
+
+     print "#!/usr/bin/env perl\n\n" . Code::Crypt->new(
+        code => 'print "hello world!\n"',
+        cipher => 'Crypt::Rijndael',
+        get_key => q{
+        require Sys::Hostname;
+        $] . Sys::Hostname::hostname();
+     },
+        key => $] . 'wanderlust',
+     )->final_code;
+
+DESCRIPTION
+    "Code::Crypt" is meant as a menial form of "DRM" which protects the code
+    from being run on unauthorized machines. The idea is illustrated in the
+    "SYNOPSIS": the code is encrypted with Crypt::Rijndael with a key that
+    is the current perl version and the string "wanderlust". We specify that
+    the way the compiled code is to retrieve a key is to get the perl
+    version and the hostname. In this way we can ensure that it is somewhat
+    difficult to take code meant for one customer and widely distribute it.
+    Of course this is not completely foolproof; if the customer distributes
+    the code themselves they can merely hardcode the key. See
+    Code::Crypt::Graveyard for an even harder to work around system.
+
+METHODS
+  "final_code"
+     my $code = $cc->final_code;
+
+    This method takes no arguments. It returns the compiled code based on
+    the "ATTRIBUTES".
+
+ATTRIBUTES
+  "key"
+    required. The key used to encrypt the code.
+
+  "get_key"
+    required. The code to be inlined into the final code to get the key.
+    Could read a file, prompt the user, or anything else.
+
+  "cipher"
+    required. The cipher used to encrypt the code. Crypt::Rijndael is
+    recommended. See Crypt::CBC for other options.
+
+  "code"
+    The code that will be encrypted.
+
+SEE ALSO
+    Code::Crypt::Graveyard
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

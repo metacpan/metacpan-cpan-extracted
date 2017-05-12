@@ -1,0 +1,40 @@
+[%-
+USE url(self.CGI.url);
+
+BLOCK form_with_hidden;
+  ## expects start_form to be set to "start_form" or "start_multipart_form"
+  self.CGI.$start_form({ action = url });
+  self.CGI.hidden(self.config_state_param);
+  content;
+  self.CGI.end_form.join("");
+END;
+
+BLOCK form;
+  INCLUDE form_with_hidden start_form = "start_form";
+END;
+
+# BLOCK multiform;
+#   INCLUDE form_with_hidden start_form = "start_multipart_form";
+# END;
+
+TRY;
+  content = PROCESS $template;
+  self.CGI.header;
+  self.CGI.start_html;
+  content;
+  self.CGI.end_html;
+### exceptions
+## for errors:
+CATCH;
+  CLEAR;
+  self.CGI.header('text/plain');
+-%]
+An error has occurred.  Remain calm.
+Authorities have been notified.  Do not leave the general area.
+[%-
+  FILTER stderr -%]
+** [% template.filename %] error: [% error.info %] **
+[%
+  END; # FILTER
+END; # TRY
+-%]

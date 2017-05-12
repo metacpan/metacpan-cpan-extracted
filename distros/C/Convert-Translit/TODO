@@ -1,0 +1,10 @@
+1.  Add more character set definitions in newer RFCs
+
+2.  Allow optional appending of more char set definition docs
+
+3.  Handle 16-bit codes in RFC 1345
+
+4.  handle Unicode
+
+5.  Refine approximate substitutions.
+

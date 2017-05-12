@@ -1,0 +1,5 @@
+[%# default html flavour body  %]
+
+ <div id="content">
+  [% content %]
+ </div>

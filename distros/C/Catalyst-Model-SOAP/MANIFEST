@@ -1,0 +1,19 @@
+Changes
+lib/Catalyst/Model/SOAP.pm
+Makefile.PL
+MANIFEST
+README
+t/01_basics.t
+t/02_docliteral.t
+t/03_docliteral_multipart.t
+t/04_rpcliteral.t
+t/05_rpcliteral_oneway.t
+t/06_docliteral_oneway.t
+t/hello.wsdl
+t/hello2.wsdl
+t/hello3.wsdl
+t/hello4.wsdl
+t/hello5.wsdl
+t/lib/MyXMLModule.pm
+t/lib/TestTransport.pm
+META.yml                                 Module meta-data (added by MakeMaker)

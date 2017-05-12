@@ -1,0 +1,135 @@
+#!/usr/local/bin/perl -w
+
+# Works only on UNIX, because of its using setview, and accessorily getpwuid
+# both unimplemented on Windows
+
+use strict;
+use ClearCase::Argv;
+use File::Basename;
+use Getopt::Long;
+use Cwd;
+use vars qw($opt_help $vob $lrep %mrep @lmas %seen %ctview %nrview);
+
+my $me = basename $0;
+my $ct = new ClearCase::Argv({autochomp=>1, ipc=>1});
+my $sil = $ct->clone({stderr=>0});
+my $cterr = $ct->clone({stdout=>0, stderr=>1});
+
+sub usage {
+  my $msg = shift;
+  print STDERR "$msg\n\n" if $msg;
+  print STDERR <<EOT;
+Usage: $me [--help]
+  --help: print this and exit with error code 1
+
+  Clean-up lost+found.
+  This script is meant to be run as vob owner, from the vob lost+found directory.
+  It checks these two conditions and exits unless satisfied.
+  It will then attempt to uncheckout and remove all elements in the directory,
+  looping doing so until the directory contains only objects it cannot remove.
+  It will report the reason for these failures:
+  - elements mastered locally but checked out remotely (in some version)
+  - elements mastered remotely (the mastering replicas are reported)
+  In addition, it reports the views holding checkouts.
+  Unfortunately, it cannot reliably tell apart local views from remote ones,
+  as the servers may not be reachable, and the storage are reported local to them.
+  Note that the same element may be checked out multiple times, even in different
+  replicas.
+  This script is suitable for being run under nohup, as it may take a significant
+  time to complete.
+EOT
+  exit 1;
+}
+sub onepass {
+  opendir my $fd, '.' or die "Failed to read lost+found: $!";
+  my @f = grep !/^\.\.?$/, readdir $fd;
+  closedir $fd;
+  return 1 if scalar @f <= scalar keys %seen;
+  map { $_ = "./$_" } @f; #For files with a name starting in '-'
+  my %co;
+  for ($sil->lsvtree(@f)->qx) {
+    if (m%^(.*)\@\@/.*/CHECKEDOUT view "(.*)"%) {
+      push @{$co{$2}}, $ct->des([qw(-fmt %On)], $1)->qx;
+    }
+  }
+  for my $v (keys %co) {
+    if (!$ctview{$v}) {
+      if (my ($host) = $v =~ /^(.*?):/) {
+	if ($cterr->hostinfo($host)->system) {
+	  $nrview{nrh}{$v} = scalar @{$co{$v}};
+	} else {
+	  $nrview{loc}{$v} = scalar @{$co{$v}};
+	}
+      } else {
+	$ctview{$v} = $ct->clone({stdout=>0, stderr=>0});
+	if ($ctview{$v}->setview($v)->system) {
+	  $nrview{loc}{$v} = scalar @{$co{$v}};
+	  delete $ctview{$v};
+	}
+      }
+    }
+    next unless $ctview{$v};
+    my $ctv = $ctview{$v};
+    $ctv->unco(['-rm'], map {$_ = "oid:$_\@$vob" } @{$co{$v}})->system;
+  }
+  my $rep;
+  for ($cterr->rmelem(['-f'], grep {!$seen{$_}} @f)->qx) {
+    if (/^cleartool: Error: Unable to perform operation.*"\Q$lrep\E"/) {
+      $rep = undef;
+      next;
+    }
+    if (/^cleartool: Error: Master replica.*"(.*)"\.$/) {
+      $rep = $1;
+      next;
+    }
+    if (/^cleartool: Error: Unable to remove .* "(.*)"\.$/) {
+      if ($rep) {
+	push @{$mrep{$rep}}, $1;
+	$seen{$1}++;
+	next;
+      } else {
+	push @lmas, $1;
+	$seen{$1}++;
+	next;
+      }
+    }
+    # The second is a duplicate: don't increase the count
+    next if /^cleartool: Warning: (Moving .* lost\+found|Object.*no longer)/
+      or /^cleartool: Error: Can't delete element with checked out versions\./;
+    $seen{$_}++;
+    warn "$_\n";
+  }
+  return 0;
+}
+GetOptions('help') or usage;
+usage if $opt_help;
+my $dir = getcwd;
+$vob = $ct->des(['-s'], 'vob:.')->qx;
+usage("The current directory is not in a vob") unless $vob;
+usage("The current directory is not the vob lost+found")
+  unless basename($dir) eq 'lost+found' and dirname($dir) eq $vob;
+(my $owner = $ct->des([qw(-fmt %[owner]p)], 'vob:.')->qx) =~ s%^.*[/\\]%%;
+usage("Not running as vob owner") unless $owner eq (getpwuid($<))[0];
+$lrep = $ct->des([qw(-fmt %[replica_name]p)], 'vob:.')->qx;
+
+while (1) {
+  last if onepass;
+}
+
+print "Some objects are mastered locally, but checked out remotely: ",
+  scalar @lmas, "\n" if @lmas;
+if (%mrep) {
+  print "Some objects mastered in remote replicas:\n";
+  print " $_: ", scalar(@{$mrep{$_}}), "\n" for keys %mrep;
+}
+if (%nrview) {
+  print "Some objects could not be unchecked out:\n";
+  if ($nrview{loc}) {
+    print " view server reachable:\n";
+    print "  $_: $nrview{loc}{$_}\n" for keys %{$nrview{loc}};
+  }
+  if ($nrview{nrh}) {
+    print " view server non reachable:\n";
+    print "  $_: $nrview{nrh}{$_}\n" for keys %{$nrview{nrh}};
+  }
+}

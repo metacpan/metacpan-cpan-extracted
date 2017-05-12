@@ -1,0 +1,27 @@
+
+Installing:
+
+ 1. verify that you have the prerequisites installed
+
+      + perl
+	perl is required for both this module and the perl program that uses
+	this module. the software has been tested with 5.6.1 and should work
+	with anything more recent, and maybe less recent, as well.
+        Find perl at www.perl.org
+
+      + GD
+	is required in order to create images
+	it can be found on CPAN
+
+ 2. unbundle the tarball
+
+ 3. run 'perl Makefile.PL'
+
+ 4. run 'make'
+
+ 5. run 'make install'
+
+ 6. run 'perldoc Chart::Strip'
+
+ 7. you are finished, sing a happy song, or, optionally, send in a bug report
+

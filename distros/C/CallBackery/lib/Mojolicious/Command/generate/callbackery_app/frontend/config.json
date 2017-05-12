@@ -1,0 +1,50 @@
+% my $p = shift;
+{
+    "name"    : "<%= $p->{name} %>",
+
+    "include" : [ {
+        "path" : "${QOOXDOO_PATH}/tool/data/config/application.json"
+    }],
+
+    "let" : {
+        "APPLICATION"  : "<%= $p->{name} %>",
+        "QXTHEME"      : "<%= $p->{name} %>.theme.Theme",
+        "API_EXCLUDE"  : ["qx.test.*","${APPLICATION}.theme.*", "${APPLICATION}.test.*", "${APPLICATION}.simulation.*"],
+        "LOCALES"      : [ "en","de","fr","it" ],
+        "CACHE"        : "./cache",
+        "ROOT"         : "."
+    },
+
+    "jobs" : {
+
+        "libraries" : {
+            "library" : [ {
+                    "manifest"   : "${CALLBACKERY_PATH}/callbackery/Manifest.json"
+                },
+                {
+                    "manifest"   : "${CALLBACKERY_PATH}/uploadwidget/Manifest.json"
+                }
+            ]
+        },
+        "pretty" : {
+            "pretty-print" : {
+                "general" : {
+                   "indent-string" : "    "
+                },
+                "comments" : {
+                    "trailing" : {
+                        "keep-column"         : false,
+                        "padding"             : "* "
+                    }
+                },
+                "code" : {
+                    "align-with-curlies"     :  false,
+                    "open-curly" : {
+                        "newline-before"      : "n",
+                        "indent-before"        : false
+                    }
+                }
+            }
+        }
+    }
+}

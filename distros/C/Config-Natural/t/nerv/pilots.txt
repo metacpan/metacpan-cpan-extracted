@@ -1,0 +1,2 @@
+# for secret reasons, all Evangelion pilots must be young children
+include ../children.txt

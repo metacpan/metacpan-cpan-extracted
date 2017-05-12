@@ -1,0 +1,50 @@
+NAME
+    Clarity::XOG::Merge - Merge several Clarity XML Open Gateway (XOG) files
+
+SYNOPSIS
+    Merge several Clarity XOG ("XML Open Gateway") files into one
+
+        xogtool merge -i subdir_with_inputfiles -o MERGEDRESULT.xml
+
+ABOUT
+    *Clarity*(R) is a project and resource management software
+    from *Computer Associates International, Inc.*(R), see
+
+      http://de.wikipedia.org/wiki/Clarity.
+
+    It provides data import of so called "XOG" ("XML Open Gateway")
+    files, sometimes historically called "nikureport". Such files are
+    generated for instance by TaskJuggler, see
+
+      http://www.taskjuggler.org/tj3/manual/nikureport.html.
+
+    Sometimes, e.g., when different departments of one company use
+    their own project management software, respectively, such XOG
+    files need to be merged into one before being imported into the
+    central Clarity database.
+
+    This module "Clarity::XOG::Merge" and its frontend "xogtool"
+    provide that merging.
+
+    It is implemented carefully to handle very large files without
+    suffering from memory issues (by using "XML::Twig", temp files and
+    running in several passes). So the only restrictions should be the
+    supported max-file-size of your filesystem. (However, please note
+    that importing a large merged XOG file into Clarity can have its
+    own memory issues, due to their import probably being XML-DOM
+    based.)
+
+    It is also explicitely polished to work under Windows using
+    Strawberry Perl and being packaged into a single standalone
+    "xogtool.exe" using PAR (tested with Strawberry Perl 5.8 on
+    Windows XP). A corresponding "mkexe.bat" file to call the PAR
+    packager is provided.
+
+AUTHOR
+    Steffen Schwigon, `<ss5 at renormalist.net>'
+
+COPYRIGHT & LICENSE
+    Copyright 2010-2011 Steffen Schwigon, all rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

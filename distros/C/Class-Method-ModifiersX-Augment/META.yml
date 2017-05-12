@@ -1,0 +1,43 @@
+---
+abstract: 'adds "augment method => sub {...}" support to Class::Method::Modifiers'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Method-ModifiersX-Augment
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Class::Method::ModifiersX::Augment:
+    file: lib/Class/Method/ModifiersX/Augment.pm
+    version: '0.002'
+  MooX::Augment:
+    file: lib/MooX/Augment.pm
+    version: '0.002'
+recommends:
+  MRO::Compat: '0'
+  Moo: '0'
+requires:
+  Class::Method::Modifiers: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Class-Method-ModifiersX-Augment/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Class-Method-ModifiersX-Augment
+  homepage: https://metacpan.org/release/Class-Method-ModifiersX-Augment
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-class-method-modifiersx-augment.git
+version: '0.002'

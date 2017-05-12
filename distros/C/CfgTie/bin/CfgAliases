@@ -1,0 +1,301 @@
+#!/usr/bin/perl -Tw
+#Copyright 1998-1999, Randall Maas.  All rights reserved.  This program is free
+#software; you can redistribute it and/or modify it under the same terms as
+#PERL itself.                                                                   
+
+=head1 NAME
+
+CfgAliases -- a tool to help change you email F</etc/aliases> settings
+
+=head1 DESCRIPTION
+
+This is a tool to help modify and keep your F</etc/aliases> file up to date.
+
+=head1 Command Line Parameters
+
+The parameters are a broken down into three categories:
+
+=over 1
+
+=item Specifying groups, users, and people
+
+C<--user>, C<--group>
+
+=item Adding, changing, removing, or retrieving entries
+
+C<--add>, C<--delete>, C<--fetch>, C<--join>, C<--remove>, C<--rename>,
+C<--set>
+
+=back
+
+=head2 Specifying Groups, Users, People
+
+=over 1
+
+=item C<--user=>I<NAME>
+
+=item C<--user >I<NAME>
+
+This specifies the user name.
+
+=item C<--group=>I<NAME>
+
+=item C<--group >I<NAME>
+
+This specifies the group name
+
+=back
+
+=head2 Adding, Changing, Removing, or Retrieving Entries.
+
+The following specify how to change various entries.  Typically they can not be
+intermixed on the same command line.  (Exceptions are noted.)
+
+=over 1
+
+=item C<--add >I<ADDRESS>
+
+=item C<--add=>I<ADDRESS>
+
+This will add the I<ADDRESS> (user, group, etc.) to a mail group.  The group
+must be specified with the C<--group> option above.
+
+=item C<--delete >I<NAME>
+
+=item C<--delete=>I<NAME>
+
+This will remove the mail alias(es) specified by I<NAME>.  It will also remove
+from any mail alias(es) (or groups) any member(s) that matches I<NAME>.  I<NAME>
+may be a regular expression.  (Can be used with C<--remove> and C<--rename>).
+
+=item C<--fetch >I<NAME>
+
+=item C<--fetch=>I<NAME>
+
+This will retrieve the list of recipients in the mail group I<NAME>.  If I<NAME>
+is a regular expression, information will retrieved for every group that matches
+the pattern.
+
+=item C<--join>
+
+=item C<--join >I<GROUP>
+
+=item C<--join=>I<GROUP>
+
+=item C<--join >I<GROUP1>,I<GROUP2>,...
+
+=item C<--join=>I<GROUP1>,I<GROUP2>,...
+
+The current or effective user will be added to a mail group(s).  If no groups 
+are specified with this option, it must be specified using the C<--group> option
+above.  Multiple C<--join>s may be used on a command line.
+
+=item C<--remove >I<NAME>
+
+=item C<--remove=>I<NAME>
+
+Like C<delete> above, this will remove the mail group(s) specified by I<NAME>.
+I<NAME> may be a regular expression.  (Can be used with C<--delete> and
+C<--rename>)
+
+=item C<--rename> I<NAME-NEW>=I<NAME-OLD>
+
+This will change all of the occurrences or references that match I<NAME-OLD> to
+the newer form of I<NAME-NEW>.  This may be a group name, and / or members of a
+group.  This may be a regular expression, similar to;
+
+	s/NAME-OLD/NAME-NEW/
+
+=item C<--set> I<NAME>=I<MEMBERS>
+
+This will create a mail group called I<NAME> with a set of specified members
+I<MEMBERS>.
+(Can be used with C<--delete> and  C<--remove>).
+
+=back
+
+=head1 Files
+
+F</etc/aliases>
+
+=head1 See Also
+
+L<CfgTie::CfgArgs> for more information on the standard parameters
+L<aliases(5)>
+L<sendmail(8)>
+
+=head1 Notes
+
+=head2 Author
+
+Randall Maas (L<randym@acm.org>)
+
+=cut
+
+local %MyArgs;
+use CfgTie::TieAliases;
+use CfgTie::CfgArgs qw(Fatal Err $Prg);
+$Prg="CfgAliases";
+
+sub is_tainted {not eval {my @r = join('',@_),kill 0; 1;};}
+sub Help
+{
+   print "CfgAliases allows you to change settings in your /etc/aliases file\n".
+	"\nUSAGE: CfgAliases [OPTIONS]\n";
+   print "\nSpecific operations:\n".
+	"\t    --add\tWill add the specified mail addresses to the specified\n".
+	"\t\t\temail group.\n";
+   print CfgTie::CfgArgs::Help();
+   print "\nIn this context, the specified `group' refers to the email group.\n\n";
+}
+
+sub Warranty ()
+{
+   print "No warranty.\n"
+}
+
+sub Copyright ()
+{
+   print "$Prg\nCopyright 1998-1999, Randall Maas.  All rights reserved.  ".
+    "This program is free\nsoftware; you can redistribute it and/or modify ".
+    "it under the same terms as PERL itself.\n\n";
+}
+
+sub ParseArgs 
+{
+   my $X = shift;
+   CfgTie::CfgArgs::do($X,"join:s@","add:s@");
+   if (!scalar keys %{$X})
+     {
+        print "Try '$Prg --help' for more information\n";
+        exit -1;
+     }
+
+   if (exists $X->{'help'})      {Help;}
+   if (exists $X->{'copyright'}) {Copyright;}
+   if (exists $X->{'warranty'})  {Warranty;}
+   if (exists $X->{'help'})      {exit -1;}
+
+
+   if (CfgTie::CfgArgs::Args_exclusive($X, "join","add","fetch",'rename'))
+     {exit -1;}
+   if (CfgTie::CfgArgs::Args_exclusive($X, "join","add","fetch",'remove'))
+     {exit -1;}
+}
+
+ParseArgs(\%MyArgs);
+my %Aliases;
+if (exists $MyArgs{'file'})
+  {tie %Aliases, CfgTie::TieAliases,$MyArgs{'file'};}
+else
+  {tie %Aliases, CfgTie::TieAliases;}
+
+my $EAdd =exists $MyArgs{'add'};
+my $EJoin=exists $MyArgs{'join'};
+
+sub ScrubAddresses (@)
+{
+   my @Ret;
+   foreach my $I (@_)
+    {
+       if ($I =~ /^([\d\w\\\/@!_\-.]+)$/)
+         {$I=$1;} 
+        else
+	 {
+            Err(EMAIL_BAD, $I);
+            next;
+         }
+       if (&is_tainted($I)) {Err(TAINTED, $I);}
+       push @Ret, $I;
+    }
+
+   @Ret;
+}
+
+
+# Validate the joining set-up
+my (%Users, $Id,@Groups);
+if ($EJoin)
+  {
+     $Id = $>;
+     #We do not intentionally allow a root user
+     if (!$Id)
+       {
+	  Err(USER_BAD_EFF);
+	  $Id = $<;
+	  if (!$Id)
+	    {
+	       Err(USER_BAD_REAL);
+               Fatal(EXITING);
+	    }
+	}
+      use CfgTie::TieUser;
+      tie %Users, CfgTie::TieUser_id;
+      if (!exists $Users{$Id} || !exists $Users{$Id}->{'name'})
+        {
+           Err(USER_NONAME);
+           Fatal(EXITING);
+	}
+   }
+
+# Determine the groups that are relevant
+if (defined $MyArgs{'join'})
+  {
+     foreach my $I (@{$MyArgs{'join'}})
+      {
+         @Groups=(@Groups,split(',',$I));
+      }
+  }
+if (exists $MyArgs{'group'})
+  {
+     push @Groups,$MyArgs{'group'};
+  }
+
+if (($EAdd||$EJoin) && (!@Groups || !scalar @Groups))
+  {Fatal(GROUP_MISSING);}
+
+# Fetch anythine now...
+if (exists $MyArgs{'fetch'})
+  {
+     foreach my $I (@{$MyArgs{'fetch'}})
+      {
+	if (exists $Aliases{$I})
+	  {print "$I\t",join(", ", @{$Aliases{$I}}),"\n";}
+         else
+          {print "$I\n";}
+      }
+  }
+
+#Add people to the groups
+if ($EAdd || $EJoin)
+  {
+     my @NewMems;
+     if ($EAdd) {@NewMems =@{$MyArgs{'add'}};}
+     if ($EJoin)
+       {
+          my $Name = $Users{$Id}->{'name'}; 
+          push @NewMems, $Name; 
+       }
+     foreach my $G (@Groups)
+      {(tied %Aliases)->APPEND($G,ScrubAddresses(@NewMems));}
+  }
+
+if (exists $MyArgs{'remove'})
+  {
+     my ($N,%R)=(1);
+     foreach my $L (@{$MyArgs{'remove'}})
+      {if ($L=~/^([\d\w\-*?{}\[\]_@.]+)$/) {$R{$1}='';};$N++;}
+     (tied %Aliases)->RENAME(\%R);
+  }
+
+if (exists $MyArgs{'rename'})
+  {
+     print "Renaming stuff\n";
+     (tied %Aliases)->RENAME($MyArgs{'rename'}); 
+  }
+
+
+if (exists $MyArgs{'list'})
+  {
+     print "Aliases: ", join(', ', sort keys %Aliases),"\n";
+  }

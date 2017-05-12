@@ -1,0 +1,5 @@
+default_test:
+  underlay: { var: .default }
+  dsn:      'dbi:Pg:dbname=${.dbname};host=${.host};port=${.port}'
+  host:     'stat-test.mydb.com'
+

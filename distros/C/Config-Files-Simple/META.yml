@@ -1,0 +1,33 @@
+---
+abstract: 'Yet another config file reader.'
+author:
+  - 'Mario Zieschang <mziescha@cpan.org>'
+build_requires:
+  Hash::MD5: '0.08'
+  Path::Tiny: '0'
+  Test::Exception: '0.43'
+  Test::More: '1.302031'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Files-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  JSON::Parse: '0'
+  Module::Load: '0'
+  Ref::Util: '0'
+  String::Any::Extensions: v0.1.1
+  YAML: '0'
+  perl: '5.006'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

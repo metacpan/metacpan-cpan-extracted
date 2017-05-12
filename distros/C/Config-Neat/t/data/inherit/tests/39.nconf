@@ -1,0 +1,14 @@
+inc {
+    bar {
+        baz     789
+    }
+}
+
+foo {
+    @inherit    ../inc/04.nconf#foo ../inc/05.nconf#foo
+}
+
+foo2 {
+    @inherit    .#inc/bar
+}
+

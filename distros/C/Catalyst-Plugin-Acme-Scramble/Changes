@@ -1,0 +1,15 @@
+Revision history for Catalyst-Plugin-Acme-Scramble
+
+0.03    20070713 1645
+        - Removed a stupid leftover "die" call in text/plain docs.
+
+0.02    20060118 1344
+        - Took out pod-coverage.t.
+        - Added Catalyst 5.6 to prereqs.
+
+0.01    20060117 2334
+        - Moo I say unto you, moo.
+        - Making sure it's out there in plenty of time for the first
+          of April.
+        - Oh, my God. Looks like I got first tracks for C::Acme too.
+

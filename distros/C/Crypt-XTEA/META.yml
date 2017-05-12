@@ -1,0 +1,27 @@
+---
+abstract: 'Implementation of the eXtended Tiny Encryption Algorithm'
+author:
+  - 'Kars Wang <jahiy@cpan.org>'
+build_requires:
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-XTEA
+requires:
+  Carp: '1.3301'
+  List::Util: '1.38'
+  Scalar::Util::Numeric: '0.40'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/JaHIY/Crypt-XTEA/issues
+  homepage: https://metacpan.org/release/Crypt-XTEA
+  repository: git://github.com/JaHIY/Crypt-XTEA.git
+version: '0.0108'
+x_serialization_backend: 'YAML::Tiny version 1.69'

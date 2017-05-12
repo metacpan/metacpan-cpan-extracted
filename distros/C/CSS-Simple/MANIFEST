@@ -1,0 +1,14 @@
+ChangeLog
+lib/CSS/Simple.pm
+MANIFEST
+Makefile.PL
+README
+t/basic.t
+t/browser_specific_properties.t
+t/create.t
+t/fail.t
+t/hacks.t
+t/modify.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

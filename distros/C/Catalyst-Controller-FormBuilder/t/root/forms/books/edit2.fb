@@ -1,0 +1,15 @@
+name: books_edit
+method: post
+fields:
+    title:
+        label: Book Title
+        type:  text
+        size:  40
+        required: 1
+    author:
+        label: Author's Name
+        type:  text
+        size:  80
+        required: 1
+
+submit: Save New Book

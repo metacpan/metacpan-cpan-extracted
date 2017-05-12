@@ -1,0 +1,84 @@
+Class/DBI/Plugin version 0.01
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that "make test" only runs a "live" example if both DBD::SQLite and
+SQL::Abstract are installed.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::DBI
+
+SYNOPSIS
+         use base 'Class::DBI::Plugin';
+
+         sub init {
+           my $class = shift;
+           $class->set_sql( statement_name => ... );
+           $class->add_trigger( ... );
+           $class->columns( TEMP => ... );
+         }
+
+         sub method_name : Plugged {
+           my $class = shift;
+           $class->sql_statement_name( ... );
+         }
+
+         sub this_method_is_not_exported {}
+
+DESCRIPTION
+       Class::DBI::Plugin is an abstract base class for Class::DBI plugins.
+       Its purpose is to make writing plugins easier. Writers of plugins
+       should be able to concentrate on the functionality their module pro-
+       vides, instead of having to deal with the symbol table hackery involved
+       when writing a plugin module.  Only three things must be remembered:
+
+       1   All methods which are to exported are given the "Plugged"
+           attribute. All other methods are not exported to the plugged-in
+           class.
+
+       2   Method calls which are to be sent to the plugged-in class are put
+           in the init() method. Examples of these are set_sql(), add_trig-
+           ger() and so on.
+
+       3   The class parameter for the init() method and the "Plugged" methods
+           is the plugged-in class, not the plugin class.
+
+CAVEATS
+       So far this module only "sees" methods in the plugin module itself. If
+       there is a class between the base class and the plugin class in the
+       inheritance hierarchy, methods of this class will not be found. In
+       other words, inherited methods will not be found. If requested, I will
+       implement this behaviour.
+
+TODO
+       It may be useful for plugin users to be able to choose only the plugin
+       methods they are interested in, if there are more than one. This is not
+       implemented yet.
+
+SEE ALSO
+       o   Class::DBI
+
+AUTHOR
+       Jean-Christophe Zeus, <mail@jczeus.com> with some help from Simon Coz-
+       ens. Many thanks to Mark Addison for the idea with the init() method,
+       and many thanks to Steven Quinney for the idea with the subroutine
+       attributes.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Jean-Christophe Zeus
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

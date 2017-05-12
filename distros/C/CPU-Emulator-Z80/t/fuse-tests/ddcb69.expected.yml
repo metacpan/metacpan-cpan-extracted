@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb69
+registers:
+  AF: 40821
+  AF_: 0
+  BC: 17077
+  BC_: 0
+  DE: 29950
+  DE_: 0
+  HL: 4374
+  HL_: 0
+  I: 0
+  IX: 13300
+  IY: 18114
+  PC: 4
+  R: 2
+  SP: 0

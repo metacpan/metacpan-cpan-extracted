@@ -1,0 +1,7 @@
+float	T_FLOAT
+int *	T_PV
+long int *	T_PV
+long int	T_LONG
+boolean	T_BOOL
+enum Languages T_IV
+enum HTMLEscapes T_IV

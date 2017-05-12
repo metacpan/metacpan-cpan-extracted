@@ -1,0 +1,80 @@
+{
+   "abstract" : "Instantiate a Metabase backend for CPAN Testers ",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Testers-Metabase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Metabase::Archive::SQLite" : "1.000",
+            "Metabase::Gateway" : "0",
+            "Metabase::Index::FlatFile" : "1.000",
+            "Metabase::Librarian" : "1.000",
+            "Moose" : "0",
+            "Path::Class" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Testers::Metabase" : {
+         "file" : "lib/CPAN/Testers/Metabase.pm",
+         "version" : "1.999002"
+      },
+      "CPAN::Testers::Metabase::Demo" : {
+         "file" : "lib/CPAN/Testers/Metabase/Demo.pm",
+         "version" : "1.999002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-cpan-testers-metabase at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Metabase"
+      },
+      "homepage" : "https://github.com/dagolden/cpan-testers-metabase",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/cpan-testers-metabase.git",
+         "web" : "https://github.com/dagolden/cpan-testers-metabase"
+      }
+   },
+   "version" : "1.999002"
+}
+

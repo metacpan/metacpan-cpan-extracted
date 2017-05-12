@@ -1,0 +1,182 @@
+/* Basic Definitions */
+
+body
+{
+	font-family: Arial, Helvetica;
+	font-size: medium;
+	color: #222;
+	margin: 2em;
+	margin-top: 160px;
+	background-repeat: no-repeat;
+	background-image: url(!!- url_caf_logo -!!);
+	background-color: #fff;
+}
+
+#banner {
+    position: absolute;
+    left:     240px;
+    top:      33px;
+}
+
+#banner h1 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+    color:         #000080;
+    font-family:   sans-serif;
+}
+#banner h2 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+    color:         #000080;
+    font-family:   sans-serif;
+    font-style:    italic;
+}
+
+h1
+{
+	font-size: 1.6em;
+}
+
+h2
+{
+	font-size: 1.5em;
+}
+
+h3
+{
+	font-size: 1.4em;
+}
+
+h4
+{
+	font-size: 1.3em;
+}
+
+h5
+{
+	font-size: 1.2em;
+}
+
+
+/* custom stuff */
+
+.error
+{
+	color: red;
+}
+
+#login
+{
+	margin-top: 2em;
+	border-color: 002966;
+	border-width: 1px;
+	border-style: solid;
+	background-color: #99c2ff;
+	padding: 2em;
+	margin-left: 30%;
+	margin-right: 30%;
+}
+
+#userform
+{
+	margin-top: 2em;
+	border-color: 002966;
+	border-width: 1px;
+	border-style: solid;
+	background-color: #99c2ff;
+	padding: 2em;
+	margin-left: 20%;
+	margin-right: 20%;
+}
+
+
+#errormessages
+{
+	border-color: red;
+	border-width: 4px;
+	border-style: double;
+	background-color: pink;
+	padding: 2em;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+/* navbars */
+
+#nav .link
+{
+	padding-left: 2em;
+	padding-right: 2em;
+	background-color: #5283cc;
+}
+
+#nav .link:hover
+{
+	background-color: #002966;
+	color: white;
+}
+
+#nav .link:hover a
+{
+	color: white;
+	text-decoration: underline;
+}
+
+#nav a
+{
+	color: #002966;
+	text-decoration: none;
+	font-size: .8em;
+}
+
+#dynamicnav
+{
+	padding-left: .3em;
+	background-color: #002966;
+	background-image: url(!!- url_barfiller -!!);
+	background-position: right top;
+	background-repeat: no-repeat;
+}
+
+#dynamicnav .link
+{
+	padding-left: 2em;
+	padding-right: 2em;
+	background-color: #5283cc;
+}
+
+#dynamicnav .link:hover
+{
+	background-color: #002966;
+	color: white;
+}
+
+#dynamicnav .link:hover a
+{
+	color: white;
+	text-decoration: underline;
+}
+
+#dynamicnav a
+{
+	color: #002966;
+	text-decoration: none;
+	font-size: .8em;
+}
+
+/* main section */
+
+#main
+{
+	width: auto;
+	padding: .5em .5em .5em .5em;
+}
+
+#userlist
+{
+	margin-left: 15%;
+	margin-right: 15%;
+	border: 1px #002966 solid;
+}
+
+

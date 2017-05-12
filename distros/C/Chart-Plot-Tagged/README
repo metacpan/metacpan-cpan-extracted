@@ -1,0 +1,31 @@
+Chart-Plot-Tagged
+=================
+
+    Chart-Plot-Tagged : Chart-Plot with tags
+
+    This package overloads Chart::Plot and adds a new method 'setTag'.
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries:
+
+  Chart::Plot
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2011 by Francois PERRAD
+
+This library is distributed under the terms of the Artistic License 2.0.
+

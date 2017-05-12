@@ -1,0 +1,313 @@
+NAME
+    Catalyst::Plugin::Server::XMLRPC -- Catalyst XMLRPC Server Plugin
+
+SYNOPSIS
+        package MyApp;
+        use Catalyst qw/Server Server::XMLRPC/;
+
+        package MyApp::Controller::Example;
+        use base 'Catalyst::Controller';
+
+        sub echo : XMLRPC {                     # available as: example.echo
+            my ( $self, $c, @args ) = @_;
+            $c->stash->{xmlrpc} = join ', ', @args;
+        }
+
+        sub ping : XMLRPCPath('/ping') {        # available as: ping
+            my ( $self, $c ) = @_;
+            $c->stash->{xmlrpc} = 'Pong';
+        }
+
+        sub world : XMLRPCRegex(/hello/) {      # available as: *hello*
+            my ($self, $c) = @_;
+            $c->stash->{xmlrpc} = 'World';
+        }
+
+        sub echo : XMLRPCLocal {                # available as: example.echo
+            my ( $self, $c, @args ) = @_;
+            $c->stash->{xmlrpc} = join ', ', @args;
+        }
+
+        sub ping : XMLRPCGlobal {               # available as: ping
+            my ( $self, $c ) = @_;
+            $c->stash->{xmlrpc} = 'Pong';
+        }
+
+DESCRIPTION
+    XMLRPC Plugin for Catalyst which we tried to make compatible with the
+    way Catalyst works with URLS. Main features are:
+
+    * Split XMLRPC methodNames by STRING to find out Controller.
+    * Single entrypoint for XMLRPC calls, like http://host.tld/rpc
+    * DispatchTypes (attributes) which work much the same as Catalyst attrs
+    * XMLRPC Parameter handling transparent to Catalyst parameter handling
+
+HOW IT WORKS
+    The default behaviour will handle XMLRPC Requests sent to "/rpc" by
+    creating an OBJECT containing XMLRPC specific parameters in
+    "$c->req->xmlrpc".
+
+    Directly after, it will find out the Path of the Action to dispatch to,
+    by splitting methodName by ".":
+
+      methodName: hello.world
+      path      : /hello/world
+
+    From this point, it will dispatch to '/hello/world' when it exists, like
+    Catalyst Urls would do. What means: you will be able to set Regexes,
+    Paths etc on subroutines to define the endpoint.
+
+    We discuss these custom XMLRPC attributes below.
+
+    When the request is dispatched, we will return $c->stash->{xmlrpc} to
+    the xmlrpc client, or, when it is not available, it will return
+    $c->stash to the client. There is also a way of defining $c->stash keys
+    to be send back to the client.
+
+ATTRIBUTES
+    You can mark any method in your Catalyst application as being available
+    remotely by using one of the following attributes, which can be added to
+    any existing attributes, except Private. Remember that one of the
+    mentioned attributes below are automatically also Privates...
+
+    XMLRPC
+        Make this method accessible via XMLRPC, the same way as Local does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "hello.world":
+
+          package Catalyst::Controller::Hello
+          sub world : XMLRPC {}
+
+    XMLRPCLocal
+        Identical version of attribute "XMLRPC"
+
+    XMLRPCGlobal
+        Make this method accessible via XMLRPC, the same way as GLOBAL does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "ping":
+
+          package Catalyst::Controller::Hello
+          sub ping : XMLRPCGlobal {}
+
+    XMLRPCPath('/say/hello')
+        Make this method accessible via XMLRPC, the same way as Path does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "say.hello":
+
+          package Catalyst::Controller::Hello
+          sub hello : XMLRPCPath('/say/hello') {}
+
+    XMLRPCRegex('foo')
+        Make this method accessible via XMLRPC, the same way as Regex does
+        when using catalyst by URL.
+
+        The following example will be accessible by example methods:
+        "a.foo.method" "wedoofoohere" "foo.getaround"
+
+          package Catalyst::Controller::Hello
+          sub hello : XMLRPCPath('foo') {}
+
+ACCESSORS
+    Once you've used the plugin, you'll have an $c->request->xmlrpc accessor
+    which will return an "Catalyst::Plugin::Server::XMLRPC" object.
+
+    You can query this object as follows:
+
+    $c->req->xmlrpc->is_xmlrpc_request
+        Boolean indicating whether the current request has been initiated
+        via XMLRPC
+
+    $c->req->xmlrpc->config
+        Returns a "Catalyst::Plugin::Server::XMLRPC::Config" object. See the
+        "CONFIGURATION" below on how to use and configure it.
+
+    $c->req->xmlrpc->body
+        The body of the original XMLRPC call
+
+    $c->req->xmlrpc->method
+        The name of the original method called via XMLRPC
+
+    $c->req->xmlrpc->args
+        A list of parameters supplied by the XMLRPC call
+
+    $c->req->xmlrpc->result_as_string
+        The XML body that will be sent back to the XMLRPC client
+
+    $c->req->xmlrpc->error
+        Allows you to set xmlrpc fault code and message
+
+Server Accessors
+    The following accessors are always available, whether you're in a xmlrpc
+    specific request or not
+
+    $c->server->xmlrpc->list_methods
+        Returns a HASHREF containing the available xmlrpc methods in
+        Catalyst as a key, and the "Catalyst::Action" object as a value.
+
+CATALYST REQUEST
+    To make things transparent, we try to put XMLRPC params into the Request
+    object of Catalyst. But first we will explain something about the XMLRPC
+    specifications.
+
+    A full draft of these specifications can be found on:
+    "http://www.xmlrpc.com/spec"
+
+    In short, a xmlrpc-request consists of a methodName, like a subroutine
+    name, and a list of parameters. This list of parameters may contain
+    strings (STRING), arrays (LIST) and structs (HASH). Off course, these
+    can be nested.
+
+    $c->req->arguments
+        We will put the list of arguments into $c->req->arguments, thisway
+        you can fetch this list within your dispatched-to-subroutine:
+
+          sub echo : XMLRPC {
+              my ($self, $c, @args) = @_;
+              $c->log->debug($arg[0]);              # Prints first XMLRPC parameter
+                                                    # to debug log
+          }
+
+    $c->req->parameters
+        Because XMLRPC parameters are a LIST, we can't just fill
+        $c->req->paremeters. To keep things transparent, we made an extra
+        config option what tells the XMLRPC server we can assume the
+        following conditions on all XMLRPC requests: - There is only one
+        XMLRPC parameter - This XMLRPC parameter is a struct (HASH)
+
+        We will put this STRUCT as key-value pairs into $c->req->parameters.
+
+    $c->req->params
+        Alias of $c->req->parameters
+
+    $c->req->param
+        Alias of $c->req->parameters
+
+INTERNAL XMLRPC FUNCTIONS
+    The following system functions are available to the public.,
+
+    system.listMethods
+        returns a list of available RPC methods.
+
+DEFINING RETURN VALUES
+    The XML-RPC response must contain a single parameter, which may contain
+    an array (LIST), struct (HASH) or a string (STRING). To define the
+    return values in your subroutine, you can alter $c->stash in three
+    different ways.
+
+  Defining $c->stash->{xmlrpc}
+    When defining $c->stash->{xmlrpc}, the XMLRPC server will return these
+    values to the client.
+
+  When there is no $c->stash->{xmlrpc}
+    When there is no "$c->stash->{xmlrpc}" set, it will return the complete
+    "$c->stash"
+
+CONFIGURATION
+    The XMLRPC Plugin accepts the following configuration options, which can
+    be set in the standard Catalyst way (See "perldoc Catalyst" for
+    details):
+
+        Your::App->config( xmlrpc => { key => value } );
+
+    You can look up any of the config parameters this package uses at
+    runtime by calling:
+
+        $c->server->xmlrpc->config->KEY
+
+    path
+        This specifies the entry point for your xmlrpc server; all requests
+        are dispatched from there. This is the url any XMLRCP client should
+        post to. You can change this to any "Regex" wish.
+
+        The default is: "qr!^(/?)rpc(/|$)!i", which matches on a top-level
+        path begining with "rpc" preceeded or followed by an optional "/",
+        like this:
+
+            http://your-host.tld/rpc
+
+    prefix
+        This specifies the prefix of the forward url.
+
+        For example, with a prefix of "rpc", and a method "foo", the forward
+        path would be come "/rpc/foo".
+
+        The default is '' (empty).
+
+    separator
+        This is a STRING used to split your method on, allowing you to use a
+        hierarchy in your method calls.
+
+        For example, with a separator of "." the method call "demo.echo"
+        would be forwarded to "/demo/echo". To make "demo_echo" forward to
+        the same path, you would change the separator to "_",
+
+        The default is ".", splitting methods on a single "."
+
+    convert_params
+        Make the arguments in "$c->req->xmlrpc->params" available as
+        "$c->req->params".
+
+        Defaults to true.
+
+    show_errors
+        Make system errors in "$c->error" public to the rpc-caller in a
+        XML-RPC faultString. When show_errors is false, and your catalyst
+        app generates a fault, it will return an XML-RPC fault containing
+        error number 500 and error string: "Internal Server Error".
+
+        Defaults to false.
+
+    xml_encoding
+        Change the xml encoding send over to the client. So you could change
+        the default encoding to "UTF-8" for instance.
+
+        Defaults to "us-ascii" which is the default of "RPC::XML".
+
+DIAGNOSTICS
+    Invalid XMLRPC request: No such method
+        There is no corresponding method in your application that can be
+        forwarded to.
+
+    Invalid XMLRPC request %s
+        There was an error parsing the XMLRPC request
+
+    Invalid XMLRPC request: Unknown error
+        An unexpected error occurred
+
+TODO
+    Make error messages configurable/filterable
+        Right now, whatever ends up on $c->error gets returned to the
+        client. It would be nice to have a way to filter/massage these
+        messages before they are sent back to the client.
+
+    Make stash filterable before returning
+        Just like the error messages, it would be nice to be able to filter
+        the stash before returning so you can filter out keys you don't want
+        to return to the client, or just return a certain list of keys. This
+        all to make transparent use of XMLRPC and web easier.
+
+SEE ALSO
+    Catalyst::Plugin::Server::XMLRPC::Tutorial, Catalyst::Manual,
+    Catalyst::Request, Catalyst::Response, RPC::XML, "bin/rpc_client"
+
+ACKNOWLEDGEMENTS
+    For the original implementation of this module:
+
+    Marcus Ramberg, "mramberg@cpan.org" Christian Hansen Yoshinori Sano
+
+AUTHORS
+    Jos Boumans (kane@cpan.org)
+
+    Michiel Ootjers (michiel@cpan.org)
+
+BUG REPORTS
+    Please submit all bugs regarding "Catalyst::Plugin::Server" to
+    "bug-catalyst-plugin-server@rt.cpan.org"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

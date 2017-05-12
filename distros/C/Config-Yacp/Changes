@@ -1,0 +1,55 @@
+Revision history for Perl extension Config::Yacp.
+
+1.00  Fri Mar 21 15:42:50 2003
+	- original version; created by h2xs 1.20 with options
+		-AXn Config::Yacp
+
+1.10  Tue Apr 1 15:35:18 2003
+	- Added the following functions
+		- add_section
+		- add_parameter
+		- set_value
+		- del_section
+		- del_parameter
+		- save_ini
+
+	- Implemented basic file locking on the new function
+
+	- Wrote additional tests to test new and old functions
+
+1.12  Fri Apr 11 15:10:37 2003
+	- Discovered a small bug within the save_ini function and
+	  corrected it.
+
+1.16  Wed Oct 29 12:20:52 2003
+	- Re-implemented all of the tests using the Test::More
+	  module
+
+1.17  Fri Nov 21 08:12:54 2003
+	- Changed the grammar slightly, so that if a particular
+	  key/value pair does not have the value defined, it will
+	  still correctly parse the ini file
+	    - This idea was inspired by the following node on
+	      PerlMonks: http://www.perlmonks.org/index.pl?node_id=308716
+	- Added additional tests to test other functions of the module.
+
+1.18  Mon Jan 10 14:09:35 2005
+	- Converted the tests to Test::Harness and added testing of the POD
+	  via Test::Pod. Added dependencies for both Test::Harness and
+	  Test::Pod
+ 
+1.181 Tue Feb  8 12:33:31 2005
+	- Fixed a small error within the 03add.t file
+
+1.182 Mon Apr  4 15:13:33 2005
+	- Fixed an error in the add_section subfunction that was causing
+	  test 03add.t to fail after two tests.
+
+2.0   Sun Jul  1 09:51:48 2007
+        - Now uses the Object::InsideOut module
+	- Added some additional tests
+	- Changed the names of the module functions to keep them
+	  separate from the ones created by Object::InsideOut
+	    - The old 'get_' methods are now 'retrieve_'
+	    - The old 'del_' methods are now 'delete_'
+

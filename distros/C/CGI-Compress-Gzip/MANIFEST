@@ -1,0 +1,13 @@
+Build.PL
+CHANGES
+lib/CGI/Compress/Gzip.pm
+lib/CGI/Compress/Gzip/FileHandle.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/gzip.t
+t/pod-coverage.t
+t/pod.t
+t/testhelp

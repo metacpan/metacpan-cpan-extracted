@@ -1,0 +1,44 @@
+Crypt/OICQ version 1.0
+=====================
+
+   This module implements the cipher used by OICQ instant messaging protocol,
+used by Tencent Technology Limited, China.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make test
+   su
+   make install
+
+DEPENDENCIES
+
+None
+
+ACKNOWLEDGEMENT
+
+FreeOICQ developers reverse-engineered Tencent's Win32 client binaries and
+published their discovery on http://sourceforge.net/projects/foicq/.  Among
+their codes are segments of assembly code for the OICQ cipher and login key
+generation.
+
+I identified the algorithm for login key generation to be MD5.
+
+Chen Peng reverse-engineered the rest of assembly codes created by FreeOICQ and
+identified the core cipher used by OICQ to be a weakened version of TEA, Tiny
+Encryption Algorithm.
+
+TEA was invented by David Wheeler and Roger Needham at Cambridge University.
+They recommend using 32 rounds.  OICQ only uses 16 rounds.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Shufeng Tan.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)
+

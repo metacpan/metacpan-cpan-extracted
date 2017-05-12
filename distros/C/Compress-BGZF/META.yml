@@ -1,0 +1,29 @@
+---
+abstract: 'Read/write blocked GZIP (BGZF) files'
+author:
+  - 'Jeremy Volkening <jdv*at*base2bio*dot*com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Compress-BGZF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: '0'
+  IO::Compress::RawDeflate: '0'
+  IO::Uncompress::RawInflate: '0'
+  List::Util: '0'
+  perl: '5.012'
+resources:
+  repository: https://github.com/jvolkening/p5-Compress-BGZF.git
+version: '0.005'

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb65
+registers:
+  AF: 6200
+  AF_: 0
+  BC: 36184
+  BC_: 0
+  DE: 16982
+  DE_: 0
+  HL: 17018
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

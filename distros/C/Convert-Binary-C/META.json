@@ -1,0 +1,40 @@
+{
+   "abstract" : "Binary Data Conversion using C Types",
+   "author" : [
+      "Marcus Holland-Moritz <mhx@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-Binary-C",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "support"
+      ],
+      "file" : [
+         "bin/elf.PL"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/~mhx/Convert-Binary-C/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mhx/Convert-Binary-C.git",
+         "web" : "https://github.com/mhx/Convert-Binary-C"
+      },
+      "x_MailingList" : "convert-binary-c@yahoogroups.com"
+   },
+   "version" : "0.78"
+}

@@ -1,0 +1,10 @@
+Changes
+lib/Crypt/SSSS.pm
+lib/Crypt/SSSS/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/message.t
+t/ssss.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

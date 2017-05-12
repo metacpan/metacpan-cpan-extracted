@@ -1,0 +1,29 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib '..'; ## for testing from this Examples directory
+use CircuitLayout;
+$|++;
+$\="\n";
+my @xys=(0,2, 20,2, 20,10, 0,10);
+my $boundary = new CircuitLayout::Boundary(-xy=>\@xys);
+print 'boundary coords=',$boundary -> printableCoords;
+print ' = = = = = = = ';
+print 'boundary north extent =',$boundary -> directionExtent(-direction=>'N');
+print 'boundary south extent =',$boundary -> directionExtent(-direction=>'S');
+print 'boundary east extent  =',$boundary -> directionExtent(-direction=>'E');
+print 'boundary west extent  =',$boundary -> directionExtent(-direction=>'W');
+print ' = = = = = = = ';
+print 'boundary extent north extent =',$boundary -> extent -> directionExtent(-direction=>'N');
+print 'boundary extent south extent =',$boundary -> extent -> directionExtent(-direction=>'S');
+print 'boundary extent east extent  =',$boundary -> extent -> directionExtent(-direction=>'E');
+print 'boundary extent west extent  =',$boundary -> extent -> directionExtent(-direction=>'W');
+print ' = = = = = = = ';
+my $c1 = new CircuitLayout::Coord(-x=>3.1,-y=>5.679);
+my $c2 = new CircuitLayout::Coord(-x=>5.3,-y=>7.8);
+my $edge = new CircuitLayout::Edge(-startCoord=>$c1,-endCoord=>$c2);
+print 'edge coords=',$edge -> printableCoords;
+print 'edge north extent =',$edge -> directionExtent(-direction=>'N');
+print 'edge south extent =',$edge -> directionExtent(-direction=>'S');
+print 'edge east extent  =',$edge -> directionExtent(-direction=>'E');
+print 'edge west extent  =',$edge -> directionExtent(-direction=>'W');
+

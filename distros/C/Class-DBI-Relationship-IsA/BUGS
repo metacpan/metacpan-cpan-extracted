@@ -1,0 +1,6 @@
+BUGS
+====
+
+Currently Class::DBI::FromCGI may have problems with classes that inherit, resulting in data for the superclass not being validated, there is a patch available and we hope that this will be resolved soon in Class::DBI
+
+There are likely to be other bugs as this is an experimental proof of concept

@@ -1,0 +1,90 @@
+NAME
+    Catalyst::Authentication::Store::DBI - Storage class for Catalyst
+    Authentication using DBI
+
+SYNOPSIS
+      use Catalyst qw(Authentication);
+
+      __PACKAGE__->config->{'authentication'} = {
+        'default_realm' => 'default',
+        'realms' => {
+          'default' => {
+            'credential' => {
+              'class'               => 'Password',
+              'password_field'      => 'password',
+              'password_type'       => 'hashed',
+              'password_hash_type'  => 'SHA-1',
+            },
+            'store' => {
+              'class'              => 'DBI',
+              'user_table'         => 'login',
+              'user_key'           => 'id',
+              'user_name'          => 'name',
+              'role_table'         => 'authority',
+              'role_key'           => 'id',
+              'role_name'          => 'name',
+              'user_role_table'    => 'competence',
+              'user_role_user_key' => 'login',
+              'user_role_role_key' => 'authority',
+            },
+          },
+        },
+      };
+
+      sub login :Global
+      {
+        my ($self, $c) = @_;
+        my $req = $c->request();
+
+        # catch login failures
+        unless ($c->authenticate({
+          'name'     => $req->param('name'),
+          'password' => $req->param('password'),
+          })) {
+          ...
+        }
+
+        ...
+      }
+
+      sub something :Path
+      {
+        my ($self, $c) = @_;
+
+        # handle missing role case
+        unless ($c->check_user_roles('editor')) {
+          ...
+        }
+
+        ...
+      }
+
+DESCRIPTION
+    This module implements the Catalyst::Authentication API using
+    Catalyst::Model::DBI.
+
+    It uses DBI to let your application authenticate users against a
+    database and it provides support for
+    Catalyst::Plugin::Authorization::Roles.
+
+METHODS
+  new
+  find_user
+  for_session
+  from_session
+  user_supports
+SEE ALSO
+    Catalyst::Plugin::Authentication
+    Catalyst::Model::DBI
+    Catalyst::Plugin::Authorization::Roles
+
+AUTHOR
+    Simon Bertrang, <simon.bertrang@puzzworks.com>
+
+COPYRIGHT
+    Copyright (c) 2008 PuzzWorks OHG, <http://puzzworks.com/>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

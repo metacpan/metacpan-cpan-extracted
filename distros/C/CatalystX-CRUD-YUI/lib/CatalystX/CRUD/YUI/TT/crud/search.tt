@@ -1,0 +1,39 @@
+[%# generic search screen %]
+  <div id="main">
+  
+  <form method="get"
+        action="[% c.uri_for('search') %]"
+        class="crud"
+        >
+   <fieldset>
+    <legend>Search [% c.action.namespace %]</legend>
+     
+    <label><!-- satisfy css --></label>
+    <input class="button" type="submit" name="search" value="Search" />
+    <input class="button" type="reset" value="Reset" />
+    <br/>
+    
+     [% PROCESS crud/form.tt 
+            show_hidden_fields=1 %]
+    
+    <label><!-- satisfy css --></label>
+    <input class="button" type="submit" name="search" value="Search" />
+    <input class="button" type="reset" value="Reset" />
+    [% IF c.controller.fuzzy_search -%]
+    <input type="hidden"  value="1" name="_fuzzy" />
+    [% END %]
+    <br/>
+    
+  </fieldset>
+ </form>
+ 
+ [% IF results.count %]
+  [% PROCESS crud/results.tt %]
+ [% ELSIF results.query.plain_query_str %]
+  <div>
+  Sorry, no results for 
+  <strong>[% results.query.plain_query_str %]</strong>.
+  </div> 
+ [% END %]
+ 
+ </div>

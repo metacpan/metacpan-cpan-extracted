@@ -1,0 +1,51 @@
+NAME
+    Clio - Command Line Input/Output with sockets and HTTP
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    Clio will allow you to connect to your command line utilities over
+    network socket and HTTP.
+
+    Please see clio for configuration options and usage.
+
+ATTRIBUTES
+  config_file
+    Path to Clio config file.
+
+    Required.
+
+  config
+    Clio::Config object.
+
+  process_manager
+    Clio::ProcessManager object.
+
+  server
+    Server object of class specified in configuration.
+
+METHODS
+  run
+    Daemonizes if required by configuration.
+
+    Starts "process_mananager" and "server".
+
+  log
+        my $logger = $c->log( $caller);
+
+    Returns logger object of class specified by configuration.
+
+INSTALLATION
+        cpanm Clio
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

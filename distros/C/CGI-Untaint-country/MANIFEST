@@ -1,0 +1,17 @@
+Build.PL
+Makefile.PL
+Changes
+lib/CGI/Untaint/country.pm
+lib/CGI/Untaint/countrycode.pm
+lib/CGI/Untaint/countrycode3.pm
+lib/CGI/Untaint/countryname.pm
+lib/CGI/Untaint/countrynumber.pm
+lib/CGI/Untaint/to_countrycode.pm
+lib/CGI/Untaint/to_countrycode3.pm
+lib/CGI/Untaint/to_countrynumber.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01.main.t
+t/pod.t

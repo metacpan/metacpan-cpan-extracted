@@ -1,0 +1,63 @@
+---
+abstract: 'Catch application errors and emit them somewhere'
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Plugin::Authentication: '0.10010'
+  Catalyst::Plugin::ConfigLoader: '0.22'
+  Catalyst::Plugin::Session: '0'
+  Catalyst::Plugin::Session::State::Cookie: '0'
+  Catalyst::Plugin::Session::Store::File: '0'
+  Catalyst::Plugin::StackTrace: '0.10'
+  Catalyst::Runtime: '5.80'
+  Catalyst::Test: '0'
+  Config::General: '0'
+  DateTime: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  File::Spec::Functions: '0'
+  FindBin::libs: '0'
+  HTTP::Request::Common: '0'
+  IO::File: '0'
+  MIME::Lite: '0'
+  MRO::Compat: '0'
+  Path::Class: '0'
+  Sys::Hostname: '0'
+  Test::Exception: '0'
+  Test::More: '0.92'
+  Test::UseAllModules: '0'
+  base: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-ErrorCatcher
+requires:
+  Catalyst::ClassData: '0'
+  Data::Dump: '0'
+  DateTime: '0'
+  File::Slurp: '0'
+  File::Type: '0'
+  IO::File: '0'
+  MIME::Lite: '0'
+  Module::Pluggable::Object: '0'
+  Moose: '0'
+  Path::Class: '0'
+  Sys::Hostname: '0'
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/chiselwright/Catalyst-Plugin-ErrorCatcher/issues
+  repository: git://github.com/chiselwright/catalyst-plugin-errorcatcher.git
+version: 0.0.8.18

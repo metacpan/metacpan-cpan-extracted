@@ -1,0 +1,13 @@
+vi:tw=75:
+
+SYNOPSIS
+
+# Well, look at this, you're very own CPAN mirror:
+
+use strict;
+use CPAN::CachingProxy;
+use CGI;
+use CGI::Carp qw(fatalsToBrowser);
+
+my $cache = CPAN::CachingProxy->new(mirrors=>['http://www.perl.com/CPAN/bug']);
+   $cache->run;

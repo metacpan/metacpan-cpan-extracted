@@ -1,0 +1,71 @@
+{
+   "abstract" : "Redis driver for CHI with proper expiration of namespace keys",
+   "author" : [
+      "Arnold Tan Casis <atancasis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CHI-Driver-Redis-SortedSet",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.36",
+            "CHI::Driver::Redis" : "0",
+            "Moo" : "0",
+            "Redis" : "1.901",
+            "URI" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Mock::Redis" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/atancasis/CHI-Driver-Redis-SortedSet/issues"
+      },
+      "homepage" : "https://github.com/atancasis/CHI-Driver-Redis-SortedSet",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atancasis/CHI-Driver-Redis-SortedSet.git",
+         "web" : "https://github.com/atancasis/CHI-Driver-Redis-SortedSet"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,17 @@
+.gitignore
+Changes
+CP_RSA.cpp
+CP_RSA.h
+ex/sample.pl
+lib/Crypt/RSA/Yandex.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+perlobject.map
+ppport.h
+README
+t/Crypt-RSA-Yandex.t
+typemap
+Yandex.xs
+META.yml                                 Module meta-data (added by MakeMaker)

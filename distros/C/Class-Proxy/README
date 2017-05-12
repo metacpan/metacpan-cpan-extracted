@@ -1,0 +1,48 @@
+Class/Proxy
+===========
+
+Objects can be served by "Class::Proxy". In practice, any method call to
+the proxy will be forwarded to the original object (victim). The purpose
+of that is to alter method calls in a generic way. This can be used for
+
+*   faking
+
+*   restriction
+
+*   logging
+
+*   benchmarking
+
+*   forwarding
+
+*   versioning
+
+*   caching
+
+and many more.
+
+SYNOPSIS
+
+   use Class::Proxy;
+
+        my $pobj = Class::Proxy->new( victim => $obj );
+
+        $pobj->victim_method();
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Murat Uenalan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

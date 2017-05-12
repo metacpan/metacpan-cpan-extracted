@@ -1,0 +1,28 @@
+---
+abstract: 'Class::Accessor::Fast with lazy defaults'
+author:
+  - 'Jan Henning Thorsen C<< jhthorsen at cpan.org >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.9
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.131560'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Accessor-Fast-WithBuilder
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor: 0.32
+  base: 2.1
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Accessor-Fast-WithBuilder
+  homepage: http://search.cpan.org/dist/Class-Accessor-Fast-WithBuilder
+  repository: https://github.com/jhthorsen/class-accessor-fast-withbuilder.git
+version: 0.01

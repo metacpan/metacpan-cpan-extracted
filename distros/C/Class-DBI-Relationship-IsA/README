@@ -1,0 +1,33 @@
+Class-DBI-Relationship-IsA version 0.05
+=======================================
+
+Class::DBI::Relationship::IsA Provides an Is A relationship between Class::DBI classes.
+This should DTRT when you specify an IsA relationship between classes transparently.
+For more information See Class::DBI and Class::DBI::Relationship. 
+
+This module is currently a proof of concept and may not work as intended, we would warn you
+to treat it as experimental.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Class::DBI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004, 2005 by Richard Hundt & Aaron Trevena
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+

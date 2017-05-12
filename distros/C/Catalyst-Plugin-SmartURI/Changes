@@ -1,0 +1,73 @@
+Revision history for Catalyst-Plugin-SmartURI
+
+0.041 2015-10-04 04:27:55
+    - skip infinite recursion test on 5.8 because of broken Time::HiRes
+
+0.040 2015-09-23 06:53:54
+    - fix infinite recursion on undef $req->uri #1
+
+0.039 2014-01-11 15:55:01
+    - remove Class::MOP::load_class RT#90916
+
+0.038 2013-11-14 20:02:08
+    - return undef for $c->req->referer correctly when there is no Referer
+      header
+
+0.037 2013-08-26 23:50:44
+    - converted to git and moved to github
+    - converted to dzil
+    - add plugin loading example to SYNOPSIS (RT#88069)
+
+0.036  2009-11-24 09:08:09
+    - POD fixes from Frank Wiegand (RT#51885)
+
+0.035  2009-09-24 04:35:28
+    - fix typo in pod (RT#49933)
+
+0.034  2009-05-13 23:46:18
+    - fix compatibility with Catalyst::Action::REST v0.71
+    - move inline tests into t/lib
+
+0.033  2009-04-29 19:46:04
+    - last dist was missing inc/
+
+0.032  2009-04-27 15:42:07
+    - converted to Moose
+    - some minor POD cleanups
+
+0.030  2008-11-19 17:54:37
+    - fixed for Catalyst 5.8
+
+0.029  2008-10-09 07:02:46
+    - fixed the host-header stuff for when there's no port.
+
+0.028  2008-08-22 03:53:49
+    - added note to the POD about usage with C::C::REST.
+
+0.027  2008-07-06 14:17:12
+    - improved request class, better Host header parsing, fixed POD.
+
+0.025  2008-06-28 08:33:57
+    - fucked up the pod for SYNOPSIS...
+
+0.024  2008-06-28 03:01:53
+    - added 'host-header' disposition.
+    - converted conf key to 'Plugin::SmartURI'
+
+0.023  2008-06-28 01:14:49
+    - weaken saved context.
+
+0.022  2008-06-24 16:52:55
+    - fix weird bug with initialization that sometimes happens.
+
+0.021  2008-06-16 22:20:42
+    - minor speedup, avoiding unnecessary string evals.
+
+0.02  2008-06-03 21:58:17
+    - moved Catalyst::SmartURI into a separate dist as URI::SmartURI
+
+0.01_01  2008-04-01 08:33:13
+    - first dev release.
+
+0.01  2008-03-08 03:30:31
+    - first version.

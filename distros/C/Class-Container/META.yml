@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name: Class-Container
+version: 0.12
+author:
+  - |-
+    Originally by Ken Williams <ken@mathforum.org> and Dave Rolsky
+    <autarch@urth.org> for the HTML::Mason project.  Important feedback
+    contributed by Jonathan Swartz <swartz@pobox.com>.  Extended by Ken
+    Williams for the AI::Categorizer project.
+abstract: Glues object frameworks together transparently
+license: perl
+requires:
+  Carp: 0
+  Params::Validate: 0.23
+recommends:
+  Scalar::Util: 0
+provides:
+  Class::Container:
+    file: lib/Class/Container.pm
+    version: 0.12
+generated_by: Module::Build version 0.26

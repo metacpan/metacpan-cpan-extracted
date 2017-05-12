@@ -1,0 +1,148 @@
+Revision history for Perl extension Class-Inspector
+
+1.31      2016-11-25 09:33:47 -0500
+  - Migrated from Module::Install to Dist::Zilla and ExtUtils::MakeMaker
+  - Fixed meta for repository which was pointing to the wrong URL
+
+1.30 23 Nov 2016
+  - Moving to prod release
+
+1.29_02 23 Nov 2016
+  - Update metadata to point to github repository.
+    Plus some other minor dist meta tweaks.
+  - Note: planning on doing a migration from Module::Install
+    to ExtUtils::MakeMaker shortly AFTER the next production
+    release.
+
+1.29_01 22 Nov 2016
+  - Fix Makefile.PL to work with Perls without '.' in @INC
+  - Fix for the installed method when used with a PAR archive (rt#42846)
+  - Minor documentation fixes (grammar, spelling: rt#74481, rt#85356)
+
+1.28 Fri 19 Oct 2012
+  - No functional changes
+  - Updating to Module::Install::DSL 1.06
+
+1.27 Wed 25 Jan 2012
+  - Moving to prod release
+
+1.26_01 Tue 24 Jan 2012
+  - Updating to Module::Install::DSL 1.04
+  - Updating copyright year
+  - Remove usage of defined @{"X::ISA"} to avoid warnings in 5.15.7
+    and later Perl 5.16 (Tom Wyant)
+
+1.25 Thu 27 Jan 2011
+  - Updating to Module::Install::DSL 1.00
+  - Updating copyright year
+
+1.24 Tue 21 Apr 2009
+  - Updating Perl dependency to 5.006
+  - Updating to Module::Install::DSL 0.83
+  - Add the Class::Inspector::Functions interface.
+
+1.23 Mon  2 Jun 2008
+  - No functional changes
+  - Updating to Module::Install 0.75
+  - Correcting the location of the author tests
+
+1.22 Sat  1 Mar 2008
+  - 1.21_01 tested ok, moving to production version
+  - No changes
+
+1.21_01 Tue 12 Feb 2008
+  - Adding experimental support for utf8 methods
+    (as per http://rt.cpan.org/Public/Bug/Display.html?id=28796)
+
+1.20 Tue 12 Feb 2008
+  - CPAN Testers results look good for 1.19_01,
+    converting to a production release.
+
+1.19_01 Mon 11 Feb 2008
+  - Bug fix to adapt to changes to File::Spec
+
+1.18 Thu  8 Nov 2007
+  - Incremental release, no functional changes
+  - Updated to Module::Install 0.68
+    (This brings META.yml to the current version)
+  - Updated versions of the automated tests that
+    were causing CPAN Testers failures.
+
+1.17 Mon  6 Aug 2007
+  - Classes with leading numbers after the first :: are permitted
+  - Removing some old cruft from the tests
+  - Updated to Module::Install 0.65
+
+1.16 Wed 10 May 2006
+  - This release contains only build-time changes
+  - AutoInstall is only needed for options, so remove auto_install
+
+1.15 Sun  7 May 2006
+  - This release contains only build-time changes
+  - Upgrading to Module::Install 0.62
+
+1.14 Sun  8 Apr 2006
+  - This release contains only build-time changes
+  - Moved from older CVS to newer SVN repository
+  - Upgraded to Module::Install 0.61
+
+1.13 Wed Sep 28 2005
+  - Fixed a minor POD bug in the synopsis
+
+1.12 Fri Sep  9 2005
+  - Added a fix for classes with insanely broken ->isa methods
+    that cause Perl to die.
+
+1.11 Tue Sep  6 2005
+  - It occured to me after I added ->find that what it _really_ is
+    is a way to find all the subclasses, but then include the class
+    itself in the returned list. This method makes much more sense
+    it I don't return the class itself, and rename it ->subclasses
+  - Fixed broken Makefile.PL
+
+1.10 Mon Sep  5 2005
+  - Added the ->find method
+  - Cleaned up and reorganised the POD
+  - Made sure all return conditions are documented properly
+  - Converted to Module::Install
+
+1.09 skipped
+
+1.08 Tue Feb 15 2005
+  - Removing braindead Build.PL
+
+1.07 Thu Nov 18 2004
+  - Improved the speed (slightly, and only in positive cases) and accuracy of ->loaded.
+  - It now checks for some additional clues before returning false.
+
+1.06 Wed Jul 21 2004
+  - Fixed a major Win32 bug
+
+1.05 Mon Jul 19 2004
+  - Inlined a better version of self_and_super_class
+  - Removed Class::ISA as a dependency
+
+1.04 Tue Mar 23 2004
+  - Apparently on Windows @INC/%INC uses Unix style backslashes
+    Updated to handle this fact.
+
+1.03 Sun Dec 14 2003
+  - Fixed an infinite loop bug in recursive_children
+
+1.02 Sun Dec 14 2003
+  - recursive children ignores ::ISA::CACHE::
+  - Minor code tweaks
+
+1.01 Mon Nov 10 2003
+  - Symbol table entries due to overloads and anonymous subs
+    are filtered from the results correctly.
+  - Did a large amount of code cleaning and optomising
+
+1.0  Sat Dec 21 13:31:21 2002
+  - Converted to use File::Spec
+
+0.2  Tue May 28 18:47:00 2002
+  - Added options for ->methods
+
+0.1  Thu May 23 20:09:55 2002
+  - original version

@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 110
+  55482:
+    - 49
+name: cb6e
+registers:
+  AF: 18944
+  AF_: 0
+  BC: 2249
+  BC_: 0
+  DE: 33143
+  DE_: 0
+  HL: 55482
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

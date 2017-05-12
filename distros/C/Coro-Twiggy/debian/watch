@@ -1,0 +1,2 @@
+version=3
+    http://search.cpan.org/dist/Coro-Twiggy/ .*-(\d+(?:\.\d+)+).tar.gz

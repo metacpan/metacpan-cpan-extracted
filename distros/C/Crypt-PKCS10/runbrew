@@ -1,0 +1,61 @@
+#! /usr/bin/perl
+
+#
+# This software is Copyright (c) 2016 Timothe Litt
+#
+# See LICENSE for details.
+#
+
+# If perlbrew is detected, run the current (or if none, highest) version on a command.
+# Otherwise, use the system perl
+
+use warnings;
+use strict;
+
+use Cwd qw/getcwd/;
+
+use Sort::Versions;
+
+my $wd;
+
+END {
+    if( $wd ) {
+        chdir( $wd ) or die( "Can't chdir to $wd: $!\n" );
+    }
+}
+
+if( @ARGV && $ARGV[0] eq '-in' && $ARGV[1] ) {
+    shift;
+    my $in = shift;
+    $wd = getcwd;
+    chdir( $in ) or die( "Can't chdir to $in: $!\n" );
+}
+
+#my $cmd = join( ' ', @ARGV );
+
+unless( system( 'which perlbrew >/dev/null 2>&1' ) == 0 ) {
+    exit( system( @ARGV ) );
+}
+
+my $perl;
+my @avail = split( /\n/, `perlbrew list` );
+
+foreach my $p (@avail) {
+    if( $p =~ s/^(\*| ) perl-(\S+)\s*$/$2/ ) {
+        if( $1 eq '*' ) {
+            $perl = $p;
+            last;
+        }
+    }
+}
+
+if( !defined $perl ) {
+    @avail = sort { -1 * versioncmp( $a, $b ) } @avail;
+    $perl = $avail[0];
+}
+die "No perl found" unless( defined $perl );
+
+#print( "Using perl $perl for $cmd\n" );
+
+exit( system( qw(perlbrew exec --quiet --with), "perl-$perl", @ARGV ) );
+

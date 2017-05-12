@@ -1,0 +1,7 @@
+<select id="[% select.name %]" name="[% select.name %]" [% IF multiple > 0 %]multiple="multiple" size="[% multiple %]"[% END %] [% IF disable %]disabled="disabled"[% END %]>
+[% FOREACH option = select.options %]
+<option value="[% option.index %]" [% IF option.selected %]selected="selected"[% END %]>[% option.value %]</option>
+[% END %]
+</select>
+
+[% multiple = 0 %]

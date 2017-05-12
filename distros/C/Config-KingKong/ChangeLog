@@ -1,0 +1,7 @@
+2011-12-05  Raphael Pinson v0.005
+
+	* Depend on Class::Accessor.
+
+2011-12-01  Raphael Pinson v0.001
+
+	* Original version.

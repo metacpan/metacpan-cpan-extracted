@@ -1,0 +1,11 @@
+^\.
+\.bak$
+\.swp$
+^Makefile$
+^Makefile.old$
+^Catalyst-View-Mason-
+^cover_db\b
+^blib\b
+^pm_to_blib$
+^t/lib/TestApp/root/var
+.DS_Store

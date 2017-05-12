@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <title>Linux Familiy Desktop</title>
+
+</head><body>
+<h2>Linux Family Desktop</h2>
+
+<i>Hopefully useful information, use at your own risk</i>
+
+<p>This page describes the setup I use to run a Linux based desktop
+system for my familiy. This is not about setting up debian. 
+Installing debian is easier than most people think and
+can be read elsewhere. This is about getting additional features -
+most prominent 3d graphics and multi seat - up and running.
+</p>
+
+<h3>Hardware</h3>
+
+<p>The board is a</p>
+<pre>enter:~# dmidecode | grep -A3 -i "base board" 
+Base Board Information
+	Manufacturer: ASUSTeK Computer INC.
+	Product Name: M3A32-MVP DELUXE
+	Version: Rev 1.xx
+</pre>
+<p>
+with AMDs 790fx chipset. The board was choosen because it provides 4 PCIex16 slots. 
+</p>
+<p>
+All graphics cards are from nvidia.</p>
+<pre>enter:~# lspci | grep VGA
+01:00.0 VGA compatible controller: nVidia Corporation NV44 [GeForce 6200 LE] (rev a1)
+02:00.0 VGA compatible controller: nVidia Corporation NV44 [GeForce 6200 LE] (rev a1)
+06:00.0 VGA compatible controller: nVidia Corporation Device 0a65 (rev a2)
+</pre>
+<p>Note that the third card is a <a href="http://www.alternate.de/html/product/Grafikkarten_NVIDIA_GeForce_GT/Gainward/G210/376917/?tn=HARDWARE&amp;l1=Grafik&amp;l2=PCIe-Karten+NVIDIA&amp;l3=GeForce+G%2FGT">Gainward
+G210</a> which is cheap, passively cooled and has most of the latest
+features (OpenGL 3.2). It does however require nvidia-glx 190.42 from
+debian unstable. The card in the middle is currently unused.
+</p>
+<p>
+Choosing nvidia cards was probably a lucky choice. According to
+<a 
+  href="http://blog.chris.tylers.info/index.php?/archives/184-Multiseat-on-Dual-ATI-and-Dual-NVIDIA.html"
+  >Chris Tylers</a> everything else is less stable or will not work 
+in a multi seat system.
+</p>
+
+<h3>Software</h3>
+
+<p>I am running this on debian lenny amd64. Debian is - I know I am repeating myself - 
+by now quite easy to use. A lot of 
+things just work out of the box.
+</p>
+
+<p>To get 3D graphics acceleration is required. Not only is it necessary for lots of 
+games. Smooth scaling of videos depends on it and youtubes audio stays in sync if you 
+have it. Fortunately it is quite easy.
+<code>apt-cache show nvidia-glx</code> will tell you which cards are
+supported. If yours are among them a simple <code>apt-get install
+nvidia-glx</code> will install all the nvidia drivers including the
+necessary kernel module. You need to have <code>main contrib non-free</code> 
+in your <code>/etc/apt/sources.list</code> since the nvida drivers are non-free.
+</p>
+
+<p>To find out if 3d acceleration is working ask glxinfo from the mesa-utils 
+package from inside an xterm.</p>
+
+<pre>
+jo@enter:~$ glxinfo | egrep -i direct\|opengl
+direct rendering: Yes
+OpenGL vendor string: NVIDIA Corporation
+OpenGL renderer string: GeForce 6200 LE/PCI/SSE2
+OpenGL version string: 2.1.2 NVIDIA 190.42
+OpenGL extensions:
+    ...
+</pre>
+
+<h3>More Software</h3>
+
+<p>For access to youtube, freecaster and
+lots of games a working flash plugin is a must. 
+You may try gnash, but most likely you still need
+to <code>apt-get install flashplugin-nonfree</code>. 
+If you do this after opengl is working the plugin
+automatically uses opengl. Otherwise you will need 
+to reconfigure your flash plugin later.
+</p>
+ 
+<p>A nice piece of software that saves a lot of argueing is 
+<a href="https://launchpad.net/timekpr">timekpr</a>. It lets 
+you limit your kids login time. The ubuntu deb is installable 
+on lenny with: </p>
+<pre>
+enter:~# dpkg -i timekpr_0.3.0~ppa1~ubuntu1_all.deb<br>
+</pre> 
+
+
+<h3>Multiseat</h3>
+
+<p>Setting up a working multiseat is hard. This is partially due to the
+fact that multi card setups are broken in most distros. The status of
+the xorg head revision is somewhat unclear. 
+See <a href="https://bugs.freedesktop.org/show_bug.cgi?id=18160">18160</a>
+for details.
+</p>
+
+<p>
+Our <a href="xorg.conf">xorg.conf</a> and <a href="gdm.conf">gdm.conf</a> 
+are provided as examples. The option <b>sharevts</b> that is according 
+to all sources needed for multi seat setups is undocumented. 
+So I only have a rough idea why my Xorg servers need to share vts.
+For my setup it was however necessary to <b>omit</b> that option 
+for the first seat.
+</p>
+
+<p>The other trick that made our system finally stable was to preload 
+the nvidia kernel module:</p>
+
+<pre>enter:~# grep nvidia /etc/modules 
+nvidia
+</pre>
+
+<p>My theory was that multiple starting xorg servers loading the nvidia
+module lead to concurrency problems. It seems that there now is
+<code>/etc/modprobe.d/nvidia-kernel-nkc</code> to do this, 
+so you may not need it.</p>
+
+<!-- h3>Removable Devices</h3>
+
+<p>If you plug in a removable device (an usb stick, an sd card or the like) into the multi seat box, 
+all users get notified. That is annoying, but the real problem is that one of the logged 
+in users automatically mounts the device. This user is the only one that has write access 
+and that can umount the device. 
+</p>
+
+<p>A solution would be to mount the device with <code>umask=0002,gid=46,users</code> (46 is plugdev). 
+How do we get gnome to do that? GConf can do that with 
+<a href="%25gconf-tree.xml">/etc/gconf/gconf.xml.mandatory/%gconf-tree.xml</a>. This will lead to 
+messages about invalid mount options since we need to allow hal the new options. This is done 
+with <a href="21-storage-methods-local.fdi"
+>/usr/share/hal/fdi/policy/10osvendor/21-storage-methods-local.fdi</a>.</p -->
+
+<h3>Wine Gaming</h3>
+
+<p>Installing wine is - you guessed it - easy. 
+<code>apt-get install wine</code> does it, 
+no matter if you are on i386 or amd64. If you are on amd64, you do  
+however also need nvidia-glx-ia32 to pass the nvidia opengl from 64bit 
+to 32bit wine.</p>
+
+<p>To test if your wine has a working opengl I recommend the
+<a href="http://www.ozone3d.net/gpu_caps_viewer/">GPU Caps Viewer</a>. 
+If wine opengl is working 
+the string it displays in <i>OpenGL&gt;OpenGL Version</i> <b>must</b>
+exaxtly match glxinfos <i>OpenGL version string</i>. The GCV 
+also comes with several test demos for opengl 2+ features.
+This is actually a much better test than glxgears for your linux 
+opengl.</p>
+
+<p>Working opengl makes lots of games playable. There are however 
+still lots of graphics issues and there are copy protection schemes 
+that will probably never work in wine.</p>
+
+<h3>References</h3>
+
+<p>A very similiar system (debian, 790fx, nvidia) is described <a 
+href="http://www.automation.dn.ua/linux/3d-multiseat_en.html">here</a>.
+Especially that description gives you more details on assigning mouse and 
+keyboard to a seat.
+</p>
+
+<h3>Contact</h3>
+
+<p>This text was written some time after I did the setup. By then 
+I could not remember all the details. If there are critical details
+missing contact <a href="mailto:jz-2009@heute-morgen.de">me</a>.
+</p>
+
+
+</body></html>
+
+

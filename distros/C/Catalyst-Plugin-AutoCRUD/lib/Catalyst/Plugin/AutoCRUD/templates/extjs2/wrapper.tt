@@ -1,0 +1,8 @@
+[% INCLUDE extjs2/wrapper/head.tt %]
+<body onresize="Ext.getCmp('search-grid').view.refresh(true)">
+[% INCLUDE extjs2/wrapper/header.tt %]
+[% INCLUDE extjs2/wrapper/banner.tt %]
+[% INCLUDE extjs2/wrapper/box.tt %]
+[% INCLUDE extjs2/wrapper/footer.tt %]
+</body>
+</html>

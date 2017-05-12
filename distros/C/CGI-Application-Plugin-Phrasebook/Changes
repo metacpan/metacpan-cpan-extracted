@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI-Application-Plugin-Phrasebook
+
+0.02 Wed. March 22, 2006
+    - added support for multiple phrasebooks
+        - added tests for this
+
+0.01 Wed. March 22, 2006
+	- module concieved and created 

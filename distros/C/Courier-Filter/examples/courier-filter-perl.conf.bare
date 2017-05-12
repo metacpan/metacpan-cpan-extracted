@@ -1,0 +1,47 @@
+# 
+# Configuration file for Courier::Filter, the purely Perl-based filter
+# framework for the Courier MTA.
+#
+##############################################################################
+
+use utf8;
+
+use Courier::Filter::Logger::Syslog;
+
+#use Courier::Filter::Module::BlankBody;
+#use Courier::Filter::Module::DNSBL;
+#use Courier::Filter::Module::SPF;
+#use Courier::Filter::Module::SPFout;
+#use Courier::Filter::Module::Envelope;
+#use Courier::Filter::Module::Header;
+#use Courier::Filter::Module::FakeDate;
+#use Courier::Filter::Module::BlankBody;
+#use Courier::Filter::Module::ClamAVd;
+#use Courier::Filter::Module::Parts;
+#use Courier::Filter::Module::SendCopy;
+
+$options = {
+    
+    # Logger Declaration:
+    ########################################
+    
+    logger      => Courier::Filter::Logger::Syslog->new(),
+    
+    # Module Declarations:
+    ########################################
+    
+    modules     => [
+        
+        # Sample declaration:
+        #Courier::Filter::Module::Header->new(
+        #    fields      => {
+        #       'list-id'        => '<debian-devel.lists.debian.org>',
+        #        subject         => qr/duell?ing\s+banjoe?s?/i
+        #    },
+        #    response    => 'Oh no, not those dueling banjos again!',
+        #    trusting    => TRUE
+        #),
+        
+    ]
+    
+};

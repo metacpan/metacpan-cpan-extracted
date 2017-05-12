@@ -1,0 +1,88 @@
+NAME
+    CGI::PSGI - Adapt CGI.pm to the PSGI protocol
+
+SYNOPSIS
+      use CGI::PSGI;
+
+      my $app = sub {
+          my $env = shift;
+          my $q = CGI::PSGI->new($env);
+          return [ $q->psgi_header, [ $body ] ];
+      };
+
+DESCRIPTION
+    This module is for web application framework developers who currently
+    uses CGI to handle query parameters, and would like for the frameworks
+    to comply with the PSGI protocol.
+
+    Only slight modifications should be required if the framework is already
+    collecting the body content to print to STDOUT at one place (rather
+    using the print-as-you-go approach).
+
+    On the other hand, if you are an "end user" of CGI.pm and have a CGI
+    script that you want to run under PSGI web servers, this module might
+    not be what you want. Take a look at CGI::Emulate::PSGI instead.
+
+    Your application, typically the web application framework adapter should
+    update the code to do "CGI::PSGI->new($env)" instead of "CGI->new" to
+    create a new CGI object. (This is similar to how CGI::Fast object is
+    initialized in a FastCGI environment.)
+
+INTERFACES SUPPORTED
+    Only the object-oriented interface of CGI.pm is supported through
+    CGI::PSGI. This means you should always create an object with
+    "CGI::PSGI->new($env)" and should call methods on the object.
+
+    The function-based interface like "use CGI ':standard'" does not work
+    with this module.
+
+METHODS
+    CGI::PSGI adds the following extra methods to CGI.pm:
+
+  env
+      $env = $cgi->env;
+
+    Returns the PSGI environment in a hash reference. This allows
+    CGI.pm-based application frameworks such as CGI::Application to access
+    PSGI extensions, typically set by Plack Middleware components.
+
+    So if you enable Plack::Middleware::Session, your application and plugin
+    developers can access the session via:
+
+      $cgi->env->{'plack.session'}->get("foo");
+
+    Of course this should be coded carefully by checking the existence of
+    "env" method as well as the hash key "plack.session".
+
+  psgi_header
+     my ($status_code, $headers_aref) = $cgi->psgi_header(%args);
+
+    Works like CGI.pm's header(), but the return format is modified. It
+    returns an array with the status code and arrayref of header pairs that
+    PSGI requires.
+
+    If your application doesn't use "$cgi->header", you can ignore this
+    method and generate the status code and headers arrayref another way.
+
+  psgi_redirect
+     my ($status_code, $headers_aref) = $cgi->psgi_redirect(%args);
+
+    Works like CGI.pm's redirect(), but the return format is modified. It
+    returns an array with the status code and arrayref of header pairs that
+    PSGI requires.
+
+    If your application doesn't use "$cgi->redirect", you can ignore this
+    method and generate the status code and headers arrayref another way.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    Mark Stosberg <mark@summersault.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    CGI, CGI::Emulate::PSGI
+

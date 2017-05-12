@@ -1,0 +1,45 @@
+Crypt::Passwd - Interface to the UFC-Crypt library.
+
+This module provides a simple interface to the UFC-Crypt's functions
+crypt() and crypt16(). This can also be an interface to other similar
+libraries as the actual functions are configurable. See below under
+'CUSTOMIZATION'.
+
+This module requires the UFC-Crypt Library written by Michael Glad. Keep
+in mind that it's ILLEGAL to export that code from the US!
+
+The module has been tested with a version circa 05/18/93 on FreeBSD and
+Digital Unix systems.
+
+To install this module, you must first download and install UFC-Crypt.
+Insure it's working well before you proceed any further. Once ready,
+copy libufc.a or equivalent library file to /usr/local. If the library
+file is somewhere else or you decide to change the name, you will have
+to change the file Makefile.PL to reflect your actual setup.
+
+After this, you should do the following
+
+		make
+		make test
+		make install
+
+This code is subject to the same licensing scheme than perl itself and/or
+the UFC-Crypt library. This code is provided as is, with no warranties.
+
+CUSTOMIZATION:
+
+If your version of UFC-Crypt includes the crypt16() function,
+you can edit the file 'config.h' and de-comment the definition for
+EXT_CRYPT. Thanks to Lupe Christoph for pointing out that most versions
+of UFC-Crypt found on the Net are missing crypt16().
+
+Other libraries can be used instead. For this, just replace 
+the -lufc in the file Makefile.PL with the desired one. Also, edit
+the file config.h to match for the function names you want to use.
+The prototypes should be compatible with the standard crypt().
+
+You're welcome to send feedback, bugs with the module and general ideas
+to Luis E. Munoz, lem@cantv.net
+
+Regards.
+

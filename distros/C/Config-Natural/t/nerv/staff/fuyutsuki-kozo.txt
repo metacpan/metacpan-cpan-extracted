@@ -1,0 +1,4 @@
+staff {
+  name = Fuyutsuki Kozo
+  role = Nerv second commander
+}

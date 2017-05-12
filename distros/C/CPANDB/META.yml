@@ -1,0 +1,37 @@
+---
+abstract: 'A unified database of CPAN metadata information'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  LWP::Online: 1.07
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CPANDB
+name: CPANDB
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DateTime: 0.50
+  Getopt::Long: 2.33
+  ORLite: 1.51
+  ORLite::Mirror: 1.20
+  Params::Util: 1.00
+  Time::HiRes: 1.97
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/CPANDB
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/CPANDB
+version: 0.18

@@ -1,0 +1,8 @@
+Revision history for Perl extension Catalyst::View::REST::Data::Serializer
+
+0.02  Mon May 22 23:56:17 PDT 2006
+        - Added "raw" option, to call the raw_serialize method instead of serialize
+          This will let you skip all the Data::Serializer headers/compression/encoding.
+          
+0.01  Tue Sep 13 1:53:00 2005
+        - Initial Release

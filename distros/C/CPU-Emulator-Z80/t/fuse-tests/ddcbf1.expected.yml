@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcbf1
+registers:
+  AF: 38080
+  AF_: 0
+  BC: 39544
+  BC_: 0
+  DE: 41213
+  DE_: 0
+  HL: 31773
+  HL_: 0
+  I: 0
+  IX: 18362
+  IY: 35969
+  PC: 4
+  R: 2
+  SP: 0

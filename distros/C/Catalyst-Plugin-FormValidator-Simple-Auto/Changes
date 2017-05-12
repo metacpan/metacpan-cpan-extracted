@@ -1,0 +1,60 @@
+Revision history for Perl module Catalyst::Plugin::FormValidator::Simple::Auto
+
+0.18 2009-06-08T18:22:36+09:00
+     - support Catalyst 5.8 (Thanks to hidek)
+
+0.17 2008-04-09T18:57:31+09:00
+     - use local when set $YAML::UseAliases
+
+0.16 2008-04-09T16:24:45+09:00
+     - support yaml aliases (Reported by Nakane)
+
+0.15 2007-04-10T10:56:52+09:00
+     - support bundle message that has no validation rule
+
+0.14 2007-04-08T02:46:50+09:00
+     - don't delete not only profile action but also form object, too
+
+0.13 2007-04-08T02:03:57+09:00
+     - don't delete profile if it's first one
+
+0.12 2007-02-22T17:14:20+09:00
+	 - Added nest forward validation (Thanks to Daniel Burke)
+	 - Added form_messages method
+
+0.11 2007-01-02T02:56:00+09:00
+     - Fixed cannot handle error_messages when validation rule is array ref
+
+0.10 2006-12-26T09:52:38+09:00
+     - Fixed wrong yaml format in pod
+     - Make yaml loading looser
+
+0.09 2006-12-23T08:58:04+09:00
+     - Use warn instead of error, when no validator profile set
+     - Switched to Module::Install
+     - Added validation error message bundling feature
+
+0.08 2006-09-09T15:16:29+09:00
+     - removed $c->path_to when loading yaml file
+
+0.07 2006-07-25T13:05:01+09:00
+     - added validator_profile accessor to store current profile
+     - added some basic tests
+
+0.06 2006-07-24T02:44:21+09:00
+     - fixed forward action tracker bug when action is relative calls
+
+0.05 2006-07-24T01:48:38+09:00
+     - added forward tracking
+
+0.04 2006-07-07T11:56:59+09:00
+     - fixed yaml load error with latest YAML.pm
+
+0.03 2006-06-14T11:30:20+09:00
+     - fixed bug for action name (reported by tokuhirom)
+
+0.02 2006-06-14T02:08:49+09:00
+     - added missing prereq modules (no code changes)
+
+0.01 2006-06-14T01:44:54+09:00
+     - original version;

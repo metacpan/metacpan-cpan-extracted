@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Carp-Perror.t
+t/Carp-Perror01.t
+t/perror.pl
+t/pexit.pl
+lib/Carp/Perror.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

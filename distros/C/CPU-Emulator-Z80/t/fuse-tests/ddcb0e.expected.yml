@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  64783:
+    - 214
+name: ddcb0e
+registers:
+  AF: 7297
+  AF_: 0
+  BC: 35083
+  BC_: 0
+  DE: 30768
+  DE_: 0
+  HL: 1548
+  HL_: 0
+  I: 0
+  IX: 64841
+  IY: 23815
+  PC: 4
+  R: 2
+  SP: 0

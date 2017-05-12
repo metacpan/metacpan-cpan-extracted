@@ -1,0 +1,117 @@
+{
+   "abstract" : "Schema for CPANTesters database processed from test reports",
+   "author" : [
+      "Oriol Soriano <oriolsoriano@gmail.com>",
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Testers-Schema",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "DBIx::Class::Candy" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Import::Base" : "0.012",
+            "Log::Any" : "1.045",
+            "perl" : "5.024",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "SQL::Translator" : "0.11018",
+            "Test::Lib" : "0",
+            "Test::More" : "1.001005"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Testers::Schema" : {
+         "file" : "lib/CPAN/Testers/Schema.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Base" : {
+         "file" : "lib/CPAN/Testers/Schema/Base.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Result::LatestIndex" : {
+         "file" : "lib/CPAN/Testers/Schema/Result/LatestIndex.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Result::Release" : {
+         "file" : "lib/CPAN/Testers/Schema/Result/Release.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Result::ReleaseStat" : {
+         "file" : "lib/CPAN/Testers/Schema/Result/ReleaseStat.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Result::Stats" : {
+         "file" : "lib/CPAN/Testers/Schema/Result/Stats.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::Result::Upload" : {
+         "file" : "lib/CPAN/Testers/Schema/Result/Upload.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::ResultSet::Release" : {
+         "file" : "lib/CPAN/Testers/Schema/ResultSet/Release.pm",
+         "version" : "0.005"
+      },
+      "CPAN::Testers::Schema::ResultSet::Upload" : {
+         "file" : "lib/CPAN/Testers/Schema/ResultSet/Upload.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-testers/cpantesters-schema/issues"
+      },
+      "homepage" : "https://github.com/cpan-testers/cpantesters-schema",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-testers/cpantesters-schema.git",
+         "web" : "https://github.com/cpan-testers/cpantesters-schema"
+      },
+      "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:PREACTION",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+}
+

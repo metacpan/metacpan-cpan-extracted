@@ -1,0 +1,78 @@
+#
+# $Id$
+#
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2007 Sinisa Susnjar <sini@cpan.org>
+# See LICENSE for terms of distribution.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+Introduction
+
+  This file documents the changes to each and every release of the
+  AutoSys perl API, going back as far as the initial 0.99 release.
+
+Changes for 1.05 - release date 11-feb-2008
+
+  o CA::AutoSys::Job:
+    Variable substitutions are now only performed when the variable is set (bug 31726).
+  o Added sample config for autorelay example.
+  o Simplified select statement for job selection in CA::AutoSys::Job.
+  o Improved output of autorep -q.
+
+Changes for 1.04 - release date 29-oct-2007
+
+  o Added status_time variable to CA::AutoSys::Status.
+  o Added autorelay example.
+
+Changes for 1.03 - release date 21-jun-2007
+
+  o Replaced dependency DBD::Sybase with the more suitable DBI...
+  o Added --dsn option to autorep and sendevent examples.
+  o Added a small example web server for controlling AutoSys jobs.
+  o Added -q option to autorep example.
+  o Cleaned up the DBI mess (a little bit at least).
+  o Moved the examples autorep and sendevent to bin directory.
+  o Added a small example that shows howto control your AutoSys jobs
+    via a web frontend.
+
+Changes for 1.02 - release date 29-mar-2007
+
+  o CA::AutoSys::Status:
+    Method format_time() now returns localtime() instead of gmtime() (bug 24962).
+    Added new instance variable "name" which contains the long name of the
+    appropriate job's status, e.g. "SUCCESS".
+  o CA::AutoSys:
+    Method new() now accepts the option "dsn" with which one should be able to
+    connect to AutoSys databases other than the default (Sybase).
+    Note: I have not tested this feature with databases other than Sybase yet,
+	since I currently only have access to a Sybase backed AutoSys installation.
+	Any feedback is welcome!
+
+Changes for 1.01 - release date 16-jan-2007
+
+  o Added documentation / pods for *.pm files.
+  o Added constants for states in CA::AutoSys::Status.
+
+Changes for 1.00 - release date 15-jan-2007
+
+  o Added online help (--help/--man) switches for examples.
+  o Added missing META.yml (sorry, it's my first CPAN module...) 
+
+Changes for 0.99 - release date 10-jan-2007
+
+  o Initial development.
+  o Implemented basic AutoSys features like job status querying, event sending.

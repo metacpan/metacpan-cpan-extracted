@@ -1,0 +1,20 @@
+Revision history for CloudApp-REST
+
+0.02    2011-02-12 17:00:00
+
+    Bug fixes:
+      - Fixed docs for proper interlinks on CPAN
+      - Added missing dependencies and new meta info
+      - Uploaded to github: http://github.com/rainboxx/CloudApp-REST
+      - Added Module::Load to the list of dependencies, removed UNIVERSAL::require
+      - Fixed typo in CloudApp::REST::Item::Bookmark
+      - Moved 'username' methods to legacy, added 'email' instead; changed doc
+
+    API changes:
+      - 'name' of items is not required
+      - Account registering added
+
+0.01    2010-06-01 10:50:00
+
+      - First version, released on an unsuspecting world.
+

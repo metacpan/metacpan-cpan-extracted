@@ -1,0 +1,15 @@
+Revision history for Perl extension CGI::Application::URIMapping.
+
+0.04  Fri Nov 16:16:50:00 2007
+	- ignore empty-string path params
+
+0.03  Fri Nov 16 15:45:00 2007
+	- add functions: all_param, validate_uri, normalize_uri
+	- more test code
+	- code cleanup
+
+0.02  Wed Nov 14 14:30:00 2007
+	- automatic registration of runmodes and build_uri method
+
+0.01  Wed Nov 14 12:00:00 2007
+	- original version

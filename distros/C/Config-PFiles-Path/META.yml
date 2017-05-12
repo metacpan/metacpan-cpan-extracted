@@ -1,0 +1,30 @@
+---
+abstract: 'manipulate PFILES path for IRAF Compatible parameter files'
+author:
+  - 'The Smithsonian Astrophysical Observatory'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.14, CPAN::Meta::Converter version 2.142060'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-PFiles-Path
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Sub::Uplevel: '0'
+  perl: v5.8.9
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-PFiles-Path
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://bitbucket.org/djerius/config-pfiles-path
+version: '0.03'

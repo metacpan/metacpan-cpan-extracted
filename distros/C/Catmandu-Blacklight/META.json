@@ -1,0 +1,73 @@
+{
+   "abstract" : "Catmandu modules for working with Blacklight catalogs",
+   "author" : [
+      "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-Blacklight",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.9",
+            "IO::Socket::SSL" : "1.993",
+            "JSON::MaybeXS" : "1.003005",
+            "REST::Client" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0",
+            "Test::Simple" : "1.001003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-Blacklight/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-Blacklight",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-Blacklight.git",
+         "web" : "https://github.com/LibreCat/Catmandu-Blacklight"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ]
+}
+

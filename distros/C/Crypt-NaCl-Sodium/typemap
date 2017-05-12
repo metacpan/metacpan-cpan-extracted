@@ -1,0 +1,11 @@
+TYPEMAP
+Data::BytesLocker                               T_PTROBJ
+Crypt::NaCl::Sodium::aead::aes256gcmstate       T_PTROBJ
+Crypt::NaCl::Sodium::generichash::stream        T_PTROBJ
+Crypt::NaCl::Sodium::hash::sha256stream         T_PTROBJ
+Crypt::NaCl::Sodium::hash::sha512stream         T_PTROBJ
+Crypt::NaCl::Sodium::auth::hmacsha256stream     T_PTROBJ
+Crypt::NaCl::Sodium::auth::hmacsha512stream     T_PTROBJ
+Crypt::NaCl::Sodium::auth::hmacsha512256stream  T_PTROBJ
+Crypt::NaCl::Sodium::onetimeauth::stream        T_PTROBJ
+

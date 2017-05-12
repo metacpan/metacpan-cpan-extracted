@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  239:
+    - 72
+name: cb1e
+registers:
+  AF: 24077
+  AF_: 0
+  BC: 26297
+  BC_: 0
+  DE: 32988
+  DE_: 0
+  HL: 239
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

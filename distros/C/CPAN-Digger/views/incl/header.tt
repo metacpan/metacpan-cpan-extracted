@@ -1,0 +1,3 @@
+[% INCLUDE incl/header_top.tt %]
+[% title %]
+[% INCLUDE incl/header_bottom.tt %]

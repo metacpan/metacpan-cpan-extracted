@@ -1,0 +1,57 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the preProcess method.
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create a new entry object.
+my $title = ["", "Type in anything but the dreaded letter 'G'!", ""];
+my $entry = new Cdk::Entry ('Label' => "Type Anything: ",
+				'Title' => $title,
+				'Width' => 20,
+				'Min' => 0,
+				'Max' => 256);
+
+# Set up the pre and post processing.
+$entry->preProcess ('Function' => sub {preProcessCB (@_, $entry);});
+
+# Activate the object.
+my $info = $entry->activate();
+
+# Check the results.
+if (!defined $info)
+{
+   popupLabel (["<C>You hit escape, nothing returned."]);
+}
+else
+{
+   popupLabel (["<C>You typed in ($info)"]);
+}
+
+# Exit Cdk.
+Cdk::end();
+
+#
+# This example will set the pre process function so it
+# will not accept the letter g.
+#
+sub preProcessCB
+{
+   my ($input, $entry) = @_;
+
+   # Check the letter.
+   if (uc $input eq "G")
+   {
+      Cdk::Beep();
+      popupLabel (["<C>I Told You </B>NOT<!B> To Do That"]);
+      $entry->draw();
+      return 0;
+   }
+   return 1;
+}

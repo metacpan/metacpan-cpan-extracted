@@ -1,0 +1,28 @@
+Curses/UI/Grid version 0.15
+===========================
+ Subclass of Curses::UI::Grid is a widget that can be used to display
+ and manipulate data in grid model
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Curses::UI
+
+COPYRIGHT AND LICENCE
+
+    (c) 2004 by Adrian Witas.
+    
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,50 @@
+---
+abstract: 'A unified CLI for CA Harvest SCM'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Pod: '1.00'
+  version: '0'
+configure_requires:
+  Module::Build: '0.340201'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - cascm
+  - harvest
+  - cli
+  - hv
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CASCM-CLI
+no_index:
+  directory:
+    - .author
+    - .t
+    - examples
+provides:
+  CASCM::CLI:
+    file: lib/CASCM/CLI.pm
+    version: v0.1.1
+requires:
+  CASCM::Wrapper: '1.000001'
+  Config::Tiny: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Getopt::Mini: '0'
+  Hash::Merge: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::Callback: '0'
+  Object::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/mithun/perl-cascm-cli/issues
+  homepage: https://github.com/mithun/perl-cascm-cli
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-cascm-cli.git
+version: v0.1.1

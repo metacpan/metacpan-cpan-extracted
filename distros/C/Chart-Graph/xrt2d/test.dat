@@ -1,0 +1,36 @@
+# Output filename
+test.ps
+# Use X values numerically?
+0
+# Number of X points
+5
+# Number of sets per X point
+2
+# Titles for each set of values (number of lines should equal above number
+To US
+From US
+# Titles for each data point
+JP
+CH
+DE
+SE
+KR
+# Data points (set1, set2, ....)
+1	2	3	4	5
+5	4	3	2	1
+# Number of headers
+1
+# Header
+Test Graph (Header)
+# Number of footers
+1
+# Footer
+Test Graph (Footer)
+# X title
+Country of Origin
+# Y title
+Amount of Traffic
+# Extra labels
+1
+# Label title, point#, set#
+Label	0	1

@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+
+package clipseqtools::compare;
+$clipseqtools::compare::VERSION = '0.1.7';
+
+##############################################
+# Import external libraries
+use Modern::Perl;
+
+
+##############################################
+# Import CLIPSeqTools
+use CLIPSeqTools::CompareApp;
+
+
+##############################################
+# Run the application
+CLIPSeqTools::CompareApp->new_with_command->run();

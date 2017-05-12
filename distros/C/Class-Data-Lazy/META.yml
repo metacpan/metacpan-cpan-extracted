@@ -1,0 +1,38 @@
+---
+abstract: 'Create class data with laziness.'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Data-Lazy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Class::Data::Lazy:
+    file: lib/Class/Data/Lazy.pm
+    version: 0.01
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/Class-Data-Lazy/issues
+  homepage: https://github.com/tokuhirom/Class-Data-Lazy
+  repository: git://github.com/tokuhirom/Class-Data-Lazy.git
+version: 0.01

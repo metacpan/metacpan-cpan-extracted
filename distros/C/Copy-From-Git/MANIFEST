@@ -1,0 +1,4 @@
+lib/Copy/From/Git.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)

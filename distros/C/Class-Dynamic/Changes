@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::Dynamic.
+
+1.01  Thu Jul  4 17:18:17 BST 2002
+    - croak and carp, always get those mixed up.
+
+0.01  Tue Jul  2 17:17:31 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Class::Dynamic
+

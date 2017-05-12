@@ -1,0 +1,65 @@
+Revision history for Perl extension CVS::Metrics.
+
+0.18  Tue Dec  7 10:30:00 2010
+	- TaggedChart: add a style 'up' (for text direction)
+
+0.17  Wed Jan 15 18:30:00 2008
+	- call default browser on *nix
+
+0.16  Mon Oct 22 18:30:00 2007
+	- some Perl Best Practices
+
+0.15  Thu Nov 24 22:30:00 2005
+	- kill others zombies
+
+0.14  Wed Aug 24 07:30:00 2005
+	- kill zombies
+
+0.13  Thu Aug 18 20:30:00 2005
+	- sorry for regressions
+
+0.12  Tue Aug 16 22:30:00 2005
+	- improve Branch report
+
+0.11  Wed Aug  3 22:30:00 2005
+	- migrate : WebCVS to ViewCVS
+
+0.10  Thu Apr 21 18:30:00 2005
+	- parser.pm add branches rule in grammar
+	- cvs_current : add Branch report
+	- cvs_revbytag : new
+
+0.09  Wed Sep  1 18:30:00 2004
+	- split module in 4
+
+0.08  Tue Mar 30 18:30:00 2004
+	- add option -o (output)
+	- add a cache (.cvs_log.pl)
+	- add 2 new CGI scripts: cgi_cvs_evolq, cgi_cvs_evolr
+
+0.07  Thu Mar 25 12:30:00 2004
+	- add a production 'imported' in grammar
+
+0.06  Wed Feb 18 12:30:00 2004
+	- cvs_current generates current.html as summary
+
+0.05  Tue Feb 17 12:30:00 2004
+	- add a new script : cvs_current
+	- cvs_wxlog uses Wx::Html on non-Win32
+	- port on *nix
+
+0.04  Fri Oct 31 12:30:00 2003
+	- add option -v : version
+	- on Win32 look for cvs.exe in CVSNT
+	- tags sorted by date (previously by name)
+
+0.03  Mon Aug 18 18:30:00 2003
+	- add cvs_wxlog.pl (uses wxWindows)
+
+0.02  Tue Apr 22 18:30:00 2003
+	- first release
+
+0.01  Fri Apr 18 18:27:50 2003
+	- original version; created by h2xs 1.21 with options
+		-XA -n CVS::Metrics
+

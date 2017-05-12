@@ -1,0 +1,5 @@
+Revision history for Catalyst-Authentication-Store-RDBO
+
+0.1000    Wed, 12 Nov 2008 19:43:20 -0500 
+       First version, based on Catalyst::Authentication::Store::DBIx::Class
+

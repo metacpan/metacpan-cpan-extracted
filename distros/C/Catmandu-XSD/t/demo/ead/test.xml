@@ -1,0 +1,1755 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink" relatedencoding="MARC21">
+  <eadheader audience="internal" langencoding="iso639-2b" scriptencoding="iso15924" dateencoding="iso8601" countryencoding="iso3166-1" repositoryencoding="iso15511" relatedencoding="DC">
+    <eadid countrycode="US" mainagencycode="BE-1" identifier="wayland-smith_p">wayland-smith_p</eadid>
+    <filedesc>
+      <titlestmt>
+        <titleproper encodinganalog="Title">Prudence Wayland-Smith Papers</titleproper>
+        <subtitle>An inventory of her papers at Syracuse University</subtitle>
+        <author encodinganalog="Creator">LR</author>
+      </titlestmt>
+      <publicationstmt>
+        <publisher encodinganalog="Publisher">
+
+</publisher>
+        <date era="ce" calendar="gregorian" normal="2006-03-08" encodinganalog="Date">10 Aug 2009</date>
+      </publicationstmt>
+    </filedesc>
+    <profiledesc>
+      <creation>
+Lea Rowe
+10 Aug 2009
+</creation>
+      <langusage>
+English
+</langusage>
+    </profiledesc>
+  </eadheader>
+  <archdesc level="collection" type="inventory" relatedencoding="MARC21">
+    <did>
+      <head>Overview of the Collection</head>
+      <repository label="Repository: " encodinganalog="852$a">
+
+</repository>
+      <origination label="Creator: ">
+Wayland-Smith, Prudence
+
+</origination>
+      <unittitle label="Title: " encodinganalog="245$a">Prudence Wayland-Smith Papers</unittitle>
+      <unitdate label="Inclusive Dates: " type="inclusive" era="ce" calendar="gregorian" normal="1925/1994" encodinganalog="245$f">1925-1994</unitdate>
+      <physdesc label="Quantity: " encodinganalog="300$a">
+18 linear feet
+</physdesc>
+      <abstract label="Abstract: " encodinganalog="520$a">
+Papers of the 20th century social activist, focused on migrant reform, education for migrant children and prison reform. Correspondence, 1925- 1994. Also newspaper clippings, personal notes, and memorabilia including student artwork from migrant schools, photographs and photo boards. Some government documents and publications along with manuscript materials from Wayland-Smith's personal and professional life.
+</abstract>
+      <unitid label="Identification: " countrycode="US" repositorycode="BE-1" encodinganalog="099">2697344</unitid>
+      <langmaterial label="Language: " encodinganalog="546">
+Most material in
+English
+, with a few items in
+Spanish
+</langmaterial>
+    </did>
+    <bioghist encodinganalog="545">
+      <head>Biographical History</head>
+      <p>
+Prudence Wayland-Smith (1908-1995) was a social activist dedicated to migrant and prison reform for over 50 years.
+</p>
+      <p>
+Born in 1908, Prudence Wayland-Smith was a descendant of the Oneida Community and a member of the Religious Society of Friends (Quakers). She graduated from Curtis High School on Staten Island in 1925 and went on to the Women's College at Brown University.
+</p>
+      <p>
+In 1934 Wayland-Smith was elected president of the Oneida-Kenwood-Sherrill League of Women Voters. Later, she became chairwoman of the Oneida-Kenwood-Sherrill Migrant Committee. Much of the work that the committee carried out was in response to the needs of migrant workers who came up from Florida and other southern states in the summer months to help plant and harvest crops in Oneida County and Madison County in central New York. Migrant families often lived in horrible conditions in labor camps and their children had little or no education. The migrant committee not only worked for better housing conditions and labor rights in migrant camps, they also established day-care centers and summer schools for migrant children so that they could get a basic education. The committee also established a scholarship fund for migrant children going on to college. Prudence remained an active member of the League and the Migrant Committee until the late 1970s when the committee disbanded due to the fact that agriculture had become more mechanized and labor camps were closing.
+</p>
+      <p>
+Beginning in the late 1970s, Wayland-Smith dedicated most of her time to prison reform in local correctional facilities in Oneida and Madison County. As a church leader she brought together other Quaker women to visit inmates, correspond, coordinate Alternatives to Violence workshops, and establish other education programs for prisoners, while also pushing for reform of the treatment of prisoners and conditions within the prisons themselves. Following the Quaker belief that there was goodness in everyone, Wayland-Smith worked to make sure that inmates would have a way to survive once they returned to society. She worked continually in local prisons up until her death at the age of 86 in 1995.
+</p>
+    </bioghist>
+    <scopecontent encodinganalog="520">
+      <head>Scope and Contents of the Collection</head>
+      <p>
+The
+Prudence Wayland-Smith Papers
+reflect the social reform work that Wayland-Smith carried out from the 1940s to the mid-1990s. The collection is divided into four parts: general files, migrant reform, prison reform and miscellaneous reform.
+</p>
+      <p>
+General files
+contains material on a variety of non-reform topics, including the Oneida Community Mansion House, Syracuse University, and general news of the day. The majority of the material deals with the Religious Society of Friends (Quakers).
+</p>
+      <p>
+Migrant reform
+contains correspondence, notes, photos, and other material related to Wayland-Smith's work with regional and state-level migrant committees and organizations, primarily the Oneida-Kenwood-Sherrill Migrant Committee. Included here is information on summer camps for migrant children, the migrant children's scholarship fund, and other related topics. There are also several scrapbooks and other items of memorabilia from the summer camps.
+</p>
+      <p>
+Prison reform
+materials relate to Wayland-Smith's work assisting prisoners directly as well as her efforts to bring about reforms in the prison system as a whole. This series includes inmate correspondence, news and media coverage, and regional and state-level committee materials as well as material relating to specific prisons in central New York.
+</p>
+      <p>
+Miscellaneous reform
+covers a range of other areas of reform in which Wayland-Smith was interested, including the peace movement, birth control, human relations, poverty, and non-violence.
+</p>
+    </scopecontent>
+    <arrangement encodinganalog="351$a">
+      <head>Arrangement of the Collection</head>
+      <p>All series are arranged alphabetically.</p>
+    </arrangement>
+    <relatedmaterial encodinganalog="544 1">
+      <head>Related Material</head>
+      <p>
+SCRC has several collections related to prison reform and the Oneida Community. Please refer to the for a complete listing. See in particular
+Oneida Community
+and
+Robert Wayland-Smith Papers
+(Prudence's husband).
+</p>
+    </relatedmaterial>
+    <separatedmaterial encodinganalog="544 0">
+      <head>Separated Material</head>
+      <p>
+Some material has been transferred to Rare Books for cataloging, including eight copies of
+Migratory Labor Notes
+and four other government publications, a pamphlet on Martin Luther King, Jr. Please refer to for a complete listing.
+</p>
+    </separatedmaterial>
+    <controlaccess>
+      <head>Subject and Genre Headings</head>
+      <subject source="local" encodinganalog="650">New York State</subject>
+      <subject source="local" encodinganalog="650">Activism and social reform</subject>
+      <persname source="lcnaf" encodinganalog="600">Garofalo, James.</persname>
+      <persname source="lcnaf" encodinganalog="600">Wayland-Smith, Prudence.</persname>
+      <corpname source="lcnaf" encodinganalog="610">Alternatives to Violence Project.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">American Friends Service Committee.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Auburn Correctional Facility.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Auburn Prison Friends Meeting (Auburn, N.Y.)</corpname>
+      <corpname source="local" encodinganalog="610">Consumers' League of New York.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Delta Kappa Gamma Society.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">League of Women Voters of New York State.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">New York State Council of Churches.</corpname>
+      <corpname source="local" encodinganalog="610">
+New York State Federation of Growers and Processors.
+</corpname>
+      <corpname source="local" encodinganalog="610">New York State Migrant Child Care Program.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">
+New York (State). Migrant Labor, Interdepartmental Committee on
+</corpname>
+      <corpname source="lcnaf" encodinganalog="610">
+New York Yearly Meeting of the Religious Society of Friends.
+</corpname>
+      <corpname source="local" encodinganalog="610">Oneida-Kenwood-Sherrill Migrant Committee.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Oneida community.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">
+Quaker Project on Community Conflict of the New York Yearly Meeting.
+</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Quakers -- New York (State)</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Quakers -- United States -- Political activity.</corpname>
+      <corpname source="lcnaf" encodinganalog="610">Society of Friends.</corpname>
+      <subject source="lcsh" encodinganalog="650">Children of migrant laborers.</subject>
+      <subject source="lcsh" encodinganalog="650">
+Civil rights movement -- United States -- History -- 20th century.
+</subject>
+      <subject source="lcsh" encodinganalog="650">
+Migrant agricultural laborers -- Government policy -- New York (State)
+</subject>
+      <subject source="lcsh" encodinganalog="650">
+Migrant agricultural laborers -- Government policy -- United States.
+</subject>
+      <subject source="lcsh" encodinganalog="650">
+Migrant agricultural laborers -- Housing -- New York (State)
+</subject>
+      <subject source="lcsh" encodinganalog="650">
+Migrant agricultural laborers -- United States -- 1930-1960.
+</subject>
+      <subject source="lcsh" encodinganalog="650">
+Migrant agricultural laborers -- United States -- 1960-1970.
+</subject>
+      <subject source="lcsh" encodinganalog="650">Migrant labor -- Camps.</subject>
+      <subject source="lcsh" encodinganalog="650">Migrant labor -- Education -- United States.</subject>
+      <subject source="lcsh" encodinganalog="650">Prisons -- Law and legislation -- United States.</subject>
+      <subject source="lcsh" encodinganalog="650">Race relations.</subject>
+      <genreform source="aat" encodinganalog="655">Annual reports.</genreform>
+      <genreform source="aat" encodinganalog="655">Clippings (information artifacts)</genreform>
+      <genreform source="aat" encodinganalog="655">Negatives (photographic)</genreform>
+      <genreform source="aat" encodinganalog="655">Photographs.</genreform>
+      <genreform source="aat" encodinganalog="655">Slides (photographs)</genreform>
+      <genreform source="aat" encodinganalog="655">Correspondence.</genreform>
+      <genreform source="aat" encodinganalog="655">Essays.</genreform>
+      <genreform source="aat" encodinganalog="655">Financial records.</genreform>
+      <genreform source="aat" encodinganalog="655">Government records.</genreform>
+      <genreform source="aat" encodinganalog="655">Memorabilia.</genreform>
+      <genreform source="aat" encodinganalog="655">Newsletters.</genreform>
+      <genreform source="aat" encodinganalog="655">Notes.</genreform>
+      <genreform source="aat" encodinganalog="655">Scrapbooks.</genreform>
+      <genreform source="aat" encodinganalog="655">Serials (publications)</genreform>
+      <occupation source="lcsh" encodinganalog="656">Prison reformers -- United States.</occupation>
+    </controlaccess>
+    <accessrestrict encodinganalog="506">
+      <head>Access Restrictions</head>
+      <p>There are no access restrictions on this material.</p>
+    </accessrestrict>
+    <userestrict encodinganalog="540">
+      <head>Use Restrictions</head>
+      <p>
+The 1965-1970 Report published by the American Friends Service Committee (Box 4) is not to be quoted or reprinted without express permission of the AFSC. Permission of James Garofalo is required to quote or use any part of 1968 migrant teachers idea booklet (Box 4).
+</p>
+    </userestrict>
+    <prefercite encodinganalog="524">
+      <head>Preferred Citation</head>
+      <p>
+Preferred citation for this material is as follows:
+</p>
+      <p>
+Prudence Wayland-Smith Papers,
+
+</p>
+    </prefercite>
+    <acqinfo encodinganalog="541">
+      <head>Acquisition Information</head>
+      <p>
+Gift of Giles, Robert, and Paul Wayland-Smith, 2003.
+</p>
+    </acqinfo>
+    <dsc type="combined">
+      <head>Inventory</head>
+      <c01 level="series">
+        <did>
+          <unittitle>General files</unittitle>
+        </did>
+        <c02>
+          <did>
+            <unittitle>Date book</unittitle>
+            <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1965">1965</unitdate>
+            <container type="Box">1</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Delta Kappa Gamma</unittitle>
+            <container type="Box">1</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Government documents</unittitle>
+            <container type="Box">1</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Negatives</unittitle>
+            <container type="Box">22</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Oneida Community Mansion House</unittitle>
+            <container type="Box">1</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Personal</unittitle>
+            <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1920/1989">1920s-1980s</unitdate>
+            <abstract>
+Includes high school papers and continues with later correspondence
+</abstract>
+            <container type="Box">1</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Religious Society of Friends</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>General</unittitle>
+              <container type="Box">1</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Friends Journal</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>
+1950s
+</unittitle>
+                <container type="Box">1</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+1960s
+</unittitle>
+                <container type="Box">1</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+1970s-1980s
+</unittitle>
+                <container type="Box">2</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Friends World College</unittitle>
+              <container type="Box">2</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Friends World Committee for Consultation</unittitle>
+              <container type="Box">1</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Printed material</unittitle>
+              <container type="Box">2</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Syracuse University</unittitle>
+            <container type="Box">2</container>
+          </did>
+          <c03>
+            <did>
+              <unittitle>George Arents Research Library</unittitle>
+              <container type="Box">2</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+Urban Education and Cultural Deprivation
+</unittitle>
+              <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1964">1964</unitdate>
+              <container type="Box">2</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>World and national news</unittitle>
+            <container type="Box">2</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Miscellaneous</unittitle>
+            <physdesc>
+2 folders
+</physdesc>
+            <container type="Box">2</container>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series">
+        <did>
+          <unittitle>Migrant reform</unittitle>
+        </did>
+        <c02>
+          <did>
+            <unittitle>General correspondence</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>A-G</unittitle>
+              <container type="Box">2</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>H-Z</unittitle>
+              <physdesc>
+3 folders
+</physdesc>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+"Letters from families to whom boxes were sent"
+Christmas 1957, Winter 1958-59
+</unittitle>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Migrant letters</unittitle>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Government legislation and reform</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>General</unittitle>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Congressional hearings and Senate reports</unittitle>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+Migratory Labor Notes
+by the President's Committee on Migratory Labor
+</unittitle>
+              <note>
+                <p>Transferred to Rare Books for cataloging</p>
+              </note>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Printed material</unittitle>
+              <container type="Box">3</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Exhibitions on black migration history</unittitle>
+            <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1989/1990">1989-1990</unitdate>
+            <container type="Box">3</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Financial</unittitle>
+            <container type="Box">4</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Housing</unittitle>
+            <container type="Box">4</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Newspaper clippings</unittitle>
+            <container type="Box">4</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Organizations</unittitle>
+          </did>
+          <c03 id="mrafsc">
+            <did>
+              <unittitle>American Friends Service Committee</unittitle>
+            </did>
+            <note>
+              <p>
+See also
+
+Prison Reform: Organizations: American Friends Service Committee
+
+</p>
+            </note>
+            <c04>
+              <did>
+                <unittitle>General</unittitle>
+                <container type="Box">4</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+1965-1970
+Report
+</unittitle>
+                <container type="Box">4</container>
+              </did>
+              <userestrict>
+                <p>
+Permission of AFSC required to quote or use any part of this report.
+</p>
+              </userestrict>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Garofalo, James</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>Correspondence</unittitle>
+                  <container type="Box">4</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+1968
+Migrant teachers idea booklet
+</unittitle>
+                  <container type="Box">4</container>
+                </did>
+                <userestrict>
+                  <p>
+Permission of James Garofalo required to quote or use any part of this booklet.
+</p>
+                </userestrict>
+              </c05>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Clinton Migrant Committee</unittitle>
+              <container type="Box">4</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Colorado State Department of Education</unittitle>
+              <abstract>
+Report:
+Providing Education for Migrant Children
+</abstract>
+              <container type="Box">4</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Consumers League of New York</unittitle>
+              <abstract>
+includes pamphlet titled
+Sweatshops In the Sun
+on the findings of a year's study of migrant farm workers in New York State
+</abstract>
+              <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1952">1952</unitdate>
+              <container type="Box">5</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>League of Women Voters</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>Agenda and advocacy</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Correspondence</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Finances and fundraising</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Newspaper clippings</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Publications</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Reports</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Mohawk Valley Meeting (Society of Friends)</unittitle>
+              <container type="Box">5</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>National Migrant Committee and Ministry</unittitle>
+              <container type="Box">5</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>National Sharecropper's Fund</unittitle>
+              <container type="Box">5</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+New York State Committee on Farm and Food Processing Labor
+</unittitle>
+              <abstract>annual reports</abstract>
+              <container type="Box">5</container>
+            </did>
+          </c03>
+          <c03 id="mrny">
+            <did>
+              <unittitle>
+New York State Council of Churches and "Migrant Ministry"
+</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>General correspondence</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Financial</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Meetings</unittitle>
+                <container type="Box">5</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Policies, legislation and agenda</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Projects and reports</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+State Council Reporter
+publication
+</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Training conferences and workshops</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Miscellaneous</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+New York State Federation of Growers and Processors - New York State Migrant Child Care Program
+</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>General correspondence</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>By-laws and program operations</unittitle>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Financial</unittitle>
+                <physdesc>
+2 folders
+</physdesc>
+                <container type="Box">6</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Meetings and conferences</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Newsletters</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Newspaper clippings</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Summaries and statistics</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Various local programs</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Miscellaneous</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>New York State Migrant Education Program</unittitle>
+              <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1981">1981</unitdate>
+              <container type="Box">7</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+New York State Interdepartmental Committee on Migrant Labor
+</unittitle>
+              <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1969/1973">1969-1973</unitdate>
+              <physdesc>
+2 folders
+</physdesc>
+              <container type="Box">7</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Oneida-Kenwood-Sherrill Migrant Committee</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>Annual reports</unittitle>
+                <container type="Box">7</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Correspondence</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>General</unittitle>
+                  <container type="Box">8</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Committee annual reports</unittitle>
+                  <container type="Box">8</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+George, Anne V., New York State Committee on Farm and Food Processing Labor
+</unittitle>
+                  <container type="Box">8</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>New York State Education Department</unittitle>
+                  <container type="Box">8</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+Price, Arthur F., New York State Migrant Child Care Program
+</unittitle>
+                  <container type="Box">8</container>
+                </did>
+              </c05>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Daily notes of migrant activities</unittitle>
+                <container type="Box">8</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Essays/reports on migrant issues and reform</unittitle>
+                <container type="Box">8</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Financial</unittitle>
+                <abstract>budgets, receipts, fund raising and contributions</abstract>
+                <container type="Box">8</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Journal</unittitle>
+                <container type="Box">8</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Lobbying efforts</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+McAllister Summer School/Vernon-Verona-Sherrill Central School
+</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Migrant camp choir</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Migrant labor camps</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>General</unittitle>
+                  <container type="Box">9</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Photos</unittitle>
+                  <abstract>
+migrant labor camps, migrant child-care centers and summer schools
+</abstract>
+                  <container type="Box">9</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Photos, oversize</unittitle>
+                  <container type="Oversize">3</container>
+                </did>
+              </c05>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Newspaper clippings</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Personal notes</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+The Readers' News
+</unittitle>
+                <container type="Box">9</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Scholarship program</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>Correspondence</unittitle>
+                </did>
+                <c06>
+                  <did>
+                    <unittitle>Brown family general files</unittitle>
+                    <container type="Box">9</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Brown, Alfred</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Brown, Anthony</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Brown, Betty</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Brown, James</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Brown, Larry</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Edwards, Cora</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Freeman, Mary</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Holloway, Janie</unittitle>
+                    <container type="Box">10</container>
+                  </did>
+                </c06>
+                <c06>
+                  <did>
+                    <unittitle>Williams family</unittitle>
+                    <container type="Box">11</container>
+                  </did>
+                </c06>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Funding</unittitle>
+                  <container type="Box">11</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Memorabilia</unittitle>
+                  <container type="Box">11</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Memorabilia, oversize</unittitle>
+                  <container type="Oversize">3</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Miscellaneous</unittitle>
+                  <container type="Box">11</container>
+                </did>
+              </c05>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Sherrill Child Care Center</unittitle>
+                <abstract>
+part of the New York State Migrant Child Care Program
+</abstract>
+                <container type="Box">11</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Special Milk Program</unittitle>
+                <container type="Box">11</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Workshops/conferences on migrant education</unittitle>
+                <container type="Box">11</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Miscellaneous</unittitle>
+                <container type="Box">11</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Oneida-Madison Migrant Committee</unittitle>
+              <container type="Box">11</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>State-level migrant groups in New York</unittitle>
+              <container type="Box">11</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Syracuse Monthly Meeting of Friends</unittitle>
+              <container type="Box">12</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Utica Area Migrant Committee</unittitle>
+              <container type="Box">12</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>World Council of Churches</unittitle>
+              <abstract>
+publication:
+
+Migration today: current problems and Christian responsibility
+
+</abstract>
+              <container type="Box">12</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+Miscellaneous conferences, committees, programs and workshops
+</unittitle>
+              <container type="Box">12</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Photographs</unittitle>
+            <physdesc>
+3 folders
+</physdesc>
+            <container type="Box">12</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Printed material</unittitle>
+            <container type="Box">12</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>School memorabilia</unittitle>
+            <physdesc>
+5 folders
+</physdesc>
+            <container type="Box">13</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>School memorabilia, oversize</unittitle>
+            <container type="Oversize">3</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Scrapbook</unittitle>
+            <container type="Box">14</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Scrapbooks, oversize</unittitle>
+            <container type="Oversize">2</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Slides</unittitle>
+            <container type="Box">23</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Slides</unittitle>
+            <container type="Box">24</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Miscellaneous</unittitle>
+            <container type="Box">14</container>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series">
+        <did>
+          <unittitle>Prison reform</unittitle>
+        </did>
+        <c02>
+          <did>
+            <unittitle>Advocacy and outreach</unittitle>
+            <abstract>coalitions, workshops, projects, legislation</abstract>
+            <container type="Box">14</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>General correspondence</unittitle>
+            <container type="Box">14</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Inmate correspondence</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>Ford, Glen (Ted)</unittitle>
+              <abstract>
+Mid-Orange, Wallkill, Auburn and Elmira correctional facilities
+</abstract>
+              <physdesc>
+2 folders
+</physdesc>
+              <container type="Box">14</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Johnson, Mel</unittitle>
+              <abstract>Auburn Correctional Facility</abstract>
+              <container type="Box">14</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Maloney, Robert</unittitle>
+              <container type="Box">14</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Montgomery, Michael</unittitle>
+              <abstract>
+Eastern New York, Mohawk and Auburn correctional facilities
+</abstract>
+              <physdesc>
+2 folders
+</physdesc>
+              <container type="Box">14</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Moseley, Winston</unittitle>
+              <abstract>Auburn Correctional Facility</abstract>
+              <container type="Box">15</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Sims, Bill</unittitle>
+              <abstract>Auburn Correctional Facility</abstract>
+              <note>
+                <p>
+See also
+
+Prison Reform: Organizations: Auburn Prison Friends
+
+</p>
+              </note>
+              <container type="Box">15</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Swanson, John</unittitle>
+              <abstract>Auburn Correctional Facility</abstract>
+              <container type="Box">15</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Miscellaneous</unittitle>
+              <physdesc>
+2 folders
+</physdesc>
+              <container type="Box">15</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>News and media coverage</unittitle>
+            <container type="Box">15</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Organizations</unittitle>
+          </did>
+          <c03 id="prafsc">
+            <did>
+              <unittitle>American Friends Service Committee</unittitle>
+              <container type="Box">15</container>
+            </did>
+            <note>
+              <p>
+See also
+
+Migrant Reform: Organizations: American Friends Service Committee
+
+</p>
+            </note>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Attica Friends Meeting</unittitle>
+              <container type="Box">15</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Auburn Correctional Facility</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>General correspondence</unittitle>
+                <container type="Box">15</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Auburn Hospitality Association</unittitle>
+                <container type="Box">15</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>
+
+Contraband: Poetry from Prison and Other Ghettos of the Mind
+
+</unittitle>
+                <container type="Box">16</container>
+              </did>
+            </c04>
+          </c03>
+          <c03 id="apf">
+            <did>
+              <unittitle>Auburn Prison Friends</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>General correspondence</unittitle>
+                <physdesc>
+2 folders
+</physdesc>
+                <container type="Box">16</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Correspondence</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>Alternatives to Violence Project (AVP)</unittitle>
+                  <container type="Box">16</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+New York State Department of Correctional Facilities
+</unittitle>
+                  <container type="Box">16</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>Schmidt, Mattie</unittitle>
+                  <abstract>mostly financial</abstract>
+                  <container type="Box">16</container>
+                </did>
+              </c05>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Auburn International Peace Petition</unittitle>
+                <container type="Box">16</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Meeting of Oversight Committee</unittitle>
+              </did>
+              <c05>
+                <did>
+                  <unittitle>
+1975-1982
+</unittitle>
+                  <physdesc>
+5 folders
+</physdesc>
+                  <container type="Box">16</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+1983-1994
+</unittitle>
+                  <physdesc>
+9 folders
+</physdesc>
+                  <container type="Box">17</container>
+                </did>
+              </c05>
+              <c05>
+                <did>
+                  <unittitle>
+Undated
+</unittitle>
+                  <container type="Box">17</container>
+                </did>
+              </c05>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Miscellaneous</unittitle>
+                <container type="Box">17</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Central Intelligence Agency</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Chautauqua County Rural Ministry</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Church Women United of Oneida</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Clinton Correctional Facility</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Department of American Studies</unittitle>
+              <abstract>counseling, therapy, and crisis intervention</abstract>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Friends Committee on National Legislation</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Idyllic Foundation</unittitle>
+              <abstract>for troubled young people</abstract>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+Land Trust Committee of the New York Yearly Meeting of the Religious Society of Friends
+</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Madison County Correctional Facility</unittitle>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Madison County bail fund</unittitle>
+              <physdesc>
+2 folders
+</physdesc>
+              <container type="Box">17</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Mohawk Meeting (Society of Friends)</unittitle>
+              <container type="Box">18</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>New York State Coalition for Criminal Justice</unittitle>
+              <container type="Box">18</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>New York State Council of Churches</unittitle>
+              <note>
+                <p>
+See also
+
+Migrant Reform: Organizations: New York State Council of Churches
+
+</p>
+              </note>
+              <container type="Box">18</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+New York Yearly Meeting of the Religious Society of Friends - Alternatives to Violence Project (NYYM/AVP)
+</unittitle>
+            </did>
+            <c04>
+              <did>
+                <unittitle>Correspondence</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Meetings and minutes</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Newsletters and reports</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Policies, by-laws and finance</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Printed material</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Prisons Committee</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+            <c04>
+              <did>
+                <unittitle>Training and workshops</unittitle>
+                <container type="Box">18</container>
+              </did>
+            </c04>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Offender Aid and Restoration (OAR)</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Syracuse Meeting (Society of Friends)</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Women's Prison Project</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Miscellaneous</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Printed material</unittitle>
+            <container type="Box">19</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Training and coursework</unittitle>
+            <container type="Box">19</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Miscellaneous</unittitle>
+            <container type="Box">19</container>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series">
+        <did>
+          <unittitle>Miscellaneous reform</unittitle>
+        </did>
+        <c02>
+          <did>
+            <unittitle>Birth control - Planned Parenthood</unittitle>
+            <container type="Box">19</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Civil rights movement</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>General correspondence</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>The Fellowship of Reconciliation</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Magazine clippings</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Martin Luther King, Jr.</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+New York Yearly Meeting of the Religious Society of Friends (NYYM)
+</unittitle>
+              <abstract>race relations</abstract>
+              <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1968">1968</unitdate>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Newspaper clippings</unittitle>
+              <container type="Box">19</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Printed material</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Runnymede Corporation against segregated housing</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Southern Christian Leadership Conference (SCLC)</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Miscellaneous</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>
+Discrimination in housing - Housing and Home Finance Agency, Washington DC
+</unittitle>
+            <unitdate type="inclusive" era="ce" calendar="gregorian" normal="1957">1957</unitdate>
+            <container type="Box">20</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>
+Human relations - National Conference of Christians and Jews
+</unittitle>
+            <container type="Box">20</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Low-income family aid</unittitle>
+            <container type="Box">20</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Missions work</unittitle>
+            <container type="Box">20</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Peace and community nonviolence</unittitle>
+          </did>
+          <c03>
+            <did>
+              <unittitle>General files</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Quaker Project on Community Conflict</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Peace movement</unittitle>
+            <container type="Box">20</container>
+          </did>
+          <c03>
+            <did>
+              <unittitle>American Friends Service Committee</unittitle>
+              <container type="Box">20</container>
+            </did>
+            <note>
+              <p>
+See also
+
+Migrant Reform: Organizations: American Friends Service Committee
+
+and
+
+Prison Reform: Organizations: American Friends Service Committee
+
+</p>
+            </note>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Disarmament</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>New York Telephone Federal Tax Protest</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>
+Peacemaker
+publication
+</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Peace walks and vigils</unittitle>
+              <container type="Box">20</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Publications and newsletters</unittitle>
+              <container type="Box">21</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Vietnam and draft law</unittitle>
+              <container type="Box">21</container>
+            </did>
+          </c03>
+          <c03>
+            <did>
+              <unittitle>Women's peace movements</unittitle>
+              <container type="Box">21</container>
+            </did>
+          </c03>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Poverty</unittitle>
+            <container type="Box">21</container>
+          </did>
+        </c02>
+        <c02>
+          <did>
+            <unittitle>Miscellaneous</unittitle>
+            <container type="Box">21</container>
+          </did>
+        </c02>
+      </c01>
+    </dsc>
+  </archdesc>
+</ead>

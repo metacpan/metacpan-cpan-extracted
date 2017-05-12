@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Config-Checker
+version:            0.42
+abstract:           Config verification and friendlier YAML
+author:
+    - David Muir Sharnoff <muir@idiom.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:               0
+    Clone::PP:          0
+    Eval::LineNumbers:  0
+    File::Basename:     0
+    File::Slurp:        0
+    FindBin:            0
+    Hash::Merge:        0
+    Module::Load:       0
+    Test::More:         0
+    Time::ParseDate:    0
+    YAML::Syck:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

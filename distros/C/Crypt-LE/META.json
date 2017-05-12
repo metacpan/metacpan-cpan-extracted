@@ -1,0 +1,74 @@
+{
+   "abstract" : "Let's Encrypt API interfacing module and client.",
+   "author" : [
+      "Alexander Yezhov <leader@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-LE",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::ASN1" : "0.2",
+            "Crypt::Format" : "0.02",
+            "Crypt::OpenSSL::Bignum" : "0.06",
+            "Crypt::OpenSSL::RSA" : "0.28",
+            "Digest::SHA" : "0",
+            "Encode" : "0",
+            "HTTP::Tiny" : "0.042",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::MaybeXS" : "1.003005",
+            "Log::Log4perl" : "1.27",
+            "MIME::Base64" : "3.11",
+            "Module::Load" : "0.16",
+            "Net::SSLeay" : "1.49",
+            "Scalar::Util" : "0",
+            "Time::Piece" : "1.27",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::LE" : {
+         "file" : "lib/Crypt/LE.pm",
+         "version" : "0.23"
+      },
+      "Crypt::LE::Challenge::Simple" : {
+         "file" : "lib/Crypt/LE/Challenge/Simple.pm",
+         "version" : "0.23"
+      },
+      "Crypt::LE::Complete::Simple" : {
+         "file" : "lib/Crypt/LE/Complete/Simple.pm",
+         "version" : "0.23"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://do-know.com",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/do-know"
+      }
+   },
+   "version" : "0.23"
+}

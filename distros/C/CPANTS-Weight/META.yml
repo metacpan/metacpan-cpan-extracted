@@ -1,0 +1,44 @@
+---
+abstract: 'Graph based weights for CPAN Distributions'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+  Test::Script: 1.03
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.90'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CPANTS::Weight
+name: CPANTS-Weight
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Algorithm::Dependency: 1.108
+  Algorithm::Dependency::Source::DBI: 0.05
+  CPAN::Version: 5.5
+  DateTime: 0.4501
+  File::HomeDir: 0.82
+  File::ShareDir: 1.00
+  File::Spec: 3.2701
+  ORDB::CPANTS: 0.05
+  ORDB::CPANTesters: 0.09
+  ORDB::CPANUploads: 0.04
+  ORLite: 1.20
+  ORLite::Migrate: 0.03
+  ORLite::Mirror: 1.12
+  Params::Util: 0.38
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/CPANTS-Weight
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/CPANTS-Weight
+version: 0.15

@@ -1,0 +1,30 @@
+
+no_index: 
+  directory: 
+    - inc
+    - t
+generated_by: Module::Install version 0.64
+distribution_type: module
+version: 0.01
+name: CPAN-Index
+author: Adam Kennedy <cpan@ali.as>
+license: perl
+build_requires: 
+  File::Remove: 0
+  File::Copy: 0
+  Test::More: 0.47
+  File::Spec: 0.80
+requires: 
+  IO::Zlib: 0
+  IO::File: 0
+  DBD::SQLite: 1.12
+  version: 0.59
+  IO::Handle: 0
+  Carp: 0
+  perl: 5.005
+  Params::Util: 0.20
+  CPAN::Cache: 0.01
+  DBIx::Class: 0.06002
+  DBI: 1.50
+  Email::Address: 1.80
+abstract: Robust and object-oriented access to the CPAN index

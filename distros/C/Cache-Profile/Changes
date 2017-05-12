@@ -1,0 +1,20 @@
+Revision history for Cache-Profile
+
+0.06      2016-09-25 03:56:04Z
+        - fix trapping of unsupported OS errors in Makefle.PL
+
+0.05      2016-06-26 01:56:14Z
+        - abort build in Makefile.PL if the OS does not support the necessary
+          Time::HiRes interfaces
+
+0.04      2016-05-29 04:13:24Z
+        - specify minimum required version of Time::HiRes
+
+0.03      2016-05-29 00:19:26Z
+        - Removed remaining uses of for qw( ) (RT #114790)
+
+0.02    2011-07-05
+        - Removed deprecated use of for qw( ) (RT #69255)
+
+0.01    2010-06-26
+        - Initial release

@@ -1,0 +1,32 @@
+---
+abstract: 'A request trait for params decoding'
+author:
+  - 'Wallace Reis C<< <wreis at cpan.org> >>'
+  - 'Wallace Reis <wreis@cpan.org>'
+build_requires:
+  Catalyst::Runtime: 5.80029
+  CatalystX::RoleApplicator: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Request-DecodedParams
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON::Any: 0
+  Moose: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/wreis/Catalyst-TraitFor-Request-DecodedParams.git
+version: 0.02

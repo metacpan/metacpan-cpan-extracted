@@ -1,0 +1,28 @@
+---
+abstract: 'Make your session data an object'
+author:
+  - 'Dave Rolsky, E<gt>autarch@urth.orgE<lt>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.88
+  Test::Requires: 0
+  Test::Spelling: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120900'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session-AsObject
+requires:
+  Catalyst::Plugin::Session: 0.27
+  MRO::Compat: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-Session-AsObject
+  repository: git://git.urth.org/Catalyst-Plugin-Session-AsObject.git
+version: 0.05

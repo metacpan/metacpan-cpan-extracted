@@ -1,0 +1,31 @@
+{
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "ExtUtils::MakeMaker version 6.54",
+   "distribution_type" : "module",
+   "version" : "0.1",
+   "name" : "Coro-MP",
+   "author" : [],
+   "license" : "unknown",
+   "build_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   },
+   "requires" : {
+      "AnyEvent" : 5.11,
+      "AnyEvent::MP" : 1.21,
+      "Coro" : 5.2,
+      "common::sense" : 0
+   },
+   "abstract" : null,
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : 0
+   }
+}

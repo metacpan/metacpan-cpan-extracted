@@ -1,0 +1,11 @@
+=head1 NAME
+
+CPAN::Test::Dummy::SCO::Onlydoc - only documentation, no module
+
+=head1 DESCRIPTION
+
+L<search.cpan.org cloning project|http://perlmaven.com/search-cpan-org>
+
+=cut
+
+

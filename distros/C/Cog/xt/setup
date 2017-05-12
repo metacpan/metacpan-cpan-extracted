@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+COG="`cd ../../../;pwd`/cog-pm"
+export PATH="$PWD/app/$1/bin:$COG/bin:$PATH"
+export PERL5LIB="$PWD/app/$1/lib:$COG/lib:$PERL5LIB"
+
+APP=cog-test
+rm -fr $APP
+mkdir $APP

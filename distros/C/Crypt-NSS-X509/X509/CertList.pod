@@ -1,0 +1,76 @@
+=head1 NAME
+
+Crypt::NSS::X509::CertList - NSS Certificate lists
+
+=head1 SYNOPSIS
+
+  use 5.10.1;
+  use Perl6::Slurp;
+
+  use Crypt::NSS::X509;
+
+  # create a certificate list
+  my $certList = Crypt::NSS::X509::CertList->new();
+
+  # add a NSS::Certificate to the list
+  $certList->add($certificate);
+
+  # verify with trusted certificate list
+  my $res = $cert->verify_pkix(time, Crypt::NSS::X509::certUsageSSLServer, $certList);
+
+  # get NSS::Certificate objects in lst
+  my @certs = $certList->dump();
+
+
+=head1 ABSTRACT
+
+Perl interface to NSS Certificate Lists
+
+=head1 Description
+
+At the moment certificate lists are mostly needed when you want to provide
+a list of trust anchors to C<NSS::Certificate::verify_pkix>. They are also 
+returned by a few functions.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<new>
+
+Create a new, empty C<Crypt::NSS::X509::CertList>
+
+=item B<add ( CERTIFICATE )>
+
+Add a C<Crypt::NSS::X509::Certificate> to the certificate list
+
+=item B<dump>
+
+Returns all C<Crypt::NSS::X509::Certificate>s that are in the certificate list as an array.
+
+=item B<new_from_rootlist>
+
+Return a CertList that is constructed by reading a file containing a list of pem-encoded
+certificates.
+
+=back
+
+=head1 AUTHOR
+
+Johanna Amann, E<lt>johanna@icir.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012 by Johanna Amann
+
+This Library is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+The library contains source code of the Mozilla Network Security Services; for
+NSS license information please see http://www.mozilla.org/projects/security/pki/
+nss/.
+
+=cut
+
+

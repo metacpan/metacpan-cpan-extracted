@@ -1,0 +1,6 @@
+.container {color: orange}
+#myid {color: blue}
+/* duplicate */
+#myid {color: blue}
+p.yellow {
+    color: yellow;}

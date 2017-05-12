@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Class-Simple
+version:             0.19
+abstract:            Simple Object-Oriented Base Class
+license:             ~
+author:              
+    - Michael Sullivan <perldude@mac.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::ISA:                    0.32
+    List::Util:                    0
+    Scalar::Util:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

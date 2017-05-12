@@ -1,0 +1,426 @@
+NAME
+    CGI::Application::Search - Base class for CGI::App Swish-e site engines
+
+SYNOPSIS
+        package My::Search;
+        use base 'CGI::Application::Search';
+
+        sub cgiapp_init {
+            my $self = shift;
+            $self->param(
+                'SWISHE_INDEX' => 'my-swishe.index',
+                'TEMPLATE'     => 'search_results.tmpl',
+            );
+        }
+
+        sub cgiapp_prerun {
+            my $self  = shift;
+            my $query = $self->query;
+
+            # let the user turn context highlighting off
+            $self->param('HIGHLIGHT' => 0) if $query->param('highlight_off');
+
+            # let the user change which property is used in the sort
+            my $sort_by = $query->param('sort_by');
+            $self->param('SORT_BY' => $sort_by) if $sort_by;
+        }
+
+        1;
+
+DESCRIPTION
+    A CGI::Application based control module that uses Swish-e API in perl
+    (<http://swish-e.org>) to to perform searches on a swish-e index of
+    documents.
+
+  Features
+    * Sub-Classable. Unlike the Perl examples that come with swish-e, this
+    is not a script, and can be customized without modifiying the original
+    so that several sites may share the same underlying code.
+    * Uses CGI::Application::Plugin::AnyTemplate to allow flexibility in
+    template engine choice (HTML::Template, Template-Toolkit or Petal).
+    * Built-in templates to use out of box or as examples for your own
+    templates
+    * HiLighted search results
+    * HiLighted pages linked from search results
+    * AJAX results sent to page without need of a page reload
+    * AJAX powered 'auto-suggest' to give the user list of choices available
+    for search
+
+TUTORIAL
+    If this is your first time using Swish-e (or you think you need a
+    refresher) or if you want step-by-step instructions on how to use the
+    AJAX capabilities of this module, then please see the "Tutorial".
+
+RUN_MODES
+    The start_mode is show_search.
+
+  show_search()
+    This method will load the template pointed to by the TEMPLATE param
+    (falling back to a default internal template if none is specified) and
+    display it to the user. It will 'associate' this template with $self so
+    that any parameters in $self->param() are also accessible to the
+    template. It will also use HTML::FillInForm to fill in the search form
+    with the previously selected parameters (unless it's a
+    'non-page-refresh' AJAX search).
+
+  perform_search()
+    This is where the meat of the searching is performed. We create a
+    SWISH::API object on the SWISHE_INDEX and create the query for the
+    search based on the value of the *keywords* parameter in CGI and any
+    other EXTRA_PROPERTIES. The search is executed and if HIGHLIGHT is true
+    we will use Search::Tools::HiLiter to highlight it and then format the
+    results, only showing PER_PAGE number of elements A paging list is also
+    shown for navigating through the results. Then we will return to the
+    show_search() method for displaying everything.
+
+  highlight_remote_page
+    This run mode will fetch a remote page (with either a relative, or
+    absolute URL using the "url" Query param) and highlight the keywords
+    used in the search on that page (the "keywords" Query param) using the
+    HIGHLIGHT_TAG, HIGHLIGHT_CLASS or HIGHLIGHT_COLORS options. This run
+    mode is best used in the links of the search results listing.
+
+        <a href="?rm=highlight_remote_page;url=http%3A%2F%2Fexample.com%2Fabout_us%2Findex.html;keywords=Us">about us</a>
+
+  highlight_local_page
+    This run mode will fetch a local page (only allowing relative files
+    based in the DOCUMENT_ROOT config var and the path using the "path"
+    Query param) and highlight the keywords used in the search on that page
+    (the "keywords" Query param) using the HIGHLIGHT_TAG, HIGHLIGHT_CLASS or
+    HIGHLIGHT_COLORS options. This run mode is best used in the links of the
+    search results listing.
+
+        <a href="?rm=highlight_local_page;path=%2Fabout_us%2Findex.html;keywords=Us">about us</a>
+
+  suggestions
+    This run mode will return an AJAX listing of words that should be
+    suggested to the user for the words that they have typed so far. It uses
+    the "suggested_words()" method to actually choose which words to send
+    back.
+
+OTHER METHODS
+    Most of the time you will not need to call the methods that are
+    implemented in this module. But in some cases customizing the templates
+    is not enought. If so, it might be prudent to override or extend these
+    methods in your derived class.
+
+  new()
+    We simply override and extend the CGI::Application new() to setup our
+    defaults.
+
+  setup()
+    Here's were we setup our run modes. If you override this method, make
+    sure you also call it in your base class
+
+        sub setup {
+            my $self = shift;
+            # do your thing
+            ...
+            $self->SUPER::setup();
+        }
+
+  generate_search_query($keywords)
+    This method is used to generate the query for swish-e from the $keywords
+    (by default the 'keywords' CGI parameter), as well as any
+    EXTRA_PROPERTIES that are present.
+
+    If you wish to generate your own search query then you should override
+    this method. This is common if you need to have access/authorization
+    control that will need to be taken into account for your search. (eg,
+    anything under /protected can't be seen by someone not logged in).
+
+    Please see the swish-e documentation on the exact syntax for the query.
+
+  suggested_words($word)
+    This object method is used by the AUTO_SUGGEST flag to return the words
+    that should be suggested to the user after they have typed a $word. It
+    returns an array reference of those words.
+
+    By default it will just look for words in the AUTO_SUGGEST_FILE that
+    begin with $word. If you need more performance or flexibility (eg,
+    storing your words in a database and querying for them) you are
+    encouraged to override this method.
+
+CONFIGURATION
+    There are several configuration parameters that you can set at any time
+    (using "param()" in your cgiapp_init, or PARAMS hash in new()) before
+    the run mode is called that will affect the search and display of the
+    results. They are:
+
+  SWISHE_INDEX
+    This is the swishe index used for the searches. The default is
+    'data/swish-e.index'. You will probably set this every time.
+
+  AJAX
+    This is a boolean indicating whether or not a non-page-refresh AJAX
+    search will be permitted.
+
+    Please see the "Tutorial" for more information on how to use the AJAX
+    capabilities of this module.
+
+  TEMPLATE
+    The name of the search interface template. Default templates are
+    included with this distribution and will be used if you don't specify
+    one. Which default template is used depends on which TEMPLATE_TYPE you
+    are using (*HTMLTemplate* or *TemplateToolkit*) and whether or not the
+    AJAX flag is true.
+
+    These sample templates are installed with the module, or you can view
+    them by looking under the templates/ directory of the source
+    distribution (*.tar.gz*).
+
+    Please see "TEMPLATE USAGE" for more information on which variables are
+    passed into your template.
+
+  TEMPLATE_TYPE
+    This module uses CGI::Application::Plugin::AnyTemplate to allow
+    flexibility in choosing which templating system to use for your search.
+    This works especially well when you are trying to integrate the Search
+    into an existing app with an existing templating structure.
+
+    This value is passed to the "$self->template->config()" method as the
+    "default_type". By default it is 'HTMLTemplate'. Please see
+    CGI::Application::Plugin::AnyTemplate for more options.
+
+    If you want more control of configuration for the template the it would
+    probably best be done by subclassing CGI::Application::Search and
+    passing your desired params to "$self->template->config".
+
+  PER_PAGE
+    How many search result items to display per page. The default is 10.
+
+  HIGHLIGHT
+    Boolean indicating whether or not we should highlight the description
+    given to the templates. The default is true.
+
+  HIGHLIGHT_TAG
+    The HTML tag used to surround the highlighted context. The default is
+    "strong".
+
+  HIGHLIGHT_CLASS
+    The class attribute of the HIGHLIGHT_TAG HTML tag. This is useful when
+    you want to dictacte the style through a CSS style sheet. If given, this
+    value will override that of HIGHLIGHT_COLORS. It has no value by
+    default.
+
+  HIGHLIGHT_COLORS
+    This is an array ref of acceptable HTML colors. If provided, it will
+    highlight each matching word/phrase in an alternating style. For
+    instance, if given 2 colors, every other highlighted phrase would be a
+    different color. By default it is an empty array.
+
+  EXTRA_PROPERTIES
+    This is an array ref of extra properties used in the search. By default,
+    the module will only use the value of the 'keywords' parameter coming in
+    the CGI query. If anything is provided as an extra property then it will
+    be added to the query used in the search.
+
+    An example: You have some of you pages designated into categories. You
+    want the user to have the option of narrowing his results by category.
+    You add the word 'category' to the 'EXTRA_PROPERTIES' list and then you
+    add a 'category' form element that the user has the option of giving a
+    value to your search form. If the user gives that element a value, then
+    it will be seen and applied to the search. This will also only work if
+    you have the 'category' element defined for your documents (see *SWISH-E
+    Configuration* and 'MetaNames' in the swish-e.org SWISH-CONF
+    documentation).
+
+    By default, this list is empty.
+
+  EXTRA_RANGE_PROPERTIES
+    This is almost exactly like the "EXTRA_PROPERTIES" above except that
+    instead of searching for the given properties as simple strings, we will
+    use a range. Since ranges need to values, if you're searching for the
+    "foo" property, then you need to have a "foo_start" and a "foo_end"
+    value coming from the query. So if "foo" is in your
+    "EXTRA_RANGE_PROPERTIES" and you have a CGI query string like this:
+
+        ?foo_start=123&foo_end=234
+
+    Then we will a generate a Swish-E query that looks something like this:
+
+      -L foo 123 234
+
+  DESCRIPTION_LENGTH
+    This is the maximum length for the context (in chars) that is displayed
+    for each search result. The default is 250 characters.
+
+  DESCRIPTION_CONTEXT
+    This is the number of words on either side of the searched for words and
+    phrases (keywords) that will be displayed as part of the description. If
+    this is 0, then the entire description will be displayed. The default is
+    0.
+
+    NOTE: This directive will cause Search to use Text::Context, which can
+    be slow and CPU intensive at times. These computations may prove to be
+    too much for some servers (eg, a shared hosting environment).
+
+  AUTO_SUGGEST
+    If true, then this will allow the broswer to give suggestions to the
+    user as they type. To use this, you must either use the
+    AUTO_SUGGEST_FILE configuration option, or override the
+    "suggested_words()" method.
+
+    You template must also have the appropriate JavaScript code. Please see
+    the "Tutorial" for more details.
+
+  AUTO_SUGGEST_FILE
+    The name of the file where the suggested words are stored. These words
+    should be in alphabetical order with one word per line.
+
+  AUTO_SUGGEST_CACHE
+    A boolean indicating whether or not the results of the AUTO_SUGGEST_FILE
+    should be cached in memory or not. This will save repeated file accesses
+    when used in a persistant environment.
+
+  AUTO_SUGGEST_LIMIT
+    An integer count of the most suggestions to show the user at a time.
+    This is useful when you don't want to overwhelm the end user and take
+    over their screen with all of your helpful suggestions.
+
+  DOCUMENT_ROOT
+    This is the root directory to use when looking for files when using the
+    "highlight_local_page" run mode.
+
+  SORT_BY
+    This is a string used by Swish-e to sort the results. The string is a
+    space separated list of valid document properties. Each property may
+    contain a qualifier (either "asc" or "desc") that sets the direction of
+    the sort. Leave it alone and Swish-e will sort by "swishrank" in
+    descending order. But say you wanted to reverse that for some reason.
+    You could specify a "SORT_BY" of
+
+        swishrank asc
+
+  FIF_DEFAULTS
+    A hash reference of extra parameters that are passed to HTML::FillInForm
+    when it does it's business with the forms. This is useful to telling
+    HTML::FillInForm to skip certain forms or form elements.
+
+TEMPLATE USAGE
+    Sample templates are included with this distribution. These sample
+    templates are installed with the module, or you can view them by looking
+    under the templates/ directory of the source distribution (*.tar.gz*).
+
+    Please feel free to copy and change them in what ever way you see fit.
+    To help give you more information to display (or not display, depending
+    on your preference) the following variables are available for your
+    templates:
+
+  Global Tmpl Vars
+    These variables are available throughout the templates and contain
+    information related to the search as a whole:
+
+    * ajax  A boolean indicating whether or not this search is an AJAX
+            search or not. You can use this flag to exclude everything but
+            your search results in your template.
+
+    * url   The URL of this application. This is useful if you want to use
+            the same templates in multiple applications, especially if you
+            are using the AJAX capabilities since they require the URL to
+            submit to.
+
+    * searched
+            A boolean indicating whether or not a search was performed.
+
+    * keywords
+            The exact string that was recieved by the server from the input
+            named 'keywords'
+
+    * elapsed_time
+            A string representing the number of seconds that the search
+            took. This will be a floating point number with a precision of
+            3.
+
+    * hits  This is an array of hashs (TMPL_LOOP in H::T) that contains one
+            entry for each result returned (for the current page). Each
+            entry contains the following keys:
+
+            reccount
+                    The "swishreccount" property of the results as indexed
+                    by SWISH-E
+
+            rank    The rank to the result as given by SWISH-E (the
+                    "swishrank" property)
+
+            title   The "swishtitle" property of the results as indexed by
+                    SWISH-E
+
+            path    The "swishdocpath" property of the results as indexed by
+                    SWISH-E
+
+            last_modified
+                    The "swishlastmodified" property of the results as
+                    indexed by SWISH-E and then formatted using
+                    Time::Piece's "strftime()" method with a format string
+                    of "%B %d, %Y".
+
+            size    The "swishdocsize" property of the results as indexed by
+                    SWISH-E and then formatted with Number::Format's
+                    "format_bytes()" method.
+
+            description
+                    The "swishdescription" property of the results as
+                    indexed by SWISH-E. If HIGHLIGHT is true, then this
+                    description will also have search terms highlighted and
+                    will only be, at most, DESCRIPTION_LENGTH characters
+                    long.
+
+    * pages This is an array of hashes (TMPL_LOOP in H::T) that contains
+            paging information for the results. It contains the following
+            keys:
+
+            current A boolean indicating whether or not this iteration is
+                    the current page or not.
+
+            page_num
+                    The integer number of the page.
+
+    * first_page
+            This is a boolean indicating whether or not this page of the
+            results is the first or not.
+
+    * last_page
+            This is a boolean indicating whether or not this page of the
+            results is the last or not.
+
+    * prev_page
+            The integer number of the previous page. Will be 0 if there is
+            no previous page.
+
+    * next_page
+            The integer number of the next page. Will be 0 if there is no
+            next page.
+
+    * start_num
+            This is the number of the first result on the current page
+
+    * stop_num
+            This is the number of the last result on the current page
+
+    * total_entries
+            The total number of results in their search, not the total
+            number shown on the page.
+
+OTHER NOTES
+    *   If at any time prior to the execution of the 'perform_search' run
+        mode you set the "$self->param('results')" parameter, a search will
+        not be performed. Instead those results are returned. This is
+        helpful when you decide in the "cgiapp_init" stage that this user
+        does not have permissions to perform the desired search.
+
+    *   You must use the *StoreDescription* setting in your Swish-e
+        configuration file. If you don't you'll get an error when
+        C::A::Search tries to retrieve a description for each hit.
+
+AUTHOR
+    Michael Peters <mpeters@plusthree.com>
+
+    Thanks to Plus Three, LP (http://www.plusthree.com) for sponsoring my
+    work on this module.
+
+CONTRIBUTORS
+    Sam Tregar <sam@tregar.com>
+    Mark Stosberg <mark@summersault.com>
+    Eric Folley <efolley@plusthree.com>
+

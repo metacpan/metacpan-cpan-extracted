@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-ParseDistribution",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Devel::CheckOS" : "0",
+            "File::Find::Rule" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Parallel::ForkManager" : "1.03",
+            "Test::More" : "0.88",
+            "YAML" : "0.6"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-CPAN-ParseDistribution/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-CPAN-ParseDistribution"
+      }
+   },
+   "version" : "1.54",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

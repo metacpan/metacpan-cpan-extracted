@@ -1,0 +1,142 @@
+#! /Users/jj/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+use CPAN::Mini::Inject::REST::Client;
+
+CPAN::Mini::Inject::REST::Client->run;
+
+=head1 NAME
+
+mcpani-client - Command-line client for CPAN::Mini::Inject::REST
+
+=head1 SYNOPSYS
+
+Add a distribution to a remote CPAN::Mini mirror:
+
+ mcpani-client add --host mycpan.local MyDist-0.04.tar.gz
+ 
+Install it with cpanm:
+
+ cpanm --mirror http://mycpan.local --mirror-only MyDist
+
+=head1 DESCRIPTION
+
+B<mcpani-client> enables distributions to be remotely uploaded to a CPAN::Mini
+mirror which is running the L<CPAN::Mini::Inject::REST> API.
+
+=head2 Usage
+
+ mcpani-client <command> [options] <arguments>
+
+=head2 Commands
+
+=over
+
+=item help
+
+ mcpani-client help
+ mcpani-client help <command_name>
+
+Displays general help, or help for a specific command.
+
+=item add
+
+ mcpani-client add [options] <filename>
+
+Adds a new file into the repository and injects it into the mirror.
+
+=item dist
+
+ mcpani-client dist [options] <dist_name>
+
+Shows files held in the mirror and the repository for the specified distribution.
+
+=item all_dists
+
+ mcpani-client all_dists [options]
+
+Lists all distributions which have been added to the mirror.
+
+=item file
+
+ mcpani-client file [options] <filename>
+
+Checks to see if F<filename> has been added to the mirror, and if so lists the
+module names (and versions) that the file provides.
+
+=item all_files
+
+ mcpani-client all_files [options]
+
+Lists all files which have been added to the mirror.
+
+=item download
+
+ mcpani-client [options] [--stdout] <filename>
+
+Downloads F<filename> from the repository.
+
+By default, the file will be saved to disk. However, if the C<--stdout> option
+is given, the file will be streamed to STDOUT.
+
+=back
+
+=head2 Options
+
+All commands accept the following options:
+
+=over
+
+=item C<--host>
+
+Hostname or IP address of the CPAN::Mini server (defaults to 127.0.0.1).
+
+=item C<--port>
+
+Port number of the CPAN::Mini server (defaults to 80).
+
+=item C<--protocol>
+
+Protocol used by the CPAN::Mini server (http or https, defaults to http).
+
+=item C<--username>
+
+=item C<--password>
+
+Username and password to use if the CPAN::Mini server requires HTTP basic
+authentication.
+
+=back
+
+=head2 Configuration
+
+Options to B<mcpani-client> may be defined in a configuration file
+
+ File pointed to by $ENV{MCPANI_CLIENT_CONFIG}
+ <user's home directory>/.mcpani-client
+ /usr/local/etc/mcpani-client
+ /etc/mcpani-client
+
+B<mcpani-client> uses the L<Config::General> configuration file format, e.g.
+
+ # mcpani-client config file
+ server cpan.local
+ protocol http
+ port 8080
+
+=head1 SEE ALSO
+
+L<CPAN::Mini::Inject::REST>, L<CPAN::Mini::Inject>
+
+=head1 AUTHOR
+
+Jon Allen (JJ) <jj@jonallen.info>
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

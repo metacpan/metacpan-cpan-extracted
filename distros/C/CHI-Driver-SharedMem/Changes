@@ -1,0 +1,67 @@
+Revision history for CHI::Driver::SharedMem
+
+0.14	Thu 23 Jan 10:34:54 EST 2014
+	Fix a rare condition where the data fails to read
+	Added work around for RT89892
+	Use Test::Most instead of Test::More
+	Added t/strict.t
+
+0.13	Mon Sep 17 09:20:58 BST 2012
+	Handle race condition which could result in an error when two processes
+		try to remove the same empty shared memory area when they
+		terminate
+
+0.12	Mon Sep  3 08:22:39 BST 2012
+	t/01-new.t: Handle 'Bad System Call' within Cygwin
+	Use read locks where possible
+
+0.11	Fri Aug 31 08:31:20 BST 2012
+	Use flock instead of IPC::Semaphore::Concurrency
+	if($value) corrected to if(defined($value))
+
+0.10	Wed Aug 22 13:53:49 BST 2012
+	Use ftok to generate the shmkey in the test
+	Don't try to build on GNU/Hurd
+	Lock the shared memory area during accesses
+
+0.09	Sat Aug 18 17:57:40 BST 2012
+	Use $Config{intsize} do determine the size of an int
+	Croak if the shared memory area can't be created
+
+0.08	Wed Aug 15 08:31:38 BST 2012
+	Added test that the shared memory area is deleted on cleanup
+	Ensure using the latest version of CHI::Stats
+	Don't set the execute bit in the shared memory area
+	Store the size as an int rather than 32 bits
+
+0.07	Mon Aug 13 09:04:17 BST 2012
+	Attach to the shared memory area
+	Only remove the shared memory area in the destructor when there are
+		no attachments, as well as nothing in the cache
+	Croak rather than carp when shmkey isn't given
+	Tidied the tests
+
+0.06	Sun Aug 12 20:17:56 BST 2012
+	Don't try to remove the shared memory area if we haven't attached to it
+
+0.05	Sun Aug 12 14:09:19 BST 2012
+	Add consistency check which handles the failure at
+		http://www.cpantesters.org/cpan/report/a7449b64-e424-11e1-9066-3d54fb7543f5
+	Fixed the failing tests (test_mirror_cache and test_li_cache)
+
+=head2 test_mirror_cache
+
+0.04	Sat Aug 11 14:27:19 BST 2012
+	Furged some tests to pass when they should fail, it's a temporary
+		work around which will nee to be addressed
+
+0.03	Fri Aug 10 18:07:19 BST 2012
+	When the last object goes, if the cache is empty reclaim the shared
+		memory
+	More moosified, so it's much smaller and cleaner
+
+0.02	Fri Aug 10 16:42:15 BST 2012
+	Fixed some tests
+
+0.01
+        First draft

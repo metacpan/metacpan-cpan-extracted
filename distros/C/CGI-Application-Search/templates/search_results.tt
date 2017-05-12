@@ -1,0 +1,83 @@
+<!--
+
+EXAMPLE TEMPLATE
+
+Designed to be used for the TEMPLATE configuration with
+a TEMPLATE_TYPE of TemplateToolkit
+
+Very basic with no frills, just a simple search.
+
+-->
+
+<html>
+<body>
+
+<h2>Search[% IF searched %] Results[% END %]</h2>
+
+<form name="search" action="[% url %]">
+<input name="rm" value="perform_search" type="hidden">
+
+<table summary="layout">
+<tr>
+  <td><label for="keywords">Keyword(s)</label></td> 
+  <td colspan="2"><input id="keywords" name="keywords" value="" size="50"></td>
+</tr>
+<tr>
+  <td colspan="2" align="right"><input value="Search" type="submit"></td>
+</tr>
+</table>
+
+</form>
+
+[% IF searched %]
+  [% IF hits %]
+    (Elapsed Time: [% elapsed_time %]s)
+
+    <div class="pagination">
+
+    [% IF pages %]
+      <div>
+      Pages:
+      [% IF first_page %]
+        &laquo;Prev
+      [% ELSE %]
+        <a href="[% url %]?rm=perform_search&amp;keywords=[% keywords %]&amp;page=[% prev_page %]">&laquo;Prev</a>
+      [% END %]
+      
+      [% FOREACH page IN pages %]
+        [% IF page.current %]
+          [% page.page_num %]
+        [% ELSE %]
+          <a href="[% url %]?rm=perform_search&amp;keywords=[% keywords %]&amp;page=[% page.page_num %]">[% page.page_num %]</a>
+        [% END %]
+      [% END %]
+      
+      [% IF last_page %]
+        Next&raquo;
+      [% ELSE %]
+        <a href="[% url %]?rm=perform_search&amp;keywords=[% keywords %]&amp;page=[% next_page %]">Next&raquo;</a>
+      [% END %]
+      </div>
+    [% END %]
+
+    Results: [% start_num %] to [% stop_num %] of [% total_entries %]
+
+    </div>
+
+    <dl>
+    [% FOREACH hit IN hits %]
+      <dt>
+      <a href="[% hit.path %]">[% IF hit.title %][% hit.title %][% ELSE %][% hit.path %][% END %]</a>
+      </dt>
+      <dd>[% hit.last_modified %] - [% hit.size %]</dd>
+      <dd><p>[% hit.description %]</p></dd>
+    [% END %]
+    </dl>
+
+  [% ELSE %]
+  <p><strong>No results found</strong></p>
+  [% END %]
+[% END %]
+
+</html>
+</body>

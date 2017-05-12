@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Chart::Graph::Xrt3d</title>
+<link rev="made" href="mailto:root@gohan24.freebsd.org" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#arguments">ARGUMENTS</a></li>
+	<ul>
+
+		<li><a href="#details_on_graphics_converter_options">DETAILS ON GRAPHICS CONVERTER OPTIONS</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#example__stock_prices_for_joe_s_restaurant">EXAMPLE: STOCK PRICES FOR JOE'S RESTAURANT</a></li>
+		<li><a href="#example__early_growth_of_the_internet">EXAMPLE: EARLY GROWTH OF THE INTERNET</a></li>
+		<li><a href="#example__using_a_data_file_for_input">EXAMPLE: USING A DATA FILE FOR INPUT</a></li>
+	</ul>
+
+	<li><a href="#more_info">MORE INFO</a></li>
+	<li><a href="#contact">CONTACT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Chart::Graph::Xrt3d</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ #Include module
+ use Chart::Graph::Xrt3d qw(xrt3d);</pre>
+<pre>
+ # Function call
+ xrt3d(\%options,
+       \@data_set
+      );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module is unmaintained, it worked with Sitraka's XRT, and hasn't been
+tested against newer versions.</p>
+<p>Sitraka (now Quest) makes a number of graphics packages for UNIX systems.  XRT is
+a Motif-based commercial software product that has been adapted by
+CAIDA using a combination of C drivers and Perl function <em>xrt3d()</em>.
+The Perl function <em>xrt3d()</em> provides access to the three dimensional
+graphing capabilities of XRT from Perl.  To access the two dimensional
+graphing using XRT, use <em>xrt2d()</em> also supplied in the
+<em>Chart::Graph</em> package.</p>
+<p>
+</p>
+<hr />
+<h1><a name="arguments">ARGUMENTS</a></h1>
+<p>The options to <em>xrt3d()</em> are listed below.  Additional control over the
+resulting graph is possible by using the XRT application itself once
+the graph has been created.</p>
+<pre>
+ +--------------------------------------------------------------------------+
+ |                                OPTIONS                                   |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ |&quot;output file&quot;   |  (set your own)          | &quot;untitled-xrt3d.gif&quot;         |
+ |&quot;output type&quot;   |  &quot;ps&quot;,&quot;xwd&quot;, &quot;png&quot;, &quot;jpg&quot;| &quot;xwd&quot;                        |
+ |&quot;x-axis title&quot;  |  (set your own)          | &quot;x-axis&quot;                     |
+ |&quot;y-axis title&quot;  |  (set your own)          | &quot;y-axis&quot;                     |
+ |&quot;z-axis title&quot;  |  (set your own)          | &quot;z-axis&quot;                     |
+ |&quot;x-min&quot;         |  &quot;0&quot; or &quot;1&quot;(normally 0)  | &quot;0&quot;                          |
+ |&quot;y-min&quot;         |  &quot;0&quot; or &quot;1&quot;(normally 0)  | &quot;0&quot;                          |
+ |&quot;x-step&quot;        |  &quot;0&quot; or &quot;1&quot;(normally 1)  | &quot;1&quot;                          |
+ |&quot;y-step&quot;        |  &quot;0&quot; or &quot;1&quot;(normally 1)  | &quot;1&quot;                          |
+ |&quot;x-ticks&quot;       |  (set your own)          | none                         |
+ |&quot;y-ticks&quot;       |  (set your own)          | none                         |
+ |&quot;header&quot;        |  (set your own)          | Array ref of &quot;header&quot; text   |
+ |&quot;footer&quot;        |  (set your own)          | Array ref of &quot;footer&quot; text   |
+ +----------------+--------------------------+------------------------------+</pre>
+<p>The <em>xrt3d</em> function only accepts data in one of two forms.  The
+choices are: either <code>[\%data1_opts, \@data_matrix]</code> or
+<code>[\%data1_opts, &quot;filename&quot;]</code> The data options are listed below.</p>
+<pre>
+ +--------------------------------------------------------------------------+
+ |                             DATA OPTIONS                                 |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ +----------------+--------------------------+------------------------------+
+ | &quot;type&quot;         | Data format: &quot;matrix&quot; or | none                         |
+ |                | &quot;file&quot;                   |                              |
+ +----------------+--------------------------+------------------------------+</pre>
+<p>
+</p>
+<h2><a name="details_on_graphics_converter_options">DETAILS ON GRAPHICS CONVERTER OPTIONS</a></h2>
+<p>The xrt package supports only two graphics formats internally:
+Postscript and the X windows format XWD.  Additional raster graphics
+formats are supported with Chart::Graph by using one of two graphics
+converter packages: <em>Imagemagick</em> and <em>Netpbm</em>.</p>
+<p>If you need to install a converter package,<em>Imagemagick</em> 
+<em><a href="http://www.imagemagick.org/">http://www.imagemagick.org/</a></em> is probably preferable
+simply for its comparatively simplicity.  It uses one program
+<em>convert</em> for all of it's conversion needs, so it is easy to manage
+and simple for Chart::Graph to use.  Many UNIX systems come with some
+collection of the <em>Netpbm</em> utilities already installed, thus users
+may be able to start using Chart::Graph without adding any additional
+converters.  Alas, it is unlikely any distributions would include all
+the converters for the newest graphics formats used by Chart::Graph.
+In that case it may still preferable to use <em>Imagemagick</em> simply for
+the sake of avoiding installing over 80 utilities that come with
+current distributions of <em>Netpbm</em>.  For more information on the
+current distribution of <em>Netpbm</em> go to the current website at:
+<em><a href="http://netpbm.sourceforge.net/">http://netpbm.sourceforge.net/</a></em></p>
+<p>The xrt package also allows for multiple header and footers with each
+graph.  As a result, instead of just the usual string, an array
+reference containing the multiple strings for the header and footer
+text.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>The following four examples show Chart::Graph::Xrt3d in different roles
+and producing different styles of output.</p>
+<p>
+</p>
+<h2><a name="example__stock_prices_for_joe_s_restaurant">EXAMPLE: STOCK PRICES FOR JOE'S RESTAURANT</a></h2>
+<p>The first example creates a three dimensional bar chart of
+fictitious stock data that is displayed in the graphic file
+<em>xrt3d-1.gif</em>.  Note that <em>xrt3d()</em> uses the older gif file format,
+but can use others as noted above if you have the available converters
+provided.</p>
+<pre>
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);</pre>
+<pre>
+ #using a 3 by 6 matrix for the data set
+ xrt3d({&quot;output file&quot; =&gt; &quot;xrt3d-1.gif&quot;,
+                           &quot;output type&quot; =&gt; &quot;gif&quot;,
+                                   &quot;header&quot; =&gt; 
+                           [&quot;Stock prices for Joe's restaurant chain&quot;,
+                                &quot;Compiled from local records&quot;
+                                ],
+                           &quot;footer&quot; =&gt;
+                           [&quot;Joe's Restaurant&quot;],
+                           &quot;y-ticks&quot;=&gt;[&quot;Jan/Feb&quot;, &quot;Mar/Apr&quot;, &quot;May/Jun&quot;, &quot;Jul/Aug&quot;,
+                                                   &quot;Sep/Oct&quot;, &quot;Nov/Dec&quot;],
+                           &quot;x-axis title&quot; =&gt; &quot;Years monitored&quot;,
+                           &quot;y-axis title&quot; =&gt; &quot;Month's tracked&quot;,
+                           &quot;z-axis title&quot; =&gt; &quot;Stock prices&quot;,
+                          },
+                          [{&quot;type&quot; =&gt; &quot;matrix&quot;},
+               [&quot;4&quot;, &quot;5&quot;, &quot;3&quot;, &quot;6&quot;, &quot;6&quot;, &quot;5&quot;],
+                           [&quot;8&quot;, &quot;13&quot;, &quot;20&quot;, &quot;45&quot;, &quot;100&quot;, &quot;110&quot; ],
+                           [&quot;70&quot;, &quot;45&quot;, &quot;10&quot;, &quot;5&quot;, &quot;4&quot;, &quot;3&quot;]])</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-1.jpg"></center></p>
+<p><center><em>xrt3d-1.jpg</em></center></p><p>
+</p>
+<h2><a name="example__early_growth_of_the_internet">EXAMPLE: EARLY GROWTH OF THE INTERNET</a></h2>
+<p>The following example creates a three dimensional bar chart of data
+collected on the early growth of the Internet (URL and corporate
+source included on graph.)  The result in this case is display in one
+of the newest graphics formats the PNG format: <em>xrt3d-2.png</em>.</p>
+<pre>
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);</pre>
+<pre>
+  xrt3d({&quot;output file&quot; =&gt; &quot;xrt3d-2.png&quot;,
+         &quot;output type&quot; =&gt; &quot;png&quot;,
+         &quot;header&quot; =&gt; 
+         [&quot;Growth of Early Internet&quot;, 
+         &quot;(according to Internet Wizards - <a href="http://www.nw.com/">http://www.nw.com/</a>)&quot;,
+         ],
+         &quot;footer&quot; =&gt;
+         [&quot;<a href="http://www.mit.edu/people/mkgray/net/internet-growth-raw-data.html&quot">http://www.mit.edu/people/mkgray/net/internet-growth-raw-data.html&quot</a>;],
+         &quot;y-ticks&quot;=&gt;[&quot;Jan 93&quot;, &quot;Apr 93&quot;, &quot;Jul 93&quot;,
+                     &quot;Oct 93&quot;, &quot;Jan 94&quot;, &quot;Jul 94&quot;,
+                     &quot;Oct 94&quot;, &quot;Jan 95&quot;, &quot;Jul 95&quot;,
+                     &quot;Jan 96&quot;
+                    ],
+         &quot;x-ticks&quot;=&gt;[&quot;Hosts&quot;, &quot;Domains&quot;, &quot;Replied to Ping&quot;],},
+         [{&quot;type&quot; =&gt; &quot;matrix&quot;},
+      [&quot;1.3e6&quot;, &quot;1.5e6&quot;, &quot;1.8e6&quot;, &quot;2.1e6&quot;, &quot;2.2e6&quot;, &quot;3.2e6&quot;, 
+           &quot;3.9e6&quot;,&quot;4.9e6&quot;, &quot;6.6e6&quot;, &quot;9.5e6&quot;
+          ],
+          [&quot;21000&quot;,&quot;22000&quot;, &quot;26000&quot;, &quot;28000&quot;, &quot;30000&quot;, &quot;46000&quot;, 
+           &quot;56000&quot;, &quot;71000&quot;, &quot;120000&quot;, &quot;240000&quot;
+          ],
+          [&quot;NA&quot;, &quot;0.4e6&quot;, &quot;NA&quot;, &quot;0.5e6&quot;, &quot;0.6e6&quot;, &quot;0.7e6&quot;, 
+           &quot;1.0e6&quot;, &quot;1.0e6&quot;, &quot;1.1e6&quot;, &quot;1.7e6&quot; 
+          ]
+         ]
+        );</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-2.png"></center></p>
+<p><center><em>xrt3d-2.png</em></center></p><p>
+</p>
+<h2><a name="example__using_a_data_file_for_input">EXAMPLE: USING A DATA FILE FOR INPUT</a></h2>
+<p>The next example uses a file instead of a array for it's data source.
+The file is listed below the Perl code.</p>
+<pre>
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);</pre>
+<pre>
+    if (xrt3d({&quot;output file&quot; =&gt; &quot;xrt3d-3.gif&quot;,
+               &quot;output type&quot; =&gt; &quot;gif&quot;,
+               &quot;x-ticks&quot;=&gt;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;],
+               &quot;y-ticks&quot;=&gt;[&quot;w&quot;, &quot;x&quot;, &quot;y&quot;, &quot;z&quot;],},
+            [{&quot;type&quot; =&gt; &quot;file&quot;},
+                 &quot;xrt3d_data.txt&quot;])) {
+        print &quot;ok\n&quot;;
+    } else {
+        print &quot;not ok\n&quot;;
+    }</pre>
+<p>The data file used in the above example is as follows.</p>
+<pre>
+ 10 15 23  10
+ 4 13 35 45
+ 29 15 64 24</pre>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-3.gif"></center></p>
+<p><center><em>xrt3d-3.gif</em></center></p><p>
+</p>
+<hr />
+<h1><a name="more_info">MORE INFO</a></h1>
+<p>For more information on XRT:</p>
+<pre>
+ <a href="http://www.quest.com/xrt_pds/">http://www.quest.com/xrt_pds/</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="contact">CONTACT</a></h1>
+<p>Send email to <a href="mailto:graph-dev@caida.org">graph-dev@caida.org</a> is you have problems, questions,
+or comments. To subscribe to the mailing list send mail to
+<a href="mailto:graph-dev-request@caida.org">graph-dev-request@caida.org</a> with a body of ``subscribe <a href="mailto:your@email.com''">your@email.com''</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+ CAIDA Perl development team (cpan@caida.org)</pre>
+
+</body>
+
+</html>

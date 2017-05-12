@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Prototype-Mecha
+version:      0.21
+version_from: lib/CGI/Prototype/Mecha.pm
+installdirs:  site
+requires:
+    CGI::Prototype:                0.9051
+    File::Temp:                    0
+    LWP:                           5.803
+    WWW::Mechanize:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.28

@@ -1,0 +1,14 @@
+
+use POSIX qw(open close);
+
+my $open_dev_null = shift;
+
+for (my $i = 3; $i <= 31; ++$i) {
+    close($i);
+}
+use vars qw(@fds);
+if ($open_dev_null) {
+    @fds = map {open('/dev/null', O_RDONLY, 0)} (3..31);
+}
+print $$, "\n";
+chdir('/');

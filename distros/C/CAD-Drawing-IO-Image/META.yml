@@ -1,0 +1,21 @@
+---
+name: CAD-Drawing-IO-Image
+version: 0.02
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: Output methods for images
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Drawing: 0.26
+  Image::Magick: 6
+  Test::More: 0
+provides:
+  CAD::Drawing::IO::Image:
+    file: lib/CAD/Drawing/IO/Image.pm
+    version: 0.02
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

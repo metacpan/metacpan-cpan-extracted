@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 123
+  27600:
+    - 165
+name: cb7b
+registers:
+  AF: 768
+  AF_: 0
+  BC: 20651
+  BC_: 0
+  DE: 1469
+  DE_: 0
+  HL: 27600
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Browse.pm
+html/browse.css
+html/browse.js
+html/browse.tmpl
+scripts/browse.cgi
+scripts/browse_tmpl.cgi
+scripts/browse_delete.cgi
+sql/browse.sql
+t/00.load.t
+t/01.build.t

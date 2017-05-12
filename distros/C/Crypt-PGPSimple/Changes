@@ -1,0 +1,12 @@
+Revision history for Perl extension Crypt::PGPSimple.
+
+$Log: Changes,v $
+Revision 0.13  2001/11/02 03:01:34  jhinkle
+Updated documentation only
+
+Revision 0.12  2001/11/02 03:01:34  jhinkle
+Fix for multiple recipients
+
+Revision 0.11  2000/01/09 03:00:21  jhinkle
+Initial Release
+

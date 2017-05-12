@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CGI/Application/Plugin/ExtJS.pm
+t/02-basic.t
+t/lib/CAPExtTest/CGIApp.pm
+t/lib/CAPExtTest/Schema.pm
+t/lib/CAPExtTest/Schema/Result/Stations.pm
+t/release-pod-syntax.t

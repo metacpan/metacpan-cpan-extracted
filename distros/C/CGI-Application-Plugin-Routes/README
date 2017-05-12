@@ -1,0 +1,101 @@
+CGI-Application-Plugin-Routes
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SYNOPSIS
+
+CGI::Application::Plugin::Routes tries to bring to perl some of the goodies of Rails routes by allowing the creationg of a routes table that is parsed at the prerun stage again the CGI's path_info data. The result of the process (if there's any match at the end of the process) is added to CGI's query method from CGI::Application and available to all the runmodes via the CGI::Application::query::param method.
+By doing this, the plugin provides a uniform way to access GET and POST parameters when using clean url's with the query->param() method.
+
+
+USAGE
+
+Perhaps a little code snippet.
+
+In TestApp.om
+
+	package TestApp;
+	use strict;
+	use warnings;
+	use base qw/CGI::Application/;
+	use CGI::Application::Plugin::Routes;
+	sub setup {
+		my $self = shift;
+
+		$self->routes_root('/thismod');#optional, will be used to prepend every route defines in $self->routes.
+		$self->routes([
+			'' => 'home' ,
+			'/view/:name/:id/:email'  => 'view',
+		]);
+		$self->start_mode('show');
+
+		$self->tmpl_path('templates/');
+	}
+	sub view {
+		my $self = shift;
+		my $q = $self->query();
+		my $name = $q->param('name');
+		my $id = $q->param('id');
+		my $email = $q->param('email');
+		my $debug = $self->routes_dbg; #dumps all the C::A::P::Routes info
+		return $self->dump_html();
+	}
+	1;
+
+ACKNOWLEDGEMENTS
+
+Michael Peter's CGI::Application::Dispatch module that can be found here:
+http://search.cpan.org/~wonko/CGI-Application-Dispatch
+I borrowed from him most of the routine that parses the url.
+
+Mark Stosberg http://search.cpan.org/~markstos/  provided great feedback and fixed parts of the code making it more clean and efficient.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Application::Plugin::Routes
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-Routes
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Application-Plugin-Routes
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Application-Plugin-Routes
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Application-Plugin-Routes
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Julián Porta
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

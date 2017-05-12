@@ -1,0 +1,31 @@
+Revision history for Class-Std-Fast
+0.0.8   Mon May 26 13:25:26 CEST 2008
+        * Allow access to even more internals for even more XS surgery
+
+0.0.7   Fri May 16 15:00:28 CEST 2008
+        * factored out getter / setter creation into separate functions to allow XS surgery
+
+0.0.6   Mon May  5 13:06:53 CEST 2008
+        * Storable freeze/thaw speedup
+        * DESTROY speedup for classes using inheritance
+
+0.0.5   Sat Dec 01 17:30:00 CEST 2007
+        * Fixed DESTROY issues
+        * made object cache work with overloading
+
+0.0.4   Tue Nov 20 19:44:00 CEST 2007
+        * Introduced named options for import
+        * Added object caching
+        * updated tests
+
+0.0.3   Tue Nov 11 22:10:00 CEST 2007
+        * fixed DESTROY/DEMOLISH methods,
+        * added missing pod for initialize method
+        * updated tests in runtime.t
+
+
+0.0.2   Tue Nov 10 21:37:00 CEST 2007
+        Fixed test scripts
+
+0.0.1   Tue Nov 10 18:51:00 CEST 2007
+        Initial release.

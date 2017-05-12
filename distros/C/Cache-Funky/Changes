@@ -1,0 +1,22 @@
+Revision history for Cache-Funky
+
+0.06  2007/10/14 03:56
+       - NOTICE! I change interface design. delete() method now does not
+         accespt many attributes. use deletes() method instead.
+       - Support an parameter for cache function. 
+
+0.0.5  Sun May 20 23:34:13 2007
+       Modifying test script.
+
+0.0.4  Sun May 20 09:46:01 2007
+       Modifying Makefile.PL and Build.PL. (add requires module)
+
+0.0.3  Sun May 20 02:54:01 2007
+       Modifying package name.(TYPO)
+
+0.0.2  Sun May 20 00:00:02 2007
+       update by README
+
+0.0.1  Tue May  1 21:23:34 2007
+       Initial release.
+

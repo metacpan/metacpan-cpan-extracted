@@ -1,0 +1,142 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::CHAP - Authenticate a user
+    using a CHAP login system.
+
+SYNOPSIS
+        use Catalyst qw/
+          Session 
+          Session::Store::File 
+          Session::State::Cookie
+          Authentication
+          Authentication::Store::Foo
+          Authentication::Credential::CHAP
+          /;
+
+        __PACKAGE__->config->{authentication}->{chap} = {
+            hash_algorithm => 'SHA-1',
+        };
+
+        sub begin : Private {
+            my ($self, $c) = @_;
+            $c->chap_init; # Generate a Challenge string and stores it in the session.
+            $c->stash("challenge_string", $c->get_challenge_string);
+        
+        }
+
+        package MyApp::Controller::Auth;
+
+        # *** NOTE ***
+        # if you place an action named 'login' in your application's root (as
+        # opposed to inside a controller) the following snippet will recurse,
+        # giving you lots of grief.
+        # never name actions in the root controller after plugin methods - use
+        # controllers and : Global instead.
+
+        sub login : Local {
+            my ( $self, $c ) = @_;
+
+            $c->login( $c->req->param('username'), $c->req->param('password') );
+        }
+
+        # Template.html
+        <form name="MyForm">
+        <input type="password" name="form_password" onclick="sendPassword();"/>
+        <input type="hidden" name="password" value="" />
+        <input type="hidden" name="challenge" value="[% challenge_string %]" />
+        </form>
+
+        # Javascript (Client side)
+        function sendPassword() {
+            var password = document.forms['MyForm'].form_password.value
+                           + document.forms['MyForm'].challenge.value;
+            document.forms['MyForm'].password.value = encode_sha1(password);
+            document.forms['MyForm'].form_password.value = '';
+            document.forms['MyForm'].challenge.value = '';
+            document.forms['MyForm'].submit();
+        }
+
+DESCRIPTION
+    This credential checker inherits from
+    Catalyst::Plugin::Authentication::Credential::Password. It generates a
+    challenge string that the user agent must concatenate to the password
+    before encoding it with a hash algorithm. When logging in, this plugin
+    will compare the sent password to the one stored, encoded with the same
+    challenge string saved in the session data. It is meant to allow you to
+    securely send passwords over a clear HTTP connection.
+
+    clear text password
+        If the user has a clear text password it will be compared directly.
+        You just have to concatenate the challenge string to the password
+        and encode it with any of the hash methods supported by the Digest
+        module.
+
+    hashed password
+        If the stored password is hashed, you will have to encode it in your
+        client BEFORE concatenating the challenge string to it, and then
+        encode the whole string again before sending it to the server.
+
+    crypted password
+        UNIX crypt hashed password are not supported. You must store your
+        passwords either in clear or hashed.
+
+REQUIREMENTS
+    You must use Sessions.
+
+CONFIGURATION
+    __PACKAGE__->config->{authentication}->{chap}->{length}
+        The length of the challenge string. Default is 40.
+
+    __PACKAGE__->config->{authentication}->{chap}->{hash_algorithm}
+        The hash method used to encode the password+challenge string,
+        client-side. It can be any method supported by the Digest module, as
+        long as you have a way to use the same on the client. Default is
+        MD5. More information and javascript functions can be found at
+        <http://pajhome.org.uk/crypt/md5/>.
+
+METHODS
+    login $username, $password
+        Inherited from
+        Catalyst::Plugin::Authentication::Credential::Password.
+
+        Try to log a user in.
+
+        $username can be a string (e.g. retrieved from a form) or an object.
+        If the object is a Catalyst::Plugin::Authentication::User it will be
+        used as is. Otherwise "$c->get_user" is used to retrieve it.
+
+        $password is a hash of the password and the challenge string,
+        encoded client side.
+
+        If $username or $password are not provided, the query parameters
+        "login", "user", "username" and "password", "passwd", "pass" will be
+        tried instead.
+
+    chap_init $force
+        Generates a challenge string for the current session. You can put it
+        in your root's begin/end actions if needed, the challenge string
+        won't change until the session ends or you call this method with
+        $force set to 1.
+
+    get_challenge_string
+        Returns the current challenge string.
+
+    setup
+    gen_challenge_string
+RELATED USAGE
+    After the user is logged in, the user object for the current logged in
+    user can be retrieved from the context using the "$c->user" method.
+
+    The current user can be logged out again by calling the "$c->logout"
+    method.
+
+SUPPORTING THIS PLUGIN
+    See Catalyst::Plugin::Authentication::Credential::Password.
+
+SEE ALSO
+    Catalyst::Plugin::Authentication,
+    Catalyst::Plugin::Authentication::Credential::Password,
+    Catalyst::Plugin::Session.
+
+AUTHOR
+        Renaud Drousies.
+

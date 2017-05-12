@@ -1,0 +1,27 @@
+<!-- TMPL_IF NAME="some_errors" -->
+<div id="errormessages">
+    There were some errors in your attempt to log in.
+    Please reinput your password to try again.
+</div>
+<!-- /TMPL_IF -->
+
+<div id="login">
+	<form   name="<!-- TMPL_VAR NAME="FORM_NAME" -->"
+		  method="<!-- TMPL_VAR NAME="FORM_METHOD" -->"
+		  action="<!-- TMPL_VAR NAME="FORM_ACTION" -->">
+	
+		<!-- TMPL_VAR NAME=COMEFROMRUNMODE -->
+		<!-- TMPL_VAR NAME=CURRENTRUNMODE  -->
+		<!-- TMPL_VAR NAME=SUBMITTORUNMODE -->
+		<!-- TMPL_VAR NAME=SESSION_STATE   -->
+		
+		<b>Username:</b> <!-- TMPL_VAR NAME="username" ESCAPE=HTML -->
+		<br />		
+		<b>Password:</b>
+		<input type=password name=password value="">
+		<br />		
+		<span class="error"><!-- TMPL_VAR NAME="err_password" --></span>
+		<br />		
+		<input type="submit" name="submit" value="Re-authenticate">
+	</form>
+</div>

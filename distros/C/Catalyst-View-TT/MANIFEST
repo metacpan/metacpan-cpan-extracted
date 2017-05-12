@@ -1,0 +1,47 @@
+Changes
+lib/Catalyst/Helper/View/TT.pm
+lib/Catalyst/Helper/View/TTSite.pm
+lib/Catalyst/View/TT.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/01use.t
+t/04pkgconfig.t
+t/05appconfig.t
+t/06includepath.t
+t/07render.t
+t/08cycle.t
+t/09providers.t
+t/10providers.encoding.t
+t/11norequest.t
+t/12expose_methods.t
+t/13classconfig.t
+t/14alt_content_type.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/FauxProvider.pm
+t/lib/TestApp/root/any_include_path/test
+t/lib/TestApp/root/expose_methods.tt
+t/lib/TestApp/root/specified_template.tt
+t/lib/TestApp/root/test.tt
+t/lib/TestApp/root/test_alt_content_type.tt
+t/lib/TestApp/root/test_include_path/testpath.tt
+t/lib/TestApp/Template/Any.pm
+t/lib/TestApp/View/TT/AltContentType.pm
+t/lib/TestApp/View/TT/Appconfig.pm
+t/lib/TestApp/View/TT/Classconfig.pm
+t/lib/TestApp/View/TT/Encoding.pm
+t/lib/TestApp/View/TT/ExposeMethods.pm
+t/lib/TestApp/View/TT/ExposeMethodsSubclassed.pm
+t/lib/TestApp/View/TT/Includepath.pm
+t/lib/TestApp/View/TT/Includepath2.pm
+t/lib/TestApp/View/TT/Includepath3.pm
+t/lib/TestApp/View/TT/Pkgconfig.pm
+t/lib/TestApp/View/TT/Providerconfig.pm
+t/root/heart
+t/utf8.t
+xt/pod-coverage.t
+xt/pod-syntax.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

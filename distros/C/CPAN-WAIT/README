@@ -1,0 +1,95 @@
+NAME
+    CPAN::WAIT - adds commands to search a WAIT4CPAN server to the CPAN
+    `shell()'
+
+SYNOPSIS
+      perl -MCPAN -e shell
+      > wq au=wall
+      > wr 3
+      > wd 3
+      > wl 20
+      > wh
+      > wh wq
+
+DESCRIPTION
+    CPAN::WAIT adds some comands to the CPAN `shell()' to perform searches
+    on a WAIT server. It connects to a WAIT server using a simple protocoll
+    resembling NNTP as described in RFC977. It uses the WAIT::Client module
+    to handle this connection. This in turn inherits from Net::NNTP from the
+    libnet package. So you need Net::NNTP to use this module.
+
+    If no direct connection to the WAIT server is possible, the modules
+    tries to connect via your HTTP proxy (as given by the CPAN
+    configuration). Be warned though that the emulation of the stateful
+    protocol via HTTP is slow.
+
+    The variable `CPAN::WAIT::TIMEOUT' specifies the number of seconds to
+    wait for an answer from the server. The default is 20. You may want to
+    set it to some larger value if you have a slow connection.
+
+    The commands available are:
+
+    wh [command]
+        Displays a short help message if called without arguments. If you
+        provide the name of another command you will get more information on
+        this command if available. Currently only wq will be explained.
+
+    wl *count*
+        Limit the number of hits returned in a search to *count*. The limit
+        usually is set ot 10 of you don't set it.
+
+    wq *query*
+        Send a query to the server.
+
+        Here are some query examples:
+
+          information retrieval               free text query 
+          information or retrieval            same as above 
+          des=information retrieval           `information' must be in the description 
+          des=(information retrieval)         one of them in description 
+          des=(information or retrieval)      same as above 
+          des=(information and retrieval)     both of them in description 
+          des=(information not retrieval)     `information' in description and
+                                              `retrieval' not in description 
+          des=(information system*)           wild-card search
+          au=ilia                             author names may be misspelled
+
+        You can build arbitary boolean combination of the above examples.
+        Field names may be abbreviated. For further information see
+        http://ls6-www.informatik.uni-dortmund.de/CPAN
+
+        The result should look like this:
+
+          wq au=wall
+
+           1 8.039 a2p - Awk to Perl translator 
+           2 8.039 s2p - Sed to Perl translator 
+           3 8.039 perlipc - Perl interprocess communication (signals, fifos, pipes, safe subprocesses, sockets, and semaphores) 
+           4 8.039 ExtUtils::DynaGlue - Methods for generating Perl extension files 
+           5 8.039 h2xs - convert .h C header files to Perl extensions 
+           6 8.039 Sys::Syslog, openlog, closelog, setlogmask, syslog - Perl interface to the UNIX syslog(3) calls 
+           7 8.039 h2ph - convert .h C header files to .ph Perl header files 
+           8 8.039 Shell - run shell commands transparently within perl 
+           9 8.039 pl2pm - Rough tool to translate Perl4 .pl files to Perl5 .pm modules. 
+          10 8.039 perlpod - plain old documentation 
+
+    wr *hit-number*
+        Display the Record of hit number *hit-number*:
+
+          wr 1
+  
+          source          authors/id/CHIPS/perl5.003_24.tar.gz
+          headline        a2p - Awk to Perl translator 
+          size            5643
+          docid           data/perl/x2p/a2p.pod
+
+    wd *hit-number*
+        Fetches the full text from the server and runs perlpod on it. Make
+        sure that you have perlpod in your path. Also check if your perlpod
+        version can handle absolute pathes. Some older versions ironically
+        do not find a document if the full patch is given on the command
+        line.
+
+AUTHOR
+    Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de>
+

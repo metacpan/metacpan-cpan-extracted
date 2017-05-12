@@ -1,0 +1,6 @@
+To install this module, do the following
+
+	perl Makefile.PL
+	make
+	make test
+	make install

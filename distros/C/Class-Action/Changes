@@ -1,0 +1,20 @@
+Revision history for Class-Action
+
+0.4  Sat May 22 17:03:52 2010
+    - get_class_action_steps() return array ref of NS for new() and new() args
+    - setup_class_execute_and_get_class_action_steps take additional coderef for undo()
+
+0.3  Sat May  1 14:07:54 2010
+    - Add Test::Carp requirement in Build.PL and Makefile.PL for t/
+    - update overlooked version in POD
+    
+0.2  Wed Apr 28 23:23:09 2010
+    - added "starting cwd" options
+    - added exec_stack_runtime_handler() step object method support
+    - added convenience methods setup_class_execute_and_get_class_action_steps() and get_action_object() in Step.pm
+    - updated step modify methods to explicitly return step stack array on success (return; on failure) for sanity sake
+    - carp when you try to work with steps on an action that has no steps assigned yet
+    
+0.1  Thu Sep 17 08:18:46 2009
+       Initial release.
+

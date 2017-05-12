@@ -1,0 +1,23 @@
+---
+abstract: 'A Catalyst model for DBIx::ResultSet.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-DBIxResultSet
+requires:
+  Catalyst: 5.80032
+  DBIx::ResultSet: 0.16
+  Moose: 2.0007
+resources:
+  bugtracker: https://github.com/bluefeet/Catalyst-Model-DBIxResultSet/issues
+  repository: git://github.com/bluefeet/Catalyst-Model-DBIxResultSet.git
+version: 0.02

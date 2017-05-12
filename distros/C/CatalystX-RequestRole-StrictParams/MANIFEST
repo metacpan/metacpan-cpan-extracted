@@ -1,0 +1,12 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/CatalystX/RequestRole/StrictParams.pm
+t/010_sanity.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

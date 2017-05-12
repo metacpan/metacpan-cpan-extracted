@@ -1,0 +1,29 @@
+---
+abstract: 'Two way converter for TBX-Min and UTX Glossaries'
+author:
+  - 'James Hayes <james.s.hayes@gmail.com>,'
+  - 'Nathan Glenn <garfieldnate@gmail.com>'
+build_requires:
+  DateTime: 1.06
+  Exporter::Easy: 0.16
+  Path::Tiny: 0.052
+  TBX::Min: 0.05
+  Test::Base: 0.62
+  Test::LongString: 0.15
+  Test::XML: 0.08
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Convert-TBX-UTX
+provides:
+  Convert::TBX::UTX:
+    file: lib/Convert/TBX/UTX.pm
+    version: 0.032
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.032

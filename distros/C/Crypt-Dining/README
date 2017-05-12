@@ -1,0 +1,77 @@
+NAME
+    Crypt::Dining - The Dining Cryptographers' Protocol
+
+SYNOPSIS
+            my $dc = new Crypt::Dining(
+                    LocalAddr       => '123.45.6.7',
+                    Peers           => [ '123.45.6.8', ... ],
+                            );
+            my $answer = $dc->round;
+            my $answer = $dc->round("hello");
+
+DESCRIPTION
+    The dining cryptographers' protocol is documented in Bruce Schneier's
+    book as a kind of "cryptographic ouija board". It works as follows:
+
+    A number of cryptographers are dining at a circular table. At the end of
+    the meal, the waiter is summoned and asked for the bill. He replies,
+    "Thank you, sir. The bill has been paid." The cryptographers now have
+    the problem of working out whether someone at the table paid the bill,
+    or whether the NSA has paid it as some sort of veiled threat. The
+    protocol proceeds.
+
+    Each cryptographer flips a coin, and shows the result ONLY to the
+    participant on his RIGHT. Each cryptographer then compares his coin with
+    that on his LEFT, and raises his hand if they show different faces. If
+    any participant paid the bill, he "cheats" and does the opposite, that
+    is, he raises his hand if the coins show the same face. Now, the hands
+    are counted. An odd number means that someone at the table paid the
+    bill. An even number means that the NSA paid.
+
+ASSUMPTIONS AND IMPLEMENTATION
+    At most one person "cheats" at any time, otherwise the message is
+    scrambled. Detecting scrambling is only possible with multi-bit messages
+    containing a checksum.
+
+    The comparison operator described above is the XOR operator on
+    single-bit values. If the protocol is performed with multi-bit messages,
+    then the XOR is still used.
+
+WIKIPEDIA DESCRIPTION
+    The following description is copied from
+    <http://en.wikipedia.org/wiki/Dining_cryptographers_protocol> and is
+    redistributed under the GNU Free Documentation License. It is a very
+    slightly different protocol to that implemented here, but the result is
+    the same.
+
+    The dining cryptographers protocol is a method of anonymous
+    communication. It offers untraceability of both the sender and the
+    recipient.
+
+    The method is as follows: two or more cryptographers arrange themselves
+    around a circular dinner table, with menus hiding the interaction of
+    each pair of adjacent cryptographers from the rest. Each adjacent pair
+    picks a random number in private. Then each cryptographer announces
+    publicly the difference between the number on his right and the number
+    on his left, adding a message if he wants to transmit one. All
+    cryptographers then add up the publicly announced numbers. If the sum is
+    0, no one sent a message. If the sum is a valid message, one
+    cryptographer transmitted a message. If the sum is invalid, more than
+    one cryptographer tried to transmit a message; they wait a random time
+    and try again.
+
+BUGS
+    If the send_*() and recv_*() methods are overridden to use TCP sockets
+    with very large messages, deadlock may occur around the ring unless
+    something intelligent is done with select().
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Dining_cryptographers_protocol>,
+    Crypt::Chimera - another cryptographic curiosity.
+
+COPYRIGHT
+    Copyright (c) 2005 Shevek. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

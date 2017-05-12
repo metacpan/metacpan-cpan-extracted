@@ -1,0 +1,21 @@
+Build.PL
+CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Convert/Morse.pm
+Makefile.PL
+LICENSE
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE
+t/morsepm.t
+t/pod.t
+t/pod_cov.t

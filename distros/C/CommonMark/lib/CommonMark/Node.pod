@@ -1,0 +1,229 @@
+=head1 NAME
+
+CommonMark::Node - Node of the CommonMark parse tree
+
+=head1 SYNOPSIS
+
+    my $html = $node->render(
+        format => 'html',
+        safe   => 1,
+    );
+
+    my $header    = $doc->first_child;
+    my $level     = $header->get_header_level;
+    my $paragraph = $header->next;
+
+    my $link = CommonMark::Node->new(CommonMark::NODE_LINK);
+    $link->set_url('http://example.com/');
+    my $text = CommonMark::Node->new(CommonMark::NODE_TEXT);
+    $text->set_literal('link text');
+    $link->append_child($link_text);
+    $paragraph->append_child($link);
+
+    $doc->render_html;
+
+
+=head1 DESCRIPTION
+
+C<CommonMark::Node> represents a node of the parse tree.
+
+=head2 new
+
+   my $node = CommonMark::Node->new($type);
+
+Creates a new node of type C<$type>. See L</"Node types"> for a list of
+types. Note that the L<node creation functions|CommonMark/"Node creation">
+provide a more powerful interface.
+
+=head2 Rendering
+
+    my $result = $node->render(
+        format        => $string,
+        sourcepos     => $bool,    # Optional
+        hardbreaks    => $bool,    # Optional
+        safe          => $bool,    # Optional
+        width         => $int,     # Optional
+    );
+
+Convenience function to render documents. Supported formats are C<'html'>,
+C<'xml'>, C<'man'>, C<'commonmark'>, and C<'latex'>.
+
+C<sourcepos>, C<hardbreaks>, and C<safe> enable the respective render
+options.
+
+C<width> is passed to renderers that support it.
+
+    my $html  = $node->render_html( [$options] )
+    my $xml   = $node->render_xml( [$options] )
+    my $man   = $node->render_man( [$options], [$width] )
+    my $md    = $node->render_commonmark( [$options], [$width] )
+    my $latex = $node->render_latex( [$options], [$width] )
+
+These methods render the contents of the node in the respective format.
+
+C<$options> is a bit field created by ORing the following constants:
+
+    CommonMark::OPT_DEFAULT => 0
+    CommonMark::OPT_SOURCEPOS
+    CommonMark::OPT_HARDBREAKS
+    CommonMark::OPT_SAFE
+
+Render options can be imported from L<CommonMark> with tag C<opt>.
+
+    use CommonMark qw(:opt);
+
+C<$options> may be omitted and defaults to C<OPT_DEFAULT>. See the
+documentation of I<libcmark> for more details.
+
+C<SOURCEPOS> adds information about line numbers in the source file to the
+XML and HTML formats.
+
+C<HARDBREAKS> translates newlines in the input to line breaks in the output.
+This is only supported by some renderers.
+
+C<SAFE> only affects the HTML renderer. It suppresses raw HTML blocks and
+some dangerous links.
+
+C<$width> specifies the number of characters at which lines are broken.
+A value of 0 disables line wrapping. The default is 0.
+
+=head2 Accessors
+
+    # Integer values
+
+    my $int = $node->get_type;
+    my $int = $node->get_header_level;
+    my $int = $node->get_list_type;
+    my $int = $node->get_list_delim;
+    my $int = $node->get_list_start;
+    my $int = $node->get_list_tight;
+    my $int = $node->get_start_line;
+    my $int = $node->get_start_column;
+    my $int = $node->get_end_line;
+    my $int = $node->get_end_column;
+
+    $node->set_header_level($int);
+    $node->set_list_type($int);
+    $node->set_list_delim($int);
+    $node->set_list_start($int);
+    $node->set_list_tight($int);
+
+    # String values
+
+    my $string = $node->get_type_string;
+    my $string = $node->get_literal;
+    my $string = $node->get_title;
+    my $string = $node->get_url;
+    my $string = $node->get_fence_info;
+    my $string = $node->get_on_enter;
+    my $string = $node->get_on_exit;
+
+    $node->set_literal($string);
+    $node->set_title($string);
+    $node->set_url($string);
+    $node->set_fence_info($string);
+    $node->set_on_enter($string);
+    $node->set_on_exit($string);
+
+Various accessors to get and set integer and string values of a node. Not
+all values are supported by every type of node. Getters return C<0> or
+C<undef> for unsupported values. Setters die on failure.
+
+See L</"Constants"> for a list of constants used for node types, list
+types, and list delimiters.
+
+=head2 Tree traversal
+
+    my $iterator = $node->iterator;
+
+Creates a new L<CommonMark::Iterator> to walk through the descendants of
+the node.
+
+    my $next   = $node->next;
+    my $prev   = $node->previous;
+    my $parent = $node->parent;
+    my $child  = $node->first_child;
+    my $child  = $node->last_child;
+
+These methods return the respective node in tree structure.
+
+=head2 Tree manipulation
+
+    $node->unlink;
+    $node->replace($other);
+    $node->insert_before($other);
+    $node->insert_after($other);
+    $node->prepend_child($other);
+    $node->append_child($other);
+
+C<unlink> removes a node and all its descendants from the tree.
+
+C<replace> replaces C<$node> with C<$other>, unlinking C<$node>.
+
+C<insert_before> and C<insert_after> insert the C<$other> node before or
+after C<$node>. C<append_child> and C<prepend_child> append or prepend
+C<$other> to the children of C<$node>.
+
+C<$other> is unlinked before it is inserted into its new position.
+
+These methods may die on failure.
+
+=head2 Constants
+
+=head3 Node types
+
+    CommonMark::NODE_NONE => 0
+    CommonMark::NODE_DOCUMENT
+    CommonMark::NODE_BLOCK_QUOTE
+    CommonMark::NODE_LIST
+    CommonMark::NODE_ITEM
+    CommonMark::NODE_CODE_BLOCK
+    CommonMark::NODE_HTML_BLOCK
+    CommonMark::NODE_CUSTOM_BLOCK
+    CommonMark::NODE_PARAGRAPH
+    CommonMark::NODE_HEADING
+    CommonMark::NODE_THEMATIC_BREAK
+    CommonMark::NODE_TEXT
+    CommonMark::NODE_SOFTBREAK
+    CommonMark::NODE_LINEBREAK
+    CommonMark::NODE_CODE
+    CommonMark::NODE_HTML_INLINE
+    CommonMark::NODE_CUSTOM_INLINE
+    CommonMark::NODE_EMPH
+    CommonMark::NODE_STRONG
+    CommonMark::NODE_LINK
+    CommonMark::NODE_IMAGE
+
+Node types can be imported from L<CommonMark> with tag C<node>.
+
+    use CommonMark qw(:node);
+
+=head3 List types
+
+    CommonMark::NO_LIST => 0
+    CommonMark::BULLET_LIST
+    CommonMark::ORDERED_LIST
+
+List types can be imported from L<CommonMark> with tag C<list>.
+
+    use CommonMark qw(:list);
+
+=head3 Delimiter types for ordered lists
+
+    CommonMark::NO_DELIM => 0
+    CommonMark::PERIOD_DELIM
+    CommonMark::PAREN_DELIM
+
+Delimiter types can be imported from L<CommonMark> with tag C<delim>.
+
+    use CommonMark qw(:delim);
+
+=head1 COPYRIGHT
+
+This software is copyright (C) by Nick Wellnhofer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

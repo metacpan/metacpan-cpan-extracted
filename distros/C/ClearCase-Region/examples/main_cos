@@ -1,0 +1,115 @@
+#!/usr/local/bin/perl -w  
+
+#
+#	main_cos
+#
+#	usage:  main_cos [ -subregion ]
+#
+#	Generate a list of files that have reserved check outs on the trunk.
+#
+
+use strict;
+
+use Cwd;
+use Getopt::Long;
+
+use Log::Log4perl;
+use ClearCase::Region;
+
+sub mainprog
+{
+	use strict;
+	use Carp;
+
+	my($region			) = "";
+	my($subregion		) = "";
+	my($subregion_name	) = undef;
+	my(@subregions		) = ();
+	my($i				) = 0;
+	my(@subregion_flags	) = ();
+	my($retval			) = 0;
+	my($vob				) = "";
+	my($vobdir			) = "";
+	my(@vobs			) = ();
+	my(%options			) = ();
+	my($logger			) = "";
+	my($sum				) = 0;
+	my($flg				) = 0;  
+	my($configFile		) = "";
+	my($configFile_found) = 0;
+	my($dir				) = "";
+
+	foreach $dir (@INC) {
+		if ( -f "$dir/main_cos.conf" ) {
+			$configFile = "$dir/main_cos.conf";
+			$configFile_found = 1;
+			last;
+		}
+	}
+	croak("Error: main_cos.conf not found in any \@INC directory\n")
+		unless $configFile_found;
+	
+	Log::Log4perl->init($configFile);
+	$logger = Log::Log4perl->get_logger("Main");
+
+	#
+	#	Add subregions to options hash
+	#
+	@subregions = Region->subregions();
+	if ($#subregions < 0) {
+			$logger->error("No subregions are defined.\n");
+			exit 1;
+	}
+	$i = 0;
+	foreach $subregion (@subregions) {
+		$subregion_flags[$i] = 0;
+		$options{$subregion} = \$subregion_flags[$i];
+		$i++;
+	}
+
+	$retval = GetOptions(%options);
+	if ($#subregions == 0) {
+		$subregion_name = $subregions[0];
+	}
+	else {
+		#
+		# Determine if the subregion was set on the command line
+		# 
+		$i = 0;
+		foreach $flg (@subregion_flags) {
+			$sum += $flg;
+			if ( $flg > 0 ) {
+				$subregion_name = $subregions[$i];
+			}
+			$i++;
+		}
+	
+		#
+		# Determine if more than one subregion was set on command line
+		#
+		if ($sum > 1) {
+			$logger->error("only one region option can be specified.\n");
+			exit 1;
+		}
+
+		#
+		# Prompt if no subregion was given and more than one exist
+		#
+		$region = Region->new(undef);
+		$subregion_name = $region->subregion();
+	}
+
+	@vobs = Region->vobs($subregion_name);
+	$vobdir = Region->vobdir($subregion_name);
+	foreach $vob (@vobs) {
+		chdir("${vobdir}/${vob}");
+		print "\nFor ${vob}, reserved Check outs on the trunk are:\n\n";
+		system("cleartool lsco -brtype main -recurse |grep '(reserve'");
+	}
+}
+
+###############################################################################
+#	Main
+###############################################################################
+
+mainprog;

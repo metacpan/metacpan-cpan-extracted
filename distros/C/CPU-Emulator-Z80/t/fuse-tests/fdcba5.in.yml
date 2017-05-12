@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 160
+    - 165
+  61761:
+    - 68
+name: fdcba5
+registers:
+  AF: 28272
+  AF_: 0
+  BC: 47085
+  BC_: 0
+  DE: 8909
+  DE_: 0
+  HL: 44764
+  HL_: 0
+  I: 0
+  IX: 18142
+  IY: 61857
+  PC: 0
+  R: 0
+  SP: 0

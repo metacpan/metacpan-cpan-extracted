@@ -1,0 +1,13 @@
+<&|/_elements/wrapper, title => 'Create a new repository'&>
+<h1>Create a repository</h1>
+<h2>(Are you sure you want to do this?)</h2>
+<% Jifty->web->form->start %>
+% foreach my $arg($create->argument_names) {
+<%$create->form_field($arg)%>
+% }
+<% Jifty->web->form->submit(label=>'Go') %>
+<% Jifty->web->form->end %>
+</&>
+<%init>
+my $create = Jifty->web->new_action(class => 'CreateRepository', moniker => 'newrepo');
+</%init>

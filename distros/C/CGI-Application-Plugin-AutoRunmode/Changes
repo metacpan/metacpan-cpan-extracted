@@ -1,0 +1,80 @@
+Revision history for Perl extension CGI::Application::Plugin::AutoRunmode.
+
+0.18  Fri Feb 18 2011
+    - add support for multiple directories in FileDelegate, suggested by Jiří Pavlovský
+        (see CPAN RT #65695: support multiple directories in FileDelegate)
+
+0.17  Fri Mar 21 2010
+    - fix support for Apache2::Reload (the changes in 0.16 did not work)
+        (see CPAN RT #35987: StartRunmode dies with Apache2::Reload)
+
+0.16  Sat Feb 14 2009
+    - :ErrorRunmode is no longer registered as a "real" runmode
+        (see CPAN RT #36706: [patch] ErrorRunmode should not create a run mode)
+    - support for Apache2::Reload
+        (see CPAN RT #35987: StartRunmode dies with Apache2::Reload)
+
+0.15  Sun Dec 17 2006
+    - added :ErrorRunmode (proposed by Robert Hicks)
+
+0.14  Sun May 21 2006
+	- fix for the Attribute::Handlers/mod_perl problems
+	  (stop relying on code being executed in the CHECK phase,
+	  which is problematic in mod_perl, use BEGIN instead)
+
+0.13  Sat Apr 8 2006
+    - put the :Runmodes directly in the run_modes map 
+    	(only for CGI::App >= 4 and using Attribute::Handlers)
+	- make FileDelegate compatible with Taint mode
+
+0.12  Thu Nov 3 2005
+    - support for multiple delegates, based on a patch submitted by 
+      Larry Leszczynski
+
+0.11  Tue Oct 18 2005
+    - applied a patch by Cees Hek to fix problems with subclassing introduced
+      with 0.10
+
+0.10  Sat Oct 15 2005
+	- use Attribute::Handlers when available to improve interoperability
+	  with other modules that want to define attributes (thanks to Cees Hek
+	  for feedback on this)
+
+0.09  Wed Sep 21 2005
+    - is_auto_runmode (proposed by Michael Graham for interoperability 
+      with CAP::Forward)
+
+0.08  Sat Jul 17 2005
+	- :StartRunmode
+	- attribute names are now case-insensitive
+	- documentation patches (thanks to Mark Stosberg)
+
+0.07  Sat Jun 18 2005
+	- removed Mac OS X meta data files that confused the build system
+		(see http://perlmonks.org/?node_id=467916 )
+	- changed links to CGI::App wiki in the documentation
+
+0.06  Wed Jun 15 2005
+    - replaced CGI::Application::Callbacks with official hook 
+        system provided by CGI::App version 4
+    - removed Perl 5.8.1 requirement
+
+0.05  Thu Mar 10 2005
+	- no longer install Runmode attribute handler into 
+		CGI::App, but export into caller's namespace
+	- added FileDelegate
+		
+0.04  Fri Mar 04 2005 
+	- security fix: disallow non-word characters in runmode name
+
+0.03  Thu Mar 03 2005
+	- support for runmode delegates
+	
+0.02  Fri Oct 29 2004
+	- support for CGI::Application::Callbacks
+	- support for prerun_mode()
+
+0.01  Sat Oct 16 18:15:03 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n CGI::Application::Plugin::AutoRunmode
+

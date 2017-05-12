@@ -1,0 +1,35 @@
+---
+abstract: 'Weather Forecast Charts'
+author:
+  - 'Mateu X Hunter <hunter@missoula.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chart-Weather-Forecast
+requires:
+  Chart::Clicker: 0
+  Chart::Clicker::Data::DataSet: 0
+  Chart::Clicker::Data::Range: 0
+  Chart::Clicker::Data::Series: 0
+  Chart::Clicker::Drawing::ColorAllocator: 0
+  Data::Dumper::Concise: 0
+  Geometry::Primitive::Circle: 0
+  Graphics::Color::RGB: 0
+  Graphics::Primitive::Font: 0
+  List::Util: 0
+  Moose: 0
+  MooseX::Types::Path::Class: 0
+  Number::Format: 0
+  Path::Class: 0
+  namespace::autoclean: 0
+  strictures: 1
+version: 0.04

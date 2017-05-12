@@ -1,0 +1,116 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.005"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Cache-Moustache>;
+	doap:created         "2012-05-08"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/Cache-Moustache>;
+	doap:homepage        <https://metacpan.org/release/Cache-Moustache>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "Cache-Moustache";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-005>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-cache-moustache>;
+	];
+	doap:shortdesc       "you'd have to be insane to use a module called Cache::Moustache, wouldn't you?".
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "The Salvador Dali";
+	dc:issued            "2012-05-09"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "The Fu-Manchu";
+	dc:issued            "2012-05-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Cache::CacheTester no longer requires Cache::Cache."@en;
+		], [
+			a doap-changeset:Bugfix, doap-changeset:Documentation;
+			rdfs:label "The 'empty' method erroneously asserted that its return value was 0 or 1.";
+		], [
+			a doap-changeset:Addition, doap-changeset:Documentation;
+			rdfs:label "Mention that keys beginning '~~~~' will not have their values stored.";
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "The Pencil";
+	dc:identifier        "Cache-Moustache-0.003"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "The Handlebar";
+	dc:identifier        "Cache-Moustache-0.004"^^xsd:string;
+	dc:issued            "2014-09-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix repo link.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Cache-Moustache/v_0-005>
+	a                    doap:Version;
+	rdfs:label           "The Imperial";
+	dc:identifier        "Cache-Moustache-0.005"^^xsd:string;
+	dc:issued            "2014-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Declare explicit dependency on Perl 5.005.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Fill in missing moustache styles in changelog.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Copyright 2014.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Avoid defined(@array) in bundled Cache::CacheTester.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Cache-Moustache-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+

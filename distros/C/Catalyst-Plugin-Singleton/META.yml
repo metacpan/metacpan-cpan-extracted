@@ -1,0 +1,24 @@
+---
+abstract: 'DEPRECATED - Singleton to context'
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.39
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Singleton
+provides:
+  Catalyst::Plugin::Singleton:
+    file: lib/Catalyst/Plugin/Singleton.pm
+    version: 0.2
+requires:
+  MRO::Compat: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.2

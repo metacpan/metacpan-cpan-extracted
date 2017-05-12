@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML><HEAD><TITLE>Timesheet</TITLE>
+</HEAD><BODY><H1>Timesheet details on : Wed Dec 30 11:10:49 1998</H1><BR>  
+
+<BR>
+<FORM METHOD="POST" ACTION="example.pl" ENCTYPE="application/x-www-form-urlencoded">
+
+<INPUT TYPE="hidden" NAME="/timesheet/employee/name/forename" VALUE="Matt">
+<INPUT TYPE="hidden" NAME="../surname" VALUE="Sergeant">
+<INPUT TYPE="hidden" NAME="../department" VALUE="Development IT">
+
+<INPUT TYPE="hidden" NAME="/timesheet/rules/rule" VALUE="NextRule1">
+<INPUT TYPE="hidden" NAME="../rule" VALUE="NextRule2">
+
+<BlockQuote>
+
+<TABLE BORDER>
+	<CAPTION>Timesheet entry form</CAPTION>
+		<TR ALIGN="CENTER" VALIGN="TOP">
+			<TH>Project name</TH> <TH> sunday </TH> <TH> monday </TH> <TH> tuesday </TH> <TH> wednesday </TH> <TH> thursday </TH> <TH> friday </TH> <TH> saturday </TH><TH>Sub total</TH> 
+		</TR>
+		<TR ALIGN="CENTER" VALIGN="TOP">
+			<TD><INPUT TYPE="text" NAME="/timesheet/projects/project/@Name" VALUE="Consultancy" SIZE=20 MAXLENGTH=30></TD>
+			<TD><INPUT TYPE="text" NAME="sunday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="monday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="tuesday" VALUE="7.75" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="wednesday" VALUE="8.75" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="thursday" VALUE="7.75" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="friday" VALUE="6.5" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="saturday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD> 30.75 </TD>
+		</TR>
+		<TR ALIGN="CENTER" VALIGN="TOP">
+			<TD><INPUT TYPE="text" NAME="/timesheet/projects/project/@Name" VALUE="Holiday" SIZE=20 MAXLENGTH=30></TD>
+			<TD><INPUT TYPE="text" NAME="sunday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="monday" VALUE="7.75" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="tuesday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="wednesday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="thursday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="friday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD>
+			<TD><INPUT TYPE="text" NAME="saturday" VALUE="0.00" SIZE=5 MAXLENGTH=5></TD><TD> 7.75 </TD> <TR ALIGN="CENTER" VALIGN="TOP"><TD> <B> Summary </B> </TD> <TD> <B> 0 </B> </TD>  <TD> <B> 7.75 </B> </TD>  <TD> <B> 7.75 </B> </TD>  <TD> <B> 8.75 </B> </TD>  <TD> <B> 7.75 </B> </TD>  <TD> <B> 6.5 </B> </TD>  <TD> <B> 0 </B> </TD> <TD> <B> 38.5 </B> </TD> <TR ALIGN="CENTER" VALIGN="TOP"><TD> Basic hours </TD><TD> 0.00 </TD><TD> 7.75 </TD><TD> 7.75 </TD><TD> 7.75 </TD><TD> 7.75 </TD><TD> 6.50 </TD><TD> 0.00 </TD>
+			<TD> 37.5 </TD>
+		</TR>
+		<TR ALIGN="CENTER" VALIGN="TOP">
+			<TD> Overtime </TD> 
+			<TD> 0 </TD>  
+			<TD> 0 </TD>  
+			<TD> 0 </TD>  
+			<TD> 1 </TD>  
+			<TD> 0 </TD>  
+			<TD> 0 </TD>  
+			<TD> 0 </TD> 
+			<TD> 1 </TD>
+		</TR>
+	</TABLE> 
+<BR><BR>
+<INPUT TYPE="submit" NAME=".submit"><INPUT TYPE="reset">
+</FORM>
+</BODY>
+</HTML>

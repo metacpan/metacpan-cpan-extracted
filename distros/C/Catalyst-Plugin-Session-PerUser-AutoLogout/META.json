@@ -1,0 +1,66 @@
+{
+   "abstract" : "Log a user out of other sessions",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-Session-PerUser-AutoLogout",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session::PerUser" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::Session::PerUser::AutoLogout" : {
+         "file" : "lib/Catalyst/Plugin/Session/PerUser/AutoLogout.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout/issues"
+      },
+      "homepage" : "https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout.git",
+         "web" : "https://github.com/Altreus/Catalyst-Plugin-Session-PerUser-AutoLogout"
+      }
+   },
+   "version" : "0.001",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>"
+   ]
+}
+

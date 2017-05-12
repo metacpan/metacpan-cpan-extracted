@@ -1,0 +1,3 @@
+[% META nowrap = 1 %]
+{"success": [% success %]}
+

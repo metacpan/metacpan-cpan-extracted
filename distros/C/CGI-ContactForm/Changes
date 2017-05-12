@@ -1,0 +1,134 @@
+Version history for CGI::ContactForm.
+
+v1.50 (Mar 3, 2009)
+    MIME encoding (quoted-printable) of bytes representing non-ASCII
+    characters.
+
+    Max line length (66) refers to characters, not bytes. This feature
+    only works if a recent version of the Encode module has been
+    installed.
+
+v1.44 (Jan 28, 2009)
+    Another measure to prevent abuse: Only a limited number of
+    messages per hour (5 by default) are allowed to be sent from
+    the same host.
+
+    Default spamfilter permits max three URLs.
+
+v1.43 (Jan 9, 2009)
+    User-Agent and Referer message headers added to make it easier to
+    prevent automated spam submissions.
+
+    Syntax check of the 'spamfilter' argument.
+
+v1.42 (Jun 24, 2007)
+    New argument: 'spamfilter' - allows you to use a Perl regex that
+    is applied to the body of the message, aiming to prevent probable
+    automated spam from being sent.
+
+v1.41 (Nov 24, 2006)
+    Bugfix: Faulty logic in the spam prevention feature corrected.
+
+v1.40 (Nov 21, 2006)
+    Feature to make automated submissions by spam robots more
+    difficult.
+
+    New argument: 'nocopy' - for disabling the sender copy.
+
+v1.31 (Sep 27, 2006)
+    Critical bug fixed: A certain kind of message body data will no
+    longer cause ContactForm.pm to enter into an infinite loop.
+
+v1.30 (Feb 11, 2005)
+    Function copied from Text::Flowed, which module no longer needs to
+    be loaded.
+
+    Email validation modified to conform better with RFC 822.
+
+v1.22 (Jul 20, 2004)
+    File scoped variables discarded.
+
+v1.21 (Mar 14, 2004)
+    Default value 'localhost' for the 'smtp' argument.
+
+v1.20 (Jan 12, 2004)
+    Creation of the module CGI::ContactForm::MHonArc for interacting
+    with a MHonArc mail archive.
+
+    Use of File::Basename and File::Spec for increased portability.
+
+    New argument: 'bouncetosender' - for directing bounce messages to
+    the sender instead of the recipient.
+
+v1.18 (Oct 18, 2003)
+    Improved documentation of mail server authentication.
+
+v1.17 (Oct 8, 2003)
+    New argument: 'subject' - for setting a default subject.
+
+    The file "Sender.config" added to the distribution to facilitate
+    authentication to a mail server.
+
+v1.16 (Sep 13, 2003)
+    Mail::Sender errors captured also with the most recent Mail::Sender
+    versions.
+
+v1.15 (Aug 24, 2003)
+    Referer check removed, since it made the script fail with certain
+    browsers while its security value was limited.
+
+v1.14 (Jul 10, 2003)
+    Handling of error messages improved.
+
+v1.13 (Jul 1, 2003)
+    Code cleanup.
+
+v1.12 (Apr 11, 2003)
+    References to the form data for saving memory.
+
+v1.11 (Apr 6, 2003)
+    Markup for 'erroralert' modified for greater flexibility when
+    editing the form template.
+
+    Preparations for mod_perl.
+
+v1.10 (Apr 4, 2003)
+    Template based customization added as an option.
+
+v1.03 (Mar 30, 2003)
+    CGI.pm used for parsing form data.
+
+    New argument: 'maxsize' - for limiting the message size.
+
+v1.02 (Feb 16, 2003)
+    DOCTYPE declaration changed to XHTML 1.1.
+
+v1.01 (Feb 13, 2003)
+    CSS validation error corrected.
+
+v1.0 (Feb 12, 2003)
+    Additional arguments added that makes it possible to have the form
+    display non-English text.
+
+    Warnings enabled.
+
+v0.4 (Feb 9, 2003)
+    Error alert message added. Also "ContactForm.css" was modified for
+    this reason.
+
+    Simple test script included in the distribution.
+
+v0.3 (Feb 7, 2003)
+    Check of email syntax modified (hopefully now closer to RFC 822).
+
+    Better structured code.
+
+v0.2 (Feb 5, 2003)
+    Referer check in order to only accept data input from the generated
+    form.
+
+    Improved email validation.
+
+v0.1 (Feb 3, 2003)
+    Initial release.
+

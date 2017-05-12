@@ -1,0 +1,26 @@
+Revision history for Perl module Compress::Huffman
+
+0.05 2016-09-21
+
+- xl works correctly for non-probability distributions
+
+0.04 2016-08-24
+
+- Add save and load methods
+
+0.03 2016-02-05
+
+- Check individual inputs are positive
+- Improve documentation
+
+0.02 2016-02-04
+
+- Implement encode and decode
+- Add encode_array method
+- Add table method
+- Add documentation examples
+
+0.01 2016-02-04
+
+- Initial version
+

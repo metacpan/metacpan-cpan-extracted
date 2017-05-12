@@ -1,0 +1,44 @@
+#!/usr/local/perl5.002_01/bin/perl
+
+use strict;
+use Convert::UU 'uudecode';
+die "Usage: $0 file\n" unless @ARGV==1;
+open F, $ARGV[0] or die "Couldn't open $ARGV[0]: $!";
+my($uudecoded_string,$file,$mode) = uudecode(\*F);
+open F, ">$file" or die "Can't open >$file: $!";
+binmode(F);
+print F $uudecoded_string;
+close F;
+chmod oct($mode), $file;
+
+__END__
+
+=head1 NAME
+
+ puudecode - perl replacement for uudecode
+
+=head1 SYNOPSIS
+
+ puudecode inputfile
+
+=head1 DESCRIPTION
+
+Uudecode reads a uuencoded inputfile and writes the decoded string to
+the file named in the uuencoded string. It changes the permissions to
+the mode given in the uuencoded string.
+
+=head1 BUGS
+
+This implementation is much slower than most uudecode programs written
+in C. Its primary intention is to allow quick testing of the
+underlying Convert::UU module.
+
+=head1 SEE ALSO
+
+puuencode(1), Convert::UU(3)
+
+=head1 AUTHOR
+
+Andreas Koenig E<lt>andreas.koenig@anima.deE<gt>
+
+=cut

@@ -1,0 +1,9 @@
+2005-01-29 Duane Hinkley <dlhinkley@homeip.net>
+	Minor change to version assignement syntax. 
+
+2005-01-29 Duane Hinkley <dlhinkley@homeip.net>
+	Changed SignedEmailCertificate method to elimiate a warning message when it tries to detect if a filename or certificate was provided to the method. 
+
+2005-01-29 Duane Hinkley <dlhinkley@homeip.net>
+	Changed tmp file syntax to make more friendly with some ISP temp file access restrictions.  Thanks to for E. v. Pappenheim for providing the patch. 
+

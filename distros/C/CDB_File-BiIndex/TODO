@@ -1,0 +1,3 @@
+We should rewrite the CDB_File module so that we can seek into the
+middle of the database and then keep going.  E.g. find all words
+starting with `run'.

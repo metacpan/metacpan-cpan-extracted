@@ -1,0 +1,58 @@
+{
+   "abstract" : "Catalyst View Adaptor for Template::Pure",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-View-Template-Pure",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.90100",
+            "File::Spec" : "0",
+            "HTTP::Status" : "0",
+            "Mojo::DOM58" : "1.000",
+            "Scalar::Util" : "0",
+            "Template::Pure" : "0.031"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.90100",
+            "Catalyst::Test" : "0",
+            "DateTime" : "0",
+            "File::Spec" : "0",
+            "Mojo::DOM58" : "1.000",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Catalyst-View-Template-Pure/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Catalyst-View-Template-Pure",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Catalyst-View-Template-Pure.git",
+         "web" : "https://github.com/jjn1056/Catalyst-View-Template-Pure"
+      }
+   },
+   "version" : "0.017",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

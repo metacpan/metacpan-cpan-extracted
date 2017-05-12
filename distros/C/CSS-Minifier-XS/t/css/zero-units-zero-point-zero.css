@@ -1,0 +1,10 @@
+/* "zero point zero" can be expressed without a unit */
+p.in  { width: 0.0in }
+p.cm  { width: 0.0cm }
+p.mm  { width: 0.0mm }
+p.pt  { width: 0.0pt }
+p.pc  { width: 0.0pc }
+p.px  { width: 0.0px }
+p.em  { width: 0.0em }
+p.ex  { width: 0.0ex }
+p.pct { width: 0.0% }

@@ -1,0 +1,38 @@
+[% 
+    # generic search result template
+    IF (! fields.defined );
+        SET fields = [];
+        FOREACH f = c.controller.field_names(c);
+            NEXT IF form.field(f).is_button;
+            fields.push(f);
+        END;
+    END;
+    
+    DEFAULT rows        = results.results;
+    DEFAULT base_uri    = c.uri_for('');
+
+
+%]
+<div id="list">
+
+ <table>
+  <tr>
+   [% FOREACH field = fields %]
+    <th>[% field | ucfirst %]</th>
+   [% END %]
+  </tr>
+  [% SET count = 0;
+     FOREACH r = rows;
+       count = count + 1;
+   %]
+   <tr [% IF (count % 2) %]class="alt"[% END %]>
+   [% FOREACH field = fields %]
+    <td><a 
+    href="[% base_uri %]/[% c.controller.make_primary_key_string(r) %]"
+    >[% r.$field %]</a></td>
+   [% END %]
+   </tr>
+  [% END %]
+ </table>
+ 
+</div>

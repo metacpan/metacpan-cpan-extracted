@@ -1,0 +1,56 @@
+---
+abstract: 'Generator module for the CPAN Index Database'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  Test::More: 0.42
+  URI::file: 4.20
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CPANDB::Generator
+name: CPANDB-Generator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Algorithm::Dependency: 1.108
+  Algorithm::Dependency::Source::DBI: 1.06
+  CPAN::Mini::Visit: 0.11
+  CPAN::SQLite: 0.197
+  DBD::SQLite: 1.25
+  DBI: 1.608
+  File::HomeDir: 0.86
+  File::Path: 2.07
+  File::Remove: 1.42
+  File::Spec: 3.30
+  File::Temp: 0.21
+  File::pushd: 1.00
+  LWP::UserAgent: 5.819
+  ORDB::CPANMeta::Generator: 0.10
+  ORDB::CPANTesters: 0.09
+  ORDB::CPANUploads: 0.04
+  Object::Tiny: 1.06
+  Params::Util: 1.00
+  Parse::CPAN::Ratings: 0.33
+  Probe::Perl: 0.01
+  Process: 0.26
+  Process::Delegatable: 0.26
+  Process::Storable: 0.26
+  Time::Elapsed: 0.26
+  URI: 1.37
+  Xtract::Publish: 0.10
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/CPANDB-Generator
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/CPANDB-Generator
+version: 0.19

@@ -1,0 +1,39 @@
+#########################
+#        TODO           #
+#                       #
+# (no particular order) #
+#########################
+
+* feedback from cpan-testers-discuss
+
+===> Add to cpantesters wiki <===
+
+* use accessor/mutator methods for the package vars...
+    not necessary?? can now be set from start(safer=>{})
+
+* POD notes:
+  + levels of test reporting
+
+* better coverage
+
+##############
+COVERAGE STATS
+##############
+
+*** v0.04 ***
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+.../Reporter/Smoker/Safer.pm   92.2   61.8   55.6  100.0  100.0  100.0   84.6	# 137/162
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+cover -test
+chmod go+rx cover_db
+
+
+export HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,^t/
+cover -delete
+make test
+cover --outputfile=index.html
+chmod go+rx cover_db
+

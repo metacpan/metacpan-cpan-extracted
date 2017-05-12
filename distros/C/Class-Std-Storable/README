@@ -1,0 +1,35 @@
+Class-Std-Storable version 0.0.1
+
+An "inside-out" class builder based on Class::Std that adds the ability to
+serialize the objects.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Class::Std
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Luke Meyer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

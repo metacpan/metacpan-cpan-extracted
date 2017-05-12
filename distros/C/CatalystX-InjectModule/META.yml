@@ -1,0 +1,42 @@
+---
+abstract: 'Inject modules in Catalyst application'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-InjectModule
+requires:
+  Catalyst: '5.9'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Plugin::ConfigLoader: '0.34'
+  Catalyst::Plugin::EnableMiddleware: '0'
+  Catalyst::Plugin::Static::Simple: '0.33'
+  CatalystX::SimpleLogin: '0.18'
+  Class::Load: '0.23'
+  DBIx::Class::DateTime::Epoch: '0.10'
+  DBIx::Class::EncodedColumn: '0'
+  DBIx::Class::Fixtures: '1.001036'
+  DBIx::Class::Migration: '0'
+  DBIx::Class::TimeStamp: '0.14'
+  Data::Clone: '0'
+  Dependency::Resolver: '0.07'
+  Devel::InnerPackage: '0.4'
+  File::Path: '2.09'
+  List::MoreUtils: '0.415'
+  Moose: '2.1405'
+  MooseX::NonMoose: '0.26'
+  Term::ANSIColor: '4.05'
+  YAML: '1.15'
+  namespace::autoclean: '0.28'
+version: '0.12'

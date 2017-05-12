@@ -1,0 +1,17 @@
+[%# This page displays a list of all node titles and links to their pages
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>[% site_name %] - Node List</h1>
+
+<p><a href="[% cgi_url %]?action=show_all_nodes">Show content of all
+nodes on one page</a>.</p>
+
+<ul>
+  [% FOREACH node = nodes %]
+     <li><a href="[% cgi_url %]?node=[% node %]">[% node %]</a></li>
+  [% END %]
+</ul>
+
+[% INCLUDE footer.tt %]

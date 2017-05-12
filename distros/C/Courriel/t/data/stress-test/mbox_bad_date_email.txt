@@ -1,0 +1,24 @@
+From perl5-porters@perl.org  Wed Jun 7 20:08:37 2000
+Received: (qmail 5096 invoked by uid 511); 7 Jun 2000 20:08:37 -0000
+Received: perl5-porters@perl.org
+Subject: perl5-porters@perl.org
+To: perl5-porters@perl.org
+Delivered-To: perl5-porters@perl.org
+Delivered-To: mailing list perl5-porters@perl.org
+Organization: perl5-porters@perl.org
+Date: perl5-porters@perl.org
+Message-ID: perl5-porters@perl.org
+From: perl5-porters@perl.org
+X-Errors-To: richard@perl.org
+X-Mailer: perl5-porters@perl.org
+X-Perlbug: perlbug@perl.org
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Newsgroups: perl.perl5.porters
+Path: nntp.perl.org
+Return-Path: <richard@tmtowtdi.perl.org>
+Xref: nntp.perl.org perl.perl5.porters:13469
+X-JNN-List-Post: <mailto:perl5-porters@perl.org>
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl5.porters:13469
+X-JNN-Orig-Date: perl5-porters@perl.org
+
+perl

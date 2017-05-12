@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/Model.pm
+INSTALL
+lib/Catalyst/Helper/Model/S3.pm
+lib/Catalyst/Model/S3.pm
+MANIFEST
+t/00.load.t
+t/01.functionality.t
+t/02.perlcritic.t
+t/03.pod.t
+t/04.pod-coverage.t
+t/lib/TestApp/Model/S3.pm
+t/lib/TestApp.pm
+Makefile.PL
+README
+META.yml

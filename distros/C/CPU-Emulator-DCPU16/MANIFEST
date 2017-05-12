@@ -1,0 +1,26 @@
+bin/dcpu16
+Build.PL
+Changes
+examples/alphabet.dasm
+examples/simple.dasm16
+examples/simple.do
+examples/spec.dasm
+examples/spec.do
+lib/CPU/Emulator/DCPU16.pm
+lib/CPU/Emulator/DCPU16/Assembler.pm
+lib/CPU/Emulator/DCPU16/Device.pm
+lib/CPU/Emulator/DCPU16/Device/Console.pm
+lib/CPU/Emulator/DCPU16/Disassembler.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+t/00_use.t
+t/01_assemble.t
+t/02_run.t
+t/03_disassemble.t
+t/04_device.t
+t/pod.t
+t/pod_coverage.t
+TODO

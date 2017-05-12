@@ -1,0 +1,31 @@
+Revision history for Perl extension Class::ObjectTemplate.
+
+0.6 Mon Feb 25 14:34:48 MST 2002
+	- Fixed a deep inheritance issue.
+	- added internals documentation
+	- added more user documentation
+
+0.5  Mon Jan  7 14:17:32 MST 2002
+	- added README to MANIFEST
+	- fixed bug that over-rode method if an attribute was defined
+	  with the same name 
+	- now has use strict
+
+0.4  Sun Jan 14 10:14:54 MST 2001
+        - added README
+
+0.3  Sat Jan 13 17:07:54 MST 2001
+        - added POD
+
+0.2  Sat Jan 13 17:07:54 MST 2001
+        - Fixed inheritance bug
+	- changed free list to be a stack
+	- added more verbose output
+
+0.1  Sat Jan 13 17:07:54 MST 2001
+	- version checked in to CPAN by jason@openinformatics.com.
+	- all original code (with new namespace, Class::ObjectTemplate)
+	- added test.pl (which has 4 tests which fail), Changes,
+	  Makefile.PL, MANIFEST
+
+

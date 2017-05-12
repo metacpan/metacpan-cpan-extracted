@@ -1,0 +1,590 @@
+﻿=encoding UTF-8
+
+=head1 NAME
+
+Catalyst::Plugin::I18N::Manual - (Draft) I18N and L10N with Catalyst and Template Toolkit.
+
+=head1 OUTLINE
+
+    Prerequisites:
+     - perl >= 5.8.0
+     - Catalyst >= 5.33
+     - Catalyst::Plugin::I18N >= 0.04
+     - Catalyst::Plugin::Unicode >= 0.2
+     - Catlayst::View::TT && Template-Toolkit >= 2.14
+     - GNU gettext utilities
+     - An editor that understands UTF-8 and Byte Order Mark (BOM)
+
+    $ catalyst.pl MyApp
+    created "MyApp"
+    created "MyApp/script"
+    created "MyApp/lib"
+    created "MyApp/root"
+    created "MyApp/root/static"
+    created "MyApp/root/static/images"
+    created "MyApp/t"
+    created "MyApp/lib/MyApp"
+    created "MyApp/lib/MyApp/Model"
+    created "MyApp/lib/MyApp/View"
+    created "MyApp/lib/MyApp/Controller"
+    created "MyApp/lib/MyApp.pm"
+    created "MyApp/Makefile.PL"
+    created "MyApp/README"
+    created "MyApp/Changes"
+    created "MyApp/t/01app.t"
+    created "MyApp/t/02pod.t"
+    created "MyApp/t/03podcoverage.t"
+    created "MyApp/root/static/images/catalyst_logo.png"
+    created "MyApp/root/static/images/btn_120x50_built.png"
+    created "MyApp/root/static/images/btn_120x50_built_shadow.png"
+    created "MyApp/root/static/images/btn_120x50_powered.png"
+    created "MyApp/root/static/images/btn_120x50_powered_shadow.png"
+    created "MyApp/root/static/images/btn_88x31_built.png"
+    created "MyApp/root/static/images/btn_88x31_built_shadow.png"
+    created "MyApp/root/static/images/btn_88x31_powered.png"
+    created "MyApp/root/static/images/btn_88x31_powered_shadow.png"
+    created "MyApp/root/favicon.ico"
+    created "MyApp/script/myapp_cgi.pl"
+    created "MyApp/script/myapp_fastcgi.pl"
+    created "MyApp/script/myapp_server.pl"
+    created "MyApp/script/myapp_test.pl"
+    created "MyApp/script/myapp_create.pl"
+
+    $ cd MyApp
+    $ vim lib/MyApp.pm
+
+    use Catalyst qw/-Debug I18N Unicode/;
+    
+    sub begin : Private {
+        my ( $self, $c ) = @_;
+        
+        my $locale = $c->request->param('locale');
+        
+        $c->response->headers->push_header( 'Vary' => 'Accept-Language' );  # hmm vary and param?
+        $c->languages( $locale ? [ $locale ] : undef );
+    }
+
+    sub default : Private {
+        my ( $self, $c ) = @_;
+
+        my $name = $c->request->param('name') || $c->loc('Guest');
+
+        $c->response->content_type('text/plain; charset=utf-8');
+        $c->response->body( $c->loc( 'Welcome [_1]!', $name ) );
+    }
+
+    $ mkdir lib/MyApp/I18N
+    $ xgettext.pl --output=lib/MyApp/I18N/messages.pot --directory=lib/
+    $ ls lib/MyApp/I18N/
+    messages.pot
+
+    $ msginit --input=lib/MyApp/I18N/messages.pot --output=lib/MyApp/I18N/sv.po --locale=sv
+    Created lib/MyApp/I18N/sv.po.
+
+    $ vim lib/MyApp/I18N/sv.po
+
+    "Content-Type: text/plain; charset=utf-8\n"
+
+    #: lib/MyApp.pm:50
+    msgid "Guest"
+    msgstr "Gäst"
+
+    #. ($name)
+    #: lib/MyApp.pm:54
+    msgid "Welcome %1!"
+    msgstr "Välkommen %1!"
+
+    $ perl script/myapp_server.pl
+    [Fri Dec  2 03:52:45 2005] [catalyst] [debug] Debug messages enabled
+    [Fri Dec  2 03:52:47 2005] [catalyst] [debug] Loaded plugins:
+    .------------------------------------------------------------------------------.
+    | Catalyst::Plugin::I18N                                                       |
+    | Catalyst::Plugin::Unicode                                                    |
+    '------------------------------------------------------------------------------'
+
+    [Fri Dec  2 03:52:47 2005] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [Fri Dec  2 03:52:47 2005] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [Fri Dec  2 03:52:47 2005] [catalyst] [debug] Found home "/Users/chansen/MyApp"
+    [Fri Dec  2 03:52:48 2005] [catalyst] [debug] Initialized i18n "MyApp::I18N"
+    [Fri Dec  2 03:52:48 2005] [catalyst] [debug] Loaded Private actions:
+    .----------------------+----------------------------------------+--------------.
+    | Private              | Class                                  | Method       |
+    +----------------------+----------------------------------------+--------------+
+    | /default             | MyApp                                  | default      |
+    '----------------------+----------------------------------------+--------------'
+
+    [Fri Dec  2 03:52:48 2005] [catalyst] [info] MyApp powered by Catalyst 5.57
+    You can connect to your server at http://localhost:3000
+
+    # point your browser to http://localhost:3000/?name=Joe
+    # output should render:
+
+    Välkommen Joe!
+
+    $ vim lib/MyApp.pm
+
+    sub default : Private {
+
+        # ...
+
+        $c->response->body( $c->loc( 'Welcome to my homepage [_1]!', $name ) );
+    }
+    
+    $ xgettext.pl --output=lib/MyApp/I18N/messages.pot --directory=lib/
+    $ msgmerge --update lib/MyApp/I18N/sv.po lib/MyApp/I18N/messages.pot
+    . done.
+
+    $ vim lib/MyApp/I18N/sv.po
+
+    #. ($name)
+    #: lib/MyApp.pm:54
+    msgid "Welcome to my homepage %1!"
+    msgstr "Välkommen till min hemsida %1!"
+
+    $ perl script/myapp_server.pl
+
+    # point your browser to http://localhost:3000/?name=Joe
+    # output should render:
+
+    Välkommen till min hemsida Joe!
+
+    $ perl script/myapp_create.pl view TT TT
+     exists "/Users/chansen/MyApp/script/../lib/MyApp/View"
+     exists "/Users/chansen/MyApp/script/../t"
+    created "/Users/chansen/MyApp/script/../lib/MyApp/View/TT.pm"
+    created "/Users/chansen/MyApp/script/../t/view_TT.t"
+    
+    $ vim lib/MyApp.pm
+
+    sub default : Private {
+        my ( $self, $c ) = @_;
+
+        my $name = $c->request->param('name') || $c->loc('Guest');
+
+        $c->response->content_type('text/plain; charset=utf-8');
+        $c->stash(
+            name     => $name,
+            template => 'test.tt' 
+        );
+        
+        $c->forward('MyApp::View::TT');
+    }
+
+    $ vim root/test.tt # Save file in UTF-8 with BOM
+    
+    [% c.loc( 'Welcome to my place [_1]!', c.stash.name ) %]
+    
+    $ xgettext.pl --output=lib/MyApp/I18N/messages.pot --directory=lib/ --directory=root/
+    $ msgmerge --update lib/MyApp/I18N/sv.po lib/MyApp/I18N/messages.pot
+    . done.    
+    
+    $ vim lib/MyApp/I18N/sv.po
+
+    #. (c.stash.name)
+    #: root/test.tt:1
+    msgid "Welcome to my place %1!"
+    msgstr "Välkommen till mitt ställe %1!"
+    
+    $ perl script/myapp_server.pl 
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Debug messages enabled
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Loaded plugins:
+    .------------------------------------------------------------------------------.
+    | Catalyst::Plugin::I18N                                                       |
+    | Catalyst::Plugin::Unicode                                                    |
+    '------------------------------------------------------------------------------'
+
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Found home "/Users/chansen/MyApp"
+    [Fri Dec  2 05:12:58 2005] [catalyst] [debug] Initialized i18n "MyApp::I18N"
+    [Fri Dec  2 05:12:59 2005] [catalyst] [debug] Loaded components:
+    .-------------------------------------------------------------------+----------.
+    | Class                                                             | Type     |
+    +-------------------------------------------------------------------+----------+
+    | MyApp::View::TT                                                   | instance |
+    '-------------------------------------------------------------------+----------'
+
+    [Fri Dec  2 05:12:59 2005] [catalyst] [debug] Loaded Private actions:
+    .----------------------+----------------------------------------+--------------.
+    | Private              | Class                                  | Method       |
+    +----------------------+----------------------------------------+--------------+
+    | /default             | MyApp                                  | default      |
+    '----------------------+----------------------------------------+--------------'
+
+    [Fri Dec  2 05:12:59 2005] [catalyst] [info] MyApp powered by Catalyst 5.57
+    You can connect to your server at http://localhost:3000
+    
+    # point your browser to http://localhost:3000/?name=Joe
+    # output should render:
+
+    Välkommen till mitt ställe Joe!   
+    
+
+=head1 INTRODUCTION
+
+=head1 INTERNATIONALIZATION
+
+=head1 CONTENT NEGOTIATION
+
+=head2 Server-driven
+
+=head2 Agent-driven
+
+=head1 LOCALIZATION
+
+=head1 STAYING IN SYNC
+
+=head1 TEMPLATE TOOLKIT
+
+=head1 RESOURCES
+
+=head2 Documentation
+
+=head3 Definitions
+
+=over 4
+
+=item Internationalization and localization
+
+L<http://en.wikipedia.org/wiki/Internationalization_and_localization>
+
+=item Locale
+
+L<http://en.wikipedia.org/wiki/Locale>
+
+=item Byte Order Mark (BOM)
+
+L<http://en.wikipedia.org/wiki/Byte_Order_Mark>
+
+=item Character encoding
+
+L<http://en.wikipedia.org/wiki/Character_encoding>
+
+=item Collation
+
+L<http://en.wikipedia.org/wiki/Collation>
+
+=item Content Negotiation
+
+L<http://en.wikipedia.org/wiki/Content_Negotiation>
+
+=item Unicode
+
+L<http://en.wikipedia.org/wiki/Unicode>
+
+=back
+
+=head3 Guides
+
+=over 4
+
+=item Guidelines, Checklists, and Resources
+
+L<http://www.i18nguy.com/guidelines.html>
+
+=item Localisation Guide
+
+L<http://translate.sourceforge.net/wiki/guide/start>
+
+=back
+
+=head3 Perl
+
+=over 4
+
+=item Perl Locale handling
+
+L<http://search.cpan.org/dist/perl/pod/perllocale.pod>
+
+=item Perl Unicode introduction
+
+L<http://search.cpan.org/dist/perl/pod/perluniintro.pod>
+
+=item Perl Unicode support
+
+L<http://search.cpan.org/dist/perl/pod/perlunicode.pod>
+
+=item Unicode-processing issues in Perl and how to cope with it
+
+L<http://www.ahinea.com/en/tech/perl-unicode-struggle.html>
+
+=item Web Localization in Perl
+
+L<http://search.cpan.org/dist/Locale-Maketext-Lexicon/docs/webl10n.html>
+
+=item Localization and Perl: gettext breaks, Maketext fixes
+
+L<http://search.cpan.org/dist/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod>
+
+=item Lessons Learned with Perl and UTF-8
+
+L<http://www.justatheory.com/computers/programming/perl/utf8_trials.html>
+
+=item UTF-8 and Perl (In Five Minutes)
+
+Slides from a talk given by Mark Fowler.
+
+L<http://www.twoshortplanks.com/talks/utf8/perlandutf8.pdf>
+
+=item Perl Loves UTF-8
+
+Slides from a talk given by Tom Insam.
+
+L<http://jerakeen.org/slush/talk-perl-loves-utf8>
+
+=item Perl I18N Mailing List
+
+L<http://lists.cpan.org/showlist.cgi?name=perl-i18n>
+
+=item Perl Unicode Mailing List
+
+L<http://lists.cpan.org/showlist.cgi?name=perl-unicode>
+
+=back
+
+=head3 Portals
+
+=over 4
+
+=item Google Directory - Computers > Software > Globalization
+
+L<http://www.google.com/Top/Computers/Software/Globalization/>
+
+=item Internationalization (I18N), Localization (L10N), Standards, and Amusements
+
+L<http://www.i18nguy.com/>
+
+=back
+
+=head3 Standards
+
+=over 4
+
+=item RFC 2616 Hypertext Transfer Protocol -- HTTP/1.1
+
+L<http://www.w3.org/Protocols/rfc2616/rfc2616.html>
+
+=over 8
+
+=item Section 12: Content Negotiation
+
+L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html#sec12>
+
+=item Section 13: Caching in HTTP
+
+L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13>
+
+=item Section 13.6: Caching Negotiated Responses
+
+L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.6>
+
+=back
+
+=item RFC 3066 Tags for the Identification of Languages
+
+L<http://www.faqs.org/rfcs/rfc3066.html>
+
+=back
+
+=head3 Web
+
+=over 4
+
+=item W3C Internationalization (I18N) Activity
+
+L<http://www.w3.org/International/>
+
+=item Authoring Techniques for XHTML & HTML Internationalization: Characters and Encodings 1.0
+
+L<http://www.w3.org/TR/i18n-html-tech-char/>
+
+=item Authoring Techniques for XHTML & HTML Internationalization: Specifying the language of content 1.0
+
+L<http://www.w3.org/TR/i18n-html-tech-lang/>
+
+=back
+
+=head2 Locale Repositories
+
+=over 4
+
+=item Common Locale Data Repository (CLDR)
+
+L<http://www.unicode.org/cldr/>
+
+=item International Components for Unicode (ICU)
+
+L<http://www-306.ibm.com/software/globalization/icu/index.jsp>
+
+=back
+
+=head2 Modules
+
+=head3 Character Encoding, Collation and Normalization
+
+=over 4
+
+=item Encode
+
+L<http://search.cpan.org/dist/Encode/>
+
+=item Unicode::Collate
+
+L<http://search.cpan.org/dist/Unicode-Collate/>
+
+=item Unicode::Normalize
+
+L<http://search.cpan.org/dist/Unicode-Normalize/>
+
+=back
+
+=head3 Currency
+
+=over 4
+
+=item Locale::Currency::Format
+
+L<http://search.cpan.org/dist/Locale-Currency-Format/>
+
+=item Math::Currency
+
+L<http://search.cpan.org/dist/Math-Currency/>
+
+=back
+
+=head3 Dates
+
+=over 4
+
+=item DateTime
+
+L<http://search.cpan.org/dist/DateTime/>
+
+=item DateTime::Locale
+
+L<http://search.cpan.org/dist/DateTime-Locale/>
+
+=item DateTime::TimeZone
+
+L<http://search.cpan.org/dist/DateTime-TimeZone/>
+
+=back
+
+=head3 Language Tags, Identification and Negotiation
+
+=over 4
+
+=item HTTP::Negotiate
+
+L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Negotiate.pm>
+
+=item I18N::AcceptLanguage
+
+L<http://search.cpan.org/dist/I18N-AcceptLanguage/>
+
+=item I18N::LangTags
+
+L<http://search.cpan.org/dist/I18N-LangTags/>
+
+L<http://search.cpan.org/dist/I18N-LangTags/lib/I18N/LangTags/Detect.pm>
+
+=back
+
+=head3 Message Catalogs
+
+=over 4
+
+=item Locale::Maketext
+
+L<http://search.cpan.org/dist/Locale-Maketext/>
+
+L<http://search.cpan.org/dist/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod>
+
+=item Locale::Maketext::Lexicon
+
+L<http://search.cpan.org/dist/Locale-Maketext-Lexicon/>
+
+L<http://search.cpan.org/dist/Locale-Maketext-Lexicon/docs/webl10n.html>
+
+L<http://search.cpan.org/dist/Locale-Maketext-Lexicon/script/xgettext.pl>
+
+=item Locale::Maketext::Simple
+
+Provides a simple interface to Locale::Maketext::Lexicon.
+
+L<http://search.cpan.org/dist/Locale-Maketext-Simple/>
+
+=item libintl-perl
+
+L<http://search.cpan.org/dist/libintl-perl/lib/Locale/Messages.pm>
+
+L<http://search.cpan.org/dist/libintl-perl/lib/Locale/TextDomain.pm>
+
+=back
+
+=head3 Numbers
+
+=over 4
+
+=item Number::Format
+
+L<http://search.cpan.org/dist/Number-Format/>
+
+=back
+
+=head2 Tools
+
+=over 4 
+
+=item GNU gettext utilities
+
+L<http://www.gnu.org/software/gettext/>
+
+L<http://www.gnu.org/software/gettext/manual/html_chapter/gettext.html>
+
+L<http://gnuwin32.sourceforge.net/packages/gettext.htm>
+
+=item gtranslator
+
+Translation tool for Gnome. Supports gettext catalogs.
+
+L<http://gtranslator.sourceforge.net/>
+
+=item Ini Translator
+
+Translation tool for Windows 98/Me/XP/2000. Supports several formats, 
+including gettext catalogs.
+
+L<http://initranslator.sourceforge.net/>
+
+=item KBabel
+
+Translation tool for KDE. Supports gettext catalogs.
+
+L<http://i18n.kde.org/tools/kbabel/>
+
+=item LocFactory Editor
+
+Translation tool for Mac OS X. Supports sevral formats, including gettext
+catalogs.
+
+L<http://www.triplespin.com/en/products/locfactoryeditor.html>
+
+=item poEdit
+
+A cross-platform gettext catalogs editor.
+
+L<http://www.poedit.org/>
+
+=back
+
+=head1 AUTHOR
+
+Christian Hansen C<ch@ngmedia.com>
+
+=head1 COPYRIGHT
+
+This program is free software, you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+=cut

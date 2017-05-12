@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 30f068e623458b2f4c5eb217af2e5358949505c2 Changes
+SHA1 0477424b40999f33692b86066fa0b45edc9a2733 MANIFEST
+SHA1 bca7ba2f5460d5987170278c09e4f1659551be53 META.json
+SHA1 507ddb6813e970f8fb7b65e7532f93e2f6d19d88 META.yml
+SHA1 b9dc26069a246ee1bca2d4c3e1d58049289b42d0 Makefile.PL
+SHA1 24afd6419035cca800404f18354a97955600cf72 README
+SHA1 4f023b04cd7ebe496e123712e5068056242ab6ae lib/Convert/Color/HPLuv.pm
+SHA1 2803a87362d7c6776ec92d83f248ab5ce3223ecd lib/Convert/Color/HSLuv.pm
+SHA1 54a5b035ee5439f7e3b3cbbe2ce31f86ef07a5dc lib/Convert/Color/LCh.pm
+SHA1 e526fe7d54e6a126cb79cbc666fffb2cae06232e lib/Convert/Color/LUV.pm
+SHA1 a902101bd4720b05e70efa7d429daaecabb33e63 lib/Convert/Color/XYZ.pm
+SHA1 4187faaac3aa22d1262cd4e1c95beca87b8b21a4 t/Convert-Color-HSLuv.t
+SHA1 4d4d883c95ddcd3ebc97ec2b44810a70b837635d t/accessors.t
+SHA1 c4330ed68e7b3d126cc29c42417a36009c254295 t/perlcritic.t
+SHA1 19d48dc9cb1480e88ed2f0e34f6a97fea61f2bfc t/perlcriticrc
+SHA1 72783d5c5d9f5a699fd4c125bda94a764d5c27f6 t/snapshot-rev4.csv
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAljNDboQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYg3rD/9mNrf4wgs3TkUbweuwmlt6EdEaj/nn5y1F
+WulyMlZmJUcVaoxqgQUNPjb0/lIJRF3B/7KIWmVm0LvH28bJ9ud5IrjahDOrqBzG
+uFaaCkeLZprEypPjhNnHYlr0mOguNZhH5zFpGi+GimkJvCepTL6y5qyYIL8qOqLH
+wOF7SNopouXPjvdMJcG3weAsXA+GZZs+IAw8Q9Z0ENfHdSzfnkV2h0t8nUWOm5Mr
+QaSHNiATu5p6p03JXbTa53o8wzGsnYTkodiIQoQfxRSwiEgLaso0DKpTE4L2+jCJ
+9wP3jpXyjV9WNiOGbdDQCsTlOlxZbKBhDnVbg51XWgpzIgKsDVs+/iE8+yZQtFrR
+pIw6lJHYhmxbjvAV+coUMu8KtFCy68CD+QPTpG70jd//8IzuRDISMuZrjuy1Q0gp
+ms5CAKUT6sU2Iqyftmd8vXJgld5W+IovvPgEsZ06KoVxG8uGQrlfyR0JUL6uVsX8
+YVom7W/Va9Jvs3Gxj5SVYIeIj4xFRvIx37WZFqSDhlgYKUWIWVDjL39NYAK8DimG
+3+T2nrtOWjNepYNLK+3wDU5Yuecvg+mRGyHPOmAl3yhDt8+yErtgQLis9A/hGV7M
+HvhUpgMjyO8un7lVVjNHG9A/zUheNmy/qp8lRGmGbIcZ4XUTOK6p9fED9VEX1Gk6
+aELCV6qPCQ==
+=UJz9
+-----END PGP SIGNATURE-----

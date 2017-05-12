@@ -1,0 +1,23 @@
+CHANGES file for CPAN::Unpack
+
+0.31 Wed Jan 25 20:15:41 GMT 2012
+  - Fixes from Dennis Kaarsemaker for the path
+
+0.30 Fri Jan 20 10:27:08 CET 2011
+  - Keep a list of unpacked versions so we know which ones to reextract
+  - Support single-file distros
+  - Fix permissions of unpacked directories so we can use them
+  - Switch to Parse::CPAN::Packages::Fast as Parse::CPAN::Packages is
+    now far too slow
+  - Support being quiet
+
+0.23 Thu Sep 18 17:19:28 BST 2008
+  - move from Module::Build to ExtUtils::MakeMaker
+  - add human-readable license
+  - add Pod test
+
+0.22 Fri Jul  2 15:14:41 IST 2004
+  - tell Archive::Extract to prefer using binaries
+
+0.21 Wed Jun 30 11:16:49 BST 2004
+  - first release

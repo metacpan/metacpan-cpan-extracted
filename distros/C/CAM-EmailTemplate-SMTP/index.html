@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-EmailTemplate-SMTP/index.html">
+<title>CAM-EmailTemplate-SMTP</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-EmailTemplate-SMTP</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-EmailTemplate-SMTP-0.91-docs">v0.91</a>, 2005-04-22</p>
+
+
+
+<p>
+This module alters the CAM:<!-- -->:EmailTemplate mail delivery mechanism to
+use raw SMTP delivery (via Net:<!-- -->:SMTP) instead of relying on the
+sendmail binary program.  This module is useful for machines which are
+not configured to do their own mail delivery.  Instead, the programmer
+or user specifies a mail server to use as the delivery agent.
+</p>
+
+<p>
+This module most closely resembles Mail:<!-- -->:Send with the smtp
+option.  It has the following advantages:
+</p>
+
+<p>
+  * Integration of templating
+  * Ability to manually customize the presentation of the mail headers
+    (this is the reason why I use Net:<!-- -->:SMTP instead of Mail:<!-- -->:Send on
+    the back end -- Mail:<!-- -->:Mailer:<!-- -->:rfc822 hardcodes too much)
+</p>
+
+<p>
+and the following disadvantages:
+</p>
+
+<p>
+  * Only supports SMTP delivery (but see also CAM:<!-- -->:EmailTemplate)
+  * Doesn't offer an easy-to-understand API for building the header
+  * Fewer mail delivery options
+</p>
+
+<p>
+This module can be extended to use alternate templating syntax just
+like CAM:<!-- -->:EmailTemplate.  See the example in the README for that
+module, and just append ":<!-- -->:SMTP" to all instances of
+"CAM:<!-- -->:EmailTemplate".
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-EmailTemplate-SMTP-0.91.tgz">CAM-EmailTemplate-SMTP-0.91.tgz</a>
+          (<a href="perl/CAM-EmailTemplate-SMTP-0.91.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-EmailTemplate-SMTP-0.91.zip">CAM-EmailTemplate-SMTP-0.91.zip</a>
+          (<a href="perl/CAM-EmailTemplate-SMTP-0.91.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-EmailTemplate-SMTP-0.91-docs">CAM-EmailTemplate-SMTP-0.91-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr 22 22:09:37 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-EmailTemplate-SMTP-0.90.tgz">CAM-EmailTemplate-SMTP-0.90.tgz</a>
+          (<a href="gpl/CAM-EmailTemplate-SMTP-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-EmailTemplate-SMTP-0.90.zip">CAM-EmailTemplate-SMTP-0.90.zip</a>
+          (<a href="gpl/CAM-EmailTemplate-SMTP-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-EmailTemplate-SMTP-0.90.html">CAM-EmailTemplate-SMTP-0.90.html</a>
+          
+        </td>
+        <td valign="top">Tue Sep 16 15:54:34 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-EmailTemplate-SMTP-0.90.tgz">CAM-EmailTemplate-SMTP-0.90.tgz</a>
+          (<a href="clotho/CAM-EmailTemplate-SMTP-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-EmailTemplate-SMTP-0.90.zip">CAM-EmailTemplate-SMTP-0.90.zip</a>
+          (<a href="clotho/CAM-EmailTemplate-SMTP-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-EmailTemplate-SMTP-0.90.html">CAM-EmailTemplate-SMTP-0.90.html</a>
+          
+        </td>
+        <td valign="top">Tue Sep 16 15:54:34 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

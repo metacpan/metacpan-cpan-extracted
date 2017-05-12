@@ -1,0 +1,45 @@
+CAM::UserApp - Extension of CAM::App to support web login
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+CAM::UserApp provides generic session-based login capabilities.  It
+supports login, state maintenance and password changing in a framework
+that supports either SOAP or cookie-based HTML, among other
+possibilities.
+
+CAM::UserApp is not complete by itself.  Some of its methods must be
+implemented by a subclass.  In particular, retrieveUser() must be
+supplied.  In an HTML or other human-interaction environment, the
+offerLogin() and offerChangePassword() methods should be implemented.
+Others are optional, and are described in the documentation.

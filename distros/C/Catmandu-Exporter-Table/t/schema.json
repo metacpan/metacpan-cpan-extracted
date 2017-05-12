@@ -1,0 +1,6 @@
+{
+    "fields" : [
+        { "name": "c", "title": "C" },
+        { "name": "b" }
+    ]
+}

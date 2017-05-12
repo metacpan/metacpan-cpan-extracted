@@ -1,0 +1,109 @@
+Revision history for Perl extension CGI::Application::Plugin::ValidateRM.
+
+2.5 June 10th, 2012
+    New features, thanks to Michael Peters (RT#46258):
+    - Support for using an alternative HTML::FillInForm class
+      via param dfv_fif_class.
+    - Support for supplying defaults for HTML::FillInForm->fill
+      via param dfv_fif_defaults.
+
+2.4 July 20th, 2011
+    No functional changes.
+
+    Fixed Perl 5.12 compatibility, thanks to Nicholas Bamber.  (RT#67894)
+
+    Also, some other code-cleanup.
+
+2.3 Wed Oct 22 23:05:29 EDT 2008
+    - Fix broken test in t/forward.t  (#35056)
+    No code changes. 
+
+2.2 Tue Apr 29 10:44:57 EDT 2008
+    - Fix test failure by requiring at least HTML::FillInForm 1.07 (RT#35056)
+      No code changes. 
+
+2.1 Sun Jul 31 21:17:23 EST 2005
+
+    - Added experimental support for ::Forward;
+
+2.00 Tue Jul 19 22:01:35 EST 2005
+
+    - Added new syntax for calling check_rm() in scalar context, returning just
+      the $result object.
+
+    - Added accessor method for the error page, named check_rm_error_page() and aliased
+      as dfv_error_page().
+
+    - Added dfv_results() accessor method, primarily of interest to other plug-in authors. 
+
+    - Switched back to exporting by default, but you can still explicitly
+      import if you want to. 
+
+1.22 Sun Nov 28 22:24:03 EST 2004
+    (No code changes)
+   - Update SIGNATURE to use key that hopefully works. 
+
+1.21 Mon Sep  6 09:01:30 EST 2004
+   - Added example of using dfv_defaults
+
+1.20 ??
+   - renamed from ::ValidateRM to ::Plugin::ValidateRM
+   - changed export policy to not export by default. 
+
+1.12 Sat May 08 2004
+    - Options can now be passed through to HTML::FillInForm (Gabor Szabo)
+    - tests cleaned up to be more sensible
+
+1.11 Thu Feb 26 2004
+    - Document appropriate support mailing list
+
+1.10 Mon Dec 01 2003
+    - CGI::Carp is no longer used. (Steve Hay)
+
+    - Module::Build is no longer required for installation 
+
+    - support has been added for returning scalar refs from
+      the run mode being validated. (Steve Hay)
+
+    - use of eval / die has been minimized a bit. (Steve Hay)
+
+1.07 Wed Oct 15 2003
+    - Documentation improvements (William McKee)
+
+1.06 Fri Aug 01 2003
+	- Syntax fix to work with Perl 5.005. (Fred Kleindenst)
+
+1.05 Sun Jun 22 2003 
+	- Improved examples in documentation (Mike Fragassi)
+	  No functionality changes. 
+
+1.04 Tue May 27 2003
+ 	- Fixed Build.PL syntax problem (Mike Fragassi)
+
+1.03 Sun May 11 2003
+	- Added check_rm, which returns the results as a
+	  Data::FormValidator::Results object.
+
+	- New Feature: Support for supplying defaults to the Data::FormValidator
+      new() constructor by using the 'dfv_defaults' parameter.
+
+	- New Feature: The profile can now be provided as the name of
+	  a CGI::Application method which returns the appropriate hash reference. 
+      
+	- Also note that non-backwards compatible changes were made to D::FV's msgs
+      interface. Although it doesn't affect the interface of this module,
+	  non-backwards compatible changes were made to accomodate it.
+
+1.00 Sun Apr 20
+	- New Feature: added support for Data::FormValidator's new custom error
+	  message facility. This version is /not/ backwards compatible.
+	  Some has the functionality of this module is now available in
+	  Data::FormValidator.
+
+0.02  Sat Apr 12  
+	- Bug Fix: options passed through vrm param weren't being respected
+	(Neil Mansilla)
+
+0.01  Sat Mar 29 07:46:31 2003
+	- original version; created by h2xs 1.19
+

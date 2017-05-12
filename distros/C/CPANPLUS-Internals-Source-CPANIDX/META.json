@@ -1,0 +1,51 @@
+{
+   "abstract" : "CPANIDX source implementation",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS-Internals-Source-CPANIDX",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0.9001",
+            "File::Fetch" : 0,
+            "File::Spec" : 0,
+            "Locale::Maketext::Simple" : 0,
+            "Module::Load::Conditional" : 0,
+            "Params::Check" : 0,
+            "Parse::CPAN::Meta" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/cpanplus-internals-source-cpanidx/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/cpanplus-internals-source-cpanidx.git",
+         "web" : "http://github.com/bingos/cpanplus-internals-source-cpanidx/tree"
+      }
+   },
+   "version" : "0.04"
+}
+

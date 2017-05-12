@@ -1,0 +1,101 @@
+=head1 NAME
+
+Convos::Manual::Environment - Environment variables for Convos
+
+=head1 SYNOPSIS
+
+You can change the behavior of L<Convos> by setting environment variables:
+
+  $ CONVOS_REDIS_URL=localhost/12 ./script/convos
+
+=head1 ENVIRONMENT VARIABLES
+
+Convos can be configured with the following environment variables:
+
+=head2 CONVOS_ARCHIVE_DIR
+
+Set this variable to a custom directory where Convos can store the IRC
+logs.
+
+=head2 CONVOS_DEBUG
+
+Set CONVOS_DEBUG to a true value for extra debug output to STDERR.
+
+=head2 CONVOS_DISABLE_AUTO_EMBED
+
+Set CONVOS_DISABLE_AUTO_EMBED to a true value to disable links from expanding
+into images, movies or other dynamic content.
+
+=head2 CONVOS_ORGANIZATION_NAME
+
+Set this to customize the organization name on the landing page, in the title
+tag and other various sites. The default is L<Nordaaker|http://nordaaker.com/>.
+
+=head2 CONVOS_REDIS_URL
+
+This is the URL to the Redis backend, and should follow this format:
+
+  redis://x:password@server:port/database_index
+  redis://127.0.0.1:6379/1 # suggested value
+
+Convos will use C<REDISCLOUD_URL>, C<REDISTOGO_URL>,
+C<DOTCLOUD_DATA_REDIS_URL> or default to "redis://127.0.0.1:6379/1" unless
+C<CONVOS_REDIS_URL> is not set.
+
+Note! The default value is only used when in "production" mode. This means
+that running L<Convos> with C<morbo> require the Redis URL to be set with
+the environment variable.
+
+It is also possible to set C<CONVOS_REDIS_INDEX=2> to use the
+database index 2, instead of the default. This is useful when
+C<REDISTOGO_URL> or C<DOTCLOUD_DATA_REDIS_URL> does not contain
+the datbase index.
+
+=head2 CONVOS_INVITE_CODE
+
+If set must be appended to register url. Example:
+
+  http://your.convos.by/register/some-secret-invite-code
+
+=head2 CONVOS_SECURE_COOKIES
+
+Set CONVOS_SECURE_COOKIES to true in order to set the secure flag
+on all session cookies.  Requires HTTPS.
+
+=head2 MOJO_CONFIG
+
+Path to a config file which will be sourced when L<Convos> starts. The file
+need to be valid Perl. Example:
+
+  # You can set environment variables inside the file:
+  $ENV{CONVOS_SECURE_COOKIES} = 1;
+  $ENV{MOJO_LISTEN} = "http://*:8080,https://*:8443";
+
+  # Do not forget this line at the end
+  {};
+
+=head2 MOJO_IRC_DEBUG
+
+Set MOJO_IRC_DEBUG for extra IRC debug output to STDERR.
+
+=head2 MOJO_LISTEN
+
+List of one or more locations to listen on. This also works for
+L<hypnotoad|Mojo::Server::Hypnotoad>. Example:
+
+  MOJO_LISTEN="http://*:8080,https://*:8443"
+
+L<Mojo::Server::Daemon/listen>.
+
+=head2 MOJO_REVERSE_PROXY
+
+Set this to a true value if you're using L<hypnotoad|Mojo::Server::Hypnotoad>
+behind a reverse proxy, such as nginx.
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+Marcus Ramberg - C<marcus@nordaaker.com>
+
+=cut

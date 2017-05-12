@@ -1,0 +1,104 @@
+Revision history for Perl extension CGI::Application::Dispatch.
+
+1.14 (Jul 24, 2012)
+    - Allow searches for properties without a full text search.
+
+1.13 (Apr 27, 2010)
+    - Fixed broken tests that were using a wrong date pattern [Jason Purdy]
+
+1.12 (Apr 21, 2010)
+    - Added FIF_DEFAULTS parameter to control HTML::FillInForm [Brad Oaks]
+
+1.11 (Nov 17, 2009)
+    - Better diagnostics when we can't load SWISH::API to be able to track down the reasons [M. Stosberg]
+    - If we can't load Search::Tools::HiLiter then just warn and move one without highlighting
+    - UTF-8 is now the default.
+
+1.10 (Nov 16, 2009)
+    - UTF-8 can now be turned on with UTF8 parameter
+    - Using Search::Tools::HiLiter instead of HTML::HiLiter
+
+1.05 (Jan 02, 2007)
+    - Can now search on poperties that are false, but still there (I'm thinking of you
+      zero)
+    - Added SORT_BY configuration param to change the order.
+
+1.04 (Nov 06, 2007)
+    - Fixed "associate" regression where data in $self->param wasn't
+      getting sent to the templates.
+    - Fixed broken Makefile.PL
+    - Adding new EXTRA_RANGE_PROPERTIES to the available fields returned in the results
+
+1.03 (Nov 05, 2007)
+    - Changed generate_search_query to allow searching when no
+      key words are specified. The search can be on other properties
+      or for everything listed. NOTE: This breaks backwards compatability
+      if you were relying on empty searches returning no results.
+
+1.02 (Nov 05, 2007)
+    - Now using swish-e 2.4.5
+    - Added EXTRA_RANGE_PROPERTIES
+
+1.00 (Jul 08 2006)
+    - Added Test::LongString and Test::Class to build_requires
+    - Fixed bug with URL generation not including PATH_INFO
+    - Fix bug in Ajax TT template that didn't work in non-ajax browsers
+
+0.10 (Nov 21, 2005)
+    - Changes to Makefile.PL to make CPAN installation happier
+    - documentation cleanup and clarifications
+
+0.09 (Nov 17, 2005)
+    - Default templates now fail more gracefully when the browser doesn't support AJAX
+    - no longer need both AJAX and AUTO_SUGGEST to use just the AUTO_SUGGEST functionality
+    - Makefile.PL not installs sample templates like Build.PL (this should make CPAN happy)
+
+0.08 (Nov 16, 2005)
+    - No code changes, just refactored out the repetitive tests using Test::Class
+    - move tests and coverage
+
+0.07 (Nov 13, 2005)
+    - No code changes just fixed failing tests when installed via CPAN
+
+0.06 (Nov 12, 2005)
+    - added AJAX flag to turn on non-refresh searches
+    - added AUTO_SUGGEST, AUTO_SUGGEST_FILE, AUTO_SUGGEST_CACHE and AUTO_SUGGEST_LIMIT
+        functionality
+    - minor doc fixes
+    - fixed mispelling of 'global_var' => 'global_vars' in HTML::Template
+        options
+    - removed use of callbacks since they didn't really add anything
+        and required newer versions of C::A
+    - better and more complete sample templates that are installed with
+        the application and useable when no others are provided.
+    - split tutorial out into a separate file and include some setup
+        info for AJAX usage.
+
+0.05 (Jul 10, 2005)
+    - renamed 'HIGHLIGHT_CONTEXT' to just 'HIGHLIGHT'
+    - removed 'HIGHLIGT_STOP' and 'HIGHLIGHT_START' in favor of
+        'HIGHLIGHT_TAG' and 'HIGHLIGHT_CLASS' and 'HIGHLIGHT_COLORS'
+    - renamed 'CONTEXT_LENGTH' to 'DESCRIPTION_LENGTH'
+    - default highlighting is now done with HTML::HiLiter (much faster)
+    - DESCRIPTION_CONTEXT added so that highlighting is now independent of
+        finding a matching 'context' inside the description
+
+0.04 (Jul 08, 2005)
+    - removed 'hit_' prefix from all vars in in the 'hits' loop for templates
+    - almost 100% test coverage (99.6%)
+    - minor bug fixes with built-in template
+    - use Carp for all errors and warnings
+
+0.03 (Jul 05, 2005)
+    - changed from straight H::T to CGI::Application::Plugin::AnyTemplate
+        for flexibility
+    - better template documentation and minor template fixes
+    - more complete test suite, still not 100% coverage, but closer
+
+0.02 (May 23, 2005)
+    - find and fix document mistakes - Sam Tregar <sam@tregar.com>
+    - added tutorial for getting started with swishe - Sam Tregar
+    - added TEMPLATE option to setup() - Sam Tregar
+
+0.01 (May 18, 2005)
+    - First released version

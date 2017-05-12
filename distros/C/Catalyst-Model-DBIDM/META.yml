@@ -1,0 +1,25 @@
+---
+name: Catalyst-Model-DBIDM
+version: 0.04
+author:
+  - 'Cedric Bouvier <cbouvi@cpan.org>'
+abstract: DBIx::DataModel model class
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Catalyst::Model: 0
+  DBI: 0
+  DBIx::DataModel: 1
+  Test::More: 0
+provides:
+  Catalyst::Helper::Model::DBIDM:
+    file: lib/Catalyst/Helper/Model/DBIDM.pm
+    version: 0.01
+  Catalyst::Model::DBIDM:
+    file: lib/Catalyst/Model/DBIDM.pm
+    version: 0.04
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

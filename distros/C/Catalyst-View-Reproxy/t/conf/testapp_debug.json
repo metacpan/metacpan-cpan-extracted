@@ -1,0 +1,6 @@
+{
+	"View::ReproxyFile": {
+		"mime_magic": 1,
+		"timeout": 10
+	}
+}

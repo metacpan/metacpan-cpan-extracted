@@ -1,0 +1,32 @@
+---
+abstract: 'Smooth over incompatible changes in Carp 1.25'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Carp-Fix-1_25
+no_index:
+  package:
+    - Carp::Fix::1_25::Fixed
+provides:
+  Carp::Fix::1_25:
+    file: lib/Carp/Fix/1_25.pm
+    version: 1.000001
+  Carp::Fix::1_25::Fixed:
+    file: lib/Carp/Fix/1_25.pm
+    version: 0
+requires:
+  Carp: 0
+  perl: v5.8.0
+resources:
+  bugtracker: http://github.com/schwern/Carp-Fix-1_25/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/Carp-Fix-1_25/tree/master
+version: 1.000001

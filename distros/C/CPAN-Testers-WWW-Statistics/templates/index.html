@@ -1,0 +1,78 @@
+[% 
+    title = 'The Dashboard' ;
+    box_sites = 1
+
+    crumb1_name = 'The Dashboard' ;
+%]
+
+<div id="watcher">
+<table summary="CPAN Testers Statistics">
+<tr><th colspan="3" width="50%">Number of CPAN Testers Reports:</th>
+    <td colspan="3" id="reportcount">[% report_count %]</td></tr>
+<tr><th colspan="3">Number of Distributions on CPAN:</th>
+    <td colspan="3" id="distrocount">[% distro_count %]</td></tr>
+<tr><td colspan="2" class="centre"><a href="/graphs.html#stats1"  title="Report Levels"     ><img src="/stats/stats1.png" alt="Report Levels"       height="75" /></a><br />Report Levels</td>
+    <td colspan="2" class="centre"><a href="/trends.html#stats6"  title="CPAN Submissions"  ><img src="/stats/stats6.png" alt="CPAN Submissions"    height="75" /></a><br />CPAN Submissions</td>
+    <td colspan="2" class="centre"><a href="/perform.html#build1" title="System Performance"><img src="/stats/build1.png" alt="System Performance"  height="75" /></a><br />System Performance</td></tr>
+</table>
+</div>
+<br />
+
+<h1 class="pagetitle">The Statistics</h1>
+<p>Everyone loves statistics, and here are several more for you to have fun with. I originally produced these statistics to spot trends in any testing of CPAN that was occurring, but I also wanted to see more clearly what platforms and versions of perl were being tested. The results were rather enlightening, so I extended the analysis to look at the complete recorded history of CPAN Testers. The first productive results of this exercise was to submit patches to <strong>CPAN::WWW::Testers</strong> and <strong>CPAN::WWW::Testers::Generator</strong> modules, which lead to me being asked by L&eacute;on to look after the <a href="http://www.cpantesters.org">CPAN Testers Reports</a> website. It started a trend and has since grown into quite a family.</p>
+
+<h2>How To Become A Tester</h2>
+<p>Whether you have a common platform or a very unusual one, you can help by testing modules you install and submitting reports. There are plenty of module authors who could use test reports and helpful feedback on their modules and distributions. If you'd like to get involved, please take a look at the <a href="http://wiki.cpantesters.org" title="CPAN Testers Wiki">CPAN Testers Wiki</a>, and read up on how you can become a CPAN Testers with either CPAN/CPAN::Reporter or CPANPLUS/CPANPLUS::YACSmoke (or the soon to be released smoker for cpanminus), how to join the <a href="http://wiki.cpantesters.org/wiki/MailingLists" title="CPAN Testers Discussion mailing list">CPAN Testers Discussion mailing list</a> and what happens when you start submitting your reports.</p>
+
+<h2>Help Refine The Stats</h2>
+<p>In creating all these statistics, it has taken a notable amount of time to match email addresses to real people. There are a significant number who aren't CPAN authors, and many who have only contributed a few reports. As a consequence, there are still many many email addresses I haven't been able to trace. If you spot an email address that you've used to send reports, please let me know, and I'll update ASAP.</p>
+<p>If you have any suggestions for improving the tools or resources here, please contact me, or post a note to the mailing list.</p>
+
+<h2>The Code &amp; The Database</h2>
+<p>Want to see the code and current database for the site, then look no further.</p>
+<ul>
+<li>The Code:       <a href="http://search.cpan.org/dist/CPAN-Testers-WWW-Statistics" title="CPAN-Testers-WWW-Statistics" >CPAN-Testers-WWW-Statistics</a></li>
+<li>Website Tools:  <a href="http://devel.cpantesters.org/#website"                   title="CPAN Testers Development - Website Tools"  >Development - Website</a></li>
+<li>Database Tools: <a href="http://devel.cpantesters.org/#database"                  title="CPAN Testers Development - Database Tools" >Development - Database</a></li>
+</ul>
+
+
+<script type="text/javascript">
+//<!-- hide
+//<![CDATA[
+
+var reportscount = [% report_count %];
+var distroscount = [% distro_count %];
+var reportstimeout = [% report_rate %];
+var distrostimeout = [% distro_rate %];
+var dots = '';
+
+function StartTimers() {
+    ReportsCount();
+    DistrosCount();
+    UpdateCounts();
+}
+
+function UpdateCounts() {
+    dots = dots + ' .';
+    if(dots == ' . . . . . .') { dots = ' .' }
+    document.getElementById('reportcount').innerHTML = reportscount + dots;
+    document.getElementById('distrocount').innerHTML = distroscount + dots;
+    window.setTimeout("UpdateCounts()",1000);
+}
+
+function ReportsCount() {
+    reportscount = reportscount + 1;
+    window.setTimeout("ReportsCount()",reportstimeout);
+}
+
+function DistrosCount() {
+    distroscount = distroscount + 1;
+    window.setTimeout("DistrosCount()",distrostimeout);
+}
+
+StartTimers();
+
+//]]>
+// stop hiding -->
+</script>

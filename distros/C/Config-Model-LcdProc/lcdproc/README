@@ -1,0 +1,7 @@
+This directory contains a slightly modified version of the LCDd.conf
+file provided by lcdproc project. See http://www.lcdproc.org/
+
+The modification are mostly typo fix in comments which are parsed
+by lcdconf2model to generate LCDd model.
+
+Eventually, Config::Model::LcdProc will not need its version of LCDd.conf.

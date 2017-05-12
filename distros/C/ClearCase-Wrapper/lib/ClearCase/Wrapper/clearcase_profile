@@ -1,0 +1,6 @@
+# This serves as a global CC profile (see 'cleartool man profile_ccase').
+# The ClearCase::Wrapper module will automatically point CLEARCASE_PROFILE
+# at it if it exists.
+
+checkin -cqe
+* -nc

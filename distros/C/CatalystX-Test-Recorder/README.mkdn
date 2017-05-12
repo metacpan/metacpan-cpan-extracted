@@ -1,0 +1,96 @@
+NAME
+    CatalystX::Test::Recorder - Generate tests from HTTP requests
+
+SYNOPSIS
+      package MyApp;
+      use Moose;
+      extends 'Catalyst';
+      __PACKAGE__->setup(qw(+CatalystX::Test::Recorder));
+      1;
+  
+      # hit /recorder/start to start recording
+      # make requests to your application
+      # hit /recorder/stop to get the test
+
+    Example output:
+
+      use Test::More;
+      use strict;
+      use warnings;
+
+      use URI;
+      use HTTP::Request::Common qw(GET HEAD PUT DELETE POST);
+
+      use Test::WWW::Mechanize::Catalyst 'MyApp';
+
+      my $mech = Test::WWW::Mechanize::Catalyst->new();
+      $mech->requests_redirectable([]); # disallow redirects
+
+      my ( $response, $request, $url );
+
+      $request = POST '/foo', [ 'foo' => 'bar' ];
+      $response = $mech->request($request);
+      is( $response->code, 200 );
+
+      $url = URI->new('/foo');
+      $url->query_form( { 'foo' => 'bar' } );
+      $request = GET $url;
+      $response = $mech->request($request);
+
+      done_testing;
+  
+DESCRIPTION
+    In order to test your application thoroughly you have to write a lot of
+    tests, to ensure all controllers and actions are set up properly. This
+    can be quite a pain, especially for large forms and complex business
+    logic.
+
+    This module provides a test skeleton from HTTP requests to your
+    application. It captures body parameters as well as query parameters and
+    handles all HTTP request methods. The generated test checks the response
+    code only. This is where the real work begins. See
+    Test::WWW::Mechanize::Catalyst for more testing goodness.
+
+CONFIGURATION
+      package MyApp;
+      ...
+      __PACKAGE__->config( 'CatalystX::Test::Recorder' => {
+        namespace => '...',
+        ...
+      } );
+
+  namespace
+    Sets the namespace under which the start and stop actions are located.
+    Defaults to `recorder'.
+
+  skip
+    This is an arrayref of regexprefs. Requests, whose path matches on of
+    these regexes, will not be recorded. Defaults to `qr/^static\//,
+    qr/^favicon.ico/'.
+
+  template
+    Specify the path to a Template::Alloy (TT dialect) file which is used to
+    render the test. For reference, the default template is available in the
+    `__DATA__' section of `CatalystX::Test::Recorder::Controller'.
+
+    The following variables are avaiable from the template:
+
+    * requests
+        An arrayref of Catalyst::Request objects.
+
+    * responses
+        An arrayref of Catalyst::Response objects.
+
+    * app
+        The name of the current application.
+
+AUTHOR
+    Moritz Onken, `onken@netcubed.de'
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by Moritz Onken.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

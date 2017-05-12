@@ -1,0 +1,264 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:6422067
+Return-Path: <angryxpeh@gmail.com>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 21282 invoked from network); 10 Dec 2009 16:48:15 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 10 Dec 2009 16:48:15 -0000
+Received: (qmail 12487 invoked by uid 225); 10 Dec 2009 16:48:15 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 12360 invoked by alias); 10 Dec 2009 16:48:14 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=DK_SIGNED,PERLBUG_CONF,SPF_PASS
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mail-fx0-f221.google.com (HELO mail-fx0-f221.google.com) (209.85.220.221)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Thu, 10 Dec 2009 08:48:13 -0800
+Received: by fxm21 with SMTP id 21so50760fxm.21
+        for <cpan-testers@perl.org>; Thu, 10 Dec 2009 08:48:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:date:subject:from:to
+         :message-id:x-reported-via:mime-version:content-type
+         :content-transfer-encoding;
+        bh=lyMqqyImRkjD9Mg79rqWzl+dqn0sWW+SFjzFoFEpXEM=;
+        b=b2DjOZ8hUpbvVa6KsrQmdx7biqPcyMKJj4P8K/rgOdj1Dq3UK9n2Jtqc1W6JW+mQJv
+         2PbU7xtlky7ErzUty+qlRaVQzWXVtweHS7Ay1q884yy7TQhzSxmfcEDDHCtKWKPNP6TS
+         hf+OXYz1SWh3Z9Sfw6Topt1TaPTrZN0YOyCic=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=date:subject:from:to:message-id:x-reported-via:mime-version
+         :content-type:content-transfer-encoding;
+        b=kxtctLw6457iMk+bWlM0J+jZCwUZzEwb2z6e9d2617KD2N2VUQ5VmIqR5KSX92Vqmr
+         urC9mwIfCi51J+p9tkNLDGEUBS23JFi/ddn31RKavQgAbZyvBjT/p3AtpzrcEr3ICJ0e
+         rxdAPpKHYK4+KIm8l0UCQrr+19znjxjGrjOAg=
+Received: by 10.223.4.84 with SMTP id 20mr128885faq.97.1260463687940;
+        Thu, 10 Dec 2009 08:48:07 -0800 (PST)
+Received: from debian5.lan.trouchelle.com (landlordless.aim.volia.net [77.122.220.109])
+        by mx.google.com with ESMTPS id 18sm1627024fkq.11.2009.12.10.08.48.07
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Thu, 10 Dec 2009 08:48:07 -0800 (PST)
+Date: Thu, 10 Dec 2009 17:50:50 +0200
+Subject: FAIL App-Pm2Port-0.26 MSWin32-x86-multi-thread 5.1
+To: cpan-testers@perl.org
+Message-ID: <1260460250.3Ed800.22233@debian5>
+X-Reported-Via: Test::Reporter 1.54
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: angryxpeh@gmail.com
+
+This distribution has been tested as part of the CPAN Testers=0D
+project, supporting the Perl programming language.  See=0D
+http://wiki.cpantesters.org/ for more information or email=0D
+questions to cpan-testers-discuss@perl.org=0D
+=0D
+=0D
+--=0D
+Dear Andrey Kostenko,=0D
+    =0D
+This is a computer-generated report for App-Pm2Port-0.26=0D
+on perl 5.11.2, created by CPAN-Reporter-1.1708. =0D
+=0D
+Thank you for uploading your work to CPAN.  However, there was a problem=0D
+testing your distribution.=0D
+=0D
+If you think this report is invalid, please consult the CPAN Testers Wiki=
+=0D
+for suggestions on how to avoid getting FAIL reports for missing library=0D
+or binary dependencies, unsupported operating systems, and so on:=0D
+=0D
+http://wiki.cpantesters.org/wiki/CPANAuthorNotes=0D
+=0D
+Sections of this report:=0D
+=0D
+    * Tester comments=0D
+    * Program output=0D
+    * Prerequisites=0D
+    * Environment and other context=0D
+=0D
+------------------------------=0D
+TESTER COMMENTS=0D
+------------------------------=0D
+=0D
+Additional comments from tester: =0D
+=0D
+this report is from an automated smoke testing program=0D
+and was not reviewed by a human for accuracy=0D
+If you have questions about this test report, send email to stro@cpan.org=
+=0D
+=0D
+------------------------------=0D
+PROGRAM OUTPUT=0D
+------------------------------=0D
+=0D
+Output from 'C:\bin\dev\perl\site\bin\dmake.EXE test':=0D
+=0D
+C:\home\stro\perl5112\bin\perl.exe "-MExtUtils::Command::MM" "-e" "test_har=
+ness(0, 'inc', 'blib\lib', 'blib\arch')" t/00-parts.t t/99testdist.t t/pod-=
+coverage.t t/pod.t=0D
+Odd number of elements in anonymous hash at C:\home\stro\cpan\build-5112\Ap=
+p-Pm2Port-0.26-yd28jV\blib\lib/App/Pm2Port.pm line 46.=0D
+Use of uninitialized value in anonymous hash ({}) at C:\home\stro\cpan\buil=
+d-5112\App-Pm2Port-0.26-yd28jV\blib\lib/App/Pm2Port.pm line 46.=0D
+t/00-parts.t ...... ok=0D
+t/99testdist.t .... skipped: No Test::Dist=0D
+=0D
+#   Failed test 'Pod coverage on App::Pm2Port'=0D
+#   at C:/home/stro/perl5112/site/lib/Test/Pod/Coverage.pm line 126.=0D
+# Coverage for App::Pm2Port is 88.9%, with 1 naked subroutine:=0D
+# 	load_meta=0D
+# Looks like you failed 1 test of 1.=0D
+t/pod-coverage.t .. =0D
+Dubious, test returned 1 (wstat 256, 0x100)=0D
+Failed 1/1 subtests =0D
+t/pod.t ........... ok=0D
+=0D
+Test Summary Report=0D
+-------------------=0D
+t/pod-coverage.t (Wstat: 256 Tests: 1 Failed: 1)=0D
+  Failed test:  1=0D
+  Non-zero exit status: 1=0D
+Files=3D4, Tests=3D11,  3 wallclock secs ( 0.06 usr +  0.01 sys =3D  0.08 C=
+PU)=0D
+Result: FAIL=0D
+Failed 1/4 test programs. 1/11 subtests failed.=0D
+dmake.EXE:  Error code 255, while making 'test_dynamic'=0D
+=0D
+------------------------------=0D
+PREREQUISITES=0D
+------------------------------=0D
+=0D
+Prerequisite modules loaded:=0D
+=0D
+requires:=0D
+=0D
+    Module                    Need Have   =0D
+    ------------------------- ---- -------=0D
+    CPANPLUS                  0    0.89_12=0D
+    ExtUtils::MakeMaker       0    6.55_03=0D
+    File::Temp                0    0.22   =0D
+    FreeBSD::Ports::INDEXhash 0    1.2.1  =0D
+    Getopt::Long              0    2.38   =0D
+    JSON::XS                  0    2.26   =0D
+    Term::ReadLine            0    1.05   =0D
+    Test::More                0    0.94   =0D
+    YAML                      0    0.70   =0D
+=0D
+configure_requires:=0D
+=0D
+    Module                    Need Have   =0D
+    ------------------------- ---- -------=0D
+    ExtUtils::MakeMaker       6.42 6.55_03=0D
+=0D
+=0D
+------------------------------=0D
+ENVIRONMENT AND OTHER CONTEXT=0D
+------------------------------=0D
+=0D
+Environment variables:=0D
+=0D
+    ACTIVEPERL_CONFIG_SILENT =3D 1=0D
+    AUTOMATED_TESTING =3D 1=0D
+    COMSPEC =3D C:\WINDOWS\system32\cmd.exe=0D
+    NUMBER_OF_PROCESSORS =3D 2=0D
+    PATH =3D C:\bin\dev\python\;C:\bin\dev\svn;C:\Program Files\Common File=
+s\Microsoft Shared\Windows Live;C:\bin\dev\perl\site\bin;C:\bin\dev\perl\bi=
+n;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\maven\bin;C:\j=
+dk\jdk1.6.0_04\bin;C:\ant\bin;C:\WINDOWS\system32\WindowsPowerShell\v1.0;C:=
+\bin\arc;C:\bin\dev\TortoiseSVN\bin;C:\bin\dev\Mercurial;C:\bin\dev\Tortois=
+eHg;c:\bin\sys\gnuwin32\bin;C:\bin\apps\mysql\db\bin;C:\Program Files\Commo=
+n Files\Microsoft Shared\Windows Live=0D
+    PERL5LIB =3D =0D
+    PERL5OPT =3D =0D
+    PERL5_CPANPLUS_IS_RUNNING =3D 1652=0D
+    PERL5_CPAN_IS_RUNNING =3D 1652=0D
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION =3D 3912,1652=0D
+    PERL_CR_SMOKER_CURRENT =3D App-Pm2Port-0.26=0D
+    PERL_EXTUTILS_AUTOINSTALL =3D --defaultdeps=0D
+    PERL_MM_USE_DEFAULT =3D 1=0D
+    PROCESSOR_IDENTIFIER =3D x86 Family 6 Model 15 Stepping 11, GenuineInte=
+l=0D
+    TEMP =3D C:\WINDOWS\Temp=0D
+=0D
+Perl special variables (and OS-specific diagnostics, for MSWin32):=0D
+=0D
+    $^X =3D C:\home\stro\perl5112\bin\perl.exe=0D
+    $UID/$EUID =3D 0 / 0=0D
+    $GID =3D 0=0D
+    $EGID =3D 0=0D
+    Win32::GetOSName =3D WinXP/.Net=0D
+    Win32::GetOSVersion =3D Service Pack 3, 5, 1, 2600, 2, 3, 0, 256, 1=0D
+    Win32::FsType =3D NTFS=0D
+    Win32::IsAdminUser =3D 1=0D
+=0D
+Perl module toolchain versions installed:=0D
+=0D
+    Module              Have   =0D
+    ------------------- -------=0D
+    CPAN                1.94_52=0D
+    Cwd                 3.31   =0D
+    ExtUtils::CBuilder  0.27   =0D
+    ExtUtils::Command   1.16   =0D
+    ExtUtils::Install   1.55   =0D
+    ExtUtils::MakeMaker 6.55_03=0D
+    ExtUtils::Manifest  1.58   =0D
+    ExtUtils::ParseXS   2.21   =0D
+    File::Spec          3.31   =0D
+    Module::Build       0.35_13=0D
+    Module::Signature   0.61   =0D
+    Test::Harness       3.17   =0D
+    Test::More          0.94   =0D
+    YAML                0.70   =0D
+    YAML::Syck          1.07   =0D
+    version             0.78   =0D
+=0D
+=0D
+--=0D
+=0D
+Summary of my perl5 (revision 5 version 11 subversion 2) configuration:=0D
+   =0D
+  Platform:=0D
+    osname=3DMSWin32, osvers=3D5.1, archname=3DMSWin32-x86-multi-thread=0D
+    uname=3D''=0D
+    config_args=3D'undef'=0D
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Dundef=0D
+    useithreads=3Ddefine, usemultiplicity=3Ddefine=0D
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef=0D
+    use64bitint=3Dundef, use64bitall=3Dundef, uselongdouble=3Dundef=0D
+    usemymalloc=3Dn, bincompat5005=3Dundef=0D
+  Compiler:=0D
+    cc=3D'gcc', ccflags =3D' -s -O2 -DWIN32 -DHAVE_DES_FCRYPT  -DPERL_IMPLI=
+CIT_CONTEXT -DPERL_IMPLICIT_SYS -fno-strict-aliasing -mms-bitfields -DPERL_=
+MSVCRT_READFIX',=0D
+    optimize=3D'-s -O2',=0D
+    cppflags=3D'-DWIN32'=0D
+    ccversion=3D'', gccversion=3D'3.4.5', gccosandvers=3D''=0D
+    intsize=3D4, longsize=3D4, ptrsize=3D4, doublesize=3D8, byteorder=3D123=
+4=0D
+    d_longlong=3Dundef, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D12=0D
+    ivtype=3D'long', ivsize=3D4, nvtype=3D'double', nvsize=3D8, Off_t=3D'lo=
+ng long', lseeksize=3D8=0D
+    alignbytes=3D8, prototype=3Ddefine=0D
+  Linker and Libraries:=0D
+    ld=3D'g++', ldflags =3D'-s -L"c:\home\stro\perl5112\lib\CORE" -L"C:\Min=
+GW\lib"'=0D
+    libpth=3DC:\MinGW\lib=0D
+    libs=3D-lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -la=
+dvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -lwin=
+mm -lversion -lodbc32 -lodbccp32=0D
+    perllibs=3D-lmoldname -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32=
+ -ladvapi32 -lshell32 -lole32 -loleaut32 -lnetapi32 -luuid -lws2_32 -lmpr -=
+lwinmm -lversion -lodbc32 -lodbccp32=0D
+    libc=3D, so=3Ddll, useshrplib=3Dtrue, libperl=3Dlibperl511.a=0D
+    gnulibc_version=3D''=0D
+  Dynamic Linking:=0D
+    dlsrc=3Ddl_win32.xs, dlext=3Ddll, d_dlsymun=3Dundef, ccdlflags=3D' '=0D
+    cccdlflags=3D' ', lddlflags=3D'-mdll -s -L"c:\home\stro\perl5112\lib\CO=
+RE" -L"C:\MinGW\lib"'=
+

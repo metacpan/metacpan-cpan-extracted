@@ -1,0 +1,10 @@
+Revision history for Catalyst-Authentication-Store-Jifty-DBI
+
+0.03 2009/11/08
+  - no code changes; use in-memory database while testing
+
+0.02 2009/04/28
+  - bumped up the version req of Catalyst::Model::Jifty::DBI
+
+0.01 2008/05/03
+  - initial release

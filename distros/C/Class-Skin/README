@@ -1,0 +1,47 @@
+Class::Skin version 0.04
+========================
+
+  Copyright (c) 2002 Ockham Technology N.V. & Rani Pinchuk.  
+  All rights reserved.  
+  This package is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+
+      ***   THIS IS AN ALPHA CODE   ***
+      ***   THIS IS AN ALPHA CODE   ***
+      ***   THIS IS AN ALPHA CODE   ***
+
+You have been warned. See also the author notes below.
+
+DESCRIPTION
+
+The Class::Skin class implements the Skin design pattern. 
+It helps the user to create text out of text templates (skins). 
+
+See The Skin Pattern - Yonat Sharon & Rani Pinchuk - PLoP2K -
+http://jerry.cs.uiuc.edu/~plop/plop2k/proceedings/Sharon/Sharon.pdf
+for some reasons for using this class.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  flex & byacc - see http://dinosaur.compilertools.net/
+
+AUTHOR NOTES
+
+  This module is used in our company for few weeks now in quite big 
+  project. It looks currently stable, although I had a bug fix only
+  last week. In any case it is very new in CPAN. If there are problems, 
+  suggestions, patches or comments - please email me.
+
+Rani Pinchuk
+rani@cpan.org

@@ -1,0 +1,42 @@
+Revision history for Catalyst-View-Text-Template
+
+0.011     2013-12-13 08:09:25 America/New_York
+          fix repo link
+
+0.010     2013-07-01 19:29:38 America/New_York
+          update bugtracker
+
+0.009     2013-01-01 19:51:12 America/New_York
+          build with Dist::Zilla
+
+          this build correctly omits the incorrectly included MYMETA.* files
+
+0.008     2012-09-14
+          update the Helper to be moosy (Dean Hamstead)
+
+0.007     2012-03-22
+          rebuild dist, but with files
+
+0.006     2012-03-20
+          fix a bug in the use of configuration (Dean Hamstead)
+
+0.005     2012-01-02
+          add a number of pass-through Text::Template parameters to config
+          (thanks, Dean Hamstead)
+
+          add a TEMPLATE_EXTENSION parameter (thanks, Dean Hamstead)
+
+0.004     2011-12-30
+          eliminate a stupid warning on every render
+
+0.003     2011-01-10
+          added a helper (contributed by Dean Hamstead)
+
+0.002     2010-11-19
+          switch from NEXT to next::method (fixes RT #63141)
+
+0.001     2009-01-05
+          correct a broken dist
+
+0.000     2009-01-08
+          initial release

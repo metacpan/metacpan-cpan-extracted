@@ -1,0 +1,10 @@
+MANIFEST
+Makefile
+Makefile.PL
+lib/CGI/Application/Plugin/Menu.pm
+lib/HTML/Template/Menu.pm
+t/0.t
+t/88_HTML-Template-Menu-withicon.t
+t/99_HTML-Template-Menu.t
+t/MTest.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+---
+abstract: 'Use a Plack Middleware QueryLog'
+author:
+  - 'John Napiorkowski, C<< <jjnapiork@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
+name: Catalyst-TraitFor-Model-DBIC-Schema-QueryLog-AdoptPlack
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Component::InstancePerContext: 0.001001
+  Moose: 1.21
+  Plack::Middleware::DBIC::QueryLog: 0.05
+  Scalar::Util: 0
+  perl: 5.8.4
+resources:
+  homepage: http://search.cpan.org/dist/Catalyst-TraitFor-Model-DBIC-Schema-QueryLog-AdoptPlack/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jjn1056/Catalyst-TraitFor-Model-DBIC-Schema-QueryLog-AdoptPlack.git
+version: 0.07

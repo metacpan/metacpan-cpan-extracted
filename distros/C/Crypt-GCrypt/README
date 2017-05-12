@@ -1,0 +1,84 @@
+$Id
+
+--------
+Abstract
+--------
+
+Crypt::GCrypt provides a Perl interface to the libgcrypt cryptographic
+functions. It currently supports symmetric ciphers such as AES/Rikndael, 
+Twofish, Triple DES, Arcfour etc., while asymmetric cryptography is being
+developed.
+
+------------
+Requirements
+------------
+
+Crypt::GCrypt requires that libgcrypt is installed on your system. You can
+use your favourite package manager or download the latest version of libgcrypt 
+at the GNU site:
+
+ftp://ftp.gnupg.org/gcrypt/libgcrypt/
+
+and then you can install it just doing:
+
+    $  ./configure
+    $  make
+    #  make install
+
+Crypt::GCrypt was tested with libgcrypt 1.2.4.
+
+If libgcrypt is installed, but in a non-standard directory, then use the
+following options to Makefile.PL:
+
+    GCRYPTLIBPATH=...  To set the directory in which to find libgcrypt
+    GCRYPTINCPATH=...  To set the directory in which to find gcrypt.h
+
+For example:
+    perl Makefile.PL GCRYPTLIBPATH=/home/me/lib GCRYPTINCPATH=/home/me/include
+
+Note that if you build against a shareable library in a non-standard location
+you may (on some platforms) also have to set your LD_LIBRARY_PATH environment
+variable at run time for perl to find the library.
+
+------------------
+Basic Installation
+------------------
+
+Crypt::GCrypt may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'install Crypt::GCrypt'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Crypt::GCrypt
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Crypt::GCrypt
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AA/AAR/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Alessandro Ranellucci / aar@cpan.org / http://alex.primafila.net

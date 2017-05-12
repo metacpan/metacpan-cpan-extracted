@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-SSI
+version:      0.92
+version_from: SSI.pm
+installdirs:  site
+requires:
+    Date::Format:                  0
+    File::Spec:                    0
+    HTML::SimpleParse:             0
+    HTTP::Cookies:                 0
+    HTTP::Response:                0
+    LWP::UserAgent:                0
+    URI:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

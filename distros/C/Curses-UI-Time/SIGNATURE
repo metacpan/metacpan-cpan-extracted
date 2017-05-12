@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6014aa06b2338b7bea95028e0b791d4480ae742d Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 d312aff8b52cb5eeb32740b724b6f6c9400a22db MANIFEST
+SHA1 3278e71db768d5e01a559e7ce8f52371eda546bd META.yml
+SHA1 bffc5e6fca5651b8b42ca09125a557ab3fa26824 Makefile.PL
+SHA1 b0aa77401da0802df7c08099f815a5fb3e9570bb README
+SHA1 4a94a049faebb3b08d21cb111e1ce57add1669e5 Time.pm
+SHA1 5ec70d35537f0e6ba5dfbebb85ce161e71db02dd examples/ex1.pl
+SHA1 bab216290b8efd8fb71f9203b0fea52237c6c9a3 examples/ex2.pl
+SHA1 6b936733eaba0997982875590d25698d1c4b488a examples/ex3.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 9b13628ddb5084625736176c7f244478da2459ab t/Curses-UI-Time/01-use.t
+SHA1 6cac617eba8ba6146171f7e08d3b27454a04c021 t/Curses-UI-Time/02-version.t
+SHA1 93335c51a5748fa938fb5e4276a894edd02b494d xt/Curses-UI-Time/01-pod_coverage.t
+SHA1 116ecffd26b9dbb56bc0e8348b7f33a74ccd3578 xt/Curses-UI-Time/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWHXy/AAoJEJe+XXKaIuTlxz4H/08Q7bDs1j9vGOaXWcD6VNam
+fAyA1s7yvIiPmK7ffilq0IA6MCDSu+5Kks6ZqNzJFkjiZP58t+bRflVcOQIQ9nj3
+XWZzRRDDGlhgM1v87Ut4f9glFK6briXFro4FKIQRrX6sVXS/Fwbz3TPh7TtKmAhI
+XQR4QRCJ+ne8JuOnacGHC0ssgWoi9C12Qw26/OR6GuCp8p4CYreV6hjs3IgMvtaF
+MTPpLPnD8E2fzCN28FHq+c7TAU0zrkIJZRPj8P8QbeQI0J+hxgmfRDYbn2u97nIK
+x8mK1qpjJb5OW9RCkuvbRjscJeJ21bEOeYwNNLrbfpbYdEFBOLx0n14A7BeYzPA=
+=Cuk2
+-----END PGP SIGNATURE-----

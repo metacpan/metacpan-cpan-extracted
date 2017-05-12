@@ -1,0 +1,13 @@
+Revision history for Perl extension Catalyst::Plugin::Bread::Board
+
+0.03 Sunday, August 8, 2010
+    - Allow configuring Controllers in addition to Models, Views, and
+      Plugins
+
+0.02 Monday, May 10, 2010
+    - fixing the test so it doesn't use ->deploy and force
+      a dependency of SQL::Translator (and cause CPAN tester
+      failures)
+
+0.01 Monday, May 3, 2010
+    - about f-ing time someone did this

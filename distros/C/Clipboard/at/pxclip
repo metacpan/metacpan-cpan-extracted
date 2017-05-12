@@ -1,0 +1,15 @@
+#!/bin/sh
+# Useful for exploring the way X selections work.
+# For example, run watch -n1 pxclip in one xterm, then highlight something in
+# another.  Now single-click in the xterm to remove the highlighting.  Now
+# highlight something in Firefox.  Now highlight something in the xterm again.
+# Now switch back to Firefox, and hit ^C. 
+# Weird, huh?
+for n in primary secondary clipboard buffer; do
+    echo == $n ==
+    xclip -o -selection $n
+    echo
+done
+echo == Clipboard.pm default ==
+perl -Ilib -MClipboard -e "print Clipboard->paste"
+echo

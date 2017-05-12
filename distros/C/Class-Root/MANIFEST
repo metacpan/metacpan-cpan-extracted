@@ -1,0 +1,27 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/Root.pm
+t/001-boilerplate.t
+t/001-load.t
+t/001-pod-coverage.t
+t/001-pod.t
+t/002-declare-class_attrs-check_value.t
+t/002-declare-class_attrs.t
+t/003-class_attrs-inheritance.t
+t/004-nochecks.t
+t/005-inheritance.t
+t/006-local_subs.t
+t/007-local_subs.t
+t/008-virtual_method.t
+t/009-inheritance.t
+t/filter
+t/main.pl
+t/MyClass/Bar.pm
+t/MyClass/Baz.pm
+t/MyClass/Foo.pm
+t/MyClass/Hoo.pm
+t/test.pl
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Plugin-Authentication-Credential-PAM
+version:      0.01
+version_from: lib/Catalyst/Plugin/Authentication/Credential/PAM.pm
+installdirs:  site
+requires:
+    Authen::PAM:                   0
+    Catalyst:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

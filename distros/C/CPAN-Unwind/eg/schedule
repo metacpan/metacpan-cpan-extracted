@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+###########################################
+# schedule - Example for setting up an
+#            installation schedule
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+
+use CPAN::Unwind;
+
+#use Log::Log4perl qw(:easy);
+#Log::Log4perl->easy_init({level => $DEBUG, layout => "%F{1}-%L: %m%n"});
+
+my $agent = CPAN::Unwind->new();
+
+my $resp = $agent->lookup("Net::Amazon");
+
+die $resp->message() unless $resp->is_success();
+
+print "Schedule:\n\n";
+for($resp->schedule()) {
+    print "$_ \n";
+}

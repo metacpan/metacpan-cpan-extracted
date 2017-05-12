@@ -1,0 +1,245 @@
+
+=head1 NAME
+
+Class::NamedParms - A lightweight base class for checked get/set property accessors
+
+=head1 SYNOPSIS
+
+ package SomePackage;
+
+ use Class::NamedParms;
+ use vars qw (@ISA);
+ @ISA=qw(Class::NamedParms);
+ 
+ sub new {
+    my $proto = shift;
+    my $class = ref ($proto) || $proto;
+ 
+    my $self = Class::NamedParms->new(-benefits,-costs);
+    $self    = bless $self,$class;
+ 
+    return $self;
+ }
+
+
+ $thingy = SomePackage->new;
+ $thingy->set({ -benefits => 1, -costs => 0.5 });
+ my ($costs,$benefits) = $thingy->get(-costs,-benefits);
+
+=head1 DESCRIPTION
+
+Provides key name checking for named accessor parameters. This allows
+the use of a generic 'get/set' type parameterized accessor while
+automatically catching accidental mis-spellings and usage of uninitialized
+parameters. This catches a large class of programming errors without requiring
+a new accessor for every object parameter.
+
+It can also be used as a standalone generic 'container' object.
+
+Example:
+
+  my $plant = Class::NamedParms->new(qw(phylum family genera species));
+  $plant->set({ species => 'Homo Sapiens Sapiens' });
+
+=head1 CHANGES
+
+ 1.00 1999.06.16 - Initial release.
+
+ 1.01 1999.06.17 - Bug fix to 'clear' method. Added 'make test' support.
+
+ 1.02 1999.06.18 - Performance tweak to 'get' method.
+
+ 1.03 1999.06.21 - Minor docs tweaks. Removal of 'use attrs' for portability
+
+ 1.04 1999.10.08 - Bug fix to 'all_parms' method
+
+ 1.05 2005.09.19 - Added GPL_License.txt, Artistic_License.txt, LICENSE,
+                   Changes, Build.PL. Added pod build tests.
+                   Split documentation into .pod file. Extended build
+                   tests to 100% code coverage. Refactored code to make
+                   it more inheritance friendly. Updated documentation.
+
+ 1.06 2005.09.20 - Fixed bad pod coverage build test.
+
+=head1 METHODS
+
+=over 4
+
+=item new;
+
+Creates a new instance of a NamedParms object.
+
+You can optionally 'declare' the legal parameter keys at the same time.
+
+Example:
+
+     my $obj = Class::NamedParms->new('benefits', 'costs', 'other');
+
+=back
+
+=over 4
+
+=item list_declared_parms;
+
+Returns a list of all parm names that have been declared for this
+NamedParms object. List is unsorted.
+
+Example:
+
+ my @declared_parms = $obj->list_declared_parms;
+
+=back
+
+=over 4
+
+=item list_initialized_parms;
+
+Lists all parms that have had values initialized for this NamedParms object
+Returns a list of the parameter names. List is unsorted.
+
+ my @parms = $obj->list_initialized_parms;
+
+=back
+
+=over 4
+
+=item declare($parmname,[$parmname1,...]);
+
+Declares one or more parameters for use with the NamedParms object.
+
+Example:
+
+   $self->declare(-moved_in,-car_key,-house_key,-relationship);
+
+This *does not* initialize the parameters - only declares them
+to be legal for use.
+
+=back
+
+=over 4
+
+=item undeclare($parmname,$parmname1,...);
+
+'undeclares' one or more parameters for use with the NamedParms object.
+This also deletes any values assigned to those parameters.
+
+Example:
+
+   $self->undeclare(-house_key,-car_key,-relationship);
+
+=back
+
+=over 4
+
+=item exists($parmname);
+
+Returns true if the specified parmname has been initialized via 'set'.
+
+Example:
+
+ if ($obj->exists('height')) {
+    #....
+ }
+
+=back
+
+=over 4
+
+=item set($parm_ref);
+
+Sets one or more named parameter values.
+
+Example:
+
+  $self->set({ -thingy => 'test', -other_thingy => 'more stuff' });
+
+Will 'confess' if an attempt is made to set an undeclared parameter key.
+
+=back
+
+=over 4
+
+=item clear(@parm_names);
+
+Clears (deletes) one or more named parameter values.
+
+Example:
+
+     $self->clear(-this,-that,-the_other_thing);
+
+Note: A 'cleared' value returns undef from 'get'.
+
+=back
+
+=over 4
+
+=item get(@parm_names);
+
+Gets one or more named parameter values.
+
+Screams and dies (well, 'confess'es) if you attempt to read
+a value that has not been initialized. Results are returned
+in the same order as the parameter names passed.
+
+In a scalar context, the _last_ result is what is returned.
+
+Example:
+
+   my ($age,$gender) = $self->get(-age,-gender);
+
+Will 'confess' if an attempt is made to access an undeclared key or if
+the requested value has not been initialized.
+
+=back
+
+=over 4
+
+=item all_parms;
+
+Returns an anonymous hash containing all the currently
+set keys and values. This hash is suitable for usage
+with Class::NamedParms or Class::ParmList for setting
+keys/values with their 'set' methods.
+
+It works by making a shallow copy of the data. This means
+that it copies the values.  In the case of simple
+numbers and strings, this produces a new copy, in the case
+of references to hashes and arrays or objects, it returns
+a reference to the original object such that alterations
+of the returned object are reflected in the live copy.
+
+Example:
+
+  my $parms = $parms->all_parms;
+
+=back
+
+=head1 AUTHOR
+
+Benjamin Franz <snowhare@nihongo.org>
+
+=head1 VERSION
+
+1.06 2005.09.20
+
+=head1 TODO
+
+Nothing.
+
+=head1 COPYRIGHT
+
+Copyright 1999-2005, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
+FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+This software may be copied or redistributed under the same terms as Perl itelf.
+
+=head1 LICENSE
+
+This module is licensed under the same terms and conditions as Perl itself.
+
+This means that you can, at your option, redistribute is and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=cut

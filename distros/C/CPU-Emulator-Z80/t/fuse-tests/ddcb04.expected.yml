@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  22929:
+    - 208
+name: ddcb04
+registers:
+  AF: 45952
+  AF_: 0
+  BC: 49092
+  BC_: 0
+  DE: 25775
+  DE_: 0
+  HL: 53282
+  HL_: 0
+  I: 0
+  IX: 22857
+  IY: 43401
+  PC: 4
+  R: 2
+  SP: 0

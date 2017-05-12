@@ -1,0 +1,20 @@
+Revision history for Perl extension Catalyst::Plugin::Captcha.
+
+0.04  Fri Apr 2 16:45:00 2010
+       - Updated to work nice on Catalyst 5.8
+            applied patch by Peter Flanigan 
+
+0.03  Mon May 29 10:42:00 2006
+       - Added clear_captcha_string method.
+       - Added pod documents.
+
+0.02  Fri Mar 24 17:15:00 2006
+        - Added image->out parameter.
+        - Added no-cache headers.
+        - Fixed content_type and documents. 
+              thanks John Napiorkowski
+
+0.01  Wed Mar  8 17:38:13 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Catalyst::Plugin::Captcha
+

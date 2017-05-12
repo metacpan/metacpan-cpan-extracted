@@ -1,0 +1,43 @@
+Revision history for Complete-Common
+
+0.22    2016-01-05 (PERLANCAR)
+
+	- Add $OPT_CHAR_MODE.
+
+
+0.21    2015-11-29 (PERLANCAR)
+
+	- [Removed] Remove %args_common_opts, %args_path_opts, for more
+	  consistent experience we want to encourage complete_* functions
+	  to remove their behavior options and simply use the global $OPT_*
+	  options.
+
+
+0.20    2015-11-29 (PERLANCAR)
+
+	- [Bugfix] Do not export $OPT_* because they will be copied and
+	  setting Complete::Common's version won't take effect later.
+
+
+0.19    2015-11-29 (PERLANCAR)
+
+	- Fix Exporter setting, derp.
+
+
+0.18    2015-11-29 (PERLANCAR)
+
+        - Fill out common arguments.
+
+        - Make settings and common arguments exportable (via ':all').
+
+        [Incompatible changes]
+
+        - Merge Complete::Setting and Complete::Args into Complete::Common.
+
+
+0.17    2015-11-28 (PERLANCAR)
+
+        - First release, split from Complete distribution and add
+          Complete::Args.
+
+        - Add setting: $OPT_WORD_MODE.

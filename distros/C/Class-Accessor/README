@@ -1,0 +1,45 @@
+NAMES
+      Class::Accessor         - automated accessor generation
+      Class::Accessor::Fast   - faster automated accessor generation
+      Class::Accessor::Faster - even faster, using an array
+
+DESCRIPTION
+
+    This module automagically generates accessors/mutators for your class.
+
+    Most of the time, writing accessors is an exercise in cutting and
+    pasting. You usually wind up with a series of almost identical methods,
+    one for each piece of data in your object. While some will be unique,
+    doing value checks and special storage tricks, most will simply be
+    exercises in repetition.
+
+    If you make your module a subclass of Class::Accessor and declare your
+    accessor fields with mk_accessors() then you'll find yourself with a set
+    of automatically generated accessors, which can even be customized!
+
+    The basic set up is very simple:
+
+        package My::Class;
+        use base qw(Class::Accessor);
+        My::Class->mk_accessors( qw(foo bar car) );
+
+    Done. My::Class now has simple foo(), bar() and car() accessors defined.
+
+    If you prefer a Moose-like interface you can do this instead:
+
+        package My::Class;
+        use Class::Accessor "moose-like";
+        has foo => ( is => "rw" );
+        has bar => ( is => "rw" );
+        has car => ( is => "rw" );
+
+    Done, again.
+
+AUTHOR
+
+    Copyright 2009 Marty Pauley <marty+perl@kasei.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. That means either (a) the GNU
+    General Public License or (b) the Artistic License.
+

@@ -1,0 +1,112 @@
+==================================================
+Changes from 1740-03-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2013-12-15 21:50:29 +0000
+------------------------------------------
+
+  Change: 41f759ff1e21155ccad6853825620fcd5929d7f0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-15 22:50:23 +0000
+
+    Cosmetic 
+
+  Change: f36ccea19febddc92316bddd55acfceec7282afd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-15 22:49:24 +0000
+
+    Ok, now i got the proper check for activate debugging 
+
+  Change: 380bfc16033aa9f949f282210ad321a4d32fe254
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-15 01:38:53 +0000
+
+    Giving example of current_chained_uri with extra args 
+
+  Change: a9b24bd5bc4f4dcef0f7ff2d7c6b10daf2c7c6d5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-15 01:37:27 +0000
+
+    Forgot params handling on current_chained_uri, also added better
+    params handling to both functions 
+
+  Change: ef9cc523f9bb520eaa62c374d865bdd86b25dd8b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-15 01:07:58 +0000
+
+    New travis config 
+
+  Change: 2e0400fa6d591b7e75516852e936002d9b48f7db
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-11-15 01:07:33 +0000
+
+    Added current_chained_uri 
+
+  Change: eb59ae4722b656160cbed62fdc00df0c51a4e434
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-06-25 05:41:50 +0000
+
+    Meh 
+
+  Change: 2f1dad1967117901570b0ab24e813a3ac782ff08
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-15 05:40:46 +0000
+
+    Upgrading to Author::GETTY, adding .travis.yml, minimal code change,
+    no need for new release 
+
+  Change: ea59aa5aaf842aa53909ba5d5c5e0323dcacfa86
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-10-12 20:25:02 +0000
+
+    Microchange happen through debugging 
+
+  Change: d91ed4cf1eb81c623ecc52623504a9e9c9753807
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-10 22:22:55 +0000
+
+    v0.002
+
+    - Change of API function, adding hint for shortkey in template
+    (t0m++) 
+
+  Change: 3c7fcdedd16e63ab7364dc173ead0073a96049d0
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-10 21:52:56 +0000
+
+    Change of API function, adding hint for shortkey in template (t0m++) 
+
+  Change: e0cec0a117d284783505091607b7901ac38d070c
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-06 23:31:13 +0000
+
+    Fixed tabs 
+
+  Change: 5cb78571637bd6364478d065fb8beac40fed325c
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-06 22:54:04 +0000
+
+    v0.001 
+
+  Change: 83116244490c692cce5ac00088880200ad2b4c71
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-06 22:52:12 +0000
+
+    Fixed requirements 
+
+  Change: 69e4e64106eb730434deea6f1c6245cc0f960861
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-06 22:42:52 +0000
+
+    First version 
+
+  Change: a20f352752aed01f80e5185bbaa123d5be7b3af7
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2011-08-06 21:25:22 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,25 @@
+Revision history for Perl extension CDB::TinyCDB.
+
+0.05  Mon Mar 15 13:46:08 2010
+    - Performance improvements
+    - Fixes for handling null data + tests
+
+0.04  Fri Mar 12 09:27:20 2010
+    - Rename of the module fron CDB::Tiny to CDB::TinyCDB to avoid confusion
+      that this module is tiny
+    - Add instructions how to install TinyCDB library
+
+0.03  Thu Mar 11 15:25:27 2010
+    - fix compability with 5.7.3 (savesvpv)
+    - fix tests for keys()
+    - fix Segmentation fault in for_update with binary data
+
+0.02  Wed Mar 10 23:09:13 2010
+    - fix memory handling function (reported by Tomasz Czepiel)
+    - remove for_create option as there was no use case
+    - add documentation
+
+0.01  Sat Feb 27 12:53:40 2010
+    - original version; created by h2xs 1.23 with options
+        -A -n CDB::TinyCDB
+

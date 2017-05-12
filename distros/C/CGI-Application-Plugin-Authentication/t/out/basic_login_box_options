@@ -1,0 +1,30 @@
+<form id="loginform" method="post" action="">
+  <div class="login">
+    <div class="login_header">
+      Sign In
+    </div>
+    <div class="login_content">
+      <ul class="message">
+<li class="warning">Invalid username or password<br />(login attempt 1)</li>
+      </ul>
+      <fieldset>
+        <label for="authen_loginfield" id="authen_loginfield_label" class="authen_label">User Name
+            <input id="authen_loginfield" class="authen_input" tabindex="1" type="text" name="authen_username" size="20" value="" />
+        </label>    
+        <label for="authen_passwordfield" id="authen_passwordfield_label" class="authen_label">Password
+            <input id="authen_passwordfield" class="authen_input" tabindex="2" type="password" name="authen_password" size="20" />
+        </label>
+        
+      </fieldset>
+    </div>
+    <div class="login_footer">
+      <div class="buttons">
+        <input id="authen_loginbutton" tabindex="3" type="submit" name="authen_loginbutton" value="Sign In" class="button" />
+        <a href="/register" id="authen_registerlink" tabindex="4">Register Now!</a>
+        <a href="/forgotpassword" id="authen_forgotpasswordlink" tabindex="5">Forgot Password?</a>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" name="destination" value="http://localhost?rm=two;authen_username=user1;authen_password=666" />
+  <input type="hidden" name="rm" value="authen_login" />
+</form>

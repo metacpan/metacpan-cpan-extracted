@@ -1,0 +1,18 @@
+<p>
+[% IF first != page %]
+<a href='[% cgipath %]/pages.cgi?act=[% doaction %]&amp;page=[% first %]'>first</a> ..
+[% END %]
+[% IF prev %]
+<a href='[% cgipath %]/pages.cgi?act=[% doaction %]&amp;page=[% prev %]'>prev</a> ..
+[% END %]
+[% FOREACH item = pages %]
+[% IF item == page %]<b>[% item %]</b>[% ELSE %]
+<a href='[% cgipath %]/pages.cgi?act=[% doaction %]&amp;page=[% item %]'>[% item %]</a>
+[% END %]
+[% END %]
+[% IF next %]
+.. <a href='[% cgipath %]/pages.cgi?act=[% doaction %]&amp;page=[% next %]'>next</a>
+[% END %]
+[% IF last != page %]
+.. <a href='[% cgipath %]/pages.cgi?act=[% doaction %]&amp;page=[% last %]'>last</a>
+[% END %]

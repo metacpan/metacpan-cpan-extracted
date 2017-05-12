@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Capture-SystemIO
+version:            0.01
+abstract:           system() capture stderr, stdout, and signals.
+author:
+    - Rudolf Lippan <rlippan@remotelinux.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Capture::Tiny:        0.08
+    Class::Data::Inheritable:  0.08
+    Devel::StackTrace:    1.16
+    Exception::Class:     1.23
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,7 @@
+<html>
+ <body>
+  <h1>Look at my style</h1>
+  <p>I was sent to <em>[% $stash_key.to %]</em> on [% time %]</p>
+ </body>
+</html>
+

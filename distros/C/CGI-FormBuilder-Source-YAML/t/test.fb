@@ -1,0 +1,51 @@
+
+method:     GET
+header:     0
+title:      test
+name:       test
+action:     /test
+submit:     test it
+linebreaks: 1
+
+required:   
+    - test1
+    - test2
+
+fields:
+    - test1
+    - test2
+    - test3
+    - test4
+
+fieldopts:
+    test1:
+        type:       text
+        size:       10
+        maxlength:  32
+
+    test2:
+        type:       text
+        size:       10
+        maxlength:  32
+
+    test3:
+        type:       radio
+        options:
+            -
+                - 1
+                - Yes
+            -
+                - 0
+                - No
+    
+    test4:
+        options:    \&test4opts
+
+validate:
+    test1:      /^\w{3,10}$/
+    test2:
+        javascript: EMAIL
+        perl:       eq 'test@test.foo'
+    test3:
+        - 0
+        - 1

@@ -1,0 +1,92 @@
+{
+   "abstract" : "A module to implement some of AutoConf macros in pure perl.",
+   "author" : [
+      "Alberto Simoes <ambs@cpan.org>",
+      "Jens Rehsack <rehsack@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-AutoConf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::CPANTS::Analyse" : "0.96",
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "ExtUtils::CBuilder" : "0.280220",
+            "File::Slurp::Tiny" : "0",
+            "Scalar::Util" : "1.18"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Text::ParseWords" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.23",
+            "Test::More" : "0.9"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Config-AutoConf@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Config-AutoConf"
+      },
+      "homepage" : "https://metacpan.org/release/Config-AutoConf",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com:ambs/Config-AutoConf.git",
+         "web" : "https://github.com/ambs/Config-AutoConf"
+      },
+      "x_IRC" : "irc://irc.perl.org/#toolchain",
+      "x_MailingList" : "mailto:cpan-workers@perl.org'"
+   },
+   "version" : "0.314",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

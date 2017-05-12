@@ -1,0 +1,71 @@
+{
+   "abstract" : "Per request clone of a DBIC model with additional parameters",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Model-DBIC-Schema-PerRequest",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catalyst::Component::InstancePerContext" : "0",
+            "Catalyst::Model" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Model::DBIC::Schema" : "0",
+            "Catalyst::Runtime" : "5.80",
+            "Catalyst::Test" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib::abs" : "0",
+            "namespace::autoclean" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-catalyst-model-dbic-schema-perrequest at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Model-DBIC-Schema-PerRequest"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/Catalyst-Model-DBIC-Schema-PerRequest.git",
+         "web" : "https://github.com/moltar/Catalyst-Model-DBIC-Schema-PerRequest"
+      }
+   },
+   "version" : "0.002002"
+}
+

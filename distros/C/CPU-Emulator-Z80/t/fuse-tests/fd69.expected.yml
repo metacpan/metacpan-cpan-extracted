@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd69
+registers:
+  AF: 5513
+  AF_: 0
+  BC: 23787
+  BC_: 0
+  DE: 46555
+  DE_: 0
+  HL: 37418
+  HL_: 0
+  I: 0
+  IX: 15418
+  IY: 56555
+  PC: 2
+  R: 2
+  SP: 0

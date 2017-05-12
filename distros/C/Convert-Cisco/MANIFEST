@@ -1,0 +1,17 @@
+.cvsignore
+Build.PL
+Changes
+lib/Convert/Cisco.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-TestUnitRunner.t
+t/boilerplate.t
+t/Convert/CiscoTest.pm
+t/data/cdr_20061026133657_105573.bin
+t/data/cdr_20061026133657_105573.noconfig.xml
+t/data/cdr_20061026133657_105573.xml
+t/pod-coverage.t
+t/pod.t
+t/TestCase.pm

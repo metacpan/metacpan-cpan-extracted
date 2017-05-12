@@ -1,0 +1,199 @@
+NAME
+    Config::Dot::Array - Module for simple configure file parsing with
+    arrays.
+
+SYNOPSIS
+     my $cnf = Config::Dot::Array->new(%params);
+     my $struct_hr = $cnf->parse($string);
+     $cnf->reset;
+     my $serialized = $cnf->serialize;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "callback"
+
+                     Callback code for adding parameter.
+                     Callback arguments are:
+                     $key_ar - Reference to array with keys.
+                     $value - Key value.
+                     Default is undef.
+
+            *       "config"
+
+                     Reference to hash structure with default config data.
+                     This is hash of hashes or arrays structure.
+                     Default value is reference to blank hash.
+
+            *       "set_conflicts"
+
+                     Set conflicts detection as error.
+                     Default value is 1.
+
+    "parse($string_or_array_ref)"
+            Parse string $string_or_array_ref or reference to array
+            $string_or_array_ref and returns hash structure.
+
+    "reset()"
+            Reset content in class (config parameter).
+
+    "serialize()"
+            Serialize 'config' hash to output.
+
+PARAMETER_FILE
+     # Comment.
+     # blabla
+
+     # White space.
+     /^\s*$/
+
+     # Parameters.
+     # Key must be '[-\w\.:,]+'.
+     # Separator is '='.
+     key=val
+     key2.subkey.subkey=val
+
+     # Arrays.
+     key3=val1
+     key3=val2
+
+ERRORS
+     new():
+             Bad 'config' parameter.
+             Parameter 'callback' isn't code reference.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     parse():
+             Bad key '%s' in string '%s' at line '%s'.
+             From Config::Utils::hash_array():
+                     Conflict in '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot::Array;
+     use Dumpvalue;
+
+     # Object.
+     my $struct_hr = Config::Dot::Array->new->parse(<<'END');
+     key1=value1
+     key2=value2
+     key2=value3
+     key3.subkey1=value4
+     key3.subkey1=value5
+     END
+
+     # Dump
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues($struct_hr);
+
+     # Output:
+     # 0  HASH(0x9970430)
+     #    'key1' => 'value1'
+     #    'key2' => ARRAY(0x9970660)
+     #       0  'value2'
+     #       1  'value3'
+     #    'key3' => HASH(0x9970240)
+     #       'subkey1' => ARRAY(0xa053658)
+     #          0  'value4'
+     #          1  'value5'
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot::Array;
+
+     # Object with data.
+     my $c = Config::Dot::Array->new(
+             'config' => {
+                     'key1' => {
+                             'subkey1' => 'value1',
+                     },
+                     'key2' => [
+                             'value2',
+                             'value3',
+                     ],
+             },
+     );
+
+     # Serialize.
+     print $c->serialize."\n";
+
+     # Output:
+     # key1=subkey1.value1
+     # key2=value2
+     # key2=value3
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Config::Dot::Array;
+     use Dumpvalue;
+
+     # Object.
+     my $struct_hr = Config::Dot::Array->new(
+             'callback' => sub {
+                    my ($key_ar, $value) = @_;
+                    if ($key_ar->[0] eq 'key3' && $key_ar->[1] eq 'subkey1'
+                            && $value eq 'value3') {
+
+                            return 'FOOBAR';
+                    }
+                    return $value;
+             },
+     )->parse(<<'END');
+     key1=value1
+     key2=value2
+     key3.subkey1=value3
+     key3.subkey1=value4
+     END
+
+     # Dump
+     my $dump = Dumpvalue->new;
+     $dump->dumpValues($struct_hr);
+
+     # Output:
+     # 0  HASH(0x87d05e8)
+     #    'key1' => 'value1'
+     #    'key2' => 'value2'
+     #    'key3' => HASH(0x87e3840)
+     #       'subkey1' => ARRAY(0x87e6f68)
+     #          0  'FOOBAR'
+     #          1  'value4'
+
+DEPENDENCIES
+    Class::Utils, Config::Utils, English, Error::Pure, Readonly.
+
+SEE ALSO
+    Config::Dot
+        Module for simple configure file parsing.
+
+    Config::Utils
+        Common config utilities.
+
+REPOSITORY
+    <https://github.com/tupinek/Config-Dot-Array>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

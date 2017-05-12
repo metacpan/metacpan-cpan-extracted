@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Untaint::upload.
+
+0.01  Mon Jun 16 12:09:13 2003
+	- original version; created by h2xs 1.2 with options
+		-AX -n CGI::Untaint::upload
+

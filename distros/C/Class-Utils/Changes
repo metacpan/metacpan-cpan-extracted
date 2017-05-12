@@ -1,0 +1,39 @@
+0.07 2015-09-27T17:57:34+02:00
+ - Improve EXAMPLE5 section in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.06 2014-08-20T09:01:08+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add LICENSE file.
+ - Add minimal Perl version.
+ - Add set_params_pub() subroutine.
+ - Add set_split_params() subroutine.
+ - Add split_params() subroutine.
+ - Fix dependencies in DEPENDENCIES section in doc.
+ - Update Module::Install to 1.10 version.
+
+0.05 2013-10-01
+ - Fix tests in last version.
+
+0.04 2013-09-30
+ - Documentation update.
+ - Add Test::NoWarnings to tests.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.03 2012-07-15
+ - Update build system.
+ - Add examples/ directory.
+ - Fix Makefile.PL to META 1.4.
+
+0.02 2011-08-03
+ - Better AUTHOR section in doc.
+ - Fix tests with Test::Pod for perl lesser than 5.8.0.
+ - Remove obsolete ';' in code.
+ - Remove "(3pm)" from pod doc.
+
+0.01 2011-07-14
+ - First version.

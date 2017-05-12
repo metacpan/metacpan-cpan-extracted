@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Coro-Twiggy
+version:            0.03
+abstract:           Coro interface for L<Twiggy>
+author:
+    - Dmitry E. Oboukhov <unera@debian.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AnyEvent:  0
+    Coro:      6.07
+    Twiggy:    0.1020
+resources:
+    bugtracker:  https://github.com/unera/coro-twiggy/issues
+    homepage:    https://github.com/unera/coro-twiggy
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

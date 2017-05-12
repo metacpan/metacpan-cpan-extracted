@@ -1,0 +1,24 @@
+---
+name: Config-Basic
+version: 1.85
+author: []
+abstract: Basic parser for simple configuration file
+license: gpl
+resources:
+  license: http://www.opensource.org/licenses/gpl-license.php
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  IO::All: 0
+  perl: 5.005_03
+recommends:
+  Config::General: 0
+  Pod::Readme: 0.04
+provides:
+  Config::Basic:
+    file: lib/Config/Basic.pm
+    version: 1.85
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

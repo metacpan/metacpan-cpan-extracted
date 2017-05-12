@@ -1,0 +1,9 @@
+ [% PROCESS crud/yui_footer.tt %]
+ <div id="crud-footer">
+ [% c.config.name %] [% c.config.version %] &#183; Powered by <a href="https://svn.msi.umn.edu/sw/perl/CatalystX-CRUD-YUI/">CatalystX::CRUD::YUI</a>
+ </div>
+ 
+ </body>
+</html>
+
+

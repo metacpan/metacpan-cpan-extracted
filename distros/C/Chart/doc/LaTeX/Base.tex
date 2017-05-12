@@ -1,0 +1,497 @@
+%
+% Base.tex
+%
+\renewcommand{\thisname}{Chart::Base}
+\section{\thisname}
+\name{\thisname}
+\file{Base.pm}
+\requires{GD, Carp, FileHandle}
+\begin{Description}
+\thisclass is the abstract superclass of classes \class{Chart::Bars},
+\class{Chart::Composite}, \class{Chart::Direction},
+\class{Chart::ErrorBars}, \class{Chart::HorizontalBars},
+\class{Chart::Lines}, \class{Chart::LinesPoints},
+\class{Chart::Mountain}, \class{Chart::Pareto}, \class{Chart::Pie},
+\class{Chart::Points}, \class{Chart::Split}, and
+\class{Chart::StackedBars}.
+
+Class \thisclass provides all public methods and most of the
+attributes of \chart objects.
+\end{Description}
+
+\begin{Constructor}
+An object instance of class \class{Chart} can be created with the
+constructor \methoduse{new()}:\index{Methods!new()}
+\begin{SmallExample}
+\$obj = Chart::\textit{Type}\deref new();\\
+\$obj = Chart::\textit{Type}\deref new(\parameter{width}, \parameter{height});
+\end{SmallExample}
+\textit{Type} here denotes the type of chart that is to be returned,
+\eg, \methoduse{Chart::Bars\deref new()} returns a bar chart.
+
+If \methoduse{new()} is called without arguments, the constructor will
+return an object of size 300\ensuremath{\times}400 pixels. If
+\methoduse{new()} is called with two arguments, \parameter{width} and
+\parameter{height}, it will return a \chart object of the desired
+size.
+\end{Constructor}
+
+
+\Methods\label{methods}\noindent%
+\methoduse{\$obj\deref add\_dataset(\parameter{@array})}{\index{Methods!add\_dataset()}}\\
+\begin{MethDecl}{\$obj\deref add\_dataset(\parameter{\bs @array\_ref})}{add\_dataset()}
+Adds a dataset to the object. The argument is an array or a reference to
+an array. Generally, the first array added is interpreted as being the
+$x$ tick labels. The subsequent arrays contain the data points. \Eg,
+after the calls\\
+\methoduse{\$obj\deref add\_dataset('Harry', 'Sally');}\\
+\methoduse{\$obj\deref add\_dataset(5, 8);}\\
+\chart will draw a picture with two bars and label them `Harry' and
+`Sally'.
+
+Some modules will operate slightly differently. Have a look at the
+description of the specific subclass to get more information. Such
+differences will also come up if you want to use the \texttt{xy\_plot}
+option in order to create a $x$--$y$ graph.
+\end{MethDecl}
+
+\methoddecl{\$obj\deref add\_pt(\parameter{@array})}{add\_pt()}
+\begin{MethDecl}{\$obj\deref add\_pt(\parameter{\bs @array\_ref})}{add\_pt()}
+This is a different method for adding data to a
+\chart object. The argument can be an array or a reference to an
+array. If you use this method, \chart wants the complete data of
+one data point, \ie, all the data that are associated with the same $x$
+value specified first in this call. \Eg,\\
+\methoduse{\$obj\deref add\_pt('Harry', 5);}\\
+\methoduse{\$obj\deref add\_pt('Sally', 8);}\\
+would create the same graph as the example for \methoduse{add\_dataset()} above.
+\end{MethDecl}
+
+\methoddecl{\$obj\deref add\_datafile("\parameter{filename}",   \textit{type})}{add\_datafile()}
+\methoddecl{\$obj\deref add\_datafile(\parameter{\$filehandle}, \textit{type})}{add\_datafile()}
+\begin{MethDecl}{\$obj\deref add\_datafile()}{add\_datafile()}
+This method adds the contents of a complete data file to the chart object.
+\textit{type} can be \literal{set} or \literal{pt}.
+In the former case, \literal{set}, each line in the data file must
+represent a complete data set (\emph{data series}). The values of the set
+must be separated by whitespace. \Eg, the file contents could look like
+this:
+\begin{quote}
+\texttt{Harry  Sally}\\
+\texttt{3      8}\\
+\texttt{2      1}
+\end{quote}
+
+If the argument is \literal{pt}, the lines of the file must look
+analogous to the parameter arrays used by method \methoduse{add\_pt()}:
+Each line includes all the values of one data point (\ie, all the $y$
+values associated with the same $x$ value), also separated by
+whitespace. \Eg:
+\begin{quote}
+\small
+\texttt{Harry 3 2}\\
+\texttt{Sally 8 1}
+\end{quote}
+\end{MethDecl}
+
+\begin{MethDecl}{\$obj\deref get\_data()}{get\_data()}
+If you want a copy of the data that have been added
+so far, make a call to this method like so:\\
+\methoduse{\$dataref = \$obj\deref get\_data();}\\[\itemabstand]
+This will return a reference to an array of references to
+datasets. For example, you can get the $x$ tick labels by:\\
+\methoduse{@x\_labels = @\{\$dataref->[0]\};}
+\end{MethDecl}
+
+\begin{MethDecl}{\$obj\deref clear\_data()}{clear\_data()}
+This is the method to remove all data that may have been entered until now.
+\end{MethDecl}
+
+\methoddecl{\$obj\deref set(\parameter{attribute$_1$} \fatcomma \parameter{value$_1$}, \ldots, \mbox{\parameter{attribute$_n$} \fatcomma \parameter{value$_n$}})}{set()}
+\methoddecl{\$obj\deref set(\parameter{\%hash})}{set()}
+\methoddecl{\$obj\deref set(\parameter{attribute1}, \parameter{value$_1$}, \ldots, \mbox{\parameter{attribute$_n$}, \parameter{value$_n$}})}{set()}
+\begin{MethDecl}{\$obj\deref set(\parameter{@array})}{set()}
+Use this method to change the attributes of the chart object.
+\methoduse{set()} looks for a hash of keys and values or an array of
+keys and values. \Eg,\\
+\methoduse{\$obj\deref set('title' \fatcomma 'The title of the image');}\\
+would set the title. This would do the same job:\\
+\methoduse{\%hash = ('title' \fatcomma 'The title of the image');}\\
+\methoduse{\$obj\deref set(\%hash);}
+\end{MethDecl}
+
+\methoddecl{\$obj\deref png("\parameter{filename}")}{png()}
+\methoddecl{\$obj\deref png(\$\parameter{filehandle})}{png()}
+\methoddecl{\$obj\deref png(\parameter{FILEHANDLE})}{png()}
+\methoddecl{\$obj\deref png("\parameter{filename}", \parameter{\bs@data})}{png()}
+\begin{MethDecl}{\$obj\deref png()}{png()}
+This method creates a \textsc{png} file.
+The file parameter can be a file name, a reference to a filehandle or a
+filehandle itself. If the file does not exist, \chart will
+create it for you. If there is already a file, \chart will
+overwrite it. In case of an error, the file is not created.\\
+You can also add data to a \chart object through its
+\methoduse{png()} method. The \parameter{@data} array should contain
+references to arrays of data, with the first array reference pointing
+to an array of $x$ labels. \parameter{@data} might look like this:\\
+\methoduse{@data = (['Harry', 'Sally'], [5, 8], [50, 80]);}\\
+This would set up a graph with two datasets and three data points in
+these sets.
+\end{MethDecl}
+
+\methoddecl{\$obj\deref jpeg("\parameter{filename}")}{jpeg()}
+\methoddecl{\$obj\deref jpeg(\parameter{\$filehandle})}{jpeg()}
+\methoddecl{\$obj\deref jpeg(\parameter{FILEHANDLE})}{jpeg()}
+\methoddecl{\$obj\deref jpeg("\parameter{filename}", \bs@data)}{jpeg()}
+\begin{MethDecl}{\$obj\deref jpeg()}{jpeg()}
+This is the method to create \textsc{jpeg} files. It works analogously
+to the \methoduse{png()} method.
+\end{MethDecl}
+
+\methoddecl{\$obj\deref cgi\_png()}{cgi\_png()}
+\begin{MethDecl}{\$obj\deref cgi\_jpeg()}{cgi\_jpeg()}
+With the \textsc{cgi} methods you can create dynamic images for your web
+site. The \textsc{cgi} methods will print the chart along with the
+appropriate \textsc{http} header to \textsc{stdout}, allowing you to
+call chart-generating scripts directly from your \textsc{html} pages
+(\eg, with a \literal{$\langle$img src="image.pl" /$\rangle$}
+\textsc{html} tag).
+\end{MethDecl}
+
+\begin{MethDecl}{\$obj\deref imagemap\_dump()}{imagemap\_dump()}
+\chart can also return pixel position information so that you can
+create image maps from the files generated by \chart. Simply set the
+\literal{imagemap} option to \literal{true} before you generate the
+file, then at the end call the \methoduse{imagemap\_dump()} method to
+retrieve the information. A structure will be returned almost identical
+to the \parameter{@data} array described above to pass the data into \chart.
+
+\methoduse{\$imagemap\_data = \$obj\deref imagemap\_dump();}
+
+Instead of single data values, references to arrays of pixel information
+are passed. For the classes \class{Chart::Bars},
+\class{Chart::HorizontalBars}, \class{Chart::Pareto} and
+\class{Chart::StackedBars}, the arrays will contain two $x$--$y$ pairs
+(specifying the upper left and the lower right corner of the bar).
+Compare to: \\
+\methoduse{(\$x1,\$y1,\$x2,\$y2) = @\{\$imagemap\_data\deref [\$dataset][\$datapoint]\};}
+
+For the classes \class{Chart::Lines}, \class{Chart::Points},
+\class{Chart::LinesPoints} and \class{Chart::Split}, the arrays will
+contain a single $x$--$y$ pair (specifying the center of the point).
+Compare to:\\
+\methoduse{(\$x, \$y) = @\{\$imagemap\_data\deref [\$dataset][\$datapoint]\};}
+
+A few caveats apply here. First of all, \chart uses the GD module by
+Lincoln Stein to draw lines, circles, strings, and so on. GD treats the
+upper-left corner of the \textsc{png}/\textsc{jpeg} image as the
+reference point, therefore, positive $y$ values are measured from the
+top of the image, not from the bottom. Second, these values will mostly
+contain long decimal values. GD, of course, has to truncate these to
+integer pixel coordinates. In a worst-case scenario, this will result in
+an error of one pixel on your imagemap. If this is really an issue, your
+only option is to experiment with it, or to contact Lincoln Stein and
+ask him. Third, please remember that the $0^{th}$ dataset will be empty,
+since that is the place for the data point labels on the $x$ axis.
+\end{MethDecl}
+
+
+\Attributes\label{options}%
+These are the options which take effect on most \chart types.
+There are three different kinds of attributes:
+\begin{itemize}
+\item attributes expecting a number for value (\eg, the number of pixels),
+\item attributes expecting a textual value (\eg, the title of the chart),
+\item attributes expecting a Boolean value.
+\end{itemize}
+
+Before Version 2.5 of the module, the Boolean value \literal{true} was
+represented by the string \texttt{'true'}, and the Boolean value
+\literal{false} was represented by the string \texttt{'false'}. For all
+other values, the Boolean value was not well-defined.
+From version 2.5 onwards, the Boolean value \literal{true} may be
+represented by any of \texttt{1}, \texttt{'t'} and \texttt{'true'},
+where case does not matter.
+From version 2.5 onwards, the Boolean value \literal{false} may be
+represented by any of \texttt{0}, \texttt{'f'}, \texttt{'false'}, and
+\texttt{undef}, where case does not matter. For all other values, the
+Boolean value is again not well-defined. Note that this behaviour is
+closer to the standard Perl way but is not identical, due to the need
+for backward compatibility in this module.
+
+\begin{AttrDecl}{transparent}
+Makes the background of the image transparent if set to \literal{true}.
+Useful for making web page images. However, it does not seem to work
+for all browsers. Defaults to \literal{false}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{png\_border}
+Sets the number of pixels used as a border between the graph and the
+edges of the image. Defaults to 10.
+\end{AttrDecl}
+
+\begin{AttrDecl}{graph\_border}
+Sets the number of pixels used as a border between the title/labels and
+the actual graph within the image. Defaults to 10.
+\end{AttrDecl}
+
+\begin{AttrDecl}{text\_space}
+Sets the amount of space left on the sides of text, to make it more
+readable. Defaults to 3.
+\end{AttrDecl}
+
+\begin{AttrDecl}{title}
+Tells \chart what to use for the title of the graph. If empty, no title
+is drawn. \literal{\bs\bs} is treated as a newline. If you want to use
+normal quotation marks instead of single quotation marks, remember to
+quote (\literal{\bs\bs\bs\bs}) to get a linebreak. Default is empty.
+\end{AttrDecl}
+
+\begin{AttrDecl}{sub\_title}
+Writes a subtitle under the title in smaller letters.
+\end{AttrDecl}
+
+\begin{AttrDecl}{x\_label}
+Tells \chart what text to use as a label for the $x$ axis. If empty, no
+label is drawn. Default is undef.
+\end{AttrDecl}
+
+\attrdecl{y\_label}
+\begin{AttrDecl}{y\_label2}
+Tells \chart what kind of label should be used for the description of
+the $y$ axis on the left or the right side accordingly. If empty, no
+label is drawn.  Default is undef.
+\end{AttrDecl}
+
+\begin{AttrDecl}{legend}
+Specifies the placement of the legend. Valid values are
+\literal{left}, \literal{right}, \literal{top},
+\literal{bottom}, and \literal{none}. Choosing \literal{none}
+tells \chart not to draw a legend. Default is \literal{right}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{legend\_labels}
+Sets the values for the labels for the different datasets. Should be
+assigned a reference to an array of labels. \Eg,\\
+\methoduse{@labels = ('foo', 'bar')};\\
+\methoduse{\$obj->set ('legend\_labels' \fatcomma \bs @labels);}\\
+Default is empty, in which case \literal{Dataset 1},
+\literal{Dataset 2}, etc. are used as labels.
+\end{AttrDecl}
+
+\begin{AttrDecl}{tick\_len}
+Sets the length of the $x$ and $y$ ticks in pixels. Default is 4.
+\end{AttrDecl}
+
+\begin{AttrDecl}{x\_ticks}
+Specifies how to draw the $x$ tick labels. Valid values are
+\literal{normal}, \literal{staggered} (labels are drawn alternatingly
+close to the axis and further away from it), and \literal{vertical}
+(label texts are rotated 90 degrees counter-clockwise). Default is
+\literal{normal}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{y\_ticks}
+The number of ticks to plot on the $y$ scale, including the end points.
+\Eg, for a $y$ axis ranging from 0 to 50, with ticks every 10 units,
+\attruse{y\_ticks} should have a value of 6.
+\end{AttrDecl}
+
+\begin{AttrDecl}{min\_y\_ticks}
+Sets the minimum number of $y$ ticks to draw when generating the $y$
+axis. Default is 6, minimum is 2.
+\end{AttrDecl}
+
+\begin{AttrDecl}{max\_y\_ticks}
+Sets the maximum number of $y$ ticks to draw when generating the $y$
+axis. Default is 100. This limit is used to avoid plotting an
+unreasonably large number of ticks if non-round values are used for
+\attruse{min\_val} and \attruse{max\_val}. The value for
+\attruse{max\_y\_ticks} should be at least 5 times as large as
+\attruse{min\_y\_ticks}.
+\end{AttrDecl}
+
+\attrdecl{min\_x\_ticks}
+\begin{AttrDecl}{max\_x\_ticks}
+These work similar to \attruse{max\_y\_ticks} and
+\attruse{min\_y\_ticks}, respectively. Of course, this applies only to
+$x$--$y$ plots.
+\end{AttrDecl}
+
+\begin{AttrDecl}{integer\_ticks\_only}
+Specifies how to draw the $x$ and $y$ ticks: as floating point
+(\literal{false}, \literal{0}) or as integer numbers
+(\literal{true}, \literal{1}). If you want integer ticks, it may
+be better to set the attribute \attruse{precision} to zero. Default:
+\literal{false}
+\end{AttrDecl}
+
+\begin{AttrDecl}{skip\_int\_ticks}
+If \attruse{integer\_ticks\_only} was set to \literal{true} the
+labels and ticks for the $y$ axis will be drawn every $n^{th}$ tick.
+(Note that in \class{Chart::HorizontalBars} the $y$ axis runs
+horizontally.) Defaults to 1, \ie, no skipping.
+\end{AttrDecl}
+
+\begin{AttrDecl}{precision}
+Sets the number of digits after the decimal point. Affects in most cases
+the $y$ axis only. In $x$--$y$ plots also affects the $x$ axis, and in
+pie charts the labels. Defaults to 3.
+\end{AttrDecl}
+
+\begin{AttrDecl}{max\_val}
+Sets the maximum $y$ value on the graph, overriding normal autoscaling.
+Does not work for \class{Chart::Split} charts. Default is undef.
+\end{AttrDecl}
+
+\begin{AttrDecl}{min\_val}
+Sets the minimum $y$ value on the graph, overriding normal autoscaling.
+Does not work for Split charts. Default is undef. Caution should be
+used when setting \attruse{max\_val} and \attruse{min\_val} to
+floating point or non-round numbers: The range must start and end on a
+tick, ticks must have round-number intervals and must include round
+numbers.\\
+Example: Suppose your dataset has a range of 35\ldots 114
+units. If you specify these values as \attruse{min\_val} and
+\attruse{max\_val}, respectively, the $y$ axis will be plotted with 80
+ticks, so one at every unit. Without specification of
+\attruse{min\_val} and \attruse{max\_val}, the system would
+autoscale the range to 30\ldots 120 with 10 ticks every 10 units. If
+\attruse{min\_val} and \attruse{max\_val} are specified to excessive
+precision, they may be overridden by the system, plotting a maximum
+\attruse{max\_y\_ticks} ticks.
+\end{AttrDecl}
+
+\begin{AttrDecl}{include\_zero}
+If \literal{true}, forces the $y$ axis to include zero even if it is
+not in the dataset range. Default is \literal{false}. -- Note:
+It is better to use this option than to set \attruse{min\_val}
+if this is all you want to achieve.
+\end{AttrDecl}
+
+\begin{AttrDecl}{skip\_x\_ticks}
+Sets the number of $x$ ticks and $x$ tick labels to skip. (\Ie, if
+\attruse{skip\_x\_ticks} were set to 4, \chart would draw every
+$4^{th}$ $x$ tick and $x$ tick label). Default is undef.
+\end{AttrDecl}
+
+\begin{AttrDecl}{custom\_x\_ticks}
+This option allows you to specify exactly which $x$ ticks and $x$ tick
+labels should be drawn. It should be assigned a reference to an array of
+desired ticks. Just remember that we are counting from the $0^{th}$
+element of the array. (\Eg, if \attruse{custom\_x\_ticks} is assigned
+[0,3,4], then the $0^{th}$, $3^{rd}$, and $4^{th}$ $x$ ticks will be
+displayed) This does not apply to \class{Chart::Split},
+\class{Chart::HorizontalBars} and \class{Chart::Pie}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{f\_x\_tick}
+Needs a reference to a function which accepts the $x$ tick labels
+generated by \parameter{\$data\deref [0]} as its argument. This function
+should return a reformatted version of the label as a string. \Eg\\
+\methoduse{\$obj\deref set ('f\_x\_tick' \fatcomma \bs\&formatter;})\\
+An example for the formatter function: Assume that $x$ labels are
+seconds since some event. The referenced function could be designed to
+transform this number of seconds to hours, minutes and seconds.
+\end{AttrDecl}
+
+\begin{AttrDecl}{f\_y\_tick}
+Similar to \attruse{f\_x\_tick}, but for $y$ labels.
+\end{AttrDecl}
+
+\begin{AttrDecl}{colors}
+\label{colors}
+This option lets you control the colors the chart will use. It takes a
+reference to a hash. The hash should contain keys mapped to references
+to arrays of \textsc{rgb} values. E.g.,\\
+\methoduse{\$obj->set('colors' \fatcomma \{'background' \fatcomma [255,255,255]\});}\\
+sets the background color to white (which is the default).\\
+Another possibility is to use named colors like 'red', 'blue'. The possible
+list of named colors can be found in chapter \ref{app:colors}, page \pageref{app:colors}.\\ 
+Valid keys for this hash are
+\begin{itemize}
+\item \literal{background} (background color for the chart)
+\item \literal{title} (color of the title)
+\item \literal{text} (all the text in the chart)
+\item \literal{x\_label} (color of the $x$ axis label)
+\item \literal{y\_label} (color of the primary $y$ axis label)
+\item \literal{y\_label2} (color of the secondary $y$ axis label)
+\item \literal{grid\_lines} (color of the grid lines)
+\item \literal{x\_grid\_lines} (color of the $x$ grid lines -- on $x$ axis ticks)
+\item \literal{y\_grid\_lines} (color of the $y$ grid lines -- on primary $y$ axis ticks)
+\item \literal{y2\_grid\_lines} (color of the y2 grid lines -- on secondary $y$ axis ticks)
+\item \literal{dataset0} \ldots \literal{dataset63} (the different datasets)
+\item \literal{misc} (everything else, \eg, ticks, box around the legend)
+\end{itemize}
+
+NB. For composite charts, there is a limit of eight datasets per
+component. The colors for \literal{dataset8} through \literal{dataset15}
+will be the same as those for \literal{dataset0} through
+\literal{dataset7} for the second component chart.
+\end{AttrDecl}
+
+\begin{AttrDecl}{title\_font}
+This option changes the font of the title line. The value must be a GD
+font, \eg, \methoduse{GD::Font\deref Large}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{label\_font}
+This option changes the font of the labels. The value must be a GD font.
+\end{AttrDecl}
+
+\begin{AttrDecl}{legend\_font}
+This option changes the font for the legend text. The value must be a
+GD font.
+\end{AttrDecl}
+
+\begin{AttrDecl}{tick\_label\_font}
+This option changes the font of the ticks. The value must be a GD font.
+\end{AttrDecl}
+
+\begin{AttrDecl}{grey\_background}
+Puts a nice soft grey background on the actual data plot when set to
+\literal{true}. This is a flag. If you set this flag to 'false' then you may
+redefine the background color to a color you like. For further information see chapter \ref{colors}
+on page \pageref{colors}. Default is \literal{true}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{x\_grid\_lines}
+Draws grid lines matching up to $x$ ticks if set to \literal{true}.
+Default is \literal{false}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{y\_grid\_lines}
+Draws grid lines matching up to $y$ ticks if set to \literal{true}.
+Default is \literal{false}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{grid\_lines}
+Draws grid lines matching up to $x$ and $y$ ticks if set to
+\literal{true}. Default is \literal{false}.
+\end{AttrDecl}
+
+\begin{AttrDecl}{imagemap}
+Lets \chart know that you are going to ask for information about the
+placement of the data for use in creating an image map from the chart.
+This information can be retrieved using the
+\mbox{\methoduse{imagemap\_dump()}}
+method. NB. The \methoduse{imagemap\_dump()} method cannot be called
+until after the chart has been generated (\eg, using the \methoduse{png()}
+or \methoduse{cgi\_png()} methods).
+\end{AttrDecl}
+
+\begin{AttrDecl}{ylabel2}
+The label for the secondary (right-hand side) $y$ axis. (In a composite
+chart, this is the axis for the second component). Default is undef.
+\end{AttrDecl}
+
+\begin{AttrDecl}{no\_cache}
+Adds \literal{Pragma: no-cache} to the \textsc{http} header.
+Be careful with this one, since some older browsers (like Netscape~4.5)
+are unhappy about \textsc{post} using this method.
+\end{AttrDecl}
+
+\begin{AttrDecl}{legend\_example\_size}
+Sets the length of the example line in the legend. Defaults to 20.
+\end{AttrDecl}
+

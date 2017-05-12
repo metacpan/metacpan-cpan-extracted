@@ -1,0 +1,10 @@
+Revision history for Catalyst-Plugin-ClamAV
+
+0.03    Wed Feb 28 16:28:25 JST 2007
+        - Added: Detailed virus info.
+
+0.02    Sun Apr 30 02:54:39 JST 2006
+        - Fixed: If no upload feilds in clamscan() arguments, ignore them (not return -1).
+
+0.01    2006-04-28
+        original version.

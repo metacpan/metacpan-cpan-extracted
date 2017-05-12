@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::OpenSSL::Blowfish.
+
+0.02  Wed Jul  4 10:36:35 2009
+	- minor pod fixes
+0.01  Wed Jul  1 20:50:04 2009
+	- original version

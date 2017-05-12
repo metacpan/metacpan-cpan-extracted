@@ -1,0 +1,15 @@
+==================================
+Revision history for CGI-PathParam
+==================================
+
+0.04    2006/06/02
+    - always import path_param to CGI.
+
+0.03    2006/06/01
+    - document fix
+
+0.02    2006/05/31
+    - add the feature of setter to path_param
+
+0.01    2006/05/30
+    - first developer release

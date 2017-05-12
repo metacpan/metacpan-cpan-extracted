@@ -1,0 +1,53 @@
+#------------------------------------------------------------------------
+# Version 1.5    Date: 2014/11/07
+#------------------------------------------------------------------------
+
+* Work around global destruction order issue.  [Craig Manley
+  <cmanley@cpan.org>, CPAN RT#23568/68526]
+
+#------------------------------------------------------------------------
+# Version 1.4    Date: 2007/09/28
+#------------------------------------------------------------------------
+
+* Added the has_instance() method to return an existing instance without
+  creating a new one.
+
+* General cleanup of code, documentation and tests.
+
+* Changed licence from Perl Artistic to the same terms as Perl itself
+  (e.g. Artistic 2.0/GPL)
+
+#------------------------------------------------------------------------
+# Version 1.03   Date: 1999/01/19
+#------------------------------------------------------------------------
+
+* Incorporated patches from Andreas Koenig to inline calculation of 
+  $instance variable.  This results in a speedup of around 35%.
+
+* Added _new_instance() constructor which is called the first time
+  _instance() is called.  This can be overloaded in derived classes 
+  to provide more specific object initialisation.
+
+* Updated documentation accordingly.
+
+
+#------------------------------------------------------------------------
+# Version 1.02    Date: 1998/04/16
+#------------------------------------------------------------------------
+
+* Fixed minor typos and corrected example in documentation.
+
+
+#------------------------------------------------------------------------
+# Version 1.01    Date: 1998/02/10
+#------------------------------------------------------------------------
+
+* Minor documentation changes
+
+
+#------------------------------------------------------------------------
+# Version 1.00    Date: 1998/02/10
+#------------------------------------------------------------------------
+
+* Initial revision
+

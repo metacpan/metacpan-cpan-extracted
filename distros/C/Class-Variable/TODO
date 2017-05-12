@@ -1,0 +1,4 @@
+- Variables name validation
+- Test with large objects number
+- Do we need kinda GC ?
+- We need to extend or create DESTROY method to free object-related links to avoid memory leakage.

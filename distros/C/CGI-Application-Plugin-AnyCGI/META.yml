@@ -1,0 +1,19 @@
+---
+name: CGI-Application-Plugin-AnyCGI
+version: 0.02
+author:
+  - 'Bianka Martinovic <mab@cpan.org>'
+abstract: "Use your favourite CGI::* module\nwith CGI::Application (instead of CGI.pm)"
+license: perl
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  CGI::Application::Plugin::AnyCGI:
+    file: lib/CGI/Application/Plugin/AnyCGI.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/

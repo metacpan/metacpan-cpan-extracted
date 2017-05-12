@@ -1,0 +1,4 @@
+<%args>
+$param
+</%args>
+param: <% $param %>

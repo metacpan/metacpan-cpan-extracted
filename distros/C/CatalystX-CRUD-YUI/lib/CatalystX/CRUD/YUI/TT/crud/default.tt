@@ -1,0 +1,13 @@
+[%# home page %]
+
+<div id="main">
+<div>
+Welcome to CatalystX::CRUD::YUI.
+</div>
+
+<div>
+You should replace this page with something more useful by editing
+the <pre>root/crud/default.tt</pre> page.
+</div>
+
+</div>

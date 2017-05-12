@@ -1,0 +1,35 @@
+<h2>Link Admin</h2>
+
+<div class="boxer">
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click on a link title to edit it's content.
+<p> <a href="[% cgipath %]/pages.cgi?act=link-cadd">create a new category</a>
+|   <a href="[% cgipath %]/pages.cgi?act=link-cadmin">edit categories</a>
+|   <a href="[% cgipath %]/pages.cgi?act=link-add">create a new link</a>
+</div>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='link-admin' />
+
+<div class="boxer">
+<table class="blocker">
+<tr>
+    <th>Category</th>
+    <th>Title</th>
+    <th>Link</th>
+    <th>Select</th>
+</tr>
+[% FOREACH record = data %]
+<tr>
+    <td>[% record.category %]</td>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=link-edit&amp;linkid=[% record.linkid %]">[% IF record.title %][% record.title %][% ELSE %]No Title[% END %]</a></td>
+    <td>[% record.href %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.linkid %]" /></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<p>
+<input type="submit" name='doaction' value='Delete' />
+</form>

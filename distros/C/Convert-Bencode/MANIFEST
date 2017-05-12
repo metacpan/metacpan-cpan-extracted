@@ -1,0 +1,9 @@
+MANIFEST
+LICENSE
+README
+INSTALL
+Todo
+Changes
+lib/Convert/Bencode.pm
+t/001_basic.t
+Makefile.PL

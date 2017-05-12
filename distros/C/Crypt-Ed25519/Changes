@@ -1,0 +1,36 @@
+Revision history for Perl extension Crypt::Ed25519
+
+1.04 Tue Feb 28 20:52:43 CET 2017
+	- update embedded lib from d4c1fa44ae1e07f7ad578032efa5d9d9959188b0
+          to 7fa6712ef5d581a6981ec2b08ee623314cd1d1c4.
+        - the (fixed) vulnerability in the embedded lib does not affect this module.
+        - no longer include key_exchange.c and add_scalar.c.
+        - minor doc fixes.
+
+1.03 Mon Jun 29 14:32:39 CEST 2015
+        - added stability canary support.
+
+1.02 Mon Jun 29 14:31:14 CEST 2015
+	- support perl multicore specification (http://perlmulticore.schmorp.de/)
+          for compression and decompression.
+
+1.01 Wed Jun 24 14:17:38 CEST 2015
+	- reduce namespace pollution and improve optimisation
+          opportunities by making the ed25519 library fully static.
+
+1.0  Sun Mar 29 08:23:50 CEST 2015
+	- improve documentation.
+        - testsuite covers more code.
+
+0.9  Sat Mar 28 20:43:02 CET 2015
+	- enable prototypes.
+        - lots of compatibility fixes for embedded ed25519 library.
+	- work around some broken cpan-testers setup.
+        - enable binmode for sign.input, to pass win32 tests.
+
+0.1  Fri Mar 27 21:23:46 CET 2015
+	- initial release.
+
+0.0  Fri Mar 27 18:36:07 CET 2015
+	- original version; cloned from Convert-Scalar.
+

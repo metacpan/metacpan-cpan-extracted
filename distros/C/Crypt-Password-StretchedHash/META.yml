@@ -1,0 +1,46 @@
+---
+abstract: 'simple library for password hashing and stretching'
+author:
+  - 'Ryo Ito <ritou.06@gmail.com>'
+build_requires:
+  Digest::SHA: 0
+  Digest::SHA3: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-Password-StretchedHash
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Crypt::Password::StretchedHash:
+    file: lib/Crypt/Password/StretchedHash.pm
+    version: 0.05
+  Crypt::Password::StretchedHash::HashInfo:
+    file: lib/Crypt/Password/StretchedHash/HashInfo.pm
+requires:
+  Carp: 0
+  Exporter: 0
+  MIME::Base64: 0
+  Params::Validate: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/ritou/p5-Crypt-Password-StretchedHash/issues
+  homepage: https://github.com/ritou/p5-Crypt-Password-StretchedHash
+  repository: https://github.com/ritou/p5-Crypt-Password-StretchedHash.git
+version: 0.05

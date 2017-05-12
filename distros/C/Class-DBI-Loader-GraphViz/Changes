@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::DBI::Loader::GraphViz.
+
+0.01  Mon Apr 12 11:18:43 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 -n Class::DBI::Loader::GraphViz
+

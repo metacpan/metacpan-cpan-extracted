@@ -1,0 +1,18 @@
+Class::StorageFactory
+---------------------
+
+1.0 - Sat Apr 16 01:42:12 UTC 2005
+
+I write a lot of OO modules that store data.  These are often very simple and
+small, but serializing and unserializing the data is more work than I want to
+repeat often.
+
+This module provides a way to store and to fetch data for various objects.  It
+currently only supports the YAML format (as used by the module of the same
+name), but there's no reason there can't be other factories.  I like to think
+that Class::StorageFactory has enough abstraction (and that for the class of
+problems this solves, it's a simple enough solution) that this will be easy for
+other people to write.
+
+You may use, modify, and distribute this software under the same licensing
+terms as Perl 5.8.

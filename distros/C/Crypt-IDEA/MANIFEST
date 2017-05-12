@@ -1,0 +1,13 @@
+COPYRIGHT
+IDEA.pm
+IDEA.pod
+IDEA.xs
+MANIFEST
+Makefile.PL
+_idea.c
+idea.h
+test.pl
+typemap
+README
+changes
+META.yml                                 Module meta-data (added by MakeMaker)

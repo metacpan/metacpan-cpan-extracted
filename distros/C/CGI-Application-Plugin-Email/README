@@ -1,0 +1,52 @@
+CGI-Application-Plugin-Email
+
+Lazy loaded easy email sending for CGI::Application.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Email::Stuff
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Application::Plugin::Email
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-Email
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Application-Plugin-Email
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Application-Plugin-Email
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Application-Plugin-Email
+
+
+COPYRIGHT AND LICENCE
+
+Use it for whatever you like, but I take no responsibility if it 
+goes wrong :P
+
+Copyright (C) 2009 Lyle Hopkins
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

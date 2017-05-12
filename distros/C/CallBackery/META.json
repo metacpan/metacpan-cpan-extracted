@@ -1,0 +1,60 @@
+{
+   "abstract" : "CallBackery is a Mojolicious+Qoodoo Framework for building Web Applications",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CallBackery",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "example",
+         "setup",
+         "lib/Mojolicious/Command/generate/callbackery_app"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Uploader" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Grammar" : "1.12",
+            "Locale::PO" : "0.27",
+            "Mojolicious" : "7.26",
+            "Mojolicious::Plugin::Qooxdoo" : "0.905",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/callbackery/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/GPL-3.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/callbackery"
+      }
+   },
+   "version" : "v0.10.6"
+}

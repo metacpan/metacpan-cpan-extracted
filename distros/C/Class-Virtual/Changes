@@ -1,0 +1,39 @@
+0.08  Sat Aug  6 13:07:36 PDT 2016
+    Kwalitee
+    * Turn on and normalize strict and warnings. (Denis Ibaev) [github #3]
+
+    Distribution
+    * Added metacpan as the homepage
+    * Now using Travis and AppVeyor CI
+
+0.07  Sun Mar  1 12:32:44 PST 2015
+    Misc
+    * Update metadata to point at Github. [github #2]
+    * Discourage use of this module, there are better solutions. [github #1]
+    * Clarify the license link in the documentation.
+
+0.06  Sun Sep  3 18:06:03 EDT 2006
+    - Minor test fix for slightly different perldiag. [rt.cpan.org 11647]
+
+0.05  Fri Dec 31 01:38:29 EST 2004
+    - Added a license and copyright.  [rt.cpan.org 8229]
+    - Fixed it so assert and affirm don't leak out from internal use of
+      Carp::Assert [rt.cpan.org 6298]
+    - Now using Test::More for tests.
+
+0.04  Sun Oct 19 22:18:59 PDT 2003
+    * Class::Virtually::Abstract was missing a $VERSION
+    - Using @ISA instead of base.pm to avoid the odd base.pm bug.
+
+0.03  Fri Mar  2 01:33:07 EST 2001
+    * Officially distributing Class::Virtually::Abstract
+    * Virtual responsibility was leaking across all virtual classes
+    - Started using Carp::Assert
+
+0.02  Fri Feb  9 13:17:34 GMT 2001
+    - Fixed wierd bug with fully qualified Carp::carp calls.
+
+0.01  Tue Nov 28 03:03:35 GMT 2000
+    - First working version released to CPAN.
+
+

@@ -1,0 +1,351 @@
+=head1 NAME
+
+Catalyst::Plugin::Server::XMLRPC::Tutorial -- Using Catalyst as XMLRPC Server
+
+=head1 Setting up your server
+
+Please consult the L<Catalyst::Tutorial> on how to set up your basic
+application, in which you can use this plugin.
+
+=head2 Configuring your server
+
+Next, you can configure the application to do your bidding. First of
+all, every C<XMLRPC> server needs to have an entrypoint. That is the
+url that every client needs to post to, in order to post methods to
+your server.
+
+By default, this is C<http://your.host.tld/rpc> 
+
+The full configuration options are described in
+L<Catalyst::Plugin::Server::XMLRPC>.
+
+=head1 Server types
+
+You can set up the server in 2 ways; One is to merely dispatch to external
+code, the other is to integrate it in your Catalyst application.
+
+Note that in both setups, the C<usual> Catalyst dispatch logic is used,
+meaning that every method will have it's corresponding C<begin>, 
+C<auto> and C<end> code called.
+
+=head2 Dispatching XMLRPC Server
+
+This is the easiest configuration, that uses your catalyst app as
+B<just> an XMLRPC server. This means that the XMLRPC server will
+just be used to dispatch to library code somewhere else.
+
+=head3 Seting up the server
+
+You could set this up as follows:
+
+    package MyApp;
+    use Catalyst    qw/Server Server::XMLRPC/;
+
+    sub dispatcher : XMLRPCRegex('.') {
+        ...
+    }
+
+Now, every xmlrpc call that gets posted to your application, will
+be handled by the C<sub dispatcher>, which will be shown in the 
+server startup as follows:
+
+    [catalyst] [debug] Loaded XMLRPCRegex actions:
+    .---------------------------+----------------------------------.
+    | XMLRPCRegex               | Private                          |
+    +---------------------------+----------------------------------+
+    | .                         | /dispatcher                      |
+    '---------------------------+----------------------------------'
+
+B<IMPORTANT>: Newer versions of Catalyst add a forward to a default view when
+no response body has been defined yet, which interferes with this plugin.
+To fix this, look for the following line in your Root controller:
+
+  sub end : ActionClass('RenderView') {}
+
+And simply comment it out:
+
+  #sub end : ActionClass('RenderView') {}
+
+=head3 Handling incoming method calls
+
+A user could now post to your XMLRPC server as follows, with the
+bundled rpc_client script in this distribution
+
+    $ rpc_client -u http://your.host.tld/rpc -m foo
+
+Your dispatcher now has to deal with the incoming request. The data
+returned, is whatever is present on the stash.
+
+The below, contrived, example simply returns the method name that
+was called.
+
+    sub dispatcher : XMLRPCRegex('.') {
+        my ($self, $c, @args) = @_;
+        $c->stash->{ method } = $c->request->xmlrpc->method;
+    }
+
+=head2 Application XMLRPC Server
+
+This uses your catalyst application as an XMLRPC server, dispatching
+method calls to your catalyst app, rather than external code. This
+also allows you to use the XMLRPC plugin transparently, meaning you
+can post to the same method in your class both via the web, and via
+XMLRPC.
+
+=head3 Setting up the server
+
+You could set this up as follows:
+
+    package MyApp;
+    use Catalyst    qw/Server Server::XMLRPC/;
+
+    package MyApp::Controller::RPC;
+
+    ### available as rpc.path
+    sub goto_path : XMLRPCPath('/rpc/path') {
+        my ($self, $c, @args) = @_;
+        ...
+    }
+    
+    ### available as any method containing 'foo'
+    sub goto_regex : XMLRPCRegex('foo') {
+        my ($self, $c, @args) = @_;
+        ...
+    }
+    
+    ### available as rpc.goto_local
+    sub goto_local : XMLRPCLocal {
+        my ($self, $c, @args) = @_;
+        ...
+    }
+    
+    ### avaiable as goto_global
+    sub goto_global : XMLRPCGlobal {
+        my ($self, $c, @args) = @_;
+        ...
+    }
+
+This gives you several method calls, available as rpc calls, as also
+shown by the catalyst server startup messages:
+
+    [catalyst] [debug] Loaded XMLRPCPath Method actions:
+    .---------------------------+---------------------------------------.
+    | XMLRPCPath Method         | Private                               |
+    +---------------------------+---------------------------------------+
+    | goto_global               | /rpc/goto_global                      |
+    | rpc.goto_local            | /rpc/goto_local                       |
+    | rpc.path                  | /rpc/goto_path                        |
+    '---------------------------+---------------------------------------'
+    
+    [catalyst] [debug] Loaded XMLRPCRegex actions:
+    .---------------------------+---------------------------------------.
+    | XMLRPCRegex               | Private                               |
+    +---------------------------+---------------------------------------+
+    | foo                       | /rpc/goto_regex                       |
+    '---------------------------+---------------------------------------'
+
+
+A user could now post to your XMLRPC server as follows, with the
+bundled rpc_client script in this distribution, to get to the
+C<goto_regex> method;
+
+    $ rpc_client -u http://your.host.tld/rpc -m foo.bar 
+
+=head1 Arguments
+
+Any XMLRPC call will have arguments available to it, if the client 
+provided them.
+
+To use our dispatcher exaple again:
+
+    package MyApp;
+    use Catalyst    qw/Server Server::XMLRPC/;
+
+    sub dispatcher : XMLRPCRegex('.') {
+        my($self, $c, @args) = @_;
+
+        ### the XMLRPC arguments, as a list
+        ### same as the ones provides in @args
+        $aref = $c->req->xmlrpc->args;
+
+        ### if the arguments provided were a list with 1 single item
+        ### and that item was a hashref, they are added as ->params,
+        ### just like in regular catalyst
+        $href = $c->req->xmlrpc->params
+
+        ...
+    }
+
+=head1 Return values
+
+By default, this plugin returns all values that are on the stash.
+If you wish to have XMLRPC specific return values, put them in
+C<< $c->stash->{xmlrpc} >> and that will be the only thing returned
+to the client.
+
+For example, returning the whole stash:
+
+    sub some_rpc_call : XMLRPCLocal {
+        ...
+        $c->stash->{foo} = 1;
+        $c->stash->{bar} = 2;
+    }        
+
+    ### will return:
+    { foo => 1, bar => 2 }
+
+For exmpale, returning xmlrpc specific values:
+
+    sub some_rpc_call : XMLRPCLocal {
+        ...
+        $c->stash->{foo}    = 1;
+        $c->stash->{xmlrpc} = { bar => 2 };
+    }        
+
+    ### will return:
+    { bar => 2 }
+
+=head1 Authentication
+
+If you wish to add authentication to your XMLRPC server, you can do this
+as follows:
+
+    package MyApp;
+    use Catalyst    qw/Server Server::XMLRPC/;
+
+    ### Make sure we show errors to the outside world
+    __PACKAGE__->config({
+            'xmlrpc' => {
+                    'show_errors' => 1,
+                }
+            );
+
+    ### always called on any method dispatch
+    sub auto {
+        my( $self, $c ) = @_;
+        
+        ### someone from an illegal ip posting to us!
+        unless( in_allowed_ips( $c->request->address ) ) {
+
+            $c->error( "You are not allowed to use this server" );
+            return 0;
+        }
+        
+        return 1;
+    }
+    
+You can use this same mechanism to do user/password based authentication    
+by checking for arguments provided to the xmlrpc server. See the 
+C<Arguments> section above.
+
+
+=head1 Transparent XMLRPC
+
+There is actually nothing stopping you from making your methods available
+both via the web, as traditionally done by Catalyst, and via XMLRPC as 
+well.
+
+You could set this up as follows:
+
+    package MyApp;
+    use Catalyst    qw/Server Server::XMLRPC/;
+
+    package MyApp::Controller::RPC;
+
+    ### available as rpc.path as well as /web/path
+    sub goto_path : Path ('/web/path') : XMLRPCPath('/rpc/path') {
+        my ($self, $c, @args) = @_;
+        
+        if( $c->request->xmlrpc->is_xmlrpc_request ) {
+            ### got called via xmlrpc
+            ...
+        } else {
+            ...
+        }     
+    }
+    
+This makes C<goto_path> available as C<http://your.host.tld/web/path> and
+C<http://your.host.tld/rpc> with method name C<rpc.path>
+
+=head1 Examples
+
+=head2 Standard remote call
+
+Here's a bit of code that uses the default configuration of this package
+to dispatch an rpc method to a subroutine in our Catalyst application.
+
+    package MyApp::Controller::Demo;
+
+    sub echo : XMLRPC {
+        my ($self, $c) = @_
+        @args = @{ $c->req->xmlrpc->args };
+
+        $c->stash->{xmlrpc} = \@args;
+    }
+
+    ### meanwhile, in an rpc client far away
+    $ rpc_client -u http://your-host.tld/rpc -m demo.echo test
+    Output: test
+
+Let's break it down line by line;
+
+    package MyApp::Controller::Demo;
+
+This is the package you are currently working in. The XMLRPC server will
+dispatch, by default, to something under your C<MyApp::Controller>
+namespace.
+
+    sub echo : XMLRPC {
+
+You now have a method that's available via XMLRPC, thanks to the C<XMLRPC>
+attribute.
+
+        @args = @{ $c->req->xmlrpc->args };
+
+        $c->stash->{xmlrpc} = \@args;
+
+First, we will retrieve our arguments from the XMLRPC::Server object.
+        
+We then set $c->stash->{xmlrpc} to @args, in good echo server tradition.
+
+    ### meanwhile, in an rpc client far away
+    $ rpc_client -u http://your-host.tld/rpc -m demo.echo test
+    -----------------Output-----------
+    $VAR1 = 'test';
+
+The rpc_client uses 2 configurable parts: the C</rpc> appended to the http
+hostname, which is called the C<entry point> of the server. C</rpc> is the
+default (you can configure this to anything you want). The XMLRPC server
+will only listen to requests that are posted to the C<entry point>.
+
+The second part is the method the client posts to. To reach the method
+C<Echo> in your package, the client will have to use the method C<demo.echo>;
+C<demo> as that is the name of your package, and the C<echo> bit as it is
+the name of your method.
+
+The fictive rpc_client program then just prints out what was returned to it.
+
+=head2 More code examples
+
+Browse through the test directory of this distribution, to see some 
+examples of all of the above usage. The relevant modules can be found
+under C<t/lib> of this distribution.
+
+=head1 AUTHORS
+
+Jos Boumans (kane@cpan.org)
+
+Michiel Ootjers (michiel@cpan.org)
+
+=head1 BUG REPORTS
+
+Please submit all bugs regarding C<Catalyst::Plugin::Server> to
+C<bug-catalyst-plugin-server@rt.cpan.org>
+
+=head1 LICENSE 
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

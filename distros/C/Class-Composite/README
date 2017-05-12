@@ -1,0 +1,108 @@
+NAME
+    Class::Composite - Implements Composite patterns
+
+SYNOPSIS
+      =========================
+      Collection implementation
+      =========================
+
+      use Class::Composite;
+      my $collection = Class::Composite::Container->new();
+      my $element = Class::Composite::Element->new();
+      $collection->addElement( $elem );
+      $elements = $collection->getElements();
+
+      ========================
+      Composite implementation
+      ========================
+
+      package graphicBase; # Base for graphics containers and elements
+      sub display {
+        my $self = shift;
+        foreach my $elem (@{$self->getElements()}) {
+          $elem->display();
+        }
+        paint($elem);
+      }
+
+      package graphicElement;
+      use base qw( Class::Composite::Element graphicBase );
+
+      package graphicContainer;
+      use base qw( Class::Composite::Container graphicBase );
+
+      package main;
+      use graphicElement;
+      use graphicContainer;
+      my $element   = graphicElement->new();
+      my $container = graphicContainer->new();
+      $container->addElement( $element );
+      $container->display();
+
+DESCRIPTION
+    "Class::Composite" is used to provide mechanisms used by
+    "Class::Composite::Container" and "Class::Composite::Element".
+    Class::Composite::* implements a Composite pattern (see OO Patterns
+    books and
+    http://www.uni-paderborn.de/cs/ag-schaefer/Lehre/Lehrveranstaltungen/Vor
+    lesungen/Entwurfsmuster/WS0102/DPSA-IVb.pdf for example). A composite
+    pattern is a collection implementation which provides same methods to
+    the container and elements. The reason for using a Composite pattern is
+    to have the same interface to deal with different objects and their
+    containers (collections).
+
+    If you only need a collection implementation, then you can inherite from
+    Class::Composite::Container and Class::Composite::Element directly. If
+    you need specific method that should be applied to both your container
+    and your elements (which is what the Class::Composite is made for), then
+    you isolate the methods you want to apply on both elements and
+    containers in a specific package. Then, you inherite from both your
+    package and Class::Composite::Element for elements, and
+    Class::Composite::Container for containers.
+
+INHERITANCE
+    Class::Base
+
+  getAll()
+    Returns an array ref of all elements below, whatever their depth or
+    type.
+
+  getLeaves(start, end)
+    Returns all Class::Composite::Element contained in the collection,
+    whatever their depth.
+
+  getElements()
+    Returns the elements just below the current object. Returns [] must
+    probably be overriden by child classes.
+
+  getElement()
+    Returns undef must probably be overriden by child classes
+
+  nOfElements()
+    Returns undef, to be overriden by child class
+
+  elementType()
+    Returns the class the element must belongs to, default is
+    Class::Composite. Sets it to undef if you don't want any checking to
+    occur. To be overriden in Child class.
+
+  applyToAll( $sub )
+    Applies the subroutine $sub to all elements. The subroutine will receive
+    a collection element as a parameter.
+
+SEE ALSO
+    Class::Composite::Container, Class::Composite::Element
+    http://opensource.fotango.com/ for other goodies
+
+AUTHOR
+    "Pierre Denis" <pdenis@fotango.com>
+
+ACKNOWLEDGEMENTS
+    Thanks to Leon Brocard and James Duncan for their input and suggestions.
+
+COPYRIGHT
+    Copyright (C) 2002, Fotango Ltd. All rights reserved.
+
+    This is free software. This software may be modified and/or distributed
+    under the same terms as Perl itself.
+

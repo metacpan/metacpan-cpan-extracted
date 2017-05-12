@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SYNCTREE.html
+SyncTree.pm
+synctree
+synctree.bat
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

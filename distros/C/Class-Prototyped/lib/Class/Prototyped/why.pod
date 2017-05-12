@@ -1,0 +1,30 @@
+=pod
+
+=head1 Why Class::Prototyped?
+
+=head1 Background: Prototypes vs. Classes
+
+=head2 The "usual way": classes
+
+=head2 Object orientation without classes
+
+=head2 What are Prototypes
+
+=head2 Prototypes and Self
+
+=head1 What Class::Prototyped can do for you
+
+Class::Prototyped and Design Patterns
+
+	Singleton objects without explicit classes
+
+	Adapters
+
+	Proxies
+
+	Wrappers
+
+Aspect-Oriented Programming and Class::Prototyped
+
+=cut
+# vim: set ft=pod

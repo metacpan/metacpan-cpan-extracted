@@ -1,0 +1,26 @@
+NAME
+    CatalystX::Script::FCGI::Engine - FCGI::Engine script for Catalyst
+
+SYNOPSIS
+        package MyApp::Script::FastCGI;
+        use Moose;
+    
+        extends 'CatalystX::Script::FCGI::Engine';
+    
+        no Moose;
+        1;
+
+DESCRIPTION
+    Replacement FastCGI script which overrides Catalyst's use of
+    FCGI::ProcManager with FCGI::Engine, and process management with
+    FCGI::Engine::ProcManager.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>".
+
+COPYRIGHT & LICENSE
+    Copyright 2011 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

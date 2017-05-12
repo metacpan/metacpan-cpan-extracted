@@ -1,0 +1,43 @@
+Revision history for Class-Load-XS
+
+0.10     2017-04-11
+   - fix test to handle altered Test::Without::Module exception message
+
+0.09     2014-11-13
+   - optimized some perl API calls (thanks, Alexandr Evstigneev!)
+
+0.08     2014-02-13
+    - switched packaging to just EUMM, as MBT wants the .xs file in a
+      different place
+
+0.07     2014-02-13
+    - switched packaging from MB to EUMM+MBT
+    - repository moved to the github moose organization
+
+0.06     2012-10-08
+- Fixed some broken logic that lead to a segfault from the
+  014-weird-constants.t test on some Perls (but unfortunately not the one I
+  test with by default). Reported by Chisel Wright (and several other
+  people). RT #80059.
+
+0.05     2012-10-07
+- Require Class::Load 0.20 in the code (not just the distro metadata). This
+  keeps the tests in sync, and this module needed at least 0.11
+  anyway. Reported by Father Chrysostomos. RT #80002.
+
+- Weird classes with either an ISA or VERSION constant (who does that?) would
+  cause the XS to blow up badly. Reported by Father Chrysostomos. RT #79998.
+
+0.04     2012-02-08
+- Some small test changes for the latest Module::Implementation and
+  Class::Load. There is no need to upgade if you have 0.03 installed.
+
+0.03     2011-11-18
+- Explicitly include Test::Fatal as a test prereq. Reported by W Phillip
+  Moore. RT #72493.
+
+0.02     2011-10-08
+- Require the latest Class::Load (0.11).
+
+0.01     2011-08-15
+- First release upon an unsuspecting world.

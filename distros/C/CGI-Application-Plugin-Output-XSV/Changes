@@ -1,0 +1,43 @@
+Revision history for Perl extension CGI::Application::Plugin::Output::XSV.
+
+1.02   Fri Jan  7 10:38:54 EST 2011
+        - fix tests failing with CGI >= 3.51 (RT #64578)
+
+1.01   Mon Oct 25 22:23:02 EDT 2010
+        - option to stream output rather than collecting and returning
+          to caller (RT #62449, suggested by Rhesa Rozendaal)
+
+1.00   Fri Oct 20 00:04:17 EDT 2006
+        - minor documentation and code formatting updates
+
+0.9_03 Fri Oct 13 11:36:43 EDT 2006
+        - fixed malformed pod (removed code marked "=for later")
+
+0.9_02 Fri Oct 13 00:59:09 EDT 2006
+        - renamed "get_row_cb" parameter to "row_filter"
+        - now calling row_filter on rows produced by iterator
+        - added DBI tests for iterator interface
+          (helpful suggestion for driver from Clayton Scott)
+        - additional tests
+
+0.9_01 Wed Oct  4 00:58:01 2006
+        - added "iterator" parameter to allow data set to be generated
+          on the fly (suggested by Mark Stosberg)
+
+0.9    Mon Oct  2 23:27:44 2006
+        - fixed bug where empty values list would raise exception
+        - additional tests
+        - removed duplicate test
+
+0.03   Wed Nov 23 2005
+        - pod cleanups
+        - several more tests
+
+0.02   Thu Sep 22 11:26:07 EDT 2005
+        - pod cleanups
+	- updated README
+        - fixed broken tests for older CGI.pm, different Perl versions
+
+0.01   Mon Sep 12 21:22:37 2005
+        - original version; created by h2xs 1.22 with options
+          -AX -n CGI::Application::Plugin::Output::XSV

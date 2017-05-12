@@ -1,0 +1,64 @@
+Revision history for Config-FromHash
+
+0.0800 2015-10-27T14:28:43Z UTC
+ [Bug Fixes]
+ - Fixed bug where using the 'filename' argument didn't work.
+
+ [Documentation]
+ - Added documentation for 'sep'.
+
+ [New Features]
+ - Added config_files() method.
+
+0.0702 2015-02-20T01:35:53Z CET
+ [Documentation]
+ - Now includes a basic README (in addition to README.md).
+
+ [Meta]
+ - Added Travis build config.
+ - Removed cpanfile, now sets prereqs in dist.ini.
+ - Replaced iller.ini with iller.yaml.
+
+ [Requirements]
+ - Fixed a kwalitee build prereq fail.
+
+0.0701 2015-01-16T19:11:13Z CET
+ [Bug Fixes]
+ - Removed unused use from test.
+
+0.0700 2015-01-13T13:46:38Z CET
+ [Enhancements]
+ - Uses Path::Tiny instead of File::Slurp.
+ - No more postderef, so Perl 5.10.1 should be supported.
+
+ [Meta]
+ - Replaces Dist::Milla with my own (expanded) bundle
+
+0.0600 2014-09-18T21:00:38Z CEST
+ - POD errors fixed
+ - Build prereqs fixed
+
+0.05 2014-09-01T19:18:30Z CEST
+ - Added data() method
+ - Documented get()
+
+0.04 2014-09-01T18:27:56Z CEST
+ - Require Perl 5.20
+ - Introduce require_all_files option
+ - Make filenames an alias for filename
+ - Make environments an alias for environment
+ - Forbid using both filenames and filename in the same constructor
+ - Documentation expanded
+ - Fixed Changes indentation
+ - Missing dependency (test)
+
+0.03 2014-08-16T21:16:53Z CEST
+ - Removed faulty use statement
+ - Added forgotten dependency
+
+0.02 2014-08-16T21:10:33Z CEST
+ - Fixed POD
+
+0.01 2014-08-16T18:44:47Z CEST
+ - Initial release
+

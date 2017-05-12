@@ -1,0 +1,45 @@
+Revision history for Class-Plugin-Util
+
+0.009  Mon Oct 2  18:18:18 PM 2007 [asksh@cpan.org]
+    -  Forgot to update Makefile.PL with the new dependency (Module::Find).
+       Now we use Module::Build's create_makefile_pl => 'traditional' instead.
+
+0.008  Mon Oct 1  16:26:06 PM 2007 [asksh@cpan.org]
+    -  Added load_plugins and get_plugins functionality. (beta)
+       See documentation for more infomration.
+    -  Now depends on Module::Find v0.05.
+    -  Now passes the new perlcritic policies.
+
+0.007  Mon Sep 10 12:10:43 AM 2007 [asksh@cpan.org]
+    -  Renamed _require_class to require_class (an alias is mantained for
+       backwards-compatability).
+    -  Now exports require_class.
+
+0.006  Sat Aug 11 08:12:13 PM 2007 [asksh@cpan.org]
+    -  Some debugging printing was left in the code. Now removed.
+
+0.005  Sat Aug 11 11:50:00 AM 2007 [asksh@cpan.org]
+    -  VERSION BUMP 0.005 Impact: None.
+    -  TESTS: Test::Kwalitee, Test::Pod::Coverage, Test::Pod and
+       Test::YAML::Meta now changed to author only tests.
+    -  REMOVED DEPENDENCY: UNIVERSAL::require
+         added new function instead: _require_class($class),
+         as this does not add the require function to every single class.
+         also it has a class name to filename cache, and tests if the
+         class-name passed as parameter actually is a valid Perl class.
+
+0.004  Thu May 24 17:20:00 PM 2007 [asksh@cpan.org]
+    -  VERSION BUMP 0.004 Impact: None.
+    -  BUG Severity: tests broken.
+        Fixed a bug with testing for Test::Perl::Critic in t/perlcritic.t
+    -  FEATURE
+        Added t/perlcriticrc
+    -  REMOVED DEPENDENCY: Params::Util
+       Stole _CLASS from Params::Util, as we don't wanna load all of it.
+    -  Fixed up import to only load Carp when necessary.
+
+0.003  Wed May 23 17:06:25 PM 2007
+       Initial release.
+
+
+# vim: expandtab tabstop=4 shiftwidth=4 shiftround

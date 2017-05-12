@@ -1,0 +1,42 @@
+Revision history for Perl extension Chart-Math-Axis.
+
+1.06 Thu 24 Mar 2011
+	- Upgrading to Module::Install::DSL 1.00
+	- Removing some imports
+	- Moved dependencies from Makefile.PL to Chart.pm
+
+1.05 Tue  3 Jun 2008
+	- Upgrading to Module::Install 0.75
+	- Switched from Clone to Storable::dclone
+
+1.04 Tue 11 Dec 2007
+	- Don't use the tainting flag except in the taint tests
+
+1.03 Wed 14 Nov 2007
+	- Upgrading to Module::Install 0.68
+
+1.02 Mon  5 Nov 2007
+	- Upgrading to newer bundled tests
+
+1.01 Fri  7 Sep 2007
+	- Adding a missing dependency on Params::Util
+	- Bumping Clone dependency to remove memory leaks
+
+1.00 Wed  1 Nov 2006
+	- Importing from CVS to new SVN repository
+	- Upgrading tests
+	- Switching from UNIVERSAL::isa to Params::Util::_INSTANCE
+	- Making tests use tainting
+	- Clone segfaults on tainted data, changed to Storable
+	- Creating a chart untaints the data
+
+0.3  Sat Mar 20 2004
+	- Updated Math::BigInt dependency to 1.70 to force them to upgrade
+
+0.2  Sun Aug 24 2003 16:19:15
+	- API to Math::BigFloat appears to have lost the ->copy method,
+	  so I'm replacing that with a call to Clone::clone
+
+0.1  Thu Oct 22 2002 16:32:52
+	- original version
+

@@ -1,0 +1,25 @@
+level1:
+  level2:
+    level3:
+      conn1@: connector:connectors.conn1
+      conn2@: connector:connectors.conn2
+
+connectors:
+  conn1:
+    class: Connector::Builtin::File::Path
+    LOCATION: t/config/
+    file: "[% ARGS.0 %].txt"
+    content: "[% data %]"
+
+  conn2:
+    class: Connector::Builtin::File::Path
+    LOCATION: t/broken/
+    file: "[% ARGS.0 %].txt"
+    content: "[% data %]"
+
+  conn3:
+    class: Connector::Builtin::File::Path
+    LOCATION: t/config/
+    file: "[% ARGS.0 %].txt2"
+    content: "[% data %]"
+

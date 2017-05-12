@@ -1,0 +1,195 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Class-Value-Contact/",
+      "repository" : "http://github.com/hanekomu/Class-Value-Contact",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Value-Contact"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100840",
+   "name" : "Class-Value-Contact",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Class::Value::Contact::Address::Zip" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/Zip.pm"
+      },
+      "Class::Value::Contact::Exception::ReplacePhoneNo" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/ReplacePhoneNo.pm"
+      },
+      "Class::Value::Contact::Name::Full" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Name/Full.pm"
+      },
+      "Class::Value::Contact::Exception::Name::NotWellformed" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Name/NotWellformed.pm"
+      },
+      "Class::Value::Contact::Exception::Name" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Name.pm"
+      },
+      "Class::Value::Contact::Address::Apartment" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/Apartment.pm"
+      },
+      "Class::Value::Contact::Name::Lastname" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Name/Lastname.pm"
+      },
+      "Class::Value::Contact::Address::Streetnumber" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/Streetnumber.pm"
+      },
+      "Class::Value::Contact::EmailAddress" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/EmailAddress.pm"
+      },
+      "Class::Value::Contact::Exception" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception.pm"
+      },
+      "Class::Value::Contact::PhoneLikeNumber" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/PhoneLikeNumber.pm"
+      },
+      "Class::Value::Contact::Exception::Email::Invalid" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Email/Invalid.pm"
+      },
+      "Class::Value::Contact::Exception::ReplaceFaxNo" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/ReplaceFaxNo.pm"
+      },
+      "Class::Value::Contact::Address::State" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/State.pm"
+      },
+      "Class::Value::Contact::Name::Firstname" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Name/Firstname.pm"
+      },
+      "Class::Value::Contact::Exception::Email::NotWellformed" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Email/NotWellformed.pm"
+      },
+      "Class::Value::Contact::Exception::Email" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Email.pm"
+      },
+      "Class::Value::Contact::Exception::InvalidCountry" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/InvalidCountry.pm"
+      },
+      "Class::Value::Contact::Exception::ReplaceAliasCountry" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/ReplaceAliasCountry.pm"
+      },
+      "Class::Value::Contact::Exception::InvalidFaxNo" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/InvalidFaxNo.pm"
+      },
+      "Class::Value::Contact::Name::Title" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Name/Title.pm"
+      },
+      "Class::Value::Contact::PhoneNumber" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/PhoneNumber.pm"
+      },
+      "Class::Value::Contact::Exception::NotWellformed" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/NotWellformed.pm"
+      },
+      "Class::Value::Contact::FaxNumber" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/FaxNumber.pm"
+      },
+      "Class::Value::Contact::Organization" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Organization.pm"
+      },
+      "Class::Value::Contact" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact.pm"
+      },
+      "Class::Value::Contact::Exception::Replace" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Replace.pm"
+      },
+      "Class::Value::Contact::CompanyNo" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/CompanyNo.pm"
+      },
+      "Class::Value::Contact::EmailAddress_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/EmailAddress_TEST.pm"
+      },
+      "Class::Value::Contact::Address::Country" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/Country.pm"
+      },
+      "Class::Value::Contact::Address::City" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/City.pm"
+      },
+      "Class::Value::Contact::Exception::InvalidPhoneNo" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/InvalidPhoneNo.pm"
+      },
+      "Class::Value::Contact::Address::Street" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address/Street.pm"
+      },
+      "Class::Value::Contact::Exception::Name::Invalid" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Name/Invalid.pm"
+      },
+      "Class::Value::Contact::URL" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/URL.pm"
+      },
+      "Class::Value::Contact::Name::Full_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Name/Full_TEST.pm"
+      },
+      "Class::Value::Contact::Address" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Address.pm"
+      },
+      "Class::Value::Contact::Exception::Invalid" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/Contact/Exception/Invalid.pm"
+      }
+   },
+   "requires" : {
+      "Class::Value::Test" : "0",
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "Email::Valid" : "0",
+      "Error::Hierarchy::Util" : "0",
+      "Class::Value::Exception::Base" : "0",
+      "constant" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Test::CompanionClasses" : "0",
+      "Class::Value::String" : "0"
+   },
+   "abstract" : "Contact-related value objects",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

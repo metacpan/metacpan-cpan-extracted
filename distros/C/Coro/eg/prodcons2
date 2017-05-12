@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# the classical producer/consumer example, using semaphores
+# one process produces items, sends a signal.
+# another process waits for that signal and
+# consumed the item.
+
+use Coro;
+use Coro::Semaphore;
+
+my $produced = new Coro::Semaphore 0;
+my $finished = new Coro::Semaphore 0;
+
+async {
+   for my $i (0..9) {
+      print "produced $i\n";
+      push @buffer, $i;
+      $produced->up;
+      cede if @buffer > 5; # simulate memory pressure ;)
+   }
+   print "work done\n";
+   $finished->up;
+};
+
+async {
+   while () {
+      $produced->down;
+      my $i = shift @buffer;
+      print "consumed $i\n";
+   }
+};
+
+$finished->down;
+
+print "job finished\n";
+

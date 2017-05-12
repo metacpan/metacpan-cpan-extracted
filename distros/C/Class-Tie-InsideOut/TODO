@@ -1,0 +1,23 @@
+TODO
+    To-do list for Class::Tie::InsideOut and Tie::InsideOut
+
+  Enhancements
+    *   Add an equivalent mk_accessors function akin to what Class::Accessor
+        does.
+
+    *   Change FIRSTKEY and NEXTKEY methods in Tie::InsideOut so that they
+        only show methods that the caller has access to.
+
+    *   Add an option so that a default exception handler or callback can be
+        given rather than dieing when a key is accessed outside of its
+        namespace. Then one can provide a map of field names to methods to
+        call.
+
+  Tests
+    *   Verify that deserialization into a different namespace causes an
+        error.
+
+    *   Add better tests for FIRSTKEY and NEXTKEY methods in Tie::InsideOut.
+
+    *   Add the usual "kwalitee" tests.
+

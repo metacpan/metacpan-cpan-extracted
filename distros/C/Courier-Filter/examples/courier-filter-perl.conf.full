@@ -1,0 +1,152 @@
+# 
+# Configuration file for Courier::Filter, the purely Perl-based filter
+# framework for the Courier MTA.
+#
+# (This is a sample configuration file.)
+#
+# $Id: courier-filter-perl.conf.full 211 2008-03-23 01:25:20Z julian $
+#
+##############################################################################
+
+use Courier::Filter::Logger::Syslog;
+use Courier::Filter::Logger::File;
+
+use Courier::Filter::Module::BlankBody;
+use Courier::Filter::Module::DNSBL;
+use Courier::Filter::Module::SPF;
+use Courier::Filter::Module::SPFout;
+use Courier::Filter::Module::Envelope;
+use Courier::Filter::Module::Header;
+use Courier::Filter::Module::FakeDate;
+use Courier::Filter::Module::BlankBody;
+use Courier::Filter::Module::ClamAVd;
+use Courier::Filter::Module::Parts;
+use Courier::Filter::Module::SendCopy;
+
+$options = {
+    
+    # Logger Declaration:
+    ##############################################################################
+    
+    logger      => Courier::Filter::Logger::File->new(
+        file_name   => '/var/log/courier-filter.log',
+        timestamp   => TRUE
+    ),
+
+    # Module Declarations:
+    ##############################################################################
+
+    modules     => [
+        
+        # Reject weird subjects:
+        Courier::Filter::Module::Header->new(
+            fields      => {
+                subject         => qr/fuzzybuzzy/
+            },
+            response    => 'No fuzzybuzzy, please!',
+            testing     => TRUE,
+            logger      => Courier::Filter::Logger::Syslog->new()
+        ),
+        
+        # Exempt mails from a forwarding account from the remaining filters:
+        Courier::Filter::Module::Header->new(
+            inverse     => TRUE,
+            fields      => {
+                'x-resent-for'  => 'me@forwarding-target.net'
+            }
+        ),
+        
+        # Reject black-listed sending IP addresses:
+        Courier::Filter::Module::DNSBL->new(
+            zones       => [qw(
+                bl.spamcop.net
+                relays.ordb.org
+                dnsbl.njabl.org
+                dynablock.njabl.org
+                dul.dnsbl.sorbs.net
+                zombie.dnsbl.sorbs.net
+            )]
+        ),
+        
+        # Inbound SPF HELO filter:
+        Courier::Filter::Module::SPF->new(
+            scope               => 'helo',
+            match_on            => ['fail', 'softfail', 'permerror', 'temperror']
+        ),
+        
+        # Inbound SPF MAIL FROM filter:
+        Courier::Filter::Module::SPF->new(
+            scope               => 'mfrom',
+            match_on            => ['fail', 'permerror', 'temperror'],
+            trusting            => TRUE
+        ),
+        
+        # Outbound SPF filter:
+        Courier::Filter::Module::SPFout->new(
+            match_on            => ['fail', 'softfail', 'permerror', 'temperror'],
+            force_response      => 'You are not authorized to use the domain "%{o}" in your sender adress when sending mail through this host (%{xr}).'
+        ),
+        
+        # Filter certain virm:
+        Courier::Filter::Module::Envelope->new(
+            fields      => {
+                'sender'        => 'paul.greenfield@unisys.com'
+            }
+        ),
+        
+        # Filter messages with fake dates:
+        Courier::Filter::Module::FakeDate->new(
+            forward_tolerance   => { hours => 4 },
+            backward_tolerance  => { days  => 7 }
+        ),
+        
+        # Filter messages with blank bodies:
+        Courier::Filter::Module::BlankBody->new(
+            trusting    => TRUE
+        ),
+        
+        # ClamAV daemon filter:
+        Courier::Filter::Module::ClamAVd->new(),
+        
+        # SpamAssassin filter:
+        Courier::Filter::Module::SpamAssassin->new(
+            prefs_file  => '/etc/courier/filters/courier-filter-spamassassin.cf'
+        ),
+        
+        # Reject various virm:
+        Courier::Filter::Module::Parts->new(
+            max_message_size    => 1024*1024,
+            max_part_size       =>  200*1024,
+            views       => ['raw', 'zip'],
+            signatures  => [
+                {
+                    file_name   => qr/\.(com|exe|lnk|pif|scr|vbs)$/i,
+                    views       => ['raw'],
+                    response    => 'Win32 executable attachment detected'
+                },
+                {
+                    encrypted   => TRUE,
+                    views       => ['zip'],
+                    response    => 'Worm suspected (only worms and fools use ZIP encryption)'
+                },
+                {
+                    # Detect one of the images sent by W32.Swen, as a
+                    # reliable fallback.
+                    size        => 3639,
+                    digest_md5  => '476225849b39aff9bb18d7fac79ad7da',
+                    response    => 'Crippled worm suspected: W32.Swen'
+                }
+            ]
+        ),
+        
+        # Copy sent messages:
+        Courier::Filter::Module::SendCopy->new(
+            match_authenticated_user => 'username',
+            copy_to_sender           => TRUE
+        )
+        
+    ]
+    
+};
+
+# vim:tw=79

@@ -1,0 +1,74 @@
+Revision history for Perl extension Catalyst::Plugin::Session::State::Cookie
+
+0.17    2009-10-18
+        - Fixup copyright information
+
+0.16    2009-10-16
+        - Use session config handling from Catalyst::Plugin::Session 0.27.
+
+0.15    2009-10-06
+        - Fix the httponly option again (Closes RT##50249).
+        - Make tests not warn with latest version of Catalyst.
+        - Prefer session configuration to be in the 'Plugin::Session'
+          config key, but provide backwards compatibility for the
+          deprecated 'session' key.
+
+0.14    2009-08-22
+        - Allow turning off the httponly option (Closes RT#48930).
+
+0.13    2009-08-19
+        - Remove Test::MockObject from the test suite as prone to failing on
+          some platforms and perl versions due to its UNIVERSAL:: package
+          dependencies.
+        - Remove Class::Accessor::Fast and replace with Moose. This allows
+          us to not have a ->new method, This is more correct for Plugins
+          and also means that Catalyst is not forced to invoke the scary
+          replace_constructor at scope end handling.
+
+0.12    2009-07-18
+        - Introduced a new option cookie_httponly
+        - Option cookie_secure extended (old syntax fully supported)
+
+0.11    2009-05-13
+        - Change TestApp so that the application is in t/lib, to make it easier
+          for Catalyst to force our package to be immutable.
+
+0.10    2009-02-08
+        - POD addition.
+        - Switch from NEXT to MRO::Compat
+
+0.09    2007-10-08
+        - Bump dependencies so that streaming a file also causes the cookie to
+          be updated.
+          - Add tests for this
+
+0.08    2007-09-14
+        - Fix live test with Mech version 0.37+
+        - Switch to Module::Install
+
+0.07    2007-04-04 23:10:00
+        - Fix the bug that caused sessions to expire immediately when another
+          session was deleted previously in the same request cycle
+
+0.06    2006-09-20 19:53:00
+        - Fix args in calls to NEXT::set_session_id and NEXT::extend_session_id
+
+0.05    2006-08-06 20:50:00
+        - Add configuration of 'cookie_path' (Michael W Peterson)
+
+0.04
+        - Depend on a higher version of C::P::Session
+
+0.03
+        - refactored make_session_cookie to separate calc_expiry, and made
+	      that easily overloadable.
+        - updated for the new state API (get_session_id, set_session_id, etc)
+
+0.02    2005-12-28 13:51:00
+        - Fixed cookie_expires to support browser session cookies.
+        - Renamed default cookie name from just 'session' to
+          'yourapp_session' to allow several applications on the same domain
+          to exist without conflict (LTJake)
+
+0.01    2005-11-14 12:45:00
+        - Initial release.

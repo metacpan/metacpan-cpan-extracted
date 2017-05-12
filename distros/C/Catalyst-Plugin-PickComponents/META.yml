@@ -1,0 +1,21 @@
+---
+name: Catalyst-Plugin-PickComponents
+version: 0.02
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: Pick up the components for Catalyst.
+license: perl
+resources:
+  license: ~
+build_requires:
+  Catalyst: 0
+  MRO::Compat: 0
+  Test::More: 0
+provides:
+  Catalyst::Plugin::PickComponents:
+    file: lib/Catalyst/Plugin/PickComponents.pm
+    version: 0.02
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,3 @@
+This is a sample recursive-make setup (as opposed to a flat, single-makefile
+build). With clearmake -C gnu it will generate CR's appropriate for
+testing ClearCase::CRDB.

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                CSS-SAC
+version:             0.08
+abstract:            SAC CSS parser
+license:             perl
+author:              
+    - Robin Berjon
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::ArrayObjects:           0.04
+    Text::Balanced:                1.84
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

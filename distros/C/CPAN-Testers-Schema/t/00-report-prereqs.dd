@@ -1,0 +1,37 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'DBIx::Class' => '0',
+                                      'DBIx::Class::Candy' => '0',
+                                      'DateTime' => '0',
+                                      'DateTime::Format::ISO8601' => '0',
+                                      'Import::Base' => '0.012',
+                                      'Log::Any' => '1.045',
+                                      'perl' => '5.024',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'SQL::Translator' => '0.11018',
+                                   'Test::Lib' => '0',
+                                   'Test::More' => '1.001005'
+                                 }
+                 }
+     };
+  $x;
+ }

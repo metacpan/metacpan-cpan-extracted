@@ -1,0 +1,215 @@
+
+Revision history for Perl extension Cstools.
+
+3.42 Fri Oct 18 11:29:40 MET DST 2002
+
+	t/cstocs.t: now skips MIME tests if MIME::Words is not
+	installed.
+
+3.4 Thu Oct 17 13:37:18 MET DST 2002
+
+	Added support for MIME encoding. It requires MIME::Words from
+	MIME-Tools, and fixes a few bugs in that code.
+
+3.3 Thu Jul  4 16:23:05 MET DST 2002
+
+	Cz::Cstocs (3.3): removed extra empty line from 1250.enc,
+	spotted by Dan Ohnesorg.
+
+	The accent file updated with character names on the right
+	side, instead of the character themselves.
+
+	Cstools.spec: updated to match RH 7.0, contributed by Milan
+	Kerslager and Ivo Panacek.
+
+	cstocs: removed uninitialized value warning, spotted by Ivo
+	Kocvara.
+
+	Changes: cleanup.
+
+3.2 Fri Jun 21 16:57:08 MET DST 2002
+
+	Cz::Cstocs (3.2): Added the utf8 encoding.
+
+	cstocs: Added the -i option for in-place conversions.
+	
+	Version of the distribution bumped to match the version of
+	Cz::Cstocs.
+
+0.173 Tue Sep  5 14:38:28 MET DST 2000
+
+	Cz::Cstocs: Added the pc2a encoding that maps semigraphics
+	to ASCII art.  Provided by Jaroslav Kozisek, SuSE CR.
+
+0.1772 Thu Aug  3 17:28:38 MET DST 2000
+
+	dbfcstocs.t: test failed if XBase module was not installed,
+	found out by Mr. Schinder.
+
+0.1771 Fri Jul 28 17:05:10 MET DST 2000
+
+	dbfcstocs: added the nomemo option.
+
+0.177 Fri Jul 28 16:20:40 MET DST 2000
+
+	dbfcstocs: utility for charset conversion of dbf files added,
+	suggested by Radim Gelner.
+
+0.176 Tue May 16 13:12:38 MET DST 2000
+
+	Cz::Sort (0.68): Petr Debef brought the text of CSN 97 6030
+	and Cz::Sort (0.68) has been changed to be as compliant as
+	possible to it. The changes affected rare diacritised letters
+	and some extra marks from the ISO-8859-2 code page.
+
+0.175 Tue May  9 15:10:35 MET DST 2000
+
+	cstocs: Use of uninitialized value fixed, reported by Jan
+	Yenya Kasprzak.
+
+0.174 Mon Apr  3 17:58:47 MET DST 2000
+
+	Cz::Sort: workaround for 5.6.0 bug with sort, pointed by Pavel
+	Rychetsky.
+	
+	Test: workaround for systems that do not understand pipes and
+	open2.
+
+0.172 Sun Feb 13 18:17:22 MET 2000
+
+	Cz::Cstocs: Fixed alias expansion, reported by Tomas Ebenlendr.
+
+0.171 Mon Jul 19 10:36:24 MET DST 1999
+
+	Cstools.spec.dist: the rpm spec file extended, thanks to
+	Milan Kerslager.
+
+0.170 Sun Jun 13 17:17:38 MET DST 1999
+
+	Cz::Cstocs: fixed incompatibility introduced by the Exporter
+	coming with the 5.004_05* version of Perl, distributed (at
+	least) with RH.
+
+0.161 Wed May 19 10:36:54 MET DST 1999
+	
+	Cz::Time: fixed error by one in month handling, spotted by
+	Lukas Hejtmanek.
+
+0.158 Sun Feb 21 14:06:42 MET 1999
+
+	Cz::Cstocs (3.17): changed error handling: new Cz::Cstocs now
+	doesn't die, only returns undef and sets $@, reported by Jan
+	Kasprzak. Added note about the typeglob syntax, thanks to Jan
+	Krynicky. Added aliases, thanks to Jan Krynicky for making me
+	to finaly do this.
+
+0.157 Mon Dec  7 23:05:54 MET 1998
+
+	Cz::Cstocs (3.168): fixed bug that prevented importing
+	functions not starting with underline.
+
+0.156 Wed Oct  7 15:01:43 MET DST 1998
+
+	Cz::Cstocs (3.167): Added Chroatian \dj for eth, suggested by
+	Dobrica Pavlinusic. Conversion function is now undef clean.
+
+0.155 Mon Aug 17 17:23:03 MET DST 1998
+
+	Cz::Cstocs (3.166): Added mu to accent file. Added possibility
+	use Cz::Cstocs '_1250_il2';
+
+0.154 Thu Jul  9 16:05:14 MET DST 1998
+
+	Cz::Cstocs (3.165): Fixed bug that caused ignoring the
+	--onebyone flag. Help page of cstocs now lists available
+	encodings.
+
+0.153 Tue Mar  3 18:08:12 MET 1998
+
+	Makefile.PL: added bin/cssort to clean, spotted by Milan
+	Zamazal.
+	
+	Cz::Cstocs (3.164): fixed to put the first occurence of
+	character label to output, spotted by Mirka Misakova.
+
+0.152 
+
+	Cz::Cstocs: added diacritic_char.
+
+0.151 Thu Dec 11 17:17:02 MET 1997
+
+	cssort: typo fixed typo; tests extended to include calling
+	external cssort.
+
+0.15 Tue Nov 25 13:08:20 MET 1997
+
+	Cz::Cstocs (3.162): Added encodings 1525, mac and macce by Marek
+	Veber, bugs fixed in 1250, added items to accent file.
+
+	Cz::Time: added utility package Cz::Time by Michael Mraka.
+
+0.149 Thu Nov 20 15:56:37 MET 1997
+
+	Cz::Cstocs (3.161): Bug fix in 1250.enc, 224 changed to racute,
+	spotted by Marek Veber.
+
+0.148 Mon Nov 17 17:43:45 MET 1997
+
+	Cz::Sort (0.64): Added script cssort that does Czech sorting on
+	input files, has similar options like cut.
+
+0.132 Sun Nov 16 13:38:01 MET 1997
+
+	Cz::Cstocs (3.16): Docs fixed. Cz::Cstocs can now be used with
+	conversion function specified, eg.
+
+		use Cz::Cstocs 'il2_ascii';
+
+	will define il2_ascii for immediate use.
+
+0.13 Sat Nov 15 18:12:33 MET 1997
+
+	Cz::Cstocs (3.155): The conversion functions now work on the
+	whole list, return depends on context. Encoding tex added.
+
+0.10 Fri Sep 26 23:04:27 MET DST 1997
+
+	Cz::Cstocs (3.13): kam encoding file fixed -- Uacute to Uring
+	at 166, spotted by Petr Mach·Ëek.
+	
+	cstocs: generation of script cstocs improved, minor bug fixes.
+	
+0.08 Thu Jul 31 20:10:31 MET DST 1997
+
+	Cz::Cstocs (3.09): error by one fixed -- spotted by Petr
+	Mach·Ëek. The il2 encoding file fixed (rcaron changed to
+	racute).
+
+	Readme in Czech added.
+
+0.05 Fri Jul 11 13:41:43 MET DST 1997
+
+	Namespace Cz:: at CPAN officially registered and the modules
+	named Cz::Cstocs and Cz::Sort.
+
+	Cz::Sort: the functions exported are now czsort and czcmp.
+
+	cstocs (3.07): now does the #! substitution when installed
+	using make.
+
+0.03 Sun Jul  6 20:41:47 MET DST 1997
+
+	Cstocs (3.06): fixed the problem with handling long options.
+
+	Cssort (0.62): now implemented through cscmp function
+	that compares two scalars.
+
+0.02 Wed Jun 18 16:13:20 MET DST 1997
+
+	First version released. Contains modules Cstocs (3.03) and
+	Cssort (0.6).
+
+0.01 Sun Jun 15 13:33:44 MET DST 1997
+
+	First Perl version.
+

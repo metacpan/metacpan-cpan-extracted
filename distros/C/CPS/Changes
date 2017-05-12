@@ -1,0 +1,90 @@
+Revision history for CPS
+
+0.18    CHANGES:
+         * Moved CPS::Future out to its own distribution, Future. Retained a
+           small back-compat wrapper for now
+         * Implement gkpar in terms of gkforeach so it respects the governor's
+           ->enter method
+
+0.17    CHANGES:
+         * Supply ->done_cb, ->fail_cb, ->cancel_cb callback-generation
+           methods to CPS::Future
+         * Allow future chaining for cancellation
+
+0.16    CHANGES:
+         * Allow passing CPS::Future objects into others for on_ready, on_done
+           and on_fail callbacks (RT78432)
+         * Override calling on a CPS::Future to invoke ->done directly
+
+0.15    CHANGES:
+         * More work on CPS::Future - added ->and_then, ->transform
+
+0.14    CHANGES:
+         * Handle Carp 1.25's new message format - RT 75377
+
+0.13    CHANGES:
+         * More work on CPS::Future - added cancellation, on_fail/on_done,
+           needs_all constructor
+         * Also build_requires Test::Fatal
+
+0.12    CHANGES:
+         * Some initial work on CPS::Future
+
+0.11    CHANGES:
+         * Added kpareach()
+         * Renamed kloop() to kwhile(); added transparent back-compatibility
+           redirect
+
+0.10    CHANGES:
+         * Moved data-flow functional functions into their own CPS::Functional
+           namespace
+         * Don't check ref($k) eq "CODE" - may get in the way of Clever Tricks
+           (e.g. callable objects)
+
+        BUGFIXES:
+         * Scrub @_ in continuation from kwhile() and kpar() - fixes RT 55787
+         * Implement gkwhile() using a fixpoint combinator to avoid weakref
+           bugs on perl 5.6 entirely
+
+0.09    CHANGES:
+         * Added kseq()
+         * Minor documentation updates
+         * Skip t/32leakcheck.t before perl version 5.8.0
+
+0.08    CHANGES:
+         * Added kpar()
+         * Only opportunisticly use Sub::Name, don't hard-depend on it in case
+           of pure-perl scenarios
+
+0.07    CHANGES:
+         * Added note about perl before 5.8 not implementing weaken properly,
+           so possible memory leaks if gkwhile()'s continuations are lost
+
+        BUGFIXES:
+         * Second attempt at making gkwhile() work on perl 5.6
+
+0.06    CHANGES:
+         * Created CPS::Governor::Deferred
+         * Use Sub::Name to correctly name the gkwhile iteration closure
+
+0.05    CHANGES:
+         * Added kdescendd() and kdescendb()
+         * (Hopefully) work on perl 5.6 again
+         * Created the concept of a Governor and implemented a simple one
+
+0.04    CHANGES:
+         * Added dropk() analogous to liftk()
+         * Added 'use warnings'
+         * Various small updates to keep CPANTS happy
+
+0.03    BUGFIXES:
+         * Declare dependency on at least perl 5.8 since weaken() fails tests on
+           earlier perls
+
+0.02    CHANGES:
+         * Use Scalar::Util::weaken() in kwhile(), breaking cycle for $iter
+           and allowing body to care less about leaks. Also allows passthrough
+           of $k without intermediate sub{}
+
+0.01    First version, released on an unsuspecting world.
+

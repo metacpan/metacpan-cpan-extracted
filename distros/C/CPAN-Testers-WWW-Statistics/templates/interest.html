@@ -1,0 +1,55 @@
+[% 
+    title = 'Interesting Stats' ;
+    box_sites = 1
+
+    crumb1_name = 'Interesting Stats' ;
+%]
+
+<h2>Contents</h2>
+<ul class="contents">
+<li><a href="#size"      title="Disk Space of Report pages">Disk Space of Report pages</a></li>
+<li><a href="#top20dist" title="Top 20 Distributions with Most Reports">Top 20 Distributions with Most Reports</a></li>
+<li><a href="#top20dver" title="Top 20 Distribution/Versions with Most Reports">Top 20 Distribution/Versions with Most Reports</a></li>
+<li><a href="#reports"   title="Notable Reports submitted by CPAN Testers">Notable Reports submitted by CPAN Testers</a></li>
+</ul>
+
+<h2 id="size">Disk Space of Report pages</h2>
+<table summary="Disk Space of Report pages">
+<tr><th class="top">Size</th><th class="top">Notes</th></tr>
+<tr><td class="numbers">[% sizes.reports %]</td><td>Disk space used by report pages (JS, JSON and HTML files)</td></tr>
+</table>
+
+<h2 id="top20dist">Top 20 Distributions with Most Reports</h2>
+<table summary="Top 20 Distributions with Most Reports">
+<tr><th class="top">#</th><th class="top">Count</th><th class="top">Distribution</th></tr>
+[% cnt = 1 %]
+[% FOREACH row = BYDIST %]
+<tr><td>[% cnt; cnt = cnt + 1 %]</td>[% FOREACH col = row %]<td>[% col %]</td>[% END %]</tr>
+[% END %]
+</table>
+
+<h2 id="top20dver">Top 20 Distribution/Versions with Most Reports</h2>
+<table summary="Top 20 Distribution/Versions with Most Reports">
+<tr><th class="top">#</th><th class="top">Count</th><th class="top">Distribution</th><th class="top">Version</th></tr>
+[% cnt = 1 %]
+[% FOREACH row = BYVERS %]
+<tr><td>[% cnt; cnt = cnt + 1 %]</td>[% FOREACH col = row %]<td>[% col %]</td>[% END %]</tr>
+[% END %]
+</table>
+
+<h2 id="reports">Notable Reports submitted by CPAN Testers</h2>
+<div class="boxer flat">
+<table summary="Notable Reports submitted by CPAN Testers">
+<tr>[% FOREACH cell = HEADINGS ; cnt = 0 %]
+[% IF    cnt == 1 ; THEN ; id = col %]
+[% ELSE %]<th class="top">[% cell %]</th>[% END ; cnt = cnt + 1 ; END %]</tr>
+[% FOREACH row = REPORTS; cnt = 0 %]
+<tr>[% FOREACH col = row %]
+[% IF    cnt == 1  ; THEN ; id = col %]
+[% ELSIF cnt == 2  ; THEN ; guid = col %]
+[% ELSIF cnt == 13 ; THEN ; type = col %]
+[% ELSIF cnt == 3 %]<td class="[% col | upper %]"><a href="http://www.cpantesters.org/cpan/report/[% id %]" title="view report">[% col | upper %]</a></td>
+[% ELSE %]<td>[% col %]</td>[% END ; cnt = cnt + 1 ; END %]</tr>
+[% END %]
+</table>
+</div>

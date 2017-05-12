@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd86
+registers:
+  AF: 56713
+  AF_: 0
+  BC: 47234
+  BC_: 0
+  DE: 17401
+  DE_: 0
+  HL: 15893
+  HL_: 0
+  I: 0
+  IX: 38785
+  IY: 35635
+  PC: 3
+  R: 2
+  SP: 0

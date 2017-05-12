@@ -1,0 +1,60 @@
+#!perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use Chess::FIDE;
+my $opts;
+
+sub usage (;$) {
+
+	my $status = shift || 0;
+	my $fide_keys = join(', ', @FIDE_SEARCH_KEYS);
+
+	print join("\n", <<ENDUSAGE =~ /^\t\t(.*)$/gm), "\n";
+		Search a fide ratings list either from the website or from a downloaded file.
+		Usage: $0 -h|--help | [-V|--version] | [-v|--verbose] -W|--www [ --U|--url URL ] | -F|--file FILE COND1 COND2 ...
+		Options:
+			-h|--help            print this message and exit
+			-V|--version         print version number and exit
+			-v|--verbose         produce verbose output to STDERR
+			-W|--www             use the rating list on the FIDE website
+			-U|--url URL         use the rating list at URL
+                                 (default: $DEFAULT_FIDE_URL)
+			-F|--file FILE       use rating list from file FILE
+		Arguments:
+			COND1 COND2 ..       Conditionals to search by. Will be applied consecutively (AND). For the syntax of the conditionals see man Chess::FIDE
+		Example:
+			fidesearch --www "surname eq 'Kramnik'"
+		    Available search fields are: $fide_keys
+
+ENDUSAGE
+	exit $status;
+}
+
+GetOptions(
+	'h|help'              => sub { usage();   },
+	'V|version'           => sub { print $Chess::FIDE::VERSION; exit; },
+	'v|verbose'           => sub { $ENV{CHESS_FIDE_VERBOSE} = 1 },
+	'W|www'               => \$opts->{-www},
+	'F|file=s'            => \$opts->{-file},
+	'U|url=s'             => \$opts->{-url},
+) || usage(1);
+
+if ($opts->{www} && $opts->{file}) {
+	print "You can only specify either --www or --file option, not both of them\n";
+	exit 2;
+}
+my $fide = Chess::FIDE->new(%{$opts});
+
+my @results = ();
+while (my $criteria = shift @ARGV) {
+	@results = $fide->fideSearch($criteria, @results ? \@results : undef);
+	last unless @results;
+}
+print $fide->dumpHeader();
+for my $result (@results) {
+	print $fide->dumpPlayer($result);
+}

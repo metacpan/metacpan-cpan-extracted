@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  62234:
+    - 57
+name: fdcbb1
+registers:
+  AF: 22979
+  AF_: 0
+  BC: 43833
+  BC_: 0
+  DE: 17134
+  DE_: 0
+  HL: 46948
+  HL_: 0
+  I: 0
+  IX: 36735
+  IY: 62360
+  PC: 4
+  R: 2
+  SP: 0

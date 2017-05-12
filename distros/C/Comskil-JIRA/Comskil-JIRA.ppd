@@ -1,0 +1,15 @@
+<SOFTPKG NAME="Comskil-JIRA" VERSION="00.11329">
+    <ABSTRACT>Retrieve, Translate, Map, Integrate, and Import JIRA Issues:\nA collection of tools to enable retrieval, storage, integration, and mapping of data\nfrom JIRA live instances and backfiles.  This was created to assist in the migration\nand integration of several 3rd party hosted issue tracking tools and JIRA instances\ninto a single JIRA Studio OnDemand site.  \nVersion '00.nnnnn' == 'Raw Development, Not Even Unstable'\n</ABSTRACT>
+    <AUTHOR>Peter Shiner &lt;pshiner@comskil.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <REQUIRE NAME="File::Path" />
+        <REQUIRE NAME="HTTP::Headers" />
+        <REQUIRE NAME="HTTP::Response" />
+        <REQUIRE NAME="HTTP::Status" />
+        <REQUIRE NAME="JIRA::Client" />
+        <REQUIRE NAME="LWP::UserAgent" />
+        <REQUIRE NAME="Test::More" />
+        <ARCHITECTURE NAME="i686-cygwin-thread-multi-64int-5.10" />
+        <CODEBASE HREF="" />
+    </IMPLEMENTATION>
+</SOFTPKG>

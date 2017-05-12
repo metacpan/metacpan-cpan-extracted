@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Untaint::html.
+
+0.01  Wed Mar 24 16:48:03 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n CGI::Untaint::html
+

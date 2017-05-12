@@ -1,0 +1,11 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README
+README.md
+t/Confman.t
+lib/Confman/API.pm
+lib/Confman.pm
+META.yml                                 Module meta-data (added by MakeMaker)

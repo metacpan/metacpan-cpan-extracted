@@ -1,0 +1,30 @@
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="plain_txt"; filename="test2.txt"
+Content-Length: 1037
+Content-Type: text/plain
+
+This is a test of a plain text document.
+It has several lines of text,
+and can be used to test how the larger documents
+are handled by CGI::Lite.
+It is not intended for any other purpose.
+
+There has to be a lot of text in here because we need it to be several
+times the size of the buffer in order to test all the possible
+situations which the upload handler will encounter.
+The smallest buffer size is 256 of your puny Earth bytes and therefore
+this file ought to be somewhat in excess of three times that just to be
+sure. That's a lot of text when you stop to think about it and, as it
+turns out, even more when you have to come up with it.
+
+Why on earth are you reading this in the first place? It's really just
+placeholder text. I could have welched out and used Lorem Ipsum instead
+but how dull and uninspiring would that be? Designers, somewhat
+surprisiingly, appear to have little creativity when it comes to such
+placeholder text. Perhaps their programmer friends could help them out
+with that.
+
+OK, that's enough now.
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa--
+

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Rgb.pm
+rgb.txt
+test.pl

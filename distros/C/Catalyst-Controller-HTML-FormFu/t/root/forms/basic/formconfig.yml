@@ -1,0 +1,9 @@
+---
+elements:
+  - name: basic_formconfig
+    label: __uri_for(/uri_for)__
+    constraint:
+        - Required
+
+  - type: Submit
+    name: submit

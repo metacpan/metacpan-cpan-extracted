@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+lib/CGI/MiniFramework.pm
+sample/sample.cgi
+sample/userLib/App/Index.pm
+META.yml                                 Module meta-data (added by MakeMaker)

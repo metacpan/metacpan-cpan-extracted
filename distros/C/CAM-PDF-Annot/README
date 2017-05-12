@@ -1,0 +1,51 @@
+CAM-PDF-Annot version 0.01 - PDF Annotations extension for CAM::PDF
+===================================================================
+
+LICENSE
+
+Copyright 2009 Donato Azevedo
+Copyright 2009 Chemtech
+
+ABOUT CHEMTECH
+
+Chemtech is a SIEMENS company in Brazil and has sponsored the development
+of this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CAM::PDF
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Donato Azevedo
+Copyright (C) 2009 by Chemtech Serviços de Software e Engenharia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+DESCRIPTION
+
+This module simply eases the interface to appending and listing 
+annotations on a pdf document. It does not support the automated
+creation of annotation objects -- yet.
+
+CAVEATS
+
+It has only been tested for Annotations of /Subtype Circle, Rect, 
+Polygon and Text and may not work consistently with other subtypes.
+
+AUTHOR
+
+Donato Azevedo - <donatoaz _AT_ gmail.com>

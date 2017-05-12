@@ -1,0 +1,81 @@
+﻿Revision history for Catalyst-Authentication-Credential-RPX
+
+0.10060100 2012-05-24T10:57:18Z
+ - Maintenance Release
+
+ [Dependencies::Changed::Develop]
+ - recommends : Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+   0.01009803 -> v1.3.0
+ - suggests : Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 -> v1.3.0
+
+ [Dependencies::Changed::Runtime]
+ - requires : Net::API::RPX 0.01 -> 0.04
+
+ [Dependencies::New::Runtime]
+ - requires : perl 5.006
+
+ [Tests::New]
+ - release/minimum-version
+
+0.10053906 2011-10-22T14:03:24Z
+ - Maintenance Release
+
+ [Dependencies::New::Runtime]
+ - strict
+ - warnings
+
+ [Dependencies::Removed::Test]
+ - English
+
+ [Internals]
+ - $VERSION no longer defined in BEGIN
+ - now defines $AUTHORITY everywhere.
+
+ [Packaging]
+ - Move Changes to CPAN::Changes format.
+ - Move to Git Versions
+ - Move author/release tests to xt/
+ - Move to @Author::KENTNL
+ - Git Repo URLS now use https://
+ - add x_authority
+
+0.10053905 2011-01-02T13:05:29Z
+ - Get rid of FindBin completely.
+ - Replace Test::Exception with Test::Fatal
+ - Toolkit upgrade.
+ - Fixed bad changelog spelling.
+
+0.10038414 2010-08-02T22:05:53Z
+ - Apply fix for rt $59170 : Logging in via RPX doesn't work. ( Reported
+   and Fixed by Stephan Jauernick )
+ - Move to @KENTNL
+ - Apply fix for rt #58843 : Unused argument "app" wrongly validated only
+   against Objects when ClassNames were valid arguments too. ( Reported by
+   Stephan Jauernick )
+ - Ship dist.ini
+
+0.10013116 2009-11-28T16:10:50Z
+ - Dropped Find::Lib
+ - Dropped Use::ok
+ - Rebuild Dist/Dzill.
+ - Revamp docs with Weaver.
+
+0.10003903 2009-08-29T03:26:38Z
+ - Version Scheme switched to AutoVersion::Relative.
+ - Rebuilt witn newer Dist::Zilla to get author tests in.
+ - Boosted the documentation a bit.
+ - Now passing critic tests ( [ this means there are less spelling
+   mistakes largely ;] )
+
+0.0920400 2009-07-23T00:38:31Z
+ - Tweaked Synopsis documentation to be a better Catalyst Representation
+   ( Thanks Tomas Doran )
+ - Fixed Typo ( Thanks Brian Cassidy, I really should have noticed that
+   one sooner )
+
+0.0920310 2009-07-22T10:05:43Z
+ - Added more dependencies
+
+0.0920221 2009-07-21T21:31:40Z
+ - First version.
+

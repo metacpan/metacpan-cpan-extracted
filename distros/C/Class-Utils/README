@@ -1,0 +1,180 @@
+NAME
+    Class::Utils - Class utilities.
+
+SYNOPSIS
+     use Class::Utils qw(set_params set_split_params);
+     set_params($self, @params);
+     set_params_pub($self, @params);
+     my @other_params = set_split_params($self, @params);
+     my ($object_params_ar, $other_params_ar) = split_params($object_keys_ar, @params);
+
+SUBROUTINES
+    "set_params($self, @params)"
+             Sets object parameters to user values.
+             If setted key doesn't exist in $self object, turn fatal error.
+             $self - Object or hash reference.
+             @params - Key, value pairs.
+
+    "set_params_pub($self, @params)"
+             Sets object parameters to user values. Only public arguments.
+             Private arguments are defined by '_' character on begin of key and will be
+             skip.
+             If setted public key doesn't exist in $self object, turn fatal error.
+             $self - Object or hash reference.
+             @params - Key, value pairs.
+
+    "set_split_params($self, @params)"
+             Set object params and other returns.
+             $self - Object or hash reference.
+             @params - Key, value pairs.
+             Returns array with other parameters.
+
+    "split_params($object_keys_ar, @params)"
+             Split params to list of object params and other params.
+             Returns array with two values. First is reference to array with object
+             parameters. Second in reference to array with other parameters.
+
+ERRORS
+     set_params():
+             Unknown parameter '%s'.
+
+     set_params_pub():
+             Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Utils qw(set_params);
+
+     # Hash reference with default parameters.
+     my $self = {
+            'test' => 'default',
+     };
+
+     # Set params.
+     set_params($self, 'test', 'real_value');
+
+     # Print 'test' variable.
+     print $self->{'test'}."\n";
+
+     # Output:
+     # real_value
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Utils qw(set_params);
+
+     # Hash reference with default parameters.
+     my $self = {};
+
+     # Set bad params.
+     set_params($self, 'bad', 'value');
+
+     # Turn error >>Unknown parameter 'bad'.<<.
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Utils qw(set_params_pub);
+
+     # Hash reference with default parameters.
+     my $self = {
+             'public' => 'default',
+     };
+
+     # Set params.
+     set_params_pub($self,
+             'public' => 'value',
+             '_private' => 'value',
+     );
+
+     # Print 'test' variable.
+     print $self->{'public'}."\n";
+
+     # Output:
+     # value
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Utils qw(set_split_params);
+
+     # Hash reference with default parameters.
+     my $self = {
+            'foo' => undef,
+     };
+
+     # Set bad params.
+     my @other_params = set_split_params($self,
+            'foo', 'bar',
+            'bad', 'value',
+     );
+
+     # Print out.
+     print "Foo: $self->{'foo'}\n";
+     print join ': ', @other_params;
+     print "\n";
+
+     # Output:
+     # Foo: bar
+     # bad: value
+
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Utils qw(split_params);
+
+     # Example parameters.
+     my @params = qw(foo bar bad value);
+
+     # Set bad params.
+     my ($main_params_ar, $other_params_ar) = split_params(['foo'], @params);
+
+     # Print out.
+     print "Main params:\n";
+     print "* ".(join ': ', @{$main_params_ar});
+     print "\n";
+     print "Other params:\n";
+     print "* ".(join ': ', @{$other_params_ar});
+     print "\n";
+
+     # Output:
+     # Main params:
+     # * foo: bar
+     # Other params:
+     # * bad: value
+
+DEPENDENCIES
+    Error::Pure, Exporter, List::MoreUtils, Readonly.
+
+REPOSITORY
+    <https://github.com/tupinek/Class-Utils>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2011-2015
+     BSD 2-Clause License
+
+VERSION
+    0.07
+

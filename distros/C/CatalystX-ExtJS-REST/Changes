@@ -1,0 +1,17 @@
+Revision history for CatalystX-ExtJS-REST
+
+2.1.3 - 2014-01-15
+  - silence warnings
+  - fix hash randomization issues in tests
+  - remove JSON::Any dependency
+  - drop JSON::Any dependency
+  - fix tests to work with latest Test::WWW::Mechanize
+
+2.1.1 - 2011-03-21
+  - accommodate changes from latest ExtJS::Direct release
+
+2.1.0 - 2011-02-05
+  -  CatalystX::ExtJS has been split in ::Direct and ::REST
+  - added error message if file could not be found
+     
+For older changes see the Changes file of CatalystX::ExtJS

@@ -1,0 +1,12 @@
+numbers:
+    - '1'
+    - '2'
+    - '3'
+thingies:
+    -
+        name: thing1
+    -
+        name: thing2
+one:
+    for:
+        the: hustle

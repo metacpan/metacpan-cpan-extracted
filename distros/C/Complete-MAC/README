@@ -1,0 +1,12 @@
+ENVIRONMENT
+
+ COMPLETE_MAC_TRACE => bool
+
+    If set to true, will display more log statements for debugging.
+
+SEE ALSO
+
+    Complete
+
+    Other Complete::* modules.
+

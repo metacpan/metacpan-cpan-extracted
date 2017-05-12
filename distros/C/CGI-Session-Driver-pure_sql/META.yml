@@ -1,0 +1,26 @@
+---
+abstract: 'Pure SQL driver with no embedded Perl stored in the database'
+author:
+  - 'Mark Stosberg <mark@summersault.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Session-Driver-pure_sql
+provides:
+  CGI::Session::Driver::pure_sql:
+    file: lib/CGI/Session/Driver/pure_sql.pm
+    version: 0.70
+  CGI::Session::Serialize::sql_abstract:
+    file: lib/CGI/Session/Serialize/sql_abstract.pm
+    version: 0.7
+requires:
+  CGI::Session: 4.13
+  Date::Calc: 0
+  SQL::Abstract: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.70

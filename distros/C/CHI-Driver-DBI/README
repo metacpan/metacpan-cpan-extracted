@@ -1,0 +1,43 @@
+NAME
+    CHI::Driver::DBI - Use DBI for cache storage
+
+VERSION
+    version 1.27
+
+SYNOPSIS
+        use CHI;
+    
+        # Supply a DBI handle
+        #
+        my $cache = CHI->new( driver => 'DBI', dbh => DBI->connect(...) );
+    
+        # or a DBIx::Connector
+        #
+        my $cache = CHI->new( driver => 'DBI', dbh => DBIx::Connector->new(...) );
+    
+        # or code that generates a DBI handle
+        #
+        my $cache = CHI->new( driver => 'DBI', dbh => sub { ...; return $dbh } );
+
+DESCRIPTION
+    This driver uses a database table to store the cache. The newest
+    versions of MySQL and SQLite work are known to work. Other RDBMSes
+    should work.
+
+    Why cache things in a database? Isn't the database what people are
+    trying to avoid with caches? This is often true, but a simple primary
+    key lookup is extremely fast in many databases and this provides a
+    shared cache that can be used when less reliable storage like memcached
+    is not appropriate. Also, the speed of simple lookups on MySQL when
+    accessed over a local socket is very hard to beat. DBI is fast.
+
+AUTHORS
+    Original version by Justin DeVuyst and Perrin Harkins. Currently
+    maintained by Jonathan Swartz.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Justin DeVuyst.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

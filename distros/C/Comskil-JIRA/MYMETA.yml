@@ -1,0 +1,28 @@
+---
+abstract: "Retrieve, Translate, Map, Integrate, and Import JIRA Issues:\nA collection of tools to enable retrieval, storage, integration, and mapping of data\nfrom JIRA live instances and backfiles.  This was created to assist in the migration\nand integration of several 3rd party hosted issue tracking tools and JIRA instances\ninto a single JIRA Studio OnDemand site.  \nVersion '00.nnnnn' == 'Raw Development, Not Even Unstable'\n"
+author:
+  - 'Peter Shiner <pshiner@comskil.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Comskil-JIRA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Path: 0
+  HTTP::Headers: 0
+  HTTP::Response: 0
+  HTTP::Status: 0
+  JIRA::Client: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+version: 00.11329

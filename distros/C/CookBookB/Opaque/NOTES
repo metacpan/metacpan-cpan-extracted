@@ -1,0 +1,420 @@
+From roehrich Fri Jan 26 18:28:05 1996
+To: mathias@singnet.com.sg, perl5-porters@africa.nicoh.com
+Subject: Re: more XS questions
+Content-Length: 5311
+
+>From: Mathias Koerber <mathias@singnet.com.sg>
+>
+> I might be dense,
+> 
+> but I just can't figure out how to pass a character array (note: not a
+> null-terminated string) to an XSUB, have the XSUB diddle a few
+> bits inside, *maybe grow it*, and then return the same character
+> array.
+
+Keep it simple.  As far as Perl, and XS, is concerned it's just an opaque
+data type.  Presumably the Cisam library knows how to diddle with that
+type.  Perl just has to keep track of the pointer.
+
+
+
+> I have defined a type (in typemap):
+> 
+> 	Record	T_PTROBJ
+
+If you're willing to put up with the restrictions and hoop-jumping involved
+in using that map, then you'll probably be okay.  I have different tastes,
+however, and prefer to use my trusty O_OBJECT (opaque object) typemap.  This
+may look familiar; it's in the C++ section of the perlxs manpage.  I use
+this for pretty much every non-trivial task these days.
+
+--------
+TYPEMAP
+
+Record *	O_OBJECT
+
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+---------
+
+
+> So now my function is supposed to be (in .xs):
+> 
+> void
+> function(par1,record,offset,par4)
+> 	int		par1
+> 	Record *	r
+> 	int		offset
+> 	int		par4
+> 	CODE:
+> 	{
+> 	...
+> 		/*
+> 		 * r+offset are a char* pointing
+> 		 * to the position in the record where
+> 		 * the changes are to be done
+> 		 */
+> 
+> 	function(par1,((char *)r)+offset,par4);
+> 		
+> 	}
+> 	OUTPUT:
+> 	record
+
+I don't know where the record comes from but I'll assume it originates
+somewhere in the Cisam library.  I would call that record an object and
+build a constructor and destructor for it.  Substitute the safemalloc and
+safefree with appropriate Cisam functions.
+
+-----------
+typedef char Record;
+
+MODULE = CookBookB::Opaque		PACKAGE = CookBookB::Opaque
+
+Record *
+new(CLASS)
+	char *CLASS
+	CODE:
+	RETVAL = (Record *)safemalloc( sizeof(Record) * 100 );
+	/* just for testing purposes */
+	strcpy( RETVAL, "Alternative-Rock Doppelgaengers" );
+	OUTPUT:
+	RETVAL
+
+void
+DESTROY(self)
+	Record *self
+	CODE:
+	safefree(self);
+
+----------
+
+Now put "function" in the same package, rearranging the parameter list so
+the object comes first.  This can now be called as a method of the object.
+Substitute the printf with an appropriate Cisam function.
+
+-------
+void
+function(self,par1,offset,par4)
+	Record *self
+	int	par1
+	int	offset
+	int	par4
+	CODE:
+	printf("(%s)\n", (char*)self );
+	
+--------
+
+
+All of that can be used like this:
+  $opaque_data = CookBookB::Opaque->new;
+  $opaque_data->function(1,2,3)
+
+
+
+> Questions:
+> 
+> 	If I define Record as T_PTROBJ, xsubpp will generate
+> 	a check at the start of the function for the correct
+> 	object type (RecordPtr). It will also allocate a new
+> 	tmp SV which I will get the pointer to as r.
+> 	
+> 	1) How do I get the exact current length of the char
+> 	array r points to at this time?
+
+How would you know the length if you weren't using Perl?  Nothing changes.
+I'll bet it's not something you need to know.
+
+> 	2) Can I use SvGROW on this SV? Or should I use
+> 		SvCUR_set?
+
+Not an issue.  Cisam is managing that type--Perl shouldn't touch it.
+
+
+> 	3) How to I return (the possibly grown) tmp SV (to which
+> 	   r pointed) to perl in ST(1)? Do I need tu PUSHs()?
+> 	   do I need to sv_setref_sv()?
+
+Not an issue.  Cisam is managing all of that.
+
+
+
+> PS: for access to global C variables contained in the library,
+> I have resorted to converting them to perl functions which just
+> return the variable with the same name. This however does not
+> allow setting the variables from perl.
+
+This can be done two ways.  The variable can live on the C side (as in your
+case), or it can live on the Perl side.  If the variable lives on the Perl
+side then the C side will use something like perl_get_sv() to refetch it
+whenever it is needed.  If the variable lives on the C side, then I prefer
+to use something like this:
+
+-------
+/* variable living on C side. */
+static int ex2_debug_c = 42;
+
+MODULE = CookBook::Ex2          PACKAGE = CookBook::Ex2
+
+int
+ex2_debug_c(...)
+        CODE:
+        if( items > 0 ){
+                ex2_debug_c = SvIV( ST(0) );
+        }
+        RETVAL = ex2_debug_c;
+        printf("# On the C side, ex2_debug_c = %d\n", RETVAL );
+        OUTPUT:
+        RETVAL
+-------
+
+That can then be called from Perl like this:
+	$debug = ex2_debug_c();
+	ex2_debug_c(1);
+
+If you get really creative you can tie the $debug variable on the Perl side
+so you don't have to call ex2_debug_c() explicitly.
+
+------
+# A tie() interface to share a variable living on the C side.
+sub TIESCALAR {
+        my $type = shift;
+        my $x;
+        bless \$x, $type;
+}
+
+sub STORE {
+        my $self = shift;
+        my $val = shift;
+        ex2_debug_c( $val );
+}
+
+sub FETCH {
+        my $self = shift;
+        my $ret;
+        $ret = ex2_debug_c();
+        $ret;
+}
+
+# Here's the tie'd variable.
+tie( $ex2_debug_c, 'CookBook::Ex2' ) || die "Tie of CookBook::Ex2 failed";
+------
+
+Then you can use the $ex2_debug_c variable in place of the &ex2_debug_c XSUB.
+
+Dean
+
+From roehrich Sat Jan 27 11:09:37 1996
+To: mathias@singnet.com.sg, perl5-porters@africa.nicoh.com
+Subject: Re: more XS questions
+Content-Length: 5358
+
+>From: Mathias Koerber <mathias@singnet.com.sg>
+
+>Thx for the tips. I'll try it, although the interface will come
+>out very un-Cisamish :-(  Ok, nevermind, I'll just rewrite the
+>manual then...
+
+If you want the Perl interface to match the C interface then you can do
+that.  My suggestion to turn the functions into methods is a just that--a
+suggestion.  You can make the interface look OO-Perlish,
+Traditional-Perlish, or you can leave it straight C-ish.
+
+>> --------
+>> TYPEMAP
+>> 
+>> Record *	O_OBJECT
+>
+>Can this handle records of different length? In Cisam the record
+>length is dependent on the file, and don't want to make one class for
+>every possible length :-( (see new(CLASS) below)
+
+O_OBJECT is an opaque object.  It knows nothing about the record, and makes
+no assumptions about its type or size.
+
+In short, you can use O_OBJECT to refer to anything.  I usually use it for C
+structs and C++ classes, but, as you can see, it doesn't care what you use
+it on.  It's very similar to the idea behind the PyObject in Python's C API.
+
+
+>> I don't know where the record comes from but I'll assume it originates
+>> somewhere in the Cisam library.  
+>
+>It is just an allocated  piece of memory, so the below should work fine.
+>But can I pass another parameter? And does safealloc zero out? or do I
+>need to ZERO?
+
+You may pass one more parameter, or you may pass one hundred more
+parameters.  You just have to alter the interface so it will accept them.  I
+don't think you should assume that safemalloc, or even malloc, will zero the
+memory--it's not a portable assumption.  You'll have to explicitly zero it.
+
+>Can I have another constructor:
+>	new_i(CLASSSS,isfd)
+>which looks up the reord size for an open file and uses that?
+
+Try it.
+
+
+>> All of that can be used like this:
+>>   $opaque_data = CookBookB::Opaque->new;
+>
+>Would this be:
+>                   Cisam::Record->new(len) ???
+
+Almost.  You have to catch the object that it throws back.
+
+   $opaque_object = Cisam::Record->new(len);
+
+>And if I have a function
+>
+>	int
+>	func2(record,a,b,c)
+>
+>this would turn into
+>
+>	$cc = Cisam::Record->func2(a,b,c) 
+>
+>right?
+
+Nope.  Where's the object?   It comes from the constructor above.  Use it.
+
+	$cc = $opaque_object->func2(a,b,c)
+
+If you don't want it to be object-oriented, maybe you want it to be C-ish,
+then you can even call it this way:
+
+	$cc = Cisam::Record::func2($opaque_object,a,b,c);
+
+But then, if you're not going OO you'll probably leave the parameters in
+their original C order when you define the XSUB so you'll probably call it
+like this:
+
+	$cc = Cisam::Record::func2(a,$opaque_object,b,c);
+
+Even if you don't go OO, I still recommend that you still use some variation
+of new/DESTROY to create and dispose of the record.  It's just easier when
+you can make the interpreter do some of the housecleaning for you.
+
+>Is the following correct to get the string back into a
+>normal perl variable
+>
+>void
+>ldchar(CLASS,offset,length)
+>        char *                  CLASS
+>        int                     offset
+>        int                     length
+>        CODE:
+>        {
+>        char *          p;
+>
+>        p = safemalloc(length+2);
+>        ldchar(((char *)CLASS)+offset,length,p);
+>        ST(0) = newSVpv(p,length);
+>        safefree(p);
+>        }
+
+Let XS do the work for you.
+
+char *
+ldchar(self,offset,length)
+	Record *self
+	int offset
+	int length
+     CODE:
+	RETVAL = (char*)safemalloc(length+2);
+        ldchar(((char *)self)+offset,length,RETVAL);
+     OUTPUT:
+	RETVAL
+
+
+>> > Questions:
+>> > 
+>> > 	If I define Record as T_PTROBJ, xsubpp will generate
+>> > 	a check at the start of the function for the correct
+>> > 	object type (RecordPtr). It will also allocate a new
+>> > 	tmp SV which I will get the pointer to as r.
+>> > 	
+>> > 	1) How do I get the exact current length of the char
+>> > 	array r points to at this time?
+>> 
+>> How would you know the length if you weren't using Perl?  Nothing changes.
+>> I'll bet it's not something you need to know.
+>
+>Since records can be of diff. length I might have to know. Or rely on
+>the user to have allocated the right size buffer...
+
+Oh.  That's going to force some changes.  In that case you'll want the
+object to know its own length.
+
+Here's the way to handle it.  Make a C struct that contains a pointer for
+the record and an integer for the record's size.  Then alter the new/DESTROY
+functions to handle this type.
+
+----------
+struct PerlObjectRecord {
+	char *record;
+	int length;
+};
+
+typedef struct PerlObjectRecord Record;
+
+MODULE = CookBookB::Opaque		PACKAGE = CookBookB::Opaque
+
+Record *
+new(CLASS,len)
+	char *CLASS
+	int len
+	CODE:
+	RETVAL = (Record *)safemalloc( sizeof(Record) );
+	RETVAL->record = (char*)safemalloc( len );
+	RETVAL->length = len;
+	strncpy( RETVAL->record, "Alternative-Rock Doppelgaengers", len );
+	OUTPUT:
+	RETVAL
+
+void
+DESTROY(self)
+	Record *self
+	CODE:
+	safefree(self->record);
+	safefree(self);
+
+---------
+
+The typemap is unchanged.  O_OBJECT, the opaque object, ever versatile,
+doesn't know or care that the type of 'Record' has changed from a (char) to
+a (struct PerlObjectRecord).
+
+Now 'function' is changed slightly, so it knows where to find the record in
+the object.
+
+--------
+void
+function(self,par1,offset,par4)
+	Record *self
+	int	par1
+	int	offset
+	int	par4
+	CODE:
+	printf("(%s) %d\n", self->record, self->length );
+--------
+
+Good luck,
+
+Dean

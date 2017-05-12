@@ -1,0 +1,16 @@
+Revision history for Perl extension Recurring-Process
+
+0.2.0 2016-10-24T07:10:05Z
+    - windows compatibility
+    - IO::Async support
+
+0.1.2 2016-10-16T18:31:19Z
+    - work on windows OS
+
+0.1.1 2016-10-06T15:13:27Z
+    - fix win32 helper
+
+0.1.0 2016-10-04T13:15:08Z
+
+    - original version
+

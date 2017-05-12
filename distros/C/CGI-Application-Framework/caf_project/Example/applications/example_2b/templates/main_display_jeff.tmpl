@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Web MVC Framework Example Application #2b ("Jeff") -- Main Page</title>
+	<link rel="stylesheet" href="[% url_examples_css %]" type="text/css" />
+</head>
+  <body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+	<div id="nav">
+		<span class="link"><a href="[% url_app_cgi %]/Example/example_1">One</a></span>
+		<span class="link"><a href="[% url_app_cgi %]/Example/example_2a">Two</a></span>
+		<span class="link"><a href="[% url_app_cgi %]/Example/example_3">Three</a></span>
+		<span class="link"><a href="[% url_app_cgi %]/Example/example_4">Four</a></span>
+		<span class="link"><a href="[% url_app_cgi %]/Example/example_5">Five</a></span>
+	</div>
+
+    <h1>Web MVC Framework Example Application #2b ("Jeff") -- Main Page</h1>
+    <h2>Template::Toolkit version</h2>
+
+<pre>
+[% README.txt %]
+</pre>
+
+<h2>Session Retained, you didn't have to log in again</h2>
+
+<a href="[% SELF_HREF_LINK %]">
+<b>Click me to reload this page...</b>
+</a>
+
+<p>
+<font size=1><b>The 'href' link value is:</b>
+[% SELF_HREF_LINK %]
+</font>
+</p>
+
+<p>
+<a href="[% MUTT_HREF_LINK %]">
+<b>Click me to jump to the other page while maintaining the same session...</b>
+</a>
+</p>
+
+<p>
+<font size=1><b>The 'href' link value is:</b>
+[% MUTT_HREF_LINK %]
+</font>
+</p>
+
+<p>
+<b>Number of times you have loaded this page:</b>
+[% load_count_just_here %]
+</p>
+
+<p>
+<b>Number of times you have loaded any page with this session:</b>
+[% load_count_for_session %]
+</p>
+
+  </body>
+</html>

@@ -1,0 +1,55 @@
+0.012     2017-02-24 14:09:45+01:00 Europe/Berlin
+
+- Bug fix for rare infinite loop + crash in decompression function
+
+0.011001  2016-08-12 14:01:57+02:00 Europe/Berlin
+
+- Unit tests now also work on linux :/
+
+0.011     2016-08-12 10:18:45+02:00 Europe/Berlin
+
+- Decompressing frames with unknown size is now supported.
+
+0.010     2016-05-25 13:20:40+02:00 Europe/Berlin
+
+- Bug fix for major bug in 0.009
+
+0.009     2016-05-24 13:18:12+02:00 Europe/Berlin
+
+- Added support for concatenated LZ4 frames.
+
+0.008     2015-12-09 13:36:57+01:00 Europe/Berlin
+
+- Added acknowledgment section to pod.
+
+0.007     2015-12-09 10:36:44+01:00 Europe/Berlin
+
+- Several Kwalitee issues fixed.
+
+0.006     2015-12-08 14:51:41+01:00 Europe/Berlin
+
+- Maybe tags now work in Travis CI
+- Added looks_like_lz4frame function
+
+0.005     2015-12-08 14:12:42+01:00 Europe/Berlin
+
+- Works with nmake now (thanks to nanis)
+
+0.004     2015-11-26 13:09:29+01:00 Europe/Berlin
+
+- Hopefully fixed maintainer transition
+
+0.003     2015-11-26 10:24:13+01:00 Europe/Berlin
+
+- First release with company PAUSE account
+- Still optimizing Travis integration
+
+0.002     2015-11-26 09:22:01+01:00 Europe/Berlin
+
+- Some adjustments for Travis
+- Nice new README.md for github
+
+0.001
+
+Initial Release
+

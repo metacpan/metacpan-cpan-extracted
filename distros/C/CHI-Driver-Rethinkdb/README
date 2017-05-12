@@ -1,0 +1,42 @@
+NAME
+
+    CHI::Driver::Rethinkdb - Rethinkdb driver for CHI
+
+VERSION
+
+    version 0.1.2
+
+SYNOPSIS
+
+        my $cache = CHI->new(
+            driver  => 'Rethinkdb'
+            host    => 'lothal', # default localhost
+            port    => 32770, # default 28015
+            db_name => 'dev', # default test
+        );
+
+DESCRIPTION
+
+    This driver uses the Rethinkdb module(s) to communicate with Rethinkdb
+    database.
+
+    Rethinkdb is an open-source nosql database.
+
+    https://www.rethinkdb.com/
+
+AUTHOR
+
+    Dan Burke dburke at addictmud.org
+
+BUGS
+
+    If you encounter any bugs, or have feature requests, please create an
+    issue on github.
+    https://github.com/dwburke/perl-CHI-Driver-Rethinkdb/issues
+
+    Pull requests also welcome.
+
+LICENSE AND COPYRIGHT
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

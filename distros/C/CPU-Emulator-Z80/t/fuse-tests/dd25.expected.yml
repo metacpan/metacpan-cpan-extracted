@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd25
+registers:
+  AF: 23210
+  AF_: 0
+  BC: 8299
+  BC_: 0
+  DE: 60688
+  DE_: 0
+  HL: 28331
+  HL_: 0
+  I: 0
+  IX: 47676
+  IY: 24253
+  PC: 2
+  R: 2
+  SP: 0

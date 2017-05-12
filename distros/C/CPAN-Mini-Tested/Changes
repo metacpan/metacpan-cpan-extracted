@@ -1,0 +1,91 @@
+Revision history for CPAN-Mini-Tested
+=====================================
+
+        Note: possible incompatabilities are marked with an asterisk -- '*'
+
+0.23    2014-08-28
+        - new maintainer: Barbie
+        - change file dates changed to meet W3CDTF standards.
+        - removed Build.PL and SIGNATURE.
+        - reworked Makefile.PL for clarity.
+        - switch to Artistic 2 License.
+        - Added LICENSE and INSTALL files.
+        - Removed DSLIP info.
+        - updated and extended test suite.
+        - updated META.yml, added META.json.
+        * migrated to newer CPAN Testers link.
+        * migrated to newer CPAN Testers cpanstats.db.
+
+0.22    2005-04-04
+        - fixed misuse of Pod::Coverage tests
+        - documented inherited methods
+
+0.21    2005-03-31
+        - minor documentation tweaks
+        - added DSLIP info to POD
+        - added Test::Prereq test
+        - added Test::Pod test
+        - added Pod::Coverage test
+        - module explicitly uses DBD::SQLite 1.00+
+        - corrected typo in README
+
+0.20    2005-02-06
+        - updated POD accordingly
+        - test_db_exceptions can be a coderef [rt.cpan.org #11197]
+        - corrected bug in test exceptions
+        * changes for updated CPAN Testers database format
+        * no longer uses test_db_arch option, renamed to test_db_os
+          because of changes in format of testers database
+        - warnings when using test_db_arch option
+        - trap error when database file is missing [rt.cpan.org #11390]
+        - download database file if it is missing
+
+0.16    2005-01-24
+        * uses Regexp::Assemble to combine regular expressions
+        - updated internal code, comments
+        - fixed typo in README regarding requirements
+
+0.15    2005-01-23
+        * uses DBD::SQLite2 instead
+
+0.14    2005-01-22
+        - noted explicit conflict with newer versions of DBD::SQLite
+        - fixed minor bug with trace when downloading test database
+
+0.13    2005-01-19
+        - added test_db_exceptions to exempt certain modules
+
+0.12    2005-01-10
+        - CPAN::Mini filters checked before database queried
+        - uses Cache::Simple::TimedExpiry to cache databse queries for
+          a limited time
+        - added option to configure expiration time
+        - updated documentation
+        - added more tests
+
+0.11    2005-01-09
+        - fixed bug with finding local file
+
+0.10    2005-01-09
+        - updated documentation
+        - can filter by multiple platforms
+        - added tests
+        - added some error handling
+        - fixed minor bug with trace
+        - passed can parse non-tar.gz paths
+        - various internal tweaks
+        - force option forces download of testers db
+        - added test_db_arch option
+        - added test_db_age option
+        - added test_db_file option
+        - added test_db_conn option
+        - added test_db_src option
+        - added redid some changed internal structure
+
+0.02    2005-01-06
+        - fixed CPAN::Mini version required
+
+0.01    2005-01-06T17:52:53
+        - original version; created by h2xs 1.23 with options
+            -v 0.01 -b 5.6.0 -X -P -n CPAN::Mini::Tested
+

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+files/cube.stl
+files/cube_binary.stl
+lib/CAD/Format/STL.pm
+lib/CAD/Format/STL/part.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/obj_load.t
+t/obj_save.t

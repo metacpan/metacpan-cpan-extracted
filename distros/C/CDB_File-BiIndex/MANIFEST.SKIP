@@ -1,0 +1,16 @@
+\bRCS\b
+\bCVS\b
+^MANIFEST\.[Bb]
+^Makefile$
+~$
+(^|/)#.*#$
+\.#.*$
+\.old$
+\.bak$
+\.tar.gz$
+\.mikeonly$
+^blib/
+^MakeMaker-\d
+^pm_to_blib$
+^CDB_File-BiIndex-[0-9]+.[0-9][0-9][0-9]
+

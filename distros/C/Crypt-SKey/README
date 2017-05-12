@@ -1,0 +1,127 @@
+NAME
+    Crypt::SKey - Perl S/Key calculator
+
+SYNOPSIS
+      # In perl script:
+      use Crypt::SKey qw(compute);
+      $output = compute($sequence_num, $seed, $password);
+      @output = compute($sequence_num, $seed, $password, $count);
+  
+      # Command line:
+      perl -MCrypt::SKey -e key 500 fo099804
+      perl -MCrypt::SKey -e key 500 fo099804 100
+      perl -MCrypt::SKey=key_md4 -e key_md4 500 fo099804
+  
+      # The following shell alias may be useful:
+      alias key 'perl -MCrypt::SKey -e key'
+      # This allows you to simply type:
+      key 500 fo099804
+
+DESCRIPTION
+    This module contains a simple S/Key calculator (as described in RFC
+    1760) implemented in Perl. It exports the function `key' by default, and
+    may optionally export the function `compute'.
+
+    `compute_md4', `compute_md5', `compute_sha1', `key_md4', `key_md5', and
+    `key_sha1' are provided as convenience functions for selecting MD4, MD5,
+    or SHA1 hashes. The default is MD4; this may be changed with with the
+    `$Crypt::SKey::HASH' variable, assigning it the value of `MD4', `MD5',
+    or `SHA1'. You can access any of these functions by exporting them in
+    the same manner as `compute' in the above example.
+
+    Most S/Key systems use MD4 hashing, but a few (notably OPIE) use MD5.
+
+INSTALLATION
+    Follow the usual steps for installing any Perl module:
+
+      perl Makefile.PL
+      make test
+      make install
+
+FUNCTIONS
+  `compute($sequence_num, $seed, $password [, $count])'
+
+  `compute_md4($sequence_num, $seed, $password [, $count])'
+
+  `compute_md5($sequence_num, $seed, $password [, $count])'
+
+  `compute_sha1($sequence_num, $seed, $password [, $count])'
+
+    Given three arguments, computes the hash value and returns it as a
+    string containing six words separated by spaces (or as a string of 16
+    hex digits if `$Crypt::SKey::HEX' is set to a true value). If $count is
+    specified and greater than one, returns a list of several such strings.
+    The meanings of the arguments is as follows:
+
+    * sequence_number
+        Which output in the sequence of calculated S/Key responses to
+        generate. This is called `N' in RFC 1760. It will usually be the
+        first number shown in an S/Key challenge.
+
+    * seed
+        This is a random seed. It is usually the second number/string shown
+        in an S/Key challenge.
+
+    * password
+        This is your secret password.
+
+    * count
+        This argument is optional and defaults to `1'. It specifies the
+        number of S/Key responses to generate. This may be useful if you
+        want to pre-generate a bunch of responses and print them on a piece
+        of paper so that you don't need to have an S/Key calculator around
+        later.
+
+  `key()'
+
+  `key_md4()'
+
+  `key_md5()'
+
+  `key_sha1()'
+
+    Acts just like the 'key' executable program that comes with the standard
+    distribution of s/key. Reads several arguments from the command line
+    (`@ARGV'), prompts for the user's password, and prints one or more
+    calculated s/key responses to `STDOUT'. The command line arguments are,
+    in order:
+
+    * sequence_number
+    * seed
+    * count (optional)
+    Their meanings are exactly the same as with the `compute' function
+    above.
+
+NOTES
+    If you care about security, you'd probably be better off using SSH than
+    S/Key, because SSH encrypts your entire session whereas S/Key only
+    encrypts your password. I wrote this module because nobody else seemed
+    to have done it yet, and because sometimes I'm on systems with neither
+    SSH nor the `key' program, but I want to telnet to a system that offers
+    S/Key password transmission.
+
+    The original `key' program takes the `count' parameter using the `-n'
+    flag, but this version takes it as an optional final argument. Unless I
+    hear from someone that needs the behavior changed, I'm not likely to add
+    the `-n' flag.
+
+    I currently have no plans to write any code that checks the validity of
+    S/Key responses at login, i.e. the code that the server has to run when
+    authenticating users. It shouldn't be hard, though, and if someone wants
+    to send me a patch implementing this functionality I'll be happy to add
+    it.
+
+AUTHOR
+    Ken Williams, kwilliams@cpan.org
+
+    Thanks to Chris Nandor and Allen Chen for testing MD5 functionality.
+
+COPYRIGHT
+    Copyright 2000-2009 Ken Williams. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    perl(1). RFC 1760. Digest::MD4(1). Digest::MD5(1). Term::ReadKey(1).
+

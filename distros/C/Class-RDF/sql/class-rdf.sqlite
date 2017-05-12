@@ -1,0 +1,27 @@
+-- drop table if exists ns;
+-- drop table if exists node;
+-- drop table if exists statement;
+
+create table ns (
+    prefix char(16),
+    uri char(255)
+);
+
+create table node (
+    id integer primary key,
+--    id integer primary key auto_increment,
+    created timestamp,
+    value text,
+    is_resource integer(1)
+);
+
+create table statement (
+    id integer primary key,
+--    id integer primary key auto_increment,
+    created timestamp,
+    subject integer,
+    predicate integer,
+    object integer,
+    context integer
+);
+

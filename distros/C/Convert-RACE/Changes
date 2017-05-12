@@ -1,0 +1,26 @@
+Revision history for Perl extension Convert::RACE.
+
+0.07  Wed Oct 31 04:03:59 JST 2001
+	- Added caveat to document
+
+0.06  Wed Jul 18 17:35:32 JST 2001
+	- Convert::Base32 is now separated from Convert::RACE
+
+0.05  Tue Mar  6 16:44:33 JST 2001
+	- fixed bug in case that input strings contain characters
+	  from only 2 rows, both of which are not 0x00.
+	  Thanks to Michael J Schout <mschout@gkg.net>
+
+0.04  Thu Mar  1 23:03:06 JST 2001
+	- fixed the bug that if a character has a byte of 0x0a, 
+	  it is ignored.
+	  Thanks to Philip Newton <pne@cpan.org>
+
+0.02  Wed Feb 28 02:52:49 JST 2001
+	- fixed the bug in case that all of the upper octets are 
+	  either 0x00 or one single other value.
+	  Thanks to Eugen SAVIN <seugen@serifu.com>
+
+0.01  Sat Dec  9 21:01:11 2000
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,119 @@
+Class/Protected
+===============
+
+DESCRIPTION
+    With this module you can protect the methods of any object. The access
+    is handled via an ACL (the Decision::ACL manpage). "Class::Protected" is
+    implemented via a proxy object (the Class::Proxy manpage).
+
+SYNOPSIS
+  use Class::Protected;
+
+       # We build the ACL
+
+        my $acl = Class::NiceApi->new( victim => Decision::ACL->new(), style => 'custom', table => { run_acl => 'RunACL' } );
+
+        $acl->push_rule(
+                Decision::ACL::Rule->new({
+                        now => 0,
+
+                        action => 'allow', # Action to be applied when rule is concerned, allow, deny, permit or block.
+
+                        fields =>
+                        {
+                                pkg => 'User',
+
+                                method => 'firstname',
+
+                                uid => 'murat',
+                        }
+                }),
+        );
+
+        $acl->push_rule(
+                Decision::ACL::Rule->new({
+                        now => 0,
+
+                        action => 'deny',
+
+                        fields =>
+                        {
+                                pkg => 'User',
+
+                                method => 'firstname',
+
+                                uid => 'john',
+                        }
+                })
+        );
+
+        $acl->push_rule(
+                Decision::ACL::Rule->new({
+                        now => 0,
+
+                        action => 'deny',
+
+                        fields =>
+                        {
+                                pkg => 'User',
+
+                                method => 'ALL',
+
+                                uid => 'james',
+                        }
+                })
+        );
+
+        for ( qw(murat john) )
+        {
+                println "$_ was ",
+
+                        { Class::Protected::ACL_RULE_ALLOW() => 'granted', Class::Protected::ACL_RULE_DENY() => 'rejected' }->{
+
+                                $acl->run_acl(
+                                        {
+                                        pkg => 'User',
+
+                                        method => 'firstname',
+
+                                        uid => $_ ,
+                                        }
+                                )
+                        };
+        }
+                # Restrict access to $u's methods (see $ACL above)
+
+        my $prot = Class::Protected->new( victim => Human->new( firstname => 'john', lastname => 'doe' ), acl => $acl );
+
+        $Class::Protected::uid = 'murat';
+
+        print $prot->firstname, "\n";   # everything ok since $Class::Protected::uid eq 'murat' (ACL allow)
+
+        $Class::Protected::uid = 'james';
+
+        print $prot->firstname, "\n";   # dies because ACL deny on user
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Murat Uenalan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

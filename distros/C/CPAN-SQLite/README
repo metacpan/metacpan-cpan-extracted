@@ -1,0 +1,74 @@
+This is the README for CPAN::SQLite, which is used for setting up,
+maintaining, and searching through a local CPAN database consisting
+of information in the three main CPAN index files:
+  $CPAN/modules/03modlist.data.gz
+  $CPAN/modules/02packages.details.txt.gz
+  $CPAN/authors/01mailrc.txt.gz
+DBD::SQLite is used as the database engine.
+
+Installation proceeds through the usual
+   perl Makefile.PL
+   $MAKE
+   $MAKE test
+   $MAKE install
+or, if Module::Build is available,
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+The package consists of a number of modules:
+   CPAN::SQLite: the top-level package
+   CPAN::SQLite::Index: set up and maintain the database
+   CPAN::SQLite::Info: extract information from the CPAN indices
+   CPAN::SQLite::META: helper module for CPAN.pm integration
+   CPAN::SQLite::State: gather information on the state of the database
+   CPAN::SQLite::Search: methods to search the database
+   CPAN::SQLite::Populate: populate the database tables
+   CPAN::SQLite::DBI: DBI information for the database
+   CPAN::SQLite::DBI::Index: DBI information for indexing the database
+   CPAN::SQLite::DBI:Search: DBI information for searching the database
+See the pod documentation of the specific modules for details.
+
+Perhaps the easiest way to set up and maintain the database is through
+the supplied cpandb script. If we assume that there is a CPAN.pm
+client available and configured, the database can be created via
+   cpandb --setup
+which will create the database file cpandb.sql under the
+"cpan_home" defined in CPAN::Config (this is the same location
+as where CPAN.pm's Metadata is found). Subsequent updates to
+the database can be done through
+   cpandb --update
+This scenario assumes that updates to the CPAN index files are
+handled by CPAN.pm.
+
+The cpandb script also provides some elementary searches:
+   cpandb --module My::Module
+   cpandb --dist My-Dist
+   cpandb --cpanid ME
+which will provide some information on, respectively, the
+specified CPAN module, distribution, and CPAN author id.
+The query terms are assumed to match exactly, and are
+case-insensitive.
+
+As of CPAN.pm version 1.88_65, there is experimental support 
+within CPAN.pm for using CPAN::SQLite to obtain
+information on packages, modules, and authors. One goal
+of this is to reduce the memory footprint of the CPAN.pm
+shell, as this information is no longer all preloaded into
+memory. This can be enabled through
+   perl -MCPAN -e shell
+   cpan> o conf use_sqlite 1
+
+This version is considered alpha. Please report bugs
+and feature requests to CPAN's request tracker:
+
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-SQLite
+
+or directly to the author. Development takes place at
+
+  http://cpan-search.svn.sourceforge.net/viewvc/cpan-search/CPAN-SQLite/
+
+This software is copyright 2006,2008 by Randy Kobes
+<r.kobes@uwinnipeg.ca>. Use and
+redistribution are under the same terms as Perl itself.

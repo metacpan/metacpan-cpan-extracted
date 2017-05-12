@@ -1,0 +1,465 @@
+=head1 NAME
+
+CPAN::Mini::Visit::Simple - Lightweight traversal of a minicpan repository
+
+=head1 SYNOPSIS
+
+    use CPAN::Mini::Visit::Simple;
+    $self = CPAN::Mini::Visit::Simple->new();
+    $self->identify_distros();
+
+=head1 DESCRIPTION
+
+This Perl extension is a variant on David Golden's App-CPAN-Mini-Visit.  It
+can be used to:
+
+=over 4
+
+=item *
+
+Calculate a subset of the set of distributions in a minicpan repository.
+
+=item *
+
+Refresh such a subset when new versions of the distributions which are its
+elements have appeared in the minicpan repository.
+
+=item *
+
+Perform an action on each element of the subset.
+
+=back
+
+=head1 GLOSSARY
+
+=over 4
+
+=item * Primary List
+
+A set of distributions calculated by this module's methods.
+
+=item * Derived List
+
+A humanly edited version of a primary list; prepared via deletions from -- but
+not additions to -- a primary list.
+
+=item * Refreshed List
+
+A prepared list whose elements have been updated to reflect the arrival of
+updated versions of those distributions in the minicpan repository.
+
+=item * Visit
+
+An operation performed on each element of any of the three types of list
+above.
+
+=back
+
+=head1 METHODS
+
+=head2 C<new()>
+
+=over 4
+
+=item * Purpose
+
+CPAN::Mini::Visit::Simple constructor.  While it cannot verify that you have a
+complete minicpan repository on disk, it does check that the most essential
+directories are present.
+
+=item * Arguments
+
+    $self = CPAN::Mini::Visit::Simple->new();
+
+or
+
+    $self = CPAN::Mini::Visit::Simple->new({
+        minicpan => /path/to/a/minicpan,
+    });
+
+If called with no arguments, the constructor will use the value of the
+C<local> key-value pair in your F<.minicpanrc> file.
+
+May also be called with a single hash reference whose C<minicpan> element's
+value is the absolute path to a minicpan repository.
+
+=item * Return Value
+
+CPAN::Mini::Visit::Simple object.
+
+=back
+
+=head2 C<get_minicpan()>
+
+=over 4
+
+=item * Purpose
+
+Get the full path to the local F<minicpan/> installation as stored within the object.
+
+=item * Arguments
+
+    $minicpan_dir = $self->get_minicpan();
+
+=item * Return Value
+
+String holding path to directory.
+
+=back
+
+=head2 C<get_id_dir()>
+
+=over 4
+
+=item * Purpose
+
+A minicpan installation, like CPAN itself, is structured with an
+F<authors/id/> directory underneath the top-level directory.  This method
+returns the full path to that directory as stored within the object.
+
+=item * Arguments
+
+    $id_dir_dir = $self->get_id_dir();
+
+=item * Return Value
+
+String holding path to directory.
+
+=back
+
+=head2 C<identify_distros()>
+
+=over 4
+
+=item * Purpose
+
+By traversing a minicpan repository and examining the names of distributions,
+prepare a list of distributions needing a visit.  We will call this list,
+which is produced without human editing, a B<primary list>.
+
+=item * Arguments
+
+May be called in any of the following two mutually exclusive ways:
+
+=over 4
+
+=item 1 No arguments
+
+    $self->identify_distros();
+
+This will add all distributions found in the minicpan repository to the primary
+list.
+
+=item 2 Single hash reference
+
+You may provide a hash reference with one or more of several elements.
+
+=over 4
+
+=item * C<start_dir>
+
+    $rv = $self->identify_distros( {
+      start_dir   => "$minicpan_id_dir/D/DR/DROLSKY",
+    } );
+
+If a C<list> element is not provided but a C<start_dir> element is provided,
+its value must be an absolute path to a directory inside the minicpan
+repository that is below the F<authors/id/> directory.  The list of
+distributions to be visited will consist of all distributions below that point
+in the minicpan.
+
+=item * C<pattern>
+
+    $rv = $self->identify_distros( {
+      pattern   => qr/Moose/,
+    } );
+
+If a C<list> element is provided but a C<pattern>
+element is provided, its value must be a compiled regular expression.  The
+list of distributions to be visited will consist of all distributions in the
+minicpan whose paths match that pattern.
+
+=item * Combination of C<start_dir> and C<pattern>
+
+    $rv = $self->identify_distros( {
+      start_dir   => "$minicpan_id_dir/D/DR/DROLSKY",
+      pattern   => qr/Moose/,
+    } );
+
+You may provide B<both> a C<start_dir> element and a C<pattern>
+element.  In this case, the C<start_dir> element takes precedence, I<i.e.,>
+the list of distributions to be visited will consist of all distributions
+below the C<start_dir> which also match the C<pattern>.
+
+=back
+
+=back
+
+=item * Return Value
+
+Returns true value -- though this is not particularly meaningful.  The list of
+distributions to be visited will be stored inside the object and can be
+accessed by other methods.
+
+=back
+
+=head2 C<identify_distros_from_derived_list()>
+
+=over 4
+
+=item * Purpose
+
+Similar to C<identify_distros()>, but used where, through human editing of a
+primary list, we have produced a B<derived_list>.
+
+=item * Arguments
+
+    $minicpan_id_dir = $self->get_id_dir();
+    $rv = $self->identify_distros_from_derived_list( {
+      list => [
+        "$minicpan_id_dir/D/DR/DROLSKY/Alzabo-0.92.tar.gz",
+        "$minicpan_id_dir/D/DR/DROLSKY/DateTime-0.53.tar.gz",
+        "$minicpan_id_dir/D/DR/DROLSKY/Params-Validate-0.95.tar.gz",
+      ],
+    } );
+
+Hash reference with single element whose key is C<list> and whose value is an
+array reference holding the full paths to the selected distribution archives.
+
+=item * Return Value
+
+Returns true value upon success.
+
+=item * Comment
+
+This method was present in earlier versions of this library but was
+incorrectly documented as an option for C<identify_distros()>.
+
+=back
+
+=head2 C<say_list()>
+
+=over 4
+
+=item * Purpose
+
+Prints a list of distributions to be visited.
+
+=item * Arguments
+
+    $self->say_list();
+
+or
+
+    $self->say_list( { file => /path/to/list } );
+
+Optional single hashref.  Hash must have C<file> element whose value is
+absolute path to a file to which list is written.  Otherwise, output is simply
+sent to STDOUT.
+
+=item * Return Value
+
+Implicitly returns true value.
+
+=back
+
+=head2 C<get_list()>
+
+=over 4
+
+=item * Purpose
+
+Get the set of distributions resulting from the operation of
+C<identify_distros()>.
+
+=item * Arguments
+
+    @output_list = $self->get_list();  # list context
+
+or
+
+    $output_list = $self->get_list();  # scalar context
+
+No arguments needed.  All information, if available, is inside the object.
+
+=item * Return Value
+
+List context:  List of distributions if the underlying set exists in the
+object; undefined otherwise.
+
+Scalar context:  Number of elements if the underlying set exists in the
+object; undefined otherwise.
+
+=item * Comment
+
+Because of the deduplication feature of C<identify_distros>, the order of
+elements in the list returned cannot be guaranteed.
+
+=back
+
+=head2 C<get_list_ref()>
+
+=over 4
+
+=item * Purpose
+
+Get a reference to the set of distributions resulting from the operation of
+C<identify_distros()>.
+
+=item * Arguments
+
+    $output_ref = $self->get_list_ref();
+
+No arguments needed.  All information, if available, is inside the object.
+
+=item * Return Value
+
+Array reference if the underlying set exists in the object; undefined
+otherwise.
+
+=item * Comment
+
+Because of the deduplication feature of C<identify_distros>, the order of
+elements in the list underneath the reference returned cannot be guaranteed.
+
+=back
+
+=head2 C<refresh_list()>
+
+=over 4
+
+=item * Purpose
+
+Takes a previously created list of distributions and replaces elements with
+the most recent versions of those distributions as needed.
+
+Suppose that you have a list of distributions, created originally from your
+minicpan repository, that you are using to test some new CPAN-wide
+functionality.  Suppose further that you update your minicpan repository with
+the F<minicpan> utility while still working on your project.  You will
+probably want to make sure that you are I<testing against HEAD>, so to speak.
+
+C<refresh_list()> will replace any elements in your list if updated versions
+thereof have appeared in your minicpan.  It will also delete any elements if
+their corresponding distributions have been removed entirely from CPAN and
+hence from your minicpan.
+
+=item * Arguments
+
+    $refreshed_list_ref = $self->refresh_list( {
+       derived_list    => \@derived_list,
+       # Next two are optional, but should be used if they were
+       # used to calculate the primary list.
+       start_dir   => "$minicpan_id_dir/D/DR/DROLSKY",
+       pattern   => qr/Moose/,
+    } );
+
+=item * Return Value
+
+Returns an reference to an array holding the refreshed list.  This arrayref is
+suitable for use as the value of the C<list> element in the hashref passed to
+the next call of C<identify_distros()>.
+
+=back
+
+=head2 C<visit()>
+
+=over 4
+
+=item * Purpose
+
+Executes an action on each distribution in the list.
+
+=item * Arguments
+
+Takes a hash reference.  Eligible keys for that hash are:
+
+=over 4
+
+=item * C<action>
+
+    $rv = $self->visit( {
+        action  => sub {
+            my $distro = shift @_;
+            if ( -f 'Makefile.PL' ) {
+                say "$distro has Makefile.PL";
+            }
+            if ( -f 'Build.PL' ) {
+                say "$distro has Build.PL";
+            }
+        },
+    } );
+
+Reference to a subroutine which is to be executed once for each distribution
+in the list.  This element is required.
+
+=item * C<action_args>
+
+Reference to an array of arguments to be provided to each iteration of the
+code reference defined in C<action>.  This element is optional.
+
+=item * C<quiet>
+
+    $rv = $self->visit( {
+        action  => sub {
+            my $distro = shift @_;
+            if ( -f 'Makefile.PL' ) {
+                say "$distro has Makefile.PL";
+            }
+            if ( -f 'Build.PL' ) {
+                say "$distro has Build.PL";
+            }
+        },
+        quiet => 1,
+    } );
+
+If provided with a true value, suppress any warnings that may appear as files
+are extracted from individual tarballs in the minicpan.
+
+=back
+
+=item * Return Value
+
+Returns true value upon success.
+
+=back
+
+=cut
+
+=head1 BUGS
+
+Report bugs at
+F<https://rt.cpan.org/Public/Bug/Report.html?Queue=CPAN-Mini-Visit-Simple>.
+
+=head1 AUTHOR
+
+    James E Keenan
+    CPAN ID: jkeenan
+    jkeenan@cpan.org
+    http://thenceforward.net/perl/modules/CPAN-Mini-Visit-Simple/
+
+=head1 ADDITIONAL CONTRIBUTORS
+
+=over 4
+
+=item * Mohammad S Anwar
+
+=item * Charlie Gonzalez
+
+=back
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+
+=head1 SEE ALSO
+
+perl(1).  App-CPAN-Mini-Visit.  CPAN-Mini.
+
+=cut
+

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Diagnostic delegation",
+   "author" : [
+      "Paul Liebert <paull@peak.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Carp-Proxy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "English" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "Moose" : "0",
+            "Pod::Coverage" : "0.18",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "YAML::XS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Cwd" : "0",
+            "English" : "0",
+            "Moose" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Sub::Name" : "0",
+            "YAML::XS" : "0",
+            "overload" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.15"
+}

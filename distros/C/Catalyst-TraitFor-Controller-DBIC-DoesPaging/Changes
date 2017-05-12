@@ -1,0 +1,43 @@
+Revision history for Catalyst-TraitFor-Controller-DBIC-DoesPaging
+
+1.001003  2013-06-01 14:07:26 CST6CDT
+       - Add missing dep
+
+1.001002  2013-05-31 23:45:39 CST6CDT
+       - Stop using RT
+
+1.001001  2012-11-17 15:47:43 CST6CDT
+       - Put MetaYAML back in dist
+
+1.001000  2010-03-10 16:32:59 CST6CDT
+       - search and sort now call simple_search and simple_sort
+         if resultset controller methods are undefined
+
+1.00000   2010-03-08 20:51:00 CST6CDT
+       - Change Version schema away from RJBS versioning
+       - Fix tests to not use keywords for labels
+
+0.093510  2009-12-17 00:12:03 CST6CDT
+       - Add multipk deletion
+       - Add aliases to a lot of things that could have been ambiguous before
+
+0.093200 Mon Nov 16 21:08:00 CDT 2009
+       - Fix required version for Catalyst::Model::DBIC::Schema
+       - Fix required Catalyst version
+
+0.093050 Sun Nov 01 01:09:00 CDT 2009
+       - Add build_dep
+
+0.093020 Thu Oct 29 19:16:00 CDT 2009
+       - Rename dist because I'm THAT dumb
+
+0.093010 Wed Oct 28 00:20:00 CDT 2009
+       - Add basic code for multple values for a single CGI Parameter
+         in simple_search
+
+0.092980 Sun Oct 25 00:57:00 CDT 2009
+       - Fix dependencies
+
+0.092970 Sat Oct 24 02:47:00 CDT 2009
+       - Initial Release
+

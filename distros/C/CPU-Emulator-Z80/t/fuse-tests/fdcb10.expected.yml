@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  17180:
+    - 57
+name: fdcb10
+registers:
+  AF: 9516
+  AF_: 0
+  BC: 14674
+  BC_: 0
+  DE: 22797
+  DE_: 0
+  HL: 44134
+  HL_: 0
+  I: 0
+  IX: 5199
+  IY: 17058
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,23 @@
+<elements>
+  <el name="hydrogen" symbol="H">
+    <isotope number="1" NA="0.99985" name="protium"></isotope>
+    <isotope number="2" NA="0.00115" name="deuterium"></isotope>
+    <isotope number="3" name="tritium">
+      <halflife unit="years">12.32</halflife>
+    </isotope>
+  </el>
+
+  <el name="carbon" symbol="C" state="solid">
+    <isotope number="12" NA="0.989"></isotope>
+    <isotope number="13" NA="0.011"></isotope>
+    <isotope number="14">
+      <halflife unit="years">5730</halflife>
+    </isotope>
+  </el>
+
+  <el name="oxygen" symbol="O">
+    <isotope number="16" NA="0.9978"></isotope>
+    <isotope number="17" NA="0.00038"></isotope>
+    <isotope number="18" NA="0.0021"></isotope>
+  </el>
+</elements>

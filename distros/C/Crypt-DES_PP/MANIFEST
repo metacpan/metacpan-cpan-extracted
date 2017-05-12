@@ -1,0 +1,17 @@
+.cvsignore
+COPYING.LIB
+ChangeLog
+DES_PP.m4
+lib/Crypt/.cvsignore
+lib/Crypt/DES_PP.pm
+MANIFEST
+Makefile.PL
+README
+test.pl
+test-xs
+t/.cvsignore
+t/00base.t
+t/cbcref.t
+t/cert.t
+t/random.t
+t/randomcache.t

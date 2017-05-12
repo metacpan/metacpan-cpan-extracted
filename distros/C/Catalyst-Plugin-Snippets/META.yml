@@ -1,0 +1,29 @@
+---
+abstract: 'Make sharing data with clients easy'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::MockObject: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Snippets
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  JSON::Syck: 0
+requires:
+  Catalyst: 5.80
+  MRO::Compat: 0
+  Test::MockObject: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-Snippets
+version: 0.03

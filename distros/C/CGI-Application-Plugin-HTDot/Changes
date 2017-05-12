@@ -1,0 +1,26 @@
+Revision history for CGI-Application-Plugin-HTDot
+
+0.07    2011/01/04
+        POD updates.  Named CGI::Application's load_tmpl_class() as an 
+        alternative to this plugin.
+
+0.06    2007/03/19
+        Removed my notes to self.
+
+0.05    2007/03/16
+        Fixed bug that could trigger a die() if die_on_bad_params is set to 1.
+
+0.04    2007/03/16
+        Ported recent modifications to CGI::Application's load_tmpl() method.
+        Fixed module metadata.
+        Improved test suite.
+        Automatically pass CGI::Application object to templates as c.
+
+0.03    2005/08/18
+        Added module dependencies to Build.PL.  Updated acknowledgements.
+
+0.02    2005/08/16
+        First public version, released on an unsuspecting world.  Mwahaha! ;)
+
+0.01    Never released :(
+        For my own testing purposes.

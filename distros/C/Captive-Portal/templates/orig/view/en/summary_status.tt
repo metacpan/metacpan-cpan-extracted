@@ -1,0 +1,56 @@
+[% WRAPPER 'view/en/layout.tt' %]
+
+<div class="span-5">
+
+ [% IF msg_type == 'error' %]
+ <p class="error">[% msg_text %]</p>
+ [% END %]
+
+ <form action="" method="post" accept-charset="UTF-8">
+  <fieldset>
+
+   <label for="admin_secret">Admin-Password:</label>
+   <br />
+   <input type="password" id="admin_secret" name="admin_secret" />
+   <br />
+   <br />
+   <input type="submit" value="detail view" id="status" name="status" />
+
+  </fieldset>
+ </form>
+
+</div>
+
+<div class="span-19 last">
+
+ [% IF stopped %]
+  <h4>ATTENTION</h4>
+  <p class="error">The Captive::Portal firewall is stopped!</p>
+ [% END %]
+
+ <p class="info">Current devices behind firewall: [% client_candidates %]</p>
+
+ <table>
+   <caption>Summary</caption>
+  <thead>
+   <tr>
+    <th>State</th>
+    <th>Number</th>
+   </tr>
+  </thead>
+  <tbody>
+   [% FOREACH state IN summary.keys.sort %]
+   <tr>
+    <td>[%- state -%]</td>
+    <td>[%- summary.$state -%]</td>
+   </tr>
+   [% END %]
+  </tbody>
+ </table>
+
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

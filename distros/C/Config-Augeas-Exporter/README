@@ -1,0 +1,119 @@
+NAME
+    Config::Augeas::Exporter - Export the Augeas tree to various formats
+
+SYNOPSIS
+      use Config::Augeas::Exporter
+
+      # Initiliaze
+      my $aug = Config::Augeas::Exporter->new( root => $aug_root );
+
+      # Export to XML
+      my $doc = $aug->to_xml( 
+        path => ['/files/etc/fstab', '/files/etc/apt'],
+        exclude => ['#comment', '#mcomment'],
+        file_stat => 1,
+        );
+
+      print $doc->toString;
+
+      # Restore from XML
+      open (my $fh, "<$file") 
+        or die "E: Could not open $file: $!\n" ;
+      my $doc = XML::LibXML->load_xml(IO => $fh);
+      close $fh;
+
+      my $aug = Config::Augeas::Exporter->new(root => $root);
+      $aug->from_xml(
+         xml => $doc,
+         create_dirs => 1,
+         );
+
+DESCRIPTION
+    This module allows to export the Augeas tree to various formats and
+    import back from these formats to the configuration files.
+
+Constructor
+new ( ... )
+    Creates a new Config::Augeas::Exporter object. Optional parameters are:
+
+    augeas
+        A Config::Augeas object. If not provided, a new one will be created.
+
+    root
+        Use "root" as the filesystem root.
+
+Methods
+  to_xml( ... )
+    Export the Augeas tree to a XML::LibXML::Document object.
+
+    path
+        An array of Augeas paths to export. If ommitted, it will default to
+        '/files'.
+
+    exclude
+        An array of label patterns to exclude from the export.
+
+    file_stat
+        A boolean, whether to include file stat.
+
+  to_hash( ... )
+    Export the Augeas tree to a hash.
+
+    path
+        "path" is the Augeas path to export. If ommitted, it will default to
+        '/files'.
+
+    exclude
+        A list of label patterns to exclude from the export.
+
+  to_yaml( ... )
+    Export the Augeas tree to YAML.
+
+    path
+        "path" is the Augeas path to export. If ommitted, it will default to
+        '/files'.
+
+    exclude
+        A list of label patterns to exclude from the export.
+
+  to_json( ... )
+    Export the Augeas tree to JSON.
+
+    path
+        "path" is the Augeas path to export. If ommitted, it will default to
+        '/files'.
+
+    exclude
+        A list of label patterns to exclude from the export.
+
+  from_xml( ... )
+    Restore the Augeas tree from an XML::LibXML::Document object. This
+    method considers the files listed in the XML document, and replaces the
+    corresponding files in the Augeas tree with the contents of the XML.
+
+    xml The XML::LibXML::Document to use as source for import.
+
+    create_dirs
+        Boolean value, whether to create the directories if missing.
+
+SEE ALSO
+    *   Config::Augeas : The Config::Augeas module
+
+    *   http://augeas.net/ : The Augeas project page
+
+AUTHOR
+    Raphaël Pinson, <raphink at cpan dot org>
+
+CONTRIBUTING
+    This module is developed on Launchpad at:
+
+    <https://launchpad.net/config-augeas-exporter>
+
+    Feel free to fork the repository and submit pull requests
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Raphaël Pinson
+
+    This library is free software; you can redistribute it and/or modify it
+    under the LGPL terms.
+

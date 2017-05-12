@@ -1,0 +1,23 @@
+Revision history for Catalyst-Plugin-Session-State-Stash
+
+0.14      2015-07-08 01:25:27Z
+        - allow multiple state objects to work at the same time
+          (IKEGAMI, RT#62090)
+
+0.13    2009-12-06
+        - Switch from CAF to Moose
+        - Switch from Module::Build to Module::Install
+        - Remove use of Test::MockObject
+
+0.12    2009-10-16
+        - Use session config handling from Catalyst::Plugin::Session 0.27.
+
+0.11    2009-10-08
+        - Update to be able to use the new 'Plugin::Session' config key
+          as the rest of the Session infrastructure is moving to that.
+        - Move actions out of the application class for TestApp as this
+          warns with the latest Catalyst.
+
+0.10    2009-04-19
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,36 @@
+Revision history for Perl extension Class-Value-Contact
+
+1.100840  2010-03-25 19:49:32 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:02:07 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - slightly improved documentation
+    - Class::Value::Contact::EmailAddress_TEST: switched to TESTDATA style
+    - Class::Value::Contact::Name::Full_TEST: switched to TESTDATA style
+    - Class::Value::Contact: don't inherit from Class::Accessor::Complex, that
+      comes via Class::Value automatically
+    - updated t/perlcriticrc
+    - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+      had a bug in make_real_object()
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - Class::Value::Contact::EmailAddress_TEST: changed
+      wellformed/notwellformed to valid/invalid as Data-Semantic only has
+      valid/invalid; added test values
+    - Class::Value::Contact::Name::Full: changed wellformed/notwellformed to
+      valid/invalid as Data-Semantic only has valid/invalid
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.01  Wed, 07 Nov 2007 11:31:40 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

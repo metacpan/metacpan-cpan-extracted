@@ -1,0 +1,7 @@
+[% IF event.sponsorid %]
+  <h4>Event Sponsor</h4>
+[% IF event.sponsorid == 1 %]
+  [% INCLUDE "events/sponsor-mbp.html" %]
+[% ELSE ; IF event.sponsorid > 0 %]
+  <p>[% IF event.sponsorlink %]<a href="[% event.sponsorlink %]">[% event.sponsor %]</a>[% ELSE ; event.sponsor ; END %]</p>
+[% END ; END ; END %]

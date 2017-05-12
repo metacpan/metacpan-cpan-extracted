@@ -1,0 +1,21 @@
+---
+name: Catalyst-Model-EmailStore
+version: 0.03
+author:
+  - Sebastian Willert <willert@cpan.org>
+abstract: Email::Store model for Catalyst
+license: perl
+build_requires:
+  Catalyst: 5.55
+  Email::Store: 0.24
+  Test::More: 0
+provides:
+  Catalyst::Helper::Model::EmailStore:
+    file: lib/Catalyst/Helper/Model/EmailStore.pm
+  Catalyst::Model::EmailStore:
+    file: lib/Catalyst/Model/EmailStore.pm
+    version: 0.03
+  Email::Store::DBI:
+    file: lib/Catalyst/Model/EmailStore.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

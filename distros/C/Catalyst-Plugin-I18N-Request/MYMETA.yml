@@ -1,0 +1,31 @@
+---
+abstract: 'A plugin for localizing/delocalizing '
+author:
+  - 'Adam Paynter <adapay@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-I18N-Request
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::I18N: 0
+  Catalyst::Runtime: 5.7000
+  MRO::Compat: 0
+  Scalar::Util: 0
+  URI: 0
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/catalyst-plugin-i18n-request
+version: 0.07

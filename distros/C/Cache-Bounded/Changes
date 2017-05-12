@@ -1,0 +1,45 @@
+Revision history for Perl extension Cache::Bounded.
+
+1.09  2015/06/18
+
+    Was incorrectly testing cache on every insertion past the first interval.
+
+1.08  2014/03/10
+
+	Added a POD test
+	Moving to an automated build of meta data
+
+1.07  2014/02/25
+
+	Updated meta information
+	Added LICENSE file to distribution
+
+1.06  2012/03/04
+
+	Tests updated to be compatible with perl 5.15. 
+	(Swapped to Test::Simple to avoid using future bareword "plan")
+
+	Cleaned up some documentation typos.
+
+1.05  2011/09/30
+
+	Added a publically accessible purge() method.
+	Automated the module packaging for CPAN.
+
+1.03  2004/04/06
+
+	Fixed class related bug where interval and size could not be set.
+
+1.02  2004/04/05
+
+	Corrected accidental Cache::Sloppy calls in the test suite.
+
+1.01  2004/04/02
+
+	Properly blessing into the class name.
+	Full copyright and license information.
+	Documentation on module installation.
+
+1.00  2004/03/29
+
+	Derived from HMS tool Cache::Sloppy (v1.3 2004/03/02)

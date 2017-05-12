@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6d921ce6fd5ef715c3fc6edbfd845844015360b5 AUTHOR_PLEDGE
+SHA1 30660b6a97cb570fd7c04c41a2d91deb30081f3f Build.PL
+SHA1 69060a7204065a36817e71219224ad9b9b6a7190 Changes
+SHA1 939697ba8d99882229c9edbfb25ed586236a996d INSTALL
+SHA1 96a4607ca40d1b9b1add2be7af82b58850074258 LICENSE
+SHA1 fa7cd2778818c7a3863e14a840ad0204c0e95ea4 MANIFEST
+SHA1 74d4117f7851c42a929cf0f3b6b9e272372b6197 META.json
+SHA1 c92d318690f5de66429b387ebe13710c5bc3e7d1 META.yml
+SHA1 701f454af478172017ec64cd74d8f80cdcecb3a5 README
+SHA1 5c0416db3f4d35ed071603786a8b65b0a3207ec1 README.mkdn
+SHA1 3016de41423e5aef57fe18331b8492bad57d5db8 lib/Catalyst/Plugin/MemoryUsage.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 667a571a14c5a50619c3d9f35f5d4610f3bcf38d t/000-report-versions-tiny.t
+SHA1 27e62a4abbe481493dfa5d3e2d26c9f8b3266b4a t/basic_app.t
+SHA1 40d051ccd078ae4bee962a345aa09208158ae224 t/lib/TestApp.pm
+SHA1 2de5436c98b1ec7e9c43759b94ba0059c027736b t/lib/TestApp/Controller/Root.pm
+SHA1 afac7b65200ae7161431bfe87dbce7b6ccdf72cc t/not-supported.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlDJIG0ACgkQ34Hwf+GwC4zMsQCg3Jw/RcK+xqKTihruiv5tmbnx
+UwYAoJzd/ziJyeBmGePKkAIJSdqZHppd
+=A2qF
+-----END PGP SIGNATURE-----

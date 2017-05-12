@@ -1,0 +1,104 @@
+2016-06-14  k  <andk@cpan.org>
+
+	* Version 2.12
+
+	* more on #113615: Fix recalc being too lazy (bug analysis by Ralf
+	Neubauer, code by Andreas Koenig)
+
+2016-04-09  k  <andk@cpan.org>
+
+	* Version 2.11
+
+	* address #113615: extend the production rules for compressed file to
+	.tgz and .tbz. Up to now those did not get a checksum for the uncompress
+	file (requested by Ralf Neubauer)
+
+	* bump the Module::Signature version that decides whether to test or not
+	to test (Salve J. Nilsen)
+
+	* never let t/00signature.t actually fail
+
+2015-04-11  k  <andk@cpan.org>
+
+	* Version 2.10; no functional change
+
+	* 00signature.t: survive recent changes in ExtUtils::MakeMaker (_eumm)
+	and in Module::Signature ($ENV{TEST_SIGNATURE})
+
+	* add repository address to the Makefile.PL
+
+	* add Changes file to the MANIFEST
+
+2014-04-04  k  <andk@cpan.org>
+
+	* Version 2.09; no functional change
+
+	* improve test signature.t (Petr Písař)
+
+2011-08-30  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.08; no functional change
+
+	* survive newest toolchain that creates a MYMETA.json
+
+2010-11-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.07; no functional change
+
+	* survive the signature test under bad conditions
+
+2010-10-24  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.06
+
+	* add MYMETA.yml to MANIFEST.SKIP
+
+2010-01-23  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.05
+
+	* Addressing the test failure in
+	http://www.nntp.perl.org/group/perl.cpan.testers/2010/01/msg6705220.html
+
+2009-09-28  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.04
+
+	* Adding a signature verification test. The previous release had two
+	files missing. Signature verification would have notified me.
+
+2009-09-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* Version 2.03
+
+	* Adding a Copyright statement. Up to now we only had a license but not
+	the copyright statement which makes it difficult for the reader to
+	understand the license. Thanks to Ryan Niebur for bringing this to my
+	attention.
+
+2008-10-31  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Version 2.02
+
+	* Bugfix: call binmode as a function and at the same time demand a newer
+	IO::File as prereq. (addressing
+	http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2516449.html)
+
+2008-09-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Version 2.01
+
+	* add missing binmode() for Windows (courtesy Elliot Shank)
+
+2008-05-17  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Version 2.00
+
+	* empty directories can now also get a checksums file.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

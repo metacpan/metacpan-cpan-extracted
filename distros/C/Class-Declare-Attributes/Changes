@@ -1,0 +1,28 @@
+Revision history for Perl module Class::Declare::Attributes
+# $Id: Changes 1515 2010-08-22 14:41:53Z ian $
+
+0.09  Mon Oct  5 15:45:32 2015
+  - altered symbol table walk to avoid "undefined behaviour" warning
+
+0.08  Sun Aug 22 15:39:24 2010
+  - removed ': locked' attribute from object method & attribute accessors
+    as this has been deprecated in newer versions of Perl
+
+0.07  Thu Jul 17 18:36:45 2008
+  - corrected symbol table walking to allow for encountering a non-GLOB
+
+0.04  Tue May  1 18:21:12 2007
+  - reworked the handling of attributes
+  - ensured attributes aren't assigned if the class is not in strict mode
+  - added a require() method for loading C::D::A classes at run-time
+
+0.03  Mon Jun 16 11:39:05 2003
+  - changed Makefile.PL to include dependency on Test::Exception v0.15 for
+    lives_and() support.
+
+0.02  Mon Jun 15 23:46:56 2003
+  - added support for the Class::Declare class and instance attribute
+    modifiers rw() and ro().
+
+0.01  Fri Jun  6 14:43:20 2003
+  - initial Class::Declare::Attributes release

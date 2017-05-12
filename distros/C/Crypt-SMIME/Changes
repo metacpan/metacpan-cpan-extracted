@@ -1,0 +1,101 @@
+Revision history for Crypt::SMIME
+
+0.19    Fri Dec  2 13:22:27 JST 2016
+        - Use RFC-5652 CMS functions instead of PKCS#7 ones for better
+          interoperability,  Suggested by Hib Engler <h [...]
+          killercool.net>.  CMS has a backwards compatibility with
+          PKCS#7 so the change should introduce no compat issues.
+        - Use AES-128-CBC instead of DES-EDE3-CBC for encryption,
+          suggested by the same person.
+
+0.18    Thu Oct 13 18:45:53 JST 2016
+        - Fix compatibility problem with OpenSSL >= 1.1, Reported by
+          ppisar [...] redhat.com:
+          https://rt.cpan.org/Public/Bug/Display.html?id=118344
+
+0.17    Tue Jun 21 12:24:18 JST 2016
+        - New function: setPrivateKeyPkcs12(), Patch by MIK [...]
+          cpan.org:
+          https://rt.cpan.org/Public/Bug/Display.html?id=115490
+
+0.16    Mon Oct  5 10:57:44 JST 2015
+        - Constants FORMAT_ASN1, FORMAT_PEM, and FORMAT_SMIME can now
+          be exported.
+        - New exportable constant: NO_CHECK_CERTIFICATE
+        - check() now takes an optional argument $flag. The only
+          possible value for $flag is NO_CHECK_CERTIFICATE, which
+          disables the verification of signer's vertificate chain.
+
+0.15    Wed Aug 13 16:53:50 JST 2014
+        - New function: setPublicKeyStore(), Patch by hatuka [...]
+          nezumi.nu:
+          https://rt.cpan.org/Public/Bug/Display.html?id=97955
+        - Fix a memory leak in setPublicKey().
+        - Add missing test cases for taintedness.
+
+0.14    Mon Aug  4 14:21:21 JST 2014
+        - New function: extractCertificates() and getSigners(), Patch
+          by hatuka [...]  nezumi.nu:
+          https://rt.cpan.org/Public/Bug/Display.html?id=97691
+
+0.13    Wed May  7 16:23:52 JST 2014
+        - Improve compatibility with MS Windows:
+          https://rt.cpan.org/Public/Bug/Display.html?id=95373
+        - Do not include .hgtags in release tarball:
+          https://rt.cpan.org/Public/Bug/Display.html?id=95294
+        - Makefile.PL now aborts if no libcrypto.pc can be found in
+          PKG_CONFIG_PATH.
+
+0.12    Fri May  2 14:41:17 JST 2014
+        - Fix broken t/00-load.t that was introduced in 0.11.
+
+0.11    Wed Apr 30 19:09:28 JST 2014
+        - setPublicKey() was erroneously raising an error if taint
+          checking was enabled:
+          https://rt.cpan.org/Ticket/Display.html?id=95163
+        - sign(), signonly(), check(), encrypt(), decrypt() now
+          returns a tainted message if the input or a key is
+          tainted. See the documentation for details.
+        - Load the standard OpenSSL configuration file when available:
+          https://rt.cpan.org/Public/Bug/Display.html?id=87675
+        - `make clean' should not remove SMIME.pod:
+          https://rt.cpan.org/Public/Bug/Display.html?id=56025
+        - isSigned() and isEncrypted() were failing to recognize a
+          signed / encrypted message if its Content-Type has an
+          unquoted smime-type:
+          https://rt.cpan.org/Public/Bug/Display.html?id=53620
+
+0.10    Thu Apr 21 14:15:46 JST 2011
+        fix: setPublicKey() should allow a single PEM string to
+             contain many X.509 certificates.
+             http://rt.cpan.org/Public/Bug/Display.html?id=67612
+
+0.09    Thu Oct  2 15:00:03 JST 2008
+        fix INSTALLMANxDIR problem.
+        fix: SSLEAY_RAND_BYTES:PRNG not seeded.
+             http://rt.cpan.org/Public/Bug/Display.html?id=35839
+
+0.08    Wed Sep 26 11:20:58 JST 2007
+        doc fix
+
+0.07    Tue Sep 25 12:39:36 JST 2007
+        Renamed from Tripletail::SMIME.
+
+0.06    Wed Sep  7 18:32:12 JST 2005
+        fix: Attempt to free unreferenced scalar on x509_xx_hash. 
+
+0.05    Fri Aug 12 14:06:56 JST 2005
+        add: x509_subject_hash, x509_issuer_hash.
+
+0.04    Fri Aug 12 11:55:38 JST 2005
+        fix: signonly had returned with "\n", new return with "\r\n".
+
+0.03    Tue Aug  9 12:44:53 JST 2005
+        add: prepareSmimeMessage method.
+
+0.02    Mon Aug  8 19:21:04 JST 2005
+        add: signonly method.
+
+0.01    Mon Aug  8 17:55:33 JST 2005
+        First version.
+

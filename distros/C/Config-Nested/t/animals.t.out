@@ -1,0 +1,185 @@
+$VAR1 = {
+          'animal' => [
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'location',
+                                            'home'
+                                          ],
+                                          [
+                                            'animal',
+                                            'fish'
+                                          ]
+                                        ],
+                                 'alive' => 1,
+                                 'animal' => 'fish',
+                                 'breed' => [],
+                                 'colour' => {
+                                               'body' => 'yellow'
+                                             },
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => 'home',
+                                 'name' => 'Fred',
+                                 'owner' => 'George',
+                                 'sex' => 'male'
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'location',
+                                            'home'
+                                          ],
+                                          [
+                                            'animal',
+                                            'rat'
+                                          ]
+                                        ],
+                                 'alive' => 0,
+                                 'animal' => 'rat',
+                                 'breed' => [],
+                                 'colour' => {},
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => 'home',
+                                 'name' => 'Bob',
+                                 'owner' => 'Gladys',
+                                 'sex' => 'male'
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'location',
+                                            'home'
+                                          ],
+                                          [
+                                            'animal',
+                                            'bird'
+                                          ]
+                                        ],
+                                 'alive' => 1,
+                                 'animal' => 'bird',
+                                 'breed' => [],
+                                 'colour' => {
+                                               'body' => 'green'
+                                             },
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => 'home',
+                                 'name' => 'Clyde',
+                                 'owner' => 'Gladys',
+                                 'sex' => 'female'
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'location',
+                                            'work'
+                                          ],
+                                          [
+                                            'animal',
+                                            'horse'
+                                          ]
+                                        ],
+                                 'alive' => 1,
+                                 'animal' => 'horse',
+                                 'breed' => [],
+                                 'colour' => {
+                                               'head' => 'brown',
+                                               'nose' => 'black'
+                                             },
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => 'work',
+                                 'name' => 'A Horse',
+                                 'owner' => 'George',
+                                 'sex' => 'male'
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'animal',
+                                            'dog'
+                                          ],
+                                          [
+                                            'animal',
+                                            'flea'
+                                          ]
+                                        ],
+                                 'alive' => 1,
+                                 'animal' => 'flea',
+                                 'breed' => [],
+                                 'colour' => {},
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => '',
+                                 'name' => 'Rover',
+                                 'owner' => 'George',
+                                 'sex' => 'male'
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'animal',
+                                            'dog'
+                                          ]
+                                        ],
+                                 'alive' => 1,
+                                 'animal' => 'dog',
+                                 'breed' => [],
+                                 'colour' => {},
+                                 'exercise' => [],
+                                 'happy' => 1,
+                                 'hungry' => 0,
+                                 'location' => '',
+                                 'name' => 'Rover',
+                                 'owner' => 'George',
+                                 'sex' => 'male'
+                               }, 'Config::Nested::Section' )
+                      ],
+          'location' => [
+                          bless( {
+                                   '+' => [
+                                            [
+                                              'location',
+                                              'home'
+                                            ]
+                                          ],
+                                   'alive' => 1,
+                                   'animal' => '',
+                                   'breed' => [],
+                                   'colour' => {},
+                                   'exercise' => [],
+                                   'happy' => 1,
+                                   'hungry' => 0,
+                                   'location' => 'home',
+                                   'name' => '',
+                                   'owner' => 'George',
+                                   'sex' => 'male'
+                                 }, 'Config::Nested::Section' ),
+                          bless( {
+                                   '+' => [
+                                            [
+                                              'location',
+                                              'work'
+                                            ]
+                                          ],
+                                   'alive' => 1,
+                                   'animal' => '',
+                                   'breed' => [],
+                                   'colour' => {},
+                                   'exercise' => [],
+                                   'happy' => 1,
+                                   'hungry' => 0,
+                                   'location' => 'work',
+                                   'name' => '',
+                                   'owner' => 'George',
+                                   'sex' => 'male'
+                                 }, 'Config::Nested::Section' )
+                        ]
+        };

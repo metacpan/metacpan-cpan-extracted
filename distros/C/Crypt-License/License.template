@@ -1,0 +1,30 @@
+ The white space between the field name and the value
+ is not important and will be ignored. This is NOT true
+ in the License text file.
+
+ ID: must be the first field and KEY: the last, otherwise 
+ the order of the fields is not important.
+
+ ID:	:unique licensee identifier, date code is fine
+ NAME:	:company or entity name
+ ADD1:	:address line 1
+ ADD2:	:address line 2
+ CITY:	:city
+ STATE:	:state or province
+ ZIP:	:postal code
+ CTRY:	:country
+ TEL:	:telephone number
+ FAX:	:fax number
+ CONT:	:contact person
+ MAIL:	:email addy of contact
+ ----------------------------------
+ SERV:	:http server name               * optional
+ HOST:	:hostname                       * optional
+ USER:	:calling user                   * optional
+ GROUP:	:calling group                  * optional 
+ HOME:	:called from withing this path  * optional
+ ----------------------------------
+ DATE:	:creation date
+ EXP:	:expiration date if any
+ KEY:	:binary key
+ ----------------------------------

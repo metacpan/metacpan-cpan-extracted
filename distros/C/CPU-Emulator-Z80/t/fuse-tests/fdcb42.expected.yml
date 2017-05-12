@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb42
+registers:
+  AF: 21853
+  AF_: 0
+  BC: 39977
+  BC_: 0
+  DE: 12267
+  DE_: 0
+  HL: 38911
+  HL_: 0
+  I: 0
+  IX: 32535
+  IY: 40790
+  PC: 4
+  R: 2
+  SP: 0

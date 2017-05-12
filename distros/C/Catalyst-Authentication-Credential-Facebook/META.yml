@@ -1,0 +1,22 @@
+---
+name: Catalyst-Authentication-Credential-Facebook
+version: 0.01000
+author:
+  - 'Jesse Stay (jessestay) <jesse@staynalive.com>'
+  - |-
+        A SocialToo.com Product
+abstract: Facebook authentication module for Catalyst
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class: 0.06002
+  WWW::Facebook::API: 0.4.17
+provides:
+  Catalyst::Authentication::Credential::Facebook:
+    file: lib/Catalyst/Authentication/Credential/Facebook.pm
+    version: 0.01000
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,29 @@
+Revision history for perl module C::Utility
+
+0.006 2017-02-09
+
+* Documentation
+* hash_to_c_file returns the value of the generated .h file
+* New function "stamp_file"
+
+0.005 2014-02-26
+
+* Add "make-c-text" executable to distribution.
+
+0.004 2013-12-13
+
+* Add "remove_quotes" function.
+
+0.003 2013-11-27
+
+* Use "croak" instead of "die" for errors.
+* Add "ch_files" function.
+* Add "Changes".
+
+0.002 2012-04-19
+
+* Add "DESCRIPTION" section to documentation.
+* Better documentation.
+
+0.001 2012-04-14
+

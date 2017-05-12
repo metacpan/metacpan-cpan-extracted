@@ -1,0 +1,64 @@
+NAME
+    CPANPLUS::Internals::Source::CPANIDX - CPANIDX source implementation
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+      # In the CPANPLUS shell
+
+      CPAN Terminal> s conf no_update 1
+      CPAN Terminal> s conf source_engine CPANPLUS::Internals::Source::CPANIDX
+      CPAN Terminal> s save
+
+DESCRIPTION
+    CPANPLUS::Internals::Source::CPANIDX is a CPANPLUS source
+    implementation.
+
+    It is highly experimental.
+
+    Usually CPANPLUS retrieves the CPAN index files, extracts them and
+    builds an in-memory index of every module listed on CPAN. As you can
+    imagine, this is quite memory intensive.
+
+    This source implementation does things slightly different.
+
+    Instead of building an in-memory index, it queries an App::CPANIDX based
+    website for module/distribution/author information as and when it is
+    required by CPANPLUS.
+
+    The default CPANIDX site is <http://cpanidx.org/cpanidx/>.
+
+    You may set the "PERL5_CPANIDX_URL" environment variable to an
+    alternative if you wish.
+
+CAVEATS
+    There are some caveats.
+
+    As shown in the "SYNOPSIS" you must set the CPANPLUS configuration
+    variable "no_update" to a true value to use this source engine. This
+    prevents CPANPLUS from attempting to update CPAN indexes.
+
+    Attempting to searches and getting a list of out of date modules in
+    CPANPLUS are incredibly slow due the million or so web accesses that are
+    incurred.
+
+    I have included two scripts in the "examples" directory of this
+    distribution that may be of use. "installer.pl" does installation of
+    modules and "updater.pl" will find out of date modules and prompt to
+    update them.
+
+SEE ALSO
+    CPANPLUS
+
+    CPANPLUS::Internals::Source
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams and Jos Boumans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

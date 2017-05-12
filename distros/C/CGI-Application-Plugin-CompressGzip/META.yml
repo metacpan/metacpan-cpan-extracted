@@ -1,0 +1,13 @@
+---
+abstract: Add gzip compression to CGI::Application
+author:
+- Rhesa Rozendaal <rhesa@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.091260
+license: perl
+name: CGI-Application-Plugin-CompressGzip
+requires:
+  CGI::Application: '4.01'
+  CGI::Compress::Gzip: '0.19'
+resources:
+  repository: http://github.com/rhesa/cgi-application-plugin-compressgzip
+version: '1.02'

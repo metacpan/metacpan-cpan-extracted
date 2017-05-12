@@ -1,0 +1,46 @@
+Class-DBI-SQL-Transformer-Quotify
+
+Quote column and table names in Class::DBI-generated SQL
+
+REQUIRES
+
+  Class::DBI  >= 3.0.8
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Class::DBI::SQL::Transformer::Quotify
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-DBI-SQL-Transformer-Quotify
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Class-DBI-SQL-Transformer-Quotify
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Class-DBI-SQL-Transformer-Quotify
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-DBI-SQL-Transformer-Quotify
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 David Westbrook
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,80 @@
+A simple tree of inheritances has been used to create the peanuts example.
+For a more elaborate approach I highly recommend the literature on OMT,
+which I mentioned in
+
+	perldoc classgen .
+
+
+I want to introduce Snoopy and Woodstock and they shall do simple things.
+In a more generic approach Snoopy is a dog and Woodstock is a bird. Dogs
+and birds both are creatures.
+
+If one thinks of all the other personalities, like Charly Brown, Lucy,
+Linus etc. they could be called kids. Kids are just other forms of
+creatures and can be distinguished from dogs or birds.
+
+Creatures:
+~~~~~~~~~~
+Thus Creature.pm may serve as a generic base-class. Creatures breath(), move(),
+make_noise(), meet() other creatures or may approach() another creature. As
+I indicated these operations of a creature should be implemented as additional
+methods in Creature.pm . make_noise() is intended to be a generic way of
+expressing something by a specific creature.
+
+People tend to give creatures a name and a creature is in a certain place
+at a specific moment in time. So it may be natural to use
+
+	$name  and  $pos
+
+as instance variables of Creature.pm to indicate name and position of a specific
+creature.
+
+Dogs:
+~~~~~
+Dog.pm is derived from Creature.pm . The main difference to a creature is
+that the dog we want to use here, Snoopy, can think(). think()ing is 
+Snoopies special way of Creature::make_noise(). Hence, think() is implemented
+as Dog's specific way to make_noise().
+
+Bird:
+~~~~~
+The same consideration holds for Woodstock. Woodstock, being a Bird.pm, simply
+uses a specific way to make_noise().
+
+
+Putting all together:
+~~~~~~~~~~~~~~~~~~~~~
+To achieve what this simple program does you could have spent less effort.
+However, to me OOP is a way to introduce generic and universal code. A 
+benefit of the big effort is that now it is very easy to have more than one
+Woodstock on the scene. That's why I put some of Woodstock's relatives into
+peanuts.
+
+If you step through peantus by the debugger you will find that all Woodstocks
+will have their own memory allocation for all the specific instance variables.
+So, when the analysis part has been done properly, you will gain a lot of
+flexibilty and benefit.
+
+E.g. it would be quite straight forward to introduce Charly_Brown, Lucy,
+Schroeder etc. which could be simple instances of a suitable class Kid.pm .
+If Kid.pm provides enough parameters to distinguish Charly_Browns behavior
+from Lucies and all the others, your coding effort quickly should decrease.
+
+Find out, what is common and what is different to the characters. Implement.
+
+Future steps:
+~~~~~~~~~~~~~
+Introduce a user interface, which lets you control actions of Snoopy, 
+Woodstock and all the others, e.g., by keyboard or mouse. Create a 
+statemachine and let it be one of Kid.pm 's instance variables. This
+way you could introduce very specific behavior of all the characters.
+E.g. if Lucy is in the state of throw_ball, then Charly_Brown experience
+the event "cheated" .
+
+Your phantasy is the limit.
+
+Enjoy.
+
+Michael Schlueter    email: mschlue@cpan.org
+
+

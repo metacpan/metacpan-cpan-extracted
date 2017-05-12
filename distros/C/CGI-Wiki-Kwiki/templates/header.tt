@@ -1,0 +1,27 @@
+[%# Included at the top of every page, this template contains common headers
+
+-%]<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+        
+<html>
+<head>
+  <title>[% node_name %] - [% site_name %]</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=[% charset %]" />
+  
+  [% IF stylesheet_url %]
+    <link rel="stylesheet" href="[% stylesheet_url %]" type="text/css" />
+  [% ELSE %]
+    <style>
+      body {
+          color:              #000000;
+          background-color:   #FFFFFF;
+      }
+    </style>
+  [% END %]
+
+</head>
+<body>
+
+[% INCLUDE navbar.tt %]
+
+<div class="content">[%# closed in footer.tt %]

@@ -1,0 +1,888 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::Catalog - List of Makable Method Types
+
+
+=head1 DESCRIPTION
+
+This document lists the various subclasses of Class::MakeMethods included
+in this distribution, and the method types each one provides. 
+
+See the documentation for each implementation for more details
+about the features it provides.
+
+For each class, a parenthetical comment indicates whether the methods it generates are applicable to individual blessed objects (Instances), to class data (Global), or both (Any)
+=head2 Scoping
+
+The final part of the name of a method-generating subclass typically indicates the scope or applicability of the methods it generates
+
+=over 4
+
+=item Hash
+
+For object instances based on blessed hashes with named values.
+
+=item Array
+
+For object instances based on blessed arrays with positional values.
+
+=item Scalar
+
+For object instances based on blessed scalars with a single value.
+
+=item InsideOut
+
+For any object instance regardless of underlying data type.
+
+=item Ref
+
+For any object instance regardless of underlying data type.
+
+=item Inheritable
+
+For data which can be set at the class, subclass, or instance level.
+
+=item Class
+
+For class data shared by all instances but different for each subclass
+
+=item ClassVar
+
+For class data shared by all instances but different for each subclass
+
+=item ClassInherit
+
+For class data shared by all instances but different for each subclass
+
+=item Global
+
+For global data shared by a class and all its instances and subclasses
+
+=item PackageVar
+
+For global data shared by a class and all its instances and subclasses
+
+=item Universal
+
+# General method types that are widely applicable
+
+=back
+
+=head2 Summary Charts
+
+This table shows which scopes are available in each generator family:
+
+  SCOPING          Basic      Standard   Evaled     Composite  Template
+  Hash               +          +          +          +          +
+  Array              +          +                     +          +
+  Scalar                                                         +
+  InsideOut                                                      +
+  Ref                                                            +
+  Inheritable                   +                     +          +
+  Class                                                          +
+  ClassVar                                                       +
+  ClassInherit                                                   +
+  Global             +          +                     +          +
+  PackageVar                                                     +
+  Universal                                           +          +
+
+This table shows which types of methods are typically available in each generator family:
+
+  METHOD           Basic      Standard   Evaled     Composite  Template
+  new                +          +                     +          +          
+
+  scalar             +          +                     +          +
+  string                                                         +
+  string_index                                                   +
+  number                                                         +
+  boolean                                                        +
+  boolean_index                                                  +
+  bits                                                           +
+
+  array              +          +                     +          +
+  struct                                                         +
+
+  hash               +          +                     +          +
+  hash_of_arrays                                                 +
+  tiedhash                                                       +
+
+  object             +                                +          +
+  instance                                                       +
+  array_of_objects                                               +
+
+  code                                                           +
+  code_or_scalar                                                 +
+
+
+=head1 BASIC CLASSES
+
+=head2 Basic::Hash (Instances)
+
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Basic::Hash> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=back
+
+=head2 Basic::Array (Instances)
+
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Basic::Array> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=back
+
+=head2 Basic::Global (Global)
+
+Global methods are not instance-dependent; calling them by class
+name or from any instance or subclass will consistently access the
+same value. See L<Class::MakeMethods::Basic::Global> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set a global scalar value
+
+=item *
+
+array: get and set values in a global array
+
+=item *
+
+hash: get and set values in a global hash
+
+=back
+
+
+=head1 STANDARD CLASSES
+
+=head2 Standard::Hash (Instances)
+
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Standard::Hash> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=item *
+
+object: access an object refered to by each instance
+
+=back
+
+=head2 Standard::Array (Instances)
+
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Standard::Array> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=item *
+
+object: access an object refered to by each instance
+
+=back
+
+=head2 Standard::Global (Global)
+
+Methods for manipulating global data. See L<Class::MakeMethods::Standard::Global> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set global scalar
+
+=item *
+
+array: get and set values stored in a global array
+
+=item *
+
+hash: get and set values in a global hash
+
+=item *
+
+object: global access to an object ref
+
+=back
+
+
+=head2 Standard::Inheritable (Any)
+
+Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Standard::Inheritable> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set scalar values for each instance or class
+
+=back
+
+
+=head1 COMPOSITE CLASSES
+
+=head2 Composite::Hash (Instances)
+
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Composite::Hash> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=item *
+
+object: access an object refered to by each instance
+
+=back
+
+=head2 Composite::Array (Instances)
+
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Composite::Array> for details.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=item *
+
+object: access an object refered to by each instance
+
+=back
+
+=head2 Composite::Global (Global)
+
+Methods for manipulating global data. See L<Class::MakeMethods::Composite::Global> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set global scalar
+
+=item *
+
+array: get and set values stored in a global array
+
+=item *
+
+hash: get and set values in a global hash
+
+=item *
+
+object: global access to an object ref
+
+=back
+
+
+=head2 Composite::Inheritable (Any)
+
+Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Composite::Inheritable> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set scalar values for each instance or class
+
+=item *
+
+hook: create a subroutine intended to have operations added to it
+
+=back
+
+
+=head2 Composite::Universal (Any)
+
+Methods for padding pre- and post-conditions to any class. See L<Class::MakeMethods::Composite::Universal> for details.
+
+=over 4
+
+=item *
+
+patch: add pre and post operations to an existing subroutine
+
+=back
+
+
+=head1 TEMPLATE CLASSES
+
+=head2 Template::Universal (Any)
+
+Meta-methods for any type of object. See L<Class::MakeMethods::Template::Universal>.
+
+=over 4
+
+=item *
+
+no_op - a method with an empty body
+
+=item *
+
+croak - a method which will croak if called
+
+=item *
+
+method_init - calls other methods from a list of method name => argument pairs
+
+=item *
+
+forward_methods - delegates to an object provided by another method
+
+=back
+
+=head2 Template::Ref (Any Instance)
+
+Methods for deep copies and comparisons. See L<Class::MakeMethods::Template::Ref>.
+
+=over 4
+
+=item *
+
+clone: make a deep copy of an object instance
+
+=item *
+
+prototype: make new objects by cloning a typical instance
+
+=item *
+
+compare: compare one object to another
+
+=back
+
+
+=head2 Template::Generic (Abstract)
+
+The remaining subclasses inherit a similar collection of templates from Template::Generic, and provide a different type of scoping or binding for the functionality defined by the Generic template. See L<Class::MakeMethods::Template::Generic> for details.
+
+
+=head2 Template::Hash (Instances)
+
+The most commonly used implementation, for objects based on blessed hashes. See L<Class::MakeMethods::Template::Hash>.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+string: get and set string values in each instance
+
+=item *
+
+number: get and set numeric values in each instance
+
+=item *
+
+boolean: get and set boolean values in each instance
+
+=item *
+
+bits: get and set boolean values stored in a single value in each
+instance
+
+=item *
+
+array: get and set values stored in an array refered to in each
+instance
+
+=item *
+
+struct - methods for acccessing values which are stored by
+position in an array
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=item *
+
+tiedhash: get and set values in a tied hash refered to in each
+instance
+
+=item *
+
+hash_of_arrays: for references to hashes of arrays contained in each
+instance
+
+=item *
+
+object: set or access a reference to an object contained in each
+instance
+
+=item *
+
+array_of_objects: manipulate an array of object references within in
+each instance
+
+=item *
+
+code: set or call a function reference contained in each instance
+
+=back
+
+
+=head2 Template::Array (Instances)
+
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Template::Array>.
+
+=over 4
+
+=item *
+
+new: create and copy array instances
+
+=item *
+
+scalar: get and set scalar values in a given array position
+
+=item *
+
+string: get and set string values in a given array position
+
+=item *
+
+number: get and set numeric values in a given array position
+
+=item *
+
+boolean: get and set boolean values in a given array position
+
+=item *
+
+builtin_isa: generates a wrapper around some builtin function,
+cacheing the results in the object and providing a by-name interface
+
+=back
+
+
+
+=head2 Template::Scalar (Instances)
+
+For objects based on blessed scalars.  See L<Class::MakeMethods::Template::Scalar>.
+
+Note that these objects can generally only have one value accessor method, as all such accessors will refer to the same value.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values in each instance
+
+=item *
+
+string: get and set a string value in each instance
+
+=item *
+
+number: get and set a numeric value in each instance
+
+=item *
+
+boolean: get and set a boolean value in each instance
+
+=item *
+
+bits: get and set boolean values stored in a single value in each
+instance
+
+=item *
+
+code: set or call a function reference contained in each instance
+
+=back
+
+
+=head2 Template::InsideOut (Instances)
+
+Stores values for objects in an external location hashed by identity. See L<Class::MakeMethods::Template::InsideOut>.
+
+Note that while the below constructor creates and returns scalar
+references, accessor methods can be created with this implementation
+for use with any type of object.
+
+=over 4
+
+=item *
+
+new: create and copy instances
+
+=item *
+
+scalar: get and set scalar values associated with each instance
+
+=item *
+
+string: get and set string values associated with each instance
+
+=item *
+
+string_index: get and set string values associated with each
+instance, and maintain an index of instances by value
+
+=item *
+
+number: get and set numeric values associated with each instance
+
+=item *
+
+boolean: get and set boolean values associated with each instance
+
+=item *
+
+boolean_index: get and set boolean values associated with each instance, and maintain a list of items which have the flag set
+
+=item *
+
+bits: get and set boolean values stored in a single value associated with each
+instance
+
+=item *
+
+array: get and set values stored in an array associated with each
+instance
+
+=item *
+
+hash: get and set values in a hash associated with each instance
+
+=item *
+
+code: set or call a function reference associated with each instance
+
+=back
+
+
+=head2 Template::Global (Global)
+
+Global methods are not instance-dependent; calling them by class
+name or from any instance will consistently access the same value.  See L<Class::MakeMethods::Template::Static>.
+
+=over 4
+
+=item *
+
+scalar: get and set a global scalar value
+
+=item *
+
+string: get and set a global string value
+
+=item *
+
+number: get and set a global number value
+
+=item *
+
+boolean: get and set a global boolean value
+
+=item *
+
+array: get and set values in a global array
+
+=item *
+
+hash: get and set values in a global hash
+
+=item *
+
+tiedhash: get and set values in a global tied hash
+
+=item *
+
+hash_of_arrays: get and set values in a global hash of arrays
+
+=item *
+
+object: set and access a global reference to an object
+
+=item *
+
+instance: set and access a global reference to an object of the declaring class
+
+=item *
+
+code: set and access a global reference to a subroutine.
+
+=back
+
+
+=head2 Template::PackageVar (Global)
+
+PackageVar methods access a variable in the declaring package. Thus,
+they have the same effect as Static methods, while keeping their
+value accessible via the symbol table.  See L<Class::MakeMethods::Template::PackageVar>.
+
+=over 4
+
+=item *
+
+scalar: get and set a global scalar value
+
+=item *
+
+string: get and set a global string value
+
+=item *
+
+number: get and set a global number value
+
+=item *
+
+boolean: get and set a global boolean value
+
+=item *
+
+array: get and set values in a global array
+
+=item *
+
+hash: get and set values in a global hash
+
+=back
+
+
+=head2 Template::Class (Global)
+
+Class methods are similar to Static methods, except that each subclass and its instances will access a distinct value. See L<Class::MakeMethods::Template::Class>.
+
+=over 4
+
+=item *
+
+scalar: get and set a class-specific scalar value
+
+=item *
+
+string: get and set a class-specific string value
+
+=item *
+
+number: get and set a class-specific number value
+
+=item *
+
+boolean: get and set a class-specific boolean value
+
+=item *
+
+array: get and set values in a class-specific array
+
+=item *
+
+hash: get and set values in a class-specific hash
+
+=back
+
+
+=head2 Template::ClassVar (Global)
+
+ClassVar methods access a variable in the package on which they
+are called.  Thus, they have the same effect as Class methods,
+while keeping their value accessible via the symbol table, like
+PackageVar. See L<Class::MakeMethods::Template::ClassVar>.
+
+=over 4
+
+=item *
+
+scalar: get and set a class-specific scalar value
+
+=item *
+
+string: get and set a class-specific string value
+
+=item *
+
+number: get and set a class-specific number value
+
+=item *
+
+boolean: get and set a class-specific boolean value
+
+=item *
+
+array: get and set values in a class-specific array
+
+=item *
+
+hash: get and set values in a class-specific hash
+
+=back
+
+
+=head2 Template::ClassInherit (Global)
+
+ClassInherit methods are an intermediate point between Static and Class methods; subclasses inherit their superclass's value until they set their own value, after which they become distinct. See L<Class::MakeMethods::Template::ClassInherit>.
+
+=over 4
+
+=item *
+
+scalar: get and set an inheritable class-specific scalar value
+
+=item *
+
+string: get and set an inheritable class-specific string value
+
+=item *
+
+number: get and set an inheritable class-specific number value
+
+=item *
+
+boolean: get and set an inheritable class-specific boolean value
+
+=item *
+
+array: get and set values in an inheritable class-specific array
+
+=item *
+
+hash: get and set values in an inheritable class-specific hash
+
+=back
+
+
+=head2 Template::Inheritable (Any)
+
+Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Template::Inheritable> for details.
+
+=over 4
+
+=item *
+
+scalar: get and set scalar values for each instance or class
+
+=item *
+
+string: get and set string values for each instance or class
+
+=item *
+
+number: get and set numeric values for each instance or class
+
+=item *
+
+boolean: get and set boolean values for each instance or class
+
+=item *
+
+hash: get and set values in a hash refered to in each instance
+
+=back
+
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+=cut

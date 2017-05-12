@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/installer.pl
+examples/updater.pl
+lib/CPANPLUS/Internals/Source/CPANMetaDB.pm
+lib/CPANPLUS/Internals/Source/CPANMetaDB/HTTP.pm
+lib/CPANPLUS/Internals/Source/CPANMetaDB/Tie.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

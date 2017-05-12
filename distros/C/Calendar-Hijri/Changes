@@ -1,0 +1,136 @@
+Revision history for Calendar::Hijri
+
+0.33  Wed Jan 25 11:30:00 2017
+      - Upgraded to use Date::Hijri::Simple v0.18.
+
+0.32  Sun Jan 08 03:40:00 2017
+      - Added dependency on Calendar::Plugin::Renderer v0.12.
+      - Removed method validate_params(), no longer required.
+
+0.31  Fri Dec 30 11:45:00 2016
+      - Added sample code for method as_text() in the SYNOPSIS section.
+      - Updated pod document for method as_text().
+
+0.30  Mon Dec 19 12:50:00 2016
+      - Upgraded to use Date::Hijri::Simple v0.17.
+
+0.29  Sun Dec 11 07:40:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.28  Thu Nov 10 10:05:00 2016
+      - Upgraded to use Date::Hijri::Simple v0.16.
+
+0.27  Mon Oct 17 11:40:00 2016
+      - Added dependency on Calendar::Plugin::Renderer v0.11.
+
+0.26  Sat Sep 10 20:10:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.25  Tue Aug 09 10:50:00 2016
+      - Upgraded to use Date::Hijri::Simple v0.15.
+
+0.24  Wed Jul 06 15:00:00 2016
+      - Added method as_text().
+      - Updated method as_svg() with regard to start index.
+      - Added dependency on Calendar::Plugin::Renderer v0.07.
+      - Added test for method as_svg().
+
+0.23  Wed May 18 13:45:00 2016
+      - Upgraded to use Date::Hijri::Simple v0.12.
+      - Updated method as_svg() to handle month name.
+      - Refactored method current() and method from_gregorian().
+
+0.22  Sat May 07 13:10:00 2016
+      - Added method as_svg() using the plugin Calendar::Plugin::Renderer.
+      - Added section "SEE ALSO".
+      - Updated copyright year information.
+
+0.21  Sun Aug 30 11:30:00 2015
+      - Upgraded to use Date::Hijri::Simple v0.09.
+
+0.20  Fri Jul 17 12:40:00 2015
+      - Upgraded to use Date::Hijri::Simple v0.08.
+      - Making use of the method get_calendar() provided by Date::Hijri::Simple.
+
+0.19  Wed Jul 08 09:05:00 2015
+      - Upgraded to use Date::Hijri::Simple v0.07.
+
+0.18  Wed Jul 01 10:20:00 2015
+      - Fixed the pod document showing sample Hijri Calendar.
+
+0.17  Sun Jun 28 02:05:00 2015
+      - Upgraded the pre-requisite Date::Hijri::Simple v0.06.
+      - Updated method _calendar() w.r.t the renamed method days_in_month_year().
+
+0.16  Thu Jun 18 10:20:00 2015
+      - Fixed the bug in the method from_gregorian().
+
+0.15  Wed Jun 10 10:25:00 2015
+      - Updated method _calendar() to validate month and year.
+
+0.14  Mon May 25 03:05:00 2015
+      - Removed the dependency on Date::Utils::Hijri.
+      - Upgraded the pre-requisite Date::Hijri::Simple v0.03.
+      - Fine tuned method BUILD().
+      - Fine tuned method current().
+      - Fine tuned method from_julian().
+      - Updated method _calendar().
+      - Added sample calendar to the section "SYNOPSIS".
+      - Added sample code to the section "SYNOPSIS".
+      - Updated pod description of method from_gregorian().
+      - Removed sample code from pod document for method current().
+      - Removed sample code from pod document for method from_gregorian().
+      - Removed sample code from pod document for method from_julian().
+
+0.13  Thu Apr 23 23:40:00 2015
+      - Re-structured and consumed Date::Utils::Hijri as Moo Role.
+
+0.12  Tue Apr 21 13:50:00 2015
+      - Fixed the bug in the method _calendar() the last cell is empty.
+
+0.11  Sun Apr 19 11:15:00 2015
+      - Complete re-write using Moo with unit tests.
+
+0.10  Mon Mar 16 13:30:10 2015
+      - Added LICENSE file.
+      - Tidied up pod document in general.
+
+0.09  Fri Jan 16 14:55:10 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.08  Sat Oct 18 22:30:19 2014
+      - Converted all files into unix format.
+
+0.07  Sun Sep 14 18:32:20 2014
+      - Deleted Build.PL file.
+      - Removed dependency of Readonly.pm and Carp.pm.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+0.06  Tue Aug 09 16:21:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.05  Tue Apr 19 10:52:34 2011
+      - Added description to the pod of method days_so_far().
+
+0.04  Tue Apr 19 09:21:13 2011
+      - Fixed the typo in the description.
+
+0.03  Mon Apr 18 15:52:00 2011
+      - Renamed title "SYNOPSIS" to "DESCRIPTION".
+      - Renamed method days_in_year_month() to days_in_month().
+      - Renamed methos days_up_until_year_month() to days_so_far().
+      - Added example pod for method from_gregorian().
+      - Added example pod for method to_gregorian().
+      - Added example pod for method to_julian().
+      - Cosmetics changes.
+
+0.02  Tue Apr 12 12:37:37 2011
+      - Fixed the internal method _validate_date().
+      - Added unit test 01-test-case.t
+
+0.01  Mon Apr 11 18:34:23 2011
+      - First version released.

@@ -1,0 +1,38 @@
+[%-	meta.wrapper = 'site-wrapper.tt';
+	meta.title   = blog_post.title;
+%]
+
+<h2>
+	<a href="[% c.uri_for( blog_post.posted.year, blog_post.posted.month, blog_post.url_title ) %]">[% blog_post.title | html %]</a>
+</h2>
+<p>
+	<i>
+		Posted at [% blog_post.posted.strftime('%H:%M') %] on [% blog_post.posted.day %] [% blog_post.posted.month_abbr %] [% blog_post.posted.year %] 
+		by [% '<a href="/user/' _ blog_post.author.username _ '">' _ ( blog_post.author.display_name || blog_post.author.username ) _ '</a>' || 'Anonymous' %]
+	</i>
+</p>
+
+[%- IF blog_post.tags %]
+<p>
+	Tags: 
+	[%- FOREACH tag IN blog_post.tags -%]
+	<a href="[% c.uri_for( 'tag', tag ) %]">[% tag | html %]</a>
+	[%- ', ' UNLESS tag == blog_post.tags.last -%]
+	[%- END %]
+</p>
+[%- END %]
+
+[% blog_post.body %]
+
+<h3>
+	<a name="comments"></a>Comments
+</h3>
+[%- IF blog_post.discussion %]
+	[%- discussion = blog_post.discussion %]
+	[%- PROCESS 'discussion/thread.tt' %]
+[%- ELSE %]
+<p>
+	<i>Commenting has been disabled on this post.</i>
+</p>
+[%- END %]
+

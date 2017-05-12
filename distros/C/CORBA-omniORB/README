@@ -1,0 +1,180 @@
+CORBA::omniORB
+==============
+
+Perl Interface to omniORB
+
+
+Status
+======
+
+Allmost all base client and server functionality is currently
+working.  Quite a few things are left to be done. A few of 
+them are:
+
+ - wchar and wstring types
+ - less frequently used ORB functions
+ - ValueBase operations, Policy object and so on
+ - IR object directly from ORB not from InterfaceRepository
+ - ... :-)
+
+None of these are particularly hard to do given what works
+now - they just haven't been done yet.  See the TODO file for
+a current list.
+
+
+Documentation
+=============
+
+General information about a mapping of CORBA onto Perl is in
+the available in the file 'omniORB/mapping.pod' while specifics
+about omniORB are in 'omniORB.pm'. Information about the internals
+of the module is in 'omniORB/internals.pod' These POD documents
+can be viewed on the screen using the 'perldoc' program:
+
+  perldoc omniORB/mapping.pod
+
+or converted to a variety of formats, for example:
+
+  pod2html omniORB/mapping.pod > omniORB/mapping.html
+
+They will also be installed as manual pages.
+
+The file omniORB/internals.ps is a diagram that may be useful
+for figuring out omniORB/internals.pod.
+
+
+Installation
+============
+
+To compile and run this package, you'll need to have omniORB 4.0.x
+or better installed. Information about omniORB is availaible from:
+
+   http://omniorb.sourceforge.net/
+
+An interface repository implementation such as omniIFR is also needed:
+
+   http://omniifr.sourceforge.net/
+
+You'll also need Graham Barr's Error module (now maintained by Arun
+Kumar U) - available from CPAN in the directory:
+
+   http://search.cpan.org/~uarun/Error-0.15/
+
+And a reasonable recent version of Perl. (This has been
+tested with perl 5.8.x.)
+
+Once you have these installed, to build this package, simply type:
+
+  perl Makefile.PL
+  make
+
+The package then can be installed by executing the command:
+
+  make install
+
+See the README.win32 file in this directory for information on how to
+build CORBA::omniORB for Win32 platforms.
+
+
+Trying it Out
+=============
+
+Make sure the interface repository (omniifr) is started and that an
+initial reference for the InterfaceRepository key is available using
+the InitRef keyword of the omniORB.cfg file.  My InitRef setting looks
+like this:
+
+  InitRef = InterfaceRepository=corbaloc::localhost:11173/DefaultRepository
+	  = NameService=corbaname::ns.example.com
+
+Load the Account.idl file into the repository by running:
+
+  omniidl -bifr Account.idl
+
+Run the Perl server program in the background:
+
+  perl -Mblib server &
+
+And then run the client program:
+
+  perl -Mblib client
+
+You should see output that looks something like:
+
+----------
+initial services:
+	InterfaceRepository
+	NameService
+	RootPOA
+	POACurrent
+Balance is +250
+Favorite color is burgundy
+Lottery numbers are 1 2 3 4
+Nickname is Sneezy
+  /****\  
+ ;     	; 
+ [ O  O ] 
+ l   \ 	l 
+  ; -- ;  
+   ;;;;	  
+Favorite color is now chartreuse
+As an any: favorite color is now chartreuse(tk_enum)
+As an any: nickname is now Grumpy(tk_string)
+As an any: lottery_numbers are now 1 2 3 4(tk_sequence)
+2 * 1,000,000,000,0000 pennies = 2000000000000 pennies
+Withdrawing $100,000
+Oops. I don't have that much money
+    (I need +99750 more)
+created counter!
+1 2 3 4 5 6 7 8 9 10
+destroyed counter!
+created counter!
+Any kind = tk_struct
+DynamicAny kind tk_struct
+da_struct {
+lval=17
+sval=seventeen
+fval=+17.03
+enval=da_enum_2
+}
+lval=17
+sval=seventeen
+fval=17.03
+fval=da_enum_2(1)
+dyn_any_struct {
+lval=18
+sval=eightteen
+fval=18.08
+enval=da_enum_3(2)
+}
+inout: want 'asd'
+inout: was '' - MUST BE EMPTY
+inout: was 'asd' - MUST BE 'asd'
+Successful completion
+----------
+
+
+Credits
+=======
+
+URLs   : http://corba-omniorb.sourceforge.net/
+Authors: Owen Taylor (original CORBA::MICO author)
+	 Nikolay Logvinov (current CORBA::MICO maintainer)
+	 Peter Housel (CORBA::omniORB maintainer)
+Contact: Peter Housel <housel@users.sourceforge.net>
+
+
+License
+=======
+
+This work is Copyright Owen Taylor, 1998-1999, and licensed
+under the terms of the GNU Library General Public License (LGPL)
+See the included file COPYING.LIB for details.
+
+Modifications for omniORB are Copyright 2005-2006 Mindspeed
+Technologies, and are also licensed under the terms of the GNU LGPL.
+
+The omnithreads and omnithreads::shared modules are modified versions
+of the core Perl threads and threads::shared modules, and are
+Copyright Artur Bergman, and distributed under the same license as
+Perl itself.

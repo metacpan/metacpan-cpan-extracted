@@ -1,0 +1,23 @@
+---
+name: Catalyst-Plugin-Setenv
+version: 0.03
+author:
+  - 'Jonathan Rockway <jrockway@cpan.org>'
+abstract: Allows you to set up the environment from Catalyst's config file.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst::Runtime: 5.7
+  NEXT: 0
+build_requires:
+  FindBin: 0
+  Test::More: 0
+provides:
+  Catalyst::Plugin::Setenv:
+    file: lib/Catalyst/Plugin/Setenv.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

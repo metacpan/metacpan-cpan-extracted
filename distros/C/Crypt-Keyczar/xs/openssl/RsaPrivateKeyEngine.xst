@@ -1,0 +1,330 @@
+#include "xs/openssl.h"
+
+MODULE = Crypt::Keyczar		PACKAGE = Crypt::Keyczar::RsaPrivateKeyEngine
+
+
+Crypt::Keyczar::RsaPrivateKeyEngine
+new(class, modulus, publicExponent, privateExponent, primeP, primeQ, primeExponentP, primeExponentQ, crtCoefficient)
+	SV *class
+	SV *modulus
+	SV *publicExponent
+	SV *privateExponent
+	SV *primeP
+	SV *primeQ
+	SV *primeExponentP
+	SV *primeExponentQ
+	SV *crtCoefficient
+	CODE:
+	{
+	    RSA *rsa;
+	    int rc;
+	    STRLEN l;
+	    unsigned char *in;
+	    BIGNUM *n, *e, *d, *p, *q, *dmp1, *dmq1, *iqmp;
+
+	    PERL_UNUSED_VAR(class);
+	    if ((rsa = RSA_new()) == NULL) {
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+
+	    in = (unsigned char *)SvPV(modulus, l);
+	    n = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (n == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(publicExponent, l);
+	    e = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (e == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(privateExponent, l);
+	    d = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (d == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(primeP, l);
+	    p = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (p == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(primeQ, l);
+	    q = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (q == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(primeExponentP, l);
+	    dmp1 = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (dmp1 == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(primeExponentQ, l);
+	    dmq1 = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (dmq1 == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    in = (unsigned char *)SvPV(crtCoefficient, l);
+	    iqmp = BN_bin2bn((const unsigned char *)in, l, NULL);
+            if (iqmp == NULL) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    if (RSA_set0_key(rsa, n, e, d) == 0) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    if (RSA_set0_factors(rsa, p, q) == 0) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    if (RSA_set0_crt_params(rsa, dmp1, dmq1, iqmp) == 0) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    rc = RSA_check_key(rsa);
+	    if (rc == 0) {
+	        RSA_free(rsa);
+	        croak("invalid RSA Private key");
+	    }
+	    else if (rc == -1) {
+	        RSA_free(rsa);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    Newz(0, RETVAL, 1, struct Crypt__Keyczar__RsaPrivateKeyEngine_class);
+	    RETVAL->rsa = rsa;
+	    RETVAL->message = NULL;
+	}
+	OUTPUT:
+	    RETVAL
+
+
+void
+DESTROY(self)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	CODE:
+	{
+	    if (self->rsa != NULL) {
+	        RSA_free(self->rsa);
+	        self->rsa = NULL;
+	    }
+	    if (self->message != NULL) {
+	        EVP_MD_CTX_destroy(self->message);
+	        self->message = NULL;
+	    }
+	    Safefree(self);
+	}
+
+
+SV *
+init(self, ...)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	CODE:
+	{
+	    RETVAL = newSVpv("", 0);
+	}
+	OUTPUT:
+	    RETVAL
+
+SV *
+decrypt(self, data)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	SV *data
+	CODE:
+	{
+	    unsigned char *in, *out;
+	    int size = RSA_size(self->rsa);
+	    int out_l;
+	    STRLEN in_l;
+
+	    Newz(0, out, size, unsigned char);
+	    in = (unsigned char *)SvPV(data, in_l);
+	    out_l = RSA_private_decrypt(in_l, in, out, self->rsa, RSA_PKCS1_OAEP_PADDING);
+	    if (out_l == -1) {
+	        Safefree(out);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    RETVAL = newSVpv((char *)out, out_l);
+	    Safefree(out);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+
+HV *
+generate(class, size)
+	SV *class
+	int size
+	CODE:
+	{
+	    RSA *rsa;
+	    BIGNUM *e, *n, *ee, *d, *p, *q, *dmp1, *dmq1, *iqmp;
+
+	    PERL_UNUSED_VAR(class);
+
+	    e = BN_new();
+	    BN_set_word(e, RSA_F4);
+	    rsa = RSA_new();
+	    if (RSA_generate_key_ex(rsa, size, e, NULL) == 0) {
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+
+	    RSA_get0_key(rsa, (const BIGNUM **)&n, (const BIGNUM **)&ee, (const BIGNUM **)&d);
+	    RETVAL = newHV();
+	    if (crypt__keyczar__util__bignum2hv(n, "modulus", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'modulus' fail");
+	    }
+	    if (crypt__keyczar__util__bignum2hv(ee, "publicExponent", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'publicExponent' fail");
+	    }
+	    if (crypt__keyczar__util__bignum2hv(d, "privateExponent", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'privateExponent' fail");
+	    }
+
+	    RSA_get0_factors(rsa, (const BIGNUM **)&p, (const BIGNUM **)&q);
+	    if (crypt__keyczar__util__bignum2hv(p, "primeP", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'primeP' fail");
+	    }
+	    if (crypt__keyczar__util__bignum2hv(q, "primeQ", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'primeQ' fail");
+	    }
+
+	    RSA_get0_crt_params(rsa, (const BIGNUM **)&dmp1, (const BIGNUM **)&dmq1, (const BIGNUM **)&iqmp);
+	    if (crypt__keyczar__util__bignum2hv(dmp1, "primeExponentP", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'primeExponentP' fail");
+	    }
+	    if (crypt__keyczar__util__bignum2hv(dmq1, "primeExponentQ", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'primeExponentQ' fail");
+	    }
+	    if (crypt__keyczar__util__bignum2hv(iqmp, "crtCoefficient", RETVAL) == 0) {
+	        RSA_free(rsa);
+	        croak("cannot generate RSA key: set 'crtCoefficient' fail");
+	    }
+	    RSA_free(rsa);
+	    BN_free(e);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+void
+update(self, ...)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	CODE:
+	{
+	    int i;
+	    SV *data;
+	    STRLEN in_l;
+	    unsigned char *in;
+	
+	    if (self->message == NULL) {
+	        self->message = EVP_MD_CTX_create();
+	        if (!EVP_DigestInit_ex(self->message, EVP_sha1(), NULL)) {
+	            croak("cannot initialize SHA1 context");
+	        }
+	    }
+
+	    for (i = 1; i < items; i++) {
+	        data = ST(i);
+	        in = (unsigned char *)SvPV(data, in_l);
+	        if (!EVP_DigestUpdate(self->message, in, in_l)) {
+	            croak("cannot update SHA1 context");
+	        }
+	    }
+	}
+
+SV *
+sign(self)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	CODE:
+	{
+	    int rc;
+	    unsigned char md[EVP_MAX_MD_SIZE];
+	    unsigned int md_l = 0;
+	    unsigned char *sign;
+	    int size = RSA_size(self->rsa);
+	    unsigned int sign_l;
+	
+	    if (self->message == NULL) {
+	        RETVAL = 0;
+	        return;
+	    }
+	    EVP_DigestFinal_ex(self->message, md, &md_l);
+	    Newz(0, sign, size, unsigned char);
+	    rc = RSA_sign(NID_sha1, md, md_l, sign, &sign_l, self->rsa);
+	    if (rc != 1) {
+	        Safefree(sign);
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    RETVAL = newSVpv((char *)sign, sign_l);
+	    Safefree(sign);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+int
+verify(self, mac)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	SV *mac
+	CODE:
+	{
+	    int rc;
+	    unsigned char md[EVP_MAX_MD_SIZE];
+	    unsigned int l = 0;
+	    STRLEN in_l;
+	    unsigned char *in;
+	
+	    if (self->message == NULL) {
+	        RETVAL = 0;
+	        return;
+	    }
+
+	    EVP_DigestFinal_ex(self->message, md, &l);
+	    in = (unsigned char *)SvPV(mac, in_l);
+	    rc = RSA_verify(NID_sha1, md, l, in, in_l, self->rsa);
+            RETVAL = rc == 1;
+	}
+	OUTPUT:
+	    RETVAL
+
+
+int
+digest_size(self)
+	Crypt::Keyczar::RsaPrivateKeyEngine self
+	CODE:
+	{
+	    RETVAL = RSA_size(self->rsa);
+	}
+	OUTPUT:
+	    RETVAL
+

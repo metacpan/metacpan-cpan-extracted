@@ -1,0 +1,58 @@
+commit e42810a6225dfdc527309490c0c32583ffab1099
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Wed Dec 17 23:21:13 2008 +0100
+
+    CHANGED: removed unnecessary test dependency
+    CHANGED: removed target latest from Build.PL
+
+commit c7fcfc87e0744a9705118cef571407b8a5baa907
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 15 22:13:01 2008 +0100
+
+    FIXED: load Net::SCP on author computer only
+    FIXED: made all files unix line ended
+
+commit 5609a1008bc9f58188db8c7f359e57577da3d131
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Tue Dec 9 02:22:47 2008 +0100
+
+    ADDED: show git status when running the dist target
+
+commit 9dddee6f06408384861fbfa9a6bdc6fa7aa43420
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Tue Dec 9 01:25:32 2008 +0100
+
+    ADDED: .gitignore
+
+commit 8d4cd27e246326579fe32ad50112b186286372b9
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Tue Dec 9 01:23:22 2008 +0100
+
+    ADDED: target latest
+
+commit 97901cc0b39438d2c55a2c4788baf6fe130bcca8
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Tue Dec 9 00:40:27 2008 +0100
+
+    CHANGED: use git instead for SVK in Build.PL
+    ADDED: author_test target to run test in xt/author
+    CHANGED: author_test runs perlcritic without user input
+
+commit b2fb7c695b562541531623374e356de8808467ed
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 8 21:15:47 2008 +0100
+
+    CHANGED: moved author tests to xt/author
+
+commit 4f18dac08e6a1d3b908bbe87aa43cbcbc8fcdd2f
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 8 21:04:22 2008 +0100
+
+    ADDED: DIE_NOT_EXISTS
+    FIXED: perl critic errors
+
+commit 7834d3f7ed6dce6a955ab0878e52d4e554ae3ef6
+Author: me <nadim@naquadim.(none)>
+Date:   Wed Aug 20 09:20:55 2008 +0200
+
+    ADDED: initial commit

@@ -1,0 +1,14 @@
+Changes
+DSA.xs
+lib/Crypt/OpenSSL/DSA.pm
+lib/Crypt/OpenSSL/DSA/Signature.pod
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/00-use.t
+t/10-selftest.t
+t/90-openssl-compat.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

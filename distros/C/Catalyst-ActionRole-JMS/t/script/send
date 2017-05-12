@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Net::Stomp;
+use Data::Printer;
+
+my $s = Net::Stomp->new({hostname=>'localhost',port=>61613});
+my $frame = $s->connect();
+my $reply_to = sprintf '%s:1', $frame->headers->{session};
+$s->subscribe({destination=>'/temp-queue/reply'});
+
+$s->send({
+    destination => '/queue/myq',
+    body => qq[{"some":"stuff","reply_to":"$reply_to"}],
+    JMSType => 'bar',
+});
+
+$frame=$s->receive_frame;
+p $frame;

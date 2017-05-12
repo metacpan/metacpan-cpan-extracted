@@ -1,0 +1,33 @@
+Revision history for CPAN-Local
+
+0.010   12 December 2012
+        Docs: added new CPAN::Local::Manual
+        Docs: fixed oboslete docs for P::PackagesDetails
+
+0.009   11 December 2012
+        Docs: add links to related modules
+
+0.008   11 December 2012
+        Drop 'authors/id' when writing distribution paths in P::PackagesDetails
+        Mark P::Indices as deprecated
+
+0.007   28 November 2012
+        Split P::Indices into three separate plugins, one per file
+
+0.006   18 September 2012
+        Update to work with latest version of CPAN::Index::API
+
+0.005   4 September 2012
+        Fixes in 'update' command
+
+0.004   31 August 2012
+        Fix some prerequisites
+
+0.003   14 August 2012
+        Documentation fixes
+
+0.002   14 August 2012
+        Documentation added
+
+0.001   30 July 2012
+        Initial release

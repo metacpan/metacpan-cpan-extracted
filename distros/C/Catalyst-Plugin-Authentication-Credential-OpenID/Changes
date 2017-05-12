@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication::Credential::OpenID
+
+0.03  Fri Oct 26 13:22:10 PDT 2007
+        - Removed t/9*.t from MANIFEST since they're never supposed to be shipped
+          (Thanks to rjbs)
+        - Accepts URI as an authenticate_openid()'s 2nd parameter so
+          you can use parameter name other than "claimed_uri".
+
+0.02  Wed May  2 17:05:02 PDT 2007
+        - Added delayed_return => 1 to work with claimid.com
+          (Thanks to Marcus Ramberg for the report)
+
+0.01  Thu Dec  7 23:47:51 2006
+        - original version

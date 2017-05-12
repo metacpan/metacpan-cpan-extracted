@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Untaint-date
+version:      1.00
+version_from: lib/CGI/Untaint/date.pm
+installdirs:  site
+requires:
+    CGI::Untaint:                  0.07
+    Date::Manip:                   5
+    Date::Simple:                  0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,10 @@
+Changes
+lib/Catalyst/Helper/Model/DBIC/Plain.pm
+lib/Catalyst/Model/DBIC/Plain.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t

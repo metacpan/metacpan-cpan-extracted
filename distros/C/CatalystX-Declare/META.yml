@@ -1,0 +1,86 @@
+---
+abstract: 'EXPERIMENTAL Declarative Syntax for Catalyst Applications'
+author:
+  - 'Robert Sedlacek <rs@474.at>'
+build_requires:
+  Catalyst::Test: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  Test::More: 0.96
+  Test::Output: 0.16
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Declare
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+provides:
+  CatalystX::Declare:
+    file: lib/CatalystX/Declare.pm
+    version: 0.015
+  CatalystX::Declare::Action::CatchValidationError:
+    file: lib/CatalystX/Declare/Action/CatchValidationError.pm
+  CatalystX::Declare::Context::AppSetup:
+    file: lib/CatalystX/Declare/Context/AppSetup.pm
+  CatalystX::Declare::Context::StringParsing:
+    file: lib/CatalystX/Declare/Context/StringParsing.pm
+  CatalystX::Declare::Controller::ActionPreparation:
+    file: lib/CatalystX/Declare/Controller/ActionPreparation.pm
+  CatalystX::Declare::Controller::DetermineActionClass:
+    file: lib/CatalystX/Declare/Controller/DetermineActionClass.pm
+  CatalystX::Declare::Controller::Meta::TypeConstraintMapping:
+    file: lib/CatalystX/Declare/Controller/Meta/TypeConstraintMapping.pm
+  CatalystX::Declare::Controller::QualifyClassNames:
+    file: lib/CatalystX/Declare/Controller/QualifyClassNames.pm
+  CatalystX::Declare::DefaultSuperclassing:
+    file: lib/CatalystX/Declare/DefaultSuperclassing.pm
+  CatalystX::Declare::Dispatching::ChainTypeSensitivity:
+    file: lib/CatalystX/Declare/Dispatching/ChainTypeSensitivity.pm
+  CatalystX::Declare::Keyword::Action:
+    file: lib/CatalystX/Declare/Keyword/Action.pm
+  CatalystX::Declare::Keyword::Application:
+    file: lib/CatalystX/Declare/Keyword/Application.pm
+  CatalystX::Declare::Keyword::Component:
+    file: lib/CatalystX/Declare/Keyword/Component.pm
+  CatalystX::Declare::Keyword::Controller:
+    file: lib/CatalystX/Declare/Keyword/Controller.pm
+  CatalystX::Declare::Keyword::Model:
+    file: lib/CatalystX/Declare/Keyword/Model.pm
+  CatalystX::Declare::Keyword::Role:
+    file: lib/CatalystX/Declare/Keyword/Role.pm
+  CatalystX::Declare::Keyword::View:
+    file: lib/CatalystX/Declare/Keyword/View.pm
+requires:
+  CLASS: 1.00
+  Carp: 0
+  Catalyst: 5.80025
+  Catalyst::Controller::ActionRole: 0.15
+  Class::Inspector: 1.24
+  Data::Dump: 1.14
+  Data::Pond: 0.002
+  Devel::Declare: 0.006000
+  FindBin: 0
+  Moose: 1.14
+  MooseX::Declare: 0.34
+  MooseX::Method::Signatures: 0.36
+  MooseX::MethodAttributes: 0.24
+  MooseX::Role::Parameterized: 0.19
+  MooseX::Types: 0.24
+  Perl6::Junction: 1.40000
+  aliased: 0.30
+  parent: 0.221
+  perl: 5.8.8
+resources:
+  homepage: http://search.cpan.org/dist/CatalystX-Declare/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jjn1056/catalystx-declarative.git
+version: 0.015

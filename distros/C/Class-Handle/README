@@ -1,0 +1,226 @@
+NAME
+    Class::Handle - Create objects that are handles to Classes
+
+SYNOPSIS
+      # Create a class handle
+      use Class::Handle;
+      my $class = Class::Handle->new( 'Foo::Class' );
+      my $name = $class->name;
+  
+      # UNIVERSAL type methods
+      $class->VERSION();
+      $class->isa( 'Foo:Bar' );
+      $class->can( 'blah' );
+  
+      # Class::Inspector type methods
+      $class->installed();
+      $class->loaded();
+      $class->filename();
+      $class->resolved_filename();
+      $class->functions();
+      $class->function_refs();
+      $class->function_exists( 'function' );
+      $class->methods( 'public', 'full' );
+      $class->subclasses();
+  
+      # Class::ISA type methods
+      $class->super_path();
+      $class->self_and_super_path();
+      $class->full_super_path();
+  
+      # Loading and unloading
+      $class->load();
+
+DESCRIPTION
+    Class related functionality in Perl is broken up into a variety of
+    different modules. Class::Handle attempts to provide a convenient object
+    wrapper around the various different types of functions that can be
+    performed on a class.
+
+    Please note that this is an initial non-production quality release, and
+    should be used as such. Functionality and API are subject to change
+    without notice.
+
+    Currently, Class::Handle provies what is effectively a combined API from
+    "UNIVERSAL", "Class::ISA" and "Class::Inspector" for obtaining
+    information about a Class, and some additional task methods, such as
+    "load" to common tasks relating to classes.
+
+UNIVERSAL API
+    To ensure we maintain compliance with other classes that rely on methods
+    provided by "UNIVERSAL", Class::Handle acts in the normal way when
+    something like "<Class::Handle-"VERSION>> is called. That is, it returns
+    the version of Class::Handle itself. When "UNIVERSAL" methods are called
+    on an instantiation the method is changed to act on the class we have a
+    handle to. For example, the two following statements are equivalent.
+
+      # Getting the version directly
+      print Foo::Bar->VERSION;
+  
+      # Getting the version via Class::Handle
+      my $class = Class::Handle->new( 'Foo::Bar' );
+      print $class->VERSION;
+
+    This also applies to the "isa" and "can" methods.
+
+METHODS
+  new $class
+    The "new" constructor will create a new handle to a class or unknown
+    existance or status. That is, it won't check that the class actually
+    exists at this time. It WILL however check to make sure that your class
+    name is legal.
+
+      Returns a new Class::Handle object on success
+      Returns undef if the class name is illegal
+
+  name
+    The c<name> method returns the name of the class as original specified
+    in the constructor.
+
+  VERSION
+    Find the version for the class. Does not check that the class is loaded
+    ( at this time ).
+
+    Returns the version on success, "undef" if the class does not defined a
+    $VERSION or the class is not loaded.
+
+  isa $class
+    Checks to see if the class is a subclass of another class. Does not
+    check that the class is loaded ( at this time ).
+
+    Returns true/false as for "UNIVERSAL::isa"
+
+  can $method
+    Checks to see if a particular method is defined for the class.
+
+    Returns a "CODE" ref to the function is the method is available, or
+    false if the class does not have that method available.
+
+  installed
+    Checks to see if a particular class is installed on the machine, or at
+    least that the class is available to perl. In this case, "class" really
+    means "module". This methods cannot detect a class that is not a module.
+    ( Has its own file ).
+
+    Returns true if the class is installed and available, or false
+    otherwise.
+
+  loaded
+    Checks to see if a class is loaded. In this case, "class" does NOT mean
+    "module". The "loaded" method will return true for classes that do not
+    have their own file.
+
+    For example, if a module "Foo" contains the classes "Foo", "Foo::Bar"
+    and "Foo::Buffy", the "loaded" method will return true for all of the
+    classes.
+
+    Returns true if the class is loaded, or false otherwise.
+
+  filename
+    Returns the base filename for a class. For example, for the class
+    "Foo::Bar", "loaded" would return "Foo/Bar.pm".
+
+    The "filename" method is platform neutral, it should always return the
+    filename in the correct format for your platform.
+
+  resolved_filename @extra_paths
+    The "resolved_filename" will attempt to find the real file on your
+    system that will be used when a class is loaded. If additional paths are
+    provided as argument, they will be tried first, before the contents of
+    the @INC array. If a file cannot be found to match the class, returns
+    false.
+
+  loaded_filename
+    If the class is loaded, returns the name of the file that it was
+    originally loaded from.
+
+    Returns false if the class is not loaded, or did not have its own file.
+
+  functions
+    Returns a list of the names of all the functions in the classes
+    immediate namespace. Note that this is not the METHODS of the class,
+    just the functions. Returns a reference to an array of the function
+    names on success.
+
+    Returns undef on error or if the class is not loaded.
+
+  function_refs
+    Returns a list of references to all the functions in the classes
+    immediate namespace.
+
+    Returns a reference to an array of CODE refs of the functions on
+    success, or "undef" on error or if the class is not loaded.
+
+  function_exists $function
+    Checks to see if the function exists in the class. Note that this is as
+    a function, not as a method. To see if a method exists for a class, use
+    the "can" method in UNIVERSAL, and hence to every other class.
+
+    Returns true if the function exists, false if the function does not
+    exist, or "undef" on error, or if the class is not loaded.
+
+  methods @options
+    Attempts to find the methods available to the class. This includes
+    everything in the classes super path up to, but NOT including,
+    UNIVERSAL. Returns a reference to an array of the names of all the
+    available methods on success. Returns undef if the class is not loaded.
+
+    Any provided options are passed through, and alter the response in the
+    same way as for the options to "<Class::Inspector-"methods()>>, that is,
+    'public', 'private', 'full' and 'expanded', and combinations thereof.
+
+  subclasses
+    The "subclasses" method will search then entire namespace (and thus all
+    currently loaded classes) to find all of the subclasses of the class
+    handle.
+
+    The actual test will be done by calling "isa" on the class as a static
+    method. (i.e. "<My::Class-"isa($class)>>.
+
+    Returns a reference to a list of the names of the loaded classes that
+    match the class provided, or false is none match, or "undef" if the
+    class name provided is invalid.
+
+  super_path
+    The "super_path" method is a straight pass through to the
+    "Class::ISA::super_path" function. Returns an ordered list of class
+    names, with no duplicates. The list does NOT include the class itself,
+    or the UNIVERSAL class.
+
+  self_and_super_path
+    As above, but includes ourself at the beginning of the path. Directly
+    passes through to Class::ISA.
+
+  full_super_path
+    The "full_super_path" method is an additional method not in
+    "Class::ISA". It returns as for "super_path", except that it also
+    contains BOTH the class itself, and "UNIVERSAL". This full list is more
+    technically accurate, but less commonly used, and as such isn't
+    available from Class::ISA itself.
+
+BUGS
+    No known bugs. Additional feature requests are being taken.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracking system
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Handle>
+
+    For other inquiries, contact the author
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+SEE ALSO
+    "UNIVERSAL", "Class::ISA", and "Class::Inspector", which provide most of
+    the functionality for this class.
+
+COPYRIGHT
+    Copyright (c) 2002 - 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ed61
+registers:
+  AF: 65448
+  AF_: 0
+  BC: 37066
+  BC_: 0
+  DE: 832
+  DE_: 0
+  HL: 55367
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

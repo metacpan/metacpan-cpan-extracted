@@ -1,0 +1,33 @@
+Revision history for Perl extension Clone-Closure.
+
+0.06    2010-12-20
+    - The 5.13 fixes asserted under -DDEBUGGING.
+
+0.05    2010-12-19
+    - Portability fixes for 5.13.x.
+    - Switch to Module::Build.
+
+0.04_01 2009-11-14
+    - Portability fixes for 5.11.x.
+
+0.04    2009-06-21
+    Just a minor tweak to the tests for 5.10.0, which has a bug we need
+    to avoid tickling.
+
+0.03    2009-06-16
+    Don't clone named subs any more.
+    Fix some 5.10 breakage.
+
+0.02    2007-10-24
+    Smoke fixes and POD updates.
+    - Don't try to use EUMM to quote oneliners
+    - Detect 5.9s with PVBM bug
+
+0.01    2007-10-18
+    Initial CPAN version.
+    - Closure cloning (fails to detect loops).
+    - Correct cloning of magic.
+    - Lots of tests.
+
+0.00    2007-07-24
+    Started modifying Clone v0.23.

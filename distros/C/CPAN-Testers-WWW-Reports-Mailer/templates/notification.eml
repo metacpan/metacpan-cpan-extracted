@@ -1,0 +1,36 @@
+Dear NAME,
+
+Welcome to possibly your first exposure to the CPAN related community that is CPAN Testers. CPAN Testers are a group of helpful volunteers who automatically download and test distributions as they are uploaded to the CPAN. You are receiving this mail because we've just started to test what appears to be your first ever CPAN distribution, congratulations and thanks for contributing to CPAN.
+
+But what does this mean to you? Well hopefully you'll discover the benefits of CPAN Testers as we are able to test your distributions on a variety of platforms, using several different Perl versions, and in a selection of different environments. This all helps to feedback to you as an author any bugs that your users may experience with your distributions, before they have the opportunity of downloading and discovering problems for themselves. The feedback also helps users of your distributions to know what versions of your distributions may or may not work in their environment.
+
+CPAN Testers has been running for over 15 years. With its increased success, and with more and more volunteers adding to the distributed network, it can mean that this feedback can be overwhelming. As such we now implement a CPAN Testers Preferences system for those authors that wish to fine tune the mails they receive. This CPAN Testers Preferences system is available at https://prefs.cpantesters.org, where you can login with your PAUSE credentials and alter your personal preferences as you wish.
+
+By default a Daily Summary Report is sent collating a list of FAIL reports for each combination of distribution version, perl version and operating system that have been submitted by the distributed smoke bots over the last 24 hours, which you can then read via the CPAN Testers Reports website.
+
+The Daily Summary Report is not the only report available, as we also implement Weekly and Monthly Summary Reports. In addition, there is the ability to receive individual reports. All reports are sent based on your specific requirements.
+
+If you choose to not receive these mails, you may still find a list of reports for all your distributions on the CPAN Testers Reports website - http://www.cpantesters.org. The site also includes an RSS feed that is dedicated to your most recent reports, which you can add to your chosen feed reader at http://www.cpantesters.org/author/[% author %].rss.
+
+Once you review your reports, if you have an issue with a particular report, or wish to gain further information from the tester, please use the 'Find A Tester' tool at http://stats.cpantesters.org/cpanmail.html, using the ID of the report to locate the tester's correct email address.
+
+If you wish to find out more about CPAN Testers, please check out our Wiki and Blog at the links below.
+
+Thanks,
+The CPAN Testers
+
+CPAN Testers is only made possible with the support of our sponsors.
+For more information on sponsoring, please visit the I ♥ CPAN Testers website (http://iheart.cpantesters.org)
+
+One of our esteemed sponsors is [% SPONSOR_NAME %], [% IF 'Individual Sponsor' == SPONSOR_CATEGORY ; THEN ; 'an' ; ELSE ; 'a' ; END ; %] [% SPONSOR_CATEGORY %].
+
+[% SPONSOR_BODY %]
+
+[% SPONSOR_HREF %]
+
+--
+Reports:     http://www.cpantesters.org
+Statistics:  http://stats.cpantesters.org
+Preferences: https://prefs.cpantesters.org
+Wiki:        http://wiki.cpantesters.org
+Blog:        http://blog.cpantesters.org

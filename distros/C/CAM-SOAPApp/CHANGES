@@ -1,0 +1,51 @@
+Revision history for Perl module CAM::SOAPApp
+
+1.06  21 Feb 2006
+      [ENHANCEMENTS]
+      - Explicitly support SOAP::Lite 0.55-0.67 (0.67 is current)
+        (used to be 0.55-only)
+      [INTERNALS]
+      - Code cleanup to comply with Perl::Critic v0.14
+
+1.05  22 Apr 2005
+      ** First CPAN release **
+      [INCOMPATIBILITIES]
+      - Changed license to Artistic/GPL
+
+1.04  02 Jun 2004
+      [INCOMPATIBILITIES]
+      - Only enter lenient mode for SOAP::Lite v0.55
+      [ENHANCEMENTS]
+      - Support SOAP::Transport::HTTP::Daemon
+
+1.03  15 Sep 2004
+      [ENHANCEMENTS]
+      - Add Build.PL, reorganize directory
+      - Regression tests
+
+1.02  08 Aug 2003
+      [ENHANCEMENTS]
+      - Added a workaround to fix the Safari 1.0 POST bug from Flash:
+          Safari truncates the last byte of the POST, so this
+          workaround detects a trailing tag that looks like
+          '</SOAP-ENV:Envelope' and adds the missing '>' at the end.
+      - Documentation of lenient mode
+
+1.01  18 Jun 2003
+      [ENHANCEMENTS]
+      - Documentation
+      [FIXES]
+      - Handle no-data return case
+
+1.00  11 Apr 2003
+      [INCOMPATIBILITIES]
+      - Fix licensing error (was prematurely GPL'd)
+      [FIXES]
+      - Don't instantiate a CGI.pm object
+
+0.02  08 Apr 2003
+      [FIXES]
+      - Typo in require statement
+
+0.01  27 Mar 2003
+      Initial revision

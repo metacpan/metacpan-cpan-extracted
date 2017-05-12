@@ -1,0 +1,20 @@
+abstract: Dynamically load adaptor modules
+author: Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Model-DynamicAdaptor
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+requires: 
+  Catalyst: 0
+  Catalyst::Model: 0
+  Module::Recursive::Require: 0
+  Test::More: 0
+  Test::Spelling: 0
+version: 0.02

@@ -1,0 +1,53 @@
+NAME
+    Catalyst::Plugin::Cache::BerkeleyDB
+
+SYNOPSIS
+        use Catalyst qw/Cache::BerkeleyDB/;
+
+        MyApp->config->{cache}{storage} = '/tmp/cache';
+        MyApp->config->{cache}{expires} = 3600;
+
+        # somewhere in a controller
+        my $data;
+        
+    unless ( $data = $c->cache->get('data') ) {
+            $data = MyApp::Model::Data->retrieve('data');
+            $c->cache->set( 'data', $data );
+        }
+
+        $c->response->body($data);
+
+DESCRIPTION
+    Adds an accessor for a BerkeleyDB cache in your Catalyst application
+    class.
+
+METHODS
+    cache
+        Returns an instance of Cache::BerkeleyDB.
+
+OPTIONS
+    Options are specified under "MyApp->config->{cache}". Besides the
+    options given below, any other options present will be passed along to
+    Cache::BerkeleyDB.
+
+    storage
+        Path to the directory to use for the cache.
+
+    expires
+        In seconds, passed to Cache::BerkeleyDB as "default_expires_in".
+        Default is not to expire.
+
+    namespace
+        The namespace to use for the cache. Default is the name of your
+        Catalyst application.
+
+SEE ALSO
+    Cache::BerkeleyDB, Catalyst.
+
+AUTHOR
+    David Kamholz <dkamholz@cpan.org>
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

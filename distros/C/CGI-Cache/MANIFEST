@@ -1,0 +1,48 @@
+CHANGES
+LICENSE
+MANIFEST
+Makefile.PL
+README
+TODO
+
+# The module files
+lib/CGI/Cache.pm
+
+# Tests
+t/basic.t
+t/buffer.t
+t/cgi_carp.t
+t/disabled_ouput.t
+t/invalidate_cache_entry.t
+t/non-caching.t
+t/pause_continue.t
+t/stop.t
+t/Test/Utils.pm
+t/speed.pl
+t/user_specified_filehandle.t
+
+# Module::Install extensions
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoLicense.pm
+inc/Module/Install/AutomatedTester.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Bugtracker.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/CheckOptional.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/PRIVATE/Add_Test_Target.pm
+inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+# Private Module::Install extensions
+private-lib/Module/Install/PRIVATE/Add_Test_Target.pm
+private-lib/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+META.yml

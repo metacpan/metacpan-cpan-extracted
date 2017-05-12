@@ -1,0 +1,23 @@
+Revision history for Catalyst-Plugin-ConfigLoader-Multi
+
+0.06    2008-05-17/11:21
+        - loal only myapp_local.yaml insetad of myapp*_local.yaml. because the specific may generate bug for your application when you set same key in your each local files.
+        - fix POD
+
+0.05    2008-04-06/20:24
+        - add spelling.t
+        - add $ENV{MYAPP_CONFIG_MULTI} support
+
+0.04    2008-04-06/12:28
+        - Fix typo
+        - using Module::Install
+
+0.03    2007-10-13/23:07
+        - Fix test file and POD for C::P::ConfigLoader update.
+
+0.02    2007-05-11/20:36
+        - Add Remove RenderView from Test Lib 
+        - Fix POD
+
+0.01    2007-04-28/18:39
+        - First version, released on an unsuspecting world.

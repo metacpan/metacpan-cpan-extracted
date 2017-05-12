@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd9e
+registers:
+  AF: 56987
+  AF_: 0
+  BC: 63941
+  BC_: 0
+  DE: 52164
+  DE_: 0
+  HL: 51745
+  HL_: 0
+  I: 0
+  IX: 46284
+  IY: 18170
+  PC: 3
+  R: 2
+  SP: 0

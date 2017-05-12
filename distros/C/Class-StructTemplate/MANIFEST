@@ -1,0 +1,9 @@
+MANIFEST				The file you are reading... ;)
+Makefile.PL				run through Perl to generate Makefile
+README					README file for newbies
+lib/Class/StructTemplate.pm		The nonpersistent replacement of Class::Struct
+lib/Class/Persistent/StructTemplate.pm	The persistence extension to Class::StructTemplate
+lib/Class/Persistent/Plugin/MySQL.pm	Persistence plugin for use with MySQL
+test.pl					Small test-file to demonstrate the capabilities of Class::Persistent::StructTemplate
+manager.pm				Class needed by test.pl
+manager2.pm				Second class needed by test.pl

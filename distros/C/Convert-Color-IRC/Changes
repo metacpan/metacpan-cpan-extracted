@@ -1,0 +1,10 @@
+Revision history for Convert-IRC-COlor
+
+0.03    Date/time
+        First version, released on an unsuspecting world.
+0.04    Sometime after
+        Remove the ._ files.
+0.05    2008/12/28 12:30 AM EST
+        Successfully converted to use Convert::Color interface.
+0.06    2008/12/28 12:45 AM EST
+        Forgot to update Readme... whoops.

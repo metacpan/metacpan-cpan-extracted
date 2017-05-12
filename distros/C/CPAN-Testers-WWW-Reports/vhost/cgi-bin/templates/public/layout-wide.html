@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+
+[% 
+    base_url   = 'www.cpantesters.org' ;
+    base_href  = 'http://www.cpantesters.org' ;
+    base_title = 'CPAN Testers Reports' ;
+%]
+
+  <title>CPAN Testers Reports: [% htmltitle || title | html %]</title>
+
+  <meta http-equiv="Content-Type"         content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Language"     content="en-gb" />
+  <meta http-equiv="Content-Style-Type"   content="text/css" />
+  <meta http-equiv="Content-Script-Type"  content="text/javascript" />
+
+  <meta name="Generator"    content="Labyrinth" />
+  <meta name="copyright"    content="Copyright (C) 2007-2013 CPAN Testers" />
+  <meta name="title"        content="CPAN Testers Reports" />
+  <meta name="author"       content="Barbie" />
+  <meta name="language"     content="en" />
+  <meta name="keywords"     content="perl, cpan, test, testing, tester, testers, reports, smoke, smoker, black box, automated, automation" />
+  <meta name="description"  content="Report listings of distributions and authors from reports submitted by the CPAN Testers community, who automatically black box test submissions to Perl's CPAN code repository" />
+
+[% IF refresh %]<meta http-equiv="refresh" content="[% refresh %]">[% END %]
+
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout_wide.css" />
+
+  [% INCLUDE "public/analytics.html" %]
+
+<script type="text/javascript">
+function goThere(loc) {
+  window.location.href=loc;
+}
+</script>
+
+<!--
+  Site Layout, Design &amp; Development by Miss Barbell Productions
+
+  Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+  Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+  Produced by LABYRINTH, a state of the art Website Management System
+  available from Miss Barbell Productions.
+  For more information contact Barbie <barbie@missbarbell.co.uk>
+
+  Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body>
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- B. MAIN -->
+    <div class="main">
+ 
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">[% title %]</h1>
+        <div class="column1-unit">
+
+          [% body %]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+      <div class="blank"></div>
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    [% INCLUDE "public/footer.html" %]
+
+  </div> 
+
+</body>
+</html>

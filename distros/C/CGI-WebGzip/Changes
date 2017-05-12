@@ -1,0 +1,15 @@
+Revision history for Perl extension CGI::WebGzip.
+
+0.10  Fri Feb 13 18:59:22 2004
+  - original version; created by h2xs 1.21 with options
+    -AX -n CGI::WebGzip -v 0.10
+
+0.11  Sat Feb 14 23:00:00 2004
+  - Fixed bug in tie handlers.
+
+0.12  Mon Dec 20 16:40:00 2004
+  - Fixed warning while using untie() with existing references.
+  - Added croak messages for print(undef,...) and printf(undef,...) cases.
+
+0.13  Apr 4 2006
+  - Bugfix for "Character in 'c' format wrapped in pack" message.

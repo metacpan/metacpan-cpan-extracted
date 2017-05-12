@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  51091:
+    - 246
+name: dd35
+registers:
+  AF: 34467
+  AF_: 0
+  BC: 17985
+  BC_: 0
+  DE: 7926
+  DE_: 0
+  HL: 4267
+  HL_: 0
+  I: 0
+  IX: 50995
+  IY: 36548
+  PC: 3
+  R: 2
+  SP: 0

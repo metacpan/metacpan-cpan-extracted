@@ -1,0 +1,31 @@
+0.07      2013-09-05 20:14:06 UTC
+
+- Fix URI building process
+- Update dzil setup
+
+0.06
+
+- Fix for RT#55804
+
+0.05
+
+- More prereqs for smoke
+
+0.04
+
+- Add prereqs #RT52664
+
+0.03
+
+- Bugfix + warning change (wreis)
+
+0.02
+
+- Allow chained actions to override parent SSL defaults. This
+will allow you to make every action under a chain not ssl, or an action under
+a Does("RequireSSL") chain Plain. 
+- Tests
+
+0.01
+
+- Initial Release

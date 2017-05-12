@@ -1,0 +1,261 @@
+NAME
+    "Config::XPath" - retrieve configuration data from XML files by using
+    XPath
+
+SYNOPSIS
+     use Config::XPath;
+
+     my $conf = Config::XPath->new( filename => 'addressbook.xml' );
+
+     ## Basic data retrieval
+
+     my $bob_phone = $conf->get_string( '//user[@name="bob"]/@phone' );
+
+     my %jim_details = $conf->get_attrs( '//user[@name="jim"]' );
+
+     my @everyone_with_fax = $conf->get_list( '//user[@fax]' );
+     print " $_ has a fax\n" for @everyone_with_fax;
+
+     my $phone_map = $conf->get_map( '//user', '@name', '@phone' );
+     print " $_ has a phone: $phone_map->{$_}\n" for sort keys %$phone_map;
+
+     ## Subconfigurations
+
+     my $james_config = $conf->get_sub( '//user[@name="james"]' );
+     my $james_phone = $james_config->get_string( '@phone' );
+
+     foreach my $user_config ( $conf->get_sub_list( '//user[@email]' ) ) {
+        my $town = $user_config->get_string( 'address/town' );
+        print "Someone in $town has an email account\n";
+     }
+
+DESCRIPTION
+    This module provides easy access to configuration data stored in an XML
+    file. Configuration is retrieved using XPath keys; various methods exist
+    to convert the result to a variety of convenient forms.
+
+    If the methods are called as static functions (as opposed to as object
+    methods) then they access data stored in the default configuration file
+    (details given below).
+
+  Subconfigurations
+    By default, the XPath context is at the root node of the XML document.
+    If some other context is required, then a subconfiguration object can be
+    used. This is a child "Config::XPath" object, built from an XPath query
+    on the parent. Whatever node the query matches becomes the context for
+    the new object. The methods "get_sub()" and "get_sub_list()" perform
+    this task; the former returning a single child, and the latter returning
+    a list of all matches.
+
+CONSTRUCTOR
+  $conf = Config::XPath->new( %args )
+    This function returns a new instance of a "Config::XPath" object,
+    containing the configuration in the named XML file. If the given file
+    does not exist, or an error occured while reading it, an exception is
+    thrown.
+
+    The %args hash requires one the following keys to provide the XML
+    source:
+
+    filename => $file
+            The filename of the XML file to read
+
+    xml => $xml
+            A string containing XML data
+
+    ioref => IO
+            An IO handle reference
+
+    Also may be provided:
+
+    parser => $parser
+            An "XML::Parser" object
+
+    If a parser is not provided, one will be constructed internally.
+
+METHODS
+  $result = $config->get( $paths, %args )
+    This method retrieves the result of one of more XPath expressions from
+    the XML file. Each expression should give either a text-valued element
+    with no sub-elements, an attribute, or an XPath function that returns a
+    string, integer or boolean value.
+
+    The $paths argument should contain a data tree of ARRAY and HASH
+    references, whose leaves will be the XPath expressions used. The $result
+    will be returned in a similar tree structure, with the leaves containing
+    the value each expression yielded against the XML config. The %args may
+    contain a "default" key, which should give default values for these
+    results, also in a similar tree structure.
+
+    If no suitable node was found matching an XPath expression and no
+    corresponding "default" value is found, then an exception is thrown. If
+    more than one node is returned, or the returned node is not either a
+    plain-text content containing no child nodes, or an attribute, then an
+    exception is thrown.
+
+    $paths  A tree data structure containing ARRAY and HASH references, and
+            XPath expressions stored in plain scalars.
+
+    %args   A hash that may contain extra options to control the operation.
+            Supports the following keys:
+
+            "default"
+                Contains a tree in the same structure as the $paths, whose
+                leaf values should be returned instead of the value yielded
+                by the XPath expression, in the case that no nodes match it.
+
+  $str = $config->get_string( $path, %args )
+    This function is a smaller version of the "get" method, which only works
+    on a single string path.
+
+    $path   The XPath to the required configuration node
+
+    %args   A hash that may contain extra options to control the operation.
+            Supports the following keys:
+
+            "default"
+                If no XML node is found matching the path, return this value
+                rather than throwing an exception.
+
+  $attrs = $config->get_attrs( $path )
+    This method retrieves the attributes of a single element in the XML
+    file. The attributes are returned in a hash, along with the name of the
+    element itself, which is returned in a special key named '+'. This name
+    is not valid for an XML attribute, so this key will never clash with an
+    actual value from the XML file.
+
+    If no suitable node was found matching the XPath query, then an
+    exception is thrown. If more than one node matched, or the returned node
+    is not an element, then an exception is thrown.
+
+    "*$path*"
+            The XPath to the required configuration node
+
+  @results = $config->get_list( $listpath; $valuepaths, %args )
+    This method obtains a list of nodes matching the $listpath expression.
+    For each node in the list, it obtains the result of the $valuepaths with
+    the XPath context at each node, and returns them all in a list. The
+    $valuepaths argument can be a single string expression, or an ARRAY or
+    HASH tree, as for the "get()" method.
+
+    If the $valuepaths argument is not supplied, the type of each node
+    determines the value that will be returned. Element nodes return a
+    hashref, identical to that which "get_attrs()" returns. Other nodes will
+    return their XPath string value.
+
+    $listpath
+            The XPath expression to generate the list of nodes.
+
+    $valuepaths
+            Optional. If present, the XPath expression or tree of
+            expressions to generate the results.
+
+    %args   A hash that may contain extra options to control the operation.
+            Supports the following keys:
+
+            "default"
+                Contains a tree in the same structure as the $valuepaths,
+                whose leaf values should be returned instead of the value
+                yielded by the XPath expression, in the case that no nodes
+                match it.
+
+  $map = $config->get_map( $listpath, $keypath, $valuepaths, %args )
+    This method obtains a map, returned as a hash, containing one entry for
+    each node returned by the $listpath search, where the key and value are
+    given by the $keypath and $valuepaths within each node. It is not an
+    error for no nodes to match the $listpath.
+
+    The result of the $listpath query must be a nodeset. The result of the
+    $keypath is used as the hash key for each node, and must be convertable
+    to a string, by the same rules as the "get_string()" method. The value
+    for each node in the hash will be obtained using the $valuepaths, which
+    can be a plain string, or an ARRAY or HASH tree, as for the "get()"
+    method.
+
+    The keys obtained by the $keypath should be unique. In the case of
+    duplicates, the last value from the nodeset is used.
+
+    $listpath
+            The XPath to generate the nodeset
+
+    $keypath
+            The XPath within each node to generate the key
+
+    $valuepaths
+            The XPath expression or tree of expressions within each node to
+            generate the value.
+
+    %args   A hash that may contain extra options to control the operation.
+            Supports the following keys:
+
+            "default"
+                Contains a tree in the same structure as the $valuepaths,
+                whose leaf values should be returned instead of the value
+                yielded by the XPath expression, in the case that no nodes
+                match it.
+
+  $subconfig = $config->get_sub( $path )
+    This method constructs a new "Config::XPath" object whose context is at
+    the single node selected by the XPath query. The newly constructed child
+    object is then returned.
+
+    If no suitable node was found matching the XPath query, then an
+    exception of is thrown. If more than one node matched, then an exception
+    is thrown.
+
+    $path   The XPath to the required configuration node
+
+  @subconfigs = $config->get_sub_list( $path )
+    This method constructs a list of new "Config::XPath" objects whose
+    context is at each node selected by the XPath query. The array of newly
+    constructed objects is then returned. Unlike other methods, it is not an
+    error for no nodes to match.
+
+    $path   The XPath for the required configuration
+
+DEFAULT CONFIG FILE
+    In the case of calling as static functions, the default configuration is
+    accessed. When the module is loaded no default configuration exists, but
+    one can be loaded by calling the "read_default_config()" function. This
+    makes programs simpler to write in cases where only one configuration
+    file is used by the program.
+
+  read_default_config( $file )
+    This function reads the default configuration file, from the location
+    given. If the file is not found, or an error occurs while reading it,
+    then an exception is thrown.
+
+    The default configuration is cached, so multiple calls to this function
+    will not result in multiple reads of the file; subsequent requests will
+    be silently ignored, even if a different filename is given.
+
+    $file   The filename of the default configuration to load
+
+FUNCTIONS
+    Each of the following functions is equivalent to a similar method called
+    on the default configuration, as loaded by "read_default_config()".
+
+  $str = get_config_string( $path, %args )
+    Equivalent to the "get_string()" method
+
+  $attrs = get_config_attrs( $path )
+    Equivalent to the "get_attrs()" method
+
+  @values = get_config_list( $path )
+    Equivalent to the "get_list()" method
+
+  $map = get_config_map( $listpath, $keypath, $valuepath )
+    Equivalent to the "get_map()" method
+
+  $map = get_sub_config( $path )
+    Equivalent to the "get_sub()" method
+
+  $map = get_sub_config_list( $path )
+    Equivalent to the "get_sub_list()" method
+
+SEE ALSO
+    *   XML::XPath - Perl XML module that implements XPath queries
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

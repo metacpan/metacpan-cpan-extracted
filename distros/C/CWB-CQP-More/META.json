@@ -1,0 +1,61 @@
+{
+   "abstract" : "A higher level interface for CWB::CQP",
+   "author" : [
+      "Alberto Simões <ambs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CWB-CQP-More",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CWB" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "POSIX::Open3" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "svn",
+         "web" : "https://natura.di.uminho.pt/svn/main/CWB-CQP-More/"
+      }
+   },
+   "version" : "0.08"
+}
+

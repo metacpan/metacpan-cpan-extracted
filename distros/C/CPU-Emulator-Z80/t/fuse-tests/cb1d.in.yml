@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 29
+  58449:
+    - 71
+name: cb1d
+registers:
+  AF: 8448
+  AF_: 0
+  BC: 15742
+  BC_: 0
+  DE: 24121
+  DE_: 0
+  HL: 58449
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,22 @@
+Revision history for Perl extension Conf.
+
+0.10 Changed testscript to skip tests that cannot be executed.
+
+0.09 Changed namespace from Conf::SQL to Config::Backend::SQL.
+
+0.08 Documentation for del method added. Links repaired.
+
+0.07 del method added.
+
+0.06 Creation of database did not work with mysql.
+     Changed code. Removed an error in the test script.
+
+0.03 Documentation: Conf::SQL was named Conf::SQL - the *file* backend...
+	is now Conf::SQL - the SQL backend...
+
+0.02 Changed the interface for Conf::SQL.
+
+0.01  Mon Mar 29 14:36:50 2004
+	- original version; created by h2xs 1.22 with options
+		-X Conf
+

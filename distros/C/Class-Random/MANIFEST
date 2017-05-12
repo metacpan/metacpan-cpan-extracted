@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+Random.pm
+t/stupid.t
+t/subclass.t

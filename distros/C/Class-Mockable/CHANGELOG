@@ -1,0 +1,10 @@
+2013-01-14      1.11    Add Class::Mock::Method::InterfaceTester
+
+2013-01-09      1.1     Add method mocking
+
+2012-11-23      1.0002  Use Capture::Tiny in tests to fix I/O-ish test
+                          failures on some legacy platforms/perls
+
+2012-11-15      1.0001  Remember to declare pre-requisites
+
+2012-11-09      1.0     Initial release

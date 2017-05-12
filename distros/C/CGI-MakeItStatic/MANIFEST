@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-MakeItStatic.t
+t/test.pl
+t/test2.pl
+lib/CGI/MakeItStatic.pm
+META.yml                                 Module meta-data (added by MakeMaker)

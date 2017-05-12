@@ -1,0 +1,33 @@
+Revision history for Perl extension Crypt::OpenSSL::ECDSA.
+
+0.08 2016-07-30
+     - Changed Makefile.PL perl version to 5.008
+
+0.07 2015-05-11
+     - removed dependency on Crypt::OpenSSL:Bignum
+
+0.06 2015-01-28
+     - reordered this Changes file
+     - Fixed problem where BIGNUMs were not blessed
+
+0.05 Jan 3 2015
+      - Added Crypt::OpenSSL::EC as a prerequisite.
+
+0.04 Jan 2 2015
+      - In ECDSA.pm, use version restriction eased to 5.6.2
+      - Added documentation for get_s and get_r, courtesy Dick Franks.
+      - Fixed leaks in set_r and set_s
+
+0.03  Oct 31 14:36
+      - ECDSA_METHOD functions are only available with OpenSSL 1.0.2 and later
+      - ECDSA_SIG is now a blessed object
+      - Added ECDSA_SIG get_r set_r get_s get_s functions and tests
+      - Documentation still to be done
+
+0.02  Oct 21 14:41 
+      - Added missing typemap
+
+0.01  Tue Oct 21 07:02:43 2014
+      - original version; created by h2xs 1.23 with options
+		-n Crypt::OpenSSL::ECDSA /usr/include/openssl/ecdsa.h -L /usr/lib -lcrypt
+

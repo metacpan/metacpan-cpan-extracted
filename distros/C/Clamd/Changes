@@ -1,0 +1,19 @@
+Clamd Changes
+
+1.04
+    - Fixed ping() to work if it can't establish a connection
+    - Removed quit warning for Linux - fixed in clamd 0.54
+    - Updates to work with clamd 0.54 (path changes mostly)
+
+1.03
+    - deep_scan option renamed to find_all
+
+1.02
+    - Quit fixes for linux (well, not fixed, but the test works ;-)
+    - Tests updated to pass cleanly if clamd can't be started
+
+1.01
+    - Stop in Makefile.PL if clamd isn't in the path
+
+1.00
+    - Initial release

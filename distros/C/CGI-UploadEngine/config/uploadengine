@@ -1,0 +1,11 @@
+---
+root_url: http://binf-app.host.ualr.edu/catalyst/
+ext_js_url: http://binf-app.host.ualr.edu/js/ext-core/
+error_image: <img src="http://binf-app.host.ualr.edu/images/alert.jpg">
+success_message: <img src="http://binf-app.host.ualr.edu/images/checked.jpg"> File Uploaded
+verbose: 0
+database: files
+host: localhost
+user: files
+pass: tmie
+

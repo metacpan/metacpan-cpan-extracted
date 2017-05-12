@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+Build.PL
+README
+lib/CGI/FormBuilderX/More.pm
+t/00-load.t
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/CGI/FormBuilderX/More/InputTie.pm
+t/01-basic.t
+t/02-validation.t
+t/author/boilerplate.t
+t/author/pod-coverage.t
+t/author/pod.t

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Portal
+version:      0.12
+version_from: Portal.pm
+installdirs:  site
+requires:
+    CGI:                           1
+    DBI:                           1
+    Digest::MD5:                   1
+    HTML::Template:                1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,43 @@
+Revision history for Carp-Growl
+
+0.0.10  Tue Oct 1 0:00:00 2013
+       FIX: t/00.load.t failure when Growl requires password
+	   IMPROVE: add Carp to prereq-modules
+	   IMPROVE: pod
+
+0.0.9  Thu Jun 20 23:45:00 2013
+       FIX: (Again) Test failure because of Carp's  dialect
+
+0.0.8  Sat Jun 15 20:00:00 2013
+       FIX: Test failure because of Carp's  dialect
+
+0.0.7  Wed May 29 20:00:00 2013
+       FIX: Works under perl-5.15.9 or lower 
+
+0.0.6  Mon May 27 12:40:00 2013
+       FIX: Test failure because of using unnecessary module "Smart::Comments"( sorry... )
+
+0.0.5  Fri May 24 23:55:00 2013
+       FIX: "warn" and "die" still reports incorrect file name and line number.
+       IMPROVE: "unimport" works correctly.
+       IMPROVE: documents
+
+0.0.4  Sun May 19 21:00:00 2013
+       FIX: Test passes even when there is no 'notice system'
+            which Growl::Any supports.
+       FIX: file name and line number of the message of growl had mistaken
+            by the multiplex call.
+       IMPROVE: documents
+
+0.0.3  Sat May 13 23:06:00 2013
+       FIX: The test failure resulting from use of the module 
+            "Test::Exception" without necessity is corrected.
+       CHANGE: build script was changed only into Build.PL.
+       IMPROVE: description of a document.
+
+0.0.2  Sat May 11 15:00:00 2013
+       ADD: 'global' option to load.
+
+0.0.1  Fri Feb 22 21:23:39 2013
+       Initial release.
+

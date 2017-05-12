@@ -1,0 +1,16 @@
+argv.i          SWIG sub-file for string array handling
+Changes
+check.pl        Build utility
+clucene.i       SWIG master definition file for CLucene C++ calling interface
+clucene_perl.h  SWIG declarations sub-file for CLucene C++ calling interface
+config.h        Dummy file needed for compilation
+COPYRIGHT
+CLucene.pm      Perl module to call CLucene C++ wrapper
+INSTALL         Instructions on installation
+Makefile.PL
+MANIFEST        This file
+README
+testc.c             Test front end in C for CLucene C++ calling interface
+TODO            Work required
+t/1.t
+t/clucene_test.pl      Test front end in perl for perl module interface to CLucene

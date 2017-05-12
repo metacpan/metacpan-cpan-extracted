@@ -1,0 +1,108 @@
+#!/usr/bin/perl -wT
+
+# Once you've integrated CGI::Buffer into a page on your website, you can use
+# this program to verify that both it and your page are working correctly. It
+# does this by testing ETag, IF_NONE_MATCH and IF_MODIFIED_SINCE work as you'd
+# like.  It also verifies that your page's output is gzipped and optimised.
+# Note that for last-modified headers to be generated you need to give a
+# cache object to CGI::Buffer
+
+use strict;
+use warnings;
+# use warnings::unused;
+
+use LWP::UserAgent;
+use LWP::ConnCache;
+
+die "Usage: $0 url" unless(@ARGV);
+
+my $ua = LWP::UserAgent->new(conn_cache => LWP::ConnCache->new());
+$ua->agent($0);
+# Turn off proxy, because the proxy may not pass on all
+# information back to here. Squid does that :-(
+$ua->no_proxy($ARGV[0]);
+my $request = HTTP::Request->new(GET => $ARGV[0]);
+$request->protocol('HTTP/1.1');
+
+# HTTP::Response object
+my $r = $ua->request($request);
+
+die $r->status_line() unless($r->code() == 200);
+
+my $rc = 0;
+
+if(!defined($r->header('ETag'))) {
+	warn 'No ETag header';
+	$rc++;
+}
+if(!defined($r->header('Last-Modified'))) {
+	warn 'No Last-Modified header';
+	$rc++;
+}
+if(defined($r->header('Content-Encoding'))) {
+	warn 'Encodes when not requested';
+	$rc++;
+}
+
+$request->header('Accept-Encoding' => 'gzip');
+
+$r = $ua->request($request);
+
+die $r->status_line() unless($r->code() == 200);
+
+if(!defined($r->header('Content-Encoding'))) {
+	warn 'Doesn\'t gzip results';
+	$rc++;
+}
+if(defined($r->header('ETag'))) {
+	$request->header('If-None-Match' => $r->header('ETag'));
+	my $r1 = $ua->request($request);
+	if($r1->code() != 304) {
+		warn $r1->status_line();
+		warn 'Didn\'t get 304 when setting If-None-Match header';
+		$rc++;
+	} else {
+		$request->header('If-None-Match' => '0' x 32);
+		$r1 = $ua->request($request);
+		if($r1->code() != 200) {
+			warn $r1->status_line();
+			warn 'Didn\'t get 200 when If-None-Match header doesn\t match';
+			$rc++;
+		}
+	}
+	$request->remove_header('If-None-Match');
+} else {
+	warn 'No ETag header';
+	$rc++;
+}
+if(defined($r->header('Last-Modified'))) {
+	$request->header('If-Modified-Since' => $r->header('Last-Modified'));
+	$r = $ua->request($request);
+
+	if($r->code() != 304) {
+		warn $r->status_line();
+		warn 'sent: ' . $request->header('If-Modified-Since') . ' got ' . $r->header('Last-Modified');
+		warn 'Didn\'t get 304 when setting If-Modified-Since header';
+		$rc++;
+	} else {
+		$request->header('If-Modified-Since' => 'Thu, 01 Jan 1970 00:00:00 GMT');
+		$r = $ua->request($request);
+		if($r->code() != 200) {
+			warn $r->status_line();
+			warn 'Didn\'t get 200 when If-Modified-Since header indicates there has been a change';
+			$rc++;
+		}
+	}
+} else {
+	# foreach($r->header_field_names()) {
+		# print "$_\n";
+	# }
+	warn 'No Last-Modified header';
+	$rc++;
+}
+
+if($rc == 0) {
+	print "All tests passed OK\n";
+}
+
+exit $rc;

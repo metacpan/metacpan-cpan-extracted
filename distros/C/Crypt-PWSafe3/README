@@ -1,0 +1,56 @@
+NAME
+       Crypt::PWSafe3 - Read and write Passwordsafe v3 files
+
+SYNOPSIS
+
+       use Crypt::PWSafe3;
+       my $vault = new Crypt::PWSafe3(file => 'filename.psafe3',
+                                      password => 'somesecret');
+ 
+
+
+DESCRIPTION
+       Crypt::PWSafe3 provides read and write access to password
+       database files created by Password Safe V3 (and up) available
+       at http://passwordsafe.sf.net.
+
+
+
+
+INSTALLATION
+
+        to install, type:
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+        to read the complete documentation, type:
+        perldoc Crypt::PWSafe3
+        perldoc Crypt::PWSafe3::Record
+
+
+COPYRIGHT
+       Crypt::PWSafe3
+           Copyright (c) 2011-2016 by T.v.Dein <tlinden@cpan.org>
+
+LICENSE
+
+       This program is free software; you can redistribute it
+       and/or modify it under the same terms of the Artistic
+       License 2.0, see: L<http://www.perlfoundation.org/artistic_license_2_0>
+
+HOMEPAGE
+
+       The homepage of Config::General is located at:
+
+          http://www.daemon.de/crypt-pwsafe3/.
+
+
+AUTHOR
+       T.v.Dein <tlinden |AT| cpan.org>
+
+
+VERSION
+        1.22
+

@@ -1,0 +1,404 @@
+#!/usr/bin/perl -w
+use strict;
+use Data::Dump qw(dump);
+use POSIX;
+use Text::Wrap;
+use Getopt::Std;
+
+my %opt;
+getopts('u',\%opt) || die $!;
+my $toupper=$opt{u};
+
+my @dot = <>;
+my $dot = join('',@dot);
+my $package = $1 if $dot =~ /^digraph\s+"*(.*?)"*\s+/;
+die "$0: can't find graph name after '^digraph '\n" unless $package;
+my $body = $1 if $dot =~ /^.*?{(.*)}/s;
+die "$0: can't find graph body between {.*}\n" unless $body;
+# my @async = split(' ',$1) if $dot =~ m|//async:(.*)|;
+my $graph={};
+my $str2num;
+my $num2str;
+my @action;
+my @event;
+my %async;
+my @async;
+my %target;
+my @allasync;
+my @newstate;
+
+while($body)
+{
+  # warn "=================\n".$body;
+  next if $body =~ s/\A\s+//ms;
+
+  $body =~ s/\A\/\/async:(.*?)$//m && do
+  {
+    @async = split(' ',$1);
+    @async = () unless @async;
+    @async = map {uc} @async if $toupper;
+    next;
+  };
+
+  my $node='"*(\w+)"*';
+  $body =~ s/\A\s*$node\s*\-\>\s*$node\s+\[(.*?)\]\s*(;|$)//msgx && do
+  {
+    my ($state,$newstate,$data) = ($1,$2,$3);
+    # warn "$state,$newstate,$data,$async";
+    my ($event,$action) = ($1,$2) if $data =~ /label="(\w+)\/(.*)"/;
+    die "$0: can't find event/action in $data\n" unless $event;
+    $action = "" unless $action;
+    if ($toupper)
+    {
+      $state=uc($state);
+      $event=uc($event);
+      $newstate=uc($newstate);
+      $action=uc($action);
+    }
+    push @newstate, $newstate;
+    $graph->{$state}{$event}{newstate}=$newstate;
+    $graph->{$state}{$event}{action}=$action;
+    push @{$async{$state}}, @async if @async;
+    push @allasync, @async if @async;
+    push @{$target{$action}}, $newstate 
+      unless grep /^$newstate$/, @{$target{$action}};
+    push @action,$action unless grep /^$action$/, @action;
+    push @event,$event unless grep /^$event$/, @event;
+    next;
+  };
+
+  $body =~ s/\A(.*)$//m;
+  warn "ignoring: $1\n"; 
+}
+# cleanup and number states
+my @state=sort keys %$graph;
+my $cseq=1;
+for my $state (@state)
+{
+  # remove dups and sort
+  my %c;
+  my @async;
+  @async=();
+  @async = sort grep {++$c{$_}<2} @{$async{$state}} if $async{$state};
+  $async{$state}=\@async;
+  $num2str->{$cseq}=$state;
+  $str2num->{$state}=$cseq;
+  $cseq*=2;
+}
+# make sure there aren't any deadends
+for my $newstate (@newstate)
+{
+  warn "WARNING: deadend state: $newstate\n" unless grep /^$newstate$/, @state;
+}
+# for my $state (@state) { warn "@{$async{$state}}" if $state eq 'INIT'; }
+# cleanup action
+@action=sort grep {$_} @action;
+# cleanup list of all async events
+{
+  my %c;
+  @allasync = sort grep {++$c{$_}<2} @allasync;
+}
+# number the events
+for my $event (@event)
+{
+  $num2str->{$cseq}=$event;
+  $str2num->{$event}=$cseq;
+  $cseq*=2;
+}
+
+
+# check for conflicts
+for my $event (@event)
+{
+  die "event name conflicts with state name: $event\n" 
+    if grep /^$event$/, @state;
+  die "event name conflicts with action name: $event\n" 
+    if grep /^$event$/, @action;
+}
+for my $state (@state)
+{
+  die "state name conflicts with action name: $state\n" 
+    if grep /^$state$/, @action;
+}
+
+
+$Text::Wrap::columns = 70;
+my $headform="use constant %-10s => %13s; # %-25s\n";
+my $listform="use constant %-12s => %13s; # %s\n";
+my $acthead="#   %-12s => %23s, # %s\n";
+my $actform="    %-12s => %23s, # %s\n";
+my $wrapindent=" "x (length($listform)+11) . "# ";
+my $actindent=" "x (length($actform)+11) . "# ";
+
+# show actions that need to be handled by external code
+my $action_const;
+$action_const.= sprintf 
+  $acthead, "Action", "Value", "Events it can generate";
+$action_const.="#\nuse constant DFA_ACTIONS => (\n";
+for my $action (@action)
+{
+  my @target = sort @{$target{$action}};
+  # events those nodes can handle 
+  my @gen;
+  for my $target (@target)
+  {
+    # remove async
+    my @async = @{$async{$target}} if $async{$target};
+    my @nonasync;
+    for my $event (keys %{$graph->{$target}})
+    {
+      next if grep /^$event$/, @async;
+      push @nonasync, $event;
+    }
+    # warn dump @nonasync;
+    push @gen, @nonasync if @nonasync;
+  }
+  @gen=('') unless @gen;
+  # remove dups and sort
+  my %c;
+  @gen = sort grep {++$c{$_}<2} @gen;
+  my $gen = "@gen";
+  my $line = sprintf "$actform", $action, lc("'\$self->$action(\@arg)'"), $gen;
+  my $const = wrap('',"          $actindent",$line);
+  $action_const.=$const;
+}
+$action_const.=");\n";
+
+my $event_const;
+$event_const.= sprintf 
+  "# $headform", "Event", "Value", "States it can be accepted in";
+$event_const.="#\n";
+for my $event (@event)
+{
+  my @accept = grep {$graph->{$_}{$event}} @state;
+  @accept=('') unless @accept;
+  my $line = sprintf $listform, $event, "'$event'", "@accept";
+  my $const = wrap('',$wrapindent,$line);
+  $event_const.=$const;
+}
+
+my $state_const;
+$state_const.= sprintf 
+  "# $headform", "State", "Value", "Events it can handle";
+$state_const.="#\n";
+for my $state (@state)
+{
+  my @can = sort (keys %{$graph->{$state}});
+  @can=('') unless @can;
+  $Text::Wrap::columns = 70;
+  my $line = sprintf $listform, $state, "'$state'", "@can";
+  my $const = wrap('',$wrapindent,$line);
+  $state_const.=$const;
+}
+
+# build list of async events we can't handle
+for my $state (@state)
+{
+  my @async = @{$async{$state}} if @{$async{$state}};
+  # warn "$state: @async\n";
+  my @can = sort (keys %{$graph->{$state}});
+  my @cant;
+  for my $event (sort @async)
+  {
+    next if grep /^$event$/, @can;
+    # see if there's an _ANY_ for this event
+    if (my $node = $graph->{'_ANY_'}{$event})
+    {
+      # ok, so add it to the graph
+      warn "note: creating $event transition from $state\n";
+      %{$graph->{$state}{$event}}=%$node;
+      $graph->{$state}{$event}{newstate}=$state;
+      next;
+    }
+    push @cant, $event;
+  }
+  warn "warning: $state can't handle:\n\t@cant\n" if @cant;
+}
+
+if (0)
+{
+  # ensure events from nearby states can be handled
+  @event=sort @event;
+  my @state=sort keys %$graph;
+  for my $state (@state)
+  {
+    # get events I can handle
+    my @can = sort ((keys %{$graph->{$state}}));
+    # get my downstream nodes
+    my @downstream = grep {$graph->{$state}{$_}{newstate}} @can;
+    # get my upstream nodes
+    my @upstream;
+    for my $other_state (@state)
+    {
+      my @other_event = keys %{$graph->{$other_state}};
+      my @other_newstate = 
+      map {$graph->{$other_state}{$_}{newstate}} @other_event;
+      push @upstream, $other_state if grep /^$state$/, @other_newstate;
+    }
+    # get likely events
+    my @likely;
+    for my $neighbor (@upstream,@downstream)
+    {
+      for my $event (keys %{$graph->{$neighbor}})
+      {
+	push @likely, $event unless grep /^$event$/, @likely;
+      }
+    }
+    # build list of nearby events we can't handle
+    my @cant;
+    for my $likely (sort @likely)
+    {
+      push @cant, $likely unless grep /^$likely$/, @can;
+    }
+    warn "warning: $state can't handle:\n\t@cant\n" if @cant;
+  }
+}
+
+
+my $out;
+my $export_ok = "@state @event";
+my $export_tags = $export_ok;
+while(<DATA>)
+{
+  my $date = ctime(time);
+  my $graphcode = dump($graph);
+  my $i=1;
+  s/::PACKAGE::/$package/g;
+  s/::PROG::/$0/;
+  s/::DATE::/$date/;
+  s/::EXPORT_OK::/$export_ok/;
+  s/::EXPORT_TAGS::/$export_tags/;
+  s/::EVENTS::/$event_const/;
+  s/::STATES::/$state_const/;
+  s/::ACTIONS::/$action_const/;
+  s/::GRAPH::/$graphcode/;
+  s/::NUM2STR::/dump($num2str)/e;
+  s/::STR2NUM::/dump($str2num)/e;
+  s/::DOT::/$dot/;
+  # $out.=$_;
+  print;
+}
+# open(COMPILE,"| perl -c") || die $!;
+# print COMPILE $out;
+# close COMPILE || die $!;
+# print $out;
+
+__DATA__
+package ::PACKAGE::;
+# 
+# AUTOMATICALLY GENERATED by ::PROG::
+# ::DATE::
+# DO NOT EDIT
+#
+#   Original .dot file contents included below __END__.
+#
+use strict;
+use warnings;
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(DFA_ACTIONS ::EXPORT_OK::);         
+our %EXPORT_TAGS = (constants => [qw(::EXPORT_TAGS::)]);
+
+my $debug = $ENV{DEBUG};
+
+# Actions
+#   (you need to implement these in caller)
+#
+::ACTIONS::
+
+my %const2act = DFA_ACTIONS;
+
+# States
+::STATES::
+
+# Events
+::EVENTS::
+
+use constant GRAPH => ::GRAPH::;
+
+my $num2str = ::NUM2STR::;
+
+my $str2num = ::STR2NUM::;
+
+my %num2str = %$num2str;
+my %str2num = %$str2num;
+
+sub new
+{
+  my $class=shift;
+  my $self = { @_ };
+  bless $self, ref($class) || $class;
+  $self->{graph}=GRAPH;
+  $self->{except}=\&except unless $self->{except};
+  $self->{entersuf} = "_enter" unless $self->{entersuf};
+  $self->{leavesuf} = "_leave" unless $self->{leavesuf};
+  $self->init() if $self->can('init');
+  return $self;
+}
+
+# set state blindly, running only the enter routine -- for use at startup
+sub state
+{
+  my ($self,$state)=@_;
+  if ($state)
+  {
+    die __PACKAGE__.": invalid state: ".$state."\n" 
+    unless $self->{graph}{$state};
+    $self->{state}=$state;
+    my $enter = $state.$self->{entersuf};
+    $self->$enter($state) if $self->can($enter);
+  }
+  return $self->{state};
+}
+
+# feed event into state engine, then execute leave, action, and enter
+# routines
+sub tick
+{
+  my ($self,$event,@arg) = @_;
+  die "usage: \$obj->tick(\$event[,\@arg])\n" unless $event;
+  @arg=() unless @arg;
+  my $numeric=0;
+  # $numeric = 1 if $event =~ /^\d+$/;
+  # $event=$num2str{$event} if $numeric;
+  my $graph = $self->{graph};
+  my $oldstate = $self->{state};
+  die __PACKAGE__.": initial state not set\n" unless $oldstate;
+  unless ($graph->{$oldstate}{$event})
+  {
+    return (&{$self->{except}}($oldstate,$event),'');
+  }
+  my $node = $graph->{$oldstate}{$event};
+  my $newstate = $node->{newstate};
+  my $action = $node->{action} || "";
+  my $statechg = ($newstate ne $oldstate);
+  $self->{state}=$newstate if $statechg;
+  my $leave = $oldstate.$self->{leavesuf};
+  my $enter = $newstate.$self->{entersuf};
+  $self->$leave($oldstate,$newstate,$action,@arg) 
+    if $statechg && $self->can($leave);
+  $self->transit($oldstate,$newstate,$action,@arg) 
+    if $self->can('transit');
+  $self->$enter($oldstate,$newstate,$action,@arg) 
+    if $statechg && $self->can($enter);
+  return ($newstate,$action);
+}
+
+# default exception handler
+sub except
+{
+  my ($state,$event) = @_;
+  warn __PACKAGE__.": state '$state': unhandled event: ".$event."\n" if $debug;
+  return $state;
+}
+
+sub num2str
+{
+  my $self=shift;
+  my $num=shift;
+  return $num2str{$num};
+}
+
+1;
+__END__
+::DOT::

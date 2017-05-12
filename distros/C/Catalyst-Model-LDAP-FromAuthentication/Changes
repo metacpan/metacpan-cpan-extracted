@@ -1,0 +1,11 @@
+0.02 2010-08-13
+  - Use MooseX::Types::LoadableClass to avoid loading Catalyst::Model::LDAP
+    if that isn't what is going to be used, and to auto-load what is going
+    to be used at component construction time.
+
+0.01 2010-03-08
+  - Fix up for the correct method in Authentication::Store::LDAP::User
+  - Add entry_class, connection_class and base config options.
+
+0.00_01
+   - Initial dev release

@@ -1,0 +1,53 @@
+[%
+
+    title = 'List Marked Reports' ;
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    ELSE ; crumb2_name = 'Author' ; END ;
+    crumb2_href = '/' ;
+    crumb1_name = 'List Marked Reports' ;
+
+    javascript = 1 ;
+    box_prefs = 1 ;
+
+%]
+
+<p>Select the reports you wish to delete from the list below. Click on the
+report ID to view more information about that report.</p>
+
+[% INCLUDE "content/moreinfo.html" %]
+
+[% IF data.reports %]
+<form id="reports-form" name="reports" action="[% cgipath %]/pages.cgi" method="post" onsubmit="return UnmarkReports();">
+<input type="hidden" name="act" value="author-unmark" />
+
+<table id="reports" class="sortable">
+<tr><th><input type="checkbox" name="top" onclick="togglecheckboxes(this)" /></th>
+	<th><span class="sortheader">Grade</span></th>
+	<th><span class="sortheader">Distribution-Version</span></th>
+	<th><span class="sortheader">Author</span></th>
+	<th><span class="sortheader">Perl</span></th>
+	<th><span class="sortheader">OS</span></th>
+	<th><span class="sortheader">Tester</span></th>
+	<th><span class="sortheader">Date</span></th>
+</tr>
+
+[% FOREACH r = data.reports %]
+<tr class="g[% r.state | upper %]relunp" id="row[% r.id %]">
+  <td><input type="checkbox" name="DELETE" value="[% r.id %]" class="cb[% r.state | upper %]relunp" /></td>
+	<td class="[% r.state | upper %]"><a href="javascript:void(0);" onclick="more_info('[% r.guid %]','[% r.state | upper %]','[% r.dist %]','[% r.version %]','[% r.perl %]','[% r.osname %]','[% r.profile.display || r.tester | html %]','[% r.cpanid %]','[% r.fulldate %]');">[% r.state | upper %]</a></td>
+	<td>[% r.dist %]-[% r.version %]</td>
+	<td>[% r.cpanid %]</td>
+	<td>[% r.perl %]</td>
+	<td>[% r.osname %]</td>
+	<td>[% r.profile.display || r.tester %]</td>
+	<td>[% r.fulldate %]</td>
+</tr>
+[% END %]
+</table>
+
+<p class="smalltext"><input type="submit" value='Unmark Reports' /></p>
+</form>
+
+[% ELSE %]
+<p>Sorry, no marked reports found.</p>
+[% END %]

@@ -1,0 +1,17 @@
+---
+name: Catalyst-View-PSP
+version: 0.01
+author:
+  - Christian Hansen, C<ch@ngmedia.com>
+abstract: PSP View Class
+license: perl
+requires:
+  Catalyst: 5
+  Text::PSP: 1.013
+provides:
+  Catalyst::Helper::View::PSP:
+    file: lib/Catalyst/Helper/View/PSP.pm
+  Catalyst::View::PSP:
+    file: lib/Catalyst/View/PSP.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

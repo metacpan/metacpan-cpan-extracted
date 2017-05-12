@@ -1,0 +1,52 @@
+Newsgroups: perl.cpan.uploads
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.uploads:34358
+Return-Path: <root@pause.perl.org>
+Mailing-List: contact cpan-uploads-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-uploads@perl.org
+Received: (qmail 25989 invoked from network); 5 Nov 2009 14:00:12 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 5 Nov 2009 14:00:12 -0000
+Received: (qmail 27624 invoked by uid 225); 5 Nov 2009 14:00:12 -0000
+Delivered-To: cpan-uploads@perl.org
+Received: (qmail 27469 invoked by alias); 5 Nov 2009 14:00:11 -0000
+X-Spam-Status: No, hits=0.0 required=8.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from pause.fiz-chemie.de (HELO pause.perl.org) (195.149.117.110)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Thu, 05 Nov 2009 06:00:09 -0800
+Received: from pause.perl.org (localhost.localdomain [127.0.0.1])
+	by pause.perl.org (8.13.8/8.13.8/Debian-3) with ESMTP id nA5E01xV026692;
+	Thu, 5 Nov 2009 15:00:01 +0100
+Received: (from root@localhost)
+	by pause.perl.org (8.13.8/8.13.8/Submit) id nA5E01ZE026691;
+	Thu, 5 Nov 2009 15:00:01 +0100
+Date: Thu, 5 Nov 2009 15:00:01 +0100
+Message-ID: <200911051400.nA5E01ZE026691@pause.perl.org>
+MIME-Version: 1.0
+Subject: CPAN Upload: B/BA/BARBIE/CPAN-Testers-Data-Uploads-0.12.tar.gz
+Content-Type: Text/Plain; Charset=UTF-8
+Reply-To: cpan-uploads@perl.org
+To: cpan-testers@perl.org, cpan-uploads@perl.org
+Content-Transfer-Encoding: 8bit
+Approved: news@nntp.perl.org
+From: upload@pause.perl.org (PAUSE)
+
+The uploaded file
+
+    CPAN-Testers-Data-Uploads-0.12.tar.gz
+
+has entered CPAN as
+
+  file: $CPAN/authors/id/B/BA/BARBIE/CPAN-Testers-Data-Uploads-0.12.tar.gz
+  size: 19345 bytes
+   md5: 734f1788c601198e6fd4fc7c38575841
+
+No action is required on your part
+Request entered by: BARBIE (Barbie)
+Request entered on: Thu, 05 Nov 2009 13:58:59 GMT
+Request completed:  Thu, 05 Nov 2009 14:00:00 GMT
+
+Thanks,
+-- 
+paused, v1047

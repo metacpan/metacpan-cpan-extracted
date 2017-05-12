@@ -1,0 +1,8 @@
+0.001001 2016-08-29
+ [Fix EXLOCK hangs on freebsd]
+ - https://github.com/kentnl/CPAN-Testers-TailLog/issues/1
+ - https://github.com/kentnl/CPAN-Testers-TailLog/pull/2
+ - Thanks Slaven Rezić
+
+0.001000 2016-08-28
+ - Initial Release

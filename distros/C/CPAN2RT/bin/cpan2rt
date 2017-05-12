@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+cpan2rt - tool for importing CPAN meatdata into RT
+
+=head1 USAGE
+
+    cpan2rt command [options]
+
+    # update
+    cpan2rt update
+    cpan2rt update --nosync --force --debug --home /opt/rt3 --datadir /var/lib/cpan2rt
+
+=head1 LIST OF COMMANDS
+
+=over 4
+
+=item L</update> - does full sync of data from a CPAN mirror into RT.
+
+=back
+
+=head1 GENERAL OPTIONS
+
+=over 4
+
+=item --home    - RT home
+
+=item --datadir - Storage for metadata
+
+=item --mirror  - URI of a CPAN mirror
+
+=item --debug   - Debug output
+
+=item --force   - Force an action
+
+=item --sync    - Sync files from a CPAN mirror
+
+=back
+
+Some options may have different defaults for different commands as
+well as meaning. Boolean options can be prepended with 'no' to turn
+option off, for example --nosync.
+
+=head1 COMMANDS
+
+=head2 update
+
+Does full sync of data from a CPAN mirror into RT. By default sync files
+from a mirror, use --nosync option to acvoid. Don't update corresponding
+data if file(s) hasn't been changed since last update, you can use --force
+option to force the action.
+
+=cut
+
+use strict;
+use warnings;
+
+use CPAN2RT;
+
+our $DEBUG = 0;
+our $DATA_DIR = '';
+
+use Getopt::Long;
+use File::Spec;
+
+my $command = shift;
+my %commands = (
+    update => \&cmd_update,
+);
+
+unless ( $command ) {
+    # XXX: help
+    usage( "command is mandatory", 1 );
+} elsif ( !$commands{ $command } ) {
+    usage( "unknown command $command", 1 );
+}
+
+$commands{ $command }->();
+
+sub cmd_update {
+    my %opt = ( sync => 1, force => 0, debug => 0 );
+    GetOptions( \%opt, 'sync!', 'force!', 'debug!', 'home=s', 'datadir=s', 'mirror=s' );
+
+    my $importer = CPAN2RT->new( %opt );
+
+    $importer->sync_files( $opt{'mirror'} ) if $opt{'sync'};
+    $importer->sync_authors( $opt{'force'} );
+    $importer->sync_distributions( $opt{'force'} );
+    $importer->sync_maintainers( $opt{'force'} );
+}
+
+sub usage {
+    my ($msg, $status) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+        -message => $msg,
+        -exitval => $status,
+        -verbose => 2,
+        -noperldoc => 1,
+    );
+}
+

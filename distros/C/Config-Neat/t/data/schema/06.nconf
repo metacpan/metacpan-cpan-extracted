@@ -1,0 +1,7 @@
+plugins
+{
+    some_plugin
+    {
+        name        my_plugin
+    }
+}

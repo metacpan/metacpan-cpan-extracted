@@ -1,0 +1,31 @@
+This archive contains the distribution Carp-Growl version 0.0.9:
+
+    Send warnings to Growl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Growl::Any
+
+NOTICE
+
+This module is installable even if you have no notification system(like 'Growl')
+that can be used from Growl::Any.
+However, it will not be helpful for you.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, kpee
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.

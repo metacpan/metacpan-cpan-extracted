@@ -1,0 +1,1 @@
+{"deriveds":[[% FOREACH derived = model.deriveds %]{id_derived:[% derived.id_derived %]}[% "," IF loop.last %][% END %]]}

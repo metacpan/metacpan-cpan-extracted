@@ -1,0 +1,8 @@
+---
+store:
+ fedora:
+   package: FedoraCommons
+   options:
+     baseurl: http://localhost:8080/fedora
+     username: fedoraAdmin
+     password: fedoraAdmin

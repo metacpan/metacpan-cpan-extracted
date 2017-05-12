@@ -1,0 +1,190 @@
+NAME
+    Class::Declare::Attributes - Class::Declare method types using Perl
+    attributes.
+
+SYNOPSIS
+      package My::Class;
+
+      use 5.006;
+      use strict;
+      use warnings;
+
+      use base qw( Class::Declare::Attributes );
+
+      # declare the class/instance attributes
+      __PACKAGE__->declare( ... );
+
+      #
+      # declare class/static/restricted/etc methods of this package
+      #
+
+      sub my_abstract   : abstract   { ... }
+      sub my_class      : class      { ... }
+      sub my_static     : static     { ... }
+      sub my_restricted : restricted { ... }
+      sub my_public     : public     { ... }
+      sub my_private    : private    { ... }
+      sub my_protected  : protected  { ... }
+
+DESCRIPTION
+    Class::Declare::Attributes extends Class::Declare by adding support for
+    Perl attributes for specifying class method types. This extension was
+    inspired by Damian Conway's Attribute::Handlers module, and Tatsuhiko
+    Miyagawa's Attribute::Protected module. The original implementation used
+    Attribute::Handlers, but now simply refers to attributes.
+
+    The addition of Perl attribute support (not to be confused with object
+    attributes, which are entirely different, and also supported by
+    Class::Declare) greatly simplifies the specification of
+    Class::Declare-derived class and instance methods. This should aid in
+    the porting of existing code (Perl, Java and C++) to a Class::Declare
+    framework, as well as simplify the development of new modules.
+
+    With the addition of Perl attributes, Class::Declare methods can now be
+    written as
+
+      sub method : public
+      {
+        my $self = shift;
+        ...
+      }
+
+    instead of
+
+      sub method
+      {
+        my $self = __PACKAGE__->public( shift );
+        ...
+      }
+
+  Attributes
+    Class::Declare::Attributes defines six method or subroutine attributes
+    that correspond to the six method and object- and class-attribute types
+    of Class::Declare:
+
+    :abstract
+        abstract methods are merely placeholders and must be defined in
+        subclasses. If called, an abstract method will throw an error
+        through *die()*.
+
+    :class
+        class methods are accessible from anywhere, and may be called
+        through the class, a derived class, or any instance derived from the
+        defining class. This is the class equivalent of public methods.
+
+    :static
+        static methods may only be accessed within the defining class and
+        instances of that class. This is the class equivalent of private
+        methods.
+
+    :restricted
+        restricted methods may only be accessed from within the defining
+        class and all classes and objects that inherit from it. This is the
+        class equivalent of protected methods.
+
+    :public
+        public methods are accessible from anywhere, but only through object
+        instances derived from the defining class.
+
+    :private
+        private methods are only accessible from within the defining class
+        and instances of that class, and only through instances of the
+        defining class.
+
+    :protected
+        protected methods are only accessible from within the defining class
+        and all classes and objects derived from the defining class. As an
+        instance method it may only be accessed via an object instance.
+
+    The attributes defined by Class::Declare::Attributes are not to be
+    confused with the object and class attributes defined by
+    Class::Declare::declare(). The clash in terminology is unfortunate, but
+    as long as you remember the context of your attributes, i.e. are they
+    Perl-attributes, or class-/object-attributes, the distinction should be
+    clear.
+
+  Attribute Modifiers
+    Class::Declare::Attributes supports the use of the class and instance
+    attribute modifiers defined by Class::Declare. These modifiers may be
+    imported into the current namespace by either explicitly listing the
+    modifier (rw and ro) or using one of the predefined tags: ":read-write",
+    ":read-only" and ":modifiers". For example:
+
+      use Class::Declare::Attributes qw( :read-only );
+
+    Note: The "magic" of Class::Declare::Attributes that defines the method
+    attributes is performed during the compilation of the module it is
+    "use"d in. To access the attribute modifiers, the "use base" approach
+    should be replaced with the more traditional:
+
+      use Class::Declare::Attributes qw( :modifiers );
+      use vars qw( @ISA );
+      @ISA = qw( Class::Declare::Attributes );
+
+    However, because Class::Declare::Attributes (or more precisely
+    Attribute::Handlers) operates before the execution phase, the assignment
+    to @ISA will occur too late to take effect (resulting in an invalid
+    attribute error). To prevent this error, and to bring the assignment to
+    @ISA forward in the module compilation/execution phase, the assignment
+    should be wrapped in a "BEGIN {}" block.
+
+      BEGIN { @ISA = qw( Class::Declare::Attributes ); }
+
+    For more information on class and instance attribute modifiers, please
+    refer to Class::Declare.
+
+  Methods
+    require( *class* )
+        In the event that a Class::Declare::Attributes-derived class needs
+        to be loaded dynamically, the require() method should be used to
+        ensure correct handling of the Class::Declare::Attributes-style
+        attributes. require() is a class method of
+        Class::Declare::Attributes and should therefore be called along the
+        lines of the following:
+
+          package My::Class;
+
+          use strict;
+          use warnings;
+
+          use bae qw( Class::Declare::Attributes );
+
+          ...
+
+              my $class   = 'My::Class::To::Load';
+                 __PACKAGE__->require( $class )    or die;
+
+        *$class* can be either a class name (as above) or a string
+        containing the definition of the class. require() will return true
+        on success and undefined on failure, with $@ containing the error.
+
+CAVEATS
+    Class::Declare::Attributes is distributed as a separate module to
+    Class::Declare as it requires Perl versions 5.6.0 and greater, while
+    Class::Declare supports all object-aware versions of Perl (i.e. version
+    5.0 and above).
+
+    The interface Class::Declare::Attributes provides is not ideal. In fact,
+    some might suggest that it's 'illegal'. In some ways, yes, it is
+    illegal, because it has hijacked some lowercase attribute names that
+    Perl has marked down for possible future use. However, as of Perl 5.8.0,
+    these attributes are not in use (":shared" is, which is why
+    Class::Declare changed this class of attributes and methods to
+    "restricted"), and so we may as well take advantage of them.
+
+    This is an example of what can be done with Perl (especially if you're
+    willing to bend the rules), and who knows, maybe it's a glimpse of the
+    sort of capabilities we'll see in Perl 6.
+
+SEE ALSO
+    Class::Declare, attributes, Attribute::Protected, Attribute::Handlers.
+
+AUTHOR
+    Ian Brayshaw <ibb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2016 by Ian Brayshaw. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

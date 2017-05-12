@@ -1,0 +1,17 @@
+<!ELEMENT parser ( elem1 )>
+
+<!ELEMENT elem1 ( elem2+, elem3, elem4 )>
+<!ATTLIST elem1 y NMTOKEN #REQUIRED>
+
+<!ELEMENT elem2 ( #PCDATA )>
+
+<!ELEMENT elem3 ( elem_bottom, empty_element )>
+<!ATTLIST elem3 attr1 NMTOKEN #REQUIRED
+                attr2 NMTOKEN #REQUIRED>
+
+<!ELEMENT elem4 ( #PCDATA )>
+
+<!ELEMENT elem_bottom ( #PCDATA )>
+<!ATTLIST elem_bottom attr_bottom NMTOKEN #REQUIRED>
+
+<!ELEMENT empty_element EMPTY>

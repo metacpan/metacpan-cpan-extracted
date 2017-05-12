@@ -1,0 +1,19 @@
+---
+name: CPAN-Test-Dummy-Perl5-Make-FailConfigRequires
+version: 1.00
+author:
+  - 'David A. Golden <dagolden@cpan.org>'
+abstract: CPAN Test Dummy
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  CPAN::Test::Dummy::Perl5::Make::FailConfigRequires:
+    file: lib/CPAN/Test/Dummy/Perl5/Make/FailConfigRequires.pm
+    version: 1.00
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+configure_requires:
+  Impossible::Requirement::Missing: 0

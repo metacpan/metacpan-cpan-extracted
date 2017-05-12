@@ -1,0 +1,7 @@
+Revision history for CGI-Session-Driver-dbic
+
+1.01    26 Aug 2010
+        s/use parent/use base/. Compatible with perl v5.10.0- on FreeBSD.
+
+1.00    24 Aug 2010
+        First version DBIx::Class storage driver for CGI::Session, released on an unsuspecting world.

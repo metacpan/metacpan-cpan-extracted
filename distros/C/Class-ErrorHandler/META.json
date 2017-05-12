@@ -1,0 +1,70 @@
+{
+   "abstract" : "Base class for error handling",
+   "author" : [
+      "Benjamin Trott, cpan@stupidfool.org. All rights reserved."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-ErrorHandler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008_001"
+         }
+      }
+   },
+   "provides" : {
+      "Class::ErrorHandler" : {
+         "file" : "lib/Class/ErrorHandler.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Class-ErrorHandler/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Class-ErrorHandler",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Class-ErrorHandler.git",
+         "web" : "https://github.com/tokuhirom/Class-ErrorHandler"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

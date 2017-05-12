@@ -1,0 +1,49 @@
+NAME
+
+    Catmandu::MAB2 - Catmandu modules for working with MAB2 data.
+
+DESCRIPTION
+
+    Catmandu::MAB2 provides methods to work with MAB2 data within the
+    Catmandu framework. See Catmandu::Introduction and http://librecat.org/
+    for an introduction into Catmandu.
+
+CATMANDU MODULES
+
+      * Catmandu::Importer::MAB2
+
+      * Catmandu::Exporter::MAB2
+
+      * Catmandu::Importer::SRU::Parser::mabxml
+
+      * Catmandu::Fix::mab_map
+
+INTERNAL MODULES
+
+    Parser and writer for MAB2 data.
+
+      * MAB2::Parser::Disk
+
+      * MAB2::Parser::RAW
+
+      * MAB2::Parser::XML
+
+      * MAB2::Writer::Handle
+
+      * MAB2::Writer::Disk
+
+      * MAB2::Writer::RAW
+
+      * MAB2::Writer::XML
+
+AUTHOR
+
+    Johann Rolschewski <jorol@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013 by Johann Rolschewski.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,26 @@
+Class::Classless::DBI
+    - provides a Classless object-oriented database interface
+
+Copyright (c) 2005, Mark Tiefenbruck. All rights reserved. This module is free
+software. It may be used, redistributed and/or modified under the same terms as
+Perl itself.
+
+To install (with ExtUtils::MakeMaker):
+
+  perl Makefile.PL
+  make
+  make install
+
+To install (with Module::Build):
+
+  perl Build.PL
+  perl Build
+  perl Build install
+
+This module may require the following other modules:
+
+  Class::Classless
+  SQL::Interpolate
+  DBI
+
+Documentation is in the POD.

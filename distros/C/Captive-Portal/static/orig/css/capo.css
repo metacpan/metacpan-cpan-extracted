@@ -1,0 +1,156 @@
+/* ************************************* */ 
+/*    CSS styles for Captive::Portal     */ 
+/* ************************************* */ 
+
+#page {
+    width: 950px;
+    min-width: 300px;
+    margin: auto;
+
+    background: white;
+
+    border: 1px solid #C6D4DE;
+    border-bottom: 2px solid #C6D4DE;
+    border-right: 2px solid #C6D4DE;
+
+    padding:10px;
+}
+
+.box {
+    background-color: #E9EEF1;
+}
+
+.error {
+    background-color: #FFEEEE;
+    border-color: #884444;
+    color: #440000;
+}
+
+.info {
+    background-color:#eeffee;
+    border-color: #448844;
+    color:#004400;
+}
+
+.box *, .info *, .error * {
+    margin:0;
+}
+
+body {
+    background: #E5EBEE;
+    font-family: Arial, sans-serif;
+    font-size: 83.33%;
+    text-align: left;
+    padding: 10px;
+    overflow-y: scroll;
+}
+
+h1, h2, h3, h4, caption {
+    color: #222;
+    line-height: 1.25;
+}
+
+tbody tr:hover td {
+    background-color: #FFEEEE;
+}
+
+thead tr th {
+    background: #8BA9B7;
+    font-weight: bold;
+    line-height: 1.25;
+    color: #222;
+}
+
+thead tr th input[type="submit"] {
+    background: inherit;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    width: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+tbody td  { 
+    background-color: #CEDBE3;
+}
+
+th, td { 
+    border-style: solid;
+    border-width: 0 1px;
+    border-color: #FFF;
+    border-collapse: collapse;
+    padding: 2px 3px;
+}
+
+form {
+    background-color: #FFEEEE;
+}
+
+input, textarea, select {
+    border: 1px #ccc solid;
+    background: #fafafa;
+    color: #777;
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    font-size: 1em;
+}
+
+input[type=password]:focus {
+    background: #fab8b8;
+    color: #333;
+    border-color: #666;
+}
+
+input[type=submit] {
+    font-size: 1.1em;
+    line-height: 1.25;
+    color: #222;
+}
+
+input[type=submit]:hover {
+    background-color: #CEDBE3;
+}
+
+#teaser {
+    color:#CEDBE3;
+    background: #8BA9B7;
+    width: 970px;
+    margin-left: -10px;
+}
+
+#teaser p {
+    margin:0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:2.7em;
+    font-weight:bold;
+}
+
+#main h4, table caption {
+    background-color: #CEDBE3;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0px 0px 1em;
+    padding: 0.25em 0px 0.25em 0.3em;
+}
+
+#header h4 { color: #91ACBC; }
+
+#footer {
+    font-size: 0.8em;
+}
+
+@media handheld {
+    #page {
+	    max-width: 310px;
+	    overflow:hidden;
+    }
+
+    #footer {
+	display:none;
+    }
+}
+

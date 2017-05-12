@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 149
+name: fd95
+registers:
+  AF: 35677
+  AF_: 0
+  BC: 46165
+  BC_: 0
+  DE: 9096
+  DE_: 0
+  HL: 60446
+  HL_: 0
+  I: 0
+  IX: 30263
+  IY: 52119
+  PC: 0
+  R: 0
+  SP: 0

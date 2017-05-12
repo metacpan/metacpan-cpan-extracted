@@ -1,0 +1,25 @@
+Convert/Transcribe version 0.01
+===============================
+
+Convert::Transcribe is a simple Perl module for implementing natural
+language transcriptions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules or libraries:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002, 2003 Thomas M. Widmann
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

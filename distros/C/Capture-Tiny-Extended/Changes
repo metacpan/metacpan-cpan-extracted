@@ -1,0 +1,17 @@
+Revision history for Capture-Tiny-Extended
+
+0.114     2011-08-04 10:41:44 Europe/Berlin
+    - fixed copyright notice, thanks to Marcus Ramberg <marcus@nordaaker.com>
+
+0.113     2011-06-24 14:29:41 Europe/Berlin
+    - Tests will not use Test::Differences version 0.60 or greater
+
+0.102     2011-03-20 00:48:19 Europe/Berlin
+    - reworded and reformatted documentation
+    - added syntax sugar for passing capture file options
+
+0.101     2011-03-18 18:17:01 Europe/Berlin
+
+    - forked from Capture-Tiny
+    - added ability to capture return values as well
+    - added ability to provide files to capture to in realtime

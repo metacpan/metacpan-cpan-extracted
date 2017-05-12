@@ -1,0 +1,35 @@
+0.07      2016-07-09 14:47:30+10:00 Australia/Melbourne
+- Move packaging/build to dist.ini
+
+----------
+Pre-dist.ini revision history
+
+Revision history for Class-Constant
+
+0.01    4 August 2006
+        First release
+
+0.02    7 August 2006
+        - Support for constant methods
+        - Make the calling class subclass ::Value
+
+0.03    11 August 2006
+        - Make stringification work properly, Test::More magic was
+          hiding the fact that it was busted
+
+0.04    13 August 2006
+        - Allow numbers in constant names
+        - Comparisons were broken, fixed them
+        - Make overload handlers actual methods, so they can be
+          overriden
+        - Produce a sane error message if argument to by_ordinal doesn't
+          exist
+
+0.05    28 August 2006
+        - Rewrote documentation
+        - Made subvalue accessors be called get_*
+        - Renamed Class::Constant::Value to be Class::Constant::Object
+
+0.06    24 August 2010
+        - Updated tests and overload operators to do the right thing with
+          Test::More 0.95+.

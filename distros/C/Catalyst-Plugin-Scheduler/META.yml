@@ -1,0 +1,31 @@
+---
+abstract: 'Schedule events to run in a cron-like fashion'
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Scheduler
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.61
+  DateTime::Event::Cron: 0
+  MRO::Compat: 0
+  Set::Scalar: 0
+  Storable: 0
+  YAML: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

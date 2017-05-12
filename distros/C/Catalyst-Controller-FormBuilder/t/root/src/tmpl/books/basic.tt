@@ -1,0 +1,6 @@
+<tmpl_var form-start>
+<tmpl_var form-statetags>
+<tmpl_var form-keepextras>
+<tmpl_var label-email> <tmpl_var field-email>
+<tmpl_var form-submit>
+<tmpl_var form-end>

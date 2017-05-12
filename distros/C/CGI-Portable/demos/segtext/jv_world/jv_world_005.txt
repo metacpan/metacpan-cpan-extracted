@@ -1,0 +1,29 @@
+# _args_are_named( ARGS[, USE_DASHES[, GUESS_NAMED]] )
+# This private method will check if the incoming argument list, provided in 
+# the array ref argument ARGS, appears to be in named format or not.  If it is 
+# named then this method will return a hash ref containing the raw named 
+# version (true); otherwise, it returns undef (false).  By default, ARGS is 
+# known to be named if its first element is a hash ref, and assumed to be 
+# positional if the count of arguments is odd.  If neither of those two 
+# conditions are true then we have an even argument count and we are in doubt 
+# of whether they are named or not.  The argument GUESS_NAMED says what to do 
+# in that case; if it is true then we guess named and if it is false then we 
+# guess positional.  If the argument USE_DASHES is true then we check the first 
+# element in ARGS to see if it begins with a dash, "-", and if it does then we 
+# assume that ARGS is named regardless of the count of elements.
+# When the first element of ARGS is a hash ref, any other elements of ARGS are 
+# also returned as "remaining" values, if they exist, after the hash ref.
+# So you can call this like "($rh_named, @rem) = _args_are_named()".
+
+sub _args_are_named {
+	my ($self, $ra_args, $use_dashes, $guess_named) = @_;
+	if( ref( $ra_args->[0] ) eq 'HASH' ) {
+		return( @{$ra_args} );  # literal hash in first return elem
+	} elsif( $use_dashes and substr( $ra_args->[0], 0, 1 ) eq '-' ) {
+		return( { @{$ra_args} } );  # first element starts with "-"
+	} elsif( @{$ra_args} % 2 ) {
+		return( undef );  # odd # elements
+	} else {
+		return( $guess_named ? { @{$ra_args} } : undef );  # even num elements
+	}
+}

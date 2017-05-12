@@ -1,0 +1,41 @@
+Version 0.12
+        * Fixed bug where multivalued parameters passed to
+          url_encode_vars() were getting sorted.
+
+Version 0.11
+        * Aliased get_self_host_url to get_self_ref_host_url
+        * Add the single quote char (') to the list of characters that
+          get escaped when calling escapeHtml
+        * Fixed url_encode() to handle utf-8 properly
+
+Version 0.10
+        * Added the $sep parameter to other methods that build a query string.
+          - addParamsToUrl
+          - convertRelativeUrlWithParams
+	  - getSelfRefUrlWithParams
+
+Version 0.09
+	* apache_* methods
+	* support for mod_perl 2 in addition to mod_perl 1
+	* added underscore versions of more methods
+	* fixed some formatting issues with the POD documentation
+
+Version 0.08
+	* setCookie()
+	* More underscore versions of methods
+	* Command-line parsing is now available.
+	* Fixed a bug where a mod_perl environment was always assumed
+	  for some methods
+	* sendHeader()
+	* sendRedirect()
+	* setCookie()
+
+Version 0.07
+        * Support for mod_perl and Mason (multipart/form-data for
+          mod_perl requires Apache::Request)
+        * getRemoteAddr()
+	* getRemoteHost()
+        * getHost()
+	* getReferer()
+	* getProtocol()
+	* getLocalRedirect()

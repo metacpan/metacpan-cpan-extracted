@@ -1,0 +1,123 @@
+INSTALLATION:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+
+NAME
+    Class::Prevayler - Prevayler implementation - www.prevayler.org
+
+SYNOPSIS
+      use Class::Prevayler;
+
+      my $prevayler = Class::Prevayler->new(
+                            system          => new Your::System,
+                            directory       => 'prevayler/demo/'
+                    );
+
+      $prevayler->start();
+
+      my $cmd_obj = Your::Command::Object->new();
+
+      $prevayler->execute( $cmd_obj );
+
+      $prevayler->take_snapshot();
+
+DESCRIPTION
+    THIS IS BETA-SOFTWARE!!
+
+    Class::Prevayler - aka 'Perlvayler' - is a Perl implementation of the
+    prevayler concept.
+
+    You can find an introduction to this concept on www.prevayler.org.
+
+    This module overloads the 'time', 'localtime' and 'gmtime' functions to
+    make the system deterministic.
+
+USAGE
+  new
+
+     Usage     : $prevayler->new()
+     Purpose   : creates a new object 
+     Returns   : the new prevayler-object
+     Argument  : you can use key-value pairs to initialize the attributes
+
+  start
+
+     Usage     : $prevayler->start()
+     Purpose   : recovers the old system state
+     Returns   : nothing
+     Argument  : none
+     Comments  : You have to call it before you can use execute(), even if there is no old serialized state
+
+  take_snapshot
+
+     Usage     : $prevayler->take_snapshot()
+     Purpose   : produce a serialized image of the system 
+     Returns   : nothing
+     Argument  : command object
+     Comments  : all command objects must implement a 'execute()' method
+
+  system
+
+     Usage     :    $prevayler->system( new My::System )
+                    my $system = $prevayler->system();
+     Purpose   : access to the prevalent system 
+     Returns   : returns the actual system if called without argument
+     Argument  : new prevalent system
+
+  directory
+
+     Usage     :    $prevayler->directory( './prevayler/' )
+                    my $directory = $prevayler->directory();
+     Purpose   : sets the directory where all serialized objects are stored 
+     Returns   : returns the actual directory if called without argument
+     Argument  : new directory
+
+  serializer
+
+     Usage     :    $prevayler->serializer( \&mySerializer )
+                    my $serializer = $prevayler->serializer();
+     Purpose   : define the serializer. 
+                    The serializer is called with a structure (an object)
+                    and returns a string representation of this structure.
+                    The default serializer is implemented with Data::Dumper.
+     Returns   : returns the actual serializer if called without argument
+     Argument  : reference to a subroutine
+
+  deserializer
+
+     Usage     :    $prevayler->deserializer( \&myDeSerializer )
+                    my $deserializer = $prevayler->deserializer();
+     Purpose   : define the deserializer. 
+                    The deserializer is called with a serialized structure
+                    and returns this structure.
+                    The default deserializer is implemented with eval.
+     Returns   : returns the actual deserializer if called without argument
+     Argument  : reference to a subroutine
+
+BUGS
+    - none known, but: this is beta-software, there will be API and
+    fileformat changes.
+
+AUTHOR
+            Nathanael Obermayer
+            CPAN ID: nathanael
+            natom-pause@smi2le.net
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+
+    http://www.prevayler.org
+

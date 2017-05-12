@@ -1,0 +1,6 @@
+Revision history for Perl extension Chess::NumberMoves.
+
+0.01  Fri Jan  9 07:34:13 2004
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Chess::NumberMoves
+

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Convert-XText.t
+lib/Convert/XText.pm

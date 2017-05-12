@@ -1,0 +1,115 @@
+#!perl -w
+# $Id: c-dbi-classgenerator,v 1.2 2008-08-28 16:48:57 cantrelld Exp $
+
+use strict;
+use warnings;
+
+use vars qw($VERSION);
+
+$VERSION = '1.0';
+
+use Class::DBI::ClassGenerator;
+
+my(%tables, $dir, $base, $dsn) = ();
+
+unshift(@ARGV, '-h') unless(@ARGV);
+
+while(@ARGV) {
+    my $arg = shift(@ARGV);
+    if($arg =~ /^(-h|--help)$/) {
+        _help();
+        exit 0;
+    } elsif($arg =~ /^(-t|--tables)$/) {
+        my @tables = ();
+        while(my $table = shift(@ARGV)) {
+            if($table !~ /^-/) {
+                push @tables, $table
+            } else {
+                unshift(@ARGV, $table);
+                last;
+            }
+        }
+        %tables = @tables;
+    } elsif($arg =~ /^(-d|--dir(ectory)?)$/) {
+        $dir = shift(@ARGV);
+    } elsif($arg =~ /^(-b|--base(class)?)$/) {
+        $base = shift(@ARGV);
+    } elsif($arg =~ /^(-D|--DSN?)$/) {
+        $dsn = [shift(@ARGV), shift(@ARGV), shift(@ARGV)];
+    }
+}
+
+Class::DBI::ClassGenerator::create(
+    connect_info  => $dsn,
+    directory     => $dir,
+    base_class    => $base,
+    (keys %tables) ? (tables => \%tables) : ()
+);
+
+sub _help {
+    print `perldoc $0`;
+}
+
+=head1 NAME
+
+c-dbi-classgenerator - a script to generate Class::DBI table classes
+
+=head1 DESCRIPTION
+
+This script interrogates a database to figure out its structure and
+spits out a bunch of classes for use with Class::DBI.
+
+=head1 SYNOPSIS
+
+    c-dbi-classgenerator -D dbi:mysql:... username password \
+                         -d MyApp/lib \
+                         -b MyApp::DB
+
+=head1 ARGUMENTS
+
+=head2 -d or --dir or --directory
+
+Compulsory, the directory in which to put generated classes
+
+=head2 -D or --DSN
+
+Compulsory, he three parameters to pass C<to DBI-E<gt>connect()>, eg
+
+    -D dbi:mysql:dbname=WillowIsBest btvsfan p4sSw0rd
+
+if the username or password are blank, pass an empty parameter:
+
+    -D dbi:SQLite:dbfile=WillowIsBest '' ''
+
+=head2 -b or --base or --baseclass
+
+The classname to use for the superclass which holds the database connection
+and which loads all the various table classes for you.
+
+=head2 -t or --tables
+
+Optional, a list of table / class pairs.  If not specified, all tables will
+be extracted from the db.
+
+=head1 BUGS and WARNINGS
+
+This should be considered to be pre-production code.  It's probably chock
+full of exciting bugs.
+
+=head1 SEE ALSO
+
+L<Class::DBI::ClassGenerator>
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Written by David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+Copyright 2008 Outcome Technologies Ltd
+
+This software is free-as-in-speech software, and may be used, distributed,
+and modified under the terms of either the GNU General Public Licence
+version 2 or the Artistic Licence. It's up to you which one you use. The
+full text of the licences can be found in the files GPL2.txt and
+ARTISTIC.txt, respectively.
+
+=cut

@@ -1,0 +1,96 @@
+$Id: Changes,v 1.10 2008/04/15 09:46:23 pmh Exp $
+
+2008-04-15 0.11
+  Doc fix:
+    Add 0.10's changes to this list :-)
+
+2008-04-15 0.11
+  Bug fix:
+    Fix the perl version check to something which doesn't complain with 5.10
+
+2005-11-15 0.09
+  Bug fix:
+    Unlock the file before mmap(), as mandated by the spec
+    Return useful values from XS
+  Thanks to Janardhan Molumuri <mjanardhan@gmail.com>
+    for being bitten by this, and for assistance in fixing it
+  Minor documentation improvements
+
+2004-03-15 0.081
+  Fix bug in t/03corrupt.t in the face of UTF8 locales
+  Escape non-printable characters in cmmtest
+
+2003-10-30 0.08
+  Add CMM_keep_expired and CMM_keep_expired_refresh flags to enable temporary
+      underlying data availability problems to be dealt with nicely
+  Thanks to Jeffrey Friedl <jfriedl@yahoo.com>
+    for the idea and initial implementation
+  Document quick_clear()
+  Commit all of the 0.07 changes to CVS (whoops, nearly lost them!)
+
+2003-06-17 0.07
+  Fix test which got broken at the last minute before 0.06's release
+
+2003-06-17 0.06
+  Deal with utf8 properly (and add t/04utf8.t)
+    This changes the file format, so added format version number to file header
+  Existing files which aren't cache files are not overwritten
+
+2003-06-13 0.05_1
+  Add a check for super-sized entries (those which extend past the bucket end)
+  Make zero-sized check message include cache filename and key
+  Add t/03corrupt.t to check that the corruption checks are working
+
+2002-08-28 0.05
+  Add the entries() method, suggested by Marc Kelly <marc@vendusia.com>
+    Actually, he wanted get_keys(), but this does more than that
+  Remove the CDROM exception in the license
+    The module is now completely Free, as in speech
+  Remove a warning from the compilation stage
+  Remove a potential warning in new()
+
+2001-12-31 0.04
+  Fixed another serious bug in write(), which was introduced in the previous fix
+  Move file locking into XS, so we don't need to know struct flock's layout
+  Remove dependency on Mmap.pm by doing that in XS, too
+    This means that it will compile on 5.6.0 without too many hassles
+  Added a test suite (well, one file so far)
+    This is how the new write() bug was caught. Yay, tests!
+
+2001-12-28 0.03
+  Fixed serious bug in write(), which corrupted the cache file when replacing
+    an already existing entry
+    Thanks to Rob Mueller for the test case
+  
+2001-06-07 0.02
+  Fixed serious bug in read(), which didn't update the current bucket content
+    size when expiring entries. This caused infinite loops in _find() and
+    _insert(), which have also been fixed, should anything else ever go wrong
+    in a similar way
+
+2000-09-18 0.01, First release
+  Only lock file header in _lock(0), rather than whole file
+  Factor out code from read() and write() into _insert()
+  Only delete clean items from underlying data in delete()
+  Add documentation, including README
+
+2000-08-25 0.00_05
+  Mostly finish write()
+  Fix bug where 'use integer' interfered with safe bucketsize calculation
+
+2000-07-13 0.00_04
+  Write pushed out items to underlying data when new items read in
+    This caused the file format to change
+  Add delete()
+  Start work on write()
+
+2000-07-13 0.00_03
+  Actually mmap the cache file!
+  Attempt to write newly cached items (causing hangups)
+
+2000-07-12 0.00_02
+  Start work on read()
+  Add accessor methods for config options
+
+2000-07-12 0.00_01
+  Actually add some code (new, _set_options, _lock, _unlock)

@@ -1,0 +1,79 @@
+    // the same window is used for adding a new record and updating an
+    // existing record. bit of a hack to make sure all tabs are treated as
+    // being in the same form wrt ajax submission.
+
+    var generate_win = function(method) {
+        return new Ext.Window({
+            title: 'Edit [% cpac.tc.display_name %]'
+            ,id: 'main-win'
+            ,collapsible: true
+            ,closable: true
+            ,width: 400
+            ,modal: true
+            ,autoHeight: true
+            ,layout: 'fit'
+    
+            // form
+            ,items: [{
+                xtype: 'form'
+                ,id: 'form-panel'
+                ,border: false
+                ,url: '[% c.uri_for(
+                    c.controller('AutoCRUD::Root').action_for('source'),
+                    [cpac.g.site,cpac_db], cpac_table
+                ) %]/extjs2/' + method
+                ,autoHeight: true
+                ,layout: 'fit'
+    
+                // tabpanel
+                ,items: [{
+                    xtype: 'tabpanel'
+                    ,activeTab: 0
+                    ,border: false
+                    ,deferredRender: false // submit all tabs as one form
+                    ,autoHeight: true
+    
+                    // tab defaults
+                    ,defaults: {
+                        layout: 'form'
+                        ,bodyStyle: 'padding: 5px;'
+                        ,defaultType: 'textarea'
+                        ,buttonAlign: 'right'
+                        ,autoHeight: true
+                        ,hideMode: 'offsets'
+                        //,labelWidth: 80
+                        //,labelAlign: 'right'
+                    }
+    
+                    ,items: tabs
+                }]
+    
+                ,buttons: [{
+                    text: 'Save'
+                    ,handler: function(){
+                        Ext.getCmp('form-panel').getForm().submit({
+                            waitMsg: 'Saving Data...'
+                            ,clientValidation: false
+    
+                            ,success: function(){
+                                Ext.Msg.alert(
+                                    'Success', 'Changes have been saved.',
+                                    refreshandclose
+                                );
+                            }
+    
+                            ,failure: function(){
+                                Ext.Msg.alert(
+                                    'Error', 'Changes have not been saved!');
+                            }
+                        });
+                    }
+                },{
+                    text: 'Cancel',
+                    handler: function(){
+                        Ext.getCmp('main-win').close();
+                    }
+                }]
+            }]
+        });
+    };

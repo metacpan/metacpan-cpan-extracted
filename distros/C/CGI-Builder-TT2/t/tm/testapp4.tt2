@@ -1,0 +1,3 @@
+[% FOREACH item IN worlds %]
+    Dear inabitants of [% item %], cheers!
+[% END %]

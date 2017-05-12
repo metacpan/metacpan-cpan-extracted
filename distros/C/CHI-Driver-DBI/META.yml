@@ -1,0 +1,30 @@
+---
+abstract: 'Use DBI for cache storage'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Test::Class: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CHI-Driver-DBI
+no_index:
+  directory:
+    - lib/CHI/Driver/DBI/t
+    - lib/CHI/Driver/DBI/Test
+  file:
+    - lib/CHI/Driver/DBI/Util.pm
+requires:
+  CHI: '0.241'
+  DBI: '1.26'
+  Moose: '0.66'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-DBI
+  repository: git://github.com/jonswar/perl-chi-driver-dbi.git
+version: '1.27'

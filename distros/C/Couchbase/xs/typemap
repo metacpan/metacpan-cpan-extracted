@@ -1,0 +1,115 @@
+# vim: set noexpandtab:
+TYPEMAP
+PLCB_XS_OBJPAIR_t	T_PLCB_XS_OBJPAIR_T
+PLCB_XS_STRING_NONULL_t	T_PLCB_XS_STRING_NONULL_T
+PLCB_XS_STRING_t	T_PLCB_XS_STRING_T
+PLCB_viewhandle_t *	T_PLCB_COUCH_HANDLE_T
+PLCB_jsondec_t*	T_PLCB_JSONDEC_T
+PLCB_t *        T_PLCB
+plcb_OPCTX*		T_OPCTX
+lcbvb_CONFIG *	T_VBC
+plcb_IOPROCS *	T_IOPROCS
+plcb_EVENT	*	T_IOEVENT
+lcb_N1QLPARAMS *	T_N1QLPARAMS
+
+INPUT
+T_PLCB_XS_OBJPAIR_T
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvIOK(SvRV($arg)))) {
+	    die(\"Not a valid Couchbase::Bucket\");
+	}
+
+	$var.sv = $arg;
+	$var.ptr = NUM2PTR(PLCB_t*, SvIV(SvRV($arg)));
+
+T_PLCB
+	if (! (SvROK($arg) && (SvOBJECT($arg) || SvOBJECT(SvRV($arg))) && SvIOK(SvRV($arg)))) {
+		die(\"Not a valid Couchbase::Bucket\"); \
+	}
+	$var = NUM2PTR(PLCB_t*,SvIV(SvRV($arg)));
+
+T_OPCTX
+	if (!sv_isa($arg, \"Couchbase::OpContext\")) {
+		die(\"Not a valid Couchbase::OpContext\");
+	}
+	$var = NUM2PTR($type, SvIV(SvRV($arg))); \
+	if (!SvROK($var->parent)) {
+		parent = NULL;
+	} else {
+		parent = NUM2PTR(PLCB_t*,SvIV(SvRV($var->parent)));
+	}
+
+T_VBC
+	if (!sv_isa($arg, \"Couchbase::BucketConfig\")) {
+		die(\"Not a valid Couchbase::BucketConfig\");
+	}
+	$var = NUM2PTR($type, SvIV(SvRV($arg)));
+
+T_IOPROCS
+	if (!sv_isa($arg, \"Couchbase::IO\")) {
+		die(\"Not a valid Couchbase::IO\");
+	}
+	$var = NUM2PTR($type, SvIV(SvRV($arg)));
+
+T_IOEVENT
+	if (!sv_derived_from($arg, \"Couchbase::IO::Event\")) {
+		sv_dump($arg);
+		die(\"Not a valid Couchbase::IO::Event\");
+	}
+	{
+		SV **tmpsv = av_fetch((AV*)SvRV((SV*)$arg), PLCB_EVIDX_OPAQUE, 0);
+		$var = NUM2PTR($type, SvIV(*tmpsv));
+	}
+
+T_PLCB_XS_STRING_NONULL_T
+	if(!SvPOK($arg)) {
+	    $var.base = NULL;
+	    $var.len = 0;
+	} else {
+	    $var.base = SvPV($arg, $var.len);
+	}
+	$var.origsv = $arg;
+	if($var.len == 0) {
+	    die(\"$var cannot be empty\");
+	}
+
+T_PLCB_XS_STRING_T
+	if(!SvPOK($arg)) {
+	    $var.base = NULL;
+	    $var.len = 0;
+	} else {
+	    $var.base = SvPV($arg, $var.len);
+	}
+	$var.origsv = $arg;
+
+
+T_PLCB_COUCH_HANDLE_T
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvIOK(SvRV($arg)))) {
+	    die(\"Not a valid Couchbase::Couch::RequestHandle\");
+	}
+
+	$var = NUM2PTR(PLCB_viewhandle_t *, SvIV(SvRV($arg)));
+
+
+T_PLCB_JSONDEC_T
+	$var = (PLCB_jsondec_t*)SvPVX(SvRV($arg));
+
+T_PLCB_ITER_T
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvIOK(SvRV($arg)))) {
+	    die(\"Not a valid Couchbase::DocIterator\");
+	}
+
+	$var = NUM2PTR(PLCB_iter_t*, SvIV(SvRV($arg)));
+
+T_PLCB_EXP_T
+	$var = plcb_exp_from_sv($arg);
+
+T_N1QLPARAMS
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvIOK(SvRV($arg)))) {
+	    die(\"Not a valid Couchbase::N1QL::Params\");
+	}
+
+	$var = NUM2PTR(lcb_N1QLPARAMS*, SvIV(SvRV($arg)));
+
+OUTPUT
+T_VBC
+	sv_setref_pv($arg, \"Couchbase::BucketConfig\", (void*)$var);

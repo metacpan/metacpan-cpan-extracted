@@ -1,0 +1,51 @@
+{
+   "abstract" : "all you want to do with parameters for your program (or someone else's)",
+   "author" : [
+      "Thomas Orgis <thomas@orgis.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Param",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Storable" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Param" : {
+         "file" : "lib/Config/Param.pm",
+         "version" : "3.002000"
+      },
+      "Config::Param::FileWorker" : {
+         "file" : "lib/Config/Param/FileWorker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "3.002000"
+}

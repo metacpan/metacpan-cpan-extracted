@@ -1,0 +1,75 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::BBAuth - Yahoo!
+    Browser-Based Authentication for Catalyst.
+
+SYNOPSIS
+      use Catalyst qw(
+          Authentication
+          Authentication::Credential::BBAuth
+          Session
+          Session::Store::FastMmap
+          Session::State::Cookie
+      );
+
+      MyApp->config(
+          authentication => {
+              use_session => 1, # default 1. see C::P::Authentication
+              bbauth      => {
+                  appid  => 'your appid',
+                  secret => 'your secret',
+              },
+          },
+      );
+
+      sub default : Private {
+          my ( $self, $c ) = @_;
+          if ( $c->user_exists ) {
+              # $c->user setted
+          }
+      }
+
+      # redirect BBAuth login form
+      sub login : Local {
+          my ( $self, $c ) = @_;
+          $c->res->redirect( $c->authenticate_bbauth_url );
+      }
+
+      # login callback url
+      sub auth : Path('/auth') {
+          my ( $self, $c ) = @_;
+          if ( $c->authenticate_bbauth ) {
+              # login successful
+              $c->res->redirect( $c->uri_for('/') );
+          } else {
+              # login failed
+          }
+      }
+
+DESCRIPTION
+    This module provide authentication via Yahoo! Browser-Based
+    Authentication, using it's api.
+
+EXTENDED METHODS
+  setup
+    Fills the config with defaults.
+
+METHODS
+  authenticate_bbauth_url(%param)
+    Returns BBAuth login form url.
+
+  authenticate_bbauth
+    Authenticate by BBAuth.
+
+    Returns login succeeded or not.
+
+AUTHOR
+    Jiro Nishiguchi <jiro@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Catalyst::Plugin::Authentication
+
+    *   Yahoo::BBAuth
+

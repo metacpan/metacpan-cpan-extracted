@@ -1,0 +1,100 @@
+[% 
+    link = '<a href="http://search.cpan.org/dist/' _ builder.distribution _ '">' _ builder.distribution _ "</a>"
+    crosslink = '/distro/' _ builder.letter _ '/' _ builder.distribution
+
+    rss = builder.distribution _ '.rss'
+    htmltitle = 'Reports for ' _ builder.distribution
+    title = 'Reports for ' _ link
+
+    box_summ  = 1
+
+    crumb3_name = 'Distributions' ;
+    crumb3_href = '/' ;
+    crumb2_name = builder.letter ;
+    crumb2_href = '/distro/' _ crumb2_name ;
+    crumb1_name = builder.distribution ;
+%]
+
+<div class="orange_buttons">
+<a rel="nofollow" href="[% builder.distribution %].json">JSON</a>
+<a rel="nofollow" href="[% builder.distribution %].rss" >RSS</a>
+<a rel="nofollow" href="[% builder.distribution %].yaml">YAML</a>
+</div>
+
+[% IF processed %]<p>This page was last updated on <b>[% processed %]</b>.</p>[% END %]
+
+[% IF update %]
+<div class="ud">
+<p>Please note that this page is in an update queue, and as such the latest data may not be currently available.</p>
+</div>
+[% END %]
+
+<h2>PASS Summary</h2>
+<p>The following table lists the most recent version of [% distribution %] to 
+have had at least one PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+
+<div class="container">
+<table class="test_results">
+<tr><th><img src="/images/headings/perlversion.png" alt="Perl Version" /></th>
+[% FOREACH os IN builder.stats_oses %]
+<th><img src="/images/headings/[% IF os ; THEN ; os | lower ; ELSE ; 'blank' ; END %].png" alt="[% os %]" /></th>
+[% END %]
+</tr>
+[% FOREACH perl IN builder.stats_poff %]
+[% IF perl != '0' %]
+<tr>
+<td><small>[% perl %]</small></td>
+[% FOREACH oses IN builder.stats_oses %]
+[% os = oses | lower %]
+[% IF builder.stats.$perl.$os.version %]<td class="PASS"><small>[% builder.stats.$perl.$os.version %]</small></td>[% ELSE %]<td></td>[% END %]
+[% END %]
+</tr>
+[% END %]
+[% END %]
+</table>
+</div>
+
+<p>See also: Full PASS statistics for <a href="http://pass.cpantesters.org/distro/[% builder.letter %]/[% builder.distribution %].html">[% builder.distribution %]</a></p>
+
+<h2>Available Reports</h2>
+<p>This page details the test reports submitted for the CPAN distribution [% link %].</p>
+<p>To view individual reports, please click the grade text associated with each report.</p>
+
+[% FOREACH version = versions %]
+  <h2 id="[% versions_tag.$version -%]">[% builder.distribution %] [% version | html %]</a> 
+  [% IF summary.$version.keys %]
+    ([%- FOREACH status = summary.$version.keys.sort -%]
+      [%- c = summary.$version.$status -%]
+      [% c %]<span class="[% status | html %]"> [% status ; IF status != "ALL" ; IF c > 1 ; IF status == 'PASS' %]es[% ELSE %]s[% END ; END ; END ; UNLESS loop.last %], [% END -%]</span>[% -%]    
+    [% END -%])
+  [% END %]</h2>
+
+    <table class="test_results">
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Perl version</th>
+          <th>OS name</th>
+          <th>OS version</th>
+          <th>Architecture</th>
+        </tr>
+      </thead>
+      <tbody id="report_data">
+      [% IF byversion.$version %]
+      [% FOREACH report = byversion.$version %]
+      <tr>
+        <td class="[% report.status | html %]"><a rel="nofollow" href="[% reportlink2 %]/[% report.guid || report.id %]">[% report.status | html %]</a></td>
+        <td>[% report.perl | html %]</td>
+        <td>[% report.osname | ucfirst | html %]</td>
+        <td>[% report.osvers | html %]</td>
+        <td>[% report.archname || report.platform | trim | html %]</td>
+      </tr>
+      [% END %]
+      [% ELSE %]
+	    <tr><td colspan="5">No reports currently listed.</td></tr>
+      [% END %]
+      </tbody>
+    </table>
+[% END %]

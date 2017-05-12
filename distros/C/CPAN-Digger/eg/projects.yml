@@ -1,0 +1,8 @@
+---
+projects:
+  - name: Dev-CPAN-Digger
+    version: 1.00
+    author: SZABGAB_dev
+    path: .
+    descr: The development version of CPAN::Digger
+

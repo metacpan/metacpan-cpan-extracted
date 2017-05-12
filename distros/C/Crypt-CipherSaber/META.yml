@@ -1,0 +1,25 @@
+---
+abstract: 'Perl module implementing CipherSaber encryption.'
+author:
+  - 'chromatic <chromatic@cpan.org>'
+build_requires:
+  Test::Simple: '0.60'
+  Test::Warn: '0.30'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-CipherSaber
+provides:
+  Crypt::CipherSaber:
+    file: lib/Crypt/CipherSaber.pm
+    version: '1.01'
+requires:
+  Scalar::Util: '1.004002'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.01'

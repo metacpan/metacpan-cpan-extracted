@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/cisco-conf.pl
+bin/cisco-info.pl
+bin/cisco-intf.pl
+bin/cisco-line.pl
+bin/cisco-pass.pl
+bin/cisco-ping.pl
+t/00-Cisco-Management.t
+t/01-Cisco-Pass.t
+test.pl
+lib/Cisco/Management.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

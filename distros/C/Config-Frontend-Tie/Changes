@@ -1,0 +1,5 @@
+0.02    I used 'Config::Frontend::String'. Had to be 
+        'Config::Backend::String', in t/1.t.
+
+0.01	Tie::Config-Frontend initial version.
+

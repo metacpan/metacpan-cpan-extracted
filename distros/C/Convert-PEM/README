@@ -1,0 +1,231 @@
+NAME
+    Convert::PEM - Read/write encrypted ASN.1 PEM files
+
+SYNOPSIS
+        use Convert::PEM;
+        my $pem = Convert::PEM->new(
+                       Name => "DSA PRIVATE KEY",
+                       ASN => qq(
+                           DSAPrivateKey SEQUENCE {
+                               version INTEGER,
+                               p INTEGER,
+                               q INTEGER,
+                               g INTEGER,
+                               pub_key INTEGER,
+                               priv_key INTEGER
+                           }
+                      ));
+
+        my $keyfile = 'private-key.pem';
+        my $pwd = 'foobar';
+
+        my $pkey = $pem->read(
+                       Filename => $keyfile,
+                       Password => $pwd
+                 );
+
+        $pem->write(
+                       Content  => $pkey,
+                       Password => $pwd,
+                       Filename => $keyfile
+                 );
+
+DESCRIPTION
+    *Convert::PEM* reads and writes PEM files containing ASN.1-encoded
+    objects. The files can optionally be encrypted using a symmetric cipher
+    algorithm, such as 3DES. An unencrypted PEM file might look something
+    like this:
+
+        -----BEGIN DH PARAMETERS-----
+        MB4CGQDUoLoCULb9LsYm5+/WN992xxbiLQlEuIsCAQM=
+        -----END DH PARAMETERS-----
+
+    The string beginning "MB4C..." is the Base64-encoded, ASN.1-encoded
+    "object."
+
+    An encrypted file would have headers describing the type of encryption
+    used, and the initialization vector:
+
+        -----BEGIN DH PARAMETERS-----
+        Proc-Type: 4,ENCRYPTED
+        DEK-Info: DES-EDE3-CBC,C814158661DC1449
+
+        AFAZFbnQNrGjZJ/ZemdVSoZa3HWujxZuvBHzHNoesxeyqqidFvnydA==
+        -----END DH PARAMETERS-----
+
+    The two headers ("Proc-Type" and "DEK-Info") indicate information about
+    the type of encryption used, and the string starting with "AFAZ..." is
+    the Base64-encoded, encrypted, ASN.1-encoded contents of this "object."
+
+    The initialization vector ("C814158661DC1449") is chosen randomly.
+
+USAGE
+  $pem = Convert::PEM->new( %arg )
+    Constructs a new *Convert::PEM* object designed to read/write an object
+    of a specific type (given in *%arg*, see below). Returns the new object
+    on success, "undef" on failure (see *ERROR HANDLING* for details).
+
+    *%arg* can contain:
+
+    *   Name
+
+        The name of the object; when decoding a PEM-encoded stream, the name
+        in the encoding will be checked against the value of *Name*.
+        Similarly, when encoding an object, the value of *Name* will be used
+        as the name of the object in the PEM-encoded content. For example,
+        given the string "FOO BAR", the output from *encode* will start with
+        a header like:
+
+            -----BEGIN FOO BAR-----
+
+        *Name* is a required argument.
+
+    *   ASN
+
+        An ASN.1 description of the content to be either encoded or decoded.
+
+        *ASN* is a required argument.
+
+    *   Macro
+
+        If your ASN.1 description (in the *ASN* parameter) includes more
+        than one ASN.1 macro definition, you will want to use the *Macro*
+        parameter to specify which definition to use when encoding/decoding
+        objects. For example, if your ASN.1 description looks like this:
+
+            Foo ::= SEQUENCE {
+                x INTEGER,
+                bar Bar
+            }
+
+            Bar ::= INTEGER
+
+        If you want to encode/decode a "Foo" object, you will need to tell
+        *Convert::PEM* to use the "Foo" macro definition by using the
+        *Macro* parameter and setting the value to "Foo".
+
+        *Macro* is an optional argument.
+
+  $obj = $pem->decode(%args)
+    Decodes, and, optionally, decrypts a PEM file, returning the object as
+    decoded by *Convert::ASN1*. The difference between this method and
+    *read* is that *read* reads the contents of a PEM file on disk; this
+    method expects you to pass the PEM contents as an argument.
+
+    If an error occurs while reading the file or decrypting/decoding the
+    contents, the function returns *undef*, and you should check the error
+    message using the *errstr* method (below).
+
+    *%args* can contain:
+
+    *   Content
+
+        The PEM contents.
+
+    *   Password
+
+        The password with which the file contents were encrypted.
+
+        If the file is encrypted, this is a mandatory argument (well, it's
+        not strictly mandatory, but decryption isn't going to work without
+        it). Otherwise it's not necessary.
+
+  $blob = $pem->encode(%args)
+    Constructs the contents for the PEM file from an object: ASN.1-encodes
+    the object, optionally encrypts those contents.
+
+    Returns *undef* on failure (encryption failure, file-writing failure,
+    etc.); in this case you should check the error message using the
+    *errstr* method (below). On success returns the constructed PEM string.
+
+    *%args* can contain:
+
+    *   Content
+
+        A hash reference that will be passed to *Convert::ASN1::encode*, and
+        which should correspond to the ASN.1 description you gave to the
+        *new* method. The hash reference should have the exact same format
+        as that returned from the *read* method.
+
+        This argument is mandatory.
+
+    *   Password
+
+        A password used to encrypt the contents of the PEM file. This is an
+        optional argument; if not provided the contents will be unencrypted.
+
+  $obj = $pem->read(%args)
+    Reads, decodes, and, optionally, decrypts a PEM file, returning the
+    object as decoded by *Convert::ASN1*. This is implemented as a wrapper
+    around *decode*, with the bonus of reading the PEM file from disk for
+    you.
+
+    If an error occurs while reading the file or decrypting/decoding the
+    contents, the function returns *undef*, and you should check the error
+    message using the *errstr* method (below).
+
+    In addition to the arguments that can be passed to the *decode* method
+    (minus the *Content* method), *%args* can contain:
+
+    *   Filename
+
+        The location of the PEM file that you wish to read.
+
+  $pem->write(%args)
+    Constructs the contents for the PEM file from an object: ASN.1-encodes
+    the object, optionally encrypts those contents; then writes the file to
+    disk. This is implemented as a wrapper around *encode*, with the bonus
+    of writing the file to disk for you.
+
+    Returns *undef* on failure (encryption failure, file-writing failure,
+    etc.); in this case you should check the error message using the
+    *errstr* method (below). On success returns the constructed PEM string.
+
+    In addition to the arguments for *encode*, *%args* can contain:
+
+    *   Filename
+
+        The location on disk where you'd like the PEM file written.
+
+  $pem->errstr
+    Returns the value of the last error that occurred. This should only be
+    considered meaningful when you've received *undef* from one of the
+    functions above; in all other cases its relevance is undefined.
+
+  $pem->asn
+    Returns the *Convert::ASN1* object used internally to decode and encode
+    ASN.1 representations. This is useful when you wish to interact directly
+    with that object; for example, if you need to call *configure* on that
+    object to set the type of big-integer class to be used when
+    decoding/encoding big integers:
+
+        $pem->asn->configure( decode => { bigint => 'Math::Pari' },
+                              encode => { bigint => 'Math::Pari' } );
+
+ERROR HANDLING
+    If an error occurs in any of the above methods, the method will return
+    "undef". You should then call the method *errstr* to determine the
+    source of the error:
+
+        $pem->errstr
+
+    In the case that you do not yet have a *Convert::PEM* object (that is,
+    if an error occurs while creating a *Convert::PEM* object), the error
+    can be obtained as a class method:
+
+        Convert::PEM->errstr
+
+    For example, if you try to decode an encrypted object, and you do not
+    give a passphrase to decrypt the object:
+
+        my $obj = $pem->read( Filename => "encrypted.pem" )
+            or die "Decryption failed: ", $pem->errstr;
+
+LICENSE
+    Convert::PEM is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR & COPYRIGHTS
+    Except where otherwise noted, Convert::PEM is Copyright Benjamin Trott,
+    cpan@stupidfool.org. All rights reserved.
+

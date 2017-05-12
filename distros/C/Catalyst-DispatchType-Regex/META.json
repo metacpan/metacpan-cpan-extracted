@@ -1,0 +1,66 @@
+{
+   "abstract" : "Regex DispatchType",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-DispatchType-Regex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.90060",
+            "Moose" : "0",
+            "Text::Balanced" : "0",
+            "Text::SimpleTable" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::DispatchType::LocalRegex" : {
+         "file" : "lib/Catalyst/DispatchType/LocalRegex.pm"
+      },
+      "Catalyst::DispatchType::LocalRegexp" : {
+         "file" : "lib/Catalyst/DispatchType/LocalRegexp.pm"
+      },
+      "Catalyst::DispatchType::Regex" : {
+         "file" : "lib/Catalyst/DispatchType/Regex.pm",
+         "version" : "5.90035"
+      },
+      "Catalyst::DispatchType::Regexp" : {
+         "file" : "lib/Catalyst/DispatchType/Regexp.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-DispatchType-Regex"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/catalyst-dispatch-regex"
+      }
+   },
+   "version" : "5.90035",
+   "x_test_requires" : {
+      "Data::Dumper" : "0",
+      "MRO::Compat" : "0",
+      "Scalar::Util" : "0",
+      "Test::More" : "0",
+      "namespace::autoclean" : "0"
+   }
+}

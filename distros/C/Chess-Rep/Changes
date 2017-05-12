@@ -1,0 +1,41 @@
+Revision history for Chess-Rep                          -*- change-log -*-
+
+0.6	Jan 26, 2010
+
+	http://rt.cpan.org/Ticket/Display.html?id=53929 -- applied a patch
+	(thanks Olivier Macchioni) that generates the smallest SAN notation
+	in case of an ambiguity.
+
+0.5	Feb 05, 2009
+	Fixed two bugs:
+
+	- allow en-passant while in check (it is possible that a pawn moves
+	  2 squares checking the enemy king, and a legal en-passant move can
+	  get out of check).  Thanks Alan Curry.
+
+	- A move b2xa1=Q (promote black pawn by capturing pawn from a1) was
+	  interpreted as en-passant and always cleared field a2.
+
+0.4	Aug 03, 2008
+	INCOMPATIBLE changes!  I skipped over 0.3 version number for this
+	reason.  The new version uses "0x88 board representation", along
+	with other changes that should make speed a lot better (for example,
+	pieces are bitwise codified in an integer, rather than a character,
+	making it a lot cheaper to do various analysis; see the
+	documentation).
+
+	Bugs fixed:
+
+	- supports "O-O-O+" and "O-O+" (rarely seen, but it can happen to
+	  check from a castling move).
+
+	- now catches illegal moves where FROM is specified (i.e. "a2e4"
+	  from the starting position) -- thanks Ken Takusagawa for the
+	  report.
+
+0.2	Apr 26, 2008
+	Fixed a nasty bug that caused "e8g8" to be always misinterpreted as
+	a O-O, even when another piece than the K was moved
+
+0.1	Apr 04, 2008
+	First public release.

@@ -1,0 +1,50 @@
+[% 
+    no_wrapper = 1;
+    DEFAULT controller = c.controller;
+    DEFAULT form       = controller.form(c);
+    DEFAULT method_name = 0;
+    SET field_names    = xls.field_names || c.req.params.item('_field_names') || form.field_names;
+    DEFAULT livegrid  = yui.livegrid(
+                'form'        => form, 
+                'results'     => results,
+                'controller'  => controller,
+                'field_names' => field_names,
+                'method_name' => method_name,
+                'c'           => c,
+                );
+    DEFAULT serializer = yui.serializer();
+%]
+[% BLOCK make_row %]
+  <row>
+  [% FOR f = field_names;
+        SET hashref = serializer.serialize_object(
+                    'object'      => r, 
+                    'col_names'   => field_names, 
+                    'show_related_values' => livegrid.show_related_values,
+                    'method_name' => method_name,
+                    'c'           => c,
+                    'parent'      => (object || 0),
+            );
+        '<cell>'; hashref.item(f) | html; '</cell>';
+                    
+   %]
+  [% END %]
+  </row>
+[% END %]
+<workbook>
+    <worksheet name="[% controller.model_name.replace('\\W+','_') %]">
+      <row>
+     [% FOR fn = field_names %]
+     [% label = livegrid.column(fn).label 
+                || form.field(fn).label 
+                || form.metadata.labels.$fn 
+                || fn %]
+       <bold><cell>[% label | html %]</cell></bold>
+     [% END %]
+      </row>
+     [% WHILE (r = results.next);
+            PROCESS make_row;
+        END;
+      %]
+    </worksheet>
+</workbook>

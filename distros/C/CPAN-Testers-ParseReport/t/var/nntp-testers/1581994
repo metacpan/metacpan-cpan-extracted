@@ -1,0 +1,166 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:1581994
+Return-Path: <andreas.koenig.gmwojprw@franz.ak.mind.de>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 23748 invoked from network); 2 Jun 2008 19:03:57 -0000
+Received: from x1a.develooper.com (HELO x1.develooper.com) (216.52.237.111)
+  by x6.develooper.com with SMTP; 2 Jun 2008 19:03:57 -0000
+Received: (qmail 19757 invoked by uid 225); 2 Jun 2008 19:03:57 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 19747 invoked by alias); 2 Jun 2008 19:03:56 -0000
+X-Spam-Status: No, hits=-6.6 required=8.0
+	tests=BAYES_00,PERLBUG_CONF
+X-Spam-Check-By: la.mx.develooper.com
+Received: from franz.ak.mind.de (HELO franz.ak.mind.de) (212.42.235.66)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Mon, 02 Jun 2008 12:03:53 -0700
+Received: from franz.ak.mind.de (localhost.localdomain [127.0.0.1])
+	by k75.linux.bogus (8.14.3/8.14.3/Debian-1) with ESMTP id m52J3l1b022350
+	for <cpan-testers@perl.org>; Mon, 2 Jun 2008 21:03:47 +0200
+Date: Mon, 2 Jun 2008 21:03:47 +0200
+Subject: PASS Scriptalicious-1.15 i686-linux-64int 2.6.22-1-k7
+To: cpan-testers@perl.org
+Message-ID: <1212433427.76f80.28609@k75>
+X-Reported-Via: Test::Reporter 1.4001, via CPAN::Reporter 1.15
+From: andreas.koenig.gmwojprw@franz.ak.mind.de
+
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.11.0 patch 33986, created by CPAN-Reporter-1.15. 
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+make[3]: Entering directory `/home/sand/.cpan/build/Scriptalicious-1.15-Ds74v6'
+PERL_DL_NONLAZY=1 /home/src/perl/repoperls/installed-perls/perl/pRLNxVQ/perl-5.10.0@33986/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01-mmmdelicious......ok
+t/02-script............ok
+t/03-yaml..............ok
+t/04-fork..............ok
+t/05-prompt............ok
+t/06-anydump...........ok
+t/07-tsay..............ok
+t/08-unit..............ok
+t/09-noyaml............ok
+All tests successful.
+Files=9, Tests=60,  5 wallclock secs ( 0.05 usr  0.01 sys +  2.96 cusr  0.33 csys =  3.35 CPU)
+Result: PASS
+make[3]: Leaving directory `/home/sand/.cpan/build/Scriptalicious-1.15-Ds74v6'
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.80
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    LANG = en_US.utf8
+    PATH = /usr/lib/ccache:/home/sand/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games:/usr/local/perl/bin:/usr/X11/bin:/sbin:/usr/sbin
+    PERL5LIB = 
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 28609
+    PERL5_CPAN_IS_RUNNING = 28609
+    SHELL = /usr/bin/zsh
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/src/perl/repoperls/installed-perls/perl/pRLNxVQ/perl-5.10.0@33986/bin/perl
+    $UID/$EUID = 1005 / 1005
+    $GID = 1005 1005
+    $EGID = 1005 1005
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.9205   
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.23     
+    ExtUtils::Command   1.14     
+    ExtUtils::Install   1.50_01  
+    ExtUtils::MakeMaker 6.44     
+    ExtUtils::Manifest  1.51_01  
+    ExtUtils::ParseXS   2.19_01  
+    File::Spec          3.2701   
+    Module::Build       0.2808_02
+    Module::Signature   0.55     
+    Test::Harness       3.10     
+    Test::More          0.80     
+    YAML                0.66     
+    YAML::Syck          1.04     
+    version             0.74     
+
+
+--
+
+Summary of my perl5 (revision 5 version 11 subversion 0 patch 33986) configuration:
+  Platform:
+    osname=linux, osvers=2.6.22-1-k7, archname=i686-linux-64int
+    uname='linux k75 2.6.22-1-k7 #1 smp sun jul 29 15:15:55 utc 2007 i686 gnulinux '
+    config_args='-Dprefix=/home/src/perl/repoperls/installed-perls/perl/pRLNxVQ/perl-5.10.0@33986 -Dinstallusrbinperl=n -Uversiononly -Dusedevel -des -Ui_db -Duse64bitint'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=define, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include'
+    ccversion='', gccversion='4.1.2 20061115 (prerelease) (Debian 4.1.1-21)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -fstack-protector -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib /usr/lib64
+    libs=-lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc -lgdbm_compat
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=/lib/libc-2.7.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.7'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -O2 -L/usr/local/lib -fstack-protector'

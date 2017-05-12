@@ -1,0 +1,419 @@
+######################################################################
+    Config::Patcher::Util 0.09
+######################################################################
+
+NAME
+    Config::Patch - Patch configuration files and unpatch them later
+
+SYNOPSIS
+        my $patcher = Config::Patch->new( 
+            file => "/etc/sudoers",
+        );
+
+          # Add a line at the end of /etc/sudoers and reset the file
+          # to its original state later on.
+        my $patch = Config::Patch::Hunk->new(
+            key  => "myapp",
+            mode => "append",
+            text => "joeschmoe ALL= NOPASSWD:/etc/rc.d/init.d/myapp",
+        );
+
+        $patcher->apply( $patch );
+        $patcher->save();
+
+          # later on: Get /etc/sudoers back to its original state
+        $patcher->eject( "myapp" );
+        $patcher->save();
+
+DESCRIPTION
+    Config::Patch provides an interface to modify configuration files in a
+    way so that the changes can be rolled back later on. For example, let's
+    say that an application wants to append the line
+
+        joeschmoe ALL= NOPASSWD:/etc/rc.d/init.d/myapp
+
+    at the end of the /etc/sudoers file to allow user joeschmoe to start and
+    stop the myapp application as root without having to type a password.
+
+    Normally, you'd have to do this by hand or via an installation script.
+    And later on, when myapp gets ejected from the system, you'd have to
+    remember to delete the line from /etc/sudoers as well.
+
+    Config::Patch provides an automated way to apply this 'patch' to the
+    configuration file and to detect and eject it later on. It does this by
+    placing special markers around the insertion, without having to refer to
+    any external meta data.
+
+    Note that a 'patch' in this context is just a snippet of text that's to
+    be applied somewhere within the file (not to be confused with the
+    diff-formatted text used by the "patch" Unix utility). Patches are
+    line-based, "Config::Patch" always adds/removes entire lines.
+
+  Command line usage
+    To facilitate its usage, "Config::Patch" comes with a command line
+    script that performs all functions:
+
+            # Append a patch
+        echo "my patch text" | config-patch -a -k key -f textfile
+
+            # Patch a file by search-and-replace
+        echo "none:" | config-patch -s 'all:.*' -k key -f config_file
+
+            # Comment out sections matched by a regular expression:
+        config-patch -c '(?ms-xi:^all:.*?\n\n)' -k key -f config_file
+
+            # Remove a previously applied patch
+        config-patch -r -k key -f textfile
+
+    You can only patch a file *once* with a given key. Note that a single
+    patch might result in multiple patched sections within a file if you're
+    using the "replace()" or "comment_out()" methods.
+
+    To apply different patches to the same file, use different keys. They
+    can be can rolled back separately.
+
+  API usage
+    With Config::Patch, you run
+
+        my $patcher = Config::Patch->new( 
+            file => "/etc/sudoers",
+        );
+
+    to create a patcher object and then define a patch that appends a line
+    to the end of the file:
+
+        my $patch = Config::Patch::Hunk->new(
+            key  => "myapp",
+            mode => "append",
+            text => "joeschmoe ALL= NOPASSWD:/etc/rc.d/init.d/myapp",
+        );
+
+    After applying the patch and saving the changes back to the original
+    file, the patch will be in place:
+
+        $patcher->apply( $patch );
+        $patcher->save();
+
+    along with markers that allow Config::Patch to identify the patch later
+    on and update or eject it:
+
+        /etc/sudoers
+        *------------------------------------------------
+        | ...
+        | previous content
+        | ...
+        | #(Config::Patch-myapp-append)
+        | joeschmoe ALL= NOPASSWD:/etc/rc.d/init.d/myapp
+        | #(Config::Patch-myapp-append)
+        *------------------------------------------------
+
+    The markers are commented out by '#' marks, and are hence ignored by the
+    application reading the configuration file. However, Config::Patch uses
+    them later on to identify and expunge the comments from the file.
+
+    To remove the patch from the file later on, call
+
+        $patcher->eject( "myapp" );
+        $patcher->save();
+
+    and the patcher will scrub the new patch from /etc/sudoers and reset the
+    file to its original state.
+
+    The "save()" method will write back the file under the name of the
+    currently active file. The path to this file was either set in the
+    Config::Patch constructor with the "file" parameter, or gets set later
+    explicitly via the "file($path)" accessor. If you want to save patched
+    content under a different name, use
+
+        $patcher->save_as("newfile.dat");
+
+    This will also modify the current file setting, which means that if you
+    use read() or save() later on, it will use the newly set name.
+
+    To peek at the manipulated output before (or after) it's been written,
+    use "$patcher->data()" which returns the current state of the patcher's
+    text data.
+
+    Patch hunks can be applied to a file in several ways, as specified in
+    the hunk's "mode" field. "append" adds the patch at the end of the file,
+    "prepend" at the beginning, and "replace" searches for a regular
+    expression within the file and then replaces it by the patch. For
+    details on application modes, see the Config::Patch::Hunk section below.
+
+  Methods
+    "new()"
+        Creates a new Config::Patch object. Takes an optional "file"
+        parameter to specify the 'current' file Config::Patch operates on.
+
+    "file()"
+        Accessor for the path to the current file. Supports read and write.
+
+    "read()"
+        Read the current file into memory. Called automatically by apply()
+        if no data has been read into memory yet.
+
+    "data()"
+        Return the text data Config::Patch is operating on.
+
+    "save()"
+        Write back the data to the current file.
+
+    "save_as( $file )"
+        Write back the data to a file named $file. Sets $file as the current
+        file.
+
+    "apply( $patch )"
+        Applies a patch (a Config::Patch::Hunk object) to the data.
+
+    "eject( $key )"
+        Removes a patch applied previously under the specified key $key.
+        Instead of a key string, it optionally takes a Config::Patch::Hunk
+        object.
+
+    "eject_all()"
+        Remove all patches from the data.
+
+    "parse()"
+        Returns a list of all applied patches so far as Config::Patch::Hunk
+        objects.
+
+            for my $patch ( $patcher->parse() ) {
+                print $patch->text();
+            }
+
+    "patched( $key )"
+        Checks if a patch with the given key was applied to the data already
+        and returns a true value if so.
+
+  Config::Patch::Hunk Objects
+    "key()"
+        Returns/sets the key under which the key will be applied. The key
+        serves to identify the hunk and to distinguish it from other hunks
+        when identifying/updating/removing the hunk later.
+
+    "mode()"
+        How the patch will be applied to the data. Supported modes are
+
+        "append"
+            Add the patch at the end of the data.
+
+        "prepend"
+            Insert the patch at the beginning of the data.
+
+        "replace"
+            Replace line ranges matching the regular expression in "regex"
+            with the patch. Encode the replaced data and store it in the
+            patch header, so that it can be put back into place, when the
+            patch is ejected later.
+
+            For example, to, replace the 'all:' target in a Makefile and all
+            of its production rules by a dummy rule, use
+
+                my $hunk = Config::Patch::Hunk->new(
+                    key  => "myapp",
+                    mode => "replace",
+                    regex => qr(^all:.*?\n\n)sm),
+                    text => "all:\n\techo 'all is gone!'\n",
+                );
+
+                $patcher->apply( $hunk );
+
+            to transform
+
+                Makefile (before)
+                *------------------------------------------------
+                | all: 
+                |     do-this-and-that
+                *------------------------------------------------
+
+            into
+
+                Makefile (after)
+                *------------------------------------------------
+                | #(Config::Patch-myapp-replace)
+                | all:
+                |     echo 'all is gone!'
+                | #(Config::Patch::replace)
+                | # YWxsOgoJZG8tdGhpcy1hbmQtdGhhdAoK
+                | #(Config::Patch::replace)
+                | #(Config::Patch-myapp-replace)
+                *------------------------------------------------
+
+            Note the Base64 encoding which carries the original content of
+            the replace line. To remove the patch, run
+
+                $patcher->eject( "myapp" );
+                $patcher->save();
+
+            and the original content of Makefile will be restored:
+
+                Makefile (restored)
+                *------------------------------------------------
+                | all: 
+                |     do-this-and-that
+                *------------------------------------------------
+
+            Tip: To have a hunk comment out a section of the data without
+            adding anything to replace it, simply use an empty "text" field
+            in "replace" mode.
+
+        "insert-after"
+            Inserts the hunk after a line matching the regular expression
+            defined in "rregex".
+
+                    # Insert "foo=bar" into "[section]". 
+                my $hunk = Config::Patch::Hunk->new(
+                    key   => "myapp",
+                    mode  => "insert-after",
+                    regex => qr(^\[section\])m,
+                    text  => "foo=bar", );
+
+                $patcher->apply( $hunk );
+
+            transforms
+
+                [section]
+                blah
+
+            into
+
+                [section]
+                #(Config::Patch-myapp-insert)
+                foo=bar
+                #(Config::Patch-myapp-insert)
+                blah
+
+        "insert-before"
+            Inserts the hunk *before* a line matching the regular expression
+            defined in $regex.
+
+                    # Insert a new section before [section]
+                my $hunk = Config::Patch::Hunk->new(
+                    key   => "myapp",
+                    mode  => "insert-before",
+                    regex => qr(^\[section\])m,
+                    text  => "[newsection]\nfoo=bar\n\n"
+                );
+
+                $patcher->apply( $hunk );
+
+            transforms
+
+                [section]
+                blah
+
+            into
+
+                #(Config::Patch-myapp-insert)
+                [newsection]
+                foo=bar
+    
+                #(Config::Patch-myapp-insert)
+                [section]
+                blah blah
+
+        "update"
+            Finds existing hunks and updates them with new values.
+
+                    # Update "myapp" hunk with new value
+                my $hunk = Config::Patch::Hunk->new(
+                    key   => "myapp",
+                    mode  => "update",
+                    text  => "foo=woot", );
+
+            While this could be done by removing the hunk via "eject" and
+            then adding it, "update" makes sure the hunk stays exactly in
+            place.
+
+    "regex"
+        Patch locations are all lines (or line ranges for multi-line
+        regexes) matching the regular expression in "regex" (qr/.../).
+
+    "text()"
+        The content text the hunk adds to the data.
+
+  Stripping everything but the hunks
+    The method "$patcher->patches_only()" will trim the surrounding text
+    from the data and just leave the patched sections in place.
+
+  Patches in Memory
+    Config::Patcher isn't limited to operating on files, you can just as
+    well operate solely in memory. The "data()" method is a read/write
+    accessor to the data string the patcher works on.
+
+        my $patcher = Config::Patch->new();
+        $patcher->data( "line1\n", "line2\n" );
+
+        $patcher->apply( $patch );
+        print $patcher->data();
+
+  Updating patches
+    Applying a patch if a patch with the same key has already been applied
+    results in an error. For this purpose, use a hunk with the mode field
+    set to 'update'.
+
+  Newline issues
+    Config::Patch operates line-based, which requires that every line ends
+    with a newline. If you read in a file with trailing characters that
+    aren't ended with a newline, Config::Patch will add a newline at the
+    end.
+
+    The same applies for patches. Patch lines need to be terminated by a
+    newline, if you forget to specify them that way, Config::Patch will
+    correct it for you.
+
+  Examining patches
+    To find out what hunks have been applied to the data, use the "parse()"
+    method which returns a list of hunks:
+
+        for my $hunk ( $patcher->parse() ) {
+            print "Found hunk: ", $hunk->text(), "\n";
+        }
+
+    Even after applying a hunk, you have access to a number of updated
+    fields:
+
+        print "Hunk inserted between positions ",
+              $hunk->pos_start(), 
+              " and ",
+              $hunk->pos_end(), 
+              "\n";
+
+    Both "pos_start" and "pos_end" refer to offsets *including* the markers
+    Config::Patch applies around the content. To find the location of the
+    content of the patch, use "pos_content_start" and "pos_content_end"
+    instead. To obtain the entire text of the hunk (including patch
+    headers), use "as_string()".
+
+  Specify a different comment character
+    "Config::Patch" assumes that lines starting with a comment character are
+    ignored by their applications. This is important, since "Config::Patch"
+    uses comment lines to hides vital patch information in them for
+    recovering from patches later on.
+
+    By default, this comment character is '#', usable for file formats like
+    YAML, Makefiles, and Perl. To change this default and use a different
+    character, specify the comment character like
+
+        my $patcher = Config::Patch->new( 
+            comment_char => ";",  # comment char is now ";"
+            # ...
+        );
+
+    in the constructor call. The command line script "config-patch" expects
+    a different comment character with the "-C" option, check its manpage
+    for details. Make sure to use the same comment character for patching
+    and unpatching, otherwise chaos will ensue.
+
+    Other than that, "Config::Patch" is format-agnostic. If you need to pay
+    attention to the syntax of the configuration file to be patched, create
+    a subclass of "Config::Patch" and put the format specific logic there.
+
+COPYRIGHT AND LICENSE
+    Copyright 2005-2010 by Mike Schilli. This library is free software; you
+    can redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+AUTHOR
+    2005, Mike Schilli <cpan@perlmeister.com>
+

@@ -1,0 +1,13 @@
+Changes
+IniHash-2.4.patch
+IniSearch.pm
+MANIFEST
+Makefile.PL
+README
+global.ini
+t/global.ini
+t/global.ini.etc
+t/test.t
+t/testSection.ini
+t/testSection.ini.etc
+testSection.ini

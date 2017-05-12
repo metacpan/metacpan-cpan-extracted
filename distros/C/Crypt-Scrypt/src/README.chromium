@@ -1,0 +1,5 @@
+Tarsnap scrypt set up as a library.  Modified to explicitly set the visibility
+attribute on the scryptenc_* and scryptdec_* functions to keep the SHA256
+functions private.
+
+See:  http://www.tarsnap.com/scrypt.html

@@ -1,0 +1,302 @@
+NAME
+    CGI::AppBuilder::MapDisps - Display tasks
+
+SYNOPSIS
+      use CGI::AppBuilder::MapDisps;
+
+      my $sec = CGI::AppBuilder::MapDisps->new();
+      my ($sta, $msg) = $sec->exe_sql($ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  disp_new($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_cpsj($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+            pid             : project id such as ckpt, owb, dba, etc.
+            task            : task name required such as task1,task2,etc.
+            target(sel_sn1) : select one (DB/server name) defining sid
+            args(sel_sn2)   : select two (Arguments)
+            task_fn         : task file name containing all the tasks defined
+            svr_conn        : host/server connection info
+            db_conn         : db connection info for each target/server
+            task_conn       : special connection for tasks. 
+                              It overwrites db_conn for the task
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: $pr will contain the parameters adn output from running the
+    PL/SQL.
+
+  check_tabs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History:
+
+  check_droptabs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History:
+
+  disp_map_task($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History: 08/28/2013 (htu): - 1. added code to only show USS and ASJ if
+    the user role is dev 2. display run_setanypwd if user role is adm
+
+  disp_archive($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_hids($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_tabs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_rpts($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_client($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_project($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_study($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_list($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_job($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History: 08/28/2013 (htu): sorted job_id descendingly.
+
+  disp_logfiles($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  build_links($q,$pr,$ar)
+    Input variables:
+
+      $pr   - array ref containing id and name 
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_links($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+HISTORY
+    *   Version 0.10
+
+        This version extracted from jp2.pl on 09/08/2010.
+
+    *   Version 0.20
+
+          09/08/2010 (htu): start this PM
+          02/16/2012 (htu): started using set_ids in disp_map_task
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2009 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 1950:
+        You forgot a '=back' before '=head1'
+

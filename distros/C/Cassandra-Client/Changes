@@ -1,0 +1,54 @@
+Revision history for Cassandra-Client
+
+0.10    2017/01/30
+
+      * Add a retry policy implementation for generic request failures
+      * Throttler: finally fix the feedback mechanism
+      * Rework shutdown() to not need asynchronous code
+      * Rework the pool management logic
+      * Support for UTF-8 authentication data
+      * Convenience method row_hashes() on a ResultSet
+      * Basic TLS support
+      * Make sure file handles always get closed when shutdown() is called
+
+0.09    2016/11/15
+
+      * Fix support for Perl 5.20 and later
+      * Fix a class of memory leaks caused by recursion using closures
+      * Add support for TIME/DATE/TINYINT/SMALLINT data types added in CQL 3.3
+      * Avoid SIGPIPE when we connect to localhost but Cassandra is not present
+      * Add support for named parameters
+
+0.08    2016/10/25
+
+      * Change event loop implementation to EV
+      * Redesign wait_for_schema_agreement, to actually wait for the schema agreement
+      * Support for proper retry settings
+      * Handle request backlogs by queueing them or failing them early
+      * Add stack traces to asynchronous queries with errors
+      * Fix handling of nested types, like list<frozen<map<int,boolean>>>
+
+0.07    2016/10/10
+
+      * Experimental support for client-side throttling
+      * No more Perl 5.8 support -- 5.10 is now required
+      * Addresses an error that can occur when a query is retried against a node that doesn't know that query
+      * Fix a rare issue causing random "Request timed out" when utf8-flagged data is passed to non-utf8 types (ascii, blob)
+
+0.06    2016/09/26
+
+      * Hopefully fixes support for Perl 5.8
+      * Addresses a documentation hole about the 'timestamp' type
+      * Support for the 'varint' type
+      * Support for the 'decimal' type
+      * Addresses an issue that occurred when both the AnyEvent and synchronous options were used
+      * Some refactoring to allow for future changes
+
+0.05    2016/09/06
+
+      * Updates Makefile.PL to list the correct requirements
+
+0.04    2016/09/05
+
+      * First version, released on an unsuspecting world.
+

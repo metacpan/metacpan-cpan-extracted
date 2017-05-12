@@ -1,0 +1,657 @@
+Revision history for Perl extension Chart::Clicker.
+
+2.90 Dec 14 2016
+
+2.89 Dec 14 2016
+
+2.88 Mar 31 2014
+
+2.87 Jan 24 2014
+  - Implement divvy strategies with tick_division_type (rbt)
+
+2.83 Jun 21 2012
+  - Remove a duplicate file (Thanks Jotam)
+
+2.82 Jun 19 2012
+  - Remove accidental label border (Thanks Eric Busto)
+
+2.81 Mar 19 2012
+  - Don't throw away old data on add_data($hashref) (pozorvlak)
+
+2.80 Mar 5 2012
+  - Minor POD updates.
+
+2.78 Feb 15 2012
+  - Add lots of POD.
+
+2.77 Feb 13 2012
+  - Fix synopsis of Axis (Thanks Gisbert W. Selke, RT #74951)
+  - Default Axis' format to %s to fix it from blowing up (Thanks Gisbert W. Selke, RT #74950)
+
+2.76 Dec 14 2011
+  - Fix syntax error in example (Alexx Roche)
+
+2.75 Dec 5 2011
+  - Add Graphics::Primitive::Cairo dep (thanks TEEJAY)
+
+2.74 Nov 13 2011
+  - POD fixes
+
+2.73 Nov 4 2011
+  - Fix busted images in renderers.
+
+2.72 Sep 5 2011
+  - Remove documentation for data method and replace it with rendered data method.
+
+2.71 Aug 25 2011
+  - Fix busted images. (Fixes RT #70376)
+  - Fix typo in ColorAllocator synopsis (Matthias Bloch)
+
+2.70 Aug 7 2011
+  - Add more examples in the Tutorial (mpeters)
+  - Convert to Dist::Zilla & Pod::Weaver
+  - Add some missing documentation found in Pod::Weaver conversion
+  - Removed a lot of useless ()
+  - Take numbers off test names
+  - Remove stillborn HeatMap renderer
+  - Remove some useless tests
+  - Use done_tests
+  - Add get_value_for_key to Series
+  - Fix name of get_all_series_keys in POD
+  - Add get_series_values_for_key to DataSet
+  - Change DataSet::get_series_values to return an arrayref
+  - Fix an issue where series whose keys don't match cause weird StackedBar
+    results (Fixes RT #57372)
+  - Adjust Axis to honor existing minimum_width and minimum_height set on
+    itself (Addresses RT #60279)
+  - Add Note to StackedArea regarding the same problem mentioned in RT #57372
+
+2.69
+  - Add note about CentOS.
+
+2.68
+  - Remove add_to_markers stuff in docs, as it's bogus.  That functionality
+    is in the context.
+  _ Remove boolean attribute that determines if a Plot has any markers to be
+    drawn, as it was always true.  Remove check of said attribute since it
+    was always true.
+
+2.67
+  - Axis now calls "super" at the end of it's finalize.  This way if there is
+    a callback it's called at the end, as advertised
+
+2.66
+  - Nudge edge tick labels closer in based on their bounding box (Rod Taylor, RT #60603)
+  - Skip "zero" values in Bar and Stacked bar.  This prevents drawing hairline
+    bars if the value of the series element is equal to the baseline of the
+    range axis.
+
+2.65
+  - Fix warning in Glass related to newer Moose deprecation warnings.
+
+2.64
+  - POD fixes (Jonathan Yu, RT #56287 and #57317)
+
+2.63
+  - Make DataSet and StackedBar more tolerant of missing values (Rod Taylor,
+    RT #57259)
+
+2.62
+  - More POD fixes
+
+2.61
+  - Add bar_width attribute to Bar and StackedBar renderers for choosing your
+    own bar width.
+  - Remove unnecessary type declaration from Axis
+  - POD errors (spotted by Ricardo Signes)
+  - Add POD 'whatis' entries (RT #56287, Jonathan Yu)
+  - Update README (RT #56396, Jonathan Yu)
+  - Add missing dependency on Test::Exception (RT #56398, Jonathan Yu)
+
+2.60    March 20, 2010
+  - Add gradient_reverse attribute to Pie renderer for reverse the
+    direction of the gradient (Carl Chambers)
+  - Add starting_angle attribute to Pie rather than hardcoding it to -90
+    (Carl Chambers)
+  - Refactor some Pie internals to not use $self->{VAR} (Carl Chambers)
+
+2.59
+  - Correct POD in PolarArea
+  - Add max_size and min_size to Series::Size
+  - Bump some dependencies
+  - Add PolarArea example to Clicker.pm POD
+  - Remove some unnecessary imports from Context and clean up some code
+  - Add Math::Gradient dep
+  - Fix POD typos in tutorial  (Thanks Franz Bräuer)
+  - Make Data::Series->range a lazy_build attribute
+  - Rearrange tests
+  - Add gradient_color to Pie renderer
+
+2.58    January 25, 2010
+  - POD fixes
+
+2.57    January 24, 2010
+  - Add PolarArea renderer
+  - Clean up some Pie POD
+
+2.56
+  - Fix tests that tested removed methods. (Thanks Christoper Bottoms)
+
+2.55
+  - Add add_pair method to Series
+  - Add repository metadata to Makefile.PL (Thanks cpanservice)
+
+2.54
+  - Values added via add_data will now be part of the same DataSet, this may
+    have caused some odd results with additive renderers
+  - Remove some unused tick attributes and code associated with them
+  - Add skip_range to Axis
+
+2.53
+  - Fix bad default opacity in Bar renderer
+  - Fix syntax error from method name typo in share-axes example
+
+2.52
+  - Add contains method to Range
+  - Redo POD to use an ATTRIBUTES section
+  - Tutorial updates (Thanks Philip Chung)
+
+2.51
+  - POD improvement for creating other formats.
+
+2.50
+  - POD fix (Thanks Brian Cassidy)
+
+2.49
+  - POD fixes
+  - Image Updates
+
+2.48
+  - Fix image URLs
+
+2.47
+  - Fix busted add_data changes in 2.46
+  - Better add_data POD
+
+2.46
+  - Use native Moose type traits rather than MX::AttributeHelpers
+  - Allow Series to be instantiated with a HashRef
+  - Deprecate data method in favor of rendered_data
+
+2.45
+  - Document the ->draw,->data method for getting back a scalar
+  - Add date-axis.pl example
+  - Improve error message when keys != values
+  - Add POD images (Thanks to Gagor Szabo and Bruno Vecchi)
+  - Bump Cairo driver version
+  - Bar Renderer fixes:
+    - When bars ran below baseline, brush width wasn't taken into account
+    - When only one series was present, bars below baseline were offset to the
+      left unecessarily
+
+2.44
+  - Add add_data method
+  - Fix long-standing bug tripped when adding multiple datasets that use the
+    same renderer.
+
+2.43
+  - Fix typo in Axis Synopsis (thanks Michael Stapelberg)
+
+2.42
+  - Add Legend::Tabular
+  - Remove unused LegendItem
+
+2.41
+  - Add title/title_position
+
+2.40
+  - Tutorial update
+
+2.39
+  - Adjust data range test
+  - Add Clicker->set_renderer (Thanks castaway!)
+  - Add Clicker->write_output to replace draw; write;
+
+2.38
+  - Change the manner in which ticks are generated. Uses the lower and upper
+    of the Axis' range then evenly divides the middle.
+  - Adjust the location of an Axis' tick if that tick is equal to the lower or
+    upper of the Axis' range.  Allows top and bottom ticks to be drawn without
+    overflowing the drawable area.
+
+2.37
+  - Properly import croak so failures are reported without generating an
+    exception (thanks omega!)
+
+2.36
+  - Fix some weird 'padding' in ranges and in Axis marking, fixes datasets
+    with ranges less than 1.
+
+2.35
+  - Legend
+    - Depend on Layout::Manager 0.29 and adjust Legend to use 
+    - Remove lots of random crap from Legend that wasn't being used
+  - Ditch Clicker's BUILD method for prepare-time work wrt plot & legend
+    addition
+  - Add has_name predicate to Series and use it in Legend
+  - Bar
+    - Fix overlap in borders
+    - Fix stroking of translucent bars
+    - Only stroke bars if their opacity is < 1 and the brush width > 0
+
+2.34
+  - Clean up some unnecessary POD
+  - Add shape_brush to Point renderer
+  - Add first cut of tutorial
+
+2.33
+  - Rename share_axis_width to share_axes_with
+  - Throw a useful error when there is no data, thanks Dave Hayes
+
+2.32
+  - Dependency bumps
+  - Trim out some unnecessary includes and code
+  - Fix busted bubble renderer scaling
+  - Allow multiple series with CandleStick
+  - Removed UPGRADING POD, it's long past time to have done that
+  - Fix Area & StackedArea's POD
+  - Make StackedArea a subclass of Area
+  - Fix contributor POD being all on one line
+
+2.31
+  - Fix slight miscalculation in X position of "negative" bar renderer
+    bars.
+  - Simplify bar width calculation when using fudged axis ranges.
+
+2.30
+  - Fix misnamed class in POD for Marker (Thanks bricas!)
+  - Fix error in example/simple.pl
+  - Fix completely busted Marker implementation (fix colors & range positioning)
+  - Add lazily constructed marker_overlay attribute to Clicker
+  - Document Marker properly
+
+2.29
+  - Fix broken bar_padding computation in Bar renderer
+  - Skip some math when no ticks are visible in an Axis
+
+2.28
+  - Fix problems in dist due to quoting
+
+2.27
+  - Fix shape positions when line renderer is additive
+  - Add pie example
+
+2.26
+  - Use min/max functions from List::Util rather than rolling my own
+  - Refactor Series internals to more easily facilitate subclasses
+  - Add HighLow series
+  - Add CandleStick renderer
+
+2.25
+  - Add some new examples: Multiple-Axes, Multiple-Renderers and Shared-Axes
+  - Add Context->share_axes_with method for convenience
+  - Add font attribute to OverAxis decoration
+
+2.24
+  - Add label_font and tick_font attributes to Axis for changing each
+    individually.
+
+2.23
+  - Don't uselessly add a Fill op to a Line renderer w/no shape
+  - Properly handle the shape_brush attribute in the Line renderer
+  - Remove default background_color from Plot
+
+2.22
+  - Line renderer will now stack if additive attribute is true.
+
+2.21
+  - More clever color allocator that attempts to space out colors at even hue
+    spacings for predictable color schemes that are more pleasing and contrast
+    enough to be easily differentiated.
+  - Bump Graphics::Color dep for color allocator test
+
+2.20
+  - Remove ghostly " - 5" that was fucking up additive ranges
+  - Clamp Area "fade" gradients to the top of their areas, not the top of the
+    plot
+  - Add tick_label_color to Axis
+  - Add label_color to Axis
+  - Use real gray rather than translucent gray for grid to get rid of
+    composited "joint" spots at line intersections
+  - Add StackedArea renderer
+  - Fix some errors in examples
+
+2.19
+  - Move some subs around in Clicker.pm, to no effect.
+  - Take out some C-style loops because they apparently offend a loud majority
+    of #moose (groditi and phaylon)
+  - Hide border of "hidden" Axis
+  - Set the type of Series keys & values to ArrayRef[Num] from ArrayRef
+  - Fix 01-data-series.t which had an error in it.  Yay type checking!
+  - Remove some useless, commented out code
+
+2.18
+  - Fix Line's shape attribute, which didn't do a damn thing
+  - Draw Line's shapes in a separate loop so that the path works right
+  - Remove Chart::Clicker::Shape
+  - Add OverAxis Decoration
+  - Add Clicker->over_decorations for adding decorations "over" the renderers
+  - POD overhaul
+  - Remove some long-commented-out code.
+
+2.17
+  - POD fixes
+  - Split Grid's brush into two separate attributes: range_brush and
+    domain_brush
+  - Set an Axis' padding to 5 at the time it is created, zero it out in prepare
+    if hidden.  This lets us remove some crufty code from Clicker.pm
+  - Set a default color on the Axis' brush
+  - Document Axis' tick_label_angle
+  - Separate Grid's line drawing into two operations so that each brush
+    can affect the output
+  - Remove color from Grid, use each brush to set range/domain color
+    separately
+  - Remove some useless code from Plot
+  - Add grid_over flag to Clicker.pm to allow grid over/under control
+  - Rejigger Axis code so that each Axis' brush size affects it's
+    border
+  - Adjust paddings a bit.
+
+2.16
+  - Add Axis->tick_label_angle for rotating tick label
+  - Add requirement for Math::Trig
+  - Bump some deps
+
+2.15
+  - Fix META.yml
+  - Add some POD to describe why NOT having a default context makes Clicker
+    shit on itself.
+  - Fix linear gradient in Area renderer.
+
+2.14
+  - Add examples directory
+  - Don't add padding if axes are hidden.
+  - Fix gradients in Area renderer
+
+2.13
+  - Remove some old code (was already commented out)
+
+2.12
+  - Fix POD bug (thanks Jay Shirley)
+  - Axis::DateTime: get this working again, albeit a bit gimped
+  - Move pod tests to t/author
+
+2.11
+  - Fix multiple-prepare bug
+
+2.10
+  - Use new Grapics::Primitive APIs
+
+2.09
+  - Remove Moose Coverage dependency
+
+2.08
+  - Keep up with Graphics::Primitive API changes
+
+2.07
+  - Bump Graphics::Primitive dep to 0.28 and make appropriate changes to Fill
+    operations.
+
+2.06
+  - Axis: Add stagger flag
+
+2.05
+  - Axis: Fix busted labels when using labels & values together
+
+2.04
+  - Fix bug in top-horizontal axes
+
+2.03
+  - Oops again, bump Cairo driver version
+
+2.02
+  - Ooops, bump version dependencies properly
+
+2.01
+  - Remove label rotation on vertical axes due to problems with
+    Graphics::Primitive
+  - Depend on Graphics::Primitive 0.25 and make necessary API changes
+
+2.0.0
+    - Pretty up some un-Moosey behaviour
+    - Add Bubble renderer and Series::Size
+    - Add PostScript and PDF support
+    - Use Graphics::Primitive
+    - Add show_range and show_domain flags to Grid
+    - Make Range's span inclusive
+    - Add lots of convenient methods via MooseX::AttributeHelpers
+    - Get rid of all indirect method calls (ewww!)
+    - Fix broken bar renderer alignment
+    - Rename Renderer::Base to just Renderer
+    - Stop baselining axes by default, it breaks stuff.
+    - Abandon $CC_* position/orientation junk for Moose roles with strings
+    - Move out lots of generic functionality to new modules
+    - Add context support
+    - Ignore duplicate axes
+    - Change Axis 'visible' attribute to 'hidden' to avoid clashing with
+      Layout::Manager
+    - Axis' ticks attribute now yields the correct number of ticks, not -1
+    - Horizontal axes' tick labels now align their baselines properly
+    - Make axes position independent, as they were intended
+
+1.4.2
+    - Packaging fixes.
+1.4.1
+    - Add fudge_amount attribute to Axis, defaulting to .1, that tells Clicker
+      how much to fudge the amount upper and lower values of the range.
+    - Fix drawing-insets test index mistype
+    - Fix range baseline throwing Moose errors on undef
+    - Fix broken layout test
+
+1.4.0
+    - Add 'baseline' attribute to Axis
+    - Fix incorrect coloring of text on customized axes
+    - Add tick_labels to axis and make use of it in Simple
+    - Make axes and labels cope with dropped letters (e.g 'y' or 'j') properly
+    - Mooseify renderer options (the 'options' method is no longer used)
+    - Allow many objects with a color to be set with just the name ('black'
+      rather than 'new Chart::Clicker::Drawing::Color'...)
+    - Fix warnings in tests
+    - Line render shapes default to filled, shape_stroke provides method for
+      old method of doing strokes.
+
+1.3.0
+    - Fix broken Bar renderer
+    - Add hide_axes and hide_grid to Simple
+    - StackedBar renderer
+    - 'additive' renderer attribute
+    - combine the 'combined' range of a DataSet for additive renderers
+    - Fix bug when setting range max/min to 0
+    - Real SVG support
+    - Add 'format' attribute to Clicker constructor
+
+1.2.2
+    - Fix broken Axis::DateTime
+    - Fix broken type for Simple's renderer
+    - Fix busted Bar renderer
+
+1.2.1
+    _ Remove unused and un-required dependency
+
+1.2.0
+    - Add Pie renderer.
+    - Moose
+
+1.1.8 Sat Sep 1 10:38:01
+    - Remove lots of ()->
+    - Try and make some things faster after watching dprofpp output
+    - Fix format accessor in Axis::DateTime
+    - Fix bug in Component::inside_width
+    - Add shape to line renderer
+
+1.1.7 Thu Aug 30 20:43:21
+    - Add time_zone to Axis::DateTime (thanks Johannes Hoerburger)
+    - Add test for formatter and document inheritance
+
+1.1.6 Fri Mar 09 18:24:12 2007
+    - Remove Mac OS X specific files (thanks jshirley)
+
+1.1.5 Sat Feb 24 12:48:03 2007
+    - Return 1 for 0 span ranges. (thanks Daniel Kasak)
+
+1.1.4 Wed Jan 02 09:31:21 2007
+    - Add Chart::Clicker::Simple
+    - Fix bug in ColorAllocator's constructor
+    - Fix bug in Bar Renderer for full-height bars
+    - Remove default border from Plot
+    - Doc cleanups
+    - Code cleanups
+
+1.1.3 Sun Oct 22 10:53:23 2006
+    - Add SVG support (thanks Torsten Schoenfeld)
+    - Teach write() how to handle different formats.
+    - Update docs
+
+1.1.2 Sat Oct 21 12:16:51 2006
+    - Add labels to Axes (thanks Torsten Schoenfeld)
+    - Add error accessor to Series (thanks Torsten Schoenfeld)
+    - Add Measurement Renderer (thanks Torsten Schoenfeld)
+
+1.1.1 Sun Sep 17 19:10:17 2006
+    - Documentation updates
+    - Fix Axis::DateTime's rendering
+
+1.1.0 Thu Sep 14 20:06:37 2006
+    - Remove (range|domain)_markers from Chart::Clicker
+    - Fix rendering of Axis grid lines by using Axis mark()
+    - Fix Series with keys given in constructor
+    - Add Marker support via Data::Marker and Plot's use of
+      Decoration::MarkerOverlay
+    - Make pseudo-smart date stuff in DateTime
+
+1.0.7 Tue Sep 12 20:12:34 2006
+    - Adjust Axis to make subclassing better
+    - Add Axis::DateTime
+
+1.0.6 Sometime
+    - Make the stroke an option (and off by default) of Bar
+    - Add max and min methods to Data::Range
+    - Fix Area renderer only showing a single series
+    - Take a stab at improving the Legend's rendering
+    - Add mark() to Axis for positioning values
+    - Adjust renderers to use Axis->mark() for positioning
+    - Fix rendering of mutiple series in Bar renderer
+
+1.0.5 Tue Sep 5 19:31:24 2006
+    - Fix broken charting of axes not based on zero lower ranges.
+    - Reverse fade color stops
+    - Use the lower on the range for Axis tick values
+    - Add Glass decoration
+    - Adjust Renderers to not take a 'min' value
+
+1.0.4 Thu Aug 31 21:45:37 2006
+    - Remove disclaimer about using File::Temp
+    - Fix completely broken domain axis values
+
+1.0.3 Tue Aug 15 19:13:12 2006
+    - Ditch File::Temp for write_to_png_stream from Cairo
+
+1.0.2 Thu Aug 10 19:18:11 2006
+    - Fix broken X axis for all Renderers (reported by Peter Hicks)
+
+1.0.1 Wed Aug 09 20:28:42 2006
+    - Remove print of file size in png()
+    - Update examples in Chart::Clicker POD
+    - Allow setting of series in constructor or DataSet
+    - Allow setting of range in Axis constructor (was overwritten)
+    - Fix constructor of Series to use Class::Accessor
+    - Document ticks() in Axis
+
+1.0.0 Sometime
+    - Don't draw on undefined surfaces returned from Components
+    - Remove 'above' crap
+    - Increase 'divvy' to ticks + 1 and only set it if it's undefined
+    - Don't outright skip if an Axis is invisible, just skip the part
+      when we are drawing.
+    - Add format() to Axis for formatting tick values.
+
+0.9.7  Mon Jun 12 00:00:00 2006
+    - Don't draw invisible axes
+    - Expose the number of ticks for the axis.
+    - Fix area renderer being off by 1.5 on first point
+
+0.9.6  Thu Jun 8 00:12:54 2006
+    - I totally forgot to document...
+
+0.9.3  Mon May 22 11:24:31 2006
+    - Layout based rendering.
+    - Documentation updates
+    - Labels
+
+0.9.1  Wed May 10 10:12:09 2006
+    - Clicker is now a Container
+    - Add CC_CENTER
+    - Add Container
+    - Add Component
+
+0.9.0  Tue May 9 01:30:19 2006
+    - Axis labels
+    - Get Axes working and add Axis positioning
+    - Set all values to 0 by default in Insets
+    - Rename constants CC_* and add TOP, BOTTOM, LEFT and RIGHT for Axis
+      positioning.
+    - Add Chart::Clicker::Drawing for some common constants
+    - Move HORIZONTAL and VERTICAL to C:C::Drawing as constants
+    - Eliminate extraneous drawing ops (paints) from Plot
+    - Use an Inset to keep up with 'shrinkage' of inner surface in Plot
+    - Enhance Axis with height, orientation, per, tick_values, and width and
+      prepare method that calculates required space.
+    - Remove prepare() from Renderer::Base and move most of the arguments
+      to the render() method.
+    - Rework Renderers to use the domain and range axes for the values they
+      need for rendering.
+    - 'inline' marker drawing
+    - Add divvy() to Range.
+    - Have Grid use 'main' domain and range axes for it's values.
+    - Remove reference to a C:Clicker::prepare sub in the docs
+
+0.2.4  Thu May 4 00:30:19 2006
+    - Shapes
+    - Use Shapes for Point Renderer
+
+0.2.3  Wed May 3 23:15:09 2006
+    - Bring Makefile.PL and MANIFEST up to speed
+    - Legends!
+    - Stop hard-coding output file
+    - Fix bugs in color allocation
+    - A solemn promise to tag this version so I can do svn diffs...
+
+0.2.2  No clue
+    - I forget
+
+0.2.1  Tue Apr 25 23:53:21 2006
+    - Update Bar renderer to divide available spots between all series
+    - Use ColorAllocator in renderers
+    - Add ColorAllocator
+    - Create the Drawing namespace
+
+0.2.0  Sun Apr 23 08:09:34 2006
+
+0.1.0  Thu Apr 20 01:12:09 2006
+    - Add Border and Stroke
+    - Use Class::Accessor
+    - Chart->background_color()
+    - Plot->background_color()
+    - Chart::Point
+
+0.0.4  Tue Apr 18 23:22:12 2006
+    - Add Color and use it for Markers
+
+0.0.3  Fri Apr 14 13:34:43 2006
+    - Add Grid decoration and move mass marker creation there for grid.
+
+0.0.2  Fri Apr 14 12:13:10 2006
+    - Get Markers working
+
+0.0.1  Tue Apr 11 20:30:16 2006
+	- original version

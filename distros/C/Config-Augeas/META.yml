@@ -1,0 +1,23 @@
+---
+abstract: 'Edit configuration files through Augeas C library'
+author:
+  - 'RaphaÃ«l Pinson (raphink at cpan dot org)'
+build_requires:
+  ExtUtils::CBuilder: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Augeas
+provides:
+  Config::Augeas:
+    file: lib/Config/Augeas.pm
+    version: 1.000
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: 1.000

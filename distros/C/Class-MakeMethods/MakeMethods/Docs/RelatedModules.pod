@@ -1,0 +1,962 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::RelatedModules - Survey of Class Builders
+
+
+=head1 SYNOPSIS
+
+  http://search.cpan.org/search?mode=module&query=Class
+
+
+=head1 DESCRIPTION
+
+There are a variety of modules on CPAN dedicated to the purpose of
+generating common constructor and accessor methods. Below, I survey
+several of these, summarizing some basic features and technical
+approaches, and comparing them to Class::MakeMethods and other
+modules.
+
+
+=head2 Caution
+
+B<Please note that these comments are for basic comparison purposes
+only and may be incorrect or out of date.> Please consult the
+documentation from a current version of each module for more specific
+details.  Corrections and clarifications would by welcomed by the author at the email address below.
+
+
+=head2 Points of Comparison
+
+In general, I compared the following characteristics:
+
+=over 4
+
+=item Distribution
+
+Is it included with Perl, or on CPAN? Is it being actively maintained?
+
+=item Usage
+
+How do you go about declaring your class's methods?
+
+=item Mechanism
+
+How are they generated and delivered?
+
+=item Instance type
+
+Are the objects of your class blessed hashes, or something else?
+
+=item Core Methods
+
+Does the module provide a constructor and basic accessors? Are there specialized methods for hash-ref, array-ref, and object-ref accessors?
+
+=item Extensible
+
+Can you subclass the package to create new types of methods, or is there some other way to extend it?
+
+=item Other Methods
+
+Other types of methods provided.
+
+=item Emulator
+
+Does Class::MakeMethods provide a drop-in replacement for this module?
+
+=item Comments
+
+Other characteristics or features of note.
+
+=back
+
+
+=head1 RELATED MODULES 
+
+=head2 accessors
+
+=over 4
+
+=item Distribution
+
+CPAN. Uploaded Sep 2003.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=item Example
+
+  package MyObject;
+  use accessors qw( foo bar baz );
+
+=back
+
+=head2 Attribute::Property
+
+=over 4
+
+=item Distribution
+
+CPAN.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=back
+
+
+=head2 Class::Accessor
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 4/01.
+
+=item Usage
+
+Inherit and call function with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Cleanly.
+
+=item Standard Methods
+
+Scalar accessors.
+
+=item Extensible
+
+Yes.
+
+=item Comments
+
+Accessor methods call overwritable C<self-E<lt>get(I<key>)> and
+C<self-E<lt>set(I<key>, I<value>)> methods.
+
+Also includes Class::Accessor::Fast, which creates direct hash keys accessors without calling get and set methods.
+
+=item Emulator
+
+Yes, but only for the Fast variation; see Class::MakeMethods::Emulator::AccessorFast.
+
+=item Example
+
+  package MyObject;
+  @ISA = qw(Class::Accessor);
+  MyObject->mk_accessors(qw( simple ordered mapping obj_ref ));
+
+=back
+
+
+=head2 Class::Class
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 1/00.
+
+=item Usage
+
+Inherit and fill %MEMBERS hash; methods created when first object is created
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+No.
+
+=item Example
+
+Usage is similar to Class::Struct:
+
+  package MyObject;
+  use Class::Class; 
+  @ISA = qw(Class::Class);
+  %MEMBERS = ( 
+    simple  => '$',
+    ordered => '@',
+    mapping => '%',
+    obj_ref => 'FooObject' 
+  ); 
+
+=item Other Method Types
+
+Provides a polymorph() method that is similar to Class::Method's "ClassName:class_name -require".
+
+=back
+
+
+=head2 Class::Constructor
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 11/01.
+
+=item Usage
+
+Inherit and call function with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Cleanly.
+
+=item Standard Methods
+
+Hash constructor, with bells.
+
+=item Extensible
+
+No.
+
+=item Emulator
+
+No, but possible.
+
+=item Example
+
+  package MyObject;
+  @ISA = qw(Class::Constructor);
+  MyObject->mk_constructor( Name => 'new' );
+
+=back
+
+
+=head2 Class::Classgen
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 12/00.
+
+=item Usage
+
+Pre-processor run against declaration files. 
+
+=item Mechanism
+
+Assembles and saves code file
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Yes. (I think.)
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+No. (I think.)
+
+=item Example
+
+  header:
+      package MyObject;
+  variables:
+      $simple
+      @ordered
+      %mapping
+      $obj_ref
+
+=back
+
+
+=head2 Class::Contract
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 5/01.
+
+=item Usage
+
+Call function with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Scalar reference with external data storage.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+Yes. (I think.)
+
+=item Comments
+
+Supports pre- and post-conditions, class invariants, and other
+software engineering goodies.
+
+=item Example
+
+  package MyObject;
+  use Class::Contract;
+  contract {
+    ctor 'new';
+    attr 'simple'  => SCALAR;
+    attr 'ordered' => ARRAY;  
+    attr 'mapping' => HASH;   
+    attr 'obj_ref' => 'FooObject';   
+  }
+
+=back
+
+
+=head2 Class::Data::Inheritable
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 4/00.
+
+=item Usage
+
+Inherit and call function with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Class data, with inheritance.
+
+=item Subclasses Cleanly
+
+Yes, specifically.
+
+=item Standard Methods
+
+Scalar accessors.
+
+=item Extensible
+
+No.
+
+=item Example
+
+Usage is similar to Class::Accessor:
+
+  package MyObject;
+  @ISA = qw(Class::Data::Inheritable);
+  MyObject->mk_classdata(qw( simple ordered mapping obj_ref ));
+
+=item Emulator
+
+Yes, Class::MakeMethods::Emulator::Inheritable, passes original test suite.
+
+=back
+
+
+=head2 Class::Delegate
+
+=over 4
+
+=item Distribution
+
+CPAN. Uploaded 12/0.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=back
+
+=head2 Class::Delegation
+
+=over 4
+
+=item Distribution
+
+CPAN. Uploaded 12/01.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=back
+
+=head2 Class::Generate
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 11/00. 
+
+=item Usage
+
+Call function with declaration arguments 
+
+=item Mechanism
+
+Assembles and evals code string, or saves code file.
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and accessors (scalar, array, hash, object, object array, etc).
+
+=item Extensible
+
+Unknown.
+
+=item Comments
+
+Handles private/protected limitations, pre and post conditions,
+assertions, and more.
+
+=item Example
+
+Usage is similar to Class::Struct:
+
+  package MyObject;
+  use Class::Generate;
+  class MyObject => [ 
+    simple  => '$',
+    ordered => '@',
+    mapping => '%',
+    obj_ref => 'FooObject' 
+  ]; 
+
+=back
+
+=head2 Class::Hook
+
+=item Distribution
+
+CPAN. Uploaded 12/01.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+
+=head2 Class::Holon
+
+=over 4
+
+=item Distribution
+
+CPAN. Experimental/Alpha release 07/2001. 
+
+=item Instance Type
+
+Hash, array, or flyweight-index.
+
+=item Subclasses Cleanly
+
+No. (I think.)
+
+=item Standard Methods
+
+Constructor and scalar accessors; flywieght objects also get scalar mutator methods.
+
+=item Extensible
+
+No. (I think.)
+
+=item Comments
+
+I'm not sure I understand the intent of this module; perhaps future versions will make this clearer....
+
+=back
+
+
+=head2 Class::MethodMaker
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 1/01. 
+
+=item Usage
+
+Import, or call function, with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash, Static.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+Yes.
+
+=item Example
+
+Usage is similar to Class::MakeMethods:
+
+  package MyObject;
+  use Class::MethodMaker (
+    new     =>   'new',
+    get_set =>   'simple',
+    list    =>   'ordered',
+    hash    =>   'mapping',
+    object  => [ 'FooObject' => 'obj_ref' ],
+  );
+
+=item Emulator
+
+Yes, Class::MakeMethods::Emulator::MethodMaker, passes original test suite.
+
+=back
+
+
+=head2 Class::MakeMethods
+
+=over 4
+
+=item Distribution
+
+CPAN.
+
+=item Usage
+
+Import, or call function, with declaration arguments; or if desired, make methods on-demand with Autoload, or declare subroutines with a special Attribute.
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash, Array, Scalar, Static, Class data, others.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+Yes.
+
+=item Example
+
+Usage is similar to Class::MethodMaker:
+
+  package MyObject;
+  use Class::MakeMethods::Hash (
+    new    =>   'new',
+    scalar =>   'simple',
+    array  =>   'ordered',
+    hash   =>   'mapping',
+    object => [ 'obj_ref', { class=>'FooObject' } ],
+  );
+
+=back
+
+
+=head2 Class::Maker
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 7/02.
+
+=item Usage
+
+Call function with declaration arguments.
+
+=item Mechanism
+
+Generates and installs closures (I think).
+
+=item Instance Type
+
+Hash (I think).
+
+=item Subclasses Cleanly
+
+Unknown.
+
+=item Standard Methods
+
+Constructor and various scalar and reference accessors.
+
+=item Extensible
+
+Unknown.
+
+=item Comments
+
+I haven't yet reviewed this module closely.
+
+=back
+
+
+=head2 Class::SelfMethods
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 2/00.
+
+=item Usage
+
+Inherit; methods created via AUTOLOAD
+
+=item Mechanism
+
+Generates and installs closures (I think)
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Yes.
+
+=item Standard Methods
+
+Constructor and scalar/code accessors (see Comments).
+
+=item Extensible
+
+No.
+
+=item Comments
+
+Individual objects may be assigned a subroutine that will be called as a method on subsequent accesses. If an instance does not have a value for a given accessor, looks for a method defined with a leading underscore.
+
+=back
+
+
+=head2 Class::Struct
+
+=over 4
+
+=item Distribution
+
+Included in the standard Perl distribution. Replaces Class::Template.
+
+=item Usage
+
+Call function with declaration arguments 
+
+=item Mechanism
+
+Assembles and evals code string
+
+=item Instance Type
+
+Hash or Array
+
+=item Subclasses Cleanly
+
+No.
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+No.
+
+  package MyObject;
+  use Class::Struct;
+  struct( 
+    simple  => '$',
+    ordered => '@',
+    mapping => '%',
+    obj_ref => 'FooObject' 
+  );
+
+=item Emulator
+
+Yes, Class::MakeMethods::Emulator::Struct.
+
+=back
+
+
+=head2 Class::StructTemplate
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 12/00. 
+
+No documentation available.
+
+=item Usage
+
+Unknown.
+
+=item Mechanism
+
+Unknown.
+
+=back
+
+
+=head2 Class::Template
+
+=over 4
+
+=item Distribution
+
+CPAN. Out of date.
+
+=item Usage
+
+Call function with declaration arguments (I think)
+
+=item Mechanism
+
+Assembles and evals code string (I think)
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Yes. (I think.)
+
+=item Standard Methods
+
+Constructor and various accessors.
+
+=item Extensible
+
+No. (I think.)
+
+=item Example
+
+Usage is similar to Class::Struct:
+
+  package MyObject;
+  use Class::Template;
+  members MyObject { 
+    simple  => '$',
+    ordered => '@',
+    mapping => '%',
+    obj_ref => 'FooObject' 
+  };
+
+=back
+
+
+=head2 Class::Virtual
+
+Generates methods that fail with a message indicating that they were not implemented by the subclass. (Cf. 'Template::Universal:croak -abstract'.)
+
+Also provides a list of abstract methods that have not been implemented by a subclass.
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 3/01.
+
+=item Extensible
+
+Unknown.
+
+=item Mechanism
+
+Uses Class::Data::Inheritable and installs additional closures.
+
+=back
+
+
+=head2 CodeGen::PerlBean
+
+=over 4
+
+=item Distribution
+
+CPAN. 
+
+=item Usage
+
+Call function with declaration arguments.
+
+=item Mechanism
+
+Generates and writes source code to a file.
+
+=item Instance Type
+
+Hash (I think).
+
+=item Subclasses Cleanly
+
+Unknown.
+
+=item Standard Methods
+
+Constructor and various scalar and reference accessors.
+
+=item Extensible
+
+Unknown.
+
+=item Comments
+
+I haven't yet reviewed this module closely.
+
+=back
+
+
+=head2 HTML::Mason::MethodMaker
+
+=over 4
+
+=item Distribution
+
+CPAN. 
+
+=item Usage
+
+Package import with declaration arguments
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash.
+
+=item Standard Methods
+
+Scalar accessors.
+
+=item Extensible
+
+No.
+
+=item Example
+
+  use HTML::Mason::MethodMaker ( 
+    read_write => [ qw( simple ordered mapping obj_ref ) ] 
+  );
+
+=back
+
+
+=head1 TO DO
+
+The following modules are relevant but have not yet been cataloged above.
+
+=head2 Attribute::Property
+
+=head2 Class::Accessor::Chained
+
+=head2 Class::Accessor::Lvalue
+
+=head2 Class::Accessor::Ref
+
+=head2 Class::AutoClass
+
+=head2 Class::Builder
+
+=head2 Class::Member
+
+=head2 Class::Trigger
+
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+
+=head1 CREDITS AND COPYRIGHT
+
+=head2 Developed By
+
+  M. Simon Cavalletto, simonm@cavalletto.org
+  Evolution Softworks, www.evoscript.org
+
+=head2 Copyright
+
+Copyright 2002 Matthew Simon Cavalletto. 
+
+Portions copyright 2000, 2001 Evolution Online Systems, Inc.
+
+=head2 License
+
+You may use, modify, and distribute this document under the same terms as Perl.
+
+=cut

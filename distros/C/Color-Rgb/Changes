@@ -1,0 +1,49 @@
+
+RCS file: /home/sherzodr/CVS/modules/Color-Rgb/Rgb.pm,v
+Working file: Rgb.pm
+head: 1.3
+branch:
+locks: strict
+access list:
+symbolic names:
+	start: 1.1.1.1
+	UltraCgis: 1.1.1
+keyword substitution: kv
+total revisions: 4;	selected revisions: 4
+description:
+----------------------------
+revision 1.3
+date: 2002/07/02 14:09:47;  author: sherzodr;  state: Exp;  lines: +28 -2
+*   Marc-Olivier BERNARD <mob@kilargo.fr> notified of the warnings that
+        the library produced while "warnings" pragma enabled and improper
+        parsed rgb values that contain single "0". This bug was fixed in 1.2
+
+    *   "Herrmann Martin (FV/FLI) *" <Martin.Herrmann@de.bosch.com> noticed
+        a bug in rgb2hex() method which was failing if the blue value was a
+        single "0". This problem is fixed in 1.3
+----------------------------
+revision 1.2
+date: 2002/05/31 03:52:35;  author: sherzodr;  state: Exp;  lines: +130 -65
+hex() method returned undef if the first value returned
+from rgb() was 0. Thanks to Marc-Olivier Bernard <mob@kilargo.fr>
+for noticing it.
+
+Warnings issued by names() is fixed
+(again thanks to Marc-Olivier Bernard mob@kilargo.fr )
+
+
+hex2rgb() also was issueing warnings, and replacing built-in
+hex() with CORE::hex() solve the problem, sine the library itself
+has its own hex() method
+
+Some touches to the manual...
+----------------------------
+revision 1.1
+date: 2002/04/03 09:28:18;  author: sherzodr;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/04/03 09:28:18;  author: sherzodr;  state: Exp;  lines: +0 -0
+Initial working copy imported to CVS
+=============================================================================

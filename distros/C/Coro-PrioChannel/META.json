@@ -1,0 +1,64 @@
+{
+   "abstract" : "Priority message queues for Coro",
+   "author" : [
+      "Darin McBride <dmcbride@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Coro-PrioChannel",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Coro" : "0",
+            "Coro::Semaphore" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::Loop" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dmcbride/Coro-PrioChannel",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dmcbride/Coro-PrioChannel.git",
+         "web" : "https://github.com/dmcbride/Coro-PrioChannel"
+      }
+   },
+   "version" : "0.005",
+   "x_contributors" : [
+      "Jeff Ober <jeffober@gmail.com>"
+   ]
+}
+

@@ -1,0 +1,51 @@
+CGI/HTMLError
+=============
+
+NAME
+       CGI::HTMLError - Perl extension for reporting fatal errors
+       to the browser
+
+SYNOPSIS
+         use CGI::HTMLError;
+
+         die "Error!"; # throw runtime error
+
+         # or ..
+
+         use CGI::HTMLError trace => 1, css => '/css/error.css';
+
+         10 = 40; # redefine the number system (compile error).
+
+
+DESCRIPTION
+       This module is supposed to be a debugging tool for CGI
+       programmers. If "use"'d in a program it will send nice
+       looking fatal errors to the browser including a view of
+       the offending source and an optional stacktrace.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Or type:
+
+   perl -MCPAN -e'install CGI::HTMLError'
+
+DEPENDENCIES
+
+This module requires Test::More for the test script.
+
+You probably also need some kind of CGI environment, like
+the very nice Apache webserver: http://httpd.apache.org/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 - 2004 Joost Diepenmaat jdiepen@cpan.org 
+
+This module is licensed under the same terms as Perl itself.
+

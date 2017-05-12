@@ -1,0 +1,46 @@
+NAME
+    CPAN::Mini::LatestDistVersion - Create a CPAN mirror with only the
+    latest version of each distribution
+
+SYNOPSIS
+        use CPAN::Mini::LatestDistVersion;
+    
+        CPAN::Mini::LatestDistVersion->update_mirror(
+          remote => "http://cpan.metacpan.org/",
+          local  => "/usr/share/mirrors/cpan",
+        );
+    
+        # or via minicpan
+    
+        minicpan -c CPAN::Mini::LatestDistVersion
+
+DESCRIPTION
+    CPAN::Mini uses the package index file ("02packages.details.txt.gz") to
+    grab the distribution tarballs that map to a module in the index.
+    Sometimes a newer version of a distribution is released which removes a
+    module. Until it is deleted via PAUSE, that old distribution will remain
+    in the index. This module attemps to filter those old distributions from
+    the local mirror.
+
+METHODS
+  new( %options )
+    Overridden method which adds a sub to "path_filters" which will reject
+    any dists which do not match the latest version from the
+    "02packages.details.txt.gz" index.
+
+  mirror_indices( )
+    Overridden method which parses "02packages.details.txt.gz" and
+    constructs the list of the latest version of each distribution.
+
+SEE ALSO
+    *   CPAN::Mini
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2013 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

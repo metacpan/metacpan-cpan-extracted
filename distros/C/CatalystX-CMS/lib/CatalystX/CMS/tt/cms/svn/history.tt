@@ -1,0 +1,28 @@
+[%- # svn history
+    #history.dump 
+-%]
+[%-
+    # parse UTC timestamps
+    USE dtparser = Class('DateTime::Format::ISO8601');
+    USE date;
+    
+-%]
+<table class="history">
+ <caption>History for <i>[% cmspage.url %]</i></caption>
+[% FOREACH entry IN history;
+     url = c.uri_for(cmspage.url, {'cxcms' => 'diff', 'rev' => entry.revision}); 
+     %]
+ <tr class="[% IF history.size > 1 %]diff[% END %] [% IF (loop.count % 2) %]alt[% END %]"
+    [%- UNLESS (loop.last || history.size == 1) -%]
+    onclick="parent.window.location='[% url %]'"
+    [%- END -%]>
+  <td>[% date.format( dtparser.parse_datetime( entry.date ).epoch ) %]</td>
+  <td>[% UNLESS loop.last %]<a href="[% url %]">[% entry.revision %]</a>
+      [% ELSE %]
+      [% entry.revision %]
+      [% END %]
+  </td>
+  <td>[% entry.msg %]</td>
+ </tr>
+[%+ END %]
+</table>

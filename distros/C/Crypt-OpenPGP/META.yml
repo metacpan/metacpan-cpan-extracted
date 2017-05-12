@@ -1,0 +1,39 @@
+---
+abstract: 'Pure-Perl OpenPGP implementation'
+author:
+  - 'Sergey Romanov <sromanov@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenPGP
+requires:
+  Alt::Crypt::RSA::BigInt: '0'
+  Compress::Zlib: '0'
+  Crypt::Blowfish: '0'
+  Crypt::CAST5_PP: '0'
+  Crypt::DES_EDE3: '0'
+  Crypt::DSA: '0'
+  Crypt::IDEA: '0'
+  Crypt::RIPEMD160: '0'
+  Crypt::Rijndael: '0'
+  Crypt::Twofish: '0'
+  Data::Buffer: '0.04'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  File::HomeDir: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Math::BigInt: '0'
+  URI::Escape: '0'
+resources:
+  homepage: https://github.com/btrott/Crypt-OpenPGP
+  repository: https://github.com/btrott/Crypt-OpenPGP.git
+version: '1.12'

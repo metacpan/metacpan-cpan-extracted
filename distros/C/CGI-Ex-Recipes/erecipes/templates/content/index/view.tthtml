@@ -1,0 +1,25 @@
+<div id="content">
+    <ul class="recipes">
+        <li class="recipes">
+            <a class="edit right" href="[% app.script_name _ '/default/' _ pid %]">back to category</a>
+            <a class="edit right" href="[% app.script_name %]">back to main page</a>
+            [%# IF app.is_authed %]
+                <a class="edit right" href="[% app.script_name _ '/edit/'_ id %]">edit</a>
+            [%# END %]
+        &nbsp;</li>
+        
+    </ul>
+    
+
+    <h2>[% title %]</h2>
+    <h3>Problem:</h3>
+    <p>[% problem %]</p>
+    <h3>Analysis:</h3>
+    <p>[% analysis %]</p>
+    <h3>Solution:</h3>
+    <p>[% solution %]</p>
+    <hr style="margin-bottom:2em;" />
+    <span class="right"><b>Last edited:</b> [% app.strftmime("%Y-%m-%d %H:%M", tstamp); %]</span>
+    <span class="left"><b>Created:</b> [% app.strftmime("%Y-%m-%d %H:%M", date_added); %]</span>
+
+</div>

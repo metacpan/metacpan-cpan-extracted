@@ -1,0 +1,29 @@
+---
+abstract: 'Cache interface to Memcached::libmemcached'
+author:
+  - 'Copyright (c) 2008 Daisuke Maki <daisuke@endeworks.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-Memcached-libmemcached
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Compress::Zlib: 0
+requires:
+  Carp: 0
+  Memcached::libmemcached: 0.4405
+  Storable: 0
+  Task::Weaken: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03001

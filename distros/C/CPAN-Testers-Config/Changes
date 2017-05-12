@@ -1,0 +1,12 @@
+Revision history for CPAN-Testers-Config
+
+0.002     2013-02-16 11:46:20 America/New_York
+
+    [FIXED]
+
+    - Fixed tests for bleadperl
+
+0.001     2010-08-22 11:50:57 EST5EDT
+
+  - First release
+

@@ -1,0 +1,39 @@
+Revision history for CPAN-Testers-Data-Release
+==============================================
+
+0.06    2014-09-12
+        - fixed license fields in META.json to be lists.
+        - added repository link to META.yml.
+        - added homepage link to META.json.
+        - extended META testing.
+        - reordered configuration option setting.
+        - more tests.
+
+0.05    2012-11-25
+        - added missing prequisite.
+        - fixed skip logic if Test::Database not available.
+
+0.04    2012-11-11
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - change file dates changed to meet W3CDTF standards.
+        - Artistic License v2 now sole license.
+        - added explicit LICENSE file.
+        - added META.json.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - more tests.
+
+0.03    2011-02-02
+        - added clean functionality to help remove any decrepancies.
+        - initial revision of backup process.
+        - removed support for CSV backups.
+        - added ability to continue backup process from known point.
+        - updated examples.
+
+0.02    2009-07-13
+        - Configuration fixes.
+        - Runtime checks added.
+        - Backup logic changed due to too large a resource drain on MySQL DB.
+
+0.01    2009-06-07
+        - Initial release.

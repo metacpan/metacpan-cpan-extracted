@@ -1,0 +1,44 @@
+0.09    13 June 2004
+        ->distance now accepts "from_lat" and "from_long" arguments;
+          use these in combination with "to_node".
+          Internally everything is still done in terms of OS X and Y.
+
+0.08    12 June 2004
+        ->find_within_distance now accepts "lat" and "long" arguments.
+          Internally everything is still done in terms of OS X and Y.
+
+0.07    3 September 2003
+        Fixed bug in ->find_within_distance where nodes with identical
+          co-ords weren't being returned.
+
+0.06    9 May 2003
+        ->find_within_distance can now optionally take "os_x" and "os_y"
+          arguments as an alternative to the "node" argument.
+        Also fixed bug where find_within_distance didn't work properly if
+          you specified the distance in kilometres.
+
+0.05    9 May 2003
+        Changed to inherit from CGI::Wiki::Plugin - you don't now do
+
+          my $locator = CGI::Wiki::Plugin::Locator::UK->new( wiki => $wiki );
+
+        but
+
+          my $locator = CGI::Wiki::Plugin::Locator::UK->new;
+          $wiki->register_plugin( plugin => $locator );
+
+0.04    5 April 2003
+        Finally remembered to add the Changes file to the MANIFEST.
+
+0.03    5 April 2003
+        Simplified tests with the use of the new test utilities available
+          in CGI::Wiki 0.27.
+
+0.02    17 March 2003
+        Fixed bug that had tests failing on some earlier versions of
+          postgres (with help from Marcel Gruenauer).
+        Simplified the SQL in ->find_within_distance since the bug in
+          CGI::Wiki with metadata hanging around too long is fixed in 0.23.
+
+0.01    28 October 2002
+        Initial release.

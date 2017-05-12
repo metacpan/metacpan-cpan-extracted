@@ -1,0 +1,14 @@
+---
+abstract: 'Class::PublicPrivate - Class with public keys with any name and a separate set of private keys'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Class-PublicPrivate
+provides:
+    Class::PublicPrivate:
+        file: lib/Class/PublicPrivate.pm
+        version: 0.82
+requires:
+    perl: 5.003
+version: 0.82

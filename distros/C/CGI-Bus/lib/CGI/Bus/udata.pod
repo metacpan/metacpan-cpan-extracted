@@ -1,0 +1,150 @@
+=head1 NAME
+
+CGI::Bus::udata - User Data Store
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->udata->param
+
+=head1 DESCRIPTION
+
+
+This module is a user data store.
+Uses filesystem, L<CGI::Bus::fut|CGI/Bus/fut>, L<CGI::Bus::file|CGI/Bus/file>.
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 SLOTS
+
+=over
+
+
+=item -data
+
+User data hash ref.
+Should be used via C<param> calls.
+
+
+=item -dataj
+
+User data joined hash ref.
+Should be used via C<paramj> calls.
+
+
+=item -file
+
+User data file L<CGI::Bus::file|CGI/Bus/file> object.
+Used internally.
+
+
+=item -ksplit
+
+Subdirectories size to split key value (username) to, 
+or splitter sub{}.
+0 - do not split, default.
+
+
+=item -path
+
+Path to users directories.
+Default is tpath('udata')
+
+
+
+=back
+
+=head1 METHODS
+
+The most commonly used are C<param>, C<paramj>, C<store>.
+
+
+=over
+
+
+=item keyfile (key, ?filename) -> key file object
+
+Returns L<CGI::Bus::file|CGI/Bus/file> object for
+key (username) given.
+
+
+=item keypath (key, ?filename) -> key filesystem path
+
+Filesystem path for key (username) given.
+
+
+=item load () -> self
+
+Load current user data with L<CGI::Bus::file|CGI/Bus/file>
+C<dumpload> call.
+Automatically called within C<param> and C<paramj> calls if needed.
+
+
+=item param () -> user data hash ref
+
+=item param (slot) -> value
+
+=item param (slot => value,...) -> self
+
+Access to user data hash ref.
+Automatically calls C<load> if needed.
+
+
+=item paramj () -> user data joined hash ref
+
+=item paramj (slot) -> value
+
+Like C<param> calls, 
+but for joined data of user and groups this user belongs to.
+
+
+=item store () -> self
+
+=item store (slot => value,...) -> self
+
+Store current user data with L<CGI::Bus::file|CGI/Bus/file>
+C<dumpstore> call
+
+
+=item uglist () -> [users and groups list]
+
+Generate list of users and groups data exists for.
+Is used by L<CGI::Bus::uauth|CGI/Bus/uauth> when
+application user authentication
+
+
+=item unload () -> self
+
+Unload current user data, 
+init object buffer to automatically load data if needed
+
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+=head2 01/01/2002 - 31/01/2002
+
+=item New:
+
+Implemented and Documented.
+
+
+=item ToDo:
+
+Review.
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

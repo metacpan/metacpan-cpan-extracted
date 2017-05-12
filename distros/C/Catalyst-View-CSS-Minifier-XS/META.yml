@@ -1,0 +1,34 @@
+---
+abstract: 'Minify your served CSS files'
+author:
+  - 'Ivan Drinchev <drinchev (at) gmail (dot) com>'
+  - "Arthur Axel \"fREW\" Schmidt <frioux@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-CSS-Minifier-XS
+requires:
+  CSS::Minifier::XS: 0
+  Catalyst: 5.64
+  Catalyst::Test: 0
+  File::Spec: 0
+  FindBin: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  Moose: 0
+  MooseX::Aliases: 0
+  Path::Class::Dir: 0.17
+  Test::More: 0.88
+  URI: 0
+  autodie: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/frioux/Catalyst-View-CSS-Minifier-XS/issues
+  repository: git://github.com/frioux/Catalyst-View-CSS-Minifier-XS
+version: 2.000002

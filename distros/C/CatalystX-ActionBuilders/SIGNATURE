@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 55ac697642a18dd7d974736a3d06fd531aa82382 .travis.yml
+SHA1 2e7a7be5eff1ccebfe61d757bb1bd53be231cf8a Changes
+SHA1 5b4ac095f29ac26c165c1ba0fa5fa61c59c9e5cf INSTALL
+SHA1 62c6886b1f14e9e9a39f6bf00f5490057d3c2885 LICENSE
+SHA1 c1ef3e9d781c97f0efb551948fae9fb910fb8e14 MANIFEST
+SHA1 60c9e11370315a79db42534a83efc4a87b9a2235 META.json
+SHA1 954cc922d6e972d3172d5cd5d42b109c429d1154 META.yml
+SHA1 68e0157e032456ee56fd798752c7de8671ff6992 Makefile.PL
+SHA1 a7c087e11bb8f4a79e4d113ed764f2d44dc08f9f README
+SHA1 adffad44bac26981b770072675e1956576d406ea cpanfile
+SHA1 d7b12ae3b847b28355090aa93dfb668151e509b8 dist.ini
+SHA1 343883df0d64dcee2904139738edac46392fc1b8 lib/CatalystX/ActionBuilders.pm
+SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
+SHA1 2e093e749980acb3f6c452366dc39be25cb15930 t/00-compile.t
+SHA1 5ec7c3d22c70f6e05c761b729ebd53a332a62bb6 t/000-report-versions-tiny.t
+SHA1 e57dc6ae2a6c50ef3ea180105962d9c15cc590f8 xt/author/pod-spell.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 b3915eaac65e18e6a048b34a4b873beccab326b4 xt/release/eol.t
+SHA1 b0f1136c7ca9f33919c0c5610bbf91b76269f6a7 xt/release/has-version.t
+SHA1 9d3cd3af5a6564f879be52d0192ecb39109584d1 xt/release/minimum-version.t
+SHA1 1c24d7092785b9dc8e33bd68bf35f4e03898b8a8 xt/release/no-smart-comments.t
+SHA1 cfbe92db4383493c41591b0328b7d138dcd4d603 xt/release/no-tabs.t
+SHA1 f8a0db723caed6eda77c2d4785dfe422a81383f0 xt/release/pod-linkcheck.t
+SHA1 e7a9fd553c7b8bf5b6e3956a111a475d5f22b8dc xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTWtUfAAoJEOd5N1CvIgQk47sIAIHwFOZ7TS3C9g6DcszTXELM
+SnnCPMQZVMaYt3tiYQQHPr/u2aLWTnwf82L63IuL1hvO8Bysm7Bz0DK8/P7afjWa
+4BXiiZ+ZyD1WNt4PVkqSw5bqhcYGwB1+uTC813yM1j0uEN+8Lc+j+kMxRrnDXM7Q
+pdyEH9huY8V9XKsS1Fho1/BlK/jPodNHHziXeYghs41il8hQmbSO7DAgvBMxv8da
+rgsdgLVZbBkkK/dJFH8oi4XlU1DD0ju+XsdP+K45AaH0FdjHjUrZMh1VlQk+/xht
+YX44f63BhWcQdNUlobxGZtdNGoHzITGniwjmiUX7YfDQwRcYGN16yM6Vrk7w048=
+=isf1
+-----END PGP SIGNATURE-----

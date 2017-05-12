@@ -1,0 +1,47 @@
+{
+   "abstract" : "Integrate with HTML::Template::Compiled",
+   "author" : [
+      "Alexander Becker <asb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Plugin-HTCompiled",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "4.31",
+            "ExtUtils::Install" : "1.52",
+            "HTML::Template::Compiled" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "UNIVERSAL::isa" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Plugin::HTCompiled" : {
+         "file" : "lib/CGI/Application/Plugin/HTCompiled.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.06"
+}

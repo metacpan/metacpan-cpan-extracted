@@ -1,0 +1,843 @@
+RCS file: /cvs/subversion/configure.in,v
+Working file: configure.in
+head: 1.16
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 16;	selected revisions: 16
+description:
+----------------------------
+revision 1.16
+date: 2000/08/28 20:11:24;  author: sussman;  state: Exp;  lines: +1 -0
+Factorized main() out of standard svn test programs.
+----------------------------
+revision 1.15
+date: 2000/08/25 21:31:02;  author: jimb;  state: Exp;  lines: +1 -0
+* configure.in: Include subversion/libsvn_fs/Makefile in the list of
+Makefiles to produce.
+* subversion/Makefile.am (SUBDIRS): Add libsvn_fs.
+* subversion/include/svn_error.h (svn_errno_t): Add new error code,
+SVN_ERR_FS_GENERAL.
+* subversion/libsvn_fs: First inklings of filesystem implementation.
+
+PR:
+Obtained from:
+Submitted by:
+Reviewed by:
+----------------------------
+revision 1.14
+date: 2000/08/08 20:54:54;  author: jimb;  state: Exp;  lines: +9 -2
+For the moment, don't include -O2 in CFLAGS by default, as that
+interferes with debugging.
+----------------------------
+revision 1.13
+date: 2000/08/08 20:01:56;  author: kfogel;  state: Exp;  lines: +6 -0
+add some CFLAGS if gcc
+----------------------------
+revision 1.12
+date: 2000/08/08 16:50:51;  author: kfogel;  state: Exp;  lines: +4 -0
+(AC_OUTPUT): generate Makefiles for libsvn_delta libsvn_wc.
+----------------------------
+revision 1.11
+date: 2000/08/03 14:39:43;  author: sussman;  state: Exp;  lines: +1 -1
+whoa, APR has changed.  s/ap_/apr_
+----------------------------
+revision 1.10
+date: 2000/08/02 22:19:25;  author: sussman;  state: Exp;  lines: +2 -1
+./configure now tells apr/ to run configure;
+our top-level Makefile builds apr first now, too.
+----------------------------
+revision 1.9
+date: 2000/08/01 21:29:33;  author: sussman;  state: Exp;  lines: +0 -9
+tweak
+----------------------------
+revision 1.8
+date: 2000/08/01 18:06:13;  author: sussman;  state: Exp;  lines: +4 -3
+doc/ should be autoconf'd now
+----------------------------
+revision 1.7
+date: 2000/08/01 01:26:32;  author: sussman;  state: Exp;  lines: +2 -0
+save work
+----------------------------
+revision 1.6
+date: 2000/08/01 00:34:40;  author: sussman;  state: Exp;  lines: +1 -1
+still autoconfiscating... getting the hang of it. :)
+----------------------------
+revision 1.5
+date: 2000/07/31 19:04:09;  author: sussman;  state: Exp;  lines: +65 -19
+hacking on autoconfiscation
+----------------------------
+revision 1.4
+date: 2000/07/14 00:08:19;  author: kfogel;  state: Exp;  lines: +4 -2
+Okay, stringtest builds too.
+----------------------------
+revision 1.3
+date: 2000/07/13 23:53:09;  author: kfogel;  state: Exp;  lines: +3 -1
+Got libsvn_string.so building...
+----------------------------
+revision 1.2
+date: 2000/07/13 05:57:35;  author: kfogel;  state: Exp;  lines: +26 -24
+more autoconfiscation work
+----------------------------
+revision 1.1
+date: 2000/07/13 05:11:19;  author: kfogel;  state: Exp;
+autoconfiscation in progress
+=============================================================================
+
+RCS file: /cvs/subversion/subversion/libsvn_delta/delta.h,v
+Working file: libsvn_delta/delta.h
+head: 1.17
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 17;	selected revisions: 17
+description:
+----------------------------
+revision 1.17
+date: 2000/08/28 16:21:57;  author: kfogel;  state: Exp;  lines: +2 -2
+Fixed Collab.Net url, and other name change tweaks.
+----------------------------
+revision 1.16
+date: 2000/08/25 20:09:06;  author: kfogel;  state: Exp;  lines: +4 -4
+Replace Collab.Net with CollabNet everywhere.
+----------------------------
+revision 1.15
+date: 2000/08/22 21:35:44;  author: sussman;  state: Exp;  lines: +11 -3
+- svn_delta_make_xml_parser:  prefix removed, this is a static routine.
+
+- svn_delta__tagmap[] added, rewrote do_stack_remove and set_tagtype
+                             accordingly... MUCH cleaner now.
+
+- svn_delta__digger_t:  "stack" argument now represents YOUNGEST
+                         stackframe.  Many routines simplified because
+                         of this.  (find_stack_newest() removed.)
+
+- do_stack_append: check that the first frame appended is always a
+                   tree-delta.
+----------------------------
+revision 1.14
+date: 2000/08/22 04:04:35;  author: kfogel;  state: Exp;  lines: +47 -47
+Derive ancestry correctly:
+
+(derive_ancestry): new function, walks up from bottom frame, looking
+for ancestry information.
+
+(do_stack_append): use it.
+
+Plus, many changes for namespace protection:
+
+(svn_delta__vcdiff_parser_t): replaces `svn_vcdiff_parser_t'.
+(svn_delta__make_vcdiff_parser): replaces `svn_make_vcdiff_parser'.
+(svn_delta__vcdiff_parse): replaces `svn_vcdiff_parse'.
+(svn_delta__vcdiff_flush_buffer): replaces `svn_vcdiff_flush_buffer'.
+(svn_delta__stackframe_t, some_random_symbol_for_testing_cvs2cl,
+another_symbol_after_the_newline, and_another,
+oh_my_goodness_will_it_never_stop, stop_too_many_symbols,
+i_am_going_crazy_aiyeee): replaces `svn_delta_stackframe_t', and then I
+tacked some more text onto the end of this entry so it would span multiple
+lines
+like so,
+see?
+(svn_delta__digger_t): replaces `svn_delta_digger_t'.
+(svn_delta__pdelta_parser_t): replaces `svn_pdelta_parser_t'.
+(svn_delta__make_pdelta_parser): replaces `svn_make_pdelta_parser'.
+(svn_delta__pdelta_parse): replaces `svn_pdelta_parse'.
+(svn_delta__reset_parser_subpool): replaces `svn_reset_parser_subpool'.
+(svn_delta__XML_t): replaces `svn_XML_t', and therefore:
+
+   `svn_delta__XML_treedelta'  replaces   `svn_XML_treedelta'
+   `svn_delta__XML_new'        replaces   `svn_XML_new'
+   `svn_delta__XML_delete'     replaces   `svn_XML_delete'
+   `svn_delta__XML_replace'    replaces   `svn_XML_replace'
+   `svn_delta__XML_file'       replaces   `svn_XML_file'
+   `svn_delta__XML_dir'        replaces   `svn_XML_dir'
+   `svn_delta__XML_textdelta'  replaces   `svn_XML_textdelta'
+   `svn_delta__XML_propdelta'  replaces   `svn_XML_propdelta'
+   `svn_delta__XML_set'        replaces   `svn_XML_set'
+----------------------------
+revision 1.13
+date: 2000/08/22 00:25:53;  author: kfogel;  state: Exp;  lines: +3 -2
+Changes to handle ancestor paths and versions correctly:
+
+(svn_version_t): removed, use `svn_vernum_t' instead.
+
+(svn_delta_stackframe_t): Added `ancestor_path' and `ancestor_version'
+fields.
+
+(xml_handle_start): look for "ancestor" and "ver" attributes, set them
+in frame if present.
+
+(do_stack_append): validate above new fields, then make them default
+to parent's values.
+
+(do_directory_callback): pass correct ancestry information to callbacks.
+----------------------------
+revision 1.12
+date: 2000/08/21 22:15:58;  author: sussman;  state: Exp;  lines: +59 -31
+Property-delta stuff at least compiles correctly now.  :)
+----------------------------
+revision 1.11
+date: 2000/08/19 01:17:45;  author: kfogel;  state: Exp;  lines: +1 -1
+(svn_delta_digger_t): call it `pdelta_chunk_parser' instead of
+`chunk_parser', just to keep things straight.
+
+Pass the new handler_baton, a.k.a. consumer_baton, as appropriate.
+----------------------------
+revision 1.10
+date: 2000/08/19 01:10:36;  author: kfogel;  state: Exp;  lines: +24 -0
+Moved `svn_pdelta_chunk_parser_t' from public to internal.
+
+(svn_delta_walker_t): add `handler_baton' argument to
+finish_propdelta, finish_textdelta.
+----------------------------
+revision 1.9
+date: 2000/08/19 01:03:47;  author: kfogel;  state: Exp;  lines: +21 -0
+Move `svn_vcdiff_parser_t' from public to internal.
+----------------------------
+revision 1.8
+date: 2000/08/18 22:37:21;  author: kfogel;  state: Exp;  lines: +6 -0
+Use new delta walker interface.
+
+(Fix a few minor things in the delta library, too: missing prototype
+and missing return value.  Everything compiles now.)
+----------------------------
+revision 1.7
+date: 2000/08/18 22:30:31;  author: sussman;  state: Exp;  lines: +3 -0
+
+We made a interface change in svn_walk_t, which then required much
+hacking on libsvn_delta.  deltaparse-test now works correctly again.
+
+We're now ready to start filling out prop_parse.c!
+----------------------------
+revision 1.6
+date: 2000/08/18 00:49:54;  author: kfogel;  state: Exp;  lines: +4 -4
+Making WC library use the new stuff in delta library:
+
+`svn_text_delta_window_handler_t' replaces `svn_delta_handler_t',
+because more specific.  All uses changed.
+
+(svn_delta_op_t): call field `action_code' instead of `op'.  Having
+two different things both called "op" was making my brain spin.
+All uses changed.
+
+(do_file_callback, do_directory_callback): parenthesize for precedence
+clarity.
+
+(svn_vcdiff_parse): increment buffer offset only if ate a byte.
+
+(svn_vcdiff_send_window): check if callback func is null before
+calling it.
+
+(check_existence): include APR_READ flag when testing, because
+apr_open() always returns APR_EACCES if you fail to request at least
+one of reading or writing.  Also, remove the file after testing.
+
+(window_handler): new func in wc library; skeleton, everything will
+depend on the baton.
+
+(add_file, replace_file): store window_handler in *handler.
+
+(checkout-test.c:main): be robuster.
+
+(test_read_fn): interpret results of apr_full_read() correctly.
+----------------------------
+revision 1.5
+date: 2000/08/17 19:39:55;  author: sussman;  state: Exp;  lines: +6 -1
+vcdiff_parse.c now compiles.
+----------------------------
+revision 1.4
+date: 2000/08/17 17:47:31;  author: sussman;  state: Exp;  lines: +7 -2
+Almost ready to start compiling deltaparse-test
+----------------------------
+revision 1.3
+date: 2000/08/16 21:36:36;  author: kfogel;  state: Exp;  lines: +5 -13
+(svn_delta_to_vcdiff): removed this hulking remnant of the bad old
+caller-pull days.
+----------------------------
+revision 1.2
+date: 2000/08/14 22:23:43;  author: sussman;  state: Exp;  lines: +5 -2
+delta_parse.c is basically finished for now;  ready to start fleshing out       dummy vcdiff parser stuff.
+----------------------------
+revision 1.1
+date: 2000/08/14 19:04:16;  author: sussman;  state: Exp;
+Moved private stuff from public header to private header.
+=============================================================================
+
+RCS file: /cvs/subversion/subversion/libsvn_delta/delta_parse.c,v
+Working file: libsvn_delta/delta_parse.c
+head: 1.63
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 63;	selected revisions: 63
+description:
+----------------------------
+revision 1.63
+date: 2000/08/28 16:21:57;  author: kfogel;  state: Exp;  lines: +2 -2
+Fixed Collab.Net url, and other name change tweaks.
+----------------------------
+revision 1.62
+date: 2000/08/25 20:09:06;  author: kfogel;  state: Exp;  lines: +4 -4
+Replace Collab.Net with CollabNet everywhere.
+----------------------------
+revision 1.61
+date: 2000/08/22 21:35:44;  author: sussman;  state: Exp;  lines: +63 -96
+- svn_delta_make_xml_parser:  prefix removed, this is a static routine.
+
+- svn_delta__tagmap[] added, rewrote do_stack_remove and set_tagtype
+                             accordingly... MUCH cleaner now.
+
+- svn_delta__digger_t:  "stack" argument now represents YOUNGEST
+                         stackframe.  Many routines simplified because
+                         of this.  (find_stack_newest() removed.)
+
+- do_stack_append: check that the first frame appended is always a
+                   tree-delta.
+----------------------------
+revision 1.60
+date: 2000/08/22 20:05:49;  author: kfogel;  state: Exp;  lines: +1 -2
+(maybe_derive_ancestry): declare p in the scope where it is used.
+----------------------------
+revision 1.59
+date: 2000/08/22 20:04:34;  author: kfogel;  state: Exp;  lines: +2 -4
+(maybe_derive_ancestry): eliminate first_frame argument; we don't need
+it anymore.  Caller changed.
+----------------------------
+revision 1.58
+date: 2000/08/22 19:55:05;  author: kfogel;  state: Exp;  lines: +2 -1
+(SVN_PATH_LOCAL_STYLE, SVN_PATH_REPOS_STYLE): new #defines.
+
+(svn_path_remove_component, svn_path_add_component,
+svn_path_add_component_nts, add_path_internal): use them.
+
+All callers changed.
+
+This gives an interface handling both local paths (for files) and
+repository paths (for ancestry), though the implementation is all
+Unix-style right now, which is the same as repository style.
+----------------------------
+revision 1.57
+date: 2000/08/22 17:30:30;  author: kfogel;  state: Exp;  lines: +62 -16
+Put mini-library for path manipulation into libsvn_subr.
+
+(maybe_derive_ancestor): always set to a full ancestry path, derived
+from both ancestors and names.
+----------------------------
+revision 1.56
+date: 2000/08/22 16:46:52;  author: sussman;  state: Exp;  lines: +25 -3
+
+ * when printing errors, specify if svn-specific
+ * fixed prop-delta handling routine
+ * fixed prop-delta "delete" validation logic
+
+Prop-deltas seem to work correctly now!
+----------------------------
+revision 1.55
+date: 2000/08/22 04:04:35;  author: kfogel;  state: Exp;  lines: +148 -125
+Derive ancestry correctly:
+
+(derive_ancestry): new function, walks up from bottom frame, looking
+for ancestry information.
+
+(do_stack_append): use it.
+
+Plus, many changes for namespace protection:
+
+(svn_delta__vcdiff_parser_t): replaces `svn_vcdiff_parser_t'.
+(svn_delta__make_vcdiff_parser): replaces `svn_make_vcdiff_parser'.
+(svn_delta__vcdiff_parse): replaces `svn_vcdiff_parse'.
+(svn_delta__vcdiff_flush_buffer): replaces `svn_vcdiff_flush_buffer'.
+(svn_delta__stackframe_t, some_random_symbol_for_testing_cvs2cl,
+another_symbol_after_the_newline, and_another,
+oh_my_goodness_will_it_never_stop, stop_too_many_symbols,
+i_am_going_crazy_aiyeee): replaces `svn_delta_stackframe_t', and then I
+tacked some more text onto the end of this entry so it would span multiple
+lines
+like so,
+see?
+(svn_delta__digger_t): replaces `svn_delta_digger_t'.
+(svn_delta__pdelta_parser_t): replaces `svn_pdelta_parser_t'.
+(svn_delta__make_pdelta_parser): replaces `svn_make_pdelta_parser'.
+(svn_delta__pdelta_parse): replaces `svn_pdelta_parse'.
+(svn_delta__reset_parser_subpool): replaces `svn_reset_parser_subpool'.
+(svn_delta__XML_t): replaces `svn_XML_t', and therefore:
+
+   `svn_delta__XML_treedelta'  replaces   `svn_XML_treedelta'
+   `svn_delta__XML_new'        replaces   `svn_XML_new'
+   `svn_delta__XML_delete'     replaces   `svn_XML_delete'
+   `svn_delta__XML_replace'    replaces   `svn_XML_replace'
+   `svn_delta__XML_file'       replaces   `svn_XML_file'
+   `svn_delta__XML_dir'        replaces   `svn_XML_dir'
+   `svn_delta__XML_textdelta'  replaces   `svn_XML_textdelta'
+   `svn_delta__XML_propdelta'  replaces   `svn_XML_propdelta'
+   `svn_delta__XML_set'        replaces   `svn_XML_set'
+----------------------------
+revision 1.54
+date: 2000/08/22 00:25:53;  author: kfogel;  state: Exp;  lines: +71 -31
+Changes to handle ancestor paths and versions correctly:
+
+(svn_version_t): removed, use `svn_vernum_t' instead.
+
+(svn_delta_stackframe_t): Added `ancestor_path' and `ancestor_version'
+fields.
+
+(xml_handle_start): look for "ancestor" and "ver" attributes, set them
+in frame if present.
+
+(do_stack_append): validate above new fields, then make them default
+to parent's values.
+
+(do_directory_callback): pass correct ancestry information to callbacks.
+----------------------------
+revision 1.53
+date: 2000/08/21 22:43:13;  author: sussman;  state: Exp;  lines: +16 -4
+save state
+----------------------------
+revision 1.52
+date: 2000/08/21 22:15:59;  author: sussman;  state: Exp;  lines: +212 -41
+Property-delta stuff at least compiles correctly now.  :)
+----------------------------
+revision 1.51
+date: 2000/08/19 01:17:45;  author: kfogel;  state: Exp;  lines: +18 -7
+(svn_delta_digger_t): call it `pdelta_chunk_parser' instead of
+`chunk_parser', just to keep things straight.
+
+Pass the new handler_baton, a.k.a. consumer_baton, as appropriate.
+----------------------------
+revision 1.50
+date: 2000/08/18 23:59:59;  author: kfogel;  state: Exp;  lines: +43 -47
+Don't drop those batons.
+----------------------------
+revision 1.49
+date: 2000/08/18 22:42:45;  author: kfogel;  state: Exp;  lines: +16 -16
+Use `ancestor_path' and `ancestor_version', instead of `base_path' and
+`base_version', because less likely to cause confusion.
+----------------------------
+revision 1.48
+date: 2000/08/18 22:30:31;  author: sussman;  state: Exp;  lines: +144 -35
+
+We made a interface change in svn_walk_t, which then required much
+hacking on libsvn_delta.  deltaparse-test now works correctly again.
+
+We're now ready to start filling out prop_parse.c!
+----------------------------
+revision 1.47
+date: 2000/08/18 17:09:52;  author: kfogel;  state: Exp;  lines: +2 -5
+Added copyright info, load svn-dev.el.
+
+This commit is also mainly to reproduce a problem with commitlogging.
+----------------------------
+revision 1.46
+date: 2000/08/18 00:49:54;  author: kfogel;  state: Exp;  lines: +7 -7
+Making WC library use the new stuff in delta library:
+
+`svn_text_delta_window_handler_t' replaces `svn_delta_handler_t',
+because more specific.  All uses changed.
+
+(svn_delta_op_t): call field `action_code' instead of `op'.  Having
+two different things both called "op" was making my brain spin.
+All uses changed.
+
+(do_file_callback, do_directory_callback): parenthesize for precedence
+clarity.
+
+(svn_vcdiff_parse): increment buffer offset only if ate a byte.
+
+(svn_vcdiff_send_window): check if callback func is null before
+calling it.
+
+(check_existence): include APR_READ flag when testing, because
+apr_open() always returns APR_EACCES if you fail to request at least
+one of reading or writing.  Also, remove the file after testing.
+
+(window_handler): new func in wc library; skeleton, everything will
+depend on the baton.
+
+(add_file, replace_file): store window_handler in *handler.
+
+(checkout-test.c:main): be robuster.
+
+(test_read_fn): interpret results of apr_full_read() correctly.
+----------------------------
+revision 1.45
+date: 2000/08/17 22:45:15;  author: sussman;  state: Exp;  lines: +5 -8
+AHA... deltaparse-test actually WORKS.  Time for a beer.
+----------------------------
+revision 1.44
+date: 2000/08/17 19:18:16;  author: sussman;  state: Exp;  lines: +2 -1
+compiles now, typo.
+----------------------------
+revision 1.43
+date: 2000/08/17 17:47:31;  author: sussman;  state: Exp;  lines: +12 -1
+Almost ready to start compiling deltaparse-test
+----------------------------
+revision 1.42
+date: 2000/08/16 23:01:07;  author: kfogel;  state: Exp;  lines: +1 -1
+(svn_delta_read_fn_t): add pool argument.  All callers changed.
+
+(svn_vernum_t): new type.  Callers who formerly used `long int' use
+this now.
+
+(svn_wc_apply_delta): correct arguments.  Def and callers changed.
+
+(svn_delta_parse): pass pool to reader function.
+
+(test_read_fn): finished.
+
+Tweaked #includes and Makefiles as appropriate, and defined skeleton
+functions.
+----------------------------
+revision 1.41
+date: 2000/08/16 21:38:31;  author: kfogel;  state: Exp;  lines: +54 -43
+You are in a maze of twisty compilation errors, each slightly
+different.
+----------------------------
+revision 1.40
+date: 2000/08/16 16:37:43;  author: kfogel;  state: Exp;  lines: +35 -18
+(get_attribute_value): completed.  Never errors now, just returns the
+value or NULL.
+
+All callers changed.
+----------------------------
+revision 1.39
+date: 2000/08/14 22:23:43;  author: sussman;  state: Exp;  lines: +246 -52
+delta_parse.c is basically finished for now;  ready to start fleshing out       dummy vcdiff parser stuff.
+----------------------------
+revision 1.38
+date: 2000/08/14 19:04:16;  author: sussman;  state: Exp;  lines: +4 -4
+Moved private stuff from public header to private header.
+----------------------------
+revision 1.37
+date: 2000/08/14 17:58:53;  author: sussman;  state: Exp;  lines: +145 -12
+
+Merged jimb's walker structure into svn_delta.h, jimb's own header is
+not (any longer) relevant.  :)
+
+Busy filling out parser's routines to call various svn_walker_t callbacks.
+----------------------------
+revision 1.36
+date: 2000/08/11 20:57:03;  author: sussman;  state: Exp;  lines: +146 -130
+Entire interface rewritten, in process of flushing out specific events now.
+----------------------------
+revision 1.35
+date: 2000/08/11 17:50:19;  author: sussman;  state: Exp;  lines: +60 -198
+Tweak validity check.
+----------------------------
+revision 1.34
+date: 2000/08/11 16:37:36;  author: sussman;  state: Exp;  lines: +112 -89
+Split telescope_delta_stack() into two routines, for better clarity.
+They have different validity-checking logic, and different execution
+logic.
+----------------------------
+revision 1.33
+date: 2000/08/11 01:07:28;  author: sussman;  state: Exp;  lines: +83 -75
+
+Saving work... in the middle of huge rewrite, a big mess.
+I'm doing this because of repeated power outages here at home.
+(I need to buy a UPS *now*)
+----------------------------
+revision 1.32
+date: 2000/08/10 22:01:37;  author: sussman;  state: Exp;  lines: +95 -62
+Still rewriting parser.
+----------------------------
+revision 1.31
+date: 2000/08/10 21:10:22;  author: sussman;  state: Exp;  lines: +9 -1
+
+New error-returning strategy:
+
+If we encounter a validation error while inside an expat callback,
+
+	1.  store the error in our digger structure
+	2.  immediately set all of the expat callbacks to NULL
+
+Item #2 causes XML_Parse() to finish its chunk rather quickly, whereby
+our main parser loop then notices the existence of #1 and returns.
+----------------------------
+revision 1.30
+date: 2000/08/10 21:03:47;  author: sussman;  state: Exp;  lines: +107 -17
+In process of rewriting parser machinery.
+----------------------------
+revision 1.29
+date: 2000/08/09 04:34:44;  author: sussman;  state: Exp;  lines: +35 -12
+temporarily report malformed XML errors
+----------------------------
+revision 1.28
+date: 2000/08/09 00:24:28;  author: sussman;  state: Exp;  lines: +1 -0
+Duh, don't forget to set previous ptr after appending stackframe.
+----------------------------
+revision 1.27
+date: 2000/08/08 23:10:36;  author: kfogel;  state: Exp;  lines: +67 -63
+The usual strcmp() mishap.
+----------------------------
+revision 1.26
+date: 2000/08/08 21:57:31;  author: kfogel;  state: Exp;  lines: +6 -6
+Fix allocation size buglets.
+----------------------------
+revision 1.25
+date: 2000/08/08 19:29:29;  author: kfogel;  state: Exp;  lines: +1 -1
+Recurse, or, as Noah Friedman likes to say, "recur".
+----------------------------
+revision 1.24
+date: 2000/08/08 18:41:21;  author: kfogel;  state: Exp;  lines: +9 -16
+Allow null callbacks.
+----------------------------
+revision 1.23
+date: 2000/08/08 17:34:03;  author: sussman;  state: Exp;  lines: +44 -43
+Delta library compiles now.
+----------------------------
+revision 1.22
+date: 2000/08/08 16:33:01;  author: sussman;  state: Exp;  lines: +23 -34
+
+Make all routines static, except for one public interface:
+svn_delta_make_xml_parser()
+----------------------------
+revision 1.21
+date: 2000/08/08 00:30:50;  author: sussman;  state: Exp;  lines: +106 -14
+Added type-checking to frame append/unpend.
+----------------------------
+revision 1.20
+date: 2000/08/07 23:35:57;  author: kfogel;  state: Exp;  lines: +1 -28
+(svn_walk_delta): gone.  No need for a generic delta walker -- it's so
+simple, it'll be clearer to write out the logic each time and avoid an
+awkward callback mechanism.
+----------------------------
+revision 1.19
+date: 2000/08/07 22:44:11;  author: sussman;  state: Exp;  lines: +43 -56
+Finished stackframe rewrite... much cleaner.
+----------------------------
+revision 1.18
+date: 2000/08/07 22:04:13;  author: sussman;  state: Exp;  lines: +88 -312
+in process of rewriting w/ stack frames
+----------------------------
+revision 1.17
+date: 2000/08/05 23:35:11;  author: sussman;  state: Exp;  lines: +28 -9
+Filled in some constructors.
+----------------------------
+revision 1.16
+date: 2000/08/05 23:19:03;  author: sussman;  state: Exp;  lines: +122 -108
+
+Finished 2nd draft (big rewrite) of:
+
+ svn_find_delta_bottom()
+ svn_starpend_delta()
+ svn_xml_handle_start()
+ svn_xml_handle_end()
+----------------------------
+revision 1.15
+date: 2000/08/05 22:56:01;  author: kfogel;  state: Exp;  lines: +11 -0
+Codus Interruptus, saving state:
+
+Implementing svn_walk_delta() before implementing delta_to_path()
+before implementing update_dir_handler().
+
+Someone remind me to read this log entry to figure what to do next.
+
+(svn_walk_delta): in progress.
+
+(update_dir_handler): waiting on above and delta_to_path().
+----------------------------
+revision 1.14
+date: 2000/08/05 22:40:58;  author: sussman;  state: Exp;  lines: +24 -32
+Factorization in progress.
+----------------------------
+revision 1.13
+date: 2000/08/05 22:19:51;  author: sussman;  state: Exp;  lines: +53 -3
+Fleshed out most of svn_xml_handle_end().
+----------------------------
+revision 1.12
+date: 2000/08/05 22:03:25;  author: sussman;  state: Exp;  lines: +142 -64
+Finished svn_starpend_delta() -- appends object to bottom of delta, or
+deletes bottommost object in delta.
+
+Uses new version of svn_find_delta_bottom(), which now returns both
+the bottommost *and* penultimate objects in the delta (needed for
+deletion.)
+----------------------------
+revision 1.11
+date: 2000/08/05 21:07:40;  author: sussman;  state: Exp;  lines: +126 -112
+
+Broke apart recursive delta cdr() logic from appending logic.
+----------------------------
+revision 1.10
+date: 2000/08/05 20:48:20;  author: kfogel;  state: Exp;  lines: +72 -0
+(svn_delta_make_xml_parser): new constructor function (rename of
+svn_xml_make_parser).
+
+Use it in test program.
+----------------------------
+revision 1.9
+date: 2000/08/05 17:56:19;  author: sussman;  state: Exp;  lines: +17 -64
+Remove useless constructors. :)
+----------------------------
+revision 1.8
+date: 2000/08/05 17:41:31;  author: kfogel;  state: Exp;  lines: +3 -0
+Made note about possible context optimization for data handler
+callback.
+----------------------------
+revision 1.7
+date: 2000/08/05 17:34:30;  author: kfogel;  state: Exp;  lines: +21 -32
+Working with Ben:
+
+Got rid of `svn_ancestor_t' -- it was only used for one thing, so just
+hold its fields inline.
+
+Say `this_edit_content' instead of `new_edit_content', to avoid
+implying that the type of the edit is `new'.
+
+Point out some remaining bookkeeping tasks in comments.
+
+Got rid of some old debugging code.
+----------------------------
+revision 1.6
+date: 2000/08/05 16:53:18;  author: sussman;  state: Exp;  lines: +99 -14
+
+First draft of svn_xml_startElement().
+----------------------------
+revision 1.5
+date: 2000/08/05 16:17:35;  author: sussman;  state: Exp;  lines: +73 -18
+
+Filling out main expat callback.
+----------------------------
+revision 1.4
+date: 2000/08/05 03:44:16;  author: sussman;  state: Exp;  lines: +125 -6
+
+1. Defined new enum svn_XML_elt_t, describing different XML elts we may
+   encounter when building a delta.
+
+2. Defined svn_append_to_delta(delta, object, svn_XML_elt_t), which
+   traverses a delta-in-progress recursively and attaches object to the tip.
+
+3. Started filling in main expat "open paren" callback with above routine.
+----------------------------
+revision 1.3
+date: 2000/08/04 22:42:43;  author: kfogel;  state: Exp;  lines: +59 -4
+Start constructors for delta components; we'll need destructors, too.
+----------------------------
+revision 1.2
+date: 2000/08/04 21:40:41;  author: sussman;  state: Exp;  lines: +32 -18
+Started XML-to-Delta callback system.
+----------------------------
+revision 1.1
+date: 2000/08/04 19:23:57;  author: sussman;  state: Exp;
+moving files around
+=============================================================================
+
+RCS file: /cvs/subversion/subversion/libsvn_delta/Attic/delta_parse.h,v
+Working file: libsvn_delta/delta_parse.h
+head: 1.3
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2000/08/08 16:35:30;  author: sussman;  state: dead;  lines: +0 -0
+Don't need intra-library header, but we do need automake.
+----------------------------
+revision 1.2
+date: 2000/08/05 17:56:19;  author: sussman;  state: Exp;  lines: +0 -33
+Remove useless constructors. :)
+----------------------------
+revision 1.1
+date: 2000/08/05 16:17:35;  author: sussman;  state: Exp;
+
+Filling out main expat callback.
+=============================================================================
+
+RCS file: /cvs/subversion/subversion/libsvn_delta/prop_parse.c,v
+Working file: libsvn_delta/prop_parse.c
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 7;	selected revisions: 7
+description:
+----------------------------
+revision 1.7
+date: 2000/08/28 16:21:57;  author: kfogel;  state: Exp;  lines: +2 -2
+Fixed Collab.Net url, and other name change tweaks.
+----------------------------
+revision 1.6
+date: 2000/08/25 20:09:06;  author: kfogel;  state: Exp;  lines: +4 -4
+Replace Collab.Net with CollabNet everywhere.
+----------------------------
+revision 1.5
+date: 2000/08/22 16:46:52;  author: sussman;  state: Exp;  lines: +7 -13
+
+ * when printing errors, specify if svn-specific
+ * fixed prop-delta handling routine
+ * fixed prop-delta "delete" validation logic
+
+Prop-deltas seem to work correctly now!
+----------------------------
+revision 1.4
+date: 2000/08/22 04:04:35;  author: kfogel;  state: Exp;  lines: +12 -12
+Derive ancestry correctly:
+
+(derive_ancestry): new function, walks up from bottom frame, looking
+for ancestry information.
+
+(do_stack_append): use it.
+
+Plus, many changes for namespace protection:
+
+(svn_delta__vcdiff_parser_t): replaces `svn_vcdiff_parser_t'.
+(svn_delta__make_vcdiff_parser): replaces `svn_make_vcdiff_parser'.
+(svn_delta__vcdiff_parse): replaces `svn_vcdiff_parse'.
+(svn_delta__vcdiff_flush_buffer): replaces `svn_vcdiff_flush_buffer'.
+(svn_delta__stackframe_t, some_random_symbol_for_testing_cvs2cl,
+another_symbol_after_the_newline, and_another,
+oh_my_goodness_will_it_never_stop, stop_too_many_symbols,
+i_am_going_crazy_aiyeee): replaces `svn_delta_stackframe_t', and then I
+tacked some more text onto the end of this entry so it would span multiple
+lines
+like so,
+see?
+(svn_delta__digger_t): replaces `svn_delta_digger_t'.
+(svn_delta__pdelta_parser_t): replaces `svn_pdelta_parser_t'.
+(svn_delta__make_pdelta_parser): replaces `svn_make_pdelta_parser'.
+(svn_delta__pdelta_parse): replaces `svn_pdelta_parse'.
+(svn_delta__reset_parser_subpool): replaces `svn_reset_parser_subpool'.
+(svn_delta__XML_t): replaces `svn_XML_t', and therefore:
+
+   `svn_delta__XML_treedelta'  replaces   `svn_XML_treedelta'
+   `svn_delta__XML_new'        replaces   `svn_XML_new'
+   `svn_delta__XML_delete'     replaces   `svn_XML_delete'
+   `svn_delta__XML_replace'    replaces   `svn_XML_replace'
+   `svn_delta__XML_file'       replaces   `svn_XML_file'
+   `svn_delta__XML_dir'        replaces   `svn_XML_dir'
+   `svn_delta__XML_textdelta'  replaces   `svn_XML_textdelta'
+   `svn_delta__XML_propdelta'  replaces   `svn_XML_propdelta'
+   `svn_delta__XML_set'        replaces   `svn_XML_set'
+----------------------------
+revision 1.3
+date: 2000/08/21 22:15:59;  author: sussman;  state: Exp;  lines: +76 -9
+Property-delta stuff at least compiles correctly now.  :)
+----------------------------
+revision 1.2
+date: 2000/08/18 22:37:21;  author: kfogel;  state: Exp;  lines: +1 -0
+Use new delta walker interface.
+
+(Fix a few minor things in the delta library, too: missing prototype
+and missing return value.  Everything compiles now.)
+----------------------------
+revision 1.1
+date: 2000/08/18 22:30:31;  author: sussman;  state: Exp;
+
+We made a interface change in svn_walk_t, which then required much
+hacking on libsvn_delta.  deltaparse-test now works correctly again.
+
+We're now ready to start filling out prop_parse.c!
+=============================================================================
+

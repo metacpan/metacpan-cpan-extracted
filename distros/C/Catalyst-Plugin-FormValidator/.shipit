@@ -1,0 +1,7 @@
+# auto-generated shipit config file.
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+svn.tagpattern = Catalyst-Plugin-FormValidator-%v
+svn.tagpattern = http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-FormValidator/tags/%v
+
+CheckChangeLog.files = Changes

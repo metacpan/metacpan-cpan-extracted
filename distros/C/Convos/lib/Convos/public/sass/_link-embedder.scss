@@ -1,0 +1,32 @@
+.link-embedder.text-html {
+  max-width: $messageWidth;
+  overflow: hidden;
+
+  .link-embedder-media {
+    float: left;
+    img {
+      max-height: 50px;
+      margin-right: 8px;
+      border: 0;
+      @include border-radius(0);
+    }
+  }
+
+  h3 {
+    font-size: 1em;
+    line-height: 1em;
+    display: block;
+    margin: 8px 0 0 0;
+  }
+
+  p {
+    font-size: 0.9em;
+    line-height: 1.2em;
+    margin: 4px 0;
+    display: table-cell;
+  }
+
+  .link-embedder-link {
+    display: none;
+  }
+}

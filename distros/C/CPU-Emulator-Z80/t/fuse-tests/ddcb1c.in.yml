@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 255
+    - 28
+  65272:
+    - 97
+name: ddcb1c
+registers:
+  AF: 64252
+  AF_: 0
+  BC: 25207
+  BC_: 0
+  DE: 35687
+  DE_: 0
+  HL: 54307
+  HL_: 0
+  I: 0
+  IX: 65273
+  IY: 19046
+  PC: 0
+  R: 0
+  SP: 0

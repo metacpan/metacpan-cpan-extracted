@@ -1,0 +1,117 @@
+{
+   "abstract" : "Random passphrase generator loosely based on the Diceware algorithm",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Diceware",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.060",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Crypt::Rijndael" : "0",
+            "Crypt::URandom" : "0",
+            "Data::Entropy" : "0",
+            "Data::Entropy::Algorithms" : "0",
+            "Data::Entropy::RawSource::CryptCounter" : "0",
+            "Data::Entropy::Source" : "0",
+            "Sub::Exporter" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Diceware" : {
+         "file" : "lib/Crypt/Diceware.pm",
+         "version" : "0.005"
+      },
+      "Crypt::Diceware::Wordlist::Beale" : {
+         "file" : "lib/Crypt/Diceware/Wordlist/Beale.pm",
+         "version" : "0.005"
+      },
+      "Crypt::Diceware::Wordlist::Common" : {
+         "file" : "lib/Crypt/Diceware/Wordlist/Common.pm",
+         "version" : "0.005"
+      },
+      "Crypt::Diceware::Wordlist::Original" : {
+         "file" : "lib/Crypt/Diceware/Wordlist/Original.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Crypt-Diceware/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Crypt-Diceware",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Crypt-Diceware.git",
+         "web" : "https://github.com/dagolden/Crypt-Diceware"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Mario Domgoergen <mdom@taz.de>",
+      "Neil Bowers <neil@bowers.com>"
+   ]
+}
+

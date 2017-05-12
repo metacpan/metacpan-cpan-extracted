@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: CGI-Wiki-Formatter-Multiple
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  CGI::Wiki: 0.48
+recommends:
+  DBD::SQLite: 0
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  CGI::Wiki::Formatter::Multiple:
+    file: lib/CGI/Wiki/Formatter/Multiple.pm
+    version: 0.02
+generated_by: Module::Build version 0.20

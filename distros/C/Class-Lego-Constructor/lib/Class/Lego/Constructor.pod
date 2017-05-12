@@ -1,0 +1,58 @@
+
+=head1 NAME
+
+Class::Lego::Constructor - Automated constructor generation
+
+=head1 SYNOPSIS
+
+  BEGIN {
+    require Class::Lego::Constructor;
+    @ISA = qw( Class::Lego::Constructor );
+  }
+
+  __PACKAGE__->mk_constructor0({
+    magical_number   => 42,
+    timestamp => sub { DateTime->new }, # deferred
+  });
+  # the weird name, mk_constructor0, is on purpose while API settles
+
+  __PACKAGE__->mk_constructor1({
+    magical_number => { default => 42 },
+    timestamp      => { default => sub { DateTime->new } },
+    sort_function  => { default_value => sub { $a <=> $b } }, # really a sub
+  });
+
+
+
+=head1 DESCRIPTION
+
+  NOTE: That module was formely called Class::Constructor::Factory.
+  It will enter the Class-Lego dist soon.
+
+I like the simplicity of L<Class::Accessor> and friends. 
+With them, creating accessors is a piece of cake.
+It does give me a default constructor as well.
+
+The case is that this default constructor is not 
+as convenient as the generated accessors. To be precise,
+I want to specify default values for attributes
+easily. This module is a tentative solution to this problem.
+
+---
+
+The intent of this module is to augment an
+existing constructor C<new> which receives 
+a hash ref argument containing pairs of field
+names versus their values.
+
+  $obj = My::Class->new( { f1 => v1, f2 => v2 } );
+
+When a declared field is omitted from the 
+constructor argument, it can be filled 
+with a default which was declared with C<mk_constructor0>.
+
+   default
+   default_value
+
+
+make_simple_constructor

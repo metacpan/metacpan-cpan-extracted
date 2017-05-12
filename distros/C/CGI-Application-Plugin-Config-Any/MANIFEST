@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/CGI/Application/Plugin/Config/Any.pm
+t/TestApp.pm
+t/00-load.t
+t/01-basic.t
+t/basic.pl
+t/named/named.pl
+t/pod-coverage.t
+t/pod.t

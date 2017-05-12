@@ -1,0 +1,19 @@
+Build.PL
+cgi-bin/ajax.cgi
+Changelog.ini
+CHANGES
+htdocs/ajax
+htdocs/ajax.cgi
+htdocs/content.tmpl
+htdocs/search.js
+htdocs/search.tmpl
+htdocs/web.page.tmpl
+INSTALL
+lib/CGI/Application/Demo/.htajax.conf
+lib/CGI/Application/Demo/Ajax.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.pod.t
+t/01.load.t

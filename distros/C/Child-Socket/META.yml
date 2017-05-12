@@ -1,0 +1,36 @@
+---
+abstract: 'Socket based IPC plugin for L<Child>'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Child-Socket
+provides:
+  Child::IPC::Socket:
+    file: lib/Child/IPC/Socket.pm
+  Child::Link::IPC::Socket:
+    file: lib/Child/Link/IPC/Socket.pm
+  Child::Link::IPC::Socket::Parent:
+    file: lib/Child/Link/IPC/Socket/Parent.pm
+  Child::Link::IPC::Socket::Proc:
+    file: lib/Child/Link/IPC/Socket/Proc.pm
+  Child::Socket:
+    file: lib/Child/Socket.pm
+    version: 0.003
+requires:
+  Child: 0.007
+  IO::Socket::UNIX: 0
+  POSIX: 0
+resources:
+  bugtracker: http://github.com/exodist/Child-Socket/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Child-Socket
+version: 0.003

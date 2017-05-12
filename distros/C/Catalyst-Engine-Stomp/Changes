@@ -1,0 +1,81 @@
+Revision history for Perl extension Catalyst::Engine::Stomp.
+
+0.17  Wed  12 Oct  2011
+    - Thanks to dakkar for:
+    - it's now possible to subscribe to a topic, not just a queue
+    - you can specify additional subscription headers, at various levels
+    - the final dispatch (in Catalyst::Controller::MessageDriven) can
+      be directed by the (standard) JMSType header
+
+0.16  Fri  6 May 16:00 2011
+    - Thanks to chiselwright for flushing the logs when an error is thrown
+      and not using 100% CPU when unable to connect.
+
+0.15  Mon  7 Feb 14:00 2011
+    - Thanks to dakkar for:
+    - Config option tries_per_server is now optional
+    - Only join a queue once even if specified twice!
+    - Code tidy
+
+0.14  Tue  8 Jue 17:00
+    - More than one stomp server can be specified so a client can
+      failover to the next server in the list
+
+0.13  Wed 10 Mar 16:45
+    - Added ability to send signal USR1 to the Catalyst app so no more
+      requests are handled and it exists.
+
+0.12  Tue Dec  7 17:45
+    - The raw request (in say YAML) is kept in $c->stash->{raw_request}
+      which is useful for debugging/logging
+
+0.11  Fri Dec  4 16:30:00 2009
+    - Really really fix the tests this time
+
+0.10  Tue Dec  1 16:00:00 2009
+    - Fixed tests _only_ to allow for cleaner install
+
+0.09  Fri Nov 27 17:00:00 2009
+    - If a single error is exists and it is blessed, that is serialized
+      and sent back to the user. Before it was stringyfied.
+
+0.08  Thu Oct 29 17:00:00 2009
+    - Added ability to convert message to UTF-8 on output if flag set
+    - Added test to demonstrate Throwable error objects not being
+      passed up the stack correctly
+
+0.07  Thu Aug 27 22:37:46 2009
+    - Ability to set the message key used to dispatch
+      to a message-driven Controller action (Jason Tang)
+    - Ability to add additional header key/value pairs to the
+      subscribe message sent to the message broker. (Jason Tang)
+    - Additional documentation (Jason Tang)
+
+0.06  Mon Jul 13 22:22:22 2009
+    - Make the test-app harness available under CatalystX::
+    - Clean up use of deprecated dispatcher methods.
+    - Add an error message in the Catalyst log when we
+      receive an unserializeable message.
+    - Fix the test application to always run with the
+      correct library paths.
+    - Fix bug causing alternate serializers to not be found
+      when using configuration from a config file.
+
+0.05  Sun Jun 07 01:38:46 2009
+    - Cleanups, tests and documentation additions.
+    - Add namespace:autoclean
+    - Handle 'no type' messages better, attempt to reply saying so.
+
+0.04  Mon Jun 01 09:21:00 2009
+    - Remove dependency on Catalyst::Action::REST, use
+      Data::Serializer directly instead.
+
+0.03  Thu May 21 22:57:00 2009
+	- Add Alien::ActiveMQ for real testing.
+
+0.02  Sun May 17 00:00:00 2009
+	- Rename TestApp
+
+0.01  Fri May 15 21:39:30 2009
+	- Initial CPAN Release
+

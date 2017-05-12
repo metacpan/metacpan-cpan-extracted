@@ -1,0 +1,46 @@
+NAME
+    Catalyst::View::Mason2 - Mason 2.x view class
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        # use the helper
+        script/create.pl view Mason2 Mason2
+
+        # lib/MyApp/View/Mason2.pm
+        package MyApp::View::Mason2;
+        use base 'Catalyst::View::Mason2';
+        __PACKAGE__->config(
+            # insert Mason parameters here
+        );
+
+        1;
+
+        # in a controller
+        package MyApp::Controller::Foo;
+        sub bar : Local {
+            ...
+            $c->stash->{name} = 'Homer';
+            $c->stash->{template} = 'foo/bar';   # .mc is automatically added
+        }
+
+        # in root/comps/foo/bar.mc
+        <%args>
+        $.name
+        </%args>
+
+        Hello <% $.name %>! Your URI was <% $c->req->uri %>.
+
+DESCRIPTION
+    Allows you to use Mason 2.x for your views.
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

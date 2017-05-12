@@ -1,0 +1,63 @@
+NAME
+
+    CGI::Session::ID::Base32 - CGI::Session ID driver based on Base32
+    encoding
+
+SYNOPSIS
+
+        use CGI::Session;
+
+        $session = new CGI::Session("id:Base32", undef, { Directory => '/tmp' };
+
+DESCRIPTION
+
+    CGI::Session::ID::Base32 is to generate Base32 encoded random ids. The
+    library does not require any arguments.
+
+     There are two reasons why to use it
+      - shorter string result
+      - case insensibility
+
+    ( both very usefull for user login and other similar purposes, keyboard
+    inputs, email contained codes, etc... )
+
+COPYRIGHT
+
+    Copyright (C) 2003 Daniel Peder. All rights reserved.
+
+    This library is free software. You can modify and distribute it under
+    the same terms as Perl itself.
+
+    Partialy based on CGI::Session::ID::MD5 and the whole excelent
+    CGI::Session work by
+
+    Sherzod Ruzmetov <sherzodr@cpan.org>
+
+AUTHOR
+
+    Daniel Peder <danpeder@cpan.org>
+
+    Feedbacks, suggestions and patches are welcome.
+
+SEE ALSO
+
+    *   MIME::Base32 - Base32 encoding method ( insensitive to character
+        cases thus most usefull for user keyboard inputs )
+
+    *   MIME::Base64 - Base64 encoding method
+
+    *   Incr - Auto Incremental ID generator
+
+    *   CGI::Session - CGI::Session manual
+
+    *   CGI::Session::Tutorial - extended CGI::Session manual
+
+    *   CGI::Session::CookBook - practical solutions for real life problems
+
+    *   RFC 2965 - "HTTP State Management Mechanism" found at
+        ftp://ftp.isi.edu/in-notes/rfc2965.txt
+
+    *   CGI - standard CGI library
+
+    *   Apache::Session - another fine alternative to CGI::Session
+

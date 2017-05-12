@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use Chess::NumberMoves;
+use File::Basename;
+
+my $file = shift or die "filename required";
+
+$file =~ /\.pgo$/ or die "file must have a .pgo extension";
+
+my $basename = basename $file, qw(.pgo) ;
+
+my $outfile = "$basename.pgn";
+
+open O, ">$outfile" or die $!;
+
+my $numbered = Chess::NumberMoves::from_file($file);
+
+print O $numbered;
+
+
+

@@ -1,0 +1,40 @@
+From tomcat-user-return-99988-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Sat May 01 16:47:24 2004
+Return-Path: <tomcat-user-return-99988-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 97563 invoked from network); 1 May 2004 16:47:23 -0000
+Received: from daedalus.apache.org (HELO mail.apache.org) (208.185.179.12)
+  by minotaur-2.apache.org with SMTP; 1 May 2004 16:47:23 -0000
+Received: (qmail 55546 invoked by uid 500); 1 May 2004 16:46:54 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 55535 invoked by uid 500); 1 May 2004 16:46:54 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 55501 invoked from network); 1 May 2004 16:46:53 -0000
+Received: from unknown (HELO jakarta.apache.org) (81.36.103.42)
+  by daedalus.apache.org with SMTP; 1 May 2004 16:46:53 -0000
+From: tomcat-user@jakarta.apache.org
+To: tomcat-user@jakarta.apache.org
+Subject: Mail Delivery (failure tomcat-user@jakarta.apache.org)
+Date: Sat, 1 May 2004 18:46:52 +0200
+MIME-Version: 1.0
+Content-Type: multipart/related;
+        type="multipart/alternative";
+        boundary="----=_NextPart_000_001B_01C0CA80.6B015D10"
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+------=_NextPart_000_001B_01C0CA80.6B015D10
+Content-Type: multipart/alternative;
+        boundary="----=_NextPart_001_001C_01C0CA80.6B015D10"
+
+------=_NextPart_001_001C_01C0CA80.6B015D10
+Content-

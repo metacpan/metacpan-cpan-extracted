@@ -1,0 +1,66 @@
+{
+   "abstract" : "CPANPLUS plugin to install packages that use Build.PL",
+   "author" : [
+      "Jos Boumans <kane[at]cpan.org>, Ken Williams <kwilliams@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPANPLUS-Dist-Build",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0.84",
+            "ExtUtils::Install" : "1.42",
+            "File::Spec" : "0",
+            "IPC::Cmd" : "0.42",
+            "Locale::Maketext::Simple" : "0",
+            "Module::Build" : "0.32",
+            "Module::Load" : "0.16",
+            "Module::Load::Conditional" : "0.30",
+            "Params::Check" : "0.26",
+            "Test::Harness" : "3.16",
+            "if" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/cpanplus-dist-build",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/cpanplus-dist-build.git",
+         "web" : "https://github.com/bingos/cpanplus-dist-build"
+      }
+   },
+   "version" : "0.86",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

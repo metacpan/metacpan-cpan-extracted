@@ -1,0 +1,58 @@
+---
+abstract: 'Unified cache handling interface'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Date::Parse: '0'
+  Test::Builder: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CHI
+no_index:
+  directory:
+    - lib/CHI/Serializer
+    - lib/CHI/Test
+    - lib/CHI/t
+  file:
+    - lib/CHI/Constants.pm
+    - lib/CHI/Driver/Role/Universal.pm
+    - lib/CHI/Test.pm
+    - lib/CHI/Types.pm
+    - lib/CHI/Util.pm
+requires:
+  Carp::Assert: '0.20'
+  Class::Load: '0'
+  Data::UUID: '0'
+  Digest::JHash: '0'
+  Digest::MD5: '0'
+  File::Spec: '0.80'
+  Hash::MoreUtils: '0'
+  JSON::MaybeXS: '1.003003'
+  List::MoreUtils: '0.13'
+  Log::Any: '0.08'
+  Moo: '1.003'
+  MooX::Types::MooseLike: '0.23'
+  MooX::Types::MooseLike::Base: '0'
+  MooX::Types::MooseLike::Numeric: '0'
+  Storable: '0'
+  String::RewritePrefix: '0'
+  Task::Weaken: '0'
+  Time::Duration: '1.06'
+  Time::Duration::Parse: '0.03'
+  Time::HiRes: '1.30'
+  Try::Tiny: '0.05'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI
+  repository: git://github.com/jonswar/perl-chi.git
+version: '0.60'

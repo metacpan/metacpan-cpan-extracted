@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 161
+  15299:
+    - 180
+name: eda1
+registers:
+  AF: 60635
+  AF_: 0
+  BC: 30310
+  BC_: 0
+  DE: 21375
+  DE_: 0
+  HL: 15299
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,6 @@
+README
+MANIFEST
+Makefile.PL
+lib/Carp/Trace.pm
+t/00_trace.t
+META.yml                                 Module meta-data (added by MakeMaker)

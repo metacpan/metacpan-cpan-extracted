@@ -1,0 +1,9 @@
+Revision history for Perl extension Catalyst::Model::JabberRPC
+
+0.04  Thu Jul 12 23:41:27 2007
+    - Fixed config options passed in via ConfigLoader.
+0.03  Sun Feb 18 02:54:33 2007
+    - Now client connection is established when the object is instantiated.
+0.02  Wed Aug 31 01:37:00 2006
+    - Fixed Changes file.
+0.01  Wed Aug 30 21:59:42 2006

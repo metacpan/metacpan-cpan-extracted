@@ -1,0 +1,59 @@
+{
+   "abstract" : "Catalyst SQL::Library Model",
+   "author" : [
+      "Alex Pavlovic <alex.pavlovic@taskforce-1.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Model-DBI-SQL-Library",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Model::DBI" : "0",
+            "Catalyst::ScriptRunner" : "0",
+            "Catalyst::Test" : "0",
+            "DBI" : "0",
+            "FindBin" : "0",
+            "SQL::Library" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04",
+            "base" : "0",
+            "namespace::autoclean" : "0",
+            "ok" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Model::DBI" : "0",
+            "DBI" : "0",
+            "SQL::Library" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.19"
+}

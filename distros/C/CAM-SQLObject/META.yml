@@ -1,0 +1,16 @@
+---
+name: CAM-SQLObject
+version: 1.01
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Object parent class for SQL delegates
+license: perl
+requires:
+  CAM::SQLManager: 1.00
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::SQLObject:
+    file: lib/CAM/SQLObject.pm
+    version: 1.01
+generated_by: Module::Build version 0.2609

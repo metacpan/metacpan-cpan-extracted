@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use File::Slurper qw(write_text);
+use File::Temp qw(tempfile);
+use Config::IOD;
+
+die "Usage: $0 <file>\n" unless @ARGV == 1;
+
+my $iod = Config::IOD->new;
+my $doc = $iod->read_file($ARGV[0]);
+my ($tmpfh, $tmpname) = tempfile();
+write_text($tmpname, $doc->as_string);
+
+say "diff:";
+system "diff", "-u", $ARGV[0], $tmpname;
+
+say "";
+say "md5sum:";
+system "md5sum", $ARGV[0], $tmpname;

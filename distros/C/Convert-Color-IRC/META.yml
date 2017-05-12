@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Convert-Color-IRC
+version:             0.06
+abstract:            ~
+license:             perl
+author:              
+    - Jason Felds <wolfman.ncsu2000@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Convert::Color::RGB8:          0.01
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

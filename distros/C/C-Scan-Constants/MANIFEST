@@ -1,0 +1,18 @@
+META.yml                                 Module meta-data (added by MakeMaker)
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/C/Scan/Constants.pm
+contrib/LICENSE
+contrib/lib/ModPerl/CScan.pm
+t/include/defines.h
+t/include/enums.h
+t/include/input.h
+t/01-use-module.t
+t/02-code-snippet.t
+t/03-extract.t
+t/04-write-syms.t
+xt/author/01-pod.t
+xt/author/02-pod-coverage.t
+xt/author/03-kwalitee.t

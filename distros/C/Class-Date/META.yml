@@ -1,0 +1,33 @@
+---
+abstract: 'Class for easy date and time manipulation'
+author:
+  - 'Balazs Szabo (dLux)'
+build_requires:
+  Scalar::Util: 1.38
+  Test::More: 1.001
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Date
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.006
+resources:
+  repository: http://code.google.com/p/perl-class-date/
+version: v1.1.15
+x_contributors:
+  - 'dLux (Szabó, Balázs) <dlux@dlux.hu>'
+  - 'Matt Sergeant <matt@sergeant.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@cpan.org>'
+  - 'Stas Bekman <stas@stason.org>'
+  - 'Chris Winters <chris@cwinters.com>'
+  - 'Benoit Beausejour <bbeausej@pobox.com>'
+  - 'Gabor Szabo <szabgab@cpan.org>'

@@ -1,0 +1,10 @@
+^Catalyst-Model-LDAP-FromAuthentication-
+.gitignore
+.git/
+blib
+pm_to_blib
+MANIFEST.bak
+MANIFEST.SKIP~
+cover_db
+Makefile$
+Makefile.old$

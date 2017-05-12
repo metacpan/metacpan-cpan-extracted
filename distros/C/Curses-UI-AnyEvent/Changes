@@ -1,0 +1,6 @@
+0.101   2016-05-03
+  * Allow usage without blocking in mainloop: new startAsync() method
+  * Supports dialogs
+
+0.100   2016-03-19
+  * Initial CPAN release

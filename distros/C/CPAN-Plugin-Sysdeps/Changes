@@ -1,0 +1,108 @@
+Revision history for Perl extension CPAN::Plugin::Sysdeps.
+
+0.28  2017-05-06
+	- mapping update
+
+0.27  2017-04-27
+	- mapping update
+
+0.26  2017-04-23
+	- mapping update
+
+0.25  2017-03-08
+	- mapping update
+
+0.24  2017-03-05
+	- mapping update
+
+0.23  2017-02-19
+	- mapping update
+
+0.22  2017-02-18
+	- mapping update
+
+0.21  2017-02-08
+	- mapping update
+
+0.20  2017-02-04
+	- mapping update, especially for Fedora/CentOS/RedHat
+
+0.19  2017-01-21
+	- batch support for yum
+	- find missing rpm packages
+	- use /etc/redhat-release in _detect_linux_distribution_fallback
+	- mapping update, especially for Fedora/CentOS/RedHat
+
+0.18  2017-01-15
+	- compat for older CPAN.pm (CPAN::Distribution::base_id may be
+	  missing)
+	- mapping update
+
+0.17  2016-10-07
+	- fix for newer homebrew versions (for "brew ls --versions")
+	- mapping update
+
+0.16  2016-09-17
+	- mapping update
+
+0.15  2016-07-05
+	- mapping update
+
+0.14  2016-06-18
+	- mapping update
+	- gnukfreebsd -> apt-get
+	- test fixes
+
+0.13  2016-06-12
+	- handling alternatives for all installers
+	- bugfix for freebsd package resolution
+	- mapping update
+	- more tests
+
+0.12  2016-06-02
+	- mapping update
+
+0.11  2016-05-31
+	- handling alternatives with homebrew
+	- mapping update
+
+0.10  2016-05-23
+	- mapping update
+	- skip some tests on Mac OS X without homebrew
+
+0.09  2016-05-20
+	- fixes and mapping update
+	- more Pod
+
+0.08  2016-05-18
+	- support for Mac OS X via homebrew
+
+0.07  2016-05-12
+	- support for Windows via chocolatey (thanks CORION!)
+	- new cpan-sysdeps options: --dryrun, --run (CORION)
+	- more documentation
+
+0.06  2016-05-10
+	- support for osvers (freebsd only)
+	- fix loading of custom mappings
+	- mapping update
+	- more tests
+
+0.05  2016-05-09
+	- mapping update: Curses, ExtUtils::F77, Math::MPFR, WWW::Curl
+
+0.04  2016-05-07
+	- mapping update
+
+0.03  2016-04-25
+	- limited support for systems without lsb_release
+	- implemented batch mode on FreeBSD systenms
+	- documentation improvements (new NOTES and CREDITS sections)
+	- mapping update
+	- new test helper: test-sysdeps-roundtrip
+
+0.02  2016-04-23
+	- mapping update
+
+0.01  2016-04-22
+	- initial release

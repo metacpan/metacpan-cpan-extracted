@@ -1,0 +1,137 @@
+NAME
+    Catalyst::Authentication::Store::Tangram - A storage class for Catalyst
+    authentication from a class stored in Tangram
+
+SYNOPSIS
+        use Catalyst qw/
+            Authentication
+        /;
+
+        __PACKAGE__->config( authentication => {  
+            default_realm => 'members',
+            realms => {
+                members => {
+                    credential => {
+                        class => 'Password',
+                        password_field => 'password',
+                        password_type => 'clear'
+                    },
+                    store => {
+                        class => 'Tangram',
+                        tangram_user_class => 'Users',
+                        tangram_model => 'Tangram',
+                        storage_method => 'storage', # $c->model('Tangram')->storage                
+                    },
+                },
+            },
+        });
+
+        # Log a user in:
+        sub login : Global {
+            my ( $self, $c ) = @_;
+
+            $c->authenticate({  
+                email_address => $c->req->param('email_address'),
+                password => $c->req->param('password'),
+            });
+        }
+
+DESCRIPTION
+    The Catalyst::Authentication::Store::Tangram class provides access to
+    authentication information stored in a database via Tangram.
+
+CONFIGURATION
+    The Tangram authentication store is activated by setting the store
+    config's class element to *Tangram* as shown above. See the
+    Catalyst::Plugin::Authentication documentation for more details on
+    configuring the store.
+
+    The Tangram storage module has several configuration options
+
+        authentication => {  
+            default_realm => 'members',
+            realms => {
+                members => {
+                    credential => {
+                        # ...
+                    },
+                    store => {
+                        class => 'Tangram',
+                        user_class => 'Users',
+                        tangram_model => 'Tangram',
+                        storage_method => 'storage', # $c->model('Tangram')->storage                
+                    },
+                },
+            },
+        }
+    
+    class
+        Class is part of the core Catalyst::Plugin::Authentication module,
+        it contains the class name of the store to be used.
+
+    tangram_user_class
+        Contains the class name of the class persisted in your Tangram
+        schema to use as the source for user information. This config item
+        is REQUIRED. This class name is used to get a Tangram remote object
+        when constructing a search for your user when first authenticating,
+        and also this is the class which the ->load method is called on to
+        restore the user from a session.
+
+    tangram_model
+        Contains the class name (as passed to $c->model()) of the Tangram
+        model to use as the source for user information. This config item is
+        REQUIRED. The *storage_method* method will be invoked on this class
+        to get the Tangram::Storage instance to restore the user from.
+
+    storage_method
+        Contains the method to call on the *tangram_model* to retrieve the
+        instance of Tangram::Storage which users are looked up from.
+
+    user_class
+        Contains the class which the user object is blessed into. This class
+        is usually Catalyst::Authentication::Store::Tangram::User, but you
+        can sub-class that class and have your subclass used instead by
+        setting this configuration parameter. You will not need to use this
+        setting unless you are doing unusual things with the user class.
+
+METHODS
+  new ( $config, $app, $realm )
+    Simple constructor, returns a blessed reference to the store object
+    instance.
+
+  find_user ( $authinfo, $c )
+    *$auth_info* is expected to be a hash with the keys being field names on
+    your Tangram user object, and the values being what those fields should
+    be matched against. A tangram select will be built from the supplied
+    auth info, and this select is used to retrieve the user from Tangram.
+
+  for_session ( $c, $user )
+    This method returns the Tangram ID for the user, as that is all that is
+    necessary to be persisted in the session to restore the user.
+
+  from_session ( $c, $frozenuser )
+    This method is called whenever a user is being restored from the
+    session. $frozenuser contains the Tangram ID of the user to restore.
+
+  user_supports ( $feature, ... )
+    Returns false.
+
+AUTHOR
+    Tomas Doran, <bobtfish at bobtfish dot net>
+
+    With thanks to state51, my employer, for giving me the time to work on
+    this.
+
+BUGS
+    All complex software has bugs, and I'm sure that this module is no
+    exception.
+
+    Please report bugs through the rt.cpan.org bug tracker.
+
+COPYRIGHT
+    Copyright (c) 2008, state51. Some rights reserved.
+
+LICENSE
+    This module is free software; you can use, redistribute, and modify it
+    under the same terms as Perl 5.8.x.
+

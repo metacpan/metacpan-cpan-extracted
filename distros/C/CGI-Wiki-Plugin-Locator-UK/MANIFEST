@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/CGI/Wiki/Plugin/Locator/UK.pm
+t/00_setup.t
+t/01_add_test_data.t
+t/02_locator.t
+t/03_same_coords_bug.t
+t/04_lat_long.t
+META.yml                                 Module meta-data (added by MakeMaker)

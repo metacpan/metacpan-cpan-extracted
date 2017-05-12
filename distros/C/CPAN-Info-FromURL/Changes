@@ -1,0 +1,21 @@
+Revision history for CPAN-Info-FromURL
+
+0.07    2016-11-07 (PERLANCAR)
+
+	- Normalize single quote in package name to double colon, e.g.
+	  Module::SubMod'SubSubMod to Module::SubMod::SubSubMod.
+
+	- Parse perldoc.perl.org/MOD/SUBMOD.html.
+
+	- Parse search.cpan.org/search?module=MOD.
+
+
+0.06    2016-03-07 (PERLANCAR)
+
+	- Allow URL without http:// or https://.
+
+
+0.05    2016-03-07 (PERLANCAR)
+
+         - First release. CPAN::Module::FromURL from CPAN-Module-FromURL is now
+           merged here, and uses CPAN::Info::FromURL.

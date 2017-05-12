@@ -1,0 +1,8 @@
+TYPEMAP
+
+csh     *           T_PTROBJ
+cs_arch             T_ENUM
+cs_mode             T_ENUM
+cs_err              T_ENUM
+cs_opt_type         T_ENUM
+

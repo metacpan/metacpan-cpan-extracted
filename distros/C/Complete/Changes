@@ -1,0 +1,122 @@
+Revision history for Complete
+
+0.19    2015-12-17 (PERLANCAR)
+
+	- No spec changes.
+
+	- Update documentation.
+
+
+0.18    2015-11-29 (PERLANCAR)
+
+	- Updates (Complete::Setting has been merged to Complete::Common,
+	  behavior/options like ci/fuzzy/etc now should not be a
+	  per-function argument but are global settings in
+	  Complete::Common).
+
+
+0.17    2015-11-28 (PERLANCAR)
+
+        - Split Complete::Setting to Complete-Common so this distribution is now
+          pure specification.
+
+
+0.16    2015-09-16 (PERLANCAR)
+
+        - [Removed] Remove setting OPT_EXP_IM_PATH_MAX_LEN.
+
+
+0.15    2015-09-12 (PERLANCAR)
+
+	- Because Complete::Path has tweaked the way it does intermediate
+	  path expansion, we might not need OPT_EXP_IM_PATH_MAX_LEN
+	  anymore, for now I first test increasing this value first from 2
+	  to 6, later if things work out I might remove this option.
+
+
+0.14    2015-09-12 (PERLANCAR)
+
+        - Setting: Introduce OPT_FUZZY for fuzzy matching.
+
+
+0.13    2015-09-09 (PERLANCAR)
+
+	- [Incompatible change] Move settings from Complete to
+          Complete::Settings, to allow Complete to become purely a spec module.
+
+
+0.12    2015-03-04 (PERLANCAR)
+
+	- Rename escmode to esc_mode for more consistent word separating
+	  style.
+
+
+0.11    2015-01-09 (PERLANCAR)
+
+	- Add experimental option: $OPT_DIG_LEAF.
+
+
+0.10    2014-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Double derp, forgot to set OPT_EXP_IM_PATH back to 1.
+
+
+0.09    2014-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Derp, forgot to declare $OPT_EXP_IM_PATH_MAX_LEN.
+
+
+0.08    2014-12-27 (PERLANCAR)
+
+	- Introduce setting: OPT_EXP_IM_PATH_MAX_LEN (defaults to 2) to
+	  work around potential annoyance described earlier, set
+	  OPT_EXP_IM_PATH default back to on.
+
+
+0.07    2014-12-25 (PERLANCAR)
+
+	- Set default of OPT_EXP_IM_PATH to 0 due to potential annoying
+	  behavior in some cases.
+
+
+0.06    2014-12-24 (PERLANCAR)
+
+	- Add settings, expand on convention for complete_*, minor rewrite.
+
+
+0.05    2014-12-09 (PERLANCAR)
+
+	- [pod] Rewrite Completion answer structure, introduce key
+	  'static'.
+
+
+0.04    2014-11-27 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change key 'completion' in hashref-form of completion answer to
+          'words' to be more descriptive.
+
+        [OTHER]
+
+        - Revise POD: explain in more detail the completion answer structure,
+          remove Developer's Notes section.
+
+
+0.03    2014-07-02 (SHARYANTO)
+
+        - Explain about hashref vs arrayref completion result.
+
+
+0.02    2014-07-02 (SHARYANTO)
+
+        - Move developer notes from Complete-Util.
+
+
+0.01    2014-07-02 (SHARYANTO)
+
+        - First release.

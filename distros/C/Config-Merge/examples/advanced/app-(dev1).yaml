@@ -1,0 +1,14 @@
+# Local overrides for machine 'dev1'
+
+---
+root:          /home/user/www/EXAMPLE
+db:
+    host:      DEV1.domain.com
+    utf8:      ON
+cron:  
+    '!' :
+        '-' :
+             - 2
+        '+' : 
+            - JOB5
+    1  : JOB1CHANGE

@@ -1,0 +1,28 @@
+---
+abstract: 'HTTP/1.1 cache validators for Catalyst'
+author:
+  - 'Bernhard Graf <graf@cpan.org>'
+build_requires:
+  Catalyst::Runtime: 0
+  HTTP::Status: 0
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Catalyst-Plugin-Cache-HTTP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0
+  HTTP::Headers::ETag: 0
+  List::Util: 0
+  MRO::Compat: 0
+  perl: 5.8.1
+version: 0.001000

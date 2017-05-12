@@ -1,0 +1,26 @@
+Revision history for Perl extension Catalyst::Model::SWISH.
+
+0.01  Fri Mar 23 09:03:46 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Catalyst::Model::SWISH
+
+0.02  20 Feb 2008
+      * patch from Brett @ atomiclearning.com to fix one-off bug in results pager
+      * added Catalyst to Makefile.PL
+      * test explicitly for SWISH::API in tests to avoid failing outright if not installed. 
+
+0.03  19 Mar 2008
+      * fix new() to test for config hash presence before merging
+      * use Catalyst::Utils::merge_hashes() to do config merging
+
+0.04  27 Mar 2009
+      * add real tests
+      * fix bug when used in prefork conditions, where all children share same index handle.
+      * refactor to not need $c
+
+0.05  29 Jan 2010
+      * fix deps per RT54097
+
+0.06  24 Feb 2010
+      * fix checks for SWISH::API and SWISH::API::Object to skip if not installed.
+

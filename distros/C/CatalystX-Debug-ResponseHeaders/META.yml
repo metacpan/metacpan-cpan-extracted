@@ -1,0 +1,29 @@
+---
+abstract: 'Log the full response headers sent by your Catalyst application in debug mode'
+author:
+  - 'Tomas Doran (t0m) C<< <bobtfish@bobtfish.net> >>.'
+build_requires:
+  Catalyst::Runtime: 5.80022
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Debug-ResponseHeaders
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/CatalystX-Debug-ResponseHeaders
+version: 0.002

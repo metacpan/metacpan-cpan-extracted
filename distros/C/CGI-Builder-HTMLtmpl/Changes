@@ -1,0 +1,39 @@
+CGI-Builder-HTMLtmpl Latest Versions Changes
+
+Version 1.21
+- Maintainance release. A few minor changes
+
+Version 1.2
+- Fixed a problem related to pages with no templates
+- Added the internal ht_exists method to check if a template file exists
+  (without using the HTML::Template object)
+- Added the ht_param group accessor in order to collect the params that will
+  be passed to the internal ht object
+- Deprecated the use of $s->ht->param()
+- The ht object becomes an internal object: added an advanced note about
+  its use
+- Added a few tests
+- A few internal changes
+- Added the "switch_to overriding" and the "CREDITS" POD sections
+
+Version 1.1
+- Added the page_content_check method
+- Changed the page_content default sub: it prints the output in the RESPONSE
+  phase thus avoiding to call HTML::Template::output() method before.
+  This fixes a few problems reported in the ML
+- A few minor changes in the Makefile.PL and the POD
+
+Version 1.03
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.02
+- Minor POD changes
+
+Version 1.01
+- Changed Makefile.PL version check
+- Minor POD changes
+
+Version 1.0
+- First public release

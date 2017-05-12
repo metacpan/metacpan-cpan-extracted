@@ -1,0 +1,18 @@
+Revision history for Class-Meta-Declare
+
+0.03    2006-02-25
+        - Support for non-built-in types.
+
+0.02    2005-12-13
+        - Defaults for all values listed in POD.
+        - "code" slot for methods no longer mandatory.
+        - The "values" in the constructors options are now array references
+          instead of hash references.  This allows us to preserve the
+          attribute order.
+        - Doc improvements.
+        - Specify alternate build class via meta.use.
+        - Renamed 'attr' to 'acc' in a couple of sports where I missed it.
+
+0.01    2005-12-09
+        - Basic support for all planned functionality.
+

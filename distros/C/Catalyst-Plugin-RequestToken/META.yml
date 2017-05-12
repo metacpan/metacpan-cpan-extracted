@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Catalyst-Plugin-RequestToken
+version:             0.06
+abstract:            Module abstract (<= 44 characters) goes here
+license:             ~
+author:              
+    - Hideo Kimura (hide@hide-k.net)
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Catalyst:                      5.5
+    Catalyst::Plugin::Session:     0
+    Digest:                        0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

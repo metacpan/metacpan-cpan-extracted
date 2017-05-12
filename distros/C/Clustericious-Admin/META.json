@@ -1,0 +1,87 @@
+{
+   "abstract" : "Parallel SSH client",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Clustericious-Admin",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "EV" : "0"
+         },
+         "requires" : {
+            "AE" : "0",
+            "AnyEvent::Open3::Simple" : "0.76",
+            "Clustericious::Config" : "1.03",
+            "EV" : "0",
+            "File::chdir" : "0",
+            "Path::Class" : "0.26",
+            "YAML::XS" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::HomeDir" : "0.91",
+            "File::HomeDir::Test" : "0",
+            "Test::Exit" : "0.11",
+            "Test::More" : "0.94",
+            "Test::Script" : "0",
+            "Test::Warn" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clustericious/App-clad/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/App::clad",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clustericious/App-clad.git",
+         "web" : "https://github.com/clustericious/App-clad"
+      }
+   },
+   "version" : "1.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

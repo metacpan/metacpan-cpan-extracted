@@ -1,0 +1,17 @@
+#-----------------------------------------------------------------
+# Changes for Pod::Strip
+# $Rev: 17 $
+# $Date: 2006-03-20 21:18:35 +0100 (Mon, 20 Mar 2006) $ 
+#-----------------------------------------------------------------
+
+
+1.01    2006-09-30
+    - no changes / additions to functionality, this is a purly housekeeping
+      release!
+    - changed to Module::Build
+    - added various dist tests (99_pod*)
+
+
+1.00    2002-01-07
+    - first release to CPAN
+

@@ -1,0 +1,43 @@
+NAME
+    CGI::Application::Plugin::DevPopup::Query - show CGI query in DevPopup
+    window
+
+SYNOPSIS
+        use CGI::Application::Plugin::DevPopup;
+        use CGI::Application::Plugin::DevPopup::Query;
+
+        The rest of your application follows
+        ...
+
+DESCRIPTION
+    This module is a plugin for CGI::Application::Plugin::DevPopup. Whenever
+    used, it creates a "CGI Query" section in the DevPopup output. This
+    section contains a list of CGI query parameters passed to your
+    CGI::Application.
+
+    See "query()" in CGI::Application and CGI for more information about
+    query parameters.
+
+VERSION
+    1.01
+
+SEE ALSO
+    CGI::Application::Plugin::DevPopup, CGI::Application
+
+INCOMPATIBILITIES
+    Not known.
+
+BUGS AND LIMITATIONS
+    Not known.
+
+AUTHOR
+    Serguei Trouchelle, stro@cpan.org
+
+    Most of code is based by CGI::Application::Plugin::DevPopup by Rhesa
+    Rozendaal, rhesa@cpan.org
+
+LICENSE AND COPYRIGHT
+    This module is distributed under the same terms as Perl itself.
+
+    Copyright (c) 2009 Serguei Trouchelle
+

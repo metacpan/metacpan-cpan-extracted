@@ -1,0 +1,55 @@
+CDDB/Fake version 2.00
+======================
+
+Sometimes there's no CDDB file available for a piece of music. For
+example, when you created a collection of tracks from other albums. In
+this case, a text file containing the name of the artist / album,
+followed by a mere list of the track titles can be used as a
+fall-back.
+
+CDDB::Fake implements a part of the CDDB::File API based on manually
+crafted fall-back files.
+
+I've adopted the convention to name files with CDDB data C<.cddb>, and
+the fake data C<.nocddb>.
+
+For example, you can cut the results of a search at Gracenote
+(cddb.com) and paste it into the file .nocddb. For example:
+
+    Birelli Lagrene / Standards
+
+       1. C'est Si Bon
+       2. Softly, As in a Morning Sunrise
+       3. Days of Wine and Roses
+      ...
+      12. Nuages
+
+The titles may be optionally followed by trailing TABs and a MM:SS
+time indicator.
+
+A tool is included to generate a fake file from the names of the files
+in the directory.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MP3::Audio::Frame (optional)
+
+COPYRIGHT AND LICENCE
+
+  This programs is Copyright 2003,2004 Squirrel Consultancy.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the Perl Artistic License or the GNU General
+  Public License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.

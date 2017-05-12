@@ -1,0 +1,87 @@
+[% 
+    box_sites = 1 ;
+
+    IF ostitle == 'ALL' ; THEN ; 
+      title = 'Distributions With No Reports' ;
+      crumb1_name = 'No Reports' ;
+    ELSE ; 
+      title = ostitle _ ' - Distributions With No Reports' ;
+      crumb2_name = 'No Reports' ;
+      crumb2_href = '/noreports/all.html' ;
+      crumb1_name = ostitle ;
+    END ;
+
+%]
+
+<p>All distributions within the list below are all the latest versions of the respective distributions.
+There is a 28 day grace period for all distributions, from the time they were released to PAUSE, until
+a report is submitted for them. All the distribution versions below have not received any reports, and 
+exceed this 28 day grace period.</p>
+<p>Reasons why distribution may appear in this list can be many, below are just a few:</p>
+<ul>
+<li>Distribution requires a C (or other language) library that is not installed</li>
+<li>Distribution prompts for user input, with no suitable default, and loops</li>
+<li>Distribution fails to run an external command (with incorrect options?)</li>
+<li>Distribution tests hang (possibly due to undefined environment variables)</li>
+<li>Distribution appears on tester's ignore lists (possibly for one of the above reasons)</li>
+<li>Dependency of distribution always fails tests or itself is in this list. Check <a href="http://deps.cpantesters.org">http://deps.cpantesters.org</a></li>
+</ul>
+<p>If you have been added to an ignore list, you can check those of some common testers.</p>
+<ul>
+<li><a href="https://github.com/eserte/srezic-cpan-distroprefs" title="Slaven Rezi&#x0107;">Slaven Rezi&#x0107; (SREZIC)</a></li>
+<li><a href="https://github.com/andk/cpanpm/tree/master/distroprefs" title="Andreas J. K&ouml;nig">Andreas J. K&ouml;nig (ANDK)</a></li>
+<li><a href="http://svn.trouchelle.com/perl/cpan/prefs/" title="Serguei Trouchelle">Serguei Trouchelle (STRO)</a></li>
+<li><a href="http://svn1.hostlocal.com/szabgab/trunk/CPANTESTERS/win32/disabled.yml" title="Gabor Szabo">Gabor Szabo (SZABGAB)</a></li>
+<li><a href="https://github.com/bingos/cpan-smoke-tools/blob/master/cpansmoke.ini" title="Chris Williams">Chris Williams (BINGOS)</a></li>
+<li><a href="http://code.google.com/p/devogon-cpan-prefs/" title="Daniel Bosold">Daniel Bosold (DEVOGON)</a></li>
+</ul>
+
+<p>If you resolve any issues, which may have resulted in your distribution being added to an ignore list, 
+please post to the <a href="http://lists.perl.org/list/cpan-testers-discuss.html" title="CPAN Testers Discuss mailing list">CPAN Testers Discuss</a> 
+mailing list.</p>
+
+<p>Filter on Operating System: 
+<select id="noreports" name="noreports" onchange="noreports()">
+<option value="/noreports/all.html">All</option>
+[% FOREACH os = osnames %]
+<option value="/noreports/[% os.osname %].html"[% IF ostitle == os.ostitle %] selected="selected"[% END %]>[% os.ostitle %]</option>
+[% END %]
+</select>
+</p>
+
+<h2>OS: [% ostitle %]</h2>
+
+<table class="sortable" summary="Distributions with no reports">
+<thead>
+<tr><th class="top">DISTRIBUTION</th>
+    <th class="top">VERSION</th>
+    <th class="top">AUTHOR</th>
+    <th class="top">RELEASED</th></tr>
+</thead>
+<tbody>
+[% FOREACH row = rows %]
+<tr><td>[% row.dist %]</td>
+    <td>[% row.version %]</td>
+    <td>[% row.author %]</td>
+    <td class="timestamp1">[% row.datetime %]</td></tr>
+[% END %]
+</tbody>
+</table>
+
+<p>[% rowcount %] current distributions without reports.</p>
+
+<p>If any distribution should not be listed, please let <a href="mailto:barbie@cpan.org" title="Contact Barbie">me</a> know.</p>
+
+[% IF rowcount > 0 && ostitle != 'All' %]
+<p>CSV data file: <a href="/noreports/[% osname %].csv" title="CSV data for [% ostitle %]">[% osname %].csv</a></p>
+[% END %]
+
+<script type="text/javascript">
+
+function noreports() {
+  var e = document.getElementById("noreports");
+  var l = e.options[e.selectedIndex].value;
+  window.location.href=l;
+}
+
+</script>

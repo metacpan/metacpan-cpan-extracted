@@ -1,0 +1,19 @@
+Revision history for Perl extension Crypt::CAST5.
+
+0.05  1 Jul 2006
+        - removed broken CBC test
+
+0.04  19 Feb 2004
+        - react appropriately to utf8 input
+
+0.03  23 Mar 2003
+        - use perl's U32 type for portability
+
+0.02  10 Nov 2002
+        - added volatile keword to keep compiler from optimizing away the
+          clear of the key material
+
+0.01  24 Oct 2002
+        - original version; created by h2xs 1.22 with options
+                -A -n Crypt::CAST5
+

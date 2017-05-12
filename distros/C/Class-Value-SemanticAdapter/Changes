@@ -1,0 +1,32 @@
+Revision history for Perl extension Class-Value-SemanticAdapter
+
+1.100841  2010-03-25 21:57:31 Europe/Vienna
+    - standardized POD method documentation
+
+1.100840  2010-03-25 20:27:33 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:02:24 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.01  Wed, 21 Nov 2007 18:21:30 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - Makefile.PL: removed unnecessary requirements
+    - deleted Class::Value::SemanticAdapter::Test (that functionality now lives
+      in Data::Semantic::Test
+    - updated MANIFEST
+    - deleted lib/Class/Value/SemanticAdapter
+    - deleted lib/Class/Value/SemanticAdapter/Test.pm
+    - deleted t/01_misc.t
+    - getting rid of the distinction between well-formedness and validity.
+      Only validity remains
+    - added documentation
+    - updated t/perlcriticrc

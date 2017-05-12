@@ -1,0 +1,79 @@
+From tomcat-user-return-131331-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Mon Aug 15 22:19:14 2005
+Return-Path: <tomcat-user-return-131331-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 2730 invoked from network); 15 Aug 2005 22:19:13 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 15 Aug 2005 22:19:13 -0000
+Received: (qmail 17885 invoked by uid 500); 15 Aug 2005 22:18:58 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 17875 invoked by uid 500); 15 Aug 2005 22:18:58 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 17862 invoked by uid 99); 15 Aug 2005 22:18:58 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Mon, 15 Aug 2005 15:18:58 -0700
+X-ASF-Spam-Status: No, hits=0.0 required=10.0
+        tests=
+X-Spam-Check-By: apache.org
+Received-SPF: neutral (asf.osuosl.org: local policy)
+Received: from [209.121.69.211] (HELO pbco-server2.pbco.ca) (209.121.69.211)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Mon, 15 Aug 2005 15:19:18 -0700
+Received: from pbco-server2.pbco.ca (localhost [127.0.0.1])
+        by pbco-server2.pbco.ca (8.13.1/8.13.1) with ESMTP id j7FMIcCN023140
+        for <tomcat-user@jakarta.apache.org>; Mon, 15 Aug 2005 15:18:46 -0700
+Received: from pbco-server2.pbco.ca (root@localhost)
+        by pbco-server2.pbco.ca (8.13.1/8.13.1/Submit) with ESMTP id j7FMIcbX023138
+        for <tomcat-user@jakarta.apache.org>; Mon, 15 Aug 2005 15:18:38 -0700
+Date: Mon, 15 Aug 2005 15:18:37 -0700
+From: "Tim Lam" <tlam@pbco.ca>
+Sender: "Tim Lam" <tlam@pbco.ca>
+To: tomcat-user@jakarta.apache.org
+Message-ID: <"H0000079000951e6.1124144316.pbco-server2.pbco.ca*"@MHS>
+Subject:  tomcat 5.0.19 randomly stops taking http requests
+x-scalix-Hops: 1
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="US-ASCII"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+
+   Tomcat 5.0.19 is actually still running, but stops taking http request=
+s
+   randomly. It will run just fine for one or two weeks, then in the midd=
+les
+   of the night, or over the weekend when no one is using tomcat at all, i=
+t
+   stops taking requests (I know when it happens because I have a standal=
+one
+   application that tries retrieving a webpage from Tomcat every half hou=
+r to
+   check if it's still up).
+   The catalina.out log file doesn't show anything unusual, it's actually=
+
+   still running, so is the Tomcat process. But trying to reach a web pag=
+e
+   will show a timeout error on any browser. And sometimes trying to shut=
+down
+   tomcat after it's hung doesn't work, I have to manually kill the tomca=
+t
+   process.
+   I am using JVM 1.4.2_02.
+   Any help would be appreciated, Thanks.
+   ps. I am new to using this mailing list, and have a question, is it
+   required to subscribe to the tomcat-user list in order to ask question=
+s?
+   or can I just send emails to the list and replies will get sent back
+   directly to my email address?
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

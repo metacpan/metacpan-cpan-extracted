@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Chart/EPS_graph.pm
+lib/Chart/EPS_graph/Test.pm
+lib/Chart/EPS_graph/PS.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

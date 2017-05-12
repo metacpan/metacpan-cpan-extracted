@@ -1,0 +1,58 @@
+# $Id: fuse2yaml.expected,v 1.3 2008/02/23 13:14:54 drhyde Exp $
+
+use strict;
+use warnings;
+use YAML::Tiny;
+
+undef $/;
+
+open(my $fh, 'tests.expected');
+my @expected = split(/\n\n+/, <$fh>);
+close($fh);
+
+foreach (@expected) {
+    my $y = YAML::Tiny->new();
+    # not interested in intermediate states
+    $_ = join(" ", grep { /^[^\s]/ } split(/\n/, $_));
+    my @bits = split(/\s+/, $_);
+    my $testspec = {
+        name => shift(@bits),
+        registers => {
+            AF   => hex('0x'.shift(@bits)),
+            BC   => hex('0x'.shift(@bits)),
+            DE   => hex('0x'.shift(@bits)),
+            HL   => hex('0x'.shift(@bits)),
+            AF_  => hex('0x'.shift(@bits)),
+            BC_  => hex('0x'.shift(@bits)),
+            DE_  => hex('0x'.shift(@bits)),
+            HL_  => hex('0x'.shift(@bits)),
+            IX   => hex('0x'.shift(@bits)),
+            IY   => hex('0x'.shift(@bits)),
+            SP   => hex('0x'.shift(@bits)),
+            PC   => hex('0x'.shift(@bits)),
+            I    => hex('0x'.shift(@bits)),
+            R    => hex('0x'.shift(@bits)),
+        },
+        IFF1 => hex('0x'.shift(@bits)),
+        IFF2 => hex('0x'.shift(@bits)),
+        IM   => hex('0x'.shift(@bits)),
+        halted => shift(@bits),
+        # Ts     => shift(@bits),
+        mem => {},
+    };
+    shift(@bits); # Ts no longer used
+    my $prev = -1;
+    my $thisseq;
+    foreach my $this (@bits) {
+        last if($prev eq $this && $this eq -1);
+        if($prev eq -1) {
+            $thisseq = $testspec->{mem}->{hex('0x'.$this)} = [];
+        }
+        if($this ne -1 && $prev ne -1) {
+            push @{$thisseq}, hex('0x'.$this);
+        }
+        $prev = $this;
+    }
+    $y->[0] = $testspec;
+    $y->write($testspec->{name}.".expected.yml");
+}

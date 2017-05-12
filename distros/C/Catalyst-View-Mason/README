@@ -1,0 +1,130 @@
+NAME
+    Catalyst::View::Mason - Mason View Class
+
+SYNOPSIS
+        # use the helper
+        script/create.pl view Mason Mason
+
+        # lib/MyApp/View/Mason.pm
+        package MyApp::View::Mason;
+
+        use base 'Catalyst::View::Mason';
+
+        __PACKAGE__->config(use_match => 0);
+
+        1;
+
+        $c->forward('MyApp::View::Mason');
+
+DESCRIPTION
+    Want to use a Mason component in your views? No problem!
+    Catalyst::View::Mason comes to the rescue.
+
+EXAMPLE
+    From the Catalyst controller:
+
+        $c->stash->{name} = 'Homer'; # Pass a scalar
+        $c->stash->{extra_info} = {
+                   last_name => 'Simpson',
+                   children => [qw(Bart Lisa Maggie)]
+        }; # A ref works too
+
+    From the Mason template:
+
+        <%args>
+        $name
+        $extra_info
+        </%args>
+        <p>Your name is <strong><% $name %> <% $extra_info->{last_name} %></strong>
+        <p>Your children are:
+        <ul>
+        % foreach my $child (@{$extra_info->{children}}) {
+        <li><% $child %></li>
+        % }
+        </ul>
+
+METHODS
+  new($app, \%config)
+  get_component_path
+    Returns the component path from $c->stash->{template} or
+    $c->request->match or $c->action (depending on the use_match setting).
+
+  process
+    Renders the component specified in $c->stash->{template} or
+    $c->request->match or $c->action (depending on the use_match setting) to
+    $c->response->body.
+
+    Note that the component name must be absolute, or is converted to
+    absolute (i.e., a / is added to the beginning if it doesn't start with
+    one).
+
+    Mason global variables $base, $c, and $name are automatically set to the
+    base, context, and name of the app, respectively.
+
+  render($c, $component_path, \%args)
+    Renders the given template and returns output, or a
+    HTML::Mason::Exception object upon error.
+
+    The template variables are set to %$args if $args is a hashref, or
+    $c->stash otherwise.
+
+   config
+    This allows you to to pass additional settings to the
+    HTML::Mason::Interp constructor or to set the options as below:
+
+    "template_extension"
+        This string is appended (if present) to "$c->action" when generating
+        a template path.
+
+        Defaults to an empty string.
+
+        Example: "template_extension => '.html'"
+
+    "always_append_template_extension"
+        Set this to a true value if you want "template_extension" to be
+        appended to the component path even if it was explicitly set.
+
+        Defaults to 0.
+
+        Example: "always_append_template_extension => 1"
+
+    "use_match"
+        Use "$c->request->match" instead of "$c->action" to determine which
+        template to use if "$c->stash->{template}" isn't set. This option is
+        deprecated and exists for backward compatibility only.
+
+        Currently defaults to 0. Old code should set this to 1 to avoid
+        breakage.
+
+        Example: "use_match => 0"
+
+    The default HTML::Mason::Interp config options are as follows:
+
+    "comp_root"
+        "$app->config->root"
+
+    "data_dir"
+        "File::Spec->catdir( File::Spec->tmpdir,
+        sprintf('%s_%d_mason_data_dir', $app, $<) )"
+
+    "allow_globals"
+        "qw/$c $name $base/"
+
+        If you add additional allowed globals those will be appended to the
+        list of default globals.
+
+SEE ALSO
+    Catalyst, HTML::Mason, "Using Mason from a Standalone Script" in
+    HTML::Mason::Admin
+
+AUTHORS
+    Andres Kievsky "ank@cpan.org"
+    Sebastian Riedel "sri@cpan.org"
+    Marcus Ramberg
+    Florian Ragwitz "rafl@debian.org"
+    Justin Hunter "justin.d.hunter@gmail.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,49 @@
+Revision history for CLI-Startup
+
+0.17    2017-03-24
+        Removed test for unsupported optspec "foo:+".
+        Added optional user message to die_usage().
+        Changed --help and --manpage to exit 0 instead of 1.
+        Updated author tests to work under Perl 5.24.
+0.16    2014-10-17
+        Removed alias --? for --help due to subtle bug.
+        TODO: Add support for users to add aliases for --help.
+0.15    2014-10-16
+        Fixed tests that break when Config::Tiny isn't installed.
+        Changed write_rcfile() to exit automatically.
+0.14    2014-10-15
+        Cleaned up some test code and fixed some failed tests.
+0.13    2014-10-13
+        Added explicit destructor, to turn off a Class:Std warning.
+        Added documentation to the man page.
+        Set explicit configs for Getopt::Long that are saner than the defaults.
+        Added -? as an alias for --help.
+0.12    2014-05-20
+        Removed support for colon-based format for config files.
+0.11    2014-05-19
+        Added implicit dependencies missing from the Build.PL.
+0.10    2014-05-18
+        Improved config file processing to avoid corrupting non-config data in the file.
+0.09    2014-05-17
+        Switched from Config::Simple to Config::Any to add JSON, YAML, XML, and Perl support.
+        Added --rcfile-format option to allow any of the above formats to be specified.
+        Fixed a bug where some attributes were returned by reference instead of by copy.
+        Bunches of cleanup to fix perlcritic warnings, some legitimate bugs among them.
+        Moved POD to end of the file, making it easier to read.
+0.08    2012-12-15
+        Added example script: rsync wrapper similar to manpage example, but robuster.
+0.07    2012-09-23
+        Put back missing sort of command-line options in help message. TNX Tim Heaney.
+0.06    2012-04-07
+        Fixed a small typo in the POD example code. TNX Tim Heaney.
+0.05    2011-08-20
+        Added workaround for instability in File::HomeDir. Grumble. See:
+        http://www.dagolden.com/index.php/1238/upgrading-filehomedir-might-lose-your-config-files/
+0.04    2011-07-10
+        Replaced $HOME with platform-independent File::HomeDir.
+0.03    2011-07-09
+        Fix documentation and one failed test.
+0.02    2011-07-08
+        First feature-complete version.
+0.01    2011-07-04
+        Initial revision

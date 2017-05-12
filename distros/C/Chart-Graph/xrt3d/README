@@ -1,0 +1,5 @@
+Creating the xrt2d or xrt3d binary does not require any modification
+of provided Makefile.  All that is required is to set the environment
+variable: XRTHOME to the directory where your XRT installation is
+located on this computer.  Then create the binary using the make
+command.

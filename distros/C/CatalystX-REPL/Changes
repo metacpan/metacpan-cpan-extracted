@@ -1,0 +1,12 @@
+0.04  Tue, 11 Aug 2009 05:59:35 +0200
+  * Fix test failures with recent versions of Class::MOP.
+  * Switch from namespace::clean to namespace::autoclean.
+
+0.03  Fri, 10 Apr 2009 01:47:22 +0200
+  * Allow passing options to Carp::REPL.
+
+0.02  Mon, 06 Apr 2009 22:28:52 +0100
+  * Doc improvmens (Ash Berlin, spurned on by Jon Rockway)
+
+0.01  Thu, 26 Feb 2009 14:31:40 +0100
+  * Initial release.

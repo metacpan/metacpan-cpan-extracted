@@ -1,0 +1,58 @@
+TODO list for Perl module CPAN::Reporter::Smoker
+
+#--------------------------------------------------------------------------#
+# Bugs
+#--------------------------------------------------------------------------#
+
+#--------------------------------------------------------------------------#
+# Features
+#--------------------------------------------------------------------------#
+
+# High priority
+
+- "list => \@list" option
+
+- refactor sub to call test to support PoCo::C::R into CPAN::Reporter
+
+# Medium priority
+
+- "limit => $n" option
+
+- try to make TTY sane (if possible) after each smoke run
+
+- clear CPAN build cache on start?
+
+# Low/Maybe
+
+- if interrupted,  be more helpful
+    - offer to send email to bug-Dist-Name@rt.cpan.org? (use Net::SMTP and
+      CPAN::Reporter mail host?)
+    - if CPAN has distroprefs, offer to auto-disable the current distro, or
+      at least to open distroprefs in editor?
+    
+- retest discards after some period of time
+    - would need CPAN::Reporter::History to keep timestamp
+    - or after failing deps are updated -- but how to discover what these are?
+      would need changes to CPAN::Reporter history logging to separately
+      log DISCARD with the missing dependencies
+    - but halt_on_failure prevents a DISCARD message, so then what?  
+      Maybe this does need to be logged via CPAN::Reporter::Smoker
+
+- docs: suggest that they join cpan-testers-discuss mailing list
+
+- docs: document how to disable CPANPLUS
+
+- create old alpha modules for minicpan and confirm they *aren't* tested
+    - edit file-ls.gz
+
+- dependencies
+    - look at Module::Depends::Intrusive and CPAN::Unwind
+
+- statistics -- show counter of tests for each test run; show total tests 
+  run at the end
+
+- logging STDERR to a file -- parameter to start()?
+
+- add some process control -- keep a proces ID in a run file and add a stop()
+  commnd to stop a running process.
+

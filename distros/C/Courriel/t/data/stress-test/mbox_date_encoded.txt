@@ -1,0 +1,47 @@
+From struts-user-return-23518-qmlist-jakarta-archive-struts-user=jakarta.apache.org@jakarta.apache.org Mon Dec 24 08:52:33 2
+001
+Return-Path: <struts-user-return-23518-qmlist-jakarta-archive-struts-user=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-struts-user-archive@apache.org
+Received: (qmail 69979 invoked from network); 24 Dec 2001 08:52:33 -0000
+Received: from unknown (HELO nagoya.betaversion.org) (192.18.49.131)
+  by daedalus.apache.org with SMTP; 24 Dec 2001 08:52:33 -0000
+Received: (qmail 2256 invoked by uid 97); 24 Dec 2001 08:52:34 -0000
+Delivered-To: qmlist-jakarta-archive-struts-user@jakarta.apache.org
+Received: (qmail 2240 invoked by uid 97); 24 Dec 2001 08:52:33 -0000
+Mailing-List: contact struts-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:struts-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:struts-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:struts-user-help@jakarta.apache.org>
+List-Post: <mailto:struts-user@jakarta.apache.org>
+List-Id: "Struts Users Mailing List" <struts-user.jakarta.apache.org>
+Reply-To: "Struts Users Mailing List" <struts-user@jakarta.apache.org>
+Delivered-To: mailing list struts-user@jakarta.apache.org
+Received: (qmail 2229 invoked from network); 24 Dec 2001 08:52:33 -0000
+Message-ID: <6593348.1009183951152.JavaMail.Administrator@liusm>
+From: Shengmeng Liu <smliu@users.sourceforge.net>
+To: struts-user@jakarta.apache.org
+Subject: [Announcement] Struts XSLT code generator 0.85 Released!
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Date: ÐÇÆÚÒ», 24 Ê®¶þÔÂ 2001 16:52:31 +0800
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+
+Greetings,
+    Struts XSLT Code Generator, an XSLT based code generator for Struts just released the version 0.85. Although it's still
+in beta stage in terms of functionality, it's quite stable. Basically, it provides similar functions with Struts SourceCode
+Generator made by Ravi Ramaiah. But because it's completely based on the XSLT transformation and a set of stylesheet files,
+users do not have to access the source code and recompile the program to customize the templates for each type of struts fil
+es. If you're really into xml/xsl, you may like to give it a try. I hope you would enjoy it and look forward to your feedbac
+k.
+
+http://xsltgenerator.sourceforge.net
+
+Best Wishes,
+Shengmeng Liu
+
+--
+To unsubscribe, e-mail:   <mailto:struts-user-unsubscribe@jakarta.apache.org>
+For additional commands, e-mail: <mailto:struts-user-help@jakarta.apache.org>

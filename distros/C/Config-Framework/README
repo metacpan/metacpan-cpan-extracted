@@ -1,0 +1,16 @@
+Config::Framework
+=================
+
+This package installs the Config::Framework perl module.
+This module is useful for efficiently managing configuration
+files, failure alerting and logging.
+
+
+Author:
+Andrew N. Hicox	<andrew@hicox.com>
+
+Copyright:
+This module comes with no warranty whatsoever.
+This module is released under the same terms as perl itself.
+
+

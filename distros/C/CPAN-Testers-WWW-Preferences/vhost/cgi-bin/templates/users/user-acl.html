@@ -1,0 +1,42 @@
+[% 
+    IF users.data.userid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = data.realname _ ' (User Access)' ;
+
+    crumb3_name = 'User' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=user-admin' ;
+    crumb2_name = data.realname ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=user-adminedit&amp;userid=' _ data.userid ;
+    crumb1_name = 'User Access' ;
+%]
+
+[% IF thanks %]
+<div class="box"><p>[% thanks %]</div>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-aclsave" />
+<input type="hidden" name="userid" value="[% data.userid %]" />
+
+<div class="box">
+    <table width="100%">
+    <tr><th width="90">User</th>
+        <th width="10"></th>
+        <td>[% data.realname %]</td>
+    </tr>
+
+    <tr><th>Access</th>
+        <th></th>
+        <td>[% FOR item = data.access %]
+            Folder: [% item.foldername %] / Access: [% item.accessname %] (<a href="pages.cgi?act=user-acldel&amp;userid=[% item.userid %]&amp;accessid=[% item.accessid %]&amp;folderid=[% item.folderid %]">remove</a>)<br/>
+            [% END %]
+        </td>
+    </tr>
+    <tr><th>Add</th>
+        <th></th>
+        <td>Folder: [% ddfolder %] / Access: [% ddaccess %]</td>
+    </tr>
+	  <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+</div>
+
+</form>

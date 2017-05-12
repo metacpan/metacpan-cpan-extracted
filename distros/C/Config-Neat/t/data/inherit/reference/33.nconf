@@ -1,0 +1,48 @@
+inc
+{
+    inc1
+    {
+        inc1-inner
+        {
+            {
+                foo1    xxx
+            }
+
+            {
+                foo2    xxxxxxxxxxxxxx
+            }
+        }
+    }
+
+    inc2
+    {
+    }
+}
+
+foo1
+{
+    inc1-inner
+    {
+        {
+            foo1        xxx
+        }
+
+        {
+            foo2        xxxxxxxxxxxxxx
+        }
+    }
+}
+
+foo2
+{
+    inc1-inner
+    {
+        {
+            foo1        xxx
+        }
+
+        {
+            foo2        xxxxxxxxxxxxxx
+        }
+    }
+}

@@ -1,0 +1,13 @@
+---
+name: John
+colors:
+  - black
+  - yellow
+  - red
+institution:
+  name: Acme
+  years:
+    - 1949
+    - 1950
+    - 1951
+    - 1952

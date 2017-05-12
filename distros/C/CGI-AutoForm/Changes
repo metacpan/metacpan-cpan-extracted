@@ -1,0 +1,19 @@
+Revision history for Perl extension CGI::AutoForm.
+
+1.05 Tue Jun  5 17:30:51 PDT 2012
+        - rt.cpan.org:
+          #59174: HELP_SUMMARY disappears when DATATYPE is set to DATETIME
+
+1.04  Mon Jun  4 15:46:53 PDT 2012
+        - Add comma-separated list search capability
+
+1.03  Fri Jul 25 20:27:58 PDT 2008
+        - support HELP_SUMMARY
+
+1.02  Thu Jul  3 19:08:30 PDT 2008
+        - support relative date searches, cleanup, documentation
+
+0.01  Thu Jul  3 19:00:34 2008
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.5.3 -n CGI::AutoForm
+

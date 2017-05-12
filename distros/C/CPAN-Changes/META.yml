@@ -1,0 +1,29 @@
+---
+abstract: 'Read and write Changes files'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Changes
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Text::Wrap: '0.003'
+  version: '0.9906'
+resources:
+  IRC: irc://irc.perl.org/#metacpan
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/CPAN-API/CPAN-Changes.git
+version: '0.400002'
+x_authority: cpan:BRICAS

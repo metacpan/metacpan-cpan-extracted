@@ -1,0 +1,66 @@
+NAME
+    Catalyst::TraitFor::View::MarkupValidation - Validates output and
+    replaces it with an error report if not OK
+
+SYNOPSIS
+        package Catalyst::View::Validation;
+
+        use Moose;
+        use namespace::autoclean;
+
+        extends qw/Catalyst::View::TT/;
+        with qw/Catalyst::TraitFor::View::MarkupValidation/;
+
+        __PACKAGE__->config(MARKUP_VALIDATOR_URI => q[http://localhost/w3c-validator/check]);
+
+        1;
+
+DESCRIPTION
+    This is a Role which which takes generated content that is ready for
+    output and validates it. If there are errors it replaces the default
+    output with an error report.
+
+CONFIGURATION
+    You must set the MARKUP_VALIDATOR_URI to the URI for an instance of the
+    W3C Markup Validation Service. You are encouraged to install a local
+    instance of the validator so that you see high levels of performance and
+    do not hammer the public server (which is funded by donations).
+
+    See <http://validator.w3.org/source/> for downloads and installation
+    instructions on a variety of platforms.
+
+CAVEATS
+    This is useful when you're developing your application, as it will
+    identify validity errors in the markup. In production, however, the
+    performance cost is likely to be too high, and throwing errors at users
+    that browsers could probably recover from is unfriendly.
+
+    This module checks that Catalyst is running in debug mode and will not
+    run if it is not.
+
+METHOD MODIFIERS
+  after process
+    Validates document and (in event of an error) replaces it with an error
+    report.
+
+TODO
+    Make document types that get validated configurable
+    Add line numbering to output
+    Hyperlink from error to source
+
+BUGS AND LIMITATIONS
+    Please report any you find using RT.
+
+    If URI to validation service is incorrect, shows error report w/ 0
+    errors.
+
+AUTHOR
+    David Dorward (dorward) "<david@dorward.me.uk>"
+
+CONTRIBUTORS
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+LICENSE AND COPYRIGHT
+    This module itself is copyright (c) 2009 David Dorward and is licensed
+    under the same terms as Perl itself.
+

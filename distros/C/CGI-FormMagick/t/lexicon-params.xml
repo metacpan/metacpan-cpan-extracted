@@ -1,0 +1,16 @@
+<form>
+  <lexicon lang="en" params="getLexiconParams()">
+    <entry>
+      <base>This text contains a {$var}.</base>
+      <trans>A {$var} this text contains.</trans>
+	</entry>
+    <entry>
+      <base>var</base>
+      <trans>lexicon variable</trans>
+    </entry>
+    <entry>
+      <base>This text contains a {$params_var}.</base>
+      <trans>A {${params_var}} this text contains.</trans>
+    </entry>
+  </lexicon>
+</form>

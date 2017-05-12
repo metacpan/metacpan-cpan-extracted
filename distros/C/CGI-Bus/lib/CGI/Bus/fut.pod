@@ -1,0 +1,184 @@
+=head1 NAME
+
+CGI::Bus::fut - File and directory utils library
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->fut->mkdir(directory);
+
+=head1 DESCRIPTION
+
+
+This module contains several file and directory methods.
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 CLASSIFICATION
+
+=over
+
+=item Directory utils
+
+C<copy>, C<delete>, C<find>, C<glob>, C<globn>, C<mkdir>, C<rmpath>, C<size>
+
+=item File utils
+
+C<fcompare>, C<fhandle>, 
+C<fload>, C<fstore>,
+C<fdumpload>, C<fdumpstore>
+
+
+=back
+
+
+
+=head1 SLOTS
+
+=over
+
+None
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+=item copy (?-rdfi, fromMask, to) -> success
+
+Copy files and directories.
+Options: 
+'r'ecurse subdirectories,
+'d'irectory target hint,
+'f'ile target hint,
+'i'gnore errors - continue copying.
+
+
+=item delete (?-ri, pathFileMask) -> success
+
+Delete files and directories.
+Options: 
+'r'ecurse subdirectories,
+'i'gnore errors - continue deleting.
+
+
+=item fcompare ( ?-opt, file, file ) -> not equal
+
+Compare files using L<File::Compare|File/Compare>
+
+
+=item fdump ( file, data ) -> success
+
+=item fdump ( file ) -> data ref
+
+=item fdumpstore ( file, data ref ) -> success
+
+=item fdumpload ( file ) -> data ref
+
+Store and load data structure to or from file using 
+C<fstore>, C<fload>, 
+L<CGI::Bus::dumpout|CGI/Bus>, L<CGI::Bus::dumpin|CGI/Bus>
+
+
+=item fhandle ( file, sub{}) -> result
+
+Selects given filehandle, evals sub, reselects previously selected handle. 
+For filename, temporarily opens file with handle 'HANDLE',
+selects this handle, evals sub...
+Returns result of sub.
+
+
+=item find ( ?-i!dlmrs, fileMask,..., sub(\@stat,path,name)...) -> num_matches
+
+Find files and directories with given mask and evaluates sub, locally setting
+$_ to filename. Returns number of sub agrees. There may be 
+several subs and several filemasks for each sub, and they will be executed
+within one transaction of C<find> call.
+Uses C<FileGlob>
+
+Options: 'i'gnore stat errors, '!' - not, 'd'irectories,
+'l'ow before deep scan, 'm'ountpoints,
+'r'ecurse directories, 's'ymlinks.
+
+Parameters of sub are local $_ with full current filename, $_[0] with
+reference to @stat array, $_[1] with path, $_[2] with filename.
+Sub can return undefined value in $_ to signal stop, determine directories with
+$_[0]->[2] & 0040000, prevent recursing by assigning $_[0]->[2] =0.
+
+
+=item fload ( ?-asb, file, ?sub ) -> list of rows || data
+
+Reads given file into memory as array or list ('-a'), text scalar ('-s'),
+binary scalar ('-b'). Default, '-a' or '-b', is determined with L<wantarray|perlfunc/wantarray>.
+Locks file with 'LOCK_SH'.
+
+If sub is defined, it is evaluated for each row read into local $_, 
+and with '-a' option results of each evaluation are returned as a list, 
+true is returned otherwise.
+
+
+=item fstore ( ?-b, file, data,...) -> success
+
+Writes given data into given file. Locks file with 'LOCK_EX'.
+Option '-b' chooses binary mode and
+binary write. Without '-b', each element of data list is printed with 
+trailing "\n" added.
+Prepend file name with '>' sign to append to file existed.
+
+
+=item glob ( pathMask ) -> entry list
+
+Glob filenames with mask and return list of them such as 
+standard C<glob> function.
+When $^O eq 'MSWin32' own implementation with fragments from 
+L<File::DosGlob|File/DosGlob> is used, else C<glob> is called.
+
+
+=item globn ( pathMask ) -> entry list
+
+Like C<glob>, but returns list of names only, without paths
+
+
+=item mkdir ( path, ?perms ) -> success
+
+Create path like standard L<mkdir|perlfunc/mkdir> call, but
+with base directories if needed,
+and optional permission mask (0777 default).
+
+
+=item rmpath ( path ) -> success
+
+Remove path, with base directories, if empty.
+Returns the number of directories deleted.
+
+
+=item -size ( ?-i, pathMask ) -> size of files described
+
+Compute size of files and directories.
+Uses C<find> and it's options.
+
+
+
+
+=head1 VERSION
+
+=over
+
+=head2 21/12/2001 - 23/12/2001
+
+Implemented and Documented.
+
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

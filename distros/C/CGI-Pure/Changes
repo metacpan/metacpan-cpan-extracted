@@ -1,0 +1,41 @@
+0.05 2015-09-27T15:20:36+02:00
+ [CGI::Pure::Save]
+ - Add class description.
+ - Fix error handling.
+ - Every return returns undef.
+ - Remove TODOs from doc, add examples.
+
+ [Common]
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove obsolete item from SEE ALSO section.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-11-13T19:45:05+01:00
+ - Add ERRORS section to doc.
+ - Add tests for clone() method.
+ - Add tests for delete_param() method.
+ - Add tests for delete_all_params() method.
+ - Improve constructor tests.
+ - Rewrite B<> to C<> in doc.
+ - Sort tests in t/CGI-Pure/ directory.
+ - Update LICENSE AND COPYRIGHT secion in doc to my standard.
+ - Update Module::Install to 1.14 version.
+
+0.03 2014-10-13T13:24:03+02:00
+ - Fix URI::Escape dependency version.
+
+0.02 2014-10-13T13:17:23+02:00
+ - Add LICENSE file.
+ - Add README file.
+ - Add Test::NoWarnings to tests.
+ - Add minimal version of Perl.
+ - Add missing Error::Pure::Utils::clean() after errors in tests.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+ - Update Module::Install to 1.12 version.
+
+0.01 2013-02-26
+ - First version.

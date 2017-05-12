@@ -1,0 +1,59 @@
+{
+   "abstract" : "Crypt::CBC compliant Rijndael encryption module",
+   "author" : [
+      "Rafael R. Sevilla",
+      "brian d foy <bdfoy@cpan.org>",
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Rijndael",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/leont/crypt-rijndael/issues"
+      },
+      "homepage" : "https://github.com/leont/crypt-rijndael",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/leont/crypt-rijndael.git",
+         "web" : "https://github.com/leont/crypt-rijndael"
+      }
+   },
+   "version" : "1.13"
+}

@@ -1,0 +1,35 @@
+CPAN::Changes::Group::Dependencies::Stats
+
+This module is a utility tool that produces short, summarized details
+about changes in dependencies between two sets of prerequisites such
+that one can visually identify at a glance the general nature of the
+dependency changes without being swamped by the specifics, only looking
+into the specifics when the summary indicates it is warranted.
+
+This aims to be a utility to assist downstream in quickly assessing
+effort when performing manual updates.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

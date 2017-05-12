@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:                Class-DBI-Plugin-FilterOnClick
+version:             1.2
+abstract:            Generate browsable and searchable HTML Tables using FilterOnClick in conjunction with Class::DBI
+license:             ~
+author:              
+    - Aaron Johnson <aaronjjohnson@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    CGI::FormBuilder:              >3
+    Class::DBI:                    0.94
+    Class::DBI::AbstractSearch:    0.04
+    Class::DBI::AsForm:            0.05
+    Class::DBI::Pager:             
+    Class::DBI::Plugin:            0.03
+    Class::DBI::Plugin::AbstractCount: >.01
+    Class::DBI::Plugin::DeepAbstractSearch: 
+    Class::DBI::Plugin::Pager:     >.4
+    Class::DBI::Plugin::RetrieveAll: 1
+    Config::Magic:                 0
+    HTML::FillInForm:              >1
+    HTML::Strip:                   >1.00
+    HTML::Table:                   >2
+    Test::More:                    0
+    Tie::Hash::Indexed:            >.02
+    URI::Escape:                   1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

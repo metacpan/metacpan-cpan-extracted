@@ -1,0 +1,21 @@
+Revision history for Catalyst::Model::FormFu
+
+0.004   24/08/2011
+        * Added more options from Catalyst::Controller::HTML::FormFu (thanks MDIETRICH)
+          - context_stash
+          - config_callback
+          - default_action_use_name
+          - default_action_use_path
+          - languages_from_context
+          - localize_from_context
+        * Fixed incorrect query object passed to FormFu
+
+0.003   13/07/2011
+        * Add build requirement for HTML::FormFu::Model::DBIC
+
+0.002   05/07/2011
+        * Upload as official release (thanks DMAKI)
+        * Add docs to distinguish from previous C::M::FF module
+
+0.001   04/07/2011
+        * Initial upload to CPAN

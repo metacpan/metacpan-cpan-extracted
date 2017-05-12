@@ -1,0 +1,14 @@
+<h5>Options Pane</h5>
+<tmpl_var name=notes>
+<hr />
+<table>
+	<tmpl_loop name=tr_loop>
+		<tr>
+			<th class="cgi_app_no_submit"><tmpl_var name=option></th>
+			<td><input type="text" name="<tmpl_var name=name>" size="5" value="<tmpl_var name=value>"></td>
+		</tr>
+	</tmpl_loop>
+</table>
+<hr />
+<tmpl_var name=commands>
+<hr />

@@ -1,0 +1,2 @@
+TYPEMAP
+openssl_smime_struct *	O_OBJECT

@@ -1,0 +1,5 @@
+[% album.id %]:[% album.name %]
+
+[% FOREACH artwork = album.artworks %]
+    [% artwork.id %]: <strong>[% artwork.name %]</strong><br/>
+[% END %]

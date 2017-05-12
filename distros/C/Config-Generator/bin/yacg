@@ -1,0 +1,349 @@
+#!/usr/bin/perl
+#+##############################################################################
+#                                                                              #
+# File: yacg                                                                   #
+#                                                                              #
+# Description: Yet Another Configuration Generator                             #
+#                                                                              #
+#-##############################################################################
+
+# $Id: yacg,v 1.38 2014/04/11 11:02:23 c0ns Exp $
+
+#
+# used modules
+#
+
+use strict;
+use warnings qw(FATAL all);
+use FindBin qw();
+use Getopt::Long qw(GetOptions);
+use No::Worries qw($ProgramName);
+use No::Worries::Die qw(dief handler);
+use No::Worries::Dir qw(dir_parent);
+use No::Worries::Log qw(log_debug log_filter);
+use No::Worries::Warn qw(handler);
+use Pod::Usage qw(pod2usage);
+use Config::Generator qw(*);
+use Config::Generator::Config qw(*);
+use Config::Generator::File qw(handle_manifest handle_spec);
+use Config::Generator::Hook qw(run_hooks);
+use Config::Generator::Random qw(random_init);
+use Config::Generator::Schema qw(/validate/);
+
+#
+# constants
+#
+
+use constant VERSION => "1.0";
+use constant REVISION =>
+    sprintf("%d.%02d", q$Revision: 1.38 $ =~ /(\d+)\.(\d+)/);
+
+#
+# global variables
+#
+
+our(%Option, @Hacks);
+
+#
+# load a Config::Generator::* module
+#
+
+sub modload ($) {
+    my($name) = @_;
+    my($module);
+
+    return if $INC{"Config/Generator/${name}.pm"};
+    $module = "Config::Generator::${name}";
+    log_debug("loading module %s...", $module);
+    eval("require $module"); ## no critic 'ProhibitStringyEval'
+    dief("loading %s failed: %s", $module, $@) if $@;
+}
+
+#
+# dump the loaded configuration
+#
+
+sub dumpit () {
+    my(%option);
+
+    $option{format} = $Option{"dump-format"} if $Option{"dump-format"};
+    print(stringify_config(%option));
+    exit(0);
+}
+
+#
+# initialize everything
+#
+
+sub init () {
+    $| = 1;
+    $Option{debug} = 0;
+    $Option{dump} = 0;
+    $Option{verbose} = 0;
+    $Option{merge} = sub { push(@Hacks, [ "merge", $_[1], $_[2] ]) };
+    $Option{set}   = sub { push(@Hacks, [ "set",   $_[1], $_[2] ]) };
+    $Option{unset} = sub { push(@Hacks, [ "unset", $_[1] ]) };
+    Getopt::Long::Configure(qw(posix_default no_ignore_case));
+    GetOptions(\%Option,
+        "clean",
+        "debug|d+",
+        "dump+",
+        "dump-format=s",
+        "help|h|?",
+        "home|H=s",
+        "include|I=s\@",
+        "manifest=s",
+        "manual|m",
+        "merge=s%",
+        "noaction|n",
+        "quiet|q",
+        "rndfile=s",
+        "rootdir=s",
+        "set=s%",
+        "spec=s",
+        "unset=s",
+        "verbose|v+",
+        "version",
+    ) or pod2usage(2);
+    pod2usage(1) if $Option{help};
+    pod2usage(exitstatus => 0, verbose => 2) if $Option{manual};
+    if ($Option{version}) {
+        printf("%s %s (revision %s)\n", $ProgramName, VERSION, REVISION);
+        exit(0);
+    }
+    pod2usage(2) unless @ARGV;
+    dief("option --clean requires --manifest")
+        if $Option{clean} and not $Option{manifest};
+    log_filter("debug") if $Option{debug};
+    $HomeDir = $Option{home} if defined($Option{home});
+    @IncPath = grep(-d $_, @{ $Option{include} });
+    $NoAction = 1 if $Option{noaction};
+    $RootDir = $Option{rootdir} if $Option{rootdir};
+    if ($Option{quiet}) {
+        $Verbosity = 0;
+    } else {
+        $Verbosity = $Option{verbose} + 1;
+    }
+    random_init($Option{rndfile});
+    # cleanup and augment Perl's include path
+    @INC = grep(substr($_, 0, 1) eq "/" && -d $_, @INC);
+    foreach my $path (@IncPath, "$HomeDir/lib") {
+        next unless -d "$path/Config/Generator";
+        unshift(@INC, $path);
+    }
+}
+
+#
+# show our setup
+#
+
+sub show () {
+    log_debug("HomeDir is '%s'", $HomeDir);
+    log_debug("IncPath is '%s'", join(":", @IncPath));
+    log_debug("NoAction is %s", $NoAction ? "true" : "false");
+    log_debug("RootDir is '%s'", $RootDir);
+    log_debug("Verbosity is %d", $Verbosity);
+}
+
+#
+# load the configuration file(s) given on the command line and prune it
+#
+
+sub load () {
+    load_config(@ARGV);
+    prune_config();
+    # maybe dump it at this point
+    dumpit() if $Option{dump} == 1;
+}
+
+#
+# hack the loaded configuration and validate it
+#
+
+sub hack () {
+    foreach my $hack (@Hacks) {
+        hack_config(@{ $hack });
+    }
+    validate_basic();
+    # maybe dump it at this point
+    dumpit() if $Option{dump} == 2;
+}
+
+#
+# work using the loaded configuration
+#
+
+sub work () {
+    # load all the modules appearing as toplevel subtrees
+    foreach my $name (sort(keys(%Config))) {
+        modload($name) if $name =~ /^[a-z]+$/;
+    }
+    # validate the complete configuration now that we know the schemas
+    validate_before();
+    # run all the check() hooks in order
+    run_hooks("check");
+    # validate the complete configuration again after the check() hooks
+    validate_after();
+    # maybe dump it at this point
+    dumpit() if $Option{dump} >= 3;
+    # run all the generate() hooks in order
+    run_hooks("generate");
+    # handle the --spec option
+    handle_spec($Option{spec})
+        if $Option{spec};
+    # handle the --clean and --manifest options
+    handle_manifest($Option{manifest}, $Option{clean})
+        if $Option{manifest};
+}
+
+#
+# main
+#
+
+init();
+show();
+load();
+hack();
+work();
+
+__END__
+
+=head1 NAME
+
+yacg - Yet Another Configuration Generator
+
+=head1 SYNOPSIS
+
+B<yacg> [I<OPTIONS>] I<PATH>
+
+B<yacg> B<--help>|B<--manual>|B<--version>
+
+=head1 DESCRIPTION
+
+B<yacg> reads the given high-level configuration file, carefully validates it
+and generates ready-to-use (configuration) files.
+
+The high-level configuration file can be altered using the B<--set>,
+B<--unset> and B<--merge> options. It can be inspected using the B<--dump>
+option.
+
+The files can be generated at their final location (by default) or elsewhere
+(using the B<--rootdir> option). B<yacg> can also be instructed to check the
+files without changing them via the B<--noaction> option.
+
+B<yacg> can use a "manifest" file to keep track of which files it generated so
+that it can later remove the files that it does not generate anymore, see the
+B<--manifest> and B<--clean> options.
+
+B<yacg> by itself does not know how to generate files. The B<--home> option
+(and optionally the B<--include> option) must be used to tell the program
+where to find domain specific modules knowing how to translate the high-level
+configuration into individual ready-to-use files.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--clean>
+
+remove the files present in the old "manifest" file but not in the new one
+
+=item B<--debug>, B<-d>
+
+show debugging information
+
+=item B<--dump>
+
+instead of generating files, dump the high-level configuration; this option
+can be given multiple times:
+
+=over
+
+=item 1: dump after loading the configuration
+
+=item 2: dump after hacking the configuration
+
+=item 3: dump after validating the configuration
+
+=back
+
+=item B<--dump-format> I<NAME>
+
+set the output format for the B<--dump> option; possible values:
+C<Config::General> (default) and C<JSON>
+
+=item B<--help>, B<-h>, B<-?>
+
+show some help
+
+=item B<--home>, B<-H> I<PATH>
+
+set the home directory where the C<cfg>, C<lib> and C<tpl> sub-directories may
+be located
+
+=item B<--include>, B<-I> I<PATH>
+
+add the given directory to the list of paths that will be looked at to find
+configuration files, Config::Generator modules or templates; this option can
+be given multiple times
+
+=item B<--manifest> I<PATH>
+
+store the list of files that B<yacg> handled in the given "manifest" file
+
+=item B<--manual>, B<-m>
+
+show this manual
+
+=item B<--merge> I<PATH>=I<VALUE>
+
+hack the loaded configuration to merge the given value at the given path
+
+=item B<--noaction>, B<-n>
+
+print what would be done but do not actually touch the generated files
+
+=item B<--quiet>, B<-q>
+
+set the verbosity level to 0
+
+=item B<--rndfile> I<PATH>
+
+set the path of the file that will be used as seed to generate random data
+
+=item B<--rootdir> I<PATH>
+
+set the path specifying where the generated files will be put
+
+=item B<--set> I<PATH>=I<VALUE>
+
+hack the loaded configuration to set the given value at the given path
+
+=item B<--spec> I<PATH>
+
+store the list of files that B<yacg> handled in the given "spec" file (same
+format as rpm's spec %files)
+
+=item B<--unset> I<PATH>
+
+hack the loaded configuration to unset the given path
+
+=item B<--verbose>, B<-v>
+
+increase the verbosity level (default: 1)
+
+=item B<--version>
+
+display version information
+
+=back
+
+=head1 SEE ALSO
+
+L<Config-Generator>.
+
+=head1 AUTHOR
+
+Lionel Cons L<http://cern.ch/lionel.cons>
+
+Copyright (C) CERN 2013-2016

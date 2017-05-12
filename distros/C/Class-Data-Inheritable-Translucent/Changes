@@ -1,0 +1,49 @@
+Revision history for Class-Data-Inheritable-Translucent
+
+1.04  Fri May 30 2014
+    - The modules listed as recommendations of optional features are actually
+      requirements of those features.
+
+1.03  Thu May 29 2014
+    - Uploaded source code to GitHub and included repository URLs in metadata.
+    - Included META.json file in addition to META.yml.
+    - Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that
+      all parameters used are supported, to save jumping through hoops to
+      support earlier versions.  (This should not be a problem since
+      ExtUtils::MakeMaker 6.64 is easily installed into Perl 5.8.1 and above,
+      that being the whole point of the new choice of minimum supported Perl
+      version.)
+    - Set minimum required Perl version to 5.8.1.  This is in line with the
+      minimum requirement of the "Perl Toolchain".
+
+1.02  Fri Jun 03 2011
+    - Fixed the default implementation of attrs() to work as documented, so that
+      each attribute really is now stored in $obj rather than $obj->{attrs} by
+      default.
+
+1.01  Mon Nov 09 2009
+    - Incorporated two improvements based on code in Class::Accessor:
+      - Generated accessor methods are now named using Sub::Name if that module
+        is available.
+      - Existing accessor methods (or their aliases) are no longer overwritten
+        by mk_translucent().
+
+1.00  Wed Nov 05 2009
+    - Changed mk_translucent() so that when overriding the translucent class
+      default value on a sub-class object it doesn't affect the inherited
+      translucent class default value still used by other instances of that
+      sub-class.  In fact, it was wrong even to install an override unless the
+      attribute is actually being overriddeen on the sub-class itself rather
+      than on an instance of the sub-class.  (Fixes [cpan #51097].)
+    - Changed Makefile.PL to check $ExtUtils::MakeMaker::VERSION before setting
+      ABSTRACT_FROM and AUTHOR.
+    - Put the NAME content all on one line in the .pm file so that the
+      'abstract' is not truncated in the META.yml file.
+    - Added LICENSE to Makefile.PL.
+    - Removed redundant 'clean' from Makefile.PL so that it doesn't remove the
+      tarball when running the 'clean' target after the 'dist' target.
+    - Removed all mention of the original author's email address (at his request
+      in private correspondence).
+
+0.01  Thu Dec 15 15:45:14 EST 2005
+    - omg 0.01!

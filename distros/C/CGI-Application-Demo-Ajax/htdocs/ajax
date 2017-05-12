@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+#
+# Name:
+# ajax.
+#
+# Note:
+# Need use lib here because CGI scripts don't have access to
+# the PerlSwitches used in httpd.conf.
+# Also, it saves having to install the module repeatedly during testing.
+
+use lib '/home/ron/perl.modules/CGI-Application-Demo-Ajax/lib';
+use strict;
+use warnings;
+
+use CGI::Application::Dispatch;
+use CGI::Fast;
+use FCGI::ProcManager;
+
+# ---------------------
+
+my($proc_manager) = FCGI::ProcManager -> new({processes => 2});
+
+$proc_manager -> pm_manage();
+
+my($cgi);
+
+while ($cgi = CGI::Fast -> new() )
+{
+	$proc_manager -> pm_pre_dispatch();
+	CGI::Application::Dispatch -> dispatch
+	(
+	 args_to_new => {QUERY => $cgi},
+	 prefix      => 'CGI::Application::Demo',
+	 table       =>
+	 [
+	  ''        => {app => 'Ajax', rm => 'initialize'},
+	  '/search' => {app => 'Ajax', rm => 'search'},
+	 ],
+	);
+	$proc_manager -> pm_post_dispatch();
+}

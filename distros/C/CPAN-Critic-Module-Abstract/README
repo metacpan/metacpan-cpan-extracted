@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     % critic-cpan-module-abstract 'Perl extension for blah blah blah'
+    
+     # customize profile (add/remove policies, modify severities, ...)
+     # TODO
+
+DESCRIPTION
+
+    This is a proof-of-concept module to critic CPAN module abstract.
+
+    Dist::Zilla plugin coming shortly.
+

@@ -1,0 +1,80 @@
+{
+    "name": "CPAN-Testers-WWW-Preferences",
+    "version": "0.20",
+    "abstract": "The CPAN Testers Preferences website",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Labyrinth": "5.24",
+                "Labyrinth::DIUtils::ImageMagick": "5.04",
+                "Labyrinth::Plugin::Core": "5.19",
+                "Labyrinth::Plugin::CPAN": "3.50",
+                "Class::Accessor::Fast": "0",
+                "Data::Dumper": "0",
+                "Digest::SHA": "0",
+                "Email::Address": "0",
+                "LWP::UserAgent": "0",
+                "MIME::Base64": "0",
+                "Net::SSLeay": "0",
+                "Sort::Versions": "0",
+                "Time::Local": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::WWW::Preferences": {
+            "file": "lib/CPAN/Testers/WWW/Preferences.pm",
+            "version": "0.20"
+        },
+        "Labyrinth::Plugin::CPAN::Preferences": {
+            "file": "lib/Labyrinth/Plugin/CPAN/Preferences.pm",
+            "version": "0.20"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples","vhost"]
+    },
+
+    "resources": {
+        "homepage": "https://prefs.cpantesters.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Preferences" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-testers-www-preferences.git",
+            "web": "http://github.com/barbie/cpan-testers-www-preferences",
+            "type": "git"
+        }
+    }
+}

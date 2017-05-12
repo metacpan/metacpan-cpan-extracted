@@ -1,0 +1,82 @@
+NAME
+    CGI::SSI_Parser - Implement SSI for Perl CGI
+
+SYNOPSIS
+      use CGI::SSI_Parser;
+
+      $CGI::SSI_Parser::recursive = 1;
+
+      fssi($filename);
+      sssi($string);
+
+DESCRIPTION
+    CGI::SSI_Parser is used in CGI scripts for parsing SSI
+    directives in files or string variables, and fully implements
+    the functionality of apache's mod_include module.
+
+    It is an alternative to famous Apache::SSI modules, but it
+    doesn't require mod_perl. This is an advantage to those who are
+    using public hosting services. There is a disadvantage, however
+    - the module consumes much memory, and I don't recommend using
+    it on heavy-loaded sites (currently it's being used on a site
+    with 10000 hits, and I consider this as a limit). I hope to get
+    rid of this disadvantage by the time the release comes out
+    (currently it's beta).
+
+  SSI Directives
+
+    This module supports the same directives as mod_include. For
+    methods listed below but not documented, please see
+    mod_include's online documentation at
+    http://httpd.apache.org/docs/mod/mod_include.html .
+
+    * config
+    * echo
+        This directive is not fully supported in current version.
+
+    * exec
+    * fsize
+    * flastmod
+    * include
+    * printenv
+    * set
+        This directive is not supported in current version.
+
+    * perl
+        This directive is not supported in current version.
+
+    * if
+    * elif
+    * else
+    * endif
+        These four directives are not supported in current version.
+
+  Outline Usage
+
+    First you need to load the CGI::SSI_Parser module:
+
+      use CGI::SSI_Parser;
+
+    You need to specify the following when processing of all nested
+    directives is needed (default value - 0):
+
+     $CGI::SSI_Parser::recursive = 1;
+
+    To parse file or string you need to use:
+
+      fssi($filename);
+      sssi($string);
+
+    The result is printed to STDOUT.
+
+TO DO
+    Full implementation of all SSI directives.
+
+    Optimize memory consumption.
+
+AUTHOR
+    Vadim Y. Ponomarenko, vp@istc.kiev.ua
+
+SEE ALSO
+    mod_include, perl(1).
+

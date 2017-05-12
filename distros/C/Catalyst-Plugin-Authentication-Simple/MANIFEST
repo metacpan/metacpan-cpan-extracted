@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Plugin-Authentication-Simple.t
+lib/Catalyst/Plugin/Authentication/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

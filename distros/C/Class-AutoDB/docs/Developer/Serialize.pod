@@ -1,0 +1,123 @@
+=head1 NAME
+
+Class::AutoDB::Serialize - Serialization engine for Class::AutoDB --
+MySQL only for now
+
+=head1 SYNOPSIS
+
+This is a mixin class that enables objects to be serialized and stored
+in a database as independent entities, and later fetched one-by-one or
+in groups. Whether fetched individually or in groups, the original
+shared object structure is preserved. It's not necessary for the object
+to also from Class::AutoClass, although the examples here all do.
+
+=head2 Define class that inherits from Class::AutoDB::Serialize
+
+Person class with attributes 'name', 'sex', 'hobbies', and 'friends',
+where 'friends' is a list of Persons.
+
+ package Person;
+ use Class::AutoClass;
+ use Class::AutoDB::Serialize;
+ @ISA=qw(Class::AutoClass Class::AutoDB::Serialize); 
+ 
+ @AUTO_ATTRIBUTES=qw(name sex hobbies friends);
+ @OTHER_ATTRIBUTES=qw();
+ %SYNONYMS=();
+ Class::AutoClass::declare(__PACKAGE__);
+ 1;
+
+=head2 Create and store some objects
+
+ use DBI;
+ use Class::AutoDB::Serialize;
+ use Person;
+ my $dbh=DBI->connect('dbi:mysql:database=ngoodman;host=localhost');
+ Class::AutoDB::Serialize->dbh($dbh);
+ 
+ my $joe=new Person(-name=>'Joe',-sex=>'male',
+                    -hobbies=>['mountain climbing', 'sailing']);
+ my $mary=new Person(-name=>'Mary',-sex=>'female',
+                     -hobbies=>['hang gliding']);
+ my $bill=new Person(-name=>'Bill',-sex=>'male',
+                     -hobbies=>['cooking', 'eating', 'sleeping']);
+ # Set up friends lists
+ $joe->friends([$mary,$bill]);
+ $mary->friends([$joe,$bill]);
+ $bill->friends([$joe,$mary]);
+ 
+ # Store the objects
+ $joe->store;
+ $mary->store;
+ $bill->store;
+ 
+ # Print their object id's so you can fetch them later
+ for my $obj ($joe, $mary, $bill) {
+   print 'name=', $obj->name, ' oid=', $obj->oid, "\n";
+ }
+
+=head2 Fetch the objects
+
+Assume that the oid's are passed as command line arguments
+
+ my @oids=@ARGV;
+ my $joe=Class::AutoDB::Serialize::fetch($ARGV[0]);
+ my $mary=Class::AutoDB::Serialize::fetch($ARGV[1]);
+ my $bill=Class::AutoDB::Serialize::fetch($ARGV[2]);
+ # Print the objects' attributes
+ for my $obj ($joe, $mary, $bill) {
+   print 'oid=', $obj->oid, "\n";
+   print 'name=', $obj->name, "\n";
+   print 'sex=', $obj->sex, "\n";
+   print 'hobbies=', join(', ',@{$obj->hobbies}), "\n";
+   print 'friends=',"\n";
+ for my $friend (@{$obj->friends}) {
+   print ' oid=', $friend->oid, ', ';
+   print 'name=', $friend->name, "\n";
+ }
+ print "----------\n";
+ }
+ # Change an attribute in each object to demonstrate 
+ # that shared structure is preserved
+ for my $obj ($joe, $mary, $bill) {
+   $obj->name($obj->name.' Changed');
+ }
+ for my $obj ($joe, $mary, $bill) {
+   print 'oid=', $obj->oid, "\n";
+   print 'changed name=', $obj->name, "\n";
+   print 'friends=',"\n";
+   for my $friend (@{$obj->friends}) {
+     print ' oid=', $friend->oid, ', ';
+     print 'changed name=', $friend->name, "\n";
+   }
+   print "----------\n";
+ }
+
+=head1 DESCRIPTION
+
+This is a mixin class that implements the serialization and data
+storage engine for Class::AutoDB. Objects that inherit from this class
+can be serialized and stored in a database as independent entities.
+This only works for objects implemented as HASHes in the usual Perl
+way.
+
+What distinguishes Class::AutoDB::Serialize from the many other
+excellent Perl serialization packages (eg, Data::Dumper, Storable,
+YAML) is that we serialize objects as independent entities existing
+within a large network, rather than serializing entire networks as a
+whole. When an object is being serialized, other
+E<ldquo>auto-serializableE<rdquo> objects that are encountered are not
+serialized then and there; instead a placeholder object called an Oid
+(short for I<object identifier>) is emitted into the serialization
+stream. When the object is later fetched, the placeholders are not
+immediately fetched; instead each placeholder is fetched transparently
+when the program invokes a method on it (this is accomplished via an
+AUTOLOAD mechanism).
+
+The purpose of all this is to make it easy for Perl programs to operate
+on large databases of objects. Objects can be created, stored, and
+later fetched. If the object points to other objects, they will be
+fetched when needed. New objects can be created, connected to the
+network of existing objects, and stored.
+
+=cut

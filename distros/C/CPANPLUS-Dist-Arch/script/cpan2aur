@@ -1,0 +1,1145 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use File::Spec::Functions qw(catfile splitpath splitdir);
+use CPANPLUS::Dist::Arch  qw(dist_pkgver);
+use CPANPLUS::Backend     qw();
+use Term::ANSIColor       qw(color);
+use Archive::Tar          qw();
+use Getopt::Long          qw(GetOptions);
+use List::Util            qw(first);
+use Pod::Usage            qw(pod2usage);
+use Text::Wrap            qw(wrap);
+use English               qw(no_match_vars);
+use version               qw();
+use POSIX                 qw();
+use Cwd                   qw(getcwd);
+
+our $VERSION = '1.02';
+
+## CONSTANTS
+##############################################################################
+
+sub PKGBUILD_ERRCODE() { 2 }
+sub NEEDLWP_ERRCODE()  { 3 }
+
+# should just make these scalars, too... hrmph
+sub AUR_LOGIN_URI()    { 'https://aur.archlinux.org/login/' }
+sub AUR_UPLOAD_URI()   { 'https://aur.archlinux.org/submit/' }
+sub COOKIE_NAME()      { 'AURSID' }
+sub CAT_LIB()          { 10 };
+
+my $TT_NAME_PREFIX = '# CPAN Name  : ';
+
+my $BAD_LOGIN_MSG  = 'Bad username or password.';
+my $NEED_LOGIN_MSG = 'You must create an account before you can upload packages.';
+my $PKG_EXISTS_MSG = qr{You are not allowed to overwrite the <b>.*?</b> package.};
+my $CFGPATH        = "$ENV{HOME}/.cpan2aur";
+
+my $NEED_LOGIN_ERR = 'Login session was invalid.';
+my $PKG_EXISTS_ERR = 'You tried to submit a package you do not own.';
+
+# Command line flags
+my ($DIRECTORY, $VERBOSE, $UPLOAD, $FORCE, $HELP, $NAME, $PASSWD,
+    $REVERSE, $CHECK, $MONO);
+
+## UTILITY FUNCTIONS
+##############################################################################
+
+sub _is_interactive
+{
+    return -t STDIN && -t STDOUT;
+}
+
+# Params : @questions - Questions to concatenate and print together.
+# Returns: The answer! (sans newline)
+sub prompt_ask
+{
+    my $question = join q{}, @_;
+    chomp $question;
+    $question .= q{ };
+
+    local $OUTPUT_AUTOFLUSH = 1;
+    my $prefix = q{ } x 4;
+    print wrap( $prefix, $prefix, $question );
+
+    return undef if $FORCE || ! _is_interactive();
+
+    my $line = <STDIN>;
+    chomp $line;
+    return $line;
+}
+
+# Params: $question - Yes or no question to ask user.
+#         $default  - Whether 'yes' or 'no' is the default.
+#                     (default for $default is Yes!)
+# Returns: 1 for yes 0 for no
+sub prompt_yn
+{
+    my ($question, $default) = @_;
+    $default ||= 'y';
+
+    my $first = lc substr $default, 0, 1;
+    $default = ( $first eq 'y' ? 1 : $first eq 'n' ? 0 : 1 );
+
+    chomp $question;
+    $question .= q{ } . ( $default ? '[Yn]' : '[yN]' );
+
+    my $answer;
+    QUESTION: {
+        $answer = prompt_ask( $question );
+
+        if ( $FORCE || ! defined $answer ) {
+            # Print the default answer if we are uninteractive or forced.
+            printf "%s\n", ( $default ? 'y' : 'n' );
+            return $default
+        }
+
+        return $default if ( length $answer == 0 );
+        redo QUESTION unless $answer =~ /\A[yYnN]/;
+    }
+
+    return 0 if $answer =~ /\A[nN]/;
+    return 1;
+}
+
+# Prompt without echoing user input to screen.
+sub prompt_password
+{
+    my $termios = POSIX::Termios->new;
+    $termios->getattr( 0 ); # STDIN
+
+    my $c_lflag = $termios->getlflag;
+    $termios->setlflag( $c_lflag & ~POSIX::ECHO );
+    $termios->setattr( 0, POSIX::TCSANOW );
+
+    my $passwd = prompt_ask( 'Password:' );
+
+    $termios->setlflag( $c_lflag );
+    $termios->setattr( 0, POSIX::TCSANOW );
+
+    print "\n";
+
+    return $passwd;
+}
+
+sub _color_wrap
+{
+    my ($color, $prefix, @messages) = @_;
+
+    # Wrap the uncolored first because ANSI color chars mess up wrap()
+    # (it doesn't know the ANSI color codes are invisible)
+    my $msg          = join q{}, @messages;
+    $msg             =~ s/\s*\n\s*/ /g;
+    my $result       = wrap( $prefix, q{ } x length( $prefix ), $msg );
+    my $prefix_match = quotemeta $prefix;
+
+    return $result if ( $MONO );
+
+    # Now colorize the prefix and stuff...
+    $result =~ s{ \A $prefix_match } # Use \033[0;1m cuz Term::ANSIColor
+                { color( "BOLD $color" ) . $prefix . "\033[0;1m" }exms;
+    $result .= color( 'RESET' );     # ... doesnt have very bright white!
+
+    return $result;
+}
+
+sub msg
+{
+    my $prefix = q{ } x 4;
+    print wrap( $prefix, $prefix, join q{}, @_ ), "\n";
+}
+
+sub status
+{
+    print _color_wrap( 'GREEN' => q{==> }, @_ ), "\n";
+}
+
+sub substatus
+{
+    print _color_wrap( 'BLUE' => q{  -> }, @_ ), "\n";
+}
+
+sub warning
+{
+    my @args = @_;
+    chomp $args[-1];
+    warn _color_wrap( 'YELLOW' => q{==> WARNING: }, @args ), "\n";
+}
+
+sub error
+{
+    my @args = @_;
+    chomp $args[-1];
+    die _color_wrap( 'RED' => q{==> ERROR: }, @args ), "\n";
+}
+
+sub pkgdir
+{
+    my $dist_obj = shift;
+    return $dist_obj->status->pkgname;
+}
+
+sub pkgdir_file
+{
+    my ($dist_obj, $file) = @_;
+    return catfile( pkgdir( $dist_obj ), $file );
+}
+
+sub find_module
+{
+    my $mod_or_dist = shift;
+    our $CB ||= CPANPLUS::Backend->new;
+    substatus "Looking up module for $mod_or_dist on CPAN...";
+    my $modobj = $CB->parse_module( module => $mod_or_dist );
+
+    warning( "Unable to find $mod_or_dist on CPAN" ) unless ( $modobj );
+
+    return $modobj;
+}
+
+# Check if a file exists, if so offer to delete it.
+# Return 1 if the file doesn't exist or it did and was deleted.
+#        0 if the file existed and the user wanted to keep it.
+sub confirm_overwrite
+{
+    my ($file_path) = @_;
+
+    return 1 unless ( -f $file_path );
+
+    my $answer = prompt_yn( "$file_path already exists, overwrite?" => 'yes' );
+    return 0 if ( $answer == 0 );
+
+    unlink $file_path or die qq{Failed to "rm $file_path": $!};
+    return 1;
+}
+
+sub new_pkgdir_file
+{
+    my ($distobj, $pkgfile) = @_;
+
+    my $pkgdir    = pkgdir ( $distobj );
+    my $file_path = pkgdir_file( $distobj, $pkgfile );
+
+    if ( -f $file_path ) {
+        # If the pkgfile already exists, offer to overwrite.
+        return 0 unless confirm_overwrite( $file_path );
+        return 1;
+    }
+
+    unless ( -d $pkgdir ) {
+        mkdir $pkgdir or die qq{failed to "mkdir $pkgdir": $!};
+    }
+
+    return 1;
+}
+
+# Create a source package or just prepare a C::D::A object for doing
+# something fancier...
+sub create_dist_arch
+{
+    my ($mod_obj, $target) = @_;
+
+    $mod_obj->fetch  ( verbose => 0 ) or return 0;
+    $mod_obj->extract( verbose => 0 ) or return 0;
+
+    my $dist_obj = $mod_obj->dist( target  => $target,
+                                   format  => 'CPANPLUS::Dist::Arch',
+                                   args    => { verbose => $VERBOSE,
+                                                pkg     => 'src',
+                                                destdir => getcwd(),
+                                                nocolor => ( $MONO ? 1 : 0 ),
+                                               })
+        or die "Failed to create CPANPLUS::Dist::Arch object";
+
+    $dist_obj->set_tt_init_args( RELATIVE => 1 );
+
+    return $dist_obj;
+}
+
+# Create a source package inside a package directory...
+sub create_pkgdir_pkg
+{
+    my $pkgdir = shift;
+    my $oldcwd = getcwd();
+
+    # Hopefully this is a package directory...
+    chdir $pkgdir unless ( $pkgdir eq q{.} );
+
+    status sprintf 'Creating source package for %s directory...',
+        getcwd();
+
+    my $pkgpath;
+    eval {
+        # Convert template to PKGBUILD if one exists in the directory.
+        tt_to_pkgbuild() if ( -f 'PKGBUILD.tt' );
+
+        error( <<'END_ERR' ) unless ( -f 'PKGBUILD' );
+There is no PKGBUILD in the directory and no file or module names specified on
+the command line.  Unable to upload anything.
+END_ERR
+
+        my $makepkg_cmd = 'makepkg --source --force --clean';
+        substatus qq{Running '$makepkg_cmd'...};
+        my $output = `$makepkg_cmd 2>&1`;
+
+        unless ( $? == 0 ) {
+            my $msg =
+                ( $? & 127
+                  ? ( sprintf 'makepkg failed, signal %d',      $? & 127 )
+                  : ( sprintf 'makepkg failed, error code %d.', $? >> 8  ));
+            error( $msg );
+        }
+
+        # We can only parse the output of makepkg to find the filename...
+        my @pkginfo = $output =~ /Making package: ([\w-]+) ([\d.-]+)/
+            or error( "makepkg returned unexpected output: $output" );
+
+        $pkgpath = ( join q{-}, @pkginfo ) . '.src.tar.gz';
+    };
+
+    # Make sure we restore the cwd...
+    chdir $oldcwd;
+    die $EVAL_ERROR if ( $EVAL_ERROR );
+
+    $pkgpath = "$pkgdir/$pkgpath";
+    status "Created $pkgpath source package...";
+
+    return $pkgpath;
+}
+
+sub create_new_pkgdir
+{
+    my $mod_name = shift;
+
+    status "Creating a new package directory for $mod_name...";
+
+    my $mod_obj  = find_module( $mod_name ) or return;
+    my $dist_obj = create_dist_arch( $mod_obj, 'prepare' );
+
+    new_tt_file( $dist_obj );
+    status( sprintf 'Created %s source package directory.',
+            pkgdir( $dist_obj ));
+
+    return;
+}
+
+## AUR PACKAGE UPLOAD
+##############################################################################
+
+# Loads the last login username & session ID used.
+sub _load_last_login
+{
+    return () unless ( -f $CFGPATH );
+
+    die q{Please 'chmod 600 ~/.cpan2aur', it is not readable}
+        unless ( -r $CFGPATH );
+
+    my ($user, $sid);
+    open my $cfgfile, q{<}, $CFGPATH or die "open $CFGPATH: $!";
+    while (<$cfgfile>) {
+        chomp;
+        ($user, $sid) = split /:/;
+        last; # only want first line
+    }
+    close $cfgfile;
+
+    return () unless ( $user && $sid && $sid =~ /\A[a-fA-F0-9]+\z/ );
+
+    # If the user specified a --name flag, make sure it matches the cached...
+    return () if ( $NAME && ( lc $user ne lc $NAME ));
+
+    chomp $sid;
+    return ($user, $sid);
+}
+
+# Save the username & session ID for later.
+sub _save_last_login
+{
+    my ($username, $sid) = @_;
+
+    # Set umask to keep this file private...
+    my $oldmask = umask 0077;
+    $username   = lc $username;
+
+    open my $cfgfile, '>', $CFGPATH or die "open $CFGPATH: $!";
+    print $cfgfile "$username:$sid\n";
+    close $cfgfile or die "close $CFGPATH: $!";
+
+    umask $oldmask;
+    return;
+}
+
+# Login to AUR to get a fresh session ID cookie.
+# Params:  $ua - LWP::UserAgent object
+#                (this gets a new cookie jar with a new session cookie)
+#          $username - Username to login AUR.
+#          $password - Password to login AUR.
+# Returns: a new session ID
+sub _new_login_sid
+{
+    my ($ua, $username, $passwd) = @_;
+
+    # Get a fresh session ID cookie...
+    $ua->cookie_jar( HTTP::Cookies->new() );
+    my $resp = $ua->post( AUR_LOGIN_URI,
+                          [ user        => $username,
+                            passwd      => $passwd,
+                            remember_me => 1, # probably not needed
+                           ] );
+
+    # Check for problems...
+    error( 'Bad username or password' )
+        if ( $resp->content =~ /$BAD_LOGIN_MSG/ );
+
+    error( "AUR login expected status code 302.
+Got status: ", $resp->status_line )
+        if !( $resp->code == 302  && !$resp->is_success );
+
+    return _scan_aursid($ua);
+}
+
+# Params: $sid - Session ID to login the AUR with.
+# Returns: A new HTTP::Cookies object with an AUR session ID cookie.
+sub _mk_session_cookie
+{
+    my ($sid) = @_;
+
+    my %cookies = ( COOKIE_NAME() => $sid,
+                    AURLANG       => 'en', );
+
+    my $cookie_obj = HTTP::Cookies->new();
+    for my $name ( keys %cookies ) {
+        $cookie_obj->set_cookie( q{}, $name, $cookies{$name},
+                                 q{/}, 'aur.archlinux.org' );
+    }
+
+    return $cookie_obj;
+}
+
+sub _scan_aursid
+{
+    my ($ua) = @_;
+    my $sid;
+    $ua->cookie_jar->scan(sub { $sid = $_[2] if ($_[1] eq 'AURSID') });
+    unless($sid){
+        Carp::confess 'AURSID cookie is missing';
+    }
+    return $sid;
+}
+
+# Params: $ua - LWP::UserAgent object, should have SID cookie in it.
+#         $pkg_path - Path of source package file to upload.
+sub _post_upload
+{
+    my ($ua, $pkg_path) = @_;
+
+    my $sid = _scan_aursid($ua);
+    my $resp = $ua->post( AUR_UPLOAD_URI,
+                          'Content-Type' => 'form-data',
+                          'Content'      => [ category  => CAT_LIB(),
+                                              submit    => 'Upload',
+                                              pkgsubmit => 1,
+                                              token     => $sid,
+                                              pfile     => [ $pkg_path ],
+                                             ] );
+
+    # We get a 302 Moved HTTP status code on success and when uploading a package
+    # that we own, if the package file is older and ignored...
+    return if ( $resp->code() == 302 );
+
+    error( "When uploading file, got http status ", $resp->status_line )
+        unless ( $resp->is_success );
+
+    die $NEED_LOGIN_ERR      if ( $resp->content =~ /$NEED_LOGIN_MSG/ );
+    error( $PKG_EXISTS_ERR ) if ( $resp->content =~ /$PKG_EXISTS_MSG/ );
+
+    return;
+}
+
+# Make sure the libwww modules we need are loaded, if not offer to install
+# as a package.
+sub _load_web_modules
+{
+    _req_or_install( 'perl-libwww',
+                     'LWP::UserAgent', 'HTTP::Cookies' );
+    _req_or_install( 'perl-lwp-protocol-https',
+                     'LWP::Protocol::https');
+}
+
+sub _req
+{
+    my $loaded = 1;
+    for my $mod ( @_ ) {
+        eval "require $mod; 1";
+        if ( $@ ) { $loaded = 0; last; }
+    };
+    return $loaded;
+}
+
+sub _req_or_install
+{
+    my ($package, @modules) = @_;
+
+    return if _req( @modules );
+
+    my $answer = prompt_yn( <<"END_PROMPT" => 'yes' );
+You need the $package package installed to upload to the AUR.
+Do you want to install it now?
+END_PROMPT
+
+    exit NEEDLWP_ERRCODE unless ( $answer );
+
+    status "Installing $package for uploads to the AUR...";
+    my $modobj = find_module( $modules[0] );
+    $modobj->install( target => 'install', prereq_target => 'install',
+                      format => 'CPANPLUS::Dist::Arch' );
+
+    # Try again after we install it!
+    my $list = join ', ', @modules;
+    error( "Unable to load $list" ) unless _req( @modules );
+    return;
+}
+
+# Upload a package file to the AUR, handle all user interaction, loading old
+# session ID's from our saved file, etc logic.
+sub upload_pkgfile
+{
+    my ($pkg_path) = @_;
+
+    _load_web_modules();
+
+    status "Uploading $pkg_path to the AUR...";
+
+    my ($username, $sid) = _load_last_login();
+    $username ||= $NAME || prompt_ask( 'Username:' );
+
+    if ( ! defined $username ) {
+        print "\n";
+        error( 'Unable to read username in uninteractive mode.' );
+    }
+
+    my $ua = LWP::UserAgent->new();
+    # First try to reuse an old Session ID...
+    if ( $sid ) {
+        substatus "Sending package as $username...";
+        $ua->cookie_jar( _mk_session_cookie( $sid ));
+        eval { _post_upload( $ua, $pkg_path ) };
+        unless ( $EVAL_ERROR ) {
+            msg 'Success.';
+            return;
+        }
+
+        # Fall through to get a new session ID if we just need to re-login...
+        die $EVAL_ERROR unless ( $EVAL_ERROR =~ /$NEED_LOGIN_ERR/ );
+
+        substatus 'Old session ID failed. Starting new session...';
+    }
+
+    my $passwd = $PASSWD || prompt_password();
+    unless ( defined $passwd ) {
+        error( 'Unable to read password in uninteractive mode. '
+               . 'Upload a file manually first or use the -p option.' );
+    }
+
+    # Retrieve a new session and save it...
+    $sid = _new_login_sid( $ua, $username, $passwd );
+    _save_last_login( $username, $sid );
+
+    substatus "Sending package as $username...";
+    _post_upload( $ua, $pkg_path );
+    msg 'Success.';
+
+    return;
+}
+
+# Convert a template to PKGBUILD, create a package with makepkg, and upload
+# the created source package file.
+sub upload_pkgdir
+{
+    my ($pkgdir) = @_;
+
+    status "Uploading package directory $pkgdir...";
+    my $srcpkg_path = create_pkgdir_pkg( $pkgdir );
+    upload_pkgfile( $srcpkg_path );
+
+    return;
+}
+
+# Do The Right Thing for uploading a file, directory, or module name.
+sub upload_thing
+{
+    my ($thing) = @_;
+
+    if ( -d $thing ) {
+        upload_pkgdir( $thing );
+        return;
+    }
+
+    if ( -f $thing ) {
+        error( "$thing file is not named like a source package file." )
+            unless ( $thing =~ /[.]src[.]tar[.]gz$/ );
+
+        upload_pkgfile( $thing );
+        return;
+    }
+
+    # Last resort is that argument is a module...
+    my $mod_obj  = find_module( $thing );
+    my $dist_obj = create_dist_arch( $mod_obj );
+    upload_pkgfile( $dist_obj->status->dist );
+
+    return;
+}
+
+## PKGBUILD TEMPLATES
+##############################################################################
+
+# Creates a new template file that matches C::D::A's default template in a
+# source package dir.
+sub new_tt_file
+{
+    my ($dist_obj) = @_;
+
+    substatus( 'Creating new PKGBUILD.tt template file...' );
+
+    error( 'Aborted.' ) unless new_pkgdir_file( $dist_obj, 'PKGBUILD.tt' );
+
+    open my $templ_file, '>', pkgdir_file( $dist_obj, 'PKGBUILD.tt' )
+        or die "open PKGBUILD.tt failed: $!";
+
+    # Insert the distribution name in the comments... used in tt_to_pkgbuild().
+    print $templ_file $TT_NAME_PREFIX, $dist_obj->parent->package_name, "\n";
+    print $templ_file $dist_obj->get_pkgbuild_templ;
+
+    close $templ_file or die "close PKGBUILD.tt failed: $!";
+}
+
+# Take a PKGBUILD in the _current_dir_ and create a template out of it for
+# future awesomeness.
+sub pkgbuild_to_tt
+{
+    status 'Reverse-engineering PKGBUILD file to a PKGBUILD.tt template...';
+
+    # Handle missing or existing files...
+    error( <<'END_ERR' ) unless ( -f 'PKGBUILD' );
+There is no PKGBUILD in the current directory that we can reverse into a
+template.
+END_ERR
+
+    return unless confirm_overwrite( 'PKGBUILD.tt' );
+
+    open my $pkgbuild_file, '<', 'PKGBUILD' or die "open PKGBUILD: $!";
+    my $pkgbuild_txt = do { local $/; <$pkgbuild_file> }; # slurp!
+    close $pkgbuild_file;
+
+    # Find the distribution name so we can look it up when we convert the template
+    # to the PKGBUILD in tt_to_pkgbuild()...
+    my ($distname) =
+        $pkgbuild_txt =~ m{^ source = \s* [^\n]* / ( [-\w]+ ) -\d }xms;
+
+    error( "Failed to determine the distribution name from the " .
+               "existing PKGBUILD" ) unless ( $distname );
+
+    # Replace our comment header with fresher template values...
+    # (if the PKGBUILD was made with C::D::A that is)
+    $pkgbuild_txt =~ s{^$TT_NAME_PREFIX.*?\n}{}ms; # remove possible conflict
+    $pkgbuild_txt =~ s{^# Contributor:.*?$}{# Contributor: [% packager %]}m;
+    $pkgbuild_txt =~ s{^# Generator  :.*?$}
+                      {# Generator  : CPANPLUS::Dist::Arch [% version %]}m;
+
+    # Replace all bash variables values we can with template values...
+    my $var_match = join '|',
+        qw/ pkgname pkgver pkgdesc url source md5sums source /;
+
+    $pkgbuild_txt =~ s{($var_match) = \s* ["]    .*? [^\\] ["]    }
+                      {$1="\[% $1 \%]"}gxms;
+    $pkgbuild_txt =~ s{($var_match) = \s* [']    .*?       [']    }
+                      {$1='\[% $1 \%]'}gxms;
+    $pkgbuild_txt =~ s{($var_match) = \s* [(]['] .*?       ['][)] }
+                      {$1=('\[% $1 \%]')}gxms;
+    $pkgbuild_txt =~ s{($var_match) = \s* [(]["] .*? [^\\] ["][)] }
+                      {$1=("\[% $1 \%]")}gxms;
+
+    # Depends are different, remove the quotes from inside the parenthesis.
+    # Also try to preserve non-perl dependencies...
+    $pkgbuild_txt =~ s{ ^depends = \s* [(] (.*?) [)] }
+                      { ( sprintf q{depends=([%% depends %%]%s)},
+                          map { $_ ? " $_" : q{} }
+                          join q{ }, grep { !/perl/ } split /\s+/, $1 ) }xmse;
+
+    # Also replace _DISTDIR or DIST_DIR if we are creating a template from
+    # a C::D::A generated PKGBUILD...
+    $pkgbuild_txt =~ s{(DIST_|_DIST)DIR=".*?"}
+                      {DIST_DIR="\${srcdir}/[% distdir %]"};
+    $pkgbuild_txt =~ s{\$_DISTDIR}{\$DIST_DIR}g;
+    # Change _DISTDIR for backwards compatibility...
+
+    open my $templ_file, '>', 'PKGBUILD.tt' or die "open PKGBUILD.tt: $!";
+    print $templ_file $TT_NAME_PREFIX, $distname, "\n";
+    print $templ_file $pkgbuild_txt;
+    close $templ_file;
+
+    substatus "Success.";
+
+    return;
+}
+
+# Fills a template and prints it to a PKGBUILD file.
+# Returns: A CPANPLUS::Dist::Arch object of the PKGBUILD's package.
+sub tt_to_pkgbuild
+{
+    substatus "Converting PKGBUILD.tt template to PKGBUILD...";
+
+    my %old_info;
+    if ( -f 'PKGBUILD' ) {
+        # Save the old PKGBUILD's pkgrel and pkgver for later...
+        open my $pkgbuild_file, '<', 'PKGBUILD' or die "open PKGBUILD: $!";
+        my $pkgbuild_txt = do { local $/; <$pkgbuild_file> };
+        close $pkgbuild_file;
+
+        %old_info = get_pkgbuild_info( $pkgbuild_txt );
+
+        # Warn if the user doesn't generate a new PKGBUILD...
+        unless ( confirm_overwrite( 'PKGBUILD' )) {
+            warning( 'Skipping template and doing a simple re-package...' );
+            return;
+        }
+    }
+
+    open my $templ_file, '<', 'PKGBUILD.tt' or die "open PKGBUILD.tt: $!";
+    my $templ_text = do { local $/; <$templ_file> };
+    close $templ_file or die "close PKGBUILD.tt: $!";
+
+    # Convert old template format to new TT-compatible format...
+    $templ_text =~ s/ [[] % \s* FI \s* % []] /[% END %]/gxms;
+
+    my ($distname) = $templ_text =~ /^$TT_NAME_PREFIX(.*)$/m;
+    error( qq{"$TT_NAME_PREFIX" line is missing from the
+PKGBUILD.tt template.  This template file may not have been generated by
+cpan2aur.
+
+In order to use this .tt file with cpan2aur, insert the CPAN distribution's
+name into the file prefixed with the above comment in quotes.
+} ) unless ( $distname );
+
+    # Create a CPANPLUS::Dist::Arch object to convert the template to PKGBUILD
+    my $modobj  = find_module( $distname );
+    my $distobj = create_dist_arch( $modobj => 'prepare' );
+
+    # If the last PKGBUILD has the same version as the to-be-generated one
+    # then increment the pkgrel.
+    REL_CHECK:
+    {
+        last REL_CHECK unless ( $old_info{pkgver} );
+
+        my $old_ver = version->new( $old_info{pkgver}   );
+        my $new_ver = version->new( $distobj->get_pkgver );
+
+        last REL_CHECK unless ( $old_ver == $new_ver );
+
+        my $new_pkgrel = $old_info{pkgrel} + 1;
+
+        my $answer = prompt_yn( <<"END_QUESTION" => 'no' );
+A PKGBUILD already exists for this version ($new_ver).
+Would you like to increment the pkgrel to $new_pkgrel?
+END_QUESTION
+
+        $distobj->set_pkgrel( $answer ? $new_pkgrel : $old_info{pkgrel} );
+    }
+
+    $distobj->set_pkgbuild_templ( $templ_text );
+    $distobj->create_pkgbuild( q{.} );
+
+    return $distobj;
+}
+
+## VERSION CHECKING
+##############################################################################
+
+sub get_pkgbuild_info
+{
+    my ($pkgbuild_txt) = @_;
+
+    my ($dist_name, $dist_ver) = $pkgbuild_txt
+        =~ m{ (?: DIST_DIR | ^_distdir )=
+              "\$\{srcdir\}/ ( [\w-]+ ) - v? ( [\d.]+ ) /? " }xms;
+
+    my ($pkgrel) = $pkgbuild_txt
+        =~ m{ ^ pkgrel = ['"]? ( \d+ ) ['"]? }xms;
+
+    my ($pkgver) = $pkgbuild_txt
+        =~ m{ ^ pkgver = ['"]? ( [-._0-9]+ ) }xms;
+
+    return ( dist_name => $dist_name, dist_ver => $dist_ver,
+             pkgrel    => $pkgrel,    pkgver   => $pkgver,
+            );
+}
+
+# Read PKGBUILD info from a compressed source package file.
+sub get_pkgfile_info
+{
+    my ($pkg_path) = @_;
+
+    eval { require Archive::Tar; 1; }
+        or error( "Failed to load Archive::Tar. Make sure it is installed." );
+
+    my ($pkg_filename) = reverse splitpath( $pkg_path );
+    my ($pkg_name)     = $pkg_filename =~ / \A ( [\w-]+ ) - \d /xms;
+    my $pkg_file       = Archive::Tar->new( $pkg_path )
+        or die "Failed to open $pkg_path source package file.";
+
+    error( "$pkg_path does not contain the $pkg_name/PKGBUILD file." )
+        unless $pkg_file->contains_file( "$pkg_name/PKGBUILD" );
+
+    my $pkgbuild = $pkg_file->get_content( "$pkg_name/PKGBUILD" );
+    my %info     = get_pkgbuild_info( $pkgbuild );
+
+    error( <<"END_ERROR" ) unless ( $info{dist_name} );
+${pkg_path}'s PKGBUILD does not seem to be made by cpan2aur.
+We are unable to extract the CPAN distribution name from it.
+END_ERROR
+
+    return %info;
+}
+
+sub by_version
+{
+    my ($aver) = $a =~ /-([^-]+)-\d+[.]src[.]tar[.]gz\z/
+        or die "Failed to extract version from $a.";
+    my ($bver) = $b =~ /-([^-]+)-\d+[.]src[.]tar[.]gz\z/
+        or die "Failed to extract version from $b.";
+    version->parse( $aver ) cmp version->parse( $bver );
+}
+
+sub pkgdir_srcpkg
+{
+    my ($pkg_dir) = @_;
+
+    my ($pkg_name) = reverse splitdir( $pkg_dir )
+        or error( "Failed to extract pkgname from dir $pkg_dir" );
+
+    # Choose the package with the latest version number...
+    my ($src_pkgpath) = reverse sort by_version
+        glob "$pkg_dir/$pkg_name-*.src.tar.gz";
+
+    return $src_pkgpath;
+}
+
+sub get_pkgdir_info
+{
+    my ($pkg_dir) = @_;
+
+    # Return a source package file's info if one exists in the dir...
+    my $srcpkg = pkgdir_srcpkg( $pkg_dir );
+    return get_pkgfile_info( $srcpkg ) if ( $srcpkg );
+
+    # Next is the PKGBUILD file itself...
+    error( "$pkg_dir does not contain a PKGBUILD or source package file." )
+        unless ( -f "$pkg_dir/PKGBUILD" );
+
+    open my $pkgbuild_file, '<', "$pkg_dir/PKGBUILD"
+        or die "open $pkg_dir/PKGBUILD: $!";
+    my $pkgbuild = do { local $/; <$pkgbuild_file> }; # slurp!
+    close $pkgbuild_file;
+
+    my %info = get_pkgbuild_info( $pkgbuild );
+
+    error( <<'END_ERROR' ) unless ( $info{dist_name} );
+$pkg_dir/PKGBUILD does not seem to be made by cpan2aur.
+We are unable to extract the CPAN distribution name from it.
+END_ERROR
+
+    return %info;
+}
+
+sub update_if_old
+{
+    my ($thing) = @_;
+
+    status "Checking if $thing is up to date...";
+
+    my $type = ( -f $thing ? 'file' : -d $thing ? 'dir' : undef );
+    unless ( $type ) {
+        error( <<"END_ERROR" );
+$thing does not seem to be a source package file or directory!
+END_ERROR
+    }
+
+    # Check if the "thing" has a newer version on CPAN...
+    my %pkg_info = ( $type eq 'file' ? get_pkgfile_info( $thing ) :
+                     $type eq 'dir'  ? get_pkgdir_info( $thing )  :
+                     die );
+
+    my $mod_obj  = find_module( $pkg_info{'dist_name'} );
+    return unless ( $mod_obj );
+
+    my $cpan_ver = version->new( dist_pkgver( $mod_obj->package_version ));
+    my $dist_ver = version->new( $pkg_info{'dist_ver'} );
+
+    if ( $cpan_ver < $dist_ver ) {
+        error( <<"END_WARN" );
+CPAN version $cpan_ver is less than package version $dist_ver!
+END_WARN
+    }
+    elsif ( $cpan_ver == $dist_ver ) {
+        msg "$thing is up to date.";
+        return;
+    }
+
+    if ( $type eq 'file' ) {
+        # If this is a source package file, make a new one!
+        my $dist_obj = create_dist_arch( $mod_obj => 'create' );
+        my $pkg_path = $dist_obj->status->dist
+            or die 'Unable to find path of created source package';
+
+        if ( prompt_yn( 'Delete the old package file?' => 'yes' )) {
+            status "Deleting old package file: $thing";
+            unlink $thing or warning( "Failed to delete $thing ($!)" );
+        }
+        upload_pkgfile( $pkg_path );
+        return;
+    }
+
+    # upload_pkgdir() will automatically update the directory
+    # TODO: perhaps we should turn force on?
+    upload_pkgdir( $thing );
+    return;
+}
+
+## SCRIPT START
+##############################################################################
+
+GetOptions( 'directory' => \$DIRECTORY,
+            'verbose'   => \$VERBOSE,
+            'reverse'   => \$REVERSE,
+            'upload'    => \$UPLOAD,
+            'force'     => \$FORCE,
+            'check'     => \$CHECK,
+            'name=s'    => \$NAME,
+            'pass=s'    => \$PASSWD,
+            'mono'      => \$MONO,
+            'help'      => \$HELP,
+           );
+
+$VERBOSE ||= 0;
+
+pod2usage( -message => '-u[pload] feature not implemented due to AUR 4.0 changes')
+    if ( $UPLOAD );
+
+pod2usage( -message => '-u[pload] and -d[irectory] cannot be used together' )
+    if ( $UPLOAD && $DIRECTORY );
+
+pod2usage( -message => 'The -r[everse] flag must be used by itself.' )
+    if ( $REVERSE && ( $UPLOAD || $DIRECTORY ));
+
+pod2usage( -verbose => 1 ) if ( $HELP );
+
+if ( $REVERSE ) {
+    pkgbuild_to_tt();
+    exit 0;
+}
+
+# If no arguments are given, upload the current directory's package.
+if ( $UPLOAD && !@ARGV ) {
+    push @ARGV, q{.};
+}
+
+pod2usage( -verbose => 0 ) unless ( @ARGV );
+
+# A list of actions, each is an aref of arg test and arg action.
+my @flagacts = ( [ sub { $CHECK     }, \&update_if_old     ],
+                 [ sub { $UPLOAD    }, \&upload_thing      ],
+                 [ sub { $DIRECTORY }, \&create_new_pkgdir ],
+                 [ sub { -d shift   }, \&create_pkgdir_pkg ],
+                );
+
+sub find_action
+{
+    my $thing = shift;
+    my $match = first { $_->[0]->( $thing ) } @flagacts;
+    return $match->[1];
+}
+
+ARG_LOOP:
+for my $arg ( @ARGV ) {
+    my $action = find_action( $arg );
+    if ( $action ) {
+        eval { $action->($arg) };
+        print $EVAL_ERROR if ( $EVAL_ERROR );
+        next ARG_LOOP;
+    }
+
+    status( 'Creating new source package for ' . $arg . '...' );
+    my $modobj  = find_module( $arg ) or next ARG_LOOP;
+    my $distobj = create_dist_arch( $modobj, ( $DIRECTORY
+                                               ? 'prepare' : 'create' ))
+        or die 'Failed to create CPANPLUS::Dist::Arch object';
+}
+
+__END__
+
+=head1 NAME
+
+cpan2aur - AUR maintainer utility for CPAN perl modules
+
+=head1 SYNOPSIS
+
+ cpan2aur [-v -f] <Module::Names /pkg/dirs/>
+
+ cpan2aur [-v -f] --directory <Module::Names>
+
+ cpan2aur [-v -f] --upload [Module::Names filenames.src.tar.gz
+                            /pkg/dirs/]
+
+ cpan2aur [-v -f] --check <file-names.src.tar.gz /pkg/dirs/>
+
+ -h, --help            Display this usage message.
+ -m, --man             Display full help manual page.
+ -v, --verbose         Allow CPANPLUS to be more verbose.
+ -f, --force           Overwrite files without asking.
+
+ -d, --directory       Create a source package directory with a standard
+                       PKGBUILD.tt template file.
+ -r, --reverse         Convert a PKGBUILD in the current directory to a
+                       template file (PKGBUILD.tt).
+
+ TODO: The upload feature is currently disabled due to AUR v4.0 changing
+ to a Git backend and HTTP Uploads removed.
+ -u, --upload  [dir]   Upload the generated source package to the AUR.
+              [file]   * If a dir is specified cd to that dir and
+            [module]     convert PKGBUILD.tt to a PKGBUILD to a
+                         source package, then upload it.
+                       * If a file is specified, upload it if it appears
+                         to be a source package.
+                       * If a module is specified, package and upload it.
+                       * If nothing is specified, act upon the current
+                         directory.
+ -c, --check   <dir>   Check if a source package or directory (with a
+              <file>   source package or PGKBUILD in it) is outdated.
+                       If so, then --upload a new version.
+ -n, --name <username> Specify a different username to login to the AUR,
+                       instead of the last one used.
+ -p, --pass <password> Specify a password to use to login to AUR.
+ -m, --mono            Disable color output, use monochrome black/white.
+ -i, --inc     <dir>   Rebuild the source package, incrementing the
+              <file>   release number.
+
+ (Unlike GNU options, single-letter options need their own hyphens
+  example: -u -d)
+
+=head1 DESCRIPTION
+
+This is a utility made for creating and uploading perl packages for
+the AUR (Archlinux User Repository).  cpan2aur's simplest usage,
+without any flags, creates AUR source packages:
+
+=over 4
+
+=item * If you specify a I<Module::Name> we create a source package file in
+the current directory.
+
+=item * If you specify a I<directory> we will generate that template
+directory's source package.
+
+=back
+
+=head2 TEMPLATES
+
+With the I<-d> or I<--directory> flag cpan2aur will create a
+directory to contain the source package and generate a C<PKGBUILD.tt>
+template inside it.  This is best when starting to maintain a new
+AUR package that requires manual PKGBUILD tweaking.
+
+Templates are a powerful way to make maintaining packages on the AUR
+easier.  Most of the time you will not have to update the PKGBUILD.tt
+template, you will just use the I<--upload> flag on a source package
+directory containing a template.  This will convert the template
+to a PKGBUILD by filling in the new info for the new CPAN version.
+
+=head2 UPLOADING
+
+With the I<-u> or I<--upload> flag cpan2aur will upload a source
+package to the AUR.  It will try to Do The Right Thing (tm) for
+command line arguments.  Arguments can be source package files,
+directories for source packages, or module/distribution names.
+
+We store previous logins inside the file C<~/.cpan2aur>.  The last
+username that was used will be retried.  To use a different username,
+use the I<-n> or I<--name> flag or delete the C<~/.cpan2aur> file.
+
+=head2 AUTOMATIC UPDATING
+
+You can even use the I<--check> flag to check if a new version
+of the perl distribution is available on CPAN.  If it is, cpan2aur
+will go through the I<--upload> process.  This is done by checking
+the versions of previously build .src.tar.gz files or PKGBUILDs.
+
+=head1 EXAMPLE
+
+For example, I keep a copy of the source packages I maintain inside my
+C<~/aur> directory.  Some of these packages I have created directories
+and PKGBUILD.tt files for, because they require more customization.
+
+  [juster@virtuarch ~]$ cd ~/aur
+  [juster@virtuarch aur]$ ls
+  perl-alpm-0.05-1.src.tar.gz  perl-text-csv-xs-0.70-1.src.tar.gz
+  perl-sepia                   perl-text-xsv-0.21-1.src.tar.gz
+  perl-text-csv                perl-tkx
+  [juster@virtuarch aur]$
+
+Now to check and see if any of these packages need updating, I just use the
+--check flag to find new versions and upload them automatically.
+
+  [juster@virtuarch aur]$ cpan2aur --check perl-*
+  ==> Checking if perl-alpm-0.05-1.src.tar.gz is up to date...
+  ==> Looking up module for ALPM on CPAN...
+  perl-alpm-0.05-1.src.tar.gz is up to date.
+  ==> Checking if perl-sepia is up to date...
+  ==> Looking up module for Sepia on CPAN...
+  perl-sepia is up to date.
+  ==> Checking if perl-text-csv is up to date...
+  ==> Looking up module for Text-CSV on CPAN...
+  perl-text-csv is up to date.
+  ==> Checking if perl-text-csv-xs-0.70-1.src.tar.gz is up to date...
+  ==> Looking up module for Text-CSV_XS on CPAN...
+  perl-text-csv-xs-0.70-1.src.tar.gz is up to date.
+  ==> Checking if perl-text-xsv-0.21-1.src.tar.gz is up to date...
+  ==> Looking up module for Text-xSV on CPAN...
+  perl-text-xsv-0.21-1.src.tar.gz is up to date.
+  ==> Checking if perl-tkx is up to date...
+  ==> Looking up module for Tkx on CPAN...
+  perl-tkx is up to date.
+  [juster@virtuarch aur]$ 
+
+It's kind of boring since I don't have anything outdated to upload but
+I hope you get the idea...
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<CPANPLUS::Dist::Arch>
+
+=item * L<http://aur.archlinux.org>
+
+=back
+
+=head1 AUTHOR
+
+Created by: Justin Davis C<< <juster at cpan dot org> >>
+
+Serendipitously maintained by: John D Jones III C<< <jnbek at cpan dot org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2015 Justin Davis, all rights reserved.
+
+Copyright 2015 John D Jones III, all rights reserved
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

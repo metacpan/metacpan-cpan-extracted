@@ -1,0 +1,31 @@
+---
+abstract: 'Perl implementation of class properties.'
+author:
+  - 'Alexandr Evstigneev <hurricup@evstigneev.com>'
+build_requires:
+  Test::Harness: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Property
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/hurricup/Class-Property/issues
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: git://github.com/hurricup/Class-Property.git
+version: '1.002'

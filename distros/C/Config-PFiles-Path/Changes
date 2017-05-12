@@ -1,0 +1,26 @@
+Revision history for Config-PFiles-Path
+
+0.03	2015-05-21T14:37:33-0400
+
+  [BUG FIX]
+
+    * fix typo in test which unwittingly used a deprecated syntax
+
+  [BUILD]
+
+    * use cpanfile for dependencies
+
+    * move author tests to xt/
+
+    * test more meta-things
+
+0.02	2007-08-24T16:44:00-0400
+
+  [ENHANCEMENT]
+    * now can manipulate $ENV{PFILES} on module load
+
+
+0.01	2007-08-24T15:18:00-0400
+
+    * Initial release.
+

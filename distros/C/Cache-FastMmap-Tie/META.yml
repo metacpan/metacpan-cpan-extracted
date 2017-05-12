@@ -1,0 +1,20 @@
+--- 
+abstract: "Using Cache::FastMmap as hash "
+author: 
+  - Yuji Suzuki <yuji.suzuki.perl@gmail.com>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Cache-FastMmap-Tie
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.8.1
+version: 0.00_01

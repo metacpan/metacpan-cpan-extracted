@@ -1,0 +1,11 @@
+1.000   2011-01-15
+    - Fixed problem when using plackup to run the server
+
+0.992   2010-01-04
+    - pushed Test::More prereq to 0.94
+
+0.991   2010-01-03
+    - added missing prereq
+
+0.99    2010-01-02
+    - initial release

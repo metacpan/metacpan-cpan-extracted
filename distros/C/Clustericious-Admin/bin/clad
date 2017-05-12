@@ -1,0 +1,437 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use EV;
+use App::clad;
+
+# PODNAME: clad
+# ABSTRACT: Parallel SSH client
+our $VERSION = '1.09'; # VERSION
+
+exit App::clad->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+clad - Parallel SSH client
+
+=head1 VERSION
+
+version 1.09
+
+=head1 SYNOPSIS
+
+ clad [options] <cluster> <command>
+ clad --list
+ clad --help
+
+=head1 DESCRIPTION
+
+Clad provides the ability to run the same command on several hosts at 
+once.  The output is displayed unbuffered as the various hosts run the 
+command.  The list of hosts is determined by reading a configuration file
+which may also contain command aliases and environment settings.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -n
+
+Dry run, just show the command that would be executed and each host.
+
+=item -a
+
+Do not colorize the host names in the output.
+
+=item -l user
+
+Specify a login name for all ssh connections.
+
+=item --verbose
+
+Print out a lot of debugging information which may be useful in debugging issues with clad.
+
+=item --serial
+
+Force clad to wait for the command to finish on each host before continuing to the next.  This
+will be slower, but may be easier to read the output.
+
+=item --config I<name>
+
+Specify the name of an alternate configuration.  For example if you use C<--config MyClad> then
+the configuration file C<~/etc/MyClad.conf> will be used instead of C<~/etc/Clad.conf>.
+
+=item --fat
+
+Send the server code with the payload and feed into Perl on the remote end.  This makes
+the total payload much larger, but it allows you to use clad with servers that do not
+have L<App::clad> installed.  The remote end must have Perl 5.6.1 or better in the C<PATH>.
+
+=item --max I<number>
+
+Limit the maximum number of simultaneous connections to C<number>
+
+=item --file I<filename>
+
+Copy files to the remote end as part of the payload.  May be specified multiple times.
+The names of the files are available as environment variables C<FILE1>, C<FILE2>, etc.  The
+files will automatically be removed on the remote end when the command completes.  An example
+usage for this would be to install rpm packages:
+
+ % clad --file Database-Server-0.01-1.noarch.rp mycluster 'rpm -U $FILE1'
+
+=item --dir I<directory>
+
+Recursively copy the directory to the remote end as part of the payload.  The name of the directory
+is available as an environment variable C<DIR>.  The directory will automatically be removed on
+the remote end when the command completes.  For example if you are installing a directory full of
+rpm packages:
+
+ % clad --dir ~/rpmbuild/RPMS/noarch mycluster 'rpm -U $DIR/*'
+
+=item --summary
+
+Do not print out standard output and standard input, just the exit values or signals returned from
+each host.
+
+=item --log-dir I<dir>
+
+Specify a directory to write log files to.  Each host will have its own log file.
+
+=item --log
+
+Same as C<--log-dir>, but the location is chosen by L<File::HomeDir#my_dist_data>
+(using C<Clustericious-Admin> as the dist).
+
+=item --purge
+
+Purge any logs that have collected under your home directory from using the C<--log> option.
+
+=item --list
+
+List the clusters and aliases defined in your configuration.
+
+=item --help
+
+Print help and exit.
+
+=item --version
+
+Print the version and exit.
+
+=back
+
+=head1 CONFIGURATION
+
+The configuration file is a L<Clustericious::Config> style configuration file.
+See L</EXAMPLES> for an example configuration. 
+It contains these sections and configuration items:
+
+=head2 env
+
+Environment hash to override environment variables on all hosts that run the command.
+
+=head2 cluster
+
+Hash to define the clusters.  This is a hash of lists, where the keys are the cluster names
+and the lists are the host names.  For example:
+
+ ---
+ cluster:
+   mycluster:
+     - host1
+     - host2
+   myothercluster:
+     - host3
+     - host4
+
+The old key (now deprecated) C<clusters> is also recognized, if C<cluster> is not
+specified.  This deprecated key will be removed on or after January 31 2016.
+
+You can use a single hostname not in the C<cluster> section to specify a cluster
+of one host, so long as it is a legal hostname understood by C<ssh>.
+
+=head2 alias
+
+Hash of aliases.  This is a useful place to specify common shortcuts.  The values
+in this hash may be either strings or lists, allowing you to use the list or scalar
+form of system.
+
+The old key (now deprecated) C<aliases> is also recognized, if C<alias> is not
+specified.  This deprecated key will be removed on or after January 31 2016.
+
+=head2 server_command
+
+L<clad> runs on both the client and the server.  This specifies the command used to
+communicate with the client on the server end.  Unless you are testing L<clad> you
+probably won't need to change this.
+
+=head2 fat
+
+Include the server code as part of the payload.  This is useful for hosts that
+do not already have L<App::clad> installed.  This is the same as the C<--fat>
+option above.
+
+=head2 fat_server_command
+
+The command to execute on the server side when using the C<--fat> command line
+option or the C<fat> configuration option.  The default is simply C<perl>.
+
+=head2 ssh_command
+
+This is the C<ssh> command to use on the client side.  It is C<ssh> by default.
+
+=head2 ssh_options
+
+These are the C<ssh> options used when opening a connection to the server.  The default
+may change as needed.
+
+=head2 ssh_extra
+
+Extra ssh command line options to be added after C<ssh_options>.  If you just want to
+add a few options without replacing the existing set, this is the way to go.
+
+=head2 colors
+
+A list of colors as understood by L<Term::ANSIColor> which are used in alteration
+for each host to help separate the output visually.
+
+=head2 fail_color
+
+Color to use if clad determined the remote call failed
+
+=over 4
+
+=item exit with non zero
+
+=item killed by signal
+
+=item failed to start (usually due to a bad command)
+
+=back
+
+The default is C<bold red>.
+
+=head2 err_color
+
+Color to use for output to standard error.  The default is C<bold yellow>.
+
+=head2 script
+
+A hash of inline scripts.  The keys are the script name and the values are the script
+bodies.  For example, with
+
+ ---
+ script:
+   dir_listing:
+     #!/bin/bash
+     for i in $( ls ); do
+       echo item: $i
+     done
+
+You can get directory listing with
+
+ % clad cluster dir_listing
+
+=head1 EXAMPLES
+
+Here is an example configuration
+
+ ---
+ env:
+   PATH: /home/starscream/perl5/bin:/usr/local/bin:/usr/bin:/bin
+   PERL5LIB: /home/starscream/perl5/lib
+ 
+ cluster:
+   mailservers:
+     - mail1
+     - mail2
+   webservers:
+     - www1
+     - www2
+     - www3
+   databases:
+     - db1
+     - db2
+     - db3
+     - db4
+ 
+ alias:
+   config_init: git clone git1:/cm/config-$CLUSTER.git ~/etc
+   config_update: cd ~/etc && git pull
+   config_destory: rm -rf ~/etc
+
+=head2 uptime
+
+To find the uptime of the mailservers:
+
+ % clad webservers uptime
+ [mail1 out ]  21:27:04 up 4 days, 12:22,  0 users,  load average: 0.96, 1.01, 1.04
+ [mail2 out ]  21:24:09 up 93 days, 12:52,  0 users,  load average: 1.25, 1.33, 1.29
+
+To find the uptime of all servers in any cluster:
+
+ % clad mailservers,webservers,databases
+ [mail1 out ]  21:27:04 up 4 days, 12:22,  0 users,  load average: 0.96, 1.01, 1.04
+ [mail2 out ]  21:24:09 up 93 days, 12:52,  0 users,  load average: 1.25, 1.33, 1.29
+ [www1  out ]  21:24:37 up 93 days, 12:52,  0 users,  load average: 2.60, 2.34, 2.21
+ [www2  out ]  21:23:06 up 93 days, 12:51,  0 users,  load average: 0.60, 0.50, 0.50
+ [www3  out ]  21:24:05 up 93 days, 12:52,  0 users,  load average: 3.99, 3.62, 3.55
+ [db1   out ]  21:24:53 up 93 days, 12:47,  0 users,  load average: 11.71, 12.15, 12.23
+ [db2   out ]  21:26:07 up 93 days, 12:52,  0 users,  load average: 14.13, 13.91, 13.05
+ [db3   out ]  21:29:06 up 93 days, 12:53,  0 users,  load average: 1.99, 1.59, 1.14
+ [db4   out ]  21:24:55 up 93 days, 12:48,  0 users,  load average: 4.99, 4.83, 4.03
+
+(note that the output in this example is displayed in order, though in practice it will usually be jumbled 
+
+=head2 log into hosts with different user
+
+By default L<clad> will login to the remote servers with what ever user is default for C<ssh>
+(this is usually determined by the local user and / or the ssh configuration).  You can
+use the C<-l> option to specify a user name for all clusters in the command
+
+ % clad -l foo mailservers,webservers,databases whoami
+ [mail1 out ] foo
+ [mail2 out ] foo
+ [www1  out ] foo
+ [www2  out ] foo
+ [www3  out ] foo
+ [db1   out ] foo
+ [db2   out ] foo
+ [db3   out ] foo
+ [db4   out ] foo
+
+or you can prefix individual clusters with a user name using the C<@> sign.
+
+ % clad foo@mailservers,bar@webservers,baz@database whoami
+ [mail1 out ] foo
+ [mail2 out ] foo
+ [www1  out ] bar
+ [www2  out ] bar
+ [www3  out ] bar
+ [db1   out ] baz
+ [db2   out ] baz
+ [db3   out ] baz
+ [db4   out ] baz
+
+=head2 running Perl remotely
+
+In the configuration above, we have specified C<PATH> and C<PERL5LIB> environment variables
+to work with the modules build for L<local::lib> on each host (the actual configuration is
+probably a little more complicated), so we can use modules that we have installed in
+L<local::lib>.
+
+ % clad webservers -- perl -Mojo -E 'say g("mojolicio.us")->dom->at("title")->text'
+ [www1 out ]
+ [www1 out ]       Mojolicious - Perl real-time web framework
+ [www1 out ]
+ [www2 out ]
+ [www2 out ]       Mojolicious - Perl real-time web framework
+ [www2 out ]
+ [www3 out ]
+ [www3 out ]       Mojolicious - Perl real-time web framework
+ [www3 out ]
+
+=head2 pulling remote configuration using git
+
+L<Clustericious> servers and client use configuration files that are usually stored in C<~/etc>.
+We usually manage these configurations on a cluster by cluster basis using git, and deploy
+them using L<clad>.
+
+For example, to initialize the configuration directory using the <config_init> alias:
+
+ ---
+ alias:
+   config_init: git clone git1:/cm/config-$CLUSTER.git ~/etc
+
+and run:
+
+ % clad webservers config_init
+
+...we can update using the C<config_update> alias:
+
+ ---
+ alias:
+   config_update: cd ~/etc && git pull
+
+and run:
+
+ % clad webservers config_update
+
+...and if the configuration becomes hosed, we can remove it and start over.
+Since the master configuration is stored in git this may not be disaster.
+
+ ---
+ alias:
+   config_destory: rm -rf ~/etc
+
+and run:
+
+ % clad webservers config_destroy
+
+=head2 using shell
+
+L<clad> runs the command on the remote end using the same exact arguments as
+you pass it on the client side.  That means that it uses either the single
+argument or list version of C<system> depending on input.  That means that
+if you want to use shell logic, pipes or redirection, you need to use the
+single argument version!  For example:
+
+ % clad webservers cd ~/etc && git pull    # WRONG !
+ % clad webservers 'cd ~/etc && git pull'  # RIGHT !
+
+Sometimes if you don't want to worry about the escaping of meta characters
+the list version will be more appropriate
+
+ % clad webservers perl -E 'say "hi there"'
+
+=head1 ENVIRONMENT
+
+=head2 CLAD_CLUSTER
+
+This environment variable is set to the cluster name from the 
+configuration file on each node that the command is run.  The deprecated
+C<CLUSTER> is also set, though that may be removed in a future version.
+
+=head1 INSTALL
+
+You can override the default values for the C<--fat>, C<--server_command> and
+C<--fat_server_command> at install time using options to Build.PL.
+
+ perl Build.PL --clad_fat \
+               --clad_server_command /usr/local/bin/perl \
+               --server_command /usr/local/bin/perl /usr/local/bin/clad --server
+
+In this example, we specify fully qualified pathnames for Perl and L<clad>, which
+may be what you want in environments where the system Perl (usually installed in
+C</usr/bin/perl>) comes before the Perl that you want to use.
+
+=head1 CAVEATS
+
+L<Clustericious::Admin> and L<clad> require an L<AnyEvent> event loop that allows
+entering the event loop by calling C<recv> on a condition variable.  This is not
+supported by all L<AnyEvent> event loops and is discouraged by the L<AnyEvent>
+documentation for CPAN modules, though most of the important event loops, such as
+L<EV> and the pure perl implementation that comes with L<AnyEvent> DO support
+this behavior.
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,18 @@
+- Create a test for non-public SSH2 format.  We may have to roll our own.
+
+- Implement SSH2 serialize.
+
+- Test encrypted key files?
+
+- DER format (PEM without the wrappers)
+
+- Should we care about CryptX PEM interop?  libtomcrypt writes the data
+  differently than OpenSSL, Crypto++, etc.  We could make a new Key type.
+
+- File ticket with Net::SSH::Perl to use this.  This and a couple other
+  changes can completely remove Math::Pari from its requirements.  I have
+  done some simple testing that shows this works.
+
+- Can we use the new key generation method if seed isn't given?
+
+- Make the BufferWithInt helper package completely internal

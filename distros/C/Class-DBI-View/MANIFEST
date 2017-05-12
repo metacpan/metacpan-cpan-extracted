@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/DBI/View.pm
+lib/Class/DBI/View/Having.pm
+lib/Class/DBI/View/SubQuery.pm
+lib/Class/DBI/View/TemporaryTable.pm
+t/00_compile.t
+t/01_temptable.t
+t/02_subquery.t
+t/03_having.t
+t/lib/CD/Music.pm
+t/lib/CD/SQLite.pm
+t/lib/CD/Tester.pm
+t/lib/CD/mysql.pm
+META.yml                                 Module meta-data (added by MakeMaker)

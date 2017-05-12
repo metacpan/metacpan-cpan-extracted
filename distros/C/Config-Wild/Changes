@@ -1,0 +1,67 @@
+Revision history for Perl extension Config::Wild.
+
+2.01	2016-02-18T09:45:04-0500
+
+  [BUILD]
+
+    * specify minimal required version of Path::Tiny
+
+2.0	2016-02-16T17:23:01-0500
+
+  * no changes since 1.6_01
+
+1.6_01	2015-03-11T16:39:49-0400
+
+  [API BREAKAGE]
+
+    * Exceptions are now always thrown upon error.  The PrintError
+      option and errmsg method have been removed
+
+  [ENHANCEMENT]
+
+    * configuration files may be searched for in one or more directories
+      using the paths option
+
+    * regularized the interpretation of ./ and ../ and relative paths
+      in %include directives.  *should* be backwards compatible...
+
+    * Logging via Log::Any for searching/reading/parsing configuration files
+
+  [BUILD]
+
+    * Switch to cpanfile
+    * More author tests
+
+1.6	2014-05-26T14:18:42-0400
+
+ [ENHANCEMENT]
+
+  * expanded (interpolated) variables may now be checked against
+    wildcard variables (via the new ExpandWild attribute).
+
+
+1.5	2013-08-30T16:00:49-0400
+
+[ENHANCEMENTS]
+
+   * new method, getbool, converts value to boolean
+
+
+1.4	2011-08-23T12:03:22-0400
+
+[ENHANCEMENTS]
+
+  * attributes may be specified via the constructor
+
+  * new attribute, 'dir' allows chdir'ing to specified directory
+    before loading config files
+
+[OTHERS]
+
+  * switch to Module::Install
+  * switch to GPL3
+
+
+1.3	2006-09-21T09:19:36-0400
+
+  * first release into the Wild

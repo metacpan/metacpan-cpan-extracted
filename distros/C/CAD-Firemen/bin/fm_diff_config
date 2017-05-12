@@ -1,0 +1,550 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_diff_config
+# ABSTRACT: Analyzes the differences between two config files.
+
+
+use strict;
+use warnings;
+use POSIX;
+use Getopt::Long;
+use Pod::Usage;
+use Digest::MD5;
+BEGIN {
+  if($^O eq "MSWin32"){
+    # the () prevents Win32 from exporting anything.
+    # Needed here, because Win32 and POSIX declares both the NULL value
+    use Win32 ();
+  }
+}
+use CAD::Firemen;
+use CAD::Firemen::Load qw(loadConfig loadDatabase);
+use CAD::Firemen::Common qw(printBlock print2ColsRightAligned testPassed testFailed maxLength printColored getInstallationPath getInstallationConfigPro dbConnect);
+use CAD::Firemen::Analyze qw(compare);
+use CAD::Firemen::Change;
+use CAD::Firemen::Change::Type;
+
+
+sub md5Sum {
+  my $file = shift;
+
+  my $fh;
+  if(!open($fh, "<", $file)){
+    return "";
+  }
+  binmode($fh);
+  my $md5 = Digest::MD5->new();
+  $md5->addfile($fh);
+  return $md5->hexdigest();
+}
+
+our @binarySuffixes = ();
+sub isBinary {
+  my $file = shift;
+
+  if(!-e $file){
+    return 0;
+  }
+
+  if(-B $file){
+    return 1;
+  }
+
+  if($file =~ m/[^\.]+\.([^\.]+)\.?[0-9]{0,}$/){
+    foreach my $binEnd (@binarySuffixes){
+      if(uc($1) eq uc($binEnd)){
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+my $showVersion = 0;
+my $verbose = 1;
+my $quiet = 0;
+my $printAdded = 0;
+my $printChanged = 0;
+my $printRemoved = 0;
+my $ignorePaths = 0;
+my $caseInsensitive = 0;
+my $description = 0;
+my $changeLog = 0;
+my $binary = 0;
+my $dbh;
+my %cfg1Options = ();
+my %cfg2Options = ();
+my %cfg1Errors = ();
+my %cfg2Errors = ();
+my %added = ();
+my %removed = ();
+my %changed = ();
+my %duplicates = ();
+my %ignoredChanges = ();
+my %descriptions = ();
+my $username = "na";
+eval{
+  $username = getpwuid( $< );
+};
+if( $@ ){
+  # $@ is $EVAL_ERROR
+  # unix way has failed, so try the win32 way
+  $username = Win32::LoginName;
+}
+
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions (
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'quiet|q' => \$quiet,
+  'changed|c' => \$printChanged,
+  'added|a' => \$printAdded,
+  'removed|r' => \$printRemoved,
+  'ignore-paths|p' => \$ignorePaths,
+  'case-insensitive|i' => \$caseInsensitive,
+  'description|d' => \$description,
+  'changelog|l' => \$changeLog,
+  'binary|b' => \$binary
+)){
+  pod2usage(2);
+}
+
+# for all of this files -B does not return
+# true, despite the fact, that they contain binary content
+@binarySuffixes = qw(
+  win
+  asm
+  prt
+  frm
+  tbl
+);
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+if($changeLog){
+  $verbose = 0;
+  $printAdded = 1;
+  $printRemoved = 1;
+  $printChanged = 1;
+  $ignorePaths = 0;
+  $caseInsensitive = 0;
+  $description = 0;
+}
+
+if($quiet){
+  $verbose = 0;
+}
+
+my $cfg1Url = shift;
+my $cfg2Url = shift;
+
+my $installPath = "";
+if($description){
+  $installPath = getInstallationPath();
+}
+
+if(!defined($cfg2Url)){
+  $cfg2Url = $cfg1Url;
+  $cfg1Url = getInstallationConfigPro($installPath);
+}
+
+if(!defined($cfg1Url) || $cfg1Url eq ""){
+  pod2usage(2);
+}
+
+if(!defined($cfg2Url) || $cfg2Url eq ""){
+  pod2usage(2);
+}
+
+# files in binary mode
+if($binary ||(isBinary($cfg1Url) && isBinary($cfg2Url))){
+  # check md5 sum
+  my $sum1 = md5Sum($cfg1Url);
+  my $sum2 = md5Sum($cfg2Url);
+  if(($sum1 eq "") || ($sum2 eq "")){
+    print "Could not determine MD5 digests.\n";
+    exit 1;
+  }
+  if($sum1 eq $sum2){
+    printColored("BOTH FILES IDENTICAL\n", "GREEN");
+  }
+  else{
+    printColored("BOTH FILES NOT IDENTICAL\n", "RED");
+  }
+  if($verbose > 0){
+    print "MD5 digest file 1 is ". uc($sum1) ."\n";
+    print "MD5 digest file 2 is ". uc($sum2) ."\n";
+  }
+  exit 0;
+}
+
+if($description){
+  $dbh = dbConnect($installPath, $verbose);
+  if(!$dbh){
+    printColored("HINT: Could not connect to database, disabled -d. Call fm_create_help to create a database", "yellow");
+  }
+}
+
+if($verbose > 1){
+  if($dbh){
+    print "Database:      ". $dbh->{Name} ."\n";
+  }
+  print "Config 1 URL:       ". $cfg1Url ."\n";
+  print "Config 2 URL:       ". $cfg2Url ."\n";
+}
+
+# load descriptions
+if($dbh){
+  my ($refDbh1, $refDbh2, $refDbh3) = loadDatabase($dbh, "SELECT * FROM options", $verbose);
+  %descriptions = %{$refDbh3};
+}
+
+# Load first config
+my ($resultRef, $errorRef, $parsed1Lines) = loadConfig($cfg1Url);
+%cfg1Options = %{$resultRef};
+%cfg1Errors = %{$errorRef};
+if(!$changeLog){
+  if(scalar(keys(%cfg1Errors)) < 1){
+    testPassed("Load Config 1 (Lines: ". $parsed1Lines .", Options: ". scalar(keys(%cfg1Options)) .")");
+  }
+  else{
+    testFailed("Load Config");
+    if($verbose > 1){
+      my @lines = sort { $a <=> $b } keys(%cfg1Errors);
+      my $length = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        print sprintf("%". $length ."s", $line) .": ". $cfg1Errors{$line} ."\n";
+      }
+    }
+  }
+}
+
+# Load second config
+my $parsed2Lines = 0;
+($resultRef, $errorRef, $parsed2Lines) = loadConfig($cfg2Url);
+%cfg2Options = %{$resultRef};
+%cfg2Errors = %{$errorRef};
+if(!$changeLog){
+  if(scalar(keys(%cfg2Errors)) < 1){
+    testPassed("Load Config 2 (Lines: ". $parsed2Lines .", Options: ". scalar(keys(%cfg2Options)) .")");
+  }
+  else{
+    testFailed("Load Config");
+    if($verbose > 1){
+      my @lines = sort { $a <=> $b } keys(%cfg2Errors);
+      my $length = length($lines[scalar(@lines) - 1]);
+      foreach my $line (@lines){
+        print sprintf("%". $length ."s", $line) .": ". $cfg2Errors{$line} ."\n";
+      }
+      print "\n";
+    }
+  }
+  if($verbose > 0){
+    print "\n";
+  }
+}
+
+my ($ref1, $ref2, $ref3, $ref4) = compare(\%cfg1Options, \%cfg2Options);
+%added = %{$ref1};
+%changed = %{$ref2};
+%removed = %{$ref3};
+%duplicates = %{$ref4};
+
+# print changelog header
+if($changeLog){
+  print strftime("%Y-%m-%d", localtime()) ." ". $username ."\n";
+  print " * Compared ". $cfg1Url ." against ". $cfg2Url ."\n";
+}
+
+# print duplicated options
+if($changeLog && (scalar(keys(%duplicates)) > 0)){
+  print " * DUPLICATES (Added, Removed and Changed options may be incorrect)\n";
+}
+else{
+  if(scalar(keys(%duplicates)) > 0){
+    print2ColsRightAligned("Duplicated options", scalar(keys(%duplicates)) ." (Added, Removed and Changed options may be incorrect)", "RED");
+  }
+  else{
+    print2ColsRightAligned("Duplicated options", "NONE", "GREEN");
+  }
+}
+if($verbose > 0 || $printAdded || $printChanged ||$printRemoved){
+  my $max = maxLength(keys(%duplicates)) + 2;
+  foreach my $opt (sort(keys(%duplicates))){
+    my $string = sprintf("%-". $max ."s", $opt) ." ". $duplicates{$opt} ."\n";
+    if($changeLog){
+      print "   * ". $string;
+    }
+    else{
+      printColored($string, "red");
+    }
+    if($description && exists($descriptions{$opt})){
+      printBlock($descriptions{$opt}, 3);
+    }
+  }
+  if(!$changeLog){
+    print "\n";
+  }
+}
+
+# print Added options
+if($changeLog && scalar(keys(%added)) > 0){
+    print " * ADDED\n";
+  }
+else{
+  print2ColsRightAligned("New options in config 2",  scalar(keys(%added)), "RESET");
+}
+if($verbose > 0 || $printAdded){
+  my $max = maxLength(values(%added)) + 2;
+  foreach my $line (sort(keys(%added))){
+    my $opt = $added{$line};
+    my $string = sprintf("%-". $max ."s", $opt) ." ". $cfg2Options{$opt}->{$line} ."\n";
+    if($changeLog){
+      print "   * ". $string;
+    }
+    else{
+      printColored($string, "green");
+    }
+    if($description && exists($descriptions{$opt})){
+      printBlock($descriptions{$opt}, 3);
+    }
+  }
+  if(!$changeLog){
+    print "\n";
+  }
+}
+
+# print changed options
+# 1) Determine length of the options and values, to arrange them
+# 2) Count ignored changes
+# 3) Print
+my @values1 = ();
+my @values2 = ();
+foreach my $opt (keys(%changed)){
+  my $i = 0;
+  foreach my $change (@{$changed{$opt}}){
+    if($change->changeType(CAD::Firemen::Change::Type->Case) && ($caseInsensitive)){
+      $ignoredChanges{$opt} = 1;
+    }
+    elsif($change->changeType(CAD::Firemen::Change::Type->Path) && ($ignorePaths)){
+      $ignoredChanges{$opt} = 1;
+    }
+    elsif(!$change->changeType(CAD::Firemen::Change::Type->NoSpecial)){
+      # it's a value or default value change, so ignore it totaly
+      delete($changed{$opt}->[$i]);
+      if(scalar(@{$changed{$opt}}) == 0){
+        delete($changed{$opt});
+      }
+    }
+    if($change && !exists($ignoredChanges{$opt})){
+      push(@values1, $change->valueOld());
+      push(@values2, $change->valueNew());
+    }
+    $i++;
+  }
+}
+my $max0 = maxLength(keys(%changed)) + 2;
+my $max1 = maxLength(@values1) + 2;
+my $max2 = maxLength(@values2) + 2;
+if($changeLog){
+  if(scalar(keys(%changed)) > 0){
+    print " * CHANGED\n";
+  }
+}
+else{
+  print2ColsRightAligned(
+    "Changed options from config 1 to config 2 (Shown+Ignored=Total[Ignored])",
+    scalar(keys(%changed)) ."[". scalar(keys(%ignoredChanges)) ."]",
+    "RESET"
+  );
+}
+if($verbose > 0 || $printChanged){
+  if((!$changeLog) && (scalar(keys(%changed)) > 0)){
+    print sprintf("%-". $max0 ."s", "Option") ." ". sprintf("%-". $max1 ."s", "Config 1") ." ". sprintf("%-". $max2 ."s", "Config 2") ."\n";
+  }
+  foreach my $opt (sort(keys(%changed))){
+    my $first = 1;
+    foreach my $change (@{$changed{$opt}}){
+      if(!exists($ignoredChanges{$opt})){
+        my $string = "";
+        if($first){
+          $string .= sprintf("%-". $max0 ."s", $opt);
+          $first = 0;
+        }
+        else{
+          $string .= sprintf("%-". $max0 ."s", "");
+        }
+        $string .= " ". sprintf("%-". $max1 ."s", $change->valueOld());
+        $string .= " ". sprintf("%-". $max2 ."s", $change->valueNew()) ."\n";
+        if($changeLog){
+          print "   * ". $string;
+        }
+        else{
+          printColored($string, $change->highlightColor());
+        }
+      }
+    }
+    if(!exists($ignoredChanges{$opt}) && $description && exists($descriptions{$opt})){
+      printBlock($descriptions{$opt}, 3);
+    }
+  }
+  if(!$changeLog){
+    print "\n";
+  }
+}
+
+# print removed options
+if($changeLog){
+  if(scalar(keys(%removed)) > 0){
+    print " * REMOVED\n";
+  }
+}
+else{
+  print2ColsRightAligned("Removed options from config 1 to config 2",  scalar(keys(%removed)), "RESET");
+}
+if($verbose > 0 || $printRemoved){
+  my $max = maxLength(values(%removed)) + 2;
+  foreach my $line (sort(keys(%removed))){
+    my $opt = $removed{$line};
+    my $string = sprintf("%-". $max ."s", $opt) ." ". $cfg1Options{$opt}->{$line} ."\n";
+    if($changeLog){
+      print "   * ". $string;
+    }
+    else{
+      printColored($string, "red");
+    }
+    if($description && exists($descriptions{$opt})){
+      printBlock($descriptions{$opt}, 3);
+    }
+  }
+  if(!$changeLog){
+    print "\n";
+  }
+}
+
+END {
+  if(defined($dbh) && ($dbh != 0) && !$dbh->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_diff_config - Analyzes the differences between two config files.
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_diff_config [options] [PATH_TO_CONFIG_1.PRO] PATH_TO_CONFIG_2.PRO
+
+This script compares the two given config files and displayes added (New in config 2),
+removed (only in config 1) and changed options.
+
+To analyze the differences between an old and new release of Pro/E or Creo, just remove
+your current config.pro from both installations and export all settings into a file.
+Afterwards you can determine new options, removed options and especially changed default
+values. The recommended command is than
+   fm_diff_config -qcip CONFIG_OLD CONFIG_NEW
+
+To create a file with a wiki formatted ( for TRAC) commit message for a version control system use
+   fm_diff_config -l CONFIG_OLD CONFIG_NEW >> MSG.TXT
+
+Options:
+
+  --help             -?   Prints this help.
+  --version               Prints current version.
+  --verbose          -v   The verbose level. 0 - least output, 2 most output (Default: 1).
+  --quiet            -q   Quiet (Same as -v 0).
+  --changed          -c   Print changed options (Regardless of verbose level)
+  --ignore-paths     -p   Ignore all changes, which containes only paths as option values
+                          The default is to print those changes in magenta.
+                          (Useful comparing old and new standard options (see above))
+  --case-insensitive -i   Ignores all changes, with same value, but different cases (e.g. YES and yes)
+                          The default is to print those changes in cyan.
+  --description      -d   Displays the description of each printed option.
+                          Only available, if a database can be queried.
+  --added            -a   Print added options (Regardless of verbose level)
+  --removed          -r   Print removed options (Regardless of verbose level)
+  --changelog        -l   Create a trac wikiformated changelog entry (e.g. for SVN Commit messages)
+  --binary           -b   Treat files as binary files. If set, the MD5 digests are compared to test whether
+                          both files are identical or not.
+
+If no first config file is given, it tries to figure out the correct installation with help of $ENV{PATH}.
+
+Example:
+
+  fm_diff_config c:\proeWildfire4\text\config.pro c:\proeWildfire5\text\config.pro
+
+  Or to display the differences between to config files with all default options (see Description)
+
+  fm_diff_config -qcip CONFIG_OLD CONFIG_NEW
+
+  Or to create a commit message within a file call
+
+  fm_diff_config -l CONFIG_OLD CONFIG_NEW >> MSG.TXT
+
+=head1 DESCRIPTION
+
+C<fm_diff_config> analyzes two config files and displays the differences.
+Per default (verbose = 1) it prints out all added, removed and changed options.
+The changed options also contains options, which contains changed paths (colored magenta)
+or changes which only differs in their written case (like yes and YES; colored cyan).
+To hide those mostly not relevant changes, use options -p to suppress path changes and
+-i to disable case sensitivity (At least for displaying changed options). Further on
+you can use -q to suppress all detailed output and enable only those parts, which you
+are interested in with appending one or more of the options -a, -c and -r.
+
+To find out how the default values changes from one release to another, just remove
+your config.pro from your installations, start each version and export a list with
+all possible options into an file. Afterwards you may call
+
+  fm_diff_config -qcip CONFIG_OLD CONFIG_NEW
+
+to display all changed values, which contains no paths and changed more than only
+its case. To get all new options or removed options, just call it with -qa or -qr.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

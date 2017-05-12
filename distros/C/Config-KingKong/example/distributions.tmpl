@@ -1,0 +1,53 @@
+#########################################
+# Fichier genere par [% program %]
+# Do not edit manually
+#
+# To modify this file, edit [% conffile %]
+# and launch [% program %]
+#########################################
+
+
+[%- BLOCK release %]
+#########################################
+# [% version %]: [% description %]
+# Release type: [% release_type %]
+# Ubuntu Status: [% ubuntu_status %]
+# Hebex Status: [% hebex_status %]
+#########################################
+
+Origin: Hebex
+Label: Ubuntu
+Suite: [% codename %]
+Codename: [% codename %]
+Version: [% version %]
+Architectures:[% FOREACH arch IN architectures %] [% arch %][% END %]
+Components:[% FOREACH comp IN components %] [% comp %][% END %]
+SignWith: yes
+Contents: .gz
+DebIndices: Packages Release . .gz .bz2
+Update: - Ubuntu Partner
+Log: [% codename %].log
+Description: Ubuntu [% description %]
+[% END -%]
+
+[%- FOREACH release IN codenames %]
+[% PROCESS release
+ codename=release.key
+ version=release.value.version
+ description=release.value.description
+ release_type=release.value.release_type
+ ubuntu_status=release.value.ubuntu_status
+ hebex_status=release.value.hebex_status %]
+
+[%- FOREACH variant IN variants -%]
+[%- SET variant_release = release.key _ "-" _ variant -%]
+[%- SET variant_description = release.value.description _ " " _ variant -%]
+[% PROCESS release
+ codename=variant_release
+ version=release.value.version
+ description=variant_description
+ ubuntu_status=release.value.ubuntu_status
+ hebex_status=release.value.hebex_status %]
+[% variantrelease %]
+[%- END -%]
+[%- END -%]

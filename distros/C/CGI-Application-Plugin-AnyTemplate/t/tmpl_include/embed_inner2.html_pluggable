@@ -1,0 +1,15 @@
+--begin inner2--
+one:<!-- TMPL_VAR NAME=one -->
+two:<!-- TMPL_VAR NAME=two -->
+three:<!-- TMPL_VAR NAME=three -->
+four:<!-- TMPL_VAR NAME=four -->
+outer_var1:<!-- TMPL_VAR NAME=outer_var1 -->
+outer_var2:<!-- TMPL_VAR NAME=outer_var2 -->
+outer_var3:<!-- TMPL_VAR NAME=outer_var3 -->
+inner1_var1:<!-- TMPL_VAR NAME=inner1_var1 -->
+inner1_var2:<!-- TMPL_VAR NAME=inner1_var2 -->
+inner1_var3:<!-- TMPL_VAR NAME=inner1_var3 -->
+inner2_var1:<!-- TMPL_VAR NAME=inner2_var1 -->
+inner2_var2:<!-- TMPL_VAR NAME=inner2_var2 -->
+inner2_var3:<!-- TMPL_VAR NAME=inner2_var3 -->
+--end inner2--

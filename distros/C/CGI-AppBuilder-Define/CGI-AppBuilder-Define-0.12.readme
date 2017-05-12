@@ -1,0 +1,54 @@
+NAME
+    CGI::AppBuilder::PLSQL - Oracle PL/SQL Procedures
+
+SYNOPSIS
+      use CGI::AppBuilder::Define;
+
+      my $sec = CGI::AppBuilder::PLSQL->new();
+      my ($sta, $msg) = $sec->exe_sql($ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  def_inputvars($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+            pid             : project id such as ckpt, owb, dba, etc.
+            task            : task name required such as task1,task2,etc.
+            target(sel_sn1) : select one (DB/server name) defining sid
+            args(sel_sn2)   : select two (Arguments)
+            task_fn         : task file name containing all the tasks defined
+            svr_conn        : host/server connection info
+            db_conn         : db connection info for each target/server
+            task_conn       : special connection for tasks. 
+                              It overwrites db_conn for the task
+            HA_*            : hash array
+
+    Variables used or routines called:
+
+      None
+
+  read_text_file($fn, $dvr)
+    sub read_text_file { my $s = shift; my ($fn, $dvr) = @_; if (!$fn) {
+    carp " No file name is specified."; return; } if (!-f $fn) { carp " File
+    - $fn does not exist!"; return; }
+
+        my ($t);
+        open FILE, "< $fn" or
+            croak "ERR: could not read to file - $fn: $!\n";
+        while (<FILE>) {
+            # skip comment and empty lines
+            next if $_ =~ /^\s*#/ || $_ =~ /^\s*$/; 
+            s/\s*[^'"\(]#[^'",\)].*$//;     # remove inline comments
+            chomp;                          # remove line break
+            $t .= $_;
+        }
+        close FILE;
+        return $t;
+    }
+

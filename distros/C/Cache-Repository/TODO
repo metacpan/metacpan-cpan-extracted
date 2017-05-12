@@ -1,0 +1,12 @@
+
+For the Filesys driver:
+* Support compression
+* Inter-process locking.
+  (the meta has some rudimentary locking, but race conditions still exist.)
+
+Other:
+* Create more drivers.
+  * FTP
+  * HTTP
+  * CPAN (combining LWP for upload, and FTP or LWP for download)
+  * ???

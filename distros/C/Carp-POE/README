@@ -1,0 +1,55 @@
+NAME
+    Carp::POE - Carp adapted to POE
+
+SYNOPSIS
+     use Carp::POE;
+     use POE;
+ 
+     POE::Session->create(
+         package_states => [
+             main => [qw( _start test_event )]
+         ],
+     );
+
+     $poe_kernel->run();
+
+     sub _start {
+         $_[KERNEL]->yield(test_event => 'fail');
+     }
+ 
+     sub test_event {
+         my $arg = $_[ARG0];
+         if ($arg ne 'correct') {
+             carp "Argument is incorrect!";
+         }
+     }
+
+DESCRIPTION
+    This module provides the same functions as Carp, but modifies the
+    behavior of "carp()" and "croak()" if called inside a POE event handler.
+    The file names/line numbers in the emitted warnings are replaced with
+    POE::Session's $_[CALLER_FILE] and $_[CALLER_LINE]. This is useful as it
+    will direct you to the code that posted the event instead of directing
+    you to some subroutine in POE::Session which actually called the event
+    handler.
+
+    Calls to "carp()" and "croak()" in subroutines that are not POE event
+    handlers will not be effected, so it's always safe to "use Carp::POE"
+    instead of "Carp".
+
+TODO
+    Do something clever with "cluck()" and "confess()".
+
+BUGS
+    Those go here:
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Carp%3A%3APOE>
+
+AUTHOR
+    Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
+
+LICENSE AND COPYRIGHT
+    Copyright 2008-2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

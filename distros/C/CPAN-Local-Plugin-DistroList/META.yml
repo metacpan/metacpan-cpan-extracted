@@ -1,0 +1,37 @@
+---
+abstract: 'Populate a mirror with a list of distributions'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  CPAN::Faker::HTTPD: 0
+  File::Copy: 0
+  File::Find: 0
+  Module::Faker::Dist: 0
+  Moose::Meta::Class: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Local-Plugin-DistroList
+requires:
+  CPAN::DistnameInfo: 0
+  CPAN::Local::Plugin: 0
+  CPAN::Local::Role::Gather: 0
+  File::Temp: 0
+  LWP::Simple: 0
+  Moose: 0
+  Path::Class: 0
+  Try::Tiny: 0
+  URI: 0
+  namespace::clean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Local-Plugin-DistroList
+version: 0.003

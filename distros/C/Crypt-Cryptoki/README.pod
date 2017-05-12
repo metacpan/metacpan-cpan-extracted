@@ -1,0 +1,67 @@
+=head1 Crypt::Cryptoki - Perl extension for PKCS#11
+
+=head2 STATUS
+
+This is project is still in a very early development stage.
+
+IT IS NOT READY FOR PRODUCTION!
+
+"RSA Security Inc. Public-Key Cryptography Standards (PKCS)"
+
+Current stable version: 2.20
+
+I'm looking forward for version 2.40, which should support TLS 1.2.
+
+=head2 INSTALLATION
+
+To install this module type the following:
+
+	$ git clone https://github.com/mlarue/p5-Crypt-Cryptoki.git
+	$ cd p5-Crypt-Cryptoki
+	p5-Crypt-Cryptoki$ perl Build.PL
+	p5-Crypt-Cryptoki$ ./Build
+	p5-Crypt-Cryptoki$ ./Build test
+	p5-Crypt-Cryptoki$ ./Build install
+
+=head3 Software HSM
+
+You can test your application with L<SoftHSM|http://www.opendnssec.org/softhsm> from the L<OpenDNSSEC Project|http://www.opendnssec.org>.
+
+Configuration
+
+	$ mkdir ~/.softhsm
+	$ echo "0:$HOME/.softhsm/slot0.db" >> ~/.softhsm/softhsm.conf
+	$ echo "export SOFTHSM_CONF=~/.softhsm/softhsm.conf" >> ~/.bashrc
+	$ source ~/.bashrc
+
+Initialization
+
+	$ softhsm --init-token --slot 0 --pin 1234 --so-pin 1234 --label testslot
+
+=head2 DOCUMENTATION
+
+See
+
+	$ perldoc Crypt::Cryptoki
+
+=head2 LINKS
+
+PKCS#11 RSA L<http://www.emc.com/emc-plus/rsa-labs/standards-initiatives/pkcs-11-cryptographic-token-interface-standard.htm>
+
+Stable Version 2.20 L<ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-11/v2-20/pkcs-11v2-20.pdf>
+
+PKCS#11 oasis L<https://www.oasis-open.org/committees/pkcs11>
+
+Public Review Draft 01, 2.40 L<http://docs.oasis-open.org/pkcs11/pkcs11-curr/v2.40/pkcs11-curr-v2.40.pdf>
+
+=head2 COPYRIGHT AND LICENCE
+
+GNU General Public Licence (GPL)
+
+Copyright (C) 2014 by Markus Lauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

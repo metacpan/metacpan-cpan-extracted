@@ -1,0 +1,11 @@
+Revision history for CGI-Application-Plugin-Cache-Adaptive
+
+0.03    2007/05/21 01:04
+        Fixed prerequires.
+
+0.02    2007/05/18 20:34
+        Fixed MANIFEST and MANIFEST.SKIP
+
+0.01    2007/05/18 14:53
+        First version
+

@@ -1,0 +1,47 @@
+# @(#) typemap -- Perl5 CodeBase database interface typemap
+# @(#) $Id: typemap,v 1.2 1999/06/24 14:35:21 andrew Exp $
+# 
+# Copyright (C) 1996, Andrew Ford.  All rights reserved.
+#
+# You may distribute under the terms of either the GNU General Public
+# License or the Artistic License, as specified in the README file.
+#
+
+##############################################################################
+TYPEMAP
+CodeBase::File *		T_PTROBJ
+CodeBase::Query *		T_PTROBJ
+CodeBase::Record *		T_PTROBJ
+
+BOOLEAN		T_IV
+HV *		T_HvRV
+AV *		T_AvRV
+
+
+INPUT
+
+T_AvRV
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVAV) )
+		$var = (AV*)SvRV( $arg );
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an AV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+T_HvRV
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+		$var = (HV*)SvRV( $arg );
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an HV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+
+
+OUTPUT
+
+T_AvRV
+	$arg = newRV((SV*)$var);
+
+T_HvRV
+	$arg = newRV((SV*)$var);

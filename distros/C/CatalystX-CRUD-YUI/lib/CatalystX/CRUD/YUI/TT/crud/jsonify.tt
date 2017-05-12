@@ -1,0 +1,5 @@
+[% # serialize an object using JSON::XS
+    no_wrapper = 1;
+    yui.serializer.serialize_object( serial_args ).as_json;
+%]
+

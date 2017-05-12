@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Helper/Model/Email.pm
+t/00-load.t
+t/01-pod.t
+t/email.t

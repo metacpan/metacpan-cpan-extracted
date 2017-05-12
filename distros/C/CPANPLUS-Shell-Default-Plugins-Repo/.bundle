@@ -1,0 +1,6 @@
+# comments begin with `#' and skipped 
+CGI # conventional way
+http://search.cpan.org/CPAN/authors/id/M/MA/MARKSTOS/CGI.pm-3.58.tar.gz # by url
+CGI.pm-3.58.tar.gz # by distro name
+
+

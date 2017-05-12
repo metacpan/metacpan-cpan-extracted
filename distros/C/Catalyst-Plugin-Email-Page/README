@@ -1,0 +1,34 @@
+Catalyst-Plugin-Email-Page version 0.26
+
+This is a simple plugin that lets a developer set and forget e-mail links in Catalyst
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Readonly, inc::Module::Install and Catalyst
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Gavin Henry
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,40 @@
+---
+abstract: 'modules for working with Atom feeds'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  JSON: '2.90'
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.023, Dist::Milla version v1.0.5, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Atom
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9206'
+  XML::Atom: '0.41'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Atom/issues
+  homepage: https://github.com/LibreCat/Catmandu-Atom
+  repository: https://github.com/LibreCat/Catmandu-Atom.git
+version: '0.04'
+x_contributors:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'vpeil <vitali.peil@uni-bielefeld.de>'

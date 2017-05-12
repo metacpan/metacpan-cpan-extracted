@@ -1,0 +1,45 @@
+[% IF outline %]
+  [% FOR a IN outline %]
+     Package name: [% a.name %]<br>
+
+     [% IF a.pragmata %]
+     pragmata
+     <ul>
+     [% FOR m IN a.pragmata %]
+        <li><a href="#[% m.line %]">[% m.name %]</a></li>
+     [% END %]
+     </ul>
+     [% END %]
+
+     [% IF a.modules %]
+     Modules
+     <ul>
+     [% FOR m IN a.modules %]
+        <li><a href="#[% m.line %]">[% m.name %]</a></li>
+     [% END %]
+     </ul>
+     [% END %]
+  
+     [% IF a.methods %]
+     Methods
+     <ul>
+     [% FOR m IN a.methods %]
+        <li><a href="#[% m.line %]">[% m.name %]</a></li>
+     [% END %]
+     </ul>
+     [% END %]
+
+
+  [% END %]
+[% END %]
+
+
+[% IF right_peg %]    
+      Interested in sponsoring the development of CPAN::Digger?
+      Please consider becomming the member of the 
+      <a href="http://perl-ecosystem.org/">Perl Ecosystem Group</a>
+[% END %]
+[% IF right_tpf %]
+      Do you want to help the development of Perl with money?
+      Donate to <a href="http://www.perlfoundation.org/">The Perl Foundation</a>.
+[% END %]

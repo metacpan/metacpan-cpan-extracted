@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl extension for PKCS#11",
+   "author" : [
+      "Markus Lauer, E<lt>mlarue@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Cryptoki",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::Constant" : "0",
+            "ExtUtils::ParseXS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Crypt::OpenSSL::Bignum" : "0",
+            "Crypt::OpenSSL::RSA" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Cryptoki" : {
+         "file" : "lib/Crypt/Cryptoki.pm",
+         "version" : "0.01"
+      },
+      "Crypt::Cryptoki::Constant" : {
+         "file" : "lib/Crypt/Cryptoki/Constant.pm"
+      },
+      "Crypt::Cryptoki::Raw" : {
+         "file" : "lib/Crypt/Cryptoki/Raw.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

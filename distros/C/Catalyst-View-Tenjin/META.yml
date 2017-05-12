@@ -1,0 +1,32 @@
+---
+abstract: 'Tenjin view class for Catalyst.'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Runtime: 5.80
+  Encode: 0
+  FindBin: 0
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Tenjin
+requires:
+  Catalyst::View: 0
+  Data::Dump: 0
+  Moose: 0
+  Tenjin: 0.070001
+  namespace::autoclean: 0
+  perl: 5.008
+resources:
+  homepage: http://github.com/ido50/Catalyst-View-Tenjin/tree
+  repository: git://github.com/ido50/Catalyst-View-Tenjin.git
+version: 0.050001

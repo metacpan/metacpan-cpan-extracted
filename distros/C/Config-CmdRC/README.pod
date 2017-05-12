@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Config::CmdRC>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Config-CmdRC"><img src="https://secure.travis-ci.org/bayashi/Config-CmdRC.png"/></a> <a href="https://coveralls.io/r/bayashi/Config-CmdRC"><img src="https://coveralls.io/repos/bayashi/Config-CmdRC/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Config::CmdRC installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Config::CmdRC
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Config::CmdRC documentation is available as in POD. So you can do:
+
+    % perldoc Config::CmdRC
+
+
+=head1 REPOSITORY
+
+Config::CmdRC is hosted on github
+L<http://github.com/bayashi/Config-CmdRC>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

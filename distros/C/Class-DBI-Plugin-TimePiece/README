@@ -1,0 +1,30 @@
+ Class-DBI-Plugin-TimePiece
+=============================
+
+"Class-DBI-Plugin-TimePiece" Extension to Class::DBI for DB date type. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - Carp
+ - Time::Piece
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.
+
+
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Base class for error handling'
+author:
+  - 'Benjamin Trott, cpan@stupidfool.org. All rights reserved.'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-ErrorHandler
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Class::ErrorHandler:
+    file: lib/Class/ErrorHandler.pm
+    version: '0.04'
+requires:
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/tokuhirom/Class-ErrorHandler/issues
+  homepage: https://github.com/tokuhirom/Class-ErrorHandler
+  repository: git://github.com/tokuhirom/Class-ErrorHandler.git
+version: '0.04'
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

@@ -1,0 +1,11 @@
+index.html
+lib/CAM/App.pm
+ChangeLog
+Build.PL
+Makefile.PL
+LICENSE
+MANIFEST
+README
+example/SampleConfig.pm
+test.pl
+META.yml

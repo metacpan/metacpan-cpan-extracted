@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb8c
+registers:
+  AF: 63488
+  AF_: 0
+  BC: 27943
+  BC_: 0
+  DE: 39903
+  DE_: 0
+  HL: 55535
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

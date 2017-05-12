@@ -1,0 +1,69 @@
+NAME
+    Catalyst::Plugin::ErrorCatcher::ActiveMQ::Stomp - Plugin for
+    ErrorCatcher to throw exceptions over ActiveMQ using Stomp
+
+VERSION
+    version 0.1.5
+
+SYNOPSIS
+    Put this sort of thing into the catalyst conf file..
+
+    <Plugin::ErrorCatcher::ActiveMQ::Stomp> destination test-message
+    hostname localhost # defaults to 61613 #port
+
+    </Plugin::ErrorCatcher::ActiveMQ::Stomp>
+
+EXPORT
+    A list of functions that can be exported. You can delete this section if
+    you don't export anything, such as for a purely object-oriented module.
+
+FUNCTIONS
+  emit
+SEE ALSO
+    Catalyst::Plugin::ErrorCatcher
+
+AUTHOR
+    Jason Tang, "<tang.jason.ch at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-errorcatcher-activemq-stomp at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-ErrorCat
+    cher-ActiveMQ-Stomp>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Plugin::ErrorCatcher::ActiveMQ::Stomp
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-ErrorCatch
+        er-ActiveMQ-Stomp>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Plugin-ErrorCatcher-ActiveMQ-Stom
+        p>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Catalyst-Plugin-ErrorCatcher-ActiveMQ
+        -Stomp>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Plugin-ErrorCatcher-ActiveMQ-S
+        tomp>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2010 Jason Tang, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

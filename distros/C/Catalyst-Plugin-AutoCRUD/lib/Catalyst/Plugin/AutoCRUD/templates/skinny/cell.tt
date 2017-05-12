@@ -1,0 +1,9 @@
+[% IF meta.data_type == 'boolean' %]
+    [% IF value == 1 OR value == 'true' OR value == 'on' %]
+        <img src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "bullet_green.png" ) %]" />
+    [% ELSE %]
+        <img src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "bullet_red.png" ) %]" />
+    [% END %]
+[% ELSE %]
+    [% value | html %]
+[% END %]

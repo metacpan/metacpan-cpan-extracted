@@ -1,0 +1,22 @@
+% title 'Add connection';
+<div class="landing-page">
+  <header class="row">
+    <h1>
+      <span class="logo">Convos</span>
+      <small>Convos for <%= $organization_name %>.</small>
+    </h1>
+  </header>
+  <div class="row">
+    <p>
+      To get started you need to add a connection. We have filled in an example
+      connection, but you can connect to any server you like.
+    </p>
+    %= include 'connection/form', wizard => 1
+    %= include 'vendor/wizard'
+  </div>
+  <div class="row footer">
+    <hr>
+    &copy; <%= link_to "Nordaaker", "http://nordaaker.com"%>
+    - <%= link_to "About", "http://convos.by" %>
+  </div>
+</div>

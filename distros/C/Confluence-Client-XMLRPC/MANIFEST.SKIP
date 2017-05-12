@@ -1,0 +1,7 @@
+dist.ini
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#

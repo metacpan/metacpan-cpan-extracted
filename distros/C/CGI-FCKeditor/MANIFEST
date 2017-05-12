@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-FCKeditor.t
+lib/CGI/FCKeditor.pm
+sample/sample.cgi
+META.yml                                 Module meta-data (added by MakeMaker)

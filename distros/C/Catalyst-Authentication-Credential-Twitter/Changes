@@ -1,0 +1,90 @@
+Revision history for Catalyst-Authentication-Credential-Twitter
+
+2.0.5 2017-05-05
+  - Move dependency to ::FastMmap to 'recommends'. (RT#76678)
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 88 insertions(+), 15 deletions(-)
+
+2.0.4 2014-03-11
+  [ BUG FIXES ]
+    - Add test dependency for "Catalyst::Plugin::Session::Store::FastMmap".
+      (RT#76678)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 14 insertions(+), 17 deletions(-)
+
+2.0.3 2014-01-21
+  [ BUG FIXES ]
+    - pass ssl => 1 option to Net::Twitter, to silence deprecation warnings
+      (GH#4, Karen Etheridge)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 17 insertions(+), 2 deletions(-)
+
+2.0.2 2013-06-23
+  [ BUG FIXES ]
+    - authenticate_twitter() was dying if the auth failed.  (RT#86270,
+      reported by yayamamo)
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 71 insertions(+), 4 deletions(-)
+
+2.0.1 2013-06-17
+  [ BUG FIXES ]
+    - Requiring the API::RESTv1_1 trait on every Net::Twitter object
+      created. (GH#3, Jason McIntosh)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 56 insertions(+), 36 deletions(-)
+
+2.0.0 2013-06-06
+  [ API CHANGES ]
+    - Using the REST::APIv1_1 trait of Net::Twitter. 
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 9 insertions(+), 1 deletion(-)
+
+1.0.0 2013-03-09
+  [ API CHANGES ]
+    - twitter() now needs to be passed C<$c>.
+
+  [ BUG FIXES ]
+    - Session infos could get mixed up. (GH#2, reported by Jason McIntosh)
+
+0.03001 2011-11-22
+  [ BUG FIXES ]
+    - Add 'Catalyst::Plugin::Session::PerUser' to the list of dependencies.
+
+0.03000 2011-11-14
+  [ BUG FIXES ]
+    - Ensure that authenticate() doesn't explode if store is not
+      DBIx::Class.
+
+  [ DOCUMENTATION ]
+    - Spell out limitation with the stores.
+
+  [ ENHANCEMENTS ]
+    - change get_authorization_url() for get_authentication_url(), which
+    - bypass the authorize page if the user has already authorized the app.
+    - (thanks to Francoise Dehinbo for the suggestion)
+
+0.02002 2011-11-11
+  [ BUG FIXES ]
+    - Check if Catalyst::Plugin::Session::PerUser is active on first use,
+      and die with a meaningful message if it's not. [RT66543]
+
+0.02001 2011-04-17
+  - Don't have the test fail if WWW::Test::Catalyst::Mechanized is not
+    installed.
+
+0.02000 2011-04-17
+  - Break the authentication process in two
+  - Cleaned up subversion files.
+  - Add some tests.
+
+0.01001 2009-12-06
+  - Share access_tokens in session for registration
+
+0.01000 2009-12-06
+  - Initial release

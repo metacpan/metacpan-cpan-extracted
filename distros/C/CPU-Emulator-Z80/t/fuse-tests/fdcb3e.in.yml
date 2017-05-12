@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 46
+    - 62
+  45823:
+    - 80
+name: fdcb3e
+registers:
+  AF: 3477
+  AF_: 0
+  BC: 15874
+  BC_: 0
+  DE: 36724
+  DE_: 0
+  HL: 3970
+  HL_: 0
+  I: 0
+  IX: 34271
+  IY: 45777
+  PC: 0
+  R: 0
+  SP: 0

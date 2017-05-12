@@ -1,0 +1,250 @@
+=head1 NAME
+
+Crypt::OpenSSL::CA::Resources - A bibliography of documentations and
+tools that I found helpful for implementing X509 PKIs in Perl over all
+these years.
+
+=head1 TUTORIALS
+
+For a tutorial introduction to the concepts of PKI and X509, please
+refer to the appropriate Wikipedia articles (in particular
+L<http://en.wikipedia.org/wiki/Public_key_infrastructure> and
+L<http://en.wikipedia.org/wiki/X.509>).
+
+Have some giggles while uncovering the bleak truth about the state of
+affairs in PKI-world with Peter Gutmann's crypto tutorials at
+L<http://www.cs.auckland.ac.nz/~pgut001/tutorial/index.html>, and
+especially the one that deals with X509 PKI at
+L<http://www.cs.auckland.ac.nz/~pgut001/pubs/pkitutorial.pdf>.
+
+=head1 ALPHABET SOUP
+
+See L<Crypt::OpenSSL::CA::AlphabetSoup>
+
+=head1 IMPLEMENTATION GUIDELINES
+
+=head2 X509 Style Guide
+
+The X509 Style Guide, also by Peter Gutmann
+(http://www.cs.auckland.ac.nz/~pgut001/pubs/x509guide.txt), although
+partly outdated (e.g. as regards Unicode support) is the single most
+helpful resource one needs to develop and deploy a full-fledged X509
+PKI.
+
+=head1 SOFTWARE
+
+=head2 IDX-PKI
+
+A working, rugged implementation of
+L<Crypt::OpenSSL::CA::AlphabetSoup/PKIX> that is GPL-licenced and covers
+all the bases, despite its being restricted from the "commercial"
+version.  Definitely a reference implementation in the field (I know,
+since I helped write it!). L<http://idx-pki.idealx.org/index.en.html>
+
+=head2 OpenSSL
+
+The venerable, feature-rich but quirky and poorly documented
+cryptographic library that I<Crypt::OpenSSL::CA> is built
+upon. Available on L<http://www.openssl.org/> (and also on
+L<https://www.openssl.org/>, of course).
+
+=head3 /usr/bin/openssl
+
+Of special interest is the C</usr/bin/openssl> command-line tool, that
+serves as a Swiss army knife of crypto debugging from making and
+parsing certificates to debugging SSL.  Actually C</usr/bin/openssl>
+is powerful enough to serve as the sole foundation for a full-fledged
+PKI; this is almost what L</IDX-PKI> does, but it B<is> quirky (and
+therefore I<Crypt::OpenSSL::CA> departs from that idea).
+
+Here are a few tricks that I know by heart from typing them so often:
+
+=over
+
+=item B<Parsing a certificate and displaying the details>
+
+  openssl x509 -noout -text -in cert.pem
+
+or at an even lower level, using L</dumpasn1>:
+
+  openssl x509 -outform der -in cert.pem | dumpasn1 -
+
+=item B<Getting the modulus (unique public key identifier) of a
+certificate or private key>
+
+If both match, then the private key and certificate correspond to each
+other.
+
+  openssl x509 -noout -modulus -in cert.pem
+  openssl rsa -noout -modulus -in key.pem
+
+=item B<Generating a self-signed certificate and matching private key
+for tests>
+
+  openssl req -x509 -nodes -new -newkey 1024 -keyout key.pem -out cert.pem
+
+The resulting C<key.pem> and C<cert.pem> files can be used directly
+for a network server, or to build a toy CA.
+
+=item B<Building a toy CA>
+
+Under distros that sport a cooperative C<openssl.cnf>: this was tested
+on Ubuntu Edgy, your mileage may vary.
+
+=over
+
+=item 1.
+
+create a test directory and chdir into it
+
+=item 2.
+
+create subdirectories C<demoCA/private> and C<demoCA/newcerts>; put
+the string C<01> into C<demoCA/serial>; create an empty
+C<demoCA/index.txt> file.
+
+=item 3.
+
+create a key and a self-signed certificate for the CA as explained
+above, and save them respectively as C<demoCA/private/cakey.pem> and
+C<demoCA/cacert.pem>.
+
+=item 4.
+
+create a certificate request using C<openssl req>
+
+=item 5.
+
+run
+
+ openssl ca -subj "/C=AU/ST=Some-State/O=Internet Widgits Pty Ltd/CN=test" \
+    -in user.req
+
+=item 6.
+
+Rinse and repeat, tweaking the command line and the contents of the
+C<./demoCA> subdirectory until openssl is satisfied. Read the I<ca(3)>
+man page to interpret and resolve the error messages.
+
+=item 7.
+
+Your certificate should appear in C<./demoCA/newcerts> after a finite
+time (and tearing out only a minority subset of your hair).
+
+=item 8.
+
+For advanced usage, copy over the default C<openssl.cnf> file (usually
+to be found in C</usr/lib/openssl>, C</usr/share/openssl> or
+C</etc/openssl>) into C<demoCA> and tack a C<-config ./openssl.cnf>
+onto the C<openssl> command line.  Then you can start mucking with
+X509 extensions and so on.
+
+=back
+
+=back
+
+=head3 Source code
+
+Any serious work towards contributing to L<Crypt::OpenSSL::CA>
+requires promiscuity with OpenSSL's code base.  I suggest reading and
+understanding C<demos/mkcert.c> and C<apps/ca.c> first, comparing and
+contrasting with the XS code in I<Crypt::OpenSSL::CA> which does
+roughly the same thing in a simpler and more modular way.  Seasoned
+programmers will find the OpenSSL man pages of some limited help, and
+the command C<grep -r some_identifier /usr/include/openssl> to come in
+handy more often than not.
+
+=head3 C<openssl.txt>
+
+There is a succint overview of OpenSSL's whole API in a file named
+C<doc/openssl.txt>, to be found either in OpenSSL's source or possibly
+in the documentation directory of your distribution's openssl package
+(YMMV).
+
+=head2 dumpasn1
+
+A tool to debug L<Crypt::OpenSSL::CA::AlphabetSoup/ASN.1> data
+structures, more fault-tolerant than the C<openssl asn1parse> command
+(see L</OpenSSL>).  Available on L</Peter Gutmann's site> and as a
+Debian package.
+
+=head1 INTERNET SITES
+
+=head2 Peter Gutmann's site
+
+L<http://www.cs.auckland.ac.nz/~pgut001/> contains more crypto- and
+security-related stuff, and is always a pleasure to waste office time
+reading from.
+
+=head2 alvestrand.no
+
+=head2 oid.elibel.tm.fr
+
+L<http://www.alvestrand.no/objectid/> and L<http://oid.elibel.tm.fr/>
+are both databases of L<Crypt::OpenSSL::CA::AlphabetSoup/OID>s that
+together contain pretty much all OIDs known to mankind.  The latter
+sports a search engine.
+
+=head1 STANDARDS
+
+The RFCs and other standards describing PKIX (the X509 PKI) are, in
+suggested reading order:
+
+=over
+
+=item B<RFC4210>
+
+Basics, security model, definition of the entities (EE, RA, CA),
+format of messages between these entities (that nobody in his right
+mind would bother to implement in this contrived way).
+
+=item B<RFC4514>
+
+Distinguished Names (L<Crypt::OpenSSL::CA::AlphabetSoup/DN>)
+
+=item B<RFC3280>
+
+Certificate and CRL formats, extensions in certificates, certificate
+validation algorithm.
+
+=item B<RFC3279>
+
+How one should set the C<keyUsage> bits in an X509 certificate.
+
+=item B<PKCS10>
+
+Certificate request file format - One of the most popular ones (the
+great thing about standards, as the saying goes, is that there are so
+many to choose from...)
+
+=item B<SPKAC>
+
+The other certificate request file format of importance to an Internet
+PKIX deployment
+(L<http://wp.netscape.com/eng/security/ca-interface.html>).  Used by
+all browsers of the Netscape family.
+
+=item L<http://wp.netscape.com/eng/security/comm4-cert-exts.html>
+
+The specification of the Netscape certificate type X509v3 extension.
+Mostly obsolete, but it does make your certificates all that more
+christmas-treeish.
+
+=item B<PKCS12>
+
+A transport and backup format for X509 key material. Allows for
+bundling a user's certificate, its matching private key
+(password-protected), and the chain of CA certificates and CRLs that
+certify the user's certificate, all into a single binary blob.
+
+=item B<RFC2560>
+
+L<Crypt::OpenSSL::CA::AlphabetSoup/OCSP>
+
+=item B<RFC3739>
+
+Qualified certificates.
+
+=back
+
+

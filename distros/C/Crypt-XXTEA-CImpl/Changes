@@ -1,0 +1,8 @@
+Revision history for Perl extension Crypt::XXTEA::CImpl.
+
+0.01  Tue May 18 17:06:54 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::XXTEA::CImpl
+
+0.02  Fri Nov 29 09:32:45 2013
+    - change type of varibles for fix bug with -fstrict-overflow flag

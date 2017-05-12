@@ -1,0 +1,164 @@
+#!D:/Perl/bin/perl
+use strict;
+use warnings;
+use SOAP::Lite;
+use Getopt::Long;
+my ($module, $dist, $cpanid, $help);
+
+###########################################################
+# Edit the following to reflect your setup
+# the following corresponds to the cgi-bin/soap.cgi script
+##
+#my $soap_uri = 'http://localhost/CPAN_Search_CGI';
+#my $soap_proxy = 'http://localhost/cgi-bin/soap.cgi';
+##
+# the following corresponds to the mod_perl Apache::CPAN::SOAP
+my $soap_uri = 'http://localhost/Apache/CPAN/SOAP';
+my $soap_proxy = 'http://localhost/soap';
+###########################################################
+
+my $rc = GetOptions('module=s' => \$module,
+                    'dist=s' => \$dist,
+                    'cpanid=s' => \$cpanid,
+                    'help' => \$help);
+
+if ($help or not ($module or $dist or $cpanid)) {
+    print <<"END";
+
+Find information on CPAN module name, distribution, or author id.
+Usage: 
+   $^X $0 --module  Mod::Name
+   $^X $0 --dist  Distname
+   $^X $0 --cpanid  CPANID
+   $^X $0 --help
+END
+    exit(1);
+}
+
+my $soap = make_soap() or die "SOAP::Lite setup failed";
+my ($result, $fields);
+
+RESULTS : {
+  $module and do {
+    $fields = [qw(mod_name mod_abs mod_vers dist_name cpanid dist_file)];
+    $result = $soap->query(mode => 'module', name => $module,
+                           fields => $fields);
+    $result->fault and last RESULTS;
+    my $results = $result->result();
+    if (not $results) {
+      print qq{\nNo module by name of "$module" was found.\n};
+    }
+    else {
+      print << "EOI";
+
+Module: $results->{mod_name}
+Abstract: $results->{mod_abs}
+Version: $results->{mod_vers}
+Distribution: $results->{dist_name}
+CPAN author: $results->{cpanid}
+CPAN file: $results->{dist_file}
+
+EOI
+        }
+    last RESULTS;
+  };
+  $dist and do {
+    $fields = [qw(dist_name dist_abs dist_vers cpanid dist_file size birth)];
+    $result = $soap->query(mode => 'dist', name => $dist, 
+                           fields => $fields);
+    $result->fault and last RESULTS;
+    my $results = $result->result();
+    if (not $results) {
+      print qq{\nNo distribution by name of "$dist" was found.\n};
+    }
+    else {
+      print << "EOI";
+
+Distribution: $results->{dist_name}
+Abstract: $results->{dist_abs}
+Version: $results->{dist_vers}
+CPAN author: $results->{cpanid}
+CPAN file: $results->{dist_file}
+Size: $results->{size} bytes
+Last modified: $results->{birth}
+
+EOI
+    }
+    last RESULTS;
+  };
+  $cpanid and do {
+    $fields = [qw(cpanid fullname email)];
+    $result = $soap->query(mode => 'author', name => $cpanid, 
+                           fields => $fields);
+    $result->fault and last RESULTS;
+    my $results = $result->result();
+   if (not $results) {
+     print qq{\nNo cpanid by name of "$cpanid" was found.\n};
+   }
+   else {
+     print << "EOI";
+
+CPANID: $results->{cpanid}
+Full Name: $results->{fullname}
+email: $results->{email}
+
+EOI
+    }
+   last RESULTS;
+ };
+  print join ', ', 
+    $result->faultcode, 
+      $result->faultstring;
+  exit(1);
+}
+
+sub make_soap {
+  unless (eval { require SOAP::Lite }) {
+    print STDERR "SOAP::Lite is unavailable to make remote call\n"; 
+    return undef;
+  } 
+  
+  return SOAP::Lite
+    ->uri($soap_uri)
+      ->proxy($soap_proxy,
+              options => {compress_threshold => 10000})
+        ->on_fault(sub { my($soap, $res) = @_; 
+                         print STDERR "SOAP Fault: ", 
+                           (ref $res ? $res->faultstring 
+                                     : $soap->transport->status),
+                           "\n";
+                         return undef;
+                       });
+}
+
+__END__
+
+=head1 NAME
+
+csl_soap - example client soap interface to C<CPAN::Search::Lite::Query>
+
+=head1 DESCRIPTION
+
+This script provides an example client soap interface
+to C<CPAN::Search::Lite::Query>. It can be used as
+
+   perl csl_soap --module  Mod::Name
+   perl csl_soap --dist  Distname
+   perl csl_soap --cpanid  CPANID
+
+which will provide, respectively, some information
+on the requested module name, distribution name, or
+CPAN id. An example server script, C<soap.cgi>, is
+supplied in the distribution; this should be placed
+in the server's cgi-bin directory.
+
+=head1 NOTE
+
+Make sure to check the values of C<$soap_uri> and
+C<$soap_proxy> at the top of this file.
+
+=head1 SEE ALSO
+
+L<CPAN::Search::Lite::Query>.
+
+=cut

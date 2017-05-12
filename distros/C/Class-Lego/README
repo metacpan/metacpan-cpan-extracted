@@ -1,0 +1,25 @@
+NAME
+    Class::Lego - Build your classes with basic building blocks
+
+SYNOPSIS
+      use Class::Lego;
+
+      # soon
+
+DESCRIPTION
+    Not ready yet. The first pieces are Class::Lego::Myself and
+    Class::Lego::Constructor.
+
+BUGS
+    Please report bugs via CPAN RT
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Lego or mailto:.
+
+AUTHORS
+    Adriano R. Ferreira, <ferreira@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Adriano R. Ferreira
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

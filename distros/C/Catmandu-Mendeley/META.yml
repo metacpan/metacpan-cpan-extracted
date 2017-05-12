@@ -1,0 +1,37 @@
+---
+abstract: 'Catmandu modules wrapping the Mendeley API'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Mendeley
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9202'
+  HTTP::Tiny: '0.051'
+  JSON::XS: '2.3'
+  Moo: '1.0'
+  OAuth::Lite2: '0.10'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Mendeley/issues
+  homepage: https://github.com/LibreCat/Catmandu-Mendeley
+  repository: https://github.com/LibreCat/Catmandu-Mendeley.git
+version: '0.01'

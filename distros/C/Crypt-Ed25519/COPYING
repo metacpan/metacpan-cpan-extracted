@@ -1,0 +1,5 @@
+This module is licensed under the same terms as perl itself.
+
+The embedded ed25519 library uses it's own (zlib-style) license
+in ed25519/license.txt.
+

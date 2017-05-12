@@ -1,0 +1,12 @@
+Revision history 
+
+1.00  Tue Sep 20 21:31:47 UTC 2005
+  - Inward code cannot include any of CIKMOV
+
+0.02  September 5, 2001
+  - Made case-insensitive (request from Keith Speers)
+
+0.01  August 22, 2001
+	- Created this
+
+

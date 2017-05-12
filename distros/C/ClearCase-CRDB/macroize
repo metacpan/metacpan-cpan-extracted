@@ -1,0 +1,70 @@
+#! /opt/perl/bin/perl
+
+use Cwd 'abs_path';
+use File::Basename;
+use File::Spec;
+use Getopt::Long;
+use Tie::IxHash;
+
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+
+use strict;
+
+my $prog = basename($0, qw(.pl));
+
+my $bar = '#' x 68;
+
+sub usage {
+    my $msg = shift;
+    my $rc = (defined($msg) && !$msg) ? 0 : 2;
+    if ($rc) {
+	select STDERR;
+	print "$prog: Error: $msg\n\n" if $msg;
+    }
+    print <<EOF;
+Usage: $prog [flags] pattern ...
+Flags:
+   -help		Print this message and exit
+Note:
+    All flags may be abbreviated to their shortest unique name.
+Examples:
+    $prog ...
+    $prog ...
+EOF
+    exit $rc;
+}
+
+my %opt;
+GetOptions(\%opt, qw(help vars=s verbose));
+usage() if $opt{help};
+
+sub note {
+    print STDERR "$prog: @_\n" if $opt{verbose};
+}
+
+our %gvars = ();
+tie(%gvars, 'Tie::IxHash');
+
+require $opt{vars} if $opt{vars};
+
+print "$bar\n\n";
+
+for my $var (keys %gvars) {
+    printf "%-15s := %s\n\n", $var, $gvars{$var};
+}
+
+print "$bar\n\n";
+
+for my $line (<>) {
+    next if $line =~ m%^##\s%;
+    if ($line !~ m%\s*#%) {
+	while (1) {
+	    my $matched = 0;
+	    for my $var (keys %gvars) {
+		$matched++ if $line =~ s%$gvars{$var}%\$($var)%g;
+	    }
+	    last if !$matched;
+	}
+    }
+    print $line;
+}

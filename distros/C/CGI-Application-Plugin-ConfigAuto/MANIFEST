@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/CGI/Application/Plugin/ConfigAuto.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/basic.t
+t/empty.t
+t/pod.t
+t/TestAppBasic.pm
+t/basic_config.pl
+t/empty_config.pl

@@ -1,0 +1,92 @@
+#!perl -w
+
+use strict;
+#use warnings;
+use Carp qw(croak);
+use Getopt::Long;
+use CSS::Janus;
+
+my $swap_ltr_rtl_in_url;
+my $swap_left_right_in_url;
+my $ignore_bad_bgp;
+
+use vars qw($VERSION);
+$VERSION = '0.03';
+
+unless (
+    GetOptions 'h|help' => sub {
+	open PIPE, '|pod2text' or exit $!;
+	print PIPE join '', <DATA>;
+	close PIPE;
+	exit;
+    },
+    'version' => sub {
+	print "cssflip $VERSION\n";
+	exit;
+    },
+
+    #'d|debug' => sub { croak 'Not yet implemented' },
+    'swap_ltr_rtl_in_url'    => \$swap_ltr_rtl_in_url,
+    'swap_left_right_in_url' => \$swap_left_right_in_url,
+    'ignore_bad_bgp'         => \$ignore_bad_bgp,
+    ) {
+    open PIPE, '|pod2text' or croak $!;
+    print PIPE join '', <DATA>;
+    close PIPE;
+    exit 2;
+}
+
+print CSS::Janus->new(
+    'swap_ltr_rtl_in_url'    => $swap_ltr_rtl_in_url,
+    'swap_left_right_in_url' => $swap_left_right_in_url,
+    'ignore_bad_bgp'         => $ignore_bad_bgp,
+)->transform(join '', <>);
+
+__END__
+
+=encoding us-ascii
+
+=head1 NAME
+
+cssflip - Flip direction of Cascading Style Sheet (CSS)
+
+=head1 SYNOPSIS
+
+  cssflip [ options ... ] file.css ... > file-rtl.css
+
+=head1 DESCRIPTION
+
+=head2 Options
+
+=over 4
+
+=item --swap_left_right_in_url
+
+Fixes "left"/"right" string within URLs.
+
+=item --swap_ltr_rtl_in_url
+
+Fixes "ltr"/"rtl" string within URLs.
+
+=item --ignore_bad_bgp
+
+Ignores unmirrorable background-position values.
+
+=back
+
+=head1 VERSION
+
+Run "C<cssflip --version>".
+
+=head1 AUTHOR
+
+Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 Hatuka*nezumi - IKEDA Soji.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

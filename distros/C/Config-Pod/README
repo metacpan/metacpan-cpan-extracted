@@ -1,0 +1,135 @@
+Config::Pod(3) User Contributed Perl Documentation Config::Pod(3)
+
+
+
+NNNNAAAAMMMMEEEE
+       Config::Pod - Configuration files in POD format
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+        use Config::Pod;
+
+        my $cfg = new Config::POD;
+
+        $cfg -> filename($filename) or $cfg -> text($podtext);
+
+        $cfg -> exists( @path )
+        $cfg -> val( @path )
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       Config::Pod allows configuration files to be written in
+       POD.  Any text may be included at any location without
+       affecting the configuration since Config::Pod only pays
+       attention to lines beginning with `='.
+
+       Headings must be properly nested (head1 followed by head3
+       is not allowed, but head3 followed by head2 is allowed).
+
+       The module searches for lines beginning with =_h_e_a_d(\d+)
+       and =item.  Only items are leaf nodes and are stored in an
+       array under the appropriate heading.
+
+MMMMEEEETTTTHHHHOOOODDDDSSSS
+       exists
+       Given a list of keys, will return true if the list
+       represents a (possibly empty) collection of leaf nodes
+       (=items).  Note that intermediate headings will return
+       false.
+
+       filename
+       If no arguments are present, returns the filename of the
+       configuration source.  If an argument is given, it tries
+       to read the file and parse the contents.
+
+       keys
+       Given a list of keys, will return an array (possibly
+       empty) of keys which reside under the list.
+
+       text
+       Either an array or an array reference may be passed.  The
+       contents will be parsed as a POD file.
+
+       val
+       Given a list of keys, will return an array reference
+       (possibly empty) of items.
+
+EEEEXXXXAAAAMMMMPPPPLLLLEEEE
+       The following is an example POD file.
+
+        =head1 Section1
+
+        =head2 Section2
+
+        =over 4
+
+        =item Item1
+
+        =item Item2
+
+        =back 4
+
+        =head2 Section3
+
+        =head3 SectionA
+
+        =over 4
+
+        =item ItemA
+
+        =item ItemB
+
+        =back 4
+
+        =head2 Section4
+
+        =cut
+
+       The following values then are available:
+
+        $cfg -> val( qw(section1 section2) ) ==
+           [ 'Item1', 'Item2' ];
+        $cfg -> val( qw(section1 section3 sectiona) ) ==
+           [ 'ItemA', 'ItemB' ];
+        $cfg -> keys( qw(section1) ) ==
+           ( qw(section2 section3 section4) );
+
+       and
+
+        $cfg -> exists( qw(section1 section4) );
+
+       should return true even though it has no values.
+
+       On the other hand,
+
+        $cfg -> exists( qw(section1 section3) );
+
+       should return false since there is yet another heading
+       under Section3.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       James Smith <jgsmith@jamesmith.com>
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       Copyright (C) 2001 Texas A&M University.  All Rights
+       Reserved.
+
+       This module is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+24/Sep/2001            perl 5.006, patch 00        Config::Pod(3)

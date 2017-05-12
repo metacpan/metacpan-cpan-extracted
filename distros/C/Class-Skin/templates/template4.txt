@@ -1,0 +1,4 @@
+in template4.txt:
+<while condition="inner_loop">
+<include src="template5.txt" skip="2">
+</while>

@@ -1,0 +1,73 @@
+[% 
+    box_sites = 1
+
+    link1 = 'osmatrix' ;
+    link2 = 'osmatrix' ;
+    link3 = '' ;
+    name1 = '' ;
+
+    crumb2_name = 'Matrices' ;
+
+    IF FULL ; THEN ; 
+      link1 = link1 _ '-full' ;
+      title = 'Matrices By OS - All Perl Releases' ; 
+      crumb1_name = 'By OS - All Perls' ; 
+    ELSE ; 
+      title = 'Matrices By OS - Official Perl Releases' ; 
+      crumb1_name = 'By OS - Official Perls' ; 
+    END ;
+
+    IF MONTH ; THEN ; 
+      link3 = '-month' ;
+      link1 = link1 _ link3 ;
+      name1 = ' (Last Month)' ;
+      title = title _ name1 ;
+      crumb1_name = crumb1_name _ name1 ;
+    END ;
+
+%]
+
+[% IF MONTH %]
+<h2>OS/Perl Matrix for Distributions &amp; Reports for <span class="timestamp1">[% LASTDATE %]</span></h2>
+[% ELSE %]
+<h2>OS/Perl Matrix for Distributions &amp; Reports prior to <span class="timestamp1">[% RUNDATE2 %]</span></h2>
+[% END %]
+<p>The matrix below represents the distributions that have received at least
+one PASS report submitted to the cpan-testers mailing list, for a particular
+version of the perl interpreter and a particular Operating System. Note that 
+patched versions of perl are mapped to their major/minor release of perl. All reports
+versions of perl are mapped to their major/minor release of perl. 
+[% IF MONTH %]
+All reports recorded are for <span class="timestamp1">[% LASTDATE %]</span> only.
+[% ELSE %]
+All reports recorded are from <span class="timestamp1">August 1999</span> until <span class="timestamp1">[% RUNDATE2 %]</span>.
+[% END %]
+</p>
+
+<p>Where available, the two values in each box represent, firstly the number of 
+distributions with at least one PASS report for that combination, and secondly the 
+total number of reports submitted for that combination. Click on the value 
+representing the distributions, to see the full list of distributions with a PASS
+for that combination.</p>
+
+[% IF FULL %]
+<p>The matrix below includes <em>all released versions of Perl</em> tested. To see a more 
+restricted matrix, listing only the versions of Perl that have had an official release, 
+please <a href="/[% link2 %][% link3 %].html" title="By OS - Official Perls[% name1 %]">click here</a>.</p>
+[% ELSE %]
+<p>The matrix below includes <em>all <strong>officially</strong> released versions of Perl</em> tested. To see a
+less restricted matrix, listing all released versions of Perl, please
+<a href="/[% link2 %]-full[% link3 %].html" title="By OS - All Perls[% name1 %]">click here</a>.</p>
+[% END %]
+
+<p><a href="/[% link1 %].xls" title="Download Excel version">Click Here</a> to download an Excel formatted version of this page.</p>
+
+[% IF layout == 'layout-wide' %]
+<p><a href="/[% link1 %].html" title="view slim screen version">Click Here</a> to return to the regular version of this page.</p>
+[% CONTENT %]
+[% ELSE %]
+<p><a href="/[% link1 %]-wide.html" title="view wide screen version">Click Here</a> to view a wide screen version of this page.</p>
+<div class="boxer">
+[% CONTENT %]
+</div>
+[% END %]

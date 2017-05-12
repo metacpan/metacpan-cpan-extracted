@@ -1,0 +1,88 @@
+0.204  Sat, 05 Feb 2011 14:24:49 +1100
+    Docs
+    - Documented that this module is obsolete.
+
+    Misc
+    - Clarified the license.
+
+
+0.203  Fri Sep  7 16:59:15 PDT 2007
+    Test Fixes
+    - Moved some tests that were really testing base.pm to base.
+    - Made a test less dependent on the formatting of a base.pm warning.
+
+0.202  Sun Jul  1 22:43:41 PDT 2007
+    Test Fixes
+    - A warning changed in base or fields.pm which broke t/bugs.t.
+      [rt.cpan.org 5293]
+    - Cleanup tests to use Test::More.
+
+0.201 Thu Aug 28 13:41:18 PDT 2003
+    - Left INSTALLDIRS=perl in after base/fields was removed.
+
+0.20  Wed Aug 27 22:00:29 PDT 2003
+    * base.pm and fields.pm have been moved to their own distribution
+    - 5.8.1 warns about deprecated pseudo-hash usage.  Silented this warning
+      in the tests.
+    - Gutted Class::Fields::Inherit.  Moved functionality to base.pm to
+      break its dependency on Class::Fields.
+
+0.16  Wed Jul  9 17:12:39 PDT 2003
+    * Ensuring we pass the bleadperl@20100 tests.
+    * brought in sync with bleadperl@20100
+    - base.pm docs now mention explicitly that import() is not called
+      (bleadperl@19189)
+    - Fixing minor bug in bleadperl@19000 test which 5.8.1 exposes
+
+0.15  Wed Feb 26 23:31:08 CET 2003
+    * base.pm now defending against stray $SIG{__DIE__} handlers interfering
+    - Fixed a small typo in the tests which was causing a warning in 5.8.0.
+    * base.pm brought in sync with bleadperl@18784.
+    * Accounts for removal of pseudo-hashes in 5.9.0.
+    * Passes 5.8.0's regression tests.
+    * Passes bleadperl@18784's regression tests.
+
+0.14  Fri Aug 24 19:42:03 EDT 2001
+    * Fixed a bug with base.pm accidentally setting $VERSION to
+      '-1, set by base.pm' even if it existed.
+    - Added some warnings about using base & fields in the wrong order.
+
+0.13  Thu Apr  5 21:22:58 BST 2001
+    * Fixed subtle bug with base.pm and "use Foo 1.3"
+    - Fixed docs about show_fields()
+
+0.12  Mon Apr  2 11:43:02 BST 2001
+    - Now properly installs base.pm and fields.pm into the core libraries
+      rather than site_perl.
+
+0.11  Wed Dec 13 21:29:24 EST 2000
+    - Alot of little doc fixes (thanks Tels)
+    - Added Carp::Assert to the dependencies (accidentally left out)
+
+0.10  Wed Jul 19 06:45:57 GMT 2000
+    - Passes 5.6.0's regression tests for base.pm and fields.pm
+      Added those tests to the library's own suite.
+
+0.09  Fri Apr 14 23:00:52 EDT 2000
+    - Added is_field() to Class::Fields
+    - Now exporting is_public, etc...
+
+0.08  Sat Feb 26 04:16:24 EST 2000
+    - Forgot to require Exporter in a few places.  This got by somehow in
+      5.005_03 but not 5.6.
+    - base.pm now only loads other Class::Fields modules if field
+      inheritance is happening.
+    - altered tests slightly to fit new 5.6 diagnostics
+
+0.07  Sat Jan  9 07:57:43 GMT 2000      *UNRELEASED*
+    * show_fields() was autoviving %FIELDS.
+    - show_fields() was not using get_fields().
+
+0.06  Wed Dec 15 19:04:36 EST 1999
+    - Mispelt 'constants' instead of 'constant' as a dependency.
+
+0.05  Wed Dec 15 02:49:11 EST 1999
+    * First seriously working version
+    * First version released to CPAN
+
+

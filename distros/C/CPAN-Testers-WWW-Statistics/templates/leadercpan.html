@@ -1,0 +1,46 @@
+[% 
+    title = 'CPAN Leaderboards' ;
+    box_sites = 1
+
+    crumb1_name = 'CPAN Leaderboards' ;
+%]
+
+<h2>Contents</h2>
+<ul class="contents">
+<li><a href="#top20current" title="Top 20 Authors - Currently Maintained Distributions">Top 20 Authors - Currently Maintained Distributions</a></li>
+<li><a href="#top20uploads" title="Top 20 Authors - All Uploaded Distributions">Top 20 Authors - All Uploaded Distributions</a></li>
+<li><a href="#top20release" title="Top 20 Authors - All Distribution Releases">Top 20 Authors - All Distribution Releases</a></li>
+<li><a href="#top20distros" title="Top 20 Distributions - Released to CPAN">Top 20 Distributions - Released to CPAN</a></li>
+</ul>
+
+<h2 id="top20current">Top 20 Authors - Currently Maintained Distributions</h2>
+<table summary="Top 20 Authors - Currently Maintained Distributions">
+<tr><th class="top w100">#</th><th class="top w100">COUNT</th><th class="top">PAUSEID</th></tr>
+[% FOREACH row = allcurrent %]
+<tr><td class="numbers">[% row.inx %]</td><td class="numbers">[% row.count %]</td><td>[% row.name %]</td></tr>
+[% END %]
+</table>
+
+<h2 id="top20uploads">Top 20 Authors - All Uploaded Distributions</h2>
+<table summary="Top 20 Authors - All Uploaded Distributions">
+<tr><th class="top w100">#</th><th class="top w100">COUNT</th><th class="top">PAUSEID</th></tr>
+[% FOREACH row = alluploads %]
+<tr><td class="numbers">[% row.inx %]</td><td class="numbers">[% row.count %]</td><td>[% row.name %]</td></tr>
+[% END %]
+</table>
+
+<h2 id="top20release">Top 20 Authors - All Distribution Releases</h2>
+<table summary="Top 20 Authors - All Distribution Releases">
+<tr><th class="top w100">#</th><th class="top w100">COUNT</th><th class="top">PAUSEID</th></tr>
+[% FOREACH row = allrelease %]
+<tr><td class="numbers">[% row.inx %]</td><td class="numbers">[% row.count %]</td><td>[% row.name %]</td></tr>
+[% END %]
+</table>
+
+<h2 id="top20distros">Top 20 Distributions - Released to CPAN</h2>
+<table summary="Top 20 Distributions - Released to CPAN">
+<tr><th class="top w100">#</th><th class="top w100">COUNT</th><th class="top">DISTRIBUTION</th></tr>
+[% FOREACH row = alldistros %]
+<tr><td class="numbers">[% row.inx %]</td><td class="numbers">[% row.count %]</td><td>[% row.name %]</td></tr>
+[% END %]
+</table>

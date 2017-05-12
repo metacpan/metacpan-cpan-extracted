@@ -1,0 +1,31 @@
+Class-Lite version v0.1.0
+
+Nature's great masterpiece, an elephant, 
+The only harmless great thing.
+-- John Donne
+
+The hashref-based base class that does no more than it must. 
+
+INSTALLATION
+
+To install this module with Module::Build, run the following commands:
+
+    perl Build.PL
+    Build
+    Build test
+    Build install
+
+DEPENDENCIES
+
+perl 5.8.8 or better. 
+For Perl module dependencies, please see Build.PL.
+This module has no non-core dependencies; however you may need to upgrade 
+some core modules if your perl is old. 
+
+LICENSE
+
+Copyright (C) 2013 Xiong Changnian <xiong@cpan.org>
+
+This library and its contents are released under Artistic License 2.0:
+
+(http://www.opensource.org/licenses/artistic-license-2.0.php)

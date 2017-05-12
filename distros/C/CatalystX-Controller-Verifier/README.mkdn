@@ -1,0 +1,177 @@
+# NAME
+
+CatalystX::Controller::Verifier - Moose Role for verifying request parameters on a per action basis.
+
+# VERSION
+
+version 0.02
+
+# SYNOPSIS
+
+    package MyApp::Controller::Foo;
+
+    use Moose;
+    BEGIN { extends 'Catalyst::Controller'; }
+
+    with 'CatalystX::Controller::Verifier';
+
+    __PACKAGE__->config(
+        'verifiers' => {
+            # The action name
+            'search' => {
+                # Everything here gets passed to Data::Verifier->new for the scope
+                filters => [ 'trim' ],
+                # Just a plain Data::Verifier profile here:
+                profile => {
+                    page => {
+                        type => 'Int',
+                        post_check => sub { shift->get_value('page') > 0 }
+                    },
+                    query => {
+                        type     => 'Str',
+                        required => 1,
+                    }
+                }
+            },
+        },
+        # Additional options can be passed in:
+    
+
+        # If verification fails, detach to the 'bad_args' action
+        'detach_on_failure' => 'bad_args',
+        
+
+        # If you want to override where the Data::Manager objects get tucked away:
+            '_verifier_stash_key' => 'a secret garden',
+    );
+    
+
+    sub search : Local {
+        my ( $self, $c ) = @_;
+        my $results = $self->verify( $c );
+     
+
+        $c->model('Search')->search(
+            # If invalid, it will be undef here.
+            $results->get_value('page') || 1,
+            $results->get_value('query')
+        );
+    }
+
+If you run `verify` in an action that does not have a profile, this will
+throw an exception informing you of your transgressions.
+
+But wait, there's more! Data::Verifier allows you to also define coercions.
+
+# ATTRIBUTES
+
+## verifiers
+
+This stores the verifier configuration, which should be a hash ref of action
+names to verification profiles.
+
+## detach_on_failure
+
+This attribute is used to instruct the verify method to detach to the action
+specified. If this is unset, no detaching happens.
+
+# METHODS
+
+## verify
+
+    $self->verify($c);
+
+The heart of the action, the verify method takes the current context object
+and verifies based on the profiles supplied in the configuration. If the
+[detach_on_failure](http://search.cpan.org/perldoc?detach_on_failure) attribute is set, it will detach on an unsuccessful
+verification.
+
+Returns a [Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) object.  Note that this can be serialized
+and tucked away in the flash for later use.
+
+## messages
+
+    $self->messages($c);
+
+Returns a [Message::Stack](http://search.cpan.org/perldoc?Message::Stack) for the action in question (after verification).
+
+## data_manager
+
+    $self->data_manager($c);
+
+Returns a [Data::Manager](http://search.cpan.org/perldoc?Data::Manager) object that is used for this request (specific to
+the controller and the request).
+
+# COERCE YOUR PARAMETERS
+
+So, in the above example lets say you wanted to parse your search query using
+[Search::Query](http://search.cpan.org/perldoc?Search::Query). Piece of cake!
+
+    use Search::Query;
+    
+
+    __PACKAGE__->config(
+        'verifiers' => {
+            # The action name
+            'search' => {
+                # ... include the rest from synopsis ...
+                query => {
+                    type     => 'Search::Query',
+                    required => 1,
+                    coercion => Data::Verifier::coercion(
+                        from => 'Str',
+                        via  => sub { Search::Query->parser->parse($_) }
+                    )
+                }
+            },
+        }
+    );
+    
+
+    sub search : Local {
+        my ( $self, $c ) = @_;
+
+        my $results = $self->verify( $c );
+     
+
+        $results->get_value('query');          # isa Search::Query object now!
+        $results->get_original_value('query'); # Still valid
+    }
+
+# MESSAGES
+
+Got a validation error? Well, [Data::Manager](http://search.cpan.org/perldoc?Data::Manager) covers that, too.
+
+The messages method will return a [Message::Stack](http://search.cpan.org/perldoc?Message::Stack) specific to that action.
+
+    sub search : Local {
+        my ( $self, $c ) = @_;
+    
+
+        my $results = $self->verify($c);
+        unless ( $results->success ) {
+            # Returns a Message::Stack for the action in question
+            $self->messages($c);
+        
+
+            # You can also get the Data::Manager object 
+            $self->data_manager($c);
+
+        }
+    }
+
+# LIFECYCLE
+
+Each controller gets its own Data::Manager per request. This is probably not
+blindly fast. It lives in the stash
+
+# AUTHOR
+
+J. Shirley <jshirley@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

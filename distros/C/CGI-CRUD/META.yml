@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               CGI-CRUD
+version:            1.06
+abstract:           Instant CRUD web front-end, featuring auto-discovery of the data dictionary for an RDBMS source
+author:
+    - Reed Sandberg
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI:                0
+    CGI::AutoForm:      0
+    CGI::Enurl:         0
+    CGI::FastTemplate:  0
+    DBI:                0
+    DBIx::IO:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,16 @@
+--begin inner1--
+one:[% one %]
+two:[% two %]
+three:[% three %]
+four:[% four %]
+outer_var1:[% outer_var1 %]
+zzz:[% param1a %]
+zzz:[% param2a %]
+zzz:[% param1b %]
+zzz:[% param2b %]
+[% CGIAPP.embed('embed_inner2',param1a,'literal1a',param2a,'literal2a') %]outer_var2:[% outer_var2 %]
+[% CGIAPP.embed('embed_inner2',param1b,'literal1b',param2b,'literal2b') %]outer_var3:[% outer_var3 %]
+inner1_var1:[% inner1_var1 %]
+inner1_var2:[% inner1_var2 %]
+inner1_var3:[% inner1_var3 %]
+--end inner1--

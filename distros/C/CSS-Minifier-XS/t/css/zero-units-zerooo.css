@@ -1,0 +1,10 @@
+/* "zeroooooo" can be expressed without a unit */
+p.in  { width: 000in }
+p.cm  { width: 000cm }
+p.mm  { width: 000mm }
+p.pt  { width: 000pt }
+p.pc  { width: 000pc }
+p.px  { width: 000px }
+p.em  { width: 000em }
+p.ex  { width: 000ex }
+p.pct { width: 000% }

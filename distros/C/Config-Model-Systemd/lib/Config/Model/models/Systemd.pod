@@ -1,0 +1,50 @@
+# PODNAME: Config::Model::models::Systemd
+# ABSTRACT:  Configuration class Systemd
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Systemd - Configuration class Systemd
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 service
+
+I<< Optional. Type hash of node of class L<Systemd::Service|Config::Model::models::Systemd::Service> .  >> 
+
+=head2 socket
+
+I<< Optional. Type hash of node of class L<Systemd::Socket|Config::Model::models::Systemd::Socket> .  >> 
+
+=head2 timer
+
+I<< Optional. Type hash of node of class L<Systemd::Timer|Config::Model::models::Systemd::Timer> .  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Systemd::Service>
+
+=item *
+
+L<Config::Model::models::Systemd::Socket>
+
+=item *
+
+L<Config::Model::models::Systemd::Timer>
+
+=back
+
+=cut
+

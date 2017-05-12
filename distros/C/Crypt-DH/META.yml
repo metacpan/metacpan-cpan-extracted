@@ -1,0 +1,34 @@
+---
+abstract: 'Diffie-Hellman key exchange system'
+author:
+  - 'Benjamin Trott (cpan:BTROTT) <ben+cpan@stupidfool.org>'
+  - 'BinGOs - Chris Williams (cpan:BINGOS) <chris@bingosnet.co.uk>'
+  - 'Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@googlemail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-DH
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Math::BigInt: 1.60
+  Math::BigInt::GMP: 1.24
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/wchristian/crypt-dh/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/wchristian/crypt-dh.git
+    web: https://github.com/wchristian/crypt-dh/tree
+version: 0.07

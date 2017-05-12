@@ -1,0 +1,2927 @@
+%PDF-1.2
+%‚„œ”
+1 0 obj
+[/CalRGB
+<<
+/WhitePoint [0.9505 1 1.089]
+/Gamma [1.8 1.8 1.8]
+/Matrix [0.4497 0.2446 0.02518 0.3613 0.672 0.1412 0.1845 0.08334 0.9227]
+>>
+]
+endobj
+2 0 obj
+<<
+/CreationDate (D:20070118102028+0000)
+/Producer (Pequel)
+/Title (Class::CodeStyler)
+>>
+endobj
+5 0 obj
+<<
+/Type /Encoding
+/Differences [ 0 /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /space /exclam
+/quotedbl /numbersign /dollar /percent /ampersand
+/quoteright /parenleft /parenright /asterisk /plus /comma
+/hyphen /period /slash /zero /one /two /three /four /five
+/six /seven /eight /nine /colon /semicolon /less /equal
+/greater /question /at /A /B /C /D /E /F /G /H /I /J /K /L
+/M /N /O /P /Q /R /S /T /U /V /W /X /Y /Z /bracketleft
+/backslash /bracketright /asciicircum /underscore
+/quoteleft /a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p
+/q /r /s /t /u /v /w /x /y /z /braceleft /bar /braceright
+/asciitilde /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /emdash
+/dotlessi /grave /acute /circumflex /tilde /macron /breve
+/dotaccent /dieresis /.notdef /ring /cedilla /.notdef
+/hungarumlaut /ogonek /caron /space /exclamdown /cent
+/sterling /currency /yen /brokenbar /section /dieresis
+/copyright /ordfeminine /guillemotleft /logicalnot /hyphen
+/registered /macron /degree /plusminus /twosuperior
+/threesuperior /acute /mu /paragraph /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright
+/onequarter /onehalf /threequarters /questiondown /Agrave
+/Aacute /Acircumflex /Atilde /Adieresis /Aring /AE
+/Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave
+/Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve
+/Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash
+/Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn
+/germandbls /agrave /aacute /acircumflex /atilde /adieresis
+/aring /ae /ccedilla /egrave /eacute /ecircumflex
+/edieresis /igrave /iacute /icircumflex /idieresis /eth
+/ntilde /ograve /oacute /ocircumflex /otilde /odieresis
+/divide /oslash /ugrave /uacute /ucircumflex /udieresis
+/yacute /thorn /ydieresis ]
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F00
+/Encoding 5 0 R
+/BaseFont /Times-Roman
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F01
+/Encoding 5 0 R
+/BaseFont /Times-Bold
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F02
+/Encoding 5 0 R
+/BaseFont /Times-Italic
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F03
+/Encoding 5 0 R
+/BaseFont /Times-BoldItalic
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F10
+/Encoding 5 0 R
+/BaseFont /Courier
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F11
+/Encoding 5 0 R
+/BaseFont /Courier-Bold
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F12
+/Encoding 5 0 R
+/BaseFont /Courier-Oblique
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F13
+/Encoding 5 0 R
+/BaseFont /Courier-BoldOblique
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F20
+/Encoding 5 0 R
+/BaseFont /Helvetica
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F21
+/Encoding 5 0 R
+/BaseFont /Helvetica-Bold
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F22
+/Encoding 5 0 R
+/BaseFont /Helvetica-Oblique
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F23
+/Encoding 5 0 R
+/BaseFont /Helvetica-BoldOblique
+>>
+endobj
+0 g
+18 0 obj
+<<
+/Length 19 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 456.87 797 Tm
+(Class::CodeStyler) Tj
+/F21 12 Tf
+1 0 0 1 52.0 750.0 Tm
+0.0000 Tw
+(NAME ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 735.6 Tm
+0.0000 Tw
+(Class::CodeStyler - Perl extension for code generation program formatting and execution. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 693.6 Tm
+0.0000 Tw
+(SYNOPSIS ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 675.0 Tm
+0.0000 Tw
+(  use Class::CodeStyler; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 658.2 Tm
+0.0000 Tw
+(  # Create a new Perl program codestyle object... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 649.8 Tm
+0.0000 Tw
+(  my $p2 = Class::CodeStyler::Program::Perl->new\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 641.4 Tm
+0.0000 Tw
+(  $p2->code\("sub function_operator"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 633.0 Tm
+0.0000 Tw
+(  $p2->open_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 624.6 Tm
+0.0000 Tw
+(  $p2->code\("my \\$self = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 616.2 Tm
+0.0000 Tw
+(  $p2->code\("my \\$arg1 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 607.8 Tm
+0.0000 Tw
+(  $p2->code\("my \\$arg2 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 599.4 Tm
+0.0000 Tw
+(  $p2->code\("return \\$arg1->eq\(\\$arg2\);"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 591.0 Tm
+0.0000 Tw
+(  $p2->close_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 574.2 Tm
+0.0000 Tw
+(  # prepare\(\) will produce the text for the program... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 565.8 Tm
+0.0000 Tw
+(  $p2->prepare\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 549.0 Tm
+0.0000 Tw
+(  # print will return the produced text... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 540.6 Tm
+0.0000 Tw
+(  print $p2->print\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 523.8 Tm
+0.0000 Tw
+(  # Create another Perl program codestyle object... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 515.4 Tm
+0.0000 Tw
+(  my $p = Class::CodeStyler::Program::Perl->new\(program_name => 'testing.pl', tab_size=>4\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 507.0 Tm
+0.0000 Tw
+(  $p->open_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 498.6 Tm
+0.0000 Tw
+(  $p->code\("package MyBinFun;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 481.8 Tm
+0.0000 Tw
+(  # Set the bookmark 'subs'... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 473.4 Tm
+0.0000 Tw
+(  $p->bookmark\('subs'\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 465.0 Tm
+0.0000 Tw
+(  $p->indent_off\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 456.6 Tm
+0.0000 Tw
+(  # The following comment line will appear un-indented... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 448.2 Tm
+0.0000 Tw
+(  $p->comment\("Some comment line..."\);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 439.8 Tm
+0.0000 Tw
+(  $p->indent_on\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 423.0 Tm
+0.0000 Tw
+(  # Add the code from $p2 object to $p codestyle object... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 414.6 Tm
+0.0000 Tw
+(  $p->add\($p2\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 397.8 Tm
+0.0000 Tw
+(  # and anther codestyle object... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 389.4 Tm
+0.0000 Tw
+(  my $p3 = Class::CodeStyler::Program::Perl->new\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 381.0 Tm
+0.0000 Tw
+(  $p3->code\("sub function_operator_2"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 372.6 Tm
+0.0000 Tw
+(  $p3->open_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 364.2 Tm
+0.0000 Tw
+(  $p3->code\("my \\$self = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 355.8 Tm
+0.0000 Tw
+(  $p3->code\("my \\$arg1 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 347.4 Tm
+0.0000 Tw
+(  $p3->code\("my \\$arg2 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 339.0 Tm
+0.0000 Tw
+(  $p3->code\("return \\$arg1->eq\(\\$arg2\);"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 330.6 Tm
+0.0000 Tw
+(  $p3->close_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 313.8 Tm
+0.0000 Tw
+(  # Jump to the bookmark position 'subs'... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 305.4 Tm
+0.0000 Tw
+(  $p->jump\('subs'\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 288.6 Tm
+0.0000 Tw
+(  # Add the code from $p3 codestyle object to $p object at the bookmark position... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 280.2 Tm
+0.0000 Tw
+(  $p->add\($p3\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 263.4 Tm
+0.0000 Tw
+(  # Return to the last position prior to last jump... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 255.0 Tm
+0.0000 Tw
+(  $p->return\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 238.2 Tm
+0.0000 Tw
+(  # Add a divider line... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 229.8 Tm
+0.0000 Tw
+(  $p->divider\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 213.0 Tm
+0.0000 Tw
+(  # Add a comment line... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 204.6 Tm
+0.0000 Tw
+(  $p->comment\('Next function follows...'\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 187.8 Tm
+0.0000 Tw
+(  my $p4 = Class::CodeStyler::Program::Perl->new\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 179.4 Tm
+0.0000 Tw
+(  $p4->code\("sub function_operator_3"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 171.0 Tm
+0.0000 Tw
+(  $p4->open_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 162.6 Tm
+0.0000 Tw
+(  $p4->code\("my \\$self = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 154.2 Tm
+0.0000 Tw
+(  $p4->code\("my \\$arg1 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 145.8 Tm
+0.0000 Tw
+(  $p4->code\("my \\$arg2 = shift;"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 137.4 Tm
+0.0000 Tw
+(  $p4->code\("return \\$arg1->eq\(\\$arg2\);"\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 129.0 Tm
+0.0000 Tw
+(  $p4->close_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 120.6 Tm
+0.0000 Tw
+(  $p->add\($p4\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 112.2 Tm
+0.0000 Tw
+(  $p->close_block\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 95.4 Tm
+0.0000 Tw
+(  # Process the $p codestyle object to produce the code text... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 87.0 Tm
+0.0000 Tw
+(  $p->prepare\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 70.2 Tm
+0.0000 Tw
+(  # Print the produced code text... ) Tj
+/F10 7 Tf
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 10:20) Tj
+1 0 0 1 537.44 37 Tm
+(1) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+19 0 obj
+5532
+endobj
+20 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+21 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 20 0 R
+/Contents 18 0 R
+>>
+endobj
+22 0 obj
+<<
+/Length 23 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::CodeStyler) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F10 7 Tf
+1 0 0 1 76.0 771.6 Tm
+0.0000 Tw
+(  print $p->print\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 754.8 Tm
+0.0000 Tw
+(  # The following is displayed to stdout... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 738.0 Tm
+0.0000 Tw
+(  >\{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+(  >    package MyBinFun; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 721.2 Tm
+0.0000 Tw
+(  >    sub function_operator_2 ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 712.8 Tm
+0.0000 Tw
+(  >    \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 704.4 Tm
+0.0000 Tw
+(  >      my $self = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 696.0 Tm
+0.0000 Tw
+(  >      my $arg1 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 687.6 Tm
+0.0000 Tw
+(  >      my $arg2 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 679.2 Tm
+0.0000 Tw
+(  >      return $arg1->eq\($arg2\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 670.8 Tm
+0.0000 Tw
+(  >    \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 662.4 Tm
+0.0000 Tw
+(  >    # BOOKMARK ---- subs ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 654.0 Tm
+0.0000 Tw
+(  >#Some comment line... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 645.6 Tm
+0.0000 Tw
+(  >    sub function_operator ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 637.2 Tm
+0.0000 Tw
+(  >    \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 628.8 Tm
+0.0000 Tw
+(  >      my $self = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 620.4 Tm
+0.0000 Tw
+(  >      my $arg1 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 612.0 Tm
+0.0000 Tw
+(  >      my $arg2 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 603.6 Tm
+0.0000 Tw
+(  >      return $arg1->eq\($arg2\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 595.2 Tm
+0.0000 Tw
+(  >    \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 586.8 Tm
+0.0000 Tw
+(  >    ---------------------------------------------------------------------- ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 578.4 Tm
+0.0000 Tw
+(  >    #Next function follows... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 570.0 Tm
+0.0000 Tw
+(  >    sub function_operator_3 ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 561.6 Tm
+0.0000 Tw
+(  >    \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 553.2 Tm
+0.0000 Tw
+(  >      my $self = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 544.8 Tm
+0.0000 Tw
+(  >      my $arg1 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 536.4 Tm
+0.0000 Tw
+(  >      my $arg2 = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 528.0 Tm
+0.0000 Tw
+(  >      return $arg1->eq\($arg2\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 519.6 Tm
+0.0000 Tw
+(  >    \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 511.2 Tm
+0.0000 Tw
+(  >\} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 494.4 Tm
+0.0000 Tw
+(  # display\(\) will output the code text with line numbers prefixed on each line... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 486.0 Tm
+0.0000 Tw
+(  $p->display\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 469.2 Tm
+0.0000 Tw
+(  # Save the code text in the program_file... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 460.8 Tm
+0.0000 Tw
+(  $p->save\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 444.0 Tm
+0.0000 Tw
+(  # Run the syntax checker for the produced program text... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 435.6 Tm
+0.0000 Tw
+(  $p->syntax_check\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 418.8 Tm
+0.0000 Tw
+(  # execute the generated program file, passing on any stdin. Process control will pass on to  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 410.4 Tm
+0.0000 Tw
+(  # the generated program... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 402.0 Tm
+0.0000 Tw
+(  $p->exec\(\);  ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 381.0 Tm
+0.0000 Tw
+(DESCRIPTION ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 366.6 Tm
+0.2857 Tw
+() Tj
+/F23 10 Tf
+0.2857 Tw
+(Class::CodeStyler) Tj
+/F20 10 Tf
+0.2857 Tw
+( is an object oriented API to be used by code-gererators in producing formatted code) Tj
+1 0 0 1 76.0 354.6 Tm
+2.4727 Tw
+(\(Perl, C, other\). The produced code file can also be syntax checked, displayed with line numbers,) Tj
+1 0 0 1 76.0 342.6 Tm
+2.1740 Tw
+(executed, and eval`d. Code can be inserted anywhere in the generated program using a system of) Tj
+1 0 0 1 76.0 330.6 Tm
+0.0000 Tw
+(bookmarks and jumps.  ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 288.6 Tm
+0.0000 Tw
+(FUNCTION REFERENCE ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 252.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Constructor) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 240.6 Tm
+0.0000 Tw
+(Use the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(new\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( function to construct a ) Tj
+/F23 10 Tf
+0.0000 Tw
+(CodeStyle) Tj
+/F20 10 Tf
+0.0000 Tw
+( object. The following properties may be specified: ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 214.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(program_name) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 202.2 Tm
+0.8246 Tw
+(A ) Tj
+/F22 10 Tf
+0.8246 Tw
+(program_name) Tj
+/F20 10 Tf
+0.8246 Tw
+( must be specified before the generated code text can be ) Tj
+/F22 10 Tf
+0.8246 Tw
+(saved) Tj
+/F20 10 Tf
+0.8246 Tw
+(, ) Tj
+/F22 10 Tf
+0.8246 Tw
+(executed) Tj
+/F20 10 Tf
+0.8246 Tw
+(,) Tj
+1 0 0 1 124.0 190.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(eval`d) Tj
+/F20 10 Tf
+0.0000 Tw
+(, or ) Tj
+/F22 10 Tf
+0.0000 Tw
+(syntax checked) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 163.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(suppress_comments) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 151.8 Tm
+0.2520 Tw
+(Set this property to non-zero to suppress the inclusion of comment text in the generated code) Tj
+1 0 0 1 124.0 139.8 Tm
+0.0000 Tw
+(text. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 113.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(tab_size) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 101.4 Tm
+1.9836 Tw
+(If ) Tj
+/F23 10 Tf
+1.9836 Tw
+(tab_type) Tj
+/F20 10 Tf
+1.9836 Tw
+( is ) Tj
+/F10 10 Tf
+1.9836 Tw
+(`spaces') Tj
+/F20 10 Tf
+1.9836 Tw
+( then the ) Tj
+/F23 10 Tf
+1.9836 Tw
+(tab_size) Tj
+/F20 10 Tf
+1.9836 Tw
+( indicates the number of spaces per ) Tj
+/F22 10 Tf
+1.9836 Tw
+(indent) Tj
+/F20 10 Tf
+1.9836 Tw
+(. If) Tj
+1 0 0 1 124.0 89.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(tab_type) Tj
+/F20 10 Tf
+0.0000 Tw
+( is ) Tj
+/F10 10 Tf
+0.0000 Tw
+(`hard') Tj
+/F20 10 Tf
+0.0000 Tw
+( then the ) Tj
+/F23 10 Tf
+0.0000 Tw
+(tab_size) Tj
+/F20 10 Tf
+0.0000 Tw
+( specifies the number of ) Tj
+/F22 10 Tf
+0.0000 Tw
+(tabs) Tj
+/F20 10 Tf
+0.0000 Tw
+( per ) Tj
+/F22 10 Tf
+0.0000 Tw
+(indent) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 63.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(tab_type) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(2) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 10:20) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+23 0 obj
+6247
+endobj
+24 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+25 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 24 0 R
+/Contents 22 0 R
+>>
+endobj
+26 0 obj
+<<
+/Length 27 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 456.87 797 Tm
+(Class::CodeStyler) Tj
+/F20 10 Tf
+1 0 0 1 124.0 780.0 Tm
+0.0000 Tw
+(Specify ) Tj
+/F10 10 Tf
+0.0000 Tw
+(`spaces') Tj
+/F20 10 Tf
+0.0000 Tw
+( or ) Tj
+/F10 10 Tf
+0.0000 Tw
+(`hard') Tj
+/F20 10 Tf
+0.0000 Tw
+(. Defaults to ) Tj
+/F10 10 Tf
+0.0000 Tw
+(`spaces') Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 753.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(divider_length) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 741.6 Tm
+0.0000 Tw
+(Specify the length in characters of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(divider) Tj
+/F20 10 Tf
+0.0000 Tw
+( text line. The default length is ) Tj
+/F22 10 Tf
+0.0000 Tw
+(70) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 715.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(divider_char) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 703.2 Tm
+0.0000 Tw
+(Specify the character to be used when printing a ) Tj
+/F22 10 Tf
+0.0000 Tw
+(divider) Tj
+/F20 10 Tf
+0.0000 Tw
+( line. The default character is ) Tj
+/F10 10 Tf
+0.0000 Tw
+(-) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 676.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(debug) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 124.0 664.8 Tm
+0.0000 Tw
+(Turn on ) Tj
+/F22 10 Tf
+0.0000 Tw
+(debug) Tj
+/F20 10 Tf
+0.0000 Tw
+( messages printed to ) Tj
+/F22 10 Tf
+0.0000 Tw
+(stderr) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 622.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(code) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 610.8 Tm
+0.0000 Tw
+(Add the code text specified in the argument. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 568.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(open_block) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 556.8 Tm
+0.9771 Tw
+(Begin a new block using the bracket characters pecified in the argument \(defaults to ) Tj
+/F10 10 Tf
+0.9771 Tw
+(\{) Tj
+/F20 10 Tf
+0.9771 Tw
+(\). The code that) Tj
+1 0 0 1 76.0 544.8 Tm
+0.0000 Tw
+(follows will be indented. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 502.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(close_block) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 490.8 Tm
+0.0000 Tw
+(End the block. Move back one indent and print the appropriate closing bracket. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 448.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(over) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 436.8 Tm
+0.0000 Tw
+(Increase the indent by the number specified in the argument \(default is one\). ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 394.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(back) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 382.8 Tm
+0.0000 Tw
+(Decrease the indent by the size specified in the last ) Tj
+/F23 10 Tf
+0.0000 Tw
+(over\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 340.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(indent_off) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 328.8 Tm
+0.0000 Tw
+(Turn off indenting. The code that follows and up to the ) Tj
+/F23 10 Tf
+0.0000 Tw
+(indent_on\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( will appear without any indentation. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 286.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(indent_on) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 274.8 Tm
+0.0000 Tw
+(Turn on indenting. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 232.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(add) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 220.8 Tm
+0.0000 Tw
+(Add the ) Tj
+/F23 10 Tf
+0.0000 Tw
+(CodeStyle) Tj
+/F20 10 Tf
+0.0000 Tw
+( object or objects that are specified in the arguments to this ) Tj
+/F23 10 Tf
+0.0000 Tw
+(CodeStyle) Tj
+/F20 10 Tf
+0.0000 Tw
+( object. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 178.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(anchor_set) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 148.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(anchor_return) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 136.8 Tm
+0.3381 Tw
+(Set an ) Tj
+/F22 10 Tf
+0.3381 Tw
+(anchor) Tj
+/F20 10 Tf
+0.3381 Tw
+( with the ) Tj
+/F23 10 Tf
+0.3381 Tw
+(anchor_set\(\)) Tj
+/F20 10 Tf
+0.3381 Tw
+( function, and return to the last set ) Tj
+/F22 10 Tf
+0.3381 Tw
+(anchor) Tj
+/F20 10 Tf
+0.3381 Tw
+( with the ) Tj
+/F23 10 Tf
+0.3381 Tw
+(anchor_return\(\)) Tj
+/F20 10 Tf
+1 0 0 1 76.0 124.8 Tm
+0.0000 Tw
+(function. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 10:20) Tj
+1 0 0 1 537.44 37 Tm
+(3) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+27 0 obj
+4436
+endobj
+28 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+29 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 28 0 R
+/Contents 26 0 R
+>>
+endobj
+30 0 obj
+<<
+/Length 31 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::CodeStyler) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F21 10 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(bookmark) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 768.0 Tm
+0.0000 Tw
+(Set the bookmark at the current position with the name as specified by the argument. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 726.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(jump) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 714.0 Tm
+0.0000 Tw
+(Jump to the position bookmarked with the name as specified in the argument. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 672.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(return) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 660.0 Tm
+0.0000 Tw
+(Return to the last position prior to the previous ) Tj
+/F23 10 Tf
+0.0000 Tw
+(jump\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 618.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(newline_on) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 606.0 Tm
+0.0000 Tw
+(Turn on ) Tj
+/F22 10 Tf
+0.0000 Tw
+(newline) Tj
+/F20 10 Tf
+0.0000 Tw
+(. A newline will be added after every code addition code. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 564.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(newline_off) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 552.0 Tm
+0.0000 Tw
+(Turn off ) Tj
+/F22 10 Tf
+0.0000 Tw
+(newline) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 510.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(comment) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 498.0 Tm
+0.0000 Tw
+(Add a ) Tj
+/F22 10 Tf
+0.0000 Tw
+(comment) Tj
+/F20 10 Tf
+0.0000 Tw
+( line. The appropriate language comment prefix will be prefixed. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 456.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(divider) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 444.0 Tm
+0.0000 Tw
+(Add a ) Tj
+/F22 10 Tf
+0.0000 Tw
+(divider) Tj
+/F20 10 Tf
+0.0000 Tw
+( line to the code text. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 402.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(clear) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 390.0 Tm
+1.1000 Tw
+(Clear the ) Tj
+/F22 10 Tf
+1.1000 Tw
+(prepared) Tj
+/F20 10 Tf
+1.1000 Tw
+( code text. Whenever the ) Tj
+/F23 10 Tf
+1.1000 Tw
+(CodeStyle) Tj
+/F20 10 Tf
+1.1000 Tw
+( object has been modified after a ) Tj
+/F23 10 Tf
+1.1000 Tw
+(prepare) Tj
+/F20 10 Tf
+1.1000 Tw
+(, the) Tj
+1 0 0 1 76.0 378.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(clear) Tj
+/F20 10 Tf
+0.0000 Tw
+( function must be called before ) Tj
+/F22 10 Tf
+0.0000 Tw
+(preparing) Tj
+/F20 10 Tf
+0.0000 Tw
+( again. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 336.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(prepare) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 324.0 Tm
+0.0000 Tw
+(Process the ) Tj
+/F23 10 Tf
+0.0000 Tw
+(CodeStyle) Tj
+/F20 10 Tf
+0.0000 Tw
+( object and produce the code text ready for printing. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 282.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(print) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 270.0 Tm
+0.0000 Tw
+(Print the code text to stdout. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 228.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(save) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 216.0 Tm
+0.0000 Tw
+(Save the generated code text to the file as specified in the ) Tj
+/F23 10 Tf
+0.0000 Tw
+(program_name) Tj
+/F20 10 Tf
+0.0000 Tw
+( member. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 174.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(display) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 162.0 Tm
+0.0000 Tw
+(Display the generated code text to stdout with line numbers. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 120.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(syntax_check) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 108.0 Tm
+0.0000 Tw
+(Check the syntax of the generated program. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(4) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 10:20) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+31 0 obj
+3929
+endobj
+32 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+33 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 32 0 R
+/Contents 30 0 R
+>>
+endobj
+34 0 obj
+<<
+/Length 35 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 456.87 797 Tm
+(Class::CodeStyler) Tj
+/F21 10 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(exec) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 768.0 Tm
+2.9664 Tw
+(Execute the generated program. The generated program will be executed in place of this \(caller\)) Tj
+1 0 0 1 76.0 756.0 Tm
+0.0000 Tw
+(program. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 714.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(run) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 702.0 Tm
+0.0000 Tw
+(Execute the generated program and wait for return. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 660.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(eval) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 648.0 Tm
+0.0000 Tw
+(Execute the generated program with the Perl ) Tj
+/F23 10 Tf
+0.0000 Tw
+(eval) Tj
+/F20 10 Tf
+0.0000 Tw
+( function. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 606.0 Tm
+0.0000 Tw
+(PREREQUISITES ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 591.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Class::STL::Containers) Tj
+/F20 10 Tf
+0.0000 Tw
+( version 0.18 or above is required. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 549.6 Tm
+0.0000 Tw
+(SEE ALSO ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 513.6 Tm
+0.0000 Tw
+(AUTHOR ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 499.2 Tm
+0.0000 Tw
+(m gaffiero, <gaffie@users.sourceforge.net> ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 469.2 Tm
+0.0000 Tw
+(COPYRIGHT AND LICENSE ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 454.8 Tm
+0.0000 Tw
+(Copyright \2511999-2007, Mario Gaffiero. All Rights Reserved. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 430.8 Tm
+0.0000 Tw
+(This file is part of Class::CodeStyler\(TM\). ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 406.8 Tm
+1.1731 Tw
+(Class::CodeStyler is free software; you can redistribute it and/or modify it under the terms of the GNU) Tj
+1 0 0 1 76.0 394.8 Tm
+0.0000 Tw
+(General Public License as published by the Free Software Foundation; version 2 of the License. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 370.8 Tm
+2.3750 Tw
+(Class::CodeStyler is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;) Tj
+1 0 0 1 76.0 358.8 Tm
+0.0175 Tw
+(without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.) Tj
+1 0 0 1 76.0 346.8 Tm
+0.0000 Tw
+( See the GNU General Public License for more details. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 322.8 Tm
+0.0425 Tw
+(You should have received a copy of the GNU General Public License along with Class::CodeStyler; if not,) Tj
+1 0 0 1 76.0 310.8 Tm
+0.0000 Tw
+(write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 10:20) Tj
+1 0 0 1 537.44 37 Tm
+(5) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+35 0 obj
+2712
+endobj
+36 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+37 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 36 0 R
+/Contents 34 0 R
+>>
+endobj
+38 0 obj
+<<
+/Length 39 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::CodeStyler) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(6) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 10:20) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+39 0 obj
+264
+endobj
+40 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F21 15 0 R
+>>
+>>
+endobj
+41 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 40 0 R
+/Contents 38 0 R
+>>
+endobj
+42 0 obj
+<<
+/Length 43 0 R
+>>
+stream
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+/F20 20 Tf
+1 0 0 1 218.57 770 Tm
+(Table of Contents) Tj
+1 0 0 1 217.48 746 Tm
+(Class::CodeStyler) Tj
+/F20 10 Tf
+ET
+q
+0.95 g
+52 695 491 12 re
+f
+Q
+BT
+1 0 0 1 76 698 Tm
+(NAME) Tj
+1 0 0 1 513.44 698 Tm
+(1) Tj
+ET
+q
+1 g
+52 683 491 12 re
+f
+Q
+BT
+1 0 0 1 76 686 Tm
+(SYNOPSIS) Tj
+1 0 0 1 513.44 686 Tm
+(1) Tj
+ET
+q
+0.95 g
+52 671 491 12 re
+f
+Q
+BT
+1 0 0 1 76 674 Tm
+(DESCRIPTION) Tj
+1 0 0 1 513.44 674 Tm
+(2) Tj
+ET
+q
+1 g
+52 659 491 12 re
+f
+Q
+BT
+1 0 0 1 76 662 Tm
+(FUNCTION REFERENCE) Tj
+1 0 0 1 513.44 662 Tm
+(2) Tj
+ET
+q
+0.95 g
+52 647 491 12 re
+f
+Q
+BT
+1 0 0 1 100 650 Tm
+(Constructor) Tj
+1 0 0 1 513.44 650 Tm
+(2) Tj
+ET
+q
+1 g
+52 635 491 12 re
+f
+Q
+BT
+1 0 0 1 124 638 Tm
+(program_name) Tj
+1 0 0 1 513.44 638 Tm
+(2) Tj
+ET
+q
+0.95 g
+52 623 491 12 re
+f
+Q
+BT
+1 0 0 1 124 626 Tm
+(suppress_comments) Tj
+1 0 0 1 513.44 626 Tm
+(2) Tj
+ET
+q
+1 g
+52 611 491 12 re
+f
+Q
+BT
+1 0 0 1 124 614 Tm
+(tab_size) Tj
+1 0 0 1 513.44 614 Tm
+(2) Tj
+ET
+q
+0.95 g
+52 599 491 12 re
+f
+Q
+BT
+1 0 0 1 124 602 Tm
+(tab_type) Tj
+1 0 0 1 513.44 602 Tm
+(2) Tj
+ET
+q
+1 g
+52 587 491 12 re
+f
+Q
+BT
+1 0 0 1 124 590 Tm
+(divider_length) Tj
+1 0 0 1 513.44 590 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 575 491 12 re
+f
+Q
+BT
+1 0 0 1 124 578 Tm
+(divider_char) Tj
+1 0 0 1 513.44 578 Tm
+(3) Tj
+ET
+q
+1 g
+52 563 491 12 re
+f
+Q
+BT
+1 0 0 1 124 566 Tm
+(debug) Tj
+1 0 0 1 513.44 566 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 551 491 12 re
+f
+Q
+BT
+1 0 0 1 100 554 Tm
+(code) Tj
+1 0 0 1 513.44 554 Tm
+(3) Tj
+ET
+q
+1 g
+52 539 491 12 re
+f
+Q
+BT
+1 0 0 1 100 542 Tm
+(open_block) Tj
+1 0 0 1 513.44 542 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 527 491 12 re
+f
+Q
+BT
+1 0 0 1 100 530 Tm
+(close_block) Tj
+1 0 0 1 513.44 530 Tm
+(3) Tj
+ET
+q
+1 g
+52 515 491 12 re
+f
+Q
+BT
+1 0 0 1 100 518 Tm
+(over) Tj
+1 0 0 1 513.44 518 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 503 491 12 re
+f
+Q
+BT
+1 0 0 1 100 506 Tm
+(back) Tj
+1 0 0 1 513.44 506 Tm
+(3) Tj
+ET
+q
+1 g
+52 491 491 12 re
+f
+Q
+BT
+1 0 0 1 100 494 Tm
+(indent_off) Tj
+1 0 0 1 513.44 494 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 479 491 12 re
+f
+Q
+BT
+1 0 0 1 100 482 Tm
+(indent_on) Tj
+1 0 0 1 513.44 482 Tm
+(3) Tj
+ET
+q
+1 g
+52 467 491 12 re
+f
+Q
+BT
+1 0 0 1 100 470 Tm
+(add) Tj
+1 0 0 1 513.44 470 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 455 491 12 re
+f
+Q
+BT
+1 0 0 1 100 458 Tm
+(anchor_set) Tj
+1 0 0 1 513.44 458 Tm
+(3) Tj
+ET
+q
+1 g
+52 443 491 12 re
+f
+Q
+BT
+1 0 0 1 100 446 Tm
+(anchor_return) Tj
+1 0 0 1 513.44 446 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 431 491 12 re
+f
+Q
+BT
+1 0 0 1 100 434 Tm
+(bookmark) Tj
+1 0 0 1 513.44 434 Tm
+(4) Tj
+ET
+q
+1 g
+52 419 491 12 re
+f
+Q
+BT
+1 0 0 1 100 422 Tm
+(jump) Tj
+1 0 0 1 513.44 422 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 407 491 12 re
+f
+Q
+BT
+1 0 0 1 100 410 Tm
+(return) Tj
+1 0 0 1 513.44 410 Tm
+(4) Tj
+ET
+q
+1 g
+52 395 491 12 re
+f
+Q
+BT
+1 0 0 1 100 398 Tm
+(newline_on) Tj
+1 0 0 1 513.44 398 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 383 491 12 re
+f
+Q
+BT
+1 0 0 1 100 386 Tm
+(newline_off) Tj
+1 0 0 1 513.44 386 Tm
+(4) Tj
+ET
+q
+1 g
+52 371 491 12 re
+f
+Q
+BT
+1 0 0 1 100 374 Tm
+(comment) Tj
+1 0 0 1 513.44 374 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 359 491 12 re
+f
+Q
+BT
+1 0 0 1 100 362 Tm
+(divider) Tj
+1 0 0 1 513.44 362 Tm
+(4) Tj
+ET
+q
+1 g
+52 347 491 12 re
+f
+Q
+BT
+1 0 0 1 100 350 Tm
+(clear) Tj
+1 0 0 1 513.44 350 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 335 491 12 re
+f
+Q
+BT
+1 0 0 1 100 338 Tm
+(prepare) Tj
+1 0 0 1 513.44 338 Tm
+(4) Tj
+ET
+q
+1 g
+52 323 491 12 re
+f
+Q
+BT
+1 0 0 1 100 326 Tm
+(print) Tj
+1 0 0 1 513.44 326 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 311 491 12 re
+f
+Q
+BT
+1 0 0 1 100 314 Tm
+(save) Tj
+1 0 0 1 513.44 314 Tm
+(4) Tj
+ET
+q
+1 g
+52 299 491 12 re
+f
+Q
+BT
+1 0 0 1 100 302 Tm
+(display) Tj
+1 0 0 1 513.44 302 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 287 491 12 re
+f
+Q
+BT
+1 0 0 1 100 290 Tm
+(syntax_check) Tj
+1 0 0 1 513.44 290 Tm
+(4) Tj
+ET
+q
+1 g
+52 275 491 12 re
+f
+Q
+BT
+1 0 0 1 100 278 Tm
+(exec) Tj
+1 0 0 1 513.44 278 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 263 491 12 re
+f
+Q
+BT
+1 0 0 1 100 266 Tm
+(run) Tj
+1 0 0 1 513.44 266 Tm
+(5) Tj
+ET
+q
+1 g
+52 251 491 12 re
+f
+Q
+BT
+1 0 0 1 100 254 Tm
+(eval) Tj
+1 0 0 1 513.44 254 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 239 491 12 re
+f
+Q
+BT
+1 0 0 1 76 242 Tm
+(PREREQUISITES) Tj
+1 0 0 1 513.44 242 Tm
+(5) Tj
+ET
+q
+1 g
+52 227 491 12 re
+f
+Q
+BT
+1 0 0 1 76 230 Tm
+(SEE ALSO) Tj
+1 0 0 1 513.44 230 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 215 491 12 re
+f
+Q
+BT
+1 0 0 1 76 218 Tm
+(AUTHOR) Tj
+1 0 0 1 513.44 218 Tm
+(5) Tj
+ET
+q
+1 g
+52 203 491 12 re
+f
+Q
+BT
+1 0 0 1 76 206 Tm
+(COPYRIGHT AND LICENSE) Tj
+1 0 0 1 513.44 206 Tm
+(5) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 10:20) Tj
+1 0 0 1 540.22 37 Tm
+(i) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+43 0 obj
+4333
+endobj
+44 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+45 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 44 0 R
+/Contents 42 0 R
+>>
+endobj
+46 0 obj
+<<
+/Length 47 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::CodeStyler) Tj
+1 0 0 1 458.55 797 Tm
+(Table of Contents) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(ii) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 10:20) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+47 0 obj
+260
+endobj
+48 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F21 15 0 R
+>>
+>>
+endobj
+49 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 48 0 R
+/Contents 46 0 R
+>>
+endobj
+50 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 53 0 R
+/Contents 51 0 R
+>>
+endobj
+51 0 obj
+<<
+/Length 52 0 R
+>>
+stream
+q
+1 0 0 rg
+180 626 8 130 re
+F
+Q
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+210 626 m
+543 626 l
+s
+BT
+/F21 24 Tf
+1 0 0 1 210 706 Tm
+0 -30 TD
+(Programmer's Reference) Tj
+/F22 12 Tf
+T* (version 0.20) Tj
+0 0 0.8 rg
+/F22 12 Tf
+() Tj
+/F21 9 Tf
+T* (gaffie@users.sourceforge.net) Tj
+/F20 20 Tf
+0 g
+1 0 0 1 217.48 371 Tm
+(Class::CodeStyler) Tj
+/F21 9 Tf
+T* () Tj
+ET
+endstream
+endobj
+52 0 obj
+346
+endobj
+53 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+>>
+>>
+endobj
+54 0 obj
+<<
+/Length 55 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 456.87 797 Tm
+(Class::CodeStyler) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 10:20) Tj
+1 0 0 1 543 37 Tm
+() Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+55 0 obj
+260
+endobj
+56 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F21 15 0 R
+>>
+>>
+endobj
+57 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 56 0 R
+/Contents 54 0 R
+>>
+endobj
+59 0 obj
+<<
+/Parent 58 0 R
+/Dest [45 0 R /Fit]
+/First 60 0 R
+/Last 101 0 R
+/Count 42 
+/Title (Table of Contents)
+>>
+endobj
+60 0 obj
+<<
+/Parent 59 0 R
+/Dest [21 0 R /FitH 764.4]
+/Next 61 0 R
+/Title (NAME)
+>>
+endobj
+61 0 obj
+<<
+/Parent 59 0 R
+/Dest [21 0 R /FitH 708]
+/Previous 60 0 R
+/Next 62 0 R
+/Title (SYNOPSIS)
+>>
+endobj
+62 0 obj
+<<
+/Parent 59 0 R
+/Dest [25 0 R /FitH 395.400000000001]
+/Previous 61 0 R
+/Next 63 0 R
+/Title (DESCRIPTION)
+>>
+endobj
+63 0 obj
+<<
+/Parent 59 0 R
+/Dest [25 0 R /FitH 303.000000000001]
+/Previous 62 0 R
+/Next 98 0 R
+/First 64 0 R
+/Last 97 0 R
+/Count 34 
+/Title (FUNCTION REFERENCE)
+>>
+endobj
+64 0 obj
+<<
+/Parent 63 0 R
+/Dest [25 0 R /FitH 264.600000000001]
+/Next 72 0 R
+/First 65 0 R
+/Last 71 0 R
+/Count 7 
+/Title (Constructor)
+>>
+endobj
+65 0 obj
+<<
+/Parent 64 0 R
+/Dest [25 0 R /FitH 226.200000000001]
+/Next 66 0 R
+/Title (program_name)
+>>
+endobj
+66 0 obj
+<<
+/Parent 64 0 R
+/Dest [25 0 R /FitH 175.800000000001]
+/Previous 65 0 R
+/Next 67 0 R
+/Title (suppress_comments)
+>>
+endobj
+67 0 obj
+<<
+/Parent 64 0 R
+/Dest [25 0 R /FitH 125.400000000001]
+/Previous 66 0 R
+/Next 68 0 R
+/Title (tab_size)
+>>
+endobj
+68 0 obj
+<<
+/Parent 64 0 R
+/Dest [25 0 R /FitH 75.0000000000011]
+/Previous 67 0 R
+/Next 69 0 R
+/Title (tab_type)
+>>
+endobj
+69 0 obj
+<<
+/Parent 64 0 R
+/Dest [29 0 R /FitH 765.6]
+/Previous 68 0 R
+/Next 70 0 R
+/Title (divider_length)
+>>
+endobj
+70 0 obj
+<<
+/Parent 64 0 R
+/Dest [29 0 R /FitH 727.2]
+/Previous 69 0 R
+/Next 71 0 R
+/Title (divider_char)
+>>
+endobj
+71 0 obj
+<<
+/Parent 64 0 R
+/Dest [29 0 R /FitH 688.8]
+/Previous 70 0 R
+/Title (debug)
+>>
+endobj
+72 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 634.8]
+/Previous 64 0 R
+/Next 73 0 R
+/Title (code)
+>>
+endobj
+73 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 580.8]
+/Previous 72 0 R
+/Next 74 0 R
+/Title (open_block)
+>>
+endobj
+74 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 514.8]
+/Previous 73 0 R
+/Next 75 0 R
+/Title (close_block)
+>>
+endobj
+75 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 460.8]
+/Previous 74 0 R
+/Next 76 0 R
+/Title (over)
+>>
+endobj
+76 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 406.8]
+/Previous 75 0 R
+/Next 77 0 R
+/Title (back)
+>>
+endobj
+77 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 352.8]
+/Previous 76 0 R
+/Next 78 0 R
+/Title (indent_off)
+>>
+endobj
+78 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 298.8]
+/Previous 77 0 R
+/Next 79 0 R
+/Title (indent_on)
+>>
+endobj
+79 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 244.8]
+/Previous 78 0 R
+/Next 80 0 R
+/Title (add)
+>>
+endobj
+80 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 190.8]
+/Previous 79 0 R
+/Next 81 0 R
+/Title (anchor_set)
+>>
+endobj
+81 0 obj
+<<
+/Parent 63 0 R
+/Dest [29 0 R /FitH 160.8]
+/Previous 80 0 R
+/Next 82 0 R
+/Title (anchor_return)
+>>
+endobj
+82 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 792]
+/Previous 81 0 R
+/Next 83 0 R
+/Title (bookmark)
+>>
+endobj
+83 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 738]
+/Previous 82 0 R
+/Next 84 0 R
+/Title (jump)
+>>
+endobj
+84 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 684]
+/Previous 83 0 R
+/Next 85 0 R
+/Title (return)
+>>
+endobj
+85 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 630]
+/Previous 84 0 R
+/Next 86 0 R
+/Title (newline_on)
+>>
+endobj
+86 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 576]
+/Previous 85 0 R
+/Next 87 0 R
+/Title (newline_off)
+>>
+endobj
+87 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 522]
+/Previous 86 0 R
+/Next 88 0 R
+/Title (comment)
+>>
+endobj
+88 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 468]
+/Previous 87 0 R
+/Next 89 0 R
+/Title (divider)
+>>
+endobj
+89 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 414]
+/Previous 88 0 R
+/Next 90 0 R
+/Title (clear)
+>>
+endobj
+90 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 348]
+/Previous 89 0 R
+/Next 91 0 R
+/Title (prepare)
+>>
+endobj
+91 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 294]
+/Previous 90 0 R
+/Next 92 0 R
+/Title (print)
+>>
+endobj
+92 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 240]
+/Previous 91 0 R
+/Next 93 0 R
+/Title (save)
+>>
+endobj
+93 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 186]
+/Previous 92 0 R
+/Next 94 0 R
+/Title (display)
+>>
+endobj
+94 0 obj
+<<
+/Parent 63 0 R
+/Dest [33 0 R /FitH 132]
+/Previous 93 0 R
+/Next 95 0 R
+/Title (syntax_check)
+>>
+endobj
+95 0 obj
+<<
+/Parent 63 0 R
+/Dest [37 0 R /FitH 792]
+/Previous 94 0 R
+/Next 96 0 R
+/Title (exec)
+>>
+endobj
+96 0 obj
+<<
+/Parent 63 0 R
+/Dest [37 0 R /FitH 726]
+/Previous 95 0 R
+/Next 97 0 R
+/Title (run)
+>>
+endobj
+97 0 obj
+<<
+/Parent 63 0 R
+/Dest [37 0 R /FitH 672]
+/Previous 96 0 R
+/Title (eval)
+>>
+endobj
+98 0 obj
+<<
+/Parent 59 0 R
+/Dest [37 0 R /FitH 620.4]
+/Previous 63 0 R
+/Next 99 0 R
+/Title (PREREQUISITES)
+>>
+endobj
+99 0 obj
+<<
+/Parent 59 0 R
+/Dest [37 0 R /FitH 564]
+/Previous 98 0 R
+/Next 100 0 R
+/Title (SEE ALSO)
+>>
+endobj
+100 0 obj
+<<
+/Parent 59 0 R
+/Dest [37 0 R /FitH 528]
+/Previous 99 0 R
+/Next 101 0 R
+/Title (AUTHOR)
+>>
+endobj
+101 0 obj
+<<
+/Parent 59 0 R
+/Dest [37 0 R /FitH 483.6]
+/Previous 100 0 R
+/Title (COPYRIGHT AND LICENSE)
+>>
+endobj
+58 0 obj
+<<
+/Type /Outlines
+/Count 43
+/First 59 0 R
+/Last 101 0 R
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 4 0 R
+/PageMode /UseOutlines
+/Outlines 58 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Pages
+/Kids [ 50 0 R 57 0 R 45 0 R 49 0 R 21 0 R 25 0 R 29 0 R 33 0 R 37 0 R 41 0 R ]
+/Count 10
+/MediaBox [0 0 595 842]
+>>
+endobj
+xref
+0 102
+0000000000 65535 f 
+0000000015 00000 n 
+0000000171 00000 n 
+0000039692 00000 n 
+0000039781 00000 n 
+0000000276 00000 n 
+0000002376 00000 n 
+0000002475 00000 n 
+0000002573 00000 n 
+0000002673 00000 n 
+0000002777 00000 n 
+0000002873 00000 n 
+0000002974 00000 n 
+0000003078 00000 n 
+0000003186 00000 n 
+0000003284 00000 n 
+0000003387 00000 n 
+0000003493 00000 n 
+0000003607 00000 n 
+0000009193 00000 n 
+0000009214 00000 n 
+0000009340 00000 n 
+0000009423 00000 n 
+0000015724 00000 n 
+0000015745 00000 n 
+0000015895 00000 n 
+0000015978 00000 n 
+0000020468 00000 n 
+0000020489 00000 n 
+0000020639 00000 n 
+0000020722 00000 n 
+0000024705 00000 n 
+0000024726 00000 n 
+0000024864 00000 n 
+0000024947 00000 n 
+0000027713 00000 n 
+0000027734 00000 n 
+0000027860 00000 n 
+0000027943 00000 n 
+0000028261 00000 n 
+0000028281 00000 n 
+0000028383 00000 n 
+0000028466 00000 n 
+0000032853 00000 n 
+0000032874 00000 n 
+0000032988 00000 n 
+0000033071 00000 n 
+0000033385 00000 n 
+0000033405 00000 n 
+0000033507 00000 n 
+0000033590 00000 n 
+0000033673 00000 n 
+0000034073 00000 n 
+0000034093 00000 n 
+0000034219 00000 n 
+0000034533 00000 n 
+0000034553 00000 n 
+0000034655 00000 n 
+0000039616 00000 n 
+0000034738 00000 n 
+0000034861 00000 n 
+0000034952 00000 n 
+0000035062 00000 n 
+0000035188 00000 n 
+0000035359 00000 n 
+0000035505 00000 n 
+0000035615 00000 n 
+0000035747 00000 n 
+0000035870 00000 n 
+0000035993 00000 n 
+0000036111 00000 n 
+0000036227 00000 n 
+0000036323 00000 n 
+0000036431 00000 n 
+0000036545 00000 n 
+0000036660 00000 n 
+0000036768 00000 n 
+0000036876 00000 n 
+0000036990 00000 n 
+0000037103 00000 n 
+0000037210 00000 n 
+0000037324 00000 n 
+0000037441 00000 n 
+0000037551 00000 n 
+0000037657 00000 n 
+0000037765 00000 n 
+0000037877 00000 n 
+0000037990 00000 n 
+0000038099 00000 n 
+0000038208 00000 n 
+0000038315 00000 n 
+0000038424 00000 n 
+0000038531 00000 n 
+0000038637 00000 n 
+0000038746 00000 n 
+0000038860 00000 n 
+0000038966 00000 n 
+0000039071 00000 n 
+0000039164 00000 n 
+0000039281 00000 n 
+0000039392 00000 n 
+0000039502 00000 n 
+trailer
+<<
+/Size 102
+/Root 3 0 R
+/Info 2 0 R
+>>
+startxref
+39929
+%%EOF

@@ -1,0 +1,16 @@
+# -*- cperl -*-
+
+#-----
+# Our entire purpose here is to add a different filename into the callstack.
+# All the other tested callstacks are contained within the same file.
+#
+# $origins is a flat-array representation of a file-line-subr callstack.
+#-----
+sub call_func {
+    my( @stack ) = @_;
+
+    return func({ file => __FILE__, line => __LINE__, subr => 'main::func'},
+               @stack );
+}
+
+1;

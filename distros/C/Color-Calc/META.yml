@@ -1,0 +1,27 @@
+---
+abstract: 'Simple calculations with RGB colors.'
+author:
+  - 'Claus Faerber <CFAERBER@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4208, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Color-Calc
+no_index:
+  directory:
+    - eg
+requires:
+  Graphics::ColorNames: '2.1'
+  Graphics::ColorNames::HTML: '0'
+  Graphics::ColorNames::WWW: '0.01'
+  Params::Validate: '0.75'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.074'

@@ -1,0 +1,70 @@
+{
+   "abstract" : "Constructor generator",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Accessor-Constructor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor" : 0,
+            "Class::Accessor::Complex" : 0,
+            "Class::Accessor::Installer" : "1.100880",
+            "Data::Inherited" : 0,
+            "Tie::Hash" : 0,
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Accessor::Constructor" : {
+         "file" : "lib/Class/Accessor/Constructor.pm",
+         "version" : "1.111590"
+      },
+      "Class::Accessor::Constructor::Base" : {
+         "file" : "lib/Class/Accessor/Constructor/Base.pm",
+         "version" : "1.111590"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-class-accessor-constructor at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Constructor"
+      },
+      "homepage" : "http://search.cpan.org/dist/Class-Accessor-Constructor/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Class-Accessor-Constructor.git",
+         "web" : "http://github.com/hanekomu/Class-Accessor-Constructor"
+      }
+   },
+   "version" : "1.111590"
+}
+

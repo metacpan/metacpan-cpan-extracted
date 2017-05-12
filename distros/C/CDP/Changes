@@ -1,0 +1,6 @@
+Revision history for Perl extension CDP.
+
+0.01  Fri Jul  8 17:41:50 2011
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.8.6 -n CDP
+

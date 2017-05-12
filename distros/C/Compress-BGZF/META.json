@@ -1,0 +1,53 @@
+{
+   "abstract" : "Read/write blocked GZIP (BGZF) files",
+   "author" : [
+      "Jeremy Volkening <jdv*at*base2bio*dot*com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Compress-BGZF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "IO::Compress::RawDeflate" : "0",
+            "IO::Uncompress::RawInflate" : "0",
+            "List::Util" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jvolkening/p5-Compress-BGZF.git",
+         "web" : "https://github.com/jvolkening/p5-Compress-BGZF"
+      }
+   },
+   "version" : "0.005"
+}

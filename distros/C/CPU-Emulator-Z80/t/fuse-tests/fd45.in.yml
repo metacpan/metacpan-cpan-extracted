@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 69
+name: fd45
+registers:
+  AF: 25941
+  AF_: 0
+  BC: 42120
+  BC_: 0
+  DE: 23272
+  DE_: 0
+  HL: 51528
+  HL_: 0
+  I: 0
+  IX: 55224
+  IY: 41335
+  PC: 0
+  R: 0
+  SP: 0

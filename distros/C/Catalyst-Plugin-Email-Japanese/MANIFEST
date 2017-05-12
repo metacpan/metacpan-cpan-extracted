@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/Email/Japanese.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/002_pod.t
+t/003_podcoverage.t
+Todo

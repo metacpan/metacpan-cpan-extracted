@@ -1,0 +1,15 @@
+Revision history for Perl extension CGI::MakeItStatic.
+
+0.03  Sat Mar 11 15:50:00 2006
+        - output, end, has_static, attr methods is added.
+	- overload scalar
+	- modify document
+	- write test only for Linux
+	- README, Changes
+
+0.02  Fri Mar 10 ??:??:?? 2006
+	- bug fix about renew.
+
+0.01  Thu Mar  9 01:41:56 2006
+	- original version.
+

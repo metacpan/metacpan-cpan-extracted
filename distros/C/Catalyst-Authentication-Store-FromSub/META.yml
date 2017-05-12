@@ -1,0 +1,16 @@
+---
+abstract: 'A storage class for Catalyst Authentication using one Catalyst Model class'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+generated_by: 'Dist::Zilla version 1.092680'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Store-FromSub
+requires:
+  Catalyst: 0
+  Catalyst::Plugin::Authentication: 0.10015
+resources:
+  repository: http://github.com/fayland/catalyst-authentication-store-fromsub/tree
+version: 0.01

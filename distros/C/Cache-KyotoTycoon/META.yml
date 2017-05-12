@@ -1,0 +1,58 @@
+---
+abstract: 'KyotoTycoon client library'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  File::Which: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::TCP: '1.17'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cache-KyotoTycoon
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cache::KyotoTycoon:
+    file: lib/Cache/KyotoTycoon.pm
+    version: '0.16'
+  Cache::KyotoTycoon::Cursor:
+    file: lib/Cache/KyotoTycoon/Cursor.pm
+  TSVRPC::Client:
+    file: lib/TSVRPC/Client.pm
+    version: '0.16'
+  TSVRPC::Parser:
+    file: lib/TSVRPC/Parser.pm
+  TSVRPC::Util:
+    file: lib/TSVRPC/Util.pm
+requires:
+  Exporter: '0'
+  Furl: '1.00'
+  Furl::HTTP: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  URI::Escape: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Cache-KyotoTycoon/issues
+  homepage: https://github.com/tokuhirom/Cache-KyotoTycoon
+  repository: git://github.com/tokuhirom/Cache-KyotoTycoon.git
+version: '0.16'
+x_contributors:
+  - 'Tobias Kirschstein <lev@ideegeo.com>'
+  - 'ktat <ktat.is@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

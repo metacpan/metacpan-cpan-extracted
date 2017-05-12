@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>FAIL Scriptalicious-1.15 i86pc-solaris-64int 2.11 -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/08.html">Postings from August 2008</a>
+
+<h2>FAIL Scriptalicious-1.15 i86pc-solaris-64int 2.11</h2>
+
+
+
+
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>Josts Smokehouse</b><br/>
+<div class="h_name">Date:</div> August 19, 2008 03:07<br/>
+<div class="h_name">Subject:</div> FAIL Scriptalicious-1.15 i86pc-solaris-64int 2.11<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.10.0, created by CPAN-Reporter-1.1601. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /export/home/cpantest/perl5/bin/perl &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....ok
+t/02-script..........ok
+t/03-yaml............ok
+t/04-fork............04-fork.t: ERROR: Command `/export/home/cpantest/perl5/bin/perl -Mlib=lib t/loopback.pl' killed by signal 13
+program output:
+
+# Looks like you planned 17 tests but only ran 8.
+# Looks like your test died just after 8.
+ Dubious, test returned 255 (wstat 65280, 0xff00)
+ Failed 9/17 subtests 
+t/05-prompt..........ok
+t/06-anydump.........ok
+t/07-tsay............ok
+t/08-unit............ok
+t/09-noyaml..........ok
+
+Test Summary Report
+-------------------
+t/04-fork        (Wstat: 65280 Tests: 8 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 17 tests but ran 8.
+Files=9, Tests=51,  4 wallclock secs ( 0.06 usr  0.06 sys +  1.39 cusr  0.56 csys =  2.07 CPU)
+Result: FAIL
+Failed 1/9 test programs. 0/51 subtests failed.
+*** Error code 255
+make: Fatal error: Command failed for target `test_dynamic'
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.80
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LANG = en_US.UTF-8
+    PATH = /export/home/cpantest/perl5/bin:/usr/bin
+    PERL5LIB = 
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 25619
+    PERL5_CPAN_IS_RUNNING = 25619
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 1445,25619
+    PERL_CR_SMOKER_CURRENT = Scriptalicious-1.15
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /bin/bash
+    TERM = vt100
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /export/home/cpantest/perl5/bin/perl
+    $UID/$EUID = 100 / 100
+    $GID = 1 1
+    $EGID = 1 1
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_63  
+    Cwd                 3.2701   
+    ExtUtils::CBuilder  0.24     
+    ExtUtils::Command   1.14     
+    ExtUtils::Install   1.50     
+    ExtUtils::MakeMaker 6.44     
+    ExtUtils::Manifest  1.54     
+    ExtUtils::ParseXS   2.19     
+    File::Spec          3.2701   
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       3.13     
+    Test::More          0.80     
+    YAML                0.66     
+    YAML::Syck          1.05     
+    version             0.76     
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=solaris, osvers=2.11, archname=i86pc-solaris-64int
+    uname='sunos open-solaris-noc 5.11 snv_86 i86pc i386 i86pc '
+    config_args='-Dcc=gcc -Dprefix=~/perl5 -Duse64bitint -d'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=define, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='gcc', ccflags ='-DPTR_IS_LONG -fno-strict-aliasing -pipe -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DPERL_USE_SAFE_PUTENV',
+    optimize='-O',
+    cppflags='-DPTR_IS_LONG -fno-strict-aliasing -pipe'
+    ccversion='', gccversion='3.4.3 (csl-sol210-3_4-20050802)', gccosandvers='solaris2.11'
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='gcc', ldflags =' '
+    libpth=/usr/lib /usr/ccs/lib
+    libs=-lsocket -lnsl -ldl -lm -lc
+    perllibs=-lsocket -lnsl -ldl -lm -lc
+    libc=/lib/libc.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-fPIC', lddlflags='-G'
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  
+    <li><b>
+      FAIL Scriptalicious-1.15 i86pc-solaris-64int 2.11</b>
+      by Josts Smokehouse</li> 
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

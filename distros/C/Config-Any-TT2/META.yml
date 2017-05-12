@@ -1,0 +1,25 @@
+---
+abstract: 'Config::Any plugin for Config::TT2 files'
+author:
+  - 'Karl Gaissmaier <gaissmai@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Any-TT2
+provides:
+  Config::Any::TT2:
+    file: lib/Config/Any/TT2.pm
+    version: 0.12
+requires:
+  Config::Any: 0
+  Config::TT2: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/gaissmai/Config-Any-TT2.git
+version: 0.12

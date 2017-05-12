@@ -1,0 +1,123 @@
+NAME
+    Class::Method::ModifiersX::Augment - adds "augment method => sub {...}"
+    support to Class::Method::Modifiers
+
+SYNOPSIS
+       use v5.14;
+       use strict;
+       use Test::More;
+   
+       package Document {
+          use Class::Method::ModifiersX::Augment;
+          sub new       { my ($class, %self) = @_; bless \%self, $class }
+          sub recipient { $_[0]{recipient} }
+          sub as_xml    { sprintf "<document>%s</document>", inner }
+       }
+   
+       package Greeting {
+          BEGIN { our @ISA = 'Document' };
+          use Class::Method::ModifiersX::Augment;
+          augment as_xml => sub {
+             sprintf "<greet>%s</greet>", inner
+          }
+       }
+   
+       package Greeting::English {
+          BEGIN { our @ISA = 'Greeting' };
+          use Class::Method::ModifiersX::Augment;
+          augment as_xml => sub {
+             my $self = shift;
+             sprintf "Hello %s", $self->recipient;
+          }
+       }
+   
+       my $obj = Greeting::English->new(recipient => "World");
+       is(
+          $obj->as_xml,
+          "<document><greet>Hello World</greet></document>",
+       );
+   
+       done_testing();
+
+    (Note that the synopsis shows Perl v5.14+ syntax for package declaration,
+    but this module and its accompanying Moo wrapper support Perl v5.8 and
+    above.)
+
+DESCRIPTION
+    Class::Method::ModifiersX::Augment extends Class::Method::Modifiers with
+    the `augment` method modifier, allowing you to use this Moose abomination
+    for augmenting superclass methods in non-Moose classes.
+
+    See Moose::Manual::MethodModifiers for details of how `augment` and its
+    companion function `inner` work.
+
+    This module exports two functions:
+
+    `augment NAME, CODE`
+    `inner`
+
+    If you want to use these with Moo classes, please look at MooX::Augment
+    instead.
+
+CAVEATS
+    This implementation of `augment` piggybacks onto Class::Method::Modifiers'
+    implementation of `around`. As a result, when multiple method modifiers
+    are applied to the same method, the order in which they are applied might
+    not match Moose.
+
+    This has not been thoroughly tested in conjunction with
+    Class::Method::ModifiersX::Override. Using them in the same class should
+    be safe. Using them to modify the same method will probably break your
+    code. The only guarantee we give you is that you get to keep both halves.
+
+    `augment` modifiers do not work in Moo::Role or Role::Tiny roles. (Though
+    `inner` might.)
+
+    `augment`/`inner` is a crazy idea to begin with, and virtually nobody
+    understands it.
+
+BUGS
+    If you find any bugs in this module they are almost certainly caused by
+    one of the following reasons:
+
+    *   You don't understand `augment`/`inner` properly, so you have incorrect
+        expectations about how this module should behave.
+
+    *   I don't understand `augment`/`inner` properly, so I have incorrect
+        expectations about how this module should behave.
+
+    *   Nobody understands `augment`/`inner` properly, and the whole idea is
+        broken.
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Class-Method-ModifiersX-Augmen
+    t>.
+
+DEPENDENCIES
+    Class::Method::ModifiersX::Augment requires Perl 5.008, and the
+    Class::Method::Modifiers package (which is available from CPAN).
+
+    MRO::Compat is also required for Perl versions earlier than 5.010.
+
+    The accompanying module MooX::Augment requires Moo. However, the
+    installation scripts for this distribution do not check that this is
+    installed. If you use MooX::Augment, it is assumed that you have installed
+    its dependencies separately.
+
+SEE ALSO
+    Moose::Manual::MethodModifiers, Class::Method::Modifiers, MooX::Augment.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

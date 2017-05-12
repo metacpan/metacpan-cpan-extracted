@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Cache-Swifty
+version:             0.07
+abstract:            A Perl frontend for the Swifty cache engine
+license:             ~
+author:              
+    - Kazuho Oku
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    File::Remove:                  0
+    Test::Pod::Coverage:           1.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

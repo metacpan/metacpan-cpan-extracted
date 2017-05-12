@@ -1,0 +1,16 @@
+[% META title = 'My Blog' %]
+
+<a href="http://feedvalidator.org/check.cgi?url=http%3A//teahut.sakura.ne.jp%3A3000/entrycollection"><img src="/static/images/valid-atom.png" alt="[Valid Atom 1.0]" title="Validate my Atom 1.0 feed" /></a>
+
+[% FOREACH collection IN collections %]
+ <div>
+  <h2>[% collection.title %]</h2>
+  [% FOREACH entry IN collection.entries %]
+   <div class="entry">
+    <h3>[% entry.title %]</h3>
+    <div class="content">[% entry.content %]</div>
+    <div class="updated">[% entry.updated %]</div>
+   </div>
+  [% END %]
+ </div>
+[% END %]

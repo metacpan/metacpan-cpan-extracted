@@ -1,0 +1,810 @@
+#!perl
+use Capture::Tiny qw(capture_merged);
+use Code::TidyAll;
+use Config;
+use Path::Tiny qw(cwd path);
+use Getopt::Long;
+use strict;
+use warnings;
+
+our $VERSION = '0.58';
+
+my $usage = '
+Usage: tidyall [options] [file] ...
+See https://metacpan.org/module/tidyall for full documentation.
+
+Options:
+   -a, --all                Process all files in project
+   -i, --ignore             Ignore matching files (zglob syntax)
+   -g, --git                Process all added/modified files according to git
+   -h, --help               Print help message
+   -l, --list               List each file along with the plugins it matches
+   -m, --mode               Mode (e.g. "editor", "commit") - affects which plugins run
+   -p <path>, --pipe <path> Read from STDIN, output to STDOUT/STDERR
+   -r, --recursive          Descend recursively into directories listed on command line
+   -s, --svn                Process all added/modified files according to svn
+   -q, --quiet              Suppress output except for errors
+   -v, --verbose            Show extra output
+   -I I<path1,path2,...>    Add one or more paths to @INC
+   --backup-ttl <duration>  Amount of time before backup files can be purged
+   --check-only             Just check each file, don\'t modify
+   --conf-file <path>       Relative or absolute path to conf file
+   --conf-name <name>       Conf file name to search for
+   --data-dir <path>        Contains metadata, defaults to root/.tidyall.d
+   --iterations <count>     Number of times to repeat each transform - default is 1
+   --no-backups             Don\'t back up files before processing
+   --no-cache               Don\'t cache last processed times
+   --no-cleanup             Don\'t clean up the temporary files
+   --output-suffix <suffix> Suffix to add to tidied file
+   --refresh-cache          Erase any existing cache info before processing each file
+   --root-dir               Specify root directory explicitly
+   --tidyall-class <class>  Subclass to use instead of Code::TidyAll
+   --version                Show version
+';
+
+sub version {
+    my $version = $Code::TidyAll::VERSION || 'unknown';
+    print "tidyall $version on perl $] built for $Config{archname}\n";
+    exit;
+}
+
+sub usage {
+    print $usage;
+    exit;
+}
+
+my (
+    %params, $all_files, $conf_file, $conf_name, $git_files,
+    $help,   $inc_dirs,  $pipe,      $svn_files, $version
+);
+my @conf_names = Code::TidyAll->default_conf_names;
+
+GetOptions(
+    'backup-ttl=i'    => \$params{backup_ttl},
+    'check-only'      => \$params{check_only},
+    'conf-file=s'     => \$conf_file,
+    'conf-name=s'     => \$conf_name,
+    'data-dir=s'      => \$params{data_dir},
+    'no-backups'      => \$params{no_backups},
+    'no-cache'        => \$params{no_cache},
+    'no-cleanup'      => \$params{no_cleanup},
+    'output-suffix=s' => \$params{output_suffix},
+    'refresh-cache'   => \$params{refresh_cache},
+    'root-dir=s'      => \$params{root_dir},
+    'tidyall-class=s' => \$params{tidyall_class},
+    'version'         => \$version,
+    'a|all'           => \$all_files,
+    'i|ignore=s@'     => \$params{ignore},
+    'g|git'           => \$git_files,
+    'h|help'          => \$help,
+    'l|list'          => \$params{list_only},
+    'm|mode=s'        => \$params{mode},
+    'p|pipe=s'        => \$pipe,
+    'r|recursive'     => \$params{recursive},
+    'j|jobs=i'        => \$params{jobs},
+    's|svn'           => \$svn_files,
+    'q|quiet'         => \$params{quiet},
+    'v|verbose'       => \$params{verbose},
+    'I=s'             => \$inc_dirs,
+) or usage();
+version() if $version;
+usage()   if $help;
+@conf_names = ($conf_name) if defined($conf_name);
+
+unshift( @INC, split( /\s*,\s*/, $inc_dirs ) ) if defined($inc_dirs);
+
+%params = map { ( $_, $params{$_} ) } grep { defined( $params{$_} ) } keys(%params);
+for my $key (qw( data_dir root_dir )) {
+    $params{$key} = path( $params{$key} ) if exists $params{$key};
+}
+
+($conf_file) = ( grep { $_->is_file } map { $params{root_dir}->child($_) } @conf_names )
+    if $params{root_dir} && !$conf_file;
+
+my $tidyall_class = $params{tidyall_class} || 'Code::TidyAll';
+
+my ( $ct, @paths );
+
+if ($pipe) {
+    my $status = handle_pipe( path($pipe) );
+    exit($status);
+}
+elsif ( ( $all_files || $svn_files || $git_files ) ) {
+    die "cannot use filename(s) with -a/--all, -s/--svn, or -g/--git"
+        if @ARGV;
+    $conf_file ||= $tidyall_class->find_conf_file( \@conf_names, cwd() );
+    $ct = $tidyall_class->new_from_conf_file( $conf_file, %params );
+
+    if ($all_files) {
+        @paths = $ct->find_matched_files;
+    }
+    elsif ($svn_files) {
+        require Code::TidyAll::SVN::Util;
+        @paths = Code::TidyAll::SVN::Util::svn_uncommitted_files( $ct->root_dir );
+    }
+    elsif ($git_files) {
+        require Code::TidyAll::Git::Util;
+        @paths = Code::TidyAll::Git::Util::git_modified_files( $ct->root_dir );
+    }
+}
+elsif ( @paths = map { path($_) } @ARGV ) {
+    $conf_file ||= $tidyall_class->find_conf_file( \@conf_names, $paths[0]->parent );
+    $ct = $tidyall_class->new_from_conf_file( $conf_file, %params );
+}
+else {
+    print "must pass -a/--all, -s/--svn, -g/--git, -p/--pipe, or filename(s)\n";
+    usage();
+}
+
+my @results = $ct->process_paths(@paths);
+my $status = ( grep { $_->error } @results ) ? 1 : 0;
+exit($status);
+
+sub handle_pipe {
+    my ($pipe_filename) = @_;
+
+    $params{$_} = 1 for ( 'no_backups', 'no_cache', 'quiet' );
+    $params{$_} = 0 for ('verbose');
+
+    $conf_file ||= $tidyall_class->find_conf_file( \@conf_names, $pipe_filename->parent );
+    my $ct       = $tidyall_class->new_from_conf_file( $conf_file, %params );
+    my $root_dir = $ct->root_dir;
+    my $source   = do { local $/; <STDIN> };
+
+    # Merge stdout and stderr and output all to stderr, so that stdout is
+    # dedicated to the tidied content
+    #
+    my $result;
+    my $output = capture_merged {
+        $result = $ct->process_source( $source, $ct->_small_path( $pipe_filename->absolute ) );
+    };
+    print STDERR $output;
+
+    if ( my $error = $result->error ) {
+        print $source;    # Error already printed above
+        return 1;
+    }
+    elsif ( $result->state eq 'no_match' ) {
+        print $source;
+        print STDERR "No plugins apply for '$pipe' in config";
+        return 1;
+    }
+    elsif ( $result->state eq 'checked' ) {
+        print $source;
+        return 0;
+    }
+    else {
+        print $result->new_contents;
+        return 0;
+    }
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+tidyall - Your all-in-one code tidier and validator
+
+=head1 SYNOPSIS
+
+    # Create a tidyall.ini or .tidyallrc at the top of your project
+    #
+    [PerlTidy]
+    select = **/*.{pl,pm,t}
+    argv = -noll -it=2
+
+    [PerlCritic]
+    select = lib/**/*.pm
+    ignore = lib/UtterHack.pm
+    argv = -severity 3
+
+    # Process all files in the current project,
+    # look upwards from cwd for conf file
+    #
+    % tidyall -a
+
+    # Process one or more specific files,
+    # look upwards from the first file for conf file
+    #
+    % tidyall file [file...]
+
+    # Process a directory recursively
+    #
+    % tidyall -r dir
+
+=head1 DESCRIPTION
+
+There are a lot of great code tidiers and validators out there. C<tidyall>
+makes them available from a single unified interface.
+
+You can run C<tidyall> on a single file or on an entire project hierarchy, and
+configure which tidiers/validators are applied to which files. C<tidyall> will
+back up files beforehand, and for efficiency will only consider files that have
+changed since they were last processed.
+
+=head2 What's a tidier? What's a validator?
+
+A I<tidier> transforms a file so as to improve its appearance without changing
+its semantics. Examples include L<perltidy>, L<podtidy> and
+L<js-beautify|https://npmjs.org/package/js-beautify>.
+
+A I<validator> analyzes a file for some definition of correctness. Examples
+include L<perlcritic>, L<podchecker> and L<jshint|http://www.jshint.com/>.
+
+Many tidiers are also validators, e.g. C<perltidy> will throw an error on badly
+formed Perl.
+
+To use a tidier or validator with C<tidyall> it must have a corresponding
+plugin class, usually under the prefix C<Code::TidyAll::Plugin::>.  This
+distribution comes with plugins for:
+
+=over
+
+=item *
+
+Perl: L<perlcritic|Code::TidyAll::Plugin::PerlCritic>,
+L<perltidy|Code::TidyAll::Plugin::PerlTidy>,
+L<perltidy-sweet|Code::TidyAll::Plugin::PerlTidy::Sweetened>
+
+=item *
+
+Pod: L<podchecker|Code::TidyAll::Plugin::PodChecker>,
+L<podspell|Code::TidyAll::Plugin::PodSpell>,
+L<podtidy|Code::TidyAll::Plugin::PodTidy>
+
+=item *
+
+Mason: L<masontidy|Code::TidyAll::Plugin::MasonTidy>
+
+=item *
+
+JavaScript: L<js-beautify|Code::TidyAll::Plugin::JSBeautify>,
+L<jshint|Code::TidyAll::Plugin::JSHint>,
+L<jslint|Code::TidyAll::Plugin::JSLint>
+
+=item *
+
+JSON: L<JSON|Code::TidyAll::Plugin::JSON>
+
+=item *
+
+CSS: L<cssunminifier|Code::TidyAll::Plugin::CSSUnminifier>
+
+=item *
+
+PHP: L<phpcs|Code::TidyAll::Plugin::PHPCodeSniffer>
+
+=item *
+
+Misc: L<Code::TidyAll::Plugin::SortLines>
+
+=back
+
+See L<Code::TidyAll::Plugin> for information about creating your own plugin.
+
+=head1 USING TIDYALL
+
+C<tidyall> works on a project basis, where a project is just a directory
+hierarchy of files. svn or git working directories are typical examples of
+projects.
+
+The top of the project is called the I<root directory>. In the root directory
+you'll need a config file named C<tidyall.ini> or C<.tidyallrc>; it defines how
+various tidiers and validators will be applied to the files in your project.
+
+C<tidyall> will find your root directory and config file automatically
+depending on how you call it:
+
+=over
+
+=item C<< tidyall file [file...] >>
+
+C<tidyall> will search upwards from the first file for the conf file.
+
+=item C<< tidyall -p/--pipe file >>
+
+C<tidyall> will search upwards from the specified file for the conf file.
+
+=item C<< tidyall -a/--all >> or C<< tidyall -s/--svn >> or C<< tidyall -g/--git >>
+
+C<tidyall> will search upwards from the current working directory for the conf
+file.
+
+=item C<< tidyall -a --root-dir dir >>
+
+C<tidyall> will expect to find the conf file in the specified root directory.
+
+=back
+
+You can also pass --conf-name to change the name that is searched for, or
+--conf-file to specify an explicit path.
+
+=head1 CONFIGURATION
+
+The config file (C<tidyall.ini> or C<.tidyallrc>) is in L<Config::INI> format.
+Here's a sample:
+
+    ignore = **/*.bak
+
+    [PerlTidy]
+    select = **/*.{pl,pm,t}
+    argv = -noll -it=2
+
+    [PerlCritic]
+    select = lib/**/*.pm
+    ignore = lib/UtterHack.pm lib/OneTime/*.pm
+    argv = -severity 3
+
+    [PodTidy]
+    select = lib/**/*.{pm,pod}
+
+In order, the four sections declare:
+
+=over
+
+=item *
+
+Always ignore C<*.bak> files.
+
+=item *
+
+Apply C<PerlTidy> with settings "-noll -it=2" to all *.pl, *.pm, and *.t files.
+
+=item *
+
+Apply C<PerlCritic> with severity 3 to all Perl modules somewhere underneath
+"lib/", except for "lib/UtterHack.pm".
+
+=item *
+
+Apply C<PodTidy> with default settings to all *.pm and *.pod files underneath
+"lib/".
+
+=back
+
+=head2 Standard configuration elements
+
+=over
+
+=item [class] or [class description]
+
+The header of each section refers to a tidyall I<plugin>. The name is
+automatically prefixed with C<Code::TidyAll::Plugin::> unless it begins with a
+'+', e.g.
+
+    ; Uses plugin Code::TidyAll::Plugin::PerlTidy
+    ;
+    [PerlTidy]
+
+    ; Uses plugin My::TidyAll::Plugin
+    ;
+    [+My::TidyAll::Plugin]
+
+You can also include an optional description after the class. The description
+will be ignored and only the first word will be used for the plugin. This
+allows you to a list a plugin more than once, with different configuration each
+time.  For example, two different C<PerlCritic> configurations:
+
+    ; Be brutal on libraries
+    ;
+    [PerlCritic strict]
+    select = lib/**/*.pm
+    argv = --brutal
+
+    ; but gentle on scripts
+    ;
+    [PerlCritic lenient]
+    select = bin/**/*.pl
+    argv = --gentle
+
+Warning: If you simply list the same plugin twice with no description (or the
+same description), one of them will be silently ignored.
+
+=item select
+
+One or more L<File::Zglob> patterns, separated by whitespace or on multiple
+lines, indicating which files to select. At least one is required. e.g.
+
+    ; All .t and .pl somewhere under bin and t;
+    ; plus all .pm files directly under lib/Foo and lib/Bar
+    ;
+    select = {bin,t}/**/*.p[lm]
+    select = lib/{Foo,Bar}/*.pm
+
+    ; All .txt files anywhere in the project
+    ;
+    select = **/*.txt
+
+The pattern is relative to the root directory and should have no leading slash.
+All standard glob characters (C<*>, C<?>, C<[]>, C<{}>) will work; in addition,
+C<**> can be used to represent zero or more directories. See L<File::Zglob>
+documentation for more details.
+
+=item ignore
+
+One or more L<File::Zglob> patterns, separated by whitespace or on multiple
+lines, indicating which files to ignore.  This is optional and overrides
+C<select>. e.g.
+
+    ; All .pl files anywhere under bin, except bin/awful.pl or anywhere
+    ; under bin/tmp
+    ;
+    select = bin/**/*.pl
+    ignore = bin/awful.pl bin/tmp/**/*.pl
+
+Ignore patterns can also specified at the beginning of the file before any
+plugin section was started, thus making them global. These ignores will be
+applied for all plugins.
+
+=item shebang
+
+One or more words on multiple lines, indicating which shebang lines to accept.
+This is optional and further filters C<select>.  e.g.
+
+    ; All files with no extension anywhere under bin that include a "perl" or
+    ; "perl5" shebang line.
+    select = bin/**/*
+    ignore = bin/**/*.*
+    shebang = perl
+    shebang = perl5
+
+=item only_modes
+
+A list of modes, separated by whitespace. e.g.
+
+    only_modes = test cli
+
+The plugin will I<only> run if one of these modes is passed to C<tidyall> via
+C<-m> or C<--mode>.
+
+=item except_modes
+
+A list of modes, separated by whitespace. e.g.
+
+    except_modes = commit editor
+
+The plugin will I<not> run if one of these modes is passed to C<tidyall> via
+C<-m> or C<--mode>.
+
+=item argv
+
+Many plugins (such as L<perltidy|Code::TidyAll::Plugin::PerlTidy>,
+L<perlcritic|Code::TidyAll::Plugin::PerlCritic> and
+L<podtidy|Code::TidyAll::Plugin::PodTidy>) take this option, which specifies
+arguments to pass to the underlying command-line utility.
+
+=item weight
+
+This is an integer that is used to sort plugins. By default, tidier plugins run
+first, then validator plugins, with each group sorted alphabetically.
+
+=back
+
+=head1 PLUGIN ORDER AND ATOMICITY
+
+If multiple plugins match a file, tidiers are applied before validators so that
+validators are checking the final result. Within those two groups, the plugins
+are applied in alphabetical order by plugin name/description.
+
+You can also explicitly set the weight of each plugin. By default, tidiers have
+a weight of 50 and validators have a weight of 60. You can set the weight to
+any integer to influence when the plugin runs.
+
+The application of multiple plugins is all-or-nothing. If an error occurs
+during the application of any plugin, the file is not modified at all.
+
+=head1 COMMAND-LINE OPTIONS
+
+=over
+
+=item -a, --all
+
+Process all files. Does a recursive search for all files in the project
+hierarchy, starting at the root, and processes any file that matches at least
+one plugin in the configuration.
+
+=item -i, --ignore
+
+Ignore matching files. This uses zglob syntax. You can pass this option more
+than once.
+
+=item -g, --git
+
+Process all added or modified files in the current git working directory.
+
+=item -h, --help
+
+Print help message
+
+=item -l, --list
+
+List each file along with the list of plugins it matches (files without any
+matches are skipped). Does not actually process any files and does not care
+whether files are cached. Generally used with -a, -g, or -s. e.g.
+
+    % tidyall -a -l
+    lib/CHI.pm (PerlCritic, PerlTidy, PodTidy)
+    lib/CHI/Benchmarks.pod (PodTidy)
+    lib/CHI/CacheObject.pm (PerlCritic, PerlTidy, PodTidy)
+
+=item -m, --mode
+
+Optional mode that can affect which plugins run. Defaults to C<cli>. See
+L</MODES>.
+
+=item -p path, --pipe path
+
+Read content from STDIN and write the resulting content to STDOUT.  If
+successful, tidyall exits with status 0. If an error occurs, tidyall outputs
+the error message to STDERR, I<mirrors the input content> to STDOUT with no
+changes, and exits with status 1. The mirroring means that you can safely pipe
+to your destination regardless of whether an error occurs.
+
+When specifying this option you must specify exactly one filename, relative or
+absolute, which will be used to determine which plugins to apply and also where
+the root directory and configuration file are. The file will not actually be
+read and does need even need to exist.
+
+This option implies --no-backups and --no-cache (since there's no actual file)
+and --quiet (since we don't want to mix extraneous output with the tidied
+result).
+
+    # Read from STDIN and write to STDOUT, with appropriate plugins
+    # for some/path.pl (which need not exist)
+    #
+    % tidyall --pipe some/path.pl
+
+=item -r, --recursive
+
+Recursively enter any directories listed on the command-line and process all
+the files within. By default, directories encountered on the command-line will
+generate a warning.
+
+=item -s, --svn
+
+Process all added or modified files in the current svn working directory.
+
+=item -q, --quiet
+
+Suppress output except for errors.
+
+=item -v, --verbose
+
+Show extra output.
+
+=item -I I<path1,path2,...>
+
+Add one or more library paths to @INC, like Perl's -I. Useful if
+--tidyall-class or plugins are in an alternate lib directory.
+
+=item --backup-ttl I<duration>
+
+Amount of time before backup files can be purged. Can be a number of seconds or
+any string recognized by L<Time::Duration::Parse>, e.g. "4h" or "1day".
+Defaults to "1h".
+
+=item --check-only
+
+Instead of actually tidying files, check if each file is tidied (i.e. if its
+tidied version is equal to its current version) and consider it an error if
+not. This is used by L<Test::Code::TidyAll> and the
+L<svn|Code::TidyAll::SVN::Precommit> and L<git|Code::TidyAll::Git::Precommit>
+pre-commit hooks, for example, to enforce that you've tidied your files.
+
+=item --conf-file I<path>
+
+Specify relative or absolute path to conf file, instead of searching for it in
+the usual way.
+
+=item --conf-name I<name>
+
+Specify a conf file name to search for instead of the defaults (C<tidyall.ini>
+/ C<.tidyallrc>).
+
+=item --data-dir I<path>
+
+Contains data like backups and cache. Defaults to root_dir/.tidyall.d
+
+=item --iterations I<count>
+
+Run each tidier transform I<count> times. Default is 1.
+
+In some cases (hopefully rare) the output from a tidier can be different if it
+is applied multiple times. You may want to perform multiple iterations to make
+sure the content "settles" into its final tidied form -- especially if the
+tidiness is being enforced with a version-control hook or a test. Of course,
+performance will suffer a little. You should rarely need to set this higher
+than 2.
+
+This only affects tidiers, not validators; e.g.
+L<perlcritic|Code::TidyAll::Plugin::PerlCritic> and
+L<jshint|Code::TidyAll::Plugin::JSHint> would still only be run once.
+
+=item --no-backups
+
+Don't backup files before processing.
+
+=item --no-cache
+
+Don't cache last processed times; process all files every time. See also
+C<--refresh-cache>.
+
+=item --output-suffix I<suffix>
+
+Suffix to add to a filename before outputting the modified version, e.g.
+C<.tdy>. Default is none, which means overwrite the file.
+
+=item --refresh-cache
+
+Erase any existing cache info before processing each file, then write new cache
+info. See also C<--no-cache>.
+
+=item --root-dir
+
+Specify root directory explicitly. Usually this is inferred from the specified
+files or the current working directory.
+
+=item --tidyall-class I<class>
+
+Subclass to use instead of C<Code::TidyAll>.
+
+=back
+
+=head2 Specifying options in configuration
+
+Almost any command-line option can be specified at the top of the config file,
+above the plugin sections. Replace dashes with underscores. e.g.
+
+    backup_ttl = 4h
+    iterations = 2
+    tidyall_class = My::Code::TidyAll
+
+    [PerlTidy]
+    select = **/*.{pl,pm,t}
+    argv = -noll -it=2
+
+    ...
+
+If an option is passed in both places, the command-line takes precedence.
+
+=head1 EXIT STATUS
+
+C<tidyall> will exit with status 1 if any errors occurred while processing
+files, and 0 otherwise.
+
+=head1 MODES
+
+You can use tidyall in a number of different contexts, and you may not want to
+run all plugins in all of them.
+
+You can pass a mode to tidyall via C<-m> or C<--mode>, and then specify that
+certain plugins should only be run in certain modes (via L</only_modes>) or
+should be run in all but certain modes (via L</except_modes>).
+
+Examples of modes:
+
+=over
+
+=item *
+
+C<cli> - when invoking tidyall explicitly from the command-line with no mode
+specified
+
+=item *
+
+C<editor> - when invoking from an editor
+
+=item *
+
+C<commit> - when using a commit hook like L<Code::TidyAll::SVN::Precommit> or
+L<Code::TidyAll::Git::Precommit>
+
+=item *
+
+C<test> - when using L<Test::Code::TidyAll>
+
+=back
+
+Now since L<perlcritic|Code::TidyAll::Plugin::PerlCritic> is a bit
+time-consuming, you might only want to run it during tests and explicit
+command-line invocation:
+
+    [PerlCritic]
+    select = lib/**/*.pm
+    only_modes = test cli
+    ...
+
+Or you could specify that it be run in all modes I<except> the editor:
+
+    [PerlCritic]
+    select = lib/**/*.pm
+    except_modes = editor
+    ...
+
+If you specify neither C<only_modes> nor C<except_modes> for a plugin, then it
+will always run.
+
+=head1 LAST-PROCESSED CACHE
+
+C<tidyall> keeps track of each file's signature after it was last processed. On
+subsequent runs, it will only process a file if its signature has changed. The
+cache is kept in files under the data dir.
+
+You can force a refresh of the cache with C<--refresh-cache>, or turn off the
+behavior entirely with C<--no-cache>.
+
+=head1 BACKUPS
+
+C<tidyall> will backup each file before modifying it. The timestamped backups
+are kept in a separate directory hierarchy under the data dir.
+
+Old backup files will be purged automatically as part of occasional C<tidyall>
+runs. The duration specified in C<--backup-ttl> indicates both the minimum
+amount of time backups should be kept, and the frequency that purges should be
+run. It may be specified as "30m" or "4 hours" or any string acceptable to
+L<Time::Duration::Parse>. It defaults to "1h" (1 hour).
+
+You can turn off backups with C<--no-backups>.
+
+=head1 "MISSING" PREREQS
+
+The C<Code::TidyAll> distribution intentionally does not depend on the prereqs
+needed for each plugin. This means that if you want to use the
+L<perltidy|Code::TidyAll::Plugin::PerlTidy>, you must install the L<Perl::Tidy>
+module manually.
+
+=head1 RELATED TOOLS
+
+=over
+
+=item *
+
+L<etc/editors/tidyall.el|https://raw.github.com/autarch-code/perl-code-tidyall/master/etc/editors/tidyall.el>
+and
+L<etc/editors/tidyall.vim|https://raw.github.com/autarch-code/perl-code-tidyall/master/etc/editors/tidyall.vim>
+in this distribution contains Emacs and Vim commands for running C<tidyall> on
+the current buffer. You can assign this to the keystroke of your choice (e.g.
+ctrl-t or ,t).
+
+=item *
+
+L<Code::TidyAll::SVN::Precommit> implements a subversion pre-commit hook that
+checks if all files are tidied and valid according to C<tidyall>, and rejects
+the commit if not.
+
+=item *
+
+L<Code::TidyAll::Git::Precommit> and L<Code::TidyAll::Git::Prereceive>
+implement git pre-commit and pre-receive hooks, respectively, that check if all
+files are tidied and valid according to C<tidyall>.
+
+=item *
+
+L<Test::Code::TidyAll> is a testing library to check that all the files in your
+project are in a tidied and valid state.
+
+=back
+
+=head1 KNOWN BUGS
+
+=over
+
+=item *
+
+Does not yet work on Windows
+
+=back
+
+=head1 AUTHOR
+
+Jonathan Swartz
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Jeff Thalhammer for helping me refine this API. Thanks to Jeff for
+perlcritic, Steve Hancock for perltidy, and all the other authors of great open
+source tidiers and validators.
+
+=cut

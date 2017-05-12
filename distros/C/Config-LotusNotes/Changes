@@ -1,0 +1,55 @@
+Changelog for Config::LotusNotes
+--------------------------------
+
+0.34 (02/10/2011)
+   - improved detection on 64-bit systems
+
+0.33 (02/07/2011)
+   - fixed problem locating installations in paths that contain spaces
+   - fixed option parsing problem in sample script
+   - updated ppm package to support 64-bit systems
+
+0.32 (06/12/2008)
+   - new property "install_scope" for install variants "all users" and "just for me"
+   - minor documentation updates 
+
+0.31 (02/25/2008)
+   - added support for "all users" install variant
+   - updated ppm package to support perl 5.10
+
+0.30 (02/14/2007)
+   - use Config::IniHash instead of Config::IniFiles to handle reading and 
+     writing notes.ini files. This module can deal with malformed ini files.
+   - added demo script editnotesini.pl
+   - demo scripts now get installed
+
+0.23 (10/31/2006)
+   - demo/FindNotes.pl no more dies on systems with no Notes installed.
+   - improved handling of debug messages for corrupt notes.ini files.
+   - documentation improvements.
+
+0.22 (10/13/2006)
+   - Removed trailing backslash from notespath() for consistency with 
+     datapath() attribute.
+   - Config::LotusNotes no longer dies when no COM server entries are 
+     found in the registry.
+   - Added mock notes binaries to test directory so that the modules 
+     can be tested if no Notes is installed.
+   - Added tests for POD coverage
+
+0.21 (08/21/2006)
+   - First public release.
+   - Separated logic for locating installs from representation of a 
+     configuration by introducing new module Config::LotusNotes::Configuration.
+   - Several minor improvements to make the module more compatible with CPAN.
+
+0.2.0 (08/09/2006)
+   - Complete rewrite.
+   - Changed namespace to Config::LotusNotes.
+   - Uses Windows registry instead of lotus.ini to locate Notes.
+   - Supports multiple installs.
+   - Documentation translated into English.
+   - Added demo script FindNotes.pl.
+
+0.1.0 (10/28/2003)
+   - First version as Lotus::Notes::Config.

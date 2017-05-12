@@ -1,0 +1,30 @@
+---
+abstract: 'Methods for Fastly intergration to Catalyst'
+author:
+  - 'Leo Lapworth'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Action::RenderView: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Runtime: '5.80'
+  Moose: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize: '1.46'
+  Test::WWW::Mechanize::Catalyst: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-Fastly-Role-Response
+requires:
+  Carp: '0'
+  Moose::Role: '0'
+resources:
+  bugtracker: https://github.com/ranguard/p5-catalystx-fastly-role/issues
+  repository: https://github.com/ranguard/p5-catalystx-fastly-role
+version: '0.07'

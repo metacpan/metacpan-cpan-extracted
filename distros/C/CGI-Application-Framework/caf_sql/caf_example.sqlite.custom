@@ -1,0 +1,99 @@
+
+-- You can connect to a SQLite database by installing DBI::Shell and
+-- using the command:
+--    $ dbish dbi:SQLite:dbname=sqlite_database_file
+--
+-- Then you can paste the following commands into the prompt
+
+
+--
+-- Table structure for table album
+--
+
+DROP TABLE album;
+CREATE TABLE album (
+  album_id INTEGER NOT NULL PRIMARY KEY,
+  artist_id INTEGER,
+  album_name varchar(100),
+  album_year INTEGER
+);
+
+--
+-- Table structure for table album_song
+--
+
+DROP TABLE album_song;
+CREATE TABLE album_song (
+  id INTEGER NOT NULL PRIMARY KEY,
+  album_id INTEGER,
+  song_id INTEGER ,
+  track_num INTEGER
+);
+
+--
+-- Table structure for table artist
+--
+
+DROP TABLE artist;
+CREATE TABLE artist (
+  artist_id INTEGER NOT NULL PRIMARY KEY,
+  artist_name varchar(100)
+);
+
+--
+-- Table structure for table song
+--
+
+DROP TABLE song;
+CREATE TABLE song (
+  song_id INTEGER NOT NULL PRIMARY KEY,
+  artist_id INTEGER ,
+  song_name varchar(100)
+);
+
+--
+-- Table structure for table user_album
+--
+
+DROP TABLE user_album;
+CREATE TABLE user_album (
+  id INTEGER NOT NULL PRIMARY KEY,
+  user_id INTEGER ,
+  album_id INTEGER
+);
+
+--
+-- Dumping data for table user_album
+--
+
+INSERT INTO user_album (user_id, album_id) VALUES (1,1);
+INSERT INTO user_album (user_id, album_id) VALUES (1,3);
+INSERT INTO user_album (user_id, album_id) VALUES (1,4);
+INSERT INTO user_album (user_id, album_id) VALUES (1,6);
+INSERT INTO user_album (user_id, album_id) VALUES (1,7);
+INSERT INTO user_album (user_id, album_id) VALUES (2,1);
+INSERT INTO user_album (user_id, album_id) VALUES (2,2);
+INSERT INTO user_album (user_id, album_id) VALUES (2,6);
+INSERT INTO user_album (user_id, album_id) VALUES (2,7);
+
+--
+-- Table structure for table users
+--
+
+DROP TABLE users;
+CREATE TABLE users (
+  uid INTEGER NOT NULL PRIMARY KEY,
+  username varchar(50) UNIQUE,
+  fullname varchar(50),
+  password varchar(50)
+);
+
+--
+-- Dumping data for table users
+--
+
+INSERT INTO users VALUES (1,'green-rdice','Richard Dice','foobar');
+INSERT INTO users VALUES (2,'green-woody','Sheriff Woody','buckaroo');
+INSERT INTO users VALUES (3,'green-pete','Prospector Pete','doggie');
+INSERT INTO users VALUES (4,'green-buzz','Buzz Lightyear','infinity');
+

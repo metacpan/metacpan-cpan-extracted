@@ -1,0 +1,18 @@
+2004-06-24 Stefano Rodighiero <larsen@perl.it>
+
+   0.03 
+
+   Version check in Makefile.PL abandoned.
+
+
+2004-06-22 Stefano Rodighiero <larsen@perl.it>
+
+   0.02
+
+   Added a note in the README and in the POD, explaining how to 
+   skip the version check.
+
+
+2004-06-21 Stefano Rodighiero <larsen@perl.it>
+
+   Release 0.01

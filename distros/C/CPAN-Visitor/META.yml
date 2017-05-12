@@ -1,0 +1,51 @@
+---
+abstract: 'Generic traversal of distributions in a CPAN repository'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150002'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Visitor
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  CPAN::Visitor:
+    file: lib/CPAN/Visitor.pm
+    version: '0.005'
+requires:
+  Archive::Extract: '0.34'
+  File::Find: '0'
+  File::Temp: '0.20'
+  File::pushd: '1.00'
+  Moose: '0.93'
+  MooseX::Params::Validate: '0.13'
+  Parallel::ForkManager: '0.007005'
+  Path::Class: '0.17'
+  autodie: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/CPAN-Visitor/issues
+  homepage: https://github.com/dagolden/CPAN-Visitor
+  repository: https://github.com/dagolden/CPAN-Visitor.git
+version: '0.005'
+x_authority: cpan:DAGOLDEN

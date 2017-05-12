@@ -1,0 +1,77 @@
+---
+global:
+  cpan_mirrors:
+    - file:///home/dann/minicpan/
+  fix_module_name:
+    - from: Class::Classgen::classgen
+      to: Class::Classgen::Attribute
+    - from: IO::Scalar
+      to: IO::stringy
+    - from: podlators
+      to: Pod::Man
+  fix_package_depends: []
+  no_depends:
+    # default
+    - module: perl
+    - module: mod_perl
+    - module: version
+    - module: File::Spec
+    - module: File::Spec::Functions
+    - module: File::Spec::Mac
+    - module: File::Spec::OS2
+    - module: File::Spec::Unix
+    - module: File::Spec::Win32
+    - module: IO::File 
+    # other
+    - module: 'Filter # brokes?'
+    - module: HTTP::Request
+    - module: HTTP::Response
+    - module: HTTP::Request::AsCGI
+    - module: IO::Socket::INET
+    - module: kurila
+    - module: Module::Install
+    - module: Module::Install::AuthorTests
+  skip_name_resolve_modules: []
+
+modules:
+  - module: Test::Exception
+    depends:
+      - module: Test::Simple
+      - module: Sub::Uplevel
+    no_depends:
+      - module: Test::Builder::Tester
+    skip_test: 1
+  - module: IO::Compress::Base
+    skip_build: 1
+  - module: MooseX::MethodAttributes::Inheritable
+    skip_build: 1
+  - module: Perl::MinimumVersion
+    skip_test: 1
+  - module: HTTP::Request::AsCGI
+    skip_build: 1
+  - module: libwww-perl
+    no_depends:
+      - module: Authen::NTLM
+      - module: HTTP::GHTTP
+      - module: Win32
+  - module: Module::Setup
+    no_depends:
+      - module: Module::Install::AuthorTests
+  - module: YAML 
+    no_depends:
+      - module: Test::Base 
+      - module: Test::Base::Filter
+  - module: Catalyst::Runtime
+    no_depends:
+      - module: HTTP::Request::AsCGI
+      - module: Test::Exception
+  - module: Module::Depends
+    no_depends:
+      - module: Template
+  - module: Acme
+    custom:
+      tgz_path: ~/.cpanpackager/custom_module/Acme-1.11111.tar.gz
+      patches: 
+        - ~/.cpanpackager/custom_module/acme_test.patch
+      dist_name: Acme
+      version: 1.11111

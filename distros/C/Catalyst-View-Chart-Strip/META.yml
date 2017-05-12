@@ -1,0 +1,26 @@
+---
+name: Catalyst-View-Chart-Strip
+version: 0.05
+author:
+  - 'Brandon L Black, C<blblack@gmail.com>'
+abstract: A Catalyst View for Chart::Strip graphics
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Chart::Strip: 1.01
+  UNIVERSAL::require: 0
+build_requires:
+  Test::More: 0
+provides:
+  Catalyst::Helper::View::Chart::Strip:
+    file: lib/Catalyst/Helper/View/Chart/Strip.pm
+  Catalyst::View::Chart::Strip:
+    file: lib/Catalyst/View/Chart/Strip.pm
+    version: 0.05
+  Catalyst::View::Chart::Strip::Example:
+    file: lib/Catalyst/View/Chart/Strip/Example.pm
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

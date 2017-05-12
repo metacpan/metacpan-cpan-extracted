@@ -1,0 +1,114 @@
+##########################################################################
+#                                                                        #
+# (C) Copyright IBM Corporation 2002, 2013 All rights reserved.          #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# William Spurlin - Initial version and framework                        #
+#                                                                        #
+# Max Vohlken - Defect fixes                                             #
+#                                                                        #
+##########################################################################
+
+ 
+ClearCase::CtCmd is an interface to IBM Rational ClearCase.  For support, 
+go to http://support.ibm.com.  For installation instructions, see
+INSTALL.
+
+ClearCase::CtCmd is supported on all platforms that IBM Rational ClearCase
+supports. Starting with IBM Rational ClearCase version 8.0.0.0 
+ClearCase::CtCmd is shipped as part of the product.
+
+
+##########################################################################
+#                                                                        #
+# Documentation                                                          #
+#                                                                        #
+##########################################################################
+
+ClearCase::CtCmd is self-documenting through the Perl POD (Plain Old
+Documentation) facility.  After installation, "perldoc ClearCase::CtCmd"
+will display the self-documentation.  Before installation the command
+"perldoc -F CtCmd.pm" may be used from the installation directory.
+
+##########################################################################
+#                                                                        #
+# Signals                                                                #
+#                                                                        #
+##########################################################################
+
+ClearCase::CtCmd does not save/restore user signal handlers upon 
+entrance/exit.  Users are, of course, able to explictly
+restore their signal handlers with the $SIG{<signal>} = <handler ref>
+mechanism after each invocation of ClearCase::CtCmd::exec(),
+but user signal handlers are modified by the ClearCase libraries
+called by ClearCase::CtCmd, except that with ClearCase versions 
+greater than 5.0, if the signal handler for signals 1, 2, 3 or 15 
+is set to SIG_IGN ( that is, $SIG{[1|2|3|15]} = 'IGNORE' ) 
+the signal handler will be saved during and after 
+an invocation of ClearCase::CtCmd::exec.
+
+##########################################################################
+#                                                                        #
+# Limitations                                                            #
+#                                                                        #
+##########################################################################
+
+# libperl.so
+
+On Solaris and presumably other Unix/Linux, 
+/usr/atria/shlib/libperl.<shared object extension> on ClearCase v5.0 
+can conflict with the user's perl installation if the user's perl is built 
+as a wrapper around  a shared object of the same name, e. g., "libperl.so". 
+With IBM Rational ClearCase v6.x and newer, the perl library is name libratlperl.so, removing this conflict.
+
+Workarounds:
+
+A.  Do not build Perl as a shared object.  
+
+    pro:   Simple
+    con:   Requires user to rebuild Perl. Since libperl.so is shared, 
+           loses advantage of significantly less memory use when
+           there are multiple Perl interpreters running. 
+
+B.  Build a shared Perl using some name other than "libperl.<shared object extension>."
+
+    pro:   Simple. Run Configure/modify the config.sh useshrplib,
+           libperl and dflt variables, assigning some name other than
+           "libperl.so" to libperl. "libperl561.so" does nicely.
+    con:   Requires user to rebuild Perl. 
+
+C. Another workaround is for the user (where, for example,  a shared Perl 
+    is installed in /opt/perl_5.6.1) to:
+
+    1. From the CtCmd directory, run "perl Makefile.PL; make". 
+    2. copy  /usr/atria/shlib/libperl.so to 
+        ./blib/arch/auto/ClearCase/CtCmd/liboldperl.so
+    3. run the following command:
+
+LD_RUN_PATH="/usr/atria/shlib:/usr/lib:/var/tmp/CtCmd" ld  -G -L/usr/atria/shlib -L/usr/local/lib CtCmd.o -Lblib/arch/auto/ClearCase/CtCmd -R/usr/ucblib  -R/usr/atria/shlib -R/shlib  -R/opt/perl_5.6.1/lib/sun4-solaris/auto/ClearCase/CtCmd  -R/opt/perl/5.6.1/lib/site_perl/auto/ClearCase/CtCmd -Rblib/arch/auto/ClearCase/CtCmd -o blib/arch/auto/ClearCase/CtCmd/CtCmd.so -lzuba  -L/var/tmp/CtCmd  -latriacmdsyn -latriacmd -latriasumcmd -latriasum -latriamsadm -latriamntrpc -latriacm -latriavob -latriaview -latriacm -latriadbrpc -latriatirpc -latriaxdr -latriamvfs -latriatbs -latriaadm -latriasplit -latriacredmap -latriaks -lezrpc -lrpcsvc -latriaccfs -latriasquidad -latriasquidcore -lc -lw -lCrun -loldperl
+
+    (The above will have to be on one line.)
+
+    Now, in lieu of "make test",
+
+    4.  perl -Iblib/lib  -Iblib/arch  t/t1_createArch.t
+
+    5. perl -Iblib/lib  -Iblib/arch  t/t2_tstArch.t
+
+    6. perl -Iblib/lib  -Iblib/arch  t/t3_cleanArch.t
+
+    will run the test suite verbosely and clean up, hopefully with no failures. 
+
+    7.  Copy the contents of  ./blib/arch/auto/ClearCase/CtCmd/ 
+    (three files ending in .so ) to 
+    /opt/perl_5.6.1/lib/sun4-solaris/auto/ClearCase/CtCmd . 
+    Directories will have to be created first. 
+
+    8. Copy blib/lib/ClearCase/CtCmd.pm to  
+    /opt/perl_5.6.1/lib/sun4-solaris/ClearCase/CtCmd.pm .  
+    Directories will have to be created. 
+

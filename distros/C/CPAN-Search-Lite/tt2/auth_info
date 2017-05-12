@@ -1,0 +1,65 @@
+[% cpanid = results.cpanid %]
+<div class=path>
+<a href="[% home %]/[% mode %]">[% pages.list.$mode %]</a>
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<a href="[% home %]/[% mode %]/[% letter %]/">
+[% letter %]</a>
+[% IF subletter %]
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<a href="[% home %]/[% mode %]/[% subletter %]/">
+[% subletter %]</a>
+[% END -%]
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<b>[% cpanid %]</b>
+</div>
+<div class=box>
+<table>
+<tr>
+<td class=label>[% pages.cpanid %]</td>
+<td class=cell>[% cpanid %]</td>
+</tr><tr>
+<td class=label>[% pages.name %]</td>
+<td class=cell>[% results.fullname %]</td>
+</tr><tr>
+<td class=label>[% pages.email %]</td>
+<td class=cell><a href="mailto:[% results.email %]">
+[% results.email %]</a></td>
+<tr><td class=label>[% pages.links %]</td>
+<td class=cell>
+<a href="[% searchcpan %]~[% results.cpanid | lower %]">
+search.cpan.org</a>&nbsp; | &nbsp; 
+<a href="[% mirror %]/authors/id/[% cpan_letter %]/[% results.cpanid %]/">
+CPAN</a>&nbsp; | &nbsp; 
+<a href="[% backpan %]/authors/id/[% cpan_letter %]/[% results.cpanid %]/">
+Archive</a>&nbsp; | & nbsp;
+<a href="[% testers_author %][% results.cpanid %].html">
+CPAN testers</a>&nbsp;
+</td>
+</tr>
+</table>
+</div>
+[% IF results.dists %]
+[% host = mirror ? mirror : download %]
+<div class=box>
+<h2 class=t2>[% pages.list.dist %]</h2>
+<table width=100% class=dists>
+[% class = 's' %]
+[% FOREACH item = results.dists %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class=[% class %]>
+<td><a href="[% home %]/~[% cpanid | lower %]/[% item.dist_name %]">
+[% item.dist_name %]-[% item.dist_vers %]</a>
+&nbsp;[&nbsp;<a
+href="[% host %]/authors/id/[% item.download %]">[% pages.download%]</a>
+&nbsp;]
+[% IF webstart %]
+&nbsp;[<a
+href="[% cpaninstall %]?dist=[% item.dist_file %];cpanid=[% results.cpanid %]">[% pages.install %]</a>]
+[% END -%]
+</td>
+<td>[% item.dist_abs %]</td>
+<td align=right>[% item.birth %]</td></tr>
+[% END -%]
+</table>
+</div>
+[% END -%]

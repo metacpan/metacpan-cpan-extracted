@@ -1,0 +1,15 @@
+ChangeLog
+test.pl
+Makefile.PL
+Listman.pm
+Listman/line.pm
+Listman/selection.pm
+Listman/exporter.pm
+Listman/dictionary.pm
+Listman/dictionary/term.pm
+MANIFEST
+MANIFEST.SKIP
+README
+schema.txt
+examples/config.pm.template
+examples/admin.pl

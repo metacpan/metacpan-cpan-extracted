@@ -1,0 +1,20 @@
+0.003003 2010-11-05 10:00EST
+ - use Test::Fatal instead of Test::Exception for tests
+ - skip tests if shared-mime-info isn't installed
+ - add fix for "sub _eq" in File::Copy 2.10-2.12
+0.003002 2010-06-01 13:00EST
+ - Messed up release
+0.003001 2010-06-01 12:00EST
+ - Add Dir::Self to the list of test deps. No other changes.
+0.003000 2010-02-23 13:00EST
+ - Added mime-type and extension support
+ - Added get/set/has/clear property methods
+0.002001 2010-01-16
+ - Updated tests to use Directory::Scratch rather than messing with FindBin
+0.002000
+ - INCOMPATIBLE CHANGE: renamed 'set_metadata' to 'metadata'
+ - Added grep_files and map_files methods (were blocked by Path::Class bug)
+ - Updated tests to use Test::Manifest instead of numbered tests.
+ - Updated POD
+0.001000 2009-11-25
+  - Initial Release

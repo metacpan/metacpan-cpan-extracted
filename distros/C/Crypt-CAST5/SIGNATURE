@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b0e1ababbf9692ca05af3d3930165761e2437d68 CAST5.pm
+SHA1 79cc7bd6a5afe66b19773894544c29253b524875 CAST5.xs
+SHA1 a99b3ba40f12114299940140ec6c7d5be146178f Changes
+SHA1 33139f455433bc03a0796212c5e741ff4782c6e9 MANIFEST
+SHA1 f31e4998e0398b6a22714231119fbab995b5d305 META.yml
+SHA1 2551f62796d5286643cde6d0676d594c67e1aa5d Makefile.PL
+SHA1 f71f1ec2430778fc6caed483bbd16c37d9d26dc3 README
+SHA1 98169a2bf69c374769832f13a27adacc788f9873 _cast5.c
+SHA1 4920562ac2fe14a6fce391ec20cf6fadc2ffb5d0 cast5.h
+SHA1 f22824404a04ad1529483f7cdc00e0f98710b5e0 ppport.h
+SHA1 99a90164635a2fb39bddc7bb42ac1ecf444ae806 t/1cast5.t
+SHA1 b5dd2039d93eb02e0a185dda768399362cdff87b t/2cbc.t
+SHA1 3a40671ffd95f2ba85fdb5bcd813dd502a8f1938 t/3utf.t
+SHA1 be40fe73963c0a3deeebc4f92165ee5ad1209ac5 tables.c
+SHA1 fe1cce578cbd1b51d9507f81ad4bfd71a96c5390 test/slowtest.pl
+SHA1 e030c2507694daad055526680259268b76cabb4e test/speedtest.pl
+SHA1 270bd5712d75edde39484c8ed6d4bfc2479fa3b3 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.4 (Darwin)
+
+iQEVAwUBRKazBlllvYCGFM9cAQKBkwf+PFuzp3/3yhfIWBOKa9+95RH4+4o/HfgC
+J8JdIETr8HrVgkDsdiNqstx8WhRi7B+FsI0iMePNK7qdT1JQEx5YMUertk5IEpEE
+cCDUKjIwHYxo5RHiTofIZvq9gMcT5oupcjnTPxI95KSfFcuEruAiBggJ28pIyTwE
+I+O46ceWtFTPp1hKPAs3nIz7ngjU1bSoLe/e6XTRJK6uIbonb/67uIBwY9pERGft
+pC8CzQt/fN/QlFkajwnVWz5CoSvGnpntEJdvAOgQqc0DAsgsC5Oq0RkiW1g0m0ht
+8xqHxvZB/QaR5/tUXTaT8eRlQDrXCuGatoCSjgSq1+h1MhrXCFDB9A==
+=kP7W
+-----END PGP SIGNATURE-----

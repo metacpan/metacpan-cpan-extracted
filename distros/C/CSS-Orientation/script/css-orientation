@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use CSS::Orientation qw( ChangeLeftToRightToLeft );
+use FindBin qw();
+use Getopt::Long qw( GetOptions );
+
+our $DEBUG = 0;
+our $SWAP_LTR_RTL_IN_URL = 0;
+our $SWAP_LEFT_RIGHT_IN_URL = 0;
+our $IGNORE_BAD_BGP = 0;
+
+my %options = (
+    'debug|d+'                  => \$DEBUG,
+    'swap_ltr_rtl_in_url!'      => \$SWAP_LTR_RTL_IN_URL,
+    'swap_left_right_in_url!'   => \$SWAP_LEFT_RIGHT_IN_URL,
+    'ignore_bad_bgp!'           => \$IGNORE_BAD_BGP,
+);
+
+sub usage {
+    printf( STDOUT "usage: %s" .
+        " [--debug]" .
+        " [--swap_ltr_rtl_in_url]" .
+        " [--swap_left_right_in_url]" .
+        " [--ignore_bad_bgp]\n",
+        $FindBin::Script
+    );
+    exit( 1 );
+}
+
+unless ( GetOptions( %options ) ) {
+    usage();
+}
+
+my $result = ChangeLeftToRightToLeft(
+    [ <STDIN> ],
+    $SWAP_LTR_RTL_IN_URL,
+    $SWAP_LEFT_RIGHT_IN_URL,
+    $IGNORE_BAD_BGP
+);
+
+print( STDOUT @$result );
+
+# vim: ts=4 sw=4 et:

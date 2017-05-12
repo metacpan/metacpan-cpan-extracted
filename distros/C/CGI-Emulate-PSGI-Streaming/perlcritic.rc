@@ -1,0 +1,466 @@
+verbose = %f:%l:%c:%p:%m\n
+color = 1
+program-extensions = .PL .pl .t
+only = 1
+severity = 2
+
+# Use `List::MoreUtils::any' instead of `grep' in boolean context.
+[BuiltinFunctions::ProhibitBooleanGrep]
+
+# Map blocks should have a single statement.
+[-BuiltinFunctions::ProhibitComplexMappings]
+
+# Use 4-argument `substr' instead of writing `substr($foo, 2, 6) = $bar'.
+[BuiltinFunctions::ProhibitLvalueSubstr]
+
+# Forbid $b before $a in sort blocks.
+[BuiltinFunctions::ProhibitReverseSortBlock]
+
+# Use Time::HiRes instead of something like `select(undef, undef, undef, .05)'.
+[BuiltinFunctions::ProhibitSleepViaSelect]
+
+# Write `eval { my $foo; bar($foo) }' instead of `eval "my $foo; bar($foo);"'.
+[BuiltinFunctions::ProhibitStringyEval]
+
+# Write `split /-/, $string' instead of `split '-', $string'.
+[BuiltinFunctions::ProhibitStringySplit]
+
+# Write `eval { $foo->can($name) }' instead of `UNIVERSAL::can($foo, $name)'.
+[BuiltinFunctions::ProhibitUniversalCan]
+
+# Write `eval { $foo->isa($pkg) }' instead of `UNIVERSAL::isa($foo, $pkg)'.
+[BuiltinFunctions::ProhibitUniversalIsa]
+# this normally disables this policy! run with --severity 1 to get it
+severity = 1
+# I'd really like to enable this, but it confuses Test::Deep::isa with
+# UNIVERSAL::isa
+
+# Don't pass $_ to built-in functions that assume it, or to most filetest operators.
+[BuiltinFunctions::ProhibitUselessTopic]
+
+# Don't use `grep' in void contexts.
+[BuiltinFunctions::ProhibitVoidGrep]
+
+# Don't use `map' in void contexts.
+# disabled because it gets confused with a map inside a hash constructor
+[-BuiltinFunctions::ProhibitVoidMap]
+
+# Write `grep { /$pattern/ } @list' instead of `grep /$pattern/, @list'.
+[BuiltinFunctions::RequireBlockGrep]
+
+# Write `map { /$pattern/ } @list' instead of `map /$pattern/, @list'.
+[BuiltinFunctions::RequireBlockMap]
+
+# Use `glob q{*}' instead of <*>.
+[BuiltinFunctions::RequireGlobFunction]
+
+# Sort blocks should have a single statement.
+[BuiltinFunctions::RequireSimpleSortBlock]
+
+# AUTOLOAD methods should be avoided.
+[ClassHierarchies::ProhibitAutoloading]
+
+# Employ `use base' instead of `@ISA'.
+[ClassHierarchies::ProhibitExplicitISA]
+
+# Write `bless {}, $class;' instead of just `bless {};'.
+[ClassHierarchies::ProhibitOneArgBless]
+
+# Use spaces instead of tabs.
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+# Write `open $handle, $path' instead of `open($handle, $path)'.
+[CodeLayout::ProhibitParensWithBuiltins]
+
+# Write `qw(foo bar baz)' instead of `('foo', 'bar', 'baz')'.
+[CodeLayout::ProhibitQuotedWordLists]
+
+# Don't use whitespace at the end of lines.
+[CodeLayout::ProhibitTrailingWhitespace]
+
+# Use the same newline through the source.
+[CodeLayout::RequireConsistentNewlines]
+
+# Must run code through perltidy.
+[-CodeLayout::RequireTidyCode]
+
+# Put a comma at the end of every multi-line list declaration, including the last one.
+[CodeLayout::RequireTrailingCommas]
+
+# Write `for(0..20)' instead of `for($i=0; $i<=20; $i++)'.
+[ControlStructures::ProhibitCStyleForLoops]
+
+# Don't write long "if-elsif-elsif-elsif-elsif...else" chains.
+[ControlStructures::ProhibitCascadingIfElse]
+
+# Don't write deeply nested loops and conditionals.
+[ControlStructures::ProhibitDeepNests]
+max_nests = 5
+
+# Don't use labels that are the same as the special block names.
+[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+
+# Don't modify `$_' in list functions.
+[ControlStructures::ProhibitMutatingListFunctions]
+
+# Don't use operators like `not', `!~', and `le' within `until' and `unless'.
+[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+
+# Write `if($condition){ do_something() }' instead of `do_something() if $condition'.
+[-ControlStructures::ProhibitPostfixControls]
+
+# Write `if(! $condition)' instead of `unless($condition)'.
+[-ControlStructures::ProhibitUnlessBlocks]
+
+# Don't write code after an unconditional `die, exit, or next'.
+[ControlStructures::ProhibitUnreachableCode]
+
+# Write `while(! $condition)' instead of `until($condition)'.
+[ControlStructures::ProhibitUntilBlocks]
+
+# Check your spelling.
+[-Documentation::PodSpelling]
+
+# The `=head1 NAME' section should match the package.
+[-Documentation::RequirePackageMatchesPodName]
+
+# All POD should be after `__END__'.
+[-Documentation::RequirePodAtEnd]
+
+# Provide text to display with your pod links.
+[-Documentation::RequirePodLinksIncludeText]
+
+# Organize your POD into the customary sections.
+[-Documentation::RequirePodSections]
+
+# Use functions from Carp instead of `warn' or `die'.
+[ErrorHandling::RequireCarping]
+
+# You can't depend upon the value of `$@'/`$EVAL_ERROR' to tell whether an `eval' failed.
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# Discourage stuff like `@files = `ls $directory`'.
+[InputOutput::ProhibitBacktickOperators]
+
+# Write `open my $fh, q{<}, $filename;' instead of `open FH, q{<}, $filename;'.
+[InputOutput::ProhibitBarewordFileHandles]
+severity = 2
+
+# Use "<>" or "<ARGV>" or a prompting module instead of "<STDIN>".
+[InputOutput::ProhibitExplicitStdin]
+
+# Use prompt() instead of -t.
+[InputOutput::ProhibitInteractiveTest]
+
+# Use `local $/ = undef' or File::Slurp instead of joined readline.
+[InputOutput::ProhibitJoinedReadline]
+
+# Never write `select($fh)'.
+[InputOutput::ProhibitOneArgSelect]
+
+# Write `while( $line = <> ){...}' instead of `for(<>){...}'.
+[InputOutput::ProhibitReadlineInForLoop]
+
+# Write `open $fh, q{<}, $filename;' instead of `open $fh, "<$filename";'.
+[InputOutput::ProhibitTwoArgOpen]
+severity = 2
+
+# Write `print {$FH} $foo, $bar;' instead of `print $FH $foo, $bar;'.
+[-InputOutput::RequireBracedFileHandleWithPrint]
+
+# Close filehandles as soon as possible after opening them.
+[-InputOutput::RequireBriefOpen]
+
+# Write `my $error = close $fh;' instead of `close $fh;'.
+[-InputOutput::RequireCheckedClose]
+
+# Write `my $error = open $fh, $mode, $filename;' instead of `open $fh, $mode, $filename;'.
+[-InputOutput::RequireCheckedOpen]
+
+# Return value of flagged function ignored.
+[-InputOutput::RequireCheckedSyscalls]
+
+# Write `open $fh, q{<:encoding(UTF-8)}, $filename;' instead of `open $fh, q{{<:utf8}, $filename;'.
+[InputOutput::RequireEncodingWithUTF8Layer]
+
+# Do not use `format'.
+[Miscellanea::ProhibitFormats]
+
+# Do not use `tie'.
+[Miscellanea::ProhibitTies]
+
+# Forbid a bare `## no critic'
+[Miscellanea::ProhibitUnrestrictedNoCritic]
+
+# Remove ineffective "## no critic" annotations.
+[Miscellanea::ProhibitUselessNoCritic]
+
+# Export symbols via `@EXPORT_OK' or `%EXPORT_TAGS' instead of `@EXPORT'.
+[Modules::ProhibitAutomaticExportation]
+
+# Avoid putting conditional logic around compile-time includes.
+[Modules::ProhibitConditionalUseStatements]
+
+# Minimize complexity in code that is outside of subroutines.
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 20
+
+# Put packages (especially subclasses) in separate files.
+[Modules::ProhibitMultiplePackages]
+severity = 2
+
+# Write `require Module' instead of `require 'Module.pm''.
+[Modules::RequireBarewordIncludes]
+
+# End each module with an explicitly `1;' instead of some funky expression.
+[Modules::RequireEndWithOne]
+
+# Always make the `package' explicit.
+[Modules::RequireExplicitPackage]
+# Don't require programs to contain a package statement.
+exempt_scripts = 1
+allow_import_of = utf8 strict warnings
+
+# Package declaration must match filename.
+[Modules::RequireFilenameMatchesPackage]
+
+# `use English' must be passed a `-no_match_vars' argument.
+[Modules::RequireNoMatchVarsWithUseEnglish]
+
+# Give every module a `$VERSION' number.
+[Modules::RequireVersionVar]
+
+# Distinguish different program components by case.
+[NamingConventions::Capitalization]
+
+# Don't use vague variable or subroutine names like 'last' or 'record'.
+[-NamingConventions::ProhibitAmbiguousNames]
+
+# Prohibit indirect object call syntax.
+[Objects::ProhibitIndirectSyntax]
+# Indirect method syntax is forbidden for these methods.
+# Values that are always included: new.
+# forbid =
+
+# Write `@{ $array_ref }' instead of `@$array_ref'.
+[References::ProhibitDoubleSigils]
+
+# Capture variable used outside conditional.
+[RegularExpressions::ProhibitCaptureWithoutTest]
+# Names of ways to generate exceptions.
+# Values that are always included: confess, croak, die.
+# exception_source =
+
+# Split long regexps into smaller `qr//' chunks.
+[-RegularExpressions::ProhibitComplexRegexes]
+
+# Use named character classes instead of explicit character lists.
+[-RegularExpressions::ProhibitEnumeratedClasses]
+
+# Use character classes for literal meta-characters instead of escapes.
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+
+# Use `eq' or hash instead of fixed-pattern regexps.
+[RegularExpressions::ProhibitFixedStringMatches]
+
+# Use `[abc]' instead of `a|b|c'.
+[RegularExpressions::ProhibitSingleCharAlternation]
+
+# Only use a capturing group if you plan to use the captured value.
+[RegularExpressions::ProhibitUnusedCapture]
+
+# Use only `//' or `{}' to delimit regexps.
+[RegularExpressions::ProhibitUnusualDelimiters]
+# In addition to allowing '{}', allow '()', '[]', and '{}'.
+#allow_all_brackets = 1
+
+# Don't use $_ to match against regexes.
+[RegularExpressions::ProhibitUselessTopic]
+
+# Use `{' and `}' to delimit multi-line regexps.
+[RegularExpressions::RequireBracesForMultiline]
+# In addition to allowing '{}', allow '()', '[]', and '{}'.
+#allow_all_brackets = 1
+
+# Always use the `/s' modifier with regular expressions.
+[-RegularExpressions::RequireDotMatchAnything]
+
+# Always use the `/x' modifier with regular expressions.
+[-RegularExpressions::RequireExtendedFormatting]
+
+# Always use the `/m' modifier with regular expressions.
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# Don't call functions with a leading ampersand sigil.
+[Subroutines::ProhibitAmpersandSigils]
+
+# Don't declare your own `open' function.
+[Subroutines::ProhibitBuiltinHomonyms]
+
+# Minimize complexity by factoring code into smaller subroutines.
+[Subroutines::ProhibitExcessComplexity]
+
+# Return failure with bare `return' instead of `return undef'.
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+# Too many arguments.
+[Subroutines::ProhibitManyArgs]
+
+# `sub never { sub correct {} }'.
+[Subroutines::ProhibitNestedSubs]
+
+# Behavior of `sort' is not defined if called in scalar context.
+[Subroutines::ProhibitReturnSort]
+
+# Don't write `sub my_function (@@) {}'.
+[Subroutines::ProhibitSubroutinePrototypes]
+severity = 2
+
+# Prevent unused private subroutines.
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+
+# Prevent access to private subs in other packages.
+[Subroutines::ProtectPrivateSubs]
+
+# Always unpack `@_' first.
+[-Subroutines::RequireArgUnpacking]
+
+# End every path through a subroutine with an explicit `return' statement.
+[Subroutines::RequireFinalReturn]
+# this normally disables this policy! run with --severity 1 to get it
+severity = 1
+# I'd really like to enable this, but we very often have
+# single-expression subs, and this policy would warn on every one of
+# them... maybe one day I'll patch the policy
+
+# Prohibit various flavors of `no strict'.
+[TestingAndDebugging::ProhibitNoStrict]
+
+# Prohibit various flavors of `no warnings'.
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = uninitialized numeric redefine
+
+# Don't turn off strict for large blocks of code.
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+# The maximum number of statements in a no strict block.
+statements = 10
+
+# Tests should all have labels.
+[TestingAndDebugging::RequireTestLabels]
+
+# Always `use strict'.
+[TestingAndDebugging::RequireUseStrict]
+
+# Always `use warnings'.
+[TestingAndDebugging::RequireUseWarnings]
+
+# Don't use the comma operator as a statement separator.
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+# this normally disables this policy! run with --severity 1 to get it
+severity = 1
+# I'd like to enable this, but it complains about arglists built with
+# ternary operators
+
+# Prohibit version values from outside the module.
+[ValuesAndExpressions::ProhibitComplexVersion]
+
+# Don't `use constant FOO => 15'.
+[ValuesAndExpressions::ProhibitConstantPragma]
+
+# Write `q{}' instead of `'''.
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+# Write `"\N{DELETE}"' instead of `"\x7F"', etc.
+[-ValuesAndExpressions::ProhibitEscapedCharacters]
+
+# Use concatenation or HEREDOCs instead of literal line breaks in strings.
+[ValuesAndExpressions::ProhibitImplicitNewlines]
+
+# Always use single quotes for literal strings.
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+
+# Write `oct(755)' instead of `0755'.
+[ValuesAndExpressions::ProhibitLeadingZeros]
+
+# Long chains of method calls indicate tightly coupled code.
+[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+
+# Don't use values that don't explain themselves.
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+# Don't mix numeric operators with string operands, or vice-versa.
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+
+# Write ` !$foo && $bar || $baz ' instead of ` not $foo && $bar or $baz'.
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+
+# Use `q{}' or `qq{}' instead of quotes for awkward-looking strings.
+[ValuesAndExpressions::ProhibitNoisyQuotes]
+
+# Don't use quotes (`'', `"', ``') as delimiters for the quote-like operators.
+[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+
+# Don't write ` print <<'__END__' '.
+[ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+
+# Don't use strings like `v1.4' or `1.4.5' when including other modules.
+[ValuesAndExpressions::ProhibitVersionStrings]
+
+# Require $VERSION to be a constant rather than a computed value.
+[ValuesAndExpressions::RequireConstantVersion]
+
+# Warns that you might have used single quotes when you really wanted double-quotes.
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+# Write ` 141_234_397.0145 ' instead of ` 141234397.0145 '.
+[-ValuesAndExpressions::RequireNumberSeparators]
+
+# Write ` print <<'THE_END' ' or ` print <<"THE_END" '.
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+
+# Write ` <<'THE_END'; ' instead of ` <<'theEnd'; '.
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+
+# Do not write ` my $foo .= 'bar'; '.
+[-Variables::ProhibitAugmentedAssignmentInDeclaration]
+
+# Do not write ` my $foo = $bar if $baz; '.
+[Variables::ProhibitConditionalDeclarations]
+
+# Use `my' instead of `local', except when you have to.
+[-Variables::ProhibitLocalVars]
+
+# Avoid `$`', `$&', `$'' and their English equivalents.
+[Variables::ProhibitMatchVars]
+
+# Eliminate globals declared with `our' or `use vars'.
+[Variables::ProhibitPackageVars]
+
+# Use double colon (::) to separate package name components instead of single quotes (').
+[Variables::ProhibitPerl4PackageNames]
+
+# Write `$EVAL_ERROR' instead of `$@'.
+[-Variables::ProhibitPunctuationVars]
+
+# Do not reuse a variable name in a lexical scope
+[Variables::ProhibitReusedNames]
+
+# Don't ask for storage you don't need.
+[Variables::ProhibitUnusedVariables]
+
+# Prevent access to private vars in other packages.
+[Variables::ProtectPrivateVars]
+
+# Write `local $foo = $bar;' instead of just `local $foo;'.
+[-Variables::RequireInitializationForLocalVars]
+
+# Write `for my $element (@list) {...}' instead of `for $element (@list) {...}'.
+[Variables::RequireLexicalLoopIterators]
+
+# Magic variables should be assigned as "local".
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV
+
+# Negative array index should be used.
+[Variables::RequireNegativeIndices]

@@ -1,0 +1,59 @@
+{
+   "abstract" : "lib/Class/DBI/Sweet.pm",
+   "author" : [
+      "Christian Hansen <ch@ngmedia.com>",
+      "Matt S Trout <mstrout@cpan.org>",
+      "Andy Grundman <andy@hybridized.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-DBI-Sweet",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::UUID" : 0
+         },
+         "requires" : {
+            "Class::DBI" : "v3.0.12",
+            "DBD::SQLite" : "1.08",
+            "DBI" : 0,
+            "Data::Page" : 0,
+            "List::Util" : 0,
+            "SQL::Abstract" : "1.55"
+         }
+      }
+   },
+   "provides" : {
+      "Class::DBI::Sweet" : {
+         "file" : "lib/Class/DBI/Sweet.pm",
+         "version" : "0.11"
+      },
+      "Class::DBI::Sweet::SQL::Abstract" : {
+         "file" : "lib/Class/DBI/Sweet.pm",
+         "version" : 0
+      },
+      "Class::DBI::Sweet::Topping" : {
+         "file" : "lib/Class/DBI/Sweet/Topping.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

@@ -1,0 +1,30 @@
+Revision history for Perl extension Catalyst::Plugin::C3
+
+0.03 - 4 Jun 2007
+    Bumped C3 req to 0.19, to avoid bug in earlier versions
+    of C::C3::XS.
+    Converted to M::I
+
+0.02 - 30 Nov 2006
+    Speed improvement - only check calculateMRO once per class
+    Caveat added about not changing @ISA at runtime
+    Dependency improvements
+    Still not for the faint of heart
+
+0.01 - 26 Sep 2006
+    Initial release
+
+0.01000_06 - Mon Jul 24 06:47:59 UTC 2006
+    Updated for the real Class::C3 0.12 maybe::next::method syntax
+
+0.01000_05 - Thu Jul  6 02:45:51 UTC 2006
+    Just an efficiency improvement
+
+0.01000_04 - Sun Jul  2 21:13:11 UTC 2006
+    Upgraded to take advantage of Class::C3 0.12, but still relatively hackish and untested
+
+0.01000_02 - Wed Jun  7 03:53:59 UTC 2006
+    Some minor compat improvements
+
+0.01000_01 - Sat May 27 23:03:44 UTC 2006
+    Initial Development Release

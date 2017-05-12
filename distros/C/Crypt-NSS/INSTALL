@@ -1,0 +1,7 @@
+This modules requires NSS (Netscape Security Services) which is available for download from ftp://ftp.mozilla.org/pub/security/nss/releases/
+
+Development and testing has been done against the 3.12 release with the bundled NSPR 4.7
+
+Currently we require that that the headers, libraries and binaries are installed in the directories "include", "lib" and "bin" with a common parent directory. Before running Makefile.PL set the environment variable NSS_BASE to the path to this directory.
+
+If your libs aren't installed in a path where ld can normally find them you might have to set LD_LIBRARY_PATH (or DYLD_LIBRARY_PATH) or similar before running.

@@ -1,0 +1,182 @@
+$Header: /cvsroot/CGI::Framework/Changes,v 1.37 2005/10/11 16:21:24 mina Exp $
+
+Revision history for Perl module CGI::Framework
+
+0.23
+	- New initializer parameter "output_filter"
+	- show_template accepts a second optional boolean parameter
+	  "nofinalize" which denotes it should not finalize() when done.
+	  This was used to bugfix fatal error emails not being sent out
+	  when not running under mod_perl
+
+0.22
+	- Fatal errors sent via sendmail now also try to respect supplied
+	  smtp_from parameter
+
+0.21
+	- Tweaked code that handles braindead browsers that do not properly
+	  terminate an SSL/TLS session.  This used to generated a fatal
+	  error (email and all) in some cases.  Now it's ignored silently.
+
+0.20
+	- Fatal error email now includes X-CGI-Framework-PID header
+
+0,19
+	- Minor bugfix - the fatal_error_template was shown to the user as
+	  text/plain instead of text/html if application was running under
+	  mod_perl and sendmail was used to email fatal error messages.
+
+0.18
+	- pre__pre__all(), pre__post__all(), post__pre__all() and
+	  post__post__all() are now all passed a second argument:  The name
+	  of the template about to be/just sent.
+
+0.17
+	- The "process" javascript function now returns false, so its return
+	  value can be utilized in "onclick" events of anchors to avoid the
+	  "screen-scroll-to-top" abnormality.
+
+0.16
+	- Implemented new constructor parameters: sessions_serializer_default,
+	  sessions_serializer_freezethaw and sessions_serializer_storable
+	- Bugfix - running under mod_perl resulted in occasional "Software
+	  caused connection abort" messages.  These are no longer considered
+	  fatal.
+	
+0.15
+	- No longer tries to write and unlink a testing file to sessions_dir
+	  for every invocation
+	- Fatal error messages now have a stack backtrace appended to them
+	- Bugfix: Fatal errors are no longer sent to browser below the fatal
+	  error template content when running under mod_perl
+
+0.14
+	- Errors emailed via fatal_error_email now include header
+	  X-CGI-Framework-REMOTE-ADDR
+	- Implemented new constructor parameters: action and cookie_domain
+	- Bugfix: A weird error produced if a submitted form has the element
+	  _lang more than once is now avoided
+	- Some minor changes to make the framework work under mod_perl: Also
+	  introduced new method finalize()
+
+0.13
+	- Implemented new constructor parameter: expire
+	- log_this now also logs the IP address from REMOTE_ADDR
+	- Internal HTML::Template object is now initialized with option
+	  loop_context_vars, allowing for loop vars such as __odd__
+	  and __inner__
+
+0.12
+	- Implemented support for 4 new callbacks:
+	    pre__pre__all()
+	    post__pre__all()
+	    pre__post__all()
+	    post__post__all()
+
+0.11
+	- Implemented new method: return_template()
+	- Implemented 2 new special variables: _missing_info and
+	  _missing_info_caller
+   - Calling the clear_session() method will now preserve
+	  the internal _lang and _lastsent variables
+
+0.10
+   - Implemented new logic that fixes problem of the framework validating
+	  the last-sent template even if the client hit BACK in their web browser
+	  and is actually submitting a different template.  The default is now
+	  to validate whichever template the client is submitting, which is not
+	  necessarily the last template sent.
+	- Added new constructor option: disable_back_button
+	  Note that this constructor replicates the behavior of version 0.09
+	  and below.  Unlike the previous versions, the default for
+	  version 0.10 is NOT to disable the back button.
+
+	  If you'd like to maintain the behavior of version 0.09 and
+	  earlier, you must set "disable_back_button => 1" in your
+	  constructor/initializer.
+
+	  See the POD for more details.
+
+0.09
+	- Fixed a bug that caused language tags in a template with no content
+	  in them (such as <en></en>) to cause random parsing problems and
+	  missing content.
+	- Introduced internationalization and localization to errors added
+	  via the add_error() method by utilizing the excellent Locale::Maketext
+	  module.
+	- Documentation clarification for multi-language support
+
+0.08
+	- Added new method initial_template()
+
+0.07
+	- Implemented new logging features:
+		+ log_filename constructor key
+		+ log_this() method
+	- Implemented new fatal error handling features:
+		+ Fatal error template through the new fatal_error_template constructor key
+		+ Fatal error email-to-admin feature through the new fatal_error_email,
+		  sendmail, smtp_host and smtp_from constructor keys as well as the
+		  new pre-defined variable _fatal_error for use in the fatal error template
+	- New pre-defined variable _current_template
+
+0.06
+	- Renamed constructor parameter importform to import_form, renamed built-in
+	  html variable _formaction to _form_action.  Both changes are backwards compatible
+	- If "import_form" was supplied to constructor, then subsequent calls to the
+	  form() method will return the value from the import_form namespace instead of
+	  from the built-in CGI object.  This allows the programmer to modify the value
+	  in the namespace (such as $FORM::firstname) then use form() or remember() to
+	  operate on the new value, not the original one.
+	- add_error() method no longer restricted to being called from inside a
+	  validate_templatename() routine.  That gives the flexibility to add_error()
+	  followed by manually calling show_template() at any time.
+	- The INITIALIZENEWPROJECT function now creates an /images/ subdirectory
+	  inside the /public_html/ subdirectory and places a couple of small images in
+	  it, which the errors.html template references. It looks nicer :)
+
+0.05
+	- Fixed a bug that caused the framework not to call the pre_templatename and
+	  validate_templatename subroutines if the non-OOP (function-based) approach using
+	  the initialize_cgi_framework initializer was used, and the callbacks_namespace
+	  parameter was not supplied.
+
+0.04
+	- Any methods and initializer parameters that were made up of 2 concatenated words
+	  have now been separated by an underscore.  The following are affected:
+
+	  Methods/Functions:
+	  adderror		=>	add_error
+	  clearsession	=> clear_session
+	  showtemplate	=> show_template
+
+	  Constructor/Initializer parameters:
+	  callbacksnamespace	=>	callbacks_namespace
+	  cookiename			=>	cookie_name
+	  initialtemplate		=>	initial_template
+	  sessionsdir			=>	sessions_dir
+	  templatesdir			=>	templates_dir
+	  validlanguages		=>	valid_languages
+
+	  The old names will still be available for compatability-purposes however will be
+	  phased out sometime in the future for code-cleanliness.  All existing and new
+	  programs should use the new naming convention.
+
+	- Implemented the ability to save session data in a mysql table instead of text files
+	  through a new constructor parameter sessions_mysql_dbh.
+	- Implemented a new method "remember" that is a shorthand for transferring values
+	  from the just-submitted form to the session.
+	- Changed default form enctype to "multipart/form-data" so that file-uploads can
+	  be done.  This seems to have no side-effect other than enabling file uploads to
+	  work.
+	- Some documentation and synopsis bugfixes. - Thanks to Ron Savage <rons@deakin.edu.au>
+
+0.03
+	-  Added new methods: get_cgi_object, get_cgi_session_object, html_push, html_unshift
+	-  Added new constructor option, importform
+	-  Documentation fixes and elaborations
+
+0.02
+	-  Initial release
+
+

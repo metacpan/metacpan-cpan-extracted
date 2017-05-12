@@ -1,0 +1,80 @@
+[% 
+    link = '<a href="http://search.cpan.org/~' _ builder.author _ '">' _ builder.author _ "</a>"
+    crosslink = '/author/' _ builder.letter _ '/' _ builder.author
+
+    rss = builder.author _ '.rss'
+    rss2 = builder.author _ '-nopass.rss'
+    htmltitle = 'Reports for distributions by ' _ builder.author
+    title = 'Reports for distributions by ' _ link
+
+    distributions = builder.distributions
+    box_summ  = 1
+
+    crumb3_name = 'Authors' ;
+    crumb3_href = '/' ;
+    crumb2_name = builder.letter ;
+    crumb2_href = '/author/' _ crumb2_name ;
+    crumb1_name = builder.author ;
+%]
+
+<div class="orange_buttons">
+<a rel="nofollow" href="[% builder.author %].rss">RSS</a>
+<a rel="nofollow" href="[% builder.author %]-nopass.rss">RSS (No PASSes)</a>
+<a rel="nofollow" href="[% builder.author %].yaml">YAML</a>
+</div>
+
+<p>
+These are the test reports that we have for the most recent versions of each CPAN distribution uploaded by
+[% link %].[% IF processed %] This page was last updated on <strong>[% processed %]</strong>.[% END %]
+</p>
+
+<h2>The Latest Distributions</h2>
+
+<p>To view individual reports, please click the grade text associated with each report.</p>
+
+[% FOREACH d = builder.distributions %]
+<div class="[% d.csscurrent %][% d.cssrelease %]">
+<h2 id="[% d.dist %]"><a href="/distro/[% d.letter %]/[% d.dist | html %].html">[% d.dist | html %]</a> [% d.version | html %]
+
+[% IF d.summary.keys %]
+(<strong>
+[%- FOREACH status = d.summary.keys.sort -%]
+[%- c = d.summary.$status -%]
+<span class="[% status | html %]">[% c %] [% status -%]
+[% IF status != "ALL" -%]
+[% IF c > 1 %][% IF status == 'PASS' %]es[% ELSE %]s[% END %][% END -%]
+[% END -%]
+[% UNLESS loop.last %], [% END -%]
+</span>[% -%]
+[% END -%]</strong>)
+[% ELSE %] (No reports)[% END -%]</h2>
+
+[% IF d.reports %]
+
+    <table class="test_results">
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Perl version</th>
+          <th>OS name</th>
+          <th>OS version</th>
+          <th>Architecture</th>
+        </tr>
+      </thead>
+      <tbody id="data-[% d.dist %]">
+        [% FOREACH report = d.reports %]
+        <tr>
+        <td class="[% report.status | html %]"><a rel="nofollow" href="[% reportlink2 %]/[% report.guid || report.id %]">[% report.status | html %]</a></td>
+        <td>[% report.perl | html %]</td>
+        <td>[% report.osname | ucfirst | html %]</td>
+        <td>[% report.osvers | html %]</td>
+        <td>[% report.archname || report.platform | trim | html %]</td>
+        </tr>
+        [% END %]
+      </tbody>
+    </table>
+
+[% END %]
+
+</div>
+[% END %]

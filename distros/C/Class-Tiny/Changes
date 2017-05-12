@@ -1,0 +1,190 @@
+Revision history for Class-Tiny
+
+1.006     2016-09-10 14:47:49-04:00 America/New_York
+
+    - No changes since 1.005
+
+1.005     2016-09-06 12:12:06-04:00 America/New_York (TRIAL RELEASE)
+
+    [INTERNAL]
+
+    - Optimize generated accessors (5% to 25% faster depending on
+      combination of read vs write and default vs no-default).
+
+1.004     2015-10-30 10:33:59-04:00 America/New_York
+
+    - No changes since 1.003
+
+1.003     2015-10-27 13:01:02-04:00 America/New_York (TRIAL RELEASE)
+
+    [INTERNAL]
+
+    - Refactored accessor generation to allow subclasses of Class::Tiny
+      to implement alternate accessors.
+
+1.001     2015-01-30 21:13:07-05:00 America/New_York
+
+    [ADDED]
+
+    - Added support for BUILDARGS for Moo(se) compatibility
+
+    [INTERNAL]
+
+    - Implements BUILDALL via method (was inline) for Moo(se) compatibility
+
+1.000     2014-07-16 09:55:29-04:00 America/New_York
+
+    [*** INCOMPATIBLE CHANGES ***]
+
+    - Attributes for custom accessors *MUST* be declared for them to be
+      set via the constructor.  It is no longer sufficient for a method of
+      the same name to exist.
+
+    - Unknown constructor arguments are ignored rather than fatal; they are
+      not included in the object.  Special instructions for using BUILD to
+      hide constructor arguments from validation are irrelevant and have
+      been removed.
+
+    - These changes make Class::Tiny-based classes easier to subclass by
+      more advanced object frameworks like Moose or Moo.
+
+0.015     2014-07-13 23:10:47-04:00 America/New_York
+
+    [CHANGED]
+
+    - lowered minimum perl to 5.006
+
+0.014     2013-11-28 07:12:14 America/New_York
+
+    [FIXED]
+
+    - put back a 'no warnings "once"' line that caused downstream warnings
+
+0.013     2013-11-26 12:01:13 America/New_York
+
+    [DOCUMENTED]
+
+    - expanded comparision to Object::Tiny and Class::Accessor
+
+0.012     2013-11-01 16:36:35 America/New_York
+
+    [DOCUMENTED]
+
+    - added documentation notes about multiple inheritance
+      and attribute defaults under subclassing
+
+    [INTERNAL]
+
+    - added tests for multiple inheritance
+
+0.011     2013-09-25 11:08:07 America/New_York
+
+    [FIXED]
+
+    - compile test could hang on Windows
+
+    [PREREQS]
+
+    - ExtUtils::MakeMaker configure_requires dropped to 6.17
+
+0.010     2013-09-18 13:23:15 America/New_York
+
+    [FIXED]
+
+    - suppressed 'used only once' warnings (GH #9)
+
+0.009     2013-09-17 06:54:47 America/New_York
+
+    [FIXED]
+
+    - "won't stay shared" bug on older perls
+
+0.008     2013-09-08 09:49:46 America/New_York
+
+    [FIXED]
+
+    - META.yml encoding problems
+
+    [DOCUMENTED]
+
+    - revised CONTRIBUTING
+
+    [INTERNAL]
+
+    - refactored precaching
+
+0.007     2013-09-07 16:48:56 America/New_York
+
+    [OPTIMIZED]
+
+    - accessors without defaults are now much faster (comparable
+      to Class::Accessor::Fast)
+
+    - constructor and destructors are slightly faster when there
+      are no superclasses except Class::Tiny::Object
+
+    - linearized @ISA and other items are cached for speed when
+      the first object is created
+
+0.006     2013-09-05 11:56:48 America/New_York
+
+    [ADDED]
+
+    - added introspection method: get_all_attribute_defaults_for($class)
+
+    [DOCUMENTED]
+
+    - Fixed TOBYINK email address for contributors list
+
+    - Revised rationale for why Class::Tiny vs other modules
+
+0.005     2013-08-28 11:51:37 America/New_York
+
+    [ADDED]
+
+    - Attributes now support lazy defaults passed as a hash reference
+      to the class declaration
+
+0.004     2013-08-21 16:38:01 America/New_York
+
+    [CHANGED]
+
+    - Base class is now Class::Tiny::Object; Class::Tiny is now only the
+      class builder
+
+    - BUILD and DEMOLISH now have Moo(se) like semantics: BUILD gets
+      original constructor arguments. DEMOLISH is now passed a global
+      destruction flag (requires Devel::GlobalDestruction on Perls before
+      v5.14)
+
+    - Constructor argument validation now happens after BUILD.
+
+    - Constructor argument validation has been softened to a heuristic:
+      argument names must match a method name
+
+    [ADDED]
+
+    - added introspection method: get_all_attributes_for($class)
+
+    [INTERNAL]
+
+    - Refactored import() for easier subclassing of Class::Tiny should
+      anyone be crazy enough to do so
+
+0.003     2013-08-19 19:43:36 America/New_York
+
+    [FIXED]
+
+    - Multiple invocations of "use Class::Tiny" in a package accumulate
+      attributes instead of overwriting them
+
+0.002     2013-08-19 17:17:24 America/New_York
+
+    [CHANGED]
+
+    - Slight reduction in memory usage tracking attributes
+
+0.001     2013-08-16 10:48:33 America/New_York
+
+    - First release
+

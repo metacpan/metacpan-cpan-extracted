@@ -1,0 +1,17 @@
+---
+name: CPAN-Test-Dummy-Perl5-Build-Fails
+version: 1.03
+author:
+  - Andreas Koenig
+abstract: CPAN Test Dummy
+license: perl
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  CPAN::Test::Dummy::Perl5::Build::Fails:
+    file: lib/CPAN/Test/Dummy/Perl5/Build/Fails.pm
+    version: 1.03
+resources:
+  license: http://dev.perl.org/licenses/

@@ -1,0 +1,63 @@
+{
+   "abstract" : "Layered configuration, because configs are like ogres",
+   "author" : [
+      "Dave Sherohman <dsheroh@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Onion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Exporter" : "0",
+            "Hash::Merge::Simple" : "0",
+            "Moo" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "dsheroh@cpan.org",
+         "web" : "https://github.com/dsheroh/Config-Onion/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dsheroh/Config-Onion.git",
+         "web" : "https://github.com/dsheroh/Config-Onion"
+      }
+   },
+   "version" : "1.007"
+}
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension CGI::Builder::SessionManager.
+
+Legenda: + = new feature, ! = updated feature/bug fix, - = removed feature
+
+0.01  Wed Apr 28 18:17:17 2004
+	- original version; created by h2xs 1.23 with options
+		-X -A -n CGI::Builder::SessionManager
+
+1.00  Thu Jul 29 14:00:00 2004
+	- First CPAN officiale release
+	+ Added base test and docs

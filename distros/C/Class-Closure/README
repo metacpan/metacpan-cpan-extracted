@@ -1,0 +1,221 @@
+Class::Closure
+
+Class::Closure is a package that makes creating Perl classes less
+cumbersome. You can think of it as a more featureful Class::Struct.
+
+To declare a class using Class::Closure, enter a new package, use
+Class::Closure, and define a sub called CLASS. Inside this sub will lie
+the declarations for the attributes and methods (and subclasses) for
+this class.
+
+  Variables
+
+To declare variables, mark them as lexicals within the sub. You may
+prefix them with "has" to make them read-only or "public" to make them
+fully read-write public.
+
+ sub CLASS {
+     my $x;             # private
+     has my $y;         # read-only
+     public my $z;      # public
+ }
+
+As of the moment, "has" and "public" only support scalar variables.
+
+You can give the variables a default value by assigning to the whole
+declaration. For simple private variables this is easy; for read-only
+and public variables, it requires extra parentheses:
+
+ sub CLASS {
+     my $x         = 1;
+     has(my $y)    = 2;
+     public(my $z) = 3;
+ }
+
+To use these variables within the class, use their plain lexical name
+with the sigil. To use them outside the class, call them as methods.
+Given the class above:
+
+ $obj->x;      # Illegal; private
+ $obj->y;      # Ok, 2.
+ $obj->z;      # Ok, 3.
+ $obj->z = 32; # Write to $z.
+
+This may be a little different from the usual "$obj->z(32)" syntax you
+might be used to. Trust me, this will grow on you.
+
+  Methods
+
+To declare methods, use the "method" keyword and pass a name and a
+reference to a sub:
+
+ sub CLASS {
+     method bark => sub {
+         print "Woof!\n";
+     };
+ }
+
+The invocant is still passed in as the first argument as in old-style
+OO. The fact is, though, that many times you won't need it, since you
+can reference the member variables without it. You still need it to call
+functions on yourself, though.
+
+ sub CLASS {
+     method chase_tail => sub {
+         my ($self) = @_;
+         $self->chase($self->find_tail);
+     };
+ }
+
+  Accessors
+
+Sometimes a change of interface goes from using a public variable to a
+function with extra behavior. Some would say that's why you never make a
+member variable public. I disagree, since you can just fake one with the
+"accessor" keyword:
+
+ sub CLASS {
+     accessor 'number',
+             get { print "Getting the number";  42; },
+             set { print "Setting the number";  $_[0]->send($_[1]) };
+ }
+ print $obj->number;  # "Getting the number"  "42"
+ $obj->number = 314;  # "Setting the number" ...
+
+  Inheritance
+
+Unlike the standard Perl 5 object model, Class::Closure can inherit from
+both classes and variables (like Class::Classless). Also, it keeps their
+respective namespaces separate, so they don't accidentally stomp on each
+other's member variables, even if they're implemented with the standard
+object model.
+
+To inherit, use the "extends" keyword. It can take as an argument either
+a class name (make sure you quote it lest you confuse Perl) or an
+object. If you need to pass construction parameters to your superclass,
+just inherit from it as an object:
+
+ sub CLASS {
+     extends MySuperClass->new(@params);
+ }
+
+  Constructors and Destructors
+
+The special method BUILD is called whenever a new object is created,
+with the blessed object in the first argument and the rest of the
+construction parameters in the remaining arguments.
+
+Destructors are a little different. Because of the magic that
+Class::Closure has to do to get them to work with inheritance, they have
+a special syntax:
+
+ sub CLASS {
+     destroy { print "Destructing object"; }
+ }
+
+Yep, that's all. And you heard me correctly, they work right with
+inheritance, unlike the standard "DESTROY" method.
+
+  FALLBACK
+
+Class::Closure supports an "AUTOLOAD" feature. But because it uses
+"AUTOLOAD" internally, it has to call it something else. It's called
+"FALLBACK", and it works just like "AUTOLOAD" in every way (the name of
+the current sub is still even in $AUTOLOAD).
+
+  How does it work?
+
+If you really want to get scary power out of this module, you have to
+understand how it works.
+
+The "CLASS" sub that you defined in your package is actually called
+every time an object is created. That's right, so there's no need for a
+"BUILD" at all (but it makes things look cleaner). Class::Closure
+exports each one of these "keywords" into your namespace, and they are
+used right on the spot to construct the object each time.
+
+Each object's member hash is actually a lexical scratchpad, and it keeps
+track of where it is, so you don't have to reference $self all the time.
+It has the added plus that each object in an inheritance heirarchy has
+it's own scratchpad, so you don't get variable name conflicts.
+
+In more detail, when you call "new" on your package, it derives a new
+anonymous package for only that object. Then when you use "method" (or
+"has" or "public" or "attribute", which are really just wrappers around
+the same thing), it installs the sub you give into that symbol table
+position. These closure's aren't "cloned", but just referenced, so this
+doesn't take up the horrible amount of memory you might be thinking it
+does.
+
+Then when all references to the object disappear, it uses Symbol's
+"delete_package" to clean out the anonymous package and free memory (and
+more importantly, call "DESTROY"s) associated with the object.
+
+What does this all mean for you, the user? Since you understand that
+these "declarations" are just sub calls at object construction time, you
+can create your objects based on a dynamic template:
+
+ sub CLASS {
+     my ($class, $mode) = @_;
+
+     if ($mode == 1) {
+         method foo => sub { ... };
+         method bar => sub { ... };
+     }
+     else {
+         method foo => sub { ... };
+         method bar => sub { ... };
+     }
+ }
+
+That avoids a run-time check on each of the method calls, and makes
+things a little easier to read. There's all kinds of other fun stuff you
+can do.
+
+  Technical Notes / Bugs / Caveats / Etc.
+
+Included in the distribution is a benchmark.pl script which will test
+various aspects of Class::Closure objects against objects created with
+the traditional object model. In general, Class::Closure is quite a bit
+faster for plain method calls (the extra hash lookup for each attribute
+is more overhead than you'd think), but is slower for inherited methods
+and *much* slower for object creation. So it's not good to use
+Class::Closure for small, intermediate objects if you're worried about
+speed. Fortunately, Perl programs tend not to use these sorts of objects
+often.
+
+"accessor"-like subs with arguments aren't yet supported, but there's
+nothing in the design that says they aren't allowed. I'm just lazy, and
+I'll happily add them upon request.
+
+You might get in trouble if you try to define method names the same as
+the exported keyword names.
+
+There are certainly more bugs, since this is complex, subtle, scary
+code. Bug reports/patches welcome.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This documentation is copyright (c) 2004 by Luke Palmer.
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

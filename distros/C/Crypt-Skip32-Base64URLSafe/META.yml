@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Crypt-Skip32-Base64URLSafe
+version:             0.33
+abstract:            Create URL-safe encodings of 32-bit values
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Crypt::Skip32:                 0
+    MIME::Base64::URLSafe:         0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,10 @@
+Revision history for Perl extension Class::CompiledC.
+
+2.20  Thu Oct 26 21:46:28 CEST 2006 @865 /Internet Time/
+      first public release.  	
+2.21  Fri Oct 27 23:25:25 CEST 2006 @934 /Internet Time/
+      I had some extranous parens in Makefile.pl, now
+      at least Makefile.pl should run now.
+2.22  Sun Oct 29 22:53:54 CET 2006 @954 /Internet Time/
+      updated documentation,
+      minor code cleanups.

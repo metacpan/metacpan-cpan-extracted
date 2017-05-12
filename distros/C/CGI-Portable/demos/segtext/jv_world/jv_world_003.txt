@@ -1,0 +1,23 @@
+# _rename_named_args( ARGS, RENAME[, USE_DASHES[, LOWERCASE]] )
+# This private method will take a hash ref as input via ARGS and copy it into a 
+# new hash ref, which it returns.  During the copy, hash keys may be renamed in 
+# several ways.  If LOWERCASE is true then the key is lowercase.  If USE_DASHES 
+# is true then the leading character is removed if it is a dash, "-".  Finally, 
+# the keys are looked up using the hash ref RENAME, and if there are matching 
+# keys then the associated RENAME values are substituted.  If any key is 
+# renamed to the empty string or undef then it is deleted.
+
+sub _rename_named_args {
+	my ($self, $rh_args, $rh_rename, $use_dashes, $lowercase) = @_;
+	my %args_out = ();
+	foreach my $key (sort keys %{$rh_args}) {
+		my $value = $rh_args->{$key};
+		$lowercase and $key = lc( $key );  # change to lowercase
+		$use_dashes and substr( $key, 0, 1 ) eq '-' and 
+			$key = substr( $key, 1 );  # remove leading "-"
+		exists( $rh_rename->{$key} ) and $key = $rh_rename->{$key};  # chg alias
+		$args_out{$key} = $value;
+	}
+	delete( $args_out{''} );  # remove unwanted elements
+	return( \%args_out );
+}

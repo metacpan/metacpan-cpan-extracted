@@ -1,0 +1,156 @@
+NAME
+    Catalyst::Plugin::ConfigLoader - Load config files of various types
+
+SYNOPSIS
+        package MyApp;
+
+        # ConfigLoader should be first in your list so
+        # other plugins can get the config information
+        use Catalyst qw( ConfigLoader ... );
+
+        # by default myapp.* will be loaded
+        # you can specify a file if you'd like
+        __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => 'config.yaml' } );
+
+      In the file, assuming it's in YAML format:
+
+        foo: bar
+
+      Accessible through the context object, or the class itself
+
+       $c->config->{foo}    # bar
+       MyApp->config->{foo} # bar
+
+DESCRIPTION
+    This module will attempt to load find and load a configuration file of
+    various types. Currently it supports YAML, JSON, XML, INI and Perl
+    formats. Special configuration for a particular driver format can be
+    stored in "MyApp->config->{ 'Plugin::ConfigLoader' }->{ driver }". For
+    example, to pass arguments to Config::General, use the following:
+
+        __PACKAGE__->config( 'Plugin::ConfigLoader' => {
+            driver => {
+                'General' => { -LowerCaseNames => 1 }
+            }
+        } );
+
+    See Config::Any's "driver_args" parameter for more information.
+
+    To support the distinction between development and production
+    environments, this module will also attemp to load a local config (e.g.
+    myapp_local.yaml) which will override any duplicate settings. See
+    get_config_local_suffix for details on how this is configured.
+
+METHODS
+  setup( )
+    This method is automatically called by Catalyst's setup routine. It will
+    attempt to use each plugin and, once a file has been successfully
+    loaded, set the "config()" section.
+
+  load_config
+    This method handles loading the configuration data into the Catalyst
+    context object. It does not return a value.
+
+  find_files
+    This method determines the potential file paths to be used for config
+    loading. It returns an array of paths (up to the filename less the
+    extension) to pass to Config::Any for loading.
+
+  get_config_path
+    This method determines the path, filename prefix and file extension to
+    be used for config loading. It returns the path (up to the filename less
+    the extension) to check and the specific extension to use (if it was
+    specified).
+
+    The order of preference is specified as:
+
+    *   $ENV{ MYAPP_CONFIG }
+
+    *   $ENV{ CATALYST_CONFIG }
+
+    *   "$c->config->{ 'Plugin::ConfigLoader' }->{ file }"
+
+    *   "$c->path_to( $application_prefix )"
+
+    If either of the first two user-specified options are directories, the
+    application prefix will be added on to the end of the path.
+
+  get_config_local_suffix
+    Determines the suffix of files used to override the main config. By
+    default this value is "local", which will load "myapp_local.conf". The
+    suffix can be specified in the following order of preference:
+
+    *   $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }
+
+    *   $ENV{ CATALYST_CONFIG_LOCAL_SUFFIX }
+
+    *   "$c->config->{ 'Plugin::ConfigLoader' }->{ config_local_suffix }"
+
+    The first one of these values found replaces the default of "local" in
+    the name of the local config file to be loaded.
+
+    For example, if $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX } is set to "testing",
+    ConfigLoader will try and load "myapp_testing.conf" instead of
+    "myapp_local.conf".
+
+  finalize_config
+    This method is called after the config file is loaded. It can be used to
+    implement tuning of config values that can only be done at runtime. If
+    you need to do this to properly configure any plugins, it's important to
+    load ConfigLoader before them. ConfigLoader provides a default
+    finalize_config method which walks through the loaded config hash and
+    calls the "config_substitutions" sub on any string.
+
+  config_substitutions( $value )
+    This method substitutes macros found with calls to a function. There are
+    a number of default macros:
+
+    *   "__HOME__" - replaced with "$c->path_to('')"
+
+    *   "__ENV(foo)__" - replaced with the value of $ENV{foo}
+
+    *   "__path_to(foo/bar)__" - replaced with "$c->path_to('foo/bar')"
+
+    *   "__literal(__FOO__)__" - leaves __FOO__ alone (allows you to use
+        "__DATA__" as a config value, for example)
+
+    The parameter list is split on comma (","). You can override this method
+    to do your own string munging, or you can define your own macros in
+    "MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions }". Example:
+
+        MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
+            baz => sub { my $c = shift; qux( @_ ); }
+        }
+
+    The above will respond to "__baz(x,y)__" in config strings.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+CONTRIBUTORS
+    The following people have generously donated their time to the
+    development of this module:
+
+    *   Joel Bernstein <rataxis@cpan.org> - Rewrite to use Config::Any
+
+    *   David Kamholz <dkamholz@cpan.org> - Data::Visitor integration
+
+    *   Stuart Watt - Addition of ENV macro.
+
+    Work to this module has been generously sponsored by:
+
+    *   Portugal Telecom <http://www.sapo.pt/> - Work done by Joel Bernstein
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2010 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Catalyst
+
+    *   Catalyst::Plugin::ConfigLoader::Manual
+
+    *   Config::Any
+

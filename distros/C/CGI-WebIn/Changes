@@ -1,0 +1,85 @@
+Revision history for Perl extension CGI::WebIn.
+
+1.00  Wed Aug 22 22:29:01 2001
+	- original version; created by h2xs 1.21 with options
+		-c -v 1.00 -n CGI::WebIn
+
+1.01  Tue Mar 12 19:34:00 2002
+    - lots of fixes;
+    - fixed DropCookie() bug.
+
+1.02  Wed Mar 20 22:21:00 2002
+    - fixed SetCookie(): if expires time is not /[+-]\d+/, it
+      is the local time stamp (1.01 used bad /[+-]?\d+/ regexp).
+    - fixed bug with no URLDecode call for usual cookies.
+
+1.03  Tue Apr 2 22:00:00 2002
+    - improved algorythm of parse {...} constructions: now you may
+      write A{'aaa\'bbb'} and even A{'aa}bb'}.
+    - fixed bug with trailing and invalid % in QUERY_STRING: 
+      no vagueness now.
+
+1.10  
+  Thu Jul 11 18:00:00 2002:
+    - No C-code now, only Perl (URLEncode/URLDecode) to simplify 
+      the module.
+    - Now module uses strict.
+    - Fixed bug with possibility of overwrite exist variables by
+      exported parameters.
+    - Fixed bug with parameter names like "A::b". Now parameter 
+      keys must be alphanumerical only.
+    - No \r cutting now, only \r\n|\n\r -> \n, maybe good for Macs.
+    - _processPar completely re-written.
+    - Added warning messages for parameter name like a[N]. N must 
+      be numerical only and < 10000.
+    - Added warning for bad parameter names (like "{a}{b}" instead 
+      of "a{b}").
+    - Now "a[]=b" means "a[-1]=b", and "a{}=b" still means "a{b}=b".
+    - Fixed bug with incorrect processing of "a{'a\'}{b'}".
+    - Now types are controlled strictly, warning messages are added.
+      For example, this QUERY_STRING generates warning (mismatched 
+      parameter type ARRAY instead of SCALAR): "a=10&a{b}=20".
+  Fri Jul 12 18:00:00 2002:
+    - _parseMultipart completely re-written (some optimizations).
+    - Now module uses File::Temp to create temporary upload files
+      (instead of own functions), maybe more universal and good 
+      for Macs.
+  Sat Jul 13 18:00:00 2002:
+    - Fixed bug with incorrect processing of upload parameter
+      names like F[] or F{}.
+       
+1.50  Sat Dec 21 02:00:00 2003
+    - Exported form variables now are synonyms (not copies!) of %IN.
+    - In Autoflush mode setting cookie causes error message.
+    - Algorythm or {}-processing is greatly improved.
+    - No XS subs till now!
+    - Fixed bug in tempnam() - now you can upload more one file
+      at the same time.
+
+1.51  Sat Dec 27 20:40:00 2003
+    - Fixed bug with "+" in urlencoded string.
+
+1.60  Wed Dec 31 22:00:00 2003
+    - Published to CPAN.
+
+1.61  Sun Jan 18 05:08:00 2004
+    - Fixed silly bug in URLEncode().
+
+2.00  Sun Feb 14 22:40:00 2004
+    - Fixed bug with autoarrays (QUERY_STRING is like test[]=a&test[]=b).
+    - Merged with old 2.0 frozen project.
+    - AutoLoader and Exporter is not used now.
+    - Function loading on demand (as in CGI.pm).
+    - Improved QUERY_STRING parser: test{'aa\'bc'}, test{'a\\b'} etc.
+    - Error reporting system now silent (GetError() function added).
+    - Autoarray handling improved: test[]{abc}=xxx, test[-10] 
+      and test[12345678] are bad and generate errors.
+
+2.01  Wed Mar 10 14:50:00 2004
+    - Removed all function prototypes.       
+    
+2.02  Mar 9 2006    
+    - Fixed: SetCookie does not work if CGI::WebOut is not present.
+    
+2.03  Oct 19 2006
+    - Fixed: URLEncode() does not encode "=" and "&" characters (and more).

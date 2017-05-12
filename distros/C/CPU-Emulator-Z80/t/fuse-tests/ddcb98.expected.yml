@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  1018:
+    - 80
+name: ddcb98
+registers:
+  AF: 28194
+  AF_: 0
+  BC: 20733
+  BC_: 0
+  DE: 40924
+  DE_: 0
+  HL: 15085
+  HL_: 0
+  I: 0
+  IX: 1054
+  IY: 64889
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,76 @@
+{
+   "abstract" : "a cpanplus backend to build Fedora/RedHat rpms",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "RHEL",
+      "centos",
+      "cpan",
+      "cpanplus",
+      "fedora",
+      "perl",
+      "rhel",
+      "rpm"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS-Dist-Fedora",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::TrailingSpace" : "0"
+         },
+         "requires" : {
+            "CPANPLUS" : "0",
+            "CPANPLUS::Dist::Base" : "0",
+            "CPANPLUS::Error" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "IPC::Cmd" : "0",
+            "POSIX" : "0",
+            "Pod::POM" : "0",
+            "Pod::POM::View::Text" : "0",
+            "Template" : "0",
+            "Text::Wrap" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPANPLUS::Dist::Fedora" : {
+         "file" : "lib/CPANPLUS/Dist/Fedora.pm",
+         "version" : "v0.0.9"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/cpanplus-dist-backends"
+      }
+   },
+   "version" : "v0.0.9",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,12 @@
+NAME
+    Catmandu::Markdown - Catmandu tools for working with markdown data
+
+MODULES
+    Catmandu::Fix::markdown_to_html
+
+AUTHORS
+    Nicolas Franck "<nicolas.franck at ugent.be>"
+
+SEE ALSO
+    Catmandu, Catmandu::Fix , Text::Markdown::Discount
+

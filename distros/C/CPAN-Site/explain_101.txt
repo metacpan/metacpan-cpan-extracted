@@ -1,0 +1,43 @@
+
+*** Changes in release v1.01    2009/09/02 MarkOv
+
+CPAN::Site is old: originally created by Ulrich Pfeifer in 1998,
+it was created for a very simple version of the CPAN install suite.
+The CPAN::Site v1.01 gets rit of a lot of legacy.
+
+* problems
+
+In the original concept, you could both do
+   perl -MCPAN::Site shell   # access local CPAN
+   perl -MCPAN       shell   # access global CPAN
+However, this does not work well together with the "recent" metadata
+cache. Besides, it is "hard" to communicate to all administrators
+which install module to use. Besides, we now have CPANPLUS.
+
+In the original concept, the local 02packages list got created in 
+a $MYCPAN/site/ directory, where the global 02packages list stayed
+on the usual location which is $MYCPAN/modules/.  The only purpose
+of the client-side CPAN::Site module was to redirect the look-ups
+to the /site/ directory.  However, in the current CPAN.pm implementation,
+there are many spots which have hardcoded references to the modules
+directory... and these spots are not easy to override.
+
+The original implementation scanned through the tar archives in binary.
+It was not able to handle all features of tar.
+
+* solutions
+
+The organization on your local server will be changed:
+   = was =             = became =
+   $MYCPAN/modules/    $MYCPAN/global/
+   $MYCPAN/site/       $MYCPAN/modules/
+With this renaming, we avoid the need to install CPAN::Site client-side.
+The only thing now needed client-side, is to configure urllist to your
+local CPAN and to set the index_expire time very short.
+
+. The deprecated mkpackages scripts has been removed.
+. Environment variables reduce the option overhead.
+. External gzip got replaced by Perl module IO::Zlib
+. Probably, the server can now run on Windows as well (untested)
+. Better support for pure local CPAN.
+. Binary scan of the tar file was replace by Archive::Tar

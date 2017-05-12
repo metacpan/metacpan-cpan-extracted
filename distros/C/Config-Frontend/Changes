@@ -1,0 +1,27 @@
+0.18 Tests added in MANIFEST (shit).
+
+0.17 Rename/move method added
+
+0.16 Properties added.
+
+0.11 Changed namespace from Conf to Config::Frontend;
+     Config::Backend for the backends.
+
+0.10 Documentation errors --> immidiately :-o!
+
+0.09 test case 3.t wrong
+
+0.08 Added 'del' function to remove a key.
+
+0.04 Removed Conf::SQL from this package and made it a package
+     on it's own.
+
+0.03 Documentation: Conf::SQL was named Conf::SQL - the *file* backend...
+	is now Conf::SQL - the SQL backend...
+
+0.02 Changed the interface for Conf::SQL.
+
+0.01  Mon Mar 29 14:36:50 2004
+	- original version; created by h2xs 1.22 with options
+		-X Conf
+

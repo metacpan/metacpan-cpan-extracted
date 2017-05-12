@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.txt
+dist.ini
+lib/CGI/Application/Plugin/Config/Std.pm
+t/author-perlcritic.t
+t/author-pod-coverage.t
+t/author-pod.t
+t/lib/cgi/application/plugin/config/std.t
+t/test.conf
+t/test.ini
+t/test_unwriteable.ini
+xt/author/perlcriticrc

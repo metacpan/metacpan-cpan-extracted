@@ -1,0 +1,16 @@
+PPMD_Encoder_Perl * T_OBJECT
+PPMD_Decoder_Perl * T_OBJECT
+
+OUTPUT
+T_OBJECT
+	sv_setref_pv( $arg, CLASS, (void *)$var);
+
+INPUT
+T_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		die( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+

@@ -1,0 +1,11 @@
+0.004     2016-09-16 03:01:25 EDT
+  - Further optimize generated accessors for chaining case (thanks haarg)
+
+0.003     2016-09-10 15:55:29 EDT
+  - Optimize generated accessors similarly to Class::Tiny 1.006
+
+0.002     2015-12-17 18:26:18 EST
+  - Removed non-core dependencies
+
+0.001     2015-10-30 12:18:23 EDT
+  - First release

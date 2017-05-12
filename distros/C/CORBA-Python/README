@@ -1,0 +1,39 @@
+CORBA::Python - IDL compiler to language Python mapping
+
+Description:
+------------
+    This package supplies the following tools :
+    idl2py : IDL compiler to Python
+    idl2pyemb : IDL compiler to Python embedded with C 
+    idl2pyext : IDL compiler to Python extension with C
+    idl2pycli : RPC-GIOP client stub generator
+    idl2pysrv : RPC-GIOP server skeleton generator
+
+Prerequisites:
+--------------
+    CORBA::IDL
+    CORBA::C
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation 
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    Python Language Mapping are available on <http://www.omg.org/>.
+
+    Python Documentation are available on <http://www.python.org/>
+    - Extending and Embedding the Python Interpreter
+    - Python/C API Reference Manual
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+	$ python setup.py install
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

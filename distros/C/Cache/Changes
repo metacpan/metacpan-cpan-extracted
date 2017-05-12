@@ -1,0 +1,95 @@
+2015-02-24
+    - Make sure t/file_lru.t skips all tests if Time::HiRes isn't installed.
+        - See https://rt.cpan.org/Ticket/Display.html?id=102316
+        - Thanks to Otto J. Makela for the report.
+    - Bugfix/maintenance release (2.11)
+
+2014-05-13
+    - Fix a small grammar in the docs (double "as") reported by pink_mist.
+        - Thanks, pink_mist!
+    - Another fix for a small typo by pink_mist.
+        - Thanks again.
+    - Add Cache category of warnings to make sure warnings do not emit
+    an error.
+        - See https://rt.cpan.org/Public/Bug/Display.html?id=95608
+        - Thanks to Gabor Szabo for the report.
+    - Bugfix/maintenance release (2.10)
+
+2014-02-02
+    - Use Digest::SHA instead of Digest::SHA1
+        - Digest::SHA is core and preferred by Debian.
+        - https://rt.cpan.org/Ticket/Display.html?id=92658
+    - Bugfix/maintenance release (2.09)
+
+2014-01-26
+    - Convert from use "warnings::register;" to "use warnings;".
+    - Bugfix/maintenance release (2.08)
+
+2014-01-26
+    - Add perl to the prereq in META.yml/META.json
+        - Kwalitee / CPANTS
+    - Bugfix/maintenance release (2.07)
+
+2013-09-13
+    - Increase the delay of the cache invalidation in the tests by default to
+    avoid test failures due to high load.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=27280
+        - One can set the PERL_CACHE_PM_TESTING environment variable to a true
+        value to set it back at a quicker-to-run 1 second delay.
+        - Thanks to ANDK for reporting it.
+    - Fix Bug in Cache::Memory regarding Namespaces
+        - https://rt.cpan.org/Ticket/Display.html?id=32339 .
+        - ->set after ->set_namespace failed.
+        - Thanks to justin@techadvise.com for the report and for a proposed
+        fix.
+    - Get rid of trailing space.
+        - Add t/style-trailing-space.t
+    - Bugfix/maintenance release (2.06)
+
+2013-09-05
+    - Add t/pod.t and got the embedded PODs to validate.
+    - Convert the Build system to Module-Build.
+    - Fix https://rt.cpan.org/Ticket/Display.html?id=78817
+        - Fix a warning for lc called with undef value
+        when "-w" is specified - during some tests.
+    - Tests fail or get stuck on Windows - use Devel::AssertOS to make sure
+    we don't build there.
+        - https://rt.cpan.org/Ticket/Display.html?id=81386
+        - if a kind soul will fix the tests and/or the code on MSWin, we will
+        remove it.
+    - Bugfix/maintenance release (2.05)
+
+2006-02-01
+	- Bugfix release (2.04)
+	- Fix for failure to call load_callback when verify_callback
+	  fails the result (credit to Chris Fletcher).
+
+2005-11-08
+	- Fix for set_expiry in Cache::Memory (credit to Sean M. Egan).
+
+2005-10-20
+	- Bugfix release (2.03)
+	- Fix for cache_umask: individual files were not created with correct
+	  permissions (credit to Chris Huegle).
+
+2004-03-23
+	- Bugfix release (2.02)
+	- Update require to 5.006 since 'use warnings' depends on it
+	  (credit to Adam Kennedy).
+	- Fixed a comparison issue with DB_File, where it can compare undef's.
+
+2003-12-15
+	- Fixed the Cache::freeze() shortcut method which wasn't passing
+	  arguments to Cache::Entry::freeze() (credit to Ingo Blechschmidt).
+
+2003-08-18
+	- Bugfix release (2.01)
+	 o Fixed parsing of all digit expiry times
+	 o Fixed use of scalar validity in Cache::Memory
+	 o Allowed validity to be set on non-existant entry
+	   (sets entry data to zero length)
+	 o Fixed package name for Cache::Memory::HeapElem
+	 o Documentation fixes
+
+2003-07-07
+	- Initial release (2.00)

@@ -1,0 +1,9 @@
+
+After looking around for a simple way to send encrypted email to Outlook,
+Mozilla and Netscape email clients, the modules had requirements that
+required installing and/or compiling other software.  This module is a simple
+and secure method of sending encrypted email.
+
+No encrypted files are written to the hard drive.  So there's no chance
+of others accessing the information.  The only files stored on the hard drive
+is public keys/certificates

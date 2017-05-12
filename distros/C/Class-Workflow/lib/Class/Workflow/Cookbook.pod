@@ -1,0 +1,280 @@
+=pod
+
+=head1 NAME
+
+Class::Workflow::Cookbook - Common recipes with L<Class::Workflow>.
+
+=head1 DESCRIPTION
+
+L<Class::Workflow> is a generic, abstract system. This document is supposed to
+fill the gap between that and the practical, for a few simple examples.
+
+=head1 ADDING STATE TO AN OBJECT
+
+The most common usage for workflows is adding arbitrary, complex state to data
+objects, thus making them stateful. A canonical example of a data object is an
+issue tracker ticket. Its fields are changed over the course of it's lifetime,
+but must be changed within a very specific workflow.
+
+There are several approaches for this:
+
+=head2 Delegate instance
+
+This is my favourite method. Basically your own derivative of
+L<Class::Workflow::Instance> is a delegate of your item:
+
+	warn "The ticket is: " . $ticket->workflow_instance->state->name; # the state
+
+Applying transitions amounts to:
+
+	my $instance = $ticket->workflow_instance;
+
+	my $new_instance = $transition->apply( $instance, @args );
+
+	$ticket->workflow_instance($new_instance);
+
+With the history encapsulated in C<< $ticket->workflow_instance->prev >>.
+
+This is easily captured in a pattern:
+
+	sub apply_transition {
+		my ( $self, $transition, @args ) = @_;
+
+		$self->_workflow_txn(sub{
+			my ( $self, $instance ) = @_;
+			$transition->apply( $instance, @args );
+		});
+	}
+
+	sub _workflow_txn {
+		my ( $self, $sub ) = @_;
+
+		my $new_instance = eval { $self->$sub($self->workflow_instance) };
+
+		if ( defined $new_instance ) {
+			$self->workflow_instance($new_instance);
+		} elsif ( $@ ) {
+			die $@;
+		} else {
+			die "$sub did not return a new workflow instance";
+		}
+	}
+
+See F<examples/dbic> for a more complicated implementation of C<_workflow_txn>,
+tying in database transactions.
+
+=head2 Translation
+
+In this pattern the fields of the instance are translated back to the item,
+mutating it.
+
+Here is a trivial example:
+
+	my $instance = MyInstance->new(
+		$ticket->get_fields,     # return all the fields of the ticket
+		state => $ticket->state, # assumes ->state returns an object
+	);
+
+	my $new_instance = $transition->apply( $instance, @args );
+
+	$ticket->set_fields( $instance->get_fields );
+	$ticket->state( $instance->state );
+
+Keeping an audit log becomes a little tricker here, but might be eased by the
+L<Class::Workflow::Util::Delta> object, which computes the changed L<Moose>
+attributes from an instance to a derived instance (multiple levels of ancestry
+are allowed).
+
+=head2 Data-less instance
+
+Yet another way is to just not use the workflow as a data object, instead using
+it just to keep state.
+
+This way requires the least code changes from the items you are adding
+statefulness to, but provides the least value back.
+
+	my $take_ownership = Class::Workflow::Transition::Simple->new(
+		to_state => $taken,
+		body => sub {
+			my ( $self, %args ) = @_;
+
+			my $ticket = $args->{ticket};
+
+			$ticket->set_owner( $args{user} );
+		}
+	);
+
+	# ...
+
+	my $instance = MyInstance->new( state => $ticket->state );
+
+	my $new_instance = $take_ownership->apply( $instance,
+		ticket => $ticket,
+		user   => $user,
+	);
+
+	# the ticket is now owned by $user
+	$ticket->state( $new_instance->state );
+
+This is useful when you are more concerned about the validation of the control
+flow. Look into L<Class::Workflow::Transition::Validate::Simple> for facilities
+that may interest you.
+
+Using that role validation and application become two somewhat distinct steps,
+and errors in validation prevent actual application from happening, allowing a
+consistent state to be preserved.
+
+=head1 SERIALIZATION
+
+Serialzing your instances is a problem related to L</PERSISTENCE>.
+
+However, there are more solutions than just keeping the instance in the
+database.
+
+If your workflow is dynamic and the transition bodies are not closure
+attributes of the transition class, but a real method, then theoretically you
+can just serialize the instance, and the workflow definition will be serialized
+along side it due to the links to C<state>, C<transition> and C<prev>.
+
+Usually this solution isn't so useful though, and you want just the instance
+definitions, so the best solution is to go through the instance fields and just
+serialize that:
+
+	sub unpack_instance {
+		my ( $self, $instance ) = @_;
+		my %attrs = map { $_->name => $_ } instance->meta->get_all_attributes;
+		my ( $state, $transition, $prev ) = delete @attrs{qw(state transition prev)};
+		return $self->__deflate_workflow_instance( $instance, $state, $transition, $prev, values %attrs );
+	}
+
+	sub _unpack_instance {
+		my ( $self, $instance, @attrs ) = @_;
+		my ( $state, $transition, $prev, @reg_attrs ) = @attrs;
+		return unless $instance;
+		$state      = $state->get_value($instance);
+		$transition = $transition->get_value($instance);
+		$prev = $self->__deflate_workflow_instance( $prev->get_value($instance), @attrs );
+		return {
+			$prev       ? ( prev       => $prev )             : (),
+			$state      ? ( state      => $state->name )      : (),
+			$transition ? ( transition => $transition->name ) : (),
+			map { $_->name => $_->get_value($instance) } @reg_attrs
+		}
+	}
+
+	sub pack_instance => as {
+		my ( $self, $instance, $wf ) = @_;
+		return unless $instance;
+		my $prev = $self->_inflate_workflow_instance( $instance->{prev}, $wf );
+
+		$wf->instance_class->new(
+			%$instance,
+			$prev ? ( prev => $prev ) : (),
+			$instance->{state} ? ( state => $wf->get_state( $instance->{state} ) ) : (),
+			$instance->{transition} ? ( transition => $wf->get_transition( $instance->{transition} ) ) : (),
+		);
+	}
+
+If you're doing this in a web application make sure to use L<Digest::HMAC> or
+something like that to authenticate the data, or the user could inject data
+into your workflow.
+
+=head1 PERSISTENCE
+
+=head2 KiokuDB
+
+For L<KiokuDB> based storage you needn't do anything to get started.
+
+You probably want to add the C<KiokuDB::Lazy> trait to the various attributes to
+prevent loading of unnecessary objects.
+
+=head2 General concerns
+
+There are two levels of persistence you could choose from. The more
+trivial one is that of the workflow state data.
+
+This means that the workflow definition (states and transitions) is defined and
+from some static location every time the program starts (probably it's own
+C<.pm> file, or L<Class::Workflow::YAML>), but the L<Class::Workflow::Instance>
+objects live in a database. The links to the states must be inflated using the
+static workflow definition.
+
+The other way would be storing the entire workflow definition in persistent
+storage as well (all the state and transition definitions).
+
+=head2 DBIx::Class
+
+=head3 Storing Instances
+
+There are two general approaches for storing L<Class::Workflow::Instance> type
+objects in a data store of some sort.
+
+See F<examples/dbic> for actual working code.
+
+If you elected to use a workflow instance delegate for your data items, which
+presumably also live in the database, then a simple relationship where the item
+has a foreign key pointing to the current workflow instance in the instances
+table is going to do the trick.
+
+In this case you have the full instance history preserved in the instances table.
+
+An alternative approach is to maintain just the current instances live, and use
+L<Class::Workflow::Util::Delta> to write changes to an audit log instead,
+skipping unchanged fields.
+
+When the data is saved to the database, the chain of workflow instances is
+walked and the delta between each one is computed, and saved to the log.
+
+Then the workflow instance is overwritten with the new data.
+
+When the data is loaded C<prev> is undefined, but could be lazily reconstructed
+from the audit log if necessary.
+
+This solution is more compact on disk but involves a lot more work.
+
+=head3 Storing Everything
+
+If you'd like to additionally have an editable, persistent workflow definition
+in the database, look at F<examples/dbic>.
+
+=head1 MULTIPLE INSTANCES
+
+Complex workflows may involve branch and sync points for instances.
+
+Branching is trivial due to the purely functional design of
+L<Class::Workflow::Instance>:
+
+	my $instance = ...;
+
+	my $branch_a_instance = $transition_a->apply( $instance, ... );
+
+	my $branch_b_instance = $transition_b->apply( $instance, ... );
+
+	$branch_b_instance->prev == $branch_a_instance->prev == $instance;
+
+There are no built in facilities for synchronization though. The process
+generally involves two instances converging on a single state:
+
+	my ( $instance_a, $instance_b ) = ...; # two separate instances
+
+	my $new_a = $transition_a->apply( $instance_a, ... );
+
+	my $new_b = $transition_b->apply( $instance_b, ... );
+
+	$new_a == $new_b; # the transitions point to the same state
+
+	my $merged = $some_helper->merge( $new_a, $new_b );
+
+this is very specific to your changing needs, so no reusable solution is
+packaged with L<Class::Workflow>.
+
+The simplest way to go about this is to make a custom type of instance that
+provides multiple C<prev> entries.
+
+Merging of fields is yet another concern. 3 way merge algorithms exist on the
+CPAN but will probably not work out of the box.
+
+If a concrete pattern does emerge from your work please feel free to submit it
+to the cookbook, release it on the CPAN, etc.
+
+=cut

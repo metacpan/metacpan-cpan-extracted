@@ -1,0 +1,33 @@
+---
+abstract: 'Persistent session data in CGI applications'
+author:
+  - 'Steve Kemp <steve@steve.org.uk>'
+build_requires:
+  File::ShareDir::Install: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  Test::Strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Session-Driver-redis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Session: '4'
+  Redis: '0'
+resources:
+  bugtracker: https://github.com/skx/CGI--Session--Driver--redis/issues
+  homepage: https://github.com/skx/CGI--Session--Driver--redis/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/skx/CGI--Session--Driver--redis.git
+version: '0.7'

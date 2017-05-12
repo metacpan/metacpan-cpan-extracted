@@ -1,0 +1,38 @@
+=head1 NAME
+
+Class::AutoDB::Registration - One registration for
+Class::AutoDB::Registry
+
+=head1 SYNOPSIS
+
+This is a helper class for Class::AutoDB::Registry which represents one
+entry in a registry.
+
+ use Class::AutoDB::Registration;
+ my $registration=new Class::AutoDB::Registration
+   (-class=>'Class::Person',
+    -collection=>'Person',
+    -keys=>qq(name string, dob integer, significant_other object, 
+              friends list(object)),
+    -transients=>[qw(age)],
+    -auto_gets=>[qw(significant_other)]);
+ 
+ # Set the object's attributes
+ my $collection=$registration->collection;
+ my $keys=$registration->keys;
+ my $transients=>$registration->transients;
+ my $auto_gets=>$registration->auto_gets;
+
+=head1 DESCRIPTION
+
+This class represents essentially raw registration information
+submitted via the 'register' method of Class::AutoDB::Registry. This
+class parses the 'keys' parameter, but does not verify that attribute
+names and data types are valid. This class I<does not talk to the
+database>.
+
+The 'keys' parameter consists of attribute, data type pairs, or can
+also be an ARRAY ref of attribute names. In the latter case the data
+type of each attribute is assumed to be 'string'.
+
+=cut

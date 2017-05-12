@@ -1,0 +1,33 @@
+---
+abstract: 'Read and write configuration data through Augeas'
+author:
+  - 'Dominique Dumont (ddumont at cpan dot org)'
+build_requires:
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0.11'
+  version: '0.77'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-Backend-Augeas
+provides:
+  Config::Model::Backend::Augeas:
+    file: lib/Config/Model/Backend/Augeas.pm
+    version: '0.119'
+requires:
+  Config::Augeas: '0.303'
+  Config::Model: '2.034'
+  Exception::Class: '0'
+  Log::Log4perl: '1.11'
+  Mouse: '0'
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+version: '0.119'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,44 @@
+CGI::Alert version 2.08
+=======================
+
+CGI::Alert notifies a developer of problems in a CGI script.
+
+Usage is simple.  Insert this line near the top of your CGI script:
+
+	use CGI::Alert	'My Name <my.addr@my.domain>';
+
+If the script terminates abnormally (e.g. via 'die'), or if there
+are warnings emitted during execution, an email message is sent
+to the given address with details of the failure.  If termination
+is due to 'die', a friendly message is displayed to the web user.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+CGI::Alert uses the 'param' function from CGI.pm, if available.
+
+CGI::Alert requires a working /usr/sbin/sendmail or /usr/lib/sendmail.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2013 Eduardo Santiago
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+ACKNOWLEDGMENTS
+
+Thanks to Jim Meyering <jim at meyering dot net> for motivating
+me to clean this up and release it, and for providing copious
+suggestions and review comments.

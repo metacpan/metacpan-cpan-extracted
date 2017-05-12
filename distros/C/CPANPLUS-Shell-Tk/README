@@ -1,0 +1,34 @@
+CPANPLUS/Shell/Tk version 0.02
+==============================
+
+CPANPLUS::Shell::Tk is a graphical user interface for CPANPLUS using Tk.
+
+To use CPANPLUS with the Tk GUI do:
+
+perl -MCPANPLUS -e 'shell(Tk)'
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+  Tk::MListbox
+  Tk::Pod
+  Tk::Splashscreen
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Bernd Dulfer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

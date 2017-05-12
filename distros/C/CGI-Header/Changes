@@ -1,0 +1,572 @@
+Revision history for Perl extension CGI::Header.
+
+0.63 (1.00-RC16) Aug 1st, 2013
+
+  - Merge CGI::Header::Extended into CGI::Header
+
+0.62 (1.00-RC15) Jul 31st, 2013
+
+  - Add CGI::Header::Extended to examples/
+
+0.61 (1.00-RC14) Jun 16th, 2013
+
+  - Add the following modules to examples/:
+      * Blosxom::Header
+      * CGI::Application::Header
+      * CGI::Redirect
+      * CGI::Redirect::Adapter
+      * MyApp::Header
+
+0.60 (1.00-RC13) Jun 16th, 2013
+
+  - Add examples/
+  - mv lib/CGI/Header/Apache2.pm examples/lib/CGI/Header/Apache2.pm
+  - CGI::Header::Apache2 isn't provided by this distribution.
+
+0.59 (1.00-RC12) Jun 11th, 2013
+
+  - Remove CGI::Header#redirect and location
+
+0.58 (1.00-RC11) Jun 5th, 2013
+
+  - CGI::Header::Apache2 updates request_rec->status_line properly
+
+0.57 (1.00-RC10) Jun 1st, 2013
+
+  - CGI::Header::Standalone is separated into CGI::Header::Adapter
+    and Apache2. Apache1 is not available at this time.
+
+0.56 (1.00-RC9) May 31st, 2013
+
+  - finalize() prints to STDOUT using CGI#print
+
+  [ROADMAP]
+
+    CGI::Header::Standalone will be separated into CGI::Header::Apache1
+    and Apache2. For example, CGI::Header::Apache2 inherits from
+    CGI::Header::Adapter which is a base class for adapters.
+
+0.55 (1.00-RC8) May 22nd, 2013
+
+  - Add CGI::Header::Standalone again as the alternative to CGI::Header
+
+0.54 (1.00-RC7) May 20th, 2013
+
+  - Rename CGI::Header#as_string to "finalize" since CGI.pm's header()
+    method returns an empty string in "mod_perl" environment
+  - Remove CGI::Header::Standalone
+
+0.53 (1.00-RC6) May 19th, 2013
+
+  [DOCUMENTATION]
+
+    - update EXAMPLES
+
+0.52 (1.00-RC5) May 14th, 2013
+
+  - Add tests for CGI::Header#clone. POD explains how CGI::Header copies
+    its instances.
+  - CGI::Header::Standalone#as_string removes CRLF from Status-Line properly.
+  - Tests require Test::MockTime (Thanks to CPAN Testers)
+
+0.51 (1.00-RC4) May 13th, 2013
+
+  - Add CGI::Header::Standalone that doesn't depend on CGI.pm's
+    header() method
+  - Add clone() method to CGI::Header
+
+0.50 (1.00-RC3) Apr 23rd, 2013
+
+  - Tests don't depend on Test::Exception (Thanks to CPAN testers)
+
+0.49 (RC-1.00) Apr 22nd, 2013
+
+  - Remove rehash(). new() normalizes property names automatically.
+
+0.48 (RC-1.00) Apr 20th, 2013
+
+  - Add EXAMPLES to POD
+  - Add tests for EXAMPLES
+  - Tests require CGI::Simple
+  - Release candidate for CGI::Header 1.00 (RC-1.00)
+
+0.47  Apr 12th, 2013
+
+  - Remove handler() and add redirect() instead
+  - Rename cookie() to cookies() since the "cookie" property can be an
+    arrayref
+  - Remove push_cookie(). It's up to you to decide how to manage HTTP cookies.
+    For example, Plack::Response#cookies behaves like HASH. On the other
+    hand, Mojo::Message::Response#cookies behaves like ARRAY.
+
+0.46  Apr 11th, 2013
+
+  - Remove CGI::Header::PSGI from this distribution. Sorry for confusing
+    changes.
+  - Simplify cookie() and p3p()
+  - push_cookie() creates CGI::Cookie object automatically
+
+0.45  Apr 10th, 2013
+
+  - Add CGI::Header::PSGI to this distribution and rewrite the module
+    entirely.
+
+  [INCOMPATIBLE CHANGES]
+
+    - Rewrite test suite entirely
+    - Remove flatten() and as_hashref() from CGI::Header
+
+0.44  Apr 9th, 2013
+
+  [INCOMPATIBLE CHANGES]
+
+    - Revise new() entirely
+
+0.43  Apr 8th, 2013
+
+   [INCOMPATIBLE CHANGES]
+
+    - Remove dispatch tables used by set() and delete()
+    - Remove tie() interface
+
+0.42  Apr 8th, 2013
+
+  - Add handler() attribute which defaults to 'header'.
+    If handler() is set to 'redirect', as_string() will invoke:
+
+        $h->query->redirect( $h->header )
+
+  [INCOMPATIBLE CHANGES]
+
+    - Remove CGI::Header::Redirect and t/31_cgi_redirect.t
+    - Remove t/32_nph_pragma.t
+    - Remove push_p3p()
+
+0.41  Apr 8th, 2013
+
+  - CGI::Header::Redirect is obsolete and will be removed in 0.42
+
+  [INCOMPATIBLE CHANGES]
+
+  - Simplify get() and exists(). Namely,
+
+      $h->get('Content-Type');
+      $h->exists('Content-Type');
+
+    become:
+
+      $h->as_hashref->{'Conetent-Type'};
+      exists $h->as_hashref->{'Content-Type'};
+
+  - Remove the following methods:
+      * is_empty
+      * field_names
+      * is_empty
+      * SCALAR
+      * p3p_tags
+
+  - Normalized property names doesn't start with a dash,
+    and also use dashes instead of underscores:
+
+      "-Content_Length" -> "content-length"
+
+  [ROADMAP]
+
+    Dispatch tables used by get(), set(), exists() and delete() will be
+    removed gradually, and so ver. 0.4x will be quite unstable.
+    Sorry for your inconvenience.
+
+0.40  Apr 7th, 2013
+
+  - field_names() is obsolete and will be removed in 0.41
+  - Add as_hashref(). get() and exists() will be replaced with this method:
+     
+      $h->get('Content-Type'); # <=> $h->as_hashref->{'Content-Type'}
+      $h->exists('Content-Type'); # <=> exists $h->as_hashref->{'Content-Type'}
+
+  - p3p_tags() is obsolete and will be renamed to p3p() in 0.41
+  - each() is obsolete and will be removed in 0.41
+  - is_empty() is obsolete and will be removed in 0.41
+  - Add the following methods:
+        * charset
+        * cookie
+        * location
+        * push_cookie
+        * push_p3p
+        * status
+        * target
+        * type
+
+  [INCOMPATIBLE CHANGES]
+
+    - Doesn't overload '""' and 'bool' anymore
+    - flatten() doesn't accept any argument
+
+0.35  Mar 22nd, 2013
+
+  - lc() is obsolete and will be removed in 0.36
+  - get(), set(), exists() or delete() throws an exception
+    in the following situation:
+
+      $header->set( 'Type' => 'text/plain' );
+      # die "'-type' can't be used as a field name"
+
+  - SCALAR returns true if the -nph pragma is enabled
+  - Since the following class methods are unstable,
+    they are not documented:
+
+      * normalize_field_name
+      * normalize_property_name
+      * get_property_names
+      * is_reserved_name
+      * get_alias
+
+0.34  Mar 16th, 2013
+
+  - Add support for -nph pragma:
+
+      use CGI qw(-nph);
+      my $h = CGI::Header->new;
+      $h->nph; # => true
+
+    If -nph pragma is enabled, you can't set nph() to FALSE:
+
+      $h->nph(0); # die "Modification of a read-only value attempted"
+
+    You can check whether the pragma is enabled or not as follows:
+
+      $h->query->nph; # <=> $CGI::NPH
+
+    You can also set $CGI::NPH to FALSE:
+
+      $h->query->nph(0);
+      $h->nph(0); # lives_ok
+
+0.33  Mar 15th, 2013
+
+  - Add tests for CGI::Header::Redirect
+  - Fix POD: "CGI::Header::Redirect#is_empty always returns false"
+  - Update dispatch tables to maintain this module more easily
+  - Add the following class methods:
+      * time2str
+      * normalize
+
+0.32  Mar 9th, 2013
+
+  - Add CGI::Header::Redirect, an adapter for the CGI::redirect() function.
+    CGI::Header::Redirect inherits from CGI::Header, and also overrides
+    some methods.
+
+0.31  Mar 8th, 2013
+
+  - add get_alias() which returns the alias of the given property name:
+
+      my $alias = CGI::Header->get_alias('content_type'); # => 'type'
+
+0.30  Mar 4th, 2013
+
+  - The following operators are overloaded:
+
+      ""   -> as_string
+      bool -> SCALAR
+
+  - env() is obsolete and will be removed in 0.31.
+
+  [DOCUMENTATION]
+
+    Add "WRITING Blosxom PLUGINS" to "EXAMPLES"
+
+  [INCOMPATIBLE CHANGES]
+
+    Summary: env() was replaced with query()
+
+    - Add query() method which returns your query object.
+      You can't pass your current environment (\%ENV) to new() anymore.
+      Namely,
+
+        my $header = { -type => 'text/plain' };
+        my $h = CGI::Header->new( $header, \%ENV );
+
+      become
+
+        use CGI;
+        my $query = CGI->new;
+        my $h = CGI::Header->new( $header, $query );
+
+      query() defaults to $CGI::Q. Functions exported by CGI.pm
+      depends on this query object. In other words, when you choose
+      the procedural interface of CGI.pm, the module behaves like
+      a Singleton class.
+
+        # $query can be omitted when you choose the procedural
+        # interface of CGI.pm
+        my $h = CGI::Header->new( $header );
+
+    - as_string() become a shortcut for:
+
+        $h->query->header( $h->header )
+
+      and so you can't pass $eol to as_string() anymore.
+
+   [ROADMAP]
+
+     CGI::Header is not compatible with CGI::Simple at this time.
+     This module will be adapted to CGI::Simple gradually.
+     (no_cache() isn't supported by CGI.pm, for example)
+
+0.22  Feb 26th, 2013
+
+  This distribution doesn't contain CGI::Header::PSGI anymore,
+  which was separated into another distribution, CGI-Header-PSGI.
+
+  The following files were removed:
+
+    - lib/CGI/Header/PSGI.pm
+    - t/31_psgi_header.t
+    - t/40_psgi_header.t
+    - t/41_psgi_redirect.t
+
+  This distribution doesn't require the following modules anymore:
+
+    - Exporter
+    - CGI::PSGI (for testing)
+
+  There are no code changes besides incrementing the version number
+  since CGI-Header-0.21.
+
+0.21  Feb 25th, 2013
+
+  [CGI::Header::PSGI]
+
+    - psgi_header() is compatible with CGI::Simple's header() method.
+      Namely, psgi_header() can be configured by no_cache() method.
+      If no_cache() isn't available, that method will be ignored simply.
+      And so psgi_header() is compatible with CGI.pm as well.
+
+    - I'm not sure about whether to use Role::Tiny ;)
+
+    - [BUG FIX] psgi_redirect() invokes self_url(), not url()
+
+    - Imports CGI::PSGI's psgi_headers.t and redirect.t
+
+0.20  Feb 24th, 2013
+
+  - Add "REQUIRED METHODS" to CGI::Header::PSGI's POD
+
+0.19  Feb 11th, 2013
+
+  Add CGI::Header::PSGI which exports two methods on demand: psgi_header()
+  and psgi_redirect().
+
+    use parent 'CGI';
+    use CGI::Header::PSGI qw(psgi_header psgi_redirect);
+
+  CGI::Header::PSGI helps you create your own CGI::PSGI-compatible class.
+
+  [INCOMPATIBLE CHANGES]
+
+    - rehash() and new() rename '-uri' and '-url' to '-location'
+
+    - flatten() and each() stringify CGI::Cookie objects by default.
+
+0.18  Feb 9th, 2013
+
+  - You can pass a media type to new() in the following situation:
+
+      my $h = CGI::Header->new('text/plain');
+      $h->header; # => { -type => 'text/plain' }
+
+  - new() throws an exception in the following situation:
+
+      my $h = CGI::Header->new( -foo => 'bar', '-baz' );
+      # die "Odd number of elements in hash assignment"
+
+  [STATE OF THIS MODULE]
+
+    The following methods are unstable:
+
+      - $h->set( 'Content-Type => $value )
+      - $h->set( 'P3P' => $value )
+      - $h->set( 'Expires' => $value )
+
+        I'm not sure about how to process these headers properly at this time.
+
+0.17  Jan 18th, 2013
+
+  [DOCUMENTATION]
+
+    - Add "EXAMPLES" and "DEPENDENCIES"
+
+  [INTERNALS]
+
+    - Fix META.yml ("version" was broken)
+
+0.16  Jan 14th, 2013
+
+  [INCOMPATIBLE CHANGES]
+
+    - rehash() throws an exception when a property name is duplicated:
+
+        my $header = {
+            -Type        => 'text/plain',
+            Content_Type => 'text/html',
+        };
+
+        my $h = CGI::Header->new( $header );
+        $h->rehash; # die "Property '-type' already exists"
+
+      If it was allowed to overwrite existent properties,
+      it would be essentially impossible to predict 
+      the overwritten value of '-type' in the above example:
+
+        $h->header->{-type}; # => 'text/html' or 'text/plain' ?
+
+    - In addition to CGI.pm-compatible HTTP header properties,
+      new() accepts '-env' property which represents your current environment:
+
+        my $h = CGI::Header->new(
+            -type => 'text/plain',
+            -env  => \%ENV,
+        );
+
+        $h->header; # => { -type => 'text/plain' }
+        $h->env;    # => \%ENV
+
+      Unlike the above case, if a property name is duplicated,
+      that property will be overwritten silently:
+
+        my $h = CGI::Header->new(
+            -Type        => 'text/plain',
+            Content_Type => 'text/html',
+        );
+
+        $h->header->{-type}; # => "text/html"
+
+  [INTERNALS]
+
+    Add a subtest called 'as_string()' to t/10_basic.t
+
+0.15  Jan 11th, 2013
+
+  Add env() which defaults to \%ENV. new() receives an additional
+  argument which determines the value of the attribute.
+     my $header = CGI::Header->new({ -type => 'text/plain' }, \%ENV);
+     $header->env; # => \%ENV
+
+  [INTERNALS]
+
+    - Add psgi_headers.t which requires CGI::PSGI
+    - new() returns an object based on a blessed hash.
+
+0.14  Jan 9th, 2013
+
+  - set() and delete() throw exceptions when the specified header field
+    is read-only.
+  - get() returns undef in the following situations:
+
+      $header->header; # => { -expires => q{}, ... }
+      $header->get( 'Expires' ); # => undef
+
+      $header->header; # => { -p3p => q{}, ... }
+      $header->get( 'P3P' ); # => undef
+
+  [INTERNALS]
+
+    id() is aliased to Scalar::Util::refaddr()
+
+0.13  Jan 8th, 2013
+
+  - clear() and each() return the current object itself
+  - set() returns the given value:
+      $header->set( 'Foo' => 'bar' ); # => "bar"
+
+  [BUG FIXES]
+
+    Correct the following warning message:
+      "Can't set '-content_type' to neither undef nor an empty string"
+    This message was replaced with:
+      "Can set '-content_type' to neither undef nor an empty string"
+
+  [DOCUMENTATION]
+
+    Add "Server" and "Date" to "LIMITATIONS" 
+
+0.12  Jan 7th, 2013
+
+  [INTERNALS]
+    - Rename _normalize() to _lc()
+    - Add a benchmark against HTTP::Response->parse
+
+  [DOCUMENTATION]
+    - Add HTTP::Headers to "SEE ALSO"
+
+0.11  Dec 16th, 2012
+  - Add FIRSTKEY() and NEXTKEY(). These methods were implemented to
+    test this module itself.
+  - flatten() receives optional $is_recursive argument
+    which determines whether to flatten the Set-Cookie headers recursively.
+    $is_recursive defaults to true.
+  - flatten() and each() don't stringify CGI::Cookie objects.
+  - field_names() returns a list of field names in a random order
+
+0.10  Dec 14th, 2012
+  - p3p_tags() returns the number of P3P tags
+    instead of the first element in scalar context
+  - rehash() returns the current object itself:
+      my @headers = CGI::Header->new(@args)->rehash->flatten;
+  - each() doesn't depend on field_names().
+    field_names() depends on each().
+    As a result, if Set-Cookie header is multi-valued,
+    field_names() will return a list which contains duplicate values.
+    I don't know how to solve this problem at this time.
+
+0.09  Nov 13th, 2012
+  - CGI.pm has charset() attribute which defaults to 'ISO-8859-1'.
+    CGI::header() function depends on this attribute.
+    I noticed this module depends on the default value, 'ISO-8859-1',
+    and so decided to remove this dependency because this module
+    shouldn't depend on the internal state of CGI.pm.
+    Namely,
+        my $h = CGI::Header->new( -type => 'text/plain' );
+        $h->get( 'Content-Type' ); # => "text/plain; charset=ISO-8859-1"
+    become
+        $h->get( 'Content-Type' ); # => "text/plain"
+
+0.08  Nov 13th, 2012
+  - reimplemented rehash()
+  - [DOCUMENTATION] add header() to "INSTANCE METHODS"
+  - [DOCUMENTATION] describe how this module normalizes parameter names
+
+0.07  Nov 12th, 2012
+  - [DOCUMENTATION] add "tie() INTERFACE"
+
+0.06  Nov 11th, 2012
+  - First release
+
+0.05  Nov 10th, 2012
+  - add rehash() method which rebuilds header hash references
+
+0.04  Nov 7th, 2012
+  - reorganized tests using subtest() function exported by Test::More
+  - doesn't overload '""' (stringify) with as_string()
+    because this module isn't the replacement of CGI::header() function.
+    I think CGI::header() should be used to stringify
+    header hash references in most cases.
+  - each() doesn't stringify values (cf. HTTP::Headers->scan),
+    and so the callback function will receive raw CGI::Cookie objects.
+  - On the other hand, flatten() forces stringification.
+    flatten() may be called to generate PSGI-compatible header array
+    references.
+
+0.03  Oct 7th, 2012
+  - add a benchmark against HTTP::Parser::XS
+  - update POD
+  - add t/server.t
+  - tests require CGI.pm 3.51 because the distribution contains t/headers.t
+
+0.02  Oct 4th, 2012
+  - tests require CGI.pm 3.60 and HTTP::Date
+  - fix typo
+
+0.01  Sep 23rd, 2012
+  - Forked from Blosxom::Header

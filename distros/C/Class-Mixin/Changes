@@ -1,0 +1,38 @@
+Revision history for Class-Mixin
+
+todo:
+        * make warnings optional via import() params (debug level).
+	* support Class::Mixin::foo  subclassing
+	* return value on unsync (and update destroy-* tests)
+	* optional filters to unsync
+	* optional filters for which methods to mixin to/from.
+	* make OBJ a 'our $OBJ' package var?
+	* get to 100% coverage
+	* param to mixin from parents (traverse @ISA) of source class.
+	* import() should call resync() directly in case of manual import() runtime call??
+	* review warnings::register usage
+	* added t/warnings.t
+	* unload all
+
+1.00    2008-05-26
+	* ==> Changed internal storage of what's mixed in to what ... Previously would only 'remember' one method per class.  Did away w/the constructed key as well. Now it's a hashref that's {srcClass}->{destClass} = [ {}, {}, ... ] where the array is an AoH with info (including symbol) on each mixin'd method.
+	* DESTROY wasn't functional (multiple reasons) -- refactored to include bug fixes, and to support interal change.
+        * Added t/mixin-to.t
+        * Added t/mixin-from.t
+        * Added t/boilerplate.t
+	* added t/destroy-to.t
+	* added t/destroy-from.t
+	* added t/errors.t
+	* added t/import.t
+	* 90% coverage
+        * pod updates (SYNOPSIS, "Desctructor" typo, HISTORY, AUTHOR, OVERVIEW, SYNOPSIS)
+	* changed here-doc to q{} for style and hoping it resolves perl 5.10 test failures
+
+0.02    2008-05-08
+        * David Westbrook added as co-maintainer.
+        * Updating repository with 7/15/2004 version.
+        * Distro restructured using Module::Starter.
+
+0.01    2003-11-13
+        * Initial release of 6/12/2003 version.
+

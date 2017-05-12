@@ -1,0 +1,21 @@
+Crypt-Polybius
+==============
+
+Created:      2014-05-23
+Home page:    <https://metacpan.org/release/Crypt-Polybius>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Crypt-Polybius>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-05-25
+
+ [ Packaging ]
+ - Add missing dependency on MooX::Traits.
+
+0.002	2014-05-25
+
+ - Added: Support for the Greek alphabet.
+ - Added: Support for the scrambling the alphabet with a password.
+ - Much refactoring, splitting things out into roles, making stuff more
+   immutable, and adding type constraint to attributes.
+
+0.001	2014-05-23	Initial release

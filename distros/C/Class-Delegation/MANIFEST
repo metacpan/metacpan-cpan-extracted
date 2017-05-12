@@ -1,0 +1,16 @@
+Changes
+lib/Class/Delegation.pm
+MANIFEST
+Makefile.PL
+demo/demo_adapt_interface.pl
+demo/demo_change_semantics.pl
+demo/demo_facade.pl
+demo/demo_handle.pl
+demo/demo_inheritance.pl
+demo/demo_pseudo.pl
+t/00.load.t
+t/delegation.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

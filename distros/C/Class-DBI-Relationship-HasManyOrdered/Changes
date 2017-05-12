@@ -1,0 +1,18 @@
+Revision history for Perl extension Class::DBI::Relationship::HasManyOrdered.
+
+0.01  Thu Sep 30 15:49:31 2004
+	- original version; created by h2xs 1.23 with options
+		-X Class::DBI::Relationship::HasManyOrdered
+        - pod, readme, and makefile all rewritten
+        - initial version of code
+0.02 Fri Oct 15 16:50 2004
+	- added replace method
+	- improved delete method
+	- tidied code
+	- fixed accessor
+
+0.03 Wed Aug 03 2005
+	- fixed mistake in synopsis
+        - fixed incorrect fetching of foreign objects
+	- added clarification to documentation
+        - amended example code

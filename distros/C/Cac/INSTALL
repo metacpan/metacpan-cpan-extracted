@@ -1,0 +1,49 @@
+
+This is not a usual Perl-Module that you can
+install out of the box.
+You need to build a Perl with Cache embedded
+(or Cache with Perl embedded) first.
+
+The reason for this is that Intersystems
+doesn't ship Cache as shared library.
+It would be no problem for them.
+Please complain.
+
+Before you start make sure you have installed
+Intersystems Cache (including source)
+and the usual C environment that was used for
+the build of your Perl...
+
+I use: Cache for UNIX (Linux Intel/32-bit) 5.0.5 (Build 936) Fri Feb 6 2004 16:28:37 EST
+but it's reported to work with 4.0.x, too.
+My Perl is currently 5.8.3 built nearly as slow as possible (IThreads, Int64)
+
+Here the instructions:
+
+1. Building a new Cache:
+
+   1. Edit gen/Makefile.unix
+      and modify "PERL" and "CACHEDIR"
+      "PERL" - should point to the Perl-binary you want to use.
+      "CACHEDIR" - should point to the directory where Cache is installed.
+
+   2. In directory ./gen run: 
+      > make -f Makefile.unix
+      this should create a "cache" binary.
+
+2. Installing the new Cache binary.
+
+   1. stop cache  - usually by running ./cstop in "CACHEDIR"
+   2. In directory ./gen run:
+      > make -f Makefile.unix install
+   3. start cache - usually by running ./cstart in "CACHEDIR"
+
+After that, you can install the package as expected:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Have fun - Stefan <oesi@cpan.org>
+

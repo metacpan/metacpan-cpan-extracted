@@ -1,0 +1,11 @@
+Changes
+lib/CGI/Session/Driver/aggregator.pm
+lib/CGI/Session/Driver/aggregator/Drivers.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/g4_aggregator.t
+t/normal.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

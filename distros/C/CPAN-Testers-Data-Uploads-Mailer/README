@@ -1,0 +1,106 @@
+CPAN-Testers-Data-Uploads-Mailer
+================================
+
+This distribution is part of the CPAN Testers tools that provides verification
+of CPAN uploads and mails reports to authors where uploads would fail to be 
+tested by CPAN Testers, and thus don't typically conform to the standard
+package format that most modern CPAN distributions use.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these modules:
+
+  Email::Simple
+  File::Basename
+  File::Path
+  File::Slurp
+  Getopt::ArgvFile
+  Getopt::Long
+  IO::File
+  Template
+  Time::Piece
+
+For testing the module requires these modules:
+
+  File::Basename
+  File::Path
+  File::Slurp
+  IO::File
+  Test::More
+  Test::Trap
+
+For optional testing the module would like these modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+SYNOPSIS
+
+  my $mailer = CPAN::Testers::Data::Uploads::Mailer->new();
+  $mailer->process();
+
+  For further information please read the POD documentation.
+
+CPAN TESTERS FUND
+
+  CPAN Testers wouldn't exist without the help and support of the Perl 
+  community. However, since 2008 CPAN Testers has grown far beyond the 
+  expectations of it's original creators. As a consequence it now requires
+  considerable funding to help support the infrastructure.
+
+  In early 2012 the Enlightened Perl Organisation very kindly set-up a
+  CPAN Testers Fund within their donatation structure, to help the project
+  cover the costs of servers and services.
+
+  If you would like to donate to the CPAN Testers Fund, please follow the link
+  below to the Enlightened Perl Organisation's donation site.
+
+    https://members.enlightenedperl.org/drupal/donate-cpan-testers
+
+  If your company would like to support us, you can donate financially via the
+  fund link above, or if you have servers or services that we might use, please
+  send an email to admin@cpantesters.org with details.
+
+  Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+    http://iheart.cpantesters.org
+
+BUGS, PATCHES & FIXES
+  There are no known bugs at the time of this release. However, if you spot a 
+  bug or are experiencing difficulties, that is not explained within the POD 
+  documentation, please send an email to barbie@cpan.org. However, it would 
+  help greatly if you are able to pinpoint problems or even supply a patch.
+
+  Fixes are dependent upon their severity and my availability. Should a fix not 
+  be forthcoming, please feel free to (politely) remind me.
+
+SEE ALSO
+  CPAN::Testers::Data::Uploads
+
+  http://www.cpantesters.org/	(Reports), 
+  http://stats.cpantesters.org/	(Statistics), 
+  http://wiki.cpantesters.org/	(Wiki),
+  http://devel.cpantesters.org/	(Development)
+  http://blog.cpantesters.org/	(Blog)
+
+AUTHOR
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2010-2014 Barbie for Miss Barbell Productions
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

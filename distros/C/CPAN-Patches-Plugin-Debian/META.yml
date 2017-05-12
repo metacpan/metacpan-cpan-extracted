@@ -1,0 +1,53 @@
+---
+abstract: 'patch CPAN distributions Debian package'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Module::Build::SysPath: 0.16
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+  Module::Build::SysPath: 0.16
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+keywords:
+  - cpan
+  - patch
+  - debian
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Patches-Plugin-Debian
+provides:
+  CPAN::Patches::Plugin::Debian:
+    file: lib/CPAN/Patches/Plugin/Debian.pm
+    version: 0.03
+  CPAN::Patches::Plugin::Debian::SPc:
+    file: lib/CPAN/Patches/Plugin/Debian/SPc.pm
+    version: 0.03
+requires:
+  CPAN::Patches: 0.04
+  Carp: 0
+  Debian::Dpkg::Version: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Path: 2.01
+  File::Spec: 0
+  File::chdir: 0
+  File::is: 0
+  Getopt::Long: 0
+  IO::Any: 0
+  List::MoreUtils: 0
+  Moose::Role: 0
+  Parse::Deb::Control: 0.03
+  Path::Class: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Storable: 0
+  Test::Deep::NoTest: 0
+resources:
+  bugtracker: http://github.com/jozef/CPAN-Patches-Plugin-Debian/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/CPAN-Patches-Plugin-Debian.git
+version: 0.03

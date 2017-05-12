@@ -1,0 +1,988 @@
+NAME
+    Curses::Simp - Curses Not Quite Simple
+
+VERSION
+    This documentation refers to version 1.4.A8UG1gG of Curses::Simp, which
+    was released on Mon Aug 30 16:01:42:16 2010.
+
+SYNOPSIS
+      use Curses::Simp;
+      my @text; my $keey = '';
+      my $simp = tie(@text, 'Curses::Simp');
+      @text =('1337', 'nachoz', 'w/', 'cheese' x 7);
+      while($keey ne 'x'){         # wait for 'x' to eXit
+        $keey = $simp->GetKey(-1); # get a blocking keypress
+        push(@text, $keey);
+      }
+
+DESCRIPTION
+    Curses::Simp provides a curt mechanism for updating a console screen
+    with any Perl array (or multiple arrays to include color codes). Most
+    key events can be obtained and tested directly. The goal was ease-of-use
+    for the common cases first and efficient rendering second.
+
+2DU
+    - mk proper scrollbars for all objects && use in Brws: view
+    - Brws: mk togl to pack files left && right in view
+    - mk ~/.simprc to save CPik && Brws cfg, OVERMAPP, etc.
+    - CPik: rewrite BildBlox to scale style to window dims if !flagshrk &&
+    mk sure no forg or bakg works for all styles... also add options for
+    only name or number options or common grid size defaults
+    - CPik: add styles to pick fgcl,bgcl color code at once
+    - 4NT: work on recognizing more keys the same as Curses (&& then SDL)
+    - 4NT: write custom window support? mk Mesg at least wrap MSGBOX
+    - describe Simp objects sharing apps (ptok above pmix) mk OScr read Simp
+    apps @_ param list && auto-handle --geom wxh+x+y
+    - Prmt: mk new 'cbls' type: as a ckbx list && use in BrwsCnfg
+    - Prmt: mk new 'rdls' type: as a radio list w/ auto (*) -
+    - Mesg: mk new 'slid' type: params for all overlay text, chars, ticks,
+    flags, etc. && updt pmix to use... maybe register sub fields,dims...
+    - Prnt: add multi-line option where text can split on /\n/ but each new
+    line prints relative to starting xcrs
+    - Prmt: add multi-line option where dtxt can split on /\n/ && ^d accepts
+    entry instead of RETURN
+    - Prnt: handle ASCII chars under 32 with escapes like Draw
+    - Draw: optimize rendering
+    - Prnt&&Draw: handle ASCII chars under 32 better than current escapes
+    - mk 'ceol' && 'ceos' params to clear text[n] from cursor on
+    - consider breaking sub (CPik|Brws|.+?) into own Curses::Simp::$1.pm
+    instead of letting Simp.pm remain so cluttered
+
+            if detectable:
+
+    - handle xterm resize events
+    - handle mouse input (study any existent Curses apps that use mouse
+    input you can find ... probably in C), read man for gpm(1), sysmouse(4),
+    && sb(4) && study aumix mouse source
+    - Learn how to read a Shift-Tab key press if in any way distinguishable
+    from Tab/Ctrl-I
+    - What else does Simp need?
+
+WHY?
+    Curses::Simp was created because I could hardly find documentation or
+    examples of Curses usage so I fiddled until I could wrap the most
+    important behaviors in names and enhanced functions.
+
+USAGE
+    new() - Curses::Simp object constructor
+
+    new() opens a new Curses screen if one does not exist already and
+    initializes useful default screen, color, and keys settings. The created
+    Curses screen is automatically closed on program exit.
+
+    Available object methods are described in detail below. Each of the
+    following four letter abbreviated or verbose method names can be used as
+    initialization parameters to new():
+
+       Key       or  VerboseName                 =>   Default Value
+      -----         -------------                    ---------------
+      'text'     or 'TextData'                   =>        [ ]
+      'fclr'     or 'ForegroundColorData'        =>        [ ]
+      'bclr'     or 'BackgroundColorData'        =>        [ ]
+      'kque'     or 'KeyQueue'                   =>        [ ]
+      'mque'     or 'KeyModQueue'                =>        [ ]
+      'hite'     or 'WindowHeight'               =>         0
+      'widt'     or 'WindowWidth'                =>         0
+      'yoff'     or 'WindowYOffset'              =>         0
+      'xoff'     or 'WindowXOffset'              =>         0
+      'ycrs'     or 'CursorYOffset'              =>         0
+      'xcrs'     or 'CursorXOffset'              =>         0
+      'btyp'     or 'WindowBorderType'           =>         0
+      'brfc'     or 'WindowBorderForegroundColor'=>        'w'
+      'brbc'     or 'WindowBorderBackgroundColor'=>        'k'
+      'titl'     or 'WindowTitle'                =>         ''
+      'ttfc'     or 'WindowTitleForegroundColor' =>        'W'
+      'ttbc'     or 'WindowTitleBackgroundColor' =>        'k'
+      'dndx'     or 'DisplayStackIndex'          =>         0
+      'flagaudr' or 'FlagAutoDraw'               =>         1
+      'flagadtf' or 'FlagAutoDrawTiedForegroundData' =>     1
+      'flagadtb' or 'FlagAutoDrawTiedBackgroundData' =>     1
+      'flagmaxi' or 'FlagMaximize'               =>         1
+      'flagshrk' or 'FlagShrinkToFit'            =>         1
+      'flagcntr' or 'FlagCenter'                 =>         1
+      'flagcvis' or 'FlagCursorVisible'          =>         0
+      'flagscrl' or 'FlagScrollbar'              =>         0
+      'flagsdlk' or 'FlagSDLKey'                 =>         0
+      'flagfram' or 'FlagTimeFrame'              =>         0
+      'flagmili' or 'FlagMillisecond'            =>         0
+      'flagprin' or 'FlagPrintInto'              =>         1
+      'flagclru' or 'FlagColorUsed'              =>         0
+
+    An example of setting and updating 'WindowHeight':
+
+      use Curses::Simp;
+      my $simp = Curses::Simp->new( 'WindowHeight' => 7 ); # set
+         $simp->WindowHeight( 15 ); # update
+
+    See the individual sections in the "ACCESSOR AND FLAG METHODS" heading
+    for more information on how to manipulate created Curses::Simp objects.
+
+    Most other Curses::Simp methods also accept hash key => value pairs as
+    parameters which loads the object fields the same way new() does before
+    performing their operation. This gives you the ability to update many
+    Simp fields with a call to any particular accessor method. The method
+    name just designates where the lone value will be assigned and which
+    field will be returned.
+
+  Tied Array Interfaces
+    Curses::Simp now supports tied array interfaces as the new preferred
+    object construction mechanism (instead of new()). This allows more
+    natural manipulation of screen data (i.e., both text and colors) through
+    all of the familiar operations that can be performed on standard Perl
+    arrays. A basic example for just text can be found in the "SYNOPSIS"
+    above.
+
+    Since it's not a straightforward process to tie multiple arrays to
+    different components of the same object (which seemed desirable for
+    printing colors), here is an example of how it can be done:
+
+      use Curses::Simp;
+      my $keey = ''; my @text; my @fclr; my @bclr;
+      my $simp = tie(@text, 'Curses::Simp');
+                 tie(@fclr, 'Curses::Simp::FClr', $simp);
+                 tie(@bclr, 'Curses::Simp::BClr', $simp);
+      @text = (   '1337', 'nachoz', 'w/', 'cheese' x 7); $simp->GetK(1);
+      push(@fclr, 'GBRG'                              ); $simp->GetK(1);
+      push(@fclr,         'YWOPCY'                    ); $simp->GetK(1);
+      push(@fclr,                   'wK'              ); $simp->GetK(1);
+      push(@fclr,                         'P'         ); $simp->GetK(1);
+      push(@bclr, 'r'                                 ); $simp->GetK(1);
+      push(@bclr,         'g'                         ); $simp->GetK(1);
+      push(@bclr,                   'c'               ); $simp->GetK(1);
+      push(@bclr,                         'b'         ); $simp->GetK(1);
+
+    Notice the three tie() lines near the top. The second and third must
+    provide the third parameter of the object which they also want to tie
+    to. If this is not provided, the program will exit.
+
+    The result of all this is an extremely simple way to immediately
+    manipulate any of the text or colors displayed on the console screen.
+
+  CnvAnsCC or ConvertAnsiColorCode( $AnsiColorCode )
+    Returns the Simp form of the ANSI color code $AnsiColorCode.
+
+    $AnsiColorCode may contain any of the typical ANSI attribute or color
+    codes:
+
+                            Attribute        codes:
+      00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
+                            Foreground color codes:
+      30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
+                            Background color codes:
+      40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
+
+    ConvertAnsiColorCode() is primarily useful as an internal function to
+    the Curses::Simp package but I have exposed it because it could be
+    useful elsewhere.
+
+  ShokScrn or ShockScreen( [$FlagClear] )
+    ShockScreen() forces the screen and all created Simp objects to be
+    refreshed in order.
+
+    The $FlagClear (default is false) can be provided to specify that the
+    entire screen is to be cleared before everything refreshes. Clearing the
+    entire screen usually isn't necessary and it slows drawing down.
+
+  KNum or KeyNumbers()
+    Returns a hash with key numbers => "names".
+
+  CLet or ColorLetters()
+    Returns a hash with color "letters" => numbers.
+
+  NumC or NumColors()
+    Returns the number of available colors (last index: NumC() - 1)
+
+  Hite or Height
+    Returns the current Simp object's window height (last index: Height() -
+    1)
+
+  Widt or Width
+    Returns the current Simp object's window width (last index: Width() - 1)
+
+  Prnt or PrintString( $String )
+    Prints $String at current cursor position. PrintString() can also accept
+    a hash of parameters (e.g., PrintString('text' => $String)) where:
+
+      'text' => [ "String to Print" ], # or can just be string without arrayref
+      'fclr' => [ "ForegroundColorCodes corresponding to text" ],
+      'bclr' => [ "BackgroundColorCodes corresponding to text" ],
+      'ycrs' =>  3, # Number to move the cursor's y to before printing
+      'xcrs' =>  7, # Number to move the cursor's x to before printing
+      'yoff' => 15, # same as ycrs except original ycrs is restored afterwards
+      'xoff' => 31, # same as xcrs except original xcrs is restored afterwards
+      'prin' =>  1, # flag to specify whether printed text should update the
+                    #   main Text(), FClr(), and BClr() data or just print to the
+                    #   screen temporarily.  Default is true (i.e., Print Into all)
+
+    The hash keys can also be the corresponding VerboseNames described in
+    the new() section instead of these 4-letter abbreviated key names.
+
+    PrintString() returns the number of characters printed.
+
+  Draw or DrawWindow()
+    Draws the current Simp object with the established TextData() and
+    ColorData() functions.
+
+    DrawWindow() accepts a hash of parameters like new() which will update
+    as many attributes of the Simp object as are specified by key => value
+    pairs.
+
+    DrawWindow() returns the number of lines printed (which is normally the
+    same as Height()).
+
+  Wait or WaitTime( $Time )
+    WaitTime() does nothing for $Time seconds.
+
+    $Time can be an integer or floating point number of seconds. (e.g.,
+    WaitTime(1.27) does nothing for just over one second).
+
+    WaitTime() (like GetKey()) can also use alternate waiting methods. The
+    default $Time format is integer or floating seconds. It can also be a
+    Time::Frame object or an integer of milliseconds. These modes can be set
+    with the FlagTimeFrame(1) and FlagMillisecond(1) methods respectively.
+
+  GetK or GetKey( [$Timeout [,$FlagSDLKey]] )
+    Returns a keypress if one is made or -1 after waiting $Timeout seconds.
+
+    $Timeout can be an integer or floating point number of seconds. (e.g.,
+    GetKey(2.55) waits for two and one-half seconds before returning -1 if
+    no key was pressed).
+
+    Default behavior is to not block (i.e., GetKey(0)). Use GetKey(-1) for a
+    blocking keypress (i.e., to wait indefinitely).
+
+    GetKey() can use alternate waiting methods. The default is integer or
+    floating seconds. It can also utilize Time::Frame objects or integer
+    milliseconds if preferred. These modes can be set with the
+    FlagTimeFrame(1) and FlagMillisecond(1) methods respectively.
+
+    Under normal mode (i.e., when $FlagSDLKey is absent or false), GetKey()
+    returns a string describing the key pressed. This will either be a
+    single character or the Curses name for the key if a special key was
+    pressed. The list of special key names that can be returned from normal
+    mode are described in the "CURSES KEY NOTES" section. This means that
+    the return value should be easy to test directly like:
+
+      use Curses::Simp;
+      my $simp = Curses::Simp->new();
+      my $key  = $simp->GetKey(-1); # get a blocking keypress
+      if     (    $key  eq 'a'        ) { # do 'a' stuff
+      } elsif(    $key  eq 'b'        ) { # do 'b' stuff
+      } elsif(    $key  eq 'A'        ) { # do 'A' stuff
+      } elsif(    $key  eq 'B'        ) { # do 'B' stuff
+      } elsif(    $key  eq 'KEY_LEFT' ) { # do Left-Arrow-Key stuff
+      } elsif(    $key  eq 'KEY_NPAGE') { # do PageDown       stuff
+      } elsif(    $key  eq 'KEY_F1'   ) { # do F1 (Help)      stuff
+      } elsif(ord($key) ==  9         ) { # do Tab    stuff
+      } elsif(ord($key) == 13         ) { # do Return stuff
+      } elsif(ord($key) == 27         ) { # do Escape stuff
+      }
+
+    $FlagSDLKey is a flag (default is false) which tells GetKey() to return
+    a verbose key string name from the list of SDLKeys in the "SDLKEY NOTES"
+    section instead of the normal Curses key value or name. In SDLKey mode,
+    GetKey() also sets flags for Shift, Control, and Alt keys which are
+    testable through KeyMode().
+
+    The $FlagSDLKey parameter sets SDLKey mode temporarily (i.e., only for a
+    single execution of GetKey()). This mode can be turned on permanently
+    via the FlagSDLKey(1) function.
+
+    If the $Timeout for GetKey() is reached and no keypress has occurred (in
+    either normal mode or SDLKey mode), -1 is returned.
+
+  KMod or KeyMode( [$KeyName [,$NewValue]] )
+    Returns the key mode (state) of the key mode name $KeyName. $KeyName
+    should be one of the KMOD_ names from the bottom of the "SDLKEY NOTES"
+    section.
+
+    If no parameters are provided, the state of KMOD_NONE is returned.
+
+    If $NewValue is provided, the state of $KeyName is set to $NewValue.
+
+  GetS or GetString(  [$YCursor, $XCursor[, $ResultLength]] )
+    GetString() returns the string found from the cursor (or the specified
+    coordinates) on to the end-of-line or to $ResultLength if provided.
+
+  Move or MoveCursor( [$YCursor, $XCursor] )
+    MoveCursor() updates the current Simp object's cursor position to the
+    newly specified $YCursor, $XCursor.
+
+    By default, the cursor is not visible but this can be changed through
+    the FlagCursorVisible(1) function.
+
+    Returns ($YCursor, $XCursor) as the coordinates of the cursor.
+
+  Rsiz or ResizeWindow( $Height, $Width )
+    ResizeWindow() updates the current Simp object's window dimensions to
+    the newly specified $Height, $Width.
+
+    Think of ResizeWindow() as an easy way to call both Height() and Width()
+    at once.
+
+    Returns ($Height, $Width) as the dimensions of the window.
+
+  Mesg or MessageWindow( $Message )
+    MessageWindow() draws a Message Window in the center of the screen to
+    display $Message. MessageWindow() can also accept a hash of parameters
+    (e.g., MessageWindow('mesg' => $Message)) where:
+
+      'mesg' => "Message to Print",
+      'text' => [ "same as new \@text" ],
+      'fclr' => [ "ForegroundColorCodes corresponding to mesg or text" ],
+      'bclr' => [ "BackgroundColorCodes corresponding to mesg or text" ],
+      'titl' => "MessageWindow Title string",
+      'ttfc' => "ColorCodes corresponding to titl foreground color",
+      'ttbc' => "ColorCodes corresponding to titl background color",
+      'flagprsk' => 1, # a flag specifying whether to "Press A Key"
+      'pres' => "Press A Key...", # string to append if flagprsk is true
+      'prfc' => "ColorCodes corresponding to pres foreground color",
+      'prbc' => "ColorCodes corresponding to pres background color",
+      'wait' => 1.0, # floating number of seconds to wait
+                     #   if flagprsk is true,  MessageWindow() waits this
+                     #     long for a keypress before quitting
+                     #   if flagprsk is false, MessageWindow() waits this
+                     #     long regardless of whether keys are pressed
+
+    The hash keys can also be the corresponding VerboseNames described in
+    the new() section instead of these 4-letter abbreviated key names.
+
+    Returns the value of the pressed key (if the "Press A Key" flag was
+    true). This can be used to make simple one-character prompt windows. For
+    example:
+
+      use Curses::Simp;
+      my $simp   = Curses::Simp->new();
+      my $answer = $simp->MessageWindow('titl' => 'Is Simp useful?',
+                                        'pres' => '(Yes/No)');
+                   $simp->MessageWindow('titl' => 'Answer:', $answer);
+
+  Prmt or PromptWindow( \$DefaultRef )
+    PromptWindow() draws a Prompt Window in the center of the screen to
+    display and update the value of $DefaultRef. \$DefaultRef should be a
+    reference to a variable containing a string you want edited or replaced.
+    PromptWindow() can also accept a hash of parameters (e.g.,
+    PromptWindow('dref' => \$DefaultRef)) where:
+
+      'dref' => \$dref, # Default Reference to variable to be read && edited
+      'dtxt' => "Default Text string in place of dref",
+      'dtfc' => "ColorCodes corresponding to dref/dtxt foreground color",
+      'dtbc' => "ColorCodes corresponding to dref/dtxt background color",
+      'hifc' => "ColorCodes for highlighted (unedited) dref/dtxt foreground color",
+      'hibc' => "ColorCodes for highlighted (unedited) dref/dtxt background color",
+      'text' => [ "same as new \@text" ],
+      'fclr' => [ "ForegroundColorCodes corresponding to text" ],
+      'bclr' => [ "BackgroundColorCodes corresponding to text" ],
+      'hite' =>  3, # height of the prompt window (including borders)
+      'widt' => 63, # width  of the prompt window (including borders)
+      'titl' => "PromptWindow Title string",
+      'ttfc' => "ColorCodes corresponding to titl foreground color",
+      'ttbc' => "ColorCodes corresponding to titl background color",
+      'flagcvis' => 1, # a flag specifying whether the cursor should be displayed
+
+    The hash keys can also be the corresponding VerboseNames described in
+    the new() section instead of these 4-letter abbreviated key names.
+
+  CPik or ColorPickWindow()
+    ColorPickWindow() is a simple Color Picker window.
+
+    It accepts arrow keys to highlight a particular color and enter to
+    select. The letter corresponding to the color or the number of the index
+    can also be pressed instead.
+
+    Returns the letter (i.e., Color Code) of the picked color.
+
+  Brws or BrowseWindow()
+    BrowseWindow() is a simple file browser.
+
+    It contains typical file browse dialog components which can be tabbed
+    between. The tilde (~) character opens and closes drop down boxes. Enter
+    presses highlighted buttons or selects a highlighted file. F1 brings up
+    the BrowseWindow() help text.
+
+    Returns the full filename chosen or -1 if dialog was canceled.
+
+  DESTROY or DelW or DeleteWindow()
+    DeleteWindow() deletes all the components of the created Simp object and
+    calls ShockScreen() to cause the screen and all other created objects to
+    be redrawn.
+
+ACCESSOR AND FLAG METHODS
+    Simp accessor and flag object methods have related interfaces as they
+    each access and update a single component field of Curses::Simp objects.
+    Each one always returns the value of the field they access. Thus if you
+    want to obtain a certain value from a Simp object, just call the
+    accessor method with no parameters. If you provide parameters, the field
+    will be updated and will return its new value.
+
+    All of these methods accept a default parameter of their own type or a
+    hash of operations to perform on their field.
+
+    Some operations are only applicable to a subset of the methods as
+    dictated by the field type. The available operations are:
+
+       Key   =>   Value Type
+        NormalName (if different) ... # Purpose
+      -----      ------------
+      'asin' =>  $scalar (number|string|arrayref)
+       'assign' # asin is context-sensitive assignment to load the field
+      'blnk' =>  $ignored         # blanks a string value
+       'blank'
+      'togl' =>  $ignored         # toggles    a flag value
+       'toggle'
+      'true' =>  $ignored         # trues      a flag value
+      'fals' =>  $ignored         # falsifies  a flag value
+       'false'
+      'incr' =>  $numeric_amount
+       'increase' # increments if no $num is provided or increases by $num
+      'decr' =>  $numeric_amount
+       'decrease' # decrements if no $num is provided or decreases by $num
+      'nmrc' =>  $string
+       'numeric'
+      # instead of an explicit 'nmrc' hash key, this means the
+      #   key is an entirely numeric string like '1023'
+      #   so the value gets assigned to that indexed element when
+      #   the field is an array.  The key is assigned directly if
+      #   the field is numeric or a string.
+      # Array-Specific operations:
+      'size' => $ignored                # return the array size
+      'push' => $scalar (number|string) # push new value
+      'popp' => $ignored                # pop last value
+       'pop'
+      'apnd' => $scalar (number|string) # append to last element
+       'append'
+      'dupl' => $number                 # duplicate last line or
+       'duplicate'                      #   $num line if provided
+      'data' => $arrayref               # assigns the array if
+                                        #   $arrayref provided &&
+                                        #   returns ALL array data
+      # Loop-Specific operations:
+      'next' => $ignored          # assign to next     in loop
+      'prev' => $ignored          # assign to previous in loop
+       'previous'
+
+  Array Accessors
+      Text or TextData            # update the text  array
+      FClr or ForegroundColorData # update the color array for foregrounds
+      BClr or BackgroundColorData # update the color array for backgrounds
+
+    Instead of using the above Array Accessors and Array-Specific
+    operations, it is recommended that you employ the "Tied Array
+    Interfaces" since they accomplish the goal of screen manipulation in a
+    more Perl-friendly manner.
+
+   Text or TextData
+   FClr or ForegroundColorData
+   BClr or BackgroundColorData
+  Loop Accessors
+      BTyp or WindowBorderType # loop through border types
+
+   BTyp or WindowBorderType
+  Normal Accessors
+      Name or VerboseName                 # Description
+      ----    -----------                 -------------
+      Hite or WindowHeight                # window height
+      Widt or WindowWidth                 # window width
+      YOff or WindowYOffset               # window y-offset position
+      XOff or WindowXOffset               # window x-offset position
+      YCrs or CursorYOffset               # window y-cursor position
+      XCrs or CursorXOffset               # window x-cursor position
+      BrFC or WindowBorderForegroundColor # border fg color code string
+      BrBC or WindowBorderBackgroundColor # border bg color code string
+      Titl or WindowTitle                 # title string
+      TtFC or WindowTitleForegroundColor  # title  fg color code string
+      TtBC or WindowTitleBackgroundColor  # title  bg color code string
+      DNdx or DisplayStackIndex           # global display index
+
+   Hite or WindowHeight
+   Widt or WindowWidth
+   YOff or WindowYOffset
+   XOff or WindowXOffset
+   YCrs or CursorYOffset
+   XCrs or CursorXOffset
+   BrFC or WindowBorderForegroundColor
+   BrBC or WindowBorderBackgroundColor
+   Titl or WindowTitle
+   TtFC or WindowTitleForegroundColor
+   TtBC or WindowTitleBackgroundColor
+   DNdx or DisplayStackIndex
+  Flag Accessors
+      FlagName or VerboseFlagName Default # Description
+      --------    --------------- ------- -------------
+      FlagAuDr or FlagAutoDraw      1     # Automatic DrawWindow() call whenever
+                                          #   TextData or Color*Data is updated
+      FlagADTF or FlagAutoDrawTiedForegroundData 1 # Automatic DrawWindow() call
+        #   for arrays tied to Curses::Simp::FClr objects when FlagAuDr is already set
+      FlagADTB or FlagAutoDrawTiedBackgroundData 1 # Automatic DrawWindow() call
+        #   for arrays tied to Curses::Simp::BClr objects when FlagAuDr is already set
+      FlagMaxi or FlagMaximize      1     # Maximize window
+      FlagShrk or FlagShrinkToFit   1     # Shrink window to fit TextData
+      FlagCntr or FlagCenter        1     # Center window within entire screen
+      FlagCVis or FlagCursorVisible 0     # Cursor Visible
+      FlagScrl or FlagScrollbar     0     # use Scrollbars
+      FlagSDLK or FlagSDLKey        0     # use advanced SDLKey mode in GetKey()
+      FlagFram or FlagTimeFrame     0     # use Time::Frame objects  instead of
+                                          #   float seconds for timing
+      FlagMili or FlagMillisecond   0     # use integer milliseconds instead of
+                                          #   float seconds for timing
+      FlagPrin or FlagPrintInto     1     # PrintString() prints Into TextData
+        # array.  If FlagPrintInto is false, then each call to PrintString()
+        # only writes to the screen temporarily and will be wiped the next time
+        # the window behind it is updated.
+      FlagClrU or FlagColorUsed     0     # ColorUsed gets set automatically
+        # when color codes are used and determines if internal dialogs have color
+
+   AuDr or FlagAuDr or FlagAutoDraw
+   ADTF or FlagADTF or FlagAutoDrawTiedForegroundData
+   ADTB or FlagADTB or FlagAutoDrawTiedBackgroundData
+   Down or FlagDown or FlagDropIsDown
+   Drop or FlagDrop or FlagDropDown
+   Insr or FlagInsr or FlagInsertMode
+   Maxi or FlagMaxi or FlagMaximize
+   Shrk or FlagShrk or FlagShrinkToFit
+   Cntr or FlagCntr or FlagCenter
+   CVis or FlagCVis or FlagCursorVisible
+   Scrl or FlagScrl or FlagScrollbar
+   SDLK or FlagSDLK or FlagSDLKey
+   Fram or FlagFram or FlagTimeFrame
+   Mili or FlagMili or FlagMillisecond
+   Prin or FlagPrin or FlagPrintInto
+   ClrU or FlagClrU or FlagColorUsed
+  Miscellaneous Accessors
+      Name     or VerboseName             # Description
+      --------    ----------------------- -------------
+      AttrNamz or AttributeNames          # list of available Simp Attributes
+      DfltValu or DefaultValues           # list of Default attribute Values
+      KQue     or KeyQueue                # list of ordered unhandled Key events
+      MQue     or KeyModQueue             # list of ordered unhandled modifiers
+      Focu     or FocusWindow             # changes Focus   to current Window
+      Updt     or UpdateWindow            # Updates display of current Window
+      CScr     or CloseScreen             # closes all opened Curses screens
+      # Note: CScr() is automatically called when any Simp program exits,
+      #   so explicit calls are probably unnecessary && redundant.
+      BordChar or PrintBorderCharacter    # utility to draw Border Characters
+      InitPair or InitializeColorPair     # utility to Initialize Color Pairs
+      MkMethdz or MakeMethods             # utility to Make many Methods
+      TestDraw                            # Tests whether AutoDraw is pending
+      BildBrws                            # utility to Build Browse dialogs
+      BrwsCdUp                            # utility to `cd ..` Browse directories
+      BrwsHelp                            # utility to print Browse Help
+
+   AttrNamz or AttributeNames
+   DfltValu or DefaultValues
+   KQue or KeyQueue
+   MQue or KeyModQueue
+   Focu or FocusWindow
+   Updt or UpdateWindow
+   CScr or CloseScreen
+   BordChar or PrintBorderCharacter
+   InitPair or InitializeColorPair
+   MkMethdz or MakeMethods
+   TestDraw
+   BildBrws
+   BrwsCdUp
+   BrwsHelp
+  Accessor and Flag Method Usage Examples
+      #!/usr/bin/perl -w
+      use strict;
+      use Curses::Simp;
+      # create new object which gets auto-drawn with init params
+      my $simp = Curses::Simp->new('text' => [ 'hmmm', 'haha', 'whoa', 'yeah' ],
+                                   'fclr' => [ 'kkkK', 'kKKw', 'KwrR', 'ROYW' ],
+                                   'btyp' => 1,
+                                   'maxi' => 0);
+         $simp->GetK(-1);               # wait for a key press
+         $simp->Text('push' => 'weee'); # add more to the Text
+         $simp->FClr('push' => 'WwKk'); #              && FClr arrays
+         $simp->Maxi('togl');           # toggle  the maximize flag
+         $simp->GetK(-1);               # wait for a key press
+         $simp->Text('2'    => 'cool'); # change index two elements of Text
+         $simp->FClr('2'    => 'bBCW'); #                           && FClr
+         $simp->Maxi('fals');           # falsify the maximize flag
+         $simp->GetK(-1);               # wait for a key press
+         $simp->Text('popp');           # pop the last elements off Text
+         $simp->FClr('popp');           #                        && FClr
+         $simp->BTyp('incr');           # increment the border type
+         $simp->GetK(-1);               # wait for a key press
+         $simp->Text('asin' => [ 'some', 'diff', 'rent', 'stuf' ]);
+         $simp->FClr('asin' => [ 'GGYY', 'CCOO', 'BBRR', 'WWPP' ]);
+         $simp->BTyp('incr');           # increment the border type
+         $simp->GetK(-1);               # wait for a key press before quitting
+
+CURSES KEY NOTES
+    When the GetKey() function is in the normal default mode of input,
+    special keypress name strings will be returned when detected. A small
+    set of the names below are found commonly (like the arrow keys, the
+    function keys, HOME, END, PPAGE [PageUp], NPAGE [PageDown], IC [Insert],
+    and BACKSPACE) but they are all described here since they are supported
+    by Curses.pm and therefore could arise.
+
+    The list of returnable Curses Key names are:
+
+          KEY_F1                   KEY_F2                   KEY_F3                 
+          KEY_F4                   KEY_F5                   KEY_F6                 
+          KEY_F7                   KEY_F8                   KEY_F9                 
+          KEY_F10                  KEY_F11                  KEY_F12                
+          KEY_F13                  KEY_F14                  KEY_F15                
+          KEY_A1                   KEY_A3                   KEY_B2                 
+          KEY_BACKSPACE            KEY_BEG                  KEY_BREAK              
+          KEY_BTAB                 KEY_C1                   KEY_C3                 
+          KEY_CANCEL               KEY_CATAB                KEY_CLEAR              
+          KEY_CLOSE                KEY_COMMAND              KEY_COPY               
+          KEY_CREATE               KEY_CTAB                 KEY_DC                 
+          KEY_DL                   KEY_DOWN                 KEY_EIC                
+          KEY_END                  KEY_ENTER                KEY_EOL                
+          KEY_EOS                  KEY_EXIT                 KEY_F0                 
+          KEY_FIND                 KEY_HELP                 KEY_HOME               
+          KEY_IC                   KEY_IL                   KEY_LEFT               
+          KEY_LL                   KEY_MARK                 KEY_MAX                
+          KEY_MESSAGE              KEY_MIN                  KEY_MOVE               
+          KEY_NEXT                 KEY_NPAGE                KEY_OPEN               
+          KEY_OPTIONS              KEY_PPAGE                KEY_PREVIOUS           
+          KEY_PRINT                KEY_REDO                 KEY_REFERENCE          
+          KEY_REFRESH              KEY_REPLACE              KEY_RESET              
+          KEY_RESTART              KEY_RESUME               KEY_RIGHT              
+          KEY_SAVE                 KEY_SBEG                 KEY_SCANCEL            
+          KEY_SCOMMAND             KEY_SCOPY                KEY_SCREATE            
+          KEY_SDC                  KEY_SDL                  KEY_SELECT             
+          KEY_SEND                 KEY_SEOL                 KEY_SEXIT              
+          KEY_SF                   KEY_SFIND                KEY_SHELP              
+          KEY_SHOME                KEY_SIC                  KEY_SLEFT              
+          KEY_SMESSAGE             KEY_SMOVE                KEY_SNEXT              
+          KEY_SOPTIONS             KEY_SPREVIOUS            KEY_SPRINT             
+          KEY_SR                   KEY_SREDO                KEY_SREPLACE           
+          KEY_SRESET               KEY_SRIGHT               KEY_SRSUME             
+          KEY_SSAVE                KEY_SSUSPEND             KEY_STAB               
+          KEY_SUNDO                KEY_SUSPEND              KEY_UNDO               
+          KEY_UP                   KEY_MOUSE
+
+SDLKEY NOTES
+    The GetKey() function has a special advanced mode of input. Instead of
+    returning the plain keypress (e.g., 'a'), the $FlagSDLKey parameter can
+    be set to true for temporary SDLKey mode or with FlagSDLKey(1) for
+    permanence so that verbose strings of SDLKey names (e.g., 'SDLK_a') will
+    be returned.
+
+    The list of returnable SDLKey names are:
+
+       SDLKey           ASCII value    Common name
+      ----------------  -----------   ------------
+      'SDLK_BACKSPACE',      #'\b'    backspace
+      'SDLK_TAB',            #'\t'    tab
+      'SDLK_CLEAR',          #        clear
+      'SDLK_RETURN',         #'\r'    return
+      'SDLK_PAUSE',          #        pause
+      'SDLK_ESCAPE',         #'^['    escape
+      'SDLK_SPACE',          #' '     space
+      'SDLK_EXCLAIM',        #'!'     exclaim
+      'SDLK_QUOTEDBL',       #'"'     quotedbl
+      'SDLK_HASH',           #'#'     hash
+      'SDLK_DOLLAR',         #'$'     dollar
+      'SDLK_AMPERSAND',      #'&'     ampersand
+      'SDLK_QUOTE',          #'\''    quote
+      'SDLK_LEFTPAREN',      #'('     left parenthesis
+      'SDLK_RIGHTPAREN',     #')'     right parenthesis
+      'SDLK_ASTERISK',       #'*'     asterisk
+      'SDLK_PLUS',           #'+'     plus sign
+      'SDLK_COMMA',          #','     comma
+      'SDLK_MINUS',          #'-'     minus sign
+      'SDLK_PERIOD',         #'.'     period
+      'SDLK_SLASH',          #'/'     forward slash
+      'SDLK_0',              #'0'     0
+      'SDLK_1',              #'1'     1
+      'SDLK_2',              #'2'     2
+      'SDLK_3',              #'3'     3
+      'SDLK_4',              #'4'     4
+      'SDLK_5',              #'5'     5
+      'SDLK_6',              #'6'     6
+      'SDLK_7',              #'7'     7
+      'SDLK_8',              #'8'     8
+      'SDLK_9',              #'9'     9
+      'SDLK_COLON',          #':'     colon
+      'SDLK_SEMICOLON',      #';'     semicolon
+      'SDLK_LESS',           #'<'     less-than sign
+      'SDLK_EQUALS',         #'='     equals sign
+      'SDLK_GREATER',        #'>'     greater-than sign
+      'SDLK_QUESTION',       #'?'     question mark
+      'SDLK_AT',             #'@'     at
+      'SDLK_LEFTBRACKET',    #'['     left bracket
+      'SDLK_BACKSLASH',      #'\'     backslash
+      'SDLK_RIGHTBRACKET',   #']'     right bracket
+      'SDLK_CARET',          #'^'     caret
+      'SDLK_UNDERSCORE',     #'_'     underscore
+      'SDLK_BACKQUOTE',      #'`'     grave
+      'SDLK_TILDE',          #'~'     tilde
+      'SDLK_a',              #'a'     a
+      'SDLK_b',              #'b'     b
+      'SDLK_c',              #'c'     c
+      'SDLK_d',              #'d'     d
+      'SDLK_e',              #'e'     e
+      'SDLK_f',              #'f'     f
+      'SDLK_g',              #'g'     g
+      'SDLK_h',              #'h'     h
+      'SDLK_i',              #'i'     i
+      'SDLK_j',              #'j'     j
+      'SDLK_k',              #'k'     k
+      'SDLK_l',              #'l'     l
+      'SDLK_m',              #'m'     m
+      'SDLK_n',              #'n'     n
+      'SDLK_o',              #'o'     o
+      'SDLK_p',              #'p'     p
+      'SDLK_q',              #'q'     q
+      'SDLK_r',              #'r'     r
+      'SDLK_s',              #'s'     s
+      'SDLK_t',              #'t'     t
+      'SDLK_u',              #'u'     u
+      'SDLK_v',              #'v'     v
+      'SDLK_w',              #'w'     w
+      'SDLK_x',              #'x'     x
+      'SDLK_y',              #'y'     y
+      'SDLK_z',              #'z'     z
+      'SDLK_DELETE',         #'^?'    delete
+      'SDLK_UP',             #        up arrow
+      'SDLK_DOWN',           #        down arrow
+      'SDLK_RIGHT',          #        right arrow
+      'SDLK_LEFT',           #        left arrow
+      'SDLK_INSERT',         #        insert
+      'SDLK_HOME',           #        home
+      'SDLK_END',            #        end
+      'SDLK_PAGEUP',         #        page up
+      'SDLK_PAGEDOWN',       #        page down
+      'SDLK_F1',             #        F1
+      'SDLK_F2',             #        F2
+      'SDLK_F3',             #        F3
+      'SDLK_F4',             #        F4
+      'SDLK_F5',             #        F5
+      'SDLK_F6',             #        F6
+      'SDLK_F7',             #        F7
+      'SDLK_F8',             #        F8
+      'SDLK_F9',             #        F9
+      'SDLK_F10',            #        F10
+      'SDLK_F11',            #        F11
+      'SDLK_F12',            #        F12
+      'SDLK_F13',            #        F13
+      'SDLK_F14',            #        F14
+      'SDLK_F15',            #        F15
+      # SDLKeys below aren't detected correctly yet
+      'SDLK_KP0',            #        keypad 0
+      'SDLK_KP1',            #        keypad 1
+      'SDLK_KP2',            #        keypad 2
+      'SDLK_KP3',            #        keypad 3
+      'SDLK_KP4',            #        keypad 4
+      'SDLK_KP5',            #        keypad 5
+      'SDLK_KP6',            #        keypad 6
+      'SDLK_KP7',            #        keypad 7
+      'SDLK_KP8',            #        keypad 8
+      'SDLK_KP9',            #        keypad 9
+      'SDLK_KP_PERIOD',      #'.'     keypad period
+      'SDLK_KP_DIVIDE',      #'/'     keypad divide
+      'SDLK_KP_MULTIPLY',    #'*'     keypad multiply
+      'SDLK_KP_MINUS',       #'-'     keypad minus
+      'SDLK_KP_PLUS',        #'+'     keypad plus
+      'SDLK_KP_ENTER',       #'\r'    keypad enter
+      'SDLK_KP_EQUALS',      #'='     keypad equals
+      'SDLK_NUMLOCK',        #        numlock
+      'SDLK_CAPSLOCK',       #        capslock
+      'SDLK_SCROLLOCK',      #        scrollock
+      'SDLK_RSHIFT',         #        right shift
+      'SDLK_LSHIFT',         #        left shift
+      'SDLK_RCTRL',          #        right ctrl
+      'SDLK_LCTRL',          #        left ctrl
+      'SDLK_RALT',           #        right alt
+      'SDLK_LALT',           #        left alt
+      'SDLK_RMETA',          #        right meta
+      'SDLK_LMETA',          #        left meta
+      'SDLK_LSUPER',         #        left windows key
+      'SDLK_RSUPER',         #        right windows key
+      'SDLK_MODE',           #        mode shift
+      'SDLK_HELP',           #        help
+      'SDLK_PRINT',          #        print-screen
+      'SDLK_SYSREQ',         #        SysRq
+      'SDLK_BREAK',          #        break
+      'SDLK_MENU',           #        menu
+      'SDLK_POWER',          #        power
+      'SDLK_EURO',           #        euro
+
+    SDLKey mode also sets flags in KeyMode() where:
+
+       SDL Modifier                    Meaning
+      --------------                  ---------
+      'KMOD_NONE',           #        No modifiers applicable
+      'KMOD_CTRL',           #        A  Control key is down
+      'KMOD_SHIFT',          #        A  Shift   key is down
+      'KMOD_ALT',            #        An Alt     key is down
+
+COLOR NOTES
+    Colors can be encoded along with each text line to be printed.
+    PrintString() and DrawWindow() each take hash parameters where the key
+    should be one of:
+
+      'fclr' or 'ForegroundColorData'
+      'bclr' or 'BackgroundColorData'
+
+    and the value is a color code string as described below.
+
+    A normal color code is simply a single character (typically just the
+    first letter of the color name and the case [upper or lower] designates
+    high or low intensity [i.e., Bold on or off]). The default printing mode
+    of color codes assumes black background colors for everything when no
+    'ColorBackgroundData' is supplied. Sometimes Bold misbehaves. I've
+    hardcoded the correct value of A_BOLD from my implementation of Curses
+    as the default value which will only be overridden if A_BOLD properly
+    returns the curses number of the attribute. Occassionally it doesn't
+    work and I can't figure out why.
+
+  Normal Color Code Reference
+       (lower-case = dull)    k(blacK),  r(Red),    g(Green),  y(Yellow),
+       (upper-case = bright)  b(Blue),   p(Purple), c(Cyan),   w(White),
+
+  Alternate Color Codes
+       (lower-case = dull)    o([Orange] *Yellow),   m([Magenta] Purple),
+       (upper-case = bright)  u([blUe]      Blue),   t([Teal]      Cyan),
+
+  *Case-Determines-Brightness Exception
+    There is one special exception to the Case-Determines-Brightness rule.
+    Orange is actually Dark Yellow but it is often expected to be much
+    brighter than any of the other dark colors. Therefore, Upper-Case 'O'
+    breaks the "lower-case = dull, upper-case = bright" rule and is
+    interpreted as Lower-Case 'y'. Every other color code is consistent with
+    the rule.
+
+CHANGES
+    Revision history for Perl extension Curses::Simp:
+
+    - 1.4.A8UG1gG Mon Aug 30 16:01:42:16 2010
+        * t/00podc.t should pass now that my POD is updated to cover all
+        subs
+
+        * Brws: setup to read $ENV{'LS_COLORS'} into GLBL{OVERMAPP}
+
+        * fixed POD error that was failing on FreeBSD because items must
+        follow overs
+
+        * tested ACS_ borders working again, restored as dfalt, added new
+        ARROW bordset
+
+        * fixed Prmt handle Eterm BACKSPACE (ord(127)) like TTY (without
+        ndng Ctrl-BS)
+
+        * fixed FlagCVis (MkMethodz CRSR flag was accidentally set as CURS)
+
+        * updated license to GPLv3 and bumped minor version for the CPAN
+
+    - 1.2.A7DDCh3 Tue Jul 13 13:12:43:03 2010
+        * made B == Blue && K == blacK like RGB vs. CMYK
+
+        * added ColorUsed '_flagclru' tracking and test for internal dialogs
+
+        * fixed up Mesg() for no press key option to force window to stay
+        for wait && auto header color gen for my help && info pages
+
+        * added flags to auto-draw tied @_fclr (FlagADTF) && @_bclr
+        (FlagADTB)
+
+        * added optional length param to GetS
+
+        * added basic 4NT support by generating C:/SimpDraw.bat
+
+        * added Tie::Array interfaces for @_text, @_fclr, && @_bclr
+
+        * removed repeats and color code expansion && added @_bclr
+
+        * updated License
+
+        * added GetS() since Dan asked how
+
+    - 1.0.4287FJQ Sun Feb 8 07:15:19:26 2004
+        * made Brws()
+
+        * added ckbx && butn types to Mesg() && drop type to Prmt() && wrote
+        Focu() to focus new types
+
+        * added info && help types to Mesg() to auto title && color those
+        screens
+
+        * added blox && squr styles to CPik && made style/blockchar
+        increment keys (PgUp/Dn/Home/End)
+
+    - 1.0.41V0L3a Sat Jan 31 00:21:03:36 2004
+        * made flag accessors without ^Flag
+
+        * wrote support for VerboseName hash keys
+
+        * fixed ShokScrn overlap && DelW bugs
+
+        * made GetK return detected KEY_ names in normal mode && added
+        CURSES KEY MODE section to POD && made both key modes return -1 if
+        $tmot reached
+
+        * made ShokScrn not blank the screen so often
+
+        * made Text('1' => 'new line') use Prnt instead of Draw for
+        efficiency
+
+        * updated POD to use VerboseNames instead of 4-letter names &&
+        erased most '&&'
+
+        * made verbose accessor names like VerboseName instead of
+        verbose_name
+
+    - 1.0.41O4516 Sat Jan 24 04:05:01:06 2004
+        * made all but ptok && qbix non-executable for EXE_FILES
+
+        * updated POD && added Simp projects into bin/ && MANIFEST in
+        preparation for release
+
+    - 1.0.41O3SQK Sat Jan 24 03:28:26:20 2004
+        * fixed weird char probs in Draw && removed weird char support from
+        Prnt
+
+        * added PrintInto '_flagprin' ability
+
+        * made new Mesg, Prmt, && CPik utils
+
+        * added SDLK advanced input option to GetK
+
+        * setup window border char sets
+
+    - 1.0.4140asO Sun Jan 4 00:36:54:24 2004
+        * refined Draw() && InitPair() for objects instead of exported
+        procedures
+
+        * CHANGES section && new objects created
+
+    - 1.0.37VG26k Thu Jul 31 16:02:06:46 2003
+        * original version
+
+INSTALL
+    Please run:
+
+        `perl -MCPAN -e "install Curses::Simp"`
+
+    or uncompress the package and run the standard:
+
+        `perl Makefile.PL; make; make test; make install`
+
+FILES
+    Curses::Simp requires:
+
+    Carp - to allow errors to croak() from calling sub
+    Curses - provides core screen and input handling
+    Tie::Array - to allow text arrays to be bound to objects
+    Math::BaseCnv - to handle number-base conversion
+
+    Curses::Simp uses (if available):
+
+    Time::PT - for pt color coding
+    Time::Frame - to provide another mechanism for timing
+
+LICENSE
+    Most source code should be Free! Code I have lawful authority over is &&
+    shall be! Copyright: (c) 2002-2010, Pip Stuart. Copyleft : This software
+    is licensed under the GNU General Public License (version 3). Please
+    consult the Free Software Foundation (http://FSF.Org) for important
+    information about your freedom.
+
+AUTHOR
+    Pip Stuart <Pip@CPAN.Org>
+

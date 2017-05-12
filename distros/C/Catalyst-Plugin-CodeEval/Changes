@@ -1,0 +1,10 @@
+Revision history for Perl extension Catalyst::Plugin::CodeEval.
+
+0.012 Thu Feb 9 15:14:43 2006
+        - code_eval returned eval returned value.
+0.011 Thu Feb 9 04:53:06 2006
+        - It was deleted that the code for debug had remained.
+0.01  Thu Feb  9 19:02:51 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::Plugin::CodeEval
+

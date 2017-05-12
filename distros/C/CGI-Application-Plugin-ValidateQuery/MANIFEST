@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/CGI/Application/Plugin/ValidateQuery.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-options.t
+t/02-validate.t
+t/03-validate_no_logger.t
+t/04-functional_error_modes.t
+t/05-extra_fields_optional.t
+t/06-app_params.t
+t/TestAppWithLogger.pm
+t/TestAppWithoutLogger.pm

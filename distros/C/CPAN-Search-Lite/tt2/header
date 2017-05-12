@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+[% heading = title ? title : pages.title %]
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/style.css" type="text/css">
+<link href="[% home %]/htdocs/cpan.xml" rel="alternate"
+  type="application/rss+xml" title="Recent CPAN uploads" />
+<meta name="description" content="Browse and search CPAN" />
+<meta name="keywords" content="Perl modules, CPAN" />
+  <title>[% title %]</title>
+ </head>
+<body onload="if (document.f) document.f.query.focus()">
+<table width="100%">
+<tr>
+<td width="5%" rowspan=3>
+<a href="http://www.cpan.org/">
+<img src="[% cpanimg %]" alt="CPAN" /></a></td>
+<td align=center>
+<table width="60%" border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td valign="top" align="center">
+<a class="button" href="[% home %]/chapter">[% pages.buttons.Home %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% home %]/cgi-bin/docperl">[% pages.buttons.Documentation %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% home %]/recent">[% pages.buttons.Recent %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% home %]/mirror">[% pages.buttons.Preferences %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% home %]/module">[% pages.buttons.Modules %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% home %]/dist">[% pages.buttons.Distributions %]</a></td>
+<td valign="top" align="center">
+<a class="button" href="[% $home %]/author">[% pages.buttons.Authors %]</a></td>
+</tr>
+</table>
+</td></tr><tr><tr><td colspan=2 align=center>
+<form method=get action="[% search %]" name=f>
+<table><tr><td>
+<font size="-1">[% pages.form.Find %]</font> &nbsp; 
+<input type="text" name="query" value="[% query %]" size=20 ></td>
+<td align=left>&nbsp;<font size="-1">[% pages.form.in %]</font>&nbsp; 
+<select name="mode">&nbsp; &nbsp;
+[% FOREACH m = ['dist', 'module', 'author', 'chapter'] %]
+[% IF m == mode %] 
+ <option value="[% m %]" selected="selected">[% pages.list.$m %]</option>
+[% ELSE %]
+ <option value="[% m %]">[% pages.list.$m %]</option>
+[% END %]
+[% END %]
+</select>&nbsp;&nbsp; &nbsp;
+<input type="submit" value="[% pages.form.Search %]">
+</td></tr></table>
+</form>
+</td></tr></table>
+<hr />

@@ -1,0 +1,6 @@
+name = "Cache-Keys-DSL"
+badges = ["travis", "codecov"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

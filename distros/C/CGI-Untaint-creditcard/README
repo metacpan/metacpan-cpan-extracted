@@ -1,0 +1,37 @@
+NAME
+    CGI::Untaint::creditcard - validate a creditcard
+
+SYNOPSIS
+      use CGI::Untaint;
+      my $handler = CGI::Untaint->new($q->Vars);
+
+      my $cc = $handler->extract(-as_creditcard => 'ccno');
+
+            print $cc->number;
+
+DESCRIPTION
+  is_valid
+    This Input Handler verifies that it is dealing with a reasonable credit
+    card number (i.e. one that Business::CreditCard::Object believes to be
+    valid.)
+
+    The resulting object will be set back into value().
+
+SEE ALSO
+    CGI::Untaint. Business::CreditCard::Object.
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-CGI-Untaint-creditcard@rt.cpan.org
+
+COPYRIGHT
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

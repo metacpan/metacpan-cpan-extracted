@@ -1,0 +1,9 @@
+Flow Spec   			- Cisco Not Supported ?
+DOCSIS Service Class Name	- Working - Class Dependent
+Best Effort Service		- Upstream
+Non-Real-Time Polling Service 	- Cisco Not supported ?
+Real-Time Polling Service	- Cisco Not supported ?
+Unsolicited Grant Service	- Cisco Not supported
+Unsolicited Grant Service with Activity Detection - Upstream Only
+Downstream			- Downstream only
+

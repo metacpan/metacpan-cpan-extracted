@@ -1,0 +1,9 @@
+Revision history for Perl extension CGI::Application::Plugin::HTMLPrototype.
+
+0.20
+
+    - Add pod coverage tests
+
+0.10  
+
+    - original version

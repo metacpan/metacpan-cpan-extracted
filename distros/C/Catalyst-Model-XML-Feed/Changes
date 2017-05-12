@@ -1,0 +1,17 @@
+Revision history for Catalyst-Model-XML-Feed
+
+0.04   2011-04-28 15:52:25
+    Make model warn rather than die on invalid feeds (Okko)
+    Make model return new version when TTL expires (Okko)
+
+0.03    17 December 2009
+    Switch to use MRO::Compat
+    Skip live tests by default
+    Update to new delicious links.
+
+0.02    3 September 2006
+	Feeds didn't refresh properly, they do now.
+	Documentation fixes.
+
+0.01_01 22 August 2006
+        First version, released on an unsuspecting world.

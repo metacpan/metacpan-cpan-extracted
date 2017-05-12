@@ -1,0 +1,38 @@
+Class::DBI::Plugin::MultiDatabases version 0.01
+==================================================
+
+"There are cases when you have the same schema in multiple databases
+and would like to access two or more databases from the same script
+without reconnecting every time."
+
+from http://wiki.class-dbi.com/index.cgi?UsingMultipleDatabases
+
+This module helps you for it automatically.
+
+All that you must do is 'use Class::DBI::Plugin::MultiDatabases'
+in your base CDBI application class.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Test::More
+Class::DBI
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005 by Makamaka Hannyaharamitu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use threads;
+use threads::shared;
+
+use CORBA::omniORB ids => [ 'IDL:Callback:1.0' => undef, 'IDL:Sender:1.0' => undef ];
+
+package ORBThread;
+
+sub _run
+{
+  $_[0]->run();
+}
+
+package Callback_impl;
+
+@Callback_impl::ISA = qw(POA_Callback);
+
+sub new
+{
+  my $class = shift;
+  bless {}, $class;
+}
+
+sub reply
+{
+  my ($self, $msg) = @_;
+  print "got: $msg\n";
+}
+
+package main;
+
+$orb = CORBA::ORB_init("omniORB4");
+$poa = $orb->resolve_initial_references("RootPOA");
+
+my $servant = new Callback_impl;
+my $id = $poa->activate_object($servant);
+
+my $callback = $poa->servant_to_reference($servant);
+
+$poa->_get_the_POAManager->activate;
+
+# create and start new thread in which will run orb
+# for receiving requests to the Callback object.
+my $main = threads->new(\&ORBThread::_run, $orb);
+
+open IOR, "object.ref"; my $ior = <IOR>; close IOR;
+my $sender = $orb->string_to_object($ior);
+
+my $msg = "Hello";
+print "sending message ``$msg'' to the server.\n";
+$sender->message($callback, $msg);
+
+
+for (;;) {
+  # we can do something in the infinite loop
+  sleep 1;
+}
+# or we can use $main->join() for waiting on main thread finis
+
+0;

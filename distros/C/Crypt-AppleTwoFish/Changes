@@ -1,0 +1,23 @@
+Revision history for Perl module Crypt::AppleTwoFish
+
+0.10 Fri Apr 22 15:33:56 2005
+    - original version
+
+0.02 Sun May 8 2005
+    - added support for DRMS key decryption keys along with the 
+      original iTMS support
+
+0.03 Sun 20 Apr 2008
+    - pod changes, add pod testing
+
+0.05 Sat 28 Jun 2008
+    - added Veggie tales algorithm
+
+0.051 Sun 29 Jun 2008
+    - tweaks to code syntax, removed evals
+    - POD corrections
+
+
+
+
+

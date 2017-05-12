@@ -1,0 +1,26 @@
+Changes
+lib/CGI/Builder/Magic.pm
+Makefile.PL
+MANIFEST			This list of files
+perl_side_include/lib/MagicWebApp.pm
+perl_side_include/README.txt
+perl_side_include/www/.htaccess
+perl_side_include/www/index.html
+perl_side_include/www/show_env.html
+perl_side_include/www/show_mix.html
+README
+t/01_features.t
+t/02_sess.t
+t/03_dfv.t
+t/04_memory_leaking.t
+t/Test.pm
+t/test_pod.t
+t/test_pod_coverage.t
+t/TestD.pm
+t/TestS.pm
+t/tm/dfv.html
+t/tm/ENV_RM.html
+t/tm/form.html
+t/tm/index.html
+t/tm/sess.html
+META.yml                                 Module meta-data (added by MakeMaker)

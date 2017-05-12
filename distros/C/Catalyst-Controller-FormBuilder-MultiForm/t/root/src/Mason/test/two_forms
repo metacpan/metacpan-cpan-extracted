@@ -1,0 +1,11 @@
+<%args>
+  $forms
+</%args>
+
+<!-- Two forms using Catalyst::Controller::FormBuilder::MultiForm render style -->
+
+<!-- Render foo form by name -->
+<% $forms->{foo}->{FormBuilder}->render %>
+
+<!-- Render bar form by name -->
+<% $forms->{bar}->{FormBuilder}->render %>

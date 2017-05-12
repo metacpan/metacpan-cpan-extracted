@@ -1,0 +1,122 @@
+CGI-Builder Latest Versions Changes
+
+Version 1.36
+- Restored the canonical cgi_new method :-)
+
+Version 1.35
+- "use strict" fix for CPANTS
+- Little improvement of the cgi-new method
+
+Version 1.34
+- Fixed the string returned by the die_handler (bug introduced in 1.33)
+- Added the 'phase' method
+
+Version 1.33
+- Removed the internal use of lvalue assigments incompatible with
+  the perl-bug #17663 (Perl 5 Debugger doesn't handle properly lvalue
+  sub assignment)
+- Deprecated the use of CGI::Builder::Const: constants are now defined
+  in the main package
+
+Version 1.32
+- CGI::Builder::Conf now accepts a list of configuration files
+  that will be mixed in a final structure
+- Deprecated the CGI::Builder::Conf::conf_options now 'conf_mml_options'
+- Added the TRIM_BLANKS default option to the
+  CGI::Builder::Conf::conf_mml_options
+- Fixed a switch_to bug, which didn't pass any argument to the SH_* handlers
+
+Version 1.31
+- Updated OOTools 2.1 as a prerequisite
+- A few minor changes
+
+Version 1.3
+- Updated OOTools 2 as a prerequisite
+- Updated IO::Util 1.45 as a prerequisite
+- Added CGI::Builder::Conf in order to add user editable configuration files
+  to your WebApp
+- The import() sub internally uses the Class::Util::load() now
+- Added a few details about asking support
+- Updated the PROPERTY GROUP ACCESSORS > param() example with the new
+  OOTool behaviour (about retrieving the keys, retrieving a slice and
+  copying the whole hash)
+
+Version 1.26
+- Changed the private and protected 'my' suffix to the more useful and
+  consistent 'my_'
+- Added a warning in AUTOLOAD sub for unprefixed autoloaded params
+- Improved die_handler method: now it doesn't wrap the $@
+- Removed the PH, SH, OH constants from *::Const
+- Added a few useful information in the "IMPORTANT INFO" POD section
+- Changed the "SUPPORT" POD section
+- Improved the documentation of "PH_AUTOLOAD" and "switch_to" method
+- Added a few information in the "Avoid Common Mistakes" POD section
+- Added CGI::Builder::Auth in the "Extensions List" section
+- Added "KNOWN ISSUE" POD section
+
+Version 1.25
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+- Added requested_page property
+
+Version 1.24
+- Added the CBF_examples dir in the distributed files
+- Some POD improvements (EXAMPLES section and other)
+- Updated CREDITS section
+
+Version 1.23
+- Added the not page_content_check() condition, before using
+  AUTOLOAD page handler
+- Improved header() POD documentation
+
+Version 1.22
+- Minor POD changes
+
+Version 1.21
+- Changed Makefile.PL version check
+- Internal code adjustments
+- Added some POD notes
+- Updated Extensions List
+
+Version 1.2
+- Added internal phase check to the redirect() method
+- Simplified the page_content_check goal
+- Added the no_page_content_status advanced class property used internally
+  and overridable by other extensions
+- Added a compile time check for deprecated usage of Apache::CGI::Builder
+- Improved documentation of group accessors (see param() method)
+- Added "Global Variables Persistence" topic in ADVANCED FEATURES section
+- Added a CREDIT section in POD
+
+Version 1.12
+- Improved exception handling for CBB definition
+- Eliminated the dependency from base.pm
+- Minor CGI::Builder::Test fixing
+- Minor POD fixing
+
+Version 1.11
+- This version contains the real 1.1 files: the 1.1 distribution
+  file was a wrong outdated file. Sorry for the mismatch.
+  
+Version 1.1
+- Reversed the overrun execution order for OH_fixup and OH_cleanup
+- Added advanced method 'page_content_check' with automatic handling
+  of 'unknown' page_name(s) (204 status header)
+- Fixed OH_* handlers execution problem under mod_perl
+- Eliminated the definition/dependency of any INIT blocks
+- Eliminated content check in send_content method
+- Lot of code optimization (now the C::B source is just 200 lines)
+- Added the perl version check to the Makefile.PL
+- Updated OOTools 1.62 as a prerequisite
+- Updated POD with the new feature/fixing
+- Added several tests
+
+Version 1.01
+- Fixed POD errors in the Examples sections
+- Fixed POD errors in the page_content and page_prefix properties sections
+- Fixed a weird PH_AUTOLOAD bug (probably related with the use of constant.pm)
+- Eliminated dependency from constant.pm in CGI::Builder::Const
+ 
+Version 1.0
+- First public release

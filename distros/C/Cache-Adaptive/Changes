@@ -1,0 +1,9 @@
+Revision history for Perl extension Cache::Adaptive.
+
+0.03  Mon May 14 2007
+	- switched from ExtUtils::MakeMaker to Module::Install
+	- use POD::Coverage
+
+0.02  Thu May 10 2007
+	- original version
+

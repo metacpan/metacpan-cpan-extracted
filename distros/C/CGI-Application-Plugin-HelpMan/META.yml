@@ -1,0 +1,23 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Application-Plugin-HelpMan
+version:      1.09
+version_from: lib/CGI/Application/Plugin/HelpMan.pm
+installdirs:  site
+requires:
+    CGI::Application:              0
+    CGI::Application::Plugin::AutoRunmode: 0
+    CGI::Application::Plugin::Feedback: 0
+    CGI::Application::Plugin::Forward: 0
+    CGI::Application::Plugin::Session: 0
+    CGI::Application::Plugin::TmplInnerOuter: 0
+    Cwd:                           0
+    File::Slurp:                   0
+    File::Which:                   0
+    LEOCHARRE::DEBUG:              1.02
+    Pod::Html:                     0
+    Pod::Simple::Search:           0
+    Test::Simple:                  0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

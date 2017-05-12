@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>NA Scriptalicious-1.15 i386-freebsd 6.1-release -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/06.html">Postings from June 2008</a>
+
+<h2>NA Scriptalicious-1.15 i386-freebsd 6.1-release</h2>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/06/msg1727422.html">Thread Previous</a>
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>srezic</b><br/>
+<div class="h_name">Date:</div> June 18, 2008 02:51<br/>
+<div class="h_name">Subject:</div> NA Scriptalicious-1.15 i386-freebsd 6.1-release<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.00505, created by CPAN-Reporter-1.15. 
+
+Thank you for uploading your work to CPAN.  While attempting to build or test 
+this distribution, the distribution signaled that support is not available 
+either for this operating system or this version of Perl.  Nevertheless, any 
+diagnostic output produced is provided below for reference.  If this is not 
+what you expect, you may wish to consult the CPAN Testers Wiki:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.00505 &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....
+#   Failed test 'use Scriptalicious;'
+#   at t/01-mmmdelicious.t line 6.
+#     Tried to use 'Scriptalicious'.
+#     Error:  Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+# BEGIN failed--compilation aborted at t/01-mmmdelicious.t line 6.
+# BEGIN failed--compilation aborted at (eval 3) line 2.
+Useless use of a constant in void context at t/01-mmmdelicious.t line 9.
+Name &quot;main::PROGNAME&quot; used only once: possible typo at t/01-mmmdelicious.t line 11.
+
+#   Failed test 'got PROGNAME ok'
+#   at t/01-mmmdelicious.t line 11.
+#          got: undef
+#     expected: 'myscript'
+Undefined subroutine &amp;main::getopt called at t/01-mmmdelicious.t line 16.
+# Looks like you planned 9 tests but only ran 2.
+# Looks like you failed 2 tests of 2 run.
+# Looks like your test died just after 2.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-9
+	Failed 9/9 tests, 0.00% okay
+t/02-script..........Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at t/02-script.t line 8.
+# Looks like your test died before it could output anything.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-6
+	Failed 6/6 tests, 0.00% okay
+t/03-yaml............skipped
+        all skipped: YAML not installed
+t/04-fork............Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at t/Util.pm line 4.
+BEGIN failed--compilation aborted at t/04-fork.t line 10.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+t/05-prompt..........Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at t/05-prompt.t line 3.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+t/06-anydump.........Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at t/06-anydump.t line 8.
+# Looks like your test died before it could output anything.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-2
+	Failed 2/2 tests, 0.00% okay
+t/07-tsay............Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+BEGIN failed--compilation aborted at t/07-tsay.t line 8.
+# Looks like your test died before it could output anything.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-2
+	Failed 2/2 tests, 0.00% okay
+t/08-unit............
+#   Failed test 'use Scriptalicious;'
+#   at t/08-unit.t line 5.
+#     Tried to use 'Scriptalicious'.
+#     Error:  Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+# BEGIN failed--compilation aborted at t/08-unit.t line 5.
+# BEGIN failed--compilation aborted at (eval 3) line 2.
+Undefined subroutine &amp;main::time_unit called at t/08-unit.t line 16.
+# Looks like you failed 1 test of 2.
+# Looks like your test died just after 2.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED test 1
+	Failed 1/2 tests, 50.00% okay
+t/09-noyaml..........
+#   Failed test 'use Scriptalicious;'
+#   at t/09-noyaml.t line 6.
+#     Tried to use 'Scriptalicious'.
+#     Error:  Perl 5.006 required--this is only version 5.00505, stopped at /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh/blib/lib/Scriptalicious.pm line 12.
+# BEGIN failed--compilation aborted at t/09-noyaml.t line 6.
+# BEGIN failed--compilation aborted at (eval 3) line 2.
+Undefined subroutine &amp;main::getconf_f called at t/09-noyaml.t line 11.
+# Looks like you planned 2 tests but only ran 1.
+# Looks like you failed 1 test of 1 run.
+# Looks like your test died just after 1.
+dubious
+	Test returned status 255 (wstat 65280, 0xff00)
+DIED. FAILED tests 1-2
+	Failed 2/2 tests, 0.00% okay
+Failed Test         Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/01-mmmdelicious.t  255 65280     9   16  1-9
+t/02-script.t        255 65280     6   12  1-6
+t/04-fork.t          255 65280    ??   ??  ??
+t/05-prompt.t        255 65280    ??   ??  ??
+t/06-anydump.t       255 65280     2    4  1-2
+t/07-tsay.t          255 65280     2    4  1-2
+t/08-unit.t          255 65280     2    1  1
+t/09-noyaml.t        255 65280     2    3  1-2
+1 test skipped.
+Failed 8/9 test scripts. 22/23 subtests failed.
+Files=9, Tests=23,  0 wallclock secs ( 0.09 cusr +  0.07 csys =  0.16 CPU)
+Failed 8/9 test programs. 22/23 subtests failed.
+*** Error code 35
+
+Stop in /var/tmp/CPAN-build/Scriptalicious-1.15-lkOBvh.
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.72
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/Tree-DAG_Node-1.06-Q9Bn7x/blib/arch:/usr/local/src/CPAN/build/Tree-DAG_Node-1.06-Q9Bn7x/blib/lib:/usr/local/src/CPAN/build/Math-Derivative-0.01-u98N2s/blib/arch:/usr/local/src/CPAN/build/Math-Derivative-0.01-u98N2s/blib/lib:/usr/local/src/CPAN/build/Math-Spline-0.01-IT6UD5/blib/arch:/usr/local/src/CPAN/build/Math-Spline-0.01-IT6UD5/blib/lib:/usr/local/src/CPAN/build/Statistics-Descriptive-2.6-wR5nh8/blib/arch:/usr/local/src/CPAN/build/Statistics-Descriptive-2.6-wR5nh8/blib/lib:/usr/local/src/CPAN/build/Readonly-1.03-plmGC7/blib/arch:/usr/local/src/CPAN/build/Readonly-1.03-plmGC7/blib/lib:/usr/local/src/CPAN/build/Math-Complex-1.54-ckIZnx/blib/arch:/usr/local/src/CPAN/build/Math-Complex-1.54-ckIZnx/blib/lib:/usr/local/src/CPAN/build/SVG-2.44-coqBeC/blib/arch:/usr/local/src/CPAN/build/SVG-2.44-coqBeC/blib/lib:/usr/local/src/CPAN/build/Class-Date-1.1.9-xwNj2O/blib/arch:/usr/local/src/CPAN/build/Class-Date-1.1.9-xwNj2O/blib/lib:/usr/local/src/CPAN/build/SQL-String-0.02-ncj0tv/blib/arch:/usr/local/src/CPAN/build/SQL-String-0.02-ncj0tv/blib/lib:/usr/local/src/CPAN/build/Storable-2.18-85RZi5/blib/arch:/usr/local/src/CPAN/build/Storable-2.18-85RZi5/blib/lib:/usr/local/src/CPAN/build/TimeDate-1.16-HwlxuI/blib/arch:/usr/local/src/CPAN/build/TimeDate-1.16-HwlxuI/blib/lib:/usr/local/src/CPAN/build/version-0.7501-JSlkPI/blib/arch:/usr/local/src/CPAN/build/version-0.7501-JSlkPI/blib/lib:/usr/local/src/CPAN/build/HTML-Tagset-3.20-sDkdui/blib/arch:/usr/local/src/CPAN/build/HTML-Tagset-3.20-sDkdui/blib/lib:/usr/local/src/CPAN/build/Class-Adapter-1.04-YjpGwY/blib/arch:/usr/local/src/CPAN/build/Class-Adapter-1.04-YjpGwY/blib/lib:/usr/local/src/CPAN/build/Params-Util-0.33-69JVFO/blib/arch:/usr/local/src/CPAN/build/Params-Util-0.33-69JVFO/blib/lib:/usr/local/src/CPAN/build/Tie-Hash-Indexed-0.05-EPnisM/blib/arch:/usr/local/src/CPAN/build/Tie-Hash-Indexed-0.05-EPnisM/blib/lib:/usr/local/src/CPAN/build/Math-Round-0.06-BuCGAH/blib/arch:/usr/local/src/CPAN/build/Math-Round-0.06-BuCGAH/blib!
+ /lib:/us
+r/local/src/CPAN/build/CGI-FormBuilder-3.0501-DCVItw/blib/arch:/usr/local/src/CPAN/build/CGI-FormBuilder-3.0501-DCVItw/blib/lib:/usr/local/src/CPAN/build/Image-ExifTool-7.30-h1LVv0/blib/arch:/usr/local/src/CPAN/build/Image-ExifTool-7.30-h1LVv0/blib/lib:/usr/local/src/CPAN/build/Lingua-EN-Inflect-1.89-nSfBcW/blib/arch:/usr/local/src/CPAN/build/Lingua-EN-Inflect-1.89-nSfBcW/blib/lib:/usr/local/src/CPAN/build/File-Slurp-9999.13-dEfc06/blib/arch:/usr/local/src/CPAN/build/File-Slurp-9999.13-dEfc06/blib/lib:/usr/local/src/CPAN/build/Regexp-Common-2.122-sv093F/blib/arch:/usr/local/src/CPAN/build/Regexp-Common-2.122-sv093F/blib/lib:/usr/local/src/CPAN/build/Regexp-Assemble-0.33-6UtUuk/blib/arch:/usr/local/src/CPAN/build/Regexp-Assemble-0.33-6UtUuk/blib/lib:/usr/local/src/CPAN/build/JSON-2.11-dGMlU8/blib/arch:/usr/local/src/CPAN/build/JSON-2.11-dGMlU8/blib/lib:/usr/local/src/CPAN/build/Proc-Exists-0.13-5998n9/blib/arch:/usr/local/src/CPAN/build/Proc-Exists-0.13-5998n9/blib/lib:/usr/local/src/CPAN/build/Pretty-0.2-IEmiI6/blib/arch:/usr/local/src/CPAN/build/Pretty-0.2-IEmiI6/blib/lib:/usr/local/src/CPAN/build/Pod-Simple-Wiki-0.09-8e8pmA/blib/arch:/usr/local/src/CPAN/build/Pod-Simple-Wiki-0.09-8e8pmA/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 51645
+    PERL5_CPAN_IS_RUNNING = 51645
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 60269,51645
+    PERL_CPAN_REPORTER_CONFIG = /home/cpansand/.cpanreporter/confignofail.ini
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.00505
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.25     
+    ExtUtils::CBuilder  n/a      
+    ExtUtils::Command   1.13     
+    ExtUtils::Install   1.41     
+    ExtUtils::MakeMaker 6.36     
+    ExtUtils::Manifest  1.51     
+    ExtUtils::ParseXS   n/a      
+    File::Spec          3.25     
+    Module::Build       0.2808_01
+    Module::Signature   n/a      
+    Test::Harness       2.64     
+    Test::More          0.72     
+    YAML                n/a      
+    YAML::Syck          n/a      
+    version             0.7501   
+
+
+--
+
+Summary of my perl5 (5.0 patchlevel 5 subversion 5) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd
+    uname='freebsd biokovo.herceg.de 6.1-release freebsd 6.1-release #0: sun may 7 04:32:43 utc 2006 root@opus.cse.buffalo.edu:usrobjusrsrcsysgeneric i386 '
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=undef useperlio=undef d_sfio=undef
+  Compiler:
+    cc='ccache cc', optimize='-O2 -mtune=athlon64 -pipe', gccversion=3.4.4 [FreeBSD] 20050518
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -I/usr/local/include'
+    ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -I/usr/local/include'
+    stdchar='char', d_stdstdio=undef, usevfork=true
+    intsize=4, longsize=4, ptrsize=4, doublesize=8
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    alignbytes=4, usemymalloc=y, prototype=define
+  Linker and Libraries:
+    ld='ccache cc', ldflags ='-Wl,-E  -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lc -lcrypt
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fpic', lddlflags='-shared  -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/06/msg1727422.html">Thread Previous</a>
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  <ul>
+  
+  
+    <li><!-- #1727422 --><a href="/group/perl.cpan.testers/2008/06/msg1727422.html">
+      NA Scriptalicious-1.15 i386-freebsd 6.1-release</a>
+      by srezic</li> 
+  
+  
+    <li><b>
+      NA Scriptalicious-1.15 i386-freebsd 6.1-release</b>
+      by srezic</li> 
+
+
+
+</ul>
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

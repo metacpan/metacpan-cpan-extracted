@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  361:
+    - 23
+name: fdcb35
+registers:
+  AF: 38404
+  AF_: 0
+  BC: 8646
+  BC_: 0
+  DE: 19638
+  DE_: 0
+  HL: 46103
+  HL_: 0
+  I: 0
+  IX: 26426
+  IY: 248
+  PC: 4
+  R: 2
+  SP: 0

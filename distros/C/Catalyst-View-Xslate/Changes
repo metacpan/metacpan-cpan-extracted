@@ -1,0 +1,89 @@
+Changes
+=======
+
+0.00019 2015-09-29T23:50:59Z
+    * Apply changes from PR #21 as #23. This should fix memory leaks
+      introduced in `expose_method` related code (Mark Ellis)
+
+0.00018 2015-01-04T06:28:41Z
+    * compatibility shim added to test cases so that the encoding tests will
+      pass with Catalyst v 5.90080+
+    * Documentation on UTF8 and default encoding on new Catalyst.
+    * Updated copyeright notices
+
+0.00017 - 28 Feb 2013
+    * Merge pullreq #17: Check passed parameters are defined, not for their
+      boolean values (wreis)
+    * Merge pullreq #18: Add type attribute (wreis)
+
+0.00016 - 17 Oct 2012
+    * Merge pullreq #16: Add a build_expose_method (wreis)
+
+0.00015 - 12 May 2012
+    * Merge pullreq #14: Remove unused lazy building (wreis)
+    * Merge pullreq #15: Add template preloading (wreis)
+    * Add "preload" parameter to toggle preloading on/off
+
+0.00014 - 07 May 2012
+    * Merge pullreq #13: Use Catalyst::Component::ApplicationAttribute (wreis)
+    * Merge pullreq #12: Change type of 'verbose' option to int (wreis)
+    * Merge pullreq #8: Add encode_body attr to avoid automatically
+                        encode the body (sunnavy)
+                        (Author's note: I recognize that there's a time and
+                        place where this is useful, but if you find yourself
+                        needing this and you're doing something that doesn't
+                        require the entire rendered body to run it, then
+                        you're doing something wrong. Instead, see if you can
+                        avoid it by using a combination of Text::Xslate's
+                        function/module attrs and stuff like html_builder())
+
+0.00013 - 25 Feb 2012
+    * Add header/footer support(rt #75256)
+
+0.00012 - 13 Apr 2011
+    * Change how 'exposed_methods' are defined. Now functions are generated
+      at render time for every request, and is available in the stash
+      (John Napiorkowski)
+
+0.00011 - 28 Feb 2011
+    * Change TEMPLATE_EXTENSION to template_extension in the helper
+    * Factor out the method to generate Xslate object (Getty)
+
+0.00010 - 10 Feb 2011
+    * Fix attribute specification for 'cache' to accept Int as
+      Text::Xslate accepts values 0, 1, or 2 (travail, gfx)
+
+0.00009 - 19 Jan 2011
+    * Added 'expose_methods' configuration option similar to the TT View
+      (John Napiorkowski)
+    * test for above (John Napiorkowski)
+    * allow you to pass a scalar ref to ->render so that you can render
+      literal / inlined templates (John Napiorkowski)
+    * Added docs
+
+0.00008 - 28 Oct 2010
+    * Add content_charset to specify the encoding (hiratara)
+        -> You NEED to pass in a flagged UTF-8 to body
+
+0.00007 - 21 Sep 2010
+    * Add helpers to generate stubs (garu)
+    * Add tests for it (garu, lestrrat)
+
+0.00006 - 15 Jul 2010
+    * Update tests to work with newer Text::Xslate
+    * Require latest Text::Xslate
+
+0.00005 - 09 Jun 2010
+    * Initialize xslate attribute on ACCEPT_CONTEXT
+
+0.00004 - 09 Jun 2010
+    * s/functions/function/g
+
+0.00003 - 22 May 2010
+    * Fix dependency
+
+0.00002 - 19 May 2010
+    * Fix error display
+
+0.00001 - 19 May 2010
+    * Initial release

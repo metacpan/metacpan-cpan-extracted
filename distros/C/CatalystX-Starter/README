@@ -1,0 +1,98 @@
+NAME
+    CatalystX::Starter - bootstrap a CPAN-able Catalyst component
+
+SYNOPSIS
+    Like "module-starter", but sane:
+
+      $ catalystx-starter 'Module::Name'
+      $ cd Module-Name
+      $ git init
+      $ mv gitignore .gitignore
+      $ git add .gitignore *
+      $ git ci -m 'Start my component'
+
+    Then edit Changes and README to taste
+
+      $ mg README
+      $ mg Changes
+      $ git ci -a -m 'update Changes and README'
+
+    Then you're ready to work:
+
+      $ make test
+      00load.............ok
+      live...............ok
+      All tests successful.
+
+      $ prove --lib t/author # don't want users running these
+      pod................ok
+      pod-coverage.......ok
+      All tests successful.
+
+DESCRIPTION
+    Recently, I've stopped using "Module::Starter", because it generates way
+    too much boilerplate and not enough of stuff I actually need. I find it
+    easier to just start with nothing and manually write what I need.
+
+    "CatalystX::Starter" automates this minimalism for me. It will create
+    everything you need to start developing a Catalyst component or plugin,
+    but won't create useless crap that you just have to delete.
+
+    Here's what you get:
+
+    "t/lib/TestApp"
+        A live app that can be run from tests (including "t/live-test.t").
+        It also comes with the "testapp_server.pl" and "testapp_test.pl", so
+        you can try our your TestApp from the command line. Yay for never
+        having to write this again.
+
+        So far, I've wasted more than an hour of my life typing this exact
+        TestApp code in again and again. Now it's automatic. FINALLY.
+
+    Makefile.PL
+        "Module::Install"-based Makefile.PL with "build_requires" set up to
+        run the default tests.
+
+    gitignore
+        Save yourself the effort of setting up a ".gitignore". You can of
+        course import this as "svn:ignore" or ".cvsignore". I use git, so
+        that's what you get by default.
+
+        Note that you have to rename this yourself, because I want git to
+        track it, not treat it as an ignore file.
+
+    MANIFEST.SKIP
+        A useful MANIFEST.SKIP that ignores stuff that "make" leaves lying
+        around, and my ".git" directory.
+
+    Changes / README
+        No text in here. Change it to what you want it to look like.
+
+    "lib/Your/Module.pm"
+        Almost nothing:
+
+           package Your::Module;
+           use strict;
+           use warnings;
+
+           1;
+
+        Write the POD yourself. You're smart enough to remember that the
+        sequence is NAME, SYNOPSIS, DESCRIPTION, METHODS, BUGS, AUTHOR,
+        COPYRIGHT. If not... now you are :)
+
+    That's about it. Enjoy.
+
+SEE ALSO
+    "catalyst.pl", for creating Catalyst applications.
+
+    Module::Starter, if you like deleting code more than writing it.
+
+AUTHOR
+    Jonathan Rockway "<jrockway@cpan.org>".
+
+COPYRIGHT
+    I don't assert any copyright over the generated files. This module
+    itself is copyright (c) 2007 Jonathan Rockway and is licensed under the
+    same terms as Perl itself.
+

@@ -1,0 +1,18 @@
+Revision history for Perl extension Class-Cloneable.
+
+0.03 Mon Feb. 6, 2006
+    - now using Scalar::Util::reftype to determine 
+      the type of instance
+    - refactored the code heavily
+    - now properly clones weak references too
+
+0.02 Thurs Nov 18 2004
+    - now using Scalar::Util::blessed() instead of 
+      the convoluted UNIVERSAL::isa() stuff. 
+      - added Scalar::Util as a dependency
+
+0.01 Mon Oct  6 2004
+    - module created and released on CPAN
+      - based upon Clone::PP, but with many 
+        fundamental philosophical changes
+

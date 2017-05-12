@@ -1,0 +1,30 @@
+Compress/Zlib/Perl version 0.02
+===============================
+
+This a very incomplete pure perl implementation of Compress::Zlib's API.
+Currently only inflateInit and inflate are supported. The code is a 
+Ton Hospel's implementation of gunzip in perl rewritten to support
+Compress::Zlib's API, which involved converting it into a restartable state
+machine.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None. :-)
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2004 Ton Hospel, Nicholas Clark
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

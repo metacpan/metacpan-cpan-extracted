@@ -1,0 +1,64 @@
+Config-Simple-Extended
+
+This provides two and one day at least three additional public
+methods to Sherzod B. Ruzmetov's Config::Simple.  This module
+started life as Config::Simple::Inherit, but after version 0.04
+that name was abandoned and the work put into the module was
+recreated as this module to permit additional missing features
+to be added to Config::Simple.
+
+The first method implemented permits a configuration object to
+inherit from a parent configuration object, overwriting existing
+parameters with new values and returns a Config::Simple object.
+The second parses a url and returns a configuration file path
+based on that url, permitting a single code installation to
+host multiple instances of an application based on aliased
+domains and subdirectories of domains.  The third, planned
+though still not coded public method will permit the parsing of
+heredoc data into a configuration hash; though as it turns out, 
+I seem to use Template for that purpose instead and that third 
+method may never materialize.  
+
+But this evening I found a need to expose a function I wrote 
+years ago to support the ->inherit method, for other uses.  So 
+v0.16 will now include a new ->get_stanzas() method, to return 
+an arrayref of stanza names from the config file.  Hope others 
+might find it handy as well.  
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation including examples
+for this module with the perldoc command.
+
+    perldoc Config::Simple::Extended
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-Simple-Extended
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Simple-Extended
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Config-Simple-Extended
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Config-Simple-Extended
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2016 Hugh Esco
+dba/ http://CampaignFoundations.com/
+
+This program is released under the following license: gpl

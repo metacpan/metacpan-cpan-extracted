@@ -1,0 +1,41 @@
+INSERT INTO address (addressid,addforename,addsurname,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Abo','Hogg','01232-533611');
+
+INSERT INTO address (addressid,addforename,addsurname,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'N.','Anyon','444415');
+
+INSERT INTO address (addressid,addforename,addsurname,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Taxi','Andersons','454288');
+
+INSERT INTO address (addressid,addforename,addorg,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Ards LC','Ards Leisure Centre','91-812837');
+
+INSERT INTO address (addressid,addforename,addsurname,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'David','Aumoniers','451406');
+
+INSERT INTO address (addressid,addforename,addorg,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Bangor LC','Bangor Leisure Centre','270271');
+
+INSERT INTO address (addressid,addforename,addorg,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Benone','Benone Camp Site','05047-50324');
+
+INSERT INTO address (addressid,addforename,addorg,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Vet','Cedermount Vet Clinic','028-91-271364');
+
+INSERT INTO address (addressid,addforename,addorg,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Doctor','Priory Surgery','90-426991');
+
+INSERT INTO address (addressid,addforename,addphone1) 
+	VALUES(NEXTVAL('address_addressid_seq'),
+	'Superdrug','91-818529');
+
+

@@ -1,0 +1,18 @@
+0.04     2016-09-18
+
+- Use Path::Tiny internally and expect Code::TidyAll to be using it too.
+
+
+0.03     2016-05-28
+
+- Remove // so this module works on 5.8.
+
+
+0.02     2015-11-05
+
+- Depend on latest Test::Vars.
+
+
+0.01     2015-11-04
+
+- Initial release.

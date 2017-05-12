@@ -1,0 +1,32 @@
+use Test::Simple tests => 18;
+
+use Chess::Piece::Pawn;
+use Chess::Game::MoveListEntry;
+
+$pawn = Chess::Piece::Pawn->new("e2", "white", "White King's pawn");
+$entry = Chess::Game::MoveListEntry->new(1, $pawn, "e2", "e4");
+ok( $entry );
+ok( $entry->get_move_num() == 1 );
+ok( $entry->get_piece() eq $pawn );
+ok( $entry->get_start_square() eq "e2" );
+ok( $entry->get_dest_square() eq "e4" );
+$clone = $entry->clone();
+ok( $clone );
+ok( $clone ne $entry );
+$piece1 = $entry->get_piece();
+$piece2 = $clone->get_piece();
+$piece2->set_description("cloned");
+ok( $piece1->get_description() ne $piece2->get_description() );
+ok( !$entry->is_capture() );
+ok( !$entry->is_short_castle() );
+ok( !$entry->is_long_castle() );
+ok( !$entry->is_en_passant() );
+$entry = Chess::Game::MoveListEntry->new(1, $pawn, "e2", "e4", 0x0f);
+ok( $entry->is_capture() );
+ok( $entry->is_short_castle() );
+ok( $entry->is_long_castle() );
+ok( $entry->is_en_passant() );
+$entry = Chess::Game::MoveListEntry->new(1, $pawn, "e7", "e8", 0x10);
+ok( $entry->is_promotion() );
+$entry->set_promoted_to("queen");
+ok( $entry->get_promoted_to() eq "queen" );

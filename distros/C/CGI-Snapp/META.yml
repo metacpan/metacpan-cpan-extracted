@@ -1,0 +1,46 @@
+---
+abstract: 'An almost back-compat fork of CGI::Application'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '1.12'
+  Test::More: '1.302052'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Snapp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '4.32'
+  CGI::PSGI: '0.15'
+  CGI::Simple: '1.113'
+  Capture::Tiny: '0.44'
+  Carp: '1.2'
+  Class::ISA: '0.36'
+  Data::Dumper::Concise: '2.02'
+  File::Spec: '3.4'
+  IO::Pipe: '1.15'
+  Log::Handler: '0.88'
+  Moo: '2.002004'
+  Proc::Fork: '0.804'
+  Try::Tiny: '0.27'
+  lib: '0'
+  parent: '0.234'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/CGI-Snapp.git
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

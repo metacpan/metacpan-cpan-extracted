@@ -1,0 +1,11 @@
+
+ Options +ExecCGI +Indexes
+ AddHandler cgi-script .cgi .pl
+
+#~ <Files ~ "\.(pl|cgi)$">
+    #~ SetHandler perl-script
+    #~ PerlHandler ModPerl::RegistryPrefork
+    #~ PerlOptions +ParseHeaders
+#~ </Files>
+
+

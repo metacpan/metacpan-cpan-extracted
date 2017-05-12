@@ -1,0 +1,40 @@
+body 
+{
+	font-family: optima, "Trebuchet MS", Arial, Helvetica, sans-serif;
+	line-height: 1.5; 
+	color: black;
+	padding: 0;
+	border: 0;
+	margin: 40px;
+}
+
+h1,h2,h3,h4 
+{
+	font-family: Georgia, Baskerville, "Times New Roman", Times, serif;
+	text-decoration: none;
+	line-height: 1.2;
+	font-variant: normal;
+	font-weight: lighter;
+}
+
+#status {
+	padding: 10px;
+	border-top: 1px solid #666;
+	margin-top: 30px;
+}
+
+#status p {
+	font-size: 0.8em;
+	line-height: 1.4;
+	color: #666;
+	font-family: optima, arial, helvetica, sans;
+}
+
+p.centered {
+	text-align: center;
+}
+
+.big { font-size: 1.5em; line-height: 0.9; }
+.medium { font-size: 1.2em; line-height: 1.0; }
+.small { font-size: 0.8em; line-height: 1.4;}
+.tiny { font-size: 0.6em; }

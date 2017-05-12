@@ -1,0 +1,15 @@
+---
+name: CGI-Untaint-datetime
+version: 0.06
+author:
+  - Marcus Ramberg <marcus@thefeed.no>
+abstract: validate a date
+license: perl
+requires:
+  CGI::Untaint: 0
+  Time::Piece: 1
+provides:
+  CGI::Untaint::datetime:
+    file: lib/CGI/Untaint/datetime.pm
+    version: 0.06
+generated_by: Module::Build version 0.2607

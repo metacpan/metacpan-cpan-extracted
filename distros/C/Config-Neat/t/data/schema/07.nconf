@@ -1,0 +1,7 @@
+data
+{
+    anything
+    {
+        can_go          here
+    }
+}

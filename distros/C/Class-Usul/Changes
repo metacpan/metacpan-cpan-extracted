@@ -1,0 +1,404 @@
+Revision history for Class::Usul
+
+0.81.1    2017-05-01 04:46:18
+          - Protect db admin password from spaces
+          - Adds all option to schema creation
+          - Splits out more of the create_schema functions
+
+0.80.1    2017-04-03 20:45:27
+          - Adds conditional creation of Pg schema
+          - Fewer assumptions about exception class
+          - New default for usage_opt
+          - Only show method list for help_usage
+
+0.79.1    2017-01-01 15:27:08
+          - RunningMethods terminated no longer quotes bind value
+          - Fixes has_shell_meta in Cmd
+          - Toolchain update CVE-2016-1238
+          - Better help option output
+          - Adds repopulate_class to ::Schema
+            Hides list_popoulation_classes
+          - Exposes list_population_classes in ::Schema
+
+0.78.1    2016-11-03 20:19:28
+          - Makes unlink in ::Schema privately settable
+          - Exposes ddl_paths in ::Schema
+          - Added broken smoker
+
+0.77.1    2016-09-01 13:42:52
+          - Added broken smoker
+
+0.76.1    2016-09-01 01:48:18
+          - Bumps dependency version
+          - Fixes keep_fhs bug in Log and Cmd
+
+0.75.1    2016-08-06 16:05:17
+          - Corrected log filename precedence
+          - Refactored db attr code in Schema
+          - Adds create_token64
+          - Deprecated Schema::deploy_file v populate_class
+
+0.74.1    2016-06-02 15:31:46
+          - Changed QUOTED_RE to be a regex
+          - Stringify DateTime in dumper function
+
+0.73.1    2016-03-02 02:14:56
+          - Fixed missing config in deploy and populate
+          - Fixed bug in str2time. Present in Date::Parse
+            RT#53413 and RT#105031
+
+0.72.1    2016-02-06 00:00:35
+          - Skipped evaluating Config shell on mswin32
+
+0.71.1    2016-02-05 13:16:12
+          - Skipped evaluating Config shell on mswin32
+
+0.70.1    2016-02-04 17:29:12
+          - Dropped Log::Handler dependency to 0.84
+
+0.69.1    2016-02-04 17:22:16
+          - Improved test coverage and documentation
+          - Added ns_environment function
+          - Made data_dumper smarter
+          - Improved Log class documentation. Added get_logger
+
+0.68.1    2016-01-02 02:12:32
+          - Dropped dependency on Regexp::Common
+            That module has had installation and indexing problems for
+            some time 249f54a8-b08e-11e5-9304-6ec2af845ad4 and RT#110771
+          - Added more options to Functions find_apphome
+          - Added function interface to Log
+          - Made data_dumper smarter
+          - Refactored smoker exceptions to dump file
+
+0.67.1    2015-10-02 20:56:53
+          - Fixed schema test on win32
+          - Finer control of L10N constructor attributes
+
+0.66.1    2015-10-02 15:06:15
+          - Fewer test dependencies in boilerplate
+          - Smarter changelog parsing in git hook
+          - Creating functional composition section
+          - Fixing Time::Piece test
+          - Avoid STDIN reopen warning in Prompt tests
+          - Added str2time_piece to ::Time
+          - Switched Travis to a containerised build
+          - Made Schema deploy_file public
+          - Toolchain and prereq updates
+          - Added expected_rv to Programs params
+          - Use BuildRequires not TestRequires for Kwalitee
+          - Using Test::ReportMetadata
+
+0.65.1    2015-08-27 13:51:59
+          - Improved naming of type constraints
+
+0.64.1    2015-08-22 18:08:11
+          - Added Functions::chain
+          - Added log method to Log class for Web::ComposableRequest
+          - Relaxed the BaseType constraint
+          - Added Functions cwdp current working directory
+          - Dropped usage of feature state
+          - Removed C:U:encoding
+          - Default to connect-info in ctrldir for db connection data
+          - Disable smoking on broken smoker
+            2267ff46-0a8a-11e5-a85a-e28fcaadd3a7
+
+0.63.1    2015-06-03 21:15:44
+          - Disable smoking on broken smoker
+            158a80fe-0a22-11e5-9d49-e60ed23c8333
+          - Functions find_apphome uses defined home for short circuit
+          - Improved Types documentation
+          - Made Config shell attr builder use File::Which
+
+0.62.1    2015-06-02 10:46:24
+          - Fixed mswin32 configuration test
+
+0.61.1    2015-06-01 21:40:56
+          - Added two points to the coverage
+          - Added Options option config passed to GLD
+          - Exposed select_method in RunningMethods
+          - Fixed newline on OutputLogging fatal method
+          - Removed taint from attribute POD content
+          - Changed some Config directory defaults to be more sensible
+
+0.60.1    2015-05-30 14:32:15
+          - Added type_map to Usage configuration options
+          - Added usage configuration options
+          - Bugfix in Getopt::Usage::_option_length
+          - Added option highlighting to Getopt::Usage output
+          - Added Getopt and Getopt::Usage classes
+
+0.59.1    2015-05-29 02:01:42
+          - Refactored no_quote_bind_values in OutputLogging
+          - Refactored Programs into roles
+          - Added grave to untaint cmdline
+          - Split Programs into OutputLogging and Usage roles
+          - Added whiten to Functions
+          - Stopped shortening the key in Crypt
+          - Added Functions urandom
+          - Logs levels settable via Constants class attr
+          - Added log object tests
+          - Eliminated _message methods from the log object
+
+0.58.1    2015-05-11 14:32:21
+          - Added untainted_argv to UntaintedGetopts
+          - Made trapping exec failure an authore test. Unreliable
+          - Moved Programs interpolate_cmd to CX::Usul Admin
+          - Made Programs exit usage public
+          - Untainted more configuration attributes
+          - Functions get_user accepts uids or names
+          - Untainted IPC::SRLock type attr and Programs encoding attr
+          - Usul now even more lazy
+          - Depoy and populate now uses Data::Record
+          - Added Schema dry run and SQLite support
+          - Added Config::datadir
+          - Added badges
+          - Made host and port optional in get_connect_info
+          - Make list_attr_of an public exported function
+          - Made ::Schema lookup DDL commands from a map
+          - Use File::DataClass constants for MSOFT and CYGWIN
+          - No longer export is_member by default from Functions
+          - Usul->lock no longer a singleton
+          - Added diag output to tests for solaris
+          - Deleted unused meta_class attr from Programs
+
+0.57.1    2015-03-14 20:07:54
+          [ Additions ]
+          - Added dump_config_attr method to Programs
+          - Default debug attr to env var in Programs
+
+          [ Changes ]
+          - Made more private subs lexical
+          - Removed ::TraitFor::MetaData in favour of CPAN::Meta
+          - Use ensure_class_loaded not require at runtime
+
+0.56.1    2015-02-05 19:42:30
+          [ Bug Fixes ]
+          - Bumped version dependencies
+
+0.55.1    2015-02-04 23:57:08
+          [ Changes ]
+          - Factored out usage of MooX::ClassStash
+
+0.54.1    2015-02-04 15:52:16
+          [ Bug Fixes ]
+          - Fixed exec failure traping in Cmd. Closes RT#101921 haarg++
+          - Fixed VERSION derivation in Programs
+
+0.53.1    2015-02-01 15:10:41
+          [ Bug Fixes ]
+          - Fixed method name in ::Progams::usage
+          - Fixed Pod::* usage in ::Programs
+
+          [ Changes ]
+          - Replaced coercion calls with coerce TRUE
+          - Renamed version attr to show_version in ::Programs
+          - Made Config::mode type OctalNum and Constant::mode a string
+          - Refactored tests. Added t::boilerplate
+          - Removed CatalystX references from POD
+
+0.52.1    2015-01-09 23:12:20
+          [ Bug Fixes ]
+          - Better parsing of @INC in Functions
+          - Fixed method listing for composable roles
+          - Fixed error for no method in ::Programs
+          - Fixed default closing of stdin in ::Cmd
+
+          [ Changes ]
+          - Will try IPC::Run in ::Cmd on mswin32
+
+          [ Enhancements ]
+          - Cmd out and err handlers redirect to blessed objects
+          - Added socket_pair to ::Functions
+          - Try IPC::Run in ::Cmd on mswin32 if requested and available
+          - Added the partition_cmd attr to ::Cmd
+          - More ::Cmd debug output
+          - Switched to lexical subroutines for private methods and functions
+
+0.51.1    2014-11-11 14:44:49
+          [ Changes ]
+          - Made ::Programs::debug rwp
+          - Made Usul::debug ro. Removed trigger
+
+0.50.1    2014-10-28 11:44:12
+          [ Bug Fixes ]
+          - Fixed changelog format
+          - Fixed badly written test
+
+0.49.1    2014-10-27 13:04:54
+          [ Bug Fixes ]
+          - Fixed exit code when async process is killed
+          - Fixed trapping exec failure if ::Cmd fork and exec
+          - Fixed object serialisation in ::Log
+          - Fixed child signal handling in ::Cmd fork and exec
+
+          [ Test Suite ]
+          - Added Hash::MoreUtils to test prereqs
+
+          [ Enhancements ]
+          - Added cfgfiles as a Config attr
+          - ::Programs run_method now accepts dashes in method names
+          - Made ::Programs method attr rwp
+          - Added AS_PASSWORD constant for ::Prompting get_line
+
+          [ Changes ]
+          - Renamed dbattrs to db_attr in ::Schema
+
+0.48.0    2014-10-18 15:46:39
+          - Factored out C::U::IPC::Cmd. IPC::Run no longer required
+          - Had to add quote_identifiers to dbi connect attrs
+            after laptop rebuild to make create_ddl work again
+          - Shortened throw calls, can remove class key
+          - Fixed spelling
+          - Added POD to ::IPC::Cmd
+          - Added functional interface to ::IPC::Cmd
+          - ::IPC::Cmd async processes no more zombies
+          - Removed new_from_class since only used by CX::Usul
+          - Sync MetaData attr names with CPAN::Meta
+          - Created AS_PARA constant
+
+0.47.1    2014-08-28 21:36:17
+          - Removed last of ::sweep statements
+
+0.46.1    2014-08-28 18:05:46
+          - Replace namespace::sweep with namespace::autoclean
+          - Make packages specify which constants they use
+          - Replaced diagnostic with new boilerplate plan skip_all test
+          - Added diagnostic to test since
+            f3a3dae7-6bf7-1014-bf26-fc13b95c3ac1
+          - Renamed config dbasedir to sharedir
+          - Conditionally load Proc::ProcessTable if available
+          - Added level > 1 to Functions::ensure_class_loaded
+          - Propagte changes in Exception Class to File::DataClass
+          - Added DateTime type, coercion, and exception
+          - Added test for metadata role
+          - Removed dependency on Path::Class
+          - The find_apphome function will search XDG_DATA_HOME
+          - Set exception level to 2 in get_cfgfiles
+
+0.45.1    2014-07-09 20:39:04
+          - Added localizer to L10N
+          - Added curry function
+
+0.44.1    2014-06-20 14:38:41
+          - Implemented timeouts in ::IPC::run_cmd
+          - ::IPC::run_cmd improved method selection
+          - Removed debug attr from ::IPC::run_cmd
+
+0.43.1    2014-06-17 10:20:46
+          - Updated prereqs
+          - Deprecated ::L10N::domain_names in favour of
+            l10n_attributes->{domains}
+          - ::IPC::run_cmd better arg processing for out parameter
+          - Made untaint_path more stringent
+          - ::Programs::list_methods avoid POD markup in method name
+
+0.42.1    2014-05-18 08:32:38
+          - b1a3c1dc-de3e-11e3-84c4-fc77f9652e90 Test::Requires Hash::MoreUtils
+
+0.41.1    2014-05-01 15:30:31
+          - Moo / Role::Tiny upgrade. Must explicitely use feature 'state'
+          - Removed special behaviour for Win32 from ::F::emit
+
+0.40.1    2014-05-01 02:20:09
+          - Fix ::Functions::fullname to remove &s for CPAN Testing
+          - Moved location of namespace::clean calls. Yuck
+          - Replaced JSON with JSON::MaybeXS
+          - Removed dh_base and dh_mod
+          - Fixed ::Crypt for user supplied passwords
+
+0.39.1    2014-02-03 18:58:12
+          - Removed Ident and VERSION from most files
+          - Skipped ::Functions fullname test
+          - Added locales config attribute
+          - Log methods now return true
+          - Added ::Functions first_char
+
+0.38.1    2014-01-25 02:11:23
+          - Fixed VERSION in ::TF::MetaData
+          - Fixed IPC::cache_ttys
+
+0.37.1    2014-01-24 20:58:30
+          - Updated dependency on File::DataClass
+          - Updated git pre commit hook
+
+0.36.1    2014-01-15 17:20:32
+          - Renamed Unexpected::has_exception to add_exception
+          - Removed unecessary methods from ::File
+          - ::Functions now exports F::DC::IO::io
+          - Renamed ::TF::MetaData::get_meta to get_package_meta
+          - Moved ::TraitFor::LoadingClasses to CX::Usul
+          - Moved ::Response::Meta to ::TraitFor::MetaData
+          - Dropped dependency on YAML::Syck
+
+0.35.1    2014-01-07 08:39:29
+          - Added ::Schema and ::TraitFor::ConnectInfo
+
+0.34.1    2014-01-05 22:06:39
+          - Stopped using XML data files in tests
+          - Using predefined exception errors
+          - Simplified Build.PL. Updated test boilerplate
+          - Using DZ::P::AbstractFromPOD and LicenseFromModule
+          - Added ::Types testing
+          - Dropped dependency on Class::Load
+          - Added ::Functions emit_err
+          - ::Prompting::get_option right justifies the count
+          - Refactored ::Functions::ensure_class_loaded
+          - Exposed throw_on_error in ::Functions
+
+0.33.1    2013-11-23 12:57:25
+          - Dropped MooX::Options dependency
+
+0.32.1    2013-11-22 14:59:52
+          - Added more tests
+          - Updated POD
+          - ::Prompting will add_leader with initial +
+          - Bumped Unexpected dependency to v0.15
+          - Refactored TF::UntaintedGetopts
+          - Set quiet to true for ::Programs help
+          - Removed prefix and salt attr from ::Usul
+
+0.31.1    2013-10-05 03:18:00
+          - Set cache_ttys to false for CPAN testing
+
+0.30.1    2013-10-03 17:29:45
+          - Added Capture::Tiny to test dependencies
+
+0.29.1    2013-10-03 17:17:17
+          - Fixed ipc process_table test
+          - Fixed file test
+
+0.28.1    2013-10-03 15:40:10
+          - Renamed ::Prompt to ::TraitFor::Prompting
+          - POD updates. More tests better coverage
+          - Updated git hooks
+          - Removed _ from CU attributes
+          - Split ::Prompt from ::Programs
+          - Added ::Functions::emit_to removed __print_fh
+          - Replaced Exporter::TypeTiny with Exporter::Tiny
+
+0.27.1    2013-10-02 13:47:48
+          - Programs::nodebug deprecated for noask
+          - Functions::get_user accepts a uid
+          - Added 'Tainted' as an exception class
+          - Relaxed CMDLINE untaint regex
+          - Also accept dashes in config file names
+
+0.26.1    2013-09-03 13:10:50
+          - Bumped version dependencies
+
+0.25.1    2013-08-18 12:15:00
+          - Updated toolchain
+
+0.24.1    2013-08-15 14:43:52
+          - Updated toolchain
+          - Bumped dependency File::DataClass
+          - Converted to Dist::Zilla
+
+0.23.1    2013-08-11 21:56:06
+          - Skip file tests if XML::DTD is not available
+          - Toolchain update. Attempt to filter out residual noise
+          - Misconfigured smoker b0c2e9aa-ffb4-11e2-8a37-e2882d12fa71
+            should have been N/A or Unknown. Toolchain updated
+          - Reset min perl testing to original behaviour
+          - POD Updates, removed last references to Moose

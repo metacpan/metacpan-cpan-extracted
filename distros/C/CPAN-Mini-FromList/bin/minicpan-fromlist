@@ -1,0 +1,141 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use File::Find::Rule;
+
+# ABSTRACT: run CPAN::Mini::FromList
+# PODNAME: minicpan-fromlist
+
+
+use CPAN::Mini::FromList;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+
+sub config_read {
+	my $filename = shift;
+
+	return unless -f $filename;
+
+	open my $config_file, '<', $filename
+		or die "couldn't open config file $filename: $!";
+	
+	my %config;
+	while (<$config_file>) { 
+		chomp;
+		next if /\A\s*\Z/sm;
+		if (/\A(\w+):\s*(.+)\Z/sm) { $config{$1} = $2; }
+	}
+	for (qw(module_filters path_filters)) {
+		$config{$_} = [ map { qr/$_/ } split /\s+/, $config{$_} ] if $config{$_};
+	}
+	return %config;
+}
+
+my %config;
+
+%config = config_read( $ENV{HOME} . '/.minicpanrc' );
+
+GetOptions(
+           "h|help"     => sub { pod2usage(1); },
+           "v|version"  => sub { print "minicpan-fromlist, powered by CPAN::Mini::FromList $CPAN::Mini::FromList::VERSION\n\n"; exit; },
+           "l|local_fromlist=s"   => \$config{local_fromlist},
+           "r|remote=s"  => \$config{remote},
+           "d|dirmode=s" => \$config{dirmode},
+           "q+" => \$config{quiet},
+           "p+" => \$config{perl},
+           "x+" => \$config{exact_mirror},
+           "generate_02" => \$config{generate_02},
+          ) or pod2usage(2);
+
+pod2usage(2) unless $config{local_fromlist} and $config{remote};
+
+$|++;
+$config{dirmode} &&= oct($config{dirmode});
+
+CPAN::Mini::FromList->delete_02packages($config{local_fromlist});
+
+CPAN::Mini::FromList->update_mirror(
+    remote  => $config{remote},
+    local   => $config{local_fromlist},
+    trace   => (not $config{quiet}),
+    dirmode => $config{dirmode},
+    skip_perl      => 1,
+    exact_mirror   => ($config{exact_mirror}),
+    module_filters => ($config{module_filters}),
+    path_filters   => ($config{path_filters}),
+    force   => 1,
+    list    => \@ARGV,
+);
+
+CPAN::Mini::FromList->generate_fake_02packages($config{local_fromlist});
+
+
+
+
+__END__
+=pod
+
+=head1 NAME
+
+minicpan-fromlist - run CPAN::Mini::FromList
+
+=head1 VERSION
+
+version 0.05
+
+=head1 SYNOPSIS
+
+ minicpan-fromlist [options]
+
+ Options
+   -l LOCAL   - where is the local minicpan?     (required)
+   -r REMOTE  - where is the remote cpan mirror? (required)
+   -d 0###    - permissions (numeric) to use when creating directories
+   -q         - run in quiet mode (don't print status)
+
+=head1 DESCRIPTION
+
+This simple shell script just updates (or creates) a miniature CPAN mirror as described in CPAN::Mini::FromList.
+
+The local and remote mirror locations are (for now) hardcoded and 
+should be updated before running this script for the first time.
+
+=head1 NAME
+
+minicpan-fromlist - uses CPAN::Mini::FromList to create or update a local mirror
+
+=head1 CONFIGURATION FILE
+
+C<minicpan> will read the file C<~/.minicpanrc> to get configuration
+information.  The file is a simple set of names and values, as in the 
+following example:
+
+ local:  /home/rjbs/mirrors/minicpan/
+ local_fromlist:  /home/domm/cpants/fake_cpan
+ remote: http://your.favorite.cpan/cpan/
+ exact_mirror: 1
+
+Please note that C<local> will not be used by minicpan_fromlist. Use 
+C<local_fromlist> instead.
+
+=head1 AUTHOR
+
+Thomas Klausner C<< domm@cpan.org >> 
+
+This code was copyrighted in 2008, and is released under the same 
+terms as Perl
+itself.
+
+=head1 AUTHOR
+
+Thomas Klausner <domm@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,37 @@
+NAME
+    CatalystX::Debug::ResponseHeaders - Log the full response headers sent
+    by your Catalyst application in debug mode
+
+SYNOPSIS
+        use Catalyst qw/
+            +CatalystX::Debug::ResponseHeaders
+        /;
+
+DESCRIPTION
+    Prints a Text::SimpleTable style table containing all the headers sent
+    from the user's browser to the application for each request when the
+    application is in debug mode.
+
+METHODS
+  log_response_status_line
+    Thie method is wrapped to stop the normal method being called. This
+    suppresses the normal single line response status output.
+
+  log_response_headers
+    This hook method in Catalyst is wrapped to call the "log_headers" in
+    Catalyst method for the request headers.
+
+BUGS
+    None known, but there probably are some.
+
+    Patches are welcome, as are bug reports in the rt.cpan.org bug tracker.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>".
+
+COPYRIGHT & LICENSE
+    Copyright 2010 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

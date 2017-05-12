@@ -1,0 +1,51 @@
+{
+   "abstract" : "use Panda::Config::Perl with catalyst.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Config-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76",
+            "ExtUtils::ParseXS" : "3.24",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.76",
+            "Panda::Install" : "v1.2.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "0",
+            "Class::Accessor::Inherited::XS" : "0.07",
+            "Panda::Config::Perl" : "0",
+            "Panda::Install" : "v1.2.4",
+            "Panda::Lib" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.3"
+}

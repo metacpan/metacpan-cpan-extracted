@@ -1,0 +1,166 @@
+# PODNAME: Crypt::NaCl::Sodium::scalarmult
+# ABSTRACT: Diffie-Hellman (Curve25519)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::scalarmult - Diffie-Hellman (Curve25519)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_scalarmult = Crypt::NaCl::Sodium->scalarmult();
+
+    my ($a_skey, $a_pkey, $a_shared_key, $a_key
+        $b_skey, $b_pkey, $b_shared_key, $b_key);
+
+    ## Alice
+    ########
+
+    # Alice generates secret key
+    $a_skey = $crypto_scalarmult->keygen();
+
+    # and computes the public key
+    $a_pkey = $crypto_scalarmult->base( $a_skey );
+
+    # ... and shares it with Bob
+    send_to( Bob => { public_key => $a_pkey } );
+
+    ## Bob
+    ########
+
+    # Bob generates his secret key
+    $b_skey = $crypto_scalarmult->keygen();
+
+    # and computes the public key
+    $b_pkey = $crypto_scalarmult->base( $b_skey );
+
+    # ... and shares his public key with Alice
+    send_to( Alice => { public_key => $b_pkey } );
+
+    # Bob receives the public key from Alice
+    $a_key = receive_for( Bob => 'public_key' );
+
+    # Bob can now calculate the shared secret key
+    $b_shared_key = $crypto_scalarmult->shared_secret( $b_skey, $a_key );
+
+    ## Alice
+    ########
+
+    # Alice receives the public key from Bob
+    $b_key = receive_for( Alice => 'public_key' );
+
+    # and can now also calculate the shared secret key
+    $a_shared_key = $crypto_scalarmult->shared_secret( $a_skey, $b_key );
+
+    # shared keys calculated by Alice and Bob are equal
+    $a_shared_key eq $b_shared_key or die;
+
+    # NOTE: send_to() and receive_for() and user functions providing transport of
+    # messages
+
+=head1 DESCRIPTION
+
+C<crypto_scalarmult> provides I<Curve25519>, a state-of-the-art
+Diffie-Hellman function suitable for a wide variety of
+applications, eg. authenticate and encrypt messages between both parties.
+
+=head1 METHODS
+
+=head2 keygen
+
+    my $secret_key = $crypto_scalarmult->keygen();
+
+Helper method to generate a random secret key to be used by C<$crypto_scalarmult>.
+
+The length of the C<$secret_key> equals L</SCALARBYTES>.
+
+The same secret key can be used with multiple other users, without the need of
+generating a distinct set of keys.
+
+B<NOTE:> keep the secret key confidential.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 base
+
+    my $public_key = $crypto_scalarmult->base( $secret_key );
+
+Computes the public key for corresponding secret key.
+
+The length of the C<$public_key> equals L</BYTES>.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 shared_secret
+
+    my $shared_key = $crypto_scalarmult->shared_secret( $sender_secret_key, $recipient_public_key );
+
+Given a user's secret key C<$sender_secret_key> and another user's public key
+C<$recipient_public_key>, computes a secret shared
+by the two users and returns it. This secret can then
+be used to authenticate and encrypt messages between the two
+users.
+
+The length of the C<$shared_key> equals L</BYTES>.
+
+Returns L<Data::BytesLocker> objects.
+
+=head1 CONSTANTS
+
+C<BYTES> and C<SCALARBYTES> are provided for consistency, but it is safe to
+assume that C<BYTES == SCALARBYTES>.
+
+=head2 BYTES
+
+    my $pkey_length = $crypto_scalarmult->BYTES;
+
+Returns the length of public key (and shared secret).
+
+=head2 SCALARBYTES
+
+    my $skey_length = $crypto_scalarmult->SECRETKEYBYTES;
+
+Returns the length of secret key.
+
+=head1 ALGORITHM DETAILS
+
+C<crypto_scalarmult> uses I<Curve25519>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Crypt::Curve25519>
+
+=item * L<Cryptography in NaCl|http://cr.yp.to/highspeed/naclcrypto-20090310.pdf>
+
+=item * L<A state-of-the-art Diffie-Hellman function|http://cr.yp.to/ecdh.html>
+- Curve25519
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

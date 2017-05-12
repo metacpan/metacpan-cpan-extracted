@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution Catalyst-Plugin-Devel-ModuleVersions, version
+0.100330:
+
+  Dump your loaded module versions to the debug-screen
+
+This software is copyright (c) 2010 by Andreas Marienborg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

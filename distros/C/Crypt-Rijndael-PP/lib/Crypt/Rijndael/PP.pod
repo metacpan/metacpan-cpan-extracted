@@ -1,0 +1,144 @@
+=pod
+
+=head1 NAME
+
+Crypt::Rijndael::PP - Pure Perl Implementation of the Rijndael Encryption Algorthim
+
+=head1 SYNOPSIS
+
+    use Crypt::Rijndael::PP;
+
+    # Please use securely generated keys and IV's, these are purely examples!!!
+    my $key   = 'A' x 32;
+    my $input = 'B' x 16;
+
+    # For you hardcore low level 'I want to control everything!' types:
+    {
+        my $iv = 'A' x 16;
+
+        # If you aren't sure which mode to use, use CBC (Chaining Block Cipher)
+        my $cipher = Crypt::Rijndael::PP->new(
+            $key, Crypt::Rijndael::PP::MODE_CBC()
+        );
+
+        $cipher->set_iv( $iv );
+
+        my $cipher_text = $cipher->encrypt( $input );
+        my $plain_text  = $cipher->decrypt( $cipher_text );
+    }
+
+    # For you, 'do it for me' types:
+    {
+        my $cipher = Crypt::CBC->new(
+            -key    => $key,
+            -cipher => 'Rijndael::PP',
+        );
+
+        my $cipher_text = $cipher->encrypt( $input );
+        my $plain_text  = $cipher->decrypt( $cipher_text );
+    }
+
+=head1 DESCRIPTION
+
+Crypt::Rijndael::PP is a pure perl drop in alternative to Crypt::Rijndael, fully compatiable with L<Crypt::CBC>.  It exposes the exact same functionatly and can be used in place for any use case where you can not use the XS version of the Rijndael module.
+
+Though named Crypt::Rinjdae::PP, this module implements the Advanced Encryption Standard (AES) and is suitable for all of your strong cryptographic needs.  It will accept either a 128, 192, or 256 bit key and inputs that are multiples of the blocksize (which is 16 bytes).  This module B<WILL NOT> perform padding for you, if you need that functionatly consider using L<Crypt::CBC> with the 'Rijndael::PP' cipher under the hood.  The following encryption modes are available.
+
+=over 4
+
+=item MODE_ECB - Electronic Code Book
+
+The default, but you most likely do not want to use this.  In Electronic Code Book, each block is encrypted as a seperate indepedent block meaning that the same plain text produces the same cipher text.
+
+=item MODE_CBC - Chaining Block Cipher
+
+My personal choice, uses an initialization vector (IV) as a 'salt' of sorts.  Much better then ECB because the same plain text will not produce the same cipher text.
+
+=item MODE_CTR - Counter
+
+Similiar to CBC, but adds a counter to the IV for each succesive block.
+
+=item MODE_CFB - Cipher Feedback
+
+Similiar to CBC, but uses the IV as input to the cipher algorthim then XOR'ing the plain text with the result of the algorthim.
+
+=item MODE_OFB - Output Feedback
+
+Similiar to CFB, but uses the the result of the cipher algorthim before XOR'ing it with the plain text as input to the next block.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+    my $cipher = Crypt::Rijndael::PP->new(
+        $key, Crypt::Rijndael::PP::MODE_ECB(),
+    )
+
+Generates an instance of Crypt::Rijndael::PP, accepts the key and the mode to use.
+
+=head2 encypt
+
+    my $cipher_text = $cipher->encrypt( $input );
+
+Encrypts the provided input, generating cipher text.
+
+=head2 decrypt
+
+    my $plain-text = $cipher->encrypt( $cipher_text );
+
+Decrypts the provided input, gneerating plain text.
+
+=head2 set_iv
+
+    $cipher->set_iv( 'A' x 16 );
+
+Sets the initialization vector.
+
+=head2 get_iv
+
+    my $iv = $cipher->get_iv();
+
+Gets the current IV.
+
+=head1 COMPATABILITY
+
+Crypt::Rijndael::PP is intended to be fully compatable with Crypt::Rijndael, and is fully compatable with Crypt::CBC when using 256 bit keys.
+
+=head1 REPOSITORY and BUG REPORTING
+
+The repository for this module is publically available on github at L<https://github.com/drzigman/crypt-rijndael-pp> so feel free to go fork yourself!  Please use the github issues tracker for any normal bugs and try to create a failing test case if possible.  Please email me (see below) for any sensitive issues you may come across.
+
+=head1 EXTERNAL LINKS
+
+=over 4
+
+=item L<My Presentation on the AES Algorthim and How it Works|http://houston.pm.org/talks/2014talks/1410Talk/index.html>
+
+If you aren't a member of your local L<Perl Mongers|http://www.pm.org/> you really should be!
+
+=item L<AES Specification from NIST|http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf>
+
+=item L<Wikipedia's Article on Block Cipher Modes of Operation|http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+None of this would be possible without the excellent Rijndael algorithm written by Joan Daemen and Vincent Rijmen.
+
+Special thanks to L<brian d foy|http://www252.pair.com/~comdog/> for his faith and entrusting me with the Crypt::Rijndael module, the L<Houston Perl Mongers|http://houston.pm.org/> for allowing me to present to them my initial implementation, and to L<HostGator|http://www.hostgator.com> and L<BrainStorm Incubator|http://brainstormincubator.com> for providing development resources.
+
+Thanks to L<Leon Timmermans|https://metacpan.org/author/LEONT> for pointing out a testing dependency on L<Crypt::Rijndal|https://metacpan.org/pod/Crypt::Rijndael> that was removed and for noting a perl 5.10 dependency that was not needed.
+
+=head1 AUTHORS
+
+Robert Stone, C<< <drzigman AT cpan DOT org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2015 Robert Stone
+This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU Lesser General Public License as published by the Free Software Foundation; or any compatible license.
+
+See http://dev.perl.org/licenses/ for more information.

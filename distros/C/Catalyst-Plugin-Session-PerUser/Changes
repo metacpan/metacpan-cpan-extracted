@@ -1,0 +1,24 @@
+Revision history for Perl extension Catalyst::Plugin::Session::PerUser
+
+0.05   2010-01-22 19:18:00
+    - Switch to using Moose and MRO::Compat rather than NEXT and
+      Class::Accessor::Fast (RT#53862)
+    - Split the TestApp out of the test file.
+
+0.04    2009-08-18 00:25:00
+    - switch to Module::Install
+    - add basic use test, plus pod/pod coverage tests
+    - skip live_app test if Test::WWW::Mechanize::Catalyst <= 0.40 is missing
+      (RT #29041)
+
+0.03    2006-06-30 01:06:29
+    - cleaned up internals to be a bit more efficient
+    - split session_data api on user objects into get_session_data and
+      store_session_data
+
+0.02    2005-12-04
+    - handle things correctly on logout
+    - make merge behavior configurable, and make RIGHT_PRECEDENT the default
+
+0.01    2005-11-27
+    - initial release

@@ -1,0 +1,84 @@
+NAME
+    CGI::Pure::Fast - Fast Common Gateway Interface Class for CGI::Pure.
+
+SYNOPSIS
+     use CGI::Pure::Fast;
+     my $cgi = CGI::Pure::Fast->new(%parameters);
+     $cgi->append_param('par', 'value');
+     my @par_value = $cgi->param('par');
+     $cgi->delete_param('par');
+     $cgi->delete_all_params;
+     my $query_string = $cgi->query_string;
+     $cgi->upload('filename', '~/filename');
+     my $mime = $cgi->upload_info('filename', 'mime');
+     my $query_data = $cgi->query_data;
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+             Extends CGI::Pure for FCGI.
+
+     Other methods are same as CGI::Pure.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use CGI::Pure::Fast;
+     use HTTP::Headers;
+
+     # HTTP header.
+     my $header = HTTP::Headers->new;
+     $header->header('Content-Type' => 'text/html');
+
+     # FCGI script.
+     my $count = 1;
+     while (my $cgi = CGI::Pure::Fast->new) {
+             print $header->as_string."\n";
+             print $count++."\n";
+     }
+
+     # Output in CGI mode:
+     # Content-Type: text/html
+     # 
+     # 1
+     # ...
+     # Content-Type: text/html
+     # 
+     # 1
+     # ...
+
+     # Output in FASTCGI mode:
+     # Content-Type: text/html
+     # 
+     # 1
+     # ...
+     # Content-Type: text/html
+     # 
+     # 2
+     # ...
+
+DEPENDENCIES
+    CGI::Pure, FCGI, Readonly.
+
+SEE ALSO
+    CGI::Pure
+        Common Gateway Interface Class.
+
+    CGI::Pure::Save
+        Common Gateway Interface Class for loading/saving object in file.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.06
+

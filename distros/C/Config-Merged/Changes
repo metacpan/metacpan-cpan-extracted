@@ -1,0 +1,24 @@
+changes from 0.03 to 0.04
+=========================
+
+  * removed MYMETA.yml and MYMETA.json from module distribution
+    per CPAN standards
+
+  * updated documentation to reflect new formatting standards
+
+changes from 0.02 to 0.03
+=========================
+
+  * fixed test to properly load stems
+
+changes from 0.01 to 0.02
+=========================
+
+  * added handling in case 'flatten_to_hash' is used
+
+
+changes from 0.00 to 0.01
+=========================
+
+  * minor fixes for better distribution handling
+

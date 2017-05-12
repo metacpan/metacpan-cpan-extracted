@@ -1,0 +1,181 @@
+NAME
+    CSS::Simple - Interface through which to read/write/manipulate CSS files
+    while respecting the cascade order
+
+SYNOPSIS
+     use CSS::Simple;
+
+     my $css = new CSS::Simple();
+
+     $css->read_file({ filename => 'input.css' });
+
+     #perform manipulations...
+
+     $css->write_file({ filename => 'output.css' });
+
+DESCRIPTION
+    Class for reading, manipulating and writing CSS. Unlike other CSS
+    classes on CPAN this particular module focuses on respecting the order
+    of selectors while providing a common sense API through which to
+    manipulate the rules.
+
+    Please note that while ordering is respected, the exact order of
+    selectors may change. I.e. the rules implied by the styles and their
+    ordering will not change, but the actual ordering of the styles may
+    shift around. See the read method for more information.
+
+CONSTRUCTOR
+    new ([ OPTIONS ])
+        Instantiates the CSS::Simple object. Sets up class variables that
+        are used during file parsing/processing.
+
+        warns_as_errors (optional). Boolean value to indicate whether fatal
+        errors should occur during parse failures.
+
+METHODS
+    read_file( params )
+        Opens and reads a CSS file, then subsequently performs the parsing
+        of the CSS file necessary for later manipulation.
+
+        This method requires you to pass in a params hash that contains a
+        filename argument. For example:
+
+        $self->read_file({filename => 'myfile.css'});
+
+    read( params )
+        Reads css data and parses it. The intermediate data is stored in
+        class variables.
+
+        Compound selectors (i.e. "a, span") are split apart during parsing
+        and stored separately, so the output of any given stylesheet may not
+        match the output 100%, but the rules themselves should apply as
+        expected.
+
+        Ordering of selectors may shift if the same selector is seen twice
+        within the stylesheet. The precendence for any given selector is the
+        last time it was seen by the parser.
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->read({css => $css});
+
+    write_file()
+        Write the parsed and manipulated CSS out to a file parameter
+
+        This method requires you to pass in a params hash that contains a
+        filename argument. For example:
+
+        $self->write_file({filename => 'myfile.css'});
+
+    write()
+        Write the parsed and manipulated CSS out to a scalar and return it
+
+    content_warnings()
+        Return back any warnings thrown while parsing a given block of css
+
+        Note: content warnings are initialized at read time. In order to
+        receive back content feedback you must perform read() first.
+
+    get_selectors( params )
+        Get an array of selectors that represents an inclusive list of all
+        selectors stored.
+
+    get_properties( params )
+        Get a hash that represents the various properties for this
+        particular selector
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->get_properties({selector => '.foo'});
+
+    check_selector( params )
+        Determine if a selector exists within the stored rulesets
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->check_selector({selector => '.foo'});
+
+    modify_selector( params )
+        Modify an existing selector
+
+        Modifying a selector maintains the existing selectivity of the rule
+        with relation to the original stylesheet. If you want to ignore that
+        selectivity, delete the element and re-add it to CSS::Simple
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->modify_selector({selector => '.foo', new_selector => '.bar'
+        });
+
+    add_selector( params )
+        Add a selector and associated properties to the stored rulesets
+
+        In the event that this particular ruleset already exists, invoking
+        this method will simply replace the item. This is important - if you
+        are modifying an existing rule using this method than the previously
+        existing selectivity will continue to persist. Delete the selector
+        first if you want to ignore the previous selectivity.
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->add_selector({selector => '.foo', properties => {color =>
+        'red' }});
+
+    add_properties( params )
+        Add properties to an existing selector, preserving the selectivity
+        of the original declaration.
+
+        In the event that this method is invoked with a selector that
+        doesn't exist then the call is just translated to an add_selector
+        call, thus creating the rule at the end of the ruleset.
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->add_properties({selector => '.foo', properties => {color =>
+        'red' }});
+
+    delete_selector( params )
+        Delete a selector from the ruleset
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->delete_selector({selector => '.foo' });
+
+    delete_property( params )
+        Delete a property from a specific selectors rules
+
+        This method requires you to pass in a params hash that contains
+        scalar css data. For example:
+
+        $self->delete_property({selector => '.foo', property => 'color' });
+
+Sponsor
+    This code has been developed under sponsorship of MailerMailer LLC,
+    http://www.mailermailer.com/
+
+AUTHOR
+    Kevin Kamel <"kamelkev@mailermailer.com">
+
+ATTRIBUTION
+    This module is directly based off of Adam Kennedy's <adamk@cpan.org>
+    CSS::Tiny module.
+
+    This particular version differs in terms of interface and the ultimate
+    ordering of the CSS.
+
+LICENSE
+    This module is a derived version of Adam Kennedy's CSS::Tiny Module.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

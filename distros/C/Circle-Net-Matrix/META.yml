@@ -1,0 +1,32 @@
+---
+abstract: 'use C<Circle> as a I<Matrix> client'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Circle-Net-Matrix
+provides:
+  Circle::Net::Matrix:
+    file: lib/Circle/Net/Matrix.pm
+    version: '0.03'
+  Circle::Net::Matrix::Room:
+    file: lib/Circle/Net/Matrix/Room.pm
+    version: '0.03'
+  Circle::Net::Matrix::Utils:
+    file: lib/Circle/Net/Matrix/Utils.pm
+    version: '0.03'
+requires:
+  Circle: '0.142470'
+  Circle::Net: '0'
+  Net::Async::Matrix: '0.18003'
+  String::Tagged: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

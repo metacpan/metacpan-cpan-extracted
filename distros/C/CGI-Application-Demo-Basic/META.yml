@@ -1,0 +1,67 @@
+---
+abstract: 'A vehicle to showcase C<CGI::Application>'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Demo-Basic
+provides:
+  CGI::Application::Demo::Basic:
+    file: lib/CGI/Application/Demo/Basic.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Base:
+    file: lib/CGI/Application/Demo/Basic/Base.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Faculty:
+    file: lib/CGI/Application/Demo/Basic/Faculty.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Five:
+    file: lib/CGI/Application/Demo/Basic/Five.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Four:
+    file: lib/CGI/Application/Demo/Basic/Four.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::One:
+    file: lib/CGI/Application/Demo/Basic/One.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Three:
+    file: lib/CGI/Application/Demo/Basic/Three.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Two:
+    file: lib/CGI/Application/Demo/Basic/Two.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Util::Config:
+    file: lib/CGI/Application/Demo/Basic/Util/Config.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Util::Create:
+    file: lib/CGI/Application/Demo/Basic/Util/Create.pm
+    version: 1.06
+  CGI::Application::Demo::Basic::Util::LogDispatchDBI:
+    file: lib/CGI/Application/Demo/Basic/Util/LogDispatchDBI.pm
+    version: 1.06
+requires:
+  CGI::Application: 0
+  CGI::Application::Plugin::LogDispatch: 0
+  CGI::Application::Plugin::Session: 0
+  CGI::Simple: 0
+  Class::DBI: 0
+  Class::DBI::Loader: 0
+  Class::DBI::SQLite: 0.11
+  Config::Tiny: 2.12
+  DBIx::Admin::CreateTable: 2.06
+  File::Slurp: 9999.13
+  FindBin::Real: 0
+  HTML::Template: 0
+  Hash::FieldHash: 0.1
+  Log::Dispatch::DBI: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 1.06

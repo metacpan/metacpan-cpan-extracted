@@ -1,0 +1,29 @@
+NAME
+
+Class::Mix - dynamic class mixing
+
+DESCRIPTION
+
+The "mix_class" function provided by this module dynamically generates
+`anonymous' classes with specified inheritance.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2004, 2006, 2009, 2010, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

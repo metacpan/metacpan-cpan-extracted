@@ -1,0 +1,12 @@
+ The white space between the field name and the value
+ is not important and will be ignored. This is NOT true
+ in the License text file.
+
+ ID:	:12345
+ NOTE:	:There is just enough here to check the load operation
+ ----------------------------------
+ SERV:	:www.bizsystems.net
+ ----------------------------------
+ DATE:	:creation date
+ EXP:	:12-31-37
+ ----------------------------------

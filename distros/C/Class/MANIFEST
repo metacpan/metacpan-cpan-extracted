@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-CompiledC.t
+lib/Class/CompiledC.pm

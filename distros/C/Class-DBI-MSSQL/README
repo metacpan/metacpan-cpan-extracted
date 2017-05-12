@@ -1,0 +1,4 @@
+README for Class::DBI::MSSQL
+
+This is just a simple subclass of Class::DBI;  it makes Class::DBI play nicely
+with MSSQL, at least if DBD::ODBC is providing the connection.

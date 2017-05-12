@@ -1,0 +1,38 @@
+#
+# CA::WAAE - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2013 Douglas Wilson <dougw@cpan.org>
+# See LICENSE for terms of distribution.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+Introduction
+
+  This file documents the changes to each release of the
+  CA::WAAE (Workflow Automation Autosys Edition) perl API.
+
+Changes for 0.03 - release date 3-mar-2014
+
+  o Require minimum version for constant pragma.
+  o Add to TODO
+
+Changes for 0.02 - release date 18-feb-2014
+
+  o Add Time::Piece to prerequisite list
+  o Fix typos in pod.
+
+Changes for 0.01 - release date 13-sep-2013
+
+  o Initial development.

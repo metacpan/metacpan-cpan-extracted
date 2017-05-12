@@ -1,0 +1,5 @@
+name: Bx
+version: 1
+deps:
+  - Cx == 1
+  - Ex

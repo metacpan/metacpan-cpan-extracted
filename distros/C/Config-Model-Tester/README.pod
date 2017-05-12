@@ -1,0 +1,9 @@
+=head1 Tester class to test configuration models for Config::Model
+
+Config::Model::Tester provides a way to test configuration models with
+tests files.  This class was designed to tests several models and
+several tests cases per model.
+
+For details, see L<Config::Model::Tester>
+
+

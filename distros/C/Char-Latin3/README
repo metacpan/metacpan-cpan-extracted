@@ -1,0 +1,137 @@
+NAME
+
+  Latin3 - Native Encoding Support by Traditional Scripting
+
+SYNOPSIS
+
+  # encoding: Latin3
+  use Latin3;
+  print "Hello, world wide market!\n";
+
+  # "no Latin3;" not supported
+
+DESCRIPTION
+
+  The Latin3 software provides character-oriented Perl environment on the
+  native encoding, by traditional scripting that we know.
+
+  - Character oriented regular expression and runtime routines
+  - Character oriented Latin3::* subroutines
+      and
+  - Byte oriented CORE::* built-in functions
+  - Byte oriented regular expression on /b modifier
+
+  Information processing model beginning with Perl3 or this software.
+
+    +--------------------------------------------+
+    |    Text string as Digital octet string     |
+    |    Digital octet string as Text string     |
+    +--------------------------------------------+
+    |       Not UTF8 Flagged, No Mojibake        |
+    +--------------------------------------------+
+
+  In UNIX Everything is a File
+  - In UNIX everything is a stream of bytes
+  - In UNIX the filesystem is used as a universal name space
+
+  Native Encoding Scripting
+  - native encoding of file contents
+  - native encoding of file name on filesystem
+  - native encoding of command line
+  - native encoding of environment variable
+  - native encoding of API
+  - native encoding of network packet
+  - native encoding of database
+
+SUBROUTINES
+
+  Old Days -- memories are always beautiful.
+
+    Functions of
+    Byte and SBCS -- Traditional Perl Script
+    -------------
+    eval
+    length
+    substr
+    ord
+    reverse
+    getc
+    index
+    rindex
+    pos
+    m//
+    s///
+    split //
+    tr///
+    qr//
+    -------------
+
+  Today -- some memories are beautiful, others are not.
+           (I don't say what are not;)
+
+    Byte Oriented        Character Oriented
+    Functions       vs   Subroutines
+    -------------        ----------------
+    eval            vs   Latin3::eval
+    length          vs   Latin3::length
+    substr          vs   Latin3::substr
+    ord             vs   Latin3::ord
+    reverse         vs   Latin3::reverse
+    getc            vs   Latin3::getc
+    index           vs   Latin3::index
+    rindex          vs   Latin3::rindex
+    pos             vs   (nothing)
+    m//b            vs   m//
+    s///b           vs   s///
+    split //b       vs   split //
+    tr///b          vs   tr///
+    qr//b           vs   qr//
+    -------------        ----------------
+
+                                            ****************                     
+                                            * Casual       *          Traditional
+                                            * Scripting    *  nearly  Perl Script
+                                            ****************          -----------
+                                            * Latin3::eval   *  is not  eval       
+                                            * length       *    is    length     
+                                            * substr       *    is    substr     
+                                            * ord          *    is    ord        
+                                            * reverse      *    is    reverse    
+                                            * getc         *    is    getc       
+                                            * index        *    is    index      
+                                            * rindex       *    is    rindex     
+                                            * pos          *    is    pos        
+                                            * m//          *    is    m//        
+                                            * s///         *    is    s///       
+                                            * split //     *    is    split //   
+                                            * tr///        *    is    tr///      
+                                            * qr//         *    is    qr//       
+                                            ****************          -----------
+
+  - Data typing by switching operators, like traditional Perl style
+  - Text data by Character Oriented Subroutines
+  - Binary data by Byte Oriented Functions
+  - /b modifier was introduced via JPerl
+  - Multibyte Character Support by Traditional Scripting, in almost all cases
+
+ENCODING FAMILY
+
+  Arabic, Big5HKSCS, Big5Plus, Cyrillic, EUCJP, EUCTW, GB18030, GBK, Greek,
+  HP15, Hebrew, INFORMIXV6ALS, JIS8, KOI8R, KOI8U, KPS9566, Latin1, Latin10,
+  Latin2, Latin3, Latin4, Latin5, Latin6, Latin7, Latin8, Latin9, OldUTF8,
+  Sjis, TIS620, UHC, USASCII, UTF2, Windows1252, and Windows1258
+
+SUPPORTED OPERATING SYSTEMS
+
+  Apple Mac OS X, HP HP-UX, IBM AIX, Microsoft Windows, Oracle Solaris,
+  and Other Systems
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  http://search.cpan.org/~ina/
+  http://backpan.perl.org/authors/id/I/IN/INA/
+

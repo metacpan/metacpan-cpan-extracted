@@ -1,0 +1,57 @@
+[Changes for 1.02 - 2010年11月 7日 周日 11時22分24秒 CST]
+
+* Minor POD and stylistic cleanup plus switch to Module::Install::DSL.
+  No functional changes.
+
+[Changes for 1.01 - 2009年11月19日 周四 00時59分18秒 CST]
+
+* Added "=encoding utf8" to POD to fix author name display.
+  No functional changes.
+
+[Changes for 1.00 - 2009年11月17日 周二 13時19分36秒 CST]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to Module-Signature.
+
+* Updated Module::Install to 0.91, prompted by Florian Ragwitz.
+
+* Removed the dependency on Unicode::EastAsianWidth and replaced the
+  internal algorithm to a simple "tr" based substitution:
+
+      $input =~ tr/\x{3000}\x{FF01}-\x{FF5E}/ -~/;  # to_halfwidth
+      $input =~ tr/ -~/\x{3000}\x{FF01}-\x{FF5E}/;  # to_fullwidth
+
+  Many thanks to BKB for suggesting this improvement, and for noting
+  the caveat of unsupported full/half width katakana, which is now
+  duly documented in the module documentation.
+
+[Changes for 0.10 - 2007-10-16]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* This module now requires Perl 5.8.0 or later.
+  (It never really worked on Perl 5.6.x anyway...)
+
+* Modernized the build infrastructure with Module::Install.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 0.03 - 2003-10-02]
+
+* Fixed corruption of the $1 capture variable.
+  Reported by: Terje Marthinussen.
+
+[Changes for 0.02 - 2003-03-25]
+
+* Corrected exporting bug.
+  Reported by: Vincent at csie.ntu.edu.tw
+
+* Switched to the Module::Install build framework.
+
+[Changes for 0.01 - 2003-01-20]
+
+* First CPAN release.

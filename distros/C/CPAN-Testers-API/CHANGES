@@ -1,0 +1,64 @@
+Changelog for CPAN-Testers-API
+
+0.006     2016-12-27 20:05:59-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed index page documentation links (broken in 0.005)
+
+0.005     2016-12-23 22:46:11-06:00 America/Chicago
+
+    [Fixed]
+
+    - Reorganized OpenAPI spec to include tags for better documentation
+      rendering.
+
+    [Other]
+
+    - Improve example upload feed reader.
+
+0.004     2016-12-17 18:28:28-06:00 America/Chicago
+
+    [Added]
+
+    - /uploads API for querying the CPAN uploads information table. See
+      http://api.cpantesters.org/docs/?url=/v1#!/default/uploads for
+      details.
+
+    - Upload feeds to get push notifications of new CPAN uploads via
+      WebSockets. Subscribe to any /uploads endpoint to get a feed of
+      new information from that endpoint.
+
+0.003     2016-11-26 21:10:39-06:00 America/Chicago
+
+    [Added]
+
+    - Introductory information on the root
+    - API documentation using Alien::SwaggerUI
+
+0.002     2016-11-20 19:15:28-06:00 America/Chicago
+
+    [Added]
+
+    - Added `render_error` helper to reduce boilerplate for error
+      reporting.
+
+    - Added `Rexfile` deploy script to deploy the app with
+      [Rex](http://rexify.org).
+
+    [Fixed]
+
+    - Reduced the amount of release data transmitted. There were fields
+      in the release summary API that aren't important or needed, so
+      they were removed. Also, results for development Perl releases are
+      no longer included in the API.
+
+    - Disabled the `?since` parameter when querying all release summary
+      data. This feature causes the database query to be too slow:
+      Fetching all the data takes about a minute, fetching only the last
+      day's worth of data takes hours before it times out.
+
+0.001     2016-11-19 16:51:52-06:00 America/Chicago
+
+    - Initial release. This module is a JSON API for CPAN Testers data
+      using Mojolicious and CPAN::Testers::Schema.

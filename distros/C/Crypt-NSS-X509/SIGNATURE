@@ -1,0 +1,86 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 05ba713d4a2f854809cc3eb4a5a6e262c7a7da90 Changes
+SHA1 9744cedce099f727b327cd9913a1fdc58a7f5599 LICENSE
+SHA1 521de9228aa94e4514471f7ee3424684d72e9437 MANIFEST
+SHA1 5121ec517084167fa5d94ddea028d13cdcceb5ba MANIFEST.SKIP
+SHA1 ad485815e1e80cb45c80e8cfe7da43b9ab070405 META.yml
+SHA1 edcea9b34c51b1100ee7edf0241590b6b50091a4 Makefile.PL
+SHA1 67ba474536a59079fef9139e5486cc5b8f2f4115 README
+SHA1 51363c52fa4fdfa43d11aed7c513131c3171e0d1 README.pod
+SHA1 8be5d5cde464d41aa932e489add3ee570f9df612 X509.pm
+SHA1 51363c52fa4fdfa43d11aed7c513131c3171e0d1 X509.pod
+SHA1 0ef72c0ec1bcfcca194d54574a5826d9848961c5 X509.xs
+SHA1 0c6282da4140554dd60c15f956bf1e6e708266f8 X509/CRL.pm
+SHA1 137490e073cde1f7c2e57923e7866cb536bb36f4 X509/CRL.pod
+SHA1 873a2d57ac656e5fea0b4e35d7d724429b382b13 X509/CertList.pm
+SHA1 80bbe373e3f202c0bfa3ee7994e92bbf52aad359 X509/CertList.pod
+SHA1 ce85faa6944b5bfa0bd001363664f0e11714b180 X509/Certificate.pm
+SHA1 4382901df6f22b70cf6bbe0b6a2eb54cb0b68b20 X509/Certificate.pod
+SHA1 2d96452416d93bdde9fbff536fe0ecfc7c0d65d0 certs/google.crt
+SHA1 979785055ae32d188c327865f6534b3519bb16fc certs/nist-dsa.crt
+SHA1 dbcdfb4ba9878c2915c9ea3b1e554a76d595c8c8 certs/rapidssl.crt
+SHA1 555ff3adcb3e243bbdb79144b1ed5b99dc5568e5 certs/rfc3280bis_CRL.crl
+SHA1 bf13be7ad42930b36640617a1071d9dc633ee236 certs/rfc3280bis_cert1.cer
+SHA1 add5524671f1c90102e7b30f2f4cebf8268efecd certs/root.ca
+SHA1 400327f94b54b0fcc3218924e38dd92688a1dafb certs/selfsigned.crt
+SHA1 530032f4c8b67c878f3bf6859f7722cdaa1200b7 certs/thawte-ec.crt
+SHA1 a97812aa530c899a84380662e61d5a000890df1f certs/thawte.crt
+SHA1 1bc51475bf9453bc214ab0a02162df1a506cff77 inc/Module/AutoInstall.pm
+SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
+SHA1 43aed6ac7d779deb47cc5cab2a5ef2f040dcf8f7 inc/Module/Install/AutoInstall.pm
+SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
+SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
+SHA1 76024a9d052bd0e8ff6f9b2f98d277464a41970a inc/Module/Install/Compiler.pm
+SHA1 523ae0e1000d19fc50c87a838eaffeeb5754a58b inc/Module/Install/External.pm
+SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
+SHA1 0c70de66cdd063352766d49db176e5f710f75fe7 inc/Module/Install/Include.pm
+SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
+SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
+SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
+SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
+SHA1 aabc7e478f9cd1858c7147d690febd1d7e9c5201 perlcritic.rc
+SHA1 99a44f7bd22a2d81fc27d381fcf38bf1075f8385 t/001-load.t
+SHA1 e2f2509f09425ac73dcfb8d8dd67a045afeb9f3b t/002-verify-certlist.t
+SHA1 6b41140d01f18a2e517d8a9fa35d283996660db4 t/003-verify-db.t
+SHA1 dc3e2166ce3bcc28b91ddc1a314d810919814dec t/004-db.t
+SHA1 fb2ad222de30e7966ad76cf2ee067125de04d12e t/005-name.t
+SHA1 9dcd9859ac3ee4be3a0835976309b8901f7133ae t/006-crl.t
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/007-signature.t
+SHA1 4abc0738be833eba244d7ae233f15c0e50b4e81d t/author-critic.t
+SHA1 82f9617d2ad6cbe7ed19c89e26fd947127e8c6d5 t/author-pod-coverage.t
+SHA1 88cea9987d9fb6fab5ec1f4b0b37cb85785603d3 t/author-pod.t
+SHA1 6242477b028dd4bdd65ab21ec2d9e0a4d782936e t/author-spelling.t
+SHA1 87ae1710eab5533906b39498896b7a3c92eef4af t/author-version.t
+SHA1 80179d43cc76eed4f82b127ac124f6b7fce367ee typemap
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iQIcBAEBCgAGBQJTsr/iAAoJECOZ8Wl8E8ZdyQgP/A/hcQY7IVXhkp30JcewLYD0
+xlebBOX4Pz8VkZtVNKiunyJAzu/heJo8Yk1N0mvBiw309xM4z8HPViZOTWD8Xa1A
+WCdspmIhAP9xnSmG6NHnzuoF9baz7S5fdv5tVpvXTbQvo0gZPvqTIFDlYLCL9TkO
+9AagcB7J08mJgaDkw5N4JPL3G2TMR9Jr0sA7Q7/9gwSLv1og5cNsl5DGjitY7WBs
+y7UyJ+nxNzy2YchoYPzFicxKpqPF28Y/WHzeDtlbQZceBKW9Fupz8nXvGfEc8zrQ
+XiBIHlbXoacaWILDi52ySYzM1KvLtzolucrUXQFvVcnq+5ghlfp0P3eHawydMdb0
+sBjxFZbr2HwPvSyPn2GD5f3zWrK+P/Rle8f1UzUJSx6k659r+qrVSh4JrdvW0nuI
+FOYjVdgv/PNTbjb/F8cvlmGT/kF6pPK5IrUBWeyZaz1poH7BDh2pc4idZNIcL92M
+/ykWM2sP9NBNpL892atRcVavUmagaA9/T3CoUWeyKm5tmi9ENBnG18hI+z6JGzkc
+k8E02R+SgRC4EYG2yVgkyYUNvibHVW+9IQZRhLG19ZEYYF6Pn5XfWWY7UeLkCvoc
+8Gsm9Ylv3TG5StDGJJvULjLh2J4iFvpjOWD7uNGmi1VnHQPVvs9hHR+k2QDGO1qY
+r2hoFV5ztl/1GinHTeeI
+=5bGa
+-----END PGP SIGNATURE-----

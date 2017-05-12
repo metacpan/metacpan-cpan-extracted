@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  30804:
+    - 46
+name: ddcb3e
+registers:
+  AF: 14637
+  AF_: 0
+  BC: 45678
+  BC_: 0
+  DE: 46704
+  DE_: 0
+  HL: 47266
+  HL_: 0
+  I: 0
+  IX: 30794
+  IY: 30784
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,179 @@
+=head1 NAME
+
+Crypt::NSS::X509 - Perl interface for the certificate handling parts of the NSS api.
+
+=head1 SYNOPSIS
+
+  use 5.10.1;
+  use Perl6::Slurp;
+
+  use Crypt::NSS::X509;
+
+  my $cert = Crypt::X509::NSS::Certificate->new(slurp('derfile'));
+
+  say $cert->subject();
+  say $cert->issuer();
+
+  my $valid = $cert->verify_cert();
+  
+  if ( ! $cert->match_name('www.testdomain') ) {
+    # Domain does not match certificate information
+    exit(1);
+  }
+
+
+=head1 ABSTRACT
+
+Perl interface for the certificate handling parts of the NSS API.
+
+=head1 DESCRIPTION
+
+This library exposes a relatively simple API to a the NSS certificate
+API. It allows a user to load certificates, examine them by getting e.g.
+the subject, issuer, validity times and other information. 
+
+Furthermore, a user can validate a certificate with several of the 
+verification functions provided by NSS.
+
+Please note that this is a very early version of the library, the interface
+API will change.
+
+This document just describes the NSS class and how to load it; for certificate
+parsing you probably want to refer to L<Crypt::NSS::X509::Certificate>
+
+=head2 EXPORT
+
+None.
+
+=head2 INITIALIZATION
+
+The NSS module can be loaded in two different ways. The simplest way is to 
+load the module without any options.
+
+  use NSS;
+
+In this case, the NSS library is initialized without any disk based database.
+It is not possible to load certificates and store them permanently. This mode
+is primarily useful when no certificate verification is desired.
+
+The second way to load NSS is to specify the path to a database directory at
+load time. The directory has to exist. If no NSS database exists in the 
+specified directory, it is automatically generated
+
+  use NSS (':dpath', $dbdir);
+
+A third option for loading NSS without any initialization is also offered.
+It should however not be used in normal operation - about the only
+reason to use it is if you have to switch between several different root-stores
+while running a script. If you absolutely need it, examine the source :).
+
+=head1 FUNCTIONS
+
+Note that all functions are called as B<functions, not methods>.
+
+=over 4
+
+=item B<Crypt::NSS::X509::load_rootlist($filename)>
+
+This function reads a list of pem-formatted certificates from C<$filename>.
+The certificates are then loaded into the NSS database and marked as valid,
+trusted root-certificates.
+
+Note that this function requires a NSS database.
+
+=item B<Crypt::NSS::X509::add_cert_to_db($cert, $nick)>
+
+This function adds a specified C<Crypt::NSS::X509::Certificate> to the active NSS database
+and stores it using the nickname C<$nick>.
+
+=item B<Crypt::NSS::X509::add_trusted_cert_to_db($cert, $nick)>
+
+This function adds a specified C<Crypt::NSS::X509::Certificate> to the active NSS database
+and stores it using the nickname c<$nick>. The certificate is marked as trusted
+for all purposes. Used by C<Crypt::NSS::X509::load_rootlist> to add the certificates.
+
+=item B<Crypt::NSS::X509::dump_certificate_cache_info()>
+
+This function dumps the current contents of the NSS certificate cache and
+the NSS temporary certificate store to the standard output
+
+=item B<Crypt::NSS::X509::_reinit()>
+
+This function shuts down the NSS library and reinitialized it again with the
+exact same parameters. Do not use this if you do not absolutely know what
+this encompasses / why it might be necessary. 
+
+=back
+
+=head2 Certificate usages
+
+You can specify several different certificate usages for the verify functions in
+L<Crypt::NSS::X509::Certificate>.
+
+=over 4
+
+=item certUsageAnyCA
+
+CA certificate of any kind.
+
+=item certUsageEmailRecipient
+
+Used to encrypt S/MIME mails.
+
+=item certUsageEmailSigner
+
+Used to verify S/MIME email signatures.
+
+=item certUsageObjectSigner
+
+Certificate allowed to sign executable code files like jar files.
+
+=item certUsageSSLCA
+
+SSL Certificate Authority certificate.
+
+=item certUsageSSLClient
+
+SSL Client certificate.
+
+=item certUsageSSLServer
+
+SSL Server certificate.
+
+=item certUsageSSLServerWithStepUp
+
+SSL Server certificate, which allows export clients to use strong cryptography.
+
+=item certUsageStatusResponder
+
+Used for OCSP responders.
+
+=item certUsageProtectedObjectSigner
+=item certUsageUserCertImport
+=item certUsageVerifyCA
+
+TODO: Find out what those do.
+
+=back
+
+=head1 SEE ALSO
+
+OpenSSL(1), Crypt::X509, Crypt::NSS
+
+=head1 AUTHOR
+
+Johanna Amann, E<lt>johanna@icir.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012 by Johanna Amann
+
+This Library is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+The library contains source code of the Mozilla Network Security Services; for
+NSS license information please see http://www.mozilla.org/projects/security/pki/nss/.
+
+=cut
+

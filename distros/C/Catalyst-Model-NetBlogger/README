@@ -1,0 +1,72 @@
+NAME
+    Catalyst::Model::NetBlogger - Catalyst Model to post and retrieve blog
+    entries using Net::Blogger
+
+SYNOPSIS
+        # Model
+        __PACKAGE__->config(
+            engine   => 'movabletype',
+            blogid   => 1,
+            username => 'login',
+            password => 'apipassword',
+            proxy    => 'http://example.com/mt/mt-xmlrpc.cgi'
+        );
+
+        # Controller
+        sub default : Private {
+            my ($self, $c) = @_;
+
+            {
+                local $^W = 0;
+
+                my ($return, @entries) = $c->model('Blog')->metaWeblog->getRecentPosts({numberOfPosts => 5});
+
+                if ($return) {
+                    $c->stash->{'entries'} = \@entries;
+                };
+            };
+
+            $c->stash->{'template'} = 'blog.tt';
+        };
+
+DESCRIPTION
+    This model class uses Net::Blogger to post and retrieve blog entries to
+    various web log engines XMLRPC API.
+
+CONFIG
+    The following configuration options are available. They are taken
+    directly from Net::Blogger:
+
+  engine
+    The name of the blog engine to use. This defaults to 'blogger',
+
+  proxy
+    The url of the remote XMLRPC listener to connect to.
+
+  blogid
+    The id of the blog to post or retrieve entries to.
+
+  username
+    The username used to log into the specified blog.
+
+  password
+    The password used to log into the specified blog.
+
+  appkey
+    The magic appkey used when connecting to Blogger blogs.
+
+  uri
+    The URI to post to at the proxy specified above.
+
+METHODS
+    See Net::Blogger for the available methods.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Helper, Net::Blogger
+
+AUTHOR
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+

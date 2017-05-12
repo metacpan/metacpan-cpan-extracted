@@ -1,0 +1,18 @@
+A syntax/perl.vim syntax highlighting file for Vim that highlights 'property'.
+
+Overwrite your existing syntax/perl.vim file, it should be in the vim runtime
+directory.
+
+If you can't find this directory you can open vim and type the following
+command:
+
+    :echo $VIMRUNTIME
+
+or do it from the shell:
+
+    vim -e --cmd 'echo $VIMRUNTIME' --cmd 'q!'
+
+if all fails you can always fall back to:
+
+    locate perl.vim
+    

@@ -1,0 +1,32 @@
+==============================================================================
+Release 0.01 of CGI::Untaint::isbn
+==============================================================================
+
+NAME
+
+  CGI::Untaint::isbn - validate an isbn
+
+SYNOPSIS
+
+  use CGI::Untaint;
+  my $handler = CGI::Untaint->new($q->Vars);
+
+  my $isbn = $handler->extract(-as_isbn => 'isbn');
+
+INSTALLATION
+
+  perl Makefile.pl
+  make
+  make test
+  make install
+
+AUTHOR
+  
+  Steve Rushe, steve-cpan@deeden.co.uk
+  
+COPYRIGHT
+ 
+  Copyright (C) 2001 Steve Rushe. All rights reserved.
+  
+  This module is free software. It may be used, redistributed
+  and/or modified under the same terms as Perl itself.

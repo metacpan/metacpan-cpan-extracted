@@ -1,0 +1,10 @@
+Revision history for Perl extension Crypt::GCM.
+0.02  Wed Sep  6 18:04:40 JST 2006
+	- fixed memory leak.
+	- added -key => -value style initializer.
+	- added POD.
+
+0.01  Tue Sep  5 12:29:18 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::GCM
+

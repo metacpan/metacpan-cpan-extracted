@@ -1,0 +1,73 @@
+{
+   "abstract" : "read-eval-print-loop on die and/or warn",
+   "author" : [
+      "Shawn M Moore, <sartak at gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Carp-REPL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "DB",
+         "Devel::REPL::Plugin::Carp::REPL"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump::Streamer" : "0",
+            "Devel::LexAlias" : "0",
+            "Devel::REPL" : "0",
+            "Devel::StackTrace::WithLexicals" : "0",
+            "Lexical::Persistence" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Expect" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Carp-REPL@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-REPL"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bestpractical/carp-repl.git",
+         "web" : "https://github.com/bestpractical/carp-repl"
+      }
+   },
+   "version" : "0.18",
+   "x_authority" : "cpan:SARTAK",
+   "x_contributors" : [
+      "Shawn M Moore <sartak@bestpractical.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Thomas Sibley <trs@bestpractical.com>",
+      "sunnavy <sunnavy@bestpractical.com>",
+      "Josh ben Jore <jjore@cpan.org>",
+      "Jesse Luehrs <doy@tozt.net>",
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>",
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>"
+   ]
+}

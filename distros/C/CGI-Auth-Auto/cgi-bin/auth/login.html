@@ -1,0 +1,28 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title><TMPL_VAR NAME=TITLE DEFAULT="Login"></title>
+</head>
+<body>
+<h1>Authorization Required</h1>
+<h3>Please Log In</h3>
+<TMPL_IF NAME=MESSAGE>
+<p><TMPL_VAR NAME=Message></p>
+<hr>
+</TMPL_IF>
+
+<form method="post" action="<TMPL_VAR Name=Form_Action>">
+
+<!-- TMPL_LOOP NAME=Auth_Fields -->
+<table border="0px" > 
+<tr>
+<td class="fieldname" width="100px" align="right"><p><TMPL_VAR NAME=Display_Name>:</p></td>
+<td class="fieldvalue"><input type="<TMPL_VAR Name=Input_Type>" name="<TMPL_VAR Name=Input_Name>"></td>
+</tr>
+<!-- /TMPL_LOOP -->
+</table>
+<p><input type=submit name="<TMPL_VAR Name=Button_Name>" value="Login"></p>
+<!-- TMPL_VAR NAME=Form_Fields -->
+</form>
+</body>
+</html>

@@ -1,0 +1,18 @@
+NAME
+    CPAN::Test::Dummy::ProvidesDupe - Test duplicating existing module in
+    provides
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2013 the Module::Reader "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

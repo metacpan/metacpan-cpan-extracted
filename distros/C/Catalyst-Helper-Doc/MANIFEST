@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00compile.t
+lib/Catalyst/Helper/Doc.pm
+META.yml                                 Module meta-data (added by MakeMaker)

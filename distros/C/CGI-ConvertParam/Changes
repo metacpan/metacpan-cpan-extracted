@@ -1,0 +1,36 @@
+Revision history for Perl extension CGI::ConvertParam.
+
+0.01  Fri Sep 22 11:20:29 JST 2000
+	- original version; created by h2xs 1.20 with options
+		-X -n CGI::ConvertParam
+
+0.02  Mon Sep 18 16:51:07 JST 2000
+	- changed new() method behavior
+	- added convert_on_set() method
+	- added convert_on_get() method
+	- added convert_all_param() method
+
+0.03  Fri Sep 22 20:07:34 JST 2000
+	- added initialize() method
+
+0.04  Mon Oct 16 16:01:46 JST 2000
+	- fixup Problem which AUTOLOAD() does not correctly forward.
+	- changed AUTOLOAD() method. DESTROY() is not forwarded.
+	- added CGI::ConvertParam::JIS sub-class
+	- added CGI::ConvertParam::ShiftJIS sub-class
+	- added CGI::ConvertParam::UTF8 sub-class
+	- added CGI::ConvertParam::OngetEUC sub-class
+	- added CGI::ConvertParam::OngetJIS sub-class
+	- added CGI::ConvertParam::OngetShiftJIS sub-class
+	- added CGI::ConvertParam::OnsetEUC sub-class
+	- added CGI::ConvertParam::OnsetJIS sub-class
+	- added CGI::ConvertParam::OnsetUTF8 sub-class
+
+0.05 Thu Apr 26 10:48:48 JST 2001
+	- fixup Since 'carriage returns' was included at the end of the
+	  sentence of 'Makefile.PL', 'MANIFEST', 'Changes' and 'README',
+	  it was deleted. Only environment older than perl version5.005
+      was influenced.
+	  (See also perl5005delta.pod/'More generous treatment of
+	   carriage return')
+	  thanks to NAKAGAWA ( Pipe Smoker ) Tsuneo.

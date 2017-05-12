@@ -1,0 +1,8 @@
+Revision history for Chess-960
+
+0.002     2014-02-01 19:11:50-05:00 America/New_York
+        - fix erroneous mentions of imaginary ->pos method
+        - link to Forsyth-Edwards notation
+
+0.001     2014-01-29 20:46:25-05:00 America/New_York
+        - first release

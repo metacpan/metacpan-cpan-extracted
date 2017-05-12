@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Method::Auto.
+
+0.01  Tue Jun  7 22:40:26 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Class::Method::Auto
+

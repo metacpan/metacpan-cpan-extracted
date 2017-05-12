@@ -1,0 +1,21 @@
+0.05	2015-12-29
+	Other
+	* Add link to git repository
+
+0.04	2011-03-24
+	Bug Fixes
+	* t/Memory.t failed test on non-US locale due to different $! error message.
+
+0.03	2010-11-28
+	Bug Fixes
+	* Tests fail when CPU::Z80::Assembler is installed, but version is old, 
+	  (e.g. 'equ' not recognized)
+
+0.02	2010-11-25
+	Bug Fixes
+	* Tests fail when CPU::Z80::Assembler not installed
+	* Tests fail due to line ending differences in output and benchmark files
+	* z80dis fixed
+
+0.01	2010-11-21
+        First version

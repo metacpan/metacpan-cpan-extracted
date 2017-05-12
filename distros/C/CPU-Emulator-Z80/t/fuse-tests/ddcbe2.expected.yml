@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcbe2
+registers:
+  AF: 26327
+  AF_: 0
+  BC: 43984
+  BC_: 0
+  DE: 29256
+  DE_: 0
+  HL: 32852
+  HL_: 0
+  I: 0
+  IX: 61264
+  IY: 39319
+  PC: 4
+  R: 2
+  SP: 0

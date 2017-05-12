@@ -1,0 +1,32 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+ignore.txt
+lib/CHI/Driver/SharedMem.pm
+lib/CHI/Driver/SharedMem/t/CHIDriverTests.pm
+t/00-load.t
+t/01-new.t
+t/boiler.t
+t/CHI-driver-tests.t
+t/changes.t
+t/coverage.t
+t/critic.t
+t/cv.t
+t/dist.t
+t/gv.t
+t/kwalitee.t
+t/manifest.t
+t/metrics.t
+t/noplan.t
+t/pod-cm.t
+t/pod.t
+t/port.t
+t/prereq.t
+t/snippets.t
+t/spelling.t
+t/strict.t
+t/unused.t
+t/vars.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

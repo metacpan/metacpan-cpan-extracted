@@ -1,0 +1,77 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:1805500
+Return-Path: <Klaus@Ethgen.de>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Delivered-To: moderator for cpan-testers@perl.org
+Received: (qmail 18701 invoked from network); 27 Jun 2008 10:00:45 -0000
+Received: from x1a.develooper.com (HELO x1.develooper.com) (216.52.237.111)
+  by x6.develooper.com with SMTP; 27 Jun 2008 10:00:45 -0000
+Received: (qmail 4992 invoked by uid 225); 27 Jun 2008 10:00:45 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 4980 invoked by alias); 27 Jun 2008 10:00:44 -0000
+X-Spam-Status: No, hits=-2.6 required=8.0
+	tests=BAYES_00
+X-Spam-Check-By: la.mx.develooper.com
+Received: from toomai.ethgen.de (HELO toomai.ethgen.de) (85.10.201.50)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Fri, 27 Jun 2008 03:00:40 -0700
+Received: from static-195-068.catv.glattnet.ch ([80.242.195.68] helo=ikki.ket)
+	by toomai.ethgen.de with esmtpsa (TLS-1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.63)
+	(envelope-from <klaus@ethgen.de>)
+	id 1KCAkr-0002vL-7O; Fri, 27 Jun 2008 12:00:33 +0200
+Received: from klaus by ikki.ket with local (Exim 4.63)
+	(envelope-from <klaus@ikki.ethgen.de>)
+	id 1KCAkq-0000Cx-F7; Fri, 27 Jun 2008 12:00:32 +0200
+Date: Fri, 27 Jun 2008 11:00:32 +0100
+To: srezic@cpan.org
+Cc: cpan-testers@perl.org, KETHGEN@cpan.org
+Subject: Re: FAIL Image-MetaData-GQview-1.9 i386-freebsd 6.1-release
+Message-ID: <20080627100032.GA30668@ikki.ethgen.de>
+References: <1214518288.7Ad78b0.49630@biokovo.herceg.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; x-action=pgp-signed
+Content-Disposition: inline
+In-Reply-To: <1214518288.7Ad78b0.49630@biokovo.herceg.de>
+User-Agent: Mutt/1.5.18 (2008-05-17)
+From: Klaus@Ethgen.de (Klaus Ethgen)
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Hi,
+
+thanks for your report.
+
+Am Do den 26. Jun 2008 um 23:11 schrieb srezic@cpan.org:
+> #   Failed test 'save("test.jpg", ".metadata/test.jpg.meta")'
+> #   at t/Image-MetaData-GQview.t line 27.
+> 
+> #   Failed test 'Save (Unknown open() mode '>:utf8' at (eval 3) line 10.
+
+I did not realize that such archaic perl versions are still in the wild.
+
+I updated the package to version 1.10. This should fix the error.
+However, I can not test as I do not have such a old system around.
+
+Please test the new version when they is synced to cpan.
+
+Regards
+   Klaus Ethgen
+- -- 
+Klaus Ethgen                            http://www.ethgen.de/
+pub  2048R/D1A4EDE5 2000-02-26 Klaus Ethgen <Klaus@Ethgen.de>
+Fingerprint: D7 67 71 C4 99 A6 D4 FE  EA 40 30 57 3C 88 26 2B
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBSGS6QJ+OKpjRpO3lAQJ+BggAsXkzI7G/4lJ8LKmcLYF6g7sQlkyjQ3+U
+NUTBmk0cmSqaCVzEU4+uupsV9CfRWBF2Fv4Dn+hUChWOoass6HoLmaTRXJjgZlnb
+L+zbQmDPFUPdCb/U4JRay6ojg6Fm2oHM+oms2APB0ZU6moe/QmV0meQ2oLFnNU3t
+GKEFbqrlViJz8SKUB3ZPgtSyTLUyzyi7GL1lRkTGtRgeC50VCWtOdObrvHNJlz3u
+K0L+Gucb2MNVXNhQNFnfrjhz8m0XuQW8p81AGFBdPs/8THVjWkZi8ycLyOxjg2SD
+5zyeamBhdQA1PzkVHYpgyHNW2gB2d0NP2hu8Cg59pTzL/Vyyu6KfUg==
+=a/KS
+-----END PGP SIGNATURE-----
+

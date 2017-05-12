@@ -1,0 +1,70 @@
+{
+   "abstract" : "OpenSSH config editor",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Model-OpenSsh",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Model::CursesUI" : "0",
+            "Config::Model::TkUI" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Config::Model" : "2.050",
+            "Config::Model::Backend::Any" : "0",
+            "File::Copy" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "IO::File" : "0",
+            "Log::Log4perl" : "1.11",
+            "Mouse" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Model::BackendMgr" : "0",
+            "Config::Model::Tester" : "2.042",
+            "English" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dod38fr/config-model-openssh/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/config-model-openssh.git",
+         "web" : "http://github.com/dod38fr/config-model-openssh.git"
+      }
+   },
+   "version" : "1.237"
+}
+

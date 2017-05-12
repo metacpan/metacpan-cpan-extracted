@@ -1,0 +1,37 @@
+{
+   "abstract" : "A pure Perl implementation of RS14, aka \"Spritz\", encryption algorithm.",
+   "author" : [
+      "RonW, C<< <ronw at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.010",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-RS14_PP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.010"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::RS14_PP" : {
+         "file" : "lib/Crypt/RS14_PP.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

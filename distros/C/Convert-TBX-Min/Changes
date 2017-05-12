@@ -1,0 +1,19 @@
+Revision history for Convert-TBX-Min
+
+0.07      2016-05-18 12:45:55-06:00 America/Denver
+	Fixed changes file
+0.06      2016-05-18 11:08:12-06:00 America/Denver
+	Fixed failing tests and updated to be compliant with TBX-Min
+0.05      2014-02-11 16:26:17 America/Los_Angeles
+    Rereleasing after having uploaded to wrong account :/
+0.04      2014-02-11 15:05:33 America/Los_Angeles
+    fixed failing 02-script.t on *nix
+0.03      2014-02-06 11:56:46 America/Los_Angeles
+    add min2basic executable script
+    require newer version of TBX::Min
+    update documentation
+    fix copyright name
+0.02      2014-01-17 19:14:55 America/Los_Angeles
+    - print titleStmt before sourceDesc (required by TBX Checker)
+0.01      2014-01-11 15:44:16 America/Los_Angeles
+	initial release

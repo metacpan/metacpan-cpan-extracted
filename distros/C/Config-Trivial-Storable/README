@@ -1,0 +1,36 @@
+$Id: README 70 2014-05-23 10:29:23Z adam $
+
+Config::Trivial::Storable Version 0.32
+======================================
+
+This is "Yet Another" simple module to read (and write)
+trivial configuration files. It inherits from Config::Trivial
+and provides seamless support for using Storable as the
+repository for configuration data.
+
+ALSO SEE
+
+Config::Trivial
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires:
+    Perl 5.10 (may work with older but is not tested)
+    Config::Trivial
+    Storable
+    strict
+    warnings
+    Carp
+    Test::More
+
+The tests will use additional non-core modules if
+available but these are not required for normal use.

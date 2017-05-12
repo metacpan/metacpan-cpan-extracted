@@ -1,0 +1,45 @@
+---
+abstract: 'Config::Any loader for Java-style property files'
+author:
+  - 'Peter Hallam <pragmatic@cpan.org>'
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'
+build_requires:
+  Config::Any: '0'
+  Config::Properties: '1.75'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Any-Properties
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+provides:
+  Config::Any::Properties:
+    file: lib/Config/Any/Properties.pm
+    version: '0.001001'
+requires:
+  Config::Any::Base: '0'
+  Config::Properties: '1.75'
+  parent: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pragmatic/Config-Any-Properties/issues
+  homepage: https://github.com/pragmatic/Config-Any-Properties/wiki
+  repository: git://github.com/pragmatic/Config-Any-Properties.git
+version: '0.001001'
+x_authority: cpan:PRAGMATIC

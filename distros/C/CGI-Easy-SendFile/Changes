@@ -1,0 +1,11 @@
+Revision history for CGI-Easy-SendFile
+
+v2.0.0  2016-02-15 23:51:54 EET
+	- Switch from Perl6::Export::Attrs to Export::Attrs.
+	- Switch to Dist::Milla.
+
+1.0.1	2012-11-25 08:34:29 EET
+	- Update Module::Install.
+
+1.0.0	2010-11-25 09:39:55 EET
+	- Initial public release.

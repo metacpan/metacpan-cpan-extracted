@@ -1,0 +1,54 @@
+Revision history for CatalystX-Controller-Auth
+
+0.22    9 July 2012 - Catalyst::View::Email stash key is now a config attribute and use get_object call on user
+
+0.21    20 June 2012 - fix issue with inactive password field not rendering
+
+0.20    22 May 2012 - better docs for auto_create of user model
+
+0.19    15 May 2012 - castaway patch for openid (following HTML::FormHandlerX::Form::Login patch)
+
+0.18    11 May 2012 - better pod for action_after_* config options
+
+0.17    11 May 2012 - StatusMessage plugin dep
+
+0.16    11 May 2012 - basic method tests
+
+0.15    10 May 2012 - Extra hooks for customisation including more detailed POD
+
+0.14    3 May 2012 - Enable toggling of register functionality
+
+0.13    25 April 2012 - Registration email
+
+0.12    23-04-2012 - include 'register' inline with HTML::FormHandlerX::Form::Login
+
+0.11    18-04-2012 - detach if not authenticated
+
+0.10    2012-04-04 - fix pod
+
+0.09    more pod to re-mention SimpleLogin
+
+0.08    pod
+
+0.07    Yet more POD and fixed the token salt
+
+0.06    More pod with example config
+
+0.05    2012-03-23 - POD
+
+0.04    just a makefile issue
+
+0.03    more pod
+
+0.02    pod
+
+0.01    2012-03-22 - Published without this.
+
+
+
+
+
+
+
+
+

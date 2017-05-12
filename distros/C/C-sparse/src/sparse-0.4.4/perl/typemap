@@ -1,0 +1,123 @@
+TYPEMAP
+const_string		T_PV
+const_string_assume	CONST_STRING_ASSUME
+sparsectx		SPARSE_CTX
+sparsepos		SPARSE_POS
+sparsetok		SPARSE_TOK
+sparsestmt		SPARSE_STMT
+sparseexpr		SPARSE_EXPR
+sparsesym		SPARSE_SYM
+sparseident		SPARSE_IDENT
+sparsestring		SPARSE_STRING
+sparsectype		SPARSE_CTYPE
+sparsesymctx		SPARSE_SYMCTX
+sparsescope		SPARSE_SCOPE
+sparseexpand		SPARSE_EXPAND
+sparsestream		SPARSE_STREAM
+sparsepos_assume	SPARSE_POS_ASSUME
+sparsetok_assume	SPARSE_TOK_ASSUME
+sparsestmt_assume	SPARSE_STMT_ASSUME
+randstate		RANDSTATE
+ulong_coerce		ULONG_COERCE
+malloced_string		MALLOCED_STRING
+order_noswap		ORDER_NOSWAP
+dummy			DUMMY
+# perl 5.005 doesn't have UV in its standard typemap, so use this instead
+gmp_UV			GMP_UV
+unsigned long long      UINT_ULL
+long long               INT_ULL
+long double             UFLOAT_LD
+
+INPUT
+SPARSE_CTX
+	class_or_croak ($arg, sparsectx_class); $var = SvSPARSE_CTX($arg);
+SPARSE_POS
+	class_or_croak ($arg, sparsepos_class); $var = SvSPARSE_POS($arg);
+SPARSE_TOK
+	class_or_croak ($arg, sparsetok_class); $var = SvSPARSE_TOK($arg);
+SPARSE_STMT
+	class_or_croak ($arg, sparsestmt_class); $var = SvSPARSE_STMT($arg);
+SPARSE_EXPR
+	class_or_croak ($arg, sparseexpr_class); $var = SvSPARSE_EXPR($arg);
+SPARSE_SYM
+	class_or_croak ($arg, sparsesym_class); $var = SvSPARSE_SYM($arg);
+SPARSE_IDENT
+	class_or_croak ($arg, sparseident_class); $var = SvSPARSE_IDENT($arg);
+SPARSE_CTYPE
+	class_or_croak ($arg, sparsectype_class); $var = SvSPARSE_CTYPE($arg);
+SPARSE_SYMCTX
+	class_or_croak ($arg, sparsectype_class); $var = SvSPARSE_SYMCTX($arg);
+SPARSE_SCOPE
+	class_or_croak ($arg, sparsescope_class); $var = SvSPARSE_SCOPE($arg);
+SPARSE_EXPAND
+	class_or_croak ($arg, sparseexpand_class); $var = SvSPARSE_EXPAND($arg);
+SPARSE_STREAM
+	class_or_croak ($arg, sparsestream_class); $var = SvSPARSE_STREAM($arg);
+SPARSE_POS_ASSUME
+        SPARSE_POS_ASSUME ($var, $arg)
+SPARSE_TOK_ASSUME
+        SPARSE_TOK_ASSUME ($var, $arg)
+SPARSE_STMT_ASSUME
+        SPARSE_STMT_ASSUME ($var, $arg)
+RANDSTATE
+	class_or_croak ($arg, rand_class); $var = SvRANDSTATE($arg);
+ULONG_COERCE
+	$var = coerce_ulong ($arg)
+ORDER_NOSWAP
+	assert ($arg != &PL_sv_yes);
+DUMMY
+	/* dummy $var */
+CONST_STRING_ASSUME
+        /* No need to check for SvPOKp and use SvPV, this mapping is
+           only used for overload_constant, which always gets literal
+           strings.  */
+	assert (SvPOK ($arg));
+	$var = SvPVX ($arg);
+INT_ULL
+	$var = 0
+UINT_ULL
+	$var = 0
+UFLOAT_LD
+	$var = 0
+SPARSE_STRING
+	$var = 0
+
+OUTPUT
+SPARSE_CTX
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsectx_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_POS
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsepos_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_TOK
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), gv_stashpv (token_types_class[token_type($var->m)],1)); } else { $arg = &PL_sv_undef; }
+SPARSE_STMT
+    if ($var && $var->m) { sv_bless (sv_setref_pv ($arg, NULL, $var), gv_stashpv (stmt_types_class[$var->m->type],1)); } else { $arg = &PL_sv_undef; }
+SPARSE_EXPR
+    if ($var && $var->m) { sv_bless (sv_setref_pv ($arg, NULL, $var), gv_stashpv (expr_types_class[$var->m->type],1)); } else { $arg = &PL_sv_undef; }
+SPARSE_SYM
+    if ($var && $var->m) { sv_bless (sv_setref_pv ($arg, NULL, $var), gv_stashpv (sym_types_class[$var->m->type],1)); } else { $arg = &PL_sv_undef; }
+SPARSE_IDENT
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparseident_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_CTYPE
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsectype_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_SYMCTX
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsesymctx_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_SCOPE
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsescope_class_hv); } else { $arg = &PL_sv_undef; }
+SPARSE_EXPAND
+    if ($var && $var->m) { sv_bless (sv_setref_pv ($arg, NULL, $var), gv_stashpv (expand_types_class[$var->m->typ],1)); } else { $arg = &PL_sv_undef; }
+SPARSE_STREAM
+    if ($var) { sv_bless (sv_setref_pv ($arg, NULL, $var), sparsestream_class_hv); } else { $arg = &PL_sv_undef; }
+RANDSTATE
+    sv_setref_pv ($arg, rand_class, $var);
+MALLOCED_STRING
+    sv_usepvn_mg ($arg, $var, strlen($var));
+GMP_UV
+    sv_setuv ($arg, (UV) ($var));
+UINT_ULL
+    sv_setuv ($arg, (UV) ($var));
+INT_ULL
+    sv_setuv ($arg, (UV) ($var));
+UFLOAT_LD
+    sv_setuv ($arg, (UV) ($var));
+SPARSE_STRING
+    sv_setuv ($arg, (UV) ($var));

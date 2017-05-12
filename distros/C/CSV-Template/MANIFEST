@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/CSV/Template.pm
+t/10_CSV_Template_test.t
+t/test.tmpl
+t/pod.t
+t/pod_coverage.t

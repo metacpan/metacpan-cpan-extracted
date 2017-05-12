@@ -1,0 +1,8 @@
+% title 'Add connection';
+% stash sidebar => 'convos';
+<ul>
+  <li class="form">
+    <h2>Add Connection</h2>
+    %= include 'connection/form', wizard => 0
+  </li>
+</ul>

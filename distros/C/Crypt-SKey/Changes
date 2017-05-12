@@ -1,0 +1,65 @@
+Revision history for Perl extension Crypt::SKey.
+
+0.09 - Wed Jan  7 22:43:49 2009
+
+ - Added support for SHA1 hashing. [Ed Ravin]
+
+ - An unknown $HASH setting will now trigger an error, rather than
+   silently defaulting to MD4.
+
+0.09 - Wed Nov 19 19:46:48 2008
+
+ - This time I *swear* I added "use Exporter;" and it's not commented
+   out.
+
+0.08 - Mon Nov 17 21:51:53 2008
+
+ - Added a missing "use Exporter;" line to the code.  [Spotted by
+   Frédéric Brière]
+
+0.07  Sat Dec  3 15:55:37 CST 2005
+
+ - Added the ability to generate output in hexadecimal format for the
+   benefit of some older gear that likes to see it that way
+   (e.g. HP4000m/HP8000m/HP2424m). [Ed Ravin]
+
+0.06  Mon Feb 17 08:49:39 CST 2003
+
+ - The README wasn't being included in the distribution because I'd
+   removed it from the MANIFEST.  Now it's included.
+
+0.05  Sun 15 Dec 02:02:22 GMT 2002
+
+ - The tests weren't properly being skipped if their module
+   prerequisites weren't installed, try as they might.  This has been
+   fixed.
+
+0.04  Thu Aug 29 23:08:17 EST 2002
+
+ - Added a mention of OPIE, the main system people might want MD5
+   hashing for, to the docs.  Requested by Allen Chen.
+
+ - The test 03-interactive.t shouldn't run anymore in non-interactive
+   environments like CPANPLUS's smoke-tester.
+
+ - Added a Build.PL so people can install via Module::Build.  This
+   helps capture "recommended" dependencies like Term::ReadLine.
+   (Note to self: it would be nice if Module::Build let you specify a
+   reason *why* things are required/recommended, and if it let you
+   specify boolean combinations like 'Digest::MD5 || Digest::MD4'.)
+
+0.03  Mon Jun 10 11:24 AEST 2002
+
+ - No code changes, just moved some tests from test.pl to t/
+   subdirectory.
+
+0.02  Sun May 12 11:06:44 AEST 2002
+
+ - Implemented support for MD5 hashing.  Requested by Allen Chen,
+   patched by Chris Nandor.
+
+ - Term::ReadLine isn't strictly necessary now, it will only be loaded
+   when using the key() function.
+
+0.01  Thu Jun  7 16:53:39 2001
+ - original version; created by h2xs 1.1.1.4 with options -XA -n Crypt::SKey

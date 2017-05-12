@@ -1,0 +1,19 @@
+---
+abstract: 'A request trait for XMLHttpRequest detection support'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+generated_by: 'Dist::Zilla version 1.100160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Request-XMLHttpRequest
+requires:
+  Catalyst: 5.80
+  CatalystX::RoleApplicator: 0
+  ExtUtils::MakeMaker: 6.11
+  Moose: 0
+  MooseX::Types::Moose: 0
+  Test::More: 0.89
+  namespace::autoclean: 0
+version: 0.01

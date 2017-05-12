@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/Multimethods/Pure.pm
+test.pl
+t/arity.t
+t/export.t
+t/junction.t
+t/nonclass.t
+t/other.t
+t/smd.t
+t/subtype.t
+META.yml                                 Module meta-data (added by MakeMaker)

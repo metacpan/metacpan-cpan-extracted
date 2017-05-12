@@ -1,0 +1,21 @@
+Makefile.PL
+examples/foo.cfg.tmpl
+examples/foo.pl
+examples/foo01.cfg
+lib/Conan.pm
+lib/Conan/Configure/Xen.pm
+lib/Conan/Deploy.pm
+lib/Conan/Promote.pm
+lib/Conan/Promote/Xen.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+MANIFEST.bak
+META.json
+META.yml
+README
+README.md
+scripts/conan-update.pl
+scripts/conan.pl
+scripts/server.pl
+t/001.t
+t/002.t

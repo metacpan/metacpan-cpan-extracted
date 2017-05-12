@@ -1,0 +1,51 @@
+{
+   "abstract" : "rfc4559 SPNEGO/GSSAPI",
+   "author" : [
+      "Daniel Ruoso <druoso@bloomberg.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Authentication-Credential-GSSAPI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0",
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Authentication::Credential::GSSAPI" : {
+         "file" : "lib/Catalyst/Authentication/Credential/GSSAPI.pm",
+         "version" : "v0.0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/bloomberg/Catalyst-Authentication-Credential-GSSAPI"
+      }
+   },
+   "version" : "v0.0.5",
+   "x_serialization_backend" : "JSON::PP version 2.27200"
+}

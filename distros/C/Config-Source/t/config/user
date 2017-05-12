@@ -1,0 +1,8 @@
+{
+	'user.someval' => 'ABCDEF',
+	'user.someotherval' => 90,
+	'user.somestruct' => [100,200],
+	'user.somedeeperstruct' => { a => [1,2,3], b => { c => 'asd' } },
+	
+	'additional_key' => 1,
+}

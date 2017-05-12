@@ -1,0 +1,42 @@
+Class-Private
+
+This module provides some level of encapsulation around hashrefs for objects. It does this by transforming every C<key> into C<package::key>. This way you won't have collisions. If the key contains C<::>, it will not be transformed, and normal access takes place. Thus keys from other packages can be accessed explicitly if necessary.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Class::Private
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Private
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Class-Private
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Class-Private
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-Private
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Leon Timmermans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

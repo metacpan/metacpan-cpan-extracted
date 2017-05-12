@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "name": "foo",
+      "format": {
+        "parse": {
+          "baz": "integer"
+        }
+      }
+    },
+    { "name": "baz" }
+  ],
+  "marks": []
+}

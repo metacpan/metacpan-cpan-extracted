@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use Coro;
+
+$p = 2;
+
+sub p1 : Coro {
+   for (0..9) {
+      print "p1: $_\n";
+      cede;
+   }
+   $p--;
+}
+
+sub p2 : Coro {
+   for (10..23) {
+      print "p2: $_\n";
+      cede;
+   }
+   $p--;
+}
+
+eval {
+   cede while $p;
+};
+
+
+

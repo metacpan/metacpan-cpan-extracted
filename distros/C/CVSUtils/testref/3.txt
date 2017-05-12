@@ -1,0 +1,20 @@
+2000-07-20 10:39  sreinst
+
+	* Alib/a.h, Blib/b.h, Clib/c.h, common/a.h, common/b.h, common/c.h:
+	Created a new "common" directory and moved all the .h files to that
+	directory.
+
+2000-07-18 06:40  sreinst
+
+	* Alib/Alib.dsp, Alib/a.c, Alib/a.h, Alib/Alib.dsw, App/App.dsp,
+	App/App.dsw, App/app.c, Blib/Blib.dsp, Blib/Blib.dsw, Blib/b.c,
+	Blib/b.h, Clib/c.c, Clib/Clib.dsp, Clib/Clib.dsw, Clib/c.h: Initial
+	revision
+
+2000-07-18 06:40  sreinst
+
+	* Alib/Alib.dsp, Alib/a.c, Alib/a.h, Alib/Alib.dsw, App/App.dsp,
+	App/App.dsw, App/app.c, Blib/Blib.dsp, Blib/Blib.dsw, Blib/b.c,
+	Blib/b.h, Clib/c.c, Clib/Clib.dsp, Clib/Clib.dsw, Clib/c.h: Sample
+	product for testing product promotion
+

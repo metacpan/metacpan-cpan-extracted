@@ -1,0 +1,12 @@
+Crypt::OpenToken is a Perl implementation of Ping Identity's "OpenToken"
+
+Copyright (C) 2010, Socialtext.  All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the Artistic-2.0 license.
+
+To install:
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install

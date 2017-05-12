@@ -1,0 +1,89 @@
+CPAN-Testers-WWW-Statistics
+===========================
+
+Website creation tools for CPAN Tester Statistics.
+
+Please note the tests for this code is very basic. If you wish to help me out
+and can add to the test suite, please feel free.
+
+INSTALLATION
+
+Untar the tarball into the directory of choice. All scripts can then be run
+from that directory. All the results end up in ./html, which can then be
+copied to your web server.
+
+DEPENDENCIES
+
+The scripts require the following Perl modules to be installed:
+
+  CGI
+  DBI
+  DBD::SQLite
+  GD::Graph::lines
+  Getopt::ArgvFile
+  Getopt::Long
+  HTML::Entities
+  IO::File
+  Sort::Versions
+  Template
+  Time::Piece
+  WWW::Mechanize
+
+SCRIPTS
+
+* addresses.pl
+
+Selects all the tester email addresses and attempts to guess the mapping of
+any addresses not mapped to known people in the address.txt file.
+
+* cpanstats-leaderboard
+
+Data table management script. Generates all the leaderboard entries.
+
+* cpanstats-writepages
+
+Web page creation script. Generates all the HTML files.
+
+* cpanstats-writegraphs
+
+Graph creation script. Generates all the graphs files.
+
+* getmailrc.pl
+
+Gets the latest copy of the 01mailrc.txt.gz and extracts the text file.
+
+* updates.pl
+
+Used in association with the cpanstats-data-latest.tar.gz tarball to update
+templates and the RSS feed.
+
+CPAN TESTERS FUND
+
+CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.
+
+In early 2012 the Enlightened Perl Organisation very kindly set-up a
+CPAN Testers Fund within their donatation structure, to help the project
+cover the costs of servers and services.
+
+If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+https://members.enlightenedperl.org/drupal/donate-cpan-testers
+
+If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.
+
+Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+http://iheart.cpantesters.org
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2005-2015 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

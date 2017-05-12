@@ -1,0 +1,31 @@
+---
+abstract: 'A clone that knows how to clone closures'
+author:
+  - 'This module is based on Clone v0.23 by Ray Finch, <rdf@cpan.org>.'
+  - 'This module is copyright 2007 Ben Morrow, <ben@morrow.me.uk>.'
+build_requires:
+  Data::Dumper: 0
+  ExtUtils::CBuilder: 0
+  File::Temp: 0.16
+  Scalar::Util: 1.14
+  Taint::Runtime: 0
+  Task::Weaken: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Clone-Closure
+provides:
+  Clone::Closure:
+    file: lib/Clone/Closure.pm
+    version: 0.06
+requires:
+  XSLoader: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mauzo/Clone-Closure
+version: 0.06

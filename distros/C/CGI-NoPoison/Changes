@@ -1,0 +1,15 @@
+Revision history for Perl module CGI::NoPoison
+
+0.01 Thu Jul 14 10:42:52 2005
+    - original version; created by ExtUtils::ModuleMaker 0.33
+
+3.10 Thu Jul 14 10:42:52 2005
+	- renumbered to match current CGI.pm version.
+	- tests added, readme, etc
+	- first release version.
+
+3.10_01 Mon Jul 18 11:56:14 EDT 2005
+	- corrected minor typo in NoPoison.pm ; removed duplicate '1;' from end of module
+
+3.11 Wed Dec  7 13:01:17 EST 2005
+	- corrected thinko in the return value of the params : only return an anon-array when more than one value is present

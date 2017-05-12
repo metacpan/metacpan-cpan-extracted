@@ -1,0 +1,19 @@
+---
+name: CGI-Minimal
+version: 1.29
+author:
+  - 'Benjamin Franz <snowhare@nihongo.org>'
+abstract: A lightweight CGI form processing package
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+provides:
+  CGI::Minimal:
+    file: lib/CGI/Minimal.pm
+    version: 1.29
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

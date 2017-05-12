@@ -1,0 +1,19 @@
+a note on time dependencies:
+avoid using them. the main point of Cache::Static is to allow for
+freshness while preserving performance. time dependencies, improperly 
+used, can defeat freshness. they can also harm performance if your 
+content does not change often (for example: instead of regenerating 
+whenever a file is changed, you regenerate every 3 minutes, and the 
+file is only changed on average every 3 hours - regeneration load 
+goes up by a factor of about 60).
+
+when is it okay to use time dependencies?
+1 - when you depend on time :), e.g. a widget that displays the current 
+time to minute resolution should probably use 'time|1m'.
+2 - when you have a complex piece of code (perhaps written by someone 
+else) that has dependencies you do not understand, and/or you're in a 
+hurry.
+
+In general, try to avoid #2. If you find yourself mostly using time 
+dependencies, you might want to consider the wealth of traditional 
+caching packages out there.

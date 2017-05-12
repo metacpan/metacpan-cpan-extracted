@@ -1,0 +1,16 @@
+Build.PL
+example/example-gnuplot.pl
+example/example-latex.pl
+lib/ChainMake.pm
+lib/ChainMake/Functions.pm
+lib/ChainMake/Parallel.pm
+lib/ChainMake/Tester.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/chains.t
+t/failing_targets.t
+t/incmpl_targets.t
+t/multiple_targets.t
+t/oo.t
+t/parallel.t

@@ -1,0 +1,67 @@
+{
+   "abstract" : "Help study usage of CGI::Application::Dispatch",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Demo-Dispatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.44"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.52",
+            "CGI::Application" : "4.31",
+            "CGI::Application::Dispatch" : "2.18",
+            "FCGI::ProcManager" : "0.19",
+            "HTML::Template" : "2.9"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Demo::Dispatch" : {
+         "file" : "lib/CGI/Application/Demo/Dispatch.pm",
+         "version" : "1.05"
+      },
+      "CGI::Application::Demo::Dispatch::Base" : {
+         "file" : "lib/CGI/Application/Demo/Dispatch/Base.pm",
+         "version" : "1.05"
+      },
+      "CGI::Application::Demo::Dispatch::Menu" : {
+         "file" : "lib/CGI/Application/Demo/Dispatch/Menu.pm",
+         "version" : "1.05"
+      },
+      "CGI::Application::Demo::Dispatch::Organization" : {
+         "file" : "lib/CGI/Application/Demo/Dispatch/Organization.pm",
+         "version" : "1.05"
+      },
+      "CGI::Application::Demo::Dispatch::Person" : {
+         "file" : "lib/CGI/Application/Demo/Dispatch/Person.pm",
+         "version" : "1.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "1.05"
+}

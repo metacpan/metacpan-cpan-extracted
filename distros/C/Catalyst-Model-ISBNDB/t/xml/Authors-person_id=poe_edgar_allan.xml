@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:01:58Z">
+<AuthorList total_results="1" page_size="10" page_number="1" shown_results="1">
+<AuthorData person_id="poe_edgar_allan">
+<Name>Poe, Edgar Allan</Name>
+<Details first_name="Edgar" last_name="Poe" dates="1809-1849." has_books="1" />
+<Categories>
+<Category category_id="alphabetically.authors.p.o.e">E</Category>
+</Categories>
+<Subjects>
+<Subject subject_id="adventure_fiction" book_count="1">Adventure fiction</Subject>
+<Subject subject_id="amazon_com_childrens_books_ages_9_12_general" book_count="2">Amazon.com -- Children's Books -- Ages 9-12 -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_authors_illustrators_a_z_t_twain_" book_count="1">Amazon.com -- Children's Books -- Authors &amp; Illustrators, A-Z -- ( T ) -- Twain, Mark</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_classics_by_age_genera" book_count="2">Amazon.com -- Children's Books -- Literature -- Classics by Age -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_poetry_general" book_count="1">Amazon.com -- Children's Books -- Literature -- Poetry -- General</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_science_fiction__aaaa0" book_count="1">Amazon.com -- Children's Books -- Literature -- Science Fiction, Fantasy, Mystery &amp; Horror -- Spine-Chilling Horror</Subject>
+<Subject subject_id="amazon_com_childrens_books_literature_short_story_collection" book_count="2">Amazon.com -- Children's Books -- Literature -- Short Story Collections</Subject>
+<Subject subject_id="amazon_com_childrens_books_series_classics_scribners_illustr" book_count="1">Amazon.com -- Children's Books -- Series -- Classics -- Scribner's Illustrated Classics</Subject>
+<Subject subject_id="amazon_com_entertainment_radio_general_broadcasting" book_count="1">Amazon.com -- Entertainment -- Radio -- General Broadcasting</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_authors_a_z_d_doyle_arthur" book_count="1">Amazon.com -- Formats -- Audiocassettes -- Authors, A-Z -- ( D ) -- Doyle, Arthur Conan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_authors_a_z_p_poe_edgar_al" book_count="1">Amazon.com -- Formats -- Audiocassettes -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_general" book_count="1">Amazon.com -- Formats -- Audiocassettes -- General</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_mystery_thrillers_au_aaaa1" book_count="1">Amazon.com -- Formats -- Audiocassettes -- Mystery &amp; Thrillers -- Authors, A-Z -- ( D ) -- Doyle, Sir Arthur Conan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_mystery_thrillers_mystery" book_count="1">Amazon.com -- Formats -- Audiocassettes -- Mystery &amp; Thrillers -- Mystery</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_radio_shows" book_count="1">Amazon.com -- Formats -- Audiocassettes -- Radio Shows</Subject>
+<Subject subject_id="amazon_com_formats_libros_en_espa_241_ol_infantil_y_ju_aaaa3" book_count="1">Amazon.com -- Formats -- Libros en español -- Infantil y juvenil -- 4 a 8 años</Subject>
+<Subject subject_id="amazon_com_formats_libros_en_espa_241_ol_infantil_y_juvenil_" book_count="1">Amazon.com -- Formats -- Libros en español -- Infantil y juvenil -- General</Subject>
+<Subject subject_id="amazon_com_horror_anthologies" book_count="2">Amazon.com -- Horror -- Anthologies</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_edgar_allan" book_count="7">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_poe_robert" book_count="1">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Poe, Robert</Subject>
+<Subject subject_id="amazon_com_horror_authors_a_z_p_price_robert_m" book_count="1">Amazon.com -- Horror -- Authors, A-Z -- ( P ) -- Price, Robert M</Subject>
+<Subject subject_id="amazon_com_horror_general" book_count="2">Amazon.com -- Horror -- General</Subject>
+<Subject subject_id="amazon_com_horror_united_states" book_count="6">Amazon.com -- Horror -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_c_chopin_kate" book_count="1">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( C ) -- Chopin, Kate</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_h_henry_o" book_count="1">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( H ) -- Henry, O</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_p_poe_edgar_allan" book_count="8">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_t_twain_mark_gener" book_count="1">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( T ) -- Twain, Mark -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_t_twain_mark_paper" book_count="1">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( T ) -- Twain, Mark -- Paperback</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics" book_count="10">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_contemporary" book_count="1">Amazon.com -- Literature &amp; Fiction -- General -- Contemporary</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_literary" book_count="2">Amazon.com -- Literature &amp; Fiction -- General -- Literary</Subject>
+<Subject subject_id="amazon_com_literature_fiction_genre_fiction_historical" book_count="1">Amazon.com -- Literature &amp; Fiction -- Genre Fiction -- Historical</Subject>
+<Subject subject_id="amazon_com_literature_fiction_history_criticism_criticism_th" book_count="1">Amazon.com -- Literature &amp; Fiction -- History &amp; Criticism -- Criticism &amp; Theory -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_general" book_count="1">Amazon.com -- Literature &amp; Fiction -- Poetry -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_poets_a_z_p_poe_edgar_a" book_count="5">Amazon.com -- Literature &amp; Fiction -- Poetry -- Poets, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_single_authors_united_s" book_count="3">Amazon.com -- Literature &amp; Fiction -- Poetry -- Single Authors -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_anthologies" book_count="2">Amazon.com -- Literature &amp; Fiction -- Short Stories -- Anthologies</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_british" book_count="1">Amazon.com -- Literature &amp; Fiction -- Short Stories -- British</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_general" book_count="5">Amazon.com -- Literature &amp; Fiction -- Short Stories -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_united_states" book_count="3">Amazon.com -- Literature &amp; Fiction -- Short Stories -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa1" book_count="5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa2" book_count="3">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa4" book_count="1">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Twain, Mark</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa5" book_count="8">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- 19th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa9" book_count="3">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- 20th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaab9" book_count="1">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Chopin, Kate</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5" book_count="20">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united_states" book_count="1">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Collections &amp; Readers</Subject>
+<Subject subject_id="amazon_com_mystery_thrillers_authors_a_z_d_doyle_arthur_cona" book_count="1">Amazon.com -- Mystery &amp; Thrillers -- Authors, A-Z -- ( D ) -- Doyle, Arthur Conan -- General</Subject>
+<Subject subject_id="amazon_com_mystery_thrillers_mystery_anthologies" book_count="1">Amazon.com -- Mystery &amp; Thrillers -- Mystery -- Anthologies</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_authors_a_z_c_clarke_arth" book_count="1">Amazon.com -- Science Fiction &amp; Fantasy -- Authors, A-Z -- ( C ) -- Clarke, Arthur C</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_authors_a_z_v_verne_jules" book_count="1">Amazon.com -- Science Fiction &amp; Fantasy -- Authors, A-Z -- ( V ) -- Verne, Jules</Subject>
+<Subject subject_id="amazon_com_science_fiction_fantasy_science_fiction_general" book_count="1">Amazon.com -- Science Fiction &amp; Fantasy -- Science Fiction -- General</Subject>
+<Subject subject_id="amazon_com_teens_horror" book_count="1">Amazon.com -- Teens -- Horror</Subject>
+<Subject subject_id="american_fiction" book_count="14">American fiction</Subject>
+<Subject subject_id="american_literature" book_count="3">American literature</Subject>
+<Subject subject_id="american_literature_19th_century_history_and_criticism" book_count="1">American literature -- 19th century -- History and criticism</Subject>
+<Subject subject_id="american_literature_history_and_criticism" book_count="1">American literature -- History and criticism</Subject>
+<Subject subject_id="american_poetry" book_count="4">American poetry</Subject>
+<Subject subject_id="american_poetry_juvenile_literature" book_count="2">American poetry -- Juvenile literature</Subject>
+<Subject subject_id="angels_fiction" book_count="1">Angels -- Fiction</Subject>
+<Subject subject_id="authors_american" book_count="1">Authors, American</Subject>
+<Subject subject_id="authors_american_19th_century_biography" book_count="2">Authors, American -- 19th century -- Biography</Subject>
+<Subject subject_id="authors_american_19th_century_correspondence" book_count="2">Authors, American -- 19th century -- Correspondence</Subject>
+<Subject subject_id="authors_american_autographs_facsimiles" book_count="1">Authors, American -- Autographs -- Facsimiles</Subject>
+<Subject subject_id="books_reviews" book_count="2">Books -- Reviews</Subject>
+<Subject subject_id="burial_premature_fiction" book_count="1">Burial, Premature -- Fiction</Subject>
+<Subject subject_id="buried_treasure_fiction" book_count="1">Buried treasure -- Fiction</Subject>
+<Subject subject_id="carling_james_1857_1887" book_count="1">Carling, James,1857-1887</Subject>
+<Subject subject_id="cats_fiction" book_count="1">Cats -- Fiction</Subject>
+<Subject subject_id="childrens_poetry_american" book_count="1">Children's poetry, American</Subject>
+<Subject subject_id="childrens_stories_american" book_count="1">Children's stories, American</Subject>
+<Subject subject_id="clemm_maria" book_count="1">Clemm, Maria</Subject>
+<Subject subject_id="collected_works" book_count="1">Collected works</Subject>
+<Subject subject_id="conduct_of_life_fiction" book_count="1">Conduct of life -- Fiction</Subject>
+<Subject subject_id="cosmology" book_count="1">Cosmology</Subject>
+<Subject subject_id="crime_fiction" book_count="2">Crime -- Fiction</Subject>
+<Subject subject_id="criticism_france" book_count="1">Criticism -- France</Subject>
+<Subject subject_id="death_fiction" book_count="1">Death -- Fiction</Subject>
+<Subject subject_id="death_poetry" book_count="1">Death -- Poetry</Subject>
+<Subject subject_id="demonology_fiction" book_count="1">Demonology -- Fiction</Subject>
+<Subject subject_id="detective_and_mystery_stories_american" book_count="6">Detective and mystery stories, American</Subject>
+<Subject subject_id="detective_and_mystery_stories_american_juvenile_fiction" book_count="1">Detective and mystery stories, American -- Juvenile fiction</Subject>
+<Subject subject_id="devil_fiction" book_count="1">Devil -- Fiction</Subject>
+<Subject subject_id="didactic_fiction" book_count="1">Didactic fiction</Subject>
+<Subject subject_id="electronic_books" book_count="21">Electronic books</Subject>
+<Subject subject_id="encyclopedias" book_count="1">Encyclopedias</Subject>
+<Subject subject_id="enoch_pratt_free_library" book_count="1">Enoch Pratt Free Library</Subject>
+<Subject subject_id="fantasy_fiction_american" book_count="4">Fantasy fiction, American</Subject>
+<Subject subject_id="fantasy_literature_american" book_count="5">Fantasy literature, American</Subject>
+<Subject subject_id="fantasy_literature_american_encyclopedias" book_count="1">Fantasy literature, American -- Encyclopedias</Subject>
+<Subject subject_id="fantasy_literature_american_history_and_criticism" book_count="1">Fantasy literature, American -- History and criticism</Subject>
+<Subject subject_id="fantasy_literature_authorship" book_count="1">Fantasy literature -- Authorship</Subject>
+<Subject subject_id="fantasy_poetry_american" book_count="5">Fantasy poetry, American</Subject>
+<Subject subject_id="fantasy_poetry_american_translations_into_french" book_count="1">Fantasy poetry, American -- Translations into French</Subject>
+<Subject subject_id="ghost_stories" book_count="1">Ghost stories</Subject>
+<Subject subject_id="ghosts_poetry" book_count="2">Ghosts -- Poetry</Subject>
+<Subject subject_id="haunted_places_poetry" book_count="1">Haunted places -- Poetry</Subject>
+<Subject subject_id="horror_fiction" book_count="3">Horror fiction</Subject>
+<Subject subject_id="horror_literary_collections" book_count="1">Horror -- Literary collections</Subject>
+<Subject subject_id="horror_poetry" book_count="1">Horror -- Poetry</Subject>
+<Subject subject_id="horror_stories" book_count="3">Horror stories</Subject>
+<Subject subject_id="horror_tales" book_count="4">Horror tales</Subject>
+<Subject subject_id="horror_tales_american" book_count="23">Horror tales, American</Subject>
+<Subject subject_id="horror_tales_american_juvenile_fiction" book_count="1">Horror tales, American -- Juvenile fiction</Subject>
+<Subject subject_id="horror_tales_english" book_count="1">Horror tales, English</Subject>
+<Subject subject_id="horror_tales_juvenile_fiction" book_count="1">Horror tales -- Juvenile fiction</Subject>
+<Subject subject_id="husband_and_wife_fiction" book_count="1">Husband and wife -- Fiction</Subject>
+<Subject subject_id="inheritance_and_succession_fiction" book_count="1">Inheritance and succession -- Fiction</Subject>
+<Subject subject_id="jerusalem_fiction" book_count="1">Jerusalem -- Fiction</Subject>
+<Subject subject_id="large_type_books" book_count="2">Large type books</Subject>
+<Subject subject_id="literary_forgeries_and_mystifications_fiction" book_count="1">Literary forgeries and mystifications -- Fiction</Subject>
+<Subject subject_id="literature_history_and_criticism_theory" book_count="1">Literature -- History and criticism -- Theory</Subject>
+<Subject subject_id="literature_history_and_criticism_theory_etc" book_count="1">Literature -- History and criticism -- Theory, etc</Subject>
+<Subject subject_id="love_poetry_aaaa0" book_count="1">Love -- Poetry</Subject>
+<Subject subject_id="manuscripts_american_facsimiles" book_count="1">Manuscripts, American -- Facsimiles</Subject>
+<Subject subject_id="mummies_fiction" book_count="1">Mummies -- Fiction</Subject>
+<Subject subject_id="murder_fiction" book_count="2">Murder -- Fiction</Subject>
+<Subject subject_id="musicals_librettos" book_count="1">Musicals -- Librettos</Subject>
+<Subject subject_id="mystery_and_detective_stories" book_count="2">Mystery and detective stories</Subject>
+<Subject subject_id="mystery_fiction" book_count="2">Mystery fiction</Subject>
+<Subject subject_id="nantucket_island_mass_fiction" book_count="1">Nantucket Island (Mass.) -- Fiction</Subject>
+<Subject subject_id="netherlands_fiction" book_count="2">Netherlands -- Fiction</Subject>
+<Subject subject_id="nosology_humor_fiction" book_count="1">Nosology -- Humor -- Fiction</Subject>
+<Subject subject_id="parody_in_literature_satire" book_count="1">Parody in literature -- Satire</Subject>
+<Subject subject_id="poe_edgar_allan" book_count="1">Poe, Edgar Allan</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849" book_count="2">Poe, Edgar Allan,1809-1849</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_aesthetics" book_count="1">Poe, Edgar Allan,1809-1849 -- Aesthetics</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_correspondence" book_count="2">Poe, Edgar Allan,1809-1849 -- Correspondence</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_criticism_and_interpretation" book_count="2">Poe, Edgar Allan,1809-1849 -- Criticism and interpretation</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_encyclopedias" book_count="1">Poe, Edgar Allan,1809-1849 -- Encyclopedias</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_fall_of_the_house_of_usher" book_count="1">Poe, Edgar Allan,1809-1849. -- Fall of the House of Usher</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_manuscripts_facsimiles" book_count="1">Poe, Edgar Allan,1809-1849 -- Manuscripts -- Facsimiles</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_notebooks_sketchbooks_etc" book_count="3">Poe, Edgar Allan,1809-1849 -- Notebooks, sketchbooks, etc</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_raven" book_count="1">Poe, Edgar Allan,1809-1849. -- Raven</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_translations_into_french" book_count="1">Poe, Edgar Allan,1809-1849 -- Translations into French</Subject>
+<Subject subject_id="poetry" book_count="1">Poetry</Subject>
+<Subject subject_id="poetry_history_and_criticism_theory_etc" book_count="1">Poetry -- History and criticism -- Theory, etc</Subject>
+<Subject subject_id="prisoners_fiction" book_count="1">Prisoners -- Fiction</Subject>
+<Subject subject_id="readers" book_count="1">Readers</Subject>
+<Subject subject_id="readers_for_new_literates" book_count="1">Readers for new literates</Subject>
+<Subject subject_id="rogers_mary_1820_1841" book_count="1">Rogers, Mary,1820-1841</Subject>
+<Subject subject_id="rome_drama" book_count="1">Rome -- Drama</Subject>
+<Subject subject_id="scheherazade_legendary_character" book_count="1">Scheherazade (Legendary character)</Subject>
+<Subject subject_id="shadows_fiction" book_count="1">Shadows -- Fiction</Subject>
+<Subject subject_id="short_stories" book_count="7">Short stories</Subject>
+<Subject subject_id="short_stories_american" book_count="2">Short stories, American</Subject>
+<Subject subject_id="short_stories_juvenile_fiction" book_count="1">Short stories -- Juvenile fiction</Subject>
+<Subject subject_id="spirit_possession_fiction" book_count="1">Spirit possession -- Fiction</Subject>
+<Subject subject_id="spirits_fiction" book_count="1">Spirits -- Fiction</Subject>
+<Subject subject_id="stories_in_rhyme" book_count="2">Stories in rhyme</Subject>
+<Subject subject_id="time_fiction" book_count="1">Time -- Fiction</Subject>
+<Subject subject_id="timur_1336_1405" book_count="1">Timur,1336-1405</Subject>
+<Subject subject_id="voyages_imaginary" book_count="2">Voyages, Imaginary</Subject>
+<Subject subject_id="whirlpools_fiction" book_count="1">Whirlpools -- Fiction</Subject>
+<Subject subject_id="wissahickon_creek_pa_description_and_travel" book_count="1">Wissahickon Creek (Pa.) -- Description and travel</Subject>
+<Subject subject_id="young_men_massachusetts_nantucket_island_fiction" book_count="1">Young men -- Massachusetts -- Nantucket Island -- Fiction</Subject>
+<Subject subject_id="zincography" book_count="1">Zincography</Subject>
+</Subjects>
+</AuthorData>
+</AuthorList>
+</ISBNdb>

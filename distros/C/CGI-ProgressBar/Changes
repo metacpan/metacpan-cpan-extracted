@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::ProgressBar.
+
+0.05  Tue Nov 30 17:00:00 2010
+	- Patch from CPAN RT
+
+0.03  Wed Nov 17 18:01:00 2004
+	- XHTML cleaned up
+
+0.01  Fri Jul  4 07:39:00 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n CGI::ProgressBar
+

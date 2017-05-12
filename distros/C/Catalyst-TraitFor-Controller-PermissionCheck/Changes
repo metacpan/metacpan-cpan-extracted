@@ -1,0 +1,13 @@
+Revision history for Catalyst-TraitFor-Controller-PermissionCheck
+
+0.04 Jul 21 2011
+  * Renaming to Catalyst::TraitFor::Controller::PermissionCheck, per Catalyst naming conventions.
+
+0.03 Jul 21 2011
+  * Force fetch_permissions to return a hash ref if permissions are undefined
+
+0.02 Jul 15 2011
+
+0.01    
+  * First version, released on an unsuspecting world.
+

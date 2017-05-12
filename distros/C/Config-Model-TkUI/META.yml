@@ -1,0 +1,57 @@
+---
+abstract: 'Tk GUI to edit config data through Config::Model'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Config::Model::Value: '0'
+  Module::Build: '0.34'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Test::Warn: '0.11'
+configure_requires:
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-TkUI
+requires:
+  Carp: '0'
+  Config::Model: '2.084'
+  Config::Model::ObjTreeScanner: '0'
+  Log::Log4perl: '1.11'
+  Path::Tiny: '0'
+  Pod::POM: '0'
+  Pod::POM::View::Text: '0'
+  Scalar::Util: '0'
+  Text::Diff: '0'
+  Text::Wrap: '0'
+  Tk: '0'
+  Tk::Adjuster: '0'
+  Tk::Balloon: '0'
+  Tk::BrowseEntry: '0'
+  Tk::Dialog: '0'
+  Tk::DialogBox: '0'
+  Tk::DirSelect: '0'
+  Tk::DoubleClick: '0'
+  Tk::Frame: '0'
+  Tk::Menubutton: '0'
+  Tk::NoteBook: '0'
+  Tk::PNG: '0'
+  Tk::Pane: '0'
+  Tk::Photo: '0'
+  Tk::Pod: '0'
+  Tk::Pod::Text: '0'
+  Tk::ROText: '0'
+  Tk::Toplevel: '0'
+  Tk::Tree: '0'
+  Try::Tiny: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dod38fr/config-model-tk-ui/issues
+  homepage: https://github.com/dod38fr/config-model/wiki
+  repository: git://github.com/dod38fr/config-model-tk-ui.git
+version: '1.361'
+x_serialization_backend: 'YAML::Tiny version 1.69'

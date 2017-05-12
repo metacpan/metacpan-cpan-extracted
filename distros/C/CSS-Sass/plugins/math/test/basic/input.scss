@@ -1,0 +1,96 @@
+test {
+
+  E: $E;
+  PI: $PI;
+  TAU: $TAU;
+
+  sign: sign(0);
+  sign: sign($E);
+  sign: sign(-$E);
+
+  exp: exp($E);
+  log: log($E);
+  log2: log2($E);
+  log10: log10($E);
+  cbrt: cbrt($E);
+  sqrt: sqrt($E);
+  fact: fact($E);
+  pow: pow($E, $PI);
+
+  sin: sin(0);
+  sin: sin($PI/2);
+  sin: sin($TAU/2);
+  cos: cos(0);
+  cos: cos($PI/2);
+  cos: cos($TAU/2);
+  tan: tan(0);
+  tan: tan($PI/3);
+  tan: tan($TAU/2);
+  sec: sec(0);
+  sec: sec($PI/3);
+  sec: sec($TAU/2);
+  csc: csc(0);
+  csc: csc($PI/3);
+  csc: csc($TAU/3);
+  cot: cot(0);
+  cot: cot($PI/2);
+  cot: cot($TAU/3);
+
+  sinh: sinh(0);
+  sinh: sinh($PI/2);
+  sinh: sinh($TAU/2);
+  cosh: cosh(0);
+  cosh: cosh($PI/2);
+  cosh: cosh($TAU/2);
+  tanh: tanh(0);
+  tanh: tanh($PI/2);
+  tanh: tanh($TAU/2);
+  sech: sech(0);
+  sech: sech($PI/2);
+  sech: sech($TAU/2);
+  csch: csch(0);
+  csch: csch($PI/2);
+  csch: csch($TAU/2);
+  coth: coth(0);
+  coth: coth($PI/2);
+  coth: coth($TAU/2);
+
+  asin: asin(0);
+  asin: asin($PI/2);
+  asin: asin($TAU/2);
+  acos: acos(0);
+  acos: acos($PI/2);
+  acos: acos($TAU/2);
+  atan: atan(0);
+  atan: atan($PI/2);
+  atan: atan($TAU/2);
+  asec: asec(0);
+  asec: asec($PI/2);
+  asec: asec($TAU/2);
+  acsc: acsc(0);
+  acsc: acsc($PI/2);
+  acsc: acsc($TAU/2);
+  acot: acot(0);
+  acot: acot($PI/2);
+  acot: acot($TAU/2);
+
+  asinh: asinh(0);
+  asinh: asinh($PI/2);
+  asinh: asinh($TAU/2);
+  acosh: abs(acosh(0));
+  acosh: acosh($PI/2);
+  acosh: acosh($TAU/2);
+  atanh: atanh(0);
+  atanh: abs(atanh($PI/2));
+  atanh: abs(atanh($TAU/2));
+  asech: abs(asech(0));
+  asech: asech($PI/2);
+  asech: asech($TAU/2);
+  acsch: abs(acsch(0));
+  acsch: acsch($PI/2);
+  acsch: acsch($TAU/2);
+  acoth: acoth(0);
+  acoth: abs(acoth($PI/2));
+  acoth: abs(acoth($TAU/2));
+
+}

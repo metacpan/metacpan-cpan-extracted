@@ -1,0 +1,53 @@
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/DynaVision.html,v
+Working file: DynaVision.html
+head: 1.21
+branch:
+locks: strict
+access list:
+symbolic names:
+	ILAB-1-7: 1.21
+	ILAB-1-6-patches: 1.19.0.2
+	ILAB-1-6: 1.19
+	ILAB-1-5: 1.16
+	ILAB-1-4: 1.8
+keyword substitution: kv
+total revisions: 21;	selected revisions: 1
+description:
+----------------------------
+revision 1.21
+date: 2003/01/28 12:48:47;  author: bkuemmer;  state: Exp;  lines: +3 -3
+Just a test (sorry, sven)
+=============================================================================
+
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/DynaVisionShort.html,v
+Working file: DynaVisionShort.html
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+	ILAB-1-7: 1.6
+	ILAB-1-6-patches: 1.6.0.2
+	ILAB-1-6: 1.6
+	ILAB-1-5: 1.6
+	ILAB-1-4: 1.3
+keyword substitution: kv
+total revisions: 7;	selected revisions: 0
+description:
+=============================================================================
+
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/test.txt,v
+Working file: test.txt
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/28 12:52:02;  author: bkuemmer;  state: Exp;
+Just a test (sorry, sven)
+=============================================================================

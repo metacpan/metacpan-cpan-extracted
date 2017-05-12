@@ -1,0 +1,44 @@
+NAME
+    Catalyst::Model::Net::Amazon - Catalyst model for Net::Amazon SOAP
+    interface
+
+SYNOPSIS
+        # Use the helper to add an Net::Amazon model to your application...
+        script/myapp_create.pl create model Net::Amazon Net::Amazon
+    
+        # This creates the following file...
+        # lib/MyApp/Model/Net/Amazon.pm
+    
+        package MyApp::Model::Net::Amazon;
+    
+        use base qw/ Catalyst::Model::S3 /;
+    
+        __PACKAGE__->config(
+            token => 'my amazon secret token',
+        );
+    
+        1;
+    
+        # Then in your Catalyst controller, you just need to do...
+        my $amazon = $c->model('Net::Amazon');
+
+METHODS
+  new
+    Instantiate a new Net::Amazon Model. See Net::Amazon's new method for
+    the options available.
+
+SEE ALSO
+    Catalyst::Helper::Net::Amazon, Net::Amazon
+
+    Catalyst::Model::S3
+
+AUTHOR
+    Carl Franks, "cfranks@cpan.org"
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Carl Franks
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,26 @@
+                    -                                   -                   @
+                /888888\                            /ggg|lll\               @
+             /5\888888888/7\                     /|ggggg|lllll|\            @
+          /5555555\888/7777777\               /hhh|ggggg|lllll|ooo\         @
+      /22\55555555/444\77777777/66\       /i|hhhhh|ggggg+lllll|ooooo|r\     @
+   /22222222\55/444444444\77/66666666\ /iiii|hhhhh|g/ddd|kkk\l|ooooo|rrrr\  @
+  |\2222222/1111\4444444/3333\6666666/|iiiii|hhhh/|ddddd|kkkkk|n\ooo|rrrrr| @
+  |FFF\2/1111111111\4/3333333333\6/KKK|iiiii|h/eee|ddddd|kkkkk|nnnnn|\rrrr| @
+  |FFFFF|C\111111/00000\333333/J|KKKKK|iii/f|eeeee|ddddd+kkkkk|nnnnn|qqq\r| @
+  |FFFFF|CCCC\/00000000000\/JJJJ|KKKKK|/ffff|eeeee|d/aaa|jjj\k|nnnnn|qqqqq| @
+  |\FFFF|CCCCC|9\000000/II|JJJJJ|KKKK/|fffff|eeee/|aaaaa|jjjjj|m\nnn|qqqqq| @
+  |GGG\F|CCCCC|99999-IIIII|JJJJJ|K/NNN|fffff|e/bbb|aaaaa|jjjjj|mmmmm|\qqqq| @
+  |GGGGG|D\CCC|99999|IIIII|JJJ/M|NNNNN|fff/c|bbbbb|aaaaa-jjjjj|mmmmm|ppp\q| @
+  |GGGGG|DDDD\|99999|IIIII|/MMMM|NNNNN|/cccc|bbbbb|a/RRRRRRR\j|mmmmm|ppppp| @
+  |\GGGG|DDDDD|A\999|II/LL|MMMMM|NNNN/|ccccc|bbbb/U\RRRRRRRRRR/S\mmm|ppppp| @
+  |HHH\G|DDDDD|AAAAA+LLLLL|MMMMM|N/QQQ|ccccc|b/UUUUUUU\RRRR/SSSSSS\m|ppppp| @
+  |HHHHH|E\DDD|AAAAA|LLLLL|MMM/P|QQQQQ|ccc/XX\UUUUUUUUU/VV\SSSSSSSSS/TT\pp| @
+  |HHHHH|EEEE\|AAAAA|LLLLL|/PPPP|QQQQQ|/XXXXXXXX\UUU/VVVVVVVV\SSS/TTTTTTT\| @
+   \HHHH|EEEEE|B\AAA|LL/OO|PPPPP|QQQQ/ \XXXXXXXX/YYY\VVVVVVVV/WWW\TTTTTTT/  @
+      \H|EEEEE|BBBBB+OOOOO|PPPPP|QQ/      \XX/YYYYYYYYY\VV/WWWWWWWWW\TT/    @
+          \EEE|BBBBB|OOOOO|PPPP/              \YYYYYYY/ZZZZ\WWWWWWW/        @
+             \|BBBBB|OOOOO|/                     \Y/ZZZZZZZZZZ\W/           @
+                \BBB|OO/                            \ZZZZZZZ/               @
+                    -                                   -                   @
+^ Turns:  Clockwise = wrybog    CounterClockwise = WRYBOG    Twice = 012345 @
+^  AltColrSet = a  Fill = f  Mix = m  Init = i  Exit = x  Please Press A Key:$

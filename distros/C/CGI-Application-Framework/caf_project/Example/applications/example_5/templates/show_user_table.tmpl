@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>All Users</title>
+	<link rel="stylesheet" href="[% url_examples_css %]" type="text/css" />
+</head>
+  <body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+
+[% CGIAPP.embed("make_navbar") %]
+
+    <h1>All Users</h1>
+    <h2>Template::Toolkit version</h2>
+
+<pre>
+[% README.txt %]
+</pre>
+
+<p>
+Here are all the users on the example application.
+
+<div id="userlist">
+<table width="100%">
+
+  <tr bgcolor=#d0d0ff>
+    <th>UID</th>
+    <th>Username</th>
+    <th>Full name</th>
+    <th>Password</th>
+    <th>Actions</th>
+  </tr>
+
+[% FOREACH user_loop %]
+  <tr>
+    <td valign=top align=left>
+    [% IF uid_is_you %]
+      <b>[% uid %]  -- this is you</b>
+    [% ELSE %]
+      [% uid %]
+    [% END %]
+    </td>
+    <td valign=top align=left>[% username %] </td>
+    <td valign=top align=left>[% fullname %] </td>
+    <td valign=top align=left>[% password %] </td>
+    <td valign=top align=left>
+      <a href="[% edit_link %]">edit user</a>
+      [% IF delete_link %]
+        <br>
+        <a href="[% delete_link %]">delete user</a>
+      [% END %]
+    </td>
+  </tr>
+[% END %]
+
+  <tr>
+    <td valign=top align=center colspan=5 bgcolor=#d0d0d0>
+      <b><a href="[% add_link %]">add a user</a></b>
+    </td>
+  </tr>
+
+</table>
+</div>
+
+</p>
+
+  </body>
+</html>
+

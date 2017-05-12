@@ -1,0 +1,54 @@
+CAM::Template - Clotho-style search/replace HTML templates
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module implements an easy to use search-and-replace API for
+substituting parameters into template files.  The Perl module it most
+closely resembles is HTML::Template.  It's main advantages over that
+module are:
+
+ * it's template syntax is easily configured
+ * it implements the Clotho Advanced Media template syntax by default
+   (yeah big deal, but it's important to us)
+ * it is smaller and, subjectively, more readable
+
+It's main disadvantages under HTML::Template are:
+
+ * it's caching and preparsing are less sophisticated
+ * the default template syntax is quirkier
+ * it's not as feature rich in syntax and configuration options
+
+If you are starting from scratch, you may prefer HTML::Template.  But,
+if you already have a bunch of templates using a syntax that is not
+compatible with HTML::Template, this can help.

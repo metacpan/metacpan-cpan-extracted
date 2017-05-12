@@ -1,0 +1,31 @@
+Changelog for Config-AutoConf-INI
+
+0.005 2017-02-23T06:11:44
+ [Jean-Damien Durand]
+ - Old versions of File::Path does not provide make_path, but the legacy
+   mkpath
+
+0.004 2017-02-22T04:58:55Z
+ [Jean-Damien Durand]
+ - dzil xtest
+ - use Config::Tiny::Ordered instead of Config::INI::Reader
+
+0.003 2017-02-21T05:50:58Z
+ [Jean-Damien Durand]
+ - For write_config_h, prepare path directory if needed
+
+0.002 2017-02-16T07:23:44Z
+ [Jean-Damien Durand]
+ - FIx meta resource
+ - Removed unused "use SUPER"; sort keys alphabetically since it was
+   unsorted anyway previously -;
+
+0.001 2017-02-11T13:59:03Z
+ [Jean-Damien Durand]
+ - doc
+ - t+
+ - packaging
+ - dist.ini and README
+ - .gitignore
+ - README
+ - Initial commit

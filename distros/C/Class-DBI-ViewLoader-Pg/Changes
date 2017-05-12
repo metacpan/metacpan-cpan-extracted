@@ -1,0 +1,28 @@
+Changes document for Class::DBI::ViewLoader::Pg
+
+0.05 - Tue Jul 11 2006
+	- Made tests work properly with non-reloading classes.
+	- Made tests skip in absense of dsn, instead of having Module::Build
+	  prompt the user.
+
+	- Made tests use an existing database instead of trying to create a new
+	  one. 
+
+	- Moved setup and shutdown tests into the main test script.
+        - Added INSTALL document (by running pod2text on Build.PL)
+
+0.04 - Fri, 28 Oct 2005
+	- Added Test::Pod and Test::Pod::Coverage tests
+
+0.03 - Fri, 2 Sep 2005
+	- Added more useful documentation
+	- Fixed bug with cached statement handles
+
+0.02 - Fri, 12 Aug 2005
+	- Updated Build.PL to cope with non-local test databases and
+	  non-existant default databases
+
+	- Updated api plugin test script to match Class::DBI::ViewLoader 0.02
+
+0.01 - Wed, 03 Aug 2005
+	- initial version

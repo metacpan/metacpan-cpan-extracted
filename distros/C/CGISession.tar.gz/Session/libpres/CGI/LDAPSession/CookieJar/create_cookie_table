@@ -1,0 +1,427 @@
+#!/usr/local/bin/perl5
+#
+
+package CGI::LDAPSession::CookieJar::DBI;
+
+use Carp;
+use CGI::LDAPSession::CookieJar::DBI;
+
+use vars qw( @ISA );
+push @ISA, qw( CGI::LDAPSession::CookieJar );
+
+=item CGI::LDAPSession::CookieJar::DBI
+
+A DBI Based CookieJar.
+
+The general usage is as follows:
+
+my $cookiejar;
+$cookiejar = new CGI::LDAPSession::CookieJar::DBI();
+$cookiejar->use_mysql();
+$cookiejar->user( 'MyMYSQLUser' );
+$cookiejar->password( 'lijlkdfsf' );
+$cookiejar->database( 'DBI' );
+$cookiejar->host( 'my.dbi.server.myco.com' );
+$cookiejar->open();
+...
+... cookie operations
+...
+$cookiejar->close();
+
+
+Most functions manipulating cookies use "queries" to specify the
+cookies which will be operated upon.  These queries are references to
+associative arrays.  The keys indicate variables which will be
+compared, and the values specify the query operations. These
+intersection of all the results determines which ones will be
+selected.
+
+Here are examples of simple queries:
+
+{ user => "bob" } selects all cookies with the user value of "bob"
+
+{ expiration => "<".time() } selects all cookies which have already
+                             expired
+
+{ expiration => ">".time() } selects all cookies which have not
+                             expired
+
+{ cookie_name => "$cookie" } selects all cookies which are named $cookie
+
+{ passkey => "435765" } selects all cookies which have the passkey value
+                        of "435765"
+
+
+{ user => "bob", passkey => "6578" } selects all cookies which have the user
+                                     "bob" and the passkey set to "6578"
+
+There is no way to select a union of search results.
+
+=cut
+
+=item CGI::LDAPSession::CookieJar::open
+
+$cookiejar->open();
+
+Opens up the cookie jar.  This must be called before any operations
+can take place.  When you are through with the cookie jar the close
+operation me be called.
+
+=cut
+
+sub open { my $p=__PACKAGE__; $croak "The $p::open operation must be defined."; }
+
+
+=item CGI::LDAPSession::CookieJar::close
+
+$cookiejar->close;
+
+Closes a previously opened cookie jar.  This must be done before your program ends.
+
+=cut
+
+sub close { my $p = __PACKAGE__; croak "The method $p::close must be defined."; }
+
+
+=item CGI::LDAPSession::CookieJar::contains
+
+Determines if a session contains a given cookie.
+
+my $time = time;
+my %query = ( user=>'bob',
+	      cookie_name=>'3476dfgh', 
+	      passkey=>'23438',
+	      expiration=>'>$time' );
+
+my $has_cookie = $cookie_jar->contains( -query => \$query );
+
+=cut
+
+sub contains { my $p=__PACKAGE__; croak "$p::contains is not implemented, but it must be."; };
+
+
+
+
+=item CGI::LDAPSession::CookieJar::cookie
+
+Retreives a cookie from the cookie jar using a specified query. If no
+cookie is found then it returns 'undef'.
+
+By default all cookie fields are returned.  If your application potentially
+contains large 'server_data' fields this may not be what you want.  In these
+cases you can specify a list of fields to omit.  These fields are passed in
+via array reference.
+
+my $time = time;
+my %query = ( user=>'bob',
+	      cookie_name=>'3476dfgh', 
+	      passkey=>'23438',
+	      expiration=>'>$time' );
+
+my $cookie = $cookie_jar->cookie( -query => \$query );
+
+if ( !defined $cookie ) { croak "There is no such cookie."; }
+
+...or...
+
+my $cookie = $cookie_jar->cookie( -query => \$query,
+				  -omit => [ "server_data" ] );
+ 
+=cut
+
+sub cookie { my $p=__PACKAGE__; croak "$p::cookie is not implemented, but it must be."; };
+
+
+
+=item CGI::LDAPSession::CookieJar::delete
+
+Deletes the specified cookies from the cookie jar. 
+
+my $time = time;
+my %query = ( expiration=>'<$time' );
+$cookie_jar->cookie( -query => \$query );
+
+=cut
+
+sub delete { my $p=__PACKAGE__; croak "$p::delete is not implemented, but it must be."; };
+
+
+
+
+=item CGI::LDAPSession::CookieJar::create_cookie
+
+Creates a new cookie
+
+my $time = time;
+my %cookie = ( user=>'bob',
+	       cookie_name=>'3476dfgh', 
+	       passkey=>'23438',
+	       expiration=>'$time',
+	       server_data=>$data );
+
+my $cookie_jar->create_cookie( -cookie => \$cookie );
+
+=cut
+
+sub create_cookie { my $p=__PACKAGE__; croak "$p::create_cookie is not implemented, but it must be."; };
+
+
+=item CGI::LDAPSession::CookieJar::modify_cookie
+
+Modifies the specified cookie fields in all the matching cookies.
+
+my $time = time;
+my %query = ( user=>'bob',
+	      cookie_name=>'3476dfgh', 
+	      passkey=>'23438',
+	      expiration=>'>$time' );
+my %changed_fields = ( server_data=>$data, 
+		       expiration=>($time+3600) );
+
+my $cookie_jar->modify_cookie( -query=>\$query, -changes=>\$changed_fields );
+
+=cut
+
+sub modify_cookie { my $p=__PACKAGE__; croak "$p::modify_cookie is not implemented, but it must be."; };
+
+=item CGI::LDAPSession::user_exists
+
+Internal function.  Checks the database to see if a user has an existing
+record within the cookie table.  True if the cookie table contains
+an entry for the username, and false if it does not.
+
+  if ( $self->user_exists( $username ) )
+    {
+      ... perform action for defined user ...
+    }
+
+=cut
+
+sub user_exists
+  {
+    my ($self,$username) = @_;
+    
+    my $cookie_table = $self->cookie_table;
+    my $user_column = $self->user_column;
+    my $cookie_column = $self->cookie_column;
+    my $passkey_column = $self->passkey_column;
+
+    $self->ConnectToDatabase;
+    $self->SendSQL("SELECT count($user_column) FROM $cookie_table WHERE $user_column='$username'");
+    my $user_exists = 0;
+    if ( $self->MoreSQLData )
+      {
+	$user_exists = $self->FetchOneColumn == 1;
+      }
+    $self->DisconnectDatabase;
+    return $user_exists;
+  }
+
+=item CGI::LDAPSession::register_username
+
+Creates an entry for the specified user within the cookie table.
+
+  if ( ! $self->contains( -user=>$username ) )
+    {
+      $self->register_username( $username );
+    }
+
+=cut
+
+sub register_username
+  {
+    my ($self,$username) = @_;
+    return unless $self->register;
+    return if $self->user_exists($username);
+
+    my $cookie_table = $self->cookie_table;
+    my $user_column = $self->user_column;
+    my $cookie_column = $self->cookie_column;
+    my $passkey_column = $self->passkey_column;
+
+    return unless $self->connection_valid();
+    my $db = $self->dbi;
+    my $results = $dbi->do( "INSERT INTO $cookie_table ( $user_column ) VALUES ( '$username' )" );
+    if ( $
+    $self->DisconnectDatabase;
+  }
+
+
+
+=item CGI::LDAPSession::CookieJar::version
+
+Returns the version of CGI::LDAPSession that was used to create this 
+data store.
+
+my $version => $cookie_jar->version();
+
+=cut
+
+sub version { my $p=__PACKAGE__; croak "$p::version is not implemented, but it must be."; };
+
+
+=item CGI::LDAPSession::CookieJar::create_cookie_jar
+
+Creates a new cookie jar.  For a database cookie jar this would create
+the necessary tables.  For a file based cookie jar this might set up
+the required directory structure.
+
+This should only be necessary once.
+
+$cookie_jar->create_cookie_jar();
+
+=cut
+
+sub create_cookie_jar { my $p=__PACKAGE__; croak "$p::create_cookie_jar is not implemented, but it must be."; };
+
+
+=item CGI::LDAPSession::CookieJar::destroy_cookie_jar
+
+Destroys an existing cookie jar.  For a database cookie jar this would
+drop all of the tables.  For a file based cookie jar this might
+delete all the existing files and directories.
+
+This should only be necessary once.
+
+$cookie_jar->destroy_cookie_jar();
+
+=cut
+
+sub destroy_cookie_jar { my $p=__PACKAGE__; croak "$p::destroy_cookie_jar is not implemented, but it must be."; };
+
+
+
+
+=item CGI::LDAPSession::CookieJar::error
+
+If the previous cookie operation resulted in an error then
+the value of this error will be found here.  If the operation
+did not result in an error then this will return 'undef'.
+
+Calling error() does not alter the value.  Each cookie jar object has
+it's own error state, which is independent of the backend database.
+
+my $error = $cookie_jar->error();
+
+=cut
+
+sub error { my $p=__PACKAGE__; croak "$p::error is not implemented, but it must be."; };
+
+
+# Login/cookie table description.
+#
+=item Database tables
+
+The names of the database tables.
+
+=item CGI::LDAPSession::cookie_table
+
+Accessor method.  The name of the cookie table.
+
+=cut
+
+sub cookie_table { my $self=shift; @_ ? $self->{cookie_table}=shift : $self->{cookie_table}; }
+
+
+=item CGI::LDAPSession::user_column
+
+Accessor method.  The column containing the usernames.
+
+=cut
+
+sub user_column { my $self=shift; @_ ? $self->{dbi_user_column}=shift : $self->{dbi_user_column}; }
+
+
+=item CGI::LDAPSession::passkey_column
+
+Accessor method.  The column containing the passkey.
+
+=cut
+
+sub passkey_column { my $self=shift; @_ ? $self->{dbi_passkey_column}=shift : $self->{dbi_passkey_column}; }
+
+
+=item CGI::LDAPSession::cookie_column
+
+Accessor method.  The column containing the cookie id.
+
+=cut
+
+sub cookie_column { my $self=shift; @_ ? $self->{dbi_cookie_column}=shift : $self->{dbi_cookie_column}; }
+
+
+=item CGI::LDAPSession::login_expiration_column
+
+Accessor method.  The expiration time for the cookie.  Currently not
+used, but it will be used in the future.
+
+=cut
+
+sub login_expiration_column { my $self=shift; @_ ? $self->{dbi_login_expiration_column}=shift : $self->{dbi_login_expiration_column}; }
+
+
+=item CGI::LDAPSession::server_side_data_column
+
+Accessor method.  The name of the column containing server side data.
+
+=cut
+
+sub server_side_data_column { my $self=shift; @_ ? $self->{dbi_server_side_data_column}=shift : $self->{dbi_server_side_data_column}; }
+
+
+=item CGI::LDAPSession::create_cookie_jar
+
+  Creates the database tables that are described by a CGI::LDAPSession.
+
+  my $session = new CGI::LDAPSession;
+  $session->create_cookie_table;
+  exit;
+
+  Fill out your CGI::LDAPSession just like your going to make
+  a connection.  Call this routine, and voila!  Your database
+  tables are created.
+
+=cut
+
+sub create_cookie_table
+  {
+    my ($self) = @_;
+
+    my $cookie_table = $self->cookie_table;
+    my $user_column = $self->user_column;
+    my $cookie_column = $self->cookie_column;
+    my $passkey_column = $self->passkey_column;
+    my $expiration_column = $self->login_expiration_column;
+    my $server_side_data_column = $self->server_side_data_column;
+
+    my dbi = $self->dbi();
+    my $db-
+    $self->dbi( <<EOSQL );
+CREATE TABLE $cookie_table (
+			    $user_column varchar(64),
+			    $cookie_column varchar(32),
+			    $passkey_column bigint(20),
+			    $expiration_column timestamp(14),
+			    $server_side_data_column longblob)" )
+EOSQL
+    $self->DisconnectDatabase;
+  }
+
+
+
+1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

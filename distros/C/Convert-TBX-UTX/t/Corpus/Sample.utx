@@ -1,0 +1,520 @@
+#UTX-S 1.01; en-US/ja-JP; 2009-09-08T17:55:00Z+09:00 copyright: Medical Informatics, School of Allied Health Sciences, Kitazato University (2009); license: CC-BY 3.0
+#description: This is a medical dictionary. You may use this dictionary only when you agreed that you and you alone are fully responsible for the results of its use. The author of the original data, AAMT and its members do not guarantee the contents of this dictionary including, but not limited to its accuracy. Some part of speech properties are indicated as noun, even when they are not. / このデータは医学辞書です。このデータは使用者が使用結果に対して全責任を持つ場合にのみお使い頂けます。データの著作者、AAMTおよびAAMTのメンバーは正確性を含め、辞書の内容について一切の保証はいたしません。品詞が名詞でない場合も名詞扱いになっていることがあります。
+#src	tgt	src:pos	comment
+1/2 T vector	1/2Tベクトル	noun
+1/2FF	1/2拡張分画	noun
+1/3 ER mean	駆出早期1/3での平均駆出速度	noun
+1/3EF	1/3駆出分画	noun
+1/3ER mean	駆出早期1/3での平均駆出速度	noun
+1/3FF	1/3充満分画	noun
+1/3FR mean	拡張早期1/3での左室平均充満速度	noun
+11-deoxycorticosterone acetate salt hypertension	DOCA食塩高血圧	noun
+11-deoxycortisosterone	11-デオキシコルチコステロン	noun
+131I-hippurate	131I-ヒプル酸塩	noun
+17 α-hydroxycorticosteroid	17αヒドロキシコルチコステロイド	noun
+17 β-hydroxysteroid dehydrogenase	17βヒドロキシステロイドデヒドロゲナーゼ	noun
+17-hydroxycorticoid	17-ヒドロキシコルチコイド	noun
+17-hydroxydesoxycorticosterone	17-ヒドロキシデゾキシコルチコステロン	noun
+17-hydroxyprogesterone	17-ヒドロキシプロゲステロン	noun
+17-ketosteroid	17-ケトステロイド	noun
+17-ks	17-ケトステロイド	noun
+17-OHCS	17αヒドロキシコルチコステロイド	noun
+2,3-diphosphoglycerate	2,3-ジフォスフォグリセリン酸	noun
+2,3-DPG	2,3-ジフォスフォグリセリン酸	noun
+3-dimethyl-p-iodophenyl-pentadecanoic acid	3-ジメチル-p-ヨード フェニルペンタデカン酸	noun
+4-hydroxybutylic aciduria	4-ヒドロキシブチル酸尿症	noun
+50% lethal dose	50％致死量	noun
+5-aminolevulinic acid	δアミノレブリン酸	noun
+5-aminolevulinic acid	5-アミノレブリン酸	noun
+5'-nucleotidase	5'ヌクレオチダーゼ	noun
+7-pinhole collimator 	7-ピンホール コリメータ	noun
+7-pinhole collimator 	7-ピンホールコリメータ	noun
+9-hydroxyoctadecadienoic acid	9-ヒドロキシオクタデカジエン酸	noun
+A band	A帯	noun
+A behavior pattern	A型行動様式	noun
+A fiber	A線維	noun
+A mode echocardiography	Aモード心エコー法	noun
+A standard light	A標準光源	noun
+A wave	A波	noun
+a wave	a波	noun
+A-band	A帯	noun
+abasia	失歩	noun
+abdominal	腹部	noun
+abdominal actinomycosis	腹部放射菌症	noun
+abdominal aortic aneurysm	腹部大動脈瘤	noun
+abdominal ballottement	腹部浮球感	noun
+abdominal bandage	腹帯	noun
+abdominal bloating	腹部膨満	noun
+abdominal breathing	腹式呼吸	noun
+abdominal bruit	腹部血管雑音	noun
+abdominal cavity	腹腔	noun
+abdominal circumference	腹囲	noun
+abdominal cramp	腹部けいれん	noun
+abdominal dropsy	腹水	noun
+abdominal face	腹膜炎顔貌	noun
+abdominal Hodgkin's disease	腹部型ホジキン病	noun
+abdominal muscle pressure	腹圧	noun
+abdominal muscle reflex	腹筋反射	noun
+abdominal pain	腹痛	noun
+abdominal paracentesis	腹腔穿刺	noun
+abdominal pressure	腹腔内圧	noun
+abdominal proptosis	腹部突出	noun
+abdominal purpura	腸性紫斑病	noun
+abdominal reflex	腹壁反射	noun
+abdominal region	腹部	noun
+abdominal respiration	腹式呼吸	noun
+abdominal typhus	腸チフス	noun
+abdominal wall	腹壁	noun
+abdominal wall abscess	腹壁膿瘍	noun
+abdominal wall reflex	腹壁反射	noun
+abdominal window method	腹窓法	noun
+abducens nerve	外転神経	noun
+abduction	外転	noun
+abduction gait	外転歩行	noun
+aberrancy	変行伝導	noun
+aberrant	変行	noun
+aberrant	異所性	noun
+aberrant	異所	noun
+aberrant conduction	変行伝導	noun
+aberrant goiter	異所性甲状腺腫	noun
+aberrant intraventricular conduction	心室内変行伝導	noun
+aberrant pancreas	迷入膵	noun
+aberrant subclavian artery	異所性鎖骨下動脈	noun
+aberrant vessel	迷入血管	noun
+aberration	収差	noun
+aberration	異所	noun
+aberration	異常	noun
+aberration	迷入	noun
+abiotrophy	無生活力	noun
+ablactation	離乳	noun
+ablactation	乳離れ	noun
+ablation	剥離	noun
+ablation	アブレーション	noun
+ablation	切断	noun
+ablation	離解	noun
+ablation	切除	noun
+ablepsia	失明	noun
+ablepsia	盲	noun
+abnormal	異常	adjective
+abnormal	奇形	adjective
+abnormal	変則	adjective
+abnormal behavior	異常行動	noun
+abnormal bleeding	異常出血	noun
+abnormal hemoglobin	異常ヘモグロビン	noun
+abnormal negative area	異常負領域	noun
+abnormal positive area	異常正領域	noun
+abnormal Q wave	異常Q波	noun
+abnormality	奇形	noun
+ABO antigen	ABO抗原	noun
+ABO antigen blood group	ABO式血液型	noun
+ABO antigen system	ABO式血液型分類法	noun
+ABO blood group	ABO式血液型	noun
+ABO blood type	ABO式血液型	noun
+abortive	流産	noun
+abortive	不全型	noun
+abortive infection	不発感染	noun
+abortive infection	頓挫感染	noun
+abortive infection	不全感染	noun
+abortive typhoid	頓挫性腸チフス	noun
+abrasion	剥脱	noun
+abrasion	剥離	noun
+abrupt clsure	急性閉塞	noun
+abruption	剥離	noun
+abscess	膿瘍	noun
+abscess endocarditis	膿性心内膜炎	noun
+absence	欠損	noun
+absence	欠乏	noun
+absence epileptica	てんかん性欠神	noun
+absence seizure	欠伸発作	noun
+absence seizure	アプサンス発作	noun
+absolute cardiac dullness	心絶対濁音界	noun
+absolute diet	絶対食	noun
+absolute error	絶対誤差	noun
+absolute hearing	絶対音感	noun
+absolute immunity	絶対免疫	noun
+absolute indication	絶対的適応	noun
+absolute muscle strength	絶対筋力	noun
+absolute pitch hearing	絶対音感	noun
+absolute refractory period	絶対不応期	noun
+absolute refractory phase	絶対不応期	noun
+absorbanbent	吸収量	noun
+absorbanbent cotton	脱脂綿	noun
+absorbance	吸収度	noun
+absorbance	吸光度	noun
+absorbent cotton	脱脂綿	noun
+absorption	吸収	noun
+absorption	吸水軟膏	noun
+absorption	吸着	noun
+absorption band	吸収帯	noun
+absorption coefficient	吸収係数	noun	ガスの
+absorption ointment	吸水軟膏	noun
+absorption rate constant	呼吸速度定数	noun
+abstinence	禁断	noun
+abstinence symptom	禁断症状	noun
+abuse	乱用	noun
+abusolute alchol	無水アルコール	noun
+acalculia	失算	noun
+acanthocephaliasis	鉤頭虫症	noun
+acanthocheilonemiasis	常在糸状虫症	noun
+acanthocyte	有棘赤血球	noun
+acanthokeratodermia	角質増殖症	noun
+acanthokeratodermia	棘細胞増殖症	noun
+acantholysis	棘細胞離開	noun
+acantholysis	棘融解	noun
+acanthoma	棘細胞腫	noun
+acanthosis	アカントーシス	noun
+acanthosis	有棘層肥厚	noun
+acanthosis nigricance	黒色表皮腫	noun
+acardia	無心症	noun
+acardius	無心体	noun
+acariasis	ダニ症	noun
+acaryote	無核	noun
+acaryote	無核細胞	noun
+acatalasia	無カタラーゼ症	noun
+acataphasia	錯語症	noun
+acataphasia	言語不当配列	noun
+acceleractor	加速器	noun
+acceleractor	促進神経	noun
+acceleractor	加速装置	noun
+accelerans	促進神経	noun
+accelerated	加速性	adjective
+accelerated conduction	促進伝導	noun
+accelerated ectopic rhythm	頻脈性異所性調律	noun
+accelerated hypertension	加速型高血圧	noun
+accelerated hypertension	移行型高血圧	noun
+accelerated hypertension	進行性高血圧	noun
+acceleration	加速化現象	noun
+acceleration flow	加速血流	noun
+acceleration time	加速時間	noun
+accelerator	促進神経	noun
+accelerator	加速装置	noun
+accelerator of coagulation	凝固促進因子	noun
+accentuation	亢進	noun	心音の
+acceptable diary intake	一日摂取許容量	noun
+acceptable dose	許容線量	noun
+accessory	副	adjective
+accessory	補助的	adjective
+accessory	付属	adjective
+accessory chromosome	異形染色体	noun
+accessory conduction pathway	副伝導路	noun
+accessory gland	副腺	noun
+accessory lobe	副肺葉	noun
+accessory lobe	副葉	noun	肺の
+accessory lung	副肺葉	noun
+accessory lung	副葉	noun	肺の
+accessory nasal sinus	副鼻腔	noun
+accessory nerve	副神経	noun
+accessory pancreas	副膵	noun
+accessory pathway	副伝導路	noun	WPW症候群の
+accessory pathway syndrome	副伝導路症候群	noun
+accessory respiratory muscle	補助呼吸筋	noun
+accessory spleen	副脾	noun
+accessory symptom	随伴症状	noun
+accident	不慮の事故	noun
+accident	偶発症候	noun
+accident	災害	noun
+accident neurosis	災害神経症	noun
+accident neurosis	災害ノイローゼ	noun
+accidental	事故	noun
+accidental dead	事故死	noun
+accidental dead	災害死	noun
+accidental death	事故死	noun
+accidental death	災害死	noun
+accidental death	偶発死	noun
+acclimation	環境順応	noun
+acclimation	人工気候	noun
+acclimation	馴致	noun	微生物の作用による
+acclimation fever	馴化熱	noun
+acclimation fever	順化熱	noun
+acclimation to cold	寒冷順化	noun
+acclimation to heat	暑熱順化	noun
+acclimatization	気候順化	noun
+acclimatization	環境順応	noun
+acclimatization	人工気候	noun
+acclimatization	馴致	noun	微生物の作用による
+acclimatization to cold	寒冷順化	noun
+acclimatization to high altitude	高所適応	noun
+accommodation	馴化	noun
+accommodation	適応	noun
+accommodation	調節	noun	眼筋の
+accommodation	順応	noun	神経などの
+accommodation paresis	調節不全麻痺	noun
+accommodation paresis palsay	調節不全麻痺	noun
+accommodation reflex	遠近調節反射	noun
+accommodation to high altitude	高所適応	noun
+accommodative asthenopia	調節性眼精疲労	noun
+accumulated dose	蓄積線量	noun
+accumulation curve	集積曲線	noun
+accuracy	正確度	noun
+accuracy	精度	noun
+accuracy	正診率	noun
+ACD solution	ACD液	noun
+acephalias	無頭症	noun
+acephalobrachus	無頭腕体	noun
+acephalus	無頭体	noun
+acephaly	無頭症	noun
+acervulus	脳砂	noun
+acetabulum	寛骨臼	noun
+acetabulum	股臼	noun
+acetanilid	アセトアニリド	noun
+acetate	酢酸塩	noun
+acetic acid	酢酸	noun
+acetone	アセトン	noun
+acetone body	アセトン体	noun
+acetyl CoA	アセチルCoA	noun
+acetylcarnitine	アセチルカルニチン	noun
+acetylcholine	アセチルコリン	noun
+acetylcholinesterase	アセチルコリンエステラーゼ	noun
+acetylsalicylic acid	アスピリン	noun
+Ach	アセチルコリン	noun
+achalasia	特発性食道拡張症)	noun
+achalasia	食道弛緩不全症	noun
+ache	うずく痛み	noun
+acheiropodia	無手足症	noun
+Achilles	アキレス	noun
+Achilles tendon	アキレス腱	noun
+Achilles tendon reflex	アキレス腱反射	noun
+aching pain	うずく痛み	noun
+achoresis	縮小症	noun	胃、膀胱などの
+achromacyte	血球影	noun
+achromasia	蒼白	noun
+achromasia	無色素性	noun
+achromatic	無色	noun
+achromatic color	無彩色	noun
+achromatic series	無彩色系列	noun
+achromatic series	色なし系列	noun
+achromatin	不染色質	noun
+achromatin	非染色体	noun
+achromatism	無色素症	noun
+achromatism	無色症	noun
+achromatopsia	色盲	noun
+achromatosis	皮膚色素欠乏症	noun
+achromia	皮膚色素欠乏症	noun
+achromodermia	白斑	noun
+achromodermia	皮膚色素欠乏症	noun
+achromotrichia	毛髪色素欠乏症	noun
+acid base	酸塩基	noun
+acid diet	酸性食	noun
+acid phosphatase	酸性ホスファターゼ	noun
+acid phosphatase	酸性リン酸分解酵素	noun
+acid smell	酸臭	noun
+acid taste	酸味	noun
+acid-base balance	酸塩基平衡	noun
+acid-base balance	酸アルカリ平衡	noun
+acid-base balance disturbance	酸塩基平衡障害	noun
+acid-base equilibrium	酸塩基平衡	noun
+acid-citrate-dextrose solution	ACD液	noun
+acid-fast	抗酸性	noun
+acid-fast bacterium	抗酸菌	noun
+acid-fast organism	抗酸菌	noun
+acid-fast stain	抗酸染色	noun
+acidic	酸性	adjective
+acidic dye	酸性色素	noun
+acidic dyspepsia	多酸性消化不良	noun
+acidification	酸性化	noun
+acidifying diuretic	酸形成性利尿薬	noun
+acidophilic acidophil cell	好酸性細胞	noun
+acidophilic adenoma	好酸性細胞腺腫	noun
+acidophilic cell	好酸性細胞	noun
+acidophilic leukocyte	好酸球	noun
+acidosis	アシドーシス	noun
+Acinetobactor	アシネトバクター	noun
+Acinetobactor calcoaceticus	アシネトバクター-カルコアセチカス	noun	アシネトバクター菌の一つ
+acinous	房状	adjective
+acinous	細葉状	adjective
+acinous adenoma	腺房状腺腫	noun
+acinous cancer	小葉癌	noun
+acinous carcinoma	小葉癌	noun
+acinous gland	細葉状腺	noun
+acinus	腺房	noun
+acinus	細葉	noun
+acme	病勢極期	noun
+acme	アクメ	noun
+acne	座瘡	noun
+acne	アクネ	noun
+acne erythematosa	赤鼻	noun
+acne rosacea	赤鼻	noun
+acoria	満腹感欠如	noun
+acoria	無満腹感	noun
+acormus	無胴体	noun
+acoustic	聴覚	noun
+acoustic center	聴覚中枢	noun
+acoustic impedance	音響インピーダンス	noun
+acoustic neurinoma	聴神経鞘腫	noun
+acoustic neuroma	聴神経腫	noun
+acoustic schwannoma	聴神経鞘腫	noun
+acoustic schwannoma	聴神経シュヴァン細胞腫	noun
+acoustic spectrum	音響スペクトル	noun
+acoustic trauma	音響性外傷	noun
+acquired character	獲得形質	noun
+acquired heart disease	後天性心疾患	noun
+acquired hemolytic anemia	後天性溶血性貧血	noun
+acquired immune deficiency syndrome	後天性免疫不全症候群	noun
+acquired immunity	獲得免疫	noun
+acquired immunity	後天免疫	noun
+acquired immunodeficiency syndrome	後天性免疫不全症候群	noun
+acquiredcharacter	後天形質	noun
+acquisition time	収集時間	noun
+acrasia	不摂生	noun
+acrasia	不養生	noun
+acredema	先端浮腫	noun
+acredema	肢端浮腫	noun
+acroarthritis	四肢関節炎	noun
+acroedema	先端浮腫	noun
+acroedema	肢端浮腫	noun
+acrolein	アクロレイン	noun
+acromegaly	先端巨大症	noun
+acromicria	先端矮小症	noun
+acromion	肩峰	noun
+across fiber pattern theory	総神経線維パターン説	noun
+acrotic limb	上行脚隆起の切痕	noun
+ACTH-MSH syndrome	ACTH-MSH症候群	noun
+actin	アクチン	noun
+actin isoform	アクチン・アイソフォーム	noun
+actinic	日射	adjective
+actinic	紫外線	adjective
+actinic cheilitis	日射性口唇炎	noun
+actinic chilitis	日射性口唇炎	noun
+actinic retinitis	紫外線網膜炎	noun
+actinic retinitis	化学線網膜炎	noun
+actinin	アクチニン	noun
+actinobacillus actinomycetemcomitance	アクチノバチルス-アクチノミセテムコミタンンス	noun
+actinobacillus actinomycetemcomitance	アクチノバチルス菌	noun
+actinomyces	放射菌属	noun
+actinomyces	アクチノミセス属	noun
+actinomycin D	アクチノマイシンD	noun
+actinomycomycotic abscess	放射菌膿瘍	noun
+actinomycosis	アクチノミセス症	noun
+actinomycosis	放線菌症	noun
+actinomycotic abscess	放線菌膿瘍	noun
+action current	活動電流	noun
+action potential	活動電位	noun
+action potential amplitude	活動電位振幅	noun
+action potential duration	活動電位持続時間	noun
+action tremor	動作振戦	noun
+activable tracer	放射化トレーサ	noun
+activated charcoal	活性炭	noun
+activated macrophage	活性化マクロファージ	noun
+activated sleep	賦活睡眠	noun
+activation	活性化	noun
+activation	賦活	noun
+activation	活動化	noun
+activation energy	活性化エネルギー	noun
+activation heat	活動化熱	noun
+activation recovery interval	興奮回復間隔	noun
+activation sequence	興奮順序	noun
+activation unblock	活性化ブロック解除	noun
+activator	賦活体	noun
+activator	活性薬	noun
+activator	賦活物質	noun
+active carrier	活動性保菌者	noun
+active electrode	探査電極	noun
+active exercise	自動運動	noun
+active immunity	能動免疫	noun
+active immunity	活動免疫	noun
+active lipid	活性リピッド	noun
+active metabolite	活性代謝物	noun
+active movement	自発運動	noun
+active rest	積極的休息	noun
+active sleep	賦活睡眠	noun
+active state	活動状態	noun	筋の
+active sweat gland	能動汗腺	noun
+active tension	活動張力	noun
+active transport	能動輸送	noun
+active tuberculosis	活動性結核	noun
+activities of dairy living	日常生活動作	noun	リハビリテーションの
+activity coefficient	イオン活動度係数	noun
+activity coefficient	活動度係数	noun
+activity hypertrophy	活動性肥大	noun
+actomyosin	アクトミオシン	noun
+acuity	明瞭度	noun
+acuity	鋭敏	noun
+acute	急性	adjective
+acute abdomen	急性腹症	noun
+acute bacterial endocarditis	急性細菌性心内膜症	noun
+acute bronchitis	急性気管支炎	noun
+acute chorea	急性舞踏症	noun
+acute compliance	早期コンプライアンス	noun
+acute conjunctivitis	急性結膜炎	noun
+acute coronary occlusion	急性冠閉塞	noun
+acute disease	急性疾患	noun
+acute eczema	急性湿疹	noun
+acute endocarditis	急性心内膜炎	noun
+acute exacerbation	急性増悪	noun
+acute exanthema	急性発疹	noun
+acute experiment	急性実験	noun
+acute exposure	急性被爆	noun
+acute fulminating type	急性激症型	noun
+acute hemorrhagic leukoencephalitis	急性出血性白質脳炎	noun
+acute interstitial pneumonia	急性間質性肺炎	noun
+acute intestitial pneumonia	急性間質性肺炎	noun
+acute leukemia	急性白血病	noun
+acute lymphatic leukemia	急性リンパ性白血病	noun
+acute lymphoblastic leukemia	急性リンパ性白血病	noun
+acute myelitis	急性脊髄炎	noun
+acute myeloblastic leukemia	急性骨髄芽球性白血病	noun
+acute myelocytic leukemia	急性骨髄性白血病	noun
+acute myeloid leukemia	急性骨髄性白血病	noun
+acute myocardial infarction	急性心筋梗塞	noun
+acute myocarditis	急性心筋炎	noun
+acute nephritis	急性腎炎	noun
+acute occlusion	急性閉塞	noun
+acute pericarditis	急性心膜炎	noun
+acute pneumonia	急性肺炎	noun
+acute poisoning	急性中毒	noun
+acute purulent myositis	急性化膿性筋炎	noun
+acute renal failure	急性腎不全	noun
+acute response	急性期反応	noun
+acute stage	急性期	noun
+acute thyroiditis	急性甲状腺炎	noun
+acute tonsillitis	急性扁桃炎	noun
+acute toxicity	急性毒性	noun
+acyanoblepsia	青色盲	noun
+acyanopia	青色盲	noun
+acyanotic	非チアノーゼ性	noun
+acyl CoA	アシルCoA	noun
+acylcarnitine	アシルカルニチン	noun
+adamantblast	エナメル芽細胞	noun
+adamantin	エナメル質	noun
+adamantinoma	エナメル上皮腫	noun
+Adamkiewicz artery	アダムキーヴィッツ動脈	noun
+Adamkiewicz artery	前脊髄動脈	noun
+adaptation	順応	noun
+adaptation	調節	noun
+adaptation	適応	noun
+adaptation disease	適応症候群	noun
+adaptation syndrome	適応症候群	noun
+adaptation to environment	環境適応	noun
+adaptation to high altitude	高所適応	noun
+adaptive enzyme	適応酵素	noun
+addiction	渇望	noun
+Addison's disease	アジソン病	noun
+addition color	和色	noun
+additive	相加的	noun
+additive	添加物	noun
+additive	付加的	adjective
+additive action	相加作用	noun
+additive color mixing	加法混色	noun
+additive effect	相加効果	noun	薬の
+adduction	内転	noun
+adductor	内転筋	noun
+adductor muscle	内転筋	noun
+adductor reflex	内転筋反射	noun
+adenin	アデニン	noun
+adenin arabinoside	アデニンアラビノシド	noun
+adenin phosphoribosyltransferase	アデニンホスホリボシルトランスフェラーゼ	noun
+adenine nucleotide translocator	アデニンヌクレオチド・トランスロケータ	noun
+adenitis	腺炎	noun
+adenization	腺化	noun
+adenoacanthoma	腺棘細胞腫	noun
+adenoacanthoma	腺表皮癌	noun
+adenocancroid	腺カンクロイド	noun
+adenocancroid	腺表皮癌	noun
+adenocarcinoma	腺癌	noun
+adenocystoma	腺嚢腫	noun
+adenofibroma	腺線維腫	noun
+adenofibrosis	腺線維症	noun
+adenohypophyseal hormone	下垂体前葉ホルモン	noun
+adenohypophysis	腺下垂体	noun
+adenohypopophysis	腺下垂体	noun
+adenohypopophysis	下垂体前葉	noun

@@ -1,0 +1,15 @@
+Changes
+lib/Classic/Perl.pm
+Makefile.PL
+MANIFEST
+ptable.h
+README
+t/arybase.t
+t/bugs.t
+t/import.t
+t/multiline.t
+t/split.t
+xs/new.xs
+xs/old.xs
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

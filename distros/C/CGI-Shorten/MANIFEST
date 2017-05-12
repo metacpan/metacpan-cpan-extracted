@@ -1,0 +1,9 @@
+Changes
+eg/redirect.pl
+eg/shorten.pl
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+Shorten.pm
+test.pl

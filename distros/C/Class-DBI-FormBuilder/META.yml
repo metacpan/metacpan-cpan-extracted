@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-DBI-FormBuilder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::FormBuilder: 3
+  Class::DBI: 0
+  Class::DBI::AbstractSearch: 0
+  Class::Data::Inheritable: 0
+  List::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  UNIVERSAL::require: 0
+version: 0.483

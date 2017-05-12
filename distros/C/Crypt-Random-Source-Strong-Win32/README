@@ -1,0 +1,40 @@
+NAME
+    Crypt::Random::Source::Strong::Win32 - Get random data from the Windows
+    API.
+
+SYNOPSIS
+     use Crypt::Random::Source::Strong::Win32;
+     my $p = Crypt::Random::Source::Strong::Win32->new;
+     my $data = $p->get(1024);
+
+DESCRIPTION
+    This is a source of random data that uses the RtlGenRandom function on
+    Windows XP and above, and CryptGenRandom on Windows 2000.
+
+    This is considered to be a strong source of random data, as the
+    CryptGenRandom function, which is backed by RtlGenRandom, is documented
+    as being a strong source of random data.
+
+    If you are on Windows, this is the recommended way of getting random
+    data.
+
+METHODS
+    The same as Crypt::Random::Source::Base. There is no need to seed this
+    source.
+
+AUTHOR
+    Max Kanat-Alexander <mkanat@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 BugzillaSource, Inc.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0. For details, see the full
+    text of the license at
+    <http://opensource.org/licenses/artistic-license-2.0.php>.
+
+    This program is distributed in the hope that it will be useful, but it
+    is provided "as is" and without any express or implied warranties. For
+    details, see the full text of the license at
+    <http://opensource.org/licenses/artistic-license-2.0.php>.
+

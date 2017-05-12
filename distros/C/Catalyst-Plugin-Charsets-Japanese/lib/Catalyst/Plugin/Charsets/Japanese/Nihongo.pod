@@ -1,0 +1,103 @@
+=encoding utf8
+
+=head1 名前
+
+Catalyst::Plugin::Charsets::Japanese - 日本語特有の文字コード操作プラグイン
+
+=head1 概要
+
+    use Catalyst 'Charsets::Japanese';
+
+    # 使用する文字コードを設定
+
+    MyApp->config->{charsets} = 'UTF-8';
+
+    # もしくは、内部で使いたい文字コードと
+    # 出力データに使いたい文字コードを別々に設定
+
+    MyApp->config->{charsets} = {
+        in  => 'EUC-JP',
+        out => 'Shift_JIS',
+    };
+
+=head1 説明
+
+近年の日本語環境下でのWEB開発において、サーバーサイドで扱う文字コードとして、
+EUC-JP, Shift_JIS, UTF-8 が考えられます。
+このモジュールを使うと、選択された文字コードによって適切に、
+入出力データのコンバート、Content-Typeのセットを自動で処理します。
+
+仕様する文字コードがUTF-8だけの場合は、L<Catalyst::Plugin::Unicode>,
+サーバーサイドがUTF-8、出力が他の文字コードの場合は、 L<Catalyst::Plugin::Unicode::Encoding>
+をそれぞれ使用するといいでしょう。
+
+サーバーサイドの文字コードがEUCなどの場合に、このモジュールを使用してください。
+
+=head1 設定
+
+次のように config の charsets に 使用したい文字コードを入れます。
+
+    MyApp->config->{charsets} = 'UTF-8';
+
+また、一つのアプリケーションで二つの文字コードを使いたい場合もあると思います。
+
+例えば、サーバーのロケールや、DBは、EUCで使う設定になっているが、
+出力するレスポンスのHTMLはUTF-8にしたい等。
+
+このモジュールでは、リクエストをパースした後のプログラム中で使用したい文字コード、
+出力時のレスポンスの文字コードをそれぞれ設定できます。
+設定された文字コードによって適切な処理を自動で行います。
+
+上記のように二つの文字コードを使用したい場合は次のようにします。
+
+    MyApp->config->{charsets} = {
+        in  => 'EUC-JP',
+        out => 'Shift_JIS',
+    };
+
+このように書くと、出力は Shift_JIS で行います。
+
+また、リクエストを受けたときは、リクエストのパラメータを
+Shift_JIS から EUC-JP にコンバートします。
+
+=head1 charsets アクセサ
+
+コンテキストに charsets アクセサが実装されます。
+
+charsetsアクセサで呼び出せるオブジェクトには、さらに in と out という、それぞれ
+内部文字コードオブジェクト、出力文字コードオブジェクトへのアクセサが実装されます。
+
+次のようにすると、使用している文字コードの名前、省略名、Jcode使用時のコンバート用メソッド名を取得できます。
+
+    sub default : Private {
+        my( $self, $c ) = @_;
+
+        # 内部処理用の文字コード名( UTF-8, EUC-JP, Shift_JIS )
+
+        my $inner_charset = $c->charsets->in->name;
+
+        # 内部処理用の文字コード省略名( utf8, euc, sjis )
+
+        my $inner_abbrev = $c->charsets->in->abbreviation;
+
+        # 内部処理用の文字コードのJcodeにおけるコンバート用メソッド名( utf8, euc, sjis )
+
+        my $inner_method = $c->charsets->in->method;
+
+        # 同様に、出力用文字コードについて知りたいときも、
+        # name ,abbreviation, method を使用できます。
+
+        my $outer_charset = $c->charsets->out->name;
+    }
+
+=head1 参考
+
+L<Jcode>
+
+L<Catalyst>
+
+=head1 著者
+
+Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
+
+=cut

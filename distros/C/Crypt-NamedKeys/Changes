@@ -1,0 +1,18 @@
+Revision history for Crypt-NamedKeys
+
+1.1.1     2017-02-20 05:27:40+00:00 UTC
+  switch to dzil
+  
+1.1.1	2015-07-10
+	Fixing round trip on encrypt/decrypt payload with Escape_Eq turned on
+
+1.1.0	2015-07-07
+	Allow = to be replaced by - for web apps.
+
+0.02    2014-11-03
+        Fixed missing dependency on some platforms
+        Added repo to Meta
+
+0.01    2014-10-31
+        First version, released on an unsuspecting world.
+

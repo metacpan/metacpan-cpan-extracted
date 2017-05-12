@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Catalyst-Plugin-ClamAV
+version:             0.03
+abstract:            ClamAV scanning Plugin for Catalyst
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Catalyst:                      0
+    ClamAV::Client:                0.1
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - FUJIWARA Shunichiro <fujiwara@topicmaker.com>

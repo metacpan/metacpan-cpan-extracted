@@ -1,0 +1,22 @@
+---
+abstract: 'Base class for hierarchally ordered objects'
+author:
+  - 'Arthur Corliss <corliss@digitalmages.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-EHierarchy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008003
+version: 2.00

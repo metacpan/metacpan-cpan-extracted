@@ -1,0 +1,106 @@
+CHANGES
+    Revision history for Perl extension Curses::Simp:
+
+    - 1.4.A8UG1gG Mon Aug 30 16:01:42:16 2010
+        * t/00podc.t should pass now that my POD is updated to cover all
+        subs
+
+        * Brws: setup to read $ENV{'LS_COLORS'} into GLBL{OVERMAPP}
+
+        * fixed POD error that was failing on FreeBSD because items must
+        follow overs
+
+        * tested ACS_ borders working again, restored as dfalt, added new
+        ARROW bordset
+
+        * fixed Prmt handle Eterm BACKSPACE (ord(127)) like TTY (without
+        ndng Ctrl-BS)
+
+        * fixed FlagCVis (MkMethodz CRSR flag was accidentally set as CURS)
+
+        * updated license to GPLv3 and bumped minor version for the CPAN
+
+    - 1.2.A7DDCh3 Tue Jul 13 13:12:43:03 2010
+        * made B == Blue && K == blacK like RGB vs. CMYK
+
+        * added ColorUsed '_flagclru' tracking and test for internal dialogs
+
+        * fixed up Mesg() for no press key option to force window to stay
+        for wait && auto header color gen for my help && info pages
+
+        * added flags to auto-draw tied @_fclr (FlagADTF) && @_bclr
+        (FlagADTB)
+
+        * added optional length param to GetS
+
+        * added basic 4NT support by generating C:/SimpDraw.bat
+
+        * added Tie::Array interfaces for @_text, @_fclr, && @_bclr
+
+        * removed repeats and color code expansion && added @_bclr
+
+        * updated License
+
+        * added GetS() since Dan asked how
+
+    - 1.0.4287FJQ Sun Feb 8 07:15:19:26 2004
+        * made Brws()
+
+        * added ckbx && butn types to Mesg() && drop type to Prmt() && wrote
+        Focu() to focus new types
+
+        * added info && help types to Mesg() to auto title && color those
+        screens
+
+        * added blox && squr styles to CPik && made style/blockchar
+        increment keys (PgUp/Dn/Home/End)
+
+    - 1.0.41V0L3a Sat Jan 31 00:21:03:36 2004
+        * made flag accessors without ^Flag
+
+        * wrote support for VerboseName hash keys
+
+        * fixed ShokScrn overlap && DelW bugs
+
+        * made GetK return detected KEY_ names in normal mode && added
+        CURSES KEY MODE section to POD && made both key modes return -1 if
+        $tmot reached
+
+        * made ShokScrn not blank the screen so often
+
+        * made Text('1' => 'new line') use Prnt instead of Draw for
+        efficiency
+
+        * updated POD to use VerboseNames instead of 4-letter names &&
+        erased most '&&'
+
+        * made verbose accessor names like VerboseName instead of
+        verbose_name
+
+    - 1.0.41O4516 Sat Jan 24 04:05:01:06 2004
+        * made all but ptok && qbix non-executable for EXE_FILES
+
+        * updated POD && added Simp projects into bin/ && MANIFEST in
+        preparation for release
+
+    - 1.0.41O3SQK Sat Jan 24 03:28:26:20 2004
+        * fixed weird char probs in Draw && removed weird char support from
+        Prnt
+
+        * added PrintInto '_flagprin' ability
+
+        * made new Mesg, Prmt, && CPik utils
+
+        * added SDLK advanced input option to GetK
+
+        * setup window border char sets
+
+    - 1.0.4140asO Sun Jan 4 00:36:54:24 2004
+        * refined Draw() && InitPair() for objects instead of exported
+        procedures
+
+        * CHANGES section && new objects created
+
+    - 1.0.37VG26k Thu Jul 31 16:02:06:46 2003
+        * original version
+

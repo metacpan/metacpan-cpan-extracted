@@ -1,0 +1,11 @@
+[% WRAPPER page.tt %]
+
+<h1>List authors</h1>
+
+<ul>
+	[% FOREACH author IN authors %]
+		<li><a href="[% c.uri_for(c.controller.action_for('edit'), author.id) %]">[% author.name %]</a></li>
+	[% END %]
+</ul>
+
+[% END %]

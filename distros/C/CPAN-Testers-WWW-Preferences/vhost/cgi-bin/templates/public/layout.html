@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+
+  <title>[% iname | html %]</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en-gb" />
+    <meta name="Generator"          content="Labyrinth" />
+    <meta name="keywords"           content="perl,cpan,testing,testers" />
+    <meta name="description"        content="[% iname %]" />
+    <meta name="copyright"          content="[% copyright %]" />
+
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_setup.css" />
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_text.css" />
+
+    [% INCLUDE "public/analytics.html" %]
+
+	<script src="/js/admin.js" type="text/javascript"></script>
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+    Original CSS/XHTML Template Design by Wolfgang.
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+    Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body 
+[%    IF request == "author-dist"    AND (data.ignored == 1 OR data.ignored == 2) %]onload="toggle(1)"[% END %]
+[%    IF request == "author-default" AND (data.active  == 1 OR data.active  == 2) %]onload="toggled(1)"
+[% ELSIF request == "author-default" AND (data.ignored == 1 OR data.ignored == 2) %]onload="toggle(1)"[% END %]
+>
+
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->      
+    <div class="header">
+      
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/">[% iname %]</a></h1>
+          <h3>prefs.cpantesters.org</h3>
+          <h2>[% IF loggedin ; IF user.author ; user.author | upper | html ; ELSE ; user.name | html ; END ; ELSE ; title ; END %]</h2>
+        </div>
+      </div>
+
+        [% INCLUDE "public/box-sites.html" %]
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <ul>
+          <li><a href="/">Home</a></li>
+          [% IF crumb3_name %]<li><a href="[% crumb3_href %]">[% crumb3_name %]</a></li>[% END %]
+          [% IF crumb2_name %]<li><a href="[% crumb2_href %]">[% crumb2_name %]</a></li>[% END %]
+          <li>[% crumb1_name %]</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- B. MAIN -->
+    <div class="main">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+        [% INCLUDE "public/navigation.html" %]
+        [% INCLUDE "public/quote.html" %]
+
+      </div>
+
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">[% title %]</h1>
+        <div class="column1-unit">
+
+          [% body %]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    [% INCLUDE "public/footer.html" %]
+
+  </div> 
+
+</body>
+</html>

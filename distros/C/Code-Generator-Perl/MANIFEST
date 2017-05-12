@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Code-Generator-Perl.t
+lib/Code/Generator/Perl.pm
+META.yml                                 Module meta-data (added by MakeMaker)

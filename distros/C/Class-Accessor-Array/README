@@ -1,0 +1,33 @@
+SYNOPSIS
+
+    In lib/Your/Class.pm:
+
+     package Your::Class;
+     use Class::Accessor::Array {
+         accessors => {
+             foo => 0,
+             bar => 1,
+         },
+     };
+
+    In code that uses your class:
+
+     use Your::Class;
+    
+     my $obj = Your::Class->new;
+     $obj->foo(1980);
+     $obj->bar(12);
+
+    $obj is now:
+
+     bless([1980, 12], "Your::Class");
+
+DESCRIPTION
+
+    This module is a builder for array-backed classes.
+
+SEE ALSO
+
+    Other class builders for array-backed objects:
+    Class::XSAccessor::Array, Class::ArrayObjects, Object::ArrayType::New.
+

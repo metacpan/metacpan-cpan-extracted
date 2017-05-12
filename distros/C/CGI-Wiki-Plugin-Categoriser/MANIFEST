@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Wiki/Plugin/Categoriser.pm
+t/00_setup.t
+t/01_add_test_data.t
+t/categoriser.t
+t/nested_categories.t

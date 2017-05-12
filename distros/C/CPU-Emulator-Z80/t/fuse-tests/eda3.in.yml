@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 163
+  13050:
+    - 179
+name: eda3
+registers:
+  AF: 17093
+  AF_: 0
+  BC: 25396
+  BC_: 0
+  DE: 7720
+  DE_: 0
+  HL: 13050
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  55408:
+    - 230
+name: ddcb9e
+registers:
+  AF: 49671
+  AF_: 0
+  BC: 46204
+  BC_: 0
+  DE: 3606
+  DE_: 0
+  HL: 57727
+  HL_: 0
+  I: 0
+  IX: 55483
+  IY: 48025
+  PC: 4
+  R: 2
+  SP: 0

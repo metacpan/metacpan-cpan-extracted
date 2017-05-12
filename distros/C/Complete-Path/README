@@ -1,0 +1,12 @@
+DESCRIPTION
+
+ENVIRONMENT
+
+ COMPLETE_PATH_TRACE => bool
+
+    If set to true, will produce more log statements for debugging.
+
+SEE ALSO
+
+    Complete
+

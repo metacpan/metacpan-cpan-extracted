@@ -1,0 +1,26 @@
+User-agent: Googlebot
+Crawl-delay: 600
+Disallow: /private/
+Disallow: /*.yaml$
+Disallow: /*.rss$
+Disallow: /*.json$
+
+User-agent: msnbot
+Disallow: /private/
+Disallow: /*.yaml$
+Disallow: /*.rss$
+Disallow: /*.json$
+
+User-agent: DotBot
+Crawl-delay: 600
+Disallow: /private/
+Disallow: /*.yaml$
+Disallow: /*.rss$
+Disallow: /*.json$
+
+User-agent: *
+Crawl-delay: 600
+Disallow: /private/
+Disallow: /*.yaml$
+Disallow: /*.rss$
+Disallow: /*.json$

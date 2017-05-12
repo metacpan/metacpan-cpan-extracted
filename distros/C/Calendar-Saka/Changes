@@ -1,0 +1,133 @@
+Revision history for Calendar::Saka
+
+1.34  Sun Jan 29 17:45:00 2017
+      - Upgraded to use Date::Saka::Simple v0.18.
+
+1.33  Tue Jan 10 10:50:00 2017
+      - Added dependency on Calendar::Plugin::Renderer v0.12.
+      - Removed method validate_params(), no longer required.
+
+1.32  Tue Jan 03 07:55:00 2017
+      - Added sample code for method as_text() in the SYNOPSIS section.
+      - Updated pod document for method as_text().
+
+1.31  Sat Dec 10 12:35:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+1.30  Mon Nov 14 09:20:00 2016
+      - Upgraded to use Date::Saka::Simple v0.17.
+
+1.29  Thu Oct 20 09:55:00 2016
+      - Added dependency on Calendar::Plugin::Renderer v0.11.
+
+1.28  Mon Sep 26 11:00:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+1.27  Fri Aug 12 12:30:00 2016
+      - Upgraded to use Date::Saka::Simple v0.15.
+
+1.26  Sat Jul 09 08:00:00 2016
+      - Added method as_text().
+      - Updated method as_svg() with regard to start index.
+      - Added dependency on Calendar::Plugin::Renderer v0.07.
+      - Added test for method as_svg().
+
+1.25  Tue May 24 10:50:00 2016
+      - Upgraded to use Date::Saka::Simple v0.12.
+      - Updated copyright year information.
+      - Updated method as_svg() to handle month name.
+      - Refactored method current() and method from_gregorian().
+      - Updated pod document with regard to the Calendar::Plugin::Renderer v0.06.
+
+1.24  Mon Jan 11 09:45:00 2016
+      - Added method as_svg() using the plugin Calendar::Plugin::Renderer.
+
+1.23  Sat Aug 29 14:55:00 2015
+      - Upgraded to use Date::Saka::Simple v0.09.
+
+1.22  Tue Aug 11 11:45:00 2015
+      - Upgraded to use Date::Saka::Simple v0.08.
+      - Making use of the method get_calendar() provided by Date::Saka::Simple.
+
+1.21  Fri Jul 10 10:05:00 2015
+      - Upgraded to use Date::Saka::Simple v0.07.
+
+1.20  Tue Jun 30 11:00:00 2015
+      - Upgraded the dependency on Date::Saka::Simple v0.06.
+      - Removed the dependecy on Date::Utils, no longer required.
+
+1.19  Sat Jun 20 19:40:00 2015
+      - Fixed the bug in the method from_gregorian().
+
+1.18  Fri Jun 12 10:00:00 2015
+      - Updated method _calendar() to validate month and year.
+
+1.17  Mon May 25 14:40:00 2015
+      - Dropped the dependency on Date::Utils::Saka.
+      - Upgraded the dependency on Date::Saka::Simple v0.05.
+      - Updated code w.r.t the above changes.
+
+1.16  Sat May 02 20:50:00 2015
+      - Added LICENSE file.
+
+1.15  Thu Apr 23 23:45:00 2015
+      - Re-structured and consumed Date::Utils::Saka as Moo Role.
+
+1.14  Tue Apr 21 13:50:10 2015
+      - Fixed the bug in the method _calendar() the last cell is empty.
+
+1.13  Tue Apr 21 10:20:10 2015
+      - Complete re-write using Moo with unit tests.
+
+1.12  Fri Jan 16 15:20:10 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+1.11  Fri Sep 12 22:30:19 2014
+      - Deleted Build.PL file.
+      - Removed dependency of Readonly.pm and Carp.pm.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+1.10  Tue Aug 09 16:32:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.09  Tue Apr 19 10:42:55 2011
+      - Fixed the typo in the pod.
+
+0.08  Tue Apr 19 09:36:29 2011
+      - Renamed tilte "SYNOPSIS" to "DESCRIPTION".
+
+0.07  Mon Apr 18 17:22:11 2011
+      - Updated description.
+      - Renamed method days_in_year_month() to days_in_month().
+      - Updated unit test 01-test-case.t regarding method name change.
+
+0.06  Mon Apr 18 16:54:00 2011
+      - Renamed title "Month Names" to "MONTHS" and set it head1.
+      - Removed title "Saka Calendar for the month of Phalgun year 1932.".
+      - Cosmetics changes.
+
+0.05  Tue Apr 12 12:05:00 2011
+      - Fixed buggy internal method _validate_date().
+      - Added unit test 05-test-case.t
+
+0.04  Tue Mar 29 10:53:10 2011
+      - Added more information about the month name and weekdays of Saka calendar.
+
+0.03  Fri Mar 18 14:15:16 2011
+      - Corrected typo in the SYNOPSIS.
+
+0.02  Fri Mar 18 12:29:00 2011
+      - Renamed month "Caitra" to "Chaitra".
+      - Updated SYNOPSIS to tell more about Saka Calendar.
+      - Renamed method _days_in_caitra() to _days_in_chaitra().
+      - Updated method to_julian() and from_julian() for month name "Chaitra".
+      - Cleaned up method as_string() and method get_calendar().
+      - Updated test 04-test-case.t for month name "Chaitra".
+      - Updated pod for method days_in_year_month().
+
+0.01  Thu Mar 17 16:10:29 2011
+      - First version released.

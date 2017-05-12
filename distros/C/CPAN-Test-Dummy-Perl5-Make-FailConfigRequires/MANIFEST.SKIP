@@ -1,0 +1,38 @@
+# DON'T INCLUDE BUILD.PL -- USED TO CREATE DIST TARBALL ONLY
+^Build.PL$
+
+# SURVIVE file is used to skip failure for some private reason
+^SURVIVE$
+
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+.svn/
+.git
+
+# ExtUtils::MakeMaker generated files and dirs.
+^MANIFEST\.(?!SKIP)
+^Makefile$
+^blib/
+^blibdirs$
+^PM_to_blib$
+^pm_to_blib$
+^MakeMaker-\d
+                                                                                                                    
+# Module::Build
+^Build$
+^_build
+.bat$
+
+# Coverage
+^cover_db
+
+# Temp, old, vi and emacs files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.swp$
+\.bak$
+\.tmp$

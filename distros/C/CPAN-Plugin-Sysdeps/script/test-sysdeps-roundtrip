@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use FindBin;
+use blib;
+use Getopt::Long;
+
+defined $ENV{PERL_LOCAL_LIB_ROOT}
+    or die <<"EOF";
+Please make sure local::lib is in effect, e.g. by running
+
+    eval \$($^X -Mlocal::lib)
+
+EOF
+
+my $nodistroprefs;
+GetOptions(
+	   'distroprefs!' => sub {
+	       $nodistroprefs = 1 if !$_[1];
+	   },
+	   'pre=s@' => \my @pre,
+	   'debug' => \my $debug,
+	  )
+    or die "usage?";
+
+my @mod_or_dist = @ARGV;
+if (!@mod_or_dist) {
+    die "Please specify one or more modules or dists!\n";
+}
+
+sub get_package_list_debian {
+    my @package_list;
+    my @cmd = ('dpkg-query', '-W', '-f', '${Package}\n');
+    open my $fh, '-|', @cmd
+	or die "Error while running @cmd: $!";
+    while(<$fh>) {
+	chomp;
+	push @package_list, $_;
+    }
+    close $fh
+	or die "Error while running @cmd: $!";
+    sort @package_list;    
+}
+
+sub get_package_list_freebsd {
+    my @package_list;
+    my @cmd = ('pkg', 'info', '-q');
+    open my $fh, '-|', @cmd
+	or die "Error while running @cmd: $!";
+    while(<$fh>) {
+	chomp;
+	push @package_list, $_;
+    }
+    close $fh
+	or die "Error while running @cmd: $!";
+    sort @package_list;    
+}
+
+sub get_package_list {
+    if ($^O eq 'freebsd') {
+	get_package_list_freebsd();
+    } else {
+	get_package_list_debian();
+    }
+}
+
+sub remove_packages_debian {
+    my @extra_installed_debs = @_;
+    my @cmd = ('sudo', 'apt-get', 'purge', '-y', @extra_installed_debs);
+    system @cmd;
+    if ($? != 0) {
+	warn "ERROR: removing @extra_installed_debs failed.\n";
+    }
+}
+
+sub remove_packages_freebsd {
+    my @packages = @_;
+    my @cmd = ('sudo', 'pkg', 'remove', '-y', @packages);
+    system @cmd;
+    if ($? != 0) {
+	warn "ERROR: removing @packages failed.\n";
+    }
+}
+
+sub remove_packages {
+    if ($^O eq 'freebsd') {
+	remove_packages_freebsd(@_);
+    } else {
+	remove_packages_debian(@_);
+    }
+}
+
+my %prev_installed_debs = map { ($_,1) } get_package_list();
+
+chdir "$FindBin::RealBin/.."
+    or die $!;
+system('make', 'install');
+
+my $srezic_misc_dir = "$ENV{HOME}/src/srezic-misc/scripts";
+
+for my $mod_or_dist (@mod_or_dist) {
+    {
+	my @cmd = (
+		   ($debug ? ('env', 'CPAN_PLUGIN_SYSDEPS_DEBUG=1') : ()),
+		   "$srezic_misc_dir/sudo_keeper", "$srezic_misc_dir/cpan_smoke_modules",
+		   "-notypescript", # because of sudo
+		   ($nodistroprefs ? '-nodistroprefs' : ()),
+		   (map { ('-pre', $_) } @pre),
+		   "-perl", $^X, $mod_or_dist,
+		  );
+	warn "INFO: @cmd\n";
+	system @cmd;
+	if ($? != 0) {
+	    warn "ERROR: No success running @cmd.\n";
+	}
+    }
+
+    my @extra_installed_debs = grep { !$prev_installed_debs{$_} } get_package_list();
+
+    if (@extra_installed_debs) {
+	remove_packages(@extra_installed_debs);
+    } else {
+	warn "INFO: no extra packages installed.\n";
+    }
+}

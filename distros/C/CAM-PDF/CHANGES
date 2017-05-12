@@ -1,0 +1,507 @@
+Revision history for Perl module CAM::PDF
+
+1.60  14 Aug 2013
+      [ENHANCEMENTS]
+      - Added min/max font size for form field filling.
+        Thanks to Gareth Tunley for the idea and the initial code
+
+1.59  28 Jan 2013
+      [FIXES]
+      - Added support for the \134 escape, synonymous with \\
+        Thanks to Zakariyya Mughal for the patch
+        https://rt.cpan.org/Ticket/Display.html?id=83018
+
+1.58  28 May 2012
+      Many thanks for Vadim Repin for numerous excellent bug reports!
+      [FIXES]
+      - Appended pdf revisions incorrectly incremented object generation numbers
+        https://rt.cpan.org/Ticket/Display.html?id=76513
+      - Appending pdf revisions was broken for non-linearized PDFs
+        https://rt.cpan.org/Ticket/Display.html?id=76514
+      - Allow multiple "startxref" statements in the last 1024 bytes -- unlikely, but possible
+        https://rt.cpan.org/Ticket/Display.html?id=77508
+      - Allow whitespace at the beginning of an indirect object (I think the PDF spec is
+        ambiguous about this)
+        https://rt.cpan.org/Ticket/Display.html?id=76512
+      - Allow backspace character
+        https://rt.cpan.org/Ticket/Display.html?id=76151
+      [DOCUMENTATION]
+      - mention $pdf->setPageContent($pagenum, $tree->toString());
+        Leo Lapworth and http://cpanforum.com/posts/13228
+
+1.57  17 Dec 2011
+      [FIXES]
+      - Test for undef streams instead of truth, to allow streams like '' or '0'
+        Thanks to Thorsten Schwander for the patch
+      - Failed to parse PDF 1.5 cross reference streams where a
+        1024-byte boundary happened to fall between "endstream" and
+        "endobj" do to a logic error.
+        Thanks to Thorsten Schwander for the report and fix suggestion
+
+1.56  13 Dec 2011
+      [FIXES]
+      - Workaround for corrupt PDFs that have 'n' records in their index that point to byte zero
+        of the file. Silently treat those as 'f' records. Yet another case of Acrobat supporting
+        broken PDFs, so the rest of us have to support them too...
+        Thanks to Mark Hunnibell for a sample PDF that demonstrated the problem
+
+1.55  22 Jun 2011
+      [FIXES]
+      - Performance enhancement saving large files
+        https://rt.cpan.org/Ticket/Display.html?id=69021
+        Thanks to David Porter of Audacitas Limited for the patch
+
+1.54  26 Mar 2011
+      [FIXES]
+      - appendPDF was broken intermittently if appended doc was bigger than main doc
+        Thanks to Charlie Katz for a sample PDF
+        http://chrisdolan.net/talk/2011/03/26/cam-pdf-fixes-appendpdf-bug/
+
+1.53  25 Mar 2011
+      [FIXES]
+      - Handle PDF 1.5 case where "endstream" token crosses a 1024-byte boundary
+        Thanks to Charlie Katz for a sample PDF
+      - Allow whitespace after the 'stream' token for better interoperability
+        http://rt.cpan.org/Ticket/Display.html?id=42819
+        Credit to Vonne 'Robert' Bannavong
+      - Fix broken crunchjpgs.pl, patch submitted by George Greer
+      - Tolerate leading zeros on objnums and gennums
+        http://www.cpanforum.com/posts/11494
+
+1.52  02 Oct 2008
+      [FIXES]
+      - Better handling of failures during filter loading
+        (rlane10 via http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2361238.html)
+
+1.51  28 Sep 2008
+      [FIXES]
+      - Support PDFs with 24-bit offsets in the xref stream (PDF v1.5 only)
+        (thanks to Dan Richman for reporting the problem and providing an example)
+
+1.50  20 Sep 2008
+      [ENHANCEMENTS]
+      - Support for reading PDF 1.5 compressed object streams and cross reference streams.
+        (we cannot write this style, but we can append to it)
+      [FIXES]
+      - Decompression of PNG-filtered streams was totally broken.
+      - Deleting pages now also deletes back references from annotations on that page.
+      - cleanse() now removes PieceInfo data.  I have no idea what
+        PieceInfo does, but it had a whole bunch of page back links
+        that broke page deletion.
+
+1.21  13 Aug 2008
+      [FIXES]
+      - Permit comments after the %%EOF, like Adobe Reader does.  Thanks to
+        Malcolm Cook for pointing out the incompatibility.
+
+1.20  26 Jun 2008
+      [ENHANCEMENTS]
+      - Support for Type 2 encryption (just reading, not writing)
+      - Support for reading PDFs where the owner and user passwords
+        are different
+      - Improvement to performance of node traversal, inspired by
+        RT #35555 (credit Eric Hall and his anonymous employee).
+
+1.13  23 Apr 2008
+      [FIXES]
+      - setpdfbackground.pl computed RGB values incorrectly.  Thanks to
+        Andrew Cadman for finding the bug and suggesting a fix
+
+1.12  27 Nov 2007
+      [FIXES]
+      - I just realized that CAM::PDF::Renderer::Text was useless
+        because it just printed to STDOUT.  Fixed to offer a
+        toString() method instead.  Fuse::PDF wants this feature.
+      - Fixed a typo in the Synopsis of CAM::PDF::Content
+
+1.11  20 Nov 2007
+      [ENHANCEMENTS]
+      - added previousRevision() and allRevisions() [invented in Fuse::PDF]
+      [INTERNALS]
+      - Compliance with Perl::Critic v1.080
+
+1.10  24 Mar 2007
+      [FIXES]
+      - RT #25306, regression in rangeToArray
+
+1.09  25 Feb 2007
+      [FIXES]
+      - Restore Perl 5.6.x compatibility which was broken in 1.08
+        (credit Brian Casey of rootlevelservices.com)
+      - Detect end-image tag accidentally embedded with an inline
+        image (credit Christian Drechsler)
+      [INTERNALS]
+      - Changed maintainer from CLOTHO@cpan.org to CDOLAN@cpan.org
+
+1.08  17 Oct 2006
+      [FIXES]
+      - Add binmode() for Windows (RT #22136)
+      - Fix addFont() where there is no 'Font' property (RT #22049)
+      [INTERNALS]
+      - Compliance with Perl::Critic v0.21 and Bangs
+      - Moved the examples from scripts/ to bin/
+
+1.07  11 Jul 2006
+      [ENHANCEMENTS]
+      - Add background_color options to fillFormFields
+      [FIXES]
+      - Add binmode() for Windows (RT #22136)
+      - Documentation and copyright year
+      [INTERNALS]
+      - Compliance with Perl::Critic v0.17
+
+1.06  20 Mar 2006
+      [ENHANCEMENTS]
+      - Added scripts/setpdfbackground.pl program
+      - Added getPageDimensions() method
+
+1.05  06 Dec 2005
+      [FIXES]
+      - Forgot to import Carp::cluck
+
+1.04_01  30 Nov 2005
+      [ENHANCEMENTS]
+      - Docs
+      [INTERNALS]
+      - Refactoring
+      - Add an ENV flag to skip some tests
+
+1.03  20 Oct 2005
+      [ENHANCEMENTS]
+      - Regression tests
+      [FIXES]
+      - Fixes for deletePages with initial support for Dests and Outlines
+      [INTERNALS]
+      - Some code cleanup
+
+1.02_01  18 Oct 2005
+      Broken CPAN release!
+      [ENHANCEMENTS]
+      - Add options hash to the constructor.
+      - Documentation
+      [FIXES]
+      - Regression: parseStream must be able to be called as a class method
+      [INTERNALS]
+      - Code refactoring.
+
+1.01  20 Sep 2005
+      [INCOMPATIBLE]
+      - The API for CAM::PDF::Decrypt changed.  Several methods now
+        require a CAM::PDF instance as a first argument.
+      [FIXES]
+      - Remove instances of circular references so CAM::PDF instances
+        are able to be garbage collected.
+
+1.00  19 Sep 2005
+      [FIXES]
+      - Fix an artificial limitation of the encryption module
+
+0.99  22 Apr 2005
+      First CPAN release
+      [INCOMPATIBLE]
+      - Relicence from GPL-only to GPL+Artistic
+      [FIXES]
+      - Debug asciify shell script
+      - Read error on fontmetrics Width array (bounds error)
+      [INTERNALS]
+      - Add handy nodeType function
+
+0.98  30 Nov 2004
+      [ENHANCEMENTS]
+      - Added better position support to GS
+      - Added support for color devices in G
+      - Prepend
+      [FIXES]
+      - addFont now checks that the font does not exist before adding
+      [INTERNALS]
+      - load Data::Dumper on demand only
+
+0.97  09 Nov 2004
+      [FIXES]
+      - Tree validation fixes
+      - Pass textwidth into the renderText() function
+      - Page validation: string vs. hexstring
+
+
+0.95  18 Jun 2004
+      [ENHANCEMENTS]
+      - New methods: addFont, wrapString
+      [FIXES]
+      - Debugged: graphic state computation
+
+0.94  13 May 2004
+      [ENHANCEMENTS]
+      - New methods:
+        getFontNames
+        getFonts
+        getFontByBaseName
+        deEmbedFontByBaseName
+        deEmbedFontObj
+      - pdfinfo.pl - more detailed output
+      - deillustrate.pl - new script to remove Illustrator metadata
+      [FIXES]
+      - disable the "node has only one kid and no parent" error
+        This is a case where the delete code does a poor job of
+        maintaining a balanced page tree and then complains about it's
+        own bad work.  This should eventually be fixed, but for now,
+        removing the die() is good enough.
+
+0.93  29 Mar 2004
+      [FIXES]
+      -  Fix for font de-embedding to remove unused font widths
+
+0.92  30 Jan 2004
+      [ENHANCEMENTS]
+      - Add deEmbedFont() method
+      [FIXES]
+      - Fix a new bug in the page range code
+
+0.91  30 Jan 2004
+      [ENHANCEMENTS]
+      - Add listfonts.pl
+      [FIXES]
+      - Fix bug regarding page number ranges in getpdftext.pl and
+        rendertext.pl
+      - Fix MANIFEST
+
+0.90  18 Sep 2003
+      [INCOMPATIBLE]
+      - Rename revert.pl to revertpdf.pl
+      [ENHANCEMENTS]
+      - Add documentation to all scripts
+      - Ensure that all scripts respect PDF Modify permission
+      [INTERNALS]
+      - Add functions to facilitate testing PDF permissions
+
+0.80  16 Sep 2003
+      [ENHANCEMENTS]
+      - Lots and lots and lots of documentation
+      - Use Module::Build
+      [FIXES]
+      - Caught a couple little bugs in Decrypt.pm
+      - Clean up some obsolete code in the Decrypt module
+
+0.75  11 Sep 2003
+      [FIXES]
+      - Fix little bug in getStringWidth method
+      - Minor bugfix in debugging function
+
+0.74  29 Aug 2003
+      [FIXES]
+      - Better handling for loading Text::PDF::Filter library
+      [INTERNALS]
+      - Split GS.pm into two parts for performance
+
+0.73  11 Aug 2003
+      [FIXES]
+      - Font metric widths were not properly dereferenced, in the case
+        of indirect objects
+      - Page content "cm" directives (transform user coordinate system
+        matrix) were replacing the current matrix instead of appending
+        to it.
+
+0.72  26 Jun 2003
+      [ENHANCEMENTS]
+      - Add documentation for extractPages
+      [FIXES]
+      - rangeToArray() bug fixes in the corner cases, added tests
+      - Fix number of tests
+
+0.71  25 Jun 2003
+      [ENHANCEMENTS]
+      - add extractPages()
+      - add more tests
+      [FIXES]
+      - Fix bug in deletePages
+
+0.70  24 Jun 2003
+      [ENHANCEMENTS]
+      - Convert parser to non-destructive for higher speed
+      [FIXES]
+      - Fix a bug in the test script
+
+0.65  24 Jun 2003
+      [ENHANCEMENTS]
+      - Add toPDF() and needsSave() methods.
+
+0.64  24 Jun 2003
+      [ENHANCEMENTS]
+      - Add PDF.pm dcumentation
+      - Add isLinearized() method
+      - Add more output for pdfinfo.pl
+      [FIXES]
+      - Fix bug in syntax for page "d" element (numbers, not just integers)
+
+0.63  22 Jun 2003
+      [ENHANCEMENTS]
+      - Added PDF test document
+      - Added pdfinfo.pl script
+      - Added toString method on CAM::PDF::Content class
+      - Added writeInlineImage method to support above
+      [FIXES]
+      - Simple bug fix in writeAny error message
+
+0.62  09 Jun 2003
+      [ENHANCEMENTS]
+      - Add Images renderer
+      - findImages() content method
+      - Add prependPDF to function list
+      [FIXES]
+      - bug fix
+
+0.61  22 Apr 2003
+      [ENHANCEMENTS]
+      - Added prependPDF(), deletePages(), and rangeToArray() methods
+      - test.pl overhaul
+      - a little debugging output in getPage()
+
+0.60  04 Apr 2003
+      [ENHANCEMENTS]
+      - Graphics state and rendering, some little code clean ups
+      - Make output function more mod-perl friendly
+      - Add page content validation
+      - Add parsing of inline images
+      - Add better Tj/TJ handline
+      - Add check option to getpdftext.pl
+      - Simplify BT treatment
+      - Enhance the content reading by using native PDF data type
+        parsing (converted the parsing functions to be either instance
+        or class methods)
+      - Special heuristic treatment of TJs
+      [FIXES]
+      - Add getpdftext.pl to the manifest
+
+0.50  01 Apr 2003
+      [ENHANCEMENTS]
+      - Add page content parsing
+      - Add script to output page text content
+      - Overhauled fillForm to do things like use inherited form field
+        values, do justified text, do autosized text.  This requires
+        the use of the Text::PDF font utilities.
+      - Handle multiline form widgets
+      [FIXES]
+      - Fix font autosizing to account for multiline fields
+
+0.42  19 Feb 2003
+      [ENHANCEMENTS]
+      - Add getFont() function and supporting script
+      - Add deletePage() function
+      - Add deletepdfpage.pl script
+      [FIXES]
+      - Expect Encoding key in resource dictionary
+      - Expect font size zero in form widgets
+      TO DO: properly treat font size zero as autoscaled font
+
+0.39  28 Oct 2002
+      [ENHANCEMENTS]
+      - Add return of number of successes to fillformfields
+
+0.38  28 Oct 2002
+      [ENHANCEMENTS]
+      - Added clearAnnotations and addPageResources
+      [FIXES]
+      - Fix appendPDF
+      - Add appendpdf.pl to the MANIFEST
+
+0.37  04 Oct 2002
+      [ENHANCEMENTS]
+      - Add appendPDF() function and a script to facilitate PDF merging
+      - Support for removal of decryption blocks
+      - deleteObject function
+      - Add support for the "null" object type
+      [FIXES]
+      - Fix and enable the cleanse function.  I can't make this
+        function fail any longer.  Yay!
+      - Fix typo for free block in xref dictionary creation
+      - Catch undef objects in fillFormFields
+
+0.35  29 Jul 2002
+      [ENHANCEMENTS]
+      - Add clearFormFieldTriggers function
+      - Make buildNameTable work on fonts as well as xobjects
+      [FIXES]
+      - Fix dereference() documentation.
+      - Change "if" to "while" in check for cmd line arguments
+      [INTERNALS]
+      - Moved uninlineImages function into library from script
+      - Made some improvements to the embedded image detection logic
+      - Change data structure for nodes from arrayref to object (hashref)
+
+0.31  14 May 2002
+      [INTERNALS]
+      - Reorganize directory
+
+0.30  13 May 2002
+      [INCOMPATIBLE]
+      - Change package name from PDF to CAM::PDF
+      [ENHANCEMENTS]
+      - lots and lots of documentation
+      [FIXES]
+      - fix undef bug in getFormField
+
+0.23  26 Apr 2002
+      bugfixes
+
+0.22  19 Apr 2002
+      [ENHANCEMENTS]
+      - Password fields
+      - Make Makefile.PL smarter -- read MANIFEST itself
+      [FIXES]
+      - Fix delinearize for non-linearized files
+      - Font tweaks in form filling
+      - Add listpdffields.pl to the manifest
+
+0.21  15 Apr 2002
+      [FIXES]
+      - Improvements to form handling
+      - Bug fixes in output of xref
+
+0.20  12 Apr 2002
+      [ENHANCEMENTS]
+      - Add .pl files to manifest
+
+0.10  12 Apr 2002
+      [INCOMPATIBLE]
+      - Change how the changestring code works with regex values
+      [ENHANCEMENTS]
+      - Form fields
+      - Remove extra files from make process
+      - Support for:
+        different PDF versions
+        concatenated strings
+        \ continued lines
+        \ escaped characters
+        cleaner output formatting
+        some dictionary sorting (special cases)
+      - mac2unix support in asciify
+      - verbose option in extractallimages.pl
+      - pdf versioning in rewritepdf.pl
+      - new revision reversion tool
+      [FIXES]
+      - Fix bug for \n in string
+      - Fix string output implementation (used to break Acrobat5 and Xpdf)
+
+0.01  13 Mar 2002
+      [ENHANCEMENTS]
+      - JPG options; PDF stamping functions
+      - Cmd line options for tweaking jpg compression
+      - Add JPEG quality flag
+      - Added support for messing with images
+      [FIXES]
+      - Fix bug in escaped strings
+      - Fix permission modification
+
+0.01  22 Feb 2002
+      [ENHANCEMENTS]
+      - encryption/decryption
+      - some documentation
+
+0.01  18 Feb 2002
+      [ENHANCEMENTS]
+      - Search-and-replace text in a PDF doc
+      - Program to change all reference objects
+      - add cleanse feature (which breaks acrobat), fix some traverse bugs
+      - Inline image uninlining
+
+0.00  15 Feb 2002
+      Initial import

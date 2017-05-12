@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/CGI/Session/Driver/pure_sql.pm
+lib/CGI/Session/Serialize/sql_abstract.pm
+t/02_puresql.t
+t/01_serialize_sql_abstract.t
+Build.PL
+Makefile.PL
+META.yml

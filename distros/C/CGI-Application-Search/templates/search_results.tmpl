@@ -1,0 +1,88 @@
+<!-- 
+
+EXAMPLE TEMPLATE
+
+Designed to be used for the TEMPLATE configuration with
+a TEMPLATE_TYPE of HTMLTemplate or HTMLTemplateExpr
+
+Very basic with no frills, just a simple search.
+
+-->
+<html>
+<body>
+
+<h2>Search<tmpl_if searched> Results</tmpl_if></h2>
+
+
+<form name="search" action="<tmpl_var url>">
+<input name="rm" value="perform_search" type="hidden">
+
+<table summary="layout">
+<tr>
+  <td><label for="keywords">Keyword(s)</label></td> 
+  <td colspan="2"><input id="keywords" name="keywords" value="" size="50"></td>
+</tr>
+<tr>
+  <td colspan="2" align="right"><input value="Search" type="submit"></td>
+</tr>
+</table>
+
+</form>
+
+<tmpl_if searched>
+  <tmpl_if hits>
+    (Elapsed Time: <tmpl_var escape=html elapsed_time>s)
+
+    <div class="pagination">
+
+    <tmpl_if pages>
+      <div>
+      Pages:
+      <tmpl_if first_page>
+        &laquo;Prev
+      <tmpl_else>
+        <a href="<tmpl_var url>?rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var prev_page>">&laquo;Prev</a>
+      </tmpl_if>
+  
+      <tmpl_loop pages>
+        <tmpl_if current>
+          <tmpl_var page_num>
+        <tmpl_else>
+          <a href="<tmpl_var url>?rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var page_num>">
+            <tmpl_var page_num>
+          </a>
+        </tmpl_if>
+      </tmpl_loop>
+
+      <tmpl_if last_page>
+        Next&raquo;
+      <tmpl_else>
+        <a href="<tmpl_var url>?rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var next_page>">
+          Next&raquo;
+        </a>
+      </tmpl_if>
+      
+      </div>
+    </tmpl_if>
+    
+    Results: <tmpl_var escape=html start_num> to <tmpl_var escape=html stop_num> of <tmpl_var escape=html total_entries>
+    </div>
+
+
+    <dl>
+    <tmpl_loop hits>
+      <dt>
+      <a href="<tmpl_var path>"><tmpl_if title><tmpl_var escape=html title><tmpl_else><tmpl_var escape=html path></tmpl_if></a>
+      </dt>
+      <dd><tmpl_var last_modified> - <tmpl_var size></dd>
+      <dd><p><tmpl_var description></p></dd>
+    </tmpl_loop>
+    </dl>
+
+  <tmpl_else>
+  <p><strong>No results found</strong></p>
+  </tmpl_if>
+</tmpl_if>
+
+</html>
+</body>

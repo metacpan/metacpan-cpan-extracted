@@ -1,0 +1,23 @@
+---
+name: Catalyst-Plugin-Authentication-Credential-Flickr
+version: 0.05
+author:
+  - 'Daisuke Murase E<lt>typester@cpan.orgE<gt>'
+abstract: Flickr authentication for Catalyst
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.50
+  Catalyst::Plugin::Authentication: 0
+  Catalyst::Plugin::Session: 0
+  Flickr::API: 0
+  UNIVERSAL::require: 0
+provides:
+  Catalyst::Plugin::Authentication::Credential::Flickr:
+    file: lib/Catalyst/Plugin/Authentication/Credential/Flickr.pm
+    version: 0.05
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

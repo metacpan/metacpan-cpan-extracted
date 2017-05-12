@@ -1,0 +1,700 @@
+2004-06-07   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.51.
+
+	* This is primarily a bug fix and/or compatability release.
+
+	* Renamed all demo/example modules besides the core 5 so that their names
+	all start with 'Demo'.  These demo/example modules all had/have top-level
+	names, and after the change there should not be any name conflicts with
+	other CPAN modules that should have the original top-level names.  All
+	references to these module names in other files were also updated.
+
+	* Moved the 5 'main' demo modules (which I actually use in production) into
+	the 'lib' folder: "Demo[GuestBook|MailForm|Redirect|TextFile|Usage]".  Now 
+	they are also test-compiled by CGI-Portable.t.
+
+	* Several documentation fixes or changes in CGI::Portable (now v0.51).
+
+	* Fixed a couple "\1 better written as $1" warnings in the
+	search_and_replace_url_path_tokens() method of CGI::Portable.
+
+	* Removed unused "@ISA" global var declaration from DemoUsage (now v0.51).
+
+	* Since no one should be actually using the renamed demo modules, this 
+	release is completely backwards compatible.
+
+2004-06-06   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.50.
+
+	* Updated this distribution's external dependencies on CGI::MultiValuedHash
+	to v1.09.  That module's API didn't change, but it had a bug fix.
+
+	* The 4 modules that CGI::Portable subclassed (::Errors, ::Files,
+	::Request, ::Response) in release 0.472 are now merged into it as of
+	release 0.50.  The result of this 5-way merge has a version of 0.50, and
+	can be used identically to the old module.  No new code or features were
+	added.  The new module has all of the old 5's documentation, slightly
+	altered as was necessary for the merger.  Due to the elimination of
+	redundancies, the new module is 17% smaller than the combined size of the
+	old 5.  Every other module in this distribution was also updated to 
+	version 0.50, even though they otherwise had no changes (1 exception).
+
+	* Small feature update in CGI::Portable::AppMultiScreen whereby
+	set_multi_screen_no_delegate_message() now spits out an 'http_status_code'
+	of '404 Not Found' to go with the "screen doesn't exist" error page that it
+	generates.  It used to leave the default status code of '200 OK' to be
+	returned, which is technically wrong even though the user sees the same
+	thing.  As a result of the change, web crawling robots such as search
+	engines should record that an external link pointing to your "doesn't
+	exist" page is broken, and they shouldn't index "doesn't exist" as if it
+	were a valid page, sending more visitors straight to it later.  This
+	shouldn't break anything unless you depended on the old, broken behaviour.
+
+	* Note that if you referenced any of the 4 modules that don't exist by name, 
+	then just substitute 'CGI::Portable' for the old name and your code should 
+	continue to work as before.
+
+	* Besides the aforementioned, this release is completely backwards
+	compatible with the previous one, so you should be able to swap it in
+	without problems.
+
+	* Renamed t/CGI-Portable-Framework.t to t/CGI-Portable.t.
+
+2003-03-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.472.
+
+	* The only change in this release was to fix t/CGI-Portable-Framework.t,
+	where I had forgotten to declare (and set) a variable before using it. 
+	This omission had caused "make test" to completely fail.
+
+2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.471.
+
+	* This is a small maintenance release that is mainly for improving
+	documentation.  Similar maintenance releases are being done with all of my
+	distributions simultaneously.  A lot of it was formatting issues that were
+	easy to miss before; the other bullet points below list the non-formatting
+	issues.  These files had formatting fixes: Portable.pm, Request.pm, 
+	Response.pm, AdapterCGI.pm, AppMultiScreen.pm, ChangeLog, ReadMe.
+
+	* The distribution file layouts have also been standardized.  Modules were
+	already in a "lib" folder so no change was needed there.  Tests were put in
+	a "t" folder.  "test.pl" was changed to "t/CGI-Portable-Framework.t".
+
+	* Updated all Copyright statements to a better (and longer) version, which
+	is dated 1999-2003.  Your rights to use these modules haven't changed, but
+	they may now be easier to understand.  These statements appear once in the
+	ReadMe file at the bottom (under "AUTHOR"), and twice in each module (.pm
+	file), a full version at the bottom (under "AUTHOR") and a shorter version
+	at the top (in code comments).
+
+	* Added the "use warnings" pragma at the top of all files beside "use
+	strict"; every occurance of "use strict" gained a "use warnings" whether it
+	was in the module proper or in its test script or in its SYNOPSIS.  This
+	should save users from having to put -w on the command line for them.
+
+	* Incremented all module $VERSION numbers by 0.001, and all test scripts to
+	require the new versions.  Also, where any of my modules use others of my
+	modules, they now require the latest version as of this writing, for
+	simplicity of maintenance.
+
+	* Updated all test scripts to read $verbose from @ARGV (command line
+	arguments), and other test script improvements.
+
+	* Updated these sections of the ReadMe file: REQUIREMENTS, INSTALLATION.
+
+2001-11-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.47.
+
+	* Updated CGI::Portable::Request so that it now stores all raw http request 
+	details, rather than just some of them.  To implement this, two properties 
+	named "request head" and "request body" were added; the first is a hash and 
+	the second is a scalar.  Their format and accessor methods are designed to 
+	mirror those for the "http head" and "http body" in Response.  Therefore, 5 
+	new accessor methods were added: get_request_headers_ref(), 
+	[get/set/add]_request_headers(), request_body().  The older methods 
+	referer() and user_agent() have been re-implemented to retrieve and set 
+	certain key/value pairs in "request head" rather than have their own 
+	properties, which were deleted.  Many property accessor groups, other 
+	functions, and their POD were rearranged into a more logical order, starting 
+	with raw connection and request details, then parsed user input, then 
+	functions for making new call-back urls.  Despite this, no existing code 
+	was changed, so all the existing functions work the same as before.
+	This Request version 0.47 should be backwards-compatible with version 0.46.
+	Much of the overview POD was rewritten to be easier to understand, so you 
+	should have a better idea what the features represent.
+	Note that all "user path/query/post/cookies" properties are parsed copies 
+	of various "request" properties, which are the raw versions; both can be 
+	stored to give you maximum flexability.
+
+	* The two demo modules named DemoStatic and DemoSegTextDoc have been merged 
+	into a single module named DemoTextFile, at version 0.47.  Any of your 
+	scripts that used DemoStatic can use DemoTextFile with no changes besides 
+	the name of the module called.  Scripts that use DemoSegTextDoc will need 
+	to, in addition to the rename, pass an extra preference of "is_text => 1" 
+	in order to replicate the old behaviour.  The new module is more flexible 
+	than its predecessors by letting you have multi-part documents that are 
+	either plain text or html (not plain text only).  In addition, extra title 
+	and creator and date information is only displayed if the preference "title" 
+	has a value, so you can have multi-part documents without extra headers now.  
+	Any demos have been updated where necessary to the new module name.
+
+	* No other files were changed, and are still at version 0.46.
+
+2001-09-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.46.
+
+	* IMPORTANT: Rewrote the take_context_output() methods in all 
+	CGI::Portable::* modules that had them: Errors, Files, Request, Response, 
+	suffixless.  Be aware that the changed methods have a different default 
+	behaviour than before, as well as that they take a different argument set.  
+	You should check any of your code which calls this method, because it may 
+	very well break if it used any arguments or depended on specific behaviour.
+	Specifically, the new arguments [CONTEXT, LEAVE_SCALARS, REPLACE_LISTS] 
+	replace the old arguments [CONTEXT, APPEND_LISTS, SKIP_SCALARS].  The new 
+	default behaviours regarding when CONTEXT properties overwrite SELF 
+	properties have been changed so that they more closely match what one would 
+	intuitively expect to happen.  No longer will null properties overwrite 
+	properties with values.  Also, lists are now combined by default rather than 
+	replaced, which works well when you have multiple "application components" 
+	subcontracted to make different regions of the same screens; previously, the 
+	last component would overwrite earlier ones by default.  Scalar properties 
+	in "taken" CONTEXTs still will overwrite ones in SELF by default, but this 
+	time only if they aren't null.  See the method's own POD for more.
+
+	* Added method page_search_and_replace() to CGI::Portable::Response, which 
+	replaces the search_and_replace_page_body() method in CGI::Portable; the 
+	latter was deleted.  Correspondingly, the deprecated preference named 
+	"page_replace" that was handled by CGI::Portable::AppStatic has been renamed 
+	to "page_search_and_replace".  The renamed preference works the same as 
+	before, and should be permanent.  Also, added property and method 
+	page_prologue() to Response and a corresponding "low/high_page_prologue" 
+	properties to AppStatic.  The new method and properties have no effect 
+	unless your HTML::EasyTags install is 1-06 or later.
+
+	* Added module CGI::Portable::AppMultiScreen, an "application component" 
+	that lets you easily define a group of screens that are related, delegate 
+	the construction of each screen to separate "components", and simplify the 
+	creation of links between the screens.  The module is subclassed from 
+	AppStatic.  This module has complete POD so you can get a good description 
+	by reading that documentation.  This module is meant as a non-proprietary 
+	replacement for DemoMultiPage; the latter module was deleted.  The 
+	preferences handled by DemoMultiPage were renamed as follows: "vrp_handlers" 
+	to "delegate_list", "def_handler" to "default_delegate", "wpm_module" to 
+	"module_name", "wpm_prefs" to "preferences", "wpm_subdir" to "file_subdir".  
+	The new module does not have any replacement for the older "menu_items" and 
+	related preferences for generating html menus of hyperlinks between the 
+	various screens, and it will not get any due to the proprietary nature of 
+	such a task.  If you used "menu_items" before then you will need to make the 
+	hyperlinks yourself and attach them to the pages.  It really isn't that 
+	difficult; see the "website" demo for an example of how to do it now.
+
+	* Added module CGI::Portable::AppSplitScreen, an "application component" 
+	that lets you easily divide a response screen into multiple regions and 
+	then delegate the construction of each region to separate "components".  
+	You define the regions within the standard "preferences", and no other 
+	input is required.  The module is subclassed from AppStatic.  This module 
+	has complete POD so you can get a good description by reading that 
+	documentation.  Before this module became available, you would have had to 
+	do your own programming for such simple tasks as adding page headers or 
+	footers that are stored in a different file of their own; now such 
+	activities can be done with nothing more than ordinary config files.
+
+	* Updated CGI::Portable::AdapterCGI so that it will always read posted data 
+	up to Content-length bytes.  While it never got more than that before, 
+	it had also refused to read content if there was more than 100K of it.  
+	This change brings more behaviour partity with AdapterSocket.
+
+	* Small update to the search_and_replace_url_path_tokens() method of 
+	CGI::Portable so that it didn't leave a trailing "?" on urls when there was 
+	no query string.
+
+	* Various small updates were made to the demo modules to keep them up to 
+	date with the main module changes, above, so they don't break.
+
+	* Various small updates were made so that the output of the modules is 
+	better compliant with XHTML.  All HTML now has lowercased tags, among other 
+	things.  However, it should continue to work with older web browsers.
+
+2001-08-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.45.
+
+	* In summary, this release adds a new module, CGI::Portable::AppStatic, 
+	removes a now-redundant existing one, CGI::WPM::Base, adds some methods to 
+	other modules (mostly Response), deletes a few methods (mostly Request), 
+	renames a number of methods (about 10% of Request), and renames the main 
+	demo modules (all CGI::WPM::* became Demo*).  These changes were done to 
+	further streamline the modules, and prepare for large feature additions in 
+	subsequent releases.  Some of your code may break due to the changes, but 
+	a simple search-and-replace should be all that's necessary to fix it.
+
+	* All files had versions changed to 0.45 whether changes were made or not.
+
+	* Updated CGI::Portable::Request to delete the following 3 methods along 
+	with their associated properties: url_path_is_in_path_info(), 
+	url_path_is_in_query(), url_path_query_param_name().  There were related 
+	simplifications made to the module set such that it is expected that the 
+	"user path" or "url path" are always stored as the "path info"; the option 
+	to store it as a "query string" argument instead has been removed.  
+	You should not need to change your code to reflect the above change, as the 
+	public interface of the url-making methods were not changed.  However, you 
+	probably want to reset your app if you used the query string store because 
+	any web screens currently served would then have invalid hyperlinks in them.
+
+	* Renamed several methods that store request details: virtual_host() became 
+	server_domain(), remote_addr() became client_ip(), remote_host() became 
+	client_domain().  These methods were added: server_ip(), client_port().  To 
+	round out the six-method set, server_port() was kept unchanged from before.  
+	Also, the methods request_uri() and request_protocol() were added to 
+	complement request_method(), which remained as before; the script_name() 
+	method was removed since it became partially redundant with request_path().  
+	Accordingly, CGI::Portable::Request, CGI::Portable::AdapterSocket, 
+	CGI::Portable::AdapterCGI, and all "CGI::WPM::*" modules were updated.
+
+	* Updated CGI::Portable::Response by adding these methods: set_http_cookies(), 
+	add_http_headers(), add_page_meta(), add_page_style_sources(), 
+	add_page_style_code(), add_page_frameset_attributes(), 
+	add_page_body_attributes().  The delete_http_cookies() method was deleted, 
+	but its effect can be simulated by calling set_http_cookies() with an empty 
+	array ref argument.
+
+	* Added module CGI::Portable::AppStatic, an "application component" that 
+	lets you define whole response screens within a config file.  This module is 
+	meant as a non-proprietary replacement for CGI::WPM::Base; the latter module 
+	was deleted.  The preferences handled by CGI::WPM::Base were renamed as 
+	follows: "http_target" to "low_http_window_target", "page_body" to 
+	"high_page_body", "page_header" to "prepend_page_body", "page_footer" to 
+	"append_page_body", "page_title" to "low_page_title", "page_author" to 
+	"low_page_author", "page_meta" to "add_page_meta", "page_css_src" to 
+	"add_page_style_sources", "page_css_code" to "add_page_style_code", 
+	"page_body_attr" to "add_page_body_attributes".  Any modules that used 
+	CGI::WPM::Base have been updated to use CGI::Portable::AppStatic instead; 
+	the exception is CGI::WPM::Usage, which now uses neither of them.  The new 
+	module does not yet have an elegant replacement for the older "page_replace" 
+	property, so it continues to support that property as a deprecated feature.
+
+	* Renamed all "CGI::WPM::*" modules to "Demo*" since they truly belong with 
+	the demos.  If you use any of these then you will need to search-and-replace 
+	any calls to the module name.  They otherwise work the same way as before.
+
+	* Removed support of the "amend_msg" preference from all "Demo*" modules.  
+	This preference had allowed one to customize the text for a portion of 
+	most error screens, so that portion is no longer customizable.
+
+	* Removed support of the "url" preference in the DemoRedirect module.  
+	This preference had allowed DemoRedirect to always use the same target url, 
+	rather than getting it from the query string parameter named "url".  Now, 
+	the query string is the only place that DemoRedirect looks.  However, you 
+	can now use CGI::Portable::AppStatic directly (and not use DemoRedirect) to 
+	replace the lost functionality.  Then, you set the high_http_status_code 
+	preference to "301 Moved" and "high_http_redirect_url" to the destination.
+
+	* Updated CGI::Portable and many of the demo modules to make them more 
+	XHTML-compliant.  Specifically, all main screen headers are now '<H1></H1>' 
+	rather than '<H2 ALIGN="center"></H2>'.  Users who want their headings to 
+	appear a specific way, like centered, should use a stylesheet to say so.
+
+2001-06-11   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.44.
+
+	* This release does not update any of the core modules having "CGI::Portable" 
+	in their names.  It focuses on updates for the other modules instead.
+
+	* CGI::WPM::Usage and CGI::WPM::CountFile have been merged into a single 
+	module, keeping the name CGI::WPM::Usage.  This mainly consisted of copying 
+	about 6K of code into Usage and deleting the rest of CountFile entirely.  
+	CGI::WPM::Usage was further edited so that the new code integrated cleanly.  
+	The deleted module didn't really belong in the CGI::WPM::* name space, but 
+	was put there to get it out of the way of the generic name spaces, and 
+	because Usage depended on it.  So there are now 8 CGI::WPM::* modules down 
+	from 9, and all of the remaining belong together.
+
+	* All CGI::WPM::* modules have been updated to version 0.44.  Most of the 
+	modules have had only minor tweaks that consist of renaming a few private 
+	methods (any leading "_" was removed for consistency).  They should all work 
+	the same as they did before.
+
+	* The ReadMe file was updated in several places, and there were other minor 
+	documentation updates.
+
+	* Added demo SmartHouse - A Web-based X10 Device Controller in Perl.
+	This demo is based on a college lab assignment.  It doesn't actually 
+	control any hardware, but is a simple web interface for such a program 
+	should one want to extend it in that manner.  This is meant to show how 
+	CGI::Portable can be used in a wide variety of environments, not just 
+	ordinary database or web sites.  If you wanted to extend it then you 
+	should use modules like ControlX10::CM17, ControlX10::CM11, or 
+	Device::SerialPort.  On the other hand, if you want a very complete 
+	(and complicated) Perl solution then you can download Bruce Winter's 
+	free open-source MisterHouse instead at "http://www.misterhouse.net".
+
+2001-06-05   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.43.
+
+	* CGI::Portable has been split into 5 modules, all of which are at version 
+	0.43.  The four new ones are [CGI::Portable::Errors, CGI::Portable::Files, 
+	CGI::Portable::Request, CGI::Portable::Response] and these handle most of 
+	the core functionality from the larger module before it.  The new 
+	CGI::Portable module is a subclass of the above four and adds the remaining 
+	functionality itself; you can still use CGI::Portable as you did before.  
+	The split of functionality is to emphasize that CGI::Portable is doing 
+	several tasks in parallel that are related but distinct, so you can now use 
+	each of them independently and not carry around the weight of others that 
+	you don't use.  Each module has the POD for all methods it implements.
+
+	* The module CGI::WPM::SimpleUserIO has been rewritten and renamed to 
+	CGI::Portable::AdapterCGI.  The new module has the same primary purpose but 
+	a simplified interface.  The two methods which took CGI::Portable objects as 
+	arguments have been renamed to fetch_user_input() and send_user_output().  
+	All of the other methods were removed except the send_quick_*() ones.  
+	Unlike before, it is fetch_user_input() that does the actual data gathering, 
+	whereas before it had to be done earlier with a separate method like new().  
+	Unlike before, AdapterCGI sends all "http *" properties, including cookies.  
+	You will need to make slight changes to any "config shell" code that used 
+	the old module in order to stay compatible.  All of the demo scripts and the 
+	Synopsis POD in the CGI::WPM::* modules have been updated for the new version.
+
+	* Added module CGI::Portable::AdapterSocket which is like AdapterCGI except 
+	that it talks to an IO::Socket::INET object instead of a CGI environment, so 
+	the means is now provided for you to skip web servers altogether if you just 
+	need a lightweight Perl-only server.  There is also a new demo script named 
+	startup_socket.pl which complements startup_cgi.pl in which they do the 
+	exact same thing (animals demo) but under different servers.  However, this 
+	Sockets demo is fairly lightweight and doesn't have things like threading 
+	that the big servers do, so you would want to improve on it if you are 
+	operating in a heavy-use environment.
+
+	* The "http cookies" property and associated methods that are now in 
+	CGI::Portable::Response have been greatly simplified so that they are easier 
+	to use and to eliminate external dependencies.  While the property is still 
+	an array, each element is now a scalar instead of a MultiValuedHash object.  
+	It is assumed that users would encode cookies ahead of time and just insert 
+	them as strings; that is, the Adapter modules will send them literally.  
+	These methods have been removed: get_http_cookie_refs(), get_http_cookie(), 
+	get_http_cookie_ref().  The method get_http_cookies_ref() has been added to 
+	replace the first one, and it returns a reference to the whole list.  These 
+	methods continue to work as they did before: get_http_cookies(), 
+	add_http_cookies(), delete_http_cookies().
+
+	* Added 8 new scalar properties to CGI::Portable::Request which hold extra 
+	miscellaneous HTTP request details: [request_method(), virtual_host(), 
+	server_port(), script_name(), referer(), user_agent(), remote_addr(), 
+	remote_host()].  AdapterCGI has been updated to feed them as well.  
+	Related to this change, [CGI::WPM::Usage, MailForm, GuestBook] have been 
+	updated to use these properties rather than looking in %ENV themselves, which 
+	wouldn't work if they were running in a non-CGI environment.
+
+	* Updated CGI::WPM::Usage to lowercase all search engine keywords, and to 
+	do case-insensitive matching when determining search engine domains.  The 
+	latter would be considered a bug fixed since other domain checks were c-i.
+
+	* Some demo modules now require version 2.01 of HTML::FormTemplate since that 
+	version has some bug fixes.
+
+2001-05-08   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.42.
+
+	* Added a demo called "image" to show that, yes, CGI::Portable can store 
+	and output any type of file, not just HTML, but pictures and other binary 
+	types too.  Contrary to some critics' statements, just because I don't use 
+	all the features that my modules provide in my own websites doesn't mean 
+	they aren't there.  This demo script will generate an html page with text 
+	and an image, both of which are generated by the same script.  This script 
+	requires the GD library to 	work so you'll need to have it installed to see 
+	the picture.
+
+	* Added explicit support for the "Window-Target" http header to 
+	CGI::Portable, CGI::WebUserIO, and CGI::WPM::Base, which is needed for 
+	multiple frame pages where each screen can determine for itself what frame 
+	or window it goes into (meaning no messy target attributes in hyperlinks).  
+	To implement this, a new property was added to CGI::Portable with the 
+	accessor method http_window_target().  CGI::WPM::Base handles an additional 
+	preference named "http_target" which lets you set the new property.  
+	All three of the above modules were raised to version 0.42 from 0.41.
+	Also, the "website" demo was updated to use this new ability by putting 
+	redirected links in a different window; that "website" change is also in 
+	the Synopsis POD for CGI::WPM::MultiPage, which is at version 0.4101.
+
+	* Added explicit support for building HTML frameset pages to CGI::Portable 
+	in the form of two new properties with the accessor methods like 
+	page_frameset_attributes*() and page_frameset*().  These respectively hold 
+	properties for the opening <FRAMESET> tag and the list of <FRAME> tags.  
+	Also, a new "frameset" demo was added to show how one could use a single 
+	script to implement a frameset and all member frames.  This demo has 4.
+
+	* To help implement the frameset feature, this distribution now requires 
+	version 1.05 of HTML::EasyTags, which had frameset support added to it.
+
+	* Fixed a bug in CGI::WPM::WebUserIO where redirection headers didn't work 
+	properly under mod_perl.  In fact, this led to a complete rewrite of the 
+	methods relating to sending output.  The methods make_http_headers() and 
+	send_user_output() were dropped entirely.  These methods were added instead: 
+	send_quick_html_response(), send_quick_redirect_response().  The method 
+	send_user_output_from_cgi_portable() still exists and does everything it did 
+	before.  It also outputs miscellaneous http headers now, but it still doesn't 
+	do anything with cookies yet.  In the future this will be addressed.
+	Since the last method is the only one I actually used in my demos 
+	or Synopsis, I figure that these changes are okay.  I also added the method 
+	server_is_mod_perl() which returns true if we're running under mod_perl.
+
+	* As a result of the above changes, HTTP::Headers is no longer used by any 
+	of my modules, so the requirements are now simplified.
+
+2001-05-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.41.
+
+	* This release is the first one following successful registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+CGI::
+::Portable        adpO Framework for server-agnostic web apps       DUNCAND
+
+	* This is the first release of CGI::Portable, which has been renamed from 
+	HTML::Application.  There are several changes to the module itself.
+	This release also includes all of my CGI::WPM::* modules, which have not been 
+	renamed, to serve as demonstrations of CGI::Portable in use.  Their code has 
+	been updated a bit.  Similarly, this distribution has been renamed to 
+	CGI-Portable from HTML-Application and duncand-prerelease.
+
+	* This distribution now has a "demos" folder containing 40 files and folders 
+	which are ready-to-use example scripts and data files that exercise 
+	CGI::Portable and all of the CGI::WPM::* modules.  Many of these are exactly 
+	the same as the *new* Synopsis POD for particular modules.  Some have minor 
+	adjustments or demonstrate the Synopsis examples that make use of the most 
+	features of the particular modules.  Many demos have extra files in them 
+	that never appeared in Synopsis.  It is my hope that these demos will 
+	make it an order of magnitude easier for you to adopt my modules and put 
+	them to work in a productive manner.  The provided demos include: a multi-page 
+	web site with usage tracking, guest books, mail and survey forms, static html 
+	and plain text pages, segmented text file display, redirection, and a few 
+	other strange modules that don't do anything useful but play with features.
+
+	* All of the CGI::WPM::* modules except CountFile had their POD updated, 
+	most notably with their Synopsis section.  The new Synopsis should each be 
+	complete working programs now, although some of the other data files they 
+	call on may not exist unless you make them.
+
+	* All modules in this distribution are at version 0.41 whether or not there 
+	was any functionality change.
+
+	* Updated these methods of CGI::Portable to permit more descriptive error 
+	messages: resolve_prefs_node_to_array(), resolve_prefs_node_to_hash().  
+	Previously these methods always reported a nonexistant file or directory 
+	(whatever is in $!) even if the file did exist but had a different problem.  
+	The new versions will distinguish a successful runtime that returns something 
+	other than a hash/array ref, and will distinguish an existing file that just 
+	doesn't compile or has a runtime error.
+
+	* Updated methods add_virtual_filename_error(), add_physical_filename_error() 
+	to support custom reason strings for file-related errors as an extra method 
+	argument.  Previously the "reason" was always the content of $!.
+
+	* Modified method call_component() so that it now makes error screens itself 
+	upon error conditions that it discovers, including failure of the component 
+	to compile or run, or previously unhandled errors, probably related to prefs.  
+	As a result, the calling structure of this method is simplified; you simply 
+	take_context_output() and/or send the output as you usually do, without 
+	needing extra code to report error conditions.  (You can still make a custom 
+	error screen if you want.)  The second argument to call_component() was also 
+	removed, and the method will now always make an error screen and return if 
+	there is an unresolved error message.  Likewise to the simplified calling 
+	code, the called component doesn't need code to make an error screen for 
+	problems occuring prior to its invocation, and is thereby simplified.
+
+	* Added method search_and_replace_url_path_tokens() to CGI::Portable that 
+	handles a special kind of search and replace that 
+	search_and_replace_page_body() can't handle, since it deals with processing 
+	and replacing text near the token being searched for rather than just the 
+	token itself.  This method makes it easier to embed dynamic self-referencing 
+	urls inside static screen content files used by your app.
+
+	* Added seven new methods to CGI::Portable which handle a special set of 
+	"global preferences", each of which gets its own accessor method, which can 
+	be set once and used all over your program.  They are: 
+	default_application_title(), default_maintainer_name(), 
+	default_maintainer_email_address(), default_maintainer_email_screen_url_path(), 
+	default_smtp_host(), default_smtp_timeout(), maintainer_email_html().  
+	The updated call_component() uses this information in its error screens, and 
+	the various CGI::WPM::* modules use it in many places as well.  During 
+	release 0.4, this global info was passed using the miscellaneous objects 
+	property, which was a rather user-unfriendly means in comparison; scripts 
+	written to use release 0.4 will have to be updated accordingly.
+
+	* CGI::Portable received several updates to its pod besides the appropriate 
+	method updates, most notably in the Name, Synopsis, Description, 
+	Similar Modules, A Different Overview.
+
+	* Added a couple methods to CGI::WPM::SimpleUserIO which will considerably 
+	reduce the size of your config shell if you use them: the method 
+	give_user_input_to_cgi_portable() will take a CGI::Portable object and feed 
+	it all the user input possible at once; the method 
+	send_user_output_from_cgi_portable() will likewise take a CGI::Portable 
+	object and send its output to the user all at once.
+
+	* CGI::WPM::Base has been reduced to half its size as all but these 3 methods 
+	were removed: main(), main_dispatch(), _get_amendment_message().  The code 
+	to check for pre-existing logged error conditions was also removed.
+
+	* Updated CGI::WPM::GuestBook in the following ways: 1. The private method 
+	get_question_field_defs() had a lot of redundant code removed, reducing the 
+	method to half its previous size; for one thing, it makes use of 
+	CGI::Portable's resolve_prefs_node_to_array() method now instead of doing a 
+	poorer job of it manually.  2. Added preference "sign_by_default" which 
+	allows you to choose whether the signing or reading mode is the default 
+	when one isn't specified.  3. Added self-referencing links in the signing 
+	mode that takes one to the reading mode; the reverse had already existed; so 
+	now the module has built-in links between all of its modes.  4. Added 
+	preference "msg_list_show_email" which if true will display the email 
+	addresses of book signers in the reading mode; the default of not showing 
+	the emails is what always happened before, even though they were stored in 
+	the message file.  5. Minor update to the screen showing a successful 
+	message was just posted where the recipient's email is now shown.  
+	6. Updated the functionality relating to the simplified Boulder data files 
+	(used to be called SequentialFile by me) where nonexistant files are only 
+	created if they are for storing messages; they are now not created when they 
+	were supposed to hold field definitions, since this is an error.
+
+	* Updated CGI::WPM::MailForm in the same ways as #s 1, 5, 6 of GuestBook; 
+	regarding #6, MailForm would only ever read from such files anyway.
+
+	* Updated CGI::WPM::Usage in the following ways: 1. Removed preference 
+	'use_def_engines'; it no longer applies because there is no longer any list 
+	of search engines built into the module.  To attempt such a thing here is an 
+	impossible task considering how many there are and people's varying opinions 
+	on what should be grouped there.  So now if you want search engine 
+	differentiation in referrer listings then you can provide a complete list 
+	yourself via the already existing 'search_engines' preference.
+	2. Removed preference 'site_urls' since it had existed to make a big deal of 
+	something that is better automated and not worried about anyway.  From now on, 
+	a referring url is said to be self-referencing if its base portion matches 
+	the return value of CGI::Portable's base_url() method.  While a few self urls 
+	will undoubtedly end up in the normal referrer list, the majority will be 
+	caught, and the ones slipping through are easy to identify in the list. 
+	3. As a result of these changes, CGI::WPM::Usage is now a tenth smaller.
+
+2001-04-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* duncand-prerelease 0.4, the last version of any distribution, prior to 
+	this one, to include the CGI::WPM::* modules, was released.
+
+2001-04-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.4.
+
+	* This is the second release of HTML::Application as a distinct module.  
+	It follows more extensive usability testing which resulted in a few added 
+	features and bug fixes.  As a result of the new testing, this module is being 
+	moved to beta status from alpha.
+
+	* Fixed SYNOPSIS POD in "Aardvark" module relating to the $inner context; some 
+	methods are now called following make_new_context() instead of before.
+
+	* Fixed bug in private method _make_an_url(), which is used by 
+	url_as_string() and recall_url(), where query parameters were not being 
+	replicated when url_path_is_in_path_info() was true; now they are.
+
+	* Fixed design flaw in make_new_context() where it had been calling 
+	initialize() to give default values to the new object before copying over the 
+	non default ones; now initialize() is not called and all object properties 
+	are either set or copied explicitely.  The flaw being fixed relates to 
+	unpleasantries when a subclass overrides the initialize() method.
+
+	* Added new method take_context_output() which is designed to complement 
+	make_new_context().  This new method copies output values from the new 
+	context back to the parent object.
+
+	* Added new utility method search_and_replace_page_body() which takes a hash 
+	of tokens (or regexps) to search for in the html page body and text to 
+	replace them with; this method implements search-and-replace functionality.
+
+	* This module has become 5K larger including documentation.
+
+2001-04-20   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 0.38.
+
+	* This release is the first one anticipating official registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+HTML::
+::Application     adpO Framework for complex portable web apps      DUNCAND
+
+	* This release contains the first appearance of my HTML::Application module.
+	Its code is derived from several related modules which had been constantly 
+	renamed, split, and combined since their first CPAN release in 2000-07-23.  
+	The most recent temporary names for these were "CGI::WPM::Globals", 
+	"CGI::WPM::PageMaker" and "CGI::WPM::WebUserIO".  They were previously 
+	released as parts of the following distributions:
+		- "libdwg": v1.0 r2000-07-23, v1.11 r2000-08-23
+		- "CGI-FormGenerator": v0.9 r2000-09-04, v0.9201 r2000-12-26
+		- "CGI-WebsiteGenerator": v0.3 r2000-09-04, v0.36 r2001-04-10
+		- "duncand-prerelease": v0.37 r2001-04-12
+
+	* This module requires Perl version 5.004.
+
+	* It also requires File::VirtualPath 1.0, HTML::EasyTags 1.04, 
+	Data::MultiValuedhash 1.07, and CGI::MultiValuedHash 1.07.  I consider the 
+	first three modules to be stable and well tested, as well as unlikely to 
+	change.  The fourth module is partially tested, but production use of the 
+	other functionality finds it to be working properly.
+
+	* This release comes with the CPAN standard files "Makefile.PL", "test.pl", 
+	and "MANIFEST", which were all created since the previous release.
+
+	* Note that "test.pl" is incomplete; it only tests that this module will 
+	compile but not that the methods work; it is included so that people can use 
+	the Makefile in the standard way during installation.  This file will be 
+	fleshed out when I have the chance.
+
+2001-04-12   Darren Duncan <perl@DarrenDuncan.net>
+
+	* duncand-prerelease 0.37, the last version of any distribution to include
+	CGI::WPM::Globals, was released.
+
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+	CGI::WPM::Globals and other CGI::WPM::* modules, was released on CPAN.
+
+2000-05-15   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on these modules, but POD mostly nonexistant.
+
+2000-03-07   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final versions of these modules.
+
+	* Module based on a template created by h2xs 1.18.
+
+1999-07 thru 1999-12
+
+	* Worked on second prototype of code that ended up in these modules.  The 
+	effects of this development, as far as this distribution's own modules go, 
+	were mostly confined to CGI::Portable.
+
+	* As a separate but parallel project, I also implemented a complete and
+generic Threaded Discussion Board object using some of my low level modules *and*
+CGI.pm.  This board is possibly still in use today in a corporate Intranet site.
+
+1999-02 thru 1999-05
+
+	* Created first prototypes of code that ended up in these modules and used 
+in a production environment for a year to generate my web sites. Many present-day
+features were present at that time, including static pages, segmented text pages,
+e-mail forms and guest books with unlimited questions (but were text only),
+redirection, and usage tracking.  The implementation was just a hell of a lot
+uglier.  These modules also used CGI.pm to do some things that have since become 
+implemented by my own more focused modules: HTML::FormTemplate, HTML::EasyTags, 
+Data::MultiValuedHash, CGI::MultiValuedHash, CGI::Portable, 
+CGI::Portable::Request, CGI::Portable::AdapterCGI.

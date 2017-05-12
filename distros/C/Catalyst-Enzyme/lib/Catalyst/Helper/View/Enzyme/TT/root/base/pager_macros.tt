@@ -1,0 +1,33 @@
+[% MACRO pager_previous BLOCK; %]
+        <span class="pager_previous">&lt;&lt;</span>
+[% END; %]
+
+
+
+[% MACRO pager_previous_link(previous_page) BLOCK; %]
+        <span class="pager_previous_link"><a href="[% c.this_request_except("page", previous_page) %]">&lt;&lt;</a></span>
+[% END; %]
+
+
+
+[% MACRO pager_next BLOCK; %]
+        <span class="pager_next">&gt;&gt;</span>
+[% END; %]
+
+
+
+[% MACRO pager_next_link(next_page) BLOCK; %]
+        <span class="pager_next_link"><a href="[% c.this_request_except("page", next_page) %]">&gt;&gt;</a></span>
+[% END; %]
+
+
+
+[% MACRO pager_current_page BLOCK; %]
+            <span class="pager_current_page">[% cur_page %]</span>
+[% END; %]
+
+
+
+[% MACRO pager_other_page_link(cur_page) BLOCK; %]
+            <span class="pager_other_page_link"><a href="[% c.this_request_except("page", cur_page) %]">[% cur_page %]</a></span>
+[% END; %]

@@ -1,0 +1,14 @@
+Revision history for Catalyst-Plugin-Session-Store-CHI-CHI
+
+0.002     6 Jan 14
+          Added POD.
+
+0.001_003 28 Dec 14
+          More work on Makefile.PL
+
+0.001_002 21 Dec 14
+          Added dependencies to Makefile.PL
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

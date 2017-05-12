@@ -1,0 +1,4 @@
+$var1 = 11;
+rewrite('rw1', 11);
+
+rewrite('rw4', 41);

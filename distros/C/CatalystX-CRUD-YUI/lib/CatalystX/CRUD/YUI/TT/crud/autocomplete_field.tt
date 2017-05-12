@@ -1,0 +1,52 @@
+[%# ajax autocompletion field.
+# 'input' object should have following keys/methods:
+#
+#   id
+#   label (optional)
+#   name (optional - defaults to id. used as param name for query.)
+#   url
+#   csize (optional - defaults to 30)
+#   value (optional)
+#
+# TODO catch user return key so as not to submit on selection
+%]
+[% thopen %]
+[% input.label.replace('(for=".+?")','$1 class="autocomplete"'); %]
+[% thclose %]
+[% tdopen %]
+<div id="autocomplete_wrapper_[% input.id %]" class="autocomplete_wrapper">
+ <input type="hidden" id="[% input.fname %]" name="[% input.fname %]" 
+        value="[% input.hidden_value || input.value %]" />
+ <input autocomplete="off" [% # do not let browser complete it for you %]
+       id="[% input.id %]" 
+       name="[% input.name || input.id %]" 
+       size="[% input.csize || '30' %]"
+       style="position:static;width:[% input.csize || '30' %]em;" [%# 'em' is not exactly right but neither is px %]
+       type="text" 
+       class="varchar text"
+       value="[% input.value %]"
+       tabindex="[% input.tabindex %]"
+       [% FOR k = input.keys.grep('^on\w+$') %]
+       [% k %]="[% input.item(k) %]"
+       [% END %]
+       />&nbsp;<span class="error" id="[% input.id %]_error"></span>
+ <div style="text-align:left;width:[% (input.csize || 30) + 1 %]em;"
+      class="auto_complete" id="[% input.id %]_auto_complete"></div>
+</div>
+
+<script type="text/javascript">
+ /* <![CDATA[ */
+ YAHOO.crud.autocomplete_text_field({
+        id: '[% input.id %]',
+        container_id: '[% input.id %]_auto_complete',
+        url: '[% input.url %]',
+        param: [% input.param.as_json %],
+        params: '[% input.params %]',
+        fname: '[% input.fname %]',
+        limit: [% input.limit %],
+        cache_size: [% input.cache_size %]
+        });
+/* ]]> */
+</script>
+[% PROCESS crud/related_field_link.tt %]
+[% tdclose %]

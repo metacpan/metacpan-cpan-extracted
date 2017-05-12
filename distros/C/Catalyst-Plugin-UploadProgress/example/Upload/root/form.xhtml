@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Catalyst Upload Progress Demo</title>
+	<!-- The lazy way... -->
+	[% c.upload_progress_javascript %]
+	<!-- or the right way...
+    <link href="/static/css/progress.css" media="screen" rel="Stylesheet" type="text/css" />
+    <script src="/static/js/progress.js" type="text/javascript"></script>
+	<script src="/static/js/progress.jmpl.js" type="text/javascript"></script>
+    -->
+</head>
+
+<body>
+
+<div id="form">
+    <form action=""
+          method="post"
+          enctype="multipart/form-data"
+          onsubmit="return startEmbeddedProgressBar(this)">
+    
+        <fieldset>
+            <legend>Select a file to upload...</legend>
+            <label for="upload_file">File:</label>
+                
+            <input type="file" name="file" /><br />
+            <br />
+            <input type="submit" />
+        </fieldset>
+    </form>
+</div>
+
+<div id="progress"></div>
+
+</body>
+</html>

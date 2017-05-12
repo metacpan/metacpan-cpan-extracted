@@ -1,0 +1,10 @@
+Revision history for Perl extension Cache::LRU::WithExpires
+
+0.03  Sun Nov 18 15:37:34 2012
+    - removed dist_abstract on Build.PL (no code changes)
+
+0.02  Sat Nov 17 21:04:28 2012
+    - re-packing
+
+0.01  Sat Nov 17 20:31:57 2012
+    - original version

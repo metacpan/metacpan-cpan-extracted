@@ -1,0 +1,47 @@
+NAME
+    Config::INI::Reader::Multiline - Parser for .ini files with continuation lines
+
+SYNOPSIS
+    If act.ini contains:
+
+        [general]
+        conferences = ye2003 fpw2004 \
+                      apw2005 fpw2005 hpw2005 ipw2005 npw2005 ye2005 \
+                      apw2006 fpw2006 ipw2006 npw2006
+        cookie_name = act
+        searchlimit = 20
+
+    And your program does:
+
+        my $config = Config::INI::Reader::Multiline->read_file('act.ini');
+
+    Then $config contains:
+
+        {
+            general => {
+                cookie_name => 'act',
+                conferences => 'ye2003 fpw2004 apw2005 fpw2005 hpw2005 ipw2005 npw2005 ye2005 apw2006 fpw2006 ipw2006 npw2006',
+                searchlimit => '20'
+            }
+        }
+
+DESCRIPTION
+    Config::INI::Reader::Multiline is a subclass of Config::INI::Reader that
+    offers support for line continuations, i.e. adding a "\<newline>"
+    (backslash-newline) at the end of a line to indicate the newline should be
+    removed from the input stream and ignored.
+
+    In this implementation, the backslash can be followed and preceded by
+    whitespace, which will be ignored too (just as whitespace is trimmed by
+    Config::INI::Reader.
+
+AUTHOR
+    Philippe Bruhat (BooK), <book@cpan.org>
+
+COPYRIGHT
+    Copyright 2014-2015 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

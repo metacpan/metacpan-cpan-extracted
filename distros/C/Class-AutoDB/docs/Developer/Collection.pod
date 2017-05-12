@@ -1,0 +1,52 @@
+=head1 NAME
+
+Class::AutoDB::Collection - Schema information for one collection
+
+=head1 SYNOPSIS
+
+This is a helper class for Class::AutoDB::Registry which represents the
+schema information for one collection.
+
+ use Class::AutoDB::Registration;
+ use Class::AutoDB::Collection;
+ my $registration=new Class::AutoDB::Registration
+   (-class=>'Person',
+    -collection=>'Person',
+    -keys=>qq(name string, dob integer, significant_other object, 
+              friends list(object)),
+    -transients=>[qw(age)],
+    -auto_gets=>[qw(significant_other)]);
+ 
+ my $collection=new Class::AutoDB::Collection
+   (-name=>'Person',-register=>$registration);
+ 
+ # Get the object's attributes
+ my $name=$collection->name; 
+ my $keys=$collection->keys;            # hash of key=>type pairs
+ my $tables=$collection->tables;        # Class::AutoDB::Table objects 
+                                        #   that implement this collection 
+ 
+ my @sql=$collection->schema;           # SQL statements to create collection
+ my @sql=$collection->schema('create'); # same as above
+ my @sql=$collection->schema('drop');   # SQL statements to drop collection
+ my @sql=$collection->schema('alter',$diff); 
+                                        # SQL statements to alter collection
+                                        #   ($diff is CollectionDiff object)
+
+=head1 DESCRIPTION
+
+This class represents processed registration information for one
+collection. Registrations are fed into the class via the 'register'
+method which combines the information to obtain a single hash of
+key=E<gt>type pairs. It makes sure that if the same key is registered
+multiple times, it has the same type each time. It further processes
+the information to determine the database tables needed to implement
+the collection, and the SQL statements needed to create, and drop those
+tables. It also has the ability to compare its current state to a
+Class::AutoDB::CollectionDiff object and generate the SQL statements
+needed to alter the current schema the new one.
+
+This class I<does not talk to the database>.
+ 
+=cut
+

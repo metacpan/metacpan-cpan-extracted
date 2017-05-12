@@ -1,0 +1,714 @@
+-*- org -*-
+:   ____ _                                 
+:  / ___| |__   __ _ _ __   __ _  ___  ___ 
+: | |   | '_ \ / _` | '_ \ / _` |/ _ \/ __|
+: | |___| | | | (_| | | | | (_| |  __/\__ \
+:  \____|_| |_|\__,_|_| |_|\__, |\___||___/
+:                          |___/           
+
+* Release 1.32 [2015-10-05 Mon] <jnbek@cpan.org>
+
+** Temporarily disable the upload feature
+
+** Fix documentation to change the contact infomation.
+
+* Release 1.31 [2015-10-05 Mon] <jnbek@cpan.org>
+
+** Fix regex warning in cpan2aur
+
+** Taken over maintainership from juster.
+
+* Release 1.30 [2015-03-17 Tue]
+
+** Change package homepage to use metacpan.org
+
+** Fix bug caused by CRLF newlines in files containing pkgdesc.
+
+* Release 1.29 [2014-06-15 Sun]
+
+** Force option to CPANPLUS will pass --force to pacman.
+
+If you specify --force to CPANPLUS this will add the --force
+flag to pacman, when installing the package file. Thanks for
+the idea Scott.
+
+** Update web link in README
+
+The package has not been on the AUR for many years. Thanks for 
+pointing that out Scott.
+
+** Fix bug caused by undefined dependency version.
+
+Text::LevenshteinXS forgot to specify a version for its own dep
+inside the META.yml file. This causes the META.yml to be parsed
+into a hash with an undefined value. Catastrophic failure ensues!
+
+Reported by Volker Schatz. Thanks!
+
+* Release 1.28 [2013-10-25 Fri]
+
+** Fix bug where packaging fails if checkdepends is empty.
+
+The built-in template engine for PKGBUILDs has been modified. If a
+template variable is used which has no assigned value, the empty
+string is used as a replacement. An undefined template variable
+used in an IF block also evaluates as false.
+
+* Release 1.27 [2013-09-06 Fri]
+
+** Fix broken tests.
+
+Whoops I totally forgot to run tests last release! Turns out some
+changes like function renaming and better error checking were
+causing massive test failure. Who knew?
+
+** get_pkgvars always returns makedepends and depends.
+
+This is to preserve backwards compatibility. I wouldn't want to cause
+errors in custom PKGBUILD templates. If makedepends and depends suddenly
+disappeared when empty, this would also require cpan2aur's PKGBUILD.tt
+files to be updated... manually!
+
+The new checkdepends and conflicts keys are only returned when they
+contain one or more entries. These are rare so this shouldn't be a
+problem.
+
+* Release 1.26 [2013-08-31 Sat]
+
+** get_pkgvars return value modified.
+
+The key named "depshash" was renamed to "pkglinks". This stands for the
+less specific concept of packages linked by dependencies or conflicts.
+I did this because "pkglinks" might now contain conflicts as well as
+dependencies.
+
+** Improved dependency generation through META-file dependencies.
+
+Package relationships specified in depends, makedepends, checkdepends, and
+conflicts arrays are now more completely distinguished. The conversion from
+metadata in the META file into lists of dependencies or conflicts has been
+rewritten.
+
+* Release 1.25 [2013-04-11 Thu]                                       :BUGFIX:
+
+** Bugfix to match pacman 4.1's new makepkg behavior.
+
+The output PKGBUILD was changed to match makepkg's new behavior. makepkg no
+longer allows one to use the srcdir, pkgdir, or startdir variables outside
+of functions. I was setting the _distdir variable with the value of srcdir so
+that cd-ing into it for every function was less spammy.
+
+* Release 1.24 [2012-12-11 Tue]
+
+** Update cpan2aur for AUR website changes again.
+
+The URIs for login and package submit were changed to /login/ and /submit/.
+
+* Release 1.23 [2012-06-27 Wed]
+
+** Update cpan2aur for AUR website changes.
+
+The AUR passes the session token as an extra POST parameter to prevent
+cross-site scripting. cpan2aur needed updating in order to be able to
+upload source packages to the AUR.
+
+* Release 1.22 [2012-06-04 Mon]                                       :BUGFIX:
+
+** Avoid using Cwd::abs_path on non-existant directory.
+
+* Release 1.21 [2012-05-31 Thu]
+
+** Developer versions nuked to hell.                                  :BUGFIX:
+
+Developer versions on CPAN have a trailing underscore and numeric
+portion (eg 1.2.3_4). These are a largely misunderstood nuisance
+which require special logic on the part of perl/CPAN to compare versions.
+A dev ver drops the trailing number if compared against a non-dev ver
+string. So 1.2.3_4 == 1.2.3 but 1.2.3_4 < 1.2.3_5.
+
+Previously I tried to preserve them but because pacman mercifully
+has no special logic to compare them with non-developer version
+strings I decided to just remove them entirely from pkgvers.
+
+Long story short... 1.2.3_4 is not equivalent to 1.2.3.4 so why
+even try to make it so.
+
+Reported by Florian Pritz (Bluewind)
+
+* Release 1.20 [2012-04-29 Sun]
+
+** Be more careful removing duplicate makedepends/depends.           :BUGFIX:
+
+The depends list starts off with packages containing the modules
+in the META.json's build.requires. The build.requires are merged
+into the makedepends and these are removed from the depends list.
+This was causing a problem with Params::Validate where
+perl-module-implementation was showing up only on the makedepends list.
+
+Now this should be fixed because the build.requires is a different
+version than the runtime.requires. We don't remove seemingly duplicate
+deps that have a differing version string.
+
+However, this is just a hackish fix.  A better fix would be to only use
+the META.yml if it is available or else use the pre-requisites CPP provides.
+
+Reported by Florian Pritz (Bluewind)
+
+** Use META.json if it is available.
+
+Now that META.json is more prevalent we can use it instead of META.yml
+when it is available.
+
+* Release 1.19 [2011-10-25 Tue]
+
+** Detect non-perl XS deps when using non-english locale.            :BUGFIX:
+
+We scrape pacman's output in order to find package owners of C
+libraries that we are linking to. Silly me, I only matched english
+output of pacman. We now force the locale to C when we run pacman
+behind the scenes.
+
+Reported by Franek at https://bbs.archlinux.org/viewtopic.php?id=128890
+
+* Release 1.18 [2011-08-21 Sun]
+
+** Trivial fix for $CPANPLUS::Dist::Arch::PACKAGER.
+
+If the PACKAGER environment variable is set then the package variable
+$CPANPLUS::Dist::Arch::PACKAGER will now be set to its value,
+overriding the /etc/makepkg.conf value.
+
+** cpan2aur: Update to match the latest AUR upgrades.
+
+Logins are now HTTPS only. I thought I updated this already but I
+guess that was WWW::AUR instead. Sessions now have lowercase letters
+instead of uppercase letters. This confused the session key
+loading mechanism.
+
+** Add sha512sums to PKGBUILD.
+
+SHA-512 digests are calculated for the "sources" tarball if the
+Digest::SHA module is installed.
+
+** Make all warnings fatal.
+
+Warnings will now stop the program.
+
+** Fix warning messages for undefined module versions.
+
+Warning messages would be printed when a sub-module of a distribution
+is depended on. Sub-modules are modules inside a distribution which
+don't match the name of the distribution. These are generally hidden
+in order to depend only on distributions and not modules. Example
+warning message (word-wrapped):
+
+Use of uninitialized value $depver in numeric eq (==) at
+/usr/share/perl5/vendor_perl/CPANPLUS/Dist/Arch.pm line 984.
+
+* Release 1.17 [2011-08-03 Wed]
+
+** If at first you don't succeed, try again harder.
+
+   Okay the last fix didn't really work. Really fix it this time
+   and add a test.
+
+* Release 1.16 [2011-08-03 Wed]
+
+** Remove any leading 'v' char in front of versions for perl.
+
+   Since we parse these on our own we must be diligent of the strange
+   perl habit of prefixing versions with "v".
+
+   Found when uploading Exporter-Declare to the AUR.
+
+* Release 1.15 [2011-07-06 Wed]
+
+** Depend on perl core modules again
+
+   After getting some coffee in me I realized that it's ok to depend
+   on core perl modules because we only depend on them if the
+   version we need is greater than the bundled version.
+
+* Release 1.14 [2011-07-06 Wed]
+
+** Core perl modules no longer depend-able
+
+   Because the perl package no longer has a provides list for all the
+   core perl modules we cannot depend on any packages for distributions
+   that perl comes with.
+
+** Match perl versions with 0's rounded off the end.                 :BUGFIX:
+
+   Like the version string 5.00503 for example. It should convert to
+   5.5.30. Reported by xbj9000 on the perl-cpanplus-dist-arch AUR page.
+
+** perl-cpanplus-dist-arch moved to [community]
+
+   Cool! I hope?
+
+* Release 1.13 [2011-06-26 Sun]
+
+** Use makepkg's --nocheck option to skip tests
+
+   Since pacman 3.4 PKGBUILDs can now have a check() function. Inside
+   this bash function, tests are run to make sure the build package is
+   functioning properly. Since most CPAN modules have tests, the test
+   command (make test or ./Build test) are now placed inside check().
+   Makepkg has a --nocheck option useful for skipping tests which
+   this module now uses instead of commenting out tests.
+
+** Accept dist dirs with "v" version strings                         :BUGFIX:
+
+   cpan2aur now anticipates extracted dist. dirs which have a v in
+   their version.
+
+** Use the new version::parse() instead of the obsolete version::qv()
+
+   Keeping up with the times.
+
+** Better makepkg error handling in cpan2aur :BUGFIX:
+
+   When makepkg failed before we didn't handle it properly.
+
+* Release 1.12 [2011-03-25 Fri]
+
+** Upgrades for pacman/makepkg 3.5
+
+*** SRCPKGDEST environment variable
+
+Makepkg uses the 'SRCPKGDEST' environment variable when building a
+source package. To override where the package will end up, simply
+set SRCPKGDEST. This also means we don't know where it will
+end up until create() is called and you specify whether you want
+a 'bin' or 'src' package in create()'s parameters.
+
+set_destdir() still allows you to override where a package will be
+stored after being built. This method doesn't discriminate between
+source or binary packages.
+
+get_destdir() is now alot stupider and will not try to guess where
+a package will end up. Instead it just returns what you have given
+to set_destdir() previously.
+
+*** check() PKGBUILD function
+
+makepkg allows you to specify a new step when building a package
+from a PKGBUILD. Automated tests (via make test or Build test)
+are now run inside the check() bash function in the PKGBUILD.
+
+** PKGBUILD Template Tweaks
+
+PKGBUILDs are now more conservative about exporting environment
+variable everywhere. Even though I never heard of any problems
+caused by this. Now a subshell wraps any exported env. vars.
+
+We also use the check() and package() functions in PKGBUILDs.
+These changes shouldn't change the user experience any but I
+thought I'd try them out. Overly anal-retentive users should
+appreciate it.
+
+** Dependences on Minor Module Versions :BUGFIX:
+
+If one distribution depends on a module that is not the main module,
+the versions of the dependency cannot be cross-referenced. This means
+there is no way to find which old version of the distribution contains
+the old module file. We cannot convert module deps to distribution
+deps in this case.
+
+What I have done is discard the version and simply depend on the
+package representing the CPAN distribution we need. This is not ideal
+but will work in most cases. The fact that ArchLinux is a rolling
+release also helps to support the idea that most users have very
+recent versions of perl modules installed.
+
+* Release 1.11 [2011-02-04 Fri]
+
+** New Changelog Format
+
+The changelog now uses org-mode. It is much nicer. I rewrote many
+of the latest entries for the last few versions and renamed
+ChangeLog to the perl-default Changes.
+
+** Template Changes
+
+*** No more || return 1
+
+Since around pacman 3.4, makepkg no longer requires you to use
+gratutious "|| return 1's". I suppose makepkg uses set -e now, so
+any errors should make makepkg bail out. Anyways these are now
+removed from the PKGBUILD template and generated PKGBUILDs.
+
+*** Emacs local variables
+
+Because I am tired of adding them in manually. You will see them
+at the end of the PKGBUILD. I forget what the vim equivalent is.
+
+** Perl Version Conversion :BUGFIX:
+
+When some modules depend on perl they use the decimal notation for
+the version string (i.e. 5.006001) whereas ArchLinux uses the
+dotted-decimal notation for versions (i.e. 5.6.1). Pacman was
+confused by the decimal notation so we now convert any explicit
+dependencies on perl into dotted-decimal format.
+
+Reported by: Xenoterracide
+
+* Release 1.10 [2010-12-10 Fri]
+
+** Cowardly Reverting
+
+Regress back to not adding dependencies to packages (distributions)
+that are included with the version of perl running us.
+
+* Release 1.09 [2010-12-02 Thu]
+
+** lib/CPANPLUS/Dist/Arch.pm
+
+*** dist_pkgname
+
+Fix bug with our own package dependencies. + signs are now allowed
+in package names (for Text-Tabs+Wraps aka perl-text-tabs+wraps).
+
+* Release 1.08 [2010-11-30 Tue]
+
+** lib/CPANPLUS/Dist/Arch.pm
+
+*** _extract_makedepends
+
+Extract ExtUtils:: modules into makedepends.
+
+*** _prepare_cfgdeps
+
+Extract 'configure_requires' modules from META.yml into makedepends.
+
+*** dist_pkgname
+
+Adds Cairo and Gtk2-GConf to the package name overrides.
+
+* Release 1.07 [2010-11-23 Tue]
+
+** lib/CPANPLUS/Dist/Arch.pm
+
+*** _translate_cpan_deps
+
+Return perl-test- packages as 'makedepends' unless we are
+ourselves a perl-test- package. This updates templates as well.
+(_translate_cpan_deps): We also no longer filter out perl core
+module requirements. The perl package now gives us a provides list
+of included core modules.  (set_pkgrel): Adds new mutator.
+
+*** _prepare_arch
+
+Search for XS files in the CPAN package dir and set the PKGBUILD
+arch field to 'i686' 'x86_64' if we find we are building an XS
+module. This changes the 'arch' field for templates. Do not
+enclose the 'arch' value in quotes! The value of the 'arch'
+template variable now comes enclosed in single-quotes.
+
+*** get_pkgbuild
+
+Fix bug where quoted bash special characters were padded with
+spaces. Remove exclaimation point (!) quoting for bash's sake,
+this wasn't necessary and looks funny.
+
+* Release 1.06 [2010-09-29 Wed]
+
+** Bad libxml name override                                          :BUGFIX:
+
+Remove erronous 'XML::LibXML' to 'libxml-perl' name mapping. There
+is a dist named libxml-perl so it doesn't need a mapping to
+it. Oops!
+
+*Reported by IsaacG*
+
+** Templates
+
+Change PKGBUILD template to use the absolute path to the system
+perl interpreter.
+
+** Yes - stop asking me
+
+Add --noconfirm flag to pacman arguments.
+
+** Update official name overrides
+
+Update name overrides to match changed ArchLinux perl package names
+in official repos.
+
+** t/05-custom_template.t                                            :BUGFIX:
+
+Fix bug where the packager was hard-coded in our test output.
+
+*Reported by IsaacG*
+
+* Old Entries
+
+2010-05-28  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.03)
+
+	* lib/CPANPLUS/Dist/Arch.pm (_find_built_pkg): Fix bug where
+	source packages were not being found after being built.
+	(dist_pkgname): Changed naming rules again.  ALWAYS prefix a
+	package name with perl- unless it is "perl".
+
+	Added an override for Perl-Tidy and Perl-Critic so they will still
+	convert to 'perl-tidy' and 'perl-critic'.  We may need more
+	overrides to match Archlinux packages...
+
+	Fixes a bug with Perl::Version and version both translating to
+	perl-version.  Reported by Xenoterracide
+
+2010-05-20  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.02)
+
+	* lib/CPANPLUS/Dist/Arch.pm (set_tt_module): Add new method.  This
+	can also be a class method.
+
+2010-05-18  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.01)
+
+	* lib/CPANPLUS/Dist/Arch.pm (_process_template): [Bugfix] When
+	using internal template engine the [%-'s and -%]'s would not be
+	recognized.  When I added the -'s I forgot to change the code.
+	Reported by IsaacG
+
+2010-05-11  Justin Davis  <juster@cpan.org>
+
+	* RELEASE (1.00): Uploaded to CPAN.
+
+	* lib/CPANPLUS/Dist/Arch.pm (dist_pkgname): Changed the mapping of
+	CPAN dist names to package names:
+	  - Prefix the package name with 'perl-' even if it ends with '-perl'.
+	  - The only time to not prefix the package with 'perl-' is if it
+	    already starts with 'perl-'.
+	  - Special case: the 'perl' dist name maps to the 'perl' package.
+
+2010-05-10  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm: The PKGBUILD template has been
+	changed.  We now more eloquently override environment
+	variables (i.e. PERL_MM_OPT, PERL_MB_OPT) in order to assure
+	their values don't affect our package building.
+
+2010-04-28  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm: Add POST_CHOMP (-%]) tags to PKGBUILD
+	template to remove extra whitespace.
+
+2010-04-17  Justin Davis  <juster@cpan.org>
+
+	* script/cpan2aur (update_if_old): Fix bug where we were comparing
+	the module version and not the module's package version.
+
+	* lib/CPANPLUS/Dist/Arch.pm: Fix bug where installing packages
+	from the AUR runs Module::AutoInstall inside the PKGBUILD.
+	Module::AutoInstall installed packages while running _inside_ the
+	PKGBUILD.  Maybe all AUR packages created by cpan2aur who used
+	Module::Install were broken!  Reported by Xenoterracide
+
+2010-04-13  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): Fix bug where I assumed
+	makepkg creates a .pkg.tar.gz.  Nowadays makepkg creates
+	.pkg.tar.xz files (but it may still create .pkg.tar.gz if the user
+	tells it to in /etc/makepkg.conf... right?)
+
+2010-04-11  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (get_pkgbuild): Fix bug where
+	exclaimation marks (!) in pkgdesc are displayed with the leading
+	quoting backslash (\).  Turns out quoting exclaimation marks with
+	backslashes doesn't work in bash.  We use "..."'!'"..." instead!
+
+2010-04-08  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (get_tt_module): Added new method.
+
+2010-03-22  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (_metayml_pkgdesc): Fix bug where the
+	abstract description inside the META.yml was left to its default
+	entry by a lazy module author.  This caused the pkgdesc to be:
+	Module abstract (<= 44 characters) goes here
+	Reported by Xenoterracide
+
+2010-03-03  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (_prepare_pkgdesc): Fix bug where
+	pkgdesc is blank when the .pm/.pod file is in a non-standard
+	location.  We now search more places for the files.
+	Reported by Xenoterracide
+
+2010-02-21  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (_shell_expand): Created helper
+	function for reading PKGDEST from /etc/makepkg.conf entries.
+	Fixed bug when PKGDEST in makepkg.conf contains environment
+	variables or tildes that need shell expansion.
+	Reported by Isaac Good
+	(_prepare_pkgdesc): Fix bug where META.yml contains double-quoted
+	text (not-single quotes) in the pkgdesc.  These double quotes
+	would not be removed and show up in the pkgdesc.
+
+2010-02-18  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (get_pkgname): Added method.
+	(get_pkgver): Added method.
+	(get_pkgrel): Added method.
+	(set_pkgrel): Added method.
+	(get_pkgvars): Added 'pkgrel' as a new template variable.
+
+2010-02-17  Justin Davis  <juster@cpan.org>
+
+	* script/cpan2aur (confirm_overwrite): Fixed bug where the
+	overwrite confirmation prompt answered yes no matter what.
+	Reported by Xenoterracide.
+
+2010-02-14  Justin Davis  <juster@cpan.org>
+
+	* 0.17 (RELEASE)
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): Added the 'quiet' and
+	'verbose' dist options.
+	(create): Fixed bug where we chdir to create a package and do not
+	chdir back.  Messed up calling programs cwd.
+
+2010-02-03  Justin Davis  <juster@cpan.org>
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): We are now verbose by
+	default so people don't think we are hanging.
+
+	* script/cpan2aur:  Heavily updated cpan2aur.  We can now create
+	templates for AUR packages that need customization.  Then you only
+	need to generate a package from the template.  We can also upload
+	to the AUR easily from the command line.
+
+2010-01-26  Justin Davis  <jrcd83@gmail.com>
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): Dependencies of modules are
+	now installed as implicit packages.
+	(_prepare_pkgdesc): Fixed bug where descriptions were "~".
+
+2010-01-08  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.16 (RELEASE)
+
+	* script/cpan2aur: Now we can also create a source package
+	directory for tweaking the PKGBUILD and then running makepkg.
+
+	* lib/CPANPLUS/Dist/Arch.pm (_translate_xs_deps): Fixed bug
+	with detecting XS deps for Module::Build distributions.
+	It never seemed to work right anyways, and would sometimes
+	cause a fatal error.
+	Reported by Xenoterracide
+
+2010-01-07  Justin Davis  <jrcd83@gmail.com>
+
+	* lib/CPANPLUS/Dist/Arch.pm (dist_pkgver): Fixed bug where
+	underscores in developer releases were not preserved as they
+	were supposed to be.
+	Reported by Xenoterracide
+
+2010-01-02  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.15 (RELEASE)
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): Fixed bug where I broke
+	skiptest handling when creating the PKGBUILD.
+	(create_pkgbuild): Added optional argument for skipping tests in
+	PKGBUILD.
+	(get_pkgbuild): Same as create_pkgbuild.
+
+2009-12-12  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.14 (RELEASE)
+
+	* lib/CPANPLUS/Dist/Arch.pm (get_cpandistdir): Fixed bug caused by
+	distributions having letters in their filenames.  The extracted
+	directory did not have the trailing letter.  Now we use the
+	distribution directory name previously stored by CPANPLUS.
+
+	* lib/CPANPLUS/Dist/Arch.pm (dist_pkgver): Fixed bug with letters
+	in package versions.  Letters are removed because makepkg cannot
+	compare versions with letters properly.  Underscores are now only
+	allowed at the end of the version; for developer releases.
+
+2009-12-02  Justin Davis  <jrcd83@gmail.com>
+
+	* 0.13 (RELEASE)
+
+	* lib/CPANPLUS/Dist/Arch.pm (create): Fixed a bug caused when
+	PKGDEST environment variable was used.  Fixed a bug when yaourt is
+	trying to run ./Build in a /tmp mounted with the noexec option.
+	Thanks to "xenoterracide" for pointing this out on the AUR; which
+	led me to the even worse PKGDEST bug.
+
+	* lib/CPANPLUS/Dist/Arch.pm (get_pkgpath): Added new method.
+
+	* t/02-build.t: Checks for online connectivity and deletes
+	the test package after it is created.
+
+	* ChangeLog: Switched to the emacs style changelog since...
+	I use emacs.
+
+Revision history for CPANPLUS-Dist-Arch
+
+0.12    October 29, 2009
+        Fixed bugs when searching for XS packages.
+        Fixed a regexp bug when escaping bash characters in pkgdesc.
+        Changed the automatic perl dependency to not have a version.
+
+0.11    June 9, 2009
+        I added List::MoreUtils in the last release, thought it was a
+        core module, and forgot to add it to the Build.PL.  So I just
+        removed use of "uniq" now.
+
+0.10    May 28, 2009
+        Fixed trivial bug with Maintainer in PKGBUILD having a newline.
+
+0.09    May 27, 2009
+        Added many package name overrides from the Arch website.
+        Removed use of Readonly, now we only need core modules.
+        Now searches for non-perl dependencies as well! (ie for XS modules)
+        Tweaked PKGBUILD again.
+
+0.08    May 11, 2009
+        Added a public method interface to the CPANPLUS::Dist::Arch class.
+        Added example script "cpanpkgbuild.pl" and binary script "cpan2aur".
+        Changed PKGBUILD template slightly as suggested by smb.
+
+        (I accidentally used the Makefile.PL for this version instead
+         of Build.PL!  So META.yml got screwed up.  I also forgot to
+         update this file.)
+
+0.07    April 12, 2009
+        Fixed the typo bug in last version.  Added a build test so I'll catch this faster.
+        Now searches the main module's .pm and .pod files for the pkgdesc as well,
+        using Pod::Select.
+        Now running as root will work, also useful for nested fakeroot environments...
+
+0.06    April 05, 2009
+        Added the setupdistarch script to easily enable/disable CPANPLUS packaging.
+        I broke this version with a typo!  Luckily no one suspects anything.
+
+0.05    March 23, 2009
+        Inserted missing /CPAN/ text for the PKGBUILD's srcurl variable,
+        Added tests for _translate_name & _translate_version.
+
+0.04    March 22, 2009
+        Fixed CPAN version numbers which don't conform to Archlinux standards.
+        Stopped using the version module for prefixing everything with v, why!!
+        Fixed typos, some inefficient code, etc...
+
+0.03    March 21, 2009
+        Included missing file Arch.pod in MANIFEST.
+        Fixed some typos in README and Arch.pod.
+
+0.02    March 21, 2009
+        Fixed some bugs, separated docs to pod file.
+
+0.01    March 20, 2009
+        First version, uploaded to CPAN.

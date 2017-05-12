@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  5978:
+    - 98
+name: ddcbbf
+registers:
+  AF: 25137
+  AF_: 0
+  BC: 800
+  BC_: 0
+  DE: 4939
+  DE_: 0
+  HL: 30659
+  HL_: 0
+  I: 0
+  IX: 5940
+  IY: 48173
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,18 @@
+[% INCLUDE template/header.tt -%]
+<h1>TinyURL [% c.loc('New') %]</h1>
+
+[% IF c.stash.create.error -%]
+<p><font color="red">[% c.stash.create.error %]</font></p>
+[% END -%]
+<form name="tinyurl" method="post" action="/tinyurl/create">
+<table>
+  <tr>
+    <td>URL</td><td><input type="text" name="long_url" size="25" value="[% c.req.param('long_url') %]"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><input type="submit" name="btn_create" value="[% c.loc('Add') %]"></td>
+  </tr>
+</table>
+</form>
+[% INCLUDE template/footer.tt -%]
+

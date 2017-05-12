@@ -1,0 +1,35 @@
+<&|/_elements/wrapper, title => _('People involved with %1',$project->name)&>
+
+<% Jifty->web->form->start%>
+% my $committers = $project->people;
+<ul>
+% while (my $committer = $committers->next) {
+% my $member = CommitBit::Model::ProjectMember->new();
+% $member->load_by_cols (project => $project, person => $committer);
+% my $del = Jifty->web->new_action(class => 'DeleteProjectMember', record => $member, moniker => 'delete-member-'.$member->id);
+<li><%$committer->name_and_email%>  (<%$member->access_level%>)
+<%$del->form_field('id')%>
+    <% $del->button( label    => 'Delete',
+                               class    => 'delete',
+                               onclick  => qq|return confirm('Really revoke this person's project access?');| ) %>
+                               
+                               </li>
+% }
+</ul>
+<h2><%_('Add a new committer')%></h2>
+<% $new_committer->form_field('person')%>
+<% $new_committer->form_field('access_level')%>
+<% $new_committer->form_field('project', render_as => 'Hidden')%>
+
+<% Jifty->web->form->submit(submit => $new_committer, label => 'Invite em!')%>
+<% Jifty->web->form->end%>
+</&>
+<%init>
+my $new_committer = Jifty->web->new_action(
+    class     => 'CreateProjectMember',
+    arguments => { project => $project->id }
+);
+</%init>
+<%args>
+$project
+</%args>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Protected.
+
+0.01  Sat Jan 11 18:59:23 2003
+	- original version; created by h2xs 1.21 with options
+		-A -X -a -n Class::Protected
+

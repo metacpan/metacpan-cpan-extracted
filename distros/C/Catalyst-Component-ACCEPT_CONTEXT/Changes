@@ -1,0 +1,19 @@
+Revision history for Catalyst-Component-ACCEPT_CONTEXT
+
+0.07    11 June 2009
+        Fix tests with Catalyst 5.80005
+
+0.06    24 April 2009
+        Switch from NEXT to MRO::Compat
+
+0.05    18 Jan 2008
+        Don't inherit from Catalyst::Component; this breaks NEXT (!)
+
+0.04	15 Sep 2007
+	Be less invasive; return the same $self each time.
+
+0.03    13 Jul 2007
+        Weaken context.
+
+0.01    18 Feb 2007
+        First version, released on an unsuspecting world.

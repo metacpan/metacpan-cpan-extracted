@@ -1,0 +1,23 @@
+<html>
+ <head>
+  <title>Hello, world.</title>
+  <script type="text/javascript" src="/json-rpc"></script>
+  <script type="text/javascript" src="/json-rpc/Hello"></script>
+  <script type="text/javascript" src="/json-rpc/LWP::UserAgent"></script>
+  <script type="text/javascript">
+    LWPer = new LWP.UserAgent;
+    LWPer.ID = 5;
+  
+    Talker = new Hello;
+    Talker.ID = 1;
+  </script>
+ </head>
+ <body>
+  <h1>Hello, world.</h1>
+  <input type="button" onClick="Talker.who_am_i()" value="Who am I?" />
+  <input type="button" onClick="LWPer.get_page(document.getElementById('loadurl').value)" value="Load URL" />
+  <input type="text" name="loadurl" id="loadurl" value="" />
+  <br/>
+  <iframe id="well" width="640" height="480"></iframe>
+ </body>
+</html>

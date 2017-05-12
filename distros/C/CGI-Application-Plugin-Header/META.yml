@@ -1,0 +1,37 @@
+---
+abstract: 'Plugin for handling header props.'
+author:
+  - 'Ryo Anazawa (anazawa@cpan.org)'
+build_requires:
+  CGI::Application: 0
+  CGI::Application::Plugin::Redirect: 1.00
+  CGI::Application::Plugin::Session: 1.04
+  CGI::Application::Plugin::Stream: 2.10
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CGI::Application::Plugin::Header
+name: CGI-Application-Plugin-Header
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  CGI::Header: 0.63
+  Exporter: 0
+  parent: 0
+  perl: 5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/anazawa/p5-CGI-Application-Plugin-Header
+version: 0.63008

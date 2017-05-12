@@ -1,0 +1,13 @@
+By default when you write an AUTOLOAD, the functions that are available
+from it are not visible to UNIVERSAL::can.  Worse yet, if you try to use
+AUTOLOAD in a subclass, you hide the AUTOLOAD in a superclass (or in
+classes farther down the tree in multiple inheritance) so AUTOLOAD and
+inheritance do not play well together.  See
+http://www.perlmonks.org/?node_id=342804 for a full explanation of the
+problems.
+
+This module attempts to solve that.  Import this module somewhere in the
+class hierarchy that you wish to have your AUTOLOAD, and write a CAN
+which takes arguments and returns a function that will do that.  This
+module will then provide an AUTOLOAD and UNIVERSAL::can that cooperate
+and work properly.

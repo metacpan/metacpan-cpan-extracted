@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  25887:
+    - 18
+name: ddcb26
+registers:
+  AF: 8197
+  AF_: 0
+  BC: 65335
+  BC_: 0
+  DE: 58399
+  DE_: 0
+  HL: 28903
+  HL_: 0
+  I: 0
+  IX: 25896
+  IY: 41173
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,22 @@
+Requirements
+------------
+
+Use cpan shell (perl -MCPAN -e shell) to install:
+ o Math::Pari 
+ o Crypt::Random
+
+Build Instructions
+------------------
+
+perl Makefile.PL
+make
+make test
+make install
+
+Documentation
+-------------
+
+perldoc lib/Crypt/Primes.pm
+perldoc Crypt::Primes
+man largeprimes
+

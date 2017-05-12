@@ -1,0 +1,47 @@
+Crypt::Random::Seed version 0.03
+========================
+
+Crypt::Random::Seed provides a simple interface to get the strongest source
+of randomness on the current platform, typically for use in seeding a CSPRNG
+such as Math::Random::ISAAC.  It can also be restricted to non-blocking
+sources, and has a very simple plug-in method.
+
+The following sources are tried, in order:
+  Win32 Crypto API
+  EGD
+  /dev/random
+  Crypt::Random::TESHA2
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Win32::API on Windows.
+
+Crypt::Random::TESHA2, only used if /dev/random or Win32 API doesn't work.
+
+
+SEE ALSO
+
+Crypt::URandom provides similar functionality for non-blocking sources.
+
+For more complex setups, Crypt::Random::Source has multiple plugins.
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Dana Jacobsen <dana@acm.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.

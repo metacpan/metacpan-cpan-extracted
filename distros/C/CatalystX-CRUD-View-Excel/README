@@ -1,0 +1,38 @@
+CatalystX-CRUD-View-Excel
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc CatalystX::CRUD::View::Excel
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/CatalystX-CRUD-View-Excel
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CatalystX-CRUD-View-Excel
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/CatalystX-CRUD-View-Excel
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/CatalystX-CRUD-View-Excel
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Regents of the University of Minnesota
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

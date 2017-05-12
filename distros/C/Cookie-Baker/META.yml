@@ -1,0 +1,43 @@
+---
+abstract: 'Cookie string generator / parser'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Time: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cookie-Baker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cookie::Baker:
+    file: lib/Cookie/Baker.pm
+    version: '0.07'
+requires:
+  Exporter: '0'
+  URI::Escape: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kazeburo/Cookie-Baker/issues
+  homepage: https://github.com/kazeburo/Cookie-Baker
+  repository: git://github.com/kazeburo/Cookie-Baker.git
+version: '0.07'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

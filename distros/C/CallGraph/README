@@ -1,0 +1,28 @@
+CallGraph version 0.55
+======================
+
+This module creates a "call graph" for a program. Please note that you need
+another module to actually parse your program and add the calls by using
+the CallGraph methods. The current distribution includes a module for parsing
+Fortran 77, CallGraph::Lang::Fortran.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None, except Test::Simple and Test::Pod for testing.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Ivan Tubert <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

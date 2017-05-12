@@ -1,0 +1,76 @@
+{
+   "abstract" : "Inject modules into a CPAN::Mini mirror.",
+   "author" : [
+      "Shawn Sorichetti <ssoriche@coloredblocks.net>",
+      "Andy Armstrong <andy@hexten.net>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Randy Stauner <rwstauner@cpan.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Salve J. Nilsen <sjn@cpan.org>",
+      "Wolfgang Pecho <pecho@belwue.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Mini-Inject",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Checksums" : "0",
+            "CPAN::Mini" : "0.32",
+            "Carp" : "0",
+            "Compress::Zlib" : "0",
+            "Dist::Metadata" : "0.921",
+            "Env" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "2.07",
+            "File::Slurp" : "0",
+            "File::Spec" : "2.07",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Server::Simple" : "0.07",
+            "IO::Zlib" : "0",
+            "LWP::Simple" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Mini::Inject" : {
+         "file" : "lib/CPAN/Mini/Inject.pm",
+         "version" : "0.33"
+      },
+      "CPAN::Mini::Inject::Config" : {
+         "file" : "lib/CPAN/Mini/Inject/Config.pm",
+         "version" : "0.33"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Mini-Inject"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/AndyA/CPAN--Mini--Inject.git"
+      }
+   },
+   "version" : "0.33"
+}

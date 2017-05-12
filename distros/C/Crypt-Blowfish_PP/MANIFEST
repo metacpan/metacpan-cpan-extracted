@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+Blowfish_PP.pm
+README
+CHANGELOG
+t/blowfish.t

@@ -1,0 +1,48 @@
+CIAO-Lib-StackIO version 0.01
+================================
+
+NAME
+   CIAO::Lib::StackIO - Perl wrapper for the CIAO stackio library
+
+
+DESCRIPTION
+
+   CIAO::Lib::StackIO is an interface to the stackio (libstk)
+   library shipped with the Chandra Interactive Analysis of
+   Observations (CIAO) software package.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If built in the CIAO environment, the module will be linked against
+the library in the CIAO distribution.  If not, it will use a version
+of the library packaged with this module.
+
+
+DEPENDENCIES
+
+This module has been tested against the stklib library shipped with
+CIAO V3.2.1.  The included stklib source is from that release.
+
+CIAO may be downloaded from http://asc.harvard.edu/ciao.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by The Smithsonian Astrophysical Observatory.
+
+The Perl interface to the stklib library is released under the GNU
+General Public License.  You may find a copy at
+L<http://www.fsf.org/copyleft/gpl.html>.
+
+The source to the included stklib library is released under a separate
+license, a copy of which may be found in the stklib subdirectory.
+
+

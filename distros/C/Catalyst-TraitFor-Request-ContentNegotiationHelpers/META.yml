@@ -1,0 +1,27 @@
+---
+abstract: 'methods for your request object to assist in content negotiation'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst::Test: '0'
+  HTTP::Request::Common: '0'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-TraitFor-Request-ContentNegotiationHelpers
+requires:
+  HTTP::Headers::ActionPack: '0.09'
+  Moose: '2.1403'
+  Plack::MIME: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-TraitFor-Request-ContentNegotiationHelpers/issues
+  homepage: https://github.com/jjn1056/Catalyst-TraitFor-Request-ContentNegotiationHelpers
+  repository: https://github.com/jjn1056/Catalyst-TraitFor-Request-ContentNegotiationHelpers.git
+version: '0.006'

@@ -1,0 +1,27 @@
+Class/Wrapper version 0.20
+==========================
+
+The Class::Wrapper module is a base module for decorators. Decorators are used to dynamically
+attach and detach responsibilities to an object. This is useful in a variety of situations
+when inheritance can't be used, or when inheritance would create too heavy objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires perl 5.8 or later. There are no other dependencies.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Henrik Mårtensson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

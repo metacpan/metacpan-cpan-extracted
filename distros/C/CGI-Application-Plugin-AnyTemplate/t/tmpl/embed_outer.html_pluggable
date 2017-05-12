@@ -1,0 +1,5 @@
+--begin--
+outer_var1:<!-- TMPL_VAR NAME=outer_var1 -->
+<!-- TMPL_VAR NAME="cgiapp.embed('embed_inner1')" -->outer_var2:<!-- TMPL_VAR NAME=outer_var2 -->
+outer_var3:<!-- TMPL_VAR NAME=outer_var3 -->
+--end--

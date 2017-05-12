@@ -1,0 +1,11 @@
+images/cat_loading.gif
+lib/Catalyst/Helper/Graphics.pm
+lib/Catalyst/Helper/Graphics/Files.pm
+Makefile.PL
+Changes
+MANIFEST			This list of files
+script/pack_images.pl
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+Changes
+lib/CGI/Alternatives.pm
+Makefile.PL
+MANIFEST
+README.md
+t/001_compiles_pod.t
+examples/cgi.pl
+examples/cgi_tt.pl
+examples/dancer2.pl
+examples/example_form/lib/example_form/Controller/Root.pm
+examples/example_form/lib/example_form/View/HTML.pm
+examples/example_form/lib/example_form.pm
+examples/example_form/root/example_form.html.tt
+examples/example_form/script/example_form_server.pl
+examples/mojolicious.pl
+examples/mojolicious_lite.pl
+examples/mojolicious_lite_plugin_cgi.pl
+examples/plack_psgi.pl
+examples/templates/example_form.html.tt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,118 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Calendar Widget
+
+# Set some global variables.
+my %birthdays = ();
+my %appointments = ();
+my %anniversay = ();
+
+# Initialize Cdk.
+use Cdk;
+Cdk::init();
+
+# Create the calendar object.
+my $calendar = new Cdk::Calendar ('Dattrib' => "</32/B>",
+					'Mattrib' => "</5/B>",
+					'Yattrib' => "</24/B>",
+					'Highlight' => "</R>");
+
+# Create the scrolling window.
+my $swindow = new Cdk::Swindow ('Title' => "<C></B/5>Date Information",
+					'Lines' => 300,
+					'Height' => 4,
+					'Width' => 50,
+					'Ypos' => "BOTTOM");
+
+# Set the key binding for the calendar widget.
+$calendar->bind ('Key' => "m", 'Function' => sub { setMarkerCB ($calendar);});
+
+# Set the post-process function for the calendar widget.
+$calendar->postProcess ('Function' => sub { checkDatePP ($calendar);});
+
+# Draw the scrolling window.
+$swindow->draw();
+
+# Let the user play.
+for (;;)
+{
+   # Activate the object.
+   my $ret = $calendar->activate();
+}
+
+# Exit Cdk.
+Cdk::end();
+
+#
+# This checks if the current date has a marker set on it.
+#
+sub checkDatePP
+{
+   my $calendar = shift;
+}
+
+#
+# This allows the user to create a marker.
+#
+sub setMarkerCB 
+{
+   my $calendar = shift;
+   my @mesg = ("<C></B/5>What type of a marker is it?");
+   my @buttons = ("</B/3>Birthday", "</B/5>Anniversary", "</B/30>Appointment");
+
+   # Get the current date the marker is at.
+   my ($day, $month, $year) = $calendar->getDate();
+
+   # Ask the user what type of marker to add.
+   my $dialog = new Cdk::Dialog ('Message' => \@mesg, 'Buttons' => \@buttons);
+   my $choice = $dialog->activate();
+   undef $dialog;
+
+   # If they hit escape, tell them...
+   if (!defined $choice)
+   {
+      popupLabel (["Escape Hit. No marker set."]);
+      $calendar->draw();
+      return;
+   }
+
+   # Check the choice.
+   if ($choice == 0)
+   {
+      addBirthdayMarker ($day, $month, $year);
+   }
+   elsif ($choice == 1)
+   {
+      addAnniversaryMarker ($day, $month, $year);
+   }
+   elsif ($choice == 2)
+   {
+      addAppointmentMarker ($day, $month, $year);
+   }
+}
+
+#
+#
+#
+sub addBirthdayMarker
+{
+   my ($day, $month, $year) = @_;
+}
+
+#
+#
+#
+sub addAnniversaryMarker
+{
+   my ($day, $month, $year) = @_;
+}
+
+#
+#
+#
+sub addAppointmentMarker
+{
+   my ($day, $month, $year) = @_;
+}

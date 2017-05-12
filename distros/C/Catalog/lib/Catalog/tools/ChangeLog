@@ -1,0 +1,78 @@
+1999-05-19  Loic DACHARY  <loic@home.ceic.com>
+
+	* sqledit.pm (stemplate_build): change to script_name
+
+1999-05-15  Loic Dachary  <loic@ceic.com>
+
+	* sqledit.pm (selector): local($SIG{__DIE__}); (Thanks Tim Bunce) to reduce stack redundancy.
+
+1999-04-14  Loic Dachary  <loic@ceic.com>
+
+	* sqledit.pm (special_auth_initialize): added special_auth for CFCE
+
+1999-04-13  Loic Dachary  <loic@ceic.com>
+
+	* sqledit.pm (selector): fix eval and error handling weirdness.
+
+1999-04-08  Loic Dachary  <loic@ceic.com>
+
+	* sqledit.pm (selector): added gauge() function
+
+	* cgi.pm (myunescapeHTML): change wrong &acute; to &#39;
+
+1999-04-07  Loic Dachary  <loic@ceic.com>
+
+	* mysql.pm (table_schema): add table_schema function
+
+1999-03-25  Loic Dachary  <loic@ceic.com>
+
+	* cgi.pm (myunescapeHTML): fix unescape & escape for &acute;
+
+1999-03-08  root  <root@transparens-1.clients.easynet.fr>
+
+	* sqledit.pm (selector): detect PATH_INFO and build pathcontext
+
+1999-02-23  Loic Dachary  <loic@loic.ceic.com>
+
+	* sqledit.pm (fct_return): add explicit error if recursive cgi-bin called
+	twice (back and click again).
+
+1999-02-18  Loic Dachary  <loic@loic.ceic.com>
+
+	* cgi.pm (fct_call): bomb if recursive cgi call > 1
+
+	* sqledit.pm (selector): add context_allow for sqledit.conf
+
+1999-02-15  Loic Dachary  <loic@loic.ceic.com>
+
+	* mysql.pm (update): fix warning
+
+1999-02-11  Loic Dachary  <loic@loic.ceic.com>
+
+	* tools.pm (template_parse): get rid of all $&, they are known to
+	trash ALL regular expressions (see Devel::SawAmpersand).
+
+	* cgi.pm (fct_call): workaround for fileno() memory leak
+
+	* sqledit.pm (selector): fix eval security hole (context argument)
+
+1999-02-09  Loic Dachary  <loic@loic.ceic.com>
+
+	* sqledit.pm: remove spurious warn()
+
+	* sqledit.pm (selector): dump does not depend on DOCUMENT_ROOT anymore
+
+	* mysql.pm (connect): fix port/host/mysql_socket setting. DEPEND ON
+	MySQL 3.22 from now on.
+
+1999-02-03  Loic Dachary  <loic@loic.ceic.com>
+
+	* tools.pm (config_load): cache based on $file instead of $base for
+	mod_perl
+
+1999-02-02    <ecila40@interdev>
+
+	* sqledit.pm: Add missing quotemeta in values2select
+	(confedit): If not in default directory use CONFIG_DIR before .
+	
+

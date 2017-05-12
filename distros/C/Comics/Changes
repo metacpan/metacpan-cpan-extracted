@@ -1,0 +1,131 @@
+Revision history for Comics
+
+1.05	2017-05-01
+
+	Fixes for TheMinistryOfAbnormality, CtrlAltDel.
+
+1.04	2017-03-11
+
+	Fix regexp for Glasbergen, AMultiverse.
+
+1.03	2017-01-31
+
+	Fix tally of comics in statistics.
+
+1.02	2017-01-12
+
+	Release 1.02.
+	Miscellaneous small fixes and enhancements.
+	Update the GoComics fetcher to the new page contents.
+
+1.00	2016-11-26
+
+	Release 1.00.
+	Defeat erroneous image caching.
+	Use HTTP header ETag to avoid unneccessary image fetching.
+	Remove plugin data and files when disabling a plugin.
+	(JoyOfTech, CSectionComics) Fix pattern.
+
+0.13	2016-11-14
+
+	Add 'ondemand' property for plugins that are initially
+	disabled.
+	The spool directory now defaults to <tmpdir>/Comics and will
+	be created if necessary.
+	Add CSectionComics LearnToSpeakCat.
+	Lower Perl requirement to 5.12.
+
+0.12	2016-11-04
+
+	Add nice(r) heading.
+	Add white background to the images.
+	Add link to Comics web page.
+	Add MIN_PER_VERSION to Makefile.PL.
+
+0.11	2016-11-02
+
+	Tags are now derived from the package name instead of the
+	comics name. This should not matter much.
+	Internal changes to the API. This should not matter much either.
+	Add comics Ben and RedPanels.
+
+0.10	2016-10-28
+
+	New plugin API. Much, much (yes, much) easier.
+	See Sigmund for	details.
+	
+	Add comics DirkJan.
+	Fix naming problem with the Soopah plugins.
+	Fix naming problem with Glasbergen and TheJoyOfTech plugins.
+
+0.09	2016-10-27
+
+	Small enhancements and fixes to the sorting of the listing.
+	(GoComics) Derive url from name or tag.
+	Move tag-from-name method from Fetcher to Plugin.
+	Add overall totals to statistics.
+	Add comics DoYouKnowFlo EEK FrankAndErnest Megatokyo Monty
+	NonSequitur SavageChickens Wondermark.
+	Add comics APOKALIPS ASofterWorld AmazingSuperPowers
+	AmazingSuperPowersSecretToon DieselSweeties DominicDeegan
+	GarfieldMinusGarfield HaraKiri HeinDeKort Lectrr LittleGamers
+	Nozzman OrderOfTheStick PennyArcade RedMeat
+	TheMinistryOfAbnormality VGCats. This completes all the
+	original Gotblah toons, although some are no longer functional.
+
+0.08	2016-10-26
+
+	Add --rebuild to rebuild just the HTML index without fetching
+	new comics. Thanks to tux@tux.nl for the suggestion.
+	Eliminate --fetchonly.
+	Eliminate --buildonly.
+	New Fetcher: Cascade. Handles a series (one or more) of
+	patterns, each designating the page to be loaded for the next
+	pattern.
+	Comics::Fetcher::Single is now a wrapper around Cascade.
+	Comics::Fetcher::Direct is now a wrapper around Cascade.
+	Comics::Fetcher::GoComics is now a wrapper around Cascade.
+	Add comics CtrlAltDel MyJetpack PlayerVsPlayer Soopah
+	SoopahBonus Abstrusegoose DoghouseDiaries.
+
+0.07	2016-10-26
+
+	Fix problem where the location of the statefile was
+	initialized before the command line args were handled.
+	Fix problem with processing of the plugins selectors.
+
+0.06	2016-10-25
+
+	Enable/Disable/List plugins via command line.
+	Make a backup copy of the state file before changing it.
+	Fix WuMo plugin.
+
+0.05	2016-10-24
+
+	CPAN packaging improvements.
+	Improve documentation.
+	Improve GoComics fetcher.
+	Fix problem with new plugins losing state.
+
+0.04	2016-10-24
+
+	Add S1ngle plugin.
+	More documentation.
+
+0.03	2016-10-24
+
+	Move collect code to Comics.pm.
+	Introduce Fetchers (Comics::Fetcher).
+	Rename Plugins to Plugin (Comics::Plugin).
+	Add documentation and more CPAN files.
+    	Improve checks and logging; add width/height.
+    	More plugins.
+	First CPAN release.
+
+0.02	2016-10-23
+
+	Initial (GitHub) release.
+
+0.01	2016-10-23
+
+	Initial commit.

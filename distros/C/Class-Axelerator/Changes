@@ -1,0 +1,14 @@
+# Revision history for Class-Axelerator
+#
+# $Id: Changes,v 0.2 2009/02/15 02:25:03 dankogai Exp dankogai $
+#
+$Revision: 0.2 $ $Date: 2009/02/15 02:25:03 $
+! Makefile.PL
+  Added Filter::Simple to PREREQ_PM  
+! lib/Class/Axelerator.pm
+  POD fixes
+  http://blog.livedoor.jp/dankogai/archives/51177689.html
+
+0.01 2009/02/13 22:59:21
+        First version, released on an unsuspecting world.
+

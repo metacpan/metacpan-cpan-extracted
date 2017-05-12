@@ -1,0 +1,52 @@
+{
+   "abstract" : "Convert paginated DBIx::Class::ResultSet's to JSON-style structures",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Plugin-ExtJS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "0",
+            "CGI::Application::Plugin::DBH" : "0",
+            "CGI::Application::Plugin::DBIx::Class" : "0",
+            "DBIx::Class" : "0.08113",
+            "FindBin" : "0",
+            "Readonly" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "UNIVERSAL" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frioux/CGI-Application-Plugin-ExtJS",
+         "web" : "http://github.com/frioux/CGI-Application-Plugin-ExtJS"
+      }
+   },
+   "version" : "1.000001"
+}
+

@@ -1,0 +1,46 @@
+Revision history for Perl extension Class-Factory-Enhanced
+
+1.101420  2010-05-22 22:56:10 Europe/Vienna
+    - 'use parent' instead of 'use base'
+
+1.100810  2010-03-22 22:42:55 Europe/Vienna
+    - converted distribution to Dist::Zilla-style
+
+0.09  Thu 2010.02.18 21:42:11 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - tests no longer require Class::Accessor::Complex
+
+0.08  Mon 2010.02.08 14:40:08 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added author tests; this also removes dependencies
+
+0.07  Thu, 29 May 2008 12:01:33 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.07
+     - Changes: fixed global.name
+     - .shipit: fixed svk.tagpattern
+
+0.06  Wed, 21 Nov 2007 18:21:11 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Added requirement for Class::Accessor::Installer
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - tags: BUGFIX
+
+0.05  Wed, 07 Nov 2007 14:40:43 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - Makefile.PL now requires Class::Factory 1.06 or better specifically.
+
+0.04  Wed, 07 Nov 2007 08:03:33 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - removed Class::Factory::Patched, since Fred Moyers accepted my patches
+       to Class::Factory. Class::Factory::Enhanced now subclasses
+       Class::Factory.
+
+0.03  Wed, 07 Nov 2007 01:07:39 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - added get_factory_type_for()
+
+0.02  Sun, 21 Oct 2007 21:50:03 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - build_requires 'Class::Accessor::Complex'
+
+0.01  Sun, 21 Oct 2007 20:03:24 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

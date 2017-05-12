@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  CGI::Fast: '0'
+  ExtUtils::MakeMaker: '0'
+  FCGI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - cgi
+  - rss
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-RSS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+  Date::Manip: '0'
+  perl: '5.008'
+resources:
+  repository: http://github.com/jettero/cgi--rss/tree
+version: '0.9660'

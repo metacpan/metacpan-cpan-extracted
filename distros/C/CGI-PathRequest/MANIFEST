@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+lib/CGI/PathRequest.pm
+lib/CGI/PathRequest.pod
+t/2_cpr_basic.t
+t/3_cpr_excerpt.t
+t/4_cpr_ls.t
+t/5_cpr_hash.t
+t/6_noexists.t
+t/public_html/.hidden_file.txt
+t/public_html/demo/civil.txt
+t/public_html/demo/hellokitty.gif
+t/public_html/house.txt
+t/public_html/oake.jpg

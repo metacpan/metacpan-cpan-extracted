@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  25795:
+    - 149
+name: ddcbc7
+registers:
+  AF: 38228
+  AF_: 0
+  BC: 40534
+  BC_: 0
+  DE: 26664
+  DE_: 0
+  HL: 12681
+  HL_: 0
+  I: 0
+  IX: 25803
+  IY: 57261
+  PC: 4
+  R: 2
+  SP: 0

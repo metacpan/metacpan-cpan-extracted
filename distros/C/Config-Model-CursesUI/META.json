@@ -1,0 +1,52 @@
+{
+   "abstract" : "Curses interface to edit config data through Config::Model",
+   "author" : [
+      "Dominique Dumont (ddumont at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Model-CursesUI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Log::Log4perl" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Model" : "1.233",
+            "Curses::UI" : "0.9606",
+            "Exception::Class" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Model::CursesUI" : {
+         "file" : "lib/Config/Model/CursesUI.pm",
+         "version" : "1.105"
+      },
+      "Config::Model::CursesUI::AbortWizard" : {
+         "file" : "lib/Config/Model/CursesUI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
+      ]
+   },
+   "version" : "1.105",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

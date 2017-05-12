@@ -1,0 +1,7 @@
+These PHP3 files are a display interface for an existing catalog.
+It is provided on a "as-is" basis. You will have to modify the code
+to fit your needs, no general purpose configuration mechanism is
+provided at present and the only documentation is the code itself.
+
+Questions and suggestions should be directed to the author:
+(Weston J. Bustraan) weston@infinityteldata.net

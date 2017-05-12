@@ -1,0 +1,780 @@
+
+=head1 NAME
+
+CGI::Minimal - A lightweight CGI form processing package
+
+=head1 SYNOPSIS
+
+ # use CGI::Minimal qw(:no_subprocess_env);
+ # use CGI::Minimal qw(:preload);
+ use CGI::Minimal;
+
+ my $cgi = CGI::Minimal->new;
+ if ($cgi->truncated) {
+    &scream_about_bad_form;
+    exit;
+ }
+ my $form_field_value = $cgi->param('some_field_name');
+
+=head1 DESCRIPTION
+
+Provides a micro-weight alternative to the CGI.pm module
+
+Rather than attempt to address every possible need of a CGI
+programmer, it provides the _minimum_ functions needed for CGI such
+as form decoding (including file upload forms), URL encoding
+and decoding, HTTP usable date generation (RFC1123 compliant
+dates) and I<basic> escaping and unescaping of HTMLized text.
+
+The ':preload' use time option is used to force all sub-component
+modules to load at compile time.  It is not required for
+operation. It is solely a performance optimization for particular
+configurations. When used, it preloads the 'dehtmlize',' param_mime',
+'param_filename', 'date_rfc1123', 'url_decode', 'calling_parms_table'
+and parameter setting supporting code. Those code sections
+are normally loaded automatically the first time they are needed.
+
+The ':no_subprocess_env' use time option is used under ModPerl2
+to suppress populating the %ENV hash with the usual CGI environmental
+variables. This is primarily a performance enhancement for some
+configurations.
+
+The form decoding interface is somewhat compatible with the
+CGI.pm module. No provision is made for generating HTTP or HTML
+on your behalf - you are expected to be conversant with how
+to put together any HTML or HTTP you need.
+
+
+The parser accepts either '&' or ';' as CGI form field seperators.
+
+IOW
+
+  a=b;c=d
+
+  a=b&c=d
+
+both will decode as a=b and c=d
+
+The module supports command line testing of scripts by letting you type a GET
+style argument followed by pressing the 'enter/return' key
+when the module is called to decode a form when running a script
+from the shell.
+
+Example:
+
+ bash> ./myscript
+ a=b&b=d<return>
+
+Alternatively, you can set the environment variable REQUEST_METHOD to 'GET'
+and set the environment variable QUERY_STRING to pass your CGI parameters.
+
+Example:
+
+bash> REQUEST_METHOD=GET QUERY_STRING='a=b' ./myscript
+
+=head2 Performance Hints
+
+If you are using this module as part of a conventional standalone CGI
+specifically to get a speedup over using CGI.pm, don't 'use warnings', 'use vars'
+or 'use Carp' in your final production code.
+
+The problem with 'use vars' or 'use warnings' is that (unless you are using
+Perl 5.8.6 or later) they add on the order of 40 kilobytes of code to your
+load and you B<will> feel the slowdown. Half of that is from the Carp module (which
+is used by both the 'vars' and 'warnings' modules.)
+
+So a well written script tuned for performance will start like this:
+
+ #!/usr/bin/perl -Tw
+
+ use strict;
+ use CGI::Minimal;
+
+ my $cgi = CGI::Minimal->new;
+
+The ':no_subprocess_env' option is available (C<use CGI::Minimal qw (:no_subprocess_env);>)
+to suppress population of the %ENV hash with the standard CGI environment values when
+running under ModPerl2. This improves performance slightly under ModPerl2, but does not
+affect anything when running as standard CGI or under ModPerl1. 
+
+B<WARNING:> Due to the 'singleton' pattern used by CGI::Minimal, the C<:no_subprocess_env> option
+is B<persistent between scripts>, if you use it in any script, it may affect B<any> ModPerl2
+script running on the same Apache instance that uses CGI::Minimal if they run after a script
+that I<does> use ':no_subprocess_env'.
+
+This would manifest as the %ENV hash as being unexpectedly mostly empty in a script that
+B<didn't> use ':no_subprocess_env'. The fix for this is to call the C<CGI::Minimal::subprocess_env>
+class method in any script that requires the %ENV hash to be populated if it is sharing an Apache
+instance with scripts that use ':no_subprocess_env'.
+
+The ':preload' option is available in CGI::Minimal (C<use CGI::Minimal qw (:preload);>)
+to compile all sub-components of the module at initial load time. This will I<slowdown>
+your script unless you are using one or more of the following methods:
+
+ dehtmlize       param_mime    param_filename
+ date_rfc1123    url_decode    calling_parms_table
+
+or are using the 'param' method to 'set' values
+(ie. C<$cgi-E<gt>param({'fieldname' =E<gt> $field_value });>).
+
+If you B<are> using one of those methods, then it should provide a slight speedup when
+being used as a conventional CGI script - but B<NOT> when being used via mod_perl.
+When invoked via mod_perl, :preload is already implied.
+
+The ultimate performance hint, of course, is use mod_perl (or another persistent
+execution environment). While you can reach around 66 or so invokations per second on
+an AMD XP2100+ processor running a simple script using CGI::Minimal, you can exceed
+400 per second using mod_perl.
+
+Here are some performance numbers using an extremely simple script
+using CGI.pm, CGI::Lite, CGI::Deurl, cgi-lib.pl, CGI::Thin, CGI::Simple
+and CGI::Minimal to read a single passed parameter (a=b) and print it.
+
+Also included are a 'null' Perl script and a 'null' compiled C program which
+didn't actually read the passed cgi parameter but output the same results
+as if they had.
+
+Notably, mod_perl outperforms the compiled C program by
+quite a lot for this simple case. Note also that using the :preload
+option slowed the CGI::Minimal script down from 66 fetches/second
+to only 52 fetches/second when used in standard CGI mode.
+
+With 10 parallel fetches repeated as fast as possible for 30 seconds
+with and without mod_perl (if supported) the tests gave the following
+results (sorted by speed):
+
+  CGI.pm (3.05)                 via standard CGI -  16 fetches per second
+  CGI::Simple (0.075)           via standard CGI -  20 fetches per second
+  CGI::Deurl (1.08)             via standard CGI -  36 fetches per second
+  CGI::Thin (0.52)              via standard CGI -  38 fetches per second
+  CGI::Lite (2.02)              via standard CGI -  52 fetches per second
+  CGI::Minimal (1.16, :preload) via standard CGI -  52 fetches per second
+  CGI::Minimal (1.16)           via standard CGI -  66 fetches per second
+  cgi-lib.pl (2.18)             via standard CGI -  71 fetches per second
+  null Perl script              via standard CGI - 103 fetches per second
+  null C program                via standard CGI - 174 fetches per second
+  CGI::Simple (0.075)           via mod_perl     - 381 fetches per second
+  CGI.pm (3.05)                 via mod_perl     - 386 fetches per second
+  CGI::Minimal (1.16)           via mod_perl     - 417 fetches per second
+  null Perl script              via mod_perl     - 500 fetches per second
+
+=head1 CHANGES
+
+ 1.29 21 Aug 2007 - Documentation fix to performance hints section. No functional changes.
+
+ 1.28 18 Aug 2007 - Improved mod_perl2 handling (patch courtesy of Jeremy Nixon).
+                    Added a ':no_subprocess_env' flag to suppress populating
+                    the %ENV environment hash. Added a 'subprocess_env'
+                    static class method to allow smooth co-existance of
+                    ModPerl2 scripts that use ':no_subprocess_env' with ModPerl2
+                    scripts that do not on the same server.
+
+ 1.27 25 May 2007 - Added example of a command line 'wrapper' script and
+                    of using environment variables as an alternate way
+                    to test scripts via the command line. Added example
+                    for use with FastCGI. Changed behavior for unsupported
+                    HTTP methods. The module used to 'croak' for unsupported
+                    methods, it now 'carp's instead and treats as a 'GET'
+                    (change at suggestion of Roman Mahirov to better support
+                    FastCGI).
+
+ 1.26 06 Apr 2007 - Added decoding of Javascript/EMCAScript style unicode 
+                    escaped (%uxxxx form) parameter data (both to the main
+                    'param' method and to the 'url_decode'/'url_encode' methods)
+                    at the suggestion of Michael Kröll (the core code for
+                    this additional functionality is derived from CGI.pm).
+
+                    Added support for ModPerl2.
+
+                    Fixed META.yml problems introduced with 1.25.
+
+                    Changed POD/POD Coverage tests to only execute if specifically requested
+                    
+                    Added examples directory and scripts
+
+ 1.25 20 Apr 2006 - Added 'allow_hybrid_post_get' class method. Tweaked file permissions.
+                    Added regression tests for hybrid forms.
+
+ 1.24 23 Sep 2005 - Added 'Carp' to install requirements. Extended build tests.
+                    Fixed multi-part form decoding bug in handling of degenerate MIME
+                    boundaries. Added fatal errors for mis-calling of param_mime
+                    and param_filename methods.
+
+ 1.23 18 Sep 2005 - Made Test::More optional in build tests. No functional changes.
+
+ 1.22 13 Sep 2005 - Changed POD tests to be more friendly to CPANTS.
+
+ 1.21 11 Sep 2005 - Fixed pod coverage build test for compatibility
+                    with Perl 5.005.
+
+ 1.20 11 Sep 2005 - Fixed issue that caused mod_perl to issue
+                    'Use of uninitialized value.' warnings.
+                    Extended build tests.
+
+ 1.19 10 Sep 2005 - Fixed POD Coverage build test error.
+
+ 1.18 08 Sep 2005 - Tweaked prerequisite modules lists. Extended regresssion
+                    tests to cover more of the code.
+
+ 1.17 04 Sep 2005 - More tweaks to regression tests to work around MS-Windows
+                    problems with binary file handles under Perl 5.6.1.
+
+                    Added 'Build.PL' support back in. Added POD tests.
+                    Minor documentation tweaks. No functional changes.
+
+ 1.16 12 Nov 2004 - Added CGI::Simple to the benchmarks table. Tweaked regresssion
+                    tests for MS-Windows. Added 'delete' and 'delete_all'
+                    methods and regression tests. Added ':preload' flag for
+                    preloading all sub-components at module 'use' time.
+                    Fixed bug introduced with 1.15 in param value setting.
+
+ 1.15 9 Nov 2004  - Added more regression tests. Tweaked url encoder to comply
+                    better with RFC2396. Tuned performance some more. Extended
+                    benchmarks table to cover more CGI form decoders.
+
+ 1.14 16 Oct 2004 - Tuned module load time (about a 40% improvement) and
+                    added performance hints to the documentation.
+
+ 1.13 28 Sep 2004 - Removed support for Module::Build from module install.
+
+ 1.12 25 Sep 2004 - Tweaked the default form parser to accept ';' as a field seperator
+                    in addition to '&'. Change suggested by Peter Karman.
+                    Eliminated the explicit application/sgml-form-urlencoded support
+                    as redundant (it still works, it is just not explicitly different
+                    than application/x-www-form-urlencoded support anymore).
+
+                    Adjusted the multipart form parser to be more robust against
+                    malformed MIME boundaries and the build tests to work around a
+                    bug in Perl 5.8.0 UTF8ness and split.
+
+                    Added documentation of command line script testing behavior.
+
+                    Tightened up the code to reduce size (went from 14.9K to 11K).
+
+                    Removed the 'sgml_safe_mode' redirect code since there
+                    was no exposed interface to it anyway.
+
+                    Squashed a bug where the global buffer might fail to initialize
+                    correctly for 0 byte POST forms (only impacted  use of the 'raw'
+                    method for POST use).
+
+                    Added regression test for form truncation
+
+                    Added LICENSE section to documentation
+
+                    Added Module::Build installation support
+
+ 1.11 28 Sep 2003 - Tweaked test script to avoid warnings about
+                    opening STDIN filehandle for writing. No functional
+                    changes.
+
+ 1.10 04 Apr 2003 - Added 'binmode STDIN' on module load to correct for
+                    windows defaulting to 7-bit filehandles. Fixed problem where
+                    split would fail on unusual MIME boundary strings.
+                    Problems noticed by Markus Wichitill.
+
+                    Deferred loading of 'Carp' unless actually needed.
+
+                    Small code cleanups. Removed big disclaimer from
+                    .pm and moved in pod to 'DISCLAIMERS' section
+
+                    Added tests
+
+
+ 1.09 19 Mar 2002 - Exposed 'reset_globals' static method for support
+                    of non-mod_perl persistent perl execution environments.
+
+ 1.08 26 Jul 2001 - Added 'raw' method for obtaining a dump of the raw input buffer data
+                    without any parsing. Moved documentation into seperate POD file.
+
+ 1.07 01 Dec 2000 - Added capability of taking a GET style parameter string
+                         via STDIN if running at the command line.
+
+ 1.06 10 Apr 2000 - 'Unfixed' use of 'quotemeta' for multipart
+                    boundaries. 'split' is doing the 'wrong thing'
+                    according to the specs...
+
+ 1.05 03 Apr 2000 - Fixed breakage in 'param;' from 1.04 changes
+
+ 1.04 03 Apr 2000 - Added capability to set params via the param() method
+                         like 'CGI.pm' plus general code cleanup
+
+ 1.03 02 Mar 2000 - 'mod_perl' compatibility added
+
+ 1.02 09 Jun 1999 - Initial public release.
+
+=cut
+
+=head1 METHODS
+
+=cut
+
+######################################################################
+
+=over 4
+
+=item new;
+
+Creates a new instance of the CGI::Minimal object and decodes
+any type of form (GET/POST). Only one 'true' object is generated -
+all subsequent calls return an alias of the one object (a 'Singleton'
+pattern).
+
+Example:
+
+ use CGI::Minimal;
+
+ my $cgi = CGI::Minimal->new;
+
+=back
+
+=cut
+
+=over 4
+
+=item param([$fieldname]);
+
+Called as C<$cgi-E<gt>param();> it returns the list of all defined
+form fields in the same order they appear in the data from the
+user agent.
+
+Called as C<$cgi-E<gt>param($fieldname);> it returns the value (or
+array of values for multiple occurances of the same field name) assigned
+to that $fieldname. If there is more than one value, the values are
+returned in the same order they appeared in the data from user agent.
+
+Examples:
+
+  my (@form_fields) = $cgi->param;
+
+  my (@multi_pick_field) = $cgi->param('pick_field_name');
+
+  my ($form_field_value) = $cgi->param('some_field_name');
+
+You can also use the param method to set param values to new values.
+These values will be returned by any invokation of a CGI::Minimal object
+as if they had been found in the original passed data.
+
+Examples:
+
+    $cgi->param( 'name' => 'Joe Shmoe' );
+
+    $cgi->param({ 'name' => 'Joe Shmoe', 'birth_date' => '06/25/1966' });
+
+    $cgi->param({ 'pick_list' => ['01','05','07'] });
+
+Starting with the 1.12 version, CGI::Minimal accepts the ';' character
+as a form field seperator in addition to the '&'.
+
+IOW: a=b;c=d will decode as well as a=b&c=d in form submissions. This is
+to provide SGML/XML/XHTML compatibility for those needing it. Since ';' has
+always been escaped to %3e by the url_encode method, this should only affect
+people who are already doing the wrong thing with their forms by
+not escaping their data correctly. This is also compatible with what the CGI.pm
+module does.
+
+=back
+
+=cut
+
+=over 4
+
+=item delete_all;
+
+This is functionally equivalent to the CGI.pm 'delete_all' method. It clears
+all currently set param values. It B<is not> the same as the static method
+C<reset_globals> because it does not reset the C<raw>, C<max_read_size>,  C<truncated>
+states or reintialize the form decoding configuration for reuse.
+
+It just deletes all the parameters.
+
+Ex.
+
+   $cgi->delete_all;
+
+=back
+
+=cut
+
+=over 4
+
+=item delete(@param_names);
+
+This allows you to delete specified parameters from the CGI::Minimal
+object.
+
+Ex.
+   $cgi->delete('fieldname', 'another');
+
+=back
+
+=cut
+
+=over 4
+
+=item param_mime([$fieldname]);
+
+Called as C<$cgi-E<gt>param_mime();> it returns the list of all defined
+form fields in the same order they appear in the data from the
+user agent.
+
+Called as C<$cgi-E<gt>param_mime($fieldname);> it returns the MIME
+type (or array of MIME types for multiple occurances of the same field
+name) assigned to that $fieldname. If there is more than one value, the
+values are returned in the same order they appeared in the data from user
+agent.
+
+This is only meaningful when doing Form Based File Uploads and
+should probably not be trusted even then since it depends on the
+_browser_ correctly identifying what it is sending.
+
+=back
+
+=cut
+
+=over 4
+
+=item param_filename([$fieldname]);
+
+Called as C<$cgi-E<gt>param_filename();> it returns the list of all
+defined form fields in the same order they appear in the data from the
+user agent.
+
+Called as C<$cgi-E<gt>param_filename($fieldname);> it returns the
+file name (or array of file names for multiple occurances of the same field
+name) assigned to that $fieldname. If there is more than one value, the
+values are returned in the same order they appeared in the data from user
+agent.
+
+This is only meaningful when doing Form Based File Uploads.
+
+=back
+
+=cut
+
+=over 4
+
+=item raw;
+
+Returns a copy of the raw form data. Returns 'undef' if the form
+has not been parsed yet.
+
+=back
+
+=cut
+
+=over 4
+
+=item date_rfc1123($time);
+
+Takes a unix time tick value and returns a RFC1123 compliant date
+as a formatted text string suitable for direct use in Expires,
+Last-Modified or other HTTP headers (with the exception of
+'Set-Cookie', which requires a different format not generated
+here. See 'CGI::Cookie' for cookie generation).
+
+Example:
+
+ print "Expires: ",$cgi->date_rfc1123(time + 3600),"\015\012";
+
+=back
+
+=cut
+
+=over 4
+
+=item calling_parms_table;
+
+Returns a formatted HTML table containing all the form and environment
+variables for debugging purposes
+
+Example:
+
+  print $cgi->calling_parms_table;
+
+=back
+
+=cut
+
+=over 4
+
+=item url_encode($string);
+
+Returns URL encoding of input string (URL unsafe codes are
+escaped to %xx form)
+
+Example:
+
+ my $url_encoded_string = $cgi->url_encode($string);
+
+=back
+
+=cut
+
+=over 4
+
+=item url_decode($string);
+
+Returns URL *decoding* of input string (%xx and %uxxxx substitutions
+are decoded to their actual values).
+
+Example:
+
+ my $url_decoded_string = $cgi->url_decode($string);
+
+=back
+
+=cut
+
+=over 4
+
+=item htmlize($string);
+
+Returns HTML 'safe' encoding of input string. Replaces &,>,< and "
+with their named entity codes (&amp, &gt; &lt; and &quot;)
+
+Example:
+
+ my $html_escaped_string = $cgi->htmlize($string);
+
+=back
+
+=cut
+
+=over 4
+
+=item dehtmlize($string);
+
+Undoes basic HTML encoding of input string. Replaces &amp;,
+&gt;, &lt; and &quot; named entity codes with their actual values.
+NOT a general purpose entity decoder.
+
+=back
+
+=cut
+
+=over 4
+
+=item truncated;
+
+Returns '1' if the read form was shorter than the
+Content-Length that was specified by the submitting
+user agent (ie the data from a form uploaded by a
+web browser was cut off before all the data was received).
+
+Returns '0' if the form was NOT truncated.
+
+Example:
+
+  use CGI::Minimal;
+
+  my $cgi = CGI::Minimal->new;
+  if ($cgi->truncated) {
+    &bad_form_upload;
+  } else {
+    &good_form_upload;
+  }
+
+'truncated' will also return '1' if the form length
+received would have exceeded the set 'max_read_length'.
+
+=back
+
+=cut
+
+=head1 STATIC METHODS
+
+=cut
+
+######################################################################
+
+=over 4
+
+=item CGI::Minimal::max_read_size($size);
+
+Sets the maximum number of bytes/octets that the
+CGI decoder will accept. By default, 1000000 bytes/octets.
+This must be called *BEFORE* calling 'new' for the first
+time for it to actually affect form decoding.
+
+Example:
+
+  use CGI::Minimal;
+
+  CGI::Minimal::max_read_size(1000000);
+  my $cgi = CGI::Minimal->new;
+
+=back
+
+=cut
+
+=over 4
+
+=item CGI::Minimal::allow_hybrid_post_get(0|1);
+
+The HTTP standard specifies that POST parameters are passed
+in the body of the HTTP request while GET parameters are
+passed as part of the URL. The two B<are not> supposed
+to be mixed, and the semantics of doing so are undefined,
+but many people have done so anyway.
+
+By default, CGI::Minimal does not mix the two.
+
+If you wish to do so (with a resulting speed penalty for processing
+'POST' forms since it has to B<also> process the GET query string)
+you can do so by setting allow hybrid post/get via the
+allow_hybrid_post_get static method before calling
+'new' for the first time:
+
+Example:
+
+  use CGI::Minimal;
+
+  CGI::Minimal::allow_hybrid_post_get(1);
+  my $cgi = CGI::Minimal->new;
+
+CGI::Minimal decodes the POST parameters first, and appends
+the GET parameters B<after> them.
+
+Note: Setting allow hybrid post/get on a POST B<does not>
+append the GET query string (if any) to the POST data returned
+by the 'raw' method: It continues to return only the raw
+POST message body for a POST request and the raw GET query string
+for a GET (or HEAD) request.
+
+=back
+
+=over 4
+
+=item CGI::Minimal::reset_globals;
+
+Sets the CGI::Minimal object to it's initial state (the
+state it is in before calling 'new' for the first time
+in a CGI interaction). 
+
+This static method not needed if you are running CGI::Minimal
+either as a traditional CGI script or under mod_perl. In
+other persistent execution environments you need to call
+this static method _before_ calling ->new or the module
+will not 'forget' the data parameters passed
+from the last time it was executed.
+
+FCGI Example:
+
+ #!/usr/bin/perl -Tw
+
+ use strict;
+ use FCGI;
+ use CGI::Minimal;
+
+ my $request = FCGI::Request();
+ while($request->Accept() >= 0) {
+    CGI::Minimal::reset_globals();
+    my $value = CGI::Minimal->new->param('a');
+    print "Status: 200 OK\015\012Content-Type: text/plain\015\012\015\012a = $value\n";
+}
+
+
+Note: This method resets the the 'max_read_size' back to its default
+of 1_000_000 octets ('bytes'); so if you want to use a different
+size, you need to restore it after you do the 'reset_globals' call.
+
+Ex.:
+
+ use CGI::Minimal;
+
+ CGI::Minimal::reset_globals;
+ CGI::Minimal::max_read_size(200000);
+ my $cgi = CGI::Minimal->new;
+
+=back
+
+=over 4
+
+=item CGI::Minimal::subprocess_env;
+
+Under ModPerl2, this imports the CGI environment variables into
+the %ENV hash. Under either a standard CGI invokation or ModPerl1,
+it does nothing. It is intended for use in scripts sharing a ModPerl2
+Apache instance with scripts that use the ':no_subprocess_env' flag.
+
+Because of the 'singleton' pattern used by CGI::Minimal, if one ModPerl2 script
+sets the ':no_subprocess_env' flag, other scripts may be affected by it (which
+would manifest as mysteriously missing %ENV hash values).
+
+To prevent that from happening, add
+
+C<CGI::Minimal::subprocess_env;>
+
+to that scripts that need %ENV to be populated if they share an Apache instance
+with other scripts that B<DO> use the C<:no_subprocess_env> flag. 
+
+Example:
+
+ use CGI::Minimal
+
+ CGI::Minimal::subprocess_env();
+ my $cgi = CGI::Minimal->new;
+
+The method has no effect on regular CGI or ModPerl1 scripts and can be safely
+invoked in them without harm.
+
+=back
+
+=cut
+
+=head1 BUGS
+
+None known.
+
+=head1 TODO
+
+To be determined. ^_^
+
+=head1 AUTHOR
+
+Benjamin Franz <snowhare@nihongo.org>
+
+=head1 VERSION
+
+Version 1.29 21 Aug 2007 
+
+=head1 COPYRIGHT
+
+Copyright (c) Benjamin Franz. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 SEE ALSO
+
+CGI
+
+=cut

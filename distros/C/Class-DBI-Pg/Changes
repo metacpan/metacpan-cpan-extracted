@@ -1,0 +1,32 @@
+Revision history for Perl extension Class::DBI::Pg
+
+0.08  Sat Mar 11 17:00:00 2006
+        - Stop using _croak (#18093)
+
+0.07  Thu Jan 26 03:00:00 2006
+        - work with PostgreSQL 8.1's new sequence display 
+        - pg_version(full_version => 1) gets you the major, minor, micro
+          version strings
+        - maintainer changed to Daisuke Maki
+
+0.06  Wed Dec 02 18:00:00 2004
+        - support for compound primary keys (Simon Flack)
+
+0.05  Wed Dec 01 14:00:00 2004
+        - no more warnings for missing sequences (Marcus Ramberg)
+
+0.04  Wed Dec 01 10:00:00 2004
+        - cleanup
+
+0.03  Thu Sep 10 00:00:00 2004
+        - 0.03
+        - treat dropped column correctly.
+        - fixed sequence test.
+        - added pg_version().
+        - fixed PREREQ_PM 
+
+0.02  Thu Aug 08 00:00:00 2004
+        - 0.01
+        - original version
+        - 0.02
+        - added SERIAL type support.

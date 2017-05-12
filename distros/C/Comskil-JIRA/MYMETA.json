@@ -1,0 +1,47 @@
+{
+   "abstract" : "Retrieve, Translate, Map, Integrate, and Import JIRA Issues:\nA collection of tools to enable retrieval, storage, integration, and mapping of data\nfrom JIRA live instances and backfiles.  This was created to assist in the migration\nand integration of several 3rd party hosted issue tracking tools and JIRA instances\ninto a single JIRA Studio OnDemand site.  \nVersion '00.nnnnn' == 'Raw Development, Not Even Unstable'\n",
+   "author" : [
+      "Peter Shiner <pshiner@comskil.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "restricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Comskil-JIRA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : 0,
+            "HTTP::Headers" : 0,
+            "HTTP::Response" : 0,
+            "HTTP::Status" : 0,
+            "JIRA::Client" : 0,
+            "LWP::UserAgent" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "00.11329"
+}

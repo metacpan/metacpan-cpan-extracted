@@ -1,0 +1,65 @@
+==============================================================================
+                        Coy.pm
+==============================================================================
+
+DESCRIPTION
+
+	Error messages 
+	strewn across my terminal. 
+	A vein starts to throb. 
+
+	Their reproof adds the 
+	injury of insult to 
+	the shame of failure. 
+
+	When a program dies 
+	what you need is a moment 
+	of serenity. 
+
+	The Coy.pm 
+	module brings tranquillity 
+	to your debugging. 
+
+	The module alters 
+	the behaviour of C<die> and 
+	C<warn> (and C<croak> and C<carp>). 
+
+	It also provides 
+	C<transcend> and C<enlighten> -- two 
+	Zen alternatives. 
+
+	Like Carp.pm, 
+	Coy reports errors from the 
+	caller's point-of-view. 
+
+	But it prefaces 
+	the bad news of failure with 
+	a soothing haiku. 
+
+	The haiku are not 
+	"canned", but are generated 
+	freshly every time. 
+
+	Once the haiku is 
+	complete, it's prepended to 
+	the error message. 
+
+	Execution of 
+	the original call to
+	C<die> or C<warn> resumes. 
+
+	Haiku and error
+	message strew across my screen. 
+	A smile starts to form. 
+
+
+
+==============================================================================
+
+AVAILABILITY
+
+Coy has been uploaded to the CPAN and is also available from:
+
+	https://github.com/schwern/coy/tree
+
+==============================================================================

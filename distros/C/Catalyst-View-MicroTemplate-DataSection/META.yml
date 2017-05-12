@@ -1,0 +1,41 @@
+---
+abstract: 'Text::MicroTemplate::DataSection View For Catalyst'
+author:
+  - 'Masaaki Saito <masakyst.public@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-MicroTemplate-DataSection
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Catalyst::View::MicroTemplate::DataSection:
+    file: lib/Catalyst/View/MicroTemplate/DataSection.pm
+    version: '0.03'
+requires:
+  Catalyst::Devel: '0'
+  Catalyst::Runtime: '0'
+  Text::MicroTemplate::DataSection: '0'
+resources:
+  bugtracker: https://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection/issues
+  homepage: https://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection
+  repository: git://github.com/masakyst/Catalyst-View-MicroTemplate-DataSection.git
+version: '0.03'
+x_authority: cpan:MASAKYST
+x_contributors:
+  - 'Masaaki Saito <masakyst.mobile@gmail.com>'

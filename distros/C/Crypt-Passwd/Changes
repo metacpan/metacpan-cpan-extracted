@@ -1,0 +1,23 @@
+Revision history for Perl extension Crypt::Passwd.
+
+0.01  Mon Aug  3 20:41:48 1998
+	- Initial release.
+
+0.02  Sun Aug  9 09:45:03 1998
+	- Added config.h to customize crypt*() methods to use. This
+	allows users with an implementation of UFC-Crypt with no
+	crypt16() to use the module easily. This also eases the use
+	of other crypt() libraries. Thanks to Lupe Christoph
+	for pointing out that most versions of UFC-Crypt found on
+	the Net are missing crypt16().
+
+0.03  Sun Aug 16 14:04:05 MET DST 1998
+	- Removed superflous passwd.c.
+	- Edited passwd.h to supply the correct declarations
+	  depending on definitions in config.h.
+	- Added PROTOTYPE statements to Passwd.xs.
+	- Made no crypt16() the default.
+	- Removed test.pl (integrated into t/std.t).
+	- t/std.t now checks the availability of functions
+	  before testing them.
+	- Added test for MD5 prerequisite.

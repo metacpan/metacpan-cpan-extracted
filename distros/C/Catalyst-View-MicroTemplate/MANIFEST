@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/View/MicroTemplate.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+out
+t/01_appconfig.t
+t/02_pkgconfig.t
+t/03_extends.t
+t/lib/TestApp.pm
+t/lib/TestApp/root/base.mt
+t/lib/TestApp/root/test.mt
+t/lib/TestApp/root/test_extends.mt
+t/lib/TestApp/View/MT/AppConfig.pm
+t/lib/TestApp/View/MT/Default.pm
+t/lib/TestApp/View/MT/PkgConfig.pm

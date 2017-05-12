@@ -1,0 +1,35 @@
+1.03 - Thu 08 Dec 05 06:43:31
+	Added $VERSION variable to IDEA.pm
+	Changed Makefile.PL to get version from IDEA.pm
+	Added README document
+
+1.04 - stillborn.
+
+1.05 - Thu 08 Dec 05 17:34:47 UTC
+	Added patches donated by anonymous RT guest to
+	use htons to remove endian issues and Solaris
+	build problems.
+	Tested on OS X 10.4.3, RHES3 x86, Solaris 8/9 SPARC
+	Added improved test suite contributed graciously.
+
+1.06 - Thu 08 Dec 05 18:51:23 UTC
+	changed __sparc to __sun so the module will build
+	on solaris x86.  Thanks to Cory @ Sun for the fixup.
+
+1.07 - Wed 22 Feb 06 08:57:02 UTC
+	added  || defined(__hpux) to idea.h to cope with
+	HPUX 11.11 w/ANSI C compiler per RT ticket 17796
+
+1.08 - Fri 21 Apr 06 10:40:52 UTC
+	added  || defined(WIN32) to idea.h
+	added  ifdef for WIN32 to _idea.c
+	Thanks to Carl Franks for the pach contributions
+		per RT ticket 18811
+	Updated README - added additional known-good platforms
+	Updated COPYRIGHT
+
+1.09 - Tue 23 Jul '13
+	made SvUPGRADE a statement
+	corrected VERSION statement
+	fixed _idea.c for Strawberry
+ 

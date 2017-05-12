@@ -1,0 +1,19 @@
+---
+abstract: 'Geo lookups for Catalyst::Requests via Geo::IP'
+author:
+  - 'Matthias Dietrich <perl@rainboxx.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Request-GeoIP
+requires:
+  Geo::IP: 0
+  Moose::Role: 0
+  namespace::autoclean: 0
+version: 0.001

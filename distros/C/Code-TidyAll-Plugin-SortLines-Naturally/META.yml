@@ -1,0 +1,43 @@
+---
+abstract: 'Sort lines of a file using Unicode::Collate::Locale'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Code::TidyAll: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  open: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-SortLines-Naturally
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+requires:
+  Code::TidyAll::Plugin: '0'
+  Moo: '0'
+  Unicode::Collate::Locale: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/Code-TidyAll-Plugin-SortLines-Naturally/issues
+  homepage: https://github.com/oalders/code-tidyall-plugin-sortlines-naturally
+  repository: https://github.com/oalders/code-tidyall-plugin-sortlines-naturally.git
+version: '0.000003'
+x_contributors:
+  - 'Gregory Oschwald <goschwald@maxmind.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'

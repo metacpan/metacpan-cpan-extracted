@@ -1,0 +1,62 @@
+{
+   "abstract" : "Minify your served CSS files",
+   "author" : [
+      "Ivan Drinchev <drinchev (at) gmail (dot) com>",
+      "Arthur Axel \"fREW\" Schmidt <frioux@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-CSS-Minifier-XS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::Minifier::XS" : "0",
+            "Catalyst" : "5.64",
+            "Catalyst::Test" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request" : "0",
+            "Moose" : "0",
+            "MooseX::Aliases" : "0",
+            "Path::Class::Dir" : "0.17",
+            "Test::More" : "0.88",
+            "URI" : "0",
+            "autodie" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Catalyst-View-CSS-Minifier-XS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frioux/Catalyst-View-CSS-Minifier-XS",
+         "web" : "http://github.com/frioux/Catalyst-View-CSS-Minifier-XS"
+      }
+   },
+   "version" : "2.000002"
+}
+

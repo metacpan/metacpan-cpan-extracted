@@ -1,0 +1,161 @@
+    [% PROCESS extjs2/javascript/grid/columns.tt %]
+
+    [% PROCESS extjs2/javascript/grid/toolbar.tt %]
+
+    [% PROCESS extjs2/javascript/grid/pagebar.tt %]
+
+    // most of the work in the grid itself is making the filter row work
+    // we want clickable filter fields for cols which can be filtered
+    // and the clicks ignored on other fields, and the delete col field
+    // and pressing return after editing should not start edit on anything
+    // else.
+
+    var grid = new Ext.grid.EditorGridPanel({
+        id: 'search-grid'
+        ,renderTo: 'cpac_content'
+        ,autoHeight: true
+        ,autoScroll: true
+        ,stripeRows: true
+        ,store: store
+        ,loadMask: true
+        ,colModel: cm
+        ,trackMouseOver: true
+        ,disableSelection: true
+        ,viewConfig: new Ext.grid.GridView({
+            autoFill: true
+            ,forceFit: true
+            //,scrollOffset: 0
+            ,getRowClass: function (record, index) {
+                if (index === 0) { return 'half-grey' }
+            }
+        })
+        ,listeners: {
+            cellclick: function(g, row, col) {
+                var rec = g.getStore().getAt(row);
+                var fieldName = g.getColumnModel().getDataIndex(col);
+
+                // reset the grid selectionModel
+                g.getSelectionModel().deselectRow(row);
+
+                if (fieldName == 'cpac-multi-column') {
+                    // multi rows are ignored
+                    return false;
+                }
+
+              [% IF cpac.tc.delete_allowed == 'yes' %]
+                if (fieldName == 'cpac-delete-column') {
+                    if (row === 0) {
+                        // edit row is ignored
+                        return false;
+                    }
+
+                    Ext.MessageBox.confirm (
+                        'Confirm Delete [% cpac.tc.display_name %]'
+                        ,"Are you sure you want to delete '" + rec.get('cpac__display_name') + "'?"
+                        ,function (btn) {
+                            if (btn == 'yes') {
+                                grid.loadMask.el.mask();
+                                Ext.Ajax.request({
+                                    url: '[% c.uri_for(
+                                        c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('delete'),
+                                        [cpac.g.site,cpac_db,cpac_table]
+                                    ) %]'
+                                    ,params: {
+                                        key: rec.get('cpac__id')
+                                    }
+                                    ,success: function(response,options) {
+                                        grid.loadMask.el.unmask();
+                                        Ext.MessageBox.alert(
+                                            'Success'
+                                            ,'Entry successfully deleted.'
+                                            ,function() {
+                                                // XXX private parts of pagingtoolbar
+                                                pagebar.doLoad(pagebar.cursor);
+                                            }
+                                        );
+                                    }
+                                    ,failure: function(response,options) {
+                                        grid.loadMask.el.unmask();
+                                        Ext.MessageBox.alert(
+                                            'Problem deleting entry'
+                                            ,'Sorry, the entry could not be deleted. '
+                                                + 'Is its primary key referenced in another table?'
+                                        );
+                                    }
+                                });
+                            }
+                        }
+                    );
+
+                    return false;
+                }
+              [% END %]
+
+                if (row === 0) {
+                    if (isCheck(fieldName)) {
+                        return false;
+                    }
+
+                    g.stopEditing;
+                    if (rec.get(fieldName) === '(click to add filter)') {
+                        rec.set(fieldName, '');
+                    }
+                    g.startEditing(row,col);
+                }
+              [% IF cpac.tc.update_allowed == 'yes' %]
+                else {
+                    // draw the window!
+                    var win = generate_win('update');
+                    win.show(this);
+
+                    // handle for the form
+                    var mainform = Ext.getCmp('form-panel').getForm();
+
+                    // import data from grid row
+                    mainform.loadRecord(rec);
+
+                    // fill in reverse relations
+                    mainform.setValues({
+                      [% SET count = 1 %]
+                      [% FOREACH col IN cpac.tc.cols %]
+                        [% NEXT UNLESS cpac.tm.f.$col.extra('is_reverse')
+                                AND cpac.tm.f.$col.extra('rel_type') == 'might_have' %]
+                        [% SET ft = cpac.tm.f.$col.extra('ref_table') %]
+                        [% SET anyfk = cpac.tm.f.$col.extra('ref_fields').first %]
+
+                        [%# work around SQLT's broken contextual return %]
+                        [%# need to carefully work through the SQLT methods to preseve ordering %]
+                        [% IF cpac.tm.extra('pks').size > 1 %]
+                          [% FOREACH fk IN cpac.m.t.$ft.f.$anyfk.foreign_key_reference.fields %]
+                            [% ',' IF count > 1 %]
+                            [% SET count = count + 1 %]
+                            [% SET idx = loop.index %]
+                            '[% ft %].[% fk %]':
+                                rec.data['[% cpac.m.t.$ft.f.$fk.foreign_key_reference.reference_fields.$idx %]']
+                          [% END %]
+                        [% ELSE %]
+                          [% ',' IF count > 1 %]
+                          [% SET count = count + 1 %]
+                          '[% ft %].[% anyfk %]': rec.data['[% cpac.tm.extra('pks').first %]']
+                        [% END %]
+
+                      [% END %]
+                    });
+                }
+              [% END %]
+            }
+            ,beforeedit: function(e) {
+                // cancel ENTER key driven edits from the filter row
+                // also cancel on the filter row itself if a checkbox
+                if ((e.row !== 0) || isCheck(e.field)) { return false }
+            }
+            ,columnmove: function(oldidx, newidx) {
+                // XXX private parts of pagingtoolbar
+                pagebar.doLoad(pagebar.cursor);
+            }
+        }
+        ,selModel: new Ext.grid.RowSelectionModel // req'd to deselect row
+        ,tbar: toolbar
+        ,bbar: pagebar
+    });
+

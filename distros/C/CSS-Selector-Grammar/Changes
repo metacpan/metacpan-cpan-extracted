@@ -1,0 +1,8 @@
+Revision history for CSS::Selector::Grammar
+
+0.002     2014-07-04 13:32:23-04:00 America/New_York
+  - added i index property to more rules
+
+0.001     2014-06-19 00:04:25-04:00 America/New_York
+  - initial release to the CPAN
+

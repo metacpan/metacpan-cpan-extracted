@@ -1,0 +1,174 @@
+#!/usr/bin/perl
+use strict;
+$|++;
+
+my $VERSION = '0.52';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+cpanstats-writegraphs - script to create the CPAN Testers Statistics graphs.
+
+=head1 SYNOPSIS
+
+  perl cpanstats-writegraphs
+
+=head1 DESCRIPTION
+
+Using previously formatted data, generate graphs using the Google Chart API.
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use lib qw(./lib ../lib);
+
+use Getopt::ArgvFile default=>1;
+use Getopt::Long;
+
+use CPAN::Testers::WWW::Statistics;
+
+# -------------------------------------
+# Variables
+
+my (%options);
+
+# -------------------------------------
+# Program
+
+init_options();
+
+my $stats = CPAN::Testers::WWW::Statistics->new(
+        config    => $options{config},
+        directory => $options{directory},
+        logfile   => $options{logfile},
+        logclean  => $options{logclean}
+);
+
+$stats->make_graphs();
+
+# -------------------------------------
+# Subroutines
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item init_options
+
+Prepare command line options.
+
+=item help
+
+Display the help screen.
+
+=back
+
+=cut
+
+sub init_options {
+    GetOptions( \%options,
+        'config=s',
+        'directory=s',
+        'logfile=s',
+        'logclean=i',
+        'help|h',
+        'version|v'
+    ) or help(1);
+
+    help(1) if($options{help});
+    help(0) if($options{version});
+}
+
+sub help {
+    my $full = shift;
+
+    if($full) {
+        print "\n";
+        print "Usage:$0 --config=<file> \\\n";
+        print "         [--logfile=<file> [--logclean=<1|0>]] \\\n";
+        print "         [--directory=<dir>]   \\\n";
+        print "         [--help|h] [--version|v] \n\n";
+
+#              12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        print "This program builds the CPAN Testers Statistics website graphs.\n";
+
+        print "\nFunctional Options:\n";
+        print "  [--config=<file>]          # path to config file [required]\n";
+        print "  [--directory=<dir>]        # path to website directory\n";
+        print "  [--logfile=<file>]         # path to logfile\n";
+        print "  [--logclean]		    # overwrite log if specified\n";
+
+        print "\nOther Options:\n";
+        print "  [--version]                # program version\n";
+        print "  [--help]                   # this screen\n";
+
+        print "\nFor further information type 'perldoc $0'\n";
+    }
+
+    print "$0 v$VERSION\n";
+    exit(0);
+}
+
+__END__
+
+=head1 CPAN TESTERS FUND
+
+CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.
+
+In early 2012 the Enlightened Perl Organisation very kindly set-up a
+CPAN Testers Fund within their donatation structure, to help the project
+cover the costs of servers and services.
+
+If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+F<https://members.enlightenedperl.org/drupal/donate-cpan-testers>
+
+If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.
+
+Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+F<http://iheart.cpantesters.org>
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to the RT Queue (see below).
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Statistics
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::Data::Generator>,
+L<CPAN::Testers::WWW::Reports>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2013 Barbie for Miss Barbell Productions.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+
+=cut

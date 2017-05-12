@@ -1,0 +1,58 @@
+{
+   "abstract" : "Truly private classes with private data for Perl5",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.009",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Anonymous",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.009"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Package::Anon" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Anonymous" : {
+         "file" : "lib/Class/Anonymous.pm",
+         "version" : "0.03"
+      },
+      "Class::Anonymous::Instance" : {
+         "file" : "lib/Class/Anonymous/Instance.pm"
+      },
+      "Class::Anonymous::Utils" : {
+         "file" : "lib/Class/Anonymous/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Class-Anonymous/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Class-Anonymous"
+      }
+   },
+   "version" : "0.03"
+}

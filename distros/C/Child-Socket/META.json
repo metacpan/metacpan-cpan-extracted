@@ -1,0 +1,66 @@
+{
+   "abstract" : "Socket based IPC plugin for L<Child>",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Child-Socket",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Child" : "0.007",
+            "IO::Socket::UNIX" : "0",
+            "POSIX" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Child::IPC::Socket" : {
+         "file" : "lib/Child/IPC/Socket.pm"
+      },
+      "Child::Link::IPC::Socket" : {
+         "file" : "lib/Child/Link/IPC/Socket.pm"
+      },
+      "Child::Link::IPC::Socket::Parent" : {
+         "file" : "lib/Child/Link/IPC/Socket/Parent.pm"
+      },
+      "Child::Link::IPC::Socket::Proc" : {
+         "file" : "lib/Child/Link/IPC/Socket/Proc.pm"
+      },
+      "Child::Socket" : {
+         "file" : "lib/Child/Socket.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Child-Socket/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Child-Socket"
+      }
+   },
+   "version" : "0.003"
+}

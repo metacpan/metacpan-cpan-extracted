@@ -1,0 +1,102 @@
+=head1 NAME
+
+C::TinyCompiler - Full C JIT compiling using the Tiny C Compiler
+
+These are Perl bindings to the Tiny C Compiler (TCC). TCC is a very fast, very 
+small, and nearly compliant C-99 compiler. Some benchmarks claim that TCC
+compiles 7x faster than GCC. TCC does not apply the same sorts of optimizations
+as GCC, mind you, but it still compiles to machine code. Another important
+feature of TCC is that it can compile a string of C code to machine code
+without writing to file. In other words, it can be used as a Just In Time
+C compiler!
+
+If you do not yet see my point, then consider this: Perl has excellent string
+manipulation facilities. By combining Perl's ability to manipulate strings and
+TCC's ability to quickly compile C code, we have an easy, fast way to
+dynamically generate machine code. Perl's bytecode is fast, of course, but for
+certain numerical work, this can lead to operations that are orders of magnitude
+faster.
+
+(Though, admitedly, I don't yet have the benchmarks to prove my point.)
+
+=head1 INSTALLATION
+
+This module depends on L<Alien::TinyCC>, so you must install that first with
+something like:
+
+ cpan Alien::TinyCC
+ cpanm Alien::TinyCC
+
+Once you have those installed, simply download the contents of this
+distribution from the Github repo (L<http://github.com/run4flat/perl-TCC>)
+or download and unpack the latest tarball from the Download link on the
+left of the distributions page at
+L<http://https://metacpan.org/module/C::TinyCompiler>. Once you have the
+code, run:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=head1 DEVELOPMENT
+
+Current development for C::TinyCompiler is hosted on github. To get the latest 
+work, just clone the repo:
+
+ git clone https://github.com/run4flat/perl-TCC.git
+
+Since I have a hard time keeping the F<Changes> file up-to-date, I wrote a git 
+pre-commit hook that checks that I updated the Changes file and double-checks 
+with me in case I did not. This hook is included in the repo. To enable it in 
+your clone, just copy the hook to your F<.git/hooks/> directory like so:
+
+ # Optional; helps keep the Changes file up-to-date
+ cp git-pre-commit-hook.pl .git/hooks/pre-commit    # Unixen
+ copy git-pre-commit-hook.pl .git/hooks/pre-commit  # Windows
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc C::TinyCompiler
+
+You can also look for information at:
+
+=over 4
+
+=item * The Github issue tracker (report bugs here)
+
+L<http://github.com/run4flat/perl-TCC/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/C-TinyCompiler>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/C-TinyCompiler>
+
+=item * Search CPAN
+
+L<http://p3rl.org/C::TinyCompiler>
+L<http://search.cpan.org/dist/C-TinyCompiler/>
+
+=back
+
+=head1 AUTHOR
+
+Written by David Mertens, C<< <dcmertens.perl at gmail.com> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Portions of this code are copyright 2011-2013 Northwestern University.
+Portions of this code are copyright 2013 Dickinson College.
+Documentation copyright 2011-2013 David Mertens.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

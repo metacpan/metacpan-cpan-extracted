@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name: ClamAV-Client
+version: 0.11
+author:
+  - Julian Mehnle <julian@mehnle.net>
+abstract: |-
+  A client class for the ClamAV C<clamd> virus scanner daemon
+license: perl
+requires:
+  Error: 0
+  IO::File: 0
+  IO::Socket: 0
+  IO::Socket::INET: 0
+  IO::Socket::UNIX: 0
+  perl: 0
+provides:
+  ClamAV::Client:
+    file: lib/ClamAV/Client.pm
+    version: 0.11
+  ClamAV::Client::Error:
+    file: lib/ClamAV/Client.pm
+    version: 0.11
+  ClamAV::Config:
+    file: lib/ClamAV/Config.pm
+    version: 0.11
+  ClamAV::Config::Error:
+    file: lib/ClamAV/Config.pm
+    version: 0.11
+generated_by: Module::Build version 0.26

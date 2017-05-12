@@ -1,0 +1,194 @@
+NAME
+
+    Catalyst::Plugin::SmartURI - Configurable URIs for Catalyst
+
+SYNOPSIS
+
+    In your lib/MyApp.pm, load the plugin and your other plugins, for
+    example:
+
+        use Catalyst qw/
+            -Debug
+            ConfigLoader
+            Static::Simple
+            Session
+            Session::Store::Memcached
+            Session::State::Cookie
+            Authentication
+            Authorization::Roles
+            +CatalystX::SimpleLogin
+            SmartURI
+        /;
+
+    In your .conf:
+
+        <Plugin::SmartURI>
+            disposition host-header   # application-wide
+            uri_class   URI::SmartURI # by default
+        </Plugin::SmartURI>
+
+    Per request:
+
+        $c->uri_disposition('absolute');
+
+    Methods on URIs:
+
+        <a href="[% c.uri_for('/foo').relative %]" ...
+
+DESCRIPTION
+
+    Configure whether $c->uri_for and $c->req->uri_with return absolute,
+    hostless or relative URIs, or URIs based on the 'Host' header. Also
+    allows configuring which URI class to use. Works on application-wide or
+    per-request basis.
+
+    This is useful in situations where you're for example, redirecting to a
+    lighttpd from a firewall rule, instead of a real proxy, and you want
+    your links and redirects to still work correctly.
+
+    To use your own URI class, just subclass URI::SmartURI and set
+    uri_class, or write a class that follows the same interface.
+
+    This plugin installs a custom $c->request_class, however it does so in
+    a way that won't break if you've already set $c->request_class
+    yourself, ie. by using Catalyst::Action::REST (thanks mst!).
+
+    There is a minor performance penalty in perls older than 5.10, due to
+    Class::C3, but only at initialization time.
+
+METHODS
+
+ $c->uri_for
+
+ $c->req->uri_with
+
+    Returns a $c->uri_class object (URI::SmartURI by default) in the
+    configured $c->uri_disposition.
+
+ $c->req->uri
+
+    Returns a $c->uri_class object. If the context hasn't been prepared
+    yet, uses the configured value for uri_class.
+
+    $c->req->uri->relative will be relative to $c->req->base.
+
+ $c->req->referer
+
+    Returns a $c->uri_class object for the referer (or configured uri_class
+    if there's no context) with reference set to $c->req->uri if it comes
+    from $c->req->base.
+
+    In other words, if referer is your app, you can do
+    $c->req->referer->relative and it will do the right thing.
+
+CONFIGURATION
+
+    In myapp.conf:
+
+        <Plugin::SmartURI>
+            disposition absolute
+            uri_class   URI::SmartURI
+        </Plugin::SmartURI>
+
+    disposition
+
+      One of 'absolute', 'hostless', 'relative' or 'host-header'. Defaults
+      to 'absolute'.
+
+      The special disposition 'host-header' uses the value of your 'Host:'
+      header.
+
+    uri_class
+
+      The class to use for URIs, defaults to URI::SmartURI.
+
+PER REQUEST
+
+        package MyAPP::Controller::RSSFeed;
+    
+        ...
+    
+        sub begin : Private {
+            my ($self, $c) = @_;
+    
+            $c->uri_class('Your::URI::Class::For::Request');
+            $c->uri_disposition('absolute');
+        }
+
+    $c->uri_disposition('absolute'|'hostless'|'relative'|'host-header')
+
+      Set URI disposition to use for the duration of the request.
+
+    $c->uri_class($class)
+
+      Set the URI class to use for $c->uri_for and $c->req->uri_with for
+      the duration of the request.
+
+EXTENDING
+
+    $c->prepare_uri actually creates the URI, which you can override.
+
+SEE ALSO
+
+    URI::SmartURI, Catalyst, URI
+
+AUTHOR
+
+    Rafael Kitover, <rkitover at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-catalyst-plugin-smarturi at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-SmartURI.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Plugin::SmartURI
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-SmartURI
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Catalyst-Plugin-SmartURI
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Catalyst-Plugin-SmartURI
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Catalyst-Plugin-SmartURI
+
+ACKNOWLEDGEMENTS
+
+    from #catalyst:
+
+    vipul came up with the idea
+
+    mst came up with the design and implementation details for the current
+    version
+
+    kd reviewed my code and offered suggestions
+
+TODO
+
+    I'd like to extend on Catalyst::Plugin::RequireSSL, and make a plugin
+    that rewrites URIs for actions with an SSL attribute.
+
+COPYRIGHT & LICENSE
+
+    Copyright (c) 2008 Rafael Kitover
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

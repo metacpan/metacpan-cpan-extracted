@@ -1,0 +1,24 @@
+$VAR1 = {
+          'GREEN' => {
+                       'COLOR' => 'green'
+                     },
+          'MAIN' => {
+                      'ANOTHERKEY' => 'other value',
+                      'KEY' => 'value',
+                      'KOE' => 'ne se chete'
+                    },
+          'FRUITS' => {
+                        'TREE' => {
+                                    'ISATREE' => 'yes'
+                                  },
+                        'APPLE' => {
+                                     'COLOR' => 'green',
+                                     'NAME' => 'this is a green apple tree',
+                                     'ISATREE' => 'yes'
+                                   }
+                      },
+          'NEWSECTION' => {
+                            'SECTIONKEY1' => 'value',
+                            'NEWKEY' => 'value'
+                          }
+        };

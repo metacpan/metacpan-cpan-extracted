@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# $Id: cpanxr,v 1.2 2003/10/06 21:00:47 clajac Exp $
+
+use CPANXR;
+use CPANXR::Config;
+use CPANXR::Indexer;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec::Functions qw(catfile);
+use strict;
+
+my ($help, $man);
+
+GetOptions("help|?" => \$help, man => \$man);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+my $cmd = shift;
+
+if($cmd eq 'index') {
+  my $xr_root = catfile(CPANXR::Config->get('XrRoot'), "*");
+  my @dists = glob($xr_root);
+  foreach my $dist (@dists) {
+    if(-e $dist && -d $dist) {
+      eval {
+	CPANXR::Indexer->index($dist);
+      };
+
+      if($@) {
+	print STDERR "Failed to index '$dist' because of: $@\n";
+      }
+    }
+  }
+}
+
+__END__
+
+=head1 NAME
+
+cpanxr - CPANXR indexer
+
+=head1 SYNOPOSIS
+
+cpanxr [options] command
+
+ Options:
+  -help             brief help message
+  -man              full documentation
+
+ Commands:
+  index             Run indexer
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Prints a brief help message and exit.
+
+=item B<-man>
+
+Prints the manual page and exists.
+
+=back
+
+=head1 COMMANDS
+
+=over 8
+
+=item B<index>
+
+Index distributions
+
+=back
+
+=head1 DESCRIPTION
+
+B<cpanxr> will index the distributions unpackaged in the directory as specified by the B<XrRoot> configuration directive in I</etc/cpanxr.conf>.
+
+=cut

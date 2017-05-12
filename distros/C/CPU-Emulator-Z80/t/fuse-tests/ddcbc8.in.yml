@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 101
+    - 200
+  28383:
+    - 143
+name: ddcbc8
+registers:
+  AF: 35530
+  AF_: 0
+  BC: 5022
+  BC_: 0
+  DE: 58962
+  DE_: 0
+  HL: 9355
+  HL_: 0
+  I: 0
+  IX: 28282
+  IY: 6298
+  PC: 0
+  R: 0
+  SP: 0

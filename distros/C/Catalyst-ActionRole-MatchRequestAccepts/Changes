@@ -1,0 +1,23 @@
+Revision history for Perl extension Catalyst::ActionRole::MatchRequestAccepts
+
+0.06    09 January 2017
+        - Merged https://github.com/jjn1056/Catalyst-ActionRole-MatchRequestAccepts/pull/2
+          to fix issue when you declare multiple Accept attributes
+
+0.05    12 May 2011
+        - fixed a documentation mistake and took the opportunity to
+          add a bit more details to the docs.
+
+0.04    11 May 2011
+        - removed additional debugging code
+`
+0.03    11 May 2011
+        - fixed a last moment typo that causes tests to fail
+
+0.02    11 May 2011
+        - (removed version due to ultimate brokeness)
+        - Removed some debug code I accidentally left in place.
+        - minor code and documentation tweaks.
+
+0.01    10 May 2011
+        - original version.

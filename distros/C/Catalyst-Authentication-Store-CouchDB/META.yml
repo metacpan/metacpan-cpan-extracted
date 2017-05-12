@@ -1,0 +1,41 @@
+---
+abstract: 'A storage class for Catalyst Authentication using CouchDB'
+author:
+  - 'Colin Bradford <cjbradford@gmail.com>'
+build_requires:
+  Catalyst: 5.80032
+  Catalyst::Controller: 0
+  Catalyst::Plugin::Authorization::Roles: 0
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Test: 0
+  English: 0
+  FindBin: 1.49
+  HTTP::Response: 5.824
+  LWP::UserAgent: 5.834
+  Test::Exception: 0.31
+  Test::More: 0.98
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Store-CouchDB
+requires:
+  Catalyst::Authentication::User: 0
+  Catalyst::Exception: 0
+  Catalyst::Utils: 0
+  CouchDB::Client: 0.09
+  JSON: 2.17
+  Moose: 2.00
+  MooseX::NonMoose: 0.20
+  Try::Tiny: 0.09
+  namespace::autoclean: 0
+resources:
+  homepage: http://github.com/cjbradford/catalyst-authentication-store-couchdb
+  repository: http://github.com/cjbradford/catalyst-authentication-store-couchdb
+version: 0.001

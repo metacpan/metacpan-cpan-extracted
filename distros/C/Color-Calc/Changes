@@ -1,0 +1,114 @@
+Revision history for Perl extension Color::Calc.
+
+1.074 (2014-09-27):
+	- FIXES: #99150: not everything from POSIX (reported by JHI)
+
+1.073 (2012-06-29)
+	- FIXES: compile error due to warning "Non-ASCII character seen before
+	  =encoding in '...'. Assuming UTF-8"
+
+1.072 (2011-12-08)
+	- FIXES: #72615 faulty data in Build.PL causes a lack of
+	  meta files, which breaks carton.
+
+1.071 (2011-03-07)
+	- FIXES: #66357: Cannot Build the library on Debian
+	  (reported by SILASMONK)
+
+1.070 (2010-10-20)
+	- better workaround for #54500, now also works with explicit scheme
+	  specifications (e.g. 'HTML'), not just the default value
+	- unsupported output formats (due to uninstalled modules) now croak at
+	  import
+	- allow all types of colour schemes acceptet by Graphics::ColorNames
+	- add missing tests for Color::Calc::color_* calls
+
+1.061 (2010-02-11)
+	- workaround for #54500: ambiguity between module and file names in
+	  TIEHASH in Color::GraphicsName  (reported here by sunnavy)
+
+1.060 (2010-01-01)
+	- release 1.059_20091227
+
+1.059_20091227
+	- new calc functions: opposite, round, safe
+
+1.059_20091226
+	- use Scalar::Util, List::Util
+	- some clean-ups and refactorisations
+	- remove obsolete modules
+
+1.052 Mon Dec 14 00:00:00 2009
+	- switch to Module::Build
+	- FIXES: #52744: Undeclared dependency on Test::NoWarnings
+	  (reported by ANDK)
+	- better documentation
+
+1.051 Fri Dec 11 00:00:00 2009
+	- documentation and meta information fixes, switch to Github
+	- no API/functionality changes
+
+1.05 Sun Sep 14 22:00:00 2008
+	- use warnings everywhere
+	- use strict everywhere
+	- Test::Pod & Test::Pod::Coverage
+	- cleanup
+
+1.04 Sun Dec 10 22:00:00 2006
+	- fixed last test w/ Graphics::ColorObject
+	  (reported by Nelson Elhage)
+
+1.03 Thu Nov 16 16:45:00 2006
+	- documentation update
+	- fixes and tests for 'pdf' format
+
+1.02 Mon Nov 13 00:00:00 2006
+	- fixed tests without Graphics::ColorObject
+
+1.01 Sat Nov 11 11:11:11 2006
+	- fixed tests w/ Graphics::ColorObject (reported by
+	  Ernesto Hernández-Novich)
+	- fixed dependencies (reported by Ernesto Hernández-Novich)
+
+1.00 Sat Sep 24 20:00:00 2005
+	- new 'pdf' output format, which is accepted by PDF::API2 v.40
+	- allow any number of hex digits per color in #RGB/#RRGGBB/
+	  #RRRGGGBBB/...
+	- better tests
+	- FIX: #13731 import w/ use does not work under mod_perl
+
+0.29_0003 Sat Apr 09 20:00:00 2005
+	- fixed MANIFEST (broken distribution)
+
+0.29_0002 Sat Mar 26 16:20:00 2005
+	- Color::Calc::WWW now uses Graphics::ColorNames::WWW
+	- Color::Calc::WWW was missing from distribution
+	- removed 'pdf' output format as PDF::API2::Color is no longer
+	- complete test suite
+
+0.29_0001 Fri Mar 25 12:00:00 2005
+	- added object-orientated interface
+	- added procedural interface with customisation on import
+	- added Color::Calc::WWW
+	- color scheme is now selectable
+
+0.20  Mon Mar 28 00:00:00 2004
+	- added Color::Calc::<xxx> modules to select return type
+	- added $Color::Calc::MODE to select return type
+	- return value of xxx_tuple can be used as parameter
+	- <xxx>_html returns color names instead of #RRGGBB if possible
+	- support for Graphics::ColorObject (input/output)
+	- support for PDF::API2::Color (input/output)
+	- fixed import list
+
+0.12  Thu Mar 18 00:00:00 2004
+	- added xxx_html
+	- should work with perl 5.005 now
+
+0.10  Sun May 04 00:00:00 2003
+	- added tests
+	- added more functions
+	- some documentation corrections
+
+0.02  Sat Apr 26 00:00:00 2003
+	- first public release

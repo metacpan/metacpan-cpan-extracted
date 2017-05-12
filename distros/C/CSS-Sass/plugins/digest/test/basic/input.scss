@@ -1,0 +1,16 @@
+$text: "Hello World";
+$file: "digest.txt";
+
+strings {
+  md5: md5($text);
+  crc16: crc16($text);
+  crc32: crc32($text);
+  base64: base64($text);
+}
+
+files {
+  md5: md5f($file);
+  crc16: crc16f($file);
+  crc32: crc32f($file);
+  base64: base64f($file);
+}

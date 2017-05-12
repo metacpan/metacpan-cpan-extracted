@@ -1,0 +1,37 @@
+CatalystX-PathContext version 0.0.1
+
+This Role allows your Catalyst app to provide multiple path prefixes aka
+a context with none or multiple url path based arguments.
+
+You can specify as much path prefixes as you like and give them a name
+and use a matchp for matching them. If the module finds a configured
+path prefix you could find all info in the catalyst stash and it could be
+used for whatever you like (eg. use a different view for different
+languages).
+
+If you use this module your Catalyst controllers would be reachable via
+the default urls but also over urls which are prefixed with anything you
+would use as prefix.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+This module only works under Perl 5.10 or later.
+It requires a Catalyst and isa Moose::Role
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Andreas 'ac0v' Specht
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

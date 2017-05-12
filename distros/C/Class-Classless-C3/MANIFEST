@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-Classless-C3.t
+lib/Class/Classless/C3.pm
+META.yml                                 Module meta-data (added by MakeMaker)

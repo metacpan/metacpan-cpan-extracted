@@ -1,0 +1,98 @@
+This file documents the revision history for Catalyst::Engine::Apache.
+
+1.16   2010-10-05 00:29:16
+        - No code changes.
+        - Don't ship .rej files in the dist.
+        - Convert to Dist::Zilla.
+
+1.15   2010-10-03 22:07:00
+        - Fix license info for debian et all.
+
+1.14
+        - No changes since dev release.
+
+1.13_01
+        - Update tests to pass again.
+        - Update tests to not throw warnings with newer versions of Catalyst.
+        - Fix $c->req->remote_user with this engine.
+        - Clarify use with non-standard ports.
+        - Fixes RT#61707, RT#61706, RT#61704, RT#36829
+
+1.13
+        - Workaround change in LWP that broke a cookie test (RT #40037)
+        - Update streaming test to latest 5.70
+
+1.12    2008-02-20 09:00:00
+        - Fixed bug where %2b in query parameter is doubly decoded to ' ', instead of '+'
+          (Gavin Henry, Tatsuhiko Miyagawa)
+        - Fixed bug where req->base and req->uri would include a port number when running
+          in SSL mode.
+        - Fixed warning when a non-trivial regex is used in a LocationMatch block.
+          (Steffen Schwigon)
+        - Clear the value of $c->engine->return() before each request.
+        - Added support for 'PerlSetVar CatalystDisableLocationMatch 1' to disable check
+          for a LocationMatch regex to set base path.
+
+1.11    2007-05-18 08:30:00
+        - Don't 'use mod_perl;' as this may not work on some mod_perl installations.
+
+1.10    2007-05-15 17:40:00
+        - Properly detect the base when running within a LocationMatch block.
+        - Use the unparsed URI for building the path instead of Apache's
+          pre-parsed URI.
+        - Load APR::Table when using mod_perl 1.99.
+        - Switch to Module::Install.
+
+1.09    2007-03-28 23:00:00
+        - Fixed compatibility with older Catalyst versions.  5.7008+
+          is recommended for best performance.
+
+1.08    2007-03-28 22:45:00
+        - Improved prepare_query_parameters performance by using C-based
+          Apache modules instead of URI and URI::Escape.
+        - Improved prepare_path performance by removing the use of URI.pm.
+        - Extract host and port from X-Forwarded-Host.
+        - Use Apache2::ModSSL for determining SSL mode if available.
+
+1.07    2006-02-17 17:00:00
+        - Fixed bug: Can't locate object method "FIRSTKEY" via package
+          "APR::Table" when running under mod_perl 2.0.2.
+
+1.06    2006-01-17 16:30:00
+        - Removed t/01use.t as it will fail if Catalyst is not installed.
+
+1.05    2005-12-23 10:00:00
+        - Fixed double-cookie bug on redirects.
+        - Synced tests with Catalyst.
+
+1.04    2005-12-22 13:15:00
+        - Fixed bug when processing a bare HTTP/1.0 HEAD request with no
+          headers.
+
+1.03    2005-12-13 22:30:00
+        - Removed dependency on Catalyst because it causes an endless loop
+          when trying to install Cat with AutoInstall.
+
+1.02    2005-12-06 08:35:00
+        - Default to text/html, like the standalone server.
+
+1.01    2005-12-05 14:25:00
+        - Added $c->engine->return method to allow custom Apache status
+          codes to be returned from the mod_perl handler.
+        - Fixed mod_perl 1.99 engine to use correct Apache::OK status code.
+
+1.00    2005-11-13 19:30:00
+        - No changes, version bumped to coincide with Catalyst 5.50.
+
+0.99002 2005-11-08 09:00:00
+        - Really fixed the return values and status codes this time!
+
+0.99001 2005-10-25 21:25:00
+        - Fixed return value from handler to use the correct
+          Apache::Const or Apache2::Const value rather than a numeric
+          value.
+        - Fixed query param handling.
+        - Added automated tests using Apache::Test.
+
+0.99    2005-10-10 10:15:00
+        - Initial release, separated Apache engines from Catalyst core.

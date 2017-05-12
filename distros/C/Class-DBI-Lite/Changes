@@ -1,0 +1,316 @@
+Revision history for Perl extension Class::DBI::Lite.
+
+1.034   2012-05-07
+  - DEPRECATED until further notice.
+    No other changes.
+
+1.033   2012-03-08
+  - This release fixes a long-standing bug in Class::DBI::Lite::Pager->nagivations
+    which caused it to sometimes return '0' as the "start" position.
+    eg: my ($start, $stop) = $pager->navigations()
+    If you then did:
+    for my $page_number ($start..$stop) { # Make a hyperlink to $page_number }
+    Your first $page_number would sometimes be '0'
+  - Ray Baksh++ for submitting the patch at a ridiculous wee hour in the morning.
+    (Much appreciated!)
+
+1.032   2012-03-02
+  - No longer depend on or use DBIx::ContextualFetch.
+  - RootMeta was not getting cached/setup correctly in ::Lite.  First attempt to fix this.
+  - Bumped version dependency of Ima::DBI::Contextual due to bugfixes/enhancements there.
+
+1.031   2012-02-29
+  - Special leap-day release.
+  - Documented the limit/offset/order_by way of calling ->search_where
+
+1.030   2012-02-22
+  - Fixed regression in 1.029 which caused db_Main to be reset each time
+    a new connection was defined.
+  - UPGRADE RECOMMENDED!
+
+1.029   2012-02-13
+  - Added support for master/slaves setup.
+  - Multiple slaves are supported (there can only be one master).
+  - Slaves are always read from *unless* you are within a transaction.
+    In that case, all reads go to the master.
+  - All writes go to the master.
+  - You can change your slave connection at any time via ->switch_slave($debug).
+  - Passing a true value to ->switch_slave will cause a little message to be printed
+    to STDERR which looks like:
+      "[Debug] Switched slave from DBI:mysql:dbname:host1 to DBI:mysql:dbname:host2"
+  - Also updated the 'pagination' test so that it runs quicker.
+
+1.028   2012-01-30
+  - No longer die on a failed class-load.
+
+1.027   2012-01-10
+  - Setting $pager->page_number( 1 ) now works.
+
+1.026   2011-11-18
+  - do_transaction will now look at wantarray and execute the transaction coderef
+    in the appropriate list or scalar context, and return the appropriate result.
+
+1.025   2011-11-07
+  - Fixed POD for count_search_where.  (ray.baksh++)
+
+1.024   2011-11-04
+  - Calling sth_to_objects(...) would return a list with a single 'undef' element
+    instead of returning nothing when no results were found.
+
+1.023   2011-10-27
+  - Now if you want to override the default 'getter' or 'setter' behavior for a
+    field in your objects, you can do so by defining _set_foo( $self, $val ) or
+    _get_foo( $self ).
+  - Thanks Eric for the idea!  ehayes.inflection++
+
+1.022   2011-09-19
+  - POD change from app::* to App::db::* namespace.
+
+1.021   2011-06-14
+  - Upgrade Recommended!!
+  - BUG FIX: `before_update` triggers which caused changes to an object did not get those
+    changes saved as part of the final update.
+
+1.020   2011-06-05
+  - Updates to work with changes in the public interface of Ima::DBI::Contextual.
+  - No other changes.
+
+1.019   2011-04-08
+  - Updated POD to use the new lowercase classname standard - as in .NET's Entity Framework.
+
+1.018   2011-04-07
+  - Added ->trace( 1:0 ) to enable/disable SQL logging to STDERR via Carp::cluck.
+
+1.017   2010-12-09
+  - Upgrade Recommended!!
+  - BUG FIX: before_update_<field> triggers were not able to change the value of object data.
+    So if you had a before_update_password trigger that hashed the password before
+    the plaintext password were stored in the database, it would not work as expected.
+
+1.016   2010-11-17
+  - Included Class::DBI::Lite::Dataset - a class with helper methods useful for
+    fetching a recordset useful for paged displays.
+
+1.015   2010-09-17  ** BEHAVIOR CHANGE!!!! **
+  - has_many(...) no longer adds a trigger for after_delete that would remove whatever
+    the 'has_many' reference declares.  Reason? This should be handled by the database,
+    not by the application.
+
+1.014   2010-09-09
+  - root() is initialized to your application's base class (eg: My::Model).
+    This helps segment database handles even further.
+
+1.013   2010-08-08
+  - This release fixes that bug related to running multiple applications under
+    different VirtualHosts on the same apache server.
+
+1.012   2010-05-20
+  - This release addresses several issues related to running multiple applications
+    under different VirtualHosts on the same apache server.
+
+1.011   2010-05-19
+  - Removed dependency on DBIx::ContextualFetch.
+  - Removed dependency on Ima::DBI - lateral move to Ima::DBI::Lite.  See Ima::DBI::Lite
+    for details on why...
+
+1.010   2010-05-13
+  - My::Thing->sql_pager(...) now correctly handles {order_by => ...}
+
+1.009   2010-04-26
+  - Class::DBI::Lite::mysql was incorrectly parsing `SHOW COLUMNS FROM <table>`
+    and therefore not returning the correct information when you called:
+      My::Type->get_table_info->column('foo')->enum_values
+    This is now fixed.
+
+1.008   2010-04-02
+  - Pager was reporting incorrect stop_item before items() or next_page() were called.
+  - That caused problems when you wanted to say...
+    "Showing items X - Y of Z total items"
+    ...before you actually showed them.
+
+1.007   2010-04-02
+  - Pager now does the right thing when you want to page without specifying
+    the field to sort by.
+  - New method $pager->navigations( [$padding] ).
+
+1.006   2010-03-27
+  - Pager was not handling 'has_next' correctly - now it does.
+
+1.005   2010-03-22
+  - Renamed has_a method as belongs_to.
+  - Added has_one method.
+  - Added test t/010-basic/000-AAAsetup.t that creates the SQLite database structure.
+  - Added the ability to pass search_where-style arguments to the has-many relationship
+    methods.  So if My::Artist has_many My::Album as 'albums' you can now do:
+      my @albums = $artist->albums({name => { LIKE => 'Best of%'}}, {order_by => 'name DESC'});
+    * A SPECIAL thanks to Tudor Marghidanu for finding a bug and for suggesting this update.
+
+1.004   2010-03-16
+  - Had to update Changes and META.yml.
+
+1.003   2010-03-16
+  - Added Class::DBI::Lite::Pager
+  - Added 2 new methods: pager(...) and sql_pager(...)
+  - Added documentation for the new methods and the Pager class.
+  - Added tests for paging.
+
+1.002   2010-03-13
+  - create(...) now properly inserts the new object into the %Live_Objects cache.
+  - Experimental NoSQL caching extensions added.
+  - Caching options include InMemory and Memcached.
+
+1.001   2010-02-14
+  - Didn't update 'Changes' file in 1.000, so had to re-upload it and change version.
+
+1.000   2010-02-14
+  - Going 1.0!
+  - Added lots of documentation and examples.
+  - Test coverage is quite high.
+  - Public interface is frozen.
+  - Used in production for over a year on websites getting millions of hits.
+
+0.034   2009-10-28
+  - Enum vals NOW work for mysql.
+
+0.033   2009-10-28
+  - Fixed broken regexp from last update.
+
+0.032   2009-10-28
+  - New Feature: "enum" column values are now parsed and added to
+    the "get_table_info->column('columnName')->enum_values" property as an arrayref.
+
+0.031   2009-10-22
+  - MANIFEST was missing t/lib/My/Fixtures.pm
+
+0.030   2009-10-17
+  - Added Class::DBI::Lite::Fixture for easy test fixtures.
+  - Added tests for test fixtures.
+
+0.029   2009-10-16
+  - Added "ad hoc" queries.
+  - Test coverage much better now.
+  - Updated Artists/CDs example to Artists/Albums.
+
+0.028   2009-08-22
+  - Promoted _load_class to be a public method (as load_class($class) ).
+
+0.027   2009-06-18
+  - create() was calling discard changes after creation, which had the rare side-effect
+    of reverting any values set by before_create triggers.
+
+0.026   2009-06-12
+  - Removed AUTOLOAD accessor/mutators.  Gained a performance increase (oh about 300%).
+
+0.025   2009-04-17
+  - Update to after_update_$field triggers to keep them from getting called
+    over-and-over.
+
+0.024   2009-04-07
+  - Field-triggers were not getting called (eg: after_update_$field)
+
+0.023   2009-04-06
+  - Transactions that failed only warned.  Now they confess.
+
+0.022   2009-04-05
+  - Transactions work properly.
+  - Added TableInfo and ColumnInfo.
+  - Added class method 'Class->get_table_info()' which returns a TableInfo object.
+
+0.021   2009-04-01
+  - There was a rogue "commit" statement in DESTROY.  Removing it made transactions
+    work properly.
+  - Added test for transactions.
+
+0.020   2009-03-20
+  - Converted to Module::Install.
+  - Added several tests, improved code-coverage.
+  - discard_changes() now uses the __Changed->{$fieldname}->{oldval} data instead
+    of re-retrieving the object from the database.
+  - Fixed typo in error message for AUTOLOAD in Class::DBI::Lite.
+
+0.019   2009-02-07
+  - Broke schema metadata and entity metadata out into their own classes.
+  - Metadata classes are schema/entity-partitioned singletons.
+  - Initialization process is slightly different as a result of metadata changes.
+  - Classes that subclass entity classes no longer have to call set_up_table(...).
+
+0.018   2009-01-05
+  - Subclasses of entity classes should no longer receive 
+    errors like "Can't use an undefined value as a HASH reference"
+
+0.017   2008-11-23
+  - Use of has_a or has_many sometimes failed because _init_meta had not yet
+    been called.
+
+0.016   2008-10-27
+  - db_Main database handle is now created with "AutoCommit = 1" to prevent a
+    transaction deadlock in other code that uses Class::DBI::Lite::mysql.
+
+0.015   2008-10-26
+  - Object cache key now begins with the current database schema.
+
+0.014   2008-10-24
+  - Added "after_set_up_table()" event.
+
+0.013   2008-10-12
+  - Added Test::Memory::Cycle to dependencies list in Makefile.PL
+
+0.012   2008-10-10
+  - Updated some documentation.
+  - has_a and has_many causes the other class to be loaded via require().
+
+0.011   2008-10-09
+  - Stable release of new version.
+  - Fixed a bug under mod_perl which caused unstable behavior when each
+    VirtualHost used a different database handle.  Sometimes a VirtualHost
+    started talking to the wrong database (which is not good, obviously!).
+
+0.010_01   2008-10-09
+  - Complete rewrite.
+  - Removed dependency on Class::Data::Inheritable.  Switched to simpler
+    class-based "meta" hashrefs.
+  - Improved performance.
+
+0.009   2008-09-16
+  - Added find_column().
+
+0.008   2008-08-17
+  - Added logic to ping() the DBI handle a maximum of once every 5 seconds.
+    This should fix the bug that causes the occasional "white screen of death"
+    after a web application has been idle for a long period.
+
+0.007   2008-08-01
+  - discard_changes() now correctly discards changes.
+  - Updated POD to mention DBIx::Class and DBIx::Class::CDBICompat.
+  - Added a memcycle test to check for any memory leaks.
+
+0.006   2008-07-18
+  - $obj->remove_from_object_index() removes it from memory AND the %Live_Objects cache.
+
+0.005   2008-07-18
+  - $obj->delete on an object that has_many will delete its has_many records
+    via straight SQL unless the has_many class has before/after_delete triggers.
+  - added new trigger events:
+      before_set_$column( $s, $oldval, $newval )
+      after_set_$column( $s, $oldval, $newval )
+      before_update_$column( $s, $oldval, $newval )
+      after_update_$column( $s, $oldval, $newval )
+  - Updating a field value with the same value as the old value is ignored.
+
+0.004   2008-07-18
+  - All create/update/delete/add_to_* actions are performed within transactions.
+
+0.003   2008-07-18
+  - OK, *now* triggers are called on the correct objects.
+
+0.002   2008-07-18
+  - Triggers are now called on the correct object with the correct @_.
+
+0.002_01  2008-07-17
+  - Updated Makefile.PL to properly list all prerequisites.
+  - Updated POD.
+
+0.001 2008-07-16
+	- original version; created by h2xs 1.23 with options
+		-AXn Class::DBI::Lite
+

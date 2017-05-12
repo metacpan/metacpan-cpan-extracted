@@ -1,0 +1,37 @@
+NAME
+    Catmandu::Importer::Parltrack - Import from Parltrack
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        catmandu convert Parltrack --dossier "2011/0167(NLE)"
+        catmandu convert Parltrack --mep "Rebecca HARMS"
+        catmandu convert Parltrack --meps 1
+
+        echo '/dossier/2011/0167(NLE)' | catmandu convert Parltrack
+        echo '/mep/Rebecca HARMS' | catmandu convert Parltrack
+
+DESCRIPTION
+    This Catmandu::Importer queries Parltrack for entities.
+
+CONFIGURATION
+    This importer extends Catmandu::Importer::getJSON, so it can be configured
+    with options `agent`, `timeout`, `headers`, `proxy`, and `dry`. Additional
+    options include:
+
+    api Parltrack API base URL. Default is `http://parltrack.euwiki.org`.
+
+    dossier
+    meps
+    committee
+
+AUTHOR
+    Jonas Smedegaard
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Jonas Smedegaard.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+

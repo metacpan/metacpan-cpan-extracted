@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::CBC;    # CBC automatically loads Loki97 for us
+
+my $key = pack "H32", "00112233445566778899aabbccddeeff";
+my $IV = pack "H32", "00112233445566778899aabbccddeeff";
+
+my $cipher = Crypt::CBC->new({'key' => $key,
+                              'cipher' => 'Loki97',
+                              'iv' => $IV,
+                              'regenerate_key' => 1,
+                              'padding' => 'standard',
+                              'prepend_iv' => 0
+                            });
+
+my $plaintext1 = pack "H32", "0123456789abcdeffedcba9876543210";
+print "plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1 : ", unpack("H*", $ciphertext1), "\n";
+
+my $plaintext2 = $cipher->decrypt($ciphertext1);
+print "plaintext2  : ", unpack("H*", $plaintext2), "\n";
+

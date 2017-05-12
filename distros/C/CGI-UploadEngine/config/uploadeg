@@ -1,0 +1,7 @@
+---
+file_path: /var/www/html/documents/engine/
+max_size: 5000000
+min_size: 1
+allowed_types: .ahk .htm .html .pdf .doc .txt
+disallowed_types: .exe .pl .sh
+

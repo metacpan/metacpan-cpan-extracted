@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-Plugin-URLMap,
+version 0.002:
+
+  Mount any Plack application to a URL root
+
+This software is copyright (c) 2012 by John Napiorkowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/TraitFor/Controller/Ping.pm
+t/00-load.t
+t/01-basic.t
+t/lib/AppTest.pm
+t/lib/AppTest/Controller/.Root.pm.swp
+t/lib/AppTest/Controller/Root.pm
+t/lib/AppTest/Model/SomeModel.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

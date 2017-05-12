@@ -1,0 +1,58 @@
+Contize version 0.2
+====================
+
+Fake Continuations for a Perl Object. Sort of.
+
+Contize is primarily meant to be useful in the context of CGI programming. It
+effectively alters the programmer's view of what is happening -- changing it
+from a program which is run and re-run with each input/output into a program
+which is continuously run, sending output and then pausing for input at certain
+intervals. Documentation on using Contize for this style of CGI programming can
+be found elsewhere for now.
+
+Contize helps an object to be suspendable and resumeable. For this to happen
+the object must be Contized, which is a lot like being blessed or Memoized.
+Once an object has been Contized several new methods are provided to it. The
+two most important methods are suspend and resume.
+
+The suspend method logically replaces the normal return statement. So instead
+of a method returning its results directly it instead does
+"$self->suspend(@results)". The suspend method contains an 'exit', so upon
+suspend the entire process is terminated. In order to succesfully be resumed at
+a later point, the owner of this object should have an END block which saves
+the Contized object to long-term storage.
+
+The resume method is called by the program after it has restored the Contized
+object from long-term storage. This restores the objects internal state so that
+subsequent calls to its methods will (more or less) pick up right where they
+left off. So, if you have a CGI::Session object for example, you might have
+something like this:
+
+  my $obj = $session->param('obj') || new Contize(new MyObj);
+  $obj->resume();
+  $obj->run();
+
+Fun, eh? Also see http://thelackthereof.org/wiki.pl/Contize
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires doesn't have any extra dependencies, I think.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Brock Wilcox <awwaiid@thelackthereof.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/Builtin.pm
+lib/Class/Builtin/Scalar.pm
+lib/Class/Builtin/Array.pm
+lib/Class/Builtin/Hash.pm
+lib/scalar/object.pm
+t/00-load.t
+t/01-scalar.t
+t/02-array.t
+t/03-hash.t
+t/04-pragma.t
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

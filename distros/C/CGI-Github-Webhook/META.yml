@@ -1,0 +1,40 @@
+---
+abstract: 'Easily create CGI based GitHub webhooks'
+author:
+  - 'Axel Beckert <abe@deuxchevaux.org>'
+build_requires:
+  CGI::Test: '0'
+  CGI::Test::Input::URL: '0'
+  File::Slurper: '0'
+  File::Temp: '0'
+  Test::File: '0'
+  Test::File::ShareDir: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Github-Webhook
+requires:
+  CGI: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::ShareDir: '0'
+  JSON: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/xtaran/CGI-Github-Webhook/issues
+  homepage: https://github.com/xtaran/CGI-Github-Webhook
+  repository: https://github.com/xtaran/CGI-Github-Webhook.git
+version: '0.06'

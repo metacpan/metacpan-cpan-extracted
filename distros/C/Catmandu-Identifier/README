@@ -1,0 +1,64 @@
+NAME
+
+    Catmandu::Identifier - Namespace for handling/fixing identifier, e.g.
+    ISBN, ISSN
+
+MODULES
+
+      * Catmandu::Fix::isbn10
+
+      * Catmandu::Fix::isbn13
+
+      * Catmandu::Fix::issn
+
+      * Catmandu::Fix::uuid
+
+      * Catmandu::Fix::memento_find
+
+      * Catmandu::Fix::orcid_bio
+
+      * Catmandu::Fix::orcid_find
+
+      * Catmandu::Fix::orcid_profile
+
+      * Catmandu::Fix::orcid_works
+
+      * Catmandu::Fix::Condition::is_valid_isbn
+
+      * Catmandu::Fix::Condition::is_valid_issn
+
+      * Catmandu::Fix::Condition::is_uri
+
+      * Catmandu::Fix::Condition::is_http_uri
+
+      * Catmandu::Fix::Condition::is_https_uri
+
+      * Catmandu::Fix::Condition::is_web_uri
+
+      * Catmandu::Fix::Condition::is_live_web_uri
+
+      * Catmandu::Fix::Condition::is_archived_web_uri
+
+      * Catmandu::Fix::Condition::is_valid_orcid
+
+      * Catmandu::Fix::Condition::is_live_orcid
+
+AUTHOR
+
+    Vitali Peil
+
+ CONTRIBUTOR
+
+    Patrick Hochstenbach
+
+    brian d foy
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Catmandu::Fix
+

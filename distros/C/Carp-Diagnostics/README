@@ -1,0 +1,16 @@
+Diagnostics
+===========
+
+Carp with a diagnostic message. Use the 'try_me.pl' for a, hmm, try.
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

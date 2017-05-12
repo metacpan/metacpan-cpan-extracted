@@ -1,0 +1,87 @@
+Changes for the CPAN Testers Admin website
+==========================================
+
+0.15    2015-04-19
+        - template fixes.
+        - added tracking when author marks a report.
+        - SQL improvements for listing dates and reports.
+        - upgraded to Labyrinth-Plugin-CPAN-3.53.
+
+0.14    2015-02-13
+        - clean up of family links.
+
+0.13    2014-11-26
+        - phrasebook updates.
+        - fixed missing use module in Author.pm.
+        - fixed prerequisites and module loading to be consistent.
+
+0.12    2014-11-12
+        - documentation updates.
+        - upgrade to Labyrinth-5.27.
+        - upgrade to Labyrinth-Plugin-Core-5.18.
+        - fixed PAUSE login mechanism for Authors.
+        - removed unused field validation for Testers.
+        - renamed LIST field to MAILS due to validation conflict.
+        - fixed Search by GUID logic.
+        - revised form field validation criteria.
+
+0.11    2014-09-20
+        - fixed license fields in META.json to be lists.
+        - added documentation about the CPAN Testers Fund.
+
+0.10    2014-07-12
+        - typo in mail templates (thanks to chorny).
+        - extract Labyrinth::Plugin::CPAN.
+        - upgrade to Labyrinth-5.23.
+        - upgrade to Labyrinth-Plugin-Core-5.15.
+        - upgrade to Labyrinth-Plugin-CPAN-3.50.
+        - save realm when saving User details.
+
+0.09    2014-07-03
+        - added contact email for testers.
+        - added script to fix address index table.
+
+0.08    2014-03-17
+        - added LICENSE file.
+
+0.07    2014-03-16
+        - added missing pre-requisites.
+
+0.06    2014-02-23
+        - extended allowed password characters.
+        - added missing mailer config.
+        - reworked account and email confirmation.
+        - upgrade to Labyrinth-5.20.
+        - upgrade to Labyrinth-Plugin-Core-5.14.
+        - switch tables to UTF-8.
+
+0.05    2014-01-05
+        - prepped for official release.
+
+0.04    2013-12-04
+        - new templates.
+        - updated MANIFEST.
+        - new script to manage testers database.
+        - new script to manage cpanstats leaderboard.
+        - added GetUser function to reduce repeat lookups.
+        - added AssignTesters functionality to link addresses to profiles.
+        - upgraded to Labyrinth v5.18.
+        - upgraded to Labyrinth::Plugin::Core v5.13.
+        - upgraded to Labyrinth::Plugin::Articles::Diary v1.04.
+
+0.03    2013-10-07
+        - added Metabase and Labyrinth links.
+        - repositioned site boxes to avoid text and logo clashing.
+        - upgraded to Labyrinth v5.17.
+        - activated SetHits
+        - update to admin templates to make them consistent across sites.
+        - upgraded prototype.js to 1.7.1.
+
+0.02    2010-01-08
+        - added quote.html
+        - added Analysis to site family lists.
+        - updated report list pages to hide ID.
+        - updated report list pages to use tester profile, rather than email.
+
+0.01    2009-12-11
+        - First released version, based on Labyrinth v4.16

@@ -1,0 +1,11 @@
+pod2text Convert::ASCIInames.pm > README
+
+To create/install this module, unpack it and execute the following
+commands in the resulting diretory:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

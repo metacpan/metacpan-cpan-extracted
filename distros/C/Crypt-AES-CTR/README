@@ -1,0 +1,104 @@
+NAME
+    Crypt::AES::CTR - This is a port of Chris Veness' AES implementation.
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+    This module encrypts and decrypts AES strings using CTR and Chris
+    Veness' AES implementation. It is compatible with PHP encrypting and
+    decrypting.
+
+        use Crypt::AES::CTR;
+    
+        my $plaintext 'string';
+        my $ciphertext = Crypt::AES::CTR::encrypt($plaintext,'password',256);
+        $plaintext = Crypt::AES::CTR::decrypt($ciphertext,'password',256);
+
+SUBROUTINES/METHODS
+  encrypt($plaintext, $key, $nbits)
+     Encrypt a text using AES encryption in Counter mode of operation
+ 
+     Unicode multi-byte character safe
+ 
+     $plaintext - plaintext Source text to be encrypted
+     $key - The password to use to generate a key
+     $nbits - Number of bits to be used in the key (128, 192, or 256)
+ 
+     returns encrypted text string
+
+  decrypt($ciphertext, $key, $nbits)
+     Decrypt a text encrypted by AES in counter mode of operation
+ 
+     $ciphertext - Source text to be decrypted
+     $key - The password to use to generate a key
+     $nbits - Number of bits to be used in the key (128, 192, or 256)
+ 
+     returns decrypted text
+
+  aes_padding($padding)
+     Override default padding(\n) for base64 encodes
+
+OO-INTERFACE
+  new
+      my $crypt = Crypt::AES::CTR->new( key=>$key, nbits=>$nbits , padding => $padding  );
+
+     #Unicode multi-byte character safe
+ 
+     #$key - The password to use to generate a key
+     #$nbits - Number of bits to be used in the key (128, 192, or 256)
+     #$padding - What to use as padding for base64 encodes, default is \n (optional)
+ 
+     #returns blessed reference
+ 
+     $crypt->encrypt($plaintext); # use cached $key and $nbits from new declaration
+     $crypt->encrypt($plaintext, $key, $nbits); #override $key and $nbits
+
+     # see documentation above for encrypt function
+ 
+     $crypt->decrypt($plaintext); # use cached $key and $nbits from new declaration
+     $crypt->decrypt($plaintext, $key, $nbits); #override $key and $nbits
+
+     # see documentation above for decrypt function 
+ 
+AUTHOR
+    KnowZero
+
+BUGS
+    Please report any bugs or feature requests to `bug-crypt-aes-ctr at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-AES-CTR. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Crypt::AES::CTR
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-AES-CTR
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Crypt-AES-CTR
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Crypt-AES-CTR
+
+    * Search CPAN
+        http://search.cpan.org/dist/Crypt-AES-CTR/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    This is an unofficial port of Chris Veness' AES implementation Copyright
+    (C) Chris Veness 2005-2011. Right of free use is granted for all
+    commercial or non-commercial use under CC-BY 3.0 licence. No warranty of
+    any form is offered.
+
+    Released under the http://creativecommons.org/licenses/by/3.0/ Creative
+    Commons Attribution 3.0 Unported License
+
+    For more information: http://www.movable-type.co.uk/scripts/aes.html
+

@@ -1,0 +1,13 @@
+Revision history for Catmandu-Fix-cmd
+
+0.0201  2013-06-21
+  - add missing namespace::clean dependency
+
+0.02    2013-04-03
+  - add examples
+
+0.0101  2013-03-29
+  - fix pod
+
+0.01    2013-03-28
+  - initial release

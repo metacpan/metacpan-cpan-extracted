@@ -1,0 +1,77 @@
+[%# generic edit screen for forms %]
+[% # some backwards compat for versions < 0.009;
+   IF buttons.defined; EDITMODE = buttons; END;
+   IF !EDITMODE.defined; EDITMODE = 1; END;
+%]
+[% SET oid = c.controller.make_primary_key_string(object) || 0 %]
+[% SET ThisObjectName = object.moniker || form.metadata.object_class.replace('.+::') %]
+[% SET ThisURL = c.uri_for('/' _ c.action.namespace, oid) %]
+[% # since CatalystX::CRUD >= 0.40 calling /edit checks for can_read() only
+   # so check can_write() here just to assure user s/he cannot actually change any of 
+   # the object's values, only (potentially) related values.
+   IF !c.controller.can_write(c);
+    UNLESS fields.defined;
+        SET fields = { order = [], readonly = {} };
+    END;
+    UNLESS fields.order.size;
+        fields.order    = form.field_names_by_rank;
+    END;
+    UNLESS fields.readonly.size;
+        FOREACH f = fields.order;
+            fields.readonly.$f = 1;
+        END;
+    END;
+   END; # can_write
+%]
+
+ <a href="#" id="portal_clicker" class="hidden button" onclick="YAHOO.crud.close_iframe_portal(); return false">Close this panel</a>
+ <div id="iframe_portal_container" class="hidden"></div><!-- used by submenu.tt -->
+ <div id="main">
+
+ [% IF c.flash.message %]<div class="message">[% c.flash.message %]</div>[% END %]
+
+ <form method="post" 
+       action="[% c.uri_for(oid, 'save') %]"
+       class="crud"
+       onsubmit="return YAHOO.crud.submit_form(this)"
+       >
+  <fieldset>
+   <legend>
+    [% IF oid && EDITMODE != 0 # edit mode %]
+    <a href="[% ThisURL %]/view">View [% ThisObjectName %]: [% object.unique_value %]</a>
+    [% ELSIF oid == 0 %]
+     Create [% ThisObjectName %]
+    [% ELSE # view mode %]
+    <a href="[% ThisURL %]/edit">Edit [% ThisObjectName %]: [% object.unique_value %]</a>
+    [% END %]
+   </legend>
+    
+    <input type="hidden" id="x-tunneled-method" 
+           name="x-tunneled-method" value="[% oid ? 'POST' : 'PUT' %]" />
+    
+    [% PROCESS crud/form.tt %]
+    
+    [% 
+        UNLESS EDITMODE == 0;
+            PROCESS crud/crud_buttons.tt;
+        END;
+    %]
+    
+  </fieldset>
+ </form>
+ </div><!-- end main -->
+  
+[%
+  # if configured, also show links to relationships.
+  IF (form.metadata.show_relationships && oid);
+   '<div id="relationships">'; 
+    PROCESS crud/show_relationships.tt;
+   '</div>';
+  END;  # show_relationships
+%] 
+
+<script type="text/javascript">
+  /* <![CDATA[ */
+    YAHOO.crud.ACTIVE_TAB = 'main';
+  /* ]]> */
+</script>

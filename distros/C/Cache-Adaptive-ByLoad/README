@@ -1,0 +1,36 @@
+Cache-Adaptive version 0.04
+===========================
+
+
+"Cache::Adaptive" is a cache engine with adaptive lifetime control.
+Cache lifetimes can be increased or decreased by any factor, e.g. load
+average, process time for building the cache entry, etc., through the
+definition of the "check_load" callback.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Cache::Cache
+  Class::Acccessor::Fast
+  List::Util
+  Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Cybozu Labs, Inc.
+
+written by Kazuho Oku <kazuhooku@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

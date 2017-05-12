@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  61127:
+    - 101
+name: ddcb30
+registers:
+  AF: 15396
+  AF_: 0
+  BC: 26029
+  BC_: 0
+  DE: 40135
+  DE_: 0
+  HL: 42636
+  HL_: 0
+  I: 0
+  IX: 61160
+  IY: 23168
+  PC: 4
+  R: 2
+  SP: 0

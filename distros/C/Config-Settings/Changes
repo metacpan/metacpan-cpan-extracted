@@ -1,0 +1,11 @@
+0.02 - Sat Aug 1, 2009
+    * License change; Don't worry, it's to the liberal MIT license.
+    * s/auto_savepoints/auto_savepoint/ in doc example.
+    * Update where to report bugs.
+
+0.01 - Wed Jul 29, 2009
+    * Finally decided to release a non-dev version of this module,
+      since I've now been using it in production for quite some time
+      without any big issues.
+    * Changed the Catalyst example as requested by mst
+

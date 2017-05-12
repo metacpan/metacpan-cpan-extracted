@@ -1,0 +1,42 @@
+---
+abstract: unknown
+author:
+  - 'Tema Novikov <novikov.tema@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+  t::lib::Crane: 0
+  t::lib::Crane::Base: 0
+  t::lib::Crane::Config: 0
+  t::lib::Crane::Logger: 0
+  t::lib::Crane::Options: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.63_03
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crane
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  English: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  Getopt::Long: 0
+  IO::Handle: 0
+  POSIX: 0
+  Readonly: 0
+  Try::Tiny: 0
+  YAML: 0
+  YAML::Dumper: 0
+  perl: 5.014_002
+version: v1.03.0011

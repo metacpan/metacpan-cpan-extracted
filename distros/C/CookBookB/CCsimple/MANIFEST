@@ -1,0 +1,7 @@
+CCsimple.pm
+CCsimple.xs
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+typemap

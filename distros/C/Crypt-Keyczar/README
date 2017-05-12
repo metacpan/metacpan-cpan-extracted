@@ -1,0 +1,86 @@
+Crypt::Keyczar
+==============
+
+Keyczar is an open source cryptographic toolkit designed to make it
+easier and safer for devlopers to use cryptography in their
+applications. Keyczar supports authentication and encryption with
+both symmetric and asymmetric keys. Some features of Keyczar include:
+
+ * A simple API
+
+ * Key rotation and versioning
+
+ * Safe default algorithms, modes, and key lengths
+
+ * Automated generation of initialization vectors and ciphertext
+   signatures
+
+ * Perl, Java, Python, and C++ implementations
+
+
+INSTALLATION
+------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+QUICK START
+-----------
+1. Create new 'keyset' by 'keyczar' tool:
+
+  $ keyczar create --location=/path/to/keyset --purpose=crypt
+
+2. Add new key to 'keyset':
+
+  $ keyczar addkey --location=/path/to/keyset --status=primary
+
+3. Encrypt message with 'keyset':
+
+  $ perl > msg.txt
+  use Crypt::Keyczar::Crypter;
+  my $kcz = Crypt::Keyczar::Crypter->new("/path/to/keyset");
+  print $kcz->encrypt('Hello World!');
+  __END__
+
+SUPPORTED CRYPTOGRAPHIC ALGORITHMS(current version)
+---------------------------------------------------
+* HMAC
+   Default keys are 256 bits. SHA1 used as the hash algorithm.
+   HMAC-SHA224, HMAC-SHA256, HMAC-SHA384 and HMAC-SHA512
+   algorithms are also supported.
+
+* AES
+   Default keys are 128 bits. 192 and 256 bit keys are also
+   supported. CBC mode with PKCS#5 padding is used by default.
+
+* RSA Encryption
+   RSA-OAEP encryption is used. Default key size is 2048 bits.
+   1024, 768, and 512 bit keys are also supported.
+
+* RSA Signatures
+   RSA-SHA1 signing is used. Default key size is 2048 bits.
+   1024, 768, and 512 bit keys are also supported.
+
+* DSA
+    DSA-SHA1 signing algorithm used by default. Default key
+    size is 1024 bits.
+
+DEPENDENCIES
+------------
+This module requires these other modules and libraries:
+
+  libcrypto (OpenSSL 0.9.8 or later)
+  MIME::Base64
+  JSON (version 1.xxx or 2.xxx)
+
+
+SEE ALSO
+--------
+  "keyczar" in bin,
+  perldoc Crypt::Keyczar,
+  perldoc Crypt::Keyczar::Crypter,
+  perldoc Crypt::Keyczar::Signer,
+  http://www.keyczar.org/

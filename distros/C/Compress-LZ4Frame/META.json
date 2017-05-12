@@ -1,0 +1,59 @@
+{
+   "abstract" : "Compression package using the lz4frame library\r",
+   "author" : [
+      "Felix Bytow <felix.bytow@autinity.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Compress-LZ4Frame",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.010_001"
+         }
+      }
+   },
+   "provides" : {
+      "Compress::LZ4Frame" : {
+         "file" : "lib/Compress/LZ4Frame.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/autinitysystems/Compress-LZ4Frame/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/autinitysystems/Compress-LZ4Frame.git",
+         "web" : "https://github.com/autinitysystems/Compress-LZ4Frame"
+      }
+   },
+   "version" : "0.012",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

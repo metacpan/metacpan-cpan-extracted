@@ -1,0 +1,23 @@
+Revision history for CPAN module Class::Hook
+
+0.05 2016-06-29 NEILB
+    - Class::Hook evals some code into UNIVERSAL::, so did the usual
+      trick to hide the package line from PAUSE, to prevent warning
+      about not having permissions on the package.
+    - Fixed some typos in the doc
+
+0.04 2016-06-28 NEILB
+    - Changed ChangeLog to Changes, and updated format to CPAN::Changes::Spec
+    - Switched to Dist::Zilla
+    - Moved test.pl to t/original.t and moved FOO.pm to t/lib/FOO.pm
+    - Added "use warnings" and "use 5.006"
+
+0.03 2009-01-19 PDENIS
+    - rt #5413: Fix core dump on RH9
+
+0.02 2005-12-11 PDENIS
+    - Fixed Makefile.PL to not install FOO.pm - Thanks JONASBN
+
+0.01 2001-12-14 PDENIS
+    - First release to CPAN
+

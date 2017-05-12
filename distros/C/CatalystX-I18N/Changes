@@ -1,0 +1,70 @@
+Revision history for Perl module CatalystX::I18N
+
+1.13 Tue Jan 28 2013
+    - Fix deprecation warning with latest Moose
+    - Fix failing tests 
+
+1.12 Sat Apr 07 2012
+    - Removed built in DateTime related type constraints in favour of global 
+      type constraints (MooseX::Types::DateTime) (moltar via github)
+    - Fixed failing tests (moltar via github)
+    - Fix dependencies
+    - Improve documentation
+
+1.11 Sat Apr 07 2012
+    - Maintenance release
+
+1.10 Sun Jan 22 2012
+    - Fix test failures on perl < 5.010
+    - Renamed i18n_timezone to i18n_datetime_timezone (moltar via github)
+
+1.09 Wed Oct 26 2011
+    - Fix failing tests
+    - Refactor POSIX locale handling into a separate role
+
+1.08 Fri 14 Oct 2011
+    - Add support for Data::Localize localization
+    - Better checks for valid locales
+    - Refactoring and code cleanup
+
+1.07 Wed 28 Sep 2011
+    - Fix broken fallback random locale (RT71098, Alexander Hosfeld)
+    - Fix wrong helper filenames (RT71098, Alexander Hosfeld)
+
+1.06 Thu 08 Sep 2011
+    - Fix conflicting role method names error with latest Moose
+    - Check against invalid browser languages
+    - Dist cleanup
+
+1.05 Sun 12 Dec 2010
+    - Add CatalystX::I18N::TraitFor::ViewTT
+    - Add CatalystX::I18N::Role::Colate
+    - Rename Model::L10N an Role::L10N to *::Maketext (Incompatible change!)
+
+1.04 Sat 16 Oct 2010
+    - Added more missing dependencies
+    - Add support for fail_with method in L10N model
+    - Better posix setlocale support (check for return value)
+    - Extend documentation
+
+1.03 Tue 12 Oct 2010
+    - Added missing dependencies
+    - Fixed bugs in GetLocale role
+    - Make sure that request/response traits will be applied only once
+    - Documentation typos
+    - Better locale checks
+    - More tests
+
+1.02 Sun 10 Oct 2010
+    - Added missing dependencies
+    - Better handling of default locales
+    - 'All' role for loading all available roles and traits
+    - Required perl version 5.010 -> 5.008
+
+1.01 Wed 06 Oct 2010
+    - Added missing dependencies
+    - Better handling of default locales
+    - Language-only locales are also accepted
+
+1.00 Wed 06 Oct 2010
+    - original version

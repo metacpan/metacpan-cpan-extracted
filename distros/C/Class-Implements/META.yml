@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Class-Implements
+version: 0.01
+author:
+  - Richard Clamp <richardc@unixbeard.net>
+abstract: pretend that your class is another class
+license: perl
+requires:
+  Hook::Queue: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Class::Implements:
+    file: lib/Class/Implements.pm
+    version: 0.01
+generated_by: Module::Build version 0.24

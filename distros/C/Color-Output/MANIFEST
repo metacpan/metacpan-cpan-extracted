@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+Output.pm
+README
+examples/ANSI.pl
+examples/W32.pl
+examples/colors.pl
+examples/symbol.pl
+test.pl

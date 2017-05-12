@@ -1,0 +1,18 @@
+# Legend:
+# --- = A new release
+#   + = Add a feature (in a backwards compatible way)
+#   ! = Change something significant, or remove a feature
+#   * = Fix a bug, or make a minor improvement
+
+--- ?
+
+  + Add a multi-threaded mode (using Perl 5.8 ithreads).
+  + Implement a _simple_ configuration syntax.
+  + Allow filter modules to store their results in message objects for reuse by
+    other filter modules.
+  * Factor out the prefixing of "FilterModule:" tags to rejection messages from
+    individual filter modules.
+  + Allow placeholders to be used in filter modules' response options.
+
+# $Id: TODO 211 2008-03-23 01:25:20Z julian $
+# vim:tw=79 sts=2 sw=2

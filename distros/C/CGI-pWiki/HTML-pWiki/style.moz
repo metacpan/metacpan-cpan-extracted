@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>%TITLE%</title>
+</head>
+<body background="/pWiki/background.png" bgcolor="#FFFFFF" text="#000000">
+<STYLE type="text/css">
+A.button:link, A.button:visited, A.button:active { margin-left: .5em; color: #075507; font-style: italic; font-weight: bold; text-decoration: none; }
+A:link, A:visited, A:active { color: blue; text-decoration: underline; }
+</STYLE>
+<table with="790" border=0 cellpadding=0 cellspacing=0><tr>
+  <td width=150 valign=top>
+    <img src="/icons/blank.gif" alt="" width=130 height=1"><p>
+    &nbsp;<p>%INDEX%<p>
+    <table border=0 cellpadding=0 cellspacing=0>
+
+    <tr><td colspan=2>
+    <font color="#FFFFFF" size=2>Search:</font>
+    </td></tr>
+    <tr><td colspan=2>
+    <form method="get" action="%URL%">
+    <font size=2><input type="text" name="search" size="10"/></font>
+    </form>
+    </td></tr>
+
+    <tr>
+    <td><a class="button" href="/pWiki/copyleft.wiki">&copy;</a></td>
+    <td><font color="#FFFFFF" size=2>1997-2002</font></td>
+    </tr>
+
+    <tr><td>
+      <form method="POST" action="%URL%?edit">
+      <input type="image" src="/pWiki/pWiki.png" border=0>
+      </form>
+    </td><td valign="top">
+      <font size=1 color="#ffffff">powered by<br></font>
+      <a class="button" href="/pWiki/pWiki.wiki">pWiki</a>
+    </td></tr>
+
+    </table>
+  </td>
+  <td width=640 valign=top>&nbsp;<p>
+    <table width="100%" border=0>
+    <tr><td align="left">
+        <font color=#075507 size=4 face="helvetica,arial"><i><b>%TITLE%</b></i></font>
+        <hr>
+    </td></tr>
+    </table>
+    <table width=625 border=0>
+    <tr><td>
+%HTML%
+    </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

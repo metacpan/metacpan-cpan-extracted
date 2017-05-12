@@ -1,0 +1,27 @@
+Revision history for Perl extension Convert::Base32.
+
+0.06  Sun Apr 22 2012
+    - POD fix.
+
+0.05  Thu Jan 25 2010
+    - Reinstated support for 5.6.
+    - Reinstated support for older ExtUtils::MakeMaker.
+
+0.04  Thu Jan 07 2010
+	- Documentation fixes
+
+0.03  Wed Jan 06 2010
+	- Allow uppercase letters in input [RT#53015]
+	- Fixed bug in error check [RT#53014]
+        - Added check for invalid input to encode_base32.
+        - Improved tests.
+        - Increased speed of decoding.
+        - Increased speed of encoding.
+
+0.02  Wed Jul 18 17:29:25 JST 2001
+	- Separated from Convert::RACE
+	- Went on CPAN
+
+0.01  Wed Jul 18 17:26:08 2001
+	- original version; created by h2xs 1.19
+

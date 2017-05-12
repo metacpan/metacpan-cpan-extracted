@@ -1,0 +1,13 @@
+    [% # debugging console for development %]
+    <script type="text/javascript">
+     YAHOO.namespace('console');
+     YAHOO.console.OK2LOG = [% c.debug ? 'true' : 'false' %];
+    </script>
+    <script type="text/javascript" 
+         src="http://static.msi.umn.edu/db/js/console.js"></script>
+
+    <link rel="stylesheet" type="text/css" media="all" 
+          href="[% CMS.static %]/css/cms.css" />
+          
+    <script type="text/javascript" 
+         src="[% CMS.static %]/js/cms.js"></script>

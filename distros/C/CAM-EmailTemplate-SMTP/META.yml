@@ -1,0 +1,17 @@
+---
+name: CAM-EmailTemplate-SMTP
+version: 0.91
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Net::SMTP based email message sender
+license: perl
+requires:
+  CAM::EmailTemplate: 0.90
+  Net::SMTP: 1.03
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::EmailTemplate::SMTP:
+    file: lib/CAM/EmailTemplate/SMTP.pm
+    version: 0.91
+generated_by: Module::Build version 0.2609

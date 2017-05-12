@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use CAM::DBF;
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+
+our $VERSION = '1.02';
+
+##no critic
+
+my $outfile = "";
+my $outprefix = "out_";
+my $help = 0;
+my $info = 0;
+
+Getopt::Long::Configure("bundling");
+GetOptions("o|outfile=s",   \$outfile,
+           "x|outprefix=s", \$outprefix,
+           "h|help",        \$help,
+           ) or pod2usage(1);
+pod2usage(-exitstatus => 0, -verbose => 2) if ($help || @ARGV == 0);
+
+foreach my $file (@ARGV)
+{
+   my $dbf = new CAM::DBF($file, "r", ignoreHeaderBytes => 1);
+   if (!$dbf)
+   {
+      &croak("Cannot open file $file: $!\n");
+   }
+
+   if ($dbf->repairHeaderData())
+   {
+      warn "Detected corruption in the header of $file\nbut it was repaired\n";
+   }
+
+   my $fout = $outfile;
+   if (!$fout)
+   {
+      $fout = $file;
+      $fout = $outprefix . $fout;
+   }
+
+   my $out = CAM::DBF->create($fout, "w", @{$dbf->{fields}});
+   if (!$out)
+   {
+      &croak("Cannot open output file $fout: $!\n");
+   }
+
+   my $infh = $dbf->{fh};
+   my $outfh = $out->{fh};
+
+   # Trust the nrecordbytes from $out rather than $dbf since we just
+   # recomputed the former
+   my $nrecordbytes = $out->{nrecordbytes};
+
+   my $buffer;
+   my $printedrows = 0;
+   for (my $row = 0; $row < $dbf->nrecords(); $row++)
+   {
+      read $infh, $buffer, $nrecordbytes;
+      next if ($buffer !~ /^ /); # skip deleted
+      print $outfh $buffer;
+      $printedrows++;
+   }
+   $out->{nrecords} = $printedrows;
+   $out->closeDB();
+}
+
+__END__
+
+=for stopwords packdbf DBF
+
+=head1 NAME
+
+packdbf - Rebuild DBF files, removing deleted rows
+
+=head1 SYNOPSIS
+
+ packdbf [options] [file ...]
+
+ Options:
+   -h --help             verbose help message
+   -o --outfile=<file>   write output to <file> (overrides -x)
+   -x --outprefix=<pre>  use <pre> as output prefix
+
+ Defaults:
+   -o out_<infile>
+   -x out_
+
+=head1 DESCRIPTION
+
+One or more files specified on the command line are read in and
+written back out, rebuilding the header from scratch and removing rows
+flags for deletion.  Output is typically specified with the C<-o> flag,
+but lacking that, it is written to C<out_$infile>, given input C<$infile>.
+The output prefix can be changed with the C<--outprefix> parameter.
+
+The output or input can be C<-> specifying STDIN or STDOUT, but this is
+fragile and likely will only work for reading.
+
+=head1 SEE ALSO
+
+L<CAM::DBF>
+
+=head1 AUTHOR
+
+Chris Dolan, Clotho Advanced Media, F<chris@clotho.com>
+
+=cut

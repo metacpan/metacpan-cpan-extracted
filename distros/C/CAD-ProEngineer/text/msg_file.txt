@@ -1,0 +1,52 @@
+USER Pick point on the screen 
+Pick a point on the screen to be transformed
+#
+#
+USER %s
+%0s
+#
+#
+USER Demo plot filename [QUIT] : 
+Enter the name of the plot file [QUIT] :
+#
+#
+%CPUSER Enter any integer between %0d and %1d: |||%2d
+Enter any integer between %0d and %1d: |||%2d
+#
+#
+%CPUSER Enter any strint %0s-%1s: |||%2s
+Enter any strint %0s-%1s: |||%2s
+#
+#
+%CPUSER Enter %0s or %1s: |||%2s
+Enter %0s or %1s: |||%2s
+#
+#
+%CPUSER Enter str %0s or int %1d: |||%2s
+Enter str %0s or int %1d: |||%2s
+#
+#
+%CPUSER str %0s int %1d dbl %2f: |||%3s
+str %0s int %1d dbl %2f: |||%3s
+#
+#
+USER1 str %s
+str %0s
+#
+#
+USER2 int %d
+int %0d
+#
+#
+USER3 dbl %f
+dbl %0f
+#
+#
+Stuff
+Stuff
+#
+#
+Special stuff commands
+Special stuff commands
+#
+#

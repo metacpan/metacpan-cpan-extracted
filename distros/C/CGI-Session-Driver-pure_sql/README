@@ -1,0 +1,105 @@
+NAME
+    CGI::Session::Driver::pure_sql - Pure SQL driver with no embedded Perl
+    stored in the database
+
+SYNOPSIS
+        use CGI::Session::Driver::pure_sql;
+        $session = CGI::Session->new("driver:pure_sql;serializer:sql_abstract", undef, {Handle=>$dbh});
+
+    For more examples, consult CGI::Session manual
+
+DESCRIPTION
+    *Disclaimer* While this software is complete and includes a working test
+    suite, I'm marking it as a development release to leave room for
+    feedback on the interface. Until that happens, it's possible I may make
+    changes that aren't backwards compatible. You can help things along by
+    communicating by providing feedback about the module yourself.
+
+    CGI::Session::Driver::pure_sql is a CGI::Session driver to store session
+    data in a SQL table. Unlike the "CGI::Session::Driver::postgresql"
+    driver, this "pure SQL" driver does not serialize any Perl data
+    structures to the database.
+
+    The means that you can access all the data in the session easily using
+    standard SQL syntax.
+
+    The downside side is that you have create the columns for any data you
+    want to store, and each field will have just one value: You can't store
+    arbitrary data like you can with the CGI::Session::Driver::postgresql
+    driver. However, you may already be in the habit of writing applications
+    which use standard SQL structures, so this may not be much of a
+    drawback. :)
+
+    It currently requires the sql_abstract serializer to work, which is
+    included in the distribution.
+
+STORAGE
+    To store session data in SQL database, you first need to create a
+    suitable table for it with the following command:
+
+        -- This syntax for for Postgres; flavor to taste
+        CREATE TABLE sessions (
+            session_id       CHAR(32) NOT NULL,
+            remote_addr      inet,
+            creation_time    timestamp,
+            last_access_time timestamp,
+            duration         interval
+        );
+
+    You can also add any number of additional columns to the table, but the
+    above fields are required.
+
+    For any additional columns you add, if you would like to expire that
+    column individually, you need to an additional column to do that. For
+    example, to add a column named "order_id" which you want to allow to be
+    expired, you would add these two columns:
+
+        order_id            int,
+        order_id_exp_secs   int,
+
+    If you want to store the session data in other table than "sessions",
+    you will also need to specify TableName attribute as the first argument
+    to new():
+
+        use CGI::Session;
+
+        $session = CGI::Session->new("driver:pure_sql;serializer:sql_abstract", undef,
+                            {Handle=>$dbh, TableName=>'my_sessions'});
+
+    Every write access to session records is done through PostgreSQL own row
+    locking mechanism, enabled by `FOR UPDATE' clauses in SELECTs or
+    implicitly enabled in UPDATEs and DELETEs.
+
+    To write your own drivers for CGI::Session refere CGI::Session manual.
+
+COPYRIGHT
+    Copyright (C) 2003-2010 Mark Stosberg. All rights reserved.
+
+    This library is free software and can be modified and distributed under
+    the same terms as Perl itself.
+
+CONTRIBUTING
+    Patches, questions and feedback are welcome. Please use the bug tracker
+    to submit bugs and patches, and e-mail directly with questions and
+    feedback.
+
+    https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Session-Driver-pur
+    e_sql
+
+AUTHOR
+    Mark Stosberg <mark@summersault.com>
+
+SEE ALSO
+    *   CGI::Session - CGI::Session manual
+
+    *   CGI::Session::Tutorial - extended CGI::Session manual
+
+    *   CGI::Session::CookBook - practical solutions for real life problems
+
+    *   RFC 2965 - "HTTP State Management Mechanism" found at
+        ftp://ftp.isi.edu/in-notes/rfc2965.txt
+
+    *   CGI - standard CGI library
+
+    *   Apache::Session - another fine alternative to CGI::Session
+

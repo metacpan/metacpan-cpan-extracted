@@ -1,0 +1,17 @@
+Revision history for Perl module CPAN::WWW::Testers.
+
+1.11 Thu Sep 18 17:01:37 BST 2008
+    - move from Module::Build back to ExtUtils::MakeMaker
+    - add a Pod test
+    - use warnings
+
+1.10 Mon Oct 13 20:57:00 BST 2003
+	- new release_status metadata: show if a module is a public
+	  or developer release
+	- slight renaming of fields with more underscores
+	- new RDF schema at http://downlode.org/rdf/cpan/0.1/
+	  thanks to Earle Martin
+	- NINJA support
+
+1.00 Sun Oct 12 19:49:19 BST 2003
+	- first release

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl extension to produce and manipulate EPD text. ",
+   "author" : [
+      "Hugh S. Myers <hsmyers@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chess-PGN-EPD",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Chess::PGN::Moves" : "0.05",
+            "Cpanel::JSON::XS" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurper" : "0",
+            "perl" : "v5.24.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Chess::PGN::Moves" : "0.05",
+            "Chess::PGN::Parse" : "0.20",
+            "Test::More" : "0",
+            "diagnostics" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Chess::PGN::EPD" : {
+         "file" : "lib/Chess/PGN/EPD.pm",
+         "version" : "0.34"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.34",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

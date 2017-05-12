@@ -1,0 +1,5 @@
+TYPEMAP
+Calendar::CSA::Session		T_PTROBJ
+Calendar::CSA::Entry		T_PTROBJ
+Calendar::CSA::EntryList	T_PTROBJ
+

@@ -1,0 +1,43 @@
+{
+   "abstract" : "CPAN Test Dummy for CPAN.pm",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-Make-OptionalPrereq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.46"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CPAN::Test::Dummy::Perl5::Make::CircularPrereq" : "0.14",
+            "CPAN::Test::Dummy::Perl5::Make::NotExistingPrereq" : "0.123"
+         },
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00"
+}

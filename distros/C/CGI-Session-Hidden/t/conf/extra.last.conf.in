@@ -1,0 +1,11 @@
+<IfModule mod_env.c>
+        PassEnv PERL5LIB
+</IfModule>
+
+<IfModule @CGI_MODULE@>
+        ScriptAlias /cgi-bin/ @top_dir@/t/cgi-bin/
+        <Directory "@top_dir@/t/cgi-bin">
+                AllowOverride None
+                Options ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        </Directory>
+</IfModule>

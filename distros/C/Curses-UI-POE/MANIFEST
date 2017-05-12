@@ -1,0 +1,24 @@
+CHANGES
+examples/color_editor
+examples/demo-add
+examples/demo-buttonbox
+examples/demo-color
+examples/demo-cuml
+examples/demo-language
+examples/demo-widgets
+examples/editor
+examples/hello_world
+examples/irc_client
+examples/mouse_focustest
+examples/pop3_reader
+examples/tutorial
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+POE.pm
+t/base_classes.t
+t/dialog_classes.t
+t/rt25021.pl
+t/widget_classes.t
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

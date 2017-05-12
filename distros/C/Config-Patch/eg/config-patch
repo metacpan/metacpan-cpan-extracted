@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+###########################################
+# config-patch 
+# 2005, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+use Getopt::Std;
+use Pod::Usage;
+use Config::Patch;
+
+use vars qw($CVSVERSION);
+
+$CVSVERSION = '$Revision: 1.9 $';
+
+getopts("lapC:c:s:i:k:f:rhvA", \my %opts);
+pod2usage() if $opts{h};
+
+if($opts{v}) {
+    my ($version) = $CVSVERSION =~ /(\d\S+)/;
+    die "$0 $version\n";
+}
+
+# Mandatory parameters
+if(! exists $opts{k} or 
+   ! exists $opts{f}) {
+    pod2usage();
+}
+
+my @comment_opt = ();
+@comment_opt = (comment_char => $opts{C}) if exists $opts{C};
+
+my $patcher = Config::Patch->new(file  => $opts{f}, key => $opts{k},
+                                 flock => $opts{l},
+                                 @comment_opt);
+
+if($opts{a}) {
+    my $patch = join "", <>;
+    $patcher->append($patch);
+} elsif($opts{p}) {
+    my $patch = join "", <>;
+    $patcher->prepend($patch);
+} elsif($opts{r}) {
+    $patcher->remove($opts{k});
+} elsif($opts{c}) {
+    $patcher->comment_out(qr($opts{c}));
+} elsif($opts{i}) {
+    my $patch = join "", <>;
+    $patcher->insert(qr($opts{i}), $patch, $opts{A});
+} elsif($opts{s}) {
+    my $patch = join "", <>;
+    $patcher->replace(qr($opts{s}), $patch);
+}
+
+__END__
+
+=head1 NAME
+
+    config-patch - Apply modifications to config files and take them back
+
+=head1 SYNOPSIS
+
+        # Append a patch
+    echo "my patch text" | config-patch -a -k key -f config_file
+
+        # Prepend a patch
+    echo "my patch text" | config-patch -p -k key -f config_file
+
+        # Remove a patch
+    config-patch -r -k key -f config_file
+
+        # Patch a section matched by a regex
+    echo "replace" | config-patch -s 'regex' -k key -f config_file
+
+        # Comment out a section matched by a regex
+    config-patch -c 'regex' -k key -f config_file
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-a>
+
+Appends text to the configuration file. The text can be provided either
+via STDIN or by specifying a file name:
+
+            # Append a patch
+    echo "my appended text" | config-patch -a -k key -f config_file
+
+            # Append a patch
+    config-patch -a -k key -f config_file appended_text.txt
+
+=item B<-p>
+
+Adds text to the beginning of a configuration file. The text can be
+provided either via STDIN or by specifying a file name:
+
+            # Prepend a patch
+    echo "my prepend text" | config-patch -p -k key -f config_file
+
+            # Prepend a patch
+    config-patch -p -k key -f config_file prepended_text.txt
+
+=item B<-r>
+
+Removes the patch specified by the key (see C<-k>).
+
+=item B<-f filename>
+
+Specifies the config file to apply/remove the patch on/from.
+
+=item B<-k key>
+
+Specifies the key of the patch.
+
+=item B<-l>
+
+Flock the file exclusively before performing updates.
+
+=item B<-h>
+
+Prints this manual page in text format.
+
+=item B<-s>
+
+Apply a patch by using search-and-replace. The search term is a regular
+expression, the replacement string 
+
+    echo "none:" | config-patch -s 'all:.*' -k key -f config_file
+
+=item B<-i>
+
+insert a patch by using insert. The search term is a regular
+expression. By default, the "text to insert" is inserted onto the line
+above the regex. By utilising the -A flag, then the text will be inserted on
+the line below the regex.
+
+    echo "text to insert" | config-patch -i 'text to find' -k key -f config_file
+
+=item B<-A>
+
+used with the -i flag. this will insert the text on the line below the regex.
+
+
+=item B<-c>
+
+Comment out a section in a configuration file matched by a regular expression.
+Example:
+
+    config-patch -c 'all:.*' -k key -f config_file
+
+=item B<-v>
+
+Prints the current version of C<config-patch>.
+
+=item B<-C>
+
+Use a different comment character than '#'. Example:
+
+    config-patch -C ";" -a -k key -f config_file appended_text.txt
+
+=back
+
+=head1 DESCRIPTION
+
+C<config-patch> performs modifications on configuration files and removes
+them later. It keeps track of modifications by assigning a key to
+each of them and by storing this key in a comment around the applied patch.
+
+Then, when asked later to remove the patch, it will track it down the
+patched section(s) by I<key> and remove them.
+
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, 
+all rights reserved. This program is free 
+software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <cpan@perlmeister.com>

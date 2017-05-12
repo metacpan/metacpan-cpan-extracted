@@ -1,0 +1,35 @@
+diff -Nuar src.orig/lib/scryptenc/scryptenc.h src/lib/scryptenc/scryptenc.h
+--- src.orig/lib/scryptenc/scryptenc.h	2010-01-16 12:48:20.000000000 -0800
++++ src/lib/scryptenc/scryptenc.h	2010-07-26 14:34:14.000000000 -0700
+@@ -78,6 +78,7 @@
+  * Encrypt inbuflen bytes from inbuf, writing the resulting inbuflen + 128
+  * bytes to outbuf.
+  */
++__attribute__ ((visibility("default")))
+ int scryptenc_buf(const uint8_t *, size_t, uint8_t *,
+     const uint8_t *, size_t, size_t, double, double);
+ 
+@@ -88,6 +89,7 @@
+  * decrypted data length to outlen.  The allocated length of outbuf must
+  * be at least inbuflen.
+  */
++__attribute__ ((visibility("default")))
+ int scryptdec_buf(const uint8_t *, size_t, uint8_t *, size_t *,
+     const uint8_t *, size_t, size_t, double, double);
+ 
+@@ -97,6 +99,7 @@
+  * Read a stream from infile and encrypt it, writing the resulting stream to
+  * outfile.
+  */
++__attribute__ ((visibility("default")))
+ int scryptenc_file(FILE *, FILE *, const uint8_t *, size_t,
+     size_t, double, double);
+ 
+@@ -106,6 +109,7 @@
+  * Read a stream from infile and decrypt it, writing the resulting stream to
+  * outfile.
+  */
++__attribute__ ((visibility("default")))
+ int scryptdec_file(FILE *, FILE *, const uint8_t *, size_t,
+     size_t, double, double);
+ 

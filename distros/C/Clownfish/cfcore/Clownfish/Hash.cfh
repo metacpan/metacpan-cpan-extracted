@@ -1,0 +1,146 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/**
+ * Hashtable.
+ *
+ * Values are stored by reference and may be any kind of Obj.
+ */
+public final class Clownfish::Hash inherits Clownfish::Obj {
+
+    void   *entries;
+    size_t  capacity;
+    size_t  size;
+    size_t  threshold;    /* rehashing trigger point */
+
+    inert void
+    init_class();
+
+    /** Return a new Hash.
+     *
+     * @param capacity The number of elements that the hash will be asked to
+     * hold initially.
+     */
+    public inert incremented Hash*
+    new(size_t capacity = 0);
+
+    /** Initialize a Hash.
+     *
+     * @param capacity The number of elements that the hash will be asked to
+     * hold initially.
+     */
+    public inert Hash*
+    init(Hash *self, size_t capacity = 0);
+
+    inert String*
+    get_tombstone();
+
+    void*
+    To_Host(Hash *self, void *vcache);
+
+    /** Empty the hash of all key-value pairs.
+     */
+    public void
+    Clear(Hash *self);
+
+    /** Store a key-value pair.
+     */
+    public void
+    Store(Hash *self, String *key, decremented nullable Obj *value);
+
+    /** Store a key-value pair using a raw UTF-8 key.
+     *
+     * @param utf8 Pointer to UTF-8 character data of the key.
+     * @param size Size of UTF-8 character data in bytes.
+     * @param value The Obj to store.
+     */
+    public void
+    Store_Utf8(Hash *self, const char *utf8, size_t size,
+               decremented nullable Obj *value);
+
+    /** Fetch the value associated with `key`.
+     *
+     * @return the value, or [](@null) if `key` is not present.
+     */
+    public nullable Obj*
+    Fetch(Hash *self, String *key);
+
+    /** Fetch the value associated with a raw UTF-8 key.
+     *
+     * @param utf8 Pointer to UTF-8 character data of the key.
+     * @param size Size of UTF-8 character data in bytes.
+     * @return the value, or [](@null) if `key` is not present.
+     */
+    public nullable Obj*
+    Fetch_Utf8(Hash *self, const char *utf8, size_t size);
+
+    /** Attempt to delete a key-value pair from the hash.
+     *
+     * @return the value if `key` exists and thus deletion
+     * succeeds; otherwise [](@null).
+     */
+    public incremented nullable Obj*
+    Delete(Hash *self, String *key);
+
+    /** Attempt to delete a key-value pair from the hash.
+     *
+     * @param utf8 Pointer to UTF-8 character data of the key.
+     * @param size Size of UTF-8 character data in bytes.
+     * @return the value if `key` exists and thus deletion
+     * succeeds; otherwise [](@null).
+     */
+    public incremented nullable Obj*
+    Delete_Utf8(Hash *self, const char *utf8, size_t size);
+
+    /** Indicate whether the supplied `key` is present.
+     */
+    public bool
+    Has_Key(Hash *self, String *key);
+
+    /** Return the Hash's keys.
+     */
+    public incremented Vector*
+    Keys(Hash *self);
+
+    /** Return the Hash's values.
+     */
+    public incremented Vector*
+    Values(Hash *self);
+
+    size_t
+    Get_Capacity(Hash *self);
+
+    /** Return the number of key-value pairs.
+     */
+    public size_t
+    Get_Size(Hash *self);
+
+    /** Equality test.
+     *
+     * @return true if `other` is a Hash with the same key-value pairs as
+     * `self`.  Keys and values are compared using their respective `Equals`
+     * methods.
+     */
+    public bool
+    Equals(Hash *self, Obj *other);
+
+    public void
+    Destroy(Hash *self);
+}
+
+

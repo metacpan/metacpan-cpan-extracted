@@ -1,0 +1,60 @@
+{
+   "abstract" : "Parse RSA keys",
+   "author" : [
+      "Felipe Gasper (FELIPE)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-RSA-Parse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.34",
+            "Convert::ASN1" : "0.27",
+            "Crypt::Format" : "0.06",
+            "MIME::Base64" : "3.15",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.01",
+            "Test::NoWarnings" : "0.01",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/FGasper/p5-Crypt-RSA-Parse.git",
+         "web" : "https://github.com/FGasper/p5-Crypt-RSA-Parse"
+      }
+   },
+   "version" : 0.043,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,22 @@
+Cv-Pango version 0.28
+=====================
+
+INSTALLATION
+
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Cv, Pango
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2013 by Masuda Yuta.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

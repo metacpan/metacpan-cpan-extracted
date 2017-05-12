@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!DOCTYPE phrasebook [
+	       <!ELEMENT phrasebook (dictionary)*>              
+	       <!ELEMENT dictionary (phrase)*>
+               <!ATTLIST dictionary name CDATA #REQUIRED>
+               <!ELEMENT phrase (#PCDATA)>
+               <!ATTLIST phrase name CDATA #REQUIRED>
+]>
+<phrasebook>
+ <dictionary name="Pg">
+
+  <!-- get the value of specific sequence -->
+  <phrase name="GET_SEQUENCE">
+            select val from t_seq where name = '$name'
+  </phrase>
+
+  <!-- increment the value of specific sequence -->
+  <phrase name="INCREMENT_SEQUENCE">
+            update t_seq set val = val + 1 where name = '$name'
+  </phrase>
+
+  <!-- get the level of certain config object according to its id  -->
+  <phrase name="GET_LEVEL_OF_CONFIG">
+            select level from t_config 
+               where id = $id
+  </phrase>
+
+  <!-- insert row into t_config  -->
+  <phrase name="INSERT_INTO_CONFIG_ROW">
+            insert into t_config (id, parent_id, level)
+                   values($id, $parent, $level)
+  </phrase>
+
+  <!-- insert into the t_config_parents table all the parents of the -->
+  <!-- config object with $id as parents of the object $new_id.      -->
+  <phrase name="INSERT_INTO_CONFIG_PARENTS_PARENTS_OF_ID_FOR_NEW_ID">
+            insert into t_config_parents (config_id, parent_id)
+               select $new_id, t_config_parents.parent_id
+                 from t_config_parents 
+                 where (t_config_parents.config_id = $id)
+  </phrase>
+        
+  <!-- select all the config_item-s that belong to our config (with the id) -->
+  <!-- or its parents, in the right order (the oldest parent first).        -->
+  <phrase name="ORDERED_CONFIGS_ITEMS_OF_THIS_AND_ITS_PARENTS">
+            select t_config.id, t_config.level, t_config_item.name, 
+                   t_config_item.value, t_config_item.overwritable
+              from t_config, t_config_item, t_config_config_item 
+              where 
+                t_config_item.id = t_config_config_item.config_item_id and 
+                t_config_config_item.config_id = t_config.id and 
+                (t_config.id = $id or 
+                  t_config.id = 
+                    (select t_config_parents.parent_id 
+                       from t_config_parents 
+                       where (t_config_parents.config_id = $id)))
+               order by t_config.level
+  </phrase>
+
+  <!-- update the edited time -->
+  <phrase name="UPDATE_LAST_EDITED_DATE">
+            update t_dates set edited = 'NOW' 
+                   where id = $id
+  </phrase>
+
+  <!-- update row of account. -->
+  <phrase name="UPDATE_ACCOUNT_WITH_SPECIFIC_ID">
+            update t_account set
+                         login = '$login',
+                         description = '$description', 
+                         dates_id = $dates_id, 
+                         groups = $groups,
+                         owners = $owners
+                                     where id = $id
+  </phrase>
+
+  <!-- update row of account. -->
+  <phrase name="UPDATE_ACCOUNT_WITH_SPECIFIC_ID_AND_LOGIN">
+            update t_account set
+                         login = '$login',
+                         description = '$description', 
+                         dates_id = $dates_id, 
+                         groups = $groups,
+                         owners = $owners
+                                     where id = $id and
+                                           login = '$login'
+                    
+  </phrase>
+  <!-- delete user according to account_id -->
+  <phrase name="DELETE_USER">
+            delete from t_user
+                 where account_id = $account_id
+  </phrase>
+
+  <!-- update with no where - was a bug -->
+  <phrase name="UPDATE_NO_WHERE">
+    update table set i=1
+  </phrase>
+ </dictionary>
+</phrasebook>

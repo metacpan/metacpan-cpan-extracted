@@ -1,0 +1,7 @@
+CHANGES
+README
+Build.PL
+MANIFEST
+test.pl
+lib/Foo/Bar.pm
+bin/foobar.pl

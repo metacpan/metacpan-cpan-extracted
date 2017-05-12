@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_regex.t
+t/02_path.t
+t/03_default.t
+t/04_runmode.t
+t/05_match.t
+t/TestAppDefault.pm
+t/TestAppMatch.pm
+t/TestAppPath.pm
+t/TestAppRegex.pm
+t/TestAppRunmode.pm
+lib/CGI/Application/Plugin/ActionDispatch.pm
+lib/CGI/Application/Plugin/ActionDispatch/Attributes.pm

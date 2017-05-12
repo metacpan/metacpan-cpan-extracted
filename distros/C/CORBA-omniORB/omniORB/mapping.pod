@@ -1,0 +1,288 @@
+=head1 NAME
+
+CORBA::omniORB::mapping - CORBA mapping for Perl
+
+=head1 DESCRIPTION
+
+This document describes a mapping of the CORBA system into Perl.  It
+sticks most closely to the mapping in the L<CORBA::MICO>,
+L:<CORBA:omniORB>, and L<CORBA::ORBit> modules; however, some
+reference is also made to the mappings implemented in L<COPE> and
+ILU/Perl.
+
+These systems exhibit a wide diversity in the details of their object
+adaptors. CORBA::MICO and CORBA::omniORB implement most of the POA
+specification fashion, including all activation modes. COPE implements
+a version of the BOA, and ILU has its own object native adaptor
+different from the BOA, though it implements some of the BOA
+specificatoin through compatibility classes.
+
+For this reason, this document largely avoids specifying object
+adaptor details, except for a few specific notes. Details about the
+manner in which the ORB is initialized and interface definitions are
+loaded are also not specified here. Conformant implementations may
+either use conventional stubs or access interface definitions in a
+dynamic manner. (For instance, by loading them from an Interface
+Repository.)
+
+The design goal for this mapping was to allow applications to access
+the complete CORBA specification from Perl in a convenient and concise
+manner, even when this requires sacrificing some amount of speed or
+convenience for the ORB implementor.
+
+=head1 Scoped Names
+
+Names in Perl are identical to those in CORBA IDL. For instance,
+an interface C<Foo> defined in module C<M>, is mapped into the
+Perl package C<M::Foo>. 
+
+It should be noted however that Perl package names do not 
+constitute nested scopes. That is, within the package C<M::Foo>,
+the package C<M:Foo::Bar> cannot be referred to as C<Bar>, but
+must be specified by the fully qualified name C<M::Foo::Bar>.
+
+Also, there is no inheritance of scope. If a constant 
+C<M::Foo::const1> is defined in C<M::Foo> and C<M::Bar>
+inherits from C<M::Foo>, this constant cannot be referred
+to as C<M::Bar::const1>.
+
+=head1 Mapping for Basic Types
+
+Unsigned C<short>, C<long>, C<float>, C<double>, and C<octet> all
+map to Perl scalar variables. C<char> maps to a string of length 1. 
+C<boolean> map as expected for Perl. That is, a CORBA C<boolean>
+maps to "" if false and to 1 if true. A Perl scalar maps to
+CORBA::TRUE if it is true, and CORBA::FALSE otherwise.
+
+The remaining numeric types mapped to blessed objects.
+C<long long> maps to objects in the package C<CORBA::LongLong>,
+C<unsigned long long> maps to objects in the package C<CORBA::ULongLong>,
+C<long double> maps to objects in the package C<CORBA::LongDouble>.
+C<fixed> maps to objects in the package C<CORBA::Fixed>.
+
+All of these packages provide overloading for the basic numeric
+operations. For the C<CORBA::LongLong>, C<CORBA::ULongLong>, and
+C<CORBA::LongDouble>, the mapping is one-to-one.  
+
+For C<CORBA::Fixed>, each object has a scale which is propagated in
+arithmetic operations, but no fixed number of digits. Arithmetic
+operations other than division are done at infinite precision; the
+result of division is truncated at 31 digits. When the CORBA::Fixed
+object is provided as an argument to a CORBA call with the argument
+type specified C<fixed<d,s>>, the C<CORBA::Fixed> object will be
+rounded to scale C<s> and padded or truncated on the left to C<d>
+digits.
+
+Providing an value not in one of the above classes to a numeric
+operation expecting the corresponding type will give the same result
+as converting the value to a string by Perl's normal rules, then
+creating a value in the corresponding class from that string.
+
+=head1 Mapping for constructed types
+
+=over 4
+
+=item Structures
+
+A structure maps to a hash reference with keys which are the
+names of the members.
+
+That is:
+
+  struct S {
+     short a;
+     string b;
+  };
+
+maps to the hash reference:
+
+  {
+     a => 42,
+     b => "some string"
+  }
+
+
+=item Enumerations
+
+Enumerations map to strings corresponding to the names of 
+the members.
+
+=item Sequences
+
+Sequences of C<octet> and C<char> map to Perl strings. Other
+sequences map to array references.
+
+=item Arrays
+
+Arrays map to Perl array references. Multiple dimensional
+arrays map to nested Perl array references.
+
+=item Anys
+
+An any maps to a Perl object of type CORBA::Any. The constructor
+takes two arguments, the type (of type CORBA::TypeCode) and
+the value. The type and value are accessed via the type() and
+value() member functions.
+
+=item Unions
+
+A union maps into a two element array reference. The first
+element is the discriminator, the second, value of the arm selected
+by that discriminator. If the discriminator does not match
+one of the arms of the union, and there is no default arm, the
+second element will be an undefined value.
+
+=back
+
+=head1 Constants
+
+Constants defined in IDL map to a Perl subroutine which returns
+the value of the constant.
+
+=head1 Objects
+
+CORBA object references are opaque perl objects.
+
+An object reference for the object will be created when required.
+That is, when the object is marshalled as the argument or return
+value from a call, or when an API operation that requires 
+
+=head2 Attributes
+
+Attributes are mapped to a pair of methods with names which are the
+attribute name prepended with C<_set_> and C<_get_>.  The C<_set_>
+method (not present for C<readonly> attributes)  takes a single
+parameter of the type of the attribute. The C<_get_> method returns
+a value of the type of the attribute.
+
+=head2 Operations
+
+Operations are mapped to method calls. C<in> parameters are
+mapped to parameters normally, C<inout> parameters get an
+extra reference, and C<out> parameters are returned as part
+of a list.
+
+For instance, the operation:
+
+   char foo(in long l, inout string b, out float f);
+
+would be called as:
+
+   ($c,$f) = $obj->foo($l, \$s);
+
+=head1 Exceptions 
+
+Exceptions are implemented using the Error module by Graham Barr.
+To throw an exception, use the C<throw> method in the Exception
+package:
+
+  throw MyInterface::MyException field1 => 'red', field2 => 32;
+
+To catch an exception, use a C<try...catch> statement.
+
+  try {
+     $foo->runit();
+  } catch MyInterface::MyException with {
+     $e = shift;
+     print "Caught a $e->{field1} exception";
+  }
+
+=head1 Object Implementations
+
+=over 4
+
+The POA supports modes of operation where a single servant
+may incarnate multiple object references. For this reason,
+it is not, in general, permissible to supply a servant
+where an object reference is required. However,  in
+situations where it is valid to call the _this() method of 
+the servant, an ORB may do this transparently when
+a servant is used in place of an object reference.
+
+=head2 Implementing interfaces
+
+Interface are implemented by deriving from the package corresponding 
+to the interface prepended with "POA_".
+
+  package MyAccount;
+
+  @MyAccount::ISA = qw(POA_Bank::Account);
+  
+  sub new {
+    my $self = bless {
+		      current_balance => 0
+		     };
+  }
+
+If the implementation of a interface in addition from the
+implementation of a base interface, then the module
+for the interface being implemented must appear in the @ISA 
+array before the base interface implementation. 
+
+For instance, when implementing the following IDL:
+
+  module Foo {
+     interface A { long foo(); };
+     interface B : A { long bar(); }
+  }
+
+with the following Perl code;
+
+  package MyA;
+
+  @MyA::ISA = qw(Foo::A);
+ 
+  sub foo {
+      return 1;
+  }  
+
+  package MyB;
+
+  @MyA::ISA = qw(Foo::B MyA);
+ 
+  sub bar {
+     return 2;
+  } 
+
+  sub new {
+     my $self = bless {};
+  }
+
+C<Foo:B> must come first in C<MyB>'s C<@ISA>.
+
+=head2 Implementing operations and attributes
+
+Operations and attributes are implemented exactly as expected 
+from the client-side mapping. That is, the operation is called
+with the same parameters as a client would use to 
+invoke the operation.
+
+=head2 PortableServer routines
+
+In general, the POA routines map from their description in the .IDL
+file as specified above. One major exception to this rule is the
+policy objects and the create_POA routine. There are no policy
+objects, instead, the create_POA routine is variadic, with the
+additional arguments being key-value pairs specifying Policy values.
+
+For instance,
+
+  $root_poa->create_POA ("MyPOA", undef,
+			 id_assignment => 'MULTIPLE_ID',
+		         lifetime => 'PERSISTENT');
+
+=head2 Mapping for ServantManager
+
+The opaque Cookie type maps to an arbitary Perl value.
+
+=back
+
+=head1 AUTHOR
+
+Owen Taylor <otaylor@redhat.com>
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

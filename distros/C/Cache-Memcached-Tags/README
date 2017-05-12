@@ -1,0 +1,18 @@
+This is the Perl API for memcached+tags, a branch of memcached with tags
+See the documentation within the module for details on its use.
+
+Information about memcached+tags:
+
+	http://code.google.com/p/memcached-tags/
+
+And about original memcached:
+
+	http://www.danga.com/memcached/
+
+Feel free to ask any questions.
+
+-- 
+Eugene Bragin
+eugene.bragin+memd@gmail.com
+
+

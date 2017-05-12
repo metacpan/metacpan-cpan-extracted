@@ -1,0 +1,32 @@
+---
+abstract: 'Test framework for Config::Model'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Module::Build: '0.34'
+configure_requires:
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-Tester
+requires:
+  File::Copy::Recursive: '0'
+  Log::Log4perl: '1.11'
+  Path::Tiny: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::File::Contents: '0'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dod38fr/config-model-tester/issues
+  homepage: https://github.com/dod38fr/config-model/wiki
+  repository: git://github.com/dod38fr/config-model-tester.git
+version: '2.060'
+x_serialization_backend: 'YAML::Tiny version 1.70'

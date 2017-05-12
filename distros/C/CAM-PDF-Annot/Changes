@@ -1,0 +1,25 @@
+Revision history for Perl extension CAM::PDF::Annot.
+
+0.09 2014.09.08
+    - Add YAML::Tiny to test requirements.
+
+0.08 2014.09.04
+    - Add CAM::PDF::Annot::Parsed to this distribution.
+
+0.07 2014.09.03
+    - Unofficial release by SZABGAB.
+
+0.06 2009.09.07
+    - update on META.yml to require CAM::PDF
+
+0.05 2009.08.26
+
+0.04 2009.08.21
+
+0.02 2009.08.20
+    - World writables problem in PAUSE
+
+0.01  Wed Aug 19 12:59:28 2009
+	- original version; created by h2xs 1.23 with options
+		-X -A -n CAM::PDF::Annot -v 0.01
+

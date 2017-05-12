@@ -1,0 +1,30 @@
+#>> Ipfilter v143 (19-04-2010) by R3Qu13M
+#>> [based on Meuh6879's ipfilter format]
+#
+#>> Updated all lists (18-04-2010)
+#
+# ...
+4.18.48.24      - 4.18.48.31      , 109 , [L2]Bank of America
+4.18.48.128     - 4.18.48.167     ,  90 , [L1]Cisco Systems, Inc
+4.18.48.168     - 4.18.48.175     , 109 , [L2]Guidant Corp
+4.18.49.0       - 4.18.49.15      ,  90 , [L1]Fuji Photo Film USA, Inc
+4.18.49.64      - 4.18.49.127     ,  90 , [L1]Palm Springs Hilton
+4.18.49.224     - 4.18.49.239     ,  90 , [L1]Sanctuary Records Group
+4.18.50.128     - 4.18.50.159     ,  90 , [L1]City of Redondo Beach
+4.18.50.160     - 4.18.50.191     , 109 , [L2]United Methodist Federal Credit Union - VOL End Cu
+4.18.51.0       - 4.18.51.255     ,  90 , [L1]City of Chino Hills
+4.18.52.128     - 4.18.52.159     , 109 , [L2]Financial Data Solutions
+4.18.52.176     - 4.18.52.191     ,  90 , [L1]US Dept of Treasury-TIGTA TIGTA8-52-17 (NET-4-18-52-176-1)
+4.18.55.40      - 4.18.55.47      , 109 , [L2]Canon Research and Development Center Am
+4.18.55.128     - 4.18.55.135     ,  90 , [L1]Riordan & McKinzie
+4.18.55.136     - 4.18.55.143     , 109 , [L2]Santa Clara Valley Bank
+4.18.55.144     - 4.18.55.159     ,  90 , [L1]EMI Music Publishing
+4.18.57.64      - 4.18.57.95      ,  90 , [L1]NBS Government Finance Group
+4.18.58.0       - 4.18.58.23      , 109 , [L2]Harriman Jones Medical Group
+4.18.60.112     - 4.18.60.159     ,  90 , [L1]Synopsys Inc
+4.18.61.0       - 4.18.61.31      ,  90 , [L1]City of Laguna Beach
+4.18.61.128     - 4.18.61.191     ,  90 , [L1]Raytheon Training LLC
+4.18.62.0       - 4.18.62.63      , 109 , [L2]Desert Community Bank
+4.18.63.0       - 4.18.63.63      ,  90 , [L1]Sarnoff Legal Technologies
+4.18.65.192     - 4.18.65.255     ,  90 , [L1]City of Dallas Library
+4.18.78.16      - 4.18.78.31      , 109 , [L2]Blue Cross Blue Shield TX

@@ -1,0 +1,5 @@
+TODO list for Perl module CGI::Untaint::Filenames
+
+- Add support for filenames which end in: $,!, and % via a is_valid method
+
+

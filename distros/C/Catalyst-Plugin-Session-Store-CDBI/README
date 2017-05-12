@@ -1,0 +1,76 @@
+NAME
+    Catalyst::Plugin::Session::Store::CDBI - CDBI sessions for Catalyst
+
+SYNOPSIS
+        use Catalyst qw/Session Session::Store::CDBI Session::State::Cookie/;
+    
+        MyApp->config->{session} = {
+            storage_class => 'MyApp::M::CDBI::Session',
+            id_field      => 'id',
+            storage_field => 'storage',
+            expires_field => 'expires',
+            expires       => 3600,
+            need_commit   => 0,
+        };
+
+        # ... in an action:
+        $c->session->{foo} = 'bar'; # will be saved
+
+DESCRIPTION
+    "Catalyst::Plugin::Session::Store::CDBI" is a session storage plugin for
+    Catalyst that uses Class::DBI.
+
+  METHODS
+    get_session_data
+    store_session_data
+    delete_session_data
+    delete_expired_sessions
+    setup_actions
+    setup_session
+        These are implementations of the required methods for a store. See
+        Catalyst::Plugin::Session::Store.
+
+    serialize
+        Returns the serialized form of the data passed in.
+
+    deserialize
+        Returns the deserialized data.
+
+CONFIGURATION
+    These parameters are placed in the hash under the "session" key in the
+    configuration hash.
+
+    storage_class
+        CDBI-subclass that represents the table that stores session-data.
+
+    id_field
+        Column name for the primary key. Defaults to 'id'.
+
+    storage_field
+        Column name used to store the serialized session data. Defaults to
+        'storage'.
+
+    expires_field
+        Column name to store the expire time. Defaults to 'expires'.
+
+    expires
+        Session time to live. Defaults to 3600.
+
+    need_commit
+        Defaults to 0. Set to 1 when the CDBI class has AutoCommit turned
+        off.
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::Session, Class::DBI.
+
+AUTHOR
+    Jason Woodward <"woodwardj@jaos.org">
+
+    Based on work by Lyo Kato <lyo.kato@gmail.com> Yuval Kogman
+    <"nothingmuch@woobling.org"> Sebastian Riedel <"sri@cpan.org">, Marcus
+    Ramberg <"mramberg@cpan.org">, Andrew Ford <"andrewf@cpan.org">,
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

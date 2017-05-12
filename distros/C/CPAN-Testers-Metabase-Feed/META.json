@@ -1,0 +1,72 @@
+{
+   "abstract" : "Generate Atom feed for CPAN Testers Reports",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.102160",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Testers-Metabase-Feed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::GUID" : 0,
+            "DateTime" : 0,
+            "DateTime::Format::ISO8601" : 0,
+            "File::Slurp" : 0,
+            "JSON" : 0,
+            "Metabase::Librarian" : "0.013",
+            "Moose" : 0,
+            "MooseX::Types::ISO8601" : 0,
+            "XML::Feed" : 0,
+            "autodie" : "2.00",
+            "namespace::autoclean" : 0,
+            "perl" : "5.010",
+            "utf8" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Testers::Metabase::Feed" : {
+         "file" : "lib/CPAN/Testers/Metabase/Feed.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/dagolden/cpan-testers-metabase-feed/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dagolden/cpan-testers-metabase-feed.git",
+         "web" : "http://github.com/dagolden/cpan-testers-metabase-feed/tree"
+      }
+   },
+   "version" : "0.001"
+}
+

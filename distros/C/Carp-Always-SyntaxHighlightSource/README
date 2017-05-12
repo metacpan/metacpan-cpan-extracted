@@ -1,0 +1,24 @@
+SYNOPSIS
+
+     % perl -MCarp::Always::SyntaxHighlightSource script.pl
+
+    Or, for less carpal tunnel syndrome:
+
+     % perl -MCarp::Always::SHS script.pl
+
+DESCRIPTION
+
+CREDITS
+
+    Modified from Carp::Source::Always.
+
+SEE ALSO
+
+    Carp::Always
+
+    Carp::Source and Carp::Source::Always
+
+    carpa
+
+    Devel::Confess
+

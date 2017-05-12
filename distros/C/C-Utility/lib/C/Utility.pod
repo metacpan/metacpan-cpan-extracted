@@ -1,0 +1,371 @@
+
+
+
+=head1 NAME
+
+C::Utility - utilities for generating C programs
+
+=head1 DESCRIPTION
+
+This module contains functions which assist in automatic generation of
+C programs.
+
+=head1 FUNCTIONS
+
+=head2  convert_to_c_string
+
+   my $c_string = convert_to_c_string ($perl_string);
+
+This converts a Perl string into a C string. For example,
+
+    
+    use C::Utility 'convert_to_c_string';
+    my $string =<<'EOF';
+    The quick "brown" fox\@farm
+    jumped %over the lazy dog.
+    EOF
+    print convert_to_c_string ($string);
+
+
+produces output
+
+    "The quick \"brown\" fox\@farm\n"
+    "jumped %over the lazy dog.\n"
+
+
+(This example is included as L<F<fox.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/fox.pl> in the distribution.)
+
+
+It also removes backslashes from before the @ symbol, so \@ is
+transformed to @.
+
+=head2 convert_to_c_string_pc
+
+    my $c_string = convert_to_c_string_pc ($string);     
+
+As L</convert_to_c_string>, but also with % (the percent character)
+converted to a double percent, %%. This is for generating strings
+which may be used as C format strings without generating an error
+because of embedded percent characters.
+
+    
+    use C::Utility 'convert_to_c_string_pc';
+    my $string =<<'EOF';
+    The quick "brown" fox\@farm
+    jumped %over the lazy dog.
+    EOF
+    print convert_to_c_string_pc ($string);
+
+
+produces output
+
+    "The quick \"brown\" fox\@farm\n"
+    "jumped %%over the lazy dog.\n"
+
+
+(This example is included as L<F<fox-pc.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/fox-pc.pl> in the distribution.)
+
+
+=head2 c_string
+
+Alias for L</convert_to_c_string>.
+
+=head2 ch_files
+
+    my $hfile = ch_files ($c_file_name);
+
+This makes a .h filename from a .c filename, and backs up both C and
+.h files using L<File::Versions>. See also L</c_to_h_name>.
+
+=head2 escape_string
+
+   my $escaped_string = escape_string ($normal_string);
+
+Escape double quotes (") in a string with a backslash.
+
+=head2  c_to_h_name
+
+    my $h_file = c_to_h_name ("frog.c");
+    # $h_file = "frog.h".
+
+Make a .h file name from a .c file name.
+
+=head2 valid_c_variable
+
+    valid_c_variable ($variable_name);
+
+This returns 1 if C<$variable_name> is a valid C variable, the
+undefined value otherwise. It tests for two things, first that the
+argument only contains the allowed characters for a C variable, and
+second that the argument is not a C keyword like "goto" or "volatile".
+
+=head2 wrapper_name
+
+    my $wrapper = wrapper_name ($file_name);
+
+Given a file name, this returns a suitable C preprocessor wrapper name
+based on the file name. The preprocessor wrapper name is just the
+uppercase version of the file name with hyphens and dots replaced with
+underscores. This does not strip out directory paths from
+C<$file_name>, since it would usually be an error to include a
+particular directory path in a header file's wrapper.
+
+=head2 print_top_h_wrapper
+
+    print_top_h_wrapper ($file_handle, $file_name);
+    # Prints #ifndef wrapper at top of file.
+
+Print an "include wrapper" for a .h file to C<$file_handle>. For
+example,
+
+    #ifndef MY_FILE
+    #define MY_FILE
+
+The name of the wrapper comes from L</wrapper_name> applied to
+C<$file_name>. If C<$file_handle> is a scalar reference, this
+concatenates the wrapper to the scalar.
+
+See also L</print_bottom_h_wrapper>.
+
+=head2 print_bottom_h_wrapper
+
+    print_bottom_h_wrapper ($file_handle, $file_name);
+
+Print the bottom part of an include wrapper for a .h file to
+C<$file_handle>.
+
+The name of the wrapper comes from L</wrapper_name> applied to
+C<$file_name>.
+
+If C<$file_handle> is a scalar reference, this concatenates the
+wrapper to the scalar.
+
+See also L</print_top_h_wrapper>.
+
+=head2 print_include
+
+    print_include ($file_handle, $file_name);
+
+Print an #include statement for a .h file named C<$file_name> to
+C<$file_handle>:
+
+    #include "file.h"
+
+=head2 hash_to_c_file
+
+    my $h_file = hash_to_c_file ($c_file_name, \%hash);
+
+Output a Perl hash as a set of const char * strings. For example,
+
+    
+    use FindBin '$Bin';
+    use C::Utility 'hash_to_c_file';
+    use File::Slurper 'read_text';
+    my $file = "$Bin/my.c";
+    my $hfile = hash_to_c_file ($file, { version => '0.01', author => 'Michael Caine' });
+    print "C file:\n\n";
+    print read_text ($file);
+    print "\nHeader file:\n\n";
+    print read_text ($hfile);
+    unlink $file, $hfile or die $!;
+
+
+produces output
+
+    C file:
+    
+    #include "my.h"
+    const char * author = "Michael Caine";
+    const char * version = "0.01";
+    
+    Header file:
+    
+    #ifndef MY_H
+    #define MY_H
+    extern const char * author; /* "Michael Caine" */
+    extern const char * version; /* "0.01" */
+    #endif /* MY_H */
+
+
+(This example is included as L<F<michael-caine.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/michael-caine.pl> in the distribution.)
+
+
+The keys of the hash are checked with L</valid_c_variable>, and the
+routine dies if they are not valid C variable names.
+
+A third argument, C<$prefix>, contains an optional prefix to add to
+all the variable names:
+
+    hash_to_c_file ('that.c', {ok => 'yes'}, 'super_');
+
+prints
+
+    const char * super_ok = "yes";
+
+The behaviour of returning the name of the header file was added in
+version 0.006.
+
+=head2 line_directive
+
+     line_directive ($fh, 42, "file.x")
+
+prints
+
+     #line 42 "file.x"
+
+to C<$fh>. This prints a C preprocessor line directive to the file
+specified by C<$fh>. If C<$fh> is a scalar reference, it concatenates
+the line directive to the end of it.
+
+
+
+=head2 brute_force_line
+
+    brute_force_line ($input_file, $output_file);
+
+Read C<$input_file>, put #line directives on every single line, and
+write that to C<$output_file>. This is a fix used to force line
+numbers into a file before it is processed by L<Template>.
+
+=head2 add_lines
+
+    my $text = add_lines ($file);
+
+Replace strings of the form #line in the file specified by C<$file>
+with a C-style line directive before it is processed by L<Template>.
+
+=head2 remove_quotes
+
+    my $unquoted_string = remove_quotes ($string);
+
+This removes the leading and trailing quotes from C<$string>. It also
+removes the "joining quotes" in composite C strings. Thus input of the
+form B<"composite " "C" " string"> is converted into B<composite C
+string> without the quotes.
+
+=head2 linein
+
+    my $intext = linein ($infile);
+
+Given a file F<$infile>, this opens the file, reads it in, replaces
+the text C<#linein> in the file with a C line directive referring to
+the original file, then returns the complete text as its return value.
+
+=head2 lineout
+
+    lineout ($outtext, $outfile);
+
+Given a C output text C<$outtext> and a file name F<$outfile>, this
+writes out the text to F<$outfile>, replacing C<#lineout> with an
+appropriate line directive.
+
+    
+    use FindBin '$Bin';
+    use C::Utility 'lineout';
+    use File::Slurper 'read_text';
+    my $file = "$Bin/some.c";
+    my $c = <<EOF;
+    static void unknown (int x) { return x; }
+    #lineout
+    int main () { return 0; }
+    EOF
+    lineout ($c, $file);
+    print read_text ($file);
+    unlink $file or die $!;
+
+
+produces output
+
+    static void unknown (int x) { return x; }
+    #line 2 "/usr/home/ben/projects/c-utility/examples/some.c"
+    int main () { return 0; }
+
+
+(This example is included as L<F<lineout.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/lineout.pl> in the distribution.)
+
+
+=head2 stamp_file
+
+    stamp_file ($fh);
+
+Add a stamp to file handle C<$fh> containing the name of the program
+which created it, and the time of generation.
+
+The name of the C file output can be added as a second argument:
+
+    stamp_file ($fh, $name);
+
+If C<$fh> is a scalar reference, the stamp is concatenated to it.
+
+    
+    use C::Utility 'line_directive';
+    my $out = '';
+    line_directive (\$out, 99, "balloons.c");
+    print $out;
+
+
+produces output
+
+    #line 99 "balloons.c"
+
+
+(This example is included as L<F<line-directive.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/line-directive.pl> in the distribution.)
+
+
+This function was added in version 0.006.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<C::Template>
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item Carp
+
+L<Carp> is used to report errors.
+
+=item File::Spec
+
+L<File::Spec> is used to get the base name of the file from the
+argument to L</hash_to_c_file>, and to get the absolute name of the
+file in L</add_lines>.
+
+=item File::Versions
+
+L<File::Versions> is used to back up files
+
+=back
+
+=head1 HISTORY
+
+Most of the functions in this module are for supporting automated C
+code generators.
+
+C::Utility was on CPAN, but then deleted between version 0.005
+and version 0.006. I don't know of anyone who was using the module,
+but I decided to restore it to CPAN anyway, since I'm still using and
+maintaining it, and it might be useful to somebody.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

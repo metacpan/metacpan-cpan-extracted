@@ -1,0 +1,48 @@
+  EXAMPLE 2
+
+    Now, a complex calculator with two IDL files. And unfortunetly, some
+    generated files need modifications.
+
+    Cplx.idl contains :
+
+        module Cplx {
+            struct Complex {
+                float   re;
+                float   im; 
+            };
+        };
+ 
+    and CalcCplx.idl contains :
+
+        #include "Cplx.idl"
+        interface CalcCplx {
+            Cplx::Complex Add(in Cplx::Complex val1, in Cplx::Complex val2);
+            Cplx::Complex Sub(in Cplx::Complex val1, in Cplx::Complex val2);
+        };
+
+    First, run :
+
+        idl2xs_c Cplx.idl
+        idl2xs_c CalcCplx.idl
+
+    Second, you edit and complete MANIFEST with
+
+        Cplx.pm
+        Cplx.h
+
+    Third, you edit Makefile.PL
+
+            'PM'            => {
+                        'CalcCplx.pm'          => '$(INST_LIBDIR)/CalcCplx.pm',
+                        'Cplx.pm'              => '$(INST_LIBDIR)/Cplx.pm',
+            },
+
+    Fourth, rebuild Makefile :
+
+        perl Makefile.PL
+
+    Now, you can create skel_CplxCalc.c, build :
+
+        make
+        make test
+        make install

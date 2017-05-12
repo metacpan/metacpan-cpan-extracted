@@ -1,0 +1,14 @@
+Revision history for CGI-Browse
+
+1.0.0  Wed Nov 25 05:00:00 2009
+       Initial release renamed from IOSea-Browse.
+       Simple fields hash plus SQL statement.
+       Multiple link-outs definable with hidden columns.
+       Sortable columns.
+       Multi and Each Deletes.
+       TMPL Hash values.
+       Default HTML layout.
+       Default styles.
+       Sorted by, Starting row, Show rows, Go to page.
+       State capitals SQL.
+

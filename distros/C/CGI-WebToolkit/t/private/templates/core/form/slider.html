@@ -1,0 +1,35 @@
+<dl>
+	<dt><label for="{name}">{label}</label></dt>
+	<dd class="info">
+		{info}
+	</dd>
+	<dd>
+		<input class="slider" type="text" name="{name}" id="js_{name}" value="{content}" onchange="Slider_{name}.f_setValue(this.value);"/>
+		<script language="javascript">
+			var A_TPL = {
+				'b_vertical' : false,
+				'b_watch': true,
+				'n_controlWidth': 149,
+				'n_controlHeight': 17,
+				'n_sliderWidth': 9,
+				'n_sliderHeight': 17,
+				'n_pathLeft' : 1,
+				'n_pathTop' : 0,
+				'n_pathLength' : 138,
+				's_imgControl': '{public_url}/core/tigra_slider_control/sldr5h_bg.gif',
+				's_imgSlider': '{public_url}/core/tigra_slider_control/sldr5h_sl.gif',
+				'n_zIndex': 1
+			};
+			var A_INIT = {
+				's_form' : 0,
+				's_name': '{name}',
+				'n_minValue' : 0,
+				'n_maxValue' : 100,
+				'n_value' : 20,
+				'n_step' : 1
+			};
+			var Slider_{name} = new slider(A_INIT, A_TPL);
+		</script>
+	</dd>
+	{clear}
+</dl>

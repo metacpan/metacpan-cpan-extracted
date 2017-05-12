@@ -1,0 +1,23 @@
+--- #YAML:1.0
+clean: 0
+clobber: 1
+debug: 0
+dotfiles: 0
+media:
+  - mp\d
+  - ogg
+  - mpe?g
+  - mov
+  - avi
+  - wmv
+  - asf
+  - qt
+  - gif
+  - jpe?g
+  - png
+monly: 0
+nodirs: 0
+nolog: 0
+silent: 0
+undo: 0
+verbose: 0

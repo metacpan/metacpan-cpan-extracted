@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Plugin-Mode.t
+lib/Catalyst/Plugin/Mode.pm

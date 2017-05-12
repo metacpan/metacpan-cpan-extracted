@@ -1,0 +1,106 @@
+NAME
+    CogBase - A CogBase Implementation in Perl
+
+WARNING
+    This Database implementation is in its infancy. Just barely a proof of
+    concept so far. It would be ridiculous of you to use it for anything
+    serious, yet.
+
+SYNOPSIS
+        use CogBase;
+
+        my $conn = CogBase->connect('http://cog.example.com');
+
+        my $schema = $conn->node('Schema');
+        $schema->value(<<'...');
+        +: person
+        <: Node
+        age: Number
+        given_name: String
+        family_name: String
+        ...
+        $conn->store($schema);
+
+        my $person = $conn->node('person');
+
+        $person->given_name('Ingy');
+        $person->family_name('dot Net');
+        $person->age(42);
+
+        $conn->store($person);
+
+        my @results = $conn->query('!person');
+        my @nodes = $conn->fetch(@results);
+
+        for my $node (@nodes) {
+            print "%s %s is %d years old\n",
+                $node->given_name,
+                $node->family_name,
+                $node->age;
+        }
+
+        $conn->disconnect;
+
+DESCRIPTION
+    CogBase is a Object Database Management System.
+
+    Some interesting characteristics of its design are:
+
+    * All objects are stored as nodes.
+    * Every node has a universally unique id.
+    * Every node has a type.
+    * Every type has a schema.
+    * Every schema, is itself, a node in the db.
+    * Every schema has a base/super schema that it inherits from.
+    * Schemas can be used to generate programming language (Perl) classes
+    for every type (schema) of node.
+    * CogBase defines several core scalar types.
+    * CogBase defines one core schema (that every schema inherits from).
+    * Every node has one or more revisions.
+    * Every revision is immutable.
+    * Database access methods are connect, create, store, fetch, query and
+    disconnect.
+    * All nodes have access control based on the Unix File System.
+    * HTTP is used for the network layer. GET and POST are used for all
+    operations.
+    * Database can be used over network or embedded.
+    * Access control is based on Unix File System
+
+AUTHOR
+    Ingy döt Net, "<ingy at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-cogbase at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CogBase>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CogBase
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/CogBase>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/CogBase>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=CogBase>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/CogBase>
+
+ACKNOWLEDGEMENTS
+    Unix, HTTP
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Ingy döt Net, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

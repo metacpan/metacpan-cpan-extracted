@@ -1,0 +1,54 @@
+Class::Proxy::Lite
+==================
+
+Simple, lightweight implementation of object proxies.
+
+All methods are delegated to a target object, but no reference
+to the target object is kept.  Instead, a user-supplied token
+(any kind of data) and resolver (a function to convert the token
+into an object reference) are used to identify the target object
+each time a method is called on the proxy.
+
+In order to avoid method name clashes, the only method defined
+in this class is AUTOLOAD.
+
+This class is not related to Class::Proxy by Murat Uenalan.
+
+See the module documentation for more information.
+
+
+INSTALLATION
+------------
+
+To install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternatively, if you have Module::Build installed,
+you can do this:
+
+   perl Build.PL
+   ./build
+   ./build test
+   ./build install
+
+At this point the two methods should be equivalent.
+
+
+DEPENDENCIES
+------------
+
+None.
+
+
+COPYRIGHT
+---------
+
+Copyright 2003 Paul M. Hoffman <nkuitse AT cpan DOT org>.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

@@ -1,0 +1,115 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Text::Wrap;
+use Convert::GeekCode;
+binmode STDOUT, ':utf8' if $] >= 5.008;
+
+my $VERSION = '0.6';
+
+=head1 NAME
+
+geekgen - Geek Code generator
+
+=head1 SYNOPSIS
+
+B<geekgen> [I<code>|I<version>|I<charset>...]
+
+=head1 DESCRIPRTION
+
+This script generates Geek Code sequences interactively, according
+to user's input. User could mix numerical selections with usual
+symbols like (), >, ! and @.
+
+=head1 BUGS
+
+Currently it's broking on two topics: Sex and Unix, due to lack of
+implementation on multiple-selections.
+
+=head1 TODO
+
+A simple WWW Front-end sounds cool.
+
+=cut
+
+if (@ARGV and $ARGV[0] eq '-h') {
+    print "Usage: $0 [code|version|charset]\n";
+    exit;
+}
+
+$Text::Wrap::columns = 80;
+
+my ($code, $ver, $charset) = ('geekcode', 3.12, 'en_us');
+
+foreach (@ARGV) {
+    if (/^[\d\.]+$/) {
+        $ver = $_;
+    }
+    elsif (/^(\w\w)[\-\_](\w\w)$/) {
+        $charset = lc "$1_$2"; # converts en-us to en_us
+    }
+    elsif ($_) {
+        $code = $_;
+    }
+}
+
+my $out = geek_encode(sub  {
+    my $i = 1;
+    print "\n$_[0]\n", "=" x 79, "\n";
+    my $len1 = length($#_ / 2);
+    my $len2 = 1 + length((
+        sort {
+            length($a) <=> length($b)
+        } map {
+            $_[$_ * 2 - 1]
+        } (1.. $#_ / 2)
+    )[-1]);
+
+    my $lines = 0;
+    while (defined $_[$i * 2 - 1]) {
+        my $txt = wrap(
+            sprintf("\%${len1}d %-${len2}s", $i, $_[$i * 2 - 1]),
+            ' ' x ($len1 + $len2 + 1),
+            $_[$i++ * 2]
+        );
+        if ($_[0] eq 'Geek Type' and not $i % 2 and length($txt) < 40) {
+            $txt .= (' ' x (40-length($txt)));
+            }
+            else {
+            $txt .= "\n";
+            }
+
+        print $txt;
+        $lines += $#{[$txt =~ m/\n/g]} + 1;
+    }
+
+    print "\n" x (21 - $lines);
+    print "Enter your $_[0] code here [()>!\@ okay]: ";
+    my $inp = <STDIN>;
+    chomp $inp;
+    $inp =~ s/(\d+)/$_[$1 * 2 - 1]/g;
+    return $inp;
+}, $code, $ver, $charset);
+
+print $out;
+
+__END__
+
+=head1 SEE ALSO
+
+L<Convert::GeekCode>, L<geekdec>
+
+=head1 AUTHORS
+
+唐鳳 E<lt>cpan@audreyt.orgE<gt>
+
+=head1 CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Module-Signature.
+
+This work is published from Taiwan.
+
+L<http://creativecommons.org/publicdomain/zero/1.0>
+
+=cut

@@ -1,0 +1,19 @@
+abstract: JabberRPC Model Class for Catalyst
+author: Florian Merges <fmerges@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Model-JabberRPC
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 0
+  Catalyst::Devel: 0
+  Frontier::RPC2: 0
+  Jabber::RPC: 0
+  NEXT: 0
+version: 0.04

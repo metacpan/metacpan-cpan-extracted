@@ -1,0 +1,82 @@
+# To generate a new  Parser Module you need to run the following:
+#  perl -MParse::RecDescent - OQFilterParser.grammar CGI::OptimalQuery::OQFilterParser
+#
+# Notes:
+#
+#   NEVER use a "return" in one of these executable blocks!
+#      (it takes weeks to find the error)
+#   
+#   For some reason the { $item[1] } code is necessary for the toplevel target
+#   "expression" but the internal targets default to it?
+#
+#   The expression:<error> catches the empty and not fully parsed cases.
+# 
+#   The expr:<error> catches malformed syntax during parsing. 
+
+
+expression:
+	 or_expr /\Z/
+		{ $item[1] }
+	| <error>
+
+or_expr: 
+	<leftop: and_expr /or/i and_expr>
+		{ @{$item[1]} < 2 ? $item[1][0] : [ 'OR', @{$item[1]} ] }
+and_expr: 
+	<leftop: expr /and/i expr>
+		{ @{$item[1]} < 2 ? $item[1][0] : [ 'AND', @{$item[1]} ] }
+expr:
+	'(' or_expr ')'
+		{ [ '()' , $item[2] ] }
+	| function
+	| comp_expr
+	| <error>
+comp_expr: 
+	identifier comp_op identifier
+		{ [ 'COMP', $item[1], $item[2], $item[3] ] }
+        | /upper/i '(' identifier ')' comp_op /upper/i '(' identifier ')'
+		{ [ 'COMP', $item[3], 'CONTAINS', $item[8] ] }
+        | /lower/i '(' identifier ')' comp_op /lower/i '(' identifier ')'
+		{ [ 'COMP', $item[3], 'CONTAINS', $item[8] ] }
+comp_op: 
+	'!=' | '<=' | '>=' | /LIKE/i | /NOT\s+LIKE/i | '<' | '>' | '='
+identifier: 
+	'[' /[^\]]*/ ']'
+                { [ 'COLM', $item[2] ] }
+	| "\'" /[^\']*/ "\'"
+		{ ['VAL', $item[2] ] }
+	| '"' /[^\']*/ '"'
+		{ ['VAL', $item[2] ] }
+	| /[\-]?\d+\.?\d*/
+		{ ['VAL', $item[1] ] }
+	| /[\-]?\d*\.?\d+/
+		{ ['VAL', $item[1] ] }
+function: 
+	vname '(' ')'
+		{ ['FUNCT', $item[1], {} ] }
+	| vname '(' <leftop: farg ',' farg> ')'
+		{ my %h = map {@$_} @{$item[3]};
+		  ['FUNCT', $item[1], \ %h ]; }
+vname:
+	/[a-zA-Z]+[\w]*/
+		{ $item[1] }
+
+farg: 	
+	arg_name '=>' arg_val
+		{ [ $item[1] => $item[3] ] }
+        | arg_name '=>' '[' <leftop: arg_val ',' arg_val> ']' 
+		{ [ $item[1] => [ @{$item[4]} ] ] }
+arg_name:
+	 "\'" vname "\'"
+		{ $item[2] }
+	| vname
+		{ $item[1] }
+arg_val:
+	numval
+ 		{ "$item[1]" }
+	| "\'" /[^\']*/ "\'"
+		{ "$item[2]" }
+
+numval:
+	/[\-]?\d+/
+		{ $item[1] }

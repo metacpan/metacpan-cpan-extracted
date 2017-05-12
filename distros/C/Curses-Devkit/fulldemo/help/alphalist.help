@@ -1,0 +1,252 @@
+</R>Purpose<!R>
+The Cdk alphalist widget allows the user to select an item in a list. This
+widget allows the user to type in letters to refine and narrow the search. When
+a character is typed into the entry field, the scrolling list looks for the 
+first word which matches the string in the entry field. You can continue to
+narrow the search by typing in more letters.
+
+</R>Construction Options<!R>
+The alphalist widget is defined using the following syntax. The variable
+</B>$alphalistObject<!B> contains the reference to the entry object.
+<C></B>$alphalistObject = new Cdk::Alphalist ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Label       Required            Scalar     This is the label of the widget.
+List        Required            Array Ref  This is the list of words to choose from.
+Height      Required            Scalar     The height of the widget.
+Width       Required            Scalar     The width of the widget.
+Highlight   Reverse             Scalar     The highlight attribute of the scrolling list.
+Filler      .                   Scalar     The default field character.
+Xpos        Center              Scalar     This is the position of the window on the X axis.
+Ypos        Center              Scalar     This is the position of the window on the Y axis.
+Box         True                Scalar     This Boolean states whether the dialog box will have a box drawn around it.
+Shadow      False               Scalar     This Boolean states whether the dialog box will have a shadow on the box.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The
+following example demonstrates how to activate a entry widget.
+<C></B>$returnValue = $alphalistObject->activate ();
+
+The variable </B>$returnValue<!B> contains a scalar value of what was typed into
+the entry field.
+
+</B>inject<!B>
+This function injects a single character into the widget. The following
+examples demonstrates how to call the inject method.
+<C></B>$alphalistObject->inject ( options );
+
+The options are defined in the following table.
+</U>Option      Default Value       Type       Purpose<!U>
+Shadow      Required             Scalar     The character to inject into the widget.
+
+If you are injecting a special character into the widget, then you can
+use a pre-defined value to represent the key.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+</B>set<!B>
+Sets or resets certain attributes or features of the widget. The following
+demonstrates how to call the set method from the entry field.
+<C></B>$alphalistObject->set ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+List        Required            Array Ref  This is the list of words to choose from.
+Highlight   Reverse             Scalar     The highlight attribute of the scrolling list.
+Filler      .                   Scalar     The default field character.
+Box         True                Scalar      Changes the current value of the box flag.
+
+</B>bind<!B>
+The bind method binds keys to events. The binding is specific to the individual
+objects. The following example demonstrates how to call the bind method.
+<C></B>$alphalistObject->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Key         Required            Scalar     This is the character to bind the event to.
+Function    Required            Scalar     This is the name of the callback function.
+
+</B>preProcess<!B>
+The </B>preProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+preProcess method.
+<C></B>$alphalistObject->preProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a pre-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$alphalistObject->preProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+If the pre-process function returns a value of 0 the key hit will
+not be injected into the widget. This allows the programmer to
+selectively pick which characters will or will not get injected
+into the widget.
+
+The </B>postProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+postProcess method.
+<C></B>$alphalistObject->postProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a post-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$alphalistObject->postProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+<C></B>$alphalistObject->draw ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Box         True                Scalar     Draws the window with a box around it.
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+<C></B>$alphalistObject->erase ();
+
+</B>raise<!B>
+The raise method raises the widget to the top of the screen. This means if there
+were any widgets obscuring part of the view, raising the object would bring the
+complete object into view. The following example demonstrates how to call the 
+raise method.
+<C></B>$alphalistObject->raise();
+
+</B>lower<!B>
+The lower method lowers the object so it doesn't obscure the view of any other 
+objects. The following example demonstrates how to call the lower method.
+<C></B>$alphalistObject->lower();
+
+</B>register<!B>
+The register method registers the object to the default screen. This does </R>NOT<!R>
+have to be called since the objects are registered automatically. This method
+should be called if the </B>unregister<!B> method was called. The following
+example demonstrates how to call the register method.
+<C></B>$alphalistObject->register();
+
+</B>unregister<!B>
+The unregister method should be called when a widget, which is part of the
+default screen, needs to be taken away temporarily. This does not delete or free
+the object, it just unmaps it from any future screen refreshes. The object can
+be registered by calling the </B>register<!B> method. The following example
+demonstrates how to call the unregister method.
+<C></B>$alphalistObject->unregister();
+
+</B>getwin<!B>
+This method returns a pointer to the window of the object. Not much use for this
+yet. It will be useful in the future when the drawing methods are added. The
+following example demonstrates how to call the getwin method.
+<C></B>$alphalistObject->getwin();
+
+</R>Default Key Bindings<!R>
+Since this widget is 'driven' by the entry field, the default key bindings
+of the entry field apply to this widget. There are however extra bindings
+which have been applied. They are as follows:
+
+</U>Key               Action<!U>
+TAB               Tries to complete the word in the entry field.
+Key Up            Scrolls the list one item backward.
+Page Up           Scrolls the list one page backward.
+CTRL-B            Scrolls the list one page backward.
+Key Down          Scrolls the list one line forward.
+Page Down         Scrolls the list one page forward.
+CTRL-F            Scrolls the list one page forward.
+Return            Returns what is currently displayed in the entry field.
+Escape            Exits the widget and returns undef.
+
+</R>Tips & Tricks<!R>
+None.
+
+</R>Physical Restrictions<!R>
+Same as the scrolling list.
+
+</R>Example Use Of The Widget<!R>
+<F=../examples/alphalist>
+
+<C><#HL(70)>
+<C>Document Created: June, 1996
+<C>Document Revised: July, 1996

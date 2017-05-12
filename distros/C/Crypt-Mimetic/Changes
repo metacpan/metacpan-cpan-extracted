@@ -1,0 +1,13 @@
+Revision history for Perl extension Crypt::Mimetic. 
+
+0.02 - Current version
+  2002-08-17
+  - Makefile.PL bug fixed:
+    now checks dependences.
+  2002-08-07
+  - Added new feature in Error::Mimetic
+    now there are 'errors' and 'warnings'
+
+0.01
+  2002-07-30
+  - Initial release

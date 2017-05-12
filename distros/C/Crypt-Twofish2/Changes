@@ -1,0 +1,50 @@
+Revision history for Perl extension Crypt::Twofish2
+
+1.02 Wed Dec  1 03:10:32 CET 2010
+	- make all twofish functions static to avoid namespace issues
+          when statically linking perl.
+        - convert to XSLoader.
+
+1.01 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+1.0  Wed Jul 14 17:55:13 CEST 2004
+	- minor spelling mistakes.
+        - pad result with trailing (hidden) zero-byte to please regex code
+          (problem reported by Andreas König).
+
+0.06  Fri Feb 23 02:12:22 CET 2001
+	- fix TWO MAJOR BUGS. First, keys with a leading zero byte
+          caused no encryption at all. Second, the keys were byte-swapped
+          on BIG-ENDIAN machines (or rather, not swapped at all).
+
+          Both of these bugs were corrected. If you have old keys on
+          big-endian machine you can get the old behaviour by applying the
+          following regex to your key:
+
+          $key =~ s/(.)(.)(.)(.)/$4$3$2$1/gs;
+          
+        - added more test vectors that should also catcg endianness-issues.
+        - minor portability fixes.
+
+0.05  Mon Feb 19 09:08:12 CET 2001
+	- workaround for the 5.004 pod anomaly.
+        - renamed twofish2.c to twofish.c to avoid name clash on the
+          lesser os's ;) actually, the old name was a bug anyway.
+
+0.04  Tue Jan 16 13:59:00 CET 2001
+	- better test for little endian (should work on alpha now).
+        - more(?) 5.004 compatibility (5.004 is still unsupported). I
+          wished people wouldn't insist on using ANTIQUE versions of their
+          software with my module.
+
+0.03  Tue Aug  1 22:05:05 CEST 2000
+	- added SvPV_nolen emulation for stoneage perls (5.5 and below).
+
+0.02  Sun Apr  9 02:54:32 CEST 2000
+	- use BYTEORDER form perl.h
+        - improved testsuite
+
+0.01  Fri Apr  7 11:24:43 CEST 2000
+	- original version; leftover "garbage" from the PApp module
+

@@ -1,0 +1,79 @@
+{
+   "abstract" : "color space conversions and named lookups",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-Color",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Number::Delta" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::UtilsBy" : "0",
+            "Module::Pluggable" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Convert::Color" : {
+         "file" : "lib/Convert/Color.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::CMY" : {
+         "file" : "lib/Convert/Color/CMY.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::CMYK" : {
+         "file" : "lib/Convert/Color/CMYK.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::HSL" : {
+         "file" : "lib/Convert/Color/HSL.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::HSV" : {
+         "file" : "lib/Convert/Color/HSV.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::RGB" : {
+         "file" : "lib/Convert/Color/RGB.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::RGB16" : {
+         "file" : "lib/Convert/Color/RGB16.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::RGB8" : {
+         "file" : "lib/Convert/Color/RGB8.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::VGA" : {
+         "file" : "lib/Convert/Color/VGA.pm",
+         "version" : "0.11"
+      },
+      "Convert::Color::X11" : {
+         "file" : "lib/Convert/Color/X11.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

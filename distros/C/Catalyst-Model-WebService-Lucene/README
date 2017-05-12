@@ -1,0 +1,37 @@
+NAME
+    Catalyst::Model::WebService::Lucene - Use WebService::Lucene in your
+    Catalyst application
+
+SYNOPSIS
+        package MyApp::Model::Lucene;
+    
+        use base qw( Catalyst::Model::WebService::Lucene );
+    
+        __PACKAGE__->config(
+            server => 'http://localhost:8080/lucene/'
+        );
+
+DESCRIPTION
+    This module helps you use remote indexes via WebService::Lucene in your
+    Catalyst application.
+
+METHODS
+  COMPONENT( )
+    passes your config options to WebService::Lucene's "new" method.
+
+SEE ALSO
+    *   Catalyst
+
+    *   WebService::Lucene
+
+AUTHORS
+    Brian Cassidy <bricas@cpan.org>
+
+    Adam Paynter <adapay@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2009 National Adult Literacy Database
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

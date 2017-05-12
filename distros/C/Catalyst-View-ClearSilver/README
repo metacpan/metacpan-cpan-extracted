@@ -1,0 +1,54 @@
+NAME
+       Catalyst::View::ClearSilver - ClearSilver View Class
+
+SYNOPSIS
+           # use the helper
+           create.pl view ClearSilver ClearSilver
+
+           # lib/MyApp/View/ClearSilver.pm
+           package MyApp::View::ClearSilver
+
+           use base 'Catalyst::View::ClearSilver';
+
+           __PACKAGE__->config(
+               loadpaths => ['/path/to/loadpath', '/path/to/anotherpath'],
+               hdfpaths  => ['mydata.hdf'],
+               template_extension => '.cs',
+           );
+
+           1;
+
+           # Meanwhile, maybe in an 'end' action
+           $c->forward('MyApp::View::ClearSilver');
+
+DESCRIPTION
+       This is the "ClearSilver" view class. Your subclass should inherit from this class.
+
+METHODS
+       process
+           Renders the template specified in "$c->stash->{template}" or "$c->action" (the private
+           name of the matched action.  Calls render to perform actual rendering. Output is
+           stored in "$c->response->body".
+
+CONFIG VARIABLES
+       loadpaths
+           added to hdf.loadpaths.  default is "$c->config->{root}" only.
+
+       hdfpaths
+           HDF Dataset files into the current HDF object.
+
+       template_extension
+           a sufix to add when looking for templates bases on the "match" method in Cata-
+           lyst::Request.
+
+AUTHOR
+       Jiro Nishiguchi <jiro@cpan.org>
+
+       This library is free software; you can redistribute it and/or modify it under the same
+       terms as Perl itself.
+
+SEE ALSO
+       Catalyst, ClearSilver
+
+       ClearSilver Documentation:  <http://www.clearsilver.net/docs/>
+

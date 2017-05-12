@@ -1,0 +1,473 @@
+Name
+    Catalyst::View::TD - Catalyst Template::Declare View Class
+
+Synopsis
+    Use the helper to create your view:
+
+        ./script/myapp_create.pl view HTML TD
+
+    Create a template by editing lib/MyApp/Templates/HTML.pm:
+
+        template hello => sub {
+            my ($self, $vars) = @_;
+            html {
+                head { title { "Hello, $vars->{user}" } };
+                body { h1    { "Hello, $vars->{user}" } };
+            };
+        };
+
+    Render the view from MyApp::Controller::SomeController:
+
+        sub message : Global {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'hello';
+            $c->stash->{user}     = 'Slim Shady';
+            $c->forward( $c->view('HTML') );
+        }
+
+Description
+    This is the Catalyst view class for Template::Declare. Your application
+    should define a view class that subclasses this module. The easiest way
+    to achieve this is using the myapp_create.pl script (where myapp should
+    be replaced with whatever your application is called). This script is
+    created as part of the Catalyst setup.
+
+        ./script/myapp_create.pl view HTML TD
+
+    This creates a "MyApp::View::HTML" module in the lib directory (again,
+    replacing "MyApp" with the name of your application) that looks
+    something like this:
+
+        package MyApp::View::HTML;
+
+        use strict;
+        use warnings;
+        use parent 'Catalyst::View::TD';
+
+        __PACKAGE__->config(
+            # dispatch_to     => [qw(MyApp::Templates::HTML)],
+            # auto_alias      => 1,
+            # strict          => 1,
+            # postprocessor   => sub { ... },
+            # around_template => sub { ... },
+        );
+
+    It also creates a "MyApp::Templates::HTML" template class that looks
+    something like this:
+
+        package MyApp::Templates::HTML;
+
+        use strict;
+        use warnings;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        # template hello => sub {
+        #     my ($self, $vars) = @_;
+        #     html {
+        #         head { title { "Hello, $vars->{user}" } };
+        #         body { h1    { "Hello, $vars->{user}" } };
+        #     };
+        # };
+
+    Now you can modify your action handlers in the main application and/or
+    controllers to forward to your view class. You might choose to do this
+    in the "end()" method, for example, to automatically forward all actions
+    to the TD view class.
+
+        # In MyApp::Controller::SomeController
+        sub end : Private {
+            my( $self, $c ) = @_;
+            $c->forward( $c->view('HTML') );
+        }
+
+  Configuration
+    There are a three different ways to configure your view class (see
+    config for an explanation of the configuration options). The first way
+    is to call the "config()" method in the view subclass. This happens when
+    the module is first loaded.
+
+        package MyApp::View::HTML;
+
+        use strict;
+        use parent 'Catalyst::View::TD';
+
+        __PACKAGE__->config({
+            dispatch_to     => [ 'MyApp::Templates::HTML' ],
+            auto_alias      => 1,
+            strict          => 1,
+            postprocessor   => sub { ... },
+            around_template => sub { ... },
+        });
+
+    The second way is to define a "new()" method in your view subclass. This
+    performs the configuration when the view object is created, shortly
+    after being loaded. Remember to delegate to the base class "new()"
+    method (via "$self->next::method()" in the example below) after
+    performing any configuration.
+
+        sub new {
+            my $self = shift;
+            $self->config({
+                dispatch_to     => [ 'MyApp::Templates::HTML' ],
+                auto_alias      => 1,
+                strict          => 1,
+                postprocessor   => sub { ... },
+                around_template => sub { ... },
+            });
+            return $self->next::method(@_);
+        }
+
+    The final, and perhaps most direct way, is to call the ubiquitous
+    "config()" method in your main application configuration. The items in
+    the class hash are added to those already defined by the above two
+    methods. This happens in the base class "new()" method (which is one
+    reason why you must remember to call it via "MRO::Compat" if you
+    redefine the "new()" method in a subclass).
+
+        package MyApp;
+
+        use strict;
+        use Catalyst;
+
+        MyApp->config({
+            name     => 'MyApp',
+            'View::HTML' => {
+                dispatch_to     => [ 'MyApp::Templates::HTML' ],
+                auto_alias      => 1,
+                strict          => 1,
+                postprocessor   => sub { ... },
+                around_template => sub { ... },
+            },
+        });
+
+    Note that any configuration defined by one of the earlier methods will
+    be overwritten by items of the same name provided by the later methods.
+
+  Auto-Aliasing
+    In addition to the dispatch template class (as defined in the
+    "dispatch_to" configuration, or defaulting to
+    "MyApp::Templates::ViewName"), you can write templates in other classes
+    and they will automatically be aliased into the dispatch class. The
+    aliasing of templates is similar to how controller actions map to URLs.
+
+    For example, say that you have a dispatch template class for your
+    "MyApp::View::XHTML" view named "MyApp::Templates::XHTML":
+
+        package TestApp::Templates::XHTML;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        template home => sub {
+            html {
+                head { title { 'Welcome home' } };
+                body { h1    { 'Welcome home' } };
+            };
+        };
+
+    This will handle a call to render the "/home" (or just "home"):
+
+            $c->stash->{template} = 'home';
+            $c->forward( $c->view('XHTML') );
+
+    But let's say that you have a controller, "MyApp::Controller::Users",
+    that has an action named "list". Ideally what you'd like to do is to
+    have it dispatch to a view named "/users/list". And sure enough, you can
+    define one right in the dispatch class if you like:
+
+        template 'users/list' => sub {
+            my ($self, $args) = @_;
+            ul {
+                li { $_ } for @{ $args->{users} };
+            };
+        };
+
+    But it can get to be a nightmare to manage *all* of your templates in
+    this one class. A better idea is to define them in multiple template
+    classes just as you have actions in multiple controllers. The
+    "auto_alias" feature of Catalyst::View::TD does just that. Rather than
+    define a template named "users/list" in the dispatch class
+    ("MyApp::Templates::XHTML"), create a new template class,
+    "MyApp::Templates::XHTML::Users":
+
+        ./script/myapp_create.pl TDClass XHTML::Users
+
+    Then create a "list" template there:
+
+        package TestApp::Templates::XHTML::Users;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        template list => sub {
+            my ($self, $args) = @_;
+            ul { li { $_ } for @{ $args->{users} } };
+        };
+
+    Catalyst::View::TD will automatically import the templates found in all
+    classes defined below the dispatch class. Thus this template will be
+    imported as "users/list". The nice thing about this is it allows you to
+    create template classes with templates that correspond directly to
+    controller classes and their actions.
+
+    You can also use this approach to create utility templates. For example,
+    if you wanted to put the header and footer output into utility
+    templates, you could put them into a utility class:
+
+        package TestApp::Templates::XHTML::Util;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        template header => sub {
+            my ($self, $args) = @_;
+            head { title {  $args->{title} } };
+        };
+
+        template footer => sub {
+            div {
+                id is 'fineprint';
+                p { 'Site contents licensed under a Creative Commons License.' }
+            };
+        };
+
+    And then you can simply use these templates from the dispatch class or
+    any other aliased template class, including the dispatch class:
+
+        package TestApp::Templates::XHTML;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        template home => sub {
+            html {
+                show '/util/header';
+                body {
+                    h1 { 'Welcome home' };
+                    show '/util/footer';
+                };
+            };
+        };
+
+    And the users class:
+
+        package TestApp::Templates::XHTML::Users;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        template list => sub {
+            my ($self, $args) = @_;
+            html {
+                show '/util/header';
+                body {
+                    ul { li { $_ } for @{ $args->{users} } };
+                    show '/util/footer';
+                };
+            };
+        };
+
+    If you'd rather control the importing of templates yourself, you can
+    always set "auto_alias" to a false value. Then you'd just need to
+    explicitly inherit from "Template::Declare::Catayst" and do the mixing
+    yourself. The equivalent to the auto-aliasing in the above examples
+    would be:
+
+        package TestApp::Templates::XHTML;
+        use parent 'Template::Declare::Catalyst';
+        use Template::Declare::Tags;
+
+        use TestApp::Templates::XHTML::Users;
+        use TestApp::Templates::XHTML::Util;
+
+        alias TestApp::Templates::XHTML::Users under '/users';
+        alias TestApp::Templates::XHTML::Util under '/util';
+
+    This would be the way to go if you wanted finer control over
+    Template::Declare's composition features.
+
+  Dynamic "dispatch_to"
+    Sometimes it is desirable to modify "dispatch_to" for your templates at
+    runtime. Additional paths can be prepended or appended "dispatch_to" via
+    the stash as follows:
+
+        $c->stash->{prepend_template_classes} = [ 'MyApp::Other::Templates' ];
+        $c->stash->{append_template_classes}  = [ 'MyApp::Fallback::Templates' ];
+
+    If you need to munge the list of dispatch classes in more complex ways,
+    there is also a "dispatch_to()" accessor:
+
+        my $view = $c->view('HTML')
+        splice @{ $view->dispatch_to }, 1, 0, 'My::Templates'
+            unless grep { $_ eq 'My::Templates' } $view->dispatch_to;
+
+    Note that if you use "dispatch_to()" to change template classes, they
+    are *permanently* changed. You therefore must check for duplicate paths
+    if you do this on a per-request basis, as in this example. Otherwise,
+    the class will continue to be added on every request, which would be a
+    rather ugly memory leak.
+
+    A safer approach is to use "dispatch_to()" to overwrite the array of
+    template classes rather than adding to it. This eliminates both the need
+    to perform duplicate checking and the chance of a memory leak:
+
+        $c->view('HTML')->dispatch_to( ['My::Templates', 'Your::Templates'] );
+
+    This is safe to do on a per-request basis. But you're really better off
+    using the stash approach. I suggest sticking to that when you can.
+
+    If you are calling "render" directly, then you can specify extra
+    template classes under the "prepend_template_classes" and
+    "append_template_classes" keys. See "Capturing Template Output" for an
+    example.
+
+  Rendering Views
+    The Catalyst "view()" method renders the template specified in the
+    "template" item in the stash.
+
+        sub message : Global {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'message';
+            $c->forward( $c->view('HTML') );
+        }
+
+    If a stash item isn't defined, then it instead uses the stringification
+    of the action dispatched to (as defined by "$c->action"). In the above
+    example, this would be "message".
+
+    The items defined in the stash are passed to the the Template::Declare
+    template as a hash reference. Thus, for this controller action:
+
+        sub default : Private {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'message';
+            $c->stash->{message}  = 'Hello World!';
+            $c->forward( $c->view('TD') );
+        }
+
+    Your template can use access the "message" key like so:
+
+        template message => sub {
+            my ($self, $args) = @_;
+            h1 { $args->{message} };
+        };
+
+    Template classes are automatically subclasses of
+    Template::Declare::Catalyst, which is itself a subclass of
+    Template::Declare. Template::Declare::Catalyst provides a few extra
+    accessors for use in your templates (though note that they will return
+    "undef" if you call "render()" without a context object):
+
+    "context"
+        A reference to the context object, $c
+
+    "c" An alias for "context()"
+
+    These can be accessed from the template like so:
+
+        template message => sub {
+            my ($self, $args) = @_;
+            p { "The message is $args->{message}" };
+            p { "The base is " . $self->context->req->base };
+            p { "The name is " . $self->c->config->{name} };
+        };
+
+    The output generated by the template is stored in "$c->response->body".
+
+  Capturing Template Output
+    If you wish to use the output of a template for some purpose other than
+    displaying in the response, e.g. for sending an email, use
+    Catalyst::Plugin::Email and the render method:
+
+        sub send_email : Local {
+            my ($self, $c) = @_;
+
+            $c->email(
+                header => [
+                    To      => 'me@localhost',
+                    Subject => 'A TD Email',
+                ],
+                body => $c->view('TD')->render($c, 'email', {
+                    prepend_template_classes => [ 'My::EmailTemplates' ],
+                    email_tmpl_param1        => 'foo'
+                }),
+            );
+            # Redirect or display a message
+        }
+
+  Template Class Helper
+    In addition to the usual helper for creating TD views, you can also use
+    the "TDClass" helper to create new template classes:
+
+        ./script/myapp_create.pl TDClass HTML::Users
+
+    This will create a new Template::Declare template class,
+    "MyApp::Templates::HTML::Users" in the lib directory. This is perhaps
+    best used in conjunction with creating a new controller for which you
+    expect to create views:
+
+        ./script/myapp_create.pl controller Users
+        ./script/myapp_create.pl TDClass HTML::Users
+
+    As explained in "Auto-Aliasing", if you already have the TD view
+    "MyApp::View::HTML", the templates in the
+    "MyApp::Templates::HTML::Users" class will be aliased under the "/users"
+    path. So if you defined a "list" action in the "Users" controller and a
+    corresponding "list" view in the "HTML::Users" view, both would resolve
+    to "/users/list".
+
+Methods
+  Constructor
+   "new"
+        my $view = MyApp::View::HTML->new( $c, $args );
+
+    The constructor for the TD view. Sets up the template provider and reads
+    the application config. The $args hash reference, if present, overrides
+    the application config.
+
+  Class Methods
+   "config"
+        __PACKAGE__->config(
+            dispatch_to     => [qw(MyApp::Templates::HTML)],
+            auto_alias      => 1,
+            strict          => 1,
+            postprocessor   => sub { ... },
+            around_template => sub { ... },
+        );
+
+    Sets up the configuration your view subclass. All the settings are the
+    same as for Template::Declare's "init()" method except:
+
+    auto_alias
+        Additional option. Determines whether or not classes found under the
+        dispatch template's namespace are automatically aliased as described
+        in "Auto-Aliasing".
+
+    strict
+        Set to true by default so that exceptional conditions are
+        appropriately fatal (it's false by default in Template::Declare).
+
+  Instance Methods
+   "process"
+      $view->process($c);
+
+    Renders the template specified in "$c->stash->{template}" or
+    "$c->action" (the private name of the matched action). Calls render() to
+    perform actual rendering. Output is stored in "$c->response->body".
+
+   "render"
+      my $output = $view->render( $c, $template_name, $args );
+
+    Renders the given template and returns output. Dies on error.
+
+    If $args is a hash reference, it will be passed to the template.
+    Otherwise, "$c->stash" will be passed if $c is defined.
+
+SEE ALSO
+    Catalyst, Catalyst::View::TT, Catalyst::Helper::View::TD,
+    Catalyst::Helper::TDClass, Template::Manual,
+    <http://justatheory.com/computers/programming/perl/catalyst/>
+
+Author
+    David E. Wheeler <david@justatheory.com>
+
+Copyright
+    This program is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

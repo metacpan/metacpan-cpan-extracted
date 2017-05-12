@@ -1,0 +1,21 @@
+Revision history for Catalyst-Authentication-Credential-RemoteHTTP
+
+0.05      2012-02-11 22:18:34 Europe/London
+    - Distribution related tweaks
+    - Minor documentation fixes to make sure examples correct
+
+0.04      2010-12-22 16:22:12 Europe/London
+    - Convert distribution to Dist::Zilla
+    - Use IO::Socket::INET in tests to check port, avoiding smoker failures
+
+0.03    Thu 28 Jan 2010
+    - Updated to current best practice (ie Moose) - t0m
+    - Tweaks for kwalitee and release sanitation
+
+0.02    Wed 27 Jan 2010
+    - Tests added
+    - Intending this release to be sent to CPAN after checking
+
+0.01-     Tue 26 Jan 2010
+    - Initial version - functional but no tests
+

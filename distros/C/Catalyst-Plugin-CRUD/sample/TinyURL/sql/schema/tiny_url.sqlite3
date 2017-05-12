@@ -1,0 +1,7 @@
+-- TinyURL
+CREATE TABLE tiny_url (
+        id INTEGER PRIMARY KEY,
+        disable INTEGER DEFAULT '0' NOT NULL,
+        long_url TEXT NOT NULL
+);
+

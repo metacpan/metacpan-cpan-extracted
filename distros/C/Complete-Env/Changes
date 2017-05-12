@@ -1,0 +1,25 @@
+Revision history for Complete-Env
+
+0.39    2016-10-18 (PERLANCAR)
+
+        - Add functions: complete_env_elem(), complete_path_env_elem().
+
+
+0.38    2015-11-29 (PERLANCAR)
+
+        - Adjust to Complete::Common 0.19.
+
+        - [Removed] Remove options 'ci', 'fuzzy', 'map_case' (one can
+	  alternatively set global behavior, see Complete::Common).
+
+
+0.37    2015-09-17 (PERLANCAR)
+
+	- Add options fuzzy & map_case.
+
+
+0.36    2015-09-16 (PERLANCAR)
+
+        - First release, split from Complete-Util following the splitting of
+          Complete-File, to let Complete-Util really only contains generic
+          routines.

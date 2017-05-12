@@ -1,0 +1,82 @@
+NAME
+       Class::Method::Auto - Turn subroutine calls into class method calls
+
+SYNOPSIS
+	 # in Foo.pm
+	 package Foo;
+
+	 sub bar {
+	   ...
+	 }
+
+	 # in Baz.pm
+	 package Baz;
+
+	 use Class::Method::Auto 'bar';
+
+	 use base 'Foo';
+
+	 bar("Moose!"); # same as __PACKAGE__->bar("Moose!")
+
+DESCRIPTION
+       Class::Method::Auto allows you to call inherited class methods directly
+       without prefixing them with the class name.
+
+       There are two methods of telling Class::Method::Auto which methods to
+       call automatically: By explicitly giving it a list of method names or
+       by specifying a filter for the methods.
+
+       In the first case, Class::Method::Auto creates a subroutine in the
+       importing package for every name in the list that "unshift"'s the call-
+       ing package name onto @_ and jumps to the method in the first package
+       where is it defined.
+
+	 package Blurp;
+
+	 use Class::Method::Auto qw[bar baz]; # creates Blurp::bar and Blurp::baz
+
+       In the second case, you can specify a regular expression for the method
+       names to be tested against or the string "-attributes", which causes
+       Class::Method::Auto to check whether the called method has the <method>
+       attribute to make sure only real methods are called.
+
+       When specifying a filter, the method AUTOLOAD is installed in the
+       importing package for dispatching.
+
+	 package Foo;
+
+	 sub my_method :method {
+	   ...
+	 }
+
+	 sub no_method {
+	   ...
+	 }
+
+	 sub _private {
+	   ...
+	 }
+
+	 package Moose;
+
+	 use base 'Foo';
+
+	 use Class::Method::Auto '-attributes', qr/^[^_]/;
+
+	 # now my_method(...) can be called, but not no_method or _private
+
+BUGS
+       Due to the subroutine calling mechanism in Perl, only method in base
+       classes can be called automatically via Class::Method::Auto.
+
+SEE ALSO
+       attributes
+
+AUTHOR
+       Bernhard Bauer, <bauerb@in.tum.de>
+
+COPYRIGHT AND LICENSE
+       Copyright (C) 2005 by Bernhard Bauer
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.

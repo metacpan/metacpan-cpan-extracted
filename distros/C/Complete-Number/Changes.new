@@ -1,0 +1,32 @@
+Revision history for Complete-Number
+
+0.04    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21.
+
+        - [Removed] For more consistent user experience, remove per-function
+	  option ci, users are now encouraged to set these behaviors globally
+	  via Complete::Common.
+
+
+0.03    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01     2015-08-06 (PERLANCAR)
+
+         - First release.

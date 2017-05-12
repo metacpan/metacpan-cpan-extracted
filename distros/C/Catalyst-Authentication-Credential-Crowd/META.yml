@@ -1,0 +1,32 @@
+---
+abstract: 'Authenticate a user using Crowd REST Service'
+author:
+  - 'Keerati Thiwanruk <keerati.th@gmail.com>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Plugin::Authentication: 0
+  FindBin: 0
+  Test::Fake::HTTPD: 0
+  Test::More: 0
+  Test::TCP: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  lib: 0
+  namespace::autoclean: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Credential-Crowd
+requires:
+  HTTP::Request: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+version: 0.07

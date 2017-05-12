@@ -1,0 +1,76 @@
+{
+   "abstract" : "CPANPLUS backend generating Gentoo ebuilds.",
+   "author" : [
+      "Vincent Pit <perl@profvince.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS-Dist-Gentoo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPANPLUS" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IPC::Cmd" : "0",
+            "List::Util" : "0",
+            "Parse::CPAN::Meta" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IPC::Cmd" : "0",
+            "List::Util" : "0",
+            "Parse::CPAN::Meta" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPANPLUS-Dist-Gentoo"
+      },
+      "homepage" : "http://search.cpan.org/dist/CPANPLUS-Dist-Gentoo/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FCPANPLUS-Dist-Gentoo.git"
+      }
+   },
+   "version" : "0.12"
+}

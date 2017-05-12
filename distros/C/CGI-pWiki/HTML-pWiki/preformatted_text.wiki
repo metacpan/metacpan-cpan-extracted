@@ -1,0 +1,4 @@
+Use .text extension for preformatted_text to be displayed inside
+a &lt;pre&gt; region.
+
+The edit screen asumes fixed blocked 80 characters per line.

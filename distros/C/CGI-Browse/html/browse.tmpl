@@ -1,0 +1,22 @@
+[% browse_script %]
+<form name="browse" action="[% browse_action %]" method="POST">
+<table cellspacing="0" cellpadding="0" width="100%">
+  <tr>
+    <td align="left" width="36%"> &nbsp; &nbsp; [% browse_sorted %]</td>
+    <td align="center" width="34%">[% browse_start %]</td>
+    <td align="right" width="30%">[% browse_prevnext %]</td>
+  </tr>
+</table>
+[% browse_table %]
+&nbsp; <br>
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+  <tr>
+    <td width="36%">[% browse_delete %]</td>
+    <td width="34%">[% browse_show %]</td>
+    <td width="30%" align="right">[% browse_goto %]</td>
+  </tr>
+  <tr>
+    <td colspan="2">[% browse_control %]</td>
+  </tr>
+</table>
+</form>

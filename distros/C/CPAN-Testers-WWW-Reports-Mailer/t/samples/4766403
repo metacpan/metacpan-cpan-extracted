@@ -1,0 +1,220 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:4766403
+Return-Path: <cpan.dcollins.5100rc1@gmail.com>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 25535 invoked from network); 24 Jul 2009 21:53:31 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 24 Jul 2009 21:53:31 -0000
+Received: (qmail 19597 invoked by uid 225); 24 Jul 2009 21:53:31 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 19592 invoked by alias); 24 Jul 2009 21:53:30 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=DK_SIGNED,PERLBUG_CONF,SPF_PASS
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mail-px0-f128.google.com (HELO mail-px0-f128.google.com) (209.85.216.128)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Fri, 24 Jul 2009 14:53:25 -0700
+Received: by pxi34 with SMTP id 34so192855pxi.24
+        for <cpan-testers@perl.org>; Fri, 24 Jul 2009 14:53:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:date:subject:from:to
+         :message-id:x-reported-via;
+        bh=6zirXtvd+f+a2ZhydC2KiLQrR7HuYdBVAnKvsekfVTo=;
+        b=xdkWbVS3NccEV0WdSKdUJ3zUktFM4jaQelXzJtpuZAwcaIOd2JEmro24ElcNM2u+Xx
+         nNRG/B6DBIhUy2mX0VYybkQDJhIs4ggq1RixbdrQDUWT0Wp9hB6fzwDJ6arjcGpsjX47
+         EIxbRKLZ/0MJmRJaQSmr/gC/wK37sIyDFbiFA=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=date:subject:from:to:message-id:x-reported-via;
+        b=oOZpEZAeERqn8Obynn2Z+pH4OA3quhJQ0PC754+JDS/kXTkgr3zwSzStC5bdQF92S2
+         iFn8UO1Z3z+ja/tQVQOzN5YeSkY5gy+lQHM7kp7U/c4mAL04JXb08Bp30yqvs1Bmn0WG
+         uho9eSopIUT+WUD+lC/zVOSL/yCXDS2cLlXQo=
+Received: by 10.114.171.9 with SMTP id t9mr5065451wae.80.1248472399861;
+        Fri, 24 Jul 2009 14:53:19 -0700 (PDT)
+Received: from nightshade (c-69-242-11-169.hsd1.nj.comcast.net [69.242.11.169])
+        by mx.google.com with ESMTPS id l37sm7431809waf.5.2009.07.24.14.53.17
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Fri, 24 Jul 2009 14:53:17 -0700 (PDT)
+Date: Fri, 24 Jul 2009 17:53:17 -0400
+Subject: FAIL WWW-Scraper-ISBN-ORA_Driver-0.09 i686-linux-thread-multi 2.6.28-11-generic
+To: cpan-testers@perl.org
+Message-ID: <1248472397.F48ac60.14762@nightshade>
+X-Reported-Via: Test::Reporter 1.5203
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: cpan.dcollins.5100rc1@gmail.com
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Barbie,
+    
+This is a computer-generated report for WWW-Scraper-ISBN-ORA_Driver-0.09
+on perl 5.8.8, created by CPAN-Reporter-1.1705. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /home/perl588/perl/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01basic.t ..... ok
+Use of uninitialized value in hash element at /home/perl588/perl/lib/site_perl/5.8.8/HTML/Form.pm line 209.
+Use of uninitialized value in hash element at /home/perl588/perl/lib/site_perl/5.8.8/HTML/Form.pm line 229.
+Use of uninitialized value in hash element at /home/perl588/perl/lib/site_perl/5.8.8/HTML/Form.pm line 229.
+
+#   Failed test at t/10object.t line 29.
+#          got: 'http://oreilly.com/catalog/9780596001735/'
+#     expected: 'http://oreilly.com/catalog/9780596001735/index.html'
+
+#   Failed test at t/10object.t line 30.
+#          got: 'http://www.oreilly.comhttp://covers.oreilly.com/images/9780596001735/sm.gif'
+#     expected: 'http://www.oreilly.com/catalog/covers/0596001738_sm.gif'
+# Looks like you failed 2 tests of 12.
+t/10object.t .... 
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 2/12 subtests 
+t/91pod.t ....... ok
+t/92podcover.t .. ok
+t/94metatest.t .. skipped: Test::CPAN::Meta v0.12 required for testing META.yml
+
+Test Summary Report
+-------------------
+t/10object.t  (Wstat: 512 Tests: 12 Failed: 2)
+  Failed tests:  8-9
+  Non-zero exit status: 2
+Files=5, Tests=15,  2 wallclock secs ( 0.03 usr  0.00 sys +  0.66 cusr  0.11 csys =  0.80 CPU)
+Result: FAIL
+Failed 1/5 test programs. 2/15 subtests failed.
+make: *** [test_dynamic] Error 255
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                     Need Have   
+    -------------------------- ---- -------
+    Template::Extract          0    0.41   
+    Test::More                 0.45 0.89_01
+    WWW::Mechanize             0    1.54   
+    WWW::Scraper::ISBN         0.25 0.25   
+    WWW::Scraper::ISBN::Driver 0.18 0.18   
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LANG = en_US.UTF-8
+    PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+    PERL5LIB = /home/perl588/.cpan/build/WWW-Scraper-ISBN-Driver-0.18-g0iN2V/blib/arch:/home/perl588/.cpan/build/WWW-Scraper-ISBN-Driver-0.18-g0iN2V/blib/lib:/home/perl588/.cpan/build/Template-Extract-0.41-0LEyio/blib/arch:/home/perl588/.cpan/build/Template-Extract-0.41-0LEyio/blib/lib:/home/perl588/.cpan/build/Template-Toolkit-2.22-kvT76v/blib/arch:/home/perl588/.cpan/build/Template-Toolkit-2.22-kvT76v/blib/lib:/home/perl588/.cpan/build/WWW-Scraper-ISBN-0.25-m5V7SS/blib/arch:/home/perl588/.cpan/build/WWW-Scraper-ISBN-0.25-m5V7SS/blib/lib:/home/perl588/.cpan/build/WWW-Scraper-ISBN-Record-0.17-_sRO8K/blib/arch:/home/perl588/.cpan/build/WWW-Scraper-ISBN-Record-0.17-_sRO8K/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 3568
+    PERL5_CPAN_IS_RUNNING = 3568
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 13721,3568
+    PERL_CR_SMOKER_CURRENT = WWW-Scraper-ISBN-ORA_Driver-0.09
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /bin/bash
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/perl588/perl/bin/perl
+    $UID/$EUID = 1005 / 1005
+    $GID = 1005 1005
+    $EGID = 1005 1005
+
+Perl module toolchain versions installed:
+
+    Module              Have   
+    ------------------- -------
+    CPAN                1.9304 
+    Cwd                 3.29   
+    ExtUtils::CBuilder  0.24   
+    ExtUtils::Command   1.16   
+    ExtUtils::Install   1.52   
+    ExtUtils::MakeMaker 6.50   
+    ExtUtils::Manifest  1.56   
+    ExtUtils::ParseXS   n/a    
+    File::Spec          3.29   
+    Module::Build       0.33   
+    Module::Signature   n/a    
+    Test::Harness       3.17   
+    Test::More          0.89_01
+    YAML                0.68   
+    YAML::Syck          1.07   
+    version             0.76   
+
+
+--
+
+Summary of my perl5 (revision 5 version 8 subversion 8) configuration:
+  Platform:
+    osname=linux, osvers=2.6.28-11-generic, archname=i686-linux-thread-multi
+    uname='linux nightshade 2.6.28-11-generic #42-ubuntu smp fri apr 17 01:57:59 utc 2009 i686 gnulinux '
+    config_args=''
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=define
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include'
+    ccversion='', gccversion='4.3.3', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lnsl -lgdbm -ldl -lm -lcrypt -lutil -lpthread -lc
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lpthread -lc
+    libc=/lib/libc-2.9.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.9'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fpic', lddlflags='-shared -L/usr/local/lib'
+

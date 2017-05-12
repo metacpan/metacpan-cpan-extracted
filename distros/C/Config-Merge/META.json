@@ -1,0 +1,64 @@
+{
+   "abstract" : "load a configuration directory tree containing YAML, JSON, XML, Perl, INI or Config::General files",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Merge",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::General" : "0",
+            "Config::Tiny" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "XML::Simple" : "0",
+            "YAML" : "0",
+            "YAML::Syck" : "0"
+         },
+         "requires" : {
+            "Config::Any" : "0.07",
+            "File::Glob" : "0",
+            "File::Spec" : "0",
+            "Storable" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Any" : "0.07",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/ConfigMerge/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/ConfigMerge.git",
+         "web" : "https://github.com/clintongormley/ConfigMerge"
+      }
+   },
+   "version" : "1.04"
+}
+

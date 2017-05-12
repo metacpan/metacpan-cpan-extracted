@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name: Comedi::Lib
+abstract: Perl API for Comedilib
+version: 0.24
+author:
+   - Manuel Gebele <forensixs@gmx.de>
+license: perl
+distribution_type: module
+configure_requires:
+   ExtUtils::MakeMaker: 0
+build_requires:
+   ExtUtils::MakeMaker: 0
+requires:
+   Test::More:      0
+   Carp:            0
+   POSIX:           0
+   InlineX:C2XS: 0.14
+   define:          0
+   enum:            0
+recommends:
+   YAML: 0.68
+no_index:
+   file:
+      - vim_info
+   directory:
+      - C2XS
+      - ctags
+      - map
+      - t
+      - utilitys
+resources:
+   license: http://dev.perl.org/licenses/
+   Comedi:  http://www.comedi.org/
+meta-spec:
+   version: 1.4
+   url: http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: Manuel Gebele

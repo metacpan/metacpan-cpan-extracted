@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Class/Proxy/Lite.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/cached.t
+t/pod-coverage.t
+t/pod.t
+t/proxy.t

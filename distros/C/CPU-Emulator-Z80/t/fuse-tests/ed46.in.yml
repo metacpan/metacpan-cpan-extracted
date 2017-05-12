@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 70
+name: ed46
+registers:
+  AF: 46828
+  AF_: 0
+  BC: 35579
+  BC_: 0
+  DE: 52745
+  DE_: 0
+  HL: 28833
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 36330

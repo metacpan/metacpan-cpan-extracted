@@ -1,0 +1,5 @@
+name = "Cookie-Baker-XS"
+badges = ["travis"]
+module_maker="ExtUtilsMakeMaker"
+
+

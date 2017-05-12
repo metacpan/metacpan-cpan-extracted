@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4281d43578c71c7b239da59a0a054ae0f63200af Changes
+SHA1 d27f105e01415961005f2007fb0a2e7e7989abdf MANIFEST
+SHA1 e350d39b940e26c7b4319efa4fdb52199558cbcf MANIFEST.SKIP
+SHA1 f8d1011a9b68ce37162e81c4da0945957e2a07d1 META.json
+SHA1 1022dca13484fda3a7e5ba89348a9ec3eb8c1761 META.yml
+SHA1 3ae11e2d8b796efc58e9be7111089424d4660efa Makefile.PL
+SHA1 378ba4b97d5a989790877de0214ca23ac5aeef37 README
+SHA1 b929ff9f01730419548cab2dfcc30003b49fbbfb Todo
+SHA1 1af2e2eda97338400e6241d9961b8803877347fa lib/CPAN/Checksums.pm
+SHA1 b59f5313eaa742bab15a3560b797dbad4b6c61f3 t/00signature.t
+SHA1 51e1c061bc02e9a38948a5d8e3ca7352830f0fac t/42.gz
+SHA1 23e182506f4b883d8aae3d29d08e044c55b04deb t/43
+SHA1 0d942b3ef6791694fde4693d3329a0ff924cb583 t/44.bz2
+SHA1 57fa704d8f013fd117d9431b933932ae5c2f6a89 t/52podcover.t
+SHA1 b6c54678f8c518943ca73208c52b268090b3f797 t/CHECKSUMS
+SHA1 6a79f15a10337bd3450604abf39d4462df2a550b t/pod.t
+SHA1 3a73818d40fce12a21bf9d4d2c38ee2145cc0628 t/updatedir.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAldfblkACgkQ7IA58KMXwV25JQCgwSCTKHpg7s8+gvNdCLtck8Jw
+4ZoAoL0BJi1qsrutsd5uVtM4ytJt3w1f
+=rkTR
+-----END PGP SIGNATURE-----

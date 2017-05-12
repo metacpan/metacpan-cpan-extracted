@@ -1,0 +1,40 @@
+{
+   "abstract" : "Implementation of Corrected Block Tiny Encryption Algorithm",
+   "author" : [
+      "Kars Wang <jahiy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-XXTEA_XS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.3301",
+            "List::Util" : "1.38",
+            "Scalar::Util::Numeric" : "0.40",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0101"
+}
+

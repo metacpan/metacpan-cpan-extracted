@@ -1,0 +1,17 @@
+foo
+{
+    bar     baz
+}
+
+foo2
+{
+    bar     baz
+    bar2    baz2
+}
+
+foo3
+{
+    bar     baz
+    bar2    baz2
+    bar3    baz3
+}

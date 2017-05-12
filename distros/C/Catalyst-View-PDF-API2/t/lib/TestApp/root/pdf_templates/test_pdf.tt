@@ -1,0 +1,8 @@
+ [% f1 = pdf.corefont('Helvetica') %]
+ [% page = pdf.page %]
+ [% page.mediabox(421,595) %]
+ [% text = page.text %]
+ [% text.font(f1, 20) %]
+ [% text.translate(50,500) %]
+ [% text.text('Hello World') %]
+

@@ -1,0 +1,35 @@
+This directory contains a set of example programs using ClearCase::Argv.
+Details:
+
+- simplest: The simplest use of ClearCase::Argv I could think up.
+
+- simple: A longer script with a bunch of simple, standalone, code
+nuggets.
+
+- CCreport: A "real" application which generates a textual report on
+changes made across some time slice in some set of vobs by some set of
+users, etc., all configurable.
+
+- tarvob: Another real tool though much less ambitious. This is a
+standard vob-backup script implemented with ClearCase::Argv. Locks
+vobs, tars, unlocks, etc. Don't use this with production vobs without
+careful testing and full understanding of what it does.
+
+- fix_eltype: A real script that brings element types into line with
+what "cleartool file" thinks they should be.
+
+- mkattr: An example of how to set string-valued attributes which
+tends to be the toughest quoting job. All these examples work on both
+Unix and Windows.
+
+- envp: Shows how to use the ->envp method to control the environment
+of a child process.
+
+- setview: demo of an inline setview in a script using IPC mode.
+This isn't possible with traditional fork/exec. It is possible with
+CtCmd too.
+
+- functional: demos of the functional interface.
+
+- ./ctcmd: a subdirectory containing examples of accessing CtCmd via
+ClearCase::Argv.

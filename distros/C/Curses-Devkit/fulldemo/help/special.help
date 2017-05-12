@@ -1,0 +1,22 @@
+</U>Special Display Keywords<!U>
+There are a number of special keywords which can be added into any string in 
+Cdk which will highlight characters. Cdk has the ability to </B>BOLD<!B>, </U>UNDERLINE<!U>,
+</R>Reverse<!R>, </K>Blink<!K>, </S>Standout<!S>, </D>Dim<!D>, and </1>m<!1></2>a<!2></3>n<!3></4>y<!4></5> <!5></6>c<!6></7>o<!7></8>l<!8></9>o<!9></10>r<!10></11>s<!11>
+
+To turn on highlighting the format command \<\/XX> is used. To turn off 
+formatting the command \<\!XX> is used. The following table lists all of the
+display attributes available through Cdk, and how to turn them on.
+
+<C><#UL><#HL(7)><#TT><#HL(10)><#UR>
+<C><#VL></U>Command <#VL> Attribute <!U><#VL>
+<C><#VL>\<\/N>    <#VL> </N>Normal<!N>    <#VL>
+<C><#VL>\<\/B>    <#VL> </B>Bold<!B>      <#VL>
+<C><#VL>\<\/R>    <#VL> </R>Reverse<!R>   <#VL>
+<C><#VL>\<\/U>    <#VL> </U>Underline<!U> <#VL>
+<C><#VL>\<\/K>    <#VL> </K>Blink<!K>     <#VL>
+<C><#VL>\<\/S>    <#VL> </S>Standout<!S>  <#VL>
+<C><#VL>\<\/D>    <#VL> </D>Dim<!D>       <#VL>
+<C><#LL><#HL(7)><#BT><#HL(10)><#LR>
+
+<C><#HL(70)>
+<C>Document Created: January, 1996

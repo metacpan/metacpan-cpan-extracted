@@ -1,0 +1,8 @@
+Revision history for Perl extension Catalyst::TraitFor::Controller::jQuery::jqGrid.
+
+0.04  Tue Sep 20 11:37:00 2011
+    - Add TestSchema to tests
+
+0.01  Sat Mar 27 15:30:30 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Catalyst::TraitFor::Controller::jQuery::jqGrid

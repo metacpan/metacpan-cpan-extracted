@@ -1,0 +1,13 @@
+/* "something point zero" requires a unit */
+p.in  { width: 1.0in }
+p.cm  { width: 1.0cm }
+p.mm  { width: 1.0mm }
+p.pt  { width: 1.0pt }
+p.pc  { width: 1.0pc }
+p.px  { width: 1.0px }
+p.em  { width: 1.0em }
+p.ex  { width: 1.0ex }
+p.pct { width: 1.0% }
+
+/* percentages require a unit */
+p.pct { width: 10% }

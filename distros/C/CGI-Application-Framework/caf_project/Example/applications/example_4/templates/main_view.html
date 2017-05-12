@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Web MVC Framework Example Application #4 -- Main View</title>
+	<link rel="stylesheet" href="<!-- TMPL_VAR NAME="url_examples_css" -->" type="text/css" />
+</head>
+
+  <body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+
+<!-- TMPL_VAR NAME="cgiapp_embed('make_navbar')" -->
+
+    <h1>Web MVC Framework Example Application #4 -- Main View</h1>
+    <h2>HTML::Template Version</h2>
+
+<pre>
+<!-- TMPL_INCLUDE NAME="README-ht.txt" -->
+</pre>
+
+<h2>Includes</h2>
+
+<p>
+The navbar at the top of the page is now an include of the new version from Example 3.
+</p>
+
+<p>
+<a href="<!-- TMPL_VAR NAME="SELF_HREF_LINK" -->">
+<b>Click me to reload this page...</b>
+</a>
+</p>
+
+<p>
+The purpose of this example application is to demonstrate the use of
+the "embed" tag within HTML::Template templates which are used to
+display the content of one run mode within another run mode.
+Inspect this source .html file to see how "embed" is used.
+</p>
+
+<p>
+<b>Number of times you have loaded this page:</b>
+<!-- TMPL_VAR NAME="load_count" -->
+</p>
+
+1.
+<hr />
+
+<!-- TMPL_VAR NAME="cgiapp_embed('outer_component')" -->
+
+<hr />
+2.
+<hr />
+
+<!-- TMPL_VAR NAME="cgiapp_embed('outer_component')" -->
+
+<hr />
+
+<b>Number of times you have loaded this page:</b>
+<!-- TMPL_VAR NAME="load_count" -->
+</p>
+
+  </body>
+</html>
+

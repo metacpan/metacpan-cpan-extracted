@@ -1,0 +1,32 @@
+<? read_starfish_conf(); echo &readme_line(); !>
+#+
+Calendar::Schedule version 1.07
+===============================
+#-
+
+This is a Perl module for handling calendar schedules.  Documentation
+is a part of Schedule.pm in the pod format.  To convert it into manual
+page format, type something like the following:
+
+	  pod2html Schedule.pm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No known dependencies yet.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003-2016 Vlado Keselj http://web.cs.dal.ca/~vlado
+
+This script is provided "as is" without express or implied warranty.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

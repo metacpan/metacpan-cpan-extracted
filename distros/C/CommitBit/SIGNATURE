@@ -1,0 +1,93 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba COPYING/Artistic
+SHA1 0291ffea89744aaf525b9120e8a8e53f7ea81175 COPYING/dr.txt
+SHA1 17e3b0eea99abffe6ac71e65627413236e0b117a COPYING/gpl2.txt
+SHA1 2ca69ad61df3d80ecbea2e2c5ac55c3ba4ce603e MANIFEST
+SHA1 62b4136c70f2d40c5100354c8bfdf65b1802340f META.yml
+SHA1 b11fa37e4cf5b7b71e47150a424a9f8fca21d163 Makefile.PL
+SHA1 667e15de6c64c5d128c63160ec09d36cd4acc116 README
+SHA1 7addd705c31eb12a4f7c59f6f2cb53137cf9e2bc bin/create_admin
+SHA1 a7dc1f376cac630ea28d2965e561469deb951cc7 bin/jifty
+SHA1 861b310287714491f29e0aa304f899f5ac0cd8b6 doc/integration
+SHA1 7b13d7d1fcae68ffe8946e3e5fd7e5283327fc1e etc/config.yml
+SHA1 9b2f9d83bcf77860f53a0c07c90a4a59ad9f5df1 inc/Module/Install.pm
+SHA1 abe32855d75ab13747cf65765af9947b7a8c3057 inc/Module/Install/Base.pm
+SHA1 95b81d1e91bd634467bf633571eff4420e9c04eb inc/Module/Install/Can.pm
+SHA1 1fe98c63cf9d7271c8cb4183ba230f152df69e26 inc/Module/Install/Fetch.pm
+SHA1 2249171a2b72cd73ff2c0a06597d29f86e5df456 inc/Module/Install/Makefile.pm
+SHA1 381bb98ea3877bba49ae85e7a7ea130645fd3dbf inc/Module/Install/Metadata.pm
+SHA1 0c2118868ef82ac517eb6d9c3bd93e6eb9bbf83e inc/Module/Install/Win32.pm
+SHA1 e827d6d43771032fa3df35c0ad5e5698d0e54cda inc/Module/Install/WriteAll.pm
+SHA1 9f081331760f0223f7e03eecabd0f64b2d338e5a lib/CommitBit.pm
+SHA1 c364a613cc76ae5eee0af9db45a37dc6365144d3 lib/CommitBit/Action/ConfirmEmail.pm
+SHA1 11b0bc89867e2c1947ab9be01fde1442a45d51b9 lib/CommitBit/Action/CreateProjectMember.pm
+SHA1 16056baffbdae607c2f187777f279596ff2eff26 lib/CommitBit/Action/Login.pm
+SHA1 218077e18cd611ae32ba823eaaec6ad50147e926 lib/CommitBit/Action/Logout.pm
+SHA1 917c96626c6593cf8746656d0e0ab32b1aa713b8 lib/CommitBit/CurrentUser.pm
+SHA1 caef327de2fd9c5e1d3bec83c04d314eb465ff86 lib/CommitBit/Dispatcher.pm
+SHA1 5c0baacd7a52167c001800b6d6376915d3346171 lib/CommitBit/Model/Project.pm
+SHA1 60b5145333951eaade89ba20f08c38cb0525bf73 lib/CommitBit/Model/ProjectMember.pm
+SHA1 6f647a820299c6dc6b1703120eaa30300b05bb73 lib/CommitBit/Model/Repository.pm
+SHA1 1e1b5fe17d352372e95a2e8aa842302583983e8d lib/CommitBit/Model/User.pm
+SHA1 d4eec56bd790a8f61dde946aa44133704c945097 lib/CommitBit/Notification/ConfirmAddress.pm
+SHA1 f50fbb1eba8e021a4cc3ad1bcb3d6a5665065ebb lib/CommitBit/Notification/InviteToProject.pm
+SHA1 4ef465123e60f95361ea310168284c6ff6b3fec0 lib/CommitBit/Record.pm
+SHA1 73b3154249cf9a88f8d1976fcb52749f3abfd88a lib/CommitBit/Test.pm
+SHA1 88dbdcb4de7b0c2b89478b12c5dca5692f217e1a share/web/static/css/app.css
+SHA1 5eec3c2db4f2fe454d795139a825ea2431589eda share/web/static/css/main.css
+SHA1 517a148dd1f5f1aedfddce89e4a51c08deec2799 share/web/static/css/nav.css
+SHA1 7255a8ec5a351a17941b08e6a659307c7b4587a3 share/web/static/css/yui/fonts/README
+SHA1 3ccf2e99dde5b9096509e287c8606944fc90cbf9 share/web/static/css/yui/fonts/fonts-min.css
+SHA1 a3f236f04f8fdd0aae4619272bc77298664a42ec share/web/static/css/yui/fonts/fonts.css
+SHA1 a18d64edcc55c479a27663cec22d351f9c970b1e share/web/static/css/yui/grids/README
+SHA1 907c78f13e8a219f0dfd91e0995dbeedf0f05ffa share/web/static/css/yui/grids/grids-min.css
+SHA1 078acaa7bf342f6c593d89a36cba5588fe472665 share/web/static/css/yui/grids/grids.css
+SHA1 60f631affaa0865ee38b2a366396f307de2d642f share/web/static/css/yui/reset/README
+SHA1 ee26091b108689e91d5b11a2b5ed87017afe6606 share/web/static/css/yui/reset/reset-min.css
+SHA1 18b059fa95f8d6cbc7170237d2d6c632df2b2be0 share/web/static/css/yui/reset/reset.css
+SHA1 f99f112eb030b4c7365554a508c972c5184287d5 share/web/templates/_elements/header
+SHA1 f18d193b7f530cf52a7357a8ccd8353578e5fe71 share/web/templates/_elements/sidebar
+SHA1 e0f574c7b95e350bd2c209a35dccbebfb5587be6 share/web/templates/_elements/wrapper
+SHA1 c09a05700211535494f71e456f01d2c28fe9c703 share/web/templates/admin/create_repository
+SHA1 1a2fe5f40dcbd0f366370e3b6850fe12c746a5ce share/web/templates/admin/index.html
+SHA1 2d1775ab4ac9cadad2dd529380b642b1bc2046d8 share/web/templates/admin/project/index.html
+SHA1 94a4ac102f85f57b8fc41ba8e01cf8eafed456f0 share/web/templates/admin/project/people
+SHA1 3ae3e1701add37378d502f4586fa9fd975ce6435 share/web/templates/admin/projects
+SHA1 45700b73bc0b7331f3d20a8fcd910efc35494520 share/web/templates/admin/repositories
+SHA1 190cca3aeb5f8301100f421aeb9c334c6bfff7fd share/web/templates/admin/repository/index.html
+SHA1 32c820bf3c576f186c7ab500d5ad5828e00cb8e4 share/web/templates/admin/repository/projects
+SHA1 6a790091f61ee22dc03012097a15bac893ad3ac2 share/web/templates/index.html
+SHA1 e8cb18ec931e802b109af34aef85cbac867216fb share/web/templates/let/set_password
+SHA1 9a1c6d00d1b2878e045cd683deaf97d7afe8e9de share/web/templates/login
+SHA1 e38eaf6f5d52cf5050df5803cf13623b14ecd96d share/web/templates/logout
+SHA1 8637a54816f2fc23450c8775da3a87264ab06c14 share/web/templates/prefs
+SHA1 20e290dc43ecc803af565a44f9ae58761d046fd4 share/web/templates/project/index.html
+SHA1 1069a79533d0cef7eee2652fb2c9029c19a9aa03 share/web/templates/signup
+SHA1 579ff6b109f17bfc403b3027197267b6bb14e750 t/00-model-Project.t
+SHA1 8de77058aad70fd6110f277ecabba0ecc4a8bc96 t/00-model-ProjectMember.t
+SHA1 780092b9be9f040175d7847597d0eca0daa0d431 t/00-model-Repository.t
+SHA1 76db6cd080b3d9ceec71fb14fa52862936f8097d t/00-model-User.t
+SHA1 801e13865be6bf74327ff4d10b44520e0859af34 t/01-dependencies.t
+SHA1 9943f623fad0e97ebb90f04cf2c46330224a9546 t/authz.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (Darwin)
+
+iD8DBQFFIVPBEi9d9xCOQEYRApcPAKCdZXlhOoe6jksKJ844JlNgFY4hDQCgj/Kh
+fm6H0ZsQ6XsqOHDX8ItxLDU=
+=QLyu
+-----END PGP SIGNATURE-----

@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+mode=$1
+
+case "$mode" in
+  remove | upgrade )
+    echo "Stopping courier-filter-perl mail filter ..."
+    filterctl stop courier-filter-perl
+    ;;
+esac
+
+#DEBHELPER#

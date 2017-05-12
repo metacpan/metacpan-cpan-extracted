@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Builder-HTMLtmpl
+version:      1.21
+version_from: lib/CGI/Builder/HTMLtmpl.pm
+installdirs:  site
+requires:
+    CGI::Builder:                  1
+    HTML::Template:                2.6
+    Object::groups:                1.62
+    Object::props:                 1.62
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

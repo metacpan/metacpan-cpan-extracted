@@ -1,0 +1,50 @@
+0.03 jonathan Wed Nov  1 12:02:41 GMT 2006
+
+    Added POD tests and so forth
+	 Added Build.PL support
+	 tested with 10.UC5
+
+(Below is old log from SVN)
+
+------------------------------------------------------------------------
+r89 | jonathan | 2006-02-09 17:20:09 +0000 (Thu, 09 Feb 2006) | 2 lines
+
+Try to skip if we can't use the database
+
+------------------------------------------------------------------------
+r88 | jonathan | 2006-02-09 15:53:06 +0000 (Thu, 09 Feb 2006) | 2 lines
+
+Added a test for POD, added a signature
+
+------------------------------------------------------------------------
+r87 | jonathan | 2006-02-08 10:49:32 +0000 (Wed, 08 Feb 2006) | 2 lines
+
+Shagged up the $VERSION
+
+------------------------------------------------------------------------
+r86 | jonathan | 2006-02-08 10:45:44 +0000 (Wed, 08 Feb 2006) | 2 lines
+
+Added insert test
+
+------------------------------------------------------------------------
+r85 | jonathan | 2006-02-08 10:45:35 +0000 (Wed, 08 Feb 2006) | 2 lines
+
+Now gets VERSION from CVS
+
+------------------------------------------------------------------------
+r84 | jonathan | 2006-02-08 10:45:05 +0000 (Wed, 08 Feb 2006) | 2 lines
+
+Class::DBI::Informix needs to provide the last insert id function
+
+------------------------------------------------------------------------
+r83 | jonathan | 2006-02-08 10:43:55 +0000 (Wed, 08 Feb 2006) | 3 lines
+
+Changed VERSION to come from Makefile.PL
+Added description to README
+
+------------------------------------------------------------------------
+r79 | jonathan | 2006-02-07 21:09:08 +0000 (Tue, 07 Feb 2006) | 2 lines
+
+Initial revision
+
+------------------------------------------------------------------------

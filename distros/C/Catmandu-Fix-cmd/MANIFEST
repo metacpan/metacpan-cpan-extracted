@@ -1,0 +1,16 @@
+Build.PL
+Changes
+examples/catjson.c
+examples/catjson.java
+examples/catjson.lua
+examples/catjson.pl
+examples/catjson.py
+examples/catjson.scm
+lib/Catmandu/Fix/cmd.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t

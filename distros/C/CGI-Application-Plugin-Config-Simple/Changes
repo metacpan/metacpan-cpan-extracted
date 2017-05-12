@@ -1,0 +1,22 @@
+Revision history for Perl extension CGI::Application::MailPage.
+
+1.01 (Dec, 19 2005)
+        - fixed failing permission tests if running as root
+
+1.00 (Mar, 08 2005)
+        - 100% test coverage
+
+0.04 (Oct, 19 2004)
+        - Removed CGI::Application::Plugin dependancy in tests
+        - Fixed minor POD discrepancy
+
+0.03 (Sep. 13 2004)
+        - Changed from using CGI::Application::Plugin to Exporter
+        - Changed name of internal store from {_PLUGINS}->{'Config::Simple'} to just {__CONFIG_SIMPLE}
+
+0.02 (Aug. 16 2004)
+        - Changed to support new CGI::Application::Plugin
+
+0.01
+        - First version.
+

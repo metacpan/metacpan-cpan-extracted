@@ -1,0 +1,10 @@
+
+_prefix:
+  some:
+    levels:
+      down:
+
+deep_key: 1
+deep:
+  subkey: 2
+

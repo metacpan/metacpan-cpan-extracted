@@ -1,0 +1,313 @@
+
+Konzept zum Verwalten von Konfigurationsinformationen
+
+Das Modul "Conf.pm" löst das allgemeine Problem, dass Programme in
+der Regel Konstanten (Zahlen, Dateinamen, Zeichenketten, usw.)
+benötigen, die von Installation zu Installation oder sogar von
+Aufruf zu Aufruf variieren können und deshalb nicht im Programm
+selbst "hart verdrahtet" werden dürfen.
+
+Zudem gibt es einerseits oft Einstellungen, die projektweit (oder
+für ein Teilprojekt) gültig sind, und andererseits aber auch
+solche, die jeder Benutzer individuell festlegen können muss.
+
+Auch kann es in diesem Zusammenhang sehr praktisch und
+arbeitssparend sein, projektweite Default-Einstellungen
+anzubieten, die bei Bedarf vom Benutzer durch eigene Einstellungen
+"überstimmt" werden können.
+
+Übliche Lösungen für dieses Problem durchsuchen z.B. eine (fest
+vorgegebene) Liste von Dateien in verschiedenen Verzeichnissen,
+wobei die erste gefundene (d.h. existierende) Datei aus dieser
+Liste dann zur Initialisierung des jeweiligen Programms verwendet
+wird. Dies ist das Standard-Vorgehen der meisten Unix-Tools, die
+jeweils nach einer (oder mehreren verschiedenen) sogenannten
+"rc"-Datei(en) zuerst im Home-Verzeichnis des Benutzers und dann
+an einer zentralen Stelle (z.B. im Verzeichnis "/etc") suchen.
+
+Manchmal wird nicht ausschliesslich die erste der gefundenen
+Dateien verwendet, sondern alle gefundenen Dateien, wobei die
+Einstellungen in den zuerst gefundenen Dateien gewöhnlich Vorrang
+gegenüber den später gefundenen Dateien haben.
+
+Das problematische an diesem Ansatz ist, dass die Liste der zu
+durchsuchenden Verzeichnisse dabei im wesentlichen im Programm
+festgelegt, also "hart verdrahtet" ist.
+
+Ausserdem lassen sich so in der Regel nur individuelle und globale
+Einstellungen vornehmen, eine feinere Abstufung und Unterteilung
+in Projekte und Teilprojekte (mit jeweils eigenen
+Default-Einstellungen) ist normalerweise nicht möglich, oder wenn
+doch, ist die Anzahl der Hierarchie-Stufen und Gruppierungen in
+der Regel fest vorgegeben (fest verdrahtet).
+
+Alternativ könnte man natürlich eine Liste von Benutzern und
+Gruppen in einer zentralen Konfigurationsdatei ablegen, aber dann
+benötigt man einen Administrator, der diese Benutzer- und
+Gruppenlisten pflegt. Es wäre nicht von vorneherein möglich, dass
+sich jede Gruppe (d.h. jedes Teilprojekt) ihre eigenen
+Konfigurationsdateien selbst erstellt, ohne dass dies zentral
+irgendwo festgehalten und "freigeschaltet" werden muss.
+
+Im folgenden Bild wird ein solcher konventioneller Ansatz
+dargestellt:
+
+  [Abbildung 1]  (= "Bild1.jpg")
+
+Das vorliegende Modul "Conf.pm" beseitigt alle diese
+Einschränkungen, indem es einem anderen, neuen und in gewisser
+Weise entgegengesetzten, Ansatz folgt. Statt "Top Down" von einer
+zentralen Liste von Benutzern und Gruppenzugehörigkeiten
+auszugehen, wird vielmehr "Bottom Up" von den
+Benutzer-spezifischen zu den Gruppen- und Teilprojekt-spezifischen
+zu den globalen Einstellungen vorangeschritten:
+
+Anstatt also zentral eine Liste von Benutzern und
+Gruppenzugehörigkeiten pflegen zu müssen, gibt es bei diesem Modul
+nur eine (in der Regel minimale) "Anker"-Datei, die an einer
+festen Stelle im Dateisystem stehen muss (dies ist jedoch die
+einzige fest verdrahtete Konstante des ganzen Moduls!), und in der
+generisch per Konfiguration festgelegt wird, wie die
+Benutzer-spezifischen Konfigurationsdateien heissen und wo sie
+liegen (dazu kann auf Umgebungsvariablen wie z.B. das
+Home-Verzeichnis und Login-Kürzel des Aufrufers zurückgegriffen
+werden).
+
+Diese "Anker"-Datei heisst für das vorliegende Modul "Conf.ini"
+und muss im selben Verzeichnis liegen wie das (installierte!)
+Modul "Conf.pm" selbst. Durch eine Installation der Tools und
+Module mit Hilfe des Standard-Installationsverfahrens für
+Perl-Module (perl Makefile.PL; make; make test; make install) kann
+dies automatisch sichergestellt werden.
+
+Nach dem Einlesen der Benutzer-spezifischen Konfigurationsdatei
+des Aufrufers springt das Modul "Conf.pm" anschliessend in eine
+weitere Konfigurationsdatei, deren Name und Pfad in der
+Benutzer-spezifischen Konfigurationsdatei des Aufrufers angegeben
+sein muss (falls diese Angabe fehlt, ist das Einlesen der
+Konfigurationsinformationen nach dem Einlesen der
+Benutzer-spezifischen Konfigurationsdatei beendet). Dies ist in
+der Regel die Konfigurationsdatei mit den Default-Einstellungen
+einer übergeordneten Organisationseinheit, also z.B. einer
+Arbeitsgruppe oder eines Teilprojekts, oder auch nur eine Datei
+mit allen globalen Einstellungen. Es könnte sich aber zum Beispiel
+auch um eine Konfigurationsdatei mit maschinenabhängigen
+Einstellungen handeln, d.h. es ist möglich, Benutzer-spezifische
+Einstellungen von maschinenabhängigen Einstellungen zu trennen, so
+dass z.B. jeder Benutzer an jedem beliebigen Rechner über seine
+individuellen Einstellungen verfügt, maschinenabhängige
+Einstellungen (wie z.B. IP-Adressen o.ä.) jedoch immer automatisch
+richtig nur für den jeweiligen Rechner vorgenommen werden.
+
+Jede Konfigurationsdatei kann dabei festlegen, in welche andere
+Konfigurationsdatei als nächstes gesprungen werden soll. Fehlt
+diese Angabe, ist die Kette der einzulesenden
+Konfigurationsdateien zuende. Da jeder Benutzer bzw. jede Gruppe
+die jeweils eigene(n) Konfigurationsdatei(en) editieren
+darf/dürfen, kann jeder Benutzer selbst festlegen, zu welcher
+Gruppe er gehört (das ist wichtig, wenn er z.B. in mehreren
+Teilprojekten arbeitet!), und jede Arbeitsgruppe (oder jedes
+Teilprojekt) kann ihrerseits beliebige weitere Unterteilungen in
+Teilgruppen vornehmen, jederzeit (ohne Wartezeiten auf eine
+Zentraladministration) und ganz nach den jeweiligen
+Erfordernissen. Das bedeutet auch, dass die Anzahl der
+Hierarchiestufen nicht von vornherein festgelegt ist, dass die
+Anzahl der Hierarchiestufen für unterschiedliche Teilprojekte oder
+-gruppen unterschiedlich sein kann und dass diese Anzahl jederzeit
+(je nach den Erfordernissen der Projektorganisation) verändert
+werden kann – mit anderen Worten, jedes hierarchische Organigramm
+kann jederzeit in der Struktur der entsprechenden
+Konfigurationsdateien abgebildet werden.
+
+Das folgende Bild illustriert diese Vorgehensweise:
+
+  [Abbildung 2]  (= "Bild2.jpg")
+
+Beim Einlesen der Konfigurationsdaten nach diesem Verfahren gilt:
+Zuerst eingelesene Konstanten haben Vorrang gegenüber später
+eingelesenen.
+
+Dies führt zu dem üblichen und intuitiv erwarteten Verhalten, dass
+Benutzer globale Einstellungen "überschreiben" können.
+
+Dies ist jedoch nur die halbe Wahrheit. Tatsächlich ist es so,
+dass aufgrund dieser Regel alle Einstellungen in der "Anker"-Datei
+für alle Werkzeuge und alle Teilprojekte verbindlich sind, während
+alle Einstellungen aus der Datei mit den "globalen Einstellungen"
+optionale, d.h. unverbindliche Defaults darstellen.
+
+Dies bietet sogar noch grössere Flexibilität gegenüber
+konventionellen Methoden zur Behandlung von
+Konfigurationsinformationen, da sowohl verbindliche als auch
+unverbindliche Defaults festgelegt werden können.
+
+Im obigen Bild werden darüber hinaus auch noch zwei weitere
+wesentliche Features des "Conf.pm"-Moduls gezeigt:
+
+Zum einen ist es möglich, für unterschiedliche "Sätze" von
+Werkzeugen, nennen wir sie künftig "Werkzeugkästen", vollkommen
+unterschiedliche und voneinander völlig unabhängige Ketten von
+Konfigurationsdateien zu haben. Solche "Werkzeugkästen" könnten
+z.B. verschiede Erzeugnisklassen sein, oder verschiedene
+Entwicklungsumgebungen, o.ä.
+
+Die Zugehörigkeit eines Werkzeugs zu einem bestimmten
+Werkzeugkasten (im folgenden "scope" genannt) kann dabei z.B.
+durch eine "package"-Deklaration am Anfang des Skripts automatisch
+gesteuert werden. Ein expliziter Aufruf mit der Übergabe des
+gewünschten "scope" als Parameter ist natürlich auch realisierbar.
+
+Zum anderen ist es möglich, sensible personenbezogene Daten in
+eigene Dateien auszulagern, die durch Mittel des Betriebssystems
+so geschützt werden können, dass sie nur vom jeweiligen Benutzer
+gelesen und beschrieben werden können.
+
+Diese müssen stets am Ende der Kette von einzulesenden
+Konfigurationsdateien stehen. Dies hängt damit zusammen, dass es
+möglich sein muss, die wesentlichen Konfigurationsinformationen
+auch eines vom Aufrufer des Tools verschiedenen Benutzers
+einzulesen (wichtig z.B. für den Betreuer der Tools, wenn er
+Fehler in der Konfiguration eines Benutzers aufspüren soll und
+sich diese daher auflisten lassen können muss, oder zur Ausführung
+von Tools unter der Kennung eines "Projekt-Users"). Gleichzeitig
+dürfen aber die Dateien mit den sensiblen Daten für andere
+Benutzer nicht lesbar sein – ein Versuch sie trotzdem zu lesen
+führt zu einem Fehler des Betriebssystems. Das Modul "Conf.pm"
+geht nun so vor, dass es bei den speziellen "privaten"
+Konfigurationsdateien diesen Fehler einfach ignoriert. Da das aber
+dazu führt, dass die Angabe, welche Konfigurationsdatei als
+nächstes eingelesen werden soll, nicht ausgewertet werden kann,
+die Kette der Konfigurationsdateien an dieser Stelle also
+abbricht, muss die "private" Konfigurationsdatei stets die letzte
+Datei der Kette sein. Damit das Modul "Conf.pm" einen Lesefehler
+ignoriert, muss der Name der entsprechenden speziellen
+Konfigurationsdatei mit "PRIVAT.ini" oder "PRIVATE.ini" aufhören.
+
+Ein weiteres Feature des "Conf.pm"-Moduls, das bisher noch
+gänzlich unerwähnt geblieben ist, ist die Möglichkeit, innerhalb
+der Definition einer Konfigurationskonstanten auf andere
+Konfigurationskonstanten zuzugreifen (was auch als
+"String-Interpolation" bezeichnet wird), und zwar völlig
+unabhängig davon, ob die referenzierte Konfigurationskonstante in
+derselben Datei definiert ist oder in einer anderen Datei, und
+unabhängig davon, ob es sich um eine Konfigurationsdatei handelt,
+die vor oder nach der aktuellen Konfigurationsdatei eingelesen
+wird.
+
+Dies wird dadurch ermöglicht, dass zuerst alle
+Konfigurationsdateien eingelesen werden, bevor irgendwelche
+Definitionen von Konfigurationskonstanten ausgewertet werden (mit
+Ausnahme der Verweise auf die jeweils nächste einzulesende
+Konfigurationsdatei in der Kette). Tatsächlich ist es sogar so,
+dass jede Konfigurationskonstante erst dann ausgewertet (und ab
+diesem Zeitpunkt in einem Cache gepuffert) wird, wenn sie
+tatsächlich angefordert wird (dies wird als "Lazy Evaluation"
+bezeichnet), d.h. Konfigurationskonstanten, die vom Programm nicht
+benötigt werden, müssen auch nicht ausgewertet werden, was zu
+einer deutlichen Performance-Steigerung führt.
+
+Diese String-Interpolation benutzt dabei eine Syntax, die stark an
+Shell- und Perl-Programme angelehnt ist (während der Aufbau der
+Dateien selbst von Windows inspiriert ist):
+
+    [DEFAULT]
+    # $[SPECIAL]{OS} enthält den Namen des aktuellen Betriebssystems:
+    Home-Dir     = $[$[SPECIAL]{OS}]{Home-Dir}
+    Group-Dir    = $[$[SPECIAL]{OS}]{Group-Dir}
+    Group-User   = $[$[SPECIAL]{OS}]{Group-User}
+    TEMPDIRPATH  = $[$[SPECIAL]{OS}]{TEMPDIRPATH}
+    LOGFILEPATH  = ${Group-Dir}/Tools/Logfiles
+    CONFIGPATH   = ${Group-Dir}/Tools/Config
+    GLOBALCONF   = ${CONFIGPATH}/Global/DEFAULT.ini
+
+    [MSWin32]
+    Home-Dir     = U:
+    Group-Dir    = G:
+    Group-User   = Administrator
+    TEMPDIRPATH  = C:/Temp
+
+    [freebsd]
+    Base-Dir     = /u
+    Home-Dir     = $[UNIX]{Home-Dir}
+    Group-Dir    = $[UNIX]{Group-Dir}
+    Group-User   = projadmin
+    TEMPDIRPATH  = /tmp
+
+    [UNIX]
+    # Die folgende Zeile holt das Home-Dir des aktuellen Benutzers aus /etc/passwd:
+    Home-Dir     = $[SPECIAL]{HOME}
+    Group-Dir    = $[$[SPECIAL]{OS}]{Base-Dir}/$[$[SPECIAL]{OS}]{Group-User}
+
+    [Manager]
+    GROUPCONF    = $[DEFAULT]{CONFIGPATH}/Group/GROUP.ini
+    NEXTCONF     = $[DEFAULT]{Home-Dir}/Config/USER.ini
+
+Zusätzlich zur String-Interpolation besteht ausserdem die
+Möglichkeit zur sogenannten "Indirektion", d.h. eine
+Konfigurationskonstante kann ihrerseits den symbolischen Namen
+einer anderen Konfigurationskonstanten (oder einer
+"Section"-Überschrift) enthalten, deren Inhalt dann (per
+String-Interpolation) eingefügt werden soll.
+
+Hinweis: Der Inhalt der Konfigurationsdateien lässt sich – ganz
+wie bei "INI"-Dateien unter Windows – mit Hilfe von "Section"-
+(also "Kapitel"-) Überschriften in virtuelle Abschnitte einteilen.
+Virtuell deshalb, weil dieselbe "Section"-Überschrift mehrmals
+vorkommen darf – sowohl in derselben Konfigurationsdatei als auch
+in verschiedenen Konfigurationsdateien. Die Gesamtheit aller
+Einträge, die zur selben "Section"-Überschrift gehören, bildet
+dann zusammengenommen den virtuellen Abschnitt. Die Verwendung von
+"Section"-Überschriften ist jedoch keineswegs verpflichtend, und
+alle Einträge ohne vorherige "Section"-Überschrift gehören
+automatisch zum Abschnitt "DEFAULT". Doppelte Einträge im selben
+virtuellen Abschnitt (nicht notwendigerweise jedoch "physikalisch"
+unterhalb derselben "Section"-Überschrift, d.h. innerhalb
+desselben Blocks) innerhalb derselben Konfigurationsdatei sind
+übrigens verboten (jedoch nicht in unterschiedlichen
+Konfigurationsdateien, denn ein Benutzer muss ja z.B. globale
+Defaults "überschreiben" können).
+
+Zusammen mit gewissen eingebauten Spezial-Variablen sowie der
+Möglichkeit des Zugriffs auf sämtliche Umgebungsvariablen lassen
+sich mit Hilfe der String-Interpolation und der Indirektion z.B.
+betriebssystemabhängige Einstellungen ohne Programmierung, allein
+durch Konfiguration, vor dem Werkzeug "verbergen". Auch ist es auf
+diese Weise beispielsweise möglich, von "dem" Benutzerpasswort für
+"das" Server-Account zu sprechen (und es auch so zu verwenden),
+unabhängig davon, um welchen von mehreren Servern es sich gerade
+handelt, bzw. welche Zielumgebung gerade eingestellt ist.
+
+D.h. mit anderen Worten, dem Programm bleibt es erspart, zuerst in
+der Konfiguration nachzusehen, welche Zielumgebung eingestellt
+ist, um daraufhin (abhängig von der eingestellten Umgebung) sich
+das Login und Benutzerpasswort des Aufrufers für diese Umgebung
+herauszusuchen. Dies lagert einen bedeutenden (und immer
+wiederkehrenden, aber nie identischen) Teil der Programmierung in
+eine einfache, leicht zu handhabende Konfigurationssyntax aus, und
+hilft so einen erheblichen Programmieraufwand einzusparen.
+
+Nähere Details zur genauen Syntax und den Spezial- und
+Umgebungsvariablen sind in der Man-Page dieses Moduls (die mit
+Hilfe von "perldoc" angezeigt werden kann, unter Unix auch mittels
+"man") zu finden.
+
+Mit Hilfe eines weiteren Moduls ("Base.pm") besteht ausserdem die
+Möglichkeit, einzelnen Konfigurationskonstanten über die
+Kommandozeile (für die Dauer des jeweiligen Tool-Aufrufs) einen
+anderen Wert zuzuweisen. Vereinzelt sind im Modul "Base.pm" zu
+diesem Zweck für manche, häufig benötigte Konfigurationskonstanten
+auch besonders handliche Abkürzungen definiert. In einigen Fällen
+gibt es zudem die Möglichkeit, bestimmte Konfigurationskonstanten
+per Umgebungsvariable zu überschreiben (genaueres hierzu ist in
+der Man-Page dieses Moduls nachzulesen).
+
+Aufgrund des Caching-Mechanismus bleiben Konfigurationskonstanten,
+die von einer per Kommandozeile oder Umgebungsvariable temporär
+überschriebenen Konfigurationskonstanten abhängen, aber schon zur
+Startup-Zeit des Programms benötigt und daher ausgewertet wurden
+(z.B. Name und Pfad einer Log-Datei), von solchen Änderungen
+unberührt, d.h. die Reihenfolge der Auswertung (Anforderung) von
+Konfigurationskonstanten ist im Zusammenhang mit Änderungen über
+die Kommandozeile oder Umgebungsvariablen von Bedeutung (während
+das bei "normalen" Konfigurationskonstanten keine Rolle spielt).
+

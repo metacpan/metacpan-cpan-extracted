@@ -1,0 +1,53 @@
+[% INCLUDE 'header.tt' %]
+[% USE HTML %]
+<h2>[% group %]</h2>
+
+<p>
+<a href="../">Back to group listing</a> |
+<a href="news://[% nntp_server %]/[% group %]">read in newsreader</a> |
+<a href="[% path_to_root %]rss/[% group %].rdf">rss</a>
+</p>
+
+<p>
+[% num_arts %] articles, listing [% min_art %]-[% max_art %]
+</p>
+
+<p>
+[% UNLESS (min_art == 1) %]<a href="./?max=[% min_art - 1 %]">[% END
+%]Previous[% UNLESS (min_art == 1) %]</a>[% END %] |
+[% UNLESS (max_art == last_art) %]<a href="./[%
+SET next_max = max_art + arts_per_page
+%][% UNLESS next_max >= last_art %]?max=[% next_max %][% END %]">[%
+END %]Next[% UNLESS (max_art == last_art) %]</a>[% END %] |
+[% UNLESS (max_art == last_art) %]<a href="./">[% END %]Latest[% UNLESS (max_art == last_art) %]</a>[% END %]
+</p>
+
+<table class="articles">
+<tr>
+<th>#</th>
+<th>Subject</th>
+<th>Author</th>
+<th>Date</th>
+<th>Lines</th>
+</tr>
+[% FOREACH art = articles %]
+<tr>
+<td>
+<a href="[% art.idx %]">[% art.idx %]</a>
+</td>
+<td>
+[% HTML.escape(art.subject) %]
+</td>
+<td>
+[% HTML.escape(art.author) %]
+</td>
+<td>
+[% HTML.escape(art.date) %]
+</td>
+<td>
+[% art.lines %]
+</td>
+</tr>
+[% END %]
+</table>
+[% INCLUDE 'footer.tt' %]

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/CGI/Application/Plugin/CAPTCHA.pm
+t/00-load.t
+t/01-config.t
+t/02-create.t
+t/03-verify.t
+t/pod-coverage.t
+t/pod.t
+t/TestApp.pm
+t/TestApp2.pm
+t/CAPCServer.pm
+Makefile.PL

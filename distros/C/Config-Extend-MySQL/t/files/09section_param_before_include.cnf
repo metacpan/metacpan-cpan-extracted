@@ -1,0 +1,3 @@
+[main]
+debug = yes
+!include parts/nodebug.cnf

@@ -1,0 +1,44 @@
+CGI-Builder-SessionManager version 1.00
+=======================================
+
+CGI::Builder::SessionManager is a CGI::Builder extension that integrates
+Apache::SessionManager session management into CGI::Builder framework (CBF).
+
+See 'perldoc CGI::Builder::SessionManager' for module documentation and use.
+
+Apache::SessionManager is a mod_perl (1.0 and 2.0) module that helps session
+management of a web application. This module is a wrapper around
+Apache::Session persistence framework for session data. It creates a session
+object and makes it available to all other handlers transparenlty. See 'perldoc
+Apache::SessionManager' for module documentation and use.
+
+CHANGES FROM PREVIOUS VERSION
+
+	- First CPAN officiale release
+	+ Added base test and docs
+	
+See 'Changes' file in this distribution for complete history revision
+
+INSTALLATION
+
+To install this module type the following:
+
+   %> perl Makefile.PL
+   %> make
+   %> make test
+   %> make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- CGI::Builder >= 1.2
+- Apache::SessionManager >= 1.01
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001-2004 Enrico Sorcinelli. All rights reserved.
+This program is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself. 
+
+

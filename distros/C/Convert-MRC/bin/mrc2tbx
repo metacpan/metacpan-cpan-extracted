@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+#
+# This file is part of Convert-MRC
+#
+# This software is copyright (c) 2013 by Alan K. Melby.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+package mrc2tbx;
+use strict;
+use warnings;
+# ABSTRACT: CONVERT MRC FILES TO TBX-BASIC
+our $VERSION = '4.03'; # VERSION
+use Convert::MRC;
+Convert::MRC->new->batch(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mrc2tbx - CONVERT MRC FILES TO TBX-BASIC
+
+=head1 VERSION
+
+version 4.03
+
+=head1 AUTHOR
+
+Nathan Rasmussen, Nathan Glenn <garfieldnate@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Alan K. Melby.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

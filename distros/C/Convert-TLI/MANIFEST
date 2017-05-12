@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Convert-TLI.t
+lib/Convert/TLI.pm

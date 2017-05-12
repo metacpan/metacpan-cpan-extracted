@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb09
+registers:
+  AF: 6188
+  AF_: 0
+  BC: 4654
+  BC_: 0
+  DE: 56727
+  DE_: 0
+  HL: 22982
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,18 @@
+Revision history for Perl extension CGI::SHTML
+
+1.29		Wed May 19 13:11:30 CDT 2004 
+	- Fixed parsing information with parse_shtml(); doesn't lose
+	  newlines.
+	- Setting blank versions of environment variables, to placate 
+	  the warning messages in Cmd.pm
+
+1.28		Mon May 17 15:17:05 CDT 2004 
+	- Environment variables are now preserved.
+
+1.27		Thu May 06 11:16:06 CDT 2004 
+	- Added if/elif/else/endif functionality.
+	- Minor bugfixes
+	- Code cleanup, documentation cleanup.
+
+1.26		Thu Apr 22 15:14:12 CDT 2004 
+	- First version ready for some kind of distribution.

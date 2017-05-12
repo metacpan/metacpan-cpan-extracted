@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication::Credential::Livedoor
+  0.02  Thu Apr 19 14:45:57 2007
+        - Document fixed. s/BBAuth/Livedoor/;
+          many parts of this module are copy paste from Catalyst::Plugin::Authentication::Credential::BBAuth.
+
+  0.01  Fri Apr 13 16:53:11 2007
+        - original version

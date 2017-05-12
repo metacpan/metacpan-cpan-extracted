@@ -1,0 +1,13 @@
+0.03   2008-03-18
+
+- Accept an object as the uri parameter to allow for URI objects.
+
+
+0.02   2008-03-01
+
+- Add prereqs.
+
+
+0.01   2008-03-01
+
+- First version, released on an unsuspecting world.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Contextual::Return::Wrapper.
+
+0.01  Sat Aug 10 15:33:42 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Contextual::Return::Wrapper
+

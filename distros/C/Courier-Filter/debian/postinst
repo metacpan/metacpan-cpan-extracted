@@ -1,0 +1,49 @@
+#!/bin/sh -e
+
+mode=$1
+
+# Move a conffile without triggering a dpkg question
+mv_conffile() {
+    OLDCONFFILE="$1"
+    NEWCONFFILE="$2"
+
+    if [ -e "$OLDCONFFILE" ]; then
+        echo "Preserving user changes in $OLDCONFFILE to $NEWCONFFILE ..."
+        mv -f "$NEWCONFFILE" "$NEWCONFFILE".dpkg-new
+        mv -f "$OLDCONFFILE" "$NEWCONFFILE"
+    fi
+}
+
+# Move a conffile to a non-conffile
+mv_conffile_to_noncf() {
+    OLDCONFFILE="$1"
+    NEWCONFFILE="$2"
+
+    if [ -e "$OLDCONFFILE" ]; then
+        echo "Preserving user changes in $OLDCONFFILE to $NEWCONFFILE ..."
+        mv -f "$OLDCONFFILE" "$NEWCONFFILE"
+    fi
+}
+
+case "$mode" in
+  configure )
+    old_version=$2
+    
+    config_file=/etc/courier/filters/courier-filter-perl.conf
+    
+    if dpkg --compare-versions "$old_version" lt "0.200"; then
+        # Preserve customized old config file, if any:
+        mv_conffile_to_noncf /etc/courier/filters/pureperlfilter.conf $config_file
+    fi
+    
+    if [ ! -e $config_file ]; then
+        # No config file exists, create one:
+        cp /usr/share/doc/courier-filter-perl/examples/courier-filter-perl.conf.bare $config_file
+    fi
+    
+    echo "Starting courier-filter-perl mail filter ..."
+    filterctl start courier-filter-perl
+    ;;
+esac
+
+#DEBHELPER#

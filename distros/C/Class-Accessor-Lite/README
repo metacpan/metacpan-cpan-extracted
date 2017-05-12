@@ -1,0 +1,111 @@
+NAME
+    Class::Accessor::Lite - a minimalistic variant of Class::Accessor
+
+SYNOPSIS
+        package MyPackage;
+
+        use Class::Accessor::Lite (
+            new => 1,
+            rw  => [ qw(foo bar) ],
+            ro  => [ qw(baz) ],
+            wo  => [ qw(hoge) ],
+        );
+
+DESCRIPTION
+    The module is a variant of "Class::Accessor". It is fast and requires
+    less typing, has no dependencies to other modules, and does not mess up
+    the @ISA.
+
+THE USE STATEMENT
+    The use statement (i.e. the "import" function) of the module takes a
+    single hash as an argument that specifies the types and the names of the
+    properties. Recognises the following keys.
+
+    new => $true_or_false
+        the default constructor is created if the value evaluates to true,
+        otherwise nothing is done (the default behaviour)
+
+    rw => \@name_of_the_properties
+        creates a read / write accessor for the name of the properties
+        passed through as an arrayref
+
+    ro => \@name_of_the_properties
+        creates a read-only accessor for the name of the properties passed
+        through as an arrayref
+
+    wo => \@name_of_the_properties
+        creates a write-only accessor for the name of the properties passed
+        through as an arrayref
+
+    For more detailed explanation read the following section describing the
+    behaviour of each function that actually creates the accessors.
+
+FUNCTIONS
+    As of version 0.04 the properties can be specified as the arguments to
+    the "use" statement (as can be seen in the SYNOPSIS) which is now the
+    recommended way of using the module, but for compatibility the following
+    functions are provided as well.
+
+  Class::Accessor::Lite->mk_accessors(@name_of_the_properties)
+    Creates an accessor in current package under the name specified by the
+    arguments that access the properties (of a hashref) with the same name.
+
+  Class::Accessor::Lite->mk_ro_accessors(@name_of_the_properties)
+    Same as mk_accessors() except it will generate read-only accessors (i.e.
+    true accessors). If you attempt to set a value with these accessors it
+    will throw an exception.
+
+  Class::Accessor::Lite->mk_wo_accessors(@name_of_the_properties)
+    Same as mk_accessors() except it will generate write-only accessors
+    (i.e. mutators). If you attempt to read a value with these accessors it
+    will throw an exception.
+
+  Class::Accessor::Lite->mk_new()
+    Creates the "new" function that accepts a hash or a hashref as the
+    initial properties of the object.
+
+  Class::Accessor::Lite->mk_new_and_accessors(@name_of_the_properties)
+    DEPRECATED. Use the new "use Class::Accessor::Lite (...)" style.
+
+FAQ
+  Can I use "Class::Accessor::Lite" in an inherited module?
+    Yes in most cases, when the class object in the super class is
+    implemented using a hashref. However you _should_ _not_ create the
+    constructor for the inherited class by calling
+    "<Class::Accessor::Lite-"new()>> or by "<use Class::Accessor::Lite (new
+    =" 1)>>. The only other thing that "Class::Accessor::Lite" does is to
+    set up the accessor functions for given property names through a blessed
+    hashref.
+
+  What happens when passing more than one arguments to the accessor?
+    When the accessor built by Class::Accessor::Lite is given more than one
+    arguments, a reference to the arguments will be saved as an arrayref.
+    This behaviour might not be necessary but is implemented as is to
+    maintain compatibility with Class::Accessor::Fast.
+
+        my @data = (1, 2, 3);
+        $obj->someproperty(@data);
+
+        $obj->someproperty->[2]++; # $data[3] is incremented
+
+    In general, you should pass an arrayref to set an arrayref to a
+    property.
+
+        my @data = (1, 2, 3);
+        $obj->someproperty([ @data ]); # save a copy using arrayref
+
+        $obj->someproper->[2]++; # @data is not modified
+
+SEE ALSO
+    Class::Accessor
+
+    Class::Accessor::Lite
+
+AUTHORS
+    Copyright (C) 2008 - 2010 Kazuho Oku
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

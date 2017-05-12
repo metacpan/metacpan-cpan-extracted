@@ -1,0 +1,49 @@
+---
+abstract: 'Catmandu module for working with SRU data'
+author:
+  - 'Wouter Willaert, C<< <wouterw@inuits.eu> >>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+  XML::XPath: '1.13'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-SRU
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9204'
+  Furl: '0.41'
+  Moo: '1.005000'
+  URI::Escape: '1.60'
+  XML::LibXML::Simple: '0.91'
+  XML::Struct: '0.16'
+  YAML::XS: '0.34'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-SRU/issues
+  homepage: https://github.com/LibreCat/Catmandu-SRU
+  repository: https://github.com/LibreCat/Catmandu-SRU.git
+version: '0.039'
+x_contributors:
+  - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
+  - 'Jakob Voss <jakob@nichtich.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Johann Rolschewski <rolschewski@gmail.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+  - 'wouterw <wouter.willaert@gmail.com>'

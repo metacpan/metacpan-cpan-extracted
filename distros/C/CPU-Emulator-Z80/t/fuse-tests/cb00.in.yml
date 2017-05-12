@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 0
+  43014:
+    - 118
+name: cb00
+registers:
+  AF: 55808
+  AF_: 0
+  BC: 58489
+  BC_: 0
+  DE: 21806
+  DE_: 0
+  HL: 43014
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

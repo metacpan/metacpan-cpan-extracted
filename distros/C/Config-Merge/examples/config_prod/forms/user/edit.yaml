@@ -1,0 +1,24 @@
+name:                   user_edit
+fields:
+  -  email:
+        name:
+            en:         Email address
+        required:       1
+        default:        
+        type:           text
+        checks:         email                      
+        max_length:     255
+  -  firstname:
+        name:
+            en:         First name
+        required:       1
+        type:           text
+        checks:         name
+        max_length:     100
+  -  surname:
+        name:
+            en:         Last name
+        required:       1
+        type:           text
+        checks:         name
+        max_length:     100

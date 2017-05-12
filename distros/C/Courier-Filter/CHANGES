@@ -1,0 +1,270 @@
+# Legend:
+# --- = A new release
+#   + = Added a feature (in a backwards compatible way)
+#   ! = Changed something significant, or removed a feature
+#   * = Fixed a bug, or made a minor improvement
+
+--- 0.200 (2008-03-11 22:00)
+
+  Courier::Filter:
+  ! Config file has been renamed to "courier-filter-perl.conf" from
+    "pureperlfilter.conf".
+
+  Courier::Message:
+  * Fixed a bug that caused crashes when encountering invalid (e.g., non-ASCII)
+    characters in raw MIME encoded words.
+  * Fixed fallback decoding of raw message headers from non-ASCII, non-UTF-8
+    encodings such as ISO-8859-1.  Previously, any non-UTF-8 byte sequences
+    would be decoded as the "�" Unicode substitution character.  Now this
+    case properly falls back to reinterpreting the entire header as Windows-
+    1252.
+    Note:  In the absence of the experimental "UTF8SMTP" SMTP extension,
+    non-ASCII characters are formally illegal in raw message headers, so this
+    really only affects exceptional cases.
+  * Eliminated some corner case "Use of uninitialized value" warnings.
+
+  Courier::Config:
+  * Lower-cased and slightly adjusted constant/method names.  Compatibility
+    aliases for the old names are provided.
+  + Added courier_executable() and courier_version() methods.  See man-page.
+
+  Courier::Util:
+  + Added as a utility module for use by other modules of the Courier::Filter
+    framework.
+
+  Courier::Filter::Module:
+  + Added warn() method for writing warning messages to syslog.
+
+  DNSBL filter module:
+  * Ignore messages received via IPv4/IPv6 loopback addresses (i.e., self
+    submissions).
+
+  SPF filter module:
+  * Use Mail::SPF instead of the old Mail::SPF::Query.  Added new "spf_options"
+    option with options for Mail::SPF::Server.
+  + The switch to Mail::SPF brings IPv6 support!
+  + Support both MAIL FROM and HELO checks separately.
+  ! Deprecated "fallback_guess" and "trusted_forwarders" options in favor of
+    the "default_policy" and "tfwl" keys to the "spf_options" option.  The old
+    options induce a warning when specified but are still supported for now.
+    Due to the move from the obsolete Mail::SPF::Query module to the Mail::SPF,
+    the (yet unreleased) Mail::SPF::BlackMagic extension module is now required
+    when using these non-standard options.
+  ! Deprecated the "unknown" and "error" SPF result codes in favor of the new
+    "permerror" and "temperror" ones defined in RFC 4408.  The old result codes
+    induce a warning when specified in the "match_on" option but are still
+    supported for now.
+  * Ignore messages with an empty identity of the configured scope (esp. empty
+    MAIL FROM, i.e., bounces) or with an identity in the form of an IP address
+    literal ("[<ip-address>]").
+
+  SPFout filter module:
+  * Use Mail::SPF instead of the old Mail::SPF::Query.  Added new "spf_options"
+    option with options for Mail::SPF::Server.
+  * Use the IPv6-supporting Net::Address::IP::Local rather than the IPv4-only
+    Net::Address::IPv4::Local module for auto-discovery of the local system's
+    outbound IP addresses.  Note that auto-discovery does not work from behind
+    NATs, in which case outbound IP addresses must be configured manually using
+    the "outbound_ip_addresses" option.
+  + The switch to Mail::SPF and Net::Address::IP::Local brings IPv6 support!
+  ! Deprecated the "unknown" and "error" SPF result codes in favor of the new
+    "permerror" and "temperror" ones defined in RFC 4408.  The old result codes
+    induce a warning when specified in the "match_on" option but are still
+    supported for now.
+  * Ignore messages with an empty identity of the configured scope (esp. empty
+    MAIL FROM, i.e., bounces) or with an identity in the form of an IP address
+    literal ("[<ip-address>]").
+
+  SpamAssassin filter module:
+  + Added a "prefs_file" option for easy configuration of Courier::Filter
+    specific SpamAssassin preferences.  SpamAssassin now will not read any
+    preferences besides its default configuration files unless this option is
+    specified.
+  * Eliminated memory leak by properly cleaning up Mail::SpamAssassin::Message
+    objects.
+
+  BlankBody filter module:
+  + Added for matching blank message bodies (a stupid spammer symptom).
+
+  FakeDate filter module:
+  + Added for matching implausible and malformed date header fields.
+
+  SendCopy filter module:
+  + Added for sending message copies to additional recipients.
+
+  Debian:
+  + Automatically start and stop courier-filter-perl using Courier's
+    `filterctl` post-installation and pre-removal, respectively.
+  ! "courier-filter-perl.conf" (previously "pureperlfilter.conf") config file
+    is no longer a conffile managed by dpkg.  Migrate seamlessly.
+  ! Install courier-filter-perl executable into /usr/lib/courier/filters/
+    rather than /usr/lib/.
+  > control:
+    * Section: mail (was: perl)
+    * Standards-Version: 3.7.3
+    * Raised debhelper compat level to 5 / Build-Depends: debhelper (>= 5)
+    * Build-Depends: debhelper (was: Build-Depends-Indep:)
+    * Removed Build-Depends-Indep: libtest-simple-perl (now provided by
+      perl-modules)
+    * Recommends: libmail-spf-perl (was: libmail-spf-query-perl)
+    * Recommends: libnet-rblclient-perl, libclamav-client-perl (was: Suggests:)
+    * Removed Recommends: libdigest-md5-perl (now provided by perl)
+    * Removed Recommends: libnet-dns-perl (unused)
+    * Suggests: libnet-address-ip-local-perl
+      (was: libnet-address-ipv4-local-perl)
+  > rules:
+    * Run `$(BUILD) distclean` only if $(BUILD) actually exists.
+
+--- 0.17 (2005-11-11 03:00)
+
+  Courier::Filter:
+  * If socket already exists, check whether it is dead or alive.  If it is
+    dead, remove it and start up normally.  If it is alive, die like before.
+                                                       (Closes: Debian #326785)
+  * Ignore connections that don't send any data.
+
+  Courier::Message:
+  * Decode header text as "UTF-8" encoded, not as "utf8" encoded.  Starting
+    with Perl 5.8.7, this does make a difference.  "utf8" allows invalid
+    Unicode codepoints (such as UTF-16 surrogates), while "UTF-8" (the official
+    standard UTF-8) doesn't.  We want to avoid invalid codepoints because they
+    tend to cause trouble later.
+  * Don't die on invalid characters in encoded-word chunks.  If an encoded-word
+    cannot be decoded, retain it undecoded.
+  * "authenticated" property: refined parsing of "Received:" header and "AUTH:"
+    authentication information.
+  + Added "authenticated_user" property.
+  * Corrected documentation of "header" property.
+
+  SPFout filter module:
+  * Don't be pedantic about what our "public" IPv4 address is vis-à-vis the
+    various recipient MXes.  Assume we just have a single public address that
+    applies to all recipient MXes.  (Let's see if anyone out there actually has
+    a more complex setup...)
+
+  Parts filter module:
+  * Requires IO::InnerFile 2.110 or later, Archive::Zip.
+
+  SpamAssassin filter module:
+  + Added for SpamAssassin-based spam detection.
+  ! Requires Mail::SpamAssassin.
+
+  Miscellaneous:
+  * Relaxed sender IPv4 address matching in DNSBL, SPF, and SPFout filter
+    modules, making the "::ffff:" IPv6 prefix optional and thus supporting
+    IPv6-disabled versions of Courier.
+  * Courier::Filter::Overview: Updated mention of pythonfilter from version 0.5
+    to 0.8.
+  * README: Added license statement.
+  + INSTALL: Added system requirements and building/installation instructions.
+  * Minor documentation fixes.
+
+  Debian:
+  * Recommends: libmime-perl, not libmime-tools-perl.  (Closes: Debian #297730)
+  ! Recommends: libio-stringy-perl (>= 2.110), libmail-spamassassin-perl,
+    libarchive-zip-perl.
+
+--- 0.16 (2005-01-17 19:11)
+
+  Debian:
+  * Explicitly specify the dependency on Perl 5.8 so upgrades from Woody are
+    guaranteed to work smoothly and also to simplify backporting.  This deals
+    with Debian bug #289796.
+  ! Recommend libnet-dns-perl.  Suggest libnet-rblclient-perl,
+    libnet-address-ipv4-local-perl, and libclamav-client-perl (all of which are
+    not yet packaged for Debian).
+
+  SPF filter module:
+  ! Deprecated the "reject_on" option in favor of the new "match_on" option.
+  ! Removed "none" from the default set of result codes to match on.
+  ! Changed the documentation to recommend also rejecting on "unknown" results.
+  + Added a reference in the documentation to the spf-draft-200406
+    specification, to which this module complies.
+
+  SPFout filter module:
+  + Added for outbound SPF filtering.
+
+  ClamAVd filter module:
+  + Added for malware filtering using a ClamAV `clamd` dameon.
+
+  Miscellaneous:
+  * Updated the sample configuration file.
+  * Minor documentation fixes.
+
+--- 0.15 (2004-10-30 01:13)
+
+  ! Courier::Filter is primarily a plug-in for the Courier MTA, not a library
+    of Perl modules intended to be used by other programs or modules.
+    ! Renamed the Debian package to "courier-filter-perl".
+    ! Install included Perl modules in the private path
+      /usr/share/courier-filter-perl/perl5 instead of Perl's configured
+      "vendorlib" path (/usr/share/perl5 in Debian).
+  * Various minor fixes.
+
+--- 0.14 (2004-10-22 00:10)
+
+  + Added documentation for the test-filter-module and pureperlfilter
+    executables.
+  > test-filter-module:
+    * Fixed the command-line parsing and handling of control file names.
+    * Made the result output format compatible with multi-line results.
+
+--- 0.13 (2004-10-04 23:00)
+
+  + Added Debian package control files.
+
+  > Deprecated the MIMEParts filter module in favor of the new Parts filter
+    module, which is compatible but a lot more powerful:
+    ! Switched from completely-in-memory processing to using temporary files in
+      order to work around two nasty bugs in MIME::Parser and Archive::Zip.
+    ! Renamed the "max_size" constructor option to "max_message_size".
+      "max_size" is deprecated but still supported for now.
+    ! The "max_size" constructor option now defaults to 1024**2 (1MB) instead
+      of undef.
+    + Added the "max_part_size" constructor option.
+    + Added "views" support (as constructor option and signature aspect),
+      supporting "raw" and "zip" views for now.
+    + Added the "encrypted" signature aspect.
+
+  + Added Envelope filter module.
+  + Added etc/pureperlfilter.conf as a default configuration file.
+
+  * Fixed the mysterious ``Can't call method "close" on an undefined value at
+    Filter.pm line 299´´ bug that caused Courier::Filter to fail starting up on
+    some platforms.  (File descriptor 3 must be opened in write mode, not in
+    read mode!)
+  * Fixed filter module group handling:
+    * Skip the rest of the current module group and treat it as an implicit
+      accept if a module in the group states an explicit accept.
+    * Log rejections just once, right after a module has stated a reject,
+      i.e. avoid logging the rejection for all higher recursion levels of the
+      module group structure that contains the rejecting module.
+    * Don't try extracting a logger from filter module groups, only from atomic
+      filter modules.
+  * Fixed the Header filter module:
+    * Fixed handling of undefined header fields.
+    * Prepend a "Header:" keyword to positive match results.
+  * Disabled timestamping for the Syslog logger module, as syslog does its own
+    timestamping.
+  * Reworked configuration file example.
+  * Refined Build.PL script.
+  * Lots of minor documentation fixes.
+
+--- 0.12 (2004-02-25 01:00)
+
+  * chmod the courierfilter socket to 0660, so the Courier daemon system group
+    has write access to the socket.  This solves the "sendmail: Unable to
+    submit message" permissions problem that occurred on some platforms..
+  * Make Module::Build automatically create a Makefile.PL to facilitate
+    auto-installation through the CPAN interface..
+
+--- 0.11 (2004-02-22 22:00)
+
+  * Do not use the proprietary "boolean" pragma module, declare our own boolean
+    constants instead.
+  * Lots of minor documentation fixes.
+
+--- 0.1 (initial release) (2004-02-16 23:00)
+
+# $Id: CHANGES 211 2008-03-23 01:25:20Z julian $
+# vim:tw=79 sts=2 sw=2

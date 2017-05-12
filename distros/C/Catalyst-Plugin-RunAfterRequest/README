@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-Plugin-RunAfterRequest,
+version 0.04:
+
+  run code after the response has been sent.
+
+This software is copyright (c) 2010 by Matt S Trout.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,210 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use CAM::DBF;
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+
+our $VERSION = '1.02';
+
+##no critic
+
+my %opts = (
+            "-field"      =>  ",",
+            "-enclose"    =>  "\"",
+            "-escape"     =>  "\\",
+            "-record"     =>  "\n",
+            );
+my $showheader => 0;
+my $outfile = "";
+my $outext = ".txt";
+my $help = 0;
+my $repairfile => 0;
+my $info = 0;
+my $samplerow = 0;
+
+Getopt::Long::Configure("bundling");
+GetOptions("f|field=s",   \$opts{"-field"},
+           "e|enclose=s", \$opts{"-enclose"},
+           "E|escape=s",  \$opts{"-escape"},
+           "r|record=s",  \$opts{"-record"},
+           "H|header",    \$showheader,
+           "R|repair",    \$repairfile,
+           "o|outfile=s", \$outfile,
+           "x|outext=s",  \$outext,
+           "h|help",      \$help,
+           "i|info",      \$info,
+           "s|samplerow=s", \$samplerow,
+           ) or pod2usage(1);
+pod2usage(-exitstatus => 0, -verbose => 2, -input => \*DATA) if ($help);
+
+foreach my $key (keys %opts)
+{
+   $opts{$key} =~ s/\\t/\t/gs;
+   $opts{$key} =~ s/\\r/\015/gs;
+   $opts{$key} =~ s/\\n/\012/gs;
+   $opts{$key} =~ s/\\\\/\\/gs;
+}
+
+push @ARGV, "-" if (@ARGV == 0);
+
+foreach my $file (@ARGV)
+{
+   local *OUT;
+
+   my $dbf = new CAM::DBF($file);
+   if (!$dbf)
+   {
+      &croak("Cannot open file $file: $!\n");
+   }
+   if ($repairfile)
+   {
+      $dbf->repairHeaderData();
+   }
+
+   if ($info)
+   {
+      if ($info++ > 1)
+      {
+         # Print blank line between output files
+         print "\n";
+      }
+      # print header metadata
+      if (!$dbf->validateColumns())
+      {
+         print "Invalid header!\n";
+      }
+      my $recordlength = $dbf->computeRecordBytes();
+      if ($recordlength != $dbf->nRecordBytes())
+      {
+         print("Error: the number of bytes per record in the header (" .
+               $dbf->nRecordBytes() . ")\n   is not equal to the sum of the lengths of the columns ($recordlength)\n");
+      }
+      my $recordnum = $dbf->computeNumRecords();
+      if ($recordnum != $dbf->nrecords())
+      {
+         print("Error: the number of bytes per record in the header (" .
+               $dbf->nrecords() . ")\n   is not equal to the sum of the lengths of the columns ($recordlength)\n");
+      }
+      print "File: $file\n";
+      print "Header Size: " . $dbf->nHeaderBytes() . " bytes\n";
+      print "Record Size: " . $dbf->nRecordBytes() . " bytes\n";
+      print "Records: " . $dbf->nrecords() . "\n";
+      print "Total Size: " . ($dbf->nHeaderBytes()+ ($dbf->nRecordBytes()*$dbf->nrecords())) . " bytes\n";
+      print "Actual Size: " . (-s $file) . " bytes\n";
+      my @widths = (16,4,6,3,6);
+      my $format = join(" ", map {"%-${_}s"} @widths) . "\n";
+      printf($format, "Name", "Type", "Length", "Dec", "Sample"); # header
+      print(join(" ", map {"-"x$_} @widths), "\n");     # dashes
+      my @sample = $dbf->fetchrow_array($samplerow);
+      foreach my $c (0 .. $dbf->nfields()-1)
+      {
+         my $val = defined $sample[$c] ? "'$sample[$c]'" : "NULL";
+         printf($format, $dbf->fieldname($c), $dbf->fieldtype($c), 
+                $dbf->fieldlength($c), $dbf->fielddecimals($c), $val);
+      }
+      # don't output row data
+      next;
+   }
+
+   my $fout = $outfile;
+   if (!$fout)
+   {
+      $fout = $file;
+      if ($file ne "-")
+      {
+         $fout =~ s/\.dbf$//i;
+         $fout .= $outext;
+      }
+   }
+   if ($fout eq "-")
+   {
+      *OUT = *STDOUT;
+   }
+   else
+   {
+      if (!open(OUT, ">$fout"))
+      {
+         &croak("Cannot open output file $fout: $!\n");
+      }
+   }
+
+   my $step = 200;
+   for (my $i=0; $i < $dbf->nrecords(); $i += $step)
+   {
+      my $header = ($i == 0 && $showheader);
+      my $end = $i+$step-1;
+      $end = $dbf->nrecords()-1 if ($end > $dbf->nrecords()-1);
+
+      print OUT $dbf->toText($i, $end, %opts, -showheader => $header);
+   }
+
+   close(OUT) if ($fout ne "-");
+}
+
+__DATA__
+
+=for stopwords dbf2csv DBF dBASE
+
+=head1 NAME
+
+dbf2csv - Convert dBASE DBF files to text files
+
+=head1 SYNOPSIS
+
+dbf2csv [options] [file ...]
+
+ Options:
+   -h --help           verbose help message
+   -i --info           just print header metadata and no rows
+   -R --repair         repair any header corruption
+   -H --header         output column headers
+   -f --field=<char>   set the field separator character
+   -e --enclose=<char> set the field enclosing character
+   -E --escape=<char>  set the escape character
+   -r --record=<char>  set the record separator character
+   -o --outfile=<file> write output to <file> (overrides -x)
+   -x --outext=<ext>   use <ext> as output extension
+
+ Defaults:
+   -R  (false)
+   -H  (false)
+   -f  ,
+   -e  "
+   -E  \
+   -r  \n
+   -o <infile>.txt
+   -x .txt
+
+ dbf2csv understands the following special characters in its arguments:
+   \r  carriage return
+   \n  newline
+   \t  tab
+   \\  backslash
+
+=head1 DESCRIPTION
+
+One or more files specified on the command line (or from standard
+input if none specified, or C<-> is specified) are converted from
+dBASE DBF format to text delimited files.  Delimiters and escape
+characters can be indicated on the command line.  Output is typically
+written to C<< <file>.txt >>, given input C<< <file>.dbf >>.  The output extension
+can be changed with the C<--outext> parameter.  Alternatively, an output
+file can be manually specified via the C<-o> argument.  If C<--outfile> is
+C<->, output will be written to standard output.
+
+If C<--info> is specified, header metadata is printed to standard output
+for all specified DBF files.  All other flags are ignored and no row
+data are output.
+
+=head1 SEE ALSO
+
+L<CAM::DBF>
+
+=head1 AUTHOR
+
+Chris Dolan, Clotho Advanced Media, F<chris@clotho.com>
+
+=cut

@@ -1,0 +1,26 @@
+Revision history for Perl extension CSS::Croco.
+0.09  Sat 26 Dec 2009 18:47:14 MSK
+    fixed bug with includes
+0.08  Sat Nov  7 17:08:04 MSK 2009
+    fixed warnings
+    small fixes
+0.07  Sat Nov  7 03:21:31 MSK 2009
+    updated POD
+    @media rule processing
+    fixed tests
+0.06  Fri Nov  6 22:19:18 MSK 2009
+    updated POD
+    new it can parse wikipedia CSS
+    and my blog CSS
+    basic selectors
+0.05  пятница,  6 ноября 2009 г. 22:18:22 (MSK)
+    now it REALLY works on linux
+    now it REALLY works
+    updated POD
+    now in can parse http://gnu.org stylesheet
+0.04  вторник,  3 ноября 2009 г. 19:01:24 (MSK)
+    now it works on linux
+0.01  Sun Nov  1 21:33:02 2009
+	- original version; created by h2xs 1.23 with options
+		-p cr_om_ -n CSS::Croco /usr/local/include/libcroco-0.6/libcroco/libcroco.h
+

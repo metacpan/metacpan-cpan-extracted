@@ -1,0 +1,53 @@
+Revision history for perl module C::Tokenize
+
+0.13 2016-12-07
+
+* Improve $cvar_re to match more possible lvalues, and test it
+* Export $octal_re, $decimal_re, and $hex_re on demand
+* Document the above, and remove an error about octal from documentation
+
+0.12 2016-12-07
+
+* Add "$include" regular expression which matches any #include
+  statement.
+
+0.11 2016-09-06
+
+* Add "$cvar_re" regular expression
+* Change to machine-readable documentation
+
+0.10 2015-11-15
+
+* Add "$include_local" regular expression
+
+0.09 2014-01-15
+
+* Update list of C keywords to C99.
+
+0.08 2013-12-26
+
+* Documentation correction
+
+0.07 2013-11-27
+
+* Fix up Changes
+
+0.06 2013-11-27
+
+* Add Changes to repository
+
+0.05 2013-11-27
+
+* Add export tag ':all'.
+
+0.04 2012-05-26
+
+* Add synopsis, description
+* Document bugs
+
+0.03 2012-05-26
+
+0.02 2012-05-02
+
+0.01 2012-05-02
+

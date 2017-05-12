@@ -1,0 +1,64 @@
+NAME
+    Catalyst::Authentication::Credential::TypeKey - TypeKey authentication
+    (in new Catalyst Authentication )
+
+VERSION
+    Version 0.004
+
+SYNOPSIS
+    Authenticate Catalyst apps with TypeKey system.
+
+    Uses the Catalyst::Plugin::Authentication system. In MyApp.pm
+
+      use Catalyst qw(
+        ...
+        Authentication
+        ...
+      );
+
+      __PACKAGE__->config(
+        'authentication' => {
+          typekey => {
+            credential => {
+                  class             => 'TypeKey',
+                  #Config below relies heavly on Authen::TypeKey
+                  key_cache         => '/var/cache/webapp/myapp/',
+                  version           => '1',
+                  skip_expiry_check => '1',
+                  key_url           => 'http://www.typekey.com/extras/regkeys.txt',
+            },
+            ...
+          },
+        },
+      );
+
+
+      In your controller
+
+      sub login : Local {
+        # body...
+         if ( $c->authenticate( { email => $c->req->param('email') }, 'typekey') ) {
+            # SUCCESS
+         } else {
+            # FAILED
+         }
+      }
+
+TODO
+METHODS
+SEE ALSO
+    Authen::TypeKey, Catalyst, Catalyst::Plugin::Authentication.
+
+AUTHOR
+    zdk ( Warachet Samtalee )
+
+    The idea was from
+    https://github.com/omega/catalyst-authentication-credential-typekey
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+
+  authenticate
+    Standard authentication method
+

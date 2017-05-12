@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Model-EVDB
+version:      0.08
+version_from: lib/Catalyst/Model/EVDB.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.5
+    Catalyst::Test:                0
+    Data::Dumper:                  0
+    EVDB::API:                     0
+    FindBin:                       0
+    NEXT:                          0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

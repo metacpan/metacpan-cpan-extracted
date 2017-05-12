@@ -1,0 +1,42 @@
+CGI/Shorten version 0.01
+========================
+
+NAME
+    CGI::Shorten - Creating your shortened links
+
+SYNOPSIS
+    This module may help you to build a personal shortening-link service.
+    Feeding the long, verbose, and tedious url, it can return you a
+    shortened one. And it can also print out redirection header in you CGI
+    script.
+
+USAGE
+      use CGI::Shorten;
+
+  new
+      $sh = new CGI::Shorten (
+                              db_prefix => ".shorten_",
+                              script_url => 'http://my.host/shorten.pl',
+                              );
+
+    You need to specify the prefix of databases to the constructor and may
+    specify the url of the script that does the shortening task. The
+    script's url defaults to 'http://127.0.0.1/shorten.pl'
+
+  Return the shortened url
+      print $sh->shorten($url);
+
+  return the original url
+      print $sh->lengthen($url);
+
+  return the CGI redirection header
+      print $sh->redirect($url);
+
+    If the redirected url does not exist, it will return 404 Not Found.
+
+COPYRIGHT
+    xern <xern@cpan.org>
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

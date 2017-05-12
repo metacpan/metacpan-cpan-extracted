@@ -1,0 +1,55 @@
+{
+   "abstract" : "minimal configuration access to PSGI/Plack session (EXPERIMENTAL)",
+   "author" : [
+      "Chisel <chisel@chizography.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Session-PSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session::State" : "0",
+            "Catalyst::Plugin::Session::Store" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-catalyst-plugin-session-psgi at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Session-PSGI"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/chiselwright/catalyst-plugin-session-psgi.git",
+         "web" : "https://github.com/chiselwright/catalyst-plugin-session-psgi"
+      }
+   },
+   "version" : "0.0.2"
+}
+

@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/CatalystX/Controller/Verifier.pm
+t/01use.t
+t/basic.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/live.t

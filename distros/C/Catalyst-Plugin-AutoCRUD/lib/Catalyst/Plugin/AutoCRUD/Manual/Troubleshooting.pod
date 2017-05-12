@@ -1,0 +1,66 @@
+=head1 NAME
+
+Catalyst::Plugin::AutoCRUD::Manual::Troubleshooting - Troubleshooting Advice
+
+=head1 Debug Trace
+
+It's possible to have the plugin dump several key data structures used when
+retrieving data or updating the data source. Set the environment variable
+C<AUTOCRUD_DEBUG> to a true value, when running your server.
+
+For example with the test server:
+
+ AUTOCRUD_DEBUG=1 ./server.pl
+
+Currently the L<DBIx::Class> backend will dump:
+
+=over 4
+
+=item *
+
+Search parameters used
+
+=item *
+
+All SQL statements executed (including transactions)
+
+=item *
+
+Data structure of results prepared for return in an AJAX bundle
+
+=back
+
+These can be very useful in working out why data is missing from the display
+(perhaps DBIx::Class is misconfigured and issueing the wrong SQL statements).
+
+=head1 Metadata Dump
+
+Within the AutoCRUD plugin exists a data structure representing all backend
+storage metadata required to render the frontend display. This includes
+database, table and column names, data types, default values, relations, and
+so on.
+
+Furthermore, this metadata comes in two parts: that introspected by the plugin
+itself, and also the user's own configuration directives (whether items or
+features are hidden, enabled, and so on).
+
+To dump this data for inspection, you must set an environment variable and
+then GET a specific URL path. The path requires the database and table name to
+be included, so for the example below we have C<mydb> and C<mytable> as the
+names. Run the server with the environment variable:
+
+ AUTOCRUD_DEBUG=1 ./server.pl
+
+And then retrieve this URL path:
+
+ .../autocrud/site/default/schema/mydb/source/mytable/dumpmeta_html
+
+Note that if you use the C<basepath> configuration then C<autocrud> will of
+course be something else (or not present). The response will be a web page
+with all the metadata known about your data sources.
+
+This is extremely useful when data is not being retrieved or displayed
+correctly, or your configuration directives are supposedly being ignored.
+Entries in the data structure should be self-explanatory.
+
+=cut

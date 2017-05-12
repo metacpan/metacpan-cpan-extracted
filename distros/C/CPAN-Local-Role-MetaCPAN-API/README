@@ -1,0 +1,62 @@
+NAME
+    CPAN::Local::Role::MetaCPAN::API - A role for plugins needing to access
+    or query MetaCPAN's API
+
+VERSION
+    This document describes version 0.001 of
+    CPAN::Local::Role::MetaCPAN::API - released April 15, 2013 as part of
+    CPAN-Local-Role-MetaCPAN-API.
+
+SYNOPSIS
+        # in your plugin
+        with 'CPAN::Local::Role::MetaCPAN::API';
+
+        # and later somewhere...
+        my $foo = $self->metacpan->...
+
+DESCRIPTION
+    This is a role for CPAN::Local plugins that want to access the MetaCPAN
+    API, by providing a "metacpan" attribute granting easy access to a
+    MetaCPAN::API instance.
+
+ATTRIBUTES
+  metacpan
+    This attribute contains a read-only, lazily constructed MetaCPAN::API
+    instance.
+
+METHODS
+  metacpan
+    Returns our MetaCPAN::API instance.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   MetaCPAN::API
+
+    *   CPAN::Local
+
+SOURCE
+    The development version is on github at
+    <http://github.com/WhitePointStarLLC/cpan-local-role-metacpan-api> and
+    may be cloned from
+    <git://github.com/WhitePointStarLLC/cpan-local-role-metacpan-api.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/WhitePointStarLLC/cpan-local-role-metacpan-api/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by White-Point Star, LLC
+    <http://whitepointstarllc.com>.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,27 @@
+#!/bin/csh
+
+# convert binary files to ascii, so they can be viewed or diffed
+
+set dosconvert = 0
+set macconvert = 0
+if ("q$1" == "q-m") then
+  set macconvert = 1
+  shift
+endif
+if ("q$1" == "q-d") then
+  set dosconvert = 1
+  shift
+endif
+
+while ($#argv > 0)
+  if ($dosconvert == 1) then
+    perl -pe's/\r\n/\n/gs;s/\r/\n/gs' "$1" | cat -v >! "$1.ascii"
+  else
+    if ($macconvert == 1) then
+      perl -pe's/\r/\n/gs' "$1" | cat -v >! "$1.ascii"
+    else
+      cat -v "$1" >! "$1.ascii"
+    endif
+  endif
+  shift
+end

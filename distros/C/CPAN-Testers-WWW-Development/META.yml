@@ -1,0 +1,51 @@
+--- #YAML:1.0
+name:                     CPAN-Testers-WWW-Development
+version:                  2.11
+abstract:                 The CPAN Testers Development website
+author:
+  - Barbie <barbie@cpan.org>  
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                             5.006
+  Config::IniFiles:                 0
+  File::Basename:                   0
+  File::Copy:                       0
+  File::Path:                       0
+  Getopt::ArgvFile:                 0
+  Getopt::Long:                     0
+  Number::Format:                   0
+  Template:                         0
+recommends:
+  Test::CPAN::Meta:                 0.18
+  Test::CPAN::Meta::JSON:           0.10
+  Test::More:                       0.70
+  Test::Pod:                        1.00
+  Test::Pod::Coverage:              0.08
+build_requires:
+  IO::File:                         0
+  Test::More:                       0.01
+
+provides:
+  CPAN::Testers::WWW::Development:
+    file:     lib/CPAN/Testers/WWW/Development.pm
+    version:  2.11
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  homepage:   http://devel.cpantesters.org
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Development
+  repository: http://github.com/barbie/cpan-testers-www-development.git
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

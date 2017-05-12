@@ -1,0 +1,14 @@
+Any.pm
+MANIFEST
+Makefile.PL
+t/01array.t
+t/02hash.t
+t/03scalar.t
+t/04tie.t
+t/05dtype.t
+t/06refcnt.t
+t/dclone.t
+t/dump.pl
+t/tied.pl
+benchmark.pl
+README

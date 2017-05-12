@@ -1,0 +1,8 @@
+Build.pl
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-Tag.t
+lib/Class/Tag.pm
+META.yml

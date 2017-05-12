@@ -1,0 +1,105 @@
+# -*- mode: pod; coding: utf-8; tab-width: 4; -*-
+
+=encoding utf8
+
+=head1 Name
+
+Cv::Pango::JA - Pango を使って様々な文字を描きます。
+
+=head1 SYNOPSIS
+
+ use Cv;
+ use Cv::Pango;
+ 
+ my $img = Cv::Mat->new([240, 320], CV_8UC4);
+ $img->putText(
+	"\x{03A0}\x{03B1}\x{03BD}\x{8A9E}", # "Παν語",
+	[20, 200], 'Sans Serif 42',
+	);
+ $img->showImage;
+ $img->waitKey;
+
+=head1 DESCRIPTION
+
+Cv::Pango は、日本語のような Cv では扱えない文字を Pango を使って描くた
+めのパッケージです。CV_8UC1, CV_8UC3, CV_8UC4 が扱えます。
+
+Cv::Arr::PutText() を上書きします。
+
+=head2 メソッド
+
+=over 4
+
+=item Cv::Arr::PutText()
+
+ $img->PutText($text, $org, $font, $color)
+
+$img は Cv::Arr のオブジェクトです。$font は Pango::FontDescription の
+オブジェクトかフォントを識別するための文字列を指定します。InitFont() で
+作成したフォントも使えます。PutText のその他のパラメータの詳細は
+OpenCV の cvPutText() を参照してください。
+
+フォントを識別するための文字列は次のとおり。
+
+ "[FAMILY-LIST] [STYLE-OPTIONS] [SIZE]"
+
+たとえば、
+
+ "sans bold 12"
+ "serif,monospace bold italic condensed 16"
+ "normal 10"
+
+詳細は pango.FontDescription() を参照してください。
+
+=item Cv::GetTextSize()
+
+ Cv->GetTextSize($text, $font, my $size, my $baseline);
+
+文字列を描画したとき、その文字列が含まれる矩形の大きさとベースラインを
+求めます。
+
+このメソッドは、Cv 0.25 以前は、Pango::FontDescription に置いていました。
+しかし、行儀が悪いので、Cv 0.26 で Cv に移しました。従って、0.25 以前は
+できた次の書き方では getTextSize() を呼ぶことができません。
+
+ my $font = Pango::FontDescription->from_string('Sans Serif 12'),
+ $font->getTextSIze($text, my $size, my $baseline);  # 呼べない
+
+=back
+
+=head2 エクスポート
+
+ありません。
+
+=head2 バグ
+
+=over
+
+=item *
+
+CV_8UC1、CV_8UC3、CV_8UC4 以外の形式は扱えません。
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Cv>
+
+=item L<http://opencv.willowgarage.com/>
+
+=item L<http://github.com/obuk/Cv-Olive>
+
+=back
+
+=head1 LICENCE
+
+Yuta MASUDA E<lt>yuta.masuda@newdaysys.co.jpE<gt>
+
+Copyright (c) 2013 by Yuta MASUDA.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

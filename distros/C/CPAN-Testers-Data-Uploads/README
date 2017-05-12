@@ -1,0 +1,66 @@
+CPAN-Testers-Data-Uploads
+=========================
+
+This distribution is the CPAN Testers Uploads Database Generator.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Class::Accessor::Fast
+  CPAN::DistnameInfo
+  CPAN::Testers::Common::Article
+  CPAN::Testers::Common::DBUtils
+  Config::IniFiles
+  DBI
+  DBD::mysql
+  DBD::SQLite
+  File::Basename
+  File::Find::Rule
+  File::Path
+  File::Slurp
+  Getopt::Long
+  IO::AtomicFile
+  IO::File
+  Net::NNTP
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm shell or CPANPLUS shell as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Uploads
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions http://www.missbarbell.co.uk.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2008-2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

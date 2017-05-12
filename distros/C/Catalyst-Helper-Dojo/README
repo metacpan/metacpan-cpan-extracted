@@ -1,0 +1,41 @@
+NAME
+    Catalyst::Helper::Dojo - Helper to generate Dojo JavaScript / AJAX
+    library
+
+SYNOPSIS
+        script/myapp_create.pl Dojo edition
+        # where "edition" is the edition name you want to install
+
+    See HTML::Dojo for a list of available editions.
+
+DESCRIPTION
+    Helper to generate Dojo JavaScript / AJAX library.
+
+  METHODS
+    mk_stuff
+        Create javascript files for Dojo in your application's
+        "root/static/dojo" directory.
+
+SUPPORT
+    IRC:
+
+        Join #catalyst on irc.perl.org.
+
+    Mailing Lists:
+
+        http://lists.rawmode.org/mailman/listinfo/catalyst
+
+    For Dojo-specific support, see <http://dojotoolkit.org>.
+
+SEE ALSO
+    HTML::Dojo, Catalyst::Helper
+
+    <http://dojotoolkit.org>
+
+AUTHOR
+    Carl Franks, "cfranks@cpan.org"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

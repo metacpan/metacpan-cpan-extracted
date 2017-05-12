@@ -1,0 +1,8 @@
+header:
+package Example;
+	use strict;
+	
+variables:
+	$var
+	%wages
+	@monthly

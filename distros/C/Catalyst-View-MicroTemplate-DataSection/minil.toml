@@ -1,0 +1,6 @@
+name = "Catalyst-View-MicroTemplate-DataSection"
+# badges = ["travis"]
+authority="cpan:MASAKYST"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd21
+registers:
+  AF: 51509
+  AF_: 0
+  BC: 17235
+  BC_: 0
+  DE: 48418
+  DE_: 0
+  HL: 38101
+  HL_: 0
+  I: 0
+  IX: 31986
+  IY: 43734
+  PC: 4
+  R: 2
+  SP: 0

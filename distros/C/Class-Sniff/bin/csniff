@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Class::Sniff::App;
+my $app = Class::Sniff::App->new(@ARGV);
+$app->run;
+
+__END__
+
+=head1 NAME
+
+csniff - Command line interface to C<Class::Sniff> graphs.
+
+=head1 USAGE
+
+ csniff [options] dir(s)
+
+=head1 OPTIONS
+
+Boolean options:
+
+ -v,  --verbose     Print what classes are being loaded
+ -p,  --png         Output as png (requires 'dot' executable)
+ -g,  --gif         Output as gif (requires 'dot' executable)
+ -t,  --text        Output as text (large graphs may not render well)
+
+Options that take arguments:
+
+ -n,  --namespace   Perl regex to match desired namespaces
+ -i,  --ignore      Perl regex to exclude namespaces
+ -I,                Use this path with "use lib". Can be set multiple
+                    times for more than one path.
+ -o   --output      Graph format as understood by 'dot' (eg. svg, dia)
+
+=head1 DESCRIPTION
+
+Given one or more directories, attempts to render a C<Class::Sniff>
+graph for all modules found in them.  This may be very slow.  Be
+patient.  Output is sent to STDOUT, so redirect it where you will.
+
+If no C<namespace> argument is passed, it will attempt to graph every
+namespace.  Because some of the modules C<Class::Sniff> must load are fairly
+heavyweight, you will get plenty of modules showing up in the graph which you
+didn't expect.  And it will be slow.  Did I mention that already?
+
+=head1 EXAMPLES
+
+=head2 Graph your C<DBIx::Class> resultset objects
+
+You have a bunch of C<DBIx::Class> resultset objects, but you don't want to
+see the C<DBIx::Class> hierarchy.
+
+As text graph:
+
+ csniff --namespace '^My::ResultSet' --ignore '^DBIx' \
+    lib/My/ResultSet > rs.txt
+
+As text graph with short options:
+
+ csniff -n '^My::Resultset' -i '^DBIx' lib/My/ResultSet > rx.txt
+
+As PNG:
+
+ csniff -n '^My::Resultset' -i '^DBIx' --png lib/My/ResultSet > rx.png
+
+As Gif:
+
+ csniff -n '^My::Resultset' -i '^DBIx' --gif lib/My/ResultSet > rx.gif
+
+Note that the C<--gif> and C<--png> options require that you have the
+C<dot> executable installed and in your C<PATH>.  C<dot> is part of the
+GraphViz package (L<http://www.graphviz.org/>).
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe, C<< <ovid at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-class-sniff at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Sniff>.  I will be
+notified, and then you'll automatically be notified of progress on your bug as
+I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Class::Sniff
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Sniff>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Class-Sniff>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Class-Sniff>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Class-Sniff/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Curtis "Ovid" Poe, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

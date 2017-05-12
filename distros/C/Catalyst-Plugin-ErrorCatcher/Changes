@@ -1,0 +1,140 @@
+This file documents the revision history for Catalyst::Plugin::ErrorCatcher
+
+0.0.8.18  2015-05-28 12:00:58+00:00 UTC
+ - (author) auto-commit local changes to updated Changes file
+   Changes file is modified as part of the dzil release process
+
+0.0.8.17  2015-05-28 11:54:52+00:00 UTC
+ - (author) auto-commit local changes to generated file README.mkdn
+ - (author) reintroduce Git::Tag plugin behaviour
+
+0.0.8.16  2015-05-28 11:44:21+00:00 UTC
+ - Disable the tests that are failing with recent versions of Catalyst
+   PR #4 from timbunce; relates to issue #3
+ - (author) update dist.ini to use Test::NoTabs
+ - (author) add POD to naked subroutines to appease t/release-pod-coverage.t
+ - (author) allow README.mkdn to be 'dirty' at release time
+
+0.0.8.15  2013-11-29 11:12:35 UTC
+ - update tests to not actually use MIME::Lite::send
+   we don't really need to send messages in the tests, just behave as if we did
+
+0.0.8.14  2013-11-25 15:43:23 UTC
+ - make path in test Win32 friendly
+   http://www.cpantesters.org/cpan/report/47340104-6c16-1014-af5d-8b4ea133ff58
+ - Update bugtracker to point to github
+
+0.0.8.13  2012-12-10 23:32:27 Europe/London
+ - Add cleanup for unique constraint violation (Pg)
+
+0.0.8.12  2012-03-08 23:41:37 UTC
+  - Extend version affected by RT#75607
+
+0.0.8.11  2012-03-08 21:50:09 UTC
+  - Replace GET/POST with QUERY/BODY
+  - Replace deprecated KwaliteeTests plugin
+  - resolve issues with CRLF line-endings
+  - Skip tests affected by RT#75607
+
+0.0.8.10  2011-12-02 22:57:59 Europe/London
+  - RT#72781: emit referer and GET/POST parameter data
+    - Better output with long values in parameters
+  - Error Cleanup: foreign key constraint violation (Pg)
+  - Error Cleanup: transaction aborted (Pg)
+  - (author) update dzil config with current preferred preferences
+  - (author) Copy README.mkdn to root on a 'dzil build'
+  - (author) add missing 'ABSTRACT' comments for dzil/PodWeaver
+
+0.0.8.9   2011-07-18 17:26:58 Europe/London
+  - drop Class::Data::Accessor in favour of Catalyst::ClassData
+
+0.0.8.8   2011-04-05 14:16:35 Europe/London
+  - add user_identified_by option for identifying users in reports
+  - better email tag handling with no stack frame info
+
+0.0.8.7   2011-01-24 21:36:49 Europe/London
+  - use plugins for tidying messages
+  - add more cleanup regexps
+
+0.0.8.6   2011-01-20 18:47:55 Europe/London
+  - RT#60483: specify minimum versions for plugins
+     to force the earliest MRO::Compat version
+  - RT#64492: add 'include_session' option and accompanying output
+
+0.0.8.5   2011-01-04 22:56:54 Europe/London
+  - Make file/path munging behave more sensibly
+  - add lives_ok() tests
+
+0.0.8.4   2010-12-29 22:46:10 EST5EDT
+  - RT#64278: Hopefully the final missing dependency
+
+0.0.8.3   2010-12-29 16:34:25 EST5EDT
+  - RT#64278: manually specify dependencies used by tests
+
+0.0.8.2   2010-12-23 15:24:00 EST5EDT
+  - RT#64128: generate deps with dzil's AutoPrereq plugin
+
+0.0.8.1   2010-12-16 00:55:33 Europe/London
+  - RT#63957: remove dependency on earlier version of ourself
+
+0.0.8     2010-12-14 23:11:29 Europe/London
+  - convert to Dist::Zilla
+
+0.0.7   Fri Feb 12 16:14:48 GMT 2010
+    - call new() on requested emitters, if the method exists
+    - store object from new() and use in the emit phase
+
+0.0.6.5	Sun Jan 31 17:13:22 GMT 2010
+    - RT#54071: fails if C:P:Authentication is not loaded
+      apply patch and add NoAuth based tests under t/bug/
+
+0.0.6.4 Mon Sep 28 10:02:32 BST 2009
+    - extend ::Email emitter to allow tag placeholders in subject line
+
+0.0.6.3 Fri Sep 11 11:21:03 BST 2009
+    - POD fix (enabled --> enable)
+    - RT#49550: POD fix (copy-and-paste whoopsie)
+    - RT#49552: ->user added to report (if exists)
+    - RT#49590: ->request only added if exists (for ::Stomp)
+
+0.0.6.2 Wed Jul 22 19:17:15 BST 2009
+    - add Cc: option to email emitter
+
+0.0.6.1 Mon Jun 29 14:15:08 BST 2009
+    - fix hostname in email emitter subject line
+
+0.0.6
+    - make sure we do nothing if "enabled" is explicitly set to 0
+    - add some extra output if we have a non-zero "verbose" value
+    - added ::File emitter
+
+0.0.5   Tue May 26 18:55:03 BST 2009
+    - "cleanup" DBIx::Class::Schema::txn_do() format messages
+    - add hostname to default email subject line
+
+0.0.4   Thu May 21 08:58:22 BST 2009
+    - remove UNIVERSAL::can module usage
+      (still calling can() 'correctly')
+    - added "always_log" config option
+    - added missing build dependency
+
+0.0.3   Mon May 11 21:18:55 BST 2009
+    - fix plugin setup() to work properly
+    - added tests
+
+0.0.2.2 Mon May 11 14:05:11 BST 2009
+    - specified minimum version of Catalyst::Runtime
+      (for ctx_request() test method)
+
+0.0.2.1 Sat May  9 19:31:11 BST 2009
+    - added missing build dependencies
+    - added version number to Email emitter
+
+0.0.2   Fri May  8 21:22:09 BST 2009
+    - added Email emitter
+    - store config options in an accessor
+    - specify version of inc::Module::Install
+    - added some basic tests
+
+0.0.1   Thu May  7 23:13:09 BST 2009
+    - Initial module release

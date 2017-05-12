@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+
+=pod
+
+=head1 NAME
+
+cpanmetrics - Generation of CPAN metrics using some default settings
+
+=head1 SYNOPSIS
+
+  > cpanmetrics
+  (various output for several hours)
+
+=head1 DESCRIPTION
+
+C<cpanmetrics> is the script version of the L<CPAN::Metrics> module,
+downloading a L<minicpan> mirror, expanding out the default set of Perl
+files from the archives, and processing the metrics data for all
+installed L<Perl::Metrics> plugins.
+
+=head2 Settings Used
+
+The minicpan mirror will be checked out underneath a C<.minicpan>
+directory, created in your home directory.
+
+The archives will be extracted underneath a C<.cpanmetrics> directory,
+create in your home directory, with the root directory for each
+archive located at the same name as the relevant archive in the
+C<.minicpan> directory.
+
+And finally, the metrics SQLite database will be created at
+C<.cpanmetrics/metrics.sqlite>.
+
+=cut
+
+use 5.005;
+use strict;
+use File::Spec    ();
+use File::HomeDir ();
+use Getopt::Long  ();
+use CPAN::Mini    ();
+use CPAN::Metrics ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.08';
+}
+
+
+
+
+
+#####################################################################
+# Check the directories
+
+# Get some command line flags
+my $QUIET         = 0;
+my $EXTRACT_FORCE = 0;
+my $PROCESS_INDEX = 0;
+Getopt::Long::GetOptions(
+	help    => sub { help()    },
+	version => sub { version() },
+	force   => \$EXTRACT_FORCE,
+	process => \$PROCESS_INDEX,
+	quiet   => \$QUIET,
+);
+
+#my $extracted = File::Spec->catdir(
+#	File::HomeDir->my_data, 'Perl', 'CPAN-Metrics',
+#);
+#my $metrics  = File::Spec->catfile(
+#	File::HomeDir->my_documents, 'metrics.sqlite',
+#);
+my $extracted = "C:\\CPAN-Metrics";
+my $metrics   = "C:\\metrics.sqlite";
+
+
+
+
+
+#####################################################################
+# Create and execute the CPAN::Metrics object
+
+# Get the user's minicpan configuration
+my %config = CPAN::Mini->read_config;
+
+message("Creating CPAN::Metrics object...\n");
+my $metrics = CPAN::Metrics->new(
+	%config,
+	trace         => ! $QUIET,
+	extract       => $extracted,
+	metrics       => $metrics,
+	extract_force => $EXTRACT_FORCE,
+);
+
+message("Launching CPAN::Metrics process...\n");
+if ( $PROCESS_INDEX ) {
+	$metrics->process_index;
+} else {
+	$metrics->run;
+}
+
+exit(0);
+
+sub message {
+	return if $QUIET;
+	print $_[0];
+}
+
+sub version {
+	print "cpanmetrics $VERSION\n";
+	exit(0);
+}
+
+sub help {
+	print <<"END_HELP";
+This is cpanmetrics $VERSION, the CPAN::Metrics command line launcher
+
+Usage:
+  cpanmetrics [OPTIONS]
+
+Options:
+  --quiet         run quietly, with all tracing disabled
+  --help          show this help, then exit
+  --version       output version information, then exit
+END_HELP
+	exit(0);
+}

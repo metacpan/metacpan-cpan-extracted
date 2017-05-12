@@ -1,0 +1,23 @@
+Revision history for Catalyst-View-GD-Thumbnail
+
+0.14    27 January  2016 - 14:04
+    Spacing changes
+    POD update (moltar++)
+
+0.13    24 November 2012 - 13:58
+    Fixed prereq for Catalyst::View
+
+0.12    18 November 2012 - 20:33
+    Switched to MakeMaker
+
+0.10    26 October 2012 - 23:00
+    Corrected encoding problem with PODs causing test failures
+
+0.09    01 April 2010 - 01:35
+    Corrected typos in documents
+    Fixed pods
+    Cleaned up some code
+
+0.01    15 March 2010 - 15:00
+    Initial public release
+

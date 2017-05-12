@@ -1,0 +1,72 @@
+Prima-CodeManager version 0.03
+==============================
+
+CodeManager is an application in the form of a Perl modules.
+The aim of CodeManager is to manage projects with many types source code
+files (including exotic or totally independent ones) which are spread over
+independent directories.
+
+CodeManager focuses on easy:
+
+-- managing of directories & files structures,
+-- preparing code source highlitning patterns
+-- writing templates of creating new objects (sub-directories and files)
+
+CodeManager uses excelent Prima libraries and therefore works identically
+in those systems which have Prima installed (tested Linux and Windows).
+
+It can efectively manage quite large files. It was used for edition
+sql dump files of size over 200MB with over 470 000 lines.
+
+SYNOPSIS
+
+The working application can be written very simple:
+
+	#!/usr/bin/perl -w
+
+	use strict;
+	use warnings;
+
+	use Prima::CodeManager::CodeManager;
+
+	our $project = Prima::CodeManager-> new();
+	$project-> open( 'CodeManager.cm' );
+	$project-> loop;
+
+	__END__
+
+INSTALLATION
+
+CodeManager is a pure Perl module and can
+be used after including its path into
+Perl @INC paths array.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Run CodeManager with the command:
+
+	perl CodeManager.pl
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Prima 1.29
+File::Path 2.07
+File::Copy 2.14
+File::Copy::Recursive 0.38
+File::HomeDir 0.86
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2013 by Waldemar Biernacki (wb@sao.pl).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

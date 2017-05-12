@@ -1,0 +1,61 @@
+Revision history for Catalyst::Plugin::Authorization::ACL
+
+0.16 2014-05-15 03:16:39
+    - fix a spelling error and copyright statement (Jonathan Yu) (RT#95566)
+    - convert to git
+    - convert to dzil
+
+0.15  2009-10-18 05:56:51
+        - apply fix from RT#50604 (filter undef actions when building tree)
+
+0.14  2009-09-30 22:20:41
+        - add 'deny_access_unless_any' and 'allow_access_if_any' as shortcuts
+        for any role in a list
+        - fix 'uninitialized' warning in tests
+
+0.13  2009-09-26 03:34:16
+        - fix use of $dispatcher->tree warning
+        - fix actions in testapp warning
+
+0.12  2009-09-25 09:35:51
+        - workaround for a test failure on some configurations of Strawberry
+        Perl
+        - add test_requires for things the tests depend on
+
+0.11  2009-04-21
+        - switch from NEXT to MRO::Compat
+
+0.10  2008-10-13
+        - fix access_denied action support
+
+0.09  2008-08-22
+        - fix the overwriting of $c->req->args for access_denied handlers
+
+0.08  2006-07-21 20:01:00
+        - protect ACL::Engine from custom $SIG{__DIE__} handlers
+
+0.07  2006-07-05 23:15:27
+        - support for ACL setup in app config
+        - bug fix for private access_denied action
+
+0.06  2005-12-25 20:37:00
+        - Added forcibly_allow_access, proper denial handling
+        - allow for constant conditions
+        - i think there was something else
+
+0.05  2005-12-25 20:37:00
+        - Forgot to changelog this release ;-)
+
+0.04  2005-12-08 10:15:00
+        - Fix a bug with ACLs on "/"
+
+0.03  2005-12-04 22:07:00
+        - Maybe some tiny doc fixes
+        - No longer relies on Test::Plan which had some trouble with windows
+          and was used incorrectly anyhow ;-)
+
+0.02  ???
+        - can't recall, may have been drunk
+
+0.01  ???
+        - Initial release.

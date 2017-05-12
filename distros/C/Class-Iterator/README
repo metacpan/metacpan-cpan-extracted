@@ -1,0 +1,43 @@
+NAME
+    Class::Iterator - Iterator class
+
+SYNOPSIS
+      use Class::Iterator;
+      my $it = Class::Iterator->new(\&closure_generator);
+
+      while (my $v = $it->next) { print "value : $v\n" }
+  
+      # use map like
+      my $it2 = imap { ...some code with $_...} $it
+      while (my $v = $it->next) { print "value : $v\n" }
+
+      # use grep like
+      my $it3 = imap { ...some code with $_...} $it
+      while (my $v = $it->next) { print "value : $v\n" }
+
+DESCRIPTION
+    Class::Iterator is a generic iterator object class. It use a closure an
+    wrap into an object interface.
+
+    new(\&closure_generator)
+        This is the constructor. The argument is a sub which look like sub
+        closure_generator { my $private_data; return sub { # do something
+        with $private_data # and return it return $private_data } }
+
+    next
+        calling this method make one iteration.
+
+    $o = imap { ... } $it
+        This a creator. It create a new iterator from an existant iterator
+        in the manner of map.
+
+    $o = igrep { ... } $it
+        This a creator. It create a new iterator from an existant iterator
+        in the manner of grep.
+
+CREDITS
+    Marc Jason Dominius's YAPC::EU 2003 classes.
+
+AUTHOR
+    Robert Silve <robert@silve.net>
+

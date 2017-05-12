@@ -1,0 +1,6 @@
+=head1 CHANGES (CPAN::DistroBuilder)
+
+=head1 v0.01 Thu Mar 14 15:11:38 SGT 2002
+
+* version basic version of the CPAN::DistroBuilder
+

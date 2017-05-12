@@ -1,0 +1,13 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+Scalar.pm
+Scalar.xs
+t/00_load.t
+t/01_utf8.t
+t/02_call.t
+t/03_refcnt.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

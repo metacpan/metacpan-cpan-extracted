@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<form>
+  <elements type="Text">
+          <label>Label1</label>
+  </elements>
+  <elements type="Text">
+          <label>Label2</label>
+  </elements>
+  <indicator>submit</indicator>
+</form>

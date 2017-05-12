@@ -1,0 +1,35 @@
+Revision history for Catmandu-Stat
+
+0.13  2016-07-15 09:28:03 CEST
+  - fixing backwards compatibility in the tests
+
+0.12  2016-07-01 10:05:04 CEST
+  - updating pod with new functionality
+
+0.11  2016-07-01 09:58:31 CEST
+  - adding total number of records count
+  - adding overflow indicator
+
+0.10  2016-06-30 07:42:51 CEST
+  - calculating statistics without keepin all data in memory
+  - adding more tests
+  - deleting mode count
+  - making uniq% and entropic calculations estimated and thereby
+    needing much less memory
+  - new topk, hll options to tune the estimate count
+
+0.04  2015-11-02 14:57:56 CET
+  - fixing locales in the tests
+
+0.03  2015-06-18 10:03:08 CEST
+  - adding entropy statistic
+  - adding uniq count
+  - adding default table layout
+  - adding default keys support
+  - adding examples
+
+0.02  2015-05-18 09:35:35 CEST
+  - updating dependencies
+
+0.01  2015-05-13 14:49:28 CEST
+  - initial release

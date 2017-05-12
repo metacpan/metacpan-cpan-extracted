@@ -1,0 +1,13 @@
+---
+abstract: apply roles to your Catalyst application-related classes
+author:
+- Hans Dieter Pearcey <hdp@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.091200
+license: perl
+name: CatalystX-RoleApplicator
+requires:
+  Catalyst::Runtime: '5.7'
+  Class::MOP: '0.80'
+  Moose: '0.73'
+  MooseX::RelatedClassRoles: '0.003'
+version: '0.005'

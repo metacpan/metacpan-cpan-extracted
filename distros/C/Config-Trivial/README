@@ -1,0 +1,40 @@
+$Id: README,v 1.7 2007-05-28 17:11:28 adam Exp $
+
+Config::Trivial Version 0.81
+============================
+
+This is "Yet Another" simple module to read (and write)
+trivial configuration files. The files are very simple,
+simply consisting of key values pairs separated by the
+first space.
+
+ALSO SEE
+
+There are LOTS of other configuration reading and writing
+modules on CPAN, please check them all carefully before
+installing this one.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+or
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires only core modules:
+    Perl 5.10
+    strict
+    warnings
+    Carp
+
+The tests will use non-core modules if available
+but these are not required for normal use.

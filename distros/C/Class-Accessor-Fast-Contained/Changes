@@ -1,0 +1,8 @@
+1.01  Sat Nov 08 15:41:00 GMT 2008
+    - Move to Module::Install
+    - Add examples
+0.05  Tue Sep 19 12:19:00 BST 2006
+    - handle GLOB and HASH based objects
+    - setup() is alias for new()
+0.01  Mon Sep 18 12:19:00 BST 2006
+    - Initial Version

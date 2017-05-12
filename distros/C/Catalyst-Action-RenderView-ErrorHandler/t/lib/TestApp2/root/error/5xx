@@ -1,0 +1,4 @@
+5xx error happened
+[% FOREACH err IN c.error %]
+* [% err %]
+[% END %]

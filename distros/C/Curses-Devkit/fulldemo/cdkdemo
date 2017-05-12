@@ -1,0 +1,1143 @@
+#!../../../perl
+
+#
+# Purpose:
+#	This script demonstrates the Cdk widget set and how you can use them.
+#
+
+#
+# Use the Cdk module.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the label rows.
+my @titleMessage = ("<C></5>This is a CDK demo script<!5>",
+			"<C></5>It will demonstrate all of the<!5>",
+			"<C></5>widgets available with the<!5>",
+			"<C></5/U>Cdk Perl 5 extension.<!5>");
+
+# Create the title.
+my $title = new Cdk::Label ('Message' => \@titleMessage, 'Box'  => "FALSE");
+
+# Set some global vars
+my $CONTINUE	= "</B/48>Press Any Key To Continue.<!B!48>";
+my $HOME	= $ENV{'HOME'};
+
+# Create the menu.
+my $currentLoc	= 0;
+my @mLoc	= ("Switch to Pull-Up Menu  ", "Switch to Pull-Down Menu");
+my @fMenu	= ("</5>File<!5>", "</5>Quit<!5>");
+
+my @iMenu	= ("</5>Info<!5>",
+			"</5>Calendar        <!5>",
+			"</5>Date            <!5>",
+			"</5>Label           <!5>",
+			"</5>Scrolling Window<!5>",
+			"</5>Viewer          <!5>");
+
+my @eMenu	= ("</5>Entry<!5>",
+			"</5>Entry Field              <!5>",
+			"</5>Item List                <!5>",
+			"</5>Matrix                   <!5>",
+			"</5>Multiple Line Entry Field<!5>",
+			"</5>Scale                    <!5>",
+			"</5>Slider                   <!5>",
+			"</5>Template                 <!5>");
+
+my @lMenu	= ("</5>Lists<!5>",
+			"</5>Alpha List    <!5>",
+			"</5>Dialog        <!5>",
+			"</5>Radio List    <!5>",
+			"</5>Scrolling List<!5>",
+			"</5>Selection List<!5>");
+
+my @mMenu	= ("</5>Misc<!5>",
+			"</5>Histogram               <!5>",
+			"</5>Graph                   <!5>",
+			"</5>Marquee                 <!5>",
+			"</5>Menu                    <!5>",
+			"</5>$mLoc[$currentLoc]");
+
+my @hMenu	= ("</5>Help<!5>",
+			"</5>General Help<!5>",
+			"</5>Widget Help <!5>",
+			"</5>About...    <!5>");
+
+# Create the pulldown menu menu lists.
+my @menulist = (\@fMenu, \@iMenu, \@eMenu, \@lMenu, \@mMenu, \@hMenu);
+
+# Set the location of the menus
+my @menuloc = ("LEFT", "LEFT", "LEFT", "LEFT", "LEFT", "RIGHT");
+
+# Create the menu
+my $menu = new Cdk::Menu ('Menulist' => \@menulist, 'Menuloc' => \@menuloc);
+
+# Create the callback for the menu.
+$menu->bind ('Key' => '?', 'Function' => sub { main::menuCallback($menu); });
+
+# Create the scrolling window.
+my $swindow = new Cdk::Swindow ('Title' => "<C></U>Menu Selection History<!U>",
+				'Lines' => 200,
+				'Height' => 6,
+				'Width' => 60,
+				'Ypos' => "BOTTOM");
+my $menuItemCount = 0;
+
+# Let the user play.
+for (;;)
+{
+   # Redraw the screen.
+   Cdk::refreshCdkScreen();
+
+   # Get the selection.
+   my ($submenu, $submenuItem) = $menu->activate();
+   my $menuSelection = $menulist[$submenu]->[$submenuItem];
+
+   # I'm going to use the name, instead of the numeric value to
+   # determine what was picked. But either way is acceptable.
+   if ($menuSelection =~ "Label")
+   {
+      my @mesg	= ("<C></B/32>You just selected the Cdk label widget<!B!32>",
+			"<C></B/32>demo. The labels have many personalities<!B!32>",
+			"<C></B/32>To discover them all, use the help option<!B!32>",
+			"<C></B/32>and pick the Label item.<!B!32>", "",
+			"<C>$CONTINUE");
+      labelDemo (@mesg);
+   }
+   elsif ($menuSelection =~ "Calendar")
+   {
+      itemlistDemo();
+   }
+   elsif ($menuSelection =~ "Date")
+   {
+      my $date	= qx (date); chomp $date;
+      my @mesg	= ("<C>The current time is:", "",
+			"<C></B/24>$date<!B!24>", "",
+			"<C>$CONTINUE");
+      labelDemo (@mesg);
+   }
+   elsif ($menuSelection =~ "Scrolling Window")
+   {
+      # Put a message inside the scrolling window.
+      $swindow->addline ('Info' => "<C></R>This is the scrolling window.<!R> It's purpose");
+      $swindow->addline ('Info' => "<C>is to act as an information window. It also");
+      $swindow->addline ('Info' => "<C>has the ability to display </15>colors<!15>");
+      $swindow->addline ('Info' => "<C>and </B>attributes<!B>.");
+      $swindow->addline ('Info' => "<C>Hit return, tab, or escape to exit this window.");
+      $swindow->activate();
+   }
+   elsif ($menuSelection =~ "Viewer")
+   {
+      viewerDemo();
+   }
+   elsif ($menuSelection =~ "Multiple Line Entry Field")
+   {
+      mentryDemo();
+   }
+   elsif ($menuSelection =~ "Entry Field")
+   {
+      entryDemo();
+   }
+   elsif ($menuSelection =~ "Item List")
+   {
+      itemlistDemo();
+   }
+   elsif ($menuSelection =~ "Template")
+   {
+      templateDemo();
+   }
+   elsif ($menuSelection =~ "Matrix")
+   {
+      matrixDemo();
+   }
+   elsif ($menuSelection =~ "$mLoc[$currentLoc]")
+   {
+      # We are going to switch the menu type.
+      if ($currentLoc == 0)
+      {
+         # Pull-Down to Pull-Up
+         $currentLoc = 1;
+         @mMenu = ("</5>Misc<!5>",
+			"</5>Histogram               <!5>",
+			"</5>Graph                   <!5>",
+			"</5>Marquee                 <!5>",
+			"</5>Menu                    <!5>",
+			"</5>$mLoc[$currentLoc]");
+         @menulist = (\@fMenu, \@iMenu, \@eMenu, \@lMenu, \@mMenu, \@hMenu);
+         undef $menu;
+         $menu = new Cdk::Menu ('Menulist' => \@menulist,
+				'Menuloc' => \@menuloc,
+				'Tattrib' => $highlight,
+				'Menupos' => "BOTTOM",
+				'SubTattrib' => $highlight);
+      }
+      elsif ($currentLoc == 1)
+      {
+         # Pull-Up to Pull-Down
+         $currentLoc = 0;
+         @mMenu = ("</5>Misc<!5>",
+			"</5>Histogram               <!5>",
+			"</5>Graph                   <!5>",
+			"</5>Marquee                 <!5>",
+			"</5>Menu                    <!5>",
+			"</5>$mLoc[$currentLoc]");
+         @menulist = (\@fMenu, \@iMenu, \@eMenu, \@lMenu, \@mMenu, \@hMenu);
+         undef $menu;
+         $menu = new Cdk::Menu ('Menulist' => \@menulist,
+				'Menuloc' => \@menuloc,
+				'Tattrib' => $highlight,
+				'Menupos' => "TOP",
+				'SubTattrib' => $highlight);
+      }
+   }
+   elsif ($menuSelection =~ "Menu")
+   {
+      # Pop up a message stating what we got.
+      my @mesg	= ("<C>The Cdk Menu widget is what",
+			"is driving this application.", "",
+			"<C>$CONTINUE");
+      labelDemo (@mesg);
+   }
+   elsif ($menuSelection =~ "Dialog")
+   {
+      dialogDemo();
+   }
+   elsif ($menuSelection =~ "Scrolling List")
+   {
+      scrollDemo();
+   }
+   elsif ($menuSelection =~ "Selection List")
+   {
+      selectionDemo();
+   }
+   elsif ($menuSelection =~ "Radio List")
+   {
+      radioDemo();
+   }
+   elsif ($menuSelection =~ "Histogram")
+   {
+      histogramDemo();
+   }
+   elsif ($menuSelection =~ "Graph")
+   {
+      graphDemo();
+   }
+   elsif ($menuSelection =~ "Scale")
+   {
+      scaleDemo();
+   }
+   elsif ($menuSelection =~ "Slider")
+   {
+      sliderDemo();
+   }
+   elsif ($menuSelection =~ "Marquee")
+   {
+      marqueeDemo();
+   }
+   elsif ($menuSelection =~ "Alpha List")
+   {
+      alphalistDemo();
+   }
+   elsif ($menuSelection =~ "General Help")
+   {
+      generalHelp();
+   }
+   elsif ($menuSelection =~ "Widget Help")
+   {
+      widgetHelp();
+   }
+   elsif ($menuSelection =~ "About...")
+   {
+      # Pop up a message about this script.
+      my @mesg	= ("<C></U/40>Cdk Perl 5 Extension<!U!40>",
+			"<C></32>Written by Mike Glover<!32>", "",
+			"</16>Created     : December, 1995<!16>", 
+			"</16>Last Updated: April, 1997<!16>", "",
+			$CONTINUE);
+      my $label	= new Cdk::Label ('Message' => \@mesg, 'Shadow' => "TRUE");
+      $label->draw();
+      $label->wait();
+   }
+   elsif ($menuSelection =~ "Quit")
+   {
+      # Add a message to the scrolling window.
+      $swindow->addline ('Info' => "<C>Goodbye...");
+      sleep 2;
+
+      # Exit.
+      Cdk::end();
+      exit (1);
+   }
+
+   # Add the chosen item to the scrolling window.
+   my $item = $menulist[$submenu]->[0] . "->" . $menuSelection;
+   $swindow->addline ('Info' => "$menuItemCount : $item");
+   $menuItemCount++;
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk label widget.
+# 
+sub labelDemo
+{
+   my @mesg = @_;
+
+   # Create the label.
+   my $label = new Cdk::Label ('Message' => \@mesg);
+
+   # Draw the label and wait.
+   $label->draw();
+   $label->wait();
+}
+
+##############################################################################
+#
+# This demostrates the Cdk viewer widget.
+#
+sub viewerDemo
+{
+   # Use the file selector widget to get a filename.
+   my $fselect	= new Cdk::Fselect ('Label' => "Filename:",
+					'Height' => 20,
+					'Width' => 50,
+					'Dattrib' => "</16/B>",
+					'Lattrib' => "</39>",
+					'Fattrib' => "</40>");
+   my $fname	= $fselect->activate ();
+
+   # Check if the person hit escape.
+   if (!defined $fname)
+   {
+      return;
+   }
+
+   # Popup a file viewer.
+   my $viewer	= new Cdk::Viewer ('Buttons' => ["OK"],
+					'Height' => 0,
+					'Width' => -2);
+
+   # Load in the file.
+   my @info	= qx (cat $fname); chomp (@info);
+
+   # Set the contents of the viewer.
+   $viewer->set ('Info' => \@info,
+			'Interpret'  => "TRUE",
+			'Title' => "<R></29>Viewing filename:<!29></38>$fname<!38>");
+
+   # Activate the viewer.
+   $viewer->activate();
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk entry widget.
+#
+sub entryDemo
+{
+   my $continue;
+
+   my $entry = new Cdk::Entry ('Label' => "</B/56>Enter a new pause prompt: ",
+					'Max' => 125,
+					'Width' => 30);
+   $continue = $entry->activate ();
+
+   # Check if they hit escape.
+   if (! defined $continue)
+   {
+      popupLabel (["<C></U>Escape Hit",
+			"<C>Pause prompt not changed.", "",
+			"<C>$CONTINUE"]);
+      return;
+   }
+
+   # Pop up a message stating what we got.
+   $CONTINUE = $continue;
+   my @mesg = ("<C>The new pause prompt is now set to",
+		"<C>what is below this message",
+		"<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk itemlist widget.
+#
+sub itemlistDemo
+{
+   # Declare locals.
+   my $row;
+
+   # Create the list.
+   my @months = ("<C>January", "<C>Feburary", "<C>March", "<C>April",
+		"<C>May", "<C>June", "<C></2>July<!2>", "<C>August",
+		"<C>September", "<C></32>October<!32>", "<C>November",
+		"<C></18>December<!18>");
+
+   # Get the current date info.
+   my $info = qx (date +"%d,%m,%Y"); chomp $info;
+   my ($currentDay, $currentMonth, $currentYear) = split (/,/, $info);
+   $currentMonth--;
+
+   # Create n itemlist to get the month.
+   my $monthList = new Cdk::Itemlist ('Label' => '</B/5>Pick a month ',
+					'Default' => $currentMonth,
+					'List' => \@months);
+
+   # Get the month name.
+   my $choice = $monthList->activate();
+   undef $monthList;
+
+   # Did they hit escape?
+   return if ! defined $choice;
+   $choice++;
+
+   # Create a scale to get the year.
+   my $yearScale = new Cdk::Scale ('Label' => '</B/5>Pick a year',
+					'Width' => 6,
+					'Low' => "1900",
+					'High' => "2200");
+
+   # Set the limits of the years to select from.
+   $yearScale->set ('Low' => 1900,
+			'High' => '2200',
+			'Value' => "$currentYear");
+
+   # Get the year.
+   my $year = $yearScale->activate();
+   undef $yearScale;
+
+   # Did they hit escape?
+   return if ! defined $year;
+
+   # Get the day
+   my $dayScale = new Cdk::Scale ('Label' => '</5/B>Pick a day',
+					'Width' => 5,
+					'Low' => 1,
+					'High' => 31);
+
+   # Set the limits of the days to select from.
+   $dayScale->set ('Low' => 1,
+			'High' => '31',
+			'Value' => "$currentDay");
+
+   # Get the day.
+   my $day = $dayScale->activate();
+   undef $dayScale;
+
+   # Did they hit escape?
+   return if ! defined $day;
+
+   # Create the calander.
+   my $cal = new Cdk::Calendar ('Day' => $day,
+				'Month' => $month,
+				'Year' => $year,
+				'Dattrib' => "</40>",
+				'Mattrib' => "</24>",
+				'Yattrib' => "</16>");
+   $cal->activate();
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Template widget.
+#
+sub templateDemo
+{
+   # Create the template widget.
+   my $birthday = new Cdk::Template ('Label' => 'Enter in your birthday',
+					'Plate' => '##/##/####',
+					'Overlay' => '</5>DD<!5>-</15>MM<!15>-</20>YYYY<!20>');
+
+   # Get the birthday.
+   my $bday = $birthday->activate();
+
+   # Did the user hit escape?
+   return if ! defined $bday;
+
+   # Get the mixed value from the template.
+   my $bday2 = $birthday->mix();
+
+   # Display the results.
+   my @mesg = ("<C>Birthday without plate mixing: </U>$bday<!U>",
+		"<C>Birthday with plate mixing: </U>$bday2<!U>", "",
+		"<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk multiple line entry widget.
+#
+sub mentryDemo
+{
+   # Create the mentry widget.
+   my $mentry	= new Cdk::Mentry ('Label' => "</B/16>Enter Anything:",
+					'Width' => 20,
+					'Lrows' => 10,
+					'Prows' => 5);
+
+   # Activate the mentry widget.
+   my $info	= $mentry->activate ();
+
+   # Did the user hit escape?
+   return if ! defined $info;
+
+   # Display the results.
+   my @mesg	= ("<C>You just typed:",
+			"<C>$info", "",
+			"<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk matrix widget.
+#
+sub matrixDemo
+{
+   my @colTitles	= ("Item Name", "Base Price", "% Markup");
+   my @rowTitles	= ("Item 1", "Item 2", "Item 3");
+   my @colWidths	= (6, 6, 6);
+   my @colTypes		= ("VIEWONLY", "VIEWONLY", "INT");
+   my @matrixValues	= (["Flabberit", "10.99", ""],
+				["Whatzit", "102.99", ""],
+				["Albatros", "99.99", ""]);
+   my (@newlist, $x);
+
+   # Create the matrix widget.
+   my $matrix = new Cdk::Matrix ('Title' => ["<C>Flabberjabbit Sales", ""],
+					'RowTitles' => \@rowTitles,
+					'ColTitles' => \@colTitles,
+					'ColWidths' => \@colWidths,
+					'ColTypes' => \@colTypes,
+					'Vrows' => 3, 
+					'Vcols' => 3);
+
+   # Set the values of the matrix.
+   $matrix->set ('Values' => \@matrixValues);
+
+   # Activate the matrix.
+   my ($rows, $cols, $info) = $matrix->activate ();
+
+   # Did the user hit escape?
+   return if ! defined $rows;
+
+   # Take the information from the matrix and redisplay it.
+   push (@newlist, "</U>Name       Base    Percent Price");
+   for ($x=0; $x < $rows; $x++)
+   {
+      if ($info->[$x][2] ne "")
+      {
+         my $name	= $info->[$x][0];
+         my $base	= $info->[$x][1];
+         my $perc	= $info->[$x][2];
+         my $price	= $base + ($base * $perc) / 100;
+         push (@newlist, sprintf ("%-10s %4.2f %4.2f %4.2f", $name, $base, $perc, $price));
+      }
+   }
+
+   # Create the file viewer.
+   my $viewer = new Cdk::Viewer ('Buttons' => ["OK"],
+					'Height' => 8,
+					'Width' => 60);
+
+   # Set the contents of the viewer.
+   $viewer->set ('Title' => "Adjusted Price List",
+			'Info' => \@newlist);
+
+   # Activate the viewer.
+   $viewer->activate();
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Dialog widget.
+#
+sub dialogDemo
+{
+   my @mesg	= ("<C></U>Cheesy Unix Command Interface<!U>",
+			"<C>Select a command from the buttons.");
+
+   # Create the buutons for the dialog box.
+   my @buttons	= ("date", "pwd", "whoami", "ls -l");
+
+   # Create the dialog widget.
+   my $dialog	= new Cdk::Dialog ('Message' => \@mesg, 'Buttons' => \@buttons);
+
+   # Activate the dialog box.
+   my $pick	= $dialog->activate ();
+ 
+   # Did the user hit escape?
+   return if ! defined $pick;
+
+   # Check what we want to run.
+   if ($buttons[$pick] =~ "ls -l")
+   {
+      # Get the directory listing.
+      my @info	= qx (ls -l ${HOME}); chomp (@info);
+
+      # Create the file viewer.
+      my $viewer = new Cdk::Viewer ('Buttons' => ["OK"],
+					'Height' => 15,
+					'Width' => 60);
+
+      # Set the contents of the viewer.
+      $viewer->set ('Title' => "<C>Listing $HOME", 'Info' => \@info);
+      $viewer->activate();
+   }
+   else
+   {
+      # We want to tun anything but ls -l
+      my $result = qx ($buttons[$pick]); chomp $result;
+
+      # Display the result.
+      my @mesg	= ("<C>The command </R>$buttons[$pick]<!R> produced the following:",
+			"<C>$result",
+			"<C>$CONTINUE");
+      labelDemo ( @mesg );
+   }
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Scrolling widget.
+#
+sub scrollDemo
+{
+   my ($x, @items);
+
+   # Create an itemlist widget to determine if the user wants numbers or not.
+   my $boolean = new Cdk::Itemlist ('Label' => 'Do You Want Numbers?:',
+					'Default' => 0,
+					'List' => ["No", "Yes"]);
+
+   # Create a scale widget for the number of elements.
+   my $size	= new Cdk::Scale ('Label' => 'How Many Items?',
+					'Width' => 5,
+					'Low' => 10,
+					'High' => 100);
+
+   # Create an entry field for the title of the scrolling list.
+   my $entry	= new Cdk::Entry ('Label' => 'Title: ',
+					'Max' => 100,
+					'Min' => 2,
+					'Width' => 20); 
+
+   # Get whether they want numbers or not.
+   my $nums	= $boolean->activate ();
+   return if ! defined $nums;
+
+   # Get the number of elements.
+   my $count	= $size->activate ();
+
+   # Get the title of the scrolling list.
+   my $title	= $entry->activate ();
+
+   # Create the item list
+   for ($x=1; $x <= $count ; $x++)
+   {
+      push (@items, "This is item #</U>$x");
+   }
+   
+   # Create the scrolling list.
+   my $scrollDemo = new Cdk::Scroll ('Title' => "$title",
+					'Highlight' => "</B/5>",
+					'List' => \@items,
+					'Numbers' => $nums,
+					'Height' => 14,
+					'Width' => 20);
+
+   # Activate the scrolling list.
+   my $selection = $scrollDemo->activate ();
+   return if ! defined $selection;
+
+   # Spit out the results.
+   my @mesg = ("<C>You selected",
+		"<C>$items[$selection]",
+		"<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Selection widget.
+#
+sub selectionDemo
+{
+   my ($x, @result);
+
+   # Create the list of commands to choose from.
+   my @commands	= ("date", "whoami", "pwd", "hostname", "uname -a");
+
+   # Create the selection scrolling list.
+   my $select	= new Cdk::Selection ('Title' => "<C></B>Select Commands<!B>",
+					'List' => \@commands,
+					'Choices' => ["</24>Yep<!24>", "</16>Nope<!16>"],
+					'Height' => 8,
+					'Width' => 20);
+
+   # Activate the selection widget.
+   my @info	= $select->activate ();
+
+   # Did the user hit escape?
+   return if ! defined @info;
+
+   # Create the result message.
+   @result	= ("<L>Here are the results from the commands you selected:", "");
+   for ($x=0; $x <= $#info; $x++)
+   {
+      if ($info[$x] eq 0)
+      {
+         my $tmp = qx ($commands[$x]); chomp $tmp;
+         my $fmt = sprintf ("</40>%10s<!40></16>...<!16></48>%-30s<!48>", $commands[$x], $tmp);
+         push (@result, $fmt);
+      }
+   }
+   push (@result, "");
+   push (@result, "<C>$CONTINUE");
+
+   # Spit the results out.
+   labelDemo (@result);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Radio widget.
+#
+sub radioDemo
+{
+   # Create the radio list
+   my @colors	= ("</B/8>White",
+			"</B/16>Red",
+			"</B/24>Green",
+			"</B/32>Yellow",
+			"</B/40>Blue",
+			"</B/48>Purple",
+			"</B/56>Cyan");
+
+   # Create the radio widget.
+   my $radio	= new Cdk::Radio ('Title' => "Pick A Color",
+					'List' => \@colors,
+					'Highlight' => "A_REVERSE",
+					'Height' => 7,
+					'Width' => 10);
+
+   # Activate the radio list.
+   my $color	= $radio->activate ();
+
+   # Did the user hit escape?
+   return if ! defined $color;
+
+   # Display the results.
+   my @mesg = ("<C>You Selected",
+		"<C> $colors[$color]",
+		"<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Histogram widget.
+#
+sub histogramDemo
+{
+   my ($x);
+
+   # Create the histogram label.
+   my $histLabel = "<C>Time In Seconds This Demo Has Run";
+
+   # Create the histogram widget.
+   my $hist = new Cdk::Histogram ('Title' => $histLabel,
+					'Orient' => "HORIZONTAL",
+					'Height' => 5,
+					'Width' => 0);
+
+   # Take the current time - the start time of this script.
+   my $diff = time - $;
+
+   # Redraw the histogram every second.
+   for ($x=0; $x < 5; $x++)
+   {
+      # Set the values of the histogram.
+      $hist->set ('Low' => 1,
+			'FillerChar' => "</R/24> ",
+			'High' => $diff + 25,
+			'Value' => $diff+$x,
+			'Statstype' => "REAL",
+			'Statspos' => "CENTER");
+
+      # Redraw the histogram.
+      $hist->draw();
+
+      # Sleep for a sec.
+      sleep (1);
+   }
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Marquee widget.
+#
+sub marqueeDemo
+{
+   # Create an entry widget to get the user's message.
+   my $entry	= new Cdk::Entry ('Label' => 'Enter a Message: ',
+					'Max' => 100,
+					'Min' => 2,
+					'Width' => 20); 
+  
+   # Activate the widget to get the message.
+   my $message	= $entry->activate ();
+   return if ! defined $message;
+
+   # Create the widget to get the number times to repeat the message.
+   my $rvalue	= new Cdk::Scale ('Label' => 'Repeat Value:',
+					'Width' => 5,
+					'Low' => 1,
+					'High' => 20);
+
+   # Get the repeat value from the user.
+   my $repeat	= $rvalue->activate();
+
+   # Create the widget to get the delay.
+   my $dvalue	= new Cdk::Scale ('Label' => 'Delay Value:',
+					'Width' => 5,
+					'Low' => 1,
+					'High' => 20);
+
+   # Get the delay value.
+   my $delay	= $dvalue->activate() * 10;
+
+   # Create the widget to get the width of the marquee widget.
+   my $mWidth	= new Cdk::Scale ('Label' => 'Marquee Width:',
+					'Width' => 5,
+					'Low' => length($message),
+					'High' => 50);
+
+   # Get the width of the marquee widget.
+   my $width	= $mWidth->activate();
+
+   # Create the marquee widget.
+   my $marquee	= new Cdk::Marquee ('Width' => $width);
+
+   # Activate the marquee widget.
+   $marquee->activate ('Message' => $message,
+			'Delay' => $delay,
+			'Repeat' => $repeat);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Graph widget.
+#
+sub graphDemo
+{
+   # Create the graph.
+   my $graph	= new Cdk::Graph ('Title' => "<C>Camel Count",
+					'Xtitle' => "<C>Quantity",
+					'Ytitle' => "<C>Months",
+					'Height' => -4,
+					'Width' => -20);
+
+   # Set the graph values.
+   my @numberList = qw (10 12 14 16 17 22 31);
+   my $graphChars = "ooooooo";
+   $graph->set ('Values' => \@numberList,
+			'DisplayType' => "PLOT",
+			'GraphChars' => $graphChars);
+
+   # Draw the graph.
+   $graph->draw();
+
+   # Prompt the user.
+   my @mesg	= ("When done looking at your Camels", "<C>$CONTINUE");
+   my $label	= new Cdk::Label ('Message' => \@mesg, 'Xpos' => "BOTTOM");
+   $label->draw();
+   $label->wait();
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Scale widget.
+#
+sub scaleDemo
+{
+   # Create the scale widget.
+   my $scale	= new Cdk::Scale ('Label' => 'Pick a number:',
+					'Width' => 5,
+					'Low' => 10,
+					'High' => 100);
+
+   # Activate the widget.
+   my $num	= $scale->activate();
+
+   # Display the results.
+   my @mesg	= ("<C>You chose $num.", "<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Slider widget.
+#
+sub sliderDemo
+{
+   # Create the scale widget.
+   my $slider = new Cdk::Slider ('Label' => '</B/16>Pick a number:',
+				'Filler' => "</R/24> ",
+				'Width' => 50,
+				'Low' => 10,
+				'High' => 100);
+
+   # Activate the widget.
+   my $num = $slider->activate();
+   undef $slider;
+
+   # Display the results.
+   my @mesg	= ("<C>You chose $num.", "<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This demonstrates the Cdk Alpha List widget.
+#
+sub alphalistDemo
+{
+   my @acctList = ();
+
+   # Reset the password entry pointer.
+   setpwent();
+
+   # Get a list of all the accounts on this box.
+   while ($tmp = getpwent)
+   {
+      push (@acctList, $tmp);
+   }
+
+   # Create the scale widget.
+   my $alpha = new Cdk::Alphalist ('Label' => '</B/16>Select an account:',
+					'List' => \@acctList,
+					'Width' => 50,
+					'Height' => 10);
+
+   # Activate the widget.
+   my $acct = $alpha->activate();
+
+   # Display the results.
+   my @mesg = ("<C>You chose $acct.", "<C>$CONTINUE");
+   labelDemo (@mesg);
+}
+
+##############################################################################
+#
+# This is the help menu option under help.
+#
+sub generalHelp
+{
+   my $choice	= 0;
+   my $helpdir	= $ENV{'CDKHELPDIR'}	|| "./help";
+
+   # Define the names of the help files.
+   my @helpFiles = ("general.help",
+			"concepts.help",
+			"binding.help",
+			"preprocess.help",
+			"postprocess.help",
+			"display.help",
+			"special.help",
+			"charfile.help",
+			"colors.help",
+			"debug.help",
+			"future.help",
+			"bugs.help");
+
+   # Define the concepts.
+   my @conceptList = ("</24>General Information About Cdk<!24>",
+			"</24>Cdk Concepts                 <!24>",
+			"</24>Creating a key binding.      <!24>",
+			"</24>Creating a pre-process.      <!24>",
+			"</24>Creating a post-process.     <!24>",
+			"</24>Cdk Display Types            <!24>",
+			"</24>Special Display Attributes   <!24>",
+			"</24>Special Character Formats    <!24>",
+			"</24>Predefined Colors            <!24>",
+			"</24>Debugging Cdk Code           <!24>",
+			"</24>The Future of Cdk            <!24>",
+			"</24>Known Bugs                   <!24>",
+			"</24>Exit Help                    <!24>");
+
+   # Get the screen dimensions.
+   my ($rows, $cols) = Cdk::getCdkScreenDim();
+
+   # Create the scrolling list ...
+   my $helplist	= new Cdk::Scroll ('Title' => "<C></U/B/29>Pick A Topic",
+					'Highlight' => "</R>",
+					'List' => \@conceptList,
+					'Numbers' => "TRUE",
+					'Height' => $#conceptList+4,
+					'Width' => 40);
+
+   # Keep doing this until we are told to leave.
+   for (;;)
+   {
+      # Redraw the screen.
+      Cdk::refreshCdkScreen();
+
+      # Get the choice from the user.
+      my $choice = $helplist->activate();
+   
+      # Exit if we have to .
+      return if ! defined $choice;
+      return if $choice == $#conceptList;
+
+      # Create the help filename
+      $helpfile = "${helpdir}/$helpFiles[$choice]";
+      $topic	= "$conceptList[$choice]";
+
+      # Check if the file exists.
+      if (! -e $helpfile)
+      {
+         my @error = (
+			"<C></16>Can not seem to find the help file on the topic </U>$topic<!U><!16>",
+			"<C></16>Try setting the CDKHELPDIR environment variable<!16>",
+			"<C></16>or check if the help file '$helpfile' exists<!16>", "",
+			"<C>$CONTINUE");
+          labelDemo (@error);
+      }
+      else
+      {
+         # Display the file.
+         my @info = ();
+         undef $helpviewer;
+         my $helpviewer = new Cdk::Viewer ('Buttons' => ["OK"],
+						'Height' => $rows-3,
+						'Width' => $cols-2);
+
+          chop (@info = `cat $helpfile`);
+          $helpviewer->set ('Title' => "<C></18>Help: </U>$topic<!18U>",
+				   'Info' => \@info);
+          $helpviewer->activate();
+      }
+   }
+}
+
+sub widgetHelp
+{
+   my ($helpfile, $topic, $helpviewer);
+   my $helpdir		= $ENV{'CDKHELPDIR'}	|| "./help";
+
+   # Define the widget help files.
+   my @helpFiles = ("alphalist.help",
+			"calendar.help",
+			"dialog.help",
+			"entry.help",
+			"fselect.help",
+			"graph.help",	
+			"histogram.help",
+			"itemlist.help",
+			"label.help",
+			"marquee.help",
+			"matrix.help",
+			"menu.help",
+			"mentry.help",
+			"radio.help",
+			"scale.help",
+			"scroll.help",
+			"swindow.help",
+			"selection.help",
+			"slider.help",
+			"template.help",
+			"viewer.help");
+
+   # Define the widget help entries.
+   my @widgetList = ("</B/40>Alphalist Widget             <!40>",
+			"</B/40>Calendar Widget             <!40>",
+			"</B/40>Dialog Widget               <!40>",
+			"</B/40>Entry Field Widget          <!40>",
+			"</B/40>File Selector Widget        <!40>",
+			"</B/40>Graph Widget                <!40>",
+			"</B/40>Histogram Widget            <!40>",
+			"</B/40>Item List Widget            <!40>",
+			"</B/40>Label Widget                <!40>",
+			"</B/40>Marquee Widget              <!40>",
+			"</B/40>Matrix Widget               <!40>",
+			"</B/40>Menu Widget                 <!40>",
+			"</B/40>Multiple Line Entry Widget  <!40>",
+			"</B/40>Radio List Widget           <!40>",
+			"</B/40>Scale Widget                <!40>",
+			"</B/40>Scrolling List Widget       <!40>",
+			"</B/40>Scrolling Window Widget     <!40>",
+			"</B/40>Selection List Widget       <!40>",
+			"</B/40>Slider Widget               <!40>",
+			"</B/40>Template Widget             <!40>",
+			"</B/40>Viewer Widget               <!40>",
+			"</B/40>Exit Help                   <!40>");
+
+   # Get the screen dimensions.
+   my ($rows, $cols) = Cdk::getCdkScreenDim();
+
+   # Create the scrolling list ...
+   my $helplist	= new Cdk::Scroll ('Title' => "<C></U/B/29>Pick A Topic",
+					'Highlight' => "</R>",
+					'List' => \@widgetList,
+					'Numbers' => "TRUE",
+					'Height' => $#widgetList+4,
+					'Width' => 40);
+
+   # Keep doing this until we are told to leave.
+   for (;;)
+   {
+      # Redraw the screen.
+      Cdk::refreshCdkScreen();
+
+      my $choice = $helplist->activate();
+   
+      # Exit if we have to .
+      return if ! defined $choice;
+      return if ($choice == $#widgetList);
+
+      # Create the help filename
+      $helpfile = "${helpdir}/$helpFiles[$choice]";
+      $topic = "$widgetList[$choice]";
+   
+      # Does the help file exist?
+      if (! -e $helpfile)
+      {
+         my @error = (
+			"<C></16>Can not seem to find the help file on the topic </U>$topic<!U><!16>",
+			"<C></16>Try setting the CDKHELPDIR environment variable<!16>",
+			"<C></16>or check if the help file '$helpfile' exists<!16>", "",
+			"<C>$CONTINUE");
+         labelDemo (@error);
+      }
+      else
+      {
+         # Display the file.
+         my @info = ();
+         my $helpviewer = new Cdk::Viewer ('Buttons' => ["OK"],
+							'Height' => $rows-3,
+							'Width' => $cols-2);
+         chop (@info = `cat $helpfile`);
+         $helpviewer->set ('Title' => "<C></18>Help: </U>$topic<!18U>",
+				   'Info' => \@info);
+         $helpviewer->activate();
+      }
+   }
+}
+
+#
+# This is the callback function for the menu.
+#
+sub menuCallback
+{
+   my $menu = shift;
+
+   # Call the help function.
+   main::help();
+
+   # Refresh the screen.
+   Cdk::refreshCdkScreen();
+}

@@ -1,0 +1,41 @@
+Crypt/SmbHash version 0.01
+==========================
+
+This module provides functions to generate LM/NT hashes used in Samba's
+'password' files, like smbpasswd.
+
+The module is written entirely in perl, so it's a slower implementation
+that if it was written in C, its easily ported and installed.
+
+Example use:
+
+   use Crypt::SmbHash;
+   ntlmgen $ARGV[0], $lm, $nt;
+   print "root:0:${lm}:${nt}:[U          ]:LCT-35463AFF\n";
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module should work out-of-the-box, although only tested with
+perl 5.005 and perl 5.6.1
+
+The generation of NT hashes requires an md4 algorithm, and although
+Crypt::SmbHash has it's own version of md4 hashing, things are alot
+faster if Digest::MD4 is installed aswell. Crypt::SmbHash will
+automatically use Digest::MD4 if it detects that Digest::MD4 is
+installed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 Benjamin Kuit <bj@it.uts.edu.au>
+Ported from Samba.
+Samba is Copyright (C) Andrew Tridgell 1997-1998
+

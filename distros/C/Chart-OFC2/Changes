@@ -1,0 +1,34 @@
+Revision history for Chart::OFC2
+
+0.07    11 12 2009
+        - #50419 added "text" property to elements (thanks to Noe Snaterse)
+        - aliased 'color' to 'colour' (thanks to Jeff Tam)
+        - moved coerce and types to Chart::OFC2::Types (thanks to Jeff Tam)
+        - axis labels coerce from hashref (thanks to Jeff Tam)
+        - renamed "3d" property to "is3d" to avoid accessor name starting with a number (reported by John Goulah)
+
+0.06    25.09.2009
+        - #50019 rotate for labels (thanks to noesnaterse <noe@noesnaterse.nl>)
+        - removed Perl 5.10 constructs to promote compatibility with older Perls (thanks to Adam J. Foxson)
+
+0.05    10.08.2009
+        - added bar_3d type_name (thanks to JGOULAH <jgoulah@cpan.org>)
+        - make $element->values with numbers really numbers in JSON (thanks to JGOULAH <jgoulah@cpan.org>)
+		- add ability to set background color (jgoulah)
+
+0.04    30.07.2009
+        - replaced deprecated compute_all_applicable_attributes by get_all_attributes
+          (thanks to John Goulah for pointing this out)
+
+0.03    26.11.2008
+        - pie chart added
+        - hbar chart added
+        - GNU GPL licensing
+        - line chart added
+        - scatter chart added
+
+0.02    24.11.2008
+        Just MANIFEST fix
+
+0.01    22.11.2008
+        First version, released on an unsuspecting world.

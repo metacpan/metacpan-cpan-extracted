@@ -1,0 +1,46 @@
+---
+abstract: 'Authentication framework for CGI::Application'
+author:
+  - 'Cees Hek <ceeshek@gmail.com>'
+  - 'Nicholas Bamber <nicholas@periapt.co.uk>'
+  - 'Wes Malone <wesm@cpan.org>'
+build_requires:
+  Readonly: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '1.302015'
+  Test::NoWarnings: '0'
+  Test::Regression: '0'
+  Test::Taint: '0'
+  Test::Warn: '0.11'
+  Test::Without::Module: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Application-Plugin-Authentication
+recommends:
+  Apache::Htpasswd: '1.8'
+  CGI::Application::Plugin::Session: '0'
+  Color::Calc: '0.12'
+  Digest::MD5: '0'
+requires:
+  Attribute::Handlers: '0'
+  CGI: '3.16'
+  CGI::Application: '4'
+  Class::ISA: '0'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Scalar::Util: '0'
+  UNIVERSAL::require: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/cees/cgi-application-plugin-authentication/issues
+  homepage: https://github.com/cees/cgi-application-plugin-authentication
+  repository: https://github.com/cees/cgi-application-plugin-authentication.git
+version: '0.21'
+x_serialization_backend: 'YAML::Tiny version 1.70'

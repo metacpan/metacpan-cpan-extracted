@@ -1,0 +1,33 @@
+NAME
+    Build.PL - Build script for Class::DBI::ViewLoader
+
+SYNOPSIS
+        perl Build.PL --dsn=dsn
+                      --user=username
+                      --pass=password
+
+        ./Build
+        ./Build test
+        ./Build install
+
+TESTING
+    When provided with a dsn (and optional username and password), the unit
+    tests of this module create three tables and two views and then attempt
+    to load the views into Class::DBI.
+
+    The tables that are created and dropped are: actor, film and role. The
+    views are film_roles and actor_roles. Automatically generated primary
+    key sequences for the three tables will also be created and dropped.
+
+    If the dsn option is not specifed, all view-loading tests are skipped
+    and only pod and API-compatability tests are performed.
+
+    Please do not use a live/production/important database to test this
+    module!
+
+SEE ALSO
+    Class::DBI::ViewLoader, Module::Build, Class::DBI, DBI
+
+AUTHOR
+    Matt Lawrence <mattlaw@cpan.org>
+

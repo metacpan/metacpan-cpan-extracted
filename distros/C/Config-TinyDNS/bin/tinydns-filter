@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+tinydns-filter - Filter a tinydns data file
+
+=head1 SYNOPSIS
+
+    tinydns-filter [filter ...]
+
+=head1 DESCRIPTION
+
+The file format used by L<tinydns-data(8)> is designed primarily to be
+easily machine-readable, and can be rather verbose and inflexible for
+manual editing. This program passes such a file through a series of
+filters, which extend the format in useful ways.
+
+The list of filters is provided on the command line. The data file is
+read from stdin, and the filtered file is printed to stdout. If a filter
+takes arguments, they should be specified as C<filter=arg1,arg2>.
+
+For a list of filters, see L<Config::TinyDNS|Config::TinyDNS/FILTERS>.
+
+=cut
+
+use warnings;
+use strict;
+
+use Config::TinyDNS qw/:ALL/;
+use File::Slurp     qw/slurp/;
+
+my @filters = map { /^(.*?)=(.*)/ ? [$1, split /,/, $2] : $_ } @ARGV;
+print filter_tdns_data scalar slurp(\*STDIN), @filters;
+
+=head1 AUTHOR
+
+Ben Morrow <ben@morrow.me.uk>
+
+=head1 COPYRIGHT
+
+Copyright 2010 Ben Morrow.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+=over 4
+
+=item *
+
+Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+=item *
+
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+=back
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL BEN MORROW BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

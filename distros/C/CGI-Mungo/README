@@ -1,0 +1,10 @@
+Simple web framework based on CGI.
+
+For a simple example:
+
+1) Change into the "script" directory
+2) run ./simple_cgi_server.pl
+3) Visit the URL output by the above script.
+4) View the source of the test script at "script/example_cgi_scripts/mungo_hello.cgi"
+
+Please send all feeback/bug reports to dumb@cpan.org

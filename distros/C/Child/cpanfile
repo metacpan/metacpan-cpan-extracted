@@ -1,0 +1,16 @@
+requires "Exporter" => "5.57";
+requires "POSIX" => "0";
+requires "perl" => "5.006";
+
+on 'test' => sub {
+  requires "Capture::Tiny" => "0.31";
+  requires "Test::More" => "0.88";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

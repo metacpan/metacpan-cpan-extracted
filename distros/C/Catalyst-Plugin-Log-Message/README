@@ -1,0 +1,76 @@
+NAME
+    Catalyst::Plugin::Log::Message - Alternative catalyst log module
+
+SYNOPSIS
+        package MyAPP;
+
+        use Catalyst qw/Log::Message/;
+
+        package MyAPP::Controller::Tester;
+
+        sub logthis : Local {
+            my ($self, $c) = @_;
+
+            $c->logger->debug('Entering user mode');
+            ### Doing something user here
+
+            if ($msg =~ /no such user/i) {
+                $c->logger->error('Ok, critical error, abort');
+                ### Send most critical last message to screen of user
+                $c->stash->{error} = $c->logger->retrieve_last(qw/error/);
+
+                ### Send stack to file or something
+                $c->doing_something_savy($c->logger->stack_as_string);
+            }
+
+        }
+
+DESCRIPTION
+    "Catalyst::Log::Message" is an alternative module providing extra
+    logging possibilities for the developer. Extra options include the
+    possibility to read the stack of errors from the current request in
+    string or array form, retrieve the last error matching a specific level
+    etc. The stack is flushed after every request.
+
+    We chose to create another method on the Catalyst context object,
+    because the log method provided to much information for a good trackdown
+    of errors.
+
+Object Methods
+    The following methods are available for the developer.
+
+  $c->logger->flush()
+    Will flush the stack
+
+  $c->logger->stack()
+    In scalar context it will return the first item and in list context, it
+    will return all of them.
+
+  $c->logger->stack_as_string()
+    Return the entire stack of this request in a stringified way
+
+  $c->logger->retrieve([ $STRINGTAG ])
+    Retrieve an array of "Log::Message" objects matching the optional tag
+    (tag can be error handlers like error,debug,fatal etc)
+
+  $c->logger->retrieve_last([ $STRINGTAG ])
+    Retrieve the last message on the stack matching the optional tag.
+
+AUTHOR
+    This module by Michiel Ootjers <michiel@cpan.org>.
+
+    and
+
+    Jos Boumans <kane@cpan.org>.
+
+BUG REPORTS
+    Please submit all bugs regarding "Catalyst::Plugin::Log::Message" to
+    "bug-catalyst-plugin-log-message@rt.cpan.org"
+
+COPYRIGHT
+    This module is copyright (c) 2002 Michiel Ootjers <michiel@cpan.org>.
+    All rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,57 @@
+NAME
+    Convert::Bencode - Functions for converting to/from bencoded strings
+
+SYNOPSIS
+      use Convert::Bencode qw(bencode bdecode);
+
+      my $string = "d4:ainti12345e3:key5:value4:type4:teste";
+      my $hashref = bdecode($string);
+
+      foreach my $key (keys(%{$hashref})) {
+          print "Key: $key, Value: ${$hashref}{$key}\n";
+      }
+
+      my $encoded_string = bencode($hashref);
+      print $encoded_string."\n";
+
+DESCRIPTION
+    This module provides two functions, "bencode" and "bdecode", which
+    encode and decode bencoded strings respectivly.
+
+  Encoding
+    "bencode()" expects to be passed a single value, which is either a
+    scalar, a arrary ref, or a hash ref, and it returns a scalar containing
+    the bencoded representation of the data structure it was passed. If the
+    value passed was a scalar, it returns either a bencoded string, or a
+    bencoded integer (floating points are not implemented, and would be
+    returned as a string rather than a integer). If the value was a array
+    ref, it returns a bencoded list, with all the values of that array also
+    bencoded recursivly. If the value was a hash ref, it returns a bencoded
+    dictionary (which for all intents and purposes can be thought of as a
+    synonym for hash) containing the recursivly bencoded key and value pairs
+    of the hash.
+
+  Decoding
+    "bdecode()" expects to be passed a single scalar containing the bencoded
+    string to be decoded. Its return value will be either a hash ref, a
+    array ref, or a scalar, depending on whether the outer most element of
+    the bencoded string was a dictionary, list, or a string/integer
+    respectivly.
+
+SEE ALSO
+    The description of bencode is part of the bittorrent protocol
+    specification which can be found at
+    http://bitconjurer.org/BitTorrent/protocol.html
+
+BUGS
+    No error detection of bencoded data. Damaged input will most likely
+    cause very bad things to happen, up to and including causeing the
+    bdecode function to recurse infintly.
+
+AUTHOR & COPYRIGHT
+    Created by R. Kyle Murphy <orclev@rejectedmaterial.com>, aka Orclev.
+
+    Copyright 2003 R. Kyle Murphy. All rights reserved. Convert::Bencode is
+    free software; you may redistribute it and/or modify it under the same
+    terms as Perl itself.
+

@@ -1,0 +1,57 @@
+# mod_perl 1
+<IfDefine APACHE1>
+    <IfModule mod_perl.c>
+        <Perl>
+            use lib qw(@ServerRoot@/lib);
+        </Perl>
+        
+        PerlModule TestApp
+        
+        <Location />
+            SetHandler perl-script
+            PerlHandler TestApp
+        </Location>
+        
+        # test at a non-root location
+        <Location /deep/path>
+            SetHandler perl-script
+            PerlHandler TestApp
+        </Location>
+    </IfModule>
+</IfDefine>
+
+# mod_perl 2
+<IfDefine !APACHE1>
+    <IfModule mod_perl.c>
+
+        # Needed to pass some %2F tests
+        AllowEncodedSlashes on
+
+        PerlSwitches -I@ServerRoot@/lib
+        
+        PerlModule TestApp
+        
+        <Location />
+            SetHandler          modperl
+            PerlResponseHandler TestApp
+        </Location>
+        
+        # test at a non-root location
+        <Location /deep/path>
+            SetHandler          modperl
+            PerlResponseHandler TestApp
+        </Location>
+        
+        # test LocationMatch (RT 26921)
+        <LocationMatch ^/match/(this|that)*>
+            SetHandler          modperl
+            PerlResponseHandler TestApp
+        </LocationMatch>
+        
+        # test using the perl-script handler
+        <Location /oldscript>
+            SetHandler          perl-script
+            PerlResponseHandler TestApp
+        </Location>
+    </IfModule>
+</IfDefine>

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  36242:
+    - 99
+name: dd72
+registers:
+  AF: 32969
+  AF_: 0
+  BC: 44062
+  BC_: 0
+  DE: 25533
+  DE_: 0
+  HL: 33419
+  HL_: 0
+  I: 0
+  IX: 36351
+  IY: 38127
+  PC: 3
+  R: 2
+  SP: 0

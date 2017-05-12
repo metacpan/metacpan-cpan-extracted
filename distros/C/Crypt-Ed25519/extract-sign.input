@@ -1,0 +1,15 @@
+#!/opt/bin/perl
+
+# wget http://ed25519.cr.yp.to/python/sign.input
+# extract-sign.input <sign.input >t/sign.input
+
+while (<>) {
+   my ($sk, $pk, $m, $s) = split /:/;
+
+   warn length $sk;
+
+   my $l = pack "a32 a32 a64 w/a*", map { pack "H*", $_ } $sk, $pk, $s, $m;
+
+   print $l
+      if 400 > length $l;
+}

@@ -1,0 +1,41 @@
+0.601  2012-09-19  brian m. carlson <brian.carlson@cpanel.net>
+    - Fix CVE-2012-2143.
+
+0.600  2011-07-20  John Lightsey <jd@cpanel.net>
+    - Add support for Apache's apr1 crypt scheme.
+    - Fix warnings about conversion from char* to unsigned char*
+      in md5_append() calls.
+
+0.507  2011-03-09  John Lightsey <jd@cpanel.net>
+    - Prefixed all implemetations of underlying crypt C functions with cpx_
+      to avoid conflicts with libc builtin versions.
+
+0.506  2011-03-08  John Lightsey <jd@cpanel.net>
+    - Fix handling of undef values passed in for plaintext or salt
+    - Improve test output
+    - Update DES crypt to convert single character salts to two character salts
+
+0.505  2010-11-23  John Lightsey <jd@cpanel.net>
+    - Remove usage of stdbool.h to fix compile on Solaris
+
+0.504  2010-11-19  John Lightsey <jd@cpanel.net>
+    - Fix compile of sha512crypt.c on systems with no uintptr_t type
+
+0.503  2010-11-17  John Lightsey <jd@cpanel.net>
+    - Fix Win32 build, thanks toddr (rt 63098)
+
+0.502  2010-11-17  John Lightsey <jd@cpanel.net>
+    - Remove usage of strpncpy() from sha256crypt.c and sha512crypt.c
+    - Remove usage of stdint.h from sha256crypt.c and sha512crypt.c
+
+0.501  2010-11-16  John Lightsey <jd@cpanel.net>
+    - Remove useless include of crypt.h in des.c
+    - Remove usage of mempcpy() from sha256crypt.c and sha512crypt.c
+    - Remove usage of __stpncpy from sha512crypt.c
+    - Update Makefile.PL
+    - Fix byte order detection
+    - Fix typo in POD example
+    - Fix test messages is 05_combined.t
+
+0.4  2010-11-09  John Lightsey <jd@cpanel.net>
+    - Initial public release

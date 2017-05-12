@@ -1,0 +1,696 @@
+#!/usr/local/bin/perl
+
+use Benchmark;
+use ClearCase::Argv 1.34;
+use ClearCase::SyncTree 0.28;
+use File::Basename;
+use File::Find;
+use File::Path;
+use File::Spec 0.82;
+use Cwd;
+use Getopt::Long;
+
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+
+require 5.005 if MSWIN;
+
+my $prog = basename($0, qw(.pl));
+my $rc = 0;
+
+sub usage {
+    my $msg = shift;
+    my $retcode = (defined($msg) && !$msg) ? 0 : 2;
+    if ($retcode) {
+	select STDERR;
+	print "$prog: Error: $msg\n\n" if $msg;
+    }
+    print <<EOF;
+Usage: $prog [flags] -sbase <dir> -dbase <vob-dir> [pname...]
+Flags:
+   -help		Print this message and exit
+   -sbase <dir>		The source base directory
+   -dbase <vob-dir>	The destination base directory
+   -flist <file>	A file containing a list of src files, or "-" for stdin
+   -map			Interpret \@ARGV as a hash mapping src => dest
+   -follow		Follow symlinks when traversing <pname> directories
+   -force		Continue despite errors
+   -stop		Stop at the first error (no cleanup)
+   -ignore_co		Allow checkouts to remain, untouched, in the dest
+   -overwrite_co	Allow existing checkouts in dest to be overwritten
+   -ci			Check in changes (default is to leave co'ed)
+   -cr			Check in so as to preserve CR's (slower)
+   -vp			Ignore versioned elements in src area
+   -ctime		Checked in files get current time (no -ptime)
+   -rmname		Remove files from dest area that aren't in src
+   -label <lbtype>	Apply the specified label recursively to -dbase
+   -lbmods		Apply the -label lbtype only to modified elems
+   -c <comment>		Use specified comment for checkins
+   -no			Exit after showing a preview
+   -yes			Perform all work (except checkin) without prompting
+   -nprotect		Turn off "cleartool protect -chmod" phase
+   -rellinks            Turn absolute symlinks within sbase into relative ones
+   -reuse		Attempt to reuse existing elements of same name
+   -summary 		Print a summary of cleartool activities when done
+   -verbose <n>		Set to 0 for least verbosity, 2 for most (default=1)
+   -Narrow [!]<re>	Limit files found to those which match /re/
+   -Version		Print the current $prog version and quit
+   -vreuse		Attempt to reuse existing versions of same element
+   -/dbg=1		Verbose mode: show cleartool cmds as they run
+Notes:
+    All flags may be abbreviated to their shortest unique name.
+    Run "perldoc synctree" for detailed documentation and examples.
+    Or "perldoc ClearCase::SyncTree" for even more documentation.
+Examples:
+    $prog -sbase /tmp/newcode -dbase /vobs_tps/foo /tmp/newcode
+    $prog -sb /tmp/newcode -db /vobs_tps/foo -N '\.java\$' -rm -yes -ci
+    $prog -sb /tmp/newcode -db /vobs_tps/foo -N '!\.old\$' -reuse 
+EOF
+    exit $retcode;
+}
+
+my(%opt, %xfer);
+
+{
+    my($only, $skip);
+    sub wanted {
+	my $path = File::Spec->rel2abs($File::Find::name);
+	$path =~ s%\\%/%g if MSWIN;
+	if (! -d && defined $opt{Narrow}) {
+	    $only ||= join('|', grep !/^!/, @{$opt{Narrow}});
+	    return if $only && $path !~ /$only/;
+	    $skip = join('|', map {(m/^!(.*)/)[0]} grep /^!/, @{$opt{Narrow}});
+	    # Filename patterns should be case insensitive on Windows.
+	    $skip = "(?i:$skip)" if MSWIN;
+	    return if $skip && $path =~ /$skip/;
+	}
+	if (-f $_ || -l $_) {
+	    if (-r _) {
+		# Skip versioned elements if requested.
+		return if $opt{vp} && (-e "$_@@/main/0" || -e "$_/@@/main/0");
+		# Passed all tests, put it on the list.
+		$xfer{$path} = $path;
+	    } else {
+		print STDERR "$prog: Error: permission denied: $path\n";
+	    }
+	} elsif (-d _) {
+	    if ($_ eq 'lost+found') {
+		$File::Find::prune = 1;
+		return;
+	    }
+	    # Keep directories in the list only if they're empty.
+	    opendir(DIR, $_) || warn "$prog: Error: $_: $!";
+	    my @entries = readdir DIR;
+	    closedir(DIR);
+	    $xfer{$path} = $path if @entries == 2;
+	} elsif (! -e _) {
+	    die "$prog: Error: no such file or directory: $path\n";
+	} else {
+	    print STDERR "$prog: Error: unsupported file type: $path\n";
+	}
+    }
+}
+
+ClearCase::Argv->attropts;
+ClearCase::Argv->inpathnorm(0);
+
+local $Getopt::Long::ignorecase = 0;  # global override for dumb default
+# A little hack to allow use of flag abbreviations without ambiguity
+# warnings, e.g. parse -c <cmnt> independently of -ci etc.
+{
+    local $Getopt::Long::autoabbrev = 0;
+    local $Getopt::Long::passthrough = 1;
+    GetOptions(\%opt, qw(comment|c=s nprotect)) || exit 1;
+}
+GetOptions(\%opt, qw(sbase=s dbase=s flist=s label|mklabel=s lbmods map
+		     Narrow=s@
+		     ci cr ctime follow force rellinks rmname stop
+		     reuse vreuse ignore_co overwrite_co
+		     help no ok quiet yes
+		     summary verbose=i vp Version
+)) || exit 1;
+usage() if $opt{help};
+if ($opt{Version}) {
+    print ClearCase::SyncTree->version, "\n";
+    exit 0;
+}
+usage("-sbase is a required flag") if !$opt{sbase};
+usage("-dbase is a required flag") if !$opt{dbase};
+usage("-force and -stop are mutually exclusive") if $opt{force} && $opt{stop};
+usage("-yes and -no are mutually exclusive") if $opt{yes} && $opt{no};
+usage("-vreuse requires -label") if $opt{vreuse} && !$opt{label};
+
+# Implement the -summary functionality.
+if ($opt{summary}) {
+    my $start = new Benchmark;
+    ClearCase::Argv->summary;	# start keeping stats
+    END {
+	if ($start && $opt{summary}) {
+	    # print out the stats we kept
+	    print STDERR ClearCase::Argv->summary;
+	    # show timing data
+	    my $timing = timestr(timediff(new Benchmark, $start));
+	    print "Elapsed time: $timing\n";
+	}
+    }
+}
+
+if (!exists($opt{verbose}) || $opt{verbose} == 1) {
+    # do nothing
+} elsif ($opt{verbose} == 0) {
+    ClearCase::Argv->quiet(1);
+} else {
+    ClearCase::Argv->dbglevel(1);
+}
+
+# Create the object we'll be working with.
+my $sync = ClearCase::SyncTree->new;
+
+# The dest base must be normalized right away so we can work with it.
+# This means conversion to an absolute, view-extended, pathname.
+$opt{dbase} = $sync->dstbase($opt{dbase});
+
+# Normalize src dir path too.
+die "$prog: Error: no such directory $opt{sbase}\n" unless -d $opt{sbase};
+$opt{sbase} = Cwd::realpath($opt{sbase});
+$opt{sbase} =~ s%\\%/%g if MSWIN;
+
+# Suppress blathering on stdout from cleartool if asked.
+ClearCase::Argv->quiet(1) if $opt{quiet};
+
+# Support incremental label families (ClearCase::Wrapper::MGi)
+if ($opt{label}) {
+    my $ct = $sync->clone_ct({autofail=>0, stderr=>0});
+    my $dvob = $ct->desc(['-s'], "vob:$opt{dbase}")->qx;
+    my $lbtype = "lbtype:$opt{label}\@$dvob";
+    $sync->lblver($opt{label}) if $opt{vreuse} && $ct->desc(['-s'], $lbtype)->qx;
+    my ($inclb) = grep s/-> (lbtype:.*)$/$1/,
+                               $ct->desc([qw(-s -ahl EqInc)], $lbtype)->qx;
+    if ($inclb) {
+        die "$prog: Error: incremental label types must be unlocked\n"
+	                       if $ct->lslock(['-s'], $lbtype, $inclb)->qx;
+	$inclb =~ s/^lbtype:(.*)@.*$/$1/;
+	$sync->inclb($inclb);
+    }
+}
+
+if ($opt{flist}) {
+    #usage("-flist and -map are mutually exclusive") if $opt{map};
+    usage("-flist and -Narrow are mutually exclusive") if $opt{Narrow};
+    open(FLIST, $opt{flist}) || die "$prog: Error: $opt{flist}: $!";
+    while(<FLIST>) {
+	chomp;
+	s/^\s+//;
+	s/\s+$//;
+	next if ! $_ || /^#/;
+	my($from, $to) = split /\s*=>\s*/;
+	if (! $to) {
+	    $to = $from;
+	    $to =~ s%^$opt{sbase}/%% if $to !~ m%^$opt{dbase}%;
+	}
+	ClearCase::SyncTree->canonicalize($opt{sbase}, $from);
+	ClearCase::SyncTree->canonicalize($opt{dbase}, $to);
+	$to = $sync->normalize($to);
+	die "$prog: Error: $from: No such file or directory\n" unless -e $from;
+	die "$prog: Error: to-file '$to' not under $opt{dbase}\n"
+				if $to !~ m%^$opt{dbase}%;
+	if (-d $from) {
+	    opendir(DIR, $from) || warn "$prog: Error: $from: $!";
+	    my @entries = readdir DIR;
+	    closedir(DIR);
+	    next unless @entries == 2;
+	}
+	$from =~ s%\\%/%g if MSWIN;
+	$to   =~ s%\\%/%g if MSWIN;
+	$xfer{$from} = $to;
+    }
+    close(FLIST);
+    # Reopen stdin for further use.
+    open(STDIN, "<&STDERR") if $opt{flist} eq '-';
+}
+
+if ($opt{map}) {
+    while (@ARGV) {
+	my($from, $to) = split /\s*=[=>]\s*/, shift;
+	$to ||= shift;
+	ClearCase::SyncTree->canonicalize($opt{sbase}, $from);
+	ClearCase::SyncTree->canonicalize($opt{dbase}, $to);
+	$to = $sync->normalize($to);
+	die "$prog: Error: odd number of files specified with -map\n" if !$to;
+	die "$prog: Error: to-file '$to' not under $opt{dbase}\n"
+				if $to && $to !~ m%^$opt{dbase}%;
+	next if -d $from;
+	$xfer{$from} = $to;
+    }
+} elsif (!$opt{flist}) {
+    if (@ARGV) {
+        if (-r $ARGV[0]) { # relative paths are OK, but must point under src
+	    my @argv = @ARGV;
+	    my @abort;
+	    for my $arg (@argv) {
+		if (-r $arg) {
+		    my $real = Cwd::realpath($arg);
+		    $real =~ s%\\%/%g if MSWIN;
+		    if ($real =~ /^\Q$opt{sbase}\E/) {
+			$arg = $real;
+			next;
+		    }
+		}
+		push @abort, $arg;
+	    }
+	    if (@abort) {
+		my @abs = grep {File::Spec->file_name_is_absolute($_)} @abort;
+		die "$prog: Error: the following absolute argument"
+		  . (@abs > 1? 's are' : ' is') . " not under\n"
+		  . "$opt{sbase}:\n  " . join("\n  ", @abort) . "\n" if @abs;
+		warn "$prog: Warning: interpreting the arguments relative"
+		  . " to $opt{sbase}\n";
+		$_ = File::Spec->catfile($opt{sbase}, $_) for @ARGV;
+	    } else {
+		@ARGV = @argv;
+	    }
+	} else {
+	    $_ = File::Spec->catfile($opt{sbase}, $_) for @ARGV;
+	}
+    } else {
+        push(@ARGV, $opt{sbase}) unless %xfer;
+    }
+    # Convert warnings from within find() into fatal errors.
+    local $SIG{__WARN__} = sub { die "$prog: Error: @_" };
+    my %find_cfg;
+    $find_cfg{wanted} = \&wanted;
+    $find_cfg{follow_fast}++ if $opt{follow};
+    for my $pname (@ARGV) {
+	find(\%find_cfg, $pname);
+    }
+}
+
+#########################################################################
+# At this point we've parsed the cmd line, derived the file list, etc.
+# and are set to do some real work. First, set some options in the object.
+#########################################################################
+
+# Allow the protect default to be overridden.
+$sync->protect(0) if $opt{nprotect};
+# Attempt element reconstitution, and/or version reuse.
+$sync->reuse(1) if $opt{reuse};
+$sync->vreuse(1) if $opt{vreuse};
+# The user may wish to leave existing checkouts in the dest base untouched ...
+$sync->ignore_co(1) if $opt{ignore_co};
+# ... or may wish to see them overwritten.
+$sync->overwrite_co(1) if $opt{overwrite_co};
+# Check that the dest area is in a legal state (no view privates etc.)
+$sync->dstcheck;
+# Turn off the default exception handler if -force.
+if ($opt{force}) {
+    $sync->err_handler(\$rc);
+} elsif ($opt{stop}) {
+    $sync->err_handler(sub {exit 2});
+}
+# Specify the comment to attach to any changes.
+if (!$opt{comment}) {
+    ($opt{comment} = "By:$0") =~ s%\\%/%g;
+}
+$sync->comment($opt{comment});
+# Suppress -ptime flag on checkins if requested.
+$sync->ctime(1) if $opt{ctime};
+# Tell it where the files are coming from. We already said where they're
+# going (dstbase) above.
+$sync->srcbase($opt{sbase});
+# Supply the list of required files.
+$sync->srcmap(%xfer);
+# Prep the object to think about doing some rmnames if requested.
+$sync->remove(1) if $opt{rmname};
+# Remember to fix absolute symlinks
+$sync->rellinks(1) if $opt{rellinks};
+# Check in: one at a time if -cr, otherwise all at once (ipc mode relevant!)
+$sync->no_cr unless $opt{cr};
+
+#########################################################################
+# Now the object knows what it needs to do. Begin the 'action' methods
+# which tell it to start doing things.
+#########################################################################
+
+# Compare src and dest lists and figure out what to do.
+$sync->analyze;
+# If -no, give a preview and exit. Ask for OK to proceed unless -yes.
+if (!$opt{yes} || $opt{no}) {
+    my $changes = $sync->preview;
+    exit 0 unless $changes;
+    exit 0 if $opt{no};
+    my $msg = "Continue with these $changes element changes?";
+    $msg = qq("$msg") if MSWIN;
+    exit 0 if system(qw(clearprompt proceed -pro), $msg);
+}
+# Remove symlinks to directories which would fool synctree
+$sync->rmdirlinks;
+# Create new elements in the target area.
+$sync->add;
+# Update any existing files whose contents differ between src and dest.
+$sync->modify;
+# Remove any files from dest that aren't in src (if requested).
+$sync->subtract if $opt{rmname};
+# Optionally label the above work, including any still-checked-out files.
+if ($opt{label}) {
+    $sync->label_mods if $opt{lbmods};
+    $sync->label($opt{label});
+}
+## Workaround for a CC bug - xml files may have binary (well, UTF-16) data.
+## But as of CC 4.1 there's a new "xml" eltype that fixes it.
+### And as of CC 6.0 xml files are considered binary!?
+## $sync->eltypemap('\.xml$' => 'compressed_file');
+
+# If nothing was done, exeunt stage left.
+exit $rc unless $sync->get_addhash || $sync->get_modhash
+		                   || $sync->get_sublist || $sync->_lsco;
+
+# Prompt the user before checkin if -ci not in use.
+if (! $opt{ci}) {
+    my $b = MSWIN ? 'Cancel' : 'Abort';
+    my $msg = "Check in all changes? (No to leave checked out, $b to unco all)";
+    $msg = qq("$msg") if MSWIN;
+    my $resp = system(qw(clearprompt yes_no -pro), $msg) >> 8;
+    $sync->fail if $resp > 1;
+    $opt{ci} = !$resp;
+}
+
+# Get rid of the exception handler before starting the checkin
+# process, as once a checkin succeeds there's no going back.
+# Instead, count subsequent errors in a scalar.
+$sync->err_handler(\$rc);
+# Now check in the changes
+$sync->checkin if $opt{ci} || $opt{cr};
+
+exit $rc;
+
+__END__
+
+=head1 NAME
+
+synctree - Normalize a tree of flat files with a tree of ClearCase elements
+
+=head1 SYNOPSIS
+
+  synctree -sbase /tmp/newcode -dbase /vobs_tps/xxx
+
+Take all files located under /tmp/newcode, remove the leading
+"/tmp/newcode" from each of their pathnames, and place the remaining
+relative paths under "/vobs_tps/xxx" as versioned elements, leaving
+them checked out.
+
+  synctree -cr -yes -ci -sbase /vobs/hpux/bin -dbase /vobs_rel/hpux/bin
+
+Sync all files under "/vobs_rel/hpux/bin" with those in
+"/vobs/hpux/bin", making sure to preserve their CR's. Suppress
+interactive prompting and check in all work when done.
+
+  synctree -sb /A/B -db /X/Y -map /A/B/foo /X/Y/bar /A/B/here /X/Y/there
+
+Take 'foo' from directory /A/B and check it in as 'bar' in /X/Y.
+Similarly, create an element /X/Y/there with the contents of /A/B/here.
+
+=head1 DESCRIPTION
+
+Synctree brings a VOB area into alignment with a specified set of files
+from a source area. It's analogous in various ways to I<clearfsimport>,
+I<citree>, and I<clearexport/clearimport>; see the COMPARISONS section
+below.  Synctree is useful if you have a ClearCase tree that must be
+kept in sync with a CVS tree during a transition period, or for
+overlaying releases of third-party products upon previous ones, or
+exporting deliverable DO's from a nightly build to a release VOB while
+preserving config records (CR's) and labels, or similar.
+
+The default operation is to mkelem all files which exist in
+I<E<lt>srcE<gt>> but not in I<E<lt>destE<gt>>, modify any files which
+exist in both but differ, but B<not> to remove files which are present
+in I<E<lt>destE<gt>> and not in I<E<lt>srcE<gt>>.  Adding the
+I<-rmname> flag will cause this removal to happen as well and thus make
+the I<E<lt>srcE<gt>> and I<E<lt>destE<gt>> areas identical.
+
+Synctree need not run in a view context itself but the directory named
+by the I<-dbase> flag must provide a view context. The branching
+behavior of any checkouts performed will be governed by that view's
+config spec.  The I<-dbase> directory need not exist, as long as it
+lies under a mounted VOB tag and in a view context. In other words,
+synctree can auto-create the destination directory tree.
+
+The list of source files to operate on may be provided with the
+I<-flist> option or it may come from C<@ARGV>. Any directories
+encountered on the command line will be traversed recursively. If no
+source-file-list is provided, the directory specified with I<-sbase> is
+used as the default.
+
+File paths may be given as relative or absolute. Destination paths are
+determined as follows: all source filenames are first turned into
+absolute paths if necessary, then the source preface given with the
+I<-sbase> parameter is removed and replaced with the value of I<-dbase>
+to produce the destination pathname (but see FILE MAPPING below).
+
+ClearCase symbolic links are supported, even on Windows.  Note that,
+unless you use the I<-rellinks> flag, the text of the link is
+transported B<verbatim> from source area to dest area; thus relative
+symlinks may no longer resolve in the destination area.
+
+Consider using the I<-n> flag the first time you use this on a valued
+VOB, even though nothing irreversible (I<rmelem>, I<rmbranch>,
+I<rmver>, I<rmtype>, etc.) is B<ever> done by synctree.  And by the
+same token use I<-yes> and I<-ci> with care.
+
+=head1 OPTIONS
+
+Not all options are described here, only those requiring elaboration
+beyond the C<-help> summary. Run C<synctree -help> for a full option
+summary.
+
+=over
+
+=item * I<-force, -stop>
+
+By default, upon encountering a ClearCase error synctree will attempt
+to return to the initial state by undoing all checkouts etc. The
+I<-stop> flag will cause it to exit immediately leaving the partial
+state intact while I<-force> will cause it to blunder onward, ignoring
+errors. However, even with I<-force> a nonzero status is returned if
+errors are encountered.
+
+=item * I<-ignore_co, -overwrite_co>
+
+By default, synctree refuses to run if any view-private files exist
+under the destination base. This includes checkouts, which are a
+special form of view private file. The I<-ignore_co> flag allows
+synctree to continue in this situation. As the flag name implies it
+will B<ignore> these checkouts; i.e. differences in the source base
+will I<not> overwrite the checked-out file in the destination.  The
+I<-overwrite_co> flag also allows synctree to proceed in the presence
+of existing checkouts but causes them to be overwritten by the source
+version.
+
+=item * I<-no, -yes, -ci>
+
+The I<-no> flag causes synctree to report what it would do and exit
+without making any changes, I<-yes> suppresses all prompts except for
+the C<check in changes?> prompt, and I<-ci> suppresses that one. The
+default behavior is to prompt before making changes. To suppress all
+prompting you must use both I<-yes> and I<-ci>.
+
+=item * I<-label, -lbmods>
+
+The I<-label> option let you specify a label to be applied before
+finishing. By default it will label recursively from the I<-dbase> area
+down, as well as all parent directories upward to the vob root.  But if
+the I<-lbmods> flag is used as well, only modified elements will be
+labeled.
+
+=item * I<-reuse>
+
+If element X is created in synctree run #1, rmname'd in run #2, and 
+created again in run #3, you may end up with multiple elements with
+the same name. This situation is known as an I<evil twin>. The
+I<-reuse> flag can avoid this; before making a new element it
+searches the directory's version tree looking for a prior element
+of the same name. If found, it will link the old element back into
+the current version of the directory, then (if the contents differ)
+check it out and replace the contents with those of the source
+file.
+
+This flag can avoid evil twins and save storage space but will run a
+little slower due to the extra analysis. Also, there's no guarantee the
+prior element of the same name is in fact logically related to the new
+one. They could conceivably even be of different element types.
+
+I<The B<-reuse> feature is not well tested and should still be considered
+B<experimental>.>
+
+=item * I<-vreuse>
+
+If two alternative releases of the same tree are imported in alternation,
+new versions are created at every step, as the result of even imports is
+systematically hidden by odd ones.
+
+This flag will check for suitable versions of the elements in their
+version tree, and apply there the label provided with the I<-label>
+option. This will considerably slow down the processing, but will avoid
+data duplication.
+
+Consider forcing the ipc mode of I<ClearCase::Argv>, with I<-/ipc=1>, and
+using the BranchOff feature, both of which are relevant to this kind of
+situation.
+
+=item * I<-Narrow>
+
+The I<-Narrow> flag allows a regular expression to limit the files
+from the source list which are compared with the destination base.
+I.e. if you want to transport all the C<*.java> files from a
+dir tree without the class files you can use
+
+    synctree -N '\.java\$' ...
+
+Note that the argument is a Perl regular expression, not a file glob.
+Any legal Perl RE may be used. Also, multiple I<-Narrow> flags may be
+used; thus, to collect C<*.class> and C<*.properties> files you may use
+either of:
+
+    synctree -N '\.class\$' -N '\.properties\$' ...
+    synctree -N '\.(class|properties)\$' ...
+
+Also, the I<-Narrow> flag is considered only for file lists derived
+internally by synctree. If you provide your own file list using
+I<-flist>, filtering it is your own responsibility.
+
+This RE is automatically made case-insensitive on Windows.
+
+=back
+
+=head1 FILE MAPPING
+
+Synctree has lots of support for remapping filenames. The options can
+be pretty confusing and thus deserve special treatment here.
+
+Filename mapping is enabled with the B<-map> flag.  Without I<-map>, a
+list of files provided on the command line is interpreted as a set of
+I<from> files; their I<to> paths are derived via I<s/^sbase/dbase/> and
+thus the file basenames cannot change.  In the presence of I<-map> the
+arguments are instead interpreted as a hash alternating B<from> and
+B<to> names.  Thus
+
+  synctree -sb /etc -db /vobs_st/etc /etc/passwd /etc/group
+
+would make two files under /vobs_st/etc called passwd and group, whereas
+
+  synctree -sb /etc -db /vobs_st/etc -map /etc/passwd /vobs_st/etc/foo
+
+would create one file (/vobs_st/etc/foo) which is a copy of /etc/passwd.
+Alternatively the mapping may be specified with a literal B<=E<gt>>:
+
+  synctree -sb /etc -db /vobs_st/etc -map '/etc/passwd => /vobs_st/etc/foo' ...
+
+but note that this must be quoted against shell expansion. The
+I<=E<gt>> style is also allowed in files specified via B<-flist>,
+thus:
+
+  synctree -sb /etc -db /vobs_st/etc -flist - << EOF
+  /etc/passwd => /vobs_st/etc/foo
+  /etc/group  => /vobs_st/etc/bar
+  EOF
+
+=head1 COMPARISONS
+
+Synctree is comparable to I<citree> and I<clearfsimport>. It is
+similar to citree but has more options and runs on both Windows
+(including Cygwin) and UNIX. It has the following advantages over
+clearfsimport:
+
+=over
+
+=item *
+
+Synctree works with all ClearCase versions whereas clearfsimport is
+first supported in CC 4.2.
+
+=item *
+
+Synctree is capable of preserving CR's during C<MVFS-E<gt>MVFS> transfers
+whereas clearfsimport always treats the source area as flat files.
+
+=item *
+
+Synctree has support for mapping filenames in transit and a I<-Narrow>
+option for limiting the set of files to transfer.
+
+=item *
+
+Synctree is built on a documented API (B<ClearCase::SyncTree>) which is
+available for custom tool development in Perl, whereas clearfsimport is
+a command-line interface only.
+
+=item *
+
+Synctree has support for I<element reuse>. I.e. if an element is
+added in one pass and removed (rmnamed) in a subsequent pass, and if a
+third pass would make another element of the same name, synctree can
+optionally (I<-reuse>) make a link to the existing file instead of
+creating a new element which might be considered an "evil twin".
+
+=item *
+
+Synctree has support for I<version reuse>. In conjunction with
+labeling the results, importing a new version may be skipped by
+labeling instead an existing suitable one, even if not currently
+selected.
+
+=back
+
+However, unless you need one of the above features the supported,
+integrated solution (B<clearfsimport>) is generally preferable. And of
+course some of these features I<may> eventually be supported by
+clearfsimport; check current documentation.
+
+=head1 BUGS
+
+=over
+
+=item *
+
+Subtraction of symlinks is currently unimplemented. This could be made
+to work, it's just a corner case I haven't gotten to.
+
+=item *
+
+SyncTree does not transport empty directories, and added/removed
+directories aren't shown explicitly in the list of operations to be
+performed. This is a structural artifact. It could presumably be
+fixed by adding an extra phase which looks for empty dirs.
+
+=item *
+
+I have not tested SyncTree in snapshot views and would not expect it to
+work there without modifications.
+
+=back
+
+=head1 DEBUGGING
+
+The special flag I<-/dbg=1> will cause all underlying cleartool
+commands to be printed as they are run (this is actually a feature of
+the Argv module on which I<synctree> is built). Please run in this mode
+and include all output when reporting problems.
+
+Note also the I<-/ipc=1> flag, which uses a common background
+cleartool process, for improved performance.
+In this mode, cleartool commands are prefixed with C<=&gt;> instead of
+the default C<+>.
+
+=head1 AUTHOR
+
+David Boyce <dsbperl AT boyski.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000-2010 David Boyce. All rights reserved.  This Perl
+program is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), "perldoc ClearCase::SyncTree"
+
+=cut

@@ -1,0 +1,144 @@
+# NAME
+
+Catalyst::ComponentRole::PathFrom - Derive a path using common Catalyst patterns
+
+# SYNOPSIS
+
+    package MyApp::Model::Path;
+
+    use Moose;
+
+    extends 'Catalyst::Component';
+    with 'Catalyst::ComponentRole::PathFrom',
+      'Catalyst::Component::InstancePerContext';
+
+    has ctx => (is=>'rw', weak_ref=>1);
+
+    sub build_per_context_instance {
+      my ($self, $c) = @_;
+      $self->ctx($c);
+      return $self;
+    }
+
+    around 'path_from', sub {
+      my ($orig, $self, @args) = @_;
+      return $self->$orig($self->ctx, @args);
+    };
+
+    __PACKAGE__->meta->make_immutable;
+
+    package MyApp::Controller::Example;
+    use base 'Catalyst::Controller';
+
+    sub test_a :Local {
+      my ($self, $c) = @_;
+    }
+
+    sub test_b :Local PathFrom('ffffff') {
+      my ($self, $c) = @_;
+    }
+
+    sub test_c :Local  {
+      my ($self, $c) = @_;
+      $c->stash(path_from=>'foo/bar');
+    }
+
+# DESCRIPTION
+
+Common [Catalyst](https://metacpan.org/pod/Catalyst) views set a template path using a standard process,
+typically one based on the action or from a stash key.  This component
+role trys to encapsulate that common pattern, with the hope that it makes
+it easier for people to make new Views in a consistent way.  For example
+if you make your own custom Views this could save you some time in getting
+a common and expected setup.
+
+# ATTRIBUTES
+
+This role exposes the following attributes for configuration
+
+## extension
+
+Optional.  This is a file extension added to the end of your generated file
+path.  For example 'html', 'tt2'.  You don't need to include the '.' separator.
+
+## stash\_key
+
+Has default, 'path\_from'.  Used to set the stash key you wish to use to
+programmatically set the file path pattern in your action body.
+
+## action\_attribute
+
+Has default, 'PathFrom'.  Used to set the action attribute we use to get a file
+path pattern.
+
+## path\_base
+
+Has default "$app->config->{root}".  Used to set the base path for relative
+paths.  Usually you leave this one alone :)
+
+# METHODS
+
+This role exposes the following public methods
+
+## path\_from ( $action | $c | $c, $action | $c, $string\_path )
+
+Builds a full path to a file on the filesystem using common [Catalyst](https://metacpan.org/pod/Catalyst) conventions.
+
+Given an $action, will return $base\_path + $action->reverse + $extension OR if
+the $action has an attribute value for $action\_attribute, return $base\_path +
+$action\_attribute + $extension.
+
+Given $c, will do all the above (using $c->action for $action), but also check if
+the stash contains $stash\_key and if so use that path instead.
+
+Given $c, $action, does as above but uses the given $action instead of $c->action
+
+Given $c, $string\_path, uses $string\_path instead of $action->reverse.
+
+When using a $string\_path, a $stash\_key value or a value in $action\_attribute you
+may use the following placeholders in the string (for example ':namespace/foo')
+
+- :namespace
+
+    The action namespace ($action->namespace), which is typically the controller
+    namespace
+
+- :reverse
+
+    "$action->reverse" (which is basically the default
+
+- :actionname
+
+    "action->name" (the subroutine method name, typically).
+
+**NOTE**: if you use a $string\_path, a $stash\_key value or a value in
+$action\_attribute and that value starts with '/', that is a signal you wish to
+use an absolute path, and we don't prepend $self->base\_path.  You probably
+won't need this...
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Component](https://metacpan.org/pod/Catalyst::Component), [File::Spec](https://metacpan.org/pod/File::Spec), [Moose::Role](https://metacpan.org/pod/Moose::Role).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 238:
+
+    Unknown directive: =over4
+
+- Around line 240:
+
+    '=item' outside of any '=over'

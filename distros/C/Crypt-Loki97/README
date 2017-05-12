@@ -1,0 +1,29 @@
+Crypt::Loki97
+=============
+
+Loki97 is 128-bit block cipher that accepts a variable-length key. It
+was designed by Lawrie Brown, Josef Pieprzyk, and Jennifer Seberry.
+
+Loki97 was one of the 15 candidates for the AES.
+
+BONUS
+
+The C file, _loki97.c, is a standalone Loki97 implementation. To
+compile it, type:
+
+        gcc -Wall _loki97.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque. Please read contact.html that comes
+with this distribution for details on how to contact the author.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

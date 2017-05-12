@@ -1,0 +1,11 @@
+app_module.tmpl
+ARTISTIC
+Changes
+Generator.pm
+GPL
+Makefile.PL
+MANIFEST
+README
+t/01loadmodule.t
+t/02makecgiapp.t
+t/03runapp.t

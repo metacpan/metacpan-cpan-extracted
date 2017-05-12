@@ -1,0 +1,5 @@
+Revision history for Perl extension Catalyst::Plugin::AutoSession.
+
+0.03  Sat Mar 27 15:30:30 2010
+    - updated to make a correct CPAN module
+

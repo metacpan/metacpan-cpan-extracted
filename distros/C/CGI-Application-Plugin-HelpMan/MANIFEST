@@ -1,0 +1,8 @@
+t/0.t
+t/10_WUI.t
+t/TestApp.pm
+lib/CGI/Application/Plugin/HelpMan.pm
+lib/CGI/Application/HelpMan.pm
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

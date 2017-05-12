@@ -1,0 +1,31 @@
+[Changes for 0.63 - 2013-06-27]
+
+* More robust against leading spaces when decoding geek code blocks.
+  Contributed by: Kardan
+
+[Changes for 0.62 - 2010-11-08]
+
+* Added "=encoding utf8" to POD to fix author name display.
+  No functional changes.
+
+[Changes for 0.61 - 2010-11-07]
+
+* Source code and META.yml tidying up; no functional changes.
+
+[Changes for 0.60 - 2010-11-07]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to Convert-GeekCode.
+
+* Updated to Module::Install::DSL 1.00.
+
+* Update YAML translations to UTF-8, as reported by CPAN testers.
+
+[Changes for 0.51 - 2003-08-03]
+
+* Switch from .yaml to .yml.
+* Add the missing e* code.
+* Add a simplified chinese version.

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb9d
+registers:
+  AF: 51177
+  AF_: 0
+  BC: 6355
+  BC_: 0
+  DE: 36589
+  DE_: 0
+  HL: 48467
+  HL_: 0
+  I: 0
+  IX: 39551
+  IY: 49287
+  PC: 4
+  R: 2
+  SP: 0

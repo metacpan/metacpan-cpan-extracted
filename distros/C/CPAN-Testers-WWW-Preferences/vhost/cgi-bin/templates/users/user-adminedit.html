@@ -1,0 +1,55 @@
+[% 
+    IF users.data.userid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = data.realname _ ' (' _ editmode _ ')' ;
+
+    crumb3_name = 'User' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=user-admin' ;
+    crumb2_name = data.realname ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=user-adminedit&amp;userid=' _ data.userid ;
+    crumb1_name = editmode ;
+%]
+
+[% IF thanks %]<p>User saved successfully.</p>[% END %]
+<p>Fields marked '*' are mandatory fields and must be completed.<p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.<p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-save" />
+<input type="hidden" name="userid" value="[% IF users.data.userid %][% data.userid %][% ELSE %]0[% END %]" />
+
+<div class="box">
+    <table width="100%">
+    <tr><th width="150">Email *</th>
+        <th class="alert top">[% users.data.email_err %]</th>
+        <td><input type="text" name="email" value="[% users.data.email %]" size="50" /></td>
+    </tr>
+[% IF newuser %]
+    <tr><th>Password *</th>
+        <th class="alert top">[% users.data.effect_err %]</th>
+        <td><input type="text" name="effect" value="[% users.data.effect %]" size="50" /></td>
+    </tr>
+[% END %]
+
+    <tr><th>Display Name *</th>
+        <th class="alert top">[% users.data.realname_err %]</th>
+        <td><input type="text" name="realname" value="[% users.data.realname %]" size="50" /></td>
+    </tr>
+    <tr><th>Realm</th>
+        <th class="alert top">[% users.data.realm_err %]</th>
+        <td>[% users.data.ddrealms %]</td>
+    </tr>
+
+	  <tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+    </table>
+</div>
+</form>
+
+[% IF newuser %][% ELSE %]
+<p align="center"><br />
+  <a href="[% cgipath %]/pages.cgi?act=user-adminpass&amp;userid=[% users.data.userid %]">change password</a>
+| <a href="[% cgipath %]/pages.cgi?act=user-acl&amp;userid=[% users.data.userid %]">change access rights</a>
+[% END %]
+

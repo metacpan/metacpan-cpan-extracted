@@ -1,0 +1,30 @@
+Revision history for CGI-Struct
+
+1.21    2012-11-24
+        Fix test failure that hash randomization causes to happen more
+        often.  Code is fine.
+        Some minor improvements and clarifications in the POD.
+
+1.20    2012-09-30
+        Add splitting on \0 in strings to better support CGI->Vars
+        handling of multiple values.
+        Add deep cloning by default to be sure the returned hash is
+        completely decoupled from the passed hash.
+        Escape { in regexes in tests to avoid warnings on perl 5.17 and
+        later.
+
+1.12    2010-12-04
+        Minor doc tweaks.
+        Fix test suite on perl 5.6.2.  Code worked fine; just the test
+        was broken.
+        Some additional test improvements.
+
+1.11    2010-11-28
+        Improve docs, add some extra tests for safety.  No code changes.
+
+1.10    2010-11-28
+        Add 'nodot' to avoid interpretting dots as hash level references.
+
+1.00    2010-11-28
+        First version, released on an unsuspecting world.
+

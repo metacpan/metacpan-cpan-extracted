@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use CPAN::Patches 0.02;
+
+use 5.010;
+
+exit main();
+
+sub main {
+	my $help;
+	my @set_folders;
+	GetOptions(
+		'help|h' => \$help,
+		'patch-set|s=s' => \@set_folders,
+	) or pod2usage;
+	pod2usage if $help;
+	
+	my $cmd = shift @ARGV;
+	pod2usage if not $cmd;
+	$cmd =~ s/-/_/;
+	$cmd = 'cmd_'.$cmd;
+	
+	my $cpan_ps  = CPAN::Patches->new(
+		scalar @set_folders
+		? ('patch_set_locations' => \@set_folders)
+		: ()
+	);
+	pod2usage if not $cpan_ps->can($cmd);
+	
+	$cpan_ps->$cmd();
+	
+	return 0;
+}
+
+__END__
+
+=head1 NAME
+
+cpan-patches - work with CPAN patch sets
+
+=head1 SYNOPSIS
+
+	cpan-patches [--patch-set FOLDER] CMD
+	
+		patch  - will apply all patches
+		list   - list all patches
+		?      - check out CPAN::Patches::Plugin::* for additional commands
+		
+		--patch-set FOLDER
+			is the FOLDER where the patch-sets are stored
+
+=head1 DESCRIPTION
+
+=cut

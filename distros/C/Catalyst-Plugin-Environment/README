@@ -1,0 +1,8 @@
+Catalyst::Plugin::Environment - Catalyst plugin to modify %ENV via your application configuration
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

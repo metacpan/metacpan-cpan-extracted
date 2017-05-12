@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution CatalystX-MooseComponent, version
+0.004:
+
+  Ensure your Catalyst component isa Moose::Object
+
+This software is copyright (c) 2009 by Hans Dieter Pearcey.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

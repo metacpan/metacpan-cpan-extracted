@@ -1,0 +1,60 @@
+This is C::DynaLib, a Perl 5 FFI for calling C functions.
+Example:
+
+  use C::DynaLib;
+  $libm = new C::DynaLib("-lm");
+  $sinh = $libm->DeclareSub("sinh", "d", "d");
+  print "The hyperbolic sine of 3 is ", &$sinh(3), "\n";
+
+The module has been tested successfully on iX86, Sparc, and Alpha
+machines.  However, there are probably compilers for even these chips
+which will require some porting. Please report any problems at rt.cpan.org
+
+Included are the following packages:
+
+  C::DynaLib            - call a C function from Perl
+  C::DynaLib::Callback  - convert a perl sub into a usable
+                          C function pointer
+  C::DynaLib::Struct    - handle C records nicely. The declaration can be 
+			  created automatically from .h excerpts if 
+			  Convert::Binary::C is installed
+  Asm                   - unsupported whimsical i386 CPU interface
+                                     (not installed by default)
+
+To build this module, run the usual
+
+  perl Makefile.PL
+  make test
+
+Various things can go wrong.  First, your perl should be of the dynamic
+variety.  Be sure you answered "y" when Configure asked, "Do you wish
+to use dynamic loading?".  Otherwise, you will still (I think) be able
+to create callback pointers and convert a function pointer into a Perl
+sub, but you won't be able to do dynamic loading.
+
+gcc stack adjustment changed with gcc-4. This is not fixed yet, so
+hack30 must be used.
+
+The biggest issue in porting this module is your system's function
+call interface.  If Makefile.PL prints that it is using `hack30', it
+is a sign that your system is not yet supported.  Another sign of
+trouble is when `make test' prints `not ok' or `Illegal memory
+operation'.  Further documentation in pod format is in DynaLib.pm.
+
+The callback feature has sometimes caused grief in building the
+module.  If Makefile.PL writes a makefile but you can't get it to
+build, try `perl Makefile.PL CALLBACKS=0' followed by `make test',
+and report of your success or failure.
+
+COPYRIGHT
+
+The files named in MANIFEST, accompanying this file, are Copyright (c)
+1997, 2000 by John Tobey.  All rights reserved.  They may be modified,
+distributed and used under the same conditions as Perl itself.  Of
+course, there is no express or implied warranty.  See the file README
+in the top-level Perl source directory for more information.
+
+Enjoy!
+-John
+jtobey@john-edwin-tobey.org and 
+Reini Urban <rurban@cpan.org>

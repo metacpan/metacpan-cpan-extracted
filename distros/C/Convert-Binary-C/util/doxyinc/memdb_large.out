@@ -1,0 +1,13 @@
+
+Summary Statistics:
+
+  Total allocs       : 32404
+  Total frees        : 32404
+  Max. memory blocks : 13305
+  Max. memory usage  : 183675 bytes
+
+  Smallest block     : 2 bytes
+  Largest block      : 29 bytes
+
+  Memory leakage     : 0 bytes
+

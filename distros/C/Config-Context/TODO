@@ -1,0 +1,12 @@
+
+TODO
+- clean up file caching tests: split out each case so that no test
+  depends on its predecessors
+
+- CPAN installer that lets you pick your driver and
+  doesn't automatically set Config::General as prereq
+
+- YAML support
+
+- Tests for parameter correctness (e.g. %driver_opts to XMLSimple)
+

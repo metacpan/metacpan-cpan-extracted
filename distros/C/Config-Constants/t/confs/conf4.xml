@@ -1,0 +1,7 @@
+<config>
+    <include path='t/confs/conf4a.xml' />
+    <module name='Bar::Baz'>
+        <constant name='FOO' value='50' />
+        <constant name='BAR' value='Foo and Baz' />        
+    </module>
+</config>

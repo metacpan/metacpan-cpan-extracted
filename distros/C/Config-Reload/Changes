@@ -1,0 +1,11 @@
+# Change file for Config::Reload
+
+0.21 2013-08-24
+    Updated Config::ZOMG to reduce code
+
+0.2 2013-08-15
+    Refactored and extended documentation
+    Additional method `loaded`
+
+0.1  2013-07-16
+    First public version at CPAN

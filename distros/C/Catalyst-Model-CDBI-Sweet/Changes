@@ -1,0 +1,25 @@
+Revision history for Perl extension Catalyst::Model::CDBI::Sweet
+
+0.06  Thu Nov 03 16:19:00 2005
+        - use can to future proof the model. 
+        
+0.05  Thu Oct 27 17:13:00 2005
+        - Use Catalyst::Exception
+		- Removed dependency on UUID class
+		- Rewrote docs to make the purpose of this module more clear.
+
+0.04  Sun May 29 01:00:00 2005
+        - Moved most logic to a seperate package Class::DBI::Sweet
+
+0.03  Tue May 03 17:24:00 2005
+        - Added support for calling count without arguments
+        - Fixed Documentation
+        - Fixed search SQL bug, a WHERE clause was missing from the statement
+
+0.02  Sat Apr 30  09:00 2005
+        - Sweet is no longer tied to Catalyst
+        - Added support for Win32
+        - Added retrieve_all
+
+0.01  Wed Apr 27 01:00:00 2005
+        - original version.

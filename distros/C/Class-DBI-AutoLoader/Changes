@@ -1,0 +1,17 @@
+Revision history for Perl extension Class::DBI::AutoLoader.
+
+0.12  Sat Oct 18 12:46:12 2003
+	- Fixed another doco bug
+
+0.11  Mon Oct 13 22:29:36 2003
+	- Reduced the eval'ed code
+	- Added 'use_base' option
+	- Changed base class to Class::DBI::BaseDSN
+
+0.10  Fri Oct 10 01:07:00 2003
+	- Added 'tables' option.
+	- Updated POD
+
+0.09  Thu Oct  9 22:38:51 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Class::DBI::AutoLoader

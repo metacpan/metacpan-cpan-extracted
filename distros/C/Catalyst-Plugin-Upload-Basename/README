@@ -1,0 +1,27 @@
+NAME
+    Catalyst::Plugin::Upload::Basename - Basename for uploads
+
+SYNOPSIS
+        use Catalyst qw[Upload::Basename];
+
+        if ( my $upload = $c->request->upload('field') ) {
+            print $upload->basename;
+        }
+
+DESCRIPTION
+    Extends "Catalyst::Request::Upload" with a basename method.
+
+METHODS
+    basename
+        Returns basename for "filename".
+
+SEE ALSO
+    Catalyst::Request, Catalyst::Request::Upload.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

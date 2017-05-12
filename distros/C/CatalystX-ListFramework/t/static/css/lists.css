@@ -1,0 +1,573 @@
+/* old talisman */
+
+.oldjob {
+   background-color: #ffffaa;
+   border: 1px solid #000000;
+}
+
+.newjob {
+   background-color: #ffaaaa;
+   
+}
+
+h2 {
+   margin-top: 15px;
+}
+div.indented {
+   margin-left: 30px;
+}
+
+body.alt {
+   background-color: white;
+   margin: 0;
+   font-family: Arial, Helvetica, sans-serif;
+  }
+.boldlabel {
+   color: #333399;
+   font-size: 90%;
+   font-weight: bold;
+  }
+button.popup {
+        font-size: 8pt;
+        margin: 0;
+        padding: 0;
+        cursor: hand;
+        }
+
+.boldlabel {
+   color: #333399;
+   font-size: 90%;
+   font-weight: bold;
+  }
+
+.btnsort {
+   background-color: #dae0ed;
+   font-size: 90%;
+   color: #333399;
+   font-weight: bold;
+   border-left: 0px solid #ccccee;
+   border-right: 0px solid #666688;
+   border-top: 0px solid #ccccee;
+   border-bottom: 0px solid #666688;
+   padding-left: 2px;
+   padding-right: 2px;
+   text-align: center;
+  }
+.btnsorton {
+   background-color: #333399;
+   font-size: 90%;
+   color: #dae0ed;
+   font-weight: bold;
+   border-left: 0px solid #ccccee;
+   border-right: 0px solid #444488;
+   border-top: 0px solid #ccccee;
+   border-bottom: 0px solid #444488;
+   padding-left: 2px;
+   padding-right: 2px;
+   text-align: center;
+  }
+.column {
+   background-color: #EEEEEE;
+   color: #333399;
+   font-weight: bold;
+   text-align: center;
+   border-width: 0px;
+   border-style: none;
+  }
+.columnsel {
+   background-color: #333333;
+   color: #EEEEEE;
+   font-weight: bold;
+   text-align: center;
+  }
+.columnsrt {
+   background-color: #EEEEEE;
+   color: #333333;
+   font-weight: bold;
+   text-align: center;
+  }
+.data {
+   color: #333399;
+   background-color: #FFFFFF;
+   font-weight: bold;
+   border-width: 0;
+   border-style: inset;
+  font-weight:bold;
+  }
+.error {
+   color: red;
+   font-size: 120%;
+   font-style: italic;
+   font-weight: bold;
+   text-align: center;
+  }
+
+.formnoinput {
+   background-color: #CCCCCC;
+  color: #666666;
+  font-weight:bold;
+  font-size:90%;
+  }
+.heading {
+   color: #333399;
+   font-size: 110%;
+   font-weight: bold;
+   text-align: center;
+  }
+.input {
+   color: #333399;
+   font-size: 80%;
+   border-width: 0px;
+   border-style: none;
+  }
+.label {
+   color: #333399;
+   font-size: 90%;
+   border-width: 0px;
+   font-weight: bold;
+  }
+.listhead {
+   color: #333399;
+   font-size: 110%;
+   font-weight: bold;
+   text-align: right;
+  }
+.normal {
+   color: #333399;
+   font-weight: bold;
+  }
+.rowa {
+   background-color: #f4f6fa;
+  }
+.rowh {
+   background-color: #DDDDDD;
+  }
+.rown {
+   /*background-color: transparent*/;
+  }
+.select {
+   background-color: #d6dceb;
+   color: #333399;
+   font-size: 80%;
+   font-weight: bold;
+   border-width: 0px;
+   border-style: none;
+  }
+.tdcusttitle {
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 150%;
+   font-weight: bold;
+   color: navy
+   }
+.widebutton {
+   background-color: #dae0ed;
+   font-weight: bold;
+   font-size: 80%;
+   color: #333399;
+   border-style: groove;
+   border-bottom: 1px solid;
+   border-left: #ffffff 1px solid;
+   border-right: 1px solid;
+   border-top: #ffffff 1px solid;
+   padding-top: 0;
+   padding-bottom: 0 ;
+   padding-left: 10px;
+   text-align: left;
+   width: 150px;
+   cursor: hand;
+  }
+
+/* talnf */
+
+body.main {
+   background-color: white;
+   margin: 0;
+   font-family: Arial, Helvetica, sans-serif;
+   color: #0000aa;
+  }
+
+a:link, a:visited {
+  color: #333399;
+  }
+a:active {
+  color: blue;
+  }
+
+input.textfield {
+  width: 100px;
+  }
+select.select {
+  background-color: transparent;
+  font-weight: normal;
+  color: black;
+  font-family: Arial, Helvetica, sans-serif;
+  }
+
+/* lists */
+
+table.listing {
+   clear: both;  
+}
+.listbutton {
+   background-color: #dae0ed;
+   font-weight: bold;
+   font-size: 80%;
+   color: #333399;
+   border-style: groove;
+   border-bottom: 1px solid;
+   border-left: #ffffff 1px solid;
+   border-right: 1px solid;
+   border-top: #ffffff 1px solid;
+   padding-bottom: 0 ;
+   padding-left: 10px;
+   cursor: hand;
+}
+td.searchboxtitle {
+   background-color: #EEEEEE;
+   color: #333399;
+   font-weight: bold;
+   text-align: center;
+   border-width: 0px;
+   border-style: none;  
+}
+td.searchboxlabel, td.searchboxinput {
+   background-color: #d6dceb;
+   color: #333399;
+   font-size: 80%;
+   padding-left: 4px;
+   padding-right: 4px;
+   font-weight: bold;
+   border-width: 0px;
+   border-style: none;
+}
+.listcolheadsort {
+   background-color: #dae0ed;
+   font-size: 90%;
+   color: #333399;
+   font-weight: bold;
+   border-left: 0px solid #ccccee;
+   border-right: 0px solid #666688;
+   border-top: 0px solid #ccccee;
+   border-bottom: 0px solid #666688;
+   padding-left: 2px;
+   padding-right: 2px ;
+   text-align: center;
+   cursor:hand;
+}
+.listcolheadrunningtotal {
+   background-color: #dae0ed;
+   font-size: 90%;
+   color: #333399;
+   font-weight: bold;
+   border-left: 0px solid #ccccee;
+   border-right: 0px solid #666688;
+   border-top: 0px solid #ccccee;
+   border-bottom: 0px solid #666688;
+   padding-left: 2px;
+   padding-right: 2px ;
+   text-align: center;
+   cursor:hand;
+}
+a.listcolheadsort:link, a.listcolheadsort:visited, a.listcolheadsort:active {
+  text-decoration: none;
+}
+tr.listrow0 {
+   background-color: #f4f6fa;
+   font-size: 90%;
+}
+tr.listrow1 {
+   font-size: 90%;
+}
+tr.listrowsum {
+   background-color: #e0e0e0;
+   font-size: 90%;
+}
+input.listpagesize {
+   font-size: 80%;
+}
+
+table.listfoot {
+   background-color: #EEEEEE;
+   width: 100%;
+   clear: both;
+   padding: 0;
+   margin: 0;
+   border: 0;
+   border-collapse: collapse;
+}
+td.listpagesize {
+   color: #333399;
+   text-align: left;
+   font-size: 90%;
+   margin-left: 1px;
+}
+td.listfoottotal {
+   color: #333399;
+   font-weight: bold;
+   text-align: center;
+}
+td.listpageselect {
+   color: #333399;
+   font-size: 90%;
+   text-align: right;
+}
+
+div.listfootcount {
+   margin-left: 3px;
+   background-color: #EEEEEE;
+   color: #333399;
+   font-weight: bold;
+   text-align: center;
+   border-width: 0px;
+   border-style: none;  
+   width:75%;
+}
+
+/* forms */
+
+.header {
+  color:#333399;
+  background-color:#ffffff;
+  font-size: 80%;
+  vertical-align:top;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.headeritem {
+  color:#333399;
+  text-decoration:none;
+  }
+.singleboxhead {
+  color:#ffffff;
+  background-color:#333399;
+  font-size:13px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight:bold;
+  vertical-align:top;
+  }
+
+.singleboxbody {
+  color:#333399;
+  background-color:#ffffff;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif;
+  vertical-align:top;
+  }
+
+.singleboxkey {
+  color:#333399;
+  background-color:#ffffff;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight:normal;
+  vertical-align:top;
+  }
+.singleboxvalue {
+  color:#333399;
+  background-color:#ffffff;
+  font-size:12px;
+  font-family: Arial, Helvetica, sans-serif;
+  vertical-align:top;
+  }
+td.boxdataheading {
+   background-color: #EEEEFF;
+   color: #333399;
+   padding: 2px;
+   font-weight: bold;
+   text-align: center;
+}
+td.boxdatalabel {
+   background-color: #EEEEFF;
+   color: #333399;
+   font-size: 90%;
+   border-width: 0px;
+   padding: 2px;
+   font-weight: bold;
+}
+td.boxdatasubheading {
+   background-color: #EEEEFF;
+   color: #333399;
+   border-width: 0px;
+   padding: 2px;
+   font-weight: bold;
+   text-align: center;
+}
+td.boxdatavalue {
+  color: #333399;
+  background-color: #FFFFFF;
+  font-weight: bold;
+  border-width: 0;
+  font-weight:bold;
+}
+td.boxsubvalue {
+  color: #333399;
+  background-color: #FFFFFF;
+}
+span.boxdatavalue { /*
+  background-color: lightgrey;
+  padding: 2px;
+*/ }
+table.summary strong {
+   font-weight: bold;  
+}
+table.boxdata {
+  border-color: #EEEEFF;
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 2px;
+  border-style: outset;
+}
+table.boxsubdata {
+  border-color: #EEEEFF;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+
+table.invoiceinfo {
+   border-collapse: separate;
+   border-spacing: 10px;
+   empty-cells: hide;
+}
+table.invoiceinfo th {
+  font-weight: bold;
+}
+
+table.invoicedetails {
+   border-collapse: separate;
+   border-spacing: 10px;
+   empty-cells: hide;
+   margin-left: 100px;
+}
+table.invoicedetails th {
+  border-width: 0;
+  font-weight: bold;
+  text-align: center;
+}
+table.invoicedetails td {
+  border-width: 0;
+}
+
+
+table.timesheetinfo {
+   border-collapse: separate;
+   border-spacing: 10px;
+   empty-cells: show;
+}
+
+table.timesheetinfo th {
+   font-weight: bold;
+}
+
+
+table.timesheetrates {
+  border-color: #FFFFFF;
+  border-collapse: collapse;
+  border-style: solid;
+  border-width: 2px;
+  border-style: solid;
+  empty-cells: show;
+  width: 100%;
+}
+table.timesheetrates th {
+  font-weight: bold;
+  text-align: left;
+}
+table.timesheetrates td {
+  text-align: right;
+  background-color: #CCCCCC;
+}
+table.timesheetrates td.timesheetratedatafirst {
+  text-align: left;
+}
+td.reftablevalue {
+  color: #333399;
+  background-color: #FFFFFF;
+  font-size: 90%;
+}
+div.viewheader {
+   font-family: Arial, Helvetica, sans-serif;
+   font-size: 150%;
+   font-weight: bold;
+   color: white;
+   background-color: navy;
+   margin-bottom: 15px;
+}
+
+
+/* tabs */
+#navigation {
+  width: 200px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+#navigation ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  }
+#navigation li {
+  border-bottom: 1px solid #ED9F9F;
+}
+#navigation li a:link, #navigation li a:visited {
+  display: block;
+  padding: 5px 5px 5px 0.5em;
+  border-left: 12px solid #711515;
+  border-right: 1px solid #711515;
+  background-color: #B51032;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+#navigation li a:hover {
+  background-color: #711515;
+  color: #FFFFFF;
+}
+#navigation ul ul {
+  margin-left: 12px;
+}
+#navigation ul ul li {
+  border-bottom: 1px solid #711715;
+  margin: 0;
+}
+#navigation ul ul a:link, #navigation ul ul a:visited {
+  background-color: #ED9F9F;
+  color: #711715;
+}
+#navigation ul ul a:hover {
+  background-color: #711717;
+  color: #FFFFFF;
+}
+
+/* infobox layout */
+
+#infobox_podetails {
+   float: right;
+   width: 37%;
+   margin: 1%;
+}
+#infobox_prdetails {
+   float: left;
+   width: 57%;
+   margin: 1%;
+}
+#infobox_booking {
+   float: left;
+   width: 57%;
+   margin: 1%;
+}
+#infobox_status {
+   float: right;
+   width: 37%;
+   margin: 1%;
+}
+#infobox_customer {
+   float: left;
+   width: 57%;
+   margin: 1%;
+}
+#infobox_rates {
+   float: left;
+   width: 57%;
+   margin: 1%;
+}
+#infobox_rates th {
+   font-weight: bold;
+}

@@ -1,0 +1,172 @@
+#:Configuration file for Cmenu
+#:
+#: Comments are hash and colon #:
+#:
+#: Help file root dir
+#: Don't forget trailing slash
+H:helpfile:::
+#H:helpfile::/etc/Cmenu/:
+#H:helpfile::./:
+#:
+#:Screen colours
+#:===============================================
+#:Specify colours for menus using these numebrs
+#:Black = 0 Red     = 1 Green = 2 Brown = 3
+#:Blue  = 4 Magenta = 5 Cyan  = 6 White = 7
+#: bold or bright
+#:
+#:Specify colours in this format
+#:C : description : tag-name : colour definition
+#:Description for readability only (thrown away)
+#:The colour definition contains 3 elements
+#:  fg - foreground colour
+#:  bg - background colour
+#:  at - mono attributes (as below)
+#:These should be combined as dot seperated list
+#:multiple attributes seperated by a bar (|)
+#------------------------------------------------
+#:These are the defaults
+#:  Backdrop of the display 
+#C::backdrop :6.4
+#C::advice   :6.4.BOLD
+#:  Main menu rendering
+#C::text     :0.7
+#C::title    :3:7.BOLD
+#C::option   :1.7.BOLD
+#C::button   :7.7.BOLD
+#:  Scrolly thing
+#C::scroll   :2.7.BOLD
+#:  Reverse menu rendering (bounce bar + hot button)
+#C::rtext    :7.4.BOLD
+#C::rtitle   :6.4.BOLD
+#C::roption  :3.4.BOLD
+#:  Line drawing
+#C::edge     :7.7.BOLD
+#C::dull     :0.7.BOLD
+#:  Splash screens
+#C::help     :3.2
+#C::warn     :7.3
+#C::error    :7.1
+#C::popup    :3.2.BOLD
+#:  box shadow on colour screens
+#C::shadow   :0.0
+#:------------------------------------------------
+#:Monochrome rendition
+#: defined as Curses toggles from
+#:   NORMAL | BOLD | REVERSE
+#:   STANDOUT | BLINK | UNDERLINE | DIM
+#: depends what the terminal supports; not all may
+#: render distinctly from others if they work at all
+#:------------------------------------------------
+#: these are the defaults
+#M::backdrop:DIM
+#M::advice  :NORMAL
+#M::text    :NORMAL
+#M::title   :NORMAL
+M::option  :BOLD
+#M::button  :DIM
+#M::scroll  :NORMAL
+#M::rtext   :REVERSE
+#M::rtitle  :REVERSE
+M::roption :REVERSE|BOLD
+#M::edge    :DIM
+#M::dull    :DIM
+#M::help    :REVERSE
+#M::warn    :REVERSE
+#M::error   :REVERSE
+#M::popup   :NORMAL
+#:
+#:Key sequences
+#:================================================
+#:Key sequences are terminal specific or provided
+#:by curses 
+#:------------------------------------------------
+#:Key sequences are specified as follows
+#K:Key sequence          :##:CODE
+#K:----------------------:##:----
+#: Fields seperated by : where
+#: K - is key specifier
+#: Key sequence is a text description (thrown away)
+#: ## The actual sequence
+#:     control chars and <ESC> should be entered exactly
+#:     see your editors docs on how to do this
+#: Interpretation strings (what the key will do)
+#:    to disable a key, make this NOP
+#:	Cursor movement   UP   DOWN LEFT RITE
+#:      	          PREV NEXT HOME END
+#:	Deleting          BS   DEL
+#:	Buffer            KILL YANK BUFF
+#:	Toggles           INS  HELP
+#:	Tabbing           TAB  BTAB
+#:	Return            RET  EXIT QUIT
+#:	Do nothing        NOP
+#:------------------------------------------------
+#: These are the default control sequences
+#: --------
+#: ANSI sequences for xterm
+#: --------
+#K:Ansi cursor-up     ^[[A :[A:UP
+#K:Ansi cursor-down   ^[[B :[B:DOWN
+#K:Ansi cursor-right  ^[[C :[C:RITE
+#K:Ansi cursor-left   ^[[D :[D:LEFT
+#K:Ansi guess         ^[[E :[E:PREV
+#K:Ansi end key       ^[[F :[F:END
+#K:Ansi guess         ^[[G :[G:NEXT
+#K:Ansi home key      ^[[H :[H:HOME
+#: --------
+#: Emacs control sequences
+#: --------
+#K:begin of line         ^A::HOME
+#K:end of line           ^E::END
+#K:next char             ^F::RITE
+#K:prev char             ^B::LEFT
+#K:next field            ^N::TAB
+#K:prev field            ^P::BACK
+#K:redraw screen         ^L::REFS
+#K:delete right          ^D::DEL
+#K:kill line             ^K::KILL
+#K:yank/paste buffer     ^V::YANK
+#K:copy and kill to buff ^X::BUFF
+#K:tab                   ^I:	:TAB
+#:
+#: --------
+#: These are the default Curses return values
+#: Do not change the return values
+#: Lynx type motion is the default for Right & Left
+#: to disable this, change LYNXL to LEFT & LYNXR to RITE
+#: --------
+#K:break                   :257:EXIT
+#K:down arrow              :258:DOWN
+#K:up arrow                :259:UP
+#K:left arrow              :260:LYNXL
+#K:right arrow             :261:LYNXR
+#K:home                    :262:HOME
+#K:backspace               :263:BS
+#K:Func key 1              :265:HELP
+#K:Func key 2              :266:NOP
+#K:Func key 3              :267:NOP
+#K:Func key 4              :268:NOP
+#K:Func key 5              :269:NOP
+#K:Func key 6              :270:NOP
+#K:Func key 7              :271:NOP
+#K:Func key 8              :272:QUIT
+#K:Func key 9              :273:NOP
+#K:Func key 10             :274:NOP
+#K:Func key 11             :275:NOP
+#K:Func key 12             :276:EXIT
+#K:page up                 :339:PREV
+#K:page down               :338:NEXT
+#K:insert toggle           :331:INS
+#K:delete                  :330:DEL
+#K:enter key               :343:RET
+#K:shifted tab             :353:BTAB
+#K:end                     :360:END
+#:
+#:=================================================
+#: Miscellaneous User Hacks
+#:This gives an extra line in the menu pane by dropping
+#:the pane border to overlap the button bar
+#:Disabled by default - looks OK on mono-screens
+X:::hack25
+#:=================================================
+

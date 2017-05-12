@@ -1,0 +1,13 @@
+Changes
+data/9a0bed0d
+data/be0c140e
+data/ee074b12
+lib/CDDB/File.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/pod-coverage.t
+t/pod.t
+t/readfile.t

@@ -1,0 +1,127 @@
+   login($cgi, $ar, $tmout)
+    Input variables:
+
+      $cgi - CGI object
+      $ar  - parameter array ref
+      $tmout - whether the session has been timed out
+
+    Variables used or routines called:
+
+      to_remember - to remember inputs
+      check_user  - to check user logins
+      set_cookies - to set cookies
+
+    How to use:
+
+      my $q = new CGI;
+      $self->login($q, 'jsmith', 'jojo');     # login as jsmith
+      my %cfg = (usr=>'jsmith', pwd=>'jojo');
+      $self->login($q, \%cfg, 0);                # login as jsmith
+
+    Return: ($toc, $txt): the login screen HTML code
+
+   get_version ($cgi, $ar, $sub)
+    Input variables:
+
+      $cgi - CGI object
+      $ar  - Array ref containing all the parameters
+      $sub - sub procedure name.
+             display user first name if it is 'login'
+
+    Variables used or routines called:
+
+      None.
+
+    How to use:
+
+      my $q = new CGI;
+      my %cfg = (usr=>'jsmith', pwd=>'jojo');
+      my @names = $q->param;
+      foreach my $k (@names) { $cfg{$k} = $q->param($k) if ! exists $cfg{$k}; }
+      $self->get_version($q, \%cfg);
+
+    Return: $t - HTML code
+
+    This method forms HTML code to show demorgraphic information about the
+    subject.
+
+   check_timeout($cgi, $ar)
+    Input variables:
+
+      $cgi - CGI object
+      $ar  - Array ref containing all the parameters
+
+    Variables used or routines called:
+
+      None.
+
+    How to use:
+
+      my $q = new CGI;
+      my %cfg = (usr=>'jsmith', pwd=>'jojo');
+      my @names = $q->param;
+      foreach my $k (@names) { $cfg{$k} = $q->param($k) if ! exists $cfg{$k}; }
+      $self->check_timeout($q, \%cfg);
+
+    Return: 1 or 0: 1 - timed out; 0 - not timed out
+
+    This method checks to see if the session has been timed out. The default
+    time out is 20 minutes.
+
+   get_access ($cgi,$ar)
+    Input variables:
+
+      $cgi - CGI object
+      $ar  - Array ref containing all the parameters
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $q = new CGI;
+      my %cfg = (usr=>'jsmith', pwd=>'jojo');
+      my @names = $q->param;
+      foreach my $k (@names) { $cfg{$k} = $q->param($k) if ! exists $cfg{$k}; }
+      $self->get_access($q, \%cfg);
+
+    Return: $hr - access hash array ref: ${$hr}{uid|gid}{$name} = $uid|$giu
+
+    This method retrieves portal access user and group files and
+    access_users and access_groups in the configuration file to build an
+    access list.
+
+   check_user ($cgi,$ar)
+    Input variables:
+
+      $cgi - CGI object
+      $ar  - Array ref containing all the parameters
+
+    Variables used or routines called:
+
+      disp_param  - display parameters
+      get_cookies - get cookies
+      get_access  - get access information
+
+    How to use:
+
+      my $q = new CGI;
+      my %cfg = (usr=>'jsmith', pwd=>'jojo');
+      my @names = $q->param;
+      foreach my $k (@names) { $cfg{$k} = $q->param($k) if ! exists $cfg{$k}; }
+      $self->check_user($q, \%cfg);
+
+    Return: $n - status code
+
+      0 - no user name from input nor from cookie
+      1 - user name does not exists
+      2 - user does not belong to any group which has granted access
+      >9 - user has access to the application
+
+    A successful user authentication includes: 1) the user has to be a valid
+    web portal user; 2) user's password matches 3) user has to be a
+    authorized user or in an authorized group to use this application. The
+    autorization parameters are access_users and access_groups in the
+    configuration file.
+

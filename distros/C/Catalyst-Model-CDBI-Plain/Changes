@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Model::CDBI::Plain.
+
+0.02  Tue May  3 10:14:48 EDT 2005
+        - Fixed constructor
+
+0.01  Tue Apr 26 21:38:51 EDT 2005
+        - first release

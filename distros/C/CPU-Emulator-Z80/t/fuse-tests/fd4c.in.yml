@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 76
+name: fd4c
+registers:
+  AF: 32363
+  AF_: 0
+  BC: 48459
+  BC_: 0
+  DE: 9398
+  DE_: 0
+  HL: 65428
+  HL_: 0
+  I: 0
+  IX: 34349
+  IY: 464
+  PC: 0
+  R: 0
+  SP: 0

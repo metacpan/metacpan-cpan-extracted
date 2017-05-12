@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/ActionRole/Tabs.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.skip
+META.yml
+README
+t/00-load.t
+t/01-action-class.t
+t/02-chained.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestChained.pm
+t/lib/TestChained/Controller/Test.pm
+t/pod-coverage.t
+t/pod.t

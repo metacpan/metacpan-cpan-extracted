@@ -1,0 +1,33 @@
+Crypt::OpenSSL::DSA
+===================
+
+DESCRIPTION
+
+Crypt::OpenSSL::DSA implements the DSA
+(Digital Signature Algorithm) signature verification system.
+
+It is a thin XS wrapper to the DSA functions contained in the 
+OpenSSL crypto library, located at http://www.openssl.org
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  openssl, available from http://www.openssl.org/
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 T.J. Mather.  Crypt::OpenSSL::DSA is free software;
+you may redistribute it and/or modify it under the same terms as Perl itself. 
+
+Paid support is available directly from the author of this package.
+Please see http://www.maxmind.com/app/opensourceservices for more details.

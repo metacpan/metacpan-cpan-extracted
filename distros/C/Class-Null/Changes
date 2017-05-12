@@ -1,0 +1,74 @@
+Revision history for Perl extension Class-Null
+
+2.110730  2011-03-14 11:39:42 Europe/Vienna
+    - tests use 'base' instead of 'parent' - no need to introduce an
+      extra dependency for 5.8.* users
+
+2.101420  2010-05-22 23:09:16 Europe/Vienna
+    - 'use parent' instead of 'use base'
+
+2.100830  2010-03-24 11:44:23 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+1.11  Mon 2009.12.07 22:18:14 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - reduced dependencies using author tests
+     - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+1.10  Fri Nov  7 11:43:47 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - Fixed a bug where Class::Null->new->new didn't work (thanks rabbit,
+       rt.cpan.org bug #34244)
+
+1.09  Thu, 29 May 2008 12:01:38 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - added t/perlcriticrc
+     - updated MANIFEST
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+1.08  Sat, 20 Oct 2007 22:19:07 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - simplified accessor declaration in documentation
+
+1.07  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+1.06  Sun, 23 Sep 2007 10:03:20 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - now uses Module::Install::StandardTests
+
+1.05  Sat, 08 Sep 2007 09:38:55 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed the documentation
+     - use warnings; use strict;
+     - converted to new-style distro (with Module::Install and such)
+
+1.04  Wed, 11 Jan 2006 15:44:53 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - Consistency improvements
+
+1.03  Wed, 09 Feb 2005 15:26:03 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - Removed Test::Distribution requirement
+     - Added method chaining
+
+1.02  Fri, 06 Sep 2002 18:58:47 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - changed AUTOLOAD to return undef. Up to now it returned the glob created
+       by *{$AUTOLOAD}, which is not what the called would expect from sub {}.
+
+1.01  Sun, 18 Aug 2002 13:52:05 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - Class::Null is now a singleton to reduce memory overhead (thanks
+       nwetters)
+     - Class::Null now creates an empty subroutine when autoloading, to
+       increase the speed of subsequent calls (they don't have to go through
+       AUTOLOAD again) (thanks nwetters)
+
+1.00  Sat, 17 Aug 2002 11:38:47 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - changed 'our' to 'use vars' for $VERSION so it runs under earlier
+       versions of perl (thanks richardc)
+     - fixed a POD typo
+     - removed the '5.008' requirement from Makefile.PL
+
+0.01  Fri, 16 Aug 2002 17:01:00 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

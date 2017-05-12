@@ -1,0 +1,76 @@
+NAME
+    CGI::ParamComposite - Convert .-delimited CGI parameters to Perl
+    classes/objects
+
+SYNOPSIS
+      use CGI;
+      use CGI::ParamComposite;
+      my $q = CGI->new();
+      my $c = CGI::ParamComposite->new( populate => 0 , cgi => $q );
+
+      #Dumper([$composite->roots()]) returns (minor formatting):
+      $VAR1 = [
+         bless( {}, 'CGI::ParamComposite' )
+      ];
+
+      my $c = CGI::ParamComposite->new( populate => 1 , cgi => $q , package => 'market');
+
+      #Dumper([$composite->roots()]) returns (minor formatting):
+      $VAR1 = [
+        bless( {
+          'food' => bless( {
+            'market::food::meat' => [
+              'pork',
+              'beef',
+              'fish'
+            ],
+            'market::food::vegetable' => [
+              'tomato',
+              'spinach'
+            ]
+          }, 'market::food' )
+        }, 'market' )
+      ];
+
+      #either way, these calls now work:
+      my($market) = $composite->roots();
+      ref($market);                                       #returns "market"
+      ref($market->food);                                 #returns "market::food"
+      join(', ', map {ref($_)} $market->food->children(); #returns "market::food::meat, market::food::vegetable"
+
+DESCRIPTION
+    I needed this for a fairly large single-CGI script application that I
+    was working on. It was a script that had been actively, organically
+    growing for 4+ years, and was getting very difficult to track the
+    undocumented 50+ CGI parameters that were being passed, some of them
+    dynamically generated, and almost all with very short names.
+
+    I wanted a way to organize the parameters, to make it easier to set up
+    some simple guidelines for how to maintain parameters, and how to make
+    sure they were accessable in a consistent manner. I decided to use a
+    hierarchical, dot-delimited convention similar to what you seen in some
+    programming languages. Now if I see a parameter like:
+
+    /my.cgi?gbrowse.param.navigation.instructions=1
+
+    I can pretty quickly guess, after not looking at the code for
+    days/weeks/months, that this value is somehow affecting the instructions
+    on the Gbrowse navigation page. In my opinion, this is superior to:
+
+    /my.cgi?ins=0
+
+    which had the same effect in an earlier version of the code (negated
+    logic :o).
+
+SEE ALSO
+    CGI, Symbol
+
+AUTHOR
+    Allen Day, <allenday@ucla.edu>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Allen Day
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.

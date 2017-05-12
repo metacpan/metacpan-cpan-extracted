@@ -1,0 +1,77 @@
+=head1 NAME
+
+CCCP::LiveMX
+
+=head1 DESCRIPTION
+
+Getting a ip-list of living MX-records for hostname
+
+=head1 SYNOPSIS
+
+    use CCCP::LiveMX;
+    
+    my $lmx = CCCP::LiveMX->check_host('example.org');
+    if ($lmx->success) {
+        my @live_ip = $lmx->live_ip;
+    } else {
+        print $lmx->error,"\n";
+        my @not_ping_ip = $lmx->not_ping;
+        my @not_ask_ip  = $lmx->not_ask;
+    }
+    
+=head1 PACKAGE VARIABLES
+
+=head2 $CCCP::LiveMX::timeout
+
+Timeout for ping, resolve and another.
+By default 5 sec.
+
+=head1 METHODS
+
+=head2 check_host($host_name)
+
+Checking MX records for C<$host_name> and return instance.
+
+=head2 success()
+
+Return status of check (bool)
+
+=head2 live_ip()
+
+Return list avaliable ip for host, sorted by "preference" mx-records
+
+=head2 not_ping()
+
+Return list ip for host, that not ping
+
+=head2 not_ask()
+
+Return list ip for host, that ping but not ask
+
+=head2 error()
+
+Return error-string or undef otherwise
+
+=head1 DEPENDS ON
+
+=over 4
+
+=item *
+
+L<Mail::CheckUser> (used only package variables)
+
+=item *
+
+L<Net::DNS>
+
+=item *
+
+L<Net::Ping>
+
+=back
+
+=head1 AUTHOR
+
+mr.Rico <catamoose at yandex.ru>
+
+=cut

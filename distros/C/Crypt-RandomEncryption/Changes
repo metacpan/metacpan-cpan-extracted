@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::RandomEncryption.
+
+0.01  Thu May 16 22:46:37 2013
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Crypt::RandomEncryption
+

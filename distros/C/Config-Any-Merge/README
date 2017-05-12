@@ -1,0 +1,36 @@
+NAME
+    Config::Any::Merge - Overrinding of configuration variables based on
+    file order
+
+VERSION
+    Version 0.07
+
+DESCRIPTION
+    Config::Any returns your configuration as a hash of hashes keyed by the
+    name of the configuration file. This module merges these hashes into a
+    single hash. If the "override" paramter is set to 0 in the paramters for
+    "load_files" or "load_stems", configurations files later in the list
+    can't override variables that are already set. The default is to
+    override previous set variables. In all other regards Config::Any::Merge
+    is a strict subclass of Config::Any and inherits all of its functions.
+
+SYNOPSIS
+        use Config::Any::Merge;
+
+        my $cfg = Config::Any::Merge->load_files({files => \@filepaths, override => 0, ...  });
+
+DEPENDENCIES
+    "Config::Any" >= 0.15, "Hash::Merge"
+
+SEE ALSO
+    "Config::Any"
+
+AUTHOR
+    Mario Domgoergen, " <dom@math.uni-bonn.de" >
+
+LICENSE AND COPYRIGHT
+    Copyright 2008 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,15 @@
+Revision history for Perl extension Class::DBI::Template.
+
+0.01 Mon Nov 22 2004
+	- original version; created by h2xs 1.23 with options
+		-X Class::DBI::Template
+
+0.02 Tue Dec 28 2004
+	- first attempted release, MANIFEST was wrong, oops.
+	- fixed some pod problems
+
+0.03 Tue Dec 28 2004
+	- fixed some Class::DBI::Template::Stash problems
+		- changed it to work with compound variables
+		- fixed the defaults for order and preload, so they are as documented
+		- added caching of the variables found through searching

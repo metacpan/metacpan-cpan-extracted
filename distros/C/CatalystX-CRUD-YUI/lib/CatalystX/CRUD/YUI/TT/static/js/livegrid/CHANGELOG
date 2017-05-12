@@ -1,0 +1,279 @@
+﻿Version 0.3RC2 (GPL)
+07-December-2008
+
+ - fixed: (GridView.js) "renderUI()" would not set "this.dragZone" properly if
+drag & drop is enabled for the GridView's grid
+- fixed: (make.bat, make.sh) naming issues for debug-build resolved; enhanced
+check if argument was submitted
+
+
+Version 0.3RC1 (GPL)
+23-November-2008
+
+ - enhancement: added build tools for creating minified deployable versions of
+Ext.ux.Livegrid-scripts
+ - enhancement: (GridView.js) the rowIndex argument of the column's renderer will
+now pass the value of the index of the row as available in the view, i.e. as defined
+in the row's rowIndex property, which adds support for Ext.grid.RowNumberer
+ - fixed: (GridView.js) fixed a bug where "getPredictedBufferIndex()" would not
+compute the next rowIndex for a request properly, leading to an endless loop
+ - enhancement: (GridView.js, RowSelectionModel.js) removed override of "onRefresh()"
+to keep selections after a refresh or sort occured, if, and only if those records are
+returned by the response; removed custom call to selection model's "clearSelections()"
+in the GridView's "reset()" method
+ - enhancement: intercepted "autoLoad" property of Ext.ux.grid.livegrid.Store to make
+sure the store gets only loaded if the view has been rendered, if the store's autoLoad
+property was set to "true"
+
+
+Version 0.3a4 (GPL)
+1-November-2008
+
+ - fixed: (EditorGridPanel.js) call to "startEditing()" would throw error if the
+requested index in the view is not currently representing a record; overrode
+method for checking if record to edit is available
+ - enhancement: (GridView.js) adjusted behavior of "ensureVisible()" to scroll a
+requested cell horizontally into view
+
+Version 0.3a3 (GPL)
+1-November-2008
+
+ - fixed: (Toolbar.js) when passing the grid as config parameter, the immediate
+call to "bind" would throw an error since the views's "ds" property is not available
+yet
+
+
+Version 0.3a2 (GPL)
+1-November-2008
+
+ - enhancement: (Toolbar.js) config object allows now to specify either the grid
+or the view the toolbar is bound to
+ - fixed: (Store.js) "getAt()" would return "-1" if the data at the passed index
+could not be found in some cases; changed to return type "undefined"
+ - fixed: (GridView.js) overrode method "getCell()" to return "null" if the row
+for the specified index could not be found
+ - fixed: firing of event "cursormove" would happen before "replaceLiveRows()"
+has taken care of re-assigning the rowIndex to the rows in the view which could
+lead to errors; adjusted method and made sure that "replaceLiveRows()" is called
+first
+ - enhancement: (EditorGridPanel.js, GridPanel.js) added basic support for using
+cell editors for the Livegrid (EditorGridPanel-support)
+ - enhancement: (ext-ux-livegrid.css, DragZone.js) minor code cleanups, changed
+css class "x-dd-drop-waiting" to "ext-ux-livegrid-drop-waiting"
+ - enhancement: (GridView.js) added method "getRow()", removed overriden method
+"onCellSelect()", "onCellDeselect()", "onRowOver()", "onRowOut()" and changed
+arguments for call of methods that operate on Html-elements in the view to pass
+the model index as specified in the elements "rowIndex"-property, which will get
+translated internally to the html-element's index in the view, for broadening
+compatibility to other plugins/exension, such as the EditorGridPanel
+ - enhancement: (GridView.js) changed behavior of "processRows()" to paint the selections
+if the third argument does not equal to "false"
+ - enhancement: (RowSelectionModel.js) added method "deselectRecord()" to deselect a record
+that is already selected in the model
+ - enhancement: (GridView.js) added method "isRecordRendered()" to check whether the passed
+record is currently within the visible rect of the grid's view
+ - enhancement: removed programmatically invoking scroll in IE when the grid is rendered,
+since this was fixed due to the css changes in a previously version
+ - fixed: (RowSelectionModel.js) method "isSelected()" would lose it's original argument
+while processing it, which could lead to erroneous behavior
+ - fixed: (GridView.js) missing call to "isBuffering = true" in "updateLiveRows()"
+made the component to ignore a previously set queue and request new data immediately
+
+Version 0.3a1 (GPL)
+29-September-2008
+
+ - enhancement: added Ext 2.2 compatibility, refactored code, changed ui to match
+Ext style
+ - License changed from LGPL to GPL
+ - enhancement: changed namespace to "Ext.ux.grid.livegrid":
+  +---------------------------------------+----------------------------------------+
+  |        old name                       |          new name                      |
+  +---------------------------------------+----------------------------------------+
+  | Ext.ux.grid.BufferedGridView          | Ext.ux.grid.livegrid.GridView          |
+  |--------------------------------------------------------------------------------|
+  | Ext.ux.BufferedGridToolbar            | Ext.ux.grid.livegrid.Toolbar           |
+  |--------------------------------------------------------------------------------|
+  | Ext.ux.grid.BufferedGridDragZone      | Ext.ux.grid.livegrid.DragZone          |
+  |--------------------------------------------------------------------------------|
+  | Ext.ux.data.BufferedJsonReader        | Ext.ux.grid.livegrid.JsonReader        |
+  |--------------------------------------------------------------------------------|
+  | Ext.ux.grid.BufferedRowSelectionModel | Ext.ux.grid.livegrid.RowSelectionModel |
+  |--------------------------------------------------------------------------------|
+  | Ext.ux.grid.BufferedStore             | Ext.ux.grid.livegrid.Store             |
+  +---------------------------------------+----------------------------------------+
+  +---------------------------------------+----------------------------------------+
+ - fixed: rows would not be striped properly when grid panel's "stripeRows" property
+is set to true
+ - fixed: rendering bug of the vertical scrollbar in IE7 did not trigger the scroll
+event to small; set min height to two times of horizontalScrollOffset property
+ - fixed: vertical scrollbar would disappear in FF3 if the size of the viewport gets
+to small; set min height to two times of horizontalScrollOffset property
+ - fixed: view would not always calculate the grid's size leading to errors when it
+should decide whether the horizontal scrollbar is shown
+ - enhancement: added "bulkRemove()" method and "bulkremove" event to store, added
+"bulkremove"-listener to BufferedGridView
+ - fixed: (RowSelectionModel.js) added a property for mapping already
+selected records to their view index, so that the position of records, which are
+no longer in the store, can still be referenced. Added support for removing and
+shifting selections if a record was removed that is not part of the store, but
+still could be referenced using the map
+ - fixed: (Store.js) when removing records which are not buffered by the
+store, and which are behind the range of the currently buffered record set, the
+"remove" method now adjusts the values of the "bufferRange"-property minus the
+number of records removed, to reflect the changes in the underlying data model
+ - fixed: (GridView.js) when removing rows which are not part of the data
+model, the "rowIndex" and "lastRowIndex" properties are now both updated, and the
+remaining rows in the view processed by "processRows()"
+ - fixed: (GridView.js) "forceRepaint" argument for the "updateLiveRows"
+method is now passed using the "options"-object of the Ajax.request, which will
+then be passed to the "replaceLiveRows()".method called by the "liveBufferUpdate()".
+ - fixed: (GridView.js) last revision had a typo left that caused the rows
+not to be updated when the "insertRows()" method would be called with the
+"isUpdate"-argument set to true
+ - enhancement: (GridView.js) changed "onRemove()" method to not support
+"isUpdate" argument, since the current implementation of GridView would
+never call "onRemove" for simply updating a row in the view
+ - fixed: bufferRange will now get reset if all records in the store are removed
+
+Version 0.2
+11-September-2008
+
+Version 0.2rc5
+31-August-2008
+
+- fixed:
+ - BufferedGridView.js: typo left in "insertRows()" would prevent the view to reassign
+the proper rowIndex when argument "isUpdate" was set to true
+ - BufferedGridView.js: wrong parameter passed to "buffer" and "beforebuffer" event caused
+listeners to use wrong number of visible rows in the grid
+
+
+Version 0.2rc4
+30-August-2008
+
+- fixes:
+ - BufferedStore.js: store would not allow for adding records without throwing errors when
+the store was initialized with no records; changed bufferRange to be initialized with [0,0]
+instead of [0, bufferSize] and incremented bufferRange-count according to the records coming
+in, until bufferRange[1] equals to bufferSize
+ - BufferedGridView.js, BufferedRowSelectionModel.js: store "add" event would neccessarily
+trigger the selectionmodel's onAdd-listener before the onAdd-listener of the GridView, resulting
+in false rendering of selected records; changed the selection model to listen to the "rowsinserted"
+event of the view and extended this event to pass the length of added record as the fourth
+parameter to all it's listeners
+ - BufferedGridView.js: collapsed panel would hide added records of the grid when the grid is
+expanded again and would lose scroll-position; added listener for "expand"-event of the view's
+gridpanel to recalculate visible rows, the buffer inset and reset the scrollbar's position to the
+proper value
+ - BufferedGridView.js: "onAdd()" would not always insert records depending on the position they got
+added in the store; updated and improved code based on "rows get added before first visible row",
+"rows get added after the last visible row", "rows get added somewhere in between the first and last visible row"
+- enhancements:
+ - BufferedGridView.js: improved calculation of rows that would cause spill when new records
+get added in "insertRows()"
+
+
+Version 0.2rc3
+30-August-2008
+
+- fixes:
+ - BufferedGridView.js: last row would not always be rendered proper if the end of
+records is reached and the panel would be resized so that more records are displayable
+- enhancements:
+ - BufferedGridView.js: improved calculating the height of the buffer inset in both
+performance and functionality. Component now working with Safari 3.1 under Windows XP
+
+Version 0.2rc2
+29-August-2008
+
+- fixes:
+ - BufferedGridView.js: re-rendering rows would not work proper if a resize of the panel
+during buffering happened; "adjustVisibleRows()" skips recalculating the "rowIndex"
+property now if the livegrid is currently buffering. "replaceLiveRows()" would not always
+calculate the exact range of rows to render; adjusted conditions to check for valid ranges
+
+Version 0.2rc1
+29-August-2008
+
+- fixes:
+ - BufferedGridView.js: fixed a bug that would not recalculate the scrollbar's
+height if the number of possible rows to display in the view would exceed the
+total number of records in the store
+ - BufferedRowSelectionModel: "selectRow()" would allow selecting indexes greater than
+the "totalLength"-property of the store; added condition to check whether the index is
+out of bounds (closes google issue 5)
+- BufferedStore.js: buffer range would not store the number of the total length
+of the records when last possible range is reached, but instead the number of the
+start-parameter with the "limit"-parameter, which lead to errors when a last
+possible record to render is requested that cannot be found in the store
+
+ - enhancements:
+- BufferedGridView.js: last row in the grid is now clipped instead of removed if
+it is not fully displayable
+
+
+
+Version 0.1.2
+25-August-2008
+
+- fixes:
+ - BufferedGridView: wrong calculation of "start"-parameter for the buffer-request
+caused infinite loop. Adjusted calculation of return value in "getPredictedBufferIndex()"
+to always return correct value for "start"-parameter if the "nearLimit" property is greater
+than or equals to half of store's "bufferSize" property (fixes google issue 4)
+
+Version 0.1.1
+25-August-2008
+
+- fixes:
+ - BufferedGridView: grid would not be repainted correctly if a column was moved:
+method "onColumnMove()" with appropriate implementation added (fixes google issue 9);
+"onRemove()" would not work properly if the end of the data was reached in the visible
+rect and rows from within that rect are removed. Adjusted "lastRowIndex" to be equal to
+"rowIndex", and skipped implicit "processRows()" call in "replaceLiveRows()" via passing
+a new third argument "processRows", which will only call "processRows()" if the argument
+was not set to false; removed call to "selections.add()" in "processRows()" since selections
+are already in the "bufferedSelections" property of the selection model, and previously
+selected records are still part of the "selections"-property of the selection model.
+
+
+- enhancements:
+ - BufferedGridView: Added functionality for listening to erroneous responses from
+buffer-requests. Event "bufferfailure" will now be fired if the store indicated that
+the proxy's response was erroneous; added "options" parameter to be passed to
+"buffer"-event
+
+ - BufferedGridToolbar: Toolbar is now listening to "bufferfailure"-event and resets
+the reload-button to "enabled" if necessary.
+
+Version 0.1
+16-June-2008
+
+- enhancements:
+ - BufferedGridStore - added overrride of getAt() method to translate
+the passed argument to the appropriate index in the model; updated sources to take
+overriden method into account
+ - added cfg option "scrollDelay" in BufferedGridView for buffering calls to onLiveScroll
+when scroll-event gets fired (thanks to Rich Waters)
+ - BufferedStore: removed custom applySort() implementation due to changes in findInsertIndex
+ - BufferedStore: changed findInsertIndex to use parent implementation first, then check
+return value and adjust the index if needed
+ - BufferedStore/BufferedGridView: moved bufferRange-member to BufferedStore
+ - BufferedStore: optimized insert() method in BufferedStore
+ - allowed to add records at position "0" in grid (existing records get shifted down)
+
+- fixes:
+ - wrong calculation in BufferedGridView.onLiveScroll (based on lastScrollPosition and actual
+scrollPosition) caused the view sometimes to not re-render some rows
+ - provided bug fix for "ensureVisible: returned x-coordinate does not take the x-position
+of the gridpanel into account" (see http://extjs.com/forum/showthread.php?p=175331#post175331)
+ - wrong calculation of last displayable row after removing a row caused selection-model
+to get out of synch with the store's data
+ - when adding a record to the store on the fly, the ensureVisible-method
+would not work always corect afterwards
+ - when adding records, a previously made selection would block selecting the
+newly added record
+ - skipped request for updateLiveRows in Ext.ux.grid.BufferedGridView.adjustVisibleRows
+when number of total records in store is less than the number of visible rows
+ - request for buffering data in Ext.ux.grid.BufferedGridView.updateLiveRows() did
+not apply the property "lastOptions.params" to the params sent with the buffer-request

@@ -1,0 +1,34 @@
+<div class=path>
+[% results.size %] [% pages.results %]
+</div>
+<div class=box>
+[% class = 's' %]
+<table width="100%">
+[% USE table(results, rows=2) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END -%]
+<td><a href="[% home %]/dist/[% item.dist_name %]"> 
+<b>[% item.dist_name %]</b></a> 
+[% IF item.chapters %]
+[% FOREACH ch = item.chapters %]
+[ <a href="[% home %]/chapter/[% ch %]"><small>[% pages.related %]</small></a> ]
+[% END %]
+[% END %]
+<br /><small>[% item.dist_abs %]</small></td>
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>
+</div>
+<hr />
+[% IF mode && query %]
+<font size="-1">[% pages.try %]</font> <a href=
+"[%searchcpan%]search?mode=[% mode %];query=[% query | uri | html %]">
+<font size="-1">search.cpan.org</font></a>
+[% END %]

@@ -1,0 +1,48 @@
+Revision history for Perl extension Class::Classless
+                                        Time-stamp: "2004-12-29 20:13:07 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.35 -- just rebundling.  No code changes.
+	
+2000-10-17  Sean M. Burke  sburke@cpan.org
+	
+	* Release 1.34 -- just a buxfig version:
+	* $ROOT's VERSION attribute was not present, but documentation
+	said it was '0.00'.  Now is '0.00', as documented.
+	* $object->VERSION(whatever) wasn't documented, and didn't
+	return the version on success.  Fixed on both accounts.
+	
+2000-08-21  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.33 -- supports memoization (caching) of each object's
+	lineage.
+	* Minor doc changes.
+	* Dispatcher now uses "magic goto" to pass off to sub methods.
+	I think that should make for proper @_-aliasing and context
+	propagation.
+	* Fixed obscure bug in 'pretty' (used by the EXAMINE method) that
+	would mistake some "0"-initial numerals for real decimal numbers.
+		
+2000-05-13  Sean M. Burke  sburke@cpan.org
+
+	* Release 1.22 -- just noting my new email address.
+
+1999-09-22  Sean M. Burke  sburke@netadventure.net
+
+	* Release 1.21 -- second release version
+	* Added support for 'constant methods' (and magic dereferencing)
+	* Added $callstate->no_fail, set_no_fail_true, set_fail_false,
+	   and set_fail_undef
+	* Added $callstate->via_next
+	* Added support for $callstate->NEXT with no (explicit) method name
+	* IMPORTANT CHANGE!!  The 'can' method now returns simply either
+	   true or false, instead of returning the coderef for
+	   true
+	* Added 'howcan' method
+	* Documentation, yet more documentation, always more documentation.
+	* Added more tests to test.pl
+
+1999-05-31  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.25 -- first release version.

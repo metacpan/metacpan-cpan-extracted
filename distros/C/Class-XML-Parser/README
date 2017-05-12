@@ -1,0 +1,32 @@
+Class::XML::Parser
+
+DESCRIPTION
+
+Parses an XML file into a user-defined class hierarchy, with
+optional DTD validation.
+
+PREREQUISITES
+
+XML::Parser - class used internally for parsing
+Carp
+
+OPTIONAL MODULES
+
+XML::Checker::Parser - needed if DTD validation of the source XML is
+  desired
+
+BUILDING/INSTALLING
+
+perl Makefile.PL
+make
+make test
+make install
+
+BUG REPORTS
+
+Please 
+
+Copyright 2006 Mark Morgan.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

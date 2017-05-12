@@ -1,0 +1,57 @@
+NAME
+    Class::Accessor::Assert - Accessors which type-check
+
+SYNOPSIS
+      use Class::Accessor::Assert;
+      __PACKAGE__->mk_accessors( qw( +foo bar=Some::Class baz ) );
+
+DESCRIPTION
+    This is a version of Class::Accessor which offers rudimentary
+    type-checking and existence-checking of arguments to constructors and
+    set accessors.
+
+    To specify that a member is mandatory in the constructor, prefix its
+    name with a "+". To specify that it needs to be of a certain class when
+    setting that member, suffix "=CLASSNAME". Unblessed reference types such
+    as "=HASH" or "=ARRAY" are acceptable.
+
+SEE ALSO
+    Class::Accessor
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+    Maintained by
+      Steffen Mueller, <accessor-module at steffen-mueller dot net>
+    Original author is
+      Simon Cozens, <simon@simon-cozens.org>
+    Please direct any inquiries, bug reports and the like towards the
+    maintainer. Simon does not support this module any more.
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Simon Cozens
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,21 @@
+a { foo: bar; }
+
+a,a { foo: bar;} 
+
+a, a { foo: bar;} 
+
+a ,a { foo: bar;} 
+
+a , a { foo: bar;} 
+
+a	,	a { foo: bar;} 
+
+a,
+a { foo: bar;} 
+
+a
+,a { foo: bar;} 
+
+a,a,a { foo: bar;} 
+
+a,a,a { foo: bar;} 

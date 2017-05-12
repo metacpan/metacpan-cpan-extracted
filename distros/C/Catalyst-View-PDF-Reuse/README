@@ -1,0 +1,73 @@
+NAME
+       Catalyst::View::PDF::Reuse - Create PDF files from Catalyst using
+       Template Toolkit templates
+
+VERSION
+       Version 0.01
+
+SYNOPSIS
+       Create a PDF::Reuse view:
+
+        script/myapp_create.pl view PDF::Reuse PDF::Reuse
+
+       In MyApp.pm, add a configuration item for the template include path:
+
+        __PACKAGE__->config('View::PDF::Reuse' => {
+          INCLUDE_PATH => __PACKAGE__->path_to('root','templates')
+        });
+
+       In your controller:
+
+        $c->stash->{pdf_template} = 'hello_pdf.tt';
+        $c->forward('View::PDF::Reuse');
+
+       In root/templates/hello_pdf.tt:
+
+        [% pdf.prFont('Helvetica-Bold') %]
+        [% pdf.prFontSize(20) %]
+        [% pdf.prText(100,100,'Hello, World!') %]
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Catalyst::View::PDF::Reuse
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-View-PDF-Reuse
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Catalyst-View-PDF-Reuse
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Catalyst-View-PDF-Reuse
+
+    Search CPAN
+        http://search.cpan.org/dist/Catalyst-View-PDF-Reuse
+
+
+SEE ALSO
+
+Penny's Arcade Open Source - http://www.pennysarcade.co.uk/opensource
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Penny's Arcade Limited
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

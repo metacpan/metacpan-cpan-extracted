@@ -1,0 +1,7 @@
+<if condition="condition1">
+  bla
+</if>
+<elsif condition="condition2">
+  foo
+</elsif>
+bar

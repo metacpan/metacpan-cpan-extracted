@@ -1,0 +1,14 @@
+Revision history for CDB-TinyCDB-Wrapper
+
+0.03    2010-04-28
+
+        Add close().  It is recommended that all new code use this
+        explicit ->close(), guaranteeing that the file is handled when
+        desired.
+
+0.02    2010-04-26
+        Added exists().
+
+0.01    2010-04-26
+        First version, released on an unsuspecting world.
+

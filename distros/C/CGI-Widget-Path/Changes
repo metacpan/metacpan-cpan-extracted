@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI::Widget::Path.
+
+Legenda: + = new feature, ! = updated feature/bug fix, - = removed feature
+
+0.01  Thu Oct 31 10:26:53 2002
+	+ original version; created by h2xs 1.20 with options
+	  -X -n CGI::Widget::Path
+

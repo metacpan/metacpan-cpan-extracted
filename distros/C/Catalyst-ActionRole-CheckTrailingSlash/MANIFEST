@@ -1,0 +1,7 @@
+Changes
+lib/Catalyst/ActionRole/CheckTrailingSlash.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

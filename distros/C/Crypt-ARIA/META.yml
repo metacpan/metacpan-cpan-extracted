@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for ARIA encryption/decryption algorithm.'
+author:
+  - 'Geunyoung Park <gypark@gmail.com>'
+build_requires:
+  Crypt::CBC: 2.31
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-ARIA
+requires:
+  Carp: 0
+  Exporter: 0
+  XSLoader: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/gypark/Crypt-ARIA.git
+version: 0.004

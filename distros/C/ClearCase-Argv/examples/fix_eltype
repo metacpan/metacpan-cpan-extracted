@@ -1,0 +1,35 @@
+#!perl
+
+## This script reads a list of filenames from stdin and, assuming
+## they represent ClearCase versioned elements, compares their
+## current element type to what it should be according to
+## "cleartool file". If they differ, it changes the type to what
+## it should be. Useful if for whatever reason you've got a bunch
+## of elements with (potentially) wrong types and need to fix them.
+
+use ClearCase::Argv;
+
+ClearCase::Argv->ipc;
+ClearCase::Argv->autochomp;
+
+my $ct_file	= ClearCase::Argv->new('file');
+my $ct_desc	= ClearCase::Argv->new('desc', [qw(-fmt %[type]p)]);
+my $ct_chtype	= ClearCase::Argv->new('chtype', ['-f']);
+$ct_chtype->attropts(\@ARGV);
+
+$| = 1;
+
+while (<STDIN>) {
+    chomp;
+    next if !(-f $_ && -f "$_@\@/main/0");
+    next if m%\Q/lost+found/%;
+    my $is = $ct_desc->args($_)->qx;
+    my $should_be = (split /\s+/, $ct_file->args($_)->qx)[1];
+    if (!$should_be || !$is) {
+	warn "Warning: missing value should_be=$should_be, is=$is\n";
+	next;
+    }
+    next if $should_be eq $is;
+    #print "$_: is -$is-, changing to -$should_be-\n";
+    $ct_chtype->args($should_be, $_)->system;
+}

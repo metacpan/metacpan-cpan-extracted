@@ -1,0 +1,229 @@
+Revision history for Perl module CLDR::Number
+
+0.19 2016-04-06
+ - Bugfix: require Class::Method::Modifiers because it’s a requirement of using
+   Moo::Role method modifiers but not a requirement of Moo::Role itself
+
+0.18 2016-03-17
+ [ New CLDR version ]
+ - Upgrade CLDR data from v28 (2015-09-17) to v29 (2016-03-16)
+ - Release notes: http://cldr.unicode.org/index/downloads/cldr-29
+
+ [ New languages ]
+ - yue (Cantonese)
+
+ [ New locales for existing languages ]
+ - es-BR (Spanish in Brazil)
+ - pt-CH (Portuguese in Switzerland)
+ - pt-GQ (Portuguese in Equatorial Guinea)
+ - pt-LU (Portuguese in Luxembourg)
+
+ [ Updated locales ]
+ - da (Danish):   at_least pattern
+ - gl (Galician): currency pattern
+ - ka (Georgian): GEL (Georgian Lari) currency symbol
+ - os (Ossetic):  GEL (Georgian Lari) currency symbol
+
+0.17 2016-03-10
+ - Bugfix: prohibit Moo v2.001000 because it introduced a bug that breaks this
+   module, which was fixed in v2.001001, as tested and reported by Slaven Rezić
+   @eserte++ and fixed by Graham Knop @haarg++ in
+   https://rt.cpan.org/Public/Bug/Display.html?id=112677 [#48]
+ - Docs: new FAQ entry on fallback for non-existant locales by Michael LaGrasta
+   @mnlagrasta++ [#41]
+ - Docs: update example output for CLDR v28
+
+0.16 2015-09-23
+ [ Minimum grouping digits ]
+ - Add support for minimum grouping digits, introduced in the CLDR v26 spec and
+   data [#36]
+ - Add minimum_grouping_digits attribute with default value `1` (which has no
+   effect on formatting) to all classes
+ - Locales with value `1`: root (Root), es-419 (Latin American Spanish)
+ - Locales with value `2`: be (Belarusian), bg (Bulgarian), es (Spanish),
+   et (Estonian), ka (Georgian), pl (Polish), pt-PT (European Portuguese)
+ - Locales with value `3`: lv (Latvian), my (Burmese)
+
+ [ Examples ]
+ - en (1): 100 | 1,000 | 10,000 | 100,000 | 1,000,000
+ - pl (2): 100 |  1000 | 10 000 | 100 000 | 1 000 000
+ - my (3): ၁၀၀ |  ၁၀၀၀ |  ၁၀၀၀၀ | ၁၀၀,၀၀၀ | ၁,၀၀၀,၀၀၀
+
+0.15 2015-09-22
+ - Bugfix: fix support for formatting `Inf` and `NaN` in Perl v5.22, which has
+   changed from the previous values `inf` and `nan` [#46]
+
+0.14 2015-09-21
+ - Bugfix: fix formatting negative numbers along with a custom
+   rounding_increment value, which had caused double negative signs
+ - Bugfix: fix formatting of string values `inf` and `nan` which weren’t treated
+   as numeric on combinations of some operating systems with some older versions
+   of Perl [#44, #45]
+ - Docs: typo fix by Fred Moyer @redhotpenguin++ [#43]
+
+0.13 2015-09-20
+ [ New CLDR version ]
+ - Upgrade CLDR data from v27.0.1 (2015-03-30) to v28 (2015-09-17)
+ - “Added several English locales for Europe and W Asia”
+ - “Major review of and improvement to Spanish locales for Latin America”
+ - See also: http://cldr.unicode.org/index/downloads/cldr-28
+
+ [ New languages ]
+ - ce (Chechen)
+ - ckb (Central Kurdish)
+ - cu (Church Slavic)
+ - lrc (Northern Luri)
+ - mzn (Mazanderani)
+ - tk (Turkmen)
+
+ [ New locales for existing languages ]
+ - en-AT (English in Austria)
+ - en-BI (English in Burundi)
+ - en-CH (English in Switzerland)
+ - en-DE (English in Germany)
+ - en-DK (English in Denmark)
+ - en-FI (English in Finland)
+ - en-NL (English in Netherlands)
+ - en-SE (English in Sweden)
+ - es-DO (Spanish in Dominican Republic)
+ - es-GT (Spanish in Guatemala)
+ - fo-DK (Faroese in Denmark)
+ - fr-MA (French in Morocco)
+
+ [ New numbering systems ]
+ - ahom (Ahom Digits)
+ - brah (Brahmi Digits)
+ - cakm (Chakma Digits)
+ - hmng (Pahawh Hmong Digits)
+ - mathbold (Mathematical Bold Digits)
+ - mathdbl (Mathematical Double-Struck Digits)
+ - mathmono (Mathematical Monospace Digits)
+ - mathsanb (Mathematical Sans-Serif Bold Digits)
+ - mathsans (Mathematical Sans-Serif Digits)
+ - modi (Modi Digits)
+ - mroo (Mro Digits)
+ - mymrtlng (Myanmar Tai Laing Digits)
+ - osma (Osmanya Digits)
+ - shrd (Sharada Digits)
+ - sind (Khudawadi Digits)
+ - sinh (Sinhala Lith Digits)
+ - sora (Sora Sompeng Digits)
+ - takr (Takri Digits)
+ - tirh (Tirhuta Digits)
+ - wara (Warang Citi Digits)
+
+0.12 2015-08-29
+ - Add support for passing infinity, negative infinity, and NaN arguments to all
+   formatting methods (format, at_least, range) on all formatting classes
+   (decimal, percent, currency), because those are valid numeric values in Perl,
+   which are now all localized even though it doesn’t always make
+   sense [issue #26]
+ - Add `infinity` and `nan` attributes to all classes in addition to the decimal
+   formatter
+
+0.11 2015-08-25
+ - Upgrade CLDR data from v24 (2013-09-18) to v27.0.1 (2015-03-30) [issue #33]
+ - Add bin/generate-cldr-data.pl script to update Perl data from CLDR JSON
+ - Add new locales including dsb (Lower Sorbian), fy (West Frisian),
+   hsb (Upper Sorbian), lb (Luxembourgish), qu (Quechua), smn (Inari Sami),
+   and ug (Uyghur)
+ - Remove CLDR data with draft status of 'provisional' or 'unconfirmed', only
+   including 'contributed' or 'approved', which is the same threshold as the
+   ICU Project as well as the CLDR JSON data as of v27.0.1
+ - Remove 'provisional' draft numbering systems until they become at least
+   'contributed': brah (Brahmi), cakm (Chakma), osma (Osmanya), shrd (Sharada),
+   sora (Sora Sompeng), takr (Takri)
+ - Change various symbols for several locales, including grouping symbol in
+   es (Spanish, not including Latin American Spanish locales) from
+   ' ' (no-break space) to '.' (full stop) and fr-SH (Swiss French) from
+   "'" (apostrophe) to ' ' (no-break space)
+ - Change negative number format for any locales using formats with parentheses
+   like '(N)', including ko (Korean), to using the minus sign like '-N', except
+   for accounting format which is not yet supported
+ - Change currency decimal symbol for sv (Swedish) from ':' to ',' now matching
+   the regular (non-currency) decimal symbol and common usage, resulting in no
+   locale having a different decimal symbol for currencies
+ - Change THB (Thai Baht) symbol from '฿' to 'THB' for most locales including
+   root and th (Thai), due to its general obscurity
+ - Change many other currency symbols for many locales, but generally minor
+   changes, for example DKK (Danish Krone) in da (Danish) from 'kr' to 'kr.' and
+   USD (US Dollar) in fr-CA (Canadian French) from '$US' to '$ US'
+ - Change CLF (Chilean Unit of Account (UF)) currency fraction digits
+   from 0 to 4
+ - Change CZK (Czech Republic Koruna) currency cash fraction digits from 2 to 0
+   with default fraction digits remaining 2
+ - Change HUF (Hungarian Forint) currency fraction digits from 0 to 2 with
+   cash fraction digits remaining 0
+ - Change UYI (Uruguayan Peso (Indexed Units)) currency fraction digits
+   from 2 to 0
+
+0.10 2015-03-26
+ - Improve documentation and unit tests (no functional changes)
+ - Docs: Fix attribute name in CLDR::Number::Format::Currency
+   synopsis [issue #40] (by Olaf Alders @oalders++)
+
+0.09 2014-11-12
+ - Deprecate use of the the `locale` method as a setter. In the future the
+   formatter objects’ locale will become immutable. Please see [issue #38] for
+   details and to submit comments or concerns:
+   https://github.com/patch/cldr-number-pm5/issues/38
+ - Add items to the FAQ and TODO docs
+
+0.08 2014-03-28
+ - Improve locale inheritance to use parent overrides from CLDR data [issue #34]
+
+0.07 2014-03-25
+ - Add numbering_system attribute and support non-Latin decimal numbering
+   systems [issue #8]
+ - Use default numbering system for locale [issue #9]
+ - Use numbering system from Unicode extension of locale when provided
+ - Integrate Travis CI, Devel::Cover, and Coveralls with GitHub repo
+
+0.06 2014-02-28
+ - Improve documentation
+ - Add FAQ
+
+0.05 2014-01-26
+ - Validate numeric arguments to methods in the same way as core Perl functions:
+   warn on non-numeric values and use the leading numeric portion when
+   available, otherwise 0 [issue #23]
+ - Add class name to uninitialized value warnings [issue #22]
+
+0.04 2014-01-21
+ - Implement currency spacing rules from CLDR spec: when a non-symbol character
+   in the currency sign would touch a digit, add a space between them,
+   e.g. CHF 1.99 instead of CHF1.99 [issue #7]
+ - Use private-use characters U+F8F0–U+F8F4 internally as placeholders,
+   which makes them unavailable for use in patterns and signs [issue #24]
+ - Add private module CLDR::Number::Constant to provide internal placeholder
+   variables [issue #25]
+
+0.03 2014-01-15
+ - Handle uninitialized values as arguments to the format, at_least, and range
+   methods by warning and returning undef [issue #22]
+
+0.02 2013-12-30
+ - Bugfix: encoding error for escaped quotes ('') within patterns on
+   Perl ≤ v5.8.8 [issue #20]
+ - Bugfix: require Moo v1.001000 for support of non-reference default attribute
+   values [issue #21]
+ - Docs: minor improvements
+
+0.01 2013-12-26
+ - First non-development release
+ - Optimization: preparse and cache patterns and attributes from predefined CLDR
+   data [issue #3]
+ - Add documentation, but more is needed
+
+0.00_03 2013-12-17
+ - Yet another development release
+ - Remove clearer methods for primary_grouping_size/secondary_grouping_size
+ - Currency: fix minimum_fraction_digits/maximum_fraction_digits bug [issue #1]
+ - Tests: remove warnings to stderr and test warnings [issue #2]
+
+0.00_02 2013-12-16
+ - Yet another development release
+ - First public CPAN release
+
+0.00_01 2013-12-02
+ - Development release

@@ -1,0 +1,10 @@
+// File: CORBA_Current.idl
+// CORBA 3.0, Chapter 4
+
+#ifdef _PRE_3_0_COMPILER_
+#pragma prefix "omg.org/CORBA"
+#endif
+
+    // interface for the Current object
+    local interface Current {
+    };

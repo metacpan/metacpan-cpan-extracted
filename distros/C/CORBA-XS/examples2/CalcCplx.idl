@@ -1,0 +1,11 @@
+
+#include "Cplx.idl"
+
+interface CalcCplx
+{
+	Cplx::Complex Add(in Cplx::Complex val1, in Cplx::Complex val2);
+
+	Cplx::Complex Sub(in Cplx::Complex val1, in Cplx::Complex val2);
+};
+
+

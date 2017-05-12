@@ -1,0 +1,26 @@
+Revision history for Perl extension Crypt::Curve25519.
+
+0.06   2017-04-06 00:25:43
+    Various building and XS improvements
+      - provided by Leon Timmermans.
+
+0.05   2016-02-23 22:02:53
+    Fix 64int archname detection in the remaining Makefile.PL
+      - patch provided by Lance Kinley.
+
+0.04   2014-12-15 01:43:32
+    There are 32bit platforms with 64int, harden the archname check
+      - reported by Jeff Anderson.
+
+0.03   2014-04-28 23:36:16
+    Document primitive function.
+
+0.02   2014-04-15 23:54:00
+    Missed to point out the requirement of masking the random bytes
+      to create secret key - reported by Marc Lehmann
+    Improve documentation
+    Add more unit tests
+
+0.01   2014-02-04 00:33:47
+	Initial version.
+

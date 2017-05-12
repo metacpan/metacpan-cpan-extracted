@@ -1,0 +1,33 @@
+Chemistry/PointGroup version 0.01
+=================================
+
+Group theory for normal modes of vibration
+
+Many common molecules, for example, water, ammonia, methane,etc.,
+possess some symmetry. In calculating the normal modes and frequencies
+of vibration, symmetry considerations can reduce enormously the labor
+of the calculations. The symmetry and geometry of a molecular model can
+be used to determine the number and symmetry of fundamental frequencies,
+their degeneracies, the selection rules for the infrared and Raman spectra.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Leo Manfredi
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

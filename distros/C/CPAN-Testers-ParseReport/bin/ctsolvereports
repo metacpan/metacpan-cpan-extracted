@@ -1,0 +1,55 @@
+#!/usr/bin/perl -- -*- mode: cperl -*-
+
+=head1 NAME
+
+ctsolvereports - Analyse reports from a YAML file
+
+=head1 SYNOPSIS
+
+  ctsolvereports [options] yamlfile
+
+=head1 OPTIONS
+
+=over 8
+
+=cut
+
+my $optpod = <<'=back';
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=back
+
+use strict;
+use warnings;
+
+use CPAN::Testers::ParseReport;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+use YAML::Syck;
+
+our %Opt;
+my @opt = $optpod =~ /B<--(\S+)>/g;
+for (@opt) {
+    $_ .= "!" unless /[+!=]/;
+}
+
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(2);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if (1 != @ARGV) {
+    pod2usage(2);
+}
+
+my $data = YAML::Syck::LoadFile($ARGV[0]);
+CPAN::Testers::ParseReport::solve($data);
+
+
+__END__

@@ -1,0 +1,11 @@
+Revision history for CGI-Session-ID-crypt_openssl
+
+1.02    14. Januar 2013
+        Resolve failed Test::Pod::Coverage
+
+1.01    08. September 2011
+        Only Change the documentation
+
+1.00    13. July 2011
+        First version created by Module::Starter
+

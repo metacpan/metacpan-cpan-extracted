@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Wiki-Plugin-Locator-UK
+version:      0.09
+version_from: lib/CGI/Wiki/Plugin/Locator/UK.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    CGI::Wiki:                     0.36
+    Geography::NationalGrid:       0
+    Geography::NationalGrid::GB:   0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

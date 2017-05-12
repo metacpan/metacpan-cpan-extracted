@@ -1,0 +1,6 @@
+0.02
+	- better docs (thanks to markstos)
+	- block header splitting attack (thanks to markstos and miyagawa)
+
+0.01
+	- initial release

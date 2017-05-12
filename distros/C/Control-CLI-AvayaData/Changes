@@ -1,0 +1,118 @@
+Revision history for Control-CLI-AvayaData
+
+0.01	2011-06-07
+	* Initial internal posting
+
+0.02	2011-06-16
+	* Changed login() & connect() to return output of login sequence with new return_output argument
+	* Errmode argument for all methods was not working
+	* Updated pod with Control::CLI 1.03 new eof method
+
+0.03	2011-06-19
+	* Re-worded pod description section
+
+0.04	2011-08-24
+	* Updated matching patterns
+	* Modified 0.02 changes and removed return_output argument for login() & connect()
+	* Now login() & connect() will return output if an array is seeked as return argument
+	* Now login() & connect() accept return_reference argument
+	* Detection of generic family type now only carps if errmode is 'die' or 'croak'
+	* Added read_attemps argument to login() & connect()
+
+0.05	2011-09-02
+	* Added VSP-7000 support
+
+0.05	2011-09-07
+	* Corrected warnings about uninitialized value when cmd() timed out before family_type detection 
+
+0.06	2011-09-11
+	* Added config_context method
+	* Fixed some issues with prompt pattern matching
+	* Modified test script
+
+0.07	2011-10-06
+	* Modified command error matching regex for ACLI PassportERS under _determineOutcome()
+	* Modified InitPrompt regex strings
+
+0.08	2011-10-07
+	* Moved syntax error patterns away from _determineOutcome() into global variables
+
+0.09	2011-11-27
+	* Added new attributes: 'slots', 'ports', 'is_dual_cpu'
+	* Modified test script to test above new attributes
+	* Also enhanced test script to show optional attributes
+
+0.10	2012-09-01
+	* Modified error patterns for BaystackERS, PassportERS & Accelar family types
+	* Method last_cmd_errmsg suppresses the bell character from error messages
+	* Modified prompt and more patterns for SecureRouter
+	* Optimized port attribute to use cli commands with less output on PassportERS
+	* Added stp_mode, sysname, base_mac attributes
+	* Changed login() to prioritize login pattern matches to avoid false prompt detections
+	* Increased default login() read_attempts from 5 to 10
+	* Modified login banner detection patterns
+	* Bug in login(); a failed login was not detected if resuming login() from password
+	* Added wake_console method and argument to connect() and login()
+
+0.11	2014-06-01
+	* login() now remembers loginstage even after failed telnet authentication
+	* Modified error patterns for BaystackERS
+	* Attribute stp_mode was not being set correctly on older stackables pre-dating rstp/mstp
+	* Updated y/n prompt match regex to also match yes/no
+	* Updated wake_console sequence as it was not working on SecureRouter
+	* Updated login() to match SSH exception changes made in login() of Control::CLI v1.05
+	* Fixed shorthand syntax for connect($host) which was not working
+	* Shorthand connect syntax now connect($host [$port]) which will work also with IPv6 addresses
+	* Updated new & connect methods for new Control:CLI v1.05 connection_timeout
+	* flush_credentials method is re-defined in this class to also handle enable-password
+	* Code changes to pass Perl Critic severity 4 and above violations
+	* Updated exporter tags to include new Control:CLI v1.05 useIPv6 symbol
+	* login() method was not always returning output on login failure
+	* Modified more prompt match patterns to remove a carriage return under PassportERS family type
+	* Setting debug on constructor was failing to enable debug() on parent class Control::CLI
+	* cmd_prompted() now also accepts 'progress_dots' argument like cmd() does
+	* last_prompt() was sometimes returning the last prompt with a carriage return pre-pended
+	* Changed naming from 'Avaya Data' to 'Avaya Networking'
+
+0.12	2014-07-26
+	* Discovery of family_type can no longer be based on prompt match alone and uses extended discovery
+	* Modified extended discovery which also now covers PassportERS and BaystackERS family types
+	* Method login() now may set the family_type attribute even on login failure if it matches a banner pattern
+	* Made login more robust when connecting via serial console; wake_console is now simply a carriage return
+	* Updated error patterns
+	* Added debug_file() method to send debug messages to file 
+
+1.00    2014-07-29
+        * First version to publish on CPAN
+
+2.00	2015-03-15
+	* As of this version, these methods support a non-blocking mode and have their own polling method:
+	  connect(), login(), cmd(), attribute(), change_baudrate(), enable(), device_more_paging(), device_peer_cpu()
+	  (requires Control::CLI version 2.01)
+	* Debug messages now rely on Control::CLI debug level and use bits 4 & 8
+	* Attribute port was not picking up fastEthernet ports on older ERS8300 & ERS8600 in ACLI/NNCLI mode
+	* Added argument "feed_list" to cmd_prompted()
+	* Method config_context now returns an empty string if the device is not in config mode
+	* New attributes 'oob_ip', 'oob_virt_ip', 'oob_standby_ip', 'is_oob_connected', 'mgmt_vlan', 'mgmt_ip'
+	* New attributes 'baudrate' and 'max_baud'; also change_baudrate() now makes use of them
+	* change_baudrate() with baudrate set to 'max' now forgiving (returns success) if baudrate cannot be increased
+	* Module now supports the same export tags for class methods as Control::CLI
+	* prompt_credentials can now be set either as a code ref or as an array ref where the 1st element is a code ref
+	* Added console() method to better control wake_console sequence sending
+	* Made changes to 'ports' attribute to accomodate 40GbE channelized interfaces which are new in VSP VOSS 4.2
+
+2.01	2016-02-07
+	* Exteneded discovery was incorrectly setting up WLAN9100 family_type device with SecureRouter prompt patterns
+	* Updated error patterns for detecting error generated on Avaya device and to use single line patterns
+	* Updated login() & connect() methods to leverage new Control::CLI data_with_error() with new argument
+	  (requires Control::CLI version 2.02)
+	* Fixed telnet handling of WLAN9100 which generates unprintable characters in telnet output (but not with SSH)
+	* Locking onto WLAN9100 prompt was not working properly if calling login() on a configuration context prompt
+	* Sub-classing method syntax changed to more flexible hash style arguments (old list style format still accepted)
+	* Patterns for responding to device confirmation yes/no prompts updated
+
+2.02	2016-04-20
+	* Method last_cmd_errmsg() was not returning the switch error message if this was preceded by a line with caret
+	* Updated to support new Control::CLI's 'callback' argument in connect() and 'errmsg_format' in constructor
+	* Updated error messages to comply with new Control::CLI error message formats
+	* Updates to switch error messages

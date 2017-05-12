@@ -1,0 +1,88 @@
+---INPUT---
+_x j&á
+_&
+---OUTPUT---
+_&
+_x j&á
+---DONE---
+
+---INPUT---
+plácka g_&
+placka x
+---OUTPUT---
+placka x
+plácka g_&
+---DONE---
+
+---INPUT---
+\b
+b
+\
+a
+---OUTPUT---
+\
+a
+b
+\b
+---DONE---
+
+---INPUT---
+japonský
+Japonsko
+chrt
+hrnec
+Japonec
+---OUTPUT---
+hrnec
+chrt
+Japonec
+Japonsko
+japonský
+---DONE---
+
+---INPUT---
+plachta
+platno
+plá¹»
+platnost
+Plánièka
+plánì
+plagiát
+plánièka
+plankton
+plátno
+plát
+plat
+plaòka
+---OUTPUT---
+plagiát
+plachta
+plánì
+plánièka
+Plánièka
+plaòka
+plankton
+plá¹»
+plat
+plát
+platno
+plátno
+platnost
+---DONE---
+
+---INPUT---
+abc frézaøe
+ABC nástrojáøe
+ABC
+a
+abc
+abc nástrojáøe
+---OUTPUT---
+a
+abc
+ABC
+abc frézaøe
+abc nástrojáøe
+ABC nástrojáøe
+---DONE---
+

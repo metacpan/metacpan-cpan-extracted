@@ -1,0 +1,139 @@
+Mungo 1.9 07/01/2014
+
+  Tidied up Template Toolkit response code.
+
+Mungo 1.801 -- 08/12/2013
+
+	Fixed tests.
+
+Mungo 1.8 -- 05/12/2013
+
+	Updated POD.
+
+	Not modified response now gives the correct HTTP message.
+
+	No need for action list any more!
+
+	Updated dependencies.
+	
+	Removed etag support as was not working the way i wanted it to.
+	
+	Now outputting 404 errors when an action sub is now found.
+
+	500 error now has the correct HTTP message.
+
+	Now outputting any error given to the view template to the logs.
+
+	Now gets template files from relative path of the server document root.
+	
+	Fixed redirect status code.
+	
+	getThisUrl() now works when running servers not on port 80.
+
+	Sessions now working with servers running on a non standard port.
+	
+	SimpleTemplate class removed.
+	
+	Reverted back to using CGI for form input as CGI::Minimal does not handle large files well.
+	
+	Now using secure cookies if needed.
+	
+	Using httponly cookies for session.
+ 
+Mungo 1.701 -- 27/04/2013
+
+	Updated change log.
+
+Mungo 1.7 -- 27/04/2013
+
+	Fixed bug in template toolkit response class.
+	
+	Search engine friendly URLs are now supported.
+	
+	Template toolkit templates are now in UTF8.
+	
+	Correct HTTP error code sent when errors occur.
+	
+	getThisUrl() no longer matches the query string.
+	
+	Switched to CGI::Minimal.
+	
+	Now expiring sessions when the session object is destroyed.
+	
+	Template toolkit view now has full access to Mungo object.
+	
+	getHeader() method added to request class.
+	
+	More logging only sent when in debug mode.
+	
+	ETag headers now sent.
+	
+	Not modified response class to quickly return when no change in content.
+		
+Mungo 1.6 -- 11/04/2012
+
+	Current action is now accessible from template toolkit response template automatically.
+	
+	Session and request classes can now be overridden via config.
+	
+	Session now created automatically if a invalid one is found.
+	
+	Session save path now moved to single class variable that can be overridden.
+	
+	Relaxed include regex in simple template response class.
+	
+	Framework can determine URL without mod_rewrite being used.
+
+Mungo 1.5 -- 11/11/2011
+
+	Fixed bug that stopped jquery working with template toolkit templates
+	
+	On session problems just log and create a new one
+	
+	The correct http response code is sent when an error occurs
+	
+	we now export the whole of %env to the template toolkit response template
+	
+	fixed template toolkit error display bug
+
+Mungo 1.4 -- 26/06/2011
+
+	Added more documentation
+	
+	Improved example script
+	
+	Add template toolkit response plugin
+	
+	Fixed cookie domain bug
+
+Mungo 1.3 -- 18/04/2009
+
+	Added more pod
+	
+	Now we use the correct way of placeholder replacement
+	
+	New function in mungo added
+	
+	Untainted session contents
+	
+	Moved utility function out of mungo and into utils
+	
+	We can now store "0" in session variables
+	
+	Now logs if template path is not found
+	
+	Template path changed
+	
+	Example error template added
+
+Mungo 1.2 -- 07/03/2009
+
+	Functionality bugs fixed in CGI::Mungo::Response::SimpleTemplate
+
+Mungo 1.1 -- 13/02/2009
+
+	Name changed from Mungo to CGI::Mungo
+
+Mungo 1.0 -- 13/02/2009
+
+	Initial Release

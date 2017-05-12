@@ -1,0 +1,9 @@
+inc
+{
+    @inherit    24.nconf#inc
+}
+
+foo_2
+{
+    @inherit    .#inc/foo
+}

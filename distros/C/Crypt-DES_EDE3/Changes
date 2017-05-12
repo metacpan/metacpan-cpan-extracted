@@ -1,0 +1,7 @@
+$Id: Changes,v 1.2 2001/09/15 03:41:51 btrott Exp $
+
+Revision history for Crypt::DES_EDE3
+
+0.01  2001.09.14
+    - Initial distribution, extracted from Crypt::OpenPGP and Convert::PEM
+      distributions.

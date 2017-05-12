@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8ec64fcf94093edf23d74e27f353103f1ea0bbbb Changes
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 143cb0873984e14f7ff1291702566404c4c9a984 MANIFEST
+SHA1 01e2008f36a09a79a264760e5483d4b52802284a META.yml
+SHA1 406bcccfbd6292f447197edc3c21bd7e38e1d92c Makefile.PL
+SHA1 1983c54b711164eb46a5f0a49719fc7f8036c868 README
+SHA1 6dabf62f95be2f7638940ebdabce8c78b778fd69 Volume.pm
+SHA1 fd55a7abde68b82271f41567b6c60aaf14133990 examples/ex1.pl
+SHA1 ebc26ecebcf1bef1cfe89c0c0939dee0d9e9ff99 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 7977923648836f6481a46f08c28b2b90c894ccc8 t/Curses-UI-Volume/01-use.t
+SHA1 c3e0451b7c9669e74a93745fa678c47d1a4ce425 t/Curses-UI-Volume/02-version.t
+SHA1 d349a0bb6356d6d0621d6006f01a1d4b1709a3ad xt/Curses-UI-Volume/01-pod_coverage.t
+SHA1 2d7c086b1e9470975ec60e313350805051606e86 xt/Curses-UI-Volume/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWHfDwAAoJEJe+XXKaIuTlkMcH/0Zr9FJ64Z+VwTxzYelbJ+px
+lZpQCI0/G7JxCgv8+LZFGdCOVtP/D4UICf8kJZyD1SO/PhgVlMzDg8/AO2sDrFSu
+Vhqrku/DNaVJJSkyYoA+GHG2uRiPn8ctBQOtPHNWljsF6PDYHjavjie+A5K5xHIx
+3+ObtMunWdZZ9wmdEY4IsRrKuP/9q9IxSZ/yTyzUF6RQExhA+5SR/J9lzTboNjYv
+OJECgXvgj3584C1knAGWmGm1YUGFpQOnImk/kPutAK5MkMdTBAeV36L8qbZwEB6R
+M3bmEdvt5xoRFqETIhePkcDZKaNp3SOQ35NSco/Mopq14NyJ3B6HrrD6cPYnus4=
+=d1N2
+-----END PGP SIGNATURE-----

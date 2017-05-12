@@ -1,0 +1,45 @@
+---
+abstract: 'Automatic Trait Loading and Resolution for Catalyst Components'
+author:
+  - 'Rafael Kitover <rkitover@cpan.org>'
+build_requires:
+  Catalyst: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Moose: 0
+  MooseX::MethodAttributes: 0.15
+  Test::More: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+  version: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Component-Traits
+no_index:
+  directory:
+    - t
+requires:
+  Carp: 0
+  Catalyst: 0
+  Class::Load: 0
+  List::MoreUtils: 0
+  Moose::Role: 0
+  MooseX::Traits::Pluggable: 0
+  Scalar::Util: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CatalystX-Component-Traits
+  homepage: http://metacpan.org/release/CatalystX-Component-Traits
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rkitover/catalystx-component-traits.git
+version: 0.19
+x_authority: cpan:RKITOVER

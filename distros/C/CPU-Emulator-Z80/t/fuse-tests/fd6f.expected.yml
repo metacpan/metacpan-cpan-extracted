@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd6f
+registers:
+  AF: 36381
+  AF_: 0
+  BC: 41272
+  BC_: 0
+  DE: 61962
+  DE_: 0
+  HL: 10638
+  HL_: 0
+  I: 0
+  IX: 46592
+  IY: 3214
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,146 @@
+Class::DBI::Plugin::PseudoColumns version 0.03
+==============================================
+
+NAME
+    Class::DBI::Plugin::PseudoColumns - an interface to use some pseudo columns
+
+SYNOPSIS
+     package Music::CD;
+     use base 'Music::DBI';
+ 
+     Music::CD->table('cd');
+     Music::CD->columns(All => qw/cdid artist title year reldate properties/);
+     use Class::DBI::Plugin::PseudoColumns;
+     Music::CD->pseudo_columns(properties => qw/asin tag/);
+ 
+     use Music::CD;
+     my $cds = Music::CD->search(artist => 'Steve Vai');
+     while (my $cd = $cds->next) {
+         if ($cd->title =~ /^Real\s+Illusions/i) {
+             $cd->asin('B0007GADZO');
+         }
+         $cd->tag(['rock', 'guitar', 'tricky play']);
+         $cd->update;
+     }
+
+     my $bought_cd = Music::CD->create({
+         artist  => 'Rolling Stones',
+         title   => 'A Bigger Bang',
+         year    => 2005,
+         reldate => '2005-11-22',
+         asin    => 'B000BP86LE',
+         tag     => ['rock', 'blues', 'favorite'],
+     });
+     $bought_cd->set(
+         artist => 'The Rolling Stones',
+         title  => 'A Bigger Bang - Special Edition',
+     );
+     $bought_cd->update;
+
+DESCRIPTION
+    This module provides an easy way to use pseudo column in your
+    "Class::DBI" based table classes. The ``pseudo column'' means a kind of
+    column that is including an optical hashref string (via "Data::Dumper",
+    by default). You can get and set with using the pseudo column accessors
+    (same as always). But, you can't use the columns' name into your SQL,
+    SQL interfaced methods, "ORDER BY" clause and "GROUP BY" clause, etc.
+    This module is useful when you'd like to add an unimportant column
+    without issuing "ALTER TABLE", and when you'd like to have related
+    multiple data without normalizing table.
+
+HOW TO USE
+  Create a column
+    You should create a huge size column into your table. like this:
+
+     CREATE TABLE cd (
+       cdid int UNSIGNED auto_increment,
+       artist varchar(255),
+       title varchar(255),
+       year int,
+       reldate date,
+       properties text, # create for using pseudo column
+       PRIMARY KEY (cdid)
+     );
+
+  Create a table class
+    Almost same as usual.
+
+     package Music::CD;
+     use base 'Music::DBI';
+ 
+     Music::CD->table('cd');
+     Music::CD->columns(All => qw/cdid artist title year reldate properties/);
+
+  Use it
+    You will be able to use pseudo column with only to "use" this module.
+
+     use Class::DBI::Plugin::PseudoColumns;
+
+  Set your pseudo columns as your like
+     Music::CD->pseudo_columns(properties => qw/asin tag/);
+
+METHOD
+    This module provides following class methods.
+
+    * create(\%data);
+        "create" method works almost same as "Class::DBI::create()" if
+        there's some pseudo column in %data.
+
+    * set(column => value[, column2 => value2, ...]);
+        "set" method works almost same as "Class::DBI::set()" if there's
+        some pseudo column in argument.
+
+    * pseudo_columns([parent_colname => ('pseudo_column1'[, 'pseudo_column2'
+    ...])]);
+        You can set a pseudo columns' name with parent column's name.
+        ``pseudo_column1'' ... will provide to you each pseudo column's
+        accessor.
+
+        if you want to take a list of pseudo columns, you can pass one
+        argument to this method when you want to specify grouped parent
+        column name.
+
+         my @p_columns = Music::CD->pseudo_columns('properties');
+
+        And if you want to take all columns list of pseudo columns, you
+        don't need to pass any argument to this method.
+
+         my @all_p_columns = Music::CD->pseudo_columns();
+
+    * serializer(parent_colname => \&serializer_sub);
+        You can set a specific serializing function for your pseudo columns.
+
+         use Storable ();
+         __PACKAGE__->serializer(properties => \&Storable::nfreeze);
+
+        The default serializer is "Data::Dumper::Dumper" (when you don't
+        specify).
+
+    * deserializer(parent_coluname => \&deserializer_sub);
+        You can set a specific deserializing function for your pseudo
+        columns.
+
+         use Storable ();
+         __PACKAGE__->deserializer(properties => \&Storable::thaw);
+
+        The default deserializer calls "eval()" (when you don't specify) for
+        the dumped optical hashref string.
+
+        NOTE: The subref for serializer/deserializer must return a really
+        ``storable'' string for your database. example of above works under
+        a MySQL environment, but you have to change to use some another
+        ``storable'' filter (like "MIME::Base64") under SQLite environment
+        (see t/05_serializer.t)
+
+AUTHOR
+    Koichi Taniguchi <taniguchi@livedoor.jp>
+
+COPYRIGHT
+    Copyright (c) 2006 Koichi Taniguchi. Japan. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Class::DBI, Data::Dumper
+

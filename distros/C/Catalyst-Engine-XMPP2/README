@@ -1,0 +1,210 @@
+NAME
+    Catalyst::Engine::XMPP2 - Net::XMPP2::Connection Catalyst Engine
+
+SYNOPSIS
+      MyApp->config->{Engine::XMPP2} =
+       {
+        username => "abc",
+        domain => "jabber.org",
+        password => "foo",
+        override_host => "myserver",
+        override_port => 5722
+       };
+      MyApp->run();
+
+DESCRIPTION
+    This engine enables you to deploy a Catalyst application that can be
+    accessed using the XMPP protocol. This is done by a mapping of each XMPP
+    stanza to a HTTP Request, using the Catalyst::Engine::Embeddable as a
+    base.
+
+Semantics mapping
+    One important thing to realise is that the XMPP semantics are
+    considerably different than the HTTP semantics, that way, a set of
+    mappings must be done.
+
+    Request-Response
+        Usually, an HTTP application implements only Request-Response
+        semantics for every action. That is not always true for the XMPP
+        protocol. In fact, the only stanza that implements this semantics is
+        the <iq/> stanza.
+
+        That way, when receiving <message/> or <presence/> stanzas, the
+        response will be ignored on success. If the response is a failure
+        (400 or 500), an error response will be sent. If wanting to send an
+        explicit message, that should be done explicitly.
+
+        When receiving <iq/> stanzas, the response will be sent back as the
+        action processing returns, independent of the response status.
+
+        In any way, the attributes of the stanza root element will be
+        translated as HTTP Headers with the "XMPP_Stanza_" prefix.
+
+    SCRIPT_NAME
+        This is the most relevant aspect of this mapping. As XMPP doesn't
+        have a URI definition for each stanza, that means that there's no
+        proper way of dispatching a message to a given controller action in
+        Catalyst.
+
+        What this mapping does is, at the beggining, creating several
+        connections to the server, providing different resource identifiers
+        based on the Path actions registered in the application.
+
+        This have two important side-effects to realize:
+
+        A Catalyst XMPP application can only use 'Path' actions, because
+        that is the only DispatchType that have a static mapping of the
+        available actions. Other DispatchTypes, like Chained or Index,
+        depends on the current request to find out which action to dispatch.
+        This doesn't forbid the use of the other DispatchTypes for internal
+        forward and dispatch, but the only really public actions will be the
+        ones seen by the 'Path' DispatchType.
+
+        You have to keep in mind that the resources will be pre-advertised,
+        and that for each public path action, you will have a public jabber
+        id, and, at least by now, a separated connection to the server, so
+        it's probably a good idea to do a carefull planning of which actions
+        to make public.
+
+    Content-Type
+        XMPP has no support for MIME types. Every message is, by definition,
+        a XML document. So every request will have the "application/xml"
+        MIME type. If the response content-type is also "application/xml",
+        it will be written as raw into the XMPP stream. This will allow SOAP
+        responses, for instance, to be sent as in XEP-0072.
+
+        On the other hand, if the content type is of some other type, it
+        will be sent as literal string inside a <body> tag, as described by
+        XMPP RFC3921, this way, interaction with regular IM clients should
+        be natural.
+
+    Scalability
+        At this point, this engine is single-threaded, which means that it
+        will block in each operation, and, therefore it cannot handle more
+        than one request at a time. At the time of this writing, two options
+        are available to solve this problem:
+
+        The first would be to turn this engine into a pre-fork server that
+        would keep pipes to every child and dispatch the requests to them,
+        while keeping a single control thread for the XMPP connections.
+
+        The other option would be to implement a balancer server that would
+        accept several connections for the same JID and connect only once
+        for each JID, dispatching a message sent to some JID among each of
+        the candidate connections.
+
+        The second option is probably a better idea, as the handling of that
+        number of connections could be implemented in C, for instance, and
+        using low-level OS operations, like libevent for linux, making it
+        easier to scale in several machines.
+
+    Error handling
+        Error handling in XMPP is also different than from HTTP. While HTTP
+        defines numeric error codes, XMPP defines a set of named conditions.
+        But both provide a way to return a custom text to the requestor.
+        This way, the HTTP error codes will be mapped to the XMPP error
+        conditions, and the content of the response will be set as the error
+        text. The XMPP spec also define the "error-type" concept which
+        indicates what the requestor can do about, and the recommended
+        error-type for each of the known conditions. The user can override
+        this default by sending the XMPP_error-type header in the failure
+        case.
+
+        The HTTP-XMPP error code mapping will happen as described in the
+        following table.
+
+          bad-request                          400
+          conflict                             409
+          feature-not-implemented              501
+          forbidden                            403
+          gone                                 410
+          internal-server-error                500
+          item-not-found                       404
+          jid-malformed                        520*
+          not-acceptable                       406
+          not-allowed                          420*
+          not-authorized                       401
+          payment-required                     402
+          recipient-unavailable                521*
+          redirect                             302
+          registration-required                421*
+          remote-server-not-found              502
+          remote-server-timeout                504
+          resource-constraint                  412
+          service-unavailable                  503
+          subscription-required                422*
+          undefined-condition                  423*
+          unexpected-request                   424*
+
+        The items marked with an * are of codes that are not standard HTTP
+        error codes. Most error codes in this list could be mapped
+        literally.
+
+USAGE
+    The 'Engine::XMPP2' configuration key expects a hashref that will be
+    sent to Net::XMPP2::Connection->new dereferenced. It's important to
+    notice, however, that setting "jid" or "resource" in this hash has no
+    effect as this values will be set according to the Action-Resource
+    mapping.
+
+SENDING MESSAGES
+    One of the greater benefits of the XMPP protocol is the hability to
+    chain operations in a more complex choreography. In order to do that,
+    you just need to send new messages while processing other messages, in
+    order to do that, you can access the engine object by using $c->engine
+    and use one of the following methods
+
+    $c->engine->send_message($c, $to, $type, $create_cb, %attrs)
+        This will call send_message on the connection that generated the
+        current request with the parameters as described in
+        Net::XMPP2::Connection.
+
+        One important hint: if $create_db is a CODE ref, it will be executed
+        with a XML::Writer object in UNSAFE mode as its first argument,
+        which means you can call "raw" on it to send unencoded data.
+
+        As you'll be sending the message with the connection that generated
+        this request, it will have the complete JID, with the resource, as
+        the "from".
+
+    $c->engine->send_presence($c, $type, $create_cb, %attrs)
+        Same as above.
+
+    $c->engine->send_iq($c, $type, $create_cb, $result_cb, %attrs)
+        Same as above.
+
+        Hint: $result_cb is a coderef that will be executed once the
+        response for this iq arrives. This method won't block, so you might
+        have to implement a semaphore if the reply for this iq is relevant
+        to the rest of this request.
+
+DIRECT CONNECTION MANIPULATION
+    This is strongly discouraged, but it might be life-saving for some
+    corner cases.
+
+    $c->engine->connection($c)
+        Access the connection object that generated the current request.
+
+    $c->engine->connections()
+        This returns a hashref identifying all the connections by the
+        resource name.
+
+INTERNAL METHODS
+    $engine->handle_xmpp_node($app, $resource, $node)
+        This method is called by the stanza callbacks in the connections.
+
+SEE ALSO
+    Catalyst::Engine, Catalyst::Engine::CGI, HTTP::Request, HTTP::Reponse,
+    Catalyst, Net::XMPP2::Connection, Catalyst::Engine::Embeddable
+
+AUTHORS
+    Daniel Ruoso "daniel@ruoso.com"
+
+BUG REPORTS
+    Please submit all bugs regarding "Catalyst::Engine::XMPP2" to
+    "bug-catalyst-engine-xmpp2@rt.cpan.org"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

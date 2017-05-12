@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Config/Column.pm
+lib/Config/Column_ja.pod
+t/00-can.t
+t/base.pl
+t/column.pson
+t/delim_order-has1.t
+t/delim_order-last1.t
+t/delim_order-no1.t
+t/errorous.t
+t/nodelim_order-has1.t
+t/nodelim_order-last1.t
+t/nodelim_order-no1.t
+t/pod.t
+t/pod_coverage.t
+t/zz-clean.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

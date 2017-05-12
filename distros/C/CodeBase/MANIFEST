@@ -1,0 +1,16 @@
+Artistic		Artistic License statement
+Changes			Change history
+MANIFEST		This file
+README			Introductory notes
+TODO			To-do list
+Makefile.PL		Makefile generator
+CodeBase.pm		PM file
+CodeBase.xs		XS file
+t/01-basic.t		Basic tests
+t/02-records.t		Record handling tests
+t/03-index.t		Index handling tests
+t/04-lock.t		Lock handling tests
+t/05-query.t		Query tests
+t/CodeBaseTestsubs.pm	Common functions for tests
+testdata/README		directory for test data files
+typemap			Type map

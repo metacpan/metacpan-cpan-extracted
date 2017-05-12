@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 994ecae1f3d2d1791b8ff30526bfd63d3328d92e COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 c85077fd75807b2a154f603e1131ec8a69699484 Changes
+SHA1 d1135013621ea847e974892ceabce0ed9b0bdb1d INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 7f368844c4022f4e25634a6f696660fec2ec74c9 MANIFEST
+SHA1 fe3bc9790caa46c14d98506aea88314b39e28723 META.json
+SHA1 26827bad687f779a873c838ed5abd61515e4b2c2 META.yml
+SHA1 adafa48468016673fe28846840e028ad675ffb2a Makefile.PL
+SHA1 95a6e5891082ff49e4b19a6d2e05834c1fd81430 README
+SHA1 4e311f6fa62cb07ed5ea2ee7e78f4ea86dc5149c dist.ini
+SHA1 9328e4777824e1a0a3beebc90fa7fa60d4ca4933 doap.ttl
+SHA1 32e8544c8a4d6fce7e6cd9959cdb8832c8f21a69 lib/Cache/Moustache.pm
+SHA1 06f8e622df438cc7241bdffd2a95c60e5b6c7751 t/01basic.t
+SHA1 077b7cfcacfbf96158b2e59dee04bbe57cd2d7c9 t/02cachetester.t
+SHA1 79795a8caf65b724fd60eb4a9ba20d7248d16af1 t/lib/Cache/BaseCacheTester.pm
+SHA1 d96ed5d4c464ef916405518146971bfa09b4813e t/lib/Cache/CacheTester.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQbZxsACgkQzr+BKGoqfTlWLACfRpAx21+hoeUhChtz8zg4c4fm
+8hUAnRt5FVkEGP8j6GtyKuV65Tq38lH8
+=qs8u
+-----END PGP SIGNATURE-----

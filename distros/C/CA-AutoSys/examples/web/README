@@ -1,0 +1,44 @@
+#
+# $Id: README 57 2007-10-26 15:10:55Z sini $
+#
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2007 Sinisa Susnjar <sini@cpan.org>
+# See LICENSE for terms of distribution.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+This directory contains a little sample web server that can be used as a basis
+for more elaborate ways to control your AutoSys jobs.
+
+The web server makes extensive use of the excellent Perl modules HTML::Macro
+and Net::HTTPServer. Those two modules are not mentioned in the dependency list
+of CA::AutoSys for obvious reasons. Make sure you have them installed - otherwise
+this example web server won't come up...
+
+After starting the web server with the following command:
+
+  ./httpd.pl --job=YOUR_JOB_PREFIX% --dsn=dbi:Sybase:server=YOUR_AUTOSYS_SERVER
+
+you should see something like the following in your console window:
+
+  2007/04/11 18:45:57 - Server running on port 8081
+
+Now point your browser to http://localhost:8081 and enjoy ;-)
+
+IMPORTANT NOTE: this is only an example implementation - a real web control
+interface should of course also incooperate access control, proper logging and
+better error handling, just to name a few... you get the point: don't use this
+to run your production! You have been warned...

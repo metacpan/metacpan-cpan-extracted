@@ -1,0 +1,10 @@
+Revision history for Perl extension Coro::Multicore.
+
+TODO: idle timeout, like IO::AIO
+
+0.02  Mon Jun 29 22:24:18 CEST 2015
+	- actual first release, so experimental.
+
+0.01  Thu Jun 25 16:04:51 CEST 2015
+	- original version; cloned from AnyEvent::XSThreadPool.
+

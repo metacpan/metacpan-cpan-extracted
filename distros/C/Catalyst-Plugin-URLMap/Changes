@@ -1,0 +1,8 @@
+Revision history for Catalyst-Plugin-URLMap
+
+0.002   06 April 2012
+        - Show the mapped urls in debug mode startup
+        - skip trying to map stuff when there is nothing to map
+
+0.001   02 April 2012
+        - initial release with all features complete

@@ -1,0 +1,56 @@
+---
+abstract: 'Load (and optionally decrypt via GnuPG) user/pass identity information '
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Identity
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Config::Identity:
+    file: lib/Config/Identity.pm
+    version: '0.0019'
+  Config::Identity::GitHub:
+    file: lib/Config/Identity/GitHub.pm
+    version: '0.0019'
+  Config::Identity::PAUSE:
+    file: lib/Config/Identity/PAUSE.pm
+    version: '0.0019'
+requires:
+  Carp: '0'
+  File::HomeDir: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  IPC::Run: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Config-Identity
+  homepage: https://github.com/dagolden/Config-Identity
+  repository: https://github.com/dagolden/Config-Identity.git
+version: '0.0019'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <dagolden@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,38 @@
+Curses/UI/DelimitedTextViewer version 0.10
+==========================================
+Curses::UI::DelimitedTextViewer is subclass of Curses::UI::TextViewer
+which allows a delimited file to be viewed on screen as a fixed width
+file. This class adds the following arguments to those used by
+Curses::UI::TextViewer:
+
+-delimiter specifies the delimiter used in incoming data
+
+-scrollColumn sets to 1 to scroll left and right column by column
+
+-fieldSeparator  character used to seperate one column from another, the 
+default is a |
+
+-addBlankColumns adds extra columns of spaces and seperators if the incoming 
+data line did not have the maximum number of fields in it
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires that the Curses::UI distribution has been installed.
+
+COPYRIGHT AND LICENCE
+
+(c) 2002 by Garth Sainio. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as perl itself.
+

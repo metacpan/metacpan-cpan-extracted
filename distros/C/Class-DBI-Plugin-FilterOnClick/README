@@ -1,0 +1,39 @@
+Class::DBI::Plugin::FilterOnClick
+=======================
+
+The Class::DBI::Plugin::FilterOnClick module is for use with the
+Class::DBI module and requires additional modules as well.
+See DEPENDENCIES below for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Class::DBI
+   Class::DBI::Pager
+   HTML::Table
+   HTML::FillInForm
+   Class::DBI::AsForm
+   Class::DBI::Plugin::RetrieveAll (optional)
+   Config::Magic
+   Class::DBI::Plugin
+   Class::DBI::Plugin::RetrieveAll
+   Class::DBI::AbstractSearch
+   Class::DBI::Plugin::AbstractCount
+   Tie::Hash::Indexed
+   HTML::Strip
+
+COPYRIGHT AND LICENCE
+
+Artistic same as Perl
+
+Copyright (C) 2001 Aaron Johnson <aaronjjohnson@gmail.com>

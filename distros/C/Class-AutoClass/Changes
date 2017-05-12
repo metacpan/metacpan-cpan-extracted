@@ -1,0 +1,116 @@
+Revision history for Class-AutoClass
+
+1.56	2013-10-05
+	No functional changes
+	Update depdendencies
+        Fix boilerplate & pod tests
+
+1.55	2012-11-25
+	Added test for version number in POD
+	Changes to Build.PL
+	  Removed redundant 'dist_version_from' param
+          Added Module::Build to configure_requires
+	  Changed create_makefile_pl from deprecated 'passthrough' to 'small'
+	Fixed test failures caused by hash key randomization in perl 5.17.6
+          autoclass.011.inconsistent.t, autoclass.101.no_use_parent.t
+
+1.54	2010-08-22
+	Fixed bug causing __OVERRIDE__ not to work correctly in base
+        classes.  Setting __OVERRIDE__ in a base class did not change
+        the value of $self passed to _init_self in subclasses.  The net
+        effect was to lose all the initialization done in subclasses.
+	sigh! how did this survive so long??
+
+1.53	2010-01-06
+	Now works to use CODE or GLOB refs as DEFAULTS
+        Fixed version number for dependency Storable in Build.PL
+
+1.52	2009-12-04
+        Changed handling of %AUTODB=0 and %AUTODB=1 in anticipation of 
+          Class::AutoDB 1.10.  Does not functionally change Class::AutoClass
+
+1.51	2009-11-19
+        Tightened dependency for Test::Deep (now require version 0.098 
+          instead of 0), because this is first version that defines
+          cmp_details and deep_diag. Thanks to the CPAN Testers for 
+          finding this!!
+        Changed test file t/autoclassUtil.pm to manually import 
+          cmp_details and deep_diag, because not exported by Test::Deep
+          until version 0.104.
+
+1.50	2009-11-15
+        See changes for 1.49_02, 1.49_01
+
+1.49_02 2009-11-14 - Trial release on the way to 1.50
+	Fixed dependencies in Build.PL
+        Removed unused dependencies from tests
+
+1.49_01 2009-11-13 - Trial release on the way to 1.50
+        Brings CPAN version up-to-date with version used internally
+        New features:
+        - 'declare' can be called without class parameter
+        Bug fixes:
+        - if 'new' called from subclass via SUPER::new, 'new' retains object
+	  from subclass rather than creating new one; this is a rare occurence
+        - defaults for class attributes set at declare-time, not by 'new'
+        - removed undocumented 'class' method since it pollutes namespace 
+	  unreasonably
+        - caught error when a class does not 'use' its base class, and base 
+	  class cannot be loaded because of compile errors
+        - version number conforms to Perl standard
+
+1.0	2006-04-07
+	first stable version
+
+0.1	2006-01-04
+	- initialization strategy changed. instead of init'ing class by class 
+          down the hierarchy, it's now done all at once
+	- fixed many bugs in default initialization
+	- set_attributes always calls setter method
+	- added check for super classes not yet 'used'.  caution: this only works 
+          if people follow the Perl convention of placing module Foo in file Foo.pm.  
+          Else, there's no easy way to translate a classname into a string that can 
+          be 'used'
+	- fixed bug to auto-register subclasses that did not set %AUTODB
+
+0.093 Tue Oct 25 16:02:24 PDT 2005
+	- new override capability (for returning an instance of another object) 
+          and tests to cover new functionality
+	- added nullable functionality, so that an AutoClass object can return undef
+
+0.092 Tue May 31 17:40:32 PDT 2005
+	- changed AutoDB require in AutoClass.pm to AutoDB::Object (bug: utility 
+          classes were forced to 'use Class::AutoDB::Object'
+	- changed prereq syntax in Makefile.pl to just check for lib existance
+
+0.091 Mon Apr 18 09:22:47 PDT 2005
+	- removed Data::Dumper dependency
+	- removed versions from dependencies in Makefil.PL
+
+0.09  Wed Sep  1 12:11:24 PDT 2004
+	- Class::AutoDB::auto_register now takes a Class::AutoClass::Args object as an arg 
+
+0.08  Tue Aug 17 10:36:06 PDT 2004
+	- missed some test files in the 0.07 distribution (oops)
+
+0.07  Mon Aug 16 18:04:12 PDT 2004
+	- changes to accomodate Class::AutoDB refactor
+
+0.05  Mon Feb 23 11:12:43 PST 2004
+	- supressed a bunch of warnings throw when using -w flag
+	- use Storable added back to AutoClass
+
+0.04  Thu Feb 19 09:39:57 PST 2004
+	- removed Clone dependency 
+	- refactored AutoDB hooks
+
+0.03  Mon Jan 12 17:13:33 PST 2004
+	- more documentation changes 
+	- removed Class::WeakSingleton dependency
+
+0.02  Tues 06 Jan 18:03:38 PST 2004 
+	- some documentation changes
+
+0.01  Mon Dec 22 17:28:49 PST 2003
+	- original version. 
+

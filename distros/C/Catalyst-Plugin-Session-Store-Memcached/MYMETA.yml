@@ -1,0 +1,28 @@
+---
+abstract: 'Memcached storage backend for'
+author:
+  - 'This module is derived from L<Catalyst::Plugin::Session::FastMmap> code, and'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session-Store-Memcached
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cache::Memcached::Managed: 0
+  Catalyst::ClassData: 0
+  Catalyst::Plugin::Session: 0.26
+  MRO::Compat: 0
+  Moose: 0
+  MooseX::Emulate::Class::Accessor::Fast: 0
+  namespace::clean: 0
+version: 0.05

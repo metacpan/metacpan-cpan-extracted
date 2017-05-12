@@ -1,0 +1,10 @@
+Revision history for Perl Extention Catalyst::Plugin::Authentication::Credential::BBAuth
+
+0.03 Wed Nov 22 14:05:12 JST 2006
+	fixed test doesn't pass in some environment.
+
+0.02 Sun Nov 19 06:03:49 JST 2006
+	fixed dependencies.
+
+0.01 Thu Nov 17 07:07:21 JST 2006
+	original version

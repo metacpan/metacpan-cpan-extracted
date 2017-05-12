@@ -1,0 +1,57 @@
+NAME
+    CPAN::Mirror::Finder - Find a locally-configured CPAN mirror
+
+SYNOPSIS
+      use CPAN::Mirror::Finder;
+      my $finder = CPAN::Mirror::Finder->new;
+      my @mirrors = $finder->find_all_mirrors;
+
+      my @cpanmini_mirrors = $finder->find_cpanmini_mirrors;
+      my @cpan_mirrors = $finder->find_cpan_mirrors;
+      my @cpanplus_mirrors = $finder->find_cpanplus_mirrors;
+
+DESCRIPTION
+    This modules makes it easy to find a locally-configured CPAN mirror.
+    There are many ways to have a CPAN mirror. The most explicit is to use
+    CPAN::Mini with a configuration file to have an entirely local CPAN
+    mirror.
+
+    Also CPAN.pm can be configured with details of CPAN mirrors.
+
+    Also CPANPLUS can be configured with details of CPAN mirrors. This also
+    contains sensible defaults if the user has not configured anything.
+
+    All methods return URI objects.
+
+METHODS
+  find_all_mirrors
+    Returns a combination of all the ways of finding locally-configured CPAN
+    mirror:
+
+      my @mirrors = $finder->find_mirror; # returns all the following
+
+  find_cpanmini_mirrors
+    Returns a local CPAN::Mini mirror, if any:
+
+      my @cpanmini_mirrors = $finder->find_cpanmini_mirrors;
+
+  find_cpan_mirrors
+    Returns the mirrors configured by CPAN.pm:
+
+      my @cpan_mirrors = $finder->find_cpan_mirrors;
+
+  find_cpanplus_mirrors
+    Returns the mirrors configured by CPANPLUS:
+
+      my @cpanplus_mirrors = $finder->find_cpanplus_mirrors;
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2011, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

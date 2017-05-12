@@ -1,0 +1,65 @@
+Revision history for Perl module CommonMark
+
+0.240100  2015-02-17
+    - Support custom nodes (requires libcmark 0.23)
+    - Export constants
+    - Document more helper functions
+    - Use new node naming conventions for helpers (old names are still
+      supported).
+    - Fix tests under libcmark 0.24.0.
+      Thanks to A. Sinan Unur for the report.
+    - Implement $node->replace
+
+0.230002  2015-12-30
+    - Fixes for libcmark 0.21.0
+
+0.230001  2015-12-30
+    - Define constants in XS code.
+      Should add backward compatibility for libcmark 0.21.
+
+0.230000  2015-12-29
+    - Support and require libcmark 0.23
+    - Improve and fix documentation
+    - Fix "unescaped left brace" warning on Perl 5.22
+
+0.210001  2015-07-28
+    - Stop returning encoded UTF-8 from renderers
+      BREAKING CHANGE: The renderers now return normal Perl strings.
+      Use utf8::encode before printing the result to binary streams.
+    - $node->render convenience method
+    - Additional parser options for CommonMark->parse
+    - Fix and improve check for libcmark
+
+0.210000  2015-07-27
+    - Require libcmark 0.21.0
+    - Adjust for libcmark API changes
+    - Add support for Latex renderer
+
+0.180300  2015-04-02
+    - Require libcmark 0.18.3
+    - Add options parameter to markdown_to_html
+    - Add support to render as Commonmark
+
+0.1802  2015-03-16
+    - Fix build with Perl <= 5.14.
+    - Test with Travis CI.
+
+0.1801  2015-03-11
+    - Fix Parser->new to work correctly with libcmark 0.18.
+      Also fixes compilation with libcmark 0.18.1.
+
+0.1800  2015-03-05
+    - Adjust to API changes in libcmark 0.18.
+    - Require libcmark 0.18.
+    - Add "parse" convenience function.
+    - Fix build with old EUMM versions.
+
+0.1700  2015-02-04
+    - Check for libcmark with Devel::CheckLib.
+    - Accessors for libcmark version.
+    - Require libcmark 0.16.
+    - Improve and fix documentation.
+
+0.1601  2015-01-22
+    - Initial release.
+

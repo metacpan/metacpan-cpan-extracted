@@ -1,0 +1,254 @@
+=pod
+
+=head1 NAME
+
+CLIPSeqTools::Tutorial::Introduction - An introduction to I<CLIPSeqTools>
+
+=head1 INTRODUCTION
+
+I<CLIPSeqTools> is a collection of command line applications used for the
+analysis of CLIP-Seq datasets. CLIP-Seq stands for UV cross-linking and
+immunoprecipitation coupled with high-throughput sequencing.
+
+I<CLIPSeqTools> offers applications for a wide range of analyses that will
+give an in depth view of the analysed dataset. Examples of such analyses are:
+genome read coverage, motif enrichment, relative positioning of reads of two
+datasets, etc).
+
+
+I<CLIPSeqTools> is grouped in 4 toolboxes each of which performs a specific
+set of analyses:
+
+=over
+
+=item 1. C<clipseqtools>
+
+Application to analyse a single CLIP-Seq library.
+
+=item 2. C<clipseqtools-compare>
+
+Application to compare two CLIP-Seq libraries. (Can be used after
+C<clipseqtools> is run on each dataset).
+
+=item 3. C<clipseqtools-plots>
+
+Helper application to create plots for the output of C<clipseqtools> and
+C<clipseqtools-compare>.  (Note: Usually the plotting functions are called
+from the analysis scripts themselves using the C<--plot>).
+
+=item 4. C<clipseqtools-preprocess>
+
+Application to process a FastQ file into files that are compatible with
+C<clipseqtools>. (Among other things, it aligns the reads on the reference
+genome, annotate the alignments with genic, repeat masker and phastCons
+conservation information).
+
+=back
+
+=head1 INSTALLATION
+
+=head2 Prerequisites
+
+I<CLIPSeqTools> relies on a few external programs for things like the
+alignment and the plotting functionality. To successfully install and use
+I<CLIPSeqTools> you will need to have the following tools installed and
+available in the users path:
+
+=over
+
+=item * C<R>
+
+Language for statistical computing. To download R statistical package and for
+installation instructions refer to L<http://www.r-project.org/>
+
+=item * C<STAR>
+
+For the alignment of reads on a reference genome (only if you use
+clipseqtools-preprocess). To download STAR and for installation instructions
+refer to L<https://code.google.com/p/rna-star/>
+
+=item * C<cutadapt>
+
+To remove 5' end adaptor sequence from reads (only if you use clipseq-tools
+preprocess). To download cutadapt and for installation instructions refer to
+L<https://code.google.com/p/cutadapt/>
+
+=back
+
+=head2 Installing CLIPSeqTools
+
+I<CLIPSeqTools> is a Perl module and should be compatible with any Unix style
+operating system with the Perl programming language installed.  Chances are
+that if you are working on a Mac or a Linux operating system you already have
+Perl installed.
+
+The simplest way to install I<CLIPSeqTools> is to use CPAN which is the a
+package manager for Perl modules.  If you are the system administrator and
+want to install the module system-wide, you need to switch to your root user.
+
+To fire up the CPAN module, just get to your terminal (Command Line) and run
+the following command:
+
+  perl -MCPAN -e shell
+
+If this is the first time you've run CPAN, it's going to ask you a series of
+questions - in most cases the default answer is fine.
+
+Once you find yourself staring at the C<< cpan> >> command prompt type:
+
+  install CLIPSeqTools
+
+CPAN should take it from there and install I<CLIPSeqTools>.
+
+=head1 GETTING STARTED
+
+=head2 Download required files
+
+I<CLIPSeqTools> relies on certain data and annotation files to function
+properly. For the user's convenience, we provide the required files for 3
+species - human (assembly: hg19), mouse (assembly: mm9) and fly (assembly:
+dme3) on our public server.
+
+You may access these file at
+L<http://mourelatos03.med.upenn.edu/clipseqtools/>
+
+=head2 Prepare your working directory
+
+To keep things simle, in the following we assume you are using a working
+directory named C<clip> and that you work for human (hg19) species.
+
+=over
+
+=item 1. Create a new directory named C<data> inside C<clip/>.
+
+This creates the path C<clip/data/>
+
+=item 2. Download file C<hg19.tgz> from our public server using the link given previously
+
+=item 3. Put the downloaded file into the new directory C<clip/data/> and unzip it.
+
+This creates the path C<clip/data/hg19/>
+To save disk space you can now remove file hg19.tgz
+
+=item 3. Assuming your CLIP-Seq data are for I<proteinA>, create a new directory named C<proteinA> inside C<clip/>.
+
+This creates the path C<clip/proteinA/>
+
+=item 4. Move/Copy the FastQ file with the CLIP-Seq reads into C<clip/proteinA/> and rename it to I<reads.fastq>.
+
+B<Important:> Unzip it, if it is zipped.
+
+=item 5. Open a terminal and navigate to your working directory.
+
+  cd /path/to/clip/
+
+=item 6. List all directories and files with the following command.
+
+  find .
+
+You should have a working directory that looks like this:
+
+  clip/
+  clip/data/
+  clip/data/hg19/
+  clip/proteinA/
+  clip/proteinA/reads.fastq
+
+Verify that everything is in place.
+
+=back
+
+=head2 Align and process the FastQ file with C<clipseqtools-preprocess>
+
+To process the fastq file, align the reads on the reference genome, annotate
+the alignments with genic, repeat masker and phastCons conservation
+information run the following command substituting <PLACEHOLDER> with the
+appropriate information.
+
+=over
+
+=item * If you are running on a machine with B<more> than 32GB RAM.
+
+  clipseqtools-preprocess all \
+    --adaptor <5_END_ADAPTOR> \
+    --fastq proteinA/reads.fastq \
+    --gtf data/hg19/annotation/UCSC_gene_parts_genename.gtf \
+    --rmsk data/hg19/annotation/rmsk.bed \
+    --star_genome data/hg19/STAR/index/ \
+    --phyloP_dir data/hg19/phyloP/ \
+    --rname_sizes data/hg19/chrom.sizes \
+    --o_prefix clip/proteinA/ \
+    -v
+
+=item * If you are running on a machine with B<more> than 16GB RAM.
+
+  clipseqtools-preprocess all \
+    --adaptor <5_END_ADAPTOR> \
+    --fastq proteinA/reads.fastq \
+    --gtf data/hg19/annotation/UCSC_gene_parts_genename.gtf \
+    --rmsk data/hg19/annotation/rmsk.bed \
+    --star_genome data/hg19/STAR/index-sparsed2/ \
+    --phyloP_dir data/hg19/phyloP/ \
+    --rname_sizes data/hg19/chrom.sizes \
+    --o_prefix clip/proteinA/ \
+    -v
+
+=item * If you are running on a machine with B<less> than 16GB RAM.
+
+  ... sorry no luck here
+
+=back
+
+The command above is doing a lot of things and it's going to take quite some
+time. Most likely it will take at least a few hours, so be B<patient> and B<do
+NOT close the terminal>.  When it finishes you will find all files required to
+run C<clipseqtools> in the next step under C<clip/proteinA/>.
+
+=head2 Analyse a library with C<clipseqtools>
+
+To run C<clipseqtools>.
+
+  clipseqtools all \
+    --database proteinA/reads.adtrim.star_Aligned.out.single.sorted.db \
+    --gtf data/hg19/annotation/UCSC_gene_parts_genename.gtf \
+    --rname_sizes data/hg19/chrom.sizes \
+    --o_prefix clip/proteinA/ \
+    --plot \
+    -v
+
+The command above is doing many things and is going to take some time,
+probably a few hours so be B<patient> and B<do NOT close the terminal>.  When
+it finishes you will find the result files (tables and figures) in
+C<clip/proteinA/>.
+
+To view the table files (those with .tab extension) you can open them with a
+spreadsheet program like MS Excel or copy & paste their content directly into
+a spreadsheet.
+
+=head2 Compare two libraries with C<clipseqtools-compare>
+
+Assuming you have two libraries on which you have previously run
+C<clipseqtools> you can now use C<clipseqtools-compare> to compare their
+results.  For simplicity, we assume the two directories containing the
+C<clipseqtools> results for these two libraries are C<clip/proteinA/> and
+C<clip/proteinB/>.  To compare the results for the two libraries run the
+following command.
+
+  clipseqtools-compare all \
+    --database clip/proteinA/reads.adtrim.star_Aligned.out.single.sorted.db \
+    --res_prefix clip/proteinA/ \
+    --r_database clip/proteinB/reads.adtrim.star_Aligned.out.single.sorted.db \
+    --r_res_prefix clip/proteinB/ \
+    --rname_sizes data/hg19/chrom.sizes \
+    --o_prefix clip/proteinA_vs_B/ \
+    --plot \
+    -v
+
+Note that with the above command we are comparing library I<proteinA> against
+the B<reference> library I<proteinB>.
+
+The command is going to take some time so be patient. When it finishes you
+will find the result files for the analyses in C<clip/proteinA_vs_B/>.
+
+=cut
+

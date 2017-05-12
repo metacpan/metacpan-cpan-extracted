@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     use Complete::Regexp::Pattern qw(
+         complete_regexp_pattern_module
+         complete_regexp_pattern_pattern
+     );
+     my $res = complete_regep_pattern_module(word => 'L');
+     # -> {word=>['License', 'License/'], path_sep=>'/'}
+    
+     my $res = complete_regep_pattern_pattern(word => 'Y');
+     # -> {word=>['YouTube/video_id'], path_sep=>'/'}
+

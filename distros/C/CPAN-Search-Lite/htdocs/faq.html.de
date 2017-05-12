@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+  <title>CPAN Suche Häufig gestellte Fragen</title>
+  </head>
+
+  <body>
+<br><div class=t5>Häufig gestellte Fragen</div>
+
+<ol>
+<li>
+<a HREF="#01">Worauf l&auml;uft diese Site?</a>
+</li>
+<li>
+<a HREF="#02">Warum ist das Modul X nicht vorhanden?</a>
+</li>
+<li>
+<a HREF="#03">Warum ist das Modul X nicht da, obwohl es auf search.cpan.org auftaucht?</a>
+
+</li>
+<li>
+<a HREF="#04">Warum fehlt beim Modul X die Dokumentation?</a>
+</li>
+<li>
+<a HREF="#05">Warum fehlen alle oder einige der Voraussetzungen eines Paketes?</a>
+</li>
+<li>
+<a HREF="#06">Wie ist die Syntax f&uuml;r die Suche?</a>
+</li>
+<li>
+
+<a HREF="#07">Wie benutze ich die PPM-Quellen?</a>
+</li>
+<li>
+<a HREF="#08">Gibt es noch weitere Suchmaschinen f&uuml;r das CPAN?</a>
+</li>
+<li>
+<a HREF="#09">Welche Konventionen gibt es, an die man sich f&uuml;r externe Links halten sollte?</a>
+</li>
+<li>
+<a HREF="#10">Ich habe ein Problem gefunden. An wen wende ich mich?</a>
+</li>
+<li>
+<a HREF="#11">Ist der Quellcode verf&uuml;gbar, auf dem diese Website l&auml;uft?</a>
+
+</li>
+</ol>
+<hr>
+<dl class=faq>
+
+
+<dt>
+<a CLASS="t5" NAME="01">Worauf l&auml;uft diese Site?</a>
+</dt>
+<dd><p>
+
+Die Grundlage ist ein <a href="http://www.linux.org" target="_blank">Linux</a>-System, als Software kommen unter anderem <a href="http://www.mysql.com" target="_blank">mysql</a>, <a href="http://www.apache.org" target="_blank">Apache</a> und <a href="http://perl.apache.org" target="_blank">mod_perl</a>, <a href="http://www.template-toolkit.com" target="_blank">Template-Toolkit</a> und nat&uuml;rlich <a href="http://www.perl.com" target="_blank">Perl</a> zum Einsatz. Der Multiplexer, der Downloads zum (hoffentlich) n&auml;chsten CPAN-Mirror umleitet, basiert auf <a href="http://www.maxmind.com" target="_blank">GeoIP</a>. Die Netzanbindung wird von der <a href="http://www.uwinnipeg.ca" target="_blank">Univeris&auml;t von Winnipeg</a> bereitgestellt.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="02">Warum ist das Modul X nicht vorhanden?</a>
+</dt>
+<dd><p>
+
+Gesetzt den Fall, dass es erfolgreich im <a href="http://www.cpan.org" target="_blank">CPAN</a> indiziert wurde und dass genug Zeit verstrichen ist, sodass der lokale Mirror es &uuml;bernommen hat, k&ouml;nnte dies daran liegen, dass die Distribution eine un&uuml;bliche Struktur hat. Im Speziellen wird hier erwartet, dass die Distribution sich in ein Unterverzeichnis entpackt, das sich vom Namen der Distribution ableitet und dass der Name der Distribution und eine g&uuml;ltige Version mit Graham Barrs <a href="http://cpan.uwinnipeg.ca/~gbarr/CPAN-DistnameInfo" target="_blank">CPAN-DistnameInfo</a>-Modul extrahiert werden k&ouml;nnen.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="03">Warum ist das Modul X nicht da, obwohl es auf search.cpan.org auftaucht?</a>
+</dt>
+<dd><p>
+
+Die Indizierung basiert auf den CPAN-Indices, die restriktiver sind als die, die auf <a href="http://search.cpan.org" target="_blank">search.cpan.org</a> benutzt werden. Daher ist die Wahrscheinlichkeit recht hoch, dass ein Modul, das hier nicht auftaucht, auch von Tools wie CPAN/CPANPLUS nicht gefunden wird. Dies kann mehrere Gr&uuml;nde haben - es kann eine Entwickler-Version sein (gekennzeichnet als solche durch einen Unterstrich in der Versionsnummer der Distribution), es ist m&ouml;glicherweise nicht bei <a href="http://pause.perl.org" target="_blank">PAUSE</a> registriert oder es ist registriert aber mit einer anderen CPAN-id. Beachten Sie, dass nur die aktuellste Version einer Distribution in der Datenbank sind, was Module ausschlie&szlig;t, die nur in &auml;lteren Versionen einer Distribution enthalten sind.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="04">Warum fehlt beim Modul X die Dokumentation?</a>
+</dt>
+<dd><p>
+
+Dies kann an Problemen bei der Extraktion oder der Umwandlung in HTML liegen. Eine weitere M&ouml;glichkeit ist, dass das Modul sich nicht an die erwartete Konvention für den NAME-Bereich der pod-Dokumentation h&auml;lt, in der der Name des Moduls angegeben wird. Au&szlig;erdem kann es sein, dass es vorhanden ist aber nicht an einem Standard-Ort - Sie k&ouml;nnen, als Beispiel, <a href="http://cpan.uwinnipeg.ca/htdocs/libnet/" target="_blank">http://cpan.uwinnipeg.ca/htdocs/libnet/</a> &ouml;ffnen, um eine &Uuml;bersicht &uuml;ber alle mit einer Distribution verbundenen Dokumente zu erhalten.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="05">Warum fehlen alle oder einige der Voraussetzungen eines Paketes?</a>
+</dt>
+<dd><p>
+
+Die Informationen &uuml;ber Voraussetzungen werden aus der Datei META.yml innerhalb der Distribution extrahiert. Nicht alle Distributionen haben diese Datei, da sie nur erstellt wird, wenn man eine Distribution mit einer relativ neuen Version von ExtUtils::MakeMaker oder Module::Build erzeugt.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="06">Wie ist die Syntax f&uuml;r die Suche?</a>
+</dt>
+<dd><p>
+
+<ul>
+<li>Eine grundlegende Abfrage wie <code>foo bar</code> wird, abh&auml;ngig von dem ausgew&auml;hlten Such-Typ, Modulnamen und -kurzbeschreibungen, Distributionsnamen und -kurzbeschreibungen, CPAN-ids und Namen durchsuchen und wird alle Resultate liefern, die alle Worte enthalten. Bei der Suche in Kurzbeschreibungen werden nur Begriffe mit mehr als zwei Zeichen beachtet.</li>
+<li>Wenn Sie einen Begriff ausschlie&szlig;en wollen, stellen Sie ihm ein Minus-Zeichen voran, zB <code>foo -bar</code>.</li>
+<li>Suchabfragen k&ouml;nnen auch mit regul&auml;ren Ausdr&uuml;cken durchgef&uuml;hrt werden - diese werden erkannt, wenn eines oder mehrere der Zeichen ^, $, *, +, ?, | im Suchausdruck auftauchen.</li>
+</ul>
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="07">Wie benutze ich die PPM-Quellen?</a>
+</dt>
+<dd><p>
+
+Lesen Sie die Dokumentation von <a href="http://www.activestate.com" target="_blank">ActivePerl</a> f&uuml;r generelle Informationen zur Benutzung von ppm. Die ppm-Pakete, die hier auftauchen, k&ouml;nnen mit dem ppm-Programm installiert werden. F&uuml;r die ActivePerl-Pakete sollten Sie in der Lage sein, die Pakete mit <code>install Paket-Name</code> innerhalb von ppm zu installieren; f&uuml;r die anderen Pakete m&uuml;ssen Sie m&ouml;glicherweise den angezeigten Ort zur Liste Ihrer Quellen hinzuf&uuml;gen: 
+<ul>
+<li><b>http://www.bribes.org/perl/ppm</b>, f&uuml;r das <i>Perl 5.6/5.8 Depot von bribes</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer</b>, f&uuml;r das <i>Perl 5.6 Depot von uwinnipeg</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58</b> (ActivePerl Builds &lt; 819) /
+<b>http://theoryx5.uwinnipeg.ca/ppms/</b> (ActivePerl Builds &gt;= 819),  
+f&uuml;r das <i>Perl 5.8 Depot von uwinnipeg</i></li>
+</ul>
+</p><p>
+Stellen Sie sicher, dass Sie die Quellen nutzen, die f&uuml;r Ihre Perl-Version richtig sind (5.6-Quellen f&uuml;r ActivePerl 6xx Builds, 5.8-Quellen f&uuml;r ActivePerl 8xx Builds). Beachten Sie auch, dass der Name, der hier genannt wird, der auf dem Namen der Distribution beim CPAN basiert, derjenige ist, den Sie bei der Installation angeben m&uuml;ssen; dieser stimmt oft, aber nicht immer, mit dem Namen des Hauptmoduls in der Distritbution &uuml;berein.
+</p><p>
+Wenn Sie ein PPM-Depot betreuen und es in die Datenbank aufgenommen werden soll, wird zur Zeit eine summary.ppm-Datei ben&ouml;tigt, die alle verf&uuml;gbaren Dateien enth&auml;lt. Wie man diese erzeugt wird in dem Script beschrieben, das in der PPM-Distribution auf dem <a href="http://www.cpan.org/authors/id/M/MU/MURRAY/" target="_blank">CPAN</a> verf&uuml;gbar ist. Nachdem Sie diese Datei erzeugt haben, kontaktieren Sie bitte <a href="mailto:randy@theoryx5.uwinnipeg.ca" target="_blank">Randy Kobes</a> mit Details &uuml;ber Ihr PPM-Depot.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="08">Gibt es noch weitere Suchmaschinen f&uuml;r das CPAN?</a>
+</dt>
+<dd><p>
+
+    Ja.
+    <ul>
+	<li><a href="http://search.cpan.org" target="_blank">search.cpan.org</a>.</li>
+<li><a href="http://www.perldoc.com" target="_blank">www.perldoc.com</a>.</li>
+<li><a href="http://wait.cpan.org" target="_blank">wait.cpan.org</a>.</li>
+</ul>
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="09">Welche Konventionen gibt es, an die man sich f&uuml;r externe Links halten sollte?</a>
+</dt>
+<dd><p>
+
+<ul>
+<li>Ein Link wie <a href="http://cpan.uwinnipeg.ca/~gbarr" target="_blank">http://cpan.uwinnipeg.ca/~gbarr</a> f&uuml;hrt zu Informationen &uuml;ber den CPAN-Autor mit der id GBARR.</li>
+<li>F&uuml;r Informationen &uuml;ber eine bestimmte Distribution oder ein Modul benutzen Sie einen Link wie <a href="http://cpan.uwinnipeg.ca/dist/libnet" target="_blank">http://cpan.uwinnipeg.ca/dist/libnet</a> (f&uuml;r Distributionen) oder <a href="http://cpan.uwinnipeg.ca/module/Net::FTP" target="_blank">http://cpan.uwinnipeg.ca/module/Net::FTP</a> (f&uuml;r Module). F&uuml;r Distributionen k&ouml;nnen Sie auch <a href="http://cpan.uwinnipeg.ca/~gbarr/libnet" target="_blank">http://cpan.uwinnipeg.ca/~gbarr/libnet</a> benutzen, wenn Sie den CPAN-Autor wissen.</li>
+<li>F&uuml;r alphabethische Auflistung von Distributionen und Modulen nutzen Sie <a href="http://cpan.uwinnipeg.ca/dist/A/" target="_blank">http://cpan.uwinnipeg.ca/dist/A/</a> oder <a href="http://cpan.uwinnipeg.ca/module/A/" target="_blank">http://cpan.uwinnipeg.ca/module/A/</a> f&uuml;r alle Distributionen oder Module, die mit einem bestimmten Buchstaben beginnen. Benutzen Sie <a href="http://cpan.uwinnipeg.ca/dist/Apache/" target="_blank">http://cpan.uwinnipeg.ca/dist/Apache/</a> oder <a href="http://cpan.uwinnipeg.ca/module/Apache/" target="_blank">http://cpan.uwinnipeg.ca/module/Apache/</a> um Distributionen, die Apache-* entsprechen oder Module, die Apache::* entsprechen, anzuzeigen. Beachten Sie den abschlie&szlig;enden Schr&auml;gstrich in diesen Links.</li>
+<li>Um in eine Kategorie zu linken, k&ouml;nnen Sie <a href="http://cpan.uwinnipeg.ca/chapter" target="_blank">http://cpan.uwinnipeg.ca/chapter</a> f&uuml;r die Hauptkapitel, <a href="http://cpan.uwinnipeg.ca/chapter/World_Wide_Web_HTML_HTTP_CGI" target="_blank">http://cpan.uwinnipeg.ca/chapter/World_Wide_Web_HTML_HTTP_CGI</a> f&uuml;r ein bestimmtes Kapitel und <a href="http://cpan.uwinnipeg.ca/chapter/World_Wide_Web_HTML_HTTP_CGI/Apache" target="_blank">http://cpan.uwinnipeg.ca/chapter/World_Wide_Web_HTML_HTTP_CGI/Apache</a> f&uuml;r ein Unterkapitel benutzen.</li>
+<li>Links Dokumenten f&uuml;r ein bestimmtes Modul k&ouml;nnen als <a href="http://cpan.uwinnipeg.ca/htdocs/libnet/Net/FTP.html" target="_blank">http://cpan.uwinnipeg.ca/htdocs/libnet/Net/FTP.html</a> angelegt werden, um die Dokumentation f&uuml;r Net::FTP in der libnet-Distribution anzuzeigen. Alternativ k&ouml;nnen Sie <a href="http://cpan.uwinnipeg.ca/perldoc?Net::FTP" target="_blank">http://cpan.uwinnipeg.ca/perldoc?Net::FTP</a> benutzen (Dies funktioniert auch f&uuml;r die Perl-Dokumentation, zum Beispiel bringt <a href="http://cpan.uwinnipeg.ca/perldoc?perlfaq" target="_blank">http://cpan.uwinnipeg.ca/perldoc?perlfaq</a> die PerlFAQ. Beachten Sie, dass diese Dokumentationslinks aus einer Vielzahl von Gr&uuml;nden, die meistens die Konvetionen im CPAN-Index und die Form der pod-Dokumentation innerhalb der Distribution betreffen, m&ouml;glicherweise nicht f&uuml;r alle Module funktionieren. 
+</ul>
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="10">Ich habe ein Problem gefunden. An wen wende ich mich?</a>
+</dt>
+<dd><p>
+
+    Bitte senden Sie eine Email an <a href="mailto:randy@theoryx5.uwinnipeg.ca" target="_blank">Randy Kobes</a> wenn Sie auf Probleme sto&szlig;en, nicht-funktionierende Links und Fehler in den &Uuml;bersetzungen eingeschlossen. Bitte geben Sie Details (und Links) an, was Sie taten, als das Problem auftrat.
+</p></dd>
+<dt>
+
+<dt>
+<a CLASS="t5" NAME="11">Ist der Quellcode verf&uuml;gbar, auf dem diese Webseite l&auml;uft?</a>
+</dt>
+<dd><p>
+
+
+    Ja. Schauen Sie nach dem CPAN-Search-Lite Projekt auf <a href="http://sourceforge.net/projects/cpan-search/" target="_blank">SourceForge</a>. Eine Mailing-List ist verf&uuml;gbar f&uuml;r Fragen rund um die Installation, die Diskussion von Bugs und Vorschl&auml;ge von Verbesserungen und Features. Beachten Sie, dass dieses Projekt nicht dazu gedacht ist, mit dem (fantastischen) <a href="http://search.cpan.org" target="_blank">search.cpan.org</a> zu konkurrieren, das eine Reihe Features enth&auml;lt, die es hier nicht gibt (&auml;ltere Releases von Distributionen, grep- und diff-F&auml;higkeit etc). Eine Richtung, die dieser Code hier einschlagen k&ouml;nnte, k&ouml;nnte zu Diensten abseits der Standard-Web-Dienste (SOAP-basierende Tools zum Beispiel) f&uuml;hren.  
+</p></dd>
+

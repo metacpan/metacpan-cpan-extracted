@@ -1,0 +1,68 @@
+Cisco::CopyConfig Version 1.3
+=============================
+
+INTRODUCTION
+============
+Cisco::CopyConfig provides methods for manipulating the running-config
+of Cisco devices running IOS via SNMP directed TFTP.  This is handy for
+making changes or backups on many devices without having to log into each 
+device or write messy expect type scripts that need constant tweaking.
+
+Example: Backup the configuration of 'lab-router-a' to 'tftp-server-a':
+
+use Cisco::CopyConfig;
+
+$config = Cisco::CopyConfig->new(
+  'Host' => 'lab-router-a',
+  'Comm' => 'rw_community_string'
+);
+$config->copy('tftp-server-a', 'lab-router-a.config');
+
+For those that think SNMP is evil and will open giant security holes, 
+consider the following IOS configuration:
+
+access-list 10 permit host 10.0.1.3
+access-list 10 deny any
+!
+snmp-server tftp-server-list 10
+snmp-server view backup ciscoMgmt.96.1.1.1.1 included
+snmp-server community public view backup RW 10
+end
+
+The above only allows a selected "view" of the SNMP MIB and restricts 
+what TFTP servers can be used in SNMP calls.  With this method, it is 
+trivial to only allow changes or backups on trusted hosts.
+
+INSTALLATION
+============
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+============
+The following modules are required:
+
+   Socket
+   Net::SNMP
+
+COPYRIGHT
+=========
+Copyright (c) 2004 - Aaron Scarisbrick <aaronsca@cpan.org>
+
+LICENSE
+=======
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.

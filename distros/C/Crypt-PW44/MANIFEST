@@ -1,0 +1,9 @@
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Crypt/PW44.pm
+t/pw44-exists-and-runs.t
+contrib/cgi-bin-pwgen.pl
+contrib/genpw
+META.yml                                 Module meta-data (added by MakeMaker)

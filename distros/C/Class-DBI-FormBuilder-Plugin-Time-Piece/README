@@ -1,0 +1,29 @@
+Class-DBI-FormBuilder-Plugin-Time-Piece version 0.02
+====================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::DBI::FormBuilder 0.32
+
+COPYRIGHT AND LICENCE
+
+Copyright James Tolley all rights reserved.
+
+Copyright (C) 2005 by James Tolley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

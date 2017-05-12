@@ -1,0 +1,222 @@
+#!/usr/local/bin/perl
+#
+# cpan-dist-counts - ascii graph of distinct dists released per year
+#                       for user, or across all users
+#
+use 5.006;
+use strict;
+use warnings;
+use CPAN::ReleaseHistory 0.03;
+use Getopt::Long;
+
+my $MAX_BAR_SIZE     = 50;
+my $BAR_CHAR         = '#';
+my $SHOW_MONTHS      = 0;
+my $TARGET_YEAR;
+my $NEWCPANISMS_ONLY = 0;
+my $iterator         = CPAN::ReleaseHistory->new()->release_iterator(well_formed => 1);
+my $USER;
+my $DIST_PREFIX;
+my %counts;
+my %data;
+my %seen;
+
+GetOptions('user|u=s'  => \$USER,
+           'distprefix|d=s' => \$DIST_PREFIX,
+           'monthly|m' => \$SHOW_MONTHS,
+           'char|c=s'  => \$BAR_CHAR,
+           'width|w=i' => \$MAX_BAR_SIZE,
+           'year|y=i'  => \$TARGET_YEAR,
+           'neo|n'     => \$NEWCPANISMS_ONLY,
+          ) || die "usage: $0 [-user PAUSE-ID] [-distprefix Some-Prefix] [-char <char>] [-width N]\n";
+
+$USER = uc($USER) if defined($USER);
+
+RELEASE:
+while (my $release = $iterator->next_release) {
+    my $distname = $release->distinfo->dist;
+    if ($NEWCPANISMS_ONLY) {
+        next RELEASE if $seen{ $distname };
+        $seen{$distname} = 1;
+    }
+    next if $USER && $release->distinfo->cpanid ne $USER;
+    next if $DIST_PREFIX && $distname !~ qr/^\Q$DIST_PREFIX\E/;
+    my @ts    = gmtime($release->timestamp);
+    my $year  = $ts[5] + 1900;
+    next if defined($TARGET_YEAR) && $year != $TARGET_YEAR;
+    my $month = $ts[4] + 1;
+    my $key   = $SHOW_MONTHS ? sprintf('%.4d%.2d', $year, $month) : $year;
+    $data{$key}{$distname}++;
+}
+
+foreach my $key (keys %data) {
+    $counts{$key} = int(keys %{ $data{$key} });
+}
+
+if ( keys(%counts) == 0 ) {
+    if ( defined($USER) and defined($DIST_PREFIX) ) {
+        die "No releases seen for $USER/$DIST_PREFIX*";
+    }
+    if ( defined($USER) ) {
+        die "No releases seen for $USER/*";
+    }
+    if ( defined($DIST_PREFIX) ) {
+        die "No releases seen for */$DIST_PREFIX*";
+    }
+}
+
+my $max                    = (sort { $b <=> $a } values %counts)[0];
+my $count_width            = (sort { $b <=> $a } map { length($_) } values %counts)[0];
+my $scale                  = $max < $MAX_BAR_SIZE ? 1 : $max / $MAX_BAR_SIZE;
+my ($first_key, $last_key) = (sort keys %counts)[0,-1];
+my @keys                   = $first_key .. $last_key;
+
+@keys = grep { /(01|02|03|04|05|06|07|08|09|10|11|12)$/ } @keys if $SHOW_MONTHS;
+
+foreach my $year (@keys) {
+    printf " %d (%${count_width}d) %s\n",
+           $year, $counts{$year}||0, $BAR_CHAR x (($counts{$year}||0) / $scale);
+}
+
+=head1 NAME
+
+cpan-dist-counts - display graph of different CPAN dists released by year for single user or all users
+
+=head1 SYNOPSIS
+
+ cpan-dist-counts [--user NEILB] [--char =] [--width 40] [--year YYYY] [-monthly]
+                  [--neo | -n] [--distprefix Moose]
+
+=head1 DESCRIPTION
+
+B<cpan-dist-counts> generates a text graph of the number of different CPAN distributions
+released each year,
+either across all users, or for a specific user.
+The most likely usage is to see your personal release history --
+how many different distribution you released each year:
+
+ % cpan-dist-counts --user PJF
+ 2000 ( 2) ##
+ 2001 ( 1) #
+ 2002 ( 1) #
+ 2003 ( 1) #
+ 2004 ( 3) ###
+ 2005 ( 3) ###
+ 2006 ( 3) ###
+ 2007 ( 2) ##
+ 2008 ( 4) ####
+ 2009 ( 2) ##
+ 2010 ( 2) ##
+ 2011 ( 0)
+ 2012 ( 3) ###
+ 2013 ( 5) #####
+ 2014 (12) ############
+ 2015 ( 1) #
+
+If you don't specify a user, you'll get a graph of all distinct CPAN distributions each year.
+You can also change the character used when drawing the bars,
+and the maximum width used for the longest bar:
+
+ % cpan-dist-counts --char = --width 30
+ 
+ 1995 ( 125)
+ 1996 ( 267) =
+ 1997 ( 472) =
+ 1998 ( 727) ==
+ 1999 (1017) ====
+ 2000 (1293) =====
+ 2001 (1924) =======
+ 2002 (2611) ==========
+ 2003 (3403) =============
+ 2004 (3844) ===============
+ 2005 (4343) =================
+ 2006 (4436) =================
+ 2007 (4812) ===================
+ 2008 (5792) ======================
+ 2009 (6169) ========================
+ 2010 (6411) =========================
+ 2011 (6554) =========================
+ 2012 (6775) ==========================
+ 2013 (7438) =============================
+ 2014 (7581) ==============================
+ 2015 (7176) ============================
+ 2016 (4363) =================
+
+If you use the B<--monthly> switch, you'll get the counts broken down by month.
+You can also restrict the data to a particular year:
+
+ % cpan-dist-counts --year 2015 --monthly -width 40
+
+ 201501 (1486) ########################################
+ 201502 (1036) ###########################
+ 201503 (1157) ###############################
+ 201504 (1071) ############################
+ 201505 ( 916) ########################
+ 201506 ( 974) ##########################
+ 201507 ( 923) ########################
+ 201508 ( 964) #########################
+ 201509 (1109) #############################
+ 201510 ( 979) ##########################
+ 201511 ( 937) #########################
+ 201512 (1215) ################################
+
+You can use the B<--distprefix> (or B<-d>) option to only consider releases
+where the distribution's name matches the given prefix:
+
+ % cpan-dist-counts -d Moose
+
+ 2006 (  3) #
+ 2007 ( 29) ##########
+ 2008 ( 83) ###############################
+ 2009 (132) ##################################################
+ 2010 (120) #############################################
+ 2011 (112) ##########################################
+ 2012 (123) ##############################################
+ 2013 ( 98) #####################################
+ 2014 (102) ######################################
+ 2015 ( 65) ########################
+ 2016 ( 23) ########
+
+You can use the B<--neo> option to only count the initial
+releases of new distributions:
+
+ % cpan-dist-counts -n --user RJBS
+
+ 2003 ( 2) #
+ 2004 (33) ###############################
+ 2005 (12) ###########
+ 2006 (52) ##################################################
+ 2007 (29) ###########################
+ 2008 (46) ############################################
+ 2009 (51) #################################################
+ 2010 (29) ###########################
+ 2011 ( 7) ######
+ 2012 (10) #########
+ 2013 (16) ###############
+ 2014 ( 4) ###
+ 2015 (14) #############
+ 2016 ( 5) ####
+
+=head1 SEE ALSO
+
+L<CPAN::ReleaseHistory> is used to get data for all CPAN releases.
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/CPAN-ReleaseHistory>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+Prompted by a tweet from Paul Fenwick.
+
+And the C<-neo> option was prompted by a request from RJBS.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

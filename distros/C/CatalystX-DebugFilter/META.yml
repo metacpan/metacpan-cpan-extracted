@@ -1,0 +1,38 @@
+---
+abstract: 'Provides configurable filtering of data that is logged to the debug logs (and error screen)'
+author:
+  - 'Brian Phillips <bphillips@cpan.org>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Log: '0'
+  Catalyst::ScriptRunner: '0'
+  Catalyst::Test: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  Module::Build: '0.28'
+  Moose: '0'
+  Test::More: '0'
+  Test::Pod: '1.14'
+  Test::Pod::Coverage: '1.04'
+  Test::WWW::Mechanize::Catalyst: '0'
+  lib: '0'
+  ok: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CatalystX-DebugFilter
+requires:
+  Moose::Role: '0'
+  Scalar::Util: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: http://github.com/brianphillips/CatalystX-DebugFilter
+version: '0.13'

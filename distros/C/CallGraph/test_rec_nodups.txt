@@ -1,0 +1,9 @@
+MAIN
+        EXTSUB *
+1       SUB1
+                SUB11
+2               SUB12
+                        SUB1 (1)
+        SUB2
+                SUB12 (2)
+                SUB21

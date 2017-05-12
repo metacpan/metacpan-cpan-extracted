@@ -1,0 +1,21 @@
+Revision history for Color-Palette
+
+0.100003  2013-12-13 08:13:16 America/New_York
+          update bugtracker and repo links
+
+0.100002  2011-12-19 16:41:42 America/New_York
+          optimize_for sounds like a mutator; rename to optimized_for with an
+          alias (for now)
+
+0.100001  2011-12-19 11:49:30 America/New_York
+          add as_strict_css_hash method
+
+0.100000  2011-10-18 13:18:14 America/New_York
+          privatize the ->colors method, which did not belong public
+
+          fix several critical bugs in the hex code reader and generator
+
+0.091400  2009-05-20
+          replace Color::Palette::Color with Graphics::Color
+
+0.091392  2009-05-19

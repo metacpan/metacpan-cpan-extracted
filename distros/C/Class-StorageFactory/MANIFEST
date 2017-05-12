@@ -1,0 +1,17 @@
+Build.PL
+lib/Class/StorageFactory.pm
+lib/Class/StorageFactory/YAML.pm
+MANIFEST			# This list of files
+MANIFEST.SKIP		# Files to ignore
+SIGNATURE			# A digital signature for tamper-resistance
+META.yml			# Distribution metadata
+README				# Basic information about this module
+t/0-signature.t		# Tests that no one has tampered with the distribution
+t/base.t			# Test runner for Class::StorageFactory
+t/lib/Astronaut.pm	# A sample module for testeing
+t/lib/TestBase.pm	# Tests for Class::StorageFactory
+t/lib/TestYAML.pm	# Tests for Class::StorageFactory::YAML
+t/pod.t				# Tests for POD errors in the documentation
+t/pod_coverage.t	# Tests for documentation coverage
+t/yaml.t			# Test runner for Class::StorageFactory::YAML
+SIGNATURE    Added here by Module::Build

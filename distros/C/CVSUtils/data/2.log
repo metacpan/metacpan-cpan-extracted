@@ -1,0 +1,334 @@
+RCS file: /var/lib/cvsroot/Java_code/src/com/reef/webaccess/beans/product/forum/RFForumBean.java,v
+Working file: RFForumBean.java
+head: 1.17
+branch:
+locks: strict
+access list:
+symbolic names:
+        barcelona-2_0_1_a: 1.17
+        reef-2_0_1: 1.7.2.39
+        barcelona-2_0_1: 1.7.2.39
+        barcelona-2_0_0: 1.7.2.39
+        reef-2_0_0: 1.7.2.39
+        avendor: 1.1.1
+        barcelona_b1_fix: 1.7.2
+        barcelona_b1: 1.7
+        engine-2_0a3: 1.4
+        Forum_Beta1: 1.3
+        PVCS: 1.1.1.1
+        REEF: 1.1.1
+keyword substitution: kv
+total revisions: 64;    selected revisions: 64
+description:
+----------------------------
+revision 1.17
+date: 2000/04/07 09:02:47;  author: ptruong;  state: Exp;  lines: +24 -4
+patrice code clean up
+#last change#
+----------------------------
+revision 1.16
+date: 2000/04/05 23:09:24;  author: ptruong;  state: Exp;  lines: +19 -15
+code clean up:
+psobject use in all method (for cache validity)
+----------------------------
+revision 1.15
+date: 2000/04/03 19:09:07;  author: ptruong;  state: Exp;  lines: +6 -5
+code clean up
+----------------------------
+revision 1.14
+date: 2000/04/03 14:12:51;  author: ttran;  state: Exp;  lines: +3 -1
+package changed
+----------------------------
+revision 1.13
+date: 2000/03/31 15:06:01;  author: ttran;  state: Exp;  lines: +303 -100
+intermediate code clean-up
+----------------------------
+revision 1.12
+date: 2000/03/31 12:47:27;  author: ptruong;  state: Exp;  lines: +16 -16
+code clean:
+correction of method not found
+du to interface modification
+(FOForum,FOHeading,FOMessage)
+----------------------------
+revision 1.11
+date: 2000/03/24 10:16:05;  author: ptruong;  state: Exp;  lines: +22 -22
+correction of RFFOrumBean
+as a consequence of the clean code FOForumImpl FOForum
+->using interface and primitives types
+in methods arguments
+->replacing getmoderated by ismoderated
+----------------------------
+revision 1.10
+date: 2000/03/23 10:02:54;  author: ttran;  state: Exp;  lines: +2068 -432
+code migration from branch and rmi compliant work
+----------------------------
+revision 1.9
+date: 2000/01/06 15:56:44;  author: zfehri;  state: Exp;  lines: +12 -11
+RMI COMPLIANT
+----------------------------
+revision 1.8
+date: 2000/01/05 18:33:51;  author: dpillot;  state: Exp;  lines: +24 -12
+add code for the creation of FOMessageFinder object
+----------------------------
+revision 1.7
+date: 2000/01/05 12:35:19;  author: cdavaren;  state: Exp;  lines: +23 -0
+branches:  1.7.2;
+language parameters & format
+@author:Abdelkader & Mathieu
+----------------------------
+revision 1.6
+date: 2000/01/05 12:08:49;  author: cdavaren;  state: Exp;  lines: +81 -0
+language parameters & format
+@author:Abdelkader & Mathieu
+----------------------------
+revision 1.5
+date: 2000/01/04 17:09:22;  author: ttran;  state: Exp;  lines: +2 -5
+Bug occurred when a FreeUser (without login/password) post a
+message. Bug was generated because in the method postMessage()
+Tribe.addPopul() was called with the null value (for the popul).
+
+Correction: modification of the method postMessage()
+----------------------------
+revision 1.4
+date: 1999/12/20 17:48:06;  author: tclarke;  state: Exp;  lines: +5 -5
+Added getKeywords() and getKeywordsField()
+----------------------------
+revision 1.3
+date: 1999/12/07 10:58:15;  author: ttran;  state: Exp;  lines: +47 -5
+remove the lines throwing ForumBeanException
+----------------------------
+revision 1.2
+date: 1999/11/30 10:17:18;  author: tdraier;  state: Exp;  lines: +61 -46
+debugged
+----------------------------
+revision 1.1.1.2
+date: 2000/02/24 10:54:20;  author: jrabas;  state: Exp;  lines: +1787 -295
+no message
+----------------------------
+revision 1.1.1.1
+date: 1999/11/29 17:59:28;  author: cvsadmin;  state: Exp;  lines: +0 -0
+Initial revision.
+----------------------------
+revision 1.7.2.45
+date: 2000/05/26 12:07:19;  author: ttran;  state: Exp;  lines: +18 -3
+add new method public int postMessage(String)
+----------------------------
+revision 1.7.2.44
+date: 2000/05/25 12:21:59;  author: ttran;  state: Exp;  lines: +10 -5
+remove the popul.updateForm(.) from the postMessage() method
+----------------------------
+revision 1.7.2.43
+date: 2000/05/23 17:42:01;  author: ttran;  state: Exp;  lines: +12 -8
+use StringBuffer in getMessagesList(Vector, String, String, String)
+----------------------------
+revision 1.7.2.42
+date: 2000/05/23 09:59:41;  author: ttran;  state: Exp;  lines: +50 -44
+clean code presentation
+----------------------------
+revision 1.7.2.41
+date: 2000/05/16 16:42:07;  author: ttran;  state: Exp;  lines: +1589 -1333
+code improvement
+----------------------------
+revision 1.7.2.40
+date: 2000/05/09 15:18:05;  author: ttran;  state: Exp;  lines: +282 -228
+use the new functions of PSForum and PSTopic in
+getNextMessage...(...) and getPreviousMessage...(...)
+----------------------------
+revision 1.7.2.39
+date: 2000/03/10 21:28:31;  author: ttran;  state: Exp;  lines: +19 -7
+fix for the bug of the month+1 in topics valid period setting
+----------------------------
+revision 1.7.2.38
+date: 2000/03/02 19:06:31;  author: ttran;  state: Exp;  lines: +7 -1
+BUG#211
+solution: the JSP has to have a parameter named "notification_text"
+If "notification_text" exists in the JSP then the notification email text will
+be this "notification_text" value + the forum URL
+----------------------------
+revision 1.7.2.37
+date: 2000/03/02 18:50:35;  author: ttran;  state: Exp;  lines: +97 -33
+change the condition that triggers the email notification
+----------------------------
+revision 1.7.2.36
+date: 2000/03/01 15:23:56;  author: ttran;  state: Exp;  lines: +5 -2
+added
+throws com.reef.framework.persist.PersistenceException
+to the method "public void setMessage()"
+----------------------------
+revision 1.7.2.35
+date: 2000/02/29 11:11:41;  author: ttran;  state: Exp;  lines: +135 -69
+new method added:
+public String getTopicName(long t_id)
+----------------------------
+revision 1.7.2.34
+date: 2000/02/24 19:07:33;  author: ttran;  state: Exp;  lines: +9 -3
+correction code for the method moreNextMessages()
+allowing the new choice of displaying "all messages" for a selected
+topic
+----------------------------
+revision 1.7.2.33
+date: 2000/02/24 18:52:02;  author: ttran;  state: Exp;  lines: +32 -0
+BUG#185
+new methods added:
+getMessagesLimitNumber() and getChosenTopic()
+----------------------------
+revision 1.7.2.32
+date: 2000/02/24 16:18:35;  author: ttran;  state: Exp;  lines: +157 -47
+"Page Scope Memory" technology used here
+----------------------------
+revision 1.7.2.31
+date: 2000/02/24 14:36:34;  author: ptruong;  state: Exp;  lines: +69 -53
+BUG#120
+Messages list filtering by dates
+Topics visibility dates setting
+----------------------------
+revision 1.7.2.30
+date: 2000/02/23 17:51:43;  author: tdraier;  state: Exp;  lines: +2 -2
+removed toString(french)
+----------------------------
+revision 1.7.2.29
+date: 2000/02/22 11:16:05;  author: ttran;  state: Exp;  lines: +51 -8
+Correction code for creation of topic/heading: add lock.save() for
+the heading creation before doing the messages transferring
+
+remove the call for recalculateOrder()
+----------------------------
+revision 1.7.2.28
+date: 2000/02/18 14:17:35;  author: ttran;  state: Exp;  lines: +12 -10
+use null value as short name for heading/topic creation
+----------------------------
+revision 1.7.2.27
+date: 2000/02/16 17:24:44;  author: ttran;  state: Exp;  lines: +177 -0
+Patrice's code for search using dates filters
+----------------------------
+revision 1.7.2.26
+date: 2000/02/15 19:08:08;  author: ttran;  state: Exp;  lines: +11 -4
+use TopicNotFoundException in getHeading()
+----------------------------
+revision 1.7.2.25
+date: 2000/02/15 12:37:36;  author: ttran;  state: Exp;  lines: +28 -11
+use the new class TopicNotFoundException
+----------------------------
+revision 1.7.2.24
+date: 2000/02/14 20:11:52;  author: ttran;  state: Exp;  lines: +23 -22
+because a '{ }' was missing in the processing of the variable
+"visibility" in the method "getMessagesList()"
+----------------------------
+revision 1.7.2.23
+date: 2000/02/10 19:21:50;  author: ttran;  state: Exp;  lines: +3 -0
+before: the "Edit Message" leave the subject empty if the user
+put in an empty subject.
+----------------------------
+revision 1.7.2.22
+date: 2000/02/09 18:21:06;  author: ttran;  state: Exp;  lines: +2 -2
+why change: in the method getNumberMessagesList()
+PersistenceException is not thrown anymore by FOMessageFinder
+----------------------------
+revision 1.7.2.21
+date: 2000/02/09 16:39:52;  author: ttran;  state: Exp;  lines: +45 -40
+remove some traces
+----------------------------
+revision 1.7.2.20
+date: 2000/02/08 20:05:04;  author: ttran;  state: Exp;  lines: +2 -1
+put the call to addPopul() in comment because its produce very
+strange result on the original Tribe access rights
+----------------------------
+revision 1.7.2.19
+date: 2000/02/08 17:10:02;  author: tdraier;  state: Exp;  lines: +1 -0
+added register in the sender tribe when user is not a free user
+----------------------------
+revision 1.7.2.18
+date: 2000/02/07 14:44:42;  author: ttran;  state: Exp;  lines: +42 -16
+replace the "addKeywordsString()" by "addText()"
+----------------------------
+revision 1.7.2.17
+date: 2000/02/01 18:38:28;  author: ttran;  state: Exp;  lines: +122 -55
+more useful comments added
+----------------------------
+revision 1.7.2.16
+date: 2000/02/01 09:13:06;  author: ttran;  state: Exp;  lines: +92 -12
+add Kader & Mathieu's methods:
+String getMessagePostDay()
+String getMessagePostMonth()
+String getMessagePostYear()
+----------------------------
+revision 1.7.2.15
+date: 2000/01/28 19:12:18;  author: ttran;  state: Exp;  lines: +45 -15
+Barcelona bug#55 is no more - Fixes the bug#55
+methods changed:
+getMessageProperties(FOMessage message, RFProperties props)
+setMessage(char action, FOMessage message)
+----------------------------
+revision 1.7.2.14
+date: 2000/01/27 17:10:29;  author: ttran;  state: Exp;  lines: +218 -2
+add in Kader's methods
+----------------------------
+revision 1.7.2.13
+date: 2000/01/26 17:01:44;  author: ttran;  state: Exp;  lines: +61 -1
+add new methods: (for the PlanetCareer forum integration)
+
+boolean getWaitingMessagesCount()
+boolean isForumModerated()
+----------------------------
+revision 1.7.2.12
+date: 2000/01/26 14:38:37;  author: ttran;  state: Exp;  lines: +57 -305
+remove old commented code and add more trace
+----------------------------
+revision 1.7.2.11
+date: 2000/01/21 15:17:50;  author: ttran;  state: Exp;  lines: +60 -20
+add try{} catch{} when creating a form.RFFormDisplayBean
+----------------------------
+revision 1.7.2.10
+date: 2000/01/20 16:02:36;  author: ttran;  state: Exp;  lines: +3 -3
+change the method moreNextMessages in order to remove the
+hyperlink "Next Page" showing up when "View all" is called
+...
+the previous commit was made accidentally
+----------------------------
+revision 1.7.2.9
+date: 2000/01/20 15:16:57;  author: ttran;  state: Exp;  lines: +68 -40
+change the method moreNextMessages in order to remove the
+hyperlink "Next Page" showing up when "View all" is called
+----------------------------
+revision 1.7.2.8
+date: 2000/01/19 19:04:43;  author: ttran;  state: Exp;  lines: +76 -26
+use of a new way to obtain the forum URL
+----------------------------
+revision 1.7.2.7
+date: 2000/01/19 11:54:17;  author: ttran;  state: Exp;  lines: +52 -26
+change from using RFForm and the old RFFormDisplay to using
+FormsArray and the new RFFormDisplay for displaying the sender
+(popul) data
+
+in this version, the old code are kept in comments
+----------------------------
+revision 1.7.2.6
+date: 2000/01/18 17:08:54;  author: ttran;  state: Exp;  lines: +589 -136
+migration from using the old RFFormDisplayBean to the new one that
+uses FormsArray
+
+also, add forum to the finder
+----------------------------
+revision 1.7.2.5
+date: 2000/01/14 19:18:51;  author: ttran;  state: Exp;  lines: +90 -31
+new methods added in preparation for the use of FormsArray
+----------------------------
+revision 1.7.2.4
+date: 2000/01/13 18:54:14;  author: ttran;  state: Exp;  lines: +142 -34
+some trivial modification
+----------------------------
+revision 1.7.2.3
+date: 2000/01/12 16:41:51;  author: ttran;  state: Exp;  lines: +28 -20
+adding Finder instance creation for the method
+getNumberMessagesList
+----------------------------
+revision 1.7.2.2
+date: 2000/01/11 17:39:52;  author: ttran;  state: Exp;  lines: +101 -40
+email sending code adapted after the move of the question_mail into
+another form.
+----------------------------
+revision 1.7.2.1
+date: 2000/01/10 16:40:05;  author: ttran;  state: Exp;  lines: +27 -14
+The code of this version is exactly the same as the code in the
+version 1.9.
+It's a copy of 1.9 for the branch barcelona_b1_fix

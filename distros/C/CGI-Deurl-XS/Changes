@@ -1,0 +1,17 @@
+Revision history for Perl extension CGI::Deurl::XS.
+
+0.08  Sun Dec 21 15:06:21 PST 2014
+	- remove use of deprecated encoding pragma, see
+      https://rt.cpan.org/Public/Bug/Display.html?id=101061
+0.07  Wed Jun 18 22:43:01 2008
+	- provide strndup since not all libc's have it
+0.06  Wed Jun 18 12:02:03 2008
+	- initial CPAN release
+0.03  Thu Apr 19 16:11:47 2007
+	- kick out the SV leaks, add tests and docs.
+0.02  Thu Apr 19 03:50:08 2007
+	- initial semi-working version which passes some tests. leaks like a sieve.
+0.01  Wed Apr 18 19:45:24 2007
+	- original version; created by h2xs 1.23 with options
+		-O -n CGI::Deurl::XS -b 5.8.0 ./CGI-Deurl-XS/parser/parser.h
+

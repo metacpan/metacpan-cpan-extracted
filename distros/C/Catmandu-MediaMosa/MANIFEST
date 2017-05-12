@@ -1,0 +1,25 @@
+Build.PL
+CHANGES
+lib/Catmandu/Importer/MediaMosa.pm
+lib/Catmandu/MediaMosa.pm
+lib/Catmandu/MediaMosa/Items.pm
+lib/Catmandu/MediaMosa/Items/asset.pm
+lib/Catmandu/MediaMosa/Items/asset_list.pm
+lib/Catmandu/MediaMosa/Items/login.pm
+lib/Catmandu/MediaMosa/Items/mediafile.pm
+lib/Catmandu/MediaMosa/Items/simple_list.pm
+lib/Catmandu/MediaMosa/Items/status.pm
+lib/Catmandu/MediaMosa/Response.pm
+lib/Catmandu/MediaMosa/Response/Header.pm
+lib/Catmandu/MediaMosa/Response/Items.pm
+lib/Catmandu/MediaMosa/XPath/Helper.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/01_mediamosa.t
+t/02_importer.t
+t/parse.pl
+META.yml
+META.json

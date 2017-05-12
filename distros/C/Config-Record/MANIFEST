@@ -1,0 +1,26 @@
+AUTHORS
+autobuild.sh
+CHANGES
+Config-Record.spec
+Config-Record.spec.PL
+debian/changelog
+debian/control
+debian/copyright
+debian/README.Debian
+debian/rules
+examples/auto-build.conf
+INSTALL
+lib/Config/Record.pm
+lib/Config/Record.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+META.yml.PL
+README
+t/005-config-plain.t
+t/006-config-quoted.t
+t/007-config-includes.t
+t/010-pod.t
+t/015-pod-coverage.t

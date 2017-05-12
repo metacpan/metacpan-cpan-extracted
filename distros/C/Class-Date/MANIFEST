@@ -1,0 +1,20 @@
+Changes
+Date.xs
+lib/Class/Date.pm
+lib/Class/Date.pod
+lib/Class/Date/Const.pm
+lib/Class/Date/Invalid.pm
+lib/Class/Date/Rel.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+success.txt
+t/00_base.t
+t/05_parsing.t
+t/10_fields.t
+t/20_gmdate.t
+t/30_localdate.t
+t/40_errors.t
+t/50_timezone.t
+META.json                                Module JSON meta-data (added by MakeMaker)

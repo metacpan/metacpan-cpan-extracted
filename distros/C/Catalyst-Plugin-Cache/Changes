@@ -1,0 +1,51 @@
+0.12
+        - Remove .git from MANIFEST. RT#78058
+
+0.11
+        - Convert repository to git (fREW Schmidt)
+        - Depend on Catalyst 5.8 and so lose un-declared dependencies
+          on Class::Data::Inheritable and Class::Accessor::Fast.
+          RT#74972
+
+0.10
+        - Change to Module::Install
+        - Drop test dep on ok
+        - Split requires and test_requires
+        - Fix bug when used in conjunction with ::Model::DBIC::Schema
+          Caching trait by not trying to cache the curried cache instance when
+          we don't have a request instance to cache it against
+
+0.09
+        - Generate a warning if no config is specified, or config
+          is specified using the old key.
+        - Support the compute() method, and emulate it if the backend
+          doesn't have it.
+
+0.08
+        - Forgot to add MRO::Compat to Makefile.PL, fail.
+
+0.07
+        - Switch from NEXT to MRO::Compat.
+        - Change config key from 'cache' to 'Plugin::Cache', old key
+          is still supported for backwards compatibility, but the new
+          key is preferred (RT#40344).
+
+0.06
+        - clarify the documentation on how to configure a backend
+        - due to stacked evals, certain start up errors were quietly
+          ignored until the first cache hit. These start up errors
+          now correctly manifest themselves at start up time.
+0.05
+        - change base class order to appease Class::C3
+
+0.04
+        - ???
+
+0.03
+        - Be more compatible with ->set() convention of passing expiry
+
+0.02
+        - Pass around a hash ref instead of a list of kvp.
+
+0.01
+        - Initial release

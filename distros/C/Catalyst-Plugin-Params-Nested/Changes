@@ -1,0 +1,14 @@
+- 0.05 2011-11-24 08:47:00
+        - Hook into prepare_uploads instead of prepare_parameters
+          (since uploads are also added to the request parameters,
+           we need to hook here to expand uploads parameters)
+
+- 0.04 2010-07-28 22:31:44
+        - Fixed RT:59604 `param[]` causing copy to `param` (ECARROLL)
+
+- 0.03  2010-04-14 22:45:00
+        - Update to change NEXT to MRO::Compat
+        - Change Module::Build to Module::Install
+
+- 0.02  2006-1-10 15:35:00
+        - Use CGI::Expand instead of reinventing

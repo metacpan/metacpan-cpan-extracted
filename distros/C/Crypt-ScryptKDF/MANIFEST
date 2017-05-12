@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Crypt/ScryptKDF.pm
+lib/Crypt/ScryptKDF.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+src/crypto_scrypt-nosse.c
+src/crypto_scrypt.h
+src/msinttypes.h
+src/scrypt_platform.h
+src/sha256.c.inc
+src/sha256.h
+src/sysendian.h
+t/compile.t
+t/interface.t
+t/internal.t
+t/test_vectors.t

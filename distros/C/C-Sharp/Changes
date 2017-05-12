@@ -1,0 +1,6 @@
+Revision history for Perl extension C::Sharp.
+
+0.01  Tue Jul 10 09:19:03 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n C::Sharp
+

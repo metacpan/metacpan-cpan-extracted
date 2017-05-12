@@ -1,0 +1,28 @@
+---
+abstract: 'interactive shell for Catmandu'
+author:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+build_requires:
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catmandu-Cmd-repl
+provides:
+  Catmandu::Cmd::repl:
+    file: lib/Catmandu/Cmd/repl.pm
+    version: 0.01
+requires:
+  Catmandu: 0.01
+  Devel::REPL: 1.003012
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

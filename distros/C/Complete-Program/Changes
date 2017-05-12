@@ -1,0 +1,26 @@
+Revision history for Complete-Program
+
+0.39    2016-02-06 (PERLANCAR)
+
+	- [Removed] Remove options ci/word_mode/fuzzy/map_case, users are
+	  now encouraged to set behavior globally via Complete::Common.
+
+
+0.38    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21.
+
+        - [Removed] For more consistent user experience, remove per-function
+	  options ci/fuzzy/map_case, users are now encouraged to set these
+	  behaviors globally via Complete::Common.
+
+
+0.37    2015-09-17 (PERLANCAR)
+
+	- Add fuzzy & map_case options.
+
+
+0.36    2015-09-16 (PERLANCAR)
+
+        - First release, split from Complete-Util following the splitting of
+          Complete-File, to let Complete-Util only contain the generic routines.

@@ -1,0 +1,67 @@
+
+This package provides Class::IntrospectionMethods.  A module to create
+method with introspection feature. In other words, this module provides:
+
+- A way to set up a lot of get/set method. These get/set methods can
+  access plain scalars, array, hash. These scalar, hash or array can
+  be tied (See perltie) with classes specified by the user. The
+  element of these arrays or hashes can be constrained to be object,
+  tied scalar.
+
+- A way to later query the object or class to retrieve the list of
+  methods (aka slots) created by this module.
+
+- A way to organize these slots in several catalogs.
+
+- A way to backtrack from contained object to container object: When a
+  slot contains object or tied scalars hashes or arrays, the contained
+  object can be queried for the container object. In other words, the
+  parent object (the one constructed by Class::IntrospectionMethods
+  contains a child object in one of its slots either as a plain object
+  or an object hidden behind a tied
+  construct. Class::IntrospectionMethods will provide the child object
+  a method to retrieve the parent object reference.
+
+This module was forked from a modified version of Class::MethodMaker
+v1.08. To ease migration from older project using Class::MethodMaker
+to Class::IntrospectionMethods, a compatiblity mode is provided
+(although some features of Class::MethodMaker will not work. See 
+Class::IntrospectionMethods::Legacy man page).
+
+THANKS
+------
+
+To Martyn J. Pearce for Class::MethodMaker and the enlightening
+discussion we had a while ago about parent and catalog.
+
+To Matthew Simon Cavalletto for the parameter translation idea that I
+pilfered from Class::MakeMethods.
+
+Legal mumbo jumbo:
+------------------
+
+ Copyright (c) 2004 Dominique Dumont. All rights reserved.
+ This program is free software; you can redistribute it and/or
+ modify it under the same terms as Perl itself.
+
+ Copyright (c) 2002, 2001, 2000 Martyn J. Pearce.  This program is free
+ software; you can redistribute it and/or modify it under the same terms as
+ Perl itself.
+
+ Copyright 1998, 1999, 2000 Evolution Online Systems, Inc.  You may use
+ this software for free under the terms of the MIT License.  More info
+ posted at http://www.evolution.com, or contact info@evolution.com
+
+ Copyright (c) 1996 Organic Online. All rights reserved. This program is
+ free software; you can redistribute it and/or modify it under the same
+ terms as Perl itself.
+
+---------------------------------------------------------------------
+INSTALLATION
+
+         gunzip -c <dist_file>.tar.gz | tar xvf -
+         cd <dist_directory>
+         perl Makefile.PL
+         make test          
+         make install
+

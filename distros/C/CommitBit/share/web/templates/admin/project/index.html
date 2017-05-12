@@ -1,0 +1,14 @@
+<%args>
+$project
+</%args>
+<%init>
+my $edit = Jifty->web->new_action(class =>'UpdateProject', record => $project);
+</%init>
+<&|/_elements/wrapper,title => _('Overview of %1', $project->name) &>
+% Jifty->web->form->start;
+% foreach my $arg ($edit->argument_names) {
+<%$edit->form_field($arg)%>
+%}
+<% Jifty->web->form->submit(label => 'Save changes')%>
+% Jifty->web->form->end;
+</&>

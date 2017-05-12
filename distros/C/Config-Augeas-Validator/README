@@ -1,0 +1,79 @@
+NAME
+       Config::Augeas::Validator - A generic configuration validator API
+
+SYNOPSIS
+       use Config::Augeas::Validator;
+
+       # Initialize
+       my $validator = Config::Augeas::Validator->new(rulesdir => $rulesdir);
+
+       $validator->play(@files);
+       exit $validator->{err};
+
+    $rulesdir points to one or more directories of rules, separated by
+    colons.
+
+CONFIGURATION
+    The Config::Augeas::Validator configuration files are INI files.
+
+  DEFAULT SECTION
+    The DEFAULT section is mandatory. It contains the following variables:
+
+    lens    The name of the lens to use, for example:
+
+            "lens=Httpd"
+
+    err_code
+            The exit code to return when a test fails. This parameter is
+            optional. Example:
+
+            "err_code=3"
+
+  RULES
+    Each section apart from the DEFAULT section defines a rule, as listed in
+    the rules variable of the DEFAULT section. Each rule contains several
+    parameters.
+
+    name    The rule description, for example:
+
+            "name=Application Type"
+
+    explanation
+            The explanation for the rule, for example:
+
+            "explanation=Check that application type is FOO or BAR"
+
+    type    The type of rule. For now, Config::Augeas::Validator only
+            supports the count type, which returns the count nodes matching
+            expr. Example:
+
+            "type=count"
+
+    expr    The Augeas expression for the rule. The $file variable is the
+            path to the file in the Augeas tree. Example:
+
+            "expr=$file/VirtualHost[#comment =~ regexp("^1#
+            +((AI|BO)\+?|DR)$")]"
+
+    value   The value expected for the test. For example, if using the count
+            type, the number of matches expected for the expression.
+            Example:
+
+            "value=1"
+
+    level   The importance level of the test. Possible values are 'error'
+            (default) and 'warning'. When set to 'error', a failed test will
+            interrupt the processing and set the return code. When set to
+            'warning', a failed test will display a warning, continue, and
+            have no effect on the return code. When set to 'ignore', the
+            test is ignored and never run.
+
+            "level=warning"
+
+SEE ALSO
+    Config::Augeas
+
+FILES
+    /etc/augeas-validator/rules.d The default rules directory for
+    Config::Augeas::Validator.
+

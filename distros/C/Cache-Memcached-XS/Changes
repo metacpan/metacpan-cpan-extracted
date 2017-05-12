@@ -1,0 +1,6 @@
+Revision history for Perl extension Cache::Memcached::XS.
+
+0.01  Thu Feb  2 21:53:08 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Cache::Memcached::XS
+

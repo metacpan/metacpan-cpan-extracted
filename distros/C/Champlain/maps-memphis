@@ -1,0 +1,5 @@
+CHAMPLAIN_TYPE_BOUNDING_BOX               ChamplainBoundingBox             GBoxed     Champlain::BoundingBox
+CHAMPLAIN_TYPE_LOCAL_MAP_DATA_SOURCE      ChamplainLocalMapDataSource      GObject    Champlain::LocalMapDataSource
+CHAMPLAIN_TYPE_MAP_DATA_SOURCE            ChamplainMapDataSource           GObject    Champlain::MapDataSource
+CHAMPLAIN_TYPE_MEMPHIS_TILE_SOURCE        ChamplainMemphisTileSource       GObject    Champlain::MemphisTileSource
+CHAMPLAIN_TYPE_NETWORK_MAP_DATA_SOURCE    ChamplainNetworkMapDataSource    GObject    Champlain::NetworkMapDataSource

@@ -1,0 +1,36 @@
+#!/bin/sh -e
+
+mode=$1
+
+# Prepare to move a conffile without triggering a dpkg question
+prep_mv_conffile() {
+    PKGNAME="$1"
+    CONFFILE="$2"
+    
+    if [ -e "$CONFFILE" ]; then
+        md5sum="`md5sum \"$CONFFILE\" | sed -e \"s/ .*//\"`"
+        old_md5sum="`dpkg-query -W -f='${Conffiles}' $PKGNAME | sed -n -e \"\\\\' $CONFFILE'{s/ obsolete$//;s/.* //p}\"`"
+        if [ "$md5sum" = "$old_md5sum" ]; then
+            rm -f "$CONFFILE"
+        fi
+    fi
+}
+
+case "$mode" in
+  install | upgrade )
+    old_version=$2
+    
+    if dpkg --compare-versions "$old_version" lt "0.200"; then
+        pureperlfilter_link=/etc/courier/filters/active/pureperlfilter
+        if [ -h $pureperlfilter_link ]; then
+            echo "Disabling pureperlfilter mail filter ..."
+            rm $pureperlfilter_link
+            courierfilter restart
+        fi
+        
+        prep_mv_conffile courier-filter-perl /etc/courier/filters/pureperlfilter.conf
+    fi
+    ;;
+esac
+
+#DEBHELPER#

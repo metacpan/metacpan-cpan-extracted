@@ -1,0 +1,20 @@
+Changes
+lib/CGI/Builder/Session.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+ses/cgisess_13098a934c1ec9e7305c886bb820768d
+ses/cgisess_393346a973f427f016e4ddba71d99c5f
+ses/cgisess_4550a776c4c82853ad6dd47ba3c04534
+ses/cgisess_62037eb48301a6d159285db9be111d2c
+ses/cgisess_b2c0e4efb9c3b3535af5001b7ed6e5eb
+ses/cgisess_b5fa317b87e42da759beb16a3c1526cc
+t/01_class.t
+t/02_features.t
+t/03_memory_leaking.t
+t/ses/cgisess_c5a2314f1be87e07663b804cf7effacb
+t/ses/cgisess_f73bcf0235b1bbf96811a629a60c1d6d
+t/Test.pm
+t/test_pod.t
+t/test_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

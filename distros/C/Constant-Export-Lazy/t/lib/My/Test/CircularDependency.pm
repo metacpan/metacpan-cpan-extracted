@@ -1,0 +1,13 @@
+package My::Test::CircularDependency;
+use strict;
+use warnings;
+BEGIN {
+    TestSimple->import(qw(
+        TEST_CONSTANT_NOT_CIRCULAR_DEPENDENCY_54321
+        TEST_CONSTANT_CIRCULAR_DEPENDENCY_CONSTANT
+    ));
+}
+
+sub gimme { TEST_CONSTANT_CIRCULAR_DEPENDENCY_CONSTANT + TEST_CONSTANT_NOT_CIRCULAR_DEPENDENCY_54321 }
+
+1;

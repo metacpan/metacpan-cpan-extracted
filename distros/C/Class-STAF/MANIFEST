@@ -1,0 +1,9 @@
+Makefile.PL
+MANIFEST
+Changes
+README
+lib/Class/STAF.pm
+lib/Class/STAF/Marshalled.pm
+t/01marshal.t
+t/02build.t
+t/03handle.t

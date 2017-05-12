@@ -1,0 +1,18 @@
+0.05 Fri Oct 26 06:01:52 PDT 2012
+  * Reverse Change log chronology.
+  * Add "mech" function/method: Test::WWW::Mechanize::Catalyst.
+
+0.04 Mon Aug 20 22:01:35 PDT 2012
+  * Require Catalyst 5.8 in Makefile.PL to match t/lib/MyApp.pm.
+  * Typos.
+
+0.03 Mon Aug 13 18:22:36 PDT 2012
+  * Silly me, I thought Catalyst::Action::RenderView was core Cat.
+
+0.02 Mon Aug 13 10:27:59 PDT 2012
+  * Add repository to Makefile.PL.
+  * Add Catalyst proper to deps to address tester failures.
+
+0.01 Sun Aug 12 23:24:01 PDT 2012
+  * Release to the CPAN.
+  * Tag v0.01.

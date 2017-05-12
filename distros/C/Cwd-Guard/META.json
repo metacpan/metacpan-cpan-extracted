@@ -1,0 +1,82 @@
+{
+   "abstract" : "Temporary changing working directory (chdir)",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cwd-Guard",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "if" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cwd::Guard" : {
+         "file" : "lib/Cwd/Guard.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Cwd-Guard/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Cwd-Guard",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Cwd-Guard.git",
+         "web" : "https://github.com/kazeburo/Cwd-Guard"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>",
+      "Slaven Rezic <slaven.rezic@idealo.de>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

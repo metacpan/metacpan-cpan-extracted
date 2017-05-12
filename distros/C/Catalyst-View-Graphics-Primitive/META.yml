@@ -1,0 +1,30 @@
+---
+abstract: 'A Catalyst View for Graphics::Primitive'
+author:
+  - 'Cory Watson, C<< <gphat@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Graphics-Primitive
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst::Runtime: 5.7014
+  Class::Load: 0.22
+  Graphics::Primitive: 0.29
+  Moose: 0.57
+  Scalar::Util: 1.19
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

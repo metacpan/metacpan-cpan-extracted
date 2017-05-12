@@ -1,0 +1,27 @@
+Changes
+ex/benchmark.pl
+lib/Compress/LZ4.pm
+LZ4.xs
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+src/LICENSE
+src/lz4.c
+src/lz4.h
+src/lz4hc.c
+src/lz4hc.h
+src/Makefile.PL
+t/00_compile.t
+t/01_lz4.t
+xt/kwalitee.t
+xt/leaktrace.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/valgrind.t
+xt/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

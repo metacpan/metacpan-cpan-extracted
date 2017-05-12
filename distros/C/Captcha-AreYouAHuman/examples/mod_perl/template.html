@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!-- saved from url=(0024)http://areyouahuman.net/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+
+        <title>Are You A Human? - Demo</title>
+        <link href='/style.css' rel='stylesheet' type='text/css'>
+
+<!--
+Website: Are You a Human?
+Designed by: June Lily Studio - http://www.junelily.com
+-->
+
+        <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script>
+        <script type="text/javascript">
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-2459068-2']);
+          _gaq.push(['_trackPageview']);
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+        </script>
+        <style>
+                body > iframe { /* To hide the empty iframe that reCAPTCHA creates, which breaks the layout */
+                        display:none;
+                }
+        </style>
+</head>
+
+<body>
+        <div id="page-top">
+        <div class="logo"><a href="http://areyouahuman.com/"><img src="/logo.png" width="362" height="21"></a></div>
+        </div>
+        <div id="page-wrap" style="text-align: center;">
+
+
+        <TMPL_IF NAME="ScoreResult">
+        <div style='text-align: center; margin-top: 10px; margin-bottom: 10px; border-top: 2px  solid blue; border-bottom: 2px solid blue; padding: 6px; background: #eef;'>
+        <p style='text-align: center'><strong><TMPL_VAR NAME="ScoreResult"></strong></p>
+        </div>
+        </TMPL_IF>
+
+
+<form method="post">
+<input type="hidden" name="Submit" value="Yes">
+
+<TMPL_VAR NAME="PublisherHTML">
+
+
+<p style="text-align: center">
+<input type="Submit" value="Submit" name="Submit">
+</p>
+</form>
+
+<TMPL_VAR NAME="ConversionCode">
+
+                </div>
+        </div>
+<div style="clear:both;"></div>
+
+        </div>
+        <div id="page-footer">
+        </div>
+
+        <div style="text-align: center; color: white">
+        <a href="http://www.areyouahuman.com" style="color: white; text-decoration: none; ">www.areyouahuman.com</a>
+        </div>
+
+</body></html>
+

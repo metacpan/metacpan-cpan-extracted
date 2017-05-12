@@ -1,0 +1,4 @@
+%$
+\.(b[ac]k|old|o)$
+\bMakefile$
+\bblib\b

@@ -1,0 +1,65 @@
+NAME
+    Catalyst::View::JavaScript - Cache and/or compress JavaScript output
+
+VERSION
+    version 0.995
+
+SYNOPSIS
+    This module fetches JavaScript either from the stash or from
+    "$c->output". By default the JavaScript code is read from
+    "$c->stash->{js}" and compressed. The content type is set to
+    "text/javascript".
+
+    By default this view will not compress and/or cache if your application
+    is in the debug mode.
+
+METHODS
+  cache
+    If $c is able to cache (i. e. "if $c->can('cache')") the value of
+    "cache" is used as key to cache the JavaScript output. This method
+    returns the view so you can invoke it like this:
+
+      $c->detach( $c->view('JavaScript')->cache('unique-cache-key') );
+
+  compress
+    Set this to a true value to enable compression of the code. See
+    JavaScript::Minifier::XS for more information on how this minification
+    works. Defaults to 1.
+
+  copyright
+    This string will be displayed on the top of the output enclosed in a
+    commentary tag.
+
+  disable_if_debug
+    If you set the debug flag on your application caching and compressing is
+    disabled. Defaults to 1.
+
+  output
+    If this is set to a true value this module fetches the JavaScript code
+    from "$c->output" and ignores the value of "stash". Defaults to 0.
+
+  key
+    This module looks in the stash for this value for JavaScript if "stash"
+    is enabled. Defaults to "js".
+
+  stash
+    Set this to a true value if the JavaScript code is on the stash. Set the
+    stash value with "key". Defaults to 1.
+
+AUTHOR
+    Moritz Onken, "<onken at netcubed.de>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-view-javascript at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-View-JavaScript
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Moritz Onken, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

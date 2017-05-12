@@ -1,0 +1,23 @@
+--- 
+abstract: foundations for displaying and editing lists (CRUD) in a Catalyst application
+author: Andrew Payne C<< <andrew@dragonstaff.com> >>.
+build_requires: 
+  Catalyst::Runtime: 0
+  Catalyst::View::JSON: 0
+  DBD::SQLite2: 0
+  HTML::Widget: 0
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: CatalystX-ListFramework
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.5

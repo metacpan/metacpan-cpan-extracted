@@ -1,0 +1,189 @@
+
+=head1 NAME
+
+Class::Lego::Myself - Classes with a default object
+
+=head1 SYNOPSIS
+
+  package My:Class;
+
+  use Class::Lego::Myself;
+  __PACKAGE__->give_my_self();
+
+  sub doit {
+    my $self = &find_my_self;
+    ...
+  }
+
+  # somewhere else
+
+  $my = My::Class->new();
+  $my->doit(); # normal method call
+  #
+  My::Class->doit(); # doit() invoked over the default object
+
+
+=head1 DESCRIPTION
+
+This module is a minor helper to write OO modules
+with methods that work on some default object
+when called as class methods.
+
+Suppose you're writing a nice OO module C<My::Class>
+with a handy method C<doit>. If customization is needed,
+the usage follows the example:
+
+  my $obj = My::Class->new( @new_args );
+  $obj->doit();
+
+However, most of the time, your users will not
+be interested in the neat OO design underneath
+and some default object will be good enough.
+So a nice interface would be to use C<doit> as a
+class method too.
+
+  My::Class->doit(); 
+  # no need to create an instance
+
+You may do that with this module. In two slightly
+different ways: (1) importing a helper function
+C<give_my_self> and (2) inheriting from it.
+
+  # importing &give_my_self
+  package My::Class;
+
+  use Class::Lego::Myself;
+  #use parent qw( Class::Lego::Myself ); # if you prefer IS-A relationship
+  __PACKAGE__->give_my_self();
+
+After you called C<give_my_self>, your package
+is now endowed with a new sub C<find_my_self>
+which should be used in every method of the
+public interface intented to work both 
+as an instance method and as a class method.
+So the first lines of C<doit> should look like
+this:
+
+  sub doit {
+      my $self = &find_my_self;
+      ...
+  }
+
+The task of C<find_my_self> is to bypass a
+reference if that's the invocant or to replace
+it with the default object as if
+
+  My::Class->doit();
+
+were equivalent to
+
+  My::Class->get_default_object()->doit();
+
+By default, the default object is constructed
+by C<< $class->new >> where C<$class> is the
+package over which C<give_my_self> was called.
+
+The default object is always the same (that is,
+a singleton). The default
+object is not saved into a package variable
+or something like that. (Actually it resides
+in closures that make it accessible only to the
+code which needs it.) So it can't pollute your
+namespace and hopefully will keep us out of
+trouble with hard-to-track bugs.
+
+=over 4
+
+=item give_my_self
+
+  $package->give_my_self;
+  $package->give_my_self({
+              default => $coderef,
+            });
+
+Install C<find_my_self> into the receiver.
+The default object is computed once from the
+C<$coderef> given in the key C<'default'> of
+the hashref argument. The default
+C<$coderef> is:
+
+  sub { $package->new() };
+
+An explicit coderef may pass additional constructor
+arguments and do other things you want:
+
+  sub { $package->new(@customized_args); }
+
+=item find_my_self
+
+  my $self = &find_my_self;
+
+  (my $self, @_) = &find_my_self;
+
+  my ($self, @args) = &find_my_self;
+
+This function examines the first argument and
+leaves it alone if it is a ref. Otherwise,
+replaces it with the corresponding default
+object (established when C<give_my_self> was
+called). The first argument is shifted from
+the argument list.
+
+In scalar context, it returns the computed
+invocant. In list context, it returns the
+computed invocant and the the rest of the
+argument list.
+
+The usage forms above are just handy ways
+to make current C<@_> visible to 
+C<find_my_self> (as explained in L<perlsub>).
+Otherwise, you could pass C<@_> explicitly
+but may need to update it.
+
+  my $self = find_my_self(@_); # ok
+  # but @_ is intact (including invocant)
+
+=back
+
+=head1 CAVEATS
+
+If you ask me, I may agree this module is possibly
+overkill. But better
+code is no code. And I don't have to code
+anymore to get methods which work seamlessly
+as class methods (with the right object behavior
+underneath).
+
+=head1 HISTORY
+
+I first borrowed the code of C<find_my_self>
+from L<Test::Base>, but my use case turned to
+be pretty much simpler.
+C<Test::Base> struggles to
+turn methods into functions by discovering
+the default object under the hood. In contrast,
+this module is only for good OO code.
+
+=head1 SEE ALSO
+
+L<Class::Default>
+
+=head1 BUGS
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Lego>
+or L<mailto://bugs-Class-Lego@rt.cpan.org>.
+
+=head1 AUTHORS
+
+Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

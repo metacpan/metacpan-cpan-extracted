@@ -1,0 +1,30 @@
+---
+abstract: 'HTML::CTPP2 View Class'
+author:
+  - 'Victor M Elfimov (victor@sols.ru)'
+build_requires:
+  Catalyst: 5.7
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0
+  HTML::CTPP2: 2.005010
+  MRO::Compat: 0
+  Path::Class: 0
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-HTML-CTPP2
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

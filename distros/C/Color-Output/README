@@ -1,0 +1,36 @@
+Color/Output version 1.05
+=========================
+
+DESCRIPTION
+
+With this module you can color the output. It will color the output on both Windows and on Unix/Linux.
+On Windows it uses by default Win32::Console (unless overwritten with some options),
+on Unix/Linux it uses ANSI by default.
+
+This module allows you to do:
+
+* Color the output of your program
+
+* Clearing the screen
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    On Win32: Win32::Console or ANSI support
+    On Unix/Linux: ANSI support
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 Animator. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

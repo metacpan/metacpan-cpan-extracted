@@ -1,0 +1,16 @@
+Revision history for Perl extension CGI::Application::Util::Diff.
+
+1.03  Sun Feb 21 12:54:30 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+
+1.02  Wed Feb 10 13:52:37 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.01  Fri Jul  3 12:07:00 2009
+	  - Patch t/test.t, which used the old name CGI::Application::Diff::Dir
+	  - Patch this file, which used another old name CGI::Application::Demo::Dispatch
+
+1.00  Fri Jun 12 18:40:00 2009
+	- Original version

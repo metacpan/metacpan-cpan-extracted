@@ -1,0 +1,436 @@
+
+=head1 NAME
+
+CAF Examples - Guide to the CAF Example scripts
+
+=head1 CAF EXAMPLES
+
+=head2 Before you Begin
+
+First, make sure that you've read and followed the instructions in the
+INSTAL.txt file.
+
+=head3 Path Conventions
+
+A typical C<CGI::Application::Framework> project has the following
+layout:
+
+     cgi-bin/
+             app.cgi                 # The CGI script
+
+     framework/
+         framework.conf              # Global CAF config file
+
+         projects/
+             MyProj/
+                framework.conf       # MyProj config file
+
+                common-templates/    # login templates go here
+
+                common-modules/
+                     CDBI/
+                         MyProj.pm   # The Class::DBI project module
+
+                         MyProj/
+                             app.pm  # The Class::DBI application module
+
+                     MyProj.pm       # The project module
+
+                applications/
+                    myapp1/
+                         framework.conf       # myapp1 config file
+
+                         myapp1.pm            # An application module
+                         templates/
+                            runmode_one.html  # templates for myapp1
+                            runmode_two.html
+
+                    myapp2/
+                         framework.conf       # myapp2 config file
+                         myapp2.pm            # An application module
+                         templates/
+                            runmode_one.html  # templates for myapp2
+                            runmode_two.html
+
+
+
+The Example applications follow this layout closely:
+
+  (*) cgi-bin/
+              app.cgi                 # The CGI script
+
+ (**) framework/
+          framework.conf              # Global CAF config file
+
+  (+)     projects/
+              Example/
+                 framework.conf       # Exmample config file
+
+                 common-templates/    # login templates go here
+
+                 common-modules/
+                      CDBI/
+                          Example.pm      # The Class::DBI project module
+
+                          Example/
+                              example.pm  # The Class::DBI application module
+
+                      Example.pm          # The project module
+
+                 applications/
+                     example_1/
+                          framework.conf       # example_1 config file
+
+                          example_1.pm         # The 'example_1' application
+                          templates/
+                             main_display.html # template for myapp1
+
+                     example_2a/
+                          framework.conf       # example_2a config file
+                          example_2a.pm        # The 'example_2a' application
+                          templates/
+                             main_display_mutt.html  # templates for example_2a
+                             main_display_jeff.html
+
+
+When we refer to the C<[cgi-bin]> directory, we are referring to the
+directory that contains C<app.cgi> (the C<[cgi-bin]> directory is
+indicated above with C<(*)>).  When we refer to the C<[framework]>
+directory, we mean the directory marked with C<(**)>, above.  When we
+refer to the C<[projects]> directory, we are referring to the
+C<projects> directory within the top level C<framework> directory (as
+indicated with C<(+)>, above).
+
+=head2 A First Example
+
+Inspect the following files on disk via the command line:
+
+     [cgi-bin]/app.cgi
+
+and
+
+     [projects]/Example/example_1/example_1.pm
+
+Run the example_1 application through the web, for instance at:
+
+    http://localhost/cgi-bin/app.cgi/Example/example_1
+
+Does it give you anything more than a server error?  If so, then odds
+are you set up your installation correctly.  If you get an error,
+happy hunting!
+
+
+=head2 The "app.cgi" file
+
+This is the the only CGI script in the whole entire
+C<CGI::Application::Framework>! Through this single script, all your
+applications are run.
+
+It works by analyzing the C<PATH_INFO> portion of the URL.  In the
+following example:
+
+    http://localhost/cgi-bin/app.cgi/Example/example_1?rm=main_display
+
+The C<PATH_INFO> is "/Example/example_1".
+
+This is broken up into two parts:  project (C<Example>) and application
+C<example_1>.
+
+C<CGI::Application::Framework> searches for C<example_1.pm> in the project
+tree:
+
+    [projects]/Example/applications/example_1/example_1.pm
+
+Once it has found your application module, it runs it.  Exactly *how* it
+runs it is controlled by your configuration file.
+
+The programs in the C<CGI::Application::Framework> follow the general
+structure of a C<CGI::Application> program.  That means that at any given
+time, they have a C<run mode> which is their current state.  Each run mode
+has a subroutine.
+
+In the case of C<example_1> the only run mode is called C<main_display>.
+
+When you leave out the run mode, C<CGI::Application::Framework>'s
+run_app mechanism knows to call the C<main_display> run mode, because
+this is set in the configuration file.
+
+Look at the project level C<framework.conf> in
+
+    [projects]/Example/framework.conf
+
+In this file there is a paramter called C<post_login_rm>:
+
+    post_login_rm = main_display
+
+This means that after login, C<CGI::Application::Framework> will dispatch
+to the C<main_display> run mode.
+
+Other applications can have different start run modes.  For instance,
+C<example_2>'s first run mode is C<main_display_mutt>:
+
+    <LocationMatch example_2>
+        post_login_rm = main_display_mutt
+    </LocationMatch>
+
+More information on configuration system is available in the
+L<CGI::Application::Framework> docs.
+
+For more information on L<CGI::Application>, see its documentation at:
+
+    http://search.cpan.org/dist/CGI-Application/lib/CGI/Application.pm
+
+=head3 Templates
+
+Note that the CAF uses templates for its its presentation (aka
+"view") layer.
+
+Currently, you have a choice between L<HTML::Template>,
+C<HTML::Template::Expr>, L<Template::Toolkit|Template>
+and C<Petal>.
+
+See the documentation for these modules at:
+
+    http://search.cpan.org/dist/HTML-Template/Template.pm
+    http://search.cpan.org/dist/Template-Toolkit/lib/Template.pm
+    http://search.cpan.org/dist/Petal/lib/Petal.pm
+
+
+=head2 The "example_1.pm" file
+
+This file has the heck commented out of it.  Read it extensively to
+start to get an idea of what is possible, and what the efficient
+idioms are, in the C<CGI::Application::Framework>.
+
+=head3 The Example.pm Base Class
+
+Regarding the line
+
+    use base qw ( Example );
+
+When you start developing applications that relate to a different base
+class, you can change this to
+
+    use base qw ( YourProject );
+
+Make sure you create a
+
+     [projects]/YourProject/common-modules/YourProject.pm
+
+file and a
+
+     [projects]/YourProject/common-templates
+
+directory with the templates that you need to put in there, per what is
+named in your C<YourProject.pm> file.
+
+You get to decide what template you need and what their names are,
+within reasonable limits.  For instance, by default, the Framework
+expects different types of templates to use different extensions:
+
+    HTML::Template      .html
+    Template::Toolkit   .tmpl
+    Petal               .xhtml
+
+But this is a convention, and configurable in your top-level
+C<framework.conf>.
+
+For examples on how to create a project and a set of templates, refer to
+
+     [projects]/Example/common-modules/Example.pm
+     [projects]/Example/common-templates
+
+These are fairly heavily documented internally as well.
+
+Note that, in the C<setup> subroutine, C<mode_param> and C<start_mode>
+are B<NOT> defined.  They normally would be here in a C<CGI::Application>
+program, but these are managed by the C<CGI::Application::Framework>
+module here.
+
+=head3 Configuration
+
+In the C<main_display> subroutine, the first CAF-oriented thing that you
+encounter is:
+
+    my $config = $self->conf->context;
+
+This is a quick way of getting the current application configuration.
+C<$config> is a hash ref.  You use it like this:
+
+    my $start_mode = $config->{'post_login_rm'};
+
+You can store values in C<framework.conf> and they will be visible to your
+application in this hashref.
+
+    # in [projects]/Example/applications/example_1/framework.conf
+
+    favourite_colour = blue
+
+    # in [projects]/Example/applications/example_1/example_1.pm
+
+    my $config = $self->conf->context;
+    my $background = $config->{'favourite_colour'};
+
+The configuration system is very powerful and flexible.  To make a
+configuration value available to all apps in a project, declare it the
+project level C<framework.conf>:
+
+    [projects]/Example/framework.conf
+
+To make a configuration value available to all apps on the system,
+declare it the top-level C<framework.conf>:
+
+    [framework]/framework.conf
+
+Additionally, configuration files allow matching based on the current
+module, the current URL and other runtime data.  So for instance, you
+could put the following in the top level C<framework.conf>:
+
+    <LocationMatch example>
+        favourite_colour = red
+    </LocationMatch>
+
+And this would set the C<favourite_colour> configuration parameter to
+C<'red'> any time an application's URL matched the string C<'example'>.
+
+See the C<CGI::Application::Framework> docs for details.
+
+=head3 Session
+
+The next thing unique to C<CGI::Application::Framework> is the
+first-class session, C<< $self->session >>.  This is a "scratchpad" area that
+persists across all loadings of the application via the web and across
+all subroutines.  The programmer doesn't have to create the session
+object, as the framework does this for the programmer.  The session
+will come with a few pre-populated fields, e.g. _session_id, _timeout
+and _cgi_query, as well as whatever is defined by the programmer in
+the .pm file that defines the project class
+(e.g. C<Example.pm>).  See that file to get some ideas of what you can do
+here.
+
+=head3 Linking
+
+C<< $self->make_link >> is meant to create all C<< <a href=...> >> style links
+that are displayed throughout the application.  If you don't use this to
+link to another run mode within the application and you instead just
+create the C<< <a href> >> yourself then the application will die with a
+rather strongly-worded error message.  More documentation regarding
+make_link and all its options can be found inside the docs of
+C<CGI::Application::Framework>.
+
+=head3 Templates
+
+Finally there is the templating code:
+
+    return $self->template->fill(\%tmplvars);
+
+In one step, this creates a template, fills it with the paramters in the
+hash C<%tmplvars> and then returns the output.
+
+Since we haven't specified a filename, the system will load a template
+with a filename matching the current runmode (in this case
+C<main_display.html>).
+
+As for the type of template used (and other The template options) the
+template is created according to the rules set out in your application's
+configuration.  In the case of the examples, the template type is set to
+C<HTML::Template> by default.
+
+If you want to override this for a particular run mode, you can:
+
+    my $template = $self->template('named_config')->load(
+        file             => 'yummy'
+        type             => 'TemplateToolkit'
+        add_include_path => '.',
+    );
+
+    $template->param('foo' => 'bar');
+    return $template->output;
+
+This would create a template named C<yummy.tmpl> in the
+L<Template::Toolit|Template> format, set some parameters and then return
+the result.
+
+=head2 "app-db.cgi"
+
+This is the same as C<app.cgi> but with one small difference -- its
+beginning is:
+
+    #!/usr/bin/perl -d:ptkdb
+
+    sub BEGIN {
+        $ENV{DISPLAY} = ":0.0" ;
+    }
+
+This is meant to activate the Perl TK Debugger.  You probably need to
+specify the hostname or IP of the display that ptkdb will target, and
+"xhost +" the display as well.  ptkdb doesn't work on C<Apache::Registry>
+scripts, which is a bit of a drag, so you have to make sure that you
+run this through CGI.  This is an excellent way of finding out what's
+wrong in your C<CGI::Application::Framework> applications.
+
+
+=head2 "example_1.pm-small"
+
+This isn't runable, but it is meant to show how small and compact
+these applications can be without all of the comment verbage in
+C<example_1.pm>  It is entirely equivalent to C<example_1.pm> in how it
+would run, though.
+
+=head2 "example_2a.pm" and "example_2b.pm"
+
+This demonstrates how to link between two applications while maintaining
+the user's session.
+
+=head2 "example_3.pm"
+
+This demonstrates how to create a navigation bar of links to multiple
+applications without having to log in each time.
+
+=head2 "example_4.pm"
+
+This demonstrates the component embedding system.  It shows you how to
+embed runmodes within runmodes by using the navigation bar as an
+example.
+
+=head2 "example_5.pm"
+
+This is meant to illustrate a standard CRUD application (Create, Read,
+Update, Delete) as done in the CAF.  All database interaction is
+mediated via the C<Class::DBI>-based parallel framework that I've created
+for C<CGI::Application::Framework> called C<CDBI>.  The file
+
+    [projects]/Example/common-modules/CDBI/Example/example.pm
+
+mirrors the database "example", and highlights some of the
+relationships within it via its C<has_many> and C<has_a> statements.  See
+documentation for this at:
+
+    http://search.cpan.org/dist/Class-DBI/lib/Class/DBI.pm
+    http://search.cpan.org/dist/Class-DBI-mysql/lib/Class/DBI/mysql.pm
+    http://search.cpan.org/dist/Class-DBI-Pg/Pg.pm
+    http://search.cpan.org/dist/Class-DBI-SQLite/lib/Class/DBI/SQLite.pm
+
+Note the use of the C<check_rm> in C<process_add_user> comes from
+C<CGI::Application::Plugin::ValidateRM>.  See its documentation, and the
+documentation for the modules that support it, at:
+
+    http://search.cpan.org/dist/CGI-Application-Plugin-ValidateRM/lib/CGI/Application/Plugin/ValidateRM.pm
+    http://search.cpan.org/dist/Data-FormValidator/lib/Data/FormValidator.pm
+
+The C<_add_user_profile> subroutine shows a C<Data::FormValidator>
+profile that includes some programmatic elements.
+
+=head1 AUTHOR
+
+Richard Dice, C<< <rdice-at-pobox.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Richard Dice, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

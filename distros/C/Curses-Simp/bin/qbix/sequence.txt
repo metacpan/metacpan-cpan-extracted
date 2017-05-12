@@ -1,0 +1,34 @@
+Notation: sides are Front,Back,Up,Down,Left,Right
+          first letter designates which side to turn
+          normal turns are clockwise but a side letter may be followed 
+            by a - (meaning counter-clockwise) or 2 (twice).
+FU2RUR-U2F-
+FU2RU-R-U2F-
+L-URU-LUR-U-
+URU-L-UR-U-L
+FU-B-UF-U-BU2
+UFURU-R-F-
+L2UF-BL2FB-UL2
+L2U-F-BL2FB-U-L2
+L2R2DL2R2U2L2R2DL2R2
+RBUB-U-R2F-U-FUR
+R-DRFDF-
+FD-F-R-D-R
+FUD-L2U2D2R
+R-D2U2L2DU-F-
+
+F-BU2FB-R2
+B-DL2D-R2DL2D-R2B
+FURU-R-F-
+RBR-FRB-R-F-
+LU2L-B-R-F-U2FRB
+FD2B2DF2D-B2DF2DF-
+BUB-R-F-L-U-LFR
+R-F-L-FRF-LF
+RBLU-L-B-R-F-UF
+B2L2BR2B-L2BR2B
+LF2D-B2DF2D-B2DL-
+LF2LB2L-F2LB2L2
+R-ULU-RUL-U-
+LDRBR-F-RB-R-FD-L-
+F2D-FU2F-DFU2L-BLFL-B-L

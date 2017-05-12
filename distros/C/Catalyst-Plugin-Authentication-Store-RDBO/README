@@ -1,0 +1,60 @@
+NAME
+    Catalyst::Plugin::Authentication::Store::RDBO - Authentication and
+    authorization against a Rose::DB::Object model.
+
+VERSION
+    This document describes Catalyst::Plugin::Authentication::Store::RDBO
+    version 0.002.
+
+SYNOPSIS
+        use Catalyst;
+
+        __PACKAGE__->setup(
+            qw(
+               Authentication
+               Authentication::Store::DBIC
+               Authentication::Credential::Password
+               Authorization::Roles
+              )
+        );
+
+        # Authentication
+        __PACKAGE__->config->{authentication}{rdbo} = {
+            user_class         => 'User',     # or 'MyApp::Model::User'
+            user_field         => 'username',
+            password_field     => 'password',
+            password_type      => 'hashed',   # or 'clear'
+            password_hash_type => 'SHA-1',
+        };
+
+        # Authorization
+        __PACKAGE__->config->{authorization}{rdbo} = {
+            role_rel   => 'roles',  # name of the many-to-many relationship
+            role_field => 'name',
+        };
+
+DESCRIPTION
+    This plugin uses a Rose::DB::Object object to authenticate an user. It
+    is based on Catalyst::Plugin::Authentication::Store::DBIC. Please read
+    there for a much better description.
+
+DIFFERENCES
+    Currently only a single field for the "user_field" parameter is
+    supported. The DBIC plugin supports also an array reference. This can be
+    added in a future version.
+
+    The default for "user_field" is "username" instead of "user".
+
+    The configuration for authorization is much simpler, only two parameters
+    are needed. "role_rel" specifies the name of the many-to-many
+    relationship which connects user and role names. "role_field" is the
+    column accessor for the role name. (For
+    Catalyst::Plugin::Authorization::Roles roles are just strings.)
+
+AUTHOR
+    Uwe Voelker, <uwe.voelker@gmx.de>
+
+COPYRIGHT
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See "perldoc perlartistic".
+

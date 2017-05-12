@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+###############################################################################
+#                              testcurses
+###############################################################################
+#
+#  This is a test driver for the Curses Perl module.
+#
+#  This program is a development tool and is meant to change frequently.
+#
+###############################################################################
+use strict;
+use warnings;
+
+use Devel::Peek;
+use Data::Dumper;
+
+use I18N::Langinfo;
+
+use Encode;
+
+use Curses;
+
+
+
+sub test($$) {
+    my ($win, $argsR) = @_;
+
+    my $charset = I18N::Langinfo::langinfo(I18N::Langinfo::CODESET());
+
+    my ($function, $arg) = @{$argsR};
+
+    if (!defined($function)) {
+        die("You must give a function name as the first argument");
+    }
+
+    $win->keypad(1);
+
+    if ($function eq "getchar") {
+        my ($char, $key);
+        do {
+            ($char, $key) = $win->getchar();
+            if (defined $char) {
+                print STDERR "Char: " . encode($charset, $char) . "\n";
+            } elsif (defined $key) {
+                printf STDERR "Key: %04X\n", $key;
+            } else {
+                last;
+            }
+        } until (defined $char and $char eq " ");
+    } elsif ($function eq "getstring") {
+        my $s = $win->getstring;
+        print STDERR encode($charset, $s) . "\n";
+        Dump($s);
+    } elsif ($function eq "addstring") {
+        if (!defined($arg)) {
+            die("Need 2nd argument: string to add");
+        }
+        my $s = decode($charset, $arg) // "Hallo";
+        my $ret = $win->addstring($s);
+        print STDERR $ret, "\n";
+        $win->getchar;
+        $win->refresh;
+    } elsif ($function eq "getmaxyx") {
+        my ($y, $x);
+        $win->getmaxyx($y, $x);
+        print STDERR "$y $x\n";
+    } elsif ($function eq "insstring") {
+        if (!defined($arg)) {
+            die("Need 2nd argument: string");
+        }
+        my $s = decode($charset, $arg) // "Huhu";
+        $win->addstring("Hallo");
+        $win->insstring(0, 0, $s);
+        $win->getchar;
+    } elsif ($function eq "instring") {
+        if (!defined($arg)) {
+            die("Need 2nd argument: string");
+        }
+        my $s = decode($charset, $arg) // "Huhu";
+        $win->addstring("Hallo\n");
+        $win->addstring("$s\n");
+        $s = $win->instring(0, 0); print STDERR encode($charset, $s) . "\n";
+        $s = $win->instring(1, 0); print STDERR encode($charset, $s) . "\n";
+    } elsif ($function eq "ungetch") {
+        if (!defined($arg)) {
+            die("Need 2nd argument: string");
+        }
+        my $s = decode($charset, $arg) // "X";
+        if (ungetchar($s)) {
+            my ($ch, $key) = $win->getchar();
+            if (defined($ch)) {
+                print STDERR ("Char: " . encode($charset, $ch) . "\n");
+            }
+            if (defined($key)) {
+                print STDERR ("Key: $key\n");
+            }
+        } else {
+            print STDERR ("FAIL\n");
+        }
+    } else {
+        print STDERR "unknown function $function\n";
+    }
+}
+
+
+
+###############################################################################
+#                                 MAINLINE
+###############################################################################
+my ($function, $rest) = @ARGV;
+
+my $win = new Curses;
+
+eval { test($win, \@ARGV); };
+
+if ($@) {
+    print STDERR ("EXCEPTION: '$@'\n");
+};
+
+endwin();

@@ -1,0 +1,39 @@
+# PODNAME: Config::Model::models::Itself::ConfigWR::DefaultLayer
+# ABSTRACT:  Configuration class Itself::ConfigWR::DefaultLayer
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Itself::ConfigWR::DefaultLayer - Configuration class Itself::ConfigWR::DefaultLayer
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 config_dir
+
+I< Optional. Type uniline.  > 
+
+=head2 os_config_dir - configuration file directory for specific OS
+
+Specify and alternate location of a configuration directory depending on the OS (as returned by C<$^O> or C<$Config{'osname'}>, see L<perlport/PLATFORMS>) Common values for C<$^O> are 'linux', 'MSWin32', 'darwin' I< Optional. Type hash of uniline.  > 
+
+=head2 file - target configuration file name
+
+specify the configuration file name. This parameter may not be applicable depending on your application. It may also be hardcoded in a custom backend. If not specified, the instance name is used as base name for your configuration file. The configuration file namecan be specified with &index keyword when a backend is associated to a node contained in a hash. See L<backend specifications|http://search.cpan.org/dist/Config-Model/lib/Config/Model/BackendMgr.pm#Backend_specification>. I< Optional. Type uniline.  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

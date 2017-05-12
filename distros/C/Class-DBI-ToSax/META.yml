@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Class-DBI-ToSax
+version: 0.10
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor: 0
+  Class::Data::Inheritable: 0
+  NEXT: 0
+  Test::More: 0
+  XML::SAX::Writer: 0
+  perl: 5.6.1
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Class::DBI::ToSax:
+    file: lib/Class/DBI/ToSax.pm
+    version: 0.10
+generated_by: Module::Build version 0.18

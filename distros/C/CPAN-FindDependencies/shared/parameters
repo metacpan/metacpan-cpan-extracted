@@ -1,0 +1,47 @@
+=item nowarnings
+
+Warnings about modules where we can't find their META.yml or Makefile.PL, and
+so can't divine their pre-requisites, will be suppressed;
+
+=item fatalerrors
+
+Failure to get a module's dependencies will be a fatal error
+instead of merely emitting a warning;
+
+=item perl
+
+Use this version of perl to figure out what's in core.  If not
+specified, it defaults to 5.005.  Three part version numbers
+(eg 5.8.8) are supported but discouraged.
+
+=item 02packages
+
+The location of CPAN.pm's C<02packages.details.txt.gz> file as a
+local filename, with either a relative or an absolute path.  If not
+specified, it is fetched from a CPAN mirror instead.  The file is
+fetched just once.
+
+=item cachedir
+
+A directory to use for caching.  It defaults to no caching.  Even if
+caching is turned on, this is only for META.yml or Makefile.PL files.
+02packages is not cached - if you want to read that from a local disk, see the
+C<02packages> option.
+
+=item maxdepth
+
+Cuts off the dependency tree at the specified depth.  Your specified
+module is at depth 0, your dependencies at depth 1, their dependencies
+at depth 2, and so on.
+
+=item usemakefilepl
+
+If set to true, then for any module that doesn't have a META.yml,
+try to use its Makefile.PL as well.  Note that this involves
+downloading code from the Internet and running it.  This obviously
+opens you up to all kinds of bad juju, hence why it is disabled
+by default.
+
+=item recommended
+
+Adds recommended modules to the list of dependencies, if set to a true value.

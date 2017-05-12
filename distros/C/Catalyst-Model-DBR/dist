@@ -1,0 +1,9 @@
+#!/bin/sh
+./clean
+git tag -f $1
+perl -pi -e "s/-DBR-VERSION-TAG-/$1/" lib/Catalyst/Model/DBR.pm lib/Catalyst/Helper/Model/DBR.pm Makefile.PL
+perl ./Makefile.PL
+make manifest
+make dist
+./clean
+git checkout lib/Catalyst/Model/DBR.pm lib/Catalyst/Helper/Model/DBR.pm Makefile.PL

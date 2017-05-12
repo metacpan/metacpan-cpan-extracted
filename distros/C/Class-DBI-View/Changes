@@ -1,0 +1,29 @@
+Revision history for Perl extension Class::DBI::View
+
+0.07  Thu Aug  4 02:28:28 UTC 2005
+        - Removed strategy name restriction
+          (Rintaro Ishizaki)
+
+0.06  Tue Mar  1 22:05:28 JST 2005
+	- Fixed execute and sth_to_objects() as it works with recent Class::DBI
+	  (Thanks to SUGAWARA Hajime)
+
+0.05  Sat Feb 14 12:33:30 JST 2004
+	* Added retrieve_from_sql support in TemporaryTable
+	  (Thanks to Yoshimune Kitta again)
+	- Added test suite for retrieve_from_sql
+
+0.04  Sat Feb 14 00:06:35 JST 2004
+	* Fixed _class_name to table_alias()
+	  Now it needs Class::DBI 0.94 or over
+	  (Thanks to Yoshimune Kitta and Atsushi Baba)
+	- Fixed test suite so it doesn't fail without SQLite
+
+0.03  Fri Feb 28 18:11:16 JST 2003
+	- Fixed test code to check mysql/sqlite installation
+
+0.02  Fri Feb 28 16:56:17 JST 2003
+	- CPAN release
+
+0.01  Thu Feb 20 18:12:46 2003
+	- original version

@@ -1,0 +1,29 @@
+CGI/CookieSerial version 0.01
+=============================
+
+Check the SYNOPSIS and DESCRIPTION of the POD for the latest
+documentation and intro to this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Cookie
+  Data::Serializer
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Duncan McGreggor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

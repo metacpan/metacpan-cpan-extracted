@@ -1,0 +1,14 @@
+Changes
+INSTALL
+lib/Catalyst/Helper/Model/Filemaker.pm
+lib/Catalyst/Model/Filemaker.pm
+MANIFEST
+t/00.load.t
+t/01.functionality.t
+t/02.perlcritic.t
+t/03.pod.t
+t/04.pod-coverage.t
+t/lib/TestApp.pm
+Makefile.PL
+README
+META.yml

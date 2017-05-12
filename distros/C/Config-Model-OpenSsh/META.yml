@@ -1,0 +1,40 @@
+---
+abstract: 'OpenSSH config editor'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Config::Model::BackendMgr: '0'
+  Config::Model::Tester: '2.042'
+  English: '0'
+  Module::Build: '0.34'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-OpenSsh
+recommends:
+  Config::Model::CursesUI: '0'
+  Config::Model::TkUI: '0'
+requires:
+  Carp: '0'
+  Config::Model: '2.050'
+  Config::Model::Backend::Any: '0'
+  File::Copy: '0'
+  File::HomeDir: '0'
+  File::Path: '0'
+  IO::File: '0'
+  Log::Log4perl: '1.11'
+  Mouse: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dod38fr/config-model-openssh/issues
+  homepage: https://github.com/dod38fr/config-model/wiki
+  repository: git://github.com/dod38fr/config-model-openssh.git
+version: '1.237'

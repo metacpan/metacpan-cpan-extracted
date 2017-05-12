@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use utf8;
+use Convert::Dayi qw(as_ascii from_ascii);
+use Encode;
+while( <STDIN> ) {
+    print from_ascii( $_ );
+}

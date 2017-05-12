@@ -1,0 +1,10 @@
+name:                   login
+fields:
+  -  email:
+        name:
+            en:         Email address
+        required:       1
+        default:        
+        type:           text
+        checks:         email                      
+        max_length:     255

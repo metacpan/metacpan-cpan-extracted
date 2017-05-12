@@ -1,0 +1,16 @@
+PREREQUISITES
+Perl5
+Exporter
+Data::Dumper
+Storable
+Carp;
+Text::Abbrev
+
+Parse::RecDescent
+
+HOW TO BUILD AND INSTALL
+perl Makefile.PL
+make
+make test
+make install
+

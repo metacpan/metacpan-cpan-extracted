@@ -1,0 +1,43 @@
+--- #YAML:1.0
+name:               CPAN-Search-Lite
+version:            0.78
+abstract:           setup and maintain a searchable CPAN database
+author:
+    - Randy Kobes <r.kobes@uwinnipeg.ca>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AI::Categorizer:      0
+    Algorithm::NaiveBayes:  0
+    Apache2::SOAP:        0
+    Archive::Tar:         1.08
+    Archive::Zip:         1.09
+    Config::IniFiles:     0
+    CPAN::DistnameInfo:   0
+    DBD::mysql:           0
+    File::Spec:           0
+    File::Temp:           0
+    HTML::TextToHTML:     0
+    IO::Zlib:             0
+    Lingua::Stem:         0
+    Lingua::StopWords:    0
+    Locale::Country:      0
+    LWP:                  0
+    Perl::Tidy:           0
+    Pod::Select:          0
+    Pod::Xhtml:           0
+    SOAP::Lite:           0
+    XML::SAX::ExpatXS:    0
+    YAML:                 0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

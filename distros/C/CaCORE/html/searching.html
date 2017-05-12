@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+
+<head>
+<title>Developer's Guide on Searching</title>
+</head>
+
+<body>
+
+<h1>Developer's Guide on Searching</h1>
+
+<p>The core function of CaCOREperl is to provide an object based search capability to obtain caCORE server-hosted
+domain object data. It answers questions such as "How do I retrieve all chromosomes whose
+genes with a symbol of 'NAT2'"? In a typical search scenario, you start with certain information, usually some attributes
+of a certain domain object, and you want to find the domain objects that have these attributes, in addition, you want to
+look for other domain objects that are associated with these domain objects with the said attributes.</p>
+
+<p>A search operation results in a remote webservice invocation to the caCORE server. The known information from the source
+object, such as a gene with symbol name "NAT2", is converted into request XML, and passed to the caCORE server. The caCORE
+server would parse the request, generate an internal query, and return the result in a response XML format. CaCOREperl then
+parses the response, and convert it into the target objects(s). Thus, CaCOREperl users only deal with domain objects, and do not have
+to deal with webservice request/response, and XML manipulations.</p>
+
+<h2><a name="Association_Search">Simple Search via Object Associations</a></h2>
+
+<p>Use the getX method to retrieve associated object X with many-to-one relationships.</p>
+<code>
+<DD># search by association: many to one<br/></DD>
+<DD>my $chromo1 = $chromos[0];<br/></DD>
+<DD>print "start chromosome id=" . $chromo1->getId . "\n";<br/></DD>
+<DD>my $taxon = $chromo1->getTaxon;<br/></DD>
+<DD>print "find taxon: id= " . $taxon->getId . " scientificName=" . $taxon->getScientificName ."\n";<br/></DD>
+</code>
+
+<p>Use the getXCollection method to retrieve a list of associated object X with one-to-many relationships.</p>
+<code>
+<DD># test 3: use association: one to many<br/></DD>
+<DD>my @genes = $chromo1->getGeneCollection;<br/></DD>
+<DD>foreach my $gn (@genes) {<br/></DD>
+<DD><DD>	print "Gene: id= " . $gn->getId . "  symbol=" . $gn->getSymbol . "\n";<br/></DD></DD>
+<DD>}<br/></DD>
+<DD>my $num = $#genes + 1;<br/></DD>
+<DD>print "number of result: " . $num . "\n";<br/></DD>
+</code>
+
+<p>Note: these methods utlizes the ApplicationService->queryObject() method. The caCORE
+server automatically trims the result set to 1000. More detail in the subsequent discussion.</p>
+
+<h2><a name="AppSvc_Search">Advanced Search via ApplicationService Utility</a></h2>
+
+<p><a href="ApplicationService.htm">ApplicationService</a> is a utility class that encapsulates webservice invocation to caCORE server.
+ApplicationService object follows the Singleton pattern, in that each program will ONLY contain one instance
+of such class.
+The URL being passed to the <code>instance</code> method is the service endpoint of the caCORE webservice.
+If no such URL is provided in the program, it will default to the caCORE production server,
+"http://cabio.nci.nih.gov/cacore32/ws/caCOREService". The ApplicationService class exposes two methods:
+queryObject and query for search. The ApplicationService is the fundamental class that all other search
+methods utilize.</p>
+
+<p>The following methods are supported in CaCORE::ApplicationService:</p>
+
+<ul>
+	<li>instance(url): returns the ApplicationService instance. "url" is the service endpoint to a caCORE server. Example url: "http://cabio.nci.nih.gov/cacore30/ws/caCOREService".
+	<li>queryObject(targetPath, sourceObject): invoke caCORE server to search for domain objects. This method returns at most 1000 objects because caCORE webservice automatically trims the result set to 1000 if actual result set is greater than 1000.
+	<li>query(targetPath, sourceObject, startIndex, requestSize): invoke caCORE server to search for domain objects. Allows for specifying the return result set.
+</ul>
+
+<p>Description of parameters used in the above functions:</p>
+<ul>
+    <li>url: the service endpoint to a caCORE server. Example url: "http://cabio.nci.nih.gov/cacore30/ws/caCOREService".
+	<li>targetPath can be either a fully qualified target object name, such as "CaCORE::CaBIO::Gene"; or a series
+	of comma separated fully qualified object names indicating a navigational path, such as
+	"CaCORE::CaBIO::Taxon,CaCORE::CaBIO::Chromosome". This navigational path specifies the relationship to traverse
+	when retrieving the target objects.
+	<li>sourceObject is the search criteria that specifies the search starting point.
+	<li>startIndex (for method "query" only), allows for control of the starting index of the result set. When presented,
+	requestSize must also be present.
+	<li>requestSize (for method "query" only), defines the requested size. Server trims the return result to the requested
+	size before returns. If the result set is smaller than the requested size, the result set is returned without trimming.
+	<li>For queryObject method, caCORE webservice automatically trims the result set to 1000 if actual result set is greater
+	than 1000.
+</ul>
+
+<h3>Search via ApplicationService->queryObject()</h3>
+
+<p>	This following example retrieves all Chromosomes whose associated genes have a symbol of "NAT2" using the direct
+and basic search function of ApplicationService->queryObject().
+This queryObject() function encapsulates the webservice invocation to the caCORE server, and converts
+	the returned XML into list of Chromosome objects.
+	Parameter 1 indicates target class, Chromosome, to be retrieved.
+	Parameter 2 indicates search criteria. In this case, is the gene associated with the chromosome.
+</p>
+
+<code>
+<DD>use CaCORE::ApplicationService;<br/></DD>
+<DD>use CaCORE::CaBIO;<br/></DD>
+<DD>my $gene = new CaCORE::CaBIO::Gene;<br/></DD>
+<DD>$gene->setSymbol("NAT2");<br/></DD>
+<DD>my $appsvc = CaCORE::ApplicationService-></DD>
+<DD><DD>instance("http://cabio.nci.nih.gov/cacore32/ws/caCOREService");<br/></DD></DD>
+<DD>my @chromos = $appsvc->queryObject("CaCORE::CaBIO::Chromosome", $gene);<br/></DD>
+</code>
+
+
+<h3><a name="Nest_Search">Nested Search</a></h3>
+
+<p>The first parameter in the search method can be constructed as a "navigation path" that reflects how
+these objects are related to the target object.
+This example retrieves all the Taxons related to the Chromosomes that are related to a Gene object:</p>
+<code>
+<DD>my @taxons = $appsvc->queryObject("CaCORE::CaBIO::Taxon,CaCORE::CaBIO::Chromosome", $gene);<br/></DD>
+<DD>foreach my $tx (@taxons){<br/></DD>
+<DD><DD>	print "id= " . $tx->getId . " scientificName=" . $tx->getScientificName ."\n";<br/></DD></DD>
+<DD>}<br/></DD>
+</code>
+
+
+<h3><a name="Throttle_Mechanism">Result Set Control</a></h3>
+
+<p>Depending on the search criteria, a search may yield a large result set, which cause slower response time
+and increase the likelihood of failure. A throttle mechanism is provided by:</p>
+<DD>
+<code>ApplicationService->query(targetClassName, knownSourceObject, startingIndex, requestedSize)</code><br/>
+</DD>
+<p>In the following example:</p>
+
+<DD>
+<code>my @geneSet = $appsvc->query("CaCORE::CaBIO::Gene", $chromo1, 10, 20);</code><br/>
+</DD>
+
+<ul>
+    <li>Parameter 1 indicates name of the target object, Gene,  to be retrieved
+    <li>Parameter 2 indicates search criteria. In this case, is the chromosome associated with the genes
+    <li>Parameter 3 indicates the requested start index, 10
+    <li>Parameter 4 indicates the requested size, 20
+</ul>
+
+This will retrieve related Gene objects from a Chromosome object, the result set starts from index number 10,
+and contains up to 20 Gene objects.</p>
+
+<p>Note: By default, when calling ApplicationService->queryObject, the caCORE server automatically
+trim the resultset to 1000 objects if the there more than 1000. So in reality, if you want to
+retrieve anything beyond 1000, you must use ApplicationService->query.</p>
+
+
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Struct.pm
+t/00-load.t
+t/00-pod-coverage.t
+t/00-pod.t
+t/01-array.t
+t/01-directcopy.t
+t/01-hash.t
+t/01-odd.t
+t/02-arrayofhash.t
+t/02-hashofarray.t
+t/03-multiarray.t
+t/03-multihash.t
+t/04-autoarr.t
+t/04-dotted.t
+t/04-mixed.t
+t/05-bad.t
+t/05-copies.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

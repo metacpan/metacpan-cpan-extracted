@@ -1,0 +1,29 @@
+[% FOREACH artist = artists.all %]
+    <a href="[% c.uri_for(c.controller('Resource::Artist').action_for('show'), [ artist.id ]) %]">[% artist.name %]</a>
+    Position: [% artist.position %]
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Artist').action_for('move_previous'), [ artist.id ] ) %]">
+        <input type="submit" value="move previous">
+    </form>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Artist').action_for('move_next'), [ artist.id ] ) %]">
+        <input type="submit" value="move next">
+    </form>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Artist').action_for('move_to'), [ artist.id ] ) %]">
+        <input type="hidden" id="pos" name="pos" value="1">
+        <input type="submit" value="move to pos 1">
+    </form>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Artist').action_for('move_to'), [ artist.id ] ) %]">
+        <input type="hidden" id="pos" name="pos" value="2">
+        <input type="submit" value="move to pos 2">
+    </form>
+    Albums:<br/>
+    [% FOREACH album = artist.albums %]
+        [% album.name %]<br/>
+    [% END %]
+    <br/>
+    Concerts:<br/>
+    [% FOREACH concert = artist.concerts %]
+        [% concert.location %]<br/>
+    [% END %]
+    <br/>
+    <br/>
+[% END %]

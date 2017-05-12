@@ -1,0 +1,9 @@
+Revision history for Perl extension Crypt::PKCS5.
+
+0.02  Tue Aug 28 01:39:48 JST 2007
+	- add PBKDF1 and PBKDF2
+
+0.01  Mon Aug 27 12:05:26 JST 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Crypt::PKCS5
+

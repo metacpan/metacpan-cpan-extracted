@@ -1,0 +1,67 @@
+CAM::EmailTemplate::SMTP - Net::SMTP based email message sender
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+To get the full effect of testing, please specify a recipient email
+address and mailhost:
+  setenv RECIPIENT user@foo.com
+  setenv MAILHOST mail.foo.com
+
+To take advantage of Net::SMTP's debugging capabilities, use this:
+  setenv SMTPTemplate_Debug 1
+
+
+DESCRIPTION
+
+This module alters the CAM::EmailTemplate mail delivery mechanism to
+use raw SMTP delivery (via Net::SMTP) instead of relying on the
+sendmail binary program.  This module is useful for machines which are
+not configured to do their own mail delivery.  Instead, the programmer
+or user specifies a mail server to use as the delivery agent.
+
+This module most closely resembles Mail::Send with the smtp
+option.  It has the following advantages:
+
+  * Integration of templating
+  * Ability to manually customize the presentation of the mail headers
+    (this is the reason why I use Net::SMTP instead of Mail::Send on
+    the back end -- Mail::Mailer::rfc822 hardcodes too much)
+
+and the following disadvantages:
+
+  * Only supports SMTP delivery (but see also CAM::EmailTemplate)
+  * Doesn't offer an easy-to-understand API for building the header
+  * Fewer mail delivery options
+
+This module can be extended to use alternate templating syntax just
+like CAM::EmailTemplate.  See the example in the README for that
+module, and just append "::SMTP" to all instances of
+"CAM::EmailTemplate".

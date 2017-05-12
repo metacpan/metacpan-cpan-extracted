@@ -1,0 +1,13 @@
+lib/CORBA/Cplusplus.pm
+lib/CORBA/Cplusplus/IncludeVisitor.pm
+lib/CORBA/Cplusplus/LiteralVisitor.pm
+lib/CORBA/Cplusplus/NameVisitor.pm
+lib/CORBA/Cplusplus/LengthVisitor.pm
+lib/CORBA/Cplusplus/TypeVisitor.pm
+bin/idl2cpp
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+README
+META.yml                                 Module meta-data (added by MakeMaker)

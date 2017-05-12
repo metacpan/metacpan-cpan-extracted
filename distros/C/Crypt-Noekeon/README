@@ -1,0 +1,27 @@
+Crypt::Noekeon
+==============
+
+Noekeon is a 128-bit key, 128-bit block cipher designed by Joan Daemen,
+Michael Peeters, Vincent Rijmen, and Gilles Van Assche. Noekeon was
+submitted as a NESSIE candidate.
+
+BONUS
+
+The C file, _noekeon.c, is a standalone Noekeon implementation. To
+compile it, type:
+
+        gcc -Wall _noekeon.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque <jcduque (AT) lycos (DOT) com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

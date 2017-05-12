@@ -1,0 +1,312 @@
+######################################################################
+    Cvs::Trigger 0.04
+######################################################################
+
+NAME
+    Cvs::Trigger - Argument parsers for CVS triggers
+
+SYNOPSIS
+        # CVSROOT/commitinfo
+        DEFAULT /path/trigger
+
+        # /path/trigger
+        use Cvs::Trigger;
+        my $c = Cvs::Trigger->new();
+        my $args = $c->parse("commitinfo");
+
+        if( $args->{repo_dir} =~ m#/secret$#) {
+            die "You can't check stuff into the secret project";
+        }
+
+        for my $file (@{ $args->{files} }) {
+            if( $file =~ /\.doc$/ ) {
+                die "Sorry, we don't allow .doc files in CVS";
+            }
+        }
+
+DESCRIPTION
+    CVS provides three different hooks to intercept check-ins. They can be
+    used to approve/reject check-ins or to take action, like logging the
+    check-in in a database.
+
+    "commitinfo"
+        Gets executed before the check-in happens. If it returns a false
+        value (usually caused by calling "die()"), the check-in gets
+        rejected.
+
+        The following entry in the CVS admin file "commitinfo" calls the
+        hook for all check-ins:
+
+            # CVSROOT/commitinfo
+            ALL /path/cvstrig
+
+        The corresponding script, "/path/cvstrig", parses the arguments
+        which "cvs" passes to them:
+
+            # /path/cvstrig
+            use Cvs::Trigger;
+            my $c = Cvs::Trigger->new();
+            my $args = $c->parse("commitinfo");
+
+        Note that you need to specify the hook name to the "parse" method,
+        because CVS provides the different hooks with different parameters.
+        In case of the "commitinfo" hook, the following parameters are
+        available as keys into the has referenced by $args:
+
+        "repo_dir"
+            Full path to the repository directory where the check-in
+            happens, e.g. "/cvsroot/foo/bardir".
+
+        "files"
+            Reference to an array of filenames involved the check-in. No
+            path information is provided, all files are relative to the
+            "repo_dir" directory.
+
+        "opts"
+            Additionally, optional parameters passed to the trigger script
+            are available with this parameter. Note that the number of these
+            parameters needs to be passed to the "parse" method:
+
+                # CVSROOT/commitinfo
+                ALL /path/cvstrig foo bar
+
+                # /path/cvstrig
+                use Cvs::Trigger;
+                my $c = Cvs::Trigger->new();
+                my $args = $c->parse("commitinfo", { n_opt_args => 2 });
+
+                    # => "foo-bar"
+                print join('-', @{ $args->{opts} }), "\n";
+
+    "verifymsg"
+        Gets executed right after the user entered the check-in message.
+        Based on the message text, the check-in can be approved or rejected.
+
+        This hook is typically used to enforce a certain format or content
+        of the log message provided by the user.
+
+        Here's an example that checks if the check-in message references a
+        bug number:
+
+            # CVSROOT/verifymsg
+            DEFAULT /path/checkin-verifier
+
+            # /path/checkin-verifier
+            #!/usr/bin/perl
+            use Cvs::Trigger;
+            my $c = Cvs::Trigger->new();
+            my $args = $c->parse("verifymsg");
+    
+            if( $args->{message} =~ m(fixes bug #)) {
+                die "No bug number specified";
+            }
+
+        "verifymsg" provides the message, accessible by the "message" key in
+        the hash ref returned by the "parse" method. Additionally, the
+        "opts" key provides a list of optional parameters passed to the
+        script (check "commitinfo" for details).
+
+    "loginfo"
+        Gets executed after the check-in succeeded. It doesn't matter if the
+        corresponding script fails or not, the check-in has already happend
+        by the time it gets called.
+
+        An entry like
+
+           DEFAULT /path/string
+
+        will call the loginfo script with the following data on STDIN:
+
+            Update of /cvsroot/m/a
+            In directory mybox:/local_root/m/a
+    
+            Modified Files:
+                   a1.txt
+            Log Message:
+            Fixing some bug, forgot which one. Yay!
+
+        There's no need to parse this, though, "Cvs::Trigger" will do that
+        for you. The following hash keys are available:
+
+        "repo_dir"
+            Full path to the repository directory where the check-in
+            happens, e.g. "/cvsroot/foo/bardir".
+
+        "host"
+            Name of the host where the check-in has been initiated.
+
+        "local_dir"
+            The directory in the user's workspace where the check-in got
+            initiated.
+
+        "message"
+            Check-in message.
+
+        "files"
+            Reference to an array of filenames involved the check-in. No
+            path information is provided, all files are relative to the
+            "repo_dir" directory.
+
+        "loginfo" scripts can get additional data from "cvs". For this to
+        happen, the call syntax in the "loginfo" administration file needs
+        to change to this format:
+
+           DEFAULT ((echo %{sVv}; cat) | /path/script)
+
+        The first line piped into the script's STDIN then consists of the
+        file name, the previous and the new revision number, all
+        space-separated (oh well, this seems to have been invented before
+        spaces in file names came around):
+
+            module/path file1.txt,1.3,1.4 file2,1.1,1.2
+            Update of /tmp/RgNSQ4Yomr/cvsroot/module/path
+            In directory mybox:/tmp/RgNSQ4Yomr/local_root/module/path
+
+            Modified Files:
+                file1.txt file2.txt
+            Log Message:
+                Here are my check-in notes.
+
+        In order to parse this enhanced format, the call to "Cvs::Trigger"'s
+        "parse" method needs to be modified:
+
+            use Cvs::Trigger;
+            my $c = Cvs::Trigger->new();
+            my $args = $c->parse("verifymsg", { rev_fmt => "sVv" });
+
+        The result in args will then store the file names and their
+        revisions under the "revs" key:
+
+            use Data::Dumper;
+            print Dumper($args->{revs});
+
+                # $VAR1 = { file1.txt => [1.3, 1.4]
+                            file2.txt => [1.1, 1.2]
+                          }
+
+  Use the same script for multiple hooks
+    You can call the same trigger script in multiple hooks. Since the
+    parameters passed to the script vary from hook to hook, the easiest
+    solution is to pass the hook name on to the script, so that it can
+    switch the command argument parser accordingly:
+
+        # CVSROOT/commitinfo
+        DEFAULT /path/trigger commitinfo
+
+        # CVSROOT/verifymsg
+        DEFAULT /path/trigger verifymsg
+
+        #!/usr/bin/perl
+        use Cvs::Trigger;
+        my $c = Cvs::Trigger->new();
+
+        my $hook = shift;
+
+           # First argument specifies the parser
+        my $args = $c->parse( $hook );
+    
+        if( $hook eq "verifymsg" ) { 
+            if( $args->{message} =~ m(fixes bug #)) {
+                die "No bug number specified";
+            }
+        } 
+        elsif( $hook eq "commitinfo" ) { 
+            if( $args->{repo_dir} =~ m#/secret$#) {
+                die "You can't check stuff into the secret project";
+            }
+        }
+
+  Remember fields by caching
+    THIS FEATURE IS EXPERIMENTAL. USE AT YOUR OWN RISK.
+
+    If you want to make a decision based on both the file name and the
+    check-in message, none of the hooks provides all necessary information
+    in one swoop. If, say, ".c" files need a bug number in their check-in
+    message and ".txt" don't, here's a tricky way to forward the filenames
+    parsed by "commitinfo" to the "verifymsg" hook, which has the check-in
+    message available:
+
+        # CVSROOT/commitinfo
+        DEFAULT /path/trigger commitinfo
+
+        # CVSROOT/verifymsg
+        DEFAULT /path/trigger verifymsg
+
+        #!/usr/bin/perl
+        use Cvs::Trigger;
+
+            # Turn on the cache
+        my $c = Cvs::Trigger->new( cache => 1 );
+
+        my $hook = shift;
+
+           # First argument specifies the parser
+        my $args = $c->parse( $hook );
+    
+        if( $hook eq "verifymsg" ) { 
+            # We're in verifymsg now, but the cache still holds the file
+            # names obtained in the commitinfo phase
+            if( grep { /\.c$/ } @{ $args->{cache}->{files} } and
+                $args->{message} =~ m(fixes bug #) ) {
+                die "No bug number specified in .c file";
+            }
+        } 
+
+    Caching has a couple of gotchas, though. First, items can only stay in
+    the cache for a limited time, to avoid a cache overflow with many
+    simultaneous checkins going on.
+
+    However, the time span between "commitinfo" and "verifymsg" can hardly
+    be estimated accurately. What if someone types "cvs commit" and then
+    goes to lunch? The editor window will stay open, and if the message gets
+    saved a couple of hours later, the cache still needs to hold a copy of
+    the "commitinfo" data.
+
+    Deleting the cache data once "verifymsg" is done with it doesn't work
+    either. If you type "cvs commit" in a directory with multiple
+    subdirectories, both the "commitinfo" and "verifymsg" will get called
+    for each subdirectory containing modified files. "Cvs::Trigger"
+    therefore maintains a TTL (time to live) counter to keep track of how
+    many instances of "verifymsg" are still going to read it. Bottom line:
+    The cache entry will be deleted once the last "verifymsg" instance is
+    done with it.
+
+    Nevertheless, determining the cache timeout is a delicate issue. The
+    default values are set as follows:
+
+            # Turn on the cache
+        my $c = Cvs::Trigger->new(
+           cache                     => 1,
+           cache_default_expires_in  => 3600,
+           cache_auto_purge_interval => 1800,
+           cache_namespace           => "cvs",
+        );
+
+    Therefore, the cache will expire entries after an hour and it will run
+    the check/prune procedure every half hour. To set different values,
+    simply call "new" with different parameters. The cache namespace can
+    also be configured, see the Cache::Cache manual page for details.
+
+    The cache makes use of the fact that the "commitinfo" and "verifymsg"
+    scripts are run by processes sharing the same parent pid (ppid). The
+    cache indexes its data using this pid value. If the operating system
+    reuses the same pid within the expiration timeframe, a clash will occur.
+
+TODO List
+        * Try filenames with commas, spaces, and newlines
+        * tests for optional arguments
+        * methods vs. hash access
+        * no STDIN on loginfo => hangs
+
+SEE ALSO
+    http://ximbiot.com/cvs/wiki/index.php?title=CVS--Concurrent_Versions_Sys
+    tem_v1.12.12.1:_Reference_manual_for_Administrative_files#SEC184
+
+LEGALESE
+    Copyright 2006 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2006, Mike Schilli <m@perlmeister.com>
+

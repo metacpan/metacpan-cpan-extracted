@@ -1,0 +1,18 @@
+---
+name: CGI-Safe
+version: 1.25
+author:
+  - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>
+abstract: |-
+  Safe method of using CGI.pm.  This is pretty much a two-line change
+  for most CGI scripts.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 2.2
+provides:
+  CGI::Safe:
+    file: lib/CGI/Safe.pm
+    version: 1.25
+generated_by: Module::Build version 0.2702

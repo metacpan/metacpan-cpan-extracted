@@ -1,0 +1,22 @@
+---
+abstract: 'Encrypt your code'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Code-Crypt
+requires:
+  Crypt::CBC: 2.32
+  Crypt::DES: 2.05
+  MIME::Base64: 3.13
+  Moo: 1.000007
+resources:
+  repository: git://github.com/frioux/Code-Crypt.git
+version: 0.001000

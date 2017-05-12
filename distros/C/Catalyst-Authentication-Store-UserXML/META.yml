@@ -1,0 +1,46 @@
+---
+abstract: 'Catalyst authentication storage using xml files'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Path::Class: '0.26'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+keywords:
+  - catalyst
+  - store
+  - xml
+  - folder
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Authentication-Store-UserXML
+provides:
+  Catalyst::Authentication::Store::UserXML:
+    file: lib/Catalyst/Authentication/Store/UserXML.pm
+    version: '0.04'
+  Catalyst::Authentication::Store::UserXML::Folder:
+    file: lib/Catalyst/Authentication/Store/UserXML/Folder.pm
+    version: '0.03'
+  Catalyst::Authentication::Store::UserXML::User:
+    file: lib/Catalyst/Authentication/Store/UserXML/User.pm
+    version: '0.03'
+requires:
+  Authen::Passphrase: '0'
+  Authen::Passphrase::BlowfishCrypt: '0'
+  Catalyst::Authentication::User: '0'
+  Catalyst::Plugin::Authentication: '0'
+  Moose: '0'
+  Path::Class: '0.26'
+  XML::LibXML: '0'
+resources:
+  bugtracker: http://github.com/jozef/Catalyst-Authentication-Store-UserXML/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/Catalyst-Authentication-Store-UserXML
+version: '0.04'

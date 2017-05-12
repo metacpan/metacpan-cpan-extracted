@@ -1,0 +1,3 @@
+[% FOREACH session IN sessions -%]
+USERNAME: "[% session.USERNAME -%]", IP: "[% session.IP -%]", MAC: "[% session.MAC -%]", STATE: "[% session.STATE -%]", START_TIME: "[% session.LOCAL_START_TIME -%]", STOP_TIME: "[% session.LOCAL_STOP_TIME -%]", USER_AGENT: "[% session.USER_AGENT -%]"
+[% END %]

@@ -1,0 +1,29 @@
+package config;
+
+use vars qw($front_page $error_page $confirmation_pag
+	    $backend
+	    $db_name $db_table $db_uname $db_passwd $db_host $db_port
+	    $separator $list_name $list_dir);
+
+$front_page = 'user.html';
+$error_page = 'error.html';
+$confirmation_page = 'confirm.html';
+
+$list_name = '';
+$backend = 'CSV';
+
+# Exporter
+$separator = ',';
+
+# CSV backend
+$list_dir = '';
+
+# database backend (pgsql/mysql)
+$db_name = '';
+$db_table = '';
+$db_uname = '';
+$db_passwd = '';
+$db_host = '';
+$db_port = '';
+
+1;

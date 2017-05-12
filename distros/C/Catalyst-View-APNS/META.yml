@@ -1,0 +1,27 @@
+---
+abstract: 'APNS View Class.'
+author:
+  - 'haoyayoi <st.hao.yayoi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-APNS
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst: 0
+  Net::APNS: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

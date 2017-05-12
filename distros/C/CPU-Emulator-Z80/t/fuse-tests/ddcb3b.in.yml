@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 32
+    - 59
+  28685:
+    - 169
+name: ddcb3b
+registers:
+  AF: 7129
+  AF_: 0
+  BC: 51093
+  BC_: 0
+  DE: 55470
+  DE_: 0
+  HL: 31951
+  HL_: 0
+  I: 0
+  IX: 28653
+  IY: 2524
+  PC: 0
+  R: 0
+  SP: 0

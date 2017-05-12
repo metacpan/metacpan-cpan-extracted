@@ -1,0 +1,146 @@
+1.22:	Records created by Crypt::PWSafe3 (eg. the ones fetched
+	with getrecords) are now associated with the parent
+	object, so that you can modify them directly and call
+	$vault->save afterwards without using $vault->modifyrecord.
+
+        Erase passwd from memory using zeros instead of
+        random bytes. fixes github#9.
+
+	Fixed rt.cpan.org#112975: Crypt::ECB (which we use) have been
+	reworked and among other issues it fixed handline of padding.
+	PWSafe3.pm did not specify a padding scheme (because it doesn't
+	use it) and therefore Crypt::ECB enforced a default scheme
+	which lead to an invalid key size. Now we specify explicitly
+	padding:none, as suggested by Christoph Appel.
+
+1.21:
+	forgot to load File::Spec
+
+1.20:
+	applied another patch by David Dick: writing tmp files in
+	the same directory where the vault file resides (unless it's
+	not writable).
+
+1.19:
+	applied patch by David Dick, which adds some more precautions
+	of i/o error handling and flushing.
+
+1.17:
+	added license to META
+
+	open tmpfiles with O_EXLOCK disabled (cpantesters)
+
+	added new parameter 'create', enabled by default,
+	which creates a new vault if enabled and dies otherwise.
+
+	enhanced unit tests to report if read/write of files fails.
+
+	added unit test to create a new vault
+
+	added POD for newrecord() and addrecord(), previously
+	missing.
+
+	replaced "new $perl::$object" with $perl::$object->new()
+	everywhere.
+
+	using weak random source for unit tests to avoid blocking
+	/dev/random on cpantesters systems with heavy entropy
+	load.
+
+1.16
+	re-licensed from artistic1 to artistic2 in order to be
+	compatible to fedora packaging. no code changes otherwise
+
+1.15
+	fixed github#8, using File::Temp instead of self baked
+	File::Spec.
+
+1.14
+	fixed github#7: added PasswordPolicy.pm to MANIFEST.
+
+1.13
+	added Crypt::PWSafe3::PasswordPolicy submodule, which allows
+	to access the password policy of a PasswordSafe record.
+
+1.12
+	I somehow managed to mangle version numbers of sub modules,
+	now all properly incremented.
+
+1.11
+	fixed:
+	https://github.com/TLINDEN/Crypt--PWSafe3/issues/6
+	https://github.com/TLINDEN/Crypt--PWSafe3/issues/5
+	This was NOT caused by polish characters, but by the
+	password expire field being set (I didn't use it so far
+	and my test database doesn't contain records with this
+	field set). The 'W<*' pack identifier had been used
+	for this field and W doesn't support < indeed. I changed
+	it to use 'S<' now, which is a 2 byte little endian
+	value according to the db-spec. I also edited the
+	test database so that it contains the field now, so that
+	a make test catches it.
+
+	fixed cpantester problem with taintmode unlink() call,
+	now $tmpfile is untainted before
+
+1.10
+	I forgot to fix the pack() format as well.
+
+1.09
+	the unpack() formatstring for the uuid (field 0x01) "L<4" didn't
+	return a hex string, but a number only, which is fine for most
+	cases, but isn't a correct Data::UUID representation. Changed back
+	to "H*".
+
+1.08
+	fixed pack/unpack formats to use strictly little-endian values as required.
+	machine-dependend unpack() formats changed to machine-independend.
+
+1.07
+	applied patch by  https://github.com/Mekk:
+	https://github.com/TLINDEN/Crypt--PWSafe3/pull/3,
+	fix import of Bytes::Random::Secure.
+
+1.06
+	applied patch by  https://github.com/Mekk:
+	https://github.com/TLINDEN/Crypt--PWSafe3/pull/2,
+	adds new function "deleterecord()", improves performance
+	when using Bytes::Random::Secure[now optional] and fixes
+	an error in ::Record::addfield().
+
+1.05
+	applied patch by https://github.com/Mekk:
+	https://github.com/TLINDEN/Crypt--PWSafe3/pull/1,
+	which replaces use of cp and mv commands with File::Copy.
+	this makes it portable.
+
+1.04
+
+	fixed rt.cpan.org#75145. uninitialized fields lead to
+        program abort. solved by pre-initializing them in the
+        new records method. types notes and groups affected.
+
+	fixed rt.cpan.org#75146. mtime will only modified if
+	the passwd field changed. POD adjusted. Fix suggested
+	by Luca Filipozzi - thx.
+
+
+1.03
+	after saving we do not mv the tmp file but copying
+	it, because mv sometimes doesn't work with files the
+	current user is not the owner but has write permissions
+	while cp works on such files. so now we cp and unlink
+	the tmpfile after saving.
+
+
+1.02
+	doc fix in ::Record (group separator is . not /)
+	added Shell.pm to Makefile.PL dependencies
+
+
+1.01
+	bug fix in t/run.t
+
+
+1.00
+	initial version

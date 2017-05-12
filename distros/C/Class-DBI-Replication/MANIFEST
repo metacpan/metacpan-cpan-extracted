@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/DBI/Replication.pm
+t/00_Replication.t

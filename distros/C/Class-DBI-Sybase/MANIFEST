@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Sybase.pm
+FreeTDS.pm
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+{
+   "abstract" : "MongoDB driver for CHI",
+   "author" : [
+      "Heiko Jansen <hjansen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CHI-Driver-MongoDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.60",
+            "MongoDB" : "v1.4.5",
+            "Moo" : "2.000000",
+            "Time::Moment" : "0.19",
+            "Try::Tiny" : "0",
+            "URI::Escape::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/heikojansen/chi-driver-mongodb.git",
+         "web" : "https://github.com/heikojansen/chi-driver-mongodb"
+      }
+   },
+   "version" : "0.0001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,28 @@
+Revision history for CGI-Application-Plugin-HTCompiled
+
+1.06
+    - increased minimum Perl version to Perl 5.8, as does HTML::Template::Compiled
+    - moved POD tests to xt folder (dedicated author tests folder, run "prove t xt" for all tests)
+
+1.05
+    - changed to way of using UNIVERSAL::isa, as "UNIVERSAL->import is
+    deprecated and will be removed in a future perl"
+
+1.04
+    - clean up POD
+    - build the dist with Module::Build
+    - test for CGI::Application v. 4.31
+    - renamed TestApp2 to CGIAPP_TestApp2 to avoid unauthorized release warning
+    - require ExtUtils::Install >= 1.52 to properly install with makefile
+
+1.03 Tue Oct 13 20:25:50 2009
+    - No code changes. I just didn't upload the last version the right way.
+
+1.02 Tue Oct 13 16:54:32 2009
+    - Changed the way the plugin gets used from inheritance to ordinary "use".
+    - Changed some tests.
+
+1.01 Wed Dec  7 23:08:30 EST 2005
+    - Fixed this Changes file...
+
+1.00 First release

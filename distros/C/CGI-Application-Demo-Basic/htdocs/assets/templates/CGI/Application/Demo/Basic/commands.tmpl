@@ -1,0 +1,11 @@
+<br />
+<span class = "cgi_app_no_submit"><tmpl_var name = commands>:</span>
+<table>
+	<tmpl_loop name = row_loop>
+		<tr>
+			<tmpl_loop name = col_loop>
+				<td><input type = "submit" name = "submit" class = "cgi_app_submit" value="<tmpl_var name=td>" <tmpl_var name=onClick> /></td>
+			</tmpl_loop>
+		</tr>
+	</tmpl_loop>
+</table>

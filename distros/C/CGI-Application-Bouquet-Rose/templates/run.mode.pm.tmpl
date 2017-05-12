@@ -1,0 +1,141 @@
+package <tmpl_var name=package>::<tmpl_var name=module>;
+
+use base '<tmpl_var name=package>';
+use strict;
+use warnings;
+
+use Data::Page;
+use <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Form;
+use <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Manager;
+
+our $VERSION = '1.00';
+
+# -----------------------------------------------
+
+sub cgiapp_init
+{
+	my($self) = @_;
+
+	$self -> cgiapp_init_local();
+	$self -> run_modes([qw/search/]);
+
+} # End of cgiapp_init.
+
+# -----------------------------------------------
+
+sub search
+{
+	my($self)    = @_;
+	my($special) = {_page => 1};
+	my(%var)     = $self -> query() -> Vars();
+
+	# Discard undefined and unwanted input.
+	# What's left will be the Rose search keys.
+	# Of course, if there are no values, skip the search.
+
+	my($key, @key);
+
+	for $key (keys %var)
+	{
+		if (! defined $var{$key})
+		{
+			delete $var{$key};
+
+			next;
+		}
+
+		if (length($var{$key}) == 0)
+		{
+			delete $var{$key};
+
+			next;
+		}
+
+		if ($key =~ /^(?:next|previous|submit)$/)
+		{
+			delete $var{$key};
+
+			next;
+		}
+
+		if ($key eq '_page')
+		{
+			$$special{$key} = $var{$key};
+
+			# Delete it so Rose doesn't see it when the iterator is built.
+
+			delete $var{$key};
+
+			next;
+		}
+
+		# Process search keys.
+
+		push @key, $var{$key};
+	}
+
+	# Do a search if there is user input.
+
+	my($form)         = <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Form -> new();
+	my($results)      = '';
+	my($search_count) = 0;
+	my($value)        = join($;, @key);
+
+	# This form name is used in cgiapp.pm.tmpl.
+
+	$form -> name('search');
+
+	my($pager);
+
+	if ($value)
+	{
+		$pager     = Data::Page -> new();
+		my($count) = <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Manager -> get_<tmpl_var name=iterator>_count
+		(
+			page     => $pager -> current_page(),
+			per_page => $pager -> entries_per_page(),
+			query    => [map{[\"t1.$_ like ?" => $var{$_}]} keys %var]
+		);
+
+		$pager -> total_entries($count);
+		$pager -> entries_per_page($self -> param('config') -> get_db_rows_per_page() );
+
+		if ($$special{'_page'} < 0)
+		{
+			$$special{'_page'} = $pager -> first_page();
+		}
+		elsif ($$special{'_page'} > $pager -> last_page() )
+		{
+			$$special{'_page'} = $pager -> last_page();
+		}
+
+		$pager -> current_page($$special{'_page'});
+
+		# 1 of 2: The table name is in lower case to keep Rose happy.
+
+		my($iterator) = <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Manager -> get_<tmpl_var name=iterator>_iterator
+		(
+			page     => $pager -> current_page(),
+			per_page => $pager -> entries_per_page(),
+			query    => [map{[\"t1.$_ like ?" => $var{$_}]} keys %var]
+		);
+		($results, $search_count) = $self -> build_results($form, $iterator);
+	}
+
+	# Build the search form, and add the results, if any.
+
+	my($content)     = $self -> load_tmpl('content.tmpl');
+	my($search_mode) = 1;
+	my($total_count) = <tmpl_var name=prefix>::Rose::<tmpl_var name=module>::Manager -> get_<tmpl_var name=iterator>_count();
+
+	$content -> param(search_content => $self -> build_search_form($search_mode, $form, '<tmpl_var name=module>', 'search', \%var, $pager) );
+
+	# 2 of 2: The table name is in the default case to keep the user happy.
+
+	return $self -> output($content -> output(), $results, $search_count, "<tmpl_var name=table>. Total records: $total_count");
+
+} # End of search.
+
+# -----------------------------------------------
+
+1;

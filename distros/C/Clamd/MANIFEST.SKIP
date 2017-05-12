@@ -1,0 +1,16 @@
+CVS/.*
+\.bak$
+\.sw[a-z]$
+\.tar$
+\.tgz$
+\.tar\.gz$
+^mess/
+^tmp/
+^blib/
+^build/
+^clamav.conf$
+^Clamd.pbproj/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$
+~$

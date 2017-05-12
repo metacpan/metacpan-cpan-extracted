@@ -1,0 +1,32 @@
+---
+abstract: 'Modern YAML-based config loader from file or directory.'
+author:
+  - 'Meettya <meettya@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-YAML-Modern
+provides:
+  Config::YAML::Modern:
+    file: lib/Config/YAML/Modern.pm
+    version: 0.36
+requires:
+  Carp: 1.2
+  Data::Diver: 1.0101
+  File::Basename: 2.82
+  File::Glob: 1.12
+  File::Spec: 3.33
+  Hash::Merge: 0.12
+  YAML::Any: 0.72
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Meettya/Config-YAML-Modern/
+version: 0.36

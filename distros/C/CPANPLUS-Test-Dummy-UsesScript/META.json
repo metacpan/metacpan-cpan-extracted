@@ -1,0 +1,40 @@
+{
+   "abstract" : "CPANPLUS Test Dummy",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS-Test-Dummy-UsesScript",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS::Test::Dummy::HasScript" : "0.0004",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/cpanplus-test-dummy-usesscript",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/cpanplus-test-dummy-usesscript.git",
+         "web" : "https://github.com/bingos/cpanplus-test-dummy-usesscript"
+      }
+   },
+   "version" : "0.0004"
+}
+

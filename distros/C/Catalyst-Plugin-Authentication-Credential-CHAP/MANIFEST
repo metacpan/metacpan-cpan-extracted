@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+contrib/md5.js
+contrib/sha1.js
+lib/Catalyst/Plugin/Authentication/Credential/CHAP.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

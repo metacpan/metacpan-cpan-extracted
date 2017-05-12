@@ -1,0 +1,69 @@
+Contextual::Return version 0.004014
+
+This module provides a collection of named blocks that allow a return
+statement to return different values depending on the context in which it's
+called. For example:
+
+    use Contextual::Return;
+    use Carp;
+
+    sub foo {
+        return
+            BOOL   { 1 }
+            NUM    { 7*6 }
+            STR    { 'forty-two' }
+
+            LIST   { 0..41 }
+
+            HASHREF   { {name => 'Arthur', species => 'EXTINCT'} }
+            ARRAYREF  { ['q'..'z'] }
+
+            GLOBREF   { \*STDOUT }
+            CODEREF   { croak 'I am not a code reference!'; }
+        ;
+    }
+
+    # and later...
+
+    if (my $foo = foo()) {                 # evals to 1 in boolean context
+        for my $count (1..$foo) {          # evals to 7*6 in numeric context
+            print "$count: $foo is:\n"     # evals to 'forty-two' in str context
+                . "    array: @{$foo}\n"   # evals to 'q'..'z' in array context
+                . "    hash:  $foo->{name} is $foo->{species}\n"
+                                           # evals to hash in hashref context
+                ;
+        }
+        print {$foo} $foo->();             # Your planet destroyed here
+    }
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

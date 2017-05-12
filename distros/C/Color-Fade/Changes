@@ -1,0 +1,19 @@
+Revision history for Perl extension Color::Fade.
+
+  0.02  Aug  1 2008
+  - Major bugfix: If the input string was so massive and not enough colors were
+    sent in with it, the length of a given segment of the string might've been
+    greater than 255, meaning that the delta of a RGB value against the length
+    of the segment would be a number less than 1. Long story short, the fading
+    would fail miserably. This has been fixed by detecting segment lengths higher
+    than 128 characters, and looping through the provided colors and adding more
+    to the list. So if the provide colors are red and yellow, it would make the
+    list contain (red, orange, yellow), and then (red, orange-red, orange,
+    yellow-orange, yellow), until the length of a segment divided by the new
+    color selection is less than 128 characters. If you send something so massive
+    that it fails to factor it down 100 times, it gives up and continues.
+  - Minor bugfix: I was using oct() instead of hex() to convert hex into
+    decimal.
+
+  0.01  Jan 29 2007
+  - Initial release.

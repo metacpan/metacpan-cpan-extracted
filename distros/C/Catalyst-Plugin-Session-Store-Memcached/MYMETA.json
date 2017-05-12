@@ -1,0 +1,47 @@
+{
+   "abstract" : "Memcached storage backend for",
+   "author" : [
+      "This module is derived from L<Catalyst::Plugin::Session::FastMmap> code, and"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Session-Store-Memcached",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Memcached::Managed" : "0",
+            "Catalyst::ClassData" : "0",
+            "Catalyst::Plugin::Session" : "0.26",
+            "MRO::Compat" : "0",
+            "Moose" : "0",
+            "MooseX::Emulate::Class::Accessor::Fast" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

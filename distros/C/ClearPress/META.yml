@@ -1,0 +1,126 @@
+---
+abstract: 'ClearPress - Simple, fresh & fruity MVC framework'
+author:
+  - 'Roger M Pettett <rpettett@cpan.org>'
+build_requires:
+  CPAN: '1.9205'
+  Cwd: '3.2701'
+  File::Copy: '2.09'
+  File::Path: 2.07_02
+  File::Spec: '3.2701'
+  File::Temp: '0.22'
+  JSON: '2.12'
+  Test::More: '0.8'
+  Test::Trap: '0'
+  XML::LibXML: '1.66'
+  XML::Simple: '2.18'
+  XML::TreeBuilder: '3.09'
+  XML::XPath: '1.30'
+  bareword::filehandles: '0.003'
+  indirect: '0.31'
+  multidimensional: '0.010'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ClearPress
+provides:
+  ClearPress:
+    file: lib/ClearPress.pm
+    version: v475.3.3
+  ClearPress::Localize:
+    file: lib/ClearPress/Localize.pm
+    version: v475.3.3
+  ClearPress::authdecor:
+    file: lib/ClearPress/authdecor.pm
+    version: v475.3.3
+  ClearPress::authenticator:
+    file: lib/ClearPress/authenticator.pm
+    version: v475.3.3
+  ClearPress::authenticator::db:
+    file: lib/ClearPress/authenticator/db.pm
+    version: v475.3.3
+  ClearPress::authenticator::ldap:
+    file: lib/ClearPress/authenticator/ldap.pm
+    version: v475.3.3
+  ClearPress::authenticator::passwd:
+    file: lib/ClearPress/authenticator/passwd.pm
+    version: v475.3.3
+  ClearPress::authenticator::session:
+    file: lib/ClearPress/authenticator/session.pm
+    version: v475.3.3
+  ClearPress::controller:
+    file: lib/ClearPress/controller.pm
+    version: v475.3.3
+  ClearPress::decorator:
+    file: lib/ClearPress/decorator.pm
+    version: v475.3.3
+  ClearPress::driver:
+    file: lib/ClearPress/driver.pm
+    version: v475.3.3
+  ClearPress::driver::Pg:
+    file: lib/ClearPress/driver/Pg.pm
+    version: v475.3.3
+  ClearPress::driver::SQLite:
+    file: lib/ClearPress/driver/SQLite.pm
+    version: v475.3.3
+  ClearPress::driver::mysql:
+    file: lib/ClearPress/driver/mysql.pm
+    version: v475.3.3
+  ClearPress::model:
+    file: lib/ClearPress/model.pm
+    version: v475.3.3
+  ClearPress::util:
+    file: lib/ClearPress/util.pm
+    version: v475.3.3
+  ClearPress::view:
+    file: lib/ClearPress/view.pm
+    version: v475.3.3
+  ClearPress::view::error:
+    file: lib/ClearPress/view/error.pm
+    version: v475.3.3
+recommends:
+  Crypt::MySQL: '0.04'
+  DBD::SQLite: '1.14'
+  DBD::mysql: '4.007'
+  Digest::MD5: '2.39'
+  Digest::SHA: '5.47'
+  Net::LDAP: '0.39'
+requires:
+  CGI: '3.20'
+  Carp: '1.02'
+  Class::Accessor: '0.31'
+  Config::IniFiles: '2.38'
+  Crypt::Blowfish: '2.10'
+  Crypt::CBC: '2.30'
+  DBI: '1.51'
+  English: '1.01'
+  HTML::Entities: '1.35'
+  HTTP::ClientDetect::Language: '0.03'
+  HTTP::Server::Simple: '0.44'
+  IO::Capture: '0.05'
+  IO::Scalar: '2.110'
+  Lingua::EN::Inflect: '1.89'
+  Lingua::EN::PluralToSingular: '0.17'
+  Locale::Maketext: '1.19'
+  Locale::Maketext::Lexicon: '0.91'
+  MIME::Base64: '3.07'
+  POSIX: '1.09'
+  Readonly: '1.03'
+  Template: '2.19'
+  Template::Filters: '2.24'
+  XML::Simple: '2.18'
+  YAML::Tiny: '1.36'
+  base: '2.13'
+  perl: v5.8.8
+  strict: '1.03'
+  warnings: '1.05'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/rmp/libclearpress-perl
+version: v475.3.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

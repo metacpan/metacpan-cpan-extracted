@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Model::Net::Amazon.
+
+0.01001 2007-05-14
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Catalyst::Model::Net::Amazon -b 5.8.1 -v 0.01001
+

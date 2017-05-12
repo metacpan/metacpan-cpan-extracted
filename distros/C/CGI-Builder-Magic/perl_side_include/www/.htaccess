@@ -1,0 +1,28 @@
+# /www/.htaccess file
+
+
+# if mod_perl is loaded
+<IfModule mod_perl.c>
+
+    # require application module
+    # change this path as needed
+    PerlRequire /perl_side_include/lib/MagicWebApp.pm
+    
+    # just for '*.html' files
+    <FilesMatch "\.html$">
+    
+        SetHandler perl-script
+
+        # mod_perl 1
+        <IfDefine !MODPERL2>
+            PerlHandler MagicWebApp
+        </IfDefine>
+        
+        # mod_perl 2
+        <IfDefine MODPERL2>
+            PerlResponseHandler MagicWebApp
+        </IfDefine>
+        
+    </FilesMatch>
+                                           
+</IfModule>

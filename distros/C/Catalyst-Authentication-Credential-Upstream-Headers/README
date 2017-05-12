@@ -1,0 +1,81 @@
+NAME
+    Catalyst::Authentication::Credential::Upstream::Headers
+
+SYNOPSIS
+     use Catalyst qw(Authentication);
+
+     __PACKAGE__->config(
+         authentication => {
+             default_realm => 'upstream',
+             realms => {
+                 upstream => {
+                     credential => {
+                         class => 'Upstream::Headers',
+
+                         # name of header containing the user id
+                         user_header => 'X-Catalyst-Credential-Upstream-User',
+
+                         # name of header containing a delimited list of user roles
+                         role_header => 'X-Catalyst-Credential-Upstream-Roles',
+
+                         # the delimiter to use when parsing roles
+                         role_delimiter => '|',
+
+                         # boolean value indicating whether or not to attempt to
+                         # parse roles as X.500 distinguished names
+                         use_x500_cn => 1
+                     }
+                 }
+             }
+         }
+     );
+
+DESCRIPTION
+    The Upstream::Headers credential class provides for passing identity
+    metadata to the application via HTTP headers. These headers might be
+    appended by an HTTP front-end that performs authentication services
+    before reverse proxying to the application.
+
+    In addition to the username, a list of delimited roles may be passed.
+    The delimiter is configurable by setting the role_delimiter property in
+    the config. By default, the pipe character ('|') is used for the
+    delimiter.
+
+    By default, roles are crudely checked to see if they look like X.501
+    distinguished names. If so, the commonName (cn) component of the DN is
+    returned instead of the full DN. This behavior may be disabled by
+    setting use_x500_cn to false in the config.
+
+HISTORY
+    This authentication credential for Catalyst::Plugin::Authentication was
+    originally implemented to support OpenAM in a way that fit into the
+    framework provided by C::P::A.
+
+    OpenAM (formerly Sun's OpenSSO) is a federated identity management
+    platform. It is a complex product supporting SAML and integration with
+    Microsoft's Active Directory. OpenAM provides authentication and
+    authorization services to web applications by utilizing agents that run
+    in front of the application. The agents are implemented as plugins for
+    popular HTTP servers, injecting logic into the request handler and
+    applying policy based upon upstream configuration.
+
+    One of the methods of passing identity information back down to the
+    application is by including the information in the request headers. This
+    is similar in scope to the Credential::Remote implementation, but using
+    headers instead of environment variables.
+
+CAVEATS
+    * I really hope I don't have to say it, but don't let users bypass your
+      authentication mechanisms by passing the headers themselves.
+
+    * This is a pretty crappy way of passing identity metadata around.
+
+AUTHOR
+    Mike Eldridge <diz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Infinity Interactive, Inc.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

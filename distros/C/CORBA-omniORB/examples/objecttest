@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB;
+use Error qw(:try);
+
+use strict;
+
+my $ior = shift || Usage();
+my $orb = CORBA::ORB_init("omniORB4");
+
+try {
+	my $object = $orb->string_to_object($ior);
+	my $repoid = $object->_repoid();
+	print "Object Exists : ", ($object->_non_existent() ? "No" : "Yes"),"\n";
+	print "Repository ID : ", $repoid,"\n";
+	print "Object Hash   : ", $object->_hash(-1),"\n";
+	print "Is Equivalent : ", ($object->_is_equivalent($object) ? "Yes" : "No"),"\n";
+	print "Is a \"$repoid\" : ", ($object->_is_a($repoid) ? "Yes" : "No"),"\n";
+}
+catch CORBA::SystemException with {
+	my $ex = shift;
+	print "Caught CORBA Exception: $ex\n";
+	exit(1);
+};
+
+sub Usage
+{
+	print <<USAGE;
+Usage: $0 <IOR>
+USAGE
+	exit(1);
+}
+

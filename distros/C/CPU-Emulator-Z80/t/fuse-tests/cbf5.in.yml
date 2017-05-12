@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 245
+  18406:
+    - 206
+name: cbf5
+registers:
+  AF: 52736
+  AF_: 0
+  BC: 11586
+  BC_: 0
+  DE: 24170
+  DE_: 0
+  HL: 18406
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

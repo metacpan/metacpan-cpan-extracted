@@ -1,0 +1,57 @@
+---
+abstract: 'a safe, simple inside-out object construction kit'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  DynaLoader: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  Test::More: '0.45'
+  XSLoader: '0'
+  lib: '0'
+  perl: '5.008'
+  threads: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-InsideOut
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Class::InsideOut:
+    file: lib/Class/InsideOut.pm
+    version: '1.14'
+requires:
+  Carp: '0'
+  Class::ISA: '0'
+  Exporter: '0'
+  Scalar::Util: '1.09'
+  Storable: '0'
+  overload: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/dagolden/class-insideout/issues
+  homepage: https://github.com/dagolden/class-insideout
+  repository: https://github.com/dagolden/class-insideout.git
+version: '1.14'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Toby Inkster <tonyink@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

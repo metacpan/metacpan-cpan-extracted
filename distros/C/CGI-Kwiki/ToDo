@@ -1,0 +1,9 @@
+These things need to be done for 0.18 release:
+
+- Chinese pages should not be installed by default
++ Apply Schwern's patches.
++ Update Changes file.
++ Revert Blog header (no toolbar)
++ KwikiCustomization won't display
++ RCS throws error when saving an installed page
++ Revert stylesheets

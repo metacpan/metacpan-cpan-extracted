@@ -1,0 +1,50 @@
+---
+abstract: 'optimize SVG files with tidyall'
+author:
+  - 'Jonas Smedegaard (JONASS) <dr@jones.dk>'
+build_requires:
+  Test::Compile: '0'
+  Test::Fixme: '0'
+  Test::More: '0.61'
+  Test::Pod: '1.00'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - 'Code refactoring'
+  - 'Source code'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-SVG
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Code::TidyAll::Plugin::SVG:
+    file: lib/Code/TidyAll/Plugin/SVG.pm
+    version: '0.003'
+requires:
+  Code::TidyAll: '0'
+  Moo: '0'
+  String::Escape: '0'
+  XML::Twig: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Code-TidyAll-Plugin-SVG/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Code-TidyAll-Plugin-SVG
+  homepage: https://metacpan.org/release/Code-TidyAll-Plugin-SVG
+  license: http://dev.perl.org/licenses/
+  repository: https://anonscm.debian.org/cgit/design/Code-TidyAll-Plugin-SVG.git
+version: '0.003'
+x_help_wanted:
+  - tester
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

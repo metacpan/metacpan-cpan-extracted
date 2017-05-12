@@ -1,0 +1,431 @@
+#!/usr/bin/perl
+# A POE::Component::IRC/Curses::UI::POE IRC Client
+# Intends to demonstrate new Curses::UI::POE features.
+
+use strict;
+use warnings FATAL => "all";
+
+use POE qw( Component::IRC );
+use Curses::UI::POE;
+use Carp;
+
+my $Curses;
+
+$Curses = new Curses::UI::POE inline_states => {
+    _start => sub {
+        $_[HEAP]->{irc} =
+            POE::Component::IRC->spawn( alias => "IRC" );
+
+        # Even if we dont use all events, it shouldn't create an error since
+        # POE::Component::IRC politely (as well as inefficiently) routes all of
+        # its events via the POE Event Queue.  This means events to states which
+        # don't exist will quietly be ignored...since this is an irc client
+        # efficiency *really* isn't a big issue here.
+
+        $_[KERNEL]->post(IRC => register => "all");
+
+    },
+
+    irc_connected => sub {
+        my $server_name = $_[ SENDER ]->get_heap->server_name;
+        unless (defined $server_name) {
+            print "Connected...";
+        }
+        else {
+            print "Connected to %s", $server_name;
+        }
+    },
+
+    irc_snotice => sub {
+        printf "[server] %s", $_[ARG0];
+    },
+
+    irc_001 => sub {
+        printf "Connection Successful!";
+    },
+
+    irc_433 => sub {
+        my ($nick) = ($_[ARG1] =~ m/^(\S+)/);
+
+        $_[KERNEL]->yield( nick => sprintf "%s_", $nick );
+
+        printf "--- %s in use, trying %s_", $nick, $nick;
+    },
+
+    irc_372 => sub {
+        print $_[ARG1];
+    },
+
+    irc_353 => sub {
+        local $_ = $_[ARG1];
+
+        s/^[^:]+://;
+        print;
+
+        for (m/(\S+)/g) {
+            s/\+|\@//;
+            $Curses->addnick($_);
+        }
+    },
+
+    irc_quit => sub {
+        my ($nick, $hostmask) = ($_[ARG0] =~ m/([^!]+)!(\S+)/);
+
+        printf "--- %s (%s) quit \"%s\"", $nick, $hostmask, $_[ARG1];
+
+        $Curses->dropnick($nick);
+    },
+
+    irc_part => sub {
+        my ($nick, $hostmask) = ($_[ARG0] =~ m/([^!]+)!(\S+)/);
+
+        printf "--- %s (%s) left %s", $nick, $hostmask, $_[ARG1];
+
+        $Curses->dropnick($nick);
+    },
+
+    irc_join => sub {
+        my ($nick, $hostmask) = ($_[ARG0] =~ m/([^!]+)!(\S+)/);
+
+        printf "--- %s (%s) joined %s", $nick, $hostmask, $_[ARG1];
+
+        $Curses->addnick($nick);
+    },
+
+    irc_public => sub {
+        my ($nick, $hostmask) = ($_[ARG0] =~ m/([^!]+)!(\S+)/);
+
+        printf "<%s:%s> %s", $nick, $_[ARG1][0], $_[ARG2];
+    },
+
+    irc_msg => sub {
+        printf "[%s] %s", @_[ARG0, ARG2];
+    },
+
+    irc_nick => sub {
+        my ($nick, $hostmask) = ($_[ARG0] =~ m/([^!]+)!(\S+)/);
+
+        printf "--- %s (%s) is now %s", $nick, $hostmask, $_[ARG1];
+    },
+}, -color_support => 1;
+
+tie *CURWIN, "IRC::Output", $Curses;
+select CURWIN;
+
+
+open LOG, ">>", "cuirc-debug.log";
+
+# Try to put errors in the window...
+$SIG{"__DIE__"} = sub {
+    print LOG $_[0];
+};
+$SIG{"__WARN__"} = sub {
+    print LOG $_[0];
+};
+
+print "Welcome to Curses::UI::POE's IRC example";
+
+run POE::Kernel;
+
+package IRC::Output;
+
+use strict;
+use warnings FATAL => "all";
+
+use POE;
+use POSIX qw( strftime cuserid );
+use Curses;
+use Carp qw( carp );
+use constant KEY_TAB => "\t";
+
+my @nicks;
+
+sub addnick {
+    my ($nicklist, $curses) = @{ +shift }{qw( -nicks -curses )};
+    my $nick = shift;
+
+    push @nicks, $nick;
+
+    $nicklist->values([sort @nicks]);
+    $nicklist->draw(1);
+
+    $curses->draw;
+}
+
+sub dropnick {
+    my ($nicklist, $curses) = @{ +shift }{qw( -nicks -curses )};
+    my $nick = shift;
+
+    @nicks = grep $nick ne $_, @nicks;
+    $nicklist->values([sort @nicks]);
+    $nicklist->draw(1);
+    $curses->draw;
+}
+
+sub PRINT { 
+    our @Channel;
+
+    my $object = shift;
+    my ($viewer, $curses) = @$object{qw( -viewer -curses )};
+
+    push @Channel, shift;
+
+    $viewer->text(join "\n", @Channel);
+    $viewer->cursor_down(undef, $viewer->canvasheight);
+    $viewer->draw;
+
+#    $viewer->{-ypos} = @Channel;
+#    $viewer->layout_content;
+
+    $curses->draw;
+}
+
+sub PRINTF {
+    our @Channel;
+
+    my $object = shift;
+    my ($viewer, $curses) = @$object{qw( -viewer -curses )};
+
+    # XXX Hack: Just ignore bunk requests for now...
+    if (grep !defined $_, @_) {
+        carp "Attempt to print undefined value";
+    }
+
+    push @Channel, sprintf shift, @_;
+
+    $viewer->text(join "\n", @Channel);
+    $viewer->cursor_down(undef, $viewer->canvasheight);
+    $viewer->draw;
+
+#    $viewer->{-ypos} = @Channel;
+#    $viewer->layout_content;
+
+    $curses->draw;
+}
+
+sub TIEHANDLE { 
+    my $curses = $_[-1];
+
+    # Main Menu
+    my $menu = $curses->add
+        ( 'menu','Menubar', 
+          -fg   => "white",
+          -bg   => "blue",
+          -menu => [
+            { -label => 'File', 
+              -submenu => [
+                { -label => 'Exit      ^Q', -value => sub { exit } }
+              ]
+            },
+            { -label => 'Help', 
+              -submenu => [
+                { -label => 'about', -value => \&about_dialog }
+              ]
+            }, 
+          ]
+        );
+
+    # Create the screen for the editor.
+    my $screen = $curses->add
+        ( 'screen', 'Window',
+          -padtop       => 1, # leave space for the menu
+          -border		=> 0,
+          -ipad		    => 0,
+        );
+
+    # We add the editor widget to this screen.
+    my $viewer = $screen->add
+        ( 'viewer', 'TextViewer',
+          -border 	        => 0,
+          -pos              => -1,
+          -sfg              => "blue",
+          -sbg              => "white",
+          -padright         => 11,
+          -padtop		    => 0,	
+          -padbottom 	    => 2,
+          -showlines	    => 0,
+          -sbborder	        => 0,
+          -vscrollbar	    => 1,
+          -hscrollbar	    => 0,
+          -showhardreturns  => 0,
+          -wrapping         => 1,
+        );
+
+    my $nicks = $screen->add
+        ( 'nicks', 'Listbox',
+          -x            => -1,
+          -y            => -1,
+          -padtop       => 0,
+          -padbottom    => 2,
+          -width        => 10,
+          -radio        => 0 );
+
+    # There is no need for the editor widget to loose focus, so
+    # the "loose-focus" binding is disabled here. This also enables the
+    # use of the "TAB" key in the editor, which is nice to have.
+    #$editor->clear_binding('loose-focus');
+
+    $screen->add
+        ( 'help', 'Label',
+          -y 	 	        => -2,
+          -width		    => -1,
+          -reverse 	        => 1,
+          -paddingspaces    => 1,
+          -fg               => "blue",
+          -bg               => "white",
+          -text 	 	    => strftime("[%h:%m]", localtime),
+        );
+
+    my $editor = $screen->add
+        ( "editor", 'TextEditor',
+          -y              => -1,
+          -x              => 0,
+          -width          => -1,
+          -height         => 1,
+          -singleline     => 1,
+        );
+
+    my $set_editor_focus = sub {
+        $editor->focus;
+        $editor->draw;
+    };
+
+    $nicks->onFocus($set_editor_focus);
+    $viewer->onFocus($set_editor_focus);
+    $menu->onFocus($set_editor_focus);
+
+    my (%Channel, $Current, @History);
+    my ($CurCon, $CurrentChannel);
+
+    my $execute = {
+        server => sub {
+            my ($server, $port) = @_[1, 2];
+
+            $server ||= "irc.freenode.net";
+            $port   ||= 6667;
+
+            printf "Sending Connect EVENT for %s:%s", $server, $port;
+
+            $poe_kernel->post
+                ( IRC => connect => {
+                    Nick        => cuserid,
+                    Server      => $server,
+                    Port        => $port,
+                    Username    => cuserid,
+                    Ircname     => +(getpwnam cuserid)[6],
+                  } 
+                ); 
+        },
+
+        join => sub {
+            shift;
+            my $Join = shift;
+            if (defined $Channel{$Join}) {
+                $CurrentChannel = $Join;
+            }
+            else {
+                $Channel{$Join} = 1;
+                $poe_kernel->post( IRC => join => $Join );
+                $CurrentChannel = $Join;
+            }
+        },
+
+        nick => sub { $poe_kernel->post( IRC => nick => $_[1] ) },
+        kick => sub { $poe_kernel->post( IRC => kick => @_[1..$#_] ) },
+        msg  => sub { $poe_kernel->post( IRC => privmsg => @_[1..$#_] ) },
+        
+        quote => sub {
+            $poe_kernel->post( IRC => sl => join " ", @_[1..$#_] );
+        },
+
+        quit => sub {
+            $poe_kernel->post( IRC => quit => join " ", @_[1..$#_] );
+
+            print "Have a nice day";
+            exit;
+        },
+    };
+
+    set_binding $editor sub {
+        my $input = shift;
+        my $line = $input->get;
+
+        push @History, $line;
+        $Current = @History;
+
+        $input->text("");
+
+        if (my ($cmd) = ($line =~ m[^/(\w+)])) {
+            $cmd = lc $cmd;
+            if (defined $execute->{$cmd}) {
+                $execute->{$cmd}->($line =~ m[(\S+)]g);
+            }
+            else {
+                print "--- $cmd not registered";
+            }
+        }
+        else {
+            if ($CurrentChannel) {
+                $poe_kernel->post( IRC => privmsg => $CurrentChannel, $line );
+                print "> $line";
+            }
+            else {
+                print "No Current Channel ---";
+            }
+        }
+    }, KEY_ENTER;
+
+    set_binding $editor sub {
+        # Do nothing...overload the lose-focus event.
+    }, KEY_TAB, KEY_BTAB;
+
+    # Why doesn't this work?
+    set_binding $editor sub {
+        warn "Calling \$viewer->cursor_pageup";
+        $viewer->cursor_pageup;
+        $viewer->draw;
+    }, KEY_PPAGE;
+
+    set_binding $editor sub {
+        warn "Calling \$viewer->cursor_pagedown";
+        $viewer->cursor_pagedown;
+        $viewer->draw;
+    }, KEY_NPAGE;
+
+    set_binding $editor sub { shift->text($History[--$Current]) }, KEY_UP;
+    set_binding $editor sub {
+        $Current++;
+        if ($Current > @History)    { shift->text("") }
+        else                        { shift->text( $History[$Current] ) }
+    }, KEY_DOWN;
+
+    # Focus on the editor.
+    $editor->focus;
+    $editor->draw;
+
+    $_[-1] = bless { 
+        -curses => $curses,
+        -viewer => $viewer,
+        -screen => $screen,
+        -editor => $editor,
+        -menu   => $menu,
+        -nicks  => $nicks,
+    }, shift;
+}
+
+sub about_dialog {
+	shift->root->dialog
+        ( -title    => "About poco_irc_client",
+		  -message  => <<'ABOUT'
+Program : Curses::UI::POE IRC Client
+Author  : Scott McCoy
+          tag@cpan.org
+
+The sole purpose of this client is to demonstrate
+new Curses::UI::POE features, as well as provide
+an example of how Curses::UI::POE could be used.
+This example was crafted specifically for snl20
+from #perl, on the freenode network.
+ABOUT
+	);
+}

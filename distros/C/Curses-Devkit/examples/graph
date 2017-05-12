@@ -1,0 +1,36 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Graph Widget.
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create the graph values.
+my @values = qw (50 0 25 66 41 42 30 49 27);
+my $chars  = "123456789";
+
+# Create the graph object.
+my $graph = new Cdk::Graph ('Title' => "<C></3>Total Breakins",
+				'Xtitle' => "<C></2>Count",
+				'Ytitle' => '<C></5>Time Period',
+				'Height' => -4,
+				'Width' => -4);
+
+# Load the object up.
+$graph->set ('Values' => \@values,
+		'GraphChars' => $chars,
+		'Box' => "FALSE");
+
+# Draw the graph.
+$graph->draw();
+
+# Wait until the user hits a key.
+getc(STDIN);
+
+# End Cdk.
+Cdk::end();

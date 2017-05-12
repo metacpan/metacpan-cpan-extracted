@@ -1,0 +1,36 @@
+  NAME
+
+    Chart::ThreeD::Pie - 3D Piechart
+
+  DESCRIPTION
+
+    Chart::ThreeD::Pie allows you to create 3D Piecharts very easily
+    and emit the drawings as GIF files. You can customize almost everything
+    using a large number of methods.
+
+    This module requires the Lincoln D. Stein's GD module available on CPAN.
+
+    More information about this module is included in this package.
+
+  INSTALLATION
+
+    To install, cd to the directory containing the unpacked
+    distribution and do one of the following:
+
+    a.  Create a makefile by running Makefile.PL using the perl
+        program into whose library you want to install and then run
+        make three times:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    b.  To install into a private library, for example your home
+        directory:
+
+            perl Makefile.PL INSTALLSITELIB=$HOME/lib INSTALLMAN3DIR=$HOME/man
+            make
+            make test
+            make pure_install
+

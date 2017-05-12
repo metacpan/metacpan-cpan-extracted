@@ -1,0 +1,22 @@
+Revision history for perl module Cache::Memcached::Fast::Logger
+
+0.15 2013-09-01
+    - Update of the Changes - to follow the CPAN::Changes::Spec specification
+    - Some tests were moved to author's test directory
+
+0.14 2012-11-28
+    - Update inc::Module::Install 1.04 -> 1.06
+      (the bug in this module - http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+    - Cache::Memcached::Fast::Logger::log method now generates warning in case of failure
+
+0.13 2012-11-08
+    - Some doc fixes
+
+0.12 2012-11-07
+    - Added 'namespace' option in constructor and test for it
+
+0.11 2012-11-07
+    - Some doc fixes
+
+0.10 2012-11-06
+    - First release

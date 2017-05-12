@@ -1,0 +1,9 @@
+
+For 0.02:
+ X add a base64 bit of sugar so people can inline text
+ - increase test coverage
+
+For 0.03:
+ - add a 'bulk' call for bulk documents
+ - add CouchDB::View support for views written in Perl
+

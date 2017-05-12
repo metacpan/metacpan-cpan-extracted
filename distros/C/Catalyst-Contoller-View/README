@@ -1,0 +1,22 @@
+
+This module provide a class that could be use as a base class of one of your
+controller classes. If you just want to put some pages under "root" while you
+want to use the advantage of a templating system (like the way people use
+PHP), here's the class you're looking for. Read the module document for more
+description details.
+
+This module could be installed using followoing commands:
+
+  perl Makefile.PL
+  make
+  make install
+
+And it is suggested to test the module before installing it:
+
+  make test
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself. Use it at your own risk.
+
+Cheers
+Kang-ming Liu

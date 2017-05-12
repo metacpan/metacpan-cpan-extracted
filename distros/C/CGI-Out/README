@@ -1,0 +1,13 @@
+
+This is a helper routine for building CGI programs.  It buffers
+stdout until you're completed building your output.  If you should
+get an error before you are finished, then it will display a nice
+error message (in HTML), log the error, and send email about the
+problem.
+
+To build/install it, use 
+
+	perl Makefile.PL
+	make 
+	make install
+

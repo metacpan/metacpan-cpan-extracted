@@ -1,0 +1,48 @@
+{
+   "abstract" : "Handle method and function keywords with tidyall",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Code-TidyAll-Plugin-Perl-IgnoreMethodSignaturesSimple",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll" : "0.04"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-code-tidyall-plugin-perl-ignoremethodsignaturessimple@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Code-TidyAll-Plugin-Perl-IgnoreMethodSignaturesSimple"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-code-tidyall-plugin-perl-ignoremethodsignaturessimple.git",
+         "web" : "https://github.com/jonswar/perl-code-tidyall-plugin-perl-ignoremethodsignaturessimple"
+      }
+   },
+   "version" : "0.03"
+}
+

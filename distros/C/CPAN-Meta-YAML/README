@@ -1,0 +1,54 @@
+NAME
+    CPAN::Meta::YAML - Read and write a subset of YAML for CPAN Meta files
+
+VERSION
+    version 0.018
+
+SYNOPSIS
+        use CPAN::Meta::YAML;
+
+        # reading a META file
+        open $fh, "<:utf8", "META.yml";
+        $yaml_text = do { local $/; <$fh> };
+        $yaml = CPAN::Meta::YAML->read_string($yaml_text)
+          or die CPAN::Meta::YAML->errstr;
+
+        # finding the metadata
+        $meta = $yaml->[0];
+
+        # writing a META file
+        $yaml_text = $yaml->write_string
+          or die CPAN::Meta::YAML->errstr;
+        open $fh, ">:utf8", "META.yml";
+        print $fh $yaml_text;
+
+DESCRIPTION
+    This module implements a subset of the YAML specification for use in
+    reading and writing CPAN metadata files like META.yml and MYMETA.yml. It
+    should not be used for any other general YAML parsing or generation
+    task.
+
+    NOTE: META.yml (and MYMETA.yml) files should be UTF-8 encoded. Users are
+    responsible for proper encoding and decoding. In particular, the "read"
+    and "write" methods do not support UTF-8 and should not be used.
+
+SUPPORT
+    This module is currently derived from YAML::Tiny by Adam Kennedy. If
+    there are bugs in how it parses a particular META.yml file, please file
+    a bug report in the YAML::Tiny bugtracker:
+    <https://github.com/Perl-Toolchain-Gang/YAML-Tiny/issues>
+
+SEE ALSO
+    YAML::Tiny, YAML, YAML::XS
+
+AUTHORS
+    *   Adam Kennedy <adamk@cpan.org>
+
+    *   David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Adam Kennedy.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

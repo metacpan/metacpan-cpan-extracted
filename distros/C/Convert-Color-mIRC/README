@@ -1,0 +1,46 @@
+NAME
+    `Convert::Color::XTerm' - indexed colors used by mIRC
+
+SYNOPSIS
+    Directly:
+
+     use Convert::Color::mIRC;
+
+     my $red = Convert::Color::mIRC->new( 3 );
+
+    Via Convert::Color:
+
+     use Convert::Color;
+
+     my $cyan = Convert::Color->new( 'mirc:11' )
+
+DESCRIPTION
+    This subclass of Convert::Color::RGB8 provides lookup of the colours
+    that mIRC uses by default. Note that of course the module is not
+    intelligent enough to be able to parse mIRC config, or know what
+    palettes users are actually using, and thus it provides only an
+    approximation of the likely behaviour of clients.
+
+    The palette implemented consists of 16 colours, described as:
+
+     0      1           2    3     4          5     6      7
+     white  black       blue green red        brown purple orange
+
+     8      9           10   11    12         13    14     15
+     yellow light-green teal cyan  light-blue pink  grey   silver
+
+CONSTRUCTOR
+  $color = Convert::Color::mIRC->new( $index )
+    Returns a new object to represent the color at that index.
+
+METHODS
+  $index = $color->index
+    The index of the mIRC color.
+
+TODO
+    *   Find out if the embedded colour palette really is the default mIRC
+        one, or update it if not. Patches welcome ;)
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

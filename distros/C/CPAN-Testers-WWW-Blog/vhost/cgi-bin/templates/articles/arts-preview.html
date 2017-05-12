@@ -1,0 +1,38 @@
+<h1>Preview: [% preview.data.title %]</h1>
+
+[% IF preview.data.snippet %]
+<table width="100%" summary="Article Preview">
+<tr><th>[% preview.data.title %]</th></tr>
+<tr><td>
+[% IF preview.data.link %]<img class="left" src="[% webpath %]/[% preview.data.link %]" [% IF item.resize %]width="100"[% END %] alt="[% preview.data.tag %]" align="right" style="padding:0 0px 0 4px" />[% END %]
+[% preview.data.snippet %] ... <a href='[% cgipath %]/pages.cgi?act=arts-main&amp;name=[% preview.data.quickname %]' title='read more about [% preview.data.title %]'><em>more</em></a>
+    </td></tr>
+</table>
+[% END %]
+
+[% FOREACH item = preview.body %]
+[% IF item.type == 2 %]
+        [% item.body %]
+[% ELSE %]
+[% IF item.type == 1 %]
+    [% IF item.link %]
+    [% IF item.align  %][% class = 'thumb' _ item.align %][% ELSE %][% class = "inline" %][% END %]
+    [% IF item.href %]
+        <a href='[% item.href %]'><img class="[% class %]" src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.align  %]align="[% item.align %]"[% END %]
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+    [% ELSE %]
+        <img class="[% class %]" src="[% webpath %]/[% item.link %]" align="[% item.align %]" alt="[% item.tag %]"
+        [% IF item.align  %]align="[% item.align %]"[% END %]
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+    [% END %]
+    [% END %]
+[% ELSE %]
+        <a href='[% item.href %]'>[% item.body %]</a>
+[% END %]
+[% END %]
+[% END %]

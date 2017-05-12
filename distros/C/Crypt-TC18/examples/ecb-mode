@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::TC18;
+
+my $key = pack "H16", "0001020304050607";
+my $cipher = new Crypt::TC18 $key;
+
+print "rounds    : ", $cipher->rounds, "\n";
+print "blocksize : ", $cipher->blocksize, " bytes \n";
+print "keysize   : ", $cipher->keysize, " bytes \n";
+
+print "\n";
+
+my $plaintext = pack "H32", "000102030405060708090a0b0c0d0e0f";
+print "old plaintext  : ", unpack("H*", $plaintext), "\n";
+
+my $ciphertext = $cipher->encrypt($plaintext);
+print "ciphertext     : ", unpack("H*", $ciphertext), "\n";
+
+my $decrypted = $cipher->decrypt($ciphertext);
+print "new plaintext  : ", unpack("H*", $decrypted), "\n";
+

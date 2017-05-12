@@ -1,0 +1,12 @@
+
+outstanding items (in no particular order):
+
+* code review/clean up
+* more flixable formatting (whitespace, number format,num_atoms, '=' in var defs, etc)
+* support (test if ok as-is) for format supporting different atom names (e.g. He) and Z's
+* smarter file_is()
+* error-checking anywhere...
+* tests!
+* docs (esp options and supported format)
+* add the conforminator stuff as an example (esp w/the no-build option and the re-open file hack) (should it call $ic->add_cartesians ??)
+* change skip_build to default to 1 ?  maybe try to auto-detect (skip build if any atom has ic's set. and use an optional force_zmat_build flag instead?)?

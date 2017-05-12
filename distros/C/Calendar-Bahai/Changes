@@ -1,0 +1,190 @@
+Revision history for Calendar::Bahai
+
+0.46  Thu Jan 26 11:55:00 2017
+      - Upgraded to use Date::Bahai::Simple v0.20.
+
+0.45  Mon Jan 09 12:20:00 2017
+      - Added dependency on Calendar::Plugin::Renderer v0.12.
+      - Removed method validate_params(), no longer required.
+
+0.44  Sat Dec 31 20:00:00 2016
+      - Added sample code for method as_text() in the SYNOPSIS section.
+      - Updated pod document for method as_svg().
+      - Updated pod document for method as_text().
+
+0.43  Sat Dec 17 00:35:00 2016
+      - Updated dependency on Date::Bahai::Simple v0.19.
+
+0.42  Wed Dec 07 22:50:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t)
+
+0.41  Sat Nov 26 16:55:00 2016
+      - Updated dependency on Date::Bahai::Simple v0.18.
+      - Tidied up method as_text() and as_svg().
+
+0.40  Tue Nov 22 10:35:00 2016
+      - Fixed the bug in the method as_text().
+
+0.39  Wed Nov 09 09:55:00 2016
+      - Updated dependency on Date::Bahai::Simple v0.16.
+
+0.38  Sat Oct 15 09:10:00 2016
+      - Added dependency on Calendar::Plugin::Renderer v0.11.
+
+0.37  Sun Sep 25 19:40:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.36  Wed Aug 10 11:30:00 2016
+      - Updated dependency on Date::Bahai::Simple v0.15.
+
+0.35  Fri Jul 08 15:00:00 2016
+      - Added method as_text().
+      - Updated method as_svg() with regard to start index.
+      - Added dependency on Calendar::Plugin::Renderer v0.07.
+      - Added test for method svg_calendar().
+
+0.34  Fri May 13 11:40:00 2016
+      - Updated dependency on Date::Bahai::Simple v0.13.
+      - Tidied up method current() and method from_gregorian().
+      - Updated method as_svg() to make use of method get_month_number() and method get_month_name().
+      - Updated pod document with regard to the Calendar::Plugin::Renderer v0.06.
+      - Added section "SEE ALSO".
+      - Updated copyright year information.
+
+0.33  Sat Jan 09 02:30:00 2016
+      - Updated pod document with regard to the Calendar::Plugin::Renderer v0.04.
+
+0.32  Sun Dec 20 15:20:00 2015
+      - Added missing prereqs Module::Pluggable as reported by CPAN Testers.
+
+0.31  Fri Dec 18 21:00:00 2015
+      - Fixed typo in the pod document.
+
+0.30  Fri Dec 18 20:45:00 2015
+      - Updated pod for method as_svg().
+
+0.29  Fri Dec 18 20:35:00 2015
+      - Added method as_svg() using the plugin Calendar::Plugin::Renderer.
+
+0.28  Fri Aug 28 10:45:00 2015
+      - Upgraded to use Date::Bahai::Simple v0.11.
+
+0.27  Wed Jul 15 10:05:00 2015
+      - Upgraded to use Date::Bahai::Simple v0.10.
+      - Making use of the method get_calendar() provided by Date::Bahai::Simple.
+
+0.26  Tue Jul 07 10:10:00 2015
+      - Upgraded to use Date::Bahai::Simple v0.09.
+
+0.25  Sat Jun 27 16:40:00 2015
+      - Upgraded to use Date::Bahai::Simple v0.08.
+
+0.24  Wed Jun 17 18:15:00 2015
+      - Fixed the bug in the method from_gregorian().
+
+0.23  Mon Jun 08 11:40:00 2015
+      - Updated method _calendar() to validates month and year.
+
+0.22  Mon May 25 02:05:00 2015
+      - Fine tuned method from_gregorian().
+      - Fine tuned method from_julian().
+      - Dropped un-used method _date().
+      - Updated method _calendar() w.r.t the dropped method _date().
+      - Removed the code from the pod document for method current().
+      - Removed the code from the pod document for method from_gregorian().
+
+0.21  Sun May 24 22:00:00 2015
+      - Removed the dependency on Date::Utils::Bahai.
+      - Upgraded to use Date::Bahai::Simple v0.04 to fix RT: 103403.
+
+0.20  Sun May 17 00:50:00 2015
+      - Upgraded to use Date::Utils::Bahai v0.02.
+
+0.19  Thu Apr 23 23:35:00 2015
+      - Re-structured and consumed Date::Utils::Bahai as Moo Role.
+
+0.18  Tue Apr 21 13:45:00 2015
+      - Fixed the bug in the method _calendar() the last cell is empty.
+
+0.17  Sun Apr 19 02:45:00 2015
+      - Fixed the bug in the method _calendar() when the first day of the month is Sunday.
+
+0.16  Sat Apr 18 02:20:00 2015
+      - Removed Date::Bahai and replaced with Date::Bahai::Simple.
+      - Moved calendar generation code out of Date::Utils.
+
+0.15  Fri Apr 17 16:00:00 2015
+      - Restructured the distribution to make use of new packages Date::Utils
+        and Date::Bahai.
+
+0.14  Fri Apr 17 14:50:00 2015
+      - Made default month as current bahai month.
+      - Documented CONSTRUCTOR in the pod document.
+      - Added more code to the section SYNOPSIS.
+
+0.13  Fri Apr 17 12:00:00 2015
+      - Cleaned up method Calendar::Bahai::BUILD() and removed duplicate code.
+      - Cleaned up method Calendar::Bahai::current() and removed duplicate code.
+      - Updated pod description of the following methods in the package Calendar::Bahai:
+        - from_gregorian()
+        - from_julian()
+      - Tidied up method Calendar::Bahai::_calendar() and extracted out common code
+        to the get_bahai_month_calendar() in the package Calendar::Bahai::Utils.
+      - Renamed method validate_year() to validate_bahai_year()
+      - Renamed method validate_month() to validate_bahai_month()
+      - Renamed method validate_day() to validate_bahai_day()
+      - Enabled method validate_bahai_month()
+      - Added the following methods to the package Calendar::Bahai::Utils:
+        - bahai_to_gregorian()
+        - bahai_to_julian()
+        - get_bahai_month_calendar()
+      - Updated pod description of the following methods in the package Calendar::Bahai::Utils:
+        - gregorian_to_bahai()
+        - julian_to_bahai()
+        - julian_t0_gregorian()
+        - get_major_cycle_year()
+
+0.12  Thu Apr 16 16:50:00 2015
+      - Complete re-write of the entire distribution using Moo with unit tests.
+
+0.11  Fri Mar 20 10:30:00 2015
+      - Added LICENSE file.
+      - Tidied up pod document in general.
+
+0.10  Fri Jan 16 15:05:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.09  Sat Oct 18 09:00:00 2014
+      - Patched RT: 99109.
+
+0.08  Fri Sep 12 20:06:10 2014
+      - Deleted Build.PL file.
+      - Removed dependency of Readonly.pm and Carp.pm.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+0.07  Tue Aug 09 16:16:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.06  Tue Apr 19 09:17:23 2011
+      - Renamed title "SYNOPSIS" to "DESCRIPTION".
+
+0.05  Mon Apr 18 16:42:10 2011
+      - More cosmetics changes.
+
+0.04  Mon Apr 18 15:47:00 2011
+      - Cosmetics changes.
+
+0.03  Tue Apr 12 12:29:29 2011
+      - Fixed the internal method _validate_date().
+      - Added unit test 01-test-case.t
+
+0.02  Fri Apr 08 15:59:10 2011
+      - Updated pod for SYNOPSIS.
+      - Updated some of the sample code in the pod.
+
+0.01  Fri Mar 25 15:31:00 2011
+      - First version, released.

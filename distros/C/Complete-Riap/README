@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use Complete::Riap qw(complete_riap_url);
+     my $res = complete_riap_url(word => '/Te', type=>'package');
+     # -> {word=>['/Template/', '/Test/', '/Text/'], path_sep=>'/'}
+

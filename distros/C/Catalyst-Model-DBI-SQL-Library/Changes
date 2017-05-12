@@ -1,0 +1,21 @@
+Revision history for Perl extension Catalyst::Model::DBI::SQL::Library.
+0.19  Fri May 03 23:08:00 2013
+  - moved log level support into Catalyst::Model::DBI instead
+0.18  Fri May 03 22:21:00 2013
+  - documentation fixes
+0.17  Fri May 03 22:06:00 2013
+  - added support for log levels and more documentation
+0.16  Thu May 02 22:45:00 2013
+  - fixed Makefile.PL, added proper log levels
+0.15  Sat Mar 10 11:00:00 2007
+  - fixed YAML issue as reported on mailing list
+0.14  Mon Jul 24 12:00:00 2006
+  - added new object caching support
+0.13  Tue May 30 12:00:00 2006
+  - added path_to support
+0.12  Wed May 25 02:23:00 2006
+  - removed $c from load
+0.11  Wed Dec 14 12:00:00 2005
+  - minor changes
+0.10  Sun Nov 29 15:00:00 2005
+  - first release

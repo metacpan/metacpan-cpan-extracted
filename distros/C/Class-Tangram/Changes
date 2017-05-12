@@ -1,0 +1,162 @@
+Revision history for Perl extension Class::Tangram
+
+2006-01-31
+   o Release 1.57
+   o Don't insert accessors if the package can already do that method.
+
+2004-02-23
+   o Release 1.56
+   o Make sure reference "container methods" always only call their
+     set method with one argument.
+   o ->set(), ->get(): Allow classes to AUTOLOAD their accessors
+                       without redefining ->can()
+   o generator test no longer requires Tangram to be installed
+
+2004-02-23
+   o Release 1.54.2
+   o Added support for Storable, idbif, etc column types.  Mutter to
+     self disadvantages of hardcoding Tangram Type list in module.
+
+2004-01-08
+   o Release 1.54.1
+   o Fixed dire copy constructor bug.
+
+2004-01-01
+   o Release 1.54
+   o Many fixes for the intermediate classes change below
+   o Check functions on setters for collections
+
+2003-10-27
+   o Release 1.53
+   o Added intermediate classes, so that calling $self->SUPER::get_foo
+     works as OO discipline dictates.
+   o Removed function prototypes
+   o import_schema() will now return immediately if called twice for a
+     class
+
+2003-10-27
+   o Release 1.52
+   o Various minor fixes
+   o Major enhancements to the operation of Class::Tangram::Generator.
+     `use Class' when `Class' is a part of the Generator now works.
+
+2003-08-12
+   o Release 1.51
+   o Implements a work-around for Tangram on Perl 5.8.0
+   o Now auto-loads Tangram components (Tangram::Type classes) if it
+     can
+   o Added Class::Tangram::Generator
+
+2003-07-01
+   o Release 1.50
+   o Container ubiquity (see the README)
+   o Companion attributes (explicit back-references)
+
+2002-09-15
+   o Release 1.13
+   o Scrapped Pod::Constants bullshit
+   o some 
+
+2002-05-29
+   o Release 1.12
+   o Complete removal of AUTOLOAD.  More backwards compatibility than
+     1.115
+   o Massive documentation simplification and rewording
+
+2002-05-22
+   o Release 1.115 (not released publicly)
+   o Early changes to make the module more efficient - closures and
+     direct symbol table manipulation are used instead of AUTOLOAD.
+
+2002-04-15
+   o Release 1.11
+   o Minor Bugfix - "iset" default init_default had a typo relating to
+     the cleanup.  Should have known it would happen, making releases
+     at 2:43am
+   o Added test for above bugfix
+
+2002-04-15
+   o Release 1.10
+   o Added "required" attribute, contributed by Charles Owens
+     <owensc@enc.edu>
+   o Much cleanup of code, particularly the import_schema function.
+   o Removed seemingly superfluous check for tied values of
+     init_default attribute option (tied checking is used elsewhere to
+     prevent unwanted auto-vivification of attributes, but those
+     should never get to init_default, especially since if they did
+     they would be effectively useless)
+   o Minor enhancements to documentation and Pod::Constants imported
+     sections
+
+2002-02-18
+   o Release 1.09
+   o Bugfix affecting objects with stringify function fixed
+   o "transient" type now works in storage properly
+
+2002-02-10
+   o Release 1.08
+   o Added "transient" type
+   o Documentation changes
+
+2002-02-09
+   o Release 1.07
+   o "array" and "hash" types are now as magical as set types on
+     "get()" - that is, if they are undefined, an empty array is
+     returned rather than undef.  Also, if evaluated in list context,
+     the members of the array are returned in a list rather than a
+     reference to the array.
+   o Added &YourClass::set_init_default(field => $value)
+   o made test suite a bit more complete
+   o Removed support for bogus non-existant "time", "timestamp"
+     Tangram types
+   o Support for "rawdate", "rawtime", "dmdatetime".  This completes
+     support for all standard Tangram data types.
+   o Class::Tangram classes now pass the "empty sub-class" test
+
+2001-11-21
+
+   o Release 1.06
+   o Added run-time type information functions
+
+2001-11-21
+
+   o Release 1.05
+   o Some small speed optimisations and bug fixes.
+   o Changed Makefile.PL to use Pod::Constants
+
+2001-10-14
+
+   o Release 1.04
+   o Added some Set::Object AUTOLOAD functions
+   o More documentation fixes
+   o Now creates empty Set::Object containers for set attributes so
+     that Tangram doesn't get upset when you store a new object, but
+     didn't initialise one of its sets.
+   o Get of a Set::Object attribute returns its members when called in
+     list context
+
+2001-10-10
+
+   o Release 1.03
+   o Supressed useless warning that I couldn't work around in
+     destructor:
+	'(in cleanup) Can't call method "FETCH" on an undefined value
+	 at ...'
+   o Documentation bugfixes
+
+2001-10-08
+
+   o Release 1.02
+   o Fixed many small bugs
+
+2001-09-28
+
+   o Release 1.01
+   o Fixed subtle bug with sets and clear_refs()
+
+2001-09-25
+
+   o Release 1.00
+   o Renamed from Tao::Object
+   o Testing functions not yet complete, some field types might not be
+     working.

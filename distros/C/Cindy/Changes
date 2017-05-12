@@ -1,0 +1,84 @@
+Revision history for Perl extension Cindy.
+
+0.01  Wed Dec  3 08:54:14 2008
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Cindy
+  - First version for CPAN. 
+    Alpha, needs discussion of use cases. 
+
+0.02  Sat Feb 28 14:52:23 2009
+  - content treats source as text if it is not a node set
+  - XPath expressions can be enclosed with quotes
+  - Added dependency on XML::LibXML
+
+0.03  Sun Mar  1 16:29:27 2009
+  - Added dependency on Parse::RecDescend
+  - Perl 5.6 should do
+
+0.04  
+  - Complete rewrite of the core (Injection.pm)
+  - Uses Log4Perl if available
+
+0.05
+  - Outputs XPath profile on log level INFO
+  - Shortcut libxml call for . path
+
+0.06
+  - Added error handling to the RecDescent based
+    cjs parser.
+
+0.07
+  - Added comment action
+  - Fixed cjs parser to handle comments first
+  - Pass http charset to html parser
+
+0.08 
+  - Moved Cindy::Apache2 to a seperate CPAN package 
+    to get explicit Apache2 dependencies.
+  - Fixed upper case HTML handling
+  - critic cleanup
+
+0.09
+  - Added repeat condition
+
+0.11
+  - Fixed "no data found" handling
+  - Implemented css selectors similiar to 
+    Template::Semantics
+
+0.12
+  - Fixed "no data found" handling for repeat
+    and added tests.
+
+0.13
+  - Fixed a repeat problem caused by the no data found fix.
+
+0.14
+  - Added current() XPath function
+
+0.15
+  - Removed Readonly.pm dependency suggested by perlcritic
+
+0.16
+  - Not released
+
+0.17
+  - Fixed memory leak
+  - Use a precompiled CJS parser
+
+0.18
+  - Added copy action
+
+0.19
+  - Improved error handling
+
+0.20
+  - target document doctypes are preserved
+  - tests ignore whitespace to avoid false positives
+
+0.21
+  - Fixed copying of dtd nodes
+
+0.22
+  - Fixed stupid bug affecting Cindy::Apache2
+ 

@@ -1,0 +1,57 @@
+# -*- perl -*-
+use strict;
+use Benchmark;
+select(STDERR); $| = 1; select(STDOUT); $| = 1;
+use ClearCase::Argv qw(chdir);
+
+die 'cleartool setview non supported on this platform'
+  if $^O =~ /MSWin32|cygwin/;
+ClearCase::Argv->summary;	# start keeping stats
+ClearCase::Argv->ipc(1);
+my $obj1 = ClearCase::Argv->new({autochomp=>1});
+my $view1 = $obj1->argv(qw(pwv -s))->qx;
+die "This script needs to be run in a view\n" unless $view1;
+my $view2;
+{
+    my $pipeaview = ClearCase::Argv->new;
+    $pipeaview->readonly('yes');
+    $pipeaview->autofail(0);
+    $pipeaview->stderr(0);
+    #Find a dynamic view different from $view1
+    $pipeaview->pipecb(
+	sub {
+	    $view2 = shift;
+	    chomp $view2;
+	    return 'continue' if grep /^View attributes:.*snapshot/,
+	        $obj1->argv(qw(lsview -l), $view2)->qx;
+	    return ($view2 eq $view1); # continue
+	});
+    $pipeaview->argv(qw(lsview -s))->pipe;
+}
+if ($view2) {
+    my $obj2 = ClearCase::Argv->new({autochomp=>1});
+    $view1 = $obj1->argv(qw(pwv -s))->qx;
+    my $cwd = $obj1->argv('pwd')->qx;
+    $obj2->argv('setview', $view2)->stderr(0)->system;
+    $view2 = $obj2->argv(qw(pwv -s))->qx;
+    print "Current views in two ipc objects: 1: $view1; 2: $view2\n";
+    die "Failed setview\n" unless $view1 and $view2 and ($view1 ne $view2);
+    my $v22 = $obj1->argv(qw(setview -exec),
+			  '/opt/rational/clearcase/bin/cleartool pwv -s',
+			  $view2)->stderr(0)->qx;
+    chdir($cwd);
+    die "Failed setview -exec" unless $v22 eq $view2;
+} else {
+  print STDERR
+    "Failed to find a second, dynamic, view, needed for this test\n";
+}
+
+# Regression test: no extra newline returned by setview
+$obj1->stderr(1);
+my $ret = $obj1->setview($view2)->qx;
+my $v2 = $obj1->pwv(['-s'])->qx;
+my $rc = ($ret =~ /^$/m)? 1 : 0;
+$rc++ unless $v2 eq $view2;
+
+print STDERR ClearCase::Argv->summary;	# print out the stats we kept
+exit $rc;

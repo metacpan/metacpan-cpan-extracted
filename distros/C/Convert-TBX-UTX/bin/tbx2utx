@@ -1,0 +1,42 @@
+#!usr/bin/perl
+
+use strict;
+use warnings;
+use Convert::TBX::UTX qw(min2utx);
+
+die "Usage: $0 <file.tbx> <output>\n"
+	unless @ARGV == 2;
+
+min2utx(@ARGV);
+
+__END__
+
+=head1 NAME
+
+tbx2utx - Convert TBX-Min to UTX.
+
+=head1 USAGE
+
+	tbx2utx ('/path/to/input.tbx') ('/path/to/output')
+	
+=head1 EXAMPLE
+
+	% tbx2utx Sample.tbx Sample.utx
+	
+=head1 DESCRIPTION
+
+tbx2utx converts specified TBX-Min files into specified UTX files.
+
+=head1 AUTHOR
+
+James Hayes <james.s.hayes@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+ 
+This software is copyright (c) 2014 by Alan Melby.
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+ 
+=cut
+

@@ -1,0 +1,30 @@
+You need Perl 5.005 or later.
+
+1. Create a Makefile.
+
+    perl Makefile.PL
+
+2. Build the CDB_File extension.
+
+    make
+
+3. Test it (please don't omit this step).
+
+    make test
+
+You should see `ok 1' through to `ok 38'.
+
+If any tests fail, please get in touch so we can sort out the problem.
+
+4. Install the extension.
+
+If you have built CDB_File as a dynamic extension, it's as simple as
+this.
+
+    make install
+
+If you have built CDB_File as a static extension, follow the
+instructions given during the build process.
+
+5. If you have any problems, questions, or ideas for future
+enhancements, please contact the author (see perldoc CDB_File).

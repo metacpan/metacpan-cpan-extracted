@@ -1,0 +1,232 @@
+Revision history for CPAN-Mini
+
+1.111016  2014-08-08 18:52:05-04:00 America/New_York
+        - cope with a difference in the 02packages headers made by Pinto
+          (thanks, Fabrice Gabolde)
+
+1.111015  2013-12-13 08:17:02 America/New_York
+          update repo and bugtracker
+
+1.111014  2013-11-15 19:17:39 America/New_York
+          prune overly-aggressively-set prereqs; we do not require CPANPLUS!
+
+1.111013  2013-04-13 14:02:58 Europe/London
+          make www.cpan.org the default remote!
+
+          link to the list of mirrors, too (thanks, SYSMON!)
+
+          pass all options from command line, not just known ones (thanks,
+          Jeffrey Thalhammer, who waited a very very long time for me to apply
+          this!)
+
+          add --remote-from option to get remote from CPAN or CPANPLUS config
+          (thanks, Jeff Bisbee, who also waited a long time)
+
+          expand leading "~" in config file name (suggested by justincase)
+
+          die if local target isn't writable (suggested by SARGIE)
+
+1.111012  2013-03-28 16:32:58 America/New_York
+          when testing, mock my_home harder (thanks, David Golden!)
+
+1.111011  2013-02-07 16:40:23 America/New_York
+          check that the received 02packages seems at least remotely plausible
+
+1.111010  2012-10-24 10:46:35 America/New_York
+          fix the old ->trace method, broken in 1.111004
+
+1.111009  2012-08-27 21:32:39 America/New_York
+          config options that once had to be specified as multiple entries
+          on one line may now be given as repeated entries; these are
+          also_mirror, module_filters, and path_filters
+
+1.111008  2011-12-23 13:36:41 America/New_York
+          don't fail tests when the outside env has set CPAN_MINI_CONFIG
+          (thanks, Stephen Thirwall!)
+
+1.111007  2011-05-12 08:21:55 America/New_York
+          run the test minicpan in offline mode to avoid tester errors
+
+1.111006  2011-04-30 14:21:22 America/New_York
+          set the default log_level much earlier, to avoid an undef warning
+
+1.111005  2011-04-29 11:14:10 America/New_York
+          no code changes, this release is just intended to be indexed
+
+1.111004  2011-04-26 08:57:00 America/New_York
+          overhaul logging: there is now a log_level
+
+          delay creation of scratch dir until needed
+
+          a bunch of tests added for switch and config processing
+
+1.111003  2011-04-18 14:17:36 Europe/Amsterdam
+          add tools for building a fake cpan and an xt test for testing online
+
+1.111002  2011-04-16 18:20:43 Europe/Amsterdam
+
+          test for online-ness by HEAD-ing 02packages, not the remote root
+
+1.111001  2011-02-10 19:34:38 America/New_York
+          restore six-digit-mantissa versioning to help downstream packagers
+
+1.111     2011-02-05 15:13:17 America/New_York
+          add --timeout (thanks, Gabor Szabo!)
+
+1.110     2011-01-27 21:48:34 America/New_York
+          if the config file does not exist, do not die or spew warnings; this
+          fixes RT #57388
+
+1.100630  2010-03-04 07:57:34 America/New_York
+          suppress "using config..." during setup with -qq
+
+1.100593  2010-02-28 16:58:34 America/New_York
+          fix a previously unreached bit of code re: basename
+
+1.100592  2010-02-28 15:15:36 America/New_York
+          fix insanely stupid typo; need more tests!
+
+1.100591  2010-02-28 15:11:03 America/New_York
+          add an option to skip source code control files (thanks, brian d foy)
+
+1.100590  2009-02-28
+          add -C switch to allow alternate config file (thanks, brian d foy)
+          getopt switches are now correctly case-sensitive (thanks, brian)
+          improve subclassability for config file and output (thanks, brian)
+          switch to Dist::Zilla for release management
+
+0.576     2009-01-16
+          add repo to metadata
+
+0.575     2009-01-12
+          add no_conn_cache argument
+
+0.574     2008-11-26
+          fix broken prereq declaration in Makefile.PL
+
+0.573     2008-11-25
+          switch to new File::Path API, do not suffer undef dirmodes
+          write a RECENT file of the files mirrored in the latest run
+
+0.572     2008-11-04
+          add 'use File::HomeDir' to CPAN/Mini.pm (thanks DAGOLDEN)
+          improve handling of trailing whitespace in config (thanks ANK)
+
+0.571     2008-05-23
+          set LWP::UserAgent's env_proxy option to use proxy (RT #36124 from
+          IFOMICHEV)
+
+          allow skip_cleanup in config
+
+0.570     2008-05-01
+          offline mode now (correctly) means that the remote is not checked for
+          availability (RT #35563)
+
+0.569     2008-04-30
+          massive speed improvements by caching connection to remote mirror
+          add offline mode (by request of ADAMK)
+          add default config file location (by request of ADAMK)
+
+0.568     2008-03-05
+          [ no code changes ]
+          fix distribution to remove resource forks (ugh!)
+
+0.567     2008-02-05
+          BUGFIX: actually respect -c option
+          internal refactoring to make subclassing easier (DAGOLDEN)
+          bring code formatting inline with other (code (simply)) code
+
+0.566     2008-01-21
+          do not mirror "also_mirror" files twice (thanks DAGOLDEN)
+
+0.565     2007-11-08
+          move guts of minicpan command to ::App
+          CPANTS tweaks
+          switch to Module::Install
+
+0.564     2007-10-31
+          tweak packaging for CPANTS
+
+0.563     2007-10-16
+          MAJOR BUG FIX: mirror files in ./modules
+            introduced in 0.561, this bug only affected new mirrors, so anyone
+            who had been using it before that would not have noticed
+          BUG FIX: don't be so pedantic about requiring that remote end in /
+
+0.562     2007-07-04
+          fix skip_perl to continue to skip a perl-like dist
+
+0.561     2007-07-03
+          initially mirror indices to a scratch space, so that the indices in
+          the minicpan are not replaced until all referenced files are in place
+
+          when skipping perls, also skip: kurila, perl_mlb
+
+0.552     2006-12-01
+          documentation fixes
+
+0.551     2006-11-13
+          packaging improvements
+
+0.550     2006-08-08
+          add tilde expansion for homedir in local mirror specification
+          move configuration reading into CPAN::Mini
+          document a few previously-undocumented things
+          documentation cleanup
+          added unused-by-script option to use current mtime for indices
+           (this helps CPANPLUS do the right thing)
+
+0.500     2006-07-11
+          we no longer need File::HomeDir::Win32 on Windows
+          provide the also_mirror option to get other static files
+
+0.40      2005-11-04
+          remove force option to trace
+          create local mirror if needed
+          notice if local mirror -e && ! -d
+          cleared out stupid /\A\s+\z/ lines
+
+0.38      2005-10-13 00:05
+          more intelligently divide cleanup tasks (isn't ADAMK great?)
+          move arg validity check constructor (to silence ADAMK)
+          add some more checks for validity (stolen from ADAMK)
+          add errors option and -qq commandline option for it
+
+0.36	    2005-01-06 18:40
+			    code refs can be passed to _filters, which were slightly refactored
+
+0.32	    2004-12-31 15:45
+          added an old alpha binary for perl to the perls to skip
+
+0.30      2004-12-28 10:00
+          added a "new" method for construction
+          update_mirror can act as class or instance method
+          added clean_file method
+
+0.26      2004-12-02 15:05
+          require version 5.6 of perl in Makefile.PL
+
+0.24      2004-11-29 14:30
+          dirmode is correctly octalized (thanks SSORICHE)
+          sungo's *_filters patch
+
+0.20      2004-09-28 10:20
+          added config file
+          added file_allowed (to override cleanup)
+          the -d option, long documented, now works
+
+0.18      2004-09-21 20:15
+          canonpath File::Find::name to avoid horrible Win32 bug
+          added -v to print version of CPAN::Mini
+
+0.16      2004-09-07 21:50
+          added -d to set mode for created dirs
+
+0.14      2004-08-28 17:05
+          uses Pod::Usage
+          now skips ponie and parrot (not just perl)
+          -p option to override the above skipping
+          "seen_changes" attribute and return value added
+
+0.10      2004-08-26 10:50
+          initial release

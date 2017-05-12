@@ -1,0 +1,17 @@
+# Filename:	config.in
+#
+# written by Rob Janes
+# copied from Paul Marquess <pmqs@cpan.org>
+# last modified 24th April 2005
+# version 2.05
+# 
+# This file is used to control which bzip2 library will be used by
+# Compress::Bzip2
+
+BUILD_BZLIB   = Test
+
+BZLIB_INCLUDE = #./bzlib-src
+BZLIB_LIB     = #./bzlib-src
+BZLIB_BIN     = #./bzlib-src
+
+# end of file config.in

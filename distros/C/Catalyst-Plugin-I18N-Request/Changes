@@ -1,0 +1,27 @@
+Revision history for Perl extension Catalyst::Plugin::I18N::Request.
+
+0.08  2012-10-22
+    - Repackage to fix Module::Install 1.04 issue
+
+0.07  2012-02-20
+    [TEMPORARY FIX]
+    - Put context object back in Request object for Catalyst >= 5.90009
+
+0.06  2011-07-04
+    - Fix test suite
+
+0.05  2008-01-18
+    - Add MRO::Compat to prereqs
+
+0.04  2009-01-15
+    - switch to Module::Install
+    - use MRO::Compat
+
+0.03  2007-05-18
+    - remove custom context key for requests
+
+0.02  2006-09-21
+    - Fixed multi-valued parameter issue
+
+0.01  2006-08-17
+	- original version;

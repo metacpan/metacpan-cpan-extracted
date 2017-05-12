@@ -1,0 +1,12 @@
+Auth.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/base.t
+t/dbi.t
+Auth/DBI.pm
+Auth/File.pm
+examples/testapp.pl
+examples/testapp-dbi.pl
+META.yml                                 Module meta-data

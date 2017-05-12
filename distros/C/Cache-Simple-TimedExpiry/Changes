@@ -1,0 +1,20 @@
+0.27 Mon Nov 20 17:06:59 EST 2006
+    - Moved an expire check to has_key
+    - Doc updates from Terrence Brannon (metaperl)
+
+0.26 Thu Aug 24 18:16:08 EDT 2006
+    - Signature fixed on distribution
+
+0.25 Wed Aug 23 01:25:36 EDT 2006
+    - The last release was...ill-considered and missing a "defined"
+
+0.24
+    - Quiet down a warning on expirey
+
+0.23 Tue Jan 18 08:31:03 EST 2005
+    - Switch to fetch/store instead of fetch/set (recommended by Ruslan)
+      (Also support get/set as aliases)
+
+0.22
+    - Minor doc fixes
+    - Try harder not to invoke "expire" multiple times in the same second.

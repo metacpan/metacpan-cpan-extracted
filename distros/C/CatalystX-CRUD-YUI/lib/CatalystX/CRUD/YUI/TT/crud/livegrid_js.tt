@@ -1,0 +1,60 @@
+[% # based on http://www.siteartwork.de/livegrid_demo/
+   IF !livegrid.defined;
+    SET livegrid = yui.livegrid(
+         'results'      => results, 
+         'controller'   => c.controller(), 
+         'form'         => form,
+         'c'            => c,
+    ); 
+   END;
+   CALL livegrid.excel_url(c.req.uri_with({'cxc-fmt'='xls','cxc-no_page'=1}));
+%]
+<div id="livegrid[% livegrid.counter %]"></div>
+<script type="text/javascript">
+/* <![CDATA[ */
+    var relTab    = YAHOO.crud.new_relTab();
+    relTab.index  = [% livegrid.counter || 0 %];
+    relTab.id     = '[% livegrid.counter || 0 %]';
+    relTab.name   = '[% livegrid.counter || 0 %]';
+    relTab.grid.opts = {
+        index       : [% livegrid.counter || 0 %],
+        reader : {
+            opts    : [% livegrid.json_reader_opts.as_json %], 
+            columns : [% livegrid.json_reader_columns.as_json %]
+        },
+        sort_by     : '[% livegrid.sort_by %]',
+        sort_dir    : '[% livegrid.sort_dir %]',
+        url         : '[% livegrid.url %]',
+        div_id      : 'livegrid[% livegrid.counter %]',
+        pk          : [% livegrid.pk.as_json %],
+        column_defs : [% livegrid.column_defs.as_json %],
+        defer_load  : false,
+        height      : 500,
+        tools       : [
+        [%- IF livegrid.excel_url -%]
+            {
+                text : 'Export as Excel',
+                handler: function(btn) {
+                    window.location.href = '[% livegrid.excel_url %]';
+                }
+            }
+        [%- END -%]
+        ],
+        title       : '[% livegrid.title %]',
+        clickhandler: function(sm, rowIndex, r) {
+            if (!r) {
+                YAHOO.crud.log('no row passed on click');
+                return;
+            }
+            window.location.href = '[% c.uri_for("/" _ livegrid.controller.action_namespace) %]/' + 
+                                r.id + '/' + '[% (c.session.prefs.default_crud_action || 'view') %]';
+        },
+        filters     : [% livegrid.col_filter.as_json || '[]' %],
+        text_columns: [% livegrid.text_columns.as_json || '[]' %]
+    };
+    YAHOO.util.Event.onDOMReady(function() {
+        YAHOO.crud.new_livegrid([% livegrid.counter || 0 %]); 
+    });
+    YAHOO.crud.TABS[[% livegrid.counter || 0 %]] = relTab;
+/* ]]> */
+</script>

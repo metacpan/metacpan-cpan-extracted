@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Constant/Generate.pm
+lib/Constant/Generate/Stringified.pm
+lib/Constant/Generate/Dualvar.pm
+
+t/00-all.t
+t/01-strings.t
+t/02-dualvar.t
+t/03-listings.t
+t/99-synopsis.t
+t/99-api_revision.t
+
+test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

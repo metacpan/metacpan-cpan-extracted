@@ -1,0 +1,31 @@
+NAME
+    Catalyst::Model::LDAP::FromAuthentication - Provides an LDAP model bound
+    as the user who logged in.
+
+  SYNOPSIS
+        package MyApp::Model::LDAP;
+        use Moose;
+        use namespace::autoclean;
+
+        extends 'Catalyst::Model::LDAP::FromAuthentication';
+
+        # Elsewhere
+        $c->model('LDAP');
+
+  DESCRIPTION
+    This model is a shim used to mash up
+    Catalyst::Authentication::Store::LDAP and Catalyst::Model::LDAP.
+
+    It will return Catalyst::Authentication::Store::LDAP object bound to the
+    directory as the logged in user.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net"
+
+COPYRIGHT
+    Copyright 2009 state51
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

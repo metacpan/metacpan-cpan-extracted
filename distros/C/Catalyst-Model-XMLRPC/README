@@ -1,0 +1,35 @@
+Catalyst::Model::XMLRPC version 0.04
+=======================================
+
+Catalyst model that provide a simple way to communicate with remote processes
+using XML-RPC.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl modules:
+
+  Catalyst
+  Catalyst::Devel
+  NEXT
+  RPC::XML
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006,07 by Florian Merges <fmerges@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

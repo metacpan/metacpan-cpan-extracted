@@ -1,0 +1,11 @@
+Revision history for Perl extension Class::DBI::Plugin::Type.
+
+0.02  Thu Apr  1 17:47:23 BST 2004
+    - Silence warnings about statement handles
+    - Return if already set up.
+    - We don't need 5.8.1
+
+0.01  Mon Mar 15 18:08:00 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Class::DBI::Plugin::Type
+

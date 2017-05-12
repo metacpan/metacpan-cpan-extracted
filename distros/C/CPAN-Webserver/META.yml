@@ -1,0 +1,26 @@
+---
+abstract: 'Browse and search CPAN locally'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Webserver
+provides:
+  CPAN::Webserver:
+    file: lib/CPAN/Webserver.pm
+    version: 0.01
+requires:
+  CPAN::Mirror::Finder: 0
+  LWP: 0
+  Path::Class: 0
+resources:
+  homepage: http://search.cpan.org/dist/CPAN-Webserver/
+  license: http://dev.perl.org/licenses/
+version: 0.01

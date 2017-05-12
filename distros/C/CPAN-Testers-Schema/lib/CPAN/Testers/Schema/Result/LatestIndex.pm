@@ -1,0 +1,271 @@
+use utf8;
+package CPAN::Testers::Schema::Result::LatestIndex;
+our $VERSION = '0.005';
+# ABSTRACT: A cache of the latest version of a dist by author
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     my $ix = $schema->resultset( 'LatestIndex' )->find({
+#pod         dist => 'My-Dist',
+#pod         author => 'PREACTION',
+#pod     });
+#pod
+#pod     $schema->resultset( 'LatestIndex' )->find_or_create({
+#pod         dist => 'My-Dist',
+#pod         author => 'PREACTION',
+#pod         uploadid => 23,
+#pod         version => '1.003',
+#pod         released => 1479410521,
+#pod         oncpan => 1,
+#pod     });
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This table stores the latest version of a dist that was uploaded by an
+#pod author. This information is used to build author pages.
+#pod
+#pod This table is a cache of information already found in the C<uploads>
+#pod table. See L<CPAN::Testers::Schema::Result::Upload>.
+#pod
+#pod B<XXX>: This table violates 3NF. If we want to continue doing so, we need
+#pod to have a good reason. Remove this note when we find that reason, or else
+#pod remove this module/table entirely.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =over 4
+#pod
+#pod =item L<DBIx::Class::Row>
+#pod
+#pod =item L<CPAN::Testers::Schema>
+#pod
+#pod =item L<CPAN::Testers::Schema::Result::Upload>
+#pod
+#pod =item L<CPAN::Testers::Data::Uploads>
+#pod
+#pod This module processes the data and writes to this table.
+#pod
+#pod =item L<http://github.com/cpan-testers/cpantesters-project>
+#pod
+#pod For an overview of how the CPANTesters project works, and for
+#pod information about project goals and to get involved.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+use CPAN::Testers::Schema::Base 'Result';
+
+table 'ixlatest';
+
+#pod =attr dist
+#pod
+#pod The distribution name. Composite primary key with L</author>. Copied
+#pod from the `dist` column of the `uploads` table.
+#pod
+#pod =cut
+
+column dist => {
+    data_type => 'varchar',
+    is_nullable => 0,
+};
+
+#pod =attr author
+#pod
+#pod The distribution author. Composite primary key with L</dist>. Copied
+#pod from the `author` column of the `uploads` table.
+#pod
+#pod =cut
+
+column author => {
+    data_type => 'varchar',
+    is_nullable => 0,
+};
+
+primary_key qw( dist author );
+
+#pod =attr version
+#pod
+#pod The version of the distribution release. Copied from the `version` column
+#pod of the `uploads` table.
+#pod
+#pod =cut
+
+column version => {
+    data_type => 'varchar',
+    is_nullable => 0,
+};
+
+#pod =attr released
+#pod
+#pod The UNIX epoch of the release. Copied from the `released` column of the
+#pod `uploads` table.
+#pod
+#pod =cut
+
+column released => {
+    data_type => 'bigint',
+    is_nullable => 0,
+};
+
+#pod =attr oncpan
+#pod
+#pod An integer deciding whether this release is on CPAN. If C<0>, this
+#pod release is not available on CPAN. If C<1>, this release is available on
+#pod CPAN or was reported by the CPAN upload notification system (`cpan` or
+#pod `upload` value in the `type` column on the `uploads` table). If C<2>,
+#pod this release is available on BackPAN.
+#pod
+#pod =cut
+
+column oncpan => {
+    data_type => 'int',
+    is_nullable => 0,
+};
+
+#pod =attr uploadid
+#pod
+#pod The ID of this upload from the `uploads` table.
+#pod
+#pod =cut
+
+column uploadid => {
+    data_type => 'int',
+    is_nullable => 0,
+};
+
+#pod =method upload
+#pod
+#pod Get the related row from the `uploads` table. See
+#pod L<CPAN::Testers::Schema::Result::Upload>.
+#pod
+#pod =cut
+
+belongs_to upload => 'CPAN::Testers::Schema::Result::Upload' => 'uploadid';
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CPAN::Testers::Schema::Result::LatestIndex - A cache of the latest version of a dist by author
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+    my $ix = $schema->resultset( 'LatestIndex' )->find({
+        dist => 'My-Dist',
+        author => 'PREACTION',
+    });
+
+    $schema->resultset( 'LatestIndex' )->find_or_create({
+        dist => 'My-Dist',
+        author => 'PREACTION',
+        uploadid => 23,
+        version => '1.003',
+        released => 1479410521,
+        oncpan => 1,
+    });
+
+=head1 DESCRIPTION
+
+This table stores the latest version of a dist that was uploaded by an
+author. This information is used to build author pages.
+
+This table is a cache of information already found in the C<uploads>
+table. See L<CPAN::Testers::Schema::Result::Upload>.
+
+B<XXX>: This table violates 3NF. If we want to continue doing so, we need
+to have a good reason. Remove this note when we find that reason, or else
+remove this module/table entirely.
+
+=head1 ATTRIBUTES
+
+=head2 dist
+
+The distribution name. Composite primary key with L</author>. Copied
+from the `dist` column of the `uploads` table.
+
+=head2 author
+
+The distribution author. Composite primary key with L</dist>. Copied
+from the `author` column of the `uploads` table.
+
+=head2 version
+
+The version of the distribution release. Copied from the `version` column
+of the `uploads` table.
+
+=head2 released
+
+The UNIX epoch of the release. Copied from the `released` column of the
+`uploads` table.
+
+=head2 oncpan
+
+An integer deciding whether this release is on CPAN. If C<0>, this
+release is not available on CPAN. If C<1>, this release is available on
+CPAN or was reported by the CPAN upload notification system (`cpan` or
+`upload` value in the `type` column on the `uploads` table). If C<2>,
+this release is available on BackPAN.
+
+=head2 uploadid
+
+The ID of this upload from the `uploads` table.
+
+=head1 METHODS
+
+=head2 upload
+
+Get the related row from the `uploads` table. See
+L<CPAN::Testers::Schema::Result::Upload>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<DBIx::Class::Row>
+
+=item L<CPAN::Testers::Schema>
+
+=item L<CPAN::Testers::Schema::Result::Upload>
+
+=item L<CPAN::Testers::Data::Uploads>
+
+This module processes the data and writes to this table.
+
+=item L<http://github.com/cpan-testers/cpantesters-project>
+
+For an overview of how the CPANTesters project works, and for
+information about project goals and to get involved.
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Oriol Soriano <oriolsoriano@gmail.com>
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Oriol Soriano, Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

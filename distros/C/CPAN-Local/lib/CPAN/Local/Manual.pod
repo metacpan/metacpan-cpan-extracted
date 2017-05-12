@@ -1,0 +1,290 @@
+# PODNAME: CPAN::Local::Manual
+
+# ABSTRACT: How to assemble your custom repository
+
+
+__END__
+=pod
+
+=head1 NAME
+
+CPAN::Local::Manual - How to assemble your custom repository
+
+=head1 VERSION
+
+version 0.010
+
+=head1 INTRODUCTION
+
+CPAN::Local is a rerepository management library inspired by L<Dist::Zilla>,
+and focused on extensibility and DIY. It provides almost nothing out of the
+box, assumes as little as possible about what your use cases are, and mandates
+as little as possibles about how you should handle them. This makes it an
+ideal solutions when you have custom requirements and need fine-grained
+control over how your repository is populated.
+
+This software is still experimental and does not have all the features that
+one may expect. If you needly mostly standard functionality and do not care
+much about customization, check L</SEE ALSO> below for a list of alternatives.
+
+CPAN::Local is built around roles and plugins. Roles represent different
+stages of the repository management process, while plugins implement these
+roles in order to get executed at those stages. A configuration file is
+used to specify which plugins should be enabled for a specific repository.
+
+There are two types of roles: those that run as part of the update process:
+
+=over
+
+=item Gather
+
+=item Prune
+
+=item Inject
+
+=item Index
+
+=item Finalise
+
+=back
+
+and standalone roles:
+
+=over
+
+=item Initialise
+
+=item Remove
+
+=item Cleanup
+
+=back
+
+These are described in detail below.
+
+=head1 ROLES
+
+=head2 Gather
+
+Gather is run at the beginning of the update process, and its purpose is
+to collect the list of distributions that need to be added to the repository.
+Plugins that implement this role might for example fetch recently updated
+distributions from a public CPAN mirror, apply patches and rebuild
+distributions from CPAN, fetch private distributions from a local path, etc.
+
+=head2 Prune
+
+Prune is run after L</Gather> and removies items from the list produced by
+L</Gather>. Plugins that implement this role might remove duplicates, fileter
+by distribution name or author, check for failing tests, check upload
+permissions, etc.
+
+=head2 Inject
+
+Inject is where distrubtion tarballs are actually copied to the respective
+author directory in the local repo.
+
+=head2 Index
+
+The Index stage comes after all distributions are already available in the
+repo, and this is when the varioius index files (or wherever the indices
+are stored) should get updated.
+
+=head2 Finalise
+
+The Finalise stage is executed last in the update process, and it expects
+the repository to be fully updated and in a consistent state. It can be used
+to execute any post-update actions that do not alter the state of the repo
+itself - i.e. sent a notification, commit to an uderlying version control
+system, trigger a CI run, etc.
+
+=head2 Initialise
+
+Initialise is run when creating a new repository. Plugins that implement any
+of the above roles should use Initialise to make sure that any resources that
+they require exist. It is useful for things such as creating a sceleton
+directory structure, creating an empty database, creating emtpy index files,
+or initializing a version control system.
+
+=head2 Remove
+
+Romeve is executed by the `remove` command, which requests the removal of
+an individual distribution from the repository. Plugins that know how to add
+a distribution to the repo should also know how to remove it (i.e. from the
+file system, from the indices, etc.)
+
+=head2 Cleanup
+
+Cleanup is executed by the `clean` command, which removes all orphaned
+distributions from the repository. Plugins that implement the L</Gather>
+role should be able to report which distributions they care for, so that
+ones that no plugin needs anymore can be deleted.
+
+NOTE: The `clean` command is not implemented yet.
+
+=head1 BUNDLED PLUGINS
+
+The following plugins currently come with the main CPAN::Local distribution:
+
+=over
+
+=item Inject
+
+Injects a distribution into the respective author directory in the local repo.
+
+=item MailRc
+
+Creates or updates 01mailrc.txt.
+
+=item PackagesDetails
+
+Creates or updates 02packages.details.txt.
+
+=item ModList
+
+Creates an empty 03modlist.data.
+
+=item Duplicates
+
+Removes duplicate distribution (i.e. when different Gather plugins request
+the same distribution more than once).
+
+=back
+
+=head1 CONFIGURATION FILE
+
+Repository settings are kept in a file named C<cpanlocal.ini> in the root of
+the repository. See L<CPAN::Local::Plugin::DistroList> (shipped separately)
+for an usage example.
+
+=head1 USEFUL MODULES FOR PLUGIN AUTHORS
+
+=head2 Index files
+
+=over
+
+=item L<CPAN::Index::API>
+
+Read and write 00whois.xml, 01mailrc.txt, 02packages.details.txt, and 03modlist.data
+
+=item L<PAUSE::Permissions>
+
+Read 06perms.txt
+
+=item L<CPAN::Indexer::Mirror>
+
+Write mirror.yml and mirror.json
+
+=item L<File::Rsync::Mirror::Recentfile>
+
+Read and write RECENT-XX.json files
+
+=item L<Parse::CPAN::MirroredBy>
+
+Read MIRRORED.BY
+
+=item L<Parse::CPAN::Distributions>
+
+Read find-ls
+
+=item L<CPAN::Checksums>
+
+Read and write checksums
+
+=back
+
+=head2 Populating a repository
+
+=over
+
+=item L<CPAN::Inject>
+
+Add a distribution tarball to a local mirror
+
+=item L<CPAN::Cache>
+
+Mirror a file from a remote repo
+
+=back
+
+=head2 Distribution metadata
+
+=over
+
+=item L<CPAN::DistnameInfo>
+
+Parse a distribution filename
+
+=item L<Dist::Metadata>
+
+Read a distribution META file
+
+=item L<CPAN::ParseDistribution>
+
+Use regular expressions to find distribution name, version, and provided packages
+
+=item L<Perl::PrereqScanner>
+
+Use PPI to find a distribution's dependencies
+
+=item L<Module::Depends::Intrusive>
+
+Execute Makefile.PL/Build.PL to find a distribution's dependencies
+
+=back
+
+=head2 Testing
+
+=over
+
+=item L<CPAN::Faker>
+
+Build a dummy repo for testing
+
+=item L<CPAN::Faker::HTTPD>
+
+Build a dummy repo and serve it over http
+
+=back
+
+=head2 Miscellaneous
+
+=over
+
+=item L<CPAN::Visitor>
+
+Traverse distributions in a repo
+
+=back
+
+=head1 SEE ALSO
+
+Other libraries for building private CPANs
+
+=over
+
+=item L<CPAN::Mini> and L<CPAN::Mini::Inject>
+
+=item L<Pinto>
+
+=item L<OrePAN>
+
+=item L<CPAN::Site>
+
+=item L<MyCPAN::App::DPAN>
+
+=back
+
+=head1 AUTHOR
+
+Peter Shangov <pshangov@yahoo.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Venda, Inc..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

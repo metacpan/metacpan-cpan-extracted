@@ -1,0 +1,96 @@
+#!perl
+
+use strict; use warnings FATAL => 'all';
+
+use Convert::Z85;
+
+use Getopt::Long;
+my $do_decode = 0;
+my $wrap = 0;
+my $file;
+GetOptions(
+  version   => sub {
+    print
+      "z85_convert - Convert::Z85 - ",
+      ($Convert::Z85::VERSION || '(git)'),
+      "\n"
+    ;
+    exit 0
+  },
+
+  help      => sub {
+    print
+      "z85_convert - encode or decode data or Z85 text\n\n",
+      "  --file=FILE    Retrieve input from FILE (rather than STDIN)\n",
+      "  --decode       Decode Z85 text (rather than encoding data)\n",
+      "  --wrap=COLS    Wrap encoded lines after COLS characters\n",
+      "\n"
+    ;
+    exit 0
+  },
+
+  decode    => \$do_decode,
+  'file=s'  => \$file,
+  'wrap=i'  => \$wrap,
+);
+$file = shift @ARGV unless $file;
+
+my $input;
+if ($file) {
+  open my $fh, $file or die $!;
+  $input = do { local $/; <$fh> };
+  close $fh or warn $!;
+} else {
+  $input = do { local $/; <STDIN> };
+}
+
+if ($do_decode) {
+  # accept extraneous newlines in z85 stream ->
+  print decode_z85(join('', split /\n/, $input), pad => 1)
+} else {
+  my $output = encode_z85($input, pad => 1);
+  $output = join "\n", unpack "(A$wrap)*", $output if $wrap;
+  print $output, "\n"
+}
+
+=pod
+
+=head1 NAME
+
+z85_convert - Command line interface to Convert::Z85
+
+=head1 SYNOPSIS
+
+  # Encode Z85 from file:
+  sh$ z85_convert --file FILE
+
+  # Decode Z85 from file:
+  sh$ z85_convert --decode --file FILE
+  
+  # Encode Z85 from STDIN (and wrap at 76 columns):
+  sh$ cat FILE | z85_convert -w 76
+
+=head1 DESCRIPTION
+
+A trivial command line interface to the Z85 encoding, as implemented by
+L<Convert::Z85>.
+
+Padding is applied automatically.
+
+=head1 OPTIONS
+
+=head2 decode
+
+Decode, rather than encode, the given input.
+
+=head2 file
+
+A file path to encode or L</decode>.
+
+If none is specified, C<STDIN> is taken as input instead.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

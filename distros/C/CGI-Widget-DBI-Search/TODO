@@ -1,0 +1,8 @@
+- remove HTML which control style (e.g. width, height, nowrap, <b>, etc) and
+  CSS classes everywhere, and add a default CSS stylesheet
+- add Terms of Use link to AGPL on user-visible pages
+- add search functionality to widget: right now its more of just a
+  "result pager" widget, with the actual search code in the calling class
+- convert to DB abstraction layer, e.g. Alzabo or Tangram
+  (would be nice to have some performance tests written for comparisons
+   before this is done though)

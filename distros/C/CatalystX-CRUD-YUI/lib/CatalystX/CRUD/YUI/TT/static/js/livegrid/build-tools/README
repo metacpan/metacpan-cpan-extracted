@@ -1,0 +1,47 @@
++------------------------------------------------------------------------------+
+|                           Ex.ux.Livegrid Build Tools                         |
++------------------------------------------------------------------------------+
+
+The shell scripts found in ./windows and ./unix will create several files within
+the /build directory.
+The directory layout is:
+
+/build
+  /resources
+    /css
+    /images
+
+After running the script, you will find 3 files within /build:
+  livegrid-core.js
+  livegrid-all.js
+  livegrid-all-debug.js
+and one file within /build/resources/css:
+  ext-ux-livegrid.css
+
+ext-ux-livegrid.css
+--------------------
+ext-ux-livegrid.css is the compressed version of the following files:
+  /src/resources/css/ext-ux-livegrid.css
+
+livegrid-core.js
+----------------
+livegrid-core.js is the merged and compressed version of the following files:
+  /src/GridPanel.js
+  /src/GridView.js
+  /src/JsonReader.js
+  /src/RowSelectionModel.js
+  /src/Store.js
+
+livegrid-all.js, livegrid-all-debug.js
+---------------------------------------
+livegrid-all.js is the merged and compressed version of the following files:
+  /src/GridPanel.js
+  /src/GridView.js
+  /src/JsonReader.js
+  /src/RowSelectionModel.js
+  /src/Store.js
+  /src/Toolbar.js
+  /src/DragZone.js
+  /src/EditorGridPanel.js
+
+livegrid-all-debug.js contains the same files, but is not compressed.

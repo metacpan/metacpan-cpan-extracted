@@ -1,0 +1,23 @@
+Revision history for Perl extension CORBA::XPIDL.
+
+0.21  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+
+0.20  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+0.04  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+	- some Perl Best Practices
+
+0.03  Mon Jun  7 08:30:00 2004
+	- better support of 'import'
+
+0.02  Tue May 18 18:30:00 2004
+	- first release
+
+0.01
+	- original version; created by h2xs 1.20 with options
+		-XA -n CORBA::XS
+

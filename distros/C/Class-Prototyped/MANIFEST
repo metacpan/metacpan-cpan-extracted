@@ -1,0 +1,27 @@
+Build.PL
+Changes
+examples/graph.png
+examples/graphtest.pl
+lib/Class/Prototyped.pm
+lib/Class/Prototyped/Graph.pm
+lib/Class/Prototyped/why.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+perf/package_creation.pl
+perf/references.pl
+README
+t/autoload.t
+t/classReflect.t
+t/constant.t
+t/defaultAttributes.t
+t/delegate.t
+t/destroy.t
+t/extendedSyntax.t
+t/include.t
+t/reflectAny.t
+t/super.t
+t/test.t
+t/tied.t
+t/wrap.t
+META.json

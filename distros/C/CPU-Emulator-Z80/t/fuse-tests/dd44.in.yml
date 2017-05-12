@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 68
+name: dd44
+registers:
+  AF: 45950
+  AF_: 0
+  BC: 52144
+  BC_: 0
+  DE: 14056
+  DE_: 0
+  HL: 16197
+  HL_: 0
+  I: 0
+  IX: 9986
+  IY: 46009
+  PC: 0
+  R: 0
+  SP: 0

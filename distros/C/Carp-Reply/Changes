@@ -1,0 +1,30 @@
+Revision history for Carp-Reply
+
+0.08  2013-12-17
+      - allow suppressing the initial stacktrace when invoking the repl
+        manually
+
+0.07  2013-07-10
+      - update to work with new reply
+
+0.06  2013-07-04
+      - update to work with new reply
+      - modifications to existing lexical variables in a stack frame now
+        persist if the program continues running
+      - lexical variables declared in the repl are now persisted (assuming
+        LexicalPersistence is enabled)
+
+0.05  2013-06-27
+      - update to work with new reply
+
+0.04  2013-06-26
+      - documentation updates (RT86274)
+
+0.03  2013-06-26
+      - set the current package properly when moving around in frames
+
+0.02  2013-06-12
+      - fix some mis-formatted pod which broke the trailing 1;
+
+0.01  2013-06-12
+      - Initial release

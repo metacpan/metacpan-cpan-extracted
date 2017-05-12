@@ -1,0 +1,14 @@
+MANIFEST
+LICENCE
+README
+TODO
+Changes
+lib/Convert/ASCIInames.pm
+t/001_load.t
+t/002_config.t
+t/003_ord2name.t
+t/004_ord2alt.t
+t/005_desc.t
+t/006_altdesc.t
+t/007_inputs.t
+Makefile.PL

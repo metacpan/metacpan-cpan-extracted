@@ -1,0 +1,12 @@
+NAME
+    CCCP::Encode - Perl extension for character encodings from utf-8 to any
+    cyrillic (koi8-r, windows-1251, etc.)
+    
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

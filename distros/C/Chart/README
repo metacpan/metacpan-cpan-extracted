@@ -1,0 +1,279 @@
+------------------------------------------------------------------------
+Chart version 2.4.10
+------------------------------------------------------------------------
+
+
+----------
+INSTALLING
+----------
+
+The usual.
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+This should install to your site_perl directory.  The test scripts also
+put samples of the different charts in the samples/ directory.
+
+
+-------------
+PREREQUISITES
+-------------
+
+Lincoln Stein's GD module version 2.0.36 or higher.
+
+-------
+CHANGES
+-------
+2.4.10 Upload to pause.perl.org failed for version 2.4.9. Therefore, the version 2.4.9 was renamed to 2.4.10
+       for a new upload.
+
+2.4.9 Upload to pause.perl.org failed for version 2.4.8. Therefore, the version 2.4.8 was renamed to 2.4.9
+      for a new upload.
+       
+2.4.8 Bug repaired: rt.cpan.org #81171::Composite w/two ::Lines and xy_plot ==> undefined value when drawing ticks
+      (t/composite_7.t and t/composite_8.t are showing the differences)
+      Base.pm: defined(@array) 
+      Chart.pod corrected for deprecated @ARR->[$i]
+
+2.4.7 Not published
+      
+2.4.6 Number of named colors extended
+      Documentation.pdf explains the use of colors (Appendix added) 
+      Corrections in base.pm, routines
+       _draw_bottom_legends, _draw_x_number_ticks
+       in LinesPoints.pm, routines  _draw_data
+ 
+2.4.5 Typo in _draw_x_ticks corrected
+      Methods scalar_png(), scalar_jpeg() corrected for result.
+      Test routine t/scalarImage.t added
+      Chart.pod corrected
+
+2.4.4 The brush styles to points and linespoints are extended.
+      Not only circles represent the points but a number of different
+      brush styles, linke donut, Star and so on.
+
+2.4.3 Corrections to imagemap production in Composite.pm and Lines.pm
+
+2.4.2 Changes done by R. Dassing, Michael Potter
+      Base.pm:
+      The values for 'true' resp. 'false' may be of the following
+      true: TRUE, true, T, t, 1 and defined
+      false: FALSE, false, F, f, 0 or undefined
+      
+      Base.pm:
+      Added new options xlabel and xrange which is valid for xy_plot
+      and Chart::Lines, Chart::Points, Chart::LinesPoints,
+      Chart::Split, Chart::ErrorBars.
+      
+      In order to use the labels, the chart module needs to have 'xlabels' 
+      AND 'xrange' set. Below is some example code for use: 
+      @labels = (['Jan', 'Feb','Mar'], 
+                 ['10','40','70']); 
+      $chart->set( xlabels => \@labels, 
+                   xrange => [0,100] ); 
+      This options allow to set and position labels at the x-axis arbitrary.
+
+      add_dataset() and app_pt() accepts now datasets as lists and as
+          references to list like already mentioned in the docs
+
+
+      Pie.pm: 
+      Optimized organisation of the placement of the labels.
+      Added flag to avoid plotting of legends at all
+      Using GD Version 2.0.36 as this version supports 'filledArc'
+
+      Composite.pm:
+      Correction due to Request 23166
+      write the endmost value of input array
+      in imagemap_data array
+      
+      Lines.pm:
+      Correction due to Request 23166: 
+      write the endmost value of input array
+      in imagemap_data array
+      
+      
+      
+2.4.1 Changes done by Christine Zilker, Gerhard Stuhlpfarrer, R. Dassing
+        Added new Options:
+             ring             Draw a ring instead of a Pie
+             legend_lines     Connect Pie and the description with a line
+             stepline         Connect Lines and LinesPoints by a stepped line
+             stepline_mode    (thanks to Gerhard Stuhlpfarrer)
+             brush_size1      Define Brush Size for Composite 1 
+             brush_size2      and 2
+        Color problem in Pie fixed
+        Positioning of the description optimized in Pie
+        Division by zero problem fixed in Pie
+        Module 'Bars' checks for numeric data a input on y-axis
+        New Function added to Base:
+            minimum  - determine minimal value of an array of numeric values
+            maximum  - determine maximal value of an array of numeric values
+            arccos   - arccos
+            arcsin   - arcsin
+        Some small bugs corrected:
+            Base::_find_y_scale
+            Base::_find_y_range   : check for numeric values
+            Base::_find_x_range   : check for numeric values
+        Latex sources for documentation included 
+            (We hope to get a better documentation be a native english speaking person)
+                 
+2.3  Changes done by Christine Zilker:
+        Added new Options: 
+	     in Composite: 
+                legend_example_height    changes thickness of the lines in the legend,
+	        f_y_tick1, f_y_tick2 analog to f_y_tick 
+                                         used for right and left y-axes
+	     in Direction: 
+                pairs                    
+
+        Added the possibility to add more datasets in Chart::Direction 
+			   
+	Fixed "label space" problem in Pie
+	Fixed dataset order (in the legend) in StackedBars
+	Fixed problem of getting the right values if round2Tick is used
+	Fixed problem of datavalues in _find_y_scale
+	Some minor bugfixes	    
+
+        Update of the Documentation (Documentation.pdf)
+
+        The requested support of TruType fonts was currently dropped due to
+        missing support in GD.pm (even in new versions)
+        
+        The print out of some hints and warnings where deleted not to confuse
+        the user.
+
+2.2: Composite.pm: imagemap_dump() repaired.
+
+2.1: Changes done by Markus Brandl:
+	new Modules added: ErrorBars.pm, HorizontalBars.pm, Pareto.pm,                          
+	 
+	Pie.pm, Split.pm and Direction.pm
+
+        Subdirectory "doc" contains a Acrobat Reader Documentation.pdf file.
+
+	Function add_datafile() added. It is now possible to add a complete
+	datafile.
+
+        Added new Options: precision, xy_plot, min_x_ticks, max_x_ticks,
+	skip_y_ticks, skip_int_ticks, legend_label_value, y_axes,
+	scale, interval, start, interval_ticks, sort, same_error, point,
+	line, arrow, angle_interval, min_circles, max_circles
+	Also added: the 'title' and 'x_label' options in the colors option 
+
+	Documentation (Documentation.pdf) added.
+
+	_find_x_scale, _find_x_range and _draw_x_number_ticks added to make 
+	xy_plots possible.
+
+	_sort_data has now a body. 
+
+        Fixed integer ticks problem by adding the skip_int_ticks option
+	Fixed f_x_ticks and f_y_ticks problem in Composite
+	Fixed negative value problem in Bars
+	Fixed min_val and max_val problem in draw_data function of all modules:
+	Now, Chart plots the data only if the data is in the area of min_val and
+	max_val! The border of bars in Bars, HorizontalBars and StackedBars will
+	be plotted pink (not misccolor) if the data isn't in the min_val-max_val
+	interval.
+	Fixed custom_x_ticks problem in _draw_x_ticks
+	Some other bugfixes.
+	Updates in _find_y_scale, _round2tick, _calcTickInterval 
+	   
+
+1.1: Changes done by David Pottage:
+        Plot scales can now have any magnitude. 
+        It does not matter if the data covers a range of 100000000000 units
+        or 0.00000000001 units, the scale will be correctly calculated.
+
+        Ticks on plot scales are now plotted on 'round' numbers. 
+        The number & spacing of ticks is chosen based on the data range.
+
+        False zero graphs are now explicitly supported, and will be 
+        generated if the data range merits it. 
+        The instance field 'include_zero' should be set to zero to suppress this.
+
+        Added: include_zero, min_y_ticks, max_y_ticks, integer_ticks_only
+
+1.0.1:
+        Fixed _draw_bottom_legend in Base.pm
+
+0.99c-pre3 - 1.0:
+        Fixed _draw_data in Lines.pm: lines are limited to the frame
+        Added f_x_tick, f_y_tick
+        Added jpeg(), cgi_jpeg() to produce the format jpeg
+        Delete GIF support, added PNG and JPEG instead
+
+0.99b - 0.99c-pre3:
+	James F Miner <jfm@winternet.com>:
+	Added Mountain chart type
+	Added Patterns.  See t/mountain.t for details
+	Bugfix for drifting x tick
+	Improved internal color handling
+
+	Richard Dice  <rdice@shadnet.shad.ca>:
+	Added brush shapes for Points, LinesPoints
+	Added scalar_gif
+
+0.99a - 0.99b:
+	Fixed left legend in composite charts
+	Fixed no color problem when using composite charts w/ no legend
+	Fixed color handling for datasets
+	Added option for http header Pragma: no-cache
+		Netscape 4.5 has a bug that breaks it, but it works with
+		other browsers.  Any ideas for a workaround?
+
+0.99 - 0.99a:
+	Added use of undef() values to represent 'no data' for line breaks
+	Added ylabel*_color options
+	Added x_grid_lines, y_grid_lines & y2_grid_lines , and color options for each
+	Cache disabling in cgi header: Reiner Nippes <nippes.r@gmx.de>
+	Restored grid_lines option: Heinz-Guenter Kontny <hek@kronos.nic.dtag.de>
+	Fixed a typo that broke imagemap data storage in Lines charts
+
+0.94 - 0.99:
+	Modified the 'title' option to correctly process newlines
+	Deprecated the 'subtitle' option, will remove it in next release
+	Changed the API for specifying colors
+	Added support for printing to file handles
+	Added Chart::Composite
+	Added 'spaced_bars' to make it easy to differentiate the bars
+	Added 'grey_background' to make plot background grey
+	Added support for negative values in the datasets
+	Added methods to remember and dump imagemap pixel information
+	Included rgb.txt with distribution for WinXX users
+
+0.93 - 0.94:
+	Moved the legend down to be flush with the chart
+	Fixed the long decimal y-tick label problem
+	Fixed (for the last time, hopefully) the pre-5.004 compilation problem
+	Fixed handling of undefined data points
+	Added more colors for the default data colors
+	Added the transparent gif option
+	Added the option for user-specified colors
+	Added the grid_lines option
+
+0.92 - 0.93: 
+	Fixed the sort problem
+	Fixed the y-axis label centering problem
+	Fixed pre-5.004 compilation problem
+	Added StackedBars charts
+	
+------
+MAINTAINER
+------
+
+Chart-Group (chart@fs.wettzell.de)
+
+---------
+COPYRIGHT
+---------
+
+Copyright(c) 1997-1998 David Bonner, 1999 Peter Clark, 
+2001-2012 Chart-Group at BKG.
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.

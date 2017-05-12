@@ -1,0 +1,20 @@
+== Headline ==
+
+Some text in a paragraph. And some more text.
+
+ Indended text is verbatim.
+
+But this isn't.
+
+== Headline number 2 ==
+
+* a list with some
+* short items
+* and a very long item that contains a lot of silly text and spans more than one line
+
+Some more text in a long paragraph that also spans more than one line.
+
+----
+
+End of document.
+

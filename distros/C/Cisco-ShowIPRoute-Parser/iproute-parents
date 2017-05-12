@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+# Simple script to show the parents (next routes) to the destination
+# given the log file passed in.
+
+use Cisco::ShowIPRoute::Parser;
+
+# Main
+
+my $ip = shift;
+my $log = shift;
+
+# An re for valid IP addresses from Daimian Conway
+my $digit =  q{(25[0-5]|2[0-4]\d|[0-1]??\d{1,2})};
+my $ipre  = "$digit\.$digit\.$digit\.$digit";
+
+unless( $ip =~ /^$ipre$/ && -f $log)
+{
+	print "Usage: $0 IPaddress Logfile\n";
+	exit 1;
+}
+
+
+my $router = new Cisco::ShowIPRoute::Parser($log);
+my @rts =  $router->getroutes($ip);
+print join("\n",@rts), "\n" if @rts;
+

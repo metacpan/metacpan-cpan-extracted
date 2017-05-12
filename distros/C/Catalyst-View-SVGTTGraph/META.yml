@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Catalyst-View-SVGTTGraph
+version:             0.02
+abstract:            SVG Graph View Component for Catalyst
+license:             ~
+author:              
+    - Shota Takayama <shot[atmark]bindstorm.jp>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Catalyst:                      5.57
+    SVG::TT::Graph:                0.08
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

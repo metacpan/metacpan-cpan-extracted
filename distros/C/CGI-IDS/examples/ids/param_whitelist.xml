@@ -1,0 +1,33 @@
+<whitelist>
+	<param>
+		<key>sid</key>
+		<rule><![CDATA[(?:^[0-9]+\.[0-9]+$)]]></rule>
+	</param>
+	<param>
+		<key>uid</key>
+	</param>
+	<param>
+		<key>scr_rec_id</key>
+		<rule><![CDATA[(?:^[0-9]+\.[0-9a-f]+$)]]></rule>
+		<condition>
+			<key>action</key>
+			<rule><![CDATA[(?:^login$)]]></rule>
+		</condition>
+	</param>
+	<param>
+		<key>login_password</key>
+		<conditions>
+			<condition>
+				<key>username</key>
+				<rule><![CDATA[(?:^[a-z]+$)]]></rule>
+			</condition>
+			<condition>
+				<key>send</key>
+			</condition>
+			<condition>
+				<key>action</key>
+				<rule><![CDATA[(?:^login$)]]></rule>
+			</condition>
+		</conditions>
+	</param>
+</whitelist>

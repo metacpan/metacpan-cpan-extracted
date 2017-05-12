@@ -1,0 +1,28 @@
+Revision history for Perl extension Crypt::Lite.
+
+0.82.11  16.09.2006 15:27
+
+	 - There was a severe security bug in the encryption procedure in all
+	   earlier releases. To include the private key was a bad idea.
+	   It's being improved for the little price there is an additional
+	   dependency to the MD5 Perl module from now on.
+
+	 - Updated documentation part about double encryption.
+
+	 - Portability issue on Win32 systems addressed
+
+	 - Strings encrypted with earlier versions can still be decrypted
+	   with this release and the new procedure will apply as of the next
+	   encryption call.
+
+
+0.82.06  29.09.2005 10:33
+
+	 - A comment has shown it needs at least version 5.6.1
+	   of Perl and the Makefile.PL has been updated
+	   accordingly.
+
+
+0.82.05  14.04.2005 00:58
+
+	 - Updated comment.

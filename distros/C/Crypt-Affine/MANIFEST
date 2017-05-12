@@ -1,0 +1,19 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Crypt/Affine.pm
+lib/Crypt/Affine/Params.pm
+t/00-load.t
+t/01-new.t
+t/02-encrypt.t
+t/03-decrypt.t
+t/manifest.t
+t/pod.t
+t/changes.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

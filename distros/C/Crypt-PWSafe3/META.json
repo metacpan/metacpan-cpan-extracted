@@ -1,0 +1,61 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "T.v.Dein <tlinden@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-PWSafe3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::CBC" : "2.3",
+            "Crypt::ECB" : "1.45",
+            "Crypt::Random" : "1.25",
+            "Crypt::Twofish" : "2.14",
+            "Data::UUID" : "1.217",
+            "Digest::HMAC" : "1",
+            "Digest::SHA" : "1",
+            "File::Temp" : "0",
+            "Shell" : "0.5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/tlinden/Crypt--PWSafe3"
+      },
+      "homepage" : "http://www.daemon.de/",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "git://github.com/tlinden/Crypt--PWSafe3.git"
+      }
+   },
+   "version" : "1.22"
+}

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Helper-Model-Bitcoin.t
+t/Catalyst-Model-Bitcoin.t
+lib/Catalyst/Helper/Model/Bitcoin.pm
+lib/Catalyst/Model/Bitcoin.pm
+META.yml                                 Module meta-data (added by MakeMaker)

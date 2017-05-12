@@ -1,0 +1,27 @@
+$Id: Todo,v 1.6 2003/11/03 10:25:48 pmh Exp $
+
+clear(), like quick_clear(), but flushing dirty entries
+
+entry-specific expiry times (see differential-expiry)
+
+Untaint values read from file in _set_options() (see taint)
+	Actually, only the header values should be untainted
+	Cache entries should be tainted
+
+Make thread-safe
+
+Factor common code out of read() and write()
+
+Improve test suite
+
+Another good idea from Rob Mueller:
+> One thing I was wondering about your cache, whenever you access something,
+> it seems to move it to the front of the bucket. That's neat from a LRU
+> perspective, but couldn't you just use pointers or offsets or something
+> instead of having to move the whole data around each time you access it?
+	Store pointer table at beginning of bucket, and just swap pointers
+	Only move entries when deleting entries
+	What about backwards compatibility?
+	Will it need defragging?
+		
+

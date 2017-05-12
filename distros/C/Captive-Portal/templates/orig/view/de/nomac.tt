@@ -1,0 +1,11 @@
+[% WRAPPER 'view/de/layout.tt' %]
+
+<div class="span-8">
+ <p class="error">Login von diesem Interface des Captive::Portal ist
+ nicht möglich bzw. der URL zur Anzeige der Statusseite ist falsch.</p>
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

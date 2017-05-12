@@ -1,0 +1,52 @@
+Revision history for Convert::PEM
+
+0.08  2010.12.06
+    - Altered explode() to canonicalize line endings to \n, handling
+      DOS (\r\n) and older mac (\r) line breaks cleanly. Thanks to Matt
+      Gramlich for the patch.
+    - Removed sign() and auto_install() from Makefile.PL.
+    - Removed magic svn keywords.
+    - Converted test suite to Test::More.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.07  2005.05.25
+    - Allow passing in Name and Macro parameters on encode and decode,
+      rather than just at initialization.
+    - Use Class::ErrorHandler instead of our own built-in error-handling
+      class.
+    - Switched to using Module::Install in Makefile.PL.
+
+0.06  2001.09.14
+    - Use Convert::PEM::ErrorHandler instead of defining error/errstr
+      methods for each class. This also lets us use error/errstr as
+      class methods.
+    - Added Macro param to constructor; this is useful when dealing
+      with an ASN.1 description that defines multiple ASN.1 macros,
+      and we want to decode/encode using a specific macro.
+    - Removed Crypt::DES_EDE3 from this distribution; it is now
+      packaged and distributed separately, and has been added as a
+      prereq for Convert::PEM.
+
+0.05  2001.05.11
+    - Changed explode/implode so that they return/get list of headers
+      in order in which they appear in the file. This fixes the bug
+      where openssl-compatible PEM readers (like ssh-keygen in OpenSSH)
+      could sometimes not read encrypted files (depending on the order
+      given to the headers by the hash).
+
+0.04  2001.04.22
+    - Changed 'Source' param back to 'Content'.
+
+0.03  2001.04.21
+    - Added test suite.
+    - Added encode/decode methods, which are the encoding and decoding
+      routines, broken out into separate methods. read and write are
+      now implemented as wrappers around decode and encode. This allows
+      for more flexibility.
+
+0.02  2001.04.20
+    - Added Content parameter to read method; bypasses file-reading.
+
+0.01  2001.04.20
+    - original version; created by h2xs 1.19

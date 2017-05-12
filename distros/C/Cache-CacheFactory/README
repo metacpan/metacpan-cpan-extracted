@@ -1,0 +1,78 @@
+Cache-CacheFactory
+
+Cache::CacheFactory provides a class factory for modules using the
+Cache::Cache API. You supply the combination of features you require
+regarding storage, pruning and validity policies and
+Cache::CacheFactory produces a cache object that behaves like an
+extended Cache::Cache object with the features you requested.
+
+Other than a slightly modified constructor Cache::CacheFactory can
+behave as a drop-in replacement for any existing
+Cache::Cache-compatibile cache.
+
+Policies are seperated into different modules, you no longer need to
+find or write a Cache::SizeAwareAgainstFileSharedMemoryCache.pm with
+the exact combination of features you're after.
+
+Cache::CacheFactory can also allows you to combine multiple policies,
+so you can have a cache that stores to both memory and disk, or one
+that that prunes the cache based on time, cache size and file
+last-modified times.
+
+If you're a module author you can create a Cache::CacheFactory object
+without knowing what cache policies are installed on the target system
+by using handy helper functions to choose the best match from a list
+of preferences, useful if you don't want to clutter them up with
+unwanted dependencies.
+
+Cache::CacheFactory also provides a 'lastmodified' pruning and
+validity policy allowing you to mark an entry as having a dependency
+chain of files, when any of the files in the chain are modified the
+cache entry is considered invalid.
+
+If any of the existing policies don't suit your needs, it's easy to
+write a new policy module to provide the behaviour you need, and it
+can then be used in combination with any of the existing policies with
+no further work.
+
+Further, any Cache::Cache-compatible module can most likely be used
+"as is" as a new storage policy.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Cache::CacheFactory
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Cache-CacheFactory
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Cache-CacheFactory
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Cache-CacheFactory
+
+    Search CPAN
+        http://search.cpan.org/dist/Cache-CacheFactory
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Sam Graham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

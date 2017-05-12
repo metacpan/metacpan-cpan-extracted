@@ -1,0 +1,160 @@
+Revision history for Cisco-IronPort
+
+0.09	28-05-2013 ltp@cpan.org
+	Added new methods:
+		- content_filter_detail_current_day
+		- content_filter_detail_current_day_raw
+		- content_filter_detail_current_hour
+		- content_filter_detail_current_hour_raw
+		- content_filter_detail_current_week
+		- content_filter_detail_current_week_raw
+		- outgoing_content_filter_matches_current_day
+		- outgoing_content_filter_matches_current_day_raw
+		- outgoing_content_filter_matches_current_hour
+		- outgoing_content_filter_matches_current_hour_raw
+		- outgoing_content_filter_matches_current_week
+		- outgoing_content_filter_matches_current_week_raw
+		- outgoing_delivery_status_current_day
+		- outgoing_delivery_status_current_day_raw
+		- outgoing_delivery_status_current_hour
+		- outgoing_delivery_status_current_hour_raw
+		- outgoing_delivery_status_current_week
+		- outgoing_delivery_status_current_week_raw
+		- top_incoming_content_filter_matches_current_day
+		- top_incoming_content_filter_matches_current_day_raw
+		- top_incoming_content_filter_matches_current_hour
+		- top_incoming_content_filter_matches_current_hour_raw
+		- top_incoming_content_filter_matches_current_week
+		- top_incoming_content_filter_matches_current_week_raw
+
+	Re-wrote core to handle new parameters.
+
+0.08	15-04-2013 ltp@cpan.org
+	Added new methods:
+		- incoming_mail_summary_current_week
+		- incoming_mail_summary_current_week_raw
+		- incoming_mail_details_current_week
+		- incoming_mail_details_current_week_raw
+		- top_users_by_clean_outgoing_messages_current_week
+		- top_users_by_clean_outgoing_messages_current_week_raw
+		- average_time_in_workqueue_current_week
+		- average_time_in_workqueue_current_week_raw
+		- average_incoming_message_size_current_week
+		- average_incoming_message_size_current_week_raw
+		- average_messages_in_workqueue_current_week
+		- average_messages_in_workqueue_current_week_raw
+		- average_outgoing_message_size_current_week
+		- average_outgoing_message_size_current_week_raw
+		- cpu_by_function_current_week
+		- cpu_by_function_current_week_raw
+		- incoming_content_filter_matches_current_week
+		- incoming_content_filter_matches_current_week_raw
+		- maximum_messages_in_workqueue_current_week
+		- maximum_messages_in_workqueue_current_week_raw
+		- memory_page_swapping_current_week
+		- memory_page_swapping_current_week_raw
+		- overall_cpu_usage_current_week
+		- overall_cpu_usage_current_week_raw
+		- top_incoming_virus_types_detected_current_week
+		- top_incoming_virus_types_detected_current_week_raw
+		- top_outgoing_content_filter_matches_current_week
+		- top_outgoing_content_filter_matches_current_week_raw
+		- total_incoming_connections_current_week
+		- total_incoming_connections_current_week_raw
+		- total_incoming_message_size_current_week
+		- total_incoming_message_size_current_week_raw
+		- total_incoming_messages_current_week
+		- total_incoming_messages_current_week_raw
+		- total_outgoing_connections_current_week
+		- total_outgoing_connections_current_week_raw
+		- total_outgoing_message_size_current_week
+		- total_outgoing_message_size_current_week_raw
+		- total_outgoing_messages_current_week
+		- total_outgoing_messages_current_week_raw
+		- internal_user_details_current_week
+		- internal_user_details_current_week_raw
+
+0.07	05-12-2012 ltp@cpan.org
+	Added new methods:
+		- internal_user_details_current_hour
+		- internal_user_details_current_hour_raw
+		- internal_user_details_current_day
+		- internal_user_details_current_day_raw
+
+0.06	14-09-2012 ltp@cpan.org
+	Added new methods:
+		- average_incoming_message_size_current_hour
+		- average_incoming_message_size_current_hour_raw
+		- average_incoming_message_size_current_day
+		- average_incoming_message_size_current_day_raw
+		- average_messages_in_workqueue_current_hour
+		- average_messages_in_workqueue_current_hour_raw
+		- average_messages_in_workqueue_current_day
+		- average_messages_in_workqueue_current_day_raw
+		- average_outgoing_message_size_current_hour
+		- average_outgoing_message_size_current_hour_raw
+		- average_outgoing_message_size_current_day
+		- average_outgoing_message_size_current_day_raw
+		- cpu_by_function_current_hour
+		- cpu_by_function_current_hour_raw
+		- cpu_by_function_current_day
+		- cpu_by_function_current_day_raw
+		- incoming_content_filter_matches_current_hour
+		- incoming_content_filter_matches_current_hour_raw
+		- incoming_content_filter_matches_current_day
+		- incoming_content_filter_matches_current_day_raw
+		- maximum_messages_in_workqueue_current_hour
+		- maximum_messages_in_workqueue_current_hour_raw
+		- maximum_messages_in_workqueue_current_day
+		- maximum_messages_in_workqueue_current_day_raw
+		- memory_page_swapping_current_hour
+		- memory_page_swapping_current_hour_raw
+		- memory_page_swapping_current_day
+		- memory_page_swapping_current_day_raw
+		- overall_cpu_usage_current_hour
+		- overall_cpu_usage_current_hour_raw
+		- overall_cpu_usage_current_day
+		- overall_cpu_usage_current_day_raw
+		- top_incoming_virus_types_detected_current_hour
+		- top_incoming_virus_types_detected_current_hour_raw
+		- top_incoming_virus_types_detected_current_day
+		- top_incoming_virus_types_detected_current_day_raw
+		- top_outgoing_content_filter_matches_current_hour
+		- top_outgoing_content_filter_matches_current_hour_raw
+		- top_outgoing_content_filter_matches_current_day
+		- top_outgoing_content_filter_matches_current_day_raw
+		- total_incoming_connections_current_hour
+		- total_incoming_connections_current_hour_raw
+		- total_incoming_connections_current_day
+		- total_incoming_connections_current_day_raw
+		- total_incoming_message_size_current_hour
+		- total_incoming_message_size_current_hour_raw
+		- total_incoming_message_size_current_day
+		- total_incoming_message_size_current_day_raw
+		- total_incoming_messages_current_hour
+		- total_incoming_messages_current_hour_raw
+		- total_incoming_messages_current_day
+		- total_incoming_messages_current_day_raw
+		- total_outgoing_connections_current_hour
+		- total_outgoing_connections_current_hour_raw
+		- total_outgoing_connections_current_day
+		- total_outgoing_connections_current_day_raw
+		- total_outgoing_message_size_current_hour
+		- total_outgoing_message_size_current_hour_raw
+		- total_outgoing_message_size_current_day
+		- total_outgoing_message_size_current_day_raw
+		- total_outgoing_messages_current_hour
+		- total_outgoing_messages_current_hour_raw
+		- total_outgoing_messages_current_day
+		- total_outgoing_messages_current_day_raw
+
+0.05	07-08-2012 ltp@cpan.org
+	Added new methods:
+		- average_time_in_workqueue_current_hour
+		- average_time_in_workqueue_current_day
+		- average_time_in_workqueue_current_hour_raw
+		- average_time_in_workqueue_current_day_raw
+
+0.01    19-06-2012 ltp@cpan.org
+        Initial release to CPAN.
+

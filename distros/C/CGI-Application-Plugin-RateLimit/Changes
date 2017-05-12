@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Application::Plugin::RateLimit.
+
+0.01  Tue May  2 13:48:29 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A -n CGI::Application::Plugin::RateLimit
+

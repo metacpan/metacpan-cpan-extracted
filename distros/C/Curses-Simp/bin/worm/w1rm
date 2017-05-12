@@ -1,0 +1,80 @@
+#!/usr/bin/perl -w
+# 622IQTD: w1rm by PipStuart <Pip@CPAN.Org>; a color version of w0rm with more features.
+# A6GGrIg: a bug became a feature! ;) The expansion of colors in the tail also expands a hidden head increasing the anticipatory difficulty level.
+#   Still kinda a bad bug though because sometimes crashes invisibly (at least with outer walls?) && confusingly.
+use strict;
+use Curses::Simp;
+my $scor = 0;   # game Score
+my $dtim = 0.8; # Delta Time
+my $dire = 'u'; # movement Direction
+my $grow = 1;   # Grow amount
+my $gotf = 1;   # Got  Food flag
+my $govr = 0;   # Game Over flag
+my $yndx = 0;   # y-index
+my $xndx = 0;   # x-index
+my $valu = 0;   # food Value
+my $keey = '-1';# pressed SDL Key name
+my @ytai = ();  # y-coordinates of tail
+my @xtai = ();  # x-coordinates of tail
+my @ctai = ();  #   color       of tail
+my $simp = Curses::Simp->new('flagsdlk' => 1);
+for($yndx = 1; $yndx < $simp->Hite(); $yndx++) { # draw border
+  $simp->Prnt('ycrs' => $yndx, 'xcrs' =>                  0 , '#');
+  $simp->Prnt('ycrs' => $yndx, 'xcrs' => ($simp->Widt() - 1), '#');
+}
+for($xndx = 0; $xndx < $simp->Widt(); $xndx++) {
+  $simp->Prnt('ycrs' =>                  1 , 'xcrs' => $xndx, '#');
+  $simp->Prnt('ycrs' => ($simp->Hite() - 1), 'xcrs' => $xndx, '#');
+}
+push(@ytai, int($simp->Hite() / 2)); # center player worm to start
+push(@xtai, int($simp->Widt() / 2));
+while(!$govr) { # as long as the game is not over...
+  if($gotf) { # if during the last loop, the food was gotten...
+    do { # pick new food location
+      $yndx = int(rand($simp->Hite() - 8) + 4);
+      $xndx = int(rand($simp->Widt() - 8) + 4);
+      $gotf = 0;
+      $valu = int(rand(9) + 1); # pick new food value
+    } while(substr($simp->Text->[$yndx], $xndx , 1) ne ' '); # find blank 4food
+    $simp->Prnt('ycrs' => $yndx, 'xcrs' => $xndx, 'fclr' => 'W', "$valu"); # print food
+  }
+  $simp->Prnt('ycrs' => 0, 'xcrs' => 40, 'fclr' => 'W',# print title
+    "Worm Expanded              Score: $scor");
+  if(substr($simp->Text->[$ytai[$#ytai]], $xtai[$#xtai], 1) eq '#') {
+    $govr = 1; # Game Over if player ran into border or tail
+    $simp->Mesg('wait' => 7, 'titl' => "You Died!", 'flagprsk' => 0,
+      "\nFinal Score: $scor\n\n   Goodbye!");
+  } elsif(substr($simp->Text->[$ytai[$#ytai]], $xtai[$#xtai], 1) =~ /\d/) {
+    $gotf  = 1;     # player worm got the food so...
+    $scor += $valu; #   increase the score
+    $grow  = $valu; #   && grow worm by food value
+  } elsif(!$grow){  # no longer growing so erase end of tail
+    $simp->Prnt('ycrs' => shift(@ytai), 'xcrs' => shift(@xtai), 'fclr' => 'W', '+');
+  } else { # growing so...
+    $grow--;                         # count down growth
+    $dtim -= 0.005 if($dtim > 0.01); # && speed game up
+    push(@ctai, substr('WROYGCBM',rand(8),1)); # growing color tail too
+  }
+  for(0..$#ctai){
+    $simp->Prnt('ycrs' => $ytai[$_    ], 'xcrs' => $xtai[$_    ], 'fclr' => $ctai[$_], '#');
+  }#$simp->Draw(); # draw new head in direction of movement
+  $keey = $simp->GetK($dtim); # get new key input waiting delta time
+  exit() if($keey eq 'SDLK_q' || $keey eq 'SDLK_x'); # Quit or eXit?
+  if     (($keey eq 'SDLK_UP'   ) || (($keey eq -1) && ($dire eq 'u'))) {
+    $dire = 'u';
+    push(@xtai,  $xtai[$#xtai]);
+    push(@ytai, ($ytai[$#ytai]) - 1);
+  } elsif(($keey eq 'SDLK_DOWN' ) || (($keey eq -1) && ($dire eq 'd'))) {
+    $dire = 'd';
+    push(@xtai,  $xtai[$#xtai]);
+    push(@ytai, ($ytai[$#ytai]) + 1);
+  } elsif(($keey eq 'SDLK_LEFT' ) || (($keey eq -1) && ($dire eq 'l'))) {
+    $dire = 'l';
+    push(@xtai, ($xtai[$#xtai]) - 1);
+    push(@ytai,  $ytai[$#ytai]);
+  } elsif(($keey eq 'SDLK_RIGHT') || (($keey eq -1) && ($dire eq 'r'))) {
+    $dire = 'r';
+    push(@xtai, ($xtai[$#xtai]) + 1);
+    push(@ytai,  $ytai[$#ytai]);
+  }
+}

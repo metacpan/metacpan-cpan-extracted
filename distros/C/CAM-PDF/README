@@ -1,0 +1,72 @@
+CAM::PDF - PDF manipulation library
+
+
+LICENSE
+
+Copyright 2002-2006 Clotho Advanced Media, Inc., L<http://www.clotho.com/>
+
+Copyright 2007-2008 Chris Dolan
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+originally sponsored the development of this module.  Clotho no longer
+has anything to do with this module and simply forwards inquiries to
+me.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This package reads and writes any document that conforms to the PDF
+specification generously provided by Adobe at
+http://partners.adobe.com/asn/developer/acrosdk/docs/filefmtspecs/PDFReference.pdf
+(3rd edition, for PDF v1.4 as of May 2002)
+
+The file format is well-supported, with the exception of the
+"linearized" or "optimized" output format, which this module can read
+but not write.  Many specific aspects of the document model are not
+manipulable with this package (like some font details), but if the
+input document is correctly written, then this module will preserve
+the model integrity.
+
+This library grants you some power over the PDF security model.  Note
+that applications editing PDF documents via this library MUST respect
+the security preferences of the document.  Any violation of this
+respect is contrary to Adobe's intellectual property position, as
+stated in the reference manual at the above URL.
+
+
+COMPARISON TO OTHER MODULES
+
+Other Perl libraries which implement the PDF specification are
+Text::PDF, PDF::API2, PDFLib.  PDF::API2 supercedes Text::PDF.  PDFlib
+is a wrapper around the superb C library by www.pdflib.com.
+
+All three of those libraries are optimized for programatically
+creating new PDF documents from scratch.  If that is your goal, then
+we highly recommend that you look at those.  On the contrary, CAM::PDF
+is optimized for reading and manipulating existing PDF documents.
+
+We use CAM::PDF in production Linux environments to customize template
+PDF documents that were often created by non-programmers using
+standard tools.

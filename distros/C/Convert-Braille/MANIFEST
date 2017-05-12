@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/demo.pl
+examples/makeethiopic.pl
+lib/Convert/Braille.pm
+lib/Convert/Braille/English.pm
+lib/Convert/Braille/Ethiopic.pm
+t/braille.t

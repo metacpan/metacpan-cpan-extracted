@@ -1,0 +1,870 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.  Web view of changes:
+	<http://git.gnome.org/browse/perl-Cairo/>.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* NEWS
+	* README
+	* lib/Cairo.pm: Stable release 1.061.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm → lib/Cairo.pm (moved)
+	* MakeHelper.pm → inc/MakeHelper.pm (moved)
+	* MANIFEST
+	* Makefile.PL: Move the two modules into their own folders to make
+	it clear that the one is the real thing while the other is just
+	build helper code.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.xs (cairo_object_from_sv, cairo_struct_from_sv): Hush two
+	compiler warnings.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm: In the POD, use =item instead of =head4 for methods so
+	that not every single method shows up in a table of contents.
+	Also fix two other small POD glitches.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MANIFEST.SKIP: Update for SVN.
+
+2009-03-28  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Use EU::MM's META_MERGE instead of EXTRA_META.
+
+2008-10-26  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: CAIRO_FONT_TYPE_QUARTZ was introduced in cairo 1.6,
+	not 1.4.
+
+2008-10-05  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MakeHelper.pm: Use the correct enum type instead of int for the
+	enum converters.
+
+2008-10-05  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm:
+	* Cairo.xs:
+	* CairoFont.xs:
+	* CairoFt.xs:
+	* CairoMatrix.xs:
+	* CairoPath.xs:
+	* CairoPattern.xs:
+	* CairoSurface.xs:
+	* MakeHelper.pm:
+	* Makefile.PL:
+	* cairo-perl-private.h:
+	* cairo-perl.h:
+	* cairo-perl.typemap:
+	* examples/simple.pl:
+	* t/Cairo.t:
+	* t/CairoFont.t:
+	* t/CairoFt.t:
+	* t/CairoMatrix.t:
+	* t/CairoPath.t:
+	* t/CairoPattern.t:
+	* t/CairoSurface.t: In preparation of the move to SVN, use the Id
+	keyword in place of Header.
+
+2008-09-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: When prompting for auto-installing dependencies,
+	default to 'no' so that automatic testers with CPANPLUS.pm don't
+	end up invoking CPAN.pm.  (RT #38286)
+
+2008-09-06  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* README: Fix the dependency versions for EU::Depends and
+	EU::PkgConfig.
+
+	* Cairo.pm: Mention http://cairographics.org/manual/ in the API
+	documentation section.  Fix a POD error.
+
+	* Makefile.PL: Support the enum value CAIRO_FONT_TYPE_QUARTZ.  (RT
+	#34681)
+
+2008-06-01  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/CairoSurface.t: Cairo::PsSurface->create can under certain
+	conditions apparently return a surface that is not a PS surface.
+	Handle this gracefully.  (RT #33871)
+
+2008-04-19  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Stable release 1.060.
+
+2008-04-19  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm: Add documentation for new API.
+
+2008-03-22  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Trap exceptions thrown by EU::PkgConfig->find.
+	When one occurs, exit with status 0 to indicate to CPAN testers
+	that their system isn't supported.
+
+2008-02-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Unstable release 1.053.
+
+2008-02-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* Cairo.xs
+	* t/Cairo.t: Wrap cairo_has_current_point.
+
+2008-02-12  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Unstable release 1.052.
+
+2008-02-10  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.xs
+	* t/Cairo.t: Wrap cairo_path_extents.
+
+	* CairoSurface.xs
+	* t/CairoSurface.t: Wrap cairo_format_stride_for_width.  Adapt to
+	API changes: cairo_surface_copy_page and cairo_surface_show_page
+	don't return cairo_status_t anymore.
+
+	* CairoPath.xs: Fix the tied interface for paths on perl 5.6,
+	whose magic support was slightly broken.  Also cleanup the tie
+	code a bit.
+
+2008-01-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Unstable release 1.051.
+
+2008-01-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* CairoSurface.xs
+	* t/CairoSurface.t: Wrap cairo_surface_copy_page and
+	cairo_surface_show_page.
+
+	* Cairo.pm
+	* Makefile.PL
+	* CairoSurface.xs
+	* t/CairoSurface.t: Wrap cairo_ps_surface_restrict_to_level,
+	cairo_ps_get_levels, and cairo_ps_level_to_string.
+
+	* Cairo.pm
+	* CairoSurface.xs
+	* t/CairoSurface.t: Wrap cairo_ps_surface_set_eps and
+	cairo_ps_surface_get_eps.
+
+2007-12-29  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.xs
+	* CairoFont.xs
+	* CairoMatrix.xs
+	* CairoSurface.xs: Use perl's New*/Safefree facilities instead of
+	calloc/malloc/free as the latter aren't safe on some platforms,
+	notably Win32.  Patch by T.J. Ferraro.
+
+	* t/CairoSurface.t: Mark the isa_ok test for PDF surfaces returned
+	by create_similar() as TODO, since the returned surface's type is
+	not reliable at this point.
+
+2007-11-20  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS: Unstable release 1.050.
+
+2007-11-20  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm: Add entries for the various surfaces to the API
+	listing.
+
+	* Makefile.PL: Update the list of exported symbols.  (Reported by
+	spicy jack)
+
+2007-10-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/CairoFont.t: Really don't use the hash-ref variant of the
+	constant pragma this time.
+
+	* Cairo.pm
+	* Cairo.xs
+	* CairoFt.xs
+	* Makefile.PL
+	* cairo-perl.h
+	* cairo-perl.typemap
+	* examples/freetype-font.pl
+	* t/CairoFt.t: Add support for part of cairo's FreeType
+	integration API.  Currently, that's just
+	Cairo::FtFontFace::create, which lets you create a cairo font face
+	from a FreeType font face.
+
+2007-10-18  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/Cairo.t
+	* t/CairoPattern.t: When Test::Number::Delta is not available,
+	skip the relevant tests instead of faking passes.  (Suggested by
+	Aristotle Pagaltzis)
+
+2007-10-14  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/Cairo.t
+	* t/CairoFont.t
+	* t/CairoPath.t
+	* t/CairoPattern.t
+	* t/CairoSurface.t: Don't use the hash-ref variant of the constant
+	pragma.  It's not supported by the version that ships with perl
+	5.6.
+
+2007-10-14  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Cairo.pm
+	* NEWS
+	* README: Release 1.043.
+
+2007-10-13  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Use BEGIN { require 5.006; } instead of require
+	v5.6.0.  Make missing Test::Number::Delta non-fatal; add it to the
+	build_requires META.yml field.
+
+	* t/Cairo.t
+	* t/CairoPattern.t: Cope with Test::Number::Delta being
+	unavailable.
+
+2007-10-07  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Make EU::MM output configure_requires and no_index
+	information when generating META.yml.
+
+	* t/CairoSurface.t (PNG surface tests): Since exceptions are
+	actually propagated now, throw the same kind of exception we test
+	for.
+
+2007-10-06  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Require perl >= 5.6.0 for some features we use,
+	like `our´.
+
+2007-09-30	tsch
+
+	* ppport.h
+	* Cairo.xs
+	* CairoPath.xs
+	* CairoPattern.xs
+	* CairoSurface.xs
+	* MANIFEST
+	* cairo-perl-private.h
+	* cairo-perl.h: Add and use the portability header ppport.h from
+	Devel::PPPort to hopefully fix compilation on older perls.
+
+2007-09-27	tsch
+
+	* Cairo.pm
+	* NEWS
+	* README: Stable release 1.042.
+
+2007-09-27	tsch
+
+	* Makefile.PL: Make missing prerequisites fatal.
+
+2007-09-09	tsch
+
+	* cairo-perl.typemap: Add const char * for backwards
+	compatibility.
+
+2007-08-13	tsch
+
+	* doctypes: Add missing type names.
+
+2007-05-27	tsch
+
+	* Cairo.pm, NEWS, README: Stable release 1.041.
+
+2007-05-27	tsch
+
+	* t/CairoSurface.t: Use proper version checks to decide when to
+	skip the create_for_stream tests.
+
+2007-05-13	tsch
+
+	* Makefile.PL, README, t/Cairo.t, t/CairoPattern.t: Use
+	Test::Number::Delta to make floating point number comparisons more
+	reliable.
+
+2007-05-10	tsch
+
+	* Cairo.pm, NEWS, README: Stable release 1.040.
+
+2007-05-10	tsch
+
+	* t/CairoSurface.t: For now, skip tests that make cairo crash.
+
+2007-05-06	tsch
+
+	* Cairo.pm: Document new API.  Mark functions that were added
+	after cairo 1.0.
+
+2007-05-06	tsch
+
+	* Cairo.xs
+	* CairoPattern.xs
+	* Makefile.PL
+	* cairo-perl.h
+	* t/Cairo.t
+	* t/CairoPattern.t: Use 1.4.0 in version checks.
+
+	* Cairo.xs: If CAIRO_PERL_DEBUG is true, call
+	cairo_debug_reset_static_data at exit.
+
+2007-03-17	tsch
+
+	* Cairo.xs
+	* t/Cairo.t: Wrap cairo_get_scaled_font.
+
+	* CairoSurface.xs
+	* t/CairoSurface.t: Re-add the binding for cairo_surface_finish.
+	It was orignally removed because its effect can also be achieved
+	by destroying the surface or letting it go out of scope.  But
+	Oleksandr Alex Protasenko convinced me that it's still a good idea
+	to have it anyway, mainly for paginated surfaces like PDF and PS
+	which defer rendering as long as they can.  With $surf->finish you
+	can more clearly express what you're intending to do than with
+	$surf = undef.
+
+	* examples/png-streams.pl: Fix indention.
+
+2007-01-21	tsch
+
+	* Cairo.pm, NEWS, README: Unstable release 1.031.
+
+2007-01-21	tsch
+
+	* Cairo.xs: Track upstream API change: cairo_get_dash_count
+	returns the count directly; cairo_get_dash_count and
+	cairo_get_dash don't return a status anymore.
+
+2007-01-18	tsch
+
+	* t/Cairo.t, Cairo.xs: Track upstream API improvement:
+	cairo_copy_clip_rectangles -> cairo_copy_clip_rectangle_list.
+
+2007-01-05	tsch
+
+	* t/CairoSurface.t: Fix an endianness problem.
+
+2006-12-30	tsch
+
+	* MakeHelper.pm: Fix the valid-value lists in enum error messages.
+
+2006-12-28	tsch
+
+	* Cairo.pm, NEWS, README: Unstable release 1.030.
+
+2006-12-28	tsch
+
+	* Cairo.xs, cairo-perl.h, t/Cairo.t: Wrap and test
+	cairo_copy_clip_rectangles and cairo_clip_extents.
+
+2006-11-23	tsch
+
+	* CairoSurface.xs, t/CairoSurface.t: Make
+	Cairo::ImageSurface::get_data usable by specifying the buffer
+	length.
+
+	* MANIFEST, Makefile.PL, doctypes: Describe our types.
+
+	* NEWS: Merge from stable-1-0.
+
+2006-11-09	tsch
+
+	* Cairo.xs, cairo-perl-private.h: Export cairo_perl_alloc_temp
+	privately.
+
+	* Cairo.xs: Remove the DOUBLES_ macros and inline them.  They were
+	used only in one place.
+
+	* Cairo.xs, t/Cairo.t: Wrap cairo_get_dash.
+
+	* CairoPattern.xs, cairo-perl-private.h, t/CairoPattern.t: Wrap
+	cairo_pattern_get_rgba, cairo_pattern_get_surface,
+	cairo_pattern_get_color_stop_rgba, cairo_pattern_get_points, and
+	cairo_pattern_get_circles.
+
+	* Makefile.PL: Support new cairo_status_t values.
+
+2006-11-09	tsch
+
+	* Cairo.pm, NEWS, README: Stable release 1.02.
+
+2006-11-09	tsch
+
+	* MakeHelper.pm, CairoSurface.t: When comparing enum values, look
+	at length+1, not just length, bytes to discern string pairs like
+	'color' and 'color-alpha'.  Duh!  Many thanks to Martijn van Beers
+	for finding this bug.
+
+2006-09-24	tsch
+
+	* Cairo.pm, NEWS: Stable release 1.01.
+
+2006-09-24	tsch
+
+	* t/CairoSurface.t: Skip the create_for_stream test for ps and pdf
+	surfaces if cairo < 1.2.0.  Earlier versions didn't handle errors
+	correctly and thus caused too many tests.  Also partly revert the
+	previous change and instead do a conditional type check on
+	surfaces create with create_similar.
+
+2006-09-24	tsch
+
+	* t/CairoSurface.t: Don't check the specific type of similar
+	surfaces created from PS and PDF surfaces; it's not reliable.
+
+	* xs/CairoSurface.xs: Cosmetical changes.
+
+2006-09-04	tsch
+
+	* Cairo.pm, NEWS, README: Stable release 1.00.
+
+2006-08-27	tsch
+
+	* Makefile.PL: Make EU::MM export our symbols on Win32.
+
+2006-08-20	tsch
+
+	* MakeHelper.pm: Revert the last commit which used real enum types
+	instead of int; it broke compilation.  Also alter the way unknown
+	enum types are dealt with: don't declare and implement stub
+	converters, just omit them.  Still declare typemaps for them
+	though, to make xsubpp happy.
+
+2006-08-20	tsch
+
+	* MakeHelper.pm: Add the infrastructure necessary to support
+	protecting the enum related things with #ifdef, if needed.  Also
+	use the real enum types for the enum converters, instead of just
+	int.
+
+2006-08-15	tsch
+
+	* Cairo.pm, MANIFEST, NEWS, README: Beta release 0.92.
+
+2006-08-13	tsch
+
+	* CairoSurface.xs (read_func_marshaller): Use POPs, SvPV, and
+	sv_len instead of POPpx to avoid problems on perl 5.8.8 reported
+	by Joe Smith and Alexey Tourbin.
+
+2006-08-11	tsch
+
+	* examples/png-streams.pl: New example that demonstrates how to
+	use the PNG stream functions.
+
+	* t/CairoSurface.t: Whitespace fix.
+
+2006-08-11	tsch
+
+	* CairoSurface.xs: Patch from Yaakov S puts version guards around
+	a few PDF and PS functions that appeared in 1.2.0.
+
+	* t/CairoSurface.t: Do the same for the corresponding tests.
+
+2006-08-10	tsch
+
+	* Cairo.pm, NEWS, README: Beta release 0.91.
+
+2006-08-10	tsch
+
+	* Cairo.xs, CairoFont.xs, CairoPattern.xs, CairoSurface.xs,
+	MakeHelper.pm, Makefile.PL, cairo-perl-private.h, t/Cairo.t,
+	t/CairoFont.t, t/CairoPattern.t, t/CairoSurface.t: Make it
+	possible to compile and run the bindings against cairo 1.0.x.  Use
+	a package lookup table for patterns and surfaces to work around
+	the lack of type accessors.  Add version guards around things that
+	were introduced in 1.2.0.
+
+	* CairoSurface.xs: Use OUTLIST for
+	cairo_surface_get_device_offset.
+
+	* CairoPattern.xs, CairoSurface.xs, cairo-perl-private.h: Rename
+	cair_perl_set_isa to cairo_perl_set_isa.  Doh!
+
+	* t/CairoSurface.t: Explicitly clear the image surface on cairo
+	1.0.x before writing it out since 1.0.x doesn't do it for us.  Use
+	lexical surface variables to make sure they get destroyed before
+	execution ends which in turn makes sure all tests inside callbacks
+	are run before Test::More checks if reality matches the test plan.
+
+2006-07-15	tsch
+
+	* Cairo.pm, NEWS, README: Beta release 0.90.
+
+2006-07-15	tsch
+
+	* Cairo.pm: Update existing, add new documentation.
+
+	* TODO: Update.
+
+2006-07-15	tsch
+
+	* Cairo.xs: Remove Cairo::HAS_XLIB_SURFACE and HAS_FT_FONT.
+
+	* Cairo.pm, Cairo.xs, CairoPattern.xs, CairoSurface.xs,
+	cairo-perl-private.h: Add cairo_perl_set_isa and use it for
+	surfaces and patterns.
+
+	* CairoSurface.xs, Makefile.PL, cairo-perl.h, t/CairoSurface.t:
+	Add support for svg surfaces if available.
+
+	* t/CairoSurface.t: Remove TODO block and revert workaround
+	related to the weird unknown surface types.  It's been fixed
+	upstream: https://bugs.freedesktop.org/show_bug.cgi?id=7322
+
+2006/07/02	tsch
+
+	* Makefile.PL: Require cairo 1.2.0.  Add CAIRO_FORMAT_RGB16_565.
+
+	* Cairo.pm, CairoFont.xs: Cosmetical changes.
+
+	* Cairo.xs: Add Cairo::VERSION and Cairo::VERSION_ENCODE.
+
+	* t/CairoSurface.t: Shuffle a few tests around to avoid some
+	strange singularities.
+
+2006/06/15	tsch
+
+	* Cairo.pm, MANIFEST, NEWS, README: Release 0.04.
+
+2006/06/15	tsch
+
+	* t/CairoSurface.t: Wrap two tests that recently started failing
+	in TODO blocks.
+
+2006/06/14	tsch
+
+	* Makefile.PL: Require cairo >= 1.1.8.
+
+	* CairoSurface.xs, t/CairoSurface.t: Wrap and test
+	cairo_surface_set_fallback_resolution,
+	cairo_image_surface_get_data, cairo_image_surface_get_format, and
+	cairo_image_surface_get_stride.  Remove the wrappers and tests for
+	cairo_pdf_surface_set_dpi and cairo_ps_surface_set_dpi.
+
+	* t/CairoSurface.t: Test Cairo::ImageSurface::get_width and
+	get_height.
+
+2006/06/03	tsch
+
+	* Cairo.pm: Document Cairo::get_group_target, Cairo::new_sub_path,
+	Cairo::Pattern::get_type, Cairo::set_scaled_font, Cairo::version,
+	and Cairo::version_string.
+
+	* t/Cairo.t, Cairo.xs: Allow Cairo::version[_string] to be called
+	as a function and as a class method.
+
+	* CairoPattern.xs, CairoSurface.xs, t/CairoSurface.t, Makefile.PL,
+	examples/simple.pl, examples/png/caps_joins.pl,
+	examples/png/hering.pl: Whitespace fixes.
+
+	* t/CairoSurface.t, CairoSurface.xs: Wrap
+	cairo_surface_get_content.
+
+	* MakeHelper.pm: Don't add a linebreak to croaks so perl prints
+	line information.
+
+	* Makefile.PL: Require cairo 1.1.7.
+
+	* examples/png/README, examples/png/bevels.pl,
+	examples/png/spline-pipeline.pl, examples/png/text-rotate.pl,
+	examples/png/text.pl: New example ports.
+
+2006/05/14	tsch
+
+	* t/CairoSurface.t, CairoSurface.xs: Remove
+	Cairo::Surface::finish; it's memory management related and not
+	needed, as far as I can tell.  Scream if you used it.
+
+	* t/CairoSurface.t, CairoSurface.xs: Bind and test
+	cairo_surface_write_to_png_stream,
+	cairo_image_surface_create_from_png_stream,
+	cairo_pdf_surface_create_for_stream, and
+	cairo_ps_surface_create_for_stream.
+
+	* CairoSurface.xs: Don't leak cairo_surface_create_similar's
+	return value.
+
+	* cairo-perl-private.h: Remove CAIRO_PERL_UNUSED.
+
+	* cairo-perl-private.h, Cairo.xs, CairoFont.xs, CairoMatrix.xs,
+	CairoPattern.xs: Rename pcairo_copy_matrix to
+	cairo_perl_copy_matrix.
+
+	* TODO: Update.
+
+2006/05/07	tsch
+
+	* .cvsignore, MANIFEST.SKIP: Update.
+
+	* Cairo.pm: Update copyright notice.
+
+	* MANIFEST, cairo-perl-private.h: Add a private header file for
+	non-public declarations that are used in more than one place.
+
+	* MakeHelper.pm: Improve the enum converters to produce more useful
+	error messages.
+
+	* Makefile.PL: Incorporate a slightly modified patch from  Christopher
+	Oezbek to prompt the user if he wants to install EU::Depends and
+	EU::PkgConfig if they can't be found.  Require cairo >= 1.1.6.  Update
+	and rearrange enums.
+
+	* cairo-perl.h, Cairo.xs: Move CAIRO_PERL_CALL_BOOT to Cairo.xs.
+
+	* cairo-perl.h, CairoSurface.xs, CairoPattern.xs, Makefile.PL: Use
+	cairo_surface_get_type and cairo_pattern_get_type to redo the sub-type
+	handling for surfaces and patterns.
+
+	* cairo-perl-private.h, Cairo.xs, CairoMatrix.xs, CairoPattern.xs: Add
+	pcairo_copy_matrix and use it all over the place to make matrix handling
+	more robust.
+
+	* Cairo.xs, t/Cairo.t: Wrap cairo_version, cairo_version_string,
+	cairo_push_group, cairo_push_group_with_content, cairo_pop_group,
+	cairo_pop_group_to_source, cairo_new_sub_path, cairo_set_scaled_font,
+	and cairo_get_group_target.
+
+	* CairoFont.xs, t/CairoFont.t: Wrap cairo_font_face_get_type,
+	cairo_scaled_font_get_type, cairo_scaled_font_text_extents,
+	cairo_scaled_font_get_font_face, cairo_scaled_font_get_font_matrix,
+	cairo_scaled_font_get_ctm, and cairo_scaled_font_get_font_options.
+
+	* CairoPattern.xs, t/CairoPattern.t: Wrap cairo_pattern_get_type.
+
+	* CairoSurface.xs, t/CairoSurface.t: Wrap
+	cairo_surface_get_device_offset, cairo_surface_get_type,
+	cairo_pdf_surface_set_size, cairo_ps_surface_set_dpi,
+	cairo_ps_surface_set_size, cairo_ps_surface_dsc_comment,
+	cairo_ps_surface_dsc_begin_setup, and cairo_ps_surface_dsc_begin_setup.
+
+2006/01/29	tsch
+
+	* Cairo.pm, NEWS, README: Release 0.03.
+
+2006/01/29	tsch
+
+	* Cairo.pm, CairoPattern.xs, Makefile.PL, cairo-perl.h,
+	t/CairoPattern.t: Add Cairo::SolidPattern::create_rgb and
+	create_rgba.
+
+2006/01/28	tsch
+
+	* Cairo.pm: Add documentation for Cairo::Context, paths, patterns,
+	transformations, and text.
+
+2006/01/08	tsch
+
+	* Cairo.pm: Make DynaLoader export all our symbols.
+
+	* Cairo.xs, MakeHelper.pm, Makefile.PL, cairo-perl.h: Revamp the
+	type conversion API.  Instead of implementing everything in the
+	typemap, we now have macros like newSVCairoPattern and
+	SvCairoPattern.  These get exported, so other modules can make use
+	of them.
+
+	* cairo-perl.h: Remove the DBG macro.
+
+	* cairo-perl.typemap: Use T_UV instead of T_IV for cairo_bool_t.
+
+2005/09/01	tsch
+
+	* Cairo.pm, MANIFEST, Makefile.PL, NEWS, README: Release 0.02.
+	Require cairo 1.0.0.
+
+2005/08/31	tsch
+
+	* MakeHelper.pm, Makefile.PL: Surround our _noinc typedefs for the
+	PS and PDF backends with appropriate ifdefs to fix compilation
+	when these backends were not installed with cairo.
+
+2005/08/18	tsch
+
+	* Cairo.pm: Fix incorrect package line that read GStreamer instead
+	of Cairo.
+
+2005/08/15	tsch
+
+	* Cairo.pm, README: Release 0.01.  Also add stub documentation.
+
+	* MANIFEST.SKIP: Remove CairoEnums.xs.
+
+	* Makefile.PL: Add ABSTRACT_FROM to the WriteMakefile call.
+
+	* TODO: Update to reflect the present situation.
+
+2005/08/10	tsch
+
+	* t/Cairo.t, Cairo.xs: Bind cairo_set_antialias and
+	cairo_get_antialias.
+
+	* t/CairoSurface.t, CairoSurface.xs: Bind cairo_surface_flush,
+	cairo_surface_mark_dirty, cairo_surface_mark_dirty_rectangle.
+
+	* MANIFEST, META.yml: Remove META.yml; let EU::MakeMaker generate
+	it on "make dist".
+
+	* Makefile.PL: Require cairo 0.9.0.  Add our prerequisites to the
+	WriteMakefile call so that they appear in the generated META.yml.
+	Support CAIRO_STATUS_FILE_NOT_FOUND.
+
+2005/07/29	tsch
+
+	* t/Cairo.t, xs/Cairo.xs: Wrap cairo_get_font_options.
+
+	* t/CairoFont.t, xs/CairoFont.xs: Wrap cairo_font_face_status,
+	cairo_scaled_font_status, cairo_font_options_*.  Update
+	cairo_scaled_font_create.
+
+	* t/CairoSurface.t, CairoSurface.xs: Wrap cairo_surface_status,
+	cairo_surface_get_font_options.
+
+	* Makefile.PL: Wrap the new cairo_font_options_t stuff.
+
+	* Makefile.PL: Require cairo 0.6.0.  Add new and update the old
+	enums.  Install all files necessary for other modules to use
+	Cairo.
+
+	* cairo-perl.typemap: Add a cairo_bool_t typemap.
+
+2005/07/12	tsch
+
+	* Cairo.pm, Cairo.xs, t/Cairo.t: Replace the %backends hash with
+	Cairo::HAS_PS_SURFACE, HAS_PDF_SURFACE, HAS_XLIB_SURFACE,
+	HAS_FT_FONT and HAS_PNG_FUNCTIONS.
+
+	* Cairo.pm, CairoPattern.xs, CairoSurface.xs, Makefile.PL:
+	Implement the pattern and surface hierarchy suggested by the
+	language bindings guidelines.
+
+	* Cairo.xs: Use Cairo::Context for the namespace of cairo_t,
+	instead of just Cairo, as suggested by the guidelines.
+
+	* Cairo.xs, CairoFont.xs, CairoMatrix.xs, CairoPattern.xs,
+	CairoSurface.xs, cairo-perl.h: Add new, remove old API.  Shuffle
+	some things around.
+
+	* Cairo.xs: Convert font and text extents and glyphs to and from
+	native Perl data structures.
+
+	* Cairo.xs, cairo-perl.h, cairo-perl.typemap: Remove everything
+	that cannot be used from Perl, like the XLib and Glitz stuff.
+
+	* CairoPath.xs, t/CairoPath.t: Add support for cairo_path_t,
+	including a nice tied interface that lets you iterate over paths
+	as if they were normal array references.
+
+	* MakeHelper.pm: Extend the typemap generator to support "const"
+	and "_noinc" types.  Change the enum handling to use the Glib
+	convention, i.e. lowercase and hyphen instead of underscore.
+
+	* Makefile.PL, README: Use ExtUtils::Depends.
+
+	* examples/simple.pl, examples/png/caps_join.pl,
+	examples/png/hering.pl, examples/png/outline.pl,
+	examples/png/spiral.pl, examples/png/splines_tolerance.pl,
+	examples/png/stars.pl: Update the examples to make them work again
+	after all those API changes.
+
+	* t/Cairo.t, t/CairoFont.t, CairoMatrix.t, CairoPattern.t,
+	CairoSurface.t: Redo and/or expand the whole test suite.
+
+2005/02/06 11:18 (-0500) rwmcfa1
+
+	* CairoSurface.xs: fixed a bug in wrapping of cairo_surface_xlib_create
+	where the return value wasn't being caught in RETVAL. thank you -Wall -W
+
+	* cairo-perl.h: wrapped new includes (prev log msg) in #ifdef HAS's so
+	that we can build on systems where no all backends are supported. XS
+	code already supports this.
+
+2005-01-20  Carl Worth  <cworth@cworth.org>
+
+	* cairo-perl.h: Track split-up of cairo.h.
+
+2004/11/28 13:20 (-0500) rwmcfa1
+
+	* Makefile.PL, MakeHelper.pm: initial import of MakeHelper, mess of
+	code moved out of Makefile.PL into it. beginning of cleaning all that
+	up. File::Spec now used.
+
+	* examples/png/*: initial import of port of cairo-demo/png examples,
+	except text.
+
+	* META.yml: unknown version
+
+	* MANIFEST, MANIFEST.SKIP: updates
+
+2004/11/11 22:10 (-0500) rwmcfa1
+
+	* t/CairoMatrix.t, t/CairoPattern.t, t/CairoSurface.t: initial import,
+	95% complete tests
+
+	* Cairo.xs, CairoMatrix.xs, CairoSurface.xs, CairoPattern.xs: no more
+	new's, not really a good idea.
+
+	* CairoFont.xs: all disabled for now
+
+	* CairoMatrix.xs: copy, multiply, and transforms fixed while doing
+	tests
+
+	* CairoPattern.xs: get_matrix fixed whlie doing tests
+
+	* CairoSurface.xs: cleaned up the namespace problems herein. fixed
+	several output funcs.
+
+	* MANIFEST: added TODO and new tests.
+
+	* MANIFEST.SKIP: skip CairoEnums.xs
+
+	* t/Cairo.t: no new test, change Surface stuff due to namespace above
+
+2004/11/10 21:08 (-0500) rwmcfa1
+
+	* TODO: initial import
+
+	* Cairo.pm, Cairo.xs: added %backends facility
+
+	* Cario.xs, CairoSurface.xs: stuff moved out of Cairo.xs that belonged
+	here
+
+	* Cairo.xs: fixed some OUTLIST stuff (IN_OUTLIST.) cairo_current_matrix
+	fixed.
+
+	* CairoPattern.xs: added class param to create_for_surface
+
+	* Makefile.PL: seperated structs out of objects. add refs to object
+	typemaps OUTPUT sections. don't return full strings for OUTPUT enum
+	types.
+
+	* cairo-perl.h: don't need stdio.h
+
+	* t/Cairo.t: test most all of cairo type. 90% done.
+
+2004/11/08 20:44 (-0500) rwmcfa1
+
+	* Cairo.xs, CairoMatrix.xs, CairoPattern.xs, CairoSurface.xs: all of
+	the create functions have been cleaned up/fixed. debug prints removed.
+	create's alised to new's where appropriate.
+
+	* MANIFEST, MANIFEST.SKIP: ChangeLog added. build and CVS skipped
+
+	* Makefile.PL, cairo-perl.h, Cairo.xs: new (write_)boot code added,
+	in progress. use build dir for most of autogen'd stuff

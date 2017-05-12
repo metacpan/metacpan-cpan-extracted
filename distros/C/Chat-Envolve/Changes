@@ -1,0 +1,35 @@
+2011-05-06 1.0007
+ - Last release didn't fix the problem the right way.
+ - Now require at least MIME::Base64 3.11.
+
+2011-05-06 1.0006
+ - Fixed get_tags() to support multi-line javascript, which can be generated for the Envolve command.
+
+2011-05-06 1.0005
+ - Switched to Any::Moose rather than Moose.
+
+2011-05-06 1.0004
+ - Envolve now supports SSL mode.
+
+2010-12-23 1.0003
+ - Fixed admin mode flag.
+
+2010-12-16 1.0002
+ - Forgot to remove DateTime reference in chat.t.
+
+2010-12-09 1.0001
+ - Fixed an HMAC signing issue.
+
+2010-12-09 1.0000
+ - Now requires Digest::HMAC_SHA1.
+ - No longer requires DateTime.
+ - Switched to the v0.2 chat API.
+ 
+ NOTE: This version is not backward compatible with the previous version. That's
+ the reason for the big version number increase. All client_ip related methods
+ and params have been removed due to changes in the API.
+
+
+2010-10-26 0.0100
+ - Initial public release.
+

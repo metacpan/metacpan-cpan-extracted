@@ -1,0 +1,26 @@
+    // turn on validation errors beside the field globally
+    Ext.form.Field.prototype.msgTarget = 'side';
+
+    // BUG FIX for align of checkboxes in forms
+    // see: http://extjs.com/forum/showthread.php?t=37685
+    Ext.override(Ext.form.Checkbox, {
+        onResize : function(){
+            Ext.form.Checkbox.superclass.onResize.apply(this, arguments);
+            if (!this.boxLabel && !this.fieldLabel) {
+                this.el.alignTo(this.wrap, 'c-c');
+            }
+        }
+    }); 
+
+    // called from acknowledgement dialog
+    var refreshandclose = function(btn,text){
+        if (btn == 'ok') {
+            // XXX using private parts of PagingToolbar
+            pagebar.doLoad( pagebar.cursor ); // reload
+            Ext.getCmp('main-win').close();
+        }
+    };
+
+    [% PROCESS extjs2/javascript/update/tabs.tt %]
+
+    [% PROCESS extjs2/javascript/update/window.tt %]

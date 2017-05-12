@@ -1,0 +1,13 @@
+Revision history for Perl module Class::AccessorMaker
+
+1.11 Tue Dec 30 2003
+	- applied a suggested patch by Robert Bakker, 2organize
+
+1.0  Thu Oct 17 2002
+	- took some slight errors from the documentation, and set the
+	version to 1.0, since my baby now hit CPAN ;)
+
+0.2  Thu Oct 10 2002
+	- original version; created by ExtUtils::ModuleMaker 0.31229
+
+

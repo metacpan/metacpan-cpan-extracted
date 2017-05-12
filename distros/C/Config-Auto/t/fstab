@@ -1,0 +1,7 @@
+/dev/wd0a / ffs rw 1 1
+/dev/wd0b none swap sw 0 0
+/dev/wd0e /usr ffs rw 1 2
+/dev/wd0f /var ffs rw 1 2
+/dev/wd0g /home ffs rw 1 2
+kernfs /kern kernfs rw
+procfs /proc procfs rw,linux

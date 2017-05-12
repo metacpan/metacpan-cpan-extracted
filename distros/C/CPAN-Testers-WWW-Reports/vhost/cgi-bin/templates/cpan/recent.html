@@ -1,0 +1,41 @@
+[% 
+    rss = '/recent.rss' ;
+    title = 'Recent Reports' ;
+
+    crumb1_name = 'recent' ;
+%]
+
+<div class="orange_buttons">
+<a rel="nofollow" href="/recent.rss">RSS</a>
+</div>
+
+<p>Here are the 200 most recent test reports:</p>
+<p>To view individual reports, please click the grade text associated with each report.</p>
+
+<div class="container">
+    <table class="test_results">
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Dist</th>
+          <th>Version</th>
+          <th>Perl version</th>
+          <th>OS name</th>
+          <th>OS version</th>
+          <th>Architecture</th>
+        </tr>
+      </thead>
+      <tbody id="report_data">
+  [% FOREACH report = recent %]
+	  <tr><td class="[% report.status | html %]"><a rel="nofollow" href="[% reportlink2 %]/[% report.guid || report.id %]">[% report.status | html %]</a></td>
+	      <td><strong><a href="/distro/[% report.dist.substr(0,1) %]/[% report.dist %].html">[% report.dist %]</a></strong></td>
+	      <td>[% report.version %]</td>
+	      <td>[% report.perl | html %]</td>
+	      <td>[% report.osname | ucfirst | html %]</td>
+	      <td>[% report.osvers | html %]</td>
+	      <td>[% report.archname || report.platform | trim | html %]</td>
+	  </tr>
+  [% END %]
+      </tbody>
+    </table>
+</div>

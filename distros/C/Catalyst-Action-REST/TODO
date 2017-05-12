@@ -1,0 +1,13 @@
+* Override setup_classes from Catalyst::Base, so things that use 
+  C::Controller:REST don't need to have ActionClass('REST') on them
+
+* More documentation of the Serialization/Deserialization process. 
+
+* More Serializers!
+
+* More status methods!
+
+* More tests
+
+* Add a preference weight for what type of content to return given an
+  equal weight Accept header.

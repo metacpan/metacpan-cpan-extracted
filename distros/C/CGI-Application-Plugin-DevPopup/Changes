@@ -1,0 +1,67 @@
+Revision history for CGI-Application-Plugin-DevPopup
+
+1.08    2013-01-18  Rhesa Rozendaal <rhesa@cpan.org>
+    - typo fix (RT69672)
+
+1.07    2011-07-17  Rhesa Rozendaal <rhesa@cpan.org>
+    - Document HTTPHeaders output
+
+1.06    2010-01-10  Rhesa Rozendaal <rhesa@cpan.org>
+    - Better XHTML (Alexandr Ciornii)
+
+1.05    2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+    - Added repository to META.yml. No code changes.
+
+1.04    2009-12-25  Rhesa Rozendaal <rhesa@cpan.org>
+    - RT #53100 (Serguei Trouchelle)
+
+1.03    2009-10-20  Rhesa Rozendaal <rhesa@cpan.org>
+    - RT #50096 (Serguei Trouchelle)
+    - RT #42315 (Lyle Hopkins)
+
+1.02    2009-01-15  Rhesa Rozendaal <rhesa@cpan.org>
+    - Moved to Dist::Zilla
+    - Migrated repository to github
+
+1.01    2008-10-24  Rhesa Rozendaal <rhesa@cpan.org>
+    - RT #35088
+    - CPANTS fixes
+
+1.00    2007-09-27  Rhesa Rozendaal <rhesa@cpan.org>
+    - added ::Log plugin, kindly provided by Joshua Miller
+
+0.951   2006-11-20  Rhesa Rozendaal <rhesa@cpan.org>
+    - pod fixes
+    - dist improvements conforming to CPANTS
+
+0.95    2005-12-07  Rhesa Rozendaal <rhesa@cpan.org>
+    - added "severity" attribute to reports.
+    - cosmetic changes in css and html
+    - added log report (from Log::Dispatch or STDERR)
+
+0.94    2005-11-23  Rhesa Rozendaal <rhesa@cpan.org>
+    - scrollbars didn't show up after all (reported by Robert Lawson)
+
+0.93    2005-10-05  Rhesa Rozendaal <rhesa@cpan.org>
+    - Made popup resizable and scrollable in IE.
+
+0.92    2005-10-05  Rhesa Rozendaal <rhesa@cpan.org>
+    - Moved HTTP Headers to its own module
+
+0.91    2005-10-04  Rhesa Rozendaal <rhesa@cpan.org>
+    - Added HTTP Headers report
+    - Updated docs to reflect availability of CAP::HtmlTidy
+
+0.02    2005-09-22  Rhesa Rozendaal <rhesa@cpan.org>
+    - Added master switch in the form of $ENV{CAP_DEVPOPUP_EXEC}
+        (thanks to markstos and hide on #cgiapp)
+
+    - Added a hook to ::Timing at devpopup_addtiming for your own timing needs
+    - Added name of template in load_tmpl timing point
+        (thanks to Michael Graham on the mailing list)
+
+    - Cosmetic changes in html
+
+0.01    2005-09-21  Rhesa Rozendaal <rhesa@cpan.org>
+    - Initial revision, basic html and a simple Timing plugin.
+

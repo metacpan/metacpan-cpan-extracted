@@ -1,0 +1,11 @@
+ChangeLog
+DotCom.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+scripts/chessgames-dotcom
+scripts/potd
+scripts/README
+scripts/sample-cron-entry
+t/1.t

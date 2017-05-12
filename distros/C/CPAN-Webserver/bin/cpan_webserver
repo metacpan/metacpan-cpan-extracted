@@ -1,0 +1,43 @@
+#!perl
+use strict;
+use warnings;
+use lib 'lib';
+use CPAN::Webserver;
+use Getopt::Long;
+
+my $port = 2963;
+GetOptions( "port=i" => \$port, );
+
+my $server = CPAN::Webserver->new($port);
+$server->run();
+
+__END__
+
+=head1 NAME
+
+cpan_webserver - Search and browse CPAN
+
+=head1 SYNOPSIS
+
+  % cpan_webserver
+  % cpan_webserver --port 8090
+
+=head1 DESCRIPTION
+
+This program provides a web server that allows you to search and
+browse CPAN.
+
+Then you may run cpan_webserver and search and browse CPAN at
+http://localhost:2963/. The listening port can be configured
+with C<--port> command line option.
+
+=head1 AUTHOR
+
+Leon Brocard <acme@astray.com>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011, Leon Brocard.
+
+This module is free software; you can redistribute it or 
+modify it under the same terms as Perl itself.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Chemistry::PointGroup::Cs.
+
+0.01  Sat Feb 18 19:50:58 2006
+	- original version; created by h2xs 1.22 with options
+		-AX -n Chemistry::PointGroup::Cs
+

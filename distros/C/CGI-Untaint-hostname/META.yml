@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name: CGI-Untaint-hostname
+version: 0.1
+author: ~
+abstract: untaint DNS host names
+license: perl
+provides:
+  CGI::Untaint::hostname:
+    file: lib/CGI/Untaint/hostname.pm
+    version: 0.1
+generated_by: Module::Build version 0.25

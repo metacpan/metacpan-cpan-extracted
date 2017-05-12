@@ -1,0 +1,60 @@
+SYNOPSIS
+
+    In lib/Your/Class.pm:
+
+     package Your::Class;
+     use Class::Build::Array::Glob;
+    
+     has foo => (is => 'rw');
+     has bar => (is => 'rw');
+     has baz => (is => 'rw', glob=>1);
+
+    In code that uses your class, use your class as usual:
+
+     use Your::Class;
+    
+     my $obj = Your::Class->new(foo => 1);
+     $obj->bar(2);
+    
+     my $obj2 = Your::Class->new(foo=>11, bar=>12, baz=>[13, 14, 15]);
+
+    $obj1 is now:
+
+     bless([1, 2], "Your::Class");
+
+    $obj2 is now:
+
+     bless([11, 12, 13, 14, 15], "Your::Class");
+
+DESCRIPTION
+
+    This module is a class builder for array-backed classes. With it you
+    can declare your attributes using Moose-style has. Only these has
+    predicates are currently supported: is (ro/rw), glob (bool). Array
+    index will be determined by the order of declaration, so in the example
+    in Synopsis, foo will be stored in element 0, bar in element 1.
+
+    The predicate glob can be specified for the last attribute. It means
+    the attribute has an array value that are put in the end of the object
+    backend array's elements. So in the example in Synopsis, bazvalue's
+    elements will occupy object backend array's elements 2 and subsequent.
+
+    There can only be at most one attribute with glob set to true. After
+    the globbing attribute, there can be no more arguments (so subclassing
+    a class with a globbing attribute is not possible).
+
+    Note that without globbing attribute, you can still store arrays or
+    other complex data in your attributes. It's just that with a globbing
+    attribute, you can keep a single flat array backend, so the overall
+    number of arrays is minimized.
+
+    An example of application: tree node objects, where the first attribute
+    (array element) is the parent, then zero or more extra attributes, then
+    the last attribute is a globbing one storing zero or more children.
+    This is how Mojo::DOM stores its HTML tree node, for example.
+
+SEE ALSO
+
+    Other class builders for array-backed objects:
+    Class::XSAccessor::Array, Class::ArrayObjects, Object::ArrayType::New.
+

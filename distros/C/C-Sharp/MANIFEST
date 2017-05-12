@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Sharp.pm
+cs-parser.yp
+test.pl
+Sharp/Tokener.pm

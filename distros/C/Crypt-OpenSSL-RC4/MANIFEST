@@ -1,0 +1,18 @@
+author/benchmark.pl
+Build.PL
+Changes
+lib/Crypt/OpenSSL/ppport.h
+lib/Crypt/OpenSSL/RC4.pm
+lib/Crypt/OpenSSL/RC4.xs
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_crypt.t
+typemap
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/perlcriticrc

@@ -1,0 +1,25 @@
+# client is required by the cikl, cikl_ping, and cikl_smrt
+[client]
+## For Redis: 
+#driver = Cikl::Redis
+#server = localhost:6379
+
+## For RabbitMQ: 
+#driver = Cikl::RabbitMQ
+#
+#host = localhost
+#port = 5672
+#username = guest
+#password = guest
+#vhost = /
+
+# cikl_smrt is required by cikl_smrt
+[cikl_smrt]
+# change example.com to your local domain and hostname respectively
+# this identifies the data in your instance and ties it to your specific instance in the event
+# that you start sharing with others
+name = local
+instance = hostname.example.com
+
+# the apikey for cikl_smrt
+

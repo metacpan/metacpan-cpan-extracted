@@ -1,0 +1,61 @@
+---
+abstract: 'implementation of the Polybius square'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Modern: 0.007
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.015, CPAN::Meta::Converter version 2.120921'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-Polybius
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Crypt::Polybius:
+    file: lib/Crypt/Polybius.pm
+    version: 0.003
+  Crypt::Polybius::Greek:
+    file: lib/Crypt/Polybius/Greek.pm
+    version: 0.003
+  Crypt::Role::CheckerboardCipher:
+    file: lib/Crypt/Role/CheckerboardCipher.pm
+    version: 0.003
+  Crypt::Role::GreekAlphabet:
+    file: lib/Crypt/Role/GreekAlphabet.pm
+    version: 0.003
+  Crypt::Role::LatinAlphabet:
+    file: lib/Crypt/Role/LatinAlphabet.pm
+    version: 0.003
+  Crypt::Role::ScrambledAlphabet:
+    file: lib/Crypt/Role/ScrambledAlphabet.pm
+    version: 0.003
+requires:
+  Const::Fast: 0
+  Moo: 1.002000
+  Moo::Role: 0
+  MooX::Traits: 0
+  Text::Unidecode: 0
+  Types::Common::Numeric: 0
+  Types::Common::String: 0
+  Types::Standard: 0
+  namespace::sweep: 0
+  perl: 5.008
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Crypt-Polybius/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Crypt-Polybius
+  homepage: https://metacpan.org/release/Crypt-Polybius
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-crypt-polybius.git
+version: 0.003

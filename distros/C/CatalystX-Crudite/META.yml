@@ -1,0 +1,69 @@
+---
+abstract: 'Framework for Catalyst-based CMS Web Applications'
+author:
+  - 'The following person is the author of all the files provided in'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Crudite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Authen::Passphrase::BlowfishCrypt: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::ActionRole::ACL: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Plugin::Authentication: 0
+  Catalyst::Plugin::Authorization::Roles: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Plugin::Session::Store::FastMmap: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Runtime: 0
+  Catalyst::View::TT: 0
+  CatalystX::Resource: 0.008001
+  CatalystX::SimpleLogin: 0
+  Config::General: 0
+  DBIx::Class: 0
+  DBIx::Class::PassphraseColumn: 0
+  DBIx::Class::TimeStamp: 0
+  DBIx::Class::UUIDColumns: 0
+  Data::Printer: 0
+  Data::UUID: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  HTML::FormHandler: 0
+  HTML::FormHandler::Model::DBIC: 0
+  Modern::Perl: 0
+  Moose: 0
+  Params::Validate: 0
+  Template: 0
+  Web::Library: 0
+  Web::Library::Bootstrap: 0
+  Web::Library::DataTables: 0
+  Web::Library::jQuery: 0
+  Web::Library::jQueryUI: 0
+  namespace::autoclean: 0
+  parent: 0
+  perl: 5.012000
+resources:
+  bugtracker: https://github.com/marcelgruenauer/CatalystX-Crudite/issues
+  homepage: https://github.com/marcelgruenauer/CatalystX-Crudite
+  repository: https://github.com/marcelgruenauer/CatalystX-Crudite.git
+version: 0.21
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

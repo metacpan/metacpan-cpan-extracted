@@ -1,0 +1,77 @@
+NAME
+    Catalyst::Plugin::SubRequest - Make subrequests to actions in Catalyst
+
+SYNOPSIS
+        use Catalyst 'SubRequest';
+
+        my $res_body = $c->subreq('/test/foo/bar', { template => 'magic.tt' });
+
+        my $res_body = $c->subreq( {
+           path            => '/test/foo/bar',
+           body            => $body
+        }, {
+           template        => 'magic.tt'
+        });
+
+        # Get the full response object
+        my $res = $c->subreq_res('/test/foo/bar', {
+            template => 'mailz.tt'
+        }, {
+            param1   => 23
+        });
+        $c->log->warn( $res->content_type );
+
+DESCRIPTION
+    Make subrequests to actions in Catalyst. Uses the catalyst dispatcher,
+    so it will work like an external url call. Methods are provided both to
+    get the body of the response and the full response (Catalyst::Response)
+    object.
+
+METHODS
+    subreq [path as string or hash ref], [stash as hash ref], [parameters as
+    hash ref]
+    subrequest
+    sub_request
+        Takes a full path to a path you'd like to dispatch to.
+
+        If the path is passed as a hash ref then it can include body,
+        action, match and path.
+
+        An optional second argument as hashref can contain data to put into
+        the stash of the subrequest.
+
+        An optional third argument as hashref can contain data to pass as
+        parameters to the subrequest.
+
+        Returns the body of the response.
+
+    subreq_res [path as string or hash ref], [stash as hash ref],
+    [parameters as hash ref]
+    subrequest_response
+    sub_request_response
+        Like "sub_request()", but returns a full Catalyst::Response object.
+
+SEE ALSO
+    Catalyst.
+
+AUTHORS
+    Marcus Ramberg, "mramberg@cpan.org"
+
+    Tomas Doran (t0m) "bobtfish@bobtfish.net"
+
+MAINTAINERS
+    Eden Cardim (edenc) "eden@insoli.de"
+
+THANK YOU
+    SRI, for writing the awesome Catalyst framework
+
+    MIYAGAWA, for writing the awesome Plack toolkit
+
+COPYRIGHT
+    Copyright (c) 2005 - 2011 the Catalyst::Plugin::SubRequest "AUTHORS" as
+    listed above.
+
+LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

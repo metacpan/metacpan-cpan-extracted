@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+cgi-bin/browse.html
+cgi-bin/gallery.cgi
+cgi-bin/view.html
+lib/CGI/Application/Gallery.pm
+lib/CGI/Application/Gallery.pod
+t/0.t
+t/1_with_thumbnail_rm_interactive_only.pl
+t/99.cleanup.pl
+t/public_html_src/gallery/1.jpg
+t/public_html_src/gallery/10.jpg
+t/public_html_src/gallery/2.jpg
+t/public_html_src/gallery/3.jpg
+t/public_html_src/gallery/4.jpg
+t/public_html_src/gallery/5.jpg
+t/public_html_src/gallery/6.jpg
+t/public_html_src/gallery/7.jpg
+t/public_html_src/gallery/8.jpg
+t/public_html_src/gallery/9.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,19 @@
+
+NAME       properl-dll
+EXEC_FILE  perl561/properl.dll
+TEXT_DIR   ./text
+STARTUP    dll
+allow_stop true
+delay_start true
+revision 18
+END
+
+NAME       properl-exe
+EXEC_FILE  perl561/properl
+TEXT_DIR   ./text
+STARTUP    spawn
+allow_stop true
+delay_start true
+revision 18
+END
+

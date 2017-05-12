@@ -1,0 +1,15 @@
+INSERT INTO addcat VALUES(1,0,'Voice');
+INSERT INTO addcat VALUES(1,1,'FAX');
+INSERT INTO addcat VALUES(1,2,'Mobile');
+INSERT INTO addcat VALUES(1,3,'Data');
+
+INSERT INTO addcat VALUES(2,0,'Family');
+INSERT INTO addcat VALUES(2,1,'Business');
+INSERT INTO addcat VALUES(2,2,'Pauline\'s Work');
+INSERT INTO addcat VALUES(2,3,'Drew\'s Work');
+INSERT INTO addcat VALUES(2,4,'Niall\'s Personal');
+INSERT INTO addcat VALUES(2,5,'Erinne\'s Personal');
+INSERT INTO addcat VALUES(2,6,'Ruairi\'s Personal');
+INSERT INTO addcat VALUES(2,7,'AFC');
+INSERT INTO addcat VALUES(2,8,'Other');
+INSERT INTO addcat VALUES(2,9,'Old/Obsolete');

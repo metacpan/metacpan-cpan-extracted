@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 192
+    - 188
+  25422:
+    - 40
+name: ddcbbc
+registers:
+  AF: 46128
+  AF_: 0
+  BC: 31431
+  BC_: 0
+  DE: 46175
+  DE_: 0
+  HL: 64503
+  HL_: 0
+  I: 0
+  IX: 25486
+  IY: 12659
+  PC: 0
+  R: 0
+  SP: 0

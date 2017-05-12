@@ -1,0 +1,75 @@
+NAME
+    Crypt::Pwsafe - Perl extension for decrypting and parsing PasswordSafe
+    V3 data files
+
+VERSION
+    Version 1.1
+
+SYNOPSIS
+    use Crypt::Pwsafe;
+    my $file = 'pwsafe.psafe3';
+    my $key = Crypt::Pwsafe::enter_combination();
+    my $pwsafe = Crypt::Pwsafe->new($file, $key);
+
+    # The password for 'user' at 'host' computer in 'Test group'
+
+    my $passwd = $pwsafe->{'Test group'}->{'user@host'};
+
+DESCRIPTION
+    Crypt::Pwsafe module provide read-only access to database files created
+    by Version 3 of PasswordSafe utility available from SourceForge at
+    <http://passwordsafe.sf.net>.
+
+    Users of this module should take these notes:
+
+    1. All passwords will be stored in memory unencrypted (in the form of
+    Perl hashes) once the password file is loaded.
+
+    2. The module will read the entire content of the password file into
+    memory. This may be a problem for large data files on systems with small
+    amount of memory.
+
+    3. The modules does not support Version 2 Passwordsafe data files.
+    Please convert them to Version 3 if needed.
+
+AUTHOR
+    Shufeng Tan, "<shufengtan at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-crypt-pwsafe at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-Pwsafe>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Crypt::Pwsafe
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Crypt-Pwsafe>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Crypt-Pwsafe>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-Pwsafe>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Crypt-Pwsafe>
+
+ACKNOWLEDGEMENTS
+    PasswordSafe is a password database utility, originally developed by
+    Counterpane Labs. PasswordSafe project is currently administered by Rony
+    Shapiro. The project homepage is located at
+    <http://passwordsafe.sourceforge.net>.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Shufeng Tan, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

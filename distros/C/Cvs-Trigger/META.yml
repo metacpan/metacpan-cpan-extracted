@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Cvs-Trigger
+version:             0.04
+abstract:            Argument parsers for CVS triggers
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Cache::FileCache:              0
+    File::Path:                    2.04
+    File::Temp:                    0.2
+    POSIX:                         0
+    Storable:                      0
+    Sysadm::Install:               0.26
+    YAML:                          0.66
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <m@perlmeister.com>

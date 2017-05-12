@@ -1,0 +1,35 @@
+---
+abstract: 'Convert Oracle NLS_DATE_FORMAT <-> strftime Format Strings'
+author:
+  - 'Nathan Gray, <kolibrie@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-NLS_DATE_FORMAT
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Convert::NLS_DATE_FORMAT:
+    file: lib/Convert/NLS_DATE_FORMAT.pm
+    version: '0.06'
+requires:
+  perl: '5.006001'
+version: '0.06'
+x_contributors:
+  - 'Nathan Gray <kolibrie>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

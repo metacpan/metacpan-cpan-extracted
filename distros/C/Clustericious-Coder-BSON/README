@@ -1,0 +1,32 @@
+NAME
+
+    Clustericious::Coder::BSON - BSON encoder for AutodataHandler
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     % cpanm Clustericious::Coder::BSON
+
+DESCRIPTION
+
+    Simply install this module and any Clustericious 1.12 applications will
+    automatically handle BSON encoded requests and responses.
+
+SEE ALSO
+
+    Clustericious
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

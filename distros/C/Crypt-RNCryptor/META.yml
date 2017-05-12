@@ -1,0 +1,45 @@
+---
+abstract: 'Perl implementation of L<RNCryptor|https://github.com/RNCryptor/RNCryptor>'
+author:
+  - 'Shintaro Seki <s2pch.luck@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Pretty: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-RNCryptor
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Crypt::RNCryptor:
+    file: lib/Crypt/RNCryptor.pm
+    version: '0.01'
+  Crypt::RNCryptor::V3:
+    file: lib/Crypt/RNCryptor/V3.pm
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Crypt::CBC: '0'
+  Crypt::OpenSSL::AES: '0'
+  Crypt::PBKDF2: '0'
+  Digest::SHA: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/s-shin/p5-Crypt-RNCryptor/issues
+  homepage: https://github.com/s-shin/p5-Crypt-RNCryptor
+  repository: git://github.com/s-shin/p5-Crypt-RNCryptor.git
+version: '0.01'

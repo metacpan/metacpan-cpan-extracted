@@ -1,0 +1,28 @@
+Revision history for Perl extension Class::Accessor::Assert.
+
+1.41 Wed Mar 03 18:00 GMT+1 2010
+  - Distribution fix (borken version in META.yml).
+
+1.40 Tue Sep 05 15:40 GMT+1 2006
+  - Now works with newer Class::Accessor's (0.25 and up, I think)
+  - Requires 0.25 and up.
+
+1.22 Thu Oct 06 21:25 GMT+1 2005
+  - Distribution upgrade
+  - now using Module::Build.
+
+1.21 Tue Oct 19 17:12 GMT+1 2004
+  - Maintainer now Steffen Mueller.
+  - Removed Carp::Assert requirement from Makefile.PL
+  - Some restructuring of distribution.
+
+1.2 Sat May  1 12:04 BST 2004
+  - Don't need Carp::Assert.
+
+1.1 Sun Dec 21 15:07 GMT 2003
+  - Allow setting to undef.
+
+0.01 Fri Dec 19 20:43 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.6.0 -n Class::Accessor::Assert
+

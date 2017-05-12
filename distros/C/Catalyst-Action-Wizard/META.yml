@@ -1,0 +1,37 @@
+---
+abstract: 'Catalyst::Action::Wizard -- Catalyst module for building wizards'
+author:
+  - unknown
+build_requires:
+  Catalyst::Plugin::Session::State::Cookie: 0
+  HTTP::Message: 5.812
+  MRO::Compat: 0
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Action-Wizard
+provides:
+  Catalyst::Action::Wizard:
+    file: lib/Catalyst/Action/Wizard.pm
+    version: 0.008
+  Catalyst::Wizard:
+    file: lib/Catalyst/Wizard.pm
+  CatalystX::Wizarded:
+    file: lib/CatalystX/Wizarded.pm
+requires:
+  Catalyst: 0.57
+  Catalyst::Plugin::Session: 0.19
+  HTTP::Message: 1.57
+  MRO::Compat: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.008

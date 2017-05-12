@@ -1,0 +1,155 @@
+Copyright (C) 2001-2006 DeWitt Clinton  All Rights Reserved
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+NAME
+
+  Cache::Cache
+
+
+DESCRIPTION
+
+  The Cache modules are designed to assist a developer in persisting
+  data for a specified period of time.  Often these modules are used
+  in web applications to store data locally to save repeated and
+  redundant expensive calls to remote machines or databases.  People
+  have also been known to use Cache::Cache for its straightforward
+  interface in sharing data between runs of an application or
+  invocations of a CGI-style script or simply as an easy to use
+  abstraction of the filesystem or shared memory.
+
+  The Cache package provides Cache::Cache, a generic interface
+  for creating persistent data stores.  This interface is implemented
+  by the Cache::MemoryCache, Cache::SharedMemoryCache, Cache::FileCache, 
+  Cache::SizeAwareFileCache, Cache::SizeAwareMemoryCache, and 
+  Cache::SizeAwareSharedMemoryCache classes. 
+
+  This work aggregates and extends the obsolete File::Cache and
+  IPC::Cache projects.
+
+
+CACHE::CACHE VERSUS CHI
+
+  Cache::Cache is in wide use and very stable, but has not changed in years
+  and is no longer actively developed.
+
+  L<CHI|CHI> is the successor to Cache::Cache. It adheres to the basic
+  Cache::Cache API but adds new features and drivers (e.g. FastMmap and
+  Memcached), improves performance, and addresses limitations in the
+  Cache::Cache implementation. The authors recommend the use of CHI going forward.
+  
+  Questions about Cache::Cache and CHI may be directed to the perl-cache
+  mailing list at http://groups.google.com/group/perl-cache-discuss.
+
+
+REQUIREMENTS
+
+  Digest::SHA1
+  Error
+  File::Spec
+  File::Path
+  Storable
+
+
+OPTIONAL
+
+  IPC::ShareLite
+
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+USAGE
+
+  First, choose the best type of cache implementation for your needs.
+  The simplest cache is the MemoryCache, which is suitable for
+  applications that are serving multiple sequential requests, and
+  wish to avoid making redundant expensive queries, such as an
+  Apache/mod_perl application talking to a database.  If you wish to
+  share that data between processes, then perhaps the
+  SharedMemoryCache is appropriate, although its behavior is tightly
+  bound to the underlying IPC mechanism, which varies from system to
+  system, and is unsuitable for large objects or large numbers of
+  objects.  When the SharedMemoryCache is not acceptable, then
+  FileCache offers all of the same functionality with similar
+  performance metrics, and it is not limited in terms of the number of
+  objects or their size.  If you wish to maintain a strict limit on
+  the size of a file system based cache, then the SizeAwareFileCache
+  is the way to go.  Similarly, the SizeAwareMemoryCache and the
+  SizeAwareSharedMemoryCache add size management functionality
+  to the MemoryCache and SharedMemoryCache classes respectively.
+
+  Using a cache is simple.  Here is some sample code for instantiating
+  and using a file system based cache.
+
+    use Cache::FileCache;
+
+    my $cache = new Cache::FileCache( );
+
+    my $customer = $cache->get( $name );
+
+    if ( not defined $customer )
+    {
+      $customer = get_customer_from_db( $name );
+      $cache->set( $name, $customer, "10 minutes" );
+    }
+
+    return $customer;
+
+  Please refer to the perldoc for Cache::Cache and the related
+  implementations for complete documentation.
+
+INCOMPATIBLE CHANGES
+
+  Cache::Cache 0.99 contains the following incompatible changes:
+
+    * Error::Simple is thrown on exceptions
+
+    * the get_identifiers method has been deprecated in favor of the
+      get_keys method
+
+    * the internal format of object in a FileCache has been modified,
+      necessitating a clearing of the cache while upgrading (make test 
+      does this for the standard cache root)
+
+  Also note that Storable is not forward compatible between all 
+  releases.  That is, older versions of the Cache will not always
+  be able to read objects written by newer versions.  This is
+  unlikely to ever be an issue in production scenarios.
+
+
+ON LOCKING:
+
+  The FileCache backend uses an temp file and an atomic rename to
+  avoid requiring a lock during the write.  This has been demonstrated
+  to be safe across all platforms to date.
+
+  The MemoryCache backend relies on Perl's atomic write to a hash to
+  ensure that a lock is not required.
+
+  The SharedMemoryCache backend uses ShareLite's locking mechanism
+  for safety during the write.
+
+
+SEE ALSO
+
+  The project homepage at http://perl-cache.googlecode.com/.
+
+  The discussion list at http://groups.google.com/group/perl-cache-discuss.
+
+  The CHI project.
+
+
+AUTHOR
+
+  Original author: DeWitt Clinton <dewitt@unto.net>
+
+  Copyright (C) 2001-2009 DeWitt Clinton
+

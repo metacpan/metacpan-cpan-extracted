@@ -1,0 +1,177 @@
+NAME
+    Checkout::CyberSource::SOAP
+
+  WHAT?
+    A Modern Perl interface to CyberSource's SOAP API.
+
+WHY?
+    Folks often have a need for simple and quick, but "enterprise-level"
+    payment- gateway integration. CyberSource's Simple Order API still
+    requires that you compile a binary, and it won't compile on 64-bit
+    processors (no, not OSes, but processors, i.e., what I imagine to be
+    most development workstations by now). So you have to use the SOAP API,
+    which is unwieldy, not least because it uses XML. May no one struggle
+    with this again. :)
+
+NOTICE
+  Credit Card Numbers
+    To save you some legal hassles and vulnerability, this module does not
+    store credit card numbers. If you'd like the option of returning a
+    credit card number from the Response object, please send a patch.
+
+  ID and Key
+    Please note that you must use your own CyberSource id and key, even for
+    testing purposes on CyberSource's test server. This module defaults to
+    using the test server, so when you go into production, set production to
+    a true value in your configuration file or in your object construction,
+    e.g.,
+
+        my $checkout = Checkout::CyberSource::SOAP->new(
+            id         => $id,
+            key        => $key,
+            production => 1,
+            column_map => $column_map
+        );
+
+SYNOPSIS
+    This is for single transactions of variable quantity.
+
+    column_map is important. You must map the keys in the hashref you send
+    (which also sets the keys for the payment_info hashref you receive
+    back). CyberSource uses camelCased and otherwise idiosyncratic
+    identifiers here, so this mapping cannot be avoided.
+
+    I mentioned above that this module does not store credit card numbers;
+    more specifically, the payment_info hash that the Response object
+    returns deletes the credit card number, replaces it with card_type, and
+    adds 4 additional keys:
+
+        decision fault reasoncode refcode
+
+    These are for more a detailed record of why a particular transaction was
+    denied.
+
+  Standalone Usage
+    You can use this as a standalone module by sending it a payment
+    information hashref. You will receive a
+    Checkout::CyberSource::SOAP::Response object containing either a success
+    message or an error message. If successful, you will also receive a
+    payment_info hashref, suitable for storing in your database.
+
+        my $checkout = Checkout::CyberSource::SOAP->new(
+            id         => $id,
+            key        => $key,
+            column_map => $column_map
+        );
+
+        ...
+
+        my $response = $checkout->checkout($args);
+
+        ...
+
+        if ($response->success) {
+            my $payment_info = $response->payment_info;
+            # Store payment_info in your database, etc.
+        }
+        else {
+            # Display error message
+            print $response->error->{message};
+        }
+
+  Catalyst
+    You can use this in a Catalyst application by using
+    Catalyst::Model::Adaptor and setting your configuration file somewhat
+    like this:
+
+        <Model::Checkout>
+            class   Checkout::CyberSource::SOAP
+            <args>
+                id  your_cybersource_id
+                key your cybersource_key
+                #production  1
+                <column_map>
+                    firstName               firstname
+                    lastName                lastname
+                    street1             address1
+                    city                    city
+                    state           state
+                    postalCode          zip
+                    country         country
+                    email           email
+                    ipAddress               ip
+                    unitPrice               amount
+                    quantity                quantity
+                    currency                currency
+                    accountNumber   cardnumber
+                    expirationMonth expiry.month
+                    expirationYear  expiry.year
+                </column_map>
+            </args>
+        </Model::Checkout>
+
+    production is commented out. You will want to set production to true
+    when you are ready to process real transactions. So that in your payment
+    processing controller you would get validated data back from a shopping
+    cart or other form and do something like this:
+
+        # If your checkout form is valid, call Checkout::CyberSource::SOAP's
+        # checkout method:
+
+        my $response = $c->model('Checkout')->checkout( $c->req->params );
+
+        # Check the Checkout::CyberSource::SOAP::Response object, branch
+        # accordingly.
+
+        if ( $response->success ) {
+
+            # Store a payment in your database
+
+            my $payment = $c->model('Payment')->create($response->payment_info);
+
+            $c->flash( status_msg => $response->success->{message} );
+            $c->res->redirect($c->uri_for('I_got_your_money'));
+        }
+    
+        else {
+            $c->stash( error_msg => $response->error->{message} );
+            return;
+        }
+
+METHODS
+    checkout
+        The only method you need to call.
+
+    addComplexType
+        Internal method for construction of the SOAP object.
+
+    addField
+        Internal method for construction of the SOAP object.
+
+    addItem
+        Internal method for construction of the SOAP object.
+
+    addService
+        Internal method for construction of the SOAP object.
+
+    formSOAPHeader
+        Internal method for construction of the SOAP object.
+
+AUTHOR
+    Amiri Barksdale <amiri@metalabel.com>
+
+CONTRIBUTORS
+    Tomas Doran (t0m) <bobtfish@bobtfish.net> Caleb Cushing (xenoterracide)
+    <xenoterracide@gmail.com>
+
+COPYRIGHT
+    Copyright (c) 2011 the Checkout::CyberSource::SOAP "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Catalyst::Model::Adaptor Business::OnlinePayment::CyberSource
+

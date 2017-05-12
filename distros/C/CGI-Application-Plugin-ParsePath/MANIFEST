@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/CGI/Application/Plugin/ParsePath.pm
+t/01-parse.t
+t/pod-coverage.t
+t/pod.t
+t/lib/MyTestApp.pm

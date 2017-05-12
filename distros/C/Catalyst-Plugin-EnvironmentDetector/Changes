@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Plugin::EnvironmentDetector.
+
+0.01  Thu Jun 20 22:00:19 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Catalyst::Plugin::EnvironmentDetector
+

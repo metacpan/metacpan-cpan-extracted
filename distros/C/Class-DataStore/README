@@ -1,0 +1,45 @@
+Class::DataStore 0.07
+=====================
+
+DESCRIPTION
+
+Class::DataStore implements a simple storage system for object data.  This data
+can be accessed via get/set methods and AUTOLOAD. AUTOLOAD calls are not added
+to the symbol table, so using get/set will be faster.
+
+This module was written originally as part of a website framework that was used
+for the Democratic National Committee website in 2004. Some of the
+implementations here, such as get() optionally returning a list if called in
+array context, reflect the way this module was originally used for building web
+applications.
+
+Class::DataStore is most useful when subclassed. To preserve the AUTOLOAD
+functionality, be sure to add the following when setting up the subclass:
+
+  use base 'Class::DataStore';
+  *AUTOLOAD = \&Class::DataStore::AUTOLOAD;
+															
+This module is also a useful add-on for modules that need quick and simple data
+storage, e.g. to store configuration data:
+
+  $self->{_config} = Class::Datastore->new( $config_data );
+  sub config { return $_[0]->{_config}; }
+  my $server = $self->config->server;
+  my $sender = $self->config->get( 'sender' );
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2005 Eric Folley
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+

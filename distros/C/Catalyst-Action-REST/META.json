@@ -1,0 +1,67 @@
+{
+   "abstract" : "Automated REST Method Dispatching",
+   "author" : [
+      "Tomas Doran <bobtfish@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Action-REST",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.80030",
+            "Class::Inspector" : "1.13",
+            "JSON::MaybeXS" : "0",
+            "MRO::Compat" : "0.10",
+            "Module::Pluggable::Object" : "0",
+            "Moose" : "1.03",
+            "Params::Validate" : "0.76",
+            "URI::Find" : "0",
+            "namespace::autoclean" : "0"
+         },
+         "suggests" : {
+            "Config::General" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "Data::Taxi" : "0",
+            "FreezeThaw" : "0",
+            "HTML::Parser" : "0",
+            "PHP::Serialization" : "0",
+            "XML::Simple" : "0",
+            "YAML::Syck" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::UserAgent" : "5.00",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Catalyst-Action-REST"
+      },
+      "x_authority" : "cpan:BOBTFISH"
+   },
+   "version" : "1.20"
+}
+

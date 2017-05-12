@@ -1,0 +1,59 @@
+{
+   "abstract" : "Inspect leaks found by L<Catalyst::Plugin::LeakTracker>",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Controller-LeakTracker",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.88",
+            "Test::use::ok" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::LeakTracker" : "0",
+            "Catalyst::Runtime" : "5.8",
+            "Data::Dumper" : "0",
+            "Devel::Cycle" : "0",
+            "Devel::Size" : "0",
+            "Number::Bytes::Human" : "0.07",
+            "Template::Declare" : "0.42",
+            "YAML::XS" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/wreis/catalyst-controller-leaktracker"
+      }
+   },
+   "version" : "0.08"
+}

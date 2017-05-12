@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 136
+    - 123
+  20424:
+    - 34
+name: ddcb7b
+registers:
+  AF: 44607
+  AF_: 0
+  BC: 551
+  BC_: 0
+  DE: 29215
+  DE_: 0
+  HL: 21153
+  HL_: 0
+  I: 0
+  IX: 20544
+  IY: 47498
+  PC: 0
+  R: 0
+  SP: 0

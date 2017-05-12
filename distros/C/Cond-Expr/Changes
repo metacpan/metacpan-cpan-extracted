@@ -1,0 +1,18 @@
+Revision history for Cond-Expr
+
+0.05   2017-04-02 23:14:10Z
+  - fixes for perl 5.25.1 for manipulation of op_sibling (RT#117254; thanks,
+    Dave Mitchell!)
+
+0.04   2015-01-03 20:45:48Z
+  - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.03   2014-12-21 00:17:16Z
+  - specify that distribution requires a minimum perl version of 5.014
+
+0.02   2012-03-05 14:44:32Z
+  - Fix a small documentation mistake (Sawyer X)
+
+0.01   2012-02-29 12:54:50Z
+  - Initial release
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb5a
+registers:
+  AF: 32792
+  AF_: 0
+  BC: 20741
+  BC_: 0
+  DE: 14000
+  DE_: 0
+  HL: 41852
+  HL_: 0
+  I: 0
+  IX: 3552
+  IY: 52863
+  PC: 4
+  R: 2
+  SP: 0

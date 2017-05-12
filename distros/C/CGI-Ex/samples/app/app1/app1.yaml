@@ -1,0 +1,15 @@
+---
+# configuration file for app1.pl
+
+# this is the path of steps that signup will go through
+# you could add intermediate steps here if you wanted to
+# in yahoo speak - this is a signup profile's list of brokers
+path:
+ - pick_domain
+ - pick_domain_alternate
+ - cust_info
+ - do_bill
+ - thankyou
+
+# setting this to 1 will turn off all history tracing
+no_history: 0

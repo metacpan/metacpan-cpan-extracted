@@ -1,0 +1,176 @@
+charset EUC-JP
+
+=head1 NAME
+
+CGI::ConvertParam - CGI::param()メソッドへの漢字コード変換フックの追加
+
+=head1 SYNOPSIS
+
+  package CGI::ConvertParam::OngetUTF8;
+  use base 'CGI::ConvertParam';
+  use Jcode;
+
+  sub do_convert_on_get
+  {
+      my $self = shift;
+      my $parameter_value = shift;
+      return Jcode->new($parameter_value)->utf8;
+  }
+  1;
+
+  package client;
+  use CGI;
+  use CGI::ConvertParam::OngetUTF8;
+
+  $query = CGI::ConvertParam::OngetUTF8->new(CGI->new);
+  print $query->param('parameter_foo');
+
+=head1 DESCRIPTION
+
+CGI::ConvertParam は CGI.pm の param() メソッドをパラーメータの一括した文字コード変換や取得時の変換もしくは設定時の変換を行えるように拡張します。Decoratorパターンによって拡張を行っています。
+
+=head1 EXAMPLE
+
+=head2 全パラメータを EUC-JP に変換する。
+
+  package CGI::ConvertParam::EUC;
+  use base 'CGI::ConvertParam';
+  use Jcode;
+
+  sub initialize
+  {
+      my $self = shift;
+      $self->convert_all_param;
+  }
+
+  sub do_convert_all
+  {
+      my $self    = shift;
+      my $strings = shift;
+      return Jcode->new($strings)->euc;
+  }
+  1;
+
+  package main;
+  use CGI;
+  use CGI::ConvertParam::EUC;
+  my $query = CGI::ConvertParam::EUC->new(CGI->new);
+  print 'Name(EUC-JP):', $query->param('NAME');
+
+=head2 値をセットする際に Shift-JIS へ変換する。
+
+  package CGI::ConvertParam::OnsetShiftJIS;
+  use base 'CGI::ConvertParam';
+  use Jcode;
+
+  sub do_convert_on_set
+  {
+      my $self    = shift;
+      my $strings = shift;
+      return Jcode->new($strings)->sjis;
+  }
+  1;
+
+
+  package main;
+  use CGI;
+  use CGI::ConvertParam::OnsetShiftJIS;
+  my $query = CGI::ConvertParam::OnsetShiftJIS->new(CGI->new);
+  $query->param(NAME => $value);
+  print 'Name(Shift-JIS):', $query->param('NAME');
+
+=head2 値を取得する際に UTF-8 に変換する。
+
+  package CGI::ConvertParam::OngetUTF8;
+  use base 'CGI::ConvertParam';
+  use Jcode;
+
+  sub do_convert_on_get
+  {
+      my $self    = shift;
+      my $strings = shift;
+      return Jcode->new($strings)->utf8;
+  }
+  1;
+
+
+  package main;
+  use CGI;
+  use CGI::ConvertParam::OngetUTF8;
+  my $query = CGI::ConvertParam::OngetUTF8->new(CGI->new);
+  $query->param(NAME => $value);
+  print 'Name(UTF-8):', $query->param('NAME');
+
+=head1 METHOD
+
+=head2 Class method
+
+=over 4
+
+=item new(I<CGI_OBJECT>)
+
+The B<new()> method is the constructor for a CGI::ConvertParam and sub-class. I<CGI_BOJECT> is the reference of the CGI instance. It return a specialized CGI instance.
+
+B<new()> メソッドは CGI::ConvertParam とそのサブクラスのコンストラクタです。I<CGI_OBJECT> に CGIモジュールのインスタンスを渡すと、拡張した CGI.pm 互換のインスタンスを返します。
+
+=back
+
+=head2 Instance method
+
+=over 4
+
+=item convert_all_param()
+
+B<convert_all_param()> メソッドは全てのパラメータに変換処理を行います。
+
+=back
+
+=head2 Subclassing and Override methods
+
+CGI::ConvertParam はサブクラスを作成しメソッドを上書き（オーバーライド）することによって実装を行います。上書きすることができるメソッドは以下を参照してください:
+
+=over 4
+
+=item initialize()
+
+このメソッドは B<new()> コンストラクタから呼び出されます。B<initialize()>メソッドを上書きすることでパラメータの追加やメソッドの呼び出しを行うことができます。
+
+=item do_convert_on_set()
+
+このメソッドは B<param('name' =&gt; $value)> など、param() メソッドで値を設定する前に呼び出されます。
+
+=item do_convert_on_get()
+
+このメソッドは B<param('name')> など、param()メソッドで値を参照するときに呼び出されます。
+
+=item do_convert_all_param
+
+このメソッドは B<convert_all_param()>メソッドから呼び出されます。
+
+=back
+
+=head2 Data-access method
+
+=over 4
+
+=item query()
+
+このメソッドは拡張する前のCGIオブジェクトのインスタンスを返します。
+
+=back
+
+=head1 SEE ALSO
+
+L<CGI>
+
+=head1 AUTHOR
+
+OYAMA Hiroyuki <oyama@crayfish.co.jp>  http://perl.infoware.ne.jp/
+
+=head1 COPYRIGHT
+
+Copyright(c) 2000, OYAMA Hiroyuki. Japan. All rights reserved.
+
+CGI::ConvertParam class may be copied only under the terms of either the Artistic License or the GNU General Public License, which may be found in the Perl 5 source kit.
+
+=cut

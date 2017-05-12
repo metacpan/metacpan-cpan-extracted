@@ -1,0 +1,65 @@
+<html>
+<head>
+<title>CGI::ContactForm - Perl extension for generating a web contact form</title>
+<style type="text/css">
+p, h1, body, ul { font-family: arial, helvetica, sans-serif }
+p, body, ul { background: #f0f0f0; color: black; font-size: 14px }
+body { margin-left: 15%; margin-right: 15% }
+h1 { background: #f0f0f0; color: #4c5ea8; font-size: 19px }
+tt {
+    background: #f0f0f0;
+    color: #4c5ea8;
+    font-family: 'courier new', monospace;
+    font-size: 14px;
+    font-weight: bold;
+}
+ul { line-height: 1.5em }
+a         { color: #4c5ea8; background: none }
+a:visited { color: #4c5ea8; background: none }
+a:active  { color: #cc6600; background: none }
+a:hover   { color: #cc6600; background: none }
+</style>
+</head>
+<body>
+<br>
+
+<h1>CGI::ContactForm</h1>
+
+<p><tt>CGI::ContactForm</tt> is a Perl module that generates a contact form for the
+web and sends a message to a predestinated recipient. Unlike many form-to-mail programs,
+it's limited to this single purpose, but it allows you to set up a decently designed
+form with a minimum of effort. In other words, it's simple to use rather than flexible,
+even if there are quite a few customization possibilities.</p>
+
+<p>The distribution file includes two modules:</p>
+
+<ul>
+<li><a href="http://search.cpan.org/perldoc?CGI%3A%3AContactForm">CGI::ContactForm</a>
+(main module)</li>
+<li><a href="http://search.cpan.org/perldoc?CGI%3A%3AContactForm%3A%3AMHonArc">
+CGI::ContactForm::MHonArc</a></li>
+</ul>
+
+<p>Clicking those links takes you to the POD (documentation) for respective module.</p>
+
+<p>The principal functionality is served by the main module.<br>
+<tt>CGI::ContactForm::MHonArc</tt> is a special purpose add-on that makes it easy to
+have <tt>CGI::ContactForm</tt> interact with a mail archive created by the
+<a href="http://www.mhonarc.org/">MHonArc</a> Email-to-HTML converter.</p>
+
+<p>You can download <tt>CGI::ContactForm</tt> from <a href="http://search.cpan.org/~gunnar/">
+CPAN</a> or from my <a href="http://www.gunnar.cc/contactform/">personal web site</a>.</p>
+
+<p>Installation guidance can be found in the POD for the main module.</p>
+
+<hr>
+
+<p>Copyright &copy; 2003-2009 <a href="http://www.gunnar.cc/cgi-bin/contact.pl">
+Gunnar Hjalmarsson</a><br>
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.</p>
+
+<br>
+</body>
+</html>
+

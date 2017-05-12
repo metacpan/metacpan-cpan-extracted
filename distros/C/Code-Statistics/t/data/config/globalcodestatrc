@@ -1,0 +1,22 @@
+global_setting = 1
+overridden_by_command = 1
+overridden_by_profile = 1
+overridden_by_local = 1
+overridden_by_local_command = 1
+overridden_by_local_profile = 1
+overridden_by_args = 1
+
+[collect]
+overridden_by_command = 2
+overridden_by_profile = 2
+overridden_by_local = 2
+overridden_by_local_command = 2
+overridden_by_local_profile = 2
+overridden_by_args = 2
+
+[collect::test]
+overridden_by_profile = 3
+overridden_by_local = 3
+overridden_by_local_command = 3
+overridden_by_local_profile = 3
+overridden_by_args = 3

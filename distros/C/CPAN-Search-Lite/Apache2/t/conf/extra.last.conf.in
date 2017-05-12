@@ -1,0 +1,57 @@
+AddDefaultCharset UTF-8
+
+PerlLoadModule Apache2::CPAN::SOAP
+
+CSL_soap_db test
+CSL_soap_user test
+
+<Location /soap>
+   SetHandler perl-script
+   PerlResponseHandler Apache2::SOAP
+   PerlSetVar dispatch_to "@ServerRoot@/../../blib/lib, Apache2::CPAN::SOAP"
+</Location>
+
+PerlLoadModule Apache2::CPAN::Query
+CSL_db test
+CSL_user test
+CSL_tt2 "@ServerRoot@/../../tt2"
+
+<Location "/search">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->search
+</Location>
+<LocationMatch "/~[A-Za-z0-9-]+">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->cpanid
+</LocationMatch>
+<Location "/author">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->author
+</Location>
+<Location "/dist">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->dist
+</Location>
+<Location "/module">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->module
+</Location>
+<Location "/chapter">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->chapter
+</Location>
+<Location "/recent">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->recent
+</Location>
+<Location "/mirror">
+   SetHandler perl-script
+   PerlResponseHandler Apache2::CPAN::Query->mirror
+</Location>
+
+<Location /TestCSL__search>
+   SetHandler perl-script
+   PerlResponseHandler Apache2::SOAP
+   PerlSetVar dispatch_to "@ServerRoot@/lib, TestCSL::search"
+</Location>
+

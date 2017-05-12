@@ -1,0 +1,16 @@
+<form name="util_diff_form" action="" method="post" onSubmit="return util_diff_onsubmit()">
+<table align="center">
+<tr><th>Left directory</th><td><input id="left"  name="left" type="input" size="100" maxlength="250" value="<tmpl_var name=left>" /></td></tr>
+<tr><th>Right directory</th><td><input id="right" name="right" type="input" size="100" maxlength="250" value="<tmpl_var name=right>" /></td></tr>
+</table>
+<table align="center">
+<tr><th><div id="diff.button"></div></th><td><div id="menu.button"></div></td></tr>
+</table>
+<table align="center">
+<tr><td align="center"><div id="message"></div></td></tr>
+<tr><td align="center"><div id="output"></div></td></tr>
+<tr><td align="center"><div id="result"></div></td></tr>
+</table>
+<input type="hidden" id="action" name="action" value="" />
+<input type="hidden" id="target" name="target" value="" />
+</form>

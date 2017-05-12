@@ -1,0 +1,19 @@
+CHANGES
+examples/benchmark.pl
+lib/Compress/LZF_PP.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/hello_1.dat
+t/hello_10.dat
+t/hello_100.dat
+t/hello_1000.dat
+t/hello_10000.dat
+t/hello_100000.dat
+t/hello_2.dat
+t/hello_3.dat
+t/hello_4.dat
+t/hello_5.dat
+t/pod.t
+t/simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

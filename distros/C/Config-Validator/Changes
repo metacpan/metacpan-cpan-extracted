@@ -1,0 +1,36 @@
+Revision history for Config-Validator:
+
+1.3	Mon Nov 30 2015
+	* Added support for more string-equivalent types in options().
+
+1.2	Fri Feb 14 2014
+	* Added yet another built-in type: duration.
+
+1.1	Thu Nov 28 2013
+	* Added more built-in types: hostname, ipv4, ipv6 and size.
+
+1.0	Mon Feb 25 2013
+	* Promoted to 1.0 after successful testing.
+	* The API is now stable.
+
+0.6	Mon Nov 12 2012
+	* Cleanup code to please Perl::Critic.
+
+0.5	Tue Oct 23 2012
+	* Now using No::Worries.
+
+0.4	Tue Mar 27 2012
+	* Improved boolean handling with Getopt::Long.
+	* Added yet more convenient functions.
+
+0.3	Tue Feb 28 2012
+	* Added the treeify() function.
+	* Added the is_true() and is_false() functions.
+	* Added the traverse() method.
+	* Added some example code in the "eg" directory.
+
+0.2	Tue Feb 14 2012
+	* Documented and made public the is_regexp() function.
+
+0.1	Mon Feb 13 2012
+	* First version released in CPAN.

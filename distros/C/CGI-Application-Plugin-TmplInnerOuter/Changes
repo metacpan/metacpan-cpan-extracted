@@ -1,0 +1,19 @@
+2008-09-09 10:27  cvs
+
+	* lib/CGI/Application/Plugin/TmplInnerOuter.pm, t/1.t: moved around
+	  documentation, cleaned some code
+
+	  for example, introduced some aliases
+
+2007-08-27 09:15  cvs
+
+	* CGI-Application-Plugin-TmplInnerOuter-1.03.tar.gz: changes
+
+2007-08-22 17:10  cvs
+
+	* lib/CGI/Application/Plugin/TmplInnerOuter.pm: Initial revision
+
+2007-08-22 17:10  cvs
+
+	* lib/CGI/Application/Plugin/TmplInnerOuter.pm: init import
+

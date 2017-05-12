@@ -1,0 +1,67 @@
+Revision history for Perl module Class::User::DBI
+
+0.10 2012-12-07
+  - Fixed META_MERGE provides field for proper CPAN indexing (broken
+    in 0.09).
+
+0.09 2012-12-05
+  - add_user(): Better handling of possible race condition if user 
+    already exists. Previously an exception could be thrown on 
+    attempt to add twice, since the DB only allows unique entries.  
+    Now undef is returned.
+  - add_user(): Transaction tests for existence of user ahead of add.
+
+0.08 2012-11-02
+  - "Changes" now CPAN::Changes::Spec compliant.
+  - t/09-changes.t added to verify compliance.
+
+0.07 2012-09-27
+  - Eliminated some code that prevented running under pre-5.10 Perls (we
+    should be ok through 5.8.x now, again).
+
+0.06 2012-08-30
+  - Changed 'id' datatype to BIGINT in user_ips table to resolve issue where
+    mysql and sqlite have different ways of designating an unsigned int type.
+    Failure to designate an unsigned int (or larger) for IP storage results
+    in unreliable round-trip.
+
+0.05 2012-08-21
+  - Added setter and getter for ip_required field for users.
+  - load_profile() now also includes an ip_required field.
+  - Minor documentation updates.
+
+0.04 2012-08-15
+  - Class::User::DBI->list_users now returns a sorted list, and includes all
+    fields except salt and passphrase hash.
+
+0.03 2012-07-23
+  - Corrected some POD typos.
+  - Fixed a spelling mistake in the META_MERGE segment within Makefile.PL
+  - POD enhancements regarding configuration, examples, and explanation of
+    the class heirarchy.
+
+0.02 2012-07-22
+  - Major rewrite.
+  - Added Domains, UserDomains, Roles, Privileges, and RolePrivileges classes.
+  - Full POD rewrite.
+  - Many bugfixes.
+  - Added ./examples/
+  - Reconfigured ./scripts/cudbi-configdb
+  - Many new test.
+  - Fully operational now.
+  - API has stabilized.
+
+0.01_002 2012-06-11
+  - Corrected some example code in the POD.
+  - Added cudbi-configdb script to scripts/ for automatic database setup.
+  - Added a note to the POD about cudbi-configdb.
+  - Still beta quality.
+
+0.01_001 2012-06-09
+  - First version.
+  - Beta.
+
+
+
+
+

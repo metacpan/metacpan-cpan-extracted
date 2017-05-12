@@ -1,0 +1,29 @@
+Revision history for CloudPAN: 1.131740
+
+1.131740  2013-06-23 06:54:22 Europe/Amsterdam
+    Bah. I forgot the other print and seek.
+
+1.131730  2013-06-22 12:08:29 Europe/Amsterdam
+    Switch away from treating $fh as an IO::Handle so 5.8.9 works
+
+1.130561  2013-02-25 14:56:35 Europe/Amsterdam
+    Oops. Forgot to tell dzil to not mark Acme::Stardate as a prereq
+
+1.130560  2013-02-25 14:44:54 Europe/Amsterdam
+    Fix the tests. One, let's use a module that should be more permanent. And
+    two, use a tempdir for the persistence test
+
+1.130120  2013-01-12 20:20:27 Europe/Amsterdam
+    Always pull the latest version of a module (Thanks Matt Horsfall)
+
+1.123261  2012-11-21 03:54:59 Europe/Amsterdam
+
+1.123260  2012-11-21 03:24:08 Europe/Amsterdam
+    Use real temporary files
+    Implement basic persistence
+    Do some more rigorous checking
+    Swap out the tests to use something silly (Number::Zero)
+    Document the new import method
+
+1.121730  2012-06-21 14:30:45 Europe/Amsterdam
+    Initial release

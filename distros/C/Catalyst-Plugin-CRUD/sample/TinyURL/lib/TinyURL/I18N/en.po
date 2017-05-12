@@ -1,0 +1,39 @@
+msgid "New"
+msgstr ""
+
+msgid "Detail"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "List"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "TinyUrl_class_name"
+msgstr "TinyUrl"
+
+msgid "TinyUrl_id"
+msgstr "ID"
+
+msgid "TinyUrl_disable"
+msgstr "DISABLE"
+
+msgid "TinyUrl_long_url"
+msgstr "LONG_URL"
+

@@ -1,0 +1,11 @@
+--- #YAML:1.0
+name: Convert-Wiki
+version: 0.05
+version_from: lib/Convert/Wiki.pm
+license: perl
+distribution_type: module
+generated_by: Convert-Wiki version 0.05
+installdirs: site
+requires:
+  Test::Differences: 0.47
+  Text::Format: 0.52

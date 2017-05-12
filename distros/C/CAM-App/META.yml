@@ -1,0 +1,28 @@
+---
+name: CAM-App
+version: 1.07
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Web database application framework
+license: perl
+requires:
+  CAM::Template: 0
+  CGI: 2.00
+  File::Spec: 0
+recommends:
+  CAM::EmailTemplate: 0
+  CAM::EmailTemplate::SMTP: 0
+  CAM::SQLManager: 0
+  CAM::SQLObject: 0
+  CAM::Session: 0
+  CAM::Template::Cache: 0
+  CGI::Compress::Gzip: 0
+  CGI::Cookie: 1.00
+  DBI: 1.10
+build_requires:
+  Test::More: 0
+provides:
+  CAM::App:
+    file: lib/CAM/App.pm
+    version: 1.07
+generated_by: Module::Build version 0.2609

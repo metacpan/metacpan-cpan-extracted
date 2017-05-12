@@ -1,0 +1,64 @@
+From jaq@spacepants.org Tue Oct 05 21:11:28 2004
+Received: from support.anchor.net.au ([202.4.236.33])
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1CF1H6-0006qX-7m
+        for ubuntu-users@lists.ubuntu.com; Tue, 05 Oct 2004 21:11:28 -0500
+Received: from willow.spacepants.org (willow.bridge.anchor.net.au
+        [10.108.62.188])
+        by support.anchor.net.au (Postfix) with ESMTP id 5108B2BDB6
+        for <ubuntu-users@lists.ubuntu.com>;
+        Wed,  6 Oct 2004 12:10:56 +1000 (EST)
+Received: by willow.spacepants.org (Postfix, from userid 1000)
+        id 9642C264E92; Wed,  6 Oct 2004 12:09:51 +1000 (EST)
+Date: Wed, 6 Oct 2004 12:09:51 +1000
+From: Jamie Wilkinson <jaq@spacepants.org>
+To: ubuntu-users@lists.ubuntu.com
+Message-ID: <20041006020951.GP3878@spacepants.org>
+Mail-Followup-To: ubuntu-users@lists.ubuntu.com
+References: <20041006010904.GK3878@spacepants.org>
+        <1097027233.17830.9.camel@localhost.localdomain>
+        <41631E15.1060106@coco2.arach.net.au>
+        <1097019070.27630.5.camel@tyrosine>
+        <20041006010904.GK3878@spacepants.org>
+        <20041006014416.GA20615@ben.net.au>
+        <41631E15.1060106@coco2.arach.net.au>
+        <1097019070.27630.5.camel@tyrosine>
+        <20041006010904.GK3878@spacepants.org> <41634850.60201@iNode.co.nz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1097027233.17830.9.camel@localhost.localdomain>
+        <20041006014416.GA20615@ben.net.au> <41634850.60201@iNode.co.nz>
+X-Message-Flag: Magic 8-Ball says Outlook Not Good.
+X-Mailer: beefmail v0.0
+Reply-By: Sat, 04 Sep 2004 23:19:55 +1000
+X-No-CC: Please respect the setting of my Mail-Followup-To header
+User-Agent: Mutt/1.5.6+20040523i
+Subject: Re: Disappointing Evolution
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Wed, 06 Oct 2004 02:11:28 -0000
+
+This one time, at band camp, Jim Cheetham wrote:
+>ubuntu-users mailing list
+
+This one time, at band camp, Ben Lisle wrote:
+>Tell me about it!  If you really want an RSS reader you could try Blam,
+
+This one time, at band camp, janne wrote:
+>If you use firefox, get the "Sage" extension; it is a pretty decent feed
+
+All good suggestions, but I really liked that straw fit into the gnome2 look
+and feel.
+
+--
+jaq@spacepants.org                           http://spacepants.org/jaq.gpg

@@ -1,0 +1,41 @@
+---
+abstract: 'Cache one scalar value with expiry'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0.98
+  Test::Time: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-Scalar-WithExpiry
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cache::Scalar::WithExpiry:
+    file: lib/Cache/Scalar/WithExpiry.pm
+    version: 0.01
+requires:
+  Time::HiRes: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/Songmu/p5-Cache-Scalar-WithExpiry/issues
+  homepage: https://github.com/Songmu/p5-Cache-Scalar-WithExpiry
+  repository: git://github.com/Songmu/p5-Cache-Scalar-WithExpiry.git
+version: 0.01

@@ -1,0 +1,38 @@
+---
+abstract: 'Perl Conductrics Management API for universal optimization and reporting platform'
+author:
+  - 'Ferruccio Zamuner - nonsolosoft@diff.org'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  JSON::MaybeXS: 0
+  JSON::Schema: 0
+  Test::Deep: 0
+  Test::Deep::JSON: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Conductrics-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON::Any: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::URI: 0
+  Time::HiRes: 0
+  URI: 0
+  URI::QueryParam: 0
+  perl: 5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.003'

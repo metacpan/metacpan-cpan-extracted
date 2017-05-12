@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd96
+registers:
+  AF: 20998
+  AF_: 0
+  BC: 17951
+  BC_: 0
+  DE: 52951
+  DE_: 0
+  HL: 56127
+  HL_: 0
+  I: 0
+  IX: 11366
+  IY: 40383
+  PC: 3
+  R: 2
+  SP: 0

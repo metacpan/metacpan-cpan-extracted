@@ -1,0 +1,10 @@
+^blib/
+^Makefile$
+.*\.bak$
+^Makefile\.old$
+^pm_to_blib$
+^blib$
+^\.git/
+^\.gitignore$
+\._.*
+CSS-LESSp-.*

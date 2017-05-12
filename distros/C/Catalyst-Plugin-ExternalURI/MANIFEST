@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Plugin/ExternalURI.pm
+t/02pod.t
+t/03_translate.t
+t/03podcoverage.t
+t/04_uri_for.t
+t/lib/TestURIs.pm

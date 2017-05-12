@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Class/FakeAttributes.pm
+t/use.t

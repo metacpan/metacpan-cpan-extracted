@@ -1,0 +1,68 @@
+{
+    "name": "CPAN-Testers-Fact-PlatformInfo",
+    "version": "1.03",
+    "abstract": "Platform information on which a CPAN Testers smoker is running",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>",
+        "Brian McCauley (NOBULL) <nobull67@gmail.com>",
+        "Colin Newell (NEWELLC) http://colinnewell.wordpress.com/",
+        "Jon 'JJ' Allen (JONALLEN) <jj@jonallen.info>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "prereqs" : {
+        "runtime": {
+            "requires": {
+                "perl": "5.006",
+                "Carp": "0",
+                "Metabase::Fact::Hash": "0.016"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::Fact::PlatformInfo": {
+            "file": "lib/CPAN/Testers/Fact/PlatformInfo.pm",
+            "version": "1.03"
+        }
+    },
+    "no_index": {
+        "directory": ["t"]
+    },
+
+    "resources": {
+        "homepage": "http://devel.cpantesters.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Fact-PlatformInfo" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-testers-fact-platforminfo.git",
+            "web": "http://github.com/barbie/cpan-testers-fact-platforminfo",
+            "type": "git"
+        }
+    }
+}

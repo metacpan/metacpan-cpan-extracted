@@ -1,0 +1,72 @@
+{
+   "abstract" : "Install Perl distributions on Slackware Linux",
+   "author" : [
+      "Andreas Voegele <voegelas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPANPLUS-Dist-Slackware",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::LicenseFromModule" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0",
+            "Cwd" : "0",
+            "ExtUtils::Install" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IPC::Cmd" : "0",
+            "Locale::Maketext::Simple" : "0",
+            "Module::CoreList" : "2.32",
+            "Module::Pluggable" : "0",
+            "POSIX" : "0",
+            "Params::Check" : "0",
+            "Pod::Find" : "0",
+            "Pod::Simple" : "0",
+            "Text::Wrap" : "0",
+            "parent" : "0",
+            "perl" : "5.012003",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/voegelas/CPANPLUS-Dist-Slackware.git"
+      }
+   },
+   "version" : "1.024",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

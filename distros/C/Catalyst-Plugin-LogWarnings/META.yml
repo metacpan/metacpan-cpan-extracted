@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Catalyst-Plugin-LogWarnings
+version:            0.03
+abstract:           Log perl warnings to your Catalyst log object
+author:
+    - Jonathan Rockway <jrockway@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Catalyst::Runtime:  5.7001
+    MRO::Compat:        0
+    Test::More:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

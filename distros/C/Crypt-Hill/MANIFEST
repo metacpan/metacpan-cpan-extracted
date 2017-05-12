@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Crypt/Hill.pm
+lib/Crypt/Hill/Utils.pm
+t/00-load.t
+t/01-crypt-hill.t
+t/02-crypt-hill.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

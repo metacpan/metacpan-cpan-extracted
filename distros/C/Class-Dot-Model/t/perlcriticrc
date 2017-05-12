@@ -1,0 +1,9 @@
+#theme     = (pbp + security) * bugs 
+
+severity  = brutal
+exclude   = RequireTidyCode RequirePodSections ProhibitCallsToUnexportedSubs 
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 10
+#ProhibitFlagComments RequireExplicitInclusion 
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2

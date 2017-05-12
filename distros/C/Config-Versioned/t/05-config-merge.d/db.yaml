@@ -1,0 +1,12 @@
+username : admin
+hosts:
+    - host1
+    - host2
+password:
+    host1:  password1
+    host2:  password2
+port:
+    host1:  123
+    host2:  456
+symgroup:
+    sym1@:  conn1:new.location

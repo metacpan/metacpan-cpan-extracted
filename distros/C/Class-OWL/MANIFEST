@@ -1,0 +1,19 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+.project
+lib/Class/OWL.pm
+t/03.emptyvalue.t
+t/02.classinstance.t
+t/pod-coverage.t
+t/01.wine.t
+t/00.load.t
+t/04.multibnode.t
+t/pod.t
+t/lib/OM2.pm
+t/lib/Foaf.pm
+t/lib/Wine.pm
+t/02.classinstance-new.t

@@ -1,0 +1,57 @@
+#head {
+	background: #e4e4e4 url(/images/layout/admin/header.jpg) no-repeat top left;
+	width: 997px;
+}
+
+#body_wrapper {
+	background: url(/images/layout/admin/body_repeat.jpg) repeat-y top left;
+	width: 997px;
+}
+
+#body {
+	background: url(/images/layout/admin/body_top.jpg) no-repeat top left;
+}
+
+#end_body {
+	background: url(/images/layout/admin/body_bottom.jpg) no-repeat top left;
+	width: 997px;
+}
+
+#all {
+	background: url(/images/layout/admin/all_repeat.jpg) repeat-y top left;
+	width: 957px;
+}
+
+#all .top {
+	background: url(/images/layout/admin/all_top.jpg) no-repeat top left;
+	width: 957px;
+}
+
+#all .bottom {
+	background: url(/images/layout/admin/all_bottom.jpg) no-repeat bottom left;
+	width: 957px;
+}
+
+#split {
+	background: url(/images/layout/admin/both_repeat.jpg) repeat-y top left;
+	width: 957px;
+}
+
+#split .top {
+	background: url(/images/layout/admin/both_top.jpg) no-repeat top left;
+	width: 957px;
+}
+
+#split .bottom {
+	background: url(/images/layout/admin/both_bottom.jpg) no-repeat bottom left;
+	width: 957px;
+}
+
+#left {
+	width: 788px;
+}
+
+#footer {
+	width: 997px;
+}
+

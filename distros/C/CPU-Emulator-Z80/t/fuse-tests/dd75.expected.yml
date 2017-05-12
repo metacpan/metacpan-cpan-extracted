@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  44668:
+    - 79
+name: dd75
+registers:
+  AF: 22386
+  AF_: 0
+  BC: 59443
+  BC_: 0
+  DE: 46654
+  DE_: 0
+  HL: 29519
+  HL_: 0
+  I: 0
+  IX: 44620
+  IY: 59586
+  PC: 3
+  R: 2
+  SP: 0

@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl5
+
+# Very much like the get_post.pl, except we're passing a request
+# method to parse_form_data.
+
+use CGI_Lite;
+
+$cgi  = new CGI_Lite;
+
+# We specifically instruct CGI_Lite to read POSTed form data. Why
+# is this useful, you may ask? This forces the user to fill out
+# your form -- where the METHOD is POST -- as opposed to passing a 
+# query string to the CGI program, like so:
+#
+#     http://www.some.com/cgi-bin/program.pl?name=john&age=45
+
+%data = $cgi->parse_form_data ('POST');
+
+print "Content-type: text/plain", "\n\n";
+
+while (($key, $value) = each %data) {
+
+    # Let's check to see if a value is a reference to an array,
+    # which indicates multiple values for the field.
+
+    if (ref $value) {
+	@all_values = $cgi->get_multiple_values ($value);
+
+	print "$key = @all_values\n";
+    } else {
+	print "$key = $value\n";
+    }
+}
+
+print "\nHere are the same key/value pairs in order:\n";
+
+foreach $key ($cgi->get_ordered_keys) {
+    $value = $data{$key};
+
+    if (ref $value) {
+	@all_values = $cgi->get_multiple_values ($value);
+
+	print "$key = @all_values\n";
+    } else {
+	print "$key = $value\n";
+    }
+}
+
+exit (0);

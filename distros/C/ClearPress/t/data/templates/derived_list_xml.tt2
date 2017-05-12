@@ -1,0 +1,1 @@
+<deriveds>[% FOREACH derived = model.deriveds %]<derived id="[% derived.id_derived %]"/>[% END %]</deriveds>

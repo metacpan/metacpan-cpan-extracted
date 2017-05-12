@@ -1,0 +1,49 @@
+# NAME
+
+Catalyst::Component::WithDelayedSetup - Moose Role for components which setup late
+
+# SYNOPSIS
+
+    package MyApp::Model::Foo;
+
+    use Moose;
+    extends 'Catalyst::Model';
+    with 'Catalyst::Component::DelayedSetup';
+
+    # Proceed as normal
+
+# DESCRIPTION
+
+Sometimes you want an application scoped component that nevertheless needs other
+application components as part of its setup.  In the past this was not reliable
+since Application scoped components are setup in linear order.  You could not
+call $app->model('A') in a COMPONENT method and expect $app->model('B') to be there
+This role defers creating the application scoped instance until after your application is
+fully setup.  This means you can now assume your other application scoped components
+(components that do COMPONENT but not ACCEPT\_CONTEXT) are available as dependencies.
+
+Please note this means that your instance is not created until the first time its
+called in a request.  As a result any errors with configuration will not show up
+until later in runtime.  So there is a larger burden on your testing to make sure
+your application startup and runtime is accurate.  Also note that even though your
+instance creation is deferred to request time, the request context is NOT given,
+but the application is (this means that you cannot depend on components that do
+ACCEPT\_CONTEXT, since you don't have one...).
+
+Please note it makes no sense to use this component role and then do the ACCEPT\_CONTEXT
+method...
+
+# SEE ALSO
+
+[Catalyst::Component](https://metacpan.org/pod/Catalyst::Component), [Catalyst](https://metacpan.org/pod/Catalyst).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,12 @@
+inc
+{
+    foo
+    {
+        bar    baz
+    }
+}
+
+foo_2
+{
+    bar        baz
+}

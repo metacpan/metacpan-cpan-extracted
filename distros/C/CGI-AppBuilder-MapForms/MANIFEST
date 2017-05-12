@@ -1,0 +1,6 @@
+MapForms.pm
+test.pl
+Makefile.PL
+./t/AppBuilder::MapForms.t
+CGI-AppBuilder-MapForms-0.12.readme
+README

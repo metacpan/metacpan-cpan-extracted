@@ -1,0 +1,117 @@
+Changes			History of this package
+Makefile.PL		Custom Makefile maker tested on Win32, Mac, and Linux
+MANIFEST		This file
+MatrixSSL.xs		The "C" code which builds a perl module containing the MatrixSSL routines
+ppport.h
+README			Info about MatrixSSL and Crypt::MatrixSSL
+t/00.load.t		Test scripts
+t/cert/testca.crt
+t/cert/testca.crt.der
+t/cert/testca.key
+t/cert/testca.serial
+t/cert/testserver.crt
+t/cert/testserver.crt.der
+t/cert/testserver.key
+t/cert/testserver.key.der
+t/cert/testserver.key.des3
+t/client_server.t
+t/Crypt-MatrixSSL.t
+t/export-const.t
+t/export.t
+t/leak.t
+t/matrixSslReadKeys.t
+MatrixSSL.pm		Main Module
+mxgg.pl			Example script showing MatrixSSL grabbing an HTTPS web page
+matrixCommon.h		(was mxSsl.h)	Header file so MatrixSSL.xs can connect to the MatrixSSL source tree (./matrixssl-1-8-3-open/*)
+matrixSsl.h		Header file so MatrixSSL.xs can connect to the MatrixSSL source tree (./matrixssl-1-8-3-open/*)
+const-c.inc		
+const-xs.inc
+CAcertCln.pem		Certificates used by the sample script:-
+CAcertSrv.pem
+certCln.pem
+certSrv.pem
+privkeyCln.pem
+privkeySrv.pem
+typemap
+META.yml		Version info etc
+sample_functions.pl	Some samples from Alex Efros
+sample_ssl_client.pl	Some samples from Alex Efros 
+sample_ssl_server.pl	Some samples from Alex Efros
+matrixssl-1-8-6-open/license.txt	Subdirectory containing the source of "matrixssl-1-8-6-open.tgz" downloaded on Tue Jan  6 00:29:20 UTC 2009 from http://matrixssl.org/download.html
+matrixssl-1-8-6-open/doc/MatrixSSLReadme.pdf
+matrixssl-1-8-6-open/doc/MatrixSSL-1.8.6-ReleaseNotes.pdf
+matrixssl-1-8-6-open/doc/MatrixSSLDeveloperGuide.pdf
+matrixssl-1-8-6-open/doc/MatrixSSLKeyGeneration.pdf
+matrixssl-1-8-6-open/doc/MatrixSSLApi.pdf
+matrixssl-1-8-6-open/doc/MatrixSSLSocketApi.pdf
+matrixssl-1-8-6-open/doc/MatrixSSLPortingGuide.pdf
+matrixssl-1-8-6-open/matrixCommon.h
+matrixssl-1-8-6-open/matrixSsl.h
+matrixssl-1-8-6-open/examples/sslSocket.c
+matrixssl-1-8-6-open/examples/privkeySrv.der
+matrixssl-1-8-6-open/examples/httpsReflector.c
+matrixssl-1-8-6-open/examples/certSrv.pem
+matrixssl-1-8-6-open/examples/httpsReflector.sln
+matrixssl-1-8-6-open/examples/httpsClient.c
+matrixssl-1-8-6-open/examples/sslSocket.h
+matrixssl-1-8-6-open/examples/httpsReflector.vcproj
+matrixssl-1-8-6-open/examples/httpsClient.vcproj
+matrixssl-1-8-6-open/examples/CAcertSrv.der
+matrixssl-1-8-6-open/examples/certSrv.der
+matrixssl-1-8-6-open/examples/certSrv.p12
+matrixssl-1-8-6-open/examples/httpsClient.sln
+matrixssl-1-8-6-open/examples/privkeySrv.pem
+matrixssl-1-8-6-open/examples/Makefile
+matrixssl-1-8-6-open/examples/CAcertSrv.pem
+matrixssl-1-8-6-open/src/crypto/peersec/des3.c
+matrixssl-1-8-6-open/src/crypto/peersec/base64.c
+matrixssl-1-8-6-open/src/crypto/peersec/md5.c
+matrixssl-1-8-6-open/src/crypto/peersec/sha1.c
+matrixssl-1-8-6-open/src/crypto/peersec/mpi.h
+matrixssl-1-8-6-open/src/crypto/peersec/rsa.c
+matrixssl-1-8-6-open/src/crypto/peersec/arc4.c
+matrixssl-1-8-6-open/src/crypto/peersec/md2.c
+matrixssl-1-8-6-open/src/crypto/peersec/mpi.c
+matrixssl-1-8-6-open/src/crypto/peersec/pscrypto.h
+matrixssl-1-8-6-open/src/crypto/cryptoLayer.h
+matrixssl-1-8-6-open/src/crypto/matrixCrypto.h
+matrixssl-1-8-6-open/src/matrixSsl.vcproj
+matrixssl-1-8-6-open/src/matrixSsl.c
+matrixssl-1-8-6-open/src/sslDecode.c
+matrixssl-1-8-6-open/src/pki/x509.c
+matrixssl-1-8-6-open/src/pki/matrixPki.h
+matrixssl-1-8-6-open/src/pki/rsaPki.c
+matrixssl-1-8-6-open/src/pki/pkiInternal.h
+matrixssl-1-8-6-open/src/pki/asn1.c
+matrixssl-1-8-6-open/src/sslEncode.c
+matrixssl-1-8-6-open/src/matrixInternal.h
+matrixssl-1-8-6-open/src/sslv3.c
+matrixssl-1-8-6-open/src/matrixSslStatic.vcproj
+matrixssl-1-8-6-open/src/matrixConfig.h
+matrixssl-1-8-6-open/src/cipherSuite.c
+matrixssl-1-8-6-open/src/Makefile
+matrixssl-1-8-6-open/src/os/vxworks/vxworks.c
+matrixssl-1-8-6-open/src/os/psMalloc.h
+matrixssl-1-8-6-open/src/os/debug.c
+matrixssl-1-8-6-open/src/os/linux/linux.c
+matrixssl-1-8-6-open/src/os/win/win.c
+matrixssl-1-8-6-open/src/os/osLayer.h
+matrixssl-1-8-2.patch		for building older versions
+matrixssl-1-1-5-open.files	for building older versions
+matrixssl-1-7-3-open.files	for building older versions
+matrixssl-1-8-open.files	for building older versions
+matrixssl-1-8-2.files		for building older versions
+matrixssl-1-8-3-open.files	for building older versions
+matrixssl-1-8-6-open.files	for building older versions
+ca-certificates.crt		Bundle of current CA certs in common browsers
+Crypt-MatrixSSL.ppd		Info for the Windows precompiled PPM version (see also ../blib/*)
+ppmblib/arch/auto/Crypt/MatrixSSL/MatrixSSL.dll	Precompiled PPM MSWin32 binary
+ppmblib/arch/auto/Crypt/MatrixSSL/MatrixSSL.exp
+ppmblib/arch/auto/Crypt/MatrixSSL/MatrixSSL.lib
+ppmblib/arch/auto/Crypt/MatrixSSL/MatrixSSL.bs
+ppmblib/lib/Crypt/sample_ssl_server.pl
+ppmblib/lib/Crypt/mxgg.pl
+ppmblib/lib/Crypt/MatrixSSL.pm
+ppmblib/lib/Crypt/sample_functions.pl
+ppmblib/lib/Crypt/sample_ssl_client.pl
+ppmhtml/site/lib/Crypt/MatrixSSL.html

@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Plugin::Cache::Memcached
+
+0.8  2010-02-09 02:42:00
+        - Marked as deprecated as you can just use Cache::Memcached in
+          Catalyst::Plugin::Cache config directly.
+
+0.7  2007-04-29 02:10:00
+        - Switched to Module::Install
+
+0.6  Wed Apr 27 20:00:00 2005
+        - fixed test
+
+0.5  Tue Apr 23 01:00:00 2005
+        - original version.

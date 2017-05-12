@@ -1,0 +1,171 @@
+{
+   "mods" : {
+      "physicalDescription" : [
+         {
+            "form" : [
+               {
+                  "_body" : "graphic material",
+                  "authority" : "gmd"
+               }
+            ],
+            "extent" : [
+               {
+                  "_body" : "1 document."
+               }
+            ]
+         }
+      ],
+      "typeOfResource" : [
+         {
+            "_body" : null
+         }
+      ],
+      "location" : [
+         {
+            "physicalLocation" : [
+               {
+                  "_body" : "CA20"
+               }
+            ],
+            "shelfLocation" : [
+               {
+                  "_body" : "BIB.ARCH.0090.0001"
+               }
+            ]
+         }
+      ],
+      "version" : "3.4",
+      "subject" : [
+         {
+            "hierarchicalGeographic" : [
+               {
+                  "country" : [
+                     {
+                        "_body" : "België"
+                     }
+                  ],
+                  "state" : [
+                     {
+                        "_body" : "Vlaanderen"
+                     }
+                  ],
+                  "city" : [
+                     {
+                        "_body" : "Gent (9000)"
+                     }
+                  ],
+                  "county" : [
+                     {
+                        "_body" : "Oost-Vlaanderen"
+                     }
+                  ]
+               }
+            ]
+         }
+      ],
+      "name" : [
+         {
+            "usage" : "primary",
+            "namePart" : [
+               {
+                  "_body" : "Roelandt, Louis (Louis Joseph Adrien)"
+               },
+               {
+                  "type" : "date",
+                  "_body" : "1786-1864"
+               }
+            ]
+         }
+      ],
+      "note" : [
+         {
+            "_body" : "Notitie op map nr. Arch. 29"
+         },
+         {
+            "_body" : "Collectie Vliegende Bladen / Ephemera"
+         }
+      ],
+      "recordInfo" : [
+         {
+            "recordCreationDate" : [
+               {
+                  "_body" : "081021",
+                  "encoding" : "marc"
+               }
+            ],
+            "recordChangeDate" : [
+               {
+                  "_body" : "20081021144339.0",
+                  "encoding" : "iso8601"
+               }
+            ],
+            "recordContentSource" : [
+               {
+                  "_body" : "UGent",
+                  "authority" : "marcorg"
+               }
+            ],
+            "recordIdentifier" : [
+               {
+                  "source" : "rug01",
+                  "_body" : "001293138"
+               }
+            ],
+            "recordOrigin" : [
+               {
+                  "_body" : "Converted from MARCXML to MODS version 3.4 using MARC21slim2MODS3-4.xsl\n\t\t\t\t(Revision 1.70)"
+               }
+            ]
+         }
+      ],
+      "titleInfo" : [
+         {
+            "title" : [
+               {
+                  "_body" : "Brief]"
+               }
+            ],
+            "nonSort" : [
+               {
+                  "_body" : "["
+               }
+            ]
+         }
+      ],
+      "originInfo" : [
+         {
+            "script" : "Latn",
+            "place" : [
+               {
+                  "placeTerm" : [
+                     {
+                        "type" : "code",
+                        "_body" : "xx^",
+                        "authority" : "marccountry"
+                     }
+                  ]
+               }
+            ],
+            "frequency" : [
+               {
+                  "_body" : null
+               }
+            ],
+            "issuance" : [
+               {
+                  "_body" : null
+               }
+            ],
+            "dateIssued" : [
+               {
+                  "_body" : "19 mei 1835"
+               },
+               {
+                  "_body" : "1835^^^^",
+                  "encoding" : "marc"
+               }
+            ]
+         }
+      ]
+   }
+}

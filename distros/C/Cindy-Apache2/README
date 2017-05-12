@@ -1,0 +1,32 @@
+Cindy-Apache2 version 0.01
+==========================
+
+This module uses Cindy from  an apache request handler. To use this 
+module writing perl is not required. 
+
+The module can configured from .htaccess files.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires mod_perl2 and these other modules and libraries:
+
+  Cindy Apache2::Request
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Joachim Zobel <jz-2008@heute-morgen.de>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

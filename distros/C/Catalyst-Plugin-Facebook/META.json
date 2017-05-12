@@ -1,0 +1,22 @@
+{
+   "resources" : {
+      "repository" : "http://github.com/omega/perl-catalyst-plugin-facebook/tree"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla::Plugin::MetaJSON version 1.092360",
+   "version" : "0.2",
+   "name" : "Catalyst-Plugin-Facebook",
+   "author" : [
+      "Nick Gerakines <nick@gerakines.net>"
+   ],
+   "license" : "perl",
+   "requires" : {
+      "Scalar::Util" : 0,
+      "Test::More" : "0",
+      "WWW::Facebook::API" : 0
+   },
+   "abstract" : "Build Facebook applications in Catalyst easier"
+}

@@ -1,0 +1,100 @@
+Revision history for Compare::Directory
+
+1.25  Sun Oct 30 08:50:00 2016
+      - Added test scripts (t/meta-json.t andt t/meta-yml.t).
+
+1.24  Fri Oct 28 07:15:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+1.23  Mon Aug 15 10:00:00 2016
+      - Added missing pre-req Scalar::Util as reported by CPANTS.
+      - Made "SEE ALSO" entries clickable.
+
+1.22  Mon Jun 06 13:35:00 2016
+      - Added missing prereq as reported by CPANTS.
+      - Updated copyright year information.
+
+1.21  Fri Jul 31 12:00:00 2015
+      - Upgraded to use Test::Excel v1.35.
+
+1.20  Thu Jul 30 12:00:00 2015
+      - Added LICENSE file.
+
+1.19  Fri Jan 16 15:30:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+1.18  Sun Sep 28 17:42:55 2014
+      - Added missing 'use strict; use warnings;'
+
+1.17  Sun Sep 28 12:37:20 2014
+      - Added secction "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+      - Updated Makefile.PL and update Test::Excel v1.28 as minimum requirement.
+      - Tidied up README file.
+      - Minor changes to the pod document.
+      - Updated COPYRIGHT year details.
+
+1.16  Sun Sep 28 09:28:33 2014
+      - Removed Build.PL file.
+      - Removed 00-signature.t test script.
+      - Added pre-requisite 'Text::PDF' to Makefile.PL as test were failing.
+
+1.15  Tue Aug 09 15:54:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+1.14  Wed Apr 13 19:19:19 2011
+      - Corrected/Updated pod.
+      - Cosmetics changes to the pod.
+
+1.13  Mon Mar 28 13:14:15 2011
+      - Updated Copyright information.
+
+1.12  Wed Mar 09 19:04:22 2011
+      - Changed the description of the module slightly.
+
+1.11  Wed Mar 02 11:16:45 2011
+      - Updated Build.PL to remove the creation of Makefile.PL on the fly.
+      - Added 'clean' key to Makefile.PL.
+      - Removed "-T" from the first line of 00-load.t, pod.t, manifest.t,
+        00-signature.t and unit-test-01.t. It appears to me that Mac OS X
+        doesn't like it, for some reason.
+
+1.10  Tue Mar 01 14:43:35 2011
+      - Minor changes to the pod in the types of file format supported.
+      - Removed ACKNOWLEDGEMENTS title from the pod.
+
+0.09  Mon Feb 28 11:46:10 2011
+      - Added DISCLAIMER section to the pod.
+
+0.08  Mon Feb 07 17:42:20 2011
+      - Fixed the pod for CONSTRUCTOR as it was generating incorrect html on install.
+      - Added MYMETA.json to MANIFEST.SKIP.
+
+0.07  Mon Feb 07 17:31:29 2011
+      - Corrected the pod about "SEE ALSO" where module name was incorrect.
+
+0.06  Wed Nov 24 09:30:12 2010
+      - Added SIGNATURE to the distribution.
+      - Added unit test for SIGNATURE.
+      - Removed ignore.txt from the distribution.
+      - Removed unit test for boilerplate.
+      - Updated Build.PL and Makefile.PL to have Test::Excel v1.11.
+      - Removed all internal methods detail from the pod.
+
+0.05  Wed Nov 17 13:57:23 2010
+      - Updated Build.PL and Makefile.PL to have Test::Excel v1.06.
+
+0.04  Mon Nov 15 20:21:11 2010
+      - Updated Build.PL and Makefile.PL to have Test::Excel v1.05.
+
+0.03  Mon Nov 15 13:14:15 2010
+      - Updated Build.PL and Makefile.PL to have Test::Excel v1.04.
+
+0.02  Mon Nov 15 10:08:22 2010
+      - Renamed method cmp() to cmp_directory() as it was conflicting with File::Compare.
+
+0.01  Wed Nov 10 17:57:51 2010
+      - First version, released.

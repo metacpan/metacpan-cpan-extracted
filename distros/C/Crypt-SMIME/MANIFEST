@@ -1,0 +1,24 @@
+Changes
+lib/SMIME.pm
+lib/SMIME/JA.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+SMIME.mlpod
+SMIME.pl
+SMIME.pod
+SMIME.xs
+t/00-load.t
+t/01-smime.t
+t/02-smime.more.t
+t/03-chained-certs.t
+t/04-taint.t
+t/boilerplate.t
+t/dependencies.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

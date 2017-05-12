@@ -1,0 +1,28 @@
+---
+abstract: 'A Client/Server Networking Framework based on Moose and Sprocket'
+author:
+  - 'Chris Prather  C<< <perigrin@cpan.org> >>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cogwheel
+no_index:
+  directory:
+    - ex
+    - inc
+    - t
+requires:
+  Moose: 0.58
+  MooseX::AttributeHelpers: 0
+  MooseX::Daemonize: 0
+  MooseX::Getopt: 0
+  POE::Filter::JSON: 0
+  Sprocket: 0.07
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

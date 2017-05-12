@@ -1,0 +1,382 @@
+$Id: Changes,v 1.47 2006/05/29 11:25:09 joern Exp $
+
+3.0.8 Mon May 29, 2006, joern
+    Features:
+    - set locale for LC_TIME as well
+
+3.0.7 Tue May 16, 2006, joern
+    Features:
+    - Real implementation of the new gettext based l10n 
+      framework. Set the actual LC_MESSAGES language
+      with the new tag <?lang><?/lang>.
+    - new command line tool cipp-l10n handles all tasks
+      around .pot file generation, .po merging and .mo
+      installation.
+
+3.0.6 Thu Nov 17, 2005, joern
+    Bugfix:
+    - Omit CIPP version header when XHTML conformity
+      is enabled.
+
+3.0.5 Mon Oct 31, 2005, joern
+    Features:
+    - 'Initial Perl Statement' for database handles.
+      This affects the runtime API!
+
+3.0.4 Fri Oct 28, 2005, joern
+    Features:
+    - All database commands now support getting a variable 
+      passed in the DB option for runtime evaluation.
+
+3.0.3 Thu Sep 22, 2005, joern
+    Features:
+    - HTTP Header Content-type: default to windows-1252
+      instead of iso-8859-1.
+
+3.0.2 Wed Sep 21, 2005, joern
+    Features:
+    - optionally truncate whitespace around CIPP tags
+    - optionally generate XHTML conform HTML code
+
+3.0.1 Fri Sep 16, 2005, joern
+    Bugfix:
+    - Runtime: Determiniation of full prod path didn't
+      work with Apache2
+
+3.0.0 Mon Sep 12, 2005, joern
+    Bugfix:
+    - <?GETPARAM MY VAR="@list" NAME="foo"> returned only
+      the first value of the foo list parameter when
+      utf8 was enabled.
+
+2.99.38 Thu Aug 11, 2005, joern
+    Notes:
+    - <?l> tag changed incompatibly! The 'MY' and 'VAR'
+      options were dropped and in PERL context the text
+      is not printed to STDOUT anymore but returned
+      in expression context.
+
+    Feature:
+    - <?l> command now works as a expression in PERL and
+      VAR context and inside <?OPTION> and other
+      VAR_QUOTE context tags as well.
+
+2.99.37 Wed May 25 2005, joern
+    Feature:
+    - l10n: <?l MY VAR="$foo">...<?/l> stores translated message
+      in a variable instead of printing it.
+    - l10n: Runtime API officially documented, for direct access
+      from your Perl code: CIPP->request->print_gettext and
+      CIPP->request->gettext. Refer to the CIPP::Runtime::Request 
+      manpage for details.
+
+2.99.36 Fri May 20 2005, joern
+    Feature:
+    - New command <?l> for l10n, as a future frontend to the
+      Locale::TextDomain module. Currently a dummy implementation
+      translating nothing, but printing the text as is.
+      For details refer to CIPP::Manual.
+
+2.99.35 Tue Mar 15 2005, joern
+    Feature:
+    - Changes to Runtime library only: print more/better
+      information about runtime exceptions. Switched on
+      include backtracing again, although it's *just* what it
+      is: a backtrace of include calls. Method calls are *not*
+      listed here (only if an include was called *by* a method),
+      so aware: this may be confusing.
+
+2.99.34 Fri Feb 25 2005, joern
+    Feature:
+    - CIPP::Runtime::Request 0.92: print_http_equiv_content_type()
+      prints iso-8859-1 charset mime type by default, not only
+      a utf-8 mime type if request is utf8 enabled.
+
+2.99.33 Tue Nov 30 2004, joern
+    Bugfix:
+    - Under special circumstances changes of includes where
+      ignored at runtime in a persistant einvironment.
+
+2.99.32 Mon Nov 29 2004, joern
+    Bugfix:
+    - CGI programs loading modules with "use" didn't work, if
+      the module is located in a directory which is configured
+      in the base configuration. This was a side effect from
+      the SpeedyCGI bugfix of 2.99.30.
+    - @INC growed on each call in Speedy/mod_perl context.
+
+2.99.31 Thu Nov 4 2004, joern
+    Bugfixes:
+    - new.spirit project installation: HTML files were generated
+      in the wrong context (config files of the development system
+      instead of production system)
+
+2.99.30 Mon Oct 11 2004, joern
+    Notes:
+    - This release requires installation on production systems,
+      since bugs in the runtime environment were fixed.
+
+    Bugfixes:
+    - new.spirit CGI's didn't work with CGI::SpeedyCGI
+    - Perl errors from Includes were not reported anymore.
+
+2.99.29 Tue Sep 14 2004, joern
+    Bugfixes:
+    - Perl syntax check sometimes hung due to BEGIN/END blocks
+      in the code, which were not nuked under all circumstances
+    - Generation of static HTML documents was broken since 2.99.28.
+
+2.99.28 Fri Sep 10 2004, joern
+    Bugfixes:
+    - <?TEXTAREA> always produced an empty <textarea>
+    - write CIPP error log entry, even if error output to browser
+      is disabled
+    - <?INPUT TYPE="CHECKBOX" STICKY> was broken
+    - Switched off exception stack backtrace, because CIPP
+      can't trace method calls, which is confusing. Better
+      no backtrace than a wrong one. According information could
+      be gathered at runtime, but with high cost of performance.
+    - Lexical variable check for non declared <?SUB> variable
+      didn't work.
+    - Complain about <?INCINTERFACE> parameters declared
+      INPUT and OPTIONAL at the same time.
+    - Several documentation fixes.
+
+    Features:
+    - improved CIPP exception logging layout
+    - a Unique Exception Identifier (=> UEI) is generated and
+      printed to the log and to the browser - makes detailed
+      bug reporting and hunting easier
+    - Anchors for forms: <?FORM NAME="x.foo#anchor">
+    - <?IMG NOSIZE> omits automatic WIDTH/HEIGHT determination
+    - <?>$x->foo();<?/> now throws an CIPP error message, because
+      the trailing ; resulted in unusable Perl compiler errors
+    - <?DUMP LOG STDERR> prints dumps to CIPP log and/or
+      STDERR resp. webserver error log. Format slightly changed,
+      better mapping of name/value.
+
+2.99.27 Fri Jul 02 2004, joern
+    Bugfixes:
+    - fixed logical error with utf8 tagging of input parameters
+      when utf8 is switched on at runtime
+    - NewSpirit mode: additional library path's were missing
+      when compiling an Include at secondary level
+
+2.99.26 Fri Jun 25 2004, joern
+    Features:
+    - switch on utf8 mode at runtime with
+      CIPP->request->set_utf8(1)
+    - new Method CIPP->request->print_http_equiv_content_type
+      prints appropriate <meta http-equiv> line for
+      current mime type and charset setting
+
+2.99.25 Tue May 11 2004, joern
+    - imported CIPP::Runtime version 0.42
+
+2.99.24 Tue Dec 02 2003, joern
+    - imported CIPP::Runtime version 0.41
+
+2.99.23 Thu Aug 07 2003, joern
+    Bugfixes:
+    - Recursive usage of Includes resulted in endless loop.
+      Now the compiler detects a recursion and throws an
+      error message (probably future releases may support
+      recursive Includes).
+    - This was parsed without error: <?GETURL ... <br> >
+    - <?SQL>: some special handling to PARAMS of non-SELECT
+      statements applied. Empty variables will be converted
+      to undef (NULL) before they're passed to DBI. This
+      harmonizes the handling of empty strings with different
+      database systems (e.g. Oracle converts empty strings
+      to NULL always, while MySQL handles them as-is).
+
+2.99.22
+    Features:
+    - new command <?SWITCHDB>...<?/SWITCHDB> which switches
+      the default database inside the correspoding block.
+      Nesting is possible, also this switiching exception
+      safe.
+    - new project configuration parameter: add_prod_dir.
+      Enables searching for includes, libs and configs in
+      external CIPP3 projects. Needs new.spirit 2.1.17.
+
+2.99.21
+    Bugfixes:
+    - added a timeout the Perl syntax checker to prevent
+      hanging processes.
+
+2.99.20 
+    Bugfixes:
+    - missed utf8 output stream initialization for subsequent
+      requests in mod_perl/SpeedyCGI context.
+
+2.99.19
+    Features:
+    - New project attribute 'utf8', which makes a project
+      Unicode aware. Default mime-type/charset is utf-8,
+      all CGI parameters are expected to be utf8 encoded.
+      All values in the database are expected to be
+      utf8 encoded. utf8 upgrading / _utf8_on is done
+      on all I/O variables (for CGI and SQL).
+      Requires Perl 5.8.0
+
+2.99.18
+    Bugfixes:
+    - finally fixed whitespace generation problems. Now
+      CIPP3 behaves exactly like CIPP2
+    - sometimes the Perl checker process hangs - this
+      is prevented by a 5 seconds timeout.  
+
+2.99.17
+    Bugfixes:
+    - Whitespace between CIPP tags was removed entirely,
+      what could mess up HTML formatting. Now whitespace
+      appears as is.
+
+2.99.16
+    !!! Note: you must recompile your project after
+              upgrading to this version  !!!
+
+    Features:
+    - updated CIPP::Manual
+    - the script doc/create_pdf.sh creates a nice looking
+      PDF version of CIPP::Manual. It requires pod2html
+      and ps2pdf.
+
+    Bugfixes:
+    - SpeedyCGI context: internal request object wasn't
+      destroyed at the end of a request if a DBI database
+      handle was stored in a global variable, because the
+      request object was referenced by the database handle
+      through a closure. This out of sync request destruction
+      could lead to memory leaks or other problems.
+    - internal CIPP::Request object was passed unnecessarily
+      to Include subroutines.
+    - newlines were always generated, even for such constructs:
+      no<?IF COND="1">newline<?/IF>here.
+
+2.99.15
+    Bugfixes:
+    - <?SQL MY RESULT> didn't work
+    - internal exception if an include file wasn't readable
+
+2.99.14
+    Features:
+    - revised internal API naming convention
+    - documented CIPP::Request interface for public access
+      (not stable yet, interface may change)
+    - local Perl syntax check for subroutines defined with
+      <?SUB>. This reports illegal usage of global lexical
+      variables inside the subroutine. The new option
+      <?SUB ... IMPORT="$foo"> tells the syntax checker,
+      that access to $foo is explicitely allowed (e.g. if
+      you need access to lexically defined class variables)
+      Note: the IMPORT option was also added to CIPP2 2.47,
+            as a no-op, so you can use this in CIPP3 programs,
+            which must compile under CIPP2 as well.
+    - new command: <?FRAME SRC>
+
+    Bugfixes:
+    - processing cipp-html objects left files in /tmp
+    - internal exception handling fixed: error messages
+      of exceptions caught with <?TRY> were printed out.
+
+2.99.13
+    Features:
+    - new option <?GETURL PATHINFO="">
+    - new option <?SQL COND>:
+      With <?SQL COND="$foo < $bar"> data will only be fetched
+      as long as the condition $foo < $bar is true.
+    - <?AUTOCOMMIT ON/OFF> throws an exception, if AutoCommit
+      is already on (resp. off)
+    - <?COMMIT> and <?ROLLBACK> throw an exception, if
+      AutoCommit is enabled.
+    - new parser internal attribute url_par_delimiter, which
+      defines the delimiter for URL parameters (& or ;). The
+      ; delimiter prevents problems with entity interpolation
+      in URL's (e.g. &not)
+    - error message reporting enhanced. Stack backtrace with
+      CIPP and Perl line numbers where possible.
+    - if a CGI program is started only a ASCII formatted
+      error message is shown, instead of the sophisticated
+      HTML version.
+    - <?IMG> tag determines image geometry at runtime and set
+      WIDTH/HEIGHT attributes accordingly, if not explicetly
+      set by the author. Needs Image::Size on the development
+      system, which is autodetected. If not available this 
+      feature is silently disabled.
+
+    Bugfixes:
+    - <?SQL RESULT> gives 0 instead of 0E0, if no rows were
+      processed.
+    - newlines at the end of parameter lists (e.g. <?INCINTERFACE
+      OPTIONAL="... <nl>") weren't removed, which results
+      in Perl syntax errors sometimes.
+
+2.99.12
+    Bugfixes:
+    - prod directory path of a module wasn't created
+      automatically
+
+2.99.11
+    Bugfixes:
+    - <?IMG> command produced linefeed after <img> tag.
+
+2.99.10
+    Bugfixes:
+    - <?OPTION> tag was broken
+
+2.99.9 Wed Apr 17 2002, joern
+    Features:
+    - strip whitespace from SQL commands before passing them
+      to DBI. MSSQL *hangs* if a SQL statement begins with
+      a TAB or NL character... *sigh*
+    - CIPP::Runtime Version 0.40 copied from CIPP2 Distribution.
+      This way mixing CIPP2 and CIPP3 projects on production
+      systems should be possible (untested yet)
+
+2.99.8 Tue Apr 08 2002, joern
+    Features:
+    - support for brief error reports in new.spirit cmd line mode
+
+2.99.7 Fri Apr 05 2002, joern
+    Bugfxies:
+    - <?GETPARAM>, <?GETPARAMLIST> didn't work
+
+2.99.6 Fri Mar 22 2002, joern
+    Bugfixes:
+    - fixed bug in cached error mechanism
+
+2.99.5 Wed Jan 31 2002, joern
+    Bugfixes:
+    - <?GETURL> did not work on jar files
+    - <?SUB> subroutine not found in main package
+    - <?SQL> no trim of trailing semicolon
+    - CIPP module initilization failed on inherited classes
+    - <?GETURL RUNTIME> did not work
+
+2.99.4 Wed Jan 30 2002, joern
+    Bugfixes:
+    - many CIPP object types couldn't be resolved in new.spirit mode
+    - variable list parsing was too sensitive, e.g. hash derefences
+      and stuff were rejected by the parser
+    - static text objects had no URL
+
+
+Major / Incompatible Changes to CIPP 2.x
+========================================
+
+- <?INTERFACE>, <?INCINTERFACE> may only be used one time per program,
+and only in CGIs resp. Includes
+- no defaulting to scalar variables when no $@% is given
+- <?VAR>: DEFAULT did not work with NOQUOTE
+- <?LOG>: throws an exception if something gets wrong
+- variable name / option case is preserved for these statements now:
+- <?MY>
+- <?DUMP>
+- <?TEXTAREA>
+- immediate tag closing for emtpy block tags:
+<?SQL SQL="insert into ..." />
+- always "use strict"
+- <?FETCHUPLOAD>
+- <?MODULE NAME="X" ISA="A, B, C">

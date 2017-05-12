@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+ <head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <title>Captive Portal</title>
+
+  <link href="/orig/css/blueprint/screen.css" rel="stylesheet" type="text/css" media="all"/>
+
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" href="/orig/css/blueprint/ie.css" type="text/css" media="all"/>
+  <![endif]-->
+
+  <link href="/orig/css/capo.css" rel="stylesheet" type="text/css" media="all"/>
+
+ </head>
+ <body>
+
+  <div id="page">
+   <div class="container">
+
+    <div id="header" class="container">
+     <h4 class="span-8">Welcome</h4>
+    </div>
+
+    <div id="teaser">
+     <div class="container">
+      <p>Captive::Portal</p> 
+     </div>
+    </div>
+
+    <div id="main" class="container prepend-top">
+
+     <!-- Template-Toolkit directive -->
+     [% content %]
+
+    </div>
+
+    <div id="footer" class="container">
+     <hr />
+
+     <p class="left">
+     Version: v[%- version -%] 
+     </p>
+
+     <p class="right">
+     <a href="http://search.cpan.org/~gaissmai/Captive-Portal/">Captive::Portal</a>
+     is standing on the shoulders of giants:
+     <a href="http://www.perl.org/">Perl</a>,
+     <a href="http://www.linuxfoundation.org/">Linux</a>
+     </p>
+
+    </div>
+
+   </div>
+  </div>
+
+ </body>
+
+</html>
+[% STOP %]
+
+vim: sw=1 ft=html

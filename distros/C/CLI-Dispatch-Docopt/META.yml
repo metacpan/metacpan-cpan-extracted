@@ -1,0 +1,30 @@
+---
+abstract: 'CLI dispatcher with affinity for Docopt'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  File::Spec: 0
+  FindBin: 0
+  Test::More: 0.88
+  Test::Output: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CLI-Dispatch-Docopt
+provides:
+  CLI::Dispatch::Docopt:
+    file: lib/CLI/Dispatch/Docopt.pm
+    version: 0.01
+requires:
+  Docopt: 0.03
+  perl: 5.008005
+resources:
+  bugtracker: http://github.com/bayashi/CLI-Dispatch-Docopt/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/CLI-Dispatch-Docopt
+version: 0.01

@@ -1,0 +1,69 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+CR_AREF	Lib.pm	/^sub CR_AREF      {  ((($_[0]) >> 24) & 0x0300) }$/;"	s
+CR_CHAN	Lib.pm	/^sub CR_CHAN      {   (($_[0])        & 0xffff) }$/;"	s
+CR_PACK	Lib.pm	/^sub CR_PACK {$/;"	s
+CR_PACK_FLAGS	Lib.pm	/^sub CR_PACK_FLAGS {$/;"	s
+CR_RANGE	Lib.pm	/^sub CR_RANGE     {  ((($_[0]) >> 16) & 0xff00) }$/;"	s
+DESTROY	Lib.pm	/^sub DESTROY {$/;"	s
+DynaLoader	Lib.pm	/^DynaLoader::bootstrap Comedi::Lib $Comedi::Lib::VERSION;$/;"	l
+RANGE_LENGTH	Lib.pm	/^sub RANGE_LENGTH {   (($_[0])        & 0xffff) }$/;"	s
+RANGE_OFFSET	Lib.pm	/^sub RANGE_OFFSET {  ((($_[0]) >> 16) & 0xffff) }$/;"	s
+RF_UNIT	Lib.pm	/^sub RF_UNIT      {   (($_[0])        & 0xff00) }$/;"	s
+_assert_open	Lib.pm	/^sub _assert_open {$/;"	s
+cancel	Lib.pm	/^sub cancel {$/;"	s
+close	Lib.pm	/^sub close { ## no critic <Prohibit Builtin Homonyms>$/;"	s
+command	Lib.pm	/^sub command {$/;"	s
+command_test	Lib.pm	/^sub command_test {$/;"	s
+data_read	Lib.pm	/^sub data_read {$/;"	s
+data_read_delayed	Lib.pm	/^sub data_read_delayed {$/;"	s
+data_read_hint	Lib.pm	/^sub data_read_hint {$/;"	s
+data_write	Lib.pm	/^sub data_write {$/;"	s
+dio_bitfield2	Lib.pm	/^sub dio_bitfield2 {$/;"	s
+dio_config	Lib.pm	/^sub dio_config {$/;"	s
+dio_get_config	Lib.pm	/^sub dio_get_config {$/;"	s
+dio_read	Lib.pm	/^sub dio_read {$/;"	s
+dio_write	Lib.pm	/^sub dio_write {$/;"	s
+dl_load_flags	Lib.pm	/^sub dl_load_flags { 0 } # Prevent DynaLoader from complaining and croaking$/;"	s
+do_insn	Lib.pm	/^sub do_insn {$/;"	s
+do_insnlist	Lib.pm	/^sub do_insnlist {$/;"	s
+errno	Lib.pm	/^sub errno {$/;"	s
+fileno	Lib.pm	/^sub fileno {$/;"	s
+find_range	Lib.pm	/^sub find_range {$/;"	s
+find_subdevice_by_type	Lib.pm	/^sub find_subdevice_by_type {$/;"	s
+get_board_name	Lib.pm	/^sub get_board_name {$/;"	s
+get_buffer_contents	Lib.pm	/^sub get_buffer_contents {$/;"	s
+get_buffer_offset	Lib.pm	/^sub get_buffer_offset {$/;"	s
+get_buffer_size	Lib.pm	/^sub get_buffer_size {$/;"	s
+get_cmd_generic_timed	Lib.pm	/^sub get_cmd_generic_timed {$/;"	s
+get_cmd_src_mask	Lib.pm	/^sub get_cmd_src_mask {$/;"	s
+get_driver_name	Lib.pm	/^sub get_driver_name {$/;"	s
+get_max_buffer_size	Lib.pm	/^sub get_max_buffer_size {$/;"	s
+get_maxdata	Lib.pm	/^sub get_maxdata {$/;"	s
+get_n_channels	Lib.pm	/^sub get_n_channels {$/;"	s
+get_n_ranges	Lib.pm	/^sub get_n_ranges {$/;"	s
+get_n_subdevices	Lib.pm	/^sub get_n_subdevices {$/;"	s
+get_range	Lib.pm	/^sub get_range {$/;"	s
+get_read_subdevice	Lib.pm	/^sub get_read_subdevice {$/;"	s
+get_subdevice_flags	Lib.pm	/^sub get_subdevice_flags {$/;"	s
+get_subdevice_type	Lib.pm	/^sub get_subdevice_type {$/;"	s
+get_version_code	Lib.pm	/^sub get_version_code {$/;"	s
+get_write_subdevice	Lib.pm	/^sub get_write_subdevice {$/;"	s
+lock	Lib.pm	/^sub lock {$/;"	s
+loglevel	Lib.pm	/^sub loglevel {$/;"	s
+mark_buffer_read	Lib.pm	/^sub mark_buffer_read {$/;"	s
+mark_buffer_written	Lib.pm	/^sub mark_buffer_written {$/;"	s
+maxdata_is_chan_specific	Lib.pm	/^sub maxdata_is_chan_specific {$/;"	s
+new	Lib.pm	/^sub new {$/;"	s
+open	Lib.pm	/^sub open { ## no critic <Prohibit Builtin Homonyms>$/;"	s
+perror	Lib.pm	/^sub perror {$/;"	s
+poll	Lib.pm	/^sub poll {$/;"	s
+range_is_chan_specific	Lib.pm	/^sub range_is_chan_specific {$/;"	s
+set_buffer_size	Lib.pm	/^sub set_buffer_size {$/;"	s
+set_max_buffer_size	Lib.pm	/^sub set_max_buffer_size {$/;"	s
+strerror	Lib.pm	/^sub strerror {$/;"	s
+unlock	Lib.pm	/^sub unlock {$/;"	s

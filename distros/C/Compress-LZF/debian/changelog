@@ -1,0 +1,6 @@
+mlehmann-compress-lzf (0.1046-1) unstable; urgency=low
+
+  * Initial Debianization.
+
+ -- Marc Alexander Lehmann <schmorp@schmorp.de>  Fri, 17 Jan 2003 08:02:14 +0100
+

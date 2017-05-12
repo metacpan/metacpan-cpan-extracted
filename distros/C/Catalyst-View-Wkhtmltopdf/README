@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-View-Wkhtmltopdf,
+version 0.5.2:
+
+  Catalyst view to convert HTML (or TT) content to PDF using wkhtmltopdf
+
+This software is copyright (c) 2012 by Michele Beltrame.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

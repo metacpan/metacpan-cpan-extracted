@@ -1,0 +1,56 @@
+Installation of the Perl modules follows the standard
+   perl Makefile.PL
+   make
+   make install
+
+A mysql database should be created manually. Two generic users
+should be created - one, with access to create, drop, insert, 
+query, and update tables in the database, and another, for
+just querying the tables. Before creating the database, you
+may want to set
+   ft_min_word_len=3
+in your my.cnf file (and restart the server), so that words 
+of a minimum length of 3 (eg, "net" and "ftp") are indexed.
+
+Creating, and subsequently updating the database, is controlled
+through the use of the csl_index script in the bin/ subdirectory.
+The various options needed to set up the database, including the
+name, password, and database name to be used, are specified through
+a configuration file - run the script build/gen_conf.pl to
+create a minimal such file. Once this is set up,
+   perl csl_index --config /path/to/csl_config.conf --setup
+will initially create and populate the needed tables, after which
+   perl csl_index --config /path/to/csl_config.conf
+will update it. See the embedded pod documentation for details.
+
+A number of example interfaces for querying the database are included:
+
+- bin/csl_query   - a script for local queries
+- bin/csl_soap    - a script for soap-based queries; the server is
+                    found as cgi-bin/soap.cgi
+- bin/perldocs    - a soap-enhanced perldoc; the server is found as
+                    as cgi-bin/docserver.cgi, and the required
+                    module as lib/Pod/Perldocs.pm (requires Pod::Perldoc).
+- cgi-bin/search  - a cgi script
+- mod_perl        - two mod_perl-2 modules, Apache2::CPAN::Search and
+                    Apache2::CPAN::Query, for a mod_perl interface
+
+For the cgi-bin and mod_perl interfaces, example Template-Toolkit
+pages are included in the tt2/ subdirectory. Note
+that some of these scripts and the tt2 config file will
+require manual editing for urls reflecting the local server, the 
+location of the tt2 pages, and the username, password, and name of 
+the database to be used when connecting to the database for 
+performing queries. See the embedded pod docs for details.
+
+In the htdocs/ directory there are some files: faq.html, for some
+faqs, dslip.html, for some information on the dslip entry in the
+information for packages, style.css, a css style file, and ppm.html,
+for some information on using ppm on Win32.
+
+Support is available for different languages (based on the
+preference set in the browser). Translations occurs within 
+the language-specific modules of CPAN::Search::Lite::Lang::*.
+The default language used is "en" (English), if the user's 
+preference isn't available.
+

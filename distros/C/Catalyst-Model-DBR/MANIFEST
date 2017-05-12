@@ -1,0 +1,10 @@
+Changelog.md
+clean
+dist
+lib/Catalyst/Helper/Model/DBR.pm
+lib/Catalyst/Model/DBR.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

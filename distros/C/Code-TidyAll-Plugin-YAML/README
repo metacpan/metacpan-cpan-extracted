@@ -1,0 +1,47 @@
+SYNOPSIS
+
+       In configuration:
+    
+       [YAML]
+       select = **/*.yaml
+       Indent = 4
+
+DESCRIPTION
+
+    Uses YAML to format YAML files. Has the same defaults as YAML.pm
+
+CONFIGURATION
+
+    The following configuration options can be set. See YAML for a full
+    description of each option.
+
+    AnchorPrefix
+
+    CompressSeries
+
+    DumpCode
+
+    Indent
+
+    QuoteNumericStrings
+
+    SortKeys
+
+    Stringify
+
+    UseAliases
+
+    UseBlock
+
+    UseCode
+
+    UseFold
+
+    UseHeader
+
+    UseVersion
+
+SEE ALSO
+
+    Code::TidyAll, YAML
+

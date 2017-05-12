@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use File::Slurp qw( write_file );
+use JSON::XS;
+use Getopt::Std;
+use Cheater::Util qw( quote_sql_str );
+
+my %opts;
+getopts('hr', \%opts) or usage();
+
+my $keyword = $opts{r} ? 'replace' : 'insert';
+
+if ($opts{h}) {
+    usage();
+}
+
+sub usage {
+    die <<"_EOC_";
+Usage: $0 [options] <infile>...\n";
+Options:
+    -h                  print this message
+    -r                  generate replace statements
+_EOC_
+}
+
+if (!@ARGV) {
+    usage();
+}
+
+my $json_xs = JSON::XS->new;
+
+my $outdir = './sql';
+if (! -d $outdir) {
+    mkdir $outdir or
+        die "Failed to create directory $outdir: $!\n";
+}
+
+for my $infile (@ARGV) {
+    process_file($infile);
+}
+
+sub process_file {
+    my $infile = shift;
+
+    my ($table) = ($infile =~ /(\w+)\.rows\.json$/);
+
+    if (!$table) {
+        die "Bad input file name: $infile\n";
+    }
+
+    #warn "Processing table $table...\n";
+
+    open my $in, $infile or
+        die "Cannot open $infile for reading: $!\n";
+
+    my $json = do { local $/; <$in> };
+
+    close $in;
+
+    my $rows = $json_xs->decode($json);
+
+    if (!$rows || ref $rows ne 'ARRAY' || !@$rows) {
+        die "Bad rows data in $infile.\n";
+    }
+
+    my $col_names = shift @$rows;
+    if (!$col_names || ref $col_names ne 'ARRAY') {
+        die "No column names found in the first row.\n";
+    }
+
+    my $sql = "$keyword into $table (" .
+        join(",", @$col_names) . ") values\n";
+
+    my @lines;
+    for my $row (@$rows) {
+        push @lines, "(" . join(",", map { quote_sql_str($_) } @$row) . ")";
+    }
+
+    $sql .= join ",\n", @lines;
+
+    $sql .= ';';
+
+    my $outfile = "$outdir/$table.rows.sql";
+
+    write_file $outfile, $sql;
+    warn "Wrote $outfile\n";
+}
+

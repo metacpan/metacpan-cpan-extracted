@@ -1,0 +1,40 @@
+Revision history for CatalystX-CMS
+
+0.001   3 Nov 2008
+        First version, released on an unsuspecting world.
+
+0.002   2 Feb 2009
+        * fix crud.js toggle feature to actually save changes.
+        * update dep on SVN::Class to 0.10 for sig chld fix
+
+0.003   5 Feb 2009
+        * doc fixes 
+        * ActionClass attribute test addition
+
+0.004   14 June 2009
+        * add real test suite
+        * add CatalystX::CMS::tt class for Catalyst::Plugin::Static::Simple::ByClass
+        * refactor cms .tt files out for easier integration with existing wrappers
+        * set TT CACHE_SIZE to zero (0) in default View config() to fix race condition.
+
+0.005   26 June 2009
+        * add missing dependency on Catalyst::Plugin::ConfigLoader that was causing
+          cpantesters to croak.
+
+0.006   18 Aug 2009
+        * fix default search() behaviour and add cms_list() local URL method.
+
+0.007   25 Oct 2009
+        * add missing dependency on Catalyst::View::TT
+
+0.008   04 Dec 2009
+        * add missing deps to Makefile.PL per RT#50940
+
+0.009   11 April 2010
+        * change dep from Class::C3 to MRO::Compat
+
+0.010   08 May 2010
+        * added dep for YAML since ConfigLoader needs it for tests.
+
+0.011   13 July 2011
+        * fixed tests for newer HTTP::Response

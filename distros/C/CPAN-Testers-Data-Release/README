@@ -1,0 +1,61 @@
+CPAN-Testers-Data-Release
+=========================
+
+This distribution is the CPAN Testers Release database generator. The
+distribution contains the code that extracts the data from the release_summary 
+table in the cpanstats database. The data extracted represents the data 
+relating to the public releases of Perl, i.e. no patches and official releases
+only.
+
+USAGE
+
+  perl release.pl --config=<file> [--clean] [ -h | -v ]
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  CPAN::Testers::Common::DBUtils
+  Config::IniFiles
+  File::Basename
+  File::Path
+  Getopt::Long
+  IO::File
+
+INSTALLATION
+
+To install this module, untar the tarball into the directory of choice then
+type the following on the command line (substitute make with nmake or dmake
+if appropriate):
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Alternatively you may wish to use the CPAN.pm shell or CPANPLUS shell as your
+installer, which will automatically detect uninstalled prerequisities and 
+install those too for you.
+
+BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please submit a bug to the RT system (see link below). However,
+it would help greatly if you are able to pinpoint problems or even supply a 
+patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me by sending an email
+to barbie@cpan.org .
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Release
+
+AUTHOR & COPYRIGHT
+
+  Copyright (C) 2009-2014 Barbie <barbie@cpan.org>
+
+LICENCE
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.

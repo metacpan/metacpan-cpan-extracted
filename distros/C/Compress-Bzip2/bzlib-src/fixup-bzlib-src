@@ -1,0 +1,11 @@
+#!/bin/sh
+# prepare fresh bzip2-* distro for the bzlib-src dir
+for tst in dlltest.c dlltest.dsp mk251.c spewG.c unzcrash.c; do
+  mv $tst tst-$tst
+done
+for win in libbz2.def libbz2.dsp makefile.msc tst-dlltest.c tst-dlltest.dsp; do
+  mv $win win-$win
+done
+for c in Makefile*; do
+  mv $c c-$c
+done

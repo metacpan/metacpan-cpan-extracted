@@ -1,0 +1,66 @@
+{
+   "abstract" : "(DEPRECATED) Send emails with Catalyst",
+   "author" : [
+      "Sebastian Riedel <sri@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0526, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Email",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "2.99",
+            "Email::MIME" : "0",
+            "Email::MIME::Creator" : "0",
+            "Email::Send" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Plugin-Email@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Email"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/Catalyst-Plugin-Email.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Email"
+      },
+      "x_IRC" : "irc://irc.perl.org/#catalyst",
+      "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
+   },
+   "version" : "0.09",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}
+

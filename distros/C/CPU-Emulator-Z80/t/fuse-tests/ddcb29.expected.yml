@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  8323:
+    - 193
+name: ddcb29
+registers:
+  AF: 1152
+  AF_: 0
+  BC: 47041
+  BC_: 0
+  DE: 12863
+  DE_: 0
+  HL: 64820
+  HL_: 0
+  I: 0
+  IX: 8423
+  IY: 51027
+  PC: 4
+  R: 2
+  SP: 0

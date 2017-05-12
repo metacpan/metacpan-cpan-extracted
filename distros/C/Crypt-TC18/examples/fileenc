@@ -1,0 +1,117 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Getopt::Long;
+use Crypt::CBC;
+
+my $SRC_RAND = "/dev/urandom";
+
+my ($encrypt, $decrypt, $help, $cipher, $blocksize);
+
+GetOptions("encrypt" => \$encrypt, "decrypt" => \$decrypt,
+           "cipher=s" => \$cipher, "blocksize=i" => \$blocksize,
+           "help" => \$help);
+
+sub syntax
+{
+    print "Examples:\n";
+    print "$0 --encrypt --cipher=TC18 --blocksize=16 file.txt > ";
+    print "file.enc\n";
+    print "$0 --decrypt --cipher=TC18 --blocksize=16 file.enc > ";
+    print "file.dec\n\n";
+    print "$0 -e -c=TC18 -b=16 file.txt > file.txt.enc\n";
+    print "$0 -d -c=TC18 -b=16 file.txt.enc > file.txt.dec\n\n";
+    print "NOTE: User should know the block size (in bytes) of the ";
+    print "cipher being used\n";
+    exit 1;
+}
+
+sub get_input
+{
+    my ($message) = @_;
+    local $| = 1;
+    local *TTY;
+    open TTY,"/dev/tty";
+    my ($tkey1, $tkey2);
+    system "stty -echo </dev/tty";
+    do {
+        print STDERR "Enter $message: "; chomp($tkey1 = <TTY>);
+        print STDERR "\nRe-type $message: "; chomp($tkey2 = <TTY>);
+        print STDERR "\n";
+        print STDERR "\nThe two $message", "s don't match. ",
+            "Please try again.\n\n" unless $tkey1 eq $tkey2;
+    } until $tkey1 eq $tkey2;
+
+    system "stty echo </dev/tty";
+    close TTY;
+    return $tkey1;
+}
+
+&syntax() if ($help);
+
+if (!$encrypt and !$decrypt) {
+    print "Please specify switch:\n";
+    print "  --encrypt (or -e) to encrypt a file\n";
+    print "  --decrypt (-d) to decrypt a file\n\n";
+    print "Type $0 --help (or $0 -h) for usage examples\n";
+    exit 1;
+}
+
+if (!$cipher) {
+    print "Please provide a block cipher to use\n\n";
+    print "Type: $0 --help (or $0 -h) for usage examples\n";
+    exit 1;
+}
+
+if (!$blocksize) {
+    print "Please provide the block size (in bytes)\n\n";
+    print "Type $0 --help (or $0 -h) for usage examples\n";
+    exit 1;
+}
+
+if ($#ARGV < 0) {
+    print "Please provide a file to encrypt or decrypt\n\n";
+    print "Type $0 --help (or $0 -h) for usage examples\n";
+    exit 1;
+}
+
+chomp $ARGV[0];
+open INFILE, $ARGV[0];
+my $key = &get_input("passphrase");
+
+my $IV;
+
+if ($encrypt) {
+    open RANDSRC, $SRC_RAND;
+    read RANDSRC, $IV, $blocksize;    # generate one-time, random IV
+    close RANDSRC;
+    print $IV;     # make IV as 1st ciphertext block
+} elsif ($decrypt) {
+    read INFILE, $IV, $blocksize;
+}
+
+my $obj = Crypt::CBC->new({'key' => $key,
+                                 'cipher' => $cipher,
+                                 'iv' => $IV,
+                                 'regenerate_key' => 1,
+                                 'padding' => 'standard',
+                                 'prepend_iv' => 0
+                               });
+
+#$obj->start('encrypt') if ($encrypt);
+#$obj->start('decrypt') if ($decrypt);
+
+$encrypt ? $obj->start('encrypt') : $obj->start('decrypt');
+
+while (read(INFILE, my $buffer, 4096)) {
+    print $obj->crypt($buffer);
+}
+
+close INFILE;
+
+print $obj->finish;
+
+#1234567890123456789012345678901234567890123456789012345678901234567890
+

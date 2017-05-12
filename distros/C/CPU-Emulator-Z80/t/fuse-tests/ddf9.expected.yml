@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddf9
+registers:
+  AF: 34569
+  AF_: 0
+  BC: 5597
+  BC_: 0
+  DE: 32678
+  DE_: 0
+  HL: 15452
+  HL_: 0
+  I: 0
+  IX: 54183
+  IY: 7547
+  PC: 2
+  R: 2
+  SP: 54183

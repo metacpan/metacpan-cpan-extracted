@@ -1,0 +1,30 @@
+Changes
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+VERSION
+eg/README
+eg/ex1.pl
+eg/ex2.pl
+eg/ex3.pl
+eg/ex3-cfg1
+eg/ex4.pl
+eg/ex4-cfg1
+eg/ex5.pl
+eg/ex5-cfg1
+lib/Config/Validator.pm
+t/1group.t
+t/1misc.t
+t/1ref.t
+t/1simple.t
+t/1tree.t
+t/2duration.t
+t/2hostname.t
+t/2ipv4.t
+t/2ipv6.t
+t/2schema.t
+t/2size.t
+t/2traverse.t
+t/3pod.t
+t/4podcov.t

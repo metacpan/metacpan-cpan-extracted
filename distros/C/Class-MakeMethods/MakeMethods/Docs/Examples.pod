@@ -1,0 +1,554 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::Examples - Sample Declarations and Usage
+
+=head1 EXAMPLES
+
+The following examples indicate some of the capabilities of
+Class::MakeMethods. 
+
+=head2 A Contrived Example
+
+Object-oriented Perl code is widespread -- you've probably seen code like the below a million times:
+
+  my $obj = MyStruct->new( foo=>"Foozle", bar=>"Bozzle" );
+  if ( $obj->foo() =~ /foo/i ) {
+    $obj->bar("Barbados!");
+  }
+
+Here's a possible implementation for the class whose interface is
+shown above:
+
+  package MyStruct;
+  
+  sub new {
+    my $callee = shift;
+    my $self = bless { @_ }, (ref $callee || $callee);
+    return $self;
+  }
+
+  sub foo {
+    my $self = shift;
+    if ( scalar @_ ) {
+      $self->{'foo'} = shift();
+    } else {
+      $self->{'foo'}
+    }
+  }
+
+  sub bar {
+    my $self = shift;
+    if ( scalar @_ ) {
+      $self->{'bar'} = shift();
+    } else {
+      $self->{'bar'}
+    }
+  }
+
+Class::MakeMethods allows you to simply declare those methods to
+be of a predefined type, and it generates and installs the necessary
+methods in your package at compile-time.
+
+Here's the equivalent declaration for that same basic class:
+
+  package MyStruct;
+  use Class::MakeMethods::Standard::Hash (
+    'new'       => 'new',
+    'scalar'    => 'foo',
+    'scalar'    => 'bar',
+  );
+
+=head2 A Typical Example
+
+The following example shows a common case of constructing a class with several types of accessor methods
+
+  package MyObject;
+  use Class::MakeMethods::Standard::Hash (
+    new => 'new',
+    scalar => [ 'foo', 'bar' ],
+    array => 'my_list',
+    hash => 'my_index',
+  );
+
+This class now has a constructor named new, two scalar accessors named foo and bar, and a pair of reference accessors named my_list and my_index. Typical usage of the class might include calls like the following:
+
+  my $obj = MyObject->new( foo => 'Foozle' );
+  print $obj->foo();
+  
+  $obj->bar('Barbados'); 
+  print $obj->bar();
+  
+  $obj->my_list(0 => 'Foozle', 1 => 'Bang!');
+  print $obj->my_list(1);
+  
+  $obj->my_index('broccoli' => 'Blah!', 'foo' => 'Fiddle');
+  print $obj->my_index('foo');
+
+=head2 Lvalue Accessors
+
+The Template subclasses support an optional "--lvalue" modifer that causes your accessors method to be marked as returning an lvalue which can be assigned to. (This feature is only available on Perl 5.6 or later.)
+
+  package MyStruct;
+  use Class::MakeMethods::Template::Hash (
+    'new'                   => 'new',
+    'scalar --get --lvalue' => 'foo',
+    'array --get --lvalue'  => 'bar',
+  );
+
+  $obj->foo = "Foozle";
+  print $obj->foo;
+
+  $obj->bar = ( 'baz', 'beep', 'boop' );
+  print $obj->bar->[1]; # beep
+
+=head2 String and Numeric Accessors
+
+In addition to the C<scalar> accessor supported by the C<Standard::*> classes, the Template subclasses also provide specialized accessors that can facilitate the use of specific types of data.
+
+For example, we could declare the following class to hold information
+about available Perl packages:
+
+  package MyVersionInfo;
+  use Class::MakeMethods::Template::Hash (
+    'new'     => 'new',
+    'string'  => 'package',
+    'number'  => 'version',
+  );
+
+  sub summary {
+    my $self = shift;
+    return $self->package() . " is at version " . $self->version()
+  }
+
+You could use this class as follows:
+
+  package main;
+  use MyVersionInfo;
+  
+  my $obj = MyVersionInfo->new( package=>"Class::MakeMethods");
+  $obj->version( 2.0 );
+  print $obj->summary();
+
+These accessors will provide a bit of diagnostic type checking;
+an attempt to call C<$obj-E<gt>version("foo")> will cause your
+program to croak.
+
+
+=head2 String Concatenation Interface
+
+The following defines a get_concat method C<i>, and specifies
+a string to use when joining additional values when this method is
+called.
+
+  use Class::MakeMethods::Template::Hash
+    'string' => [ '--get_concat', 'i', { join => ' - ' } ];
+
+(See L<Class::MakeMethods::Template::Generic> for information about the C<string> C<get_concat> interface.)
+
+
+=head2 Access Control Example
+
+The following defines a secret_password method, which will croak
+if it is called from outside of the declaring package.
+
+  use Class::MakeMethods::Composite::Hash
+    'scalar' => [ 'secret_password' => { permit => 'pp' } ];
+
+(See L<Class::MakeMethods::Composite> for information
+about the C<permit> modifier.)
+
+For template classes, the same thing is accomplished with '--private':
+
+  use Class::MakeMethods::Template::Hash
+    'scalar' => [ '--private', 'secret_password' ];
+
+(See L<Class::MakeMethods::Template::Universal> for information
+about the C<private> modifier.)
+
+
+=head2 Lazy-Init Interface
+
+Templapte scalar accessors declared with the "init_and_get" interface
+can be used for "memoization" or lazy-evaluation for object
+attributes. If the current accessor value is undefined, they will
+first call a user-provided init_* method and save its value.
+
+  package MyWidget;
+  use Class::MakeMethods::Template::Hash (
+    'new --with_values' => [ 'new' ],
+    'scalar --init_and_get' => [ 'foo', 'count', 'result' ],
+  );
+  
+  sub init_foo { 
+    return 'foofle';
+  }
+  
+  sub init_count {
+    return '3';
+  }
+  
+  sub init_result {
+    my $self = shift;
+    return $self->foo x $self->count;
+  }
+  ...
+  
+  my $widget = MyWidget->new();
+  print $widget->result; # output: fooflefooflefoofle
+  
+  # if values are predefined, the init methods are not used
+  my $other_widget = MyWidget->new( foo => 'bar', count => 2 );
+  print $widget->result; # output: barbar  
+
+(See L<Class::MakeMethods::Template::Generic> for more information about
+C<init_and_get>. This interface is also supported by all of Generic's
+subclasses, so you can add lazy-init methods for global data, class
+data, array objects, etc. Unfortunately, to date it is only supported
+for scalar-value accessors...)
+
+
+=head2 Helper Methods
+
+Template methods often include similarly-named "helper" methods. For example, specifying the "--with_clear" interface for Template::*:scalar methods creates an extra method for each accessor x named clear_x.
+
+  package MyClass;
+  use Class::MakeMethods::Template::Hash('scalar --with_clear' => 'foo');
+
+  my $obj = MyClass->new;
+  $obj->foo(23);
+  $obj->clear_foo;
+  print $obj->foo();
+
+
+=head2 Reference Accessor and Helper Methods
+
+For references to arrays and hashes, the Template subclasses provide
+accessors with extra "helper methods" to facilitate method-based
+interaction.
+
+Here's a class whose instances each store a string and an array
+reference, along with a method to search the directories:
+
+  package MySearchPath;
+  use Class::MakeMethods::Template::Hash (
+    'new'     => 'new',
+    'string'  => 'name',
+    'array'   => 'directories',
+  );
+  
+  sub search {
+    my $self = shift; 
+    my $target = shift;
+    foreach my $dir ( $self->directories ) {
+      my $candidate = $dir . '/' . $target;
+      return $candidate if ( -e $candidate );
+    }
+    return;
+  }
+
+Note that the directories accessor returns the contents of the
+array when called in a list context, making it easier to loop over.
+
+And here's a sample usage:
+
+  package main;
+  use MySearchPath;
+  
+  my $libs = MySearchPath->new( name=>"libs", directories=>['/usr/lib'] );
+  $libs->push_directories( '/usr/local/lib' );
+  
+  print "Searching in " . $libs->count_directories() . "directories.\n";
+  foreach ( 'libtiff', 'libjpeg' ) {
+    my $file = $libs->search("$_.so"); 
+    print "Checking $_: " . ( $file || 'not found' ) . "\n";
+  }
+
+Note the use of the push_* and count_* "helper" accessor methods,
+which are defined by default for all 'Template::*:array' declarations.
+
+Consult L<Class::MakeMethods::Template::Generic> for more information about
+the available types of reference accessors, and the various methods
+they define.
+
+
+=head2 Object Accessors
+
+There's also a specialized accessor for object references:
+
+  package MyStruct;
+  use Class::MakeMethods::Template::Hash (
+    'new'    => 'new',
+    'object' => [ 'widget' => {class=>'MyWidgetClass', delegate=>"twiddle"} ],
+  );
+
+(Note that the C<class> and C<delegate> values specified above are
+method parameters, which provide additional information about the
+C<widget> declaration; see L<"Standard Declaration Syntax"> for more information.)
+
+The above declaration creates methods equivalent to the following:
+
+  package MyStruct;
+
+  sub widget {
+    my $self = shift;
+    if ( scalar @_ ) { 
+      if (ref $_[0] and UNIVERSAL::isa($_[0], 'MyWidgetClass')) { 
+	$self->{widget} = shift;
+      } else {
+	$self->{widget} = MyWidgetClass->new(@_);
+      }
+    } else {
+      return $self->{widget};
+    }
+  }
+  
+  sub clear_widget {
+    my $self = shift;
+    $self->{widget} = undef;
+  }
+  
+  sub twiddle { 
+    my $self = shift;
+    my $obj = $self->widget() 
+      or Carp::croak("Can't forward twiddle because widget is empty");
+    $obj->twiddle(@_) 
+  } 
+
+
+=head2 Mixing Object and Global Methods
+
+Here's a package declaration using two of the included subclasses, C<Standard::Hash>, for creating and accessing hash-based objects, and C<Basic::Global>, for simple global-value accessors:
+
+  package MyQueueItem;
+  
+  use Class::MakeMethods::Standard::Hash (
+    new => { name => 'new', defaults=>{ foo => 'Foozle' } },
+    scalar => [ 'foo', 'bar' ],
+    hash => 'history'
+  );
+  
+  use Class::MakeMethods::Basic::Global (
+    scalar => 'Debug',
+    array  => 'InQueue',
+  );
+  
+  sub AddQueueItem {
+    my $class = shift;
+    my $instance = shift;
+    $instance->history('AddQueueItem' => time());
+    $class->InQueue([0, 0], $instance);    
+  }
+  
+  sub GetQueueItem {
+    my $class = shift;
+    $class->InQueue([0, 1], []) or $class->new
+  }
+
+=head2 Adding Custom Initialization to Constructors
+
+Frequently you'll want to provide some custom code to initialize new objects of your class. Most of the C<*:new> constructor methods provides a way to ensure that this code is consistently called every time a new instance is created.
+
+=over 4
+
+=item Composite::Hash:new { post_rules => [] }
+
+The Composite classes allow you to add pre- and post-operations to any method, so you can pass in a code-ref to be executed after the new() method.
+
+  package MyClass;
+  
+  sub new_post_init {
+    my $self = ${(pop)->{result}}; # get result of original new()
+    length($self->foo) or $self->foo('FooBar');   # default value
+    warn "Initialized new object '$self'";       
+  }
+  
+  use Class::MakeMethods (
+    'Composite::Hash:new' => [
+	'new' => { post_rules=>[ \&new_post_init ] } 
+    ],
+    'Composite::Hash:scalar' => 'foo;,
+  );
+  ... 
+  package main;
+  my $self = MyClass->new( foo => 'Foozle' )
+
+=item Template::Hash:new --and_then_init
+
+Use 'Template::Hash:new --and_then_init', which will first create the object and initialize it with the provided values, and then call an init() method on the new object before returning it.
+
+  package MyClass;
+  use Class::MakeMethods::Template::Hash (
+    'new --and_then_init' => 'new'
+    'string'  => 'foo'
+  );
+  sub init {
+    my $self = shift;
+    length($self->foo) or $self->foo('FooBar');   # default value
+    warn "Initialized new object '$self'";       
+  }
+  ... 
+  package main;
+  my $self = MyClass->new( foo => 'Foozle' )
+
+=item Template::Hash:new --with_init
+
+If you don't want your constructor to use the default hash-of-method-names style of initialization, use 'Template::Hash:new --with_init', which will create an empty object, pass its arguments to the init() method on the new object, and then return it.
+
+  package MyClass;
+  use Class::MakeMethods::Template::Hash (
+    'new --with_init' => 'new'
+    'string'  => 'foo'
+  );
+  sub init {
+    my $self = shift;
+    $self->foo( shift || 'FooBar' ); # init with arg or default
+    warn "Initialized new object '$self'";       
+  }
+  ... 
+  package main;
+  my $self = MyClass->new( 'Foozle' )
+
+=back
+
+Some additional notes about these constructors:
+
+=over 4
+
+=item * 
+
+The C<Template::*:new> methods allow you to specify a name for your method other than C<init> by passing the C<init_method> parameter:
+
+  use Class::MakeMethods::Template::Hash (
+    'new --and_then_init' => [ 
+	'new' => { init_method =>  'my_init' } 
+    ],
+  );
+
+=item * 
+
+If you know that you're not going to have a complex class hierarchy, you can reduce resource consumption a bit by changing the above declarations from "*::Hash" to "*::Array" so your objects end up as blessed arrays rather than blessed hashes.
+
+=back
+
+
+=head2 Changing Method Names
+
+The Template subclasses allow you to control the names assigned to
+the methods you generate by selecting from several naming interfaces.
+
+For example, the accessors declared above use a default, Perl-ish
+style interface, in which a single method can be called without an
+argument to retrieve the value, or with an argument to set it.
+However, you can also select a more Java-like syntax, with separate
+get* and set* methods, by including the '--java' template specification:
+
+  package MyStruct;
+  use Class::MakeMethods::Template::Hash (
+    'new'     => 'new',
+    'scalar'  => '--java Foo',
+  );
+
+(Note that the declaration of Foo could also have been written as
+C<'scalar --java' =E<gt> 'Foo'> or C<'scalar' =E<gt> ['--java',
+'Foo']>, or C<'scalar' =E<gt> [ 'foo' => { 'interface'=>'java' }
+], all of which are interpreted identically; see the
+L<Class::MakeMethods> section on "Argument Normalization" for
+details.)
+
+Usage of this accessor would then be as follows:
+
+  package main;
+  use MyStruct;
+  
+  my $obj = MyStruct->new( setFoo => "Foozle" );
+  print $obj->getFoo();
+  $obj->setFoo("Bozzle");
+
+
+=head2 Selecting Specific Helper Methods
+
+You can use the ability to specify interfaces to select specific helper methods rather than getting the default collection. 
+
+For example, let's say you wanted to use a Template::Hash:array, but you only wanted two methods to be installed in your class, a foo() accessor and a shift_foo() mutator. Any of the below combinations of syntax should do the trick:
+
+  use Class::MakeMethods::Template::Hash
+    'array' => [
+      'foo' => { interface=>{'foo'=>'get_set', 'shift_foo'=>'shift'} },
+    ];
+
+If you're going to have a lot of methods with the same interface, you could pre-declare a named interface once and use it repeatedly:
+
+  BEGIN {
+    require Class::MakeMethods::Template::Hash;
+    Class::MakeMethods::Template::Hash->named_method('array')->
+        {'interface'}->{'my_get_set_shift'} =
+            { '*'=>'get_set', 'shift_*'=>'shift' };
+  }
+
+  use Class::MakeMethods::Template::Hash
+    'array --my_get_set_shift' => [ 'foo', 'bar' ];
+
+
+=head2 Tree Structure Example
+
+In this example we will create a pair of classes with references
+to other objects.
+
+The first class is a single-value data object implemented as a
+reference to a scalar.
+
+  package MyTreeData;
+  use Class::MakeMethods::Template::Scalar (
+    'new'     => 'new',
+    'string'  => 'value',
+  );
+
+The second class defines a node in a tree, with a constructor, an
+accessor for a data object from the class above, and accessors for
+a list of child nodes.
+
+  package MyTreeNode;
+  use Class::MakeMethods::Template::Hash (
+    'new'     => 'new',
+    'object -class MyTreeData'  => 'data',
+    'array_of_objects -class MyTreeNode' => 'children',
+  );
+  
+  sub depth_first_data {
+    my $self = shift;
+    return $self->data, map { $_->depth_first_data() } $self->children;
+  }
+
+Here's a sample of how the above classes could be used in a program.
+
+  package main;
+  use MyTreeData;
+  use MyTreeNode;
+
+  my $node = MyTreeNode->new( 
+      data => { value=>'data1' }, 
+      children => [ { value=>'data3' } ] 
+  );
+  $node->push_children( MyTreeNode->new( data => { value=>'data2' } ) );
+  
+  foreach my $data ( $node->depth_first_data ) {
+    print $data->value();
+  }
+
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+=head2 Annotated Tutorials
+
+Ron Savage has posted a pair of annotated examples, linked to below.
+Each demonstrates building a class with MakeMethods, and each
+includes scads of comments that walk you through the logic and
+demonstrate how the various methods work together.
+
+  http://savage.net.au/Perl-tutorials.html
+  http://savage.net.au/Perl-tutorials/tut-33.tgz
+  http://savage.net.au/Perl-tutorials/tut-34.tgz
+
+=cut

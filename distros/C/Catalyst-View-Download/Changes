@@ -1,0 +1,36 @@
+Revision history for Catalyst::View::Download
+
+0.09    June 13, 2013
+        * Cleaned / Updated pod.
+        * Everything, except helper, now using Moose...
+
+0.08    June 11, 2013
+        * Finally added a Helper, yay! 
+        * Cleaned / Updated pod.
+        * Added support for App based modules. e.g MyApp::View::Download::PDF
+        * Changed outfile to be outfile_ext in config. outfile_name is available to set in stash or uses current action, stringified, as name.
+
+0.07    November 2, 2011
+        * Now using Moose...
+
+0.06    September 5, 2009
+        * Encorporated a fix to Catalyst::View::Download which was missing support for the new module Catalyst::View::Download::XML
+
+0.05    September 5, 2009
+        * Encorporated a fix to Catalyst::View::Download::CSV submitted by Kevin Frost which prevents a warning in process().
+        * Encorporated a change to Catalyst::View::Download::CSV submitted by Michele Beltrame such that it will always quote each field in the document.
+        * Cleaned up POD code snippets and used perltidy on everything. Thanks for the tips Kevin!
+        * Added another supported format, xml. Which will either support content as a string or convert a hashref into an xml document using XML::Simple.
+
+0.04    March 14, 2008
+        * Added Catalyst::Download::HTML. Fixed some typos in the POD documentation.
+
+0.03    March 8, 2008
+        * Modified the way each format Class worked so that each accepted a hash ref where data could then be stored in a 'data' key.
+
+0.02    March 5, 2008
+        * Fixed some problems with the test scripts.
+
+0.01    March 4, 2008
+        * First version.
+

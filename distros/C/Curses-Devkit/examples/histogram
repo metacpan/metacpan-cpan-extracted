@@ -1,0 +1,44 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Histogram Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+my $x;
+
+#
+# Create the histogram.
+#
+my $histogram = new Cdk::Histogram ('Title' => "<C>Dum De Dummmm",
+					'Height' => 3,
+					'Width' => 0,
+					'Orient' => "HORIZONTAL");
+
+#
+# Set some properties of the histogram.
+#
+$histogram->set ('StatsType' => "PERCENT",
+			'StatsPos' => "CENTER",
+			'FillerChar' => "</R> ");
+
+# Set the values.
+for ($x=1; $x <= 100; $x += 2)
+{
+   # Set the values of the histogram.
+   $histogram->set ('Value' => $x,
+			'Low' => 1,
+			'High' => 100);
+
+   # Draw the histogram.
+   $histogram->draw ();
+   sleep (1);
+}
+
+# Exit Cdk.
+Cdk::end();

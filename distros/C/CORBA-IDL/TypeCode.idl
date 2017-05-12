@@ -1,0 +1,9 @@
+#ifndef _TYPECODE_IDL_
+#define _TYPECODE_IDL_
+module CORBA {
+	// See CORBA Specifications - 3.14 CORBA Module
+	interface TypeCode {
+	};
+};
+#endif // _TYPECODE_IDL_
+

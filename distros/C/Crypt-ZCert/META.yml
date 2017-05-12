@@ -1,0 +1,35 @@
+---
+abstract: 'Manage ZeroMQ 4+ ZCert CURVE keys and certificates'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Path::Tiny: 0.06
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  FFI::CheckLib: 0.11
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-ZCert
+requires:
+  Convert::Z85: 0
+  FFI::Raw: 0
+  List::Objects::Types: 1
+  List::Objects::WithUtils: 2.016
+  Moo: 1
+  MooX::late: 0.014
+  Text::ZPL: 0
+  Try::Tiny: 0
+  Types::Path::Tiny: 0
+  Types::Standard: 0
+  perl: 5.010
+  strictures: 2
+resources:
+  repository: git://github.com/avenj/crypt-zcert.git
+version: 0.003002

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Action-RenderView-ErrorHandler-Action-Email.t
+lib/Catalyst/Action/RenderView/ErrorHandler/Action/Email.pm
+META.yml                                 Module meta-data (added by MakeMaker)

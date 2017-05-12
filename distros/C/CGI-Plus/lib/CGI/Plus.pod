@@ -1,0 +1,276 @@
+=head1 NAME
+
+CGI::Plus -- Extra utilities for CGI
+
+=head1 Description
+
+This module adds a few enhancements to
+L<CGI::Safe|http://search.cpan.org/~ovid/CGI-Safe/lib/CGI/Safe.pm>,
+which itself adds a few security-based enancements to
+L<CGI.pm|http://perldoc.perl.org/CGI.html>.  The enhancement are almost
+entirely additions -  the only method that is overridden is new(), and
+the changes there are only addition.  The enhancements in this module entirely
+use the object-oriented interface.
+
+=head1 SYNOPSIS
+
+ use CGI::Plus;
+ my ($cgi, $cookie, $url, $param);
+
+ # new CGI::Plus object
+ $cgi = CGI::Plus->new();
+
+ # turn on checks for cross-site request forgeries (CSRF)
+ $cgi->csrf(1);
+
+ # get a cookie and look at its values
+ $cookie = $cgi->incoming_cookies->{'mycookie'};
+ print $cookie->{'values'}->{'x'}, "\n";
+ print $cookie->{'values'}->{'y'}, "\n";
+
+ # more concise way to get an incoming cookie
+ $cookie = $cgi->ic->{'mycookie'};
+
+ # resend a cookie, but change one of its values
+ $cookie = $cgi->resend_cookie('mycookie');
+ $cookie->{'values'}->{'x'} = 2;
+
+ # add an outgoing cookie, set some values
+ $cookie = $cgi->new_send_cookie('newcookie');
+ $cookie->{'values'}->{'val1'} = '1';
+ $cookie->{'values'}->{'val2'} = '2';
+
+ # output HTTP header with outgoing cookies, including CSRF
+ # check cookie, automatically added
+ print $cgi->header_plus;
+ 
+ # output header again if it hasn't already been sent, but if it
+ # has then output an empty string
+ print $cgi->header_plus;
+
+ # output the URL of the current page but set a new value
+ # for the "t" param and remove the "j" param
+ $url = $cgi->self_link(params=>{t=>2, j=>undef});
+
+ # check if the submitted form includes the value of the CSRF
+ # cookie that was sent
+ if (! $cgi->csrf_check)
+     { die 'security error' }
+
+ # output the randomly generated value of the CSRF cookie,
+ # output: KTFnGgpkZ4
+ print $cgi->csrf_value, "\n";
+
+ # output the hidden input form field that uses the same
+ # value as the CSRF cookie
+ # output: <input type="hidden" name="csrf" value="KTFnGgpkZ4">
+ print $cgi->csrf_field, "\n";
+
+ # get the CSRF check param for use in a URL
+ # output: csrf=KTFnGgpkZ4
+ print $cgi->csrf_param;
+
+ # set a custom header
+ $cgi->set_header('myheader', 'whatever');
+
+ # change content type
+ $cgi->set_content_type('text/json');
+
+ # output HTTP headers, including added cookies, the CSRF cookie,
+ # and the new header
+ print $cgi->header_plus;
+
+ # outputs something like this:
+ # Set-Cookie: newcookie=val2&2&val1&1; path=/
+ # Set-Cookie: mycookie=y&2&x&2; path=/
+ # Set-Cookie: csrf=v&KTFnGgpkZ4; path=/
+ # Date: Sun, 29 Jul 2012 04:08:06 GMT
+ # Myheader: whatever
+ # Content-Type: text/json; charset=ISO-8859-1
+
+=head1 INSTALLATION
+
+CGI::Plus can be installed with the usual routine:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+=head1 METHODS
+
+=head2 CGI::Plus->new()
+
+Creates and returns a CGI::Plus object.  New calls the super-class' new()
+method, so all params sent to this method will be passed through to CGI
+and CGI::Safe.
+
+=head2 $cgi->ic, $cgi->oc
+
+=head2 $cgi->self_link(%options)
+
+Returns a url that is a relative link to the current page.  The local path of
+the URL is sent, but not the protocol or host.  So, for example, if the URL
+of the current page is
+
+ http://www.example.com/cgi-plus/?y=1&x=2&t=2&y=2
+
+then $cgi->self_link() would return something like as follows.  Note that the
+order of the URL params mght be changed.
+
+ /cgi-plus/?y=1&y=2&x=2&t=2
+
+NOTE: If all you want is to do is get the URL of the current page, then
+L<< $cgi-E<gt>url()|http://perldoc.perl.org/CGI.html#OBTAINING-THE-SCRIPT%27S-URL >>
+is a better choice because it preserves the order of URL params.
+
+B<option:> params
+
+The C<params> option allows you to change the values of some of the URL params
+while leaving others as-is.  C<params> is a hashref of URL params and
+their new values. For example, consider this URL:
+
+ http://www.example.com/cgi-plus/?y=1&x=2&t=2&y=2
+
+Suppose you want to change just that C<t> param from 2 to 3.  You would do that
+like this:
+
+ $cgi->self_link(params=>{t=>3})
+
+which gives us this relative URL with the C<x> and C<y> values as they were before, but
+with the new C<t> value:
+
+ /cgi-plus/?y=1&y=2&x=2&t=3
+
+If the value of the param is an array ref, then the param is output once
+for each value in the array ref.  So, for example, you could set that C<t>
+to have the values 4 and 5 like this:
+
+ $cgi->self_link(params=>{t=>[4,5]})
+
+which gives us
+
+ /cgi-plus/?y=1&y=2&x=2&t=4&t=5
+
+You can remove params by setting their values to undef:
+
+ $cgi->self_link(params=>{t=>undef})
+
+which gives us
+
+ /cgi-plus/?y=1&y=2&x=2
+
+B<option:> clear_params
+
+C<clear_params> removes all params from the URL.  For example, using our
+example URL from above:
+
+ http://www.example.com/cgi-plus/?y=1&x=2&t=2&y=2
+
+this:
+
+ $cgi->self_link(clear_params=>1)
+
+returns this URL;
+
+ /cgi-plus/
+
+You can use C<clear_params> in conjunction with C<params> to wipe the slate clean
+and send only specific params. So, for example, this call
+
+ $cgi->self_link(clear_params=>1, params=>{j=>10})
+
+gives us this URL:
+
+ /cgi-plus/?j=10
+
+B<option:> html
+
+The C<html> option returns the URL HTML-escaped.  So, for example, this
+call:
+
+ $cgi->self_link(params=>{t=>[4,5]}, html=>1)
+
+returns this:
+
+ /cgi-plus/?y=1&amp;y=2&amp;x=2&amp;t=4&amp;t=5
+
+=head1 Cross-site request forgery (CSRF) defenses
+
+A L<Cross-site request forgery|http://en.wikipedia.org/wiki/Cross-site_request_forgery>
+(CSRF) is a technique for breaching a web site's security.  CSRF is one of the
+most common web-site vulnerabilities.  CGI::Plus provides a technique for
+protecting
+
+=head2 $cgi->csrf_value()
+
+Returns the string used in CSRF checks.  This value must be included in an HTML
+form (see L<< /$cgi-E<gt>csrf_value() >>)
+
+=head2 $cgi->csrf_field()
+
+Returns a hidden HTML field with the CSRF check value in it.  This field must
+be included in HTML forms if you do a CSRF check.  The string will look
+something like this:
+
+ <input type="hidden" name="csrf" value="8hFnVjSr25">
+
+=head2 $cgi->csrf_param()
+
+Returns the URL parameter to use in a URL.  The return value will look
+something like this:
+
+ csrf=8hFnVjSr25
+
+The string will never contain HTML or URL meta characters, so it does not need
+to be HTML or URL escaped.
+
+=head2 $cgi->csrf_check()
+
+Checks if a CSRF check value was sent and that it matches the CSRF check
+cookie.  CSRF checks must be turned on or this method will croak.  The
+following code is a typical usage of csrf checking:
+
+ $cgi->csrf(1);
+
+ if (! $cgi->csrf_check) {
+    die 'security error';
+ }
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2012 by Miko O'Sullivan.  All rights reserved.  This program is 
+free software; you can redistribute it and/or modify it under the same terms 
+as Perl itself. This software comes with B<NO WARRANTY> of any kind.
+
+=head1 AUTHOR
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+=head1 VERSION
+
+=over 4
+
+=item Version 0.10    November 22, 2012
+
+Initial release
+
+=item Version 0.12    November 28, 2012
+
+Fixing prerequisite lists in CPAN upload.
+
+=item Version 0.13    April 25, 2014
+
+Fixed error in META.yml.
+
+=item Version 0.14    May 23, 2014
+
+Fixed bugs in test script.
+
+=item Version 0.15 January 4, 2015
+
+Gave tests names.
+
+=back
+

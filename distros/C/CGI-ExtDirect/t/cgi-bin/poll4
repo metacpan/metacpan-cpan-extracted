@@ -1,0 +1,25 @@
+#!/bin/sh
+
+$PERL -x 3<&0 <<'END_OF_SCRIPT'
+#!perl
+
+use CGI::ExtDirect;
+
+use RPC::ExtDirect::Test::Pkg::PollProvider;
+
+# 2 argument open() is here for older Perls
+open STDIN, '<&3' or die "Can't reopen STDIN";
+
+my %headers = ();
+
+local $RPC::ExtDirect::Test::Pkg::PollProvider::WHAT_YOURE_HAVING
+        = "Sorry sir, but that's not on the menu?";
+
+my $cgi = CGI::ExtDirect->new({ debug => 1 });
+
+print $cgi->poll(%headers);
+
+exit 0;
+
+END_OF_SCRIPT
+

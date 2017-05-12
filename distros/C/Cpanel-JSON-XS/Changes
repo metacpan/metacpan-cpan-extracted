@@ -1,0 +1,805 @@
+Revision history for Perl extension Cpanel::JSON::XS
+
+TODO: http://stevehanov.ca/blog/index.php?id=104 compression
+
+3.0233 2017-05-01 (rurban)
+        - 5.6 test fixes, silence some cc warnings,
+          add coverage and release targets, fix appveyor
+
+3.0232 2017-04-30 (rurban)
+        - Fix for MSVC 2015/14.0 and newer with changed nan/inf. #85
+        - Added appveyor CI
+        - Silence 32bit debugging format warning
+        - stabilize decode_hv hook (Coverity)
+        - ignore sv_utf8_downgrade errors (Coverity)
+
+3.0231 2017-03-29 (rurban)
+        - Fix need() overallocation (#84 Matthew Horsfall) and missing
+        need() calls.
+
+3.0230 2017-03-12 (rurban)
+        - Relax -Werror=declaration-after-statement for older gcc < 4.2
+
+3.0229 2017-03-10 (rurban)
+        - fix minor gcc compilation warnings.
+        - Add some core compat. warnings for gcc/clang compat. compilers.
+
+3.0228 2017-03-08 (rurban)
+        - fix decode_prefix offset when the string was re-allocated.
+        rather return the offset not the pointer to the old start. (#82 PaulGWebster)
+
+3.0227 2017-02-13 (rurban)
+        - fix CLONE and END, broken with 3.0226 (#80 y).
+          These methods are usually called with arguments, which we ignore.
+
+3.0226 2017-02-11 (rurban)
+        - relax longdouble Gconvert test on ppc64le and aarch64-linux-ld,
+        with apparent HW quadmath without USE_QUADMATH (older perls).
+        (detected by dgolden)
+        - Fixed 2 uninit warnings in the XS
+
+3.0225 2016-11-23 (rurban)
+        - decode utf8 security fixes for perl 5.6.
+          added extra detection code for overflows and non-continuations.
+          This broke one 5.6 test with an overlong multi-byte character,
+          which previously worked accidently.
+          i.e. decode "\ud801\udc02\x{10204}"
+        - Added tests for ill-formed utf8 sequences from Encode.
+
+3.0224 2016-11-20 (rurban)
+        - fixes for g++-6, stricter -fpermissive and -Wc++11-compat
+
+3.0223 2016-11-16 (rurban)
+        - fixed decode bignum with a string prefix. #76, patch by GilmarSantosJr.
+
+3.0222 2016-10-30 (rurban)
+        - enable decode_bom for multibyte encodings UTF16 and UTF32.
+          encode internally to UTF-8.
+
+3.0221 2016-10-30 (rurban)
+        - fixed documentation of decode for unicode noncharacters.
+          added correct code to warn as in core.
+          no replacement, ignore warnings when in relaxed mode.
+          We used a wrong range also, but the wrong code from 3.02220
+          was never executed because of an coding error. #73, #74
+        - Fixed a perl 5.6 compilation regression from 3.0220.
+        - Improve decode_bom for multibyte encoding, but not yet enabled.
+          refcount error.
+        - Add 5.24 to travis tests
+
+3.0220 2016-10-28 (rurban)
+	- add comprehensive JSON decode spectests from
+          http://seriot.ch/parsing_json.html. #72
+        - decode with BOM (UTF-8, UTF-16, or UTF-32). For now only UTF-8,
+          the others error.
+        - fixed detection of final \0 as illegal non-whitespace garbage. Fixes
+          spectest 'n_number_then_00'. #72
+        - changed decode of unicode noncharacters between U+FFFD and U+10FFFF
+          to the recommended U+FFFD REPLACEMENT CHARACTER, when not in the binary
+          or relaxed mode.
+        - fail decode of non-unicode raw characters above U+10FFFF
+          when not in relaxed mode.
+
+3.0219 2016-10-26 (rurban)
+	- workaround mingw 4.0 modfl() bug [perl #125924]
+
+3.0218 2016-10-13 (rurban)
+	- no changes
+
+3.0217_06 2016-10-08 (rurban)
+	- fix DPPP_dummy_PL_parser warnings
+
+3.0217_05 2016-10-07 (rurban)
+	- fix t/gh70-asan.t for older perls < 5.14
+
+3.0217_04 2016-10-07 (rurban)
+	- fix and document wrong strEQc usage in new(). #70 (ilmari)
+
+3.0217_03 2016-10-06 (rurban)
+	- expect_false() macro fix for MSVC
+        - fix av and hv length types: protect from security sensitive overflows,
+          add HVMAX_T and RITER_T
+        - add new "Hash key too large" error. perl5 silently truncates it, we
+          prefer errors, cperl 5.25.1 does error also.
+        - fix broken 5.8.1 SvPOK_only, i.e. assert_not_ROK
+
+3.0217_02 2016-10-04 (rurban)
+	- Use faster strEQc macros from cperl with constant strings.
+        - prefer memEQ for systems without memcmp, to use bcmp there.
+        - add more expect_false() to inf/nan branches.
+
+3.0217_01 2016-10-04 (rurban)
+	- Detect INF/NAN: ?/++/-?/--- on HP-UX (#56)
+        - New stringify_infnan(3) infnan_mode. Easy to detect platform
+          independent "inf", "-inf" or "nan" strings with double quotes,
+          with qnan, snan or negative nan unified to "nan".
+
+3.0217 2016-06-18 (rurban)
+	- Improve test t/20_unknown.t for older JSON::PP (Christopher J. Madsen)
+
+3.0216 2016-06-12 (rurban)
+	- Fix wrong test 117 for 5.10.0 (pghmcfc)
+
+3.0215 2016-06-03 (rurban)
+	- Fix wrong test 117 (pghmcfc)
+        - TODO the fragile mojo boolean interop test.
+	- Improve error message with class based method calls,
+          when forgetting ->new. #66
+
+3.0214 2016-06-02 (rurban)
+	- Fix a off-by-one IV_MIN -> NV overflow in decode_json. #67 (xdg)
+        - Avoid encode_sv SEGV with -Dusequadmath #62
+          Fix quadmath NV stringification.
+
+3.0213_02 2016-04-13 (rurban)
+	- Remove author-only Pod::Usage dependency (karenetheridge).
+
+3.0213_01 2016-04-11 (rurban)
+	- Preserve numbers as numbers, enforce an added .0 (dagolden).
+          Also note that 42+"bar" will result >=5.10 in numbers not integers,
+          => 42.0
+        - 5.6 compilation fixes
+        - add yaml-tiny formats to cpanel_json_xs
+
+3.0213 2016-03-02 (rurban)
+	- silence JSON::PP::Boolean redefine warnings #60
+
+3.0212 2016-02-27 (rurban)
+	- merge with JSON-XS-3.02:
+	  - docs: add some INTEROP, stricter nonref RFC 7159 and
+	          TAGGED VALUE SYNTAX AND STANDARD JSON EN/DECODERS paragraphs
+	  - use 7159 nonref detection from JSON-XS: json_nonref()
+	  - add some SAVESTACK_POS calls
+	  - add -f cbor decode option (via CBOR::XS) to cpanel_json_xs
+	- fixed many spelling errors in the new docs
+	- fixed errors with threaded perls
+	- improved code quality in new merged code and fixed
+          new warnings found with gcc-5
+
+	- add -f and -t yaml-xs and yaml-syck options to cpanel_json_xs
+
+3.0211 2016-01-10 (rurban)
+       - relax Mojo interop test strictness ('' or 0 for false)
+       - t/z_pod.t as author test (Ether)
+       - t/z_kwalitee.t accepts now RELEASE_TESTING
+       - fix mingw64 inf/nan with uselongdouble, strawberry 5.22.1. #57
+
+3.0210 2015-12-03 (rurban)
+       - improve cpanel_json_xs: more input and output formats
+       - improved various spellings and add test
+       - much faster t/99_binary.t test
+
+3.0209 2015-12-03 (rurban)
+       - Fix nasty regression bug with allow_singlequote or relaxed,
+         hanging with single quotes in normal strings. #54
+         (reported by Quim Rovira)
+
+3.0208 2015-12-02 (rurban)
+       - Fix regression for is_bool([]), with unblessed references. #53
+         (reported by Gregory Oschwald)
+
+3.0207 2015-12-02 (rurban)
+       - Fix regression decoding big strings (>16384). #50 (reported by Dan Book)
+       - Ignore allow_barekey if we detect quotes. #51 (Fixed by Quim Rovira)
+       - Skip some unicode tests with 5.6
+
+3.0206 2015-11-30 (rurban)
+       - Add support for escape_slash from JSON::PP. #47
+       - Map sort_by to canonical from JSON::PP. #47
+         reverse sort or sort by custom keys not yet possible/silently ignored.
+       - Add support for allow_singlequote from JSON::PP. #47
+       - Add support for allow_barekey from JSON::PP. #47
+       - Add support for allow_bignum from JSON::PP. #47
+       - relaxed uses now also allow_singlequote and allow_barekey.
+       - Fixed t/20_unknown.t: SKIP when JSON is not available. #45
+       - Fixed t/55_modifiable.t: Broaden the is check of true <5.12 #45
+         (both reported by Paul Howarth)
+       - Add t/zero-mojibake.t from JSON::PP testing all supported decoding
+         options: none, utf8, ascii, latin1, binary.
+
+3.0205 2015-11-29 (rurban)
+       - Add t/20_unknown.t tests from JSON::PP, extended.
+       - Fix convert_blessed, disallow invalid JSON. #46 (reported by Dan Book)
+         convert_blessed returns now always a string, even for numbers.
+       - Fix encountered GLOB error message (still in JSON::XS, and JSON::PP took
+         over the wrong message also).
+       - Fixed regression of immediate raw values for null/true/false to be
+         modifiable again. #45. Broken with 3.0201 - 3.0204.
+         (reported by Thomas Sibley and Karen Etheridge)
+         This caused failues in Test::JSON and App::RecordStream.
+
+3.0204 2015-11-26 (rurban)
+       - Fix is_bool with JSON::XS >3.0 interop. #44 (Graham Knop)
+
+3.0203 2015-11-26 (rurban)
+       - New optional decode_json() argument to set allow_nonref as in
+         RFC 7159 and PHP. Before 3.02 JSON::XS and Cpanel::JSON::XS always
+         allowed nonref values for decode_json due to an interal bug.
+
+3.0202 2015-11-26 (rurban)
+       - New feature: convert_blessed for encode.
+         Stringify overloaded perl objects and with allow_blessed even without
+         string overload (#37)
+
+3.0201 2015-11-26 (rurban)
+       - Simplify handling of references, removing all the complicated
+         work-around for reblessing. Breaks overloaded values, but fixes
+         serialising refs to readonly values. #21 (Gianni Ceccarelli)
+         new test t/53_readonly.t
+         schmorp thinks that overloading is broken with this patch,
+         but reblessing and breaking readonly is worse.
+       - Stabilize Test::Kwalitee with missing XS dependencies
+       - suggests common::sense, not recommend. #36 (mst)
+       - Boolean interop: use only JSON::PP::Boolean. #40
+         Remove our own JSON::XS::Boolean, and solely use
+         JSON::PP::Boolean and accept Mojo::JSON::_Bool and
+         Types::Serialiser::Boolean, which is aliased to JSON::PP::Boolean.
+         JSON::YAJL::Parser just produces an unbless IV (0|1).
+         fix overload of our bools.
+         stringify true to "true", false to "0"
+       - accept Mojo::JSON::_Bool (#37)
+         Mojo does not store their booleans as JSON::PP::Boolean
+         as everybody else does.
+       - accept is_bool as method call also.
+       - implement native encode_sv of the internal sv_yes/sv_no values (#39)
+         and map them to json true/false. YAML::XS compatible.
+       - pod: add SECURITY CONSIDERATIONS
+         added a table of safe and unsafe serializers for comparison.
+         Written by JD Lightsey.
+         Only JSON and Data::MessagePack are safe by default.
+       - With canonical only skip hash keys sorting for actually tied hashes.
+         #42 (Sergey Aleynikov)
+
+3.0115 2015-01-31 (rurban)
+       - Fix stack corruption when encoding nested objects with FREEZE method,
+         #35 (Sergey Aleynikov)
+
+3.0114 2015-01-04 (rurban)
+       - Fix bad powl with Freebsd 10 -Duselongdouble. Rather use strtold. #34 + RT #101265
+
+3.0113 2014-12-15 (rurban)
+       - t/117_number relax the tests for negative nan, as BSDs also cannot deal with it. #33
+
+3.0112 2014-12-14 (rurban)
+       - Add {get_,}stringify_infnan methods and use it in the test, now run-time. #32
+         mode 0: null, 1: stringify, 2: inf/nan (invalid JSON) as before.
+       - Fix t/117_number tests for Solaris and MSWin32
+       - Remove build-time "Do you want to handle inf/nan as strings? Default: null." prompt.
+       - Improve docs.
+
+3.0111 2014-12-13 (rurban)
+       - Fixed detecting 1.#INF/1.#IND on windows. #28
+       - Also detect now -inf and -nan. #28
+       - Fixed STRINGIFY_INFNAN return string, length off by one. #28
+       - Fixed a non-C99 declaration error on XS.xs:863. Was broken with older MSVC.
+
+3.0110 2014-12-12 (rurban)
+       - Fixed one more memory bug with encode of dual-vars to strings,
+         esp. with older perl <5.10, leading to eventual panic: realloc.
+
+3.0109 2014-12-12 (rurban)
+       - Fixed serious bug with encode of dual-vars to strings, missing
+         the ending \0. #31 (Grinnz)
+
+3.0108 2014-12-11 (rurban)
+       - Change encode of numbers with dual-strings (int and float), integers
+         and numbers are now not mishandled anymore by dual-vars, temp. string representations.
+         Add t/117_numbers.t from JSON::PP, PR#10 by kraih.
+       - Add prompt for nan/inf encode policy: null or stringify.
+       - Change stringification of false and true to 0 and 1, matching upstream JSON and JSON::XS, #29.
+         This didn't affect string comparisons, just e.g. print decode_json("false").
+       - Tolerate literal ASCII TABs in strings in relaxed mode #22 (from JSON::XS)
+       - Revise pod, merge updates from JSON::XS.
+       - Fix pod typo #30 (Colin Kuskie)
+
+3.0107 2014-11-28 (rurban)
+       - fix fatal stack corruption with perl callbacks in list context
+         #27 (dur-randir)
+
+3.0106 2014-11-11 (rurban)
+       - more minor doc improvements #26 (schwern)
+
+3.0105 2014-11-05 (rurban)
+       - minor doc improvements #25 (ether)
+       - fix d_Gconvert test in t/11_pc_expo.t for 5.6
+
+3.0104 2014-04-26 (rurban)
+       - add t/z_leaktrace.t
+       - restore build on C89 (bulk88)
+       - fix small cxt->sv_json leak on interp exit (bulk88)
+
+3.0103 2014-04-21 (rurban)
+       - Change booleans interop logic (again) for JSON-XS-3.01
+         Check now for Types::Serialiser::Boolean ie JSON::PP::Boolean refs (#18 clintongormley)
+         to avoid allow_blessed for JSON-XS-3.01 booleans.
+       - fix boolean representation for JSON-XS-3.01/Types::Serialiser::Boolean interop
+         (arrayref, not hashref)
+       - add t/52_object.t from JSON::XS
+       - backport encode_hv HE sort on stack < 64 or heap to avoid stack
+         overflows from JSON-XS-3.01. do not use alloca.
+       - backport allow_tags, decode_tag, FREEZE/THAW callbacks from JSON-XS-3.01
+       - added pod for OBJECT SERIALISATION (allow_tags, FREEZE/THAW)
+
+3.0102 2014-04-17 (rurban + bulk88)
+       - Added PERL_NO_GET_CONTEXT for better performance on threaded Perls (bulk88)
+       - MANIFEST: added t/96_interop.t
+       - Document deprecated functions
+       - Change booleans interop logic for JSON-XS-3.01
+
+3.0101 2014-04-15 (rurban + bulk88)
+       - Added ithreads support (bulk88)
+         Cpanel::JSON::XS is now thread-safe.
+       - const'ed a translation table for memory savings (bulk88)
+       - Fixed booleans for JSON 2.9 and JSON-XS-3.01 interop.
+         JSON does not support JSON::XS booleans anymore, so
+         I cannot think of any reason to still use JSON::XS.
+
+2.3404 2014-01-30 (rurban)
+       - fix interop with JSON::XS booleans
+         the internal boolean objects are now blessed into JSON::XS::Boolean
+         #13 and [cpan #92548] (samuel.c.kaufman)
+       - t/96_interop.t: added
+       - LICENSE section to pod added for t/z_kwalitee.t
+       - README: fixed some pod spelling errors in (David Steinbrunner)
+
+2.3403 2013-11-02 (cpanel)
+       - fix json_atof on AIX without HAS_LONG_DOUBLE (powl in libm)
+         [cpan #88061] (Ulisse Monari, Reini Urban)
+
+2.3402 2013-11-02 (cpanel)
+       - t/97_unshare_hek.t: fix issue #10, unshare hek assertion resp. valgrind error
+       - Rename internal 5.6 methods {from|to}_json_ to _{from|to}_json
+       - Fixed get_binary pod
+       - Added t/z_*.t maintainer tests
+
+2.3401 2013-10-02 (cpanel)
+       - add more binary tests, including 5.6
+       - improve POD for binary and cPanel fork
+       - Fix homepage META
+
+2.3314 2013-09-09 (cpanel)
+       - t/01_utf8.t: workaround for stricter Encode versions (syohex)
+       - autogenerate META files
+
+2.3313 2013-06-26 (cpanel)
+       - Fix re-blessing of READONLY data (chip) [GH issue #7].
+       - Depend on Pod::Usage 1.36. 1.51 was added with 2.3306
+       - t/01_utf8.t: workaround for stricter Encode versions [RT #84244]
+       - avoid <5.10 const warnings with sv_chop
+
+2.3312 2013-05-22 (cpanel)
+       - Made common::sense optional to get smaller FatPacker packages.
+
+2.3311 2013-04-04 18:41:23 (cpanel)
+       - Changed maintainer to cpan@cpanel.net
+       - Changed tracker to RT
+       - Worked on JSON integration (matching prototypes)
+       - Fixed Boolean stringify and eq overload methods to match JSON (Fixes JSON tests)
+
+2.3310 2013-03-28 12:20:11 (rurban)
+       - add testcases for JSON::XS RT #84244, double-encoding with utf8
+         t/01_utf8.t (use utf8), t/14_latin1.t (no utf8)
+       - t/01_utf8.t: enable and fix more 5.6 testcases
+
+2.3309 2013-03-28 09:37:29 (rurban)
+       - fix 19_incr.t broken with 5.17.10 hash randomization [JSON::XS RT #84151]
+         by wyant @ cpan.org
+
+2.3308 2013-03-28 09:10:45 (rurban)
+       - fix 5.6 binary utf8 encoding, harmonized with newer perls
+         5.6. encodes strings to utf8 internally when seeing a codepoint >= 0x80.
+	 with binary decode it to the original bytes before encoding it to escaped JSON.
+
+2.3307 2013-03-27 17:27:18 (rurban)
+       - fix lots of -Wincompatible-pointer-types and -Wpointer-sign warnings
+       - add binary method
+       - write and accept \xNN JSON encoding with binary only,
+         also accept octal \0NNN JSON with binary
+
+2.3306 2013-03-27 12:15:20 (rurban)
+       - fix decode_utf8 for 5.6 (bdraco)
+       - use common::sense for tests
+       - fix README dependency: update earlier, not just at make dist
+       - added pod2text prereqs
+
+2.3305 2013-03-27 11:47:36 (rurban)
+       - nondev version to be indexed in CPAN
+       - t/99_binary.t: non-numeric test names, use is instead of ok
+       - added META data to Makefile.PL
+
+2.33_04 2013-03-01 15:42:39 (rurban)
+	- fix for 5.6 compiler:
+	  $json->incr_text may not be called as lvalue,
+	  missing attributes::reftype
+
+2.33_03 2013-02-28 17:22:52 (bdraco)
+	- revert fix crash with invalid JSON, empty sv 
+    
+2.33_02 2012-08-17 16:29:52 (rurban)
+	- fix crash with invalid JSON, empty sv 
+
+2.33_01 2012-08-08 16:29:52 (rurban)
+	- merge with JSON-XS-2.33
+
+2.33 Wed Aug  1 21:03:52 CEST 2012
+	- internal encode/decode XS wrappers did not expect stack
+          moves caused by callbacks (analyzed and testcase by Jesse Luehrs).
+	- add bencode as to/from option in bin/json_xs.
+        - add -e option to json_xs, and none and string in/out formats.
+
+2.32_02 Wed Jun 27 19:59:18 2012 (rurban)
+	- forked from JSON-XS-2.32
+	- Cpanel perl-5.6.2 support
+	- prefix with Cpanel
+
+2.32 Thu Aug 11 19:06:38 CEST 2011
+	- fix a bug in the initial whitespace accumulation.
+
+2.31 Wed Jul 27 17:53:05 CEST 2011
+	- don't accumulate initial whitespace in the incremental buffer
+          (this can be useful to allow whitespace-keepalive on a tcp
+          connection without triggering the max_size limit).
+	- properly croak on some invalid inputs that are not strings
+          (e.g. undef) when trying to decode a json text (reported
+          and analyzed by Goro Fuji).
+
+2.3   Wed Aug 18 01:26:47 CEST 2010
+	- make sure decoder doesn't change the decoding in the incremental
+          parser (testcase provided by Hendrik Schumacher).
+	- applied patch by DaTa for Data::Dumper support in json_xs.
+        - added -t dump support to json_xs, using Data::Dump.
+        - added -f eval support to json_xs.
+
+2.29  Wed Mar 17 02:39:12 CET 2010
+	- fix a memory leak when callbacks set using filter_json_object
+          or filter_json_single_key_object were called (great testcase
+          by Eric Wilhelm).
+
+2.28  Thu Mar 11 20:30:46 CET 2010
+	- implement our own atof function - perl's can be orders of
+          magnitudes slower than even the system one. on the positive
+          side, ours seems to be more exact in general than perl's.
+          (testcase provided by Tim Meadowcroft).
+        - clarify floating point conversion issues a bit.
+	- update jpsykes csrf article url.
+        - updated benchmark section - JSON::PP became much faster!
+
+2.27  Thu Jan  7 07:35:08 CET 2010
+	- support relaxed option inside the incremental parser
+          (testcase provided by IKEGAMI via Makamaka).
+
+2.26  Sat Oct 10 03:26:19 CEST 2009
+	- big integers could become truncated (based on patch
+          by Strobl Anton).
+	- output format change: indent now adds a final newline, which is
+          more expected and more true to the documentation.
+
+2.25  Sat Aug  8 12:04:41 CEST 2009
+	- the perl debugger completely breaks lvalue subs - try to work
+          around the issue.
+	- ignore RMAGICAL hashes w.r.t. CANONICAL.
+	- try to work around a possible char signedness issue on aix.
+        - require common sense.
+
+2.24  Sat May 30 08:25:45 CEST 2009
+	- the incremental parser did not update its parse offset
+          pointer correctly when parsing utf8-strings (nicely
+          debugged by Martin Evans).
+	- appending a non-utf8-string to the incremental parser
+          in utf8 mode failed to upgrade the string.
+        - wording of parse error messages has been improved.
+
+2.232 Sun Feb 22 11:12:25 CET 2009
+	- use an exponential algorithm to extend strings, to
+          help platforms with bad or abysmal==windows memory
+          allocater performance, at the expense of some memory
+          wastage (use shrink to recover this extra memory).
+          (nicely analysed by Dmitry Karasik).
+
+2.2311 Thu Feb 19 02:12:54 CET 2009
+        - add a section "JSON and ECMAscript" to explain some
+          incompatibilities between the two (problem was noted by
+          various people).
+	- add t/20_faihu.t.
+
+2.231 Thu Nov 20 04:59:08 CET 2008
+	- work around 5.10.0 magic bugs where manipulating magic values
+          (such as $1) would permanently damage them as perl would
+          ignore the magicalness, by making a full copy of the string,
+          reported by Dmitry Karasik.
+        - work around spurious warnings under older perl 5.8's.
+
+2.23 Mon Sep 29 05:08:29 CEST 2008
+	- fix a compilation problem when perl is not using char * as, well,
+          char *.
+	- use PL_hexdigit in favour of rolling our own.
+
+2.2222 Sun Jul 20 18:49:00 CEST 2008
+	- same game again, broken 5.10 finds yet another assertion
+          failure, and the workaround causes additional runtime warnings.
+          Work around the next assertion AND the warning. 5.10 seriously
+          needs to adjust it's attitude against working code.
+
+2.222 Sat Jul 19 06:15:34 CEST 2008
+	- you work around one -DDEBUGGING assertion bug in perl 5.10
+          just to hit the next one. work around this one, too.
+
+2.22 Tue Jul 15 13:26:51 CEST 2008
+	- allow higher nesting levels in incremental parser.
+        - error out earlier in some cases in the incremental parser
+          (as suggested by Yuval Kogman).
+        - improve incr-parser test (Yuval Kogman).
+
+2.21 Tue Jun  3 08:43:23 CEST 2008
+	- (hopefully) work around a perl 5.10 bug with -DDEBUGGING.
+	- remove the experimental status of the incremental parser interface.
+	- move =encoding around again, to avoid bugs with search.cpan.org.
+          when can we finally have utf-8 in pod???
+        - add ->incr_reset method.
+
+2.2  Wed Apr 16 20:37:25 CEST 2008
+	- lifted the log2 rounding restriction of max_depth and max_size.
+	- make booleans mutable by creating a copy instead of handing out
+          the same scalar (reported by pasha sadri).
+   	- added support for incremental json parsing (still EXPERIMENTAL).
+	- implemented and added a json_xs command line utility that can convert
+          from/to a number of serialisation formats - tell me if you need more.
+        - implement allow_unknown/get_allow_unknown methods.
+        - fixed documentation of max_depth w.r.t. higher and equal.
+	- moved down =encoding directive a bit, too much breaks if it's the first
+          pod directive :/.
+        - removed documentation section on other modules, it became somewhat
+          outdated and is nowadays mostly of historical interest.
+
+2.1  Wed Mar 19 23:23:18 CET 2008
+        - update documentation here and there: add a large section
+          about utf8/latin1/ascii flags, add a security consideration
+          and extend and clarify the JSON and YAML section.
+        - medium speed enhancements when encoding/decoding non-ascii chars.
+        - minor speedup in number encoding case.
+	- extend and clarify the section on incompatibilities
+          between YAML and JSON.
+        - switch to static inline from just inline when using gcc.
+        - add =encoding utf-8 to the manpage, now that perl 5.10 supports it.
+        - fix some issues with UV to JSON conversion of unknown impact.
+        - published the yahoo locals search result used in benchmarks as the
+          original url changes so comparison is impossible.
+
+2.01 Wed Dec  5 11:40:28 CET 2007
+	- INCOMPATIBLE API CHANGE: to_json and from_json have been
+          renamed to encode_json/decode_json for JSON.pm compatibility.
+          The old functions croak and might be replaced by JSON.pm
+          comaptible versions in some later release.
+
+2.0  Tue Dec  4 11:30:46 CET 2007
+	- this is supposed to be the first version of JSON::XS
+          compatible with version 2.0+ of the JSON module.
+          Using the JSON module as frontend to JSON::XS should be
+          as fast as using JSON::XS directly, so consider using it
+          instead.
+	- added get_* methods for all "simple" options.
+        - make JSON::XS subclassable.
+
+1.53 Tue Nov 13 23:58:33 CET 2007
+	- minor doc clarifications.
+        - fixed many doc typos (patch by Thomas L. Shinnick).
+
+1.52 Mon Oct 15 03:22:06 CEST 2007
+	- remove =encoding pod directive again, it confuses too many pod
+          parsers :/.
+
+1.51 Sat Oct 13 03:55:56 CEST 2007
+	- encode empty arrays/hashes in a compact way when pretty is enabled.
+	- apparently JSON::XS was used to find some bugs in the
+          JSON_checker testsuite, so add (the corrected) JSON_checker tests to
+          the testsuite.
+        - quite a bit of doc updates/extension.
+        - require 5.8.2, as this seems to be the first unicode-stable version.
+
+1.5  Tue Aug 28 04:05:38 CEST 2007
+	- add support for tied hashes, based on ideas and testcase by
+          Marcus Holland-Moritz.
+        - implemented relaxed parsing mode where some extensions are being
+          accepted. generation is still JSON-only.
+
+1.44 Wed Aug 22 01:02:44 CEST 2007
+	- very experimental process-emulation support, slowing everything down.
+          the horribly broken perl threads are still not supported - YMMV.
+
+1.43 Thu Jul 26 13:26:37 CEST 2007
+	- convert big json numbers exclusively consisting of digits to NV
+          only when there is no loss of precision, otherwise to string.
+
+1.42 Tue Jul 24 00:51:18 CEST 2007
+	- fix a crash caused by not handling missing array elements
+          (report and testcase by Jay Kuri).
+
+1.41 Tue Jul 10 18:21:44 CEST 2007
+	- fix compilation with NDEBUG (assert side-effect),
+          affects convert_blessed only.
+	- fix a bug in decode filters calling ENTER; SAVETMPS;
+          one time too often.
+        - catch a typical error in TO_JSON methods.
+	- antique-ised XS.xs again to work with outdated
+          C compilers (windows...).
+
+1.4  Mon Jul  2 10:06:30 CEST 2007
+	- add convert_blessed setting.
+        - encode did not catch all blessed objects, encoding their
+          contents in most cases. This has been fixed by introducing
+          the allow_blessed setting.
+        - added filter_json_object and filter_json_single_key_object
+          settings that specify a callback to be called when
+          all/specific json objects are encountered.
+        - assume that most object keys are simple ascii words and
+          optimise this case, penalising the general case. This can
+          speed up decoding by 30% in typical cases and gives
+          a smaller and faster perl hash.
+        - implemented simpleminded, optional resource size checking
+          in decode_json.
+        - remove objToJson/jsonToObj aliases, as the next version
+          of JSON will not have them either.
+        - bit the bullet and converted the very simple json object
+          into a more complex one.
+        - work around a bug where perl wrongly claims an integer
+          is not an integer.
+        - unbundle JSON::XS::Boolean into own pm file so Storable
+          and similar modules can resolve the overloading when thawing.
+
+1.3  Sun Jun 24 01:55:02 CEST 2007
+        - make JSON::XS::true and false special overloaded objects
+          and return those instead of 1 and 0 for those json atoms
+          (JSON::PP compatibility is NOT achieved yet).
+        - add JSON::XS::is_bool predicate to test for those special
+          values.
+	- add a reference to
+          http://jpsykes.com/47/practical-csrf-and-json-security.
+        - removed require 5.8.8 again, it is just not very expert-friendly.
+          Also try to be more compatible with slightly older versions,
+          which are not recommended (because they are buggy).
+
+1.24 Mon Jun 11 05:40:49 CEST 2007
+	- added informative section on JSON-as-YAML.
+        - get rid of some c99-isms again.
+        - localise dec->cur in decode_str, speeding up
+          string decoding considerably (>15% on my amd64 + gcc).
+        - increased SHORT_STRING_LEN to 16kb: stack space is
+          usually plenty, and this actually saves memory
+          when !shrinking as short strings will fit perfectly.
+
+1.23 Wed Jun  6 20:13:06 CEST 2007
+	- greatly improved small integer encoding and decoding speed.
+	- implement a number of µ-optimisations.
+        - updated benchmarks.
+
+1.22 Thu May 24 00:07:25 CEST 2007
+	- require 5.8.8 explicitly as older perls do not seem to offer
+          the required macros.
+        - possibly made it compile on so-called C compilers by microsoft.
+
+1.21 Wed May  9 18:40:32 CEST 2007
+	- character offset reported for trailing garbage was random.
+
+1.2  Wed May  9 18:35:01 CEST 2007
+        - decode did not work with magical scalars (doh!).
+        - added latin1 flag to produce JSON texts in the latin1 subset
+          of unicode.
+        - flag trailing garbage as error.
+        - new decode_prefix method that returns the number
+          of characters consumed by a decode.
+        - max octets/char in perls UTF-X is actually 13, not 11,
+          as pointed out by Glenn Linderman.
+	- fixed typoe reported by YAMASHINA Hio.
+
+1.11 Mon Apr  9 07:05:49 CEST 2007
+	- properly 0-terminate sv's returned by encode to help
+          C libraries that expect that 0 to be there.
+	- partially "port" JSON from C to microsofts fucking broken
+          pseudo-C. They should be burned to the ground for pissing
+          on standards. And I should be stoned for even trying to
+          support this filthy excuse for a c compiler.
+
+1.1  Wed Apr  4 01:45:00 CEST 2007
+	- clarify documentation (pointed out by Quinn Weaver).
+        - decode_utf8 sometimes did not correctly flag errors,
+          leading to segfaults.
+        - further reduced default nesting depth to 512 due to the test
+          failure by that anonymous "chris" whose e-mail address seems
+          to be impossible to get. Tests on other freebsd systems indicate
+          that this is likely a problem in his/her configuration and not this
+          module.
+        - renamed json => JSON in error messages.
+        - corrected the character offset in some error messages.
+
+1.01 Sat Mar 31 16:15:40 CEST 2007
+	- do not segfault when from_json/decode gets passed
+          a non-string object (reported by Florian Ragwitz).
+          This has no effect on normal operation.
+
+1.0  Thu Mar 29 04:43:34 CEST 2007
+	- the long awaited (by me) 1.0 version.
+        - add \0 (JSON::XS::false) and \1 (JSON::XS::true) mappings to JSON
+          true and false.
+	- add some more notes to shrink, as suggested by Alex Efros.
+        - improve testsuite.
+        - halve the default nesting depth limit, to hopefully make it
+          work on Freebsd (unfortunately, the cpan tester did not
+          send me his report, so I cannot ask about the stack limit on fbsd).
+
+0.8  Mon Mar 26 00:10:48 CEST 2007
+	- fix a memleak when decoding hashes.
+	- export jsonToBj and objToJson as aliases
+          to to_json and from_json, to reduce incompatibilities
+          between JSON/JSON::PC and JSON::XS. (experimental).
+        - implement a maximum nesting depth for both en- and de-coding.
+        - added a security considerations sections.
+
+0.7  Sun Mar 25 01:46:30 CET 2007
+	- code cleanup.
+	- fix a memory overflow bug when indenting.
+        - pretty-printing now up to 15% faster.
+        - improve decoding speed of strings by
+          up to 50% by specialcasing short strings.
+        - further decoding speedups for strings using
+          lots of \u escapes.
+        - improve utf8 decoding speed for U+80 .. U+7FF.
+
+0.5  Sat Mar 24 20:41:51 CET 2007
+	- added the UTF-16 encoding example hinted at in previous
+          versions.
+        - minor documentation fixes.
+        - fix a bug in and optimise canonicalising fastpath
+          (reported by Craig Manley).
+        - remove a subtest that breaks with bleadperl (reported
+          by Andreas König).
+
+0.31 Sat Mar 24 02:14:34 CET 2007
+	- documentation updates.
+        - do some casting to hopefully fix Andreas' problem.
+        - nuke bogus json rpc stuff.
+
+0.3  Fri Mar 23 19:33:21 CET 2007
+	- remove spurious PApp::Util reference (John McNamara).
+	- adapted lots of tests from other json modules
+          (idea by Chris Carline).
+        - documented mapping from json to perl and vice versa.
+        - improved the documentation by adding more examples.
+        - added short escaping forms, reducing the created
+          json texts a bit.
+        - added shrink flag.
+        - when flag methods are called without enable argument
+          they will by default enable their flag.
+        - considerably improved string encoding speed (at least
+          with gcc 4).
+        - added a test that covers lots of different characters.
+        - clarified some error messages.
+        - error messages now use correct character offset
+          with F_UTF8.
+        - improve the "no bytes" and "no warnings" hacks in
+          case the called functions do... stuff.
+        - croak when encoding to ascii and an out-of-range
+          (non-unicode) codepoint is encountered.
+
+0.2  Fri Mar 23 00:23:34 CET 2007
+	- the "could not sleep without debugging release".
+          it should basically work now, with many bugs as
+          no production tests have been run yet.
+	- added more testcases.
+	- the expected shitload of bugfixes.
+	- handle utf8 flag correctly in decode.
+        - fix segfault in decoder.
+        - utf8n_to_uvuni sets retlen to -1, but retlen is an
+          unsigned types (argh).
+        - fix decoding of utf-8 strings.
+        - improved error diagnostics.
+        - fix decoding of 'null'.
+        - fix parsing of empty array/hashes
+        - silence warnings when we prepare the croak message.
+
+0.1   Thu Mar 22 22:13:43 CET 2007
+	- first release, very untested, basically just to claim
+          the namespace.
+ 
+0.01  Thu Mar 22 06:08:12 CET 2007
+	- original version; cloned from Convert-Scalar
+

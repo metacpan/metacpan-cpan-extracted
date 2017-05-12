@@ -1,0 +1,16 @@
+user.someval = ABCDEF
+user.someotherval = 90
+
+user.somestruct = 100
+user.somestruct = 200
+
+<user.somedeeperstruct>
+a = 1
+a = 2
+a = 3
+<b>
+c = asd
+</b>
+</user.somedeeperstruct>
+
+additional_key => 1

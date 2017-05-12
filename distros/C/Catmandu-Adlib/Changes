@@ -1,0 +1,7 @@
+Revision history for Catmandu-Adlib
+
+0.02  2017-04-20 11:40:10 CEST
+        - added: XML parser for Catmandu-OAI
+
+0.01  2017-02-17 11:19:50 UTC
+        - Initial release

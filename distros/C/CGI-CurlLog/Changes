@@ -1,0 +1,8 @@
+Revision history for CGI::CurlLog
+
+0.02 Thu Dec 15 13:07:32 CST 2016
+    - Don't buffer before outputting the log
+
+0.01 Wed Dec 14 18:05:14 CST 2016
+    - CGI::CurlLog a way of logging CGI parameters as curl command options
+

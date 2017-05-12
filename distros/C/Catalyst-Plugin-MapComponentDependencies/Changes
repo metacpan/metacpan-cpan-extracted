@@ -1,0 +1,36 @@
+Revision history for Perl extension Catalyst::Plugin::MapComponentDependencies
+
+0.009   31 May 2015
+        - Fixed a bug where FromResponse utility helper was returning a request
+          object.
+
+0.008   27 May 2015
+        -  Additional Util methods to name common dependencies such as context,
+           log, response, etc.
+        - Fixed bug where the ACCEPT_CONTEXT models didn't get a fresh configuration
+           in the expected way.  This was a major bug ( V 0.006-0.007 are totally
+           borked by this, don't use 'em).
+
+0.007   26 May 2015
+        - Fixed POD errors introduced in last release
+
+0.006   26 May 2015
+        - Catalyst::Plugin::MapComponentDependencies::Utils allows a more
+        streamlined configuration setup if you like to use Perl based configs.
+
+0.005   15 May 2015
+        - Allow shorthand configuration option
+
+0.004   11 May 2015
+        - make a shallow clone of the dependencies so that you get a fresh
+          copy each time.
+
+0.003   11 May 2015
+        - Fixed bug with coderef style dependencies
+        - Expanded docs a bit and test case for above
+
+0.002   05 May 2015
+        - Fixed bad version information
+
+0.001   30 April 2015
+        - original version.

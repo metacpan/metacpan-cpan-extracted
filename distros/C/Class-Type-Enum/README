@@ -1,0 +1,195 @@
+NAME
+
+    Class::Type::Enum - Build Enum-like classes
+
+VERSION
+
+    version 0.009
+
+SYNOPSIS
+
+      package Toast::Status {
+        use Class::Type::Enum values => ['bread', 'toasting', 'toast', 'burnt'];
+      }
+    
+      package Toast {
+        use Moo;
+    
+        has status => (
+          is     => 'rw',
+          coerce => sub {
+            Toast::Status->coerce_symbol(shift)
+          },
+          isa    => sub {
+            $_[0]->isa('Toast::Status') or die "Toast calamity!"
+          },
+        );
+      }
+    
+      my @toast = map { Toast->new(status => $_) } qw( toast burnt bread bread toasting toast );
+    
+      my @trashcan = grep { $_->status->is_burnt } @toast;
+      my @plate    = grep { $_->status->is_toast } @toast;
+    
+      my $ready_status   = Toast::Status->new('toast');
+      my @eventual_toast = grep { $_->status < $ready_status } @toast;
+    
+      # or:
+    
+      @eventual_toast = grep { $_->status lt 'toast' } @toast;
+    
+      # or:
+    
+      @eventual_toast = grep { $_->status->none('toast', 'burnt') } @toast;
+
+DESCRIPTION
+
+    Class::Type::Enum is a class builder for type-like classes to represent
+    your enumerated values. In particular, it was built to scratch an itch
+    with DBIx::Class value inflation.
+
+    I wouldn't consider the interface stable yet; I'd love feedback on this
+    dist.
+
+    When useing Class::Type::Enum:
+
+      * Required:
+
+      values => [@symbols]
+
+	The list of symbolic values in your enum, in ascending order if
+	relevant.
+
+      values => {symbol => ordinal, ...}
+
+	The list of symbols and ordinal values in your enum. There is no
+	check that a given ordinal isn't reused.
+
+ Custom Ordinal Values
+
+    If you'd like to build an enum that works like a bitfield or some other
+    custom setup, you need only pass a more explicit hashref to
+    Class::Type::Enum.
+
+      package BitField {
+        use Class::Type::Enum values => {
+          READ    => 1,
+          WRITE   => 2,
+          EXECUTE => 4,
+        };
+      }
+
+METHODS
+
+ $class->import(values => ...)
+
+    Sets up the consuming class as a subclass of Class::Type::Enum and
+    installs functions that are unique to the class.
+
+ $class->new($value)
+
+    Your basic constructor, expects only a value corresponding to a symbol
+    in the enum type. Also works as an instance method for enums of the
+    same class.
+
+ $class->inflate_symbol($symbol)
+
+    Does the actual work of $class->new($value), also used when inflating
+    values for DBIx::Class::InflateColumn::ClassTypeEnum.
+
+ $class->inflate_ordinal($ord)
+
+    Used when inflating ordinal values for
+    DBIx::Class::InflateColumn::ClassTypeEnum or if you need to work with
+    ordinals directly.
+
+ $class->sym_to_ord
+
+    Returns a hashref keyed by symbol, with ordinals as values.
+
+ $class->ord_to_sym
+
+    Returns a hashref keyed by ordinal, with symbols as values.
+
+ $class->values
+
+    Returns an arrayref of valid symbolic values, in order.
+
+ $class->test_symbol($value)
+
+    Test whether or not the given value is a valid symbol in this enum
+    class.
+
+ $class->test_ordinal($value)
+
+    Test whether or not the given value is a valid ordinal in this enum
+    class.
+
+ $class->coerce_symbol($value)
+
+    If the given value is already a $class, return it, otherwise try to
+    inflate it as a symbol. Dies on invalid value.
+
+ $class->coerce_ordinal($value)
+
+    If the given value is already a $class, return it, otherwise try to
+    inflate it as an ordinal. Dies on invalid value.
+
+ $class->coerce_any($value)
+
+    If the given value is already a $class, return it, otherwise try to
+    inflate it first as an ordinal, then as a symbol. Dies on invalid
+    value.
+
+ $o->is($value)
+
+    Given a test symbol, test that the enum instance's value is equivalent.
+
+    An exception is thrown if an invalid symbol is provided
+
+ $o->is_$value
+
+    Shortcut for $o->is($value)
+
+ $o->stringify
+
+    Returns the symbolic value.
+
+ $o->numify
+
+    Returns the ordinal value.
+
+ $o->cmp($other, $reversed = undef)
+
+    The string-compare implementation used by overloading. Returns the same
+    values as cmp. The optional third argument is an artifact of overload,
+    set to true if the order of $o and $other have been reversed in order
+    to make the overloaded method call work.
+
+ $o->any(@cases)
+
+    True if $o->is(..) for any of the given cases.
+
+ $o->none(@cases)
+
+    True if $o->is(..) for none of the given cases.
+
+SEE ALSO
+
+      * Object::Enum
+
+      * Class::Enum
+
+      * Enumeration
+
+AUTHOR
+
+    Meredith Howard <mhoward@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Meredith Howard.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

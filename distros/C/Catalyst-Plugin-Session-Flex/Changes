@@ -1,0 +1,33 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Flex.
+
+0.07  10/17/2005
+        - Add cookie_name option to specify the name of the session cookie, 
+        patch contributed by John Beppu <beppu@somebox.com>.
+
+0.06  09/15/2005
+	- Correct documentation bug for session_clear being listed as
+	clear reported by John Beppu <beppu@somebox.com>.
+
+0.05  08/27/2005
+	- Change finalize() to always set the cookie even if one
+	already exists, this way the expiration time is updated.
+
+	- Allow the "domain", "path", and "secure" parameters to be
+	set for the session cookie, if you configure them in the
+	application config.  To see what all of these parameters do
+	look at CGI::Cookie.
+
+0.04  07/24/2005 
+	- Add support persistent session cookies, beyond the duration
+	of the browser by setting the expires config option.  Patched
+	by Andy Grundman <andy@hybridized.org>.
+
+0.03  05/23/2005
+	- Remove prerequisite for Cache::FastMmap from Makefile.PL
+
+0.02  05/23/2005
+	- add session_clear method
+	- cleanup the tie() code to use the %$ form of tying an existing hash reference.
+
+0.01  05/19/2005
+        - first release

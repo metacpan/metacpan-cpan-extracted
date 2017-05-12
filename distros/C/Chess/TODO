@@ -1,0 +1,15 @@
+Chess version 0.6.0 TODO
+========================
+
+This version essentially covers all the rules of Chess. It does not, however,
+have the ability to determine that a game has been drawn by three-fold
+repetition. I would require a hashing function that can hash a particular
+board position into a unique key. Once this hashing function has been
+designed, this last rule can be put into place.
+
+For the 1.0 release, I would like to include these features:
+- a framework for writing an analysis of a board position, complete with
+  memoization so that expensive operations can be cached for every board
+  position that's been seen before
+- compatability with Chess Engine communication protocols so that this
+  object-oriented Chessboard could communicate with GNU chess

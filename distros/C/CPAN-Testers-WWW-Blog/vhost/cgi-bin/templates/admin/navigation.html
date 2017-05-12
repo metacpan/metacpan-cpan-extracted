@@ -1,0 +1,12 @@
+        <!-- Navigation Level 0 -->
+
+        <div class="nav0">
+          <ul>
+[% FOREACH item = menus.2.data -%]
+    [% IF item.4 <= user.access -%]
+            <li><a href="[% item.3 %]" title="[% item.2 %] pages">[% item.2 %]</a></li>
+    [% END -%]
+[% END -%]
+          </ul>
+        </div>			
+

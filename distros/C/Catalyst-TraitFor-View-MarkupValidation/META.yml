@@ -1,0 +1,41 @@
+---
+abstract: 'Validates output and replaces it with an error report if not OK'
+author:
+  - '=over'
+build_requires:
+  Catalyst::Runtime: 5.80015
+  Catalyst::ScriptRunner: 0
+  Catalyst::View::TT: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  Test::MockObject: 0
+  Test::More: 0.88
+  Test::WWW::Mechanize::Catalyst: 0
+  WebService::Validator::HTML::W3C::Error: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-View-MarkupValidation
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Catalyst::Action::RenderView: 0
+  Memoize: 0
+  Moose: 0
+  Syntax::Highlight::Engine::Kate: 0
+  Template: 0
+  WebService::Validator::HTML::W3C: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/dorward/Catalyst-TraitFor-View-MarkupValidation.git
+version: 0.003

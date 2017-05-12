@@ -1,0 +1,38 @@
+    // create a data record
+    var rowRecord = Ext.data.Record.create([
+      [% FOREACH col IN cpac.tc.cols %]
+      [%+ ',' IF NOT loop.first %]{ name: '[% col | replace('\'', '\\\'') %]' }
+      [% IF cpac.tm.f.$col.extra('rel_type') == 'belongs_to' %]
+      ,{ name: 'cpac__pk_for_[% col | replace('\'', '\\\'') %]' }
+      [% END %]
+      [% END %]
+      ,{ name: 'cpac__id' }
+      ,{ name: 'cpac__display_name' }
+    ]);
+
+    // create the Data Store
+    var store = new Ext.data.JsonStore({
+        url: '[% c.uri_for( c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list'),
+                        [cpac.g.site,cpac_db,cpac_table], cpac.g.filter_params ) %]'
+        ,root: 'rows'
+        ,fields: rowRecord
+        ,remoteSort: true
+        ,totalProperty: 'total'
+    });
+
+    // set default sort if we can
+    store.setDefaultSort('[% cpac.g.default_sort %]', 'ASC');
+
+    // hook to add page num param
+    // got this from the extjs forums
+    store.on('beforeload', function(store, options) {
+        options.params.limit = Ext.state.Manager.get('cpac-pgsz', pagebar.pageSize);
+        var limit = options.params.limit;
+        var start = options.params.start;
+        options.params.page = Math.floor(start / limit) + 1;
+        return true;
+    });
+
+    store.on('loadexception', function() {
+        Ext.Msg.alert('Error', 'Failed to load records, please check your data source configuration.');
+    });

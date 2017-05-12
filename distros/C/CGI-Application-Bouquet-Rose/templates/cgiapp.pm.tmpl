@@ -1,0 +1,203 @@
+package <tmpl_var name=prefix>::CGIApp;
+
+use base 'CGI::Application';
+use strict;
+use warnings;
+
+use <tmpl_var name=module>::Config;
+
+our $VERSION = '1.00';
+
+# -----------------------------------------------
+
+sub build_results
+{
+	my($self, $form, $iterator) = @_;
+	my(@column_definitions)     = 'var myColumnDefs = [';
+
+	my(@field_name);
+
+	for ($form -> fields() )
+	{
+		push @column_definitions, '{key:"' . $_ -> label() . '", sortable:true},';
+		push @field_name, $_ -> label();
+	}
+
+	# Remove final comma, just in case someone somewhere squeals.
+
+	chop $column_definitions[$#column_definitions];
+
+	push @column_definitions, '];', '';
+
+	my($count) = 0;
+	my(@data)  = 'myData = [';
+
+	my($name);
+	my($record, @row);
+
+	while ($record = $iterator -> next() )
+	{
+		$count++;
+
+		my($s) = '{';
+
+		my(@column);
+
+		for ($form -> fields() )
+		{
+			# This must be a separate line. Don't try $record -> $_() in the push...
+
+			$name = $_ -> name();
+
+			push @column, $_ -> label() . ':"' . $record -> $name() . '"';
+		}
+
+		$s = $s . join(',', @column) . '},';
+
+		push @data, $s;
+	}
+
+	# Remove final comma, just in case someone somewhere squeals.
+
+	chop $data[$#data];
+
+	push @data, '];';
+
+	my($field_names)   = '"' . join('","', @field_name) . '"';
+	my($rows_per_page) = $self -> param('config') -> get_js_rows_per_page();
+
+	my($js) = join("\n", @column_definitions, @data, <<EOS);
+
+var oConfigs = {
+paginator: new YAHOO.widget.Paginator({
+rowsPerPage: $rows_per_page
+}),
+};
+
+var myDataSource = new YAHOO.util.DataSource(myData);
+
+myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+
+myDataSource.responseSchema = {
+fields: [$field_names]
+};
+
+function adjust_page_and_submit(step)
+{
+	/* Eval is needed to turn the string into an integer. I hate JS! */
+
+	document.search._page.value = eval(document.search._page.value) + step;
+
+	document.search.submit();
+}
+
+EOS
+	return ($js, $count);
+
+} # End of build_results.
+
+# -----------------------------------------------
+
+sub build_search_form
+{
+	my($self, $search_mode, $form, $table, $mode, $var, $pager) = @_;
+
+	# In search mode, convert serial types from hidden to integer.
+	# I.e. we turn primary keys into input fields.
+	# TODO: We need to ensure this is not a Postgres-only manoeuvre.
+
+	my($field) = $form -> field('id');
+
+	if ($search_mode)
+	{
+		my($key);
+
+		for $key (keys %{$$field{'html_attrs'} })
+		{			
+			if ( ($key eq 'type') && ($$field{'html_attrs'}{$key} eq 'hidden') )
+			{
+				$$field{'html_attrs'}{'maxlength'} = 20;
+				$$field{'html_attrs'}{'size'}      = 20;
+				$$field{'html_attrs'}{'tabindex'}  = 1;
+				$$field{'html_attrs'}{'type'}      = 'integer';
+			}
+		}
+	}
+
+	$form -> field(id => $field);
+
+	# Build the HTML version of the form.
+
+	my($form_action) = $self -> param('config') -> get_form_action();
+
+	$form -> action("$form_action/$table/$mode");
+	$form -> method($self -> param('config') -> get_form_method() );
+
+	my(@field);
+
+	for $field ($form -> fields() )
+	{
+		# Pre-populate form fields, so user can easily step thru
+		# database pages with the Previous and Next buttons.
+
+		$field -> value($$var{$field -> name()});
+
+		push @field, {th => $field -> label(), td => $field -> xhtml_field()};
+	}
+
+	my($tmpl_path)       = $self -> param('config') -> get_tmpl_path();
+	my($search_template) = HTML::Template -> new(filename => "$tmpl_path/search.form.tmpl");
+
+	$search_template -> param(_page      => $pager ? $pager -> current_page() : 1);
+	$search_template -> param(start_form => $form -> start_xhtml() );
+	$search_template -> param(tr_loop    => \@field);
+	$search_template -> param(end_form   => $form -> end_xhtml());
+
+	return $search_template -> output();
+
+} # End of build_search_form.
+
+# -----------------------------------------------
+
+sub cgiapp_init_local
+{
+	my($self) = @_;
+
+	$self -> param(config => <tmpl_var name=module>::Config -> new() );
+	$self -> tmpl_path('<tmpl_var name=tmpl_path>');
+
+} # End of cgiapp_init_local.
+
+# -----------------------------------------------
+
+sub output
+{
+	my($self, $content, $results, $search_count, $table_name) = @_;
+	my($web_page) = $self -> load_tmpl('web.page.tmpl');
+
+	$web_page -> param(content => $content);
+	$web_page -> param(js_path => $self -> param('config') -> get_js_path() );
+	$web_page -> param(results => $results);
+
+	# If we're not processing the main menu, add a main menu link.
+
+	if ($results)
+	{
+		$web_page -> param(main_menu    => $self -> param('config') -> get_form_action() );
+		$web_page -> param(search_count => $search_count);
+	}
+
+	# If we're processing a non-main menu run mode, display the table name.
+
+	if ($table_name)
+	{
+		$web_page -> param(table_name => $table_name);
+	}
+
+	return $web_page -> output();
+
+} # End of output.
+
+# -----------------------------------------------
+
+1;

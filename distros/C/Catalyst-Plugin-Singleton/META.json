@@ -1,0 +1,42 @@
+{
+   "abstract" : "DEPRECATED - Singleton to context",
+   "author" : [
+      "Christian Hansen, C<ch@ngmedia.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Singleton",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.39"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MRO::Compat" : 0,
+            "Scalar::Util" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::Singleton" : {
+         "file" : "lib/Catalyst/Plugin/Singleton.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.2"
+}

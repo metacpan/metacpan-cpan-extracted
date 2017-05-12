@@ -1,0 +1,67 @@
+{
+   "abstract" : "OpenID credential for Catalyst::Plugin::Authentication framework.",
+   "author" : [
+      "-2009, Ashley Pond V C<< <ashley@cpan.org> >>. Some of Tatsuhiko Miyagawa's work is reused here.",
+      "Ashley Pond V <ashley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Authentication-Credential-OpenID",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::Engine::HTTP" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::General" : "2",
+            "LWPx::ParanoidAgent" : "1.03",
+            "Math::BigInt" : "0",
+            "YAML" : "0.6"
+         },
+         "requires" : {
+            "Cache::FastMmap" : "1.28",
+            "Catalyst" : "5.7",
+            "Catalyst::Devel" : "1",
+            "Catalyst::Plugin::Authentication" : "0",
+            "Catalyst::Plugin::Session::State::Cookie" : "0.08",
+            "Catalyst::Plugin::Session::Store::FastMmap" : "0.05",
+            "Class::Accessor::Fast" : "0",
+            "HTML::Parser" : "3",
+            "LWP::UserAgent" : "0",
+            "Net::OpenID::Consumer" : "1.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Authentication-Credential-OpenID/"
+      }
+   },
+   "version" : "0.19"
+}

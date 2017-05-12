@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb74
+registers:
+  AF: 26236
+  AF_: 0
+  BC: 25793
+  BC_: 0
+  DE: 56293
+  DE_: 0
+  HL: 60232
+  HL_: 0
+  I: 0
+  IX: 32193
+  IY: 49659
+  PC: 4
+  R: 2
+  SP: 0

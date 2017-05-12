@@ -1,0 +1,8 @@
+lib/Config/LDAPClient.pm
+lib/Config/LDAPClient/Search.pm
+Makefile.PL
+MANIFEST
+Changes
+README
+t/load.t
+META.yml                                 Module meta-data (added by MakeMaker)

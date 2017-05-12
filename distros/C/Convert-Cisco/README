@@ -1,0 +1,62 @@
+Convert-Cisco
+
+This is a pure perl module that can be used to convert Cisco billing
+records into XML.
+
+This is version 0.06 and should be considered alpha quality.
+The module was developed on Windows. Still problems building the module on
+some Unix platforms.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+If you are using Activestate and want PPM to manage your installed modules
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build ppmdist
+    ppm install Convert-Cisco.ppd
+
+TESTING
+
+This module uses the test module Test::Unit. I prefer this module as it emulates the XUnit test framework
+
+ http://en.wikipedia.org/wiki/XUnit
+
+The following file contains the Unit tests implemented for this module:
+
+ t/Convert/CiscoTest.pm
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Convert::Cisco
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Convert-Cisco
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-Cisco
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Convert-Cisco
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Convert-Cisco
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Mark O'Connor
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

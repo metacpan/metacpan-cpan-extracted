@@ -1,0 +1,168 @@
+Revision history for Perl module GraphViz.
+
+1.8 Sun Feb 23 09:15:14 GMT 2003
+	- support for client-side image maps by Dan Boorstein
+
+1.7 Sun Jan 19 21:55:14 GMT 2003
+	- quote bgcolor so that HSV works
+
+1.6 Sat Jan 18 15:47:26 GMT 2003
+	- moved tests to Test::More
+	- new test which checks if graphviz is installed
+	- new 'layout' graph attribute to support twopi - you
+	  may have to change your programs!
+	- new bgcolor graph attribute (idea by Scott Murman)
+	- labels named "graph" now work
+
+1.5 Sun Jan 13 16:59:14 GMT 2002
+	- updated code reference docs slightly
+	- removed GraphViz::Remote as it was no longer working
+	- new no_overlap graph attribute which tells the graph solver
+	  to not overlap the nodes (idea by Chris Ball)
+	- added patches by Barrie Slaymaker to make GraphViz
+	  work under Win32!
+	- this is the Flight 63 edition
+
+1.4 Wed Oct  3 07:57:42 BST 2001
+	- added new filehandle, scalar reference, and code reference
+	  scheme to as_* to allow streaming of data, rather than
+	  accumulating potentially very large output in memory (based
+	  on patch by Dave Rolsky)
+	- new pagewidth and pageheight graph attributes for creating
+	  PostScript mosaics of large graphs (idea by Nelson Loyola)
+
+1.3 Sun Aug 19 15:43:02 BST 2001
+	- labels can now contain quotes
+	- fixed bug: labels can now start with a number
+	- fixed bug in Devel::GraphVizProf so that packages
+	  are now grouped seperately (lines with the same text used to
+	  be grouped together)
+	- fixed undefined warning in GraphViz::Parse::RecDescent
+	- increased coverage of tests
+	- new 'rank' node attribute allows nodes to be ranked
+          at the same level
+	- make empty cluster names do nothing (patch by Barrie
+	  Slaymaker)
+
+1.2 Fri Aug 10 18:54:21 BST 2001
+        - removed the images in the examples directory and added
+          a file (make_all.pl) to, errr, make all the images
+	- This is the HAL2001 edition
+
+1.1 Tue Jul 24 23:54:42 BST 2001
+	- added extra parameter to as_* to allow easy saving of
+	  images: $graph->as_png("pretty.png")
+	- added new GraphViz::Parse::Yapp module to visualise
+	  Parse::Yapp grammars
+	- added new GraphViz::Parse::Yacc module to visualise
+	  Parse::Yacc grammars
+	- This is the TPC5 edition
+
+1.00 Thu Jun 14 15:10:28 BST 2001
+	- finally released as version 1.00!
+	- added a reference to brian d foy's DDJ article on
+	  Devel::GraphVizProf
+	- put the entire Perl regular expression test suite through
+	  GraphViz::Regex and fixed all the bugs
+        - no longer sort nodes by default (idea by Stephen Riehm),
+          which makes graphs just work better. Not documented, do
+          you want it to be?
+
+0.14 Thu May  3 17:57:57 BST 2001
+	- added support for InterpLit node in RecDescent grammars
+	- added cumulative effect for node attributes (patch by Diego
+	  Zamboni)
+	- changed the quoting rules again to make it easier to read
+	  the dot files (idea by Diego Zamboni)
+	- make add_edge() automatically add any nodes specified for
+	  the edge that have not been previously added to stop the
+	  Graph module complaining (patch by Diego Zamboni)
+	- new 'node', 'edge', and 'graph' graph attributes to specify
+	  global node, edge, and graph attributes (patch by Diego
+	  Zamboni)
+	- removed t/regex.t and documented that GraphViz::Regex may
+	  not work on various perls
+	- added GraphViz::Regex_YAPE module, another way to graph
+	  a regular expression
+
+0.13 Mon Mar 19 19:31:18 GMT 2001
+	- removed 'use warnings' as suggested by David Adler so we
+          no longer require Perl 5.6
+	- moved all modules into a new 'lib' directory (and updated
+	  examples) so that Devel::GraphVizProf gets installed
+	- new 'concentrate' graph attribute to merge edges in
+	  cluttered directed graphs
+	- new 'random_start' graph attribute, which requests an
+	  initial random placement for the graph
+	- new 'epsilon' graph attribute, which decides how long the
+	  graph solver tries before finding a graph layout, requested
+	  by Pierre-Yves Genot
+	- an empty cluster now means not clustered
+	- added GraphViz::Regex and example regexp.pl which visualises
+	  a regular expression
+	- now an award-winning module!
+
+0.12
+	- fixed bug in redcarpet.pl example
+	- new rankdir graph attribute, which controls the direction
+	  the nodes are linked together (patch by Mark Fowler)
+	- new 'width' and 'height' graph attributes control the size
+	  of the bounding box of the drawing in inches, requested by
+	  Pierre-Yves Genot
+
+0.11 Tue Mar  6 17:37:20 GMT 2001
+	- rearranged module naming: Data::GraphViz ->
+	  GraphViz::Data::Dumper, Parse::RecDescent::GraphViz ->
+	  GraphViz::Parse::RecDescent, XML::GraphViz -> GraphViz::XML,
+	- added GraphViz::Remote so that you do not need to install
+	  the graphviz tools to use this module
+
+0.10 Mon Mar  5 17:32:14 GMT 2001
+	- now allow simple add_edge({$from => $to}) syntax
+	  (idea by DJ Adams and Brian Ingerson)
+	- much better documentation (especially on attributes)
+	- new module Parse::RecDescent::GraphViz (and example) for
+	  graphing Parse::RecDescent grammars (idea by Damian Conway)
+	- new module XML::GraphViz (and example) for graphing XML
+	- new module Data::GraphViz (and example) for graphing data
+	  structures
+	- new example ppmgraph.pl by Marcel Grunauer which graphs CPAN
+	  tarball dependencies using ActiveState's package list (thanks
+	  to Brian Ingerson too ;-)
+	- new, better, testsuite
+	- better quoting (especially in ports) to allow a greater range	
+	  of characters
+	- new undocumented (it may change) as_graph method, which
+	  returns a graph object with the coordinates of nodes and edges
+
+0.09 Fri Jan 12 15:50:17 GMT 2001
+	- moved back to "dot" and "neato" from "dotneato"
+	- now allow directed and undirected graphs
+	- added GraphViz::No and GraphViz::Small subclasses
+	  which aid in visualising the structure of large
+	  graphs
+
+0.08 Sun Dec  3 15:15:29 GMT 2000
+	- minor patch to cope with DESTROY
+
+0.07 Sun Oct  1 15:19:55 2000
+	- new features: allows clusters and ports
+	- includes the talk I gave on this at yapc::Europe 19100
+	- many more examples (well, see the examples directory!),
+	  including quite a few PNGs
+
+0.06 Thu Aug 24 09:33:21 2000
+	- better quoting of nodes and edges (they can now have 
+	really wierd names)
+	- new examples directory with xref.pl: "graphing subroutine
+	cross-reference reports for Perl modules" and example graph to
+	see what kind of things it can do
+
+0.05 Wed Aug 18 13:12:25 2000
+	- now use dotneato to layout the graphs and can now ouput in a
+	variety of file formats
+
+0.04 Wed Aug  9 16:14:35 2000
+	- first released version
+
+

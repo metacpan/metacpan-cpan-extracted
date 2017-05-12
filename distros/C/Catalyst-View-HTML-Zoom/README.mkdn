@@ -1,0 +1,163 @@
+# SYNOPSIS
+
+    package MyApp::View::HTML;
+    use Moose;
+    extends 'Catalyst::View::HTML::Zoom';
+
+    package MyApp::Controller::Wobble;
+    use Moose; BEGIN { extends 'Catalyst::Controller' }
+    sub dance : Local {
+        my ($self, $c) = @_;
+        $c->stash( shaking => 'hips' );
+    }
+
+    package MyApp::View::HTML::Wobble;
+    use Moose;
+    sub dance {
+        my ($self, $stash) = @_;
+        $_->select('#shake')->replace_content($stash->{shaking});
+    }
+
+    #root/wobble/dance
+    <p>Shake those <span id="shake" />!</p>
+
+    GET /wobble/dance => "<p>Shake those <span id="shake">hips</span>!</p>";
+
+# DESCRIPTION
+
+This is our first pass attempt at bringing [HTML::Zoom](http://search.cpan.org/perldoc?HTML::Zoom) to [Catalyst](http://search.cpan.org/perldoc?Catalyst).  You
+should be familiar with [HTML::Zoom](http://search.cpan.org/perldoc?HTML::Zoom) before using this.  Additionally, as this
+is an early attempt to envision how this will work we say:
+
+["Danger, Will Robinson!"](http://en.wikipedia.org/wiki/Danger,_Will_Robinson)
+
+# ATTRIBUTES
+
+The following is a list of configuration attributes you can set in your global
+[Catalyst](http://search.cpan.org/perldoc?Catalyst) configuration or locally as in:
+
+    package MyApp::View::HTML;
+    use Moose;
+    extends 'Catalyst::View::HTML::Zoom';
+
+    __PACKAGE__->config({
+        content_type => 'text/plain',
+    });
+
+## template_extension
+
+Optionally set the filename extension of your zoomable templates.  Common
+values might be `html` or `xhtml`.  Should be a scalar.
+
+## content_type
+
+Sets the default `content-type` of the response body.  Should be a scalar.
+
+## root
+
+Used at the prefix path for where yout templates are stored.  Defaults to
+`$c->config->{root}`.  Should be a scalar.
+
+# METHODS
+
+This class contains the following methods available for public use.
+
+## process 
+
+args: ($c)
+
+Renders the template specified in `$c->stash->{template}` or 
+`$c->namespace/$c->action` (the private name of the matched action). Stash
+contents are passed to the underlying view object.
+
+Output is stored in `$c->response->body` and we set the value of 
+`$c->response->content_type` to `text/html; charset=utf-8` or whatever you
+configured as the [content_type](#pod_content_type) attribute unless this header has previously
+been set.
+
+## render
+
+args: ($c, $template || \$template, ?\%args, ?$coderef)
+
+Renders the given template and returns output.
+
+If `$template` is a simple scalar, we assume this is a path part that combines
+with the value of [root](#pod_root) to discover a file that lives on your local
+filesystem.
+
+However, if `$template` is a ref, we assume this is a scalar ref containing 
+some html you wish to render directly.
+
+If `\%args` is not defined we use the value of `$c-`stash>.
+
+If `$coderef` is defined and is a subroutine reference, we use is the same way
+we use [zoom_do](http://search.cpan.org/perldoc?zoom_do).
+
+# STASH KEYS
+
+This View uses the following stash keys as hints to the processor.  Currently
+these keys are passed on in the stash to the underlying templates.
+
+## template
+
+This overrides which template file is parsed by [HTML::Zoom](http://search.cpan.org/perldoc?HTML::Zoom).  If the value 
+is a plain scalar then we assume it is a file off the template [root](#pod_root).  If it
+is a scalar ref, we assume it is the actual body of the template we wish to
+parse.
+
+If this value is not set, we infer a template via `$c->action->private_path`
+
+## zoom_class
+
+This is the View class which is responsible for containing actions that converts
+a [template](#pod_template) into a rendered body suitable for returning to a user agent.  By
+default we infer from the controller name such that if your controller is called
+`MyApp::Web::Controller::Foo` and your base View class is `MyApp::Web::View::HTML`,
+the `zoom_class` is called `MyApp::Web::View::HTML::Foo`.
+
+If you override this default you can either give a full package name, such as
+`MyApp::CommonStuff::View::Foo` or a relative package name such as `::Foo`, in
+which case we will automatically prefix the base View (like `MyApp::Web::View::HTML`)
+to create a full path (`MyApp::Web::View::HTML::Foo`).
+
+## zoom action
+
+This refers to a method name in your [zoom_class](#pod_zoom_class) which does the actual work of
+processing a template into something we return as the body of an HTTP response.
+
+    package MyApp::View::HTML::Foo;
+
+    sub fill_name {
+        my ($self, $args) = @_;
+        $_->select("#name")->replace_content($args->{name});
+    }
+
+## zoom_do
+
+This is a subroutine reference which is optionally used to provide [HTML::Zoom](http://search.cpan.org/perldoc?HTML::Zoom)
+directives directly in a controller.  Useful for simple templates and rapid 
+prototyping.
+
+    sub example_zoom_do :Local {
+        my ($self, $c) = @_;
+        $c->stash(
+            name => 'John',
+            zoom_do => sub {
+                my ($zoom, %args) = @_;
+                $zoom->select("#name")->replace_content($args{name});
+            },
+        );
+    }
+
+If this key is not defined, we assume you want to use a class as above.
+
+# WARNING: VOLATILE!
+
+This is the first version of a Catalyst view to [HTML::Zoom](http://search.cpan.org/perldoc?HTML::Zoom) - and we might 
+have got it wrong. Please be aware that this is still in early stages, and the
+API is not at all stable. You have been warned (but encouraged to break it and 
+submit bug reports and patches :).
+
+# THANKS
+
+Thanks to Thomas Doran for the initial starting point.

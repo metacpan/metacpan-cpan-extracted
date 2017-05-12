@@ -1,0 +1,49 @@
+SYNOPSIS
+
+     use Class::GenSource qw(gen_class_source_code);
+    
+     say gen_class_source_code(
+         name => 'My::Class',
+         attributes => {
+             foo => {},
+             bar => {default=>3},
+             baz => {},
+         },
+     );
+
+    Will print something like:
+
+     package My::Class;
+    
+     sub new {
+         my $class = shift;
+         my $self = bless {@_}, $class;
+         $self->{bar} = 3 unless exists $self->{bar};
+         $self;
+     }
+     sub foo { my $self = shift; $self->{foo} = $_[0] if @_; $self->{foo} }
+     sub bar { my $self = shift; $self->{bar} = $_[0] if @_; $self->{bar}  }
+     sub baz { my $self = shift; $self->{baz} = $_[0] if @_; $self->{baz}  }
+
+    Another example (generating Moo-based class):
+
+     say gen_class_source_code(
+         name => 'My::Class',
+         attributes => {
+             foo => {},
+             bar => {default=>3},
+             baz => {},
+         },
+         variant => 'Moo',
+     );
+
+    will print something like:
+
+     package My::Class;
+     use Moo;
+     has foo => (is=>'rw');
+     has bar => (is=>'rw', default=>3);
+     has baz => (is=>'rw');
+
+DESCRIPTION
+

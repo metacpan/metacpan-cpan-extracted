@@ -1,0 +1,20 @@
+Revision history for CPAN-Patches
+
+0.05    5 Jun 2015
+    * test fixes, thanks to Slaven Rezić
+
+0.04    10 Jul 2010
+    * added read_meta_intrusive() that generates META.yml
+    * the patch set folders are "stackable"
+    * added get_module_folder() to resolve the first set folder that has
+      some files for a module
+
+0.03     2 Mar 2010
+    * fixed plugin loading (ignoring nested plugin names)
+
+0.02     1 Mar 2010
+    * moved Debian specific functionality to CPAN::Patches::Plugin::Debian
+
+0.01    25 Feb 2010
+    * First version, released on an unsuspecting world.
+

@@ -1,0 +1,45 @@
+---
+abstract: 'Interface to hide text into an image.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Image
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Crypt::Image:
+    file: lib/Crypt/Image.pm
+    version: '0.11'
+  Crypt::Image::Axis:
+    file: lib/Crypt/Image/Axis.pm
+    version: '0.11'
+  Crypt::Image::Params:
+    file: lib/Crypt/Image/Params.pm
+    version: '0.11'
+  Crypt::Image::Util:
+    file: lib/Crypt/Image/Util.pm
+    version: '0.11'
+requires:
+  GD::Image: '2.38'
+  Math::Random: '0.71'
+  Moo: '2.000000'
+  POSIX: '1.09'
+  Type::Tiny: '1.000005'
+  autodie: '0'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Crypt-Image.git
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

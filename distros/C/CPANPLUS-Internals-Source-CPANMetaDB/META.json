@@ -1,0 +1,47 @@
+{
+   "abstract" : "CPAN Meta DB source implementation",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Jos Boumans <kane@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPANPLUS-Internals-Source-CPANMetaDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPANPLUS" : "0.9001",
+            "File::Fetch" : 0,
+            "File::Spec" : 0,
+            "Locale::Maketext::Simple" : 0,
+            "Module::Load::Conditional" : 0,
+            "Params::Check" : 0,
+            "Parse::CPAN::Meta" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/cpanplus-internals-source-cpanmetadb",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/cpanplus-internals-source-cpanmetadb.git",
+         "web" : "https://github.com/bingos/cpanplus-internals-source-cpanmetadb"
+      }
+   },
+   "version" : "0.06"
+}
+

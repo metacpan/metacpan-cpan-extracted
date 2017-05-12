@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Crypt-OTP26
+version:             0.03
+abstract:            a classic form of encryption
+license:             ~
+author:              
+    - osfameron <osfameron@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

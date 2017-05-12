@@ -1,0 +1,15 @@
+---
+pod_spelling_system:
+  skip: 0
+  stopwords:
+    - Müller
+    - Steffen
+    - Wyant
+
+
+pod_coverage:
+  skip: 0
+  private:
+    - Class::Inspector#children
+    - Class::Inspector#recursive_children
+    - Class::Inspector::Functions

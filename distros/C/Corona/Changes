@@ -1,0 +1,22 @@
+Revision history for Perl extension Corona
+
+0.1004 Sun Mar 28 14:37:03 PDT 2010
+        - Implemented corona -v
+
+0.1003 Fri Mar 19 19:20:27 PDT 2010
+        - Fixed the namespace in Coro.pm (I suck)
+
+0.1002 Fri Mar 19 00:43:40 PDT 2010
+        - Add $VERSION to Plack::Server::Coro
+
+0.1001 Tue Mar 16 18:57:15 PDT 2010
+        - Include Plack::Server::Coro, now it's an empty subclass of Handler::Corona
+
+0.1000 Thu Mar 11 21:39:47 JST 2010
+        - Renamed the software as 'Corona'
+
+0.02  Sat Oct 24 01:27:12 PDT 2009
+        - Added psgi.streaming interface
+
+0.01  Mon Oct 12 23:38:36 2009
+        - original version

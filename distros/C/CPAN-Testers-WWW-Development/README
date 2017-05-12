@@ -1,0 +1,63 @@
+CPAN-Testers-WWW-Development
+============================
+
+Website creation tools for CPAN Tester Development.
+
+Please note the tests for this code is very basic. If you wish to help me out
+and can add to the test suite, please feel free.
+
+INSTALLATION
+
+Untar the tarball into the directory of choice. All scripts can then be run
+from that directory. All the results end up in the output directory of your
+choice, which can then be copied to your web server.
+
+DEPENDENCIES
+
+The scripts require the following Perl modules to be installed:
+
+  Config::IniFiles
+  File::Basename
+  File::Copy
+  File::Path
+  Getopt::ArgvFile
+  Getopt::Long
+  Number::Format
+  Template
+
+SCRIPTS
+
+* cpandevel-writepages
+
+Web page creation script. Generates all the HTML files.
+
+CPAN TESTERS FUND
+
+CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.
+
+In early 2012 the Enlightened Perl Organisation very kindly set-up a
+CPAN Testers Fund within their donatation structure, to help the project
+cover the costs of servers and services.
+
+If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+https://members.enlightenedperl.org/drupal/donate-cpan-testers
+
+If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.
+
+Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+http://iheart.cpantesters.org
+
+COPYRIGHT AND LICENCE
+
+  Copyright (C) 2008-2016 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

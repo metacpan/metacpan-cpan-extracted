@@ -1,0 +1,19 @@
+
+# Files in Convert-ASCII-Armour bundle.
+
+MANIFEST
+ARTISTIC
+
+Makefile.PL
+
+lib/Convert/ASCII/Armour.pm
+lib/Convert/ASCII/Armor.pm
+
+t/01-encode_content.t
+t/02-armour.t
+t/03-armour-compress.t
+t/04-noheaders.t
+t/05-armor.t
+
+# $Id: MANIFEST,v 1.2 2001/03/19 23:15:08 vipul Exp $ 
+

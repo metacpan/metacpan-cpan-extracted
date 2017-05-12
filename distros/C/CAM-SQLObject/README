@@ -1,0 +1,77 @@
+CAM::SQLObject - Object parent class for SQL delegates
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+Subclasses of CAM::SQLObject act as delegates for an SQL
+infrastructure implemented by CAM::SQLManager XML files.  You name
+your SQL queries in the XML files (kind of like stored procedures) and
+call them by name from your SQLObject instance.  The data retrieved
+from or written to the database is reflected in the instance's data
+structure.  The goal of CAM::SQLObject is to minimize the amount of
+programming needed to build a full-power interface to an SQL data
+record.
+
+This class is not meant to be instantiated directly.  Instead, it is
+intended to be the superclass of real database frontend objects.
+Those objects may add several get[field] and set[field] routines to
+act as accessors and mutators for the database fields.  Or, they can
+be very thin layers where all of the implementation is done in the SQL
+XML file.
+
+See CAM::SQLManager for XML file examples and a DTD.
+
+The CPAN module that is most similar to CAM::SQLObject is Class::DBI.
+The main difference is that CAM::SQLObject abstracts as much of the
+SQL away into external files as possible, while Class::DBI embraces
+the SQL and internalizes it as much as possible.
+
+Advantages of CAM::SQLObject vs. Class::DBI:
+
+  * SQL commands are disconnected from the Perl code, allowing
+    database adjustments without rewriting code.
+  * Allows complex joins
+  * Allows Perl field names to be different from SQL column names
+  * Facilitates testing and benchmarking SQL queries
+
+Disadvantages of CAM::SQLObject vs. Class::DBI:
+
+  * Requires nearly all queries to be written out (almost no implicit
+    queries)
+  * Difficult to translate free-form searches from Perl to SQL
+  * Doesn't support foreign keys or triggers
+
+In summary, Class::DBI is nice if you have simple tables that don't
+change format.  CAM::SQLObject is better if you have a large
+collection of well-defined queries, or if your database might change,
+or if you need to keep an eye on all of the possible queries.

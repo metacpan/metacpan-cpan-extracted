@@ -1,0 +1,12 @@
+Revision history for Catalyst-View-PDF-API2
+
+0.03    2014-08-12
+        fixed Makefile.PL to require Test::WWW::Mechanize::Catalyst and moved
+	Test::More and Test::File::Content from PREREQ_PM to TEST_REQUIRES. 
+
+0.02    2009-10-25
+        Fixed test with use_ok.
+
+0.01    2009-08-27
+        First version, to be release.
+

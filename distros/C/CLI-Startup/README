@@ -1,0 +1,54 @@
+CLI-Startup
+
+Every command-line script does (or should) accept command-line
+options, at the very least a --help option, and should allow
+default options to be specified in a "resource" file, named by
+default $HOME/.SCRIPTNAMErc.
+
+This package accepts a simple hash of command-line options and
+uses it to generate command-line processing, a --help message,
+and resource-file processing. These are all annoying chores that
+every script needs, and that are always essentially identical but
+for the specific options supported.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CLI::Startup
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CLI-Startup
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CLI-Startup
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CLI-Startup
+
+    Search CPAN
+        http://search.cpan.org/dist/CLI-Startup/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Len Budney
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

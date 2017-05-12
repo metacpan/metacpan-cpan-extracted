@@ -1,0 +1,137 @@
+NAME
+    Catalyst::Plugin::Authentication::LDAP - LDAP Authentication for
+    Catalyst
+
+SYNOPSIS
+        use Catalyst 'Authentication::LDAP';
+        __PACKAGE__->config->{authentication} = (
+            ldap_server            => 'ldap://ldap.mycompany.com',
+            default_naming_context => 'dc=mycompany,dc=com',
+            user_context           => 'cn=users',
+            user_append            => '@mycompany.com',
+            user_filter            => '(&(objectclass=user)(objectcategory=user)(samaccountname=__USER__*))',
+            group_attribute        => 'memberOf',
+        );
+        $c->login( $user, $password );
+        $c->logout;
+        $c->session_login( $user, $password );
+        $c->session_logout;
+        $c->roles(qw/customer admin/);
+
+DESCRIPTION
+    This plugin allows you to authenticate your web users using an LDAP
+    server. See the Configuration section for more details on how to set it
+    up. This module was designed with Active Directory in mind and has not
+    yet been tested using other LDAP servers. Patches are welcome that
+    enable support for other servers.
+
+    Note that this plugin requires a session plugin like
+    "Catalyst::Plugin::Session::FastMmap".
+
+CONFIGURATION
+    This plugin is configured by passing an "authentication" hash reference
+    to your application's config method. The following keys are supported:
+
+        ldap_server
+
+    Required. Specify the full URI to your LDAP server. Some examples are:
+    ldap://ldap.mycompany.com, ldap://pdc:1234,
+    ldaps://secure.ldap.mycompany.com
+
+        default_naming_context => 'dc=mycompany,dc=com'
+
+    Required. This is the base context for your server. In most cases, this
+    is a string of two or more "dc" values separated by commas.
+
+        user_context => 'cn=users',
+
+    Optional. The context to be used when querying a user's details. This
+    value is prefixed to the default_naming_context. The default value
+    should be suitable for Active Directory servers. If you do not intend to
+    use role-based authentication, you can ignore this option.
+
+        user_append = '@mycompany.com'
+    
+    Optional. This string will be appended to a user's login name when
+    authenticating to the server. Active Directory servers require the user
+    to be specified as "username@mycompany.com".
+
+        user_filter => '(&(objectclass=user)(objectcategory=user)(samaccountname=__USER__*))'
+
+    Optional. This filter is used to retrieve the user's account details,
+    specifically the list of groups the user is a member of. For Active
+    Directory servers, the default value should be suitable. The string
+    __USER__ is replaced by the current username. If you do not intend to
+    use role-based authentication, you can ignore this option.
+
+        group_attribute => 'memberOf'
+    
+    Optional. Specify which attribute contains the list of groups/roles the
+    user is a member of.
+
+  METHODS
+    login
+        Attempt to authenticate a user. Takes username/password as
+        arguments,
+
+            $c->login( $user, $password );
+
+        User remains authenticated until end of request.
+
+    logout
+        Log out the user. will not clear the session, so user will still
+        remain logged in at next request unless session_logout is called.
+
+    process_permission
+        check for permissions. used by the 'roles' function.
+
+    roles
+        Check permissions for roles and return true or false.
+
+            $c->roles(qw/foo bar/);
+
+        Returns an arrayref containing the verified roles.
+
+            my @roles = @{ $c->roles };
+
+    session_login
+        Persistently login the user. The user will remain logged in until he
+        clears the session himself, or session_logout is called.
+
+            $c->session_login( $user, $password );
+
+    session_logout
+        Session logout. will delete the user object from the session.
+
+  EXTENDED METHODS
+    prepare_action
+        sets $c->request->{user} from session.
+
+    setup
+        sets up $c->config->{authentication}.
+
+  OVERLOADED METHODS
+    process_roles
+        Takes an arrayref of roles and checks if user has the supplied
+        roles. Returns 1/0.
+
+LIMITATIONS
+    Because many LDAP servers require a password to query information, the
+    user's group/role data must be queried and stored at the time they
+    login. This means that group/role data updated on the LDAP server after
+    a user logs in will not be reflected in their session until they logout
+    and log back in.
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::Authentication::CDBI.
+
+AUTHOR
+    Andy Grundman, "andy@hybridized.org"
+
+    Based on Catalyst::Plugin::Authentication::CDBI by: Sebastian Riedel,
+    "sri@cpan.org" Marcus Ramberg, "mramberg@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

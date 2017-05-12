@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Plugin-EnvironmentDetector.t
+lib/Catalyst/Plugin/EnvironmentDetector.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

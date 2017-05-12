@@ -1,0 +1,185 @@
+# NAME
+
+Catalyst::Authentication::Credential::Twitter - Twitter authentication for Catalyst
+
+# VERSION
+
+version 2.0.5
+
+# SYNOPSIS
+
+In MyApp.pm
+
+```perl
+use Catalyst qw/
+   Authentication
+   Session
+   Session::Store::FastMmap
+   Session::State::Cookie
+       Session::PerUser
+/;
+
+MyApp->config(
+    "Plugin::Authentication" => {
+        default_realm => "twitter",
+        realms => {
+            twitter => {
+                credential => {
+                    class => "Twitter",
+                },
+
+                consumer_key    => 'twitter-consumer_key-here',
+                consumer_secret => 'twitter-secret-here',
+                callback_url => 'http://mysite.com/callback',
+                                # you can bypass the above by including
+                                # "twitter_consumer_key", "twitter_consumer_secret", 
+                                # and "twitter_callback_url" in your Catalyst site
+                                # configuration or yml file
+            },
+        },
+    },
+);
+```
+
+And then in your Controller:
+
+```perl
+sub login : Local {
+   my ($self, $c) = @_;
+   
+   my $realm = $c->get_auth_realm('twitter');
+   $c->res->redirect( $realm->credential->authenticate_twitter_url($c) );
+}
+```
+
+And finally the callback you specified in your API key request above (e.g.
+example.com/twitter/callback/ ):
+
+```perl
+sub callback : Local {
+   my ($self, $c) = @_;
+   
+   if (my $user = $c->authenticate(undef,'twitter')) {
+               # user has an account - redirect or do something cool
+       $c->res->redirect("/super/secret/member/area");
+       }
+       else {
+               # user doesn't have an account - either detect Twitter
+               # credentials and create one, or return an error.
+               #
+               # Note that "request_token" and "request_token_secret"
+               # are stored in $c->user_session as hashref variables under
+               # the same names
+       }
+}
+```
+
+# DESCRIPTION
+
+This module handles Twitter API authentication in a Catalyst application.
+
+Note that _Catalyst::Authentication::Credential::Twitter_ needs
+the catalyst application to also load [Catalyst::Plugin::Session::PerUser](https://metacpan.org/pod/Catalyst::Plugin::Session::PerUser)
+to be functional.
+
+# METHODS
+
+As per guidelines of [Catalyst::Plugin::Authentication](https://metacpan.org/pod/Catalyst::Plugin::Authentication), there are two
+mandatory methods, `new` and `authenticate`. Since this is not really
+enough for the Twitter API, I've added one more.
+
+## new()
+
+Will not be called by you directly, but will use the configuration you
+provide (see above). Mandatory parameters are `consumer_key`, `consumer_secret` and
+`callback_url`. Note that you can also include `twitter_consumer_key`, `twitter_consumer_secret`, and `twitter_callback_url` as variables in your Catalyst site configuration or yml file and you don't need to pass configuration parameters in your MyApp.pm file.  Please see [Net::Twitter](https://metacpan.org/pod/Net::Twitter) for more details on them.
+
+## authenticate\_twitter\_url( $c )
+
+This method will return the authentication URL. Bounce your users there
+before calling the `authentication` method.
+
+## authenticate( )
+
+Handles the authentication. Nothing more, nothing less. It returns
+a [Catalyst::Authentication::User::Hash](https://metacpan.org/pod/Catalyst::Authentication::User::Hash) with the following keys
+(all coming straight from Twitter).
+
+- twitter\_user
+- twitter\_user\_id
+- twitter\_access\_token
+- twitter\_access\_token\_secret
+
+Your database must at least contain a column called "twitter\_user\_id"
+in your main user table. If the other keys are present they will be
+updated on login with Twitter's most up-to-date information for that
+user.
+
+## authenticate\_twitter( )
+
+Only performs the twitter authentication. Returns a hashref containing
+the user's information given by Twitter (see `authenticate()` above for
+the lists of keys returned), or undef if the authentication failed.
+
+## twitter\_user($c)
+
+Contains the user's twitter information after a successful twitter
+authentication via `authenticate_twitter()` or
+`authenticate()`. Useful if, for example, you want to create users
+on-the-fly:
+
+```perl
+sub twitter_callback :Path( 'twitter/callback' ) {
+    my ($self, $c) = @_;
+
+    my $twitter = $c->get_auth_realm('twitter')->credential;
+    my $user =  $twitter->authenticate( $c );
+
+    # properly authenticated against twitter,
+    # user just doesn't exist yet
+    if ( !$user and  $twitter->twitter_user($c) ) {
+        $user = $self->model->create_user( $twitter->twitter_user($c) );
+    }
+
+    # etc
+}
+```
+
+# SEE ALSO
+
+[Catalyst::Plugin::Authentication](https://metacpan.org/pod/Catalyst::Plugin::Authentication), [Net::Twitter](https://metacpan.org/pod/Net::Twitter)
+
+# BUGS AND LIMITATIONS
+
+`Catalyst::Authentication::Credential::Twitter` works well 
+with [Catalyst::Authentication::Store::DBIx::Class](https://metacpan.org/pod/Catalyst::Authentication::Store::DBIx::Class), but might 
+have problem with other stores, as its `authenticate()` method uses
+
+```perl
+$realm->find_user({
+    twitter_user_id => $authenticated_twitter_id
+}, $c);
+```
+
+to find the user. If this causes a problem for your store, 
+you can get around it by using `authenticate_twitter()` and
+accessing the store manually.
+
+Please report bugs to [http://rt.cpan.org/Ticket/Create.html?Queue=Catalyst-Authentication-Credential-Twitter](http://rt.cpan.org/Ticket/Create.html?Queue=Catalyst-Authentication-Credential-Twitter)
+
+# THANKS
+
+Thanks go out Daisuke Murase for writing C::P::A::Credential::Flickr,
+Marc Mims and Chris Thompson for Net::Twitter.
+
+# AUTHORS
+
+- Jesse Stay <jesse@staynalive.com>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jesse Stay.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

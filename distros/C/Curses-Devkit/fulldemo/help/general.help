@@ -1,0 +1,104 @@
+<C></U>Preamble:<!U>
+   The Cdk curses widget set was written by myself (Mike Glover). It started
+as a small pet project to test how compatible my new Linux box was to other
+flavours of Unix. As it turned out I discovered Ncurses, and played with 
+that a whole lot. This constant playing with Ncurses created what is 
+currently known as Cdk. Cdk has evolved many times since its first inception
+and has evolved to what you are currently looking at. One day I finally told 
+myself that the C version was 'done'. I quickly looked in other directions 
+for the Cdk widget set. One day I told myself:
+
+<C>"Cdk would be really cool if it was
+<C> interpreted instead of compiled! "
+
+Enter Mike's love of Perl. It finally dawned on me that I could extend Perl5
+to include the Cdk widget set. So I started to play with Perl5. The more I 
+played with Perl5, the more I really started to like the additions. I 
+finally read the manual pages on how to extend Perl5 to include other 
+libraries. As time passed I entrenched myself deeper into extending Perl5 to
+what I currently call the Cdk Perl5 extension. After about 2 months of work,
+Cdk was finally extended into Perl5.  (crowd cheers...)
+
+</R>Info:<!R>
+   I'm sure the first question being asked is, 'What does Cdk
+stand for?'. In response I say : (fanfare please)
+
+<C></B/U>Curses Development Kit<!B!U>
+
+There are currently 22 widgets available in Cdk, with more coming. What they 
+are and what they do is in the following table.
+
+<C><#UL><#HL(13)><#TT><#HL(51)><#UR>
+<C><#VL></R> Widget Name  <!R></U><#VL><!U></R>Purpose                                             <!R><#VL>
+<C><#VL>Alphalist     <#VL>Provides a list of words which the user can select  <#VL>
+<C><#VL>              <#VL>from. Allows you to narrow the seach by entering    <#VL>
+<C><#VL>              <#VL>a few initial characters of thw words being         <#VL>
+<C><#VL></U>              <#VL>sought after to narrow the search.                  <!U><#VL>
+<C><#VL></U>Buttonbox     <#VL>Creates a widget with numerous buttons.             <!U><#VL>
+<C><#VL></U>Calendar      <#VL>Creates a simple calendar widget.                   <!U><#VL>
+<C><#VL>Dialog        <#VL>Prompts the user with a message, and the user       <#VL>
+<C><#VL></U>              <#VL>can pick an answer from the buttons provided.       <!U><#VL>
+<C><#VL></U>Entry         <#VL>Allows the user to enter information.               <!U><#VL>
+<C><#VL>File Selector <#VL>A file selector built from Cdk base widgets.        <#VL>
+<C><#VL>              <#VL>This example shows how to create more complicated   <#VL>
+<C><#VL></U>              <#VL>widgets using the Cdk widget library.               <!U><#VL>
+<C><#VL></U>Graph         <#VL>Draws a graph.                                      <!U><#VL>
+<C><#VL></U>Histogram     <#VL>Draws a histogram.                                  <!U><#VL>
+<C><#VL>Item List     <#VL>Creates a pop up field which allows the user to     <#VL>
+<C><#VL>              <#VL>select one of several choices in a small field. Very<#VL>
+<C><#VL>              <#VL>useful for things like days of the week or month    <#VL>
+<C><#VL></U>              <#VL>names.                                              <!U><#VL>
+<C><#VL>Label         <#VL>Displays messages in a pop up box, or the label can <#VL>
+<C><#VL></U>              <#VL>be considered part of the screen.                   <!U><#VL>
+<C><#VL></U>Marquee       <#VL>Displays a message in a scrolling marquee.          <!U><#VL>
+<C><#VL></U>Matrix        <#VL>Creates a complex matrix with lots of options.      <!U><#VL>
+<C><#VL></U>Menu          <#VL>Creates a pull-down menu interface.                 <!U><#VL>
+<C><#VL>Multiple Line <#VL>A multiple line entry field. Very useful for long   <#VL>
+<C><#VL></U>Entry Field   <#VL>fields. (like a description field)                  <!U><#VL>
+<C><#VL></U>Radio List    <#VL>Creates a radio button list.                        <!U><#VL>
+<C><#VL>Scale         <#VL>Creates a numeric scale. Allows a user to pick a    <#VL>
+<C><#VL>              <#VL>numeric value and restrict them to a range of       <#VL>
+<C><#VL></U>              <#VL>values.                                             <!U><#VL>
+<C><#VL></U>Scrolling List<#VL>Creates a scrolling list/menu list.                 <!U><#VL>
+<C><#VL>Scrolling     <#VL>Creates a scrolling log file viewer. Can add        <#VL>
+<C><#VL>Window        <#VL>information into the window while its running.      <#VL>
+<C><#VL>              <#VL>A good widget for displaying the progress of        <#VL>
+<C><#VL></U>              <#VL>something. (akin to a console window)               <!U><#VL>
+<C><#VL></U>Selection List<#VL>Creates a multiple option selection list.           <!U><#VL>
+<C><#VL></U>Slider        <#VL>Akin to the Scale widget but provides a visual      <!U><#VL>
+<C><#VL></U>              <#VL>representation of the current numeric value.        <!U><#VL>
+<C><#VL>Template      <#VL>Creates a entry field with character sensitive      <#VL>
+<C><#VL>              <#VL>positions. Used for pre-formatted fields like dates <#VL>
+<C><#VL></U>              <#VL>and phone numbers.                                  <!U><#VL>
+<C><#VL>Viewer        <#VL>Creates an information viewer. You are currently    <#VL>
+<C><#VL>              <#VL>using the viewer by the way.                        <#VL>
+<C><#LL><#HL(13)><#BT><#HL(51)><#LR>
+
+Each help subsection outlines certain features of each widget. They are 
+broken up into the following sections:
+
+<B=*>Purpose
+<B=*>Construction Options
+<B=*>Available Methods
+<B=*>Key bindings
+<B=*>Tips & Tricks
+<B=*>Physical Restrictions
+<B=*>Example Use Of The Widget
+
+The documentation supplied with the demo is more than enough information
+to get any user off the ground and flying with the Cdk Perl5 extension.
+
+Have fun.
+
+Just in case, there is a subdirectory named examples which provides 
+individual examples of each Cdk widget.
+
+ttfn,
+     Mike
+
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995
+<C>Document Revised: January,  1996
+<C>Document Revised: June,     1996
+<C>Document Revised: April,    1997

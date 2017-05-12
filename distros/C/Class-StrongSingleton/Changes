@@ -1,0 +1,14 @@
+Revision history for Perl extension Class-StrongSingleton.
+
+0.02 Sun Feb 27 2005
+    - changed the _init method to _init_StrongSingleton
+      to help avoid possible name clashes/overridding
+        - added tests for this
+        - updated docs for this
+
+0.01 Thu Sep 30 2004
+    - module created from Singleton.pm
+		- tests added
+		- documentation written
+		- etc, etc.
+

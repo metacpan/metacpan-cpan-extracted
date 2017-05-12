@@ -1,0 +1,32 @@
+Revision history for Perl extension Catalyst::Plugin::Static.
+0.11  Sun Oct 18 19:11:00 2009
+        - Make tests pass again, clean up warnings with newer
+          Catalyst.
+        - Add clearer deprecation notice.
+0.10  Mon Nov 14 11:15:00 2005
+        - better fix for security issue.
+0.09  Mon Nov 14 09:33:00 2005
+        - Make sure ::Static can't serve files outside of $config->{root}
+0.08  Sun Apr 17 16:43:00 2005
+	    - Made pod tests succeed.
+0.07  Sun Apr 17 16:43:00 2005
+        - Updated tests for 5.0
+        - Fixed dependency
+        - Added CAVEATS
+0.06  Wed Mar 28 21:14:00 2005
+        - Changed to File::MimeInfo::Magic for greater justice
+          (and correct CSS/JS mimetypes)
+0.05  Wed Mar 23 07:00:00 2005
+        - Updated tests
+0.04  Thu Mar 17 05:55:00 2005
+        - Added finalize section to allow empty content for not-modified
+        - More tests (Christian Hansen <ch@ngmedia.com>)
+0.03  Thu Mar 17 01:47:00 2005
+        - Added Content_length/last_modified (Christian Hansen <ch@ngmedia.com>)
+        - Added modified-since check (Christian Hansen <ch@ngmedia.com>)
+        - http://home.ngmedia.net/chansen/catalyst/Catalyst-Plugin-Static.patch
+0.02  Sat Feb 19 20:00:00 2005
+        - override content/type
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

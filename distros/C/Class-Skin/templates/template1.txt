@@ -1,0 +1,53 @@
+<comment> this comment will not be shown in the final html </comment>
+<comment> the title will be in `title'</comment>
+*** $title ***
+
+Here two templates will be included:
+<comment> including template with its filepath </comment>
+<include src="template2.txt">
+
+<comment> 
+ including template that its path is in a variable called filepath </comment>
+<include src="$filepath">
+
+Here we will put some conditions:
+<if condition="condition1">
+ condition1 is true
+ <if condition="condition2">
+  condition2 is true (in condition1)
+ </if>
+ <if condition="condition3">
+  condition3 is true (in condition1)
+  <if condition="condition5">
+   condition5 is true (in condition3 that in condition1)
+  </if>
+  <else>
+   condition5 is false (in condition3 that in condition1)
+  </else>
+ </if>
+</if>
+<elsif condition="condition2">
+ condition2 is true
+</elsif>
+<if condition="condition4">
+ condition4 is true
+</if>
+<elsif condition="condition5">
+ condition5 is true
+</elsif>
+<elsif condition="condition6">
+ condition6 is true
+</elsif>
+<else>
+ condition5,4,6 are false
+</else>
+
+Here we will put a table where the rows are in a while loop.
+Note that we use $a here, but $a is not defined in the calling script, so
+it stays $a. Only in the last loop of the while we will define $a.
+<while condition="func">
+$i: $a <if condition="condition7"> condition7 is true inside the while loop. </if><else> condition7 is false inside the while loop. </else>
+</while>
+
+
+

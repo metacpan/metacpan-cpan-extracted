@@ -1,0 +1,54 @@
+Revision history for CGI-Untaint-Facebook
+
+0.13	Wed Nov  4 11:05:49 EST 2015
+	More helpful message on redirect
+
+0.12	Sun Aug 16 20:30:31 EDT 2015
+	Someone has taken the xyzzy page
+
+0.11	Sat 25 Jan 15:02:24 EST 2014
+	Deal with 301 and 302 from Facebook
+	Bumped minimum version of Net::SSLeay that's needed to connect to
+		facebook.com
+
+0.10	Tue 11 Jun 08:23:16 EST 2013
+	Derive the name of the browser from the class name rather than
+		hard-coded
+	Use Test::Most
+	Allow m.facebook.com to be entered
+	Allow CGI arguments
+
+0.09	Fri Mar 29 09:54:51 EDT 2013
+	Give error message if the URL lookup fails with anything other than
+		404.  This is most useful in giving certifcate fail messages
+	Allow the field to start with www.facebook.com - no leaading http
+
+0.08	Tue Jan 15 21:00:58 EST 2013
+	Makefile.PL - check for https not http
+	Set minimum version of LWP::Protocol::https to 6.03
+
+0.07	Sat Jan 12 08:13:04 EST 2013
+	Replaced t/unused.t with t/vars.t
+
+0.06	Sat Dec 29 09:43:50 EST 2012
+	Fail to install if there is no connexion to the Internet
+	Added explicit use LWP::Protocol::https, that's needed on some systems
+	Honour http_proxy
+	Added t/strict.t
+
+0.05	Tue Dec 18 20:48:42 EST 2012
+	Added t/taint.t
+	Ensured return value isn't tainted
+
+0.04	Sat Dec 15 11:30:33 EST 2012
+	Added tests to t/facebook.t
+	Added dependancy on LWP::Protocol::https
+
+0.03	Thu Dec 13 11:24:07 EST 2012
+	Validate hostname using Mozilla::CA
+
+0.02	Thu Dec 13 10:26:35 EST 2012
+	Validate IDs as well as URLs
+
+0.01	Thu Dec 13 09:42:25 EST 2012
+        First draft

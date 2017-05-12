@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Class/DBI/Plugin/DateTime.pm
+lib/Class/DBI/Plugin/DateTime/Base.pm
+lib/Class/DBI/Plugin/DateTime/MySQL.pm
+lib/Class/DBI/Plugin/DateTime/Pg.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-sanity.t
+t/02-pg-basic.t
+t/03-pg-explicit.t
+t/04-pg-auto.t
+t/05-mysql-basic.t
+t/06-mysql-explicit.t
+t/07-mysql-auto.t
+t/99-pod-coverage.t
+t/99-pod.t

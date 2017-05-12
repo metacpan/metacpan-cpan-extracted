@@ -1,0 +1,7 @@
+\.swp\z
+.git/
+blib
+pm_to_blib
+MANIFEST.bak
+Makefile\z
+Makefile.old\z

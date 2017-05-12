@@ -1,0 +1,8 @@
+CDDB::Fake Version 2.0
+======================
+
+ * Added extended info for tracks.
+
+ * Tracks and disc extended info can contain \n sequences.
+
+ * Added 'as_cddb' method.

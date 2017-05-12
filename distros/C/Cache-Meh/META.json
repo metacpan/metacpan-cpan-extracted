@@ -1,0 +1,55 @@
+{
+   "abstract" : "A cache of indifferent quality",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Meh",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Storable" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Cache-Meh@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Cache-Meh"
+      },
+      "homepage" : "https://metacpan.org/dist/Cache-Meh",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/Cache-Meh.git",
+         "web" : "https://github.com/mrallen1/Cache-Meh"
+      }
+   },
+   "version" : "0.04"
+}
+

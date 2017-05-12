@@ -1,0 +1,72 @@
+NAME
+    Class::Value::SemanticAdapter - Adapter for Data::Semantic objects
+
+VERSION
+    version 1.100841
+
+DESCRIPTION
+    This class is an adapter, a wrapper, that turns Data::Semantic objects
+    into Class::Value objects.
+
+METHODS
+  semantic_class_name
+    Returns the corresponding semantic class name. This method provides a
+    default mapping, the idea of which is to mirror the layout of the
+    Data::Semantic class tree. If you have a different mapping, override
+    this method in a subclass.
+
+    So in the Class::Value::URI::http class, it will return
+    "Data::Semantic::URI::http".
+
+  adaptee
+    Takes the results of "semantic_class_name()" and "semantic_args()",
+    loads the semantic data class and returns a semantic data object with
+    the given args passed to its constructor.
+
+  semantic_args
+    Return those of the value object's attributes, in hash format, that are
+    relevant to the semantic data object constructor.
+
+  is_valid_value
+    Like the same method in Class::Value, but forwards the question to the
+    adapted data semantic object.
+
+  normalize_value
+    Like the same method in Class::Value, but forwards the question to the
+    adapted data semantic object.
+
+  is_valid_normalized_value
+    Like the same method in Class::Value, but forwards the question to the
+    adapted data semantic object.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Value-SemanticAd
+    apter>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Class-Value-SemanticAdapter/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Class-Value-SemanticAdapter/>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

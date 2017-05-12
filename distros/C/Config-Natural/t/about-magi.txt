@@ -1,0 +1,20 @@
+include nerv
+
+about_magi_1 = -
+  As Ritsuko explains, MAGI is a system made by the interconnection of 
+  three genetic supercomputers. They are partially biologic and have a 
+  genetically created brain. The theory was conceived by her mother, 
+  who also created MAGI. She implanted parts of her own personality in 
+  each components of MAGI. The first is named ${magi/brain[0]/name} and has the 
+  personality of her as a ${magi/brain[0]/personality}. The second, named ${magi/brain[1]/name}, is 
+  her as a ${magi/brain[1]/personality}. Finally, ${magi/brain[2]/name}, the third, is her as a ${magi/brain[2]/personality}. 
+.
+
+about_magi_2 = -
+  As Ritsuko explains, MAGI is a system made by the interconnection of 
+  three genetic supercomputers. They are partially biologic and have a 
+  genetically created brain. The theory was conceived by her mother, 
+  who also created MAGI. She implanted parts of her own personality in 
+  each components of MAGI. $magi::brain[0]::name has the personality of her as a 
+  $magi::brain[0]::personality . $magi::brain[1]::name is her as a $magi::brain[1]::personality and $magi::brain[2]::name her as a $magi::brain[2]::personality . 
+.

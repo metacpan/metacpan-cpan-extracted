@@ -1,0 +1,117 @@
+[%
+   title="Frequently asked questions"
+   description=""
+%]
+[% INCLUDE incl/header.tt %]
+
+It is hard to write a FAQ before the web site is launched.
+<div id="faq_index">
+<ul>
+<li><a href="#what_is_cpan_digger">What is CPAN Digger?</a></li>
+<li><a href="#search_types">What search types are available?</a></li>
+<li><a href="#the_source_code_of_cpan_digger">Where is the source code of CPAN Digger?</a></li>
+<li><a href="#meta_yaml">What is META.yml and why is it missing?</a></li>
+<li><a href="#meta_license">Why is the license missing?</a></li>
+<li><a href="#examples">Examples not found?</a></li>
+<li><a href="#other_search_engines">Other search engines for CPAN?</a></li>
+<li><a href="#author_json">What is author.json </a></li>
+</ul>
+</div>
+
+<div id="faq">
+<ul>
+<li><a name="what_is_cpan_digger"></a><b>What is CPAN Digger?</b><br>
+CPAN Digger is a place to find and analyze information about CPAN modules, distributions and authors. Some of the features:
+<ul>
+  <li>/dist/Distribution-Name (including links to the examples)</li>
+  <li>/m/Module::Name</li>
+  <li>Authors: /id/PAUSEID</li>
+  <li>We parse the 00whois.xml file.</li>
+  <li>The author.json file is (partially) inculded in the author page at /id/PAUSEID</li>
+  <li>Plan: Fetch the avatars and display them.</li>
+  <li><b>Syntax highlighted source code</b>. Each module is sent through a PPI based syntax highlighter.
+      See the "syn" links on the module pages. The syntax highlighted code sould provide 
+      easy navigation in the source code. Just as an <a href="http://padre.perlide.org/">IDE</a> would...
+      </li>
+  <li><b>Minimum Required perl version</b>
+      For each module we check the mimimum required version using 
+      <a href="/dist/Perl-MinimumVersion">Perl::MinimumVersion</a> of modules and setting 
+      minimum version of package. We also collect the version markers in the version.txt file 
+      of each distribution. See them linked from the /dist pages.</li>
+  <li><b>Perl::Critic</b><br> Each module is processed by <a href="/dist/Perl-Critic">Perl::Critic</a> at level 4. The results are currently 
+      collected and saved in the critic.txt file of each distribution. See the /dist/Distro-Name page for a link.
+      <br>
+      It is done mostly to promote the use of Perl::Critic.
+      <br>
+      In the future the processing will be fine tuned and the results will be linked the 
+      syntax highlighted source code.
+      </li>
+  <li>Planned: <b>Needs compiler?</b> The parser will try to guess if the distribution only contains Perl code
+      or if there is a need for a compiler. <a href="https://github.com/szabgab/CPAN-Digger/issues/17">issue 17</a>
+  </li>
+  <li>Planned dependency analysis:<br>
+     Licenses of all the dependencies: <a href="https://github.com/szabgab/CPAN-Digger/issues/15">issue 15</a>
+  <li>
+</ul>
+</li>
+
+<li><a name="search_types"></a><b>What search types are available?</b><br>
+The Digger is primarily NOT a search engine. It provides 3 search types: 
+<ul>
+  <li>All: a generic search that is not particularily strong. Yet<br />
+      It currently tries to match a Module::Name. If it does not match then it falls back to the Distribution mode:
+      </li>
+  <li>Distribution: expects strings like some-distro and tries to find a CPAN distribution that contains some-distro in its name</li>
+  <li>Author: tries to match the PAUSEID of an author</li>
+</ul>
+</li>
+
+<li><a name="the_source_code_of_cpan_digger"></a><b>Where is the source code of CPAN Digger?</b><br>
+It is on Github. Go <a href="http://github.com/szabgab/CPAN-Digger">fork it</a>.
+</li>
+
+<li><a name="meta_yaml"></a><b>What is META.yml and why is it missing?</b><br>
+The META.yml file needs to be supplied by the developer of the module as part of the distribution. 
+Modern tool will be able to automatically generate it when packaging the distribution. (TODO: describe how or link to article)
+</li>
+
+<li><a name="meta_license"></a><b>Why is the license missing?</b><br>
+The META.yml file can optionally contain a license field. Older distributions don't have META.yml file 
+or don't have this field yet. Newer distributions can make sure that the license field in the META.yml 
+file is included. (TODO: describe or link to how.)
+</li>
+
+<li><a name="examples"></a><b>Examples not found?</b><br>
+Some CPAN distributions add examples for usage in the eg/ or examples/ directory in the distribution.
+Apparently you just looked at a package that does not have either of those directories.
+</li>
+
+<li><a name="other_search_engines"></a><b>Other search engines for CPAN?</b><br>
+There are several search engines and helper sites for CPAN:
+<a href="http://search.cpan.org/">search.cpan.org</a> by Graham Bar<br>
+<a href="http://kobesearch.cpan.org/">Kobesearch</a> by Randy Kobes<br>
+<a href="http://search.metacpan.org/">MetaCPAN</a> by Olaf Alders<br>
+<a href="http://frepan.org/">Frepan</a> by Tokuhiro Matsuno<br>
+<a href="http://grep.cpan.me/">grep.cpan.me</a> by David Leadbeater<br>
+
+<a href="https://rt.cpan.org/">Request Tracker for CPAN</a><br>
+<a href="http://www.cpantesters.org/">CPAN Testers</a><br>
+<a href="http://deps.cpantesters.org/">Dependencies and test</a><br>
+<a href="http://cpanratings.perl.org/">CPAN Ratings</a><br>
+<a href="http://www.annocpan.org/">AnnoCPAN</a><br>
+<a href="http://p3rl.org/">p3rl.org</a><br>
+<a href="http://www.cpanforum.com/">CPAN::Forum</a><br>
+<a href="http://cpants.perl.org/">CPANTS</a><br> 
+
+There is also a separate web site to look up the core Perl documentation at 
+<a href="http://perldoc.perl.org/">perldoc.perl.org</a> by Jon Allen.
+</li>
+
+<li><a name="author_json"></a><b>What is author.json?</b><br>
+See <a href="http://blogs.perl.org/users/olaf_alders/2010/12/expanding-your-author-info-in-the-metacpan.html">Expanding Your Author Info in the MetaCPAN</a>
+and see instructions <a href="https://github.com/CPAN-API/cpan-api/wiki/How-to-upload-author-meta-data">how to upload</a> your author meta data.
+</li>
+
+</ul>
+</div>
+[% INCLUDE incl/footer.tt %]

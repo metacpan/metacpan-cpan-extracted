@@ -1,0 +1,5 @@
+^dev.bat
+^codestat.kpf
+^Code-Statistics-.*
+^codestat.out
+^dist.ini

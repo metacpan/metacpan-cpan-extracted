@@ -1,0 +1,238 @@
+==================================================
+Changes from 2012-04-13 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.86 at 2017-04-12 11:32:06 +0000
+-----------------------------------------
+
+  Change: 62e668ec919f17101486d83ff968e7cb9af198d0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-04-12 12:32:06 +0000
+
+    Use Autoflush if CPANPLUS is a suitable version
+
+    Also realised that the compilation tests weren't being run because
+    M::B since 0.36 has always had C_support. Fixed that too. 
+
+-----------------------------------------
+version 0.84 at 2017-04-07 20:39:25 +0000
+-----------------------------------------
+
+  Change: ca0adc5f8b84ddb1992c2aecdcfdfff56db4018d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-04-07 21:39:25 +0000
+
+    Switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 0.82 at 2017-02-16 12:30:35 +0000
+-----------------------------------------
+
+  Change: ac694271a5be511d3278c4af60ad97048523ba49
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-16 12:30:35 +0000
+
+    Release engineering for 0.82 
+
+  Change: 64dbc5c083c6a07bb9402daaf135893f0b3f1f0f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-13 14:03:16 +0000
+
+    Set env var PERL_USE_UNSAFE_INC if required
+
+    [rt.cpan.org #120227] 
+
+-----------------------------------------
+version 0.80 at 2016-06-05 12:46:14 +0000
+-----------------------------------------
+
+  Change: e8ad0a7ebfb3bfcb59912ec06525257a1353498d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-06-05 13:46:14 +0000
+
+    Include test_requires when falling back on old shizz 
+
+-----------------------------------------
+version 0.78 at 2014-06-11 17:08:00 +0000
+-----------------------------------------
+
+  Change: a0a9bb963612d388f910ffee7515f9597c87a749
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-06-11 18:08:00 +0000
+
+    Shield tests from PERL_INSTALL_QUIET env var 
+
+-----------------------------------------
+version 0.76 at 2014-01-08 08:47:19 +0000
+-----------------------------------------
+
+  Change: 5d7aa070927e2417cabf5ccbd94ae99ffa4a3e49
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-01-08 08:47:19 +0000
+
+    Release engineering for 0.76 
+
+  Change: f52daeda1e36f88f4e2bf47da821d421f2c1776e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-01-08 08:45:33 +0000
+
+    Don't send test reports during prepare() phase 
+
+-----------------------------------------
+version 0.74 at 2013-08-06 19:53:37 +0000
+-----------------------------------------
+
+  Change: 1d05112a458c2bd82c36b2110c4573cdbae9990e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-06 20:53:37 +0000
+
+    Remove Module::Pluggable prereq 
+
+  Change: 14dcae8692cfd2072fde47449a67dbcbd44bafbf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-21 16:25:19 +0000
+
+    Update Changes and bump to version 0.72 
+
+  Change: 6396a7bbc27321f1feb2194d968709b93cb127ae
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-21 16:25:18 +0000
+
+    Actually resolve issue where Build.PL does not generate Build script 
+
+  Change: 0cb493116a1cd338207e6ebe461cb4d64269b4b5
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-20 11:30:38 +0000
+
+    Merge pull request #1 from dsteinbrunner/patch-1
+
+    typo fix 
+
+  Change: 275b48eb1a0608a120922d7d152bf8d0d2915e28
+  Author: David Steinbrunner <dsteinbrunner@pobox.com>
+  Date : 2013-05-19 13:09:10 +0000
+
+    typo fix 
+
+-----------------------------------------
+version 0.72 at 2013-07-21 15:22:42 +0000
+-----------------------------------------
+
+  Change: 49afc65c472f51cd53c4f9d86693923a02ce38d4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-21 16:22:42 +0000
+
+    Update Changes and bump to version 0.72 
+
+  Change: 85ec1923b10a98bda4737dc51c6adf7565ab543f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-21 16:20:53 +0000
+
+    Actually resolve issue where Build.PL does not generate Build script 
+
+  Change: 8035fa59594f897c99a74c767e5f38a0546d7bcd
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-03-31 12:18:24 +0000
+
+    svn.perl.org is being retired. Switch over to git and github. 
+
+-----------------------------------------
+version 0.70 at 2013-01-25 16:09:36 +0000
+-----------------------------------------
+
+  Change: 651cebdfb842548594bc5b18d28da5f479c99de3
+  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
+  Date : 2013-01-25 16:09:36 +0000
+
+    CPAN release 0.70
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.70@15567
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+  Change: 40e0ac09bb4f7152edf64f697c9cc02e088aadbc
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-25 16:03:17 +0000
+
+    Core deprecation warnings added, prior to de-coring with v5.20.0
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15566
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+-----------------------------------------
+version 0.68 at 2012-12-05 00:19:04 +0000
+-----------------------------------------
+
+  Change: b1941dee38917a0e1174830a50707996a173aa9e
+  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
+  Date : 2012-12-05 00:19:04 +0000
+
+    CPAN release 0.68
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.68@15496
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+  Change: 89300ed43246d33eb33885d089cc162cf6770c8d
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2012-12-05 00:18:30 +0000
+
+    Revert change to wrapper command-line
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15495
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+-----------------------------------------
+version 0.66 at 2012-12-04 23:12:59 +0000
+-----------------------------------------
+
+  Change: 12975d87a8d5438130c682fe57a0b04fb3093303
+  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
+  Date : 2012-12-04 23:12:59 +0000
+
+    CPAN release 0.66
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.66@15494
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+  Change: 99eb62806d6ff5e0d2ea9e7e15546fe961282fdd
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2012-12-04 23:10:45 +0000
+
+    Resolve issue where Build.PL does not generate Build script
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15493
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+-----------------------------------------
+version 0.64 at 2012-10-20 22:28:51 +0000
+-----------------------------------------
+
+  Change: 6cdee172f685bd9a55f842b407febb005cdce644
+  Author: BINGOS <BINGOS@50811bd7-b8ce-0310-adc1-d9db26280581>
+  Date : 2012-10-20 22:28:51 +0000
+
+    CPAN release 0.64
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/tags/0.64@15446
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+  Change: 5c42eccaa68b574298b3b3a52b15d9ee957e7d8f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2012-10-20 22:27:00 +0000
+
+    Update Module::Install, no functional changes.
+
+    git-svn-id:
+    https://svn.perl.org/modules/CPANPLUS-Dist-Build/trunk@15445
+    50811bd7-b8ce-0310-adc1-d9db26280581 
+
+=================================================
+Plus 27 releases after 2012-04-13 00:00:00 +0000.
+=================================================

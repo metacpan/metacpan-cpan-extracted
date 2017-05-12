@@ -1,0 +1,41 @@
+---
+abstract: 'Parallel SSH client'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  File::HomeDir: '0.91'
+  File::HomeDir::Test: '0'
+  Module::Build: '0.28'
+  Test::Exit: '0.11'
+  Test::More: '0.94'
+  Test::Script: '0'
+  Test::Warn: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clustericious-Admin
+recommends:
+  EV: '0'
+requires:
+  AE: '0'
+  AnyEvent::Open3::Simple: '0.76'
+  Clustericious::Config: '1.03'
+  EV: '0'
+  File::chdir: '0'
+  Path::Class: '0.26'
+  YAML::XS: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/clustericious/App-clad/issues
+  homepage: https://metacpan.org/pod/App::clad
+  repository: git://github.com/clustericious/App-clad.git
+version: '1.09'
+x_serialization_backend: 'YAML::Tiny version 1.70'

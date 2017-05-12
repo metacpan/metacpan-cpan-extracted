@@ -1,0 +1,366 @@
+Revision history for CGI-Buffer
+
+0.79	Fri Jan  6 11:17:01 EST 2017
+	Fix Brotli tests which failed in some places
+	Improved handling of HTTP status
+	Put different languages in different caches
+
+0.78	Mon Oct 10 09:35:18 EDT 2016
+	Print stack trace when calling init too late
+	Support Brotli
+	Honour the order of HTTP_ACCEPT_ENCODING
+
+0.77	Sat Feb 27 11:55:55 EST 2016
+	Fix RT112029
+	Call the right routine
+
+0.76	Sun Feb 14 19:10:51 EST 2016
+	generate_key - honour the vary header
+	Fix problem were server side cached contents weren't compressed when
+		loading the content from the cache
+	If you give a cache to init() then later give cache => undef,
+		the server side cache is no longer used.
+
+0.75	Sun May 17 09:00:46 EDT 2015
+	Added X-Cache and X-Cache-Lookup headers
+	Fixed overly agressive optimisation
+	Don't use the cache if the client sends max-age=0
+	Added cache_age option to init()
+	Fix set_options when given a ref
+	Fix RT102226
+	Improved handling of Wide characters
+
+0.74	Sat Jan 24 10:47:50 EST 2015
+	Added t/strict.t, t_unused.t and t/used.t
+	When a script has been updated clear all the cache
+	Added can_cache()
+
+0.73	Fri Nov  7 16:48:40 EST 2014
+	It's is_search_engine, not is_search!
+	Fix missing encoding_utf8
+
+0.72	Fri Nov  7 11:03:55 EST 2014
+	Added the info option to init
+	Removed some unused modules, and defer loading others
+	Removed Exporter and use vars, use our instead
+	Separate the web and mobile caches
+
+0.71	Wed Apr  2 16:50:48 EDT 2014
+	Speed optimisation with some output
+
+0.70	Fri 13 Dec 10:24:45 EST 2013
+	Loop optimisation until complete for even smaller output
+	Use Test::Tempdir to create the temporary files when testing
+	# Use RegExp::List to consolidate some scans of the output
+	Ensure logger isn't called after it's been destroyed since that
+		would cause Log4Perl to say it hasn't been initialised
+	Use $cobject->value() rather than $cache->get() to see if the
+		object data is there as well. There were some false
+		negatives
+	Accept HTTP_TE as well as HTTP_ACCEPT_ENCODING
+	Output parsing improvements courtesy of Regexp::List
+	Use Test::Most instead of Test::More
+	Support HTTP_RANGE as well as Range
+	Added more JavaScript optimisations when optimise_level >= 2
+
+0.69	Tue Apr  2 14:59:59 EDT 2013
+	Bumped minimum version of CGI::Info, needed for Cygwin
+	t/output.t: try harder to ensure the "to be tested" version of
+		CGI::Buffer is tested
+	Minor speed improvements
+	_check_modified_since, fix in 0.68 was broken
+
+0.68	Sat Feb  2 12:13:03 EST 2013
+	Handle situation where not modified but Etag is different would
+		generate 304
+	Added generate_304 option (defaults to 1)
+	Handle situation where IF_MODIFIED_SINCE isn't a valid date
+	On some platforms (e.g. Cygwin) t/is_cached is failing, so
+		added debugging to find out why
+
+0.67	Sun Oct 21 23:00:13 EDT 2012
+	Remove spaces after <body>.
+	Fix removal of spaces between </head> and <body>.
+	Better handling of no body, e.g. when redirecting using Location
+
+0.66	Thu Oct 11 12:11:11 EDT 2012
+	Add sanity check.
+	Only add Last-Modified when statis is 200
+	Don't get the object from the cache twice
+
+0.65	Sat Sep 29 14:05:17 EDT 2012
+	General tidy up and minor speed improvements
+	Improved handling of cache errors
+
+0.64	Mon Sep 24 17:08:15 EDT 2012
+	Only store in the cache when status is 200
+
+0.63	Sat Sep 22 18:45:27 EDT 2012
+	Fixed t/is_cached.t for systems without CHI
+	Sometimes 304 was not generated for when giving IF_MODIFIED_SINCE in
+		scenarios were it could have been
+	Amalgameted that 3 separate caches into one cache.
+	Minor speed improvements
+
+0.62	Wed Sep 19 10:09:53 BST 2012
+	Added resilience to is_cached in case the age of the script can't be
+		determined.
+	Removed logger calls from END, since it'll have gone by then
+	is_cached now returns false unless both body and headers can be found
+
+0.61	Sat Sep 15 17:57:03 BST 2012
+	Fixed typo in subroutine name
+
+0.60	Fri Sep 14 08:44:00 BST 2012
+	Removed superflouous whitespace around the top of the document and
+		in lists
+	Added t/unused.t
+	Remove spaces after <div>
+	Remove spaces before </div>
+	Simplified the cache key
+	If the script has been modified since the value in IF_MODIFIED_SINCE
+		don't return 304, since the output may have been changed
+	If the script has been modified since the time it was stored in the cache
+		don't return true from is_cached()
+	Use the cookies to ensure that different states of the client are stored
+		in different entries in the cache
+
+0.59	Wed Aug  8 10:00:00 BST 2012
+	t/is_cached: fix tests on systems without CHI
+
+0.58	Tue Aug  7 12:40:03 BST 2012
+	Improve the new-line handling between header fields
+	Replaces stats_file option with logger
+	Fix putting Content-Length in twice when cache is given
+	Optimise <hr> tags
+	Remove more redundant whitespace around hrefs
+	Test::Kwalitee isn't needed for build, only for optional testing
+	Only get the etag value from the cache when needed
+
+0.57	Tue Jul 24 13:51:43 BST 2012
+	Use get() rather than is_valid()
+	If get on the body fails, remove the corresponding headers from the
+		cache
+
+0.56	Tue Jul 24 13:45:57 BST 2012
+	Always store the unzipped body in the cache.  It uses more disc
+		space, but makes the code much simpler and more robust
+
+0.55	Mon Jul 23 12:14:34 BST 2012
+	Only store a response in the cache when HTTP status is 200
+	Ensure that the headers are in the cache as well as the body
+		before deciding to send the server's cached response
+
+0.54	Thu Jul 19 13:53:58 BST 2012
+	lint_content is now off by default
+
+0.53	Wed Jul 18 10:57:50 BST 2012
+	Added support for lint_content to put output through HTML::Lint
+
+0.52	Fri Jul 13 09:27:43 BST 2012
+	Don't create cache entry for empty headers
+	src/testit: check etag and last-modifed don't return 304 when the
+		content has changed
+
+0.51	Thu Jul 12 11:20:19 BST 2012
+	Store the etag value in the cache to ensure correctness
+	Added src/testit to check etag and last-modified HTTP headers
+
+0.50	Tue Jul 10 19:28:36 BST 2012
+	Fixed use of an uninitialised variable
+	Don't set 304 if status != 200
+
+0.49	Sun Jun 17 22:57:52 EDT 2012
+	Made the stats_file more readable
+	Fixed IF_MODIFIED_SINCE which was often not working
+
+0.48	Sun Jun 17 08:48:25 EDT 2012
+	Added stats_file option
+
+0.47	Fri Jun 15 12:56:57 EDT 2012
+	Fix bug where 307 wasn't sent if the first request set encoding to gzip
+		and subsequent check didn't
+
+0.46	Sat Jun  2 14:02:39 EDT 2012
+	304 can be sent irrespective of the value of gzip - so check
+		for both in the cache
+
+0.45	Tue May 29 12:19:41 EDT 2012
+	Honour Cache-Control: private
+	Look at If-Modified-Since before If-None-Match to reduce etag
+		calculations
+	Unlikely possibility: if cached headers have an etag that matches our
+		body but we somehow missed that, then send 304
+
+0.44	Mon May 28 10:39:57 EDT 2012
+	Corrected logic error
+
+0.43	Mon May 28 00:31:40 EDT 2012
+	Generate Last-Modified header when possible
+
+0.42	Sat May 26 15:31:54 EDT 2012
+	Tightned tests for Content-Length
+	Send 304 if object in cache is newer than IF_MODIFIED_SINCE
+
+0.41	Mon May 14 12:30:32 EDT 2012
+	Allow options to be given in the 'use' call
+
+0.40	Tue May  1 20:58:23 BST 2012
+	Check gzip is valid
+	Avoid 'Wide character in memGzip'
+	Renamed set_options to init, but kept set_options as a synonym for
+		legacy apps
+	Allow a reference to be passed to init
+
+0.39	Fri Apr 20 09:04:51 BST 2012
+	Avoid "Wide character in subroutine entry" when generating ETags
+	Remove warning on perl5.15.9
+	Added tests that If-None-Match can generate 304 return status
+
+0.38	Wed Apr 18 11:32:31 BST 2012
+	Only do kwalitee test in author environment because it throws too
+		many false positives
+	Remove blank spaces between table cells
+
+0.37
+	Turned JavaScript optimisation off for optimise_content level 1.
+
+0.36	Sat Mar 17 16:47:25 EDT 2012
+	Drop use of HTML Clean until RT402 is fixed.
+
+0.35	Thu Mar  8 10:07:35 EST 2012
+	Include JavaScript::Packer as a prerequisite
+	Bump minimum required HTML::Packer in an attempt to fix
+		http://www.cpantesters.org/cpan/report/b077836c-688d-11e1-b4da-8ac6d9130bc2
+	Added aggressive optimisation for document.write and t/js.t
+
+0.34	Wed Mar  7 15:51:08 EST 2012
+	Bump minimum required HTML::Clean in an attempt to fix
+		http://www.cpantesters.org/cpan/report/40d9566e-6673-11e1-a50d-8482959b33a2
+	Introduce optimise_content levels, 0 = OFF, 1 = normal, 2 = aggressive (may fail)
+
+0.33	Mon Feb 27 11:42:45 EST 2012
+	Fix occasional unitialised value
+	Various performance enhancements
+	Use Digest::MD5 instead of MD5
+
+0.32	Sat Feb 25 16:53:39 EST 2012
+	Call the correct Perl in t/output.t - RT75309.  Thanks to ANDK@cpan.org
+
+0.31	Mon Feb 20 11:30:29 EST 2012
+	Handle Range header
+	Fixed t/output.t to look in PERL5LIB for locally installed modules
+
+0.30	Sat Feb 18 12:37:29 EST 2012
+	Don't gzip if the output is < MIN_GZIP_LEN
+	Honour cache-control HTTP header
+
+0.29
+	Added tests to t/output.t to verify that Content-Length is correct
+	Don't tell HTML::Packer to remove newlines.
+
+0.28	Sun Jan 29 12:33:55 GMT 2012
+	Fixed test count in t/output.t
+
+0.27	Sat Jan 28 11:04:32 GMT 2012
+	Use the domain name as part of the key, so that if two scripts of
+		the same name are used in different hosts, ensure that they
+		are kept separate
+	Remove use of JavaScript::Packer.  It produces JavaScript that doesn't
+		work - I don't know what's wrong.
+	Fix bug removing our own name in links to our own domain
+
+0.26	Fri Jan 27 11:07:13 GMT 2012
+	Added t/output.t
+	Use shrink not best in JavaScript::Packer
+	Only import HTML::Clean and HTML::Packer if they are going to be used.
+
+0.25	Wed Jan 25 10:40:25 GMT 2012
+	Fixed the way HTML::Packer was called
+
+0.24	Tue Jan 24 21:59:00 GMT 2012
+	Include HTML::Packer. Eventually I will probably drop HTML::Clean,
+		so I'm testing HTML::Packer.  HTML::Clean doesn't seem to
+		be supported any more
+
+0.23
+	Improved header handling when caching few headers
+
+0.22	Fri Jan  6 20:58:43 EST 2012
+	Ensure that two newlines are appended when doing redirects
+	If CHI isn't installed, get the count right in t/too_late.t
+
+0.21
+	Fixed spelling mistakes in the documentation
+	More optimise content at end of paragraphs and hyperlinks
+
+0.20	Tue Nov  1 13:48:55 EDT 2011
+	More server side cache fixes
+
+0.19	Mon Oct 31 22:52:01 EDT 2011
+	Send 304 if server cache matches client's HTTP_IF_NONE_MATCH
+
+0.18	Mon Oct 31 17:41:48 EDT 2011
+	Small optimisations
+	Fix is_cache handling of gzipped content_encoding
+
+0.17	Mon Oct 31 16:09:09 EDT 2011
+	Fix bug in X-CGI-Buffer header
+	Carp if you're trying to set an unsafe option after output has been
+		generated
+
+0.16	Mon Oct 24 09:54:09 EDT 2011
+	Improved client side caching
+
+0.15	Sat Sep 24 16:08:32 EDT 2011
+	Improved error handling
+
+0.14	Mon Sep 19 14:54:10 EDT 2011
+	Another attempt at fiximg HEAD requests
+
+0.13	Mon Sep 12 14:17:55 EDT 2011
+	Fixed the call to "new HTML::Clean"
+
+0.12	Tue Sep  6 14:55:17 EDT 2011
+	Improved handling of HEAD
+	Added t/is_cached.t
+	Use HTML::Clean
+
+0.11	Thu Aug 18 16:10:27 EDT 2011
+	Optimise table rows
+	Added t/critit.t
+
+0.10	Wed Aug 10 13:31:46 EDT 2011
+	Optimise HEAD handling
+
+0.09	Tue Aug  2 11:58:47 EDT 2011
+	Fix problem with HEAD which meant that the headers weren't being sent
+	optimise_content: Add optimisations for <br> and <div>
+
+0.08	Mon Aug  1 10:57:32 EDT 2011
+	Ensure that the correct encoding mechanism is passed to the client
+
+0.07	Sun Jul 31 20:06:52 EDT 2011
+	Fixed compilation error
+
+0.06	Fri Jul 29 18:04:56 EDT 2011
+	Added cache_key option
+	Fixed problem with cache delivering gzipped version to non gzip
+		aware browsers
+
+0.05	Wed Jul 27 23:07:50 EDT 2011
+	Fix the documentation
+	Fix calls to is_cached() when there is no cache
+	Added new optimise_content
+
+0.04	Wed Jul 27 10:19:41 EDT 2011
+	Fixed over zealous optimise_content
+
+0.03	Mon Jul 25 16:38:00 EDT 2011
+	Improvements to optimise_content
+
+0.02	Sun Jul 24 20:18:15 EDT 2011
+	If protocol isn't known, assume http
+
+0.01    Fri Jul 22 13:09:17 EDT 2011
+	First draft

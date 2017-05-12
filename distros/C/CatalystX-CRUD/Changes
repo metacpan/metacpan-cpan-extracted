@@ -1,0 +1,299 @@
+Revision history for CatalystX-CRUD
+
+0.57 07 Dec 2015
+ - failure to load object now returns 404 rather than throwing a 500.
+
+0.56 28 Feb 2014
+ - remove : character from rxOp param in internal Search::QueryParser::SQL
+   constructor. This allows for finding url values like http://foo/bar
+   which previously would be parsed as http=//foo/bar
+ - add 'use_lower' feature to Module::Utils to support Search::QueryParser::SQL
+   version 0.010.
+
+0.55 28 Jan 2013
+ - add Iterator->serialize() method.
+
+0.54 5 Nov 2012
+ - add Results->serialize() method
+ - refactor some Controller methods into a Role class
+ - Model::File->fetch() now returns undef if file does not exist. Add
+   Model::File->prep_new_object().
+ - add new required method to Object class: is_new()
+ - add Model->put_related method
+
+0.53 31 Oct 2012
+ - add list_related and view_related primarily for REST support
+
+0.52 13 July 2011
+ - doc fix in Tutorial via RT#68499
+ - tests fixed for RT#68779
+
+0.51 19 May 2010
+ - added use_request_uri_for_path to test MyApp to fix	test failures with
+   Catalyst::Runtime 5.80024
+
+0.50 13 May 2010
+ - fix make_primary_key_string() to get rid of bad sprintf() call
+
+0.49 11 April 2010
+ - uri_for_view_on_single_result() will return uri for 'view' action,
+   regardless of value of can_write().
+
+0.48 29 Jan 2009
+ - fix bug with create() introduced in 0.47.
+ - remove explicit dep on Class::C3 per RT54097
+
+0.47 15 Jan 2009
+ - fix tutorial per RT#53396
+ - fix bug in base Controller->fetch() where multiple PKs where one value
+   is null were slipping through. Reported by Adam Mackler.
+
+0.46 20 Nov 2009
+ - tweek Model::File _find to avoid multiple loops over the same list of
+   root dirs.
+ - tweek Model::File->search to read() each object like fetch() does.
+ - add dep on Sort::SQL 0.07 to avoid sql injection (RT#51777)
+
+0.45 13 June 2009
+ - fix multi-column sort via cxc-order param (requires Sort::SQL 0.04)
+
+0.44 23 May 2009
+ - check for symlink() support in Model::File at compile time and return
+   from rm_related() if not supported. Fixes spurious test breakage on
+   Win32. See https://rt.cpan.org/Ticket/Display.html?id=46314
+
+0.43 29 April 2009
+ - rid of ourselves of Class::Data::Inheritable because it clashes with
+   Catalyst::Runtime 5.8. Notably, it caused a strange bug in
+   Rose::DBx::Garden::Catalyst where the MyApp->config class hashref would
+   get nuked after a call to Class::C3::initialize(). Yes. That fsked up.
+
+0.42 27 April 2009
+ - revert ACCEPT_CONTEXT changes; fixes pushed to new C::C::A_C on CPAN,
+   and added no warnings using Class::C3::Adopt::NEXT (thanks to t0m)
+ - change from 'use Class::C3' to 'use mro "c3"' with new dep on
+   MRO::Compat
+ - added some debugging in tests
+
+0.41 21 April 2009
+ - remove Catalyst::Component::ACCEPT_CONTEXT as a dependency since it has
+   not been updated for Catalyst 5.8.
+
+0.40 16 April 2009
+ - change base Controller to call can_read() rather than can_write() in
+   edit(). This is because the call to edit() does not actually write
+   anything; it's just a GET for a form.
+
+0.39 14 Jan 2009
+ - add missing file to MANIFEST that causes tests to fail in 0.38
+
+0.38 12 Jan 2009
+ - use maybe::next::method
+ - fix view_on_single_result bug in Test::Controller
+
+0.37 8 Dec 2008
+ - support x-tunneled-method for DELETE in save() calls
+
+0.36 4 Dec 2008
+ - add cxc-fuzzy2 feature and document both it and cxc-fuzzy.
+
+0.35 24 Nov 2008
+ - call edit() after initializing object and form with passed in params, so
+   that the init_form() method can have all data already set.
+
+0.34 24 Nov 2008
+ - fix make_primary_key_string to return undef if multi-col PK has no
+   values
+
+0.33 22 Nov 2008
+ - fix Tutorial wrt RT#40846
+
+0.32 21 Oct 2008
+ - use Class::Data::Inheritable to define delegate_class() class accessor
+   in base Model
+
+0.31 16 Sept 2008
+ - add missing req to Makefile.PL
+ - force field_names to be an ARRAY ref in Utils make_sql_query()
+
+0.30 11 Sept 2008
+ - fix uninit value warning in Controller
+ - change REST create() : Local to _rest_create() : Path('create') to make
+   it easier for create_form() to call create() in superclass.
+ - clean up old style $self->config->{value} to instead use $self->value in
+   Controller
+ - add app_class() and model_meta() accessors to ModelAdapter 
+ - in base Controller, rename view_on_single_result() method to
+   uri_for_view_on_single_result and make accessor for the config value
+   'view_on_single_result'
+ - change all reserved param names in Model::Utils to use 'cxc-' prefix
+   instead of '_'. Backwards compat is preserved where possible.
+ - Model::Utils make_query() will uc() sort direction 
+ - change behaviour of get_primary_key() in base Controller to not look in
+   req->params for pk values. This allows for changing the PK as part of an
+   update.
+ - add new() in REST to call next::method. Works around (some) multiple
+   inheritance issues.
+ - check for $c->res->location before redirecting in postcommit()
+ - Model::Utils was refactored to use Search::QueryParser::SQL. The
+   following methods were affected: * sql_query_as_string() -- removed *
+   params_to_sql_query() -- now returns hashref with 3 items: - query isa
+   Search::QueryParser::SQL::Query object - query_hash (formerly query) is
+   a simple param-name => [values] hashref - sql is the output of
+   S::QP::S::Query->rdbo * make_sql_query() -- returned hash ref now has
+   query_hash as plain_query value and the stringify'd Query object as
+   plain_query_str
+
+0.29 23 Aug 2008
+ - fix typos in the Tutorial
+ - add relationship methods to Controller, ModelAdapter and Model core API.
+ - added sugary alias methods for read(), update() and delete() to match
+   CRUD.
+ - refactored REST controller to support related methods and provide better
+   HTTP status checks and responses.
+
+0.28 11 Aug 2008
+ - API for ModelAdapter changed to pass controller instance in do_model()
+ - add get_primary_key() and make_primary_key_string() methods to base
+   Controller.	This allows for PKs composed of multiple columns.
+
+0.27 12 June 2008
+ - fix Controller->rm() to check for model_adapter() and call its delete()
+   method as advertised.
+ - check for length($oid) instead of defined($oid) in REST->default
+ - added CatalystX::CRUD::Results class
+ - added naked_results() config option to base Controller
+ - refactored base Controller to make all config options into accessors.
+   added t/02-controller
+ - change Model::Utils to use req->params rather than param()
+
+0.26 06 May 2008
+ - fix bug in Iterator to test for !next() rather than !defined(next())
+ - re-set action in ::REST->default so that RPC-style template naming works
+ - use :Path instead of :Private on ::REST->default
+ - fix several bugs with action() set in ::REST
+ - ::Controller->form now calls NEXT::form. This is for REST compat and
+   @INC oddness.
+ - added new ::ModelAdapter class and refactored base Controller to use it.
+ - moved make_pager() from base ::Model to ::Model::Utils
+ - added new ::Test classes to ease writing controller-agnostic tests.
+ - new, optional 'make_query' method in Controller.
+ - move AUTOLOAD() and can() hackery out of base Model into base Object
+   where it belongs. Now there is only 2 sins instead of the 3 in previous
+   releases (where we no longer monkey-patch the subs at run time).
+ - refactor tests to actually perform some CRUD.
+ - add ::ModelAdapter::File example.
+ - add envvar CXCRUD_TEST in base CX::CRUD to cluck() stack traces on
+   exceptions. Mostly useful during testing since the ::Test::Controller
+   now returns only the error.
+ - renamed 'buffer' to 'content' in ::Object::File.
+ - ::Model::File->fetch() will now always return an object even if it does
+   not yet exist on the filesystem.
+ - change default create() method in Controller to call methods directly
+   instead of forward()ing.
+ - add create() method to REST that just redirects to create_form().
+ - change from 'use NEXT' to 'use Class::C3'
+ - added support for "x-tunneled-method" param to REST controller in
+   addition to "_http_method".	This is for compat with
+   Catalyst::Request::REST::ForBrowsers.
+
+0.25 1 Feb 2008
+ - fix bug to clarify what happens when form_to_object() returns false.
+
+0.24 22 Jan 2008
+ - always fetch() in REST->default, to fix bug with no object being set for
+   create()
+ - always uc() the req method for comparison purposes
+ - fix bug when checking the _http_method param to use params() instead of
+   param() and use the first if multiple.
+ - refactor REST to provide backwards compat with Controller for easy @ISA
+   swap (as advertised)
+
+0.23 20 Jan 2008
+ - added REST API
+ - added allow_GET_writes Controller config option, to prevent casual GET
+   /save or /delete requests.
+
+0.22 04 Jan 2008
+ - add treat_like_int() support to Model::Utils
+
+0.21 04 Jan 2008
+ - fix black magic can() in Model.pm
+
+0.20 31 Dec 2007
+ - fix view_on_single_result() to check can_write()
+
+0.19 21 Dec 2007
+ - added Sort::SQL to Makefile.PL reqs.
+
+0.18 20 Dec 2007
+ - added _no_page parameter support to the Model API.
+ - added ::Model::Utils to help with DRY
+
+0.17 19 Dec 2007
+ - add field_names() method to base Controller class. This is to aid
+   development
+ - of CatalystX::CRUD::View implementations.
+
+0.16 04 Dec 2007
+ - fix typo in Tutorial so it shows up in search.cpan.org
+ - fix Controller->do_search() to always include query for view's use,
+ - even when there are no results.
+
+0.15 24 Nov 2007
+ - oops. actually include the tutorial pod in this release.
+
+0.14 23 Nov 2007
+ - add Tutorial
+ - fix bug (again) in Controller when there is only one result in
+   do_search().
+
+0.13 19 Nov 2007
+ - fix bug in Controller when there is only one result in do_search().
+
+0.12 17 Nov 2007
+ - fix bug in Controller when determining whether do_search() should
+   search.
+
+0.11 14 Nov 2007
+ - fix AUTOLOAD method to report correct object class on error
+
+0.10 12 Nov 2007
+ - simplify Iterator base class to hardcode 'delegate' method name
+
+0.09 10 November 2007
+ - fix missing precommit() default sub in Controller.pm
+ - fix AUTOLOAD hackery in Model.pm
+
+0.08 9 November 2007
+ - fix documentation for save() method.
+
+0.07 9 November 2007
+ - added count() method to base Controller
+
+0.06 6 November 2007
+ - clean up temp files from make test [rt# 30425]
+
+0.05 1 November 2007
+ - stash query in Controller results for View
+ - do_search() returns if no input
+ - Model reserved params now start with _
+ - some can/AUTOLOAD black magic to make Object/delegate stuff DWIM.
+
+0.04 25 October 2007
+ - rework view_on_single_result API in base Controller and tests for same
+
+0.03 22 October 2007
+ - add test for File implementation (and fix the bugs it revealed)
+ - fix AUTOLOAD to ignore DESTROY
+
+0.02 22 October 2007
+ - Fixed Makefile.PL dependencies (added
+   Catalyst::Component::ACCEPT_CONTEXT)
+ - Refactored Controller and Model to abstract a little more, notably added
+   the form_to_object() method in Controller.
+ - New File example implementation of the whole Model/Object/Iterator API.
+
+0.01 3 October 2007
+ - First version, released on an unsuspecting world.
+

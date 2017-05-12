@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+
+<title>CPAN Testers Reports: Report for MojoX-DirectoryListing-0.04</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="title"       content="CPAN Testers Reports" />
+<meta name="author"      content="Barbie" />
+<meta name="language"    content="en" />
+<meta name="keywords"    content="perl, cpan, test, testing, tester, testers, reports, smoke, smoker, black box, automated, automation" />
+<meta name="description" content="Report listings of distributions and authors from reports submitted by the CPAN Testers community, who automatically black box test submissions to Perl's CPAN code repository" />
+
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_setup.css" />
+<link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_text.css" />
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-1826389-16");
+pageTracker._trackPageview();
+</script>
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+-->
+
+</head>
+<body  >
+
+  
+    <pre>
+From: <strong>&quot;Chris Williams (BINGOS)&quot; &lt;chris [at] bingosnet [dot] co [dot] uk&gt;</strong>
+Subject: <strong>FAIL MojoX-DirectoryListing-0.04 v5.12.0 FreeBSD</strong>
+Date: <strong>2013-09-22T21:52:18Z</strong>
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+
+Dear MOB,
+
+This is a computer-generated error report created automatically by
+CPANPLUS, version 0.9142. Testers personal comments may appear
+at the end of this report.
+
+
+Thank you for uploading your work to CPAN.  However, it appears that
+there were some problems testing your distribution.
+
+TEST RESULTS:
+
+Below is the error stack from stage 'make test':
+
+PERL_DL_NONLAZY=1 /usr/home/cpan/pit/bare-clang/perl-5.12.0/bin/perl &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+# Testing MojoX::DirectoryListing 0.04, Perl 5.012000, /usr/home/cpan/pit/bare-clang/perl-5.12.0/bin/perl
+t/00-load.t ........... ok
+# building test filesystem
+# tearing down test filesystem
+t/10-app1.t ........... ok
+# building test filesystem
+
+#   Failed test 'Content-Type: text/plain'
+#   at t/20-content-types.t line 59.
+#          got: 'text/plain;charset=UTF-8'
+#     expected: 'text/plain'
+# tearing down test filesystem
+# Looks like you failed 1 test of 22.
+t/20-content-types.t .. 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/22 subtests 
+# building test filesystem
+# tearing down test filesystem
+t/30-stylesheets.t .... ok
+# building test filesystem
+# tearing down test filesystem
+t/31-header-footer.t .. ok
+# building test filesystem
+# tearing down test filesystem
+t/60-icons.t .......... ok
+
+Test Summary Report
+-------------------
+t/20-content-types.t (Wstat: 256 Tests: 22 Failed: 1)
+  Failed test:  13
+  Non-zero exit status: 1
+Files=6, Tests=248,  6 wallclock secs ( 0.05 usr  0.02 sys +  1.49 cusr  0.31 csys =  1.88 CPU)
+Result: FAIL
+Failed 1/6 test programs. 1/248 subtests failed.
+*** [test_dynamic] Error code 255
+
+Stop in /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04.
+
+
+PREREQUISITES:
+
+Here is a list of prerequisites you specified and versions we
+managed to load:
+
+	  Module Name                        Have     Want
+	  Mojolicious::Lite                     0        0
+	  Test::Mojo                            0        0
+	  Test::More                         0.98        0
+
+Perl module toolchain versions installed:
+	Module Name                        Have
+	CPANPLUS                         0.9142
+	CPANPLUS::Dist::Build              0.70
+	Cwd                                3.40
+	ExtUtils::CBuilder             0.280212
+	ExtUtils::Command                  1.16
+	ExtUtils::Install                  1.55
+	ExtUtils::MakeMaker                6.76
+	ExtUtils::Manifest                 1.63
+	ExtUtils::ParseXS                  3.22
+	File::Spec                         3.40
+	Module::Build                    0.4007
+	Pod::Parser                        1.37
+	Pod::Simple                        3.13
+	Test::Harness                      3.28
+	Test::More                         0.98
+	version                          0.9904
+
+******************************** NOTE ********************************
+The comments above are created mechanically, possibly without manual
+checking by the sender.  As there are many people performing automatic
+tests on each upload to CPAN, it is likely that you will receive
+identical messages about the same problem.
+
+If you believe that the message is mistaken, please reply to the first
+one with correction and/or additional informations, and do not take
+it personally.  We appreciate your patience. :)
+**********************************************************************
+
+Additional comments:
+
+
+This report was machine-generated by CPANPLUS::Dist::YACSmoke 0.90.
+Powered by minismokebox version 0.56
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    NONINTERACTIVE_TESTING = 1
+    PATH = /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/script:/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/local/bin:/home/cpan/bin
+    PERL5LIB = :/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/lib:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/arch:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/lib:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/arch
+    PERL5_CPANPLUS_IS_RUNNING = 11518
+    PERL5_CPANPLUS_IS_VERSION = 0.9142
+    PERL5_MINISMOKEBOX = 0.56
+    PERL5_YACSMOKE_BASE = /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /usr/local/bin/bash
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    Perl: $^X = /usr/home/cpan/pit/bare-clang/perl-5.12.0/bin/perl
+    UID:  $&lt;  = 1002
+    EUID: $&gt;  = 1002
+    GID:  $(  = 1002 1002
+    EGID: $)  = 1002 1002
+
+
+-------------------------------
+
+
+--
+
+Summary of my perl5 (revision 5 version 12 subversion 0) configuration:
+   
+  Platform:
+    osname=freebsd, osvers=9.1-release, archname=amd64-freebsd
+    uname='freebsd fremen 9.1-release freebsd 9.1-release #0 r243825: tue dec 4 09:23:10 utc 2012 root@farrell.cse.buffalo.edu:usrobjusrsrcsysgeneric amd64 '
+    config_args='-des -Dprefix=/usr/home/cpan/pit/bare-clang/perl-5.12.0 -Dcc=clang'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=define, use64bitall=define, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='clang', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include',
+    optimize='-O',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include'
+    ccversion='', gccversion='4.2.1 Compatible FreeBSD Clang 3.1 ((branches/release_31 156863))', gccosandvers=''
+    intsize=4, longsize=8, ptrsize=8, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=16
+    ivtype='long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=8, prototype=define
+  Linker and Libraries:
+    ld='clang', ldflags ='-Wl,-E  -fstack-protector -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lgdbm -lm -lcrypt -lutil -lc
+    perllibs=-lm -lcrypt -lutil -lc
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib -fstack-protector'
+
+
+Characteristics of this binary (from libperl): 
+  Compile-time options: PERL_DONT_CREATE_GVSV PERL_MALLOC_WRAP USE_64_BIT_ALL
+                        USE_64_BIT_INT USE_LARGE_FILES USE_PERLIO
+                        USE_PERL_ATOF
+  Built under freebsd
+  Compiled at Dec 20 2012 12:34:23
+  %ENV:
+    PERL5LIB=&quot;:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/lib:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/arch:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/lib:/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/arch&quot;
+    PERL5_CPANPLUS_IS_RUNNING=&quot;11518&quot;
+    PERL5_CPANPLUS_IS_VERSION=&quot;0.9142&quot;
+    PERL5_MINISMOKEBOX=&quot;0.56&quot;
+    PERL5_YACSMOKE_BASE=&quot;/usr/home/cpan/pit/bare-clang/conf/perl-5.12.0&quot;
+    PERL_EXTUTILS_AUTOINSTALL=&quot;--defaultdeps&quot;
+    PERL_MM_USE_DEFAULT=&quot;1&quot;
+  @INC:
+    /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/lib
+    /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/Mojolicious-4.41/blib/arch
+    /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/lib
+    /usr/home/cpan/pit/bare-clang/conf/perl-5.12.0/.cpanplus/5.12.0/build/MojoX-DirectoryListing-0.04/blib/arch
+    /usr/home/cpan/pit/bare-clang/perl-5.12.0/lib/site_perl/5.12.0/amd64-freebsd
+    /usr/home/cpan/pit/bare-clang/perl-5.12.0/lib/site_perl/5.12.0
+    /usr/home/cpan/pit/bare-clang/perl-5.12.0/lib/5.12.0/amd64-freebsd
+    /usr/home/cpan/pit/bare-clang/perl-5.12.0/lib/5.12.0
+    .</pre>
+    
+  
+</body>
+</html>

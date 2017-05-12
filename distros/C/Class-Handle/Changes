@@ -1,0 +1,50 @@
+Revision history for Perl extension Class::Handle.
+
+1.07 Tue 11 Dec 2007
+	- No functional changes
+	- Updating to Module::Install 0.68
+	- Updating bundled author test
+
+1.06 Sun  4 Jun 2006
+	- Fixed bug #18553 (resolve_filename in sub load)
+	- Moved from old CVS to new SVN repository
+	- Upgraded to Module::Install 0.62
+	- Added a proper version in the Class::ISA dependency
+
+1.05 Fri Dec 30 2005
+	- Fixed a number of POD bugs (Ricardo Signes)
+	- Upgraded Makefile.PL to use Module::Install
+
+1.04 Wed Sep 28 2005
+	- Added ->subclasses from Class::Inspector 1.12 (nothingmuch/NUFFIN)
+	- To answer a question from the relevant bug, I won't be making
+	  new methods appear automatically as it is very unwise to make
+	  a modules API morph based on functionality in another dist.
+	  It Class::Handle and Class::Inspector were in the same dist,
+	  this might be a different story.
+	- Upgraded Makefile.PL to Module::Install
+
+1.03 Wed Jul 21 2004
+	- Tweaking the tests to work properly on Win32
+
+1.02 Wed Jul 21 2004
+	- Forcing the use of the newest 1.06 version of Class::Inspector
+
+1.01 Tue Apr 20 2004
+	- Internals of Class::Interface changed, which broke some tests
+	  Resolved this problem.
+
+1.0  Mon Nov 10 2003
+	- Cleaned up and shrunk the code base a little
+	- Updated the dependencies
+	- Some tweaks to the documentation
+	- Incrementing version to 1.0, since it has proven stable
+
+0.3  Sat Jun  7 19:57:21 2003
+	- Fixed a broken test
+
+0.2  Tue May 28 18:47:00 2002
+	- Updating to match ->methods options in Class::Handle
+
+0.1  Thu May 23 21:01:52 2002
+	- original version

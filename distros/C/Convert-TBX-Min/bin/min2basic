@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+#
+# This file is part of Convert-TBX-Min
+#
+# This software is copyright (c) 2016 by Alan K. Melby.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+use strict;
+use warnings;
+use Convert::TBX::Min 'min2basic';
+# PODNAME: min2basic
+our $VERSION = '0.07'; # VERSION
+# ABSTRACT: script for converting TBX-Min to TBX-Basic
+
+
+@ARGV == 1 or
+    die "Usage: basic2min <TBX-Min input file>";
+my ($input) = @ARGV;
+
+print ${ min2basic($input) };
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+min2basic - script for converting TBX-Min to TBX-Basic
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SYNOPSIS
+
+    % min2basic <TBX-Min input file> >basic.tbx
+
+=head1 DESCRIPTION
+
+This script is a simple CLI wrapper around the C<min2basic> function
+of L<Convert::TBX::Min>. Use it to generate a TBX-Basic document from a
+TBX-Min file.
+
+=head1 AUTHOR
+
+Nathan Glenn <garfieldnate@gmail.com>, James Hayes <james.s.hayes@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Alan K. Melby.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

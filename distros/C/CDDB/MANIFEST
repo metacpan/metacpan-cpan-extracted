@@ -1,0 +1,17 @@
+CHANGES
+HISTORY
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+eg/osx-lookup.pl
+lib/CDDB.pm
+t/000-report-versions.t
+t/01_cddb.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

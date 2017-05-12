@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 101
+    - 204
+  8127:
+    - 114
+name: ddcbcc
+registers:
+  AF: 530
+  AF_: 0
+  BC: 56390
+  BC_: 0
+  DE: 36673
+  DE_: 0
+  HL: 34126
+  HL_: 0
+  I: 0
+  IX: 8026
+  IY: 1994
+  PC: 0
+  R: 0
+  SP: 0

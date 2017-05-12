@@ -1,0 +1,6 @@
+0.03 2006/07/10
+    - deprecated. Use CGI::Builder::GetPageName instead. 
+0.02 2006/05/23
+    - fix typo and test script.
+0.01 2006/05/15
+    - created.

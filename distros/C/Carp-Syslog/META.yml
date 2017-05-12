@@ -1,0 +1,26 @@
+---
+abstract: 'Send warn and die messages to syslog'
+author:
+  - 'Chris Grau <cgrau@cpan.org>'
+build_requires:
+  Exporter: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120630'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Carp-Syslog
+requires:
+  Carp: 0
+  Sys::Syslog: 0
+  overload: 0
+  perl: v5.10.0
+  strict: 0
+resources:
+  homepage: https://github.com/sirhc/carp-syslog
+  repository: https://github.com/sirhc/carp-syslog.git
+version: 0.01

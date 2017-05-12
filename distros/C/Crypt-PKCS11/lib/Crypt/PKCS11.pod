@@ -1,0 +1,824 @@
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11 - Full-fledged PKCS #11 v2.30 interface
+
+=head1 SYNPOSIS
+
+  use Crypt::PKCS11;
+
+  # Create the main PKCS #11 object, load a PKCS #11 provider .so library and initialize the module
+  my $pkcs11 = Crypt::PKCS11->new;
+  $pkcs11->load(...);
+  $pkcs11->Initialize;
+
+  # Create a new session and log in
+  my $session = $pkcs11->OpenSession(...);
+  $session->Login(...);
+
+  # Create the public key template
+  my $publicKeyTemplate = Crypt::PKCS11::Attributes->new->push(
+      Crypt::PKCS11::Attribute::Encrypt->new->set(1),
+      Crypt::PKCS11::Attribute::Verify->new->set(1),
+      Crypt::PKCS11::Attribute::Wrap->new->set(1),
+      Crypt::PKCS11::Attribute::PublicExponent->new->set(0x01, 0x00, 0x01),
+      Crypt::PKCS11::Attribute::Token->new->set(1),
+      Crypt::PKCS11::Attribute::ModulusBits->new->set(768)
+  );
+
+  # Create the private key template
+  my $privateKeyTemplate = Crypt::PKCS11::Attributes->new->push(
+      Crypt::PKCS11::Attribute::Private->new->set(1),
+      Crypt::PKCS11::Attribute::Id->new->set(123),
+      Crypt::PKCS11::Attribute::Sensitive->new->set(1),
+      Crypt::PKCS11::Attribute::Decrypt->new->set(1),
+      Crypt::PKCS11::Attribute::Sign->new->set(1),
+      Crypt::PKCS11::Attribute::Unwrap->new->set(1),
+      Crypt::PKCS11::Attribute::Token->new->set(1)
+  );
+
+  # Create a public and private key pair
+  my ($publicKey, $privateKey) = $session->GenerateKeyPair(
+      Crypt::PKCS11::CK_MECHANISM->new->set_mechanism(...),
+      $publicKeyTemplate,
+      $privateKeyTemplate);
+
+  # Encrypt data
+  my $data = ...;
+  $session->EncryptInit(
+      Crypt::PKCS11::CK_MECHANISM->new->set_mechanism(...),
+      $privateKey);
+  my $encryptedData = $session->Encrypt($data);
+  $encryptedData .= $session->EncryptFinal;
+
+  # Decrypt data
+  $session->DecryptInit(
+      Crypt::PKCS11::CK_MECHANISM->new->set_mechanism(...),
+      $privateKey);
+  $data = $session->Decrypt($encryptedData);
+  $data .= $session->DecryptFinal;
+
+  # Finalize the PKCS #11 module and unload the provider .so library
+  $pkcs11->Finalize;
+  $pkcs11->unload;
+
+=head1 DESCRIPTION
+
+Crypt::PKCS11 provides a full-fledged PKCS #11 v2.30 interface for Perl and
+together with a PKCS #11 provider .so library you can use all the functionality
+a Hardware Security Module (HSM) has to offer from within Perl.
+
+Other modules/pod sections included are:
+
+=over 4
+
+=item Crypt::PKCS11::XS
+
+XS layer containing wrappers for all PKCS #11 functions that converts Perl data
+structures to/from PKCS #11 specific data structures.
+
+=item Crypt::PKCS11::Session
+
+A module handling everything related to a PKCS #11 session.
+
+=item Crypt::PKCS11::Object
+
+A module that represent a PKCS #11 object which for example can be a public or
+private key.
+
+=item Crypt::PKCS11::Attribute
+
+A module that represent a PKCS #11 attribute that are used in templates when for
+example creating keys. This is only a base class, see
+L<Crypt::PKCS11::Attributes> for a list of all available attributes.
+
+=item Crypt::PKCS11::Attributes
+
+A module to handle a set of Crypt::PKCS11::Attribute objects and also lists all
+available PKCS #11 attributes.
+
+=item Crypt::PKCS11::constant
+
+List of all PKCS #11 constants.
+
+=item Crypt::PKCS11::Attribute::AttributeArray
+
+A base module that handles nested PKCS #11 attributes.
+
+=item Crypt::PKCS11::Attribute::ByteArray
+
+A base module that handles byte array attributes.
+
+=item Crypt::PKCS11::Attribute::CK_BBOOL
+
+A base module that handles boolean attributes.
+
+=item Crypt::PKCS11::Attribute::CK_BYTE
+
+A base module that handles one byte attributes.
+
+=item Crypt::PKCS11::Attribute::CK_DATE
+
+A base module that handles date attributes.
+
+=item Crypt::PKCS11::Attribute::CK_ULONG
+
+A base module that handles an unsigned long attributes.
+
+=item Crypt::PKCS11::Attribute::RFC2279string
+
+A base module that handles RFC 2279 string attributes.
+
+=item Crypt::PKCS11::Attribute::UlongArray
+
+A base module that handles unsigned long array attributes.
+
+=item Crypt::PKCS11::Attribute::Value
+
+A base module that handles attributes containing either a byte array or a binary
+string.
+
+=back
+
+Following modules exist as an interface to its corresponding PKCS #11 C
+structure, for more information about each structure see individual pod page and
+PKCS #11 documentation.
+
+=over 4
+
+=item L<Crypt::PKCS11::CK_AES_CBC_ENCRYPT_DATA_PARAMS>
+
+=item L<Crypt::PKCS11::CK_AES_CCM_PARAMS>
+
+=item L<Crypt::PKCS11::CK_AES_CTR_PARAMS>
+
+=item L<Crypt::PKCS11::CK_AES_GCM_PARAMS>
+
+=item L<Crypt::PKCS11::CK_ARIA_CBC_ENCRYPT_DATA_PARAMS>
+
+=item L<Crypt::PKCS11::CK_CAMELLIA_CBC_ENCRYPT_DATA_PARAMS>
+
+=item L<Crypt::PKCS11::CK_CAMELLIA_CTR_PARAMS>
+
+=item L<Crypt::PKCS11::CK_CMS_SIG_PARAMS>
+
+=item L<Crypt::PKCS11::CK_DES_CBC_ENCRYPT_DATA_PARAMS>
+
+=item L<Crypt::PKCS11::CK_ECDH1_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_ECDH2_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_ECMQV_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_KEA_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_KEY_DERIVATION_STRING_DATA>
+
+=item L<Crypt::PKCS11::CK_KEY_WRAP_SET_OAEP_PARAMS>
+
+=item L<Crypt::PKCS11::CK_KIP_PARAMS>
+
+=item L<Crypt::PKCS11::CK_MECHANISM>
+
+=item L<Crypt::PKCS11::CK_OTP_PARAM>
+
+=item L<Crypt::PKCS11::CK_OTP_PARAMS>
+
+=item L<Crypt::PKCS11::CK_OTP_SIGNATURE_INFO>
+
+=item L<Crypt::PKCS11::CK_PBE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_PKCS5_PBKD2_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RC2_CBC_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RC2_MAC_GENERAL_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RC5_CBC_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RC5_MAC_GENERAL_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RC5_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RSA_PKCS_OAEP_PARAMS>
+
+=item L<Crypt::PKCS11::CK_RSA_PKCS_PSS_PARAMS>
+
+=item L<Crypt::PKCS11::CK_SKIPJACK_PRIVATE_WRAP_PARAMS>
+
+=item L<Crypt::PKCS11::CK_SKIPJACK_RELAYX_PARAMS>
+
+=item L<Crypt::PKCS11::CK_SSL3_KEY_MAT_OUT>
+
+=item L<Crypt::PKCS11::CK_SSL3_KEY_MAT_PARAMS>
+
+=item L<Crypt::PKCS11::CK_SSL3_MASTER_KEY_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_SSL3_RANDOM_DATA>
+
+=item L<Crypt::PKCS11::CK_TLS_PRF_PARAMS>
+
+=item L<Crypt::PKCS11::CK_VERSION>
+
+=item L<Crypt::PKCS11::CK_WTLS_KEY_MAT_OUT>
+
+=item L<Crypt::PKCS11::CK_WTLS_KEY_MAT_PARAMS>
+
+=item L<Crypt::PKCS11::CK_WTLS_MASTER_KEY_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_WTLS_PRF_PARAMS>
+
+=item L<Crypt::PKCS11::CK_WTLS_RANDOM_DATA>
+
+=item L<Crypt::PKCS11::CK_X9_42_DH1_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS>
+
+=item L<Crypt::PKCS11::CK_X9_42_MQV_DERIVE_PARAMS>
+
+=back
+
+=head1 QUALITY ASSURANCE AND TESTING
+
+This module is currently tested on Ubuntu 12.04 and with SoftHSM version 1.3.7
+and 2.0.0b2 as PKCS #11 providers / HSM backends. It uses Test::LeakTrace to
+detect leaks and Devel::Cover to provide coverage reports. The goal is to always
+be non-leaking and to have 100% coverage. See README.testing.md for more
+information how to test.
+
+  ---------------------------- ------ ------ ------ ------ ------ ------ ------
+  File                           stmt   bran   cond    sub    pod   time  total
+  ---------------------------- ------ ------ ------ ------ ------ ------ ------
+  blib/lib/Crypt/PKCS11.pm      100.0  100.0  100.0  100.0  100.0   90.6  100.0
+  ...Crypt/PKCS11/Attribute.pm  100.0  100.0  100.0  100.0  100.0    0.1  100.0
+  ...tribute/AttributeArray.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...11/Attribute/ByteArray.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...S11/Attribute/CK_BBOOL.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
+  ...CS11/Attribute/CK_BYTE.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...CS11/Attribute/CK_DATE.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...S11/Attribute/CK_ULONG.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...ttribute/RFC2279string.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
+  ...1/Attribute/UlongArray.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...PKCS11/Attribute/Value.pm  100.0  100.0  100.0  100.0  100.0    0.0  100.0
+  ...rypt/PKCS11/Attributes.pm  100.0  100.0  100.0  100.0  100.0    6.3  100.0
+  ...ib/Crypt/PKCS11/Object.pm  100.0  100.0  100.0  100.0  100.0    1.7  100.0
+  ...b/Crypt/PKCS11/Session.pm  100.0  100.0  100.0  100.0  100.0    1.1  100.0
+  crypt_pkcs11.c                100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct.c         100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_aes.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_aria.c    100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  ..._pkcs11_struct_camellia.c  100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_cms.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_des.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_ecdh1.c   100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_ecdh2.c   100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_ecmqv.c   100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_kea.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_key.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_kip.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  ...pkcs11_struct_mechanism.c  100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_otp.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_pbe.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_pkcs5.c   100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_rc2.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_rc5.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_rsa.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  ..._pkcs11_struct_skipjack.c  100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_ssl3.c    100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_tls.c     100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  ...t_pkcs11_struct_version.c  100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_wtls.c    100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  crypt_pkcs11_struct_x9.c      100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  pkcs11.xs                     100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct.c               100.0  100.0    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_aes.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_aria.xs         100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_camellia.xs     100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_cms.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_des.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_ecdh1.xs        100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_ecdh2.xs        100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_ecmqv.xs        100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_kea.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_key.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_kip.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_mechanism.xs    100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_otp.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_pbe.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_pkcs5.xs        100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_rc2.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_rc5.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_rsa.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_skipjack.xs     100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_ssl3.xs         100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_tls.xs          100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_version.xs      100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_wtls.xs         100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  pkcs11_struct_x9.xs           100.0    n/a    n/a    n/a    n/a    n/a  100.0
+  Total                         100.0  100.0  100.0  100.0  100.0  100.0  100.0
+  ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+This module has been tested with the following PKCS #11 providers and operating
+systems:
+
+=over 4
+
+=item *
+
+Ubuntu Server 12.04 using SoftHSM version 1.3.7 and 2.0.0b2
+
+=back
+
+More platforms and PKCS #11 providers will be added in the future.
+
+=head1 RETURN VALUES AND ERROR HANDLING
+
+This is the general return value and error handling for all methods unless
+otherwise stated.
+
+On XS layer errors, when called from within these methods, all methods returns
+false (0/undef) and the XS layer error can be retrieved with C<$pkcs11-E<gt>errno>
+for the number and C<$pkcs11-E<gt>errstr> for the message.
+
+For errors from the methods themself, the method will confess (croak) with the
+error message.
+
+=head1 CONSTANTS
+
+All PKCS #11 constants (C #define's) can be imported by specifying the tag
+:constant when using the module, see PKCS #11 documentation for a list of all
+constants.
+
+  use Crypt::PKCS11 qw(:constant);
+
+There are also hashes for reverse lookup available, to get the name of the
+constant in text, per constant section using the tag :constant_names, for
+example if you wish to reverse lookup a mechanism you can use the C<%CKM_NAME>
+hash.
+
+  use Crypt::PKCS11 qw(:constant_names);
+  ...
+  print "Support for $CKM_NAME{$mechanism} found.\n";
+
+Beside all constants that exists in PCKS #11 these have been added:
+
+=over 4
+
+=item CK_ULONG_SIZE
+
+Contains the size of CK_ULONG type that will be different depending on the
+operating system.
+
+=back
+
+=head1 METHODS
+
+For more extensive documentation about the methods, data structures and types
+please see http://www.cryptsoft.com/pkcs11doc/v230/ .
+
+=over 4
+
+=item $pkcs11 = Crypt::PKCS11->new
+
+Returns a new Crypt::PKCS11 object.
+
+=item $pkcs11->load ($so)
+
+Loads the PKCS #11 provider .so library specified by C<$so>.
+
+=item $pkcs11->unload
+
+Unloads the PKCS #11 provider .so library, done automatically on destruction of
+the object.
+
+=item $pkcs11->Initialize ([initArgs => ... ])
+
+Initialize the PKCS #11 library, this must be done before using the PKCS #11
+library. The initialization arguments can be given as one hash reference or as
+a hash.
+
+The following initialization arguments can be used:
+
+=over 4
+
+=item flags
+
+Bit flags specifying options for initialization.
+
+=back
+
+=item $pkcs11->Finalize
+
+Finalize the PKCS #11 library, done automatically on destruction of the object.
+
+=item < %hash || $hash_ref > = $pkcs11->GetInfo
+
+Return information about the PKCS #11 library as a hash, if called in list
+context, or as a hash reference, if called in scalar context.
+
+Fields in hash are as follows:
+
+=over 4
+
+=item cryptokiVersion
+
+Cryptoki interface version number, for compatibility with future revisions of this interface, as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=item manufacturerID
+
+ID of the Cryptoki library manufacturer, padded with the blank character (' ').
+
+=item flags
+
+Bit flags reserved for future versions.
+
+=item libraryDescription
+
+Character-string description of the library, padded with the blank character (' ').
+
+=item libraryVersion
+
+Cryptoki library version number as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=back
+
+=item < @array || $array_ref > = $pkcs11->GetSlotList ([$tokenPresent = undef])
+
+Return a list of slot IDs as an array, if called in list context, or as an array
+reference, if called in scalar context.
+
+=over 4
+
+=item $tokenPresent
+
+Optional argument which is default to false. If set to true then only the slot
+IDs which has tokens will be returned.
+
+=back
+
+=item < %hash || $hash_ref > = $pkcs11->GetSlotInfo ($slotID)
+
+Return information about a slot as a hash, if called in list context, or as a
+hash reference, if called in scalar context.
+
+=over 4
+
+=item $slotID
+
+The slot ID to return information about.
+
+=back
+
+Fields in hash are as follows:
+
+=over 4
+
+=item slotDescription
+
+Character-string description of the slot, padded with the blank character (' ').
+
+=item manufacturerID
+
+ID of the slot manufacturer, padded with the blank character (' ').
+
+=item flags
+
+Bits flags that provide capabilities of the slot, see PKCS #11 documentation for
+the list of flags available.
+
+=item hardwareVersion
+
+Version number of the slot's hardware as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=item firmwareVersion
+
+Version number of the slot's firmware as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=back
+
+=item < %hash || $hash_ref > = $pkcs11->GetTokenInfo ($slotID)
+
+Return information about tokens in a slot as a hash, if called in list context,
+or as a hash reference, if called in scalar context.
+
+=over 4
+
+=item $slotID
+
+The slot ID to return information about.
+
+=back
+
+Fields in hash are as follows:
+
+=over 4
+
+=item label
+
+Application-defined label, assigned during token initialization, padded with the blank character (' ').
+
+=item manufacturerID
+
+ID of the device manufacturer, padded with the blank character (' ').
+
+=item model
+
+Model of the device, padded with the blank character (' ').
+
+=item serialNumber
+
+Character-string serial number of the device, padded with the blank character (' ').
+
+=item flags
+
+Bit flags indicating capabilities and status of the device, see PKCS #11 documentation for the list of flags available.
+
+=item ulMaxSessionCount
+
+Maximum number of sessions that can be opened with the token at one time by a single application.
+
+=item ulSessionCount
+
+Number of sessions that this application currently has open with the token.
+
+=item ulMaxRwSessionCount
+
+Maximum number of read/write sessions that can be opened with the token at one time by a single application.
+
+=item ulRwSessionCount
+
+Number of read/write sessions that this application currently has open with the token.
+
+=item ulMaxPinLen
+
+Maximum length in bytes of the PIN.
+
+=item ulMinPinLen
+
+Minimum length in bytes of the PIN.
+
+=item ulTotalPublicMemory
+
+The total amount of memory on the token in bytes in which public objects may be stored.
+
+=item ulFreePublicMemory
+
+The amount of free (unused) memory on the token in bytes for public objects.
+
+=item ulTotalPrivateMemory
+
+The total amount of memory on the token in bytes in which private objects may be stored.
+
+=item ulFreePrivateMemory
+
+The amount of free (unused) memory on the token in bytes for private objects.
+
+=item hardwareVersion
+
+Version number of hardware as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=item firmwareVersion
+
+Version number of firmware as a hash reference.
+
+=over 4
+
+=item major
+
+Major version part.
+
+=item minor
+
+Minor version part.
+
+=back
+
+=item utcTime
+
+Current time as a character-string of length 16, represented in the format YYYYMMDDhhmmssxx (4 characters for the year; 2 characters each for the month, the day, the hour, the minute, and the second; and 2 additional reserved '0' characters). The value of this field only makes sense for tokens equipped with a clock, as indicated in the token information flags.
+
+=back
+
+=item < @array || $array_ref > = $pkcs11->GetMechanismList ($slotID)
+
+Return a list of mechanism for a slot as an array, if called in list context, or
+as an array reference, if called in scalar context.
+
+=over 4
+
+=item $slotID
+
+The slot ID to return information about.
+
+=back
+
+=item < %hash || $hash_ref > = $pkcs11->GetMechanismInfo ($slotID, $mechanismType)
+
+Return information about mechanism for a slot as a hash, if called in list
+context, or as a hash reference, if called in scalar context.
+
+=over 4
+
+=item $slotID
+
+The slot ID to return information about.
+
+=item $mechanismType
+
+The mechanism type to return information about.
+
+=back
+
+Fields in hash are as follows:
+
+=over 4
+
+=item ulMinKeySize
+
+The minimum size of the key for the mechanism (whether this is measured in bits or in bytes is mechanism-dependent).
+
+=item ulMaxKeySize
+
+The maximum size of the key for the mechanism (whether this is measured in bits or in bytes is mechanism-dependent).
+
+=item flags
+
+Bit flags specifying mechanism capabilities.
+
+=back
+
+=item $pkcs11->InitToken ($slotID, [$pin = undef], $label)
+
+Initialize a token.
+
+=over 4
+
+=item $slotID
+
+The slot ID to initialize.
+
+=item $pin
+
+Optional argument that specifies the PIN to use when initializing.
+
+=item $label
+
+The label of the token.
+
+=back
+
+=item $session = $pkcs11->OpenSession ($slotID, [$flags = 0, $notifycb = undef])
+
+Open a new PKCS #11 session and return a L<Crypt::PKCS11::Session> object.
+
+=over 4
+
+=item $slotID
+
+The slot ID to open a session for.
+
+=item $flags
+
+Optional argument that indicates the type of session to open.
+
+=item $notifycb
+
+Optional argument for a callback CODE reference to be used when notifying the
+application of certain events.
+
+=back
+
+=item $pkcs11->CloseAllSessions ($slotID)
+
+Close all current session with the slot specified.
+
+=over 4
+
+=item $slotID
+
+The slot ID to close sessions for.
+
+=back
+
+=item $pkcs11->WaitForSlotEvent ([$flags = 0])
+
+Waits for a slot event, such as token insertion or token removal, to occur. Will
+block unless the flag C<CKF_DONT_BLOCK> is used.
+
+=over 4
+
+=item $flags
+
+Optional argument to determines whether or not the method blocks.
+
+=back
+
+=item $errno = $pkcs11->errno
+
+Return the last error number, can be used after a method returns false.
+
+=item $errstr = $pkcs11->errstr
+
+Return the last error message, can be used after a method returns false.
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

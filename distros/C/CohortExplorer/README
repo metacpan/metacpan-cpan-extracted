@@ -1,0 +1,36 @@
+CohortExplorer
+
+INSTALLATION
+
+sudo dpkg -i debian/cohortexplorer_0.14-1_all.deb
+
+To install dependencies type,
+sudo apt-get install -f
+
+or install
+sudo apt-get install gdebi
+
+and then,
+sudo gdebi debian/cohortexplorer_0.14-1_all.deb
+
+After the installation, the datasources can be configured by following the instructions in /etc/CohortExplorer/datasource-config.properties.
+
+SECURITY
+
+When installing CohortExplorer for group use, the administrator MUST ensure that:
+
+a) MySQL connection parameters are for the read only mode (i.e. grant select only). 
+b) At all times /etc/CohortExplorer/datasource-config.properties is only readable by the user 'cohexp'.
+c) Log file is only readable by root/administrator or cohexp.
+
+
+To uninstall type,
+
+sudo apt-get purge cohortexplorer
+
+
+SUPPORT AND DOCUMENTATION
+
+After installation, you can find the documentation for CohortExplorer using the man command.
+
+man CohortExplorer (Linux systems)

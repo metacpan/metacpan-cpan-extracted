@@ -1,0 +1,66 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chouette",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent::HTTP" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Temp" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Task" : "0.804",
+            "Callback::Frame" : "0",
+            "EV" : "0",
+            "Feersum" : "0",
+            "JSON::XS" : "0",
+            "Log::Defer" : "0",
+            "Log::Defer::Viz" : "0",
+            "Log::File::Rolling" : "0",
+            "Plack" : "0",
+            "Plack::Request::WithEncoding" : "0",
+            "Regexp::Assemble" : "0",
+            "Session::Token" : "0",
+            "YAML" : "0",
+            "common::sense" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoytech/Chouette/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/hoytech/Chouette.git"
+      }
+   },
+   "version" : "0.102",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

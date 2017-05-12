@@ -1,0 +1,33 @@
+{
+  "info" :
+  {
+    "name" : "callbackery",
+
+    "summary" : "CallBackery Toolkit",
+    "description" : "A framework for creating single page webapplications",
+
+    "homepage" : "http://www.oetiker.ch/",
+
+    "license" : "GPLv3",
+    "authors" :
+    [
+      {
+        "name" : "Tobias Oetiker (oetiker)",
+        "email" : "tobi@oetiker.ch"
+      }
+    ],
+
+    "version" : "master",
+    "qooxdoo-versions": ["5.0"]
+  },
+
+  "provides" :
+  {
+    "namespace"   : "callbackery",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation",
+    "type"        : "application"
+  }
+}

@@ -1,0 +1,28 @@
+Revision history for Perl extension Class::Accessor::Lite.
+
+0.08
+	- unbundle MYMETA.* (thanks to dolmen)
+	- build the archive using GNU tar
+
+0.07
+	- lazy Carp loading (thanks to qsimpleq)
+
+0.06
+	- fix documentation issues (thanks to magnolia-k)
+
+0.05
+	- improve usage error checking: assert that the accessor lists passed through the "import" function are arrayrefs
+
+0.04
+	- add read-only and write-only accessor constructors (tokuhirom)
+	- the new "use Class::Accessor::Lite (rw => ...)" style
+
+0.03
+	- add mk_new_and_accessors
+	- more documentation
+
+0.02  Wed Nov 26 18:00:00 2008
+	- used to create accessor for different package in caller stack
+
+0.01  Wed Nov 26 17:00:00 2008
+        - initial release

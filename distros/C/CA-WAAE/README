@@ -1,0 +1,91 @@
+#
+# $Id: README 57 2007-10-26 15:10:55Z sini $
+#
+# Original code based on CA::Autosys:
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2007 Sinisa Susnjar <sini@cpan.org>
+# See LICENSE for terms of distribution.
+#
+# Change to CA::WAAE:
+# Copyright (c) 2013 Douglas Wilson <dougw@cpan.org>
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+BIG FAT NOTE
+
+  This module is beta software!!!
+  If you find a bug, please report it to me (the author), or if you made an
+  improvement, please send the changes (in the form of a context diff) to me,
+  so I can integrate it.
+  If you would like a feature to be implemented in this module, drop me a line.
+
+INTRODUCTION
+
+  This module implements a perl5 API for accessing CA's AutoSys job control.
+
+  For more information on the AutoSys product itself,
+  see CA's website at: http://www3.ca.com/solutions/Product.aspx?ID=253
+
+  This release requires perl5.005 or later, and some release of the AutoSys
+  product installed, 4.5 or better should do just fine.
+
+  This package has been known to build with the following combinations
+  of software.  Those marked with an asterix (*) are platforms the
+  author can not test personally, so there is a remote possibility that
+  there may be new bugs in these platforms.  Please report problems to
+  the author, of course.
+
+    Operating System          AutoSys Version Perl Version FreeTDS Version
+    ========================= =============== ============ ===============
+    Cygwin 1.5.23 (WinXP SP2) 4.5             5.8.7        0.64
+    openSUSE 10.3 (i586)      4.5             5.8.8        0.64
+
+  NOTE: If you have built it on new platforms, *PLEASE* help save the free
+  world by letting me know what version of AutoSys, OS, perl,
+  etc. you built it with.
+
+  If you succeed in making this work on any other platform, please send
+  the changes (in the form of a context diff) to the author, so I can
+  integrate it.
+
+INSTALLATION
+
+  This module installs much like anything else available on CPAN.
+  Automatic tests are not yet provided.
+
+    perl Makefile.PL
+    make
+	make test
+    make install
+                                                                     
+  When using a Sybase backend, you may have to edit your $SYBASE/interfaces file or
+  your $HOME/.freetds.conf file and add the appropriate AutoSys DB server(s).
+
+RELEASE NOTES
+
+  The CHANGES file has a complete, historical list of all user-visible
+  (and some invisible) changes to this code.
+
+DOCUMENTATION
+
+  POD inside ;-)
+
+AUTHORS
+
+  This module was developed by:
+
+    Sinisa Susnjar <sini@cpan.org>

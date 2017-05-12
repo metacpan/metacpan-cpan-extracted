@@ -1,0 +1,14 @@
+Revision history for Catalyst-View-Image-Empty
+
+0.06    17 April 2012 - Include extra config option
+
+0.05    Fix code POD
+
+0.04    Typos in POD
+
+0.03    Mention PNG support
+
+0.02    Fixing helper
+
+0.01    16 April 2012 - First version
+

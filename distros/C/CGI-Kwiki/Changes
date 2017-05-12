@@ -1,0 +1,108 @@
+# Change log for CGI::Kwiki
+
+version: 0.18
+date:    Sun Sep  7 11:14:56 PDT 2003
+changes:
+  - Changed template/local to local/template
+  - Handle edit collisions
+  - Merge config file settings on --upgrade
+  - Move LOGIN button to prefs
+  - Initial plugin framework
+  - Diff plugin
+  - i18n support - Autrijus Tang
+  - FastCGI support - Autrijus Tang
+  - Schwern's patches - Michael Schwern
+
+version: 0.17
+date:    Mon Jun  9 23:48:01 PDT 2003
+changes:
+  - RCS Support!!!
+  - Changed wiki_link regexps to include '_'
+  - Cleaned up html and css (AdamTrickett)
+  - Support template/local/ directory
+  - Add Login button to edit
+  - Added Blog to navbar
+  - Change localtime to gmtime
+  - Added time to RecentChanges
+---
+version: 0.16
+date:    Tue Jun  3 00:02:21 PDT 2003
+changes: 
+  - Support Page Privacy (Public, Protected, Private)
+  - Support administrator login
+  - KwikiBlog is a reality
+  - Allow uppercase suffixes for urls (.GIF)
+  - Display 'Site Index' for empty search (JoergBraukhoff)
+  - Display 'Search' as the page_id on a search results page.
+  - Bang (!) before bracket ([) negates the usual formatting effect.
+  - Defeat browser caching (JoergBraukhoff)
+  - Support $ENV{REMOTE_USER} for htaccess (Pardus)
+---
+version: 0.15
+date:    Wed May 28 00:24:47 PDT 2003
+changes:
+  - Support unicode character classes in page names
+  - Search searches page names
+  - Search is written in Perl now, instead of grep
+  - Cookies span sessions
+  - Allow ftp:// and irc:// links
+  - Allow to create a new page from an old one
+  - Dead wiki links use <strike>
+  - Stop links from being underlined
+  - Allow Wiki links like KWiki
+  - Support <H4> <H5> and <H6>
+  - Refactored installation and upgrade process
+  - Added [#.#] format for $CGI::Kwiki::VERSION
+---
+version: 0.14
+date:    Thu May 22 11:47:48 PDT 2003
+changes:
+  - Works with mod_perl.
+  - Preferences works.
+  - RecentChanges shows who last editted page.
+  - Almost all non-perl content is now written to appropriate files.
+    Javascript, CSS etc. Much easier to maintain and extend now.
+  - Support mailto links and inline code.
+  - Fixed KwikiSlideShow bug in IE.
+  - https links added. Thanks to GregSchueler.
+  - ':' added to charset for page names. Suggested by JamesFitzGibbon.
+  - Javascript fix reported by Mike Arms.
+  - Security hole in CGI params fixed. Reported by TimSweetman.
+  - Emacs artifact bug fix by HeikkiLehvaslaiho.
+  - Cleaned up unneeded <p> tags. Reported by HolgerSchurig
+---
+version: 0.13
+date:    Tue May 13 11:48:40 PDT 2003
+changes:
+  - Improved javascript in slideshow
+---
+version: 0.12
+date:    Tue May 13 02:28:47 PDT 2003
+changes:
+  - Refactored the Formatter heavily
+  - Added a slideshow
+  - Works with 5.005
+  - Username works in cookie
+  - Lots more default pages (but need even more)
+---
+version: 0.12
+date:    Sat May 10 01:00:26 PDT 2003
+changes:
+  - Refactor new() out of most classes
+  - Added cgi, template, and config attributes to most classes as helpers
+  - Got user_name into cookie
+---
+version: 0.11
+date:    Thu May  8 08:29:54 PDT 2003
+changes:
+  - Cookie support
+  - Inline images
+  - Format method calls
+  - Better formatting algorithm
+  - Applied Nico Hoogervorsti's patch for tests
+  - Moved kwiki.cgi to kwiki-install
+---
+version: 0.10
+date:    Thu Apr 17 16:03:52 PDT 2003
+changes:
+  - Initial release

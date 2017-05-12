@@ -1,0 +1,38 @@
+NAME
+    Catalyst::Plugin::Account::AutoDiscovery - Catalyst Plugin for Account
+    Auto-Discovery
+
+SYNOPSIS
+      use Catalyst qw/Account::AutoDiscovery/;
+
+      # setting
+      $c->config(
+          account_autodiscovery => {
+              name => 'typester',
+              is_xml => 0,
+          },
+      );
+
+      # output
+      $c->account_autodiscovery;
+
+      # in View::TT
+      [% c.account_autodiscovery %]
+
+DESCRIPTION
+    This is a simple Catalyst plugin for Account Auto-Discovery.
+
+METHODS
+  account_autodiscovery
+SEE ALSO
+    Catalyst.
+
+    Hatena Bookmark http://b.hatena.ne.jp/help?mode=tipjar
+
+AUTHOR
+    Daisuke Murase, <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

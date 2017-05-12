@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 92
+    - 92
+  40482:
+    - 201
+name: ddcb5c
+registers:
+  AF: 19620
+  AF_: 0
+  BC: 58626
+  BC_: 0
+  DE: 53820
+  DE_: 0
+  HL: 28072
+  HL_: 0
+  I: 0
+  IX: 40390
+  IY: 28420
+  PC: 0
+  R: 0
+  SP: 0

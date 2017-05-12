@@ -1,0 +1,24 @@
+Revision history for Perl extension Catalyst::Plugin::CustomErrorMessage.
+
+0.06  Thu, 09 Sep 2010 13:35:31 +0200
+    - removed unneeded dependency
+
+0.05  Tue, 07 Sep 2010 16:58:24 +0200
+    - #60723 replaced 'use NEXT;' by 'use MRO::Compat;' (thanks to Sven - NIERLEIN@cpan.org)
+
+0.04  Tue Oct  6 12:49:20 2009
+	- config "messsage" is now "message" (thanks to Oldřich Krůza)
+
+0.03  Tue May 27 08:12:54 2008
+	- calling view in an eval block
+	- config "custome" is now "custom" (but previous also works)
+	- migrated to the Module::Build so that build_requires can be set
+
+0.02  Mon Oct  9 18:05:14 2007
+	- added:
+		__PACKAGE__->config->{'custome-error-messsage'}->{'content-type'}      = 'text/html; charset=utf-8';
+		__PACKAGE__->config->{'custome-error-messsage'}->{'view-name'}         = 'TT';
+		__PACKAGE__->config->{'custome-error-messsage'}->{'response-status'}   = 500;
+
+0.01  Fri Oct  5 17:57:18 2007
+	- initial version

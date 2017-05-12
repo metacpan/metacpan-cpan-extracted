@@ -1,0 +1,27 @@
+Revision history for Crypt-Trifid
+
+0.07  Thu Mar 31 15:50:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t)
+      - Added key 'provides' to the Makefile.PL script.
+      - Updated copyright year information.
+
+0.06  Thu Jan 07 12:05:00 2016
+      - Added LICENSE file.
+
+0.05  Sat Mar 07 09:00:00 2015
+      - Renamed method generate_charset() to _generate_charset(), just to mark as private.
+
+0.04  Sat Mar 07 08:45:00 2015
+      - Moved out helper methods to new package Crypt::Trifid::Utils.
+      - Tidied up pod document in general.
+
+0.03  Wed Feb 25 15:50:00 2015
+      - Updated description for method encode() and method decode() in the pod document.
+
+0.02  Fri Jan 16 15:40:00 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.01  Wed Nov 19 22:22:00 2014
+      - First version, released.

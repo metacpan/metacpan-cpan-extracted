@@ -1,0 +1,18 @@
+Revision history for Perl extension Catalyst::Plugin::Config::YAML.
+
+0.03  Tue Jun 21 20:05:58 2005
+	- Tweaked to use JSON
+
+Revision history for Perl extension Catalyst::Plugin::Config::JSON.
+
+0.03  Tue Jun 21 20:05:58 2005
+	- Renamed from Catalyst::Plugin::FileConfig
+
+0.02  Tue Jun 21 19:24:56 2005
+	- removed dependency on Perl 5.8.6
+	- added t/config.yml
+
+0.01  Sat Jun 18 21:59:37 2005
+	- original version; created by h2xs 1.23 with options
+		-n Catalyst::Plugin::FileConfig -X
+

@@ -1,0 +1,19 @@
+Changes
+lib/Class/Fields.pm
+lib/Class/Fields/Attribs.pm
+lib/Class/Fields/Fuxor.pm
+lib/Class/Fields/Inherit.pm
+lib/private.pm
+lib/protected.pm
+lib/public.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+t/Attribs.t
+t/bugs.t
+t/Class-Fields.t
+t/examples.t
+t/Fuxor.t
+t/Inherit.t
+t/members.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,136 @@
+
+
+=head1 NAME
+
+CPAN::Nearest - find the nearest module to a given name.
+
+=head1 SYNOPSIS
+
+    
+    use CPAN::Nearest 'search';
+    my $mod = 'Lingua::Stop::Wars';
+    my $pfile = "$ENV{HOME}/.cpan/sources/modules/02packages.details.txt.gz";
+    print "Nearest to $mod in $pfile is '", search ($pfile, $mod), "'.\n";
+    
+
+
+produces output
+
+    Nearest to Lingua::Stop::Wars in /home/ben/.cpan/sources/modules/02packages.details.txt.gz is 'Lingua::StopWords'.
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/CPAN-Nearest-0.13/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents CPAN::Nearest version 0.13
+corresponding to git commit L<16243f456a77b2cd864ecc6243ce9eef74f89368|https://github.com/benkasminbullock/nearest-module/commit/16243f456a77b2cd864ecc6243ce9eef74f89368> released on Fri Jan 13 10:24:59 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module provides a way of searching for CPAN modules whose name
+may be misspelt. For example, if a user accidentally types
+"Lingua::Stopwords" when looking for the module "Lingua::StopWords",
+the common cpan clients will not be able to function:
+
+    cpan Lingua::Stopwords
+
+gives
+
+    Warning: Cannot install Lingua::Stopwords, don't know what it is.
+    Try the command
+
+    i /Lingua::Stopwords/
+
+    to find objects with matching identifiers.
+
+and
+
+    cpanm Lingua::Stopwords
+
+gives
+
+    ! Finding Lingua::Stopwords on cpanmetadb failed.
+    ! Finding Lingua::Stopwords on search.cpan.org failed.
+    ! Finding Lingua::Stopwords () on mirror http://www.cpan.org failed.
+    ! Couldn't find module or a distribution Lingua::Stopwords ()
+
+CPAN::Nearest supplies a spelling-mistake tolerant search for the most
+similar name, intended for people making tools like C<cpan>, C<cpanm>,
+C<pm-uninstall>, and anything else which needs to use the CPAN
+packages list. CPAN::Nearest was written to be fast enough for
+practical use.
+
+CPAN::Nearest was inspired by the helpful "git" version control
+system, which provides suggestions for spelling mistakes.
+
+=head1 FUNCTIONS
+
+=head2 search
+
+    my $close_name = search ($file, $module_name);
+
+Search the package detail file C<$file> for a module named
+C<$module_name> and return the closest name. E.g. if you search for
+"Harry::Potter",
+
+    my $close_name = search ($file, 'Harry::Potter');
+
+the value in C<$close_name>, the closest CPAN module, is
+"Data::Lotter".
+
+The file specified by the first argument, C<$file> in the example, is
+usually found at F<~/.cpan/sources/modules/02packages.details.txt.gz>
+on a Unix-like system. This may be specified as the file name. This
+module can read either a compressed or uncompressed version. There is
+a speed increase of 10-20% when an uncompressed file is used.
+
+=head1 FILES
+
+Users of the C<cpan> utility supplied with Perl may find the file
+listing the CPAN modules in
+F<~/.cpan/sources/modules/02packages.details.txt.gz>. Others can
+download the file from the directory F</modules/> of any CPAN mirror. 
+
+=head1 STANDALONE PROGRAM
+
+The distribution includes a standalone program called "nearest-module"
+as shown in L<this blog
+entry|http://blogs.perl.org/users/ben_bullock/2012/06/find-a-misspelt-module-name.html>. To
+use this program, edit the file F<nearest-module.c> in the top level
+of the distribution to point to the name of the file
+F<02packages.details.txt> or F<02packages.details.txt.gz> on your
+system, and compile it with
+
+    make -f makeitfile nearest-module
+
+It is run with the name of a single module:
+
+    ./nearest-module Lingo::Jingo::Mojo
+    Closest to 'Lingo::Jingo::Mojo' is 'Lingua::JA::Moji'.
+
+There is a C<-v> option to view candidate modules:
+
+    $ ./nearest-module -v Lingo::Jingo::Mojo
+    Games::Bingo::Bot (9) is nearer than 10.
+    Lingua::JA::Moji (7) is nearer than 9.
+    Closest to 'Lingo::Jingo::Mojo' is 'Lingua::JA::Moji'.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

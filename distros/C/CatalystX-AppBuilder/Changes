@@ -1,0 +1,43 @@
+Changes
+=======
+
+0.00011 2016-02-26T13:30:30Z
+
+    - Fixed bug introduced in 0.00010 [https://github.com/lestrrat/CatalystX-AppBuilder/pull/3]
+
+0.00010 2015-11-10T21:57:22Z
+    - Add Build.PL, dist.ini, and minil.toml as markers not to descend
+      further into searching (colinnewell [https://github.com/lestrrat/CatalystX-AppBuilder/pull/2] + lestrrat)
+
+0.00009 - Jan 27 2010
+    - Fix to allow applications installed into the perl installation to 
+      use the inherited_path_to call.
+      (colinnewell [https://github.com/lestrrat/CatalystX-AppBuilder/pull/1])
+
+0.00008 - Jul 21 2010
+    - Grrr, fix what was supposed to be fixed in 0.00006 for real 
+
+0.00007 - Jul 20 2010
+    - Grrr, remove stupid debug statement...
+
+0.00006 - Jul 20 2010
+    - Grrr, work with newer Catalyst
+
+0.00005 - Mar 06 2010
+    - Attempt to fix rt #55256. Prevents CatalystX::AppBuilder to run setup
+      if we're being called from within another CatalystX::AppBuilder.
+
+0.00004 - Mar 05 2010
+    - Attempt to fix rt #55229. Now requires Catalyst::ScriptRunner, which is
+      bundled with Catalyst 5.80015 onward
+
+0.00003 - Mar 01 2010
+    - Check for the existance of Makefile.PL to determine Catalyst root
+
+0.00002 - Sep 30 2009
+    - Fix docs
+    - Warn when the same plugin is listed multiple times in the plugins
+      attribute
+
+0.00001 - Sep 29 2009
+    - First release

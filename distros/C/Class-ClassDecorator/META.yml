@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: Class-ClassDecorator
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  NEXT: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Class::ClassDecorator:
+    file: lib/Class/ClassDecorator.pm
+    version: 0.02
+  super:
+    file: lib/Class/ClassDecorator.pm
+    version: 0.02
+generated_by: Module::Build version 0.21

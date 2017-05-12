@@ -1,0 +1,147 @@
+0.232.6 2017-01-15
+
+  Documentation improvement:
+  
+    * Respect paragraph format of original documentation. This
+      improves a lot the readability of the documentation displayed in
+      cme and on cpan website.
+
+0.232.5 2017-01-13
+
+  Bug fix:
+    * fix Unit Condition* parameters which are list type, not uniline
+      (Debian #849490)
+
+0.232.4 2016-12-30
+
+  Bug fix:
+    * fix systemd-user load when config dir is missing (Debian #849490)
+
+0.232.3 2016-12-12
+
+  Bug fix:
+    * fix load of bad systemd files with -force option
+      (require App::Cme 1.016 and Config::Model 2.096)
+    * issue an error when a systemd parameter is specified
+      twice (can be overriden with -force option)
+    * issue a warning when an unknown parameter is found in a
+      systemd file
+    * avoid writing systemd default values in systemd file
+
+0.232.2 2016-11-22
+
+  Add missing dependency on Config::Model 2.094
+
+0.232.1 2016-11-20
+
+  Release again with correct version number.
+
+0.231.3 2016-11-20
+
+  Systemd model update:
+    * update with systemd 232
+    * specify default value of some integer parameters
+    * can migrate depracated resource-control parameters
+      (for instance, cme replaces deprecated CPUWeight with CPUShares)
+
+  Systemd parser update:
+    * parser: enable 2 styles of comments (gh #1)
+
+  Improved model generation from systemd doc (parse-man.pl):
+    * model extraction:
+      * fix enum values extraction
+      * fix integer min max extraction
+      * extract integer range from description
+      * extract default value of integer param
+      * detect and setup migration of deprecated parmaters
+      * handle correctly integer with K|G|M suffix
+    * description extraction:
+      * remove obsolete utf8 cleanup in descrtipion
+      * fix bug in description formatting
+      * disable insertion of debian man page URL (this debian
+        service is now down)
+
+0.231.2 2016-11-13
+
+  Bug fix:
+  * Fix parser bug triggered by unit name containing a dot
+
+0.231.1 2016-10-27
+
+  This release uses a new version scheme where the 2nd field shows the
+  version of Systemd supported by 'cme'
+
+  Systemd model update:
+    * update with systemd 231
+    * add support for Timer service
+
+  Bug fix:
+    * Systemd model: use new warp syntax
+      (required Config::Model 2.087)
+    * parse_man: use new warp syntax
+      (Require Config::Model::Itself 2.005)
+    * fix linkage of generated class in root class (parse-man)
+    * remove socket service file when needed
+ 
+0.007 2016-06-05
+
+  Bug fix:
+    * Unit backend: fix read value of accepted elements
+
+  Improved model generation from systemd doc:
+    * parse-man:
+      * Booleans are yes/no values
+      * infer enum choice from "boolean or something else"
+        as seen in Systemd doc.
+      * parse-man dies when no option is used on command line
+      * cannot extract info from IOSchedulingClass doc, this param is
+        tweaked using specific instructions
+
+  Generated model:
+   * Booleans are yes/no values
+   * "boolean or something else" are now enum type with
+     choices: yes,no,somethin-else as specified in Systemd doc
+
+0.006 2016-05-11
+
+  Bug fix:
+    * do not write 'disable' param in systemd file
+
+  Usability improvements:
+    * dist.ini: recommends App::Cme and Config::Model::TkUI
+    * improved abstract and description of Config::Model::Systemd
+
+0.005 2016-05-09
+
+    * Added doc to the classes reading and writing systemd
+      files
+
+0.004 2016-05-07
+
+    Improved model generation from systemd doc:
+    * parse_man:
+      * infer enum (some? most?) from doc
+      * handles Condition* variables..
+      * added -from parameter
+      * added copyright and license info...
+      * use debian service for man pages
+      * preserve upstream doc formatting..
+    * regenerated model from systemd 228 with the changes above
+
+0.003 2016-05-02
+
+  Fix utf-8 issues in pod documentation:
+    * removed utf8 chars from generated model
+    * parse_man: remove utf8 chars from systemd doc...
+    * added test to check pod syntax
+
+0.002 2016-04-26
+
+  Bug fixes:
+  * Updated dependency versions:
+    * Config::Model::Tester 2.054
+    * Config::Model 2.083
+
+0.001 2016-04-23
+
+  Initial release

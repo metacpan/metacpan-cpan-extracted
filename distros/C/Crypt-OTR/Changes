@@ -1,0 +1,17 @@
+Revision history for Perl extension Crypt::OTR.
+
+0.04  Sun Jan 17 2010
+        - better docs
+
+0.03  Sun Jan 17 2010
+        - accessors for keyfile and fingerprint file
+        - cleanup, docs
+
+0.02  Sun Jan 17 2010
+        - free memory used by callbacks on destruction
+        - remove some cruft
+
+0.01  Sun Jun 21 09:19:14 2009
+	- original version; created by h2xs 1.23 with options
+		-P -g -n Crypt::OTR
+

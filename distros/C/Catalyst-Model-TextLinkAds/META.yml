@@ -1,0 +1,28 @@
+---
+name: Catalyst-Model-TextLinkAds
+version: 0.01
+author:
+  - 'Dave Cardwell <dcardwell@cpan.org>'
+abstract: Catalyst model for Text Link Ads
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Catalyst::Model: 0
+  Catalyst::Utils: 0
+  Class::C3: 0
+  TextLinkAds: 0
+build_requires:
+  Test::More: 0
+provides:
+  Catalyst::Helper::Model::TextLinkAds:
+    file: lib/Catalyst/Helper/Model/TextLinkAds.pm
+    version: 0.01
+  Catalyst::Model::TextLinkAds:
+    file: lib/Catalyst/Model/TextLinkAds.pm
+    version: 0.01
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

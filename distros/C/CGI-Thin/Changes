@@ -1,0 +1,54 @@
+Revision history for Perl extension CGI::Thin.
+
+0.52	Sat Sept 15 2001
+	- New version for CPAN, but no changes from 0.5102
+
+0.5102  Wed Jul 18  2001
+	- Brought CGI::Thin and CGI::Thin::Cookies back into the same tarball for
+	  easier distribution
+	- Moved both test.pl files into the t directory as tests 01 and 02
+	- Moved both *.pm files into the lib directory
+
+0.51  April 2001
+	- Create and spin off CGI::Thin::Cookies to parse and set cookies.
+	  Thus this module can remain focused on form parsing only
+	- Fixed some nits picked by Barrie Slaymaker <barries@slaysys.com>
+		- switched from s/\+/ /g to tr/+/ / which should be a tad faster
+		- You might want to use %([0-9a-fA-F]{2} to avoide grabbing illegal
+		  escapes and passing non-hex data to hex().
+		- switched from a pack("c",hex($1)) to a chr(hex($1))
+		- ';' is a synonym for '&' in query strings, no longer overlooked.
+		- What if there are parameters in both the query string and in
+		  multipart/form-data? Could CGI::Thin be tweaked to process both?
+		  Now it always looks at $ENV{QUERY_STRING} and then does multi-part or POST
+		- If somebody sticks a %3D in a name, a very remote possibility, there
+		  could be problems.  Moving the index($i,"=") up and de-escaping the
+		  key and name seperately might do the trick.
+		  Now decode hex characters after the split so they work.
+		- CGI::Thin doesn't seem to know about keyword style query strings like "/foo?a&b&c".
+		  Changed to using a split ("=", $item, 2).  So key can be set without a value.
+    - Added a test.pl and other CPAN friendly extras
+
+0.41  Sun Feb 11 00:20:00 2001
+	- first released version (CPAN)
+
+0.40  Tue Jul 18 11:54:08 2000
+	- first released version (PlatypiVentures.com) 
+
+0.31  4/22/99
+    - now can handle multipart forms and read in files
+    - also changed multiple entries in one name, now returns an array of values
+
+0.30  12/18/98
+    - changed to Parse_CGI and now returns the hash not the size of the hash
+      and has no input pointer to the hash
+
+0.20  7/5/95
+	- Craig R. Meyer Optimized ReadParse()
+    - Use read() not getc(), don't use subscripts
+
+0.10  1993
+	- Steven E. Brenner wrote CGILIB.pl, original available from...
+      http://cgi-lib.stanford.edu/cgi-lib/
+
+

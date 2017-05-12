@@ -1,0 +1,101 @@
+NAME
+    Context::Handle - A convenient context propagation proxy thingy.
+
+SYNOPSIS
+            use Context::Handle qw/context_sensitive/;
+
+            sub wrapping {
+                    my $rv = context_sensitive {
+                            $some_thing->method(); # anything really
+                    };
+
+                    # you can do anything here
+
+                    $rv->return; # returns the value in the right context
+
+                    # not reached
+            }
+
+DESCRIPTION
+    This module lets you delegate to another method and return the value
+    without caring about context propagation.
+
+    The level of support is tied to what Want does - this module tries to
+    make all the distinctions Want can make fully supported, for example
+    array dereference context, boolean context, etc.
+
+EXPORTS
+    Nothing is exported by default.
+
+    context_sensitive BLOCK
+        This is a convenience shortcut that calls "new"
+
+METHODS
+  Regular Usage
+    new $code
+        This method invokes $code in the calling sub's context, and returns
+        an object that saves the return value.
+
+    rv_container
+        This instance method returns the return value container object. The
+        only useful methods for the RV containers is "value", which has a
+        delegator anyway.
+
+    value
+        This returns the value from the "rv_container"
+
+    return
+        This (ab)uses Want to perform a double return.
+
+        Saying
+
+                $rv->return;
+
+        is just like
+
+                return $rv->value;
+
+  Introspection
+    Incidientially due to the needs of the wrapping layer this module also
+    provides an OO interface to Want, more or less ;-)
+
+    bool
+    void
+    scalar
+    list
+    refarray
+    refhash
+    refscalar
+    refobject
+    refcode
+    refglob
+        All of these methods return boolean values, with respect to the
+
+TODO
+    *   pseudoboolean context - the right side of && and the left side of ||
+        evaulate in boolean context, but still return a meaningful value.
+
+    *   Glob assignment context. I'm not sure how to make the value
+        propagate back once it's been assigned to the glob - it's hard to
+        know what it is without inspecting the slots and that's kinda
+        tricky.
+
+    *   Lvalue assignment
+
+    *   use Sub::Uplevel to hide the wrapping
+
+    *   context arity - Want's count stuff. This can probably be done using
+        @list[0..$x] = (...), but might need to be emulated with eval. See
+        "perldoc -f split".
+
+ACKNOWLEGMENTS
+    Robin Houston for Want and lots of help by email
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2006 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

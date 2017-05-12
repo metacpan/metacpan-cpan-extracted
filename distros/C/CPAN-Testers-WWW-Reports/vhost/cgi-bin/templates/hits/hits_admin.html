@@ -1,0 +1,42 @@
+[% 
+    title = 'Hit Counters' ;
+
+    crumb1_name = 'Hits' ;
+%]
+
+<h2>Last Month Main Site Pages</h2>
+<div class="box">
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>Area</th>
+    <th>Query</th>
+</tr>
+[% FOREACH record = pagesmon %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td>[% record.area %]</td>
+    <td>[% record.query %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<h2>All Time Main Site Pages</h2>
+<div class="box">
+<table class="blocker">
+<tr>
+    <th width="30">Count</th>
+    <th>Area</th>
+    <th>Query</th>
+</tr>
+[% FOREACH record = pagesall %]
+<tr>
+    <td>[% record.counter %]</td>
+    <td>[% record.area %]</td>
+    <td>[% record.query %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+

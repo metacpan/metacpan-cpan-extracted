@@ -1,0 +1,34 @@
+Readme for Cache
+
+The Cache modules are designed to assist a developer in persisting data for a
+specified period of time.  Often these modules are used in web applications to
+store data locally to save repeated and redundant expensive calls to remote
+machines or databases.
+
+The Cache package provides the 'Cache' module, a generic interface for
+creating persistent data stores.  The interface is implemented by the
+Cache::Memory and Cache::File modules.
+
+This work aggregates and extends the original Cache::Cache modules.
+
+For more details, see the pod documentation in Cache.pm.
+
+For licensing, see the LICENSE file in this distribution.
+To install:
+
+  perl Makefile.PL
+  make
+  make test
+  sudo make install
+
+will probably do it.
+
+Please send any bug reports to the rt.cpan.org queue at
+https://rt.cpan.org/Dist/Display.html?Name=Cache .
+
+This module was originally created by Chris Leishman <chris@leishman.org>
+and is now maintained by Shlomi Fish ( http://www.shlomifish.org/ ).
+
+Messages of thanks can be sent by E-mail. :)
+
+Enjoy!

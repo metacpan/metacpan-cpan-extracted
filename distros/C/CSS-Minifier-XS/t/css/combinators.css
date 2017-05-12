@@ -1,0 +1,4 @@
+/* CSS Selector Combinators */
+h1 > p { background: green }
+h1 + p { background: yellow }
+h1 ~ p { background: red }

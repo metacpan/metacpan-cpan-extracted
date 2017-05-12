@@ -1,0 +1,36 @@
+---
+name: Config-Hierarchical
+version: 0.13.9
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+abstract: configuration variable hierachical container
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::Compare: 0
+  Data::TreeDumper: 0
+  Eval::Context: 0.03
+  Readonly: 0
+  Sub::Install: 0
+  Test::Block: 0
+  Test::Cookbook: 0.02
+  Test::Distribution: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Strict: 0
+  Test::Warn: 0
+provides:
+  Config::Hierarchical:
+    file: lib/Config/Hierarchical.pm
+    version: 0.13
+  Config::Hierarchical::Delta:
+    file: lib/Config/Hierarchical/Delta.pm
+    version: 0.01
+  Config::Hierarchical::Tie::ReadOnly:
+    file: lib/Config/Hierarchical/Tie/ReadOnly.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

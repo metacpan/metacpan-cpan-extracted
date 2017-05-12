@@ -1,0 +1,1035 @@
+<RDF xmlns:r="http://www.w3.org/TR/RDF/"
+     xmlns:d="http://purl.org/dc/elements/1.0/"  
+     xmlns="http://dmoz.org/rdf">
+
+<Topic r:id="Top">
+  <catid>1</catid>>
+  <d:Title>Top</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts">
+  <catid>2</catid>>
+  <d:Title>Arts</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books">
+  <catid>26</catid>>
+  <d:Title>Books</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/News">
+  <d:Title>News</d:Title>
+  <link r:resource="http://www.bookmagazine.com/"/>
+  <link r:resource="http://members.barnesandnoble.com/ennounce/efeatures.asp?sourceid=e395"/>
+  <link r:resource="http://www.bookreporter.com/brc/newsletter.asp"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthGen.html"/>
+  <link r:resource="http://www.amazon.com/exec/obidos/subst/delivers/delivers-signup-combo.html/002-1591481-5740650"/>
+  <link r:resource="http://www.wordsworth.com/www/present/newtitles/11263623376"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthDM.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthHist.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthHor.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthInsp.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthMil.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthRom.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthSF.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthThril.html"/>
+  <link r:resource="http://www.bookbrowser.com/Forthcoming/ForthWest.html"/>
+  <link r:resource="http://www.randomhouse.com/delrey/inbox/current.html"/>
+</Topic>
+
+<ExternalPage about="http://www.bookmagazine.com/">
+  <d:Title>Book - The Magazine for the Reading Life</d:Title>
+  <d:Description>&quot;At bookmagazine.com you'll be able to read selected articles ... &quot;</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://members.barnesandnoble.com/ennounce/efeatures.asp?sourceid=e395">
+  <d:Title>barnesandnoble.com e-nnouncements Categories</d:Title>
+  <d:Description>Pick your favorite genre and get email newsletters on upcoming releases, interviews, and events</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookreporter.com/brc/newsletter.asp">
+  <d:Title>Book News &amp; Commentary</d:Title>
+  <d:Description>Subscribe to The Book Report's Newsletter</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthGen.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>General Fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.amazon.com/exec/obidos/subst/delivers/delivers-signup-combo.html/002-1591481-5740650">
+  <d:Title>Amazon.com Delivers Sign Up</d:Title>
+  <d:Description>sign up to receive recommended reads in your favorite subject area</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.wordsworth.com/www/present/newtitles/11263623376">
+  <d:Title>WordsWorth Books</d:Title>
+  <d:Description>New Titles and Catalogs</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthDM.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Detective/Mystery</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthHist.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Historical Fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthHor.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Horror</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthInsp.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Inspirational Fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthMil.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Military Fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthRom.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Romance</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthSF.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Speculative Fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthThril.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Thriller</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookbrowser.com/Forthcoming/ForthWest.html">
+  <d:Title>BookBrowser:Forthcoming</d:Title>
+  <d:Description>Westerns</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.randomhouse.com/delrey/inbox/current.html">
+  <d:Title>Del Rey Books: Science Fiction and Fantasy</d:Title>
+  <d:Description>What's new in stores, and forthcoming releases</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Books/Reviews">
+  <catid>908</catid>>
+  <d:Title>Reviews</d:Title>
+  <link r:resource="http://www.clark.net/~bell/eibr/book_review.html"/>
+  <link r:resource="http://www.az.com/~drysdam/books/books.htm"/>
+  <link r:resource="http://www.tronco.com/books"/>
+  <link r:resource="http://www.crl.com/~dbrandt/"/>
+  <link r:resource="http://www.indolink.com/Book/index.html"/>
+  <link r:resource="http://www.sfsite.com/fi/index.htm"/>
+  <link r:resource="http://www.sannes.net/chris/library/index.html"/>
+  <link r:resource="http://www.booknews.co.uk/"/>
+  <link r:resource="http://www.sau.edu/CWIS/Internet/Wild/Refdesk/Howgood/Bookbyte/bkindex.htm"/>
+  <link r:resource="http://www.reed.edu/~karl/postapoc/"/>
+  <link r:resource="http://www.cs.virginia.edu/~jdr8d/books/"/>
+  <link r:resource="http://www.cea.berkeley.edu/~john/book/"/>
+  <link r:resource="http://falcon.cc.ukans.edu/~luce/"/>
+  <link r:resource="http://www.teleport.com/~jaheriot/reviews.htm"/>
+  <link r:resource="http://www.access.digex.net/~cdl/books.html"/>
+  <link r:resource="http://www.mutoscope.com/doras.htm"/>
+  <link r:resource="http://www.teleport.com/~jonno/"/>
+  <link r:resource="http://www.fictiondigest.com"/>
+  <link r:resource="http://www.ideasign.com/crowt/books.htm"/>
+  <link r:resource="http://www.arielbooks.com/"/>
+  <link r:resource="http://www.geocities.com/Athens/Academy/5529/"/>
+  <link r:resource="http://www.theromancereader.com"/>
+  <link r:resource="http://strobe.lights.com/novel/welcome.html"/>
+  <link r:resource="http://www.sleepless.to"/>
+  <link r:resource="http://www.prairienet.org/community/clubs/gpf/reviews.html"/>
+  <link r:resource="http://www.writerswrite.com/journal/"/>
+  <link r:resource="http://web2.airmail.net/thomas3/booklist.htm"/>
+  <link r:resource="http://positive.net/"/>
+  <link r:resource="http://www.anatomy.usyd.edu.au/danny/book-reviews/"/>
+  <link r:resource="http://colargol.tihlde.hist.no/~dagr/fantasy/fantasy.html"/>
+  <link r:resource="http://www.muohio.edu/~haguecs/bkrvw/BKRVWS.HTM"/>
+  <link r:resource="http://www.pezzi.nl"/>
+  <link r:resource="http://www.topbestsellers/com"/>
+  <link r:resource="http://www.themysteryreader.com"/>
+  <link r:resource="http://www.bookreporter.com/"/>
+  <link r:resource="http://www.bookreviews.net/"/>
+  <link r:resource="http://www.brothersjudd.com/"/>
+</Topic>
+
+<ExternalPage about="http://www.clark.net/~bell/eibr/book_review.html">
+  <d:Title>Ed's Internet Book Review</d:Title>
+  <d:Description>Dr. Edwin V. Bell invites others to join him in reviewing books on all categories.  Quick index and tracking of popular reviews make this a useful sight for current literature.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.az.com/~drysdam/books/books.htm">
+  <d:Title>Book Reviews by Kristen Voskuil</d:Title>
+  <d:Description>Personal reviews on fiction and non-fiction, updated monthly.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.tronco.com/books">
+  <d:Title>Book Review Corner, The</d:Title>
+  <d:Description>Easy to access site with reviews of fiction, science, politics, biography, religion, language, and martial arts books.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.crl.com/~dbrandt/">
+  <d:Title>NameBase Book Index</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.indolink.com/Book/index.html">
+  <d:Title>INDOlink Book &amp; Media Review</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.sfsite.com/fi/index.htm">
+  <d:Title>First Impressions</d:Title>
+  <d:Description>A &quot;reading diary&quot; that contains comments and reviews of mainly older fiction works, with a sprinkling of current and non-fiction books.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.sannes.net/chris/library/index.html">
+  <d:Title>My Reading Library</d:Title>
+  <d:Description>Heavily favors reviews of American Religious History, but also contains other genres as well.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.booknews.co.uk/">
+  <d:Title>Book News</d:Title>
+  <d:Description>Short overviews of the latest books about science, technology, and medicine.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.sau.edu/CWIS/Internet/Wild/Refdesk/Howgood/Bookbyte/bkindex.htm">
+  <d:Title>Book Bytes</d:Title>
+  <d:Description>Review columns by Marylaine Block, an educator and avid bookreader.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.reed.edu/~karl/postapoc/">
+  <d:Title>Post-Apocalyptic Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.cs.virginia.edu/~jdr8d/books/">
+  <d:Title>John's Book Pages</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.cea.berkeley.edu/~john/book/">
+  <d:Title>John's Thumbnail Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://falcon.cc.ukans.edu/~luce/">
+  <d:Title>Luce Canon, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.teleport.com/~jaheriot/reviews.htm">
+  <d:Title>Micropress Reviews by Jean Heriot</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.access.digex.net/~cdl/books.html">
+  <d:Title>Chris' Book Reviews</d:Title>
+  <d:Description>Short, short reviews and lists of good &quot;book discussion group' books.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.mutoscope.com/doras.htm">
+  <d:Title>Doras Roundtower Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.teleport.com/~jonno/">
+  <d:Title>Herbal Bookworm, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.fictiondigest.com">
+  <d:Title>Fiction Digest Cafe</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.ideasign.com/crowt/books.htm">
+  <d:Title>Curled Up With a Good Book</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.arielbooks.com/">
+  <d:Title>ArielBooks</d:Title>
+  <d:Description>A small, but nice selection of reviews of suspense, classic, and adventure literature.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.geocities.com/Athens/Academy/5529/">
+  <d:Title>Book Tape Page, The</d:Title>
+  <d:Description>Reviews of audiobooks (i.e, &quot;books on cassettes&quot;).</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.theromancereader.com">
+  <d:Title>The Romance Reader</d:Title>
+  <d:Description>The site for news, views, and reviews of romance fiction.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://strobe.lights.com/novel/welcome.html">
+  <d:Title>How Novel</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.sleepless.to">
+  <d:Title>Sleepless Resources</d:Title>
+  <d:Description>Book reviews on a wide variety of topics including  history, politics, science, fantasy, sci-fi,   general fiction, children's books, and more.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.prairienet.org/community/clubs/gpf/reviews.html">
+  <d:Title>Prairie Pen Book Reviews, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.writerswrite.com/journal/">
+  <d:Title>The Internet Writing Journal</d:Title>
+  <d:Description>Monthly onlne magazine with book  reviews in several generals, author  interviews and writing articles.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://web2.airmail.net/thomas3/booklist.htm">
+  <d:Title>The Thomas Booklist</d:Title>
+  <d:Description>Barbara and Tom Thomas offer a small collection of reviews of SF/Fantasy and children's fiction.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://positive.net/">
+  <d:Title>Positive Net Home Page: Books, Stories and Essays</d:Title>
+  <d:Description>The Positive Place on the Internet where upbeat and inspirational books, magazines, stories, and essays are reviewed.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.anatomy.usyd.edu.au/danny/book-reviews/">
+  <d:Title>Danny Yee's Book Reviews</d:Title>
+  <d:Description>A collection of 450 book reviews.  Some fiction,  but mostly non-fiction: biology, physics,  anthropology, history, you name it.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://colargol.tihlde.hist.no/~dagr/fantasy/fantasy.html">
+  <d:Title>Anotherland - Fantasy Authors</d:Title>
+  <d:Description>Reviews of Fantasy books</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.muohio.edu/~haguecs/bkrvw/BKRVWS.HTM">
+  <d:Title>Chuck's Book Reviews</d:Title>
+  <d:Description>Long and detailed reviews of genre work; small site, but worth reading.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.pezzi.nl">
+  <d:Title>Pezzi</d:Title>
+  <d:Description>[Language: Dutch] Short, intelligent reviews of the best international books on arts, culture, history and travel</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.topbestsellers/com">
+  <d:Title>TopBestsellers.com</d:Title>
+  <d:Description>Bestseller news, reviews, and trivia.  Also includes a composite index of all the major bestseller lists, averaged into a single comprehensive list.  Updated weekly.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.themysteryreader.com">
+  <d:Title>The Mystery Reader</d:Title>
+  <d:Description>The latest reviews and news of current mystery novels, including police procedurals, thrillers, suspense, cozies, historicals and romantic suspense. Also author interviews, features, upcoming releases and more.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookreporter.com/">
+  <d:Title>Bookreporter</d:Title>
+  <d:Description>&quot;A community site dedicated to book lovers and writers. We provide a forum for readers to communicate with authors. Gather information about books inluding reviews, excerpts, features, author interviews, and reader polls.  Books - Newsletter - Search - Authors - Excerts - Interveiws.&quot;</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookreviews.net/">
+  <d:Title>Book Reviews</d:Title>
+  <d:Description>Index of book review sites</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.brothersjudd.com/">
+  <d:Title>The Brothers Judd</d:Title>
+  <d:Description>Reviews of books of all genres, including the Modern Library Top 100, National Book Award winners, and current books.  A complete directory of recommended authors and their works that have all been read by one or both of the Brothers Judd.</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Books/Reviews/Magazines_and_Newspapers">
+  <catid>941</catid>>
+  <d:Title>Magazines_and_Newspapers</d:Title>
+  <link r:resource="http://www.brightleaf-review.com/"/>
+  <link r:resource="http://www.ala.org/booklist/index.html"/>
+  <link r:resource="http://www.bookpage.com/"/>
+  <link r:resource="http://chicago.digitalcity.com/cafe/books/index.htm"/>
+  <link r:resource="http://www.ala.org/acrl/choice/home.html"/>
+  <link r:resource="http://www.bookwire.com/hmr/"/>
+  <link r:resource="http://www.christianity.net/ct/features/ctbooks.html"/>
+  <link r:resource="http://www.bookwire.com/qbr/qbr.html"/>
+  <link r:resource="http://www.literascape.com/Readers/index.html"/>
+  <link r:resource="http://www.salonmagazine.com/books/sneaks"/>
+  <link r:resource="http://www.scotsman.com/bookreviews"/>
+  <link r:resource="http://www.nytimes.com/auth/login?Tag=/&URL=/books/"/>
+  <link r:resource="http://www.geocities.com/Athens/Acropolis/5710/"/>
+  <link r:resource="http://www.mph.lm.com/pbf.html"/>
+  <link r:resource="http://moshplant.com/prob/prob_covers.html"/>
+  <link r:resource="http://www.raintaxi.com/"/>
+  <link r:resource="http://www.ralphmag.org/"/>
+  <link r:resource="http://www.cs.unca.edu/~davidson/msrrt"/>
+  <link r:resource="http://www.wowwomen.com/tapestry/"/>
+  <link r:resource="http://www.januarymagazine.com/out/reviews.jan"/>
+</Topic>
+
+<ExternalPage about="http://www.brightleaf-review.com/">
+  <d:Title>Brightleaf: A Southern Review of Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.ala.org/booklist/index.html">
+  <d:Title>Booklist Magazine</d:Title>
+  <d:Description>The American Library Association magazine.  It reviews an amazing number of the books published each year in the United States.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookpage.com/">
+  <d:Title>BookPage</d:Title>
+  <d:Description>A monthly general interest book review magazine.  typically reviews 40 to 50 of each month's new fiction, nonfiction, business, children's, spoken word audio, and how-to books.  The tone is upbeat and literate, focusing on bestsellers as well as new discoveries.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://chicago.digitalcity.com/cafe/books/index.htm">
+  <d:Title>Chicago Tribune Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.ala.org/acrl/choice/home.html">
+  <d:Title>Choice Magazine:  Current Reviews for Academic Libraries</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookwire.com/hmr/">
+  <d:Title>Hungry Mind Review</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.christianity.net/ct/features/ctbooks.html">
+  <d:Title>Christianity Today Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.bookwire.com/qbr/qbr.html">
+  <d:Title>Quarterly Black Review of Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.literascape.com/Readers/index.html">
+  <d:Title>New Reader, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.salonmagazine.com/books/sneaks">
+  <d:Title>Salon  Books:  Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.scotsman.com/bookreviews">
+  <d:Title>Scotsman Book Reviews, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.nytimes.com/auth/login?Tag=/&URL=/books/">
+  <d:Title>New York Times Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.geocities.com/Athens/Acropolis/5710/">
+  <d:Title>Lazy Literate, The</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.mph.lm.com/pbf.html">
+  <d:Title>Provident Book Finder Book Review Service</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://moshplant.com/prob/prob_covers.html">
+  <d:Title>Plant's Review of Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.raintaxi.com/">
+  <d:Title>Rain Taxi Review of Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.ralphmag.org/">
+  <d:Title>RALPH: the Review of Arts, Literature, Philosophy, and the Humanities</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.cs.unca.edu/~davidson/msrrt">
+  <d:Title>MSRRT Newsletter: Library Alternatives</d:Title>
+  <d:Description>Reviews of alternative press books, zines, and other DiY media; a source of commentary and networking info for library workers</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.wowwomen.com/tapestry/">
+  <d:Title>Tapestry</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.januarymagazine.com/out/reviews.jan">
+  <d:Title>January Magazine</d:Title>
+  <d:Description>Reviews of the latest popular fiction (crime, mainstream, popular authors), cookbooks, children's, and non-fiction.</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Books/Reviews/Computer_Books">
+  <catid>942</catid>>
+  <d:Title>Computer_Books</d:Title>
+  <link r:resource="http://www.bookwire.com/cbr/"/>
+  <link r:resource="http://www.ercb.com/"/>
+  <link r:resource="http://www.compbookreview.com/"/>
+  <link r:resource="http://www.jetcafe.org/~npc/reviews/computing/"/>
+</Topic>
+
+<ExternalPage about="http://www.bookwire.com/cbr/">
+  <d:Title>Computer Book Review</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.ercb.com/">
+  <d:Title>Dr. Dobb's Electronic Review of Computer Books</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.compbookreview.com/">
+  <d:Title>Online Book Reviews</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.jetcafe.org/~npc/reviews/computing/">
+  <d:Title>Computing Book Reviews by Nick Christenson</d:Title>
+  <d:Description>A collection of reviews of computer and Internet related books by Nick Christenson.</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Books/Genres">
+  <catid>41214</catid>>
+  <d:Title>Genres</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Genres/Science_Fiction">
+  <catid>906</catid>>
+  <d:Title>Science_Fiction</d:Title>
+  <link r:resource="http://168.150.253.1/~zlensman/lensfaq.html"/>
+  <link r:resource="http://www.baen.com/"/>
+  <link r:resource="http://web.mit.edu/mitsfs/www/homepage.html"/>
+  <link r:resource="http://www.halcyon.com/phaedrus/translist/translist.html"/>
+  <link r:resource="http://lacon3.worldcon.org/"/>
+  <link r:resource="http://www.msen.com/~yorick/srb_taos.html"/>
+  <link r:resource="http://www.randomhouse.com/delrey/"/>
+  <link r:resource="http://sflovers.rutgers.edu/"/>
+  <link r:resource="http://www.skatecity.com/ah/"/>
+  <link r:resource="http://www.tor.com/"/>
+  <link r:resource="http://www.bdd.com/forum/bddforum.cgi/scifi/main.html"/>
+  <link r:resource="http://www.wsfs.org"/>
+  <link r:resource="http://earthspace.net/~esr/sf-words/"/>
+  <link r:resource="http://www.bucconeer.worldcon.org/"/>
+  <link r:resource="http://www.aussiecon3.worldcon.org/"/>
+  <link r:resource="http://world.std.com/~mam/Cracks-and-Shards/"/>
+  <link r:resource="http://www.dcs.gla.ac.uk/SF-Archives/Ansible/"/>
+  <link r:resource="http://www.white-wolf.com/"/>
+  <link r:resource="http://fanac.org/"/>
+  <link r:resource="http://ebbs.english.vt.edu/olp/nyrsf/nyrsf.html"/>
+  <link r:resource="http://www.io.com/~stefanj/82Eridani/index.html"/>
+  <link r:resource="http://www.nor.com.au/users/antisf/index.html"/>
+  <link r:resource="http://www.sfsite.com/isfdb/index.html"/>
+  <link r:resource="http://www.slip.net/~shanly/gallery.html"/>
+  <link r:resource="http://www.locusmag.com/"/>
+  <link r:resource="http://www.nesfa.org/"/>
+  <link r:resource="http://www.atlantic.net/~jcd/"/>
+  <link r:resource="http://www.dragoncon.org/"/>
+  <link r:resource="http://www.scifi.com/sfw/"/>
+  <link r:resource="http://sflovers.rutgers.edu/Web/SFRG/"/>
+  <link r:resource="http://husted.com/hgsf/"/>
+  <link r:resource="http://moonmilk.volcano.org/whorl/"/>
+  <link r:resource="http://cube.ice.net/~kwalsh/callahans.html"/>
+  <link r:resource="http://hugin.imat.com/jordan/"/>
+  <link r:resource="http://www.clark.net/pub/iz/Books/Top100/top100.html"/>
+  <link r:resource="http://www.rahul.net/rootbear/graphics/ringworld/index.html"/>
+  <link r:resource="http://sflovers.rutgers.edu/Web/cons.html"/>
+  <link r:resource="http://www.scifiweekly.com/current/site.html"/>
+  <link r:resource="http://www.nauticom.net/www/babylon/store/store.htm"/>
+  <link r:resource="http://www.lasfs.org"/>
+  <link r:resource="http://www.worldcon.org"/>
+  <link r:resource="http://www.geocities.com/Athens/6477/"/>
+  <link r:resource="http://www.sff.net/bfob/"/>
+  <link r:resource="http://www-personal.umich.edu/~pkretsch/dragon/dragon.htm"/>
+  <link r:resource="http://members.aol.com/kurellian/spint.html"/>
+  <link r:resource="http://www.geocities.com/Area51/Vault/8067/"/>
+  <link r:resource="http://members.aol.com/misuly/bookclub.htm"/>
+  <link r:resource="http://www.magicdragon.com/UltimateSF/SF-Index.html"/>
+  <link r:resource="http://starkloff.com"/>
+  <link r:resource="http://www.delphi.com/sflit/"/>
+  <link r:resource="http://outer-rim.lweb.net"/>
+  <link r:resource="http://www.robotbooks.com/"/>
+  <link r:resource="http://www.fortunecity.com/tattooine/halebopp/162"/>
+  <link r:resource="http://www.eclipse.co.uk/sweetdespise/"/>
+  <link r:resource="http://colargol.tihlde.hist.no/~dagr/fantasy/fantasy.html"/>
+  <link r:resource="http://www.scifan.com"/>
+  <link r:resource="http://www.scifistation.com/"/>
+  <link r:resource="http://www.cs.wisc.edu/~mlk/sfbooks.html"/>
+  <link r:resource="http://www.geocities.com/ResearchTriangle/5431/scifi.html"/>
+  <link r:resource="http://www.speculativevision.com"/>
+  <link r:resource="http://hem.passagen.se/gumby/sf/eng/"/>
+</Topic>
+
+<ExternalPage about="http://168.150.253.1/~zlensman/lensfaq.html">
+  <d:Title>The Lensman FAQ</d:Title>
+  <d:Description>Information about E.E. &quot;Doc&quot; Smith's &quot;Lensman&quot; series.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.baen.com/">
+  <d:Title>Baen Books</d:Title>
+  <d:Description>Publishers of science fiction and fantasy.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://web.mit.edu/mitsfs/www/homepage.html">
+  <d:Title>MIT Science Fiction Society</d:Title>
+  <d:Description>home of the world's largest open-shelf collection of science fiction</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.halcyon.com/phaedrus/translist/translist.html">
+  <d:Title>Transformation Stories List - Lycanthropy, Shapechanging Magic, Nanotechnology, Shapeshifters...</d:Title>
+  <d:Description>Books, stories and other works (mostly SF, fantasy, and horror) with shapeshifting (werewolves, nanotechnology, etc.) as a theme.  Searchable; includes brief descriptions and reviews.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://lacon3.worldcon.org/">
+  <d:Title>L.A.con III, the 1996 Worldcon - Home Page</d:Title>
+  <d:Description>L.A.con III Home Page</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.msen.com/~yorick/srb_taos.html">
+  <d:Title>The Official Architect of Sleep / Steven R. Boyett WWW page</d:Title>
+  <d:Description>Information about Steven R. Boyett and  The Architect of Sleep.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.randomhouse.com/delrey/">
+  <d:Title>Del Rey Books</d:Title>
+  <d:Description>Publisher of science fiction and fantasy.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://sflovers.rutgers.edu/">
+  <d:Title>SF-Lovers Archive</d:Title>
+  <d:Description>Welcome to the home of SF-Lovers, a net presence since 1979!  We here are dedicated to providing information of interest to the fan of Science Fiction, Fantasy, Horror and related genres.  From these pages, you'll be able to access wealth of information on the net and will find links to a lots sites with additional information.  </d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.skatecity.com/ah/">
+  <d:Title>Uchronia: The Alternate History List</d:Title>
+  <d:Description>An annotated bibliography of alternate history stories.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.tor.com/">
+  <d:Title>Tom Doherty Associates, Inc.</d:Title>
+  <d:Description>Publishers of Tor and Orb books.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.bdd.com/forum/bddforum.cgi/scifi/main.html">
+  <d:Title>Bantam Books: Spectra</d:Title>
+  <d:Description>SF publishers. Site includes a bulletin board and mailing list.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.wsfs.org">
+  <d:Title>World Science Fiction Society</d:Title>
+  <d:Description>The official page for information about the Worldcon, the Hugo awards, and the NASFiC.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://earthspace.net/~esr/sf-words/">
+  <d:Title>Prototype Worlds: A Glossary of SF Jargon</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.bucconeer.worldcon.org/">
+  <d:Title>BucConeer</d:Title>
+  <d:Description>The 1998 WorldCon (56th World Science Fiction Convention) -- Wed., August 5th through Sun., August 9th, 1998. Baltimore, Maryland, USA.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.aussiecon3.worldcon.org/">
+  <d:Title>Aussiecon 3</d:Title>
+  <d:Description>The 1999 WorldCon (57th World Science Fiction Convention) --   Thurs., September 2nd through Monday 6 September 6th, 1999,  Melbourne, Australia.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://world.std.com/~mam/Cracks-and-Shards/">
+  <d:Title>Cracks and Shards</d:Title>
+  <d:Description>Observations on Steven Brust's &quot;Dragaera&quot; books.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.dcs.gla.ac.uk/SF-Archives/Ansible/">
+  <d:Title>Ansible</d:Title>
+  <d:Description>Dave Langford's notorious British sf/fan newsletter, published since 1979.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.white-wolf.com/">
+  <d:Title>White Wolf</d:Title>
+  <d:Description>In addition to role-playing games, White Wolf also publishes some fine SF and fantasy, generally under their Borealis imprint. [Warning: Site requires frames-capable browser and strong tolerance for pretentious ad copy.]</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://fanac.org/">
+  <d:Title>FANAC FanHistory Archives</d:Title>
+  <d:Description>A site devoted to the preservation and distribution of information about science fiction and science fiction fandom.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://ebbs.english.vt.edu/olp/nyrsf/nyrsf.html">
+  <d:Title>The New York Review of Science Fiction</d:Title>
+  <d:Description>An important forum for the intelligent discussion of SF and fantasy.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.io.com/~stefanj/82Eridani/index.html">
+  <d:Title>Epona</d:Title>
+  <d:Description>A scientifically accurate alien world full of life</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.nor.com.au/users/antisf/index.html">
+  <d:Title>Antipodean Science Fiction</d:Title>
+  <d:Description>Australian web SF magazine.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.sfsite.com/isfdb/index.html">
+  <d:Title>Internet Speculative Fiction DataBase</d:Title>
+  <d:Description>An invaluable site for the SF fan or researcher! A database of stories, authors, awards, etc.</d:Description>
+  <priority>1</priority>
+</ExternalPage>
+
+<ExternalPage about="http://www.slip.net/~shanly/gallery.html">
+  <d:Title>Hanly Gallery</d:Title>
+  <d:Description>SF art by Steve Hanly for the Epona project</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.locusmag.com/">
+  <d:Title>Locus Online</d:Title>
+  <d:Description>The online version of the leading news and review magazine of the science fiction, fantasy, and horror publishing fields.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.nesfa.org/">
+  <d:Title>NESFA</d:Title>
+  <d:Description>The New England Science Fiction Association runs an annual convention, Boskone, and a small press, NESFA Press.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.atlantic.net/~jcd/">
+  <d:Title>The Keepers of Forever</d:Title>
+  <d:Description>Online copy of science fiction novel too bold for  traditional print publishers. A blend of hard  science, space opera, and erotica. Download free.  Visit site for reader comments &amp; downloads.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.dragoncon.org/">
+  <d:Title>Dragon*Con</d:Title>
+  <d:Description>Large convention for SF, fantasy, horror, comics, and game fans, held annually in Atlanta, Georgia, USA.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.scifi.com/sfw/">
+  <d:Title>Science Fiction Weekly</d:Title>
+  <d:Description>The leading electronic publication covering the world of Science Fiction, with news, reviews, original art and celebrity chats.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://sflovers.rutgers.edu/Web/SFRG/">
+  <d:Title>Science Fiction Resource Guide</d:Title>
+  <d:Description>A great collection of links to SF resources on the Net.</d:Description>
+  <priority>1</priority>
+</ExternalPage>
+
+<ExternalPage about="http://husted.com/hgsf/">
+  <d:Title>A Hitchhiker's Guide to Science Fiction</d:Title>
+  <d:Description>Explore this site and you will be amazed at how many titles/themes are here. Lots of areas to choose and get lost in. There is even a bookstore to buy the books you find interesting.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://moonmilk.volcano.org/whorl/">
+  <d:Title>Whorl</d:Title>
+  <d:Description>Mailing list for discussion of Gene Wolfe's Book of the Long Sun series.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://cube.ice.net/~kwalsh/callahans.html">
+  <d:Title>Alt.Callahans Home Page</d:Title>
+  <d:Description>Information about the alt.callahans newsgroup and the #callahans IRC channel, inspired by Spider Robinson's &quot;Callahan's Bar&quot; stories.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://hugin.imat.com/jordan/">
+  <d:Title>Wheel of Time FAQ</d:Title>
+  <d:Description>Frequently Asked Questions about Robert Jordan's &quot;Wheel of Time&quot; series.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.clark.net/pub/iz/Books/Top100/top100.html">
+  <d:Title>The Internet Top 100 SF/Fantasy List</d:Title>
+</ExternalPage>
+
+<ExternalPage about="http://www.rahul.net/rootbear/graphics/ringworld/index.html">
+  <d:Title>Rendering Larry Niven's Ringworld</d:Title>
+  <d:Description>Images of Larry Niven's Ringworld, rendered with 3-D graphics software.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://sflovers.rutgers.edu/Web/cons.html">
+  <d:Title>SF-Lovers Conventions Listing</d:Title>
+  <d:Description>Very thorough listing of conventions devoted to SF, fantasy, etc.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.scifiweekly.com/current/site.html">
+  <d:Title>Sci-Fi Site of the Week: SF Site</d:Title>
+  <d:Description>The latest Web site reviews from the world of science fiction.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.nauticom.net/www/babylon/store/store.htm">
+  <d:Title>The Sci-Fi Bookstore</d:Title>
+  <d:Description>an Amazon.com associate, with an assortment of books, VHS tapes and video games on some of the most beloved Science Fiction shows.  From Babylon5 to the Twilight Zone and lots more.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.lasfs.org">
+  <d:Title>LASFS</d:Title>
+  <d:Description>The Los Angeles Science Fiction Society (meeting regularly since 1935!) runs Loscon, an annual convention.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.worldcon.org">
+  <d:Title>The World Science Fiction Society</d:Title>
+  <d:Description>Links to World Science Fiction Conventions.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.geocities.com/Athens/6477/">
+  <d:Title>Sweet Despise</d:Title>
+  <d:Description>An exploration into the darker side of literature, including recommended reading, bibliographies and writing on: Michael Moorcock, Clark Ashton Smith, Angela Carter, Graham Masterton and others. Lots of areas to go and examine the contents of this interesting site.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.sff.net/bfob/">
+  <d:Title>Basement Full of Books</d:Title>
+  <d:Description>Books available by mail directly from the authors (many out-of-print).</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www-personal.umich.edu/~pkretsch/dragon/dragon.htm">
+  <d:Title>Gordon R. Dickson: The Dragon Knight</d:Title>
+  <d:Description>Fan-maintained website about Gordy's Dragon Knight books</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://members.aol.com/kurellian/spint.html">
+  <d:Title>Timeline for the Third Millennium</d:Title>
+  <d:Description>Illustrated online book detailing probable technological advances and their likely socio-economic impact over coming decades and centuries.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.geocities.com/Area51/Vault/8067/">
+  <d:Title>DarTrac Books</d:Title>
+  <d:Description>Readers reviews of science fiction authors and their works.  Authors include John Wyndham, Gordon R. Dickson, William Gibson and Clifford D. Simak</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://members.aol.com/misuly/bookclub.htm">
+  <d:Title>Denver Science Fiction &amp; Fantasy bookclub</d:Title>
+  <d:Description>SF book reading and discussion group meeting twice monthly. We're looking to read great imaginative novels. Our group selections alternate between science fiction and fantasy. Web site contains pages on books and authors.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.magicdragon.com/UltimateSF/SF-Index.html">
+  <d:Title>Ultimate Science Fiction Web Guide</d:Title>
+  <d:Description>Guide to science fiction. Listings include Authors, Books, Movies, TV and topical.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://starkloff.com">
+  <d:Title>James Allen Starkloff Home Page</d:Title>
+  <d:Description>This is the James Allen Starkloff Home Page. The writer of I.T. and Planet Movers Inc.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.delphi.com/sflit/">
+  <d:Title>Delphi's SF Literature Forum</d:Title>
+  <d:Description>A Delphi Forums community of science fiction and fantasy readers and writers.  Home of the Wednesday  Night Irregulars chat, a Delphi fixture since 1985.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://outer-rim.lweb.net">
+  <d:Title>The Outer Rim Magazine</d:Title>
+  <d:Description>An SF/F mag dedicated to exploring every aspect of the genres.  Reviews, original fiction, mythical analysis of fantasy, science articles, two serial novels, artwork, and more.  Sense of humor included.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.robotbooks.com/">
+  <d:Title>Robot Books.com</d:Title>
+  <d:Description>Reviews of robotics books, plus robot kits, movies, and toy robots. Build robots for competitions, for industry, or just for fun! Learn about artificial intelligence, electronics, and mechanisms.  Read about mobile robots, educational toys, walking robots, even robots that play soccer! Enter competitions like Robot Wars, Micromouse, Robot Sumo, and RoboCup!</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.fortunecity.com/tattooine/halebopp/162">
+  <d:Title>Joran's Science Fiction Page</d:Title>
+  <d:Description>Site dedicated to Amber, StarTrek and StarWars.  Includes pictures, descriptions and information about characters, items and places.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.eclipse.co.uk/sweetdespise/">
+  <d:Title>Sweet Despise</d:Title>
+  <d:Description>An exploration into the darker side of literature, including recommended reading, bibliographies and writing on: Michael Moorcock, Clark Ashton Smith, Angela Carter, Graham Masterton and others. Lots of areas to go and examine the contents of this interesting site.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://colargol.tihlde.hist.no/~dagr/fantasy/fantasy.html">
+  <d:Title>Anotherland</d:Title>
+  <d:Description>A site featuring authors, the latest news, reviews,   a free ezine and more.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.scifan.com">
+  <d:Title>scifan: bookstore for the science (fiction) fan</d:Title>
+  <d:Description>science fiction online bookstore for the science fan, with classics, awards, series, hard and social science related sections.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.scifistation.com/">
+  <d:Title>SCI-FI STATION</d:Title>
+  <d:Description>Get Docked at New Website SCI-FI STATION Set your course for SCI-FI STATION, a website dedicated to the whole universe of science fiction and fantasy.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.cs.wisc.edu/~mlk/sfbooks.html">
+  <d:Title>Recommended SF</d:Title>
+  <d:Description>A non-definitive guide to good SF and fantasy</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.geocities.com/ResearchTriangle/5431/scifi.html">
+  <d:Title>Best Science Fiction and Fanstasy Sagas</d:Title>
+  <d:Description>The place to learn about the best sci-fi and fantasy cycles and their writers (from Asimov's Foundation to Zelazny's Riverworld). It's convenient to buy these books from this page too.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.speculativevision.com">
+  <d:Title>Speculative Vision Science Fiction and Fantasy</d:Title>
+  <d:Description>A one-stop guide to Science Fiction and Fantasy. Art gallery, TV and Movie theme MIDI's, interactive Fantasy story, discussion forum, a huge Sci Fi and Fantasy link index, and more.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://hem.passagen.se/gumby/sf/eng/">
+  <d:Title>A Science Fiction and Fantasy website, articles about sf/fantasy history and biographys</d:Title>
+  <d:Description>Articles about Science Fiction and  Fantasy. History how sf/fantasy started, biographies of influent authors in  the genre</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Books/Genres/Science_Fiction/Science">
+  <catid>927</catid>>
+  <d:Title>Science</d:Title>
+  <link r:resource="http://www.algonet.se/~aleph/Trans/Tech/Megascale/dyson_page.html"/>
+  <link r:resource="http://sandbox.xerox.com/nano/"/>
+  <link r:resource="http://www.foresight.org"/>
+  <link r:resource="http://www.talkorigins.org"/>
+  <link r:resource="http://www.diemme.it/~luigi/alma.html"/>
+  <link r:resource="http://www.chaparraltree.com/scison/"/>
+  <link r:resource="http://sparky.mcmaster.ca/People/Faculty/Haykin/books.html"/>
+  <link r:resource="http://www.improb.com"/>
+  <link r:resource="http://www.physics.purdue.edu/~hinson/ftl/FTL_StartingPoint.html"/>
+  <link r:resource="http://www.jps.net/gangale/mars/calendar.htm"/>
+  <link r:resource="http://www.uilondon.org/chernidx.htm"/>
+  <link r:resource="http://nano.xerox.com/nanotech/selfRepNASA.html"/>
+  <link r:resource="http://www.research.ibm.com/quantuminfo/teleportation"/>
+  <link r:resource="http://science.msfc.nasa.gov/newhome/headlines/essd06oct97_1.htm"/>
+  <link r:resource="http://seds.lpl.arizona.edu/nodes/NODEv4n3-10.html"/>
+  <link r:resource="http://seds.lpl.arizona.edu/nineplanets/nineplanets/nineplanets.html"/>
+  <link r:resource="http://www.serve.com/mahood/lazar/lazarmn.htm"/>
+  <link r:resource="http://www.sff.net/people/Geoffrey.Landis"/>
+  <link r:resource="http://www.spacefuture.com"/>
+  <link r:resource="http://www.cis.ohio-state.edu/hypertext/faq/usenet-faqs/bygroup/sci/astro/top.html"/>
+  <link r:resource="http://daisy.uwaterloo.ca/~alopez-o/math-faq/mathtext/node26.html"/>
+</Topic>
+
+<ExternalPage about="http://www.algonet.se/~aleph/Trans/Tech/Megascale/dyson_page.html">
+  <d:Title>Dyson Spheres</d:Title>
+  <d:Description>Some Sketches of Dyson Spheres</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://sandbox.xerox.com/nano/">
+  <d:Title>Nanotechnology</d:Title>
+  <d:Description>Ralph Merkle's nanotechnology website.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.foresight.org">
+  <d:Title>Foresight Institute</d:Title>
+  <d:Description>The Foresight Institute's goal is to guide emerging technologies (especially nanotechnology) to improve the human condition.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.talkorigins.org">
+  <d:Title>Talk.Origins Archive</d:Title>
+  <d:Description>Exploring the creation/evolution controversy from a mainstream scientific perspective.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.diemme.it/~luigi/alma.html">
+  <d:Title>alma - Scores of the unfinished thought</d:Title>
+  <d:Description>Articles on scientific topics.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.chaparraltree.com/scison/">
+  <d:Title>Sonnets on Science</d:Title>
+  <d:Description>by Raphael Carter</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://sparky.mcmaster.ca/People/Faculty/Haykin/books.html">
+  <d:Title>Books by Professor Simon Haykin</d:Title>
+  <d:Description>Neural Networks: A Comprehensive Foundation; Adaptive Filter Theory: Third Edition; Communication Systems: Third Edition ;</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.improb.com">
+  <d:Title>HotAIR</d:Title>
+  <d:Description>Rare and well-done tidbits from the Annals of Improbable Research.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.physics.purdue.edu/~hinson/ftl/FTL_StartingPoint.html">
+  <d:Title>Relativity and FTL Travel</d:Title>
+  <d:Description>Discussion of relativity, and its implications for faster-than-light travel, written for the layperson.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.jps.net/gangale/mars/calendar.htm">
+  <d:Title>Martian Time Website</d:Title>
+  <d:Description>A proposed Martian calendar (the &quot;Darian&quot; calendar), and links to pages that discuss keeping time on Mars.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.uilondon.org/chernidx.htm">
+  <d:Title>Chernobyl</d:Title>
+  <d:Description>The Accident and Progress Since 1986</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://nano.xerox.com/nanotech/selfRepNASA.html">
+  <d:Title>Self Replicating Systems</d:Title>
+  <d:Description>NASA and Self-Replicating Systems: Implications for Nanotechnology </d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.research.ibm.com/quantuminfo/teleportation">
+  <d:Title>Quantum Teleportation</d:Title>
+  <d:Description>An article about the teleportation of particles using Einstein-Podolsky-Rosen entanglement.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://science.msfc.nasa.gov/newhome/headlines/essd06oct97_1.htm">
+  <d:Title>NASA satellite temperature measurements fuel Global Warming debate</d:Title>
+  <d:Description>Science News: atmospheric temperature measurements do not imply Global Warming</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://seds.lpl.arizona.edu/nodes/NODEv4n3-10.html">
+  <d:Title>Ultimate Biospheres</d:Title>
+  <d:Description>An explanation of the concept of the Dyson sphere.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://seds.lpl.arizona.edu/nineplanets/nineplanets/nineplanets.html">
+  <d:Title>The Nine Planets</d:Title>
+  <d:Description>A multimedia overview of the history, mythology, and current scientific knowledge of each of the planets and moons in our solar system.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.serve.com/mahood/lazar/lazarmn.htm">
+  <d:Title>Bob Lazar Corner</d:Title>
+  <d:Description>Tom Mahood examines Robert Scott Lazar's claims of having worked on a top-secret anti-matter-powered, gravity-distorting UFO project.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.sff.net/people/Geoffrey.Landis">
+  <d:Title>Geoffrey A. Landis</d:Title>
+  <d:Description>In addition to writing SF, Mr. Landis also does scientific research for NASA and the Ohio Aerospace Institute.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.spacefuture.com">
+  <d:Title>Space Future</d:Title>
+  <d:Description>Space Future is for everyone who'd like to visit space. Features include the archive of space tourism work, information on vehicles, tourism and power plus mailing lists and the Space Future Journal.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://www.cis.ohio-state.edu/hypertext/faq/usenet-faqs/bygroup/sci/astro/top.html">
+  <d:Title>sci.astro FAQ</d:Title>
+  <d:Description>Frequently Asked Questions list for the Usenet newsgroup sci.astro. Includes sections on time, astrophysics, the solar system, extraterrestrial life, stars, galaxies, and a list of often-used acronyms.</d:Description>
+</ExternalPage>
+
+<ExternalPage about="http://daisy.uwaterloo.ca/~alopez-o/math-faq/mathtext/node26.html">
+  <d:Title>Famous Problems in Mathematics</d:Title>
+  <d:Description>Famous Problems in Mathematics</d:Description>
+</ExternalPage>
+
+<Topic r:id="Top/Arts/Performing_Arts/Dance">
+  <catid>501</catid>
+</Topic>
+<Topic r:id="Top/Reference/Education/Art_Education">
+  <catid>502</catid>
+</Topic>
+<Topic r:id="Top/Arts/Performing_Arts/Theatre">
+  <catid>503</catid>
+</Topic>
+<Topic r:id="Top/Computers/Fonts">
+  <catid>504</catid>
+</Topic>
+<Topic r:id="Top/Business/Books/Book_Sellers">
+  <catid>505</catid>
+</Topic>
+
+<Topic r:id="Top/Arts/Humanities/Great_Books_Indices">
+  <catid>520</catid>
+</Topic>
+<Topic r:id="Top/Arts/Literature">
+  <catid>521</catid>
+</Topic>
+<Topic r:id="Top/Arts/Publishing">
+  <catid>522</catid>
+</Topic>
+<Topic r:id="Top/Arts/Writing">
+  <catid>523</catid>
+</Topic>
+<Topic r:id="Top/Business/Books/Publishers">
+  <catid>524</catid>
+</Topic>
+<Topic r:id="Top/Shopping/Books">
+  <catid>525</catid>
+</Topic>
+<Topic r:id="Top/Games/Role-Playing_Games/Gamebooks">
+  <catid>526</catid>
+</Topic>
+<Topic r:id="Top/Arts/Books/Authors/Science_Fiction">
+  <catid>527</catid>
+</Topic>
+<Topic r:id="Top/Arts/Books/Genres/Cyberpunk">
+  <catid>528</catid>
+</Topic>
+<Topic r:id="Top/Arts/Literature/Science_Fiction">
+  <catid>529</catid>
+</Topic>
+<Topic r:id="Top/Arts/Magazines/Science_Fiction">
+  <catid>530</catid>
+</Topic>
+<Topic r:id="Top/Arts/Movies/Genres/Science_Fiction">
+  <catid>531</catid>
+</Topic>
+<Topic r:id="Top/Arts/Television/Science_Fiction">
+  <catid>532</catid>
+</Topic>
+<Topic r:id="Top/Arts/Writing/Organizations/Science_Fiction">
+  <catid>533</catid>
+</Topic>
+
+</RDF>

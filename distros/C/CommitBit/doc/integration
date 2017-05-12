@@ -1,0 +1,18 @@
+* pre-commit hook for write acls
+    shouldn't require the jifty acl server to be running.
+* password-writer for svnserve  
+    (plaintext)
+* password-writer for htpasswd
+    (htpasswd)
+
+* repo creator
+
+* repo commitbit injector
+
+* user manager
+    * create user
+    * manage project memberships
+    * reset password
+   
+* project mnanager
+    

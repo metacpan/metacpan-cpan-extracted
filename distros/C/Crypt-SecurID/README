@@ -1,0 +1,29 @@
+Crypt/SecurID version 0.04
+==========================
+
+This README is for Perl module Crypt::SecurID.  For information
+about the working module itself, run:
+
+   perldoc SecurID.pm 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires: a C compiler and a C++ compiler. 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 John Pliam <pliam@cpan.org>
+
+See file COPYING for details.

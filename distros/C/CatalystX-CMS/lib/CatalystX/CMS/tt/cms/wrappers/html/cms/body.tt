@@ -1,0 +1,12 @@
+[%# cms html flavour body  %]
+[%-
+    SET use_layout    = c.config.cms.use_layout;
+-%]
+<script type="text/javascript">
+  CMS.USE_LAYOUT    = [% use_layout ? 'true' : 'false' %];
+</script>
+
+<div id="content">
+[% content %]
+</div>
+

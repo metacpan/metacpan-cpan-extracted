@@ -1,0 +1,14 @@
+Revision history for Perl extension BZS-Access-0.01.
+
+1.00  Sun Sep 22 16:15:16 PDT 2002
+	change group name to Crypt
+
+0.03  Tue Jan  1 17:03:40 PST 2002
+	update test so next_sec uses select 0.1
+
+0.02  Wed Jan 17 16:23:39 PST 2001
+	convert to use shared $ptr2_License hash
+
+0.01  Jan 15 14:17:44 PST 2001
+	- original version; created by h2xs 1.20 with options
+		-cn 

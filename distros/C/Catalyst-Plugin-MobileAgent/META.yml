@@ -1,0 +1,19 @@
+---
+author:
+  - 'Yoshiki Kurihara <kurihara __at__ cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Catalyst-Plugin-MobileAgent
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.3
+  HTTP::MobileAgent: 0.22
+  Test::More: 0
+version: 0.041

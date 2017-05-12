@@ -1,0 +1,74 @@
+NAME
+    Class::DBI::Loader - Dynamic definition of Class::DBI sub classes.
+
+SYNOPSIS
+      use Class::DBI::Loader;
+
+      my $loader = Class::DBI::Loader->new(
+        dsn                     => "dbi:mysql:dbname",
+        user                    => "root",
+        password                => "",
+        namespace               => "Data",
+        additional_classes      => qw/Class::DBI::AbstractSearch/,
+        additional_base_classes => qw/My::Stuff/,
+        constraint              => '^foo.*',
+        relationships           => 1
+      );
+      my $class = $loader->find_class('film'); # $class => Data::Film
+      my $obj = $class->retrieve(1);
+
+    use with mod_perl
+
+    in your startup.pl
+
+      # load all tables
+      use Class::DBI::Loader;
+      my $loader = Class::DBI::Loader->new(
+        dsn       => "dbi:mysql:dbname",
+        user      => "root",
+        password  => "",
+        namespace => "Data",
+      );
+
+    in your web application.
+
+      use strict;
+
+      # you can use Data::Film directly
+      my $film = Data::Film->retrieve($id);
+
+DESCRIPTION
+    Class::DBI::Loader automate the definition of Class::DBI sub-classes.
+    scan table schemas and setup columns, primary key.
+
+    class names are defined by table names and namespace option.
+
+     +-----------+-----------+-----------+
+     |   table   | namespace | class     |
+     +-----------+-----------+-----------+
+     |   foo     | Data      | Data::Foo |
+     |   foo_bar |           | FooBar    |
+     +-----------+-----------+-----------+
+
+    Class::DBI::Loader supports MySQL, Postgres and SQLite.
+
+    See Class::DBI::Loader::Generic.
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+AUTHOR EMERITUS
+    IKEBE Tomohiro, "ikebe@edge.co.jp"
+
+THANK YOU
+    Randal Schwartz, Simon Flack and all the others who've helped.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Class::DBI, Class::DBI::mysql, Class::DBI::Pg, Class::DBI::SQLite,
+    Class::DBI::Loader::Generic, Class::DBI::Loader::mysql,
+    Class::DBI::Loader::Pg, Class::DBI::Loader::SQLite
+

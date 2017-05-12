@@ -1,0 +1,37 @@
+<head>
+  <title>[% form.title %]</title>
+  [% form.jshead %]
+</head>
+<body>
+  [% IF ERROR %]<span id="error">[% ERROR %]</span>[% END %]
+
+  <div id="form">
+  [% form.start %]
+    [% FOREACH field IN form.fields %]
+    <div id="[%- field.name -%]">
+      <div class="label">
+        [% field.required
+              ? "<span class='required'>$field.label</span>"
+              : field.label
+        %]
+      </div>
+      <div class="field">
+        [% field.field %]
+        [% IF field.invalid %]
+            <span class="error">
+                Missing or invalid entry, please try again.
+            </error>
+        [% END %]
+      </div>
+    </div>
+    [% END %]
+    <div id="submit">[% form.submit %]</div>
+    <div id="reset">[% form.reset %]</div>
+    <div id="state">
+      [% # The following two tags include state information %]
+      [% form.statetags  %]
+      [% form.keepextras %]
+    </div>
+  [% form.end %]
+  </div>
+</body>

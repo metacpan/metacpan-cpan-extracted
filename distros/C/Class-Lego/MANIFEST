@@ -1,0 +1,16 @@
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+Changes
+
+lib/Class/Lego.pm
+lib/Class/Lego/Myself.pm
+lib/Class/Lego/Myself.pod
+
+t/01use.t
+t/02basic.t
+t/03subclass.t
+t/98pod-coverage.t
+t/99pod.t

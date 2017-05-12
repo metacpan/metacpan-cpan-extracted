@@ -1,0 +1,90 @@
+---
+abstract: 'embeding a fast C compiler directly into your Perl parser'
+author:
+  - 'David Mertens <dcmertens.perl@gmail.com>'
+build_requires:
+  Alien::TinyCCx: '0.12'
+  Capture::Tiny: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Config: '0'
+  ExtUtils::Embed: '0'
+  ExtUtils::ParseXS: '3'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::More: '0.88'
+  Test::Warn: '0'
+configure_requires:
+  Alien::TinyCCx: '0.12'
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: C-Blocks
+no_index:
+  file:
+    - README.pod
+provides:
+  C::Blocks:
+    file: lib/C/Blocks.pm
+    version: '0.42'
+  C::Blocks::Filter:
+    file: lib/C/Blocks/Filter.pm
+    version: '0.42'
+  C::Blocks::Filter::BlockArrowMethods:
+    file: lib/C/Blocks/Filter/BlockArrowMethods.pm
+    version: '0.42'
+  C::Blocks::PerlAPI:
+    file: lib/C/Blocks/PerlAPI.pm
+    version: '0.42'
+  C::Blocks::PerlAPI::Type:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::StretchyBuffer:
+    file: lib/C/Blocks/StretchyBuffer.pm
+    version: '0.42'
+  C::Blocks::Type::IV:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::NV:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::UV:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::char_array:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::double:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::double_array:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::float:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::float_array:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::int:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::int_array:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::long:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::short:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::uint:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::ulong:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Type::ushort:
+    file: lib/C/Blocks/Types.pm
+  C::Blocks::Types:
+    file: lib/C/Blocks/Types.pm
+    version: '0.42'
+requires:
+  Alien::TinyCCx: '0.12'
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+resources:
+  bugtracker: http://github.com/run4flat/C-Blocks/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/run4flat/C-Blocks
+version: '0.42'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

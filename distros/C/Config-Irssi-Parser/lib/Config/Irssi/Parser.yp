@@ -1,0 +1,94 @@
+#
+# Calc.yp
+# 
+# Parse::Yapp input grammar example.
+#
+# This file is PUBLIC DOMAIN 
+#
+#
+%{
+use Config::Irssi::Lexer;
+%}
+%right ','
+%%
+input:  #empty
+        |   input line  { push(@{$_[1]},$_[2]); $_[1] }
+;
+
+line:       ';'   { $_[1] }
+        |   toplevel
+		|	error ';' { $_[0]->YYErrok }
+;
+
+toplevel: assign_list {
+	my %hash = @{$_[1]};
+	$_[0]->YYData->{return} = \%hash;
+};
+
+array: '(' list ')' { $_[2] }
+     |  '(' list ',' ')' { $_[2] }
+     | '(' ')' { [] };
+hash:  '{' assign_list '}' { my %hash = @{$_[2]}; \%hash  }
+    | '{' '}' { my %hash; \%hash };
+
+assign: key '=' expr { [$_[1], $_[3]] };
+
+assign_list: assign { [ @{$_[1]} ] }
+           | assign ';' { [ @{$_[1]} ] }
+           | assign ';' assign_list { [ @{$_[1]}, @{$_[3]} ] }
+           | assign ';' assign_list ';' { [ @{$_[1]}, @{$_[3]} ] }
+;
+
+list: expr   { [ $_[1] ] }
+         | expr ',' list  {
+			[ $_[1], @{$_[3]} ];
+		 }
+;
+
+key: SYMBOL | NUMBER | STRING;
+expr: STRING | NUMBER | array | hash;
+
+
+%%
+
+sub error {
+	my ($me) = @_;
+	
+	print "Oh, error\n";
+	return if $me->YYData->{error};
+
+	$me->YYData->{error} = {
+		val => scalar $me->YYCurval,
+		tok => scalar $me->YYCurtok,
+		expect => [$me->YYExpect],
+		line  => $.,
+	};
+
+	return;
+}
+
+sub parse {
+    my ($self, $fh) = @_;
+	
+	$self->YYData->{fh} = $fh;
+    $self->YYParse( yylex => mklexer($fh), yyerror => \&error );
+
+	if ($self->YYData->{return}) {
+		return $self->YYData->{return};
+	}
+	return undef;
+}
+
+sub lex {
+    my ($self, $fh) = @_;
+	
+	$self->YYData->{fh} = $fh;
+	while (my ($tok, $val) = $self->lexer) {
+		last if (not $tok and not defined $val);
+		print "# $tok";
+		if ($val ne $tok) {
+			print " ($val)";
+		}
+		print "\n";
+	}
+}

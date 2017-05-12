@@ -1,0 +1,27 @@
+Revision history for Config-Extend-MySQL
+
+0.05    2012.12.18  (SAPER)
+        [TESTS] Added \Q..\E to the one test where it was missing, so the tests
+        pass under Win32.
+        [DOC] Added a missing bit.
+
+0.04    2008.09.11  (SAPER)
+        [BUGFIX] Added a workaround so that Config::IniFiles can play nicely
+        with IO::String. Thanks to CPAN Tester Chris Williams.
+
+0.03    2008.09.07  (SAPER)
+        [CODE] Config::Extend::MySQL is now compatible with Perl 5.6. A patch 
+        for Perl 5.5 is also included. Thanks to CPAN Tester Chris Williams
+        and imacat for their 5.6 smokers.
+        [TESTS] Added a section in t/files/parts/nodebug.cnf in order to make 
+        the tests more deterministic.
+
+0.02    2008.09.05  (SAPER)
+        [CODE] Added more diagnostics.
+        [DOC] Fixed the links which where using the old name.
+        [TESTS] Fixed tests count.
+        [TESTS] Added a few more tests.
+
+0.01    2008.09.01  (SAPER)
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,81 @@
+Revision history for Perl extension Class-Value-Net
+
+1.110250  2011-01-25 14:02:02 Europe/Vienna
+    - is_valid_string_value checks value for defindeness and length, docs why we don't call SUPER
+    - removed private algorithms 253, 254
+    - adapted tests after deletion of unsupported algorithms
+    - included valiation for 16 bit integer + tests
+    - normalize Digest via lc + added tests
+
+1.103070  2010-11-03 12:31:06 Europe/Vienna
+    - implemented DNSSEC RR DS
+
+1.103060  2010-11-02 15:31:30 Europe/Vienna
+
+1.101870  2010-07-06 13:39:50 Europe/Vienna
+    - use Data::Semantic::Net::IPAddress::TestData::IPv4 1.101750
+
+1.101730  2010-06-22 15:00:24 Europe/Vienna
+    - added minimum version for ::TestData::IPv4
+
+1.101690  2010-06-18 13:04:17 Europe/Vienna
+    - Class::Value::Net::IPAddress: forbid_internal defaults to 1 now
+
+1.101610  2010-06-10 21:53:36 Europe/Vienna
+    - Class::Value::Net::IPAddress: use Error::Hierarchy::Mixin to get record()
+
+1.101370  2010-05-17 17:45:08 Europe/Vienna
+    - local $Class::Value::SkipChecks = 0; # where necessary
+
+1.100840  2010-03-25 20:16:13 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.04  Thu, 29 May 2008 12:02:16 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+
+0.03  Thu, 22 Nov 2007 13:08:28 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.03
+     - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+       had a bug in make_real_object()
+
+0.02  Wed, 21 Nov 2007 18:21:27 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - slightly improved documentation
+     - Class::Value::Net::IPAddress::IPv4 and ::IPv6 now subclass
+       Class::Value::SemanticAdapter
+     - added lib/Class/Value/Net/IPAddress/IPv4_TEST.pm
+     - deleted t/README.txt
+     - Makefile.PL: require Class::Value::SemanticAdapter, Data::Semantic::Net
+     - Class::Value::Net::IPAddress::IPv4, ::IPv6: inherit from
+       Class::Value::Net::IPAddress, moved is_internal() there
+     - Class::Value::Net::IPAddress::IPv4_TEST: just inherit from
+       Class::Value::Test and Data::Semantic::Net::IPAddress::TestData::IPv4
+     - Class::Value::Net::IPAddress: inherit from
+       Class::Value::SemanticAdapter, remove is_valid_normalized_value(), add
+       semantic_args(), add is_internal()
+     - Class::Value::Net::NAPTR::CharacterString_TEST: adapted to TESTDATA
+       style
+     - Class::Value::Net::NAPTR::Flags_TEST: adapted to TESTDATA style
+     - Class::Value::Net: reflow
+     - updated MANIFEST
+     - added lib/Class/Value/Net/IPAddress/IPv6_TEST.pm
+     - getting rid of the distinction between well-formedness and validity.
+       Only validity remains
+     - Class::Value::Net::IPAddress::IPv4, ::IPv6: replaced pod
+     - updated t/perlcriticrc
+     - tags: NEWFEATURE
+
+0.01  Wed, 07 Nov 2007 09:59:46 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

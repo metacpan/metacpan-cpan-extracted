@@ -1,0 +1,11 @@
+
+module Cplx
+{
+	struct Complex
+	{
+		float	re;
+		float	im;
+	};
+};
+
+

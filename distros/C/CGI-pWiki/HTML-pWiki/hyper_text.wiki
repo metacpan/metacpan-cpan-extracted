@@ -1,0 +1,6 @@
+Files with html extension can be used to migrate normal html text
+into [pWiki].
+
+Be aware that most [pWiki] sites provide their framework
+around the content. So omit the html, head, title and body
+tags, and mix free floating text with normal html tags.

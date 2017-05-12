@@ -1,0 +1,56 @@
+Freeing block not previously allocated: 0x00004000 in foo.c(4)
+Freeing block not previously allocated: 0x00004000 in foo.c(5)
+Freeing block more than once: 0x00001000 in foo.c(7)
+Freeing block more than once: 0x00001000 in foo.c(8)
+Freeing NULL pointer in foo.c(9)
+Freeing NULL pointer in foo.c(10)
+Trying to validate NULL pointer in foo.c(11)
+Valid pointer assertion (0x00000100) failed in foo.c(12)
+  - pointer references memory not previously allocated
+Valid pointer assertion (0x00001000) failed in foo.c(13)
+  - pointer references a block that has been freed
+Trying to validate block starting at NULL
+Block assertion (0x00000FFF, size 4) failed in foo.c(17)
+  - overlaps with old block at 0x00001000, size 16
+Block assertion (0x00001000, size 4) failed in foo.c(18)
+  - references memory in old block at 0x00001000, size 16
+Block assertion (0x0000100C, size 4) failed in foo.c(19)
+  - references memory in old block at 0x00001000, size 16
+Block assertion (0x0000100D, size 4) failed in foo.c(20)
+  - overlaps with allocated block at 0x00001010, size 16
+  - overlaps with old block at 0x00001000, size 16
+Block assertion (0x00000FFD, size 18) failed in foo.c(21)
+  - overlaps with old block at 0x00001000, size 16
+Block assertion (0x00000FFE, size 18) failed in foo.c(22)
+  - overlaps with old block at 0x00001000, size 16
+Block assertion (0x00001000, size 18) failed in foo.c(23)
+  - overlaps with allocated block at 0x00001010, size 16
+  - overlaps with old block at 0x00001000, size 16
+Block assertion (0x00001FFF, size 4) failed in foo.c(25)
+  - overlaps with allocated block at 0x00002000, size 8
+Block assertion (0x00002005, size 4) failed in foo.c(28)
+  - overlaps with allocated block at 0x00002000, size 8
+  - overlaps with old block at 0x00002008, size 8
+Block assertion (0x00001FFD, size 10) failed in foo.c(29)
+  - overlaps with allocated block at 0x00002000, size 8
+Block assertion (0x00001FFE, size 10) failed in foo.c(30)
+  - overlaps with allocated block at 0x00002000, size 8
+Block assertion (0x00002000, size 10) failed in foo.c(31)
+  - overlaps with allocated block at 0x00002000, size 8
+  - overlaps with old block at 0x00002008, size 8
+Not freed: block at 0x00001010, size 16, allocated in foo.c(1)
+Not freed: block at 0x00002000, size 8, allocated in foo.c(2)
+Not freed: block at 0x00003000, size 4, allocated in foo.c(3)
+
+Summary Statistics:
+
+  Total allocs       : 5
+  Total frees        : 2
+  Max. memory blocks : 5
+  Max. memory usage  : 52 bytes
+
+  Smallest block     : 4 bytes
+  Largest block      : 16 bytes
+
+  Memory leakage     : 28 bytes
+

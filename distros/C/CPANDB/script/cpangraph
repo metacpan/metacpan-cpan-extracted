@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+
+use 5.008005;
+use strict;
+use warnings;
+use Time::HiRes  1.97 ();
+use Getopt::Long 2.33 ();
+
+=pod
+
+=head1 NAME
+
+cpangraph - Generate dependency chain graphs for CPAN modules
+
+=head1 VERSION
+
+Version 0.12
+
+=cut
+
+our $VERSION = '0.18';
+
+use CPANDB ();
+
+# Check params
+my $PERL    = undef;
+my $PHASE   = undef;
+my $VERBOSE = 0;
+my $RANKDIR = 0;
+my $REVERSE = 0;
+
+=pod
+
+=head1 SYNOPSIS
+
+  cpangraph [options] <file>
+
+    Options:
+      --help            display a brief help message
+      --perl=VERSION    filter those available in Perl core
+      --phase=PHASE     filter those needed for a phase (e.g., build)
+      --rankdir         controls the GraphViz 'rankdir' variable
+      --reverse         graph reverse dependencies (dependents)
+      --verbose         display additional debugging information
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Prints a brief help message to the standard output and exits.
+
+=item B<--perl>=VERSION
+
+This displays dependencies which have been available in Perl core since
+the given VERSION. It does not currently know if a module has been removed
+from core, but this is an unlikely occurrence. Specify Perl versions in
+the form:
+
+  5.008008 # for versions >= 5.8.8
+  5.010    # for versions >= 5.10
+
+=item B<--phase>=PHASE
+
+This displays dependencies which are needed for a given module's install
+or runtime PHASE. Available phases are:
+
+=over
+
+=item * runtime: required whenever the module is used
+
+=item * build: required to build the module
+
+=item * configure: these are required while preparing the module for
+build
+
+=back
+
+=item B<--rankdir>
+
+In GraphViz, the 'rankdir' attribute controls the direction that the nodes
+are linked together. If set, the graph will use left -> right linking of
+nodes rather than the default up-down linking.
+
+=item B<--reverse>
+
+Create a graph of the reverse dependencies of a package (the packages which
+depend on it, or dependent packages).
+
+=item B<--verbose>
+
+Display extra output useful during debugging.
+
+=back
+
+=cut
+
+=head1 DESCRIPTION
+
+B<This script> will use the CPAN Database to build a graph of a package's
+dependencies or reverse dependencies (dependent packages).
+
+=cut
+
+Getopt::Long::GetOptions(
+	'perl=s'  => \$PERL,
+	'phase=s' => \$PHASE,
+	'verbose' => \$VERBOSE,
+	'rankdir' => \$RANKDIR,
+	'reverse' => \$REVERSE,
+) or die "Failed to parse options";
+
+# Find the distribution
+my $name = shift @ARGV;
+unless ( $name ) {
+	print "Did not provide a distribution name\n";
+	exit(0);
+}
+
+# Load the database and fine the distribution
+CPANDB->import( {
+	show_progress => $VERBOSE,
+} );
+my $dist = CPANDB->distribution($name);
+
+# Determine the graph file name
+my $file = $name;
+if ( $PHASE ) {
+	$file .= '-' . $PHASE;
+}
+if ( $PERL ) {
+	$file .= '-' . $PERL;
+}
+
+# Generate the graph
+my $method = $REVERSE
+	? 'dependants_graphviz'
+	: 'dependency_graphviz';
+$dist->$method(
+	perl    => $PERL,
+	phase   => $PHASE,
+	rankdir => $RANKDIR,
+)->as_svg("$file.svg");
+
+=pod
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SUPPORT
+
+For support details, please look at C<perldoc CPANDB> and use the
+corresponding support methods.
+
+=head1 LICENSE
+
+This has the same copyright and licensing terms as L<CPANDB>.
+
+=cut

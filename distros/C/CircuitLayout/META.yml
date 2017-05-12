@@ -1,0 +1,40 @@
+--- #YAML:1.0
+name: CircuitLayout
+version: 0.07
+author:
+  - ~
+abstract: circuit layout module
+license: artistic
+requires:
+  Tk: 800.013
+  Tk::WorldCanvas: 1.2
+  perl: 5.6.0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  CircuitLayout:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Boundary:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Coord:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Edge:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Path:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Rectangle:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Sref:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+  CircuitLayout::Text:
+    file: lib/CircuitLayout.pm
+    version: 0.07
+generated_by: Module::Build version 0.22

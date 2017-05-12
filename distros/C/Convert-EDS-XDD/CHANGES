@@ -1,0 +1,109 @@
+==================================================
+Changes from 2016-05-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2017-05-07 21:58:47 +0000
+------------------------------------------
+
+  Change: 3fe493bfd4f2745f4d0618b268877b42a5f4b65b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-05-07 23:57:45 +0000
+
+    Make documentation reflect that XDDs are EPL-only
+
+    CANopen has a XML format, but it's much less used, and it's not XDD. 
+
+------------------------------------------
+version 0.007 at 2017-03-28 08:11:41 +0000
+------------------------------------------
+
+  Change: b146163c060f7abdabe82344792c84d27a32a5e4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-28 10:11:41 +0000
+
+    Set Perl v5.10.0+ as dependency 
+
+------------------------------------------
+version 0.006 at 2017-03-02 19:16:21 +0000
+------------------------------------------
+
+  Change: 6262d0f13bbe664b73312d2cdf05643645d79de2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-02 20:16:21 +0000
+
+    Now ignoring SubNumber field in Object tag
+
+    Found a file where the SubNumber field is commented out. Now all
+    subindices are considered, regardless of what the SubNumber say (or
+    doesn't) 
+
+  Change: c2ded3d033c6f573f77a792a0ba5cc3cec30a9a3
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-03-02 19:58:45 +0000
+
+    [Bugfix] Closing tag when last entry is a subindex
+
+    Previously this didn't happen. 
+
+------------------------------------------
+version 0.005 at 2017-02-28 18:32:38 +0000
+------------------------------------------
+
+  Change: 8f0fd3d13b6f5c35710634fa019c9df1d2cc14f2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-28 19:32:38 +0000
+
+    Now ignoring inline comments
+
+    hash comments were only recognized at start of line 
+
+------------------------------------------
+version 0.004 at 2017-02-21 22:39:29 +0000
+------------------------------------------
+
+  Change: 39734a1fd5f07c851ff9f1634cd830f94b5fcb68
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-21 23:39:29 +0000
+
+    Merge branch 'master' of github.com:epl-viz/Convert-EDS-XDD 
+
+  Change: d8ecb63c9912fb9c8430ea837536f948ed8cd14b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-21 23:25:00 +0000
+
+    Updated link to fatpacked release 
+
+------------------------------------------
+version 0.003 at 2017-02-21 22:38:25 +0000
+------------------------------------------
+
+  Change: 22d7b192e590a478a08d7b285a3509a42f951ced
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-21 23:38:25 +0000
+
+    Fixed some formatting issues 
+
+------------------------------------------
+version 0.002 at 2017-02-21 22:25:00 +0000
+------------------------------------------
+
+  Change: d8ecb63c9912fb9c8430ea837536f948ed8cd14b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-21 23:25:00 +0000
+
+    Updated link to fatpacked release 
+
+------------------------------------------
+version 0.001 at 2017-02-21 22:15:32 +0000
+------------------------------------------
+
+  Change: ae933d5af0c07e5aee952be36753810a79abdc33
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-02-21 23:15:32 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

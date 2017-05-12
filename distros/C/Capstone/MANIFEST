@@ -1,0 +1,15 @@
+typemap
+Capstone.xs
+Makefile.PL
+ppport.h
+MYMETA.yml
+t/Capstone.t
+t/x86_Capstone.t
+lib/Capstone.pm
+lib/Capstone_const.pm
+CHANGES
+README
+LICENSE
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

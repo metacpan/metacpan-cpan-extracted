@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                CGI-Application-Gallery
+version:             1.09
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    CGI::Application:              0
+    CGI::Application::Plugin::AutoRunmode: 0
+    CGI::Application::Plugin::Feedback: 0
+    CGI::Application::Plugin::Forward: 0
+    CGI::Application::Plugin::Session: 0
+    CGI::Application::Plugin::Stream: 0
+    CGI::Application::Plugin::Thumbnail: 0
+    CGI::Application::Plugin::TmplInnerOuter: 0
+    Data::Page:                    0
+    File::PathInfo::Ext:           1
+    LEOCHARRE::DEBUG:              0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

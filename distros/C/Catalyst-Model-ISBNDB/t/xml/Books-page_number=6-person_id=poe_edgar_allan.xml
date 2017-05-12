@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:30Z">
+<BookList total_results="252" page_size="10" page_number="6" shown_results="10">
+<BookData book_id="great_tales_and_poems_of_edgar_allan_poe" isbn="0671727702">
+<Title>GREAT TALES AND POEMS OF EDGAR ALLAN POE</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="simon_schuster">NEW YORK : SIMON &amp; SCHUSTER, 1940</PublisherText>
+<Details dewey_decimal="" physical_description_text="432 P. ; 18 CM" language="ENG" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2004-08-01T14:20:45Z" price_time="2006-10-08T07:56:30Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/vromans.html" store_id="vromans" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-08-02T11:13:42Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="GREAT TALES OF EDGAR ALLAN POE " store_url="49240484&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-26T10:20:07Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe by Edgar Al..." store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-26T10:20:07Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780671727703" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-26T10:20:08Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="7" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="4.49" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="1.05" />
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe Product 389929" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.389929&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:41Z" currency_rate="1" price="5.39" />
+</Prices>
+<Subjects>
+<Subject subject_id="american_poetry">American poetry</Subject>
+<Subject subject_id="short_stories_american">Short stories, American</Subject>
+<Subject subject_id="horror_tales">Horror tales</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Hurst Public Library (Hurst, TX)" last_update="2004-08-01T14:20:45Z" marc_url="http://isbndb.com/x/libdata/isbndb-233-great_tales_and_poems_of_edgar_allan_poe-20040801.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="great_tales_and_poems_of_edgar_allan_poe_a01" isbn="0743467469">
+<Title>Great Tales and Poems of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="pocket">Pocket</PublisherText>
+<Details dewey_decimal="" physical_description_text="4.2&quot;x6.9&quot;x1.1&quot;; 480 pages; 0.5 lb" language="" edition_info="Paperback; 2003-04-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-07T05:19:01Z" price_time="2006-10-08T07:56:33Z" />
+<Summary>Born to an unfortunate heritage, orphaned, unsympathetically raised, and then abandoned, Edgar Allan Poe struggled for greatness in an adverse social and economic climate -- a setting not improved by his fiery temperament and caustic criticism of others. Poe's melancholy brilliance, his passionate lyricism, and his tormented soul would make him one of the most widely read and original writers in American literature. Here, in one volume, are his classic short works: masterpieces of horror, terror, humor, and adventure -- and the finest lyric and narrative poetry of this ill-fated genius whose influence on both prose and verse continues to this day. Pocket Books' Enriched Classics present the great works of world literature enhanced for the contemporary reader. This edition of Great Tales And Poems Of Edgar Allan Poe contains the original Pocket Books introduction, first published in 1951, along with an updated selection of critical excerpts, and suggestions for further readings.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allen Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T01:38:23Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="" store_url="60752906&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T01:38:23Z" currency_rate="1" price="1.72" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780743467469" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T01:38:23Z" currency_rate="1" price="3.1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T01:38:27Z" currency_rate="1" price="4" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T01:38:27Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe NEW Poe, Edgar" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T02:03:55Z" currency_rate="1" price="2.16" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="3.23" />
+<Price store_isbn="" store_title="Poe" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="4.23" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="4.88" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="1.83" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="3.18" />
+<Price store_isbn="" store_title="Great Tales of Edgar Allen Poe" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D31088374%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:20Z" currency_rate="1" price="5.39" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0743467469&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:06Z" currency_rate="1" price="5.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="2.01" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:08Z" currency_rate="1" price="4.49" />
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe Product 2023734" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2023734&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:47Z" currency_rate="1" price="4.79" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_and_poems_of_edgar_allan_poe_a01/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:33Z" currency_rate="1" price="5.99" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_literary">Amazon.com -- Literature &amp; Fiction -- General -- Literary</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_general">Amazon.com -- Literature &amp; Fiction -- Short Stories -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="great_tales_of_edgar_allen_poe" isbn="0671687220">
+<Title>Great Tales of Edgar Allen Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="washington_square_press">Washington Square Press</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Mass Market Paperback; 1981-09" dewey_decimal_normalized="" lcc_number="" change_time="2006-05-21T07:28:38Z" price_time="2006-10-08T07:56:37Z" />
+<Summary>Born to an unfortunate heritage, orphaned, unsympathetically raised, and then abandoned, Edgar Allan Poe struggled for greatness in an adverse social and economic climate -- a setting not improved by his fiery temperament and caustic criticism of others. Poe's melancholy brilliance, his passionate lyricism, and his tormented soul would make him one of the most widely read and original writers in American literature. Here, in one volume, are his classic short works: masterpieces of horror, terror, humor, and adventure -- and the finest lyric and narrative poetry of this ill-fated genius whose influence on both prose and verse continues to this day.Pocket Books' Enriched Classics present the great works of world literature enhanced for the contemporary reader. This edition of Great Tales And Poems Of Edgar Allan Poe contains the original Pocket Books introduction, first published in 1951, along with an updated selection of critical excerpts, and suggestions for further readings.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe" store_url="http://www.biblio.com/details.php?dcx=46134854&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-15T23:47:47Z" currency_rate="1" price="2.97" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780671687229" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-15T23:47:47Z" currency_rate="1" price="2.29" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_of_edgar_allen_poe/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="2.97" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_of_edgar_allen_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="0.94" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_tales_of_edgar_allen_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="1.89" />
+<Price store_isbn="" store_title="Great Tales and Poems of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_tales_of_edgar_allen_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="GREAT TALES &amp; POEMS OF EDGAR A.POE" store_url="http://isbndb.com/x/book/great_tales_of_edgar_allen_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:10Z" currency_rate="1" price="4.49" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="hans_phaall" isbn="0585051925">
+<Title>Hans Phaall</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:23:03Z" price_time="2006-10-08T07:56:40Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085988 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:23:03Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-hans_phaall-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="histoires_extraordinaires" isbn="2070363104">
+<Title>Histoires Extraordinaires</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="gallimard_french">Gallimard French</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Unknown Binding" dewey_decimal_normalized="" lcc_number="" change_time="2006-04-12T19:33:28Z" price_time="2006-10-08T07:56:45Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/histoires_extraordinaires/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/histoires_extraordinaires/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:13Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/histoires_extraordinaires/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="2.61" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/histoires_extraordinaires/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:18Z" currency_rate="1" price="5.9" />
+<Price store_isbn="" store_title="Histoires extraordinaires" store_url="http://isbndb.com/x/book/histoires_extraordinaires/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:18Z" currency_rate="1" price="11.39" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="how_to_write_a_blackwood_article" isbn="0585051941">
+<Title>How to write a Blackwood article</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:23:17Z" price_time="2006-10-08T07:56:48Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085990 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:23:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-how_to_write_a_blackwood_article-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="les_poemes_dedgar_poe_traduction_de_stephane_mallarme_avec_p" isbn="0404163343">
+<Title>Les poèmes d'Edgar Poe [; traduction de Stéphane Mallarmé, avec portrait et fleuron par Édouard Manet]</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="ams_press">New York : AMS Press, [1980]</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="196 p. : ill. ; 24 cm." language="fre" edition_info="" dewey_decimal_normalized="811.3" lcc_number="PS2604" change_time="2004-09-11T20:22:07Z" price_time="2004-12-19T18:55:18Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1888 ed. published by E. Deman, Brussels.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Works of Edgar Allan Poe: With a Study of His Life and Writings by Charles Baudelaire" store_url="http://isbndb.com/x/book/les_poemes_dedgar_poe_traduction_de_stephane_mallarme_avec_p/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2004-12-19T17:52:44Z" currency_rate="1" price="268.23" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_translations_into_french">Poe, Edgar Allan,1809-1849 -- Translations into French</Subject>
+<Subject subject_id="fantasy_poetry_american_translations_into_french">Fantasy poetry, American -- Translations into French</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-09-11T20:22:07Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-les_poemes_dedgar_poe_traduction_de_stephane_mallarme_avec_p-20040911.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="mallarme_stephane">Mallarmé, Stéphane</Person>
+<Person person_id="manet_edouard">Manet, Edouard</Person>
+</Authors>
+</BookData>
+<BookData book_id="les_pomes_dedgar_poe" isbn="0404163351">
+<Title>Les pom̈es d'Edgar Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>traduits par Stp̌hane Mallarm. ̌</AuthorsText>
+<PublisherText publisher_id="ams_press">New York : AMS Press, 1980.</PublisherText>
+<Details dewey_decimal="" physical_description_text="196 p. ; 24 cm." language="fre" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-03-08T07:57:24Z" price_time="2005-03-08T07:57:30Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1888 ed. published by E. Deman, Brussels.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Les Poemes D'Edgar Poe" store_url="http://isbndb.com/x/book/les_pomes_dedgar_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-03-08T07:57:26Z" currency_rate="1" price="57.5" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Boston College" last_update="2005-03-08T07:57:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-28-les_pomes_dedgar_poe-20050307.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="mallarm_stphane">Mallarm,̌ Stp̌hane</Person>
+<Person person_id="manet_edouard">Manet, Edouard</Person>
+</Authors>
+</BookData>
+<BookData book_id="letters_and_documents_in_the_enoch_pratt_free_library" isbn="0849222079">
+<Title>Letters and documents in the Enoch Pratt Free Library</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited by Arthur H. Quinn and Richard H. Hart</AuthorsText>
+<PublisherText publisher_id="r_west">Philadelphia : R. West, 1978 [c1941]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="ix, 84 p., [22] leaves of plates : ill. ; 29 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2631" change_time="2003-10-23T17:35:49Z" price_time="2006-07-04T03:41:21Z" />
+<Summary></Summary>
+<Notes>Reprint of the ed. published by Scholars' Facsimiles &amp; Reprints, New York.
+
+Includes bibliographical references and index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_correspondence">Poe, Edgar Allan,1809-1849 -- Correspondence</Subject>
+<Subject subject_id="clemm_maria">Clemm, Maria</Subject>
+<Subject subject_id="enoch_pratt_free_library">Enoch Pratt Free Library</Subject>
+<Subject subject_id="authors_american_19th_century_correspondence">Authors, American -- 19th century -- Correspondence</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2003-10-23T17:35:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-letters_and_documents_in_the_enoch_pratt_free_library-20031023.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="quinn_arthur_hobson">Quinn, Arthur Hobson</Person>
+<Person person_id="hart_richard_h">Hart, Richard H.</Person>
+</Authors>
+</BookData>
+<BookData book_id="lionizing" isbn="0585052018">
+<Title>Lionizing</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:03Z" price_time="2005-12-13T01:20:30Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085997 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="nosology_humor_fiction">Nosology -- Humor -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:03Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-lionizing-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

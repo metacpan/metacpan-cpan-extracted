@@ -1,0 +1,90 @@
+#!/usr/local/bin/perl -w
+######################################################################
+# cpan-unwind -- 2005, Mike Schilli <m@perlmeister.com>
+######################################################################
+use strict;
+
+my  $VERSION = "0.01";
+
+use Pod::Usage;
+use Log::Log4perl qw(:easy);
+use CPAN::Unwind;
+use Getopt::Std;
+
+getopts("vcu", \my %opts);
+
+Log::Log4perl->easy_init($opts{v} ? $DEBUG : $ERROR);
+
+pod2usage("No module given") unless @ARGV;
+
+my $agent = CPAN::Unwind->new( 
+    core_include => $opts{c},
+    $opts{u} ? (cache => undef) : (),
+);
+
+my $resp = $agent->lookup(@ARGV);
+
+LOGDIE $resp->message() unless $resp->is_success();
+
+for($resp->schedule()) {
+    print "$_\n";
+}
+
+__END__
+
+=head1 NAME
+
+    cpan-unwind - Create an installation schedule for a module on CPAN
+
+=head1 SYNOPSIS
+
+    cpan-unwind module_name
+
+=head1 DESCRIPTION
+
+C<cpan-unwind> determines a CPAN module's dependencies recursively. 
+It then unravels the list, and returns an 'install schedule'.
+
+An 'install schedule' is an ordered list of modules. If installed in the
+given order, there won't be any unresolved dependencies.
+
+This will obviously work only if there are no circular dependencies.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-u>
+
+Uncached. Disables the cache.
+
+=item C<-v>
+
+Verbose mode.
+
+=item C<-c>
+
+By default, cpan-unwind won't list modules that are listed on CPAN
+as part of a C<perl-*> release. If you want them listed as dependencies, 
+use the C<-c> (I<core>) option.
+
+=back
+
+=head1 EXAMPLES
+
+    $ cpan-unwind Net::Amazon
+    Carp Compress::Zlib Data::Dumper Fcntl File::Basename File::Path 
+    File::Spec HTML::Tagset IO::Socket MIME::Base64 Socket Test::Harness 
+    Test::More Test::Simple Time::HiRes URI XML::NamespaceSupport 
+    Digest::base File::Temp HTML::Parser Log::Log4perl Net::FTP 
+    XML::SAX XML::Simple Digest::MD5 LWP::UserAgent Net::Amazon
+    
+=head1 LEGALESE
+
+Copyright 2005 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2005, Mike Schilli <m@perlmeister.com>

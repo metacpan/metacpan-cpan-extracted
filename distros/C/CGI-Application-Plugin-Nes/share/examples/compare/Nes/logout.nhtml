@@ -1,0 +1,4 @@
+{: NES 1.0 none :}
+
+{: include ( '{: * cfg_obj_top_dir :}/session.nhtml', del ) :}
+{: include ( '{: * cfg_obj_top_dir :}/location.nhtml', '?action=index' ) :} 

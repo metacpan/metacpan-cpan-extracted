@@ -1,0 +1,861 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:5928865
+Return-Path: <bingos@cpan.org>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 31146 invoked from network); 8 Nov 2009 14:48:38 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 8 Nov 2009 14:48:38 -0000
+Received: (qmail 32287 invoked by uid 225); 8 Nov 2009 14:48:38 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 32203 invoked by alias); 8 Nov 2009 14:48:37 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=PERLBUG_CONF
+X-Spam-Check-By: la.mx.develooper.com
+Received: from kidney-bingos.demon.co.uk (HELO kidney-bingos.demon.co.uk) (62.49.18.107)
+    by la.mx.develooper.com (qpsmtpd/0.28) with SMTP; Sun, 08 Nov 2009 06:48:34 -0800
+Date: Sun, 8 Nov 2009 14:48:26 +0000
+Subject: FAIL CatalystX-SimpleLogin-0.02 i386-freebsd 6.4-release
+To: cpan-testers@perl.org
+Message-ID: <1257691706.28746ed0.31072@diafol-rhyddha64.bingosnet.co.uk>
+X-Reported-Via: Test::Reporter 1.54, via CPANPLUS 0.89_07
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: bingos@cpan.org
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+
+Dear BOBTFISH,
+=20=20=20=20
+This is a computer-generated error report created automatically by
+CPANPLUS, version 0.89_07. Testers personal comments may appear=20
+at the end of this report.
+
+
+Thank you for uploading your work to CPAN.  However, it appears that
+there were some problems testing your distribution.
+
+TEST RESULTS:
+
+Below is the error stack from stage 'make test':
+
+[MSG] [Sun Nov  8 14:45:27 2009] cp lib/MooseX/Role/Parameterized/Parameter=
+s.pm blib/lib/MooseX/Role/Parameterized/Parameters.pm
+cp lib/MooseX/Role/Parameterized/Meta/Role/Parameterized.pm blib/lib/MooseX=
+/Role/Parameterized/Meta/Role/Parameterized.pm
+cp lib/MooseX/Role/Parameterized/Meta/Role/Parameterizable.pm blib/lib/Moos=
+eX/Role/Parameterized/Meta/Role/Parameterizable.pm
+cp lib/MooseX/Role/Parameterized.pm blib/lib/MooseX/Role/Parameterized.pm
+cp lib/MooseX/Role/Parameterized/Tutorial.pod blib/lib/MooseX/Role/Paramete=
+rized/Tutorial.pod
+cp lib/MooseX/Role/Parameterized/Meta/Parameter.pm blib/lib/MooseX/Role/Par=
+ameterized/Meta/Parameter.pm
+Manifying blib/man3/MooseX::Role::Parameterized::Parameters.3
+Manifying blib/man3/MooseX::Role::Parameterized::Meta::Role::Parameterized.3
+Manifying blib/man3/MooseX::Role::Parameterized::Meta::Role::Parameterizabl=
+e.3
+Manifying blib/man3/MooseX::Role::Parameterized::Meta::Parameter.3
+Manifying blib/man3/MooseX::Role::Parameterized::Tutorial.3
+Manifying blib/man3/MooseX::Role::Parameterized.3
+
+[MSG] [Sun Nov  8 14:46:00 2009] MAKE TEST passed: PERL_DL_NONLAZY=3D1 /usr=
+/home/cpan/pit/bare/perl-5.10.1/bin/perl "-MExtUtils::Command::MM" "-e" "te=
+st_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+t/001-parameters.t .................. ok
+t/002-role-block.t .................. ok
+t/003-apply.t ....................... ok
+t/004-with.t ........................ ok
+t/005-with-parameterized.t .......... ok
+t/006-requires.t .................... ok
+t/007-excludes.t .................... ok
+t/008-method-modifers.t ............. ok
+t/009-override-super.t .............. ok
+t/010-blessed-confess.t ............. ok
+t/011-reference-parameters.t ........ ok
+t/012-rename-role.t ................. ok
+t/013-does.t ........................ ok
+t/014-compose-parameterizable.t ..... ok
+t/015-compose-keywords.t ............ ok
+t/016-trait.t ....................... ok
+t/017-current_metaclass.t ........... ok
+t/100-erroneous-keywords.t .......... ok
+t/101-alias-excludes.t .............. ok
+t/150-composite-role-application.t .. ok
+All tests successful.
+Files=3D20, Tests=3D127, 32 wallclock secs ( 0.12 usr  0.81 sys +  5.10 cus=
+r 25.61 csys =3D 31.65 CPU)
+Result: PASS
+
+[MSG] [Sun Nov  8 14:46:00 2009] Sending test report for 'MooseX-Role-Param=
+eterized-0.13'
+[MSG] [Sun Nov  8 14:46:01 2009] Successfully sent 'pass' report for 'Moose=
+X-Role-Parameterized-0.13'
+[MSG] [Sun Nov  8 14:46:06 2009] cp lib/MooseX/RelatedClassRoles.pm blib/li=
+b/MooseX/RelatedClassRoles.pm
+Manifying blib/man3/MooseX::RelatedClassRoles.3
+
+[MSG] [Sun Nov  8 14:46:08 2009] MAKE TEST passed: PERL_DL_NONLAZY=3D1 /usr=
+/home/cpan/pit/bare/perl-5.10.1/bin/perl "-MExtUtils::Command::MM" "-e" "te=
+st_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01_basic.t .. ok
+All tests successful.
+Files=3D1, Tests=3D5,  1 wallclock secs ( 0.00 usr  0.27 sys +  0.17 cusr  =
+1.30 csys =3D  1.73 CPU)
+Result: PASS
+
+[MSG] [Sun Nov  8 14:46:09 2009] Sending test report for 'MooseX-RelatedCla=
+ssRoles-0.004'
+[MSG] [Sun Nov  8 14:46:09 2009] Successfully sent 'pass' report for 'Moose=
+X-RelatedClassRoles-0.004'
+[MSG] [Sun Nov  8 14:46:14 2009] cp lib/CatalystX/SimpleLogin/TraitFor/Cont=
+roller/Login/RenderAsTTTemplate.pm blib/lib/CatalystX/SimpleLogin/TraitFor/=
+Controller/Login/RenderAsTTTemplate.pm
+cp lib/CatalystX/SimpleLogin/Manual.pod blib/lib/CatalystX/SimpleLogin/Manu=
+al.pod
+cp lib/CatalystX/SimpleLogin/TraitFor/Controller/Login/Logout.pm blib/lib/C=
+atalystX/SimpleLogin/TraitFor/Controller/Login/Logout.pm
+cp lib/CatalystX/SimpleLogin/Controller/Login.pm blib/lib/CatalystX/SimpleL=
+ogin/Controller/Login.pm
+cp lib/CatalystX/SimpleLogin.pm blib/lib/CatalystX/SimpleLogin.pm
+cp lib/Catalyst/ActionRole/NeedsLogin.pm blib/lib/Catalyst/ActionRole/Needs=
+Login.pm
+cp lib/CatalystX/SimpleLogin/Form/LoginOpenID.pm blib/lib/CatalystX/SimpleL=
+ogin/Form/LoginOpenID.pm
+cp lib/CatalystX/SimpleLogin/Form/Login.pm blib/lib/CatalystX/SimpleLogin/F=
+orm/Login.pm
+cp lib/CatalystX/SimpleLogin/TraitFor/Controller/Login/WithRedirect.pm blib=
+/lib/CatalystX/SimpleLogin/TraitFor/Controller/Login/WithRedirect.pm
+Manifying blib/man3/CatalystX::SimpleLogin::TraitFor::Controller::Login::Re=
+nderAsTTTemplate.3
+Manifying blib/man3/CatalystX::SimpleLogin::Manual.3
+Manifying blib/man3/CatalystX::SimpleLogin::TraitFor::Controller::Login::Lo=
+gout.3
+Manifying blib/man3/CatalystX::SimpleLogin::Controller::Login.3
+Manifying blib/man3/CatalystX::SimpleLogin.3
+Manifying blib/man3/Catalyst::ActionRole::NeedsLogin.3
+Manifying blib/man3/CatalystX::SimpleLogin::Form::LoginOpenID.3
+Manifying blib/man3/CatalystX::SimpleLogin::Form::Login.3
+Manifying blib/man3/CatalystX::SimpleLogin::TraitFor::Controller::Login::Wi=
+thRedirect.3
+
+[ERROR] [Sun Nov  8 14:48:24 2009] MAKE TEST failed: No such file or direct=
+ory PERL_DL_NONLAZY=3D1 /usr/home/cpan/pit/bare/perl-5.10.1/bin/perl "-MExt=
+Utils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" =
+t/*.t
+t/00-load.t ........................... ok
+t/01-live-test.t ...................... ok
+t/02-redirect-test.t .................. ok
+t/03-login-form.t ..................... ok
+t/04-test-role-apply-order.t .......... ok
+t/05-login-redirect-custom-message.t .. ok
+t/06-rendertt.t ....................... ok
+Can't locate Catalyst/Authentication/Credential/OpenID.pm in @INC (@INC con=
+tains: /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cata=
+lystX-SimpleLogin-0.02/t/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpan=
+plus/5.10.1/build/CatalystX-SimpleLogin-0.02/inc /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-SimpleLogin-0.02/blib/lib /=
+usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-Si=
+mpleLogin-0.02/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Params-Util-1.00/blib/lib /usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/Params-Util-1.00/blib/arch /usr/home/cpan/pit/=
+bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Install-0.925/blib/lib /us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Install-0.=
+925/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Data-OptList-0.104/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/Data-OptList-0.104/blib/arch /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Exporter-0.982/blib/lib /usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Exporter-0.982/b=
+lib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Va=
+riable-Magic-0.38/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanpl=
+us/5.10.1/build/Variable-Magic-0.38/blib/arch /usr/home/cpan/pit/bare/conf/=
+perl-5.10.1/.cpanplus/5.10.1/build/B-Hooks-EndOfScope-0.08/blib/lib /usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/B-Hooks-EndOfScope=
+-0.08/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/IO-stringy-2.110/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/IO-stringy-2.110/blib/arch /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/CGI-Simple-1.112/blib/lib /usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CGI-Simple-1.112/blib/ar=
+ch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/List-Mor=
+eUtils-0.22/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/List-MoreUtils-0.22/blib/arch /usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/MRO-Compat-0.11/blib/lib /usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/MRO-Compat-0.11/blib/arch /usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Uplevel-0.200=
+2/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+Sub-Uplevel-0.2002/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpan=
+plus/5.10.1/build/Test-Exception-0.27/blib/lib /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/Test-Exception-0.27/blib/arch /usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-C3-Adopt-NEXT-=
+0.12/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Class-C3-Adopt-NEXT-0.12/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.1=
+0.1/.cpanplus/5.10.1/build/Class-Data-Inheritable-0.08/blib/lib /usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Data-Inheritable=
+-0.08/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/Scope-Guard-0.03/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/Scope-Guard-0.03/blib/arch /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/Devel-GlobalDestruction-0.02/blib/lib /=
+usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-Global=
+Destruction-0.02/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanpl=
+us/5.10.1/build/Sub-Name-0.04/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/Sub-Name-0.04/blib/arch /usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/Task-Weaken-1.03/blib/lib /usr/hom=
+e/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Task-Weaken-1.03/bl=
+ib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cla=
+ss-MOP-0.94/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/Class-MOP-0.94/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/Data-Dump-1.15/blib/lib /usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/Data-Dump-1.15/blib/arch /usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/HTML-Tagset-3.20/blib/li=
+b /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/HTML-Tags=
+et-3.20/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/HTML-Parser-3.64/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/HTML-Parser-3.64/blib/arch /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/URI-1.40/blib/lib /usr/home/cpan/pit/=
+bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/URI-1.40/blib/arch /usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/libwww-perl-5.833/blib=
+/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/libwww=
+-perl-5.833/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/YAML-0.70/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpa=
+nplus/5.10.1/build/YAML-0.70/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/HTTP-Body-1.05/blib/lib /usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/HTTP-Body-1.05/blib/arch /usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Accessor-0.34/=
+blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cl=
+ass-Accessor-0.34/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/HTTP-Request-AsCGI-0.9/blib/lib /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/HTTP-Request-AsCGI-0.9/blib/arch /usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Try-Tiny-0.02/b=
+lib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Try=
+-Tiny-0.02/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/Moose-0.92/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpa=
+nplus/5.10.1/build/Moose-0.92/blib/arch /usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/namespace-clean-0.11/blib/lib /usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/namespace-clean-0.11/blib/a=
+rch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-=
+Emulate-Class-Accessor-Fast-0.00903/blib/lib /usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/MooseX-Emulate-Class-Accessor-Fast-0.0090=
+3/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build=
+/Carp-Clan-6.04/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Carp-Clan-6.04/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/MooseX-Types-0.20/blib/lib /usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Types-0.20/blib/arch /us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/namespace-auto=
+clean-0.09/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10=
+.1/build/namespace-autoclean-0.09/blib/arch /usr/home/cpan/pit/bare/conf/pe=
+rl-5.10.1/.cpanplus/5.10.1/build/MooseX-MethodAttributes-0.18/blib/lib /usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-MethodAt=
+tributes-0.18/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/Path-Class-0.17/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.1=
+0.1/.cpanplus/5.10.1/build/Path-Class-0.17/blib/arch /usr/home/cpan/pit/bar=
+e/conf/perl-5.10.1/.cpanplus/5.10.1/build/String-RewritePrefix-0.004/blib/l=
+ib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/String-R=
+ewritePrefix-0.004/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpan=
+plus/5.10.1/build/Text-SimpleTable-2.0/blib/lib /usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/Text-SimpleTable-2.0/blib/arch /usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tree-Simple-1.18/b=
+lib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tre=
+e-Simple-1.18/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/Tree-Simple-VisitorFactory-0.10/blib/lib /usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tree-Simple-VisitorFactory-0.10/=
+blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/C=
+atalyst-Runtime-5.80013/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/Catalyst-Runtime-5.80013/blib/arch /usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Inspector-1.24/blib/lib=
+ /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Insp=
+ector-1.24/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/Data-Serializer-0.49/blib/lib /usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/Data-Serializer-0.49/blib/arch /usr/home/cpan/=
+pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Params-Validate-0.92/blib/=
+lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Params-=
+Validate-0.92/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/URI-Find-20090319/blib/lib /usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/URI-Find-20090319/blib/arch /usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-Leak-0.03/blib/lib /usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-Leak-0.03=
+/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+YAML-Syck-1.07/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/YAML-Syck-1.07/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.1=
+0.1/.cpanplus/5.10.1/build/Catalyst-Action-REST-0.78/blib/lib /usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Action-REST-0.7=
+8/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build=
+/UNIVERSAL-can-1.15/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpan=
+plus/5.10.1/build/UNIVERSAL-can-1.15/blib/arch /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/UNIVERSAL-isa-1.03/blib/lib /usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/UNIVERSAL-isa-1.03/bli=
+b/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test=
+-MockObject-1.09/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplu=
+s/5.10.1/build/Test-MockObject-1.09/blib/arch /usr/home/cpan/pit/bare/conf/=
+perl-5.10.1/.cpanplus/5.10.1/build/Test-use-ok-0.02/blib/lib /usr/home/cpan=
+/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-use-ok-0.02/blib/arc=
+h /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tie-ToObj=
+ect-0.03/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Tie-ToObject-0.03/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/Data-Visitor-0.26/blib/lib /usr/home/cpan/pit/bare/=
+conf/perl-5.10.1/.cpanplus/5.10.1/build/Data-Visitor-0.26/blib/arch /usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Action-Re=
+nderView-0.13/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/Catalyst-Action-RenderView-0.13/blib/arch /usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Controller-ActionRole-0=
+.12/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/buil=
+d/Catalyst-Controller-ActionRole-0.12/blib/arch /usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-ActionRole-ACL-0.05/blib/lib =
+/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Ac=
+tionRole-ACL-0.05/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/Object-Signature-1.05/blib/lib /usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/Object-Signature-1.05/blib/arch /usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Tester-0.107=
+/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/T=
+est-Tester-0.107/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanpl=
+us/5.10.1/build/Test-NoWarnings-0.084/blib/lib /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/Test-NoWarnings-0.084/blib/arch /usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Deep-0.106/bl=
+ib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test=
+-Deep-0.106/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/Catalyst-Plugin-Session-0.29/blib/lib /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-0.29/blib/arc=
+h /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-=
+Plugin-Authentication-0.10015/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Authentication-0.10015/blib/arc=
+h /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-=
+Plugin-Session-State-Cookie-0.17/blib/lib /usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-State-Cookie-0.17/bl=
+ib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Dig=
+est-SHA1-2.12/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/Digest-SHA1-2.12/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/Error-0.17015/blib/lib /usr/home/cpan/pit/bare/=
+conf/perl-5.10.1/.cpanplus/5.10.1/build/Error-0.17015/blib/arch /usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cache-Cache-1.06/blib/=
+lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cache-C=
+ache-1.06/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10=
+.1/build/Catalyst-Plugin-Session-Store-File-0.18/blib/lib /usr/home/cpan/pi=
+t/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-Stor=
+e-File-0.18/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/AppConfig-1.66/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/AppConfig-1.66/blib/arch /usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/Template-Toolkit-2.22/blib/lib /usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Template-Toolkit-=
+2.22/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bu=
+ild/Template-Timer-1.00/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/Template-Timer-1.00/blib/arch /usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-View-TT-0.31/blib/lib /us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-View-=
+TT-0.31/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/MooseX-Traits-Pluggable-0.08/blib/lib /usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/MooseX-Traits-Pluggable-0.08/blib/arch /u=
+sr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-Com=
+ponent-Traits-0.14/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/CatalystX-Component-Traits-0.14/blib/arch /usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-StackTrace-1.22/blib/=
+lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-S=
+tackTrace-1.22/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Exception-Class-1.29/blib/lib /usr/home/cpan/pit/bare/conf/pe=
+rl-5.10.1/.cpanplus/5.10.1/build/Exception-Class-1.29/blib/arch /usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Algorithm-Diff-1.1902/=
+blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Al=
+gorithm-Diff-1.1902/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpa=
+nplus/5.10.1/build/Text-Diff-1.37/blib/lib /usr/home/cpan/pit/bare/conf/per=
+l-5.10.1/.cpanplus/5.10.1/build/Text-Diff-1.37/blib/arch /usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Differences-0.500/blib/l=
+ib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Dif=
+ferences-0.500/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Tree-DAG_Node-1.06/blib/lib /usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/Tree-DAG_Node-1.06/blib/arch /usr/home/cpan/=
+pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Warn-0.21/blib/lib /u=
+sr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Warn-0.2=
+1/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build=
+/Test-Most-0.21/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Test-Most-0.21/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/CatalystX-InjectComponent-0.024/blib/lib /usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-InjectC=
+omponent-0.024/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/Class-Load-0.05/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/Class-Load-0.05/blib/arch /usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-Locale-0.44/blib/lib /u=
+sr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-Loca=
+le-0.44/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Class-Singleton-1.4/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.=
+1/.cpanplus/5.10.1/build/Class-Singleton-1.4/blib/arch /usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-TimeZone-1.03/blib/lib=
+ /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-T=
+imeZone-1.03/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/DateTime-0.51/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/DateTime-0.51/blib/arch /usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/Getopt-Long-Descriptive-0.077/blib/lib=
+ /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Getopt-Lon=
+g-Descriptive-0.077/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpa=
+nplus/5.10.1/build/MooseX-Getopt-0.24/blib/lib /usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Getopt-0.24/blib/arch /usr/home/=
+cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Traits-0.07/bl=
+ib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Moos=
+eX-Traits-0.07/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus=
+/5.10.1/build/MooseX-Types-Common-0.001000/blib/lib /usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Types-Common-0.001000/blib/=
+arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/aliase=
+d-0.30/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/aliased-0.30/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/HTML-FormHandler-0.28001/blib/lib /usr/home/cpan/pit/bare/=
+conf/perl-5.10.1/.cpanplus/5.10.1/build/HTML-FormHandler-0.28001/blib/arch =
+/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Perl6-Junct=
+ion-1.40000/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/Perl6-Junction-1.40000/blib/arch /usr/home/cpan/pit/bare/conf/per=
+l-5.10.1/.cpanplus/5.10.1/build/autobox-2.55/blib/lib /usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/autobox-2.55/blib/arch /usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Moose-Autobox-0.10/b=
+lib/lib /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Moo=
+se-Autobox-0.10/blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplu=
+s/5.10.1/build/MooseX-Role-Parameterized-0.13/blib/lib /usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Role-Parameterized-0.13/=
+blib/arch /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/M=
+ooseX-RelatedClassRoles-0.004/blib/lib /usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/MooseX-RelatedClassRoles-0.004/blib/arch /usr/h=
+ome/cpan/pit/bare/perl-5.10.1/lib/5.10.1/i386-freebsd /usr/home/cpan/pit/ba=
+re/perl-5.10.1/lib/5.10.1 /usr/home/cpan/pit/bare/perl-5.10.1/lib/site_perl=
+/5.10.1/i386-freebsd /usr/home/cpan/pit/bare/perl-5.10.1/lib/site_perl/5.10=
+.1 .) at t/07-openid-live.t line 12.
+BEGIN failed--compilation aborted at t/07-openid-live.t line 12.
+# Looks like your test exited with 2 before it could output anything.
+t/07-openid-live.t ....................=20
+Dubious, test returned 2 (wstat 512, 0x200)
+No subtests run=20
+
+Test Summary Report
+-------------------
+t/07-openid-live.t                  (Wstat: 512 Tests: 0 Failed: 0)
+  Non-zero exit status: 2
+  Parse errors: No plan found in TAP output
+Files=3D8, Tests=3D56, 128 wallclock secs ( 0.05 usr  0.54 sys + 13.68 cusr=
+ 112.66 csys =3D 126.93 CPU)
+Result: FAIL
+Failed 1/8 test programs. 0/56 subtests failed.
+*** Error code 2
+
+Stop in /usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cat=
+alystX-SimpleLogin-0.02.
+
+[MSG] [Sun Nov  8 14:48:24 2009] DEFAULT 'proceed_on_test_failure' HANDLER =
+RETURNING 'sub return value'
+
+
+MISSING PREREQUISITES:
+
+It was observed that the test suite seem to fail without these modules:
+
+Data::Alias
+Template::Provider::Encoding
+Catalyst::Authentication::Credential::OpenID
+
+As such, adding the prerequisite module(s) to 'PREREQ_PM' in your
+Makefile.PL should solve this problem.  For example:
+
+WriteMakefile(
+    AUTHOR      =3D> 'BOBTFISH (cpanplus-info@lists.sf.net)',
+    ... # other information
+    PREREQ_PM   =3D> {
+	'Data::Alias'	=3D> '0', # or a minimum working version
+	'Template::Provider::Encoding'	=3D> '0', # or a minimum working version
+	'Catalyst::Authentication::Credential::OpenID'	=3D> '0', # or a minimum wo=
+rking version
+    }
+);
+
+Thanks! :-)
+
+PREREQUISITES:
+
+Here is a list of prerequisites you specified and versions we=20
+managed to load:
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20
+	  Module Name                        Have     Want
+	  Catalyst::Action::REST             0.78     0.74
+	  Catalyst::Action::RenderView       0.13        0
+	  Catalyst::ActionRole::ACL          0.05        0
+	  Catalyst::Controller::ActionRole     0.12     0.12
+	  Catalyst::Plugin::Authentication  0.10015        0
+	  Catalyst::Plugin::Session          0.29        0
+	  Catalyst::Plugin::Session::State::Cookie     0.17        0
+	  Catalyst::Plugin::Session::Store::File     0.18        0
+	  Catalyst::Runtime               5.80013  5.80013
+	  Catalyst::View::TT                 0.31        0
+	  CatalystX::Component::Traits       0.14     0.13
+	  CatalystX::InjectComponent        0.024        0
+	  ExtUtils::MakeMaker             6.55_02     6.42
+	  HTML::FormHandler               0.28001  0.26001
+	  HTTP::Request::Common             5.824        0
+	  Moose                              0.92        0
+	  Moose::Autobox                     0.10     0.09
+	  MooseX::MethodAttributes           0.18     0.18
+	  MooseX::RelatedClassRoles         0.004    0.004
+	  MooseX::Types                      0.20        0
+	  MooseX::Types::Common          0.001000        0
+	  Test::More                         0.94     0.94
+	  namespace::autoclean               0.09        0
+
+Perl module toolchain versions installed:
+	Module Name                        Have
+	CPANPLUS                        0.89_07
+	CPANPLUS::Dist::Build              0.40
+	Cwd                                3.30
+	ExtUtils::CBuilder                 0.27
+	ExtUtils::Command                  1.16
+	ExtUtils::Install                  1.54
+	ExtUtils::MakeMaker             6.55_02
+	ExtUtils::Manifest                 1.57
+	ExtUtils::ParseXS                  2.21
+	File::Spec                         3.30
+	Module::Build                      0.35
+	Test::Harness                      3.17
+	Test::More                         0.94
+	version                            0.78
+
+******************************** NOTE ********************************
+The comments above are created mechanically, possibly without manual
+checking by the sender.  As there are many people performing automatic
+tests on each upload to CPAN, it is likely that you will receive=20
+identical messages about the same problem.
+
+If you believe that the message is mistaken, please reply to the first
+one with correction and/or additional informations, and do not take
+it personally.  We appreciate your patience. :)
+**********************************************************************
+
+Additional comments:
+=20
+
+This report was machine-generated by CPANPLUS::Dist::YACSmoke 0.45_01.
+Powered by minismokebox version 0.18
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING =3D 1
+    PATH =3D /sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/=
+local/bin:/usr/X11R6/bin:/home/cpan/bin
+    PERL5LIB =3D :/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Params-Util-1.00/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/Params-Util-1.00/blib/arch:/usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Install-0.925/blib/lib:/usr/home/=
+cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Install-0.925/bli=
+b/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Data=
+-OptList-0.104/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/Data-OptList-0.104/blib/arch:/usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/Sub-Exporter-0.982/blib/lib:/usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Exporter-0.982/blib/arc=
+h:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Variable-=
+Magic-0.38/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10=
+.1/build/Variable-Magic-0.38/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/B-Hooks-EndOfScope-0.08/blib/lib:/usr/home/cpan=
+/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/B-Hooks-EndOfScope-0.08/b=
+lib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/IO=
+-stringy-2.110/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/IO-stringy-2.110/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/CGI-Simple-1.112/blib/lib:/usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/CGI-Simple-1.112/blib/arch:/usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/List-MoreUtils-=
+0.22/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/List-MoreUtils-0.22/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/MRO-Compat-0.11/blib/lib:/usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/MRO-Compat-0.11/blib/arch:/usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Uplevel-0.2002/blib/=
+lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sub-Upl=
+evel-0.2002/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/Test-Exception-0.27/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/Test-Exception-0.27/blib/arch:/usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-C3-Adopt-NEXT-0.12/bl=
+ib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Clas=
+s-C3-Adopt-NEXT-0.12/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/Class-Data-Inheritable-0.08/blib/lib:/usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Data-Inheritable-0.08/b=
+lib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Sc=
+ope-Guard-0.03/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/=
+5.10.1/build/Scope-Guard-0.03/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/Devel-GlobalDestruction-0.02/blib/lib:/usr/hom=
+e/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-GlobalDestruc=
+tion-0.02/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10=
+.1/build/Sub-Name-0.04/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/Sub-Name-0.04/blib/arch:/usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/Task-Weaken-1.03/blib/lib:/usr/home/cpan/=
+pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Task-Weaken-1.03/blib/arch=
+:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-MOP-=
+0.94/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Class-MOP-0.94/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/Data-Dump-1.15/blib/lib:/usr/home/cpan/pit/bare/conf/perl-=
+5.10.1/.cpanplus/5.10.1/build/Data-Dump-1.15/blib/arch:/usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/HTML-Tagset-3.20/blib/lib:/usr/=
+home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/HTML-Tagset-3.20=
+/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+HTML-Parser-3.64/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplu=
+s/5.10.1/build/HTML-Parser-3.64/blib/arch:/usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/URI-1.40/blib/lib:/usr/home/cpan/pit/bare/co=
+nf/perl-5.10.1/.cpanplus/5.10.1/build/URI-1.40/blib/arch:/usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/libwww-perl-5.833/blib/lib:/u=
+sr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/libwww-perl-5=
+.833/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bu=
+ild/YAML-0.70/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/YAML-0.70/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/HTTP-Body-1.05/blib/lib:/usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/HTTP-Body-1.05/blib/arch:/usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Accessor-0.34/blib/li=
+b:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Acc=
+essor-0.34/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/HTTP-Request-AsCGI-0.9/blib/lib:/usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/HTTP-Request-AsCGI-0.9/blib/arch:/usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Try-Tiny-0.02/blib/lib=
+:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Try-Tiny-0=
+.02/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Moose-0.92/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/Moose-0.92/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/namespace-clean-0.11/blib/lib:/usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/namespace-clean-0.11/blib/arch:/us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Emulate=
+-Class-Accessor-Fast-0.00903/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.1=
+0.1/.cpanplus/5.10.1/build/MooseX-Emulate-Class-Accessor-Fast-0.00903/blib/=
+arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Carp-C=
+lan-6.04/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Carp-Clan-6.04/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/MooseX-Types-0.20/blib/lib:/usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Types-0.20/blib/arch:/usr/home/=
+cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/namespace-autoclean-0=
+.09/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/buil=
+d/namespace-autoclean-0.09/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10=
+.1/.cpanplus/5.10.1/build/MooseX-MethodAttributes-0.18/blib/lib:/usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-MethodAttribute=
+s-0.18/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/=
+build/Path-Class-0.17/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/Path-Class-0.17/blib/arch:/usr/home/cpan/pit/bare/conf/=
+perl-5.10.1/.cpanplus/5.10.1/build/String-RewritePrefix-0.004/blib/lib:/usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/String-RewriteP=
+refix-0.004/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/Text-SimpleTable-2.0/blib/lib:/usr/home/cpan/pit/bare/conf/perl-=
+5.10.1/.cpanplus/5.10.1/build/Text-SimpleTable-2.0/blib/arch:/usr/home/cpan=
+/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tree-Simple-1.18/blib/lib=
+:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tree-Simpl=
+e-1.18/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/=
+build/Tree-Simple-VisitorFactory-0.10/blib/lib:/usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/Tree-Simple-VisitorFactory-0.10/blib/ar=
+ch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst=
+-Runtime-5.80013/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplu=
+s/5.10.1/build/Catalyst-Runtime-5.80013/blib/arch:/usr/home/cpan/pit/bare/c=
+onf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Inspector-1.24/blib/lib:/usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Class-Inspector-1=
+.24/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Data-Serializer-0.49/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/Data-Serializer-0.49/blib/arch:/usr/home/cpan/pit/bar=
+e/conf/perl-5.10.1/.cpanplus/5.10.1/build/Params-Validate-0.92/blib/lib:/us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Params-Validat=
+e-0.92/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/=
+build/URI-Find-20090319/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.=
+cpanplus/5.10.1/build/URI-Find-20090319/blib/arch:/usr/home/cpan/pit/bare/c=
+onf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-Leak-0.03/blib/lib:/usr/home/c=
+pan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-Leak-0.03/blib/a=
+rch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/YAML-Sy=
+ck-1.07/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/=
+build/YAML-Syck-1.07/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cp=
+anplus/5.10.1/build/Catalyst-Action-REST-0.78/blib/lib:/usr/home/cpan/pit/b=
+are/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Action-REST-0.78/blib/=
+arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/UNIVER=
+SAL-can-1.15/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.=
+10.1/build/UNIVERSAL-can-1.15/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/UNIVERSAL-isa-1.03/blib/lib:/usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/UNIVERSAL-isa-1.03/blib/arch:=
+/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-MockOb=
+ject-1.09/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.=
+1/build/Test-MockObject-1.09/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.=
+10.1/.cpanplus/5.10.1/build/Test-use-ok-0.02/blib/lib:/usr/home/cpan/pit/ba=
+re/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-use-ok-0.02/blib/arch:/usr/=
+home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tie-ToObject-0.0=
+3/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+Tie-ToObject-0.03/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/Data-Visitor-0.26/blib/lib:/usr/home/cpan/pit/bare/conf/pe=
+rl-5.10.1/.cpanplus/5.10.1/build/Data-Visitor-0.26/blib/arch:/usr/home/cpan=
+/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Action-RenderVie=
+w-0.13/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/Catalyst-Action-RenderView-0.13/blib/arch:/usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Controller-ActionRole-0.12/bli=
+b/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catal=
+yst-Controller-ActionRole-0.12/blib/arch:/usr/home/cpan/pit/bare/conf/perl-=
+5.10.1/.cpanplus/5.10.1/build/Catalyst-ActionRole-ACL-0.05/blib/lib:/usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-ActionRol=
+e-ACL-0.05/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/Object-Signature-1.05/blib/lib:/usr/home/cpan/pit/bare/conf/perl-=
+5.10.1/.cpanplus/5.10.1/build/Object-Signature-1.05/blib/arch:/usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Tester-0.107/blib/l=
+ib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Tes=
+ter-0.107/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10=
+.1/build/Test-NoWarnings-0.084/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/Test-NoWarnings-0.084/blib/arch:/usr/home/cpan=
+/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Deep-0.106/blib/lib:=
+/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Deep-0=
+.106/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bu=
+ild/Catalyst-Plugin-Session-0.29/blib/lib:/usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-0.29/blib/arch:/usr/=
+home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-=
+Authentication-0.10015/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/Catalyst-Plugin-Authentication-0.10015/blib/arch:/usr/=
+home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-=
+Session-State-Cookie-0.17/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-State-Cookie-0.17/blib/arch=
+:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Digest-SHA=
+1-2.12/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/Digest-SHA1-2.12/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/Error-0.17015/blib/lib:/usr/home/cpan/pit/bare/conf/pe=
+rl-5.10.1/.cpanplus/5.10.1/build/Error-0.17015/blib/arch:/usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cache-Cache-1.06/blib/lib:/us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Cache-Cache-1.=
+06/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/buil=
+d/Catalyst-Plugin-Session-Store-File-0.18/blib/lib:/usr/home/cpan/pit/bare/=
+conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-Plugin-Session-Store-File-=
+0.18/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bu=
+ild/AppConfig-1.66/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/AppConfig-1.66/blib/arch:/usr/home/cpan/pit/bare/conf/perl=
+-5.10.1/.cpanplus/5.10.1/build/Template-Toolkit-2.22/blib/lib:/usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Template-Toolkit-2.22/bl=
+ib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Tem=
+plate-Timer-1.00/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplu=
+s/5.10.1/build/Template-Timer-1.00/blib/arch:/usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/Catalyst-View-TT-0.31/blib/lib:/usr/home/=
+cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Catalyst-View-TT-0.31=
+/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+MooseX-Traits-Pluggable-0.08/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.1=
+0.1/.cpanplus/5.10.1/build/MooseX-Traits-Pluggable-0.08/blib/arch:/usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-Component-=
+Traits-0.14/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/CatalystX-Component-Traits-0.14/blib/arch:/usr/home/cpan/pit/bare=
+/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-StackTrace-1.22/blib/lib:/us=
+r/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Devel-StackTra=
+ce-1.22/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Exception-Class-1.29/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10=
+.1/.cpanplus/5.10.1/build/Exception-Class-1.29/blib/arch:/usr/home/cpan/pit=
+/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Algorithm-Diff-1.1902/blib/li=
+b:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Algorithm=
+-Diff-1.1902/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/Text-Diff-1.37/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.=
+1/.cpanplus/5.10.1/build/Text-Diff-1.37/blib/arch:/usr/home/cpan/pit/bare/c=
+onf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Differences-0.500/blib/lib:/usr=
+/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Difference=
+s-0.500/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Tree-DAG_Node-1.06/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1=
+/.cpanplus/5.10.1/build/Tree-DAG_Node-1.06/blib/arch:/usr/home/cpan/pit/bar=
+e/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Warn-0.21/blib/lib:/usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-Warn-0.21/blib/=
+arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Test-M=
+ost-0.21/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Test-Most-0.21/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/CatalystX-InjectComponent-0.024/blib/lib:/usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-InjectComponen=
+t-0.024/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/Class-Load-0.05/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/Class-Load-0.05/blib/arch:/usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-Locale-0.44/blib/lib:/usr/home=
+/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-Locale-0.44=
+/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/=
+Class-Singleton-1.4/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpan=
+plus/5.10.1/build/Class-Singleton-1.4/blib/arch:/usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-TimeZone-1.03/blib/lib:/usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/DateTime-TimeZone=
+-1.03/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/b=
+uild/DateTime-0.51/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanp=
+lus/5.10.1/build/DateTime-0.51/blib/arch:/usr/home/cpan/pit/bare/conf/perl-=
+5.10.1/.cpanplus/5.10.1/build/Getopt-Long-Descriptive-0.077/blib/lib:/usr/h=
+ome/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Getopt-Long-Descr=
+iptive-0.077/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5=
+.10.1/build/MooseX-Getopt-0.24/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5=
+.10.1/.cpanplus/5.10.1/build/MooseX-Getopt-0.24/blib/arch:/usr/home/cpan/pi=
+t/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Traits-0.07/blib/lib:=
+/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Trai=
+ts-0.07/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1=
+/build/MooseX-Types-Common-0.001000/blib/lib:/usr/home/cpan/pit/bare/conf/p=
+erl-5.10.1/.cpanplus/5.10.1/build/MooseX-Types-Common-0.001000/blib/arch:/u=
+sr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/aliased-0.30/=
+blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/al=
+iased-0.30/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.1=
+0.1/build/HTML-FormHandler-0.28001/blib/lib:/usr/home/cpan/pit/bare/conf/pe=
+rl-5.10.1/.cpanplus/5.10.1/build/HTML-FormHandler-0.28001/blib/arch:/usr/ho=
+me/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Perl6-Junction-1.4=
+0000/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/bui=
+ld/Perl6-Junction-1.40000/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.=
+1/.cpanplus/5.10.1/build/autobox-2.55/blib/lib:/usr/home/cpan/pit/bare/conf=
+/perl-5.10.1/.cpanplus/5.10.1/build/autobox-2.55/blib/arch:/usr/home/cpan/p=
+it/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Moose-Autobox-0.10/blib/lib=
+:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/Moose-Auto=
+box-0.10/blib/arch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.=
+1/build/MooseX-Role-Parameterized-0.13/blib/lib:/usr/home/cpan/pit/bare/con=
+f/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-Role-Parameterized-0.13/blib/ar=
+ch:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/MooseX-R=
+elatedClassRoles-0.004/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.c=
+panplus/5.10.1/build/MooseX-RelatedClassRoles-0.004/blib/arch:/usr/home/cpa=
+n/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build/CatalystX-SimpleLogin-0.=
+02/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.1/.cpanplus/5.10.1/build=
+/CatalystX-SimpleLogin-0.02/blib/arch
+    PERL5_CPANPLUS_IS_RUNNING =3D 31072
+    PERL5_CPANPLUS_IS_VERSION =3D 0.89_07
+    PERL5_MINISMOKEBOX =3D 0.18
+    PERL5_YACSMOKE_BASE =3D /usr/home/cpan/pit/bare/conf/perl-5.10.1/
+    PERL_EXTUTILS_AUTOINSTALL =3D --defaultdeps
+    PERL_MM_USE_DEFAULT =3D 1
+    SHELL =3D /usr/local/bin/bash
+    TERM =3D screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    Perl: $^X =3D /usr/home/cpan/pit/bare/perl-5.10.1/bin/perl
+    UID:  $<  =3D 1001
+    EUID: $>  =3D 1001
+    GID:  $(  =3D 1001 1001 1001
+    EGID: $)  =3D 1001 1001 1001
+
+
+-------------------------------
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 1) configuration:
+=20=20=20
+  Platform:
+    osname=3Dfreebsd, osvers=3D6.4-release, archname=3Di386-freebsd
+    uname=3D'freebsd diafol-rhyddha64.bingosnet.co.uk 6.4-release freebsd 6=
+.4-release #0: wed nov 26 11:43:51 utc 2008 root@dessler.cse.buffalo.edu:us=
+robjusrsrcsysgeneric i386 '
+    config_args=3D'-de -Dprefix=3D/usr/home/cpan/pit/bare/perl-5.10.1'
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Ddefine
+    useithreads=3Dundef, usemultiplicity=3Dundef
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef
+    use64bitint=3Dundef, use64bitall=3Dundef, uselongdouble=3Dundef
+    usemymalloc=3Dn, bincompat5005=3Dundef
+  Compiler:
+    cc=3D'cc', ccflags =3D'-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-stric=
+t-aliasing -pipe -I/usr/local/include',
+    optimize=3D'-O',
+    cppflags=3D'-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing =
+-pipe -I/usr/local/include'
+    ccversion=3D'', gccversion=3D'3.4.6 [FreeBSD] 20060305', gccosandvers=
+=3D''
+    intsize=3D4, longsize=3D4, ptrsize=3D4, doublesize=3D8, byteorder=3D1234
+    d_longlong=3Ddefine, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D12
+    ivtype=3D'long', ivsize=3D4, nvtype=3D'double', nvsize=3D8, Off_t=3D'of=
+f_t', lseeksize=3D8
+    alignbytes=3D4, prototype=3Ddefine
+  Linker and Libraries:
+    ld=3D'cc', ldflags =3D'-Wl,-E  -L/usr/local/lib'
+    libpth=3D/usr/lib /usr/local/lib
+    libs=3D-lm -lcrypt -lutil -lc
+    perllibs=3D-lm -lcrypt -lutil -lc
+    libc=3D, so=3Dso, useshrplib=3Dfalse, libperl=3Dlibperl.a
+    gnulibc_version=3D''
+  Dynamic Linking:

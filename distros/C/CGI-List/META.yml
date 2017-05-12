@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                CGI-List
+version:             0.05
+abstract:            Easily generate HTML Lists From a DataBase
+license:             ~
+author:              
+    - David Romero Garcia <romdav@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Math::Round:                   0.01
+    Number::Format:                0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

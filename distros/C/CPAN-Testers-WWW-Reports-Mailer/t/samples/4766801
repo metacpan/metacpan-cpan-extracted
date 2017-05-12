@@ -1,0 +1,222 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:4766801
+Return-Path: <cpan.dcollins.smoker8@gmail.com>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 2510 invoked from network); 24 Jul 2009 22:03:55 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 24 Jul 2009 22:03:55 -0000
+Received: (qmail 23511 invoked by uid 225); 24 Jul 2009 22:03:54 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 23501 invoked by alias); 24 Jul 2009 22:03:53 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=DK_SIGNED,PERLBUG_CONF,SPF_PASS
+X-Spam-Check-By: la.mx.develooper.com
+Received: from mail-qy0-f197.google.com (HELO mail-qy0-f197.google.com) (209.85.221.197)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Fri, 24 Jul 2009 15:03:48 -0700
+Received: by mail-qy0-f197.google.com with SMTP id 35so2451478qyk.24
+        for <cpan-testers@perl.org>; Fri, 24 Jul 2009 15:03:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:received:received:date:subject:from:to
+         :message-id:x-reported-via;
+        bh=o6feVyobiZNfVVjeFKVbl2asm+x20eq+zFZwn/8JCTc=;
+        b=a9BlH+zC2sPmu1saxNSlJ6nLHgfyOVxzZDy1M5eGI6j9M2wmjBQPW+zm24ivKsG/Tr
+         5NLCXcX0Hqet/nsmf3xR7cDefFWt0OlEn47XjBxTjGSs3qMmRoeJZn8zT0YpMGfiYrkc
+         FpY0U16yKdiUV5jQL1CKoHh7qhPt+t+j1li2o=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=date:subject:from:to:message-id:x-reported-via;
+        b=DN5zwXyEvGoGfqHUJ+TNXoLd7Vo1HfEPXy8t2R1aDrNp2PKeZ3j1t9Y6jLaxkhEe3H
+         W2LT7Hqwmq8t72oj5swD26VKh/6WVj5CwJlVb929zG0Zqt1Ls6BEP3XRkEtfYxaMuXJ8
+         BH1LNRVuuEW+4ZHrsh9kRN4RYKfcjCiVCAxOA=
+Received: by 10.224.54.67 with SMTP id p3mr271633qag.195.1248473027694;
+        Fri, 24 Jul 2009 15:03:47 -0700 (PDT)
+Received: from nightshade (c-69-242-11-169.hsd1.nj.comcast.net [69.242.11.169])
+        by mx.google.com with ESMTPS id 8sm5647638qwj.56.2009.07.24.15.03.46
+        (version=TLSv1/SSLv3 cipher=RC4-MD5);
+        Fri, 24 Jul 2009 15:03:47 -0700 (PDT)
+Date: Fri, 24 Jul 2009 18:03:46 -0400
+Subject: FAIL WWW-Scraper-ISBN-Amazon_Driver-0.14 i686-linux-thread-multi-ld 2.6.30-020630rc7-generic
+To: cpan-testers@perl.org
+Message-ID: <1248473026.e747f0.14831@nightshade>
+X-Reported-Via: Test::Reporter 1.5203
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: cpan.dcollins.smoker8@gmail.com
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Barbie,
+    
+This is a computer-generated report for WWW-Scraper-ISBN-Amazon_Driver-0.14
+on perl 5.11.0 patch GitLive-blead-1437-g8bca5c8, created by CPAN-Reporter-1.1708. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /home/perllive/perl/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01basic.t ......... ok
+There is no form numbered 0 at /home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Amazon_Driver-0.14-anP9HZ/blib/lib/WWW/Scraper/ISBN/AmazonUS_Driver.pm line 103
+No form defined at /home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Amazon_Driver-0.14-anP9HZ/blib/lib/WWW/Scraper/ISBN/AmazonUS_Driver.pm line 104
+# Looks like you planned 23 tests but ran 1.
+# Looks like your test exited with 255 just after 1.
+t/10objectus.t ...... 
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 22/23 subtests 
+# Looks like you planned 23 tests but ran 21.
+t/11objectuk.t ...... 
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 2/23 subtests 
+	(less 20 skipped subtests: 1 okay)
+t/90podtest.t ....... ok
+t/91podcover.t ...... ok
+t/92distribution.t .. skipped: Test::Distribution not installed
+t/94metatest.t ...... skipped: Test::CPAN::Meta v0.12 required for testing META.yml
+
+Test Summary Report
+-------------------
+t/10objectus.t    (Wstat: 65280 Tests: 1 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 23 tests but ran 1.
+t/11objectuk.t    (Wstat: 65280 Tests: 21 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 23 tests but ran 21.
+Files=7, Tests=28, 10 wallclock secs ( 0.04 usr  0.01 sys +  1.39 cusr  0.13 csys =  1.57 CPU)
+Result: FAIL
+Failed 2/7 test programs. 0/28 subtests failed.
+make: *** [test_dynamic] Error 255
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                     Need Have
+    -------------------------- ---- ----
+    Template::Extract          0    0.41
+    Test::More                 0.45 0.86
+    WWW::Mechanize             0    1.54
+    WWW::Scraper::ISBN         0.25 0.25
+    WWW::Scraper::ISBN::Driver 0.18 0.18
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LANG = en_US.UTF-8
+    PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+    PERL5LIB = /home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Driver-0.18-ETXoTY/blib/arch:/home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Driver-0.18-ETXoTY/blib/lib:/home/perllive/perl/cpan/build/Template-Extract-0.41-cYxZkX/blib/arch:/home/perllive/perl/cpan/build/Template-Extract-0.41-cYxZkX/blib/lib:/home/perllive/perl/cpan/build/Template-Toolkit-2.22-JmuPYJ/blib/arch:/home/perllive/perl/cpan/build/Template-Toolkit-2.22-JmuPYJ/blib/lib:/home/perllive/perl/cpan/build/WWW-Scraper-ISBN-0.25-c_dis8/blib/arch:/home/perllive/perl/cpan/build/WWW-Scraper-ISBN-0.25-c_dis8/blib/lib:/home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Record-0.17-XgQM06/blib/arch:/home/perllive/perl/cpan/build/WWW-Scraper-ISBN-Record-0.17-XgQM06/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 20887
+    PERL5_CPAN_IS_RUNNING = 20887
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 13718,20887
+    PERL_CR_SMOKER_CURRENT = WWW-Scraper-ISBN-Amazon_Driver-0.14
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /bin/bash
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/perllive/perl/bin/perl
+    $UID/$EUID = 1008 / 1008
+    $GID = 1008 1008
+    $EGID = 1008 1008
+
+Perl module toolchain versions installed:
+
+    Module              Have   
+    ------------------- -------
+    CPAN                1.94   
+    Cwd                 3.30   
+    ExtUtils::CBuilder  0.24_01
+    ExtUtils::Command   1.16   
+    ExtUtils::Install   1.52_01
+    ExtUtils::MakeMaker 6.53_02
+    ExtUtils::Manifest  1.56   
+    ExtUtils::ParseXS   2.19_01
+    File::Spec          3.30   
+    Module::Build       0.33_02
+    Module::Signature   n/a    
+    Test::Harness       3.17   
+    Test::More          0.86   
+    YAML                0.68   
+    YAML::Syck          1.07   
+    version             0.76   
+
+
+--
+
+Summary of my perl5 (revision 5 version 11 subversion 0 patch GitLive-blead-1437-g8bca5c8) configuration:
+  Snapshot of: 8bca5c8a8bf440bd153c3cead9b89ad997975d66
+  Platform:
+    osname=linux, osvers=2.6.30-020630rc7-generic, archname=i686-linux-thread-multi-ld
+    uname='linux nightshade 2.6.28-11-generic #42-ubuntu smp fri apr 17 01:57:59 utc 2009 i686 gnulinux '
+    config_args=''
+    hint=previous, useposix=true, d_sigaction=define
+    useithreads=define, usemultiplicity=define
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=define
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -D_GNU_SOURCE -DSOCKS -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-D_REENTRANT -D_GNU_SOURCE -DSOCKS -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_REENTRANT -D_GNU_SOURCE -DSOCKS -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -D_GNU_SOURCE -DSOCKS -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_REENTRANT -D_GNU_SOURCE -DSOCKS -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64'
+    ccversion='', gccversion='4.3.3', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='long double', nvsize=12, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -fstack-protector -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib /usr/lib64
+    libs=-lnsl -lgdbm -ldl -lm -lcrypt -lutil -lpthread -lc -lgdbm_compat
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lpthread -lc
+    libc=/lib/libc-2.9.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.9'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -O2 -L/usr/local/lib -fstack-protector'
+

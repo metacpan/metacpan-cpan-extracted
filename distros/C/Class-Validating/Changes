@@ -1,0 +1,10 @@
+Changes
+=======
+
+0.02 - 06 Jan 2004
+  - minor fixes: doc typo, email typo (doh!), missing Changes,
+      small cleanup in the backend
+
+0.01 - 05 Jan 2004
+  - Initial release, almost forgot about it.
+    Thanks to Dave Rolsky for reminding me

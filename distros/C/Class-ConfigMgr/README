@@ -1,0 +1,26 @@
+Class::ConfigMgr - A base class for implementing a singleton
+object configuration manager.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries: 
+	Class::ErrorHandler
+
+COPYRIGHT AND LICENSE
+
+The software is released under the Artistic License. The
+terms of the Artistic License are described at
+http://www.perl.com/language/misc/Artistic.html.
+
+Except where otherwise noted, Class::ConfigMgr is Copyright
+2005, Timothy Appnel, tima@cpan.org. All rights reserved.
+

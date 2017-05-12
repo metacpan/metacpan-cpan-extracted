@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: CGI-Untaint-set
+version: 0.01
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: untaint sets of values
+license: perl
+requires:
+  CGI::Untaint: 0
+  Test::CGI::Untaint: 0
+  Test::More: 0
+provides:
+  CGI::Untaint::set:
+    file: lib/CGI/Untaint/set.pm
+    version: 0.01
+generated_by: Module::Build version 0.2609

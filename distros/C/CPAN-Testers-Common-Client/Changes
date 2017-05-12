@@ -1,0 +1,65 @@
+Revision history for CPAN-Testers-Common-Client
+
+0.13  2016-04-24
+      - fixed long path issue on Windows
+
+0.12  2016-04-24
+      - expand list of environment variables included in reports
+
+0.11  2016-04-23
+      - ability to use paths with namespaces (Ed J)
+      - improved transport argument parsing
+      - improved documentation
+      - display CCFLAGS/LDFLAGS environment variables on report
+      - prerequisites check improved
+      - increased test coverage
+
+0.10  2015-04-19
+      - is_duplicate() and record_history() available as methods
+        from within CTCC.
+
+0.09  2015-04-18
+      - Improved documentation
+      - Don't attempt to open a literal file '<' in the modulino (Kent Fredric);
+      - Capture and report errors encountered by the modulino (Kent Fredric);
+      - Warn if the prereq check module gave no output (Kent Fredric);
+      - Defend against undef issues that occur when version extraction goes awry (Kent Fredric);
+      - More test cases (Kent Fredric);
+
+0.08  2015-04-18
+      - history support (to prevent sending duplicate reports)
+
+0.07  2013-05-15
+      - fixed metabase_id generation prompting
+        (thanks SYP for reporting!)
+      - improved handling of email strings
+
+0.06  2013-05-09
+      - better handling transport name/args
+      - fixed Metabase transport issue where
+        the normalized id_file was not being
+        used as a transport argument (thanks
+        Lars for reporting)
+
+0.05  2013-05-08
+      - fixed validation issue
+      - extra CTCC information added to META file
+
+0.04  2013-05-06
+      - continued porting CPAN::Reporter's common
+        configuration code.
+      - validation of configuration data.
+      - new public API for reading/writing
+        configuration data.
+
+0.03  2013-04-18
+      - code to normalize Metabase's id_file.
+      - adding extra variables according to the
+        Lancaster Consensus.
+
+0.02  2013-04-16
+      - added files that were missing from MANIFEST
+
+0.01  2013-04-15
+      - Initial release.
+

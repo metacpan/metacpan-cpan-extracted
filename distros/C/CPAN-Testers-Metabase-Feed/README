@@ -1,0 +1,60 @@
+NAME
+    CPAN::Testers::Metabase::Feed - Generate Atom feed for CPAN Testers
+    Reports
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+       use CPAN::Testers::Metabase::Feed;
+       use CPAN::Testers::Metabase::AWS;
+ 
+       my $mb = CPAN::Testers::Metabase::AWS->new(
+         bucket    => 'myS3bucket',
+         namespace => 'prod'
+       );
+ 
+       my $feed = CPAN::Testers::Metabase::Feed->new( ct_metabase => $mb );
+ 
+       $feed->save('recent.xml');
+
+DESCRIPTION
+    This module creates a 'recent reports' feed from a CPAN Testers Metabase
+    in Atom format. Each entry has a title with summary information. The
+    content is HTML-encoded, but when decoded is just JSON text with report
+    metadata.
+
+ATTRIBUTES
+  ct_metabase (required)
+    A CPAN::Testers::Metabase subclass that will be used to generate a feed
+    of recent reports.
+
+  since
+    An ISO8601 date time string. The feed will contain all reports since the
+    given date. It defaults to "now" minus one hour.
+
+METHODS
+  as_xml
+      $feed->as_xml;
+
+    Returns the feed as a string in XML format.
+
+  save
+      $feed->save( $filename );
+
+    Saves the feed as XML to the given file. If the file exists, it is
+    replaced atomically.
+
+SEE ALSO
+    *   CPAN::Testers::Metabase
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

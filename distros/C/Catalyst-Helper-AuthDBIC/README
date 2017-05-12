@@ -1,0 +1,3 @@
+Helper to provide a simple authentication scaffold for a Catalyst
+application.  Run the script authdbic.pl in your application's root
+directory to create a simple database based authentication system.

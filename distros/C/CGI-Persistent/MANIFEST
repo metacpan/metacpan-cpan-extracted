@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+lib/CGI/Persistent.pm
+test.pl
+html/roach.cgi
+html/README.roach
+META.yml                                 Module meta-data (added by MakeMaker)

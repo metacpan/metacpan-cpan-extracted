@@ -1,0 +1,18 @@
+{
+    'main2_overwritten_by_sub2_scalar' => 'o1',
+    'main2_overwritten_by_sub2_hash' => {
+        'o1' => 'o2',
+        'o3' => [
+        'o4',
+        'o5',
+        'o6'
+        ]
+    },
+    'main2_overwritten_by_sub2_array' => [
+    'o1',
+    'o2',
+    {
+        'o3' => 'o4'
+    }
+    ]
+};

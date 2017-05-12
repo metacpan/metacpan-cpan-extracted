@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+ROADMAP
+Hello.sera
+Ethiopic.xs
+Ethiopic.pm
+Ethiopic/System.pm
+Ethiopic/Cstocs.pm
+Ethiopic/Time.pm
+bin/edate.PL
+bin/enumber.PL
+bin/estring.PL
+test.pl
+typemap

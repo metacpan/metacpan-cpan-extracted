@@ -1,0 +1,7 @@
+Changes
+lib/Class/Inner.pm
+MANIFEST
+README
+Makefile.PL
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::View::GD::Barcode.
+
+0.01  Tue Feb 21 15:43:23 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::View::GD::Barcode
+

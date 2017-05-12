@@ -1,0 +1,8 @@
+{
+    "name": "AnimalExtension",
+    "nickname": "AniExt",
+    "version": "v0.1.0",
+    "prerequisites": {
+        "Animal": null
+    }
+}

@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 113
+  17150:
+    - 36
+name: cb71
+registers:
+  AF: 15616
+  AF_: 0
+  BC: 2398
+  BC_: 0
+  DE: 55007
+  DE_: 0
+  HL: 17150
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

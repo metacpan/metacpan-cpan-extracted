@@ -1,0 +1,29 @@
+<body bgcolor=#ffffff>
+<title>The Senga Resources Catalog</title>
+
+<center><h3>The Senga Resources Catalog</h3></center>
+<hr>
+<center>
+<form action=_SCRIPT_ method=POST>
+<input type=hidden name=name value=_NAME_>
+<input type=hidden name=context value=csearch>
+<input type=hidden name=style value=urlcatalog>
+<input type=hidden name=mode value=_CONTEXT_>
+<input type=text size=40 name=text value='_TEXT-QUOTED_'>
+<input type=submit value='search'><br>
+</form>
+<hr>
+
+<!-- start categories -->
+<table>
+<!-- params 'style' => 'table', 'columns' => 2 -->
+<!-- start row --> 
+<tr>
+<!-- start entry -->
+<td> <b><a href='_URL_'>_NAME_</a></b> (_COUNT_) </td>
+<!-- end entry -->
+</tr>
+<!-- end row --> 
+</table>
+<!-- end categories -->
+</center>

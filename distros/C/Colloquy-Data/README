@@ -1,0 +1,58 @@
+NAME
+    Colloquy::Data - Read Colloquy 1.3 and 1.4 data files
+
+SYNOPSIS
+     use Data::Dumper;
+     use Colloquy::Data qw(:all);
+     
+ my $colloquy_datadir = "/home/system/colloquy/data";
+     
+ #my ($users_hashref,$lists_hashref) = users($colloquy_datadir);
+     my ($lists_hashref,$users_hashref) = lists($colloquy_datadir);
+     
+ print "Users: ".Dumper($users);
+     print "Lists: ".Dumper($lists);
+
+DESCRIPTION
+    This module munges the users.lua and lists.lua (Colloquy 1.3x) files in
+    to executable perl code which is then evaluated. Colloquy 1.4 uses a
+    seperate LUA file for each user and list, which are located in the users
+    and lists directories in the Colloquy data directory. These files are
+    read one by one and evaluated in the same way.
+
+    This module compiles and execute the Colloquy data files in restricted
+    compartments using the Safe module. Even so, this module should be used
+    with caution if you cannot gaurentee the integrity of the user and list
+    LUA files. The module will issue a warning complaining about world
+    writable permissions if $^W warnings.
+
+EXPORTS
+  users
+     my ($users_hashref,$lists_hashref) = users($colloquy_datadir);
+
+    Returns users and lists hash references, in that order.
+
+  lists
+     my ($lists_hashref,$users_hashref) = lists($colloquy_datadir);
+
+    Returns lists and users hash references, in that order.
+
+SEE ALSO
+    <http://freshmeat.net/projects/colloquy-talker/>, Apache2::AuthColloquy
+
+VERSION
+    $Id: Data.pm 526 2006-05-29 12:27:43Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+COPYRIGHT
+    Copyright 2005,2006 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

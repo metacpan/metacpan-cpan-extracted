@@ -1,0 +1,30 @@
+Revision history for CHI-Driver-DBI
+
+** denotes an incompatible change
+
+1.23  May 22, 2010
+
+- Add DBI as requirement
+
+1.22  May 19, 2010
+
+- Allow DBIx::Connection or database handle generators to be passed for dbh and dbh_ro -
+  submitted by Stevan Little
+
+1.21  May 14, 2010
+
+- Move source to github
+- Move test libs to CHI::Driver::DBI::t::* to match other driver distros
+- Switch to Module::Install
+
+1.20  May 26, 2009
+
+- Depend on CHI 0.241, for fuller set of dependencies
+
+1.10  May 26, 2009
+
+- Switch to Moose, to match CHI 0.23
+
+1.00  Mar 17, 2009
+
+- Initial version

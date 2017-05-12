@@ -1,0 +1,16 @@
+Revision history for Catalyst-Model-SMS
+
+0.4       2013-04-16 19:53:35 Europe/London
+         - All the pm files must carry the updated version number
+
+0.3       2013-04-16 19:40:14 Europe/London
+        - CPAN does not understand that version 0.2.1 is greater than 0.2 so
+	  just go up by one
+
+0.2.1     2013-04-01 13:02:45 UTC
+	- Correct the version of module and distribution
+
+0.2       2013-03-31 20:23:50 UTC
+
+0.1       2013-01-25 18:12:40 Europe/London
+	- Original version unleased on an unsuspecting world.

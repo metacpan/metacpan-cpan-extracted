@@ -1,0 +1,46 @@
+---
+abstract: 'Generate html/javascript charts from perl data using javascript library plotly.js'
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  Const::Fast: '0'
+  Data::Dump: '0'
+  Getopt::Long::Descriptive: '0'
+  Module::Build: '0.28'
+  Path::Tiny: '0'
+  Text::Template: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chart-Plotly
+requires:
+  Exporter: '0'
+  HTML::Show: '0'
+  JSON: '0'
+  Module::Load: '0'
+  Moose: '0'
+  Params::Validate: '0'
+  Ref::Util: '0'
+  Text::Template: '0'
+  UUID::Tiny: '0'
+  overload: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/p5-Chart-Plotly/issues
+  homepage: https://github.com/pablrod/p5-Chart-Plotly
+  repository: https://github.com/pablrod/p5-Chart-Plotly.git
+version: '0.011'
+x_contributors:
+  - 'weatherwax <s.g.lobo@hotmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

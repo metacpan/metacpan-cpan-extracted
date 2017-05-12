@@ -1,0 +1,392 @@
+Revision history for Capture-Tiny
+
+0.46      2017-02-25 14:19:22-05:00 America/New_York
+
+  - No changes from 0.45-TRIAL
+
+0.45      2017-02-23 13:22:43-05:00 America/New_York (TRIAL RELEASE)
+
+  [Internal]
+
+  - Avoid variable shadowing to improve debuggability.
+
+0.44      2016-08-05 13:40:33-04:00 America/New_York
+
+  [Docs]
+
+  - Note that dropping privileges during a capture can lead to
+    temporary files not cleaned up.
+
+0.42      2016-05-31 12:40:10-04:00 America/New_York
+
+  - No changes from 0.41
+
+0.41      2016-05-23 11:58:15-04:00 America/New_York (TRIAL RELEASE)
+
+  [Fixed]
+
+  - Fixed some failing tests when STDIN is routed to /dev/null
+
+0.40      2016-05-23 11:42:35-04:00 America/New_York
+
+  - No changes from 0.39
+
+0.39      2016-05-02 10:21:48-04:00 America/New_York (TRIAL RELEASE)
+
+  [Fixed]
+
+  - Fix in 0.37 tickled a very obscure regular expressions bug in perl <
+    5.18; should now be fixed.
+
+0.37      2016-05-02 07:08:31-04:00 America/New_York (TRIAL RELEASE)
+
+  [Fixed]
+
+  - Skip some tests if locale can't be determined.
+
+0.36      2016-02-28 21:36:57-05:00 America/New_York
+
+  [Docs]
+
+  - Fixed typos.
+
+0.34      2016-02-18 23:26:13-05:00 America/New_York
+
+  [Fixed]
+
+  - Removed spurious JSON::PP dependency added by a broken
+    Dist::Zilla plugin.
+
+0.32      2016-02-18 10:12:02-05:00 America/New_York
+
+  [Docs]
+
+  - Changed internal formatting of documentation
+
+  [Changes]
+
+  - No functional changes from 0.31
+
+0.31      2016-02-14 07:33:50-07:00 America/Mazatlan (TRIAL RELEASE)
+
+  [Fixed]
+
+  - Application of layers to handles during and after capture now attempts
+    to more accurately duplicate the original layers, including potential
+    duplicate layers.  Because of the unusual ways that layers are ordered
+    and applied, exact duplication is not guaranteeed, but this should be
+    better that what Capture::Tiny did before.
+
+  - Avoids a hard crash on Windows with Perl < 5.20 if a fork occurs in a
+    capture block.  Also documented the risks and lack of support for
+    forks in capture blocks.
+
+0.30      2015-05-15 20:43:54-04:00 America/New_York
+
+  No changes from 0.29
+
+0.29      2015-04-19 18:36:24+02:00 Europe/Berlin (TRIAL RELEASE)
+
+  Fixed:
+
+  - Fix double filehandle close error with tee on Windows
+    (which started warning during the perl 5.21.x series,
+    causing tests to fail)
+
+0.28      2015-02-11 06:39:51-05:00 America/New_York
+
+  Tests:
+
+  - Removes test that optionally uses Inline::C to avoid spurious
+    test failures.  Also Inline::C had become a fairly heavy
+    (if optional) dependency.
+
+  Docs:
+
+  - Clarify that PERL_CAPTURE_TINY_TIMEOUT is an internal control,
+    not a timeout of the code reference being captured.
+
+0.27      2014-11-04 23:10:44-05:00 America/New_York
+
+  Prereqs:
+
+  - Make Inline::C recommended, not required
+
+0.26      2014-11-04 06:55:15-05:00 America/New_York
+
+  Tests:
+
+  - Actually check for Inline::C in tests, not just Inline
+
+0.25      2014-08-16 10:08:42-04:00 America/New_York
+
+  Prereqs:
+
+  - Amended recommended modules to list Inline::C rather than Inline
+
+0.24      2014-02-06 17:15:37-05:00 America/New_York
+
+  Fixed:
+
+  - Closed security hole in use of semaphore file in /tmp;
+    now opens the semaphore file using O_CREAT|O_EXCL
+    
+0.23      2013-10-20 11:25:34 America/New_York
+
+  Fixed:
+
+  - minimum Perl prereq is back to 5.6 (but $diety help you if
+    you're still stuck on 5.6)
+
+  Documented:
+
+  - Added warning about using @_ in a capture block
+
+0.22      2013-03-27 15:50:29 America/New_York
+
+  Documented:
+
+  - Issue tracker is now github
+
+0.21      2012-11-14 19:04:49 America/New_York
+
+  Changed:
+
+  - Skips tee and leak tests for closed STDIN on Perl prior to
+    5.12 when PERL_UNICODE=D.  Documented lack of support as
+    a known issue.
+
+  - Isolated tee subprocesses from effects of PERL_UNICODE as a
+    precaution (though this did not fix the above issue).
+
+  - Improved layer detection for handles proxied due to being closed
+    or tied.
+
+0.20      2012-09-19 13:20:57 America/New_York
+
+  Fixed:
+
+  - Nested merged captures that include an external program call no longer
+    leak STDERR to the outer scope [rt.cpan.org #79376]
+
+0.19      2012-08-06 20:26:34 America/New_York
+
+  Fixed:
+
+  - Work around rt.perl.org #114404 by forcing PerlIO layers back on
+    original handles [rt.cpan.org #78819]
+
+0.18      2012-05-04 16:31:53 America/New_York
+
+  Added:
+
+  - When capture or tee are called in void context, Capture::Tiny
+    skips reading back from the capture handles if it can do so safely
+
+0.17_52   2012-03-09 11:45:19 EST5EDT
+
+  Fixed:
+
+  - Tied STDIN is always localized before redirections to avoid tees
+    hanging on MSWin32
+    
+  - Copying and reopening STDIN is necessary to avoid tees hanging on MSWin32.
+
+0.17_51   2012-03-07 18:22:34 EST5EDT
+
+  Fixed:
+
+  - Avoids reopening STDIN while setting up a capture, which avoids
+    some problems with pathological tied filehandle implementations
+    such as in FCGI
+
+  Tested:
+
+  - Re-enabled tied STDIN testing for MSWin32 to see if changes above
+    avoid crashes seen historically
+
+0.17      2012-02-22 08:07:41 EST5EDT
+
+  Fixed:
+
+  - Added a workaround for failing t/08-stdin-closed.t under blead
+    perl / 5.15.8 [rt.perl.org #111070]
+
+  Documented:
+
+  - Clarified some limitations; added a link to CPAN Testers Matrix;
+    removed redundant BUGS section; standardized terminology
+
+  Tested:
+
+  - Added a test using Inline::C to print to stdout and stderr in response
+    to rt.cpan.org #71701
+
+0.16      2012-02-12 21:04:24 EST5EDT
+
+  Documented:
+
+  - Noted problems and workaround for FCGI's pathological tied STDIN
+    [rt.cpan.org #74681; thank you Karl Gaissmaier for testing the
+    workaround]
+
+0.15      2011-12-23 11:10:47 EST5EDT
+
+  Fixed:
+
+  - Repeated captures from a custom filehandle would return undef instead
+    of the empty string (and would warn). This has been fixed.
+    [rt.cpan.org #73374 part two. Thank you to Philipp Herz for help
+    in reproducing this bug.]
+
+  Other:
+
+  - Commented out debugging code for slightly less runtime overhead
+
+0.14      2011-12-22 10:14:09 EST5EDT
+
+  Added:
+
+  - Capturing with custom filehandles will return only newly appended
+    output instead of everything already in the file.
+    [rt.cpan.org #73374]
+
+0.13      2011-12-02 13:39:00 EST5EDT
+
+  Fixed:
+
+  - Fixed t/18-custom-capture.t failures on Windows due to tempfile
+    removal problems in the testfile
+
+0.12      2011-12-01 16:58:05 EST5EDT
+
+  Added:
+
+  - New functions capture_stdout, capture_stderr, tee_stdout, tee_stderr
+    [rt.cpan.org #60515]
+
+  - Capture functions also returns the return values from the executed
+    coderef [rt.cpan.org #61794, adapted from patch by Christian Walde]
+
+  - Capture functions take optional custom filehandles for capturing
+    via named files instead of anonymous ones [inspired by Christian Walde]
+
+  Fixed:
+
+  - Tied filehandles based on Tie::StdHandle can now use the ":utf8"
+    layer; removed remaining TODO tests; adds Scalar::Util as a dependency
+
+  Changed:
+
+  - When Time::HiRes::usleep is available, tee operations will
+    sleep during the busy-loop waiting for tee processes to be ready
+    [rt.cpan.org #67858]
+
+0.11      2011-05-19 23:34:23 America/New_York
+
+  Fixed:
+
+  - Tests will not use Test::Differences version 0.60 or greater
+
+0.10      2011-02-07 07:01:44 EST5EDT
+
+  Fixed:
+
+  - Setting PERL_CAPTURE_TINY_TIMEOUT to 0 will disable timeouts
+
+0.09      2011-01-27 23:52:16 EST5EDT
+
+  Added:
+
+  - Added support for $ENV{PERL_CAPTURE_TINY_TIMEOUT} to control
+    the timeout period under 'tee'; tests set not to timeout to
+    avoid false FAIL reports on overloaded virtual machine smokers
+
+  Fixed:
+
+  - $@ set within a captured block is no longer lost when the capture
+    is completed; likewise, the initial value of $@ is not lost
+    during capture (when no subsequent error occurs) (RT #65139)
+
+0.08 Sun Jun 20 19:13:19 EDT 2010
+
+  Fixed:
+
+  - Exceptions in captured coderef are caught, then handles are restored
+    before the exception is rethrown (RT #58208)
+
+0.07 Sun Jan 24 00:18:45 EST 2010
+
+  Fixed:
+
+  - Changed test for $? preservation to be more portable
+
+  - Dropped support for Perl 5.8.0 specifically due to excessive bugs.
+    Tests will bail out. (5.6.X is still supported)
+
+0.06 Thu May  7 06:54:53 EDT 2009
+
+  Fixed:
+
+    - On Win32, subprocesses now close themselves on EOF instead of being
+      killed with a signal
+
+0.05_51 Tue Apr 21 07:00:38 EDT 2009
+
+  Added:
+
+    - Support for wide characters on handles opened to utf8
+
+    - Support for STDOUT, STDERR or STDIN opened to in-memory
+      files (open to scalar reference) or tied, albeit with some limitations
+
+  Testing:
+
+    - Verify that $? is preserved during capture { system(@cmd) };
+
+0.05 Tue Mar  3 06:56:05 EST 2009
+
+  Fixed:
+
+    - On Win32, increased a delay waiting for buffers to flush to avoid losing
+      final output during tee()
+
+0.04 Wed Feb 25 09:25:27 EST 2009
+
+  Added:
+
+    - Can capture/tee even if STDIN, STDOUT or STDERR are closed prior to
+      capture/tee block
+
+    - Generally, added more error handling
+
+  Fixed:
+
+    - Will timeout instead of hang if subprocesses fail to start
+
+0.03 Fri Feb 20 13:03:08 EST 2009
+
+  Added:
+
+    - capture_merged() and tee_merged()
+
+  Fixed:
+
+    - Tests skip if not Win32 and no fork() (rather than Build.PL and
+      Makefile.PL failing); this allows capture() on odd platforms, even if
+      fork doesn't work
+
+0.02 Tue Feb 17 17:24:35 EST 2009
+
+  Fixed:
+
+    - Bug recovering output when STDOUT is empty (reported by Vincent Pit)
+
+    - Removed Fatal.pm to avoid global action-at-a-distance
+
+0.01 Fri Feb 13 23:15:19 EST 2009
+
+  Added:
+    - 'capture' and 'tee' functions
+
+# vim: set ts=2 sts=2 sw=2 et tw=75:

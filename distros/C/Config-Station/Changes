@@ -1,0 +1,12 @@
+Revision history for Config-Station
+
+0.002001  2015-10-24 08:51:38-07:00 America/Los_Angeles
+ - Clarify documenation about env_key (Thanks for the request, Ron Savage!)
+
+0.002000  2015-09-30 20:58:12-07:00 America/Los_Angeles
+ - Add decode_via/encode_via to allow other storage formats
+ - Clean up some of the docs
+
+0.001000
+ - Initial Release (originally Changes file was missing)
+

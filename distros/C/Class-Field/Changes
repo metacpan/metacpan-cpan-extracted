@@ -1,0 +1,40 @@
+0.23 Thu Aug 21 12:06:13 PDT 2014
+ - Typo fix via PR/1. @wollmers++
+
+0.22 Sat Aug 16 10:53:43 PDT 2014
+ - Meta 0.0.2
+
+0.21 Sat Aug 16 00:52:16 PDT 2014
+ - Eliminate File::Basename from tests
+
+0.20 Fri Aug 15 15:42:06 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.19 Sat Aug  2 10:40:36 PDT 2014
+ - Fix Copyright years in Meta.
+
+0.18 Sat Aug  2 10:18:52 PDT 2014
+ - Fix Copyright years.
+
+0.17 Wed Jul 30 15:39:56 PDT 2014
+ - Switch IRC to
+
+0.16 Sat Jul 26 00:19:48 PDT 2014
+ - Switch to Zilla::Dist
+
+0.15 Sat Apr 18 09:21:21 PDT 2009
+ - Make stack trace not say ANON
+
+0.14 Fri Apr 25 12:20:38 CST 2008
+ - Make Class::Field work with utf8 package names
+
+0.12 Fri Feb 17 11:48:15 PST 2006
+ - 0.11 got corrupted on the way to CPAN. Grrrrrrrrrr!
+
+0.11 Fri Feb 17 11:32:47 PST 2006
+ - 0.10 got corrupted on the way to CPAN
+
+0.10 Tue Jan 31 00:44:04 PST 2006
+ - Maiden voyage
+

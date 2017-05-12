@@ -1,0 +1,13 @@
+CHANGES
+lib/CPAN/Unpack.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/cpan/authors/id/L/LB/LBROCARD/Acme-Buffy-1.3.tar.gz
+t/cpan/authors/id/L/LB/LBROCARD/Acme-Colour-1.01.tar.gz
+t/cpan/authors/id/L/LB/LBROCARD/GraphViz-1.8.tar.gz
+t/cpan/modules/02packages.details.txt.gz
+t/local.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

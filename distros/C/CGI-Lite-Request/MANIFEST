@@ -1,0 +1,15 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/CGI/Lite/Request.pm
+lib/CGI/Lite/Request/Apache.pm
+lib/CGI/Lite/Request/Base.pm
+lib/CGI/Lite/Request/Cookie.pm
+lib/CGI/Lite/Request/Upload.pm
+Makefile.PL
+MANIFEST			This list of files

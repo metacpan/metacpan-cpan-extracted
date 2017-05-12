@@ -1,0 +1,30 @@
+---
+abstract: 'Dummy CPAN distribution with $VERSION delcared with version.pm'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Test-Dummy-Perl5-VersionDeclare
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionDeclare/issues
+  homepage: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionDeclare
+  repository: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionDeclare.git
+version: v0.0.1

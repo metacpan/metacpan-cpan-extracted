@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/gematria.pl
+examples/transliterate.pl
+lib/Convert/CEGH/Gematria.pm
+lib/Convert/CEGH/Transliterate.pm
+t/01gematria.t
+t/01transliterate.t

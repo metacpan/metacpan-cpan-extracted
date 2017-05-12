@@ -1,0 +1,3 @@
+Makefile.PL
+lib/Class/DBI/Plugin/CountSearch.pm
+t/01.t

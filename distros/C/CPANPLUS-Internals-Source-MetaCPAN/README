@@ -1,0 +1,56 @@
+NAME
+    CPANPLUS::Internals::Source::MetaCPAN - MetaCPAN source implementation
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+      # In the CPANPLUS shell
+
+      CPAN Terminal> s conf no_update 1
+      CPAN Terminal> s conf source_engine CPANPLUS::Internals::Source::MetaCPAN
+      CPAN Terminal> s save
+
+DESCRIPTION
+    CPANPLUS::Internals::Source::MetaCPAN is a <http://metacpan.org/> source
+    implementation.
+
+    It is highly experimental.
+
+    Usually CPANPLUS retrieves the CPAN index files, extracts them and
+    builds an in-memory index of every module listed on CPAN. As you can
+    imagine, this is quite memory intensive.
+
+    This source implementation does things slightly different.
+
+    Instead of building an in-memory index, it queries the
+    <http://metacpan.org/> website for module/distribution/author
+    information as and when it is required by CPANPLUS.
+
+CAVEATS
+    There are some caveats.
+
+    As shown in the "SYNOPSIS" you must set the CPANPLUS configuration
+    variable "no_update" to a true value to use this source engine. This
+    prevents CPANPLUS from attempting to update CPAN indexes.
+
+    Attempting to do searches and getting a list of out of date modules in
+    CPANPLUS are incredibly slow due the million or so web accesses that are
+    incurred.
+
+SEE ALSO
+    CPANPLUS
+
+    CPANPLUS::Internals::Source
+
+    <http://metacpan.org/>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams and Jos Boumans.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

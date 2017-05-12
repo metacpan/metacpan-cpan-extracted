@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:27Z">
+<BookList total_results="252" page_size="10" page_number="4" shown_results="10">
+<BookData book_id="edgar_allan_poe_a42" isbn="0948149264">
+<Title>Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>selected and with an introduction by Geoffrey Moore</AuthorsText>
+<PublisherText publisher_id="aurum_press">London : Aurum Press, 1988.</PublisherText>
+<Details dewey_decimal="" physical_description_text="60 p. : col. ill. ; 18 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-11-20T17:58:29Z" price_time="2006-10-08T07:55:45Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Killing of Sister George" store_url="http://www.biblio.com/details.php?dcx=23035929&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-20T17:58:34Z" currency_rate="1" price="50" />
+<Price store_isbn="" store_title="Edgar Allan Poe (Illustrated Poets S.)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a42/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="50" />
+<Price store_isbn="" store_title="Edgar Allan Poe (The Illustrated Poets)" store_url="http://isbndb.com/x/book/edgar_allan_poe_a42/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="7.74" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Arkansas, Fayetteville" last_update="2005-11-20T17:58:29Z" marc_url="http://isbndb.com/x/libdata/isbndb-143-edgar_allan_poe_a42-20051120.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="moore_geoffrey_a">Moore, Geoffrey A.</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a44" isbn="0753814080">
+<Title>Edgar Allan Poe</Title>
+<TitleLong>Edgar Allan Poe: Selected Poems</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="phoenix_press">Phoenix Press</PublisherText>
+<Details dewey_decimal="811.3" physical_description_text="128 pages" language="" edition_info="Hardcover; 2003-03-28" dewey_decimal_normalized="811.3" lcc_number="" change_time="2006-08-24T23:05:46Z" price_time="2006-10-08T07:55:48Z" />
+<Summary>Take this kiss upon the brow!And in parting from you now,Thus much let me avow-You are not wrong, who deemThat my days have been a dream... --From A Dream Within a DreamHis poem The Raven caused a sensation, and was nevermore forgotten, but Edgar Allan Poe produced many more powerful and haunting verses. The Bells vividly describes the varied meanings and sounds of the chimes, from merry wedding bells to "brazen" alarms to death tolls. Go back to the "kingdom by the sea" where Annabel Lee lived, loved, and died. Forty-eight poems in all will keep readers riveted.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="5.21" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="4.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="5.31" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="2.75" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:07Z" currency_rate="1" price="4" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:07Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33715614%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:08Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:08Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:08Z" currency_rate="1" price="3.08" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0753814080&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:35Z" currency_rate="1" price="6.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Selected Poems" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:37Z" currency_rate="1" price="5.21" />
+<Price store_isbn="" store_title="Edgar Allan Poe Selected Poems Product 2146639" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2146639&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:08Z" currency_rate="1" price="6.53" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_a44/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:48Z" currency_rate="1" price="6.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_audio_collection" isbn="0694524190">
+<Title>Edgar Allan Poe Audio Collection</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="harperaudio">HarperAudio</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.7&quot;x5.0&quot;x1.0&quot;; 0.5 lb" language="" edition_info="Audio CD; 2000-10-01" dewey_decimal_normalized="" lcc_number="" change_time="2004-12-21T20:19:17Z" price_time="2006-10-08T07:55:51Z" />
+<Summary>Universally acclaimed as the maestro of horror and the morbid, Edgar Allan Poe's dark gift has for more than a century and a half set the standard for the genre.Now, Caedmon Audio presents a classic collection of Poe's most terrifying tales performed by two of the most brilliant interpreters of his work ever to be recorded: Vincent Price and Basil Rathbone.Between them, they perform 20 of Poe's chilling stories and poems, creating an unforgettably intense listening experience.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="22.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="20.66" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:05Z" currency_rate="1" price="19.38" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:06Z" currency_rate="1" price="16.41" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:08Z" currency_rate="1" price="19.77" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:08Z" currency_rate="1" price="16.95" />
+<Price store_isbn="" store_title="The Edgar Allan Poe Collection" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30614351%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="18.87" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="17.85" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="21.07" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0694524190&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:37Z" currency_rate="1" price="29.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:39Z" currency_rate="1" price="29.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:39Z" currency_rate="1" price="22.46" />
+<Price store_isbn="" store_title="Edgar Allan Poe Audio Collection Product 802862" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.802862&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:15Z" currency_rate="1" price="18.58" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_audio_collection/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:51Z" currency_rate="1" price="20.96" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_a_high_priest_of_the_beautiful" isbn="0849220513">
+<Title>Edgar Allan Poe, a high priest of the beautiful</Title>
+<TitleLong>Edgar Allan Poe, a high priest of the beautiful: a biographical essay supplemented by select Poe poems, including "The raven," "The bells," "Annabel Lee," etc</TitleLong>
+<AuthorsText>by Elisabeth Ellicott Poe and Vylla Poe Wilson</AuthorsText>
+<PublisherText publisher_id="r_west">Philadelphia : R. West, 1978 [c1930]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="112 p. ; 23 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2631" change_time="2003-10-23T17:35:49Z" price_time="2006-10-08T07:55:55Z" />
+<Summary></Summary>
+<Notes>Reprint of the ed. published by Stylus Pub. Co., Washington.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849">Poe, Edgar Allan,1809-1849</Subject>
+<Subject subject_id="authors_american_19th_century_biography">Authors, American -- 19th century -- Biography</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2003-10-23T17:35:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-edgar_allan_poe_a_high_priest_of_the_beautiful-20031023.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_elisabeth_ellicott">Poe, Elisabeth Ellicott</Person>
+<Person person_id="wilson_vylla_poe">Wilson, Vylla Poe</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_complete_poems" isbn="0517082454">
+<Title>Edgar Allan Poe: Complete Poems</Title>
+<TitleLong>Edgar Allan Poe: Complete Poems (Library of Classic Poets)</TitleLong>
+<AuthorsText>EDGAR ALLAN POE, </AuthorsText>
+<PublisherText publisher_id="gramercy">Gramercy</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.7&quot;x8.5&quot;x0.6&quot;; 128 pages; 0.6 lb" language="" edition_info="Hardcover; 2001-03-20" dewey_decimal_normalized="" lcc_number="" change_time="2005-02-03T03:19:34Z" price_time="2006-10-08T07:55:58Z" />
+<Summary>Edgar Allan Poe (1809-1849) is internationally renowned as a pioneering master of the macabre. He is regarded as one of the world's great short story writers as well as a great lyric poet, and is credited with inventing the detective story and the modern gothic horror tale. He has been an important influence on many major American and European writers including William Faulkner, Fyodor Dostoevsky, Baudelaire, H.P. Lovecraft, and William Butler Yeats, among many others.Poe's poetry, which is collected in this volume, is more personal than his prose. The themes of love, death, and despair which recur throughout reflect the anguish he suffered in his own troubled life. "Annabel Lee" is a haunting lament to his young wife, Virginia, who died of tuberculosis. "The Bells" is an eerie and melancholy meditation which recreates with brilliant musical language the hypnotic, funereal aura of ringing bells. "The Raven" is a comic tour de force in which the protagonist turns his strange visitor into a symbol of his own sorrow and loss. Poe's best poems remain some of the most popular and technically accomplished in the English language.This book features a deluxe cover, ribbon marker, top stain, and decorative endpaper with a name plate.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-12T15:40:24Z" currency_rate="1" price="4" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-12T15:40:24Z" currency_rate="1" price="9.99" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780517082454" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-12T15:40:25Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="Complete Poems of Edgar Allan Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-09-12T15:40:25Z" currency_rate="1" price="9.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems (Library of Classic Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-12T15:40:28Z" currency_rate="1" price="1.2" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems " store_url="http://www.biblio.com/details.php?dcx=96793697&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-12T15:40:36Z" currency_rate="1" price="2.49" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:06Z" currency_rate="1" price="7.49" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:06Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:06Z" currency_rate="1" price="7.05" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems (Library of Classic Poets)" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:06Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems (Library of Classic Poets)" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="9.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems (Library of Classic Poets)" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="0.94" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Complete Poems (Library of Classic Poets)" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="6.06" />
+<Price store_isbn="" store_title="Complete Poems" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30088156%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="8.99" />
+<Price store_isbn="" store_title="Edgar Allan Poe The Complete Poems" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0517082454&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:42Z" currency_rate="1" price="9.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:44Z" currency_rate="1" price="7.49" />
+<Price store_isbn="" store_title="Edgar Allan Poe Complete Poems Product 419612" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.419612&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:20Z" currency_rate="1" price="8.27" />
+<Price store_isbn="" store_title="Edgar Allan Poe" store_url="http://isbndb.com/x/book/edgar_allan_poe_complete_poems/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:55:58Z" currency_rate="1" price="9.99" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa9">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- 20th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_general">Amazon.com -- Literature &amp; Fiction -- Poetry -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_single_authors_united_s">Amazon.com -- Literature &amp; Fiction -- Poetry -- Single Authors -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_p_poe_edgar_allan">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_poets_a_z_p_poe_edgar_a">Amazon.com -- Literature &amp; Fiction -- Poetry -- Poets, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- 19th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa2">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_letters_till_now_unpublished_in_the_valentin" isbn="0838316921">
+<Title>Edgar Allan Poe letters till now unpublished, in the Valentine Museum, Richmond, Virginia</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Introductory essay and commentary by Mary Newton Stanard. With fac-similes of all letters</AuthorsText>
+<PublisherText publisher_id="haskell_house">New York, Haskell House [1973]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="327 p. illus. 24 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2631" change_time="2004-07-16T23:44:14Z" price_time="2006-10-08T07:56:01Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1925 ed. published by Lippincott, Philadelphia.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe Letters Till Now Unpublished: In the Valentine Museum Richmond, Virgina" store_url="http://isbndb.com/x/book/edgar_allan_poe_letters_till_now_unpublished_in_the_valentin/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:07Z" currency_rate="1" price="113.83" />
+<Price store_isbn="" store_title="Edgar Allan Poe Letters Until Now Unpublished" store_url="http://isbndb.com/x/book/edgar_allan_poe_letters_till_now_unpublished_in_the_valentin/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="75" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_correspondence">Poe, Edgar Allan,1809-1849 -- Correspondence</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_manuscripts_facsimiles">Poe, Edgar Allan,1809-1849 -- Manuscripts -- Facsimiles</Subject>
+<Subject subject_id="authors_american_19th_century_correspondence">Authors, American -- 19th century -- Correspondence</Subject>
+<Subject subject_id="manuscripts_american_facsimiles">Manuscripts, American -- Facsimiles</Subject>
+<Subject subject_id="fantasy_literature_authorship">Fantasy literature -- Authorship</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-07-16T23:44:14Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-edgar_allan_poe_letters_till_now_unpublished_in_the_valentin-20040716.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_literary_theory_and_criticism" isbn="0486401553">
+<Title>Edgar Allan Poe: Literary Theory and Criticism</Title>
+<TitleLong>Edgar Allan Poe: Literary Theory and Criticism (Dover Books on Literature and Drama)</TitleLong>
+<AuthorsText>Edgar Allan Poe, Leonard Cassuto (Editor)</AuthorsText>
+<PublisherText publisher_id="dover_publications">Dover Publications</PublisherText>
+<Details dewey_decimal="" physical_description_text="256 pages" language="" edition_info="Paperback; 1999-09-21" dewey_decimal_normalized="" lcc_number="" change_time="2005-11-27T15:15:08Z" price_time="2005-11-27T15:15:29Z" />
+<Summary>This essential anthology of Poe’s critical works features items from the Southern Literary Messenger, Graham’s Magazine, and other periodicals, reviewing works by Dickens, Hawthorne, Cooper, and many others. The Theory of Poetry—consisting of "The Philosophy of Composition," "The Rationale of Verse," and "The Poetic Principle"—appears as well. Introduction.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe: Literary Theory and Criticism (Dover Books on Literature and Drama)" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-27T15:15:14Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Literary Theory and Criticism" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-27T15:15:14Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Literary Theory and Criticism (Dover Books on Literature and Drama)" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-27T15:15:14Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="Literary Theory and Criticism" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-27T15:15:14Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="Literary Theory and Criticism" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-27T15:15:14Z" currency_rate="1" price="1.3" />
+<Price store_isbn="" store_title="Literary Theory and Criticism Product 424265" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.424265&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-27T15:15:15Z" currency_rate="1" price="14.05" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-27T15:15:17Z" currency_rate="1" price="14.2" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780486401553" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-27T15:15:19Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="Literary Theory and Criticism" store_url="http://isbndb.com/x/book/edgar_allan_poe_literary_theory_and_criticism/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-27T15:15:29Z" currency_rate="1" price="14.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="cassuto_leonard">Cassuto, Leonard</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_poetry_tales_and_selected_essays" isbn="1883011388">
+<Title>Edgar Allan Poe: Poetry, Tales, and Selected Essays</Title>
+<TitleLong>Edgar Allan Poe: Poetry, Tales, and Selected Essays (Library of America College Editions)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="library_of_america">Library of America</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.1&quot;x7.8&quot;x2.2&quot;; 1506 pages; 2.2 lb" language="" edition_info="Paperback; 1996-09-01" dewey_decimal_normalized="" lcc_number="" change_time="2004-12-30T11:37:34Z" price_time="2006-05-23T13:12:37Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-08-07T04:11:14Z" currency_rate="1" price="17.95" />
+<Price store_isbn="" store_title="Edgar Allan Poe : Poetry, Tales, and Selected Essays" store_url="http://www.biblio.com/details.php?dcx=31172386&amp;aid=isbndb" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-07T04:11:27Z" currency_rate="1" price="22" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Poetry, Tales, and Selected Essays (Library of America College Editions)" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="16.95" />
+<Price store_isbn="" store_title="Poe Poetry Tales and Selected Essays Product 781501" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.781501&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="16.23" />
+<Price store_isbn="" store_title="Poe: Poetry, Tales, and Selected Essays" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="11.99" />
+<Price store_isbn="" store_title="Poe: Poetry, Tales, and Selected Essays" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="18.45" />
+<Price store_isbn="" store_title="Poe: Poetry, Tales, and Selected Essays (Library of America College Editions..." store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="11.45" />
+<Price store_isbn="" store_title="Poe: Poetry, Tales, and Selected Essays (Library of America College Editions)" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="10.2" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9781883011383" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-23T13:12:27Z" currency_rate="1" price="12.08" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-23T13:12:28Z" currency_rate="1" price="3" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/edgar_allan_poe_poetry_tales_and_selected_essays/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-23T13:12:28Z" currency_rate="1" price="19.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa9">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- 20th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_history_criticism_criticism_th">Amazon.com -- Literature &amp; Fiction -- History &amp; Criticism -- Criticism &amp; Theory -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_single_authors_united_s">Amazon.com -- Literature &amp; Fiction -- Poetry -- Single Authors -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_p_poe_edgar_allan">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_poetry_poets_a_z_p_poe_edgar_a">Amazon.com -- Literature &amp; Fiction -- Poetry -- Poets, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- 19th Century</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa2">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Poetry -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_the_fall_of_the_house_of_usher" isbn="0675096413">
+<Title>The fall of the house of Usher</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edited by Eric W. Carlson</AuthorsText>
+<PublisherText publisher_id="merrill">Columbus, Ohio, Merrill [1971]</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="v, 138 p. 23 cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="PZ3" change_time="2003-11-11T14:42:20Z" price_time="2006-07-11T05:09:54Z" />
+<Summary></Summary>
+<Notes>Includes a collection of critical articles on The fall of the house of Usher (p. 24-124)
+
+Bibliography: p. 129-130.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Fall of the House of Usher (The Merrill Literary Casebook Series)" store_url="http://isbndb.com/x/book/edgar_allan_poe_the_fall_of_the_house_of_usher/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-11T05:09:51Z" currency_rate="1" price="20.4" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan">Poe, Edgar Allan</Subject>
+<Subject subject_id="poe_edgar_allan_1809_1849_fall_of_the_house_of_usher">Poe, Edgar Allan,1809-1849. -- Fall of the House of Usher</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="LIBRIS -- Swedish Union Catalog" last_update="2003-11-02T11:29:23Z" marc_url="http://isbndb.com/x/libdata/isbndb-197-edgar_allan_poe_the_fall_of_the_house_of_usher-20031102.mrc" />
+<MARC library_name="Purdue University Library" last_update="2003-11-11T14:42:20Z" marc_url="http://isbndb.com/x/libdata/isbndb-purdueuniv-edgar_allan_poe_the_fall_of_the_house_of_usher-20031111.mrc" />
+<MARC library_name="Acadia University" last_update="2003-11-19T08:47:47Z" marc_url="http://isbndb.com/x/libdata/isbndb-2-edgar_allan_poe_the_fall_of_the_house_of_usher-20031119.mrc" />
+<MARC library_name="University of California (MELVYL)" last_update="2004-08-29T22:46:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-edgar_allan_poe_the_fall_of_the_house_of_usher-20040829.mrc" />
+<MARC library_name="Malaspina University-College (Nanaimo, BC)" last_update="2006-02-21T00:24:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-317-edgar_allan_poe_the_fall_of_the_house_of_usher-20060220.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="carlson_eric_w">Carlson, Eric W.</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="edgar_allan_poe_writings_in_the_broadway_journal_nonfictiona" isbn="0877522324">
+<Title>Edgar Allan Poe: Writings in the Broadway Journal , Nonfictional Prose : Part 1, the Text, Part 2, the Annotations</Title>
+<TitleLong>Edgar Allan Poe: Writings in the Broadway Journal , Nonfictional Prose : Part 1, the Text, Part 2, the Annotations (Collected Writings, Vol 3-4)</TitleLong>
+<AuthorsText>Edgar Allan Poe, Burton R. Pollin, </AuthorsText>
+<PublisherText publisher_id="gordian_pr">Gordian Pr</PublisherText>
+<Details dewey_decimal="" physical_description_text="9.0&quot;x2.5&quot;x11.5&quot;; 4.4 lb" language="" edition_info="Hardcover; 1986-11-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-02-11T18:46:28Z" price_time="2005-02-11T23:00:36Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe: Writings in the Broadway Journal , Nonfictional Prose : Part 1, the Text, Part 2, the Annotations (Collected Writings, Vol 3-4)" store_url="http://isbndb.com/x/book/edgar_allan_poe_writings_in_the_broadway_journal_nonfictiona/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-02-11T18:47:52Z" currency_rate="1" price="100" />
+<Price store_isbn="" store_title="Collected Writings of Edgar Allan Poe: Poe's Nonfiction in the Broadway Journal, Vol. 4" store_url="http://isbndb.com/x/book/edgar_allan_poe_writings_in_the_broadway_journal_nonfictiona/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-02-11T18:50:33Z" currency_rate="1" price="150" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="pollin_burton_ralph">Pollin, Burton Ralph</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

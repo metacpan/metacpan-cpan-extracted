@@ -1,0 +1,4 @@
+README for Class-DBI-Relationship-HasVariant
+
+This distribution provides a new relationship type for Class::DBI, which
+functions as has_a with different classes for different rows.

@@ -1,0 +1,49 @@
+Revision history for Perl extension Class::DBI::ToSax.
+
+0.10	Tue Oct 14 15:14:04 BST 2003
+	- Add coderef support to norecurse.
+	- Much improved tests for norecurse support.
+	- Don't propogate forced wrapper names down to has_many
+	  elements.
+
+0.09	Wed Jul 16 17:13:24 BST 2003
+	- Bring up to date with Class::DBI 0.93 and multi column primary
+	  keys.
+
+0.08	Thu Jun  5 15:21:22 BST 2003
+	- Prevent recursion using table name not class name.  This
+	  helps if you've inherited from your Class::DBI objects in
+	  weird ways like I did...
+
+0.07	Wed Jun  4 10:49:21 BST 2003
+	- Add notoplevel flag, to let this be used as part of a bigger
+	  SAX generator.
+
+0.06	Thu Apr 24 14:10:50 BST 2003
+	- Enable Module::Build.
+
+0.05	Sat Apr 12 22:38:20 BST 2003
+	- [BACKWARDS INCOMPATIBLE]
+	  When outputting a has_a() relation, use the column name
+	  instead of the element name.
+	- [RT#2362] [BACKWARDS INCOMPATIBLE]
+	  Change the way that we detect has_a() relationships to work
+	  consistently, even when there is nothing there.
+	- Actually test the XML output.  This means that we depend on a
+	  few more modules now, hopefully nothing too onerous.
+
+0.04    Tue Apr  1 13:07:55 BST 2003
+        - Expand norecurse option to take a hash ref.
+
+0.03	Sun Mar 30 14:28:23 BST 2003
+	- Call start/end_document() ourselves
+	- Make the recursion defense barrier a bit better.
+	- Add in optional norecurse to to_sax().
+
+0.02	Fri Mar 28 15:32:12 GMT 2003
+	- Send out the full range of SAX fields in start/end_element().
+
+0.01  Wed Mar 26 13:14:20 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Class::DBI::ToSax -b 5.6.1
+

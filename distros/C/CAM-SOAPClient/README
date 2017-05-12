@@ -1,0 +1,81 @@
+CAM::SOAPClient - SOAP interaction tools
+
+
+LICENSE
+
+Copyright 2006 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module simplifies interaction with SOAP web services.  Mostly
+it's an easy-to-use wrapper around SOAP::Lite, but it contains a
+killer feature to simplify the programmer's life: the call() method.
+
+The call() method lets your client specify exactly which data it wants
+from the SOAP response, in the order it wishes to receive that data.
+We find this to be substantially simpler than SOAP::Lite's data
+returning helpers (like result() and paramsout()) which try to be
+smart, but end up making life harder for many applications (in
+particular, for applications that return tagged data in arbitrary
+order, instead of simple positional values).
+
+Example API (see t/server.t):
+
+  The getEmployeeData() service expects a request like:
+    <ssn>111-11-1111</ssn>
+  and provides a response like:
+    <name>John Smith</name>
+    <birthdate>1969-01-01</birthdate>
+    <phone>212-555-1212</phone>
+
+CAM::SOAPClient style:
+
+  sub getPhoneNumber_CAM_SOAP {
+     my ($ssn, $uri, $proxy) = @_;
+     return CAM::SOAPClient
+                 -> new($uri, $proxy)
+                 -> call('getEmployeeData', 'phone', ssn => $ssn);
+  }
+
+Equivalent SOAP::Lite style:
+
+  sub getPhoneNumber_SOAPLite {
+     my ($ssn, $uri, $proxy) = @_;
+     my $som = SOAP::Lite
+                 -> uri($uri)
+                 -> proxy($proxy)
+                 -> call('getEmployeeData', SOAP::Data->name(ssn => $ssn));
+     if (ref $som) {
+        return $som->valueof('/Envelope/Body/[1]/phone');
+     } else {
+        return;
+     }
+  }
+
+The simplistic server implementation is in t/lib/Example.pm

@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ff9cc7109a7cba15ae024984062910ab46d0e342 Changes
+SHA1 7fdafe280e56a5b79fead957267f943b9c82924c MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 2e6edd9fe31146eae85d1c503106df2e4cb76eb1 META.yml
+SHA1 030ed2c6c287f9fc67455938301c5e3eef329b11 Makefile.PL
+SHA1 fd055ffcd23f50451a4f34bdb4144f674c3039cd examples/dbic/README
+SHA1 246bf2606a765982a57306604eb47c4517d2b537 examples/dbic/lib/Foo/DB.pm
+SHA1 31b9f46c61154b1f5644bb7ad13cfc40e60c709f examples/dbic/lib/Foo/DB/Item.pm
+SHA1 3e58b1169be061846482fc06f771402d030b9820 examples/dbic/lib/Foo/DB/Workflow/Instance.pm
+SHA1 950af01dbdebe21a1df5fe5220cbd40480f2c728 examples/dbic/lib/Foo/DB/Workflow/State.pm
+SHA1 1f1ecb3fcae1eab34a6bdcebfae0973cb4f1a8e4 examples/dbic/lib/Foo/DB/Workflow/Transition.pm
+SHA1 188113356268ad81b6473f177c18803c573a00e8 examples/dbic/t/example_dbic.t
+SHA1 8a802a095c0a627817659929f6a5144a1747b103 examples/example.yaml
+SHA1 c6b9576ac2d670418863c01e5437e35af188e5cd examples/example_pop3.t
+SHA1 d551ae924cc43fa6990cc6dfcafccbd06c385515 lib/Class/Workflow.pm
+SHA1 adf4d65e4208304972445cfa70d470a5849bf186 lib/Class/Workflow.pmc
+SHA1 3670a3e17b0fae95c57334798e1b164da09151f5 lib/Class/Workflow/Context.pm
+SHA1 49f306b1d8496fb72ffb44b04de5dfea0ae05588 lib/Class/Workflow/Cookbook.pod
+SHA1 0d5ffd60534fdb47c70fcbb7066b39b92f7c170c lib/Class/Workflow/Instance.pm
+SHA1 0e0f0021292f5ede9f3dd57723fc5324aa6009d1 lib/Class/Workflow/Instance/Simple.pm
+SHA1 58defb4a84ed7e557cb3b86ee578b41f64772f61 lib/Class/Workflow/State.pm
+SHA1 b0a18c195ed0d22b41f7bd72b242c1303695dc85 lib/Class/Workflow/State/AcceptHooks.pm
+SHA1 1d579187bca69701813cf022e98145f8d892c6ff lib/Class/Workflow/State/AutoApply.pm
+SHA1 8b42ddf692240f4f983f86033e7418c55e8015c5 lib/Class/Workflow/State/Simple.pm
+SHA1 30487df33db6c10fc6b8e9c17d6731cab1a09c03 lib/Class/Workflow/State/TransitionHash.pm
+SHA1 9db58b80e7582fae0cce3ac33f7f003cc20d1c9d lib/Class/Workflow/State/TransitionSet.pm
+SHA1 c057711f4d601dc8c77c28a65d96cc7bea9a044d lib/Class/Workflow/Transition.pm
+SHA1 dff592113c196347be942a585b4b79f5c8dc2d42 lib/Class/Workflow/Transition/Deterministic.pm
+SHA1 9d88270093fbc743fd5c9485d64f7546ed7f958c lib/Class/Workflow/Transition/Simple.pm
+SHA1 1cffef6d32ad72938a49090670d1971356a867db lib/Class/Workflow/Transition/Strict.pm
+SHA1 aca0b99b28ab2f6b39f89b2935a6e994535892da lib/Class/Workflow/Transition/Validate.pm
+SHA1 d5cf504aa46a35fa60ee125adca799888c600ada lib/Class/Workflow/Transition/Validate/Simple.pm
+SHA1 1fbea0f1efd4b2f0831c67f3492375abd6987941 lib/Class/Workflow/Util/Delta.pm
+SHA1 14fd0bf1fb0681a01098e0ddcf57c8c6c1ba73bb lib/Class/Workflow/YAML.pm
+SHA1 ef2f9a05726a53e075fd09864334158068deb01c lib/Class/Workflow/YAML.pmc
+SHA1 0b42fb5c215c496b702351f923546a4e2e1f1d76 t/01_use.t
+SHA1 56a47bfeac8c7b55bbb162d920951121b4f54489 t/basic.t
+SHA1 e25e8fa3ab958978ff3f269a52035e4651bd51bd t/delta.t
+SHA1 8a8dd116c793bfbebdd87f088d587e6196fd57b4 t/example_dbic.t
+SHA1 37c02947fd00d462346f3557b98ebd9542c65297 t/example_pop3.t
+SHA1 4a97f1fc74a86f5fb9cdcce2537dc1cbd513964f t/yaml.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFKl/F0VCwRwOvSdBgRAslpAJ48bbEr17H55oy1rXC24UBORLFbkwCfdxi1
+HQ679SJ92hUfoCXlmaCXG0g=
+=gBy8
+-----END PGP SIGNATURE-----

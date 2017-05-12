@@ -1,0 +1,35 @@
+Crypt::SEAL2
+============
+
+SEAL2 is the second version of the stream cipher SEAL2, designed by Don
+Coppersmith and Phillip Rogaway.
+
+CAVEAT
+
+SEAL2 is designed to generate up to 2^48 bytes of output per seed. In
+1997, Handschuh and Gilbert showed, however, that the output stream can
+be distinguished from a random sequence after only seeing roughly 2^34
+bytes of output. Thus, it is prudent to avoid using the same seed for
+more than 2^34 bytes of output.
+
+BONUS
+
+The C file, _seal2.c, is a standalone SEAL2 implementation. To
+compile it, type:
+
+        gcc -Wall _seal2.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque. Please read contact.html that comes
+with this distribution for details on how to contact the author.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

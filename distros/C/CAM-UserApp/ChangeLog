@@ -1,0 +1,52 @@
+2005-04-23 00:06  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/UserApp.pm: v1.01 Relicensing
+
+2003-09-16 13:50  chris
+
+	* Build.PL, COPYRIGHT, LICENSE, MANIFEST, Makefile.PL, README,
+	  UserApp.pm, index.html, test.pl, lib/CAM/UserApp.pm, t/userapp.t:
+	  v1.00 Update for new build and license infrastructure
+
+2003-04-23 16:53  chris
+
+	* UserApp.pm: v0.05 doc updates from a while back
+
+2003-03-06 20:18  chris
+
+	* UserApp.pm: v0.04 Bugfix: check for password mistakenly written
+	  as a test for username  CVS:
+	  ----------------------------------------------------------------------
+
+2003-03-04 00:50  chris
+
+	* UserApp.pm: Move argument defaults to constructor
+
+2003-03-01 14:44  chris
+
+	* UserApp.pm: Allow CGI parameters to be passed through login
+	  transparently
+
+2003-02-28 17:36  chris
+
+	* UserApp.pm: Fix POD
+
+2003-02-28 17:27  chris
+
+	* UserApp.pm: v0.02 Documentation Some small API changes
+
+2003-02-27 16:12  chris
+
+	* Makefile.PL: v0.01 - first working version, no documentation yet
+
+2003-02-27 14:47  chris
+
+	* COPYRIGHT, MANIFEST, Makefile.PL, README, UserApp.pm, test.pl:
+	  Initial revision
+
+2003-02-27 14:47  chris
+
+	* COPYRIGHT, MANIFEST, Makefile.PL, README, UserApp.pm, test.pl:
+	  initial import
+

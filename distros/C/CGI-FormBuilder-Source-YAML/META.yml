@@ -1,0 +1,22 @@
+---
+name: CGI-FormBuilder-Source-YAML
+version: 1.0008
+author:
+  - 'Mark Hedges <hedges@ucsd.edu>'
+abstract: Initialize FormBuilder from YAML file
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::FormBuilder: 3.02
+  FindBin: 0
+  Test::More: 0
+  YAML::Syck: 0
+provides:
+  CGI::FormBuilder::Source::YAML:
+    file: lib/CGI/FormBuilder/Source/YAML.pm
+    version: 1.0008
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

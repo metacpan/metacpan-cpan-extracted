@@ -1,0 +1,27 @@
+<style type="text/css">
+	HTML                         { background-color:#FFFFFF; } 
+	BODY                         { background-color:#FFFFFF; } 
+	TD                           { font-family:arial; font-size:9pt; } 
+	TD.browseHead                { background-color:#666666; color:white; padding-left:4; padding-right:4; text-align:left; } 
+	TD.browseRowA                { background-color:#FFEEEE; font-size:9pt; padding-left:2; color:black; text-align:left; } 
+	TD.browseRowB                { background-color:#FFDDDD; font-size:9pt; padding-left:2; color:black; text-align:left; } 
+	A.browseHead:link            { color:#FFFFFF; text-decoration:underline; } 
+	A.browseHead:visited         { color:#FFFFFF; text-decoration:underline; } 
+	A.browseHead:hover           { color:#FFFFFF; text-decoration:underline; } 
+	A.browseLink:link            { color:#660000; text-decoration:underline; } 
+	A.browseLink:visited         { color:#660000; text-decoration:underline; } 
+	A.browseLink:hover           { color:#660000; text-decoration:underline; } 
+	A.browseDelete:link          { color:#000000; text-decoration:underline; padding-left:4; padding-right:4; } 
+	A.browseDelete:visited       { color:#000000; text-decoration:underline; padding-left:4; padding-right:4; } 
+	A.browseDelete:hover         { color:#000000; text-decoration:underline; padding-left:4; padding-right:4; } 
+	A.browsePrevNextOn:link      { color:#000000; text-decoration:underline; font-size:9pt; } 
+	A.browsePrevNextOn:visited   { color:#000000; text-decoration:underline; font-size:9pt; } 
+	A.browsePrevNextOn:hover     { color:#000000; text-decoration:underline; font-size:9pt; } 
+	font.browseInfo              { font-family:arial; text-align:left; line-height:110%; font-style:italic; font-size:10; } 
+	font.browsePrevNextOff       { color:#999999; text-decoration:underline; font-size:9pt; } 
+	font.browsePrevNextOff       { color:#999999; text-decoration:underline; font-size:9pt; } 
+	font.browsePrevNextOff       { color:#999999; text-decoration:underline; font-size:9pt; } 
+	.browseSmallBox              { font-family:arial; font-size:7pt; height:16; width:18; text-align:center; color:#660000; background-color:#EEEEEE; } 
+	.browseSmallSelect           { font-family:arial; font-size:7pt; height:16; text-align:center; color:#660000; background-color:#EEEEEE; } 
+	.browseSmallButton           { font-family:arial; font-size:7pt; height:16; text-align:center; color:#FFFFFF; background-color:#666666; } 
+</style>

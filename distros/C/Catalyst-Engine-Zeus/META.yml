@@ -1,0 +1,17 @@
+---
+name: Catalyst-Engine-Zeus
+version: 0.01
+author:
+  - Christian Hansen C<ch@ngmedia.com>
+abstract: Catalyst Zeus Engine
+license: perl
+requires:
+  Catalyst: 5.2
+  Zeus::ModPerl: 0
+provides:
+  Catalyst::Engine::Zeus:
+    file: lib/Catalyst/Engine/Zeus.pm
+    version: 0.01
+  Catalyst::Engine::Zeus::Base:
+    file: lib/Catalyst/Engine/Zeus/Base.pm
+generated_by: Module::Build version 0.26

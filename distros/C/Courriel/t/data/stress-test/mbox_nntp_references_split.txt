@@ -1,0 +1,54 @@
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl6.language:12609/28009
+Newsgroups: perl.perl6.language
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.perl6.language:12609
+Return-Path: <martin@sig.net.nz>
+Mailing-List: contact perl6-language-help@perl.org; run by ezmlm
+Delivered-To: mailing list perl6-language@perl.org
+Delivered-To: moderator for perl6-language@perl.org
+Received: (qmail 81971 invoked by uid 76); 21 Nov 2002 02:23:12 -0000
+Received: from mailhost2.auckland.ac.nz (HELO mailhost2.auckland.ac.nz) (130.216.191.4) by onion.perl.org (qpsmtpd/0.12) with SMTP; 2002-11-21 02:23:12Z
+Received: from mailhost.auckland.ac.nz (IDENT:mirapoint@mailhost [130.216.191.61])	by mailhost2.auckland.ac.nz (8.9.2/8.9.2/8.9.2-ua) with ESMTP id PAA19035;	Thu, 21 Nov 2002 15:22:53 +1300 (NZDT)
+Received: from tanya.sig.net.nz (ben-vm.itss.auckland.ac.nz [130.216.4.76])	by mailhost.auckland.ac.nz (Mirapoint Messaging Server MOS 3.2.1.6-EA)	with ESMTP id AKB02599;	Thu, 21 Nov 2002 15:22:52 +1300 (NZDT)
+Received: from localhost (localhost [127.0.0.1])	by tanya.sig.net.nz (8.12.5/8.12.2/Debian -5) with ESMTP id gAL2Mvfw001341;	Thu, 21 Nov 2002 15:22:57 +1300
+Subject: Re: String concatentation operator
+To: Mark Biggar <mark.a.biggar@attbi.com>
+Cc: perl6-language@perl.org
+In-Reply-To: <3DDBCD19.9030608@attbi.com>
+References: 	<20021114202930.GT547@ool-18b93024.dyn.optonline.net>	<Marcel-1.53-111421100
+X-SMTPD: qpsmtpd/0.12, http://develooper.com/code/qpsmtpd/
+	
+	7-bbaRr9i@waveney.demon.co.uk>	<20021114214715.GX547@ool-18b93024.dyn.optonl
+	 ine.net>	<3DD42A6F.4060603@vulpes.com>
+	<a05200f00b9f9db470de4@[63.120.19.221]>	<3DD6F50A.2000504@conway.org>
+	<a05200f01b9fd88f0263d@[63.120.19.221]>	<3DD7FE9B.8070301@conway.org>
+	<a05200f00b9fdb26fa549@[63.120.19.221]>	<20021118020031.GC3579@ouroboros.anu
+	 .edu.au>	<a05200f00b9fdfe25395d@[63.120.19.221]>
+	<20021118051040.36543.qmail@onion.perl.org>
+	<1037673259.29506.14.camel@tanya.sig.net.nz>  <3DDBCD19.9030608@attbi.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Mailer: Ximian Evolution 1.0.8 (1.0.8-10) 
+Date: 21 Nov 2002 15:22:57 +1300
+Message-ID: <1037845377.1222.23.camel@tanya.sig.net.nz>
+Mime-Version: 1.0
+From: martin@sig.net.nz (Martin D Kealey)
+
+On Thu, 2002-11-21 at 06:57, Mark Biggar wrote:
+> Martin D Kealey wrote:
+> > I want Perl to run 128 times faster on a 128 CPU machine... now I know
+> > that's not entirely realistic, but it should be able to run at least say
+> > 60 times faster.
+> 
+> Amdahl's law applies here:  "no amount of paralellism will speed up
+> an inheirently sequential algorithm"
+
+True in the abstract, but in practice in most languages an awful lot of
+algorithms that I<aren't> inherently sequential get serialized by the
+compiler because it can't tell it's safe to do otherwise.
+
+This is where pure-functional or applicative languages can have a big
+performance win - because the compile almost alway I<can> see that
+things are safe to parallelize.
+
+-Martin

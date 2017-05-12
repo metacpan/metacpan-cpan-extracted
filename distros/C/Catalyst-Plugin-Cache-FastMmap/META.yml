@@ -1,0 +1,28 @@
+---
+abstract: 'DEPRECATED FastMmap cache'
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Cache-FastMmap
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Cache::FastMmap: 0
+  Catalyst::Runtime: 5.7006
+  MRO::Compat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-Cache-FastMmap/
+version: 0.9

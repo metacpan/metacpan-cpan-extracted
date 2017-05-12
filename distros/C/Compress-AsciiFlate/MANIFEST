@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Compress-AsciiFlate.t
+lib/Compress/AsciiFlate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,80 @@
+#! /usr/bin/perl
+##
+##  This code contributed by Chris Leach <leachcj@bp.com>
+
+use ExtUtils::testlib;
+use Curses;
+
+eval { new_panel() };
+if ($@ =~ m{not defined in your Curses library}) {
+    print STDERR "Curses was not compiled with panel function.\n";
+    exit 1;
+}
+
+my $p1 = mkpanel("000");
+message("New Panel with 000's");
+
+my $p2 = mkpanel("+++");
+move_panel($p1, 8, 20);
+message("New Panel with +++'s");
+
+hide_panel($p1);
+message("Hiding 000's");
+message("000's hidden? ", panel_hidden($p1) ? "Yes" : "No");
+
+show_panel($p1);
+message("Showing 000's");
+
+my $p3 = mkpanel("XXX");
+move_panel($p3, 7, 34);
+message("New Panel with XXX's");
+
+top_panel(panel_above(panel_above(undef)));
+message("Moving the panel above the bottom panel to the top");
+
+bottom_panel(panel_below(panel_below(undef)));
+message("Moving the panel below the top panel to the bottom");
+
+my $w3 = panel_window($p3);
+del_panel($p3);
+message("Deleting panel with XXX's saving window");
+
+replace_panel($p1, $w3);
+message("Replacing 000's window");
+
+del_panel($p2);
+del_panel($p1);
+endwin(); 
+
+sub mkpanel {
+    my $s = shift;
+    my $w = Curses->new(10, 26, 12, 25);
+    die unless $w;
+
+    box($w, 0, 0);
+    my $p = new_panel($w);
+
+    if ($p) {
+        set_panel_userptr($p, $s);
+
+	foreach my $r (1..8) {
+	    addstr($w, $r, 3*$r-2, $s);
+	}
+    }
+    else {
+	fatal("new_panel failed");
+    }
+    $p;
+}
+
+sub message {
+    addstr(stdscr, 0, 0, "@_\n");
+    update_panels();
+    doupdate();
+    sleep 2;
+}
+
+sub fatal {
+    message("@_");
+    exit 1;
+}

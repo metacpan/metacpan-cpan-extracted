@@ -1,0 +1,15 @@
+Revision history for Catalyst::Authentication::Credential::OAuth
+
+0.04 Mon Oct 3 17;26:00 2011
+   Convert repository to git (fREW Schmidt)
+
+0.03 Mon Jun 28 01:16:00 2010
+   Support new "verifier" requirement for "access token"
+   to work with the Twitter API.
+
+0.02 Fri Sep 25 10:30:35 2009
+    Fix dependencies
+    Autogenerate README
+
+0.01 Tue July 08 17:17 2009
+   original version

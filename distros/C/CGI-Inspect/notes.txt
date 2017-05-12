@@ -1,0 +1,17 @@
+== AJAX Plugins ==
+
+Plugins could also be allowed to use AJAX to communicate back to the server. A
+flag could be set to skip the wrapping output. More specifically, the flag
+could be set to just get the output of a single module.
+
+== Keep-Alive ==
+
+We could send a byte ever now and then to the browser so that it doesn't time
+out. A space will probably work (HTML mostly ignores it), but maybe we could
+send some other character like \0 or something.
+
+== JS / CSS Plugin ==
+
+Make the javascript and CSS of the current setup a plugin, so that someone else
+can do better than I did or so that you could have an AJAX version
+

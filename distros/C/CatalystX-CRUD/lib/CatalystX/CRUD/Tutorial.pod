@@ -1,0 +1,478 @@
+=pod
+
+=head1 NAME
+
+CatalystX::CRUD::Tutorial - step-by-step through CatalystX::CRUD example app
+
+=head1 OVERVIEW
+
+The goal of the CatalystX::CRUD project is to provide a thin glue between your existing
+data model code and your existing form processing code. The ideal CatalystX::CRUD application
+actually uses very little Catalyst-specific code. Instead, code independent of Catalyst does
+most of the heavy lifting. This design is intended to (a) make it easier
+to re-use your non-Catalyst code and (b) make your applications easier to test.
+
+This tutorial is intended for users of CatalystX::CRUD. Developers should also
+look at the CatalystX::CRUD API documentation. We will look 
+at two of the CatalystX::CRUD implementations: the Rose::HTML::Objects
+controller (CatalystX::CRUD::Controller::RHTMLO) and the Rose::DB::Object model
+(CatalystX::CRUD::Model::RDBO). Note that these two modules are available on CPAN
+separately from the core CatalystX::CRUD package.
+
+
+=head2 Create a new Catalyst application
+
+ % catalyst.pl MyApp
+ ...
+ % cd MyApp
+
+Make a directory structure to accomodate the classes we'll be creating:
+
+ % mkdir lib/MyCRUD
+ % mkdir lib/MyCRUD/Album
+ % mkdir lib/MyCRUD/Song
+
+
+=head2 Create a database
+
+This tutorial will assume SQLite as the database, but any RDBO-supported database should work.
+You might need to tweek the SQL below to work with your particular database.
+
+ /* example SQL file to init db */
+
+ create table albums
+ (
+    id      INTEGER primary key,
+    title   varchar(128),
+    artist  varchar(128)
+ );
+
+ create table songs
+ (
+    id      INTEGER primary key,
+    title   varchar(128),
+    artist  varchar(128),
+    length  varchar(16)
+ );
+
+ create table album_songs
+ (
+    album_id    int not null references albums(id),
+    song_id     int not null references songs(id) 
+ );
+
+ insert into albums (title, artist) values ('Blonde on Blonde', 'Bob Dylan');
+ insert into songs  (title, length) values ('Visions of Johanna', '8:00');
+
+Save the above into a file called C<mycrud.sql> and then create the SQLite database:
+
+ % sqlite3 mycrud.db < mycrud.sql
+
+Test your database by connecting and verifying the data:
+
+ % sqlite3 mycrud.db
+ SQLite version 3.1.3
+ Enter ".help" for instructions
+ sqlite> select * from songs;
+ 1|Visions of Johanna||8:00
+ sqlite> .quit
+
+Now you are ready to write some Perl.
+
+=head2 Create a base Rose::DB class
+
+We need a Rose::DB class to connect to our database.
+Save the following in C<lib/MyCRUD/DB.pm>:
+
+ package MyCRUD::DB;
+ use strict;
+ use warnings;
+ use base qw( Rose::DB );
+
+ __PACKAGE__->use_private_registry;
+
+ __PACKAGE__->register_db(
+    domain   => __PACKAGE__->default_domain,
+    type     => __PACKAGE__->default_type,
+    driver   => 'sqlite',
+    database => $ENV{DB_PATH} || 'mycrud.db',
+ );
+ 
+ 1;
+
+Note that we can use the B<DB_PATH> environment variable as a convenience when we are not
+in the same directory as the database file. You could put this line in your
+C<MyApp.pm> file, just before you call MyApp->setup().
+
+ $ENV{DB_PATH} = __PACKAGE__->config->{db_path};
+
+and then in your myapp.yml (or equivalent) configuration file:
+
+ db_path: __HOME__/mycrud.db
+
+
+=head2 Create Rose::DB::Object classes
+
+The RDBO best practice is to create a base class that inherits from RDBO directly,
+and then create subclasses of your local base class. Following that convention,
+we'll create C<lib/MyCRUD/RDBO.pm> and then inherit from it:
+
+ package MyCRUD::RDBO;
+ use strict;
+ use warnings;
+ use base qw( Rose::DB::Object );
+ 
+ use MyCRUD::DB;
+
+ sub init_db {
+    my $class = shift;
+    return MyCRUD::DB->new_or_cached(@_, database => $ENV{DB_PATH});
+ }
+
+ 1;
+
+Note that the new_or_cached() method is relatively new to Rose::DB, so make sure you have
+the latest version from CPAN.
+
+Now we'll make the RDBO classes that correspond to our database. These go in
+C<lib/MyCRUD/Song.pm>, C<lib/MyCRUD/Album.pm> and C<lib/MyCRUD/AlbumSong.pm>,
+respectively.
+
+ package MyCRUD::Song;
+ use strict;
+ use base qw( MyCRUD::RDBO );
+
+ __PACKAGE__->meta->setup(
+    table => 'songs',
+    columns => [
+                id     => {type => 'integer'},
+                title  => {type => 'varchar', length => 128},
+                artist => {type => 'varchar', length => 128},
+                length => {type => 'varchar', length => 16},
+               ],
+    primary_key_columns => ['id'],
+    relationships => [
+        albums => {
+                   map_class => 'MyCRUD::AlbumSong',
+                   type      => 'many to many',
+                  },
+
+    ]
+ );
+ 1;
+
+
+ package MyCRUD::Album;
+ use strict;
+ use base qw( MyCRUD::RDBO );
+
+ __PACKAGE__->meta->setup(
+    table => 'albums',
+    columns => [
+                id     => {type => 'integer'},
+                title  => {type => 'varchar', length => 128},
+                artist => {type => 'varchar', length => 128},
+               ],
+    primary_key_columns => ['id'],
+    relationships => [
+        songs => {
+                  map_class => 'MyCRUD::AlbumSong',
+                  type      => 'many to many',
+                 },
+
+    ]
+ );
+ 1;
+
+
+ package MyCRUD::AlbumSong;
+ use strict;
+ use warnings;
+ use base qw( MyCRUD::RDBO );
+
+ __PACKAGE__->meta->setup(
+    table => 'album_songs',
+    columns => [
+                album_id => {type => 'integer', not_null => 1},
+                song_id  => {type => 'integer', not_null => 1}
+               ],
+    foreign_keys => [
+        song  => {class => 'MyCRUD::Song',  key_columns => {song_id  => 'id'}},
+        album => {class => 'MyCRUD::Album', key_columns => {album_id => 'id'}}
+                    ]
+
+ );
+ 1;
+
+That's it for our data model. Now we will create our form classes. 
+
+
+=head2 Create Rose::HTML::Form classes
+
+Just as with RDBO, best practice is to create a base form class that inherits from
+RHTMLO, and then subclass it for each form. Our base form class is C<lib/MyCRUD/Form.pm>.
+
+ package MyCRUD::Form;
+ use strict;
+ use warnings;
+ use base qw( Rose::HTML::Form );
+ 
+ 1;
+
+Now our application-specific classes in C<lib/MyCRUD/Album/Form.pm> and 
+C<lib/MyCRUD/Song/Form.pm> respectively.
+
+ package MyCRUD::Album::Form;
+ use strict;
+ use warnings;
+ use base qw( MyCRUD::Form );
+ use Carp;
+ 
+ sub init_with_album {
+    my $self  = shift;
+    my $album = shift or croak "need MyCRUD::Album object";
+    return $self->init_with_object($album);
+ }
+
+ sub album_from_form {
+    my $self = shift;
+    my $album = shift or croak "need MyCRUD::Album object";
+    $self->object_from_form($album);
+    return $album;
+ }
+
+ sub build_form {
+    my $self = shift;
+    $self->add_fields(
+        title => {
+            type         => 'text',
+            size         => 30,
+            required     => 1,
+            label        => 'Title',
+            maxlength    => 128,
+          },
+        artist => {
+            type         => 'text',
+            size         => 30,
+            required     => 1,
+            label        => 'Artist',
+            maxlength    => 128,
+          },
+    );
+ }
+
+ 1;
+
+
+ package MyCRUD::Song::Form;
+ use strict;
+ use warnings;
+ use base qw( MyCRUD::Form );
+ use Carp;
+
+ sub init_with_song {
+    my $self = shift;
+    my $song = shift or croak "need MyCRUD::Song object";
+    $self->init_with_object($song);
+ }
+ 
+ sub song_from_form {
+    my $self = shift;
+    my $song = shift or croak "need MyCRUD::Song object";
+    $self->object_from_form($song);
+    return $song;
+ }
+ 
+ sub build_form {
+    my $self = shift;
+    $self->add_fields(
+             title => {
+                type      => 'text',
+                size      => 30,
+                required  => 1,
+                label     => 'Song Title',
+                maxlength => 128,
+               },
+              artist => {
+                type        => 'text',
+                size        => 30,
+                required    => 1,
+                label       => 'Artist',
+                maxlength   => 128,
+                },
+              length => {
+                type      => 'text',
+                size      => 16,
+                maxlength => 16,
+                required  => 1,
+                label     => 'Song Length'
+                }
+    );
+ }
+
+ 1;
+
+
+=head2 Create Models
+
+So far we have not done anything with CatalystX::CRUD. Now we'll make some Model classes
+to glue our RDBO classes into the Catalyst MyApp application.
+
+Each RDBO class gets its own Model class: C<lib/MyApp/Model/Album.pm> and 
+C<lib/MyApp/Model/Song.pm> respectively.
+
+ package MyApp::Model::Album;
+ use strict;
+ use warnings;
+ use base qw( CatalystX::CRUD::Model::RDBO );
+ 
+ __PACKAGE__->config(
+    name            => 'MyCRUD::Album',
+    load_with       => [qw( songs )],
+ );
+ 1;
+
+
+ package MyApp::Model::Song;
+ use strict;
+ use warnings;
+ use base qw( CatalystX::CRUD::Model::RDBO );
+  
+ __PACKAGE__->config(
+    name            => 'MyCRUD::Song',
+    load_with       => [qw( albums )],
+ );
+ 1;
+
+We use C<load_with> in the configuation in order to pre-fetch related records
+with each RDBO object, but that is purely optional and will depend on the kind
+of application you are writing.
+
+Notice how little Model code is involved -- less than 10 lines per class.
+
+=head2 Create Controllers
+
+Now we'll make some Controllers. These act as the traffic cop in our application,
+coordinating our forms and models.
+
+Each RHTMLO class gets its own Controller class: C<lib/MyApp/Controller/Album.pm>
+and C<lib/MyApp/Controller/Song.pm> respectively.
+
+ package MyApp::Controller::Album;
+ use strict;
+ use warnings;
+ use base qw( CatalystX::CRUD::Controller::RHTMLO );
+ use MyCRUD::Album::Form;
+ 
+ __PACKAGE__->config(
+  form_class              => 'MyCRUD::Album::Form',
+  init_form               => 'init_with_album',
+  init_object             => 'album_from_form',
+  default_template        => 'album/edit.tt',  # you must create this!
+  model_name              => 'Album',
+  primary_key             => 'id',
+  view_on_single_result   => 1,
+ );
+ 
+ 1;
+
+
+
+ package MyApp::Controller::Song;
+ use strict;
+ use warnings;
+ use base qw( CatalystX::CRUD::Controller::RHTMLO );
+ use MyCRUD::Song::Form;
+ 
+ __PACKAGE__->config(
+  form_class              => 'MyCRUD::Song::Form',
+  init_form               => 'init_with_song',
+  init_object             => 'song_from_form',
+  default_template        => 'song/edit.tt',  # you must create this!
+  model_name              => 'Song',
+  primary_key             => 'id',
+  view_on_single_result   => 1,
+ );
+ 
+ 1;
+
+Hopefully most of the configuration values look familiar. You are mostly telling the Controller which form
+class and methods to use, and what Model to map the form to. See the 
+L<CatalystX::CRUD::Controller> documentation for more details.
+
+
+=head2 The View
+
+CatalystX::CRUD is View-agnostic, so this tutorial will not cover the generation
+of templates. You can see examples of CatalystX::CRUD-friendly 
+Template Toolkit templates in the
+L<Rose::DBx::Garden::Catalyst::Templates> module on CPAN.
+
+=head2 Start Up
+
+Start up the application using the development server:
+
+ % perl script/myapp_server.pl
+
+Assuming you have created a View and some templates, 
+you can now search, browse, create, read, update and delete all your Album
+and Song data.
+
+=head1 SEE ALSO
+
+The Rose::DBx::Garden::Catalyst package will generate all your RDBO, RHTMLO,
+and CatalystX::CRUD classes, along with spiffy AJAX-enhanced templates, based on
+just your database.
+
+=head1 AUTHOR
+
+Peter Karman, C<< <perl at peknet.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-catalystx-crud at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CatalystX-CRUD>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc CatalystX::CRUD
+
+You can also look for information at:
+
+=over 4
+
+=item * Mailing List
+
+L<https://groups.google.com/forum/#!forum/catalystxcrud>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/CatalystX-CRUD>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/CatalystX-CRUD>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CatalystX-CRUD>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/CatalystX-CRUD>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007 Peter Karman, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

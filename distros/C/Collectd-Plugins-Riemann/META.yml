@@ -1,0 +1,32 @@
+---
+abstract: 'Collectd plugins for Riemann.'
+author:
+  - 'Fabien Wernli <wernli@in2p3.fr>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Collectd::Plugins: '0.1007'
+  Test::MockModule: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  version: '0.88'
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.15'
+license: cecill
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Collectd-Plugins-Riemann
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Collectd::Plugins::Common: 0
+  IPC::Cmd: 0
+  Riemann::Client: 0
+  Socket: 0
+  perl: 5.8.2
+version: '0.002003'

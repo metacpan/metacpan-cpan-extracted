@@ -1,0 +1,128 @@
+NAME
+    CGI::Kwiki - A Quickie Wiki that's not too Tricky
+
+SYNOPSIS
+        > mkdir cgi-bin/my-kwiki
+        > cd cgi-bin/my-kwiki
+        > kwiki-install
+
+        Kwiki software installed! Point your browser at this location.
+
+KWIK START
+    The Offficial Kwiki Home is at http://www.kwiki.org. This site is a
+    Kwiki itself. It contains much more information about Kwiki than the
+    distributed docs.
+
+DESCRIPTION
+    A Wiki is a website that allows its users to add pages, and edit any
+    existing pages. It is one of the most popular forms of web
+    collaboration. If you are new to wiki, visit
+    http://c2.com/cgi/wiki?WelcomeVisitors which is possibly the oldest
+    wiki, and has lots of information about how wikis work.
+
+    There are dozens of wiki implementations in the world, and many of those
+    are written in Perl. As is common with many Perl hacks, they are rarely
+    modular, and almost never released on CPAN. One major exception is
+    CGI::Wiki. This is a wiki framework that is extensible and is actively
+    maintained.
+
+    Another exception is this module, CGI::Kwiki. CGI::Kwiki focuses on
+    simplicity and extensibility. You can create a new kwiki website with a
+    single command. The module has no prerequisite modules, except the ones
+    that ship with Perl. It doesn't require a database backend, although it
+    could be made to use one. The default kwiki behaviour is fairly full
+    featured, and includes support for html tables. Any behaviour of the
+    kwiki can be customized, without much trouble.
+
+SPECIAL FEATURES
+    CGI::Kwiki will come with some fancy addons not found in most wiki
+    implementations. This comes with the promise that they will not
+    interfere with the sheer simplicity of the default kwiki interface.
+
+    Check http://http://www.kwiki.org/index.cgi?KwikiFeatures from time to
+    time to see what hot features have been added.
+
+  Kwiki Slide Show
+    You can create an entire PowerPoint-like slideshow, in a single kwiki
+    page. There is Javascript magic for advancing slides, etc. See the
+    sample page KwikiSlideShow.
+
+EXTENDING
+    CGI::Kwiki is completely Object Oriented. You can easily override every
+    last behaviour by subclassing one of its class modules and overriding
+    one or more methods. This is generally accomplished in just a few lines
+    of Perl.
+
+    The best way to describe this is with an example. Start with the config
+    file. The default config file is called "config.yaml". It contains a set
+    of lines like this:
+
+        config_class:      CGI::Kwiki::Config
+        driver_class:      CGI::Kwiki::Driver
+        cgi_class:         CGI::Kwiki::CGI
+        cookie_class:      CGI::Kwiki::Cookie
+        database_class:    CGI::Kwiki::Database
+        metadata_class:    CGI::Kwiki::Metadata
+        display_class:     CGI::Kwiki::Display
+        edit_class:        CGI::Kwiki::Edit
+        formatter_class:   CGI::Kwiki::Formatter
+        template_class:    CGI::Kwiki::Template
+        search_class:      CGI::Kwiki::Search
+        changes_class:     CGI::Kwiki::Changes
+        prefs_class:       CGI::Kwiki::Prefs
+        pages_class:       CGI::Kwiki::Pages
+        slides_class:      CGI::Kwiki::Slides
+        javascript_class:  CGI::Kwiki::Javascript
+        style_class:       CGI::Kwiki::Style
+        scripts_class:     CGI::Kwiki::Scripts
+
+    This is a list of all the classes that make up the kwiki. You can change
+    anyone of them to be a class of your own.
+
+    Let's say that you wanted to change the BOLD format indicator from
+    "*bold*" to '''bold'''. You just need to override the "bold()" method of
+    the Formatter class. Start by changing "config.yaml".
+
+        formatter_class: MyKwikiFormatter
+
+    Then write a module called "MyKwikiFormatter.pm". You can put this
+    module right in your kwiki installation directory if you want. The
+    module might look like this:
+
+        package MyKwikiFormatter;
+        use base 'CGI::Kwiki::Formatter';
+
+        sub bold {
+            my ($self, $text) = @_;
+            $text =~ s!'''(.*?)'''!<b>$1</b>!g;
+            return $text;
+        }
+
+        1;
+
+    Not too hard, eh? You can change all aspects of CGI::Kwiki like this,
+    from the database storage to the search engine, to the main driver code.
+    If you come up with a set of classes that you want to share with the
+    world, just package them up as a distribution and put them on CPAN.
+
+    By the way, you can even change the configuration file format from the
+    YAML default. If you wanted to use say, XML, just call the file
+    "config.xml" and write a module called "CGI::Kwiki::Config_xml".
+
+SEE ALSO
+    All of the rest of the documentation for CGI::Kwiki is available within
+    your own Kwiki installation. Just install a Kwiki and follow the links!
+    If you're having trouble or just want to see a Kwiki in action, visit
+    http://www.kwiki.org first.
+
+AUTHOR
+    Brian Ingerson <INGY@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2003. Brian Ingerson. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

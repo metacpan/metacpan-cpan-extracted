@@ -1,0 +1,11 @@
+Revision history for Perl extension CPANPLUS::Shell::Wx.
+
+0.03 Wed Aug 06 2008 10:48:01 GMT-0400 (EDT)
+	- Added CPANPLUS's dependencies in Makefile.PL, as it has no deps listed
+	- This should fix some errors on windows machines
+0.02 Mon Aug 04 2008 11:52:09 GMT-0400 (EDT)
+	- fixed some release info. 
+	- Used `make dist` to create distribution for CPAN
+
+0.01  Sun Aug 3 12:14:45 2008
+    - first release to CPAN

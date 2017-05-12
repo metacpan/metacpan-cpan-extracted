@@ -1,0 +1,30 @@
+---
+abstract: 'define and export constants easily'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.023
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Constant-Exporter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/punytan/p5-Constant-Exporter/issues
+  homepage: https://github.com/punytan/p5-Constant-Exporter
+  repository: https://github.com/punytan/p5-Constant-Exporter.git
+version: 0.01

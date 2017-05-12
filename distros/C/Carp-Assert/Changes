@@ -1,0 +1,90 @@
+Revision history for Perl module Carp::Assert
+
+0.21 2014-06-25
+    - Fixed typos in pod. RT#95017 - thanks Daniel Lintott.
+    - Added links to a number of modules in SEE ALSO.
+    - Added links to wikipedia page on assert.h
+    - Added github repo to dist metadata and pod
+    - Add "use warnings" and bumped min perl version to 5.6.0
+    - Added license type to dist metadata via Makefile.PL
+    - Add TEST_REQUIRES if your EU::MM supports it, otherwise
+      add them to PREREQ_PM
+    - Reformatted Changes as per CPAN::Changes::Spec
+
+0.20 2007-01-05 MSCHWERN
+    - The tests will no longer fail should the user have NDEBUG or
+      PERL_NDEBUG environment variables set [rt.cpan.org 21170]
+    - Update the license link to point to the whole Perl license, not
+      just the Artistic license.
+
+0.19 2007-01-02 MSCHWERN
+    - Fixed installation for those who have Pod::Tests but pod2test is
+      not in their PATH as some CPAN shell configurations do.
+
+0.18 2004-03-03 MSCHWERN
+    - Added copyright and license info
+    - Made affirm's code dumping code safe on perl where B::Deparse
+      isn't quite up to the job.
+    - Some minor grammar nits from David Wheeler.
+
+0.17 2001-10-01 MSCHWERN
+    - Wouldn't install without Test::Inline.  Removed that dependency.
+
+0.16 2001-09-09 MSCHWERN
+    - Now works all the way back to 5.004!
+    - Forgot to add a dependency on Test::More
+    - Added embedded tests
+
+0.15 2001-08-22 MSCHWERN
+    - Now using B::Deparse
+    - Added affirm()
+    - Tweaked the assertion message a bit
+    - Added more docs about debugging vs production
+    - Added an EFFICIENCY section.
+
+0.14 2001-03-11 (not released) MSCHWERN
+    - Added $name argument to assert()
+
+0.13 2001-02-09 MSCHWERN
+    - Added shouldn't().
+
+0.12 2001-02-07 MSCHWERN
+    - Added PERL_NDEBUG environment variable, same as NDEBUG
+    - added should() and shouldnt()
+    - Fixed :NDEBUG/no Carp::Assert to completely shut off assertions.
+
+0.11 2000-06-02 MSCHWERN
+    - Added NDEBUG environment variable to shut off all assertions.
+    - Added a test for NDEBUG.
+
+0.10 2000-03-13 MSCHWERN
+    - Removed uses of constant.pm, reduces load time a bit.
+    - C< no Carp::Assert > is now the way to shut off assertions.
+
+0.08 1999-12-23 MSCHWERN
+    - Made the assert error a smidge nicer looking.
+    - Added some docs on what an assert error means.
+
+0.07 1999-10-13 MSCHWERN
+    - s/assertation/assertion/g  (Thanks to John Porter)
+    - improved the synopsis a smidge
+    - added another example of bad usage
+    - delayed loading of Carp until an assert() fails
+
+0.06 1999-04-29 MSCHWERN
+    - added INSTALL and README
+
+0.05 1999-04-28 (not released) MSCHWERN
+    - tests fixed
+    - confirmed at assert compiles out properly
+
+0.04 1999-04-28 (not released) MSCHWERN
+    - Devel::Assert is now Carp::Assert
+    - simplified the interface greatly.
+
+0.03 1999-01-06 MSCHWERN
+    - First release to CPAN
+
+0.01 1999-01-05
+    - original version; created by h2xs 1.18
+

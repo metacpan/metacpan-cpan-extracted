@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CPANPLUS-Dist-PAR
+version:      0.02
+version_from: lib/CPANPLUS/Dist/PAR.pm
+installdirs:  site
+requires:
+    CPANPLUS:                      0.074
+    CPANPLUS::Dist::Build:         0.04
+    Locale::Maketext::Simple:      0
+    Module::Load::Conditional:     0
+    PAR::Dist:                     0.19
+    Params::Check:                 0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

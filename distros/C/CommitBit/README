@@ -1,0 +1,31 @@
+CommitBit(3)          User Contributed Perl Documentation         CommitBit(3)
+
+
+
+NNAAMMEE
+       CommitBit - An opensource project administration tool
+
+DDEESSCCRRIIPPTTIIOONN
+       CommitBit is a tool for managing commit access to opensource projects.
+       It also provides for a "code.yourorganization.org" site with links to
+       your wiki, mailing lists, bug tracking and so on.
+
+       The project is in the early stages of development and could desperately
+       use some help. If you're interested, please write to jesse@bestpracti-
+       cal.com and ask for a commit bit.
+
+AAUUTTHHOORRSS
+       Jesse Vincent and Chia-liang Kao
+
+CCOOPPYYRRIIGGHHTT
+       Copyright 2006, Best Practical Solutions
+
+LLIICCEENNSSEE
+       This software is freely available under the same terms as Perl 5.8.8.
+       (That means you can use it under the terms of the GPL or The Artistic
+       License 1.0). If you want to use it under the terms of The Death and
+       Repudiation License, that's cool too. (COPYING/dr.txt)
+
+
+
+perl v5.8.8                       2006-09-19                      CommitBit(3)

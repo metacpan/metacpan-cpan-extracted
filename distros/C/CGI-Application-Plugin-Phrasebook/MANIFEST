@@ -1,0 +1,13 @@
+Build.PL
+Changes
+Makefile.PL
+META.yml
+MANIFEST
+MANIFEST.SKIP
+README
+lib/CGI/Application/Plugin/Phrasebook.pm
+t/000_load.t
+t/001_basic.t
+t/002_multiple.t
+t/my_phrasebook.txt
+t/my_phrasebook_2.txt

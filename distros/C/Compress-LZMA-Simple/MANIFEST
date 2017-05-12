@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+lib/Compress/LZMA/Simple.pm
+lib/Compress/LZMA/Simple.pod
+Simple.xs
+t/basic.t
+README
+META.yml                                 Module meta-data (added by MakeMaker)

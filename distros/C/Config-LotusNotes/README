@@ -1,0 +1,33 @@
+LICENCE AND COPYRIGHT
+---------------------
+
+Copyright (C) 2006 HS - Hamburger Software GmbH & Co. KG.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+This library is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of 
+MERCHANTIBILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+HOW TO INSTALL
+--------------
+
+To install this package, unzip and untar the file, then build the 
+makefile and use make or nmake to install:
+
+    tar xzf Config-LotusNotes-x.xx.tar.gz
+    cd Config-LotusNotes-x.xx
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+
+This package also contains an ActiveState PPM package. 
+To install it, run the following command in the current directory:
+
+    ppm install Config-LotusNotes.ppd

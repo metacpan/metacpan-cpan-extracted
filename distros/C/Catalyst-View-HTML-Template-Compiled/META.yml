@@ -1,0 +1,24 @@
+---
+name: Catalyst-View-HTML-Template-Compiled
+version: 0.16
+author:
+  - 'Sascha Kiefer, C<esskar@cpan.org>'
+abstract: HTML::Template::Compiled View Class
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.7
+  HTML::Template::Compiled: 0.8
+  Path::Class: 0.1
+provides:
+  Catalyst::Helper::View::HTML::Template::Compiled:
+    file: lib/Catalyst/Helper/View/HTML/Template/Compiled.pm
+    version: 0.03
+  Catalyst::View::HTML::Template::Compiled:
+    file: lib/Catalyst/View/HTML/Template/Compiled.pm
+    version: 0.16
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

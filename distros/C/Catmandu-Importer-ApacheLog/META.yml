@@ -1,0 +1,38 @@
+---
+abstract: 'Catmandu importer for importing log entries'
+author:
+  - 'Nicolas Franck'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Importer-ApacheLog
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Apache::Log::Parser: '0'
+  Catmandu: '0.2003'
+  Moo: '1.000003'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Importer-ApacheLog/issues
+  homepage: https://github.com/LibreCat/Catmandu-Importer-ApacheLog
+  repository: https://github.com/LibreCat/Catmandu-Importer-ApacheLog.git
+version: '0.0112'
+x_contributors:
+  - 'Jakob Voß <jakob@nichtich.de>'
+  - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
+  - 'njfranck <njfranck@ca20c521.ugent.be>'

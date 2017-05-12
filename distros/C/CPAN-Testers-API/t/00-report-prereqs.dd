@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.06'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Alien::SwaggerUI' => '0',
+                                      'CPAN::Testers::Schema' => '0.004',
+                                      'File::Share' => '0',
+                                      'Import::Base' => '0.012',
+                                      'Log::Any' => '1.045',
+                                      'Log::Any::Adapter::MojoLog' => '0.02',
+                                      'Mercury' => '0.010',
+                                      'Mojolicious' => '6',
+                                      'Mojolicious::Plugin::Config' => '0',
+                                      'Mojolicious::Plugin::OpenAPI' => '0',
+                                      'perl' => '5.024'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'SQL::Translator' => '0.11018',
+                                   'Test::Lib' => '0',
+                                   'Test::More' => '1.001005'
+                                 }
+                 }
+     };
+  $x;
+ }

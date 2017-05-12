@@ -1,0 +1,10 @@
+Revision history for Perl module Cache::BerkeleyDB
+
+0.01 Thu Jan 26 15:31:10 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+
+0.02 Fri Jan 27 12:02:01 2006
+    - Added umask option; BDB home now set to cache_root
+
+0.03 Thu Feb  2 13:21:18 2006
+    - Dispensed with tied hash: ca. 2% speed gain

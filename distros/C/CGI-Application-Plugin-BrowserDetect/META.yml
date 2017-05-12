@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-BrowserDetect
+version:             1.00
+abstract:            Browser detection plugin for CGI::Application
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    CGI::Application:              4
+    HTTP::BrowserDetect:           0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Bradley C Bailey <cap-browserdetect@brad.memoryleak.org>

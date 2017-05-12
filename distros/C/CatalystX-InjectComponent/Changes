@@ -1,0 +1,20 @@
+0.025 Monday July 02 13:47:45 PDT 2012:
+    - Incorporate documentation fix (rt76363) <gregoa@debian.org>
+
+0.024 Wednesday October 14 18:30:13 PDT 2009:
+    - Make sure we're being used with Moose-based Catalyst
+
+0.023 Monday October 12 16:10:13 PDT 2009
+    - Added Catalyst::Runtime dependency (thanks Andreas Koenig)
+
+0.022 Wednesday October 07 22:22:18 PDT 2009:
+    - Remove plugins from tests to fix dependency failure (thanks bobtfish)
+
+0.021 Wednesday June 24 00:49:08 PDT 2009:
+    - Added parent dependency
+
+0.020 Wednesday June 10 11:24:59 PDT 2009:
+    - Altered injection interface: into =>, component =>, as =>
+
+0.010 Monday June 08 16:08:08 PDT 2009:
+    - Initial release

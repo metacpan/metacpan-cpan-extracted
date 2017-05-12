@@ -1,0 +1,189 @@
+{
+   "abstract" : "Create Abstract Syntax Tree for Perl5",
+   "author" : [
+      "Masaaki Goshima (goccy) <goccy54@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Compiler-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "examples",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "2.21"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Module::Build::XSUtil" : "0.02"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0.02",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Compiler::Lexer" : "0.17",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Compiler::Parser" : {
+         "file" : "lib/Compiler/Parser.pm",
+         "version" : "0.10"
+      },
+      "Compiler::Parser::AST" : {
+         "file" : "lib/Compiler/Parser/AST.pm"
+      },
+      "Compiler::Parser::AST::Renderer" : {
+         "file" : "lib/Compiler/Parser/AST/Renderer.pm"
+      },
+      "Compiler::Parser::AST::Renderer::Engine" : {
+         "file" : "lib/Compiler/Parser/AST/Renderer/Engine.pm"
+      },
+      "Compiler::Parser::AST::Renderer::Engine::Graphviz" : {
+         "file" : "lib/Compiler/Parser/AST/Renderer/Engine/Graphviz.pm"
+      },
+      "Compiler::Parser::AST::Renderer::Engine::Text" : {
+         "file" : "lib/Compiler/Parser/AST/Renderer/Engine/Text.pm"
+      },
+      "Compiler::Parser::Node" : {
+         "file" : "lib/Compiler/Parser/Node.pm"
+      },
+      "Compiler::Parser::Node::Array" : {
+         "file" : "lib/Compiler/Parser/Node/Array.pm"
+      },
+      "Compiler::Parser::Node::ArrayRef" : {
+         "file" : "lib/Compiler/Parser/Node/ArrayRef.pm"
+      },
+      "Compiler::Parser::Node::Block" : {
+         "file" : "lib/Compiler/Parser/Node/Block.pm"
+      },
+      "Compiler::Parser::Node::Branch" : {
+         "file" : "lib/Compiler/Parser/Node/Branch.pm"
+      },
+      "Compiler::Parser::Node::CodeDereference" : {
+         "file" : "lib/Compiler/Parser/Node/CodeDereference.pm"
+      },
+      "Compiler::Parser::Node::ControlStmt" : {
+         "file" : "lib/Compiler/Parser/Node/ControlStmt.pm"
+      },
+      "Compiler::Parser::Node::Dereference" : {
+         "file" : "lib/Compiler/Parser/Node/Dereference.pm"
+      },
+      "Compiler::Parser::Node::DoStmt" : {
+         "file" : "lib/Compiler/Parser/Node/DoStmt.pm"
+      },
+      "Compiler::Parser::Node::ElseStmt" : {
+         "file" : "lib/Compiler/Parser/Node/ElseStmt.pm"
+      },
+      "Compiler::Parser::Node::ForStmt" : {
+         "file" : "lib/Compiler/Parser/Node/ForStmt.pm"
+      },
+      "Compiler::Parser::Node::ForeachStmt" : {
+         "file" : "lib/Compiler/Parser/Node/ForeachStmt.pm"
+      },
+      "Compiler::Parser::Node::Function" : {
+         "file" : "lib/Compiler/Parser/Node/Function.pm"
+      },
+      "Compiler::Parser::Node::FunctionCall" : {
+         "file" : "lib/Compiler/Parser/Node/FunctionCall.pm"
+      },
+      "Compiler::Parser::Node::Handle" : {
+         "file" : "lib/Compiler/Parser/Node/Handle.pm"
+      },
+      "Compiler::Parser::Node::HandleRead" : {
+         "file" : "lib/Compiler/Parser/Node/HandleRead.pm"
+      },
+      "Compiler::Parser::Node::Hash" : {
+         "file" : "lib/Compiler/Parser/Node/Hash.pm"
+      },
+      "Compiler::Parser::Node::HashRef" : {
+         "file" : "lib/Compiler/Parser/Node/HashRef.pm"
+      },
+      "Compiler::Parser::Node::IfStmt" : {
+         "file" : "lib/Compiler/Parser/Node/IfStmt.pm"
+      },
+      "Compiler::Parser::Node::Label" : {
+         "file" : "lib/Compiler/Parser/Node/Label.pm"
+      },
+      "Compiler::Parser::Node::Leaf" : {
+         "file" : "lib/Compiler/Parser/Node/Leaf.pm"
+      },
+      "Compiler::Parser::Node::List" : {
+         "file" : "lib/Compiler/Parser/Node/List.pm"
+      },
+      "Compiler::Parser::Node::Module" : {
+         "file" : "lib/Compiler/Parser/Node/Module.pm"
+      },
+      "Compiler::Parser::Node::Package" : {
+         "file" : "lib/Compiler/Parser/Node/Package.pm"
+      },
+      "Compiler::Parser::Node::RegPrefix" : {
+         "file" : "lib/Compiler/Parser/Node/RegPrefix.pm"
+      },
+      "Compiler::Parser::Node::RegReplace" : {
+         "file" : "lib/Compiler/Parser/Node/RegReplace.pm"
+      },
+      "Compiler::Parser::Node::Regexp" : {
+         "file" : "lib/Compiler/Parser/Node/Regexp.pm"
+      },
+      "Compiler::Parser::Node::Return" : {
+         "file" : "lib/Compiler/Parser/Node/Return.pm"
+      },
+      "Compiler::Parser::Node::SingleTermOperator" : {
+         "file" : "lib/Compiler/Parser/Node/SingleTermOperator.pm"
+      },
+      "Compiler::Parser::Node::ThreeTermOperator" : {
+         "file" : "lib/Compiler/Parser/Node/ThreeTermOperator.pm"
+      },
+      "Compiler::Parser::Node::WhileStmt" : {
+         "file" : "lib/Compiler/Parser/Node/WhileStmt.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/goccy/p5-Compiler-Parser/issues"
+      },
+      "homepage" : "https://github.com/goccy/p5-Compiler-Parser",
+      "repository" : {
+         "url" : "git://github.com/goccy/p5-Compiler-Parser.git",
+         "web" : "https://github.com/goccy/p5-Compiler-Parser"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Masaaki Goshima <masaaki.goshima@mixi.co.jp>"
+   ]
+}

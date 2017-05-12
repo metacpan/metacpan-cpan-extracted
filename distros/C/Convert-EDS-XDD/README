@@ -1,0 +1,64 @@
+NAME
+
+    Convert::EDS::XDD - Convert CANopen EDS to POWERLINK XDD
+
+SYNOPSIS
+
+      perl -MConvert::EDS::XDD=eds2xdd -e "print eds2xdd 'profile.eds'" > profile.xdd
+
+DESCRIPTION
+
+    EDS is an ini based format specified by the CiA e.V. in order to
+    describe CANopen devices. The Ethernet POWERLINK Standardization Group
+    specifies an EDS-based XML format for EPL devices.
+
+    This module Takes in an EDS file or a string with its content and
+    returns a XDD string. A self-contained (fatpacked) epl2xdd script is
+    available at the Github releases page
+    <https://github.com/epl-viz/Convert-EDS-XDD/releases/latest>.
+
+LIMITATIONS
+
+    May not handle all details of the EDS. Pull requests and reports
+    (issues on Github) welcome.
+
+METHODS AND ARGUMENTS
+
+    eds2xdd($filename, [$encoding])
+
+      Here, the [] indicate an optional parameter.
+
+      Returns the EDS' content as XML string on success or undef on error
+      in file contents.
+
+      Function croaks if opening file fails.
+
+      $encoding may be used to indicate the encoding of the file, e.g.
+      'utf8' or 'encoding(iso-8859-1)'.
+
+      Do not add a prefix to $encoding, such as '<' or '<:'.
+
+    eds2xdd_string($string)
+
+      Returns the EDS string as XML string
+
+GIT REPOSITORY
+
+    http://github.com/epl-viz/Convert-EDS-XDD
+
+SEE ALSO
+
+    EPL-Viz - Visualization for Ethernet POWERLINK
+    <http://github.com/epl-viz>
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

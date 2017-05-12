@@ -1,0 +1,39 @@
+NAME
+
+CGI::Imagemap.pm - interpret NCSA imagemaps for CGI programs
+
+INSTALL
+
+To install this module type the following
+
+   perl Makefile.PL
+   make test
+   make install
+
+SYNOPSIS
+
+  use CGI::Imagemap;
+ 
+  $map = new CGI::Imagemap;
+
+  $map->addmap(-file=>"image.map");
+  #OR
+  $map->addmap(@map);
+
+  eval { $action = $map->action($x,$y) };
+  #Check $@ for errors
+
+DESCRIPTION
+
+CGI::Imagemap allows CGI programmers to emulate the NCSA C<imagemap>
+CGI or place TYPE=IMAGE form fields on their forms.
+
+The imagemap file follows that of the NCSA imagemap program.
+See the NOTES section for further details.
+
+I sought functionality like this because I was writing a map application
+that would present the user with a multi-layered image. Each layer had
+its own "hotspots" and so I needed to support a dynamic image map.
+This module allowed me to pull in static layers of hotspots for all of
+the layers shown in the image, or optionally define the hotpsots for
+each layer dynamically as well.

@@ -1,0 +1,39 @@
+---
+abstract: 'Run CA-SCM (Harvest) commands'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - cascm
+  - harvest
+  - vci
+  - version-control
+  - scm
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CASCM-Wrapper
+provides:
+  CASCM::Wrapper:
+    file: lib/CASCM/Wrapper.pm
+    version: v1.0.1
+recommends:
+  Config::Tiny: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+requires:
+  File::Temp: '0.16'
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/mithun/perl-cascm-wrapper/issues
+  homepage: https://github.com/mithun/perl-cascm-wrapper
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-cascm-wrapper.git
+version: v1.0.1

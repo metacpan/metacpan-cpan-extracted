@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Catalyst-Authentication-Store-DBI
+version:             0.01
+abstract:            Storage class for Catalyst
+license:             perl
+author:              
+    - Simon Bertrang <simon.bertrang@puzzworks.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Catalyst::Model::DBI:          0
+    Catalyst::Plugin::Authentication: 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

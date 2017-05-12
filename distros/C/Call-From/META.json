@@ -1,0 +1,99 @@
+{
+   "abstract" : "Call functions/methods with a fake caller()",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Call-From",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta::Converter" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "ExtUtils::MM" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::Manifest" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Module::CPANfile" : "0",
+            "Module::Metadata" : "0",
+            "PIR" : "0",
+            "Path::Tiny" : "0",
+            "Perl::PrereqScanner" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "base" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.95_02",
+            "constant" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Call::From" : {
+         "file" : "lib/Call/From.pm",
+         "version" : "0.001000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/Call-From/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kentnl/Call-From",
+         "web" : "https://github.com/kentnl/Call-From"
+      }
+   },
+   "version" : "0.001000",
+   "x_authority" : "cpan:KENTNL"
+}

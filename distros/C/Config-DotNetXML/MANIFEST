@@ -1,0 +1,24 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Changes
+lib/Config/DotNetXML.pm
+lib/Config/DotNetXML/Parser.pm
+t/01pod.t
+t/02podcoverage.t
+t/1.t
+t/1.t.config
+t/2.t
+t/3.t
+t/4.t
+t/5.t
+t/6.t
+t/6.t.config
+t/7.t
+META.yml
+examples/appsettings
+examples/appsettings.config
+examples/configsection
+examples/configsection.config
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,235 @@
+---
+abstract: 'Custom errorhandling in deployed applications'
+author:
+  - 'Andreas Marienborg <andremar@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Test: 0
+  Catalyst::View: 0
+  Catalyst::View::TT: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  HTTP::Request::AsCGI: 0
+  Test::More: 0.96
+  Text::Diff: 0
+  base: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Action-RenderView-ErrorHandler
+requires:
+  Carp: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::View::TT: 0
+  Class::Inspector: 0
+  MRO::Compat: 0
+  Moose: 0
+  Moose::Role: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/omega/catalyst-action-renderview-errorhandler/issues
+  homepage: https://github.com/omega/catalyst-action-renderview-errorhandler
+  repository: https://github.com/omega/catalyst-action-renderview-errorhandler.git
+version: 0.100166
+x_Dist_Zilla:
+  perl:
+    version: 5.016003
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      name: '@ANDREMAR/Git::GatherDir'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@ANDREMAR/CheckPrereqsIndexed'
+      version: 0.009
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@ANDREMAR/CheckExtraTests'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@ANDREMAR/@Filter/PruneCruft'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@ANDREMAR/@Filter/ManifestSkip'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@ANDREMAR/@Filter/MetaYAML'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@ANDREMAR/@Filter/License'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@ANDREMAR/@Filter/Readme'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@ANDREMAR/@Filter/ExtraTests'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@ANDREMAR/@Filter/ExecDir'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@ANDREMAR/@Filter/ShareDir'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@ANDREMAR/@Filter/MakeMaker'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@ANDREMAR/@Filter/Manifest'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@ANDREMAR/@Filter/TestRelease'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@ANDREMAR/@Filter/ConfirmRelease'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@ANDREMAR/@Filter/UploadToCPAN'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@ANDREMAR/AutoPrereqs'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@ANDREMAR/PkgVersion'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@ANDREMAR/MetaConfig'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@ANDREMAR/MetaJSON'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@ANDREMAR/NextRelease'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@ANDREMAR/PodSyntaxTests'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@ANDREMAR/PodCoverageTests'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@ANDREMAR/Repository'
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@ANDREMAR/Test::ChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@ANDREMAR/Test::Compile'
+      version: 2.002
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@ANDREMAR/ReportVersions::Tiny'
+      version: 1.08
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@ANDREMAR/ContributorsFromGit'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@ANDREMAR/TestMoreWithSubtests'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@ANDREMAR/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@ANDREMAR/@Git/Check'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@ANDREMAR/@Git/Commit'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@ANDREMAR/@Git/Tag'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@ANDREMAR/@Git/Push'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@ANDREMAR/Git::NextVersion'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@ANDREMAR/GithubMeta'
+      version: 0.28
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300035
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300035
+x_contributors:
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'Pinnapong Silpsakulsuk <ping@abctech-thailand.com>'
+  - 'zdk <nx2zdk@gmail.com>'

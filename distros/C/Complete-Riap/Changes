@@ -1,0 +1,50 @@
+Revision history for Complete-Riap
+
+0.07    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21.
+
+        - [Removed] For more consistent user experience, remove per-function
+	  options ci/map_case/exp_im_path/dif_leaf, users are now encouraged to
+	  set these behaviors globally via Complete::Common.
+
+
+0.06    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.05    2015-03-07 (PERLANCAR)
+
+	- Default dig_leaf to 0 instead of Complete::OPT_DIG_LEAF to avoid
+	  slowness and error-proneness.
+
+
+0.04    2015-01-13 (PERLANCAR)
+
+	- Add option: dig_leaf.
+
+
+0.03    2015-01-13 (PERLANCAR)
+
+        - Add option: riap_client.
+
+        - [dist] Update prereq to a non-broken version of Complete::Path.
+
+
+0.02    2014-12-25 (PERLANCAR)
+
+	- Use Complete::Path, to avoid code duplication and gain feature
+	  like case-insensitive matching, map case, and expand immediate
+	  paths.
+
+	- Follow convention of Complete 0.06.
+
+
+0.01     2014-12-02 (PERLANCAR)
+
+         - First release.

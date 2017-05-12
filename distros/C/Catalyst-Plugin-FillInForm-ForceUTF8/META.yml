@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Catalyst-Plugin-FillInForm-ForceUTF8
+version:             0.02
+abstract:            Module abstract (<= 44 characters) goes here
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Catalyst:                      0
+    HTML::FillInForm::ForceUTF8:   0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Hideo Kimura (hide@hide-k.net)

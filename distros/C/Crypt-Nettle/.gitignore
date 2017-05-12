@@ -1,0 +1,8 @@
+*~
+Makefile
+Makefile.old
+Nettle.bs
+Nettle.c
+Nettle.o
+blib
+pm_to_blib

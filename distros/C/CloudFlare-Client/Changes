@@ -1,0 +1,118 @@
+Revision history for CloudFlare-Client
+
+v0.55.4   2016-03-26
+ - tweaks
+ - fix commit message
+ - test all the perls in Travis
+ - change weaver.ini to work with changes to Test::Synopsis
+
+v0.55.3   2015-05-01
+ - really fix auto tagging...
+
+v0.55.2   2015-04-30
+ - fix auto git tagging on release
+
+v0.55.1   2015-04-30
+ - switch to a V-string
+
+0.05_5    2015-04-27
+ - use docker containers in TravisCI
+ - update test targets in TravisCI
+ - start providing a cpanfile
+ - BREAKING: switch to AUTOLOAD dispatch with all arguments as a hash
+ - tidy code into my latest coding style
+ - no longer clean up pre-reqs list
+
+0.05_4    2015-02-07
+ - Change release tag format and travis stuff
+ - Test::RequiresInternet for upstream existence check
+ - Handle test dependencies better
+
+0.05_3    2015-02-06
+ - Optimise "feature" usages
+ - Add build branch
+ - JSON::Any is deprecated, use JSON::MaybeXS instead
+
+0.05_2    2015-02-05
+ - Drop auto date based prereq versions
+ - Add TravisCI testing
+ - Improve tests
+ - Make all POD weaved
+ - Rework dist.ini
+ - Remove vestigial bovine
+
+0.05_1    2015-02-03
+ - Bump to more modern Perl (5.16)
+ - Don't load unneeded dzil modules
+ - Use ::Git::GatherDir
+ - Move to GitHub
+ - Fix cpan testers failure
+ - bits and bobs
+ - Update repo info - git repo split
+
+0.04      2014-08-26
+ - Bump to stable
+
+0.03_9    2014-08-18
+ - Reinstate more liberal dep pruning
+ - Trim more cruft from pod
+ - Add homepage to meta
+ - Add no indirect 'fatal'
+ - Add git meta correctly
+
+0.03_8    2014-08-17
+ - Make upstream test an author test and remove guards
+ - Tidy imports
+ - Immutiblise
+
+0.03_7    2014-08-16
+ - Moo -> Moose because CPAN tests are still failing
+
+0.03_6    2014-08-15
+ - Moo::Lax -> Moo because CPAN tests are still failing
+
+0.03_5    2014-08-15
+ - Unloosen dependency removal to see if it stops CPAN tests exploding
+
+0.03_4    2014-08-14
+ - No longer depend on Test::Moose or Moose
+ - Use Moo::Lax in tests
+
+0.03_3    2014-08-13
+ - Loosen dependancy removal during builds to try and group more
+ - Require newer Type::Utils because of a bug
+ - Moo::Lax because we don't want fatal warnings
+
+0.03_2    2014-08-12
+ - Try to improve upstream test for CPAN testers
+ - Tidy code a bit
+ - Port to Moo
+ - Port to use Type::Tiny
+
+0.03_1    2014-08-08
+ - Fix some exception tests on older Mooses by actually escaping brackets in
+   regexes, should make Strawberry Perl happier
+ - Try harder to test for HTTPS connectivity when testing upstream existence
+   and make sure it is required for install
+ - Method::Signatures -> Kavorka
+ - Tidy distribution a bit
+
+0.03_0    2014-08-02
+ - Improve compatibility, in particular testing, for CPAN Testers
+ - Tidy code a bit
+
+0.03      2014-07-31
+ - Add a test for upstream connectivity that won't break on CPAN testers
+ - Perl requirement dropped to 5.014
+ - Tidy code and make it more robust
+ - Extensive testing of the API using Test::LWP::UserAgent
+ - Require at least one zone as an argument to zoneCheck
+ - Use Test::Exception rather than own stuff
+ - Get rid of upstream testing, they fail at CPAN Testers
+
+0.02      2014-07-16
+ - Fix issues that prevent CPAN indexing
+ - Package with Dist::Zilla
+
+0.01      2014-07-10
+ - First version, released on an unsuspecting world.

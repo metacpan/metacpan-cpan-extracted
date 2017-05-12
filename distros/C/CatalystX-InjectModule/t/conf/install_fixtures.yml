@@ -1,0 +1,19 @@
+name: Fixture
+
+CatalystX::InjectModule:
+  debug: 0
+  path:
+    - t/share/modules
+  inject:
+    - Fixture
+  persistent_dir: t/var/
+
+# - Database Model -
+Model::DBIC:
+  traits:
+    - FromMigration
+  extra_migration_args:
+    target_dir: ./t/share
+  schema_class: MyApp::Schema
+  install_if_needed:
+    default_fixture_sets:

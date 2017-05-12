@@ -1,0 +1,42 @@
+NAME
+    Catalyst::Helper::DBIC::DeploymentHandler - Create a
+    script/myapp_dbicdh.pl to help manage your DBIC deployments
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+    ./script/myapp_create.pl DBIC::DeploymentHandler
+
+DESCRIPTION
+    This is a Catalyst helper module that builds a
+    DBIx::Class::DeploymentHandler script for you.
+
+    VERY EARLY CODE: things may yet change, but shouldn't impact older
+    versions (unless you regenerate the script).
+
+TODO
+    Schemas not named MyApp::DB::Schema.
+
+    Determine the db type automatically
+
+SEE ALSO
+    DBIx::Class::DeploymentHandler, DBIx::Class,
+    DBIx::Class::DeploymentHandler::Manual::CatalystIntro
+
+CODE LINEAGE
+    While I put together this helper module, this code is largely based on
+    the information (and code) in
+    DBIx::Class::DeploymentHandler::Manual::CatalystIntro. Any errors are
+    mine.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

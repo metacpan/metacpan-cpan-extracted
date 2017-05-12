@@ -1,0 +1,8 @@
+2000-07-18 06:40  sreinst
+
+	* Alib/Alib.dsp (1.1), Alib/a.c (1.1), Alib/a.h (1.1),
+	Alib/Alib.dsw (1.1), App/App.dsp (1.1), App/App.dsw (1.1),
+	App/app.c (1.1), Blib/Blib.dsp (1.1), Blib/Blib.dsw (1.1), Blib/b.c
+	(1.1), Blib/b.h (1.1), Clib/c.c (1.1), Clib/Clib.dsp (1.1),
+	Clib/Clib.dsw (1.1), Clib/c.h (1.1): Initial revision
+

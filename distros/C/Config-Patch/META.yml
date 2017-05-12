@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Config-Patch
+version:            0.09
+abstract:           Patch configuration files and unpatch them later
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Log::Log4perl:  0
+    MIME::Base64:   0
+    Pod::Usage:     0
+    Set::IntSpan:   0
+resources:
+    repository:  http://github.com/mschilli/config-patch-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

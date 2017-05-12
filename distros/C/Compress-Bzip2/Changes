@@ -1,0 +1,195 @@
+Revision history for Perl extension Compress::Bzip2.
+
+2.00 Wed Apr 13 16:33:35 2005
+
+This is a complete re-write of Compress::Bzip2.  I left the in-memory
+compress routines much as is, compress and decompress.
+
+(re)created by h2xs 1.23 with options
+	-b 5.6.0 -n Compress::Bzip2 bzlib.h
+
+I wanted Compress::Zlib compatibility cause I have s/w that uses
+Compress::Zlib and I wanted an easy migration path, since bzlib gives
+about 20-30% better compression on ascii files than gzip.
+
+This is a 2.x release.  Since there was a change in authorship, I
+figured I should bump the major version number.  I could have easily
+given this a slightly different name.  Given the minimal functionality
+of version 1, that didn't seem like a useful thing to do.  Heck,
+version 1 doesn't even work with bzlib 1.x, you have to patch in the
+BZ2_ prefixes, so my guess is that Compress::Bzip2 isn't being used
+in a lot of places.
+
+2.01 Sat Apr 23 2005
+   - cleaned up for 64bit, HPUX PA-RISC 2.0W and itanium
+   - fleshed out the Compress::Zlib compatibility, added a
+     couple of tests for it.
+   - added bzip2, bunzip2 and bzcat, which act like the bzip
+     commands.
+   - added some compatibility for windows, can't test it out really
+   - added the bzlib library underneath
+   - changed the test suite so that it does not rely on bzip2
+     being installed.
+   - added a test to the Makefile.PL to determine whether or
+     not the internal Bzlib is necessary.
+
+2.02 Sat Apr 23 2005
+   - 2.01 rejected by PAUSE because the META.yml was invalid
+   - learned how to do "make dist"
+
+2.03 Sun Apr 24 2005
+   - didn't have config.in in the MANIFEST, the tarball was unbuildable.
+   - rewrote the INSTALL, README to give help on the config.in options
+     for locating your bzip2 installation.
+
+2.04 Mon Apr 25 2005
+   - tested different styles of builds.  confirmed some errors in the
+     Makefile.PL test for bzip2 that were pointed out by Sisyphus.
+   - Sisyphus reported some changes necessary for windows builds.  I
+     injected those changes into the code.  one of them, adding
+     aTHX_ to the call to PerlIO_binmode seems like a perl version
+     thing.
+   - added tests for internal_bzlib, copied from bzip2 1.0.2.
+
+2.05 Wed Apr 27 2005
+   - cleaned up the pod so it's more presentable online.
+   - win32 builds - the eye of the needle.  Sisyphus has been doing most of
+     the work.
+   - cater to win32 nmake - :: ok but $^ not
+   - cater to win32 dmake - :: bad but $^ ok
+   - cater to win32 - use File::Spec catfile and rel2abs all over the place
+   
+2.06 Fri Apr 29 2005
+   - build for bzip2.exe fine tuning for win32 nmake
+
+2.07 Sun May 1 2005
+   - bzlib-src/Makefile.PL had a stupid mistake in it that shows up for
+     win32 nmake.  I can't test that stuff out.  Plus, got some new
+     info from Sisyphus, so tossed my scribble and put in something
+     known to work.
+
+   - implemented Compress::Bzip2 1.03 compatibility layer to encompass
+     the post-1.00 development thread taken by Marco Carnut and David
+     Robins.  Made an effort to include the three .t test files asis.
+
+   - Why?  Cause I found that PerlIO::via::Bzip2, by Arjen Laarhoven,
+     is built on the streaming interface of 1.03.  From looking over
+     it, I gather it redirects a 1.03 compression/decompression stream
+     to/from a file.  It doesn't do the extra bit of fiddling with the
+     trailers to make the resultant file usable by the bzip2 commands.
+     Additionally, the 1.03 decompress stream doesn't handle the pause
+     when an embedded EOF marker is found, which is an issue for files
+     larger than the buffer size (900k by default).
+     
+     So, I figured it would be easy to provide a compatibility layer
+     for packages that use 1.03.  By using my stuff, the headers and
+     trailers would be automatically taken care of, as would the EOF
+     marker.  Something like PerlIO::via::Bzip2 would then
+     interoperate with bzip2 commands.  Sure, I think bzread and bzwrite
+     are better choices for file IO, but this is perl, right?  There has
+     to be at least 10 ways to do the same thing.
+
+2.08 Wed May 11 2005
+   - Sisyphus got the win32 nmake problem licked.  merging his stuff in.
+
+   - perldoc changes for bzip2 1.03 compatibility.
+
+   - got ownership of the module on cpan
+
+2.09 Tue Aug 9 2005
+   - change email addy
+
+   - patch for test 041-error.t, thanks to Dave Evans
+
+   - prototype error for bzwrite, limit variable was not optional, thanks
+     to Christian Drauch for pointing this out.
+
+2.10 2013-03-25 rurban
+   - updated bzlib-src from 1.0.2 to 1.0.6
+   - [cpan #82308] make breaks on 5.17.7 by schubiger
+   - [cpan #21961] update ppport.h
+   - [cpan #25002] memBzip() ignores level
+     keep using default 6, but honor optional level argument
+   - use -std=c89 on gcc compat compilers
+   - fix -Wimplicit-int warning for show_bzversion main()
+   - fix a couple if dangling else corner cases
+     format string errors, and unused variables.
+   - [cpan #82576] fix pod formatting errors
+   - [cpan #48128] support memBunzip BZh header w/o extra size prefix
+     and grow dest buf dynamically. Tests in t/040-memory.t
+   - [cpan #40741] fix bzreadline blocked on the broken bz2 files
+   - [cpan #84223] fix ignored bzinflateInit args
+   - [cpan #48124] Multiple issues with bzinflate
+     support PV ref as bzinflate() buffer arg as documented.
+     support status checks in chunked bzinflate() calls. t/060-inflate.t
+   - [cpan #49618] fix for win32 nmake + gcc
+   - fix t/041-error.t bzopen does not work with filehandles with 5.6,
+     global destruction of IO::Handle mixed up with a socket
+   - [cpan #36246] compress 0-byte srcfiles correctly. by Jeffrey Ratcliffe.
+     fixes debian bug 464205
+   - [cpan #28366] added testcase for double free or corruption on 32 bit, threaded
+     but could not repro it.
+
+2.11 2013-04-01 rurban
+   - [cpan #84239] Updated FSF address
+   - [cpan #68572] Workaround EUMM bug #84345 missing -R
+
+2.12 2013-04-01 rurban
+   - Fixed META.yml, added META records and SIGN, LICENSE, repository to Makefile.PL,
+     META.yml is now autogenerated
+   - added META and POD tests
+
+2.13 2013-04-01 rurban
+   - Fixed POD coverage
+
+2.14 2013-04-05 rurban
+   - Fixed solaris gcc issue [cpan #84432] by removing -std=c89
+
+2.15 2013-04-05 rurban
+   - Silence show_bzversion warnings with make test in t/lib.pl when -lbz2 is unusable.
+     ParseConfig is duplicated and not needed in t/lib.pl, but I'll leave it there.
+
+2.16 2013-06-18 rurban
+   - pod typo fixed by GH dsteinbrunner.
+
+2.17 2013-08-28 rurban
+   - Fixed license in README (thanks to John Peacock)
+
+2.18 2014-08-06 rurban
+   - [cpan #68572] add ccdlflags for show_bzversion missing -R also, similar to the
+     fix in 2.11. Not a EUMM bug.
+   - require constant 1.04 (since 5.8) to accept hashrefs.
+   - add META to MANIFEST
+
+2.19 2015-10-24 rurban
+   - fixed generated SIGNATURE (EUMM parallel make issue)
+
+2.20 2015-01-15 rurban
+   - Convert README to markdown, mention the preferred IO::Compress::Bzip2 in
+     the docs (done by Pattarawat Chormai, GH PR #2)
+
+2.21 2015-02-17 rurban
+   - Add leaktrace test
+   - Add .gitignore
+
+2.22 2015-02-17 rurban
+   - Fixed huge decompress memory leak, leaking every single XS outbut buffer.
+   - Better memory leak testcase with Memory::Dump, t/090-memory-usage.pl
+     (RT #102211 by Nick Koston)
+   - clarify docs that deflate = compress, inflate = uncompress
+
+2.23 2015-06-08 rurban
+   - HP-UX lddlflags fix by Merjin Brand (RT #105096)
+     "ld: Unrecognized argument: -Wl,-E"
+   - -Wformat fixes
+
+2.24 2015-12-08 rurban
+   - Silence gcc-5 optimizer warning (RT #105647)
+     with internal BUILD_BZLIB=1
+   - Improve kwalitee test
+
+2.25 2016-11-11 rurban
+   - Workaround EUMM 7.16 (RT #117800) by chorny
+
+2.26 2017-04-10 rurban
+   - . in @INC test fixes for perl5.26 (RT #121020)

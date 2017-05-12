@@ -1,0 +1,267 @@
+Revision history for Perl extension Class::DBI::Plugin::FilterOnClick.
+(Previously known as Class::DBI::Plugin::HTML)
+
+1.2
+    * Corrected issue with Makefile.PL format based on bug:
+    http://rt.cpan.org/Public/Bug/Display.html?id=33898
+
+1.1
+
+    * Corrected searchable feature with column name case issue (no longer case
+      sensitive)
+
+    + Added ability to group columns into sub tables within a cell while maintaining
+      ability to filter on value
+
+    + Added new method, add_link, to allow for grouping of columns as mentioned above
+
+    + Added configuration option, search_primary, to enable/disable search on
+      primary column - must be set to true (1) to search primary column
+      
+    + Added configuration option, search_exclude, allows for a list of columns
+      that should not be allowed to search on
+      
+    * Corrected error condition when run without a configuration file
+    
+    * Corrected issue with current page not properly being assigned in some cases
+    
+    + Added internal methods current_column and current_record to improve OO
+      consistency
+      
+    + Now passes the current record object as the fourth or third element in the
+      list of arguments for anonymous subs and FilterOnClickCustom feature
+
+    + Added FilterOnClickCustom columns feature. Allows you to add additional
+      columns that don't appear in the base table.  See documentation
+      
+    - Removed _value_link and replaced with add_link for internal use to create
+      hyperlinks
+      
+    + Added column_css_class method to allow assigning a different class to a
+      particular column
+      
+    + Added ability to remove filter on items selected from string_navigation
+      or search directly from the table rather then the string_navigation output
+      or "resetting" the table. NULL (empty) columns still require a reset to
+      remove the filter.
+      
+    * Refactored link creation
+
+    * Reworked module packaging to bring it inline with *modern* Perl modules
+    
+    * Removed several possible warnings when run with warnings enabled
+    
+    * Corrected issue with debug method not updating the current debug level
+      outside of the configuration file.
+
+    + Switched over to Class::DBI::Plugin::Pager (suggested by Emanuele Zeppieri)
+    
+    + Revised documentation on several items as well as grammar and spelling
+      mistake corrections
+
+1.0
+    * Offical name change to FilterOnClick vs. HTML
+    
+    * Method to create new object is now filteronclick vs. html. html has been
+      left and forwards requests to filteronclick, but html will be removed
+      in future releases
+      
+    * Changed the config module to Config::Magic to allow for more configuration
+      file types without modifying the underlying method.  This may result in
+      some issues based on how it sees a file. For example ini file entries that
+      end with = and value cause the Config::Magic reader to stop and present
+      only data read up to the = size.  To prevent premature termination comment
+      out any ini file line that ends with =
+    
+    - Removed the build_form functionality, with the availability of
+      Class::DBI::FormBuilder this modules functionality became too trivial
+      
+    o Module now focuses solely on the creation of HTML tables allowing for
+      data browsing using the FilterOnClick technology.
+    
+    + Added colorize method to allow for hightlighting of values matching
+      a regex in a particular column
+      
+    + Added the dependency of HTML::Strip to assist with the above addition
+    
+    + Added "field_to_column" to allow for setting both display column
+      (database fields) and the table column header names to use.
+    
+    + Added the dependency of Tie::Hash::Indexed for the above feature
+    
+    o Modified documentation to take into account changes to the name and
+      improvements in the table generation process
+      
+    + Streamlined the creation of new object by automatically calling several
+      of the required methods.  To utilize this change the -params argument
+      to filteronclick (formerly 'html') must be set.
+    
+    + Added ability to send params in at time of object creation
+    
+    o Modified create_order_by_links to populate an internal value and return
+      an array of the links in the order of the display columns
+      (or field_to_column depending on usage of the module)
+      
+    o Renamed column_to_label to field_to_column to better reflect its intent
+    
+    + Added the ability to include additional custom columns containing results
+      from other tables or resources. Additional items currently work off the
+      primary ID of the base class table. See documentation for details
+
+    + Default alignment of search fields to top
+
+    o Modified paging to not show last - first  when result set is less then or
+      equal the number of rows showing in the rendered table.
+      
+    + Added new method extend_query_string to allow for adding items to existing
+      query string (filters) when needed for special/pre-defined navigation
+      
+    o Modified test script to die work approriately even if DBD::SQLite2 isn't
+      installed
+
+.9
+    + Added color on mouseover for result rows
+   
+    + Added methods to define the following builtin FilterOnClick methods:
+        BEGINSWITH
+        ENDSWITH
+        CONTAINS
+        VARIANCEPERCENT
+        VARIANCENUMERICAL
+
+    + Added variances to the built in FilterOnClick items.
+      One for numerical variance and one for percentage
+      variance.
+     
+    o Modified the table for full (optional) support of style sheet
+      or bgcolor defined colors for rows.
+    
+    + Added orderby creation method, this method is likely
+      to change in future versions so use with caution
+    
+    + Added ability to make columns searchable
+   
+    + Added filter class option
+   
+    o Modified order by detection
+   
+    o Modified to allow users to pass in an existing where array ref
+   
+    o Modified warnings to be output only when debug is enabled
+   
+    + Added code to allow for searching for NULL and NOT NULL rows
+   
+    + Added ability to set most options via a configuration file
+   
+    o Extensive documentation changes
+   
+    + Increased automation of process
+   
+    o Realigned names of method and arguments for better consistency
+   
+    o Enchanced testing suite
+   
+    + Moved error handling to a method and allow for warn or print level
+      debugging based on the debug level.  Currently 1 or 2, with 1 = STDERR
+      and 2 = STDOUT
+   
+
+.8
+    - Correctly check for passed in column names in build_table
+      as an array ref
+     
+    ! Completely changed the interface.  Create your own object
+      that is a Class::DBI::Plugin::HTML object.  This provides
+      for setting of parameters in a safer OO way as well as
+      via arguments for each method.
+     
+    + Added alternate row background color, default is grey
+   
+    + Added accessor methods to set various attributes used
+      across several methods.  Not all items have an accessor.
+     
+    ! Renamed attributes that are passed to methods to match
+      the accessor methods that have been added.
+     
+    + Modified (most of) the documentation to reflect the changes
+      outlined above.
+     
+    + Added dependency on Class::DBI::Plugin::AbstractCount to
+      speed up the string_filter_navigation method
+     
+    + Added additional notes in pod to clarify a couple of
+      points
+     
+    + Added link to example web page: http://cdbi.gina.net/cdbitest.pl
+
+.7
+    o Implemented Class::DBI::Plugin as the base class instead
+      of Exporting the methods
+     
+    + named arguement for url query string to be:
+      -query_string across all methods
+   
+    + changed to -page_name from -script across all methods to
+      indicate which page (cgi script) is to be used in url
+      creation
+     
+    + added -form_tag_attributes to build_form methods allowed
+      attributes
+   
+    + added -hidden attributes to the build_form methods allowed
+      attributes
+     
+    o expanded the internal function '_value_link' to handle the
+      new BEGINSWITH ENDSWITH and CONTAINS filters.
+   
+    + added new method 'string_filter_navigation'
+   
+    + html_table_navigation now has three possible outputs
+       1) block (prev,next)
+       2) google (1,2,3..)
+       3) both block and google
+
+    + added new method form_select to generate HTML select form
+      elements
+     
+    + updated documentation to reflect additional methods and
+      method changes
+      
+.6
+    o Modified the build_table method to allow for multiple
+      scenarios regarding table records, giving more control
+      back to the end user with regard to return method.
+     
+    + Added new collasping/expanding table code. This modification 
+      allows for the dynamic navigation of records via a browser
+      based the content of specific fields.  See docs for more info
+     
+    o Cleaned up some of code for better order of operation and
+      to (reduce|increase) confusion.
+     
+    o Corrected some documenation errors and added additional
+      information to clarify some of the points.
+
+    - Removed url_and_where_statement method and created url_query
+      and search_ref in its place
+     
+    + Added url_query method - creates the query string of the URL
+      based on passed in parameters
+   
+    + Added search_ref method - creates generates the hash for the
+      AbstractSearch portion
+     
+    + Made the ONLY and LIKE filters built in tools and accesible
+      via assigning a value of "only" or "like" to a field name
+     
+    + Added a parameter to the  build_table, called 'script', used
+      to set the script name for links created by the built in link
+      feature
+     
+    + Added "FilterOnClick" title for dynamic filter process
+   
+    + Added SEE ALSO section to documentation
+     
+.5
+    - Initial release
+

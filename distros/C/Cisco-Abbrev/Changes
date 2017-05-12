@@ -1,0 +1,12 @@
+Revision history for Cisco-Abbrev
+
+0.03	2009-04-17
+	Added 'Eth' --> 'Ethernet' mapping.
+	Thanks to: Petya Kohts <kohts@yandex-team.ru>
+
+0.02	2009-01-16
+	Added support for "EOBC" virtual interface.
+
+0.01    2008-07-31
+        First version, released on an unsuspecting world.
+

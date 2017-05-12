@@ -1,0 +1,324 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Log::Report       'cpan-site', syntax => 'SHORT';
+use File::Basename    qw/basename/;
+use Getopt::Long      qw/GetOptions :config gnu_getopt/;
+use CPAN::Site::Index qw/cpan_index cpan_mirror/;
+
+# the server will redirect you to a mirror
+use constant CPAN_CORE => 'ftp://ftp.cpan.org/pub/CPAN';
+
+#
+# Collect options
+#
+
+my $lazy;
+my $mode        = 0;
+my $global_cpan = $ENV{CPANSITE_GLOBAL} || CPAN_CORE;
+my $mycpan      = $ENV{CPANSITE_LOCAL}  || $ENV{CPANSITE};
+my $stand_alone = 0;
+my $undefs      = 1;
+my $env_proxy   = 0;
+
+GetOptions
+    'cpan|c=s'   => \$global_cpan
+  , 'lazy|l!'    => \$lazy
+  , 'verbose|v+' => \$mode
+  , 'mode|m=s'   => \$mode
+  , 'site|s=s'   => \$mycpan
+  , 'stand-alone|a!' => \$stand_alone
+  , 'undefs|u!'  => \$undefs
+  , 'env-proxy!' => \$env_proxy
+    or exit 1;
+
+defined $lazy or $lazy = 1;
+
+dispatcher mode => $mode, 'ALL'
+    if $mode;
+
+my $action = shift;
+defined $action
+    or error __x"Missing action. Usage {program} [OPTIONS] ACTION"
+         , program => $0;
+
+if($action eq 'version')
+{   print "$CPAN::Site::Index::VERSION\n";
+    exit 0;
+}
+
+if($action eq 'index')
+{   $mycpan = shift @ARGV if @ARGV;
+    $mycpan
+        or error __x"specify top-directory of your archive as argument";
+
+    $mycpan    =~ s!^file:(?://)?!!;
+    -d $mycpan
+        or fault __x"archive directory '{dir}'", dir => $mycpan;
+
+    cpan_index $mycpan, $global_cpan
+      , lazy      => $lazy
+      , fallback  => !$stand_alone
+      , undefs    => $undefs
+      , env_proxy => $env_proxy;
+    exit 0;
+}
+
+if($action eq 'mirror')
+{   $mycpan
+        or error __x"set CPANSITE_LOCAL in environment or use --site option";
+
+    @ARGV
+        or error __x"list of module names expected";
+
+    cpan_mirror $mycpan, $global_cpan, \@ARGV, env_proxy => $env_proxy;
+    exit 0;
+}
+
+error __x"action '{name}' does not exist (anymore)", name => $action;
+
+__END__
+
+=head1 NAME
+
+cpansite -- extend CPAN with private packages
+
+=head1 SYNOPSIS
+
+ cpansite version
+ cpansite [OPTIONS] index
+ cpansite [OPTIONS] mirror PACKAGE
+
+  OPTIONS:                                      via %ENV:
+    --verbose  -v -vv -vvv --mode=DEBUG
+    --no-lazy       redo everything
+    --cpan <url>    some CPAN mirror            CPANSITE_GLOBAL
+    --env-proxy     read additional proxy settings
+    --site <dir>    local archive directory     CPANSITE_LOCAL
+    --stand-alone   no fallback to global CPAN
+    --no-undefs     do not include "undef" versions in index
+
+=head1 DESCRIPTION
+
+B<WARNING: A lot has changed with the 1.01 release.  Please read more
+about these changes in the file "explain_101.txt" included in the
+distribution.>
+
+The C<cpansite> script is used to create your own CPAN server. The
+logic is implemented in L<CPAN::Site::Index> which you may use directly.
+You only need to install this module on one server in your network.
+
+There are two kinds of local CPANs which can be constructed with this
+software:
+
+=over 4
+
+=item 1. local CPAN with fallback to the global CPAN
+
+When you generate a new index for your local set-up, the default
+behavior is to merge that knowledge with the global CPAN. When you
+install a module on a client, it will first attempt to fetch it from
+your own set-up. If not found, it will automatically continue to
+look at the global CPAN.
+
+=item 2. pure local CPAN, without fallback
+
+When you choose to generate the index without fallback, the installation
+of a module will fail when you do not have a local copy of the module
+in your set-up. You can use the C<mirror> action to collect the latest
+version of a module into your own structure.
+
+=back
+
+=head2 Indexing options
+
+The following options are available with all actions:
+
+=over 4
+
+=item --verbose -v -vv -vvv --mode=DEBUG
+
+Produce verbose output via L<Log::Report>.
+
+=item --site <dir>  or  -s <dir>  or   $CPANSITE_LOCAL
+
+The location of your local CPAN archive set-up.
+
+Example:
+
+  export CPANSITE_LOCAL="/www/websites/cpan.example.com"
+  cpansite index
+
+  cpansite --site $CPANSITE_LOCAL index  # alternative
+
+=item --cpan <url>  or  -c <url>  or   $CPANSITE_GLOBAL
+
+Update the list of "real" CPAN modules regularly (daily or more) from
+this url. By default, C<ftp:///ftp.cpan.org> is addressed which
+redirects to a server close to you.
+
+=item --env-proxy
+
+Let L<LWP::UserAgent> read the proxy settings from environment variables.
+See the according method in that manual page.
+
+=item --stand-alone or  -a
+
+The "real" CPAN list is not included.  For instance, if you have
+downloaded all the releases from CPAN that you need, and you do not want
+unexpected extra downloads.  The downloaded versions will prevail over
+newer releases on CPAN, but you may download modules from the core CPAN
+that you do not expect.
+
+=item --no-lazy     or --lazy  or   -l
+
+Try to avoid redo-ing everything.  By default, the indexer is
+lazy: it will process only new distributions.  When not lazy, all
+distributions on the local disk are processed and a new table is
+created.  The default of this option was reversed with release 1.00
+of C<CPAN::Site>.
+
+=item --no-undefs   or --undefs or -u
+
+Whether to include package names with "undef" version in the packages
+list. Those packages cannot be used for dependencies, so are hardly
+useful but included by default.
+
+=back
+
+=head1 DETAILS
+
+=head2 Configuring the Clients
+
+To get in touch with your own cpan archive, you have to explicitly provide
+an url to it.  Add this to your C<CPAN.pm> configuration file (usually
+F<~/.cpan/CPAN/MyConfig.pm>) option C<urllist>.  B<There is no need to
+install the CPAN::Site software on your clients since release 1.01>.
+
+You probably also want to set the variable C<index_expire> to very short:
+the clients need to reload your local index as soon as possible, and not
+wait a day; just after your new local release is put in your local index,
+it must get visible to your client.
+
+You may also consider to have the CPAN install cache to be cleaned
+by the system.  Certainly when you set the cache size larger (required
+for more complex recursive installations) it is nice to have it removed
+after a (short) while.  Set C<keep_source_where> to a temporary
+directory.
+
+Example for  F<~/.cpan/CPAN/MyConfig.pm>
+
+ $CPAN::Config =
+  { ...
+  , index_expire      => 1/600     # 5 minutes
+  , urllist => [ $MYCPAN_URL, $BIGCPAN_MIRROR ]
+  , keep_source_where => '/tmp/cpan-cache'
+  , build_cache       => 100       # MegaByte cache
+  , ...
+  };
+
+To avoid manually editing the CPAN config file one can also set the
+MYCPAN_URL from the shell:
+
+  cpan> o conf urllist unshift $MYCPAN_URL
+  cpan> o conf index_expire 0.001  # 86 seconds
+  cpan> o conf commit
+
+=head2 Configuring the Server
+
+=head3 Starting your own CPAN
+
+You have to have a ftp or http server running. Create a directory
+where you will distribute the data from, here named C<$MYCPAN>.
+With a web-server, it is adviced to create a virtual host like
+C<cpan.example.com> which has C<$MYCPAN> as DocumentRoot.
+
+Define a fake pause-id (here the demo is MYID), because if you use
+an existing pause-id you clients will start producing warnings about
+missing checksums on files retreived for the public archive.
+
+  MYMODS=$MYCPAN/authors/id/M/MY/MYID
+  mkdir -p $MYMODS
+
+Although CPAN.pm claims to support a directory format of
+C<$MYCPAN/authors/id/MYID>, experience shows that this does not
+work correctly with some recursively dependencies.
+
+=head3 Adding your own modules to the local archive
+
+Put your own modules in C<$MYMODS> and then rerun the indexer.
+
+  mv MyDist-1.00-tar.gz $MYMODS   # local
+  scp MyDist-1.00-tar.gz cpan.example.com:$MYMODS
+
+=head3 Generating an index with fallback
+
+Your own software probably depends on a lot of modules which are
+found on the global CPAN.  And those modules require even more
+modules from CPAN.  By default, your local CPAN index will know
+about all modules which you have yourself plus all module on
+the global CPAN.
+
+The index only contains the last (highest) version of each file
+(which means that each file must contain a version number otherwise the
+text C<undef> is used for version)  In any case, the local packages get
+preference over the global CPAN packages, even when they have a lower
+version number.
+
+With fallback:
+
+ cpansite --site $MYCPAN index
+ cpansite index    # when   CPANSITE_LOCAL=$MYCPAN
+
+The script traverses I<$MYCPAN>F</authors/id> and merges this with the
+I<$MYCPAN>F</global/02packages.details.txt.gz> data, a copy from the
+original CPAN.  It creates a C<CHECKSUMS> file.  The result is a private
+I<$MYCPAN>F</modules/02packages.details.txt.gz> file.
+
+The files F<$MYCPAN/authors/01mailrc.txt.gz> and
+F<$MYCPAN/modules/03modlist.data.gz> are downloaded from CPAN.  This
+will reduce the number of failing retreivals when you start installing
+software.
+
+B<Be warned:> the indexing scans the archive for the same VERSION
+patterns as pause does: do not make too complex expressions in
+those program lines. Only pm files are indexed, not other files,
+like scripts (pl files).
+
+=head3 Generating an index without fallback
+
+When you wish for a controled environment, where all your systems
+run the same versions of the modules, you should disable the fallback
+to the global CPAN.
+
+Without fallback:
+
+ cpansite --site $MYCPAN --stand-alone index
+ cpansite --stand-alone index    # when   CPANSITE_LOCAL=$MYCPAN
+
+The index is now very small.  But when you start installing your software
+on systems, it will start complaining that the module cannot be found on
+CPAN.  Now, add specific distribution versions from the global CPAN to
+your own archive.  See next section.
+
+=head3 Adding distributions from global CPAN to your own
+
+When you want a fixed distribution version to be used on your systems,
+you can manually download them and insert them in the C<$MYCPAN> tree.
+
+However, there is also a simple way to retrieve the most recent version.
+The next example shows how to insert the latest versions of the
+distributions which include the packages Mail::Box and Test::More into
+your local CPAN archive.
+
+ cpansite --site $MYCPAN --cpan $GLOBAL mirror Mail::Box Test::More
+
+ # when CPANSITE_LOCAL=$MYCPAN and CPANSITE_GLOBAL=$GLOBAL
+ cpansite mirror Mail::Box Test::More
+
+=head1 AUTHORS
+
+Mark Overmeer E<lt>perl@overmeer.netE<gt>.
+
+=cut

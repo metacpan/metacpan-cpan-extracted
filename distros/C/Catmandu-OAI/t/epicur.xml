@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epicur xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance#"
+        xmlns="urn:nbn:de:1111-2004033116"
+        xsi:schemaLocation="urn:nbn:de:1111-2004033116 http://www.persistent-identifier.de/xepicur/version1.0/xepicur.xsd" >
+  <administrative_data>
+    <delivery>
+      <update_status type="urn_new"></update_status>
+    </delivery>
+  </administrative_data>
+  <record>
+    <identifier scheme="urn:nbn:de">urn:nbn:de:bsz:16-ip-164907</identifier>
+    <resource>
+      <identifier scheme="url" type="frontpage" role="primary">https://journals.ub.uni-heidelberg.de/index.php/ip/article/view/16490/12358</identifier>
+      <format scheme="imt">text/html</format>
+    </resource>
+    <resource>
+      <identifier scheme="url">https://journals.ub.uni-heidelberg.de/index.php/ip/article/download/16490/12358</identifier>
+      <format scheme="imt">application/pdf</format>
+    </resource>
+  </record>
+</epicur> 

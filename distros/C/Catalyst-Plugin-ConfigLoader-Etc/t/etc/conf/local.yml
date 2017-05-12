@@ -1,0 +1,9 @@
+---
+name: The Test LOCAL
+scalar: meh local
+array:
+    - boooo
+    - beeee
+    - barrr
+hash:
+    xx: yyay

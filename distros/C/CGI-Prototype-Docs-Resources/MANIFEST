@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Prototype-Docs-Resources.t
+lib/CGI/Prototype/Docs/Resources.pm
+META.yml                                 Module meta-data (added by MakeMaker)

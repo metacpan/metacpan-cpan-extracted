@@ -1,0 +1,4 @@
+
+This dummy file exists for testing purposes.  It should be ignored by CLIF
+when loading commands and subcommands.
+

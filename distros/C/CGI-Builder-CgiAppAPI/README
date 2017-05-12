@@ -1,0 +1,35 @@
+CGI-Builder-CgiAppAPI README File
+=================================
+
+
+Description
+-----------
+
+This module supplies an API compatible with the old CGI::Application or CGI::Application::Plus APIs. It transparently provides all the aliases, defaults and method redefinition to make the old cgiapps work unchanged under CBF as well.
+    
+Installation
+------------
+
+0.  Prerequisites:
+    - CGI::Builder >= 1.3
+
+1. CPAN installation
+
+    perl -MCPAN -e 'install CGI::Builder::CgiAppAPI'
+
+If you want to install all the extensions and prerequisites of the CBF, all in one easy step:
+
+    perl -MCPAN -e 'install Bundle::CGI::Builder::Complete'
+
+2. Standard installation
+- from the directory where this file is located, type:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+--
+Domizio Demichelis perl.4pro.net
+2004-02-18

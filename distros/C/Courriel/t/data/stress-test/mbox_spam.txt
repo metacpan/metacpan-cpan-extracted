@@ -1,0 +1,106 @@
+From sjoeboo@sjoeboo.com Mon Mar 14 13:26:03 2005
+Received: from h000f66a433cb.ne.client2.attbi.com ([24.131.189.6]
+        helo=skywalker.sjoeboo.com)
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1DAvCV-0007YK-OO
+        for ubuntu-users@lists.ubuntu.com; Mon, 14 Mar 2005 13:26:03 -0600
+Received: (qmail 20416 invoked by uid 1010); 14 Mar 2005 14:13:00 -0500
+Received: from 127.0.0.1 by skywalker (envelope-from <sjoeboo@sjoeboo.com>,
+        uid 1008) with qmail-scanner-1.24-st-qms
+        (clamdscan: 0.80/533. spamassassin: 3.0.1. perlscan: 1.24-st-qms.
+        Clear:RC:1(127.0.0.1):.
+        Processed in 0.110415 secs); 14 Mar 2005 19:13:00 -0000
+X-Antivirus-sjoeboo.com-Mail-From: sjoeboo@sjoeboo.com via skywalker
+X-Antivirus-sjoeboo.com: 1.24-st-qms (Clear:RC:1(127.0.0.1):. Processed in
+        0.110415 secs Process 20409)
+Received: from localhost (sjoeboo@sjoeboo.com@127.0.0.1)
+        by skywalker.sjoeboo.com with AES256-SHA encrypted SMTP;
+        14 Mar 2005 14:12:59 -0500
+Date: Mon, 14 Mar 2005 14:12:59 -0500
+To: Ubuntu Help and User Discussions <ubuntu-users@lists.ubuntu.com>
+J-From: <k8kk8.@.com>
+Message-ID: <20050314191259.GA20344@skywalker.sjoeboo.com>
+J-Message-ID: <199909112127.RAA14812@hub.org>
+References: <4235E1AA.2060906@themauvezone.fsnet.co.uk>
+Mime-Version: 1.0
+J-JNN-Skip: 1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
+Content-Disposition: inline
+In-Reply-To: <4235E1AA.2060906@themauvezone.fsnet.co.uk>
+User-Agent: Mutt/1.5.6+20040907i
+#J-Subject: Re: dependency fun
+#Subject: returned mail: user unknown def
+#JT-Subject: Eliminate Travel Expenses!
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: Ubuntu Help and User Discussions <ubuntu-users@lists.ubuntu.com>
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Mon, 14 Mar 2005 19:26:04 -0000
+
+
+--qMm9M+Fa2AknHoGS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+try apt-get install libstdc++6 libstdc++6-dev
+
+is in universe i do belive. those should resolve those dependancies for
+you.=20
+
+another hint is to try doing searchs via teh command line. synaptic by
+default searches package names, where as an 'apt-cache search' in teh
+command line does much much more.
+
+hope that helped
+
+On Mon, Mar 14, 2005 at 07:10:34PM +0000, baza wrote:
+> I'm trying to get the Targetware flight sim working, but am having=20
+> dependency fun and keep getting this error
+>=20
+>=20
+>=20
+>=20
+> baza@barbelith:~/Desktop/targetware$ ./targetware
+> ./targetware: error while loading shared libraries:=20
+> libstdc++-libc6.2-2.so.3: cannot open shared object file: No such file=20
+> or directory
+> baza@barbelith:~/Desktop/targetware$
+>=20
+> I can't find the above libs in synaptic, any help??
+>=20
+> Baza
+>=20
+>=20
+> --=20
+> ubuntu-users mailing list
+> ubuntu-users@lists.ubuntu.com
+> http://lists.ubuntu.com/mailman/listinfo/ubuntu-users
+
+--=20
+Mat Nicholson
+
+
+--qMm9M+Fa2AknHoGS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFCNeI7pXZHtNxjH8MRAvs5AKCNoss3KWrtqFSFmfH/6WDR667SBgCfQUy6
+kwkc2Yru32mcyHIPYL9knj0=
+=lozH
+-----END PGP SIGNATURE-----
+
+--qMm9M+Fa2AknHoGS--

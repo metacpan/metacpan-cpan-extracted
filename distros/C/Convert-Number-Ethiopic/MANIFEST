@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/numbers.pl
+lib/Convert/Number/Ethiopic.pm
+t/numbers.t

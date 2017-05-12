@@ -1,0 +1,30 @@
+yar:
+  param1:
+    underlay:
+      - { var: moo.param6_A }
+      - { include: yar_A.yml }
+      - param1_4: "yar:${jar.param6.param6_2.0}"
+        param1_5: "yar:val1_5"
+    param1_6: "yar:${jar.param1}"
+    param1_7: "yar:val1_7"
+    overlay:
+      - { var: moo.param5 }
+      - { var: moo.param4_A }
+      - param1_8: "yar:${jar.param2}"
+        param1_9: "yar:val1_9"
+
+  param2:
+    underlay:
+      - { include: yar_B.yml }
+      - { include: yar_C.yml }
+
+    param2_3:
+      underlay:   { var: yar.param2.param2_1 }
+      param2_3_3: "yar:val2_3_3"
+      param2_3_4: "yar:val2_3_4"
+
+    param2_4:
+      underlay:   { var: yar.param2.param2_2 }
+      param2_4_3: "yar:val2_4_3"
+      param2_4_4: "yar:val2_4_4"
+

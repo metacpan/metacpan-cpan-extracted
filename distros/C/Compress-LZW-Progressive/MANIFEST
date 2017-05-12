@@ -1,0 +1,14 @@
+Build.PL
+Makefile.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/Compress/LZW/Progressive.pm
+lib/Compress/LZW/Progressive/Dict.pm
+t/0-signature.t
+t/1-dict.t
+t/2-test.t
+t/3-wide.t
+SIGNATURE    Added here by Module::Build

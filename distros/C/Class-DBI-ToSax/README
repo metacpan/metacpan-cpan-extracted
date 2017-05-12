@@ -1,0 +1,33 @@
+Class::DBI::ToSax
+=================
+
+This module provides a direct-to-XML facility for Class::DBI objects.
+It is used as part of a SAX pipeline.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  NEXT (any version)
+  Class::Data::Inheritable (any version)
+  Class::Accessor (any version)
+  XML::SAX::Writer (any version)
+
+XML::SAX::Writer is only required for the tests, but most users of this
+module will end up using it, I feel.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) semantico
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

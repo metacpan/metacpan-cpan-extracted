@@ -1,0 +1,44 @@
+CPAN::AutoINC version 0.01
+==========================
+
+CPAN::AutoINC is a only slightly useful tool designed to streamline
+the process of installing all of the modules required by a script.  By
+loading the CPAN::AutoINC module (usually via a "-MCPAN::AutoINC"
+command-line option), the user is registering a handler that will
+catch any attempt to use a module that does not exist on the local
+machine.  In this case, the CPAN::Shell module will be invoked to
+search for the specified module and, if found, an attempt will be made
+to install the module.  If successful, the module will be loaded and
+execution will continue as normal.
+
+For example:
+
+perl -MCPAN::AutoINC -MLingua::Num2Word=cardinal -le 'print cardinal("en", 42)'
+...will download and install Lingua::Num2Word and then Lingua::EN::Num2Word.
+
+perl -MCPAN::AutoINC -MLingua::Num2Word=cardinal -le 'print cardinal("de", 42)'
+...will then download and install Lingua::DE::Num2Word.
+
+perl -MCPAN::AutoINC -MLingua::Num2Word=cardinal -le 'print cardinal("es", 42)'
+...will then download and install Lingua::ES::Numeros (Spanish).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires a modern version of CPAN.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Don Schwarz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

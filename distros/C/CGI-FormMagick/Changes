@@ -1,0 +1,274 @@
+Revision history for Perl extension FormMagick.
+0.88
+----
+* License clarification on all files. FormMagick is licensed under the
+  same terms as perl itself.
+* Trim blank space around lexicon entries
+* Textarea fields can now have "rows" and "cols" arguments instead of size
+  and generate proper HTML
+* UI changes to make using CSS easier
+* Improved email address parsing using Mail::RFC822::Address module
+* Security fix: force use of session dir for tokens, don't pass full path
+
+0.87
+----
+An HTML error (missing > symbol) was making the script print only the
+first error message if a field was failing more than one validation.
+
+0.86
+----
+Nothing user-visible.
+There is now a get_validation_attribute routine in Validator.pm to help
+me with a subclass we're using at e-smith.
+
+0.85
+----
+Fixed bug with charsets when displaying values in text fields.  It's a
+long story.  Ugh.
+
+0.84
+----
+Fixed insidious, nasty little display bug that caused certain form
+elements to show weird character sets.  Bleh.
+
+0.83
+----
+Various minor bugfixes.  See CVS.  I'm in a hurry.
+
+0.82
+----
+Fixed up various warnings that were thrown to the httpd error log.
+
+Templated form headers/footers are now untainted automatically.  Note 
+that this could be considered a security problem; suggestions on how to
+handle it more securely would be welcomed.  (See the parse_template
+routine in CGI::FormMagick::Utils if you're interested.)
+
+0.81
+----
+Now fails more gracefully on XML errors, dumping the XML to a file in
+/tmp as a side effect
+
+You can now specify the default XML character set encoding as an
+argument to new() (defaults to undef).  In future versions this should
+be changed to work on a per-lexicon basis, but for now we will use this
+stopgap measure.
+
+Fixed a bug which was causing fallback_language not to work.
+
+0.80
+----
+Langtags are now smashed to lowercase throughout.
+
+0.79
+----
+Added lexicon params, for variable interpolation in l10n'd strings.
+
+0.78
+----
+Added "literal" field type.
+
+0.77
+----
+Added accessor method $fm->cgi()
+
+Added convenience function $fm->wherenext() to set the magic wherenext
+variable for skipping pages etc.
+
+0.75
+----
+
+Support for language dialects.  L10N for something like en-US will now
+work.
+
+Some minor documentation patches.
+
+Fixed some weirdness with validate_field() so that its return values can
+be successfully L10N'd.
+
+0.70
+----
+
+URLs generated for form submission, start over link, etc, are now
+relative.
+
+The following things, which have always run a subroutine if the input
+contained parens, eg foo(), now also accept arguments to those
+subroutines, eg foo("bar", "baz"):
+
+    Form pre/post events
+    Page pre/post events
+    Field values
+    Subroutine elements
+
+Multiple lexicons for the same language are now merged, with the later
+entries overwriting the former.
+
+You can now set a fallback language for localisation, using the
+fallback_language() method.
+
+0.60
+----
+
+WARNING: BREAKS BACKWARDS COMPATIBILITY AGAIN.  LOTS.
+
+Changed all XML elements and attributes, and parameters to new(), to
+lower case.  For instance, <FORM...> is now <form...>
+
+All external routines called by FM, including pre- and post-events and
+validation routines, now have the FormMagick object passed to them as
+their first parameter.  This will break any existing validation, 
+pre/post routines, etc.
+
+Fixed a small bug where field values of "0" would not be preserved.
+
+Documentation fixes.
+
+0.55
+----
+
+MAJOR CHANGES, WARNING WARNING AWOOGA AWOOGA.  THIS RELEASE BREAKS
+BACKWARDS COMPATIBILITY LOTS.
+
+Added HTML and SUBROUTINE elements to allow arbitrary stuff in your
+forms.
+
+Added LEXICON element so that l10n now happens right in your XML.
+Removed all Locale::Maketext stuff.
+
+OPTIONS which are hashes (either from a subroutine or static) now sort
+by value rather than key.
+
+CHECKBOX values now default to "1" if you don't set them, and retain
+their state when navigating back and forth.
+
+Added validation routine(s):
+    Network         mac_address()
+
+Improved taint-friendliness.
+
+0.50
+----
+
+Various code cleanups.
+
+Added experimental file upload support.
+
+Changed email() validation routine to email_simple()
+
+OO interface to previousbutton() and friends
+
+More taint-friendly
+
+Starting to deprecate Locale::Maketext in favour of XML-based lexicons
+
+0.49
+----
+
+New numbering scheme (CPAN-friendly).
+
+Lots of internal fixes, shouldn't be visible to users.
+
+Lots of stuff has been moved out to sub-modules such as
+CGI::FormMagick::Setup etc.  Most of this should be irrelevant and
+invisible to users.
+
+One visible bugfix: there were problems with i18n and the "Next" button
+because we were looking for the literal string "Next".  This has been
+fixed.
+
+0.4.1
+-----
+Fixed a small bug which caused SELECT MULTIPLE fields with no SIZE to
+have their size default to only showing one item.
+
+0.4.0
+-----
+Error messages now appear near the fields to which they apply, and can
+be prettified using the "error" class in a cascading style sheet.
+
+A new parameter to the new() method, SESSIONDIR, allows the user to
+specify where they want their session-handling tokens to be put.
+
+The parameters PREVIOUSBUTTON, RESETBUTTON and STARTOVERLINK, when given
+to new(), allow you to switch off these buttons/links.  They default to
+being on.
+
+New validation routines now working:
+	password()
+	credit_card_number()
+	credit_card_expiry()
+
+Validation module no longer requires Business::CreditCard
+
+Major reworking and bug-fixing of the flow between pages when clicking
+Next/Previous/etc, including passing round a stack of all previous pages
+visited.
+
+Fixes to validation, including stuff that allows you to validate stuff
+by hand if you want.
+
+SELECT MULTIPLE is now supported.
+
+SIZE is now supported for TEXT and SELECT form elements.
+
+0.3.1
+-----
+Added stub L10N perl modules for every language in iso639.  This means
+that add_lexicon() now works for *any* real language.
+
+Added some tools to assist developers in generating L10N translations.
+
+A couple of very small bugfixes.
+
+0.3.0
+-----
+Renamed to CGI::FormMagick
+
+Changes to DTD:
+Optional CHECKED attribute on FIELD
+
+Validation changes:
+user-supplied routines now work
+much improved docco
+
+Other changes:
+You can now use TYPE => "STRING" as well as "FILE"
+RADIO buttons now implemented
+CHECKBOX now implemented
+
+0.2.9
+-----
+Made FormMagick CPAN-friendly.
+
+Changes to DTD:
+NAME attriute on PAGE element is now required
+optional DESCRIPTION attribute for PAGE and FIELD elements
+
+Validation changes:
+domain_name routine now works
+
+L10N changes:
+You can now add items to the lexicon with the add_lexicon method
+
+Debugging:
+Adding DEBUG => 1 to your new() call will turn debugging on
+You can use debug messages yourself with $fm->debug($message)
+
+Look and feel:
+You can now put DESCRIPTION attributes on your pages and/or fields, and
+   they'll show up nicely output in the HTML.
+Most parts of the form now have CSS "label" attriutes so you can
+   change the look and feel of your FormMagick apps
+
+Other functionality changes:
+Page pre/post events now work
+Form post events now work
+You can use form post events to "branch" to a page other than the
+   next one in line by setting $cgi's "wherenext" param
+when calling the new() method, TYPE now defaults to "file" and SOURCE
+   to the same filename as your script but with a .xml extension
+
+Examples:
+A worked example of collecting email retrieval options for the e-smith
+server and gateway system is included in examples/e-smith/

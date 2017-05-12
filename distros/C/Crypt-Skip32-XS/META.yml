@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Crypt-Skip32-XS
+version:            0.06
+abstract:           Drop-in replacement for Crypt::Skip32
+author:
+    - gray <gray@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+resources:
+    repository:  http://github.com/gray/crypt-skip32-xs
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

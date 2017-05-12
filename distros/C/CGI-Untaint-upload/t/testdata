@@ -1,0 +1,18 @@
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="test"
+
+hello
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="filetest"; filename="mynat"
+
+#!/bin/sh
+natd -dynamic -interface en0
+ipfw -f flush
+ipfw add divert natd all from any to any via en0
+ipfw add pass all from any to any
+
+------------0xKhTmLbOuNdArY
+Content-Disposition: form-data; name="foo"
+
+world
+------------0xKhTmLbOuNdArY--

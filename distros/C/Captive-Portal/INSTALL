@@ -1,0 +1,51 @@
+==============================================
+ INSTALLATION instructions for Captive-Portal
+==============================================
+
+
+To install this Web-App, run the following commands:
+
+	perl Build.PL [--install_base=/usr/local/capo]
+	./Build
+	./Build test
+	./Build install [--verbose]
+	
+NOTICE: /usr/local/capo is the default installation base.
+
+NOTICE: files in directories named 'local' are not overridden, please
+        put your local changes like configs, templates and static html files
+        into the according local directories.
+
+        The search order for config files is:
+	 $ENV{CAPTIVE_PORTAL_CONFIG} -> $Bin/../etc/local/... -> $Bin/../etc/...
+
+        The TEMPLATE search order is:
+          $Bin/../templates/local/ -> $bin/../templates/orig/
+
+==================================
+ CONFIGURATION after INSTALLATION
+==================================
+
+- You must adjust the configuration file to your local situation!
+
+- Don't forget to change the secrets of the admin user and the shared
+  secret for RADIUS authentication!
+
+- The default $SESSIONS_DIR is set to '/var/cache/capo'
+  You must create the $SESSIONS_DIR directory and YOUR_WWW_USER (e.g. "wwwrun")
+  must be the owner of this directory with write permissions!
+
+- Captive::Portal needs access to iptables and ipset to change the
+  firewall-rules on request.
+
+  In order to use ipset and iptables from the unprivileged "wwwrun" user,
+  we at ulm university add file capabilities to these executables.
+
+   setcap "CAP_NET_ADMIN+pe"                 /usr/sbin/ipset
+   setcap "CAP_NET_RAW+pe CAP_NET_ADMIN+pe"  /usr/sbin/iptables
+
+  in addition we allow execution only from the wwwrun user
+
+    chown wwwrun /usr/sbin/ipset /usr/sbin/iptables
+    chmod 500    /usr/sbin/ipset /usr/sbin/iptables 
+

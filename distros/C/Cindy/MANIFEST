@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Cindy.t
+lib/Cindy.pm
+lib/Cindy/Action.pm
+lib/Cindy/Injection.pm
+lib/Cindy/Log.pm
+lib/Cindy/Profile.pm
+lib/Cindy/CJSGrammar.rdc
+lib/Cindy/CJSGrammar.pm
+lib/Cindy/Sheet.pm
+lib/Cindy/XPathContext.pm
+lib/Cindy/Log/Default.pm
+examples/cindy.cjs
+examples/cindy.html
+examples/cindy.xml
+examples/css.cjs
+examples/css.html
+examples/css.xml
+scripts/cindy
+META.yml                                 Module meta-data (added by MakeMaker)

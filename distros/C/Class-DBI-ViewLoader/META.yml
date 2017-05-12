@@ -1,0 +1,34 @@
+---
+abstract: 'Load views from existing databases as Class::DBI'
+author:
+  - 'Matt Lawrence E<lt>mattlaw@cpan.orgE<gt>'
+build_requires:
+  DBD::Mock: '0.22'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-DBI-ViewLoader
+provides:
+  Class::DBI::ViewLoader:
+    file: lib/Class/DBI/ViewLoader.pm
+    version: '0.06'
+  Class::DBI::ViewLoader::Auto:
+    file: lib/Class/DBI/ViewLoader/Auto.pm
+    version: '0.01'
+recommends:
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+requires:
+  Class::DBI: '0'
+  DBI: '1.43'
+  Module::Pluggable: '0'
+  version: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.06'

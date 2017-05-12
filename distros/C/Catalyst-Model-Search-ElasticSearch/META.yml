@@ -1,0 +1,26 @@
+---
+abstract: 'A simple Catalyst model to interface with Search::Elasticsearch'
+author:
+  - 'Devin Austin <dhoss@cpan.org>'
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  Test::More: '0.90'
+  Test::Requires: '0.06'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Model-Search-ElasticSearch
+requires:
+  Catalyst: '0'
+  Moose: '0'
+  Search::Elasticsearch: '0'
+resources:
+  Mailing_list: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+  homepage: https://github.com/dhoss/catalyst-model-search-elasticsearch
+  repository: git://github.com/dhoss/catalyst-model-search-elasticsearch.git
+version: '1.142550'

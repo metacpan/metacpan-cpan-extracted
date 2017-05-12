@@ -1,0 +1,5 @@
+% my $p = shift;
+0.0.0 <%= "$p->{date}  $p->{fullName} ($p->{email})" %>
+
+- started project
+

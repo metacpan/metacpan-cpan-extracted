@@ -1,0 +1,89 @@
+NAME
+
+    Class::PublicPrivate - Class with public keys with any name and a
+    separate set of private keys
+
+SYNOPSIS
+
+    PublicPrivate is intended for use as a base class for other classes.
+    Users of class based on PublicPrivate can assign any keys to the object
+    hash without interfering with keys used internally. The private data
+    can be accessed by retrieving the private hash with the private method.
+    For example, the following code outputs two different values, one for
+    the public value of start and another for the private value of start.
+
+     package ExtendedClass;
+     use base 'Class::PublicPrivate';
+    
+     sub new{
+        my $class = shift;
+        my $self = $class->SUPER::new();
+        my $private = $self->private;
+    
+        # initialize one of the private properties
+        $private->{'start'}=time();
+    
+        return $self;
+     }
+    
+     package main;
+     my ($var);
+     $var = ExtendedClass->new();
+     $var->{'start'} = 1;
+    
+     print $var->{'start'}, "\n";
+     print $var->private()->{'start'}, "\n";
+
+INSTALLATION
+
+    Class::PublicPrivate can be installed with the usual routine:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+METHODS
+
+ YourClass->new(classname ,[initikey1=>initvalue [, ...]])
+
+    Returns an instantiation of YourClass, where YourClass is a class that
+    extends Class::PublicPrivate. Additional key=>value pairs are stored in
+    the private hash. Programs that use your class can store any date
+    directly in it w/o affecting the object's private data.
+
+ $ob->private()
+
+    Returns a reference to the hash of private data.
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2015 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHOR
+
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+
+    Version:
+
+HISTORY
+
+    Version 0.80, June 29, 2002
+
+      First public release
+
+    Version 0.81 May 18, 2014
+
+      Minor tightening up of code. Fixed problems in packaging for CPAN.
+
+    Version 0.82 January 2, 2015
+
+      Minor tidying up code formatting and POD. Modifed tests to include
+      test names. Modifed files to use Unix style newlines, and to be
+      encoded UTF-8.
+

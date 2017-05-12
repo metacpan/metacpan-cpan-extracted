@@ -1,0 +1,30 @@
+---
+abstract: 'Run Movable Type through Catalyst'
+author:
+  - "Oskari 'Okko' Ojala <perl@okko.net>"
+build_requires:
+  Catalyst::Runtime: 5.80015
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-MovableType
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Controller::WrapCGI: 0
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: ssh://catagits@git.shadowcat.co.uk/Catalyst-Controller-MovableType.git
+version: 0.004

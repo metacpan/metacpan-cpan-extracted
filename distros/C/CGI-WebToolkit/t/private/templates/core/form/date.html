@@ -1,0 +1,26 @@
+<dl>
+	<dt><label for="{name}">{label}</label></dt>
+	<dd class="info">
+		{info}
+	</dd>
+	<dd><input class="form_datetime" type="text" name="{name}" id="js_{name}" value="{content}"/></dd>
+	{clear}
+</dl>
+<script language="javascript">
+	Event.observe(window, 'load', function () {
+		var DatePicker_{name} = 
+			new Control.DatePicker('js_{name}', {
+				icon: '{public_url}/core/datepicker/calendar.png',
+				datePicker: true,
+				timePicker: false,
+				timePickerAdjacent: false,
+				use24hrs: true,
+				locale: 'en_US'
+				/* onSelect: A function to call when the user selects
+							 a date. The date object is passed as a parameter.
+				   onHover: A function to call when the active date 
+							changes (when using keyboard navigation). 
+							The date object is passed as a parameter. */
+			});
+	});
+</script>

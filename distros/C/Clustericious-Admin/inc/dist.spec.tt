@@ -1,0 +1,118 @@
+Name: acps-[% zilla.name %]
+Version: [% rpm.version %]
+Release: [% rpm.release %]
+Summary: [% zilla.abstract %]
+License: [% zilla.license.name %]
+Group: Applications/CPAN
+BuildArch: noarch
+Vendor: [% zilla.license.holder %]
+Source: [% rpm.archive %]
+Requires: perl
+[% FOREACH require IN rpm.requires -%]
+Requires: [% require %]
+[% END -%]
+BuildRequires: perl
+BuildRoot: %{_tmppath}/%{name}-%{version}-BUILD
+%define acps_prefix /util
+Prefix: %{acps_prefix}
+
+%define debug_package %{nil}
+%define _use_internal_dependency_generator 0
+%define __find_requires %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)-filter-requires
+%define __find_provides %{_tmppath}/%{name}-%{version}-%{release}-%(%{__id_u} -n)-filter-provides
+%define myfilelist %{_tmppath}/filelist-%(%{__id_u} -n)
+
+%description
+[% zilla.abstract %]
+
+%prep
+%setup -q -n [% zilla.name %]-[% rpm.version %]
+
+# filter requires, sub local-perl for ^perl
+cat << EOF > %{__find_requires}
+#!/bin/sh
+
+if [ -x /usr/lib/rpm/redhat/find-requires ] ; then
+FINDREQ=/usr/lib/rpm/redhat/find-requires
+else
+FINDREQ=/usr/lib/rpm/find-requires
+fi
+
+\$FINDREQ \$* | grep -v ^/usr/bin/env [% FOREACH filter IN rpm.filter_requires %]| grep -v [% filter %][% END %]
+EOF
+chmod +x %{__find_requires}
+
+# filter provides, sub local-perl for ^perl
+cat << EOF > %{__find_provides}
+#!/bin/sh
+
+if [ -x /usr/lib/rpm/redhat/find-provides ] ; then
+FINDPRO=/usr/lib/rpm/redhat/find-provides
+else
+FINDPRO=/usr/lib/rpm/find-provides
+fi
+
+\$FINDPRO \$*
+EOF
+chmod +x %{__find_provides}
+
+%build
+if [ -d bin ]; then
+  release-fix_shebang bin/*
+fi
+[% IF rpm.prefer_make_maker == 0 %]
+if [ -e Build.PL ]; then
+  perl Build.PL --install_path lib=%{acps_prefix}/lib/perl    \
+                --install_path arch=%{acps_prefix}/lib/perl   \
+                --install_path bin=%{acps_prefix}/bin         \
+                --install_path script=%{acps_prefix}/bin      \
+                --install_path script=%{acps_prefix}/bin      \
+                --install_path bindoc=%{acps_prefix}/man/man1 \
+                --install_path libdoc=%{acps_prefix}/man/man3 \
+                --destdir %{buildroot}                       \
+                --clad_server_command '/usr/local/bin/perl -I/util/lib/perl /util/bin/clad --server' \
+                --clad_fat_server_command '/usr/local/bin/perl' \
+  && ./Build \
+  && ./Build test
+elif [ -e Makefile.PL ]; then
+[% END %]
+  unset PERL_MB_OPT
+  unset PERL_MM_OPT
+  perl Makefile.PL INSTALLSITELIB=%{acps_prefix}/lib/perl     \
+                   INSTALLSITEARCH=%{acps_prefix}/lib/perl    \
+                   INSTALLSITEBIN=%{acps_prefix}/bin          \
+                   INSTALLSCRIPT=%{acps_prefix}/bin           \
+                   INSTALLSITESCRIPT=%{acps_prefix}/bin       \
+                   INSTALLSITEMAN1DIR=%{acps_prefix}/man/man1 \
+                   INSTALLSITEMAN3DIR=%{acps_prefix}/man/man3 \
+  && make \
+  && make test
+[% IF rpm.prefer_make_maker == 0 %]
+fi
+[% END %]
+
+%install
+if [ "%{buildroot}" != "/" ]; then
+  rm -rf %{buildroot}
+fi
+
+[% IF rpm.prefer_make_maker == 0 %]
+if [ -e Build.PL ]; then
+  ./Build install
+elif [ -e Makefile.PL ]; then
+[% END %]
+  make install DESTDIR=%{buildroot}
+[% IF rpm.prefer_make_maker == 0 %]
+fi
+[% END %]
+rm -f %{buildroot}/perl/lib/perl/perllocal.pod
+rm -f %{buildroot}/usr/lib/perl/*/perllocal.pod
+find %{buildroot}/util -not -type d | sed -e 's#%{buildroot}##' > %{myfilelist}
+
+%clean
+if [ "%{buildroot}" != "/" ] ; then
+  rm -rf %{buildroot}
+fi
+
+%files -f %{myfilelist}
+%defattr(-,root,root)

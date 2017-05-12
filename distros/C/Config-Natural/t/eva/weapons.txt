@@ -1,0 +1,9 @@
+weapons = (
+  progressive knife
+  sonic glaive
+  smash hook
+  palet riffle
+  rocket launcher
+  positron gun
+  N2 bomb
+)

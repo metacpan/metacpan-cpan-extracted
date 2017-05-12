@@ -1,0 +1,10 @@
+Revision history for CPAN-Mini-Inject-Server
+
+0.03    2010-02-08/11:53
+        Fixed some documentation errors
+0.02    2009-12-23/11:24
+        Fixed bug that was warping the file names instead of correcting them to
+        the module name
+0.01    2009-12-22/09:22 
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,70 @@
+# PODNAME: Config::Model::models::Sshd::MatchCondition
+# ABSTRACT:  Configuration class Sshd::MatchCondition
+=head1 NAME
+
+Config::Model::models::Sshd::MatchCondition - Configuration class Sshd::MatchCondition
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+Conidtion to apply to identify matched items inside 
+a sshd_config match block.
+
+=head1 Elements
+
+=head2 User
+
+Define the User criteria of a conditional block. The value of this field is a pattern that is tested against user name.I<< Optional. Type uniline.  >> 
+
+=head2 Group
+
+Define the Group criteria of a conditional block. The value of this field is a pattern that is tested against group name.I<< Optional. Type uniline.  >> 
+
+=head2 Host
+
+Define the Host criteria of a conditional block. The value of this field is a pattern that is tested against host name.I<< Optional. Type uniline.  >> 
+
+=head2 Address
+
+Define the Address criteria of a conditional block. The value of this field is a pattern that is tested against the address of the incoming connection.I<< Optional. Type uniline.  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Dominique Dumont
+
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2009-2011 Dominique Dumont
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item LGPL2
+
+
+=back
+
+=cut
+

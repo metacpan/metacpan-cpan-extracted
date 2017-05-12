@@ -1,0 +1,67 @@
+NAME
+    Callback::Cleanup - Declare callbacks that clean themselves up
+
+SYNOPSIS
+            use Callback::Cleanup;
+
+            my $anon_sub = callback {
+                    # this is the sub body
+            } cleanup {
+                    # this is called on DESTROY
+            }
+
+            # or
+
+            Callback::Cleanup->new(
+                    sub { }, # callback
+                    sub { }, # cleanup
+            );
+
+DESCRIPTION
+    This is a very simple module that provides syntactic sugar for callbacks
+    that need to finalize somehow.
+
+    Callbacks are very convenient APIs when they have no definite end of
+    life. If an end of life behavior is required this helps keep the cleanup
+    code and callback code together.
+
+EXPORTS
+    callback BLOCK $cleanup
+    cleanup BLOCK $callback
+        Both of these exports act as the identity function when given only
+        one parameter.
+
+        When given enough arguments they will create a Callback::Cleanup
+        object.
+
+        This means that you can declare a callback with a cleanup like this:
+
+                my $cleans_up = callback {
+
+                } cleanup {
+                
+        }
+
+        Or a derived sub that cleans up an existing subref:
+
+                my $cleans_up = cleanup {
+
+                } \&needs_cleanup;
+
+        As well as a few other useless forms.
+
+CLOSURES AND GARBAGE COLLECTION
+    In perl code references that are not closures aren't garbage collected
+    (they are shared).
+
+    This module uses "clone_if_immortal" in Sub::Clone to make sure timely
+    destruction of these callbacks happens.
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2006, 2008 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,240 @@
+Revision history for Perl extension ClearCase::Wrapper::MGi.
+
+0.01 Tue Sep 25 15:51:36 IST 2007
+	- Initial version: port of lsgen on top of ClearCase::Wrapper
+
+0.02 Tue Oct  2 20:39:17 IST 2007
+	- Fixed bug reported by Tatyana Shpichko: tested the argument(s)
+
+0.03 Fri Oct  5 18:04:50 IST 2007
+	- Fixed bug with branch names matching part of one another
+	- Initial version of checkout
+
+0.04 Wed Oct 10 12:00:38 IST 2007
+	- Run lsgen and checkout under CtCmd or IPC if installed.
+	- Bug fixes: Branch type constraint check on Windows; respect
+	  for functionality added in ClearCase::Wrapper; support for
+	  all options; initialisation of the return value.
+
+0.05 Thu Oct 11 18:09:17 IST 2007
+	- Bug fixes: lsgen input rejected unless version.  Wildcards
+	  supported on Windows.  Wrong semantics for -bra[nch] in
+	  checkout. Returned to default if either -ver or -bra used.
+
+0.06 Tue Nov  6 17:51:41 GMT 2007
+	- Support for checkout via view extended path
+
+0.07 Fri Oct 24 17:48:25 BST 2008
+	- lsgen: skip branch objects with digits in their name
+	- lsgen: when checked out from version 0, use source of merge arrow
+	- lsgen: use of portable quoting pattern
+	- checkcs/co: fix for use of relative path
+	- co: less verbose, and cleaning away the trivial contrib files
+
+0.08 Sat Mar  7 10:58:19 GMTST 2009
+	- co: the internal mkbranch defaults to -nc
+	- lsgen: extracted the parsing of the version tree
+
+0.09 Sun Mar 22 17:50:40 GMTST 2009
+	- lsgen: fix to the handling of -obs
+	- lsgen: indentation of incestual parent
+	- diff: -predecessor from the genealogy
+	- diff: special case for checkedout version
+	- lsgen/diff: fix when selected branch/0
+	- mkbranch
+	- unco, with rmbranch if leaving only branch/0
+
+0.10 Sat Apr 25 18:37:47 GMTDT 2009
+	- co: fixed typo--restored standard flags support
+	- mklbtype -fam and -inc, including -rep
+	- lock, and unlock, forcing if necessary
+	- added the extra directory, with scripts to enable group locking
+
+0.11 Sun Jul 19 10:22:41 GMTDT 2009
+	- added replace option to lock lbtype:
+	- preliminary handling to force locking from Windows/cygwin
+	- mklabel: incremental by default, and for -rec and -up 
+	- mkbranch: error when no brtype
+	- mklabel and mklbtype -inc: check lock on lbtype
+	- mklabel -over
+	- mklbtype: fixes for remote and existing types
+	- mkbco: fix for multiple arguments
+	- mklbtype: comments processed, and distributed to fixed or floating
+
+0.12 Sun Aug 16 15:04:39 GMTDT 2009
+     	- lsgen: print the parent version from which checked out
+	- lsgen: -all option
+	- lsgen: print parent merged in back (fix... was skipped)
+	- co/mkbranch: use preemptcmt
+	- preemptcmt: support multiline comments
+	- forcelock: sudo based solution (contributed: Tatyana Shpichko)
+	- uncheckout: interactive negociation of -rm/-keep options
+	- hidden internal function: renaming according to convention
+
+0.13 Sun Oct  4 14:28:00 GMTDT 2009
+        - lock/unlock: preserve original error message in case of failure
+	- unco: exit after running, do not fall back to default behaviour
+	- mklabel: argument in remote vob; and -all option with -over
+	- mklbtype: fix to Label type not found: "-rep"; error report
+	- ci in user interactions preempting mode
+
+0.14 Sat Nov 28 22:07:04 GMTST 2009
+        - co: die if no element
+	- rmbranch: handle the interactive case of missing -f flag
+	- mklbtype -arc, and mkbrtype -arc
+
+0.15 Sun Nov 29 11:59:47 GMTST 2009
+     	- mkbrtype documentation, and comments to the archived type.
+	- postponed 'early return' until after user interaction.
+
+0.16 Tue Dec 15 10:32:40 GMTST 2009
+        - mklabel: skip symlinks
+	- mklbtype -fam: fix when remote vob non -rep and exists
+
+0.17 Thu Jan 14 13:09:43 GMTST 2010
+        - mklabel: fix to -over ---rep implicit only for family types
+	- mklbtype: fix to -fam when explicit type prefix used
+	- checkin: fixes to -diff (from genealogy) and -rec
+	- mklbtype -inc now unlocks the label types, and re-locks the fixed
+
+0.18 Sat Jan 16 17:15:31 GMTST 2010
+        - co: detect unrecognize option errors
+	- unco: bugfix to removing useless branch
+
+0.19 Sun Feb 14 16:37:43 GMTST 2010
+        - VobPathConv: fix to the conversion of Windows/cygwin paths
+	- mkbranch: argument in other vob
+	- error handling: mklbtype and checkin
+	- ForceLock: don't use 'state'--the ssh connection may time out
+	- mklbtype -inc: skip existing but unlinked type
+	- mklbtype -inc: add the comment option only once if several types
+	- diff: fix for the no predecessor case, and support for -n flag
+	- lock -rep: fix for no -nusers
+	- unco: skip the dialog for dirs; rmbranch before handling next arg.
+
+0.20 Sat Feb 20 17:58:45 GMTST 2010
+        - mkbrtype -arc -ord and in a remote vob
+	- support for global types.
+
+0.21 Sun Jun 13 13:26:59 GMTDT 2010
+        - mkbranch with standard view (not ##:BranchOff)
+	- hyperlink and attribute types -shared
+	- mklbtype -arc: renamed new type to temporary, for later use
+	- rmlabel: support for family types and RmLBTYPE attribute
+	- mklabel: removes the RmLBTYPE attribute on the same version
+	- _EqLbTypeList: produce a list of equivalent fixed lbtypes
+	- setcs: support for incremental types
+	- updthltypes: tool to convert existing hltypes to -shared
+
+0.22 Sat Jun 19 17:06:43 GMTDT 2010
+        - mkxxtype -glo -rep: fix
+	- pod indentation
+	- rmtype: remove whole label family, including attribute type
+	- setcs: fix to support all default options
+
+0.23 Thu Jan 27 14:17:36 GMTST 2011
+        - bugfix: ensure ordinary types
+	- bugfix: mklbtype -rep -fam creates a Rm attype
+	- fixed missing feature: mklbtype -fam after archiving, creates an EcInc
+	- rmlabel adds the attribute on all versions labelled with fixed labels
+	- added extra/Examples.pod
+
+0.24 Wed Feb  2 18:34:46 GMTST 2011
+        - extra/Examples.pod: fixes and additions
+	- des: added from DSB.pm, adapted to genealogy (possibly multiple parents)
+	- des -family lbtype:XXX
+	- rmtype: fix for family types
+	- mklbtype -arc locks the types archived
+
+0.25 Fri Mar 11 16:48:50 GMT 2011
+        - Examples.pod: typos, and switched setcs for mkview -equiv
+	- des -fam n: only the most recent equivalent fixed types
+	- mkview -clone -equiv TTT,1-Jan --requires Date::Parse
+
+0.26 Tue Mar 22 17:03:20 GMTST 2011
+        - des -par/fam: fix to support no argument
+	- mkview -equiv: non local brtype in config spec
+
+0.27 Mon Jul 11 19:19:46 GMTDT 2011
+	- co/mkbranch: display mkbranch stderr
+	- fix mk*type -arc with multiple arguments
+	- fix mk*type -rep for non family types;
+	  for family types: -glo/-ord also affects equivalent types;
+	    no other flag drops back to non-family types (removes hyperlinks)
+	- fix to mklbtype -glo -fam
+	- fix rmtype with family lbtype without a previous equivalent fixed
+        - fixes to revert, parse vtree, unco/rmbranch
+	- optimization: co doesn't use lsvtree if /main/0 exists
+	- cptype: support for family types, and linking global types
+	- mklbtype -inc on global type
+	- lsgen: fix for vob root; -a implicit with -d;
+	  print offsprings in addition to siblings
+	- avoid lsvtree when possible (lsgen -all, ci, diff, des)
+	- ci -revert: this doesn't need genealogy--only the physical parent
+	- mkview -clone: fix to the storage paths, to clone other users' views
+
+0.28 Sat Aug 20 20:35:34 BST 2011
+        - mklbtype -arc: add the comment before locking the archive type
+	- mklabel -over: faster fail if no type given
+	- mklbtype -arc: unlock if necessary
+	- mklbtype -arc: creates a global hidden type and copies it as needed
+	- cptype: copy and link the Rm attribute type if needed
+	- mklbtype -fam: fix to linking eqinc, as reviving a global archived lbtype
+	- mklbtype -inc: same as -fam for previously archived lbtype
+	- rmlabel: fix for remote elements (passed with a full path)
+	- mklabel -over records the brtype for rollout
+	- rollout/rollback: global type support disabled for now
+	- lsgen -a, without -depth: parse lsvtree
+
+0.29 Mon Dec 26 18:54:57 GMTST 2011
+        - mklbtype -config
+	- mklabel -config
+	- fixed mklabel -up: view extended paths, and symlinks
+	- archive: convenience synonymous of mk(lb|br)type -arc
+	- lock/unlock: global types must be handled via their source vob
+	- fixed diff: one case of no predecessor
+
+0.30 Thu Feb  2 17:55:09 GMTST 2012
+        - reverted the cmwiki links in the doc to cmcrossroads.../cgi-bin/...
+	- cptype: fix for remote copy of a global type
+	- mklabel -up: fix for version extended names
+	- mklabel -fullcopy
+	- _Ensuretypes: back to local in every case.
+	- lstype fix: do not abort for sync errors unless in presence of admin vob
+	- rollout: fix to comment handling (bug report by Andy Walshe)
+
+0.31 Tue Feb  7 15:28:15 GMTST 2012
+        - co: implemented the -out and -nda functionalities
+	- rb: fixed the help string (-to changeset)
+	- mklabel: disambiguated -c(comment) from -con(fig)
+
+0.32 Sat Mar 31 11:53:04 IST 2012
+        - ar: as alias to archive
+	- extra/fixsrccnt: fix the previous version in the source container,
+          after branching off the root of the version tree.
+	- mklabel -up -follow: fixed a bug for symlink to ../../xxx
+	- added fix source container instructions to extra/Configuration.pod
+	- renamed FSCbroker to FSCbrokeSsh
+	- annotate: fixes, in conjunction with new options: -line and -grep
+
+1.00 Sun Aug 12 16:20:44 IST 2012
+        - no major change anymore in sight: formal publication signal
+        - rollout: typo in help string
+	- rollout: check lock of baseline, and lock it as configured
+	- rollback: fix to remote case on UNIX
+	- renamed _wrap to _Wrap, and made small functions non autoload
+	- mkview -equiv: accept times with dashes and dots instead of spaces
+	- added a synctree function, optionally fixing text file containers
+	- annotate -grep: only the lines searched
+	- extra/FSCbrokerSuDo: skip sudo for the owner account
+	- support 'an' shortcut (for annotate)
+	- lock: minor fix--pass non lbtype args to cleartool unaltered
+	- unlock performs a cptype if needed
+	- mklbtype -inc: test locally mastered before creating new increment
+	- extra/locklbtypesudo, as well as renamed locklbtype to locklbtypessh
+	- lsgen: fix-- with the -a option, siblings were missed in the genealogy
+	- lsgen -offspring (new option)
+	- lsgen -fmt (new option)
+	- des -fmt %PVn: takes genealogy into account
+	- des -fmt %[<regexp>]l, including while used from lsgen
+	- co: cascading branches in the config spec is preserved unless under BranchOff

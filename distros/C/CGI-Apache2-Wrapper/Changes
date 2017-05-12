@@ -1,0 +1,17 @@
+0.215 March 18, 2008
+  - use 'exit 0' in Makefile.PL/Build.PL if mod_perl isn't installed,
+    to try to silence failed reports from cpantesters
+ 
+0.21 Apr 11, 2007
+  - have header() return the defined ''.
+
+0.2  Apr 9, 2007
+  - add several more methods, especially url(), cookie(), and upload().
+  - if the USE_CGI_PM environment variable is set, a CGI.pm object
+    will be returned from the new() method (suggested by
+     Jonathan Vanasco).
+  - drop support of use of the mod_perl2/libapreq2 interface in a
+    cgi environment
+
+0.1  Feb 17, 2007
+  - initial version

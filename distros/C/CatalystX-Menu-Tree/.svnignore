@@ -1,0 +1,11 @@
+inc
+cover_db
+META.yml
+Makefile
+blib
+pm_to_blib
+MANIFEST.SKIP
+Makefile.old
+*.tar.gz
+*.tmp
+*.bak

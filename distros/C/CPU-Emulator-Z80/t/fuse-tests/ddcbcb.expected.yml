@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcbcb
+registers:
+  AF: 60374
+  AF_: 0
+  BC: 14190
+  BC_: 0
+  DE: 50035
+  DE_: 0
+  HL: 45324
+  HL_: 0
+  I: 0
+  IX: 42055
+  IY: 12758
+  PC: 4
+  R: 2
+  SP: 0

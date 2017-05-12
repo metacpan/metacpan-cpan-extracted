@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+GPG.pm
+README
+t/01-keygen.t
+t/02-import.t
+t/03-export.t
+t/04-encdec.t
+t/05-sigver.t
+t/06-keyops.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

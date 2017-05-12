@@ -1,0 +1,21 @@
+[% INCLUDE template/header.tt -%]
+<h1>TinyURL [% c.loc('Detail') %]</h1>
+
+<form>
+  <input type="button" name="btn_update" value="[% c.loc('Edit') %]" onclick="javascript:window.location='/tinyurl/update/[% c.stash.tinyurl.id %]';"><br/>
+  <br/>
+</form>
+
+<table border="1">
+  <tr>
+    <td>ID</td><td>[% c.stash.tinyurl.id %]</td>
+  </tr>
+  <tr>
+    <td>削除フラグ</td><td>[% c.stash.tinyurl.disable %]</td>
+  </tr>
+  <tr>
+    <td>URL</td><td>[% c.stash.tinyurl.long_url %]</td>
+  </tr>
+</table>
+[% INCLUDE template/footer.tt -%]
+

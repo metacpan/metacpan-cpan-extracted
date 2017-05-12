@@ -1,0 +1,9 @@
+To-do List for CodeBase Module
+==============================
+
+* Access to xb_errno C variable (as integer and as string)
+  (use tie?)
+* Fuller Interface to relational functions
+* Better Documentation.
+* Upgrade to CodeBase 6.4 -- it now compiles but not thouroughly tested.
+* More test cases.

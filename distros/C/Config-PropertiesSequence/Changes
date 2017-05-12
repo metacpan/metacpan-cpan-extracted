@@ -1,0 +1,3 @@
+Revision history for Perl extension Config::PropertiesSequence.
+1.003 2004/02/06 add Carp::Assert to list of required modules
+1.002 2004/01/31 original release

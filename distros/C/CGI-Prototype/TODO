@@ -1,0 +1,7 @@
+more tests
+
+Example applications (other than the ones in the tests)
+
+sub config_interstitial_generates_headers { 0 } # for Hidden, 1 for standalone
+
+==================================================

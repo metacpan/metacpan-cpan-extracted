@@ -1,0 +1,7 @@
+header:
+	package Polygon;
+
+variables:
+	@points;	# a list of Point-instances
+		
+	$a_has;		# a 'has'-association

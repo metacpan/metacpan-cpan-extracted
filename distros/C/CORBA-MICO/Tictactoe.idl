@@ -1,0 +1,26 @@
+module Tictactoe {
+  exception BadTag {};
+  exception InvalidMove {};
+  exception AlreadyConnected {};
+
+  interface Client {
+    // Connect to another client, return a tag for future communication
+    long   connect    (in Client opponent) raises (AlreadyConnected);
+
+    // Disconnect from the game
+    void    disconnect (in long tag) 
+      raises (BadTag);
+
+    // Put a mark at given position
+    void    put        (in long tag, in short row, in short column) 
+      raises (BadTag, InvalidMove);
+
+    // Request starting the game over
+    boolean request_reset (in long tag)
+      raises (BadTag);
+
+    // Response to request_reset
+    void reset         (in long tag, in boolean ok)
+      raises (BadTag);
+  };
+};

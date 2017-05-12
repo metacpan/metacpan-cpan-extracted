@@ -1,0 +1,36 @@
+Revision history for Catalyst-Model-DBIC-Schema-QueryLog
+
+0.10    2009.06.17
+        DEPERCATED WARNING
+        use Catalyst::TraitFor::Model::DBIC::Schema::QueryLog instead
+
+0.09    2009.02.11
+        fix depends
+
+0.08    2009.02.10
+        use MooseX::Emulate::Class::Accessor::Fast
+
+0.07    2009.02.10
+        bug fix
+
+0.06    2009.02.09
+        remove 'Class::Accessor::Fast' => 0, use Moose
+
+0.05    12/20/2007 9:22
+        add Class::Accessor::Fast in use base;
+
+0.04    2007.10.11/16:12:22
+        better document
+
+0.03    2007.9.5/16:25:25
+        better document
+
+0.03    2007.9.5/12:32:32
+        improved templates with " : ([% q.params.join(', ') %])"
+
+0.02    2007.9.5/10:11:11
+        add "'Sort::Key'  => 0," in build_requires
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

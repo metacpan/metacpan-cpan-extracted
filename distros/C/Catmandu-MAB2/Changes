@@ -1,0 +1,69 @@
+Changelog for Catmandu-MAB2
+
+0.14  2016-03-18 17:14:18 CET
+ - Fix issue with leader for MAB2::Writer
+
+0.13  2015-11-24 11:31:59 CET
+ - ISSUE-8: Test 07-mab-each.t fails
+ - Remove outdated Makefile.PL
+
+0.12  2015-10-01 10:51:44 CEST
+ - fix version
+
+0.11  2015-09-30 15:35:54 CEST
+ - ISSUE-7: Fix mab_each single execution bug
+
+0.10  2015-09-28 16:50:23 CEST
+ - ISSUE-6: drop PerlIO layer for XML importer
+
+0.09  2015-09-04 09:30:02 CEST
+ - add badges
+ - update build files
+ - bugfix for Version numbers
+
+0.08  2015-09-03 19:43:46 CEST
+ - add mab_each, mab_match and pluck to FIX 
+ - switch to Dist::Milla 
+
+0.07 2014-06-02
+ - transform Fix function to new syntax
+ - fix documentation
+ - fix .gitignore
+ - edit dist.ini
+
+0.06 2014-04-04
+ - XML parser should ignore PerlIO layers
+ - documentation
+
+0.05 2014-03-01
+ - added SRU importer
+
+0.04 2014-01-31
+ - better handling of record and (sub)field separators
+ - bugfix for MAB2::Writer::Disk
+ - added mab2 converter script
+ - added test status to README
+ - more documentation
+
+0.03 2013-12-18
+ - added Parser and Writer for MAB2 Diskette data
+
+0.02 2013-11-22
+ - added file encoding
+ - added XML declaration and collection handling
+ - minor correction of fix
+ - added "use warnings;"
+ - added Moo to prerequisites
+ - added CHANGES file to distribution
+
+0.01 2013-10-01
+ - added record separator to test data
+ - perltidy
+ - removed start() call from build
+ - added some modules
+ - added Catmandu exporter for MAB2 data
+ - added Makefile.pl
+ - removed github plugins
+ - correction of github URL
+ - initial commit 
+ 

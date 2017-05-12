@@ -1,0 +1,44 @@
+<form title="Hello" header="head.tmpl" footer="foot.tmpl" post-event="say_hello">
+    <page name="Name">
+        <title>Test dropdown</title>
+        <description>The colours listed here should be localised into
+        English and French.  If you see upper-case options in the list,
+        it didn't work.</description>
+        <field id="colour" type="select" options="'RED','GREEN','BLUE'">
+            <label>Colours</label>
+        </field>
+        <field id="colour2" type="radio" options="'RED','GREEN','BLUE'">
+            <label>Colours</label>
+        </field>
+    </page>
+
+    <lexicon lang="en">
+        <entry>
+            <base>RED</base>
+            <trans>red</trans>
+        </entry>
+        <entry>
+            <base>GREEN</base>
+            <trans>green</trans>
+        </entry>
+        <entry>
+            <base>BLUE</base>
+            <trans>blue</trans>
+        </entry>
+    </lexicon>
+
+    <lexicon lang="fr">
+        <entry>
+            <base>RED</base>
+            <trans>rouge</trans>
+        </entry>
+        <entry>
+            <base>GREEN</base>
+            <trans>vert</trans>
+        </entry>
+        <entry>
+            <base>BLUE</base>
+            <trans>bleu</trans>
+        </entry>
+    </lexicon>
+</form>

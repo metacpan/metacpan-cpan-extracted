@@ -1,0 +1,30 @@
+[% 
+    title = 'Performance' ;
+    box_sites = 1
+
+    crumb1_name = 'Performance' ;
+%]
+
+<h2>Contents</h2>
+<ul class="contents">
+<li><a href="#build1" title="CPAN Testers Reports Website Performance">CPAN Testers Reports Website Performance</a></li>
+<li><a href="#raw"    title="Raw Data">Raw Data</a></li>
+</ul>
+
+<h2>Graphs</h2>
+<p>The graph below highlights the rate at which testers are producing reports and the number of requests that the CPAN 
+Testers Reports Website Builder can process in a day. Slow periods for the Builder are when the server has experienced
+high load, typically when website crawler bots fail to honour our robots.txt file.</p>
+<p><img id="build1" src="/stats/build1.png" alt="CPAN Testers Reports Website Performance" /></p>
+<p>The REQUESTS measure the total number of requests processed by the system, while PAGES is the number of unique 
+requests processed. A request is created when a report is submitted, a new distribution is uploaded or a website user 
+requests a page on the dynamic Reports website, where a previous request exists. A page can either be a distribution 
+page or an author page. Also note that for every unique page requested, 6 files are generated across 3 websites by the 
+CPAN Testers Reports Website Builder.</p>
+
+<h2 id="raw">Raw Data</h2>
+<p>The raw data file is available here:</p>
+<ul>
+<li><a href="/stats/build1.txt" title="raw data for CPAN Testers Reports Website Performance">CPAN Testers Reports Website Performance</a></li>
+</ul>
+<p>Graphs generated using the <a href="http://code.google.com/apis/chart/" title="Google Chart API">Google Chart API</a>.</p>

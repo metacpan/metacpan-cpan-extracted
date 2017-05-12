@@ -1,0 +1,8 @@
+=head1 Catalyst::TraitFor::Controller::CAPTCHA
+
+This Catalyst::Controller role provides `Private` methods that deal with the generation and validation of captcha.
+
+=head2 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/RedirectAndDetach.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-load.t
+t/kwalitee.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

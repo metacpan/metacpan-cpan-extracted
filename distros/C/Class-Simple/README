@@ -1,0 +1,48 @@
+Class-Simple
+=========================
+
+This is a simple object-oriented base class.  There are plenty of oth-
+ers that are much more thorough and whatnot but sometimes I want some-
+thing simple so I can get just going (no doubt because I am a simple
+guy) so I use this.
+
+What do I mean by simple?  First off, I don't want to have to list out
+all my methods beforehand.  I just want to use them (Yeah, yeah, it
+doesn't catch typos--that's what testing and Class::Std are for :-).
+Next, I want to be able to call my methods by $obj->foo(1) or
+$obj->set_foo(1), by $obj->foo() or $obj->get_foo().  Don't tell ME I
+have to use get_ and set_ (I would just override that restriction in
+Class::Std anyway).  Simple!
+
+I did want some neat features, though, so these are inside-out objects
+(meaning the object isn't simply a hash so you can't just go in and
+muck with attributtes outside of methods), privatization of methods is
+supported, as is serialization out and back in again.
+
+Note that this is my first module for CPAN so please be gentle
+with the noob.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::ISA
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Michael Sullivan (perldude@mac.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+$Id: README,v 1.7 2007/08/23 17:42:16 sullivan Exp $

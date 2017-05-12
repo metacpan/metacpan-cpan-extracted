@@ -1,0 +1,15 @@
+Changes
+=======
+
+0.00004 - Oct 14 2009
+    - Add VirtualComponents config key
+    - Allow inheriting from MyApp::ControllerBase, ModelBase, ViewBase
+
+0.00003 - Oct 02 2009
+    - Factor out to Devel::InheritNamespace
+
+0.00002 - Oct 01 2009
+    - Properly load the local class
+
+0.00001 - Sep 30 2009
+    - Initial release

@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a3648aeb21598e6557e6b8eff32228efdd2a9111 Changes
+SHA1 3c36cc77ee983892da022b2d9f7e86528aa6d791 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 5e05cd21a5afab190c520bbda0a70b2818df986a MANIFEST
+SHA1 e28cc786c4e01c66e8ce66d59b406a23c4c817db META.json
+SHA1 536d1c83a41c25cb5306bd8a9488f40efea60d6a META.yml
+SHA1 caa36a617523de4e8cb03c1950b0c20e271a1604 Makefile.PL
+SHA1 5a2bd9152559a1464923463a4de5d2af26cc706f README
+SHA1 3d63c2d963006f164f49da0c74f3820f5f44fd3d cpanfile
+SHA1 2757fb6913be0edf3840a0cb9f3e630bd54d3193 dist.ini
+SHA1 59d8eaa451a0332128cd58462f98e5696a18b360 examples/benchmark.pl
+SHA1 19ebe9cf5b4e9f173b89e1fa950306da4d9f155f lib/Closure/Explicit.pm
+SHA1 2244b6fd3c640536bca4bcca822203ccd76b5283 lib/Closure/Explicit.pod
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 4a01e4701cc7afd4bd1f5fa8f7326cc4dc703ef7 t/00-compile.t
+SHA1 9125b9877a246ef5b2d99db4a455b5325872f672 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 a32d59d972e62cf888ea897cca439e344cb9bb55 t/basic.t
+SHA1 74411af9916259c2f71ef74dc71b8a88ad175e3b t/cleanup.t
+SHA1 be4e3c8736e77d1d797c99bd5fb1c4522a045a30 t/coderef.t
+SHA1 20e5b2f7d6eedadf85f69c72dcf2dec31c1ac252 t/nested-scope.t
+SHA1 ee90363c7cd8760b3b0897ff30670979ed8ba622 t/refcount.t
+SHA1 6f0c1bf1be0128873e53dd36f09883176f873845 t/weaken.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJY9MbrAAoJEG2WkcbynxAl9MYQALofNH1BZYp+Gcwi8p8HmhjJ
+9J+wDr4WC9DYQKCiWKf+UDSh0L6K3jw06O8IuK8BujHmX+lE3XsjfnylUFoZgHQU
+wLXhm7Zy6DsHoPK4N7dR0XHNZgC2f1L7ABUrm7qU6IzbEp6C0pYCxvz1bA2TzMdL
++M37XHAbC+kbxKspEKgMETzX326+QCgqJBJL1gfOqCq7SlD+md07DcQ0BHuKpqi3
+O3Q+bD7d+B0Vlvtyjb0Qkn+CUISm4Scm/QrbcnkWlQUGIAtOfeM1kkyeklf60hEu
+OlGmH2un6PUdgGIulP0xdaMPc/xkzJnUGP2eQr6B7l3aD5Nz+FTLI+AOBWTutIAT
+4MCFy+QVjsJ6LvfW4j/lM2wNl++RmFxEVrpn9Ko9oBb619y0Qtv/ra7h/K6CmprY
+SSH6Oppm8D0gAH3RE7n9GM+t3zSj4zDFD3ibf+xuSLqFTLRq/WkKx53xYgGFM1aQ
+cBdJsVEJO6ijR0MITLY+C3QYHGGGYj/zc223wxxvlNJiHFu3Uugi6sAPX+1htd+N
+xkkn282WXwM3/8OaxyXB69eXJkh6Bw/pGlz7bb/0NZAnx0H8Xxh7JH0/RexGudkr
+Ne9WEITUKg7iB7WB9p3mOsXds7X2YC+AwvQ8m6zsgmzDSR1DlUtqNqCIRSuuWILF
+aRtPVzx5dYDPxhKtF/J5
+=GiDV
+-----END PGP SIGNATURE-----

@@ -1,0 +1,111 @@
+2.050 2016-09-17
+
+  Bug fix:
+    * model generator: fix call to load (gh #2).
+      (Thanks Slaven Rezić)
+    * fix doc typo in LCDd.conf
+
+2.049 2016-07-15
+
+    * merge gen_LCDd_model in lcdconf2model (gh #1)
+    * update © years of generated model
+    * remove obsolete text in description
+
+2.048 2016-07-13
+
+  Usability improvements:
+    * added CONTRIBUTING.md
+    * gen_LCDd_model: use exec instead of require to get correct
+      error message when model generation fails
+
+  Bug fix:
+    * adapted model generation to new warp parameter (Debian #829442)
+
+2.047 2016-03-08
+
+  Bug fix: let Config::Model initialise log4perl during model
+  generation to avoid failure when ~/.log4configmodel does not exist
+
+2.046 2016-01-25
+
+  Fix dist.ini to update Config::Model dependency correctly
+  (i.e. >= v 2.076)
+
+2.045 2016-01-24
+
+  This release fix a limitation of "cme edit lcdproc". User can now
+  enable more than one driver (i.e. set lirc and imonlcd drivers)
+  (this requires Config::Model 2.076)
+
+2.044 2016-01-02
+
+  * Fix pod documentation re-generation which broke smoke tests on solaris.
+
+2.043 2015-12-31
+
+  Bug fix release to cope with a change on Config::Model::Iself.
+  The scripts used to generate lcdproc model will now complain in case of
+  issue:
+    * gen_LCDd_model: use new cm_lib_dir param (Debian #808853)
+    * require Config::Model::Itself >= 2.001
+    * Build.PL: exit 1 when model generation fails
+    * gen_LCDd_model: exit 1 when model generation fails
+
+  The model generator changes are:
+    * specs specified between {...} can override specs specified between [...].
+      New syntax : {% and %}
+    * specify value type in all cases
+    * handle specs between [ and ] that span several lines
+
+  In case of issue, please now use github bug tracker:
+  https://github.com/dod38fr/config-model-lcdproc/issues
+
+2.042 2014-05-25
+
+    The lcdproc model of this release is made for ldcproc 0.5.7. Only a very
+    small modification of LCDd.conf comments was required to be able to
+    generate a complete lcdproc model from LCDd.conf.
+
+    Changes:
+    * Build.PL: run script/gen_LCDd_model.pl at build time
+    * AnyEvent is no longer needed in tests
+    * LCDd.conf: modified comment to avoid Device being interpreted as list ...
+    * lcdconf2model: improved parsing of legal spec from LCDd.conf comments
+
+2.041 2014-01-24
+
+    * require perl 5.10 (like Config::Model)
+
+    * LCDd model generator:
+      * off,on values are now boolean. cme will be more tolerant on
+        input values (e.g. 'no' will be converted to 'off')
+      * removed [.*] from generated doc of LCDd configuration elements
+
+2.040 2013-09-22
+
+    * LCDd.conf v0.5.6 patches:
+	  * Specify yes/no as legal values for Foreground (so it becomes a boolean)
+      * specify ReportLevel default value is square brackets
+
+    * LCDd model generator:
+      * yes,no values are now boolean (requires Config::Model 2.043)
+      * ignore default value from file when square brackets are specified
+      * don't initialise Hello and GoodBye arrays
+      * default value mentioned in square brackets are used as upstream_default
+      * tweak model to ensure that DriverPath will end with a slash
+
+    * test upgrade from original lcdproc config file with 0.5.5 and 0.5.6
+
+2.039 2013-06-19
+
+    * model_test.t: avoid warnings in smoke tests
+    * updated doc
+    * model generator: fixed comments
+    * model generator: updated (c) years
+
+0.001 2013-06-15
+
+    * imported LCDd.conf from lcdproc 0.5.6
+    * LCDd.conf: removed extra comment that trips model generation
+
+    See Config::Model Changes for older logs

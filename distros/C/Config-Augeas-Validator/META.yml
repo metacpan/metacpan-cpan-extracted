@@ -1,0 +1,31 @@
+---
+name: Config-Augeas-Validator
+version: 1.300
+author:
+  - 'RaphaÃ«l Pinson <raphink@cpan.org>'
+abstract: A generic configuration validator API
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: https://code.launchpad.net/deput://github.com/raphink/Config--Augeas--Validator
+build_requires:
+  Test::More: 0
+requires:
+  Class::Accessor: 0
+  Config::Augeas: 0.801
+  Config::IniFiles: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Config::Augeas::Validator:
+    file: lib/Config/Augeas/Validator.pm
+    version: 1.300
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - configuration
+  - configuration management
+  - validator
+  - augeas

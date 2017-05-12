@@ -1,0 +1,22 @@
+---
+name: CGI-Application-Plugin-TT-LastModified
+version: 1.02
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: Set "Last-Modified" header based on TT template
+license: perl
+resources:
+  license: ~
+requires:
+  CGI::Application: 4
+  CGI::Application::Plugin::TT: 0
+  CGI::Util: 0
+  List::Util: 0
+provides:
+  CGI::Application::Plugin::TT::LastModified:
+    file: lib/CGI/Application/Plugin/TT/LastModified.pm
+    version: 1.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

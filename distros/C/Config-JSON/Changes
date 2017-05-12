@@ -1,0 +1,79 @@
+Revision history for Config-JSON
+1.5202 2014-12-25
+ - Fix: Moo does not import Carp it would seem - Joel Berger
+
+1.5201 2014-12-25
+ - Forgot to update the prereqs to move to Moo.
+
+1.5200 2014-12-25
+ - Switched from Any::Moose to Moo at the behest of Joel Berger.
+
+1.5100 2010-12-09
+ - Swtiched to Any::Moose so that it runs faster if used in a command line app.
+ - Now requires Any::Moose.
+ - No longer requires Moose.
+ - Added test for possible interaction problem with Data::GUID reported by David Delikat.
+
+1.5000 2009-12-19
+ - Converted Config::JSON to use Moose.
+ - Removed requirements for version and Class::InsideOut.
+ - Swiched to Dist::Zilla to build this package.
+ - Removed authors.t since I never use them anyway.
+
+1.4.0
+    Fixed resetting permissions of file on write
+    Fixed another bug that could lead to erasing the config file.
+    Add addToArrayAfter and addToArrayBefore methods to more easily insert items into lists.
+    Added support for slashes in keys via escaping.
+
+1.3.1   Mon Dec 8 14:00:00 2008
+    fix: #41525 Cleaning up temporary directory 
+    Throws a better error message when trying to access an element of an array using a multi-level directive.
+    Writes config file directives in alphabetical order for easier human reading.
+    Better handling of UTF-8 data in the config file.
+    Better version numbers on prereqs.
+
+1.3.0   Tue Oct 28 23:00:00 2008
+    Rewrote includes to be much cleaner.
+    Fixed a bug where a full disk could cause Config::JSON to destroy the config file.
+
+1.2.1   Sat Oct 18 16:58:19 EDT 2008
+    Fixed version number.
+
+1.2.0   Fri Oct 17 10:14:02 EDT 2008
+    Patch from Christopher Nehren to enable configuration file includes as in Apache.
+
+1.1.4   Fri Jan 23 16:20:00 2008
+    Patch from Doug Bell that uses better slurping action, and fixes a problem with killing config files on set() errors.
+    Switched to using blib instead of relative lib path for tests.
+
+1.1.3   Fri Jan 23 15:00:00 2008
+    fix: Copyright was mistakenly assigned to me rather than Plain Black in the Readme
+
+1.1.2   Thu Jan 23 23:00:00 2008
+    fix: #27078: predictable filename in /tmp
+    fix: #29122: Dependency declaration on Test::Deep missing
+    fix: #32633: Config::JSON 1.1.1 doesn't work with JSON 2.x (thanks to Ernesto Hernández-Novich for patch)
+
+1.1.1   Fri Aug 17 11:00:00 2007
+    Removed requirements for author related tests. Should make it easier to install for the average user.
+
+1.1.0   Wed Aug 08 20:00:00 2007
+    Added direct access multi-level directive support.
+    Now is an Inside Out object per Perl Best Practices.
+    API CHANGE: getFilename() does what you expect now, and getFilePath() returns the path and filename of the config.
+    Fixed qv/qw version number problem.
+
+1.0.3   Thu Mar 05 09:29:00 2007
+	Sorting out more CPAN issues. No code changes. (Sorry, this is the first module I've released to CPAN, and there seems to be more that happens after upload
+	than I know how to test from the command line.)
+
+1.0.2   Thu Mar 01 11:33:00 2007
+	Sorting out more CPAN issues. No code changes.
+
+1.0.1	Tue Feb 27 20:10:00 2007
+	Sorting out CPAN issues. No code changes.
+
+1.0.0  	Mon Feb 26 15:06:38 2007
+    Initial public release. Has been used in production environments for more than a year.
+

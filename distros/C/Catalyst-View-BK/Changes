@@ -1,0 +1,29 @@
+Fri Aug 17 08:00:53 CDT 2007  Jeremy@marzhillstudios.com
+  * added MANIFEST file
+
+Fri Aug 17 07:58:29 CDT 2007  Jeremy@marzhillstudios.com
+  * bugfix for helper class
+
+Thu Aug 16 07:58:36 CDT 2007  Jeremy@marzhillstudios.com
+  * code to generate a helper for the Bricklayer::Templater view
+
+Thu Aug 16 07:17:48 CDT 2007  Jeremy@marzhillstudios.com
+  * cleanup tests and files from dead code
+
+Wed Aug 15 17:46:54 CDT 2007  Jeremy@marzhillstudios.com
+  * skeleton for other method tests
+
+Wed Aug 15 17:44:35 CDT 2007  Jeremy@marzhillstudios.com
+  * remove dos line endings
+
+Wed Aug 15 17:42:58 CDT 2007  Jeremy@marzhillstudios.com
+  * render tests and functionality
+
+Tue Aug 14 22:28:23 CDT 2007  Jeremy@marzhillstudios.com
+  * Helper namespace
+
+Tue Aug 14 22:23:21 CDT 2007  Jeremy@marzhillstudios.com
+  * test and class to define the view
+
+Tue Aug 14 22:14:23 CDT 2007  Jeremy@marzhillstudios.com
+  * Initial directory structure set up

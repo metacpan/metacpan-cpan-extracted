@@ -1,0 +1,52 @@
+[%# YUI Rich Text Editor JS and CSS 
+    based on http://developer.yahoo.com/yui/examples/editor/post_editor_clean.html
+%]
+[% # setup base libs
+    PROCESS cms/yui/base.tt;  # process now so order loads correctly.
+        
+    SET editor_height = c.config.cms.editor.height || 300;
+    SET editor_width  = c.config.cms.editor.width  || 550;
+    SET use_editor    = c.config.cms.use_editor;
+    
+    # if our content has TT tags, then force use of plain textarea
+    # since the YUI editor tends to mangle non-pure HTML
+    IF cmspage.content.match('\[%');
+        use_editor = 0;
+    END; 
+    
+%]
+
+[% IF c.flash.message.defined || message.defined %]
+<div id="message">[% (c.flash.message || message) | html_line_break %]</div>
+[% END %]
+[% IF c.flash.error.defined || error.defined  %]
+<div id="error">[% (c.flash.error || error) | html_line_break %]</div>
+[% END %]
+
+<form method="post" 
+      action="[% c.uri_for( cmspage.url ) %]" 
+      id="cms_editor">
+      
+ <input type="hidden" name="x-tunneled-method" value="PUT" />
+ 
+ <button type="submit" id="save" name="cxcms" value="save">Save</button>
+ <button type="submit" id="cancel" name="cxcms" value="cancel">Cancel</button>
+ <button type="submit" id="preview" name="cxcms" value="preview">Preview</button>
+ [% IF use_editor %]
+ <button type="button" id="toggle_editor">Edit raw text</button> 
+ [% END %]
+ 
+ <div id="editor-wrap" style="height:[% editor_height + 8 %]px;width:[% editor_width + 8 %]px">
+ <textarea id="editor" name="text" 
+    style="height:[% editor_height %]px;width:[% editor_width %]px"
+    >[% cmspage.content %]</textarea>
+ </div>
+ 
+</form>
+
+
+<script type="text/javascript">
+  CMS.EDITOR_HEIGHT = '[% editor_height %]px';
+  CMS.EDITOR_WIDTH  = '[% editor_width %]px';
+  CMS.USE_EDITOR    = [% use_editor ? 'true' : 'false' %];
+</script>

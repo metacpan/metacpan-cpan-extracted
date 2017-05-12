@@ -1,0 +1,12 @@
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/Class/Std/Slots.pm
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/01.class.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

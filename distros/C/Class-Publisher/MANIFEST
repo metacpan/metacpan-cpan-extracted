@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Class/Publisher.pm
+t/pod.t
+t/pod_coverage.t
+t/publisher.t
+t/exchange.t
+t/Telephone.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,60 @@
+Revision history for Perl extension Calendar::Schedule.
+
+1.07  Fri Feb 19 11:32:35 AST 2016
+	- documentation improvements
+
+1.06  Wed Jan 12 10:07:36 AST 2011
+	- documented DefaultRowLabels instance variable
+	- documentation improvement
+
+1.05  Thu Apr  1 11:02:24 ADT 2010
+	- fixed (hopefully) another bug with crossing daylight-saving
+	  boundary
+
+1.04  Fri Mar 12 08:16:49 AST 2010
+	- fixed a bug with crossing daylight-saving boundary
+
+1.03  Fri Jan 29 07:29:55 AST 2010
+	- code tightening and optimization
+	- introduced caching in calculating recurr. events
+
+1.02  Tue Jan 26 08:22:28 AST 2010
+	- documentation improvement
+	- import to svn
+	- added a recurrent time specification; e.g., form:
+	    1st,3rd Tue 10-11 meeting
+	    1st,last Mon,Fri 4-5 meeting (4 meetings every month)
+	    4th Thu 11:30-13 meeting (fcm)
+	- speed optimization for some recurrent events
+
+1.01  Mon Sep  8 06:28:03 ADT 2008
+	- fixed a small typo in documentation
+	- included t/01.t (previously omitted by mistake)
+
+0.05  Wed Sep  3 08:31:37 ADT 2008
+	- improved documentation for $self->{ColLabel}
+	- added $self->{ShowDays} = 'workdays' option
+
+0.04  Fri Jun 30 07:49:13 ADT 2006
+	- minor change
+
+0.03  Fri Jun 30 07:25:25 ADT 2006
+	- recurring (weekly/biweekly) day events; e.g.
+          Wed :biweekly garbage collection
+	- debugging dayly biweekly, daylight saving time
+	- added support to iso8601, patch by Mike Vasiljevs
+
+0.02  Tue Jun 28 08:02:46 ADT 2005
+	- documentation improvement
+	- changable column labels (ColLabel)
+	- improved weekly events
+	- introduce format with several weekdays, e.g.:
+	  Mon,Wed,Fri 15:30-16:30 meeting (product team)
+        - fixed conflict handling; shows in several columns per day
+	- fixed a bug with daylight saving time for weekly events
+        - added support for :start and :biweekly tags
+	- added support for :until
+	- improved date format, e.g.: 1-Jul-2005
+
+0.01  2002 (some time)
+	- initial version

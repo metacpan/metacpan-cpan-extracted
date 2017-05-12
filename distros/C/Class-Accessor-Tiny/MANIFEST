@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-Accessor-Tiny.t
+lib/Class/Accessor/Tiny.pm
+META.yml                                 Module meta-data (added by MakeMaker)

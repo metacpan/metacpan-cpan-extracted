@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Class-Axelerator
+version:            0.02
+abstract:           Evade OO taxes
+author:
+    - Dan Kogai <dankogai@dan.co.jp>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Filter::Simple:  0
+    Test::More:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

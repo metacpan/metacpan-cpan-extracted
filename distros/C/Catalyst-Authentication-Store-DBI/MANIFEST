@@ -1,0 +1,15 @@
+Changes
+lib/Catalyst/Authentication/Store/DBI.pm
+lib/Catalyst/Authentication/Store/DBI/User.pm
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/10_auth.t
+t/20_session.t
+t/90_pod.t
+t/95_pod-coverage.t
+t/lib/SetupDB.pm
+t/lib/TestApp.pm
+t/lib/TestApp/Model/DBI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

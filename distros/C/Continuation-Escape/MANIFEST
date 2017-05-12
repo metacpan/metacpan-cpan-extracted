@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Continuation/Escape.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001-basic.t
+t/002-nested.t
+t/003-nested-thorough.t
+t/004-eval.t
+t/005-nonlexical-scope.t
+t/006-context.t
+t/100-saving-continuation.t
+t/101-saving-cont-across-callcc.t

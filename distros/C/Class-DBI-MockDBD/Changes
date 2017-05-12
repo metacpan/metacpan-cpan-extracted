@@ -1,0 +1,12 @@
+Revision history for Perl extension Class::DBI::MockDBD.
+
+0.03  Tue Apr 03 2007
+	- fixed bug where providing no data rows broke cdbi's _ids_to_data method
+
+0.02  Mon Apr 02 2007
+	- added method for providing 'sessions' of mocked results
+
+0.01  Thu Mar 29 15:25:14 2007
+	- original version; created by h2xs 1.23 with options
+		-X Class::DBI::MockDBD
+

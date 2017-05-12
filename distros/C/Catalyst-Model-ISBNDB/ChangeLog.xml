@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- :tabSize=2:indentSize=2:wrap=hard: -->
+<changelog xmlns="http://www.blackperl.com/2009/01/ChangeLogML"
+    xmlns:sc="http://www.blackperl.com/2009/01/ChangeLogML/source-control"
+    xmlns:git="http://www.blackperl.com/2009/01/ChangeLogML/source-control/git"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.blackperl.com/2009/01/ChangeLogML etc/ChangeLogML.xsd">
+  <project>Catalyst::Model::ISBNDB</project>
+  <title>Perl Module Catalyst::Model::ISBNDB Change History</title>
+  <description>
+    A Perl module providing Catalyst model-style access to the module
+    WebService::ISBNDB. This is an API to communicate with the web service
+    hosted by isbndb.com.
+  </description>
+  <release date="2009-08-17T19:55:00-07:00" version="0.22" sc:tag="0.22">
+    <change git:commit="811ca9c47189185ed6a4a9863a47636166e1294e">
+      <file path="t/00_signature.t" action="DELETE" />
+      <description>
+        Deprecated test.
+      </description>
+    </change>
+    <change git:commit="d6ad5d5db58de849581bde8586beb32d46f10513">
+      <fileset>
+        <file path="ChangeLog" action="DELETE" />
+        <file path="MANIFEST" action="DELETE" />
+        <file path="Makefile" action="DELETE" />
+      </fileset>
+      <description>
+        Deprecated files.
+      </description>
+    </change>
+    <change git:commit="d71aaee6663e73d5419fbdbb357e845979a1ab9c">
+      <fileset>
+        <file path="t/01_pod.t" />
+        <file path="t/02_pod_coverage.t" />
+        <file path="t/03_meta.t" action="ADD" />
+        <file path="t/04_minimumversion.t" action="ADD" />
+        <file path="t/05_critic.t" action="ADD" />
+      </fileset>
+      <description>
+        Three new test suites added, two modified to run as developer-only
+        tests.
+      </description>
+    </change>
+    <change git:commit="f5bd5eaa6fa5b6b165f962bd91276afca12f153e">
+      <fileset>
+        <file path="lib/Catalyst/Helper/Model/ISBNDB.pm" />
+        <file path="lib/Catalyst/Model/ISBNDB.pm" />
+      </fileset>
+      <description>
+        Fixed license docs, other code-cleanliness changes.
+      </description>
+    </change>
+    <change git:commit="f6fa85b0f83fd4a4ac01e019aa16e9574d0c9202">
+      <fileset>
+        <file path="README" action="DELETE" />
+        <file path="README.textile" action="ADD" />
+      </fileset>
+      <description>
+        Replace README with README.textile and associated logic in Build.PL.
+      </description>
+    </change>
+  </release>
+  <release date="2008-02-18T10:39:34-08:00" version="0.21" sc:tag="v0_21">
+    <change>
+      <fileset>
+        <file path="lib/Catalyst/Helper/Model/ISBNDB.pm" revision="14" />
+        <file path="lib/Catalyst/Model/ISBNDB.pm" revision="14" />
+        <file path="t/DUMMY.pm" revision="14" />
+      </fileset>
+      <description>
+        Updated all copyright dates and license information. All license
+        references are now to the dual-license arrangement (Artistic 2.0 and
+        LGPL). Added use of "warnings" pragma to any modules that didn't
+        already have it.
+      </description>
+    </change>
+    <change>
+      <file path="Build.PL" revision="15" />
+      <description>
+        Updated the package version, fixed reference to required perl version
+        to remove use of v-string, and added some overlooked dependencies in
+        the "requires" parameter.
+      </description>
+    </change>
+    <change>
+      <file path="t/00_load.t" revision="18" />
+      <description>
+        Fixed references to modules in this test. For some reason, the tests
+        referred to the ::XMLRPC Catalyst components, and no one caught it.
+      </description>
+    </change>
+  </release>
+  <release version="0.20" sc:tag="v0_20" date="2006-10-29T23:50:57-07:00">
+    <change>
+      <fileset>
+        <file path="lib/Catalyst/Helper/Model/ISBNDB.pm" action="ADD"
+              revision="7" />
+        <file path="t/00_load.t" action="ADD" revision="7" />
+        <file path="MANIFEST" revision="7" />
+      </fileset>
+      <description>
+        Added a new class, Catalyst::Helper::Model::ISBNDB, to make it easier
+        for developers to generate models for their applications based on
+        Catalyst::Model::ISBNDB. This called for new tests and a change to
+        MANIFEST.
+      </description>
+    </change>
+  </release>
+  <release version="0.10" sc:tag="v0_10" date="2006-10-12T23:02:48-06:00">
+    <change>
+      <fileset>
+        <file path="Build.PL" revision="5" />
+        <file path="ChangeLog" revision="5" />
+        <file path="ChangeLog.xml" revision="5" />
+        <file path="MANIFEST" revision="5" />
+        <file path="MANIFEST.SKIP" revision="2" />
+        <file path="Makefile.PL" revision="5" />
+        <file path="README" revision="5" />
+        <file path="etc/ChangeLogML.xsd" revision="2" />
+        <file path="lib/Catalyst/Model/ISBNDB.pm" revision="5" />
+        <file path="t/00_signature.t" revision="5" />
+        <file path="t/01_pod.t" revision="5" />
+        <file path="t/02_pod_coverage.t" revision="5" />
+        <file path="t/10_basic.t" revision="5" />
+        <file path="t/DUMMY.pm" revision="5" />
+        <file path="t/xml/Authors-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-book_id=programming_web_services_with_perl.xml" revision="2" />
+        <file path="t/xml/Books-isbn=0596002068.xml" revision="2" />
+        <file path="t/xml/Books-page_number=10-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=11-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=12-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=13-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=14-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=15-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=16-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=17-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=18-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=19-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=2-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=20-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=21-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=22-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=23-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=24-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=25-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=26-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=3-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=4-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=5-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=6-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=7-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=8-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-page_number=9-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Books-person_id=poe_edgar_allan.xml" revision="2" />
+        <file path="t/xml/Categories-category_id=science.xml" revision="2" />
+        <file path="t/xml/Publishers-publisher_id=oreilly.xml" revision="2" />
+        <file path="t/xml/Subjects-subject_id=perl_computer_program_language.xml" revision="2" />
+      </fileset>
+      <description>
+        Intial release.
+      </description>
+    </change>
+  </release>
+</changelog>

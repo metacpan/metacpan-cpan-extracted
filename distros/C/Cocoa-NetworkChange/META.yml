@@ -1,0 +1,36 @@
+---
+abstract: 'Checking network connection for OS X'
+author:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.9.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cocoa-NetworkChange
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - builder
+provides:
+  Cocoa::NetworkChange:
+    file: lib/Cocoa/NetworkChange.pm
+    version: 0.01
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/akiym/Cocoa-NetworkChange/issues
+  homepage: https://github.com/akiym/Cocoa-NetworkChange
+  repository: git://github.com/akiym/Cocoa-NetworkChange.git
+version: 0.01

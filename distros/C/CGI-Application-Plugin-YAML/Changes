@@ -1,0 +1,11 @@
+Revision history for CGI-Application-Plugin-YAML
+
+0.03    01/02/2009 (UK date)
+        Typo fixes.
+
+0.02    19/01/2009 (UK date)
+        YAML::Any module is now completely lazy loaded.
+
+0.01    16/01/2009 (UK date)
+        First version, released on an unsuspecting world.
+

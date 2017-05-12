@@ -1,0 +1,4 @@
+name: DBIC
+version: 1
+
+default_model: DBIC

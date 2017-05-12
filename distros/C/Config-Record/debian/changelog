@@ -1,0 +1,9 @@
+libconfig-record-perl (1.0.2-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Daniel Berrange <dan@berrange.com>  Wed,  7 Apr 2004 12:12:48 +0100
+
+Local variables:
+mode: debian-changelog
+End:

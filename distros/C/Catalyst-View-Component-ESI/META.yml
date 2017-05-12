@@ -1,0 +1,23 @@
+---
+abstract: 'Include ESI in your templates'
+author:
+  - 'BjE<oslash>rn-Olav Strand <bo@startsiden.no>'
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Component-ESI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.70000
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Role: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

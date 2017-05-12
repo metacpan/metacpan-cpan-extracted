@@ -1,0 +1,27 @@
+---
+abstract: 'DEPRECATED Zlib Compression for Catalyst'
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Compress-Zlib
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.7006
+  Compress::Zlib: 0
+  MRO::Compat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-Compress-Zlib/
+version: 0.06

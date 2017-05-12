@@ -1,0 +1,19 @@
+Changes
+lib/Catalyst/Plugin/Static/Simple/ByClass.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-myapp.t
+t/MyApp/lib/MyApp.pm
+t/MyApp/lib/MyApp/Controller/Root.pm
+t/MyApp/Makefile.PL
+t/MyApp/myapp.conf
+t/MyApp/root/favicon.ico
+t/MyApp/script/myapp_server.pl
+t/MyStaticStuff.pm
+t/MyStaticStuff/test.css
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

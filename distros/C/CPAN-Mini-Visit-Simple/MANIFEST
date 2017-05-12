@@ -1,0 +1,28 @@
+Changes
+examples/01-distros_with_xs.pl
+examples/02-build_distros_with_xs.pl
+examples/03-refresh_success_list.pl
+examples/04-visit_one_distro.pl
+examples/05-visit_multiple_distros.pl
+examples/lib/Helper.pm
+examples/module-install-130467.pl
+lib/CPAN/Mini/Visit/Simple.pm
+lib/CPAN/Mini/Visit/Simple.pod
+lib/CPAN/Mini/Visit/Simple/Auxiliary.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001_new.t
+t/002_identify_distros.t
+t/003_dedupe_superseded.t
+t/004_normalize_version_number.t
+t/005_get_list.t
+t/006_refresh_list.t
+t/007_get_lookup_table.t
+t/008_visit.t
+t/data/mydistro.tar.gz
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

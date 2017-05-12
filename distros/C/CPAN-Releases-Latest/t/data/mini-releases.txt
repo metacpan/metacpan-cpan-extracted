@@ -1,0 +1,8 @@
+#FORMAT: 1
+ack P/PE/PETDANCE/ack-2.12.tar.gz 1386078741 219614
+ack P/PE/PETDANCE/ack-2.13_06.tar.gz 1390714987 217772
+Grades D/DR/DRBEAN/Grades-0.16.tar.gz 1396744342 82593
+Graph J/JH/JHI/Graph-0.96.tar.gz 1369483123 147629
+Graph N/NE/NEILB/Graph-0.96_01.tar.gz 1394362358 147335
+Graphics-Magick-Object G/GA/GAURAV/Graphics-Magick-Object-0.01_01.tar.gz 1241026391 21039
+Gruntmaster-Daemon M/MG/MGV/Gruntmaster-Daemon-5999.000_003.tar.gz 1398243300 33067

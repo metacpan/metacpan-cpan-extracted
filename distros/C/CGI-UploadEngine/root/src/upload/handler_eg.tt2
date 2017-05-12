@@ -1,0 +1,13 @@
+[% META title = 'File upload handler example' %]
+<form action='[% action_url %]' method='POST'>
+<table cellspacing="2" cellpadding="0" width="600">
+      <tr>
+           <td width='35%' valign='center' style='font-size:12; text-align:right; background-color:#F7E2D9; padding-right:10; height:22;'> Saved as </td>
+           <td width='65%' valign='center' style='font-size:12; height:22;'> [% path_name %] </td>
+      </tr>
+      <tr>
+           <td width='35%' valign='center' style='font-size:12; text-align:right; background-color:#F7E2D9; padding-right:10; height:22;'> Your field was </td>
+           <td width='65%' valign='center' style='font-size:12; height:22;'> [% other %] </td>
+      </tr>
+</table>
+</form>

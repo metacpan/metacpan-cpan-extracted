@@ -1,0 +1,297 @@
+# Grace project file
+# 
+@version 50005
+@page size 640, 480
+@page scroll 5%
+@page inout 5%
+@link page off
+@reference date 0
+@date wrap off
+@date wrap year 1950
+@g0 stacked false
+@g0 hidden false
+@g0 type Chart
+@g0 bar hgap 0.000000
+@g0 fixedpoint off
+@g0 fixedpoint type 0
+@g0 fixedpoint xy 0.000000, 0.000000
+@g0 fixedpoint format general general
+@g0 fixedpoint prec 6, 6
+@with g0
+@    world xmin 0
+@    world xmax 1
+@    world ymin 0
+@    world ymax 1
+@    stack world 0, 0, 0, 0
+@    view xmin 0.150000
+@    view xmax 1.150000
+@    view ymin 0.150000
+@    view ymax 0.850000
+@    title "Percent of widgets"
+@    title font 0
+@    title size 1.250000
+@    title color 1
+@    subtitle "Data collected from 07/24/2001 to 08/01/2001"
+@    subtitle font 0
+@    subtitle size 1.000000
+@    subtitle color 1
+@    xaxes scale Normal
+@    xaxes invert off
+@    yaxes scale Normal
+@    yaxes invert off
+@    xaxis  on
+@    xaxis  type zero false
+@    xaxis  offset 0.000000, 0.000000
+@    xaxis  bar on
+@    xaxis  bar color 1
+@    xaxis  bar linestyle 1
+@    xaxis  bar linewidth 1.0
+@    xaxis  label "Date of data sampling"
+@    xaxis  label layout para
+@    xaxis  label place auto
+@    xaxis  label char size 1.000000
+@    xaxis  label font 0
+@    xaxis  label color 1
+@    xaxis  label place auto
+@    xaxis  tick on
+@    xaxis  tick default 6
+@    xaxis  tick place rounded true
+@    xaxis  tick major size 1
+@    xaxis  tick major color 1
+@    xaxis  tick major linewidth 1.0
+@    xaxis  tick major linestyle 1.000000
+@    xaxis  tick major grid off
+@    xaxis  tick minor size 1
+@    xaxis  tick minor color 1
+@    xaxis  tick minor linewidth 1.0
+@    xaxis  tick minor linestyle 1.000000
+@    xaxis  tick minor grid off
+@    xaxis  tick in
+@    xaxis  tick place both
+@    xaxis  tick type auto
+@    xaxis  ticklabel on
+@    xaxis  ticklabel prec 5
+@    xaxis  ticklabel format general
+@    xaxis  ticklabel append ""
+@    xaxis  ticklabel prepend ""
+@    xaxis  ticklabel angle 0
+@    xaxis  ticklabel skip 0
+@    xaxis  ticklabel stagger 0
+@    xaxis  ticklabel place normal
+@    xaxis  ticklabel offset 0.000000, 0.000000
+@    xaxis  ticklabel sign normal
+@    xaxis  ticklabel start type auto
+@    xaxis  ticklabel start 0.000000
+@    xaxis  ticklabel stop type auto
+@    xaxis  ticklabel stop 0.000000
+@    xaxis  ticklabel char size 1.000000
+@    xaxis  ticklabel font 0
+@    xaxis  ticklabel color 1
+@    xaxis  ticklabel type auto
+@    yaxis  on
+@    yaxis  type zero false
+@    yaxis  offset 0.000000, 0.000000
+@    yaxis  bar on
+@    yaxis  bar color 1
+@    yaxis  bar linestyle 1
+@    yaxis  bar linewidth 1.0
+@    yaxis  label "Percent of widgets"
+@    yaxis  label layout para
+@    yaxis  label place auto
+@    yaxis  label char size 1.000000
+@    yaxis  label font 0
+@    yaxis  label color 1
+@    yaxis  label place auto
+@    yaxis  tick on
+@    yaxis  tick default 6
+@    yaxis  tick place rounded true
+@    yaxis  tick major size 1
+@    yaxis  tick major color 1
+@    yaxis  tick major linewidth 1.0
+@    yaxis  tick major linestyle 1.000000
+@    yaxis  tick major grid off
+@    yaxis  tick minor size 1
+@    yaxis  tick minor color 1
+@    yaxis  tick minor linewidth 1.0
+@    yaxis  tick minor linestyle 1.000000
+@    yaxis  tick minor grid off
+@    yaxis  tick in
+@    yaxis  tick place both
+@    yaxis  tick type auto
+@    yaxis  ticklabel on
+@    yaxis  ticklabel prec 5
+@    yaxis  ticklabel format general
+@    yaxis  ticklabel append ""
+@    yaxis  ticklabel prepend ""
+@    yaxis  ticklabel angle 0
+@    yaxis  ticklabel skip 0
+@    yaxis  ticklabel stagger 0
+@    yaxis  ticklabel place normal
+@    yaxis  ticklabel offset 0.000000, 0.000000
+@    yaxis  ticklabel sign normal
+@    yaxis  ticklabel start type auto
+@    yaxis  ticklabel start 0.000000
+@    yaxis  ticklabel stop type auto
+@    yaxis  ticklabel stop 0.000000
+@    yaxis  ticklabel char size 1.000000
+@    yaxis  ticklabel font 0
+@    yaxis  ticklabel color 1
+@    yaxis  ticklabel type auto
+@    altxaxis  off
+@    altyaxis  off
+@    legend on
+@    legend loctype view
+@    legend x1 0.85
+@    legend y1 0.8
+@    legend box color 1
+@    legend box pattern 1
+@    legend box linewidth 1.0
+@    legend box linestyle 1
+@    legend box fill color 0
+@    legend box fill pattern 1
+@    legend font 0
+@    legend char size 1.000000
+@    legend color 1
+@    legend length 4
+@    legend vgap 1
+@    legend hgap 1
+@    legend invert false
+@    frame type 0
+@    frame linestyle 1
+@    frame linewidth 1.0
+@    frame color 1
+@    frame pattern 1
+@    frame background color 0
+@    frame background pattern 0
+@ target G0.S0
+@ type BAR
+		2001-07-24		32.58
+		2001-07-25		30.4291287386216
+		2001-07-26		34.4106463878327
+		2001-07-27		34.44
+		2001-07-28		37.4482270936458
+		2001-07-29		37.8769479862376
+		2001-07-30		34.9437860832574
+		2001-07-31		36.0707388962293
+		2001-08-01		40.0591353996737
+&
+@ target G0.S1
+@ type BAR
+		2001-07-24		29.13
+		2001-07-25		30.8192457737321
+		2001-07-26		29.1775065039023
+		2001-07-27		29.82
+		2001-07-28		28.9221133447823
+		2001-07-29		28.5772110908723
+		2001-07-30		29.2109794388737
+		2001-07-31		26.8624860250025
+		2001-08-01		8.442088091354
+&
+@ target G0.S2
+@ type BAR
+		2001-07-24		15.42
+		2001-07-25		17.2251675502651
+		2001-07-26		15.6093656193716
+		2001-07-27		16.02
+		2001-07-28		14.526719870694
+		2001-07-29		15.1791135397693
+		2001-07-30		16.8337891218475
+		2001-07-31		16.3227970322187
+		2001-08-01		17.7304241435563
+&
+@ target G0.S3
+@ type BAR
+		2001-07-24		7.61
+		2001-07-25		7.80234070221066
+		2001-07-26		7.82469481689013
+		2001-07-27		7.57
+		2001-07-28		7.72805333872108
+		2001-07-29		7.34669095324833
+		2001-07-30		7.95097741314697
+		2001-07-31		10.7226344140665
+		2001-08-01		12.9282218597064
+&
+@ target G0.S4
+@ type BAR
+		2001-07-24		10.75
+		2001-07-25		9.53285985795739
+		2001-07-26		8.375025015009
+		2001-07-27		7.79
+		2001-07-28		6.32387109809072
+		2001-07-29		6.90143695608177
+		2001-07-30		6.26962422769169
+		2001-07-31		5.43754446590101
+		2001-08-01		14.8960032626427
+&
+@ target G0.S5
+@ type BAR
+		2001-07-24		3.16
+		2001-07-25		2.68080424127238
+		2001-07-26		3.08184910946568
+		2001-07-27		2.85
+		2001-07-28		2.78816042024447
+		2001-07-29		2.6006881198138
+		2001-07-30		3.0892332624329
+		2001-07-31		3.02876308567944
+		2001-08-01		3.02814029363785
+&
+@ target G0.S6
+@ type BAR
+		2001-07-24		1.14
+		2001-07-25		1.28038411523457
+		2001-07-26		1.26075645387232
+		2001-07-27		1.33
+		2001-07-28		2.09112031518335
+		2001-07-29		1.27504553734062
+		2001-07-30		1.43826597791958
+		2001-07-31		1.31110885252566
+		2001-08-01		2.76305057096248
+&
+@ target G0.S7
+@ type BAR
+		2001-07-24		0.09
+		2001-07-25		0.110033009902971
+		2001-07-26		0.150090054032419
+		2001-07-27		0.07
+		2001-07-28		0.111122335589453
+		2001-07-29		0.121432908318154
+		2001-07-30		0.121543603767852
+		2001-07-31		0.111799979672731
+		2001-08-01		0.0815660685154976
+&
+@ target G0.S8
+@ type BAR
+		2001-07-24		0.04
+		2001-07-25		0.0500150045013504
+		2001-07-26		0.0500300180108065
+		2001-07-27		0.02
+		2001-07-28		0.0303060915243964
+		2001-07-29		0.0607164541590771
+		2001-07-30		0.0709004355312468
+		2001-07-31		0.0203272690314056
+		2001-08-01		0.0101957585644372
+&
+@ target G0.S9
+@ type BAR
+		2001-07-24		0.03
+		2001-07-25		0.0600180054016205
+		2001-07-26		0.0400240144086452
+		2001-07-27		0.08
+		2001-07-28		0.0202040610162643
+		2001-07-29		0.0303582270795386
+		2001-07-30		0.0607718018839259
+		2001-07-31		0.0609818070942169
+		2001-08-01		0.0203915171288744
+&
+@ target G0.S10
+@ type BAR
+		2001-07-24		0.05
+		2001-07-25		0.0100030009002701
+		2001-07-26		0.0200120072043226
+		2001-07-27		0.01
+		2001-07-28		0.0101020305081321
+		2001-07-29		0.0303582270795386
+		2001-07-30		0.010128633647321
+		2001-07-31		0.0508181725785141
+		2001-08-01		0.0407830342577488
+&

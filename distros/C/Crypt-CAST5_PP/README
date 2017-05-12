@@ -1,0 +1,27 @@
+Crypt::CAST5_PP
+
+The CAST5 block cipher, implemented in pure Perl.
+
+
+Dependencies:
+    Module::Signature is needed to check the signature
+    Test::More is needed to run the tests
+    Test::Taint is needed for the tainting test
+    Crypt::CBC is useful but not required
+
+
+Installation:
+    cpansign -v
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Author:
+    Bob Mathews <bobmathews@alumni.calpoly.edu>
+
+
+Copyright (c) 2006 Bob Mathews. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

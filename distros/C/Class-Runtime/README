@@ -1,0 +1,204 @@
+NAME
+    Class::Runtime - API for dynamic class loading/unloading/status
+
+DEPENDENCIES
+    *   Symbol
+
+    *   File::Spec
+
+INSTALLATION
+    To install this module type the following:
+
+    * perl Makefile.PL
+
+    * make
+
+    * make test
+
+    * make install
+
+OVERVIEW
+    Class for dynamically loading/unloading/stat on modules. Currently it is
+    designed for loading a class local to the system at runtime. Future
+    versions may include loading in a distributed environment.
+
+    A specific search path can be associated with the object which will be
+    'unshifted' onto @INC before attempting to load the class and 'shifted'
+    off after attempting to load.
+
+    Also, a class can be checked whether it is loaded or not in the process.
+
+SYNOPSIS
+     my $class = 'MyClass::MySubClass';
+     my $obj = Class::Runtime->new( class=> $class );
+
+     ## LOADING CLASS AT RUNTIME
+     unless ( $cl->load ) {
+            warn "Error in loading class\n";
+            warn "\n\n", $@, "\n\n" if DEBUG;
+     }
+
+     ## CHECKING FOR CLASS AVAILABILITY AT RUNTIME
+     unless ( $cl->isLoaded ) {
+            warn 'Class - ', $class, ' - is loaded', "\n";
+     }
+
+     my $newPath;
+     ## ADDING SEACH PATH TO OBJECT
+     ## Multiple
+     $newPath = $cl->addPath( path=> [ qw( /tmp/lib /tmp/lib2 ) ] );
+  
+     ##OR Single
+     $newPath = $cl->addPath( path=> '/tmp/lib' );
+
+     ## REMOVING SEARCH PATH FROM OBJECT
+     ## Multiple
+     $newPath = $cl->dropPath( path=> [ qw( /tmp/lib /tmp/lib2 ) ] );
+  
+     ##OR Single
+     $newPath = $cl->dropPath( path=> '/tmp/lib' );
+
+     ## GETTING PATH ASSOCIATED WITH OBJECT
+     my @path = $cl->getPath;
+
+     ## INVOKING METHOD 
+     my $method = 'new';
+     if ( $cl->isLoaded and $class->can( 'new' ) ) {
+            my $obj = $cl->invoke( 'new', arg1=> 1, arg2=> 2 );
+            $obj->method2;
+     }
+
+     ## NOT NECESSARY AS ONCE CLASS HAS BEEN LOADED CAN INVOKE DIRECTLY
+     if ( $cl->isLoaded and $class->can( 'new' ) ) {
+            my $obj = $class->new( arg1=> 1, arg2=> 2 );
+            $obj->method2;
+     }
+
+     ## UNLOADING CLASS
+     if ( $cl->isLoaded ) {
+            $cl->unload or warn 'Unable to unload class - ', $class, "\n";
+     }
+  
+METHODS
+  new CONSTRUCTOR
+
+    Creates new object and initializes member variables if passed in as
+    arguments. Takes parameterized argument list.
+
+    Input
+      * class => name of class to dynamically load
+
+    Output
+      * Class::Runtime object
+
+  getPath
+
+    Method used to retrieve path associated with this object
+
+    Input
+      * None
+
+    Output
+      * array of paths
+
+      * integer 0 if no paths exist
+
+  addPath
+
+    Method used to add path to object path list to search from
+
+    Input
+      * path => As a single string or as a reference to an array
+
+    Output
+      * array of paths
+
+      * undef if error
+
+  dropPath
+
+    Method used to remove path from object search path
+
+    Input
+      * path=> As a single string or as a reference to an array
+
+    Output
+      * array of paths
+
+      * undef if error
+
+  isLoaded
+
+    Method used to check whether given class is loaded.
+
+    Input
+      * None
+
+    Output
+      * 1 if loaded
+
+      * 0 if not loaded
+
+  load
+
+    Method used to load library/class. If a path has been associated with
+    this object it will be 'unshifted' onto the global @INC array.
+    Immediately after the attempted load the paths 'unshifted' onto the @INC
+    array will be 'spliced' out. This is done so as to prevent any wrongful
+    modification of @INC since the loading library may modify @INC or
+    perhaps some other code.
+
+    Input
+      * None
+
+    Output
+      * 1 on successful load
+
+      * undef if error (setting $@)
+
+  unload
+
+    Method used to unload class/library
+
+    Input
+      * None
+
+    Output
+      * 1 on successful unload
+
+      * undef if error
+
+  invoke
+
+    Method used to load class/library and call specific method with that
+    library.
+
+    Input
+      * name of method
+
+      * remaining list of arguments to pass off to invoked method
+
+    Output
+      * value of returned method call
+
+HISTORY
+    * 2002/02/14 Created
+
+      2003/07/07 Modified to correct exception handling in invoke
+
+SUPPORT AND SUGGESTIONS
+    Currently you can contact the author at the email address listed below.
+
+AUTHOR
+    * Stathy G. Touloumis <stathy-classruntime@stathy.com>
+
+CREDITS
+    * Per Einar Ellefsen - For providing the code to conver class to file
+      path portably.
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2002 Stathy G. Touloumis
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

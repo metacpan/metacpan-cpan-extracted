@@ -1,0 +1,27 @@
+---
+abstract: 'Easy, automatic creation of test Memcached instance'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  FindBin: 0
+  Moose: 0
+  Test::Most: 0.25
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session-Store-TestMemcached
+requires:
+  Catalyst::Plugin::Session::Store::Memcached: 0
+  Moose: 0
+  Test::Memcached: 0
+  namespace::autoclean: 0
+version: 0.001

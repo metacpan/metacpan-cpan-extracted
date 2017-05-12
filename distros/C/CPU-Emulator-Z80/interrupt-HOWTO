@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use CPU::Emulator::Z80;
+use Time::HiRes qw(setitimer ITIMER_REAL);
+use Term::ReadKey;
+
+my $cpu = CPU::Emulator::Z80->new();
+
+setitimer(ITIMER_REAL, 1, 0.01); # after 1 sec, interrupt every sec
+# setitimer(ITIMER_VIRTUAL, 1, 1); # after 1 sec, interrupt every sec
+# $SIG{VTALRM} = sub {
+$SIG{ALRM} = sub {
+    ReadMode 'cbreak';
+    my $key = ReadKey(-1);
+    if($key) {
+        print "Got char $key\n";
+    }
+    $cpu->interrupt();
+};
+
+ReadMode 'noecho';
+$cpu->run(1000000);
+ReadMode 'normal';
+

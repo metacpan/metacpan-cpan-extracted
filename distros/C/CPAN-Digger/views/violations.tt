@@ -1,0 +1,15 @@
+[%
+   title= "Perl::Critic violations"
+   description= ""
+%]
+[% INCLUDE incl/header.tt %]
+
+<table>
+<tr><td>Policy</td><td>Count</td></tr>
+[% FOR v IN violations %]
+<tr><td>[% v.0 %]</td><td>[% v.1 %]</td></tr>
+[% END %]
+</table>
+
+[% INCLUDE incl/footer.tt %]
+

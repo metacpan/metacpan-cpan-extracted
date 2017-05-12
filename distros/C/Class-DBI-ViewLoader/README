@@ -1,0 +1,481 @@
+NAME
+    Class::DBI::ViewLoader - Load views from existing databases as
+    Class::DBI classes
+
+SYNOPSIS
+        use Class::DBI::ViewLoader;
+
+        # set up loader object
+        $loader = new Class::DBI::ViewLoader (
+                dsn => 'dbi:Pg:dbname=mydb',
+                username => 'me',
+                password => 'mypasswd',
+                options => {
+                    RaiseError => 1,
+                    AutoCommit => 1
+                },
+                namespace => 'MyClass::View',
+                exclude => qr(^te(?:st|mp)_)i,
+                include => qr(_foo$),
+                import_classes => [qw(
+                    Class::DBI::Plugin::RetrieveAll
+                    Class::DBI::AbstractSearch
+                )];
+                base_classes => [qw(
+                    MyBase
+                )],
+                accessor_prefix => 'get_',
+                mutator_prefix => 'set_',
+            );
+
+        # create classes
+        @classes = $loader->load_views;
+
+        # retrieve all rows from view live_foo
+        MyClass::View::LiveFoo->retrieve_all()
+
+        # Get the class name from the view name
+        $class = $loader->view_to_class('live_foo');
+
+        # Works for views that weren't loaded too
+        $unloaded_class = $loader->view_to_class('test_foo');
+
+DESCRIPTION
+    This class loads views from databases as Class::DBI classes. It follows
+    roughly the same interface employed by Class::DBI::Loader.
+
+    This class behaves as a base class for the database-dependent driver
+    classes, which are loaded by Module::Pluggable. Objects are reblessed
+    into the relevant subclass as soon as the driver is discovered, see
+    set_dsn(). Driver classes should always be named
+    Class::DBI::ViewLoader::<driver_name>.
+
+CONSTRUCTOR
+  new
+        $obj = $class->new(%args)
+
+    Instantiates a new object. The values of %args are passed to the
+    relevant set_* accessors, detailed below. The following 2 statements
+    should be equivalent:
+
+        new Class::DBI::ViewLoader ( dsn => $dsn, username => $user );
+
+        new Class::DBI::ViewLoader->set_dsn($dsn)->set_username($user);
+
+    For compatibilty with Class::DBI::Loader, the following aliases are
+    provided for use in the arguments to new() only.
+
+    *   user -> username
+
+    *   additional_classes -> import_classes
+
+    *   additional_base_classes -> base_classes
+
+    *   constraint -> include
+
+    the debug and relationships options are not supported but are silently
+    ignored.
+
+    So
+
+        new Class::DBI::ViewLoader user => 'me', constraint => '^foo', debug => 1;
+
+    Is equivalent to:
+
+        new Class::DBI::ViewLoader username => 'me', include => '^foo';
+
+    Unrecognised options will cause a fatal error to be raised, see
+    DIAGNOSTICS.
+
+ACCESSORS
+  set_dsn
+        $obj = $obj->set_dsn($dsn_string)
+
+    Sets the datasource for the object. This should be in the form
+    understood by DBI e.g. "dbi:Pg:dbname=mydb"
+
+    Calling this method will rebless the object into a handler class for the
+    given driver. If no such handler is installed, "No handler for driver"
+    will be raised via croak(). See DIAGNOSTICS for other fatal errors
+    raised by this method.
+
+  get_dsn
+        $dsn = $obj->get_dsn
+
+    Returns the dsn string, as passed in by set_dsn.
+
+  set_username
+        $obj = $obj->set_username($username)
+
+    Sets the username to use when connecting to the database.
+
+  get_username
+        $username = $obj->get_username
+
+    Returns the username.
+
+  set_password
+        $obj = $obj->set_password
+
+    Sets the password to use when connecting to the database.
+
+  get_password
+        $password = $obj->get_password
+
+    Returns the password
+
+  set_options
+        $obj = $obj->set_dbi_options(%opts)
+
+    Accepts a hash or a hash reference.
+
+    Sets the additional configuration options to pass to DBI.
+
+    The hash will be copied internally, to guard against any accidental
+    modification after assignment.
+
+    Options specified affect how the database that is used by the loader is
+    built. This is not always the same handle that is used by generated
+    classes.
+
+  get_options
+        \%opts = $obj->get_dbi_options
+
+    Returns the DBI options hash. The return value should always be a hash
+    reference, even if there are no dbi options set.
+
+    The reference returned by this function is live, so modification of it
+    directly affects the object.
+
+  set_namespace
+        $obj = $obj->set_namespace($namespace)
+
+    Sets the namespace to load views into. This should be a valid perl
+    package name, with or without a trailing '::'.
+
+  get_namespace
+        $namespace = $obj->get_namespace
+
+    Returns the target namespace. If not set, returns an empty list.
+
+  set_include
+        $obj = $obj->set_include($regexp)
+
+    Sets a regexp that matches the views to load. Only views that match this
+    expression will be loaded, unless they also match the exclude
+    expression.
+
+    Accepts strings or Regexps, croaks if any other reference is passed.
+
+    The value is stored as a Regexp, even if a string was passed in.
+
+  get_include
+        $regexp = $obj->get_include
+
+    Returns the include regular expression.
+
+    Note that this may not be identical to what was passed in.
+
+  set_exclude
+        $obj = $obj->set_exclude($regexp)
+
+    Sets a regexp to use to rule out views. Any view that matches this regex
+    will not be loaded by load_views(), even if it is explicitly included by
+    the include rule.
+
+    Accepts strings or Regexps, croaks if any other reference is passed.
+
+    The value is stored as a Regexp, even if a string was passed in.
+
+  get_exclude
+        $regexp = $obj->get_exclude
+
+    Returns the exclude regular expression.
+
+    Note that this may not be identical to what was passed in.
+
+  set_base_classes
+        $obj = $obj->set_base_classes(@classes)
+
+    Sets classes for all generated classes to inherit from.
+
+    This is in addition to the class specified by the driver's base_class
+    method, which will always be the first item in the generated @ISA.
+
+    Note that these classes are not loaded for you, be sure to "use" or
+    "require" them yourself.
+
+  add_base_classes
+        $obj = $obj->add_base_classes(@classes)
+
+    Appends to the list of base classes.
+
+  get_base_classes
+        @classes = $obj->get_base_classes
+
+    Returns the list of base classes, as supplied by set_base_classes.
+
+  set_left_base_classes
+    Sets base classes like set_base_classes, except that the added classes
+    will go before the driver's base_class.
+
+  get_left_base_classes
+        @classes = $obj->get_left_base_classes
+
+    Returns the list of left base classes, as supplied by set_base_classes.
+
+  add_left_base_classes
+        $obj = $obj->add_base_classes(@classes)
+
+    Appends to the list of left base classes.
+
+  set_import_classes
+        $obj = $obj->set_import_classes(@classes)
+
+    Sets a list of classes to import from. Note that these classes are not
+    loaded by the generated class itself.
+
+        # Load the module first
+        require Class::DBI::Plugin::RetrieveAll;
+    
+        # Make generated classes import symbols
+        $loader->set_import_classes(qw(Class::DBI::Plugin::RetrieveAll));
+
+    Any classes that inherit from Exporter will be loaded via Exporter's
+    "export" function. Any other classes are loaded by a "use" call in a
+    string eval.
+
+  add_import_classes
+        $obj = $obj->add_import_classes(@classes)
+
+    Appends to the list of import classes.
+
+  get_import_classes
+        @classes = $obj->get_import_classes
+
+    Returns the list of classes that will be imported into you generated
+    classes.
+
+  set_accessor_prefix
+        $obj = $obj->set_accessor_prefix
+
+    Sets the accessor prefix for generated classes. See Class::DBI for
+    details of how this works.
+
+  get_accessor_prefix
+        $prefix = $obj->get_accessor_prefix
+
+    Returns the object's accessor prefix.
+
+  set_mutator_prefix
+        $obj = $obj->set_mutator_prefix
+
+    Sets the mutator prefix for generated classes. See Class::DBI for
+    details of how this works.
+
+  get_mutator_prefix
+        $prefix = $obj->get_mutator_prefix
+
+    Returns the object's mutator prefix.
+
+METHODS
+  load_views
+        @classes = $obj->load_views
+
+    The main method for the class, loads all relevant views from the
+    database and generates classes for those views.
+
+    The generated classes will be read-only and have a multi-column primary
+    key containing every column. This is because it is not guaranteed that
+    the view will have a real primary key and Class::DBI insists that there
+    should be a unique identifier for every row.
+
+    If the newly generated class inherits a "Main" Class::DBI handle (via
+    "connection" or "set_db" calls in base classes) that handle will be used
+    by the class. Otherwise, a new connection is set up for the classes
+    based on the loader's connection.
+
+    Usually, any row containing an undef (NULL) primary key column is
+    considered false in boolean context, in this particular case however
+    that doesn't make much sense. So only all-null rows are considered false
+    in classes generated by this class.
+
+    Each class is only ever generated once, no matter how many times
+    load_views() is called. If you want to load the same view twice for some
+    reason, you can achieve this by changing the namespace.
+
+    Returns class names for all created classes.
+
+  view_to_class
+        $class = $obj->view_to_class($view)
+
+    Returns the class for the given view name. This depends on the object's
+    current namespace, see set_namespace(). It doesn't matter if the class
+    has been loaded, or if the view exists in the database.
+
+    If this method is called without arguments, or with an empty string, it
+    returns an empty string.
+
+  _get_dbi_handle
+        $dbh = $obj->_get_dbi_handle
+
+    Returns a DBI handle based on the object's dsn, username and password.
+    This generally shouldn't be called externally (hence the leading
+    underscore).
+
+    Making multiple calls to this method won't cause multiple connections to
+    be made. A single handle is cached by the object from the first call to
+    _get_dbi_handle until such time as the object goes out of scope or
+    set_dsn is called again, at which time the handle is disconnected and
+    the cache is cleared.
+
+    If the connection fails, a fatal error is raised.
+
+  _clear_dbi_handle
+        $obj->_clear_dbi_handle
+
+    This is the cleanup method for the object's DBI handle. It is called
+    whenever the DBI handle needs to be closed down. i.e. when a new handle
+    is used or the object goes out of scope. Subclasses should override this
+    method if they need to clean up any state data that relies on the
+    current database connection, like statement handles for example. If you
+    don't want the handle that the object is using to be disconnected, use
+    the _set_keepalive method.
+
+        sub _clear_dbi_handle {
+            my $self = shift;
+
+            delete $self->{statement_handle};
+
+            $self->SUPER::_clear_dbi_handle(@_);
+        }
+
+  _set_dbi_handle
+        $obj = $obj->_set_dbi_handle($dbh)
+
+    This method is used to attach a DBI handle to the object. It might prove
+    useful to use this method in order to use an existing database
+    connection in the loader object. Note that unlike set_dsn, calling this
+    method directly will not cause an appropriate driver to be loaded. See
+    _load_driver for that.
+
+  _set_keepalive
+        $obj = $obj->_set_keepalive($bool)
+
+    When set to true, the database handle used by the object won't be
+    disconnected automatically.
+
+  _load_driver
+        $obj = $obj->_load_driver($driver_name)
+
+    This method is used internally by set_dsn to load a driver to handle
+    database-specific functionality. It can be called directly in
+    conjunction with _set_dbi_handle to load views from an existing database
+    connection.
+
+DRIVER METHODS
+    The following methods are provided by the relevant driver classes. If
+    they are called on a native Class::DBI::ViewLoader object (one without a
+    dsn set), they will cause fatal errors. They are documented here for the
+    benefit of driver writers but they may prove useful for users also.
+
+    *   base_class
+
+            $class = $driver->base_class
+
+        Should return the name of the base class to be used by generated
+        classes. This will generally be a Class::DBI driver class.
+
+            package Class::DBI::ViewLoader::Pg;
+
+            # Generate postgres classes
+            sub base_class { "Class::DBI::Pg" }
+
+    *   get_views
+
+            @views = $driver->get_views;
+
+        Should return the names of all the views in the current database.
+
+    *   get_view_cols
+
+            @columns = $driver->get_view_cols($view);
+
+        Should return the names of all the columns in the given view.
+
+    A list of these methods is provided by this class, in
+    @Class::DBI::ViewLoader::driver_methods, so that each driver can be sure
+    that it is implementing all required methods. The provided
+    t/04..plugin.t is a self-contained test script that checks a driver for
+    compatibility with the current version of Class::DBI::ViewLoader, driver
+    writers should be able to copy the test into their distribution and edit
+    the driver name to provide basic compliance tests.
+
+DIAGNOSTICS
+    The following fatal errors are raised by this class:
+
+    *   No dsn
+
+        set_dsn was called without an argument
+
+    *   Invalid dsn %s
+
+        the dsn passed to set_dsn couldn't be parsed by DBI->parse_dsn
+
+    *   No handler for driver %s, from dsn %s
+
+        set_dsn couldn't find a driver handler for the given dsn. You may
+        need to install a plugin to handle your database.
+
+    *   No handler loaded
+
+        load_views() or some other driver-dependent method was called on an
+        object which hadn't loaded a driver.
+
+    *   %s not overridden
+
+        A driver did not override the given method. You may need to upgrade
+        the driver class.
+
+    *   Couldn't connect to database
+
+        Self-explanatory. The DBI error string is appended to the error
+        message.
+
+    *   Regexp or string required
+
+        set_include or set_exclude called with a ref other than 'Regexp'.
+
+    *   Unrecognised arguments in new
+
+        new() encountered unsupported arguments. The offending arguments are
+        listed after the error message.
+
+    The following warnings are generated:
+
+    *   No columns found in %s, skipping
+
+        The given view didn't seem to have any columns, it won't be loaded.
+
+    *   %s has no import function
+
+        The given module from the object's import_classes list couldn't be
+        imported because it had no import() function.
+
+BUGS
+    With later versions of Class::DBI, columns names that clash with methods
+    (such as 'id') can cause exceptions. Using accessor_prefix and
+    mutator_prefix can help avoid this problem.
+
+SEE ALSO
+    DBI, Class::DBI, Class::DBI::Loader
+
+AUTHOR
+    Matt Lawrence <mattlaw@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 Matt Lawrence, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

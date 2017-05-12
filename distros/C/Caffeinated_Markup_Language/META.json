@@ -1,0 +1,46 @@
+{
+   "abstract" : "Panda blog orientated markup",
+   "author" : [
+      "J Gregory <john@johngregory.me.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Caffeinated_Markup_Language",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.99"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Escape" : "1.08",
+            "Log::Log4perl" : "1.42",
+            "Moo" : "1.003001",
+            "Readonly" : "1.03",
+            "boolean" : "0.30"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.11.1"
+}

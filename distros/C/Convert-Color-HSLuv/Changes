@@ -1,0 +1,20 @@
+Revision history for Perl extension Convert::Color::HSLuv.
+
+1.000001 2017-03-18T12:36+02:00
+ - Rename HUSL -> HSLuv and HUSLp -> HPLuv
+ - Use new (worse precision) snapshot-rev4.json
+
+1.000 2016-04-23T18:46+01:00
+ - First stable release, no changes from 0.002001
+
+0.002001 2015-07-09T15:40+03:00
+ - Fix typo in LUV -> XYZ conversion
+ - Improve tests and make dist smaller
+
+0.002 2015-06-21T10:56+03:00
+ - Update to Revision 4 of HUSL
+ - Make tests faster and dist smaller
+ - Drop minimum perl version from 5.14.0 to 5.8.9
+
+0.001 2015-06-14T10:30+03:00
+ - Initial release

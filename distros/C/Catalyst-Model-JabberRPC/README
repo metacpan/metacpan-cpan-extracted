@@ -1,0 +1,36 @@
+Catalyst::Model::JabberRPC version 0.04
+=======================================
+
+Catalyst model that provide a simple way to communicate with remote processes
+through a jabber server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl modules:
+
+  Catalyst
+  Catalyst::Devel
+  NEXT
+  Jabber::RPC
+  Frontier::RPC2
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by Florian Merges <fmerges@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

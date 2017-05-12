@@ -1,0 +1,99 @@
+=head1 NAME
+
+Crypt::NSS::X509::CRL - NSS CRL
+
+=head1 SYNOPSIS
+
+  use 5.10.1;
+  use Perl6::Slurp;
+
+  use Crypt::NSS::X509;
+
+  my $crl = Crypt::NSS::X509::Certificate->new(slurp('derfile'));
+  my $cert = Crypt::NSS::X509::Certificate->new_from_der(slurp('derfile'));
+
+  my $crlvalid = $crl->verify($cert);   
+  my @revokedserials = map { $_->serial } $crl->entries;
+
+=head1 ABSTRACT
+
+Perl interface for the certificate revocation list parts of the NSS API.
+
+=head1 DESCRIPTION
+
+This class gives access to some of the CRL handling functions of NSS.
+Note that this code is more unstable than the other classes and probably
+will change.
+
+=head1 FUNCTIONS
+
+=head2 CONSTRUCTORS
+
+=over 4
+
+=item new_from_der ( DERSTRING ) 
+
+Creates a new NSS::CRL object from the provided der-encoded
+certificate string. 
+
+=item new_from_pem ( PEMSTRING ) 
+
+Creates a new NSS::CRL object from the provided pem-encoded
+certificate. 
+
+=back 
+
+=head2 ACCESSORS & VERIFICATION FUNCTIONS
+
+=over 4
+
+=item issuer 
+
+Returns the CRL issuer as a string.
+
+=item version
+
+Returns the CRL version
+
+=item find_issuer ( [ time ] ) 
+
+Returns the NSS::Certificate object, where the subject matches
+the CRL issuer. Certificate has to be in NSS database, otherwise
+it will not be found.
+
+=item verify ( cert, [time] )
+
+Check the signature of the CRL against the NSS::Certificate cert.
+Returns true on success, false otherwise.
+
+=item verify_db( [time] )
+
+Check the signature of the CRL at the provided time (now if no time 
+provided). Tries to find a matching issuer certificate in the NSS
+db.
+
+=item entries
+
+Returns the CRL entries as an array of hash-references.
+
+=back
+
+
+=head1 AUTHOR
+
+Johanna Amann, E<lt>johanna@icir.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2012 by Johanna Amann
+
+This Library Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+The library contains source code of the Mozilla Network Security Services; for
+NSS license information please see http://www.mozilla.org/projects/security/pki/
+nss/.
+
+=cut
+

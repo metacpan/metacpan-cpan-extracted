@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  61308:
+    - 225
+name: fd34
+registers:
+  AF: 54688
+  AF_: 0
+  BC: 28452
+  BC_: 0
+  DE: 32247
+  DE_: 0
+  HL: 29936
+  HL_: 0
+  I: 0
+  IX: 13914
+  IY: 61380
+  PC: 3
+  R: 2
+  SP: 0

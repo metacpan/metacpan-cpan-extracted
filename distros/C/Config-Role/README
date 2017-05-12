@@ -1,0 +1,220 @@
+NAME
+    Config::Role - Moose config attribute loaded from file in home dir
+
+VERSION
+    version 0.1.1
+
+SYNOPSIS
+        package My::Class;
+        use Moose;
+        with 'Config::Role';
+
+        # Read configuration from ~/.my_class.ini, available in $self->config
+        # This is optional if you like this particular naming of the file
+        has 'config_filename' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+        sub _build_config_filename { '.my_class.ini' }
+
+        # Fetch a value from the configuration, allow constructor override
+        has 'username' => ( is => 'ro', isa => 'Str', lazy_build => 1 );
+        sub _build_username { return (shift)->config->{'username'}; }
+
+        sub make_request {
+            my ($self) = @_;
+            my $response = My::Class::Request->make(
+                username => $self->username,
+                ...
+            );
+            ...
+        }
+
+RATIONALE
+    This is the problem Config::Role was created to solve: Give me a config
+    attribute (hashref) which is read from a file in my home directory to
+    give other attributes default values, with configurability to choose the
+    file's location and name.
+
+DESCRIPTION
+    Config::Role is a very basic role you can add to your Moose class that
+    allows it to take configuration data from a file located in your home
+    directory instead of always requiring parameters to be specified in the
+    constructor.
+
+    The synopsis shows how you can read the value of "username" from the
+    file ".my_class.ini" located in the home directory of the current user.
+    The location of the file is determined by whatever
+    "File::HomeDir->my_data" returns for your particular platform.
+
+    The config file is loaded by using Config::Any's "load_files()" method.
+    It will load the files specified in the "config_files" attribute. By
+    default this is an array reference that contains the filename from the
+    "config_file" attribute. If you specify multiple files which both
+    contain the same configuration key, the value is loaded from the first
+    file. That is, the most significant file should be first in the array.
+
+    The "Config::Any->load_files()" flag "use_ext" is set to a true value,
+    so you can use any configuration file format supported by Config::Any by
+    just specifying the common filename extension for the format.
+
+ATTRIBUTES
+  config_dir
+    The directory where the configuration file is located. A
+    Path::Class::Dir object. Defaults to "File::HomeDir->my_data". Allows
+    coercion from Str.
+
+  config_file
+    The filename the configuration is read from. A Path::Class::File object.
+    Allows coercion from Str. Default is calculated based on the composing
+    class name. If your composing class is called "My::Class" it will be
+    ".my_class.ini". Remember that if you sub-class the composing class, the
+    default will be the name of the sub-class, not the super-class.
+
+  config_files
+    The collection of filenames the configuration is read from. Array
+    reference of Path::Class::File objects. Allows coercion from an array
+    reference of strings.
+
+  config
+    A hash reference that holds the compiled configuration read from the
+    specified files.
+
+METHODS
+  config_filename
+    Optional attribute or method on the composing class. Should return a
+    string with the name of the configuration file name. See "config_file"
+    for how the default is calculated if this method is not available.
+
+COMPARISON TO MooseX::ConfigFromFile
+    Config::Role doesn't require you to use anything else than
+    "$class->new()" to actually get the benefit of automatic config loading.
+    Someone might see this as negative, as it gives a minor performance
+    penalty even if the config file is not present.
+
+    Config::Role uses File::HomeDir to default to a known location, so you
+    only need to specify the file name you use, not a full path. This should
+    give better cross-platform compatibility, together with the use of
+    Path::Class for all file system manipulation.
+
+    Also, with Config::Role you must explicitly specify in the builder of an
+    attribute that you want to use values from the config file.
+    MooseX::ConfigFromFile seems to do that for you. You also get the
+    benefit that the configuration file keys and the class attribute names
+    does not need to map 1-to-1 (someone will probably see that as a bad
+    thing).
+
+    Otherwise they are pretty similar in terms of what they do.
+
+TODO
+    *   A nicely named sugar function could be exported to allow less
+        boilerplate in generating attributes that default to config values.
+
+SEMANTIC VERSIONING
+    This module uses semantic versioning concepts from <http://semver.org/>.
+
+SEE ALSO
+    *   Moose
+
+    *   File::HomeDir
+
+    *   Config::Any
+
+    *   Path::Class::File
+
+    *   MooseX::ConfigFromFile
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Config::Role
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Config-Role>
+
+    *   RT: CPAN's Bug Tracker
+
+        The RT ( Request Tracker ) website is the default bug/issue tracking
+        system for CPAN.
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Role>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annonations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/Config-Role>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Config-Role>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/Config-Role>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/Config-Role>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/C/Config-Role>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual way to
+        determine what Perls/platforms PASSed for a distribution.
+
+        <http://matrix.cpantesters.org/?dist=Config-Role>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=Config::Role>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to "bug-config-role
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Role>. You will
+    be automatically notified of any progress on the request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <http://github.com/robinsmidsrod/Config-Role>
+
+      git clone git://github.com/robinsmidsrod/Config-Role.git
+
+AUTHOR
+    Robin Smidsrød <robin@smidsrod.no>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Robin Smidsrød.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

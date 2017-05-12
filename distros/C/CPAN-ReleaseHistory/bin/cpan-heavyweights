@@ -1,0 +1,134 @@
+#!/usr/local/bin/perl
+#
+# cpan-heavyweights - ascii graph of top releasers on CPAN,
+#                     optionally for a specific year
+#
+use 5.006;
+use strict;
+use warnings;
+use CPAN::ReleaseHistory 0.03;
+use Getopt::Long;
+
+my $SHOW_TOP_N   = 10;
+my $MAX_BAR_SIZE = 40;
+my $BAR_CHAR     = '#';
+my $iterator     = CPAN::ReleaseHistory->new()->release_iterator(well_formed => 1);
+my $TARGET_YEAR;
+my $DIST_PREFIX;
+my %counts;
+
+GetOptions('top=i',     \$SHOW_TOP_N,
+           'distprefix|d=s' => \$DIST_PREFIX,
+           'char|c=s',  \$BAR_CHAR,
+           'width|w=i', \$MAX_BAR_SIZE,
+           'year=i',    \$TARGET_YEAR,
+          ) || die "usage: $0 [-top N] [-distprefix Some-Prefix] [-year YYYY] [-char <char>] [-width N]\n";
+
+while (my $release = $iterator->next_release) {
+    my $year = (gmtime($release->timestamp))[5] + 1900;
+    next if defined($TARGET_YEAR) && $year != $TARGET_YEAR;
+    next if $DIST_PREFIX && $release->distinfo->dist !~ qr/^\Q$DIST_PREFIX\E/;
+    $counts{ $release->distinfo->cpanid }++;
+}
+
+if ( keys(%counts) == 0 ) {
+    if ( defined($TARGET_YEAR) and defined($DIST_PREFIX) ) {
+        die "No releases seen in $TARGET_YEAR for $DIST_PREFIX\n";
+    }
+    if ( defined($TARGET_YEAR) ) {
+        die "No releases seen in $TARGET_YEAR\n";
+    }
+    if ( defined($DIST_PREFIX) ) {
+        die "No releases seen for $DIST_PREFIX\n";
+    }
+}
+
+my $max         = (sort { $b <=> $a } values %counts)[0];
+my $count_width = (sort { $b <=> $a } map { length($_) } values %counts)[0];
+my $scale       = $max < $MAX_BAR_SIZE ? 1 : $max / $MAX_BAR_SIZE;
+my @users       = sort { $counts{$b} <=> $counts{$a} } keys %counts;
+   @users       = splice(@users, 0, $SHOW_TOP_N);
+my $user_width  = (sort { $b <=> $a } map { length($_) } @users)[0];
+
+
+foreach my $user (@users) {
+    printf " %${user_width}s (%${count_width}d) %s\n",
+           $user, $counts{$user}||0, $BAR_CHAR x (($counts{$user}||0) / $scale);
+}
+
+=head1 NAME
+
+cpan-heavyweights - display top N releasers to CPAN, optionally for a specific year
+
+=head1 SYNOPSIS
+
+ cpan-heayweights [--year YYYY] [-top N] [--char =] [--width 40]
+                  [--disprefix Moose]
+
+=head1 DESCRIPTION
+
+B<cpan-heavyweights> generates a text graph of the top releasers to CPAN of all time.
+
+ % cpan-heavyweights
+
+      RJBS (2667) ########################################
+ SHARYANTO (2519) #####################################
+    BINGOS (2314) ##################################
+     ADAMK (2312) ##################################
+ TOKUHIROM (1871) ############################
+  MIYAGAWA (1668) #########################
+   DROLSKY (1650) ########################
+  DAGOLDEN (1358) ####################
+   TOBYINK (1348) ####################
+  MLEHMANN (1244) ##################
+
+You can limit the graph to a particular year, and also specify how many people you want to see:
+
+ % cpan-heavyweights --year 2003 -top 8
+
+  AUTRIJUS (229) ########################################
+   DROLSKY (174) ##############################
+      GENE (148) #########################
+   SOFTDIA (115) ####################
+     TBONE (110) ###################
+    RCLAMP (107) ##################
+      KAKE (107) ##################
+ ELIZABETH (105) ##################
+
+You can use the B<--distprefix> (or B<-d>) option to restrict the chart to
+releases where the distributions name matches the given prefix.
+For example, to see who's done the most Dancer-related releases:
+
+ % cpan-heavyweights -d Dancer
+   BIGPRESH (124) ########################################
+     SUKRIA ( 88) ############################
+     YANICK ( 80) #########################
+   XSAWYERX ( 79) #########################
+    AWNCORP ( 60) ###################
+   HORNBURG ( 54) #################
+   DAGOLDEN ( 44) ##############
+  IRONCAMEL ( 39) ############
+  HOBBESTIG ( 37) ###########
+      MICVU ( 36) ###########
+
+=head1 SEE ALSO
+
+L<CPAN::ReleaseHistory> is used to get data for all CPAN releases.
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/CPAN-ReleaseHistory>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+With contributions from Kent Fredric
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

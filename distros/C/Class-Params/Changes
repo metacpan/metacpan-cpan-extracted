@@ -1,0 +1,26 @@
+0.04 2015-09-27T17:49:22+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2014-09-28T11:21:33+02:00
+ - CHANGE API: Back to 0.01 version. :/
+ - Add EXAMPLE sections to doc.
+ - Add tests for class checks.
+ - Fix Class check.
+ - Improve EXAMPLEs in doc.
+ - Rename $class variable to $class_name.
+ - Rename $ref to $class variable.
+
+0.02 2014-09-28T09:40:50+02:00
+ - CHANGE API: Simplify definition.
+ - Add ERRORS section to doc.
+ - Add tests.
+ - Improve comments and doc.
+ - Rename $def variable to better $def_hr.
+ - Rename $input_array variable to better $params_ar.
+
+0.01 2014-09-27T23:22:21+02:00
+ - First version.

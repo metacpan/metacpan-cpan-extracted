@@ -1,0 +1,172 @@
+#!/usr/bin/perl -w
+#
+# Generate files from a YAML configuration file
+#
+# Authors:
+#   Raphaël Pinson <raphink@gmail.com>
+#   Mathieu Alorent <github@kumy.net>
+#
+# Copyright (C) 2011 Raphaël Pinson
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use strict;
+use Template;
+use YAML;
+use Hash::Merge qw( merge );
+use Getopt::Long;
+use File::Basename;
+use Config::KingKong::File;
+
+use constant CONFNAME => "kingkong.conf";
+
+sub usage() {
+   print "KingKong v".$Config::KingKong::VERSION."\n";
+   print "Usage: $0 [-h|--help|-?][-v|--verbose][-p|--print]
+       [-i|--includedir <include_dir>] [-i|--includedir <include_dir>]...
+       <conffile|dir> [<conffile|dir>...]
+
+ == KingKong Is Not a Genuine KONfiguration Generator ==
+
+      <> ( oo )    Generate files from a YAML configuration file.
+      <>_| ^^ |_ 
+      <>   @    \\  Each parameter can be either a file or a directory.
+     /~~\\ . . _ |  When a directory is passed, the file ".CONFNAME."
+    /~~~~\\    | |  will be searched within this directory.
+   /~~~~~~\\/ _| |
+   |[][][]/ / [m]  The YAML file must contain at least a 'templates'
+   |[][][[m]       array with the name of the files to generate.
+   |[][][]|
+   |[][][]|        Optionally, it can contain a 'template_extension'
+   |[][][]|        variable, which defaults to 'tmpl'.
+   |[][][]|
+   |[][][]|        All values in the YAML file are passed to the
+   |[][][]|        template to generate the file, using the Template
+   |[][][]|        Perl module.
+   |[][][]|
+   |[|--|]|        In print mode (option --print), KingKong dumps
+   |[|  |]|        the full YAML conf as generated with the includes
+   ========        but doesn't process it.
+  ==========
+  |[[    ]]|       The templates and included configuration files
+  ==========       are taken from the inclusion path, which contains
+                   only the working directory by default. You can add
+                   to the include path by using the --includedir option.
+";
+}
+
+
+# Process options
+my $help = 0;
+my $print = 0;
+my $verbose = 0;
+my @includedirs = [];
+my $opts = GetOptions(
+   'help|?'        => \$help,
+   'print'         => \$print,
+   'verbose'       => \$verbose,
+   'includedir=s'  => \@includedirs,
+);
+
+usage() and exit(0) if $help;
+
+# Process arguments
+my @conffiles = @ARGV;
+@conffiles = ('.') unless ($#conffiles >= 0);
+
+
+sub include_conf {
+   my ($conf, $include) = @_;
+
+   print "V: Including $include\n" if $verbose;
+   my $yaml = YAML::LoadFile("$include");
+   return merge($conf, $yaml);
+}
+
+
+foreach my $conffile (@conffiles) {
+   $conffile = "$conffile/".CONFNAME if (-d $conffile);
+
+   my $conf = YAML::LoadFile($conffile);
+   
+   # Use conf path to generate files
+   my $dirname = dirname($conffile);
+
+   # Manage includes
+   if ($conf->{include}) {
+      Hash::Merge::set_behavior( 'RIGHT_PRECEDENT' );
+      while ($#{$conf->{include}} >= 0) {
+         my $include_found = 0;
+         my $include = shift @{$conf->{include}};
+         if (-e "$dirname/$include") {
+            $include_found = 1;
+            $conf = include_conf($conf, "$dirname/$include");
+         } elsif ($#includedirs >= 0) {
+            foreach my $includedir (@includedirs) {
+               if (-e "$includedir/$include") {
+                  $include_found = 1;
+                  $conf = include_conf($conf, "$includedir/$include");
+               }
+            }
+         }
+         die "E: Could not find include file $include"
+           unless ($include_found);
+      }
+      delete($conf->{include});
+   }
+
+   if ($print) {
+      print YAML::Dump( $conf );
+      next;
+   }
+
+   # Add info we need
+   $conf->{program} = $0;
+   $conf->{conffile} = $conffile;
+   
+   my $template = new Template(
+      RELATIVE => 1,
+      ABSOLUTE => 1,
+      INCLUDE_PATH => "$dirname:".join(":", @includedirs),
+      OUTPUT_PATH => $dirname,
+      );
+   my $tmpl_ext = $conf->{template_extension};
+   $tmpl_ext ||= "tmpl";
+   
+   foreach my $entry (@{$conf->{templates}}) {
+      my $file = $entry;
+      my $tmpl;
+      if(ref($entry) eq "HASH") {
+         my @keys = keys %$entry;
+         $file = $keys[0];
+         $tmpl = $entry->{$file};
+      } elsif ($entry =~ m|([^: \t]+)\s*:\s*([^: \t]+)|) {
+         # YAML doesn't understand hash with $ and {} in keys
+         $file = $1;
+         $tmpl = $2;
+      }
+      my $target = Config::KingKong::File->new(
+         'engine'      => $template,
+         'directory'   => $dirname,
+         'target'      => $file,
+         'template'    => $tmpl,
+         'environment' => $conf,
+         'template_extension' => $tmpl_ext,
+         'verbose'     => $verbose,
+      );
+      $target->process();
+   }
+}
+

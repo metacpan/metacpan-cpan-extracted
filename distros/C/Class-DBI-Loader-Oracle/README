@@ -1,0 +1,35 @@
+Class-DBI-Loader-Oracle version 0.02
+====================================
+
+This module provides an Oracle driver for Class::DBI::Loader.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The tests require an Oracle server. While this module supports
+many different ways of configuring a connection, setting the
+following environment variables should ensure successful tests:
+
+    ORACLE_HOME    - path to version of Oracle used to compile DBD::Oracle
+    ORACLE_USERID  - user/pass@sid
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    Class::DBI::Loader
+    Class::DBI::Oracle
+    DBD::Oracle
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 David Naughton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

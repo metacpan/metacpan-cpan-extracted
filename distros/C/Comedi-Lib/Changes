@@ -1,0 +1,17 @@
+# 
+# Part of Comedi::Lib
+#
+# Copyright (c) 2009 Manuel Gebele <forensixs@gmx.de>, Germany
+#
+Revision history for Comedi::Lib
+
+0.24    2009/08/22
+        Remove Inline::C dependency from the module and use
+        InlineX::C2XS to generate the XS file. Thanks to
+        Sisyphus for the help with this task.
+0.23    2009/08/20
+        The Comedi::Lib module was completely re-written. It's
+        now an object-oriented module.
+0.01    2009/07/07
+        The first version of the Comedi::Lib module was released.
+        (only a wrapper module)

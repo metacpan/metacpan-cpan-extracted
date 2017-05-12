@@ -1,0 +1,279 @@
+# POD documentation - main docs before the code
+
+=head1 NAME
+
+Class::AutoDB::RegistryDiff - Compare two registries and maintain differences
+
+=head1 SYNOPSIS
+
+Used by Class::AutoDB::Registry to process differences between
+in-memory and saved registries.
+
+  use Class::AutoDB::RegistryDiff;
+  use Class::AutoDB::Registry;
+  my $diff=new Class::AutoDB::RegistryDiff(-baseline=>$saved,-change=>$in_memory)
+  if ($diff->is_sub) {                     # is new registry subset of saved one?
+    $registry=$saved_registry;             # then used saved one
+  } elsif  ($diff->is_different) {
+    # get changes -- new collections and collections with new columns
+    my @new_collections=$diff->new_collections;
+    my @expanded_collections=$diff->expanded_collections;
+    # process changes
+  }
+
+=head1 DESCRIPTION
+
+This class compares two registries and records their differences.  The
+first registry is considered the baseline, and differences are
+reported relative to it.
+
+=head2 Constructors
+
+ Title   : new
+ Usage   : $diff=new Class::AutoDB::RegistryDiff(-baseline=>$saved,-other=>$in_memory)
+ Function: Compare registries and remember differences
+ Returns : Object recording differences
+ Args    : -baseline	baseline registry
+           -other	new registry being compared to baseline
+
+=head2 Methods to get Collections
+
+ Title   : new_collections
+ Usage   : $collections=$diff->new_collections;
+ Function: Return collections present in new registry, but not baseline
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : expanded_collections
+ Usage   : $collections=$diff->expanded_collections;
+ Function: Return collections that have additional search keys in new registry 
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : baseline_only_collections
+ Usage   : $collections=$diff->baseline_only_collections
+ Function: Return collections present in basline registry, but not new one
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : equivalent_collections
+ Usage   : $collections=$diff->equivalent_collections
+ Function: Return collections present in both registries and unchanged in new one
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : sub_collections
+ Usage   : $collections=$diff->sub_collections
+ Function: Return collections that are present in both collections and are subcollections
+           in new one relative to baseline
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : super_collections
+ Usage   : $collections=$diff->super_collections
+ Function: Return collections that are present in both collections and are supercollections
+           in new one relative to baseline
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : insconsistent_collections
+ Usage   : $collections=$diff->insconsistent_collections
+ Function: Return collections that are present in both collections but  are insconsistent
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::Collection objects
+ 
+=head2 Methods to get CollectionDiffs
+
+ Title   : expanded_diffs
+ Usage   : $diffs=$diff->expanded_diffs;
+ Function: Return diffs for collections that have additional search keys in 
+           new registry 
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::CollectionDiff objects
+
+ Title   : equivalent_diffs
+ Usage   : $diffs=$diff->equivalent_diffs
+ Function: Return diffs for collections present in both registries and unchanged 
+           in new one
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::CollectionDiff objects
+
+ Title   : sub_diffs
+ Usage   : $diffs=$diff->sub_diffs
+ Function: Return diffs for collections that are present in both diffs and 
+           are subcollections in new one relative to baseline
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::CollectionDiff objects
+
+ Title   : super_diffs
+ Usage   : $diffs=$diff->super_diffs
+ Function: Return diffs for collections that are present in both diffs and 
+           are supercollections in new one relative to baseline
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::CollectionDiff objects
+
+ Title   : insconsistent_diffs
+ Usage   : $diffs=$diff->insconsistent_diffs
+ Function: Return diffs for collections that are present in both diffs but 
+           are insconsistent
+ Args    : None
+ Returns : ARRAY ref of Class::AutoDB::CollectionDiff objects
+ 
+=head2 Boolean test methods
+
+ Title   : is_consistent
+ Usage   : $bool=$diff->is_consistent
+ Function: Check if registries are consistent
+ Args    : None
+ Returns : true/false values
+
+ Title   : is_inconsistent
+ Usage   : $bool=$diff->is_inconsistent
+ Function: Check if registries are inconsistent
+ Args    : registry being compared with this one
+s Returns : true/false values
+
+ Title   : is_equivalent
+ Usage   : $bool=$diff->is_equivalent
+ Function: Check if registries are equivalent.
+ Args    : None
+ Returns : true/false values
+
+ Title   : is_different
+ Usage   : $bool=$diff->is_different
+ Function: Checkif registries are not equivalent.
+ Args    : None
+ Returns : true/false values
+
+ Title   : is_sub
+ Usage   : $bool=$registry->is_sub
+ Function: Check if new registry is subset of baseline.  Note: equivalent is 
+           considered subset.
+ Args    : None
+ Returns : true/false values
+
+ Title   : is_super
+ Usage   : $bool=$diff->is_super
+ Function: Check if new registry is superset of baseline. Note: equivalent is 
+           considered subset.
+ Args    : None
+ Returns : true/false values
+
+ Title   : has_new
+ Usage   : $bool=$registry->has_new
+ Function: Check if new registry contains new collections
+ Args    : None
+ Returns : true/false values
+
+ Title   : has_expanded
+ Usage   : $bool=$registry->has_expanded
+ Function: Check if new registry contains expanded collections
+ Args    : None
+ Returns : true/false values
+
+
+=head2 Comparison methods
+
+NG 04-12-10: copied this section from Registry.pod so it wouldn't get lost.  Is it real??
+
+These methods compare two registries and report on differences.  Since
+the underlying comparison process is relatively slow, comparison
+results are cached within the registry.  This shoudld be trasparent in
+normal use, but you must call cmp_reset if you wish to force a
+comparison to be redone, eg if you change the 'other_registry'.
+
+ Title   : cmp_reset
+ Usage   : $registry->cmp_status
+           -- OR --
+           $registry->cmp_status($other_registry)
+ Function: Reset comparison cache for one or all other registries
+ Args    : registry being compared with this one (optional)
+ Returns : true/false values
+
+ Title   : self_only_collections
+ Usage   : @collections=$registry->self_only_collections($other_registry);
+          -- OR --
+           $collections=$$registry->self_only_collections($other_registry);
+ Function: Return collections present in this registry but not other
+ Args    : registry being compared with this one
+ Returns : array or ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : other_only_collections
+ Usage   : @collections=$registry->other_only_collections($other_registry);
+          -- OR --
+           $collections=$$registry->other_only_collections($other_registry);
+ Function: Return collections present in other registry but not this one
+ Args    : registry being compared with this one
+ Returns : array or ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : expanded_collections
+ Usage   : @collections=$registry->expanded_collections($other_registry);
+          -- OR --
+           $collections=$$registry->expanded_collections($other_registry);
+ Function: Return collections that have additional search keys in this registry 
+           than the other.
+ Args    : registry being compared with this one
+ Returns : array or ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : shrunk_collections
+ Usage   : @collections=$registry->shrunk_collections($other_registry);
+          -- OR --
+           $collections=$$registry->shrunk_collections($other_registry);
+ Function: Return collections that are missing search keys in this registry 
+           compared to the other.
+ Args    : registry being compared with this one
+ Returns : array or ARRAY ref of Class::AutoDB::Collection objects
+
+ Title   : is_consistent
+ Usage   : $status=$registry->is_inconsistent($other_registry)
+ Function: Check if registries are consistent
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+ Title   : is_inconsistent
+ Usage   : $status=$registry->is_inconsistent($other_registry)
+ Function: Check if registries are inconsistent
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+ Title   : is_equivalent
+ Usage   : $status=$registry->is_equivalent($other_registry)
+ Function: Check if registries are equivalent.
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+ Title   : is_different
+ Usage   : $status=$registry->is_different($other_registry)
+ Function: Checkif registries are not equivalent.
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+ Title   : is_sub
+ Usage   : $status=$registry->is_sub($other_registry)
+ Function: Check if this registry is subset of other.  Note: equivalent is 
+           considered subset.
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+ Title   : is_super
+ Usage   : $status=$registry->is_super($other_registry)
+ Function: Check if this registry is superset of other. Note: equivalent is 
+           considered subset.
+ Args    : registry being compared with this one
+ Returns : true/false values
+
+# Title   : is_expanded
+# Usage   : $status=$registry->is_expanded($other_registry)
+# Function: Check if this registry contains collections that are expanded
+#           relative to the other. 
+# Args    : registry being compared with this one
+# Returns : true/false values
+
+# Title   : is_shrunk
+# Usage   : $status=$registry->is_shrunk($other_registry)
+# Function: Check if this registry contains collections that are shrunk
+#           relative to the other. 
+# Args    : registry being compared with this one
+# Returns : true/false values
+
+=cut

@@ -1,0 +1,11 @@
+MANIFEST
+README
+TODO
+LICENSE
+Changes
+Makefile.PL
+lib/Catalyst/Plugin/Authentication/Store/RDBO.pm
+lib/Catalyst/Plugin/Authentication/Store/RDBO/Backend.pm
+lib/Catalyst/Plugin/Authentication/Store/RDBO/User.pm
+t/00.load.t
+META.yml                                 Module meta-data (added by MakeMaker)

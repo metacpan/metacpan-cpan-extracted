@@ -1,0 +1,29 @@
+Crypt::License
+
+Read INSTALL for information about missing module Crypt::LockTite
+
+This module set provides tools to effectively obfuscate perl source
+code and allow it to be decoded and executed based on host server, user,
+expiration date and other parameters. Further, decoding and execution can be
+set for a system wide key as well as a unique user key.
+
+In addition, there are a set of utilities that provide email notification of
+License expiration and indirect use of the encrypted modules by other
+standard modules that may reside on the system. i.e. sub-process calls by
+Apache-AuthCookie while not in user space.
+
+Tools and Makefile.PL additions are included to allow the creation of
+encrypted distribution "binaries" with commands
+
+	make crypt
+	make cryptdist
+
+Basic operation:
+
+Encryption uses a modified RC4 algorithim to convert the text perl file into
+a "binary" consisting of bits -- this is a non-text file. When perl attempts
+to load the module if first encounters "use Crypt::License;" at the
+beginning of the file which in turn decrypts the stream of "bits" and
+delivers it directly to the perl interpreter.
+
+Details in the POD

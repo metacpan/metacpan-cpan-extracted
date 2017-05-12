@@ -1,0 +1,27 @@
+CGI-Deurl-XS version 0.01
+=========================
+
+This module decodes URL-encoded parameter strings in the manner of CGI.pm,
+but faster.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Written by Adam Thomason, <athomason@sixapart.com>
+
+Copyright (C) 2007 by Six Apart Ltd <cpan@sixapart.com>
+
+Portions copyright The Apache Software Foundation.
+Used under the Apache License v2.0.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

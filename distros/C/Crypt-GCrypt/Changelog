@@ -1,0 +1,107 @@
+version 1.26 (2013/05/13):
+
+    - updated Devel::CheckLib for compatibility with perl 5.18
+    - POD encoding fix
+
+version 1.25 (2011/07/26):
+
+    - setting CLONE_SKIP to avoid Crypt::GCrypt objects to be shared
+      among threads (fixes #55127)
+
+version 1.24 (2010/02/02):
+
+    - added multi-precision integers as Crypt::GCrypt::MPI (dkg)
+
+version 1.23_04 (2009/12/18):
+
+    - Makefile.PL now requires libgcrypt being not older than 1.3.0
+
+version 1.23_03 (2009/12/07):
+
+    - fixes to make 07-thread.t pass (or skip) regardless of thread support
+      or libgcrypt version
+
+version 1.23_02 (2009/11/24):
+
+    - 07-thread.t now passes on MacOS X (dkg)
+    - don't try to link to pthread.h if perl isn't compiled with ithreads
+      and Pthread
+
+version 1.23_01 (2009/11/24):
+
+    - added new version check functions gcrypt_version() and 
+      built_against_version() (Daniel Kahn Gillmor)
+    - fixed a memory leak and other minor memory optimizations (Daniel Kahn Gillmor)
+    - new cipher_algo_available() package function (Daniel Kahn Gillmor)
+    - message digests (Daniel Kahn Gillmor)
+    - new 07-thread.t test (Daniel Kahn Gillmor)
+
+version 1.22 (2009/11/01):
+
+    - now thread-safe (patch by Daniel K. Gillmor)
+
+version 1.21 (2009/02/04):
+
+    - added Devel::CheckLib to avoid FAIL reports from CPAN testers
+
+version 1.20 (2008/01/25):
+
+    - new "none" padding method
+
+    - added an optimization to make the new API a bit retrocompatible
+      in some special cases
+    
+    - padding recognition is more robust
+
+    - [API CHANGE] ->finish() is now required after decrypting, because
+      the previous implementation contained a bug when decrypting data 
+      in multiple calls to ->decrypt(): the module tried to strip
+      padding at every call, thus removing wrong bytes in some cases.
+      Added the 06-multi.t test and a warning for users who don't 
+      call the ->finish() method.
+      (thanks to Paul Kolano for bug report and test case)
+
+version 1.17 (2007/10/29):
+
+    - removed warnings on platforms with signed chars
+      (untested)
+
+version 1.16 (2006/12/20):
+
+    - fixed compilation issue with GCC 2.95
+    - test compatibility with Crypt::CBC 2.17
+    - minor code cleanup
+
+version 1.15 (2006/01/06):
+
+    - fixed t/05-size.t (now skips if we don't have Devel::Size)
+
+version 1.14 (2006/01/06):
+
+    - fixed compilation on Solaris (thanks to Andre Schmidt for bug report)
+    - fixed minor memory leaks
+    - added t/05-size.t
+    - changed version numbering format
+    - minor changes and typo fixes in POD
+
+version 1.1.3 (2005/12/27):
+
+    - fixed typo in Makefile.PL
+    - fixed pointer types in XS code
+
+version 1.1.1 (2005/12/22):
+
+    - minor bug fixes
+    - fixed typo in POD
+    - improved Makefile.PL for locating libgcrypt
+    - added t/03-pod.t and t/04-podcoverage.t
+
+version 1.1 (2005/10/10):
+
+    - added finish() to handle partial blocks
+    - added padding with null and standard methods
+    - added compatibility test with Crypt::CBC
+
+version 1.00 (2005/10/09):
+
+    - new

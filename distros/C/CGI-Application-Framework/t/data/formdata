@@ -1,0 +1,49 @@
+Content-Type: multipart/form-data; boundary=----------1234567890
+Content-Length: 1307
+
+------------1234567890
+Content-Disposition: form-data; name="unusual"
+
+bork
+foobeeble
+
+kowabunga
+------------1234567890
+Content-Disposition: form-data; name="rm"
+
+page_the_second
+------------1234567890
+Content-Disposition: form-data; name="_session_id"
+
+e71cf75e448bac8541111b36ccaa8695
+------------1234567890
+Content-Disposition: form-data; name="come_from_rm"
+
+page_the_second
+------------1234567890
+Content-Disposition: form-data; name="second_files"; filename="t/data/snark.txt"
+Content-Type: text/plain
+
+"Just the place for a Snark!" the Bellman cried,
+As he landed his crew with care; 
+Supporting each man on the top of the tide 
+By a finger entwined in his hair.
+------------1234567890
+Content-Disposition: form-data; name="first_files"; filename="t/data/jabberwocky.txt"
+Content-Type: text/plain
+
+`Twas brillig, and the slithy toves
+  Did gyre and gimble in the wabe:
+All mimsy were the borogoves,
+  And the mome raths outgrabe.
+------------1234567890
+Content-Disposition: form-data; name="first_files"; filename="t/data/walrus.txt"
+Content-Type: text/plain
+
+The sun was shining on the sea,
+Shining with all his might:
+He did his very best to make
+The billows smooth and bright--
+And this was odd, because it was
+The middle of the night.
+------------1234567890--

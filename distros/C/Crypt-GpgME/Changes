@@ -1,0 +1,44 @@
+Revision history for Crypt-GpgME
+
+0.09    Tue, 17 Nov 2009 23:49:04 +0100
+        * Disable auto_install in Makefile.PL.
+        * Upgrade Module::Install to 0.91.
+        * Fix failing tests by not relying on engine specifics.
+
+0.08    Sun, 31 Aug 2008 21:53:02 +0200
+        * Require gpgme with api version == 1.
+
+0.07    Fri, 29 Aug 2008 00:34:39 +0200
+        * Require perl 5.8.
+
+0.06    Thu, 28 Aug 2008 21:44:26 +0200
+        * Add diagnostics to Makefile.PL in order to fix FAIL reports from
+          cpantesters.
+
+0.05    Thu, 28 Aug 2008 07:54:18 +0200
+        * Add a testcase for openpgp key generation.
+        * Make key generation work with all engines.
+
+0.04    Thu, 13 Sep 2007 15:02:34 +0200
+        * Don't croak when attemting to convert illegal enum values to strings.
+        * Don't pass NULL to newSVpv{,n}.
+
+0.03    Thu, 10 May 2007 15:33:05 +0200
+        * Fix a coredump when gpgme_data_release_and_get_mem returned NULL.
+        * Use gpgme functions to convert algos/protos to strings.
+          This is an incompatible change as the proto/algo names were
+          previously returned in lower case (i.e. 'OpenPGP' was called 'openpgp'
+          in version 0.02 and below).
+        * Build depend on File::Which.
+        * Make Test::MockModule optional for the tests.
+        * Don't auto_include things anymore.
+
+0.02    Sun, 29 Apr 2007 15:58:12 +0200
+        * Don't use IPC::Run to execute gpgme-config.
+        * Better error checking for converting c structures to perl hashes.
+        * Some performance optimisations.
+        * Make signature notation flags available from perl.
+
+0.01    Wed, 18 Apr 2007 01:24:41 +0200
+        * First version, released on an unsuspecting world.
+

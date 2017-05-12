@@ -1,0 +1,169 @@
+0.31   2012-08-10
+        - Merged in changes from C:P:S:S (which added some nice expires code)
+        - Published code on CPAN, two years for RT#60053 and no feedback.
+          fuck mst.
+
+0.30   2010-08-06
+        - Added ability to override file extention and content type
+          with tests and pod patches closes RT#60053
+        - Removed requirements on Module::Install::Author*, and Test::NoTabs
+
+Revision history for Perl extension Catalyst::Plugin::Static::Simple
+
+	0.29   2010-02-01 18:45:00
+					- Switch from override to around, because really, wtf
+
+	0.28   2010-01-04 13:15:00
+					- Fix issues in debug mode. (RT#53338)
+
+	0.27   2010-01-03 14:49:00
+					- Switch to being a Moose role, removing dependencies on
+						Class::Data::Inheritable and Class::Accessor (Andrey Kostenko in
+						RT#51089)
+					- Make Pod tests mandatory for authors but never run otherwise
+					- Switch to Test::NoTabs to ensure no tabs, rather than
+						Test::Perl::Critic
+
+	0.26   2009-12-06 12:30:00
+					- Fix Pod to show less nasty method of assigning config by calling
+						the config method with parameters, rather than poking around inside
+						the hash.
+					- Require newer (>= 0.15) Catalyst::Plugin::SubRequest for subrequest
+						tests as old versions don't work with new Catalyst (>= 5.80014)
+
+	0.25   2009-10-22 21:40:00 BST
+					- Fix bug where old unrelated $@ values would result in an error.
+
+	0.24   2009-10-18 19:10:00 BST
+					- Fixup copyright information
+
+	0.23   2009-10-06 17:40:39
+					- Move actions out of TestApp into a Root controller as
+						this is now deprecated.
+
+	0.22    2009-08-21 18:14:59
+					- Add tests for delivering empty files.
+					- Fix those tests by depending on Catalyst-Runtime 5.80008.
+					- Throw away compatibility code for older catalyst versions.
+					- Fix docs to not include plugins in call to ->setup() (t0m)
+
+	0.21    2009-03-29 20:31:49
+			- Documentation improvements (jester)
+					- Change from NEXT to MRO::Compat - RT#40628, RT#44553 (ilmari)
+					- Bump prereq to MIME::Types to 1.25 to correctly send files
+						commonly used to graft support for transparent PNGs into
+						MSIE6 - RT#41314 (Florian Ragwitz)
+
+	0.20    2007-09-24 10:00:00
+					- Fixed issue where the static dir regex did not add a trailing
+						slash so URLs such as /static1 were served as static when they
+						should be handled by Catalyst. (Will Hawes)
+					- Added text/html Content-Type to 404 responses. (Will Hawes)
+
+	0.19    2007-07-02 17:00:00
+					- Fixed test failure on some systems in 11serve_static.t due to
+						multiple MIME types defined for the extension '.pm'.
+
+	0.18    2007-07-01 00:15:00
+					- Logging may now be enabled with the less confusing
+						MyApp->config->{static}->{logging} = 1;
+
+	0.17    2007-05-11 11:00:00
+					- Added serve_static_file, to serve a given file as static. (groditi)
+
+	0.16    2007-04-30 15:00:00
+					- Allow all files in directories defined by the config option 'dirs'
+						to be served as static even if the file matches ignore_dirs or
+						ignore_extensions.
+					- Fixed bug where 204 or 304 status codes would result in a 500 error
+						under mod_perl.
+					- Switch to Module::Install.
+
+	0.15    2006-12-08 22:30:00
+					- Quote metacharacters used in $c->config->{dirs} (Vlad Dan Dascalescu)
+					- store Mime::Types object in config hash instead of as classdata
+					- cleanup code a bit
+
+	0.14    2006-03-24 11:15:00
+					- Unescape the URI path before looking for the file.  This fixes
+						issues with files that have spaces.
+
+	0.13    2005-12-15 10:00:00
+					- Fixed bug in ignore_dirs under win32.
+					- Doc rewriting
+
+	0.12    (released only with Catalyst)
+					- Made prepare_action play nice with other plugins by not short-
+						circuiting.
+					- Added tmpl to the ignored extensions.
+					- Fixed security problem if req->path contained '..'.
+
+	0.11    2005-11-13 16:25:00
+					- Removed the code that set the 304 Not Modified header.  This caused
+						problems with IE under Apache.
+					- Changed 5.50 writing method to pass an IO::File object directly to
+						$c->res->body.
+					- This version is included with Catalyst 5.50.
+
+	0.10    2005-10-19 17:20:00
+					- Added tt2 to the list of ignored extensions.
+					- For Catalyst 5.5+, replaced File::Slurp with a buffered read/write
+						process.  This will improve memory usage and performance on larger
+						static files.
+					- Removed Apache integration feature.  It is slower than serving
+						through Catalyst and as far as I know no one is using it.  If you
+						need the best performance, use a separate Location block for static
+						content.
+
+	0.09    2005-10-07 13:40:00
+					- Added new configuration options to improve security:
+						ignore_extensions - keep certain extensions from being static
+						- This option defaults to tt, html, and xhtml to prevent
+							template files from being accessible.
+						ignore_dirs - keep certain dirs from being static
+					- include_path is no longer experimental.
+					- Added support for hiding log output, depends on Cat 5.50. 
+						(Marcus Ramberg)
+
+	0.08    2005-09-07 18:50:00
+					- Added tests for everything except Apache support.
+
+	0.07    2005-09-05 21:05:00
+					- POD fixes. (Thomas L. Shinnick)
+
+	0.06    2005-09-05 15:40:00
+					- Moved initial file check into prepare_action so processing can
+						bypass other plugins.
+					- Added error-checking to static dir regexes.
+					- Cleaned up various code as per Best Practices.
+
+	0.05    2005-08-26 12:00:00
+					- Added use_apache option to enable the Apache DECLINED
+						support.  Default is disabled as it appears Catalyst is
+						faster at serving the files!
+					- Added a check that Apache's DocumentRoot matches Catalyst's
+						root before serving DECLINED.
+					- Preload MIME::Types index during setup() so it's not built on
+						the first request.
+					- Added a note on performance of Apache vs. Catalyst.
+
+	0.04    2005-08-22 12:00:00
+					- Fixed bug where static files were searched for on every request
+						even without a file extension.
+					- Fixed bug where files without extensions in defined static dirs
+						were not served with text/plain.
+					- Consolidated the debug log messages.
+
+	0.03    2005-08-21 23:50:00
+					- Added config option for include_path to allow for multiple 
+						directories with static files.  This option should be
+						considered experimental!
+					- Documentation cleanups.
+
+	0.02    2005-08-16 18:00:00
+					- Return DECLINED when running under mod_perl to allow Apache to
+						serve the static file.  This is not done when any custom MIME
+						types have been specified, however.
+
+	0.01    2005-08-11 22:00:00
+					- Initial release.

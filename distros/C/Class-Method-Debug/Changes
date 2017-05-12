@@ -1,0 +1,9 @@
+Revision history for Perl extension Class-Method-Debug
+
+1.101420  2010-05-22 13:36:37 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - set dist.ini's copyright year to 2010
+    - ucfirst ABSTRACT
+
+1.100690  2010-03-10 17:40:26 Europe/Vienna
+     - original version

@@ -1,0 +1,56 @@
+==================================================
+Changes from 2012-08-15 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.222 at 2013-08-15 07:12:54 +0000
+------------------------------------------
+
+  Change: 3161b01391d7ec55d7fd8f06b6de9ceb31126416
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-15 03:03:53 +0000
+
+    Automate more of dist.ini. 
+
+------------------------------------------
+version 1.221 at 2013-08-04 06:13:24 +0000
+------------------------------------------
+
+  Change: 4e0b8cc01214485a5d4f40b7318f2646f84c5ccb
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-04 02:13:24 +0000
+
+    Add .gitignore and MANIFEST.SKIP to ignore build artifacts.
+
+    Releases will fail because the release built artifacts look like
+    untracked files. Ignore them in .gitignore. Also ignore temporary
+    files in MANIFEST.SKIP. 
+
+  Change: c5467dc4260c3ceb57e8253957c1449d3d00617a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-04 02:01:30 +0000
+
+    [rt.cpan.org 65060] Don't destroy the server list when connections
+    fail.
+
+    Connections may fail for transient reasons. It's better to assume the
+    servers will come back eventually and take the performance hit on
+    reconnect than to exhaust the list and never succeed again.
+
+    If this fix helps you, thank Timo Santi for reporting the bug. 
+
+  Change: b9835824080c25817a37bcbf6d1c3bb4ab5d51f7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-04 01:43:39 +0000
+
+    Switch to Dist::Zilla. 
+
+  Change: 15ec95acbfed79a4f4e341e150af25964fc776a3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2010-03-08 01:29:07 +0000
+
+    Fix the repository URLs and copyright date in the docs. 
+
+================================================
+Plus 4 releases after 2012-08-15 00:00:00 +0000.
+================================================

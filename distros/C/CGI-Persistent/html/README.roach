@@ -1,0 +1,4 @@
+put roach.cgi in a directory visible to your webserver 
+and create a server writable directory "dope" below it. point 
+your browser to http://localhost/somedir/roach.cgi
+

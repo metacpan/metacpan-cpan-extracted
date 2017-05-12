@@ -1,0 +1,11 @@
+Revision history for CPAN-Upload-Tiny
+
+0.003     2017-04-10 00:44:36+02:00 Europe/Amsterdam
+          - Ignore entries other than the username or password
+          - Give feedback on success
+
+0.002     2017-03-31 15:44:53+02:00 Europe/Amsterdam
+          Added a cpan-upload-tiny script
+
+0.001     2017-03-30 21:24:02+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

@@ -1,0 +1,31 @@
+---
+abstract: 'Add a JavaScript::Framework::jQuery object to TT Views'
+author:
+  - 'David P.C. Wollmann <converter42 at gmail.com>'
+build_requires:
+  Catalyst::View::TT: 0.29
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Component-jQuery
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::ConfigLoader: 0.23
+  Catalyst::Test: 0
+  JavaScript::Framework::jQuery: 0.01
+  Moose: 0.79
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

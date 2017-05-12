@@ -1,0 +1,41 @@
+NAME
+    CGI::Session::Driver::layered - Use multiple layered drivers
+
+SYNOPSIS
+     use CGI::Session;
+     
+ my $session = CGI::Session->new("driver:layered", $sessionId, { layers => [
+       {
+         driver    => 'file',
+         Directory => '/tmp/foo',
+       },
+       {
+         driver => 'postgresql'
+         table  => 'websessions',
+         handle => $dbh
+       }
+     ]});
+
+DESCRIPTION
+    CGI::Session::Driver::Layered provides a interface for using multple
+    drivers to store sessions. Each session is stored in all the configured
+    drivers. When fetching a session, the first driver to return a session
+    is used, the drivers being searched in the order they were configured.
+
+OPTIONS
+    Unlike most drivers for CGI::Session, this driver requires options to
+    function. The driver args must has a layers field, which is an array ref
+    of hash references. Each hash reference should contain the driver name
+    under the key "driver", and the rest of the arguments for that driver.
+    The order of the layers argument is the order that the layer will check
+    during a retrieve.
+
+COPYRIGHT
+    Copyright (C) 2009 Liquidweb Inc.
+
+AUTHOR
+    Chris Reinhardt <creinhardt@liquidweb.com>
+
+SEE ALSO
+    CGI::Session::Driver, CGI::Session
+

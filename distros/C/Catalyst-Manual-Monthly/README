@@ -1,0 +1,13 @@
+Catalyst-Manual-Monthly
+
+This is repository for the monthly articles which replace the Catalyst
+Advent Calendar.  Following the Catalyst philosophy, the Catalyst monthly
+doesn't use Catalyst it uses the CPAN toolchain to achieve its aims.
+Occasionally a catalyst application (e.g. Metacpan) might be used for
+system integration tasks.
+
+Articles are stored in directories as with:
+lib/Catalyst/Monthly/[Year]/[Month]/[SomeDescriptiveFilename].pod
+
+In due course an RSS scraper will be written to facilitate notifications of
+publication of new articles and edits to old articles.

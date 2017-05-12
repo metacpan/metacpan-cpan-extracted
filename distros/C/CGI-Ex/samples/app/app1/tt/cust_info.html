@@ -1,0 +1,54 @@
+[% PROCESS "header.tt" title => "Account Information" %]
+
+<span style="color:green">Congratulations! The test domain <b>[% domain %]</b> is available.</span><br>
+
+Please enter your account information.
+<form name=[% form_name %] action=[% script_name %] method=post>
+<input type=hidden name=domain>
+
+<table>
+<tr>
+  <td><label>First Name:</label></td>
+  <td><input type=text name=first_name></td>
+  <td><span class=error id=first_name_error>[% first_name_error %]</span></td>
+</tr>
+<tr>
+  <td><label>Last Name:</label></td>
+  <td><input type=text name=last_name></td>
+  <td><span class=error id=last_name_error>[% last_name_error %]</span></td>
+</tr>
+<tr>
+  <td><label>Country:</label></td>
+  <td>
+    <select name=country>
+      <option value="">Choose country</option>
+      [%- FOR code IN countries.keys.sort %]
+      <option value="[% code %]">[% countries.$code %]</option>
+      [%- END %]
+    </select>
+  </td>
+  <td><span class=error id=country_error>[% country_error %]</span></td>
+</tr>
+<tr>
+  <td><label>Password:</label></td>
+  <td><input type=text name=password></td>
+  <td><span class=error id=password_error>[% password_error %]</span></td>
+</tr>
+<tr>
+  <td><label>Password<br>Verify:</label></td>
+  <td><input type=text name=password2></td>
+  <td><span class=error id=password2_error>[% password2_error %]</span></td>
+</tr>
+
+<tr>
+  <td colspan=2 align=right>
+    <input type=submit value="Bill me"><br>
+  </td>
+  <td>&nbsp;</td>
+</tr>
+</table>
+
+</form>
+[% js_validation %]
+
+[% PROCESS "footer.tt" %]

@@ -1,0 +1,31 @@
+---
+abstract: 'Markdown View Class'
+author:
+  - 'Richard Wallman, C<wallmari@bossolutions.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Markdown
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.7
+  Class::Accessor: 0
+  MRO::Compat: 0
+  Path::Class: 0
+  Text::Markdown: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bossolutions/Catalyst-View-Markdown.git
+version: 0.01

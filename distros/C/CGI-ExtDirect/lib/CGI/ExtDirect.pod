@@ -1,0 +1,344 @@
+=pod
+
+=begin readme text
+
+CGI::ExtDirect
+==============
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+CGI::ExtDirect - Ext.Direct remoting gateway for CGI applications
+
+=head1 SYNOPSIS
+
+=head2 API definition
+
+In C</cgi-bin/api.cgi>:
+
+    use CGI::ExtDirect;
+    use RPC::ExtDirect::Config;
+    
+    use My::ExtDirect::Published::Module::Foo;
+    use My::ExtDirect::Published::Module::Bar;
+    
+    my $config = RPC::ExtDirect::Config->new(
+        api_path     => '/cgi-bin/api.cgi',
+        router_path  => '/cgi-bin/router.cgi',
+        poll_path    => '/cgi-bin/events.cgi',
+    );
+    
+    my $direct = CGI::ExtDirect->new(config => $config);
+    
+    print $direct->api();      # Prints full HTTP response
+
+=head2 Routing requests
+
+In C</cgi-bin/router.cgi>:
+
+    use CGI::Cookie;
+    use CGI::ExtDirect;
+    
+    use My::ExtDirect::Published::Module::Foo;
+    use My::ExtDirect::Published::Module::Bar;
+    
+    my %headers = (   # Optional CGI headers
+        -charset => 'iso-8859-1',
+        -nph     => 1,
+        -cookie  => CGI::Cookie->new(
+            -name  => 'foo',
+            -value => 'bar',
+        ),
+    );
+    
+    my $direct = CGI::ExtDirect->new();
+    
+    print $direct->route(%headers);
+
+=head2 Event polling service
+
+In C</cgi-bin/poll.cgi>:
+
+    use CGI::Simple;
+    use CGI::ExtDirect;
+    
+    use My::ExtDirect::Event::Provider1;
+    use My::ExtDirect::Event::Provider2;
+    
+    # CGI::Simple is supported as well
+    my $cgi = CGI::Simple->new;
+    
+    # do something with $cgi but do not print headers
+    ...
+    
+    my $direct = CGI::ExtDirect->new(cgi => $cgi);
+    
+    print $direct->poll();
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module provides an L<RPC::ExtDirect> gateway implementation for
+CGI compatible Web server environments. This includes both traditional
+CGI scripts that start up anew for each HTTP request, as well as more
+modern CGI environments in which a script is started once and then
+persists through the lifetime of a server process.
+
+CGI::ExtDirect can be used wth Perl versions 5.6 and newer with many
+Web servers; it was tested successfully with Apache/mod_perl, pure
+Perl server based on L<HTTP::Server::Simple> (L<RPC::ExtDirect::Server>),
+and various other HTTP server environments.
+
+If you are not familiar with Ext.Direct, more information can be found in
+L<RPC::ExtDirect::Intro>.
+
+=for readme stop
+
+=head1 CGI SCRIPTS
+
+If your environment requires using old fashioned standalone CGI scripts,
+CGI::ExtDirect is fine with that. In fact, it is tested in exactly this
+kind of environment to ensure it will work properly.
+
+You need to create at least two CGI scripts: API generator, and request
+router. The third Event provider script is optional, and is only needed
+if you plan to use event polling capabilities of Ext.Direct. The examples
+provided in L</SYNOPSIS> can be used as starting points for further
+customization. See also the L<examples|/EXAMPLES> packaged with
+CGI::ExtDirect.
+
+Note that this environment is supported as a measure of backwards
+compatibility. Using standalone CGI scripts is not recommended if you
+can avoid it; starting such script for each HTTP request is very
+slow and inefficient. Even the most basic persistent HTTP server will
+be much faster. If you are not familiar with this approach, refer to
+the L<section below|/"PERSISTENT CGI ENVIRONMENT">.
+
+=head1 PERSISTENT CGI ENVIRONMENT
+
+A more modern approach to building application servers is to use a
+persistent HTTP server that starts once and is reused for incoming
+HTTP requests without restarting. Usually such application server will
+be serving only I<dynamic> HTTP requests, with the task of serving
+static documents offloaded to a dedicated front-end HTTP server
+software with no Perl support built into it. Such front-end HTTP server
+is known as a I<reverse proxy> for the Perl application server.
+
+In a persistent environment, CGI::ExtDirect is configured once at
+startup, and then called when the application server receives an
+HTTP request to the URI assigned to a specific I<entry point>. The
+entry points are the same as with L<CGI scripts|/"CGI SCRIPTS">:
+API generator, request router, and optional event provider. A new
+L<CGI> object is generated for every request, but the CGI::ExtDirect
+object is reused.
+
+Configuration for this approach will depend largely on the application
+server chosen, and does not fit the scope of this documentation. If you
+are unsure which application server to choose, take a look at
+L<RPC::ExtDirect::Server> that comes preconfigured for CGI::ExtDirect
+and can be used out of box.
+
+=head1 USAGE
+
+=head2 Configuration
+
+To configure CGI::ExtDirect instance, you will need to create an
+instance of L<RPC::ExtDirect::Config> with all required options set,
+and pass it to CGI::ExtDirect L<constructor|/new> to be used. This
+step is optional; by default the Config instance in the
+L<global API instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">
+will be used instead.
+
+Refer to L<RPC::ExtDirect::Config/OPTIONS> for the list of configuration
+options and their default values.
+
+=head2 Main methods
+
+As discussed above, CGI::ExtDirect has three main entry points: the
+API generator (L</api>), the Router (L</route>), and the Event provider
+(L</poll>). Each of these should be called as an instance method, and
+each will return the full text of an HTTP response to be printed,
+including HTTP status, headers, and the body of the response. Your
+script will need to print the response text to the appropriate pipe,
+which is STDOUT for standalone scripts.
+
+=head2 HTTP response headers
+
+In certain cases, you may need to include custom HTTP headers in
+Ext.Direct responses. This may be a specific charset when you cannot
+use the default UTF-8, or an HTTP cookie. To accommodate for such
+cases, CGI::ExtDirect allows passing through any header that is
+meaningful to the underlying L<CGI.pm|CGI> or L<CGI::Simple> object,
+and conforms to C<CGI::header()> method calling convention.
+
+All three of the main CGI::ExtDirect public methods (L</api>,
+L</route>, and L</poll>) accept custom headers in the following
+fashion:
+
+=over 4
+
+=item method('content/type')
+
+A single header value is interpreted as the content type that will
+override the default C<application/json> type.
+
+Example:
+
+    print $cgi->route('text/javascript'); # JSONP
+
+=item method('content/type', 'HTTP status')
+
+Two header values will be interpreted as the content type and
+HTTP status, respectively.
+
+Example:
+
+    print $cgi->poll('text/json', '401 Unauthorized'); # Auth request
+
+=item method(-header => 'value')
+
+Any custom header can be passed in the C<< key => value >> format.
+
+Example:
+
+    print $cgi->api(-foo_bar => '42'); # Foo-bar: 42
+
+=back
+
+See also L<CGI::Simple/"CREATING HTTP HEADERS"> for sane explanation of
+the header usage that also applies to the old L<CGI.pm|CGI>.
+
+=head1 OBJECT INTERFACE
+
+CGI::ExtDirect provides several public methods:
+
+=over 4
+
+=item C<new>
+
+Constructor. Returns a new CGI::ExtDirect object. Accepts named
+arguments in a hash or hashref.
+
+Parameters:
+
+=over 8
+
+=item C<api>
+
+Optional L<RPC::ExtDirect::API> instance to be used instead of the
+default L<global API tree|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">.
+
+=item C<config>
+
+Optional L<RPC::ExtDirect::Config> instance to be used. If not provided,
+the Config instance in the API object (either default or passed in L</api>
+parameter) will be used.
+
+=item C<cgi>
+
+Instantiated L<CGI> or similar object. L<CGI::Simple> has been tested
+and works fine.
+
+=back
+
+=item C<api>
+
+Instance method. Returns the current API tree as a stringified
+L<API declaration|RPC::ExtDirect::Intro/"API declaration"> along with
+the HTTP status code and headers, to be printed or processed further.
+
+Accepts custom headers as described in L</"HTTP response headers">.
+
+=item C<route>
+
+Instance method. Parses Ext.Direct requests from the internal C<CGI> object
+passed to L<constructor|/new>; dispatches the quests, collects results and
+returns an HTTP response with results as a serialized JSON stream.
+
+Accepts custom headers as described in L</"HTTP response headers">.
+
+=item C<poll>
+
+Instance method. Queries Event provider
+L<Poll Handler Methods|RPC::ExtDirect::Intro/"Poll Handler Method">
+for events, collects these events and returns back a JSON stream.
+
+Accepts custom headers as described in L</"HTTP response headers">.
+
+=back
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme continue
+
+=head1 EXAMPLES
+
+See included Ext JS examples for ideas on what Ext.Direct is and how to
+use it in CGI applications. The examples are not installed along with
+the CGI::ExtDirect module, and are only available in the C<examples/>
+directory of the CPAN distribution. 
+
+To run examples type the following in the CGI::ExtDirect tarball
+directory:
+
+    cd examples
+    perl p5httpd
+
+Note that these examples do not require CGI::ExtDirect to be installed
+so you can try them beforehand. That said, CGI::ExtDirect depends on
+RPC::ExtDirect being available in C<@INC> so if you don't want to
+install either module, unpack RPC::ExtDirect and CGI::ExtDirect
+tarballs to the same directory and use C<$PERL5LIB> to point to
+RPC::ExtDirect location:
+    
+    cd examples
+    PERL5LIB=../../RPC-ExtDirect-3.xx/lib perl p5httpd
+
+=for readme stop
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on versions 2.x and 3.x of the RPC::ExtDirect suite of modules.
+
+The tiny but CGI capable HTTP server used to provide working examples
+is (c) 2002-2004 by Hans Lub, <hlub@knoware.nl>. It is called p5httpd
+and can be found here: L<http://utopia.knoware.nl/~hlub/rlwrap/>
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report problems
+to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/CGI-ExtDirect/issues> to open
+bug reports, this is the easiest and quickest way to get your issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011-2016 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.
+
+Included Ext JS examples are copyright (c) 2011, Sencha Inc. Example code
+is used and distributed under GPL 3.0 license as provided by Sencha Inc.
+See L<http://www.sencha.com/license>. Ext JS is available for download at
+L<http://www.sencha.com/products/extjs/>
+
+=cut

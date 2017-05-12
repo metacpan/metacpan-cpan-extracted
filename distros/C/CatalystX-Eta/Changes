@@ -1,0 +1,90 @@
+Revision history for CatalystX-Eta
+
+0.08  2015-09-30 20:42:58 BRT
+    - allow other than 'int' on sub object.
+        object_verify_type can be set to 'int', 'uuid4', or 'none'
+        default to 'int'
+
+0.07  2015-09-28 19:34:02 BRT
+    - allow use for no_user when you don't have c->user on AutoListPOST
+
+0.06  2015-09-11 12:12:52 BRT
+    - only check roles if they are defined in config.
+    - allow other than 'id' column as primary key
+
+0.05  2015-09-03 20:19:24 BRT
+    - split AutoResult into AutoResultGET, AutoResultDELETE, AutoResultPUT
+    - split AutoList into AutoListPOST, AutoListGET
+
+0.048  2015-09-01 16:16:28 BRT
+    - add option list_post_for for change execute name on create.
+    - check if check-role-right-fields is defined in CheckRoleForPUT.pm and AutoResult.pm
+
+0.047  2015-08-27 18:56:58 BRT
+    - TypesValidation.pm now looks for $data_from insteald of hardcoded c->req->params
+    - REST.pm does an info instead of error logging when the exception is captured
+
+0.046  2015-08-24 11:58:06 BRT
+    - pass $self and $c on build_row (AutoList.pm)
+
+0.045  2015-05-01 18:50:32 BRT
+    - return_data_as added. it accept 'hash' or 'array' and it is used by
+         CatalystX::Temporal::Controller::AutoResult
+        and
+         CatalystX::Temporal::Controller::AutoList
+        if return_data_as is set to 'hash', when no history is asked, the return
+        is an hash instead of an array (like the list)
+         # $ref->{data} = $ref->{data}[0] if ( $return_data_as eq 'hash' && !exists $c->req->params->{with_history} );
+
+0.044  2015-03-17 19:40:06 BRT
+    - $obj passed on each callback on CatalystX::Temporal::Controller::{AutoList|AutoObject} as last param
+    - optional id_can_be_negative => 1 config for accept negative ids on object chain
+
+0.043  2015-03-14 23:39:10 BRT
+    - added Catalyst::Controller::REST to cpanfile
+    - added Data::Manager to cpanfile (test dep)
+
+0.042  2015-03-14 16:01:35 BRT
+    - Controller::Search now can accept ilike and like filters.
+    - Controller::Search now can accept 'me.field' and 'othertable.field' too
+
+0.04  2015-03-14 14:59:58 BRT
+
+    - new classes added:
+        - CatalystX::Temporal::Controller::AutoBase
+        - CatalystX::Temporal::Controller::AutoList
+        - CatalystX::Temporal::Controller::AutoObject
+        - CatalystX::Temporal::Controller::AutoResult
+        - CatalystX::Helper::DateTimeToString
+    - Missing Data::Verifier on cpanfile
+
+0.0362  2015-03-14 01:23:58 BRT
+    - missing JSON::MaybeXS on cpanfile.
+
+0.036  2015-03-14 01:18:50 BRT
+    - Added CatalystX::Eta::Controller::Order:
+      - but doc is missing!
+    - JSON::XS now is JSON::MaybeXS
+    - minor fixs
+
+0.035  2015-02-25 15:03:12 BRT
+    - Added @{$c->req->captures} before calling $c->action_for
+      This fixes a bug when you have deep controller actions.
+
+0.03  2015-02-23 16:37:14 BRT
+    - prepare_params_for_create and prepare_params_for_update added
+      Those options is for changing params before send them to schema.
+        sub { my ($self, $c, $params_hashref) = @_; return $params_hashref }
+      must return HASHREF for using on $result(set)->execute( with => $params )
+
+0.02  2015-02-21 22:55:08 BRST
+    - CheckRoleForPUT and roles_delete fixed:
+      if the user requesting delete or update have the role,
+      the action will be executed.
+      if the role was denied and config->{check_only_roles} is not set,
+        the code test if the object have the column (user_id | created_by ) and
+        if is equals $c->user->id, the action is executed even without the role.
+
+0.01  2015-02-21 04:39:27 BRST
+
+    - Initial release

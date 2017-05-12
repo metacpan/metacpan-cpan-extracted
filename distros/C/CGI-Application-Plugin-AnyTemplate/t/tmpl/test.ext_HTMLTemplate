@@ -1,0 +1,5 @@
+--begin--
+b1:<!-- TMPL_VAR NAME=var1 -->
+b2:<!-- TMPL_VAR NAME=var2 -->
+b3:<!-- TMPL_VAR NAME=var3 -->
+--end--

@@ -1,0 +1,11 @@
+Revision history for Catalyst-Plugin-LogWarnings
+
+0.03 - Tue Feb 09 03:00:00 2010
+    Use MRO::Compat rather than Class::C3 (RT#54093)
+
+0.01 - Fri Sep 15 16:46:58 2006
+	Module::Release release 0.01 to CPAN
+
+0.01    13 September 2006
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,136 @@
+version 0.009; 2011-04-28
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * slightly reformat some Perl and C code to avoid exceeding 80 columns
+
+  * include META.json in distribution
+
+  * add MYMETA.json and MYMETA.yml to .cvsignore
+
+version 0.008; 2010-03-11
+
+  * bugfix: avoid memory leak when returning block to Perl space
+
+  * check for required Perl version at runtime
+
+  * in XS, avoid using "class" as a variable name, for compatibility
+    with C++ compilers
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.007; 2009-04-22
+
+  * in XS code, use the correct "PREINIT:" instead of "INIT:" to introduce
+    variable declarations
+
+  * test Uklblowfish with long keys
+
+version 0.006; 2009-04-21
+
+  * in C::E::Family, new method "as_class" to work around Crypt::CBC
+    brain damage
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * in C::E::Family, abandon use of the "fields" module
+
+  * add casts for pointer target signedness to avoid compiler warnings
+
+  * use full stricture in Build.PL
+
+version 0.005; 2008-04-06
+
+  * bugfix: when UTF8-decoding salt, don't attempt to read freed copy
+
+  * don't rely on typemap handling of AV* arguments, because it's broken
+    on perl 5.6
+
+  * add backward-compatibility definition of bytes_from_utf8() function
+
+  * avoid calling XSLoader::load() redundantly, which was causing
+    redefinition warnings on older versions of XSLoader
+
+version 0.004; 2008-04-02
+
+  * add backward-compatibility definition of Newx() macro
+
+  * in tests, avoid unreliable "\S" regexp element
+
+version 0.003; 2007-09-26
+
+  * bugfix: in Crypt::Eksblowfish::{Bcrypt,Family}, ensure that the
+    Crypt::Eksblowfish that is loaded is recent enough to have the
+    UTF8 bugfix
+
+  * bugfix: avoid memory leaks when croaking
+
+  * new class Crypt::Eksblowfish::Subkeyed, with constructors
+    "new_from_subkeys" and "new_initial" and subkey access
+    methods "p_array" and "s_boxes", which is now a superclass of
+    Crypt::Eksblowfish
+
+  * new method "is_weak" (in superclass Crypt::Eksblowfish::Subkeyed)
+    to check for weak keys
+
+  * new class Crypt::Eksblowfish::Blowfish, which implements the original
+    Blowfish cipher
+
+  * new class Crypt::Eksblowfish::Uklblowfish, which implements Blowfish
+    with key length limits removed
+
+  * for efficiency, change objects to point to C key schedule structure
+    instead of storing that structure as a Perl string
+
+  * wrap up block argument marshalling code in typemap
+
+  * use "fields" module to structure Crypt::Eksblowfish::Family object
+
+  * in documentation and all source, use precise term "octet" instead of
+    "byte"
+
+  * document class methods in a separate section from instance methods
+
+  * tests for key length restrictions
+
+version 0.002; 2007-09-17
+
+  * bugfix: correctly handle UTF8-encoded scalars
+
+  * don't use ppport.h, because it wasn't doing anything for perl v5.6+
+
+  * test POD syntax and coverage
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * rearrange source tree to fit Module::Build convention
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2006-08-12
+
+  * obfuscate Solar Designer's email address, at eir request
+
+version 0.000; 2006-08-06
+
+  * initial released version

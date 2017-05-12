@@ -1,0 +1,307 @@
+
+User can add a default variable generator for unexisting variables
+
+implement remaining tests (listed in 020.t)
+	- test locking and inherited variables locking
+
+Single Eval::Context perl Config::Set vs single Eval::Context for all the Set in a SetMultiple/Construction
+
+Check if a history is implemented right when a variable exists in multiple categories
+	what history is returned?
+	
+ADD name aliasing
+	categories?
+
+LOCK the whole config
+
+get a md5 for the config 
+
+set a mask for which variables can be accessed
+	set mask	get mast => die if accesses
+	inheriting object can set what it inherits
+	object giving can list what is inheritable
+
+remove variables => make them non acceessible with set/get but keep them
+
+?? Remove debugging. Filter it out?
+	use Debug::Mixin instead
+
+log4j support
+
+
+optionaly, show warning if variable withing the same category is assigned a different value
+
+Shall Parents allow override instead for children forcing the override
+	or shall we force an unlock and an override?
+	or shall we add a die if override
+	
+Die if precedence given option
+Die if override option (how does lock work in this case) 
+
+Die if variable is not set when GetConfig is called
+Die if variable not existst in GetConfig
+	both the above could be implemented with a test passed after Get instead for an internal implementation
+	
+Add a cache to get the data quickly, IMPORTANT! it should generate the same warning and errors if any
+
+#---------------------------------------------------------------------------------------
+
+#check in git
+
+# Add tests where the variable's value is a structure
+
+#optionaly, keep variable access log. can be used for Xref.
+	#log get
+	log gethashref ??
+	#access function to the log
+	#document
+	examples in cookbook
+
+#EVAL instead for VALUE
+	#EvalString (was called eval config in PBS)
+	#does it have to be in config::hierarchical? => make it a plugin
+	#check if Text::template is OK
+	implement as : replace EVAL by VALUE in CheckSetArguments (log it too?)
+	document
+
+#change ALIAS to CONFIGURATION_ALIAS
+
+#is order in CATEGORIES_TO_EXTRACT_FROM important
+
+#Add Name checking => SET_SUB
+
+#Invalid value for variable 'F'. Local validator
+	should show the values
+	
+#have a white list/regex/callback to allow only certain variables to be set
+	this will allow us to control what variables are added to the config
+
+"takes precedence" warning can not be silenced, should itpossible?
+
+# write a bunch of examples in a cookbook (take them from tests)
+	particularly show the warning errors
+	explain how to inherit from config to config
+	give some use cases
+
+# Can we set a lock to 0 without force lock?
+	=> no
+	
+#Options/CATEGORIES_TO_EXTRACT_FROM put the warning info on a single
+line. Same in GetHashRef.
+
+#Error in GetCategories example
+
+# History output has changed the action is before the value now
+
+#Disable silent ...
+        C::H will display warnings
+
+#Missing blank line before FILE and LINE
+
+#Replace 'You can override the aliased category variables.' by you can
+STILL
+
+#Options/ history: remove comment about how it could have been done
+
+
+#GetMultiple: better variable names
+
+
+#Delta: no identical filter example is weird
+
+#document history compacter
+
+#add comment, history force lock, override, lock,... to history event
+
+#Config Delta
+
+	in package Config::Hierarchical::Delta
+	
+	this can be used for showing what config have changed before running rules or to show
+	the difference between a node and its package
+	
+	delta between lists in a config object
+
+		$c->Delta
+			(
+			CATEGORIES => [],
+			EXTERNAL_CONFIGS => [], #sense if they are C::H or other type. expect a hash access 
+			CHECK_SUB => sub,
+			DISPLAY_CALLBACK => sub,
+			)
+		
+	delta between objects (with lists)
+		=> can be done in two steps
+		
+	accept callback from caller 
+		pass object to caller for introspection
+		caller pass arguments to callback
+		default callback is a dumper
+			default dumper can also get arguments
+
+	return a diff data structure that can be displayed by any dumper
+
+#package Config::Hierarchical::Tie::ReadOnly
+	same as GetHashref but the values are kept in the config object, usufull to save memory when doing EvalString
+
+# GENERATE WARNING for ALIASED categories
+
+#can we override a locked variable => yes, no warnings (except override)
+
+!Add sub to initalize a category in one call. once initialized, it shall not be possible to initialize
+	a category again.
+	=> use INITIAL_VALUES
+	
+#Add sub to extract a config for user defined categories. the returned config should be directly usable
+	to initialize another category
+	
+	my $config_1 = new Config::Hierarchical(.....) ;
+	
+	my $config_2 = new Config::Hierarchical
+					(
+					INITIAL_VALUES =>
+						[
+						config_1->GetAllVariableInInitializationFormat
+							(
+							CATEGORY => 'XYZ,
+							LOCK => 1,
+							HISTORY => undef # remove history
+							),
+						
+						[CATEGORY => 'CLI', NAME => 'CC', VALUE => 1,],
+						[CATEGORY => 'CLI', NAME => 'LD', VALUE => 2, LOCK => 1],
+						],
+					) ;
+
+
+#It should be possible to implement a category through a reference to another C::H object
+	this is nested configs. one solution is to implement a tied hash interface on top of C:.H
+	for read only nested config, we cuold implement only exists and fetch in the tie. Maybe
+	implementing two tied modules on top of C::H is the cleanest solution
+	
+	
+	my $config_1 = new Config::Hierarchical(.....) ;
+	my $config_2 = new Config::Hierarchical
+					(
+					.....
+					REFERENCE_CONFIG =>
+						[
+							{
+							CATEGORY_NAME => 
+							CONFIGURATION_REFERENCE => $config_1,
+							ALLOWED_VARIABLES => [], 
+							LOCKED_CATEGORY =>
+							HISTORY => ...
+							...
+							},
+						]
+					) ;
+	This is not going to be time effective even if it save a lot of memory
+		=> this decision should be left to the user
+
+	
+#Add sub to lock category, making the category read only
+
+#Add validation
+	can we define a validator for an already existing configuration variable, yes
+	do we inherit validators, between what?
+	Can a validator be used for cross variable dependency? preferably something added externally
+	can we have multiple validators (good)
+	does a new validator check for an already existing value? should
+	Can we use the same mechanism for user validators and C::I validators (IE override ...)
+	are validators per variable or per category? variable
+	remember where validators are added
+
+	We may want to define validators before we create a config
+
+	GetConfig shall NOT return an invalid value if the validator was set after the value
+
+	Set
+		NAME ...
+		VALIDATORS => [sub, ...]
+
+	VALIDATORS =>
+		[
+		{
+		CATEGORY_NAMES => ['CLI', 'CURRENT',] ,
+		NAMES          => ['CC', 'LD'],
+		VALIDATORS     => {alphanumeric => \&alphanumeric,},
+		},
+		],
+
+#History should have its name (including where it was created (package, node sub, ...)) at the bottom to help read it
+	can use comments
+	
+#Packages that do not modify a config variable shall not be in the previous history
+	not part of this module as history is handled manually
+
+# ----------------------------
+# We need to be able to get a config's history accross packages.
+	#This means we need to be able to link histories together. Possibily link
+	config together.
+
+	#A naive approach is to copy the history from parent to child. This will
+	use memory but will guarantee isolation.
+
+	#Setting history should only be allowed once before the variable is defined
+
+
+#'precedence given to X::Y'  should be 'X::Y takes precedence'
+
+#when a class override another:
+	do we need to use override again next time?
+	shall we display a warning if override is not set
+	this is how it worked in 0.01
+	=> force it to override
+	
+#variable history should be extracted accross the categories in the right order
+
+#what happends when setting an overriden variable?
+	#does it stay overriden? yes
+	is a warning generated? yes
+
+
+#Add option to warn if lower level config will be ignored
+	IE: setting a local variable would display a warning about the non local variable
+	CHECK_LOWER_LEVEL_CATEGORIES
+	
+#Warning when categories are used explicitely by the user
+	setable through a sub 
+	SetDisplayExplicitCategoryWarningOption
+	WARN_FOR_EXPLICIT_CATEGORY
+
+#Is category used in Get?
+#Get should return where the config is comming from (GET_CATEGORY)
+#Config category dump should be done in hierarchical order
+#status message and displayed messages differ slightly. 
+	#use the same variable
+	#multiple lines are displayed when multiple higher priority entries are
+		encountered, display a single header footer
+# An empty history string is added when the value is identical
+#Check number of element in all subs to avoid 'odd number of ...' message
+# OK Do we need 'force lock' to unlock 
+#OK Can we set a protected category variable?
+#We should be able to add a comment to the history entry when setting a
+	variable
+#lock status is not added to history when locking is done through 'set'. 
+	OK when	done through 'lock'
+#typo in GetCategories example
+#Do we keep a history of warnings (protected, ignored, ...) and should it be an option
+
+# ----------------------------
+
+#test utilities
+#wantarray
+#locked categories
+#custom get
+#custom Get Hash ref
+#document  code
+#=head1 TEST, COVERAGE and EXAMPLES
+#test pod, syntax, critic ...
+#coverage
+#check the extra test modules in Xmas proj
+#check all coverage tests and make them real tests
+#Manifest, README, ...
+
+test distribution release manifest ??.
+

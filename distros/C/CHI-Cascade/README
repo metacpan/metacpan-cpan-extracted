@@ -1,0 +1,466 @@
+NAME
+    CHI::Cascade - a cache dependencies (cache and like 'make' utility
+    concept)
+
+SYNOPSIS
+        use CHI;
+        use CHI::Cascade;
+
+        $cascade = CHI::Cascade->new(chi => CHI->new(...));
+
+        $cascade->rule(
+            target  => 'unique_name',
+            depends => ['unique_name_other1', 'unique_name_other2'],
+            code    => sub {
+                my ($rule, $target_name, $values_of_depends) = @_;
+
+                # $values_of_depends == {
+                #     unique_name_other1 => $value_1,
+                #     unique_name_other2 => $value_2
+                # }
+                # $rule->target     eq      $target_name
+                # $rule->depends    ===     ['unique_name_other1', 'unique_name_other2']
+                # $rule->dep_values ==      $values_of_depends
+                # $rule->params     ==      { a => 1, b => 2 }
+
+                # Now we can calcualte $value
+                return $value;
+            },
+            params  => { a => 1, b => 2 }
+        );
+
+        $cascade->rule(
+            target  => 'unique_name_other1',
+            depends => 'unique_name_other3',
+            code    => sub {
+                my ($rule, $target_name, $values_of_depends) = @_;
+
+                # $values_of_depends == {
+                #     unique_name_other3 => $value_3
+                # }
+
+                # computing here
+                return $value;
+            }
+        );
+
+        $value_of_this_target = $cascade->run('unique_name');
+
+DESCRIPTION
+    This module is the attempt to use a benefits of caching and 'make'
+    concept. If we have many an expensive tasks (a *computations* or
+    sometimes here used term as a *recomputing*) and want to cache it we can
+    split its to small expsnsive tasks and to describe dependencies for
+    cache items.
+
+    This module is experimental yet. I plan to improve it near time but some
+    things already work. You can take a look for t/* tests as examples.
+
+CONSTRUCTOR
+    $cascade = CHI::Cascade->new( %options )
+
+    This method constructs a new "CHI::Cascade" object and returns it.
+    Key/value pair arguments may be provided to set up the initial state.
+    Options are:
+
+    chi Required. Instance of CHI object. The CHI::Cascade doesn't construct
+        this object for you. Please create instance of "CHI" yourself.
+
+    busy_lock
+        Optional. Default is *never*. *This is not "busy_lock" option of
+        CHI!* This is amount of time (to see "DURATION EXPRESSIONS" in CHI)
+        until all target locks expire. When a target is to being computing
+        it is locked. If process which is to be computing target and it will
+        die or OS will be hangs up we can dead locks and locked target will
+        never recomputed again. This option helps to avoid it. You can set
+        up a special busy_lock for rules too.
+
+    target_chi
+        Optional. This is CHI cache for target markers. Default value is
+        value of "chi" option. It can be useful if you use a "l1_cache" in
+        CHI option. So you can separate data of targets from target markers
+        - data will be kept in a file cache and a marker in memory cache for
+        example.
+
+METHODS
+    rule( %options )
+        To add new rule to "CHI::Cascade" object. All rules should be added
+        before first "run" method
+
+        The keys of %options are (options are passed directly in
+        CHI::Cascade::Rule constructor):
+
+        target
+            Required. A target for "run" and for searching of "depends". It
+            can be as scalar text or "Regexp" object created through "qr//"
+
+        depends
+            Optional. The scalar, arrayref or coderef values of
+            dependencies. This is the definition of target(s) from which
+            this current rule is dependent. If *depends* is:
+
+            scalar
+                It should be plain text of single dependence of this target.
+
+            arrayref
+                An each item of list can be scalar value (exactly matched
+                target) or code reference. If item is coderef it will be
+                executed as $coderef->( $rule, $rule->qr_params ) and should
+                return a scalar value as current dependence for this target
+                at runtime (the API for coderef parameters was changed since
+                v0.16)
+
+            coderef
+                This subroutine will be executed every time inside *run*
+                method if necessary and with parameters as: $coderef->(
+                $rule, $rule->qr_params ) (API was changed since v0.16). It
+                should return scalar or arrayref. The returned value is
+                *scalar* it will be considered as single dependence of this
+                target and the behavior will be exactly as described for
+                *scalar* in this paragraph. If the returned value is
+                *arrayref* it will be considered as list of dependencies for
+                this target and the behavior will be exactly as described
+                for *arrayref* in this paragraph.
+
+        depends_catch
+            Optional. This is coderef for dependence exceptions. If any
+            dependence from list of "depends"'s option throws an exception
+            of type CHI::Cascade::Value by "die" (for example like this
+            code: "die CHI::Cascade::Value->new->value( { i_have_problem =>
+            1 } )" ) then the $cascade will execute this code as
+            "$rule->{depends_catch}->( $this_rule_obj,
+            $exception_of_dependence, $rule_obj_of_dependence,
+            $plain_text_target_of_dependence )" and you can do into inside a
+            following:
+
+            re-"die" new exception of any type
+                If your new exception will be type of CHI::Cascade::Value
+                you will get the value of this object from "run" method
+                immediately (please to see "code" below) without saving in
+                cache.
+
+                If exception will be other type this will be propogated
+                onward beyond the "run" method
+
+            to do something
+                You can make something in this code. After execution of your
+                code the cascade re-throws original exception of dependence
+                like described above in "re-"die"" section.
+
+                But please notice that original exception has a status of
+                "thrown from code" so it can be catched later by other
+                "depends_catch" callback from other rule located closer to
+                the call hierarchy of "run".
+
+            Please notice that there no way to continue a "code" of current
+            rule if any dependence throws an exception!. It because that the
+            main concept of execution code of rules is to have all valid
+            values (cached or recomputed) of all dependencies before
+            execution of dependent code.
+
+        code
+            Required. The code reference for computing a value of this
+            target (a *computational code*). Will be executed if no value in
+            cache for this target or any dependence or dependences of
+            dependences and so on will be recomputed. Will be executed as
+            "$code->( $rule, $target, $hashref_to_value_of_dependencies )"
+            *(The API of running this code was changed since v0.10)*
+
+            If you want to terminate a code and to return immediately from
+            "run" method and don't want to save a value in cache you can
+            throw an exception from "code" of type CHI::Cascade::Value. Your
+            instance of CHI::Cascade::Value can have a value or cannot (a
+            valid value can be even "undef"!). A "run" method returns either
+            a value is set by you (through "value" in CHI::Cascade::Value
+            method) or value from cache or "undef" in other cases. Please to
+            see CHI::Cascade::Value
+
+            If "run" method will have a "defer" option as true this code
+            will not be executed and you will get a set bit CASCADE_DEFERRED
+            in "state" bit mask variable. This may useful when you want to
+            control a target execution.
+
+            $rule
+                An instance of CHI::Cascade::Rule object. You can use it
+                object as accessor for some current executed target data
+                (plain text of target, for getting of parameters and so on).
+                Please to see CHI::Cascade::Rule
+
+            $target
+                The current executed target as plain text for this "code"
+
+            $hashref_to_value_of_dependencies
+                A hash reference of values (values are cleaned values not
+                CHI::Cascade::Value objects!) of all dependencies for
+                current target. Keys in this hash are flat strings of
+                dependecies and values are computed or cached ones.
+
+                This module should guarantee that values of dependencies
+                will be valid values even if value is "undef". This code can
+                return "undef" value as a valid code return but author
+                doesn't recommend it. If "CHI::Cascade" could not get a
+                valid values of all dependencies of current target before
+                execution of this code the last will not be executed (The
+                "run" will return "undef").
+
+        params
+            Optional. You can pass in your code any additional parameters by
+            this option. These parameters are accessed in your rule's code
+            through "params" in CHI::Cascade::Rule method of
+            CHI::Cascade::Rule instance object.
+
+        busy_lock
+            Optional. Default is "busy_lock" of constructor or *never* if
+            first is not defined. *This is not "busy_lock" option of CHI!*
+            This is amount of time (to see "DURATION EXPRESSIONS" in CHI)
+            until target lock expires. When a target is to being computed it
+            is locked. If process which to be recomputing a target and it
+            will die or OS will be hangs up we can dead locks and locked
+            target will never recomputed again. This option helps to avoid
+            it.
+
+        recomputed
+            Optional. This is a computational callback (coderef). If target
+            of this rule was recomputed this callback will be executed right
+            away after a recomputed value has been saved in cache. The
+            callback will be executed as $coderef->( $rule, $target, $value
+            ) where passed parameters are:
+
+            $rule
+                An instance of CHI::Cascade::Rule class. This instance is
+                recreated for every target searching and recomputing if
+                need.
+
+            $target
+                A current target as string
+
+            $value
+                The instance of CHI::Cascade::Value class. You can use a
+                computed value as $value->value
+
+            For example you can use this callback for notifying of other
+            sites that your target's value has been changed and is already
+            in cache.
+
+        value_expires
+            Optional. Sets an CHI's cache expire value for all future target
+            markers are created by this rule in notation described in
+            "DURATION EXPRESSIONS" in CHI. The default is 'never'. It can be
+            coderef or string scalar format as "DURATION EXPRESSIONS" in
+            CHI. A coderef should return value in same format.
+
+        ttl Optional. An arrayref for min & max intervals of TTL. Example:
+            "[ 60, 3600 ]" - where the minimum ttl is seconds and the
+            maximum is 3600 seconds. Targets of this rule will be recomputed
+            during from 60 up to 3600 seconds from touched time of any
+            dependence this rule. Please read "CASCADE_TTL_INVOLVED" in
+            CHI::Cascade::Value too.
+
+    run( $target, %options )
+        This method makes a cascade computation if need and returns value
+        (value is cleaned value not CHI::Cascade::Value object!) for this
+        target If any dependence of this target of any dependencies of
+        dependencies were (re)computed this target will be (re)computed too.
+
+        $target
+            Required. Plain text string of target.
+
+        %options
+            Optional. And all options are optional too A hash of options.
+            Valid keys and values are:
+
+            state
+                A scalarref of variable where will be stored a state of
+                "run". Value will be a bit mask.
+
+            defer
+                If value will be a true then computational code will not be
+                run if there is a need. After "run" you can test status of
+                returned value - it should be (re)computed or not by bit
+                "CASCADE_DEFERRED" in saved "state" variable. If the
+                CASCADE_DEFERRED bit is set you can recall "run" method
+                again or re-execute target in other process for a
+                non-blocking execution of current process.
+
+            actual_term
+                The value in seconds (a floating point value) of actual
+                term. The actual term is period when dependencies to be
+                checked for $target in "run" method. If this option is not
+                defined then the "run" method checks a dependencies of
+                $target every time in runtime. But sometimes (when a target
+                has many dependencies) we could want to reduce an amount of
+                dependencies checks. For example if "actual_term" will be
+                defined as 2.5 this will mean to check a dependencies only
+                every 2.5 seconds. So recomputing in this example can be
+                recomputed only one time in every 2.5 seconds (even if one
+                from dependencies will be updated). But if value of $target
+                is missing in cache a recomputing can be run regardless of
+                this option.
+
+            ttl A scalarref for getting current TTL for value of 'run'
+                target. The TTL is "time to live" as TTL in DNS. If any rule
+                in a path of following to dependencies has ttl parameter
+                then the cascade will do there:
+
+                1.  will look up a time of this retouched dependence;
+
+                2.  if rule's target marker already has a upper time and
+                    this time in future the target will be recomputed in
+                    this time in future and before this moment you will get
+                    a old data from cache for 'run' target. If this time is
+                    there and has elapsed cascade will use a standard
+                    algorithm.
+
+                3.  will look up the rule's ttl parameter (min & max ttl
+                    values) and will generate upper time of computation of
+                    this rule's target and will return from "run" method old
+                    data of 'run' target. Next "run"s executions will return
+                    old values of any targets where this TTL-marked target
+                    is as dependence.
+
+                4.  In any case if old value misses in cache the cascade
+                    will recompute codes.
+
+                This feature was made for *reset* situation. For example if
+                we have 'reset' rule and all rules depend from this one rule
+                the better way will be to have 'ttl' parameter in every rule
+                except 'reset' rule. So if rule 'reset' will be retouched
+                (or deleted) other targets will be recomputed during time
+                from 'min' and 'max' intervals from 'reset' touched time. It
+                reduce a server's load. Later i will add examples for this
+                and will document this feature more details. Please read
+                "CASCADE_TTL_INVOLVED" in CHI::Cascade::Value too.
+
+            stash
+                A *hashref* to stash - temporary data container between
+                rule's codes. Please see "stash ()" method for details.
+
+    touch( $target )
+        This method refreshes the time of this target. Here is analogy with
+        touch utility of Unix and behaviour as make(1) after it. After
+        "touch" all targets are dependent from this target will be
+        recomputed at next "run" with an appropriate ones.
+
+    target_remove ( $target )
+        It's like a removing of target file in make. You can force to
+        recompute target by this method. It will remove target marker if one
+        exists and once when cascade will need target value it will be
+        recomputed. In a during recomputing of course cascade will return an
+        old value if one exists in cache.
+
+    stash ()
+        It returns *hashref* to a stash. A stash is hash for temporary data
+        between rule's codes. It can be used only from inside "run".
+        Example:
+
+            $cascade->run( 'target', stash => { key1 => value1 } )
+
+        and into rule's code:
+
+            $rule->cascade->stash->{key1}
+
+        If a "run" method didn't get stash hashref the default stash will be
+        as empty hash. You can pass a data between rule's codes but it's
+        recommended only in special cases. For example when run's target
+        cannot get a full data from its target's name.
+
+STATUS
+    This module is experimental and not finished for new features ;-) Please
+    send me issues through <https://github.com/Perlover/CHI-Cascade> page
+
+ANALOGIES WITH make
+    Here simple example how it works. Here is a direct analogy to Unix make
+    utility:
+
+        In CHI::Cascade:            In make:
+
+        rule                        rule
+        depends                     prerequisites
+        code                        commands
+        run( rule_name )            make target_name
+
+FEATURES
+    The features of this module are following:
+
+    Computing inside process
+        If module needs to compute item for cache we compute inside process
+        (no forks) For web applications it means that one process for one
+        request could take a some time for computing. But other processes
+        will not wait and will get either old previous computed value or
+        *undef* value.
+
+    Non-blocking computing for concurrent processes
+        If other process want to get data from cache we should not block it.
+        So concurrent process can get an old data if new computing is run or
+        can get *undef* value. A concurrent process should decide itself
+        what it should do after it - try again after few time or print some
+        message like 'Please wait and try again' to user.
+
+    Each target is splitted is two items in cache
+        For optimization this module keeps target's info by separately from
+        value item. A target item has lock & timestamp fields. A value item
+        has a computed value.
+
+EXAMPLE
+    For example please to see the SYNOPSIS
+
+    When we prepared a rules and a depends we can:
+
+    If unique_name_other1 and/or unique_name_other2 are(is) more newer than
+    unique_name the unique_name will be recomputed. If in this example
+    unique_name_other1 and unique_name_other2 are older than unique_name but
+    the unique_name_other3 is newer than unique_name_other1 then
+    unique_name_other1 will be recomputed and after the unique_name will be
+    recomputed.
+
+    And even we can have a same rule:
+
+        $cascade->rule(
+            target  => qr/^unique_name_(.*)$/,
+            depends => sub { 'unique_name_other_' . $_[1] },
+            code    => sub {
+                my ($rule, $target_name, $values_of_depends) = @_;
+
+                # $rule->qr_params          === ( 3 )
+                # $target_name              == 'unique_name_3' if $cascade->run('unique_name_3') was
+                # $values_of_depends        == {
+                #     unique_name_other_3   => $value_ref_3
+                # }
+            }
+        );
+
+        $cascade->rule(
+            target  => qr/unique_name_other_(.*)/,
+            code    => sub {
+                my ($rule, $target_name, $values_of_depends) = @_;
+                ...
+            }
+        );
+
+    When we will do:
+
+        $cascade->run('unique_name_52');
+
+    $cascade will find rule with qr/^unique_name_(.*)$/, will make =~ and
+    will find a depend as unique_name_other_52
+
+AUTHOR
+    This module has been written by Perlover <perlover@perlover.com>
+
+LICENSE
+    This module is free software and is published under the same terms as
+    Perl itself.
+
+SEE ALSO
+    CHI::Cascade::Rule
+        An instance of this object can be used in your target codes.
+
+    CHI This object is used for cache.
+
+    CHI::Driver::Memcached::Fast
+        Recommended if you have the Memcached
+
+    CHI::Driver::File
+        Recommended if you want to use the file caching instead the
+        Memcached for example
+

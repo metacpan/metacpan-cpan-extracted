@@ -1,0 +1,11 @@
+Revision history for Perl module Catalyst::Model::Memcached
+
+0.02 Mon Mar 22 10:21:43 2010
+    - fixed typo in dependency list
+    - fixed depends on Test::More
+    - added license Makefile arg
+
+0.01 Sun Mar 21 23:04:08 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

@@ -1,0 +1,30 @@
+Revision history for Catalyst-Plugin-LogDeep
+
+0.0.4   2015-01-10
+        Updating for release of version 0.0.4
+        Added missing dependencies (Ivan Wills)
+        Removed generated files (Ivan Wills)
+        Fixed version numbers (Ivan Wills)
+        Fixed dependencies (Ivan Wills)
+        Repo cleanup (Ivan Wills)
+        Updated boilerplate test (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Added configure_requires section (Ivan Wills)
+        Updated change log (Ivan Wills)
+
+0.0.3   2012-07-20
+        Getting minor version release ready
+        Cleaned Build.PL
+        Updated to my current standards
+        Started to use Class::C3::Adopt::NEXT
+        Added source code repo
+        Updated info from Build.PL script
+        Added missing files to manifest & added LICENSE file
+        Removed Taint check
+        Added missing build requirement
+        Removed code Log4Perl code
+        updated description
+
+0.01    2009-05-20
+        First version, released on an unsuspecting world.
+

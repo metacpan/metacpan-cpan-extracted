@@ -1,0 +1,9 @@
+#!/bin/sh -v
+for n in \
+    at/run \
+    at/pxclip \
+    at/all-xclip-selections \
+    at/clipfilter-test \
+    at/clipjoin-test \
+    at/clipbrowse-test \
+    ; do echo -n "Run $n? "; read X; $n; done

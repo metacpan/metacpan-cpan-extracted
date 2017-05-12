@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  7341:
+    - 86
+name: ddcbe0
+registers:
+  AF: 17418
+  AF_: 0
+  BC: 22077
+  BC_: 0
+  DE: 44284
+  DE_: 0
+  HL: 63330
+  HL_: 0
+  I: 0
+  IX: 7243
+  IY: 46778
+  PC: 4
+  R: 2
+  SP: 0

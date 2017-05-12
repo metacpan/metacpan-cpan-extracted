@@ -1,0 +1,9 @@
+Revision history for Catalyst-Model-DynamicAdaptor
+
+0.02    2008-04-27/18:06
+        - skip spelling.t unless $ENV;
+        - bug fix. now support loading multiple modules correctly
+
+0.01    2008-04-19/19:36
+        First version, released on an unsuspecting world.
+

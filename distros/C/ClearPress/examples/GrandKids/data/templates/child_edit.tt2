@@ -1,0 +1,15 @@
+
+<h2>child </h2>
+<form method="post" action="[% model.id_child %]">
+ <ul>
+  <li>
+   <label for="birthday">birthday</label>
+   <input type="text" id="birthday" name="birthday" value="[% model.birthday %]" />
+  </li>  <li>
+   <label for="name">name</label>
+   <input type="text" id="name" name="name" value="[% model.name %]" />
+  </li>
+ </ul>
+ <input type="submit" value="Update" />
+</form>
+ 

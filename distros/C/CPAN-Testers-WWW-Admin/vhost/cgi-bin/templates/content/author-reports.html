@@ -1,0 +1,64 @@
+[%
+
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+
+    IF searched ; THEN ; 
+      title = 'Find Reports by GUID' ;
+      crumb1_name = 'Find by GUID' ;
+      subtitle = 'Find by GUID' ;
+    ELSE ;
+      title = 'Browse Reports by Date' ;
+      crumb1_name = 'Browse by Date' ;
+      subtitle = 'Reports for ' _ data.date ;
+    END ;
+
+    box_prefs = 1 ;
+    javascript = 1 ;
+
+%]
+
+<p>Select the reports you wish to delete from the list below. Click on the
+report ID to view more information about that report.</p>
+
+[% INCLUDE "content/moreinfo.html" %]
+
+<h2>[% subtitle %]</h2>
+
+[% IF data.reports %]
+<form id="reports-form" name="reports" action="[% cgipath %]/pages.cgi" method="post" onsubmit="return MarkReports();">
+<input type="hidden" name="act" value="author-mark" />
+
+<table id="reports" class="sortable">
+<tr><th><input type="checkbox" name="top" onclick="togglecheckboxes(this)" /></th>
+	<th><span class="sortheader">Grade</span></th>
+	<th><span class="sortheader">Distribution-Version</span></th>
+	<th><span class="sortheader">Perl</span></th>
+	<th><span class="sortheader">OS</span></th>
+	<th><span class="sortheader">Tester</span></th>
+</tr>
+[% FOREACH r = data.reports %]
+<tr class="g[% r.state | upper %]relunp">
+  <td><span id="mark[% r.id %]">
+    [% IF r.marked %]
+    marked
+    [% ELSE %]
+    <input type="checkbox" name="DELETE" value="[% r.id %]" class="cb[% r.state | upper %]relunp" />
+    [% END %]
+    </span>
+  </td>
+	<td class="[% r.state | upper %]"><span class="reportlink" onclick="more_info('[% r.guid %]','[% r.state | upper %]','[% r.dist %]','[% r.version %]','[% r.perl %]','[% r.osname %]','[% r.profile.display || r.tester | html %]','[% user.author %]','[% r.fulldate %]');">[% r.state | upper %]</span></td>
+	<td><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% r.dist %]">[% r.dist %]</a>-[% r.version %]</td>
+	<td>[% r.perl %]</td>
+	<td>[% r.osname %]</td>
+	<td>[% r.profile.display || r.tester %]</td>
+</tr>
+[% END %]
+</table>
+
+<p class="smalltext"><input type="submit" value='Mark Reports' /></p>
+</form>
+
+[% ELSE %]
+<p>Sorry, no reports found for that date.</p>
+[% END %]

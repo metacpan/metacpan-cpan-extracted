@@ -1,0 +1,49 @@
+CCCP-HTML-Truncate version 0.04
+===============================
+
+NAME
+    CCCP::HTML::Truncate - truncate html with html-entities.
+
+    Version 0.04
+
+SYNOPSIS
+Wide character in print at /usr/share/perl/5.10/Pod/Text.pm line 249.
+        CCCP::HTML::Truncate;
+
+    my $str = "<div>Тут могут быть <b>&mdash; разные entities и &quot; всякие</b> и,\n\n незакрытые теги <div> bla ... bla";
+
+    print CCCP::HTML::Truncate->truncate($str,20);
+        # <div>Тут могут быть <b>— раз...</b></div>
+
+    print CCCP::HTML::Truncate->truncate($str,20,'...конец');
+        # <div>Тут могут быть <b>— раз...конец</b></div>
+
+DESCRIPTION
+    Truncate html string. Correct job with html entities. Validate truncated html.
+
+METHODS
+   truncate($str,$length,$elips)
+    Class method. Return truncated html string.
+
+PACKAGE VARIABLES
+   $CCCP::HTML::Truncate::enc
+    Charset for source html. Default 'utf-8'.
+
+BENCHMARK
+            Benchmark: timing 10000 iterations of CCCP::HTML::Truncate, HTML::Truncate...
+            CCCP::HTML::Truncate:  4 wallclock secs ( 4.55 usr +  0.00 sys =  4.55 CPU) @ 2197.80/s (n=10000)
+            HTML::Truncate:        5 wallclock secs ( 4.86 usr +  0.00 sys =  4.86 CPU) @ 2057.61/s (n=10000)
+
+        Benchmark: timing 25000 iterations of CCCP::HTML::Truncate, HTML::Truncate...
+            CCCP::HTML::Truncate: 12 wallclock secs (11.37 usr +  0.00 sys = 11.37 CPU) @ 2198.77/s (n=25000)
+            HTML::Truncate:       12 wallclock secs (12.12 usr +  0.01 sys = 12.13 CPU) @ 2061.01/s (n=25000)
+
+WARNING
+    Version oldest 0.04 is DEPRECATED
+
+SEE ALSO
+    "XML::LibXML", "Encode"
+
+AUTHOR
+    Ivan Sivirinov
+

@@ -1,0 +1,11 @@
+body {
+  font-family: "Palatino Linotype", Freeserif, serif;
+  letter-spacing: .05em;
+}
+h1, h2 {
+  font-family: Georgia, "DejaVu Serif", serif;
+  letter-spacing: .1em;
+}
+
+h1 {font-size: 1.5em;}
+h2 {font-size: 1.4em;}

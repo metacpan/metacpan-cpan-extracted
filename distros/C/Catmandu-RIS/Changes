@@ -1,0 +1,18 @@
+Revision history for Catmandu-RIS
+
+0.10  2015-08-18 19:31:45 CEST
+  - support for semi-automatic detection of separation characters at import
+  - fixing previous_key import bug
+  - add a 'human' option to translate RIS tags
+
+0.04  2015-08-07 13:08:59 CEST
+  - data parsing improved, when field is missing take the previous one
+
+0.03  2015-07-14 11:18:27 CEST
+  - support repeated field, fixes GH[#1]
+
+0.02  2015-07-14 07:49:53 CEST
+  - pod
+
+0.01  2015-07-13 21:10:49 CEST
+  - Initial release, extracted from Catmandu core distribution

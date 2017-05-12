@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 1
+halted: 0
+mem:
+  0:
+    - 237
+    - 102
+name: ed66
+registers:
+  AF: 16520
+  AF_: 0
+  BC: 42977
+  BC_: 0
+  DE: 16381
+  DE_: 0
+  HL: 37275
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 53651

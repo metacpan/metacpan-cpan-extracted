@@ -1,0 +1,21 @@
+TYPEMAP
+CDB_TinyCDB *   T_CDB_TINYCDB
+
+INPUT
+T_CDB_TINYCDB
+    if (
+        sv_isobject($arg)
+            &&
+        (SvTYPE(SvRV($arg)) == SVt_PVMG)
+            &&
+        sv_derived_from( $arg, \"CDB::TinyCDB\")
+    )
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else
+        croak( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+ 
+
+OUTPUT
+T_CDB_TINYCDB
+        sv_setref_pv( $arg, CLASS, (void*)$var );
+        SvREADONLY_on( SvRV( $arg ) );

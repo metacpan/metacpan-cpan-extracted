@@ -1,0 +1,8 @@
+<p>Login here</p>
+<form method="POST" action="[%c.req.uri%]">
+    <label>Email</label>
+    <input type="text" id="mail" name="mail"><br />
+    <label>Password</label>
+    <input type="password" name="userPassword"><br />
+    <input type="submit" value="Login" name="submit">
+</form>

@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Application::Plugin::Authorization::Driver::ActiveDirectory.
+
+0.01  Mon Jul 19 12:26:25 2010
+	- original version; created by h2xs 1.23 with options
+		-AX -n CGI::Application::Plugin::Authorization::Driver::ActiveDirectory -v 0.01
+

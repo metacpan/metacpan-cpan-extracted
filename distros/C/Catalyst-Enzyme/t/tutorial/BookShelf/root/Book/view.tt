@@ -1,0 +1,52 @@
+[% INCLUDE "header.tt" %]
+[% PROCESS "view_macros.tt" %]
+
+<div id="title">View [% crud.moniker %]</div>
+
+<form>
+<fieldset>
+    <legend>[% crud.moniker | html %] '[% item | html %]'</legend>
+
+    [% form_view_item(item); %]
+
+    <span class="item_local_action">
+    <a href="[% c.uri_for_controller('edit', item.id) %]">Edit</a> | <a href="[% c.uri_for_controller('delete', item.id) %]">Delete</a>
+    </span>
+
+</fieldset></form>
+
+[% IF item.borrowed %]
+    <form action="[% c.uri_for('do_return', item.id) %]">
+    <fieldset>
+        <legend>Borrowed by</legend>
+
+        <a href="[% c.uri_for('/borrower/view', item.borrower.id) %]">[% item.borrower | html %]</a>
+
+        <input type="submit" value="Return">
+
+    </fieldset>
+    </form>
+[% ELSE %]
+    <form action="[% c.uri_for('do_borrow', item.id) %]">
+    <fieldset>
+        <legend>Borrow Book</legend>
+
+        [%
+        element = item.to_field('borrower');
+        element = c.view.dropdown_remove_id(element, 1); #Should go into model/controller somehow
+        element.as_HTML('<>&"\'');
+        %]
+
+        <input type="submit" value="Borrow">
+        <br />
+        <a href="/borrower/add">Add Borrower</a>
+
+    </fieldset>
+    </form>
+[% END %]
+
+<a href="[% c.uri_for_controller('add') %]">Add</a>
+<a href="[% c.uri_for_controller('list') %]">List</a>
+
+[% INCLUDE "footer.tt" %]
+

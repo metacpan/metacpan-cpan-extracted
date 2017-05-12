@@ -1,0 +1,6 @@
+name = "Config-ENV-Multi"
+# badges = ["travis"]
+authority="cpan:HIXI"
+
+module_maker="ModuleBuildTiny"
+

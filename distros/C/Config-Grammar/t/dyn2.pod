@@ -1,0 +1,95 @@
+The following variables can be set in this section:
+
+=over
+
+=item B<a>
+
+This variable I<dynamically> modifies the grammar based on its value.
+
+=back
+
+=head2 *** test ***
+
+The following sections are valid on level 1:
+
+=over
+
+=item B<+/s+/>
+
+The grammar of this section is I<dynamically> modified based on its name.
+
+The following variables can be set in this section:
+
+=over
+
+=item B<a>
+
+=item B<b>
+
+=item B<c>
+
+=back
+
+Dynamical grammar changes for example instances of this section:
+
+=over
+
+=item B<s>: Less than three 's' letters have no effect
+
+No changes that can be automatically described.
+
+(End of dynamical grammar changes for example instance C<s>.)
+
+=item B<ss>: Less than three 's' letters still have no effect
+
+No changes that can be automatically described.
+
+(End of dynamical grammar changes for example instance C<ss>.)
+
+=item B<sss>: More than two 's' letters do have an effect
+
+The following variables are not valid anymore:
+
+=over
+
+=item c
+
+=back
+
+(End of dynamical grammar changes for example instance C<sss>.)
+
+=back
+
+(End of dynamical grammar changes for example instances of section C</s+/>.)
+
+=back
+
+Dynamical grammar changes for example values of variable C<a>:
+
+=over
+
+=item B<1>: Values other than 2 have no effect
+
+No changes that can be automatically described.
+
+(End of dynamical grammar changes for variable C<a> example value C<1>.)
+
+=item B<2>: This creates new variables 'b' and 'c'
+
+The following new variables are valid:
+
+=over
+
+=item B<b>
+
+=item B<c>
+
+Default value: c = 5
+
+=back
+
+(End of dynamical grammar changes for variable C<a> example value C<2>.)
+
+=back
+
+(End of dynamical grammar changes for example values of variable C<a>.)

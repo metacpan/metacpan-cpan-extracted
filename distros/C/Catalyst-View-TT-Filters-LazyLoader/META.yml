@@ -1,0 +1,17 @@
+abstract: TT View Class with Template::Filters::LazyLoader support.
+author: Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-View-TT-Filters-LazyLoader
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 5.7
+  Catalyst::Action::RenderView: 0
+  Catalyst::View::TT: 0
+  Template::Filters::LazyLoader: 0.05
+  Test::More: 0
+version: 0.07

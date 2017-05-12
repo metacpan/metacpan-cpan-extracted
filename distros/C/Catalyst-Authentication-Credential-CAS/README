@@ -1,0 +1,8 @@
+Catalyst::Authentication::Credential::CAS - Catalyst support for JA-SIG's Central Authentication Service.
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

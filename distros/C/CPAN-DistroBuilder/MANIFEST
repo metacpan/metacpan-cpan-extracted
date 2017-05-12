@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+Changes
+lib/CPAN/DistroBuilder.pm
+lib/CPAN/DistroBuilderConfig.pm

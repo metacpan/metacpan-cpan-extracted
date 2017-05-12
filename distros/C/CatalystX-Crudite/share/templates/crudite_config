@@ -1,0 +1,69 @@
+[%- MACRO up_button(arg_title, arg_uri) BLOCK -%]
+    <a href="[% arg_uri %]" class="btn btn-primary"><i class="icon-chevron-up icon-white"></i> [% arg_title %]</a>
+[%- END -%]
+
+[%- MACRO create_button(arg_uri) BLOCK -%]
+    <a href="[% arg_uri %]" class="btn btn-primary">Create</a>
+[%- END -%]
+
+[%- MACRO show_button(arg_uri) BLOCK -%]
+    <a href="[% arg_uri %]" class="btn btn-mini"><i class="icon-eye-open"></i></a>
+[%- END -%]
+
+[%- MACRO edit_button(arg_uri) BLOCK -%]
+    <a href="[% arg_uri %]" class="btn btn-mini"><i class="icon-pencil"></i></a>
+[%- END -%]
+
+[%- MACRO delete_button(arg_uri, arg_is_disabled) BLOCK -%]
+    [%- IF arg_is_disabled -%]
+        <button type="button" class="btn btn-mini btn-danger disabled" disabled="disabled"><i class="icon-trash icon-white"></i></a>
+    [% ELSE -%]
+        <a href="[% arg_uri %]" class="btn btn-mini btn-danger"><i class="icon-trash icon-white"></i></a>
+    [%- END -%]
+[%- END -%]
+
+[%- MACRO child_list_button(arg_title, arg_uri) BLOCK -%]
+    <a href="[% arg_uri %]" class="btn btn-mini"><i class="icon-chevron-down"></i> [% arg_title %]</a>
+[%- END -%]
+
+[%- BLOCK datatable -%]
+    <div class="container">
+    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" class="display" id="resource-table">
+        <thead>
+            [%- FOR column_name IN columns %]
+                <th>[% column_name %]</th>
+            [%- END %]
+        </thead>
+        <tbody>
+            [% content %]
+        </tbody>
+    </table>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#resource-table').dataTable({
+                // disable search and sort for the buttons column
+                "aoColumns": [
+                    [%
+                        spec = [];
+                        FOR column_name IN columns;
+                            IF column_name == "";
+                                spec.push('{ "bSearchable": false, "bSortable": false }');
+                            ELSIF column_name == "*hidden";
+                                spec.push('{ "bSearchable": false, "bVisible": false }');
+                            ELSE;
+                                spec.push('null');
+                            END;
+                        END;
+                        spec.join(', ');
+                    %]
+                ]
+            });
+        });
+    </script>
+[%- END -%]
+
+[%- MACRO header_create_or_edit(arg_title) BLOCK -%]
+    [%- IF set_create_msg -%]Create[%- ELSE -%]Edit[%- END -%] [% arg_title -%]
+[%- END -%]

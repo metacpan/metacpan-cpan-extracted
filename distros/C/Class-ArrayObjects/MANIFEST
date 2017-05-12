@@ -1,0 +1,9 @@
+lib/Class/ArrayObjects.pm
+Changes
+MANIFEST
+README
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)
+t/01_base.t
+t/98_all_pod.t
+t/99_test_pod_coverage.t

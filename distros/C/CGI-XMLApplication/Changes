@@ -1,0 +1,56 @@
+Revision history for Perl extension CGI::XMLApplication
+
+1.1.3
+    o check for multivalued parameters stored in a \0 separated string by CGI::Vars (Michael Kröll)
+
+1.1.2
+    + changed run() to accept a hash reference or an object in 
+      addition to a plain hash as context (Michael Kröll)
+    o redirection handling fix
+    o documentation fixes (thanks to Christian Kauhaus)
+
+1.1.1
+    + documentation fixes and updates :)
+    o tiny tiny patch related to "perl -w"
+    o made run() more flexible
+
+1.1.0
+    tiny interface changes in this
+    getStylesheet() obsoletes selectStylesheet()
+    + getStylesheetString() so xsl strings can be passed as well
+    + panic() sends now the error state
+    + $CGI::XMLApplication::Quiet controls the errormessages returned 
+      to the client
+    + event_default returns now 0 instead of an panic on default
+    + added the minimal example
+    o documentation bugs fixed
+    o default functions return now default values (empty hashes or strings) 
+      instead of undef
+    o no warnings send with perl -w (as far as i tested)
+
+1.0.2
+    THIS VERSION FIXES TWO MAJOR BUGS INTRODUCED WITH 1.0.0
+    + getEvent Bug FIXED
+    + $stylesheet Bug FIXED
+
+1.0.1
+    + passthru() function
+    + some documentation
+
+1.0.0
+    + cleaned the structure
+    + uses strict
+    + better code to handle binary response data
+    - old (compatibility) code 
+
+0.8.1 Sat Jul 21 14:43 2001
+    Renamed the Package from CGI::OO to CGI::XMLApplication, since that
+    name makes more clear what it does :)
+    
+    As well I enabled the run function, to get a context hash as a
+    parameter.
+
+0.8  Thu Jul  5 11:31:26 2001
+    Made the Package work with MakeMaker after using it as a private
+    Module for some Months
+

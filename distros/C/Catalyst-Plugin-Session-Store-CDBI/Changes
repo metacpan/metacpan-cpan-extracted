@@ -1,0 +1,12 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Store::CDBI
+
+0.03
+        - updated POD to pass pod coverage test
+        - merged patch from jjos at aptia dot com to use CDBI primary key if id_field
+          is not set
+
+0.02
+        - compatibility changes with Catalyst::Plugin::Session::Store api.
+
+0.01
+        - initial release

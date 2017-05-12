@@ -1,0 +1,71 @@
+---
+abstract: 'Turnkey CPAN Testers smoking'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  CPAN::Checksums: '0'
+  Cwd: '3.27'
+  ExtUtils::MakeMaker: '6.46'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec: '3.27'
+  IO::CaptureOutput: '1.06'
+  IO::File: '0'
+  Test::More: '0.62'
+  lib: '0'
+  perl: '5.010'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Reporter-Smoker
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  CPAN::Reporter::Smoker:
+    file: lib/CPAN/Reporter/Smoker.pm
+    version: '0.29'
+requires:
+  CPAN: '1.93'
+  CPAN::HandleConfig: '0'
+  CPAN::Reporter::History: '1.1702'
+  CPAN::Tarzip: '0'
+  Carp: '0'
+  Compress::Zlib: '1.2'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '6.46'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Spec: '3.27'
+  File::Temp: '0.20'
+  List::Util: '1.03'
+  Module::Build: '0.30'
+  Probe::Perl: '0.01'
+  Term::Title: '0.01'
+  Test::Reporter: '1.58'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cpan-testers/CPAN-Reporter-Smoker/issues
+  homepage: https://github.com/cpan-testers/CPAN-Reporter-Smoker
+  repository: https://github.com/cpan-testers/CPAN-Reporter-Smoker.git
+version: '0.29'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'gregor herrmann <gregoa@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

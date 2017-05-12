@@ -1,0 +1,59 @@
+[%
+
+    title = 'Browse by Distribution' ;
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Distribution' ;
+
+    box_prefs = 1 ;
+    javascript = 1 ;
+
+%]
+
+[% INCLUDE "content/moreinfo.html" %]
+
+<h2>Reports for [% data.distribution %]-[% data.version %]</h2>
+
+<p>You may select reports for this distribution version, or select an alternative version from the drop-down box below.</p>
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="author-dist" />
+<input type="hidden" name="dist" value="[% data.distribution %]" />
+<p>Select Alternative Version: [% data.ddversions %] <input type="submit" value='GO!' /></p>
+</form>
+
+[% IF data.reports %]
+<form id="reports-form" name="reports" action="[% cgipath %]/pages.cgi" method="post" onsubmit="return MarkReports();">
+<input type="hidden" name="act" value="author-mark" />
+
+<table id="reports">
+<tr><th><input type="checkbox" name="top" onclick="togglecheckboxes(this)" /></th>
+	<th>Grade</th>
+	<th>Perl</th>
+	<th>OS</th>
+	<th>Tester</th>
+</tr>
+[% FOREACH r = data.reports %]
+<tr class="g[% r.state | upper %]relunp">
+  <td><span id="mark[% r.id %]">
+    [% IF r.marked %]
+    marked
+    [% ELSE %]
+    <input type="checkbox" name="DELETE" value="[% r.id %]" class="cb[% r.state | upper %]relunp" />
+    [% END %]
+    </span>
+  </td>
+	<td class="[% r.state | upper %]"><a href="javascript:void(0);" onclick="more_info('[% r.guid %]','[% r.state | upper %]','[% r.dist %]','[% r.version %]','[% r.perl %]','[% r.osname %]','[% r.profile.display || r.tester | html %]','[% user.author %]','[% r.fulldate %]');">[% r.state | upper %]</a></td>
+	<td>[% r.perl %]</td>
+	<td>[% r.osname %]</td>
+	<td>[% r.profile.display || r.tester %]</td>
+</tr>
+[% END %]
+</table>
+
+<p class="smalltext"><input type="submit" value='Mark Reports' /></p>
+</form>
+
+[% ELSE %]
+<p>Sorry, no reports found for this distribution version.</p>
+[% END %]

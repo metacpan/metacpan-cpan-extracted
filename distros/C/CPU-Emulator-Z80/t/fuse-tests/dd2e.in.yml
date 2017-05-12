@@ -1,0 +1,26 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 46
+    - 28
+name: dd2e
+registers:
+  AF: 39626
+  AF_: 0
+  BC: 41034
+  BC_: 0
+  DE: 46239
+  DE_: 0
+  HL: 42150
+  HL_: 0
+  I: 0
+  IX: 48528
+  IY: 14497
+  PC: 0
+  R: 0
+  SP: 0

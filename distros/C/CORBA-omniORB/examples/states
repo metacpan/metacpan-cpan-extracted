@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB;
+use Error qw(:try);
+
+$orb = CORBA::ORB_init("omniORB4");
+$root_poa = $orb->resolve_initial_references("RootPOA");
+
+$poaManager = $root_poa->_get_the_POAManager();
+print "POA Manager State is: ", $poaManager->get_state(), " [should be HOLDING]\n";
+
+$poaManager->discard_requests(0);
+print "POA Manager State is: ", $poaManager->get_state(), " [should be DISCARDING]\n";
+
+$poaManager->activate();
+print "POA Manager State is: ", $poaManager->get_state(), " [should be ACTIVE]\n";
+
+$poaManager->deactivate(0, 0);
+print "POA Manager State is: ", $poaManager->get_state(), " [should be INACTIVE]\n";
+
+print "ORB is ready ... \n";
+$orb->run();
+exit (0);			# Never reached
+

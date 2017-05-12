@@ -1,0 +1,361 @@
+
+=head1 NAME
+
+Class::ParmList - Methods for processing named parameter lists
+
+=head1 SYNOPSIS
+
+  use Class::ParmList qw(simple_parms parse_parms);
+
+ $thingy->some_method({
+      -bgcolor   => '#ff0000',
+      -textcolor => '#000000'
+      });
+
+ sub some_method {
+     my ($self) = shift;
+
+     my ($parm_ref) = @_;
+
+     my $parms = Class::ParmList->new ({
+            -parms    => $parm_ref,
+            -legal    => [qw (-textcolor -border -cellpadding)],
+            -required => [qw (-bgcolor)],
+            -defaults => {
+                           -bgcolor   => "#ffffff",
+                           -textcolor => "#000000"
+                         }
+         });
+
+     if (not defined $parms) {
+        my $error_message = Class::ParmList->error;
+        die ($error_message);
+     }
+
+     # Stuff...
+
+ }
+
+  sub another_method {
+    my $self = shift;
+    my ($name,$rank,$serial_number) = simple_parms([qw(-name -rank -serial_number)], @_);
+
+    #...
+  }
+
+  sub still_another {
+     my $parms = parse_parms ({
+            -parms    => \@_,
+            -legal    => [qw (-textcolor -border -cellpadding)],
+            -required => [qw (-bgcolor)],
+            -defaults => {
+                           -bgcolor   => "#ffffff",
+                           -textcolor => "#000000"
+                         }
+         });
+     if (not defined $parms) {
+        my $error_message = Class::ParmList->error;
+        die ($error_message);
+     }
+
+     # ...
+  }
+
+=head1 DESCRIPTION
+
+This is a simple package for validating calling parameters to a subroutine or
+method. It allows you to use "named parameters" while providing checking for
+number and naming of parameters for verifying inputs are as expected and
+meet any minimum requirements. It also allows the setting of default
+values for the named parameters if omitted.
+
+=cut
+
+=head1 CHANGES
+
+ 1.00 1999.06.16 - Initial release
+
+ 1.01 1999.06.18 - Performance tweaks
+
+ 1.02 1999.06.21 - Fixing of failure to catch undeclared parm,
+                   removal of 'use attrs qw(method)', and
+                   extension of 'make test' support.
+
+ 1.03 2000.12.06 - Added exportable class functions 'simple_parms'
+                   and 'parse_parms' and allowed 'stacking' references
+                   for parms to the object to improve calling usage.
+
+ 1.04 2005.09.18 - Added META.yml, Build.PL, Artistic_License.txt
+                   GPL_License.txt, LICENSE to distribution. Renamed
+                   CHANGES to Changes. Extended build tests to 100%
+                   coverage. Minor refactoring of module for speed.
+                   Seperated documentation into .pod file.
+                   Added POD/POD Coverage tests.
+
+ 1.05 2006.03.04 - Corrected mis-usage of Carp in error paths that
+                   was causing less than useful error messages.
+
+                   Added LICENSE and DISCLAIMER sections to
+                   documentation.
+
+=head1 METHODS
+
+=over 4
+
+=item new($parm_list_ref);
+
+Returns a reference to an object that can be used to return
+values. If an improper specification is passed, returns 'undef'.
+Otherwise returns the reference.
+
+Example:
+
+     my $parms = Class::ParmList->new ({
+            -parms    => $parm_ref,
+            -legal    => [qw (-textcolor -border -cellpadding)],
+            -required => [qw (-bgcolor)],
+            -defaults => {
+                           -bgcolor   => "#ffffff",
+                           -textcolor => "#000000"
+                         }
+         });
+
+All four parameters (-parms, -legal, -required, and -defaults) are
+optional. It is liberal in that anything defined for a -default
+or -required is automatically added to the '-legal' list.
+
+If the '-legal' parameter is not _explicitly_ called out, no
+checking against the legal list is done. If it _is_ explicitly
+called out, then all -parms are checked against it and it will
+fail with an error if a -parms parameter is present but not
+defined in the -legal explict or implict definitions.
+
+To simplify calling routines, the '-parms' parameters is allowed
+to 'stack' anon list references: [['parm','value']]
+
+This gives a calling routine the ability to parse @_ without
+jumping through hoops to handle the cases of arrays vs hashes for
+the passed parameters.
+
+Example:
+
+ sub example_sub {
+   my $parms = Class::ParmList->new({ -parms => \@_,
+                                      -legal => [],
+                                   -required => ['-file','-data'],
+                                   -defaults => {},
+                                  });
+
+   #...
+ }
+
+This routine would accept *either*
+
+   example_sub({ '-file' => 'test', '-data' => 'stuff' });
+
+or
+
+   example_sub( '-file' => 'test', '-data' => 'stuff' );
+
+with no code changes.
+
+=back
+
+=over 4
+
+=item parse_parms({ -parms => \@parms,
+                    -legal => ['list','legal','parms'],
+                 -required => ['list','required','parms'],
+                 -defaults => { 'default' => 'parameter values',
+                              },
+                         });
+
+This is a functional equivalent to the 'new' method. Calling
+parameters are identical, but it is called as a class function
+that may be exported.
+
+Example:
+
+   my $parms = parse_parms({ -parms => \@_,
+                             -legal => [],
+                          -required => ['-file','-data'],
+                          -defaults => {},
+                         });
+
+=back
+
+=over 4
+
+=item get($parm_name1, $parm_name2,...);
+
+Returns the parameter value(s) specified in the call line. If
+a parameter is not defined, it returns undef. If a set of
+'-legal' parameters were declared, it croaks if a parameter
+not in the '-legal' set is asked for.
+
+Example:
+  my ($help,$who) = $parms->get('-help','-who');
+
+=back
+
+=over 4
+
+=item exists($parm_name);
+
+Returns true if the parameter specifed by $parm_name (qv.
+has been initialized), false if it does not exist.
+
+  if ($parms->exists(-help) {
+      # do stuff
+  }
+
+=back
+
+=over 4
+
+=item list_parms;
+
+Returns the list of parameter names. (Names are always
+presented in lowercase).
+
+Example:
+
+  my @parm_names = $parms->list_parms;
+
+=back
+
+=over 4
+
+=item all_parms;
+
+Returns an anonymous hash containing all the currently
+set keys and values. This hash is suitable for usage
+with Class::NamedParms or Class::ParmList for setting
+keys/values. It works by making a shallow copy of
+the data. This means that it copies the scalar values.
+
+In the case of simple numbers and strings, this produces
+a new copy, in the case of references to hashes and arrays or
+objects, it returns the references to the original objects.
+
+Example:
+
+  my $parms = $parms->all_parms;
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item error;
+
+Returns the error message for the most recent invokation of
+'new'.  (Static method - does not require an object to function)
+
+Example:
+
+     my $error_message = Class::ParmList->error;
+     die ($error_message);
+
+=back
+
+=over 4
+
+=item simple_parms(['-list','-of','-parameter_names'],@_);
+
+Parses the passed named parameter list (croaking/confessing if extra or
+missing parameters are found).
+
+Examples:
+
+ use Class::ParmList qw(simple_parms);
+
+ sub some_method {
+    my $self = shift;
+
+    my ($name,$rank) = simple_parms([qw(-name -rank)],@_);
+    # Now do stuff
+ }
+
+ sub some_function {
+    my $serial_number = simple_parms([qw(-serial_number)],@_);
+    # Now do stuff
+ }
+
+The passed parameter values for parsing this way may be either an anonymous hash of parameters
+
+Example:
+   a_function({ -parm1_name => $parm1_value, -parm2_name => $parm2_value }) )
+
+or a straight list of parameters:
+
+Example:
+  a_function(-parm1_name => $parm1_value, -parm2_name => $parm2_value) )
+
+Note that it *IS* legal for a parameter to be passed with an 'undef' value - it
+will not trigger an error.
+
+If you need optional parameters, this function is not well suited. You should
+use the object methods above instead for that case - they are much more
+flexible (but quite a bit slower and slightly more complex to use).
+
+Its main virtues are that is is simple to use, has rugged error checking for
+mis-usages and is reasonably fast.
+
+'simple_parms' can be exported by specifying it on the 'use' line.
+
+=back
+
+=head1 VERSION
+
+1.05 2006.03.04
+
+=head1 COPYRIGHT
+
+Copyright Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
+FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms and conditions as
+Perl itself.
+
+This means that you can, at your option, redistribute it and/or modify it under
+either the terms the GNU Public License (GPL) version 1 or later, or under the
+Perl Artistic License.
+
+See http://dev.perl.org/licenses/
+
+=head1 DISCLAIMER
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+Use of this software in any way or in any form, source or binary,
+is not allowed in any country which prohibits disclaimers of any
+implied warranties of merchantability or fitness for a particular
+purpose or any disclaimers of a similar nature.
+
+IN NO EVENT SHALL I BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+SPECIAL, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OF THIS SOFTWARE AND ITS DOCUMENTATION (INCLUDING, BUT NOT
+LIMITED TO, LOST PROFITS) EVEN IF I HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE
+
+=head1 AUTHOR
+
+Benjamin Franz, <snowhare@nihongo.org>
+
+=head1 BUGS
+
+None known
+
+=head1 TODO
+
+Memoization of parameter validation for performance.
+
+=cut

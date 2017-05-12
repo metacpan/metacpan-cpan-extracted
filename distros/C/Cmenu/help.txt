@@ -1,0 +1,11 @@
+Menu navigation can be performed using various keys;
+  UP & DOWN      move through menu
+  LEFT & RIGHT   previous or next menu
+  PAGE keys      page through menu
+  HOME & END     top and bottom of menu
+  TAB            change buttons
+  SPACE          toggle radio and check list items
+  letters	 jump to highlighted options
+  RETURN         actions the highlighted button
+Also, Function keys may be defined
+

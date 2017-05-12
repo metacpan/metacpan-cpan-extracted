@@ -1,0 +1,36 @@
+# In order to run the tests for all the available database, you must configure
+# some ENV vars for the databases you wish to test.
+
+# It is safe to use existing dev databases as long as the user has the ability
+# to create tables. The tables created are prefixed and cleaned up after the
+# test completes.
+
+# You must also install the database driver.
+# sqlite tests will auto run if sqlite dbd driver is installed.
+
+# to run all tests, execute make test
+# to run an individual test, you will need to explicity include the lib
+#   cd t
+#   perl -I../lib ./001_load.t
+
+export OQ_DSN_SQLITE='dbi:SQLite:dbname=/tmp/oqtest.db'
+export OQ_USER_SQLITE=''
+export OQ_PASS_SQLITE=''
+
+#export OQ_DSN_ORACLE='dbi:Oracle:webdev10g'
+#export OQ_USER_ORACLE='events'
+#export OQ_PASS_ORACLE='XXXXX'
+
+#export OQ_DSN_MYSQL='dbi:mysql:testoq'
+#export OQ_USER_MYSQL='testoq'
+#export OQ_PASS_MYSQL='testoq'
+
+#export OQ_DSN_PG='dbi:Pg:dbname=testoq;hostaddr=127.0.0.1'
+#export OQ_USER_PG='testoq'
+#export OQ_PASS_PG='testoq'
+
+#export OQ_DSN_SQLSERVER='dbi:ODBC:DRIVER={ODBC Driver 11 for SQL Server};Server=wsus.sr.unh.edu;database=PDF_Submission;MARS_Connection=yes'
+#export OQ_USER_SQLSERVER='XXXXXX'
+#export OQ_PASS_SQLSERVER='XXXXXX'
+
+

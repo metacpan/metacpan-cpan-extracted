@@ -1,0 +1,16 @@
+---
+abstract: "Easy way to stuff \"status\" messages into your stash"
+author:
+  - 'Devin Austin <dhoss@cpan.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-FeedbackMessages
+requires:
+  Catalyst: 5.80004
+  Catalyst::Action::RenderView: 0.13
+  Moose: 0.93
+  Test::Simple: 0.88
+version: 0.0603

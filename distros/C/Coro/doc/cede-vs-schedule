@@ -1,0 +1,94 @@
+From: Marc Lehmann
+To: "Eric G. Bergeron"
+Subject: Re: About the Coro module
+
+> I am starting to use your perl Coro module and I think that I noticed a
+
+Well, perl is not really coro-safe, or was it that coro is not perl-safe?
+:)
+
+It should work, but some corner cases, especially at global destruction,
+are not handled as nice as they could.
+
+> bug (I just don't know where the bug is.). This code below seems to run the
+> function 1 time too many.
+>
+> use Coro;
+> use strict;
+> my $proc=new Coro sub
+> {       my $i=0;
+>         while (1)
+>         {       print "$i "; $i++;
+>                 cede;
+>         }
+> };
+> $proc->ready();
+> cede;
+> $proc->ready();
+> cede;
+
+no, that's correct. "cede" is like the posix "yield" function. It
+doesn't take the process out of the ready queue, it just gives other
+processes the opportunity to run.
+
+So a single ->ready suffices to make it run as often as it wants - until
+the main program exits, that is.
+
+The second ->ready call is actually a bug (not fatal), as it puts the
+process a second time into the run queue. This is not a problem for
+Coro, but not expected by you :)
+
+If you want to switch to another coro _without_ being put into the ready
+queue automatically, don't use "cede" but "schedule". Schedule just
+switches to another process and leaves the current one alone, while cede
+is just a temporary switch - it will return later.
+
+Think of coros as processes. The Coro::State and Coro::Cont modules
+implement different ideas, so you could roll your own stuff if you really
+wanted to.
+
+A simple (althogh difficult to read) example is in one of the many
+semaphore modules (e.g. Coro::Signal). The wait method for example:
+
+   sub wait {
+      if ($_[0][0]) {
+         $_[0][0] = 0;
+      } else {
+         push @{$_[0][1]}, $Coro::current; # <- here
+         Coro::schedule;                   # <- here
+      }
+   }
+
+It first remembers the "current" process (the calling coro) internally
+and then calls schedule, which cuases the process to stop running
+immediately. Unless somebody else wakes it up it'll never run again.
+"send" does this:
+
+   sub send {
+      if (@{$_[0][1]}) {
+         (shift @{$_[0][1]})->ready; # <- here
+      } else {
+         $_[0][0] = 1;
+      }
+   }
+
+It puts the waiting process into the ready queue again.
+
+"cede" is implemented like this (in C, but the basic idea is the same):
+
+   sub cede {
+      $current->ready;
+      schedule;
+   }
+
+so it put's itself into the ready queue and calls the scheduler.
+
+-- 
+      -----==-                                             |
+      ----==-- _                                           |
+      ---==---(_)__  __ ____  __       Marc Lehmann      +--
+      --==---/ / _ \/ // /\ \/ /       schmorp@schmorp.de      |e|
+      -=====/_/_//_/\_,_/ /_/\_\       XX11-RIPE         --+
+    The choice of a GNU generation                       |
+                                                         |
+

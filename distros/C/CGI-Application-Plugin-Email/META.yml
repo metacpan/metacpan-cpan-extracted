@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-Email
+version:             0.01
+abstract:            Lazy loaded Email
+license:             ~
+author:              
+    - Lyle Hopkins <webmaster@cosmicperl.com>
+generated_by:        ExtUtils::MakeMaker version 6.42_01
+distribution_type:   module
+requires:     
+    CGI::Application:              0
+    Email::Stuff:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+
+package clipseqtools;
+$clipseqtools::VERSION = '0.1.7';
+
+##############################################
+# Import external libraries
+use Modern::Perl;
+
+
+##############################################
+# Import CLIPSeqTools
+use CLIPSeqTools::App;
+
+
+##############################################
+# Run the application
+CLIPSeqTools::App->new_with_command->run();

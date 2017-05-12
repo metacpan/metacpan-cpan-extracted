@@ -1,0 +1,71 @@
+From tomcat-user-return-98406-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Wed Apr 14 11:34:38 2004
+Return-Path: <tomcat-user-return-98406-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 83646 invoked from network); 14 Apr 2004 11:34:38 -0000
+Received: from daedalus.apache.org (HELO mail.apache.org) (208.185.179.12)
+  by minotaur-2.apache.org with SMTP; 14 Apr 2004 11:34:38 -0000
+Received: (qmail 11351 invoked by uid 500); 14 Apr 2004 11:34:14 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 11330 invoked by uid 500); 14 Apr 2004 11:34:14 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 11293 invoked from network); 14 Apr 2004 11:34:13 -0000
+Received: from unknown (HELO pluton.nspoint.net) (195.252.123.15)
+  by daedalus.apache.org with SMTP; 14 Apr 2004 11:34:13 -0000
+Received: from nspoint.net (pg-as03-l045.crnagora.net [195.66.177.45])
+        by pluton.nspoint.net (8.12.8/8.12.8) with ESMTP id i3EBX3G3009437
+        for <vesnam@nspoint.net>; Wed, 14 Apr 2004 13:33:19 +0200
+Message-Id: <200404141133.i3EBX3G3009437@pluton.nspoint.net>
+From: virusalert@nspoint.net
+To: <tomcat-user@jakarta.apache.org>
+Subject: FOUND VIRUS IN MAIL from <tomcat-user@jakarta.apache.org> to <vesnam@nspoint.net>
+Date: Wed, 14 Apr 2004 13:33:21 +0200
+MIME-Version: 1.0
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+
+                   V I R U S  A L E R T
+
+  Our viruschecker found a VIRUS in your email to "<vesnam@nspoint.net>".
+           We stopped delivery of this email!
+
+    Now it is on you to check your system for viruses
+
+In file:
+/usr/local/mav/basedir/i3EBX3G3009437/i3EBX3G3009437
+        Found the W32/Netsky.d.eml!exe virus !!!
+/usr/local/mav/basedir/i3EBX3G3009437/message_details.pif
+        Found the W32/Netsky.d@MM virus !!!
+
+
+For your reference, here are the headers from your email:
+
+------------------------- BEGIN HEADERS -----------------------------
+Received: from pg-as03-l045.crnagora.net [195.66.177.45]
+      by pluton.nspoint.net [195.252.123.15] with SMTP id i3EBX3G3009437;
+      Wed Apr 14 13:34:12 2004 +0200
+From: tomcat-user@jakarta.apache.org
+To: vesnam@nspoint.net
+Subject: Re: Re: Message
+Date: Wed, 14 Apr 2004 13:33:21 +0200
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0011_00006D21.000015F6"
+X-Priority: 3
+X-MSMail-Priority: Normal
+-------------------------- END HEADERS ------------------------------
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+

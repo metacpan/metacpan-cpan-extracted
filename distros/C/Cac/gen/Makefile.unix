@@ -1,0 +1,81 @@
+#
+# This is the fun part (for you), building a new Perl
+# that has Cache embedded.
+# You may need to adjust some settings.
+# ------------------------------------------
+CACHEDIR=
+PERL=
+CFLAGS=
+LIBS=
+# ------------------------------------------
+# you should not need to edit anything below
+# we take it all out of your perl.
+#
+ifndef PERL
+ #?= doesn't work this way .)
+PERL=$(shell which perl)
+endif
+ifndef CACHEDIR
+CACHEDIR=/usr/cachesys
+endif
+LD=$(shell $(PERL) -MConfig -e 'print $$Config{ld}')
+CC=$(shell $(PERL) -MConfig -e 'print $$Config{cc}')
+CACHESRCDIR=$(CACHEDIR)/source/cache
+CFLAGS+= -I$(CACHESRCDIR)
+CFLAGS += $(shell $(PERL) -MExtUtils::Embed -e ccopts -e copts) -DCACHE_PERL=1 -I.
+LIBS += $(shell   $(PERL) -MExtUtils::Embed -e ccopts -e ldopts) -lperl -ldl -lc
+
+PRIVLIBDIR=$(shell $(PERL) -MConfig -e 'print $$Config{installprivlib}')
+XSUBDIR=$(PRIVLIBDIR)/ExtUtils
+XSUBPP=$(PERL) $(XSUBDIR)/xsubpp
+
+%.o:%.c ; $(CC) -c $(CFLAGS) -o $@ $<
+
+%.c:%.xs ; $(XSUBPP) -typemap $(XSUBDIR)/typemap $< >$@
+
+all:  cperl
+
+install: cperl
+	@if [ -f "$(CACHEDIR)/bin/cache.old" ] ; then \
+	  echo "sorry, there is already a backup copy of your cache binary" ; \
+	  echo "Aborting - nothing done" ; \
+	  exit 1 ; \
+	fi
+	mv "$(CACHEDIR)/bin/cache" "$(CACHEDIR)/bin/cache.old"
+	cp ./cperl "$(CACHEDIR)/bin/cperl"
+	-( cd "$(CACHEDIR)/bin" && ln -s cperl cache)
+	@echo "install complete you may now start Cache again"
+
+uninstall:
+	@if [ ! -f "$(CACHEDIR)/bin/cache.old" ] ; then \
+	  echo "Aborting - nothing to uninstall"; \
+	  exit 1 ; \
+	fi
+	rm -f "$(CACHEDIR)/bin/cperl"
+	rm -f "$(CACHEDIR)/bin/cache"
+	mv "$(CACHEDIR)/bin/cache.old" "$(CACHEDIR)/bin/cache"
+
+# note: I'm not proud of this one :)
+cacembed.h:
+	$(PERL) -e 'print "#define CACEMBED_INC \"push \@INC, ".join(",", map( { s@\"@\\\"@; chr(39)."$$_".chr(39) } @INC)).";\"\n#define PERL_OS $$^O\n"' >$@
+
+xsinit.c: cache_fix.h
+	$(PERL) -MExtUtils::Embed -e xsinit -- -o xsinit.c -std Cac
+
+clean:
+	rm -f xsinit.c cacperl.o real_main.o perl_callout.o xsinit.o cache_fix.o cacperl.c cperl cache cache.ok cacembed.h *~
+
+perl_callout.o: cacembed.h cache_fix.h
+
+cache_fix.o: cache_fix.h
+
+cacperl.o: cache_fix.h
+
+cperl: xsinit.o cacperl.o perl_callout.o real_main.o $(CACHESRCDIR)/shdir.o $(CACHESRCDIR)/cache.o cache_fix.o
+	$(LD) -o $@ $^ $(LIBS)
+	-rm cache
+	-ln -s cperl cache
+	touch cache.ok
+	@echo Well played thing.
+	@echo MAKE SURE THAT CACHE IS STOPPED BEFORE RUNNING make -f Makefile.unix install
+

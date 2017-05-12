@@ -1,0 +1,40 @@
+CGI/Application/Plugin/AutoRunmode version 0.18
+===============================================
+
+This plugin for CGI::Application provides easy
+ways to setup run modes. You can just write
+the methods that implement a run mode, you do
+not have to explicitly register it with CGI::App anymore.
+
+There are two approaches: You can flag methods
+in your CGI::App subclass with the attribute "Runmode",
+or you can assign a delegate object, all whose methods
+will become runmodes (you can also mix both approaches).
+
+A third approach is to use a delegate object that
+delegates to Perl source files on disk, an implementation
+of which is included herein.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Application
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2011 Thilo Planz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

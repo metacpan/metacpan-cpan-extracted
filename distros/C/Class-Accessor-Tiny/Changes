@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Accessor::Tiny.
+
+0.01  Wed Aug 17 11:34:43 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n Class::Accessor::Tiny -X -b 5.8.1
+

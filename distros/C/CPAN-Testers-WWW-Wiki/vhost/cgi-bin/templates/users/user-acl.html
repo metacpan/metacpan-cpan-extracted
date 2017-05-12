@@ -1,0 +1,33 @@
+<h2>User Access</h2>
+
+[% IF thanks %]
+<div class="box"><p>[% thanks %]</div>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-aclsave" />
+<input type="hidden" name="userid" value="[% data.userid %]" />
+
+<div class="box">
+    <table width="100%">
+    <tr><td width="90">User</td>
+        <td width="10"></td>
+        <td>[% data.realname %]</td>
+    </tr>
+
+    <tr><td>Access</td>
+        <td></td>
+        <td>[% FOR item = data.access %]
+            [% item.folderid %] - [% item.accessname %] (<a href="scooter.pl?act=user-acldel&amp;userid=[% item.userid %]&amp;accessid=[% item.accessid %]&amp;folderid=[% item.folderid %]">remove</a>)<br/>
+            [% END %]
+        </td>
+    </tr>
+    <tr><td>Add</td>
+        <td></td>
+        <td>[% ddfolder %] [% ddaccess %]</td>
+    </tr>
+    </table>
+</div>
+
+<p align="center"><input type="submit" name="submit" value="UPDATE" />
+</form>

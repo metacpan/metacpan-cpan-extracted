@@ -1,0 +1,6 @@
+Getopt.pm
+test.pl
+Makefile.PL
+./t/Getopt.t
+CGI-Getopt-0.13.readme
+README

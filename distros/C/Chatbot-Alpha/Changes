@@ -1,0 +1,86 @@
+Revision history for Perl extension Chatbot::Alpha.
+
+2.05  Fri Jan 23 11:24:00 2009
+	- This module is *officially* obsolete, and this is just a revision
+		release so that the documentation urges users use RiveScript
+		instead.
+
+2.04  Mon Dec 19 15:42:00 2005
+	- Fixed up some Perl warnings within the code.
+	- Renamed the example script to 'example.pl' to not confuse Makefile.
+
+2.03  Sat Dec 17 12:17:00 2005
+	- Added ~REGEXP command.
+	- Added {random} tag.
+	- Added more information about #CODE on manpage.
+	- Updated Chatbot::Alpha::Syntax to support the new ~REGEXP command.
+	- Applied a patch to Syntax.pm to hopefully make automatic installation
+		run more smoothly.
+
+2.02  Thu Oct 27 10:57:30 2005
+	- Mostly bug fixes in this release:
+	- Added 'verify' argument to the new() constructor. If 1 (default),
+		Chatbot::Alpha::Syntax is run on all files loaded. Set to 0 to avoid
+		syntax checking (not recommended).
+	- Fixed regexp bug with {formal}, {sentence}, {uppercase}, and {lowercase}.
+		They should now function correctly even if their values have odd characters
+		in them that would've previously screwed up the regexp parser.
+	- Chatbot::Alpha::Syntax updated. See its manpage for details.
+	- Rearranged a bit of the code so that <input> and <reply> would process
+		before string tags.
+
+2.01  Thu Oct 13 15:23:00 2005
+	- Added string tags {formal}, {sentence}, {uppercase}, {lowercase}
+	- Added tags <input> and <reply> and alias <star>.
+	- Fixed conditionals bug (conditionals wouldn't increment correctly so
+		only the last condition remained in memory. Now multiple conditions
+		can be used for one trigger... i.e. comparing gender to male/female
+		in two different conditions).
+
+2.00  Thu Oct  6 18:53:00 2005
+	- Added some AIML emulation:
+		- In-reply redirections (like <srai>):
+			+ * or something
+			- Or something. {@<star1>}
+	- "That" kind of support.
+		+ i hate you
+		- You're really mean... =(
+
+		+ sorry
+		% youre really mean
+		- Don't worry--it's okay. :-)
+	- Renamed all methods to be alternatingCaps instead of with underscores.
+	- Chatbot::Alpha::Syntax supports the newly-added commands.
+	- Fixed conditionals, should work more efficiently now:
+		- Format changed to *VARIABLE=VALUE::HAPPENS
+		- Does numeric == for numbers, or eq for strings... = better matching.
+
+1.71  Sat Oct  1 14:01:00 2005
+	- Sorting method reprogrammed for more efficient sorting.
+
+1.70  Wed Aug 17 13:47:35 2005
+        - Chatbot::Alpha::Syntax added.
+        - ^ command added.
+        - Module keeps filenames and line numbers internally, so on internal
+                errors such as 'Deep Recursion' and 'Infinite Loop' it can point you
+                to the source of the problem.
+        - $alpha->search() method added.
+
+1.61  Sat Aug  6 14:43:00 2005
+        - Completed Chatbot::Alpha::Sort module.
+
+1.40  Wed May  4 14:54:00 2005
+	- Fixed major bug: * being converted to (.*?) wasn't a global replace, so
+		thus far reply triggers could only contain a single *.
+
+1.30  Tue Feb 15 16:12:00 2004
+	- Added capability for topics.
+
+1.10  Thu Dec 23 14:20:23 2004
+	- Added the "#" command.
+	- Fixed bugs in reply matching.
+
+1.00  Wed Sep  6 16:22:40 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n Chatbot::Alpha
+

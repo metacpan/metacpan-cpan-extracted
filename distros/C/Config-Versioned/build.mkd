@@ -1,0 +1,72 @@
+# TODO
+
+Move this documentation to the 'commands' script so that everything is
+self-documenting.
+
+# Overview
+
+This document describes how to build, test and package this module.
+
+After doing a bit of searching, I stumbled across a makefile/script
+in the Parallel::SubFork CPAN package that looked interesting.
+
+I'm still testing and fine tuning this, so fixes may follow. Using this
+script, most of the test and dist tasks can be automated:
+
+    # Get brief info on current package
+    ./commands info
+
+    # Install local version
+    ./commands install
+    ./commands clean
+
+    # Test current working tree
+    ./commands test
+
+    # Create a new dist tarball and check it
+    ./commands distcheck
+
+    # To do the whole release (clean, test, dist, distcheck, tag, push, upload)
+    # Note: use this when _not_ using gitflow.
+    ./commands release
+
+    # To do the release with gitflow (be sure to bump versions in source!)
+    ./commands clean test dist distcheck
+    git flow release finish <RELNUM>
+    git push --tags origin master
+
+# Troubleshooting
+
+## ./commands distcheck
+
+If the distcheck fails with "No such file: ...", the file is still in the MANIFEST, but
+probably has been removed or renamed in the distribution.
+
+# Old Notes
+
+These notes are superceded by the above script, as well as the fact that
+the automated fetching of tarballs from Github by the PAUSE server seems
+to be broken.
+
+Using "git flow"
+
+    git flow release start 0.5
+    # bump release string in META.yml and lib/Config/Versioned.pm
+    make veryclean
+
+Pushing CPAN modules from Github to CPAN
+(from http://blog.usarundbrief.com/?p=36)
+
+- Check that Makefile.PL, META.yml and MANIFEST are in the top directory
+
+- Tag the release and push the tag to github
+
+    git tag rel_0.5
+    git push --tags
+
+- At PAUSE (https://pause.perl.org/pause/authenquery?ACTION=add_uri), enter
+the URL and click on "Upload this URL"
+
+    http://nodeload.github.com/mrscotty/Config-Versioned/tarball/rel_0.5
+
+

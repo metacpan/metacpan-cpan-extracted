@@ -1,0 +1,25 @@
+<!-- Multiple forms using both Catalyst::Controller::FormBuilder and Catalyst::Controller::FormBuilder::MultiForm render style -->
+
+<!-- Render whatever form is in the FormBuilder object -->
+<tmpl_var form-start>
+<tmpl_var form-statetags>
+<tmpl_var label-standard_one> <tmpl_var field-standard_one>
+<tmpl_var label-standard_two> <tmpl_var field-standard_two>
+<tmpl_var form-submit>
+<tmpl_var form-end>
+
+<!-- Render foo form by name -->
+<tmpl_var foo-form-start>
+<tmpl_var foo-form-statetags>
+<tmpl_var foo-label-foo_one> <tmpl_var foo-field-foo_one>
+<tmpl_var foo-label-foo_two> <tmpl_var foo-field-foo_two>
+<tmpl_var foo-form-submit>
+<tmpl_var foo-form-end>
+
+<!-- Render bar form by name -->
+<tmpl_var bar-form-start>
+<tmpl_var bar-form-statetags>
+<tmpl_var bar-label-bar_one> <tmpl_var bar-field-bar_one>
+<tmpl_var bar-label-bar_two> <tmpl_var bar-field-bar_two>
+<tmpl_var bar-form-submit>
+<tmpl_var bar-form-end>

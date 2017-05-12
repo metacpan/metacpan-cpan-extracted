@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  7980:
+    - 88
+name: ddcb27
+registers:
+  AF: 22537
+  AF_: 0
+  BC: 22121
+  BC_: 0
+  DE: 7150
+  DE_: 0
+  HL: 63020
+  HL_: 0
+  I: 0
+  IX: 8041
+  IY: 13336
+  PC: 4
+  R: 2
+  SP: 0

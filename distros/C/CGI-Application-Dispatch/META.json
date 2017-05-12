@@ -1,0 +1,65 @@
+{
+   "abstract" : "Dispatch requests to CGI::Application based objects",
+   "author" : [
+      "Michael Peters <mpeters@plusthree.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Dispatch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CGI::PSGI" : 0,
+            "Plack" : "0.9956",
+            "Test::LongString" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "4.50",
+            "Exception::Class" : "1.2",
+            "HTTP::Exception" : 0,
+            "Try::Tiny" : 0,
+            "perl" : "v5.6.0",
+            "version" : "0.82"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Dispatch" : {
+         "file" : "lib/CGI/Application/Dispatch.pm",
+         "version" : "3.12"
+      },
+      "CGI::Application::Dispatch::PSGI" : {
+         "file" : "lib/CGI/Application/Dispatch/PSGI.pm",
+         "version" : "3.12"
+      },
+      "CGI::Application::Dispatch::Regexp" : {
+         "file" : "lib/CGI/Application/Dispatch/Regexp.pm",
+         "version" : "3.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/markstos/CGI--Application--Dispatch"
+      }
+   },
+   "version" : "3.12"
+}

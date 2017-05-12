@@ -1,0 +1,319 @@
+#!/usr/local/bin/perl5
+#
+
+use strict;
+
+package CGI::Session::CookieJar::DBI::creakte_cookie_table;
+
+use Carp;
+use Getopt::Long;
+use DBI;
+use CGI::Session::CookieJar::DBI;
+
+my $DB_MYSQL = 'MYSQL';
+
+=item NAME
+
+create_cookie_table.  A tool to create a cookie jar for use with a cookie.
+
+It will create a database if required.  If the desired table exists
+with a preexisting database then it will drop the table and then
+recreate it.  It will also create a grant for the cookie user if it is
+requested.
+
+=cut
+
+my ( $help, $host, $database, $create_new_database, $tablename );
+my ( $grantonly, $grantuser, $grantpass, $user, $pass );
+my ( $user_column, $cookie_column, $passkey_column, $expiration_column );
+my ( $server_side_data_column, $dbtype );
+
+
+my $results = GetOptions( 'help' => \$help,
+			  'database=s' => \$database,
+			  'table=s' => \$tablename,
+			  'host=s' => \$host,
+			  'create_database' => \$create_new_database,
+			  'grantonly' => \$grantonly,
+			  'grantuser:s' => \$grantuser,
+			  'grantpass:s' => \$grantpass,
+			  'user:s' => \$user,
+			  'password:s' => \$pass,
+			  'user_column=s' => \$user_column,
+			  'passkey_column=s' => \$passkey_column,
+			  'cookie_column=s' => \$cookie_column,
+			  'expiration_column=s' => \$expiration_column,
+			  'server_side_data_column=s' => \$server_side_data_column,
+			  'type=s' => \$dbtype, );
+
+if ( $help )
+  {
+    print help();
+    exit 0;
+  }
+$host = undef unless $host;
+
+die_help() unless $user;
+die_help() unless defined $pass;
+die_help() unless $tablename;
+die_help() unless $database;
+
+if ( !$user )
+  {
+    print "Admin user: ";
+    $user = <STDIN>;
+    chop $user;
+    print "\n";
+  }
+
+if ( !$pass )
+  {
+    print "Admin password: ";
+    system( 'stty -echo' );
+    $pass = <STDIN>;
+    system( 'stty echo' );
+    chop $pass;
+    print "\n";
+  }
+if ( defined $grantuser )
+  {
+    $grantuser = $user unless $grantuser;
+  }
+if ( defined $grantpass )
+  {
+    if ( !$grantpass )
+      {
+	print "Password for $grantuser: ";
+	system( 'stty -echo' );
+	$grantpass = <STDIN>;
+	system( 'stty echo' );
+	chop $grantpass;
+	print "\n";
+      }
+  }
+else
+  {
+    $grantpass = $pass;
+  }
+
+
+    
+my $jar = CGI::Session::CookieJar::DBI->new();
+$dbtype = $DB_MYSQL unless defined $dbtype;
+if ( uc($dbtype ) eq $DB_MYSQL )
+  {
+    $dbtype=$DB_MYSQL;
+  }
+else
+  {
+    die_help();
+  }
+
+$jar->host( $host ) if $host;
+$jar->user( $user );
+$jar->password( $pass );
+$jar->database( $database );
+$jar->cookie_table( $tablename );
+$jar->user_column( $user_column ) if $user_column;
+$jar->passkey_column( $passkey_column ) if $passkey_column;
+$jar->cookie_column( $cookie_column ) if $cookie_column;
+$jar->server_side_data_column( $server_side_data_column ) if $server_side_data_column;
+$jar->login_expiration_column( $expiration_column ) if $expiration_column;
+
+my $rootdb = newdb( $jar, 'mysql' );
+
+if ( !$grantonly )
+  {
+    create_database( $jar, $rootdb ) if $create_new_database;
+    $jar->open();
+    if( $jar->error )
+      {
+	$rootdb->disconnect;
+	croak $jar->error;
+      }
+
+    if ( table_exists( $jar->db, $jar->cookie_table ) )
+      {
+	drop_table( $jar, $rootdb ) if $create_new_database;
+      }
+    
+    $jar->create_cookie_jar();
+    if ( $jar->error )
+      {
+	$jar->close;
+	$rootdb->disconnect;
+	croak $jar->error;
+      }
+
+    $jar->close;
+  }
+
+if ( $grantuser and $grantpass )
+  {
+    grant( $rootdb, sprintf( '%s.%s', $database, $tablename ), $grantuser, $grantpass );
+    flush_privileges( $rootdb );
+  }
+
+$rootdb->disconnect;
+
+sub grant
+  {
+    my ( $db, $table, $user, $pass ) = @_;
+    my $grant = sprintf( 'GRANT SELECT, DELETE, INSERT, UPDATE ON %s TO %s IDENTIFIED BY %s',
+			 $table, $user, $db->quote($pass) );
+    $db->do( $grant );
+    if ( $db->err )
+      {
+	my $msg = sprintf( 'Error: %s, %s', $db->err, $db->errstr );
+	$db->disconnect;
+	croak $msg;
+      }
+  }
+
+sub flush_privileges
+  {
+    my ( $db ) = @_;
+    $db->do( "FLUSH PRIVILEGES" );
+    if ( $db->err )
+      {
+	if ( $dbtype eq $DB_MYSQL )
+	  {
+	    print "You are using MySQL, so it may be necessary to reload or restart MySQL before the changes to the grant table take affect.\n";
+	  }
+	else
+	  {
+	    my $msg = sprintf( 'Error: %s, %s', $db->err, $db->errstr );
+	    $db->disconnect;
+	    croak $msg;
+	  }
+      }
+  }
+
+sub newdb
+  {
+    my ( $jar, $database ) = @_;
+    if ( $dbtype eq $DB_MYSQL )
+      {
+	my $db = DBI->connect( "DBI:mysql:$database".( $host ? ":$host" : "" ),
+			       $user, $pass,
+			       { RaiseError=>0, PrintError=>0 } );
+	croak( sprintf( 'Could not connect to backend database: %s, %s',  $DBI::err, $DBI::errstr) ) if $DBI::err;
+	return $db;
+      }
+    else
+      {
+	croak( "Could not determine the type of database that should be connected to." );
+      }
+  }
+
+sub table_exists
+  {
+    my ( $db, $table ) = @_;
+    my $sql = "SELECT * FROM $table WHERE 1=0";
+    my $stmt = $db->prepare( $sql );
+    my $printstate = $db->{PrintError};
+    my $raisestate = $db->{RaiseError};
+    my $warnstate = $db->{Warn};
+    $db->{PrintError} = 0;
+    $db->{RaiseError} = 0;
+    $db->{Warn} = 0;
+    $stmt->execute;
+    my $err = $db->err;
+    $db->{PrintError} = $printstate;
+    $db->{RaiseError} = $raisestate;
+    $db->{Warn} = $warnstate;
+    if ( $err )
+      {
+	return 0;
+      }
+    else
+      {
+	$stmt->finish;
+	return 1;
+      }
+  }
+
+sub create_database
+  {
+    my ( $jar, $db ) = @_;
+    $db->do( sprintf( 'CREATE DATABASE %s', $jar->database ) );
+    if ( $db->err )
+      {
+	my $msg =sprintf( 'Error: %s, %s', $db->err, $db->errstr );
+	$db->disconnect;
+	croak $msg;
+      }
+  }
+
+sub drop_table
+  {
+    my ( $jar, $db ) = @_;
+    $db->do( sprintf( 'DROP TABLE %s', $jar->cookie_table ) );
+    if ( $jar->error )
+      {
+	$jar->close;
+	$db->disconnect;
+	croak $jar->error;
+      }
+  }
+
+sub die_help
+  {
+    print help();
+    exit 1;
+  }
+
+sub help
+  {
+    my $i = ' 'x(length($0));
+    return <<EOHELP;
+
+USAGE:
+
+  $0 [--host HOST] --database DB --user [USER] --password [PASSWORD] 
+  $i  --table TABLE [--grantuser [GRANTUSER] [--grantpass [GRANTPASS]]]
+  $i  [--user_column USER] [--passkey_columm PASS] [--cookie_column COOKIE]
+  $i  [--server_side_data_column SERVERSIDE] [--expiration_column EXPIRE]
+  $i  [--create_database] [--type 'MYSQL'] 
+
+  $0 [--host HOST] --database DB --user [USER] --password [PASSWORD]
+  $i  --table TABLE --grantonly --grantuser [GRANTUSER] [--grantpass [GRANTPASS]]
+  $i [--type 'MYSQL'] 
+
+
+The first form creates a new cookie table.  The second only adds a
+grant for applications that need to access that table.
+
+The options --host, --database, --user, and --pass are used to log
+into the database.  If user and password are not specified with
+command options then they will be asked for on the command line.
+
+The option --type specifies the type of database being connected to.
+Currently the only legal value is 'MYSQL' which species that MySQL
+is the underlaying database.  If --type is not specified then the
+type is assumed to be MySQL.
+
+The option --table specifies the name of the cookie table.
+
+Normally the database is assumed to already exist.  If the
+--create_database option is passed then the script will attempt to
+create the database.
+
+If the --grantuser and --grantpass options are specified then a grant
+for select, delete, insert, and update will be created for that user
+and password on the cookie table.  If values are not supplied for the
+grantuser and grantpass then they will be assumed to be the same
+as the corresponding values of --user and --pass.
+
+The options --user_column, --passkey_column, --cookie_column,
+--expiration_column, and --server_side_data_column are used to specify
+altername names for the columns within the cookie table.
+
+The second form, specified by the use of the --grant_only option
+creates an additional grant of select, delete, insert, and update for
+the specified grantuser on the cookie table.
+
+EOHELP
+
+}
+

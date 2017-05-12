@@ -1,0 +1,26 @@
+Revision history for Class-Refresh
+
+0.07  2014-02-25
+      - fix for newer moose (reported by kentfredric, #3)
+
+0.06  2014-01-22
+      - refreshing doesn't die if a package wasn't able to be loaded in the
+        past (amacleay, #2)
+
+0.05  2013-06-25
+      - revert the previous fix, since it causes issues
+      - add 'track_require' import arg, as a better fix
+
+0.04  2013-06-21
+      - fix refreshing a module for the first time when it was first loaded
+        after the first call to refresh
+
+0.03  2013-06-21
+      - fix the case where reloading after a compilation error wouldn't work
+        properly (Michael Reddick)
+
+0.02  2011-04-10
+      - whoops, can't use Sub::Exporter in tests
+
+0.01  2011-04-06
+      - Initial release

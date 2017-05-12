@@ -1,0 +1,5 @@
+[% crud_page_header(header_create_or_edit('<% resource_name %>')) %]
+
+<p><a href="[% uri('<% resource_name %>', 'list') %]" class="btn btn-danger">Cancel</a></p>
+
+[% form.render %]

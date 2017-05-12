@@ -1,0 +1,18 @@
+---
+name: Catalyst-Plugin-Upload-MD5
+version: 0.01
+author:
+  - Christian Hansen, C<ch@ngmedia.com>
+abstract: Compute MD5 message digest of uploads
+license: perl
+requires:
+  Catalyst: 5.2
+  Digest::MD5: 0
+provides:
+  Catalyst::Plugin::Upload::MD5:
+    file: lib/Catalyst/Plugin/Upload/MD5.pm
+    version: 0.01
+  Catalyst::Request::Upload:
+    file: lib/Catalyst/Plugin/Upload/MD5.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

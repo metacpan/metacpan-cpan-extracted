@@ -1,0 +1,30 @@
+=head1 Config::Model::LcdProc - Editor for LcdProc configuration
+
+This module provides a graphical configuration editor for 
+L<LcdProc|http://lcdproc.omnipotent.net/> configuration file
+(C</etc/LCDd.conf>).
+
+=head2 Main dependencies
+
+=over
+
+=item *
+
+L<Config::Model::TkUI>
+
+=item *
+
+L<Config::Model>
+
+=back
+
+Once this module is installed, you can run:
+
+ # cme edit lcdproc
+
+If L<cme> fails to load your C<LCDd.conf>, you can try L<cme> with
+C<-force> option.
+
+=head2 Installation from git
+
+See L<README.build-from-git|https://github.com/dod38fr/config-model-lcdproc/blob/master/README.build-from-git> file

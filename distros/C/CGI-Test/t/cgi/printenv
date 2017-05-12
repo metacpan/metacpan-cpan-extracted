@@ -1,0 +1,12 @@
+#!/bin/sh
+
+$PERL -x <<'END_OF_SCRIPT'
+#!perl
+
+print "Content-type: text/plain\r\n\r\n";
+while (($key, $val) = each %ENV) {
+	print "$key = $val\n";
+}
+
+END_OF_SCRIPT
+

@@ -1,0 +1,11 @@
+Changes
+HCE_SHA.pm
+MANIFEST
+Makefile.PL
+test.pl
+README
+examples/Client.pm
+examples/Server.pm
+examples/HOW_TO_USE
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

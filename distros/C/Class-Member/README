@@ -1,0 +1,156 @@
+NAME
+    Class::Member - A set of modules to make the module developement easier
+
+SYNOPSIS
+     package MyModule;
+     use Class::Member::HASH qw/member_A member_B -CLASS_MEMBERS
+                                -NEW=new -INIT=init/;
+     
+ or
+     
+ package MyModule;
+     use Class::Member::GLOB qw/member_A member_B -CLASS_MEMBERS
+                                -NEW=new -INIT=init/;
+     
+ or
+     
+ package MyModule;
+     use Class::Member qw/member_A member_B -CLASS_MEMBERS/;
+     
+ or
+     
+ package MyModule;
+     use Class::Member::Dynamic qw/member_A member_B -CLASS_MEMBERS/;
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DESCRIPTION
+    Perl class instances are mostly blessed HASHes or GLOBs and store member
+    variables either as "$self->{membername}" or "${*$self}{membername}"
+    respectively.
+
+    This is very error prone when you start to develope derived classes
+    based on such modules. The developer of the derived class must watch the
+    member variables of the base class to avoid name conflicts.
+
+    To avoid that "Class::Member::XXX" stores member variables in its own
+    namespace prepending the package name to the variable name, e.g.
+
+     package My::New::Module;
+
+     use Class::Member::HASH qw/member_A memberB/;
+
+    will store "member_A" as "$self->{'My::New::Module::member_A'}".
+
+    To make access to these members easier it exports access functions into
+    the callers namespace. To access "member_A" you simply call.
+
+     $self->member_A;               # read access
+     $self->member_A($new_value);   # write access
+     $self->member_A=$new_value;    # write access (used as lvalue)
+
+    "Class::Member::HASH" and "Class::Member::GLOB" are used if your objects
+    are HASH or GLOB references. But sometimes you do not know whether your
+    instances are GLOBs or HASHes (Consider developement of derived classes
+    where the base class is likely to be changed.). In this case use
+    "Class::Member" and the methods are defined at compile time to handle
+    each type of objects, GLOBs and HASHes. But the first access to a method
+    redefines it according to the actual object type. Thus, the first access
+    will last slightly longer but all subsequent calls are executed at the
+    same speed as "Class::Member::GLOB" or "Class::Member::HASH".
+
+    "Class::Member::Dynamic" is used if your objects can be GLOBs and HASHes
+    at the same time. The actual type is determined at each access and the
+    appropriate action is taken.
+
+    In addition to member names there are a few options that can be given:
+    "-CLASS_MEMBERS". It lets the "import()" function create an array named
+    @CLASS_MEMBERS in the caller's namespace that contains the names of all
+    methods it defines. Thus, you can create a contructor that expects named
+    parameters where each name corresponds to a class member:
+
+     use Class::Member qw/member_A member_B -CLASS_MEMBERS/;
+     our @CLASS_MEMBERS;
+     
+ sub new {
+       my $parent=shift;
+       my $class=ref($parent) || $parent;
+       my $I=bless {}=>$class;
+       my %o=@_;
+     
+   if( ref($parent) ) {         # inherit first
+         foreach my $m (@CLASS_MEMBERS) {
+           $I->$m=$parent->$m;
+         }
+       }
+     
+   # then override with named parameters
+       foreach my $m (@CLASS_MEMBERS) {
+         $I->$m=$o{$m} if( exists $o{$m} );
+       }
+     
+   $I->init;
+     
+   return $I;
+     }
+
+    Further, if you use one of "Class::Member::HASH" or
+    "Class::Member::GLOB" a constructor method can be created automatically.
+    Just add "-NEW" or "-NEW=name" to the "use()" call. The first form
+    creates a "new()" method that is implemented as shown except of the
+    "$I->init" call. The 2nd form can be used if your constructor must not
+    be named "new".
+
+    What happens if one "Class::Member" based class inherits the constructor
+    from another "Class::Member" based class? In this case the inherited
+    contructor works for the @CLASS_MEMBERS of the base class as well as the
+    derived class. For example:
+
+     package Base;
+     use Class::Member::HASH qw/-NEW -CLASS_MEMBERS el1 el2/;
+
+     package Inherited;
+     use Class::Member::HASH qw/-CLASS_MEMBERS el3/;
+     use base qw/Base/;
+
+    Now "Inherited-"new> calls the constructor of the base class but one can
+    pass "el1", "el2" as well as "el3" parameters.
+
+    The "$I->init" call is added by specifying the "-INIT" or "-INIT=name"
+    option. If given a new function "&{I N I T}" is created in the caller's
+    namespace to hold the name of the "init()" method. Yes, the symbol name
+    does contain spaces to make it harder to change by chance. You don't
+    normally have to care about it. Again, the "-INIT=name" form is used if
+    your "init()" method is not named "init".
+
+    The "init()" method itself is provided by you.
+
+    More detailed here is how the initializer is called:
+
+     my $init=$self->can('I N I T');
+     if( $init ) {
+       $init=$init->();
+       $self->$init;
+     }
+
+    That means the constructor looks if the class itself or one of the base
+    classes provides a "I N I T" method (the name includes spaces between
+    each pair of characters). If so it calls that method to fetch the
+    initializer name. The last step calls the initializer itself.
+
+AUTHOR
+    Torsten Foertsch <Torsten.Foertsch@gmx.net>
+
+SEE ALSO
+    Class::Member::HASH, Class::Member::GLOB, Class::Member::Dynamic
+
+COPYRIGHT
+    Copyright 2003-2008 Torsten Foertsch.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

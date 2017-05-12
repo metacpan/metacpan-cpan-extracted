@@ -1,0 +1,5 @@
+TODO list for Perl module CGI::Wiki::Plugin::SpamMonkey
+
+- Debug SpamMonkey / SpamAssassin rules so test for spam works
+
+

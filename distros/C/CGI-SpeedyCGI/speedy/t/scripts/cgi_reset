@@ -1,0 +1,4 @@
+use CGI;
+my $q = CGI->new;
+print $q->param('p'), "\n";
+print "$$\n";

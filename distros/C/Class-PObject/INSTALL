@@ -1,0 +1,37 @@
+Class::PObject INSTALLATION AND TESTING
+========================================
+
+
+INSTALL
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+
+
+
+MYSQL TESTS
+
+All the mysql tests will be skipped if either of DBI or DBD::mysql are missing,
+or MYSQL_DB and MYSQL_USER environmental variables are not defined. Following
+env. variables can be set:
+
+    * MYSQL_DB          - name of the mysql database
+    * MYSQL_USER        - username to connect to database.
+    * MYSQL_PASSWORD    - password for the MYSQL_USER
+
+
+
+
+RUNNING CSV TESTS
+
+No special procedures requried for running CSV tests, however, the test will be
+skipped if either of DBI or DBD::CSV are missing.
+
+
+
+========================================
+1.5
+

@@ -1,0 +1,413 @@
+#!/usr/bin/perl
+
+#
+# Purpose:
+#	This 'rips' off Larry's perlbug from the utils directory.
+
+# Determine if the user has one of the mail modules.
+BEGIN {
+	eval "use Mail::Send;";
+	$::HaveSend = ($@ eq "");
+};
+
+use Config;
+use Sys::Hostname;
+use Getopt::Std;
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create global variables.
+my ($Version) = "1.00";
+my $address = "perlbug\@perl.com";
+
+# Check the command line arguments.
+getopts("c:a:f:r:s:vh");
+
+# Did they ask for help?
+if (defined $opt_h)
+{
+   my @help = ("<C></B/5>Perl Bug Reporting Facility Help Window.",
+		"</B/5>Usage:<!B!5> $0 [-c CC] [-a Admin Account]",
+		"          [-r Reply Account] [-s subject]",
+		"          [-f filename] [-v] [-h]", "",
+		"<B=-c> The account to carbon copy to.",
+		"<B=-a> The perl admin account.",
+		"<B=-r> The account to reply to.",
+		"<B=-s> The subject of the bug report.",
+		"<B=-f> The file to read in as the bug report.",
+		"<B=-v> Turns on verbose output for the bug report.",
+		"<B=-h> Pops up this help window.", "",
+		"<C></B/5>Press Any Key To Continue.");
+   popupLabel (\@help);
+}
+
+# Create a program information message.
+my @progInfo = ("<C></5/B>Perl Bug Reporting Facility",
+		"<C></24/B>Version $Version", "",
+		"This program allows you to create a bug report which will be",
+		"mailed to </B>$address<!B> once the report has been filled out.", "",
+		"<C>Hit any key when you are ready to start.");
+popupLabel (\@progInfo);
+
+# Create the generic label.
+my @mesg = ("******************************************************",
+		"******************************************************",
+		"******************************************************",
+		"******************************************************");
+my $mainTitle = new Cdk::Label ('Message' => \@mesg, 'Xpos' => "TOP");
+
+# Get the subject to the mail message.
+my $subject = $opt_s || getSubject ($mainTitle);
+my $verbose = $opt_v;
+
+# Get the reply address.
+@mesg = ("<C></B/24>Return Email Address",
+		"<C>Enter your return e-mail address.");
+my $defaultAddress = getlogin() . "@" . hostname() . ".";
+my $replyAddress = $opt_r || getEmailAddress ($mainTitle, $defaultAddress, @mesg);
+
+# Get the perl admin address.
+@mesg = ("<C></B/24>Perl Admin Email Address",
+		"<C>Enter the email address of the perl admin.");
+my $defaultAddress = $::Config{perladmin};
+my $adminAddress = $opt_a || getEmailAddress ($mainTitle, $defaultAddress, @mesg);
+
+# Create the bug report.
+my @report = createBugReport ($mainTitle, $subject, $opt_f);
+
+# View the bug report.
+viewBugReport($subject, $replyAddress, $adminAddress, $cc, @report);
+exit;
+
+############################################################################
+#
+# This gets the subject to the bug report.
+#
+sub getSubject
+{
+   my $mainTitle = shift;
+
+   # Create the subject entry field.
+   my $entry = new Cdk::Entry ('Label' => "</B/5>Subject: ",
+				'Width' => 35,
+				'Min' => 3,
+				'Max' => 256);
+
+   # Set the main title info.
+   @mesg = ("<C></24/B>Enter Subject",
+		"<C>Please provide a subject for the message. It",
+		"<C>should be as a concise description of the bug",
+		"<C>as is possible.");
+   $mainTitle->set ('Message' => \@mesg);
+   $mainTitle->draw();
+
+   # Get the subject.
+   while (1)
+   {
+      my $subject = $entry->activate();
+      last if defined $subject;
+
+      # No subject, prompt them for one...
+      popupLabel (["<C></16/B>Error",
+		"<C>You must have a subject line for the mail message.", "",
+		"<C>Please try again."]);
+   }
+   return $subject;
+}
+
+############################################################################
+#
+# This gets an emial address.
+#
+sub getEmailAddress
+{
+   my ($mainTitle, $entryValue, @mesg) = @_;
+   my $info;
+
+   # Set the main title info.
+   $mainTitle->set ('Message' => \@mesg);
+
+   # Create the entry field to get the email address.
+   $entry = new Cdk::Entry ('Label' => "</B/5>email Address: ",
+				'Min' => 3,
+				'Max' => 256,
+				'Width' => 35);
+
+   # Put the user name in the entry field.
+   $entry->set ('Value' => "$entryValue");
+
+   # Get the emial address
+   while (1)
+   {
+      $info = $entry->activate();
+      last if defined $info;
+
+      # No subject, prompt them for one...
+      popupLabel (["<C></B/16>Error",
+			"<C>You must provide an email address.", "",
+			"<C>Please Try again."]);
+   }
+   return $info;
+}
+
+############################################################################
+#
+# This gets the bug report from the user.
+#
+sub createBugReport
+{
+   my ($mainTitle, $subject, $filename) = @_;
+   my @bugReport = ();
+   my @info = ();
+
+   # If a filename has been speicifed, then we will use the contents of the
+   # file for the bug report.
+   if (defined $filename && -e $filename)
+   {
+      open (FILE, $filename);
+      my @tmp = <FILE>;
+      chomp (@tmp);
+      return @tmp;
+   }
+
+   # Create the title.
+   my @mesg = ("<C></24/B>Bug Report",
+			"<C>Enter a description of the bug you are submitting.");
+
+   # Set the main title info.
+   $mainTitle->set ('Message' => \@mesg);
+
+   # Create the entry field to get the email address.
+   $entry = new Cdk::Mentry ('Label' => "</B/5>Description: ",
+				'Prows' => 8,
+				'Lrows' => 15,
+				'Width' => 50);
+
+   # Get the bug report.
+   while (1)
+   {
+      $info = $entry->activate();
+      last if defined $info;
+
+      # No subject, prompt them for one...
+      popupLabel (["<C></B/16>Error",
+			"<C>You must provide a description of the bug.", "",
+			"<C>Please Try again."]);
+   }
+
+   # Split the string into a list.
+   my @info = Cdk::scalar2List ($info, 40);
+
+   # Create the bug report.
+   push (@bugReport, "This is a bug report for perl from $from generated with");
+   push (@bugReport, "the help of the Cdk version of perlbug running under perl $].");
+   push (@bugReport, "");
+   push (@bugReport, "Subject: $subject");
+   push (@bugReport, "");
+   for ($x=0; $x <= $#info; $x++)
+   {
+      push (@bugReport, $info[$x]);
+   }
+   push (@bugReport, "");
+   push (@bugReport, "Site configuration information for perl $]:");
+
+   if ($::Config{cf_by} and $::Config{cf_time})
+   {
+      push (@bugReport, "Configured by $::Config{cf_by} at $::Config{cf_time}.");
+   }
+   push (@bugReport, "");
+   foreach (split (/\n/, Config::myconfig))
+   {
+      push (@bugReport, $_);
+   }
+
+   # Do they want a verbose bug report?
+   if ($::opt_v)
+   {
+      push (@bugReport, "");
+      push (@bugReport, "Complete configuration data for perl $]:");
+      push (@bugReport, "");
+      foreach (sort keys %::Config)
+      {
+         my $value = $::Config{$_};
+         $value =~ s/'/\\'/g;
+         push (@bugReport, "$_='$value'");
+      }
+   }
+   return @bugReport;
+}
+
+############################################################################
+#
+# This views the bug report.
+#
+sub viewBugReport
+{
+   my ($subject, $replyAddress, $adminAddress, @bugReport) = @_;
+   my @buttons = ("</B/24>OK");
+
+   # Get the height and width of the screen.
+   my ($height, $width) = Cdk::getCdkScreenDim();
+   $height -= 3;
+   $width -= 3;
+
+   # Create the file viewer.
+   my $viewer = new Cdk::Viewer ('Buttons' => \@buttons,
+					'Height' => $height,
+					'Width' => $width);
+
+   # Fill the viewer with the contents of the bug report.
+   $viewer->set ('Title' => "<C></5>Bug Report",
+			'Highlight' => "</B/5>",
+			'Info' => \@bugReport);
+   $viewer->activate();
+
+   # Ask them what they want to do with the bug report.
+   my @mesg = ("<C>Now that the bug report has been created, you can",
+		"<C>send the bug report to </R>$replyAddress<!R> and </R>$adminAddress<!R>,",
+		"<C>or you can save the report to a file and send it later",
+		"<C>on your own, or you can quit without saving or sending",
+		"<C>the bug report.");
+   my @buttons = ("</B/24>Send", "</B/8>Save", "</B/16>Cancel");
+   my $choice = popupDialog (\@mesg, \@buttons);
+
+   # Redraw the viewer widget.
+   $viewer->draw();
+
+   # Check what they want to do.
+   if ($choice == 0)
+   {
+      # Mail to bug report.
+      sendBugReport ($subject, $replyAddress, $adminAddress, @bugReport);
+   }
+   elsif ($choice == 1)
+   {
+      # Save to a file.
+      saveBugReport (@bugReport);
+   }
+   else
+   {
+      popupLabel (["<C></B/24>Send Bug Report Canceled."]);
+   }
+}
+
+#
+# This saves the bug report to a file.
+#
+sub saveBugReport
+{
+   my @bugReport = @_;
+
+   # Get the filename to save to.
+   my $entry = new Cdk::Entry ('Label' => "</B/5>Filename: ",
+				'Width' => 30,
+				'Min' => 2,
+				'Max' => 256);
+
+   # Make sure we can write to the file.
+   while (1)
+   {
+      # Get the filename.
+      $filename = $entry->activate();
+
+      # Try to open the filename.
+      last if open (FILE, ">$filename");
+
+      popupLabel (["<C></B/16>Error", "<C>Can not save to the file $filename"]);
+   }
+
+   # Save the bug report to the file.
+   foreach (@bugReport)
+   {
+     print FILE "$_\n";
+   }
+   close (FILE);
+
+   # Tell the user the file has been saved.
+   popupLabel (["The bug report has been saved to $filename", "",
+			"<C>Press any key to continue."]);
+}
+
+#
+# This sends the bug report to the given addresses.
+#
+sub sendBugReport
+{
+   my ($subject, $replyAddress, $adminAddress, $cc, @bugReport) = @_;
+   my $address = "perlbug\@perl.com";
+
+   # Do we have the sendmail module?
+   if ($::HaveSend)
+   {
+      # Create a mail object.
+      my $mailMessage = new Mail::Send ('Subject' => "$subject",
+					'To' => "$address");
+	
+      # Add a carbon copy, if we have one.
+      $mailMessage->cc ($cc) if $cc;
+
+      # Add a from line.
+      $mailMessage->add ("Reply-To" => $replyAddress) if $replyAddress;
+
+      # Open the mail message and write the contents.
+      $fh = $msg->open;
+      foreach (@bugReport)
+      {
+         print $fh "$_\n";
+      }
+
+      # Close the mail message (aka send it.)
+      $fh->close;
+
+      # Popup a little message.
+      popupLabel (["<C>The bug report has been sent."]);
+      return;
+   }
+   else
+   {
+      # No, Okay, let's try to use sendmail normally. (normally????)
+      my $sendmail = "";
+
+      # Where oh where are you you today...
+      foreach (qw(/usr/lib/sendmail /usr/sbin/sendmail /usr/ucblib/sendmail))
+      {
+         $sendmail = $_, last if -e $_;
+      }
+
+      # Can we even send the bug report?
+      if ($sendmail eq "")
+      {
+         # We can't send the bug report, maybe we can save it to a file.
+         my @mesg = ("</B/5>Hmmmm.",
+			"<C>I'm terribly sorry but I can't find sendmail and the package",
+			"<C>Mail::Send has not been installed, so I can't send your bug",
+			"<C>report. Since I can't send the bug report, would you like to",
+			"<C>save it to a file and send it yourself?");
+         if (popupDialog (\@mesg, ["Yep", "Nope"]) == 0)
+         {
+            saveBugReport (@bugReport);
+         }
+         return;
+      }
+
+      # Send the message via sendmail.
+      open (SENDMAIL,"|$sendmail -t");
+      print SENDMAIL "To: $address\n";
+      print SENDMAIL "Subject: $subject\n";
+      print SENDMAIL "Cc: $cc\n" if $cc;
+      print SENDMAIL "Reply-To: $replyAddress\n" if $replyAddress;
+      print SENDMAIL "\n\n";
+      foreach (@bugReport)
+      {
+         print SENDMAIL "$_\n";
+      }
+      close(SENDMAIL);
+
+      # Popup a little message.
+      popupLabel (["<C>The bug report has been sent."]);
+   }
+}

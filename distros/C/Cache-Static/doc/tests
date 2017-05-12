@@ -1,0 +1,22 @@
+doit() { perl -I./lib/ -I./XML_Comma/XML_Comma_Util/lib -e 'use Cache::Static; my $key = Cache::Static::make_key("/url", { abc => "abc" }); my $ret = Cache::Static::get_if_same($key, [ "file|/tmp/testdate", "_XML::Comma|Doc|test2|main|000026" ] ); if(defined($ret)) { print "cache hit: $ret\n"; } else { print "cache miss, setting...\n"; Cache::Static::set($key, "foo"); }' ; };
+
+clear
+rm -f /tmp/testdate
+doit #cache miss
+doit #cache miss
+sleep 1 ; touch /tmp/testdate
+doit #cache miss
+doit #cache hit
+
+doit() { perl -I./lib/ -I./XML_Comma/XML_Comma_Util/lib -e 'use Cache::Static; my $key = Cache::Static::make_key("/url", { abc => "abc" }); my $ret = Cache::Static::get_if_same($key, [ "file|/tmp/testdate", "_XML::Comma|Doc|test2|main|000026" ] ); if(defined($ret)) { print "cache hit: $ret\n"; } else { print "cache miss, setting...\n"; Cache::Static::set($key, "foo"); }' ; };
+rm -f /tmp/testdate
+doit #cache miss
+sleep 1 ; touch /tmp/testdate
+doit #cache miss
+doit #cache hit
+sleep 1 ; perl -e 'use XML::Comma; my $d = XML::Comma::Doc->retrieve("test2|main|000026"); $d->store();'
+doit #cache miss
+doit #cache hit
+
+
+

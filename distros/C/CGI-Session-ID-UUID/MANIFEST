@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+UUID.pm
+META.yml                                 Module meta-data (added by MakeMaker)

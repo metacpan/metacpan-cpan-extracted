@@ -1,0 +1,66 @@
+{
+   "abstract" : "Create CPAN::Mini mirrors with the archives extracted",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Mini-Extract",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "1.22",
+            "CPAN::Mini" : "1.111004",
+            "File::Find::Rule" : "0.30",
+            "File::HomeDir" : "0.88",
+            "File::Remove" : "0.34",
+            "File::Spec" : "0.80",
+            "File::Temp" : "0.21",
+            "IO::File" : "1.14",
+            "IO::Uncompress::Gunzip" : "2.017",
+            "LWP::Online" : "0.03",
+            "List::Util" : "1.15",
+            "Params::Util" : "1.00",
+            "URI" : "1.37",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.ali.as/cpan/trunk/CPAN-Mini-Extract"
+      },
+      "x_ChangeLog" : "http://fisheye2.atlassian.com/changelog/cpan/trunk/CPAN-Mini-Extract"
+   },
+   "version" : "1.23",
+   "x_module_name" : "CPAN::Mini::Extract"
+}

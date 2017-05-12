@@ -1,0 +1,32 @@
+---
+abstract: 'Decision of simple and difficult chemical puzzles.'
+author:
+  - 'Alessandro Gorohovski <an.gorohovski@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chemistry-Harmonia
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Algorithm::Combinatorics: 0.27
+  Carp: 0
+  Chemistry::File::Formula: 0.37
+  Data::Dumper: 2.145
+  Math::Assistant: 0.05
+  Math::BigInt: 1.997
+  Math::BigRat: 0.2602
+  String::CRC::Cksum: 0.91
+  Test::LongString: 0.15
+  Test::More: 0.98
+  Test::Pod: 1.45
+version: 0.118

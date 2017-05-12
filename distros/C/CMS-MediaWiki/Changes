@@ -1,0 +1,34 @@
+Revision history for Perl extension CMS::MediaWiki.
+
+0.8014   13.06.2010
+
+         - Added small enhancement from "ed at sh5.net" to appear things on watch list
+
+
+0.8013	 09.02.2008
+
+         - Added dynamic requirement LWP::UserAgent into Makefile.PL
+
+
+0.8012	 25.06.2007
+
+	 - Updated URLs in the documentation.
+
+
+0.80.11	 21.10.2006
+
+	 - Set defaults for constructor values. Prevent warning if debug param is not set
+	 - Added license in META.yml
+
+
+0.80.10  24.09.2006
+
+	 - Added useful getPage() function, developed by Matt Hucke <hucke@nospam-cynico.net>
+	   Thank you.
+
+
+0.01	 Fri Dec  9 11:34:22 2005
+	 Created.
+	 - original version; created by h2xs 1.23 with options
+		-A -n CMS::MediaWiki
+

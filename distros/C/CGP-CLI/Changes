@@ -1,0 +1,8 @@
+Sun Jul 31 18:39:50 EST 2005
+- packaged http://www.stalker.com/CGPerl/CLI.pm version 2.6.7 for CPAN
+Mon Dec 24 10:04:20 PST 2007
+- packaged http://www.stalker.com/CGPerl/CLI.pm version 2.7.2 for CPAN
+Sun Dec 30 18:40:45 PST 2007
+- removed Mac OS X specific files from the .tar.gz ; increased version to 2.7.2.1 to reflect this fix
+Wed Jul 23 21:58:44 PDT 2008
+- packaged http://www.stalker.com/CGPerl/CLI.pm version 2.7.5 for CPAN

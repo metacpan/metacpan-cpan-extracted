@@ -1,0 +1,17 @@
+---
+abstract: 'L<DBIx::Class::QueryLog> support for L<Catalyst::Model::DBIC::Schema>'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Model-DBIC-Schema-QueryLog
+requires:
+  Catalyst::Component::InstancePerContext: 0
+  Catalyst::Model::DBIC::Schema: 0.24
+  DBIx::Class::QueryLog: 0
+resources:
+  repository: http://github.com/fayland/catalyst-traitfor-model-dbic-schema-querylog
+version: 0.03

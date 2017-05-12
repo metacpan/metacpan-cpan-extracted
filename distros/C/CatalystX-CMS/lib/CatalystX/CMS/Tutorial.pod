@@ -1,0 +1,179 @@
+package CatalystX::CMS::Tutorial;
+
+our $VERSION = '0.011';
+
+=pod
+
+=head1 NAME
+
+CatalystX::CMS::Tutorial - drop-in content management system
+ 
+=head1 DESCRIPTION
+
+CatalystX::CMS (CXCMS) is a set of Catalyst base classes that enable
+web-based editing and revision history of your application templates.
+The impetus behind the project is simple: sometimes you need to give
+non-programmers an easy way to manage your application templates, or to
+allow them to extend the application with new content.
+
+This tutorial provides an overview of the project and offers examples
+of CatalystX::CMS in use.
+
+=head1 OVERVIEW
+
+The basic premise is simple: any URL in your Catalyst application can be
+made edit-able by making your controller class a subclass of 
+CatalystX::CMS::Controller. This magic is achieved through
+CatalystX::CMS::Action, which evaluates every action for the presence
+of the C<cxcms> request parameter. If that parameter is present and true,
+then the appropriate CMS method is called. Otherwise, your normal action
+chain is executed.
+
+The CMS editor interface pulls up the raw Template Toolkit file and allows
+the user to edit it in a text box. The TT files are then stored in a
+Subversion repository, so you get all the Subversion features for your
+templates: revision history, diff, blame, etc.
+
+=head1 TEMPLATE STRUCTURE
+
+CXCMS assumes the following template structure:
+
+ wrapper.tt
+ header.tt
+ body.tt
+ footer.tt
+
+The C<wrapper.tt> file calls the other three.
+
+In addition to the four-part template, CXCMS supports two levels of 
+abstraction: B<type> and B<flavour>. The B<type> is intended to be used
+like a MIME type. The default B<type> is C<html>. The B<flavour> is
+intended to be used like a theme or skin designation. The template directory
+structure is assumed to be:
+
+ type/flavour/wrapper.tt
+ type/flavour/header.tt
+ type/flavour/body.tt
+ type/flavour/footer.tt
+
+This structure supports the idea of multiple flavours for each type.
+
+=head1 A NEW PROJECT
+
+This example looks at creating a new application designed specifically
+for managing mostly raw HTML files. Look at the example app in 
+the distribution t/ dir for an example.
+
+Bootstrap your app:
+
+ % catalyst.pl MyCMS
+ % cd MyCMS
+ % script/mycms_create.pl controller CMS CMS
+ % script/mycms_create.pl model CMS CMS
+ % script/mycms_create.pl view CMS CMS
+
+Add the config to lib/MyCMS.pm
+
+ __PACKAGE__->config(
+    cms => {
+        use_editor => 1,
+        use_layout => 1,
+        root => { 
+            r   => [ __PACKAGE__->path_to('root') ], 
+            rw  => ['/tmp/mycms/work'] 
+        },
+    },
+ );
+ 
+Get your css and js files served for free by the Static::Simple
+plugin. Edit lib/MyCMS.pm to include:
+
+ use Class::Inspector;
+ use Path::Class::Dir;
+ use CatalystX::CMS;
+ my $cms_base = Class::Inspector->loaded_filename( 'CatalystX::CMS' );
+ $cms_base =~ s/\.pm$//;
+
+ __PACKAGE__->config(
+    static           => {
+        include_path => [
+            __PACKAGE__->path_to( 'root' ),
+            Path::Class::dir( $cms_base, 'tt' )
+        ],
+    }
+ );
+ 
+Create your local svn repos and workdir:
+
+ % mkdir /tmp/mycms
+ % svnadmin create /tmp/mycms/repos
+ % cd /tmp/mycms
+ % svn co file:///tmp/mycms/repos work
+ % cd -
+
+Start up the test server:
+
+ % script/mycms_server.pl
+
+Point your browser at a URL that doesn't yet exist:
+
+ http://localhost:3000/cms/foo
+
+You should be prompted to create the file. If you click
+on the file name B<foo> you should be redirected to the CMS
+editor. Change the default text:
+
+ [ this is a new page ]
+
+to something more meaningful and click C<Save>. You should be
+redirected to the new URL.
+
+See the section on L<TEMPLATE STRUCTURE> for tips on customizing
+the default HTML templates.
+
+
+=head1 AN EXISTING PROJECT
+
+CXCMS was designed to drop in easily to existing projects. The easiest
+way is to change your base class from:
+
+ use base 'Catalyst::Controller';
+
+to:
+
+ use base 'CatalystX::CMS::Controller';
+
+which will make all the actions in your controller editable.
+
+What may take some work will be laying out your template directory
+structure to work with the CXCMS assumptions. I<TODO: one more example
+here.>
+
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-catalystx-cms@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll automatically be
+notified of progress on your bug as I make changes.
+
+=head1 ACKNOWLEDGEMENTS
+
+The Minnesota Supercomputing Institute C<< http://www.msi.umn.edu/ >>
+and National Adult Literacy Database C<< http://www.nald.ca/ >>
+sponsored the development of this software.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 by the Regents of the University of Minnesota.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+1;

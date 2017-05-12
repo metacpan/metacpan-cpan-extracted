@@ -1,0 +1,7 @@
+
+<h2>family </h2>
+family updated ok. Click <a href="[% SCRIPT_NAME %]/family/[% model.id_family %]">here</a> to continue.
+<script type="text/javascript">
+ document.location.href="[% SCRIPT_NAME %]/family/[% model.id_family %]";
+</script>
+ 

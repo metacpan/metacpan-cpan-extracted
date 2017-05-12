@@ -1,0 +1,214 @@
+From dojo-interest-bounces@dojotoolkit.org  Thu Jun  7 18:59:45 2007
+Return-Path: <dojo-interest-bounces@dojotoolkit.org>
+X-Original-To: archive_dojo-interest_dojotoolkit.org@grokbase.com
+X-Original-To: dojo-interest@dojotoolkit.org
+Delivered-To: archive_dojo-interest_dojotoolkit.org@grokbase.com
+Delivered-To: dojo-interest@dojotoolkit.org
+X-Spam-Status: No, hits=2.2 required=5.0
+ tests=FH_MSGID_01C67,HTML_MESSAGE,OUTLOOK_3416
+X-Spam-Check-By: s69759.xenosight.com
+Received: from turtle.dojotoolkit.org (HELO turtle.dojotoolkit.org)
+ (64.93.73.95) by s69759.xenosight.com (qpsmtpd/0.32) with ESMTP; Thu, 07 Jun
+ 2007 18:59:44 -0500
+Received: from turtle.dojotoolkit.org (localhost.localdomain [127.0.0.1]) by
+ turtle.dojotoolkit.org (Postfix) with ESMTP id 100FD23F767; Thu,  7 Jun 2007
+ 23:56:10 +0000 (UTC)
+Received: from ms-smtp-04.rdc-nyc.rr.com (ms-smtp-04.rdc-nyc.rr.com
+ [24.29.109.8]) by turtle.dojotoolkit.org (Postfix) with ESMTP id ADBD423F758
+ for <dojo-interest@dojotoolkit.org>; Thu,  7 Jun 2007 23:56:07 +0000 (UTC)
+Received: from SHUTTLE (cpe-66-108-140-226.nyc.res.rr.com [66.108.140.226])
+ by ms-smtp-04.rdc-nyc.rr.com (8.13.4/8.13.4) with ESMTP id l57NxKH1016677 for
+ <dojo-interest@dojotoolkit.org>; Thu, 7 Jun 2007 19:59:24 -0400 (EDT)
+From: "Yves Greatti" <ygreatti1@nyc.rr.com>
+To: <dojo-interest@dojotoolkit.org>
+Date: Thu, 7 Jun 2007 19:59:20 -0400
+Message-ID: <000001c7a95f$ddec59f0$8119fea9@SHUTTLE>
+MIME-Version: 1.0
+X-Priority: 3 (Normal)
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook, Build 10.0.3416
+Importance: Normal
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.3028
+X-Virus-Scanned: Symantec AntiVirus Scan Engine
+Subject: [Dojo-interest] generic question
+X-BeenThere: dojo-interest@dojotoolkit.org
+X-Mailman-Version: 2.1.9
+Precedence: list
+Reply-To: dojo-interest@dojotoolkit.org
+List-Id: <dojo-interest.dojotoolkit.org>
+List-Unsubscribe: <http://dojotoolkit.org/mailman/listinfo/dojo-interest>,
+ <mailto:dojo-interest-request@dojotoolkit.org?subject=unsubscribe>
+List-Archive: <http://dojotoolkit.org/pipermail/dojo-interest>
+List-Post: <mailto:dojo-interest@dojotoolkit.org>
+List-Help: <mailto:dojo-interest-request@dojotoolkit.org?subject=help>
+List-Subscribe: <http://dojotoolkit.org/mailman/listinfo/dojo-interest>,
+ <mailto:dojo-interest-request@dojotoolkit.org?subject=subscribe>
+Content-Type: multipart/mixed;
+ boundary="===============8256426902762623206=="
+Sender: dojo-interest-bounces@dojotoolkit.org
+Errors-To: dojo-interest-bounces@dojotoolkit.org
+
+This is a multi-part message in MIME format.
+
+--===============8256426902762623206==
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_000_0001_01C7A93E.56DAB9F0"
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0001_01C7A93E.56DAB9F0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Hi,
+
+ 
+
+I have this situation, a huge table, which is currently rendered by a
+jsp code. 
+
+In edit mode (another jsp), one has to select a specific row, and submit
+it to record the changes.
+
+For each submission the user is sent back to the top of the previous
+page.
+
+Ideally we would like the user to be able to switch to "edit mode",
+modify as many cells then submit 
+
+the changes. So in one submission, one cell, few cells, one row, many
+rows could be modified.
+
+The user will stay at the same position within the page before the
+submission.
+
+Will Dojo be of any help?
+
+Thanks,
+
+
+------=_NextPart_000_0001_01C7A93E.56DAB9F0
+Content-Type: text/html;
+	charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+
+<head>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3Dus-ascii">
+
+
+<meta name=3DGenerator content=3D"Microsoft Word 10 (filtered)">
+
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+span.EmailStyle17
+	{font-family:Arial;
+	color:windowtext;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=3DEN-US link=3Dblue vlink=3Dpurple>
+
+<div class=3DSection1>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Hi,</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>&nbsp;</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>I have this situation, a huge table, which is =
+currently
+rendered by a jsp code. </span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>In edit mode (another jsp), one has to select a =
+specific
+row, and submit it to record the changes.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>For each submission the user is sent back to the top =
+of the
+previous page.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Ideally we would like the user to be able to switch =
+to
+&quot;edit mode&quot;, modify as many cells then submit =
+</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>the changes. So in one submission, one cell, few =
+cells, one
+row, many rows could be modified.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>The user will stay at the same position within the =
+page
+before the submission.</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Will Dojo be of any help?</span></font></p>
+
+<p class=3DMsoNormal><font size=3D2 face=3DArial><span =
+style=3D'font-size:10.0pt;
+font-family:Arial'>Thanks,</span></font></p>
+
+</div>
+
+</body>
+
+</html>
+
+------=_NextPart_000_0001_01C7A93E.56DAB9F0--
+
+
+
+--===============8256426902762623206==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+FAQ: http://dojotoolkit.org/support/faq
+Book: http://dojotoolkit.org/docs/book
+Forums: http://dojotoolkit.org/forum
+Dojo-interest@dojotoolkit.org
+http://dojotoolkit.org/mailman/listinfo/dojo-interest
+
+--===============8256426902762623206==--
+
+

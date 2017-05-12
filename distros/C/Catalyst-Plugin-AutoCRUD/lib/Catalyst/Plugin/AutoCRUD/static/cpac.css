@@ -1,0 +1,145 @@
+/*
+ * Style for ExtJS
+ *
+ */
+
+/* make icon buttons have no "buttony" style */
+div.x-grid3-cell-inner .x-btn-text-icon * {
+    background-image: none;
+}
+
+div.x-grid3-cell-inner .x-btn-wrap {
+    float: left;
+    margin-top: -4px;
+    margin-left: -4px;
+    margin-left: -5px;
+}
+
+/* make grid cells wrap long lines */
+.x-grid3-cell-inner, .x-grid3-hd-inner { white-space:normal !important; } 
+
+/* Override standard grid styles (add colour to vertical grid lines) */
+.x-grid3-col {
+    border-left:  1px solid #EEEEEE;
+    border-right: 1px solid #D2D2D2;
+}
+
+/* Also remove padding from table data (to compensate for added grid lines) */
+.x-grid3-row td, .x-grid3-summary-row td {
+    padding-left: 0px;
+    padding-right: 0px;
+    cursor: pointer;
+}
+
+.half-grey, .x-grid3-dirty-row td {
+    color: #aaaaaa !important;
+    cursor: auto !important;
+}
+
+.half-grey-pointer {
+    color: #aaaaaa !important;
+}
+
+.x-grid3-cell img {
+    vertical-align: middle;
+}
+
+.x-grid3-scroller {
+    overflow-y: scroll !important;
+}
+
+.x-panel {
+    margin: 4px;
+    margin-bottom: 10px;
+}
+
+/*
+ * Style for the LFB application homepage and schema/source selector
+ *
+ */
+
+#cpac_banner {
+    background-color: #E8CECC;
+    border: 1px solid #C9AFAF;
+    text-align: center;
+    border: 1px;
+    margin: 4px 4px 2px 4px;
+}
+
+div.cpac_box {
+    position: relative;
+    border: 0px;
+    padding: 0px;
+    margin: 0px 2px 0px 2px;
+}
+
+#cpac_warning {
+    background-color: #FFF2C1;
+    border: 1px solid #FFE68C;
+    font-size: small;
+    padding: 4px 4px 4px 4px;
+    margin: 4px 4px 2px 4px;
+}
+
+#cpac_header {
+    background-color: #E2F0FF;
+    border: 1px solid #BED3DD;
+    font-size: small;
+    padding: 6px 4px 10px 4px;
+    margin: 4px 4px 2px 4px;
+}
+
+/* stuff for left-right magic, see
+ * http://www.spartanicus.utvinternet.ie/left_and_right_alignment_using_css.htm
+ */
+div.cpac_top { text-align: right; margin-bottom: -4px }
+div.cpac_top div { display: inline }
+div.cpac_top div.cpac_left { float: left }
+#cpac_outer>div.cpac_top { display: table; width: 100% }
+#cpac_outer>div.cpac_top div { display: table-cell }
+#cpac_outer>div.cpac_top div.cpac_left { float: none; text-align: left }
+#cpac_outer>div.cpac_top div.cpac_right { text-align: right }
+
+#cpac_navcontainer {
+    margin-left: 20px;
+}
+
+#cpac_navcontainer ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+#cpac_navcontainer li {
+    margin: 0 0 .2em 0;
+}
+
+#cpac_navcontainer a {
+    display: block;
+    background-color: #369;
+    color: #FFF;
+    width: 9em;
+    padding: .2em .8em;
+    text-decoration: none;
+}
+
+#cpac_navcontainer a:hover {
+    background-color: #036;
+    color: #FFF;
+}
+
+/*
+#cpac_content {
+    clear: both;
+}
+*/
+
+#cpac_footer {
+    background-color: #E2F0FF;
+    border: 1px solid #BED3DD;
+    font-size: xx-small;
+    text-align: right;
+    padding: 2px;
+    margin: 0px 4px 0px 4px;
+}
+

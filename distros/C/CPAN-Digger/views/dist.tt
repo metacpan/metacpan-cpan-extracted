@@ -1,0 +1,191 @@
+[%
+   title=  name
+   description=meta_data.abstract
+%]
+[% INCLUDE incl/header.tt %]
+
+<div id="path">
+<a href="/id/[% pauseid %]">[% author.name %]</a> - [% name %] 
+<a href="/src/[% pauseid %]/[% distvname %]/">Source</a>
+<a href="/syn/[% name %]/">Syn</a>
+</div>
+
+<div id="release_date">
+Date: [% released %]
+</div>
+
+<div id="permalink">
+<a href="/dist/[% name %]">permalink</a>
+</div>
+
+<div id="download">
+<a href="http://www.cpan.org/CPAN/authors/id/[% path %]">download</a>
+</div>
+
+<div id="version">
+Version: [% version %]
+</div>
+
+<div id="abstract">
+Abstract: [% meta_data.abstract %]
+</div>
+
+<div id="links">
+Links: 
+[ <a href="http://cpanforum.com/dist/[% name %]">discussion</a> ]
+[ <a href="https://rt.cpan.org/Public/Dist/Display.html?Name=[% name %]">View/Report bugs</a> ]
+[ <a href="http://deps.cpantesters.org/?module=[% name %];perl=latest">dependencies</a> ]
+</div>
+
+<!--
+Other tools (diff)
+-->
+
+<div id="repository">
+Repository: 
+[% IF meta_data.resources.repository %]
+  <a href="[% meta_data.resources.repository.link %]">[% meta_data.resources.repository.display %]</a>
+[% ELSE %]
+  Not in META.yml
+[% END %]
+</div>
+
+<div id="home_page">
+Home page: 
+[% IF meta_data.resources.homepage %]
+  <a href="[% meta_data.resources.homepage %]">[% meta_data.resources.homepage %]</a>
+[% ELSE %]
+  Not in META.yml
+[% END %]
+</div>
+
+<div id="cpan_testers">
+CPAN Testers:
+[ <a href="http://www.cpantesters.org/show/[% name %].html#[% distvname %]">View reports</a> ]
+[ <a href="http://matrix.cpantesters.org/?dist=[% name %]+[% version %]">Perl/Platform Version Matrix</a> ]
+</div>
+
+<div id="cpan_rating">
+Rating:
+[ <a href="http://cpanratings.perl.org/d/[% name %]">reviews</a> ]
+[ <a href="http://cpanratings.perl.org/rate/?distribution=[% name %]">Rate this distribution</a> ]
+</div>
+
+<div id="links">
+[ <a href="http://www.annocpan.org/dist/[% name %]">AnnoCPAN</a> ]
+[ <a href="http://search.cpan.org/dist/[% name %]">search.cpan.org</a> ]
+[ <a href="http://cpan.uwinnipeg.ca/dist/[% name %]">Kobes search</a> ]
+</div>
+
+<div id="license">
+License: 
+[% IF meta_data.license %]
+  [% IF meta_data.license == 'perl' %]
+     <a href="http://dev.perl.org/licenses/">Perl</a>
+     (<a href="http://dev.perl.org/licenses/artistic.html">Artistic</a> and <a href="http://www.gnu.org/licenses/gpl-1.0.txt">GPL</a>)
+  [% ELSE %]
+     [% meta_data.license %]
+  [% END %]
+[% ELSE %]
+  [% IF has_meta_yml %]
+    <a href="/faq#meta_license">Not found</a> in <a href="/src/[% pauseid %]/[% distvname %]/META.yml">META.yml</a>
+  [% ELSE %]
+    <a href="/faq#meta_yaml">No META.yml</a>
+  [% END %]
+[% END %]
+</div>
+
+<div id="examples">
+Examples: 
+[% IF examples %]
+<a href="/src/[% pauseid %]/[% distvname %]/[% examples %]">[% examples %]</a>
+[% ELSE %]
+<a href="/faq#examples">Not found</a>.
+[% END %]
+</div>
+
+<div id="tests">
+Tests:
+[% IF has_t %]
+  in the <a href="/src/[% pauseid %]/[% distvname %]/t/">t/</a> directory
+[% ELSIF test_file %]
+  in the <a href="/src/[% pauseid %]/[% distvname %]/test.pl">test.pl</a> file
+[% END %]
+</div>
+
+<div id="xt_tests">
+[% IF xt %]
+Author tests are in the <a href="/src/[% pauseid %]/[% distvname %]/xt/">xt</a> directory.
+[% END %]
+</div>
+
+<div id="special_files">
+Special files:
+<ul>
+[% FOREACH file IN special_files %]
+  <li><a href="/src/[% pauseid %]/[% distvname %]/[% file %]">[% file %]</a></li>
+[% END %]
+</ul>
+</div>
+<div>
+Minimal perl version: [% min_perl %] <a href="/dist/[% name %]/version.txt">version markers</a>
+</div>
+
+<div>
+<a href="/dist/[% name %]/critic.txt">Perl::Critic results</a>
+</div>
+
+<div id="dependencies">
+Depends on (requires):
+[% IF meta_data.requires %]
+  <ul>
+  [% FOR e IN meta_data.requires %]
+    <li><a href="/m/[% e.key %]">[% e.key %]</a> [% e.value %]</li>
+  [% END %]
+  </ul>
+[% ELSE %]
+  No prereqs were found in META.yml
+[% END %]
+</div>
+
+<form action="/grep"> 
+<input type="hidden" name="dist" value="[% name %]">
+<input name="str">
+<input type="submit" value="grep">
+</form>
+
+<div id="modules">
+Modules:
+<table>
+[% FOR m IN modules %]
+<tr>
+  <td>
+    [% IF m.html %]
+       <a href="/dist/[% name %]/[% m.path %]">[% m.name %]</a>
+    [% ELSE %]
+      [% m.name %]
+    [% END %]
+  </td>
+  <td>[% m.abstract %]</td>
+  <td><a href="/src/[% pauseid %]/[% distvname %]/[% m.path %]">src</a></td>
+  <td><a href="/syn/[% name %]/[% m.path %]">syn</a></td>
+  <td><a href="/dist/[% name %]/[% m.path %].json">out</a></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+[% IF pods %]
+<div id="pods">
+Documents:
+<ul>
+[% FOR m IN pods %]
+  <li><a href="/dist/[% name %]/[% m.path %]">[% m.name %]</a></li>
+[% END %]
+</ul>
+</div>
+[% END %]
+
+
+[% INCLUDE incl/footer.tt %]
+

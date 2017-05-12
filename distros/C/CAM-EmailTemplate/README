@@ -1,0 +1,77 @@
+CAM::EmailTemplate - Template-based email message sender
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module extends the CAM::Template search-and-replace API to with a
+send() method to enable simplified delivery of automated but
+customized emails.  This module is NOT intended for spam delivery (and
+it's definitely not very efficient for that purpose).
+
+See the documentation for templating examples.
+
+This module most closely resembles Mail::Send with the sendmail
+option.  It has the following advantages:
+
+  * Integration of templating
+  * More readable code (IMHO)
+
+and the following disadvantages:
+
+  * Only supports sendmail delivery (but see also
+    CAM::EmailTemplate::SMTP)
+  * Doesn't offer an easy-to-understand API for building the header
+  * Fewer mail delivery options
+
+If you wish to take advantage of CAM::Template's ability to use a
+custom template syntax, then you should create a new subclass that
+inherits from both your custom template and from this module.  A
+simple example:
+
+  package MyTemplate;
+  use CAM::Template;
+  our @ISA = qw(CAM::Template);
+  
+  sub patterns {
+    my $pkg = shift;
+    return {
+      $pkg->SUPER::patterns(),
+      # include syntax:  <? include("subfile.tmpl") ?>
+      include => qr/<? *include\(\"([^\"]+)\"\) *?>/,
+    };
+  }
+
+  package MyEmailTemplate;
+  use MyTemplate;
+  use CAM::EmailTemplate;
+  our @ISA = qw(MyTemplate CAM::EmailTemplate);

@@ -1,0 +1,32 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication::CDBI.
+
+0.10 Thu Dec 08 13:05:00 CET 2005
+       - expanded the documentation (Andrew Ford)
+       - Added notice about Catalyst::Plugin::Authentication.
+
+0.09 Tue May 17 11:59:57 EDT 2005
+       - minor POD tweak
+
+0.08  Sun May 08 09:51:00 2005
+       - Readded support for req->{user_id}
+0.07  Tue Apr 19 10:00:00 2005
+        - fixed a minor config bug (Torsten Seemann)
+
+0.06  Fri Apr 15 16:04:00 2005
+        - added md5 and sha hashed password support (Andy Grundman)
+0.05  Fri Apr 15 16:04:00 2005
+        - Extended and restructured the documentation
+        - Added pod tests.
+        - patch from anonymous
+0.04  Mon Mar 7 20:00:00 2005
+        - bugfix $c->req->user -> $c->req->{user}
+
+0.03  Sat Feb 19 20:00:00 2005
+        - changed default fieldname role -> name
+
+0.02  Sat Feb 19 20:00:00 2005
+        - added roles management and stuff from Catalyst::Engine
+          Note that you need at least Catalyst 3.10!
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

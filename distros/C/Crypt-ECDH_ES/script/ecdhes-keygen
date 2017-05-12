@@ -1,0 +1,87 @@
+#! perl
+
+use strict;
+use warnings;
+
+use Crypt::ECDH_ES 'ecdhes_generate_key';
+use Getopt::Long;
+use MIME::Base64;
+
+my %opts = (format => 'hex');
+GetOptions(\%opts, qw/help format=s/);
+
+my %formatter_for = (
+	hex => sub {
+		return map { unpack('H*', $_) . "\n" } @_;
+	},
+	base64 => sub {
+		return map { encode_base64($_) } @_;
+	},
+	uuencode => sub {
+		return map { pack 'u', $_ } @_;
+	},
+);
+
+my $formatter = $formatter_for{ $opts{format} };
+die "Unknown format $opts{format}" if not $formatter;
+
+my @keys = ecdhes_generate_key();
+#my (@keys) = map { pack "Cx31", $_ } 42, 123;
+
+print $formatter->(@keys);
+
+#PODNAME: ecdhes-keygen
+#ABSTRACT: A tool for generating ecdhes keys
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ecdhes-keygen - A tool for generating ecdhes keys
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+ $ ecdhes-keygen --base64
+ TDZkh2OblpB5f68XFryY7GFpR1YDyF9SFLBpdCxrrFE=
+ CBP5t6A9pNczbr5NayeR4qURo12IUtXHy9CwNy/oFkQ=
+
+=head1 DESCRIPTION
+
+This tool generates a new random Curve25519 keypair and outputs it in the designated format (the first being the public and the second being the private key). It takes one named option, C<format> that can have the following values.
+
+=over 4
+
+=item * hex
+
+The new keys will be encoded to hexadecimals, this is the defualt.
+
+=item * base64
+
+The new keys will be encoded to base64.
+
+=item * uuencode
+
+The new keys will be encoded with uuencode.
+
+=back
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

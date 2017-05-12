@@ -1,0 +1,9 @@
+CGI::Auth SUPPORT FILES
+
+The following files will help you get started with CGI::Auth:
+
+	authman.pl	A script for managing the user database and session files.
+	AuthCfg.pm	Basic configuration for a username/password login scheme.
+			See authman.pl for how to use it.
+	login.html	Simple login template file.
+

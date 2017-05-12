@@ -1,0 +1,7 @@
+0.02 Sun Mar 18 2012 Pavel Shaydo <zwon@cpan.org>
+    * Do not index README.pod
+    * Add links to resources
+
+0.01 Sun Mar 11 2012 Pavel Shaydo <zwon@cpan.org>
+    * First version, released on an unsuspecting world.
+

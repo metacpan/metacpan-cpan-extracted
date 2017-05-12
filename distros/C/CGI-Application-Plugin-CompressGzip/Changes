@@ -1,0 +1,19 @@
+Revision history for Perl extension CGI::Application::Plugin::CompressGzip.
+
+1.01  2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+      Added repository to META.yml. No code changes.
+
+1.00  2006-11-20  Rhesa Rozendaal <rhesa@cpan.org>
+    - dist improvements to conform to CPANTS
+    - bumped version to 1.00
+
+0.03  2005-09-18  Rhesa Rozendaal <rhesa@cpan.org>
+    - added pod test to raise my kwalitee.
+
+0.02  Mon Jun 20 22:31:57 2005
+    - documentation typos fixed.
+
+0.01  Thu Apr 21 14:46:26 2005
+    - original version; created by h2xs 1.23 with options
+        -XA -b 5.6.0 -n CGI::Application::Plugin::CompressGzip
+

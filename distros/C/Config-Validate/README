@@ -1,0 +1,345 @@
+NAME
+    Config::Validate - Validate data structures generated from configuration
+    files. (Or anywhere else)
+
+VERSION
+    Version 0.2.6
+
+DESCRIPTION
+    This module is for validating configuration data that has been read in
+    already and is in a Perl data structure. It does not handle reading or
+    parsing configuration files since there are a plethora of available
+    modules on CPAN to do that task. Instead it concentrates on verifying
+    that the data read is correct, and providing defaults where appropriate.
+    It also allows you to specify that a given configuration key may be
+    available under several aliases, and have those renamed to the canonical
+    name automatically.
+
+    The basic model used is that the caller provides a schema as a perl data
+    structure that describes the constraints to verify against. The caller
+    can then use the "Config::Validate" object to validate any number of
+    data structures against the configured schema. If the data structure
+    conforms to the schema given, then a new data structure will be
+    returned, otherwise an exception is thrown.
+
+    Probably the easiest way to explain the intent is that
+    "Config::Validate" is trying to be like "Params::Validate" for
+    configuration files and other data structures.
+
+    This module has the following features:
+
+    * Data structure depth is only limited by stack depth
+    * Can provide defaults for missing items at any level of the data
+    structure.
+    * Can require that items exist, or items can be optional.
+    * Can validate items in the data structure against a number of built in
+    data types, and users can easily add more data types.
+    * Configuration keys can be known by several names, and will be
+    normalized to the canonical name in the data structure returned by the
+    validation.
+
+SCHEMA DEFINITION
+    The most complex part of using "Config::Validate" is defining the schema
+    to validate against. The schema takes the form of set of nested hashes.
+
+    Here is an example schema you might use if you were writing something
+    that needs to validate a database connection configuration file.
+
+      my $schema = { db => { 
+                        type => 'nested',
+                        alias => 'dbinfo',
+                        child => { 
+                           hostname => { 
+                              type => 'hostname'
+                              alias => [ qw(host server) ],
+                              default => 'localhost,
+                           },
+                           port => { 
+                              type => 'integer',
+                              max => 64*1024 - 1,
+                              min => 1,
+                              default => '3306',
+                           },
+                           username => { 
+                              type => 'string'
+                              optional => 1,
+                              alias => 'user',
+                           },
+                           password => { 
+                              type => 'string',
+                              optional => 1,
+                              alias => [ qw(pass passwd) ],
+                           },
+                           database => {
+                              type => 'string',
+                              alias => 'dbname',
+                           },
+                           column_types => {
+                              type => 'hash',
+                              keytype => 'string',
+                              child => {
+                                id => { 
+                                   type => 'string',
+                                   default => 'INT',
+                              },
+                           },
+                        },
+                     allowed_users => {
+                        type => 'array',
+                        subtype => 'string',
+                     },
+                  };
+
+    This is a somewhat long example of what a schema can look like. This
+    uses most of the features available. The basic format is that a schema
+    consists of a hash of hashes. Each of it's children describe a single
+    field in the data structure to be validated. The only required key in
+    the field definition is "type", which defines how that element in the
+    data/config hash should be validated.
+
+  VALIDATION TYPES
+    Below is a list of the built in validation types, and the options they
+    take. There are several global options that any of these can take that
+    are documented below.
+
+   nested
+    The "nested" type provides a way to validate nested hash references.
+    Valid options are:
+
+    * child Hash reference that defines all the valid keys and values in the
+            nested section. Required.
+
+   integer
+    The "integer" type expects a whole number that can be positive or
+    negative. Valid options are:
+
+    * min   Smallest valid value
+
+    * max   Largest valid value
+
+   float
+    The "float" type verifies that the value meets the "looks_like_number"
+    test from Scalar::Util. Valid options are:
+
+    * min   Smallest valid value
+
+    * max   Largest valid value
+
+   string
+    The "string" type does no validation if no addition restrictions are
+    specified. Valid options are:
+
+    * min   Minimum length
+
+    * max   Maximum length
+
+    * regex String must match the regex provided.
+
+   boolean
+    The "boolean" type looks for a number of specific values, and converts
+    them to 0 or 1. The values considered to be true are: 1, "y", "yes",
+    "t", "true" and "on". The values considered to be false are 0, "n",
+    "no", "f", "false", "off". These values are not case sensitive. The
+    "boolean" type takes no options.
+
+   directory
+    The "directory" type verifies that the value is a directory that exists.
+    The "directory" type takes no options.
+
+   file
+    The "file" type verifies that the value is a file, or a symlink that
+    points at a file that exists. The "file" type takes no options.
+
+   domain
+    The "domain" type uses the Data::Validate::Domain "is_domain" function
+    to verify that the value is a validate domain name. This does not look
+    the value up in DNS and verify that it exists. The "domain" type takes
+    no options.
+
+   hostname
+    The "hostname" type uses the Data::Validate::Domain "is_hostname"
+    function to verify that the value is a validate hostname name. This does
+    not look the value up in DNS and verify that it exists. The "hostname"
+    type takes no options.
+
+   array
+    The "array" type verifies that the value is an array reference. If the
+    "array_allows_scalar" option is turned on (it is by default), then if a
+    scalar value is found, then it will automatically be converted to an
+    array reference with a single element.
+
+    * subkey
+            Required option that specifies the type of the elements of the
+            array.
+
+   hash
+    The "hash" type validates a hash reference of key/value pairs.
+
+    * keytype
+            Required option that specifies the type of validation to do on
+            hash keys
+
+    * child If the "hash" type finds a "child" option, then it will validate
+            any keys in the hash against the fields in the "child"
+            definition. Note that it is NOT an error if elements are found
+            in the hash that are not in child. If you want that behavior,
+            you should use the "nested" type instead.
+
+  COMMON OPTIONS
+    There are a set of options that can be added to any field definition,
+    that provide a common set of functionality to all.
+
+    * alias The "alias" option allows you to specify other names that a
+            particular field might be known by. For example, you may have a
+            field named "password", but also want to accept "pass", "passwd"
+            and "pw". If any of the aliases are found, then they will be
+            renamed in the data structure that is returned by "validate".
+            This option can point to a scalar, or an array reference.
+
+    * callback
+            The "callback" option allows you to specify a callback that will
+            be called after any other validation has been done for a
+            specific field in the data structure. The callback sub is called
+            with a reference to the "Config::Validate" object (one is
+            created automatically if you're using the functional interface),
+            the value to be verified, the definition of the field, and an
+            array reference containing the path into the data structure. You
+            can use the "mkpath" method to convert the path to a more
+            readable form for error messages and such.
+
+    * default
+            The "default" option allows you to specify a default for the
+            field. This implicitly means the field is not required to exist
+            in the data structure being validated. As many levels as
+            necessary will be created in the resulting data structure to
+            insure the default is created.
+
+    * optional
+            If the "optional" option is true, then the field is not
+            required. If "optional" is false, or not defined, then the field
+            is required.
+
+SUBROUTINES/METHODS
+  new
+    The new method constructs a "Config::Validate" object, and returns it.
+    It accepts the following arguments:
+
+    * schema
+            A validation schema as described in the "SCHEMA DEFINITION"
+            section above.
+
+    * data_path
+            If this is set to true, and the "Data::Path" module is
+            available, then the "validate" method/function will encapsulate
+            the results returned in a "Data::Path" instance. Defaults to
+            false;
+
+    * data_path_options
+            If the "data_path" option is true, then this should be a hash
+            reference to be passed in as the second argument to the
+            "Data:Path" constructor.
+
+    * array_allows_scalar
+            If this is true, then scalars will be autopromoted to a single
+            element array reference when validating "array" types.
+
+    * debug Enables debugging output.
+
+    * on_debug
+            Allows you to define a callback for debugging output. A default
+            callback will be provided if this isn't set. The default
+            callback simply prints the debug output to STDOUT. If you set
+            the callback, then will be called with the object as the first
+            parameter, and the additional parameters should be joined to
+            form the entire message.
+
+    In addition, any of these can read or changed after the object is
+    created, via an accessor with the same name as the parameter.
+
+  validate
+    The validate sub can be called as either a function, or as a instance
+    method.
+
+    If it is called as an instance method, then it expects a single "config"
+    parameter which should be the data structure/config to be validated.
+
+      my $result = $obj->validate(config => $config)
+
+    If it is called as a function, then it accepts two parameters. The
+    "config" parameter should be the data structure/config to be validated,
+    and the "schema" parameter should be the schema.
+
+      my $result = validate(config => $config, schema => $schema)
+
+    The "config" parameter above can be a hash reference, or it can be a
+    "Config::General" object. If it is a "Config::General" object, then the
+    validate sub will automatically call the "getall" method on the object.
+
+    If any errors are encountered, then the validate sub will call die to
+    throw an exception. In that case the value of $@ contain an error
+    message describing the problem.
+
+    There was formerly a one and two argument variant of this sub. It is
+    still supported, but deprecated.
+
+  add_type
+    The "add_type" method allows you to register a validation type on just a
+    single instance of "Config::Validate". The parameters are as follows:
+
+    * name  This is the name to be specified in the schema to use this
+            validation type. This is a mandatory parameter.
+
+    * validate
+            The value of "validate" should be a callback that will be run
+            when it is necessary to validate a field of this type. The
+            callback will be passed the "Config::Validate" object, the name
+            of the field being validated, the schema definition of that
+            field, and an array reference containing the path into the data
+            structure. You can use the "mkpath" method to convert the path
+            to a more readable form for error messages and such.
+
+    * init  The value of "init" should be a callback that will be run before
+            any validation is done. The callback will be passed the
+            "Config::Validate" object, the schema, and the configuration
+            being validated.
+
+    * finish
+            The value of "finish" should be a callback that will be run
+            after any validation is done. The callback will be passed the
+            "Config::Validate" object, the schema, and the configuration
+            being validated.
+
+  add_default_type
+    The "add_default_type" method allows you to register a validation type
+    for all new "Config::Validate" instances. It can be called as a
+    function, class method, or instance method. If it is called as an
+    instance method, then the new type will also be added to that instance.
+    The parameters are the same as "add_type".
+
+  reset_default_types
+    The "reset_default_types" method removes all user defined types from the
+    base class. Any instances that are alread created will retain their
+    existing type configuration.
+
+  mkpath
+    This is a convenience function for people writing callbacks and user
+    defined type validation. It takes either an array or array reference and
+    returns a string that represents the path to a specific item in the
+    configuration. This might be useful if you're interested in having your
+    error messages be consistent with the rest of "Config::Validate". This
+    is available for export, but not exported by default. Note: this is a
+    function, not a method.
+
+AUTHOR
+    Clayton O'Neill
+
+    Eval for e-mail address: "join('@', join('.', qw(cv 20 coneill)),
+    'xoxy.net')"
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2007-2008 by Clayton O'Neill
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

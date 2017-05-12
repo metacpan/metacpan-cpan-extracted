@@ -1,0 +1,15 @@
+Changes of Class-Data-Localize
+##############################
+0.0401 - 2013-01-23
+   * fix test count in t/NoBase.t
+
+0.04 - 2013-01-18
+   * drop 0.03 development in favour of a small improvement
+   * it is no longer a requirement to inherit from Class::Data::Localize -
+     mk_classdata works now as a public function callable from everywhere
+
+0.02 - 2008-07-08
+   * fixed some of the distribution errors 
+
+0.01 - 2008-07-05
+   * inititial public release

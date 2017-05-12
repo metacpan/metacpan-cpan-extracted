@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Class/Ref.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/00_load.t
+t/01_simple_hash.t
+t/02_simple_array.t
+t/03_nested_hash_in_hash.t
+t/04_nested_array_in_hash.t
+t/05_nested_hash_in_array.t
+t/06_nested_array_in_array.t
+t/20_reject_other_refs.t

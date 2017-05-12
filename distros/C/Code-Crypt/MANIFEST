@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/basic.pl
+eg/nest.pl
+lib/Code/Crypt.pm
+lib/Code/Crypt/Graveyard.pm
+t/basic.t
+t/release-pod-syntax.t

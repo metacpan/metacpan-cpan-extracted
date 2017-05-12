@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+# Tutorial example
+# 2003 (c) by Marcus Thiesen (marcus@cpan.org)
+# This file is a part of Curses::UI::POE and might be distributed 
+# under the same terms as perl itself.
+
+# Use the libraries from the distribution, instead of 
+# system wide libraries.
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use strict;
+use Curses::UI::POE;
+my $cui = new Curses::UI::POE( -color_support => 1 );
+
+my $win1 = $cui->add(
+		     'win1', 'Window',
+		     -border => 1,
+		     -y    => 1,
+		     -bfg  => 'red',
+		     );
+
+my $listbox = $win1->add('lb', 'Listbox',
+			 -multi => 1,
+			 -htmltext => 1,
+			 -values => [ "<reverse>reverse text</reverse>",
+				      "<bold>bold text</bold>",
+				      "<underline>underlined text</underline>",
+				      "<blink>blinking text</blink>",
+				      "<dim>dim text</dim>",
+				      ],
+			 );
+$cui->draw;
+sleep 5;
+			 
+

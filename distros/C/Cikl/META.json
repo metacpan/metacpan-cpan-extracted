@@ -1,0 +1,274 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "Wes Young (wesyoung.me)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cikl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.05",
+            "Config::Simple" : "4.58",
+            "Coro" : "6.31",
+            "Cwd" : "3.40",
+            "DateTime" : "0.70",
+            "DateTime::Format::DateParse" : "0.05",
+            "DateTime::Format::Strptime" : "1.54",
+            "Encode" : "2.44",
+            "File::Spec" : "3.40",
+            "File::Type" : "0.22",
+            "Getopt::Long" : "0",
+            "IO::Uncompress::Unzip" : "2.02",
+            "JSON::XS" : "2.34",
+            "LWP::Protocol::https" : "6.03",
+            "LWP::UserAgent" : "6.02",
+            "LWPx::ParanoidAgent" : "1.09",
+            "List::MoreUtils" : "0.33",
+            "Log::Log4perl" : "0",
+            "MIME::Base64" : "3.13",
+            "MIME::Lite" : "3.027",
+            "Mail::RFC822::Address" : "0.3",
+            "Module::Pluggable" : "3.9",
+            "Mouse" : "v2.0.0",
+            "Net::SSLeay" : "1.43",
+            "Regexp::Common" : "2.122",
+            "Regexp::Common::net::CIDR" : "0.02",
+            "Storable" : "2.27",
+            "Text::CSV_XS" : "1.00",
+            "Text::Table" : "1.127",
+            "Time::HiRes" : "1.972101",
+            "Try::Tiny" : "0.11",
+            "XML::LibXML" : "1.89",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0.41",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0.32"
+         }
+      }
+   },
+   "provides" : {
+      "Cikl" : {
+         "file" : "lib/Cikl.pm",
+         "version" : "v0.5.1"
+      },
+      "Cikl::AddressBuilder" : {
+         "file" : "lib/Cikl/AddressBuilder.pm"
+      },
+      "Cikl::Client" : {
+         "file" : "lib/Cikl/Client.pm"
+      },
+      "Cikl::Client::Factory" : {
+         "file" : "lib/Cikl/Client/Factory.pm"
+      },
+      "Cikl::Client::Transport" : {
+         "file" : "lib/Cikl/Client/Transport.pm"
+      },
+      "Cikl::Codecs::CodecRole" : {
+         "file" : "lib/Cikl/Codecs/CodecRole.pm"
+      },
+      "Cikl::Codecs::JSON" : {
+         "file" : "lib/Cikl/Codecs/JSON.pm"
+      },
+      "Cikl::DataTypes::Asn" : {
+         "file" : "lib/Cikl/DataTypes/Asn.pm"
+      },
+      "Cikl::DataTypes::Email" : {
+         "file" : "lib/Cikl/DataTypes/Email.pm"
+      },
+      "Cikl::DataTypes::Fqdn" : {
+         "file" : "lib/Cikl/DataTypes/Fqdn.pm"
+      },
+      "Cikl::DataTypes::Integer" : {
+         "file" : "lib/Cikl/DataTypes/Integer.pm"
+      },
+      "Cikl::DataTypes::Ipv4" : {
+         "file" : "lib/Cikl/DataTypes/Ipv4.pm"
+      },
+      "Cikl::DataTypes::Ipv4Cidr" : {
+         "file" : "lib/Cikl/DataTypes/Ipv4Cidr.pm"
+      },
+      "Cikl::DataTypes::LowerCaseStr" : {
+         "file" : "lib/Cikl/DataTypes/LowerCaseStr.pm"
+      },
+      "Cikl::DataTypes::PortList" : {
+         "file" : "lib/Cikl/DataTypes/PortList.pm"
+      },
+      "Cikl::DataTypes::Url" : {
+         "file" : "lib/Cikl/DataTypes/Url.pm"
+      },
+      "Cikl::EventBuilder" : {
+         "file" : "lib/Cikl/EventBuilder.pm"
+      },
+      "Cikl::Logging" : {
+         "file" : "lib/Cikl/Logging.pm"
+      },
+      "Cikl::Models::Address::asn" : {
+         "file" : "lib/Cikl/Models/Address/asn.pm"
+      },
+      "Cikl::Models::Address::email" : {
+         "file" : "lib/Cikl/Models/Address/email.pm"
+      },
+      "Cikl::Models::Address::fqdn" : {
+         "file" : "lib/Cikl/Models/Address/fqdn.pm"
+      },
+      "Cikl::Models::Address::ipv4" : {
+         "file" : "lib/Cikl/Models/Address/ipv4.pm"
+      },
+      "Cikl::Models::Address::ipv4_cidr" : {
+         "file" : "lib/Cikl/Models/Address/ipv4_cidr.pm"
+      },
+      "Cikl::Models::Address::url" : {
+         "file" : "lib/Cikl/Models/Address/url.pm"
+      },
+      "Cikl::Models::AddressRole" : {
+         "file" : "lib/Cikl/Models/AddressRole.pm"
+      },
+      "Cikl::Models::Event" : {
+         "file" : "lib/Cikl/Models/Event.pm"
+      },
+      "Cikl::Smrt" : {
+         "file" : "lib/Cikl/Smrt.pm",
+         "version" : "v0.5.1"
+      },
+      "Cikl::Smrt::AutoDecodableRole" : {
+         "file" : "lib/Cikl/Smrt/AutoDecodableRole.pm"
+      },
+      "Cikl::Smrt::Broker" : {
+         "file" : "lib/Cikl/Smrt/Broker.pm"
+      },
+      "Cikl::Smrt::ClientBroker" : {
+         "file" : "lib/Cikl/Smrt/ClientBroker.pm"
+      },
+      "Cikl::Smrt::DecoderRole" : {
+         "file" : "lib/Cikl/Smrt/DecoderRole.pm"
+      },
+      "Cikl::Smrt::Decoders::AutoDecoder" : {
+         "file" : "lib/Cikl/Smrt/Decoders/AutoDecoder.pm"
+      },
+      "Cikl::Smrt::Decoders::Gzip" : {
+         "file" : "lib/Cikl/Smrt/Decoders/Gzip.pm"
+      },
+      "Cikl::Smrt::Decoders::Null" : {
+         "file" : "lib/Cikl/Smrt/Decoders/Null.pm"
+      },
+      "Cikl::Smrt::Decoders::Zip" : {
+         "file" : "lib/Cikl/Smrt/Decoders/Zip.pm"
+      },
+      "Cikl::Smrt::FeedParserConfig" : {
+         "file" : "lib/Cikl/Smrt/FeedParserConfig.pm"
+      },
+      "Cikl::Smrt::Fetcher" : {
+         "file" : "lib/Cikl/Smrt/Fetcher.pm"
+      },
+      "Cikl::Smrt::Fetchers" : {
+         "file" : "lib/Cikl/Smrt/Fetchers.pm"
+      },
+      "Cikl::Smrt::Fetchers::File" : {
+         "file" : "lib/Cikl/Smrt/Fetchers/File.pm"
+      },
+      "Cikl::Smrt::Fetchers::Http" : {
+         "file" : "lib/Cikl/Smrt/Fetchers/Http.pm"
+      },
+      "Cikl::Smrt::HandlerRole" : {
+         "file" : "lib/Cikl/Smrt/HandlerRole.pm"
+      },
+      "Cikl::Smrt::Handlers::Alexa" : {
+         "file" : "lib/Cikl/Smrt/Handlers/Alexa.pm"
+      },
+      "Cikl::Smrt::Handlers::ConfigBasedHandler" : {
+         "file" : "lib/Cikl/Smrt/Handlers/ConfigBasedHandler.pm"
+      },
+      "Cikl::Smrt::Parser" : {
+         "file" : "lib/Cikl/Smrt/Parser.pm"
+      },
+      "Cikl::Smrt::ParserHelpers::XPathMapping" : {
+         "file" : "lib/Cikl/Smrt/ParserHelpers/XPathMapping.pm"
+      },
+      "Cikl::Smrt::ParserHelpers::XPathRegexMapping" : {
+         "file" : "lib/Cikl/Smrt/ParserHelpers/XPathRegexMapping.pm"
+      },
+      "Cikl::Smrt::Parsers" : {
+         "file" : "lib/Cikl/Smrt/Parsers.pm"
+      },
+      "Cikl::Smrt::Parsers::ParseCsv" : {
+         "file" : "lib/Cikl/Smrt/Parsers/ParseCsv.pm"
+      },
+      "Cikl::Smrt::Parsers::ParseDelim" : {
+         "file" : "lib/Cikl/Smrt/Parsers/ParseDelim.pm"
+      },
+      "Cikl::Smrt::Parsers::ParseJson" : {
+         "file" : "lib/Cikl/Smrt/Parsers/ParseJson.pm"
+      },
+      "Cikl::Smrt::Parsers::ParseTxt" : {
+         "file" : "lib/Cikl/Smrt/Parsers/ParseTxt.pm"
+      },
+      "Cikl::Smrt::Parsers::ParseXPath" : {
+         "file" : "lib/Cikl/Smrt/Parsers/ParseXPath.pm"
+      },
+      "Cikl::Util::TimeHelpers" : {
+         "file" : "lib/Cikl/Util/TimeHelpers.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cikl/p5-Cikl/issues"
+      },
+      "homepage" : "https://github.com/cikl/p5-Cikl",
+      "repository" : {
+         "url" : "git://github.com/cikl/p5-Cikl.git",
+         "web" : "https://github.com/cikl/p5-Cikl"
+      }
+   },
+   "version" : "0.5.1",
+   "x_contributors" : [
+      "Kevin Benton <blak111@gmail.com>",
+      "Aaron K. Reffett <akreffett@cert.org>",
+      "Matt Carothers <macaroth@t5.sie.isc.org>",
+      "Wes Young <github@barely3am.com>",
+      "Gabriel Iovino <giovino@gmail.com>",
+      "Wes Young <wes@barely3am.com>",
+      "Mike Ryan <falter@gmail.com>"
+   ]
+}

@@ -1,0 +1,31 @@
+---
+abstract: 'Get random data from the Windows API.'
+author:
+  - 'Max Kanat-Alexander <mkanat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::use::ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Crypt::Random::Source::Strong::Win32
+name: Crypt-Random-Source-Strong-Win32
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0.11
+  Crypt::Random::Source: 0.06
+  Win32: 0.35
+  Win32::API: 0.55
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.07

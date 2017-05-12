@@ -1,0 +1,26 @@
+inc1 {
+    inc2 {
+        inc3 {
+            bar {
+                baz     789
+            }
+        }
+    }
+}
+
+foo1 {
+    @inherit    .#inc1
+}
+
+foo2 {
+    @inherit    .#foo1/inc2
+}
+
+foo3 {
+    @inherit    .#foo2/inc3
+}
+
+foo4 {
+    @inherit    .#foo3/bar
+}
+

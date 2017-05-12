@@ -1,0 +1,30 @@
+---
+abstract: 'Simple way to access Cassandra 0.7/0.8'
+author:
+  - 'Gea-Suan Lin <gslin@gslin.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cassandra-Lite
+requires:
+  Any::Moose: 0
+  Class::Accessor: 0
+  Thrift: 0
+  Thrift::BinaryProtocol: 0
+  Thrift::FramedTransport: 0
+  Thrift::Socket: 0
+  constant: 0
+  perl: 5.010
+resources:
+  bugtracker: https://github.com/gslin/cassandra-lite-perl/issues
+  repository: git://github.com/gslin/cassandra-lite-perl.git
+version: 0.4.0

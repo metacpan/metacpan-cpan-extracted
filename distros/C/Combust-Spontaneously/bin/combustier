@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2009 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+combustier - run a standalone combust server
+
+=head1 About
+
+This program makes it easier to preview changes to combust-based sites
+(such as the perl.org sites) without going through the full
+apache/combust setup process.
+
+This allows you to preview your changes to the site before checking-in
+to the live svn.
+
+=head1 Caveats
+
+This setup should reliably render all of the actual content (failing to
+do this is definitely a bug.)  It may return errors for some requests
+where the live site would redirect, or other scenarios.
+
+=head1 Setup
+
+  mkdir perl.org
+  cd perl.org
+
+You'll need to fetch the combust code, as well as the perl.org shared
+components:
+
+  git clone git://git.develooper.com/combust.git combust2
+  svn co https://svn.perl.org/perl.org/docs/live/shared
+
+Then whichever site you plan to hack on:
+
+  svn co https://svn.perl.org/perl.org/docs/live/learn
+
+Now simply run combustier:
+
+  combustier learn
+
+=head1 Usage
+
+  combustier [OPTIONS] combust.conf
+
+=head1 Options
+
+=over
+
+=item -c, --combust PATH
+
+Path to combust tree.  This should typically be a checkout from
+git://git.develooper.com/combust.git.
+
+DEFAULT: combust2
+
+=item --port NUMBER
+
+Server port number.
+
+DEFAULT: 9090
+
+=item -h, --help
+
+=for help show this help message
+
+Show help about options.
+
+=back
+
+=cut
+
+package bin::combustier;
+
+use Getopt::AsDocumented;
+
+use Combust::Spontaneously;
+
+sub main {
+  my (@args) = @_;
+
+  my $opt = Getopt::AsDocumented->process(\@args) or return;
+  my $site = shift(@args);
+  die "must have site directory argument\n" unless($site);
+  die "'$site' does not exist" unless(-e $site);
+
+
+  $ENV{COMBUST_REQUEST_CLASS} = 'Spontaneously';
+
+  my $cbroot = $ENV{CBROOT} = $opt->combust;
+  die "must have a '$cbroot' directory\n" unless(-e $cbroot);
+  unshift(@INC, "$cbroot/lib");
+
+  my $conf = $ENV{CBCONFIG} = 'combust.conf';
+  unless(-e $conf) {
+    open(my $fh, '>', $conf) or die "cannot write '$conf'";
+    print $fh "servername = localhost\n";
+  }
+
+  my $server = Combust::Spontaneously->new(
+    port => $opt->port,
+    site => $site,
+  );
+  $server->run;
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::combustier::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::combustier';

@@ -1,0 +1,97 @@
+NAME
+    CHI::Driver::Memcached -- Distributed cache via memcached (memory cache
+    daemon)
+
+VERSION
+    version 0.16
+
+SYNOPSIS
+        use CHI;
+
+        my $cache = CHI->new(
+            driver => 'Memcached',   # or 'Memcached::Fast', or 'Memcached::libmemcached'
+            namespace => 'products',
+            servers => [ "10.0.0.15:11211", "10.0.0.15:11212", "/var/sock/memcached",
+            "10.0.0.17:11211", [ "10.0.0.17:11211", 3 ] ],
+            debug => 0,
+            compress_threshold => 10_000,
+        );
+
+DESCRIPTION
+    A CHI driver that uses Cache::Memcached to store data in the specified
+    memcached server(s).
+
+    CHI::Driver::Memcached::Fast and CHI::Driver::Memcached::libmemcached
+    are also available as part of this distribution. They work with other
+    Memcached clients and support a similar feature set. Documentation for
+    all three modules is presented below.
+
+CONSTRUCTOR OPTIONS
+    Namespace, appended with ":", is passed along to the
+    Cached::Memcached::* constructor, along with any constructor options not
+    recognized by CHI - for example *servers*, *compress_threshold* and
+    *debug*.
+
+    If you need more control over the options passed to Cache::Memcached::*,
+    you may specify a hash directly in `memd_params'.
+
+METHODS
+    Besides the standard CHI methods:
+
+    memd
+        Returns a handle to the underlying Cache::Memcached::* object. You
+        can use this to call memcached-specific methods that are not
+        supported by the general API, e.g.
+
+            $self->memd->incr("key");
+            my $stats = $self->memd->stats();
+
+UNSUPPORTED METHODS
+    These standard CHI methods cannot currently be supported by memcached,
+    chiefly because there is no way to get a list of stored keys.
+
+    dump_as_hash
+    clear
+    get_keys
+    get_namespaces
+    is_empty
+    purge
+
+SUPPORT AND DOCUMENTATION
+    Questions and feedback are welcome, and should be directed to the
+    perl-cache mailing list:
+
+        http://groups.google.com/group/perl-cache-discuss
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-Memcached
+
+    The latest source code can be browsed and fetched at:
+
+        http://github.com/jonswar/perl-chi-driver-memcached/tree/master
+        git clone git://github.com/jonswar/perl-chi-driver-memcached.git
+
+AUTHOR
+    Jonathan Swartz
+
+SEE ALSO
+    CHI, Cache::Memcached, CHI::Driver::Memcached::Fast,
+    CHI::Driver::Memcached::libmemcached
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2007 Jonathan Swartz.
+
+    CHI::Driver::Memcached is provided "as is" and without any express or
+    implied warranties, including, without limitation, the implied
+    warranties of merchantibility and fitness for a particular purpose.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

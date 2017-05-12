@@ -1,0 +1,59 @@
+Revision history for Perl extension Crypt::OpenSSL::DSA.
+
+0.19    2017/01/13
+        - fix building against openssl 1.1.0 without compat modes (eroen)
+
+0.18    2016/11/17
+        - OpenSSL 1.1.0 compatibility
+        - fix Kwalitee Issues
+
+0.17    2016/10/27
+        - Makefile.PL fixing v0.16
+
+0.16    2016/10/27
+        - Makefile.PL supports OPENSSL_PREFIX or OPENSSL_LIB+OPENSSL_INCLUDE env variables
+        - Makefile.PL tries to find libcrypto via pkg-config
+        - Make the files non-executable
+        - Doc fixes (grammar)
+
+0.15    2015/02/03
+        - #84367 Win32 compatibility patch
+        - #80369 fix errors in POD. Mainly just missing =over/=back
+        - #80368 Makefile.PL: unneeded -lssl in LIBS
+
+0.14    2012/10/16
+        - compiling with -Werror=format-security now works (Jerome Quelin, #48446)
+        - Use Digest::SHA instead of Digest::SHA1 (Ansgar Burchardt, #60271)
+        - Security fix, CVE-2009-0129: Missing error check in do_verify (Havard Eidnes, #79958)
+
+0.13    2005/10/15
+        - made t/90-openssl-compat.t windows compatible (Rob)
+
+0.12    2005/05/22
+        - Removed all use of strlen() in DSA.xs so signatures with nulls,
+          as commonly generated with sha1, could be signed/verified,
+          and added more tests
+          (Brad Fitzpatrick <brad@danga.com>)
+
+0.11    2003/01/06
+        - Added -DPERL5 to Makefile.PL required for perl-5.8/gcc-3.2
+
+0.10    2002/09/25
+        - Fixed Memory leak with signature object.
+        - Added set_p, set_q, set_g, set_pub_key, set_priv_key (Olaf Kolkman)
+        - Added set_r and set_s methods to Crypt::OpenSSL::DSA::Signature
+        - Renamed Signature.pm to Signature.pod
+
+0.04    2002/09/24
+        - Fixed bug in verify method
+        - Added read_priv_key_str and read_pub_key_str
+
+0.03    2002/02/06
+        - Added Crypt::OpenSSL::DSA::Signature interface
+
+0.02    2001/09/24
+        - Added more docs
+        - seed is now optional argument in generate_parameters
+
+0.01    2001/09/18
+        - original version; created by h2xs

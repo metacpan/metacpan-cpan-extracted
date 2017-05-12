@@ -1,0 +1,14 @@
+Catmandu-Importer-Parltrack
+===========================
+
+Created:      2014-06-02
+Home page:    <https://metacpan.org/release/Catmandu-Importer-Parltrack>
+Home page:    <https://wiki.debian.org/DebianParl/VoightKampff>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Catmandu-Importer-Parltrack>
+Maintainer:   Jonas Smedegaard (JONASS) <dr@jones.dk>
+
+0.001	2014-10-19
+
+ [ Packaging ]
+ - Iitial release, based on Catmandu::Wikidata.
+   Jakob Voß++

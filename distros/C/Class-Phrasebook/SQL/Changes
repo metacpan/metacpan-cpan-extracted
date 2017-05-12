@@ -1,0 +1,16 @@
+Revision history for Perl extension Class::Phrasebook::SQL.
+
+0.87  Sun Feb  9 12:30:00 CET 2003
+	- Added the PLACE_HOLDERS_CONATAIN_DOLLARS data member 
+	  and the support for it. Thanks to Benjamin Pineau
+   	  for pointing out that problem.
+
+0.86  Fri Nov  8 20:07:05 CET 2002
+	- Fixed a bug in update statement with no "where" clause.
+	  Thanks for Tiago Stock that submitted that bug report.
+
+0.2   Fri Feb  9 15:21:28 CET 2001
+	- first distribution on CPAN
+
+
+

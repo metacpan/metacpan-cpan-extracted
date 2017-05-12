@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd6e
+registers:
+  AF: 53204
+  AF_: 0
+  BC: 28401
+  BC_: 0
+  DE: 49277
+  DE_: 0
+  HL: 60408
+  HL_: 0
+  I: 0
+  IX: 45305
+  IY: 45219
+  PC: 3
+  R: 2
+  SP: 0

@@ -1,0 +1,30 @@
+output.file 
+x_min (normally 0)
+y_min (normally 0)
+x_step (normally 1)
+y_step (normally 1)
+x_cnt (number of rows of input)
+y_cnt (number of columns of input)
+data11 data12 data13 data14 .... (x by y matrix of doubles)
+data21 data22 data23 ....
+.
+.
+.
+datax1 datax2 ... dataxy
+Number of header lines (multiple header lines available)
+header1
+header2
+...
+Number of header lines (multiple header lines available)
+foot1
+foot2
+...
+Title of x-axis
+Title of y-axis
+Title of z-axis
+xlabel0 (x_cnt number of labels for ticks along x-axis)
+...
+xlabelx
+ylabel0 (y_cnt number of labels for ticks along y-axis)
+...
+ylabely

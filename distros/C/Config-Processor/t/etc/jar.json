@@ -1,0 +1,50 @@
+{ "jar": {
+    "param1": "jar:${foo.param1}",
+    "param2": "jar:${foo.param2}; jar:${ bar.param2 }",
+
+    "param3": {
+      "param3_1": "jar:${foo.param3.param3_1}; jar:${bar.param3.param3_3}",
+      "param3_2": "jar:${ foo.param3 . param3_3 }; jar:${bar.param3.param3_1}"
+    },
+
+    "param4": [
+      "jar:${foo.param4.0}; jar:${bar.param4.1}",
+      "jar:${bar.param4.1}; jar:${foo.param4.0}",
+      "jar:${foo.param6.param6_2.0}; jar:${bar.param6.param6_2.1}",
+      "jar:${bar.param6.param6_2.1}; jar:${foo.param6.param6_2.0}",
+      "jar:${foo.param6.param6_5.0}; jar:${bar.param6.param6_5.1}"
+    ],
+
+    "param5": [
+      "jar:${jar.param1}; jar:${jar.param2}",
+      { "param5_2_1": "jar:${jar.param3.param3_1}; jar:${jar.param3.param3_2}",
+        "param5_2_2": "jar:${jar.param4.0}; jar:${jar.param4.3}"
+      },
+      "jar:${jar.param4.1}; jar:${jar.param4.4}"
+    ],
+
+    "param6": {
+      "param6_1": "jar:${jar.param5.0}; jar:${jar.param5.1.param5_2_1}",
+      "param6_2": [
+        "jar:${jar.param5.1.param5_2_2}",
+        "jar:${jar.param5.2}"
+      ],
+      "param6_3": "jar:${jar.param6.param6_2.0}",
+
+      "param6_4": "jar:$${foo.param1}",
+
+      "param6_5": "jar:${foox.param3.param3_1}",
+      "param6_6": "jar:${foo.param3X.param3_1}",
+      "param6_7": "jar:${foo.param3.param3X}",
+      "param6_8": "jar:${jar.param5.3}"
+    },
+
+    "param7": {
+      "param7_1": "jar:val7_1",
+      "param7_2": "jar:val7_2",
+      "param7_3": "jar:${.param7_1}; jar:${.param7_2}",
+      "param7_4": "jar:${.param7_3}",
+      "param7_5": "jar:${..param3.param3_1} jar:${..param4.1}"
+    }
+  }
+}

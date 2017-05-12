@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+# 2004 (c) by Marcus Thiesen (marcus@thiesen.org)
+# This file is a part of Curses::UI::POE and might be distributed 
+# under the same terms as perl itself.
+
+# Use the libraries from the distribution, instead of 
+# system wide libraries.
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use strict;
+use Curses::UI::POE;
+
+$Curses::UI::debug = 0;
+
+my $cui = new Curses::UI::POE( -color_support => 1 );
+
+my $win1 = $cui->add(
+		     'win1', 'Window',
+		     -border => 1,
+		     -y    => 1,
+		     -bfg  => 'red',
+		     );
+
+$win1->add("box1", "Buttonbox",
+	   -buttons => [ {
+	       -label => "< ADD >",
+	        }, {
+		-label => "< FOO >" }] ,
+
+	 );
+
+$win1->add("box2", "Buttonbox",
+	   -y => 10,
+	   -vertical => 1,
+	   -buttons => [ {
+	       -label => "< ADD >",
+	        }, {
+		-label => "< FOO >" }] ,
+
+	 );
+
+$cui->set_binding( sub {exit 0;}, "q");
+$cui->MainLoop;

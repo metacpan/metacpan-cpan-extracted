@@ -1,0 +1,25 @@
+Revision history for Perl extension Catalyst::Plugin::Charsets::Japanese.
+
+0.06  Thu Sep 21 16:00:00
+    - bugfix: fixed Shift_JIS abbreviation.
+    - POD Shift-JIS -> Shift_JIS
+    - added live tests!
+
+0.05  Thu May 7 11:20:00
+    - bugfix: didn't work well with Static::Simple.
+      thanks to Athushi Kato
+
+0.04  Sat Jan 7 17:30:00
+    - bugfix: didn't work as expected on checking arreyref in prepare_parameters.
+      thanks to makamaka
+
+0.03  Thu Sep 29 02:00:00 2005
+    - little bit fixed documentation
+
+0.02  Wed Jun 29 22:00:00 2005
+    - fixed Nihongo.pod
+
+0.01  Tue Jun 28 18:55:12 2005
+    - original version; created by h2xs 1.23 with options
+        -X -A Catalyst::Plugin::Charsets::Japanese
+

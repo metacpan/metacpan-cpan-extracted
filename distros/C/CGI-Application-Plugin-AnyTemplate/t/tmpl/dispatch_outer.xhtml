@@ -1,0 +1,9 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<span xmlns:tal="http://purl.org/petal/1.0/">
+--begin--
+outer_var1:<span tal:replace="outer_var1">var1</span>
+<span tal:replace="structure CGIAPP/dispatch 'embed_inner1'">inner component goes here</span>outer_var2:<span tal:replace="outer_var2">var2</span>
+outer_var3:<span tal:replace="outer_var3">var3</span>
+--end--
+
+</span>

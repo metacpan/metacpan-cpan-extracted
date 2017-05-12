@@ -1,0 +1,8 @@
+Revision history for Catalyst-Plugin-Log4perl-Simple
+
+0.005     2011-11-14 19:36:30 Europe/London
+        updated to use Log::Log4perl::Catalyst instead of deprecated
+        Catalyst::Log::Log4perl
+
+0.004     2011-05-13 18:58:11 Europe/London
+        updated distribution to use Dist::Zilla

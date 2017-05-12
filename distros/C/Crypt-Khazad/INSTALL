@@ -1,0 +1,9 @@
+INSTALLATION
+
+To install Crypt::Khazad, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

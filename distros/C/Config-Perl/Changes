@@ -1,0 +1,19 @@
+Revision history for Perl extension Config-Perl.
+
+0.06	Sat, Jul  2 2016
+	- INCOMPATIBLE CHANGES:
+		- Undump dropped support for Data::Dump (for now)
+		- Undump no longer passes through Config::Perl return values
+	- Undump now supports files ending on a true value (e.g. "1;")
+	- Undump can now read from files and filehandles (via new options)
+	- Added "Dump" helper function to Data::Undump::PPI
+
+0.04	Sat, Apr  2 2016	commit f9640e7d1796ee57aef398d95839ca092d38e65b
+	- added support for "->" dereferencing and thereby
+	  Data::Dumper's self-referential data structures
+	- rewrote many internals, updated documentation
+	- added debug option
+
+0.02	Sat, May 23 2015	commit 4958cad4f3f48f763f4c4d10b5a0cdc4f9a95a3d
+	- first public release
+

@@ -1,0 +1,12 @@
+<config>
+    <main1_only_scalar>i</main1_only_scalar>
+    <main1_overwritten_by_sub1_scalar>n1</main1_overwritten_by_sub1_scalar>
+    <main1_only_hash>
+        <i1>i2</i1>
+        <i3>i4</i3>
+    </main1_only_hash>
+    <main1_overwritten_by_sub1_hash>
+        <n1>n2</n1>
+        <n3>n4</n3>
+    </main1_overwritten_by_sub1_hash>
+</config>

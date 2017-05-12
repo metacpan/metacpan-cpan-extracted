@@ -1,0 +1,75 @@
+<h1 class="caps">Edit role [% role_id %]</h1>
+[% form %]
+
+
+<div class="span-24">
+
+<div class="span-11">
+<form action="/admin/role/[% role_id %]/role/" method="post">
+<fieldset>
+<legend class="alt">Role_Role</legend>
+
+
+  <table>
+  [% WHILE  (role=allroles.next) -%] 
+  [% IF role.id == role_id ; NEXT;  END %]
+
+    <tr>
+       <td><a href="/admin/role/[% role.id %]/edit">[% role.name %]</a></td>
+
+  [% IF dont_print_childrens_role.defined(role.name) || dont_print_parents_role.defined(role.name) %]
+  [% SET type='hidden' %]
+  [% ELSE %]
+  [% SET type='checkbox' %]
+  [%  END %]
+
+       <td><input type="[% type %]" name="inherits_from_id" value=[% role.id %]
+  [% IF role_roles_id.defined(role.id) %]
+       checked
+  [% END %]
+></td
+    </tr>
+  [% END %]
+  </table>
+
+  <div class="buttons">
+  <button name="submit" class="positive" ><img src="[% c.config.static_url_path %]/images/icons/tick.png" alt="">Save</button> 
+  </div>
+
+</fieldset>
+</form>
+</div>
+
+
+<div class="span-12">
+<form action="/admin/role/[% role_id %]/action/" method="post">
+<fieldset>
+<legend class="alt">Role_Action</legend>
+
+  <table>
+  [% WHILE  (action=allactions.next) -%] 
+  <tr>
+      <td><a href="/admin/action/[% action.id %]/edit">[% action.name %]</a></td>
+      <td>
+         <input type="checkbox" name="action" value=[% action.id %]
+  [% IF role_actions_id.defined(action.id) %]
+       checked
+  [% END %]
+></td>
+  </tr>
+  [% END %]
+  </table>
+
+  <div class="buttons">
+  <button name="submit" class="positive" ><img src="[% c.config.static_url_path %]/images/icons/tick.png" alt="">Save</button> 
+  </div>
+
+</fieldset>
+</form>
+</div>
+</div>
+
+
+<div class="span-24">
+<a href="/admin/role/list">Return to listing</a>
+</div>

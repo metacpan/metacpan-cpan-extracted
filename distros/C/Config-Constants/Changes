@@ -1,0 +1,26 @@
+Revision history for Perl extension Config-Constants.
+
+0.03 Thurs May 5 2005
+    - fixed bug where XML includes would not properly
+      shadow (or be shadowed) for <module>
+        - added tests for this
+    - refactor code to be more modular
+    - add test for module reloading (ala - Apache::Reload)
+        - update docs to explain this feature
+
+0.02 Wed May 4 2005
+    - added support for more complex XML constants
+        - added tests for this
+        - added docs for this
+    - added support for including XML documents from
+      within the configs 
+        - added tests for this
+    - move XML::SAX::Handler code into it's own module        
+    - restructured Perl config format 
+        - changed internal XML format to match it
+        - changed docs for this
+    
+
+0.01 Wed May 4 2005
+    - module created
+

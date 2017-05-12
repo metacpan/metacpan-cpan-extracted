@@ -1,0 +1,21 @@
+## Demo of the functional interface to ClearCase::Argv.
+
+use Argv qw(qv);
+use ClearCase::Argv qw(ctsystem ctqv);
+
+# Use the vanilla qv() for a non-cleartool operation.
+my $year = qv({autochomp=>1}, 'date', '+%Y');
+print "year = $year\n";
+
+# Use the ClearCase::Argv::system for a 'cleartool pwv'.
+ctsystem({stdout=>2}, 'pwv');
+
+# Show how to use ctqv() (aka ctqx) to capture stderr and not stdout,
+# in a way that will work on UNIX or Windows.
+my @errmsgs = ctqv({autochomp=>1, stdout=>0, stderr=>1},
+					'ls', [qw(-d -s)], qw(. nosuchfile));
+print "==@errmsgs==\n";
+
+# How to use autoglobbing (generally only useful on Windows platforms).
+# See how the straight system() function doesn't do the right thing on Windows.
+ctsystem({syxargs=>1, autoglob=>1, dbglevel=>1}, 'ls', ['-d'], '*');

@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+
+# $Id: update-cfe,v 1.11 2001/04/10 13:24:54 jh Exp $
+
+#	Copyright 2001 Jörgen Hägg
+#	You may distribute under the terms of the GNU General Public License.
+
+
+use Config::Cfe;
+use Getopt::Long;
+use strict;
+
+my ($debug, $verbose, $file, $infile, $stdin, $add, $remove,
+	$after, $before, $afters, $befores);
+GetOptions('d' => \$debug, 'v' => \$verbose,
+	'edit=s' => \$file, 'infile=s' => \$infile,
+	'after=s' => \$after, 'before=s' => \$before,
+	'after-sect=s' => \$afters, 'before-sect=s' => \$befores,
+	'stdin' => \$stdin,
+	'add=s' => \$add, 'remove=s' => \$remove);
+die "$0:usage --edit file_to_change {--add section,--remove section} ".
+	"{--infile file,--stdin}\n" unless ($add && $file &&
+	($infile || $stdin)) || ($remove && $file);
+
+set_debug $debug, $verbose;
+######################################################################
+if (-e $file) {
+	read_file $file;
+}
+else {
+	new_file $file;
+}
+if ($add) {
+	delete_sect $add;
+	if ($afters && locate "^# CFE end <$afters>") {
+		append_sect $add;
+	}
+	elsif ($befores && locate "^# CFE begin <$befores>") {
+		insert_sect $add;
+	}
+	elsif ($after && locate $after) {
+		append_sect $add;
+	}
+	elsif ($before && locate $before) {
+		insert_sect $add;
+	}
+	else {
+		goto_end;
+		append_sect $add;
+	}
+	if ($stdin) {
+		while(<>) {
+			chop;
+			append $_;
+		}
+	}
+	else {
+		append_file $infile;
+	}
+	end_sect;
+}
+else {
+	delete_sect $remove;
+}
+write_file;
+0;
+######################################################################
+__END__
+
+=head1 NAME
+
+update-cfe - add/remove sections in configuration files
+
+=head1 SYNOPSIS
+
+B<update-cfe> --add section --edit file [-d] [-v] {--infile infile,--stdin}
+[--after regexp] [--before regexp]
+
+B<update-cfe> [-d] [-v] --remove section
+
+=head1 DESCRIPTION
+
+B<update-cfe> updates a text file and either add or removes a chunk of
+text delimited by a B<cfe> section tag.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -d
+
+Set debug mode, write_file will not overwrite destination file if debug
+is non-zero.
+
+=item -v
+
+Verbose editing
+
+=item --stdin
+
+Read data to be added from stdin.
+
+=item --infile file
+
+Read data to be added from file I<file>.
+
+=item --add section
+
+Add text to file.
+I<section> is a B<cfe> section tag, can be anything
+acceptable to B<cfe>.
+B<add> will try to remove the section before adding it.
+
+=item --remove section
+
+Remove text from file.
+I<section> is a B<cfe> section tag, can be anything
+acceptable to B<cfe>.
+
+=item --after-sect section
+
+Will add section of text after I<section> or at the end of file
+if not found.
+
+=item --before-sect section
+
+Will add section of text before I<section> or at the end of file
+if not found.
+
+=item --after regexp
+
+Will add section of text after I<regexp> or at the end of file
+if not found.
+
+=item --before regexp
+
+Will add section of text before I<regexp> or at the end of file
+if not found.
+
+=head1 AUTHOR
+
+Written by Jörgen Hägg <jh@axis.com>.
+
+
+=head1 BUGS
+
+Of course not! :-)
+
+=cut
+

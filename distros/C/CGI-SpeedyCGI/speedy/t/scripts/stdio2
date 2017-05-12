@@ -1,0 +1,15 @@
+
+# Copy stdin to stdout or stderr.  Try to mess up the STD* files when done.
+
+my $out = $ARGV[0] ? \*STDERR : \*STDOUT;
+
+while (<STDIN>) {
+    print $out $_;
+}
+
+# Try to break stdio
+open(F, ">/dev/null") || die;
+select(F);
+open(STDIN, '>&F') || die;
+open(STDOUT, '>&F') || die;
+open(STDERR, '>&F') || die;

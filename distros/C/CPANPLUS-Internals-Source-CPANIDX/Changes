@@ -1,0 +1,13 @@
+==============================
+2011-02-28 19:22:00 +0000 0.04
+==============================
+
+  commit 898c24a1f10ece7878a5a86bfea9caf45a2f6856
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Feb 28 19:22:00 2011 +0000
+  
+    Convert the distribution to Dist::Zilla and bump version to 0.04 
+
+====================================
+End of changes in the last 1825 days
+====================================

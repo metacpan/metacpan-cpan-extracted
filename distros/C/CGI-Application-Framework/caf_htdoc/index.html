@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>CGI::Application::Framework</title>
+	<link rel="stylesheet" href="!!- url_example_css -!!" type="text/css" />
+</head>
+
+<body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+	<div id="nav">
+		<span class="link"><a href="!!- url_app_cgi -!!/Example/example_1">One</a></span>
+		<span class="link"><a href="!!- url_app_cgi -!!/Example/example_2a">Two</a></span>
+		<span class="link"><a href="!!- url_app_cgi -!!/Example/example_3">Three</a></span>
+		<span class="link"><a href="!!- url_app_cgi -!!/Example/example_4">Four</a></span>
+		<span class="link"><a href="!!- url_app_cgi -!!/Example/example_5">Five</a></span>
+
+	</div>
+
+	<div id="main">
+		<h1>CGI::Application::Framework</h1>
+		<h2>Features</h2>
+		<ul>
+			<li>MVC Development with CGI::Application</li>
+			<li>
+		    Choice of templating system
+            (via CGI::Application::Plugin::AnyTemplate)
+				<ul>
+					<li>HTML::Template</li>
+					<li>HTML::Template::Expr</li>
+					<li>Template::Toolkit</li>
+					<li>Petal</li>
+				</ul>
+			</li>
+			<li>Form Validatation and Sticky Forms<br />
+			   (via CGI::Application::Plugin::ValidateRM)</li>
+			<li>Easy (optional) Class::DBI integration</li>
+			<li>Session Management<br />
+			   (Apache::SessionX)</li>
+
+			<li>Authentication</li>
+			<li>
+				Login Managment
+				<ul>
+					<li>login form</li>
+					<li>relogin after session timeout</li>
+					<li>form state is saved after relogin</li>
+			   </ul>
+			</li>
+			<li>Nested page components (Headers, Footers, Navbars)</li>
+			<li>Powerful configuration system<br />
+			   (via CGI::Application::Plugin::Config::Context)</li>
+			<li>Link Integrity system</li>
+			<li>Logging<br />
+			   (via CGI::Application::Plugin::Log::Dispatch)</li>
+		</ul>
+	</div>
+</body>
+
+</html>
+

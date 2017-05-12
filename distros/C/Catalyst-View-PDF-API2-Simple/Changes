@@ -1,0 +1,8 @@
+Revision history for Catalyst-View-PDF-API2-Simple
+
+0.02    2014-08-12
+        Added Test::WWW::Mechanize::Catalyst in required module
+
+0.01    2009-08-30
+        First version, to be release.
+

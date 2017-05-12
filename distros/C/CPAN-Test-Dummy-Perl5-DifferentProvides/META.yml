@@ -1,0 +1,37 @@
+---
+abstract: 'Dist with non-matching provides'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Test-Dummy-Perl5-DifferentProvides
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  CPAN::Test::Dummy::Perl5::DifferentProvides:
+    file: lib/CPAN/Test/Dummy/Perl5/DifferentProvides.pm
+    version: '0.01'
+  CPAN::Test::Dummy::Perl5::DifferentProvides::B:
+    file: lib/CPAN/Test/Dummy/Perl5/DifferentProvides/B.pm
+    version: '0.01'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides/issues
+  homepage: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides
+  repository: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides.git
+version: '0.01'

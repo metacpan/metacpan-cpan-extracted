@@ -1,0 +1,5 @@
+MANIFEST
+lib/CGI/Scriptpaths.pm
+t/00.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

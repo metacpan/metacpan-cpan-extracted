@@ -1,0 +1,191 @@
+############################################################################
+# Shared code for Cache::AgainstFile tests
+############################################################################
+# $Id: CacheAgainstFile.lib,v 1.5 2005/07/25 11:56:36 piersk Exp $
+#
+# To use this you need to:
+#  - declare $callcount and $callback
+#  - define the SLEEP_INT constant
+############################################################################
+
+############################################################################
+# Some exported variables
+
+$loaddelay = 0;
+$callcount = 0;
+$callback = sub {
+	my $fn = shift();
+	TRACE("CALL : was $callcount");
+	$callcount++;
+	sleep $loaddelay if $loaddelay;
+	TRACE("CALL : now $callcount for file $fn");
+	return "filename:".$fn;
+}; #Callback routine which logs when it's been called
+
+############################################################################
+
+############################################################################
+# perl replacement for the touch() external command
+sub touch {
+	my $filename = shift;
+	if (-e $filename) {
+		utime(time(), time(), $filename);
+	} else {
+		local *X;
+		open(X, ">$filename") or die "Cannot touch $filename: $!";
+		close(X);
+	}
+}
+
+############################################################################
+
+############################################################################
+#Puts the cache through its paces
+sub test_basics
+{
+	my ($cache, $filename, $method, $allow_null_size) = @_;
+	$method ||= $cache->{method};
+	$callcount=0;
+
+	#First time
+	$cache->clear();
+	ASSERT($cache->count() == 0, "$method: count on empty cache");
+	# if $filename is brand new, cachefile will have same mtime
+	# and we'll get two cache hits in a row, so wait a moment.
+	sleep( SLEEP_INT) ;
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method: #1 cache miss");
+	ASSERT($cache->count() == 1, "$method: count after a fetch");
+	my $size = $cache->size();
+	if($allow_null_size && not defined $size){
+		ASSERT(1, "$method: skipped - size not implemented");	
+	} else {
+		ASSERT($cache->size() > 0, "$method: size is nonzero - ".$cache->size());
+	}
+
+	#Second time
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method: #2 cache hit");
+
+	#Touch the file
+	sleep( SLEEP_INT );
+	touch( $filename );
+	$callcount = 0;
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method: touch => stat & cache miss (call count $callcount)");
+
+	#Sneak a sourcefile change in through vulnerable window
+	sleep (SLEEP_INT);
+	$callcount = 0;
+	touch ($filename);
+	$m_before = (stat($filename))[9];
+	$loaddelay = 5;
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method: touch => stat & cache miss (call count $callcount)");
+	# "While we were calculating", the sourcefile was modified
+	$m_before++;
+	(utime $m_before, $m_before, $filename) or die "couldn't posttouch $filename: $!";
+	$callcount = 0;
+	$cache->get($filename);
+	ASSERT($callcount == 1, "window-of-vulnerability check");
+	$loaddelay = 0;
+	
+
+	#Full purge
+	$cache->clear();
+	$callcount = 0;
+	ASSERT($cache->count() == 0, "$method: count after cache is cleared");
+	ASSERT(!defined $cache->size() || $cache->size() == 0, "$method: size is zero");
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method: purge => cache miss (call count $callcount)");
+	$cache->clear();
+}
+
+sub test_nostat
+{
+	my ($cache, $filename, $method) = @_;
+	$method ||= $cache->{method};
+	$callcount=0;
+
+	#First time
+	$cache->clear();
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method (no stat): #1 cache miss");
+
+	#Second time
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method (no stat): #2 cache hit");
+
+	#Poison cache
+	sleep( SLEEP_INT );
+	touch($filename);
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 1, "$method (no stat): touch => no stat & cache hit (call count $callcount)");
+	TRACE("Size before is: ".$cache->count());
+	ASSERT($cache->count() == 1, "$method (no stat): count on stale cache");
+
+	#Purge stale file
+	$cache->purge();
+	TRACE("Size after purge is: ".$cache->count());
+	ASSERT($cache->count() == 0, "$method (no stat): count after purge");
+	ASSERT($cache->get($filename) eq "filename:$filename" && $callcount == 2, "$method (no stat): purge => expel stale (call count $callcount)");
+	$cache->clear();
+}
+
+sub test_max_items
+{
+	my ($cache, $dir, $max, $method) = @_;
+	$method ||= $cache->{method};
+	$callcount=0;
+
+	#Fill Cache
+	$cache->clear();
+	for(1..$max+5)
+	{
+		my $filename = $dir."/file.".$_;
+		touch($filename);
+		sleep( SLEEP_INT );
+		$cache->get($filename);
+	}
+	ASSERT($callcount == $max+5, "$method: cache filled with more than MaxItems");
+
+	#Purge oldest items
+	$callcount=0;
+	$cache->purge();
+	for(1..$max+5)
+	{
+		my $filename = $dir."/file.".$_;
+		$cache->get($filename);
+		unlink($filename);
+	}
+	ASSERT($callcount == 5, "$method: MaxItems retained from purge");
+}
+
+sub test_old_items
+{
+	my ($cache,$dir,$n,$th,$method) = @_;
+	$method ||= $cache->{method};
+	$callcount=0;
+
+	#Fill Cache
+	$cache->clear();
+	for(1..$n)
+	{
+		my $filename = $dir."/file.".$_;
+		touch($filename);
+	}
+	for(1..$n)
+	{
+		my $filename = $dir."/file.".$_;
+		sleep( SLEEP_INT ); #Stagger atime
+		$cache->get($filename);
+	}
+	ASSERT($callcount == $n, "$method: filled with items of different ages [callcount=$callcount n=$n]");
+
+	#Purge oldest items
+	$callcount=0;
+	$cache->purge();
+	for(1..$n)
+	{
+		my $filename = $dir."/file.".$_;
+		$cache->get($filename);
+		unlink($filename);
+	}
+	ASSERT($callcount == ($n-$th), "$method: old items purged [n=$n th=$th callcount=$callcount]");
+}
+
+############################################################################
+
+1;

@@ -1,0 +1,244 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Clio;
+
+# PODNAME: clio
+# ABSTRACT: Command Line Input/Output with sockets and HTTP
+
+
+my $config_file = $ENV{CLIO_CONFIG} || "./clio.conf";
+
+Clio->new(
+    config_file => $config_file,
+)->run;
+
+
+__END__
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+clio - Command Line Input/Output with sockets and HTTP
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+    $ cpanm Clio                    # install
+    $ vim ~/clio.conf               # configure
+    $ CLIO_CONFIG=~/clio.conf clio  # run
+
+=head1 DESCRIPTION
+
+Clio will allow you to connect to your command line utilities over network
+socket and HTTP.
+
+=head1 CONFIGURATION
+
+    <Daemon>
+        User nobody
+        Group nobody
+
+        PidFile /var/run/clio.pid
+    </Daemon>
+
+    <Command>
+
+        # Echo chamber
+        Exec "cat -"
+
+        # or watch you log files
+        # Exec "tail -f /var/log/{maillog,messages,secure}"
+
+        # or run top in batch mode
+        # Exec "top -b"
+
+        # or shell backdoor
+        # Exec "sh -s"
+
+        StartCommands          0
+        MinSpareCommands       0
+        MaxSpareCommands       0
+        MaxCommands            20
+        MaxClientsPerCommand   10
+
+        InputFilter  LineEnd
+        OutputFilter  +MyClio::OutputFilter
+    </Command>
+
+    # HTTP server with WebSocket clients
+    <Server>
+        Listen 0:12345
+
+        Class HTTP
+
+        # HTTP server Plack app wrapper 
+        Builder /var/www/clio/plack.psgi
+
+        <Client>
+            Class WebSocket
+
+            InputFilter  +MyClio::InputFilter::Uppercase
+            OutputFilter LineEnd
+        </Client>
+    </Server>
+
+    <Log>
+        Class Log4perl
+        <Config>
+            log4perl.logger=Error, Log
+
+            log4perl.appender.Log=Log::Dispatch::File
+            log4perl.appender.Log.filename=/var/log/clio/clio.log
+            log4perl.appender.Log.mode=append
+            log4perl.appender.Log.layout=Log::Log4perl::Layout::SimpleLayout
+        </Config>
+    </Log>
+
+There are folowing main configuration blocks:
+
+=head2 Daemon
+
+If C<E<lt>DaemonE<gt>> is present then clio process will daemonize itself.
+
+=over 4
+
+=item * User
+
+=item * Group
+
+Specify user and group under which the server will answer requests.
+
+=item * PidFile
+
+Path to pid file.
+
+=back
+
+=head2 Command
+
+Configuration block of command to be executed.
+
+=over 4
+
+=item * Exec
+
+Command to be executed.
+
+=item * StartCommands
+
+Number of command processes created at startup.
+
+=item * MinSpareCommands
+
+Minimum number of idle command processes.
+
+=item * MaxSpareCommands
+
+Maximum number of idle command processes.
+
+=item * MaxCommands
+
+Maximum number of running command processes.
+
+=item * MaxClientsPerCommand
+
+Maximum number of connected client processes per command.
+
+=item * InputFilter
+
+=item * OutputFilter
+
+Optional name of the packages used to filter command's input and output.
+
+If name does not start with C<+> then I<Clio::Process> prefix will be used
+to load specified filter, eg L<Clio::ProcessInputFilter::LineEnd>.
+
+=back
+
+=head2 Server
+
+=over 4
+
+=item * Listen
+
+IP address and port that the server listens to.
+
+=item * Class
+
+Name of the package acting as server.
+
+If name does not start with C<+> then I<Clio::Server::> prefix will be used
+to load specified filter, eg L<Clio::Server::HTTP>.
+
+Servers may specify additional parameters, eg. Clio::Server::HTTP allows C<Builder> option.
+
+=item * Builder
+
+Optional path to file returning Plack application - object with C<to_app()> method or
+simply PSGI applicationcode reference, see I<examples/> dir.
+
+Note: option used by L<Clio::Server::HTTP> only.
+
+=item * Client
+
+Inner block defining Server's Client options.
+
+=over 4
+
+=item * Class
+
+Name of the package acting as client.
+
+If name does not start with C<+> then resolved I<Server>'s C<Class> prefix + I<::Client::> will
+be used to load specified filter, eg L<Clio::Server::HTTP::Client::WebSocket>.
+
+=item * InputFilter
+
+=item * OutputFilter
+
+Optional name of the packages used to filter client's input and output.
+
+=back
+
+=back
+
+=head2 Log
+
+Log configuration block.
+
+=over 4
+
+=item * Class
+
+Name of the package acting as logger.
+
+If name does not start with C<+> then I<Clio::Log::> prefix will be used
+to load specified filter, eg L<Clio::Log::Log4perl>.
+
+=item * Config
+
+Class specific configuration.
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

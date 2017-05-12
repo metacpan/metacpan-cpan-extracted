@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html ; charset=iso-8859-1">
+  <title>Le Informazioni di DSLIP</title>
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+</head>
+<body>
+  La lista completa delle opzioni possibili di DSLIP &egrave;: 
+  <dl>
+    
+    <dt class="l1">D - Stadio Di Sviluppo (Nota: * NESSUNA SCALA CRONOLOGICA IMPLICITA *)</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>i</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Idea, elencata per guadagnare consenso o come segnaposto</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>In sviluppo come pre-alfa (non ancora rilasciato)</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Versione alfa</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Versione beta</td>
+        </tr>
+      
+        <tr>
+          <td>R</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Rilasciato</td>
+        </tr>
+      
+        <tr>
+          <td>M</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Maturo (nessuna definizione rigorosa)</td>
+        </tr>
+      
+        <tr>
+          <td>S</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Standard, distribuito con il Perl 5</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">S - Livello del Supporto</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>m</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Mailing-List</td>
+        </tr>
+      
+        <tr>
+          <td>d</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Sviluppatore</td>
+        </tr>
+      
+        <tr>
+          <td>u</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Newsgroup Usenet comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Non noto, provare comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Abbandonato, il modulo &egrave; stato abbandonato dal suo autore</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">L - Linguaggio Usato</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl solamente, nessun compilatore &egrave; necessario, dovrebbe essere independente della piattaforma</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C e Perl, un compilatore C sar&agrave; necessario</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Ibrido, scritto in Perl con parti di codice C opzionali, nessun compilatore &grave; necessario</td>
+        </tr>
+      
+        <tr>
+          <td>+</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C++ e Perl, un compilatore C++ sar&agrave; necessario</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl e un altro linguaggio tranne il C o il C++</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">I - Stile dell'Interfaccia</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>f</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Solo Funzioni, senza utilizzo di riferimenti</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Ibrido, interfacce ad oggetti e funzioni disponibili</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Nessuna interfaccia (huh?)</td>
+        </tr>
+      
+        <tr>
+          <td>r</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Utilizzo di riferimenti non 'blessed' o di legami (tie)</td>
+        </tr>
+      
+        <tr>
+          <td>O</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Orientato agli Oggetti con utilizzo di riferimenti 'blessed' e/o ereditariet&agrave;</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">P - Licenza Pubblica</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl Standard: l'utente pu&ograve; scegliere fra le licenze GPL ed Artistic</td>
+        </tr>
+      
+        <tr>
+          <td>g</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>GPL: GNU General Public License</td>
+        </tr>
+      
+        <tr>
+          <td>l</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>LGPL: "GNU Lesser General Public License" (in passato conosciuta come "GNU Library General Public License")</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>BSD: BSD License</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Artistic License solamente</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>altro (ma la distribuzione &egrave; permessa senza limitazioni)</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+  </dl>
+  <p><b>INFORMATIVA:</b> Lo stato del campo Pubblica Licenza &egrave; inteso
+   solamente a fini informativi e non costituisce alcun legame legale di
+   nessun genere. Per ottenere le opportune informazioni sui reali
+   termini di licenza di un modulo e dei relativi file, siete pregati di
+   riferirvi alla distribuzione del modulo o di mettervi in contatto con
+   l'autore. Siete pregati di informare <a
+   href="mailto:modules@perl.org">modules@perl.org</a> se incontrate
+   qualunque incongruenza fra il contenuto del campo Pubblica Licenza e
+   quello che la distribuzione realmente dice a proposito.
+</p>
+  <hr>
+</body>
+</html>
+

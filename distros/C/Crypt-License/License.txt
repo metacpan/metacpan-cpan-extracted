@@ -1,0 +1,46 @@
+                        BizSystems Software License
+
+DO NOT USE THE SOFTWARE UNTIL YOU HAVE READ THIS LICENSE AGREEMENT.
+  BY USING THE SOFTWARE (OR AUTHORIZING ANY OTHER PERSON TO DO SO)
+                YOU ACCEPT THIS LICENSE AGREEMENT.
+
+License Grant: BizSystems grants to you, and you purchase, subject to the
+following terms and conditions, a nonexclusive, nontransferable right to use
+the accompanying copy of the Software. BizSystems and/or its licensors
+reserve all rights not expressly granted to you.
+
+Protection of Software: You agree to take all reasonable steps to protect
+the Software and Documentation from unauthorized copying or use. The
+Software represents and embodies trade secrets of BizSystems and/or its
+licensors. You agree not to disassemble or decomplie the Software in order
+to discover the trade secrets contained therein.
+
+Copies and Adaptations: Except as otherwise provided in this License, you
+may not make or authorize the making of copies of adaptations of the
+Software except as an essential step in the utilization of the Software, or
+for archival purposes or backup use of the Software. All proprietary rights
+notices must be faithfully reproduced and included on all copies and
+adaptations. Unless explicitly stated in th Documentation, you may not copy
+the documentation.
+
+Ownership: Ownership of, and title to, the Software and Documentation
+(including any adaptations or copies shall be held by BizSystems and/or its
+licensors. Copies are provided to you only to allow you to exercise your
+rights under the License. Only the License is purchased by you.
+
+Restrictions: Except as expressly authorized in this Agreement, you agree
+not to rent, lease, sublicense, distribute, copy, reproduce, display, or
+modify the Software or Documentation.
+
+Limited Liability: Although BizSystems has tested the Software and reviewed 
+the Documentation, BizSystems makes no warranty or representation, either 
+express or implied, with respect to the Software and its Documentation, 
+its quality, performance, merchantability or fitness for a particular 
+purpose. As a result, the Software and Documentation is licensed "as is" and 
+you are assuming the entire risk as to its quality and performance.
+In no event will BizSystems be liable for direct, indirect, special,
+incidental or consequential damages resulting from any defect in the
+Software or its Documentation.
+
+Term: This Agreement is effective from the date you use the Software, and
+will remain in force until breached.

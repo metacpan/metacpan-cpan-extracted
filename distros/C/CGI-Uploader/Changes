@@ -1,0 +1,305 @@
+Revision history for Perl extension CGI::Uploader.
+
+2.18  Feb 1, 2011
+
+    [INTERNAL]
+
+    - We now call "local $CGI::DISABLE_UPLOADS=0" just before uploading with
+      CGI.pm or CGI::Simple. For improved security, set the related variable
+      globally to "1" to disable file uploads by default, and then re-enable
+      them any other places where you need uploading enabled. Read about
+      $DISABLE_UPLOADS in CGI.pm or CGI::Simple for details.
+      (Thanks to Brian Meeker for help with this patch.)
+
+    - Now require Perl 5.8 as the minimum version. 
+
+    - Address warning about $fm_mt being undefined.
+
+2.17 Thu Apr  2 11:43:50 EDT 2009
+    [BUG FIXES]
+    - Small but fatal typo fix from 2.16 release cycle. 
+
+2.16 Thu Apr  2 11:36:40 EDT 2009
+
+    [BUG FIXES]
+    - Using 'transform_method' to tranform an upload in place was broken.
+    - Now use File::Spec instead of hardcoding "/" as a path separator. (Ron Savage) 
+    - Use binmode() on the right file handle (Ron Savage)
+    - upload_id was hardcoded in one place instead of using up_table_map (Ron Savage)
+
+    [DOCUMENTATION]
+    - Quit recommending SQL::Abstract in the Cookbook (but we use it internally)
+
+    [INTERNAL]
+    - Mark "Image::Size" as a requirement, if only to get tests to stop failing.
+      It's only really required if  you use the Image::Magick transformations. 
+
+
+2.15 Sun Jul 15 07:21:24 EDT 2007
+    - no functionality changes
+
+    [INTERNAL]
+    - improved importing code style.
+    - Clarify docs regarding file_scheme vs. file_name (Jaldhar)
+
+2.14 Thu May 24 13:19:27 EDT 2007
+
+    [BUG FIXES]
+    - Avoid SQL error when two column names are the same by giving explicit table name.
+
+2.13 Mon Apr  9 22:39:54 EDT 2007
+
+    [BUG FIXES]	
+    - Better Mac OS X detection (Jeff MacDonald)
+    - gen_thumb() now works if Image::Magick or Graphics::Magick
+      is not already loaded. (Thanks to bug report by Jeff MacDonald,
+      RT#20775).
+
+2.12 Thu Feb 15 17:43:20 EST 2007
+
+    [ENHANCEMENTS]
+    - Explicitly call File::Temp::cleanup(). This reduces the amount of 
+      disk space and file handles used.
+
+    - A new 'temp_dir' option has been added to allow to you set your own
+      temporary directory. (Jeff MacDonald)
+
+2.11 Mon Dec 19 20:18:00 EST 2005
+    [BUG FIXES]
+    - There were was confusion in the 2.1 release as to whether the new API
+      for gen_thumb() took a hash or hashref as input. The code, tests and docs
+      have all been updated to agree: It's a hashref. Thanks to bignose, who
+      wrestled this one.
+
+2.1 Sun Dec 18 21:39:23 EST 2005
+    [ENHANCEMENTS]
+    - Further simplified necessary spec API, while maintaining backwards
+      compatibility.  Specifying a transformation method for a generated file
+      can now by this simple: 
+
+       gen_files => {
+           photo_thumbnail =>  gen_thumb({ w => 100, h => 100}),
+       }
+
+
+2.0 Sat Dec 17 23:12:35 EST 2005
+
+    [ENHANCEMENTS]
+    - Previously the extension and MIME type were inherited
+      by generated files. Now the metadata for generated files
+      is extracted directly from them. This should be useful
+      if you want to create thumbnails in a different image format
+      than the large images. 
+
+    - A cleaner and simpler API for calling gen_thumb() and other potential
+      transform_methods has been introduced. The new syntax looks like this:
+
+         transform_method => gen_thumb({ w => 100, h => 100 }),
+   
+      The old syntax is still supported.    
+
+    - "gen_thumb()" can now return the Image/Graphics::Magick object as a
+      second argument. This may not be useful outside of the test suite...
+
+    [BUG FIXES]
+    - Image::Magick is no longer required to install CGI::Uploader, just
+      recommended.
+
+    - If an uploaded was updated and had its MIME type changed in the process,
+      the old file was left on the file system. Fixed. 
+
+    - If 'up_table_map' was used to modify the name of the extension field, 
+      then transform_meta() would return empty values for the extensions. Fixed.
+
+    [INTERNALS]
+    - Migrated Makefile.PL to use Module::Install. This allows me to keep the hairy 
+      Makefile.PL stuff I have, but easily add 'no_index' and 'recommends' metadata.
+    - test suite clean up.
+    - new required modules: Scalar::Util and HTTP::Request::Common
+
+1.2 Thu Dec 15 22:35:39 EST 2005
+    [BUG FIXES]
+    - Fixed bug in store_uploads() from improper hash usage.  
+
+    [INTERNALS]
+    - Fixed some typos in Makefile.PL requirements 
+    - Made test suite use SQLite by default for easier testing. 
+
+1.1 Wed Dec 14 21:23:56 EST 2005
+    [INTERNALS]
+    - Now require at least Params::Validate 0.77 (RT#13728)
+    - ..and require at least File::Temp 0.14, for a better chance 
+      of using a real temporary directory. 
+
+1.1_1 Mon Apr  4 07:52:01 EST 2005
+    [THINGS THAT MIGHT BREAK YOUR CODE]
+    - 'file_name' is now required in the data model. You can simply add it before upgrading.
+      Something like this should work: 
+        ALTER TABLE your_table_name ADD COLUMN file_name VARCHAR(255);
+
+      Of course, you can name the column something else with the up_table_map. 
+
+    [ENHANCEMENTS]
+    - extract_meta() now also returns the original filename with the
+      'file_name' key.
+
+    - PostgreSQL via ODBC is now supported (William McKee)
+
+    [BUG FIXES]
+    - Fixed RT#12051, an XSS issue in an example application. (William McKee).
+
+    [INTERNALS]
+    - Clean up some test warnings (Denis McKeon)
+    - Better diagnostics in ImageMagick.pm (William McKee)
+
+1.00
+    - No code changes, I'm just declaring it stable. 
+    - Mention availability via darcs
+
+0.80_02 08/19/04 
+    - Added missing ImageMagick.pm (Barbie)
+    - Made t/up_table_map.t more portable (Barbie)
+
+0.80_01
+    [RELEASE NOTES]
+    I changed the API again. The code has been refactored to remove all
+    image-specific code from the main package. In it's place a more general 
+    "transform_method" option has been added. With this, you can specify 
+    any arbitrary transformation you want to make to a file.  You might 
+    choose to decrypt a file, compress it, append to it, or otherwise alter
+    it. 
+
+    The thumbnailing code still exists, but has been moved to
+    CGI::Uploader::Transform::ImageMagick::gen_thumb().
+
+    However, most of the examples and tests still do rely on "gen_thumb()" for
+    examples, so test failures will occur if Image::Magick is not installed for
+    now. I'd like some help to streamline this. 
+
+    Along the way, I removed the regular expression support to simplify the
+    refactoring. It may well come back. 
+
+    Beyond these changes, things are pretty much the same. Let me know
+    if you have any feedback on the API before this turns into a stable
+    1.0 release.
+
+    Mark Stosberg
+    mark@summersault.com
+
+0.76.02
+	[ENHANCEMENTS]
+	- Added image gallery recipe to cookbook
+	- Added README to examples/friends_photos
+
+0.76_01 Sun Apr 25, 2004
+     [BUG FIXES]
+     - Fixed syntax errors in Cookbook SQL example
+     - Fixed bug where default query object wasn't loading correctly
+     - Fixed documtention of fk_meta() to match current interface.
+     - Fixed bug in t/up_table_map.t test
+     
+     [ENHANCEMENTS]
+     - Added example application to distribution
+
+0.75_02
+    - Refactored delete_upload() to be simpler and more intuitive.
+
+0.75_01
+     Added support for specifying fields to process via regular expressions. 
+    - Improved Cookbook documentation. 
+
+0.70_02 Wed Apr 21, 2004
+    - Removed custom_meta(). This problem space is now addressed by 
+      allowing meta data to be passed to store_uploads(). Also, you could
+      override extract_meta() to add more functionality there.
+    - Added support for storing files based on a MD5 sum of the files 
+      ID. This allows the file storage to scale well for millions of uploads.
+      See the docs for 'file_scheme' for detaills. (Thanks to Randal Schwartz
+      for the suggestion). 
+    - Added option to specify only a max width or max height for thumbnails.
+    - Refactored several interfaces to use named parameters. 
+    - Added 'downsize' option to spec, allowing downsizing of primary images.
+
+0.70_01
+    - Added to binmode() calls to file handles, to possibly help Windows.
+	- Added support for uploading via CGI::Simple
+	- Added experimental support for uploading via Apache::Request
+	- Added Cookbook documentation
+	- Added 'thumbnail_of_id' column to meta data table.
+    - Added delete_thumbs() method
+    - Started to do real 'updates' rather than delete/re-inserts
+	- Cleaned up prequisites in Makefile.PL
+	- Fixed bug and added test for proper thumbnail resizing
+    - More API refactors
+
+0.63_01
+    - Removed some un-needed mentions of Data::FormValidator from tests
+    - added test to verify thumbnail size
+    - refactored resize code into gen_thumb(). This will make it easier 
+      to support other resize modules besides Image::Magick. 
+    - Added Image::Size as a dependency. It's a fast tool for size checking
+      which does not depend on a graphics module being installed. 
+    - Initial support for resizing with GD as a backup. It needs tested. 
+
+0.62_01
+    - Added File::Temp to Makefile.PL. 
+    - Refactored to remove store_thumb(). This should help eventually support other
+      graphics modules besides Image::Magick
+
+0.61_02
+    - Minor POD cleanups
+
+0.61_01
+    - Added custom_meta() method for more flexible meta data handled
+    - clarified code and extended documentation
+    - exposed 'build_loc' function, which may be useful as a utility function,
+      or for a sub-class.
+    - custom fields are now returned with meta_hashref() 
+
+0.60_02
+    - Added up_table_map test and fixed some related code.
+
+0.60_01
+    - Added 'up_table_map' configuration option, allowing for custom column
+      names.
+    - Documentation for several functions added.
+    - Began refactoring to make support for Apache::Request easier.  
+
+0.50_03 Mon Mar 22, 2004
+    - possible "binmode" test fix for Windows platforms.
+
+0.50_02 Sun Mar 21, 2004
+    - Removed dependence on Image::Size 
+    - Documentation clarifications (David Manura)
+
+0.50_01 Web Feb 11, 2004
+    - Removed dependence on Data::FormValidator
+
+0.40_01 Sun Feb 8, 2004
+    - Extensive documentation updates, thanks to feedback from David Manura.
+
+0.30_01 Fri Feb 6, 2004 
+    - The API was largely re-worked, with several methods renamed and a few
+      added. No backwards compatibility can be expected. 
+
+0.10  
+	[THINGS THAT MIGHT BREAK YOUR CODE]
+	- create_img_tmpl_vars() has been replaced
+	  with a more generic create_tmpl_vars(). 
+	  It should still work the same for images,
+	  and better for non-images
+
+	- install_uploads() Now returns a hash ref 
+	based on the valid hash, with appropriate additions
+	and deletions already made.
+
+    - The interface for delete_upload() has changed to accomodate
+	deleting based on directly providing a upload ID.
+
+0.02  Sun May 18 2003
+	- initial public release
+
+0.01  Sat May 17 16:15:05 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.5.0 -XAn CGI::Uploader
+

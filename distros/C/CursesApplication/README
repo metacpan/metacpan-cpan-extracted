@@ -1,0 +1,35 @@
+Curses::Application Module for Perl
+===================================
+
+Author: Arthur Corliss
+Date:  November 14, 2002
+
+Description:
+------------
+
+Curses application framework for rapid application development.
+
+Requirements:
+-------------
+
+--(n)Curses libraries
+--Curses module
+--Curses::Widgets modules
+--Curses::Forms modules
+
+Instructions:
+-------------
+
+All that one needs to do is:
+
+	perl Makefile.pl
+	make test
+	make install
+
+Documentation for using the module(s) is available if one types the following:
+
+	perldoc Curses::Application
+
+If you find any value in these modules, write me!  All hints, tips, and wishes
+are welcome at corliss@digitalmages.com.
+

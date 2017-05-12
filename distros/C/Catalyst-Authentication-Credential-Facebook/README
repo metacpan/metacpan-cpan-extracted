@@ -1,0 +1,85 @@
+NAME
+    Catalyst::Authentication::Credential::Facebook - Facebook authentication
+    for Catalyst
+
+SYNOPSIS
+    In MyApp.pm
+
+     use Catalyst qw/
+        Authentication
+        Session
+        Session::Store::FastMmap
+        Session::State::Cookie
+            Facebook
+     /;
+     
+ MyApp->config(
+         "Plugin::Authentication" => {
+             default_realm => "facebook",
+             realms => {
+                 'facebook' => {
+                     credential => {
+                         class => "Facebook",
+                     },
+                 },
+             },
+         },
+     );
+
+    And then in your Controller:
+
+     sub login : Local {
+        my ($self, $c) = @_;
+       
+        if (my $user = $c->authenticate(undef,'facebook')) {
+                    # user is logged in - redirect or do something
+            }
+            else {
+                    # user has no account in your system
+                    # detect Facebook credentials and create an account
+                    # or do comething else
+            } 
+     }
+
+DESCRIPTION
+    This module handles Facebook Platform authentication in a Catalyst
+    application.
+
+METHODS
+    As per guidelines of Catalyst::Plugin::Authentication, there are two
+    mandatory methods, "new" and "authenticate".
+
+  new()
+    Will not be called by you directly, but will use the configuration you
+    provide (see above). WWW::Facebook::API is required, but we also suggest
+    you install Catalyst::Plugin::Facebook for ultimate Facebook integration
+    after the user is authenticated.
+
+  authenticate( )
+    Handles the authentication. Nothing more, nothing less. It returns a
+    Catalyst::Authentication::User::Hash (this is a user object from your
+    database - the user table should have a column called "facebook_id",
+    which the authenticated Facebook user is checked against)
+
+AUTHOR
+    Jesse Stay <jesse@staynalive.com> <http://staynalive.com>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Catalyst::Plugin::Authentication, WWW::Facebook::API
+
+BUGS
+    "Bugs? Impossible!". Please report bugs to
+    <http://rt.cpan.org/Ticket/Create.html?Queue=Catalyst-Authentication-Cre
+    dential-Facebook>
+
+THANKS
+    Special thanks to David Romano and Clayton Scott for writing and
+    maintaining WWW::Facebook::API
+

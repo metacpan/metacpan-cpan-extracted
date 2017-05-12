@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/authman
+cgi-bin/auth.cgi
+cgi-bin/auth/README
+cgi-bin/auth/authman.pl
+cgi-bin/auth/login.html
+cgi-bin/auth/sess/README
+cgi-bin/auth/user.dat
+lib/CGI/Auth/Auto.pm
+t/00.t
+t/CGI-Auth-Auto-1.20-1.21.patch

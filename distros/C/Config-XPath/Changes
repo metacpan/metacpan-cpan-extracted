@@ -1,0 +1,80 @@
+Revision history for Config-XPath
+
+0.16    CHANGES:
+         * Throw plain string-based exceptions instead of Error-subclassed
+           ones
+         * Removed prototypes from static functions
+         * use Exporter 'import' instead of @ISAing it
+
+0.15    CHANGES:
+         * Extracted manual examples into a runnable file
+
+        BUGFIXES:
+         * Fixed examples in manual to make them actually run
+         * Fixed minor POD error
+
+0.14    CHANGES:
+         * Added 'use warnings'
+         * Use Test::Refcount to check reference counts
+         * Other small improvements to tests or documentation
+
+0.13    CHANGES:
+         * Allow 'ioref' and 'parser' constructor arguments
+
+        BUGFIXES:
+         * Make sure test scripts clean up temporary files
+
+0.12    CHANGES:
+         * Deprecated the static functions when used as methods
+         * Added a generic ->get method that can return entire HASH/ARRAY
+           value trees. Allow ->get_list and ->get_map to do similar
+
+0.11    CHANGES:
+         * Allow index-based nodelists in addition to key-based nodesets
+
+        BUGFIXES:
+         * Avoid use of '$_' in iterators that call user code
+
+0.10    CHANGES:
+         * Documentation updates
+
+        BUGFIXES:
+         * Don't break relative child node contexts on reload
+
+0.09    CHANGES:
+         * Added ->get_map
+
+        BUGFIXES:
+         * Allow fetching the text() XPath function
+
+0.08    CHANGES:
+         * Allow constructor to take 'xml' argument of plain string
+
+        BUGFIXES:
+         * Declare dependence on Test::More to keep perl 5.6.1 happy
+
+0.07    CHANGES:
+         * Changed constructor style to named arguments
+         * Documentation updates
+
+0.06    CHANGES:
+         * Allow XPath expressions that yield non-nodesets
+           (i.e. strings/ints/booleans)
+         * Shortened ->get_config_string to ->get_string, etc..
+
+0.05    CHANGES:
+         * Licencing change to dual GPL/Artistic
+         * Use Module::Build instead of ExtUtils::MakeMaker
+         * Miscellaneous documentation updates
+
+0.04    BUGFIXES:
+         * Declare dependence on Error >= 0.15
+
+0.03    BUGFIXES:
+         * MANIFEST.SKIP needs to skip Makefile but not Makefile.PL
+
+0.02    CHANGES:
+         * Created Config::XPath::Reloadable
+
+0.01    First version, released on an unsuspecting world.
+

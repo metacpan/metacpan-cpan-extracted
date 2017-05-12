@@ -1,0 +1,6 @@
+0.03 2009-07-20
+   Missing dependency on HTML::FillInForm
+0.02 2009-06-01
+   Fix name in pod
+0.01 2009-06-01
+   First working version

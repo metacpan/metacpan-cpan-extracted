@@ -1,0 +1,94 @@
+CPAN-Tester-WWW-Reports
+=======================
+
+This distribution contains the files used to run and manage the CPAN Testers 
+Reports website.
+
+The CPAN Testers Reports website is built on top of the Labyrinth Website 
+Management System. As such, the code to drive the website is contained within
+the Labyrinth and associated plugin prerequisites. In order to define the 
+website in terms of functionality, layout and style, the files within the 
+'./vhost' directory of this distribution should be installed into your web
+server's virtual host directory.
+
+INSTALLATION
+
+This distribution is in two parts, the first is the installer and the second
+are the website files.
+
+In the first instance the installer will install Labyrinth and associated 
+plugins. These library modules form the engine of the website. These can be
+installed as
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+In the second instance, download the latest tarball and copy the contents of
+the 'vhost' directory into the directory you plan to use to provide access to
+the Admin. Create an appropriate database in MySQL and load the contents of the
+SQL file, ./cgi-bin/db/cpanadmin-base.sql. Note that this only provides the 
+base tables and contents.
+
+You then need to update the configuration file, ./cgi-bin/config/settings.ini,
+with the necessary database connection settings, together with the correct
+paths to your virtual directory. Then you'll need update the run script,
+./cgi-bin/pages.cgi, to point your configuration file.
+
+Finally, you'll need to update your web server as necessary. The CPAN Testers 
+Reports Administration website runs under Apache2, and the vhost file, 
+./vhosts.conf, can be adapted as appropriate for other web servers 
+applications.
+
+CPAN TESTERS FUND
+
+CPAN Testers wouldn't exist without the help and support of the Perl 
+community. However, since 2008 CPAN Testers has grown far beyond the 
+expectations of it's original creators. As a consequence it now requires
+considerable funding to help support the infrastructure.
+
+In early 2012 the Enlightened Perl Organisation very kindly set-up a
+CPAN Testers Fund within their donatation structure, to help the project
+cover the costs of servers and services.
+
+If you would like to donate to the CPAN Testers Fund, please follow the link
+below to the Enlightened Perl Organisation's donation site.
+
+https://members.enlightenedperl.org/drupal/donate-cpan-testers
+
+If your company would like to support us, you can donate financially via the
+fund link above, or if you have servers or services that we might use, please
+send an email to admin@cpantesters.org with details.
+
+Our full list of current sponsors can be found at our I <3 CPAN Testers site.
+
+http://iheart.cpantesters.org
+
+SEE ALSO
+
+* http://labyrinth.missbarbell.co.uk - Labyrinth
+
+* http://www.cpantesters.org - CPAN Testers Reports website
+
+AUTHOR
+
+Barbie, <barbie@missbarbell.co.uk> for
+Miss Barbell Productions, L<http://www.missbarbell.co.uk/>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2015 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or modify it 
+under the Artistic License v2.
+
+ADDITIONAL COPYRIGHT
+
+This distribution includes TinyMCE [1], a Javascript WYSIWYG Editor used within
+the site. TinyMCE is distributed under the GNU Lesser General Public License
+Version 2.1, and all files within the './vhost/html/js/tiny_mce' directory
+are copyright of the TinyMCE project.
+
+[1] http://tinymce.moxiecode.com/
+

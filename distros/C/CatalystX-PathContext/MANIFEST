@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/CatalystX/PathContext.pm
+t/00.load.t
+t/chars.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/prereq.t
+META.yml

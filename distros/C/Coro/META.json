@@ -1,0 +1,55 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Coro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Canary::Stability" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "AnyEvent" : "7",
+            "AnyEvent::AIO" : "1",
+            "AnyEvent::BDB" : "1",
+            "BDB" : "0",
+            "EV" : "4",
+            "Event" : "1.08",
+            "IO::AIO" : "3.1"
+         },
+         "requires" : {
+            "AnyEvent" : "5",
+            "Guard" : "0.5",
+            "Scalar::Util" : "0",
+            "Storable" : "2.15",
+            "common::sense" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 6.511
+}

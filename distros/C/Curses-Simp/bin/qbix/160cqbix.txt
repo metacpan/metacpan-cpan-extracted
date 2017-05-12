@@ -1,0 +1,48 @@
+                                     ---                                                                     ---                                    @
+                             /88888888888\                                                                /ggg|lll\                                 @
+                            /888888888888888888\                                                    /ggggggggg|lllllllll\                           @
+                         /5\888888888888888888888/7\                                             /|ggggggggggg|lllllllllll|\                        @
+                     /5555555\8888888888888888888/77\                                            /|ggggggggggg|lllllllllll|oooooo\                  @
+                 /5555555555555555\8888888/77777777777\                                       /hhh|ggggggggggg|lllllllllll|ooooooooo\               @
+                 5555555555555555555\888/7777777777777777777\                           /hhhhhhhhh|ggggggggggg|lllllllllll|ooooooooooo\             @
+            /22\55555555555555555555/444\77777777777777777777/66\                   /i|hhhhhhhhhhh|ggggggggggg+lllllllllll|ooooooooooo|rr\          @
+      /222222222\555555555555555/44444444\7777777777777777777/66666666\          /iiii|hhhhhhhhhhh|ggggggggggg+lllllllllll|ooooooooooo|rrrrrrr\     @
+   /22222222222222222222\55/4444444444444444\7777777777777/66666666666666\ /iiiiiiiiii|hhhhhhhhhhh|ggggggg/ddd|kkk\lllllll|ooooooooooo|rrrrrrrrrr\  @
+  |222222222222222222222\55/444444444444444444444\77/666666666666666666666|iiiiiiiiiii|hhhhhhhhhhh|g/ddddddddd|kkkkkkkkk\l|ooooooooooo|rrrrrrrrrrr| @
+  |222222222222222/111111111\4444444444444444444/3333\6666666666666666666/|iiiiiiiiiii|hhhhhhhhhhh|ddddddddddd|kkkkkkkkkkk|n\ooooooooo|rrrrrrrrrrr| @
+  |\22222222222222/1111111111\444444444444444444/3333333333\666666666666/K|iiiiiiiiiii|hhhhhhhhhh/|ddddddddddd|kkkkkkkkkkk|nnnnnnn\ooo|rrrrrrrrrrr| @
+  |FFF\2222222/1111111111111111111\4444444444/3333333333333333\6666666/KKK|iiiiiiiiiii|hhhhhhh/eee|ddddddddddd|kkkkkkkkkkk|nnnnnnnnnnn|rrrrrrrrrrr| @
+  |FFFFFFFFF\2/1111111111111111111111\4/3333333333333333333333\6/KKKKKKKKK|iiiiiiiiiii|h/eeeeeeeee|ddddddddddd|kkkkkkkkkkk|nnnnnnnnnnn|\rrrrrrrrrr| @
+  |FFFFFFFFFFF|11111111111111111111/00000\333333333333333333/J|KKKKKKKKKKK|iiiiiiiiiii|eeeeeeeeeee|ddddddddddd+kkkkkkkkkkk|nnnnnnnnnnn|qqq\rrrrrrr| @
+  |FFFFFFFFFFF|CC\111111111111/0000000000000000\333333/JJJJJJJ|KKKKKKKKKKK|iiiiiiiii/f|eeeeeeeeeee|ddddddddddd+kkkkkkkkkkk|nnnnnnnnnnn|qqqqqqqqq\r| @
+  |FFFFFFFFFFF|CCCCCC\1111/00000000000000000000000\/JJJJJJJJJJ|KKKKKKKKKKK|iiiiii/ffff|eeeeeeeeeee|ddddddd/aaa|jjj\kkkkkkk|nnnnnnnnnnn|qqqqqqqqqqq| @
+  |FFFFFFFFFFF|CCCCCCCCCC\|00000000000000000000000|JJJJJJJJJJJ|KKKKKKKKKKK|/ffffffffff|eeeeeeeeeee|d/aaaaaaaaa|jjjjjjjjj\k|nnnnnnnnnnn|qqqqqqqqqqq| @
+  |\FFFFFFFFFF|CCCCCCCCCCC|9\000000000000000000/II|JJJJJJJJJJJ|KKKKKKKKKKK|fffffffffff|eeeeeeeeeee|aaaaaaaaaaa|jjjjjjjjjjj|m\nnnnnnnnn|qqqqqqqqqqq| @
+  |GGGGG\FFFFF|CCCCCCCCCCC|99\00000000000/IIIIIIII|JJJJJJJJJJJ|KKKKKKKKKK/|fffffffffff|eeeeeeeeee/|aaaaaaaaaaa|jjjjjjjjjjj|mmmmmmm\nnn|qqqqqqqqqqq| @
+  |GGGGGGGGG\F|CCCCCCCCCCC|99999999999+IIIIIIIIIII|JJJJJJJJJJJ|KKKKKKK/NNN|fffffffffff|eeeeeee/bbb|aaaaaaaaaaa|jjjjjjjjjjj|mmmmmmmmmmm|qqqqqqqqqqq| @
+  |GGGGGGGGGGG|CCCCCCCCCCC|99999999999|IIIIIIIIIII|JJJJJJJJJJJ|K/NNNNNNNNN|fffffffffff|e/bbbbbbbbb|aaaaaaaaaaa|jjjjjjjjjjj|mmmmmmmmmmm|\qqqqqqqqqq| @
+  |GGGGGGGGGGG|DD\CCCCCCCC|99999999999|IIIIIIIIIII|JJJJJJJJJJJ|NNNNNNNNNNN|fffffffff/c|bbbbbbbbbbb|aaaaaaaaaaa|jjjjjjjjjjj|mmmmmmmmmmm|ppp\qqqqqqq| @
+  |GGGGGGGGGGG|DDDDDDD\CCC|99999999999|IIIIIIIIIII|JJJJJJJJJ/M|NNNNNNNNNNN|ffff/cccccc|bbbbbbbbbbb|aaaaaaaaaaa-jjjjjjjjjjj|mmmmmmmmmmm|ppppppppp\q| @
+  |GGGGGGGGGGG|DDDDDDDDDD\|99999999999|IIIIIIIIIII|JJJJJ/MMMMM|NNNNNNNNNNN|/cccccccccc|bbbbbbbbbbb|aaaaaaa/RRRRRRR\jjjjjjj|mmmmmmmmmmm|ppppppppppp| @
+  |GGGGGGGGGGG|DDDDDDDDDDD|99999999999|IIIIIIIIIII|/MMMMMMMMMM|NNNNNNNNNNN|ccccccccccc|bbbbbbbbbbb|a/RRRRRRRRRRRRRRRRRRR\j|mmmmmmmmmmm|ppppppppppp| @
+  |GGGGGGGGGGG|DDDDDDDDDDD|A\999999999|II/LLLLLLLL|MMMMMMMMMMM|NNNNNNNNNNN|ccccccccccc|bbbbbbbbbbbU\RRRRRRRRRRRRRRRRRRRRRR/S\mmmmmmmmm|ppppppppppp| @
+  |\GGGGGGGGGG|DDDDDDDDDDD|AA\99999999|LLLLLLLLLLL|MMMMMMMMMMM|NNNNNNNNNN/|ccccccccccc|bbbbbbbbbb/UUUUUUU\RRRRRRRRRRRRRRRR/SSSSSSS\mmm|ppppppppppp| @
+  |HHH\GGGGGGG|DDDDDDDDDDD|AAAAAAAAAAA+LLLLLLLLLLL|MMMMMMMMMMM|NNNNNNN/QQQ|ccccccccccc|bbbbbbb/UUUUUUUUUUUUU\RRRRRRRRRR/SSSSSSSSSSSS\m|ppppppppppp| @
+  |HHHHHHHHH\G|DDDDDDDDDDD|AAAAAAAAAAA|LLLLLLLLLLL|MMMMMMMMMMM|N/QQQQQQQQQ|ccccccccccc|b/UUUUUUUUUUUUUUUUUUU\RRRR/SSSSSSSSSSSSSSSSSS\m|ppppppppppp| @
+  |HHHHHHHHHHH|EE\DDDDDDDD|AAAAAAAAAAA|LLLLLLLLLLL|MMMMMMMMMMM|QQQQQQQQQQQ|ccccccccc/XX\UUUUUUUUUUUUUUUUUUUUU/VV\SSSSSSSSSSSSSSSSSSSSS/ppppppppppp| @
+  |HHHHHHHHHHH|EEEEEEE\DDD|AAAAAAAAAAA|LLLLLLLLLLL|MMMMMMMMM/P|QQQQQQQQQQQ|cccc/XXXXXXXXXXXXX\UUUUUUUUUUUUUUU/VVVVVVVV\SSSSSSSSSSSSSSS/TT\pppppppp| @
+  |HHHHHHHHHHH|EEEEEEEEEE\|AAAAAAAAAAA|LLLLLLLLLLL|MMMMM/PPPPP|QQQQQQQQQQQ|/XXXXXXXXXXXXXXXXXXX\UUUUUUUUUU/VVVVVVVVVVVVV\SSSSSSSSSS/TTTTTTTTT\pppp| @
+  |HHHHHHHHHHH|EEEEEEEEEEE|AAAAAAAAAAA|LLLLLLLLLLL|/PPPPPPPPPP|QQQQQQQQQQQ|XXXXXXXXXXXXXXXXXXXXX\UUU/VVVVVVVVVVVVVVVVVVVV\SSS/TTTTTTTTTTTTTTTTTTT\| @
+  |HHHHHHHHHHH|EEEEEEEEEEE|B\AAAAAAAAA|LLLLLLLL/OO|PPPPPPPPPPP|QQQQQQQQQQQ XXXXXXXXXXXXXXXXXXXXX/YYY\VVVVVVVVVVVVVVVVVVVV/WWW\TTTTTTTTTTTTTTTTTTTT/ @
+   \HHHHHHHHHH|EEEEEEEEEEE|BB\AAAAAAAA|LL/OOOOOOOO|PPPPPPPPPPP|QQQQQQQQQQ/ \XXXXXXXXXXXXXX//YYYYYYYYYYYYYY\VVVVVVVVVVVVVV/WWWWWWWWW\TTTTTTTTTTTTT/  @
+      \HHHHHHH|EEEEEEEEEEE|BBBBBBBBBBB+OOOOOOOOOOO|PPPPPPPPPPP|QQQQQQQQ/       \XXXXXXX/YYYYYYYYYYYYYYYYYYYY\VVVV/WWWWWWWWWWWWWWWWWWW\TTTTTTTTTT/   @
+            \H|EEEEEEEEEEE|BBBBBBBBBBB|OOOOOOOOOOO|PPPPPPPPPPP|QQ/                  \XX/YYYYYYYYYYYYYYYYYYYYY\VV/WWWWWWWWWWWWWWWWWWWWW\TTTTTTTT/    @
+                 \EEEEEEEE|BBBBBBBBBBB|OOOOOOOOOOO|PPPPPPPPPP/                          \YYYYYYYYYYYYYYYYYYY/ZZZZ\WWWWWWWWWWWWWWWWWWWW/             @
+                      \EEE|BBBBBBBBBBB|OOOOOOOOOOO|PPPP/                                      \YYYYYYYY/ZZZZZZZZZZZZZZZ\WWWWWWWWWWWWW/              @
+                        \E|BBBBBBBBBBB|OOOOOOOOOOO|PP/                                          \YYYY/ZZZZZZZZZZZZZZZZZZZZ\WWWWWWW/                 @
+                         \|BBBBBBBBBBB|OOOOOOOOOOO|/                                             \Y/ZZZZZZZZZZZZZZZZZZZZZZ/W/                       @
+                           BBBBBBBBBBB|OOOOOOOO/                                                    \ZZZZZZZZZZZZZZZZZZZ/                           @
+                            \BBBBBBBBB|OO/                                                                \ZZZZZZZ/                                 @
+                                     ---                                                                     ---                                    @
+^ Turns:  Clockwise = wrybog    CounterClockwise = WRYBOG    Twice = 012345 @
+^  AltColrSet = a  Fill = f  Mix = m  Init = i  Exit = x  Please Press A Key:$

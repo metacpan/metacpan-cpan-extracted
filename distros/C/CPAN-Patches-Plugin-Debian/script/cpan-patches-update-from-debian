@@ -1,0 +1,233 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename 'dirname';
+use Path::Class 'file', 'dir';
+use IO::Any;
+use File::Path 'make_path';
+use List::MoreUtils 'none', 'any';
+use File::Copy 'copy';
+use File::is;
+use Parse::Deb::Control 0.03;
+use CPAN::Patches;
+use CPAN::Patches::SPc;
+use File::Spec;
+
+exit main();
+
+sub main {
+	my $help;
+	my $pkg_perl_folder
+		= File::Spec->catdir(CPAN::Patches::SPc->sharedstatedir, 'cpan-patches', 'pkg-perl-trunk');
+	my $cpan_patches_folder
+		= File::Spec->catdir(CPAN::Patches::SPc->sharedstatedir, 'cpan-patches', 'debian-set');
+	GetOptions(
+		'help|h'           => \$help,
+		'pkg-perl=s'       => \$pkg_perl_folder,
+		'cpan-patches=s'   => \$cpan_patches_folder,
+	) or pod2usage;
+	pod2usage if $help;
+	pod2usage if not $pkg_perl_folder;
+	pod2usage if not $cpan_patches_folder;
+	
+	die $pkg_perl_folder.' no such folder'
+		if not -d $pkg_perl_folder;
+	die $cpan_patches_folder.' no such folder'
+		if not -d $cpan_patches_folder;
+	
+	update_patches($pkg_perl_folder, $cpan_patches_folder);
+	update_debian($pkg_perl_folder, $cpan_patches_folder);
+	
+	return 0;
+}
+
+sub update_debian {
+	my $pkg_perl_folder     = shift or die;
+	my $cpan_patches_folder = shift or die;
+	
+	my $cpanp = CPAN::Patches->new();
+	
+	my %metas =
+		map { %{$_} }
+		grep { (%{$_})[1] }    # only with parsable meta
+		map {
+			{ $_ => eval { $cpanp->read_meta($_) } || 0 }
+		}    # parse meta
+		glob($pkg_perl_folder.'/*');
+	die 'no */debian/META.* found in '.$pkg_perl_folder
+		if not %metas;
+	
+	while (my ($dist_folder, $meta) = each %metas) {
+		my $cpan_name  = $cpanp->clean_meta_name($meta->{'name'}) || die 'missing name in meta - '.$dist_folder;
+
+		my $cpan_patch_folder          = dir($cpan_patches_folder, $cpan_name)->stringify;
+		my $cpan_patch_folder_debian   = dir($cpan_patch_folder, 'debian')->stringify;
+		my $cpan_patch_debian_filename = file($cpan_patch_folder_debian, 'control')->stringify;
+		my $debian_control_filename    = file($dist_folder, 'debian', 'control')->stringify;
+		
+		if (not -f $cpan_patch_debian_filename or File::is->older($cpan_patch_debian_filename, $debian_control_filename)) {
+			#print 'updating ', $cpan_patch_debian_filename, "\n";
+			make_path($cpan_patch_folder) or die 'make_path '.$cpan_patch_folder.' fail - '.$!
+				if not -d $cpan_patch_folder;
+			my %debian_data = eval { %{ $cpanp->decode_debian([$cpan_patch_debian_filename]) } };
+			my $deb_control = Parse::Deb::Control->new([$debian_control_filename]);
+			
+			my %depends             = $cpanp->get_deb_package_names($deb_control, 'Depends');
+			my %build_depends       = $cpanp->get_deb_package_names($deb_control, 'Build-Depends');
+			my %build_depends_indep = $cpanp->get_deb_package_names($deb_control, 'Build-Depends-Indep');
+			
+			$debian_data{'Depends'} =
+				$cpanp->merge_debian_versions(\%depends, $debian_data{'Depends'} || {});
+			$debian_data{'Build-Depends'} =
+				$cpanp->merge_debian_versions(\%build_depends, $debian_data{'Build-Depends'} || {});
+			$debian_data{'Build-Depends-Indep'} =
+				$cpanp->merge_debian_versions(\%build_depends_indep, $debian_data{'Build-Depends-Indep'} || {});
+			
+			if (not exists $debian_data{'X'}) {
+				$debian_data{'X'} = (
+					(any { $_ eq 'xvfb' } keys %build_depends, keys %build_depends_indep)
+					? 1
+					: 0
+				);
+			}
+
+			if (not exists $debian_data{'App'}) {
+				my @package_names =  (
+					sort { length($a) <=> length($b) }
+					map { s/^\s*//;$_; }
+					map { s/\s*$//;$_; }
+					map { ${$_->{'value'}} }
+					$deb_control->get_keys('Package')
+				);
+				$debian_data{'App'} = (
+					(
+						any { $_ !~ /^lib .+ -perl (:? -doc)? $/xms }    # if any of the packages that will be created doesn't have lib.+-perl name than it is an app
+						@package_names
+					)
+					? $package_names[0]
+					: 0
+				);
+			}
+			
+			# create debian/ folder if needed
+			mkdir($cpan_patch_folder_debian)
+				if not -e $cpan_patch_folder_debian;
+			
+			# write debian/control
+			IO::Any->spew([$cpan_patch_debian_filename], $cpanp->encode_debian(\%debian_data));
+			
+			# copy also all post/pre inst files
+			foreach my $inst ($cpanp->debian_inst_script_names) {
+				my $src_inst = file($dist_folder, 'debian', $inst)->stringify;
+				my $dst_inst = file($cpan_patch_folder, 'debian', $inst)->stringify;
+				
+				# remove inst if no longer exists in debian
+				if (not -f $src_inst) {
+					unlink($dst_inst)
+						if -f $dst_inst;
+				}
+				else {
+					copy($src_inst, $dst_inst) or die $!;
+				}
+			}
+		}
+	}
+}
+
+sub update_patches {
+	my $pkg_perl_folder     = shift or die;
+	my $cpan_patches_folder = shift or die;
+	
+	my %series =
+		map { %{$_} }
+		grep { (%{$_})[1] }    # only with parsable meta
+		map { { $_ => eval { CPAN::Patches->read_meta($_) } || 0 } }    # parse meta
+		map { $_->stringify }
+		map { $_->parent->parent }
+		map { file($_) }
+		map { dirname($_) }
+		glob($pkg_perl_folder.'/*/debian/patches/series');
+	die 'no */debian/patches/series found in '.$pkg_perl_folder
+		if not %series;
+	
+	while (my ($dist_folder, $meta) = each %series) {
+		my $cpan_name  = CPAN::Patches->clean_meta_name($meta->{'name'}) || die 'missing name in meta - '.$dist_folder;
+		my $deb_patch_series_folder   = dir($dist_folder, 'debian', 'patches')->stringify;
+		my @deb_series =
+			grep { not m/^#/ }        # skip commented out
+			map { s/\s*$//;$_; }
+			map { s/^\s*//;$_; }
+			split "\n",
+			IO::Any->slurp([$deb_patch_series_folder, 'series'])
+		;
+		
+		my $cpan_patch_series_folder   = dir($cpan_patches_folder, $cpan_name, 'patches')->stringify;
+		my $cpan_patch_series_filename = file($cpan_patch_series_folder, 'series')->stringify;
+		if (not -f $cpan_patch_series_filename) {
+			make_path($cpan_patch_series_folder) || die $!
+				if not -d $cpan_patch_series_folder;
+			IO::Any->spew($cpan_patch_series_filename, '');
+		}
+		my @cpan_patch_series =
+			map { s/\s*$//;$_; }
+			map { s/^\s*//;$_; }
+			split "\n",
+			IO::Any->slurp($cpan_patch_series_filename);
+		
+		# find new or changed patch files
+		@deb_series =
+			grep {
+				my $d = $_;
+				(
+					(none { $_ eq $d } @cpan_patch_series)
+					|| (! -f file($cpan_patch_series_folder, $d))
+					|| File::is->older([$cpan_patch_series_folder, $d], [$deb_patch_series_folder, $d])
+				)
+			} @deb_series
+		;
+
+		# done if no change
+		next if not @deb_series;
+
+		foreach my $patch_name (@deb_series) {
+			#print 'copy ', file($dist_folder, 'debian', 'patches', $patch_name), ' to ', $cpan_patch_series_folder, "\n";
+			my $patch_src_filename = file($dist_folder, 'debian', 'patches', $patch_name)->stringify;
+			copy(
+				$patch_src_filename,
+				$cpan_patch_series_folder,
+			) or warn 'copy of '.$patch_src_filename.' to '.$cpan_patch_series_folder.' failed - '.$!;
+			
+			# add to series if it is not already there
+			push @cpan_patch_series, $patch_name
+				if none { $_ eq $patch_name } @cpan_patch_series;
+		}
+		
+		IO::Any->spew($cpan_patch_series_filename, join("\n", @cpan_patch_series)."\n");
+	}
+}
+
+__END__
+
+=head1 NAME
+
+cpan-patches-update-from-debian - update patch set based on content of Debian pkg-perl repository
+
+=head1 SYNOPSIS
+
+	cpan-patches-update-from-debian
+	
+		--pkg-perl=/path/to
+			default is /var/lib/cpan-patches/pkg-perl-trunk
+		--cpan-patches=/path/to2
+			default is /var/lib/cpan-patches/debian-set
+
+=head1 DESCRIPTION
+
+Extracts Debian dependencies from an C<pkg-perl> checkout and updates an
+C<cpan-patches-set>.
+
+=cut

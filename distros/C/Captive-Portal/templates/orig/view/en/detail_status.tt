@@ -1,0 +1,80 @@
+[% WRAPPER 'view/en/layout.tt' %]
+
+<div class="span-4">
+
+ <p class="info">Current devices behind firewall: [% client_candidates %]</p>
+
+ <table>
+  <caption>Summary</caption>
+  <thead>
+   <tr>
+    <th>State</th>
+    <th>Number</th>
+   </tr>
+  </thead>
+  <tbody>
+   [% FOREACH state IN summary.keys.sort %]
+   <tr>
+    <td>[%- state -%]</td>
+    <td>[%- summary.$state -%]</td>
+   </tr>
+   [% END %]
+  </tbody>
+ </table>
+
+</div>
+
+<div class="span-20 last block">
+
+ [% IF stopped %]
+  <p class="error">The Captive::Portal firewall is stopped!</p>
+ [% END %]
+
+ <table>
+  <caption>Sessions</caption>
+  <thead>
+   <form method="post" accept-charset="UTF-8">
+
+    <input type="hidden" name="flip_sort_order"
+    value="[%- query.param('flip_sort_order') -%]" />
+
+    <input type="hidden" name="admin_secret"
+    value="[%- query.param('admin_secret') -%]" />
+
+    <tr>
+     <th><input type="submit" value="IP" name="sort_by_ip"
+      title="flip sort order"/></th>
+     <th><input type="submit" value="MAC" name="sort_by_mac"
+      title="flip sort order"/></th>
+     <th><input type="submit" value="Username" name="sort_by_username"
+      title="flip sort order"/></th>
+     <th><input type="submit" value="State" name="sort_by_state"
+      title="flip sort order"/></th>
+     <th><input type="submit" value="Start" name="sort_by_start_time"
+      title="flip sort order"/></th>
+     <th><input type="submit" value="Stop" name="sort_by_stop_time"
+      title="flip sort order"/></th>
+    </tr>
+
+   </form>
+  </thead>
+  <tbody>
+   [% FOREACH session IN sessions %]
+   <tr>
+    <td>[%- session.IP -%]</td>
+    <td>[%- session.MAC -%]</td>
+    <td>[%- session.USERNAME -%]</td>
+    <td>[%- session.STATE -%]</td>
+    <td>[%- session.LOCAL_START_TIME -%]</td>
+    <td>[%- session.LOCAL_STOP_TIME -%]</td>
+   </tr>
+   [% END %]
+  </tbody>
+ </table>
+
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

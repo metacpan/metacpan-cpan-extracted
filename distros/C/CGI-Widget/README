@@ -1,0 +1,31 @@
+CGI/Widget version 0.01
+=======================
+
+Modules under the CGI::Widget namespace serve the purpose of allowing 
+authors of CGI or other dynamically generated HTML documents an easy way
+to create common, although perhaps complex, page elements.
+
+Currently only one such widget has been written: CGI::Widget::Series.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI
+  Tree::DAG_Node (optional -- for HList classes)
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2001 Allen Day <allenday@ucla.edu>
+License: Perl Artistic License

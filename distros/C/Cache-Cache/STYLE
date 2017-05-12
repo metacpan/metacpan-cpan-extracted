@@ -1,0 +1,449 @@
+                     ===========================
+                       Coding style guidelines
+                     ===========================
+
+
+While there is no one ideal style in which to code, there are some
+advantages to adopting a common coding style.  This guide helps
+outline the style for this project. 
+
+
+
+                    -----------------------------
+                      Tabs, spaces, and columns
+                    -----------------------------
+
+Avoid tabs.  Instead, use exactly 2 spaces to indent code.  Lines
+should break at 80 columns.  Whitespace greatly increases readability,
+and should be used between adjacent statements.  The exceptions to the
+newline between statements rule include blocks of "use" statements
+and blocks of variable assignments.  
+
+An example subroutine:
+
+  sub build_something_else
+  {
+     my ( $self, $p_param ) = @_;
+
+     Assert_Defined( $p_param );
+
+     return $self->calculate_something( $p_param + 1 );
+  }
+
+
+                          -----------------
+                            Return Values
+                          -----------------
+
+[Initially I advocated using a temporary variable to store the
+ return value to increase code readability, but since reading and
+ rereading (and re-rereading) Fowler's _Refactoring_, I am inclined
+ to agree with him and now support the Remove Temp with Query
+ refactoring, which also implies returning the result of a calculation
+ directly]
+
+                              ----------
+                                Naming
+                              ----------
+
+
+The following naming conventions should be used:
+
+
+* Variables
+
+  Inside routines, variables should be named "variable_name", all
+  lowercase alphanumeric characters, with underscores separating the
+  words.
+
+  my $variable_name;
+
+  
+  Additionally, it is often a good idea to describe the type of the 
+  variable (other than scalars and object instances) in the name.
+  Some examples follow:
+
+  my $foo = 'foo';
+
+  my @number_list = ( 1, 2, 3 );
+
+  my $number_list_ref = [ 1, 2, 3 ];
+
+  my $number_list_ref = \@number_list;
+
+  my %alphabet_hash = ( 'a' => 1, 'b' => 2 );
+
+  my $alphabet_hash_ref = { 'a' => 1, 'b' => 2 };
+
+  my $alphabet_hash_ref = \%alphabet_hash;
+  
+  my $file_cache = new Cache::FileCache( );
+
+
+* Parameters
+
+  Parameters should be prefixed with 'p_' to assist in readability.  Note
+  that I typically leave off the p_ for the $self parameter, and the
+  $proto parameter in the constructor.  For example:
+
+  sub add
+  {
+     my ( $self, $p_value_one, $p_value_two ) = @_;
+ 
+     return $p_value_one + $p_value_two;
+  }
+
+
+* Public static class variables
+
+  This type of variable is written "Public_Static_Class_Variable" and
+  is accessible publicly, and can be updated at runtime.  These
+  variables are global for the scope of the module.  Note that there
+  are very few cases in which this type of variable should not be
+  exposed via a class property (see below).
+
+  my $Public_Static_Class_Variable;
+
+
+
+* Private static class variables
+
+  This type of variable is written "_Private_Static_Class_Variable"
+  and is accessible only to the module itself, and can be updated
+  at runtime.  Note that there are very few cases in which this type
+  of variable should not be exposed via a class property (see below).
+  
+  my $_Private_Static_Class_Variable
+
+
+
+* Public static class constants
+
+  This type of "variable" is written "PUBLIC_STATIC_CONSTANT" and it
+  accessible publicly, and can not be modified at runtime.  These
+  constants are global for the scope of the module.  It is often a good
+  idea to make these constants available via Exporter as @EXPORT_OK.
+
+  my $PUBLIC_STATIC_CONSTANT = 'foo';
+
+
+
+* Private static class constants
+
+  This type of "variable" is written "_PRIVATE_STATIC_CONSTANT" and is
+  accessible only to the module itself, and can not be modified at
+  runtime.  These constants are global for the scope of the module.
+  
+
+  $_PRIVATE_STATIC_CONSTANT = 'foo';
+
+
+
+* Public instance methods
+
+  This type of subroutine is written as "public_instance_method" and
+  takes $self as the first parameter.  This is part of the public
+  interface for a module, and should be documented with pod (see below
+  for details about documentation).
+
+  sub public_instance_method
+  {
+    my ( $self, $p_parameter ) = @_;
+  }
+
+
+
+* Private instance methods
+
+  This type of subroutine is written as "_private_instance_method" and
+  takes $self as the first parameter.  This is not part of the public
+  interface, and can be documented inline with perl comments.
+
+  sub _private_instance_method
+  {
+    my ( $self, $p_parameter ) = @_;
+  }
+
+
+
+* Public class methods
+
+  This type of subroutine is written "Public_Class_Method" and does
+  not take $self as a parameter.  This is part of the public interface
+  for a module, and should be documented with pod (see below for
+  details about documentation).  You can optionally make use of
+  the Static_Params method in CacheUtils to automatically shift the
+  parameters if it is called via the class dereference operator rather
+  that explicitly via the package's namespace.  (i.e. it is called via
+  Class->Public_Class_Method( ) vs. Class::Public_Class_Method( ) ).
+
+  sub Public_Class_Method
+  {
+    my ( $p_parameter ) = Static_Params( @_ );  
+  }
+
+
+* Private class methods
+
+  This type of subroutine is written "_Private_Class_Method" and does
+  not take $self as a parameter.  This is not part of the public
+  interface, and can be documented inline with perl comments.  You can
+  optionally make use of the Static_Params method in CacheUtils to
+  automatically shift the parameters if it is called via the class
+  dereference operator rather that explicitly via the package's
+  namespace.  (i.e. it is called via Class->Public_Class_Method( )
+  vs. Class::Public_Class_Method( ) ).
+
+
+  sub _Private_Class_Method
+  {
+    my ( $p_parameter ) = Static_Params( @_ );
+  } 
+
+
+
+
+                            --------------
+                              Properties
+                            --------------
+
+Properties and property accessor methods should be used to provide a
+consistent abstracted interface to certain types of data.  In general,
+properties accessors are methods that take the form of get_property
+and set_property.  Private getters or setters are written
+_get_property and _set_property respectively.  Additionally, static
+class properties are written Get_Property and Set_Property as a method
+on the class itself.  The properties are stored in the $self hash
+(assuming the object is a blessed hash) with a key that corresponds to
+the first letter uppercase name of the property, preceded by an
+underscore.  
+
+An example of writing a scalar instance property "foo" with a public
+getter and a private setter:
+
+  sub get_foo
+  {
+    my ( $self ) = @_;
+
+    return $self->{_Foo};
+  }
+
+  sub _set_foo
+  {
+    my ( $self, $foo ) = @_;
+
+    $self->{_Foo} = $foo;
+  } 
+
+
+An example of writing a list instance property "bar_list" with a
+public getter and a public setter.
+
+
+  sub get_bar_list
+  {
+    my ( $self ) = @_;
+
+    return @{$self->{_Bar_List}};
+  }
+
+  sub set_bar_list
+  {
+    my ( $self, @bar_list ) = @_;
+
+    @{$self->{_Bar_List}} = @bar_list;
+  }
+
+
+
+
+                    -----------------------------
+                      Statement and brace style
+                    -----------------------------
+
+
+* if/elsif/else statements
+
+  if ( $condition )
+  {
+    # ...
+  }
+  elsif ( $condition )
+  {
+    # ...
+  }
+  else 
+  {
+    # ...
+  } 
+
+
+* for loops
+
+  for ( my $i; $i < 1000; $i++ )
+  {
+    # ...
+  }
+
+
+* foreach loops
+
+  foreach my $foo ( @foo_list )
+  {
+    # ...
+  }
+
+
+* subroutines
+
+  sub do_something
+  {
+    my ( $self ) = @_;
+
+    #...
+
+    return $foo;
+  }
+
+
+* error handling
+
+  my $foo = $self->get_foo( ) or
+    throw Error( "Couldn't get foo" );
+
+
+
+                         --------------------
+                           Module structure
+                         --------------------
+
+A the top of each module there should be a copyright disclaimer as
+follows:
+
+  ######################################################################
+  # $ Id: $
+  # Copyright (C) 2002 John Smith  All Rights Reserved
+  #
+  # Software distributed under the License is distributed on an "AS
+  # IS" basis, WITHOUT WARRANTY OF ANY KIND, either expressed or
+  # implied. See the License for the specific language governing
+  # rights and limitations under the License.
+  ######################################################################
+
+The "Id" keyword is optional, though highly recommended if the code is
+being managed with CVS.
+
+
+After the copyright disclaimer, there should be a blank line, and then
+the package declaration:
+
+  package Cache::FileCache;
+
+
+The "use" statements should be listed in alphabetical order, with the
+lowercase modules listed first.  (This is so that "use strict" is the
+next line after the package declaration)
+
+  use strict;
+  use vars qw( @ISA @EXPORT_OK $PUBLIC_STATIC_CONSTANT );
+  use Cache::Cache qw( $EXPIRES_NEVER );
+  use Error;
+  use Exporter;
+
+
+Next, list the @ISA and @EXPORT or @EXPORT_OK lists:
+
+  @ISA = qw( Cache::Cache Exporter );
+  @EXPORT_OK = qw( $PUBLIC_STATIC_CONSTANT );
+
+
+Followed by any variables in the "use vars" section:
+
+  $PUBLIC_STATIC_CONSTANT = 'foo';
+
+
+And any non exported, non "use vars" variables:
+
+  my $_PRIVATE_STATIC_CONSTANT = 'bar';
+  my $_Private_Static_Class_Variable;
+
+
+Write the methods in the following order:
+
+  * public class methods
+  * private class methods
+  * class properties ( first Get, then Set ) 
+  * new ( if the class is to be instantiated )
+  * public instance methods
+  * private instance methods
+  * instance properties ( first get, then set )
+
+
+Finally, the class should be documented according to this template:
+
+  __END__
+
+  =pod
+
+  =head1 NAME
+
+  Class -- short description with no line breaks
+
+  =head1 DESCRIPTION
+
+  Verbose description and overview of the class
+
+  =head1 SYNOPSIS
+
+  Example of the usage of the class
+
+  =head1 METHODS
+
+  =over 4
+
+  =item B<method_name( $p_parameter )>
+
+  Description of the method
+
+  =over 4 
+
+  =item $p_parameter
+
+  Description of the $p_parameter
+
+  =item Returns
+
+  Description of the return value
+
+  =back
+
+  =back
+
+  =head1 PROPERTIES
+
+  =over 4
+
+  =item B<(get|set)_foo>
+
+  Description of foo
+
+  =back
+
+  =head1 SEE ALSO
+
+  Related modules or documentation
+
+  =head1 AUTHOR
+
+  Original author:  John Smith <jsmith@company.com>
+
+  Last author: $ Author: $
+
+  Copyright (C) 2002 John Smith
+
+  =cut
+
+
+
+
+

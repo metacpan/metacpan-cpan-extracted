@@ -1,0 +1,31 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Scrolling Window Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the scrolling window.
+my $swindow = new Cdk::Swindow ('Title' => "<C></U>Scrolling Window", 
+					'Lines' => 200,
+					'Height' => 20,
+					'Width' => -4);
+
+# Open this file and read myself in.
+my @info = qx (cat $0); chomp @info;
+my $line;
+
+# Line by line, add the info.
+foreach $line (@info)
+{
+   $swindow->addline ('Info' => $line);
+   sleep 1;
+}
+
+# Exit Cdk.
+Cdk::end();

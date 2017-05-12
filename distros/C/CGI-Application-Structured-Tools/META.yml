@@ -1,0 +1,40 @@
+---
+abstract: 'Development tools for CGI::Application::Structured'
+author:
+  - 'Gordon Van Amburg'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Structured-Tools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Application::Structured: 0.006
+  DBIx::Class::Schema::Loader: 0
+  ExtUtils::Command: 0
+  File::Basename: 0
+  File::Slurp: 0
+  File::Spec: 0
+  FindBin: 0
+  HTML::Template: 0
+  Module::Signature: 0
+  Module::Starter: 1.5
+  Module::Starter::Plugin::Template: 1.5
+  Module::Starter::Simple: 1.5
+  Pod::Coverage: 0.18
+  Pod::Usage: 0
+  Probe::Perl: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Pod::Coverage: 1.08
+  Test::WWW::Mechanize::CGIApp: 0
+version: 0.015

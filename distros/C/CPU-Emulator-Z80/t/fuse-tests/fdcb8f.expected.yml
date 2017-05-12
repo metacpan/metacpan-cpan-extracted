@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb8f
+registers:
+  AF: 22964
+  AF_: 0
+  BC: 24507
+  BC_: 0
+  DE: 27803
+  DE_: 0
+  HL: 53475
+  HL_: 0
+  I: 0
+  IX: 44122
+  IY: 27473
+  PC: 4
+  R: 2
+  SP: 0

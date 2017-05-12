@@ -1,0 +1,11 @@
+Revision history for Catalyst-Plugin-Sitemap
+
+{{$NEXT}}
+    - Something
+
+1.0.0     2010-11-30
+    - Change sitemap object under the hood to WWW::Sitemap::XML.
+    - Add Dancer::Plugin::SiteMap in the 'SEE ALSO' section.
+
+0.0.1     2010-09-29
+    - original version unleashed on an unsuspecting world

@@ -1,0 +1,29 @@
+---
+abstract: 'a legacy-code-friendly PSGI adapter for CGI::Application'
+author:
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CGI::Application::Emulate::PSGI
+name: CGI-Application-Emulate-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI::Application: 0
+  CGI::Emulate::PSGI: 0.05
+  Plack: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

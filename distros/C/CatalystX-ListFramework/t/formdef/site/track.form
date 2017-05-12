@@ -1,0 +1,38 @@
+{
+ display => {
+                default => [
+                             {id=>'tid', heading => 'Track Code', uri => '/get/track/'},
+                             {id=>'ttitle'},
+                             {id=>'tsales'},
+                             {id=>'treleasedate'},
+                             {id=>'fromalbum.albrec', heading => 'Album released'},
+                             {id=>'fromalbum.artist.acombined_name'},
+                             {id=>'trackcopyright.cpholder'},
+                           ],
+            },
+
+ search => [
+            {id=>'fromalbum.artist.apn', heading=>'Artist', },
+            {id=>'fromalbum.albid', autocomplete=>['fromalbum.id' => 'fromalbum.title'], minchars=>'0'},
+           ],
+
+ infoboxes => {
+                    track => [
+                                {id=>'tid'},
+                                {id=>'ttitle'},
+                                {id=>'tlen', heading=>'T-Time'},
+                                {id=>'fromalbum.artist.OBJECT', heading=>'Who by'},
+                                {id=>'trackcopyright.OBJECT', heading=>'Rights'},
+                    ],
+                    album => [
+                                {id=>'fromalbum.OBJECT', heading=>'Album'},
+                    ],
+                    TEST => [  # just for the live-test.t
+                                {id=>'fromalbum.albtitle', heading=>'Album title'},
+                    ],
+ },
+
+ infobox_order => { track => 1, album => 2, },
+ 
+}
+

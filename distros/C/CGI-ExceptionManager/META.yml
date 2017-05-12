@@ -1,0 +1,34 @@
+---
+abstract: 'DebugScreen with detach!'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>'
+build_requires:
+  IO::Scalar: 0
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-ExceptionManager
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  CGI::ExceptionManager:
+    file: lib/CGI/ExceptionManager.pm
+    version: 0.06
+  CGI::ExceptionManager::StackTrace:
+    file: lib/CGI/ExceptionManager/StackTrace.pm
+    version: 0
+requires:
+  Filter::Util::Call: 0
+  perl: 5.00800
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

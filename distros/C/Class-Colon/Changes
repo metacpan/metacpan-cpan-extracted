@@ -1,0 +1,36 @@
+Revision history for Perl extension Class::Colon.
+
+0.03  Mon Nov 10 12:53:30 CST 2003
+        - Added Test::More to the prerequiste list in Makefile.PL.
+        - Added a test for direct attribute access like $obj->{first} to
+          t/01inmemory.t
+        - Corrected minor and glaring errors in the POD.
+
+0.02  Tue Oct  7 12:08:50 CDT 2003
+        - Changed the name of the fabricated class constructor from new to NEW
+          to comply with the uppercase name convetion.  I promise not to
+          use lowercase names so users can use those for fields.  They should
+          avoid ALLCAPS names, so I can use them for method names.  new
+          was in violation of the convention.  This has no effect on any
+          code, unless the caller was using NEW as a field name (and they
+          were warned not to).
+        - Added TODO file.
+        - Corrected documentation which stated that empty fields become
+          undef.  They really become "".
+        - Made minor corrections to tests and the data they use.
+        - Added OBJECTIFY which takes a colon delimited string and returns
+          the corresponding object.  This allows the caller to drive the input
+          loop.
+        - Made it easier to add new methods in the future.
+        - Changed the delimiter concept.  It must now be a simple string.
+          This facilitates the output methods and seems more in the spirit
+          of this cheap little module.
+        - Added STRINGIFY so you can retrieve the object as a string with
+          the current delimiter.
+        - Added WRITE_FILE and WRITE_HANDLE so lists of objects can be
+          rewritten to the disk.
+
+0.01  Thu Oct  2 12:45:09 2003
+	- original version; created by h2xs 1.22 with options
+		-AXn Class::Colon
+

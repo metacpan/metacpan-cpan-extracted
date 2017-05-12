@@ -1,0 +1,20 @@
+---
+name: Catalyst-Plugin-OrderedParams
+version: 0.06
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+abstract: Maintain order of submitted form parameters
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.30
+  Tie::Hash::Indexed: 0
+provides:
+  Catalyst::Plugin::OrderedParams:
+    file: lib/Catalyst/Plugin/OrderedParams.pm
+    version: 0.06
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

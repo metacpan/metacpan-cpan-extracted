@@ -1,0 +1,31 @@
+
+                         Crypt::Tea_JS.pm
+
+This module implements TEA, the Tiny Encryption Algorithm, and some
+Modes of Use based on CBC, compatibly in both Perl and JavaScript.
+This enables CGI scripts to communicate with browsers, as well
+as working as a normal private-key strong-encryption engine.
+
+Subroutines offer encryption, decryption & digest, and all cyphertext
+is ascii-encoded to prevent munging. Another routine returns JavaScript
+code with identical functions, and this can be used by CGIs to feed to
+a browser. A wrapper executable 'tea' is included for command-line use.
+
+Crypt::Tea_JS is the continuation of Crypt::Tea under another name.
+(Microsoft systems confused the old name with a different module
+Crypt::TEA and were unable to install both).  The calling interface
+is identical.  Since this change, Crypt::Tea_JS offers:
+ * since 2.13, the New Improved version of the Tea algorithm
+   is used, which provides even stronger encryption.
+ * implementation in C of some of the core routines, for improved
+   performance (at the server, if you're using it in a CGI context).
+ * since 2.23, it reverts to PurePerl if the C library is missing at
+   load-time, to make it easier for apps to bundle their whole stack.
+
+To install just:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Peter J Billam            http://www.pjb.com.au/comp/contact.html

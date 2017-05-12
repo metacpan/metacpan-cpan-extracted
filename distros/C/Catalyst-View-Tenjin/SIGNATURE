@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 450da80397dd05223e83c758f9c1d60cddca584e Changes
+SHA1 df714ede1b10e9a34f4a5d94b077a9aee36b38b4 INSTALL
+SHA1 4fd10efcea7157e7d9c3a45e000c91119dcad1f7 LICENSE
+SHA1 7dba3f25a8df047d72b7d503152563082cf4fcdb MANIFEST
+SHA1 1a61502002950becd9d46390ac595acf7a39ae3f MANIFEST.SKIP
+SHA1 c50572170b1099fcd817cdc95bd6980bc9bef150 META.json
+SHA1 e3d9aa352741d53954dfda2ae40f7e0cabbfaf8e META.yml
+SHA1 73bd4887fce1812a1f4775ccebc4e3cf2c920d51 Makefile.PL
+SHA1 cadd117cae1e6c3cc7968cf9d54ef872d4cba7dc README
+SHA1 a0c56135b3a8a60ab9aba66d5de46bc4e9e19cca dist.ini
+SHA1 82ead2a005cd85a3b82d25c00ed86873c55686af lib/Catalyst/Helper/View/Tenjin.pm
+SHA1 1b577d41b22ca9688f5542bd6c65d2f3cb2ed928 lib/Catalyst/View/Tenjin.pm
+SHA1 f201fed59dfa26a40bf10a62295bf2f8b3f29eec t/00-load.t
+SHA1 7627dc472567fc43baf8573856794a6d9ef21872 t/01-simple.t
+SHA1 a213b3e6a63cde9ddc211f3f22116209d22fd0c2 t/lib/TestApp.pm
+SHA1 73cf708a9cd9ace7bddc3f0869677d3e850d4d66 t/lib/TestApp/Controller/Root.pm
+SHA1 df87012e2d4be6e117ab2cac91b51f9e11111084 t/lib/TestApp/View/Tenjin.pm
+SHA1 975a3e5182ab2e9aa07689c90e97706bc0b65f1c t/lib/TestApp/root/default.html
+SHA1 4a1df46ba33f55371458c6fa1c275b9d0ec8c9f1 t/lib/TestApp/root/encoding.html
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iF4EAREIAAYFAk2UzUwACgkQa4OHQAFM10dzdAEAnm9j8NchWHa/iVlk+/x3huS2
+MLmGUv8FMIWJtkp0e34A/1CFMygVyV8uiMaQU+MiILM1XJRuFxDdjCvtPlb6jO3A
+=K5Ln
+-----END PGP SIGNATURE-----

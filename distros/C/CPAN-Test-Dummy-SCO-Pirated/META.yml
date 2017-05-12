@@ -1,0 +1,25 @@
+---
+abstract: 'package to test the SCO clone'
+author:
+  - 'Gabor Szabo <szabgab@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '1.00'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Test-Dummy-SCO-Pirated
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  homepage: http://perlmaven.com/
+  repository: http://github.com/szabgab/CPAN-Test-Dummy-SCO.git
+version: '1.04'

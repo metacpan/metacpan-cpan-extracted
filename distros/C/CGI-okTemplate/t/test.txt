@@ -1,0 +1,20 @@
+Just a templates file Template File is "t/test.tpl"
+
+Required File is "CGI::okTemplate.pm"
+
+Header 1
+
+Header Inside 1
+
+Header Inside 2
+
+
+
+3rd header not found
+
+
+
+
+Footer
+
+

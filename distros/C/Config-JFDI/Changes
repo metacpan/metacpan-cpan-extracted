@@ -1,0 +1,71 @@
+TODO:
+    - What if: Config::JFDI->new() # $name is undefined?
+
+0.065 Saturday January 01 14:10:43 PST 2011:
+    - Release because of mis-version
+
+0.065 Friday December 31 14:28:21 PST 2010
+    - Non-development release
+
+0.064_2 Wednesday December 29 13:43:11 PST 2010:
+    - Conversion to Any::Moose
+    - Drop unneeded deprecation-warning test
+
+0.064_1 Tuesday December 28 17:11:22 PST 2010:
+    - Fixed bug rt53886 (thanks mzrinsky & RUSSELJ)
+    - Add Config::General as a prerequisite because it's so useful
+    - Using Dist::Zilla for release process
+
+0.064 Sunday October 18 21:33:52 PDT 2009:
+    - Non-development release
+
+0.063_3 Friday October 16 00:51:31 PDT 2009:
+    - Merged _2 & _1 with 0.063
+
+0.063_2 Thursday October 15 13:30:27 PDT 2009
+    - Added mechanism to quiet deprecation warnings in a non-author environment
+
+0.063_1 Wednesday October 14 11:32:06 PDT 2009
+    - Fixed broken __path_to__ substitution (rt50490)
+
+0.063 Tuesday June 23 11:10:15 PDT 2009:
+    - Fixed undefined warning (thanks kmx rt47237)
+    - Added note about Config::Loader
+
+0.062 Friday May 29 09:54:22 PDT 2009:
+    - Release because of bad testing environment
+
+0.061 Thursday May 28 15:21:43 PDT 2009:
+    - Fix for path extension issue, thanks minty (http://github.com/minty)
+
+0.060 Wednesday May 20 14:44:51 PDT 2009:
+    - Non-developer release
+    - Fixed tests in 17-found.t to use bag() instead of [], since we can't depend on Config::Any
+      to return loaded files in a set order (srezic++)
+
+0.050_2 Thursday May 14 13:27:31 PDT 2009:
+    - Forgot some dependencies in Makefile.PL
+
+0.050_1 Wednesday May 13 19:36:19 PDT 2009:
+    - Fixed t/14-loader-env-lookup.t to ignore external ENV (rt45624)
+    - Require Data::Visitor 0.24 (rt45624)
+    - Changed how the 'file' option to work how the user actually expects it to (and how it is in the SYNOPSIS)
+    - Added ->found
+    - Added ->open 
+
+0.050 Wednesday March 18 12:36:57 PDT 2009:
+    - Modified tests to pass on Windows using Path::Class (thanks Dan Dascalescu)
+
+0.040 Thursday October 09 16:06:20 PDT 2008:
+    - Added substitution handling
+    - Added default option
+
+0.030 Tuesday April 29 11:49:21 PDT 2008:
+    - Fixed issue with install_accessor ignoring given package name
+
+0.020 Monday April 28 19:51:17 PDT 2008: 
+    - Added env_lookup support
+    - Added install_accessor for Caelum
+
+0.010 Wednesday April 23 14:19:05 PDT 2008:
+    - Initial release

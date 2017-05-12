@@ -1,0 +1,24 @@
+Config-YAML-Tiny
+
+This is a wrapper around the YAML::Tiny module to enable simple reading and
+writing of YAML-formatted configuration files. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Config::YAML:Tiny is Copyright 2010, Timothy Appnel, 
+tima@cpan.org. All rights reserved.
+
+Oringinally based on Config::YAML by 2004 Shawn Boyette.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

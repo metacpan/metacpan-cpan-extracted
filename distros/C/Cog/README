@@ -1,0 +1,49 @@
+NAME
+
+    Cog - The Cog Information Application Framework
+
+VERSION
+
+    This document describes Cog version 0.11.
+
+SYNOPSIS
+
+        > cd content/dir
+        > cog init
+        > cog make
+        > cog start
+
+STATUS
+
+    This software is pre-alpha. Don't use it yet.
+
+DESCRIPTION
+
+    Cog lets you turn any directory on your computer into an interactive
+    application, like a website or a wiki.
+
+    This module installs a command line utility called cog. This command
+    can be used to create and update your application.
+
+DOCUMENTATION
+
+    See Cog::Manual for more information.
+
+KUDOS
+
+    Many thanks to the good people of Strategic Data in Melbourne Victoria
+    Australia, for supporting me and this project. \o/
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2010-2015. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

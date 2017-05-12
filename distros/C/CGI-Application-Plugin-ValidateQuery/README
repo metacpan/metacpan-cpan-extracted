@@ -1,0 +1,24 @@
+CGI-Application-Plugin-ValidateQuery
+
+VERSION
+
+1.0.4
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build test
+    ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc CGI::Application::Plugin::ValidateQuery
+
+Copyright (C) 2009 Summersault, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

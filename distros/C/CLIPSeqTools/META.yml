@@ -1,0 +1,48 @@
+---
+abstract: 'A collection of tools for the analysis of CLIP-Seq data.'
+author:
+  - 'Emmanouil "Manolis" Maragkakis <mns.marag@gmail.com>, Panagiotis Alexiou <pan.alexiou@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CLIPSeqTools
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Data::Dumper: '0'
+  Data::Table: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  GenOO: v1.4.5
+  GenOO::Data::File::FASTQ: '0'
+  GenOO::Data::File::SAM: '0'
+  GenOO::GeneCollection::Factory: '0'
+  GenOO::GenomicRegion: '0'
+  GenOO::RegionCollection::Factory: '0'
+  GenOO::TranscriptCollection::Factory: '0'
+  GenOOx::Data::File::SAMbwa: '0'
+  GenOOx::Data::File::SAMstar: '0'
+  IO::Interactive: '0'
+  List::Util: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  MooseX::App: '0'
+  MooseX::App::Command: '0'
+  MooseX::App::Role: '0'
+  MooseX::Getopt: '0'
+  PDL: '2.007'
+  Statistics::R: '0'
+  Try::Tiny: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/mnsmar/clipseqtools/issues
+  homepage: https://github.com/mnsmar/clipseqtools
+  repository: https://github.com/mnsmar/clipseqtools.git
+version: 0.1.7

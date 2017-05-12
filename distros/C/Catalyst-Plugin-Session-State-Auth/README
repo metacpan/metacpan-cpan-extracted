@@ -1,0 +1,39 @@
+NAME
+    Catalyst::Plugin::Session::State::Auth - Use signature in HTTP MAC
+    authentication scheme to pass the session id between requests
+
+SYNOPSIS
+    In MyApp.pm
+    use Catalyst qw/
+      Session
+      Session::State::Auth
+      Session::Store::Foo
+      /;
+DESCRIPTION
+    In your HTTP request Authorization: MAC token="h480djs93hd8",
+    timestamp="137131200", nonce="dj83hs9s",
+    signature="kDZvddkndxvhGRXZhvuDjEWhGeE="
+
+    In order for Catalyst::Plugin::Session to work, Use the mac signature to
+    pass your sessionid, and the session data needs to be stored on the
+    server.
+
+    Note that this pre-alpha version has no way to rewrite outgoing data.
+
+METHODS
+BUGS
+SEE ALSO
+    Catalyst,
+    Catalyst::Plugin::Session,Catalyst::Plugin::Session::State::URI.
+
+AUTHOR
+    Warachet Samtalee (zdk)
+
+    This module is derived from Catalyst::Plugin::Session::State::URI code.
+
+COPYRIGHT & LICENSE
+    Copyright 2011 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

@@ -1,0 +1,5 @@
+#	$Id: bad.data 51 2014-05-21 19:14:11Z adam $
+#	This is a comment!
+
+test1	foo
+test1	bar

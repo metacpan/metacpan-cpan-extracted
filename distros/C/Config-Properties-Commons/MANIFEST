@@ -1,0 +1,21 @@
+.author/shell_setup
+Build.PL
+Changes
+INSTALL
+lib/Config/Properties/Commons.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-methods.t
+t/01-options.t
+t/03-loadprops.t
+t/03-saveprops.t
+t/04-roundtrip.t
+t/data/00/prop1
+t/data/00/prop2
+t/data/00/prop3
+t/data/01/prop4

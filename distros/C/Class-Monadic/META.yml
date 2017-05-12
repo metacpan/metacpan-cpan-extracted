@@ -1,0 +1,29 @@
+---
+abstract: 'Provides monadic methods (a.k.a. singleton methods)'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>.'
+build_requires:
+  Test::LeakTrace: 0.08
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Monadic
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Method::Modifiers::Fast: 0
+  Data::Util: 0.44
+  Exporter: 5.57
+  Hash::FieldHash: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

@@ -1,0 +1,28 @@
+---
+IFF1: 0
+IFF2: 1
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 101
+  61959:
+    - 235
+    - 14
+name: ed65
+registers:
+  AF: 25554
+  AF_: 0
+  BC: 8097
+  BC_: 0
+  DE: 1928
+  DE_: 0
+  HL: 34844
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 61959

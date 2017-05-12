@@ -1,0 +1,43 @@
+NAME
+    CPAN::Indexer::Mirror - Creates the mirror.yml and mirror.json files
+
+SYNOPSIS
+      use CPAN::Indexer::Mirror ();
+  
+      CPAN::Indexer::Mirror->new(
+          root => '/cpan/root/directory',
+      )->run;
+
+DESCRIPTION
+    This module is used to implement a small piece of functionality inside
+    the CPAN/PAUSE indexer which generates mirror.yml and mirror.json.
+
+    These files are used to allow CPAN clients (via the Mirror::YAML or
+    Mirror::JSON modules) to implement mirror validation and automated
+    selection.
+
+METHODS
+    Anyone who needs to know more detail than the SYNOPSIS should read the
+    (fairly straight forward) code.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Indexer-Mirror>
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Parse::CPAN::Authors, Parse::CPAN::Packages, Parse::CPAN::Modlist,
+    Parse::CPAN::Meta, Parse::CPAN::MirroredBy
+
+COPYRIGHT
+    Copyright 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

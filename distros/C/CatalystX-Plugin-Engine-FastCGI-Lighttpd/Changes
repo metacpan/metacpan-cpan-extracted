@@ -1,0 +1,14 @@
+=============================================================
+Revision history for CatalystX-Plugin-Engine-FastCGI-Lighttpd
+=============================================================
+
+0.1.0   2009-05-21
+       - don't use NEXT.
+       - fixed warning messages.
+
+0.0.2   2009-03-31
+       - hacks the problem that mod_proxy of lighttpd doesn't
+         set HTTP_X_FORWARDED_HOST
+
+0.0.1   2009-03-29
+       - initial import

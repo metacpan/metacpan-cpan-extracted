@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This module provides routines related to doing completion in zsh.
+
+SEE ALSO
+
+    Complete
+
+    Complete::Bash, Complete::Fish, Complete::Tcsh.
+
+    zshcompctl manual page.
+

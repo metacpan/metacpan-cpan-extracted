@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 21
+    - 182
+  34695:
+    - 140
+name: ddcbb6
+registers:
+  AF: 7435
+  AF_: 0
+  BC: 1256
+  BC_: 0
+  DE: 4254
+  DE_: 0
+  HL: 7646
+  HL_: 0
+  I: 0
+  IX: 34674
+  IY: 34401
+  PC: 0
+  R: 0
+  SP: 0

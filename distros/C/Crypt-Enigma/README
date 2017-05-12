@@ -1,0 +1,29 @@
+Crypt/Enigma version 1.3
+========================
+
+Perl implementation of the WWII Enigma Machine
+
+Please see the example scripts for more information and 
+usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  none
+ 
+COPYRIGHT AND LICENCE
+ 
+Copyright (C) 2001-2002 Alistair Francis <cpan@alizta.com>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <title>first.tt</title>
+    </head>
+
+    <body>
+        <h1>first.tt</h1>
+
+        <form name="first_form" method="GET" action="" >
+            <input type="text" name="first_text" />
+            <input type="submit" value="Click!" />
+        </form>
+    </body>
+</html>

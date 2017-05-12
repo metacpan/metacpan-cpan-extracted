@@ -1,0 +1,35 @@
+NAME
+    Catalyst::Plugin::Cache::Memcached - Distributed cache
+
+SYNOPSIS
+        use Catalyst qw[Cache::Memcached];
+
+        MyApp->config->{cache}->{servers} = [ '10.0.0.15:11211', 
+                                              '10.0.0.15:11212' ];
+
+        my $data;
+
+        unless ( $data = $c->cache->get('data') ) {
+            $data = MyApp::Model::Data->retrieve('data');
+            $c->cache->set( 'data', $data );
+        }
+
+        $c->response->body($data);
+
+DESCRIPTION
+    Extends base class with a distributed cache.
+
+METHODS
+    cache
+        Returns an instance of "Cache::Memcached"
+
+SEE ALSO
+    Cache::Memcached, Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com" Sebastian Riedel "sri@oook.de"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

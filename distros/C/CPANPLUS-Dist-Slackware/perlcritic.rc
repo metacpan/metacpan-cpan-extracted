@@ -1,0 +1,10 @@
+[-Documentation::PodSpelling]
+
+[-InputOutput::RequireBriefOpen]
+
+[-RegularExpressions::ProhibitComplexRegexes]
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 50

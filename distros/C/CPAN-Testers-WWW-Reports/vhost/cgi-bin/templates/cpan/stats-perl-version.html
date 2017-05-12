@@ -1,0 +1,28 @@
+[%
+    passmatrix = 1
+
+    htmltitle = 'CPAN distributions for Perl version ' _ perl
+    title = 'CPAN distributions for Perl version ' _ perl
+
+    crumb1_name = 'Perl' ;
+%]
+
+[% USE Comma -%]
+
+<h1>CPAN distributions with their latest PASSing version for Perl [% perl %]</h1>
+
+<p>The following table lists the count of distributions that have had at least one 
+PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+<p>See also: <a href="index.html">All stats</a>, <a href="perl_[% perl %]_platforms.html">perl+platform crosstable</a></p>
+<p>Total number of modules with PASSing test for this perl: <strong>[% cnt_modules | comma %]</strong>.</p>
+
+<div class="container">
+<table class="test_results">
+<tr><th>Distribution</th><th>Version</th></tr>
+[% FOREACH d = data %]
+ <tr><td><a href="distro/[% d.dist.substr(0,1) %]/[% d.dist %].html">[% d.dist %]</a></td><td>[% d.version %]</td></tr>
+[% END %]
+</table>
+</div>

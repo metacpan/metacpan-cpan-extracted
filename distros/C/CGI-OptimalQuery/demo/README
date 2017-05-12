@@ -1,0 +1,31 @@
+These instructions guide the reader through the steps to install a small perl
+CGI app which uses CGI::OptimalQuery. These instructions have been tested on
+Scientific Linux 7.
+
+
+Step 1) Install required packages
+  sudo yum install libdbi-dbd-sqlite httpd perl-DBD-SQLite
+
+
+Step 2) create and populate an sqlite database
+  ./make_test_data.pl
+
+
+Step 3) Configure Apache
+
+  # edit an apache virtualhost
+  sudo vi /etc/httpd/conf.d/0default.conf
+
+  # add an apache alias to the CGI::OptimalQuery Resources directory
+  Alias /OptimalQuery/ /path/to/perl-CGI-OptimalQuery/lib/CGI/OptimalQuery/Resources/
+
+  # add a script alias to view the demos
+  ScriptAlias /OptimalQueryDemo/ /path/to/perl-CGI-OptimalQuery/demo/cgi-bin/
+
+  # restart apache
+  sudo apachectl restart
+
+
+Step 4) Open your web browser to ..
+
+  http://localhost/OptimalQueryDemo/index.pl

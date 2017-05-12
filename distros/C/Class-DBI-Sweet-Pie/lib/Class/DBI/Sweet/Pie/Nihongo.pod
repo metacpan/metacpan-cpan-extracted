@@ -1,0 +1,124 @@
+=encoding euc-jp
+
+=head1 名前
+
+Class::DBI::Sweet::Pie - Class::DBI::Sweetで集約関数を扱うためのモジュール
+
+=head1 概要
+
+  package MyData::CD;
+  use base qw/Class::DBI::Sweet/;
+  __PACKAGE__->has_a( artist => 'MyData::Artist' );
+  use Class::DBI::Sweet::Pie;
+  __PACKAGE__->mk_aggregate_function('sum');
+  __PACKAGE__->mk_aggregate_function( max => 'maximum');
+  
+  package MyData::Artist;
+  use base qw/Class::DBI::Sweet/;
+  __PACKAGE__->has_many( cds => 'MyData::CD' );
+  use Class::DBI::Sweet::Pie;
+  __PACKAGE__->mk_aggregate_function('min');
+  __PACKAGE__->mk_aggregate_function( max => 'maximum');
+  
+  package main;
+  
+  # 一番高価なCDの価格
+  $max_price = MyData::CD->maximum( 'price' );
+  
+  # fooさんのCDの合計金額
+  $total_price = MyData::CD->sum( 'price',
+  	{ 'artist.name' => 'foo', }
+  );
+  
+  # fooさんのCDで一番安価なものの価格
+  $artist = MyData::Artist->search( name => 'foo' );
+  $min_price = $artist->min('cds.price');
+
+=head1 説明
+
+Class::DBI::Sweetを使ったテーブルで集約関数を簡単に使えるようになります。
+
+=head1 使い方
+
+=head2 集約関数メソッドを作る
+
+mk_aggregate_functionメソッドを使って集約関数を追加します。
+第１引数にSQLで利用する集約関数を、第２引数にメソッド名を指定します。
+メソッド名が省略された場合は、集約関数名がメソッド名になります。
+
+  __PACKAGE__->mk_aggregate_function( 'max' );
+
+または
+
+  __PACKAGE__->mk_aggregate_function( 'max' => 'maximum' );
+
+=head2 集約関数メソッドを使う
+
+　集約関数の第１引数に、対象となるカラム名を記述します。
+
+  $max_price = MyData::CD->maximum( 'price' );
+
+　第２引数以降はClass::DBI::Sweetのsearchメソッドと同様の記述ができます。
+
+  # SELECT SUM(price) FROM __TABLE__ WHERE artist = 'foo'
+  $total_price = MyData::CD->sum( 'price',
+  	'artist' => 'foo',
+  );
+
+または
+
+  # SELECT SUM(price) FROM __TABLE__ WHERE price >= 1000
+  $total_price = MyData::CD->sum( 'price',
+    {
+  	   'price' => {'>=', 1000},
+    }
+  );
+
+関連付けられた他のテーブルのカラムも集計できます。
+
+  $max_price = MyData::Artist->maximum( 'cds.price' );
+
+has_manyなテーブルに対してはこんなこともできます。
+
+  $artist = MyData::Artist->search( name => 'foo' );
+  $min_price = $artist->min('cds.price');
+
+=head2 集約関数の値を含んだ検索
+
+アーティスト名とその人の一番高いCDの価格を表示するにはこんな風に書きます。
+
+  my @artists = MyData::Artist->search( $criteria );
+  foreach my $artist (@artists) {
+    print $artist->name, "\t", $artist->maximum('cds.price'), "\n";
+  }
+
+ループのたびに集約関数を使ってイマイチだと思うなら、こんなこともできます。
+
+  my @artists = MyData::Artist->search_with_maximum( 'cds.price', $criteria );
+  foreach my $artist (@artists) {
+    print $artist->name, "\t", $artist->maximum, "\n";
+  }
+
+ついでに価格の高い順に並べ換えたりもできます。
+
+  my @artists = MyData::Artist->search_with_maximum( 'cds.price',
+  	$criteria,
+  	{order_by => 'maximum DESC'}
+  );
+
+=head1 著者
+
+ASAKURA Takuji <asakura.takuji+cpan@gmail.com>
+
+=head1 ライセンス
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 参照
+
+L<Class::DBI::Sweet>
+
+L<Class::DBI::Plugin::AggregateFunction>
+
+=cut

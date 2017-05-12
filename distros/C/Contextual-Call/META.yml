@@ -1,0 +1,22 @@
+# http://module-build.sourceforge.net/META-spec.html
+name:         Contextual-Call
+version:      0.01
+version_from: lib/Contextual/Call.pm
+installdirs:  site
+author:       YAMASHINA Hio <hio@cpan.org>
+abstract: call sub with caller's context
+license: perl
+#requires:
+build_requires:
+  Test::More: 0
+no_index:
+  directory:
+    - inc
+    - t
+    - example
+
+distribution_type: module
+generated_by: ExtUtils::MY_Metafile version 0.07, EUMM-6.17.
+meta-spec:
+  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html

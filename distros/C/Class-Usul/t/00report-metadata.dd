@@ -1,0 +1,71 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'recommends' => {
+                                        'IPC::Run' => '0.89',
+                                        'Proc::ProcessTable' => '0.42'
+                                      },
+                      'requires' => {
+                                      'Class::Inspector' => '1.28',
+                                      'Class::Null' => '2.110730',
+                                      'Crypt::CBC' => '2.33',
+                                      'Crypt::Twofish2' => '1.02',
+                                      'Data::Printer' => '0.36',
+                                      'Data::Record' => '0.02',
+                                      'Date::Format' => '2.24',
+                                      'DateTime::Format::Epoch' => '0.16',
+                                      'Exporter::Tiny' => '0.042',
+                                      'File::DataClass' => 'v0.68.0',
+                                      'File::Gettext' => 'v0.30.0',
+                                      'File::HomeDir' => '1.0',
+                                      'File::Which' => '1.18',
+                                      'Getopt::Long::Descriptive' => '0.099',
+                                      'IO::Interactive' => 'v0.0.6',
+                                      'IPC::SRLock' => 'v0.30.0',
+                                      'JSON::MaybeXS' => '1.003',
+                                      'Log::Handler' => '0.84',
+                                      'Module::Runtime' => '0.014',
+                                      'Moo' => '2.000001',
+                                      'Pod::Eventual' => '0.094001',
+                                      'Sub::Install' => '0.928',
+                                      'Term::ReadKey' => '2.33',
+                                      'Text::Autoformat' => '1.72',
+                                      'Time::Zone' => '2.24',
+                                      'Try::Tiny' => '0.22',
+                                      'Type::Tiny' => '1.000002',
+                                      'Unexpected' => 'v0.43.0',
+                                      'namespace::autoclean' => '0.26',
+                                      'namespace::clean' => '0.25',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0.22',
+                                   'File::Spec' => '0',
+                                   'Hash::MoreUtils' => '0.05',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Deep' => '0.108',
+                                   'Test::Requires' => '0.06',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

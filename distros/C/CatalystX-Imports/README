@@ -1,0 +1,16 @@
+Installation
+
+  You can install this module like any other perl module:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+  Depending on your setup, you probably will need superuser
+  privileges to run the last command.
+
+  Note, however, that the installation via CPAN[1] is the
+  recommended method for installing this module. Using CPAN will
+  make sure that you install the latest version.
+

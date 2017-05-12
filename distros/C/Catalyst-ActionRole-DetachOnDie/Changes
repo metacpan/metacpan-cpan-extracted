@@ -1,0 +1,23 @@
+Revision history for Catalyst-ActionRole-DetachOnDie
+
+0.001006  2013-07-12 19:24:34 CST6CDT
+  - DEPRECATED for Catalyst 5.90040
+
+0.001005  2012-11-17 17:12:13 CST6CDT
+  - Put MetaYAML back in dist
+
+0.001004  2012-05-28 09:00:31 America/Chicago
+  - allow $c->go exceptions to pass (Aristotle Pagaltzis)
+
+0.001003  2012-03-20 13:43:35 America/Chicago
+  - allow explicit $c->detach exceptions to pass through without
+    any action being taken (bphillips)
+
+0.001002  2012-03-06 14:25:48 CST6CDT
+  - fix huge bug where $c->error wasn't set correctly (good catch xinming)
+
+0.001001  2012-01-30 16:43:14 CST6CDT
+  - Add missing dep
+
+0.001000  2011-11-18 23:15:10 CST6CDT
+  - initial release

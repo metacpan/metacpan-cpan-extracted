@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  35708:
+    - 85
+name: fdcbe6
+registers:
+  AF: 64905
+  AF_: 0
+  BC: 55432
+  BC_: 0
+  DE: 7727
+  DE_: 0
+  HL: 56821
+  HL_: 0
+  I: 0
+  IX: 17141
+  IY: 35590
+  PC: 4
+  R: 2
+  SP: 0

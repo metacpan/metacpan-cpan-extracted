@@ -1,0 +1,66 @@
+{
+   "abstract" : "A truly Pure Perl interface to Git repositories",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <cogit@afoolishmanifesto.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cogit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Check::ISA" : "0",
+            "Compress::Raw::Zlib" : "0",
+            "Compress::Zlib" : "0",
+            "Config::GitLike" : "0",
+            "Data::Stream::Bulk" : "0",
+            "DateTime" : "0",
+            "File::Find::Rule" : "0",
+            "IO::Digest" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "Sub::Exporter::Progressive" : "0.001011",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Archive::Extract" : "0",
+            "Test::More" : "0.88",
+            "Test::utf8" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Cogit/issues"
+      },
+      "homepage" : "https://github.com/frioux/Cogit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Cogit.git",
+         "web" : "https://github.com/frioux/Cogit"
+      }
+   },
+   "version" : "0.001001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

@@ -1,0 +1,307 @@
+=head1 NAME
+
+Configuration -- Configuration for ClearCase::Wrapper::MGi
+
+=head1 SYNOPSIS
+
+Four methods, to configure different aspects:
+
+=over 4
+
+=item C<##:BranchOff: root> in the config spec
+
+=item .clearcase_profile.pl
+
+=item environment variables
+
+=item variables in the configuration modules
+
+=back
+
+=head1 DESCRIPTION
+
+The I<extra> directory contains files which can be used to configure
+the wrapper for specific needs, either on a site on a user basis.
+
+The features described here are not enabled by default.
+
+One functionality is highly experimental
+(the C<FSCBROKER> environment variable): fixing the layout of source
+containers for elements of text_file and derivate types, in
+conjunction with the I<BranchOff> mechanism
+
+=head2 BranchOff
+
+The I<BranchOff> mechanism is one of the two driving forces of this
+wrapper (the other one being I<incremental type families>).
+
+The intention is to make it possible to always branch off,
+when checking out a version not already on a branch one created oneself;
+this without ending up cascading 'forever',
+i.e. until meeting system limits.
+
+The setup is simple, and per view. Start your config spec with a
+meta-comment such as:
+
+  ##:BranchOff: root
+
+The effect will be to interpret C<mkbranch> directives (in the config
+spec) as injonctions to branch off the root of the version tree for
+every element (usually C</main/0>).
+
+The relation to the predecessor version is not lost: it is
+reestablished with a C<Merge> hyperlink.
+
+As this might result in 'bloated' source containers
+(in fact a very minor concern, even with certain advantages),
+an additional, optional setup may be considered: see below.
+
+=head3 fixsrccnt, FixSrcCont.pm, FSCbrokerSuDo, FSCbrokerSsh
+
+These files implement the experimental feature: I<fix source containers>.
+
+The rationale is documented in:
+
+L<http://code.google.com/p/clearcase-cpan/wiki/TypeMgr>
+
+These files are not installed by C<make install>, and are largely
+provided as templates for you to configure according to yourown
+environment.
+
+=head4 fixsrccnt
+
+This should be installed in a path accessible from every client,
+possibly in a vob. The path to C<perl> is the only part I changed
+myself.
+
+=head4 FixSrcCont.pm
+
+This must be installed as C<ClearCase::FixSrcCont> in a path in C<$INC>.
+
+Note that installing the file (e.g. for one user) is not enough to
+enable its use (e.g. for others).
+
+Remember to set there the path to the previous script, unless the
+default is suitable (unlikely since host local):
+
+ my $fxsc = '/usr/local/bin/fixsrccnt';
+
+=head4 FSCbrokerSuDo and/or FSCbrokerSsh
+
+These two scripts implement alternatives to make it possible to run
+C<fixsrccnt> as vob owner, for every possible argument (hence
+potentially multiple vob owner accounts).
+
+The C<sudo> alternative is preferred on UNIX, but the C<ssh> one is
+needed from Windows or Cygwin (note: that the current implementation
+is restricted to UNIX vob servers!)
+
+Install in a path reachable from every client, and setuid to an
+account trusted by every vob server account in the appropriate way
+(i.e. using C<sudo>, this may be restricted to using C<fixsrccnt> but
+in a passwordless way).
+
+Adjust the paths to C<perl> and to C<fixsrccnt>.
+
+In addition, check the path to C<sudo> for C<FSCbrokerSuDo>,
+which uses the C<Sudo> CPAN package (which you have to install).
+
+For C<FSCbrokerSsh>, the C<$sshhost> must be set.
+The template also assumes an installation in a vob, hence uses a C<$view>.
+Otherwise, it uses the same C<Net::SSH::Perl> CPAN package as does
+C<ForceLock> (see below).
+
+To enable the functionality, you must select the variant of the script
+suitable for your system, and set the environment variable
+accordingly:
+
+ FSCBROKER=ClearCase::FSCbrokerSuDo
+
+=head2 VobPathConv.pm
+
+I<VobPathConv.pm> (and its pod file) does not require any
+configuration and may be used as such. I may even consider to extract
+it and publish it as a separate package in its own, albeit modest,
+right.
+
+It offers functions to convert paths from Windows to Unix, using the registry
+to map the tags in associated regions.
+
+It must be installed in the C<@INC> path as C<ClearCase::VobPathConv>.
+
+=head2 ForceLock
+
+The remaining files are mostly concerned with locking and unlocking label
+types owned by other people (colleagues, members of the same group, vob
+owner...).
+
+The lack of such an ability is considered a bug in ClearCase, and is the
+object of an RFE (currently rejected...). It defeats the use of locking in
+general.
+
+The installer must select the solution(s) best adapted to her case,
+possibly edit a few fields appropriate to her environment, and copy
+the suitable file by hand to the lib/site_perl directory.
+
+Users must pick up these configurations with environment variables,
+e.g. setting them in their C<~/.clearcase_profile.pl> file
+
+I<ForceLockSudo.pm> implements the simplest, safest and most efficient
+solution, from unix. As its alternatives, dealing with cases in which
+this superior solution could not be used, it is meant to be installed
+in the C<@INC> path, under a ClearCase directory, and accessed via an
+environment variable
+
+  FORCELOCK=ClearCase::ForceLockSudo
+
+This is so its use would not penalize functions which do not require
+locking.  Two other versions are provided for now, one for unix, and
+one for Windows (and cygwin):
+
+  FORCELOCK=ClearCase::ForceLockUnix #Unix
+  FORCELOCK=ClearCase::ForceLock     #Windows
+
+These can be used as examples or a templates. They require some
+customization.  The two latter build upon I<locklbtype>, a standalone
+script, to be installed suid enabled, owned by an account, which is
+itself authorized in the configurations of the respective vob owners
+of all vobs in the local region, to run locking commands. It acts as a
+switch, allowing to simplify the maintainance of the authorization
+setup.
+
+Two variants are proposed: one using ssh, the other using sudo. Only
+the most suitable one needs to be installed, as I<locklbtype>.  The
+appropriate setup will have to be performed respectively in the vob
+owner accounts' I<~/.ssh/authorized_keys> files, or in the host based
+or system-wide I</etc/sudoers> file.
+
+Both variants require a minimal customization.
+
+For ssh, one needs to set the name of the host running an sshd daemon
+Note that one needs to avoid using I<localhost> here, so that
+different host keys do not overwrite each other in the
+I<~/.ssh/known_hosts> files.
+
+For both, one may also set the name of the log used to save the
+identity of the unlocking users (for lock events, this is saved in a
+comment of the locks).  The paths to ssh or sudo, cleartool and perl
+are likely to be satisfying.
+
+In order to use this script, we needed to define a pair of functions,
+for locking and unlocking.
+
+The unix version of the I<ClearCase::ForceLock> module, is meant to
+invoke locklbtype via a system call, therefore using the suid bit
+mechanism offered by unix shells.  The only customization is the path
+to the locklbtype utility.
+
+In a Windows environment, the related module fills the same role, but
+invokes the suid script on a unix host, via ssh.
+As perl is found in a vob on my unix environment, I need to customize
+a view tag in addition to the host name and the path to the script.
+
+Ssh is accessed with the Net::SSH::Perl module.
+
+It depends on a long list of modules, which I could successfully
+install on:
+I<cygwin 1.7 / perl 5.10 / libgmp-devel 4.3.1-1, libssh2, pari-gp 2.3.5>
+and on I<Windows Vista / Strawberry perl 5.12 / GMP-4.1.2>:
+
+  Digest-SHA1-2.1
+  Digest-HMAC-1.01
+  Class-ErrorHandler-0.01
+  Convert-ASN1-0.22
+  Crypt-CBC-2.30
+  Crypt-DES-2.05
+  Crypt-Blowfish-2.10
+  Crypt-DES_EDE3-0.01
+  Convert-PEM-0.07
+  Data-Buffer-0.04
+  Class-Loader-2.03
+  Convert-ASCII-Armour-1.4
+  Digest-MD2-2.03
+  Sort-Versions-1.5
+  Tie-EncryptedHash-1.24
+  Digest-BubbleBabble-0.01
+  String-CRC32-1.4
+  Math::GMP-2.05
+  Math::BigInt::GMP-1.24
+  Math::BigInt-1.89
+  Net::SSH::Perl-1.34
+
+On cygwin, I had in addition to install:
+
+  Crypt-DH-0.06
+  Crypt-DSA-0.14
+  Crypt-IDEA-1.08
+  Math-Pari-2.01080604
+  Crypt-Random-1.25
+  Crypt-Primes-0.50
+  Crypt-RSA-1.98
+
+Note that these are just the versions I use, and which work for me.
+I cannot claim that this list is a minimal requirement.
+
+=head2 .clearcase_profile.pl
+
+This file is meant to be found in the user home directory.
+It is common to all possible wrappers derived from ClearCase::Wrapper.
+It may be symlinked from a shared version, for sitewise configuration.
+
+An example of I<.clearcase_profile.pl> sets the ipc mode for all
+commands apart for setview (unavailable then, assuming the wrapper
+itself is used from a vob).
+
+An other setting for this file is:
+
+  $ClearCase::Wrapper::MGi::global = 1;
+
+This setting drives I<mklbtype> and I<mkbrtype> to create I<global>
+types (including the metadata types) in vobs having an admin vob.
+
+This used to be the default with I<ClearCase::Wrapper::DSB>.
+
+Next possible setting:
+
+  $ClearCase::Wrapper::MGi::lockbl = 1;
+
+If this is set, the baseline type is locked in the end of a rollout.
+Conversely, a next rollout is aborted if the baselin is found unlocked on
+entry, in order to prevent possible collisions of independent rollouts.
+This would be the default if locking/unlocking by group members was
+supported natively by ClearCase, instead of depending on user configuration.
+
+Note that one might e.g. add there code such as:
+
+  umask(002);
+
+This ensures that under cleartool (from the wrapper), group members
+are granted write access e.g. to directory elements being created.
+
+The example provided also sets an environment variable (see below).
+
+=head2 environment variables
+
+Four variables to consider (see earlier for the two first):
+
+  FORCELOCK
+  FSCBROKER
+  CLEARCASE_TAB_SIZE: affects the annotate format (default: 2)
+  CCMGI_ANNF: annotate format
+  CCMGI_ANNL: length of the prefix in the annotate format
+    (before the actual file contents)
+
+The default annotate format is:
+
+  %Sd %25.-25Vn %-9.9u,|,%Sd %25.-25Vn %-9.9u
+
+This means: a short date, a 25 chars right aligned, possibly truncated
+field for the version specification, a 9 chars left aligned field for
+the author. The same format is used for elisions as for additions.
+
+Its corresponding prefix length is: 49 (10 for the date, 25 for the
+version, 9 for the id, 2 for space separators, and 3 for the deletion
+marker--including spaces).
+
+This prefix is used to compute the beginning of the text upon which to
+apply regexps in case of using the C<-grep> option of C<annotate>.

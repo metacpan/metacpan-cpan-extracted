@@ -1,0 +1,99 @@
+Chipcard/CTAPI version 0.2
+==========================
+
+CTAPI is an industry standard for accessing chipcard terminals. CTAPI 
+drivers are available for all popular card readers. Chipcard::CTAPI
+is a Perl module which allows direct access to both memory cards
+and processor cards (smartcards) based on the CTAPI library. Besides
+the CTAPI functions themselves, Chipcard::CTAPI provides a series of 
+convenience methods for easy reading and writing of memory cards.
+
+Using CTAPI often has advantages over using the other popular card 
+terminal framework, PC/SC. Most noticable is that setting up the CTAPI
+drivers is an easy task even for less advanced end users and that it
+has no run-time overhead. PC/SC on the other hand requires more work 
+to set up and results in a daemon process running all the time. Thus,
+using CTAPI is ideal when writing applications which can make use of
+chipcards but don't focus on the communication with the card terminal
+too much.
+
+Chipcard::CTAPI is well documented and comes with a couple of demo
+applications.
+
+
+PREREQUISITES
+-------------
+
+1. Perl, Version 5.005 or higher (5.6 or higher recommended).
+2. A working CTAPI library for your card terminal.
+   If you're using the popular Towitoko card terminals, pick 
+   libtowitoko from http://www.geocities.com/cprados/ .
+
+
+INSTALLATION
+------------
+
+1. If you do NOT have a Towitoko card terminal, you'll have to edit
+   Makefile.PL and change the LIBS line. It currently looks like this:
+
+   'LIBS'              => ['-ltowitoko'], # PUT YOUR CARD TERMINAL ...
+
+   Change the -ltowitoko to match your CTAPI library's name. For 
+   example, if your library's filename is libsmarty123.so, you'd put
+   -lsmarty123 between [' and '] .
+
+2. Run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+
+   This should work without any errors. If it doesn't work, make sure
+   ctapi.h and ctbcs.h as well as the library set in step 1 can be 
+   found on your machine.
+
+   If you want to test whether the communication with your card terminal
+   actually works, edit the file quicktest.pl to make sure the correct
+   physical port your card terminal is attached to is used, and then run
+
+    perl ctapitest.pl
+
+   If this works without errors so far, it is safe to run
+
+    make install
+
+   You might require root privileges for this last step depending on 
+   your system.
+
+
+EXAMPLES AND DOCUMENTATION
+--------------------------
+
+You can view the perl module's documentation using this command:
+
+    perldoc Chipcard::CTAPI
+
+If you're planning on using it in your own Perl programs, you should
+take some time and read it all.
+
+There's a couple of demo applications in the demos/ subdirectory of
+the distribution archive. They're less useful by themselves, but show
+how various operations can be done easily using Chipcard::CTAPI.
+
+
+NOTES
+-----
+
+This version of Chipcard::CTAPI has only been tested with Towitoko
+chipcard terminals. Although CTAPI is standardized, this module might
+not work with your hardware. Please report problems.
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2003 Wolfgang Hommel (wolf (at) code-wizards.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

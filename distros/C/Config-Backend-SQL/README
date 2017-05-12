@@ -1,0 +1,22 @@
+Conf::SQL
+=========
+
+You should be able to make this package only by issuing:
+
+	perl Makefile.PL
+	make
+	
+	export DSN="a database dsn", e.g. "dbi:Pg:dbname=conf;host=localhost"
+	export DBUSER="a database user", e.g. "conf"
+	export DBPASS="a password for the database user"
+
+	make test
+
+	(sudo) make install
+
+	If you don't want the Conf::SQL package, use 
+
+	perl Makefile.PL --no-sql
+
+
+

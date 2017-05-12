@@ -1,0 +1,183 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB ids => [ 'IDL:Bank:1.0' => undef ];
+use Error qw(:try);
+
+use strict;
+
+my $orb = CORBA::ORB_init("omniORB4");
+my ($ids,$id);
+$ids = $orb->list_initial_services();
+print "initial services:\n";
+foreach $id (@{$ids}) {
+  print "\t$id\n";
+}
+my $ir = $orb->resolve_initial_references("InterfaceRepository");
+if( CORBA::is_nil($ir) ) {
+  print "Can't connect to InterfaceRepository service\n";
+  exit 1;
+}
+
+open IOR, "account.ref";
+my $ior = <IOR>;
+close IOR;
+
+my $account = $orb->string_to_object($ior);
+
+#$account->_set_prefs ( { favorite_color => 'taupe',
+#		         lottery_numbers => [ 21, 63, 83, 96 ],
+#		         nickname => 'Dopey' });
+
+#print "$$\n";
+#sleep 5;
+
+for (my $i=0;$i<0;$i++) {
+    $account->deposit( 1 );
+}
+$account->deposit( 100 );
+$account->deposit( 100 );
+$account->deposit( 100 );
+$account->deposit( 100 );
+$account->deposit( 100 );
+$account->withdraw( 240 );
+$account->withdraw( 10 );
+
+print "Balance is ".$account->balance."\n";
+
+my $prefs = $account->_get_prefs;
+print "Favorite color is ",$prefs->{favorite_color},"\n";
+print "Lottery numbers are ",
+    join(" ", @{$prefs->{lottery_numbers}}),"\n";
+print "Nickname is ",$prefs->{nickname},"\n";
+$account->set_pref ( [ 'pt_color', 'chartreuse', ] );
+$account->set_pref ( [ 'pt_nickname', 'Grumpy', ] );
+
+$account->_set_appearance ( [ map { [ split // ] } split /\n/, <<'FACE' ] );
+  /****\  
+ ;     	; 
+ [ O  O ] 
+ l   \ 	l 
+  ; -- ;  
+   ;;;;	  
+FACE
+
+for (@{$account->_get_appearance}) {
+    print join("",@$_),"\n";
+}
+
+print "Favorite color is now ",$account->get_pref('pt_color')->[1],"\n";
+print "As an any: favorite color is now ",
+          $account->get_pref_any('pt_color')->value,
+	  "(", $account->get_pref_any('pt_color')->type->kind,")","\n";
+print "As an any: nickname is now ",
+          $account->get_pref_any('pt_nickname')->value,
+	  "(", $account->get_pref_any('pt_nickname')->type->kind,")","\n";
+my $ln = $account->get_pref_any('pt_lotnum')->value;
+print "As an any: lottery_numbers are now ",
+	  join(" ", @{$ln}),
+	  "(", $account->get_pref_any('pt_lotnum')->type->kind,")","\n";
+
+print "2 * 1,000,000,000,0000 pennies = ", 
+    $account->add ('1 000 000 000 000', '1 000 000 000 000'),
+    " pennies\n";
+
+print "Withdrawing \$100,000\n";
+try {
+    $account->withdraw (100_000);
+} catch Bank::Account::InsufficientFunds with {
+    my $e = shift;
+    print STDERR "Oops. I don't have that much money\n";
+    print STDERR "    (I need $e->{overdraft} more)\n";
+};
+
+my $counter = $account->counter();
+print join(" ", map { $counter->next } (1..10)), "\n";
+
+$counter->destroy();
+try {
+    $counter->next;
+} catch CORBA::Exception with {
+    print "Caught $_[0], while counting with a destroyed counter\n";
+};
+
+# DynAny
+{
+  my $dafact = $orb->resolve_initial_references("DynAnyFactory");
+
+  my $da_any = $account->get_da_struct();
+  print "Any kind = ", $da_any->type->kind, "\n";
+  my $da = $dafact->create_dyn_any( $da_any );
+  print "DynamicAny kind ", $da->type->kind, "\n";
+
+  my $da_struct = DynamicAny::DynStruct::_narrow($da);
+  my $struct = $da_struct->get_members();
+  print "da_struct {\n";
+  my $field;
+  foreach $field (@{$struct}) {
+    print $field->{id},"=", $field->{value}->value, "\n";
+  }
+  print "}\n";
+
+  # test for plain DynAny
+  {
+    my $da_long = $dafact->create_dyn_any( $struct->[0]->{value} );
+    print "lval=",$da_long->get_long(),"\n";
+    $da_long->destroy();
+    my $da_string = $dafact->create_dyn_any( $struct->[1]->{value} );
+    print "sval=",$da_string->get_string(),"\n";
+    $da_string->destroy();
+  }
+  #test for CORBA::Fixed
+  {
+    my $da = $dafact->create_dyn_any( $struct->[2]->{value} );
+    my $da_fixed = DynamicAny::DynFixed::_narrow($da);
+    print "fval=",$da_fixed->get_value(),"\n";
+    $da->destroy();
+  }
+  #test for CORBA::Enum
+  {
+    my $da = $dafact->create_dyn_any( $struct->[3]->{value} );
+    my $da_enum = DynamicAny::DynEnum::_narrow($da);
+    print "fval=",$da_enum->get_as_string(),"(",$da_enum->get_as_ulong(),")\n";
+    $da->destroy();
+  }
+
+  # set members
+  {
+    my $lval_any = new CORBA::Any (CORBA::TypeCode->new('IDL:CORBA/Long:1.0'),   18 );
+    my $sval_any = new CORBA::Any (CORBA::TypeCode->new('IDL:CORBA/String:1.0'), "eightteen" );
+    my $fval_any = new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Amount:1.0'),  "18.08" );
+    my $enval_any = new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/da_enum:1.0'), "da_enum_3" );
+    $da_struct->set_members( 
+    [
+      { id => 'lval', value => $lval_any },
+      { id => 'sval', value => $sval_any },
+      { id => 'fval', value => $fval_any },
+      { id => 'enval',value => $enval_any },
+    ]);
+  }
+
+  # get_members_as_dyn_any
+  {
+    my $struct = $da_struct->get_members_as_dyn_any();
+    print "dyn_any_struct {\n";
+    print $struct->[0]->{id},"=",$struct->[0]->{value}->get_long(),"\n";
+    print $struct->[1]->{id},"=",$struct->[1]->{value}->get_string(),"\n";
+    my $da_fixed = DynamicAny::DynFixed::_narrow($struct->[2]->{value});
+    print $struct->[2]->{id},"=",$da_fixed->get_value(),"\n";
+    my $da_enum = DynamicAny::DynEnum::_narrow($struct->[3]->{value});
+    print $struct->[3]->{id},"=",$da_enum->get_as_string(),"(",$da_enum->get_as_ulong(),")\n";
+    print "}\n";
+  }
+}
+
+# inout
+my $smth = "asd";
+print "inout: want '$smth'\n";
+$account->set_new_get_old( \$smth );
+print "inout: was '$smth' - MUST BE EMPTY\n";
+$smth = "qwe";
+$account->set_new_get_old( \$smth );
+print "inout: was '$smth' - MUST BE 'asd'\n";
+
+print "Successful completion\n"

@@ -1,0 +1,108 @@
+<h2>Menu Admin - [% IF data.menuid %]Edit[% ELSE %]Add[% END %] Menu</h2>
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="menu-save" />
+<input type="hidden" name="menuid" value="[% data.menuid %]" />
+
+[% IF thanks %]<p>Menu saved successfully.[% END %]
+[% IF errmess %]
+<div class="box">
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+</div>
+[% END %]
+
+<div class="admin">
+<table>
+[% IF data.menuid %]
+<tr><th>ID</th>
+    <td></td>
+    <td>[% data.menuid %]</td></tr>
+[% END %]
+<tr><th>Title</th>
+    <td class="red">[% date.title_err %]</td>
+    <td><input type="text" name="title" size="32" value="[% data.title %]" /></td></tr>
+<tr><th>Type</th>
+    <td class="red">[% data.typeid_err %]</td>
+    <td>[% data.ddtypes %]</td></tr>
+<tr><th>Realm</th>
+    <td class="red">[% data.realm_err %]</td>
+    <td>[% data.ddrealms %]</td></tr>
+</table>
+</div>
+
+<p class="smalltext"><input type="button" value='Save Menu' />
+
+[% IF data.menuid %]
+<h4>Edit Options</h4>
+
+<div class="admin">
+<table>
+<tr>
+    <th>Order</th>
+    <th>Text</th>
+    <th>Href</th>
+[% IF data.typeid == 2 %]
+    <th>Image</th>
+[% END %]
+[% IF data.typeid == 3 %]
+    <th>Image</th>
+    <th>Rollover</th>
+[% END %]
+[% IF data.typeid == 4 %]
+    <th>Image</th>
+    <th>Rollover</th>
+    <th>Selected</th>
+[% END %]
+    <th>Actions</th>
+</tr>
+[% FOREACH opt = data.options %]
+<tr>
+    <td><input type="text" name="ORDER[% opt.optionid %]" size="2" value="[% opt.orderno %]" /></td>
+    <td><input type="text" name="TEXT[% opt.optionid %]" size="32" value="[% opt.text %]" /></td>
+    <td><input type="text" name="HREF[% opt.optionid %]" size="32" value="[% opt.href %]" /></td>
+
+[% IF data.typeid == 2 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+    </td>
+[% END %]
+[% IF data.typeid == 3 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+        <input type="hidden" name="IMAGEID[% opt.optionid %]" value="[% opt.imageid1 %]" />
+    </td>
+    <td><input type="file" name="ROLLOVER[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image2 %]<img src="[% webpath %]/images/[% opt.image2 %]" alt="" />[% END %]
+    </td>
+[% END %]
+[% IF data.typeid == 4 %]
+    <td><input type="file" name="IMAGE[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image1 %]<img src="[% webpath %]/images/[% opt.image1 %]" alt="" />[% END %]
+    </td>
+    <td><input type="file" name="ROLLOVER[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image2 %]<img src="[% webpath %]/images/[% opt.image2 %]" alt="" />[% END %]
+    </td>
+    <td><input type="file" name="SELECTED[% opt.optionid %]" size="10" value="" /><br />
+        [% IF opt.image3 %]<img src="[% webpath %]/images/[% opt.image3 %]" alt="" />[% END %]
+    </td>
+[% END %]
+
+
+    <td><input type=image name="optdel" value="[% opt.optionid %]" src="[% webpath %]/images/icons/icon_delete.gif" alt="delete menu option" height="15" /></a></td>
+</tr>
+[% END %]
+</table>
+</div>
+
+<p class="smalltext">
+    Note that options that are left blank will not be displayed.
+
+<p class="smalltext">
+    <input type="button" name="optadd" value="Add Menu Option" /> |
+    <input type="button" value='Save Menu' />
+[% END %]
+</form>

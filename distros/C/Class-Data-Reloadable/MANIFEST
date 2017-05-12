@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Class/Data/Reloadable.pm
+t/00.load.t
+t/01.usage.t
+t/02.reload.t
+t/03.stolen.t
+t/MyOtherTestClass.pm
+t/MyTestClass.pm
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

@@ -1,0 +1,5 @@
+severity = 4
+top = 5
+
+[ControlStructure::ProhibitPostfixControls]
+severity = 2

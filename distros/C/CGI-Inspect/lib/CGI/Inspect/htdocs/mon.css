@@ -1,0 +1,29 @@
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ccc;
+}
+
+.dialog {
+  overflow: auto;
+}
+
+/*
+#stacktrace, #repl {
+  border: 1px solid black;
+  float: left;
+  margin: 1em;
+  padding: 0.5em;
+  background-color: #eee;
+}
+
+li {
+  margin-left: 1em;
+}
+
+#repl input[type=text] {
+  width: 50%;
+}
+*/
+

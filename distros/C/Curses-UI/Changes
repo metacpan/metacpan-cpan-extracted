@@ -1,0 +1,849 @@
+Changelog for the Curses::UI distribution:
+
+Version 0.9609
+==============
+        - Bugfix for crashing error in 0.9608
+
+Version 0.9608
+==============
+        - TextEditor doc patch from Zane C.B.
+        - Patch to allow mainloop to halt from Zane C.B.
+        - key handling fix from Scott McCoy
+        - Background color set patch from Miquel van Smoorenburg
+        - AIX fix from Shava Smallen
+        - Fix for prototypes warnings from Damyan Ivanov
+
+Version 0.9607
+==============
+        - Curses::UI::set_timer no longer calls int() on passed time value,
+          allowing Time::HiRes support, thanks to Gilmar Santos, Jr. (RT#29026)
+        - Fixed ancient bug in Popupmenu.pm, thanks to Davide Chiarini
+          and Michael Arlt (RT#38211,25885)
+        - POD testing bug introduced in last version now fixed
+
+Version 0.9606
+==============
+	- Patch to Notebook.pm from Dominque Dumont (RT#39915)
+        - Test::POD no longer required for install
+
+Version 0.9605
+==============
+	- MANIFEST in 0.9604 was bad, causing pertesters FAIL
+
+Version 0.9604
+==============
+	- MainLoop removal broke several examples. Fixed (thanks to
+	  Antony Gelberg)
+	- Japanese localization added (thanks Takatoshi Kitano)
+
+Version 0.9603
+==============
+	- MainLoop has been removed (please use '$cui->mainloop')
+	- So the circular reference of $Curses::UI::rootobject has
+	  been removed as well
+	- RT bugs 31919, 11925 (Notebook.pm testing failures) fixed,
+	  again thanks to Russ Allbery
+	- UI.pm now uses strict and warnings(!)
+	- UI.pm's POD and layout being overhauled
+	- BUGS and TODO have been nuked (RT, googlecode)
+
+Version 0.9602
+==============
+	- Using Module::Install now
+	- Removed effectively null t/99template.t which was causing
+	  FAILs for CPAN testers (to be replaced with more testing
+	  at a later date)
+	- Apologies for the weird previous version number
+
+Version 0.96_01
+===============
+	- Fixed bug in C::UI::Checkbox->get (RT#31916, Russ Allbery)
+	- Fixed doc bug in Tutorial.pod (rt#31918, Russ Allbery)
+	- Fixed doc bug in Checkbox.pm (rt#31917, Russ Allbery)
+	- Began POD overhaul and code reformatting
+
+Version 0.96
+============
+		- Added -keydelay option to new()
+		- Fixed Listbox docs again
+		- Fixed focusing bug in connection with mouse support
+		- Applied patches by Vitaliy Sennikov
+	        - Doc patches by Alexey Tourbin
+		- Slovak translation by Marek Grac
+		- Removed test.pl, added note on demos to INSTALL
+		- Removed COLOR_TODO
+		- Added Coverage (Devel::Cover report)
+
+Version 0.95
+============
+		- Fixes to the RT#6770 patch to unbreak listbox
+		- Updated Manifest
+		- Fixes to Dialog Colors by Antonio Gallo
+		- Notebook widget by George Theall
+
+Version 0.94
+============
+		- Some patches by Luke Closs (lukec@activestate.com):
+		  - fixed 99template.t 
+		  - word wrap bug
+		  - Language.pm fixes
+		  - Dialog labels not-focusable
+		  - toggle password mode for text editor
+		  - Listbox id() method fix
+		  - Query Dialog
+		  - Buttonbox patch
+
+		- Listbox now take arrayrefs as well as
+		arrays as $l->values. 
+		(Patch by domi@komarr.grenoble.hp.com RT#6770)
+
+		- tabbing over the last _enabled_ component did
+		not result in leaving the container if that 
+		component was followed by a non focusable component 
+		in the focusorder.
+		(Patch by William Barsse RT#7027)
+
+		- small changes to the pod tests
+
+		- event_onblur to fix Checkbox behaviour by
+		  Joe Oppegaard and lots of POD fixes
+
+Version 0.93
+============
+		- New languages: Turkish, Spanish, Chinese
+		- Doc changes to the tutorial (after a nice 
+		  review by JC)
+		- Fixed the clear routine to use the build ins
+		  (maybe a security issue, because it called
+		   the system owns "clear" command)
+		- Added some methods to the Listbox widget
+		- Performance patch by Joe Oppegaard
+
+Version 0.92
+============
+		- Ok, blame me, I'll never ever release some
+		big changes again at "Karneval". I commented
+		out Xterm/Curses mouse support in 0.91. Should	
+		work again
+
+		- Changes to the tests, added test to make 0.90
+		never happen again and fixed failing tests on
+		no screen platforms
+
+Version 0.91
+============
+		- fixed critical bug with call to a missing sub 
+		  that should have never happened.
+
+Version 0.90
+============
+		- got an excellent patch by Ralf S. Engelschall 
+		  to enable inline markup in Listbox and other
+		  bugfixes.
+
+		- Patch by Rupert Northcote-Green and Scott Husek
+		  for vertical aligned Buttonboxes
+
+		- Bugfixes for focusing
+		
+		- Mouse hooks for Curses::UI::Mousehandler::GPM
+
+		- At least a little bit of resizing support
+
+		- Hocks for adding events to the mainloop
+
+		- Added insert_at and add_label to Listbox
+
+Version 0.85
+============
+		- new Widget: Dirbrowser
+
+		- new tutorial and some doc fixes
+		
+		- italian language updated
+
+		- a couple of bugfixes
+
+Version 0.80
+============
+		- small fixes to avoid warnings
+
+		- workaround for a strange win32 compile bug
+
+		- fixes to polish translation
+
+		- more tests
+
+		- small changes to some widgets
+
+		- color support changes
+			- fixed colors in submenus
+			- fixed colors for status messages
+
+		- norwegian translation by Vlad Tepes
+
+
+Version 0.75     
+============
+2003-07-28	- WE GOT COLOR!!! see Curses::UI::Color for details and
+		  the new color_editor demo 
+
+		- added french and portuguese translation
+
+		- various small changes and fixes
+		
+		- Some work by Raul Dias to fix some focus bugs
+
+Version 0.74
+============
+
+2003-04-27	- Fixed critical bug that broke Menubar selection
+
+
+Version 0.73
+============
+
+2003-03-28	- Added Russian, Polish, Italian and German language
+		  pack
+
+		- Applied focusdelete and userdata patch by Raul Dias
+
+		- Fixed unselect for single selects in Listbox
+
+		- Fixed Solaris 8 Compile bug
+
+		- Did some documentation work
+
+Version 0.72
+============
+
+2003-03-24	- Maintainer changed, new maintainer is now Marcus
+		  Thiesen (MARCUS) <marcus@cpan.thiesenweb.de>
+
+		- Small bug fix to the delete call that will now 
+		  work right
+
+		- Mouse support is now optional
+
+		- Some additions to the Listbox widget
+
+Version 0.71
+============
+
+2002-02-01      - Darn... the thing did not work correctly on non-
+		  ncurses systems. Having things like
+		  "BUTTON1_CLICKED" in the code does not work if
+		  the Curses module does not have them defined. It
+		  should be "BUTTON1_CLICKED()" to avoid warnings
+		  like "Bareword "BUTTON1_CLICKED" not allowed..."
+		  Solved this in all modules. Thanks to Nick
+                  Slussar for noticing.
+
+                - Added mouse-support to the Calendar widget.
+
+		- Added language support, so the widget specific
+		  language strings are configurable. The language
+		  strings are in Curses::UI::Language::<language>.pm.
+		  Extra languages can be created by adding a new
+		  <language>.pm file over there. Currently I created
+		  a Dutch and an English language module. I you create
+		  a language module of your own, please send it to 
+		  me. I'll then include it in the distribution.
+
+                - Changed all year 2001 occurrances in the Changelog
+		  to 2002. Thanks to Mark Overmeer (mr. Mail::Box) for
+		  noticing that I was one year off ;-)
+
+                - Made sure that upon deleting a widget from a
+                  container, its subwindows are deleted.
+
+                - Created calendar dialog (request made by Ravi Pina).
+		  Also added a little demo to demo-widgets for this
+		  new dialog type. The dialog is accessable via
+		  Curses::UI ($cui->calendardialog).
+
+		- Changed the unpacking of mouse events a little
+		  (thanks to William Setzer for the hint on
+		  unpack("sx2i3l", $MEVENT) instead of
+		  unpack("i5", $MEVENT)). 
+
+Version 0.70
+============
+
+2002-01-31      - After a lot of hacking on the resize code
+                  I decided to leave it out for now. I can't get
+		  things stable :-( I will try to look into this
+		  at some other time. 
+
+                - Made a start on the support of mouse events. 
+		  It's doable! :-) Most widgets now have some sort
+		  of mouse event handler. Or widgets should try
+		  to focus if clicked upon.
+
+                - Resolved a whole bunch of small bugs that 
+		  turned up while building mouse support.
+
+2002-01-29      - Removed automatic resize control. This did not 
+		  work good on ncurses (crashes). Now, resizing
+		  is done after a keypress.
+
+		- Fixed a bug in the char_read() method. The
+		  returncode of the select() call is checked for
+		  errors.
+
+                - Non interacting dialogs (status + progress) are
+		  now not focusable anymore. This makes sure that
+		  the current window is not blurred.
+
+                - Fixed bug: the horizontal positioning of the 
+		  first opened menulistbox from a menubar was 
+		  wrong.
+
+                - Renamed some "constants" to prevent future
+                  namespace clashes:
+                  KEY_ESCAPE    => CUI_ESCAPE
+                  KEY_SPACE     => CUI_SPACE
+                  KEY_TAB       => CUI_TAB
+
+2002-01-28      - Removed all demo-Curses::UI* examples from the
+		  distribution and created a new widget demo:
+		  examples/demo-widgets. In this demo all 
+		  widgets and dialogs are showed.
+
+                - If you do "make test INTERACTIVE_TEST=1", the
+                  widget demo program will be started if all
+		  tests were successful.
+
+                - Fixed examples/pop3_reader for use of the new
+		  event system.
+
+                - <SHIFT-TAB> is now supported to focus the 
+		  previous object (this will not work on all
+		  terminals, but it's a nice-to-have!).
+
+                - A lot of time is involved in debugging widgets.
+		  So I added $Curses::UI::debug which can be set
+		  using "new Curses::UI(-debug => 1)". Currently
+		  only the pressed keys are sent to STDERR (so
+		  you should write STDERR out to a file to use
+		  the debugging), but more things might be 
+		  debugged later on.
+
+                - Fixed bug: schedule_draw is set to zero if an
+		  object loses focus (else the schedule would
+		  redraw a widget after the focus change if the
+		  focus change was done by a binding routine).
+
+		- Made setprogress(), noprogress(), nostatus()
+		  from Curses::UI flush the input keys. This
+		  makes sure that on some systems the output is
+		  not buffered as long as there is input waiting
+		  and it is generally a good thing to ignore the
+		  input that was done during the showing of
+		  the dialog.
+
+                - Removed screenheight tampering from 
+		  Curses::UI::Widget->windowparameters() which was
+		  used for automatically reserving space for the
+		  menubar if the application had one. Now I 
+		  have moved this responsibility to the user.
+                  The user should use "-padtop => <value>" if a 
+		  window should not overlap the menubar. This will
+		  let Window centering be real Window centering. This
+		  also makes it possible to create a "popup"
+		  menubar by letting the main windows draw over
+		  the menubar (the menubar will only be visible
+		  if it gets the focus).
+
+                - Widgets now can focus another widget using their
+		  event callback routines. Before, the widget would
+		  always go to the next or previous widget, but now
+		  loose_focus() won't do this if the focus is not on 
+		  the widget itself anymore. I'm not sure if it works
+		  for all widgets already, but I needed it to be
+		  able to use the menubar to shift focus between 
+		  windows.
+
+
+2002-01-27      - Renamed the 'return' binding in all widgets to
+		  'loose-focus'. This makes much more sense in
+		  the new event system (in the old event system
+		  a widget would actually return a value when
+		  the 'return' binding was called).
+
+                - Renamed the '-homeonreturn' option for TextEditor
+		  and its descendants to '-homeonblur' for the
+		  same reason as mentioned above.
+
+                - The buttonbox will handle the TAB key different
+		  than before. Now it will cycle through the buttons.
+		  If the last button is selected and TAB is pressed,
+		  the total Buttonbox will loose focus. This is much
+		  more like the behaviour that a user would expect. 
+
+                - Fixed a layout bug in Dialog::Basic (if the buttonwidth
+		  was larger than the messagewidth, a 'screen not large
+		  enough' error would show).
+
+                - Fixed a bug in FileBrowser.pm. The popupbox in the
+		  FileBrowser window was still built for the old
+		  event system. Now it has an -onchange event which
+		  reloads the file list. Also, the focus will not
+		  longer go to the buttons, but to the filelistbox
+		  or the fileentry field if -editfilename is set
+		  to a true value.
+
+2002-01-26      - Reading keys is not done anymore using the halfdelay
+                  function of curses. Now a select() call is used to
+		  determine if there is input waiting.
+
+                - The timeout for reading a key is now depending
+		  upon the smallest active timed event interval.
+		  If there are no active timed events at all,
+		  the timeout will be -1, which causes a full
+		  blocking read. In this way as little as possible
+		  resources are used.
+
+                - -windowscr, screenwidth and screenheight were a 
+		  little bit too cryptic I think. These are now
+		  renamed to -canvasscr, canvaswidth and 
+		  canvasheight.
+
+                - Fixed bug in Searchable.pm (cursor was not visible
+		  during search).
+
+		- Switched testing to Test::Harness (t/*.t) 
+
+		- Buttonbox now also has Curses::UI->fatalerror() in
+		  case of an illegal button definition.
+
+                - Curses::UI now checks if there is only one
+		  instance of Curses:UI and it now exports 
+		  MainLoop() (just for fun, it is like the 
+		  Tk MainLoop function).
+
+2002-01-25      - Fixed some problems with modal focused windows.
+
+                - The Popupmenu widget now also works. This widget
+		  is partly rewritten to make it more clean and
+		  make it fit in the new event system.
+
+		- New method: Curses::UI->fatalerror( [error] ).
+		  This will display a fatal error to the user.
+		  After pressing a key, the program will exit.
+		  This is usefull in places where you would
+		  otherwise use die() (or one of its Carp friends).
+
+                - Moved usemodule() from the Container package to
+		  Curses::UI. This method now honours the %INC
+		  hash, which means less on-the-fly loading of
+		  modules will occur.
+
+                - Made searching through listboxes and textviewers
+		  possible in the new event system.
+
+                - Fixed some -onchange event bugs in popupmenu.
+
+till 2002-01-24 - The complete event structure is set upside-down.
+                  By using this new event structure, timed routines
+                  and mouse events are possibilities. Maybe even
+                  integration with POE! :-) (but I haven't looked
+                  into that enough to be sure). We also have a 
+		  Tk-like mainloop() now.
+
+                - Updated a lot of widgets to support the new event
+                  structure (central mainloop in Curses::UI which
+                  delegates events). This means that a widget has
+                  a event_keypress() method, which handles 
+                  delegated keypresses.
+                  
+
+Version 0.64
+============
+
+2002-01-19:     - Started on building a complete new event handling
+                  system. This should simplify a couple of things and
+                  it should enable new features like some kind of 
+                  time loop and mouse events.
+
+
+Version 0.63
+============
+
+2002-01-16:     - Added a CLASS HIERARCHY section to the 
+                  documentation of each Curses::UI class.
+
+                - All focusable objects now have the following 
+                  event callbacks:
+                  -onfocus / onFocus()
+                  -onblur  / onBlur()
+
+                - The Curses::UI::Calendar widget now fully
+                  supports the years 0 - 9999, including the
+                  transition from the Julian to the Gregorian
+                  calendar (september 1752). This beats the
+                  use of timelocal/localtime (which would 
+                  currently only support 1900 - 2038 IIRC).
+
+                - Added intellidraw() method to Curses::UI::Widget.
+                  If this method is called, the widget is redrawn, but
+                  only if it's visible (not hidden and in topwindow)
+                  and if intellidraw is enabled (-intellidraw data 
+                  member has a true value).
+
+                  This routine can be used to be able to redraw 
+                  widgets on a status change, without having to figure
+                  out yourself if this wouldn't clutter up the screen.
+                  The -intellidraw option is meant for widget
+                  builders (see for example the Checkbox code).
+
+                - Incorporated intellidraw() method in:
+                  - Curses::UI::Window
+                  - Curses::UI::Label
+                  - Curses::UI::Calendar
+                  - Curses::UI::Buttonbox
+                  - Curses::UI::Listbox (+ descendants)
+                  - Curses::UI::Checkbox
+                  - Curses::UI::Popupbox
+                  - Curses::UI::Progressbar
+                  - Curses::UI::TextEditor (+ descendants)
+                  - Curses::UI::SearchEntry
+
+                - Added a little example application to demonstrate
+                  the new intellidraw feature: examples/demo-intellidraw 
+
+2002-01-15:     - Changed the displaying of the calendar widget
+                  a little. The topbar showing a date is only 
+                  highlighted if the cursor is on the selected date.
+	
+                - Renamed some widgets (now we still can). I think
+                  there are too many capitals in them...
+                  - Curses::UI::ListBox renamed to
+                    Curses::UI::Listbox
+                  - Curses::UI::CheckBox renamed to
+                    Curses::UI::Checkbox
+                  - Curses::UI::MenuBar renamed to
+                    Curses::UI::Menubar
+                  - Curses::UI::MenuListBox renamed to
+                    Curses::UI::MenuListbox
+                  - Curses::UI::PopupBox renamed to
+                    Curses::UI::Popupmenu
+                  - Curses::UI::ProgressBar renamed to
+                    Curses::UI::Progressbar
+                  - Curses::UI::ButtonBox renamed to
+                    Curses::UI::Buttonbox
+                  - Curses::UI::RadioButtonBox renamed to
+                    Curses::UI::Radiobuttonbox
+                  - Curses::UI::Dialog::FileBrowser renamed to
+                    Curses::UI::Dialog::Filebrowser
+
+                - Added event callbacks to:
+                  - Curses::UI::Calendar      (-onchange / onChange())
+                  - Curses::UI::Listbox       (-onchange / onChange())
+                  - Curses::UI::Checkbox      (-onchange / onChange())
+                  - Curses::UI::TextEditor    (-onchange / onChange())
+                  - Curses::UI::TextEntry     (-onchange / onChange())
+                  - Curses::UI::PasswordEntry (-onchange / onChange())
+                  - Curses::UI::Popupmenu     (-onchange / onChange())
+
+
+                - The options that can be passed to the new()
+                  methods, are case insensitive now. So it is
+                  perfectly okay to write:
+  
+                  $win->add(
+                      'cb', 'Checkbox',
+                      -Label => 'Demonstration widget',
+                      -onChange => sub { exit() } 
+                  );
+
+
+Version 0.62
+============
+
+2002-01-14:     - Changed the Label widget. The text to
+                  show on the widget may contain more than
+                  one line of text (so newline characters
+                  may be used). The status-dialog is changed
+                  accordingly. Other widgets that use Labels
+                  are not updated yet.
+
+                - Updated Curses::UI::Dialog::Progress for
+                  use with the new Label widget.
+
+                - Fixed a layout bug in Curses::UI::Widget
+                  (the available height and width were 
+                  incorrectly computed when using negative
+                  -x and -y offsets).
+
+                - Renamed Curses::UI::Buttons to 
+                  Curses::UI::Buttonbox, which is more like
+                  the naming of the rest of the widget set.
+                  Updated all examples and wigets for this
+                  change.
+
+                - Fixed some undefined value warnings in
+                  Curses::UI::Dialog::Filebrowser.
+
+                - Incorporated multi-line label support in
+                  the checkbox widget.
+
+                - Added new widgets + documentation:
+                  - Curses::UI::PasswordEntry
+                  - Curses::UI::Calendar
+                
+		- Added new example applications:
+                  - demo-Curses::UI::Calendar
+
+2002-01-13:     - Changed the way the buttons are defined
+                  in Curses::UI::Buttons (all information
+                  is now in the -buttons option and there
+                  are predefined button types).
+                  The documentation for Curses::UI::Buttons
+                  is updated.
+
+                - Buttons can now have a -onpress event assigned
+                  to them. This callback will execute after
+                  the button is pressed and before the focus
+                  is lost.
+
+                - All examples are updated for the changed
+                  Curses::UI::Buttons class.
+
+                - Solved a warning for some versions of
+                  perl about a prototype.
+
+                - Fixed some documentation typos.
+
+Version 0.61
+============
+
+2002-01-13:     - Extended the examples/basic_test file
+                  to test the functionality of the basic 
+                  widgets (for now: Label, Buttons, 
+                  Checkbox, Listbox, Popupbox, 
+                  Progressbar and TextEditor). Directly
+                  derived widgets are not tested (like
+                  Radiobuttonbox and TextEntry) because
+                  these will most probably work like
+                  they should if the base class is okay.
+
+                - Changed the structure of the checkbox
+                  widget. The layout() method would each
+                  time re-add the label widget to the
+                  checkbox widget. Now the checkbox is 
+                  a container derivate which always
+                  contains the label.
+
+                - Fixed bug: The TextEditor class and
+                  derivates didn't call check_for_resize()
+                  during focus, so screen resize was
+                  not detected.
+         
+
+2002-01-12:     - Fixed some broken links in the
+                  documentation.
+
+                - Removed "use Carp qw(confess)" from
+                  the modules which do not use this
+                  (anymore).
+
+                - Wrote documentation for:
+                  - Curses::UI::Dialog::Basic
+                  - Curses::UI::Dialog::Error
+                  - Curses::UI::Dialog::Filebrowser
+                  - Curses::UI::Dialog::Progress
+                  - Curses::UI::Dialog::Status
+
+                - Added new example applications:
+                  - demo-Curses::UI::Dialog::Filebrowser
+                  - demo-Curses::UI::Dialog::Status
+
+                - Added the -clear_on_exit option
+                  to Curses::UI. If this option is
+                  set, a Curses::UI application will
+                  call "clear" on exit.
+
+
+Version 0.60
+============
+
+2002-01-11:     - Wrote documentation for:
+                  - Curses::UI::MenuListbox 
+                  - Curses::UI::Menubar 
+
+                - Added new example application:
+                  - demo-Curses::UI::Menubar
+
+2002-01-10:     - Wrote documentation for:
+                  - Curses::UI::TextEditor 
+                  - Curses::UI::TextEntry 
+                  - Curses::UI::TextViewer 
+                  - Curses::UI::Common 
+                  - Curses::UI::Container 
+                  
+                - Added new example applications:
+                  - demo-Curses::UI::Dialog::Basic
+                  - demo-Curses::UI::TextEditor
+
+                - New option for Curses::UI::Label: -paddingspaces
+
+
+2002-01-09:     - If the screen is too small for the application
+                  to show, the program will no longer die.
+                  Now it will show a message telling the user
+                  that the screen should be bigger. 
+
+                - Added the -compat option and compat() method
+                  to Curses::UI. If -compat is set to a true
+                  value, the Curses::UI widgets will be draw
+                  using only basic characters, which should be
+                  available on all terminals. This might be 
+                  a good option for terminals which do not 
+                  have characters like ACS_VLINE and ACS_HLINE.
+
+                - Changed the -viewmode of Curses::UI::TextEditor
+                  to -readonly.
+
+                - The setpos() method of Curses::UI::Progressbar
+                  has been renamed to pos(). The options 
+                  -showpercentage and -showcenterline have been
+                  changed to -nopercentage and -nocenterline.
+
+                - Wrote documentation for:
+                  - Curses::UI::Popupbox
+                  - Curses::UI::Progressbar
+                  - Curses::UI::SearchEntry 
+                  - Curses::UI::Searchable 
+                
+                - Added new example applications:
+                  - demo-Curses::UI::Popupbox
+                  - demo-Curses::UI::Progressbar
+
+2002-01-08:     - Deleted last references to the old mws (Maurice's
+                  Widget Set) namespace from the modules.
+
+                - Wrote documentation for:
+                  - Curses::UI::Checkbox
+                  - Curses::UI::Label
+                  - Curses::UI::Listbox
+
+                - Added new example applications:
+                  - demo-Curses::UI::Checkbox
+                  - demo-Curses::UI::Label
+                  - demo-Curses::UI::Listbox
+
+
+Version 0.56
+============
+
+2002-01-07:     - Added new example applications: 
+                  - hello_world
+                  - demo-Curses::UI::Buttons
+                  - demo-Curses::UI::Dialog::Progress
+                  - pop3_reader: a simple POP3 mail reader
+
+		- Wrote documentation for Curses::UI::Buttons
+
+		- New constants in Common.pm: KEY_TAB, KEY_SPACE
+
+                - Moved the following methods from Common.pm to
+                  Widget.pm:
+                  - clear_binding()
+                  - set_routine()
+                  - set_binding()
+                  - process_bindings()
+                  - generic_focus()
+
+2002-01-07:     - Dialogs are moved to their own namespace:
+                  Curses::UI::Dialog.
+
+                - Curses::UI has two new filebrowser dialog methods:
+                  loadfilebrowser() and savefilebrowser(). These 
+                  are filebrowser dialogs which are setup correctly
+                  for loading and saving files. The savefilebrowser()
+                  will also check if the file to save to does exist.
+                  If it does it will show a confirmation dialog to
+                  have the user confirm that the file may be 
+                  overwritten.
+
+                - The code for centering a Window is now in the
+                  Curses::UI::Window class. If the option -centered
+                  is set, the layout() method will center the 
+                  Window.
+
+                - The add() routines of the classes Curses::UI and 
+                  Curses::UI::Container will not also accept
+                  "Dialog::*" as a shortcut for "Curses::UI::Dialog::*".
+
+                - Added a new dialog: Curses::UI::Dialog::Status and
+                  added documentation and and example to Curses::UI.
+
+                - Added a new dialog: Curses::UI::Dialog::Progress and
+                  added documentation and and example to Curses::UI.
+
+                - Curses::UI applications will now automatically 
+                  clear the screen on exit (by calling the 'clear'
+                  program using a safe $PATH).
+
+
+Version 0.55
+============
+
+2002-01-06:     - Instead of: 
+                    $thingy->add('id', 'Curses::UI::WidgetType', %args)
+                  You may now also write:
+                    $thingy->add('id', 'WidgetType', %args)
+                  If there are no double colons in the class name,
+                  the sofware assumes the class is in Curses::UI.
+
+                - Wrote documentation for Curses::UI.
+
+                - Fixed some small bugs and did some code cleanup.
+
+
+2002-01-05:     - Included basic_test in test.pl, so a real use of the
+                  package is tested.
+
+                - The Curses::UI::RootWindow does not exist anymore.
+                  Now the rootlevel for Curses::UI is created using
+                  "my $cui = new Curses::UI".
+
+                - Finished first version of documentation for 
+                  Curses::UI::Widget.
+
+Version 0.54
+============
+
+2002-01-04:	- Some small changes in the examples and a new example
+                  (basic_test) added.
+
+		- Added -show_hidden option to the Filebrowser.
+
+		- Added ~ keybinding to the Filebrowser. If ~ is pressed in the
+		  directory- or filebrowser, the Filebrowser will go to the 
+		  homedirectory of the current user.
+
+		- If at creation time of the Filebrowser, the -path is 
+                  not defined, the Filebrowser will start at the 
+                  homedirectory of the user.
+
+                - The Curses::UI::Frame class is now called Curses::UI::Widget.
+
+                - Solved a bug in Curses::UI::Common::delallwin() which
+                  caused a segmentation fault on some systems (by doing
+                  a delwin on an already deleted curses window).
+               
+                - Made a test.pl to test the loading of all classes.
+
+                - Updated Makefile.PL, so required modules are checked.
+
+                - Made a start on documenting Curses::UI. The first bit
+                  of documentation is in Curses::UI::Widget. More will
+                  follow.
+
+Version 0.53
+============
+
+2002-01-03:	- Initial import to CPAN.
+

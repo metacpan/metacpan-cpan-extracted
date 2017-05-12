@@ -1,0 +1,7 @@
+^Makefile(?:\.old)?$
+^[\.#]
+~$
+blib
+CVS
+^MANIFEST.bak$
+^\w+(?:-\w+)*-\d\.\d+

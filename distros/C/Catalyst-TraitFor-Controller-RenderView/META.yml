@@ -1,0 +1,31 @@
+---
+abstract: 'Alternative to Catalyst::Action::RenderView using method modifiers.'
+author:
+  - 'Tomas Doran (t0m) C<< bobtfish@bobtfish.net >>.'
+build_requires:
+  Catalyst::Runtime: 5.80015
+  CatalystX::Component::Traits: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Controller-RenderView
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Action::RenderView: 0.13
+  Moose: 0
+  MooseX::MethodAttributes::Role: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/catalyst-traitfor-controller-renderview.git
+version: 0.002

@@ -1,0 +1,73 @@
+NAME
+    Catalyst::Authentication::Store::Htpasswd - Authen::Htpasswd based user
+    storage/authentication.
+
+SYNOPSIS
+        use Catalyst qw/
+          Authentication
+        /;
+
+        __PACKAGE__->config(
+            authentication => {
+                default_realm => 'test',
+                realms => {
+                    test => {
+                        credential => {
+                            class          => 'Password',
+                            password_field => 'password',
+                            password_type  => 'self_check',
+                        },
+                        store => {
+                            class => 'Htpasswd',
+                            file => 'htpasswd',
+                        },
+                    },
+                },
+            },   
+        );
+
+        sub login : Global {
+            my ( $self, $c ) = @_;
+
+            $c->authenticate({ username => $c->req->param("login"), password => $c->req->param("password") });
+        }
+
+DESCRIPTION
+    This plugin uses "Authen::Htpasswd" to let your application use
+    ".htpasswd" files for it's authentication storage.
+
+METHODS
+  new
+    Simple constructor, dies if the htpassword file can't be found
+
+  find_user
+    Looks up the user, and returns a
+    Catalyst::Authentication::Store::Htpasswd::User object.
+
+  user_supports
+    Delegates to
+    Catalyst::Authentication::Store::Htpasswd::User-user_supports|Catalyst::
+    Authentication::Store::Htpasswd::User#user_supports>
+
+  from_session
+    Delegates the user lookup to " find_user "
+
+CONFIGURATION
+  file
+    The path to the htpasswd file, this is taken from the application root.
+
+AUTHORS
+    Yuval Kogman "nothingmuch@woobling.org"
+
+    David Kamholz "dkamholz@cpan.org"
+
+    Tomas Doran "bobtfish@bobtfish.net"
+
+SEE ALSO
+    Authen::Htpasswd.
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005-2008 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

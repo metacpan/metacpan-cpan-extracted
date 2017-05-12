@@ -1,0 +1,34 @@
+Revision history for Perl extension CGI::Application::Plugin::Apache
+
+1.02
+    - Fixed RT #32437 by fixing a bad hash in the Build.PL
+
+1.01
+    - Fixed lots of compatability problems with mod_perl 2 and Apache2::Request
+
+1.00
+    - fixed misuage of Apache2::RequestUtil
+
+0.13
+    - fixed warning about unitialized ENV var
+
+0.12
+    - minor bug fixes in the compatability layer for cookies and uploads
+    - added docs mentioning CPAP_CGI_Compat and linking to 
+        CGI::Application::Plugin::Apache::Request
+
+0.11
+    - fixed small bug dealing with testing of header props
+    - Added more tests
+
+0.10  ()
+    - Added CGI::Application::Plugin::Apache::Request wrapper around 
+        Apache::Request for some CGI.pm compatability
+    - mod_perl 2 compatability
+    - Added more tests
+
+0.09 (Nov. 10, 2004)
+    - added Makefile.PL to MANIFEST 
+
+0.08 (Nov. 08, 2004)
+    - First public release

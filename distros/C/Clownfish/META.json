@@ -1,0 +1,61 @@
+{
+   "abstract" : "Apache Clownfish Runtime",
+   "author" : [
+      "The Apache Lucy Project <dev at lucy dot apache dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "keywords" : [
+      "clownfish"
+   ],
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Clownfish",
+   "no_index" : {
+      "directory" : [
+         "buildlib"
+      ],
+      "package" : [
+         "Clownfish::Test"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Clownfish::CFC" : "0.006001",
+            "Devel::PPPort" : "3.14",
+            "ExtUtils::CBuilder" : "0.21",
+            "ExtUtils::ParseXS" : "3",
+            "Module::Build" : "0.280801"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Clownfish::CFC::Perl::Build" : "0.006001",
+            "Module::Build" : "0.280801"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://issues.apache.org/jira/browse/CLOWNFISH"
+      },
+      "homepage" : "http://lucy.apache.org",
+      "repository" : {
+         "url" : "https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git"
+      }
+   },
+   "version" : "v0.6.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

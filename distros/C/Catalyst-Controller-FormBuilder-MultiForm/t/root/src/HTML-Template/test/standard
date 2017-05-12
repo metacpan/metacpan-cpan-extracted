@@ -1,0 +1,10 @@
+<!-- Single form using Catalyst::Controller::FormBuilder render style -->
+
+<!-- Render whatever form is in the FormBuilder object -->
+<tmpl_var form-start>
+<tmpl_var form-statetags>
+<tmpl_var label-standard_one> <tmpl_var field-standard_one>
+<tmpl_var label-standard_two> <tmpl_var field-standard_two>
+<tmpl_var form-submit>
+<tmpl_var form-end>
+

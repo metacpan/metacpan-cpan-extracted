@@ -1,0 +1,32 @@
+PREREQUISITES
+=============
+- UNIX/Linux based evronment (Not tested on Windows)
+- Citrix command line utilities (session retrieval and session control): ctxquery, ctxlogoff ...
+- Remote shell rsh utility (Windows + Cygwin with 'rsh' utility might work)
+- Perl Modules: Test::More (for tests), Net::Ping (optional), Net::DNS
+
+If you still (despite the reservations) want to try to use the modules on Windows,
+you should be familiar with Cygwin.
+
+On Ubuntu you might want to install package(s) 'libnet-dns-perl' to satisfy dependency for
+Net::DNS.  Net::Ping is a CORE Module (since at least 5.8.8) so there is no need for
+separate install. Also 'perl-doc' might be missing on your Ubuntu, so install it to read perldoc
+on the module.
+
+
+INSTALLATION
+============
+Installation is the usual routine of Perl module install (using Makefile.PL)
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % sudo make install
+
+Practical example for installation on Apachefriends XAMPP (http://apachefriends.org/)
+machine, with custom installation path:
+
+  % /opt/lampp/bin/perl Makefile.PL PREFIX=/crazy/place/
+  % make
+  % make test
+  % sudo make install

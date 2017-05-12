@@ -1,0 +1,20 @@
+Revision history for CodeBase Perl module
+
+0.80  Tue Jul 13 1999
+
+        Published on www.ford-mason.co.uk
+
+
+0.11  Wed Jun 16 1999
+
+        Tidied up ready for publishing
+	Fixed a couple of documentation bugs
+
+The details of the intervening history are lost but CodeBase started
+of back in 1995 as XBperl, an unpublished extension to perl 4.036
+using CodeBase 4.5.  It was rewritten using CodeBase 5.1 as a Perl 5
+module in 1996.
+
+0.01  Tue Apr 16 1996
+	- original version; created by h2xs 1.16
+

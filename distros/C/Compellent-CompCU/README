@@ -1,0 +1,40 @@
+Compellent-CompCU version 0.06
+====================================
+
+Compellent::CompCU provides a Perl wrapper around Compellent's command line tool.
+The Compellent command line tool is distributed in the jar file CompCU.jar. 
+Consequently, you must have Java and the CompCU.jar file in order for this to work.
+
+Please consider this to be beta software. Send any bugs, comments, or questions 
+to me directly at ac.russell@live.com.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To obtain the full documentation you will need to run the lip2pod command that
+comes with Lip::Pod.
+For example,
+lip2pod Compellent/CompCU.pm | pod2html --title=Compellent::CompCU > compcu-i.html
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Lip::Pod
+  IPC::Cmd
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Adam Russell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

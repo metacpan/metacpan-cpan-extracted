@@ -1,0 +1,30 @@
+[% IF pager AND pager.first_page != pager.last_page; %]
+<span class="pager">
+[%
+    PROCESS "pager_macros.tt";
+
+    IF  pager.current_page == pager.first_page;
+        pager_previous();
+    ELSE;
+        previous_page = pager.current_page - 1;
+        pager_previous_link(previous_page);
+    END;
+
+    FOR cur_page = [pager.first_page .. pager.last_page];
+        IF pager.current_page == cur_page;
+            pager_current_page();
+        ELSE;
+            pager_other_page_link(cur_page);
+        END;
+    END;
+
+    IF  pager.current_page == pager.last_page;
+        pager_next();
+    ELSE;
+        next_page = pager.current_page + 1;
+        pager_next_link(next_page);
+    END;
+%]
+<br>
+</span>
+[% END %]

@@ -1,0 +1,56 @@
+Revision history for Perl extension Class-Accessor-Installer
+
+1.100880  2010-03-29 19:45:57 Europe/Vienna
+    - refactored document_accessor() out of install_accessor()
+    - made it to work with Sub::Documentation
+    - dropped support for Pod::Generated
+    - added documentation
+
+1.100820  2010-03-23 18:13:50 Europe/Vienna
+    - converted distribution to Dist::Zilla-style
+
+0.09 Wed 2010.02.10 14:34:59 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - removed optional but - after the Vim::Tag rewrite unnecessary - Vim::Tag
+       dependency, thereby also removing the circular dependency of Vim::Tag ->
+       Class::Accessor::Constructor -> Class::Accessor::Complex ->
+       Class::Accessor::Installer.
+
+0.08 Sun 2010.02.07 22:20:43 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - removed test dependency on Class::Accessor - works fine without it
+
+0.07 Mon 2010.02.01 22:38:08 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - convert to new-style PTAGS handling (see Vim::Tag)
+
+0.06 Sun 2009.12.06 23:41:53 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Vim::Tag is now an optional feature
+     - reduced dependencies using author tests
+     - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.05  Sat Nov  1 22:01:44 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Now uses Vim::Tag
+
+0.04  Thu Oct 30 16:23:28 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Generate ptags if $::PTAGS is set (Florian Helmberger)
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:01:28 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Moved to YAML Changes file
+     - Added auto_install feature 'Generated documentation' that requires
+       Pod::Generated
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - add documentation on the 'purpose' and 'example' keys taken by
+       install_accessor()
+     - updated t/perlcriticrc
+     - Changes: fixed global.name
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.01  Tue, 23 Oct 2007 21:17:37 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

@@ -1,0 +1,55 @@
+{
+   "abstract" : "A Catalyst View for Excel::Template::Plus",
+   "author" : [
+      "Stevan Little E<lt>stevan@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-Excel-Template-Plus",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0.21",
+            "Test::More" : "0.62",
+            "parent" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "0",
+            "Excel::Template::Plus" : "0.05"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Helper::View::Excel::Template::Plus" : {
+         "file" : "lib/Catalyst/Helper/View/Excel/Template/Plus.pm"
+      },
+      "Catalyst::View::Excel::Template::Plus" : {
+         "file" : "lib/Catalyst/View/Excel/Template/Plus.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/stevan/catalyst-view-excel-template-plus/"
+      }
+   },
+   "version" : "0.04"
+}

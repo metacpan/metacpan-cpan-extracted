@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Controller::Mobile::JP
+
+0.02  Wed Jul 30 15:00:56 JST 2008
+        - fixed dependencies
+
+0.01  Tue Jul  8 20:27:04 JST 2008
+        - first release

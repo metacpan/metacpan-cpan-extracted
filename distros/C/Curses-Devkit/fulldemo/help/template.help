@@ -1,0 +1,288 @@
+</R>Purpose<!R>
+The template widget allows the programmer to present a user with an entry field
+which has a strict format requirement. This widget is best used to retrieve
+date fields or phone numbers, both of which have a specific format.
+
+</R>Construction Options<!R>
+A template widget is defined using the following syntax. The variable
+</B>$templateObject<!B> contains a reference to the template object.
+$templateObject = new Cdk::Template ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Label       Required            Scalar     This is the label of the widget.
+Plate       Required            Scalar     This is the format plate for the entry field. The accepted characters for the plate are listed below.
+Overlay     Required            Scalar     This is the default background of the template field. For a date field it could be DD/MM/YYYY
+Lpos        Center              Scalar     This is the position of the label in the widget.
+Xpos        Center              Scalar     This is the position of the window on the X axis.
+Ypos        Center              Scalar     This is the position of the window on the Y axis.
+Box         True                Scalar     This boolean states whether the dialog box will have a box drawn around it.
+Shadow      False               Scalar     This boolean states whether the dialog box will have a shadow on the box.
+
+The </B>Plate<!B> option takes a specific format to state which type of character
+will be accepted at each location. The following table lists the characters and what they mean.
+
+</U>Character       Meaning<!U>
+#               Accepts numeric values only. (0-9)
+A               Alphabetic characters only.  (a-zA-Z)
+C               Alphabetic characters only. This will force the character to upper case.
+c               Alphabetic characters only. This will force the character to lower case.
+X               Mixed upper case characters.
+x               Mixed lower case characters.
+Anything else.  Used as plate information.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The 
+following example demonstrates how to activate a template widget.
+$returnValue = $templateObject->activate ();
+
+The variable </B>$returnValue<!B> is the string value of what was typed in
+the field. It does </U>not<!U> have the overlay characters mixed in with it.
+This means that if a date field were used and the plate looked like
+<C>##/##/####
+and the overlay looked like
+<C>DD-MM-YYYY
+and the date June 1 1968 were typed in, then the resultant value would be
+<C>01061968
+To mix the field value and the overlay, call the mix method. Calling the mix
+method on the above example would result in
+<C>01-06-1968
+
+</B>inject<!B>
+This function injects a single character into the widget. The following
+examples demonstrates how to call the inject method.
+<C></B>$templateObject->inject ( options );
+
+The options are defined in the following table.
+</U>Option      Default Value       Type       Purpose<!U>
+Shadow      Required             Scalar     The character to inject into the widget.
+
+If you are injecting a special character into the widget, then you can
+use a pre-defined value to represent the key.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+</B>set<!B>
+Sets or resets certain attributes or features of the widget. The following
+example demonstrates how to call the set method.
+$templateObject->set ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Value       Required            Scalar     Sets the value of the field.
+
+</B>bind<!B>
+The bind method binds keys to events. The binding is specific to the individual
+objects. The following example demonstrates how to call the bind method.
+$templateObject->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Key         Required            Scalar     This is the character to bind the event to.
+Function    Required            Scalar     This is the name of the callback function.
+
+</B>preProcess<!B>
+The </B>preProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+preProcess method.
+<C></B>$templateObject->preProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a pre-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$templateObject->preProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+If the pre-process function returns a value of 0 the key hit will
+not be injected into the widget. This allows the programmer to
+selectively pick which characters will or will not get injected
+into the widget.
+
+The </B>postProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+postProcess method.
+<C></B>$templateObject->postProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a post-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$templateObject->postProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+$templateObject->draw ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Box         True                Scalar     Draws the window with a box around it.
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+$templateObject->erase ();
+
+</B>mix<!B>
+This method returns a mixed value of the template field value and the overlay.
+The following example demonstrates how to call the mix method.
+$mixedValue = $templateObject();
+
+</B>raise<!B>
+The raise method raises the widget to the top of the screen. This means if there
+were any widgets obscuring part of the view, raising the object would bring the
+complete object into view. The following example demonstrates how to call the 
+raise method.
+$templateObject->raise();
+
+</B>lower<!B>
+The lower method lowers the object so it doesn't obscure the view of any other 
+objects. The following example demonstrates how to call the lower method.
+$templateObject->lower();
+
+</B>register<!B>
+The register method registers the object to the default screen. This does </R>NOT<!R>
+have to be called since the objects are registered automatically. This method
+should be called if the </B>unregister<!B> method was called. The following
+example demonstrates how to call the register method.
+$templateObject->register();
+
+</B>unregister<!B>
+The unregister method should be called when a widget, which is part of the
+default screen, needs to be taken away temporarily. This does not delete or free
+the object, it just unmaps it from any future screen refreshes. The object can
+be registered by calling the </B>register<!B> method. The following example
+demonstrates how to call the unregister method.
+$templateObject->unregister();
+
+</B>getwin<!B>
+This method returns a pointer to the window of the object. Not much use for this
+yet. It will be useful in the future when the drawing methods are added. The
+following example demonstrates how to call the getwin method.
+$templateObject->getwin();
+
+</R>Default Key Bindings<!R>
+</U>Key               Action<!U>
+Delete            Deletes the last character in the field.
+Backspace         Deletes the last character in the field.
+Return            Leaves the widget and returns the field value.
+Tab               Leaves the widget and returns the field value.
+CTRL-N            Leaves the widget and returns the field value.
+CTRL-R            Refreshes the screen.
+
+</R>Tips & Tricks<!R>
+None.
+
+</R>Physical Restrictions<!R>
+None.
+
+</R>Example Use Of The Widget<!R>
+
+#!/usr/local/bin/perl
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create the template object.
+$template = new Cdk::Template (
+                'Label' => 'Type in a date:',
+                'Plate' => '## ## ####',
+                'Overlay' => 'DD-MM-YYYY');
+
+# Activate the widget.
+$date = $template->activate();
+$mixedDate = $template->mix();
+
+# Exit Cdk.
+Cdk::end();
+
+# Print out the info.
+print "\n\n\n";
+print "Without Overlay Mixing: $date\n";
+print "With Overlay Mixing   : $mixedDate\n";
+--------------------------------------------------------------------------------
+                       Document Created: June, 1995
+                       Document Revised: November, 1995

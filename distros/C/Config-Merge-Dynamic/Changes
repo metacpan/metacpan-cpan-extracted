@@ -1,0 +1,18 @@
+Revision history for Config-Merge-Dynamic
+
+0.14.1		2011-10-27 11:45 AM
+			* add 'parent' to prerequisite modules, to fix error report
+			  http://www.cpantesters.org/cpan/report/ad1999de-002e-11e1-ba58-f44041f6c181
+
+0.14		2011-10-10 01:57 AM
+			* Remove Data::Diver, replace DiveVal with self-crafted algo.
+
+0.12		2011-10-06 03:06 PM
+			* Add YAML::XS to required module.
+
+0.10		2011-09-07 02:23 AM
+			* Fix docs, add move() method, some code refactored.
+
+0.06    	2011-09-06 12:43 PM
+        	* First github version.
+

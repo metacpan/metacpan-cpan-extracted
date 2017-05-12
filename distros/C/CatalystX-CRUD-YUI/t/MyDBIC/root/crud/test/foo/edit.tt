@@ -1,0 +1,5 @@
+[% 
+    fields      = {};
+    fields.readonly = {'created' = 1, 'modified' = 1}; # common auto-timestamp names
+    PROCESS crud/edit.tt;
+%]

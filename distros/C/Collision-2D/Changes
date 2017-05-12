@@ -1,0 +1,21 @@
+Revision history for Collision::2D
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    Mar 5, 2010
+        2nd version, rewrite and rename from Collision::Util to Collision::2D
+0.03    Mar 9, 2010
+        Lots of circle-rect bugfixes, bounce vectors, & the marble demo
+0.04    Mar 11, 2010
+        File::Slurp dependancy was making fail. Taking out grid for 0.04. (It does nothing atm)
+0.05    Mar 25, 2010
+        Collision::Grid added,
+        Mouse taken away,
+        moving to an XS struct backend, 
+        normalize and vaxis ported to xs.
+0.06    Mar 26, 2010
+        pod fixes
+        bounce_vector fix, marble.pl works
+0.07    Mar 5, 2011
+        fixed a bug introduced with some version of Test::More
+

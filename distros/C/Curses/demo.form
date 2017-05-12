@@ -1,0 +1,219 @@
+#! /usr//bin/perl
+##
+
+use strict;
+use warnings;
+use English;
+use ExtUtils::testlib;
+use Curses;
+
+
+sub fatal {
+    clrtobot(0, 0);
+    addstr(0, 0, "@_\n");
+    refresh();
+    sleep 2;
+    die("Fatal error");
+}
+
+
+
+sub driveForm($$) {
+    my ($fwinR, $formR) = @_;
+
+    while (1) {
+        my $ch = getch($fwinR);
+        if ($ch eq KEY_UP) {
+            form_driver($formR, REQ_PREV_FIELD);
+        }  elsif ($ch eq KEY_DOWN or $ch eq "\t" or
+                  $ch eq "\r" or $ch eq "\n") {
+            form_driver($formR, REQ_NEXT_FIELD);
+        } elsif ($ch eq KEY_LEFT) {
+            form_driver($formR, REQ_LEFT_CHAR);
+        } elsif ($ch eq KEY_RIGHT) {
+            form_driver($formR, REQ_RIGHT_CHAR);
+        } elsif ($ch eq KEY_NPAGE) {
+            form_driver($formR, REQ_NEXT_PAGE);
+        } elsif ($ch eq KEY_PPAGE) {
+            form_driver($formR, REQ_PREV_PAGE);
+        }  elsif ($ch eq KEY_DC or ord($ch) == 8 or ord($ch) == 127) {
+            form_driver($formR, REQ_DEL_PREV);
+        } elsif ($ch eq KEY_F(1)) {
+            last;
+        } elsif ($ch =~ /^\S$/) {
+            form_driver($formR, ord($ch));
+        } else {
+            beep();
+        }
+    }
+}
+
+
+
+sub makeFields() {
+
+    my $fieldListR = [
+                 [ 'L', 0,  0,  0,  8, "Form"        ],
+                 [ 'L', 0,  0,  2,  0, "First Name"  ],
+                 [ 'F', 1, 15,  2, 12, "F Name"      ],
+                 [ 'L', 0,  0,  3,  0, "Last Name"   ],
+                 [ 'F', 1, 15,  3, 12, "L Name"      ],
+                 [ 'L', 0,  0,  5,  8, "Form (pt 2)" ],
+                 [ 'L', 0,  0,  7,  0, "# Tuits"     ],
+                 [ 'F', 1,  5,  7, 12, "Tuits"       ],
+                 [ 'L', 0,  0,  8,  0, "# Bleems"    ],
+                 [ 'F', 1,  5,  8, 12, "Bleems"      ]
+                 ];
+
+    my @fieldRList;
+
+    foreach my $F (@{$fieldListR}) {
+        my $fieldR;
+            # This is a Perl reference to a scalar number variable.  The
+            # number is the numerical equivalent (cast) of the C pointer to the
+            # executable-Curses FIELD object.  The reference is blessed into
+            # package "Curses::Field", but don't confuse it with a Perl
+            # object.
+
+        if ($F->[0] eq 'L') {
+            $fieldR = new_field(1, length($F->[5]), $F->[3], $F->[4], 0, 0);
+            if ($$fieldR eq '') {
+                fatal("new_field $F->[5] failed");
+            }
+            set_field_buffer($fieldR, 0, $F->[5]);
+            field_opts_off($fieldR, O_ACTIVE);
+            field_opts_off($fieldR, O_EDIT);
+        } elsif ($F->[0] eq 'F') {
+            $fieldR = new_field($F->[1], $F->[2], $F->[3], $F->[4], 0, 0);
+            if ($$fieldR eq '') {
+                fatal("new_field $F->[5] failed");
+            }
+            if ($F->[5] eq "Tuits") {
+                set_field_buffer($fieldR, 0, $F->[5]);
+            }
+            set_field_back($fieldR, A_UNDERLINE);
+        }
+
+        push(@fieldRList, $fieldR);
+    }
+    return @fieldRList;
+}
+
+
+
+sub interpretForm($$$) {
+
+    my ($cFieldRListR, $firstNameR, $lastNameR) = @_;
+
+    $$firstNameR  = field_buffer($cFieldRListR->[2], 0);
+    $$lastNameR   = field_buffer($cFieldRListR->[4], 0);
+}
+
+
+
+sub demo($$) {
+
+    my ($firstNameR, $lastNameR) = @_;
+
+    noecho();
+
+    eval { new_form() };
+    if ($@ =~ m{not defined in your Curses library}) {
+        print STDERR "Curses was not compiled with form function.\n";
+        exit 1;
+    }
+
+    my @cFieldRList = makeFields();
+
+    # Believe it or not, we have to pass to new_form() a string whose
+    # representation in memory is a C array of pointers to C field objects.
+    # Don't try to understand it; just copy this magic pack code.
+
+    # The argument is a string whose ASCII encoding is an array of C
+    # pointers.  Each pointer is to a FIELD object of the
+    # executable-Curses library, except the last is NULL to mark the
+    # end of the list.  For example, assume there are two fields and
+    # the executable-Curses library represents them with FIELD objects
+    # whose addresses (pointers) are 0x11223344 and 0x0004080C.  The
+    # argument to Curses::new_form() is a 12 character string whose
+    # ASCII encoding is 0x112233440004080C00000000 .
+
+    my @cFieldList;
+    foreach my $cFieldR (@cFieldRList) {
+        push(@cFieldList, ${$cFieldR});
+    }
+
+    push(@cFieldList, 0);
+
+    my $fieldListFormArg = pack('L!*', @cFieldList);
+
+    my $formR = new_form($fieldListFormArg);
+    if (${$formR} eq '') {
+        fatal("new_form failed");
+    }
+
+    # Don't under any circumstance destroy $itemListMenuArg while the menu
+    # object still exists, since the C menu object actually points to the
+    # memory that backs $itemListMenuArg.
+    
+    # And don't destroy @cItemList or @cItemRList either while the menu object
+    # still exists, because they are backed by memory that the C menu object
+    # references as well.
+
+    my $rows;
+    my $cols;
+
+    scale_form($formR, $rows, $cols);
+
+    my $fwinR = newwin($rows + 2, $cols + 4, 4, 0);
+    my $fsubR = derwin($fwinR, $rows, $cols, 1, 2);
+
+    set_form_win($formR, $fwinR);
+    set_form_sub($formR, $fsubR);
+
+    box($fwinR, 0, 0);
+    keypad($fwinR, 1);
+
+    post_form($formR);
+
+    addstr(0, 0, "Use KEY_UP/KEY_DOWN/KEY_PPAGE/KEY_NPAGE to navigate");
+    addstr(1, 0, "Press 'ENTER' to select item, or 'F1' to exit");
+    addstr(2, 0, "Other alphanumeric characters will enter data");
+    refresh();
+
+    driveForm($fwinR, $formR);
+
+    interpretForm(\@cFieldRList, $firstNameR, $lastNameR);
+
+    unpost_form($formR);
+    delwin($fwinR);
+    free_form($formR);
+    map { free_field($_) } @cFieldRList;
+}
+
+
+
+##############################################################################
+#                    MAINLINE
+##############################################################################
+
+initscr();
+
+# The eval makes sure if it croaks, we have a chance to restore the
+# terminal.
+
+my ($firstName, $lastName);
+
+eval { demo(\$firstName, \$lastName) };
+
+endwin();
+
+if ($@) {
+    print STDERR "Failed.  $@\n";
+    exit(1);
+}
+
+print "You entered '$firstName' for First Name and "
+       . "'$lastName' for Last Name\n";
+
+exit(0);

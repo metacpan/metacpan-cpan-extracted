@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+runtests
+lib/Config/apiLayers.pm
+t/010-cxl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

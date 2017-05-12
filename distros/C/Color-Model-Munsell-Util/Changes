@@ -1,0 +1,11 @@
+Revision history for Color-Model-Munsell-Util
+
+0.01    21 Oct 2010
+        First version, released on an unsuspecting world.
+
+0.02    26 Oct 2010
+	Corrected typo of POD, Makefile.PL.
+	updated demo.pl a bit.
+
+0.03    29 Oct 2010
+	Corrected typo of POD.

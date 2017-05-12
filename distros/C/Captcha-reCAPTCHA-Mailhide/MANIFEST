@@ -1,0 +1,13 @@
+Changes
+examples/captcha.pl
+lib/Captcha/reCAPTCHA/Mailhide.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/30.mailhide.t
+t/40.errors.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

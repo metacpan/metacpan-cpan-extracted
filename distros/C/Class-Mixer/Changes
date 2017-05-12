@@ -1,0 +1,10 @@
+Revision history for Perl extension Class::Mixer.
+
+0.51  17  Feb 2012
+	- original version; adapted from SwankWiki project
+
+0.52  2 Mar 2012
+	- Documentation update
+
+0.54  27 Nov 2015
+	- bugfix: defined(@array) warning in new versions of perl

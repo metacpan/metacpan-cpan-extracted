@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Class-Roles
+version: 0.30
+license: perl
+distribution_type: module
+requires:
+  Test::Exception: ''
+  Test::Simple: 0.47
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Class::Roles:
+    file: lib/Class/Roles.pm
+    version: 0.30
+generated_by: Module::Build version 0.20

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb63
+registers:
+  AF: 49169
+  AF_: 0
+  BC: 11458
+  BC_: 0
+  DE: 52754
+  DE_: 0
+  HL: 59260
+  HL_: 0
+  I: 0
+  IX: 29125
+  IY: 5907
+  PC: 4
+  R: 2
+  SP: 0

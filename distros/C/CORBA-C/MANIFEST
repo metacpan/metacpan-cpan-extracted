@@ -1,0 +1,17 @@
+lib/CORBA/C.pm
+lib/CORBA/C/IncludeVisitor.pm
+lib/CORBA/C/IncSkelVisitor.pm
+lib/CORBA/C/LiteralVisitor.pm
+lib/CORBA/C/NameVisitor.pm
+lib/CORBA/C/LengthVisitor.pm
+lib/CORBA/C/TypeVisitor.pm
+lib/CORBA/C/SkeletonVisitor.pm
+lib/CORBA/C/SkelCppVisitor.pm
+bin/idl2c
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+README
+
+META.yml                                 Module meta-data (added by MakeMaker)

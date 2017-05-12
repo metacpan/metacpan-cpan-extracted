@@ -1,0 +1,57 @@
+/*
+    Turn off the border on the top unit since Menu has it's own border
+*/
+.yui-skin-sam .yui-layout .yui-layout-unit-top div.yui-layout-bd {
+    /* border: none; */
+}
+
+/* main menu */
+.yui-skin-sam .bd {
+    /* background-color: #7a0019; */
+    /* background-color: #f5f5f5; */
+    border-top: 1px solid #aaa;
+}
+
+.yui-skin-sam .yuimenubarlabel,
+.yui-skin-sam .yuimenubaritemlabel,
+.yui-skin-sam .yuimenubarnav 
+{
+    /* color: #fff; */
+    color: #7a0019;
+}
+
+/* highlighting */
+.yui-skin-sam th.yui-dt-highlighted,
+.yui-skin-sam th.yui-dt-highlighted a {
+    /* background-color:#B2D2FF; */ /* med blue hover */
+    background-color: #ffdd77;
+    color: #7a0019;
+    cursor:pointer;
+}
+.yui-skin-sam tr.yui-dt-highlighted,
+.yui-skin-sam tr.yui-dt-highlighted td.yui-dt-asc,
+.yui-skin-sam tr.yui-dt-highlighted td.yui-dt-desc,
+.yui-skin-sam tr.yui-dt-even td.yui-dt-highlighted,
+.yui-skin-sam tr.yui-dt-odd td.yui-dt-highlighted {
+    cursor:pointer;
+    /* background-color:#B2D2FF; */ /* med blue hover */
+    background-color: #ffdd77;
+    color: #7a0019;
+}
+
+/* menus */
+.yui-skin-sam .yuimenubarnav .yuimenuitemlabel-hassubmenu {
+    background: transparent url(http://yui.yahooapis.com/2.6.0/build/assets/skins/sam/menuitem_submenuindicator.png) no-repeat scroll right center;
+}
+
+.yui-skin-sam .yuimenubarnav .yuimenubaritemlabel-selected,
+.yui-skin-sam .yuimenubarnav .yuimenuitemlabel-selected
+{
+    color: #7a0019;
+    cursor:pointer;
+    background-color: #ffdd77;
+}
+
+.yui-skin-sam .yuimenubarnav .yuimenuitemlabel {
+    border-bottom: none;    /* undo the global a def */
+}

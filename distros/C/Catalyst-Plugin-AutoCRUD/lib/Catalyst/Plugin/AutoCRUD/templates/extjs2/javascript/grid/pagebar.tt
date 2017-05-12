@@ -1,0 +1,123 @@
+    // this is the paging toolbar below the grid
+
+    // need to extend Ext.PagingToolbar to display correct numbers even though
+    // the store itself has one too many records in (because of the
+    // filter/search row). Cannot do this via Ext.override as it knobbles
+    // Ext.PagingToolbar globally and it is used elsewhere in the app.
+
+    Ext.ux.PagingToolbarForFilterGrid = Ext.extend(Ext.PagingToolbar, {
+        initComponent : function() {
+            Ext.ux.PagingToolbarForFilterGrid.superclass.initComponent.call(this);
+        }
+
+        ,updateInfo : function() {
+            if (this.displayEl) {
+                var count = this.store.getCount() - 1;
+                var msg = count == 0 ? 
+                    this.emptyMsg :
+                    String.format(
+                        this.displayMsg,
+                        this.cursor+1, this.cursor+count, this.store.getTotalCount()
+                    );  
+                this.displayEl.update(msg);
+            }
+        }
+
+        // make the "Page x of y" work when we choose to show all rows
+        ,getPageData : function() {
+            var total = this.store.getTotalCount();
+            var pgsz = Ext.state.Manager.get('cpac-pgsz', pagebar.pageSize);
+            if (isNaN(pgsz)) { pgsz = total }
+            return {
+                total : total
+                ,activePage : Math.ceil((this.cursor + pgsz) / pgsz)
+                ,pages :  total < pgsz ? 1 : Math.ceil(total / pgsz)
+            };
+        }
+    });
+
+    var pagebar = new Ext.ux.PagingToolbarForFilterGrid({
+        id: 'pagebar'
+        ,pageSize: Ext.state.Manager.get('cpac-pgsz', 10)
+        ,store: store
+        ,displayInfo: true
+        ,items: [
+             ' ' ,{
+                tooltip: 'Reset'
+                ,icon: '[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "page_lightning.png" ) %]'
+                ,cls:"x-btn-icon"
+                ,handler: function (){
+                    // clear the cookie storing grid state
+                    Ext.state.Manager.getProvider().clear('cpac-pgsz');
+                    Ext.state.Manager.getProvider().clear('search-grid');
+                    // clear search opts
+                    store.baseParams = {};
+                    // need to remove query string to reset
+                    store.proxy.conn.url = '[% c.uri_for( c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list'),
+                                                    [cpac.g.site,cpac_db,cpac_table] ) %]'
+                    [% IF cpac.g.site == 'default' %]
+                    Ext.get('cpac_browse_link').set({href: '[% c.uri_for( c.controller('AutoCRUD::Root').action_for('table'),
+                            [cpac_db], cpac_table, 'browse' ) %]'});
+                    [% ELSE %]
+                    Ext.get('cpac_browse_link').set({href: '[% c.uri_for( c.controller('AutoCRUD::Root').action_for('source'),
+                            [cpac.g.site,cpac_db], cpac_table, 'browse' ) %]'});
+                    [% END %]
+                    // private? clear sorting config
+                    store.sortInfo = { field: '[% cpac.g.default_sort %]', direction: 'ASC' }
+                    // reset page size to default of 10
+                    pagebar.pageSize = 10;
+                    Ext.getCmp('pgsz-combo').setValue(10);
+
+                    // reset column hiding to defaults. it seems when this is
+                    // changed via UI that it *reconfigures* the col, hence us
+                    // doing this manually in a loop for each col index.
+                    [% SET colidx = 0 %]
+                    [% FOREACH col IN cpac.tc.cols %]
+                        [% IF cpac.tc.hidden_cols.exists(col) %]
+                            cm.setHidden([% colidx %], true);
+                        [% ELSE %]
+                            cm.setHidden([% colidx %], false);
+                        [% END %]
+                        [% SET colidx = colidx + 1 %]
+                    [% END %]
+                    [% IF cpac.tc.delete_allowed == 'yes' %]
+                        cm.setHidden([% colidx %], false);
+                    [% END %]
+
+                    // reload grid
+                    pagebar.doLoad(0);
+                }
+            }
+            ,'-' ,'Rows:'
+            ,' ' ,{
+                xtype: 'combo'
+                ,id: 'pgsz-combo'
+                ,mode: 'local'
+                ,allowBlank: false
+                ,triggerAction: 'all'
+                ,lazyInit: false
+                ,width: 50
+                ,maskRe: /[0-9]/
+                ,store: [10, 20, 50, 100, 'all']
+                ,listeners: {
+                    render: function(combo) {
+                        var pgsz = Ext.state.Manager.get('cpac-pgsz', pagebar.pageSize);
+                        combo.setValue( isNaN(pgsz) ? 'all' : pgsz );
+                    }
+                    ,select: function(combo) {
+                        pagebar.pageSize = parseInt(combo.getRawValue(), 10);
+                        Ext.state.Manager.set('cpac-pgsz', pagebar.pageSize);
+                        pagebar.doLoad(pagebar.cursor);
+                    }
+                    ,specialkey: function(combo, e) {
+                        if (e.getKey() == 13) {
+                            pagebar.pageSize = parseInt(combo.getRawValue(), 10) || 'all';
+                            Ext.state.Manager.set('cpac-pgsz', pagebar.pageSize);
+                            combo.setValue(pagebar.pageSize);
+                            pagebar.doLoad(pagebar.cursor);
+                        }
+                    }
+                }
+            }
+        ]
+    });

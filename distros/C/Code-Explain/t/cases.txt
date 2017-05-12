@@ -1,0 +1,20 @@
+$_                  Default variable
+@_                  Default array
+given               keyword in perl 5.10
+say                 keyword in perl 5.10
+say()               keyword in perl 5.10
+$_[1]               This is element 1 of the default array @_
+$name[$id]          This is element $id of the array @name
+$phone{$name}       The element $name of the hash %phone
+$$y                 $y is a reference to a scalar value. This expression dereferences it. See perlref
+1                   A number
+23.14               A number
+12_345              This is the same as the number 12345 just in a more readable format
+1+1                 Numerical operation
+1   +1              Numerical operation
+1   - 1             Numerical operation
+!!                  Creating boolean context by negating the value on the right hand side twice
+'' .                Forcing string context
+0 +                 Forcing numeric context
+$z ||= $y           Assigning default value to $z. It has the disadvantage of not allowing $z=0. Startin from 5.10 you can use //= instead of ||=
+$self->editor       Calling method 'editor' on an object in the variable called $self

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Callerid.t
+lib/Callerid.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+examples/hexdecode.pl
+examples/parse.pl

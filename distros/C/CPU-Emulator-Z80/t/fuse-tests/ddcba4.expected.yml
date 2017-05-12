@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcba4
+registers:
+  AF: 57258
+  AF_: 0
+  BC: 44608
+  BC_: 0
+  DE: 707
+  DE_: 0
+  HL: 10165
+  HL_: 0
+  I: 0
+  IX: 65101
+  IY: 64163
+  PC: 4
+  R: 2
+  SP: 0

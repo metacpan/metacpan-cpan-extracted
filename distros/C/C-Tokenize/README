@@ -1,0 +1,102 @@
+    ____         _____     _              _         
+   / ___|  _ _  |_   _|__ | | _____ _ __ (_)_______ 
+  | |     (_|_)   | |/ _ \| |/ / _ \ '_ \| |_  / _ \
+  | |___   _ _    | | (_) |   <  __/ | | | |/ /  __/
+   \____| (_|_)   |_|\___/|_|\_\___|_| |_|_/___\___|
+                                                    
+
+
+This is the README for C::Tokenize version 0.13.
+
+C::Tokenize is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+C::Tokenize - reduce a C file to a series of tokens
+
+This module provides a tokenizer, "tokenize", which breaks C source
+code into its smallest meaningful components, and the regular
+expressions which match each of these components. For example, the
+module supplies a regular expression "$comment_re" which matches a C
+comment line.
+
+It also supplies some extra regular expressions for, for example,
+local include statements, "$include_local", or C variables,
+"$cvar_re", as well as extra functions, like "decomment" for
+removing traditional C comments.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?C::Tokenize
+    * http://metacpan.org/release/C-Tokenize
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc C::Tokenize
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.1.1 or later.
+
+To install the module from CPAN, use
+
+    cpan C::Tokenize
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm C::Tokenize
+
+To install the module from the source file, C-Tokenize-0.13.tar.gz, follow
+this sequence of commands:
+
+    tar xfz C-Tokenize-0.13.tar.gz
+    cd C-Tokenize-0.13
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/C-Tokenize/issues>,
+
+or if you want to alter the source code of C::Tokenize, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/C-Tokenize>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Wed Dec  7 14:27:34 2016.
+
+-----------------------------------------------------------------------------

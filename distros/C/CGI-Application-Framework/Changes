@@ -1,0 +1,37 @@
+Revision history for CGI-Application-Framework
+
+0.26
+   - A few bug fixes, found during the CAF hack-a-thon on Sat 29 Oct 2005
+     at the LPI office
+
+0.24
+   - Rebuild with better Module::Build YAML support
+
+0.23
+   - Added version number requirements on Module::Build (0.2602) and
+     DBD::SQLite (1.09) so that 'make test' doesn't fail for people
+     with older versions; thanks to Dan Horne for finding this stuff
+
+0.20_8 Sep 7, 2005
+   - version number update, attributions, license & copyright info, etc.
+     in prep of an upload to PAUSE
+
+0.20_7 Jul 11, 2005
+   - login validation errors weren't being passed to login template
+   - checksum_okay wasn't picking up the checksum from URL for POSTed forms
+
+0.20 Jun 12, 2005
+   - first release with Module::Build installer
+   - docs converted to POD
+   - basic tests are now done (still need to write more detailed ones, though)
+   - now requires CGI::Application 4.0 (for callback support)
+   - template system factored out into CGI::Application::Plugin::AnyTemplate
+   - config system switched from Config::General to Config::Context
+   - config file parameter names have been cleaned up a bit
+   - switched from log4perl to CGI::Application::Plugin::Log::Dispatch
+   - Class::DBI modules now use Class::DBI::Loader instead of home-grown equivalent
+
+0.01-0.19  Sept 2004 - May 2005
+   - glorious versions all lost in the mists of prehistory.
+
+

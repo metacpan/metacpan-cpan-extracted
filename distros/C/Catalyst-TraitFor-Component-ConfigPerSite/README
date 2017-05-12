@@ -1,0 +1,31 @@
+Catalyst-TraitFor-Component-ConfigPerSite
+=========================================
+
+This Role or Trait allows you to share an application between sites, clients, etc
+with different configuration for templates and databases (and possibly other parts).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  Catalyst
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010,2011 by Aaron Trevena <aaron@aarontrevena.co.uk>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

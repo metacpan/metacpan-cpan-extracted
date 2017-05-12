@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+t/Class-Method-Auto.t
+lib/Class/Method/Auto.pm
+Makefile.PL

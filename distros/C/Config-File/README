@@ -1,0 +1,67 @@
+Config::File - Parse a simple configuration file
+
+Config::File provides an interface to parse simple -although complete
+for most needs- configuration files. The syntax of the configuration
+file is as follows:
+
+    # This is a comment
+    VALUE_ONE = foo
+    VALUE_TWO = $VALUE_ONE/bar
+    VALUE_THREE = The value contains a \# (hash). # This is a comment.
+
+Options can be clustered when creating groups:
+
+    CLUSTER_ONE[data] = data cluster one
+    CLUSTER_ONE[value] = value cluster one
+    CLUSTER_TWO[data] = data cluster two
+    CLUSTER_TWO[value] = value cluster two
+
+Then values can be fetched using this syntax:
+
+    $hash_config->{CLUSTER_ONE}{data};
+
+There can be as many sub-options in a cluster as needed.
+
+    BIG_CLUSTER[part1][part2][part3] = data
+
+is fetched by:
+    $hash_config->{BIG_CLUSTER}{part1}{part2}{part3};
+
+There are a couple of restrictions as for the names of the keys. First of all,
+all the characters should be alphabetic, numeric, underscores or hyphens, with
+square brackets allowed for the clustering. That is, the keys should conform
+to /^[A-Za-z0-9_-]+$/
+
+This means also that no space is allowed in the key part of the line.
+
+    CLUSTER_ONE[data] = data cluster one      # Right
+    CLUSTER_ONE[ data ] = data cluster one    # Wrong
+
+For further details, please refer to the module's documentation.
+
+INSTALLATION
+
+Installing this module is like installing any standard Perl module,
+this means:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only core modules: 
+
+   Carp
+   Exporter
+   IO::File
+
+COPYRIGHT AND LICENCE
+
+Development was started by Sebastien J. Gross <seb@sjgross.org>, and since 
+2003 it is maintained by Gunnar Wolf <gwolf@gwolf.org>.
+
+All rights reserved.  This program is free software; you can redistribute
+it and/or modify it under the terms of the GPL v2 (or later, at your
+choice).

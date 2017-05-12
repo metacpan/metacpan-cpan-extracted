@@ -1,0 +1,29 @@
+Crypt::PGPSimple version $Revision: 0.05 $
+==========================================
+
+Crypt::PGPSimple provides a simple object-oriented interface to
+PGP (Pretty Good Privacy).  PGP is a command-line application 
+that provides strong encryption.
+
+Please see the POD for the module for additional information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+PGP must be installed on the server.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001 Jason M. Hinkle. All rights reserved.
+
+This library is free software.  You can redistribute it and/or modify it 
+under the same terms as Perl itself.
+

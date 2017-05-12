@@ -1,0 +1,141 @@
+
+=head1 NAME
+
+Convos::Manual::Running - How to start Convos
+
+=head1 DESCRIPTION
+
+L<Convos> can run in different modes, but we suggest running with a separate
+backend, since it allows you to restart the frontend without disconnecting
+from the IRC servers.
+
+NOTE! If you run convos from a checked out git repo, wou need to run the
+commands with C<./vendor/bin/carton exec> infront of the commands. Example:
+
+  # This...
+  $ convos frontend start
+  $ convos daemon
+
+  # becomes...
+  $ ./vendor/bin/carton exec ./script/convos frontend start
+  $ ./vendor/bin/carton exec ./script/convos daemon
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Convos::Manual::Environment>
+
+=item * L<Convos::Manual::HttpHeaders>
+
+=back
+
+=head1 SYNOPSIS
+
+  $ ./script/convos
+  $ ./script/convos [command] [options]
+
+=head1 MODES
+
+=head2 Single process mode
+
+Running Convos in single process mode is the simplest way to get started.
+In this mode, it will run the backend (The process that connects to the IRC
+servers) embedded. This might even be required, if you want to run Convos
+on a service similar to Heroku. (NOTE: Convos is not supported on Heroku)
+
+To start Convos, simply start it with the command "daemon". Below, we have
+also supplied the listen parameter which specifies which port to accept
+incoming HTTP connections on.
+
+  $ convos daemon --listen http://*:8080
+
+For more details run "help daemon" or have a look at
+L<http://mojolicio.us/perldoc/Mojo/Server/Daemon>.
+
+  $ convos help daemon
+
+=head2 Separate backend
+
+Starting up the backend separately is a big win, since it allows you to
+upgrade and restart the frontend without tearing down the connections to the
+IRC servers. There are two ways to start the backend, either in foreground
+or fork to background:
+
+  # Start in foreground
+  $ convos backend -f
+
+  # Fork to background
+  $ convos backend start
+
+After you have forked to background, you can investigate the status of
+the process, stop or restart it:
+
+  $ convos backend status
+  $ convos backend stop
+  $ convos backend restart
+
+=head2 Hypnotoad
+
+L<Hypnotoad|http://mojolicio.us/perldoc/Mojo/Server/Hypnotoad> is a full
+featured, UNIX optimized, preforking non-blocking webserver. Using Hypnotoad
+is what we suggest, since it can handle a lot more requests, than what
+L</Single process mode> can offer. Starting with Hypnotoad can be done with
+the following command:
+
+  $ convos frontend start
+
+It is possible to L<hot reload|http://mojolicio.us/perldoc/Mojo/Server/Hypnotoad#USR2>
+the server, without losing any HTTP connections:
+
+  $ convos frontend reload
+
+Like the L<backend|/Separate backend>, you can also investigate the status of
+the process, stop or restart it:
+
+  $ convos frontend status
+  $ convos frontend stop
+  $ convos frontend restart
+
+We strongly suggest starting with L<MOJO_CONFIG|Convos::Manual::Environment/MOJO_CONFIG>
+set, so you can change the environment during L<hot reload|Mojo::Server::Hypnotoad/DESCRIPTION>.
+This can also be set in L</Init script> environment.
+
+  $ MOJO_CONFIG=/path/to/config.pl convos frontend start
+
+L</Hypnotoad> mode require the backend to be started as a separate process.
+
+=head2 Init script
+
+It's possible to generate init scripts for L<Convos> now. To do that, you can
+run these commands:
+
+  for i in frontend backend; do
+    convos $i get_init_file > /etc/init.d/convos-$i
+    chmod +x /etc/init.d/convos-$i
+    update-rc.d convos-$i defaults
+  done
+
+The backend and frontend can be supplied with environment variables from
+C</etc/default/convos>. Example:
+
+  MOJO_CONFIG=/path/to/convos.conf
+  RUN_AS_USER=convos
+  RUN_AS_GROUP=nobody
+
+  CONVOS_FRONTEND_PID_FILE=/var/run/convos-frontend.log
+  CONVOS_FRONTEND_LOGFILE=/var/log/convos/frontend.log
+
+  CONVOS_BACKEND_PID_FILE=/var/run/convos-backend.pid
+  CONVOS_BACKEND_LOGFILE=/var/log/convos/backend.log
+
+  CONVOS_REDIS_URL=redis://localhost:6397/1
+
+Note: L<Hypnotoad> only reads these environment variables on start/restart,
+and not on reload.
+ 
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

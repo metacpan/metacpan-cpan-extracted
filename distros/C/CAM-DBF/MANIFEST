@@ -1,0 +1,15 @@
+index.html
+bin/dbf2csv
+bin/debugdbf
+bin/packdbf
+Build.PL
+CHANGES
+lib/CAM/DBF.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/dbf.t
+t/pod-coverage.t
+t/pod.t

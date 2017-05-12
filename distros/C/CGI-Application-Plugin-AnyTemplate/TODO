@@ -1,0 +1,16 @@
+
+TODO
+- TT driver should die with Template->error if $driver = Template->new(\%config) fails
+
+- [under debate] allow native syntax for include paths to also work in
+  addition to the include_paths param
+
+- improve handling of config params (avoid copious copying of hashes)
+- possibly remove dependency on Clone
+
+- emulate creating template from string in Petal
+  (or possibly support Template::TAL)
+
+- CPAN installer that lets you pick your template driver(s)
+- find out how to make subclassing of CAP::AT possible
+

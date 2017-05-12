@@ -1,0 +1,34 @@
+Revision history for Compress::LeadingBlankSpaces.
+
+0.06  Sun Aug 01 14:00:00 2004
+	- Clean up version inspired by conversation with Chris. More restrictive masks and rules
+	  should help to survive possible future inventions of new HTML tags. Tests were modified.
+
+0.05  Thu Jul 29 07:00:00 2004
+	- The problem of the file's last character that is not a 'new-string'
+	  was brought to my attention by Chris Clandingboel. Fixed now. Thanks Chris!
+	3882 Jul 29 07:24 Compress-LeadingBlankSpaces-0.05.tar.gz
+
+0.04  Thu May 06 01:00:00 2004
+	- new feature: <CODE ...>...</CODE> should not be compressed anymore.
+	- test.pl was edited appropriately.
+	- documentation was edited.
+	3720 May 06 20:08 Compress-LeadingBlankSpaces-0.04.tar.gz
+
+0.03  Sat Apr 17 14:50:00 2004
+	- test modification: test.pl was edited.
+	- capitalization bug in model-tag comparison was fixed. Thanks to Igor Jovanovic.
+	- the last ">" was deleted from the beginning tag-models in order to comply with optional params.
+	3566 Apr 17 23:15 Compress-LeadingBlankSpaces-0.03.tar.gz
+
+0.02  Fri Mar 26 18:50:00 2004
+	- bug-fix: <TEXTAREA>...</TEXTAREA> should not be compressed anymore.
+	  Thanks to Igor Jovanovic for the hint.
+	3113 Mar 26 23:16 Compress-LeadingBlankSpaces-0.02.tar.gz
+
+0.01  Tue Jul 23 13:40:22 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Compress::LeadingBlankSpaces
+	- original code & documentation is created.
+	2787 Sep 14  2003 Compress-LeadingBlankSpaces-0.01.tar.gz
+

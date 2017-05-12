@@ -1,0 +1,361 @@
+package Chloro::Manual::Intro;
+
+# ABSTRACT: Basic form and field definition
+
+
+
+=pod
+
+=head1 NAME
+
+Chloro::Manual::Intro - Basic form and field definition
+
+=head1 VERSION
+
+version 0.06
+
+=head1 DEFINING A BASIC FORM
+
+A form is defined as a unique class, so you might have C<MyApp::Form::Login>,
+C<MyApp::Form::User>, etc. To make a form class, just C<use Moose> and then
+C<use Chloro>.
+
+When you C<use Chloro>, your class is a form. A form class automatically
+consumes the L<Chloro::Role::Form> role. Since you're still using Moose, you
+can inherit from other classes, define attributes, consumes other roles, etc.
+
+You can also C<use Chloro> in a role, and then compose those form roles into
+form classes.
+
+A form consists of one or more fields. A field is a name plus a data type, as
+well as some other optional parameters.
+
+    package MyApp::Form::User;
+
+    use Moose;
+    use Chloro;
+
+    field username => (
+        isa      => 'Str',
+        required => 1,
+    );
+
+    field email_address => (
+        isa      => 'EmailAddress',
+        required => 1,
+    );
+
+    field password => (
+        isa    => 'Str',
+        secure => 1,
+    );
+
+    field password2 => (
+        isa    => 'Str',
+        secure => 1,
+    );
+
+    sub _validate_form {
+        my $self   = shift;
+        my $params = shift;
+
+        # Use a bare return if form is valid.
+        return if ...;
+
+        # Check that passwords are the same. Maybe check that password is
+        # present if required. Return a list of error messages.
+
+        return 'The two password fields must match.';
+    }
+
+=head1 FIELDS
+
+A field requires a name and a type. The type is a Moose type constraint, (not
+an HTML widget type). A field can be a C<Str>, C<Int>, C<ArrayRef[Int]>, or a
+L<DateTime>, or anything else you can define as a Moose type.
+
+Field values are extracted from the user-submitted params during when you call
+C<< $form->process( params => $params ) >>. By default, the extractor looks
+for a key matching the field's name, but you can define your own extraction
+logic. For example, you could define a L<DateTime> field that looked for three
+separate keys, C<day>, C<month>, C<year>, and used those to construct a
+L<DateTime> object.
+
+Fields are declared with the C<field()> subroutine exported by Chloro. This
+subroutine allows the following parameters:
+
+=over 4
+
+=item * isa
+
+This must be a L<Moose> type constraint. This can be passed as a string, a
+type constraint object, or a L<MooseX::Types> type.
+
+This type will be used to validate the field when it is submitted.
+
+This is required.
+
+=item * default
+
+The default value for the field. This can either be a non-reference scalar, or
+a subroutine reference.
+
+If this is a subroutine reference, it will be called as a method on the field
+object. It will also receive the parameters being processed and the field
+prefix as arguments.
+
+Field prefixes only matter for field groups, which are documented later.
+
+This is optional.
+
+=item * required
+
+A field can be made required. If a required field is missing, the form
+submission is not valid.
+
+=item * secure
+
+If a field is marked as secure, then it is excluded from the data returned by
+the L<Chloro::ResultSet> class's C<secure_results_as_hash()> method.
+
+The primary use of this is to avoid putting sensitive data like passwords or
+credit cards numbers in a session or query parameter.
+
+=item * extractor
+
+This is a subroutine reference that defines how the field's value is extracted
+from the hash reference of parameters that a form processes.
+
+This subroutine will be called as a method on the form object. It will receive
+three additional parameters.
+
+The first is the hash reference of parameters that was passed to the C<<
+$form->process() >> method.
+
+The second is the prefix for the group, if there is one. For fields outside a
+group, this will be undefined.
+
+The third parameter is the L<Chloro::Field> object for the field.
+
+By default, the extractor simply looks for a key in the user-submitted
+parameters that matches the field's name (with a group prefix, if needed). You
+can override this to implement a more complex extraction strategy. For
+example, you might extract a date from three separate field (year, month,
+day).
+
+The extractor is expected to return a two element list. The first should be
+the name of the field in the form, the second is the value.
+
+If the field does not have a correspondence to any one field you can return
+C<undef> for the name. If you provide a name, it will be passed to the
+L<Chloro::Result::Field> object as the C<name_in_form> parameter.
+
+=item * validator
+
+This is a subroutine reference that defines how the field's value is
+validated.
+
+This subroutine will be called as a method on the L<Chloro::Field> object
+itself. It will receive four additional parameters.
+
+The first is the value being validated. The second parameter is the hash
+reference of data submitted to the form.
+
+The third is the prefix for the group, if there is one. For fields outside a
+group, this will be undefined.
+
+The fourth is the L<Chloro::Field> object for the field.
+
+Note that the validator is called I<in addition> to validating the field's
+type. If the type validation fails, then the validator will not be called at
+all.
+
+If the validator returns nothing, the field is valid. If the field is invalid,
+you can either return a string or a L<Chloro::ErrorMessage> object.
+
+=back
+
+=head1 PROCESSING USER INPUT
+
+Each form object is immutable. The form processes user input and returns a
+L<Chloro::ResultSet> object. The resultset in turn contains a set of
+L<Chloro::Result::Field> objects, one for each field in the form.
+
+    my $resultset = $form->process( params => $params );
+
+The C<$params> value is simple a hash reference of the user submitted
+input. If you're using Catalyst you could write this:
+
+    my $resultset = $form->process( params => $c->request()->params() );
+
+The first thing you should do with the resultset is check whether it is
+valid. Valid means that there I<all> of the fields passed their required,
+type, validator checks. If the form defined any form-level validations, these
+must also pass for the resultset to be valid.
+
+    if ( $resultset->is_valid() ) {
+        ...
+    }
+    else {
+        ...
+    }
+
+If the resultset is valid, there a number of ways to retrieve the munged user
+input. The easiest is to call C<< $resultset->results_as_hash() >>, which
+returns a hash reference.
+
+The keys are field names from your form and the results are the value for that
+field.
+
+    my $user_data = $resultset->results_as_hash();
+
+    $user->update( $user_data );
+
+If the resultset isn't valid you can retrieve the errors from the resultset:
+
+    for my $error ( $resultset->all_errors() ) {
+        ...
+    }
+
+The errors are objects, and can be either L<Chloro::Error::Field> or
+L<Chloro::Error::Form> objects. A field error is associated with a specific
+field, while a form error is not. Both of these objects will have an error
+message object available from C<< $error->message() >>.
+
+What you do with these error objects is up to you.
+
+What I do is take each field error and display the error near the field in
+question. I also change the CSS class of the div that holds the field so that
+it has an orange background.
+
+I display all the form errors at the top of the form in another box with an
+orange background.
+
+=head1 PUTTING IT ALL TOGETHER
+
+Here's an example of how you might use Chloro in a Catalyst controller:
+
+    sub login {
+        my $self = shift;
+        my $c    = shift;
+
+        my $form = MyApp::Form::Login->new();
+
+        my $resultset = $form->process( params => $c->request()->params() );
+
+        if ( $resultset->is_valid() ) {
+            # Set authentication cookie or do something with session.
+            # Then redirect somewhere useful
+        }
+        else {
+            $c->session()->{errors}    = [ $resultset->all_errors() ];
+            $c->session()->{form_data} = $resultset->secure_results_as_hash();
+
+            # redirect back to login form
+        }
+    }
+
+    sub login_form {
+        my $self = shift;
+        my $c    = shift;
+
+        # Your view code will look for this data and do something useful with
+        # it.
+        $c->stash()->{errors}    = $c->session()->{errors}    || [];
+        $c->stash()->{form_data} = $c->session()->{form_data} || {};
+
+        $c->stash()->{template} = 'login_form.html';
+    }
+
+=head1 VALIDATING THE WHOLE FORM
+
+Some validations cannot be expressed by validating a single field. For
+example, when a user changes their password, you generally require them to
+type it twice. You want to compare the two passwords and make sure they match.
+
+Adding whole form validation logic can be done by adding a C<_validate_form()>
+method to your form class:
+
+    package MyApp::Form::User;
+
+    use Moose;
+    use Chloro;
+
+    use List::AllUtils qw( any );
+
+    field email_address => (
+        isa      => 'EmailAddress',
+        required => 1,
+    );
+
+    field password => (
+        isa      => 'Str',
+        secure   => 1,
+    );
+
+    field password2 => (
+        isa      => 'Str',
+        secure   => 1,
+    );
+
+    sub _validate_form {
+        my $self    = shift;
+        my $params  = shift;
+        my $results = shift;
+
+        my $pw1 = $results->{password}->value();
+        my $pw2 = $results->{password2}->value();
+
+        return unless any { defined && length } $pw1, $pw2;
+
+        return if ( $pw1 // q{} ) eq ( $pw1 // q{} );
+
+        return 'The two passwords you provided did not match.';
+    }
+
+The C<_validate_form()> method will be called with two arguments. The first is
+the raw parameters passed to C<< $form->process() >>. The second is a hash
+reference where the keys are field and group names and the values are
+L<Chloro::Result::Field> and L<Chloro::Result::Group> objects.
+
+Generally, it's best to get the data from the result objects, since this is
+the result of running any custom extraction logic.
+
+The C<_validate_form()> object is expected to return a list of errors if there
+are any. These can either be strings or L<Chloro::ErrorMessage> objects.
+
+In the example above, our C<_validate_form()> method checks several
+things. First, if both password fields are empty, we return false, because
+there's nothing to check. By default, we assume that no input means the user
+does not want to change their password.
+
+Next, we check whether the passwords match. If they do, we return false. The
+C<<( $pw1 // q{} )>> construct is there to avoid warnings from uninitialized
+values.
+
+Finally, if they I<don't> match, we return a string containing the error. This
+will be turned into an error object that is available from the
+L<Chloro::ResultSet> object.
+
+=head1 REPEATABLE GROUPS
+
+Chloro also supports the use of repeatable groups in forms. This is discussed
+in L<Chloro::Manual::Groups>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+
+
+__END__
+

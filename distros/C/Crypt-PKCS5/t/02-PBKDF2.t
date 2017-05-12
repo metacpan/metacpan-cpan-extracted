@@ -1,0 +1,118 @@
+use Test::More qw(no_plan);
+use Crypt::PKCS5;
+use strict;
+
+
+while (my $v = load()) {
+    my $DK = Crypt::PKCS5::pbkdf2($v->{P}, $v->{S}, $v->{c}, $v->{dkLen});
+    ok($DK eq $v->{DK});
+}
+
+sub load {
+    my %result = ();
+    while (defined(my $l = <DATA>)) {
+        chomp $l;
+        last if $l eq '';
+
+        my ($k, $v) = split /:\s+/, $l;
+        $result{$k} = $v;
+    }
+    return undef if !defined $result{P};
+
+    $result{P} = pack 'H*', $result{P};
+    $result{S} = pack 'H*', $result{S};
+    $result{DK} = pack 'H*', $result{DK};
+
+    return \%result;
+}
+__DATA__
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 8
+DK: 4dbe3e772ef5d907
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 16
+DK: 4dbe3e772ef5d9079171c383162af2fb
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 20
+DK: 4dbe3e772ef5d9079171c383162af2fb9cc8143a
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 24
+DK: 4dbe3e772ef5d9079171c383162af2fb9cc8143a9b777ccc
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 32
+DK: 4dbe3e772ef5d9079171c383162af2fb9cc8143a9b777ccc4925757abdb15ce1
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1
+dkLen: 64
+DK: 4dbe3e772ef5d9079171c383162af2fb9cc8143a9b777ccc4925757abdb15ce157d8aebbff3d1090682faa79df983f1fadcaa39ecc55d40e80b40a3941321e45
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 2
+dkLen: 32
+DK: 65f49bd226304afc38021022a89f0b544975e1c9dd65a55530b2fff8790e8ad9
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 3
+dkLen: 32
+DK: df195cf903b248a774432e6a3f67e13e3c9e38ace1296680fd635683af6337ef
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 10
+dkLen: 32
+DK: 40cf5ed1396ef3ba90037179fc46cfafe76664f3527d898033582c783e300d0f
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 100
+dkLen: 32
+DK: 3f7f8e4813cb30d33f5fbeffe2f99406d13d4847078de150e33cca129490df9a
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 1000
+dkLen: 32
+DK: b4fa0e52bdf5a8ea2cff5a2a14b8dadda260b627a4d5c093ad7d5e4734f0cee8
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 10000
+dkLen: 32
+DK: 201e64d26b01600e3ee75a0135850d0dd2f1d69566e040d7916589da3590b35b
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 100
+dkLen: 31
+DK: 3f7f8e4813cb30d33f5fbeffe2f99406d13d4847078de150e33cca129490df
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 100
+dkLen: 30
+DK: 3f7f8e4813cb30d33f5fbeffe2f99406d13d4847078de150e33cca129490
+
+P: 48656c6c6f20576f726c6421
+S: 3030303030303030
+c: 100
+dkLen: 17
+DK: 3f7f8e4813cb30d33f5fbeffe2f99406d1
+

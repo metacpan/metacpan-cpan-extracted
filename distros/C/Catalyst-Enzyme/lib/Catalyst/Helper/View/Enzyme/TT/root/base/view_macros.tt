@@ -1,0 +1,15 @@
+[% PROCESS "form_macros.tt" %]
+[% MACRO form_view_item(item)  BLOCK; %]
+    [% FOR column = item.view_columns %]
+        <span class="item_field_data">
+        [%
+        #The field name
+        form_field_item(column, crud.column_monikers.$column, ['list'], 'item_field');
+
+        #The field data/contents
+        form_field_item(column, item.$column, ['view', item.$column.id], 'item_data');
+        %]
+        </span>
+        <br clear="all">
+    [% END; %]
+[% END; %]

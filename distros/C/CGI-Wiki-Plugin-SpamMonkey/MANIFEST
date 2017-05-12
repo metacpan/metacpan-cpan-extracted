@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/CGI/Wiki/Plugin/SpamMonkey.pm
+t/001_load.t
+t/002_register.t
+t/003_spam.t
+t/spamedit.txt
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,24 @@
+perltidy version 20121207 log file on a darwin system, OLD_PERL_VERSION=5.012004
+Configuration and command line parameters for this run:
+-noll -blbp=0
+To find error messages search for 'WARNING' with your editor
+Indentation will be with 4 spaces
+Line 1 implies starting-indentation-level = 0
+The nesting depths in the table below are at the start of the lines.
+The indicated output line numbers are not always exact.
+ci = levels of continuation indentation; bk = 1 if in BLOCK, 0 if not.
+
+in:out indent c b  nesting   code + messages; (messages begin with >>>)
+lines  levels i k            (code begins with one '.' per indent level)
+------  ----- - - --------   -------------------------------------------
+L1:1     i0:0 0 1            package CHI::t::Util;
+L12:12   i0:0 0 1            sub test_unique_id : Tests {
+L17:17   i0:0 0 1            sub test_random_string : Tests {
+L31:31   i0:0 0 1            sub test_non_common_constructor_par ....
+L38:38   i0:0 0 1            sub test_parse_memory_size : Tests  ....
+L51:51   i0:0 0 1            >>>Last line
+
+No indentation disagreement seen
+
+No lines exceeded 80 characters
+  Maximum output line length was 80 at line 34

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Easy SMS sending from Catalyst Apps.",
+   "author" : [
+      "Martin Atukunda <matlads@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Model-SMS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Model::Adaptor" : "0",
+            "Moose" : "0",
+            "SMS::Send" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::ScriptRunner" : "0",
+            "Catalyst::Test" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "base" : "0",
+            "namespace::autoclean" : "0",
+            "ok" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-catalyst-model-sms@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Model-SMS"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/matlads/Catalyst-Model-SMS.git",
+         "web" : "http://github.com/matlads/Catalyst-Model-SMS"
+      }
+   },
+   "version" : "0.4"
+}
+

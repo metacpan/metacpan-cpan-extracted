@@ -1,0 +1,296 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::ToDo - Ideas, problems, and suggestions
+
+
+=head1 SYNOPSIS
+
+There are lots of things that could be done to improve this module.
+
+
+=head1 DISTRIBUTION ISSUES
+
+Issues about the distribution and supporting files, rather than the code:
+
+=head2 Documentation
+
+=over 4
+
+=item *
+
+Make sure that the documentation is broken up into appropriately-sized
+chunks, and that people will know which section to look at.
+
+=item *
+
+As user questions arrive, add the answers as documentation points or examples.
+
+=item *
+
+Assemble annotated examples and tutorials, and either link to or distribute them.
+
+=item *
+
+Finish overhauling Template documentation.
+
+=item * 
+
+Include Global and InsideOut uses in the EXAMPLES section
+
+=item *
+
+Template Internals: Finish documenting disk-based meta-method code-caching. 
+
+=back
+
+=head2 Tests
+
+=over 4
+
+=item *
+
+Use Devel::Coverage to measure test coverage, and fill in missing
+cases.
+
+=item *
+
+Finish tests for Standard and Composite modules.
+
+=back
+
+
+=head1 GENERAL ISSUES
+
+=over 4
+
+=item *
+
+It does not appear to be possible to assign subroutine names to
+closures within Perl. As a result, debugging output from Carp and
+similar sources will show all generated methods as "ANON()" rather
+than "YourClass::methodname()".
+
+UPDATE: There now seem to be fixes for this which should be integrated: See the new Sub::Name module and http://perlmonks.org/index.pl?node_id=304883
+
+=item *
+
+For scalar methods (and others) it would be nice to have a simple
+bounds-checking interface to approve or reject (with an exception)
+new values that were passed in.
+
+As pointed out by Terrence Brannon, the right interface to
+adopt is probably that of Attribute::Types:
+
+  use Class::MakeMethods::Standard::Hash (
+    'scalar' => [ 'count' => { TYPE => 'INTEGER' } ],
+    'scalar' => [ 'name' => { TYPE => qr/^[A-Z]\w*$/ } ],
+    'scalar' => [ 'account' => { TYPE => &checksum_account_number } ]
+  );
+
+=item *
+
+Improve use of _diagnostic hooks for debugging. Add various "(Q)"
+debug diagnostics.
+
+=item *
+
+Finish building Inheritable array and object accessors.
+
+=item *
+
+Finish building Composite::* packages.
+
+=item *
+
+Resolve DESTROY-time issues with Standard::Inheritable, Composite::Inheritable, and Template::InsideOut.
+
+=item *
+
+Add slice and splice functionality to Standard::*:hash and Composite::*:hash.
+
+=back
+
+
+=head1 TEMPLATE CLASSES
+
+=head2 Template::Generic 
+
+=over 4
+
+=item *
+
+Allow untyped object accesors if C<class> attribute is not set.
+(Suggested in Jan-01 NY Perl Seminar discussion.)
+
+=item *
+
+Standardize naming templates for array, hash, other method types. 
+
+Deprecate verb_x methods? Or at last make them consistently available both ways.
+
+Make list methods consistent with hash_of_lists methods, in action, and
+in name (x_verb).  Also for others (e.g., set_ clear_ boolean)
+
+=item *
+
+Should default object template provide auto-create behavior on ->get()?
+
+=item *
+
+Generalize the "Generic:scalar -init_and_get" interface to support 
+memoizing values for other accessor types.
+
+=item *
+
+Consider adding hash each and array iterator methods, using a closure 
+to provide iteration.
+
+=item *
+
+Add support for tied arrays & scalars, a la tiedhash
+
+=item *
+
+Add string_multiple_index.
+
+=item *
+
+Extend index methods to support weak indexes with WeakRef. Perhaps
+just have it accept a hash ref to use as the index, and then allow
+people to pass in tied hashes?
+
+=item *
+
+Maybe make private or protected method croak if they were called by a
+method_init method which was called by an outside package.
+
+Not entirely clear what the right semantics or security precautions are here... 
+
+=back
+
+
+=head2 Template::Generic Subclasses
+
+=over 4
+
+=item *
+
+Finish building code_or_scalar meta-method.
+
+=item * 
+
+Finish building Class::MakeMethods::ClassInherit subclass.
+
+Need to work out how to capture changes for non-scalar values. For
+example, if a subclass inherits an array accessor and then pops
+it, is there some way to provide them with copy-on-write?
+
+=item *
+
+Add enumerated string/number type.
+
+Provide helper methods with map of associated values (ex $o->port
+= 80 ... $o->port_readable eq 'HTTP' ). Cf. code for earlier
+unpublished 'lookup' method type.
+
+=item *
+
+For StructBuiltin:
+
+Add -fatal flag to die if core func returns false / undef
+Add call method to recall method with alternative arguments.
+Add -nocall flag to not call core func on new.
+
+=item *
+
+Replace ClassName:static_hash_classname with Class:indexed_string.
+
+=back
+
+
+=head2 Template Internals
+
+=over 4
+
+=item *
+
+Figure out which modules, if any, should actually be using AutoLoader.
+Probably just Template::Generic?
+
+=item *
+
+Give users a way to do meta-method code-caching in Perl library
+hierarchy, rather than in /tmp/auto or other user-specified
+directory..
+
+Provide mechanism for pre-generating these at install time.
+
+Perhaps load these via do, rather than open/read/eval?
+
+Perhaps pre-generate expanded libs with all of the -imports resolved?
+
+=item *
+
+Support generating code files and loading them as needed.
+
+This would be similar to Class::Classgen, except that we'd do the
+generation at run-time the first time it was required, rather than
+in a separate pass.
+
+For example, given the following declaration:
+
+  package Foo::Bar;
+  Class::MakeMethods::Template::Hash->import(-codecache=>'auto', scalar=>'foo');
+
+We should be able to write out the following file:
+
+  cat 'auto/Foo/Bar/methods-line-2.pl'
+  # NOTE: Generated for Foo::Bar by the Class::MakeMethods module.
+  # Changes made here will be lost when Foo::Bar is modified.
+  package Foo::Bar;
+  sub foo {
+    my $self = shift;
+    if ( scalar @_ ) {
+      $self->{'foo'} = shift();
+    }
+    $self->{'foo'}
+  }
+
+Then on subsequent uses, we can just re-load the generated code:
+
+  require "auto/Foo/Bar/methods-line-2.pl";
+
+To do this, we need to:
+
+=over 4
+
+=item *
+
+Provide an option to select this if desired; maybe ... 
+import('-cache' => 'auto/', ...)?
+
+=item *
+
+Figure out which directory we can/should write into.
+
+=item *
+
+Re-evaluate the textual code templates, without generating the
+closures. Substitute in any _STATIC_ATTR_ values. Make other _ATTR_
+values point to some public lookup table or package scalar.
+
+=item *
+
+Notice if the source file (or Class::MakeMethods modules) has
+been updated more recently than the generated file.
+
+=back
+
+=back
+
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+=cut

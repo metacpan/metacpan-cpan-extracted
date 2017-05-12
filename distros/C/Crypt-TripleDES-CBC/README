@@ -1,0 +1,90 @@
+NAME
+
+    Crypt::TripleDES::CBC - Triple DES in CBC mode Pure implementation
+
+VERSION
+
+    version 0.006
+
+SYNOPSIS
+
+       use Crypt::TripleDES::CBC;
+     
+       my $key = pack("H*"
+         , "1234567890123456"
+         . "7890123456789012");
+       my $iv = pack("H*","0000000000000000");
+       my $crypt = Crypt::TripleDES::CBC->new(
+         key => $key,
+         iv  => $iv,
+       );
+     
+       say unpack("H*",$crypt->encrypt(pack("H*","0ABC0F2241535345631FCE")));            # Output F64F2268BF6185A16DADEFD7378E5CE5
+       say unpack("H*",$crypt->decrypt(pack("H*","F64F2268BF6185A16DADEFD7378E5CE5")));  # Output 0ABC0F2241535345631FCE0000000000
+
+DESCRIPTION
+
+    Most Modules on CPAN don't do a standards compliant implementation,
+    while they are able to decrypt what they encrypt. There are corner
+    cases where certain blocks of data in a chain don't decrypt properly.
+    This is (almost)a pure perl implementation of TripleDES in CBC mode
+    using Crypt::DES to encrypt individual blocks.
+
+ATTRIBUTES
+
+ cipher1
+
+    First Crypt::DES Cipher object generated from the key. This is built
+    automatically. Do not change this value from your program.
+
+ cipher2
+
+    second Crypt::DES Cipher object generated from the key. This is built
+    automatically. Do not change this value from your program.
+
+ key
+
+    Encryption Key this must be ascii packed string as shown in Synopsis.
+
+ iv
+
+    Initialization vector, default is a null string.
+
+METHODS
+
+ encrypt
+
+    Encryption Method
+
+ decrypt
+
+    Decryption method
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through github at
+    https://github.com/shantanubhadoria/perl-crypt-tripledes-cbc/issues.
+    You will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/shantanubhadoria/perl-crypt-tripledes-cbc
+
+      git clone git://github.com/shantanubhadoria/perl-crypt-tripledes-cbc.git
+
+AUTHOR
+
+    Shantanu Bhadoria <shantanu@cpan.org> https://www.shantanubhadoria.com
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

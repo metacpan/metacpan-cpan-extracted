@@ -1,0 +1,21 @@
+Revision history for Catalyst-Plugin-Sitemap
+
+1.0.2 2015-10-26
+  [ DOCUMENTATION ]
+    - Move link to blog entry in POD. (GH#2, runarbu)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 31 insertions(+), 10 deletions(-)
+
+1.0.1 2015-02-22
+  - General dstribution maintenance.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 186 insertions(+), 255 deletions(-)
+
+1.0.0 2010-11-30T21:41:34Z America/Montreal
+  - Change sitemap object under the hood to WWW::Sitemap::XML.
+  - Add Dancer::Plugin::SiteMap in the 'SEE ALSO' section.
+
+0.0.1 2010-09-29T20:19:12Z America/Montreal
+  - original version unleashed on an unsuspecting world

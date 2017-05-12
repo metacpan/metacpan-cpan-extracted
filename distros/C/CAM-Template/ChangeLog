@@ -1,0 +1,195 @@
+2005-09-20 14:37  chris
+
+	* MANIFEST, MANIFEST.SKIP, lib/CAM/Template.pm, t/pod-coverage.t,
+	  t/pod.t: v0.93 Allow blessed hashes to be arguments to
+	  addParams() and setParams() Add standard POD tests
+
+2005-08-25 22:07  chris
+
+	* lib/CAM/Template.pm: Add __filename__ auto-parameter
+
+2005-07-13 22:18  chris
+
+	* MANIFEST, Makefile.PL, test.pl, t/pod-coverage.t, t/template.t:
+	  Reorganize the test code
+
+2005-04-22 21:41  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/Template.pm: v0.91 Relicense, some documentation
+
+2004-11-11 23:53  tasc
+
+	* lib/CAM/Template.pm: Add loopClass
+
+2003-09-12 16:48  chris
+
+	* MANIFEST, Makefile.PL: Bacward compatibility change
+
+2003-09-12 16:29  chris
+
+	* Build.PL, COPYRIGHT, LICENSE, MANIFEST, Makefile.PL, README,
+	  Template.pm, index.html, test.pl, lib/CAM/Template.pm: v0.90 Fix
+	  a very subtle bug in the conditional search and replace Add test
+	  to detect that bug (see 'hardtest' in test.pl).  Update
+	  infrastructure to support new publication process Update license
+	  and documentation
+
+2003-03-12 16:55  chris
+
+	* README, Template.pm: Documentation galore
+
+2003-03-12 11:56  chris
+
+	* Template.pm: * Change file caching so a separate cache is created
+	  for each   CAM::Template subclass.  * Remove unused filename from
+	  the content hash * Loops no longer call setString
+
+2003-03-12 11:45  chris
+
+	* Template.pm, test.pl: v0.79 File cache now caches preparsed
+	  template instead of raw file
+
+2003-03-12 09:04  chris
+
+	* Template.pm, test.pl: v0.78 Speedups and attempted speedups,
+	  including the study() method Some comment cleanup Change file
+	  globals to package globals
+
+2003-03-09 10:15  chris
+
+	* Template.pm: Minor doc update
+
+2003-03-06 16:57  chris
+
+	* Template.pm: v0.77 Minor changes: remove unused globals, fix
+	  documentation
+
+2002-11-10 20:52  chris
+
+	* Template.pm: Fix nested loop behavior
+
+2002-11-10 20:06  chris
+
+	* Template.pm: Add clearLoop() function
+
+2002-11-08 21:19  chris
+
+	* Template.pm: v0.75 Make the #include syntax be overloadable
+
+2002-11-08 20:51  chris
+
+	* Template.pm: v0.74 Fix the loop-out replace Speed up the pattern
+	  construction by adding it to the object
+
+2002-11-08 19:43  chris
+
+	* MANIFEST: Oops, typo in MANIFEST
+
+2002-11-08 19:42  chris
+
+	* COPYRIGHT, MANIFEST, README, Template.pm: v0.73 Prep for release:
+	  add documentation
+
+2002-11-08 14:18  chris
+
+	* Template.pm, test.pl: v0.72 Abstract out the template syntax
+	  regexes.  Add performance measurement to the test routines
+
+2002-11-08 11:21  chris
+
+	* Template.pm, test.pl: v0.71 This version STRONGLY deprecates
+	  v0.70, since some templating syntax has changed.
+
+	  Clean up loop code: use <cam_loop> instead of <loop>, make case
+	  insensitive, add setLoop function
+
+	  Clean up addParams: allow mixed hash and hashref style arguments
+
+	  test.pl: if Text::Diff module is available, use it to condense
+	  output
+
+2002-11-08 01:11  chris
+
+	* Template.pm: Fix documentation typo
+
+2002-11-08 00:49  chris
+
+	* Template.pm, test.pl: v0.70 Add support for <loop>s.	Add
+	  optimize flags to all of the regexes.
+
+2002-10-29 14:22  chris
+
+	* Template.pm: v0.65, allow program specified parameters to
+	  override template specified parameters of the same name.
+
+2002-09-20 14:54  chris
+
+	* Template.pm: Loosen the restriction on the ::var=value:: code
+	  Bump version to 0.64
+
+2002-09-18 15:58  chris
+
+	* Template.pm: Support included files via   <!-- #include
+	  template="<file>" --> syntax.  Also add support for
+	  enabling/disabling this feature.
+
+2002-09-16 17:50  chris
+
+	* test.pl: Documentation of help script
+
+2002-09-16 17:08  chris
+
+	* test.pl: more tests
+
+2002-09-16 16:47  chris
+
+	* Template.pm, test.pl: Bug fixes, add testing code
+
+2002-09-16 16:16  chris
+
+	* Template.pm: Add support for "::<key>=<val>::" constant
+	  construct.  Remove extraneous "warnings" tweaking.  Bump version.
+
+2002-07-03 11:33  chris
+
+	* Template.pm: Fix typo in use_cache variable
+
+2002-06-10 16:38  tasc
+
+	* Template.pm: Change all class methods to require
+	  PACKAGE->method() syntax.  Fixed typo in error message Bumped
+	  version
+
+2002-06-06 15:58  tasc
+
+	* Template.pm: bump version
+
+2002-06-06 15:58  tasc
+
+	* Template.pm: Change File to Filename everywhere Broke out file
+	  retrieval function
+
+2002-06-05 11:32  tasc
+
+	* Template.pm: * more intuitive and efficient(?) addParams * fix
+	  problem with disabled warnings
+
+2002-05-23 14:43  chris
+
+	* Changes, MANIFEST: Change over to ChangeLog instead of Changes
+
+2002-05-23 14:34  tasc
+
+	* Template.pm: Bugfix: add Carp package
+
+2002-04-30 14:21  chris
+
+	* Changes, MANIFEST, Makefile.PL, Template.pm, test.pl: Initial
+	  revision
+
+2002-04-30 14:21  chris
+
+	* Changes, MANIFEST, Makefile.PL, Template.pm, test.pl: initial
+	  import
+

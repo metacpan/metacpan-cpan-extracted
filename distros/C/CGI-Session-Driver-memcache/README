@@ -1,0 +1,58 @@
+== CGI::Session::Driver::memcache
+
+Memcached Session store backend compatible with (almost) any Perl
+memcache client module.
+
+memcache Client API method requirements (any module that has methods with
+these names and signatures should be compatible):
+- get($key)
+- set($key, $val)
+- delete($key)
+
+No other methods of particular memcache client library are used by
+CGI::Session::Driver::memcache.
+
+== Installation
+perl Makefile.pl
+make
+make test
+make install
+
+Module depend on CGI::Session. On Debian / Ubuntu you can install it by:
+sudo apt-get install libcgi-session-perl
+You will also need one of the Memcache client libraries (see "Perl Memcached Client Libs").
+For tests to run (and your app to run with this module) you also need to be
+running Memcached (see "Server Installation").
+
+== Testing sessions against localhost
+
+- Have memcached installed on localhost
+- Check if running by: ps -ef | grep memcache
+- Run it by: sudo /etc/init.d/memcached start (by default it may not run
+  after boot - depending on OS distribution)
+- Run web server on localhost
+- Run script in directory "example" as CGI-script (make sure it is in a
+  location where you have CGI executability rights)
+
+== Perl Memcached Client Libs
+- Cache::Memcached (Debian/Ubuntu: libcache-memcached-perl)
+- Cache::Memcached::XS (Uses libmemcache.so native library)
+- Cache::Memcached::libmemcached (by DBI guru Tim Bunce, has also nice
+  comparison of various memcache client modules)
+- Cache::Memcahced::Fast (Debian: libcache-memcached-fast-perl)
+- Others: Search CPAN for "memcache"
+
+It may be a good idea to install "libmemcached-tools" to test memcached
+function from command line (Utilities: memccp, memcdump, memccat).
+These will prove to be valuable in debugging.
+
+== Server Installation
+- If no OS install package: Compile from source, downloadable from:
+  - http://memcached.org/ (OLD: http://danga.com/memcached/)
+- Install in Debian / Ubuntu
+  - sudo apt-get install memcached
+- install in RedHat / RHEL / Centos
+  - yum install memcached
+- Testing the server
+  - /etc/init.d/memcached status
+  - Dump keys: memcdump --servers=localhost

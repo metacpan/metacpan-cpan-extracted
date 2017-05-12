@@ -1,0 +1,52 @@
+--- #YAML:1.0
+name:                     CPAN-Testers-WWW-Reports-Parser
+version:                  0.06
+abstract:                 CPAN Testers reports data parser
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                           5.006
+  Carp:                           0
+recommends:
+  JSON::XS:                       0
+  YAML::XS:                       0
+  Test::CPAN::Meta:               0
+  Test::CPAN::Meta::JSON:         0
+  Test::Pod:                      1.00
+  Test::Pod::Coverage:            0.08
+build_requires:
+  IO::File:                       0
+  Test::More:                     0.70
+
+provides:
+  CPAN::Testers::WWW::Reports::Parser:
+    file:     lib/CPAN/Testers/WWW/Reports/Parser.pm
+    version:  0.06
+  CPAN::Testers::WWW::Reports::Parser::JSON:
+    file:     lib/CPAN/Testers/WWW/Reports/Parser/JSON.pm
+    version:  0.06
+  CPAN::Testers::WWW::Reports::Parser::YAML:
+    file:     lib/CPAN/Testers/WWW/Reports/Parser/YAML.pm
+    version:  0.06
+  CPAN::Testers::WWW::Reports::Report:
+    file:     lib/CPAN/Testers/WWW/Reports/Report.pm
+    version:  0.06
+no_index:
+  directory:
+    - t
+
+resources:
+  homepage:   http://www.cpantesters.org
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Parser
+  repository: http://github.com/barbie/CPAN-Testers-WWW-Reports-Parser
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

@@ -1,0 +1,157 @@
+CPANPLUS::YACSmoke
+==================
+
+0.44  Sat Sep  5 11:40:10 BST 2009
+    - Bump to a stable release
+
+0.43_07 Tue Aug 25 18:14:33 BST 2009
+    - Added Capture::Tiny to the testsuite so we can
+      suppress output during testing
+
+0.43_06 Mon Aug 24 19:53:50 BST 2009
+    - Cosmetic change to the PASS test results appending
+
+0.43_05 Mon Aug 24 18:44:06 BST 2009
+    - Add PASS test results to the test report as per RT #40247
+    - Make sure we only get the very last test results
+    - Remove the NA test report code as CPANPLUS does this
+      and we require a high enough version of that.
+
+0.43_03 Fri Aug 21 11:11:11 BST 2009
+    - Two more testcases for NA detail and excluded dists
+
+0.43_02 Fri Jul 24 15:41:57 BST 2009
+    - Fix setting no_update indexes if there isn't an index already
+    - Remove 'Extracted' messages from test reports
+
+0.43_01 Mon Jul 20 13:36:49 BST 2009
+    - Expanded the testsuite to actually test things >:)
+
+0.42  Fri Jun 26 22:50:23 BST 2009
+    - Fix path to the config file in Dist::YACSmoke, (Vincent Pit)
+
+0.40	Fri Jun 12 00:15:26 BST 2009
+    - Added gmail.com to list of addresses we don't set MAILDOMAIN to,
+	reported by Justin Hunter (arcanez)
+
+0.38	Tue Jun  9 15:21:04 BST 2009
+    - Forgot to make the various modules actually use get_conf('base') 
+	to find the configuration files now
+
+0.36	Tue Jun  9 14:54:10 BST 2009
+    - Added yactool a simple cli to CPANPLUS::YACSmoke
+    - CPANPLUS::Config::YACSmoke, set an env var to specify the base_dir
+	for configuration files.
+    - Added no_update to config settings so the source files don't get
+	updated during smoke runs.
+
+0.34	Sun Apr 26 21:43:07 BST 2009
+    - CPANPLUS 0.86 is out, so we can set that as a prereq and make a 
+      stable release. Hurrah.
+
+0.33_04	Fri Apr 17 14:05:59 BST 2009
+    - Remove the $ENV{PERL5_CPANPLUS_VERBOSE} from YACSmoke, 
+      causes problems with CPANPLUS testsuite and is unnecessary.
+
+0.33_03 Tue Apr  7 21:00:19 BST 2009
+    - Make auto_set_repository() only run at author-time
+
+0.33_02 Wed Apr  1 22:43:13 BST 2009
+    - Rolled back in the prereqs resolution which was required.
+
+0.33_01 Mon Mar 30 11:54:18 BST 2009
+    - A few minor alterations to the format of the Changes.git file
+    - Rolled back 'prepare' stuff and saving of .yml state, 
+      this will be dealt with by save_state in recent dev CPANPLUS
+    - Included Module::Install::Repository functionality
+    
+0.32	Wed Mar 18 00:00:31 GMT 2009
+    - Updated required versions of Module::Build and CPANPLUS::Dist::Build
+    - Fixed crufty 'require Module::Build' check in Makefile.PL to use can_use() 
+	from Module::Install instead
+    - Added in 'configure_requires' support, stolen from CP::D::MM and CP::D::Build.
+
+0.30	Tue Jan  6 16:05:15 GMT 2009
+	- Added detection of PERL5_MINISMOKEBOX env var
+
+0.28	Fri Jan  2 13:53:45 GMT 2009
+	- Development release was fine, bumping to stable release.
+
+0.27_01	Mon Dec 15 16:10:41 GMT 2008
+	- Implemented 'build_dir_reuse' type functionality into
+	  Dist::YACSmoke. It will 'trust' the build dir if it has
+	  seen a successful prepare/create and stash some meta
+	  data in the build dir in a .yacsmoke.yml file. 
+
+0.26	Tue Dec  9 06:10:09 GMT 2008
+	- Logic in install_prereq callback slightly out. If the
+	  prereq is marked as 'aborted' we really should not give up
+	  out of hand, but try it again until we get a FAIL or NA.
+	  Otherwise aborted prereqs will never get retried. etc.
+
+0.24	Wed Nov  5 09:32:09 GMT 2008
+	- we now set conf_cpantest to 'dont_cc' so we don't CC the author
+	  or do those checks with http://testers.cpan.org/
+	- Added detection of PERL5_MINIYACSMOKER env var
+
+0.22	Tue Oct 14 21:54:19 BST 2008
+	- Added setting MAILDOMAIN env var if it isn't already defined.
+	  This should make sending test reports that little bit faster.
+
+0.20	Thu Oct  9 21:01:24 BST 2008
+	- Fixed the exported functions, reported by SHLOMIF 
+	- Changed the M::B requirement to 0.30
+
+0.18	Mon Oct  6 22:46:55 BST 2008
+	- Hopefully fixed the undefined %ENV value warnings.
+
+0.16	Mon Sep 29 17:02:21 BST 2008
+	- Updated the RECENT file filtering to use Dave Golden's
+	  shiny improved regex for file extensions.
+
+0.14	Sun Sep 28 19:49:06 BST 2008
+	- Dist::YACSmoke filter for cases where we didn't install
+	  a prereq for whatever reason. Guarantee that the report
+	  gets discarded if it isn't graded as PASS.
+
+0.12	Wed Sep 24 09:40:03 BST 2008
+	- Change to Dist::YACSmoke to add a message whether CPANPLUS is
+	  preferring Makefile.PL or Build.PL
+
+0.10	Mon Sep 22 07:22:51 BST 2008
+	- Test for M::B during Makefile.PL install updated version
+	  and make sure that CPANPLUS::Dist::Build is installed as
+	  well ( RT #39477 ).
+	- Check if M::B is installed. set prefer_makefile to 0 if it
+	  is.
+
+0.08	Mon Sep 15 08:07:46 BST 2008
+	- set CPANPLUS conf prefer_makefile to 0 if perl version greater
+	  than 5.9.5, which means we have both Module::Build and 
+	  CPANPLUS::Dist::Build.
+
+0.06	Tue Sep  9 13:55:05 BST 2008
+	- CP::D::YS - added check for the version of CPANPLUS we are
+	  running under. Skip manglement if greater than equal to 0.85_04
+	  where the things we are mangling are fixed.
+
+0.04	Wed Sep  3 17:16:18 BST 2008
+	- Added filtering for the edge case where CPANPLUS generates
+	  a Makefile.PL if there is only a Build.PL. If the grade isn't
+	  a pass we bin the test report.
+
+0.02	Sun Jul 20 22:34:07 BST 2008
+	- first stable release
+
+0.01_03	
+
+	- Actually explicitly listed YAML::Tiny and Test::Reporter as dependencies.
+	- Switch some more CPANPLUS configuration settings on by default.
+
+0.01_02	Thu Jul 17 21:20:50 BST 2008
+
+	- Fixed the munging of the test report for NA reports.
+
+0.01_01	Thu Jul 17 00:49:33 BST 2008
+
+	- Initial CPAN development release

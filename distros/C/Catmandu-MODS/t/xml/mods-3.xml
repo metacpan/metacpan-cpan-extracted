@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+
+  <mods ID="a">
+    <titleInfo>
+      <nonSort>[</nonSort>
+      <title>Brief]</title>
+    </titleInfo>
+    <name type="personal" usage="primary">
+      <namePart>Roelandt, Louis (Louis Joseph Adrien)</namePart>
+      <namePart type="date">1786-1864</namePart>
+    </name>
+    <typeOfResource/>
+    <originInfo script="Latn">
+      <place>
+        <placeTerm type="code" authority="marccountry">xx^</placeTerm>
+      </place>
+      <dateIssued>19 mei 1835</dateIssued>
+      <dateIssued encoding="marc">1835^^^^</dateIssued>
+      <issuance>continuing</issuance>
+      <frequency/>
+    </originInfo>
+    <physicalDescription>
+      <form authority="gmd">graphic material</form>
+      <extent>1 document.</extent>
+    </physicalDescription>
+    <note>Notitie op map nr. Arch. 29</note>
+    <note>Collectie Vliegende Bladen / Ephemera</note>
+    <subject>
+      <hierarchicalGeographic>
+        <country>België</country>
+        <state>Vlaanderen</state>
+        <county>Oost-Vlaanderen</county>
+        <city>Gent (9000)</city>
+      </hierarchicalGeographic>
+    </subject>
+    <location>
+      <physicalLocation>CA20</physicalLocation>
+      <shelfLocator>BIB.ARCH.0090.0001</shelfLocator>
+    </location>
+    <recordInfo>
+      <recordContentSource authority="marcorg">UGent</recordContentSource>
+      <recordCreationDate encoding="marc">081021</recordCreationDate>
+      <recordChangeDate encoding="iso8601">20081021144339.0</recordChangeDate>
+      <recordIdentifier source="rug01">001293138</recordIdentifier>
+      <recordOrigin>Converted from MARCXML to MODS version 3.4 using MARC21slim2MODS3-4.xsl
+          (Revision 1.70)</recordOrigin>
+    </recordInfo>
+  </mods>
+  <mods ID="b">
+    <titleInfo>                                                                        
+      <nonSort>[</nonSort>
+      <title>Brief]</title>
+    </titleInfo>
+    <name type="personal" usage="primary">
+      <namePart>Roelandt, Louis (Louis Joseph Adrien)</namePart>
+      <namePart type="date">1786-1864</namePart>
+    </name>
+    <typeOfResource/>
+    <originInfo script="Latn">
+      <place>
+        <placeTerm type="code" authority="marccountry">xx^</placeTerm>
+      </place>
+      <dateIssued>19 mei 1835</dateIssued>
+      <dateIssued encoding="marc">1835^^^^</dateIssued>
+      <issuance>multipart monograph</issuance>
+      <frequency/>
+    </originInfo>
+    <physicalDescription>
+      <form authority="gmd">graphic material</form>
+      <extent>1 document.</extent>
+    </physicalDescription>
+    <note>Notitie op map nr. Arch. 29</note>
+    <note>Collectie Vliegende Bladen / Ephemera</note>
+    <subject>
+      <hierarchicalGeographic>
+        <country>België</country>
+        <state>Vlaanderen</state>
+        <county>Oost-Vlaanderen</county>
+        <city>Gent (9000)</city>
+      </hierarchicalGeographic>
+    </subject>
+    <location>
+      <physicalLocation>CA20</physicalLocation>
+      <shelfLocator>BIB.ARCH.0090.0001</shelfLocator>
+    </location>
+    <recordInfo>
+      <recordContentSource authority="marcorg">UGent</recordContentSource>
+      <recordCreationDate encoding="marc">081021</recordCreationDate>
+      <recordChangeDate encoding="iso8601">20081021144339.0</recordChangeDate>
+      <recordIdentifier source="rug01">001293138</recordIdentifier>
+      <recordOrigin>Converted from MARCXML to MODS version 3.4 using MARC21slim2MODS3-4.xsl
+          (Revision 1.70)</recordOrigin>
+    </recordInfo>
+  </mods>
+</modsCollection>

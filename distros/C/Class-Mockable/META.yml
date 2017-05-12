@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Mockable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: 0.21
+  Data::Compare: 0
+  Data::Dumper: 0
+  PadWalker: 1
+  Scalar::Util: 0
+  Test::Class: 0
+  Test::Class::Load: 0
+  Test::More: 0
+version: 1.11
+x_resource:
+  repository: https://github.com/DrHyde/perl-modules-Class-Mockable

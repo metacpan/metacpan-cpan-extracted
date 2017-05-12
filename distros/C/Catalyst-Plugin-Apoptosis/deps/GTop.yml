@@ -1,0 +1,5 @@
+---
+name: 'GTop based apoptosis'
+default: 1
+depends:
+    'GTop': 0.15

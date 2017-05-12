@@ -1,0 +1,31 @@
+---
+abstract: 'Make serving static pages painless.'
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.12, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Static-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: '5.80008'
+  MIME::Types: '2.03'
+  Moose: '0'
+  MooseX::Types: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Static-Simple.git
+version: '0.32'

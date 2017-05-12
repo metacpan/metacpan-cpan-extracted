@@ -1,0 +1,279 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 
+
+
+=head1 DESCRIPTION
+
+This is an updated release of Class::MakeMethods, for distribution through
+CPAN.
+
+This distribution includes the Class::MakeMethods::Template and
+Class::MakeMethods::Emulator modules which were packaged sepearately in some
+previous releases.
+
+
+=head1 MOTIVATION
+
+By passing arguments to "use Class::MakeMethods ..." statements, you can
+select from a library of hundreds of common types of methods, which are
+dynamically installed as subroutines in your module, simplifying the code
+for your class.
+
+
+=head1 DISTRIBUTION AND INSTALLATION
+
+=head2 Version
+
+This is Class::MakeMethods v1.010, intended for general use.
+
+This module's CPAN registration should read:
+
+  Name            DSLIP  Description
+  --------------  -----  ---------------------------------------------
+  Class::
+  ::MakeMethods   RdpOp  Generate common types of methods
+
+=head2 Prerequisites
+
+In general, this module should work with Perl 5.003 or later,
+without requring any modules beyond the core Perl distribution.
+
+The following optional feature may not be available on some platforms:
+
+=over 4
+
+=item *
+
+Class::MakeMethods::Attribute: The C<:MakeMethod> subroutine
+attribute requires Perl version 5.6 and the Attribute::Handlers
+module (from CPAN).
+
+=item *
+
+Class::MakeMethods::Template C<--lvalue>: The lvalue modifier
+provided by the Template generator subclasses will only work on
+Perl version 5.6 or later.
+
+=item *
+
+Some third-party tests used to check the compliance of Emulator modules
+require Test::More and will be automatically skipped on machines which do
+not have this installed.
+
+=back
+
+=head2 Installation
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+Alternately, you may retrieve this package from CPAN or from the author's site:
+
+=over 2
+
+=item *
+
+http://search.cpan.org/~evo/
+
+=item *
+
+http://www.cpan.org/modules/by-authors/id/E/EV/EVO
+
+=item *
+
+http://www.evoscript.org/Class-MakeMethods/dist/
+
+=back
+
+After downloading the distribution, follow the normal procedure to unpack and install it, using the commands shown below or their local equivalents on your system:
+
+  tar xzf Class-MakeMethods-*.tar.gz
+  cd Class-MakeMethods-*
+  perl Makefile.PL
+  make test && sudo make install
+
+Thanks to the kind generosity of other members of the Perl community,
+this distribution is also available repackaged in the FreeBSD
+"ports" and Linux RPM formats. This may simplify installation for
+some users, but be aware that these alternate distributions may
+lag a few versions behind the latest release on CPAN.
+
+=over 2
+
+=item *
+
+http://www.freebsd.org/cgi/ports.cgi?query=Class-MakeMethods
+
+=item *
+
+http://www.rpmfind.net/linux/rpm2html/search.php?query=perl-Class-MakeMethods
+
+=back
+
+=head2 Tested Platforms
+
+This release has been tested succesfully on the following platforms:
+
+  5.6.1 on darwin
+
+Earlier releases have also tested OK on the following platforms:
+
+  IP30-R12000-irix
+  OpenBSD.i386-openbsd
+  i386-freebsd / i386-freebsd-thread-multi
+  i386-linux
+  i386-netbsd / i386-netbsd-thread-multi
+  i586-linux / i586-linux-thread-multi-ld
+  i686-linux / i686-pld-linux-thread-multi
+  ia64-linux
+  ppc-linux
+  sparc-linux
+  sparc-netbsd
+  sun4-solaris
+
+Some earlier versions failed to "make test" on MSWin32, although
+a forced installation would still work; that problem should be
+fixed in the most recent releases.
+
+You may also review the current test results from CPAN-Testers:
+
+=over 2
+
+=item *
+
+http://testers.cpan.org/show/Class-MakeMethods.html
+
+=back
+
+=head1 SUPPORT
+
+=head2 Release Status
+
+This module has been used in a variety of production systems and
+has been available on CPAN for over two years, with several other
+distributions dependant on it, so it would be fair to say that it
+is fully released. 
+
+However, while the commonly-used portions are well tested, some of
+the more obscure combinations of options are less so, and new bug
+reports do trickle in occasionally. If you do encounter any problems,
+please inform the author and I'll endeavor to patch them promptly.
+
+Additional features have been outlined for future development, but
+the intent is support these by adding more options to the declaration
+interface, while maintaining backward compatibility.
+
+See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues
+and development plans.
+
+=head2 Support
+
+If you have questions or feedback about this module, please feel
+free to contact the author at the below address. Although there is
+no formal support program, I do attempt to answer email promptly. 
+
+I would be particularly interested in any suggestions towards
+improving the documentation and correcting any Perl-version or platform
+dependencies, as well as general feedback and suggested additions.
+
+Bug reports that contain a failing test case are greatly appreciated,
+and suggested patches will be promptly considered for inclusion in
+future releases.
+
+To report bugs via the CPAN web tracking system, go to 
+C<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-MakeMethods> or send mail 
+to C<Dist=Class-MakeMethods#rt.cpan.org>, replacing C<#> with C<@>.
+
+=head2 Community
+
+If you've found this module useful or have feedback about your
+experience with it, consider sharing your opinion with other Perl
+users by posting your comment to CPAN's ratings system:
+
+=over 2
+
+=item *
+
+http://cpanratings.perl.org/rate/?distribution=Class-MakeMethods
+
+=back
+
+For more general discussion, you may wish to post a message on PerlMonks or the comp.lang.perl.misc newsgroup:
+
+=over 2
+
+=item *
+
+http://www.perlmonks.org/index.pl?node=Seekers%20of%20Perl%20Wisdom
+
+=item *
+
+http://groups.google.com/groups?group=comp.lang.perl.misc
+
+=back
+
+
+=head1 CREDITS AND COPYRIGHT
+
+=head2 Author
+
+Developed by Matthew Simon Cavalletto at Evolution Softworks. 
+More free Perl software is available at C<www.evoscript.org>.
+
+You may contact the author directly at C<evo@cpan.org> or C<simonm@cavalletto.org>. 
+
+=head2 Feedback and Suggestions 
+
+Thanks to the following people for bug reports, suggestions, and other feedback:
+
+  Martyn J. Pearce
+  Scott R. Godin
+  Ron Savage
+  Jay Lawrence
+  Adam Spiers
+  Malcolm Cook
+  Terrence Brannon
+  Jared Rhine
+  Peter Chen
+  Mike Castle
+
+=head2 Source Material
+
+This package was inspired by the ground-breaking original closure-generating method maker module:
+
+  Class::MethodMaker, by Peter Seibel.
+
+Additional inspiration, cool tricks, and blocks of useful code for
+this module were extracted from the following CPAN modules:
+
+  Class::Accessor, by Michael G Schwern 
+  Class::Contract, by Damian Conway
+  Class::SelfMethods, by Toby Everett
+
+=head2 Copyright
+
+Copyright 2002, 2003 Matthew Simon Cavalletto. 
+
+Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+
+Based on Class::MethodMaker, originally developed by Peter Seibel. Portions Copyright 1996 Organic Online. Portions Copyright 2000 Martyn J. Pearce. 
+
+Class::MakeMethods::Emulator::accessors is based on accessors. Portions by Steve Purkis.
+
+Class::MakeMethods::Emulator::AccessorFast is based on Class::Accessor::Fast. Portions Copyright 2000 Michael G Schwern.
+
+Class::MakeMethods::Emulator::Inheritable is based on Class::Data::Inheritable. Portions Copyright 2000 Damian Conway and Michael G Schwern.
+
+Class::MakeMethods::Emulator::mcoder is based on mcoder. Portions Copyright 2003 by Salvador Fandiño.
+
+Class::MakeMethods::Emulator::Singleton is based on Class::Singleton, by Andy Wardley. Portions Copyright 1998 Canon Research Centre Europe Ltd. 
+
+Class::MakeMethods::Utility::Ref is based on Ref.pm. Portions Copyright 1994 David Muir Sharnoff.
+
+=head2 License
+
+You may use, modify, and distribute this software under the same terms as Perl.
+
+=cut

@@ -1,0 +1,16 @@
+Revision history for Perl extension Class::ActsLike.
+
+1.00 Thu Jul  7 04:34:56 UTC 2005
+	- pass through to Class::Roles automatically
+	- increment version number
+	- mark as deprecated
+	- while I'm at it:
+		- check test coverage
+		- add POD tests
+		- migrate to Module::Build
+		- add README
+		- sign distribution
+
+0.01  Wed Jan 15 15:11:56 2003
+	- original version; created by h2xs 1.2 with options
+		-A -X -n Class::Interface

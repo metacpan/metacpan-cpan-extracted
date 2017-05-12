@@ -1,0 +1,26 @@
+---
+abstract: 'A safer stash for Catalyst'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: '5.90060'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Model-DataHash
+requires:
+  Catalyst::Component::InstancePerContext: '0.001001'
+  CatalystX::InjectComponent: '0.025'
+  Data::Perl: '0.002009'
+  Moo: '2.000001'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-Model-DataHash/issues
+  homepage: https://github.com/jjn1056/Catalyst-Model-DataHash
+  repository: https://github.com/jjn1056/Catalyst-Model-DataHash
+version: '0.001'

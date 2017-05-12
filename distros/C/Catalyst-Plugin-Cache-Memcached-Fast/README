@@ -1,0 +1,42 @@
+NAME
+    Catalyst::Plugin::Cache::Memcached::Fast - Catalyst Plugin for
+    Cache::Memcached::Fast
+
+SYNOPSIS
+            use Catalyst qw[Cache::Memcached::Fast];
+
+            MyApp->config(
+                    cache => {
+                            servers => [
+                                    '127.0.0.1:11211',
+                                    '127.0.0.1:11212',
+                            ],
+                            namespace => 'MyApp:',
+                    }
+            );
+            my $data;
+
+            unless ( $data = $c->cache->get('data') ) {
+                    $data = $c->model('MyApp::MyData')->search();
+                    $c->cache->set( 'data', $data );
+            }
+
+            $c->response->body($data);
+
+DESCRIPTION
+    Extends base class with a distributed cache.
+
+METHODS
+    cache
+        Returns an instance of "Cache::Memcached::Fats"
+
+SEE ALSO
+    Cache::Memcached::Fast, Catalyst.
+
+AUTHOR
+    Vasiliy Voloshin, "<vasiliy.voloshin at gmail.com>"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

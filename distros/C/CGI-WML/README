@@ -1,0 +1,50 @@
+Module: CGI::WML
+
+Description:
+    CGI::WML provides WML output and WML methods for CGI programming.
+    The purpose of the module is to retain the familiar CGI.pm way of
+    programming to enable experienced CGI programmers to use their
+    existing skills when creating WAP applications.
+
+Copying:
+
+	Copyright (c) 2003 Andrew Murren and copyright (c) 2000 Angus
+	Wood. All rights reserved.  This program is free software; you
+	can redistribute it and/or modify it under the same terms as Perl
+	itself.
+
+Prerequisites:
+
+    perl 5.004, CGI.pm (>=2.79), HTML::Parser, HTML::TokeParser,
+    HTML::TableExtract and XML::Parser
+   
+    The XML::Parser dependancy can be removed at compile-time.
+
+	CGI.pm 2.79 is required so we can use the CGITempFile package.
+
+Build/Installation:
+
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    I don't know how to install Perl modules on Windows platforms, if
+    someone could provide directions so I can include them here I would
+    be grateful.
+
+Planned Enhancements:
+
+	Add support for new standards for WAP2 and XHTML.
+
+    Add support for /all/ attributes defined in the WML DTD, I think
+    I've covered the most important ones already, but it's nice to 
+    be complete.
+
+    Better HTML to WML conversion.
+    
+Authors:
+
+    Angus Wood <angus@z-y-g-o.com>
+    Andy Murren <amurren@users.sourceforge.net>

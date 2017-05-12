@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               CGI-Application-Plugin-DevPopup-Params
+version:            1.01
+abstract:           Show CGI::Application parameters in DevPopup window
+author:
+    - Serguei Trouchelle <stro@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::Application::Plugin::DevPopup:  1.03
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

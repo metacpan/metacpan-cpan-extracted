@@ -1,0 +1,31 @@
+---
+abstract: 'Perl Utility for Recent Releases'
+author:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+build_requires:
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catmandu-Importer-Purr
+provides:
+  Catmandu::Importer::Purr:
+    file: lib/Catmandu/Importer/Purr.pm
+    version: 0.02
+requires:
+  Catmandu: 0.8005
+  MetaCPAN::API::Tiny: 1.131730
+  Moo: 1.000003
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Importer-Purr/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/LibreCat/Catmandu-Importer-Purr
+version: 0.02

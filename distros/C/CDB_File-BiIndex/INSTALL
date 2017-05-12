@@ -1,0 +1,24 @@
+This module requires DBFile, but that is standard with perl.  It also
+requires MLDBM.  This can be retrieved from any CPAN mirror site.
+
+To build and install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make install
+
+*************************************************************
+Please make sure that you have CDB_File version 0.86 or later
+*************************************************************
+
+Please note, that CDB_File version 0.83 declares its self to have a
+version number 0.9.  Since that version has a bug, I have put a check
+for that version number and CDB_File will die.
+
+N.B. in order to install CDB_File using the CPAN module you have to
+use the name
+
+	TIMPX/CDB_File-0.86.tar.gz
+
+rather than just asking for CDB_File.  Hopefully this will be fixed by
+the time you read this.

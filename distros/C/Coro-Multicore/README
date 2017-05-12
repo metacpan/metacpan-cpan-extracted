@@ -1,0 +1,155 @@
+NAME
+    Coro::Multicore - make coro threads on multiple cores with specially
+    supported modules
+
+SYNOPSIS
+     use Coro::Multicore;
+
+     # or, if you want it disabled by default (e.g. to use it from a module)
+     use Coro::Multicore ();
+
+DESCRIPTION
+    EXPERIMENTAL WARNING: This module is in its early stages of development.
+    It's fine to try out, but it didn't receive the normal amount of testing
+    and real-world usage that my other modules have gone through.
+
+    While Coro threads (unlike ithreads) provide real threads similar to
+    pthreads, python threads and so on, they do not run in parallel to each
+    other even on machines with multiple CPUs or multiple CPU cores.
+
+    This module lifts this restriction under two very specific but useful
+    conditions: firstly, the coro thread executes in XS code and does not
+    touch any perl data structures, and secondly, the XS code is specially
+    prepared to allow this.
+
+    This means that, when you call an XS function of a module prepared for
+    it, this XS function can execute in parallel to any other Coro threads.
+
+    The mechanism to support this is easily added to existing modules and is
+    independent of Coro or Coro::Multicore, and therefore could be used,
+    without changes, with other, similar, modules, or even the perl core,
+    should it gain real thread support anytime soon. See
+    <http://perlmulticore.schmorp.de/> for more info on how to prepare a
+    module to allow parallel execution. Preparing an existing module is
+    easy, doesn't add much overhead and no dependencies.
+
+    This module is an AnyEvent user (and also, if not obvious, uses Coro).
+
+HOW TO USE IT
+    It could hardly be simpler - if you use coro threads, and before you
+    call a supported lengthy operation implemented in XS, use this module
+    and other coro threads can run in parallel:
+
+       use Coro::Multicore;
+
+    This module has no important API functions to learn or remember. All you
+    need to do is *load* it before you can take advantage of it.
+
+  EXPORTS
+    This module does not (at the moment) export any symbols. It does,
+    however, export "behaviour" - if you use the default import, then
+    Coro::Multicore will be enabled for all threads and all callers in the
+    whole program:
+
+       use Coro::Multicore;
+
+    In a module where you don't control what else might be loaded and run,
+    you might want to be more conservative, and not import anything. This
+    has the effect of not enabling the functionality by default, so you have
+    to enable it per scope:
+
+       use Coro::Multicore ();
+
+       sub myfunc {
+          Coro::Multicore::scoped_enable;
+
+          # from here to the end of this function, and in any functions
+          # called from this function, tasks will be executed asynchronously.
+       }
+
+API FUNCTIONS
+    $previous = Coro::Multicore::enable [$enable]
+        This function enables (if $enable is true) or disables (if $enable
+        is false) the multicore functionality globally. By default, it is
+        enabled.
+
+        This can be used to effectively disable this module's functionality
+        by default, and enable it only for selected threads or scopes, by
+        calling "Coro::Multicore::scope_enable".
+
+        The function returns the previous value of the enable flag.
+
+    Coro::Multicore::scoped_enable
+        This function instructs Coro::Multicore to handle all requests
+        executed in the current coro thread, from the call to the end of the
+        current scope.
+
+        Calls to "scoped_enable" and "scoped_disable" don't nest very well
+        at the moment, so don't nest them.
+
+    Coro::Multicore::scoped_disable
+        The opposite of "Coro::Multicore::scope_disable": instructs
+        Coro::Multicore to *not* handle the next multicore-enabled request.
+
+INTERACTION WITH OTHER SOFTWARE
+    This module is very similar to other environments where perl
+    interpreters are moved between threads, such as mod_perl2, and the same
+    caveats apply.
+
+    I want to spell out the most important ones:
+
+    pthreads usage
+        Any creation of pthreads make it impossible to fork portably from a
+        perl program, as forking from within a threaded program will leave
+        the program in a state similar to a signal handler. While it might
+        work on some platforms (as an extension), this might also result in
+        silent data corruption. It also seems to work most of the time, so
+        it's hard to test for this.
+
+        I recommend using something like AnyEvent::Fork, which can create
+        subprocesses safely (via Proc::FastSpawn).
+
+        Similar issues exist for signal handlers, although this module works
+        hard to keep safe perl signals safe.
+
+    module support
+        This module moves the same perl interpreter between different
+        threads. Some modules might get confused by that (although this can
+        usually be considered a bug). This is a rare case though.
+
+    event loop reliance
+        To be able to wake up programs waiting for results, this module
+        relies on an active event loop (via AnyEvent). This is used to
+        notify the perl interpreter when the asynchronous task is done.
+
+        Since event loops typically fail to work properly after a fork, this
+        means that some operations that were formerly working will now hang
+        after fork.
+
+        A workaround is to call "Coro::Multicore::enable 0" after a fork to
+        disable the module.
+
+        Future versions of this module might do this automatically.
+
+BUGS
+    (OS-) threads are never released
+        At the moment, threads that were created once will never be freed.
+        They will be reused for asynchronous requests, though, so a slong as
+        you limit the maximum number of concurrent asynchronous tasks, this
+        will also limit the maximum number of threads created.
+
+        Future versions will likely lift this limitation.
+
+    AnyEvent is initalised at module load time
+        AnyEvent is initialised on module load, as opposed to at a later
+        time.
+
+        Future versions will likely change this.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://software.schmorp.de/pkg/AnyEvent-XSThreadPool.html
+
+    Additional thanks to Zsbán Ambrus, who gave considerable desing input
+    for this module and the perl multicore specification.
+

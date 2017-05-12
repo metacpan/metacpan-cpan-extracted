@@ -1,0 +1,155 @@
+%
+% definitions.tex
+% ---------------
+%
+% Lengths
+\newlength{\parabstand}
+\setlength{\parabstand}{2ex plus1ex minus1ex}
+%
+\newlength{\itemabstand}
+\setlength{\itemabstand}{1ex plus1ex minus1ex}
+%
+% Commands
+\newcommand{\deref}{\ensuremath{\rightarrow}}     % Dereferenzierungspfeil ->
+\newcommand{\fatcomma}{\ensuremath{\Rightarrow}}  % Fat comma for use in hash declarations: =>
+\newcommand{\ie}{i.\,e.\xspace}                   % Nicely typeset i.e.
+\newcommand{\Ie}{I.\,e.\xspace}                   % Nicely typeset I.e.
+\newcommand{\eg}{e.\,g.\xspace}                   % Nicely typeset e.g.
+\newcommand{\Eg}{E.\,g.\xspace}                   % Nicely typeset E.g.
+\newcommand{\chart}{\class{Chart}\xspace}         % Our most prominent name
+\newcommand{\thisname}{Chart}                     % Each class will overwrite this with its own name
+\newcommand{\thisclass}{\class{\thisname}\xspace} % Abbreviation for frequently used command
+%
+% Standard text for constructor:
+\newcommand{\constructorblurb}[1]{
+\begin{Constructor}
+An object instance of \class{#1} can be created with the
+constructor \methoduse{new()}\index{Methods!new()}:
+\begin{SmallExample}
+\$obj = #1\deref new();\\
+\$obj = #1\deref new(\parameter{width}, \parameter{height});
+\end{SmallExample}
+
+If \methoduse{new()} is called without arguments, the constructor will
+return an image of size 300\ensuremath{\times}400 pixels. If
+\methoduse{new()} is called with two arguments, \parameter{width} and
+\parameter{height}, it will return a \class{#1} object of the
+desired size.
+\end{Constructor}
+
+\Methods\nopagebreak
+All universally valid methods, see page \pageref{methods} of
+class \class{Chart::Base}.\hfill
+
+\Attributes\nopagebreak
+All universally valid options, see page \pageref{options} of
+class \class{Chart::Base}. In addition, the following options are
+defined for this class:
+}
+%
+%-------------- command class -------------------------
+\newcommand{\class}[1]{\textsf{#1}\index{Class!#1}}
+%
+%-------------- command parameter -------------------------
+\newcommand{\parameter}[1]{\textrm{\textit{#1}}}
+%
+%-------------- command backslash -------------------------
+\newcommand{\bs}{\ensuremath{\backslash}}
+%
+%-------------- command name -------------------------
+\newcommand{\name}[1]{\label{#1}%
+   \parbox{15ex}{\bf\large Name:} #1\index{#1}\\[\itemabstand]}
+%
+%-------------- command synopsis -------------------------
+\newcommand{\synopsis}{\label{Synopsis}{\bf\large Synopsis}\index{Synopsis}}
+%
+%-------------- command file -------------------------
+\newcommand{\file}[1]{%
+   \parbox{15ex}{\bf\large File:} #1\\[\itemabstand]}
+%
+%-------------- command requires -------------------------
+\newcommand{\requires}[1]{%
+   \parbox{15ex}{\bf\large Requires:} #1\\[\itemabstand]}
+%
+%-------------- command example -------------------------
+\newcommand{\example}{\parbox{15ex}{\bf\large Example:}}
+%
+%-------------- command literal -------------------------
+\newcommand{\literal}[1]{`\texttt{#1}'}
+%
+%-------------- command methoduse -------------------------
+\newcommand{\methoduse}[1]{\texttt{#1}}
+%
+%-------------- command methoddecl -------------------------
+\newcommand{\methoddecl}[2]{\methoduse{#1}\index{Methods!#2}\\*}
+%
+%-------------- command attruse -------------------------
+\newcommand{\attruse}[1]{\textbf{#1}}
+%
+%-------------- command attrdecl -------------------------
+\newcommand{\attrdecl}[1]{\attruse{#1}\index{Attributes!#1}\\*}
+%
+%-------------- command Methods -------------------------
+\newcommand{\Methods}{\parindent 0pt \textbf{\large Methods:}\\*}
+%
+%-------------- command Attributes -------------------------
+\newcommand{\Attributes}{\vspace*{1ex}\parindent 0pt \textbf{\large Attributes/Options:}\\*}
+%
+%
+%% Environment definitions
+%  Environment Description
+\newenvironment{Description}
+{\nopagebreak \parindent 0pt \textbf{\large Description:}
+ \begin{list}{\relax}{
+ \setlength{\leftmargin}{0.1\textwidth}
+ \setlength{\topsep}{0pt}
+ }
+ \item
+}%
+{\end{list}
+\vspace{\parabstand}
+}% end Description
+%
+%  Environment Constructor
+\newenvironment{Constructor}%
+{\nopagebreak \parindent 0pt \textbf{\large Constructor:}\index{Constructor}
+ \begin{list}{\relax}{
+ \setlength{\leftmargin}{0.1\textwidth}
+ \setlength{\topsep}{0pt}
+ }
+ \item
+}%
+{\end{list}
+\vspace{\parabstand}
+}% end Constructor
+%
+%  Environment MethDecl
+\newlength{\minilength}
+\newenvironment{MethDecl}[2]%
+{\parindent 0pt \methoduse{#1}\index{Methods!#2}
+ \begin{list}{\relax}{
+ \setlength{\leftmargin}{0.1\textwidth}
+ \setlength{\topsep}{0pt}
+ }
+ \item
+}%
+{\end{list}
+}% end MethDecl
+%
+%  Environment AttrDecl
+\newenvironment{AttrDecl}[1]%
+{\parindent 0pt \attruse{#1}\index{Attributes!#1}
+ \begin{list}{\relax}{
+ \setlength{\leftmargin}{0.1\textwidth}
+ \setlength{\topsep}{0pt}
+ }
+ \item
+}%
+{\end{list}
+}% end AttrDecl
+%
+%  Environment SmallExample
+\newenvironment{SmallExample}%
+{\begin{quote}\ttfamily}%
+{\end{quote}}% end SmallExample
+%

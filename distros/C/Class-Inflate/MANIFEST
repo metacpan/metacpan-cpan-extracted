@@ -1,0 +1,8 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+t/one_to_one.t
+t/one_to_many.t
+lib/Class/Inflate.pm
+META.yml                                 Module meta-data (added by MakeMaker)

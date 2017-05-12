@@ -1,0 +1,91 @@
+Revision history for Perl extension Class::Factory.
+
+1.06  Tue Nov   6 21:16:07 CET 2007
+      - Added remove_factory_type(), unregister_factory_type() and
+        get_factory_type_for(). Marcel Gruenauer <marcel@cpan.org>
+
+1.05  Thu Feb   1 22:57:21 PST 2007
+      - Added method get_registered_class(), suggested by 
+        Sebastian Knapp <giftnuss@netscape.net>
+
+1.04  Mon Aug  20 22:26:15 PST 2006
+      
+      - New maintainer, Fred Moyer <fred@redhotpenguin.com>
+      - Add Devel::Cover support, current coverage is 71%
+      - Moved check for Test::More to MY::test
+
+1.03  Thu Oct 14 10:08:08 EDT 2004
+
+      - Added 'get_my_factory()' and 'get_my_factory_type()' at
+      suggestion from Srdjan Jankovic.
+
+
+1.02  Tue Oct 12 21:02:04 EDT 2004
+
+      - Ensure that new() returns undef if get_factory_class() doesn't
+      work properly and factory_error() is overridden (and the
+      overridden method doesn't die)
+
+      - Relatively minor documentation clarifications and additions
+      spurred by a Perlmonks post:
+
+         http://www.perlmonks.org/index.pl?node_id=398257
+
+      - Added a few more tests to ensure factory_log() and
+      factory_error() working properly
+
+
+1.01  (never released for some reason)
+
+      - add_factory_type() checks %INC to see if a class is already
+      loaded. This gets rid of any 'Subroutine foo redefined' messages
+      you might see if warnings are turned on.
+
+      - All log/error messages now have variables in apostrophes
+      rather than brackes. So:
+
+        "Class [$class] not found"
+
+      becomes:
+
+        "Class '$class' not found"
+
+      It's just cleaner that way.
+
+
+1.00  Mon Oct  7 11:15:50 EDT 2002
+
+      - Add overridable logging/errors (Thanks to Eric Andreychek
+      <eric@openthought.net>)
+
+      - Subclasses do not need to implement any methods any longer --
+      using the module is a simple 'use base qw( Class::Factory )'
+      away. (Thanks to Eric for the suggestion.)
+
+      - Add get_loaded_types(), get_loaded_classes(),
+      get_registered_types() and get_registered_classes() so you can
+      keep track of the factory state.
+
+
+0.03  Sun Feb 10 13:00:20 EST 2002
+
+      Added the ability to register a type/class without having
+      Class::Factory include it. This is useful for modules that want
+      to know all of their types at startup time but don't want to
+      bring in a particular class until that type is requested. (See
+      POD for details.)
+
+
+0.02  Wed Jan 30 00:22:58 EST 2002
+
+      Added simple constructor to be inherited as needed. This
+      constructor automatically calls 'init()', not coincidentally the
+      name that Class::Base uses. Small variable name changes.
+
+
+0.01  Mon Jan 28 08:35:09 EST 2002
+    
+      Original version with tests, documentation and everything,
+      written after the third or fourth time I cut-and-pasted a
+      'add_type()' method to implement a dynamic factory class :-)
+

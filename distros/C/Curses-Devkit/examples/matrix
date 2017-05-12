@@ -1,0 +1,71 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Matrix Widget
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the matrix field attibutes.
+my @rowtitles = ("Course 1", "Course 2", "Course 3", "Course 4", "Course 5");
+my @coltitles = ("Course", "Lec 1", "Lec 2", "Lec 3", "Flag");
+my @colwidths = (7,5,5,5,1);
+my @coltypes  = ("UMIXED", "UMIXED", "UMIXED", "UMIXED", "UMIXED");
+my $title = ["<C>Course Selection Matrix", "", "<C><#HL(30)>"];
+my $x;
+
+# Create the matrix object.
+my $matrix = new Cdk::Matrix ('Title' => $title,
+				'RowTitles' => \@rowtitles,
+				'ColTitles' => \@coltitles,
+				'ColWidths' => \@colwidths,
+				'ColTypes' =>  \@coltypes,
+				'Vrows' => 3, 
+				'Vcols' => $#coltitles+1,
+				'BoxCell' => "TRUE",
+				'BoxMatrix' => "TRUE");
+
+# Using this array, we will load up the matrix.
+my @matrixValues = (["PSY340Y", "L0101", "L0201", "", ""],
+			["PSY340H", "L0101", "L0201", "", ""],
+			["PSY440Y", "L0101", "L0201", "", ""],
+			["PSY201Y", "L0101", "L0201", "", ""]);
+
+# Load up the matrix.
+$matrix->set ('Values' => \@matrixValues);
+
+# Draw the matrix.
+$matrix->draw();
+
+# Activate the matrix.
+my ($rows, $cols, $info) = $matrix->activate();
+
+# Check the results.
+if (!defined $rows)
+{
+   popupLabel (["<C>Escape hit. No information in the matrix."]);
+}
+else
+{
+   my @info = ("<C>Rows: $rows Cols: $cols");
+
+   for ($x=0; $x < $rows; $x++)
+   {
+      my $row = "";
+      for ($y=0; $y < $cols; $y++)
+      {
+          $row .= "($x,$y) = $info->[$x][$y], ";
+      }
+      chomp $row; chomp $row;
+      push (@info, $row);
+   }
+   popupLabel (\@info);
+}
+
+# Exit Cdk.
+Cdk::end();
+

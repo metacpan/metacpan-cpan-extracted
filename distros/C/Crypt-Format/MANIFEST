@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Crypt/Format.pm
+t/001_load.t
+t/002_convert.t
+t/003_normalize.t
+t/004_custom_base64.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

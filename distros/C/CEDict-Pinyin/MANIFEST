@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/CEDict/Pinyin.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01test.t

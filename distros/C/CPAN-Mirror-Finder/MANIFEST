@@ -1,0 +1,9 @@
+Build.PL
+CHANGES
+lib/CPAN/Mirror/Finder.pm
+MANIFEST			This list of files
+README
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

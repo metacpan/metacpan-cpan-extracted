@@ -1,0 +1,9 @@
+Revision history for Perl extension CGI::Application::Plugin::Mason.
+
+1.01  Sat Sep 29 02:13:33 2007
+        - add escape method h
+
+1.00  Sat Aug 25 19:06:57 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n CGI::Application::Plugin::Mason
+

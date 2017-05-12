@@ -1,0 +1,20 @@
+---
+abstract: 'Add HTML::Tidy support to CGI::Application'
+author:
+  - 'Rhesa Rozendaal <rhesa@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-HtmlTidy
+requires:
+  CGI::Application: 4.01
+  HTML::Tidy: 1.08
+resources:
+  repository: http://github.com/rhesa/cgi-application-plugin-htmltidy
+version: 1.05

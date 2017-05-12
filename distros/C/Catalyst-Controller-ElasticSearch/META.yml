@@ -1,0 +1,217 @@
+---
+abstract: 'Thin proxy for ElasticSearch with some protection'
+author:
+  - 'Moritz Onken <onken@netcubed.de>'
+build_requires:
+  Catalyst::View::JSON: 0
+  HTTP::Request::Common: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-ElasticSearch
+provides:
+  Catalyst::Controller::ElasticSearch:
+    file: lib/Catalyst/Controller/ElasticSearch.pm
+    version: v0.1.0
+requires:
+  Catalyst: 5.9
+  ElasticSearch: 0.64
+  List::MoreUtils: 0.33
+  MooseX::Attribute::Chained: v1.0.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Controller-ElasticSearch
+  homepage: http://search.cpan.org/dist/Catalyst-Controller-ElasticSearch/
+  repository: https://github.com/monken/p5-catalyst-controller-elasticsearch.git
+version: 0.1.0
+x_Dist_Zilla:
+  perl:
+    version: 5.016002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@Filter/CompileTests'
+      version: 2.001
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@Filter/HasVersionTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@Filter/KwaliteeTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::MinimumVersionTests
+      name: '@Filter/MinimumVersionTests'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Filter/PodCoverageTests'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/PodSyntaxTests'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@Filter/ReportVersions::Tiny'
+      version: 1.08
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Filter/PruneFiles'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/ExtraTests'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Filter/NextRelease'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Filter/PkgVersion'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Filter/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@Filter/Prepender'
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@Filter/Bugtracker'
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Homepage
+      name: '@Filter/Homepage'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@Filter/Repository'
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@Filter/MetaProvides::Package'
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@Filter/ModuleBuild'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@Filter/CheckChangeLog'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Filter/Git::Check'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Filter/Git::Commit'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: '@Filter/Git::CommitBuild'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Filter/TagMaster'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Filter/TagRelease'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Filter/Git::Push'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      name: Prereqs::FromCPANfile
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300032
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300032
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300032

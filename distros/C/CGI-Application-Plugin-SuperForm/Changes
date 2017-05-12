@@ -1,0 +1,27 @@
+Revision history for Perl extension CGI::Application::Plugin::SuperForm.
+
+0.5 Mon Dec 28 13:30:08 EST 2009
+
+    - removed non-existing file from manifest.
+    - no code changes
+
+0.4 Sat Oct 17 22:40:27 EDT 2009
+
+    - added license => perl to makefile
+    - added LICENSE file
+    
+0.3  Tue Sep  1 20:23:16 EDT 2009
+	- minor tweaks as perl CPANTS:
+	  * add use warnings to module.
+	  * provide examples file.
+	  * provide full pod coverage in test suite.
+	  * update META.yml to 1.4 version
+	  * add license to META.yml.
+	  * remove executable bit on Makefile.PL
+	  
+0.2  Sat Aug 29 10:46:31 2009
+	- removed irrelevant test. no changes to code.
+
+0.1  Wed Aug 26 07:46:31 2009
+	- original version; Based on Mark Stosbergs ValidateRM plugin
+

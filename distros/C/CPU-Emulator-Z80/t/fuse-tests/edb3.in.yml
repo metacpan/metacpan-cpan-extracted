@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 179
+  7548:
+    - 157
+    - 36
+    - 170
+name: edb3
+registers:
+  AF: 13483
+  AF_: 0
+  BC: 992
+  BC_: 0
+  DE: 16825
+  DE_: 0
+  HL: 7548
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

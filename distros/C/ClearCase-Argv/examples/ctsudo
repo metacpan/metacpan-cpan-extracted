@@ -1,0 +1,14 @@
+##########################################################################
+# This file shows a way to run a cleartool command under sudo
+# (or really with any prefixed command).
+# Note that you should *always* provide an absolute path to
+# cleartool when running it in privileged mode.
+##########################################################################
+
+use ClearCase::Argv;
+
+my $ct = ClearCase::Argv->new;
+ClearCase::Argv->cleartool_path(qw(sudo /opt/rational/clearcase/bin/cleartool));
+$ct->prog('shell');
+$ct->args('id');
+$ct->dbglevel(1)->exec;

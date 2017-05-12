@@ -1,0 +1,69 @@
+2008-03-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 0.5201
+
+	* add a License
+
+	* address RT#4926: followed a suggestion by DJBURKE to use
+	UNIVERSAL::isa instead of ref() to check for IO::Handle
+
+2003-02-08  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* lib/Convert/UU.pm: Integrated a patch sent by Silvester Erdeg to
+	accept filenames with spaces in them. Apologies to him and all the
+	others who sent in patch suggestions that it took so long to mak a
+	new release.
+
+	* Pierre Vanhove sent me an example file that was decoded by
+	uudecode with error message "Short file" which then resulted in
+	garbage bytes at the end of the decoded file. Appending the
+	unneeded line C< ` > before the C< end > tag seems to fix this
+	problem.
+
+1999-05-10  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Harald Joerg C<E<lt>Harald.Joerg@mch.sni.de$<gt>> sent me a
+	patch to add binmode to the filehandles that are used, so the
+	whole thing works on Windows.
+
+	* Modernized the Makefile.PL to use fixin() instead of writing the
+	EXE_FILES "by hand".
+
+1997-02-07  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Further investigation of the warning I "fixed" yesterday. Added
+	tests for a trailing empty string in the last line of the
+	uuencoded string and for a zero in the last line of the uudecoded
+	string. Found the bug in the code that skipped lines starting with
+	a "#". Allowing such lines fixed a long standing bug.
+
+1997-02-06  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Thanks to Kurtis D. Rader <krader@sequent.com> who describes
+	that a uuencoded chunk that consists of nothing but backtick
+	triggers a "Use of uninitialized variable" warning. Although I'd
+	like to see it as a bug in perl this version takes precautions to
+	avoid the warning.
+
+1997-11-25  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Updated to perl5.004 using m//gc instead of s///.
+
+	* Using binmode() for filehandles to (hopefully) make it work on
+	Non-UNIX systems (Thanks to Bill Baxter <bill@visix.com> for the
+	report)
+
+1997-02-10  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Integrated a patch by leachcj@bp.com that allows array
+	references being passed to uudecode.
+
+
+1996-02-19  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* original version; created by h2xs 1.16
+
+
+	Local Variables:
+	coding:utf-8
+	End:

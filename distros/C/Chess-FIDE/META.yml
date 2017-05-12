@@ -1,0 +1,34 @@
+---
+abstract: 'Perl extension for FIDE Rating List'
+author:
+  - 'Roman M. Parparov <romm@cpan.org>'
+build_requires:
+  Module::Build: '0.401'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.401'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chess-FIDE
+provides:
+  Chess::FIDE:
+    file: lib/Chess/FIDE.pm
+    version: '1.22'
+  Chess::FIDE::Player:
+    file: lib/Chess/FIDE/Player.pm
+    version: '1.22'
+requires:
+  Archive::Zip: '1.32'
+  Archive::Zip::MemberRead: '1.32'
+  IO::File: '1.14'
+  IO::String: '1.08'
+  LWP::UserAgent: '6.05'
+  Net::Ping: '2.39'
+  Sys::MemInfo: '0.91'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.22'

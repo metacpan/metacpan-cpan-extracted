@@ -1,0 +1,49 @@
+<script type="text/javascript">
+
+Ext.onReady(function(){
+
+    // Init the state manager singleton
+    // Components will save their state to a Cookie
+    Ext.state.Manager.setProvider(
+        new Ext.state.CookieProvider({
+            path: "[% c.req.uri.path %]" // cookie per table
+        })
+    );
+
+    // Init the tooltip singleton
+    // Any tag-based quick tips will start working.
+    Ext.QuickTips.init();
+
+    // Apply a set of config properties to the singleton
+    Ext.apply(Ext.QuickTips.getQuickTip(), {
+        showDelay: 0
+        ,trackMouse: true
+        ,mouseOffset: [-60,20] // otherwise Delete tt overruns browser win
+        ,autoWidth: true
+        ,dismissDelay: 0
+    });
+
+    // utility functions
+    [% PROCESS extjs2/javascript/util.tt %]
+
+    // create the Data Store
+    [% PROCESS extjs2/javascript/store.tt %]
+
+    // bring in the form for add/edit
+    [% PROCESS extjs2/javascript/update.tt %]
+
+    // set up the list grid
+    [% PROCESS extjs2/javascript/grid.tt %]
+
+    grid.render();
+
+    // trigger the data store load
+    // NB start is needed by store, but not by backend
+    store.load({params:{start:0, limit:10, page:1}});
+
+    if (Ext.isIE) {
+        document.body.onresize = function(){return true};
+    }
+});
+
+</script>

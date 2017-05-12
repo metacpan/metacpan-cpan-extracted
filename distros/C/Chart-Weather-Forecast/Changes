@@ -1,0 +1,16 @@
+0.04      2011-01-06 08:40:14 America/Denver
+          Fixes:
+          - Properly coerce file paths into a Path::Class::File object
+            by using MooseX::Types::Path::Class
+
+0.03      2011-01-03 12:06:37 America/Denver
+          Fixes:
+          - Make Imlib2 based tests optional
+          - Correct documentation on the chart_temperature_file attribute.
+            It is a Path::Class:File object so one must pass an object of that type.
+          
+0.02      2010-12-26 21:19:28 America/Denver
+          - Correct Changes, remove some cruft
+
+0.01      2010-dec-26
+          - Initial Release

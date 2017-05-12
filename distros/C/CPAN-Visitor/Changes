@@ -1,0 +1,40 @@
+Revision history for CPAN-Visitor
+
+0.005     2015-04-21 15:51:18-04:00 America/New_York
+
+  [Changed]
+
+  - The 'quiet' option now defaults to false.  This is less surprising
+    to people, as any errors will be visible by default.
+
+  [Fixed]
+
+  - If an exception is caught, the module now changes to the original
+    directory before any tempfiles are cleaned up.
+
+0.004     2015-04-21 12:33:33-04:00 America/New_York
+
+  [Changed]
+
+  - If iterating a distribution throws an exception, it will be caught
+    and a warning issued instead.  This prevents an error from interrupting
+    an entire run.
+
+  - If the extracted directory lacks an executable permission, try
+    chmod +x before chdir into it.
+
+0.003     2012-04-04 16:34:47 America/New_York
+
+  - Fix bug in 'match' validation for select()
+
+0.002     2010-09-03 11:10:47 EST5EDT
+
+  - Synopsis typo fixes
+
+  - Converted to Dist::Zilla for distribution management
+
+0.001 Wed Feb 17 22:36:37 EST 2010
+
+  - First release to CPAN
+
+# vim: ts=2 sts=2 sw=2 et tw=75:

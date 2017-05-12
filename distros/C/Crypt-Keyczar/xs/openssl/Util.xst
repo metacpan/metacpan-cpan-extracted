@@ -1,0 +1,57 @@
+#include "xs/openssl.h"
+
+MODULE = Crypt::Keyczar		PACKAGE = Crypt::Keyczar::Util
+
+SV *
+random(int size)
+	CODE:
+	{
+	    unsigned char *buff;
+	    if (size < 1) {
+	        croak("random size is short");
+	    }
+
+	    Newz(0, buff, size, unsigned char);
+	    if (RAND_bytes(buff, size) != 1) {
+	        Safefree(buff);
+                crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    RETVAL = newSVpv((char *)buff, size);
+	    Safefree(buff);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+SV *
+hash(...)
+	CODE:
+	{
+	    int i;
+	    SV *data;
+	    EVP_MD_CTX *ctx;
+	    unsigned char md[EVP_MAX_MD_SIZE];
+	    unsigned int l;
+	    STRLEN in_l;
+	    unsigned char *in;
+
+	    ctx = EVP_MD_CTX_new();
+	    if (EVP_DigestInit_ex(ctx, EVP_sha1(), NULL) == 0) {
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    for (i = 0; i < items; i++) {
+	        data = ST(i);
+	        in = (unsigned char *)SvPV(data, in_l);
+	        EVP_DigestUpdate(ctx, (const void *)in, in_l);
+	    }
+	    if (EVP_DigestFinal_ex(ctx, md, &l) == 0) {
+	        crypt__keyczar__util__croak_openssl();
+	        /* NOTREACHED */
+	    }
+	    RETVAL = newSVpv((char *)md, l);
+	    EVP_MD_CTX_free(ctx);
+	}
+	OUTPUT:
+	    RETVAL

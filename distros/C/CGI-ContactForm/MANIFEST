@@ -1,0 +1,13 @@
+examples/contact.pl
+examples/ContactForm.css
+examples/ContactForm_form.tmpl
+examples/ContactForm_result.tmpl
+examples/Sender.config
+lib/CGI/ContactForm.pm
+lib/CGI/ContactForm/MHonArc.pm
+Changes
+Makefile.PL
+MANIFEST
+readme.html
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

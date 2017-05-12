@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+README
+
+Makefile.PL
+
+Hash.pm
+
+t/encrypt.t
+t/decrypt.t

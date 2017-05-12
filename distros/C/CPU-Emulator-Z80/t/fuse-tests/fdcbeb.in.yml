@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 208
+    - 235
+  9185:
+    - 71
+name: fdcbeb
+registers:
+  AF: 31119
+  AF_: 0
+  BC: 24219
+  BC_: 0
+  DE: 37902
+  DE_: 0
+  HL: 11858
+  HL_: 0
+  I: 0
+  IX: 54957
+  IY: 9233
+  PC: 0
+  R: 0
+  SP: 0

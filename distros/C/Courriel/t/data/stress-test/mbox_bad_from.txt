@@ -1,0 +1,61 @@
+From nobody@gs1.ubuntuforums.org Mon Oct 25 22:43:42 2004
+Received: from volcano.xlogicgroup.com ([66.98.138.34]
+        helo=gs1.ubuntuforums.org)
+        by rince.africaninspace.com with esmtp (Exim 4.34)
+        id 1CMIFK-0005py-Bt
+        for ubuntu-users@lists.ubuntu.com; Mon, 25 Oct 2004 22:43:42 -0500
+Received: from nobody by gs1.ubuntuforums.org with local (Exim 4.43)
+        id 1CMIFI-0005cL-LS
+        for ubuntu-users@lists.ubuntu.com; Mon, 25 Oct 2004 22:43:18 -0500
+To: ubuntu-users@lists.ubuntu.com
+From: ubuntu-geek <@gs1.ubuntuforums.org>
+Date: Mon, 25 Oct 2004 22:43:19 -0500
+Message-ID: <ubuntu-geek.1epsqq@gs1.ubuntuforums.org>
+Organization: My Forums
+User-Agent: vBulletin USENET gateway
+X-Originating-IP: 24.247.184.104
+References: <57159d7b04102520123e45610d@mail.gmail.com>
+X-AntiAbuse: This header was added to track abuse,
+        please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gs1.ubuntuforums.org
+X-AntiAbuse: Original Domain - lists.ubuntu.com
+X-AntiAbuse: Originator/Caller UID/GID - [99 99] / [47 12]
+X-AntiAbuse: Sender Address Domain - gs1.ubuntuforums.org
+X-Source:
+X-Source-Args:
+X-Source-Dir:
+X-Mailman-Approved-At: Tue, 26 Oct 2004 00:24:24 -0500
+Subject: Re: dyndns.org, etc. client
+X-BeenThere: ubuntu-users@lists.ubuntu.com
+X-Mailman-Version: 2.1.5
+Precedence: list
+List-Id: Ubuntu Help and User Discussions <ubuntu-users.lists.ubuntu.com>
+List-Unsubscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=unsubscribe>
+List-Archive: <http://lists.ubuntu.com/archives/ubuntu-users>
+List-Post: <mailto:ubuntu-users@lists.ubuntu.com>
+List-Help: <mailto:ubuntu-users-request@lists.ubuntu.com?subject=help>
+List-Subscribe: <http://lists.ubuntu.com/mailman/listinfo/ubuntu-users>,
+        <mailto:ubuntu-users-request@lists.ubuntu.com?subject=subscribe>
+X-List-Received-Date: Tue, 26 Oct 2004 03:43:42 -0000
+
+
+Ethan King Wrote:
+> The ability to do remote access built in to gnome 2.8 is really nice
+> but it seems that it is really missing is a client for dyndns.org.
+> For many of us at home on a DSL or Calble line this would really make
+> the VNC feature usuable.
+>
+> So if anyone knows of a nice Gnome client please let us know.
+> Otherwise it would be nice to include in Hoary.
+>
+> --
+> ubuntu-users mailing list
+> ubuntu-users@lists.ubuntu.com
+> http://lists.ubuntu.com/mailman/listinfo/ubuntu-users
+You might check gnomefiles.org they got lots of gnome applications..
+
+
+--
+ubuntu-geek
+

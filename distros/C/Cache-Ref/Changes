@@ -1,0 +1,14 @@
+0.04
+	- Replace deprecated use of 'for qw(...)' with 'for (qw(...))'
+
+0.03
+	- Make sure that Cache::Ref::Random::expire removes the desired number
+	  of items
+
+0.02
+	- Added LIFO, Null and Random implementations
+	- Added 'expire' method
+	- Documentation improvements
+
+0.01
+	- Initial version

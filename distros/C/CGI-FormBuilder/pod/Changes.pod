@@ -1,0 +1,507 @@
+
+=head1 NAME
+
+Changes - Changes in FormBuilder 3.0, please also see the README
+
+=head1 COMPATIBILITY
+
+FormBuilder 3.x should be completely compatible with FormBuilder 2.x,
+with the singular exception that you can no longer use the shortcut
+autoload style of getting to fields:
+
+    $form->field(name => 'category', options => \@opt);
+    $form->category(options => \@opt);      # WRONG
+
+In order to allow the second form, you must specify the C<fieldsubs>
+option to C<new()>.
+
+=head1 VERSION 3.06
+
+Maintenance release with a couple new features: support for "charset: utf8"
+in C<Source::File>, add_before_option/add_after_option c/o Victor Porton,
+and support for HTML5 type names c/o Wolfgang Radke.
+
+=head1 VERSION 3.0501
+
+Bugfix release to repair a memory leak and a few "other" field edge cases.
+
+=head1 VERSION 3.05
+
+Just a short time after 3.04, several new features evolved very quickly:
+
+=head2 Fieldset support
+
+A new C<fieldsets> option to C<new()> and a C<fieldset> option to
+the C<field()> method can be used to organize your form into sections.
+Currently works with the built-in C<< <table> >> and new C<< <div> >>
+renderer only, but template support is in the works.
+
+=head2 Div rendering
+
+In addition to the builtin C<< <table> >> rendering module, a new
+C<Div> rendering template has been included as well. If you select
+this, you get a table-free form which you can manipulate using
+stylesheets:
+
+    $form->new(template => {type => 'div'});
+
+This provides a couple additional benefits, like separate divs
+for every submit button.
+
+=head2 Additional classes
+
+A couple additional CSS classes were added, wrapping around the
+fields as a unit for better styling. The C<< <form> >> tag now
+gets a C<.fb_form> style as well.
+
+=head2 Fixed HTML::Template support
+
+A couple bugs were introduced in 3.04 that have been fixed, and 
+more tests added.
+
+=head1 VERSION 3.04
+
+In addition to the below features, a new Catalyst FormBuilder plugin
+is available on CPAN, C<< Catalyst::Plugin::FormBuilder >>.
+
+=head2 New $form->prepare() method
+
+You can now use C<< $form->prepare() >> to get back an expanded
+hashref just before C<< $form->render() >> is called. This allows
+you to use FormBuilder with Catalyst or other frameworks more
+easily, where the rendering is done elsewhere:
+
+    my %expansion = $form->prepare;
+
+This could be passed directly to, say, Template Toolkit without
+having to use FormBuilder's Template Toolkit support.
+
+=head2 New "inflate" option to field()
+
+This is used the convert fields on the fly into objects or other
+values. For example, you could convert a "date" field into a 
+DateTime object. Nice patch from Mark Hedges, check it out.
+
+=head2 Turkish messages
+
+Thanks to Recai Oktas.
+
+=head2 Added "missing" property for fields
+
+This can be queried in templates. To see if a field is missing altogether,
+you can check "field.missing" or "missing-field" depending on your
+template engine of choice.
+
+=head2 Removal of custom C<puke> and C<belch>
+
+FormBuilder now uses C<Carp> and C<@CARP_NOT> to handle its errors.
+As such, you will probably notice some differences in error output.
+The benefit is that setting C<debug> will give you a stack trace
+on fatal errors.
+
+=head2 CGI::FormBuilder::Template::Builtin
+
+Moved the C<render_builtin()> method to the above module, to
+unify the rendering schemes.
+
+=head2 New FORMBUILDER_DEBUG environment variable
+
+Setting this has the same effect as using the C<debug> option.
+
+=head2 Removal of excess documentation
+
+Removed all the stub docs from C<Field::*> and C<Messages::*>
+to make CPAN happy.
+
+=head1 VERSION 3.0302
+
+This is a bugfix release to repair these main items:
+
+    - optgroups bugfix for complex arrays
+    - removal of HTML::Entities support due to utf8 issues
+    - new es_ES Messages module with better translations
+    - a patch from Mark Hedges to enable plugin modules for mailresults()
+
+The rest of the features remain the same as below.
+
+=head1 VERSION 3.03
+
+=head2 Subclassable Fields
+
+Each field is now rendered by its own class, named for the field type.
+For example, text fields are rendered by C<CGI::FormBuilder::Field::text>.
+This allows you to create custom field types and plugging them in by 
+creating your own C<CGI::FormBuilder::Field::whatever_you_want> module.
+Thanks to Peter Eichman for his contributions to this scheme.
+
+=head2 Messages Localization
+
+All messages are now handled in a similar way to field types: They are
+delegated to C<CGI::FormBuilder::Messages::locale> where "locale" is
+the appropriate string such as "en_US" or "da_DK". A number of localizations
+are included as part of the standard distribution.
+
+There are two ways to use these messages: Either the 'auto' messages
+mode or by specifying a specific locale:
+
+    my $form = CGI::FormBuilder->new(messages => 'auto');   # check client
+    my $form = CGI::FormBuilder->new(messages => ':da_DK'); # specified
+
+You can create your own messages by copying C<_example.pm> and modifying
+it for your language. When using messages in this way, the HTTP Charset
+is changed to C<utf-8>.
+
+=head2 Select optgroup support
+
+By using the C<field()> option C<optgroups>, you can now cause select
+fields to automatically generate optgroup tags:
+
+    $form->field(name => 'browser', options => \@opt, optgroups => 1);
+
+See the documentation on C<optgroups> for more details.
+
+=head2 Data::FormValidator Support
+
+Thanks to another great patch from Peter Eichman, C<Data::FormValidator>
+is supported as a validation option to C<new()>, just by passing it in
+as an object. See the documentation on C<validate> for more information.
+
+=head2 Option sorting by LABELNAME or LABELNUM
+
+You can now sort options by C<LABELNAME> or C<LABELNUM>, similar to
+the value-based sorting of C<NAME> and C<NUM>. See the documentation
+for more details.
+
+=head2 XHTML Compliance
+
+Generated code now validates against L<http://validator.w3.org>.
+This includes stuff like lowercase C<get> and C<post> methods, 
+lowercase C<onchange> and C<onsubmit> actions, and so on.
+
+=head1 VERSION 3.02
+
+=head2 Multi-Page Form Support
+
+A new module, C<CGI::FormBuilder::Multi>, has been added to handle the
+navigation and state of multi-page forms. A multi-page form is actually
+composed of several individual forms, tied together with the special
+CGI param C<_page>:
+
+    my $multi = CGI::FormBuilder::Multi->new(
+                     # first args are hashrefs per-form
+                     \%form1_opts,
+                     \%form2_opts,
+                     \%form3_opts,
+
+                     # remaining options apply to all forms
+                     header => 1,
+                     method => 'POST',
+                );
+
+    my $form = $multi->form;    # current form
+
+    if ($form->submitted && $form->validate) {
+
+        # you write this
+        do_data_update($form->fields);
+
+        # last page?
+        if ($multi->page == $multi->pages) {
+            print $form->confirm;
+            exit;
+        }
+
+        $multi->page++;          # next page counter
+        $form = $multi->form;    # fetch next page's form
+    }
+    print $form->render;
+
+For more details, see L<CGI::FormBuilder::Multi>.
+
+=head2 External Source File
+
+Inspired by Peter Eichman's C<Text::FormBuilder>, the new C<source>
+option has been added to C<new()> which enables the use of an external
+config file to initialize B<FormBuilder>. This file takes the format:
+
+    # sample config file
+    method: POST
+    header: 1
+    submit: Update, Delete
+
+    fields:
+        fname:
+            label: First Name
+            size:  50
+            validate: NAME
+        lname:
+            label: Last Name
+            size:  40
+            validate: NAME
+        sex:
+            label:    Gender
+            options:  M=Male, F=Female
+            jsclick:  javascript:alert("Change your mind??");
+            validate: M,F
+
+    required: ALL
+
+    messages:
+        form_invalid_text:  Please correct the following fields:
+        form_required_text: Please fill in all <b>bold</b> fields.
+
+You can even pre-parse this file, and generate a module from it
+which you can then reuse in multiple scripts using the C<write_module()>
+function. For more details, see L<CGI::FormBuilder::Source::File>.
+
+=head2 "Other" Fields
+
+The new C<other> option has been added to C<field()>. If specified,
+a text box will be added to the right of the field, and its value
+will be used if the main field is not filled in. It will be subject
+to the same required and validation checks as the main field:
+
+    $form->field(name     => 'favorite_color',
+                 options  => [qw(Red Green Blue)],
+                 validate => 'NAME',
+                 other    => 1);     # allow "other"
+
+This would create HTML something like this:
+
+    Favorite Color: []Red []Green []Blue []Other: [____________]
+
+The text "Other:" is controlled by the message C<form_other_default>.
+
+=head2 Growable Fields
+
+Thanks to a patch from Peter Eichman, C<field()> now also accepts
+a C<growable> option. This option enables some JavaScript hooks
+that add an "Additional [label]" button on text and file fields:
+
+    Data File: [______________] [Additional Data File]
+
+When you click on the "Additional Data File" button, another box will be
+appended, allowing you to add more files. The values are then retrieved
+in the usual fashion:
+
+    my @files = $form->field('data_file');
+
+Like "other" fields, all elements are subject to validation checks. The
+text "Additional %s" is controlled by the message C<form_grow_default>.
+
+=head2 Support for C<CGI::FastTemplate>
+
+Thanks once again to Peter Eichman (busy guy), the module C<CGI::FormBuilder::Template::Fast>
+has been included. This adds the template type C<Fast> as an interface
+to C<CGI::FastTemplate>:
+
+    my $form = CGI::FormBuilder->new(
+                    template => {
+                        type => 'Fast',
+                        define => {
+                            form  => 'form.tmpl',
+                            field => 'field.tmpl',
+                        }
+                    }
+
+See L<CGI::FormBuilder::Template::Fast> for more details. Thanks again
+Peter!
+
+=head2 Subclassable Templates and tmpl_param()
+
+The 2.x C<tmpl_param()> method has been reimplemented finally. In
+addition, the included template modules are now completely subclassable,
+meaning that you can create an entire template engine with something
+like this:
+
+    package My::HTML::Template;
+
+    use CGI::FormBuilder::Template::HTML;
+    use base 'CGI::FormBuilder::Template::HTML';
+
+    # new() is inherited
+
+    sub render {
+        my $self = shift;
+        my $form = shift;   # complete form object
+
+        # do any special actions here
+
+        $self->SUPER::render;
+    }
+
+For more details, see L<CGI::FormBuilder::Template>.
+
+=head2 Message Changes
+
+All messages were reworded to make them shorter and easier to read.
+The phrase "You must" was removed from all of them. To see the
+new messages, cut-and-paste this code:
+
+    perl -MCGI::FormBuilder::Messages \
+         -e 'CGI::FormBuilder::Messages->messages'
+
+In addition, the C<form_submit_default> and C<form_reset_default>
+messages were not even being used, and field labels were not being
+properly highlighted on error. These problems have been fixed.
+
+=head2 Autoloaded Fields
+
+The 2.x feature of C<< $form->$fieldname() >> has been reimplemented,
+but using it requires the C<fieldsubs> option:
+
+    my $form = CGI::FormBuilder->new(fields => \@f, fieldsubs => 1);
+
+Read the docs for some caveats.
+
+=head2 Disabled Form
+
+Similar to a static form, you can set C<< disabled => 1 >> in C<new()>
+or C<render()> to display a form with grayed-out input boxes. You can
+also set this on a per-field basis using C<field()>.
+
+=head2 Verbatim HTML Options
+
+If you want to include HTML in your field options, set C<cleanopts>
+to 0 in C<field()> (for one field) or C<new()> (for all fields).
+
+=head2 Compatibility Methods
+
+For compatibility with other modules, B<FormBuilder> now includes
+C<param()>, C<query_string()>, C<self_url()>, and C<script_name()>.
+
+=head1 VERSION 3.01
+
+This was a bugfix release, including the following changes:
+
+    - fixed major problems with keepextras, including a reversed ismember test
+    - added debug messages to keepextras and changed a few other debugs
+    - added patch from Peter Eichman to fix scalar $field->tag and $field->tag_value
+    - converted most all XHTML generation methods to only returning scalars
+    - fixed the columns option which was totally broken for radio buttons
+    - added a feature to plop in {border => 0} in columns as well
+    - added the 2.x 'override' alias for field() 'force' which was missing
+    - also added a 'defaults' alias for field() 'value' for CGI.pm happiness
+    - more tests since there were way too many bugs
+
+In addition there were many documentation updates and changes.
+
+=head1 VERSION 3.00
+
+=head2 Internals
+
+The internals have been completely rewritten, nearly from the ground up.
+All of the major functions have been split into methods, and objects have
+been created for the form, fields, messages, CGI params, and so on. Several
+new sub-modules have been created, including:
+
+    CGI::FormBuilder::Field
+    CGI::FormBuilder::Messages
+    CGI::FormBuilder::Template
+    CGI::FormBuilder::Template::HTML
+    CGI::FormBuilder::Template::Text
+    CGI::FormBuilder::Template::TT2
+
+Many of these modules can be subclassed and overridden if desired. In 
+addition, the template engine has been rewritten to allow "plugging in"
+of additional template modules, simply by specifying the name of the
+module to the 'template' option in new().
+
+For more details, see the man pages for the individual modules above.
+
+=head2 Style Sheets
+
+Stylesheets are now generated if the C<stylesheet> option is specified
+to B<FormBuilder>. This can either be C<1> to turn it on, or a full
+path to a style sheet to include. When used, all tags are then output
+with a C<class> attribute, named C<styleclass> plus the name of
+the tag:
+
+    my $form = CGI::FormBuilder->new(
+                    fields => [qw/name email/],
+                    styleclass => 'myFB',   # default is "fb_"
+                    stylesheet => 1,        # turn on style
+               );
+                
+    print $form->render;
+
+    # HTML will include
+    #   <input class="myFBname" id="name" name="name" type="text" />
+    #   <input class="myFBemail" id="email" name="email" type="text" />
+
+=head2 Compliant XHTML
+
+The output should be fully-compliant XHTML finally. Really. Maybe.
+
+=head2 Attributes and Field Objects
+
+Individual accessors have been added for every attribute that FormBuilder
+maintains. For example, here's a snippet of code to demonstrate:
+
+    if ($form->stylesheet) {
+        # loop thru fields, changing class
+        for ($form->fields) {
+            next if /_date$/;   # skip fields named "XXX_date"
+
+            # each field is a stringifiable object with accessors
+            if ($_->options) {
+                # has options
+                $_->class('my_opt_style');
+            } else {
+                # plain text box
+                $_->class('my_text_style');
+            }
+        }
+    }
+
+This code checks to see if the C<stylesheet> property has been set on
+the main C<$form>. If so, then it loops thru all the fields, skipping
+those named C<XXX_date>. Of the remaining fields, those that have options
+have their C<class> attribute changed to C<my_opt_style>, and those 
+without options have it set to C<my_text_style>.
+
+In addition, you can individually render every part of the form yourself.
+by calling the appropriate method. For example:
+
+    print $form->header;      # just the header
+    print $form->script;      # opening JavaScript
+    print $form->title;       # form title
+    print $form->start;       # opening <form> tag
+    for ($form->fields) {
+        print $_->label;      # each field's human label
+        print $_->tag;        # each field's <input> tag
+    }
+    print $form->end;         # closing </form> tag
+
+For a complete list of accessors, see the documentation for both
+L<CGI::FormBuilder> and L<CGI::FormBuilder::Field>.
+
+=head2 Messages
+
+Many messages have been reworded, and several new messages were added to
+make it easier to customize individual text. In addition, you can now
+specify messages to individual fields:
+
+    $form->field(name => 'email',
+                 message => 'Please enter a valid email address');
+
+For more details, see C<CGI::FormBuilder::Messages>.
+
+=head2 HTML::Entities encoding
+
+HTML character encoding is now dispatched to C<HTML::Entities>, if available.
+This can be downloaded as part of the C<HTML::Parser> module set on CPAN.
+
+=head2 Documentation
+
+Documentation has been updated and somewhat reorganized, which was long
+overdue.
+
+=head1 AUTHOR
+
+Copyright (c) L<Nate Wiger|http://nateware.com>. All Rights Reserved.
+
+This module is free software; you may copy this under the terms of
+the GNU General Public License, or the Artistic License, copies of
+which should have accompanied your Perl kit.
+

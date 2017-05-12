@@ -1,0 +1,20 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/CouchDB/Deploy.pm
+lib/CouchDB/Deploy/Process.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/05-pod.t
+t/10-pod-coverage.t
+t/15-deploy.t
+t/dahut.svg
+TODO

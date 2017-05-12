@@ -1,0 +1,25 @@
+NAME
+    CPAN::Test::Dummy::Perl5::NoBugTracker - CPAN Test Dummy that explicitly
+    says there is no bug tracker
+
+SYNOPSIS
+      use CPAN::Test::Dummy::Perl5::NoBugTracker;
+
+DESCRIPTION
+    This module tests the behaviour of the CPAN ecosystem in the case of a
+    author which does not make use of a bugtracker.
+
+    This module was created to assist Marc Lehmann and prove that parts of
+    the CPAN ecosystem correctly obey instructions to not have a bugtracker.
+
+    Contains no functionality, and will never do so.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,34 @@
+---
+abstract: 'A cache dependencies (principles of operation of make utility)'
+author:
+  - 'Perlover <perlover@perlover.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Storable: 0
+  Test::Base: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CHI-Cascade
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CHI: 0
+  Scalar::Util: 0
+  Time::Duration::Parse: 0
+  Time::HiRes: 0
+  parent: 0
+  perl: 5.01
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Perlover/CHI-Cascade.git
+version: 0.284

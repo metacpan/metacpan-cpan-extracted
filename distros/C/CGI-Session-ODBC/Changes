@@ -1,0 +1,14 @@
+Revision history for CGI::Session::ODBC:
+
+0.50 Tues Oct 26 2004
+    - Changed queries to parametrized versions (Rhesa Rozendaal).  Session
+      creation becomes slightly slower, but other session operations are
+      about 50% faster.
+    - Fixed bug where changes to session table name were being ignored
+      (rt.cpan.org bug #5318).
+    - Beefed up test suite.
+
+0.01  Sat Aug  9 14:01:34 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n CGI::Session::ODBC
+

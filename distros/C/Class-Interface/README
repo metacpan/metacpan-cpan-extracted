@@ -1,0 +1,97 @@
+INTRODUCTION
+
+  This is a bold attempt at getting a decent implementation for
+  interfaces in Perl.
+  Especially Perl 5.6.x.
+
+  I am aware of the presence of 'Class::Contract' and 'interface'. And
+  are particulary charmed by the ease-of-use of the latter. However it
+  lacks some insight. Thus I decided to write my own; largely based on
+  the principles of 'interfaces'
+
+
+INSTALL
+
+  The usual.
+
+  % perl Makefile.PL
+  % make && make test
+  # make install
+
+
+HOWTO
+
+  Read `perldoc lib/Interfaces.pm` first.
+
+  For a good example of how things work have a looksy through
+  test-lib/test.pl and test-lib/Car/*.pm
+
+
+
+DESIGN DECISISIONS
+
+  * I choose not to use an import method (as does 'interfaces'). Mainly
+  because I wanted to be able to distinctly show others what they are
+  dealing with (An interface or an implementation). Second to that I
+  wanted to be able to create abstract interfaces within the same
+  code. Abstracts are interfaces 2.
+
+  * I've tried to use Devel::Size and PPI to do inspection of the
+  interfaces (and make sure that they are clean and
+  unimplemented). Devel::Size gave me deviation headache. It turns out
+  that the size of each method grows as the amount of methods
+  grow. I am no good with algoritms so finding the greater deviations
+  was left as an excercise for a later day.
+
+  PPI was just 2 much for such a little project.
+
+  I have made an implementation where I just run through the file
+  looking for clues. With enough satisfaction it will just accept.
+
+  * I mangle the namespaces of interfaces and implementers because I
+  want strict enforcement of the interface paradigm. I recognize
+  that this may lead to problems, but I have been careful.
+
+
+HOW ITS DONE
+
+  interface() and abstract()
+
+    When calling the L<interface()> method the namespace of the caller
+    is checked against the syntax rules.
+
+    When all is well the namespace gets overwritten with an import
+    method. This will cause a die if anyone other then implementing
+    classes try to use it (actually proxied by the Interface class
+    itself). 'main' has been freed from this death - you might want to
+    print $VERSION and you should be able to.
+
+    Also it will publish a brand new method into the namespace of the
+    package it was called from, called '__get_interface_methods__'.
+    This returns all the available methods.
+
+    When the class is an abstract it will create a method with the
+    name '__get_abstract_methods__'. This will only give back the
+    abstractly defined methods.
+
+    The abstract method(s) of the abstract class will be overwritten
+    so that they die telling you that the method is abstract and
+    cannot be invoked here.
+
+  implements() and extends()
+
+    When calling either method each given interface is polled for
+    it's methods by calling '__get_xxx_methods__'. Then the caller is
+    checked for the methods using UNIVERSAL::can.
+
+    If all are present the @ISA of the caller is extended with the
+    name of the interface.
+
+    The methods that are missing are collected before confessing so
+    you can fix it all at once.
+
+
+TODO
+
+  - Figure out a way to make interface / abstract inspection even better
+  - Make Interfaces.pm adhere to Perl::Critic a bit more

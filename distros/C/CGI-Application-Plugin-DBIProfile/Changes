@@ -1,0 +1,35 @@
+Revision history for CGI-Application-Plugin-DBIProfile
+
+0.07    2009-11-09
+        Restructured module layout so that Build.PL stops failing.
+        No code changes made.
+
+0.06    2008-12-15
+        BUGFIX: Build.PL had a syntax error in add_to_cleanup.
+
+0.05    2007-09-27
+        Added Graph::HTML::Horizontal plugin.
+        BUGFIX: rt 29670 : Duplicate titles in reports.
+        BUGFIX: rt 29669 : Add summary to DevPopup report.
+        BUGFIX: rt 29668 : Unable to set ENV vars via PerlSetVar.
+        BUGFIX: rt 29667 : DBI profile environment var should be UPPER CASE.
+        BUGFIX: rt 29666 : Typo in callback for CAP::DevPopup report.
+
+0.04    2007-09-27
+        Added Graph::SVGTT plugin.
+        Added Graph::GDGraphInline plugin.
+        Added catch for non-html docs, so we don't run then.
+        BUGFIX: for devpopup support (typo in sub reference name).
+
+0.03    2007-09-26
+        Made graphing a plugin, and wrote custom (simple) HTML graph plugin.
+        First CPAN release.
+
+0.02    2007-09-26
+        Alpha of rewrite by Joshua Miller.
+        Uses new DBI::Profile driver that uses IO::Scalar for storage.
+        Graphs are inline html (using HTML::BarGraph, which is broken).
+
+0.01    2005-06-06
+        First version by Sam Tregar.
+

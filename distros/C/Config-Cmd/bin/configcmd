@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use Config::Cmd;
+use Getopt::Long;
+use Carp;
+
+use strict;
+use warnings;
+
+use constant PROGRAM_NAME => 'configcmd';
+
+# ABSTRACT: Store command line options in a file for future use
+our $VERSION = '0.002'; # VERSION
+# PODNAME: configcmd
+
+GetOptions(
+    'version' => sub { print PROGRAM_NAME, ",
+                       version ", $VERSION, "\n";
+		       exit 1; },
+    'help|?'  => sub { exec('perldoc',$0); exit 0 },
+);
+
+#section name is the obligtory first argument
+my $section = shift;
+croak "Give a section name before options"
+    if $section =~ /^-/;
+my $c = Config::Cmd->new(section => $section);
+
+# store the rest of the options in a file
+$c->set(\@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+configcmd - Store command line options in a file for future use
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+B<configcmd> [B<--version> | [B<-?|-h|--help>] | section options
+
+  configcmd subprgm -j 8 --verbose
+
+=head1 DESCRIPTION
+
+configcmd takes any POSIX command line with GNU extensions and stores
+it in a configuration file that can be later read into a program and
+passed to the sub-program. This simplifies the input for command line
+scripts that are repeatedly run in different complex environments.
+The main program should be using the module L<Config::Cmd> that is
+used by configcmd to process the information from the appropriate
+config file.
+
+The first argument to the program is special -- it determines the file
+name the configuration is written into. The file name is the string
+appended with '_conf.yaml' since the configuration is written in YAML
+language.
+
+This module does not do any interpretation of the options. It only
+does a simple sanity check and stores the options. The interpretation
+is left to the code or program using these options. Programs that are
+commonly used with non-standard options (e.g. tar zxvf), do understand
+standard option syntax, so you need to use it here. The program does,
+however, recognize and convert options using the equal sign:
+
+  -a = b
+  # becomes
+  -a b
+
+The used filename and the cleaned command line are printed to STDERR.
+
+=head2 File format
+
+The first argument to the program is used inside the YAML file as the
+section key. This gives some redundancy to the section information and
+the file can be renamed when needed. All other command line options
+are under this section name in an array. The options are stored as key
+value pairs, except simple options that contain only the key.
+
+The simple command line given in the synopsis is turned into the
+following self-explanatory YAML:
+
+  ---
+  subprgm:
+    - key: -j
+      value: 8
+    - key: --verbose
+
+=head2 Use of config files
+
+The configuration files can be read in using any YAML format parser,
+L<Config::Auto>, or the method Config::Cmd::get().
+
+The config files in the working directory are recognized by the
+section name by Config::Cmd::get(). It also finds a similarly named
+hidden config file from user's home directory. Read more from
+L<Config::Cmd>.
+
+=head1 NAME
+
+configcmd -  Store command line options in a file for future use
+
+=head1 SEE ALSO
+
+L<Config::Cmd>, L<Config::Auto>
+
+=head1 AUTHOR
+
+Heikki Lehvaslaiho <heikki.lehvaslaiho@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Heikki Lehvaslaiho.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>PASS Scriptalicious-1.15 i386-freebsd-64int 6.1-release -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/05.html">Postings from May 2008</a>
+
+<h2>PASS Scriptalicious-1.15 i386-freebsd-64int 6.1-release</h2>
+
+
+
+
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>srezic</b><br/>
+<div class="h_name">Date:</div> May  9, 2008 11:24<br/>
+<div class="h_name">Subject:</div> PASS Scriptalicious-1.15 i386-freebsd-64int 6.1-release<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.8.8, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.8.8 &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....ok
+t/02-script..........ok
+t/03-yaml............ok
+t/04-fork............ok
+t/05-prompt..........ok
+t/06-anydump.........ok
+t/07-tsay............ok
+t/08-unit............ok
+t/09-noyaml..........ok
+All tests successful.
+Files=9, Tests=60,  3 wallclock secs ( 1.57 cusr +  0.60 csys =  2.17 CPU)
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.62
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/autobox-2.30-vCqYsY/blib/arch:/usr/local/src/CPAN/build/autobox-2.30-vCqYsY/blib/lib:/usr/local/src/CPAN/build/Scope-Guard-0.03-3ffeZv/blib/arch:/usr/local/src/CPAN/build/Scope-Guard-0.03-3ffeZv/blib/lib:/usr/local/src/CPAN/build/Scalar-List-Utils-1.19-Jolp8Q/blib/arch:/usr/local/src/CPAN/build/Scalar-List-Utils-1.19-Jolp8Q/blib/lib:/usr/local/src/CPAN/build/Pg-Pcurse-0.10-RR3Ycz/blib/arch:/usr/local/src/CPAN/build/Pg-Pcurse-0.10-RR3Ycz/blib/lib:/usr/local/src/CPAN/build/DBIx-Abstract-1.006-0jRs2L/blib/arch:/usr/local/src/CPAN/build/DBIx-Abstract-1.006-0jRs2L/blib/lib:/usr/local/src/CPAN/build/Curses-1.23-lhMk1z/blib/arch:/usr/local/src/CPAN/build/Curses-1.23-lhMk1z/blib/lib:/usr/local/src/CPAN/build/CursesWidgets-1.997-QMMAI5/blib/arch:/usr/local/src/CPAN/build/CursesWidgets-1.997-QMMAI5/blib/lib:/usr/local/src/CPAN/build/Debug-0.01-D5JxQG/blib/arch:/usr/local/src/CPAN/build/Debug-0.01-D5JxQG/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 20870
+    PERL5_CPAN_IS_RUNNING = 20870
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 7422,20870
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.8.8
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have     
+    ------------------- ---------
+    CPAN                1.92_61  
+    Cwd                 3.23     
+    ExtUtils::CBuilder  0.18     
+    ExtUtils::Command   1.13     
+    ExtUtils::Install   1.45     
+    ExtUtils::MakeMaker 0        
+    ExtUtils::Manifest  1.51     
+    ExtUtils::ParseXS   n/a      
+    File::Spec          3.23     
+    Module::Build       0.2808_01
+    Module::Signature   0.55     
+    Test::Harness       2.64     
+    Test::More          0.62     
+    YAML                0.62     
+    YAML::Syck          0.99     
+    version             0.73     
+
+
+--
+
+Summary of my perl5 (revision 5 version 8 subversion 8) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd-64int
+    uname='freebsd freebsd.org 6.1-release freebsd 6.1-release #0: wed mar 15 00:45:26 pst 2006 kris@freebsd.org:usrsrcsysmagickernelpath i386 '
+    config_args='-sde -Dprefix=/usr/local -Darchlib=/usr/local/lib/perl5/5.8.8/mach -Dprivlib=/usr/local/lib/perl5/5.8.8 -Dman3dir=/usr/local/lib/perl5/5.8.8/perl/man/man3 -Dman1dir=/usr/local/man/man1 -Dsitearch=/usr/local/lib/perl5/site_perl/5.8.8/mach -Dsitelib=/usr/local/lib/perl5/site_perl/5.8.8 -Dscriptdir=/usr/local/bin -Dsiteman3dir=/usr/local/lib/perl5/5.8.8/man/man3 -Dsiteman1dir=/usr/local/man/man1 -Ui_malloc -Ui_iconv -Uinstallusrbinperl -Dcc=cc -Duseshrplib -Dccflags=-DAPPLLIB_EXP=&quot;/usr/local/lib/perl5/5.8.8/BSDPAN&quot; -Doptimize=-O2 -fno-strict-aliasing -pipe  -Ud_dosuid -Ui_gdbm -Dusethreads=n -Dusemymalloc=y -Duse64bitint'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=undef use5005threads=undef useithreads=undef usemultiplicity=undef
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=define use64bitall=undef uselongdouble=undef
+    usemymalloc=y, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-DAPPLLIB_EXP=&quot;/usr/local/lib/perl5/5.8.8/BSDPAN&quot; -DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include',
+    optimize='-O2 -fno-strict-aliasing -pipe ',
+    cppflags='-DAPPLLIB_EXP=&quot;/usr/local/lib/perl5/5.8.8/BSDPAN&quot; -DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include'
+    ccversion='', gccversion='3.4.4 [FreeBSD] 20050518', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=12345678
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long long', ivsize=8, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -Wl,-E -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lcrypt -lutil
+    perllibs=-lm -lcrypt -lutil
+    libc=, so=so, useshrplib=true, libperl=libperl.so
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='  -Wl,-R/usr/local/lib/perl5/5.8.8/mach/CORE'
+    cccdlflags='-DPIC -fPIC', lddlflags='-shared  -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  
+    <li><b>
+      PASS Scriptalicious-1.15 i386-freebsd-64int 6.1-release</b>
+      by srezic</li> 
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

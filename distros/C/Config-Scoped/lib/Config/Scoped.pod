@@ -1,0 +1,1086 @@
+=head1 NAME
+
+Config::Scoped - feature rich configuration file parser
+
+=head1 SYNOPSIS
+
+  use Config::Scoped;
+
+  $cs = Config::Scoped->new( file => $config_file, ... );
+  $cfg_hash = $cs->parse;
+
+
+=head1 ABSTRACT
+
+
+B<Config::Scoped> is a configuration file parser.
+
+=head2 Features
+
+=over 4
+
+=item *
+
+recursive data structures with scalars, lists, and hashes
+
+=item *
+
+simplified syntax with minimal punctuation
+
+=item *
+
+parses many Perl data structures without B<eval>, B<do> or B<require>
+
+=item *
+
+Perl quoting syntax: single quotes (B<''>), double quotes(B<"">), and here-docs (B<< <<EOF >>)
+
+=item *
+
+Perl code evaluation in B<Safe> compartments
+
+=item *
+
+parses ISC named and dhcpd config files
+
+=item *
+
+include files with recursion checks
+
+=item *
+
+controlled macro expansion in double quoted tokens
+
+=item *
+
+lexically scoped parameter assignments and directives
+
+=item *
+
+duplicate macro, parameter, and declaration checks
+
+=item *
+
+file permission and ownership safety checks
+
+=item *
+
+fine control over error checking
+
+=item *
+
+error messages report config file names and line numbers
+
+=item *
+
+exception-based error handling
+
+=item *
+
+based on B<Parse::RecDescent>
+
+=item *
+
+configuration caching with MD5 checksums on the original files
+
+=item *
+
+may be subclassed to build parsers with specialized features
+
+=back
+
+=head1 REQUIRES
+
+=over 4
+
+=item *
+
+B<Parse::RecDescent>
+
+=item *
+
+B<Error>
+
+=back
+
+
+=head1 EXPORTS
+
+Nothing.
+
+=head1 METHODS
+
+=over 4
+
+
+=item B<< Config::Scoped->new >>
+
+
+  $cs = Config::Scoped->new(
+    file     => $config_file,
+    lc       => $lc,
+    safe     => $compartment,
+    warnings => $warnings,
+    your_key => $your_value, { ... },
+  );
+
+Creates and returns a new B<Config::Scoped> object. The following parameters are optional.
+
+=over 4
+
+=item B<$config_file>
+
+The configuration file to parse. If omitted, then a B<$config_string> must be provided to the B<parse> method (see below).
+
+=item B<$lc>
+
+If true, all declaration and parameter names will be converted to lower case.
+
+=item B<$compartment>
+
+A B<Safe> compartment for evaluating Perl code blocks in the configuration file. Defaults to a B<Safe> compartment with no extra shares and the B<:default> operator tag.
+
+=item B<$warnings>
+
+may be the literal string B<'on'> or B<'off'> to set all warnings simultan.
+
+Or define a hash reference with the following keys to set each warning as specified.
+
+  $warnings = { declaration  => 'off',
+                digests      => 'off',
+                macro        => 'off',
+                parameter    => 'off',
+                permissions  => 'off',
+                your_warning => 'off',
+ };
+
+All warnings are on by default.
+
+=item B<Arbitrary key/value pairs>
+
+will be stored in the B<$cs> object. This is useful primarily for subclassing.
+
+=back
+
+=item B<< $cs->parse >>
+
+    $cfg_hash = $cs->parse;
+    $cfg_hash = $cs->parse(text => $config_string);
+
+Parses the configuration and returns a reference to the config hash.
+
+The first form parses the B<$config_file> that was provided to the constructor. If B<$config_file> was not provided to the constructor, this form B<die>s.
+
+The second form parses the B<$config_string>.
+
+This method must only be called once.
+
+=item B<< $cs->store_cache >>
+
+    $cs->store_cache;
+    $cs->store_cache(cache => $cache_file);
+
+Stores the config hash on disk for rapid retrieval. If B<$config_file> was provided to the constructor, then the stored form includes checksums of B<$config_file> and any included files.
+
+The first  form writes to B<$config_file.dump>
+The second form writes to B<$cache_file>.
+
+If B<$config_file> was not provided to the constructor, the first form B<die>s.
+
+=item B<< $cs->retrieve_cache >>
+
+    $cfg_hash = $cs->retrieve_cache;
+    $cfg_hash = $cs->retrieve_cache>(cache => $cache_file);
+
+Retrieves the B<$config> hash from a file that was created by B<store_cache>.
+
+The first  form reads B<$config_file.dump>
+The second form reads B<$cache_file>.
+
+If B<$config_file> was not provided to the constructor, the first form B<die>s.
+
+The stored file is subject to B<digests> and B<permissions> checks.
+
+=item B<< $cs->set_warnings >>
+
+    $cs->set_warnings(name => $name, switch => 'on|off');
+
+Change warning for B<$name> after construction.
+
+=item B<< $cs->warnings_on >>
+
+    $on = $cs->warnings_on(name => $name);
+
+Returns true if warning B<$name> is on. This is useful primarily for subclassing.
+
+=back
+
+=head1 EXCEPTIONS
+
+
+All methods B<die> on error.
+
+B<Config::Scoped::Error> defines a hierarchy of classes that represent B<Config::Scoped> errors. When a method detects an error, it creates an instance of the corresponding class and throws it. The error classes are all subclasses of B<Config::Scoped::Error>. See
+L<Config::Scoped::Error> for the complete list.
+
+If the exception is not caught, the program terminates, and B<Config::Scoped> prints the config file name and line number where the error was detected to B<STDERR>.
+
+
+=head1 CONFIG FILE FORMAT
+
+B<Config::Scoped> parses configuration files.
+
+If we have a config file like
+
+  % cat host.cfg
+  host {
+      name = cpan.org
+      port = 22
+  }
+  %
+
+we can parse it into Perl with code like
+
+    $cs = Config::Scoped->new( file => 'host.cfg' );
+    $cfg_hash = $cs->parse;
+
+The result is always a hash ref. We'll call this the B<config hash>, and its contents for the example file above is:
+
+    $cfg_hash = {
+       host => {
+          name => 'cpan.org',
+          port => 22,
+       }
+      }
+
+=head2 Config files and config strings
+
+As described, B<Config::Scoped> can obtain a configuration from a B<$config_file>, passed to the constructor, or from a B<$config_string>, passed to the B<parse> method. For simplicity, we'll talk about parsing configuration files, distinguishing configuration strings only when necessary.
+
+=head2 File layout
+
+Config files are free-form text files.
+Comments begin with B<#>, and extend to the end of the line.
+
+=head2 Declarations
+
+The top-level elements of a config file are called B<declarations>. A declaration consists of a name, followed by a block
+
+  foo {
+  }
+
+  bar {
+  }
+
+The declaration names become keys in the config hash. The value of each key is another hash ref. The config shown above parses to
+
+    $cfg_hash = {
+       foo => {},
+       bar => {},
+      }
+
+You can create additional levels in the config hash simply by listing successive declaration names before the block. This config
+
+  dog hound {
+  }
+
+  dog beagle {
+  }
+
+  cat {
+  }
+
+parses to
+
+    $cfg_hash = {
+       dog => {
+          hound  => {},
+          beagle => {},
+       },
+
+       cat => {}
+      }
+
+Declarations may not be nested.
+
+=head2 Parameters
+
+The ultimate purpose of a configuration file is to provide data values for a program.  These values are specified by B<parameters>.
+
+Parameters have the form
+
+  name = value
+
+and go inside declaration blocks. The
+
+  name = value
+
+parameters in a spec file become key and value pairs inside the declaration hashes in Perl code.
+
+For example, this configuration
+
+  dog {
+      legs  = 4
+      wings = 0
+  }
+
+  bird {
+      legs  = 2
+      wings = 2
+  }
+
+parses to
+
+    $cfg_hash = {
+       dog => {
+          legs  => 4,
+          wings => 0,
+       },
+
+       bird => {
+          legs  => 2,
+          wings => 2,
+       }
+      }
+
+B<Parameter values> can be B<scalars>, B<lists> or B<hashes>.
+
+Scalar values may be numbers or strings
+
+  shape = square
+  sides = 4
+
+Lists values are enclosed in square brackets
+
+  colors = [ red green blue ]
+  primes = [ 2 3 5 7 11 13  ]
+
+Hash values are enclosed in curly brackets
+
+  capitals = {
+        England => London
+        France  => Paris
+  }
+
+A hash value is also called a B<hash block>.
+
+Lists and hashes can be nested to arbitrary depth
+
+  Europe {
+     currency = euro
+     
+     cities   = {
+        England => [ London Birmingham Liverpool ]
+        France  => [ Paris Canne Calais ]
+     }
+   }
+
+parses to
+
+    $cfg_hash = {
+       Europe => {
+          currency => 'euro',
+
+          cities => {
+             England => [ 'London', 'Birmingham', 'Liverpool' ],
+             France  => [ 'Paris',  'Canne',      'Calais' ],
+          }
+       }
+      }
+
+The B<Config::Scoped> data syntax is similar to the Perl data syntax, and B<Config::Scoped> will parse many Perl data structures. In general, B<Config::Scoped> requires less punctuation that Perl. Note that B<Config::Scoped> allows arrow (B<< => >>) or equals (B<=>) between hash keys and values, but not comma (B<,>)
+
+  capitals = { England => London        # OK
+               France  =  Paris         # OK
+               Germany ,  Berlin        # error
+             }
+
+
+=head2 _GLOBAL
+
+If a config file contains no declarations at all
+
+  name = cpan.org
+  port = 22
+
+then any parameters will be placed in a B<_GLOBAL> declaration in the
+config hash
+
+   $cfg_hash = {
+      _GLOBAL => {
+         name => 'cpan.org',
+         port => 22,
+      }
+     }
+
+This allows very simple config files with just parameters and no
+declarations.
+
+
+=head2 Blocks, scoping and inheritance
+
+Each declaration block in a config file creates a lexical scope. Parameters inside a declaration are scoped to that block. Parameters are inherited by all following declarations within their scope.
+
+If all your animals have four legs, you can save some typing by writing
+
+    legs = 4
+    cat {}
+    dog {}
+
+which parses to
+
+   $cfg_hash = {
+      cat => { legs => 4 },
+      dog => { legs => 4 },
+     }
+
+If some of your animals have two legs, you can create additional scopes with anonymous blocks to control inheritance
+
+    {
+      legs = 4
+      cat {}
+      dog {}
+    }
+    {
+      legs = 2
+      bird {}
+    }
+
+parses to
+
+   $cfg_hash = {
+      cat  => { legs => 4 },
+      dog  => { legs => 4 },
+      bird => { legs => 2 },
+     }
+
+Anonymous blocks may be nested.
+
+Each hash block also creates a scope. The hash does not inherit parameters from outside its own scope.
+
+=head2 Perl code evaluation
+
+If you can't express what you need within the B<Config::Scoped> syntax, your escape hatch is
+
+  eval { ... }
+
+This does a Perl B<eval> on the block, and replaces the construct with the results of the B<eval>.
+
+  start = eval { localtime }
+  foo   = eval { warn 'foo,' if $debug; return 'bar' }
+
+The block is evaluated in scalar context. However, it may return a list or hash reference, and the underlying list or hash can become a parameter value.
+
+For example
+
+  foo {
+    list = eval { [ 1 .. 3 ]                 }
+    hash = eval { { a => 1, b => 2, c => 3 } }
+  }
+
+parses to
+
+   $cfg_hash = {
+      foo => {
+         list => [ 1, 2, 3 ],
+         hash => { a => 1, b => 2, c => 3 },
+      }
+     }
+
+
+The block is evaluated inside the parser's B<Safe> compartment. Variables can be made available to the B<eval> by sharing them with the compartment.
+
+To set the B<$debug> variable in the example above, do 
+
+    $compartment     = Safe->new('MY_SHARE');
+    $MY_SHARE::debug = 1;
+
+    $cs = Config::Scoped->new(
+      file => 'config.txt',
+      safe => $compartment,
+    );
+
+    $cfg_hash = $cs->parse;
+
+Only global variables can be shared with a compartment; lexical variables cannot.
+
+B<perl_code> is a synonym for B<eval>.
+
+
+=head2 Tokens and quoting
+
+A B<token> is a
+
+=over 4
+
+=item *
+
+declaration name
+
+=item *
+
+parameter name
+
+=item *
+
+hash key
+
+=item *
+
+scalar value
+
+=item *
+
+macro name
+
+=item *
+
+macro value
+
+=item *
+
+include path
+
+=item *
+
+warning name
+
+=back
+
+Any token may be quoted.
+
+Tokens that contain special characters must be quoted. The special characters are
+
+  \s {} [] <> () ; , ' " = # %
+
+B<Config::Scoped> uses the Perl quoting syntax.
+
+Tokens may be quoted with either single or double quotes
+
+  a = 'New York'
+  b = "New Jersey\n"
+
+Here-docs are supported
+
+  a = <<EOT
+  New York
+  New Jersey
+  EOT
+
+but generalized quotes (B<q()>, B<qq()>, etc.) are not. Text in here-docs is regarded as single-quoted if the delimiter is enclosed in single quotes, and double-quoted if the delimiter is enclosed in double quotes or unquoted.
+
+Double-quoted tokens are evaluated as Perl strings inside the parser's B<Safe> compartment. They are subject to the usual Perl backslash and variable interpolation, as well as macro expansion. Variables to be interpolated are passed via the B<Safe> compartment, as shown above in L</Perl code evaluation>. If you need a literal B<$> or B<@> in a double-quoted string, be sure to escape it with a backslash (B<\>) to suppress interpolation.
+
+An
+
+  eval { ... }
+
+may appear anywhere that a token is expected. For example
+
+  foo {
+      eval { 'b' . 'c' } = 1
+  }
+
+parses to
+
+    $cfg_hash = { foo => { bc => 1 } }
+
+=head1 DIRECTIVES
+
+B<Config::Scoped> has three directives: B<%macro>, B<%warning>, and B<%include>.
+
+=head2 Macros
+
+B<Config::Scoped> supports macros. A macro is defined with
+
+  %macro name value
+
+Macros may be defined
+
+=over 4
+
+=item *
+
+at file scope
+
+=item *
+
+within anonymous blocks
+
+=item *
+
+within declaration blocks
+
+=item *
+
+within hash blocks
+
+=back
+
+Macros defined within blocks are lexically scoped to those blocks.
+
+Macro substitution occurs
+
+=over 4
+
+=item *
+
+within B<any> double-quoted text
+
+=item *
+
+within the B<entirety> of Perl B<eval> blocks
+
+=item *
+
+nowhere else
+
+=back
+
+
+=head2 Include files
+
+B<Config::Scoped> supports include files.
+
+To include one config file within another, write
+
+  %include path/to/file
+
+B<%include> directives may appear
+
+=over 4
+
+=item *
+
+at file scope
+
+=item *
+
+within anonymous blocks
+
+=item *
+
+nowhere else
+
+=back
+
+In particular, B<%include> directives may not appear within declaration blocks or hash blocks.
+
+Parameters and macros in include files are imported to the current scope. You can control this scope with an anonymous block
+
+  {
+    %include dog.cfg
+    dog { }  # sees imports from dog.cfg
+  }
+  bird { }   # does not see imports from dog.cfg
+
+
+Warnings are scoped to the included file and do not leak to the parent file.
+
+Pathnames are either
+
+=over 4
+
+=item *
+
+absolute
+
+=item *
+
+relative to the dirname of the current configuration file
+
+=back
+
+For example, this config
+
+    # in configuration file /etc/myapp/global.cfg
+    %include shared.cfg
+
+includes the file F</etc/myapp/shared.cfg>.
+
+When parsing a configuration string, the path is relative to the current working directory.
+
+Include files are not actually included as text. Rather, they are processed by a recursive call to B<Config::Scoped>. Subclass implementers may need to be aware of this.
+
+=head2 Warnings
+
+B<Config::Scoped> can check for 5 problems with config files
+
+=over 4
+
+=item *
+
+duplicate declaration names
+
+=item *
+
+duplicate parameter definitions
+
+=item *
+
+duplicate macro definitions
+
+=item *
+
+insecure config file permissions
+
+=item *
+
+invalid config cache digests
+
+=back
+
+The API refers to these as "warnings", but they are actually errors, and if they occur, the parse fails and throws an exception. For consistency with the API, we'll use the term "warning" in the POD.
+
+The five warnings are identified by five predefined B<warning names>
+
+=over 4
+
+=item *
+
+B<declaration>
+
+=item *
+
+B<parameter>
+
+=item *
+
+B<macro>
+
+=item *
+
+B<permissions>
+
+=item *
+
+B<digests>
+
+=back
+
+The B<permissions> check requires that the config file
+
+=over 4
+
+=item *
+
+be owned by root or the real UID of the running process AND
+
+=item *
+
+have no group or world write permissions
+
+=back
+
+These restrictions help prevent an attacker from subverting a program by altering its config files.
+
+
+The B<store_cache> method computes MD5 checksums for the config file and all included files. These checksums are stored with the cached configuration.
+
+The B<retrieve_cache> method recomputes the checksums of the files and compares them to the stored values.
+
+The B<digests> check requires that the checksums agree. This helps prevent programs from relying on stale configuration caches.
+
+All warnings are enabled by default.
+
+Warnings can be disabled by passing the B<warning> key to the constructor or with the B<set_warnings> method.
+
+Warnings can also be controlled with the B<%warnings> directive, which has the form
+
+B<%warnings> [B<name>] B<off>|B<on>
+
+A B<%warnings> directive applies to the B<name>d warning, or to all warnings, if B<name> is omitted.
+
+B<%warnings> directives allow warnings to be turned on and off as necessary throughout the config file. A B<%warnings> directive may appear
+
+=over 4
+
+=item *
+
+at file scope
+
+=item *
+
+within anonymous blocks
+
+=item *
+
+within declaration blocks
+
+=item *
+
+within hash blocks
+
+=back
+
+Each B<%warnings> directive is lexically scoped to its enclosing file or block.
+
+Example
+
+  legs = 4
+  cat  {}
+  dog  {}
+  bird
+  {
+      legs = 2
+  }
+
+fails with a duplicate parameter warning, but
+
+  legs = 4
+  cat  {}
+  dog  {}
+  bird
+  {
+      %warnings parameter off;
+      legs = 2
+  }
+
+successfully parses to
+
+    $cfg_hash = {
+        cat  => { legs => 4 },
+        dog  => { legs => 4 },
+        bird => { legs => 2 },
+      }
+
+
+=head1 Best practices
+
+As with all things Perl, there's more than one way to write configuration files. Here are some suggestions for writing config files that are concise, readable, and maintainable.
+
+=head2 Perl data
+
+B<Config::Scoped> accepts most Perl data syntax. This allows Perl data to pulled into config files largely unaltered
+
+  foo
+  {
+     a = 1;
+     b = [ 'red', 'green', 'blue' ];
+     c = { x => 5,
+           y => 6 };
+  }
+
+However, B<Config::Scoped> doesn't require as much punctuation as Perl, and config files written from scratch will be cleaner without it
+
+  foo
+  {
+     a = 1
+     b = [ red green blue ]
+     c = { x => 5
+           y => 6 }
+  }
+
+
+=head2 Anonymous blocks
+
+Don't use anonymous blocks unless you need to restrict the scope of something. In particular, there is no need for a top-level anonymous block around the whole config file
+
+  {             # unnecessary
+      foo { }
+  }
+
+=head2 Inheritance
+
+Parameters that are outside of a declaration are inherited by B<all> following declarations in their scope. Don't do this unless you mean it
+
+  wheels = 4
+  car
+  {
+      # OK
+  }
+  cat
+  {
+      # I can haz weelz?
+  }
+
+
+=head2 Blocks, blocks, we got blocks...
+
+B<Config::Scoped> has four different kinds of blocks
+
+=over 4
+
+=item *
+
+anonymous
+
+=item *
+
+declaration
+
+=item *
+
+eval
+
+=item *
+
+hash
+
+=back
+
+They all look the same, but they aren't, and they have different rules and restrictions. See L</CONFIG FILE FORMAT> for descriptions of each.
+
+=head2 Macros
+
+Macros are evil, and B<Config::Scoped> macros are specially evil, because
+
+=over 4
+
+=item *
+
+they don't respect token boundaries
+
+=item *
+
+where multiple substitutions are possible, the substitution order is undefined
+
+=item *
+
+substituted text may or may not be rescanned for further substitutions
+
+=back
+
+Caveat scriptor.
+
+
+=head1 SUBCLASSING
+
+B<Config::Scoped> has no formally defined subclass interface. Here are some guidelines for writing subclasses. Implementers who override (or redefine) base class methods may need to read the B<Config::Scoped> sources for more information.
+
+Arbitrary
+
+  $your_key => $value
+
+pairs may be passed to the B<Config::Scoped> constructor. They will be stored in the B<< $cs->{local} >> hashref, and methods may access them with code like
+
+  $cs->{local}{$your_key}
+
+To avoid conflict with existing keys in the B<local> hash, consider distinguishing your keys with a unique prefix.
+
+Arbitrary warning names may be defined, set with B<new> and B<set_warnings>, used in B<%warnings> directives, and tested with B<warnings_on>. Methods can call B<warnings_on> to find out whether a warning is currently enabled.
+
+All methods throw exceptions (B<die>) on error. The exception object should be a subclass of B<Config::Scoped::Error>. You can use one of the classes defined in B<Config::Scoped::Error>, or you can derive your own. This code
+
+    Config::Scoped::Error->throw(
+        -file => $cs->_get_file(%args),
+        -line => $cs->_get_line(%args),
+        -text => $message,
+    );
+
+will generate an error message that reports the location in the config file where the error was detected, rather than a location in Perl code.
+
+B<Config::Scoped> performs validation checks on the elements of configuration files (declarations, parameters, macros, etc). Here are the interfaces to the validation methods. Subclasses can override these methods to modify or extend the validation checks.
+
+=over 4
+
+=item B<< $macro_value = $cs->macro_validate>(name => $name, value => $value) >>
+
+Called for each B<%macro> directive.
+
+Receives the B<$name> and B<$value> from the directive. The returned B<$macro_value> becomes the actual value of the macro.
+
+If the macro is invalid, throws a B<Config::Scoped::Error::Validate::Macro> exception.
+
+
+=item B<< $param_value = $cs->parameter_validate>(name => $name, value => $value) >>
+
+Called for each parameter definition.
+
+Receives the B<$name> and B<$value> from the definition. The returned B<$param_value> becomes the actual value of the parameter.
+
+If the parameter is invalid, throws a B<Config::Scoped::Error::Validate::Parameter> exception.
+
+
+=item B<< $cs->declaration_validate(name => $name, value => $value, tail => $tail) >>
+
+Called for each declaration.
+
+B<$name> is an array ref giving the chain of names for the declaration block. B<$value> is a hash ref containing all the parameters in the declaration block. B<$tail> is a hash ref containing all the parameters in any previously defined declaration with the same name(s).
+
+For example, the declaration
+
+  foo bar baz { a=1 b=2 }
+
+leads to the call
+
+  $cs->declaration_validate(name  => [ qw(foo bar baz) ],
+                                value => { a => '1', b => '2' },
+                                tail  => $cs->{local}{config}{foo}{bar}{baz});
+
+The method can test %$tail to discover if there is an existing, non-empty declaration with the same name(s).
+
+The method has no return value. However, the method can alter the contents of %$value. Upon return, the parameters in %$value become the actual contents of the declaration block.
+
+If the declaration is invalid, throws a B<Config::Scoped::Error::Validate::Declaration> exception.
+
+
+=item B<< $cs->permissions_validate(file => $file, handle => $handle) >>
+
+Called for the config file, each included file, and each retrieved cache file. One of B<$file> or B<$handle> must be non-null.
+
+Throws a B<Config::Scoped::Error::Validate::Permissions> exception if the file is not safe to read.
+
+
+=back
+
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+B<Error>
+
+=item *
+
+B<Safe>
+
+=item *
+
+B<Config::Scoped::Error>
+
+=item *
+
+B<Parse::RecDescent>
+
+=item *
+
+L<perlop/Quote and Quote-like Operators>
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item Tests
+
+Still more tests needed.
+
+=back
+
+=head1 BUGS
+
+If you find parser bugs, please send the stripped down config file and
+additional version information to the author.
+
+=head1 CREDITS
+
+POD by Steven W. McDougall E<lt>swmcd@world.std.comE<gt>
+
+=head1 AUTHOR
+
+Karl Gaissmaier E<lt>karl.gaissmaier at uni-ulm.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2004-2012 by Karl Gaissmaier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# vim: sw=4 ft=pod

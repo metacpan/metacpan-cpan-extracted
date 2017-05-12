@@ -1,0 +1,43 @@
+20011217 Crypt-Tea-1.30 Tiny Encryption Algorithm in Perl & JavaScript
+20020121 1.31 some bugs fixed, Htauth hooks & outdated subs stripped
+20020310 1.32
+20020325 1.33 Bug fixed in JS ascii decoding
+20020403 1.34 Htauth hooks removed into CGI::Htauth.pm
+20020523 1.35 mv Tea.raw Tea.pm for CPAN, include test.html
+20020601 1.36 fixed 'require Tea.raw' bug in test_script
+20020603 1.40 Makefile.PL uses MakeMaker, new Install
+20020620 1.41 my $de0, $de1 bug fixed in line 182 of Tea.pm
+20020626 1.42 Install gets default locations right
+20020917 1.43 JS portability bug fixed in ascii2bytes, a[i] to a.charAt(i)
+20020919 1.44 JS portability bug fixed in specifying 32-bit integers
+20030701 FreeBSD bug corrected ($^O now gives freebsd)
+20030901 eliminate octal number literals from the JS
+20040224 Crypt::Tea is now also named Crypt::Tea_PPJS, q.v.
+20040809 'perl Install' works better on solaris without Term::Size
+20040922 1.45 + changed to - to avoid URL-encoding, with backward compatibility
+20040928 2.00 uses - in ascii for URL-resistance
+20040930 2.01 test.html ascii2bytes should return 216 not 217
+20041005 2.02 test.pl displays correct version
+20041011 2.03 JS tea_code and tea_decode now work on Konqueror5.0
+20041127 2.04 consistentised Term::Clui in Install
+20041218 2.05 documentation of the JS end of FORM submission
+20041221 2.06 more doc adjustments, added examples/tea_demo.cgi
+20041223 2.07 eliminate octals from JS strings, for ECMAscript-3
+20050105 EXPORT_OK and ALL introduced for str2ascii and ascii2str
+20050113 2.08 test.pl uses Test::Simple
+20050114 2.09 algorithm cut out of MANIFEST, sub ascii2str gets no warnings
+20050115 XS tea_code & tea_decode doubles speed; drop Install
+20050116 Crypt-Tea_JS-2.10 Move to New version of the Tea algorithm
+20050215 2.11 fixed test.html asciidigest test, fixed EXPORT_OK doc
+20050314 2.12 use bytes in str2binary, with workaround for pre-5.6 perl
+20050323 2.13 utf8 detection and encoding in encrypt, binarydigest and test.pl
+20051005 2.14 -ve ints cut out of test.pl, to cope with 64bit machines
+20060410 2.15 Tea_JS.xs syntax refined to avoid warnings with gcc 4.1.0
+20060823 2.16 pack 'c*' changed to pack 'C*'
+20060824 2.17 cut out ppport.h to avoid a compile warning
+20060828 2.18 64-bit bug fixed in Tea_JS.xs
+20060829 2.19 for speed, 64-bit bug-fix only included on 64-bit machines
+20081010 2.20 examples/tea_demo.cgi updated into the Ajax era
+20081011 2.21 correspondingly updated the JAVASCRIPT section in the doc
+20100516 2.22 include js in tarball; now installs with cpan
+20111011 2.23 uses XSLoader, and reverts to PurePerl if the C library missing

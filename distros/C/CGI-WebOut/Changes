@@ -1,0 +1,46 @@
+Revision history for Perl extension CGI::WebOut.
+
+1.00  Wed Aug 22 04:23:54 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n CGI::WebOut
+
+1.01  Sun Mar 31 17:40:00 2002
+    - cascade (and same) fatal error messages will not duplicate at exit
+
+1.02  Sat Apr 20 19:00:00 2002
+    - bug in NoCache() with fixed Last-modified (proxy dependent)
+
+1.10  Fri May 24 18:00:00 2002
+    - added support for FCGI compatibility (partial)
+
+2.00  Sat Aug 23 21:00:00 2003
+    - code rewritten by 80%
+    - now module is fully tie-safe (see comments inside and POD)
+    - fixed bug: now module works in Perl 5.8 too
+    - module is now fully transparent for caller code even if
+      it uses tie(*STDOUT)
+    - a number of comments is translated from Russian to English
+    - no AutoLoader in new version
+    - use strict
+    
+2.02  Thu 23 Oct 21:35:05 2003
+    - fixed memory leak under FastCGI    
+
+2.10  Wed Dec 31 22:00:00 2003
+    - Published to CPAN.
+
+2.20  Fri Feb 13 19:00:00 2004
+    - Now module is more tie-safe and can be used after CGI::WebGzip.
+
+2.22  Thu May 5 16:00:00 2005
+    - Removed broken WebOut.htm from MANIFEST.
+
+2.23  Fri Sep 9 15:00:00 2005
+    - Added method FILENO to tied STDOUT object (compatibility with CGI.pm & Perl 5.8).
+
+2.24  Thu Oct 19 13:00:00 2005
+    - If undefined variable is used in print after CGI::WebOut start, generate error
+      message in context of caller code, not in context of library.
+
+2.25  Thu Dec 7 15:00:00 2006
+    - Do not call Flush() on FILENO handler (compatibility with CGI::Session & CGI).

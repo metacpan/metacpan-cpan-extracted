@@ -1,0 +1,19 @@
+inc
+{
+    bar        baz
+}
+
+inc2
+{
+    etc        pwd
+
+    inc3
+    {
+        abc    def
+    }
+}
+
+foo_2
+{
+    abc        def
+}

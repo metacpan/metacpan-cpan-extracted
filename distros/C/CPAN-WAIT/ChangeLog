@@ -1,0 +1,111 @@
+2000-03-23  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CPAN/WAIT.pm: Sanarfed code from CPAN::Config::load to load
+	config.  Neither use CPAN nor use CPAN::Config is useful.
+
+2000-03-23  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Makefile.PL: Made test optional.
+
+2000-03-21  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* lib/CPAN/WAIT.pm: Replaced 'use CPAN' by 'use CPAN::Config' as
+	suggested by Johan Vromans.
+
+Tue Aug 12 11:48:43 1997  Ulrich Pfeifer  <pfeifer@ls6.informatik.uni-dortmund.de>
+
+	* lib/CPAN/WAIT.pm (wq): calls wh now if qeury contains syntax error
+
+Mon Aug 11 17:57:27 1997  Ulrich Pfeifer  <pfeifer@ls6.informatik.uni-dortmund.de>
+
+	* lib/CPAN/WAIT.pm lib/WAIT/Client.pm: Now does not open a
+ 	connection at load time. Timeout now is 20 seconds.
+
+Tue Feb 11 14:00:00 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/CPAN/WAIT.pm lib/WAIT/Client.pm: The is now a emulation of
+	  the protocol via HTTP. So poor people behind a firewall should be
+	  able to use it now. If works but is rather slow. Here are the
+	  timings:
+	  
+	  WAIT:  3 secs ( 1.46 cusr  0.22 csys =  1.68 cpu) HTTP: 72 secs (
+	  1.51 cusr  0.28 csys =  1.79 cpu)
+	  
+	  I do not know what is so slow here. From sending a request to a
+	  proxy until it reaches the server there pass several seconds. If
+	  someone has suggestion about speeding this up, let me know.
+	  
+	  Maybe you have more luck with your proxy anyway.
+
+Tue Feb  4 16:32:43 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: Change Net::WAIT back to WAIT::Client
+
+
+Tue Feb  4 16:32:05 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL lib/CPAN/WAIT.pm: Change Net::WAIT back to
+	  WAIT::Client
+
+
+Tue Feb  4 16:32:04 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST: Change Net::WAIT back to WAIT::Client
+
+
+Tue Feb  4 15:45:14 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: Renamed WAIT::Client to Net::WAIT.
+
+
+Tue Feb  4 15:26:35 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL: Fixed Makefile.PL to remove old WAIT::Client.
+
+
+Tue Feb  4 15:26:34 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST: Fixed Makefile.PL to remove old WAIT::Client.
+
+
+Tue Feb  4 15:22:14 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: Changed WAIT::Client to Net::WAIT
+
+
+Tue Feb  4 12:08:07 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* Makefile.PL: Removed RCS controlling if README
+
+
+Tue Feb  4 12:05:20 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* t/basic.t: Switched to CVS.
+
+Tue Feb  4 12:00:38 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/CPAN/WAIT.pm: Switched to CVS.
+
+
+Tue Feb  4 12:00:17 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* MANIFEST Makefile.PL README: Switched to CVS.
+
+Tue Feb  4 10:49:51 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm: switched to CVS
+
+
+Mon Feb  3 10:19:51 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm:  Allow array argument for search().
+
+
+Fri Jan 31 16:03:50 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/CPAN/WAIT.pm: Initial revision
+
+Fri Jan 31 13:50:57 1997 Ulrich Pfeifer <pfeifer@ls6.informatik.uni-dortmund.de> 
+
+	* lib/WAIT/Client.pm:  First alpha version which should go to
+	  CPAN.pm.

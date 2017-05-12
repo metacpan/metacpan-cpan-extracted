@@ -1,0 +1,379 @@
+package Continuus;
+
+=head1 NAME
+
+  Continuus - Perl interface to Continuus CM
+
+=head1 SYNOPSIS
+
+  use Continuus;
+
+  Check out a file:
+
+  use Continuus;
+
+  $ccm = new Continuus;
+
+  $ccm->start(database => '/proj/Continuus4/rig',
+              host => 'stoxserv01');
+
+  $ccm->checkOut(file => 'main.c',
+		 version => '2');
+
+  $ccm->stop();
+
+
+=head1 DESCRIPTION
+
+  The Continuus perl module is a interface to the most common Continuus functions.
+
+=cut
+
+=head1 CHANGE HISTORY
+
+  0.1    Created.
+
+=cut
+
+# Portions Copyright:
+# Compuware Europe BV Copyright (c) 1998 - 1999
+
+use strict;
+
+=head1 METHODS
+
+=over 4
+
+=cut
+
+################################################################################
+
+=item new:
+
+  The new method creates a new Continuus object.
+
+=cut
+
+sub new() {
+  my $self  = {};
+
+  $self->{DEBUG} = 0;
+
+  bless($self);      
+
+  return $self;  
+};
+
+################################################################################
+
+=item start:
+
+  The start method starts a new Continuus session.
+
+=cut
+
+sub start() {
+  my $self = shift;
+  my %args = @_;
+  my ($command);
+
+  if (defined $args{'database'}) {
+    $args{'database'} = untaint($args{'database'});
+  } 
+  else {
+    $args{'database'} = "";
+  }
+  
+  if (defined $args{'role'}) {
+    $args{'role'} = untaint($args{'role'});
+  } 
+  else {
+    $args{'role'} = "";
+  }
+  
+  if (defined $args{'host'}) {
+    $args{'host'} = untaint($args{'host'});
+  } 
+  else {
+    $args{'host'} = "";
+  }
+  
+  if (defined $args{'password'}) {
+    $args{'password'} = untaint($args{'password'});
+  } 
+  else {
+    $args{'password'} = "";
+  }
+  
+  if (defined $args{'iniFile'}) {
+    $args{'iniFile'} = untaint($args{'iniFile'});
+  } 
+  else {
+    $args{'iniFile'} = "";
+  }
+  
+  # Role
+  my $RoleOption = ($args{'iniFile'} eq "") ? " -r developer " : ""; # Safe default
+  if ($args{'role'} =~ /developer|build_mgr|pt_admin|ccm_admin/) {
+    $RoleOption = "-r $args{'{role'}";
+  }
+  
+  # Host
+  if ($args{'host'} ne "") {
+    $args{'host'} = "-h $args{'host'}";
+  }
+  
+  # Password
+  if ($args{'password'} ne "") {
+    $args{'password'} = "-pw $args{'password'}";
+  }
+  
+  # Ini File
+  if ($args{'iniFile'} ne "") {
+    $args{'iniFile'} = "-f $args{'iniFile'}";
+    $ENV{CCM_INI_FILE} = "$args{'iniFile'}";
+  }
+  
+  $ENV{CCM_DATETIME_FMT} = "%a %b %d %H:%M:%S %Y";
+  
+  # Informix settings are not allowed, Continuus will set those itself
+  # If set the wrong Informix will be used, or Informix can not be 
+  # reached (error 329)
+  delete $ENV{INFORMIX};
+  delete $ENV{INFORMIXDIR};
+  delete $ENV{INFORMIXSERVER};
+  delete $ENV{TBCONFIG};
+  delete $ENV{SQLEXEC};
+  delete $ENV{SQLTURBO};
+  
+  $command = "ccm start -m -q -nogui $args{'database'} $args{'host'} $args{'iniFile'} 2>&1";
+
+  $self->printDebug("$command");
+
+  my $CCM_ADDR = `$command`;
+
+  if ($? ne 0) {
+    # Continuus startup failed
+    warn "$CCM_ADDR\n";
+    delete $ENV{CCM_DATETIME_FMT};
+    delete $ENV{CCM_INI_FILE};
+    return 0;
+  }
+  
+  $ENV{CCM_ADDR} = "$CCM_ADDR";
+  
+  return 1;
+};
+
+################################################################################
+
+=item command:
+
+  The command method acts as a interface to all other Continuus functions
+  not implemented in the Continuus module.
+
+  my $ccm = new Continuus;
+
+  $ccm->start(database => '/proj/Continuus4',
+	      host => 'stoxserv01');
+  
+  $ccm->command('status');
+
+  $ccm->stop;
+
+=cut
+
+sub command() {
+  my $self = shift;
+  my $command = shift;
+  my $result;
+  
+  printDebug($command);
+  $result = `ccm $command`;
+
+  print "$result\n";
+};
+
+################################################################################  
+
+=item stop:
+
+  The stop command quits the current Continuus session.
+
+=cut
+
+sub stop() {
+  my $StopMessage = `ccm stop 2>&1`;
+  if ($? ne 0) {
+    # Continuus stop failed
+    warn "Continuus stop failed.\n$StopMessage\n";
+    return 0;
+  }
+  
+  delete $ENV{CCM_DATETIME_FMT};
+  delete $ENV{CCM_ADDR};
+  delete $ENV{CCM_INI_FILE};
+  return 1;
+};
+	    
+###############################################################################	    
+
+=item query:
+
+  The query command is a interface to the Continuus query command.
+
+=cut
+
+sub query() {
+  my $self = shift;
+  my %args = @_;
+  
+  my ($output,$command,@list);
+ 
+  $command = "ccm query \"$args{'query'}\" $args{'flags'} -f \"$args{'format'}\" 2>&1";
+  $self->printDebug($command);
+
+  $output = `$command`;
+  $self->printDebug($output);
+
+  @list = split('/\r?\n/', $output);
+  $self->printDebug($#list);
+
+  for (@$output) { 
+    $_ = untaint($_) 
+  };
+  
+  if ($? ne 0) {
+    if (@$output >= 1) {
+      # One or more lines returned, can only be warnings.
+      warn "ccm query failed to execute: @$output";
+      return 0;
+    }
+    else {
+      # This is NOT an error situation!
+      # If no objects versions found ccm also returns 1.
+      return 1;
+    }
+  }
+  
+  return 1;
+};
+
+################################################################################
+
+=item checkOut:
+
+  Checks out a file.
+
+=cut
+
+sub checkOut() {
+  my $self = shift;
+  my %args = @_;
+  my ($result, $command);
+
+  if (defined $args{'version'}) {
+    $args{'version'} = "-to $args{'version'}";
+  }
+
+  $command = "ccm co $args{'version'} $args{'file'}";
+  $result = `$command`;
+  
+  return $?;
+}
+
+################################################################################
+
+=item checkIn:
+
+  Checks in a file.
+
+=cut
+
+sub checkIn() {
+  my $self = shift;
+  my %args = @_;
+  my ($result, $command);
+
+  if (defined $args{'comment'}) {
+    $args{'comment'} = "-c $args{'comment'}";
+  }
+  else {
+    $args{'comment'} = "-nc";
+  }
+
+  $command = "ccm ci $args{'comment'} $args{'file'}";
+  $result = `$command`;
+  
+  return $?;
+}
+
+################################################################################
+
+=item reconfigure:
+
+  Reconfigure command
+
+=cut
+
+sub reconfigure() {
+  my $self = shift;
+  my %args = @_;
+  my ($result, $command);
+
+  $command = "ccm reconf -p $args{'project'} $args{'parameter'}";
+  $result = `$command`;
+
+  return $?;  
+}
+
+################################################################################
+sub printDebug() {
+  my $self = shift;
+  my $tString = shift;
+
+  if($self->{DEBUG} == 1) {
+    print "DEBUG: $tString\n";
+  }
+};
+
+################################################################################
+
+=item debugOn:
+
+  Sets the debugging informatiopn on.
+
+=cut
+
+sub debugOn() {
+  my $self = shift;
+
+  $self->{DEBUG} = 1;
+}
+
+################################################################################
+
+=item debugOff:
+
+  Sets the debugging informatiopn off.
+
+=cut
+
+sub debugOff() {
+  my $self = shift;
+
+  $self->{DEBUG} = 0;
+}
+
+################################################################################
+sub untaint($) {	
+  my $ToUntaint = shift();
+
+  if ($ToUntaint =~ /(.+)/ms) { $ToUntaint = $1; }
+  return $ToUntaint;
+};
+
+	    
+################################################################################
+
+1;

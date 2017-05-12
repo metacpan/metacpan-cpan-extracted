@@ -1,0 +1,16 @@
+---
+abstract: 'Cache and/or compress JavaScript output'
+author:
+  - 'Moritz Onken <onken@netcubed.de>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-JavaScript
+requires:
+  Catalyst::Runtime: 0
+  JavaScript::Minifier::XS: 0
+  MRO::Compat: 0
+  Test::WWW::Mechanize::Catalyst: 0
+version: 0.995

@@ -1,0 +1,18 @@
+[% INCLUDE 'header.tt' %]
+
+<p>
+<a href="http://search.cpan.org/dist/CGI-Application-NetNewsIface/">CGI-Application-NetNewsIface</a> is
+a web-based read-only interface to an NNTP server, written in Perl
+by <a href="http://www.shlomifish.org/">Shlomi Fish</a>. It was intended to be
+used as a better interface for browsing the archives of the Perl mailing
+lists, and for general use.
+</p>
+
+<p>
+If you like CGI-Application-NetNewsIface and found it useful, please consider
+donating to <a href="http://donate.perl-foundation.org/">the Perl
+Foundation</a> and/or to <a href="http://www.shlomifish.org/meta/donate/">the
+author</a>.
+</p>
+
+[% INCLUDE 'footer.tt' %]

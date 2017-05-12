@@ -1,0 +1,14 @@
+<&|/_elements/wrapper, title => 'Manage repositories' &>
+
+<dl>
+% my $repositorys = CommitBit::Model::RepositoryCollection->new;
+% $repositorys->unlimit();
+% while ( my $p = $repositorys->next ) {
+<dt><%Jifty->web->link( url => '/admin/repository/'.$p->name, label => $p->name)%></dt>
+<dd<%$p->description%></dd>
+% }
+</dl>
+% if (Jifty->web->current_user->user_object->admin) {
+(<% Jifty->web->link( label => 'Create another repository', url => '/admin/create_repository')%>)
+% }
+</&>

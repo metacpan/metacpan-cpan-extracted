@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb78
+registers:
+  AF: 10169
+  AF_: 0
+  BC: 52783
+  BC_: 0
+  DE: 18468
+  DE_: 0
+  HL: 26928
+  HL_: 0
+  I: 0
+  IX: 44649
+  IY: 65227
+  PC: 4
+  R: 2
+  SP: 0

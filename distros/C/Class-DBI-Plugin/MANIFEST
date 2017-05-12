@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+Plugin.pm
+README
+t/01-require.t
+t/02-select.t
+META.yml                                 Module meta-data (added by MakeMaker)

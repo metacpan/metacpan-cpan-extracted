@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-Plugin-Session-Store-TestMemcached,
+version 0.001:
+
+  Easy, automatic creation of test Memcached instance
+
+This software is copyright (c) 2012 by John Napiorkowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

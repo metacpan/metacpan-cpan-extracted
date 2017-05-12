@@ -1,0 +1,18 @@
+#include <sys/types.h>
+/*----------------------------------------------------------
+  Module:  Convert::IBM390
+----------------------------------------------------------*/
+
+ /* This value is used to flag an invalid packed or zoned field.
+    It should work as long as those fields can't be more than 31
+    digits. */
+#define INVALID_390NUM  -5.5E50
+
+double  CF_packed2num ( const char *, int, int );
+int     CF_num2packed ( char *, double, int, int, int );
+double  CF_zoned2num ( const char *, int, int );
+int     CF_num2zoned ( char *, double, int, int, int );
+void    CF_fcs_xlate ( char *, char *, int, unsigned char * );
+void    _to_S390fw ( char *, long );
+void    _to_S390hw ( char *, long );
+int     _halfword ( char * );

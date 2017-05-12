@@ -1,0 +1,22 @@
+---
+abstract: 'INI file manager object style preserved format and sort order.'
+author:
+  - 'Ahmed Amin ELsheshtawy <support@mewsoft.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-IniMan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tie::IxHash: 0
+version: 1.20

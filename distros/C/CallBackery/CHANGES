@@ -1,0 +1,76 @@
+0.8.14
+  * added some dependencies back in
+
+0.8.13
+  * use require to load Mojo::SQLite in the sql property of the database module
+    opening up the option for using a diffrent database or none at all
+  * more Mojo::File cleanup
+
+0.8.12
+  * make login screen configurable
+
+0.8.9
+ * properly handle row selection after table reload
+
+0.8.5
+ * tr is not available in server.js
+0.8.3
+ * fix args regression
+0.8.2
+ * make sure args always returns at least a hashpointer
+
+0.8.1
+ * allow escape to cancle popupClosed
+ 
+0.8.0
+ * provide meta information to the formCfg initializer ... in the case of a popup this is the
+   data from the parent form. See SongForm for example use.
+0.7.1
+ * removed 'bad dependency' on non existing README
+0.7.0
+ * new action properties:  addToContextMenu and defaultAction. These two will get used in the table Plugin
+
+0.6.5 2016-08-19 tobi@oetiker.ch
+ * allow popups to open further popups via popup actions
+
+0.6.4 2016-07-04 tobi@oetiker.ch
+ * fix line focus ... keep focus if at least one table row has the property primary set
+
+0.6.3 2016-07-04 tobi@oetiker.ch
+ * fix table reloading
+
+0.6.2 2016-06-27 tobi@oetiker.ch
+ * it should be options not option
+
+0.6.1 2016-06-27 tobi@oetiker.ch
+ * introduced default screenCfg->{options}{warnAboutUnsavedData} => 1
+ * handle date as a column type for tables
+ * introduce btnCfg->{option}{noReload} => 1
+ * improved build system in template project
+
+0.5.0 2015-12-23 tobi@oetiker.ch
+ * properly handle 'string dates'
+ * properly layout upload button in toolbar
+ * new 'inivisible' TextWidget for storing record id in edit forms
+
+0.3.4 2015-12-08 tobi@oetiker.ch
+ * some more regressions fixed
+
+0.3.3 2015-12-08 tobi@oetiker.ch
+ * thirdparty got its own Makefile now
+
+0.3.2 2015-11-23 tobi@oetiker.ch
+ * fix sample app
+ * include missing plugin file
+
+0.3.1 2015-11-23 tobi@oetiker.ch
+
+ * never save dbh ... always request a copy via db
+ * fix reload handling in table widget
+
+0.2.0 2015-08-28 tobi@oetiker.ch
+
+ * big update
+ * prefixed all 'system' tables with cb
+ * moved Plugins to GuiPlugin
+ * renamed base classes into Abstract*

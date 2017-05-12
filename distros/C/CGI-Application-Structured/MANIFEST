@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/CGI/Application/Structured.pm
+t/001_load.t
+t/99_pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

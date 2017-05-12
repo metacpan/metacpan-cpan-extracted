@@ -1,0 +1,158 @@
+#!/usr/local/bin/perl -w
+
+#
+#	Create backup for view check-outs for all active releases
+#
+
+use strict;
+
+use Cwd;
+use Log::Log4perl;
+use ClearCase::Region;
+use ClearCase::Vob;
+
+sub mainprog
+{
+	use strict;
+	use Carp;
+
+	my(@subregions		) = ();
+	my(@active_rels		) = ();
+	my(@vobs			) = ();
+	my(@viewtag_array	) = ();
+	my($viewtag			) = "";
+	my($vob				) = "";
+	my($myvob			) = "";
+	my($cX				) = "";
+	my($subregion		) = "";
+	my($vobdir			) = "";
+	my($fn				) = "";
+	my($relno			) = "";
+	my($retval			) = 0;
+	my($logger			) = "";
+	my($appender		) = "";
+	my($layout			) = "";
+	my($configFile		) = "";
+	my($configFile_found) = 0;
+	my($dir				) = "";
+	my($platform		) = "";
+	my($HOME			) = "";
+	my($BACKUP			) = "";
+	my($PATH			) = "";
+
+	if (defined $^O) {
+		if ($^O eq "MSWin32") {
+			$platform = "MSWin32";
+		}
+		else {
+			$platform = "Unix";
+		}
+	}
+	else {
+		$platform = "MSWin32";
+	}
+	
+	if ($platform eq "Unix") {
+		$HOME = $ENV{HOME};
+		#
+		#	Uncomment if /usr/atria/bin is need in your $PATH
+		#
+		# $PATH	= $ENV{PATH};
+		# $ENV{PATH}		= "/usr/atria/bin:$PATH";
+	}
+	else {
+		$HOME = "C:";
+	}
+	$BACKUP	= "$HOME/logs";
+
+	foreach $dir (@INC) {
+		if ( -f "$dir/co_backup.conf" ) {
+			$configFile = "$dir/co_backup.conf";
+			$configFile_found = 1;
+			last;
+		}
+	}
+	croak("Error: co_backup.conf not found in any \@INC directory\n")
+		unless $configFile_found;
+	
+	Log::Log4perl->init($configFile);
+	$logger = Log::Log4perl->get_logger("Main");
+
+	chdir("/view");
+
+	@subregions = Region->subregions();
+	if ($#subregions < 0) {
+			$logger->error("Error: No subregions are defined in Region.cfg\n");
+			exit 1;
+	}
+	foreach $subregion (@subregions) {
+
+		@vobs = Region->vobs($subregion);
+		$vobdir = Region->vobdir($subregion);
+
+		foreach $vob (@vobs) {
+			$myvob = Vob->new($subregion, $vob);
+			@active_rels = $myvob->active_rels();
+			foreach $relno (@active_rels) {
+				$cX = $subregion . '_' . $relno;
+
+				# Appenders
+				$appender = Log::Log4perl::Appender->new(
+					"Log::Dispatch::File",
+					filename => "$HOME/logs/${cX}.${vob}.backup.log",
+					mode => "append",
+				);
+				$logger->add_appender($appender);
+
+				# Layouts
+				$layout = Log::Log4perl::Layout::PatternLayout->new(
+							"%d %p> %F{1}:%L %M - %m%n");
+				$appender->layout($layout);
+
+				@viewtag_array = `cleartool lsview -short '*_${cX}'`;
+				chomp(@viewtag_array);
+				if ($#viewtag_array < 0) {
+					next;
+				}
+				if (! open(OUTFILE, ">> $HOME/logs/${cX}.${vob}.backup.list")) {
+					$logger->error("Cannot open file $HOME/logs/${cX}.${vob}.backup.list.  Error: $!\n");
+				}
+				foreach $viewtag (@viewtag_array) {
+					if (! (-d ${viewtag})) {
+						$logger->error("Bad view ${viewtag}.  Error: $!\n");
+						next;
+					}
+					open(LSPRIV, "cleartool lsprivate -tag ${viewtag} -inv ${vobdir}/${vob} -co -short |");
+					while ($fn = <LSPRIV>) {
+						$fn =~ s/\/view\///;
+						chomp($fn);
+						if (! (-f ${fn})) {
+							$retval = system("cleartool startview ${viewtag}");
+							if ($retval != 0) {
+								$logger->error("Cannot startview ${viewtag}.  Error: $!\n");
+							}
+						}
+						if ( -d ${fn} ) {
+							next;
+						}
+						if ( -f ${fn} ) {
+							print OUTFILE "${fn}\n";
+						}
+					}
+					close(LSPRIV);
+				}
+				close(OUTFILE);
+				$retval = system("cat $HOME/logs/${cX}.${vob}.backup.list |/usr/bin/cpio -ocL | compress > ${BACKUP}/${cX}.${vob}.cpio.Z");
+				if ($retval != 0) {
+					$logger->error("Cannot create ${BACKUP}/${cX}.${vob}.cpio.Z.  Error: $!\n");
+				}
+			}
+		}
+	}
+}
+
+###############################################################################
+#	Main
+###############################################################################
+
+mainprog;

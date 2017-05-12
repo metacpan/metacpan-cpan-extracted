@@ -1,0 +1,77 @@
+Crypt::PassGen
+--------------
+
+This module provides a single command for generating random password
+that is close enough to a real word that it is easy to remember.
+It does this by using the frequency of letter combinations in 
+a language (the frequency table is generated during installation
+although multiple tables can be generated and used for different
+languages).
+
+This module should not be used for high security applications
+(such as user accounts) since it returns passwords that are not
+mixed case, have no punctuation and no letters. This word can be
+used as a basis for a more secure password.
+
+The language of the password depends on the language used to construct
+the frequency table.
+
+The source repository is on github: https://github.com/timj/perl-Crypt-PassGen
+
+Requirements
+------------
+
+Currently assumes /usr/dict/words or /usr/share/dict/words is available so that the
+frequency table can be constructed. On non-unix systems it might
+be easier simply to include a dictionary for this within the
+distribution. 
+
+Also requires the Storable module.
+
+Installation
+------------
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The first step may take a well since a freqeuncy table is generated
+as part of the installation. If /usr/dict/words is not available
+the location of a suitable dictionary must be put into the
+Makefile.PL
+
+
+Derivation
+----------
+
+This algorithm is based on that used in the PASSGEN program written by
+Mike Bartman of SAR, Inc as part of the SPAN security toolkit in 1989.
+
+
+Status
+------
+
+This is an early release of this module. It has not been tested
+extensively and must be considered in alpha release. 
+
+Author
+------
+
+This module was written by Tim Jenness  <tjenness@cpan.org>
+
+Copyright (C) 2000-2008, 2012 Tim Jenness.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Release Notes
+-------------
+
+V0.06   - Ensure that passwords are always the right length. In rare
+          cases the loop would exit early and return a shorter password.
+          Thanks to Vadim Pushtaev for the fix.
+
+V0.05   - Fix typo in call to _scale_thirds_down preventing the
+          module from working in some situations. Fix typo in call
+          to _scale_seconds_down during database build
+

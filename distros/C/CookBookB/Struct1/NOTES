@@ -1,0 +1,55 @@
+From roehrich Wed Jan 17 10:07:09 1996
+To: perl5-porters@africa.nicoh.com, tedz@apt.com
+Subject: Re: C structures and Perl
+Content-Length: 4599
+
+>From: tedz@DataMan (Ted Zuccarelli)
+
+>IF I could share the structure between the Perl and C would be good so that
+>I'll just process it.
+
+It can.  Think about it one step at a time.  It doesn't have to be
+complicated, it doesn't need ties, it doesn't need magic, it doesn't need a
+whiz-bang cool new xsubpp.  The only reason it would be complex is because
+people try to make it complicated by adding ties--and then doing that at the
+C level (it's no wonder that some people think this is complicated).
+
+KISS
+
+The steps:
+- You need a copy of the structure--build a constructor.
+- You have to be able to free that structure--build a destructor.
+- You need to get at each field of that structure--build getter/setters
+  for each field.
+- You need a typemap for the structure--heh
+
+
+>> > My ../abinput.h file contains:
+>> > 		typedef struct ab_input {
+>> > 			long    lTrackId;               /* Tracking number */
+>> > 			char    szDescription[80];      /* Tracking Description */
+>> > 			} AB_IN, *PAB_IN;
+>> > 
+>> > When I try co 'make' it, I get:
+>> > 	Error: 'PAB_IN' not in typemap in Test.xs, line 11
+>> > 	*** Error code 1
+>> > 	make: Fatal error: Command failed for target `Test.c'
+
+
+As the error states, you need a typemap.
+
+
+>> > What would the test.pl look like??
+
+Mine, for your example, looks like this:
+
+	require Test;
+
+	$a = Test->new;
+	$a->desc( "twiddle" );
+	$a->ab_main;
+
+
+The full working extension is included here.
+
+Dean

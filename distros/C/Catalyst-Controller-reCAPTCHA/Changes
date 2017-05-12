@@ -1,0 +1,19 @@
+# This file documents the revision history for the perl extension Catalyst::Controller::reCAPTCHA
+0.6 2 Sep 2010
+       - Fix the result of an overenthusiastic release
+0.6 1 Sep 2010
+       - remove stupid $result->{is_valid} == $result->{is_valid} line (thanks ner0x)
+0.5 31 Mar 2010
+        - fix RT 49603 Thanks Brian Philips and Castaway.
+0.4 Thu 18th June 2009
+        - Doc fixes
+0.31
+        - Hardcoded $c->stash->{recaptcha_ok} back into application.
+0.30001 
+        - Don't release modules late at night.
+0.3
+        - Significant architectural changes, thanks Bill Moesley
+0.2
+        - Some changes to improve sanity
+0.1
+        - Initial version that supplies two : Private methods in your controller to deal with the reCAPTCHA

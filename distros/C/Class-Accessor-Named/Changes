@@ -1,0 +1,41 @@
+Revision history for Class-Accessor-Named
+
+0.009 Mon Jan 18 11:28:33 PST 2010
+
+* Releng changes only (Upgrade to newer Module::Install)
+
+0.008 Thu Mar  1 23:33:17 EST 2007
+
+* Removed Test::Dependencies from build_requires. Spotted by Ishigaki-san
+
+0.007 Thu Mar  1 12:14:45 EST 2007
+
+* Remove Test::Dependencies. It's more trouble than it's worth.
+
+0.006 Tue Sep  5 18:22:53 EDT 2006
+
+* Require Class::Accessor
+
+0.005 Mon Sep  4 14:28:36 EDT 2006
+
+* Module::Install updated
+
+0.004 Mon Aug 14 22:15:51 EDT 2006
+
+* Shlomi Fish noticed a typo on the test suite.
+
+0.003 Tue Jul 18 18:46:37 EDT 2006
+
+* fixed dependencies and Test::Dependencies usage
+* updated Module::Install files in inc
+* updated META.yml and MANIFEST
+* no functionality changes
+
+0.002 Mon Jun 26 13:47:24 CDT 2006
+
+* Build system fixes 
+* No functionality changes
+
+0.0.1  Sat Jun 24 23:29:35 2006
+       Initial release.
+

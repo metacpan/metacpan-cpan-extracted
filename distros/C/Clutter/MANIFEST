@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+NEWS
+README
+dist.ini
+examples/basic-actor.pl
+lib/Clutter.pm
+perl-Clutter.doap
+t/00-stage.t

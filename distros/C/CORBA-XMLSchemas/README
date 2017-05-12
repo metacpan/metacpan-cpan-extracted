@@ -1,0 +1,41 @@
+CORBA::XMLSchemas - IDL compiler to WSDL/SOAP and W3C Schema
+
+Description:
+------------
+    idl2xsd, idl2wsdl and idl2soap parse the given input file (IDL) 
+    and generate : 
+    - a W3C Schema following the CORBA to WSDL/SOAP Interworking
+    - a WSDL file 
+    - a WSDL binding file
+    idl2rng generates :
+    - a RELAX NG Schema
+
+Prerequisites:
+--------------
+    CORBA::IDL
+    XML::DOM
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation 
+    CORBA::C - Compiler to C include
+    CORBA::JAVA - Compiler to Java
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and    
+    CORBA to WSDL/SOAP Interworking Specification are available 
+    on <http://www.omg.org/>.
+
+    WSDL 1.1 (Web Services Description Language) specifications
+    are available on <http://www.w3.org/TR/wsdl>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

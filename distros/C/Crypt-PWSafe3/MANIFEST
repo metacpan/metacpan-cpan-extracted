@@ -1,0 +1,16 @@
+lib/Crypt/PWSafe3/Databaseformat.pm
+lib/Crypt/PWSafe3/PasswordPolicy.pm
+lib/Crypt/PWSafe3/Field.pm
+lib/Crypt/PWSafe3/HeaderField.pm
+lib/Crypt/PWSafe3/Record.pm
+lib/Crypt/PWSafe3/SHA256.pm
+lib/Crypt/PWSafe3.pm
+Makefile.PL
+MANIFEST
+README
+t/run.t
+t/tom.psafe3
+CHANGELOG
+sample/test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

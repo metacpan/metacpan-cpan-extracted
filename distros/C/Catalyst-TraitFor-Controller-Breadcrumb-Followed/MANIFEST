@@ -1,0 +1,9 @@
+Changes
+lib/Catalyst/TraitFor/Controller/Breadcrumb/Followed.pm
+Makefile.PL
+MANIFEST
+README
+t/01_basic.t
+t/tlib/Icydee/MockCatalyst.pm
+t/tlib/Icydee/TestObject.pm
+META.yml                                 Module meta-data (added by MakeMaker)

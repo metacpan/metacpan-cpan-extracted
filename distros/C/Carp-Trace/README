@@ -1,0 +1,14 @@
+This is the README file for Carp::Trace, a perl module for simple
+caller tracing.
+
+Please refer to 'perldoc Carp::Trace' after installation for details.
+
+
+Carp::Trace follows the standard perl module install process
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module uses no C or XS parts, so no c-compiler is required.

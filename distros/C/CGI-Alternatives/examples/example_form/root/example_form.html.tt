@@ -1,0 +1,19 @@
+<html>
+    <meta charset="utf-8"> 
+    <head>
+        <title>An Example Form</title>
+    </head>
+    <body>
+        <form action="/example_form" method="post">
+            <p>
+            Say something: <input name="user_input" type="text" /><br />
+            [% IF result %]
+                <br />You wrote: [% result %]
+            [% END %]
+            <br />
+            <br />
+            <input type="submit" />
+            </p>
+        </from>
+    </body>
+</html>

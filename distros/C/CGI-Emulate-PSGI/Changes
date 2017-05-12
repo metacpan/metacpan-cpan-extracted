@@ -1,0 +1,78 @@
+0.23  2017-05-08 04:45:43 UTC
+
+        - Respect an NPH script's HTTP status line (wu-lee) #4
+
+0.22  2016-07-19 08:03:23 PDT
+        - Do not set HTTP_PROXY (kazeburo) #14
+
+0.21  2015-07-21 09:02:04 PDT
+        - Fix to restore the selected filehandle correctly #12
+
+0.20  2014-09-08 11:06:19 PDT
+        - Add Test::Requires dependency (andk)
+
+0.19  2014-08-31 14:04:44 JST
+        - Revert #3 since it causes deep recursion when printing to STDERR
+          inside CGI handler under some perl environments. #6
+
+0.18  2014-08-07 07:58:32 PDT
+        - Fix perl prereq (haarg) #7
+
+0.17  2014-08-03 18:30:54 PDT
+        - Make it work with debugger with perl 5.8.x (tehmoth) #5
+
+0.16  2013-09-18 12:23:21 JST
+        - Use tied handle for STDIN/STDERR (#3)
+        - Convert to Milla
+
+0.15 Fri Oct 19 15:09:17 PDT 2012
+     - Repackage with the latest Module::Install
+
+0.14 Mon Oct 31 10:37:49 PDT 2011
+     - Fixed a bug where croak was not imported from Carp (ctfliblime)
+
+0.13 Sun Sep 18 12:10:56 PDT 2011
+     - Set the status header to 302 if there's Location header but no Status in the resonse (ASP)
+
+0.12 Thu Jun  9 23:58:10 PDT 2011
+     - Fixed the PSGI header generation to prevent invalid PSGI response headers
+       such as newlines in the value and "Status" key
+
+0.11 Fri Feb 18 21:35:29 PST 2011
+     - Filter psgix.* environment too (mkanat)
+
+0.10 Sun May 16 00:39:55 PDT 2010
+     - Added a possible workaround to deal with Win32 systems to undo :utf8 PerlIO layer
+       perl #75106 (suggested by Eric Brine)
+
+0.09 Sat May  8 18:52:04 PDT 2010
+     - Added a test for utf8 decoding
+
+0.08 Sat May  1 04:30:25 PDT 2010
+     - Fixed Test::More deps
+
+0.07 Tue Apr 27 15:44:08 PDT 2010
+     - binmode the stdout filehandle when parsing
+
+0.06 Fri Mar  5 18:38:45 PST 2010
+     - Selects main::STDOUT before running the CGI handler to avoid some gotchas when
+       other file handles such as the temporary file handles are selected. (reported by athomason)
+
+0.05 Wed Jan  6 21:03:15 PST 2010
+     - Factored out CGI output parser into CGI::Parse::PSGI as well as
+       environment emulation as ->emulate_environment method (kazuho)
+
+0.04 Fri Dec 11 22:59:14 PST 2009
+     - Do not override existing %ENV values (kazuho)
+
+0.03 Sun Dec  6 06:05:25 GMT 2009
+     - Added docs about CGI::Compile
+     - Fixed a warning for SEEK_SET imported twice
+
+0.02
+    - fixed packaging issue
+
+0.01
+
+    - initial release
+

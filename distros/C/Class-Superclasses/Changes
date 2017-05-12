@@ -1,0 +1,34 @@
+Revision history for Perl extension Class::Superclass.
+======================================================
+
+0.07  2014-01-13
+
+     [MISC]
+     + added metadata for resources so that this dist is
+       considered for "CPAN PullRequest Challenge"
+     + added TODO
+
+0.06  2013-10-15
+     + switched to Dist::Zilla
+     + added support for Moo(se)?
+
+0.03  2007-12-01
+     - various bugfixes
+     - added support for parent.pm
+     - added support for quoted tokens
+     - added more tests
+
+0.02  2006-06-18
+     - bugfix in POD
+
+0.01  2006-05-16
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -XA -n Class::Superclass
+    - methods added:
+        * new
+        * superclasses
+        * document
+        * _get_base_values
+        * _get_isa_values
+        * _parse_expression
+        * _parse_quotelike

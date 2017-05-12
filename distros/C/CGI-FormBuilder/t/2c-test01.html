@@ -1,0 +1,89 @@
+<html>
+    <head>
+      <title>TEST</title>
+      <script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // name: standard text, hidden, password, or textarea box
+    var name = form.elements['name'].value;
+    if (name == null || ! name.match(/^[a-zA-Z]+$/)) {
+        alertstr += '- Invalid entry for the "Name" field\n';
+        invalid++;
+        invalid_fields.push('name');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+    </head>
+    <body>
+      <form action="TEST" method="get" onsubmit="return validate(this);"><input id="_submitted" name="_submitted" type="hidden" value="1" />
+      <table>
+        
+        <tr valign="top">
+          <td>
+            <b>Name</b>
+          </td>
+          <td>
+            
+
+        <input id="name" name="name" type="text" />
+      </td>
+    </tr>
+        
+        <tr valign="top">
+          <td>
+            Best Color
+          </td>
+          <td>
+            
+
+        <input checked="checked" id="color_red" name="color" type="radio" value="red" /> <label for="color_red">red</label>
+<input id="color_green" name="color" type="radio" value="green" /> <label for="color_green">green</label>
+<input id="color_blue" name="color" type="radio" value="blue" /> <label for="color_blue">blue</label>
+
+      </td>
+    </tr>
+        
+        <tr valign="top">
+          <td>
+            Sex
+          </td>
+          <td>
+            
+
+        <input id="sex_M" name="sex" type="radio" value="M" /> <label for="sex_M">Male</label>
+<input id="sex_F" name="sex" type="radio" value="F" /> <label for="sex_F">Female</label>
+
+      </td>
+    </tr>
+        
+        <tr valign="top">
+          <td>
+            Size
+          </td>
+          <td>
+            
+
+        <input id="size" name="size" type="text" value="42" />
+      </td>
+    </tr>
+        
+        <tr>
+          <td colspan="2" align="center">
+            <input id="_submit" name="_submit" type="submit" value="No esta una button del resetto" /> 
+          </td>
+        </tr>
+      </table>
+      </form>
+    </body>
+    </html>

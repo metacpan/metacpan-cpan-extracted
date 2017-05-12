@@ -1,0 +1,75 @@
+{
+   "abstract" : "micro config loader",
+   "author" : [
+      "ytnobody, C<< <ytnobody aaaattttt gmail> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.2",
+   "license" : "unknown",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Micro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Micro" : {
+         "file" : "lib/Config/Micro.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ytnobody/Config-Micro/issues"
+      },
+      "homepage" : "https://github.com/ytnobody/Config-Micro",
+      "repository" : {
+         "url" : "git://github.com/ytnobody/Config-Micro.git",
+         "web" : "https://github.com/ytnobody/Config-Micro"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "ytnobody <ytnobody@gmail.com>"
+   ]
+}

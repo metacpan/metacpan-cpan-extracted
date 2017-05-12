@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use Test;
+BEGIN { plan tests => 13 }
+
+package X;
+
+use Class::MakeMethods::Template::Hash (
+  new     => 'new',
+  'scalar'  => [ qw/ --class_keys a b c /]
+);
+
+package main;
+
+my $o = X->new();
+
+ok( 1 ); #1
+ok( ! defined $o->a ); #2
+ok( $o->a(123) ); #3
+ok( ! defined $o->{a} ); #4
+ok( defined $o->{'X::a'} ); #5
+ok( $o->a == 123 ); #6
+ok( ! defined $o->a(undef) ); #7
+ok( ! defined $o->a ); #8
+ok( $o->b(456) ); #9
+ok( $o->b == 456 ); #10
+ok( $o->a == 123 ); #11
+ok( ! defined $o->a (undef) ); #12
+ok( ! defined $o->a ); #13
+
+exit 0;
+

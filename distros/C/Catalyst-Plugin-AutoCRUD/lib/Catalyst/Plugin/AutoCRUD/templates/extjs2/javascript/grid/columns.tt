@@ -1,0 +1,244 @@
+    // the column model has information about grid columns.
+    // dataIndex maps the column to the specific data field in
+    // the data store
+
+    // returns a little icon which, when clicked on, redirects the browser to
+    // the grid of a related table
+    function createGridButton(id, table, url, pk) {
+        new Ext.Button({
+            cls: 'x-btn-text-icon'
+            ,tooltip: 'Jump to this ' + table
+            ,handler: function(btn, e) {
+                Ext.DomHelper.append(
+                    Ext.getBody()
+                    ,{
+                        tag: 'form'
+                        ,name: 'transportform'
+                        ,id: 'transportform'
+                        ,action: url
+                        ,method: 'POST'
+                        ,cn: pk
+                    }
+                ).submit();
+            }
+            ,icon: '[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'),
+                                            "table_go.png" ) %]'
+        }).render(document.body, id);
+    }
+
+    // text added to FK combo list to hint for the full-text-search option
+    var fk_combo_comment = ' (all matches)';
+
+    // create reusable renderer
+    Ext.util.Format.comboRenderer = function(combo, table, field, url) {
+        return function(value,metadata,record,rowindex,colindex,store) {
+            // choose what to render from the combobox store's data
+            if (rowindex === 0) {
+                var rec = combo.findRecord(combo.valueField, value);
+                var retval = rec ? rec.get(combo.displayField) : value;
+                return (retval.indexOf(fk_combo_comment) !== -1) ? value : retval;
+            }
+
+            if (value) {
+                // create an id, attached to a span, and hang a button off it
+                var id = Ext.id();
+                // if the related table is "hidden" we are not passed field,
+                // so this get() fails and the plain value is displayed
+                var pk = record.get('cpac__pk_for_' + field);
+                if (pk) {
+                    createGridButton.defer(1, this, [id, table, url, pk]);
+                    return ('<span id="' + id + '"></span>' + value);
+                }
+                return value;
+            }
+            return '';
+        }
+    };
+
+    // used to hack an extra entry into the store results on filters
+    var sfyRecord = Ext.data.Record.create([
+        { name: 'dbid' }, { name: 'stringified' }
+    ]);
+
+    // create the combo instances
+    [% FOREACH col IN cpac.tc.cols %]
+      [% NEXT UNLESS cpac.tm.f.$col.is_foreign_key OR cpac.tm.f.$col.extra('is_reverse') %]
+      [% NEXT IF cpac.tm.f.$col.extra('masked_by') %]
+      var fk_combo_[% col | replace('\'', '\\\'') %] = new Ext.form.ComboBox ({
+          valueField: 'dbid'
+          ,displayField: 'stringified'
+          ,hiddenName: 'combobox.[% col | replace('\'', '\\\'') %]'
+          ,hiddenId: 'fk_combo_[% col | replace('\'', '\\\'') %]'
+          ,loadingText: 'Searching...'
+          ,forceSelection: true
+          ,selectOnFocus: true
+          ,typeAhead: false
+          ,pageSize: 10
+          ,triggerAction: 'all'
+          ,lazyRender: true
+          ,listClass: 'x-combo-list-small'
+          ,lastQuery: ''
+          ,store: new Ext.data.JsonStore ({
+              [% IF cpac.tm.f.$col.extra('rel_type') == 'many_to_many' %]
+                url: '[% c.uri_for(
+                            c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list_stringified'),
+                            [ cpac.g.site, cpac_db, cpac.tm.f.$col.extra('via').0 ]
+                     ) %]'
+              [% ELSE %]
+                url: '[% c.uri_for(
+                            c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list_stringified'),
+                            [ cpac.g.site, cpac_db, cpac_table ]
+                     ) %]'
+              [% END %]
+              ,root: 'rows'
+              ,totalProperty: 'total'
+              ,fields: [ 'dbid', 'stringified' ]
+              ,listeners: {
+                  beforeload: function(store, options) {
+                      var start = options.params.start;
+                      var limit = options.params.limit;
+                      options.params.page = Math.floor(start / limit) + 1;
+                      [% IF cpac.tm.f.$col.extra('rel_type') == 'many_to_many' %]
+                        options.params.fkname = '[% cpac.tm.f.$col.extra('via').1 | replace('\'', '\\\'') %]';
+                      [% ELSE %]
+                        options.params.fkname = '[% col | replace('\'', '\\\'') %]';
+                      [% END %]
+                      if (fk_combo_[% col | replace('\'', '\\\'') %].getRawValue() && (options.params.page === 1)) {
+                          // so that we can hack in an extra row
+                          options.params.limit = 9;
+                      }
+                      return true;
+                  }
+                  ,load: function(store, records, options) {
+                      var queryText = fk_combo_[% col | replace('\'', '\\\'') %].getRawValue();
+                      if (queryText.length && (options.params.page === 1)) {
+                          // be sure not to accidentally add a 2nd copy of fk_combo_comment
+                          if (queryText.indexOf(fk_combo_comment) !== -1) {
+                              queryText = queryText.replace(fk_combo_comment,'');
+                          }
+                          // insert an extra row with full-text-search option
+                          store.insert(0, new sfyRecord({
+                              dbid: queryText
+                              ,stringified: queryText + fk_combo_comment
+                          }));
+                      }
+                  }
+              }
+          })
+          ,listeners: {
+              // delete the previous query in the beforequery event or set
+              // combo.lastQuery = null (this will reload the store the next time it expands)
+              beforequery: function(qe) {
+                  delete qe.combo.lastQuery;
+              }
+              ,blur : function() {
+                  if (this.allowBlank && this.getRawValue() === '') {
+                      this.clearValue();
+                  }
+              }
+          }
+      });
+    [% END %]
+
+    // we first process the main, ordinary cols (pk and others)
+    // the do the one_to_many cols, and then add a column with a delete button
+
+    var cm = new Ext.grid.ColumnModel([
+      [% FOREACH col IN cpac.tc.cols %]
+        [% ',' IF NOT loop.first %]{
+          header: '[% cpac.tc.headings.$col %]'
+          [% SET link = cpac.tm.f.$col.extra('ref_table') %]
+          [% ',hidden: true' IF cpac.tc.hidden_cols.exists(col) %]
+          [% IF (NOT cpac.tm.f.$col.extra('masked_by'))
+                AND (cpac.tm.f.$col.is_foreign_key OR cpac.tm.f.$col.extra('is_reverse')) %]
+            [% IF cpac.tm.f.$col.extra('rel_type').match('_many') %]
+            ,dataIndex: '[% col | replace('\'', '\\\'') %]'
+            ,editor: fk_combo_[% col | replace('\'', '\\\'') %] //reference to combo instance
+            ,sortable: false
+            ,menuDisabled: true
+            ,tooltip: 'Hover mouse over a cell<br />to show related data'
+            ,renderer: function (value,metadata,record,rowindex,colindex,store) {
+                if (rowindex === 0) {
+                    var combo = fk_combo_[% col | replace('\'', '\\\'') %]
+                    var rec = combo.findRecord(combo.valueField, value);
+                    var retval = rec ? rec.get(combo.displayField) : value;
+                    return (retval.indexOf(fk_combo_comment) !== -1) ? value : retval;
+                }
+                else if (record.get('[% col | replace('\'', '\\\'') %]').join('') === '') { return '' }
+                else {
+                    metadata.css += 'half-grey';
+                    metadata.attr += 'ext:qtitle="[% cpac.tc.headings.$col %]" ext:qtip="'
+                        + record.get('[% col | replace('\'', '\\\'') %]').join('<br />') + '"';
+                    return '<img ext:qtitle="[% cpac.tc.headings.$col %]" ext:qtip="'
+                        + record.get('[% col | replace('\'', '\\\'') %]').join('<br />')
+                        + '" src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'),
+                                        "magnifier.png" ) %]" />'
+                        + ' Show';
+                }
+            }
+            [% ELSE %]
+            ,dataIndex: '[% col | replace('\'', '\\\'') %]'
+            ,editor: fk_combo_[% col | replace('\'', '\\\'') %] //reference to combo instance
+            // pass combo instance to reusable renderer
+            [% SET ref_table = cpac.tm.f.$col.extra('ref_table') %]
+            [% IF cpac.c.$cpac_db.t.$ref_table.hidden == 'yes' %]
+              ,renderer: Ext.util.Format.comboRenderer(fk_combo_[% col %])
+            [% ELSE %]
+              // takes the combo-name, table display name (for tooltip), col
+              // name (for retrieving FK's PK data), and target URL for POST
+              ,renderer: Ext.util.Format.comboRenderer(
+                  fk_combo_[% col %]
+                  ,'[% cpac.c.$cpac_db.t.$ref_table.display_name %]'
+                  ,'[% col | replace('\'', '\\\'') %]'
+                  [% IF cpac.g.site == 'default' %]
+                    ,'[% c.uri_for( c.controller('AutoCRUD::Root').action_for('table'), [cpac_db], ref_table ) %]'
+                  [% ELSE %]
+                    ,'[% c.uri_for( c.controller('AutoCRUD::Root').action_for('source'), [cpac.g.site,cpac_db], ref_table ) %]'
+                  [% END %]
+              )
+            [% END %]
+            [% END %]
+          [% ELSE %]
+            ,dataIndex: '[% col | replace('\'', '\\\'') %]'
+            ,editor: new Ext.form.TextField({})
+            ,renderer: function (value,metadata,record,rowindex,colindex,store) {
+              [% IF cpac.tm.f.$col.extra('extjs_xtype') == 'checkbox' %]
+                if (rowindex === 0) { return '' }
+                if (value == '1') {
+                  return '<img src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'),
+                                        "bullet_green.png" ) %]" />';
+                }
+                else {
+                  return '<img src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'),
+                                        "bullet_red.png" ) %]" />';
+                }
+              [% ELSE %]
+                return value;
+              [% END %]
+            }
+          [% END %]
+        }
+      [% END %]
+      [% IF cpac.tc.delete_allowed == 'yes' %]
+        ,{
+            header: 'Delete'
+            ,width: 35
+            ,dataIndex: 'cpac-delete-column'
+            ,align: 'left'
+            ,sortable: false
+            ,menuDisabled: true
+            ,renderer: function (value,metadata,record,rowindex,colindex,store) {
+                if (rowindex === 0) { return '' }
+                else {
+                    metadata.attr += 'ext:qtitle="Delete" ext:qtip="' + record.get('cpac__display_name') + '"';
+                    return '<img ext:qtitle="Delete" ext:qtip="' + record.get('cpac__display_name') + '"'
+                        + ' src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'),
+                                        "bin_closed.png" ) %]" />';
+                }
+            }
+        }
+      [% END %]
+    ]);
+
+    // by default columns are sortable
+    cm.defaultSortable = true;

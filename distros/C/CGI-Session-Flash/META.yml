@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                CGI-Session-Flash
+version:             0.02
+abstract:            Session Flash Object
+license:             ~
+author:              
+    - Bradley C Bailey <cgi-session-flash@brad.memoryleak.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CGI::Session:                  4
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 35
+  43609:
+    - 193
+name: cb23
+registers:
+  AF: 8448
+  AF_: 0
+  BC: 10876
+  BC_: 0
+  DE: 14288
+  DE_: 0
+  HL: 43609
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-Frozen-301
+version:      3.0.1
+version_from: lib/Class/DBI/Frozen/301.pm
+installdirs:  site
+requires:
+    Class::Accessor:               0.18
+    Class::Data::Inheritable:      0.02
+    Class::Trigger:                0.07
+    File::Temp:                    0.12
+    Ima::DBI:                      0.33
+    List::Util:                    1.00
+    Storable:                      2.04
+    Test::More:                    0.47
+    UNIVERSAL::moniker:            0.06
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

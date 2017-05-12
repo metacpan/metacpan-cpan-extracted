@@ -1,0 +1,26 @@
+2008-02-14 18:57  mgrimes
+
+	* Build.PL, lib/Class/DBI/Pageset.pm, t/02-pageset-html.t: Changed
+	  reference to Data::Pageset::HTML to ::Render
+
+2008-02-13 03:46  mgrimes
+
+	* .releaserc, Build.PL, lib/Class/DBI/Pageset.pm: *
+	  class-dbi-pageset/lib/Class/DBI/Pageset.pm:
+	  Updated the pod to explain use of Data::Pageset::HTML, etc.
+	  * class-dbi-pageset/Build.PL:
+	  Added Class::DBI prereq (duh)
+
+2008-02-11 23:06  mgrimes
+
+	* ., .releaserc, MANIFEST, lib/Class/DBI/Pageset.pm: Prepping for
+	  release
+
+2008-02-11 22:39  mgrimes
+
+	* ., Build.PL, INSTALL, MANIFEST, MANIFEST.SKIP, lib, lib/Class,
+	  lib/Class/DBI, lib/Class/DBI/Pageset.pm, samples, t, t/00-new.t,
+	  t/01-pageset.t, t/02-pageset-html.t, t/96-kwalitee.t, t/98-pod.t,
+	  t/99-podcoverage.t: Initial implementation of Class::DBI::Pageset
+	  (heavily taken from Class::DBI::Pager
+

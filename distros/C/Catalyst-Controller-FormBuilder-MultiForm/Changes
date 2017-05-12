@@ -1,0 +1,21 @@
+Revision history for Perl module Catalyst::Controller::FormBuilder::MultiForm
+
+0.03 2015.10.27
+* Adding Catalyst::View::TT to TEST_REQUIRES to fix random automated test
+  failures (RT #107818)
+* Adding all supported templating engines to META_MERGE/recommended to make
+  it more clear which ones we support (instead of requiring all of them)
+* Moving from private svn repo to github
+* Misc cleanup to perldocs
+* Misc fixes to tests
+
+0.02 2007.02.26
+* Removed FindBin from makefile prereqs, forgot this comes bundled with perl
+* Cleaned up test names
+
+0.01 2007.02.25
+* Added prerequisite for Catalyst::Controller::FormBuilder 0.03
+* Added proper tests based on Catalyst::Controller::FormBuilder test app
+
+0.01_1 2007.02.16
+* Initial development version

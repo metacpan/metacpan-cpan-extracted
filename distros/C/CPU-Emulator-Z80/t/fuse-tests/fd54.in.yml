@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 84
+name: fd54
+registers:
+  AF: 55289
+  AF_: 0
+  BC: 63067
+  BC_: 0
+  DE: 45057
+  DE_: 0
+  HL: 54468
+  HL_: 0
+  I: 0
+  IX: 19342
+  IY: 54327
+  PC: 0
+  R: 0
+  SP: 0

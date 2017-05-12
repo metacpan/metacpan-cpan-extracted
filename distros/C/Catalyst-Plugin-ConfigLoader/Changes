@@ -1,0 +1,174 @@
+Revision history for Perl extension Catalyst::Plugin::ConfigLoader.
+
+0.34  Wed Apr 16 2014
+   - Repackage without non-standard tarball headers.
+
+0.33  Mon Jan 13 2014
+   - Fix config loading so that if passed a directory including
+     a . in the file name, then loading it as a directory works
+     (would have previously tried to force a specific filename
+     and failed)
+   - More comprehensive tests
+
+0.32  Thu Mar 14 2013
+   - Don't ship .git inside the tarball, whoops.
+
+0.31  Sat Mar 09 2013
+   - Fix repository location in metadata.
+
+0.30  Fri Aug 20 2010
+    - Fix for Windows regarding changes from 0.29
+
+0.29  Fri Aug 20 2010
+    - Fix issue with 2 character app names that are kept in versioned
+      directories (e.g. app called QX in QX-2.1.5/)
+    - bump dep on Config::Any to use the -ForceArray Config::General option
+      (caelum)
+
+0.28  Wed Jun 30 2010
+    - Pod Fixes related to config_substitutions() (Oleg Kostyuk)
+    - Pod fix for the "Using a local configuration file" section of
+      the Manual (RT #48823)
+    - Expand XML config example in the manual (teejay, Kieren Diment)
+
+0.27  Thu Aug 13 2009
+    - Require Catalyst 5.8 for tests that use ctx_request() (RT #48651)
+
+0.26  Mon Aug 10 2009
+    - Fix test to not need "parent" (RT #48547)
+    - Do not localize %ENV, rather, remove potentially conflicting
+      k-v pairs (RT #48557)
+
+0.25  Fri Aug 07 2009
+    - Fix get_config_local_suffix and get_config_path when finding values
+      from ENV vars (RT #47937)
+
+0.24  Mon Jun 29 2009
+    - Add an __ENV(foo)__ macro + tests (Stuart Watt)
+    - Document CATALYST_CONFIG_LOCAL_SUFFIX and MYAPP_LOCAL_CONFIG_SUFFIX
+      much better (Louis Erickson)
+    - Fix so that having CATALYST_CONFIG_LOCAL_SUFFIX set in $ENV{} doesn't
+      cause the tests to break.
+
+0.23  Sat Apr 18 2009
+    - Update Data::Visitor
+
+0.22  Mon Jan 05 2009
+    - add a cookbook entry re: UTF-8 and Config::General (Octavian Rasnita)
+    - switch from NEXT to MRO::Compat
+
+0.21  Mon Aug 11 2008
+    - add a cookbook entry for converting an existing config to
+      Config::General format
+    - fix up pod to explain in more detail how to pass options to each
+      driver class (Sergio Salvi)
+    - add nice syntax for plugins to match models/views/controllers (ilmari)
+
+0.20  Fri May 02 2008
+    - sort configs by filename for loading (RT #31498)
+    - updated pod with new example
+    - die() instead of silently skip files with extensions we can't handle
+
+    [THINGS THAT MAY BREAK YOUR CODE]
+    - deprecation notices removed, support for old keys removed.
+
+0.19  Wed Nov 21 2007
+    - fixed suffix appending to explicit config paths
+
+    [NOTE]
+    - Deprecation notices scream a little louder and sleep for 3 seconds
+      as this should be the last release for them
+
+0.18  Sat Oct 13 2007
+    - fix indentation on manual entry for DBIC::Schema config (Jeremy Wall)
+      RT #29967
+
+    [NOTE]
+    - Deprecation notices will remain intact
+
+0.17  Fri Aug 24 2007
+    - Requires Catalyst::Runtime 5.7008 for env_value()
+
+    [NOTE]
+    - Deprecation notices will hold for another release
+
+0.16  Thu Aug 23 2007
+    - separated out the macro expansion code into config_substitutions()
+      (Jason Kohles)
+    - allow users to specify their own macros in the "substitutions"
+      config (Johnathan Rockway)
+    - pass special constructor arguments to Config::Any. Requires Config::Any
+      0.08 (Gareth Kirwan)
+
+    [DEPRECATION NOTICE]
+    - the "file" and "config_local_suffix" config keys are now to be explicitly
+      set under the Plugin::ConfigLoader key. Support for these keys will be
+      removed in the next release.
+
+    [THINGS THAT MAY BREAK YOUR CODE]
+    - use Catalyst::Utils::env_value() to get $ENV values. This means that
+      MYAPP_* is of higher precedence than CATALYST_* -- this differs from
+      the behavior of older releases.
+
+0.15  Tue Aug 21 2007
+    - Allow multiple __HOME__ and __path_to()__ replaces in one string
+      (Greg Sheard)
+
+0.14  Tue Apr 03 2007
+    - switch to Module::Install
+    - added a user manual
+
+0.13  Fri Aug 25 2006
+    - loading code factored out into Config::Any [rataxis@cpan.org]
+      sponsored by Portugal Telecom
+
+0.12  Wed Jul 12 2006
+    - made the "local" suffix overrideable
+    - fixed __path_to()__ docs
+
+0.11  Tue Jul 11 2006
+    - remember, kids: 09 > 1
+
+0.1   Tue Jul 11 2006
+    - remove hash merging since it is now a core behavior
+    - added C/M/V legacy shortcuts
+    - fixed debug output some
+    - switched to Module::Pluggable::Object
+
+0.09  Wed May 24 2006
+    - ignore non-ref model/view/controller/component keys
+
+0.08  Tue May 23 2006
+    - added get_config_path() which extracts the path finding code
+    - added the ability to specify a MYAPP_CONFIG ENV variable
+    - more granular merging of top-level hashrefs
+    - more comprehensive tests
+
+0.07  Mon May 01 2006
+    - added Config::General support
+    - added nicer syntax for specifying models/views/controllers where
+      available
+
+0.06  Wed Apr 26 2006
+    - remove "last;" so that _local configs will be processed
+
+0.05  Thu Apr 18 2006
+    - __HOME__ now corresponds to $c->path_to( '' ) and nothing else
+    - __path_to( 'foo/bar' )__ turns in to $c->path_to( 'foo', 'bar' )
+    - attemps to load ${config}_local.$ext after ${config}.$ext for
+      an overriding effect
+
+0.04  Wed Feb 08 2006
+    - add finalize_config method
+    - make default finalize_config traverse the config and substitute
+      things beginning __HOME__/* with real path
+    - don't use File::Slurp, produces annoying warnings on some systems
+
+0.03  Mon Jan 30 2006
+    - pod fixes
+
+0.02  Sun Jan 29 2006
+    - refactoring (suggested by Christian Hansen)
+
+0.01  Sat Jan 28 2006
+    - original version

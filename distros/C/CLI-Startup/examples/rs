@@ -1,0 +1,372 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Rsync;
+use CLI::Startup;
+use List::Util qw{ reduce };
+use Hash::Merge qw{ merge };
+
+our $VERSION = 0.1;
+
+# Command-line options
+my $optspec = {
+    'archive!'     => 'Use archive mode--see manpage for rsync',
+    'checksum'     => 'Use checksums instead of file times',
+    'compress!'    => 'Enable compression',
+    'delete'       => 'Delete extraneous files from the destination',
+    'dest=s'       => 'Specify the destination of the copy or backup',
+    'devices!'     => 'Copy device files. Implied by --archive',
+    'dry-run'      => 'Just print what files would be copied; do not copy',
+    'exclude=s@'   => 'Do not copy files matching this (these) pattern(s)',
+    'group!'       => 'Preserve group ownership. Implied by --archive',
+    'include=s@'   => 'Do not exclude files matching this (these) pattern(s)',
+    'links!'       => 'Copy symbolic links as symbolic links. Implied by --archive',
+    'owner!'       => 'Preserve file owners (super-user only). Implied by --archive',
+    'perms!'       => 'Preserve file permissions. Implied by --archive',
+    'recursive!'   => 'Descend into sub-directories. Implied by --archive',
+    'restore'      => 'Use the destination as the source, and vice versa',
+    'rsh=s'        => 'Remote shell command to use. Defaults to ssh',
+    'rsync-path=s' => 'Path to rsync on the remote host',
+    'specials!'    => 'Copy special files. Implied by --archive',
+    'src=s'        => 'Specify the location to copy from',
+    'times!'       => 'Preserve file times. Implied by --archive',
+    'verbose+'     => 'Increase rsync verbosity',
+};
+
+# Default settings
+my $defaults = {
+    archive  => 1,
+    compress => 1,
+    rsh      => 'ssh',
+};
+
+# Parse command line options and read defaults from config file
+my $app = CLI::Startup->new({
+    usage            => '[options] [module ...]',
+    options          => $optspec,
+    default_settings => $defaults,
+});
+$app->init;
+
+# Make a note of the options supplied.
+my $config  = $app->get_config;
+my $options = $app->get_raw_options;
+my $restore = delete $options->{restore} || 0;
+
+# Now step through the command-line options that remain, running
+# rsync for each one.
+do {
+    my $module = shift @ARGV || 0;
+
+    # Combine command-line options with the requested module. This
+    # is an additional layer of indirection over what CLI::Startup
+    # provides, so we have to do some of our own work.
+
+    if ($module)
+    {
+        $app->die("No such module: $module")
+            unless defined $config->{$module};
+        $module = $config->{$module};
+    }
+    else
+    {
+        $module = {};
+    }
+
+    # Order of precedence:
+    # 1. Command-line options.
+    # 2. Options specified for $module in the config file.
+    # 3. Defaults specified in the config file.
+    # 4. App-defined defaults.
+
+    no warnings 'once';
+    my $options = reduce { merge($a, $b) } (
+        $options, $module, $config->{default}, $defaults,
+    );
+
+    my $source  = delete $options->{src};
+    my $dest    = delete $options->{dest};
+
+    # Optionally reverse the direction of transfer
+    ($source, $dest) = ($dest, $source) if $restore;
+
+    # Interpolate ~ like the shell does
+    $source =~ s/^~/$ENV{HOME}/;
+    $dest   =~ s/^~/$ENV{HOME}/;
+
+    # Initialize and run rsync
+    my $rsync = File::Rsync->new($options);
+    $rsync->exec({
+        src    => $source,
+        dest   => $dest,
+        outfun => sub { select STDOUT; $| = 1; print $_[0] },
+        errfun => sub { select STDERR; $| = 1; print $_[0] },
+    }) or $app->warn("Rsync failed for $source -> $dest: $!");
+
+} while @ARGV;
+
+__END__
+=head1 NAME
+
+rs - Wrapper for backups using rsync
+
+=head1 SYNOPSIS
+
+  rs                        ;# Use default settings from $HOME/.rsrc
+  rs [options] [module ...] ;# Backup the named modules
+
+=head1 DESCRIPTION
+
+The C<rs> command is a simple wrapper around C<rsync> that provides three basic services:
+
+=over
+
+=item
+
+It uses only the plain-English versions of C<rsync> options,
+
+=item
+
+It supports a config file containing default options, and
+
+=item
+
+The config file supports named groups of options, called (for lack of a better term)
+"modules."
+
+=over
+
+=item
+
+A combination of options lets you invent custom "modes."
+
+=item
+
+A combination including C<--src> and C<--dest> helps you make routine backups.
+
+=back
+
+=back
+
+=head2 Default Options
+
+The default options are convenient for doing ad hoc copies using rsync with default
+options. It lets you say this:
+
+  rs --src $HOME --dest backup:homedir/
+
+instead of this:
+
+  rsync --archive --compress --delete --rsh ssh \
+        --src $HOME/ --dest backup:homedir/
+
+If you usually use the latter combination of options, as I do, then
+C<rs> can at least save you some typing.
+
+=head2 Named Modules
+
+=head3 As Command Names
+
+Named "modules" are groupings of options in the config file, C<$HOME/.rsrc> by
+default. The C<rsync> command supports the C<--archive> option, which represents
+the grouping:
+
+  --recursive --links --perms --times --group --owner --devices --specials
+
+Using C<rs>, you can define a new grouping called "backup" which adds additional
+options, by putting the following in your config file:
+
+  [backup]
+  archive=1
+  compress=1
+  delete=1
+  rsh=ssh -2 -c arcfour -l backup_user -p 2222 -y -o BatchMode=yes
+
+Now you can make a backup of your home directory simply by issuing the command:
+
+  rs backup --src $HOME/ --dest backup:homedir/
+
+=head3 As Backup Tasks
+
+If a grouping in your config file includes C<--src> and C<--dest> options, then
+you can make a backup of a specific folder to a specific destination without
+remembering combinations of options. For example, you can put this in your config
+file:
+
+  [documents]
+  delete=1
+  exclude=*.tmp, *.bak, tmp/
+  src=/home/USERNAME/Documents/
+  dest=backup:Documents/
+
+And now you can backup your C<Documents> folder by issuing the command:
+
+  rs documents
+
+You can define multiple backup targets in this way, and then do all your
+nightly backups in a single command, like this:
+
+  rs documents music pictures
+
+=head3 Restoring from Backup
+
+C<rs> also adds the C<--restore> option, which reverses the role of C<--src>
+and C<--dest>. If you're using those options directly, you probably don't
+want to use C<--restore> option to swap them, since that will only confuse
+you. If you're using modules defined in the config file, however, and you
+think of those modules as backups, then C<--restore> probably does exactly
+what you think it does.
+
+=head1 OPTIONS
+
+=head2 --archive
+
+Use C<rsync> in "archive" mode; see the manpage for L<rsync>. Defaults
+to C<true>. Can be negated by setting the C<--no-archive> option.
+
+=head2 --checksum
+
+Use C<rsync> checksums to decide which files to update, instead of
+looking at the modification time and file size. Turned off by default.
+
+=head2 --compress
+
+Use compression; defaults to C<true>.  Disable compression entirely
+by using the C<--no-compress> option.
+
+=head2 --delete
+
+Delete extraneous files in the destination folders. I<Not> enabled
+by default, but for backup purposes you probably want to enable it.
+
+=head2 --dest [ HOST:DIRECTORY | HOST: | DIRECTORY ]
+
+Local or remote directory to copy I<to>. Mandatory unless one or more
+modules are specified on the command line.
+
+=head2 --devices
+
+Preserve device files (super-user only). Implied by C<--archive>,
+which is enabled by default, so this option is unset by default.
+It can be specifically disabled using the C<--no-devices> option.
+
+=head2 --dry-run
+
+Don't write any files; just print what actions would be taken.
+
+=head2 --exclude [pattern]
+
+Exclude files matching C<pattern>. Can be limited by also
+specifying the C<--include> option.
+
+=head2 --group
+
+Preserve group ownership. Implied by C<--archive>, which is enabled
+by default. This option is unset by default, since it would be
+redundant. It can be specifically disabled using the C<--no-group>
+option.
+
+=head2 --help
+
+Print a helpful help message.
+
+=head2 --include [pattern]
+
+Don't exclude files that match C<pattern>. Only does anything if
+the C<--exclude> option is also specified.
+
+=head2 --links
+
+Copy symbolic links as symbolic links. Implied by C<--archive>, which
+is enabled by default. This option is unset by default, since it would
+be redundant. It can be explicitly disabled using the C<--no-links>
+option.
+
+=head2 --manpage
+
+Display this manpage and exit.
+
+=head2 --owner
+
+Preserve file ownership (super-user only). Implied by C<--archive>,
+which is enabled by default. This option is unset by default, since
+it would be redundant. It can be explicitly disabled using the
+C<--no-owner> option.
+
+=head2 --perms
+
+Copy file permissions. Implied by C<--archive>, which is enabled
+by default. This option is not set by default, since it would be
+redundant. It can be explicitly disabled using the C<--no-perms>
+option.
+
+=head2 --rcfile FILE
+
+Read default settings from C<FILE> instead of C<$HOME/.rsrc>.
+
+=head2 --recursive
+
+Recurse into sub-directories. Implied by C<--archive>, which is
+enabled by default, so this option is unset by default. It can be
+specifically disabled using the C<--no-recursive> option.
+
+=head2 --restore
+
+Reverse the roles of C<--src> and C<--dest>. If you think of C<rs>
+as making a backup, then C<--restore> does just what you think it
+does: it pulls from the backup destination and overwrites the
+file or directory that you're normally backing up.
+
+=head2 --rsh [command]
+
+Command to use for remote access. Defaults to C<ssh>. A good
+choice for performance reasons is C<ssh -c arcfour>.
+
+=head2 --rsync-path [path]
+
+Path to run C<rsync> on the remote host.
+
+=head2 --specials
+
+Preserve special files (super-user only). Implied by C<--archive>,
+which is enabled by default, so this option is unset by default.
+It can be specifically disabled using the C<--no-specials>
+option.
+
+=head2 --src [ HOST:DIRECTORY | HOST: | DIRECTORY ]
+
+Local or remote directory to copy I<from>. Mandatory unless
+one or more modules are specified on the command line.
+
+=head2 --times
+
+Preserve file creation and modification times. Implied by C<--archive>,
+which is enabled by default, so this option is unset by default. It
+can be specifically disabled using the C<--no-times> option.
+
+=head2 --version
+
+Print version information and exit.
+
+=head2 --write-rcfile
+
+Write C<$HOME/.rsrc> or the file specified by C<--rcfile> with the
+settings from the current invocation.
+
+=head1 SEE ALSO
+
+L<rsync(1)>,
+L<ssh(1)>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011 Len Budney.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: the GNU General Public License as
+published by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

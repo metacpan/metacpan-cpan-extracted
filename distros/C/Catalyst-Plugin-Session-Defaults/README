@@ -1,0 +1,48 @@
+NAME
+    Catalyst::Plugin::Session::Defaults - Default values in your session.
+
+SYNOPSIS
+            use Catalyst qw/
+            Session
+            Session::Store::Moose
+            Session::State::Cookie
+            Session::Defaults
+        /;
+
+        __PACKAGE__->config->{session}{defaults} = {
+            likes_moose => 1,
+        };
+
+DESCRIPTION
+    This plugin lets you add default values to the intiial data that a
+    session will be created with.
+
+    You can either go with a hash in the session configuration key
+    "defaults", or you can override the "default_session_data" method to
+    return a hash dynamically.
+
+METHODS
+    default_session_data
+        This method returns a deep clone of
+
+            YourApp->config->{session}{defaults}
+
+        or an empty hash if there is no such key.
+
+        It will die on bad data.
+
+OVERRIDDEN METHODS
+    initialize_session_data
+        This method is overridden to provide the hook that calls
+        "default_session_data".
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::Session
+
+AUTHOR
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

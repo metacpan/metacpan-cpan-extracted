@@ -1,0 +1,15 @@
+Revision history for Catalyst-View-Haml
+
+1.00    2013-04-28
+        - No bug reports and ALL PASS on cpantesters
+          in almost three years, I guess it's good enough
+          to be bumped to 1.00 :)
+        - Added repository information
+        - Added cpanfile to repository
+        - fixed Changes format to be CPAN::Changes::Spec
+          compliant.
+
+
+0.01    2010-06-11
+        - First version, released on an unsuspecting world.
+

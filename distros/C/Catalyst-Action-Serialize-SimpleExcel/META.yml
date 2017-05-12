@@ -1,0 +1,36 @@
+---
+abstract: 'Serialize to Excel files'
+author:
+  - 'Rafael Kitover, C<< <rkitover at cpan.org> >>'
+  - 'Rafael Kitover <rkitover@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Spreadsheet::ParseExcel: 0
+  Test::Deep: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Action-Serialize-SimpleExcel
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Catalyst::Action::Serialize::SimpleExcel:
+    file: lib/Catalyst/Action/Serialize/SimpleExcel.pm
+    version: 0.015
+requires:
+  Catalyst::Controller::REST: 0
+  Spreadsheet::WriteExcel: 0
+  namespace::clean: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Action-Serialize-SimpleExcel/1.000/trunk/
+version: 0.015

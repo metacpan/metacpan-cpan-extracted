@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a6a9c287264c59f40480fb97ea69b850dfb90226 Changes
+SHA1 9791fba32e1793172d983b08c1e0244ba69ccc75 INSTALL
+SHA1 a7c133d863a5465472a0439d8cc3b2062b7a9efb LICENSE
+SHA1 02a660c64c8eedd2a3dd5f846bb9472db67b70cc MANIFEST
+SHA1 3a0716acf96f061226d71dbb192820fff2a3dd8f META.json
+SHA1 79577d1f7972efb03eb2e2aca0d172601a319360 META.yml
+SHA1 cd500b30099130a02214787082d5d88da6b3f6c0 Makefile.PL
+SHA1 4cfa1abef7ce4ffb59f5edd8e5cbbe711103c1e0 README
+SHA1 23a6e98bc02869007cf0f45ea1e777175c558e4c dist.ini
+SHA1 511ceeac2c36cae51d91cfdd27b3352c0e395e72 lib/CatalystX/Routes.pm
+SHA1 f23c6fb9ad189fa33e754cd1f77dd75b9b939a04 t/lib/MyApp1.pm
+SHA1 d75e3015b983dcd7c3b0680b0a114a2d22ded2ae t/lib/MyApp1/Controller/C1.pm
+SHA1 ac35e596405a76d186e625574efa782c8079ee4a t/lib/MyApp1/Controller/Root.pm
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 93e2d3d4b418a50a49441827ed0d2ef7588726ac t/release-pod-spell.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 e4706c129c4bb88e0e525212ac7fb0da4900e448 t/routes.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk1NubMACgkQIgMCsV8qvRKH1QCfTBvFdS4mgrpparLdrTjAKHnS
+y6UAnRwcGHg0vPa0pLKnMT3zJeQSJzCo
+=lTwF
+-----END PGP SIGNATURE-----

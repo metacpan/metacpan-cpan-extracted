@@ -1,0 +1,29 @@
+Compress::SelfExtracting version 0.04
+==========================================
+
+Compress::SelfExtracting allows you to create pure-Perl
+self-extracting scripts using a variety of compression algorithms.
+These scripts will then run on any system with a recent version of
+Perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Digest::MD5
+  Filter::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Sean O'Rourke.  All rights reserved, some wrongs
+reversed.  This module is distributed under the same terms as Perl
+itself.  Let me know if you actually find it useful.

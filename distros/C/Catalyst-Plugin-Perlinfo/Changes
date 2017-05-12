@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Plugin::Perlinfo.
+
+0.01  Sun Dec  4 15:30:25 2016
+	- original version; created by h2xs 1.23 with options
+		-X Catalyst::Plugin::Perlinfo
+

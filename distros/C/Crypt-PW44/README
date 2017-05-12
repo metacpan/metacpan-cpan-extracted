@@ -1,0 +1,11 @@
+This is the README file for the perl module 'Crypt::PW44.pm'.
+
+PW44 is a password generator that generates 44-bit (quite strong) passwords,
+which are easy to remember, being composed of 4 simple, short english words.
+The motivation for this module is http://xkcd.com/936 (Password Strength).
+
+See INSTALL for INSTALL instructions.
+
+See contrib/ for example scripts:
+"contrib/cgi-bin-genpw.pl" can be put in a web server's cgi-bin, for generating passwords on a web page (probably should be accessed via https !!).
+"contrib/genpw" is just a shell script that calls PW44 via a perl one-liner (-e on command line of perl).

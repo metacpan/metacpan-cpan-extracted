@@ -1,0 +1,67 @@
+Changes for Crypt::SRP
+
+0.017   2017/04/11
+        - @INC & . fix
+
+0.016   2016/05/10
+        - requires Math::BigInt-1.88 or newer
+
+0.015   2016/04/13
+        - minimizing dependencies, now only CryptX-0.030 + Math::BigInt-1.36
+
+0.014   2014/10/07
+        - fix compute_verifier
+
+0.013   2014/01/17
+        - optimized _calc_S_client
+
+0.012   2013/09/25
+        - documentation tweaks & cosmetics
+        - URL to github repo
+
+0.010   2013/06/17
+        - adding README
+        - removing utf8::downgrade workaround
+
+0.009   2013/06/17
+        - fix: hex padding when hex string has odd length
+
+0.008   2013/06/07
+        - calc_K fix (was broken for S with leading zeros)
+
+0.007   2013/05/19
+        - examples/srp_server.pl compatible with Mojoliciuos 4
+        - use Crypt::PRNG if available
+        - get_secret_S + get_secret_K accept optional $format parameter
+
+0.006   2013/04/11
+        - ($s, $v)=compute_verifier_and_salt
+          >>> ($v,$s)=compute_verifier_and_salt
+        - new($group, $hash, $interleaved, $format, $default_salt_len)
+          >>> new($group, $hash, $format, $interleaved, $default_salt_len)
+        - added server_client.t
+
+0.005   2013/04/10
+        - added reset(), dump(), load(), server_fake_B_s()
+        - server_init() and client_init() now return $self
+        - removed validate_A_or_B
+        - added server_verify_A() + client_verify_B()
+        - we support $self->random_bytes and Crypt::SRP->random_bytes
+        - new's param $format + $default_salt_len
+
+0.004   2013/04/08
+        - fixed bug in _calc_K
+        - new's param $interleaved
+        - documentation fixes
+
+0.003   2013/04/05
+        - no dependency on Digest::SHA1
+        - compatibility with Math::BigInt 1.991
+        - more reliable sample implementation of client/server
+        - ready for CPAN
+
+0.002   2013/04/05
+        - sample srp_client.pl + srp_server.pl (+ necessary changes)
+
+0.001   2013/04/04
+        - initial version

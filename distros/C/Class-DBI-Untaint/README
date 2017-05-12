@@ -1,0 +1,43 @@
+NAME
+    Class::DBI::Untaint - Class::DBI constraints using CGI::Untaint
+
+SYNOPSIS
+      use base 'Class::DBI';
+      use Class::DBI::Untaint;
+
+      ___PACKAGE__->columns(All => qw/id value entered/);
+      ___PACKAGE__->constrain_column(value => Untaint => "integer");
+      ___PACKAGE__->constrain_column(entered => Untaint => "date");
+
+DESCRIPTION
+    Using this module will plug-in a new constraint type to Class::DBI that
+    uses CGI::Untaint.
+
+    Any column can then be said to require untainting of a given type - i.e.
+    that any value which you attempted to set that column to (include at
+    create() time) must pass an untaint as_type() check.
+
+    In the examples above, the 'value' column must pass the check in
+    CGI::Untaint::integer, and similarly 'entered' must untaint as a date.
+
+SEE ALSO
+    Class::DBI, CGI::Untaint.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-Untaint@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2004-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

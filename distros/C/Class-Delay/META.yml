@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Class-Delay
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  Class::Accessor::Fast: 0
+  Test::More: 0
+  perl: 5.006
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Class::Delay:
+    file: lib/Class/Delay.pm
+    version: 0.02
+  Class::Delay::Message:
+    file: lib/Class/Delay/Message.pm
+generated_by: Module::Build version 0.20

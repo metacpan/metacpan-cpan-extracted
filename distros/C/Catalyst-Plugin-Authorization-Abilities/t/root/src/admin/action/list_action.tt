@@ -1,0 +1,18 @@
+list all actions:<br />
+
+<table>
+<tr><th>ID</th><th>Action</th><th></th><th></th></tr>
+[% WHILE (action=actions.next) -%]
+  <tr>
+  <td>[% action.id %]</td>
+  <td>[% action.name %]</td>
+  <td><a href="[% c.uri_for('/admin/action/') %][% action.id %]/edit">Edit</a></td>
+  <td><a href="[% c.uri_for('/admin/action/') %][% action.id %]/del">Delete</a></td>
+  </tr>
+[% END %]
+</table>
+<br />
+<ul>
+<li><a href="[% c.uri_for('/admin/action/add') %]">Add a action</a></li>
+<li><a href="[% c.uri_for('/admin/') %]">Return to administration</a></li>
+<ul>

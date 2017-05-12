@@ -1,0 +1,13 @@
+Changes
+lib/Class/Contract.pm
+lib/Class/Contract/Production.pm
+MANIFEST
+Makefile.PL
+demo.pl
+t/Magic.pm
+t/attr.t
+t/ctor.t
+t/dtor.t
+t/general.t
+t/method.t
+

@@ -1,0 +1,26 @@
+Revision history for Catalyst-View-TT-Filters-LazyLoader
+
+0.07    2008-07-13/13:16
+        - fix bug at test library. wrong name for test package name.
+        -  using Module::Install
+        - fix typo
+        - support setting config using MyApp->config() . thanks to question9
+
+0.06    2007-05-10/01:06
+        support pkgs .
+
+0.05    2007-05-07/16:00
+        add Catalyst::Action::RenderView as prereq 
+
+0.04    2007-05-03/00:59
+        remove C::P::Static::Simple C::P::ConfigLoader from TestApp
+
+0.03    2007-04-26/21:24
+        Add prereq.
+
+0.02    2007-04-26/09:05
+        Fix Helper package.
+
+0.01    2007-04-25/23:53
+        First version, released on an unsuspecting world.
+

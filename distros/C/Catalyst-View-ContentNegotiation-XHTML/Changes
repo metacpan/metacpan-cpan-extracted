@@ -1,0 +1,27 @@
+1.103
+  - Fix previously built dist being present in the tarball (t0m)
+1.102
+  - Add Vary header to prevent potential problems with downstream caches
+    (dorward)
+1.101
+  - Fix dependencies in Makefile.PL, merge fail :/
+1.100
+  - Refactor into a Moose Role for use with alternate views. (rafl)
+  - Additional documentation (t0m)
+  - Clone request headers rather than changing them (t0m)
+1.004
+  - Nick the OSX fragment out of the Catalyst::Runtime Makefile.PL to
+    beat my Mac into generating a correct dist. (t0m)
+1.003
+  - Fixes an tests to be fully Internet Explorer compatible (David Dorward)
+  - Change to MRO::Compat for perl 5.10 (t0m)
+1.002 2008-12-13
+  - Add 'use Class::C3' so that the module works on the currently
+    released Catalyst version. (t0m)
+1.001 2008-12-12
+  - Add tests for other Accept header cases where the current code
+    will get it wrong. (David Dorward)
+  - Fix all of these tests. (t0m)
+1.000 2008-12-12
+  - First working version of the module extracted from the quick hack
+    I have in every Catalyst application I've ever written. (t0m)

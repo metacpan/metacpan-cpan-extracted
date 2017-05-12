@@ -1,0 +1,31 @@
+NAME
+    Catalyst::Plugin::Upload::MIME - MIME type for uploads
+
+SYNOPSIS
+        use Catalyst qw[Upload::MIME];
+
+        if ( my $upload = $c->request->upload('field') ) {
+            print $upload->mimetype;
+            print $upload->extension;
+        }
+
+DESCRIPTION
+    Extends "Catalyst::Request::Upload" with "MIME type" magic.
+
+METHODS
+    extension
+        Returns file extension for "mimetype".
+
+    mimetype
+        Returns "MIME type" for tempname using magic.
+
+SEE ALSO
+    File::MimeInfo::Magic, Catalyst::Request, Catalyst::Request::Upload.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

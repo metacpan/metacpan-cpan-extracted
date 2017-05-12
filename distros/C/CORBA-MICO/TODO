@@ -1,0 +1,60 @@
+- It would be very nice to have alternate methods of loading
+  up interface information that don't rely on a running
+  interface repository. The two interesting variants of this
+  are:
+
+   1) Loading directly from IDL files
+   2) A "compiler" that writes the interface information into
+      module files.
+
+  1) is difficult to do, simply because the MICO IDL compiler
+  is too slow. libIDL from ORBit is fast enough to make
+  this practical, but with MICO's IDL compiler, the overhead
+  is most likely prohibitive.
+
+  There are a couple of different ways of doing 2). The first
+  one is to define a set of Perl interfaces that essentially
+  parallel the write interfaces for the Interface repository.
+  The generate .pm files would simply use these files to
+  initialize the local type structures. (In fact, these
+  interfaces could simply _be_ the IR write interfaces, if
+  we wanted to link in the MICO IR code)
+
+  The second way would be to dump the InterfaceDescription
+  information out in raw form into the __DATA__ of a .pm.
+  An easy way of doing this might be to reuse MICO's 
+  codecs, and thus pickle a CORBA::Any into its CDR
+  form.
+
+- Careful audit for reference counting leaks.
+
+- croak() doesn't unwind the C++ stack - so _var's can leak.
+
+- We probably need to surround _every_ call into MICO with
+  a trap for CORBA::SystemException
+
+- Check results of all calls to pmico_to_any, provide useful
+  error messages.
+
+- Cache results in hash table when looking up descriptions on the
+  server side to avoid tons of strcmp's.
+
+- Set up Typecode constants for loaded interfaces/modules.
+
+- Fill in member functions for TypeCode
+
+- When loading interfaces, we make too many calls to the
+  interface repository.
+
+- Globally remove all the damn (char *) casts when passing const
+  char *'s into Perl functions and do something better.
+
+- The conversions functions in exttypes.cc are pretty cheesy.
+  They should use C library functions when available. (In particular
+  for LongDouble, where the last bit tends to be wrong)
+
+- Optimize CORBA::MICO::Fixed.
+
+- A test suite.
+
+- Create the temporary files for the examples in /tmp

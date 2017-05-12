@@ -1,0 +1,70 @@
+NAME
+    Class::DBI::SAK - Class::DBI Swiss Army Knife (SAK)
+
+SYNOPSIS
+      use Class::DBI::SAK qw[:common :mysql FromCGI];
+
+ABSTRACT
+    This module encapsulates the pain and suffering that is importing
+    Class::DBI and all it's little helper friends.
+
+DESCRIPTION
+    By taking the busy work out of using Class::DBI as you see fit, your
+    code becomes more useful by size. Most of us end up using at least a
+    couple Class::DBI extensions in our programs, and it's just a pain.
+    Enter the Swiss Army Knife.
+
+    This module is intelligent. It knows how each module is supposed to be
+    used, and which ones override the need to "use base qw[Class::DBI]".
+
+  Tags
+
+    Tags may be specified either by groupings, begining with a colon (":"),
+    or by the name of the module following the "Class::DBI::" prefix.
+
+    Tags are available for all modules in the Class::DBI namepace, where it
+    makes sense to do so, as of the date of this distribution.
+
+    All modules are mentioned without the "Class::DBI::" prefix for brevity.
+
+   Groups
+
+    ":all"
+        All the modules specified in this module. This couldn't possibly be
+        useful to the end user (you) since so many of them conflict.
+
+    ":useful"
+        Modules that are generally useful all the time. AbstractSearch,
+        Join, Pager. This is the default if no tags are given at all.
+
+    ":mysql"
+        Modules for widened support for Mysql. mysql, mysql::FullTextSearch.
+
+   Modules
+
+    Extension
+    FromCGI
+    Pg
+    Replication
+    SQLite
+BUGS
+    First, this module could get out of date easily. This is due to the
+    nature of the uses of each of the modules. They are not consistent, so I
+    have to know about each one. Please submit a bug report if you find this
+    module out of date.
+
+    Second, no known bugs.
+
+    Send bug reports to http://rt.cpan.org/
+
+AUTHOR
+    Casey West, <casey@geeknest.com>
+
+COPYRIGHT
+    Copyright (c) 2003 Casey West. All rights reserved. This program is free
+    software; you may redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+SEE ALSO
+    the perl manpage, the Class::DBI manpage.
+

@@ -1,0 +1,58 @@
+==================================================
+Changes from 2013-11-24 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2014-11-24 11:29:28 +0000
+------------------------------------------
+
+  Change: 13588f8d321c7150849e1c0e726532a1e16affed
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 12:28:59 +0000
+
+    dont use return in map *oops* 
+
+------------------------------------------
+version 1.000 at 2014-11-24 07:59:30 +0000
+------------------------------------------
+
+  Change: 3107788966a52364056186710a3d15e1bf8b3e45
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 08:59:30 +0000
+
+    Merge branch 'master' of
+    https://github.com/benningm/Collectd-Plugins-RsyslogStats 
+
+  Change: d107275092ea5a34dc510730e09e08301b758967
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 08:58:30 +0000
+
+    add .gitignore file 
+
+  Change: 7efc861f620189a15d580813cd0c9b587b1981b6
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 08:57:08 +0000
+
+    fix modifing $_ in map 
+
+  Change: 90697a81ead1a0766aad36b1b85cb4cca1704ff3
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 08:54:06 +0000
+
+    prepare for first release 
+
+  Change: 3210dcbed3e9c702f1a7a80ce8eeea47fe2dd882
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-11-24 08:52:40 +0000
+
+    Create README.md 
+
+  Change: 574b2b0de116aff95c772324d4f1b6c2c48ca49b
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2014-11-24 08:48:50 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

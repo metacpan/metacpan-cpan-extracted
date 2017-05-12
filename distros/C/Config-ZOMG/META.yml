@@ -1,0 +1,28 @@
+---
+abstract: 'Yet Another Catalyst::Plugin::ConfigLoader-style layer over Config::Any'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-ZOMG
+requires:
+  Clone: 0
+  Config::Any: 0
+  Hash::Merge::Simple: 0
+  List::Util: 0
+  Moo: 0
+resources:
+  bugtracker: https://github.com/frioux/Config-ZOMG/issues
+  repository: git://github.com/frioux/Config-ZOMG.git
+version: 1.000000

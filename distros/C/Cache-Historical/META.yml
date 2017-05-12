@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Cache-Historical
+version:            0.05
+abstract:           Cache historical values
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBD::SQLite:          1.14
+    DBI:                  0
+    Log::Log4perl:        1
+    Rose::DB:             0.735
+    Rose::DB::Object::Loader:  0.764
+resources:
+    repository:  http://github.com/mschilli/cache-historical-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

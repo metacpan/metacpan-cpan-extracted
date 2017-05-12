@@ -1,0 +1,109 @@
+=head1 NAME
+
+Config::Model::models::Approx - Configuration class Approx
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+Configuration model for Approx
+
+=head1 Elements
+
+=head2 cache - approx cache directory
+
+Specifies the location of the approx cache directory (default: /var/cache/approx). It and all its subdirectories must be owned by the approx server (see also the $user and $group parameters, below.)I<< Optional. Type uniline. upstream_default: '/var/cache/approx'.  >> 
+
+=head2 interval - file cache expiration in minutes
+
+Specifies the time in minutes after which a cached file will be considered too old to deliver without first checking with the remote repository for a newer version. I<< Optional. Type integer. upstream_default: '720'.  >> 
+
+=head2 max_rate - maximum download rate from remote repositories
+
+Specifies the maximum download rate from remote repositories, in bytes per second (default: unlimited). The value may be suffixed with "K", "M", or "G" to indicate kilobytes, megabytes, or gigabytes per second, respectively.I<< Optional. Type uniline.  >> 
+
+=head2 max_redirects - maximum number of HTTP redirections
+
+Specifies the maximum number of HTTP redirections that will be followed when downloading a remote file. I<< Optional. Type integer. upstream_default: '5'.  >> 
+
+=head2 user - user that owns the files in the approx cache
+
+I<< Optional. Type uniline. upstream_default: 'approx'.  >> 
+
+=head2 group - group that owns the files in the approx cache
+
+I<< Optional. Type uniline. upstream_default: 'approx'.  >> 
+
+=head2 syslog - syslog(3) facility to use when logging
+
+I<< Optional. Type uniline. upstream_default: 'daemon'.  >> 
+
+=head2 pdiffs - support IndexFile diffs
+
+I<< Optional. Type boolean. upstream_default: '1'.  >> 
+
+=head2 offline - use cached files when offline
+
+Specifies whether to deliver (possibly out-of-date) cached files when they cannot be downloaded from remote repositories. I<< Optional. Type boolean. upstream_default: '0'.  >> 
+
+=head2 max_wait - max wait for concurrent file download
+
+Specifies how many seconds an approx(8) process will wait for a concurrent download of a file to complete, before attempting to download the file itself. I<< Optional. Type integer. upstream_default: '10'.  >> 
+
+=head2 verbose
+
+Specifies whether informational messages should be printed in the log. I<< Optional. Type boolean. upstream_default: '0'.  >> 
+
+=head2 debug
+
+Specifies whether debug messages should be printed in the log. I<< Optional. Type boolean. upstream_default: '0'.  >> 
+
+=head2 distributions - remote repositories
+
+The other name/value pairs are used to map distribution names to remote repositories. For example,
+
+  debian     =>   http://ftp.debian.org/debian
+  security   =>   http://security.debian.org/debian-security
+
+Use the distribution name as the key of the hash element and the URL as the value
+. I<< Optional. Type hash of uniline.  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Dominique Dumont
+
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2011, Dominique Dumont
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item LGPL-2.1+
+
+
+=back
+
+=cut
+

@@ -1,0 +1,164 @@
+NAME
+    Crypt::DSA - DSA Signatures and Key Generation
+
+SYNOPSIS
+        use Crypt::DSA;
+        my $dsa = Crypt::DSA->new;
+
+        my $key = $dsa->keygen(
+                       Size      => 512,
+                       Seed      => $seed,
+                       Verbosity => 1
+                  );
+
+        my $sig = $dsa->sign(
+                       Message   => "foo bar",
+                       Key       => $key
+                  );
+
+        my $verified = $dsa->verify(
+                       Message   => "foo bar",
+                       Signature => $sig,
+                       Key       => $key,
+                  );
+
+DESCRIPTION
+    *Crypt::DSA* is an implementation of the DSA (Digital Signature
+    Algorithm) signature verification system. The implementation itself is
+    pure Perl, although the heavy-duty mathematics underneath are provided
+    by the *Math::Pari* library.
+
+    This package provides DSA signing, signature verification, and key
+    generation.
+
+USAGE
+    The *Crypt::DSA* public interface is similar to that of *Crypt::RSA*.
+    This was done intentionally.
+
+  Crypt::DSA->new
+    Constructs a new *Crypt::DSA* object. At the moment this isn't
+    particularly useful in itself, other than being the object you need to
+    do much else in the system.
+
+    Returns the new object.
+
+  $key = $dsa->keygen(%arg)
+    Generates a new set of DSA keys, including both the public and private
+    portions of the key.
+
+    *%arg* can contain:
+
+    *   Size
+
+        The size in bits of the *p* value to generate. The *q* and *g*
+        values are always 160 bits each.
+
+        This argument is mandatory.
+
+    *   Seed
+
+        A seed with which *q* generation will begin. If this seed does not
+        lead to a suitable prime, it will be discarded, and a new random
+        seed chosen in its place, until a suitable prime can be found.
+
+        This is entirely optional, and if not provided a random seed will be
+        generated automatically.
+
+    *   Verbosity
+
+        Should be either 0 or 1. A value of 1 will give you a progress meter
+        during *p* and *q* generation--this can be useful, since the process
+        can be relatively long.
+
+        The default is 0.
+
+  $signature = $dsa->sign(%arg)
+    Signs a message (or the digest of a message) using the private portion
+    of the DSA key and returns the signature.
+
+    The return value--the signature--is a *Crypt::DSA::Signature* object.
+
+    *%arg* can include:
+
+    *   Digest
+
+        A digest to be signed. The digest should be 20 bytes in length or
+        less.
+
+        You must provide either this argument or *Message* (see below).
+
+    *   Key
+
+        The *Crypt::DSA::Key* object with which the signature will be
+        generated. Should contain a private key attribute (*priv_key*).
+
+        This argument is required.
+
+    *   Message
+
+        A plaintext message to be signed. If you provide this argument,
+        *sign* will first produce a SHA1 digest of the plaintext, then use
+        that as the digest to sign. Thus writing
+
+            my $sign = $dsa->sign(Message => $message, ... );
+
+        is a shorter way of writing
+
+            use Digest::SHA1 qw( sha1 );
+            my $sig = $dsa->sign(Digest => sha1( $message ), ... );
+
+  $verified = $dsa->verify(%arg)
+    Verifies a signature generated with *sign*. Returns a true value on
+    success and false on failure.
+
+    *%arg* can contain:
+
+    *   Key
+
+        Key of the signer of the message; a *Crypt::DSA::Key* object. The
+        public portion of the key is used to verify the signature.
+
+        This argument is required.
+
+    *   Signature
+
+        The signature itself. Should be in the same format as returned from
+        *sign*, a *Crypt::DSA::Signature* object.
+
+        This argument is required.
+
+    *   Digest
+
+        The original signed digest whose length is less than or equal to 20
+        bytes.
+
+        Either this argument or *Message* (see below) must be present.
+
+    *   Message
+
+        As above in *sign*, the plaintext message that was signed, a string
+        of arbitrary length. A SHA1 digest of this message will be created
+        and used in the verification process.
+
+TODO
+    Add ability to munge format of keys. For example, read/write keys
+    from/to key files (SSH key files, etc.), and also write them in other
+    formats.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-DSA>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Benjamin Trott <ben@sixapart.com>
+
+COPYRIGHT
+    Except where otherwise noted, Crypt::DSA is Copyright 2006 - 2011
+    Benjamin Trott.
+
+    Crypt::DSA is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

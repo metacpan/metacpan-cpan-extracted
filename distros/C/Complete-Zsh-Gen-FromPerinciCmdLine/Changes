@@ -1,0 +1,11 @@
+Revision history for Complete-Zsh-Gen-FromPerinciCmdLine
+
+0.002   2016-10-28 (PERLANCAR)
+
+	- Return error response when received Perinci::CmdLine scripts with
+	  subcommands.
+
+
+0.001   2016-10-27 (PERLANCAR)
+
+         - First release.

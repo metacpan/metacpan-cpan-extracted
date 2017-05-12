@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-09-25T01:16:28">
+<SubjectList total_results="1" page_size="10" page_number="1" shown_results="1">
+<SubjectData subject_id="perl_computer_program_language" book_count="118" marc_field="650" marc_indicator_1="" marc_indicator_2="0">
+<Name>Perl (Computer program language)</Name>
+<Categories>
+<Category category_id="computers.programming.languages.perl">Perl</Category>
+</Categories>
+</SubjectData>
+</SubjectList>
+</ISBNdb>

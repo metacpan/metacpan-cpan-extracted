@@ -1,0 +1,17 @@
+Revision history for Config-Apachish-Reader
+
+0.03    2016-03-11 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.02    2015-12-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention prior arts in See Also.
+
+
+0.01     2015-12-11 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,98 @@
+# NAME
+
+Catalyst::Plugin::CurrentComponents - Declare current components more easily.
+
+# SYNOPSIS
+
+Use the plugin in your application class:
+
+    package MyApp;
+    use Catalyst 'CurrentComponents';
+
+    MyApp->setup;
+
+Then you can use it in your controllers:
+
+    package MyApp::Controller::Example;
+
+    use base 'Catalyst::Controller';
+
+    sub current_model_instance {
+      my ($self, $c) = @_;
+      return $c->model("Form::Login", user_database => $c->model('Users'));
+    }
+
+    sub myaction :Local {
+      my ($self, $c) = @_;
+      my $c->model; # Isa 'MyApp::Model::Form::Login', or whatever that returns;
+    }
+
+# DESCRIPTION
+
+This plugin gives you an alternative to setting the current\_view|model(\_instance)
+via a controller method or via context helper methods.  You may find this a
+more readable approach than setting it via the stash.
+
+You may also enable a global option to set the current\_model\_instance via the
+return value of a match method.  See ["CONFIGURATION"](#configuration)
+
+Please Seee documention about Views and Models in [Catalyst](https://metacpan.org/pod/Catalyst).
+
+# METHODS
+
+This plugin adds the following methods to your context.
+
+## current\_model
+
+Sets $c->stash->{current\_model} if an argument is passed.  Always returns the
+current value of this stash key.  Expects the string name of a model.
+
+## current\_model\_instance
+
+Sets $c->stash->{current\_model\_instance} if an argument is passed.  Always returns the
+current value of this stash key.  Expects either the instance of an already created
+model or can accept arguments that can be validly submitted to $c->model.
+
+## current\_view
+
+Sets $c->stash->{current\_view} if an argument is passed.  Always returns the
+current value of this stash key.  Expects the string new of a view.
+
+## current\_view\_instance
+
+Sets $c->stash->{current\_view\_instance} if an argument is passed.  Always returns the
+current value of this stash key.  Expects either the instance of an already created
+view or can accept arguments that can be validly submitted to $c->view.
+
+# CONFIGURATION
+
+This plugin supports configuration under the "Plugin::CurrentComponents" key.
+For example:
+
+    MyApp->config(
+      'Plugin::CurrentComponents' => {
+        model_instance_from_return => 1,
+      },
+    );
+
+## model\_instance\_from\_return
+
+Allows one to set the current\_model\_instance from the return value of a matched
+action.  Please note this is an experimental option which is off by default.
+The return value must be a defined, blessed objected for this behavior to take
+place.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

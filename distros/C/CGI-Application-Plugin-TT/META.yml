@@ -1,0 +1,27 @@
+---
+name: CGI-Application-Plugin-TT
+version: 1.05
+author:
+  - 'Cees Hek <cees@crtconsulting.ca>'
+abstract: Plugin that adds Template Toolkit support to CGI::Application
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Application: 4.0
+  Class::ISA: 0
+  File::Spec: 0
+  Scalar::Util: 0
+  Template: 2.0
+recommends:
+  CGI::Application::Plugin::DevPopup: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  CGI::Application::Plugin::TT:
+    file: lib/CGI/Application/Plugin/TT.pm
+    version: 1.05
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

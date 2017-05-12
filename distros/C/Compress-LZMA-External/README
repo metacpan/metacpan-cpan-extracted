@@ -1,0 +1,31 @@
+NAME
+    Compress::LZMA::External - Compress and decompress using LZMA
+
+SYNOPSIS
+      use Compress::LZMA::External qw(compress decompress);
+      my $compressed = compress($raw_data);
+      my $decompressed = decompress($compressed_data);
+
+      # you can also export these:
+      my $compressed_fast = compress_fast($raw_data);
+      my $compressed_best = compress_best($raw_data);
+
+DESCRIPTION
+    The Lempel-Ziv-Markov chain-Algorithm (LZMA) is an data compression
+    algorithm. It compresses very well (better than gzip and bzip2),
+    compresses very slowly (much slower than bzip2) but decompresses
+    relatively quickly.
+
+    This module is an interface to the lzma command-line program, available
+    under Ubuntu with 'sudo apt-get install lzma'.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2008-9, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

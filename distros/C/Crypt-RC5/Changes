@@ -1,0 +1,14 @@
+Revision history for Perl extension Crypt::RC5.
+
+2.00 Tue Nov 5 9:53:47 2002
+	- Significant fix. The newline error has been fixed as well as overall
+          improvement of code. Many thanks to Jeff Lawson <jlawson@bovine.net>.
+
+1.01 Mon Nov 26 10:08:32 2001
+	- Service release. Accidentally left one line of debug code active
+	  in previous release. My apologies.
+
+1.0  Fri Nov 23 12:51:01 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n Crypt::RC5
+

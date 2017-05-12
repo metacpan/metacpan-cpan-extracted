@@ -1,0 +1,42 @@
+Crypt-OpenSSL-ECDSA version 0.03s
+================================
+
+This module provides an interface to the ECDSA (Elliptic Curve Digital
+Signature Algorithm) functions in OpenSSL.
+
+
+INSTALLATION
+
+To compile and install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+By default, this will compile against and link with OpenSSL in
+/usr/include/openssl and /usr/lib/libcrypto.so
+
+You can change the location of the OpenSSL headers and library to use with the
+OPENSSL_PREFIX (which defaults to /usr)
+environment variable, for example:
+
+OPENSSL_PREFIX=/home/mikem/playpen/openssl-1.0.2/ perl Makefile.PL
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Crypt::OpenSSL::EC
+ OpenSSL (0.9.8a or later) libcrypto.so library and headers with EC and ECDSA enabled
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Mike McCauley
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,49 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Session-Store-FastMmap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::FastMmap" : "1.29",
+            "Catalyst::ClassData" : 0,
+            "Catalyst::Plugin::Session" : "0.27",
+            "Catalyst::Runtime" : "5.8",
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "MRO::Compat" : 0,
+            "MooseX::Emulate::Class::Accessor::Fast" : 0,
+            "Path::Class" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.16"
+}

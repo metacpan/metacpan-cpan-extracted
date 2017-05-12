@@ -1,0 +1,355 @@
+=head1 NAME
+
+Cisco::Reconfig - Parse and generate Cisco configuration files
+
+=head1 SYNOPSIS
+
+	use Cisco::Reconfig;
+	my $config = readconfig("/my/cisco/config");
+
+	use Cisco::Reconfig qw(stringconfig);
+	my $config = stringconfig("cisco config", "goes here");
+
+=head1 DESCRIPTION
+
+Cisco::Reconfig makes it easier to write programs to generate changes to Cisco
+configuration files.
+
+Cisco::Reconfig is a module that parses Cisco router configuration files.  It
+doesn't have any real understanding of Cisco configurations so it
+might be useful for other similar configuration languages.  It knows
+that nesting is shown by indentation.  It knows that C<!> means a
+comment.  It knows that C<no> may proceed a line without changing
+where that line exists in the hierarchy.  It doesn't know much else.
+
+Cisco::Reconfig can be used to modify configurations.  The C<set()> method 
+will check the current configruation and return commands to change
+it if it is other than what is wanted (as passed to the C<set()>
+method).
+
+=head2 DETAILS
+
+Some of the accessor methods return a special "undef" object instead
+of a proper undef.  This is so that code that uses accessors 
+doesn't have to be paranoid about undefined values.  This "undef" object
+tests as false in boolean context however it is C<defined()>ed.
+
+Methods that return configuration items can return items that
+represent any particular word in the configruation file.  For
+example, with the following configuration & code, the return
+value for the C<get()> method would represent the word
+C<access-list> in both of the lines:
+
+	ip as-path access-list 111 deny _10993_
+	ip as-path access-list 111 permit .*
+
+	$config->get('ip as-path access-list');
+
+Most of the time you don't need to worry about the fact that the
+object represents a word.  Another way to look at it is that the
+object represents a selection of lines from the configuration file.
+Sometimes that selection is a single line.  Sometimes it is a block.
+Sometimes it is a few lines that start with the same tokens.
+
+To look at all the different as-path access
+lists, the following would work:
+
+	$config->get('ip as-path access-list')->all;
+
+The word C<no> is handled specially: it is discarded.  Many cisco
+directives start with the word C<no>.  To make the module more
+usable, the word C<no> is ignored during parsing.  It is kept in
+the text so, if you look for something that might have a C<no> 
+in front of it, you'll get a hit if the C<no> is there or isn't
+there.  For example:
+
+	my (@cdp_disabled);
+	for my $context ($config->get('interface')->all(qr{^ether}i)) {
+		my $cdp = $context->get('cdp enable');
+		push(@cdp_disabled, $context)
+			if $cdp =~ /no cdp enable/;
+	}
+
+=head1 FUNCTIONS
+
+There is just one function provided: C<readconfig()>.  Readconfig
+takes a single argument: a filename or file handle.  It parses
+the file and returns an Cisco::Reconfig object.
+
+=head1 MAIN METHODS
+
+=over 4
+
+=item ->get(@designators)
+
+The C<get()> method is the key to looking up items in a configuration
+file.  It takes an array of designators as an argument.  A designator
+is simply something that identifies a portion of a configuration
+file.  For example C<('interface')> is a designator for all the interfaces
+and C<('ip route')> is a designator for all the static routes.
+
+When multiple designators are specified, they are used for nested
+configuration items.  For example, 
+C<('router bgp', 'neighbor')> would be a designator for all the
+BGP neighbors.  This assumes that there is only one C<router bgp>
+defined.
+
+In array context, C<get()> will follow multiple paths to find 
+configuration items that match the specification.  For example
+C<('interface', 'ip address')> would return a list of ip address
+items across multiple interfaces.
+
+Designators must exactly match words in the configuration.  You may
+not abbr anythng.
+
+=item ->set(@designators, $newvalue)
+
+The C<set()> method will generate Cisco configuration snippets
+that will modify the configuration of an item.  For example,
+the following code:
+
+	my $ser0 = $config->get('interface Serial0');
+	print $ser0->set('ip address', 
+		'ip address 207.181.198.194 255.255.255.252');
+
+Will print:
+
+	interface Serial0
+	 ip address 207.181.198.194 255.255.255.252
+	exit
+
+If the configuration already matches the C<$newvalue> then
+nothing would be printed.
+
+The designator(s) say what will be modified.  This should either
+be represent a line or an entire block.  When multiple designators
+are needed, pass them as an anonymous array.  The above example
+could also have been written as:
+
+	print $config->set('interface Serial0', 'ip address',
+		'ip address 207.181.198.194 255.255.255.252');
+
+If no designators are needed, don't pass any.  The following
+is nearly the same as the preceeding;
+
+	my $ipaddr = $config->get('interface Serial0', 'ip address');
+	print $ipaddr->set( 'ip address 207.181.198.194 255.255.255.252');
+
+When providing code snippets to C<set()>, indent blocks just like
+Ciscos do when they display their configuration.  For example, the
+following:
+
+	print $config->set("ip access-list extended all-addresses", <<END);
+		ip access-list extended all-addresses
+		 permit ip any any
+		!
+	END
+
+Will print the following if the access list ins't already set as
+listed:
+
+	ip access-list extended all-addresses
+	 permit ip any any
+	exit
+
+When modifying a block, include the configruation line that starts
+the block in the replacement text.  For example, when setting an entire
+interface, provide the entire block:
+
+	print $config->set('interface Serial0',<<END);
+		interface Serial0 point-to-point
+		 ip address 219.22.221.3 255.255.255.252
+		 bandwidth 3022
+		!
+	END
+
+=item ->all($regex)
+
+The C<all()> method can be used to expand and select configuration
+items.
+
+For example, to make sure that all loopback interfaces use a 
+netmask of 255.255.255.255, use the following:
+
+	for my $loop ($config->get('interface')->all(qr{^Loop})) {
+		my $ip = $loop->get('ip address');
+		next unless $ip->text =~ /\A\s*ip address (\S+) \S+\s*\Z/;
+		print $ip->set(undef, "ip address $1 255.255.255.255");
+	}
+
+The C<$regex> paramater is optional. 
+
+=back
+
+=head1 ACCESSOR METHODS
+
+=over 4
+
+=item ->single()
+
+Cisco::Reconfig objects may represent any word in a configruation file.
+For example the word "address" in the following is represented by
+an object that would be returned by the code that follows.
+
+	interface Loopback0 
+	 ip access-group 151 in
+	 ip address 218.28.41.38 255.255.255.255
+	!
+
+	my $address_word = $config->get('interface Loopback0', 'ip')
+		->all(qr{^address});
+
+C<single()> answers the question: does this Cisco::Reconfig object
+uniquely specify a single point in the configuration?  In the example
+above, the object for word C<ip> (above) does not but the object
+for the word C<address> does.
+
+C<single()> returns an object (representing the last word on the
+line) or undef.
+
+=item ->zoom()
+
+C<zoom()> is the same as to C<single()> except that it will always
+return a valid Cisco::Reconfig object.  
+
+=item ->endpt()
+
+Returns an Cisco::Reconfig object representing the last word on a configuration
+line that could follow from the current ZYZ object.  When there are
+multiple possibilities the object picked is nearly random.
+
+=item ->next()
+
+C<next()> returns an Cisco::Reconfig object representing the last word on the
+suceeding line of the current configuration block.
+
+When used at the beginning of a block, it returns the last word of
+the first line in the block.
+
+=item ->context()
+
+Returns the configuration object that represents the surounding context.
+
+	# returns the "undefined" object
+	$config->context 
+
+	# returns $config
+	$config->get('interface Loopback0')->context 
+
+	# returns $config->get('interface Loopback0')
+	$config->get('interface Loopback0', 'ip address')->context 
+
+C<context()> always returns a configuration object.
+
+=item ->subs()
+
+For Cisco::Reconfig objects that represent a word in a line that introduces
+a block of configuration items (such as most C<interface> lines),
+the C<subs()> function returns an Cisco::Reconfig object that represents the
+contents of the block.
+
+If the Cisco::Reconfig object in question does not represent the start of a
+configuration block, the "undefined" object is returned.
+
+=item ->kids()
+
+For Cisco::Reconfig objects that do not uniquely specify a single line
+(ie: C<! ->single()>), the ->kids() method will return an array
+of objects representing the possible following words.  
+
+If there is only one possibility, that one possibility is returned.
+
+If the Cisco::Reconfig object represents the last word on a configuration line
+then that word is returned.
+
+=back
+
+=head1 MISCELLANEOUS METHODS
+
+=over 4
+
+=item ->text()
+
+Returns the text from the original configuration file (in original
+order) of all of the lines that could follow from the current Cisco::Reconfig
+object.  
+
+When the invoking Cisco::Reconfig object represents a single line C<text()>
+returns that line.  When the invoking Cisco::Reconfig object represents a 
+block C<text()> returns the entire block.  When the Cisco::Reconfig object
+represents a word with multiple possible completions, C<text()>
+returns all the completions.
+
+=item ->alltext()
+
+Returns the text from the original configuration file of all the lines that could
+follow from the current Cisco::Reconfig object and all lines that are introduced
+by the current object. 
+
+To get the text of all interface definitions in their entirety, use;
+	
+	$config->get('interface')->alltext
+
+=item ->setcontext()
+
+Returns an array of configuration lines that define the block
+surrounding the invoking object.
+
+=item ->unsetcontext()
+
+Returns an array of the word C<exit> repeated as many times as
+nessasary to undo a C<setcontext()>.
+
+=item ->block()
+
+Returns true if the object represents a whole configuration block.
+
+=back
+
+=head1 TWEAKS
+
+Some cisco configurations have a minus one indent beginning with the
+C<class> keyword.  This exception is matched and handled.  To change the
+regex for what is accepted for a minus-one indent, override
+C<$Cisco::Reconfig::allow_minus_one_indent> to a new regex.  Set to C<undef>
+to disable this override. 
+
+Some cisco configurations have a plus one indent beginning with the
+C<service-index> keyword.  This exception is matched and handled.  To change the
+regex for what is accepted for a plus-one indent, override
+C<$Cisco::Reconfig::allow_plus_one_indent> to a new regex.  Set to C<undef>
+to disable this override.
+
+If you encounter other broken indents, please let the maintiner know.  If it
+can be handled with the above overrides, do so.  If it cannot, you can change
+C<$Cisco::Reconfig::bad_indent_policy> to C<WARN> or C<IGNORE>.  The default
+behavior is to die.
+
+=head1 OVERLOADING
+
+Two operators are overloaded: boolean tests and stringification.
+Cisco::Reconfig objects booleanify as true if they are the special undefined
+objects.  Cisco::Reconfig objects stringify as their text lines.
+
+=head1 CAVEATS
+
+Since Cisco::Reconfig doesn't really understand Cisco configuration files
+it can't know things that you might think it should.
+
+For example, it doesn't know that C<interface Serial0> is the
+same as C<int ser 0> nor even C<interface Serial 0>.  Be very
+careful about where Cisco's actually put spaces and where they 
+don't.
+
+No attempt has been made to make this module particularly fast
+or efficient for the computer.
+
+Cisco::Reconfig objects don't automatically garbage collect themselves because
+they are highly self-referrential.
+
+=head1 LICENSE
+
+Copyright (C) 2002-2010 David Muir Sharnoff <cpan@dave.sharnoff.org>
+Copyright (C) 2011-2012 Google, Inc.
+This module may be licensed on the same terms as Perl itself.
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddb4
+registers:
+  AF: 40076
+  AF_: 0
+  BC: 10666
+  BC_: 0
+  DE: 11906
+  DE_: 0
+  HL: 19912
+  HL_: 0
+  I: 0
+  IX: 39940
+  IY: 35811
+  PC: 2
+  R: 2
+  SP: 0

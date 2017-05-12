@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+use strict;
+use lib 'lib';
+use Clipboard;
+my $CJ = 'perl -Ilib scripts/clipjoin';
+print "# Using $CJ and $INC{'Clipboard.pm'}\n";
+my %tests = (
+    "http://as\ndf.com" => 'http://asdf.com',
+    "http://as\n   |  df.com" => 'http://asdf.com',
+    "http://as\n+df.com" => 'http://asdf.com',
+    "A\n tall \nquote." => 'A tall quote.', # html-ish interpretation of space
+);
+for my $input (keys %tests) {
+    my $expected = $tests{$input};
+    Clipboard->copy($input);
+    system("$CJ -q") == 0 or die "$CJ failed: $!";
+    my $actual = Clipboard->paste;
+    if ($actual ne $expected) {
+        print "[$actual] != [$expected]\n";
+    } else {
+        print "$actual ok\n";
+    }
+}

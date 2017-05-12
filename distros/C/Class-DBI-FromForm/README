@@ -1,0 +1,34 @@
+NAME
+    Class::DBI::FromForm - Update Class::DBI data using Data::FormValidator
+
+SYNOPSIS
+      package Film;
+      use Class::DBI::FromForm;
+      use base 'Class::DBI';
+
+      my $results = Data::FormValidator->check( ... );
+      my $film = Film->retrieve('Fahrenheit 911');
+      $film->update_from_form($results);
+
+      my $new_film = Film->create_from_form($results);
+
+DESCRIPTION
+    Create and update Class::DBI objects from Data::FormValidator.
+
+  METHODS
+   create_from_form
+    Create a new object.
+
+   update_from_form
+    Update object.
+
+SEE ALSO
+    Class::DBI, Class::DBI::FromCGI, Data::FormValidator
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

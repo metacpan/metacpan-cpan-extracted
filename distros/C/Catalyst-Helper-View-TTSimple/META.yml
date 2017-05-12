@@ -1,0 +1,15 @@
+author: Victor Igumnov <victori@lamer0.com>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: unknown
+module_name: Catalyst::Helper::View::TTSimple
+name: Catalyst-Helper-View-TTSimple
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 5.7
+  Catalyst::View::TT: 0
+  Test::More: 0
+version: 0.01

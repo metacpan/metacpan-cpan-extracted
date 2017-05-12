@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Authentication/Credential/Facebook/OAuth2.pm
+t/README
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/testapp.psgi

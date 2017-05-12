@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+Build.PL
+README
+Changes
+LICENSE
+META.yml
+Artistic_License.txt
+GPL_License.txt
+lib/Class/ParmList.pm
+lib/Class/ParmList.pod
+t/01_object.t
+t/02_simple_parms.t
+t/03_parse_parms.t
+t/98_pod_coverage.t
+t/99_pod.t

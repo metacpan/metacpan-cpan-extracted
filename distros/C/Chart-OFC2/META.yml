@@ -1,0 +1,118 @@
+---
+abstract: 'Generate html and data files for use with Open Flash Chart version 2'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  File::Slurp: 0
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - chart
+  - flash
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chart-OFC2
+provides:
+  Chart::OFC2:
+    file: lib/Chart/OFC2.pm
+    version: 0.07
+  Chart::OFC2::Area::Hollow:
+    file: lib/Chart/OFC2/Line.pm
+    version: 0.07
+  Chart::OFC2::Axis:
+    file: lib/Chart/OFC2/Axis.pm
+    version: 0.07
+  Chart::OFC2::Bar:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::3D:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::Fade:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::Filled:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::Glass:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::Sketch:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::Bar::Stack:
+    file: lib/Chart/OFC2/Bar.pm
+    version: 0.07
+  Chart::OFC2::BarLineBase:
+    file: lib/Chart/OFC2/BarLineBase.pm
+    version: 0.07
+  Chart::OFC2::Element:
+    file: lib/Chart/OFC2/Element.pm
+    version: 0.07
+  Chart::OFC2::Extremes:
+    file: lib/Chart/OFC2/Extremes.pm
+    version: 0.07
+  Chart::OFC2::HBar:
+    file: lib/Chart/OFC2/HBar.pm
+    version: 0.07
+  Chart::OFC2::HBarValues:
+    file: lib/Chart/OFC2/HBarValues.pm
+    version: 0.07
+  Chart::OFC2::Labels:
+    file: lib/Chart/OFC2/Labels.pm
+    version: 0.07
+  Chart::OFC2::Line:
+    file: lib/Chart/OFC2/Line.pm
+    version: 0.07
+  Chart::OFC2::Line::Dot:
+    file: lib/Chart/OFC2/Line.pm
+    version: 0.07
+  Chart::OFC2::Line::Hollow:
+    file: lib/Chart/OFC2/Line.pm
+    version: 0.07
+  Chart::OFC2::Pie:
+    file: lib/Chart/OFC2/Pie.pm
+    version: 0.07
+  Chart::OFC2::PieValues:
+    file: lib/Chart/OFC2/PieValues.pm
+    version: 0.07
+  Chart::OFC2::Scatter:
+    file: lib/Chart/OFC2/Scatter.pm
+    version: 0.07
+  Chart::OFC2::Title:
+    file: lib/Chart/OFC2/Title.pm
+    version: 0.07
+  Chart::OFC2::ToolTip:
+    file: lib/Chart/OFC2/ToolTip.pm
+    version: 0.07
+  Chart::OFC2::Types:
+    file: lib/Chart/OFC2/Types.pm
+  Chart::OFC2::XAxis:
+    file: lib/Chart/OFC2/Axis.pm
+  Chart::OFC2::YAxis:
+    file: lib/Chart/OFC2/Axis.pm
+  Chart::OFC2::YAxisRight:
+    file: lib/Chart/OFC2/Axis.pm
+requires:
+  Carp::Clan: 0
+  Class::MOP: 0.65
+  JSON::XS: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Aliases: 0
+  MooseX::StrictConstructor: 0
+  MooseX::Types: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chart-OFC2
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jozef/chart-ofc2/
+version: 0.07

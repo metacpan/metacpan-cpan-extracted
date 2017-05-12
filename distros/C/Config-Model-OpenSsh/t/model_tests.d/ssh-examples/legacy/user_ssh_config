@@ -1,0 +1,11 @@
+# ssh global comment
+
+
+Host *
+usersh yes
+fallbacktorsh yes
+dummy yes
+
+
+
+

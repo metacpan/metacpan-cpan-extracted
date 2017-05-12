@@ -1,0 +1,9 @@
+Revision history for CGI-Application-Plugin-CHI
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.02    2009-11-24
+        Changed the handling of __get_cache to be a normal exported method, fixed some doc and
+        test bugs caused by changing CHI interface.
+0.03    2009-11-24
+        Fixed doc bugs.

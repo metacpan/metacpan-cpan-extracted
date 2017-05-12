@@ -1,0 +1,72 @@
+!
+policy-map st-rosned
+  class class-default
+    police cir 128000 bc 16000 be 16000
+     exceed-action drop
+policy-map 8M
+  class class-default
+    police cir 8192000 bc 1536000 be 3072000
+     exceed-action drop
+policy-map rt-school
+  class class-default
+    police cir 128000 bc 16000 be 16000
+     conform-action transmit
+     exceed-action drop
+policy-map 128K
+  class class-default
+    police cir 128000 bc 16000 be 16000
+     exceed-action drop
+policy-map police-512k
+  class class-default
+    police cir 512000 bc 128000 be 128000
+     conform-action transmit
+     exceed-action drop
+     violate-action drop
+policy-map 6144K
+  class class-default
+    police cir 6144000 bc 384000 be 384000
+     exceed-action drop
+policy-map 512K
+  class class-default
+    police cir 512000 bc 64000 be 64000
+     exceed-action drop
+policy-map branch_out_highpriority
+  class highpriority
+    priority 30000
+policy-map 256K
+  class class-default
+    police cir 256000 bc 32000 be 32000
+     exceed-action drop
+policy-map 1024K
+  class class-default
+    police cir 1024000 bc 64000 be 64000
+     exceed-action drop
+policy-map 4096K
+  class class-default
+    police cir 4096000 bc 256000 be 256000
+     exceed-action drop
+policy-map 30M
+  class class-default
+    police cir 30720000 bc 1920000 be 1920000
+     exceed-action drop
+policy-map branch_int_out
+  class class-default
+    shape average 52428800
+   service-policy branch_out_highpriority
+policy-map arz_out
+  class class-default
+    fair-queue
+     random-detect
+policy-map 10M
+  class class-default
+    police cir 10240000 bc 1280000 be 2560000
+     exceed-action drop
+policy-map 64K
+  class class-default
+    police cir 64000 bc 8000 be 8000
+     exceed-action drop
+policy-map 2048K
+  class class-default
+    police cir 2048000 bc 128000 be 128000
+     exceed-action drop
+!

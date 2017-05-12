@@ -1,0 +1,6 @@
+1.0.1    2003 June 30
+         Clean up S-boxes to eliminate warnings during compilation
+
+1.0.0    2003 June 26
+         Initial release
+

@@ -1,0 +1,12 @@
+Changes
+GOST.pm
+GOST.xs
+MANIFEST
+Makefile.PL
+README
+_gost.c
+gost.h
+ppport.h
+sboxes.h
+test.pl
+typemap

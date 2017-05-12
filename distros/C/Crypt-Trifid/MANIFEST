@@ -1,0 +1,18 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Crypt/Trifid.pm
+lib/Crypt/Trifid/Utils.pm
+t/00-load.t
+t/01-new.t
+t/02-encode.t
+t/03-decode.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+name: Bx
+version: 2
+deps:
+  - Cx == 2
+  - Ex
+catalyst_plugins:
+  - +CatalystX::SimpleLogin

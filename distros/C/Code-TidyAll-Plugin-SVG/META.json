@@ -1,0 +1,81 @@
+{
+   "abstract" : "optimize SVG files with tidyall",
+   "author" : [
+      "Jonas Smedegaard (JONASS) <dr@jones.dk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "Code refactoring",
+      "Source code"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Code-TidyAll-Plugin-SVG",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Moo" : "0",
+            "String::Escape" : "0",
+            "XML::Twig" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::Fixme" : "0",
+            "Test::More" : "0.61",
+            "Test::Pod" : "1.00"
+         }
+      }
+   },
+   "provides" : {
+      "Code::TidyAll::Plugin::SVG" : {
+         "file" : "lib/Code/TidyAll/Plugin/SVG.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Code-TidyAll-Plugin-SVG"
+      },
+      "homepage" : "https://metacpan.org/release/Code-TidyAll-Plugin-SVG",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://anonscm.debian.org/cgit/design/Code-TidyAll-Plugin-SVG.git"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Code-TidyAll-Plugin-SVG/project"
+   },
+   "version" : "0.003",
+   "x_help_wanted" : [
+      "tester"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

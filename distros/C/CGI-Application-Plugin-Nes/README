@@ -1,0 +1,47 @@
+CGI-Application-Plugin-Nes
+
+Plugin for use Nes templates in CGI::Application
+
+INSTALLATION
+
+Requires the modules:
+    
+    Nes 1.03.3 minimum version
+    CGI::Application
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Application::Plugin::Nes
+
+You can also look for information at:
+
+  Search CPAN
+    http://search.cpan.org/dist/CGI-Application-Plugin-Nes
+
+  Search CPAN
+    http://search.cpan.org/dist/Nes
+    
+  Sample to use Nes;
+     http://nes.sourceforge.net/
+
+  Repository
+    http://github.com/Skriptke/nes   
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 - 2010 Enrique Castañón
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

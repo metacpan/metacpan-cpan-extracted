@@ -1,0 +1,7 @@
+Revision history for Closure-Explicit
+
+0.002     2017-04-17 21:45:13+08:00 Asia/Kuala_Lumpur
+    Rebuild to avoid @INC failures
+
+0.001     2013-07-31 20:06:04 Europe/London
+	Initial CPAN release

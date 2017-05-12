@@ -1,0 +1,30 @@
+CORBA::XS - IDL compiler to extension interface between Perl and C code
+
+Description:
+------------
+    This package supplies the following tool:
+    idl2xs_c - IDL compiler to extension interface between Perl and C code
+
+Prerequisites:
+--------------
+    CORBA::IDL
+    CORBA::C
+    CORBA::Perl
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    Python Language Mapping are available on <http://www.omg.org/>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

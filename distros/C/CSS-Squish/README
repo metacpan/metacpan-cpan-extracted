@@ -1,0 +1,64 @@
+NAME
+    CSS::Squish - Compact many CSS files into one big file
+
+SYNOPSIS
+     use CSS::Squish;
+     my $concatenated = CSS::Squish->concatenate(@files);
+
+DESCRIPTION
+    This module takes a list of CSS files and concatenates them, making sure
+    to honor any valid @import statements included in the files.
+
+    Following the CSS 2.1 spec, @import statements must be the first rules
+    in a CSS file. Media-specific @import statements will be honored by
+    enclosing the included file in an @media rule. This has the side effect
+    of actually *improving* compatibility in Internet Explorer, which
+    ignores media-specific @import rules but understands @media rules.
+
+    It is possible that feature versions will include methods to compact
+    whitespace and other parts of the CSS itself, but this functionality is
+    not supported at the current time.
+
+METHODS
+  CSS::Squish->concatenate(@files)
+    Takes a list of files to concatenate and returns the results as one big
+    scalar.
+
+  CSS::Squish->concatenate_to($dest, @files)
+    Takes a filehandle to print to and a list of files to concatenate.
+    "concatenate" uses this method with an "open"ed scalar.
+
+  CSS::Squish->roots(@dirs)
+    A getter/setter for additional paths to search when looking for imported
+    files. The paths specified here are searched _before_ trying to find the
+    import relative to the file from which it is imported. This is useful if
+    your server has multiple document roots from which your CSS imports
+    files and lets you override the default behaviour (but still fall back
+    to it).
+
+BUGS AND SHORTCOMINGS
+    At the current time, comments are not skipped. This means comments
+    happening before @import statements at the top of a file will cause the
+    @import rules to not be parsed. Make sure the @import rules are the very
+    first thing in the file (and only one per line).
+
+    Only direct @import loops (i.e. where a file imports itself) are checked
+    and skipped. It's easy enough to get this module in a loop. Don't do it.
+
+    As of now, server-relative URLs (instead of file-relative URLs) will not
+    work correctly.
+
+    All other bugs should be reported via
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=CSS-Squish> or
+    bug-CSS-Squish@rt.cpan.org.
+
+AUTHOR
+    Thomas Sibley <trs@bestpractical.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2006.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

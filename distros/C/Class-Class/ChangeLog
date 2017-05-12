@@ -1,0 +1,82 @@
+2000-01-05  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/02simple.t, lib/Class/Class.pm: Support globs.
+
+1999-12-15  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/02simple.t: Added tests for coderefs.
+
+	* lib/Class/Class.pm: Added code refs.
+
+	* lib/Class/Class.pm: Added add_method; update _make_methods to use it.
+
+1999-12-14  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/01load.t, t/02simple.t, t/03complex.t, t/04polymorph.t, t/05polyvolve.t, lib/Class/Class.pm:
+	Added smart DESTROY method to help with circular links (I hope!).
+
+	* lib/Class/Class.pm: Don't shift the arg stack willy-nilly.
+
+1999-12-03  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* MANIFEST: Added t/05polyvolve.t.
+
+	* t/04polymorph.t, lib/Class/Class.pm:
+	Fixed both semantics and performance of core of polymorph.
+	Renamed _inited -> __inited and _polymorphed -> __tried_polymorph both
+	to make it more clear they are internal, and to make their functionality
+	less ambiguous.
+	Improved 04polymorph.t.
+
+	* lib/Class/Class.pm:
+	Last version to use "use" and check %INC.  Next version will rely on
+	Perl's builtin semantics for this so that we don't do the work twice.
+
+1999-11-18  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/04polymorph.t, lib/Class/Class.pm:
+	Caught top-level package case ("::TopLevelPack").
+	Improved polymorph tests.
+
+	* lib/Class/Class.pm: Use hash, not list, for build methods -- duh!
+
+1999-11-03  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/05polyvolve.t, lib/Class/Class.pm:
+	Can now polyvolve = many evolve (polymorph until it works).
+
+	* t/02simple.t, lib/Class/Class.pm, MANIFEST, Makefile.PL:
+	Pseudo-documented; polymorph seems to work, but I don't trust it yet.
+
+1999-09-17  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* lib/Class/Class.pm:
+	Use our own __DIE__ handler in case someone else has installed one
+	ahead of use.
+
+	* t/03complex.t, t/04polymorph.t, lib/Class/Class.pm:
+	Fixed polymorph bug... ugh.  Need to think more about init ordering.
+
+1999-09-16  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* t/03complex.t, t/04polymorph.t, lib/Class/Class.pm:
+	Test suite!  Work on polymorph bug.
+
+	* lib/Class/Class.pm:
+	Fixed bug with autonewed objects (new $value v. $value->new).
+
+	* lib/Class/Class.pm:
+	Fixed problem with versioning.  How do you prepend a version # to
+	the RCS number, e.g., 0.$Revision: 1.2 $?
+
+	* t/01load.t, t/02simple.t, t/03complex.t, t/load.t, lib/Class/Class.pm, MANIFEST:
+	Test suite -- caught obscure bug with object members.
+
+1999-09-14  B. K. Oxley (binkley) at Work  <binkley@datacraft.com>
+
+	* ChangeLog, MANIFEST, Makefile.PL, README, TODO, lib/Class/Class.pm, t/load.t:
+	Break out non-OMD2 code for reuseability.
+
+	* ChangeLog, MANIFEST, Makefile.PL, README, TODO, lib/Class/Class.pm, t/load.t:
+	New file.
+

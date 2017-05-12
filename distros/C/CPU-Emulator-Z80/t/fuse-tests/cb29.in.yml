@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 41
+  49926:
+    - 92
+name: cb29
+registers:
+  AF: 1536
+  AF_: 0
+  BC: 61762
+  BC_: 0
+  DE: 27354
+  DE_: 0
+  HL: 49926
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

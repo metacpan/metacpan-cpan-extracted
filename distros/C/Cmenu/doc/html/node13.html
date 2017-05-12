@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Complex Return Values</TITLE>
+<META NAME="description" CONTENT="Complex Return Values">
+<META NAME="keywords" CONTENT="Cmenu">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Cmenu.css">
+
+<LINK REL="next" HREF="node14.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node14.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html203"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html199"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html193"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html201"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html204"
+  HREF="node14.html">menu_popup</A>
+<B> Up:</B> <A NAME="tex2html200"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html194"
+  HREF="node12.html">Processing return Values</A>
+ &nbsp <B>  <A NAME="tex2html202"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00056000000000000000">
+Complex Return Values</A>
+</H2>
+Dealing with complex return values occur when menu items including radio lists, check lists and editing data fields. Essentially these type of items create multi-value responses. To do this, Cmenu returns an array of values separated by separation characters. 
+<DIV ALIGN="CENTER">
+@values = split(/$Cmenu::menu_sep/,$sel)
+
+</DIV>
+will perform the first split. The array of values will contain the function key or menu item pressed when the menu was exited. Other values will correspond to specific menu items. For radio and check list, this will be a simple list of which items had been selected. When dealing with such lists, Cmenu does not attempt to report <I>unselected</I> items - these should be processed independently - Cmenu will only returns items which have been checked.
+
+<P>
+To deal with data fields, a field identifier and the field contents will be returned as a data pair. These can be separated with the following command;
+<DIV ALIGN="CENTER">
+($identifier,$contents) = split($Cmenu::menu_sepn/,$value[1]);
+
+</DIV>
+Notice that $value[1] is one of the elements of the first array. Normally, values returned in this way will be ordered as they were defined with menu_item calls but this is not guaranteed. The $identifier is the value specified in the original $menu_item call.
+
+<P>
+Where this return value can get really messy is when a complex data entry menu has a combination of regular, alpha, numeric, radio and check list menu items. You will need to take care that you identify all the parts you need for each item. When in doubt or to aid debugging, doing a simple call to menu_show can help
+<DIV ALIGN="CENTER">
+&amp;menu_show(``Data Response'',$sel,''HELP'');
+
+</DIV>
+This will show what Cmenu is returning from a particular call.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html203"
+  HREF="node14.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html199"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html193"
+  HREF="node12.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html201"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html204"
+  HREF="node14.html">menu_popup</A>
+<B> Up:</B> <A NAME="tex2html200"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html194"
+  HREF="node12.html">Processing return Values</A>
+ &nbsp <B>  <A NAME="tex2html202"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Andy Ferguson (AFC)
+2001-10-20
+</ADDRESS>
+</BODY>
+</HTML>

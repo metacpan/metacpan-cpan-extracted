@@ -1,0 +1,10 @@
+ <form  method="post">
+    <p>
+    <label for="firstname">First name: </label>
+              <input name="firstname" type="text" id="firstname">
+    <label for="lastname">Last name: </label>
+              <input name="lastname" type="text" id="lastname">
+    <label for="email">email: </label>
+              <input name="email" type="text" id="email">
+    </p>
+ </form>

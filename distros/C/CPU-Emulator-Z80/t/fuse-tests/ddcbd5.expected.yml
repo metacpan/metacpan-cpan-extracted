@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  36349:
+    - 117
+name: ddcbd5
+registers:
+  AF: 50205
+  AF_: 0
+  BC: 51376
+  BC_: 0
+  DE: 51915
+  DE_: 0
+  HL: 30325
+  HL_: 0
+  I: 0
+  IX: 36284
+  IY: 52261
+  PC: 4
+  R: 2
+  SP: 0

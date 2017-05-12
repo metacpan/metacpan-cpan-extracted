@@ -1,0 +1,67 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Crypt::RSA::Parse - Parse RSA keys
+
+=head1 SYNOPSIS
+
+    #General-purpose, native RSA or PKCS8 (DER or PEM)
+    my $public_rsa = Crypt::RSA::Parse::public($key_str);
+    my $private_rsa = Crypt::RSA::Parse::private($private_key_str);
+
+    $public_rsa->exponent();    #alias E()
+    $public_rsa->modulus();     #isa Math::BigInt, alias N()
+    $public_rsa->size();        #i.e., the modulus length in bits
+
+    $private_rsa->version();        #usually 0
+    $private_rsa->modulus();        #isa Math::BigInt, alias N()
+    $private_rsa->size();           #i.e., the modulus length in bits
+
+    $private_rsa->publicExponent();     #same as public “exponent”, alias E()
+    $private_rsa->privateExponent();    #isa Math::BigInt, alias D()
+    $private_rsa->prime1();             #isa Math::BigInt, alias P()
+    $private_rsa->prime2();             #isa Math::BigInt, alias Q()
+    $private_rsa->exponent1();          #isa Math::BigInt, alias DP()
+    $private_rsa->exponent2();          #isa Math::BigInt, alias DQ()
+    $private_rsa->coefficient();        #isa Math::BigInt, alias QINV()
+
+    #Only checks PKCS8 (DER or PEM)
+    $public_rsa = Crypt::RSA::Parse::public_pkcs8($pkcs8_str);
+    $private_rsa = Crypt::RSA::Parse::private_pkcs8($pkcs8_str);
+
+    {
+        #If, for whatever reason, you don’t like MIME::Base64,
+        #then customize this. The module must have a decode() function.
+        #
+        local $Crypt::RSA::Parse::BASE64_MODULE = '..';
+
+        Crypt::RSA::Parse::...
+    }
+
+=head1 DESCRIPTION
+
+Not much else to say: it parses RSA keys for useful information!
+
+The public keys are represented via the C<Crypt::RSA::Parse::Public>
+class, while private keys are represented via C<Crypt::RSA::Parse::Private>.
+
+=head1 AUTHOR
+
+    Felipe M. L. Gasper
+    CPAN ID: FELIPE
+
+=head1 REPOSITORY
+
+    https://github.com/FGasper/p5-Crypt-RSA-Parse
+
+=head1 COPYRIGHT
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

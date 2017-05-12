@@ -1,0 +1,114 @@
+#!D:/Perl/bin/perl
+use strict;
+use warnings;
+use CPAN::Search::Lite::Index;
+use Getopt::Long;
+my ($config, $setup, $help, $reindex, $rebuild_info);
+
+my $rc = GetOptions('config=s' => \$config,
+                    'setup' => \$setup,
+                    'help' => \$help,
+                    'reindex=s@' => \$reindex,
+                    'rebuild-info' => \$rebuild_info);
+
+if ($help or (not $config and not $ENV{CSL_CONFIG_FILE})) {
+    print <<"END";
+
+Setup or update CPAN::Search database
+Usage: 
+   $^X $0 --config /path/to/cpan.conf [ --setup ]
+   $^X $0 --config /path/to/cpan.conf [ --reindex dist_name ]
+   $^X $0 --config /path/to/cpan.conf [ --reindex reindex_file.txt ]
+   $^X $0 --config /path/to/cpan.conf [ --rebuild-info ]
+   $^X $0 --help
+END
+    exit(1);
+}
+
+if (defined $setup and defined $reindex) {
+  die "Must reindex on an exisiting database";
+}
+
+if (defined $reindex) {
+  my @elements = @$reindex;
+  $reindex = [];
+  for (my $i=0; $i<@elements; $i++) {
+    my $entry = $elements[$i];
+    if (-f $entry) {
+      open(my $fh, $entry) or die "Cannot open $entry: $!";
+      while (my $dist = <$fh>) {
+        chomp $dist;
+        next if ($dist =~ /^\s*\#/);
+        $dist =~ s/^\s*//;
+        $dist =~ s/\s*$//;
+        next unless $dist;
+        push @$reindex, $dist;
+      }
+      close $fh;
+    }
+    else {
+      push @$reindex, $entry;
+    }
+  }
+}
+
+my $index = CPAN::Search::Lite::Index->new(config => $config,
+                                           setup => $setup,
+                                           reindex => $reindex,
+                                           rebuild_info => $rebuild_info);
+$index->index();
+
+__END__
+
+=head1 NAME
+
+csl_index - interface to C<CPAN::Search::Lite::Index>
+
+=head1 DESCRIPTION
+
+This script is an interface to C<CPAN::Search::Lite::Index>, used
+to set up and subsequently maintain the database. One option,
+C<config> specifies the configuration file:
+
+   perl csl_index --config /path/to/cpan.conf
+
+which is used to specify the additional options needed (these are
+described in L<CPAN::Search::Lite::Index>). Either this option
+must be given or the environment variable C<CSL_CONFIG_FILE>,
+pointing to the configuration file, must be present.
+
+An optional argument of C<setup>:
+
+   perl csl_index --config /path/to/cpan.conf --setup
+
+is used to create and populate the needed tables initially;
+note that any existing tables will be dropped with this option.
+Without the C<setup> option, the current tables will be
+updated, as required.
+
+One can reindex an exisiting entry in the database by
+
+   perl csl_index --config /path/to/cpan.conf --reindex dist_name
+
+where C<dist_name> is the distribtion name (without version number).
+This option may be specified multiple times to reindex a
+list of distributions. A filename may also be specified containing
+distributions to be indexed (one per line), for which
+
+   perl csl_index --config /path/to/cpan.conf --reindex file_name
+
+will reindex all the files specified in C<file_name>.
+
+There is some information in the C<chapters> and <reps> tables,
+extracted from C<%chaps> and C<$repositories> of C<CPAN::Search::Lite::Util>,
+that relate to descriptions of the chapters and Win32 ppm
+repositories. These tables may be rebuilt using
+
+   perl csl_index --config /path/to/cpan.conf --rebuild-info
+
+=head1 SEE ALSO
+
+L<CPAN::Search::Lite::Index>.
+
+=cut
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Catalyst::Plugin::DateTime.
+
+0.03  01.15.2006
+- added $c->dt (alias to $c->datetime);
+- added support for setting time_zone on initialization (i.e. $c->datetime(time_zone => 'UTC'))
+- DateTime->new will default to time_zone => 'local' also 
+
+0.02  01.10.2006
+- added default time_zone => 'local' 
+
+0.01  01.09.2006
+- original version; upload to CPAN 
+

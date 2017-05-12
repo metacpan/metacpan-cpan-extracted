@@ -1,0 +1,8 @@
+Change log for CPANPLUS-Config-BaseEnv
+======================================
+
+0.04  Mon Aug 10 12:44:50 BST 2009
+  - Added Env::Sanctify to the testcase to clean the %ENV
+
+0.02  Mon Aug 10 12:26:51 BST 2009
+  - Initial CPAN release

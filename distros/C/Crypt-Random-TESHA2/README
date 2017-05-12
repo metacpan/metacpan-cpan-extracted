@@ -1,0 +1,46 @@
+Crypt::Random::TESHA2 version 0.01
+========================
+
+Crypt::Random::TESHA2 produces "userspace voodoo entropy" for people that
+do not have or don't want to use O/S supplied sources.  It uses timing
+differences between sleeps to generate entropy, which is mixed using SHA256,
+then fed to an entropy pool using SHA512 (or SHA256 for systems with no SHA512
+support), which collects the mix and sends it out.
+
+If you want strong cryptography, use /dev/random.
+If you're having issues with /dev/random blocking, run HAVEGED.
+On Win32, use CryptGenRandom.
+
+If, however, you want something in userspace to seed a CSPRNG like
+Math::Random::ISAAC, then this could work for you.  If your system
+doesn't have /dev/random and you've verified this module works on
+your system, then this could be the answer.
+
+There are similarities between the concepts here and TrueRand 2.1, though
+that module did not influence the design or implementation of this.  The
+version of TrueRand used in Math::TrulyRandom is old.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires Time::HiRes (core in 5.7.3+) including usleep support,
+and Digest::SHA (core in 5.9.3+).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-2013 by Dana Jacobsen <dana@acm.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.1 or,
+at your option, any later version of Perl 5 you may have available.

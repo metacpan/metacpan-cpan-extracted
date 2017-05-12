@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/Class/Classless/DBI.pm
+MANIFEST			This list of files
+README
+META.yml
+Makefile.PL

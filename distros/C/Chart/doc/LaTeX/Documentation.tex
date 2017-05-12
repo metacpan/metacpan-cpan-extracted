@@ -1,0 +1,80 @@
+% Documentation.tex
+%
+\documentclass[11pt,titlepage]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{ifthen}
+\usepackage[pdftex]{graphicx}
+\usepackage{makeidx}
+\usepackage{rotating}
+\usepackage{xspace}
+\usepackage{color}
+%\usepackage{colortbl}
+\makeindex
+
+\include{definitions}
+\include{rgb}
+%\includeonly{definitions,Base}
+%\includeonly{definitions,Bars}
+%\includeonly{definitions,Composite}
+%\includeonly{definitions,Direction}
+%\includeonly{definitions,ErrorBars}
+%\includeonly{definitions,HorizontalBars}
+%\includeonly{definitions,Lines}
+%\includeonly{definitions,LinesPoints}
+%\includeonly{definitions,Mountain}
+%\includeonly{definitions,Pareto}
+%\includeonly{definitions,Pie}
+%\includeonly{definitions,Points}
+%\includeonly{definitions,Split}
+%\includeonly{definitions,Stacked}
+
+% Hyphenations
+\hyphenation{init dataref}
+\sloppy
+
+\title{Documentation for Perl Package \textbf{Chart}\\
+{\Large Version 2.4.8}
+}
+
+%% Name der Autoren
+%% Die Adressenangaben werden mit \thanks{} eingeschlossen
+%% Name des ersten Autors
+\author{Chart Group\thanks{Bundesamt f\"ur Kartographie und Geod\"asie,
+Geod\"atisches Observatorium Wettzell, Sackenrieder Strasse 25,
+D-93444 Bad K\"otzting, E-mail: chart@fs.wettzell.de}}
+\date{Last change: 2014-06-17}
+
+\begin{document}
+
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+
+% Einleitung
+\newpage
+\pagenumbering{arabic}
+
+\include{description}
+%\include{example}
+\include{Base}
+\include{Bars}
+\include{Composite}
+\include{Direction}
+\include{ErrorBars}
+\include{HorizontalBars}
+\include{Lines}
+\include{LinesPoints}
+\include{Mountain}
+\include{Pareto}
+\include{Pie}
+\include{Points}
+\include{Split}
+\include{Stacked}
+\include{Appendix}
+\clearpage
+\printindex
+
+\end{document}

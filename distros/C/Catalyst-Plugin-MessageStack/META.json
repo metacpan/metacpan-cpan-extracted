@@ -1,0 +1,59 @@
+{
+   "abstract" : "A Catalyst plugin for gracefully handling messaging (and more) that follows the Post/Redirect/Get pattern.",
+   "author" : [
+      "J. Shirley <jshirley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-MessageStack",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Plugin::Session" : "0",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "Catalyst::Runtime" : "0",
+            "MRO::Compat" : "0",
+            "Message::Stack" : "0.21",
+            "Scalar::Util" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Model" : "0",
+            "Catalyst::Plugin::Session::State" : "0",
+            "Catalyst::Test" : "0",
+            "Data::Dump" : "0",
+            "FindBin" : "0",
+            "Message::Stack::Message" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jshirley/catalyst-plugin-messagestack"
+      }
+   },
+   "version" : "0.03"
+}
+

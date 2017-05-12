@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-Agreement
+version:      0.02
+version_from: lib/Class/Agreement.pm
+installdirs:  site
+requires:
+    Class::Inspector:              1.13
+    Scalar::Util:                  1.17
+    Test::Exception:               0.20
+    Test::More:                    0.54
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-SingletonProxy.t
+lib/Class/SingletonProxy.pm
+META.yml                                 Module meta-data (added by MakeMaker)

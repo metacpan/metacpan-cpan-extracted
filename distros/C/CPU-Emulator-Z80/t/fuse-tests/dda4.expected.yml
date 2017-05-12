@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dda4
+registers:
+  AF: 528
+  AF_: 0
+  BC: 47699
+  BC_: 0
+  DE: 44284
+  DE_: 0
+  HL: 38017
+  HL_: 0
+  I: 0
+  IX: 12171
+  IY: 60918
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,5 @@
+$::test_dsn ||= $ENV{'DBI_DSN'} || 'DBI:mysql:database=test';
+$::test_user ||= $ENV{'DBI_USER'}  ||  '';
+$::test_password ||= $ENV{'DBI_PASS'}  ||  '';
+
+1;

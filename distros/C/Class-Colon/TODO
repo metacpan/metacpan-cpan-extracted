@@ -1,0 +1,9 @@
+Here are things that I might add to Class::Colon
+
+1. allow caller to supply split function which:
+takes a line and returns an array (or anon. array) of strings, one per field
+If you want real CSV, you can supply the proper function (see for example
+Perl Cookbook 2nd ed. Recipe 1.20).
+SPLITTER
+
+2. allow the caller to supply the operative part of STRINGIFY

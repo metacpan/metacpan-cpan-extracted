@@ -1,0 +1,36 @@
+[% 
+    title = "Login" ;
+
+    crumb1_name = 'Login' ;
+%]
+
+<p>Please login using the form below.</p>
+
+[% IF errmess == 1 %]
+<p>I'm sorry but that login was not recognised. Please try again, ensuring you 
+enter the correct PAUSEID and password. Thank you.</p>
+[% ELSIF errmess == 2 %]
+<p>That username/password failed to be authenticated by PAUSE</p>
+[% ELSE %]<p>[% errmess %]</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name='act' value='author-login' />
+
+    <table>
+    <tr><th>PAUSE</th>		<td><input type="text"		name="pause" /></td></tr>
+    <tr><th>Password</th>	<td><input type="password"	name="eject" /></td></tr>
+    <tr><th></th>			<td><input type="submit"	name="submit" value='LOGIN' /></td></tr>
+    </table>
+</form>
+
+<h2>Author Notes</h2>
+
+<p>If you are an author, please login using your standard PAUSE credentials.
+You will then be able to browse your filter settings, allowing you to refine
+your default filters or those for a specific distribution.</p>
+
+<p>In the interests of security, your PAUSE credentials will be used to
+dynamically verify you are an author by PAUSE directly. Once successfully
+verified, your PAUSE ID only is then held for the duration of the current
+session, and deleted when the current session times out.<p>

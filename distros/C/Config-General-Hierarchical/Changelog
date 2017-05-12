@@ -1,0 +1,23 @@
+ 0.01 - 2007/12/16
+	- Begin!
+
+ 0.02 - 2009/02/22
+	- Added wild keys in configuration
+	- Added -c and -j parameters to dump
+
+ 0.03 - 2009/03/02
+	- Added example
+
+ 0.04 - 2010/09/14
+	- English fixes
+	- Test fixes
+
+ 0.05 - 2010/09/17
+	- Compatibility with Config::General v 2.49
+	- Other platforms test fixes
+
+ 0.06 - 2010/09/20
+	- Other platforms test fixes
+
+ 0.07 - 2012/01/07
+	- Resolved https://rt.cpan.org/Public/Bug/Display.html?id=63182

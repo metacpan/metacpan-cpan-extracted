@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb4e
+registers:
+  AF: 31801
+  AF_: 0
+  BC: 64146
+  BC_: 0
+  DE: 46288
+  DE_: 0
+  HL: 40739
+  HL_: 0
+  I: 0
+  IX: 60126
+  IY: 6021
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,25 @@
+---
+name: Catalyst-Plugin-Session-CGISession
+version: 0.04
+author:
+  - Thomas L. Shinnick <tshinnic@cpan.org>
+abstract: use CGI::Session for persistent session data
+license: perl
+requires:
+  CGI::Session: 0
+  Carp: 0
+  Catalyst: 5.30
+  Data::Dumper: 0
+  File::Spec: 0
+  NEXT: 0
+  Test::More: 0
+  URI: 0
+  URI::Find: 0
+provides:
+  Catalyst::Plugin::Session::CGISession:
+    file: lib/Catalyst/Plugin/Session/CGISession.pm
+    version: 0.04
+  Catalyst::Plugin::Session::CGISession::dummy_query:
+    file: lib/Catalyst/Plugin/Session/CGISession.pm
+    version: 0.04
+generated_by: Module::Build version 0.2611

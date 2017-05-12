@@ -1,0 +1,32 @@
+---
+abstract: '(alpha software) handle transient messages and UI elements.'
+author:
+  - 'Ashley Pond V  C<< <ashley@cpan.org> >>.'
+build_requires:
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Plugin::Session::Store::FastMmap: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Plugin-Blurb
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/pangyre/p5-catalystx-plugin-blurb
+version: 0.03

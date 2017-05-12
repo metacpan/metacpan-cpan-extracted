@@ -1,0 +1,15 @@
+[%# PDF::API2::Simple %]
+[% rawpdf2 = pdf.pdf # get raw pdf::api2 object %]
+[% rawpdf2.mediabox(421,595) %]
+
+[% pdf.add_font('Helvetica') %]
+[% pdf.add_page() %]
+
+[% pdf.x(50) ; pdf.y(420) %]
+[% pdf.text('Hello, World', 'autoflow','on') %]
+[% pdf.text( 'Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left. Please align me left, Please align me left.', 'x', 25, 'y',400, 'align','left', 'autoflow','on') %]
+
+[% pdf.x(50) ; pdf.y(100) %]
+[% pdf.text("Questa è una linea particolarmente lunga, vediamo se va a capo e come, o se non va a capo cerco un'altra primitiva che lo faccia.", 'autoflow','on') %]
+
+

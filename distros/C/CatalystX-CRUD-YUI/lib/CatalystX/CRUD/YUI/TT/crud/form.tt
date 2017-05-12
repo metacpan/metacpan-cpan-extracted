@@ -1,0 +1,221 @@
+[%# generic RHTMLO form generator. %]
+[%
+# specific a specific field order with the 'fields.order' array.
+# the 'readonly' for values that should not be edited
+# but should be displayed (as with creation timestamps, etc)
+#
+# TODO some default JS validation would be nice here.
+
+# table tags
+SET thopen  = '<th class="crud" valign="top">';
+SET thclose = '</th>';
+SET tdopen  = '<td class="crud" valign="top">';
+SET tdclose = '</td>';
+
+# DEFAULT didn't work as expected here.
+UNLESS fields.defined;
+    SET fields = { order = [], readonly = {} };
+END;
+UNLESS fields.order.size;
+    fields.order    = form.field_names_by_rank;
+END;
+UNLESS fields.readonly.size;
+    # common readonly field names for auto-timestamps.
+    # to avoid getting these set automatically,
+    # set them explicitly in fields.readonly
+    # in the .tt that PROCESSes this one
+    fields.readonly.ctime = 1;
+    fields.readonly.mtime = 1;
+    fields.readonly.created = 1;
+    fields.readonly.modified = 1;
+END;
+
+DEFAULT oid = object_id;
+IF (oid);
+    oid = c.controller.make_primary_key_string(object) || 0;
+END;
+
+USE Autoformat( all = 1 );  # for textarea readonly
+
+%]
+[% BLOCK datetime_popup %]
+[% SET id = field.id %]
+<span class="calendar_container" id="[% id %]_calendar_container"><img class='calendar'
+     src='[% CalendarIconUrl %]'
+     onclick='YAHOO.crud.datetime_picker("[% id %]")'
+     alt="calendar icon" />
+</span>
+[% END %]
+[% BLOCK date_popup %]
+[% SET id = field.id %]
+<span class="calendar_container" id="[% id %]_calendar_container">
+<img class='calendar'
+     src='[% CalendarIconUrl %]'
+     onclick='YAHOO.crud.date_picker("[% id %]")'
+     alt="calendar icon" />
+</span>
+[% END %]
+
+[% IF (error || form.error) %]
+<div class="error">[% error || form.error %]</div>
+[% END %]
+
+<table class="crud">
+[%  FOREACH fname = fields.order;
+
+        field = form.field( fname );
+        
+        # make sure any serial (autoincrem) fields
+        # are skipped. This is a backwards compat fix
+        # since RDG used to generate a hidden serial
+        # field for autoincrem PKs
+        IF (field.class == 'serial' || field.isa('Rose::HTMLx::Form::Field::Serial'));
+            NEXT;
+        END;
+        
+        # set DateTime format
+        IF field.isa('Rose::HTML::Form::Field::DateTime');
+            IF (field.internal_value.epoch.defined);
+                CALL field.output_format( yui.serializer.datetime_format );
+            END;
+        END;
+        
+        # prevent <enter> key in text fields from submitting form prematurely.
+        IF field.isa('Rose::HTML::Form::Field::Text');
+            IF(!field.onkeypress);
+                CALL field.onkeypress("return YAHOO.crud.check_return_key(event)");
+            END;
+        END;
+ %]
+ <tr class="[% (loop.count % 2) ? 'alternate' : '' %]">
+ [% IF (field.description.defined && field.description.text.length) %]
+ <tr><th colspan="2"><div class="description">
+ The <strong>[% field.name %]</strong> field specifies [% field.description %].
+ </div></th></tr>
+ [% END %]
+ [%
+
+        # read-only fields
+        # check these first as this is not a field attribute
+        IF (fields.readonly.defined( fname ));
+            thopen; field.xhtml_label; thclose;
+            
+            tdopen;
+
+            "<div class='input'>";
+            IF field.isa('Rose::HTML::Form::Field::TextArea');
+                # if there is raw html in the field, assume it
+                # handles it's own line breaks, etc.
+                UNLESS field.output_value.match('<.+>');
+                    "<pre>"; 
+                    field.output_value | Autoformat | html;
+                    "</pre>";
+                ELSE;
+                    field.output_value;
+                END;
+            ELSIF field.isa('Rose::HTML::Form::Field::DateTime');
+              IF (field.internal_value.epoch.defined);
+                field.output_value _ '';
+              END;
+            ELSIF field.isa('Rose::HTMLx::Form::Field::Boolean');
+                field.output_value == '1' ? 'true' : 'false';
+            ELSIF field.isa('Rose::HTML::Form::Field::PopUpMenu');
+                field.value_label;
+            ELSE;
+                form.field_value( fname );
+            END;
+            
+            PROCESS crud/related_field_link.tt;
+            
+            "</div>";
+            
+            # optionally pass the readonly value through hidden
+            # as when creating an object with a FK that is readonly.
+            # this only works with values that are not objects themselves.
+            IF (fields.readonly.item( fname ) > 1) 
+ %]
+              <input type="hidden" name="[% fname %]" value="[% field.output_value %]" />
+ [% 
+            END;
+            
+            tdclose;
+        
+        # autocomplete magic
+        ELSIF (field.can('autocomplete'));
+            u = field.url;
+            USE url = url( u.0, u.1 );
+            SET input = {
+                    label       = field.xhtml_label,
+                    url         = u.0,
+                    params      = url.match('\?(.+)$').0.replace('&amp;','&'),
+                    id          = 'ac_' _ fname,      # fname will be used as hidden field name
+                    hidden_value = field.internal_value,
+                    fname       = fname,
+                    param       = u.1,
+                    limit       = field.limit,
+                    cache_size  = 50,
+                    csize       = field.size || 0,
+                    tabindex    = field.tabindex,
+            };
+            # if searching, we do not have an object yet.
+            IF (object);
+                input.value  = 
+                    form.metadata.foreign_field_value( fname, object )
+                    ||
+                    field.internal_value;
+            END;
+            PROCESS crud/autocomplete_field.tt;
+
+        # checkboxes
+        ELSIF (field.can('xhtml_checkbox'));
+            thopen; field.xhtml_label; thclose;
+            tdopen; field.xhtml_checkbox; tdclose;
+      
+        # hidden fields
+        ELSIF (field.isa('Rose::HTML::Form::Field::Hidden'));
+            IF show_hidden_fields;
+                t = form.hidden_to_text_field(field);
+                thopen;
+                t.xhtml_label;
+                thclose;
+                tdopen;
+                t.xhtml;
+                tdclose;
+            ELSE;
+                field.xhtml;
+            END;
+                  
+        # Dates and DateTimes get a popup calendar
+        ELSIF field.isa('Rose::HTML::Form::Field::DateTime');
+            thopen;
+            field.xhtml_label;
+            thclose;
+            tdopen;
+            field.xhtml;
+            PROCESS datetime_popup;
+            tdclose;
+            
+        ELSIF field.isa('Rose::HTML::Form::Field::Date');
+            thopen;
+            field.xhtml_label;
+            thclose;
+            tdopen;
+            field.xhtml;
+            PROCESS date_popup;
+            tdclose;
+            
+        # default
+        ELSE;
+            thopen;           
+            field.xhtml_label;
+            thclose;
+            tdopen;
+            field.xhtml;
+            PROCESS crud/related_field_link.tt;
+            tdclose;
+            
+        END;    # IF/ELSE
+    '</tr>';        
+    END;  # FOREACH     
+%]
+</table>

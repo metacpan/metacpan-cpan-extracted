@@ -1,0 +1,26 @@
+_loki97.c
+Changes
+comments.jpg
+contact.html
+contact.jpg
+examples/cbc-mode
+examples/ecb-mode
+examples/fileenc
+examples/pin-generator
+INSTALL
+LICENSE
+Loki97.pm
+Loki97.xs
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+t/01.t
+t/02.t
+t/03.t
+t/04.t
+t/05.t
+t/06.t
+t/loading.t
+typemap

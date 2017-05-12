@@ -1,0 +1,29 @@
+<form title="Grouped fields default value test" header="head.tmpl"
+footer="foot.tmpl" post-event="post">
+    <page name="select">
+    <description>
+    <![cdata[
+        This script is intended to test that default values get set
+        correctly in 'select' dropdowns and 'radio' button groups. To test
+        <b>this, do the following: 1) note that the default "blue"
+        is</b>
+        chosen for the first page.  2) choose "green" instead.  3) hit
+        "Next".  4) Note that "BSD" is selected as default.  5) Choose
+        OSX and then hit "Previous".  6) Note that "green" is selected, 
+        so that user choice overrides the default.  7) Hit "next" and
+        note that "OSX" is selected, again letting user choice override
+        the default.
+    ]]>
+    </description>
+        <title>Select dropdown test</title>
+        <field id="colour" type="select" value="blue" options="'red','green','blue'">
+            <label>Choose a colour</label>
+        </field>
+    </page>
+    <page name="radio">
+        <title>Radio button test</title>
+        <field id="os" type="radio" value="BSD" options="'Linux','BSD','OSX'">
+            <label>Choose an operating system</label>
+        </field>
+    </page>
+</form>

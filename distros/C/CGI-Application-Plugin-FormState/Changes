@@ -1,0 +1,27 @@
+Revision history for CGI-Application-Plugin-FormState
+
+0.12    Nov 16, 2005
+        - added Makefile.PL compatibility to the distribution
+
+0.11    Oct 05, 2005
+        - fixed a serious bug where calling 'delete' before calling
+          'param' could clear all values in the user's session
+
+        - 'session_key', 'id' and 'name' now all automatically configure
+          the form_state if it hasn't been configured yet.
+
+0.10    Oct 03, 2005
+        - removed the need to call 'init'
+        - default form storage name is now 'cap_form_state'
+        - allowed a form_state storage to be populated and queried in
+          the same request
+        - added CGI::Application version 4.0 as a prerequisite
+        - accepted params from url_param as well as from param
+        - made CGI version 2.37 or greater a prerequisite (for url_param)
+        - added informative error message if hooks cannot be installed
+          on module load.
+
+
+0.01    Sept 24, 2005
+        - First released version
+

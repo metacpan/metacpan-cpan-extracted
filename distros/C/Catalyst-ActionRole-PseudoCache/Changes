@@ -1,0 +1,20 @@
+Revision history for Catalyst-ActionRole-PseudoCache
+
+1.000003  2013-01-03 09:22:43 CST6CDT
+  - Fix incredible, deal breaking bug in True Cache mode
+
+1.000002  2012-11-17 17:20:07 CST6CDT
+  - Put MetaYAML back in dist
+
+1.000001  2011-08-22 19:41:33 CST6CDT
+  - Allow (and prefer) the use of Catalyst::Plugin::Cache (Geoff Darling)
+
+0.093200 Mon Nov 16 21:22:00 CDT 2009
+       - Don't delete tmp files in win32, it doesn't work
+
+0.093050 Sun Nov 01 01:21:00 CDT 2009
+       - Clarify POD
+
+0.093030 Thu Oct 29 23:32:00 CDT 2009
+       - Initial Release
+

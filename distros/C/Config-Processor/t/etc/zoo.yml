@@ -1,0 +1,22 @@
+foo:
+  param3:
+    param3_1: "zoo:val3_1"
+    param3_4: "zoo:val3_4"
+
+  param6:
+    param6_1: "zoo:val6_1"
+    param6_5:
+      - "zoo:val6_5_1"
+      - "zoo:val6_5_2"
+
+bar:
+  param3:
+    param3_1: "zoo:val3_1"
+    param3_4: "zoo:val3_4"
+
+  param6:
+    param6_1: "zoo:val6_1"
+    param6_5:
+      - "zoo:val6_5_1"
+      - "zoo:val6_5_2"
+

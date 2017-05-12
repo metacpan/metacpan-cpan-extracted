@@ -1,0 +1,14 @@
+hello.pl, hello.xml, head.tmpl, foot.tmpl
+    The simplest configuration.
+
+hello-repeat.pl, hello-repeat.xml, head.tmpl, foot.tmpl
+    Same, but with two <PAGE>'s.
+
+validations.pl, head.tmpl, foot.tmpl
+    Examples of all of FormMagick's validation routines.
+
+fileupload.pl
+    Example of how to, well, upload a file.  (Debugging is on by default)
+
+e-smith/*
+    A real-world example. (Debugging is on by default)

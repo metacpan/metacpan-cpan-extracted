@@ -1,0 +1,153 @@
+=head1 NAME
+ 
+Catalyst::ActionSignatures::Rationale - Why use this module?
+ 
+=head1 OVERVIEW
+
+The thinking that went into building L<Catalyst::ActionSignatures>. What problems
+are we trying to solve with it?  What are its pros and cons as compared to other
+prior art attempts.
+
+=head1 DISCUSSION
+
+Classically a L<Catalyst> controller is just a plain old Perl class that inherits
+from L<Catalyst::Controller>.  'Actions' are just normal subroutines that are
+decorated either via method attributes or via controller configuration to indicate
+to the dispatcher how an action or group of actions maps to an incoming request.
+Originally a request would have one main action for each request (although certain
+'special' actions like begin, auto and end could also be added to the chain of
+actions associated with a request).
+
+    package MyApp::Controller::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller;
+
+    ## http://localhost/example/myaction/$arg
+    sub myaction :Local Args(1) {
+      my ($self, $c, $arg) = @_;
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+Later when chained actions were added, that gave you the ability to assemble a
+chain of command style tree of actions.  This was useful when many actions shared
+some base common behaviors because it meant you could reuse behavior more easily:
+
+    package MyApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller;
+
+    sub find_user :Chained(/) PathPrefix CaptureArg(1) {
+      my ($self, $c, $id) = @_;
+      $c->stash(user =>
+        $c->model('Database::User')->find($id) ||
+          $c->detach('/not_found'));
+    }
+
+      sub show   :Chained('find_user') Args(0) { ... }
+      sub edit   :Chained('find_user') Args(0) { ... }
+      sub remove :Chained('find_user') Args(0) { ... }
+
+    __PACKAGE__->meta->make_immutable;
+
+In this example we have created three matchable URLs:
+
+    http://localhost/user/$id/show
+    http://localhost/user/$id/edit
+    http://localhost/user/$id/remove
+
+The action 'find_user' is responsible for matching an $id to a model, and the
+remaining actions use that prep work to finalize the response.  This chain or
+responsibility style pattern can be used to great effect in simplifying your
+code (or making a horrible mess, its really up to you...)
+
+B<NOTE> The above example is not given as an example of the best way to create
+URLs for your application, but was choosen for brevity and hope of clarity.  I'd
+personally recommend staying away from 'verby' path parts and use HTTP correctly!
+
+However a few things can be noted.  First of all the arguments passed to an action
+are not configurable (you need a custom action role to change them).  They are
+always "($self, $c, @args)".  This can lead to action code where you have to reach
+into $c a lot, which gets verbose and also makes it a little harder to test (you
+have to mock $c) and perhaps makes it harder on your maintainers since all the
+verbosity can sometimes hide the main thrust of the code.
+
+For example, if an action is going to want a User model, why not make it easy
+to say "I want one"?  I think on the code readers it makes it a lot more clear
+what the point of the action it (it does something with User...)
+
+    sub myaction(User $user) {  ... }
+
+That has the nice benefit that testing the subroutine just needs a $user, you've
+removed boilerplate lookup code and you can leverage the action match system to
+skip the whole 'see if the $id is in the database and if not return not_found.)
+Which leads to the second point.  Ideally we'd want to use the dispatcher and
+to be 'declarative' or configured and not require boilerplate code.  For example I
+have code like the following all over:
+
+    sub find_user :Chained(/) PathPrefix CaptureArg(1) {
+      my ($self, $c, $id) = @_;
+      $c->stash(user =>
+        $c->model('Database::User')->find($id) ||
+          $c->detach('/not_found'));
+    }
+
+The pattern where I take some input (like arguments or POSTed form parameters)
+and have code to evaluate its truth in some way (like if the $id matches a row
+in a database or a bunch of form parameters meet some constraint) is pretty
+common.  Ideally we'd be able to encapsulate that with a terse convention that
+is also reasonable flexible later down the road as your application complexity
+grows.  Using L<Catalyst::ActionSignatures> offers a possible solution.
+
+    sub find_user( Database::User<Capture> $user) :Chained(/) PathPrefix { ... }
+
+    sub default :Path { # User not found }
+
+Note we can also skip declaring 'CaptureArgs(1) since L<Catalyst::ActionSignatures>
+is smart enough to notice the Capture in the signature and add that to you action
+configuration for you.  So we have a nice side effect that we can reduce our need
+for method attributes a bit as well.
+
+So L<Catalyst::ActionSignatures> does three things:
+
+1) Least importantly it brings L<signatures> into your project which reduces a
+bit of boilerplate code.
+
+2) It enables you control what arguments the application passes to the action,
+enabling you to use the built in L<Catalyst> dependency injection more easily
+and reduces the need to reach into $context all the time.  I believe this will
+make you actions more simple and straightforward.
+
+3) It lets you leverage the built in L<Catalyst> dispatcher to evaluate those
+arguments and matche or fails to match an action based on the truth value of
+the requested signature dependencies.  This should result in less boilerplate
+"If I have this, then do this, otherwise show a not found" code, again making
+your action more simple and straightforward on the reader.
+
+I also hope that it encourage L<Catalyst> developers to spend more time learning
+how to make good use of the built in dependency management features and to
+better model their application use cases.
+
+=head1 SEE ALSO
+ 
+L<Catalyst::Action>, L<Catalyst>, L<signatures>,
+L<Catalyst::ActionRole::MethodSignatureDependencyInjection>
+ 
+=head1 AUTHOR
+ 
+John Napiorkowski L<email:jjnapiork@cpan.org>
+  
+=head1 COPYRIGHT & LICENSE
+ 
+Copyright 2015, John Napiorkowski L<email:jjnapiork@cpan.org>
+ 
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

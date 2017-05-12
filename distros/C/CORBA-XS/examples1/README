@@ -1,0 +1,43 @@
+  EXAMPLE 1
+
+    The file Calc.idl describes the interface of a simple calculator.
+
+    First, run :
+
+        idl2xs_c Calc.idl
+
+    Second, make skel_Calc.c from skel_Calc.c0 by completing each methode
+    between tag START_EDIT and STOP_EDIT :
+
+        // IDL : long Add(in long val1, in long val2);
+
+        CORBA_long
+        Calc_Add(
+            Calc _o,
+            CORBA_long val1, // in (fixed length)
+            CORBA_long val2, // in (fixed length)
+            CORBA_Environment * _ev
+        )
+        {
+        /* START_EDIT (Calc_Add) */
+            return val1 + val2;
+        /* STOP_EDIT (Calc_Add) */
+        }
+
+    Third, build :
+
+        make
+        make test
+        make install
+
+    Fourth, if you use Test::Unit, you can continue with :
+
+        cd testunit
+        testrunner suite_calc
+
+    Finally, using the extension module :
+
+        use Calc;
+        my $calc = new Calc();
+        print $calc->Add(2, 3);
+

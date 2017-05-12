@@ -1,0 +1,19 @@
+CGI-FCKeditor version 0.02
+==========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Kazuma Shiraiwa.
+This program is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+

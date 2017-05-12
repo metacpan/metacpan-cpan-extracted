@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: d1
+registers:
+  AF: 0
+  AF_: 0
+  BC: 0
+  BC_: 0
+  DE: 59598
+  DE_: 0
+  HL: 0
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 1
+  R: 1
+  SP: 16709

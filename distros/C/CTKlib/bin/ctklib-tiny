@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+use strict; # $Id: ctklib-tiny 191 2017-04-28 18:29:58Z minus $
+
+use constant {
+    PROJECTNAME => 'foo',
+};
+use CTK;
+use CTKx;
+use CTK::Helper;
+
+my $c = new CTK( syspaths => 1 );
+my $ctkx = CTKx->instance( c => $c );
+my $projectname = @ARGV ? shift @ARGV : '';
+$projectname =~ s/[^a-z0-9_\-]//ig;
+unless ($projectname) {
+    exit(0) unless $c->cli_prompt("Are you sure you want to create a new tiny project?:", "yes") =~ /^y/i;
+    $projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME);
+}
+exception("Invalid project's name!") if $projectname =~ /[^a-z0-9_\-]/i;
+exception("Invalid project's name. Name must not be begun with a number!") if $projectname =~ /^\d/;
+say "Creating tiny project \"$projectname\"...";
+my $h = new CTK::Helper (
+        -type           => 'tiny',
+        -projectname    => $projectname,
+    );
+$h->build();
+say "The tiny project \"$projectname\" was successfully created.";
+exit(0);
+1;
+__END__

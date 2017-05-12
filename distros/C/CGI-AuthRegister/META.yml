@@ -1,0 +1,15 @@
+# <? read_starfish_conf(); &generate_header; &generate_META_yml !>
+#+
+# file: META.yml
+# CGI::AuthRegister - Simple CGI Authentication and Registration in Perl
+# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+# $Date: $
+# $Id: $
+--- #YAML:1.0
+name: CGI::AuthRegister
+abstract: Simple CGI Authentication and Registration in Perl
+version: 1.0
+authored_by:
+  - Vlado Keselj http://web.cs.dal.ca/~vlado
+license: perl
+#-

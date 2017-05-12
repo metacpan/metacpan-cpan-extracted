@@ -1,0 +1,160 @@
+##########################################################################
+#                                                                        #
+# © Copyright IBM Corporation 2001, 2008 All rights reserved.            #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# William Spurlin - Initial version and revisions                        #
+#                                                                        #
+##########################################################################
+
+_________________________________________
+
+The ClearCase::CtCmd module requires Perl v5.6.1 or v5.8 or later.
+The ClearCase::CtCmd module requires that ClearCase be installed:
+
+Platform                    ClearCase Version
+_________________________________________
+
+Solaris 2.7, 2.8, 2.9,2.10    2002.05 or later
+HP-UX 11.00, 11.11            2002.05 "  "
+RH Linux 7.2, 7.3, 8.0, 9     2002.05 "  "
+AIX 4.3.3, 5.1, 5.2           2002.05 "  "
+Windows XP Pro                2002.05 "  "
+Windows 2000                  2002.05 "  "
+Windows NT 4.0                2002.05 "  "
+
+
+
+__________________________________________
+
+Build and Install
+__________________________________________
+
+Build and installation is by the usual method:
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+For verbose output when making test, set environment
+variable TEST_VERBOSE=1 and run "make -e test".
+
+To install the module into non-default location, do
+perl Makefile.PL PREFIX=/<your_home_directory>/. This
+may be useful for testing "make install".
+
+Note:  The CC class is for test purposes only, although it
+may be consulted for an indication of how ClearCase::CtCmd may be used.
+
+When the MVFS is not installed, e. g. with ClearCase LT, it is not possible
+to "make test".  However, in most cases, passing directly from a
+successful "make" to "make install" will be satisfactory.
+
+CtCmd extracts various parameters from the perl config file. This
+includes the compiler and the compiler/linker flags.  If you are
+building this on a different compiler than the compiler that perl
+was built with, you need to override the compiler and linker options/flags.
+perl Makefile.PL CC=gcc <appropriate flags>= .
+
+__________________________________________
+
+Platform Notes
+__________________________________________
+
+UNIX/Linux:
+
+Set environment variable ATRIA_ROOT to the
+ClearCase installation path if different from /usr/atria:
+Linked install: set ATRIA_ROOT to network path.
+
+If /var/tmp is not available, set environment variable CC_CTCMD_TMP
+to the path of an alternative directory.
+
+
+Solaris:
+
+CtCmd has used a Sun "interposing filter", implemented in libzuba.so, to tell
+the runtime loader to load RPC functions from the correct library. However,
+interposing filters are broken on Solaris 5.8 and 5.9 by some recent (as of
+2005-03-31) Solaris  patches. See Sun defect 510560:  "ld.so.1 gets a little
+too enthusiastic with interposition". If CtCmd is broken by one of the patches,
+below, or one of the corresponding Solaris 2.8 patches, it may be possible to
+set environment variable LD_PRELOAD to /usr/ucblib/librpcsoc.so to run CtCmd.
+
+Note that ClearCase release 7 eliminates the need for the interposer and
+libzuba.so.  Currently we cannot remove it as we must stay backwards compatible
+with pre-7 releases.
+
+Note that CtCmd functions normally with certain Solaris 5.9 patches:
+112963-07   work
+112963-09   work
+112963-12   work
+112963-13   doesn't work
+112963-14   doesn't work
+112963-17   work
+112963-18   doesn't work
+112963-19   doesn't work
+
+If the wrong Perl interpreter or C compiler is found, please do
+ln -s <path to Perl> perl; ln -s <path to cc> cc,
+or add the paths to those programs to PATH.
+
+If using Solaris 5.8 /usr/bin/perl and trying to build the Module with gcc,
+Set environment variable CC_CTCMD_GCC=<any non null value>.  This might work
+with other Solaris Perls/gcc, as well.
+
+AIX:
+
+The only way to run CtCmd with Perl 5.8.6 is to rebuild Perl 5.8.6 with
+the library link order changed to have -lc before -lnsl.
+
+Win32:
+
+Substitute "nmake" for "make" when building and installing.
+
+There must be an environment variable:
+TMP=<path to system temporary storage, full control by everyone>.
+
+The path to Microsoft Visual Studio and to Perl must be in the PATH.
+
+The user must be able to run "Perl", "cleartool", "cl" and "dumpbin"
+from the command line without error messages before attempting
+installation.  The environment variables "inc" and "lib" must be set to
+the paths where the MS Visual Studio C include files and libraries are
+kept.  The user's PATH must include the path to the MSDEV ...\common\bin
+and ...\bin directories, as well as the path to cleartool and the Clearcase
+*.dll's.  Perl, version 5.6.1 or greater must be installed, and the
+installed Perl must have the necessary header and other files to allow
+installation of a Perl Module.
+
+If cmdsyn.lib or ks.lib is not being created it may be because the path to
+"dumpbin" or the path to the Clearcase libraries is not in the user's PATH.
+
+An error message "This shared resource does not exist" at the beginning
+of t/t1_createArch when nmaking test indicates that a view previously mapped
+then unmapped is inaccessible.  Pressing <enter> should allow the test
+to continue.
+
+Setting AUTODEF_DEBUG=<any non null value> will produce debugging output to
+assist in determining if ks.lib and cmdsyn.lib are being produced correctly.
+
+In case of "nmake test" failure to create test view:
+"System error 67 - The network name cannot be found":
+
+If the default view net name, "view", has been set to some other value with registry key
+HKEY_LOCAL_MACHINE:SYSTEM\CurrentControlSet\Services\Mvfs\Parameters\view_netname,
+set environment variable CC_VIEW_NETNAME=\\<view net name>\ before running
+"nmake test", or running the tests in the t directory explicitly. For example,
+"nmake test", or running the tests in the t directory explicitly. For example,
+
+set CC_VIEW_NETNAME=\\net\
+
+Note that there are no quotes around \\net\  .
+__________________________________________
+

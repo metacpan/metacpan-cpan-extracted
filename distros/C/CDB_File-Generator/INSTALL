@@ -1,0 +1,15 @@
+This module requires DBFile, but that is standard with perl.  In order
+to work you have to have "cdbmake" installed (part of the CDB
+distribution which is included in the CDB_File source distribution if
+nowhere else). The tests require CDB_File and so do your applications
+probably.  This can be retrieved from any CPAN mirror site.
+
+To build and install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb49
+registers:
+  AF: 27004
+  AF_: 0
+  BC: 14905
+  BC_: 0
+  DE: 47156
+  DE_: 0
+  HL: 29878
+  HL_: 0
+  I: 0
+  IX: 3767
+  IY: 15905
+  PC: 4
+  R: 2
+  SP: 0

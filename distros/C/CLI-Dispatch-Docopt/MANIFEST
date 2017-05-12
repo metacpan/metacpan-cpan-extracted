@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/CLI/Dispatch/Docopt.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+README.pod
+t/00_compile.t
+t/01_basic.t
+t/02_no_args.t
+t/lib/MyApp/CLI.pm
+t/lib/MyApp/CLI/Qux.pm
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04_notabs.t
+xt/05_code_metrics.t
+META.yml

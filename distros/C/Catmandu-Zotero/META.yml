@@ -1,0 +1,38 @@
+---
+abstract: 'Catmandu modules for working with Zotero web'
+author:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@gmail.com>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Pod: '0'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Zotero
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '>= 0.9, != 0.9402, != 0.9401'
+  IO::Socket::SSL: '1.993'
+  WWW::Zotero: '0.03'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Zotero/issues
+  homepage: https://github.com/LibreCat/Catmandu-Zotero
+  repository: https://github.com/LibreCat/Catmandu-Zotero.git
+version: '0.07'
+x_contributors:
+  - 'Jakob Voß <jakob.voss@gbv.de>'

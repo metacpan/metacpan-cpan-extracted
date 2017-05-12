@@ -1,0 +1,83 @@
+{
+   "abstract" : "the Eksblowfish block cipher",
+   "author" : [
+      "Solar Designer (solar at openwall.com)",
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Eksblowfish",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.15",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Mix" : "0.001",
+            "Exporter" : 0,
+            "MIME::Base64" : "2.21",
+            "XSLoader" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Eksblowfish" : {
+         "file" : "lib/Crypt/Eksblowfish.pm",
+         "version" : "0.009"
+      },
+      "Crypt::Eksblowfish::Bcrypt" : {
+         "file" : "lib/Crypt/Eksblowfish/Bcrypt.pm",
+         "version" : "0.009"
+      },
+      "Crypt::Eksblowfish::Blowfish" : {
+         "file" : "lib/Crypt/Eksblowfish/Blowfish.pm",
+         "version" : "0.009"
+      },
+      "Crypt::Eksblowfish::Family" : {
+         "file" : "lib/Crypt/Eksblowfish/Family.pm",
+         "version" : "0.009"
+      },
+      "Crypt::Eksblowfish::Subkeyed" : {
+         "file" : "lib/Crypt/Eksblowfish/Subkeyed.pm",
+         "version" : "0.009"
+      },
+      "Crypt::Eksblowfish::Uklblowfish" : {
+         "file" : "lib/Crypt/Eksblowfish/Uklblowfish.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.009"
+}

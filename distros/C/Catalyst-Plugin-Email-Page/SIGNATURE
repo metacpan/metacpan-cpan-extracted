@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.52.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 12be514ea0aa1cfec8c5f39f8da7221d5e18b62a Build.PL
+SHA1 a4e014476e16db1abc445141c12164bc40ffd3b8 Changes
+SHA1 4c779f1c86d990770179552833782104b36e7db8 MANIFEST
+SHA1 c87154580248fba54cdee0477bf82516b4878b18 MANIFEST.SKIP
+SHA1 a85e0e9f3d490d053c056f5aa45a1b871c088422 META.yml
+SHA1 43214bacf8a06a571929b11a1c86ba4983fa4106 Makefile.PL
+SHA1 3c06fd32045b6a79ccc82f7260405c63c7a0e2b5 README
+SHA1 0bb5ddbe64424d40536acdee2f09e853ab39087d inc/Module/AutoInstall.pm
+SHA1 e7688055bf405375921ea837273d8bdc68803efb inc/Module/Install.pm
+SHA1 4fad9a959426996f62d0e4e972cf09e3a0cf8c0c inc/Module/Install/AutoInstall.pm
+SHA1 e5b3215acb96829f2142dcfce736c1b6484fbc08 inc/Module/Install/Base.pm
+SHA1 d82dd2b865741fcc26da07b57904d4dcefb9502a inc/Module/Install/Build.pm
+SHA1 07c44e137098675ea35a5d537df1e4af098382d9 inc/Module/Install/Can.pm
+SHA1 8f691f8e451ba687551fa836e8d75c4d514241e5 inc/Module/Install/Fetch.pm
+SHA1 0db6efc5925b96e1ea3b8bc46c3ecdb14660ae82 inc/Module/Install/Include.pm
+SHA1 81b798c6ca71d1b665a470fb49d32105084ac389 inc/Module/Install/Makefile.pm
+SHA1 c8c9737da19baa15ffa7d9d5037913f64b592189 inc/Module/Install/Metadata.pm
+SHA1 b97304e2a5c405d950eeaa4afd09c6b5507571c3 inc/Module/Install/Win32.pm
+SHA1 73a588d58f7ad0a6a9ed0ea80c48fa12f234a02c inc/Module/Install/WriteAll.pm
+SHA1 ab473bb45441307a9147407ffc7869447000a7d9 lib/Catalyst/Plugin/Email/Page.pm
+SHA1 76b395074c1bba2d4e729e674423a5b2c22dce70 t/00.load.t
+SHA1 5d3755101af2cc50d9b7a4baaebd15baeedcfbb4 t/01.distribution.t
+SHA1 3896648641ebc8b9f4034eb334c77e2b68720753 t/02._construct_url.t
+SHA1 712e2faee7a67685d191141125fe3d048b2d22d1 t/03.email_page_url.t
+SHA1 9a4aa5c71b27bb8e6f09c0b0b3b298a58554a9da t/04.load_catalyst.t
+SHA1 462fe629b6de5a577710f6b1f13bb8fce4c7b2b7 t/05.load_catalyst_request.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQFEHo8QeWseh9tzvqgRAn6yAKCI3A18jbmkxv2KiLMmKkzUpT54mwCfS+tC
+8EDYFRXfB8x21qtkZCK4jxc=
+=EY3z
+-----END PGP SIGNATURE-----

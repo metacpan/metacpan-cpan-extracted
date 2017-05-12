@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 56
+  20466:
+    - 170
+name: cb38
+registers:
+  AF: 57088
+  AF_: 0
+  BC: 31771
+  BC_: 0
+  DE: 40863
+  DE_: 0
+  HL: 20466
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

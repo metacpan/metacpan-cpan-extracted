@@ -1,0 +1,67 @@
+{
+   "abstract" : "Run CA-SCM (Harvest) commands",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "cascm",
+      "harvest",
+      "vci",
+      "version-control",
+      "scm"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CASCM-Wrapper",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Tiny" : "0",
+            "Log::Any" : "0",
+            "Log::Any::Adapter" : "0"
+         },
+         "requires" : {
+            "File::Temp" : "0.16",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "CASCM::Wrapper" : {
+         "file" : "lib/CASCM/Wrapper.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-cascm-wrapper/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-cascm-wrapper",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-cascm-wrapper.git"
+      }
+   },
+   "version" : "v1.0.1"
+}

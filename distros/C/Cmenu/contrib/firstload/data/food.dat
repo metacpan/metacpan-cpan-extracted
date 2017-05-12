@@ -1,0 +1,422 @@
+\echo 10 Fresh food - Vegetables
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Potatoes',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Onions',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Mushrooms',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Cabbage',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Cauliflower',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Carrots',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Parsnips',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Leeks',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'10','Tomatoes',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 11 Fresh food - Fruit
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Apples - Granny',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Apples - Gala',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Apples - Golden D',	0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Apples - Cooking',	0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Pears',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Oranges',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Bananas',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Melon - Canteloup',	0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Melon - Water',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Melon - Honeydew',	0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Grapes',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Mango',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Strawberry',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Nectarines',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Peaches',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Plums',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'11','Celmentines',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 12 Fresh food - Bread
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','White - pan',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','White - plain',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','White - French',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','White - crusty',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Brown - pan',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Brown - Veda',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Soda farl',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Wheaten farl',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Potato farl',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Wheaten loaf',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Barnbrack',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Burger buns',		0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'12','Baps',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 20 Dried food - Cereals
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'20','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 21 Dried food - Biscuits
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'21','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 22 Dried food - Rice & Pasta
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'22','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 23 Dried food - Soups
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'23','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 30 Tinned Food - Soups
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'30','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 31 Tinned Food - Sauces
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'31','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 32 Tinned Food - Spices
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'32','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 33 Tinned Food - Pickles
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'33','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 40 Dairy Produce - Meats
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'40','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 41 Dairy Produce - Cheese
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'41','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 42 Dairy Produce - Mild Products
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'42','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 49 Dairy Produce - Processed
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'49','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 50 Frozen Food - Vegetables
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'50','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 51 Frozen Food - Meat & Fish
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'51','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 52 Frozen Food - Desserts
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'52','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 59 Frozen Food - Processed
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'59','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 60 Meat - Chicken
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'60','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 61 Meat - Beef
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'61','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 62 Meat - Pork
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'62','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 63 Meat - Lamb
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'63','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 64 Meat - Turkey
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'64','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 65 Meat - Other meat
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'65','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 68 Meat - Fish
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'68','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 69 Meat - Processed
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'69','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 70 Drinks - Pure Juice
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'70','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 71 Drinks - Dilute Juice
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'71','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 72 Drinks - Tea & Coffee
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'72','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 73 Drinks - Fizzy
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'73','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 80 Non-food - Tissues
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'80','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 81 Non-food - Cleansers
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'81','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 82 Non-food - Household
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'82','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 89 Non-food - General
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'89','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 90 Booze - Beer
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'90','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 91 Booze - Wine
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'91','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 92 Booze - Minerals
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'92','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 93 Booze - Spirits
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'93','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 94 Booze - Snacks
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'94','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+
+\echo 95 Booze - Tobacco
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);
+INSERT INTO food VALUES(NEXTVAL('food_foodid_seq'),'95','',			0,	0,	0.0,	0,	0,CURRENT_TIMESTAMP);

@@ -1,0 +1,24 @@
+[ 0.04 - Mon 27 May 2003 ]
+
+ - optimisation - walk directories in reverse order and read only the 
+   first of each file we find
+ - modified 'glob' option to take an arrayref
+ - removed non-writable directory tests that were failing when run as root
+
+[ 0.03 - Wed 14 May 2003 ]
+
+ - fixed a buglet with two tests failing on case-insensitive filesystems 
+   (e.g. Mac OSX)
+
+[ 0.02 - Tue 13 May 2003 ]
+
+ - added write support via set() method
+ - added get() method for symmetry with set()
+ - added 'trim' option and confirmed it played properly with 'chomp'
+ - updated perldocs
+
+[ 0.01 - Wed 5 Feb 2003 ]
+
+ - added 'prefix', 'lines', 'maxsize', 'chomp', and 'ignore' options
+ - initial readonly version
+

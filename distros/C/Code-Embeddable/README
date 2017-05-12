@@ -1,0 +1,60 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertBlock::FromModule]
+
+    In lib/Your/Module.pm (that wants to embed one or more routines):
+
+     # INSERT_BLOCK: Code::Embeddable import
+     # INSERT_BLOCK: Code::Embeddable another_func
+
+DESCRIPTION
+
+    This module is a collection of functions that can be embedded into
+    another file's source code, e.g. using
+    Dist::Zilla::Plugin::InsertBlock::FromModule (if you're using
+    Dist::Zilla to build your dists).
+
+    The functions put here are usually routines that are small,
+    independent, and stable (doesn't change that much). Instead of
+    require-ing a module that contains these routines, a client code can
+    opt to embed them directly in its file instead. The advantage is less
+    dependencies (no other module to depend on) and slightly smaller
+    startup overhead. Compared to manual "copy-pasting" of code, embedding
+    using Dist::Zilla::Plugin::InsertBlock::FromModule is more
+    maintainable.
+
+FUNCTIONS
+
+ import
+
+    A lightweight Exporter-style exporter. Supports @EXPORT and @EXPORT_OK.
+    No support for tags.
+
+ pick(@list) => $item
+
+    Pick a random item from a list. Will return undef if @ary is empty.
+
+ pick_n($n, @list) => @items
+
+    Pick $n items from a list.
+
+ shuffle(@list) => @shuffled
+
+    Just like List::Util's shuffle, except implemented in pure Perl and you
+    don't have to load the module.
+
+ uniq(@list) => @unique
+
+    Just like List::MoreUtils's uniq, except implemented in pure Perl and
+    you don't have to load the module.
+
+ROUTINES
+
+    These embeddable pieces of code are not function declaration:
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertBlock::FromModule
+

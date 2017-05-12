@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use Pod::Usage;
+use CORBA::XPIDL::XPT;
+
+my %opts;
+getopts('t:', \%opts)
+        or pod2usage(-exitval => 1, -verbose=> 1);
+
+$opts{t} = '1.2' unless (exists $opts{t});
+die "ERROR: version $opts{t} not supported.\n"
+        if ($opts{t} eq '1.0');
+die "ERROR: version $opts{t} not recognised.\n"
+        if ($opts{t} ne '1.1' and $opts{t} ne '1.2');
+
+my $major_version = substr $opts{t}, 0, 1;
+my $minor_version = substr $opts{t}, 2, 1;
+
+my $outfile = shift;
+
+pod2usage(-exitval => 1, -verbose=> 1)
+        if (!defined $outfile or !@ARGV);
+
+eval {
+    my $whole = new XPT::File(
+            magic           => XPT::File::MAGIC,
+            major_version   => $major_version,
+            minor_version   => $minor_version,
+    );
+    foreach my $filename (@ARGV) {
+        open my $IN, '<', $filename
+                or die "FAILED: can't read $filename\n";
+        binmode $IN, ':raw';
+        undef $/;
+        my $rv = <$IN>;
+        close $IN;
+
+        my $offset = 0;
+        my $file = XPT::File::demarshal(\$rv, \$offset);
+
+        foreach (@{$file->{annotations}}) {
+            if ($_->{tag}) {    # not empty
+                $whole->add_annotation($_);
+            }
+        }
+        foreach ($file->_interface_directory()) {
+            $whole->add_interface($_);
+        }
+    }
+    $whole->terminate_annotations();
+    $whole->indexe();
+
+    open my $OUT, '>', $outfile
+            or die "FAILED: can't open $outfile\n";
+    binmode $OUT, ':raw';
+    print $OUT $whole->marshal();
+    close $OUT;
+    exit(0);
+};
+if ($@) {
+    warn $@;
+    exit(1);
+}
+
+
+###############################################################################
+
+__END__
+
+=head1 NAME
+
+xpt_link - typelib linker
+
+=head1 SYNOPSIS
+
+C<xpt_link> [-t version number] F<outfile> F<file1.xpt> F<file2.xpt> ...
+
+=head1 OPTIONS
+
+=over 8
+
+=item -t I<version number>
+
+create a typelib of an older version number
+
+=back
+
+=head1 DESCRIPTION
+
+C<xpt_link> is a utility for linking multiple typelib files into one outfile.
+
+=head1 MORE INFORMATION
+
+XPCOM Type Library File Format, version 1.1, is available on
+http://mozilla.org/scriptable/typelib_file.html
+
+=head1 SEE ALSO
+
+L<xpidl>, L<xpt_dump>
+
+=head1 AUTHORS
+
+The original version (C language) is mozilla.org code.
+
+Port to Perl by Francois Perrad, francois.perrad@gadz.org
+
+=head1 COPYRIGHT
+
+Copyright 2004-2007, Francois Perrad.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,22 @@
+Revision history for Config-Simple-Inherit
+
+0.04 	Thu Jun 5 15:11:12 EDT 2008
+	Remove request that UNIVERSAL export VERSION
+	to address test reports of failure 
+	from CPAN testers.
+
+0.03	Wed Jun 4 21:16:35 EDT 2008
+	I've now integrated this with an application 
+	under development and added an EXAMPLES section 
+	to the perldoc documenting what I've learned 
+	about how to use the ->inherit() method.
+	Appears to be working just fine.
+
+0.02 	Wed Jun 4 04:39:15 EDT 2008
+	Add test config files to MANIFEST
+
+0.01    Wed Jun 4 03:21:30 EDT 2008 
+	->inherit() method seems to work
+	and has 13 working tests at t/10-inherit.t
+        First version, released on an unsuspecting world.
+

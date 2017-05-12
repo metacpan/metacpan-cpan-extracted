@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 41
+name: fd29
+registers:
+  AF: 22546
+  AF_: 0
+  BC: 18896
+  BC_: 0
+  DE: 60565
+  DE_: 0
+  HL: 284
+  HL_: 0
+  I: 0
+  IX: 60524
+  IY: 22860
+  PC: 0
+  R: 0
+  SP: 0

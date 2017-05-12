@@ -1,0 +1,310 @@
+#!../../perl
+##
+##  test.syms -- test for function/variable symbols 
+##
+##  Set the environment variable CURSES_VERBOSE to see the details of the
+##  testing.
+
+##  Copyright (c) 1994-2000  William Setzer
+##
+##  You may distribute under the terms of either the Artistic License
+##  or the GNU General Public License, as specified in the README file.
+##
+##  This program is modelled after parts of the dist-3.0 distribution.
+##  In many cases I just hand-converted the sh script to perl, so this
+##  program probably falls under the Artistic license.  At the very least,
+##  it has the "look and feel".  Will I be sued? :-)
+##
+##  Thanks to Raphael Manfredi and the other contributors of dist-3.0.
+##
+##  VMS patches thanks to Peter Prymmer <pvhp@forte.com>
+
+use strict;
+use warnings;
+use English;
+
+my $verbose;
+
+sub makeCompileCommand($) {
+    my ($compileR) = @_;
+    
+    #  Get a compile command so we can test for curses symbols.
+    # (There has got to be an easier way.  Blech.)
+    #
+
+    my $compile = '#CC# #DEFS# #INCS# #CFLAGS# #FILE# #LFLAGS# #LIBS#' .
+        ($verbose ? '' : '#NULL#');
+    my $makefile = ($OSNAME =~ /VMS/) ? "Descrip.MMS" : "Makefile";
+
+    my ($cc, $inc, $ccflags, $ldloadlibs, $lddlflags);
+
+    open MAKEFILE, "< $makefile" or 
+        die "Can't open make file '$makefile' errno=$ERRNO";
+    while (<MAKEFILE>) {
+
+        if (/^CC\s*=\s*(.*)/) { 
+            $cc = $1;
+        } elsif (/^INC\s*=\s*(.*)/) { 
+            $inc = $1;
+        } elsif (/^CCFLAGS\s*=\s*(.*)/) { 
+            $ccflags = $1;
+        } elsif (/^LDLOADLIBS\s*=\s*(.*)/) { 
+            $ldloadlibs = $1;
+        } elsif (/^LDDLFLAGS\s*=\s*(.*)/) {
+            $lddlflags = $1;
+        }
+    }
+
+    if (defined($cc)) {
+        $compile =~ s{#CC#}{$cc};
+    }
+    if (defined($inc)) {
+        $compile =~ s{#INCS#}{$inc};
+    }
+    if (defined($ccflags)) {
+        $compile =~ s{#CFLAGS#}{$ccflags};
+    }
+    if (defined($ldloadlibs)) {
+        $compile =~ s{#LIBS#}{$ldloadlibs};
+    } else {
+        $compile =~ s{#LIBS#}{};
+    }
+    if (defined($lddlflags)) {
+        ## Only get -L's.  Other options can cause strange link behavior.
+        ## (I shoulda stayed in bed.)
+        #
+        my $lflags;
+        $lflags = '';  # initial value
+        while ($lddlflags =~ m{(-L\S+)}g) {
+            $lflags .= " $1";
+        }
+        $compile =~ s{#LFLAGS#}{$lflags};
+    }
+    close MAKEFILE;
+
+    #  Left to handle: DEFS/FILE/NULL
+    #  DEFS  => "cc" define of "SYM" to "_C_SYM_"
+    #  FILE  => "cc" compile of file _C_FILE_.c into executable _C_FILE_
+    #  NULL  => output of system call to dev null
+    #
+    #  _C_SYM_ and _C_FILE_ will be filled in later
+
+    if ($OSNAME =~ m{VMS}i) {
+        $compile =~ s{#DEFS#}{DEFINE=SYM="_C_SYM_"};
+        $compile =~ s{#FILE#}{_C_FILE_.c};
+        $compile =~ s{#NULL#}{};  # no non-verbose way
+    }
+    elsif ($OSNAME eq 'MSWin32') {
+        $compile =~ s{#DEFS#}{-DSYM="_C_SYM_"};
+        $compile =~ s{#FILE#}{_C_FILE_.c};
+        $compile =~ s{#NULL#}{>nul 2>&1};
+    }
+    else {
+        $compile =~ s{#DEFS#}{-DSYM="_C_SYM_"};
+        $compile =~ s{#FILE#}{-o _C_FILE_ _C_FILE_.c};
+        $compile =~ s{#NULL#}{>/dev/null 2>&1};
+    }
+    
+    if ($compile =~ m{#.+#}) {
+        die "OOPS: internal error constructing a compile command.  " .
+            "We failed to substitute for a #xxx# substitution variable " .
+            "and thus ended up with this: '$compile'\n";
+    }
+    $$compileR = $compile;
+}
+
+
+
+###############################################################################
+#                                 MAINLINE                                    #
+###############################################################################
+
+print("Checking capabilities of the Ncurses libraries.\n");
+print("Set CURSES_VERBOSE environment variable to see the details of the " .
+      "tests.\n");
+print("\n");
+
+my $panels;
+my $menus;
+my $forms;
+
+if ($ENV{CURSES_VERBOSE}) {
+    $verbose = 1;
+} else {
+ $verbose = 0;
+}
+
+open IN,  "list.syms"       or die "Can't open list.syms: $!\n";
+open(OUTH, ">CursesDef.h")  or die "Can't open CursesDef.h: $!\n";
+open LOG, ">&STDERR"        or die "Can't redirect to STDERR: $!\n";
+
+while (@ARGV) {
+    my $arg = shift;
+
+    $arg eq 'PANELS' and ++$panels and next;
+    $arg eq 'MENUS'  and ++$menus  and next;
+    $arg eq 'FORMS'  and ++$forms  and next;
+    $arg =~ /^-h/    and Usage();
+    $arg =~ /^-v/    and ++$verbose and next;
+    $arg =~ /^-l/    and do {
+	my $logfile = shift      or Usage("<-l> needs a filename");
+	open LOG,   ">$logfile"  or die "Can't open file '$logfile': $!\n";
+	open STDERR, ">&LOG"     or die "Can't redirect STDERR: $!\n";
+
+	next;
+    };	
+    $arg =~ /^-/ and Usage("Unknown option: $arg");
+    Usage("Unknown argument: $arg");
+}
+if (@ARGV) { Usage() }
+
+select LOG;
+$| = 1;
+
+# Prep compile stage
+
+makeCompileCommand(\my $compile);
+
+print STDOUT "Doing test compiles with the compile command '$compile'\n";
+
+
+###
+##  Now generate the .h file
+#
+
+print OUTH <<'EOHDR';
+/*  This file is automatically generated; changes will be lost.
+**
+**  If you need to edit this file because "test.syms" didn't do a good
+**  job, be sure to save a copy of your changes.
+**
+**  The "define"s below are simply educated guesses.  If you are
+**  having problems compiling, check the appropriate symbol to see if
+**  it was set correctly: For each line, if the answer to the question
+**  is "no", that line should start with "#undef"; if the answer is
+**  yes, it should start with "#define".
+*/
+
+EOHDR
+
+print OUTH 
+    $panels ? "#define " : "#undef  ",
+    "C_PANELFUNCTION         /* Add in panel library function?             */",
+    "\n\n";
+
+print OUTH 
+    $menus ? "#define " : "#undef  ",
+    "C_MENUFUNCTION         /* Add in menu library function?              */",
+    "\n\n";
+
+print OUTH 
+    $forms ? "#define " : "#undef  ",
+    "C_FORMFUNCTION          /* Add in form library function?              */",
+    "\n\n";
+
+# Some functions return either int or void, depending on what compiler
+# and libcurses.a you are using.  For the int/void test, if the
+# compiler doesn't complain about assigning the sym to an int
+# variable, we assume the function returns int.  Otherwise, we assume
+# it returns void.
+
+my %tstfile = qw( E  testsym
+                  I  testint
+                  V  testsym
+		  T  testtyp);
+while (<IN>) {
+    next if /^\S*#/;
+    next unless /\S/;
+
+    my ($action, $sym, $args) = /^([A-Z])\s+(\w+)\s*(\(.*\))?/;
+    my $file  = $tstfile{$action};
+
+    unless (defined $sym and defined $file) {
+	warn "WARNING: internal error on symbol $_\n";
+    }
+    
+    my $cmd;
+    $cmd = $compile;  # initial value
+    my $symargs = $sym . (defined($args) ? $args : '');
+    $cmd =~ s{_C_SYM_}{$symargs}ge;
+    $cmd =~ s{_C_FILE_}{$file}g;
+
+    print LOG $cmd, "\n"      if $verbose;
+    my $ret = qx{$cmd};
+    my $rc  = $?;
+    print LOG $ret            if $verbose;
+    print LOG "(rc = $rc)\n"  if $verbose;
+
+    my $ssym  = $sym;
+    $ssym =~ s/^w//;
+
+    my $c_sym;
+    my $comment;
+
+    if ($action eq 'E') {
+	print LOG "function '$sym' ", ($rc ? "NOT " : ""), "found\n";
+
+	$c_sym   = uc "C_$ssym";
+	$comment = "Does function '$ssym' exist?";
+    }
+    elsif ($action eq 'I') {
+	print LOG "function '$sym' returns ", ($rc ? "void" : "int"), "\n";
+
+	$c_sym   = uc "C_INT$ssym";
+	$comment = "Does function '$ssym' return 'int'?";
+    }
+    elsif ($action eq 'V') {
+	print LOG "variable '$sym' ", ($rc ? "NOT " : ""), "found\n";
+
+	$c_sym   = uc "C_$ssym";
+	$comment = "Does variable '$ssym' exist?";
+    }
+    elsif ($action eq 'T') {
+	print LOG "typedef '$sym' ", ($rc ? "NOT " : ""), "found\n";
+
+	$c_sym   = uc "C_TYP$ssym";
+	$comment = "Does typedef '$ssym' exist?";
+    }
+    else {
+        warn "WARNING: internal error on symbol $_\n";
+    }
+
+    print OUTH
+	$rc ? "#undef  " : "#define ",
+        $c_sym,   " " x (24 - length $c_sym),
+        "/* ",
+	$comment, " " x (42 - length $comment),
+	"*/\n";
+}
+
+unlink "testsym";
+unlink "testint";
+unlink "testtyp";
+
+1 while unlink "testsym.obj";   # Possibly pointless VMSism
+1 while unlink "testint.obj";   # Possibly pointless VMSism
+1 while unlink "testtyp.obj";   # Possibly pointless VMSism
+
+close IN;
+close OUTH;
+close LOG;
+exit 0;
+
+###
+##  Helper functions
+#
+
+sub Usage {
+    print LOG @_, "\n";
+    print LOG <<EOM;
+Usage: find_syms [options]
+where options include:
+
+   -h         This message.   
+   -v         Verbose.  Tell you more than you want to know about
+              how the Curses symbols are being determined.
+   -l <file>  Create file <file> and dump output into it.
+EOM
+}
+
+__END__

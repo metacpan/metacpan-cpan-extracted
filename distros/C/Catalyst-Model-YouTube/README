@@ -1,0 +1,43 @@
+NAME
+    Catalyst::Model::YouTube - Catalyst Model for the YouTube Web Services
+
+SYNOPSIS
+        # use the helper
+        myapp/script/myapp_create.pl create model YouTube YouTube [dev_id]
+
+        # lib/MyApp/Model/YouTube.pm
+    
+        package MyApp::Model::YouTube;
+
+        use base 'Catalyst::Model::YouTube';
+
+        __PACKAGE__->config(
+            dev_id => 'yourdevid'
+        );
+
+        1;
+
+        # In a controller:
+        @videos = $c->model('YouTube')->list_featured;
+
+DESCRIPTION
+    A simple model class that interfaces with WebService::YouTube to query
+    the YouTube webservice APIs to fetch and display videos.
+
+METHODS
+    new Initialized the YouTube object.
+
+    ACCEPT_CONTEXT
+        Returns the YouTube webservice object, called automatically via
+        $c->model('YouTube')
+
+SEE ALSO
+    Catalyst, WebService::YouTube
+
+AUTHOR
+    J. Shirley <jshirley@gmail.com>
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

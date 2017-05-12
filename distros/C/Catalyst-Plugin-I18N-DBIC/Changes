@@ -1,0 +1,4 @@
+Revision history for Catalyst::Plugin::I18N::DBIC
+
+0.04 2007-03-25 12:39:00
+    - added support for alternative names for the lexicon table

@@ -1,0 +1,11 @@
+{
+   "credentials" : {
+      "test" : {
+         "driver" : "sqlite",
+         "host" : "localhost",
+         "password" : "test",
+         "port" : "3306",
+         "user" : "root"
+      }
+   }
+}

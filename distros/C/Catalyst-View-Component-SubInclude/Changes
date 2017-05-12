@@ -1,0 +1,65 @@
+Revision history for Catalyst-View-Component-SubInclude
+
+0.10  Tue 14 Dec 14:32:00 2010
+      - Add HTTP support (Wallace Reis)
+
+0.09  Thu 10 June 21:24:00 2010
+      - Add SSI support (Vladimir Timofeev)
+      - Additional documentation.
+
+0.08  Sun 16 May 15:52:00 2010
+      - Released 0.07_03 with no further changes.
+
+0.07_03 Fri Feb 19 00:31:00 2010
+      - Autogenerate README file from Pod.
+      - Fix missing test_requires dependency on parent by dropping use of
+         that module.
+
+0.07_02 Fri Feb 19 00:11:00 2010
+        - Fix missing test_requires dependency on Catalyst::Action::RenderView.
+
+0.07_01 Mon Feb 15 22:41:54 2010
+        - It is now possible to configure plugins, and the subrequest
+          and visit plugins can be configured to not replace the stash
+          before redispatching.
+        - Fix Visit plugin to work with newer Catalyst versions.
+        - Use uri_for_action instead of calling methods in the dispatcher
+          directly when possible.
+        - Call pulbic rather than private methods in the dispatcher in the
+          subrequest backend.
+        - Plugins which are used now generate an instance for each plugin
+          which is subsequently cached.
+        - Fix useage of namespace::clean
+        - Proper test application bundled with the distribution.
+        - Proper tests for all engines in the distribution.
+        - Use Catalyst::Component::ContextClosure instead of weakening
+          the context manually.
+        - Make pod tests only run in author mode.
+        - General code cleanup.
+
+0.07    Mon Jul 27 20:45:42 2009
+        - Fix some issues related to Args/CaptureArgs handling in the SubRequest
+          and Visit plugins.
+
+0.06
+        - Weaken $c to avoid a memory leak.
+
+0.05    Tue Apr 21 19:16:00 2009
+        - Change attribute constraint from ClassName to Str to fix issue with
+          newer Catalyst versions
+
+0.04    Wed Feb 11 00:38:02 2009
+        - Recreate dist because the CPAN indexer doesn't like tarballs generated
+          on Windows.
+
+0.03    Fri Feb  6 17:58:50 2009
+        - Add "subinclude_using"
+        - Tidy up dist (added README and this Changes file)
+
+0.02    Thu Feb  5 23:26:54 2008
+        - Fixed several issues related to Chained actions
+        - Added the Visit subinclude plugin
+
+0.01    Fri Jan 30 21:00:00 2009
+        First public version.
+

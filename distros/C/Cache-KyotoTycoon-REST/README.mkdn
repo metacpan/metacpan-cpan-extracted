@@ -1,0 +1,72 @@
+# NAME
+
+Cache::KyotoTycoon::REST - Client library for KyotoTycoon RESTful API
+
+# SYNOPSIS
+
+    use Cache::KyotoTycoon::REST;
+
+    my $kt = Cache::KyotoTycoon::REST->new(host => $host, port => $port);
+    $kt->put("foo", "bar", 100); # store key "foo" and value "bar".
+    $kt->get("foo"); # => "bar"
+    $kt->delete("foo"); # remove key
+
+# DESCRIPTION
+
+Cache::KyotoTycoon::REST is client library for KyotoTycoon RESTful API.
+
+# CONSTRUCTOR
+
+- port
+
+- host
+
+- timeout
+
+- db
+
+Database name or number.
+
+# METHODS
+
+- my $val = $kt->get($key);
+
+Retrieve the value for a _$key_.  _$key_ should be a scalar.
+
+_Return:_ value associated with the _$key_ and _$expires_ time in RFC1123 date format of GMT, empty string on no expiration time, or undef on $key is not found.
+
+- my $expires = $kt->head($key);
+
+Check the _$key_ is exists or not.
+
+_Return:_ _$expires_: RFC 1123 date format of GMT, empty string on no expiration time, or undef if $key not found.
+
+- $kt->put($key, $val[, $expires]);
+
+Store the _$val_ on the server under the _$key_. _$key_ should be a scalar.
+_$value_ should be defined and may be of any Perl data type.
+
+_$expires_: expiration time. If $expires>0, expiration time in seconds from now. If $expires<0, the epoch time. It is never remove if missing $expires.
+
+_Return:_ 1 if server returns OK(201), or _undef_ in case of some error.
+
+- $kt->delete($key);
+
+Remove cache data for $key.
+
+_Return:_ 1 if server returns OK(200).  0 if server returns not found(404), or _undef_ in case of some error.
+
+# AUTHOR
+
+Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
+
+# SEE ALSO
+
+[Cache::KyotoTycoon](http://search.cpan.org/perldoc?Cache::KyotoTycoon)
+
+# LICENSE
+
+Copyright (C) Tokuhiro Matsuno
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

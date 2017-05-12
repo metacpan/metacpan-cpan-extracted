@@ -1,0 +1,31 @@
+CORBA::C - IDL compiler to language C mapping
+
+Description:
+------------
+    idl2c parses the given input file (IDL) and generates a include file
+    following the language C mapping rules.
+
+    idl2c is a Perl OO application what uses the Visitor design pattern.
+
+Prerequisites:
+--------------
+    CORBA::IDL
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation 
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    C Language Mapping are available on <http://www.omg.org/>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

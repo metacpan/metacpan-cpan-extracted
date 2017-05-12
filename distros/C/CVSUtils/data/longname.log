@@ -1,0 +1,15 @@
+RCS file: /root/masq-fido/modules/handler/src/ca/masq/fido/handler/useraccountmanagement/GetUserProfileResponse_UnitTest.java,v
+Working file: modules/handler/src/ca/masq/fido/handler/useraccountmanagement/GetUserProfileResponse_UnitTest.java
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2002/05/24 17:43:27;  author: eassaly;  state: Exp;
+Created tests for GetUserProfileResponse class
+=============================================================================

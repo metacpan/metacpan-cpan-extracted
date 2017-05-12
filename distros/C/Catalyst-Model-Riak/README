@@ -1,0 +1,138 @@
+NAME
+
+Catalyst::Model::Riak - Basho/Riak model class for Catalyst
+
+VERSION
+
+version 0.01
+
+SYNOPSYS
+
+	# Use this to create a new model
+	script/myapp_create.pl model ModelName Riak http:/192.168.0.1:8089 900
+	
+	
+	
+	# In you controller use
+	my $coder = JSON::XS->new->utf8->pretty->allow_nonref;
+	
+	#
+	# Set bucket
+	#
+	$c->model("ModelName")->bucket('Bucket');
+	
+	#
+	# Create a key/value pair in the bucket
+	$c->model('ModelName')->create( { key => 'key', value => $coder->encode($data) } );
+	
+	#
+	# Read key/value pair from the 'Bucket'
+	my $object = $c->model('ModelName')->get({ key => 'key' });
+	
+	#
+	# Update a key/value pair in the bucket
+	$c->model('ModelName')->update( { key => 'key', value => $code->encode($newdata) } );
+	
+	#
+	# Delete a key/value pair from the bucket
+	$c->model('ModelName')->delete( { key => 'key' } );
+
+	#
+	# Or
+	#
+	
+	#
+	# Create a key/value pair
+	my $object = $c->model("ModelName")->bucket('Container')->new_object('key', $coder->encode($data) );
+	$object->store;
+	
+	#
+	# Get a key/value pair
+	my $object = $c->model("ModelName")->bucket('Container')->get('key');
+	
+	#
+	# Update a key/value pair
+	$object->data($coder->encode($newdata));
+	
+	#
+	# Delete a key/value pair
+	$object->delete;
+	
+DESCRIPTION
+	
+Use this model set create a new L<Catalyst::Model::Riak> model for your Catalyst application.
+Check the L<Net::Riak> documentation for addtional information. Also visit L<http://www.basho.com> 
+for more information on Riak.
+
+METHODS
+
+ bucket
+
+	Set the bucket and returns a Net::Riak::Bucket object.
+
+	$c->model("ModelName")->bucket("Container");
+
+ buckets
+
+	Returns an array of all available buckets.
+
+ create
+
+	Creates a new key/value pair
+
+	$c->model("ModelName")->create({ key => 'keyname', value => $json_data });
+	
+
+ delete
+
+	Deletes a key/value pair
+
+ get
+
+	Get a key/value pair from the riak server. It returns a L<Net::Riak::Object>.
+
+ read
+
+	Synonym for get
+
+ update
+
+	Update a key/value pair
+
+	$c->model('ModelName')->update( { key => 'key', value => $json_data } );
+
+ dw
+
+	Get or set the number of partitions to wait for write confirmation
+
+ w
+
+	Get or set the number of responding partitions to wait for while writing or updating a value
+
+ r
+
+	Get or set the number of responding partitions to wait for while retrieving an object
+
+SUPPORT
+
+Repository
+
+  https://github.com/Mainframe2008/CatRiak
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Mainframe2008/CatRiak/issues
+
+AUTHOR
+
+Theo Bot <nltbo@cpan.org> L<http://www.proxy.nl>
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Theo Bot
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself
+
+=cut

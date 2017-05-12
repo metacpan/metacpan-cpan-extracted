@@ -1,0 +1,98 @@
+Revision history for Perl extension CSS-Tiny
+
+1.20  2016-03-10 by Alexandr Ciornii
+	- Require newer perl
+	- RT#87261: Support properties that start with asterisk (MADDAVE)
+
+1.19 Fri  3 Sep 2010
+	- No functional changes
+	- Resolved RT #59037: CSS::Tiny reorders rules
+	- The use of Tie::IxHash to achieve ordering is now documented
+
+1.18 Fri  3 Sep 2010
+	- Resolved RT #60776: Parsing of multiple whitespace selectors
+	- Added test script specifically for RT regression tests
+
+1.17 Sun  4 Jul 2010
+	- Removed the use of Module::Install
+	- Allow read-string to be rerun again on an existing object,
+	  and thus also thus on tied objects (MPETERS)
+	- Moved POD after __END__ to reduce number of disk reads when parsing.
+	- Added support for running xt tests
+
+1.16 Fri  4 Jul 2008
+	- Upgrading to Module::Install 0.76
+	- Localising $@ during evals
+
+1.15 Thu  1 Nov 2007
+	- Moving from Module::Install to the tinier EU:MM
+	- Changed use 5.005 to BEGIN { require 5.004 }
+
+1.14 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+1.12 Thu  9 Jun 2006
+	- Moved from old CVS to new SVN repository
+	- Removed uses of UNIVERSAL::isa
+	- Upgraded to Module::Install 0.63
+
+1.11 Sat Oct 22 2005
+	- Fixed a bug in the inline ->clone method that only runs
+	  when Clone is unavailable.
+	- Dialed back the File::Spec dep a little to prevent 5.6 people
+	  needing to upgraded when not needed.
+
+1.10 Thu May 26 2005
+	- Added the ->clone method
+
+1.09 Thu Mar 24 2005
+	- Lars Thegler noted that 3-argument open is not supported by 5.005.
+	  Added a small fix to change it to 2-argument open.
+
+1.08 Fri Feb 18 2005
+	- Adding XHTML support with the ->xhtml method
+	- Cleaning up the POD a little
+
+1.07 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+1.06 Sun Jan 16 2005
+	- Added ->html to generate CSS to dump on a HTML page
+	- Modernised the test suite and makefile
+
+1.05 Wed Jul 14 2004
+	- Switched from open( FILE, ">filename" ) to open( FILE, '>', 'filename' )
+	- Using the -X _ method to file-test via cached stat information
+	- Added support for merging differently named properties in multiply listed styles
+	- Upgraded test script to hopefully work on Win32 now
+
+1.04 Wed Jan  7 2004
+	- Changed property parser to no longer require exactly one space
+	  after the colon seperate. Now allows zero or more spaces.
+
+1.02 Wed Aug 13 16:12:51 2003
+	- Applied a series of small changes to reduce the code overhead
+	  by a K or so, without changing function
+
+1.01 Mon Jul 15 00:28:12 2003
+	- Changed write_string to sort in reverse order. This fixes
+	  a problem with A:hover described at the url
+	  http://www.w3.org/TR/CSS2/selector.html#dynamic-pseudo-classes
+	  Fix supplied by Blaise Barrelet
+
+1.0  Sat Dec 21 12:31:51 2002
+	- Removed locking code, and reliance on Fcntl
+	- Removed support for write modes
+	- Tightened up the code
+	- Added the read_string() method
+	- Simplified the file generator to save ops
+
+0.3  Mon Dec 09 00:27:01 2002
+	- Upgraded tests to use Test::More and compare structs
+
+0.2  Thu Nov 28 16:53:21 2002
+	- Regex to remove C style comments was broken
+	  Fix supplied by Bjorn Svensson.
+
+0.1  Tue Nov 26 20:53:23 2002
+	- original version

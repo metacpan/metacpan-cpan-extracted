@@ -1,0 +1,13 @@
+Revision history for Config-Win32
+
+1.00    October 15
+        First version.
+
+
+1.01	October 16
+        POD fixes.
+
+		
+1.02	December 17
+        Fixed Makefile, now load() returns undef rather than dieing if the key doesn't exist.
+

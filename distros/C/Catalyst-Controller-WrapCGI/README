@@ -1,0 +1,191 @@
+NAME
+
+    Catalyst::Controller::WrapCGI - Run CGIs in Catalyst
+
+SYNOPSIS
+
+        package MyApp::Controller::Foo;
+    
+        use parent qw/Catalyst::Controller::WrapCGI/;
+        use CGI ();
+    
+        sub hello : Path('cgi-bin/hello.cgi') {
+            my ($self, $c) = @_;
+    
+            $self->cgi_to_response($c, sub {
+                my $q = CGI->new;
+                print $q->header, $q->start_html('Hello'),
+                    $q->h1('Catalyst Rocks!'),
+                    $q->end_html;
+            });
+        }
+
+    In your .conf, configure which environment variables to pass:
+
+        <Controller::Foo>
+            <CGI>
+                username_field username # used for REMOTE_USER env var
+                pass_env PERL5LIB
+                pass_env PATH
+                pass_env /^MYAPP_/
+                kill_env MYAPP_BAD
+            </CGI>
+        </Controller::Foo>
+
+DESCRIPTION
+
+    Allows you to run Perl code in a CGI environment derived from your
+    Catalyst context.
+
+    *WARNING*: do not export CGI functions into a Controller, it will break
+    with Catalyst 5.8 onward.
+
+    If you just want to run CGIs from files, see
+    Catalyst::Controller::CGIBin.
+
+    REMOTE_USER will be set to $c->user->obj->$username_field if available,
+    or to $c->req->remote_user otherwise.
+
+CONFIGURATION
+
+ pass_env
+
+    $your_controller->{CGI}{pass_env} should be an array of environment
+    variables or regular expressions to pass through to your CGIs. Entries
+    surrounded by / characters are considered regular expressions.
+
+ kill_env
+
+    $your_controller->{CGI}{kill_env} should be an array of environment
+    variables or regular expressions to remove from the environment before
+    passing it to your CGIs. Entries surrounded by / characters are
+    considered regular expressions.
+
+    Default is to pass the whole of %ENV, except for entries listed in
+    "FILTERED ENVIRONMENT" below.
+
+ username_field
+
+    $your_controller->{CGI}{username_field} should be the field for your
+    user's name, which will be read from $c->user->obj. Defaults to
+    'username'.
+
+    See "SYNOPSIS" for an example.
+
+METHODS
+
+ cgi_to_response
+
+    $self->cgi_to_response($c, $coderef)
+
+    Does the magic of running $coderef in a CGI environment, and populating
+    the appropriate parts of your Catalyst context with the results.
+
+    Calls "wrap_cgi".
+
+ wrap_cgi
+
+    $self->wrap_cgi($c, $coderef)
+
+    Runs $coderef in a CGI environment using HTTP::Request::AsCGI, returns
+    an HTTP::Response.
+
+    The CGI environment is set up based on $c.
+
+    The environment variables to pass on are taken from the configuration
+    for your Controller, see "SYNOPSIS" for an example. If you don't supply
+    a list of environment variables to pass, the whole of %ENV is used
+    (with exceptions listed in "FILTERED ENVIRONMENT".
+
+    Used by "cgi_to_response", which is probably what you want to use as
+    well.
+
+FILTERED ENVIRONMENT
+
+    If you don't use the "pass_env" option to restrict which environment
+    variables are passed in, the default is to pass the whole of %ENV
+    except the variables listed below.
+
+      MOD_PERL
+      SERVER_SOFTWARE
+      SERVER_NAME
+      GATEWAY_INTERFACE
+      SERVER_PROTOCOL
+      SERVER_PORT
+      REQUEST_METHOD
+      PATH_INFO
+      PATH_TRANSLATED
+      SCRIPT_NAME
+      QUERY_STRING
+      REMOTE_HOST
+      REMOTE_ADDR
+      AUTH_TYPE
+      REMOTE_USER
+      REMOTE_IDENT
+      CONTENT_TYPE
+      CONTENT_LENGTH
+      HTTP_ACCEPT
+      HTTP_USER_AGENT
+
+    %ENV can be further trimmed using "kill_env".
+
+DIRECT SOCKET/NPH SCRIPTS
+
+    This currently won't work:
+
+        #!/usr/bin/perl
+    
+        use CGI ':standard';
+    
+        $| = 1;
+    
+        print header;
+    
+        for (0..1000) {
+            print $_, br, "\n";
+            sleep 1;
+        }
+
+    because the coderef is executed synchronously with STDOUT pointing to a
+    temp file.
+
+ACKNOWLEDGEMENTS
+
+    Original development sponsored by http://www.altinity.com/
+
+SEE ALSO
+
+    Catalyst::Controller::CGIBin, CatalystX::GlobalContext,
+    Catalyst::Controller, CGI, Catalyst
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-catalyst-controller-wrapcgi at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Controller-WrapCGI.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+AUTHOR
+
+    Matt S. Trout <mst at shadowcat.co.uk>
+
+CONTRIBUTORS
+
+    Caelum: Rafael Kitover <rkitover@cpan.org>
+
+    confound: Hans Dieter Pearcey <hdp@cpan.org>
+
+    rbuels: Robert Buels <rbuels@gmail.com>
+
+    Some code stolen from Tatsuhiko Miyagawa's CGI::Compile.
+
+COPYRIGHT & LICENSE
+
+    Copyright (c) 2008-2015 "AUTHOR" in Catalyst::Controller::WrapCGI and
+    "CONTRIBUTORS" in Catalyst::Controller::WrapCGI.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

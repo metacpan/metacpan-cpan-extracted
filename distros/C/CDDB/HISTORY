@@ -1,0 +1,191 @@
+$Id$
+
+Changes after 1.16 are listed in the CHANGES file.
+
+*** 1.16 2005-09-17
+
+Applied Moshe Kaminsky's patch to support utf-8 submissions.
+
+*** 1.15 2004-09-08
+
+Tilman Sauerbeck updated the ID calculations to work with FreeDB's
+reference CD.  Previously they were slightly off, but the protocol's
+fuzzy matching had been compensating.
+
+*** 1.14 2004-09-01
+
+Applied Steve James' patch to improve dead connection detection.  It
+prevents harmless yet annoying warnings.
+
+Applied Ronan Waide's patch to expose the XMCD file parsing code.  The
+new method is parse_xmcd_file().
+
+*** 1.12 2004-02-12
+
+Applied Duncan Martin's patch for submitting year and long genre data.
+
+Performed some long overdue tweaking in the tests.  The CD databases
+are constantly moving targets, and the freedb servers recently
+prohibited multiple queries for the same disc in the same connection.
+Upshot: The tests pass once again.
+
+Cleaned up the code a little in CDDB.pm and cddb.t.
+
+*** 1.11 2003-08-13
+
+Version 1.10 was an empty distribution, because I mistakenly deleted
+the MANIFEST.  This fixes the last release.
+
+*** 1.10 2003-08-13
+
+Applied Albrecht Kleine's patch to make the xmcd parser more robust.
+Some software and/or devices submit records that are slightly off and
+broke CDDB.pm in the past.
+
+*** 1.09 2003-07-31
+
+Added Christopher Hartmann's patches to the 1.08 changes, and set the
+1.08 release date.  Whoops!  I was in a hurry to release that one.
+
+Colin Meyer pointed out some confusing language in the get_discs()
+documentation.  Rocco fixed it.
+
+Added Ron Grabowski's get_discs_by_query() function.  This fetches
+discs by a query string, rather than a table of contents.
+
+Added Michael Jung's parse_cdinfo() function.  This parses the output
+of cdinfo into a table of contents suitable for calculate_id().
+
+Michael Jung suggested that the module display a diagnostic if all the
+known CDDB protocol servers are unavailable.  That seemed reasonable,
+so CDDB.pm warns if it can't contact a server.
+
+*** 1.08 2002.01.19
+
+Applied henke's patch to support CDDB protocol level 5, if available.
+
+Applied Yannick Le Saint's patch to try localhost:8880.  Made
+localhost the first server to try.
+
+Applied Yannick Le Saint's patch to add a missing =back to the POD.
+
+Jonathan Stowe and Yannick Le Saint supplied patches to avoid dying if
+no cddbp servers are available.  Rocco applied something different to
+achieve the same goal.
+
+Applied Christopher Hartmann's patch to let programmers specif new
+cddbp versions.
+
+Applied Christopher Hartmann's patch to return the entire unparsed
+xmcd record.
+
+*** 1.07 2001.11.18
+
+Fixed t/cddb.t to not care *what* it gets as long as it gets
+something.
+
+*** 1.06 2001.07.17
+
+Added get_mail_host() and get_mail_address() methods to query what the
+module thinks your SMTP host and e-mail address are.  Their purpose is
+to fetch values for confirmation or correction before submitting disc
+records.
+
+FreeDB servers sometimes emit error 530 on connection instead of the
+regular 201 banner.  The CDDB module wouldn't handle this very well;
+now it closes the connection and tries again automatically.
+
+Disc submissions had hardcoded revisions of 1.  They should be 0 for
+new discs and one more than the last for updates.  Fixed submit_disc()
+to honor its documented Revision parameter.
+
+Fixed submit_disc() to transmit e-mail submissions using ISO-8859-1
+(Latin 1) and quoted-printable.  What's this mean?  Basically: Western
+European characters won't get mangled by intermediate mail servers.
+
+Drew Taylor discovered that the tests fail on MSWin32 because
+getpwuid() isn't implemented on that platform.  Worked around its
+absence on MSWin32 systems, and documented this bit of CDDB more
+carefully.
+
+*** 1.05 2001.05.03
+
+Christoph Lorenz pointed out that the module is noisy even when
+debugging is turned off.  I made sure that all the carp calls are
+behind debuging checks.
+
+*** 1.04 2001.03.24
+
+Switched from cddb.com servers to freedb.org servers.  cddb.com has
+been denying CDDB.pm users.
+
+Made some of the tests even fuzzier.
+
+*** 1.03 2000.03.27
+
+Perl no longer likes defined(@array); tweak, tweak, tweak.
+
+CDDB returns a different code for "Achtung, Baby"; tweak, tweak,
+tweak.
+
+Updated the default hosts with the most recent CDDB protocol sites
+list; tweak, tweak, tweak.
+
+*** 1.02 1999.08.13
+
+Once again, someone has changed the compact disc record that CDDB
+tests against.  This broke tests 16 (disc title) and 26 (track
+titles).  Once again I have made the tests fuzzier, so they will pass
+again.
+
+This version's CDDB.pm is identical to 1.01's, except for the version
+number.
+
+*** 1.01 1999.07.16
+
+Just as I was getting ready to celebrate a bug-free CDDB module, along
+comes some Macintosh freak with spaces in his login ID (Hi, Schwern!).
+So now the module squashes spaces and replaces them with underscores.
+And if that isn't enough, CDDB's constructor now accepts an optional
+Login parameter.
+
+*** 1.00 1999.07.16
+
+Whenever someone updates a CDDB record that cddb.t tests against, it
+breaks the test.  It's a fairly harmless problem, but it does cause
+CDDB not to pass its tests.  I'm fed up with it after a few
+iterations, so I changed the hard "retrieved track offset != stored
+one" tests with a more lenient "retrieved track offset within 5% of
+stored one".
+
+While I'm at it, make the title tests approximate by normalizing
+whitespace and only comparing consonants.  Sort of an approximate
+metaphone match.
+
+Still to do: The genres and track-lengths tests haven't been made
+fuzzy in this version.
+
+*** 0.07-beta 1998.11.27
+
+Added a list of CDDB servers inside CDDB.pm.  Added code to cycle
+through the servers upon receipt of "417 Database access limit
+reached" or connection errors.
+
+Made t/cddb.t a little lamer for the sake of passing the fuzzy matches
+tests.
+
+Added information about the CDDB submission test to README.
+
+Chris Nandor suggested a get_discs_after_calculating_id() macro
+function.  Added it under the name get_discs_by_toc().
+
+Whoops!  CDDB::message() was missing, but it was never called during
+testing.  Until today.  Added CDDB::message().
+
+*** 0.06-beta
+
+Fixed newlines in submit_disc so they meet Net::Cmd expectations
+
+Added the HISTORY file to track changes.
+
+-EOF-

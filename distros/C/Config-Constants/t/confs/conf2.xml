@@ -1,0 +1,15 @@
+<config>
+    <module name='Foo::Bar2'>
+          <constant name='BAZ' type='ARRAY'>
+            [ 1, 2, 3 ]
+          </constant>
+    </module>
+    <module name='Bar::Baz2'>
+        <constant name='FOO' type='HASH'>
+            { test => 'this', out => 10 }
+        </constant>
+        <constant name='BAR' type='My::Object'>
+            bless({}, 'My::Object')
+        </constant>        
+    </module>
+</config>

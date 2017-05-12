@@ -1,0 +1,59 @@
+---
+version: 0.13
+date: Wed Oct 13 00:42:03 EDT 2010
+changes:
+- Tom Wyant's excellent Mac fixups
+---
+version: 0.12
+date: Mon Oct 11 02:11:44 EDT 2010
+changes:
+- Just added 'dragonfly' OS to recognized list (as *nix type)
+---
+version: 0.11
+date: Thu Oct  7 00:20:45 EDT 2010
+changes:
+- Removed dependency on IO::All, Spiffy and IO::Run (!)
+- Switched Mac from pbcopy shelling to Mac::Pasteboard (Tom Wyant)
+- Improved error handling of Xclip.pm
+- Added at/clipfilter-test
+---
+version: 0.10
+date:    Wed Oct  6 21:16:25 EDT 2010
+changes:
+- Correct recognition of Windows in Makefile.PL (Alexandr Ciornii)
+- Makefile.PL version update (Alexandr Ciornii)
+- clipjoin now escapes weechat-type mess, and also now has -q flag.
+- clipbrowse now defaults to chromium-browser.
+- added at/clipjoin-test and at/clipbrowse-test
+- Updating email address and copyright date.
+- Minor text updates here and there.
+---
+version: 0.09
+date:    Thu Oct 20 09:30:45 CDT 2005
+changes:
+- Included Anton Berezin's Clipboard::Xclip fix for data that includes \n\n
+- Added scripts/clipfilter (also with Anton's feedback)
+- Removed dependency on IO::All
+- Cheated to make CPAN tests pass (turned 'xclip' dependency into warning).
+  The real fix here is probably to Inline::C it - the xclip source is not that
+  hard to read and pare down to a minimal set.
+---
+version: 0.08
+date:    Tue Jun 21 23:10:15 CDT 2005
+changes:
+- Fixed the MSWin32 OS string.  Oops - I thought it was winSomething
+- Added a few more OS strings
+- clipaccumulate, the most obscure script in the batch!
+---
+version: 0.07
+date:    Thu Jun  2 00:10:26 PDT 2005
+changes:
+- fixed stupid typo in clipedit.  Not sure how I let this slip by me. =\
+---
+version: 0.06
+date:    Wed Jun  1 11:30:37 PDT 2005
+changes:
+- `editclip`, sure to be a celebrated entry in the world of clipboard editing!
+- Renamed `joinclip` to `clipjoin`, and `browseclip` to `clipbrowse`.  Sorry
+  if you already are in the habit of typing the others (I still am).
+- `clipbrowse` now opens URLs into a new tab.

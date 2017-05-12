@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  43760:
+    - 185
+name: ddcbc6
+registers:
+  AF: 45860
+  AF_: 0
+  BC: 56332
+  BC_: 0
+  DE: 7733
+  DE_: 0
+  HL: 36053
+  HL_: 0
+  I: 0
+  IX: 43820
+  IY: 46835
+  PC: 4
+  R: 2
+  SP: 0

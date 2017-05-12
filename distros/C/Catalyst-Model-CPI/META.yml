@@ -1,0 +1,31 @@
+---
+abstract: 'Business::CPI models for Catalyst'
+author:
+  - 'André Walker <andre@andrewalker.net>'
+build_requires:
+  File::Path: 2.08
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-CPI
+provides:
+  Catalyst::Model::CPI:
+    file: lib/Catalyst/Model/CPI.pm
+    version: 0.03
+requires:
+  Business::CPI: 0.903
+  Catalyst::Runtime: 5.8
+  Class::Load: 0.20
+  Module::Pluggable: 3.8
+  Moo::Role: 1.0
+  Moose: 0.73
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/andrewalker/p5-catalyst-model-cpi/issues
+  repository: git://github.com/andrewalker/p5-catalyst-model-cpi.git
+version: 0.03

@@ -1,0 +1,346 @@
+=head1 NAME
+
+Config::Strict - Add strict name- and type-checking to configuration data
+
+=head1 VERSION
+
+0.07 (alpha release)
+
+=head1 SYNOPSIS
+
+    use Config::Strict;
+    use Declare::Constraints::Simple -All;               # For custom checks
+
+    my $config = Config::Strict->new( {
+        params => {                                      # Parameter types & names
+            Bool     => [ qw( my_bool1 my_bool2 ) ],     # Multiple parameters
+            Int      => 'my_i',                          # Single parameter
+            Num      => 'my_n',
+            HashRef  => 'my_href',
+            Enum     => { 
+                my_enum => [ qw( v1 v2 ), undef ] 
+            },
+            Anon   => {                                  # anonymous profiles
+                my_pos2 =>                               # Positive number
+                    And( IsNumber, Matches( qr/^[^-]+$/ ) ),
+                my_nest => IsA( 'Config::Strict' ),      # Nested configuration
+            }
+        },
+        required => [ qw( my_bool1 my_n ) ],             # Required parameters
+        defaults => {                                    # Default values
+            my_bool1    => 1,
+            my_enum     => 'e2',
+            my_n        => -1.1,
+            my_pos2     => 1_000,
+        },
+    } );
+    
+    # Access and change the data
+    
+    # Retrieve a single value
+    $got = $config->get( 'my_n' );                # $got = -1.1
+    
+    # Retrieve a list of values
+    @got = $config->get( qw( my_bool1 my_n ) );   # @got = ( 1, -1.1 )
+    
+    # Set multiple parameters
+    $config->set( my_bool1 => 1, 'my_pos2' => 2 );   
+    
+    # Unset parameters
+    $config->unset( 'my_n' );
+    $config->param_is_set( 'my_n' );              # false
+    
+    # The following will die:
+    $config->get( 'foo' );                # foo doesn't exist
+    $config->set( 'my_i' => 2.2 );        # my_i must be an integer
+    $config->set( 'my_pos2' => -5 );      # my_pos2 must be positive
+    $config->unset( 'my_n' );             # my_n is required
+    
+=head1 DESCRIPTION
+
+Config::Strict wraps L<Declare::Constraints::Simple> to enable strict parameter name- and type-checking on configuration data. That is, it will complain anytime an attempt is made to access a parameter with an invalid name or type; or if an attempt is made to unset a required parameter. Both built-in and custom types can be used to build a validation profile for the entire configuration.
+
+This module is meant to be used alongside any configuration parser that hashes configuration data.
+
+See L<Declare::Constraints::Simple::Library> for an index to available constraints.
+
+=head1 CONSTRUCTING A TYPE SYSTEM
+
+Declare the configuration profile during construction:
+
+=head2 new
+
+    $config = Config::Strict->new( \%config_profile );
+
+C<%config_profile> is a multi-level hash with the following top-level keys:
+
+=over 4
+
+=item B<params> (Required)
+
+Points to the hash of parameter types and names, where the keys are the 
+built-in Config::Strict types (more below).
+
+The values are either a single parameter name or an arrayref of parameter names,
+with the exception of the special types C<Enum> and C<Anon> which point to a 
+uniquely defined hashref.
+
+Any parameter not named here cannot be added later - any attempt to L<access a
+parameter|/"GETTING AND SETTING PARAMETER VALUES"> that is not provided in the 
+constructor will result in an error.
+
+Built-In Parameter Types:
+
+=over 4
+
+=item B<Bool> => $param | [ $param1, $param2, ... ]
+
+Parameters taking the value 0 or 1.
+
+=item B<Int> => $param | [ $param1, $param2, ... ]
+
+Integer parameters.
+
+=item B<Num> => $param | [ $param1, $param2, ... ]
+
+Generic number parameters.
+
+=item B<Str> => $param | [ $param1, $param2, ... ]
+
+Generic string parameters.
+
+=item B<Enum> => { $enum1 => [ $val1, $val2, ... ], ... }
+
+Enumerated parameters. The C<Enum> key points to a hashref with parameter-values pairs, where valid values for the enumerated parameter are provided as an arrayref.
+
+It may be cleaner to instead L<register your own named enum|"USER TYPE REGISTRATION"> using C<IsOneOf>. (more below)
+
+This, along with B<Anon>, is the only exception to the normal declaration syntax.
+
+=item B<Regexp> => $param | [ $param1, $param2, ... ]
+
+Compiled regexp parameters (with C<qr//>).
+
+=item B<ArrayRef> => $param | [ $param1, $param2, ... ]
+
+Generic list parameters.
+
+=item B<HashRef> => $param | [ $param1, $param2, ... ]
+
+Generic hash parameters.
+
+=item B<CodeRef> => $param | [ $param1, $param2, ... ]
+
+Generic code parameters.
+
+=item B<Anon> => { $param1 => $profile1, ... }
+
+Anonymous profiles. The C<Anon> key points to a hashref with parameter-profile pairs, where profiles are declared via imported L<Declare::Constraints::Simple> functions. These code profiles will in fact return a L<Declare::Constraints::Simple::Result> which evaluate properly in boolean context along with other additional information when used as an object.
+
+Note that, unlike registered profiles (below), anonymous code blocks cannot be used.
+
+=back
+
+=item B<required> (Optional)
+
+Points to a arrayref of parameter names that must have valid values at all times.
+These parameters must also be given a default value.
+
+The special value '*' (the literal scalar value; not an arrayref) is a shortcut to specify that all parameters are to be required.
+
+=item B<defaults> (Optional)
+
+Points to a hashref of default values to any number of parameters. 
+Those parameters listed in C<required> I<must> be present in this section.
+
+=back
+
+=head2 USER TYPE REGISTRATION
+
+Aside from the default type built-ins (Bool,Int,...) you can register your own named types to streamline construction and add your own validation logic:
+
+=head3 register_types
+
+    Config::Strict->register_types( 
+        $name1 => $constraint1, 
+        $name2 => $constraint2, 
+        ... 
+    );
+
+An example:
+
+	use Date::Calc qw(Decode_Month);	# For 'FirstQuarter'
+	
+	# Register user-defined types...
+	Config::Strict->register_types(
+	    
+	    # Normal profiles:
+	    'Private'        => Matches( qr/^_/ ),
+	    'ArrayOfAllCaps' => IsArrayRef( Matches( qr/^[A-Z]+$/ ) ),
+	    'LessThan8Chars' => HasLength( 1, 8 ),
+	    'Size'           => IsOneOf( qw( small medium large ) ),
+	    
+	    # Custom routines:
+	    'FirstQuarter'   => sub { Decode_Month($_[0]) <= 4 },
+	    
+	    ...
+	);
+	
+	# ...and use them to make a configuration profile:
+	my $config = Config::Strict->new( {
+		params => {
+		    Private        => 'myvar',
+		    ArrayOfAllCaps => 'caps',
+		    LessThan8Chars => [ qw( short1 short2 ) ],
+		    Size           => 'beverage',
+		    FirstQuarter   => 'date_q1',
+		    ...
+		},
+		...
+    } );
+
+The parameters syntax is the same for that of any of the existing built-ins that take either a single name or arrayref of names. More importantly, they can be used in the same way.
+
+Bare code blocks are automatically converted to named L<Declare::Constraints::Simple> profiles so you can easily provide your own validation logic.
+
+Names cannot duplicate an existing registered type name.
+
+=head1 METHODS
+
+=head2 GETTING AND SETTING PARAMETER VALUES
+
+These methods will die with a stack trace if a given parameter doesn't exist in the configuration profile, or if an attempt is made to set a parameter with an invalid value.
+
+=head3 get
+
+    @values = $config->get( $param1, $param2, ... );
+
+Returns the list of values corresponding to each parameter.
+
+=head3 set
+
+    $config->set( $param1 => $value1, $param2 => $value2, ... );
+
+Sets each parameter-value configuration pair.
+
+=head3 unset
+
+    $config->unset( $param1, $param2, ... );
+
+Unsets each parameter; internally deletes the parameter-value pair from the underlying parameter hash.
+
+Required parameters cannot be unset.
+
+=head2 PARAMETER CHECKING
+
+The following methods can be used to check conditions on parameters without killing the program.
+
+=head3 validate
+
+    $ok = $config->validate( $param1 => $value1, $param2 => $value2, ... );
+
+Returns true if all parameter-value pairs are valid; false otherwise.
+
+=head3 param_exists
+
+    $ok = $config->param_exists( $param );
+
+Returns true if C<$param> exists in the configuration; false otherwise.
+
+=head3 param_is_set
+
+    $ok = $config->param_is_set( $param );
+
+Returns true if C<$param> has been set; false otherwise.
+
+=head3 param_is_required
+
+    $ok = $config->param_is_required( $param );
+
+Returns true if C<$param> is a required parameter; false otherwise.
+
+=head2 OTHER METHODS
+
+=head3 all_params
+
+    @params = $config->all_params();
+
+Returns the list of all parameters in the configuration.
+
+=head3 all_set_params
+
+    @params = $config->all_set_params();
+
+Returns the list of all set parameters in the configuration.
+
+=head3 param_hash
+
+    %data = $config->param_hash();
+
+Returns a copy of the underlying configuration data as a list of key-value pairs.
+
+=head3 param_array
+
+    @data = $config->param_array();
+
+Returns a copy of the underlying configuration data as an array of array references.
+
+=head3 get_profile
+
+    $profile = $config->get_profile( $param );
+
+Returns the L<Declare::Constraints::Simple> profile used to validate C<$param>, or C<undef> if C<$param> isn't in the profile.
+
+=head1 EXTENDING THE DEFAULT TYPES (OVERVIEW)
+
+There are several ways to make your type system even more strict than the
+built-in parameter types:
+
+=over 4
+
+=item 1. Using L</register_types> to register your own class-wide types.
+
+=item 2. Using the L<Anon|/new> key and combining any number of 
+C<Declare::Constraints::Simple> profiles.
+
+=item 3. Subclassing Config::Strict and overloading any of the C<_get_check>, C<_set_check>, and C<_unset_check> validation methods to add your own general validation semantics. These methods are executed before L</get>, L</set>, and L</unset>, respectively.
+
+=back
+
+=head1 SEE ALSO
+
+L<Declare::Constraints::Simple>
+
+=head1 CAVEATS
+
+This is an alpha release - the API is subject to change.
+
+=head1 AUTHOR
+
+Blake Willmarth
+
+bwillmarth at gmail.com
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-config-strict at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Strict>.  I will be notified, and then you'll automatically be notified of progress on your bug as changes are made.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Blake Willmarth.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut

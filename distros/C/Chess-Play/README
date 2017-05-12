@@ -1,0 +1,31 @@
+Chess-Play version 0.01
+=======================
+
+DESCRIPTION
+
+Chess::Play - Play chess games, calculate legal moves, use a search algorithm
+
+This module allows to play a chess game using STDIN or the xboard graphical interface.
+Il also can calculate legal moves and uses the Alpha-Beta search algorithm to find the best move.
+
+Please use perldoc for the documentation of the API.
+
+AUTHOR
+
+Giuliano Ippoliti, g1ul14n0 AT gmail
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This is free software in the colloquial nice-guy sense of the word.
+Copyright (c) 2009, Giuliano Ippoliti.  You may redistribute and/or modify
+it under the same terms as Perl itself.
+

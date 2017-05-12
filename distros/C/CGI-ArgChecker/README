@@ -1,0 +1,22 @@
+CGI::ArgChecker - An extensible CGI parameter validation module (allowing
+commonly used checks on parameters to be called more concisely and
+consistently).
+
+Copyright (c) 1999 WebJuice, L.L.C.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.
+
+This is really a simple wrapper around String::Checker; most of the
+interesting reading is in that module's documentation.
+
+This module has only been tested under FreeBSD, Linux and Solaris, though
+I can't think of any reason why it shouldn't work elsewhere.
+
+Building
+
+  # perl Makefile.PL
+  # make
+
+Installing
+
+  # make install

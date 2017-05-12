@@ -1,0 +1,16 @@
+Revision history for Class-Closure
+
+0.302 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+0.301 Sun 04 Jan 2015
+	- Switched lvalue accessors to using Sentinel for better performance
+	- Sanitised code as far as possible
+
+0.30 Sun 06 Jun 2010
+	- Do code generation at C<import> time, remove use of C<CHECK> block
+	  Fixes #58046 (Uses CHECK block)
+
+0.22 Sun 06 Jun 2010
+	- Switch to Dist::Zilla

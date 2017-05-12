@@ -1,0 +1,13 @@
+^_Inline
+^blib
+^cover_db
+pm_to_blib
+\.skip/
+^\.|/\.
+^\#|/\#
+\.(a|o|bak|new|old|tmp|orig)$
+\~$
+\.(bs|c|o)$
+Makefile$
+MYMETA\.yml$
+^a$

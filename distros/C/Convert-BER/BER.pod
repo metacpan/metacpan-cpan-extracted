@@ -1,0 +1,966 @@
+=head1 NAME
+
+Convert::BER - ASN.1 Basic Encoding Rules
+
+=head1 SYNOPSIS
+
+    use Convert::BER;
+    
+    $ber = new Convert::BER;
+    
+    $ber->encode(
+	INTEGER => 1,
+	SEQUENCE => [
+            BOOLEAN => 0,
+	    STRING => "Hello",
+	],
+        REAL => 3.7,
+    );
+    
+    $ber->decode(
+	INTEGER => \$i,
+	SEQUENCE => [
+            BOOLEAN => \$b,
+	    STRING => \$s,
+	],
+        REAL => \$r,
+    );
+
+=head1 DESCRIPTION
+
+B<WARNING> this module is no longer supported, See L<Convert::ASN1>
+
+C<Convert::BER> provides an OO interface to encoding and decoding data
+using the ASN.1 Basic Encoding Rules (BER), a platform independent way
+of encoding structured binary data together with the structure.
+
+=head1 METHODS
+
+=over 4
+
+=item new
+
+=item new ( BUFFER )
+
+=item new ( opList )
+
+C<new> creates a new C<Convert::BER> object.
+
+=item encode ( opList )
+
+Encode data in I<opList> appending to the data in the buffer.
+
+=item decode ( opList )
+
+Decode the data in the buffer as described by I<opList>, starting
+where the last decode finished or position set by C<pos>.
+
+=item buffer ( [ BUFFER ] )
+
+Return the buffer contents. If I<BUFFER> is specified set the buffer
+contents and reset pos to zero.
+
+=item pos ( [ POS ] )
+
+Without any arguments C<pos> returns the offset where the last decode
+finished, or the last offset set by C<pos>. If I<POS> is specified
+then I<POS> will be where the next decode starts.
+
+=item tag ( )
+
+Returns the tag at the current position in the buffer.
+
+=item length ( )
+
+Returns the length of the buffer.
+
+=item error ( )
+
+Returns the error message associated with the last method, if
+any. This value is not automatically reset. If C<encode> or
+C<decode> returns undef, check this. 
+
+=item dump ( [ FH ] )
+
+Dump the buffer to the filehandle C<FH>, or STDERR if not specified. The
+output contains the hex dump of each element, and an ASN.1-like text
+representation of that element.
+
+=item hexdump  ( [ FH ] )
+
+Dump the buffer to the filehandle C<FH>, or STDERR if not specified. The
+output is hex with the possibly-printable text alongside.
+
+=back
+
+=head1 IO METHODS
+
+=over 4
+
+=item read ( IO )
+
+=item write ( IO )
+
+=item recv ( SOCK )
+
+=item send ( SOCK [, ADDR ] )
+
+=back
+
+=head1 OPLIST
+
+An I<opList> is a list of I<operator>-I<value> pairs. An operator can
+be any of those defined below, or any defined by sub-classing
+C<Convert::BER>, which will probably be derived from the primitives
+given here.
+
+The I<value>s depend on whether BER is being encoded or decoded:
+
+=over 4
+
+=item Encoding
+
+If the I<value> is a scalar, just encode it. If the I<value> is a
+reference to a list, then encode each item in the list in turn. If the
+I<value> is a code reference, then execute the code. If the returned
+value is a scalar, encode that value. If the returned value is a
+reference to a list, encode each item in the list in turn.
+
+=item Decoding
+
+If the I<value> is a reference to a scalar, decode the value into the
+scalar. If the I<value> is a reference to a list, then decode all the
+items of this type into the list. Note that there must be at least one
+item to decode, otherwise the decode will fail. If the I<value> is a
+code reference, then execute the code and decode the value into the
+reference returned from the evaluated code.
+
+=back
+
+=head1 PRIMITIVE OPERATORS
+
+These operators encode and decode the basic primitive types defined by
+BER.
+
+=head2 BOOLEAN
+
+A BOOLEAN value is either true or false.
+
+=over 4
+
+=item Encoding
+
+The I<value> is tested for boolean truth, and encoded appropriately.
+
+    # Encode a TRUE value
+    $ber->encode(
+        BOOLEAN => 1,
+    ) or die;
+
+=item Decoding
+
+The decoded I<value>s will be either 1 or 0.
+
+    # Decode a boolean value into $bval
+    $ber->decode(
+        BOOLEAN => \$bval,
+    ) or die;
+
+=back
+
+=head2 INTEGER
+
+An INTEGER value is either a positive whole number, or a negative
+whole number, or zero. Numbers can either be native perl integers, or
+values of the C<Math::BigInt> class.
+
+=over 4
+
+=item Encoding
+
+The I<value> is the integer value to be encoded.
+
+    $ber->encode(
+        INTEGER => -123456,
+    ) or die;
+
+=item Decoding
+
+The I<value> will be the decoded integer value.
+
+    $ber->decode(
+        INTEGER => \$ival,
+    ) or die;
+
+=back
+
+=head2 STRING
+
+This is an OCTET STRING, which is an arbitrarily long binary value.
+
+=over 4
+
+=item Encoding
+
+The I<value> contains the binary value to be encoded.
+
+    $ber->encode(
+        STRING => "\xC0First character is hex C0",
+    ) or die;
+
+=item Decoding
+
+The I<value> will be the binary bytes.
+
+    $ber->decode(
+        STRING => \$sval,
+    ) or die;
+
+=back
+
+=head2 NULL
+
+There is no value for NULL. You often use NULL in ASN.1 when you want
+to denote that something else is absent rather than just not encoding
+the 'something else'.
+
+=over 4
+
+=item Encoding
+
+The I<value>s are ignored, but must be present.
+
+    $ber->encode(
+        NULL => undef,
+    ) or die;
+
+=item Decoding
+
+Dummy values are stored in the returned I<value>s, as though they were
+present in the encoding.
+
+    $ber->decode(
+        NULL => \$nval,
+    ) or die;
+
+=back
+
+=head2 OBJECT_ID
+
+An OBJECT_ID value is an OBJECT IDENTIFIER (also called an OID). This
+is a hierarchically structured value that is used in protocols to
+uniquely identify something. For example, SNMP (the Simple Network
+Management Protocol) uses OIDs to denote the information being
+requested, and LDAP (the Lightweight Directory Access Protocol, RFC
+2251) uses OIDs to denote each attribute in a directory entry.
+
+Each level of the OID hierarchy is either zero or a positive integer.
+
+=over 4
+
+=item Encoding
+
+The I<value> should be a dotted-decimal representation of the OID.
+
+    $ber->encode(
+        OBJECT_ID => '2.5.4.0', # LDAP objectClass
+    ) or die;
+
+=item Decoding
+
+The I<value> will be the dotted-decimal representation of the OID.
+
+    $ber->decode(
+        OBJECT_ID => \$oval,
+    ) or die;
+
+=back
+
+=head2 ENUM
+
+The ENUMERATED type is effectively the same as the INTEGER type. It
+exists so that friendly names can be assigned to certain integer
+values. To be useful, you should sub-class this operator.
+
+=head2 BIT_STRING
+
+The BIT STRING type is an arbitrarily long string of bits - C<0>'s and
+C<1>'s.
+
+=over 4
+
+=item Encoding
+
+The I<value> is a string of arbitrary C<0> and C<1> characters. As
+these are packed into 8-bit octets when encoding and there may not be
+a multiple of 8 bits to be encoded, trailing padding bits are added in
+the encoding.
+
+    $ber->encode(
+        BIT_STRING => '0011',
+    ) or die;
+
+=item Decoding
+
+The I<value> will be a string of C<0> and C<1> characters. The string
+will have the same number of bits as were encoded (the padding bits
+are ignored.)
+
+    $ber->decode(
+        BIT_STRING => \$bval,
+    ) or die;
+
+=back
+
+=head2 BIT_STRING8
+
+This is a variation of the BIT_STRING operator, which is optimized for
+writing bit strings which are multiples of 8-bits in length. You can
+use the BIT_STRING operator to decode BER encoded with the BIT_STRING8
+operator (and vice-versa.)
+
+=over 4
+
+=item Encoding
+
+The I<value> should be the packed bits to encode, B<not> a string of
+C<0> and C<1> characters.
+
+    $ber->encode(
+        BIT_STRING8 => pack('B8', '10110101'),
+    ) or die;
+
+=item Decoding
+
+The I<value> will be the decoded packed bits.
+
+    $ber->decode(
+        BIT_STRING8 => \$bval,
+    ) or die;
+
+=back
+
+=head2 REAL
+
+The REAL type encodes an floating-point number. It requires the POSIX
+module.
+
+=over 4
+
+=item Encoding
+
+The I<value> should be the number to encode.
+
+    $ber->encode(
+        REAL => 3.14159265358979,
+    ) or die;
+
+=item Decoding
+
+The I<value> will be the decoded floating-point value.
+
+    $ber->decode(
+        REAL => \$rval,
+    );
+
+=head2 ObjectDescriptor
+
+The ObjectDescriptor type encodes an ObjectDescriptor string. It is a
+sub-class of C<STRING>.
+
+=head2 UTF8String
+
+The UTF8String type encodes a string encoded in UTF-8. It is a
+sub-class of C<STRING>.
+
+=head2 NumericString
+
+The NumericString type encodes a NumericString, which is defined to
+only contain the characters 0-9 and space. It is a sub-class of
+C<STRING>.
+
+=head2 PrintableString
+
+The PrintableString type encodes a PrintableString, which is defined
+to only contain the characters A-Z, a-z, 0-9, space, and the
+punctuation characters ()-+=:',./?. It is a sub-class of C<STRING>.
+
+=head2 TeletexString/T61String
+
+The TeletexString type encodes a TeletexString, which is a string
+containing characters according to the T.61 character set. Each T.61
+character may be one or more bytes wide. It is a sub-class of
+C<STRING>.
+
+T61String is an alternative name for TeletexString.
+
+=head2 VideotexString
+
+The VideotexString type encodes a VideotexString, which is a
+string. It is a sub-class of C<STRING>.
+
+=head2 IA5String
+
+The IA5String type encodes an IA5String. IA5 (International Alphabet
+5) is equivalent to US-ASCII. It is a sub-class of C<STRING>.
+
+=head2 UTCTime
+
+The UTCTime type encodes a UTCTime value. Note this value only
+represents years using two digits, so it is not recommended in
+Y2K-compliant applications. It is a sub-class of C<STRING>.
+
+UTCTime values must be strings like:
+
+    yymmddHHMM[SS]Z
+or:
+    yymmddHHMM[SS]sHHMM
+
+Where yy is the year, mm is the month (01-12), dd is the day (01-31),
+HH is the hour (00-23), MM is the minutes (00-60). SS is the optional
+seconds (00-61).
+
+The time is either terminated by the literal character Z, or a
+timezone offset. The "Z" character indicates Zulu time or UTC. The
+timezone offset specifies the sign s, which is + or -, and the
+difference in hours and minutes.
+
+=head2 GeneralizedTime
+
+The GeneralizedTime type encodes a GeneralizedTime value. Unlike
+C<UTCTime> it represents years using 4 digits, so is Y2K-compliant. It
+is a sub-class of C<STRING>.
+
+GeneralizedTime values must be strings like:
+
+    yyyymmddHHMM[SS][.U][Z]
+or:
+    yyyymmddHHMM[SS][.U]sHHMM
+
+Where yyyy is the year, mm is the month (01-12), dd is the day
+(01-31), HH is the hour (00-23), MM is the minutes (00-60). SS is the
+optional seconds (00-61). U is the optional fractional seconds value;
+a comma is permitted instead of a dot before this value.
+
+The time may be terminated by the literal character Z, or a timezone
+offset. The "Z" character indicates Zulu time or UTC. The timezone
+offset specifies the sign s, which is + or -, and the difference in
+hours and minutes. If there is timezone specified UTC is assumed.
+
+=head2 GraphicString
+
+The GraphicString type encodes a GraphicString value. It is a
+sub-class of C<STRING>.
+
+=head2 VisibleString/ISO646String
+
+The VisibleString type encodes a VisibleString value, which is a value
+using the ISO646 character set. It is a sub-class of C<STRING>.
+
+ISO646String is an alternative name for VisibleString.
+
+=head2 GeneralString
+
+The GeneralString type encodes a GeneralString value. It is a
+sub-class of C<STRING>.
+
+=head2 UniversalString/CharacterString
+
+The UniveralString type encodes a UniveralString value, which is a
+value using the ISO10646 character set. Each character in ISO10646 is
+4-bytes wide. It is a sub-class of C<STRING>.
+
+CharacterString is an alternative name for UniversalString.
+
+=head2 BMPString
+
+The BMPString type encodes a BMPString value, which is a value using
+the Unicode character set. Each character in the Unicode character set
+is 2-bytes wide. It is a sub-class of C<STRING>.
+
+=head1 CONSTRUCTED OPERATORS
+
+These operators are used to build constructed types, which contain
+values in different types, like a C structure.
+
+=head2 SEQUENCE
+
+A SEQUENCE is a complex type that contains other types, a bit like a C
+structure. Elements inside a SEQUENCE are encoded and decoded in the
+order given.
+
+=over 4
+
+=item Encoding
+
+The I<value> should be a reference to an array containing another
+I<opList> which defines the elements inside the SEQUENCE.
+
+    $ber->encode(
+        SEQUENCE => [
+            INTEGER => 123,
+            BOOLEAN => [ 1, 0 ],
+        ]
+    ) or die;
+
+=item Decoding
+
+The I<value> should a reference to an array that contains the
+I<opList> which decodes the contents of the SEQUENCE.
+
+    $ber->decode(
+        SEQUENCE => [
+            INTEGER => \$ival,
+            BOOLEAN => \@bvals,
+        ]
+    ) or die;
+
+=back
+
+=head2 SET
+
+A SET is an complex type that contains other types, rather like a
+SEQUENCE. Elements inside a SET may be present in any order.
+
+=over 4
+
+=item Encoding
+
+The I<value> is the same as for the SEQUENCE operator.
+
+    $ber->encode(
+        SET => [
+            INTEGER => 13,
+            STRING => 'Hello',
+        ]
+    ) or die;
+
+=item Decoding
+
+The I<value> should be a reference to an B<equivalent> I<opList> to
+that used to encode the SET. The ordering of the I<opList> should not
+matter.
+
+    $ber->decode(
+        SET => [
+            STRING => \$sval,
+            INTEGER => \$ival,
+        ]
+    ) or die;
+
+=back
+
+=head2 SEQUENCE_OF
+
+A SEQUENCE_OF is an ordered list of other types.
+
+=over 4
+
+=item Encoding
+
+The I<value> is a I<ref> followed by an I<opList>. The I<ref> must be
+a reference to a list or a hash: if it is to a list, then the
+I<opList> will be repeated once for every element in the list. If it
+is to a hash, then the I<opList> will be repeated once for every key
+in the hash (note that ordering of keys in a hash is not guaranteed by
+perl.)
+
+The remaining I<opList> will then usually contain I<value>s which are
+code references. If the I<ref> is to a list, then the contents of that
+item in the list are passed as the only argument to the code
+reference. If the I<ref> is to a hash, then only the key is passed to
+the code.
+
+    @vals = ( [ 10, 'Foo' ], [ 20, 'Bar' ] ); # List of refs to lists
+    $ber->encode(
+        SEQUENCE_OF => [ \@vals,
+            SEQUENCE => [
+                INTEGER => sub { $_[0][0] }, # Passed a ref to the inner list
+                STRING => sub { $_[0][1] }, # Passed a ref to the inner list
+            ]
+        ]
+    ) or die;
+    %hash = ( 40 => 'Baz', 30 => 'Bletch' ); # Just a hash
+    $ber->decode(
+        SEQUENCE_OF => [ \%hash,
+            SEQUENCE => [
+                INTEGER => sub { $_[0] }, # Passed the key
+                STRING => sub { $hash{$_[0]} }, # Passed the key
+            ]
+        ]
+    );
+
+=item Decoding
+
+The I<value> must be a reference to a list containing a I<ref> and an
+I<opList>. The I<ref> must always be a reference to a scalar. Each
+value in the <opList> is usually a code reference. The code referenced
+is called with the value of the I<ref> (dereferenced); the value of
+the I<ref> is incremented for each item in the SEQUENCE_OF.
+
+    $ber->decode(
+        SEQUENCE_OF => [ \$count,
+            # In the following subs, make space at the end of an array, and
+            # return a reference to that newly created space.
+            SEQUENCE => [
+                INTEGER => sub { $ival[$_[0]] = undef; \$ival[-1] },
+                STRING => sub { $sval[$_[0]] = undef; \$sval[-1] },
+            ]
+        ]
+    ) or die;
+
+=back
+
+=head2 SET_OF
+
+A SET_OF is an unordered list. This is treated in an identical way to
+a SEQUENCE_OF, except that no ordering should be inferred from the
+list passed or returned.
+
+=head1 SPECIAL OPERATORS
+
+=head2 BER
+
+It is sometimes useful to construct or deconstruct BER encodings in
+several pieces. The BER operator lets you do this.
+
+=over 4
+
+=item Encoding
+
+The I<value> should be another C<Convert::BER> object, which will be
+inserted into the buffer. If I<value> is undefined then nothing is
+added.
+
+    $tmp->encode(
+        SEQUENCE => [
+            INTEGER => 20,
+            STRING => 'Foo',
+        ]
+    );
+    $ber->encode(
+        BER => $tmp,
+        BOOLEAN => 1
+    );
+
+=item Decoding
+
+I<value> should be a reference to a scalar, which will contain a
+C<Convert::BER> object. This object will contain the remainder of the
+current sequence or set being decoded.
+
+    # After this, ber2 will contain the encoded INTEGER B<and> STRING.
+    # sval will be ignored and left undefined, but bval will be decoded. The
+    # decode of ber2 will return the integer and string values.
+    $ber->decode(
+        SEQUENCE => [
+            BER => \$ber2,
+            STRING => \$sval,
+        ],
+        BOOLEAN => \$bval,
+    );
+    $ber2->decode(
+        INTEGER => \$ival,
+        STRING => \$sval2,
+    );
+
+=back
+
+=head2 ANY
+
+This is like the C<BER> operator except that when decoding only the
+next item is decoded and placed into the C<Convert::BER> object
+returned. There is no difference when encoding.
+
+=over 4
+
+=item Decoding
+
+I<value> should be a reference to a scalar, which will contain a
+C<Convert::BER> object. This object will only contain the next single
+item in the current sequence being decoded.
+
+    # After this, ber2 will decode further, and ival and sval
+    # will be decoded.
+    $ber->decode(
+        INTEGER = \$ival,
+        ANY => \$ber2,
+        STRING => \$sval,
+    );
+
+=back
+
+=head2 OPTIONAL
+
+This operator allows you to specify that an element is absent from the
+encoding.
+
+=over 4
+
+=item Encoding
+
+The I<value> should be a reference to another list with another
+I<opList>. If all of the values of the inner I<opList> are defined,
+the entire OPTIONAL I<value> will be encoded, otherwise it will be
+omitted.
+
+    $ber->encode(
+        SEQUENCE => [
+	    INTEGER => 16, # Will be encoded
+            OPTIONAL => [
+                INTEGER => undef, # Will not be encoded
+            ],
+            STRING => 'Foo', # Will be encoded
+        ]
+    );
+
+=item Decoding
+
+The contents of I<value> are decoded if possible, if not then decode
+continues at the next I<operator>-I<value> pair.
+
+    $ber->decode(
+        SEQUENCE => [
+            INTEGER => \$ival1,
+            OPTIONAL => [
+                INTEGER => \$ival2,
+            ],
+            STRING => \$sval,
+        ]
+    );
+
+=back
+
+=head2 CHOICE
+
+The I<opList> is a list of alternate I<operator>-I<value> pairs. Only
+one will be encoded, and only one will be decoded.
+
+=over 4
+
+=item Encoding
+
+A scalar at the start of the I<opList> identifies which I<opList>
+alternative to use for encoding the value. A value of 0 means the
+first one is used, 1 means the second one, etc.
+
+    # Encode the BMPString alternate of the CHOICE
+    $ber->encode(
+        CHOICE => [ 2,
+            PrintableString => 'Printable',
+            TeletexString   => 'Teletex/T61',
+            BMPString       => 'BMP/Unicode',
+            UniversalString => 'Universal/ISO10646',
+        ]
+    ) or die;
+
+=item Decoding
+
+A reference to a scalar at the start of the I<opList> is used to store
+which alternative is decoded (0 for the first one, 1 for the second
+one, etc.) Pass undef instead of the ref if you don't care about this,
+or you store all the alternate values in different variables.
+
+    # Decode the above.
+    # Afterwards, $alt will be set to 2, $str will be set to 'BMP/Unicode'.
+    $ber->decode(
+        CHOICE => [ \$alt,
+            PrintableString => \$str,
+            TeletexString   => \$str,
+            BMPString       => \$str,
+            UniversalString => \$str,
+        ]
+    ) or die;
+
+=back
+
+=head1 TAGS
+
+In BER everything being encoded has a tag, a length, and a
+value. Normally the tag is derived from the operator - so INTEGER has
+a different tag from a BOOLEAN, for instance.
+
+In some applications it is necessary to change the tags used. For
+example, a SET may need to contain two different INTEGER values. Tags
+may be changed in two ways, either IMPLICITly or EXPLICITly. With
+IMPLICIT tagging, the new tag completely replaces the old tag. With
+EXPLICIT tagging, the new tag is used B<as well as> the old tag.
+
+C<Convert::BER> supports two ways of using IMPLICIT tagging. One
+method is to sub-class C<Convert::BER>, which is described in the next
+section. For small applications or those that think sub-classing is
+just too much then the operator may be passed an arrayref. The array
+must contain two elements, the first is the usual operator name and
+the second is the tag value to use, as shown below.
+
+    $ber->encode(
+	[ SEQUENCE => 0x34 ] => [
+	    INTEGER => 10,
+	    STRING  => "A"
+	]
+    ) or die;
+
+This will encode a sequence, with a tag value of C<0x34>, which will
+contain and integer and a string which will have their default tag
+values.
+
+You may wish to construct your tags using some pre-defined functions
+such as C<&Convert::BER::BER_APPLICATION>,
+C<&Convert::BER::BER_CONTEXT>, etc, instead of calculating the tag
+values yourself.
+
+To use EXPLICIT tagging, enclose the original element in a SEQUENCE,
+and just override the SEQUENCE's tag as above. Don't forget to set the
+constructed bit using C<&Convert::BER::BER_CONSTRUCTOR>. For example,
+the ASN.1 definition:
+
+    Foo ::= SEQUENCE {
+        [0] EXPLICIT INTEGER,
+        INTEGER
+    }
+
+might be encoded using this:
+
+    $ber->encode(
+        SEQUENCE => [
+            [ SEQUENCE => &Convert::BER::BER_CONTEXT |
+			  &Convert::BER::BER_CONSTRUCTOR | 0 ] => [
+                INTEGER => 10,
+            ],
+            INTEGER => 11,
+        ],
+    ) or die;
+
+=head1 SUB-CLASSING
+
+For large applications where operators with non default tags are used
+a lot the above mechanism can be very error-prone. For this reason,
+C<Convert::BER> may be sub-classed.
+
+To do this the sub-class must call a static method C<define>. The
+arguments to C<define> is a list of arrayrefs. Each arrayref will
+define one new operator. Each arrayref contains three values, the
+first is the name of the operator, the second is how the data is
+encoded and the third is the tag value. To aid with the creation of
+these arguments C<Convert::BER> exports some variables and constant
+subroutines.
+
+For each operator defined by C<Convert::BER>, or a C<Convert::BER>
+sub-class, a scalar variable with the same name is available for
+import, for example C<$INTEGER> is available from C<Convert::BER>. And
+any operators defined by a new sub-class will be available for import
+from that class.  One of these variables may be used as the second
+element of each arrayref.
+
+C<Convert::BER> also exports some constant subroutines that can be
+used to create the tag value. The subroutines exported are:
+
+	BER_BOOLEAN
+	BER_INTEGER
+	BER_BIT_STR
+	BER_OCTET_STR
+	BER_NULL
+	BER_OBJECT_ID
+	BER_SEQUENCE
+	BER_SET
+    
+	BER_UNIVERSAL
+	BER_APPLICATION
+	BER_CONTEXT
+	BER_PRIVATE
+	BER_PRIMITIVE
+	BER_CONSTRUCTOR
+
+C<Convert::BER> also provides a subroutine called C<ber_tag> to calculate
+an integer value that will be used to represent a tag. For tags with
+values less than 30 this is not needed, but for tags >= 30 then tag
+value passed for an operator definition must be the result of C<ber_tag>
+
+C<ber_tag> takes two arguments, the first is the tag class and the second
+is the tag value.
+
+Using this information a sub-class of Convert::BER can be created as
+shown below.
+
+    package Net::LDAP::BER;
+
+    use Convert::BER qw(/^(\$|BER_)/);
+
+    use strict;
+    use vars qw($VERSION @ISA);
+
+    @ISA = qw(Convert::BER);
+    $VERSION = "1.00";
+
+    Net::LDAP::BER->define(
+
+      # Name		Type      Tag
+      ########################################
+
+      [ REQ_UNBIND     => $NULL,
+			  BER_APPLICATION  	 	    | 0x02 ],
+    
+      [ REQ_COMPARE    => $SEQUENCE,
+			  BER_APPLICATION | BER_CONSTRUCTOR | 0x0E ],
+    
+      [ REQ_ABANDON    => $INTEGER,
+			  ber_tag(BER_APPLICATION, 0x10) ],
+    );
+
+This will create a new class C<Net::LDAP::BER> which has three new operators
+available. This class then may be used as follows
+
+    $ber = new Net::LDAP::BER;
+    
+    $ber->encode(
+	REQ_UNBIND => 0,
+	REQ_COMPARE => [
+	    REQ_ABANDON => 123,
+	]
+    );
+
+    $ber->decode(
+	REQ_UNBIND => \$var,
+	REQ_COMPARE => [
+	    REQ_ABANDON => \$num,
+	]
+    );
+
+Which will encode or decode the data using the formats and tags
+defined in the C<Net::LDAP::BER> sub-class. It also helps to make the
+code more readable.
+
+=head2 DEFINING NEW PACKING OPERATORS
+
+As well as defining new operators which inherit from existing
+operators it is also possible to define a new operator and how data is
+encoded and decoded. The interface for doing this is still changing
+but will be documented here when it is done. To be continued ...
+
+=head1 LIMITATIONS
+
+Convert::BER cannot support tags that contain more bits than can be
+stored in a scalar variable, typically this is 32 bits.
+
+Convert::BER cannot support items that have a packed length which
+cannot be stored in 32 bits.
+
+=head1 BUGS
+
+The C<SET> decode method fails if the encoded order is different to
+the I<opList> order.
+
+=head1 AUTHOR
+
+Graham Barr <gbarr@pobox.com>
+
+Significant POD updates from
+Chris Ridd <Chris.Ridd@messagingdirect.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1995-2000 Graham Barr. All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

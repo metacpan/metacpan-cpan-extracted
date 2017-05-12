@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::LazyFactory.
+
+0.02  Wed Jan 28 15:29:03 2009
+    - removed UNIVERSAL::can dependency
+0.01  Tue Jan 27 14:25:10 2009
+    - initial version
+    - original version; created by h2xs 1.23 with options
+        -XA --skip-exporter -b 5.6.1 -n Class::LazyFactory
+

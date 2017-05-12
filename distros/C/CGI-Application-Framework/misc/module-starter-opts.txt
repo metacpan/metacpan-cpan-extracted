@@ -1,0 +1,2 @@
+
+  $ module-starter --mb --module=CGI::Application::Framework --author="Richard Dice" --email=mag-rdice@pobox.com

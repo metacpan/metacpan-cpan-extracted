@@ -1,0 +1,11 @@
+#!/bin/sh -x
+reset_data() {
+    cat scripts/clip* |
+        perl -Ilib -MClipboard -e 'Clipboard->copy(join "", <>)'
+}
+reset_data
+perl -Ilib scripts/clipfilter -html # TODO: | tail <--buggy
+reset_data
+perl -Ilib scripts/clipfilter -uri
+reset_data
+perl -Ilib scripts/clipfilter tac 

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 100
+    - 245
+  60323:
+    - 197
+name: ddcbf5
+registers:
+  AF: 55359
+  AF_: 0
+  BC: 7881
+  BC_: 0
+  DE: 53466
+  DE_: 0
+  HL: 16755
+  HL_: 0
+  I: 0
+  IX: 60223
+  IY: 7853
+  PC: 0
+  R: 0
+  SP: 0

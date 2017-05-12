@@ -1,0 +1,36 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.1/build/reset-fonts-grids/reset-fonts-grids.css"/>
+  <link rel="stylesheet" type="text/css" href="/css/editor.css"/>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.1/build/assets/skins/sam/skin.css"/>
+<title>Modified YUI Rich text editor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/element/element-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/animation/animation-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/container/container-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/json/json-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/button/button-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.1/build/editor/editor-min.js"></script> 
+<script type="text/javascript" src="/js/editor.js"></script> 
+
+</head>
+<body>
+<form action="/cgi-bin/template.cgi" method="post">
+			<fieldset>
+				<legend>Article</legend>
+   				<label class="form_control"><span class="label">Title: <TMPL_VAR NAME="err_title"></span><input type="text" name="title" id="input_title" maxlength="255" value=""/></label>
+   				<label class="form_control yui-skin-sam"><span class="label">Body: <TMPL_VAR NAME="err_body"></span><textarea name="body" id="body" cols="100" rows="10"></textarea></label>
+   				<input type="submit" value="Submit changes" class="form_control"/>
+   				<input type="hidden" value="two" name="rm"/>
+				<TMPL_IF NAME="err__"><p class="form_control">Please correct these errors.</p></TMPL_IF>
+			</fieldset>
+</form>    
+
+		</body>
+</html>

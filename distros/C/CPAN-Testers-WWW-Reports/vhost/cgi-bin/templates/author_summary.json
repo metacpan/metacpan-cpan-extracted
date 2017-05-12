@@ -1,0 +1,13 @@
+{
+[% IF distributions %]
+[
+[% inx = distributions.count -%]
+[% FOREACH d = distributions %]
+[%- s = d.summary -%]
+[% inx = inx - 1 - %]
+  { "name": "[% d.distribution %]", "version": "[% s.version %]", "all": [%- s.ALL || 0 -%], "pass": [%- s.PASS || 0 -%], "fail": [%- s.FAIL || 0 -%], "na": [%- s.NA || 0 -%], "unknown": [%- s.UNKNOWN || 0 -%]
+  [% IF inx > 0 %]},[% ELSE %]}[% END %]
+[% END -%]
+]
+[% END -%]
+}

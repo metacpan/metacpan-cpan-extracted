@@ -1,0 +1,9 @@
+Revision history for Class-DBI-Relationship-HasVariant
+
+0.020   2006-11-10
+        packaging updates
+        make tests pass again
+
+0.01    2004-10-12 12:20
+        basic tests up and running, seems good to go
+

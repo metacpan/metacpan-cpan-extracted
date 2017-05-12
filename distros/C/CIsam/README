@@ -1,0 +1,88 @@
+
+Copyright (c) 2000 Ilya Verlinsky. All rights reserved.
+Portions Copyright (c) 2000 Philippe Chane-You-Kaye. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+***************************************************************************
+* CIsam.pm a Perl module allowing a Object Oriented acces of C-Isam files *
+***************************************************************************
+
+What is C-Isam?
+__________________
+
+Isam stands for Indexed Sequential Access Method. On Unix platforms the most
+famous product is C-Isam from Informix.
+Also this seems outdated compared with modern SQL databases, Isam is still
+very important for many people who run old legacy software with data stored
+in this format.
+
+Why this module?
+__________________
+
+After looking at the only module available on CPAN for accessing C-Isam files,
+I was quite disappointed. The module produced by Phillipe Chane-You-Kaye did
+not include support for any data in the Isam files except text data. And to me
+the plain c-style Informix function interface seemed not user-friendly enough.
+The inteface that I'm used to using has 3rd party wrappers to the Informix 
+C-Isam library that hide all the nitty-gritty of the isam file manipulation.
+
+Thus the idea for this module was born. I believe that this module will provide
+a friendlier API than the generic Isam library while retaining full functiona-
+lity for the programmers that need it.
+
+
+Module requirements
+---------------------
+- Perl 5.005 or later
+- C compiler (gcc or other)
+- Isam library (tested with Informix C-Isam and ByteDesigns D-Isam)
+
+Where to download the module
+----------------------------
+Look on CPAN
+
+How to install
+--------------
+- untar the compressed archive. For example: 
+  tar xvzf Isam-0.1.tar.gz  
+- cd IsamObjects-1.0
+- vi Makefile.PL
+  You probably will have to change the following line
+  'LIBS'      => ['-ld96'],   # e.g., '-lm' 
+  for example, to link with Informix C-Isam, change it to
+  'LIBS'      => ['-lisam'],   # e.g., '-lm'
+- perl Makefile.PL
+- make
+- make test
+- make install
+  (as root) 
+
+Reference Material
+------------------
+- You can download a time limited version of the D-Isam library from 
+  www.bytedesigns.com
+
+Bugs
+__________________
+- On some Unix systems (AIX 3) Perl desides to do its garbage collection a
+  little to early. Thus destroying my object. I have found a work-around for
+  that 
+
+
+How to contact me ?
+-------------------
+Mail me at ilya@wsi.net
+
+
+ADDENDUM 
+___________________
+
+      Compiling
+      ---------
+      The Makefile.PL must have CISAM4 defined if you use Infoxmix C-ISAM v.4.00
+	  (e.g. -DCISAM4).
+
+
+If you have any questions e-mail me at ilya@wsi.net

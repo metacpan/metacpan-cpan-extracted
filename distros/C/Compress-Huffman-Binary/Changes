@@ -1,0 +1,14 @@
+Revision history for Perl module Compress::Huffman::Binary
+
+0.01 2017-02-22
+
+- Put a non-testing version number to make this visible on CPAN
+
+0.00_02 2016-09-27
+
+- Rewrite of internals for non-byte symbol table.
+
+0.00_01 2016-09-25
+
+- Initial version
+

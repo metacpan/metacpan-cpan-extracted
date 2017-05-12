@@ -1,0 +1,7 @@
+[% IF versions -%]
+[% FOREACH version = versions -%]
+[%- s = summary.$version -%]
+[% version %],[%- s.ALL || 0 -%],[%- s.PASS || 0 -%],[%- s.FAIL || 0 -%],[%- s.NA || 0 -%],[%- s.UNKNOWN || 0 -%]
+
+[% END -%]
+[% END -%]

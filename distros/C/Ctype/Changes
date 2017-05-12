@@ -1,0 +1,15 @@
+Revision history for Perl extension Ctype.
+
+0.02  Sun May 01 06:15:10 2005
+	- I've finally got around to updating Ctype.  Sorry for the long wait, but I think I spent too much time
+	  concentrating on other projects.  
+	- Added a META.yml.  (I didn't really do it, Mr. MakeMaker did it ;-)
+	- Updated MANIFEST (ditto, oh how much I love updates of Perl)
+	- Warned that isXDIGIT is deprecated because it is not offically part of libperl.  
+	- Changed license.  
+	- And finally updated $VERSION ;-).  
+
+0.01  Fri Feb 25 05:35:19 2005
+	- original version; created by h2xs 1.21 with options
+		ctype
+

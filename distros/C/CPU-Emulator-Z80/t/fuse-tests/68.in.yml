@@ -1,0 +1,26 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 104
+  41321:
+    - 80
+name: 68
+registers:
+  AF: 512
+  AF_: 0
+  BC: 53144
+  BC_: 0
+  DE: 37080
+  DE_: 0
+  HL: 41321
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

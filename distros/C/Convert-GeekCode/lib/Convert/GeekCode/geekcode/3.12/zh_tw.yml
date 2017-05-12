@@ -1,0 +1,969 @@
+--- #YAML:1.0
+Author: |-
+ Robert A. Hayden <rhayden@geekcode.com>
+Begin: |-
+ G
+Head: |-
+ -----BEGIN GEEK CODE BLOCK-----
+ID: |-
+ geekcode
+Language: |-
+ zh_tw
+Sequence: ! >-
+ _ d s a C U* P L E W N o K w O M V PS PE Y PGP t 5 X R tv b DI D G e h r
+ x:y:z
+Tail: |-
+ ------END GEEK CODE BLOCK------
+Title: |-
+ 技客碼
+Translator: |-
+ 唐鳳 <cpan@audreyt.org>, Ilya Eric Lee <ilya@elixus.org>
+Ver: |-
+ Version: 
+Version: |-
+ 3.12
+_:
+ '':
+  '!': |-
+   我寧可不將自己歸類。
+  '$': |-
+   靠這個賺錢！
+  '(': |-
+   有時候我會說：
+  ')': |-1
+    
+  '/': |-
+   ;
+  '>': |-
+   我希望將來能說：
+  '?': |-
+   連聽都沒聽過...
+  '@': |-
+   但是也不一定...
+  _: |-
+ 5:
+  '': |-
+   我看過了，沒什麼感覺。
+  '+': ! >-
+   巴比倫 5 為科幻宇宙提出了一個全新的視角。我每周定期收看。
+  '+++': ! >-
+   I am a True Worshipper of the Church of Joe who lives eats breathes and
+   thinks Babylon 5, and has Evil thoughts about stealing Joe's videotape
+   archives just to see episodes earlier.  I am planning to break into the bank
+   and steal the triple-encoded synopsis of the 5-year arc.
+  '++++': |-
+   I am J. Michael Straczynski
+  '-': ! >-
+   This show is sub-par.  The acting is wooden, the special effects are
+   obviously poor quality.  In general, it seems like a very cheap Star Trek
+   ripoff.
+  '--': >-
+   You call this Sci-Fi?  That is such a load of crap!  This show is just a
+   soap with bad actors, piss-poor effects, and lame storylines.  Puh-leese.  
+  _: |-
+   Babylon 5
+ C:
+  '': |-
+   電腦就祇是工具而已。我用它來做想做的事。
+  '++': >-
+   電腦占我生活的一大部份。每天我起床第一件事就是上線。
+   我在週末玩電腦遊戲或連線遊戲，但是還不至於讓自己被二一。
+  '+++': |-
+   網路之外還有別的生活？開玩笑！我已經幾週沒去上課了。
+  '++++': |-
+   我迫不及待想把新的生化界面裝到頭顱裡。
+  '-': |-
+   比計算機複雜的東西我就搞不懂了。
+  '--': |-
+   開機要按哪裡？
+  '---': |-
+   如果再提到電腦，我就要抓狂了！
+  _: |-
+   電腦
+ D:
+  '': |-
+   我玩過這個遊戲，覺得沒什麼不一樣的。
+  '+': |-
+   這是個有趣的動作遊戲，很適合在下午無聊的時候玩。
+  '++': |-
+   我玩過共享軟體版、買了正式版，打得還不錯。我有時候會下載 PWAD 檔玩玩看。
+  '+++': >-
+   我每天下載新的 PWAD 檔、怪獸更新、武器、音效和應用程式。我是毀滅戰士之神。
+   我閉上眼睛都能在原本的地圖上用最高難度破關。
+  '++++': |-
+   我是iD Software的員工。
+  '-': |-
+   我玩過這個遊戲, 覺得實在不怎麼樣。
+  '--': |-
+   這是個超級暴力噁心的遊戲。
+  '---': |-
+   毀滅戰士爛透了。我懷念 Zork。
+  '----': |-
+   在我的 Atari 2000 上都有更好的遊戲。
+  _: |-
+   毀滅戰士
+ DI:
+  '': |-
+   我偶爾會看呆伯持，但是很少看懂。
+  '+': |-
+   我每天看呆伯持，通常也看得懂。
+  '++': |-
+   我的辦公室裡，就有不少跟呆伯特和他老闆神似的人物。
+  '+++': |-
+   I am a Dilbert prototype.
+  '++++': ! >-
+   I've received mail from Scott Adams.  I'm in the DNRC (Dogbert's New Ruling
+   Class).
+  '+++++': |-
+   I am Scott Adams.
+  '-': |-
+   Is that the comic about the engineers?
+  '--': |-
+   Don't read it, but I think the dog is kinda cute.
+  '---': ! >-
+   I don't think it's funny to make fun of managers trying their best to run
+   their organizational units.
+  _: |-
+   Dilbert
+ E:
+  '': |-
+   對，我知道什麼是 emacs，也用它作日常文字編輯。
+  '+': |-
+   Emacs 真不錯！我用它來讀郵件和討論群！
+  '++': |-
+   我懂 elisp，也常常用！
+  '+++': ! >-
+   Emacs 是我的登入 shell！！M-x doctor 是我的心理醫生！我用
+   emacs來遙控電視和烤箱! 妳們這些用 vi 的根本不知道自己錯過了什麼！
+   我訂閱 alt.religion.emacs、alt.sex.emacs 和 comp.os.emacs。
+  '-': |-
+   Emacs 對我而言太龐大，功能太膨脹了。
+  '--': |-
+   Emacs 祇不過是個花俏的文書編輯器。
+  '---': |-
+   Emacs 爛透了！vi 萬歲！！！
+  '----': |-
+   Emacs 爛透了！pico 萬歲！！！
+  _: |-
+   Emacs
+ G:
+  '': |-
+   我知道什麼是技客碼，甚至還作了自己的。
+  '+': |-
+   我曾經是 G++（或更高），但新的版本太長太複雜了。
+  '++': |-
+   我知道每個字母的意義，但有時候還是得查細節。
+  '+++': >-
+   我把技客碼整個背了下來，
+   能在腦裡解其他人的碼。我也知道網路上的最新版要在哪裡找。
+  '++++': |-
+   我建議過未來版本的內容。
+  '+++++': |-
+   我是 Robert Hayden。
+  '-': |-
+   這個技客碼真是浪費時間極了。
+  '--': |-
+   不祇是浪費時間，還表示這個叫 Hayden 的傢伙的人生乏味。
+  _: |-
+   技客碼
+ K:
+  '': |-
+   我知道誰是 Kibo。
+  '+': |-
+   我喜歡 Kibo。
+  '++': |-
+   我讀過 Kibo。
+  '+++': |-
+   我收過 Kibo 的信。
+  '++++': |-
+   我見過 Kibo。
+  '+++++': |-
+   我和 Kibo 做過愛。
+  '++++++': |-
+   我就是 Kibo。
+  '-': |-
+   我不知道誰是 Kibo。
+  '--': |-
+   我討厭 Kibo。
+  '---': |-
+   我目前正在追殺 Kibo, 打算把他的心臟從胸口活剝出來, 放在他眼前看著他死。
+  '----': |-
+   我是 Xibo。
+  _: |-
+   Kibo
+ L:
+  '': |-
+   我知道什麼是 Linux，也就這樣而已。
+  '!': |-
+   我甚至不知道什麼是 Linux！
+  '+': |-
+   我把 Linux 裝了，也用過幾次。它看起來跟其他作業系統沒兩樣。
+  '++': >-
+   我*幾乎*祇用 linux。我放棄當 Linux.God，但是很高興能把 DOS 換掉。我祇用
+   DOS 來玩電腦遊戲.
+  '+++': |-
+   我的系統上祇裝 Linux。我訂閱 comp.os.linux.*，有時甚至還回答上面的問題。
+  '++++': >-
+   我是個 Linux 巫師。我早餐喫 C 程式碼，
+   還留下足夠的胃口作核心碼除錯。我裝了太多修正檔，
+   在十個版本之前就搞不清楚是哪些了。Linux 的新手當我是 net.god。
+  '+++++': |-
+   我是 Linus，膜拜我吧。
+  '-': >-
+   我根本不想用 Linux，坦白說，我一點都不覺得它怎樣，有其他更好的作業系統，像是
+   Mac、DOS 或 Amiga-OS。要不然，像 FreeBSD 這種自由 Unix OS 也更好。
+  '--': |-
+   Unix 爛透了。而因為 Linux = Unix。Linux 也爛透了。我崇拜比爾蓋茲。
+  '---': |-
+   我就是比爾蓋茲。
+  _: |-
+   Linux
+ M:
+  '': |-
+   我用麥金塔，但是沒有什麼特別意見。
+  '+': |-
+   麥金塔有它的用處，我經常使用它。
+  '++': >-
+   我是個麥金塔大師，任何 DOS 瘋子和 Linux 怪胎行的，我也都會。
+   要是沒有這項功能，我就自己寫軟體來做到。
+  '-': |-
+   麥金塔爛透了，所有真正的技客都有個命令列。
+  '--': >-
+   麥金塔不止是爛透了。它們讓使用者變笨，讓不知道自己在做什麼的人也能操作系統。
+   麥金塔小腳的智商比我肚臍眼裡的跳蚤還低。
+  _: |-
+   麥金塔
+ N:
+  '': |-
+   Usenet News?  Sure, I read that once.
+  '*': |-
+   All I do is read news.
+  '+': |-
+   要殺時間的時候，我會看些文章消遣一下。
+  '++': |-
+   I read all the news in a select handful of groups.
+  '+++': ! >-
+   I read so many news groups that the next batch of news comes in before I
+   finish reading the last batch, and I have to read for about 2 hours straight
+   before I'm caught up on the morning's news.  Then there's the afternoon...
+  '++++': |-
+   I am Tim Pierce.
+  '-': |-
+   News is a waste of my time and I avoid it completely.
+  '--': |-
+   News sucks!  'Nuff said.
+  '---': |-
+   I work for Time Magazine.
+  '----': |-
+   I am a Scientologist.
+  _: |-
+   Usenet
+ O:
+  '': |-
+   I finally managed to get OS/2 installed but wasn't too terribly impressed.
+  '++': ! >-
+   I use OS/2 for all my computing needs.  I use some DOS and Windows programs,
+   but rune them under OS/2.  If the program won't run under OS/2, then
+   obviously I don't need it.
+  '+++': ! >-
+   I live, eat and breathe OS/2.  All of my hard drives are HPFS.  I am the
+   Anti-Gates.
+  '-': |-
+   Tried it, didn't like it.
+  '--': |-
+   我根本安裝不起來！
+  '---': |-
+   Windows RULES!!!  Long live Bill Gates.  (See w++++).
+  '----': |-
+   I am Bill Gates of Borg.  OS/2 is irrelevant.
+  _: |-
+   OS/2
+ P:
+  '': |-
+   我知道有 Perl，就這樣而已。
+  '+': |-
+   我知道 Perl。我喜歡 Perl。我祇是沒有學到太多 Perl，但是打算慢慢學。
+  '++': |-
+   Perl 是個強力的程式工具。我不再寫 shell 命令稿，都改用 Perl 寫了。
+  '+++': ! >-
+   Perl 是個非常強力的程式工具。我不僅停止寫 shell 命令稿，也不再使用 awk 或
+   sed 了。少於一千行的程式我都用 Perl 來寫。
+  '++++': >-
+   我不止寫 Perl，我用它來說話。Perl
+   超越了一切其它的程式語言。我徹底認為所有程式都可以化簡成一行 Perl。我用 Perl
+   達到 U+++ 的境界。
+  '+++++': |-
+   我是 Larry Wall，Tom Christiansen，或 Randal Schwartz.
+  '-': |-
+   Perl 難道有什麼超過 awk 和 sed 的功能嗎？
+  '--': |-
+  '---': |-
+   Perl 結合了 sh 的威力、sed 的易懂、awk 的效率與 C 的簡潔。它應該被禁用。
+  '?': |-
+   什麼是 Pearl？
+  _: |-
+   Perl
+  ? |-
+   Perl 的使用者全是些病態、心理不正常的程式員，祇知道賣弄而已。
+: |-
+ PE:
+  '': |-
+   對政府及企業都不要相信。
+  '+': |-
+   Balance the budget with spending cuts and an amendment.
+  '++': ! >-
+   Keep the government off the backs of businesses.  Deregulate as much as
+   possible.
+  '+++': ! >-
+   Abolish antitrust legislation.  Raise taxes on everyone but the rich so that
+   the money can trickle-down to the masses.
+  '-': ! >-
+   It's ok to increase government spending, so we can help more poor people. 
+   Tax the rich!  Cut the defense budget!
+  '--': ! >-
+   Capitalism is evil!  Government should provide the services we really need. 
+   Nobody should be rich.
+  _: |-
+   政治經濟議題
+ PGP:
+  '': |-
+   I've used it, but stopped long ago.
+  '++': |-
+   我裝了最新版本，也經常使用。
+  '+++': ! >-
+   I don't send or answer mail that is not encrypted, or at the very least
+   signed.  If you are reading this without decrypting it first, something is
+   wrong.  IT DIDN'T COME FROM ME!
+  '++++': |-
+   I am Philip Zimmerman.
+  '-': |-
+   I don't have anything to hide.
+  '--': ! >-
+   I feel that the glory of the Internet is in the anarchic, trusting
+   environment that so nurtures the exchange of information.  Encryption just
+   bogs that down.
+  '---': ! >-
+   If you support encryption on the Internet, you must be a drug dealer or
+   terrorist or something like that.
+  '----': ! >-
+   Oh, here's is something you all can use that is better (insert Clipper
+   here).
+  _: |-
+   PGP
+ PS:
+  '': |-
+   I really don't have an opinion; nobody's messing with my freedoms right now.
+  '+': ! >-
+   My whole concept of liberalism is that nobody has the right to tell anybody
+   else what to do, on either side of the political fence.  If you don't like
+   it, turn the bloody channel.
+  '++': ! >-
+   I give to liberal causes.  I march for gay rights.  I'm a card carrying
+   member of the ACLU.  Keep abortion safe and legal.
+  '+++': |-
+   藥物合法化！廢除政府！去他的徵兵制！
+  '-': |-
+   Label records!  Keep dirty stuff off the TV and the Internet.
+  '--': ! >-
+   Oppose sex education, abortion rights, gay rights.  Rush Limbaugh is my
+   spokesman.
+  '---': ! >-
+   Repent left-wing sinners and change your wicked evil ways.
+   Buchanan/Robertson in '96.
+  _: |-
+   政治社會議題
+ R:
+  '': |-
+   Role-Playing?  That's just something to do to kill a Saturday afternoon.
+  '*': |-
+   我以為生命就是一場角色扮演？
+  '+': ! >-
+   I've got my weekly sessions set up and a character that I know better than I
+   know myself.
+  '++': ! >-
+   There is no life outside the role of the die.  I know all of the piddly
+   rules of (chosen game).  _MY_ own warped rules scare the rest of the
+   players.
+  '+++': |-
+   I've written and published my own gaming materials.
+  '-': |-
+   Gosh, what an utter waste of time!
+  '--': |-
+   Role-Players are instruments of pure evil.
+  '---': |-
+   I work for T$R.
+  _: |-
+   角色扮演
+ U:
+  '': |-
+   I have a unix account to do my stuff in.
+  '*': |-
+   (some other(s) not listed)
+  '+': |-
+   I not only have a unix account, but I slam VMS any chance I get.
+  '++': ! >-
+   I've get the entire admin ticked off at me because I am always using all of
+   the CPU time and trying to run programs that I don't have access to.  I'm
+   going to try cracking /etc/passwd next week, just don't tell anyone.
+  '+++': ! >-
+   I don't need to crack /etc/passwd because I just modified su so that it
+   doesn't prompt me.  The admin staff doesn't even know I'm here.  If you
+   don't understand what I just said, this category does NOT apply to you!
+  '-': |-
+   I have a VMS account.
+  '--': |-
+   I've seen unix and didn't like it.  DEC rules!
+  '---': |-
+   Unix geeks are actually nerds in disguise.
+  A: |-
+   (AIX)
+  B: |-
+   (BSD)
+  C: |-
+   (SCO Unix)
+  H: |-
+   (HPUX)
+  I: |-
+   (IRIX)
+  L: |-
+   (Linux)
+  O: |-
+   (OSF/1 (aka Digital Unix))
+  S: |-
+   (SunOS/Solaris)
+  U: |-
+   (Ultrix)
+  V: |-
+   (SysV)
+  X: |-
+   (NeXT)
+  _: |-
+   UNIX
+ V:
+  '': |-
+   I've used VMS.
+  '+': |-
+   I tend to like VMS better than Unix
+  '++': ! >-
+   Unix is a passing fad compared to the real power in the universe, my VMS
+   system.
+  '+++': ! >-
+   I am a VMS sysadmin.  I wield far more power than those UNIX admins, because
+   UNIX can be found on any dweeb's desktop.  Power through obscurity is my
+   motto.
+  '-': |-
+   Unix is much better than VMS for my computing needs.
+  '--': ! >-
+   I would rather smash my head repeatedly into a brick wall than suffer the
+   agony of working with VMS.  It's reminiscent of a dead and decaying pile of
+   moose droppings.  Unix rules the universe.
+  _: |-
+   VMS
+ W:
+  '': |-
+   I have a browser and a connection.  Occasionally I'll use them. 
+  '+': ! >-
+   I have the latest version of Netscape, and wander the web only when there's
+   something specific I'm looking for.
+  '++': ! >-
+   I have a homepage.  I surf daily.  My homepage is advertised in my
+   .signature.
+  '+++': ! >-
+   I am a WebMaster.  Don't even think about trying to view my homepage without
+   the latest version of Netscape.  When I'm not on my normal net connection, I
+   surf the web using my Newton and a cellular modem.
+  '-': ! >-
+   The web is really a pain.  Life was so much easier when you could transfer
+   information by simple ASCII.  Now everyone won't even consider your ideas
+   unless you spiff them up with bandwidth-consuming pictures and pointless
+   information links.
+  '--': ! >-
+   A pox on the Web!  It wastes time and bandwidth and just gives the
+   uneducated morons a reason to clutter the Internet.
+  _: |-
+   全球資訊網
+ X:
+  '': |-
+   Ho hum.  Just another Fox show.
+  '+': ! >-
+   I've Converted my family and watch the show when I remember.  It's really
+   kinda fun.
+  '++': ! >-
+   This is one of the better shows I've seen.  I wish I'd taped everything from
+   the start at SP, because I'm wearing out my EP tapes.  I'll periodically
+   debate online.  I've Converted at least 5 people.  I've gotten a YAXA.
+  '+++': >-
+   This is the BEST show on TV, and it's about time.  I've seen everything
+   David Duchovny and Gillian Anderson have ever done that been recorded and
+   I'm a loyal Duchovny/ Gillian Anderson fan.  I've Converted at least 10
+   people.  I have every episode at SP, debate the fine details on-line, and
+   have a credit for at least 2 YAXAs. 
+  '++++': |-
+   I am Chris Carter
+  '-': ! >-
+   It's ok if you like paranoia and conspiracy stories, but, let's face it,
+   it's crap.
+  '--': |-
+   If I wanted to watch this kind of stuff, I'd talk to Oliver Stone
+  _: |-
+   X 檔案
+ Y:
+  '': |-
+   I'm pretty indifferent on the whole issue.
+  '+': ! >-
+   I have an interest and concern in privacy issues, but in reality I am not
+   really all that active or vocal.
+  '++': ! >-
+   I am on the cypherpunks mailing list and active around Usenet.  I never miss
+   an opportunity to talk about the evils of Clipper and ITAR and the NSA. 
+   Orwell's 1984 is more than a story, it is a warning to our's and future
+   generations.  I'm a member of the EFF.
+  '+++': |-
+   I am T.C. May
+  '-': >-
+   It seems to me that all of these concerns are a little extreme.  I mean, the
+   government must be able to protect itself from criminals and the populace
+   from indecent speech. 
+  '--': ! >-
+   Get a life.  The only people that need this kind of protection are people
+   with something to hide.  I think cypherpunks are just a little paranoid.
+  '---': |-
+   I am L. Detweiler.
+  _: |-
+   編碼叛客
+ _:
+  '!': |-
+   無分類技客
+  AT: |-
+   萬能技客
+  B: |-
+   商業技客
+  C: |-
+   古典技客
+  CA: |-
+   商業藝術技客
+  CC: |-
+   通訊技客
+  CM: |-
+   電腦管理技客
+  CS: |-
+   資訊科學技客
+  E: |-
+   工程技客
+  ED: |-
+   教育技客
+  FA: |-
+   美術技客
+  G: |-
+   政府技客
+  H: |-
+   人文技客
+  IT: |-
+   資訊科技技客
+  J: |-
+   法律技客
+  L: |-
+   文學技客
+  LS: |-
+   圖書管理技客
+  M: |-
+   數學技客
+  MC: |-
+   大眾傳播技客
+  MD: |-
+   醫藥技客
+  MU: |-
+   音樂技客
+  O: |-
+   其他類技客
+  P: |-
+   哲學技客
+  PA': |-
+   表演藝術技客
+  S: |-
+   科學(數理生化)技客
+  SS: |-
+   社會科學技客
+  TW: |-
+   技術寫作技客
+  U: |-
+   未決定技客
+  _: |-
+   技客類型
+ a:
+  '': |-
+   已經過了三十，還不到四十...
+  '!': |-
+   我幾歲關妳啥事咧？
+  '+': |-
+   四十多歲還是一條活龍...
+  '++': |-
+   孩子，我屬於五十到五十九歲之間..
+  '+++': |-
+   我已經六十多歲啦。夠老了吧！
+  '-': |-
+   我 25-29，快三十了...
+  '--': |-
+   我 20-24，二十出頭。
+  '---': |-
+   我 15-19歲。
+  '----': |-
+   我 10-14歲。
+  '-----': |-
+   我九歲，或者還不滿九歲？〈技客先修班？〉
+  '?': |-
+   我是不朽的！
+  _: |-
+   年齡
+ b:
+  '': |-
+   I read the newspaper and the occasional book.
+  '+': |-
+   I enjoy reading, but don't get the time very often.
+  '++': |-
+   I find the time to get through at least one new book a month.
+  '+++': |-
+   I consume a few books a week as part of a staple diet.
+  '++++': ! >-
+   I read a book a day.  I have library cards in three states.  I have discount
+   cards from every major bookstore.  I've ordered books from another country
+   to get my Favorite Author Fix.
+  '-': |-
+   I read when there is no other way to get the information.
+  '--': |-
+   I did not actually READ the geek code, I just had someone tell me.
+  _: |-
+   書藉
+ d:
+  '': ! >-
+   I dress a lot like those found in catalog ads.  Bland, boring, without life
+   or meaning.
+  '!': |-
+   No clothing.  Quite a fashion statement, don't you think?
+  '+': ! >-
+   Good leisure-wear.  Slacks, button-shirt, etc.  No jeans, tennis shoes, or
+   t-shirts.
+  '++': |-
+   I tend to wear conservative dress such as a business suit or worse, a tie.
+  '-': |-
+   I'm usually in jeans and a t-shirt.
+  '--': |-
+   My t-shirts go a step further and have a trendy political message on them.
+  '---': ! >-
+   Punk dresser, including, but not limited to, torn jeans and shirts, body
+   piercings, and prominent tattoos.
+  '?': |-
+   I have no idea what I am wearing right now, let alone what I wore yesterday.
+  _: |-
+   衣著
+  pu: ! >-
+   I wear the same clothes all the time, no matter the occasion, forgetting to
+   do laundry between wearings.
+  x: |-
+   Cross Dresser
+ e:
+  '': |-
+   高中唸完啦。
+  '*': |-
+   生命裡的一切，我都從『銀河搭便車者指南』裡學會了。
+  '+': |-
+   肄業啦 / 休學中。
+  '++': |-
+   大學真難唸。
+  '+++': |-
+   我是碩四喲！
+  '++++': |-
+   博士快拿到了。
+  '+++++': |-
+   我是史蒂芬．霍金。
+  '-': |-
+   正在與高級中學奮鬥中
+  '--': |-
+   還沒有進高中呢...
+  _: |-
+   教育程度
+ h:
+  '': ! >-
+   Friends come over to visit every once in a while to talk about Geek things. 
+   There is a place for them to sit.
+  '!': |-
+   I am stuck living with my parents!
+  '*': ! >-
+   I'm not sure where I live anymore.  This lab/workplace seems like home to
+   me.
+  '+': ! >-
+   Living alone, get out once a week to buy food, no more than once a month to
+   do laundry.  All surfaces covered.
+  '++': ! >-
+   Living in a cave with 47 computers and an Internet feed, located near a
+   Dominoes pizza.  See !d.
+  '-': |-
+   Living with one or more registered Geeks.
+  '--': ! >-
+   Living with one or more people who know nothing about being a Geek and
+   refuse to watch Babylon 5.
+  '---': ! >-
+   Married, (persons living romantically with someone might as well label
+   themselves h---, you're as good as there already.)
+  '----': |-
+   Married with children - Al Bundy can sympathize.
+  _: |-
+   居住
+ o:
+  '': |-
+   I've submitted a question, but it has never been incarnated.
+  '+': |-
+   I have been incarnated at least once.
+  '++': |-
+   I have made the Best Of Oracularities.
+  '+++': |-
+   I was a Priest, but have retired.
+  '++++': |-
+   I am an active Priest
+  '+++++': |-
+   I am Steve Kinzler
+  '-': |-
+   I sent my question to the wrong group and got flamed.
+  '--': |-
+   Who needs answers from a bunch of geeks anyhow?
+  _: |-
+   Usenet Oracle
+ r:
+  '': |-
+   I date periodically.
+  '!': |-
+   I've never had a relationship.
+  '%': |-
+   I was going out with someone, but the asshole dumped me.
+  '*': ! >-
+   signifying membership in the SBCA (Sour Bachelor(ette)'s Club of America). 
+   The motto is 'Bitter, but not Desperate'.  First founded at Caltech.
+  '+': |-
+   I date frequently, bouncing from one relationship to another. 
+  '++': |-
+   I've dated my current S.O. for a long time.
+  '+++': |-
+   Found someone, dated, and am now married.
+  '-': |-
+   I have difficulty maintaining a relationship.
+  '--': |-
+   People just aren't interested in dating me.
+  '---': ! >-
+   I'm beginning to think that I'm a leper or something, the way people avoid
+   me like the plague.
+  _: |-
+   親密關係
+ s:
+  '+': |-
+   I'm a little rounder than most.
+  '++': |-
+   I'm a linebacker candidate.
+  '+++': |-
+   I take up three movie seats.
+  '+++:': |-
+   I usually have to duck through doors.
+  '++:': |-
+   I'm a basketball candidate.
+  '+:': |-
+   I'm a little taller than most.
+  '-': |-
+   Everyone tells me to gain a few pounds.
+  '--': |-
+   I tend to have to fight against a strong breeze.
+  '---': |-
+   My bones are poking through my skin.
+  '---:': |-
+   I take a phone book with me when I go out so I can see to eat dinner.
+  '--:': |-
+   I look up to damn near everybody.
+  '-:': |-
+   I look up to most people.
+  ':': |-
+   I'm an average geek.
+  ':+': |-
+   I'm a little rounder than most.
+  ':++': |-
+   I'm a linebacker candidate.
+  ':+++': |-
+   I take up three movie seats.
+  ':-': |-
+   Everyone tells me to gain a few pounds.
+  ':--': |-
+   I tend to have to fight against a strong breeze.
+  ':---': |-
+   My bones are poking through my skin.
+  _: |-
+   身材
+ t:
+  '': |-
+   It's just another TV show.
+  '+': ! >-
+   It's a damn fine TV show and is one of the only things good on television
+   any more.
+  '++': ! >-
+   It's the best show around.  I have all the episodes and the movies on tape
+   and can quote entire scenes verbatim.  I've built a few of the model kits
+   too.  But you'll never catch me at one of those conventions.  Those people
+   are kooks.
+  '+++': ! >-
+   It's not just a TV show, it's a religion.  I know all about warp field
+   dynamics and the principles behind the transporter.  I have memorized the
+   TECH manual.  I speak Klingon.  I go to cons with Vulcan ears on.  I have no
+   life.
+  '-': ! >-
+   Maybe it is just me, but I have no idea what the big deal with Star Trek is.
+    Perhaps I'm missing something but I just think it is bad drama.
+  '--': ! >-
+   Star Trek is just another Space Opera.  William Shatner isn't an actor, he's
+   a poser!  And what's with this Jean-Luc Picard?  A Frenchman with a British
+   accent?  Come on.  I'd only watch this show if my remote control broke. 
+   Isn't Voyager just a rehash of Lost in Space?  Has Sisko even breathed in
+   the last two seasons?
+  '---': ! >-
+   Star Trek SUCKS!  It is the worst crap I have ever seen! Hey, all you
+   trekkies out there, GET A LIFE!  (William Shatner is a t---).
+  _: |-
+   星艦迷航
+ tv:
+  '': ! >-
+   I watch only the shows that are actually worthwhile, such as those found on
+   PBS.
+  '!': |-
+   I do not own a television.
+  '+': |-
+   I watch some tv every day.
+  '++': |-
+   I just leave the tv on, to make sure I don't miss anything.
+  '-': |-
+   I watch tv for the news and 'special programming.'
+  '--': |-
+   I turn my tv on during natural disasters.
+  _: |-
+   電視
+ w:
+  '': |-
+   Ok, so I use MS Windows, I don't have to like it.
+  '+': ! >-
+   I have installed my own custom sounds, wallpaper, and screen savers so my PC
+   walks and talks like a fun house.  Oh yeah, I have a hundred TrueType(tm)
+   fonts that I've installed but never used.  I never lose Minesweeper and
+   Solitaire
+  '++': ! >-
+   I write MS Windows programs in C and think about using C++ someday.  I've
+   written at least one DLL.
+  '+++': ! >-
+   I am a MS Windows programming god.  I wrote a VxD driver to allow MS Windows
+   and DOS to share the use of my waffle iron.  P.S.  Unix sux.
+  '++++': ! >-
+   I have Windows, Windows 95, Windows NT, and Windows NT Advanced Server all
+   running on my SMP RISC machine.  I haven't seen daylight in six months.
+  '+++++': |-
+   I am Bill Gates
+  '-': ! >-
+   I'm still trying to install MS Windows and have at least one peripheral that
+   never works right
+  '--': ! >-
+   MS Windows is a joke operating system.  Hell, it's not even an operating
+   system.  NT is Not Tough enough for me either.  95 is how may times it will
+   crash an hour.
+  '---': ! >-
+   Windows has set back the computing industry by at least 10 years.  Bill
+   Gates should be drawn, quartered, hung, shot, poisoned, disembowelled, and
+   then REALLY hurt.
+  _: |-
+   微軟視窗
+ x:
+  '': |-
+   I've had sex.  Oh!  You mean with someone else?  Then no.
+  '!': |-
+   Sex?  What's that?  I've had no sexual experiences.
+  '!x+': |-
+   Sex? What's that? No experience, willing to learn!
+  '*': |-
+   I'm a pervert.
+  '**': |-
+   I've been known to make perverts look like angels.
+  '+': |-
+   I've had real, live sex.
+  '++': ! >-
+   I was once referred to as 'easy'.  I have no idea where that might have come
+   from though.
+  '+++': |-
+   I'm married, so I can get it (theoretically) whenever I want.
+  '++++': ! >-
+   I have a few little rug rats to prove I've been there.  Besides, with kids
+   around, who has time for sex?
+  '+++++': |-
+   I am Madonna
+  '-': |-
+   Not having sex by choice.
+  '--': |-
+   Not having sex because I just can't get any...
+  '---': |-
+   Not having sex because I'm a nun or a priest.
+  '?': |-
+   It's none of your business what my sex life is like.
+  _: |-
+   性(女)
+ y:
+  '': |-
+   I've had sex.  Oh!  You mean with someone else?  Then no.
+  '!': |-
+   Sex?  What's that?  I've had no sexual experiences.
+  '!y+': |-
+   Sex? What's that? No experience, willing to learn!
+  '*': |-
+   I'm a pervert.
+  '**': |-
+   I've been known to make perverts look like angels.
+  '+': |-
+   I've had real, live sex.
+  '++': ! >-
+   I was once referred to as 'easy'.  I have no idea where that might have come
+   from though.
+  '+++': |-
+   I'm married, so I can get it (theoretically) whenever I want.
+  '++++': ! >-
+   I have a few little rug rats to prove I've been there.  Besides, with kids
+   around, who has time for sex?
+  '-': |-
+   Not having sex by choice.
+  '--': |-
+   Not having sex because I just can't get any...
+  '---': |-
+   Not having sex because I'm a nun or a priest.
+  '?': |-
+   It's none of your business what my sex life is like.
+  _: |-
+   性(男)
+ z:
+  '': |-
+   I've had sex.  Oh!  You mean with someone else?  Then no.
+  '!': |-
+   Sex?  What's that?  I've had no sexual experiences.
+  '!z+': |-
+   Sex? What's that? No experience, willing to learn!
+  '*': |-
+   I'm a pervert.
+  '**': |-
+   I've been known to make perverts look like angels.
+  '+': |-
+   I've had real, live sex.
+  '++': ! >-
+   I was once referred to as 'easy'.  I have no idea where that might have come
+   from though.
+  '+++': |-
+   I'm married, so I can get it (theoretically) whenever I want.
+  '++++': ! >-
+   I have a few little rug rats to prove I've been there.  Besides, with kids
+   around, who has time for sex?
+  '-': |-
+   Not having sex by choice.
+  '--': |-
+   Not having sex because I just can't get any...
+  '---': |-
+   Not having sex because I'm a nun or a priest.
+  '?': |-
+   It's none of your business what my sex life is like.
+  _: |-
+   性(無可奉告)

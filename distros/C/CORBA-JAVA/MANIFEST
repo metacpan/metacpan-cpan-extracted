@@ -1,0 +1,24 @@
+Changes
+lib/CORBA/JAVA.pm
+lib/CORBA/JAVA/ClassVisitor.pm
+lib/CORBA/JAVA/ClassXmlVisitor.pm
+lib/CORBA/JAVA/LiteralVisitor.pm
+lib/CORBA/JAVA/NameVisitor.pm
+lib/CORBA/JAVA/Name2Visitor.pm
+lib/CORBA/JAVA/NameXmlVisitor.pm
+lib/CORBA/JAVA/UidVisitor.pm
+bin/idl2java
+bin/idl2javaxml
+javaxml/XMLInputStream.java
+javaxml/XMLOutputStream.java
+javaxml/XMLInputStreamImpl.java
+javaxml/XMLOutputStreamImpl.java
+javaxml/PYXInputStreamImpl.java
+javaxml/PYXOutputStreamImpl.java
+MANIFEST
+Makefile.PL
+t/CORBA-JAVA.t
+t/pod.t
+README
+
+META.yml                                 Module meta-data (added by MakeMaker)

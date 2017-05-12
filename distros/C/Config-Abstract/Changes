@@ -1,0 +1,41 @@
+Revision history for Perl extension Config::Abstract.
+0.16 Mon Jul 7 00:30:34 2008
+	- Fixed broken regexp in _parse_settings_file so that it correctly trims dos line endings.
+
+0.15 Mon Oct 8 15:56:12 2007
+	- Changed return value of get_entry in array context to always be a list, empty if no matching 
+	  entry exists. bug reported, with suggested fix, by Jean-Michel Vansteene.
+
+0.14 Tue May 22 20:09:16 2007
+	- Typo bug in Config::Abstract::_parse_settings_file. Thanks to Tim Daley for spotting it.
+
+0.13 Thu Apr 27 05:13:24 2006
+	- Fixed broken regexp in Ini::_parse_settings_file, bug reported, with the fix, by Eric Schultz. 
+
+0.12 Wed Feb 12 22:12:41 2003
+	- Config::Abstract->patch() implemented
+	- patch and diff documented as are get and set, the new public mutators
+	- inidiff, previously called just diff, has been renamed, to inidiff :), and made slightly
+	  more useful
+	- test.pl has been changed so it won't fail when deploying. It still does nothing useful,
+	  though. Did I hear someone say 'Let me do it!'? Thought not.
+	- test.pl in the root directory has been renamed to testdata.pl as that's a more appropriate
+	  name. Same goes for test.ini, which is now called testdata.ini
+	  
+0.11 Tue Feb 11 11:01:38 2003
+	- Config::Abstract->diff() now implemented to let us create intelligent diffs from any files
+	  supported by this set of modules
+	- Introduced path-based namespace for get_entry and set_entry
+	- Added CREDITS to the README to give something back to the folks around here who have been
+	  instrumental in getting me to the right mindset for getting all this done.
+	- Included a small utility script for the Config::Abstract::Ini module that lets you diff two
+	  .ini files
+	  
+0.10 Thu Jan 30 11:08:23 2003
+	- Updated test.pl so it will pass submission tests and put some content in README and Changes
+	- Removed some obsolete documentation in PODs
+
+0.09  Wed Jan 29 16:44:38 2003
+	- original version; created from Configfile::Ini, which(luckily) never made it into CPAN
+
+

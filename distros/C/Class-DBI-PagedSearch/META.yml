@@ -1,0 +1,23 @@
+---
+name: Class-DBI-PagedSearch
+version: 1.000
+author:
+  - Fotango Ltd. C<cpan@fotango.com>
+abstract: pageable results from searches
+license: perl
+requires:
+  Class::DBI: 3.0.14
+  Class::DBI::Plugin::Pager: 0
+  SQL::Abstract: 0
+  perl: 5.8.1
+build_requires:
+  DBD::SQLite: 0
+  Test::More: 0
+provides:
+  Class::DBI::PagedSQLSearch:
+    file: lib/Class/DBI/PagedSearch.pm
+    version: 1.000
+  Class::DBI::PagedSearch:
+    file: lib/Class/DBI/PagedSearch.pm
+    version: 1.000
+generated_by: Module::Build version 0.2609

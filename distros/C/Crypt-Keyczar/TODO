@@ -1,0 +1,4 @@
+add fallback function for SHA-256, SHA-512.
+add plaggable format.
+support encrypted key.
+add Generic Block-cipher engine module

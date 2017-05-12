@@ -1,0 +1,62 @@
+#!perl -w
+
+# $Id$
+
+use strict;
+
+use CPU::Z80::Assembler;
+$CPU::Z80::Assembler::verbose   = 1;
+$CPU::Z80::Assembler::fill_byte = 0xFF;
+
+my $version = $CPU::Z80::Assembler::VERSION;
+
+print STDERR "CPU::Z80::Assembler - z80masm v$version\n\n";
+
+my($infile, $outfile) = splice(@ARGV, 0, 2);
+defined($infile) && @ARGV == 0
+    or die "Usage: z80masm sourcefile [destfile]\n";
+$outfile ||= "$infile.o";
+
+my $code = z80asm_file($infile);
+open(OUT, ">$outfile") || die("Can't open $outfile\n");
+binmode(OUT);
+print OUT $code;
+close(OUT);
+exit 0;
+
+=head1 NAME
+
+z80masm - a macro assembler for the Z80 micro-processor
+
+=head1 DESCRIPTION
+
+A simple wrapper around the CPU::Z80::Assembler perl module
+
+=head1 SYNOPSIS
+
+    z80masm sourcefile
+
+    z80masm sourcefile destfile
+
+=head1 USAGE
+
+The source file is mandatory.  The destination file, if not
+specified, will be the same as the source file, with .o appended.
+
+For details of the assembler language, see
+L<CPU::Z80::Assembler>.
+
+=head1 BUGS and FEEDBACK
+
+See L<CPU::Z80::Assembler>.
+
+=head1 SEE ALSO
+
+L<CPU::Emulator::Z80>
+L<CPU::Z80::Assembler>
+
+=head1 AUTHORS, COPYRIGHT and LICENCE
+
+See L<CPU::Z80::Assembler>.
+
+=cut

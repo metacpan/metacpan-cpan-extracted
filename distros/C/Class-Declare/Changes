@@ -1,0 +1,90 @@
+Revision history for Perl module Class::Declare
+
+0.19  Mon Oct  5 15:39:21 2015
+  - corrected regex tests for more recent Perl versions
+
+0.18  Tue Aug  4 12:01:45 2015
+  - corrected Class::Declare::Dump tests for more recent Perl versions
+  - corrected Class::Declare::VERSION() to correctly support required versions
+
+0.17  Mon Aug 23 00:49:12 2010
+  - changed $VERSION definition in Class::Declare::Dump and Class::Declare::Hash
+    to ensure Class::Declare passes tests until Perl 5.12.0+
+  - 5.12.0+ seems to expect a numeric string, and doesn't cope with an
+    evaluate expression (not entirely cool)
+
+0.16  Sun Aug 22 14:56:37 2010
+  - updated copyright notices to show 2010
+
+0.15  Sun Aug 22 00:49:21 2010
+  - removed deprecated code previously used in the dynamic loading of the
+    dump() and hash() methods
+
+0.14  Sun Aug 22 00:14:32 2010
+  - changed dump() and hash() to no longer be dynamically loaded when first
+    used; now these methods are always loaded and available
+
+0.13  Sat Aug  8 19:53:12 2009
+  - corrected bug #48499 with Test::Builder attempting to load overload.pm
+    at runtime, while @INC has been set empty
+
+0.12  Mon Jul  7 15:20:51 2008
+  - corrected 'depth' handling in hash() to work across nested ARRAY
+    and HASH references as well as objects
+
+0.11  Mon Jul  7 12:39:34 2008
+  - corrected hash() to perform proper recursion through HASH and ARRAY
+    references, as well as Class::Declare objects
+
+0.10  Mon Jul  7 00:45;13 2008
+  - updated the versions of the Class::Declare::Hash and Class::Declare::Dump
+    helper packages
+
+0.09  Sun Jul  6 21:36:46 2008
+  - changed hash() to automatically recurse rather than stop at the first
+    depth
+
+0.08  Sun Jun  3 15:23:12 2007
+  - added 'backtrace' to dump() to control the generation of backtrace
+    references
+
+0.07  Tue May  1 18:15:43 2007
+  - added hash() method
+
+0.06  Mon Mar  5 02:07:04 2007
+  - added abstract methods
+  - added support for the 'new' for declare() allowing non-public attributes
+    to be automatically set in the constructor
+  - corrected STORABLE_thaw to allow for changes to Storable
+      (see http://rt.cpan.org/Public/Bug/Display.html?id=11783)
+  - added the strict() method for testing whether a class is running
+    under strict access control checking
+  - corrected warnings from dump()
+
+0.05  Tue Jun 17 06:05:07 2003
+  - fixed possible key collision in freeze/thaw of Class::Declare objects
+
+0.04  Mon Jun 16 11:24:21 2003
+  - fixed Makefile.PL dependency to require Test::Exception 0.15 or
+    greater (we need lives_and())
+
+0.03  Sun Jun 15 19:22:36 2003
+  - changed underlying object store from list of hashes to hash of hashes
+  - arguments() now also accepts a list of argument names as well as a single
+    name as the default arguments, in which case all arguments default to 
+    undef
+  - attribute modifiers are now supported:
+      + class attributes may be set read-write
+      + instance attributes may be set read-only
+  - declare() now also accepts a list of attribute names as well as a
+    single name for each type of attribute, in which case the attributes
+    default to undef.
+
+0.02  Fri Jun  6 13:52:37 2003
+  - renamed "shared" attributes and methods "restricted" to avoid
+    collision with :shared attribute for threading
+    (see Class::Declare::Attributes)
+  - deprecated the shared() method: now throws an error
+
+0.01  Tue Jun  3 21:42:14 2003
+  - initial Class::Declare release

@@ -1,0 +1,53 @@
+Installation
+============
+
+perl Makefile.PL
+make
+make test
+make install
+
+Tweakings to find the bzip2 distribution
+========================================
+
+Useful Environment variables
+============================
+
+Set these in the environment prior to running "perl Makefile.PL".
+
+BUILD_BZLIB=Test
+BZLIB_LIB=
+BZLIB_INCLUDE=
+BZLIB_BIN=
+
+Set BZLIB_INCLUDE to the directory with bzlib.h in it.  There is no default.
+
+Set BZLIB_LIB to the directory with libbz2.a in it.  There is no default.
+
+Set BZLIB_BIN to the directory with the bzip2 command in it.  There is no default.
+
+BUILD_BZLIB is a flag variable to control the building of
+the internal, encapsulated version of bzip2 1.0.2.  The default is
+BUILD_BZLIB=Test.
+
+BUILD_BZLIB=1
+* Means use the internal bzip2 distribution.
+
+BUILD_BZLIB=0
+* Means don't.  ever.
+
+BUILD_BZLIB=Test
+* Means try to compile a short program (show_bzversion.c) with the
+  standard perl xs compile stuff, plus the settings for BZLIB_INCLUDE
+  and BZLIB_LIB, if any.  If it fails, use the internal bzip2.  If it
+  succeeds, rely on the system bzip2.
+
+The defaults for these environment variables are in config.in.
+
+config.in
+=========
+
+# starts a comment.
+
+Has default settings for BUILD_BZLIB, BZLIB_INCLUDE, BZLIB_LIB, BZLIB_BIN.
+
+

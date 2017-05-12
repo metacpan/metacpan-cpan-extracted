@@ -1,0 +1,35 @@
+<div class=path>
+[% results.size %] [% pages.results %]
+</div>
+<div class=box>
+[% class =  's' %]
+<table width="100%">
+[% USE table(results, rows=2) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END -%]
+[% IF item.mod_id %]
+<td><a href="[% home %]/module/[% item.mod_name %]"> 
+<b>[% item.mod_name %] </b></a>
+[% IF item.chapterid %]
+[ <a href="[% home %]/chapter/[% item.chapter %]"><small>[% pages.related %]</small></a> ]
+[% END %]
+<br /><small>[% item.mod_abs %]</small></td>
+[% END -%]
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>
+</div>
+<hr />
+[% IF mode && query %]
+<font size="-1">[% pages.try %]</font> <a href=
+"[%searchcpan%]search?mode=[% mode %];query=[% query | uri | html %]">
+<font size="-1">search.cpan.org</font></a>
+[% END %]
+

@@ -1,0 +1,16 @@
+0.08    2011-06-09
+        - POD fix
+0.07    2011-06-07
+        - defaults support
+0.06    2010-03-29
+        - bugfixes
+0.05    2009-03-18
+        - embed configuration for plugins in root ns.
+0.04    2009-03-10
+        - critical fix for Win32: was broken.
+0.03    2009-03-03
+        - fix Makefile.PL - Catalyst 5.71 required
+0.02    2009-03-02
+        - bug fix (if predefined config used)
+0.01	2009-03-02
+	- Initial release

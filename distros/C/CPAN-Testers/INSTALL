@@ -1,0 +1,14 @@
+CPAN::Testers
+=============
+
+INSTALLATION
+
+To install this distribution type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+However, as this distribution is merely a namespace placeholder, installing
+it provides little to no actual value. :-)

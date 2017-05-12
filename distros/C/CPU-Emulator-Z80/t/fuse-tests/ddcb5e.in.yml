@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 98
+    - 94
+  60790:
+    - 167
+name: ddcb5e
+registers:
+  AF: 52977
+  AF_: 0
+  BC: 565
+  BC_: 0
+  DE: 58033
+  DE_: 0
+  HL: 31308
+  HL_: 0
+  I: 0
+  IX: 60692
+  IY: 53462
+  PC: 0
+  R: 0
+  SP: 0

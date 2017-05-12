@@ -1,0 +1,174 @@
+NAME
+    Class::AlzaboWrapper - Higher level wrapper around Alzabo Row and Table
+    objects
+
+SYNOPSIS
+      package WebTalk::User;
+      use base 'Class::AlzaboWrapper';
+
+      __PACKAGE->SetAlzaboTable( $schema->table('User') );
+      __PACKAGE->MakeColumnMethods();
+
+DESCRIPTION
+    This module is intended for use as a base class when you are writing a
+    class that wraps Alzabo's table and row classes.
+
+    It also provides a way to generate some methods specific to your
+    subclass.
+
+USAGE
+    Our usage examples will assume that there is database containing tables
+    named "User" and "UserComment", and that the subclass we are creating is
+    called "WebTalk::User".
+
+  Exceptions
+    This module throws exceptions when invalid parameters are given to
+    methods. The exceptions it throws are objects which inherit from
+    "Exception::Class::Base", just as with Alzabo itself.
+
+  SetAlzaboTable()
+    This method must be called by your subclass or almost none of the
+    methods provided by "Class::AlzaboWrapper" will work.
+
+  Inherited methods
+    Subclasses inherit a number of method from "Class::AlzaboWrapper".
+
+   Class methods
+    *   new(...)
+
+        The "new()" method provided allows you to create new objects either
+        from an Alzabo row object, or from the main table's primary keys.
+
+        This method first looks to see if the parameters it was given match
+        the table's primary key. If they do, it attempts to create an object
+        using those parameters. If no primary key values are given, then it
+        looks for an parameter called "object", which should be an
+        "Alzabo::Runtime::Row" object.
+
+        Finally, if your subclass defines a "_new_row()" method, then this
+        will be called, with all the parameters provided to the "new()"
+        method. This allows you to create new objects based on other
+        parameters.
+
+        If your subclass defines an "_init()" method, then this will be
+        called after the object is created, before it is returned from the
+        "new()" method to the caller.
+
+        If invalid parameters are given then this method will throw a
+        "Class::AlzaboWrapper::Exception::Params" exception.
+
+    *   create(...)
+
+        This method is used to create a new object and insert it into the
+        database. It simply calls the "insert()" method on the class's
+        associated table object. Any parameters given to this method are
+        passed given to the "insert()" method as its "values" parameter.
+
+    *   potential(...)
+
+        This creates a new object based on a potential row, as opposed to
+        one in the database. Similar to the "create()" method, any
+        parameters passed are given to the table's "potential_row()" method
+        as the "values" parameter.
+
+    *   Columns(...)
+
+        This is simply a shortcut to the associated table's "columns"
+        method. This may also be called as an object method.
+
+    *   Column(...)
+
+        This is simply a shortcut to the associated table's "column" method.
+        This may also be called as an object method.
+
+    *   Table()
+
+        This method returns the Alzabo table object associated with the
+        subclass. This may also be called as an object method.
+
+    *   AlzaboAttributes()
+
+        Returns a list of accessor methods that were created based on the
+        columns in the class's associated table.
+
+    *   NewCursor ($cursor)
+
+        Given an "Alzabo::Runtime::Cursor" object (either a row or join
+        cursor), this method returns a new "Class::AlzaboWrapper::Cursor"
+        object.
+
+   Object methods
+    *   row_object()
+
+        This method returns the "Alzabo::Runtime::Row" object associated
+        with the given subclass object. So, for our hypothetical
+        "WebTalk::User" class, this would return an object representing the
+        underlying row from the User table.
+
+    *   select() / update() / delete() / is_live()
+
+        These methods are simply passthroughs to the underlying Alzabo row
+        methods of the same names. You may want to subclass some of these in
+        order to change their behavior.
+
+   MakeColumnMethods(...)
+    If you call this method on your subclass, then for each column in the
+    associated table, a method will be created in your subclass that selects
+    that column's value from the underlying row for an object.
+
+    For example, if our User table contained "username" and "email" columns,
+    then our "WebTalk::User" object would have "username()" and "email()"
+    methods generated.
+
+    The "MakeColumnMethods()" method accepts a "skip" parameter which can be
+    either a scalar or array reference. This is a list of columns for which
+    methods *should not* be generated.
+
+   Class::AlzaboWrapper methods
+    The "Class::AlzaboWrapper" module has a method it provides:
+
+    *   TableToClass($table)
+
+        Given an Alzabo table object, this method returns its associated
+        subclass.
+
+   Cursors
+    When using this module, you need to use the
+    "Class::AlzaboWrapper::Cursor" module to wrap Alzabo's cursor objects,
+    so that objects the cursor returns are of the appropriate subclass, not
+    plain "Alzabo::Runtime::Row" objects. The "Cursor()" method provides
+    some syntactic sugar for creating "Class::AlzaboWrapper::Cursor"
+    objects.
+
+   Attributes created by subclasses
+    If you want to record the accessor methods your subclass makes so they
+    are available via "AlzaboAttributes()", you can call the
+    "_RecordAttributeCreation()" method, which expects two arguments. The
+    first argument is the class for which the method was created and the
+    second is the name of the method.
+
+SUPPORT
+    The Alzabo docs are conveniently located online at
+    http://www.alzabo.org/docs/.
+
+    There is also a mailing list. You can sign up at
+    http://lists.sourceforge.net/lists/listinfo/alzabo-general.
+
+    Please don't email me directly. Use the list instead so others can see
+    your questions.
+
+SEE ALSO
+    VegGuide.Org is a site I created which actually uses this code as part
+    of the application. Its source is available from the web site.
+
+COPYRIGHT
+    Copyright (c) 2002-2005 David Rolsky. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Dave Rolsky, <autarch@urth.org>
+

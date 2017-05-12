@@ -1,0 +1,26 @@
+Revision history for Perl extension Calendar::Japanese::Holiday.
+
+0.04  Tue Jan 6 2015
+	Added Yama-no-hi.
+
+0.03  Sun Jun 17 2007
+
+	Fix the item pointed out by fbis.
+	(Ref. to http://d.hatena.ne.jp/fbis/20070616)
+
+	(1) Supported year is changed (1948-).
+	    It was 1970 in previous version.
+
+	(2) Supporting below holidays.
+		1959/04/10
+		1989/02/24
+		1990/11/12
+		1993/06/09
+
+0.02  Fri Jun 15 2007
+	Pod Fixes - URL in SEE ALSO
+
+0.01  Tue Jun 12 2007
+	- original version; created by h2xs 1.23 with options
+		-X -c -a Calendar::Japanese::Holiday
+

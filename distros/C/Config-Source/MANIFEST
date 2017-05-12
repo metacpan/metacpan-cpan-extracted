@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/Config/Source.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-general.t
+t/02-add_source.t
+t/03-getall.t
+t/10-clone-Storable.t
+t/11-clone-Clone.t
+t/12-clone-Clone-Fast.t
+t/13-clone-Clone-PP.t
+t/14-clone-Data-Clone.t
+t/CloneTest.pm
+t/config/system
+t/config/user
+Makefile.PL
+META.yml
+META.json
+t/20-other-Config-General.t
+t/config/Config-General-system
+t/config/Config-General-user

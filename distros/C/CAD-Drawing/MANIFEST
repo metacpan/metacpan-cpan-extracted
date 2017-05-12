@@ -1,0 +1,27 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/CAD/Drawing.pm
+lib/CAD/Drawing/Calculate.pm
+lib/CAD/Drawing/Calculate/Finite.pm
+lib/CAD/Drawing/Defined.pm
+lib/CAD/Drawing/IO.pm
+lib/CAD/Drawing/IO/Circ.pm
+lib/CAD/Drawing/IO/Compressed.pm
+lib/CAD/Drawing/IO/FlatYAML.pm
+lib/CAD/Drawing/IO/Split.pm
+lib/CAD/Drawing/Manipulate.pm
+lib/CAD/Drawing/Manipulate/Graphics.pm
+lib/CAD/Drawing/Manipulate/Transform.pm
+t/data/sublist-main
+t/data/sublist-defined
+t/data/sublist-graphics
+t/00-load.t
+t/01-pod-coverage.t
+t/02-pod.t
+t/03-prereq.t
+t/basic.t
+t/methods.t

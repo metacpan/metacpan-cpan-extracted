@@ -1,0 +1,8 @@
+Makefile.PL
+CHANGES
+MANIFEST			This list of files
+META.yml
+NINJA
+README
+lib/CPAN/Metadata/RDF.pm
+t/pod.t

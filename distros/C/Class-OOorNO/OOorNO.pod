@@ -1,0 +1,627 @@
+
+=pod
+
+=head1 NAME
+
+Class::OOorNO - Give your module classic I<AND> OO interfaces
+
+=head1 STATUS!
+
+This is a developer's release, and is not intended for use in the public sector.
+This code is made available for developers who wish to aid in the furthering of
+the code.
+
+This is I<not> a registered module in the CPAN module list.  It is not part of
+the CPAN yet.
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<Functional> programming interface
+
+   package Your::Class;
+   use Class::OOorNO qw( coerce_array );
+
+=item B<Object-Oriented> programming interface
+
+   package Your::Class;
+   use Class::OOorNO;
+   my($obj) = Class::OOorNO->new();
+
+=item B<Class Inheritance>
+
+   package Your::Class;
+   use vars qw( @ISA );
+   use Class::OOorNO;
+   @ISA = qw( Class::OOorNO );
+
+=back
+
+=head1 PURPOSE
+
+Allows you set up your module so it can I<easily> provide a standard
+interface as well as an object-oriented interface to its users.
+
+=head1 DESCRIPTION
+
+Class::OOorNO helps your module handle the input for its subroutines
+whether called in object-oriented style I<(as object methods or class methods
+with the arrow syntax C<< -> >>)>, or in functional programming style
+I<(as subroutines imported to the caller's namespace via L<Exporter|Exporter>)>.
+
+The bulk of this module comprises a lightweight, pure-Perl emulation of the
+L<Devel::Caller|Devel::Caller> library's C<called_as_method()> routine which is
+written in C.
+
+Devel::Caller dives deep into the internals of of the Perl interpreter
+I<(see L<perlguts>)> to trace stack frames and can get the input for any call
+in the stack.  It's really handy for I<Devel::>opment and debugging.
+
+This module is much more lightweight and focuses more on your module's
+I<Class::> methods themselves.
+
+=head1 EXPORT
+
+None by default.
+
+=head1 EXPORT_OK
+
+All available methods.  (see L<METHODS|/METHODS> below)
+
+=head1 EXPORT_TAGS
+
+C<:all> (exports all of C<@EXPORT_OK>)
+
+=head1 METHODS
+
+=head2 C<myself()>
+
+=over
+
+=item I<Syntax:> C<myself(@_)>
+
+If your subroutine has been called as an object method, a reference to the
+object will be returned.  If your subroutine has been called as a class method,
+the name of class itself will be returned as a string.  Otherwise, a value of
+undef is returned.
+
+=back
+
+=head2 C<OOorNO()>
+
+=over
+
+=item I<Syntax:> C<OOorNO(@_)>
+
+If your subroutine has been called as an object method or as a class method, a
+value of 1 will be returned, otherwise a false value (an empty string, eg- '')
+will be returned.
+
+=back
+
+=head2 C<myargs()>
+
+=over
+
+=item I<Syntax:> C<myargs(@_)>
+
+This method retrieves the input sent to your class methods and returns it
+untouched, with the exception that if a blessed object reference from the same
+namespace as the caller is found in $_[0], it will be not be included with
+the rest of the arguments when they are returned.  B<Make note> that the
+special variable C<"@_"> for your routine B<is not altered> in any way by
+calling this method.  You can still use and manipulate it as you normally would.
+
+=item Purpose of C<OOorNO::myargs>
+
+This simply allows the methods in your class to get their argment list quickly
+without having to check if they were called procedurally or with object-oriented
+notation.
+
+=over
+
+=item I<Caveat:>
+
+B<If> you are expecting a blessed object reference from your package to be in
+C<$_[0]> regardless of the way your method was called -I<don't use this method>
+to get your arguments; that reference you're expecting will obviously be
+excluded from the list you get back from C<myargs> if you do.
+
+=back
+
+   package Your::Class;
+   use Class::OOorNO qw( myargs );
+
+   sub bar {
+
+      my(@args) = myargs(@_);
+   ...
+
+B<-OR->
+
+   package Your::Class;
+   use Class::OOorNO;
+   our($onobj) = Class::OOorNO->new();
+
+   sub foo {
+
+      my(@args) = $onobj->myargs(@_);
+   ...
+
+=back
+
+=head2 C<coerce_array()>
+
+=over
+
+=item I<Syntax:> C<coerce_array(@array/(list))>
+
+This method retrieves input sent to your class methods when called with
+name-value pairs and returns an anonymous hash reference whose keys and values
+correspond to the input argument names and their respective values.  If nothing
+is passed to it, an empty hash reference will be returned, eg- C<{ }>
+
+   package Your::Class;
+   use Class::OOorNO qw( coerce_array );
+
+   sub bar {
+
+      my($args) = coerce_array(@_);
+   ...
+
+B<-OR->
+
+   package Your::Class;
+   use Class::OOorNO;
+   our($onobj) = Class::OOorNO->new();
+
+   sub foo {
+
+      my($self) = shift(@_);
+      my($args) = $onobj->coerce_array(@_);
+   ...
+
+B<-OR->
+
+   package Your::Class;
+   use Class::OOorNO;
+   use vars qw( @ISA );
+
+   @ISA = qw( Class::OOorNO );
+
+   sub foo {
+
+      my($self) = shift(@_);
+      my($args) = $self->coerce_array(@_);
+   ...
+
+=item Purpose of C<OOorNO::coerce_array>
+
+It's common practice for Perl modules to accept name-value pairs for their
+methods, and because @_ is an array it is easy to encounter warnings and errors
+when this isn't handled correctly.  An example of what this kind of call would
+look like is shown below in the imaginary subroutine I<"Your::Class::method()">
+
+   Your::Class->method
+      (
+         -name => 'Joe',
+         -rank => 'Private, First-Class',
+         -SN   => '87D91-35-713FOO',
+      );
+
+=over
+
+=item Avoids Common Pitfalls
+
+Quite often a class method will use code such as this to handle name-value
+paired input:
+
+   sub foo {
+
+      my($class)  = shift;
+      my(%args)   = @_; ...
+
+B<-and/or->
+
+   sub bar {
+
+      my($args)   = { @_ }; ...
+
+=item What's Wrong With That?
+
+While this practice is not evil, it can be error-prone in situations where:
+
+=over
+
+=item *
+
+Your class method is called in procedural style and expects that the
+first element in @_ is a blessed object reference.
+
+=item *
+
+Your class method is errantly called with an unbalanced set of name-value
+pairs, or one or more named arguments get passed with undefined values.
+
+=item *
+
+You want to give your module the ability to export any or all of its methods
+by using the L<Exporter|Exporter> module, but still want to maintain an
+object-oriented interface to your module as well.  An example of a well known
+module which does this is L<CGI.pm|CGI>.  It is written to provide both a
+standard procedural interface as well as an object-oriented one.  You can
+call its methods either way:
+
+   # object-oriented style
+   use CGI;
+   my($cgi_object) = CGI->new();
+   my($visitor) = $cgi_object->param('visitor name');
+
+B<-OR->
+
+   # procedural style
+   use CGI qw( param );
+   my($visitor) = param('visitor name');
+
+=back
+
+=item Don't say I didn't I<warn> you B< ;o) >
+
+When these situations occur, class methods sorting out name-value paired input
+using the common problematic technique I<(demonstrated above in
+"L<Pitfalls|/Avoids Common Pitfalls>)>" encounter problems such as undesired
+program behavior, general errors, and warnings -both fatal and non-fatal.
+Problems include:
+
+=over
+
+=item *
+
+Argument sets that get reversed; the argument names become the hash values
+and the argument values become the hash keys which is exactly the opposite of
+the desired behavior.
+
+=item *
+
+The entire arument hash/hashref gets turned into a mess of mixed up
+keys and values that don't reflect the actual input at all.  Instead,
+you get hash keys containing both argument names and argument values.
+
+=item *
+
+The argument hash/hashref is created with an uneven number of elements
+and/or uninitialized values.
+
+=back
+
+Warnings I<(see L<perldiag|perldiag>)> resulting from the above mentioned
+situations could include any the following  (Some of these don't apply unless
+you run your program under the L<warnings pragma|warnings>) like you
+I<L<should|perl/BUGS>>.
+
+=over
+
+=item C<Can't coerce array into hash>
+
+I<This is a fatal warning, eg- if you see it your program
+failed and execution aborted.)>
+
+=item C<Odd number of elements in hash assignment>
+
+I<non-fatal.>
+
+=item  C<Not a %s reference>
+
+-where C<%s> is probably "HASH", though it could be complaining about a
+non-reference to any data type that your routine may be attempting to treat
+as a reference.  This is often the result of a class method being called in
+procedural style rather than in the object-oriented style using the arrow
+C<-\>> syntax.  The class method expects the first argument to be an object
+reference, when it is clearly not. I<(This warning is fatal as well.)>
+
+=item C<Can't call method %s on unblessed reference>
+
+I<This is another a fatal warning>, and will occur under the same circumstances
+that surround the warning described immediately above.  The class method
+expects the first argument to be an object reference when it's not.
+
+=back
+
+=back
+
+=back
+
+=head2 C<shave_opts()>
+
+=over
+
+=item I<Syntax:> C<shave_opts(\@_)>
+
+I<-- Documentation for this method is not yet complete! -->
+
+=back
+
+=head1 EXAMPLES
+
+B<Note: This is not a complete set of examples.  It's still evolving.>
+
+=head2 using C<OOorNO()>
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( show_call_style );
+
+   use Class::OOorNO qw( OOorNO );
+
+   sub new { bless { }, shift }
+
+   sub show_call_style {
+
+      if (ref OOorNO(@_)) {
+         print __PACKAGE__ . "::foo was called as an OBJECT METHOD.\n"
+      }
+      elsif (OOorNO(@_)) {
+         print __PACKAGE__ . "::foo was called as an CLASS METHOD.\n"
+      }
+      else {
+         print __PACKAGE__ . "::foo was called as a SUBROUTINE.\n"
+      }
+   }
+
+I<User's code...>
+
+   package main;
+   use strict;
+   use Your::Module qw( show_call_style );
+
+   my($YM) = Your::Module->new;
+
+   $YM->show_call_style;            # as an object method
+   Your::Module->show_call_style;   # as a class method
+   &Your::Module::show_call_style;  # as a subroutine
+   &show_call_style;                # as imported subroutine
+
+I<Output:>
+
+   Your::Module::foo was called as an OBJECT METHOD.
+   Your::Module::foo was called as an CLASS METHOD.
+   Your::Module::foo was called as a SUBROUTINE.
+   Your::Module::foo was called as a SUBROUTINE.
+
+=head2 using C<myself()>
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( print_self_name );
+
+   use Class::OOorNO qw( myself );
+
+   sub new { bless { }, shift }
+
+   sub print_self_name {
+      print( (ref myself(@_) || myself(@_) || __PACKAGE__), "\n" )
+   }
+
+I<User's code...>
+
+   package main;
+   use strict;
+   use Your::Module qw( print_self_name );
+
+   my($YM) = Your::Module->new;
+
+   $YM->print_self_name;            # as an object method
+   Your::Module->print_self_name;   # as a class method
+   &Your::Module::print_self_name;  # as a subroutine
+   print_self_name;                 # as imported subroutine
+
+I<Output:>
+
+   Your::Module
+   Your::Module
+   Your::Module
+   Your::Module
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( show_call_style   get_self_ref );
+
+   use Class::OOorNO qw( OOorNO   myself );
+
+   sub new { bless { }, shift }
+
+   sub show_call_style {
+
+      if (ref OOorNO(@_)) {
+         print __PACKAGE__ . "::foo was called as an OBJECT METHOD.\n"
+      }
+      elsif (OOorNO(@_)) {
+         print __PACKAGE__ . "::foo was called as an CLASS METHOD.\n"
+      }
+      else {
+         print __PACKAGE__ . "::foo was called as a SUBROUTINE.\n"
+      }
+   }
+
+   sub get_self_ref {
+      ref myself(@_) ? myself(@_) : __PACKAGE__->new
+   }
+
+I<User's code...>
+
+   package main;
+   use strict;
+   use Your::Module qw( show_call_style   get_self_ref );
+
+   my($YM) = Your::Module->new;
+
+   # supports calls that go way down the stack too:
+   Your::Module->new->get_self_ref->show_call_style;
+   Your::Module->get_self_ref->show_call_style;
+   &Your::Module::get_self_ref->show_call_style;
+   get_self_ref->show_call_style;
+
+I<Output:>
+
+   Your::Module::foo was called as an OBJECT METHOD.
+   Your::Module::foo was called as an OBJECT METHOD.
+   Your::Module::foo was called as an OBJECT METHOD.
+   Your::Module::foo was called as an OBJECT METHOD.
+
+=head2 using C<myargs()>
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( print_argument_list );
+
+   use Class::OOorNO qw( myargs );
+
+   sub new { bless { }, shift }
+
+   sub print_argument_list {
+      print "My argument list: \n" . join("\n", myargs(@_)), "\n";
+   }
+
+I<User's code...>
+
+   package main;
+   use strict;
+   use Your::Module qw( print_argument_list );
+
+   my($YM) = Your::Module->new;
+
+   my(@things) = (   'foo',
+                     12687.357,
+                     $YM,
+                     eval('*bar'),
+                     [ 'baz', sub { "wubble" },
+                     { 'flarp' => 'wibble' } ]   );
+
+   $YM->print_argument_list(@things);           # as an object method
+   Your::Module->print_argument_list(@things);  # as a class method
+   &Your::Module::print_argument_list(@things); # as a subroutine
+   print_argument_list(@things);                # as imported subroutine
+
+I<Output:>
+
+   My argument list:
+   foo
+   12687.357
+   Your::Module=HASH(0x9bd858)
+   *main::bar
+   ARRAY(0x9bd954)
+
+      ...repeated four times
+
+=head2 using C<coerce_array()>
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( pass_name_value_pairs );
+
+   use Class::OOorNO qw( coerce_array );
+
+   sub new { bless { }, shift }
+
+   sub pass_name_value_pairs {
+      my($input)  = coerce_array(@_);
+
+      my($driver) = $input->{'-driver'} || 'nobody';
+      my($car)    = $input->{'-car'}    || 'no car';
+      my($bike)   = $input->{'-bike'}   || 'no bike';
+      my($plane)  = $input->{'-plane'}  || 'no plane';
+
+      print("$driver drives $car, $bike, and $plane.\n");
+   }
+
+I<User's code...>
+
+I<Output:>
+
+=head2 using C<shave_opts()>
+
+I<Your module...>
+
+   package Your::Module;
+   use strict;
+   use Exporter;
+   use vars qw( @EXPORT_OK );
+   @EXPORT_OK = qw( print_options );
+
+   use Class::OOorNO qw( shave_opts );
+
+   sub new { bless { }, shift }
+
+   sub print_options {
+      my($opts) = shave_opts(\@_);
+      print "\n",
+      ( map { qq[$_ => $opts->{$_}] . "\n" } keys %$opts ),
+      "\n"
+   }
+
+I<User's code...>
+
+I<Output:>
+
+=head1 PREREQUISITES
+
+None.
+
+=head1 BUGS
+
+This documentation isn't done yet, as you can see.  This is being rectified
+as quickly as possible.  Please excercise caution if you choose to use this
+code before it can be further documented for you.  It is present on CPAN
+at this time despite its unfinished condition in order to provide support for
+the L<File::Util|File::Util> module which lists Class::OOorNO among its
+prerequisites.  Please excuse the inconvenience.
+
+=head1 AUTHOR
+
+Tommy Butler <L<cpan@atrixnet.com|mailto:cpan@atrixnet.com>>
+
+=head1 COPYRIGHT
+
+Copyright(c) 2001-2003, Tommy Butler.  All rights reserved.
+
+=head1 LICENSE
+
+This library is free software, you may redistribute
+and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Devel::Caller>
+
+=item L<Class::ParmList>
+
+=item L<Class::ParamParser>
+
+=item L<Exporter>
+
+=back
+
+=cut

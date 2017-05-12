@@ -1,0 +1,230 @@
+#!D:/Perl/bin/perl
+use strict;
+use CPAN::Search::Lite::Query;
+use CPAN::Search::Lite::Util qw($mode_info $query_info %chaps $tt2_pages);
+use Template;
+use CGI ':standard';
+use CGI::Cookie;
+use File::Spec::Functions qw(catfile);
+my $q = CGI->new();
+
+###############################################################
+# Change the following to reflect your setup
+my $db = '';                       # name of the database
+my $user = '';                     # user to connect as
+my $passwd = '';                   # password for this user
+my $tt2 = '';                      # tt2 pages
+my $max_results = 200;               # maximum results to report
+###############################################################
+
+my $template = Template->new({
+                              INCLUDE_PATH => [$tt2,
+                                               Template::Config->instdir('templates')],
+                              PRE_PROCESS => ['config', 'header'],
+                              POST_PROCESS => 'footer',
+                             }) or die Template->error();
+my ($results, $page, $query_term, %extra_info, 
+    $letter, $age, $mirror, $mode);
+my %params = $q->Vars;
+my $host = delete $params{host} || delete $params{url};
+delete $params{url};
+
+if (defined $host) {
+    my $cookie = CGI::Cookie->new(-name => 'cpan_search_mirror',
+                                  -value => $host,
+                                  -expires => '+1y');
+    print $q->header(-cookie => $cookie, -expires => '+2h');
+}
+else {
+    my $expires = ($mode eq 'mirror') ? 'now' : '+2h';
+    print $q->header(-expires => $expires);
+}
+if (not %params) {
+    $results = chap_results();
+    $page = 'chapterid';
+}
+else {
+    my $query = CPAN::Search::Lite::Query->new(db => $db,
+                                               user => $user,
+                                               passwd => $passwd,
+                                               max_results => $max_results);
+
+    my %cookies = fetch CGI::Cookie;
+    unless ($mirror = $host) {
+        if ($cookies{cpan_search_mirror}) {
+            $mirror = $cookies{cpan_search_mirror}->value;
+        }
+    }
+    $mode = $params{mode};
+    my %modes = map {$_ => 1} keys %$mode_info;
+
+    $query_term = trim($params{query});
+    $letter = $params{letter};
+    my $chapterid = $params{chapterid};
+    my $recent = exists $params{recent};
+  MODE: {
+        ($mode and $mode eq 'mirror') and do {
+            my %save;
+            if (my $referer = $q->referer) {
+                (my $string = $referer) =~ s!.*?\?(.*)!$1!;
+                %save = map {
+                    tr/+/ /;
+                    s/%([0-9a-fA-F]{2})/pack("C",hex($1))/ge;
+                    $_;
+                } split /[=&;]/, $string, -1;
+            }
+            delete $save{host};
+            delete $save{url};
+            $results = {save => \%save};
+            $page = 'mirror';
+            last MODE;
+        };
+        ($mode eq 'chapter') and do {
+            $results = chap_results();
+            $page = 'chapterid';
+            last MODE;
+        };
+        ($chapterid) and do {
+            my %args;
+            $args{mode} = $mode = 'chapter';
+            $args{id} = $chapterid;
+            $extra_info{chapterid} = $chapterid;
+            $extra_info{chapter_desc} = $chaps{$chapterid};
+            if (my $subchapter = $params{subchapter}) {
+                $args{subchapter} = $subchapter;
+                $extra_info{subchapter} = $subchapter;
+                $page = $tt2_pages->{$mode}->{search};
+            }
+            else {
+                $page = $tt2_pages->{$mode}->{info};
+            }
+            $query->query(%args);
+            $results = $query->{results};
+            last MODE;
+        };
+        ($mode and not $modes{$mode}) and do {
+            $page = 'missing';
+            last MODE;
+        };
+        
+        ($mode and $query_term) and do {
+            $query->query(mode => $mode, query => $query_term);
+            $results = $query->{results};
+            $page = ref($results) eq 'ARRAY' ?
+                $tt2_pages->{$mode}->{search} :
+                    $tt2_pages->{$mode}->{info};
+            last MODE;
+        };
+        ($mode and $letter) and do {
+            $query->query(mode => $mode, letter => $letter);
+            $results = $query->{results};
+            $page = $tt2_pages->{$mode}->{letter};
+            unless ($letter =~ /^\w$/) {
+                $extra_info{subletter} = $letter;
+                ($extra_info{letter} = $letter) =~ s/^(\w).*/$1/;
+            }
+            last MODE;
+        };
+        ($recent) and do {
+            $mode = 'dist';
+            $age = $params{recent} || 7;
+            $query->query(mode => $mode,
+                          recent => $age);
+            $results = $query->{results};
+            $page = 'recent';
+            last MODE;
+        };
+        foreach my $what (keys %$query_info) {
+          next unless my $value = $params{$what};
+          $mode = $query_info->{$what}->{mode};
+          my $type = $query_info->{$what}->{type};
+          $query->query(mode => $mode,
+                        $type => $value);
+          $results = $query->{results};
+          $page = ref($results) eq 'ARRAY' ?
+              $tt2_pages->{$mode}->{search} :
+              $tt2_pages->{$mode}->{info};
+          last MODE;
+      };
+        (defined $mode) and do {
+            $results->{mode} = $mode;
+            $page = 'letters';
+            last MODE;
+        };
+        $page = 'missing';
+    }
+    $page = 'missing' unless ($results and $page);
+    unless (ref($results) eq 'ARRAY') {
+        if (my $name = $results->{$mode_info->{$mode}->{name}}) {
+            if ($name =~ /^(\w)/) {
+                $extra_info{letter} = uc($1);
+            }
+            if ($mode eq 'dist' and $name =~ /^([^-]+)-/) {
+                $extra_info{subletter} = $1;
+            }
+            if ($mode eq 'module' and $name =~ /^([^:]+)::/) {
+                $extra_info{subletter} = $1;
+            }
+        }
+    }
+    if (my $error = $query->{error}) {
+        print STDERR $error;
+        $page = 'error';
+    }
+}
+my $vars = {results => $results,
+            query => $query_term,
+            mode => $mode,
+            letter => $letter,
+            age => $age,
+            mirror => $mirror,
+            %extra_info,
+        };
+$template->process($page, $vars)
+    || die "Template process failed: ", $template->error(), "\n";
+
+sub chap_results {
+    my $chapters;
+    foreach my $key( sort {$a <=> $b} keys %chaps) {
+        push @$chapters, {chapterid => $key, 
+                         chap_desc => $chaps{$key}
+                     };
+    }
+    return $chapters;
+}
+
+sub trim {
+    my $string = shift;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    $string =~ s/\s+/ /g;
+    $string =~ s/\"|\'//g;
+    return $string;
+}
+
+__END__
+
+=head1 NAME
+
+search - cgi interface to C<CPAN::Search::Lite::Query>
+
+=head1 DESCRIPTION
+
+Place this script in your web server's cgi-bin directory.
+A request for C<http://localhost/cgi-bin/search> without
+any query string will result in a page listing all chapter ids.
+All other requests are handled by the query string arguments,
+which are described in L<Apache::CPAN::Search>.
+
+=head1 NOTE
+
+Make sure to check the values of C<$db>, C<$user>,
+C<$passwd>, and C<$tt2> at the top of this file.
+
+=head1 SEE ALSO
+
+L<Apache::CPAN::Search>, L<Apache::CPAN::Query>,
+and L<CPAN::Search::Lite::Query>.
+
+=cut
+

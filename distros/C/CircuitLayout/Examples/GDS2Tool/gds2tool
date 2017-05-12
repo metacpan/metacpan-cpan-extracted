@@ -1,0 +1,2412 @@
+#!/usr/bin/perl -w
+# #!/lsi/soft/CFR/bin/perl -w
+# #!/usr/bin/perl -d:ptkdb
+use strict;
+use warnings;
+our $REVISION = do { my @r=(q$Revision: 1.0 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r }; 
+our $VERSION = '0.1 alpha'; 
+## No need to edit next line ... modified automatically by RCS
+#'@(#) $RCSfile: gds2tool.pl,v $ $Revision: 1.0 $ $Date: 2003-03-27 14:02:30-05 $';
+
+=pod
+=head1 NAME
+
+gds2tool
+
+
+=head1 Description
+
+This is gds2tool, a tool for viewing and maybe someday editing GDSII files.
+
+
+=head1 COPYRIGHT
+
+ Author: Ken Schumack (c) 2003-2004.  All rights reserved.
+ Source code may be used and modified freely, but this copyright notice
+ must remain attached to the file.  You may modify this code as you 
+ wish, but if you create a modified version, please attach a note
+ listing the modifications you have made, and send a copy to me at 
+ Schumack@cpan.org
+
+=cut
+
+require 5.006;
+$|++;
+#$\="\n";
+use Getopt::Long qw(GetOptions);
+use File::Basename;
+use Tk;
+#use Tk::FileDialog;
+use Tk::LabEntry;
+use Tk::NoteBook;
+use Tk::Pane;
+use Tk::Table;
+use Tk::HList; 
+use Tk::ROText;
+use Tk::ProgressBar;
+use Tk::WorldCanvas;
+use File::Basename;
+use FileHandle;
+use Parse::RecDescent;
+use Cwd;
+
+sub printUsage();
+sub printVersion();
+sub readGDS2;
+my $G_homeDir = $ENV{'HOME'};
+
+my $G_ICHOME;
+BEGIN
+{
+    use constant ERROR   => 'ERROR:   '; #
+    use constant WARNING => 'WARNING: '; #
+    use constant NOTE    => 'NOTE:    '; #
+
+    use constant TRUE  => 1; 
+    use constant FALSE => 0; 
+
+    ## colors for interface
+    use constant LightYellowColor  => '#ffffcc'; 
+    use constant BrightYellowColor => '#ffff00'; 
+    use constant BrightRedColor    => '#ff0000'; 
+    use constant RedColor          => '#cc0000'; 
+    use constant LightBlueColor    => '#3399ff'; 
+    use constant DarkBlueColor     => '#003399'; 
+    use constant BlackColor        => '#000000'; 
+    use constant LightGrayColor    => '#aaaaaa'; 
+    use constant GrayColor         => '#777777'; 
+    use constant WhiteColor        => '#ffffff'; 
+
+    use constant SBwidth => 15;  ## scrollbar width
+}
+use GDS2;
+use CircuitLayout;
+
+our $DEBUG = FALSE;
+our $pp = 4; ## print precision
+our $ppp = $pp + 1; ## print precision plus
+our $G_gds2FileNameIn = '';
+our $G_techContents = '';
+our $G_techFilesRead = '';
+our $G_user = getpwuid($<);
+chomp $G_user; 
+my $topCell = '';
+my $privateColorMap = FALSE;
+my $visibleOnly     = FALSE;
+
+## process command line...
+GetOptions(
+    'debug'            => \$DEBUG,
+    'help|?'           => \&printUsage,
+    'privatecolormap'  => \$privateColorMap,
+    'visibleonly'      => \$visibleOnly,
+    'version'          => \&printVersion,
+    'cell:s'           => \$topCell,
+) || printUsage();
+$G_gds2FileNameIn = shift if ($#ARGV >= 0);
+
+if ($DEBUG)
+{
+    ##Enable warnings within the Parse::RecDescent module.
+    $::RD_ERRORS = 1; # Make sure the parser dies when it encounters an error
+    $::RD_WARN   = 1; # Enable warnings. This will warn on unused rules &c.
+    $::RD_HINT   = 1; # Give out hints to help fix problems.
+}
+
+our @G_viewBoxCoords=(0,0,1,1);
+
+our $G_xMajorGridNum = 1;
+our $G_yMajorGridNum = 1;
+our $G_xMinorGridNum = 0.1;
+our $G_yMinorGridNum = 0.1;
+our $G_xSnapGrid = 0.10;
+our $G_ySnapGrid = 0.10;
+our $G_majorTriggerNum = 15;
+our $G_minorTriggerNum = 15;
+
+our $G_rulerColor = BrightYellowColor; ## default
+our $G_keyBindingText = '';
+our $G_keyLast = '';
+our $G_keyListing;
+our $G_lastCreated;
+our $G_majorGrid;
+our $G_minorGrid;
+our $G_percentDone = 0;
+our $G_progressBar;
+our $G_rulerDistance = 0;
+our $G_viewBox;
+our %G_layer;
+#our %G_selectableLayer;
+our @G_rulerTips = (3,0,8); ## default
+our $G_viewWindow;
+our $G_gridWindow;
+our $G_infoTextArea;
+our $G_infoWindow;
+our $G_layerWindow;
+our $G_gds2toolHome = ''; ## 
+
+setGds2toolHome();
+our $G_techDir = "$G_gds2toolHome/tech";
+use vars qw($G_stippleDir);
+$G_stippleDir = "$G_gds2toolHome/stipple";
+our @G_selected = ();
+
+my $G_startx = 0;
+my $G_starty = 0;
+
+#### create the MainWindow (MW) 
+my $MW;
+if ($privateColorMap)
+{
+    $MW = new MainWindow(
+        -colormap   => 'new',
+        -background => WhiteColor,
+        -foreground => DarkBlueColor, 
+    );
+}
+else
+{
+    $MW = new MainWindow(
+        -background => WhiteColor,
+        -foreground => DarkBlueColor, 
+    );
+}
+
+$MW -> setPalette(
+    'activeBackground' => LightBlueColor, 
+    'activeForeground' => WhiteColor, 
+    'background' => LightGrayColor,
+    'foreground' => BlackColor,
+);
+$MW -> title("GDS2 Tool $VERSION"); 
+open(ICON,'>/tmp/gds2tool.xbm');
+print ICON dumpIconXbm();
+close ICON;
+$MW -> iconbitmap('@/tmp/gds2tool.xbm');
+`/bin/rm -f /tmp/gds2tool.xbm`;
+$MW -> iconname('GDS2Tool'); 
+#$MW -> minsize(5, 4); 
+
+###### bottom area #####
+my $bottomArea = $MW -> Frame(-relief => 'raised', -borderwidth => 2);
+$bottomArea -> pack(
+    -fill => 'x', 
+    -side => 'bottom', 
+); 
+
+### status bar widget
+our $G_statusText = "hello $G_user";
+my $statusBar = $bottomArea -> Label(
+    -anchor       => 'w',
+    -borderwidth  => 1,
+    -relief       => 'sunken',
+    -textvariable => \$G_statusText, 
+    -width        => 60,
+);
+
+### xy status bar widget
+our $G_xyStatusText='x:y';
+my $xyStatusBar = $bottomArea -> Label(
+    -anchor       => 'w',
+    -borderwidth  => 1,
+    -relief       => 'sunken',
+    -textvariable => \$G_xyStatusText, 
+    -width        => 60,
+);
+### mouse status bar widget
+our $G_mouseInfoText='mouse buttons:    nothing  |  nothing  |  nothing';
+our $G_mouseMode = 'probe';
+my $mouseInfoBar = $bottomArea -> Label(
+    -anchor       => 'w',
+    -borderwidth  => 1,
+    -relief       => 'sunken',
+    -textvariable => \$G_mouseInfoText, 
+    -width        => 60,
+);
+
+###### start top menu bar #####
+my $topMenu = $MW -> Frame(-relief => 'raised', -borderwidth => 2);
+$topMenu -> pack(-fill => 'x');
+
+$statusBar -> pack(-side => 'bottom', -fill => 'x', -padx => 2, -pady => 2);
+$xyStatusBar -> pack(-side => 'right', -fill => 'x', -padx => 2, -pady => 2);
+$mouseInfoBar -> pack(-side => 'bottom', -fill => 'x', -padx => 2, -pady => 2);
+
+### canvas
+our $G_canvas2;
+our $G_canvas = $MW -> WorldCanvas(-height => 300, -width => 500, -bg => BlackColor);
+$G_canvas -> configure(-changeView => [\&changeView, $G_canvas2]); ## -configure appends bbox coords...
+##$canvas -> configure(-font => '-adobe-courier-bold-r-normal--17-120-*-*-*-*-*-*'); ##TODO 
+showViewWindow();
+$G_viewWindow -> withdraw;
+showGridWindow();
+$G_gridWindow -> withdraw;
+
+##### options menu #####
+my $fileMenu = $topMenu -> Menubutton(-text => 'File', -underline => 0);
+### open
+$fileMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Open ...', 
+    -command          => sub {
+        $G_gds2FileNameIn = $MW -> getOpenFile(
+            -defaultextension => '.gds2',
+            -filetypes  => [
+                ['GDSII Files', ['.gds2' , '.gds', '.sf', '.gdsii']],
+                ['All Files', '*'],
+            ],
+            -initialdir => cwd(),
+            -title      => 'GDS2 file',
+        );
+        if ((defined $G_gds2FileNameIn) && ($G_gds2FileNameIn ne ''))
+        {
+            if ($topCell eq '')
+            {
+                $topCell = basename($G_gds2FileNameIn);
+                $topCell =~ s|.*/||; ## TODO
+                $topCell =~ s/\..*//; ## TODO
+                print NOTE,"set cell to $topCell\n";
+            }
+            readGDS2(-fileName => $G_gds2FileNameIn, -cell => $topCell);       
+            $G_canvas -> viewFit(-border => 0, ['layout=true']);
+            $G_canvas -> viewFit(-border => 0.02, ['layout=true']);
+            #createAxis($G_canvas);
+        }
+        if ($MW -> colormapfull())
+        {
+            print WARNING."Colormap is full. Try -privateColorMap command line option\n";
+        }
+    }, 
+);
+$fileMenu -> pack(-side=>'left');
+
+### clear
+$fileMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -command          => sub { 
+        $G_canvas -> delete('all'); 
+        $G_canvas2 -> delete('all'); 
+        @G_selected = ();
+    },
+    -label            => 'Clear', 
+);
+$fileMenu -> pack(-side=>'left');
+
+### quit
+$fileMenu -> command(
+    -activebackground => RedColor, 
+    -activeforeground => WhiteColor, 
+    -command          => sub { $MW -> destroy; exit(1); }, 
+    -label            => 'Quit', 
+);
+$fileMenu -> pack(-side=>'left');
+
+### view menu
+my $modeMenu = $topMenu -> Menubutton(-text => 'Set Mode', -underline => 0);
+#$modeMenu -> separator;
+
+### pan
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Pan', 
+    -command          => sub {
+        $G_mouseMode = 'pan';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    click pan  |  drag pan  |  redraw  ';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&pan, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-2>' => sub {
+            my ($c) = @_;
+            my $e = $c -> XEvent;
+            $c -> scan('mark', $e -> x, $e -> y);
+        });
+        $G_canvas -> CanvasBind('<B2-Motion>' => sub {
+            my ($c) = @_;
+            my $e = $c -> XEvent;
+            $c -> scan('dragto', $e -> x, $e -> y);
+        });
+        $G_canvas -> CanvasBind('<Button-3>' => \&redraw);
+    },
+);
+
+### ruler
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Ruler', 
+    -command          => sub {
+        $G_mouseMode = 'ruler';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    ruler  |  multisegment ruler  |  finish ruler';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&ruler, 1, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-2>' => [\&ruler, 2, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-3>' => [\&ruler, 0, Ev('x'), Ev('y')]);
+    },
+);
+
+### select
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Select', 
+    -command          => sub {
+        $G_mouseMode = 'select';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    select  |  add select  |  window select';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&selectPoint, TRUE]);
+        $G_canvas -> CanvasBind('<Button-2>' => [\&selectPoint, FALSE]);
+        $G_canvas -> configure(-bandColor => BrightYellowColor);
+        $G_canvas -> CanvasBind('<Button-3>' => sub {
+            $G_canvas -> CanvasFocus;
+            $G_canvas -> rubberBand(0);
+        });
+        $G_canvas -> CanvasBind('<B3-Motion>' => sub { $G_canvas -> rubberBand(1); });
+        $G_canvas -> CanvasBind('<ButtonRelease-3>' => sub
+        {
+            my @box = $G_canvas -> rubberBand(2);
+            my @ids = $G_canvas -> find('enclosed', @box);
+            foreach my $id (@ids)
+            {
+                push @G_selected, $id;
+                my @tags = $G_canvas -> gettags($id);
+                my $tags = "@tags";
+                $tags =~ s/selected=false/selected=true/;
+                @tags=split(/\s/,$tags);
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-stipple=>'',-fill=>undef,-outline=>WhiteColor) if ("@tags" =~ m/type=boundary/);
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>WhiteColor) if ("@tags" =~ m/type=path/ || "@tags" =~ m/type=text\b/);
+            }
+        });
+    },
+);
+
+### unselect
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'unSelect', 
+    -command          => sub
+    {
+        $G_mouseMode = 'unselect';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    unselect  |  window inside unselect  |  window outside unselect';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&selectPoint, FALSE, FALSE]);
+        $G_canvas -> CanvasBind('<Button-2>' => [\&selectPoint, FALSE, FALSE]);
+        $G_canvas -> configure(-bandColor => BrightYellowColor);
+        $G_canvas -> CanvasBind('<Button-3>' => sub {
+            $G_canvas -> CanvasFocus;
+            $G_canvas -> rubberBand(0);
+        });
+        $G_canvas -> CanvasBind('<B3-Motion>' => sub { $G_canvas -> rubberBand(1); });
+        $G_canvas -> CanvasBind('<ButtonRelease-3>' => sub
+        {
+            my @box = $G_canvas -> rubberBand(2);
+            my @ids = $G_canvas -> find('enclosed', @box);
+            unselectFromArray($G_canvas,@ids);
+        });
+    },
+);
+
+### zoom in
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Zoom In', 
+    -command          => sub {
+        $G_mouseMode = 'zoom in';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    Zoom in window  |  Zoom In x 2  |  Zoom In x 5';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&zoom, 0, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-2>' => [\&zoom, 2, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-3>' => [\&zoom, 5, Ev('x'), Ev('y')]);
+    },
+);
+
+
+### zoom out 
+$modeMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Zoom Out', 
+    -command          => sub {
+        $G_mouseMode = 'zoom out';
+        setCursor();
+        $G_mouseInfoText='mouse buttons:    Full size  |  Zoom Out x 2  |  Zoom Out x 5';
+        $G_canvas -> CanvasBind('<Button-1>' => [\&zoom, 1, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-2>' => [\&zoom, 0.5, Ev('x'), Ev('y')]);
+        $G_canvas -> CanvasBind('<Button-3>' => [\&zoom, 0.2, Ev('x'), Ev('y')]);
+    },
+);
+
+$modeMenu -> pack(-side=>'left');
+
+### info menu
+my $infoMenu = $topMenu -> Menubutton(-text => 'Info', -underline => 0);
+
+### ruler
+$infoMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Ruler  (r)', 
+    -command          => sub {
+        $G_mouseMode = 'ruler';
+        setCursor();
+        $G_statusText='Enter start coordinate for ruler';
+    },
+);
+
+$infoMenu -> pack(-side=>'left');
+
+### window menu
+my $windowMenu = $topMenu -> Menubutton(-text => 'Windows', -underline => 0);
+### grid window
+$windowMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Grid', 
+    -command          => \&showGridWindow,
+);
+
+### info window
+$windowMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Info', 
+    -command          => \&showInfoWindow,
+);
+
+### layer window
+$windowMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Layers', 
+    -command          => \&showLayerWindow,
+);
+
+### 2nd view window
+$windowMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Full view', 
+    -command          => \&showViewWindow,
+);
+
+### binding help
+$windowMenu -> command(
+    -activebackground => LightBlueColor, 
+    -activeforeground => WhiteColor, 
+    -label            => 'Key bindings', 
+    -command          => \&showKeyBindings,
+);
+$windowMenu -> pack(-side=>'left');
+
+#######
+$MW -> bind( '<Any-KeyPress>' => sub 
+    {
+        my($c) = @_;
+        my $e = $c -> XEvent;
+        my( $x, $y, $W, $A ); ## $G_keyLast;
+        ( $x, $y, $G_keyLast) = ($e -> x, $e -> y, $e -> K);
+        if ($G_keyLast eq 'Escape') ## 
+        {
+            $G_canvas -> CanvasBind('<Button-1>' => '');
+            $G_canvas -> CanvasBind('<Button-2>' => '');
+            $G_canvas -> CanvasBind('<Button-3>' => '');
+            $G_mouseInfoText='mouse buttons:    nothing  |  nothing  |  nothing';
+            $G_mouseMode = 'probe';
+        }
+        elsif ($G_keyLast eq 'Delete')
+        {
+            $G_canvas -> delete('type=drawingTmp');
+            $G_canvas -> delete('type=rulerTmp');
+            $G_canvas -> delete('type=ruler');
+        }
+        elsif ($G_keyLast eq 'Left') ## pan left
+        {
+            my $geom = $G_canvas -> geometry();
+            my ($xCtr,$yCtr) = split(/[xX]/,$geom);
+            $yCtr =~ s/[\+\-].*$//;
+            my $amount = $xCtr / 4;
+            $xCtr /= 2;
+            $yCtr /= 2;
+            pan($G_canvas, $xCtr - $amount, $yCtr);
+        }
+        elsif ($G_keyLast eq 'Right') ## pan Right
+        {
+            my $geom = $G_canvas -> geometry();
+            my ($xCtr,$yCtr) = split(/[xX]/,$geom);
+            $yCtr =~ s/[\+\-].*$//;
+            my $amount = $xCtr / 4;
+            $xCtr /= 2;
+            $yCtr /= 2;
+            pan($G_canvas, $xCtr + $amount, $yCtr);
+        }
+        elsif ($G_keyLast eq 'Up') ## pan Up
+        {
+            my $geom = $G_canvas -> geometry();
+            my ($xCtr,$yCtr) = split(/[xX]/,$geom);
+            $yCtr =~ s/[\+\-].*$//;
+            my $amount = $yCtr / 4;
+            $xCtr /= 2;
+            $yCtr /= 2;
+            pan($G_canvas, $xCtr, $yCtr - $amount);
+        }
+        elsif ($G_keyLast eq 'Down') ## pan Down
+        {
+            my $geom = $G_canvas -> geometry();
+            my ($xCtr,$yCtr) = split(/[xX]/,$geom);
+            $yCtr =~ s/[\+\-].*$//;
+            my $amount = $yCtr / 4;
+            $xCtr /= 2;
+            $yCtr /= 2;
+            pan($G_canvas, $xCtr, $yCtr + $amount);
+        }
+        elsif ($G_keyLast eq 'f') ## full view
+        {
+            zoom($G_canvas, 1, '', '');
+        }
+        elsif ($G_keyLast =~ m/r/i) ## ruler
+        {
+            $G_mouseInfoText='mouse buttons:    ruler  |  nothing  |  nothing';
+            ruler($G_canvas, 1, '', '');
+        }
+        elsif ($G_keyLast eq 'z')
+        {
+            $G_canvas -> configure(-cursor => 'crosshair');
+            zoom($G_canvas, 0, $x - 20, $y - 30);
+        }
+        elsif ($G_keyLast eq 'plus')
+        {
+            zoom($G_canvas, 2, $x, $y);
+        }
+        elsif ($G_keyLast eq 'minus')
+        {
+            zoom($G_canvas, 0.5, $x, $y);
+        }
+        elsif ($G_keyLast eq 'p') ## pan
+        {
+            pan($G_canvas, $x, $y);
+        }
+        setCursor();
+    } 
+);
+$G_keyBindingText = <<EOKBT;
+<f>             full view           
+<p>             pan to cursor       
+<r>             ruler               
+<z>             zoom in with window 
+<->             zoom in on cursor   
+<+>             zoom out on cursor  
+<Escape>        clear, interrupt    
+<Delete>        clear rulers        
+<Up-arrow>      pan up              
+<Down-arrow>    pan down            
+<Right-arrow>   pan right           
+<Left-arrow>    pan left            
+
+EOKBT
+
+### y scroll bar
+my $yScroll = $MW -> Scrollbar( 
+    -activebackground => LightBlueColor, 
+    -background       => DarkBlueColor, 
+    -command          => [$G_canvas => 'yview'], 
+    -width            => SBwidth, 
+); 
+
+### x scroll bar
+my $xScroll = $MW -> Scrollbar( 
+    -activebackground => LightBlueColor, 
+    -background       => DarkBlueColor, 
+    -command          => [$G_canvas => 'xview'], 
+    -orient           => 'horizontal',
+    -width            => SBwidth, 
+); 
+
+$G_canvas -> configure( 
+    -xscrollcommand => ['set', $xScroll], 
+    -yscrollcommand => ['set', $yScroll], 
+);
+
+#### y scrollbar goes on the left side 
+$yScroll -> pack( 
+    -fill => 'y', 
+    -side => 'left', 
+); 
+#### x scrollbar goes on the bottom side 
+$xScroll -> pack( 
+    -fill => 'x', 
+    -side => 'bottom', 
+); 
+
+$G_canvas -> pack(
+    -expand => 'yes',
+    -fill   => 'both', 
+);
+$G_canvas -> Tk::bind('<Motion>', [\&reportXY, Ev('x'), Ev('y')]); ## reset
+
+$G_progressBar = $G_canvas -> ProgressBar(
+    -anchor      => 'n',
+    -blocks      => 0,
+    -colors      => [0 => BrightYellowColor],
+    -from        => 0,
+    -gap         => 0,
+    -highlightthickness => 1,
+    -resolution  => 2,
+    -to          => 99,
+    -troughcolor => GrayColor,
+    -variable    => \$G_percentDone,
+    -width       => 20,
+);
+$G_canvas -> viewAll();
+
+my $grammar = techGrammar();
+$grammar =~ s/ +/ /gs;
+my $parserTech = new Parse::RecDescent($grammar);
+
+readTechFile("$G_techDir/common.tech",TRUE);
+$parserTech -> TechFile($G_techContents);
+
+createMyGrid($G_canvas);
+showInfoWindow();
+hideInfoWindow();
+
+if (-f $G_gds2FileNameIn)
+{
+    if ($topCell eq '')
+    {
+        $topCell = basename($G_gds2FileNameIn);
+        $topCell =~ s|.*/||; ## TODO
+        $topCell =~ s/\..*//; ## TODO
+        print NOTE,"set cell to $topCell\n";
+        $MW -> title("$topCell - GDS2 Tool $VERSION"); 
+        $MW -> iconname($topCell); 
+    }
+    readGDS2(-fileName => $G_gds2FileNameIn, -cell => $topCell);       
+    $G_canvas -> viewFit(-border => 0, ['layout=true']);
+    $G_canvas -> viewFit(-border => 0.02, ['layout=true']);
+    #createAxis($G_canvas);
+    if ($MW -> colormapfull())
+    {
+        print WARNING."Colormap is full. Try -privateColorMap command line option\n";
+    }
+    displayMyGrid($G_canvas);
+}
+
+MainLoop();
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+
+sub redraw
+{
+    my @ids = $G_canvas -> find('withtag','layout=true' );
+    foreach my $id (@ids)
+    {
+        my @tags = $G_canvas -> gettags($id);
+        my $tags = "@tags";
+        my $layerNum = 0;
+        if ($tags =~ m/layer=(\d+)/)
+        {
+            $layerNum = $1;
+        }
+        if ($G_layer{$layerNum}{'visible'}) 
+        {
+            $tags =~ s/visible=0/visible=1/;
+        }
+        else
+        {
+            $tags =~ s/visible=1/visible=0/;
+        }
+        @tags=split(/\s/,$tags);
+        my $fill = $G_layer{$layerNum}{'fill'};
+        my $outline = $G_layer{$layerNum}{'outline'};
+        my $stippleFile = $G_layer{$layerNum}{'stipple'};
+        $stippleFile = '' if (! defined $stippleFile);
+        if ($tags =~ m/type=boundary/)
+        {
+            if ($tags =~ m/visible=1/)
+            {
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>$fill,-outline=>$outline);
+                $G_canvas -> itemconfigure($id,-stipple=>"\@$stippleFile") if ($stippleFile ne '');
+            }
+            else
+            {
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>undef,-outline=>undef);
+                $G_canvas -> itemconfigure($id,-stipple=>'');
+            }
+        }
+        elsif ($tags =~ m/type=path/ || $tags =~ m/type=text\b/)
+        {
+            if ($tags =~ m/visible=1/)
+            {
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>$fill);
+#$G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>$fill,-outline=>$outline);
+#$G_canvas -> itemconfigure($id,-stipple=>"\@$stippleFile") if ($stippleFile ne '');
+            }
+            else
+            {
+                $G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>undef);
+#$G_canvas -> itemconfigure($id,-tags=>\@tags,-fill=>undef,-outline=>undef);
+#$G_canvas -> itemconfigure($id,-stipple=>'');
+            }
+        }
+    }
+}
+################################################################################
+
+sub setGds2toolHome
+{
+    my $userHome = glob("~$G_user");
+    $G_gds2toolHome = $ENV{'GDS2TOOL_HOME'};
+	if ((! defined $G_gds2toolHome) || (! -d $G_gds2toolHome))
+	{
+        $G_gds2toolHome = "$userHome/.gds2tool";
+	}
+    print "set GDS2TOOL_HOME to $G_gds2toolHome\n" if ($DEBUG);
+    if (! -d $G_gds2toolHome)
+    {
+        print WARNING,"Can not find $G_gds2toolHome directory trying current directory instead....\n";
+		$G_gds2toolHome = cwd();
+    }
+    $ENV{'GDS2TOOL_HOME'} = $G_gds2toolHome;
+}
+################################################################################
+
+sub readGDS2
+{
+    my %args = @_;
+    my $fileName = $args{'-fileName'};
+    if (! defined $fileName)
+    {
+        print ERROR,"missing -fileName arg to readGDS2\n";
+        exit 2;
+    }
+    my $topCell = $args{'-cell'};
+    if (! defined $topCell)
+    {
+        print ERROR,"missing -topCell arg to readGDS2\n";
+        exit 2;
+    }
+    my $gds2FileIn = new GDS2(-fileName => $fileName);
+    my $cnt=0;
+    my @spinner=('-','\\','|','/','-');
+    my $spinCnt=0;
+    $G_percentDone=0;
+    my $fileSize = (stat $G_gds2FileNameIn)[7];
+    $G_progressBar -> pack(-anchor => 'center', -side => 'left', -fill => 'y', -padx => 5, -pady => 5);
+    $G_statusText = "Reading: $G_gds2FileNameIn";
+    $G_statusText = sprintf("%3s%% done%s",$G_percentDone,$spinner[$spinCnt % 4]);
+    my $read = TRUE;
+    while (my $record = $gds2FileIn -> readGds2Record()) 
+    {
+        if ((++$cnt % 100) == 0)
+        {
+            $spinCnt++;
+            $G_percentDone = int($gds2FileIn -> tellSize * 100 / $fileSize);
+            $G_statusText = sprintf "%3s%% done%s",$G_percentDone,$spinner[$spinCnt % 4];
+            $G_canvas -> update;
+        }
+        if ($gds2FileIn -> isStrname)
+        {
+            $read = FALSE;
+            my $strName = $gds2FileIn -> returnStrname;
+            if ($topCell =~ m/^$strName$/i)
+            {
+                $read = TRUE;
+            }
+            else
+            {
+                print NOTE."not reading cell $strName - Can not handle hierarchy yet.\n";
+            }
+        }
+        if ($read)
+        {
+            if ($gds2FileIn -> isBoundary)
+            {
+                my $layerNum = 0;
+                my @xy;
+                until ($gds2FileIn -> isEndel)
+                {
+                    if ($gds2FileIn -> isLayer)
+                    {
+                        $layerNum = $gds2FileIn -> returnLayer;
+                    }
+                    elsif ($gds2FileIn -> isXy)
+                    {
+                        @xy = $gds2FileIn -> returnXyAsArray(-asInteger=>0);
+                    }
+                    $record = $gds2FileIn -> readGds2Record();
+                }
+                my $visible = TRUE;
+                if (! defined $G_layer{$layerNum}{'visible'})
+                {
+                    $G_layer{$layerNum}{'visible'} = FALSE;
+                    $G_layer{$layerNum}{'fill'} = undef;
+                    $G_layer{$layerNum}{'name'} = 'unknown';
+                    $G_layer{$layerNum}{'outline'} = WhiteColor;
+                }
+                $visible = FALSE if ($G_layer{$layerNum}{'visible'} !~ m/^[1ty]/i);
+                my $selectable = TRUE;
+                my $fill = $G_layer{$layerNum}{'fill'};
+                my $outline = $G_layer{$layerNum}{'outline'};
+                my $stippleFile = $G_layer{$layerNum}{'stipple'};
+                if ((! defined $fill) || ($fill eq ''))
+                {
+                    $stippleFile = '';
+                }
+                if (! $visible)
+                {
+                    next if ($visibleOnly);
+                    $fill = undef;
+                    $outline = undef;
+                    $selectable = FALSE;
+                    $stippleFile = '';
+                }
+                my $boundary = new CircuitLayout::Boundary(-xy=>\@xy,-layer=>$layerNum);
+                $boundary -> display(-worldCanvas => $G_canvas,
+                                     -stippleFile => $stippleFile,
+                                     -fill        => $fill,
+                                     -name        => $G_layer{$layerNum}{'name'},
+                                     -outline     => $outline,
+                                     -visible     => $visible,
+                                     -selectable  => $selectable,
+                                    );
+                $boundary -> display(-worldCanvas => $G_canvas2,
+                                     -stippleFile => $stippleFile,
+                                     -fill        => $fill,
+                                     -outline     => $outline,
+                                     -visible     => $visible,
+                                     -selectable  => FALSE,
+                                    );
+            }
+            if ($gds2FileIn -> isText)
+            {
+                my $layerNum = 0;
+                my @xy;
+                my $string = ' ';
+                until ($gds2FileIn -> isEndel)
+                {
+                    if ($gds2FileIn -> isLayer)
+                    {
+                        $layerNum = $gds2FileIn -> returnLayer;
+                    }
+                    elsif ($gds2FileIn -> isXy)
+                    {
+                        @xy = $gds2FileIn -> returnXyAsArray(-asInteger=>0);
+                    }
+                    elsif ($gds2FileIn -> isString)
+                    {
+                        $string = $gds2FileIn -> returnString;
+                    }
+                    $record = $gds2FileIn -> readGds2Record();
+                }
+                my $visible = TRUE;
+                if (! defined $G_layer{$layerNum}{'visible'})
+                {
+                    $G_layer{$layerNum}{'visible'} = FALSE;
+                    $G_layer{$layerNum}{'fill'} = undef;
+                    $G_layer{$layerNum}{'name'} = 'unknown';
+                    $G_layer{$layerNum}{'outline'} = WhiteColor;
+                }
+                my $selectable = TRUE;
+                my $fill = $G_layer{$layerNum}{'fill'};
+                my $outline = $G_layer{$layerNum}{'outline'};
+                my $stippleFile = $G_layer{$layerNum}{'stipple'};
+                $visible = FALSE if ($G_layer{$layerNum}{'visible'} !~ m/^[1ty]/i);
+                if (! $visible)
+                {
+                    next if ($visibleOnly);
+                    $fill = undef;
+                    $outline = undef;
+                    $selectable = FALSE;
+                    $stippleFile = '';
+                }
+                my $text = new CircuitLayout::Text(-origin => \@xy,
+                                                   -layer  => $layerNum,
+                                                   -string => $string,
+                                                  );
+                $text -> display(-worldCanvas => $G_canvas,
+                                 -fill        => $fill,
+                                 -name        => $G_layer{$layerNum}{'name'},
+                                 -showOrigin  => TRUE,
+                                 -visible     => $visible,
+                                 -selectable  => TRUE,
+                                );
+            }
+            if ($gds2FileIn -> isPath)
+            {
+                my $layerNum  = 0;
+                my $pathType  = 0;
+                my $pathWidth = 0;
+                my $endExtn   = 0;
+                my $bgnExtn   = 0;
+                my @xy;
+                until ($gds2FileIn -> isEndel)
+                {
+                    if ($gds2FileIn -> isLayer)
+                    {
+                        $layerNum = $gds2FileIn -> returnLayer;
+                    }
+                    if ($gds2FileIn -> isWidth)
+                    {
+                        $pathWidth = $gds2FileIn -> returnWidth;
+                    }
+                    elsif ($gds2FileIn -> isXy)
+                    {
+                        @xy = $gds2FileIn -> returnXyAsArray(-asInteger=>0);
+                    }
+                    elsif ($gds2FileIn -> isPathtype)
+                    {
+                        $pathType = $gds2FileIn -> returnPathtype;
+                    }
+                    elsif ($gds2FileIn -> isBgnextn)
+                    {
+                        $bgnExtn = $gds2FileIn -> returnBgnextn;
+                    }
+                    elsif ($gds2FileIn -> isEndextn)
+                    {
+                        $endExtn = $gds2FileIn -> returnEndextn;
+                    }
+
+                    $record = $gds2FileIn -> readGds2Record();
+                }
+                my $visible = TRUE;
+                if (! defined $G_layer{$layerNum}{'visible'})
+                {
+                    $G_layer{$layerNum}{'visible'} = FALSE;
+                    $G_layer{$layerNum}{'fill'} = undef;
+                    $G_layer{$layerNum}{'name'} = 'unknown';
+                    $G_layer{$layerNum}{'outline'} = WhiteColor;
+                }
+                $visible = FALSE if ($G_layer{$layerNum}{'visible'} !~ m/^[1ty]/i);
+                my $selectable = TRUE;
+                my $fill = $G_layer{$layerNum}{'fill'};
+                my $outline = $G_layer{$layerNum}{'outline'};
+                my $stippleFile = $G_layer{$layerNum}{'stipple'};
+                if (! $visible)
+                {
+                    next if ($visibleOnly);
+                    $fill = undef;
+                    $outline = undef;
+                    $selectable = FALSE;
+                    $stippleFile = '';
+                }
+                my $path = new CircuitLayout::Path(
+                    -xy       => \@xy,
+                    -layer    => $layerNum,
+                    -width    => $pathWidth,
+                    -pathType => $pathType,
+                    -bgnExtn  => $bgnExtn,
+                    -endExtn  => $endExtn,
+                );
+                $path -> display(-worldCanvas => $G_canvas,
+                                 -stippleFile => $stippleFile,
+                                 -fill        => $fill,
+                                 -name        => $G_layer{$layerNum}{'name'},
+                                 -visible     => $visible,
+                                 -selectable  => TRUE,
+                            );
+            }
+        }
+    }
+
+#$G_canvas -> itemconfigure("layer6",-fill=>'yellow');
+#$G_canvas -> itemconfigure("layer6",-outline=>'');
+    $G_progressBar -> packForget();
+    $G_statusText = sprintf 'DONE reading. Starting viewer...';
+}
+################################################################################
+
+sub displayMyGrid
+{
+    my $canvas = shift;
+    my $xdist = $MW -> geometry;
+    $xdist =~ s/x.*//i;
+    my ($x1,$y1,$x2,$y2) = @G_viewBoxCoords;
+    ($x1,$y1,$x2,$y2) = [0,0,1,1] if ((!defined $x1) || ($x1 eq ''));
+    my $dataXdist = $x2 - $x1;
+    my $xRatio = $xdist / $dataXdist;
+    my $majorTriggerNum = $xRatio * $G_xMajorGridNum;
+    my $minorTriggerNum = $xRatio * $G_xMinorGridNum;
+
+    $canvas -> itemconfigure($G_majorGrid,-state => 'hidden');
+    $canvas -> itemconfigure($G_minorGrid,-state => 'hidden');
+    if ($majorTriggerNum > $G_majorTriggerNum)
+    {
+        $canvas -> itemconfigure($G_majorGrid,-state => 'normal');
+    }
+    if ($minorTriggerNum > $G_minorTriggerNum)
+    {
+        $canvas -> itemconfigure($G_minorGrid,-state => 'normal');
+    }
+}
+################################################################################
+
+sub createMyGrid
+{
+    my $canvas = shift;
+    my $worldNum = ($canvas -> worldy(100)) - ($canvas -> worldy(200));
+    my $ratio = 100 / $worldNum;
+    my $x1 = abs($canvas -> widgetx(0));
+    my $y1 = abs($canvas -> widgety(0));
+    $G_majorGrid = $canvas -> createGrid(
+        $x1,$y1,
+        ($G_xMajorGridNum * $ratio)+$x1,($G_yMajorGridNum * $ratio)+$y1,
+        -lines => FALSE,
+        -state => 'hidden',
+        -width => 2,
+        -fill  => WhiteColor,
+        -disabledcolor => undef,
+    );
+    $G_minorGrid = $canvas -> createGrid(
+        $x1,$y1,
+        ($G_xMinorGridNum * $ratio)+$x1,($G_yMinorGridNum * $ratio)+$y1,
+        -lines => FALSE,
+        -width => 1,
+        -state => 'hidden',
+        -fill  => WhiteColor,
+        -disabledcolor => undef,
+    );
+}
+################################################################################
+
+sub createAxis
+{
+    my $canvas = shift;
+
+    my ($xcmin,$ycmin,$xcmax,$ycmax) = $canvas -> bbox('all');
+    my $xLen = $xcmax - $xcmin;
+    my $yLen = $ycmax - $ycmin;
+    my $num = 2 * int($xLen + $yLen);
+    $xcmin = int($xcmin);
+    $ycmin = int($ycmin);
+    $xcmax = int($xcmax);
+    $ycmax = int($ycmax);
+    $canvas -> configure(-scrollregion => [($xcmin - $num), ($ycmin - $num), ($xcmax + $num), ($ycmax + $num)]);
+    ## create axes
+    $canvas -> createLine(($xcmin - $num), 0, ($xcmax + $num), 0,
+        -fill     => LightGrayColor,
+        -tags     => 'axis',
+    );
+    $canvas -> createLine(0, ($ycmin - $num), 0, ($ycmax + $num),
+        -fill     => LightGrayColor,
+        -tags     => 'axis',
+    );
+}
+################################################################################
+
+################################################################################ 
+sub printVersion()
+{
+    print $VERSION;
+    exit 1;
+}
+################################################################################
+
+################################################################################ 
+sub printUsage()
+{
+    print <<EOHELP;
+  gds2tool ver $VERSION rev $REVISION
+    
+Usage:
+  gds2tool [options] gds2File 
+      
+Options:
+  -cell <cellName>
+    specify cell to read
+
+  -privatecolormap
+    install private color map
+
+  -visibleOnly
+    only load layers that are visible in the tech file
+
+EOHELP
+
+    exit 1;
+}
+################################################################################
+
+################################################################################
+sub dumpIconXbm
+{
+'
+#define gdst_width 64
+#define gdst_height 64
+static unsigned char gdst_bits[] = {
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0e,
+  0x00, 0x00, 0x00, 0x00, 0xf8, 0x00, 0x00, 0x08, 0x00, 0xe0, 0x03, 0x00,
+  0x90, 0x01, 0x00, 0x08, 0x00, 0x40, 0x06, 0x00, 0x10, 0x71, 0x74, 0x08,
+  0x00, 0x40, 0xc4, 0xd1, 0x90, 0x89, 0x08, 0x08, 0x00, 0x40, 0x26, 0x22,
+  0xf0, 0xf8, 0x08, 0x08, 0x00, 0xc0, 0xe3, 0x23, 0x10, 0x08, 0x08, 0x08,
+  0x00, 0x40, 0x20, 0x20, 0x10, 0x88, 0x08, 0x08, 0x00, 0x40, 0x20, 0x22,
+  0x78, 0x70, 0x3c, 0x7e, 0x00, 0xe0, 0xc1, 0xf1, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0xc6, 0x3f, 0xc0, 0x0b, 0x0f, 0x00,
+  0x00, 0x0e, 0x87, 0xe3, 0xe0, 0x9c, 0x1f, 0x00, 0x00, 0x07, 0x86, 0xc3,
+  0x71, 0xd8, 0x3c, 0x00, 0x00, 0x07, 0x84, 0x83, 0x71, 0x50, 0x38, 0x00,
+  0x80, 0x03, 0x80, 0x83, 0xf3, 0x00, 0x38, 0x00, 0x80, 0x03, 0x80, 0x83,
+  0xe3, 0x03, 0x38, 0x00, 0x80, 0x03, 0x80, 0x83, 0xc3, 0x0f, 0x18, 0x00,
+  0x80, 0x83, 0x8f, 0x83, 0x03, 0x1f, 0x0c, 0x00, 0x80, 0x03, 0x87, 0x83,
+  0x03, 0x1c, 0x06, 0x00, 0x00, 0x07, 0x87, 0x83, 0x11, 0x18, 0x23, 0x00,
+  0x00, 0x07, 0x87, 0xc3, 0x3f, 0x98, 0x31, 0x00, 0x00, 0xfe, 0x87, 0xe3,
+  0x78, 0xcc, 0xff, 0x03, 0x00, 0xf8, 0xc1, 0x3f, 0xd8, 0xc7, 0x7f, 0x06,
+  0x00, 0x10, 0x71, 0x74, 0x08, 0x00, 0x40, 0xc4, 0x00, 0x90, 0x89, 0x08,
+  0x08, 0x00, 0x40, 0x26, 0x00, 0xf0, 0xf8, 0x08, 0x08, 0x00, 0xc0, 0xe3,
+  0x00, 0x10, 0x08, 0x08, 0x08, 0x00, 0x40, 0x20, 0x00, 0x10, 0x88, 0x08,
+  0x08, 0x00, 0x40, 0x20, 0x00, 0x78, 0x70, 0x3c, 0x7e, 0x00, 0xe0, 0xc1,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0xff, 0x07, 0x3e, 0x00, 0x1f, 0xf8, 0x00, 0x00, 0x73, 0x86, 0xe3,
+  0xc0, 0x71, 0x70, 0x00, 0x00, 0x71, 0xc4, 0xc1, 0xe1, 0xe0, 0x70, 0x00,
+  0x00, 0x71, 0xc4, 0x80, 0x61, 0xc0, 0x70, 0x00, 0x00, 0x70, 0xe0, 0x80,
+  0x73, 0xc0, 0x71, 0x00, 0x00, 0x70, 0xe0, 0x80, 0x73, 0xc0, 0x71, 0x00,
+  0x00, 0x70, 0xe0, 0x83, 0x73, 0xc0, 0x71, 0x00, 0x3e, 0x70, 0xe0, 0x82,
+  0x73, 0xf8, 0x71, 0x00, 0x64, 0x70, 0xe0, 0x82, 0x73, 0xd0, 0x71, 0x00,
+  0x44, 0x7c, 0xdd, 0x82, 0x61, 0xd0, 0x71, 0x74, 0x64, 0x72, 0xc2, 0xc3,
+  0xe1, 0xf0, 0xf9, 0x18, 0x3c, 0x7e, 0x82, 0xe3, 0xc0, 0xf1, 0xf8, 0x1f,
+  0x04, 0xfe, 0x03, 0x3e, 0x00, 0x1f, 0xf8, 0x1f, 0x04, 0x22, 0x02, 0x02,
+  0x00, 0x10, 0x88, 0x08, 0x1e, 0x1c, 0x8f, 0x1f, 0x00, 0x78, 0x70, 0x3c,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
+'
+}
+################################################################################
+
+sub pan
+{
+    my ($canvas, $x, $y) = @_;
+
+    my ($xDataPt, $yDataPt) = $canvas -> worldxy($x,$y);
+    $canvas -> center($xDataPt, $yDataPt);
+    $G_statusText = "Panned to ".sprintf("%0.${pp}f %0.${pp}f",$xDataPt,$yDataPt);
+}
+################################################################################
+
+sub round2Grid($$)
+{
+    my $input = shift;
+    my $round2grid = shift;
+
+    my $scaleNum = 10000;
+
+    $input = int($input * $scaleNum);
+    $round2grid = int($round2grid * $scaleNum);
+    my $halfGrid = $round2grid/2;
+    my $modResult = $input % $round2grid;
+    my $result;
+    if ($modResult >= $halfGrid)
+    {
+        $result = $input + ($round2grid - $modResult);
+    }
+    else
+    {
+        $result = $input - $modResult;
+    }
+    $result /= $scaleNum;
+    $result;
+}   
+################################################################################
+
+sub ruler 
+{
+    my ($canvas, $type, $x, $y) = @_;
+    if ($x ne '')
+    {
+        $G_statusText='Enter another coordinate';
+        $canvas -> configure(-cursor => 'pencil');
+        my ($x1,$y1) = $canvas -> worldxy($x,$y); ## convert before call....
+        $G_startx = round2Grid($x1,$G_xSnapGrid);
+        $G_starty = round2Grid($y1,$G_ySnapGrid);
+        startPolygon($canvas, 
+            -type    => 'line', 
+            -subtype => $type, 
+            -x       => $G_startx, 
+            -y       => $G_starty, 
+            -tag     => 'type=rulerTmp',
+        );
+    }
+    else
+    {
+        if(($G_mouseMode eq 'ruler') || ($G_keyLast eq 'r'))
+        {
+            $G_statusText='Enter ruler coordinate';
+             $canvas -> CanvasBind('<Button-1>' => [\&ruler, 1, Ev('x'), Ev('y')]);
+            $G_keyLast = '';
+        }
+        else
+        {
+            $canvas -> CanvasBind('<Button-1>' => '');
+        }
+    }
+    setCursor();
+}
+################################################################################
+
+sub zoom 
+{
+    my ($canvas, $amount, $x, $y) = @_;
+    if ($amount > 0)
+    {
+        if ($amount == 1) ## full view
+        {
+            $canvas -> viewFit(-border => 0.02, ['layout=true']);
+        }
+        elsif ($amount > 1) ## bigger
+        {
+            pan($canvas, $x, $y);
+            $canvas -> zoom($amount);
+            $G_statusText='Enter coordinate to zoom on';
+        }
+        else ## smaller
+        {
+            pan($canvas, $x, $y);
+            $canvas -> zoom($amount);
+            $G_statusText='Enter coordinate to zoom on';
+        }
+    }
+    else ## zoom in with window
+    {
+        if ($x ne '')
+        {
+            $G_statusText='Enter 2nd coordinate';
+            $canvas -> configure(-cursor => 'crosshair');
+            my ($x1,$y1) = $canvas -> worldxy($x,$y); ## convert before call....
+            startPolygon($canvas, 
+                -type => 'rectangle',
+                -x    => $x1, 
+                -y    => $y1, 
+                -tag  => 'type=drawingTmp',
+            );
+        }
+        else
+        {
+            if(($G_mouseMode eq 'zoom in') || ($G_keyLast =~ m/z/i))
+            {
+                $G_statusText='Enter coordinate to zoom on';
+                $canvas -> CanvasBind('<Button-1>' => '');
+                $canvas -> CanvasBind('<Button-1>' => [\&zoom, 0, Ev('x'), Ev('y')]) if ($G_mouseMode eq 'zoom in');
+                $canvas -> viewFit('type=drawingTmp');
+                $canvas -> delete('type=drawingTmp');
+                setCursor();
+                $G_keyLast = '';
+            }
+            else
+            {
+                $canvas -> CanvasBind('<Button-1>' => '');
+            }
+        }
+    }
+    displayMyGrid($canvas);
+}
+################################################################################
+
+sub getCanvasPoint
+{
+    my ($canvas, $x, $y) = @_;
+
+    $x = $canvas -> worldx($x);
+    $y = $canvas -> worldy($y);
+    my @xy = ($x, $y);
+    @xy;
+}
+################################################################################
+
+## from Perl/TK book by Nancy Walsh... use for edit in the future
+sub bindCheck 
+{
+    my $canvas = shift;
+    my $itemType = shift;
+    # If there is a "Motion" binding, we need to allow the user
+    # to finish drawing the item before rebinding Button-1
+    my @bindings = $canvas -> Tk::bind('<Motion>');
+    return if ($#bindings >= 0);
+}
+################################################################################
+
+sub startPolygon 
+{
+    my ($canvas, %args) = @_;
+    my $itemType = $args{'-type'};
+    if (! defined $itemType)
+    {
+        print ERROR,"missing -type arg to startPolygon\n";
+        exit 2;
+    }
+    my $x = $args{'-x'};
+    if (! defined $x)
+    {
+        print ERROR,"missing -x arg to startPolygon\n";
+        exit 2;
+    }
+    my $y = $args{'-y'};
+    if (! defined $y)
+    {
+        print ERROR,"missing -y arg to startPolygon\n";
+        exit 2;
+    }
+
+    my $tag = $args{'-tag'};
+    if (! defined $tag)
+    {
+        $tag = '';
+    }
+
+    $canvas -> Tk::bind('<Motion>', [\&sizePolygon, "$tag", $x, $y, Ev('x'), Ev('y')]);
+    $canvas -> Tk::bind('<Button-1>', [\&endPolygon, "$tag", "$itemType", $x, $y, Ev('x'), Ev('y')]);
+    if ($itemType eq 'rectangle')
+    {
+        $G_lastCreated = $canvas -> createRectangle($x, $y, $x, $y, 
+            -outline  => BrightYellowColor, ## TODO
+            -tags     => ['layout=true',"type=$itemType","$tag"],
+        );
+    }
+    elsif ($itemType eq 'line')
+    {
+        my $x2 = round2Grid($x,$G_xSnapGrid);
+        my $y2 = round2Grid($y,$G_ySnapGrid);
+        my $arrow = 'none';
+        my $width = 0;
+        if ($tag eq 'type=rulerTmp')
+        {
+            $arrow = 'both';
+            $width = 1;
+            $G_rulerDistance=0;
+            $canvas -> createText($x2,$y2,
+                -anchor => 'sw',
+                -fill   => WhiteColor,
+                -tags   => ['rulerDistTmp'],
+                -text   => sprintf("%.${pp}f",$G_rulerDistance),
+            );
+            $G_lastCreated = $canvas -> createLine($x2, $y2, $x2, $y2, 
+                -fill       => $G_rulerColor,
+                -tags       => ['layout=true',"type=$itemType","$tag"],
+                -arrow      => $arrow,
+                -arrowshape => \@G_rulerTips,
+                -width      => $width,
+            );
+        }
+        else
+        {
+            $G_lastCreated = $canvas -> createLine($x2, $y2, $x2, $y2, 
+                -fill       => BrightYellowColor, ## TODO
+                -tags       => ['layout=true',"type=$itemType","$tag"],
+                -arrow      => $arrow,
+                -arrowshape => \@G_rulerTips,
+                -width      => $width,
+            );
+        }
+    }
+}
+################################################################################
+
+sub sizePolygon
+{
+    my ($canvas, $tag, $xLast, $yLast, $x, $y) = @_;
+
+    $x = $canvas -> worldx($x); # convert inside subroutine ...
+    $y = $canvas -> worldy($y); # convert inside subroutine ...
+    my $x2 = round2Grid($x,$G_xSnapGrid);
+    my $y2 = round2Grid($y,$G_ySnapGrid);
+    $canvas -> coords($tag, $xLast, $yLast, $x2, $y2);
+
+    if ($tag eq 'type=rulerTmp')
+    {
+        my $xDiff = $x2 - $xLast;
+        my $yDiff = $y2 - $yLast;
+        $canvas -> coords('rulerDistTmp', $x2, $y2);
+        my $xDelta = abs($xDiff);
+        my $yDelta = abs($yDiff);
+        $G_rulerDistance = distance($xLast, $yLast, $x2, $y2);
+        $canvas -> itemconfigure('rulerDistTmp', -text => sprintf("%.${ppp}f",$G_rulerDistance));
+        $G_xyStatusText = sprintf("xy: %0.${pp}f %0.${pp}f | xDelta:%0.${pp}f | yDelta:%0.${pp}f | dist:%0.${ppp}f",$x2,$y2,$xDelta,$yDelta,$G_rulerDistance);
+    }
+    else
+    {
+        $G_xyStatusText = sprintf("xy:%0.${pp}f %0.${pp}f | #Selected:%d ",$x2,$y2,($#G_selected+1));
+    }
+}
+################################################################################
+
+sub endPolygon
+{
+    my ($canvas, $tag, $itemType, $lastX, $lastY, $x, $y) = @_;
+    my ($x1,$y1) = $canvas -> worldxy($x,$y); ## convert before call....
+    my $x2 = round2Grid($x1,$G_xSnapGrid);
+    my $y2 = round2Grid($y1,$G_ySnapGrid);
+
+    $canvas -> coords("$tag", $lastX, $lastY, $x2, $y2);
+## TODO for ruler
+#bindCheck($canvas, $itemType);
+
+    if ($tag eq 'type=rulerTmp')
+    {
+        $canvas -> createText($x2,$y2,
+            -anchor => 'ne',
+            -fill   => BrightYellowColor,
+            -tags   => ['type=ruler'],
+            -text   => sprintf("%.${pp}f",$G_rulerDistance),
+        );
+        $G_lastCreated = $canvas -> createLine($G_startx, $G_starty, $x2, $y2, 
+            -fill       => $G_rulerColor,
+            -tags       => ['layout=true',"type=$itemType","type=ruler"],
+            -arrow      => 'both',
+            -arrowshape => \@G_rulerTips,
+            -width      => 0,
+        );
+        $G_statusText = sprintf("dist:%0.${ppp}f",$G_rulerDistance);
+        if(($G_mouseMode ne 'ruler') && ($G_keyLast eq 'r'))
+        {
+            $G_mouseInfoText='mouse buttons:    nothing  |  nothing  |  nothing';
+        }
+        $G_canvas -> delete('rulerDistTmp');
+        $G_canvas -> delete('rulerTmp');
+    }
+    $canvas -> Tk::bind('<Motion>', [\&reportXY, Ev('x'), Ev('y')]); ## reset
+    zoom($canvas, 0, '', ''); ## special case...
+    setCursor();
+    #$canvas -> dtag('type=drawingTmp');
+}
+################################################################################
+
+sub distance
+{
+    my ($x1,$y1,$x2,$y2) = @_;
+    sqrt( (($x2 - $x1)**2) + (($y2 - $y1)**2) );
+}
+################################################################################
+
+sub unSelectPoint
+{
+    my ($canvas) = @_;
+    $canvas -> selectPoint(FALSE,FALSE);
+}
+################################################################################
+
+sub selectPoint($$;$)
+{
+    my ($canvas,$unSelectPrevious,$select) = @_;
+    $select = TRUE if (! defined $select);
+    my ($x,$y) = $canvas -> eventLocation();
+#my $id = $G_canvas -> find('closest', $x, $y, 0, 'layout=true&&selected=false');
+#my $id = $G_canvas -> find('closest', $x, $y, 1, '(layout=true^visible=1)');
+    my $id = $G_canvas -> find('closest', $x, $y, 5, 'layout=true');
+#my $id = $G_canvas -> find('closest', $x, $y, 0, 'layout=true');
+    updateInfoText(FALSE,'') if ($unSelectPrevious);
+    if (defined $id)
+    {
+        my @tags = $canvas -> gettags($id);
+print "tags==@tags\n";
+        my $fill    = '';
+        my $layer   = '';
+        my $layout  = '';
+        my $name    = '';
+        my $outline = '';
+        my $stipple = '';
+        my $type    = '';
+        foreach my $tag (@tags)
+        {
+            if ($tag =~ m/=/)
+            {
+                my ($id,$value) = split('=',$tag);
+                if ($value =~ m/^-?[\d\.]+$/)
+                {
+                    eval("\$$tag");
+                }
+                else
+                {
+                    eval("\$$id='$value'");
+                }
+            }
+        }
+        $G_statusText = "Layer:$layer $name Type:$type ";
+        updateInfoText(FALSE,"Layer    :$layer\nName     :$name\nType     :$type\n");
+
+        my @xys = $canvas -> coords($id);
+        my @cleanCoords = ();
+        foreach my $num (@xys)
+        {
+            push @cleanCoords,sprintf("%.${pp}f",$num);
+        }
+        if ($type eq 'boundary')
+        {
+            my $boundary = new CircuitLayout::Boundary(-xy=>\@xys,-layer=>$layer);
+            my $area        = $boundary -> area;
+            my $perimeter   = $boundary -> length;
+            my $centerCoord = $boundary -> extent -> center;
+            my @coords      = $boundary -> coords;
+            my $coordTxt    = '';
+            foreach my $coord (@coords)
+            {
+                $coordTxt .= sprintf("%-0.${pp}f, %-0.${pp}f\n",$coord -> x,$coord -> y);
+            }
+            my $centerTxt = sprintf("%-0.${pp}f,%-0.${pp}f",$centerCoord -> x,$centerCoord -> y);
+            $G_statusText .= sprintf("Area:%-0.${pp}f Perimeter:%-0.${pp}f Center:%s ",$area,$perimeter,$centerTxt);
+            updateInfoText(TRUE,sprintf("Area     :%-0.${pp}f\nPerimeter:%-0.${pp}f\nCenter   :%s\nCoords   :%s",$area,$perimeter,$centerTxt,$coordTxt));
+        }
+        elsif ($type eq 'text')
+        {
+            my $text = $canvas -> itemcget($id, -text);
+            $G_statusText .= sprintf("Origin:%-0.${pp}f,%-0.${pp}f ",@cleanCoords);
+            updateInfoText(TRUE,sprintf("Origin   :%-0.${pp}f,%-0.${pp}f\nText     :\"%s\"",@cleanCoords,$text));
+        }
+
+        my @tmpIds = ();
+        if ($unSelectPrevious)
+        {
+            unselectFromArray($canvas,@G_selected);
+        }
+        else
+        {
+            foreach my $tmp (@G_selected)
+            {
+                push @tmpIds, $tmp if ($id != $tmp);
+            }
+        }
+
+        if ($select)
+        {
+            push @tmpIds, $id;
+            my $tags="@tags";
+            $tags =~ s/selected=false/selected=true/;
+            @tags=split(/\s/,$tags);
+            $canvas -> itemconfigure($id,-tags=>\@tags,-stipple=>'',-fill=>undef,-outline=>WhiteColor) if ("@tags" =~ m/type=boundary/);
+            $canvas -> itemconfigure($id,-tags=>\@tags,-fill=>WhiteColor) if ("@tags" =~ m/type=path/ || "@tags" =~ m/type=text\b/);
+        }
+        else
+        {
+            $fill = undef if ($fill eq '');
+            $outline = undef if ($outline eq '');
+            my $tags="@tags";
+            $tags =~ s/selected=true/selected=false/;
+            @tags=split(/\s/,$tags);
+            $canvas -> itemconfigure($id,-tags=>\@tags,-stipple=>$stipple,-fill=>$fill,-outline=>$outline) if ("@tags" =~ m/type=boundary/);
+            $canvas -> itemconfigure($id,-tags=>\@tags,-fill=>$fill) if ("@tags" =~ m/type=path/ || "@tags" =~ m/type=text\b/);
+        }
+        @G_selected = @tmpIds;
+    }
+}
+################################################################################
+
+sub unselectFromArray
+{
+    my ($canvas,@ids) = @_;
+    foreach my $tmp (@ids)
+    {
+        my @tags = $canvas -> gettags($tmp);
+        my $fill    = '';
+        my $layer   = '';
+        my $layout  = '';
+        my $outline = '';
+        my $stipple = '';
+        my $type    = '';
+        foreach my $tag (@tags)
+        {
+            if ($tag =~ m/=/)
+            {
+                my ($id,$value) = split('=',$tag);
+                if ($value =~ m/^-?[\d\.]+$/)
+                {
+                    eval("\$$tag");
+                }
+                else
+                {
+                    eval("\$$id='$value'");
+                }
+            }
+        }
+        $fill = undef if ($fill eq '');
+        $outline = undef if ($outline eq '');
+        my $tags="@tags";
+        $tags =~ s/selected=true/selected=false/;
+        @tags=split(/\s/,$tags);
+        $canvas -> itemconfigure($tmp,-tags=>\@tags,-stipple=>$stipple,-fill=>$fill,-outline=>$outline) if ("@tags" =~ m/type=boundary/);
+        $canvas -> itemconfigure($tmp,-tags=>\@tags,-fill=>$fill) if ("@tags" =~ m/type=path/ || "@tags" =~ m/type=text\b/);
+    }
+}
+################################################################################
+
+sub reportXY
+{
+    my ($canvas, $x, $y) = @_;
+    my ($x1,$y1) = $canvas -> worldxy($x,$y); ## convert before call....
+    $G_xyStatusText = sprintf("xy:%0.${pp}f %0.${pp}f | #Selected:%d ",
+            round2Grid($x1,$G_xSnapGrid),
+            round2Grid($y1,$G_ySnapGrid),
+            ($#G_selected+1));
+}
+################################################################################
+
+sub setCursor
+{
+    if ($G_mouseMode eq 'pan')
+    {
+        $G_canvas -> configure(-cursor => 'circle');
+    }
+    elsif ($G_mouseMode eq 'ruler')
+    {
+        $G_canvas -> configure(-cursor => 'pencil');
+    }
+    elsif ($G_mouseMode =~ m/zoom/)
+    {
+        $G_canvas -> configure(-cursor => 'iron_cross') if ($G_mouseMode eq 'zoomin');
+        $G_canvas -> configure(-cursor => 'fleur')      if ($G_mouseMode eq 'zoomout');
+    }
+    else
+    {
+        $G_canvas -> configure(-cursor => 'arrow');
+    }
+}
+################################################################################
+
+sub showGridWindow
+{
+    if (! Exists($G_gridWindow))
+    {
+        $G_gridWindow = $MW -> Toplevel();
+        $G_gridWindow -> title('GDS2Tool set1 grid window');
+        $G_gridWindow -> iconname('grid');
+
+        my $gridFrame1 = $G_gridWindow -> Frame;
+        $gridFrame1 -> pack(-side => 'top');
+        #### major x grid
+        $gridFrame1 -> Label(
+            -text       => ' Major X display grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame1 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_xMajorGridNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+        
+        my $gridFrame2 = $G_gridWindow -> Frame;
+        $gridFrame2 -> pack(-side => 'top');
+        #### major y grid
+        $gridFrame2 -> Label(
+            -text       => ' Major Y display grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame2 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_yMajorGridNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        my $gridFrame3 = $G_gridWindow -> Frame;
+        $gridFrame3 -> pack(-side => 'top');
+        #### minor x grid
+        $gridFrame3 -> Label(
+            -text       => ' Minor X display grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame3 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_xMinorGridNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+        
+        my $gridFrame4 = $G_gridWindow -> Frame;
+        $gridFrame4 -> pack(-side => 'top');
+        #### minor y grid
+        $gridFrame4 -> Label(
+            -text       => ' Minor Y display grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame4 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_yMinorGridNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        my $gridFrame5 = $G_gridWindow -> Frame;
+        $gridFrame5 -> pack(-side => 'top');
+        #### x snap grid
+        $gridFrame5 -> Label(
+            -text       => ' X snap grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame5 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_xSnapGrid,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        my $gridFrame6 = $G_gridWindow -> Frame;
+        $gridFrame6 -> pack(-side => 'top');
+        #### y snap grid
+        $gridFrame6 -> Label(
+            -text       => ' Y snap grid: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame6 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_ySnapGrid,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        my $gridFrame7 = $G_gridWindow -> Frame;
+        $gridFrame7 -> pack(-side => 'top');
+        #### x trigger
+        $gridFrame7 -> Label(
+            -text       => ' Major grid display trigger: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame7 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_majorTriggerNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        my $gridFrame8 = $G_gridWindow -> Frame;
+        $gridFrame8 -> pack(-side => 'top');
+        #### x trigger
+        $gridFrame8 -> Label(
+            -text       => ' Minor grid display trigger: ',
+            -font       => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            #-background     => WhiteColor,
+            -anchor     => 'w',
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+    
+        $gridFrame8 -> Entry(
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*',
+            -relief         => 'sunken',
+            -state          => 'normal',
+            -textvariable   => \$G_minorTriggerNum,
+            -width          => 11,
+            -background     => WhiteColor,
+            -foreground     => BlackColor,
+        ) -> pack(-side => 'left', -padx => 0, -pady => 5, -fill => 'x');
+
+        $G_gridWindow -> Button(
+            -anchor           => 's',
+            -font             => '-*-times-bold-r-normal--*-140-*-*-*-*-*-*',
+            -text             => ' Set ',
+            -height           => 1,
+            -width            => 11,
+            -command          => sub {
+                $G_canvas -> itemconfigure($G_majorGrid,-width => 0, -state => 'disabled');
+                $G_canvas -> itemconfigure($G_minorGrid,-width => 0, -state => 'disabled');
+                createMyGrid($G_canvas);
+                displayMyGrid($G_canvas);
+            },
+            -activebackground => LightBlueColor,
+            -activeforeground => WhiteColor,
+        ) -> pack(-side=>'left');
+        
+        $G_gridWindow -> Button(
+            -anchor           => 's',
+            -text             => ' Close ',
+            -command          => sub { $G_gridWindow -> withdraw }
+        ) -> pack(-side=>'left');
+    }
+    else
+    {
+        $G_gridWindow -> deiconify();
+        $G_gridWindow -> raise();
+    }
+}
+################################################################################
+
+sub showViewWindow
+{
+    if (! Exists($G_viewWindow))
+    {
+        $G_viewWindow = $MW -> Toplevel();
+        $G_viewWindow -> title('GDS2Tool full view window');
+        $G_viewWindow -> iconname('full view');
+        $G_canvas2 = $G_viewWindow -> WorldCanvas(-height => 300, -width => 500, -bg => BlackColor);
+        $G_canvas2 -> pack(
+            -expand => 'yes',
+            -fill   => 'both', 
+        );
+        $G_viewWindow -> Button(
+            -anchor => 's', 
+            -text => ' Close ',
+            -command => sub { $G_viewWindow -> withdraw }
+        ) -> pack(-side=>'bottom');
+        $G_canvas -> configure(-changeView => [\&changeView, $G_canvas2]); ## -configure appends bbox coords...
+        $G_canvas -> CanvasBind('<Configure>' => sub { $G_canvas2 -> viewAll; });
+    }
+    else
+    {
+        $G_viewWindow -> deiconify();
+        $G_viewWindow -> raise();
+    }
+}
+################################################################################
+
+sub updateInfoText
+{
+    my $append = shift;
+    my $text = shift;
+    if (Exists($G_infoWindow))
+    {
+        $G_infoTextArea -> delete('0.0', 'end') if (! $append); 
+        $G_infoTextArea -> insert('end', "$text");
+        $G_infoTextArea -> update;
+    }
+}
+################################################################################
+
+sub setColor
+{
+    my $layer = shift;
+    my $type = shift;
+    my $currentColor = $G_layer{$layer}{$type};
+    print "$type color == $currentColor can not set yet...\n";
+}
+################################################################################
+
+sub hideLayerWindow
+{
+    $G_layerWindow -> withdraw;
+}
+################################################################################
+
+sub showLayerWindow
+{
+    if (! Exists($G_layerWindow))
+    {
+        $G_layerWindow = $MW -> Toplevel();
+        $G_layerWindow -> title('GDS2Tool layer window');
+        $G_layerWindow -> iconname('layers');
+        my $fgrid = $G_layerWindow -> Scrolled('Canvas',-scrollbars=>'sw');
+#my $fgrid = $G_layerWindow -> Scrolled('Canvas',-scrollbars=>'sw',-height=>400,-width=>300);
+#my $fgrid = $G_layerWindow -> Frame();
+#my $fgrid = $fgrid -> Frame();
+        my @layerNums=();
+        my @layerNames=();
+        my @visibles=();
+        my @fillColors=();
+        my @outlineColors=();
+        
+        $G_layerWindow -> Label(-text => "NOT READY") -> pack;
+
+        push @layerNums,     $fgrid -> Label(-text => "layer");
+        push @layerNames,    $fgrid -> Label(-text => "name");
+        push @visibles,      $fgrid -> Label(-text => "visibility");
+        push @fillColors,    $fgrid -> Label(-text => "fill color");
+        push @outlineColors, $fgrid -> Label(-text => "outline color");
+        foreach my $layer (keys %G_layer)
+        {
+            my $layerName = $G_layer{$layer}{'name'};
+            next if ($layerName eq 'unknown');
+
+            push @layerNames, $fgrid -> Label(-text => $layerName);
+            
+            push @layerNums, $fgrid -> Label(-text => "$layer");
+            
+            my $fillColor = $G_layer{$layer}{'fill'};
+            my $btColor = '#000000';
+            if (! defined $fillColor)
+            {
+                $fillColor = '#000000';
+                $btColor = '#ffffff';
+            }
+            push @fillColors, $fgrid -> Button( 
+                -text             => 'fill', 
+                -height           => 1, 
+                -width            => 4, 
+                -command          => sub {
+                    setColor($layer,'fill');
+                }, 
+                -background       => $fillColor, 
+                -foreground       => $btColor, 
+                -activebackground => WhiteColor, 
+                -activeforeground => $fillColor,
+            ); 
+ 
+            my $outlineColor = $G_layer{$layer}{'outline'};
+            $btColor = '#000000'; ## reset in case fill not found...
+            if (! defined $outlineColor)
+            {
+                $outlineColor = '#000000';
+                $btColor = '#ffffff';
+            }
+            push @outlineColors, $fgrid -> Button( 
+                -text             => 'outline', 
+                -height           => 1, 
+                -width            => 6, 
+                -command          => sub {
+                    setColor($layer,'outline');
+                }, 
+                -background       => $outlineColor, 
+                -foreground       => $btColor, 
+                -activebackground => WhiteColor, 
+                -activeforeground => $outlineColor,
+            ); 
+
+            my $visible = $G_layer{$layer}{'visible'};
+            if ($visible =~ m/^[1yYtT]/) ## 1 yes true
+            {
+                $visible = 1;
+            }
+            else
+            {
+                $visible = 0;
+            }
+            push @visibles, $fgrid -> Checkbutton( 
+                -activebackground => LightBlueColor, 
+                #-background       => WhiteColor, 
+                -text             => 'visible', 
+                -variable         => \$G_layer{$layer}{'visible'}, 
+                -relief           => 'flat', 
+            ); 
+        }
+        my @columns = (
+            \@layerNums,
+            \@layerNames,
+            \@visibles,
+            \@fillColors,
+            \@outlineColors,
+        );
+        my $col = 0;
+        foreach my $column (@columns)
+        {
+            my $row = 0;
+            foreach my $entry (@$column)
+            {
+                    $entry -> grid(-column => $col, -row => $row, -padx => 4);
+                    $row++;
+            }
+            $col++;
+        }
+
+#$fgrid -> configure(-scrollregion => [$fgrid -> bbox('all')]);
+        $fgrid -> pack;
+
+        $G_layerWindow -> Button(
+            -anchor => 's', 
+            -text => ' Redraw ',
+            -command => sub { redraw(); }
+        ) -> pack(-side=>'left');
+
+        $G_layerWindow -> Button(
+            -anchor => 's', 
+            -text => ' Close ',
+            -command => sub { $G_layerWindow -> withdraw }
+        ) -> pack(-side=>'left');
+    }
+    else
+    {
+        $G_layerWindow -> deiconify();
+        $G_layerWindow -> raise();
+    }
+}
+################################################################################
+
+sub hideInfoWindow
+{
+    $G_infoWindow -> withdraw;
+}
+################################################################################
+
+sub showInfoWindow
+{
+    if (! Exists($G_infoWindow))
+    {
+        $G_infoWindow = $MW -> Toplevel();
+        $G_infoWindow -> title('GDS2Tool info window');
+        $G_infoWindow -> iconname('info');
+        $G_infoTextArea = $G_infoWindow -> ROText( 
+            -bd             => '2', 
+            -font           => '-*-courier-medium-r-normal--*-140-*-*-*-*-*-*', 
+            -height         => 10, 
+            -relief         => 'sunken', 
+            -setgrid        => 'true', 
+            -width          => 70, 
+            -wrap           => 'word', 
+            -background     => WhiteColor, 
+            -foreground     => BlackColor, 
+        ); 
+        $G_infoTextArea -> tag('configure', 'fg_B',       -foreground => 'blue'); 
+        $G_infoTextArea -> tag('configure', 'fg_G',       -foreground => 'green3', background => 'black'); 
+        $G_infoTextArea -> tag('configure', 'fg_Y',       -foreground => 'yellow3'); 
+        $G_infoTextArea -> tag('configure', 'fg_R',       -foreground => 'red', background => 'black'); 
+        $G_infoTextArea -> tag('configure', 'bg_Gold',    -foreground => 'black', background => 'gold'); 
+        $G_infoTextArea -> tag('configure', 'bg_Tan',     -foreground => 'black', background => 'tan'); 
+        $G_infoTextArea -> tag('configure', 'ButtonLook', -foreground => 'black', background => 'SkyBlue1'); 
+     
+        #### text scrollbar...attached to G_infoWindow 
+        my $textScroll = $G_infoWindow -> Scrollbar( 
+            -command => [$G_infoTextArea => 'yview'], 
+            -background => DarkBlueColor, 
+        ); 
+        $G_infoTextArea -> configure( 
+            -yscrollcommand => ['set', $textScroll], 
+        ); 
+        #### scrollbar goes on the left side 
+        $textScroll -> pack( 
+            -side => 'left', 
+            -fill => 'y', 
+        ); 
+        #### display 
+        $G_infoTextArea -> pack( 
+            -expand => 'yes', 
+            -fill   => 'both', 
+        ); 
+
+        $G_infoWindow -> Button(
+            -anchor => 's', 
+            -text => ' Close ',
+            -command => sub { $G_infoWindow -> withdraw }
+        ) -> pack(-side=>'bottom');
+    }
+    else
+    {
+        $G_infoWindow -> deiconify();
+        $G_infoWindow -> raise();
+    }
+}
+################################################################################
+
+sub changeView
+{
+    my $canvas2;
+    ($canvas2, @G_viewBoxCoords) = @_;
+
+    if ((defined $canvas2) && ($canvas2 ne ''))
+    {
+        $canvas2 -> delete($G_viewBox) if ($G_viewBox);
+        $G_viewBox = $canvas2 -> createRectangle(@G_viewBoxCoords,
+            -outline => '#ffaa00',
+            -width   => 2,
+        );
+    }
+}
+################################################################################
+
+sub showKeyBindings
+{
+    if (! Exists($G_keyListing))
+    {
+        $G_keyListing = $MW -> Toplevel();
+        $G_keyListing -> title('GDS2Tool key bindings');
+        $G_keyListing -> iconname('keys');
+        $G_keyListing -> Label(
+            -anchor       => 'w',
+            -justify      => 'left',
+            -borderwidth  => 1,
+            -relief       => 'sunken',
+            -textvariable => \$G_keyBindingText, 
+        ) -> pack(-side=>'top');
+        $G_keyListing -> Button(
+            -anchor => 's', 
+            -text => ' Close ',
+            -command => sub { $G_keyListing -> withdraw }
+        ) -> pack(-side=>'bottom');
+    }
+    else
+    {
+        $G_keyListing -> deiconify();
+        $G_keyListing -> raise();
+    }
+}
+################################################################################
+
+sub techGrammar
+{
+    my(%arg) = @_;
+
+my $grammar = <<'_EOTECHGRAMMAR_1';
+{ ## these variables are global to the grammar.... 
+    my $layer = 0;
+    my $dataType = 0;
+    my $name = '';
+    my $group = '';
+    my $fillColor = '';
+    my $outlineColor = '';
+    my $stipple = '';
+    my $visible = 0;
+    my $selectable = 0;
+    my $layerIndex = 1;
+}
+
+TechFile : (LayerSection | RulerSection | GridSection | BadLine)(s) 
+
+LayerSection : 'layer' '{' LayerLine(s) '}' 
+
+#layer; datatype;       name;     group; fill color; outline color;  stipple; visible; selectable;
+#    6;      all;  "Metal 1";   "metal";  "#cc0000";     "#cc0000"; "fslash";       y;          y;
+LayerLine : (Layer | BadLayer) ';' (DataType | BadDataType) ';' (Name | EmptyName) ';' (Group | EmptyGroup | BadGroup) ';' (FillColor | EmptyFillColor | BadFillColor) ';' OutlineColor ';' (Stipple | EmptyStipple | BadStipple) ';' Visible ';' Selectable ';'
+    {
+        print "layer=$layer datatype=$dataType name=$name group=$group fillColor=$fillColor outlineColor=$outlineColor stipple=$stipple visible=$visible selectable=$selectable\n\n" if ($::DEBUG);
+
+        $::G_layer{$layer}{'index'} = $layerIndex++;
+        $::G_layer{$layer}{'visible'} = $visible;
+        $::G_layer{$layer}{'stipple'} = '';
+        $::G_layer{$layer}{'stipple'} = "$::G_stippleDir/$stipple.stipple" if ($stipple ne ''); 
+        $::G_layer{$layer}{'fill'} = undef;
+        $::G_layer{$layer}{'fill'} = "$fillColor" if ($fillColor ne '');
+        $::G_layer{$layer}{'name'} = '';
+        $::G_layer{$layer}{'name'} = "$name" if ($name ne '');
+        $::G_layer{$layer}{'outline'} = $outlineColor;
+    }
+
+GridSection : 'grid' '{' GridLine(s) '}' 
+
+GridLine : (XMajorGridNum | YMajorGridNum | XMinorGridNum | YMinorGridNum | XSnapGrid | YSnapGrid)
+
+XMajorGridNum : m/majorXgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_xMajorGridNum = $item{PosRealOrInt};
+        print "G_xMajorGridNum == $::G_xMajorGridNum\n\n" if ($::DEBUG);
+    }
+
+YMajorGridNum : m/majorYgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_yMajorGridNum = $item{PosRealOrInt};
+    }
+
+XMinorGridNum : m/minorXgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_xMinorGridNum = $item{PosRealOrInt};
+    }
+
+YMinorGridNum : m/minorYgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_yMinorGridNum = $item{PosRealOrInt};
+    }
+
+XSnapGrid : m/snapXgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_xSnapGrid = $item{PosRealOrInt};
+    }
+
+YSnapGrid : m/snapYgrid/i '=' PosRealOrInt ';'
+    {
+        $::G_ySnapGrid = $item{PosRealOrInt};
+    }
+
+RulerSection : 'ruler' '{' RulerLine(s) '}' 
+
+RulerLine : (RulerTips | RulerColor)
+
+RulerTips : m/rulerTips/i '(' m/\d+/ ',' m/\d+/ ',' m/\d+/ ')' ';'
+    {
+        my @rt=();
+        push @rt,$item[3];
+        push @rt,$item[5];
+        push @rt,$item[7];
+        @::G_rulerTips = @rt;
+    }
+
+RulerColor : m/rulerColor/i FillColor ';'
+    {
+        $::G_rulerColor = $item{FillColor};
+    }
+
+Layer : Integer 
+    {
+        $layer = $item[1];
+    }
+
+BadLayer : m/^[^}\d]/
+    {
+        print "ERROR: Bad layer:$item[1] ... should be an integer\n";
+    }
+
+DataType : ('all' | Integer)
+    {
+        $dataType = $item[1];
+    }
+
+BadDataType : m/\D/
+    {
+        print "ERROR: Bad dataType:$item[1] ... should be an integer or all\n";
+    }
+
+Name : '"' m/[^"]+/ '"'
+    {
+        $name = $item[2];
+    }
+
+EmptyName : '"' '"'
+    {
+        $name = '';
+    }
+
+Group : '"' m/[^"]+/ '"'
+    {
+        $group = $item[2];
+    }
+
+EmptyGroup : '"' '"'
+    {
+        $group = '';
+    }
+
+BadGroup : m/\S/ 
+    {
+        print "ERROR: Bad group:$item[1] ... should be a word in quotes\n";
+    }
+
+FillColor : '"' m/[^"]+/ '"'
+    {
+        $fillColor = $item[2];
+    }
+
+EmptyFillColor : '"' '"'
+    {
+        $fillColor = '';
+    }
+
+BadFillColor : m/\S/
+    {
+        print "ERROR: Bad fillColor:$item[1] ... should be a value in quotes\n";
+    }
+
+OutlineColor : '"' m/[^"]+/ '"'
+    {
+        $outlineColor = $item[2];
+    }
+
+Stipple : '"' m/[^"]+/ '"'
+    {
+        $stipple = $item[2];
+    }
+
+EmptyStipple : '"' '"'
+    {
+        $stipple = '';
+    }
+
+BadStipple : m/\S/ 
+    {
+        print "ERROR: Bad stipple:$item[1] ... should be a value in quotes\n";
+    }
+
+Visible : m/\w+/
+    {
+        $visible = $item[1];
+        if ($visible =~ m/^[0yt]/i)
+        {
+            $visible = 1;
+        }
+        else
+        {
+            $visible = 0;
+        }
+    }
+
+Selectable : m/\w+/
+    {
+        $selectable = $item[1];
+        if ($selectable =~ m/^[0yt]/i)
+        {
+            $selectable = 1;
+        }
+        else
+        {
+            $selectable = 0;
+        }
+    }
+
+PosRealOrInt : (PosReal | Integer)
+
+PosReal : m/\d+\.\d+/
+
+Integer :  m/\d+/
+
+BadLine : m/\S.*/
+    {
+        print "ERROR: @item\n";
+    }
+
+_EOTECHGRAMMAR_1
+
+    $grammar;
+}
+################################################################################
+
+sub readTechFile
+{
+    my $techFile = shift;
+    my $init = TRUE;
+    $init = shift if ($#_ >= 0);
+    $init = FALSE if (! defined $init);
+    if ($init)
+    {
+        $G_techContents = '';
+        $G_techFilesRead = '';
+    }
+    if ($techFile ne '')
+    {
+        $G_techFilesRead .= " $techFile ";
+        open(TECH,$techFile) or die ERROR,"Unable to read $techFile because $!";
+        while (<TECH>)
+        {
+            s/[ \t]+/ /g;
+            s/^\s+//;
+            s/[ \t]+$//;
+            s/^#.*//;
+            next if ($_ eq '');
+            $G_techContents .= $_;
+        }
+        close TECH;
+    }
+}
+################################################################################
+
+__END__
+
+

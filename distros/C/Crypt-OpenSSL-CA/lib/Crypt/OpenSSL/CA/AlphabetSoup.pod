@@ -1,0 +1,284 @@
+=head1 NAME
+
+B<Crypt::OpenSSL::CA::AlphabetSoup> - A L</PKIX> glossary
+
+=head1 CONTENTS
+
+=head2 ASN.1
+
+Abstract Syntax Notation one, a kind of ``binary XML'' used throughout
+the L</X.*> standards trail.  L<http://en.wikipedia.org/wiki/ASN.1>
+
+=head2 C
+
+See L</DN>
+
+=head2 CA
+
+Certification Authority, an RFC4210 concept that models the bunch of
+software and hardware that creates X509 certificates (see
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>). Unfortunately, the term CA
+is also used in other places, and in a very confusing fashion, to
+designate either
+
+=over
+
+=item *
+
+the set of the cryptographic credentials (key and CA certificate) that
+the CA-as-a-computing-equipment needs to perform,
+
+=item *
+
+the whole security domain (more computers and programs) that it relies
+on and operates for (which typically includes one or several L</RA>s),
+
+=item *
+
+the political domain (e.g. a company) that its signature vouches for;
+
+=item *
+
+or even the person that operates the CA, even though arguably there
+should be no such person in a well-designed L</PKI>! (People operate
+the RA, but the CA can and should be fully automatic.)
+
+=back
+
+=head2 CCITT
+
+French name for L</ITU-T>
+
+=head2 CN
+
+See L</DN>
+
+=head2 CRL
+
+Certificate Revocation List, the software equivalent of a state-issued
+list of stolen IDs.  This list is signed by the L</CA>, providing a
+secure means to revoke a certificate.  See also L</OCSP>.
+
+=head2 CSR
+
+Certificate Signing Request, a would-be certificate signed by the
+L</EE> (as opposed to a ``regular'' certificate which is signed by the
+L</CA>).  There are two formats of CSR in use in L</PKIX> today,
+L</SPKAC> (used by all browsers of the Netscape family) and
+L</PKCS#10> (used by the rest of the world).
+
+Concretely, a Certificate Signing Request is a file in a particular
+format (typically L</ASN.1>) that contains the requestor's public key
+and various other informations, all covered by the requestor's
+signature.  To ensure B<proof of possesion>, some L</CA>'s require
+that said signature also cover a randomly-generated I<challenge> that
+the CA issues to the requestor; in this way, the CA guarantees that
+all CSRs it is going to process are fresh, thereby preventing a
+particular (and otherwise mostly harmless) kind of B<replay attack>.
+
+=head2 DC
+
+See L</DN>
+
+=head2 DER
+
+Distinguished Encoding Rules, also known as X690; one of the
+standardized ways of encoding L</ASN.1> (meaning that yes, there are
+several of them, and as a matter of fact some deployments of ASN.1
+require the parties to I<negotiate the binary data format> that will
+be used on the wire prior to any actual communication, I guess it
+means that there are people out there who think life is way too
+long...)  The special characteristic of DER compared to the other
+ASN.1 encodings is that it is I<distinguished>, which for the rest of
+us actually means I<deterministic>: given an ASN.1 abstract syntax
+tree, there are no two correct ways of encoding it into DER, which is
+a desirable property in crypto environments where changing even one
+bit in a datagram would make any digital signature invalid.
+
+=head2 DN
+
+Distinguished Name, the rough L</X.*> equivalent of an e-mail address.
+Distinguished Names are intended to read somewhat like a postal
+address, and consist (mostly) of a series of typed key=value pairs,
+for example (from RFC4514)
+
+  CN=Kurt D. Zeilenga,OU=Engineering,L=Redwood Shores,
+  O=OpenLDAP Foundation,ST=California,C=US
+
+where C<CN> means Common Name, C<OU> means Organizational Unit, C<O>
+means Organization, C<L> means Locality, C<ST> means State (or
+province) and C<C> means country. Also seen in the wild are C<DC>
+(Domain Component, a piece of a DNS domain e.g. C<dc=google,dc=com>),
+and various longer forms or L</OID>s.
+
+Although the concept looks simple, the utter brain-deadness in the
+spec for transcribing DNs into L</ASN.1> is embarassing evidence of
+something really wrong going on inside L</ITU-T>.  (For more ramblings
+about this, search for C<IDX/PKI/DN> in
+L<http://www.google.com/codesearch>, click the source link and enjoy
+the POD.  I have since repented, or so I would like you to believe.)
+
+=head2 EE
+
+End Entity, an RFC4210 concept that models the user of a certificate /
+private key pair (see L<Crypt::OpenSSL::CA::Resources/STANDARDS>)
+
+=head2 HSM
+
+Hardware Security Module, a device that strongholds cryptographic keys
+and can compute cryptographic algorithms using them without ever
+disclosing the keys themselves.  There are HSMs of all prices and
+sizes, ranging from the ubiquitous smartcard or USB dongle to
+FIPS-certified, high-performance, redundant, multiple security domain,
+and usually outrageously expensive SCSI or PCI hardware.
+
+=head2 ITU-T
+
+Also known as CCITT, a standards body that deals with
+telcos. L<http://en.wikipedia.org/wiki/ITU-T>
+
+=head2 L
+
+See L</DN>
+
+=head2 O
+
+See L</DN>
+
+=head2 OCSP
+
+Online Certificate Status Protocol, a network service that fixes the
+shortcomings of the L</CRL> idea.  Described in RFC2560, see
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>.
+
+=head2 OID
+
+Object Identifier, the L</ASN.1> equivalent of an X11 atom or Lisp
+symbol, in essence a globally-unique list of integers that points to a
+non-unique human name.  For example 2.5.4.8 is C<stateOrProvinceName>,
+a L</DN> attribute key; 1.2.840.113549.1.1.5 is
+C<sha1WithRSAEncryption>, a cryptographic algorithm specification used
+in L</X509> certificates as part of the L</CA>'s signature; and
+1.3.6.1.2.1.10.132.2 is C<potCapacity>, a variable susceptible of being
+probed over SNMP indicating "the number of units of beverage supported
+by this device (regardless of its current state)" (no kidding).  You
+can even roll your own (for a modest fee)!
+
+See L<Crypt::OpenSSL::CA::Resources/INTERNET SITES> for more information
+about OIDs, including a couple of online databases that list them.
+
+=head2 OU
+
+See L</DN>
+
+=head2 PEM
+
+Privacy-enhanced Electronic Mail, an early attempt at deploying
+public-key cryptography over the Internet
+(http://en.wikipedia.org/wiki/Privacy-enhanced_Electronic_Mail).  The
+file format of PEM, which consists of putting base64-encoded L</DER>
+data between type markers such as C<-----BEGIN CERTIFICATE-----> and
+C<-----END CERTIFICATE----->, is still used by L</PKIX> extensively.
+
+=head2 PKCS
+
+I<Public Key Cryptography Standards>, a group of cryptography
+standards published by RSA Security
+(http://en.wikipedia.org/wiki/PKCS).  Some of them are referenced in
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>.  An aspect of the PKCS
+series that is confusing at first is that not all of them deal with
+public-key cryptography proper - e.g. PKCS#11 is an API for smart
+cards.
+
+=head2 PKCS#10
+
+The most widely used format of L</CSR>.  In addition to the
+cryptographic fields (public key, signature, and proof-of-possession
+challenge), a PKCS#10 request contains X509-like fields such as a
+would-be subject L</DN>, certificate request flags, etc.
+
+=head2 PKI
+
+Public Key Infrastructure, a typically massive assortment of standards,
+software and hardware to put public key cryptosystem such as L</RSA>
+to actual use in a computer system. L</PKIX> and PGP are the two best
+known kinds of PKI; despite their relying on the same cryptographic
+algorithms, their trust models are very different, and their codebases
+are almost totally disjoint.  Other, less-known PKI systems in actual
+use over the Internet today include SPKI and DNSSEC.
+
+=head2 PKIX
+
+The L</X509> L</PKI>, as opposed to the other PKIs such as PGP or
+SPKI. Described in (see L<Crypt::OpenSSL::CA::Resources/STANDARDS>).
+
+=head2 RA
+
+Registration Authority, an RFC4210 concept that models the operator of
+a PKI (typically a human) and her assorted software (see
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>)
+
+=head2 RDN
+
+Relative Distinguished Name, a path component of a L</DN> of length 1,
+for example: C<OU=Yoyodyne>.
+
+=head2 RFC
+
+Request For Comments, the Internet's most prominent standards
+body. L<http://www.ietf.org/rfc.html>
+
+=head2 RSA
+
+Rivest, Shamir and Aldeman, the names of the famous inventors of one
+of the earliest public-key cryptography algorithms, and still in wide
+use today.  All state-of-the-art L</PKI>s support RSA as of 2007, and
+many (including L<Crypt::OpenSSL::CA>) support I<only> that.
+
+L<http://en.wikipedia.org/wiki/RSA>
+
+=head2 S/MIME
+
+The standard for embedding cryptographic payloads from L</PKIX> inside
+Internet e-mail, thereby providing security services such as
+authentication and confidentiality.  This can be thought of as the
+equivalent of PGP's "ASCII armor" feature.
+
+L<http://en.wikipedia.org/wiki/S/MIME>
+
+=head2 SPKAC
+
+Signed Public Key and Challenge, a Netscape L</CSR> format (see
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>).
+
+=head2 ST
+
+See L</DN>
+
+=head2 X.*
+
+The set of all telecom standards put forth by the L</ITU-T> that
+pertain to ``data network and open system communication'' (see
+L<http://en.wikipedia.org/wiki/ITU-T>).  Standards of the X.* series
+are identified with numbers: the X400 series describes an electronic
+mail system (that existed long before the Internet's SMTP); X500 is a
+directory service (of which LDAP is heavily inspired).  Unlike the
+fully open Internet L</RFC>s, X.* standards are known (and loathed)
+for the complexity of their adoption process, the ensuing difficulty
+of accessing them in full including the various addenda and errata,
+and (historically) the expensive fees involved in doing so.
+
+=head2 X509
+
+One of the L</X.*> standards that describes cryptographic
+certificates.  Like L</ASN.1> before, this standard has been collated
+and transcribed into a set of L</RFC>s, as explained in
+L<Crypt::OpenSSL::CA::Resources/STANDARDS>; this made them much easier
+to use for the Internet world, both in terms of access fees and
+documentary quality.
+
+=head2 X690
+
+Another name for L</DER>.
+
+=cut

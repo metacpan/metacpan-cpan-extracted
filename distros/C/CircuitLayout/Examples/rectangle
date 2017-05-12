@@ -1,0 +1,11 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib '..'; ## for testing from this Examples directory
+use CircuitLayout;
+$|++;
+$\="\n";
+my $rect = new CircuitLayout::Rectangle(-llCoord=>[0,0],-urCoord=>[10,10]);
+print 'rectangle coords=',$rect -> printableCoords;
+my $rectOutline = $rect -> boundaryOutline;
+print "rectOutline=",$rectOutline -> printableCoords;
+

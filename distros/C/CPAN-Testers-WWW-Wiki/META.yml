@@ -1,0 +1,48 @@
+--- #YAML:1.0
+name:                CPAN-Testers-WWW-Wiki
+version:             1.12
+abstract:            The CPAN Testers Wiki website
+author:
+  - Barbie <barbie@cpan.org>
+
+license:             artistic_2
+distribution_type:   module
+installdirs:         site
+
+requires:
+  perl:                             5.006
+  Labyrinth:                        5.32
+  Labyrinth::DIUtils::ImageMagick:  5.04
+  Labyrinth::Plugin::Core:          5.19
+  Labyrinth::Plugin::CPAN:          3.55
+  Labyrinth::Plugin::Wiki:          1.04
+recommends:
+  Test::CPAN::Meta:                 0
+  Test::CPAN::Meta::JSON:           0
+  Test::Pod:                        1.00
+  Test::Pod::Coverage:              0.08
+build_requires:
+  IO::File:                         0
+  Test::More:                       0.70
+
+provides:
+  CPAN::Testers::WWW::Wiki:
+    file:     lib/CPAN/Testers/WWW/Wiki.pm
+    version:  1.12
+
+no_index:
+  directory:
+    - examples
+    - t
+    - vhost
+
+resources:
+  homepage:   http://wiki.cpantesters.org
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Wiki
+  repository: http://github.com/barbie/cpan-testers-www-wiki
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

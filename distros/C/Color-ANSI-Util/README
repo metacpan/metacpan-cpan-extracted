@@ -1,0 +1,155 @@
+SYNOPSIS
+
+     use Color::ANSI::Util qw(
+         ansifg
+         ansibg
+     );
+    
+     say ansifg("f0c010"); # => "\e[33;1m" (on 16-color terminal)
+                           # => "\e[38;5;11m" (on 256-color terminal)
+                           # => "\e[38;2;240;192;16m" (on 24-bit-color terminal)
+    
+     say ansibg("ff5f87"); # => "\e[47m" (on 16-color terminal)
+                           # => "\e[48;5;7m" (on 256-color terminal)
+                           # => "\e[48;2;255;95;135m" (on 24-bit-color terminal)
+
+    There are a bunch of other exportable functions too, mostly for
+    converting between RGB and ANSI color (16/256/24bit color depth).
+
+DESCRIPTION
+
+    This module provides routines for dealing with ANSI colors. The two
+    main functions are ansifg and ansibg. With those functions, you can
+    specify colors in RGB and let it output the correct ANSI color escape
+    code according to the color depth support of the terminal (whether
+    16-color, 256-color, or 24bit). There are other functions to convert
+    RGB to ANSI in specific color depths, or reverse functions to convert
+    from ANSI to RGB codes.
+
+    Keywords: xterm, xterm-256color, terminal
+
+FUNCTIONS
+
+ ansi16_to_rgb($color) => STR
+
+    Convert ANSI-16 color to RGB. $color is number from 0-15, or color
+    names "black", "red", "green", "yellow", "blue", "magenta", "cyan",
+    "white" with "bold" to indicate bold/bright. Return 6-hexdigit, e.g.
+    "ff00cc".
+
+    Die on invalid input.
+
+ rgb_to_ansi16($color) => INT
+
+    Convert RGB to ANSI-16 color. $color is 6-hexdigit RGB color like
+    "ff00cc". Will pick the closest color. Return number from 0-15.
+
+    Die on invalid input.
+
+ ansi256_to_rgb($color) => STR
+
+    Convert ANSI-256 color to RGB. $color is a number from 0-255. Return
+    6-hexdigit, e.g. "ff00cc".
+
+    Die on invalid input.
+
+ rgb_to_ansi256($color) => INT
+
+    Convert RGB to ANSI-256 color. $color is 6-hexdigit RGB color like
+    "ff00cc". Will pick the closest color. Return number between 0-255.
+
+    Die on invalid input.
+
+ rgb_to_ansi16_fg_code($rgb) => STR
+
+ ansi16fg($rgb) => STR
+
+    Alias for rgb_to_ansi16_fg_code().
+
+ rgb_to_ansi16_bg_code($rgb) => STR
+
+ ansi16bg($rgb) => STR
+
+    Alias for rgb_to_ansi16_bg_code().
+
+ rgb_to_ansi256_fg_code($rgb) => STR
+
+ ansi256fg($rgb) => STR
+
+    Alias for rgb_to_ansi256_fg_code().
+
+ rgb_to_ansi256_bg_code($rgb) => STR
+
+ ansi256bg($rgb) => STR
+
+    Alias for rgb_to_ansi256_bg_code().
+
+ rgb_to_ansi24b_fg_code($rgb) => STR
+
+    Return ANSI escape code to set 24bit foreground color. Supported by
+    Konsole and Yakuake.
+
+ ansi24bfg($rgb) => STR
+
+    Alias for rgb_to_ansi24b_fg_code().
+
+ rgb_to_ansi24b_bg_code($rgb) => STR
+
+    Return ANSI escape code to set 24bit background color. Supported by
+    Konsole and Yakuake.
+
+ ansi24bbg($rgb) => STR
+
+    Alias for rgb_to_ansi24b_bg_code().
+
+ rgb_to_ansi_fg_code($rgb) => STR
+
+    Return ANSI escape code to set 24bit/256/16 foreground color (which
+    color depth used is determined by COLOR_DEPTH environment setting or
+    from Term::Detect::Software if that module is available). In other
+    words, this function automatically chooses
+    rgb_to_ansi{24b,256,16}_fg_code().
+
+ ansifg($rgb) => STR
+
+    Alias for rgb_to_ansi_fg_code().
+
+ rgb_to_ansi_bg_code($rgb) => STR
+
+    Return ANSI escape code to set 24bit/256/16 background color (which
+    color depth used is determined by COLOR_DEPTH environment setting or
+    from Term::Detect::Software if that module is available). In other
+    words, this function automatically chooses
+    rgb_to_ansi{24b,256,16}_bg_code().
+
+ ansibg($rgb) => STR
+
+    Alias for rgb_to_ansi_bg_code().
+
+ENVIRONMENT
+
+ COLOR => bool
+
+    Can be used to explicitly disable color by setting it to 0.
+
+    Observed by: ansi{fg,bg}.
+
+ COLOR_DEPTH => INT
+
+    Can be used to explicitly set color depth instead of trying to detect
+    appropriate color depth.
+
+    Observed by: ansi{fg,bg}.
+
+BUGS/NOTES
+
+    Algorithm for finding closest indexed color from RGB color currently
+    not very efficient. Probably can add some threshold square distance,
+    below which we can shortcut to the final answer.
+
+SEE ALSO
+
+    Term::ANSIColor
+
+    http://en.wikipedia.org/wiki/ANSI_escape_code
+

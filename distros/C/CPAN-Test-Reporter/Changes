@@ -1,0 +1,6 @@
+0.02    Changed the address it sends to to cpan-workers@perl.org
+        (I figured that's a better address than -testers or my own
+        address (which I previously had) for the time being.  I'll
+        change it to cpan-testers when the module is stable.
+
+0.01    Original version

@@ -1,0 +1,427 @@
+=head1 NAME
+
+Examples
+
+=head2 USING THE BRANCHOFF:ROOT MODEL
+
+=head3 The Config Spec
+
+ ##:BranchOff: root
+ element * CHECKEDOUT
+ element * .../tt/LATEST
+ mkbranch tt
+ element * TTT
+ element * BL
+ element /main/0
+
+Most of this is standard. Let's read it from the bottom up:
+
+=over
+
+=item /main/0: handle new elements, not bearing any label yet
+
+=item BL: a common baseline
+
+=item TTT: our own label--more on it later
+
+=item mkbranch tt: a directive applying to the 3 previous (which follow it)
+
+=item .../tt/LATEST: catch our versions, before we labeled them
+
+=item CHECKEDOUT: catch our versions, before we checked them in
+
+=item ##:BranchOff: root: an extension of this wrapper
+
+=back
+
+What these rules describe is a process by which the user:
+
+=over 2
+
+=item * Always and exclusively edits files in her own branches
+
+=item * Applies labels as she pleases, either to communicate of her
+progress to others while offering consistent change sets, or just to
+keep save points for herself
+
+=item * Delivers by moving a baseline label which she uses herself
+(we'll see later how she ensures that she doesn't let her previous
+deliveries hide common changes)
+
+=item * May at any time merge I<home>, i.e. I<rebase> the versions she
+is actively working on in her branches.
+
+=back
+
+One of our goals will be to make this config spec as stable as
+possible, i.e. to manage changes by means not requiring us to modify
+it.
+A good reason for that is that config specs are not versioned.
+
+A second goal is to systematically branch out for making new versions
+(unless already on a I<tt> branch). The rationale is that this is
+always possible, independent from mastership or checked out state.
+
+A third goal is to avoid cascading, thus to always branch from the
+root branch (usually I<main>). This must be explicitly enabled, and is
+thus governed by our special setting on line 1.
+
+=head3 First Use: Nothing Special
+
+ $ ct mkbrtype -nc tt
+ Created branch type "tt".
+ $ ct co -nc .
+ Created branch "tt" from "." version "/main/0".
+ Checked out "." from version "/main/tt/0".
+ $ ct mkdir -nc a
+ Created directory element "a".
+ Created branch "tt" from "a" version "/main/0".
+ Checked out "a" from version "/main/tt/0".
+ $ ct mkelem -nc -ci a/foo
+ Created element "a/foo" (type "text_file").
+ Created branch "tt" from "a/foo" version "/main/0".
+ Checked in "a/foo" version "/main/tt/1".
+ $ ct ci -nc a
+ Checked in "a" version "/main/tt/1".
+
+=head2 APPLYING INCREMENTAL LABELS
+
+=head3 Create a family label type
+
+ $ ct mklbtype -c 'Family demo' -fam TTT
+ Created label type "TTT_1.00".
+ Created label type "TTT".
+ Created attribute type "RmTTT".
+
+Note that this creates:
+
+=over
+
+=item A I<floating> type: TTT
+
+=item An equivalent I<fixed> type: TTT_1.00
+
+=item An attribute type dedicated to the family (see: I<rmlabel> below).
+
+=back
+
+=head3 Apply the base labels
+
+ $ ct mklabel -rec TTT .
+ Created label "TTT_1.00" on "." version "/main/tt/1".
+ Created label "TTT" on "." version "/main/tt/1".
+ Created label "TTT_1.00" on "a" version "/main/tt/1".
+ Created label "TTT" on "a" version "/main/tt/1".
+ Created label "TTT_1.00" on "a/foo" version "/main/tt/1".
+ Created label "TTT" on "a/foo" version "/main/tt/1".
+
+The labels are applied in pairs: fixed, and floating.
+The first application is thus significantly slower than usual (~4 times),
+but this impact is typically negligible, on an initial tree with only
+few elements.
+
+=head3 Lock the label types
+
+ $ ct lock lbtype:TTT
+ Locked label type "TTT".
+ Locked label type "TTT_1.00".
+
+This is not mandatory of course, but it is a good idea, and it is supported.
+The fixed type should not be moved anymore, so why not locking it?
+
+The floating label will get unlocked as needed, but locking it
+communicates its state to others, and leaves a timestamp (the latest
+one does not get scrubbed).
+
+=head3 Increment the label type
+
+ $ ct mklbtype -c 'Increment demo' -inc TTT
+ Unlocked label type "TTT".
+ Unlocked label type "TTT_1.00".
+ Created label type "TTT_1.01".
+ Locked label type "TTT_1.00".
+
+A new incremental fixed label is created.
+It gets linked to the previous one, which is thus unlocked,
+and locked back.
+
+=head3 Make a change, and label incrementally
+
+ $ ct co -nc a/foo
+ Checked out "a/foo" from version "/main/tt/1".
+ $ ct ci -nc -ide a/foo
+ Checked in "a/foo" version "/main/tt/2".
+ $ ct mklabel -over tt TTT .
+ Created label "TTT_1.01" on "a/foo" version "/main/tt/2".
+ Moved label "TTT" on "a/foo" from version "/main/tt/1" to "/main/tt/2".
+
+We use the I<-over tt> option as a way to optimize the labeling speed.
+Note that it also restricts the application to checked-in versions.
+
+Labeling recursively would display the same incremental behaviour,
+possibly applying labels to checked-out versions.
+
+=head3 Check the results so far
+
+ $ ct lsgen a/foo a
+ a/foo@@/main/tt/2 (TTT, TTT_1.01)
+  a/foo@@/main/tt/1 (TTT_1.00)
+ a@@/main/tt/1 (TTT, TTT_1.00)
+
+We examine two objects, with the I<lsgenealogy> command.
+
+This one navigates I<Merge> hyperlinks to present the recent history
+of contribution to the selected versions.
+
+We note that the floating label designates a (full) baseline, whereas
+the fixed labels are I<sparse> and designate thus the successive
+change sets.
+
+=head3 Increment again, to remove a label
+
+ $ ct mklbtype -c 'Remove label' -inc TTT
+ Created label type "TTT_1.02".
+ $ ct rmlabel TTT a/foo
+ Removed label "TTT" from "a/foo" version "/main/tt/2".
+
+What we want to demonstrate now is a way to restore a past
+configuration.  For this we shall still create one version and apply
+one more increment, in order to build up enough of history.
+
+ $ ct co -nc a/foo
+ Checked out "a/foo" from version "/main/tt/2".
+ $ ct ci -nc -ide a/foo
+ Checked in "a/foo" version "/main/tt/3".
+ $ ct mklbtype -c 'Restore old config' -inc TTT
+ Created label type "TTT_1.03".
+ $ ct mklabel -over tt TTT .
+ Created label "TTT_1.03" on "a/foo" version "/main/tt/3".
+ Created label "TTT" on "./a/foo" version "/main/tt/3".
+
+Note that the floating label was created, not moved, since we had
+removed it previously.
+
+=head2 ARCHIVING BRANCHES AND LABELS
+
+=head3 Archive to label
+
+Currently, our config spec selects the version of I<foo> with our
+I<tt> branch, i.e. doesn't use our labels.
+Let's change this:
+
+ $ ct ls a/foo
+ a/foo@@/main/tt/3                                        Rule: .../tt/LATEST
+ $ ct mkbrtype -nc -arc tt
+ Renamed branch type from "tt" to "tt-001".
+ Created branch type "tt".
+ $ ct ls a/foo
+ a/foo@@/main/tt-001/3                                    Rule: TTT [-mkbranch tt]
+
+Now we are using our label, placing ourselves in the same situation as
+anybody else who would want to share our code in a collaborative
+manner.
+
+This step has admittedly only a temporary effect, and thus doesn't
+change much: it is only a publication but not yet a delivery. It may
+help us to narrow down the change set on which we are actively working
+without losing sight that we did not yet deliver our prior results.
+
+Note how we didn't need to change our config spec, but only to reinterpret it.
+
+Note finally how our config spec preserved the continuity of the selection.
+
+=head3 Checking out after archiving
+
+ $ ct co -nc a/foo
+ Created branch "tt" from "a/foo" version "/main/0".
+ Checked out "a/foo" from version "/main/tt/0".
+ $ ct ci -c 'after archiving' -ide a/foo
+ Checked in "a/foo" version "/main/tt/1".
+ $ ct lsgen a/foo
+ a/foo@@/main/tt/1
+  a/foo@@/main/tt-001/3 (TTT, TTT_1.03)
+   a/foo@@/main/tt-001/2 (TTT_1.01)
+    a/foo@@/main/tt-001/1 (TTT_1.00)
+
+Now, we really experimented our cascade prevention, i.e. branching off
+root.  The continuity of the data is preserved, as well, using the
+I<lsgenealogy> tool, as this of the version history.
+
+=head3 Delivery
+
+We could deliver directly from branches, assuming all the changes
+would still be in branches of the same type. If this is not the case,
+we'd rather consolidate our results first, using labels.
+We may start with a I<home merge> (aka I<rebase>):
+
+ $ ct findmerge . -fve BL -merge
+
+Assuming this confirmed that no delivery had taken place which we
+wouldn't have already taken into consideration, we can now label and
+archive the branches, skipping for now the outputs of the commands:
+
+ $ ct mklbtype -c Consolidation -inc TTT
+ $ ct mklabel -over tt TTT
+ $ ct mkbrtype -nc -arc tt
+
+Now the delivery, from the TTT labels:
+
+ $ ct mklbtype -nc -inc BL
+ $ ct mklabel -over TTT BL
+ $ ct mklbtype -nc -arc TTT
+ Renamed label type from "TTT" to "TTT-001".
+ Created label type "TTT".
+ Renamed label type from "TTT" to "TTT_0".
+ Locked label type "TTT_0".
+ Locked label type "TTT-001".
+ Locked label type "TTT_1.00".
+ $ ct lock lbtype:BL
+
+Two interesting points here (beyond the process itself):
+
+=over 2
+
+=item * The fact that we could unlock, and lock back the I<BL> type,
+although we do not own it: this is an extension of the wrapper (the
+events are duly logged) to allow group members (configurable) to
+lock/unlock each other's types
+
+=item * The way archiving label types differed from archiving branch types:
+
+=over 2
+
+=item * As for branch types, the label type is renamed I<away> from
+matching anything via the config spec
+
+=item * Again similarily, a new type is created but contrarily to the
+case of branch types, this one is not left in the open, but I<hidden>
+away.
+
+=back
+
+=back
+
+The new hidden type keeps track of the state of the family (what would
+the next increment be), and it would be resurrected by a next
+I<mklbtype -fam> command.
+
+One only creates a label type when one intends to use it
+I<explicitly>, whereas a brtype is there just in case, to be used
+I<implicitly> in a I<checkout>.
+
+Anyway, the result of the delivery is that we are using everything by
+the I<BL> labels.
+
+=head2 REPRODUCING A PAST CONFIGURATION
+
+=head3 Clone a view, in the state it was on January 1.
+
+ $ ct mkview -tag ttt_Jan1 -clone ttt -equiv TTT,1-Jan
+ Created view.
+ Host-local path: jeeves:/views/mg/ttt.vws
+ Global path:     /views/mg/ttt.vws
+ It has the following rights:
+ User : mg       : rwx
+ Group: foo      : rwx
+ Other:          : r-x
+ $ diff /views/mg/ttt.vws/config_spec /views/mg/ttt_Jan1.vws/config_spec
+ 0a1
+ > time 2011-01-01T00:00:00+0000
+ 3d3
+ < element * .../mg/LATEST
+ 5c5
+ < element * TTT
+ ---
+ > include /views/mg/ttt_Jan1.vws/TTT.2011-01-01T00:00:00+0000
+ $ ct setview ttt_Jan1
+ $ ct ls -d a/foo a
+ a/foo@@/main/tt-001/2            Rule: {lbtype(TTT_1.01)&&!attr_sub(RmTTT,<=,1.01)}
+ a@@/main/tt-001/1                Rule: {lbtype(TTT_1.00)&&!attr_sub(RmTTT,<=,1.01)}
+
+The script made three modifications to the initial config spec:
+
+=over 2
+
+=item * It added a time rule, corresponding to the specified time..
+
+=item * It removed rules based on branches using a type created after
+the specified time.
+
+=item * It replaced the I<TTT> rule (hence preserving the order of the
+rules) with a directive including set of rules, equivalent to the
+I<TTT> floating label at the specified time. This is achieved by
+determining the the fixed label in the family, which was then
+'equivalent' to I<TTT>: I<TTT_1.01>.
+
+=back
+
+We checked that these rules selected the correct versions of our two
+reference elements (the I<foo> file, and the I<a> directory).
+
+Let's examine the new file:
+
+ $ cat /views/mg/ttt.vws/TTT.2011-01-01T00:00:00+0000
+ element * "{lbtype(TTT_1.01)&&!attr_sub(RmTTT,<=,1.01)}"
+ element * "{lbtype(TTT_1.00)&&!attr_sub(RmTTT,<=,1.01)}"
+
+=head3 Examine config specs equivalent to 1.02 and 1.03 stages of TTT
+
+ $ ct mkview -tag ttt_1.02 -clone ttt -equiv TTT_1.02
+ $ ct setview ttt_1.02
+ $ ct ls -d a/foo a
+ a/foo@@/main/0                   Rule: /main/0 [-mkbranch tt]
+ a@@/main/tt-001/1                Rule: {lbtype(TTT_1.00)&&!attr_sub(RmTTT,<=,1.02)}
+ $ ct mkview -tag ttt_1.03 -clone ttt -equiv TTT_1.03
+ $ ct setview ttt_1.03
+ $ ct ls -d a/foo a
+ a/foo@@/main/tt-001/3            Rule: {lbtype(TTT_1.03)&&!attr_sub(RmTTT,<=,1.03)}
+ a@@/main/tt-001/1                Rule: {lbtype(TTT_1.00)&&!attr_sub(RmTTT,<=,1.03)}
+
+We can now see the meaning of I<RmTTT>, and see how attributes of this
+type were added to the different versions of the tree:
+
+ $ ct lsvtree -s a/foo | perl -ple 's/(.*)/des -fmt "\%Vn \%Nl \%Na\\n" $1/' | ct
+ /main
+ /main/0
+ /main/tt-001
+ /main/tt-001/1 TTT_1.00 RmTTT=1.02
+ /main/tt-001/2 TTT_1.01 RmTTT=1.02
+ /main/tt-001/3 TTT_1.03
+ /main/tt-002
+ /main/tt-002/1 BL BL_2.13 TTT-001 TTT_1.04
+
+This command shows the versions, with the labels, and the attributes they bear.
+Of course, one can also use I<lsgen> (not showing the attributes):
+
+ $ ct lsgen a/foo
+ a/foo@@/main/tt-002/1 (BL, BL_2.13, TTT-001, TTT_1.04)
+  a/foo@@/main/tt-001/3 (TTT_1.03)
+   a/foo@@/main/tt-001/2 (TTT_1.01)
+    a/foo@@/main/tt-001/1 (TTT_1.00)
+
+Given the profusion of labels, the I<lsgen> command was made to support
+an enhanced version of the I<-fmt> option, allowing to filter label
+types with a Perl regexp.
+Note that this also allows e.g. to show attributes, to shorten the
+output to versions only (the element name being common), and to
+display comments:
+
+ $ ct lsgen -fmt '%Vn %[^TTT(_[\d.]+)?$]Nl %Na "%Nc"' a/foo
+ /main/tt-002/1 TTT_1.04  "after archiving"
+  /main/tt-001/3 TTT_1.03  ""
+   /main/tt-001/2 TTT_1.01 RmTTT=1.02 ""
+    /main/tt-001/1 TTT_1.00 RmTTT=1.02 ""
+
+=head3 Pick the right increment/date
+
+One needs a convenient way to figure what increment and what date
+correspond to which changes. Fortunately, the I<-family> extension of
+I<describe> allows you to apply the formats of your choice to each and
+every element of the type family:
+
+ $ ct des -fmt "%n %d %Nc\n" -fam lbtype:TTT-001
+ TTT_1.04 2011-01-31T16:30:41Z Consolidation
+ TTT_1.03 2011-01-28T19:51:17Z Restore old config
+ TTT_1.02 2011-01-28T19:49:35Z Remove label
+ TTT_1.01 2011-01-28T19:41:55Z Increment demo
+ TTT_1.00 2011-01-26T17:35:39Z Family demo

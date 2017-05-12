@@ -1,0 +1,10 @@
+These modules allow you to create "Cryptographic Keys" derived from
+ordinary "Passwords" and/or "IVs" based on a number of differing
+specifications.
+
+You will need perl version 5.6 or better to install this module.
+
+Copyright 2007 Alfred Reibenschuh.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

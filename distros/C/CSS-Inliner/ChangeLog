@@ -1,0 +1,239 @@
+2304	2009-10-08	Kevin Kamel <kamelkev@mailermailer.com>
+	* Initial release to world.
+
+2307	2009-10-08	Kevin Kamel <kamelkev@mailermailer.com>
+	* Tweaks to do correct release to CPAN
+
+2534	2010-01-26	Kevin Kamel <kamelkev@mailermailer.com>
+	* Updates by Vivek Khera (vivek@khera.org)
+	  - Remove comment stripping of HTML passed through the Inliner
+
+2536	2010-04-26	Kevin Kamel <kamelkev@mailermailer.com>
+	* Suggested update by Vivek Khera (vivek@khera.org)
+	  - adjust TreeParser to override skippable end tags
+	* Adjust TreeParser to allow html comments to persist through
+	  processing
+
+2540	2010-04-27	Kevin Kamel <kamelkev@mailermailer.com>
+	* Include a number of updates as suggested by Michael Peters <mpeters@plusthree.com>
+	  - do not skip over style blocks with undefined media types
+	  - add feature to take previously defined HTML::TreeParser so
+            users can modify the parameters the TreeParser has
+	  - skip css psuedo attributes that cannot be inlined
+
+2544	2010-04-27	Kevin Kamel <kamelkev@mailermailer.com>
+        * Update the regex for skipping over non-inlineable psuedo attributes
+        * In addition to skipping psuedo attributes, skip over @, like @import
+
+2669	2010-08-19	Kevin Kamel <kamelkev@mailermailer.com>
+	* Include a number of contributions from Michael Peters <mpeters@plusthree.com>
+          - do not die if there is no style container within passed document
+          - do not die if comments are encountered within <style> blocks
+          - contribution of tests to ensure described functionality matches up
+          - respect order of CSS rules for better style cascade
+        * Added option to selectively strip out class and id attributes via constructor param
+        * Added automatic collapsing of overridden attributes, assisted by Vivek Khera <vivek@khera.org>
+        * Restructured parts of code and added some get methods to ease future testing
+        * Adjusted some variable names to be more correct
+
+2852	2010-10-27	Kevin Kamel <kamelkev@mailermailer.com>
+	* Manifest updated to represent all project files
+	* Rework module hierarchy, adjust all project files to match
+	* Include contributions from Michael Peters <mpeters@plusthree.com>
+	  - Add support for specificity calculations
+	  - Add support for style application that closely approximates what a browser does
+	  - Included tests to validate above behaviour
+	* Added extensive tests added to validate described cascade behaviour
+	  - Fixed all discovered and known bugs
+        * Include contribution from David Stevenson <david@ytfc.com>
+	  - allow for proper parsing of background urls, previously broken
+	  - include test for validating fix
+	* Update CSS storage module to CSS::Simple
+	* Add code to fetch remote stylesheets
+	* Include contribution from Vivek Khera <vivek@khera.org>
+	  - Add support for adusting all relative references to absolute reference
+	* Add test to remotely fetch an entire document
+	* Simplify some recursive methods
+	* Allow parsing of multiple stylesheets - stacking functionality from CSS::Simple
+	  seems to allow this feature to just work
+
+3042	2011-03-10	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add new flag to "leave_style" blocks while reading and parsing the stylesheets
+	* Include contributions from Michael Stevens (michael.stevens@dianomi.com)
+	 - Fix podchecker complaints on Inliner.pm
+	 - Add a .gitignore for perl module cruft.
+	 - Add pod tests
+	* Path fixes from contributor Michael Stevens
+	 - Beef up error reporting so you can tell which files are missing
+	 - Resolve dumb problem with tests whereby if a username had "t" in it the test failed
+
+3213	2011-05-16		Kevin Kamel <kamelkev@mailermailer.com>
+	* Add new flag "warns_as_errors" which converts content warnings to errors if set
+	* Add public method content_warnings to return content warnings to end user
+	* Add getter/setter autogenerator for private data members
+	* Add method _report_warning through which content warnings are aggregated or thrown 
+	* Add test linebreaktest.t to test for proper handling of linebreaks within inline styles
+
+3219	2011-05-18	Vivek Khera <vivek@mailermailer.com>
+	* MANIFEST was missing some entries
+	* Makefile.PL dependency on CSS::Simple updated, ensure README is included in dist file
+
+3275	2011-06-19	Kevin Kamel <kamelkev@mailermailer.com>
+	* Include post_fetch_filter constructor parameter. Allows users to protect mailmerge tags
+	* Include example for new feature under t/fetch-filter.t
+	* Update MANIFEST with example
+
+3283	2011-06-23	Kevin Kamel <kamelkev@mailermailer.com>
+	* Include test contribution from Ron Straight (quinnfazigu@gmail.org)
+	  - replace regex for test directory with proper mechanism for determining path
+	* Alter the user-agent used for remote fetching
+	  - follow "curl" recommendation to use Mozilla/4.0 for maximim compatability
+
+3286	2011-06-30	Kevin Kamel <kamelkev@mailermailer.com>
+	* Replace CSS::Simple CPAN module with a new CSS encapsulation module specific for inlining.
+	  - CSS::Inliner::Parser drops the Tie::IxHash in favor of a an array of hashes which
+	    lends itself very nicely to rules that are repeated - something that the previous version
+	    of the module could not handle properly due to the data structure.
+	  - Create tests through which to test out CSS::Inliner::Parser
+	  - Update MANIFEST with new module and associated tests
+	* Update Inliner code to utilize new Parser submodule
+	  - Add test "basic-redeclare" to ensure that the repeated rule bug is solved
+
+3295	2011-07-08	Vick Khera <vivek@mailermailer.com>
+	* Makefile.PL remove dependency on CSS::Simple missed in prior
+	release
+
+3362	2011-09-22	Kevin Kamel <kamelkev@mailermailer.com>
+	* Fix a typo in the inlined warning array
+	* Attempt to resolve agent fetching issue
+	  - Update agent to prefix "Mozilla/4.0" to work with older cgis
+
+3385	2011-10-13	Kevin Kamel <kamelkev@mailermailer.com>
+	* Fix up Makefile to include dependency for TreeBuilder version 4.2
+	* Update copyright in Inliner.pm
+
+3471	2011-12-14	Kevin Kamel <kamelkev@mailermailer.com>
+	* Attempt to resolve agent fetching issue
+	  - Update agent to be solely string "Mozilla/4.0"
+
+3671	2012-03-09	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add in support for character encodings for content to be inlined
+	  - fixes bugs whereby foreign content types (utf8) produced bad inlined documents
+	* Fix errors in output of some test files
+
+3674	2012-03-12	Kevin Kamel <kamelkev@mailermailer.com>
+	* Skip processing of link tags without an href, no reason to process them
+
+3901	2013-07-27	Kevin Kamel <kamelkev@mailermailer.com>
+	* Remove "post_fetch_filter", I know of nobody using this feature and I personally do not need it anymore
+	* Added patch from Sebastian Paaske Torholm <spt@jobindex.dk>
+		- Update psuedo class support to reject rules without leading content before :psuedo
+		- Update psuedo class support to allow :first-child and :last-child to propogate to HTML::Query
+	* Update documentation where appropriate
+	* Transition versioning to a new model
+
+3913	2013-10-01	Kevin Kamel <kamelkev@mailermailer.com>
+	* Accept pull request from Vivek Khera (http://github.com/khera)
+		- Resolve issue whereby html comments were lost
+		- Resolve issue whereby url() references within local <style> css were not absolutized
+		- Add test for url() fix
+	* Add explicit test to confirm that pull request patch does in fact retain comments
+	* Fix versioning issues
+
+3932	2013-12-02	Kevin Kamel <kamelkev@mailermailer.com>
+	* Introduce CSS::Inliner::TreeBuilder, subclass of HTML::TreeBuilder
+		- enables "relaxed" parsing through unconventional implicit_tag disabling
+	* Introduce "relaxed" mode flag
+		- allows parsing of non-standards compliant documents
+		- allows parsing of HTML5 documents
+		- add tests to ensure described functionality matches up
+	* Add new _validate_html method, which will add warnings to the report representing gross document problems
+	* Add support for media queries, this is automatic and requires no flags
+	* Address issues with indentation of outputted code
+		- NOTE: indentation within relaxed mode does not work as expected, limited by underlying libraries
+	* Address concerns raised by CPAN RT84513
+		- ensure that both relaxed and standard parsing always allow link tags within html
+	* Update POD within Inliner.pm such that it generates more consistent documentation for CPAN/GitHub
+	* Manifest updated to represent all project files
+	* Fix some silly issues within tests that hadn't been noticed before	
+
+3933	2013-12-02	Kevin Kamel <kamelkev@mailermailer.com>
+	* Fix formatting of Changelog
+	* Tick up the HTML::TreeBuilder version to 5.03 - 4.2 apparently no longer exists?
+
+3934	2013-12-17	Kevin Kamel <kamelkev@mailermailer.com>
+	* Work around pod bug that was causing some problems for users
+	* Fix issue whereby <link> references that were not inlined weren't generating a content warning 
+
+3935	2013-12-19	Kevin Kamel <kamelkev@mailermailer.com>
+	* Fix problem with stylesheet fingerprint in link tags - regex was not correct
+	* Fix issue whereby I used modern perl // (defined test) doesn't work in perl 5.8.9
+
+3936	2013-01-13	Kevin Kamel <kamelkev@mailermailer.com>
+	* Fix issue whereby malformed @media rules could cause an infinite loop within the Parser
+	* Attempt to fix issue whereby moder perl // defined test still not working perl
+	* Attempt to fix issue whereby Makefile will not properly generate the latest README file
+
+3944	2013-03-24	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add generalized at-rule support to CSS::Inliner::Parser, @media support is reimplemented
+	* Provide granularity for retrieving rules by rule name, exa qualified, @import, @media, etc
+	* Attempt to improve whitespace handling when printing out a stylesheet from CSS::Inliner::Parser
+        * Abandon using tabs in written out css, update tests to reflect the change
+	* Add support for including at-rule when printing out a stylesheet from CSS::Inliner::Parser
+        * Add tests for ensuring that at-rule are working
+	* Fix up code style whitespace issues, add associated tests for checking it
+
+3945	2013-04-25	Kevin Kamel <kamelkev@mailermailer.com>
+	* Updated embedded test, which references a remote uri that was no longer accessible
+
+3948	2014-09-02	Kevin Kamel <kamelkev@mailermailer.com>
+	* Updated handling of pseudo-classes
+		- correct issue raised in CPAN RT96413, errors incorrectly bubbling from HTML::Query
+		- update regex to properly target all unsupported pseudo-selectors
+		- update regex to skip over CSS3 style pseudo-selectors as well as CSS2
+		- update tests to properly exercise associated changes
+	* Rename test psuedo.t to pseudo.t (spelling)
+	* Bump up HTML::Query requirement to 0.09
+
+3957	2015-05-15	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add support for an argument to the Inliner constructor to override the default set of entities
+		- resolve feature request raised in CPAN RT100857
+		- add test to validate basic behavior
+	* Fix issues within pod documentation
+	* Added patch provided by sixtease@cpan.org within CPAN RT99934
+		- Resolves improper !important rule handling
+		- Adds test for validating proper !important rule handling
+	* Update copyright to 2015 throughout project
+
+3958	2015-05-29	Kevin Kamel <kamelkev@mailermailer.com>
+	* Add support for an agent string argument for the remote fetching of documents
+        * Add patch provided by Dave Gray (cpan@doesntsuck.com)
+		- Adds proper headers for remote fetching of files
+	* Fix issues within pod documentation
+
+4002	2015-11-23	Kevin Kamel <kamelkev@mailermailer.com>
+	* Update POD within Inliner.pm such that it generates more consistent documentation for CPAN/GitHub
+	* Set URI flag allowing urls containing leading dots to be handled correctly
+	* Extend support for foreign character sets
+		- implement charset detection algorithm, roughly based off of HTML5 W3C specification
+		- implement character encoding/decoding based upon detected charset
+		- implement fallback mode for when no charset is detected, leverage Encoding::FixLatin if available
+		- add tests for exercising new charset related features
+		- update documentation regarding new methods to support foreign charsets
+	* Add reference to contributor Dave Gray (cpan@doesntsuck.com) to contributors section
+	* Add reference to contributor Chelsea Rio (chelseario@gmail.com) to contributors section
+	* Add new TreeBuilder configuration method, which ensures all instances are configured identically
+	* Remove all entity handling intentionally or unintentionally done, retain original state of all read chars
+		- Modify configuration of all TreeBuilder instances, remove all entity decoding done during parsing
+		- Modify configuration of TreeBuilder output, skip calls for entity encoding
+		- strip all documentation and argument handling related to entity encoding
+		- All entity encoding is now the responsibility of the caller
+	* Update MANIFEST to reference all added tests/assets
+	* Fix minor formatting issues within some tests/assets
+        * Address concerns raised by CPAN RT96414, conditionally test for connectivity instead of outright failing
+
+4003	2015-12-16	Kevin Kamel <kamelkev@mailermailer.com>
+	* Resolve charset sniffing issue
+		- invalid charset present within the document would cause charset sniffing to end prematurely
+		- invalid charset present within the document would cause Inliner to die during the decode phase
+	* Resolve issue whereby a TreeBuilder instance was not configured as expected

@@ -1,0 +1,14 @@
+Revision history for Perl module Catalyst::Authentication::Credential::Flickr
+
+0.03 2008/10/09
+    - removed dependency on XML::Simple and thus removing ANDK's failing 
+      tests ;-)
+
+0.02 2008/10/07
+    - added better tests
+    - improved POD
+
+0.01_01 2008/10/06
+    - original version
+
+

@@ -1,0 +1,995 @@
+
+RCS file: /project/weld/cvsroot/weld/src/session/.cvsignore,v
+Working file: .cvsignore
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.2
+	WELD-0_7: 1.2
+	NGDM-1_0D: 1.2
+	NGDM-1_0C: 1.2
+	NGDM-POST-1_0: 1.2.0.8
+	NGDM-POST-1_0-BRANCH-POINT: 1.2
+	WELD-0_5: 1.2
+	LAST-OLD-PACKAGE-NAMES: 1.2
+	NGDM-1_0B: 1.2
+	NGDM-1_0A: 1.2
+	NGDM-1_0: 1.2
+	NGDM-BETA-0_9: 1.2
+	WELD-0_3: 1.2
+	NGDM-BETA-0_8: 1.2
+	WELD-0_2: 1.2
+	MAIN-POST-1: 1.2
+	MAIN-MERGE-1: 1.2
+	MAIN-PRE-1: 1.2
+	NGDM-BETA-0_7a: 1.2
+	EXPERIMENTAL-NBS-POST-0: 1.2
+	EXPERIMENTAL-NBS-PRE-0: 1.2
+	EXPERIMENTAL-NBS-MERGE-0: 1.2
+	NGDM-BETA-0_7: 1.2
+	NGDM-POST-0_6: 1.2.0.6
+	NGDM-POST-0_6-BRANCH-POINT: 1.2
+	EXPERIMENTAL-NBS: 1.2.0.4
+	EXPERIMENTAL-NBS-BRANCH-POINT: 1.2
+	NGDM-BETA-0_6: 1.2
+	NGDM-BETA-0_5: 1.2
+	MAIN-POST-0: 1.2
+	MAIN-MERGE-0: 1.2
+	MAIN-PRE-0: 1.2
+	NGDM-BETA-0_4: 1.2
+	NETTEST-VISIT-MAR-2002-BRANCH-POINT: 1.2
+	NETTEST-VISIT-MAR-2002: 1.2.0.2
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+added .cvsignore to all src dirs
+----------------------------
+revision 1.2
+date: 2002/03/05 13:57:25;  author: tfb;  state: Exp;  lines: +1 -0
+added *.wfasl to .cvsignores
+----------------------------
+revision 1.1
+date: 2002/02/24 17:35:11;  author: tfb;  state: Exp;
+added .cvsignore to all src dirs - it seems to be an artifact of the
+cygwin cvs client that .cvsignore works in subdirs.
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/ChangeLog,v
+Working file: ChangeLog
+head: 1.32
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.31
+	WELD-0_7: 1.30
+	NGDM-1_0D: 1.26.2.2
+	NGDM-1_0C: 1.26.2.2
+	NGDM-POST-1_0: 1.26.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.26
+	WELD-0_5: 1.28
+	LAST-OLD-PACKAGE-NAMES: 1.26
+	NGDM-1_0B: 1.25
+	NGDM-1_0A: 1.22
+	NGDM-1_0: 1.21
+	NGDM-BETA-0_9: 1.20
+	WELD-0_3: 1.20
+	NGDM-BETA-0_8: 1.19
+	WELD-0_2: 1.16
+	MAIN-POST-1: 1.14
+	MAIN-MERGE-1: 1.13.2.4
+	MAIN-PRE-1: 1.13
+	NGDM-BETA-0_7a: 1.12.2.1
+	EXPERIMENTAL-NBS-POST-0: 1.13.2.1
+	EXPERIMENTAL-NBS-PRE-0: 1.13.2.1
+	EXPERIMENTAL-NBS-MERGE-0: 1.12.2.1
+	NGDM-BETA-0_7: 1.12.2.1
+	NGDM-POST-0_6: 1.12.0.2
+	NGDM-POST-0_6-BRANCH-POINT: 1.12
+	EXPERIMENTAL-NBS: 1.13.0.2
+	EXPERIMENTAL-NBS-BRANCH-POINT: 1.13
+	NGDM-BETA-0_6: 1.12
+	NGDM-BETA-0_5: 1.12
+	MAIN-POST-0: 1.10
+	MAIN-MERGE-0: 1.10
+	MAIN-PRE-0: 1.10
+	NGDM-BETA-0_4: 1.10
+	NETTEST-VISIT-MAR-2002-BRANCH-POINT: 1.10
+	NETTEST-VISIT-MAR-2002: 1.10.0.2
+keyword substitution: k
+total revisions: 39;	selected revisions: 39
+description:
+add ChangeLogs and things to make them
+----------------------------
+revision 1.32
+date: 2003/01/08 22:05:41;  author: tfb;  state: Exp;  lines: +7 -0
+changelog commit
+----------------------------
+revision 1.31
+date: 2002/10/22 20:11:20;  author: tfb;  state: Exp;  lines: +17 -0
+changelog commit
+----------------------------
+revision 1.30
+date: 2002/08/16 21:14:31;  author: tfb;  state: Exp;  lines: +8 -0
+changelog commit (Weld 0.6)
+----------------------------
+revision 1.29
+date: 2002/08/12 12:33:44;  author: tfb;  state: Exp;  lines: +26 -0
+changelog commit
+----------------------------
+revision 1.28
+date: 2002/07/31 11:39:14;  author: tfb;  state: Exp;  lines: +7 -0
+changelog commit
+----------------------------
+revision 1.27
+date: 2002/07/31 10:57:33;  author: tfb;  state: Exp;  lines: +17 -0
+changelog commit
+----------------------------
+revision 1.26
+date: 2002/07/19 14:09:48;  author: tfb;  state: Exp;  lines: +5 -0
+branches:  1.26.2;
+changelog commit
+----------------------------
+revision 1.25
+date: 2002/07/10 12:26:59;  author: tfb;  state: Exp;  lines: +4 -0
+changelog commit
+----------------------------
+revision 1.24
+date: 2002/07/10 12:06:53;  author: tfb;  state: Exp;  lines: +6 -0
+changelog commit
+----------------------------
+revision 1.23
+date: 2002/07/08 21:12:05;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.22
+date: 2002/07/04 15:08:16;  author: tfb;  state: Exp;  lines: +11 -0
+changelog commit
+----------------------------
+revision 1.21
+date: 2002/06/20 05:02:35;  author: tfb;  state: Exp;  lines: +4 -0
+changelog commit
+----------------------------
+revision 1.20
+date: 2002/06/16 00:28:47;  author: tfb;  state: Exp;  lines: +31 -0
+changelog commit
+----------------------------
+revision 1.19
+date: 2002/06/10 03:22:45;  author: tfb;  state: Exp;  lines: +6 -0
+changelog commit
+----------------------------
+revision 1.18
+date: 2002/06/08 23:52:36;  author: tfb;  state: Exp;  lines: +11 -0
+restructuring of modules, auto patching
+----------------------------
+revision 1.17
+date: 2002/06/08 00:04:18;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.16
+date: 2002/06/06 22:27:45;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.15
+date: 2002/06/02 12:44:55;  author: tfb;  state: Exp;  lines: +13 -0
+changelog commit
+----------------------------
+revision 1.14
+date: 2002/06/02 12:33:29;  author: tfb;  state: Exp;  lines: +36 -0
+merge to MAIN from EXPERIMENTAL-NBS.
+
+This is merge 1 to MAIN
+
+Tags
+
+	MAIN-PRE-1 on MAIN before merge
+	MAIN-MERGE-1 on EXPERIMENTAL-NBS before merge
+	MAIN-POST-1 on MAIN after merge
+----------------------------
+revision 1.13
+date: 2002/05/05 21:06:01;  author: tfb;  state: Exp;  lines: +23 -0
+branches:  1.13.2;
+changelog commit
+----------------------------
+revision 1.12
+date: 2002/03/22 11:53:51;  author: tfb;  state: Exp;  lines: +4 -0
+branches:  1.12.2;
+ChangeLog commit
+----------------------------
+revision 1.11
+date: 2002/03/18 15:06:16;  author: tfb;  state: Exp;  lines: +11 -0
+changelog commit
+----------------------------
+revision 1.10
+date: 2002/03/09 22:22:43;  author: tfb;  state: Exp;  lines: +6 -0
+changelog commit
+----------------------------
+revision 1.9
+date: 2002/03/08 22:43:19;  author: tfb;  state: Exp;  lines: +9 -0
+changelog commit
+----------------------------
+revision 1.8
+date: 2002/03/06 15:19:22;  author: tfb;  state: Exp;  lines: +10 -0
+changelog commit
+----------------------------
+revision 1.7
+date: 2002/02/26 20:13:35;  author: tfb;  state: Exp;  lines: +4 -0
+changelog commit
+----------------------------
+revision 1.6
+date: 2002/02/24 22:09:35;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.5
+date: 2002/02/24 17:35:42;  author: tfb;  state: Exp;  lines: +6 -0
+changelog commit
+----------------------------
+revision 1.4
+date: 2002/02/23 02:41:04;  author: tfb;  state: Exp;  lines: +7 -0
+changelog commit
+----------------------------
+revision 1.3
+date: 2002/02/21 23:19:33;  author: tfb;  state: Exp;  lines: +0 -4
+another commit, this one should be stable I hope (or nearly)
+----------------------------
+revision 1.2
+date: 2002/02/21 23:12:04;  author: tfb;  state: Exp;  lines: +4 -0
+changelogs update
+----------------------------
+revision 1.1
+date: 2002/02/21 23:11:12;  author: tfb;  state: Exp;
+changelogs
+----------------------------
+revision 1.12.2.1
+date: 2002/05/13 01:37:49;  author: tfb;  state: Exp;  lines: +3 -10
+changelog commit
+----------------------------
+revision 1.13.2.4
+date: 2002/05/30 14:08:46;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.13.2.3
+date: 2002/05/15 22:47:43;  author: tfb;  state: Exp;  lines: +11 -0
+changelog commit
+----------------------------
+revision 1.13.2.2
+date: 2002/05/13 02:45:06;  author: tfb;  state: Exp;  lines: +0 -12
+changelog commit
+----------------------------
+revision 1.13.2.1
+date: 2002/05/05 22:02:59;  author: tfb;  state: Exp;  lines: +20 -0
+changelog commit
+----------------------------
+revision 1.26.2.2
+date: 2002/08/07 19:32:37;  author: tfb;  state: Exp;  lines: +5 -0
+changelog commit
+----------------------------
+revision 1.26.2.1
+date: 2002/08/06 20:06:38;  author: tfb;  state: Exp;  lines: +0 -38
+initial branch changelog commit
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/boot-expat.lisp,v
+Working file: boot-expat.lisp
+head: 1.8
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.8
+	WELD-0_7: 1.8
+	NGDM-1_0D: 1.6
+	NGDM-1_0C: 1.6
+	NGDM-POST-1_0: 1.6.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.6
+	WELD-0_5: 1.7
+	LAST-OLD-PACKAGE-NAMES: 1.6
+	NGDM-1_0B: 1.6
+	NGDM-1_0A: 1.4
+	NGDM-1_0: 1.4
+	NGDM-BETA-0_9: 1.3
+	WELD-0_3: 1.3
+	NGDM-BETA-0_8: 1.3
+	WELD-0_2: 1.3
+	MAIN-POST-1: 1.3
+	MAIN-MERGE-1: 1.3
+	MAIN-PRE-1: 1.3
+	NGDM-BETA-0_7a: 1.3
+	EXPERIMENTAL-NBS-POST-0: 1.3
+	EXPERIMENTAL-NBS-PRE-0: 1.3
+	EXPERIMENTAL-NBS-MERGE-0: 1.3
+	NGDM-BETA-0_7: 1.3
+	NGDM-POST-0_6: 1.3.0.4
+	NGDM-POST-0_6-BRANCH-POINT: 1.3
+	EXPERIMENTAL-NBS: 1.3.0.2
+	EXPERIMENTAL-NBS-BRANCH-POINT: 1.3
+	NGDM-BETA-0_6: 1.3
+	NGDM-BETA-0_5: 1.3
+	MAIN-POST-0: 1.2
+	MAIN-MERGE-0: 1.2
+	MAIN-PRE-0: 1.2
+	NGDM-BETA-0_4: 1.2
+	NETTEST-VISIT-MAR-2002-BRANCH-POINT: 1.2
+	NETTEST-VISIT-MAR-2002: 1.2.0.2
+keyword substitution: kv
+total revisions: 8;	selected revisions: 8
+description:
+----------------------------
+revision 1.8
+date: 2002/08/16 21:10:04;  author: tfb;  state: Exp;  lines: +2 -2
+Changes to allow variant cf read packages.  This changes the syntax
+of DECLARE-CF-READ-SYMBOLS and DECLARE-SHARED-CF-READ-SYMBOLS incompatibly,
+since they now need to be able to specify a package.  So this is
+Weld 0.6
+----------------------------
+revision 1.7
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +3 -3
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.6
+date: 2002/07/10 12:26:33;  author: tfb;  state: Exp;  lines: +6 -4
+Unixify some more namestrings
+----------------------------
+revision 1.5
+date: 2002/07/10 11:57:59;  author: tfb;  state: Exp;  lines: +3 -3
+Clean up progress notes (many but fairly trivial changes)
+----------------------------
+revision 1.4
+date: 2002/06/20 04:05:38;  author: tfb;  state: Exp;  lines: +10 -1
+Add listifying elts for weld.rc or ngdm.rc
+----------------------------
+revision 1.3
+date: 2002/03/20 18:47:10;  author: tfb;  state: Exp;  lines: +20 -17
+better expat connection noises
+----------------------------
+revision 1.2
+date: 2002/03/08 22:34:41;  author: tfb;  state: Exp;  lines: +19 -3
+Made expat connectery actually work
+----------------------------
+revision 1.1
+date: 2002/03/07 12:54:43;  author: tfb;  state: Exp;
+added the boot-expat file, and removed the expat stuff from the main
+boot file
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/boot.lisp,v
+Working file: boot.lisp
+head: 1.22
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.21
+	WELD-0_7: 1.21
+	NGDM-1_0D: 1.16.2.1
+	NGDM-1_0C: 1.16.2.1
+	NGDM-POST-1_0: 1.16.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.16
+	WELD-0_5: 1.18
+	LAST-OLD-PACKAGE-NAMES: 1.16
+	NGDM-1_0B: 1.15
+	NGDM-1_0A: 1.13
+	NGDM-1_0: 1.12
+	NGDM-BETA-0_9: 1.12
+	WELD-0_3: 1.12
+	NGDM-BETA-0_8: 1.12
+	WELD-0_2: 1.10
+	MAIN-POST-1: 1.10
+	MAIN-MERGE-1: 1.9.2.1
+	MAIN-PRE-1: 1.9
+	NGDM-BETA-0_7a: 1.8
+	EXPERIMENTAL-NBS-POST-0: 1.9
+	EXPERIMENTAL-NBS-PRE-0: 1.9
+	EXPERIMENTAL-NBS-MERGE-0: 1.8
+	NGDM-BETA-0_7: 1.8
+	NGDM-POST-0_6: 1.8.0.2
+	NGDM-POST-0_6-BRANCH-POINT: 1.8
+	EXPERIMENTAL-NBS: 1.9.0.2
+	EXPERIMENTAL-NBS-BRANCH-POINT: 1.9
+	NGDM-BETA-0_6: 1.8
+	NGDM-BETA-0_5: 1.8
+	MAIN-POST-0: 1.8
+	MAIN-MERGE-0: 1.7.2.1
+	MAIN-PRE-0: 1.7
+	NGDM-BETA-0_4: 1.7.2.1
+	NETTEST-VISIT-MAR-2002-BRANCH-POINT: 1.7
+	NETTEST-VISIT-MAR-2002: 1.7.0.2
+	INITIAL: 1.1.1.1
+	WELD: 1.1.1
+keyword substitution: kv
+total revisions: 26;	selected revisions: 26
+description:
+----------------------------
+revision 1.22
+date: 2003/01/08 22:04:06;  author: tfb;  state: Exp;  lines: +2 -3
+Many changes to clean up IO functions and provide implementations for
+the emacs rep.
+
+This is still pretty broken.
+----------------------------
+revision 1.21
+date: 2002/08/16 21:10:04;  author: tfb;  state: Exp;  lines: +8 -7
+Changes to allow variant cf read packages.  This changes the syntax
+of DECLARE-CF-READ-SYMBOLS and DECLARE-SHARED-CF-READ-SYMBOLS incompatibly,
+since they now need to be able to specify a package.  So this is
+Weld 0.6
+----------------------------
+revision 1.20
+date: 2002/08/12 09:40:45;  author: tfb;  state: Exp;  lines: +3 -5
+Changes to various LOOPs to use a more idiosyncratic thing:
+    (loop for (i . j) in x
+      ...)
+
+rather than
+
+    (loop for y in x
+          for (i . j) = y
+          ...)
+
+I don't know why I ever did the latter - I must have misunderstood
+destructuring in LOOP.
+----------------------------
+revision 1.19
+date: 2002/08/08 21:04:57;  author: tfb;  state: Exp;  lines: +91 -59
+Make the various boot-location control things variables, and allow
+`fileless' booting if they are NIL.  This helps being a library
+as you can control where it boots better.
+----------------------------
+revision 1.18
+date: 2002/07/31 11:36:38;  author: tfb;  state: Exp;  lines: +3 -3
+Fixed a problem which made it fail to boot (hosts-equal was getting :WILD)
+Added a couple of switches to enable backtracing during boot and
+to enable backtracing in the rep.
+----------------------------
+revision 1.17
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +9 -8
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.16
+date: 2002/07/18 19:22:57;  author: tfb;  state: Exp;  lines: +33 -13
+branches:  1.16.2;
+better hostery when looking for boot files (dotted names...)
+----------------------------
+revision 1.15
+date: 2002/07/10 11:57:59;  author: tfb;  state: Exp;  lines: +17 -16
+Clean up progress notes (many but fairly trivial changes)
+----------------------------
+revision 1.14
+date: 2002/07/08 21:06:23;  author: tfb;  state: Exp;  lines: +44 -9
+Support for setting boot location and root location - extra args to
+ENSURE-WELD-BOOT-STATE
+----------------------------
+revision 1.13
+date: 2002/07/04 01:06:11;  author: tfb;  state: Exp;  lines: +25 -2
+Added DEBUG-PARAMETERS boot form, and corresponding hook.
+Made the rep understand :backtrace t to mean `backtrace on error'
+----------------------------
+revision 1.12
+date: 2002/06/09 23:37:59;  author: tfb;  state: Exp;  lines: +16 -1
+New function, PROBE-WELD-BOOT-FILE, which lets us know if a boot file
+can be found.  This lets it tell if non-interactive booting is OK.
+----------------------------
+revision 1.11
+date: 2002/06/08 23:45:11;  author: tfb;  state: Exp;  lines: +13 -18
+Fairly large changes to the module structure: weld is now the substrate
+code (weld-low), together with session, application & rep code.  CRS and NBS
+can be loaded on top of this, and should be distributed as separate
+systems.
+
+Modules can now load patches for themselves, based on a patch tree
+corresponding to the module tree.
+----------------------------
+revision 1.10
+date: 2002/06/02 12:33:29;  author: tfb;  state: Exp;  lines: +2 -2
+merge to MAIN from EXPERIMENTAL-NBS.
+
+This is merge 1 to MAIN
+
+Tags
+
+	MAIN-PRE-1 on MAIN before merge
+	MAIN-MERGE-1 on EXPERIMENTAL-NBS before merge
+	MAIN-POST-1 on MAIN after merge
+----------------------------
+revision 1.9
+date: 2002/05/02 11:34:14;  author: tfb;  state: Exp;  lines: +18 -11
+branches:  1.9.2;
+Added an option to ENSURE-WELD-BOOT-STATE and its callees to allow
+specification of the file to boot from.  So
+
+	(ensure-weld-boot-state :host :boot-file "/local/.../boot.def")
+
+will boot it to HOST from a given file.
+
+I'm not sure this is enough, since other things can cause it to boot,  As
+a way of getting around this there is also a NO-USER option, which says
+just to fake a user boot (don't actually read the weldrc).  So you can say
+
+	(ensure-weld-boot-state :user :boot-file ... :no-user t)
+
+which will not read the user's weldrc, but will look like it has.
+----------------------------
+revision 1.8
+date: 2002/03/18 15:03:28;  author: tfb;  state: Exp;  lines: +7 -2
+Merge nettest march 2002 changes to main branch
+----------------------------
+revision 1.7
+date: 2002/03/09 22:19:15;  author: tfb;  state: Exp;  lines: +19 -1
+branches:  1.7.2;
+Changes to support code loading at boot time: moved the careful file loading
+stuff from CRS into PATCH, and added handlers to boot.lisp.
+----------------------------
+revision 1.6
+date: 2002/03/07 12:54:43;  author: tfb;  state: Exp;  lines: +1 -4
+added the boot-expat file, and removed the expat stuff from the main
+boot file
+----------------------------
+revision 1.5
+date: 2002/03/05 11:10:26;  author: tfb;  state: Exp;  lines: +4 -1
+Added declarations / definitions (which should it be?) of suitable listifying
+XML elements for boot.def, module.def, component.def, eo.def
+----------------------------
+revision 1.4
+date: 2002/02/26 20:12:21;  author: tfb;  state: Exp;  lines: +6 -1
+declared some module names
+----------------------------
+revision 1.3
+date: 2002/02/24 21:53:23;  author: tfb;  state: Exp;  lines: +4 -4
+changes to new hook definition format (with arglist).
+----------------------------
+revision 1.2
+date: 2002/02/23 02:37:12;  author: tfb;  state: Exp;  lines: +7 -3
+added new feature: COM.CLEY.WELD/NGDM which means `this version of weld
+is eing compiled as NGDM'.  Conditionalised the boot location and rc file
+names based on this feature.
+----------------------------
+revision 1.1
+date: 2002/02/14 14:23:56;  author: tfb;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/02/14 14:23:56;  author: tfb;  state: Exp;  lines: +0 -0
+initial import of WELD (ex NGDM)
+----------------------------
+revision 1.7.2.1
+date: 2002/03/13 11:25:39;  author: tfb;  state: Exp;  lines: +7 -2
+Changed all the DECLARE-MODULE forms to find the write date of the
+source file if possible, so that module information is a bit more informative
+and stable.  Maybe they should do this by default?
+----------------------------
+revision 1.9.2.1
+date: 2002/05/15 15:23:35;  author: tfb;  state: Exp;  lines: +2 -2
+Pervasive changes to module declarations - Anders pointed out they
+were buggy because they tried to ask for *compile-file-pathname* when
+it didn't exist.
+
+Made sure import directory exists before an import
+
+allowed :CONCRETE as well as :LEAF, and fixed a bug in featurized classes
+----------------------------
+revision 1.16.2.1
+date: 2002/08/07 19:21:58;  author: tfb;  state: Exp;  lines: +3 -3
+hosts-equal wildness fix from main branch
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/component-structure.lisp,v
+Working file: component-structure.lisp
+head: 1.11
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.11
+	WELD-0_7: 1.11
+	NGDM-1_0D: 1.9
+	NGDM-1_0C: 1.9
+	NGDM-POST-1_0: 1.9.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.9
+	WELD-0_5: 1.10
+	LAST-OLD-PACKAGE-NAMES: 1.9
+	NGDM-1_0B: 1.9
+	NGDM-1_0A: 1.8
+	NGDM-1_0: 1.8
+	NGDM-BETA-0_9: 1.8
+	WELD-0_3: 1.8
+	NGDM-BETA-0_8: 1.4
+	WELD-0_2: 1.4
+	MAIN-POST-1: 1.3
+	MAIN-MERGE-1: 1.2.2.1
+	MAIN-PRE-1: 1.2
+	NGDM-BETA-0_7a: 1.1.1.1
+	EXPERIMENTAL-NBS-POST-0: 1.2
+	EXPERIMENTAL-NBS-PRE-0: 1.2
+	EXPERIMENTAL-NBS-MERGE-0: 1.1.1.1
+	NGDM-BETA-0_7: 1.1.1.1
+	NGDM-POST-0_6: 1.1.1.1.0.4
+	NGDM-POST-0_6-BRANCH-POINT: 1.1.1.1
+	EXPERIMENTAL-NBS: 1.2.0.2
+	EXPERIMENTAL-NBS-BRANCH-POINT: 1.2
+	NGDM-BETA-0_6: 1.1.1.1
+	NGDM-BETA-0_5: 1.1.1.1
+	MAIN-POST-0: 1.1.1.1
+	MAIN-MERGE-0: 1.1.1.1
+	MAIN-PRE-0: 1.1.1.1
+	NGDM-BETA-0_4: 1.1.1.1
+	NETTEST-VISIT-MAR-2002-BRANCH-POINT: 1.1.1.1
+	NETTEST-VISIT-MAR-2002: 1.1.1.1.0.2
+	INITIAL: 1.1.1.1
+	WELD: 1.1.1
+keyword substitution: kv
+total revisions: 13;	selected revisions: 13
+description:
+----------------------------
+revision 1.11
+date: 2002/08/16 21:10:04;  author: tfb;  state: Exp;  lines: +2 -2
+Changes to allow variant cf read packages.  This changes the syntax
+of DECLARE-CF-READ-SYMBOLS and DECLARE-SHARED-CF-READ-SYMBOLS incompatibly,
+since they now need to be able to specify a package.  So this is
+Weld 0.6
+----------------------------
+revision 1.10
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +5 -4
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.9
+date: 2002/07/10 11:57:59;  author: tfb;  state: Exp;  lines: +3 -3
+Clean up progress notes (many but fairly trivial changes)
+----------------------------
+revision 1.8
+date: 2002/06/15 23:36:29;  author: tfb;  state: Exp;  lines: +3 -3
+unixify namestrings (I think this is right)
+----------------------------
+revision 1.7
+date: 2002/06/15 23:26:12;  author: tfb;  state: Exp;  lines: +3 -0
+Added import cleaning (which was the original thing we wanted, sigh)
+----------------------------
+revision 1.6
+date: 2002/06/15 23:08:29;  author: tfb;  state: Exp;  lines: +35 -17
+Changed CLEAN-COMPONENT to be more careful.
+
+Added CLEAN-MODULE.
+----------------------------
+revision 1.5
+date: 2002/06/15 22:30:46;  author: tfb;  state: Exp;  lines: +21 -2
+CLEAN-COMPONENT
+----------------------------
+revision 1.4
+date: 2002/06/04 17:57:16;  author: tfb;  state: Exp;  lines: +4 -3
+dump build parameters to a subdir of the stage root.
+----------------------------
+revision 1.3
+date: 2002/06/02 12:33:29;  author: tfb;  state: Exp;  lines: +16 -10
+merge to MAIN from EXPERIMENTAL-NBS.
+
+This is merge 1 to MAIN
+
+Tags
+
+	MAIN-PRE-1 on MAIN before merge
+	MAIN-MERGE-1 on EXPERIMENTAL-NBS before merge
+	MAIN-POST-1 on MAIN after merge
+----------------------------
+revision 1.2
+date: 2002/05/04 16:26:13;  author: tfb;  state: Exp;  lines: +12 -1
+branches:  1.2.2;
+added submodule.def support.
+----------------------------
+revision 1.1
+date: 2002/02/14 14:23:56;  author: tfb;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2002/02/14 14:23:56;  author: tfb;  state: Exp;  lines: +0 -0
+initial import of WELD (ex NGDM)
+----------------------------
+revision 1.2.2.1
+date: 2002/05/29 23:28:49;  author: tfb;  state: Exp;  lines: +16 -10
+Optionalized some arguments (subdir) and changed stage -> build by default
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/pkg.lisp,v
+Working file: pkg.lisp
+head: 1.10
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.10
+	WELD-0_7: 1.9
+	NGDM-1_0D: 1.6
+	NGDM-1_0C: 1.6
+	NGDM-POST-1_0: 1.6.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.6
+	WELD-0_5: 1.8
+	LAST-OLD-PACKAGE-NAMES: 1.6
+	NGDM-1_0B: 1.6
+	NGDM-1_0A: 1.6
+	NGDM-1_0: 1.5
+	NGDM-BETA-0_9: 1.5
+	WELD-0_3: 1.5
+	NGDM-BETA-0_8: 1.3
+	WELD-0_2: 1.2
+	MAIN-POST-1: 1.2
+	MAIN-MERGE-1: 1.1.2.1
+	EXPERIMENTAL-NBS-POST-0: 1.1.2.1
+	EXPERIMENTAL-NBS-PRE-0: 1.1.2.1
+	EXPERIMENTAL-NBS: 1.1.0.2
+keyword substitution: kv
+total revisions: 11;	selected revisions: 11
+description:
+----------------------------
+revision 1.10
+date: 2002/10/18 00:21:41;  author: tfb;  state: Exp;  lines: +3 -2
+General checkin of some improvements to the module tree drawing stuff.
+This still needs some error handling for menus at the weld level, the
+module chaining stuff from NBS.  Then it is probably OK as a demo
+of NGDM 1.2 (and the weld version should probably be bumped then too)
+----------------------------
+revision 1.9
+date: 2002/08/08 21:04:57;  author: tfb;  state: Exp;  lines: +3 -1
+Make the various boot-location control things variables, and allow
+`fileless' booting if they are NIL.  This helps being a library
+as you can control where it boots better.
+----------------------------
+revision 1.8
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +4 -4
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.7
+date: 2002/07/30 13:15:31;  author: tfb;  state: Exp;  lines: +2 -2
+Change all package definitions to use ORG.TFEB.CLC rather than CL.  This means
+that all packages now get the conduits version of DEFPACKAGE, and will
+not be compatible with anything earlier.  The tag LAST-OLD-PACKAGE-NAMES is
+the last NGDM-1.0 compatible version.
+----------------------------
+revision 1.6
+date: 2002/07/04 01:06:11;  author: tfb;  state: Exp;  lines: +2 -1
+Added DEBUG-PARAMETERS boot form, and corresponding hook.
+Made the rep understand :backtrace t to mean `backtrace on error'
+----------------------------
+revision 1.5
+date: 2002/06/15 22:30:46;  author: tfb;  state: Exp;  lines: +2 -1
+CLEAN-COMPONENT
+----------------------------
+revision 1.4
+date: 2002/06/15 17:24:29;  author: tfb;  state: Exp;  lines: +3 -2
+Add general-purpose system-command support, replacing the stuff CRS had
+and allowing anyone to execute named system commands.
+----------------------------
+revision 1.3
+date: 2002/06/09 23:37:59;  author: tfb;  state: Exp;  lines: +3 -2
+New function, PROBE-WELD-BOOT-FILE, which lets us know if a boot file
+can be found.  This lets it tell if non-interactive booting is OK.
+----------------------------
+revision 1.2
+date: 2002/06/02 12:33:29;  author: tfb;  state: Exp;  lines: +44 -0
+merge to MAIN from EXPERIMENTAL-NBS.
+
+This is merge 1 to MAIN
+
+Tags
+
+	MAIN-PRE-1 on MAIN before merge
+	MAIN-MERGE-1 on EXPERIMENTAL-NBS before merge
+	MAIN-POST-1 on MAIN after merge
+----------------------------
+revision 1.1
+date: 2002/05/05 21:57:47;  author: tfb;  state: dead;
+branches:  1.1.2;
+file pkg.lisp was initially added on branch EXPERIMENTAL-NBS.
+----------------------------
+revision 1.1.2.1
+date: 2002/05/05 21:57:47;  author: tfb;  state: Exp;  lines: +44 -0
+Reworked system declarations: split them amongst the subsystems, and
+made the top-level sysdcl simply load all the subsys decls.
+
+Moved package definitions into per-system files.  Packages still use
+non-structured names though this is a step towards making them structured.
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/session-cometh.lisp,v
+Working file: session-cometh.lisp
+head: 1.3
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.3
+	WELD-0_7: 1.3
+	NGDM-1_0D: 1.2
+	NGDM-1_0C: 1.2
+	NGDM-POST-1_0: 1.2.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.2
+	WELD-0_5: 1.3
+	LAST-OLD-PACKAGE-NAMES: 1.2
+	NGDM-1_0B: 1.2
+	NGDM-1_0A: 1.2
+	NGDM-1_0: 1.1
+	NGDM-BETA-0_9: 1.1
+	WELD-0_3: 1.1
+	NGDM-BETA-0_8: 1.1
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +2 -2
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.2
+date: 2002/06/28 17:01:18;  author: tfb;  state: Exp;  lines: +11 -6
+Made it somewhat smarter about reporting the actual date of a module.
+----------------------------
+revision 1.1
+date: 2002/06/08 23:45:11;  author: tfb;  state: Exp;
+Fairly large changes to the module structure: weld is now the substrate
+code (weld-low), together with session, application & rep code.  CRS and NBS
+can be loaded on top of this, and should be distributed as separate
+systems.
+
+Modules can now load patches for themselves, based on a patch tree
+corresponding to the module tree.
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/sysdcl.lisp,v
+Working file: sysdcl.lisp
+head: 1.5
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.5
+	WELD-0_7: 1.5
+	NGDM-1_0D: 1.5
+	NGDM-1_0C: 1.5
+	NGDM-POST-1_0: 1.5.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.5
+	WELD-0_5: 1.5
+	LAST-OLD-PACKAGE-NAMES: 1.5
+	NGDM-1_0B: 1.5
+	NGDM-1_0A: 1.5
+	NGDM-1_0: 1.5
+	NGDM-BETA-0_9: 1.5
+	WELD-0_3: 1.5
+	NGDM-BETA-0_8: 1.4
+	WELD-0_2: 1.2
+	MAIN-POST-1: 1.2
+	MAIN-MERGE-1: 1.1.2.1
+	EXPERIMENTAL-NBS-POST-0: 1.1.2.1
+	EXPERIMENTAL-NBS-PRE-0: 1.1.2.1
+	EXPERIMENTAL-NBS: 1.1.0.2
+keyword substitution: kv
+total revisions: 6;	selected revisions: 6
+description:
+----------------------------
+revision 1.5
+date: 2002/06/15 17:24:29;  author: tfb;  state: Exp;  lines: +2 -1
+Add general-purpose system-command support, replacing the stuff CRS had
+and allowing anyone to execute named system commands.
+----------------------------
+revision 1.4
+date: 2002/06/08 23:45:11;  author: tfb;  state: Exp;  lines: +2 -1
+Fairly large changes to the module structure: weld is now the substrate
+code (weld-low), together with session, application & rep code.  CRS and NBS
+can be loaded on top of this, and should be distributed as separate
+systems.
+
+Modules can now load patches for themselves, based on a patch tree
+corresponding to the module tree.
+----------------------------
+revision 1.3
+date: 2002/06/07 23:55:09;  author: tfb;  state: Exp;  lines: +2 -2
+A grand renaming of system names to be dotted and mostly
+hierarchical in the proper way.  See meta/Lisp-style
+----------------------------
+revision 1.2
+date: 2002/06/02 12:33:29;  author: tfb;  state: Exp;  lines: +17 -0
+merge to MAIN from EXPERIMENTAL-NBS.
+
+This is merge 1 to MAIN
+
+Tags
+
+	MAIN-PRE-1 on MAIN before merge
+	MAIN-MERGE-1 on EXPERIMENTAL-NBS before merge
+	MAIN-POST-1 on MAIN after merge
+----------------------------
+revision 1.1
+date: 2002/05/05 21:57:47;  author: tfb;  state: dead;
+branches:  1.1.2;
+file sysdcl.lisp was initially added on branch EXPERIMENTAL-NBS.
+----------------------------
+revision 1.1.2.1
+date: 2002/05/05 21:57:47;  author: tfb;  state: Exp;  lines: +17 -0
+Reworked system declarations: split them amongst the subsystems, and
+made the top-level sysdcl simply load all the subsys decls.
+
+Moved package definitions into per-system files.  Packages still use
+non-structured names though this is a step towards making them structured.
+=============================================================================
+
+RCS file: /project/weld/cvsroot/weld/src/session/system-commands.lisp,v
+Working file: system-commands.lisp
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+	NGDM-1_2: 1.7
+	WELD-0_7: 1.5
+	NGDM-1_0D: 1.3
+	NGDM-1_0C: 1.3
+	NGDM-POST-1_0: 1.3.0.2
+	NGDM-POST-1_0-BRANCH-POINT: 1.3
+	WELD-0_5: 1.4
+	LAST-OLD-PACKAGE-NAMES: 1.3
+	NGDM-1_0B: 1.3
+	NGDM-1_0A: 1.2
+	NGDM-1_0: 1.2
+	NGDM-BETA-0_9: 1.2
+	WELD-0_3: 1.2
+keyword substitution: kv
+total revisions: 7;	selected revisions: 7
+description:
+----------------------------
+revision 1.7
+date: 2002/10/21 15:12:06;  author: tfb;  state: Exp;  lines: +32 -4
+Added stuff for `always last' and `always first' menus, which have
+weights > and < respectively.
+
+Added a browse documentation command which looks in a subdir called
+docs of *WELD-ROOT* for index.html, and points a browser at it if found.
+----------------------------
+revision 1.6
+date: 2002/10/18 00:21:41;  author: tfb;  state: Exp;  lines: +4 -1
+General checkin of some improvements to the module tree drawing stuff.
+This still needs some error handling for menus at the weld level, the
+module chaining stuff from NBS.  Then it is probably OK as a demo
+of NGDM 1.2 (and the weld version should probably be bumped then too)
+----------------------------
+revision 1.5
+date: 2002/08/16 21:10:04;  author: tfb;  state: Exp;  lines: +2 -2
+Changes to allow variant cf read packages.  This changes the syntax
+of DECLARE-CF-READ-SYMBOLS and DECLARE-SHARED-CF-READ-SYMBOLS incompatibly,
+since they now need to be able to specify a package.  So this is
+Weld 0.6
+----------------------------
+revision 1.4
+date: 2002/07/31 10:53:21;  author: tfb;  state: Exp;  lines: +7 -6
+Grand package renaming: weld packages are now com.cley.weld.*
+Fixed a few bugs as well (why didn't these show up earlier?)
+this is weld 0.5 / ngdm 1.1 as it is not compatible with anything
+earlier
+----------------------------
+revision 1.3
+date: 2002/07/10 11:57:59;  author: tfb;  state: Exp;  lines: +26 -25
+Clean up progress notes (many but fairly trivial changes)
+----------------------------
+revision 1.2
+date: 2002/06/15 22:30:36;  author: tfb;  state: Exp;  lines: +5 -2
+Added single-arg version
+----------------------------
+revision 1.1
+date: 2002/06/15 17:24:29;  author: tfb;  state: Exp;
+Add general-purpose system-command support, replacing the stuff CRS had
+and allowing anyone to execute named system commands.
+=============================================================================

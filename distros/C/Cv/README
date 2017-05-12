@@ -1,0 +1,41 @@
+This is the README file for Cv. 
+
+Cv module is perl interface to Open computer vision library that
+originally developed by Intel. This module is developing to use
+computer vision more easily, like a slogan of perl "Easy things should
+be easy, hard things should be possible."
+
+INSTALLATION
+
+This module needs to be installed opencv 1.1 or later.  Make sure that
+opencv.pc is found by pkg-config:
+
+ $ pkg-config opencv --libs
+ -L/usr/local/lib -lcxcore -lcv -lhighgui -lcvaux -lml 
+
+ $ pkg-config opencv --cflags
+ -I/usr/local/include/opencv
+
+To install this module type the following:
+
+  $ CC=c++; export CC		# if you use c++ instead of cc
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  $ make install
+
+REQUIREMENTS
+
+    * Perl 5.8.8 or later is recommended.
+
+This module requires these other libraries:
+
+    * OpenCV - Open Computer Vision Library 1.1 or later
+      (http://sourceforge.net/projects/opencvlibrary/)
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010, 2011, 2012, 2013 by MASUDA Yuta.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.

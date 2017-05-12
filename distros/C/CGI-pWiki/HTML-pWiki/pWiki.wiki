@@ -1,0 +1,11 @@
+[pWiki] is an inplementation of the WikiWikiWeb idea of
+a user elaboratable database written in Perl and published
+at CPAN.
+
+Everything you see is somewhere in a database.
+All access to the database is done through a handler
+used to retrieve or update this data.
+The screens are translated depending on the file_type,
+when retrieved from the database.
+Each location in the pWiki can be extended by a
+query_string.

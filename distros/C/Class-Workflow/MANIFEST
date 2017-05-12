@@ -1,0 +1,42 @@
+Changes
+examples/dbic/lib/Foo/DB.pm
+examples/dbic/lib/Foo/DB/Item.pm
+examples/dbic/lib/Foo/DB/Workflow/Instance.pm
+examples/dbic/lib/Foo/DB/Workflow/State.pm
+examples/dbic/lib/Foo/DB/Workflow/Transition.pm
+examples/dbic/README
+examples/dbic/t/example_dbic.t
+examples/example.yaml
+examples/example_pop3.t
+lib/Class/Workflow.pm
+lib/Class/Workflow.pmc
+lib/Class/Workflow/Context.pm
+lib/Class/Workflow/Cookbook.pod
+lib/Class/Workflow/Instance.pm
+lib/Class/Workflow/Instance/Simple.pm
+lib/Class/Workflow/State.pm
+lib/Class/Workflow/State/AcceptHooks.pm
+lib/Class/Workflow/State/AutoApply.pm
+lib/Class/Workflow/State/Simple.pm
+lib/Class/Workflow/State/TransitionHash.pm
+lib/Class/Workflow/State/TransitionSet.pm
+lib/Class/Workflow/Transition.pm
+lib/Class/Workflow/Transition/Deterministic.pm
+lib/Class/Workflow/Transition/Simple.pm
+lib/Class/Workflow/Transition/Strict.pm
+lib/Class/Workflow/Transition/Validate.pm
+lib/Class/Workflow/Transition/Validate/Simple.pm
+lib/Class/Workflow/Util/Delta.pm
+lib/Class/Workflow/YAML.pm
+lib/Class/Workflow/YAML.pmc
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01_use.t
+t/basic.t
+t/delta.t
+t/example_dbic.t
+t/example_pop3.t
+t/yaml.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

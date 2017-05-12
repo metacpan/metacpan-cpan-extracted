@@ -1,0 +1,15 @@
+[% crud_page_header('Users') %]
+
+<p>[% create_button(uri('User', 'create')) %]
+
+[% WRAPPER datatable columns = [ 'Name', 'Actions' ] %]
+    [% FOREACH user = users %]
+    <tr>
+        <td>[% user.name %]</td>
+        <td>
+            [% edit_button(uri('User', 'edit', user.id)) %]
+            [% delete_button(uri('User', 'delete', user.id), user.is_used OR user.name == c.user.name) %]
+        </td>
+    </tr>
+    [% END %]
+[% END %]

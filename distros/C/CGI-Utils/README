@@ -1,0 +1,349 @@
+NAME
+    CGI::Utils - Utilities for retrieving information through the Common
+    Gateway Interface
+
+SYNOPSIS
+     use CGI::Utils;
+     my $utils = CGI::Utils->new;
+
+     my $fields = $utils->vars; # or $utils->Vars
+     my $field1 = $$fields{field1};
+
+         or
+
+     my $field1 = $utils->param('field1');
+
+     # File uploads
+     my $file_handle = $utils->param('file0'); # or $$fields{file0};
+     my $file_name = "$file_handle";  
+
+DESCRIPTION
+    This module can be used almost as a drop-in replacement for CGI.pm for
+    those of you who do not use the HTML generating features of CGI.pm
+
+    This module provides an object-oriented interface for retrieving
+    information provided by the Common Gateway Interface, as well as
+    url-encoding and decoding values, and parsing CGI parameters. For
+    example, CGI has a utility for escaping HTML, but no public interface
+    for url-encoding a value or for taking a hash of values and returning a
+    url-encoded query string suitable for passing to a CGI script. This
+    module does that, as well as provide methods for creating a
+    self-referencing url, converting relative urls to absolute, adding CGI
+    parameters to the end of a url, etc. Please see the METHODS section
+    below for more detailed descriptions of functionality provided by this
+    module.
+
+    File uploads via the multipart/form-data encoding are supported. The
+    parameter for the field name corresponding to the file is a file handle
+    that, when evaluated in string context, returns the name of the file
+    uploaded. To get the contents of the file, just read from the file
+    handle.
+
+    mod_perl is supported if a value for apache_request is passed to new(),
+    or if the apache request object is available via Apache->request, or if
+    running under HTML::Mason. See the documentation for the new() method
+    for details.
+
+    If not running in a mod_perl or CGI environment, @ARGV will be searched
+    for key/value pairs in the format
+
+     key1=val1 key2=val2
+
+    If all command-line arguments are in this format, the key/value pairs
+    will be available as if they were passed via a CGI or mod_perl
+    interface.
+
+METHODS
+  new(\%params)
+    Returns a new CGI::Utils object. Parameters are optional. CGI::Utils
+    supports mod_perl if the Apache request object is passed as
+    $params{apache_request}, or if it is available via Apache->request (or
+    Apache2::RequestUtil->request), or if running under HTML::Mason.
+
+    You may also pass max_post_size in %params.
+
+  urlEncode($str)
+    Returns the fully URL-encoded version of the given string. It does not
+    convert space characters to '+' characters.
+
+    Aliases: url_encode()
+
+  urlUnicodeEncode($str)
+    Returns the fully URL-encoded version of the given string as unicode
+    characters. It does not convert space characters to '+' characters.
+
+    Aliases: url_unicode_encode()
+
+  urlDecode($url_encoded_str)
+    Returns the decoded version of the given URL-encoded string.
+
+    Aliases: url_decode()
+
+  urlUnicodeDecode($url_encoded_str)
+    Returns the decoded version of the given URL-encoded string, with
+    unicode support.
+
+    Aliases: url_unicode_decode()
+
+  urlEncodeVars($var_hash, $sep)
+    Takes a hash of name/value pairs and returns a fully URL-encoded query
+    string suitable for passing in a URL. By default, uses the newer
+    separator, a semicolon, as recommended by the W3C. If you pass in a
+    second argument, it is used as the separator between key/value pairs.
+
+    Aliases: url_encode_vars()
+
+  urlDecodeVars($query_string)
+    Takes a URL-encoded query string, decodes it, and returns a reference to
+    a hash of name/value pairs. For multivalued fields, the value is an
+    array of values. If called in array context, it returns a reference to a
+    hash of name/value pairs, and a reference to an array of field names in
+    the order they appear in the query string.
+
+    Aliases: url_decode_vars()
+
+  escapeHtml($text)
+    Escapes the given text so that it is not interpreted as HTML. &, <, >,
+    and " characters are escaped.
+
+    Aliases: escape_html()
+
+  escapeHtmlFormValue($text)
+    Escapes the given text so that it is valid to put in a form field.
+
+    Aliases: escape_html_form_value()
+
+  getSelfRefHostUrl()
+    Returns a url referencing top level directory in the current domain,
+    e.g., http://mydomain.com
+
+    Aliases: get_self_ref_host_url()
+
+  getSelfRefUrl()
+    Returns a url referencing the current script (without any query string).
+
+    Aliases: get_self_ref_url
+
+  getSelfRefUri()
+    Returns the current URI.
+
+    Aliases: get_self_ref_uri()
+
+  getSelfRefUrlWithQuery()
+    Returns a url referencing the current script along with any query string
+    parameters passed via a GET method.
+
+    Aliases: get_self_ref_url_with_query()
+
+  getSelfRefUrlWithParams($params, $sep)
+    Returns a url reference the current script along with the given hash of
+    parameters added onto the end of url as a query string.
+
+    If the optional $sep parameter is passed, it is used as the parameter
+    separator instead of ';', unless the URL already contains '&' chars, in
+    which case it will use '&' for the separator.
+
+    Aliases: get_self_ref_url_with_params()
+
+  getSelfRefUrlDir()
+    Returns a url referencing the directory part of the current url.
+
+    Aliases: get_self_ref_url_dir()
+
+  convertRelativeUrlWithParams($relative_url, $params, $sep)
+    Converts a relative URL to an absolute one based on the current URL,
+    then adds the parameters in the given hash $params as a query string.
+
+    If the optional $sep parameter is passed, it is used as the parameter
+    separator instead of ';', unless the URL already contains '&' chars, in
+    which case it will use '&' for the separator.
+
+    Aliases: convertRelativeUrlWithArgs(),
+    convert_relative_url_with_params(), convert_relative_url_with_args()
+
+  addParamsToUrl($url, $param_hash, $sep)
+    Takes a url and reference to a hash of parameters to be added onto the
+    url as a query string and returns a url with those parameters. It checks
+    whether or not the url already contains a query string and modifies it
+    accordingly. If you want to add a multivalued parameter, pass it as a
+    reference to an array containing all the values.
+
+    If the optional $sep parameter is passed, it is used as the parameter
+    separator instead of ';', unless the URL already contains '&' chars, in
+    which case it will use '&' for the separator.
+
+    Aliases: add_params_to_url()
+
+  getParsedCookies()
+    Parses the cookies passed to the server. Returns a hash of key/value
+    pairs representing the cookie names and values.
+
+    Aliases: get_parsed_cookies
+
+  param($name)
+    Returns the CGI parameter with name $name. If called in array context,
+    it returns an array. In scalar context, it returns an array reference
+    for multivalued fields, and a scalar for single-valued fields.
+
+  getVars($delimiter)
+    Also Vars() to be compatible with CGI.pm. Returns a reference to a tied
+    hash containing key/value pairs corresponding to each CGI parameter. For
+    multivalued fields, the value is an array ref, with each element being
+    one of the values. If you pass in a value for the delimiter, multivalued
+    fields will be returned as a string of values delimited by the delimiter
+    you passed in.
+
+    Aliases: vars(), Vars(), get_args(), args()
+
+    # Other information provided by the CGI environment
+
+  getPathInfo(), path_info(), get_path_info();
+    Returns additional virtual path information from the URL (if any) after
+    your script.
+
+  getRemoteAddr(), remote_addr(), get_remote_addr()
+    Returns the dotted decimal representation of the remote client's IP
+    address.
+
+  getRemoteHost(), remote_host(), get_remote_host()
+    Returns the name of the remote host, or its IP address if the name is
+    unavailable.
+
+  getHost(), host(), virtual_host(), get_host()
+    Returns the name of the host in the URL being accessed. This is sent as
+    the Host header by the web browser.
+
+  getReferer(), referer(), get_referer(), getReferrer(), referrer(), get_referrer()
+    Returns the referring URL.
+
+  getProtocol(), protocol(), get_protocol()
+    Returns the protocol, i.e., http or https.
+
+  getRequestMethod(), request_method(), get_request_method()
+    Returns the request method, i.e., GET, POST, HEAD, or PUT.
+
+  getContentType(), content_type(), get_content_type()
+     Returns the content type.
+
+  getPathTranslated(), path_translated(), get_path_translated()
+    Returns the physical path information if provided in the CGI
+    environment.
+
+  getQueryString(), query_string(), get_query_string()
+    Returns a query string created from the current parameters.
+
+  getHeader(@args)
+    Generates HTTP headers. Standard arguments are content_type, cookie,
+    target, expires, and charset. These should be passed as name/value
+    pairs. If only one argument is passed, it is assumed to be the
+    'content_type' argument. If no values are passed, the content type is
+    assumed to be 'text/html'. The charset defaults to ISO-8859-1. A hash
+    reference can also be passed. E.g.,
+
+     print $cgi_obj->getHeader({ content_type => 'text/html', expires => '+3d' });
+
+    The names 'content-type', and 'type' are aliases for 'content_type'. The
+    arguments may also be passed CGI.pm style with a '-' in front, e.g.
+
+     print $cgi_obj->getHeader( -content_type => 'text/html', -expires => '+3d' );
+
+    Cookies may be passed with the 'cookies' key either as a string, a hash
+    ref, or as a CGI::Cookies object, e.g.
+
+     my $cookie = { name => 'my_cookie', value => 'cookie_val' };
+     print $cgi_obj->getHeader(cookies => $cookie);
+
+    You may also pass an array of cookies, e.g.,
+
+     print $cgi_obj->getHeader(cookies => [ $cookie1, $cookie2 ]);
+
+    Aliases: header(), get_header
+
+  sendHeader(@args)
+    Like getHeader() above, except sends it. Under mod_perl, this sends the
+    header(s) via the Apache request object. In a CGI environment, this
+    prints the header(s) to STDOUT.
+
+    Aliases: send_header()
+
+  getRedirect($url)
+    Returns the header required to do a redirect. This method also accepts
+    named arguments, e.g.,
+
+     print $cgi_obj->getRedirect(url => $url, status => 302,
+                                 cookie => \%cookie_params);
+
+    You may also pass a cookies argument as in getHeader().
+
+    Aliases: redirect()
+
+  sendRedirect($url)
+    Like getRedirect(), but in a CGI environment the output is sent to
+    STDOUT, and in a mod_perl environment, the appropriate headers are set.
+    The return value is 1 for a CGI environment when successful, and
+    Apache::Constants::REDIRECT in a mod_perl environment, so you can do
+    something like
+
+     return $utils->sendRedirect($url)
+
+    n a mod_perl handler.
+
+    Aliases: send_redirect()
+
+  getLocalRedirect(), local_redirect(), get_local_redirect()
+    Like getRedirect(), except that the redirect URL is converted from
+    relative to absolute, including the host.
+
+  getCookieString(\%hash), get_cookie_string(\%hash);
+    Returns a string to pass as the value of a 'Set-Cookie' header.
+
+  getSetCookieString(\%params), getSetCookieString([ \%params1, \%params2 ])
+    Returns a string to pass as the 'Set-Cookie' header(s), including the
+    line ending(s). Also accepts a simple hash with key/value pairs.
+
+  setCookie(\%params), set_cookie(\%params);
+    Sets the cookie generated by getCookieString. That is, in a mod_perl
+    environment, it adds an outgoing header to set the cookie. In a CGI
+    environment, it prints the value of getSetCookieString to STDOUT
+    (including the end-of-line sequence).
+
+  uploadInfo($file_name)
+    Returns a reference to a hash containing the header information sent
+    along with a file upload.
+
+Apache constants under mod_perl
+    Shortcut methods are provided for returning Apache constants under
+    mod_perl. The methods figure out if they are running under mod_perl 1 or
+    2 and make the appropriate call to get the right constant back, e.g.,
+    Apache::Constants::OK() versus Apache::OK(). The methods are created on
+    the fly using AUTOLOAD. The method names are in the format apache_$name
+    where $name is the lowercased constant name, e.g., $utils->apache_ok,
+    $utils->apache_forbidden. See
+    <http://perl.apache.org/docs/1.0/api/Apache/Constants.html> for a list
+    of constants available.
+
+EXPORTS
+    You can export methods into your namespace in the usual way. All of the
+    util methods are available for export, e.g., getSelfRefUrl(),
+    addParamsToUrl(), etc. Beware, however, that these methods expect to be
+    called as methods. You can also use the tag :all_utils to import all of
+    the util methods into your namespace. This allows for incorporating
+    these methods into your class without having to inherit from CGI::Utils.
+
+ACKNOWLEDGEMENTS
+    Other people who have contributed ideas and/or code for this module:
+
+        Kevin Wilson
+
+AUTHOR
+    Don Owens <don@regexguy.com>
+
+COPYRIGHT
+    Copyright (c) 2003-2008 Don Owens
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+
+VERSION
+    0.12
+

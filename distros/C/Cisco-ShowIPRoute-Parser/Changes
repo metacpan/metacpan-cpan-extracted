@@ -1,0 +1,6 @@
+Revision history for Perl extension Cisco::ShowIPRoute::Parser.
+
+0.01  Thu May 29 15:57:12 2003
+	- original version; created by h2xs 1.21 with options
+		-AXP -n Cisco::ShowIPRoute::Parser
+

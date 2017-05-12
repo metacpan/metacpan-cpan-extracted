@@ -1,0 +1,562 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+__C__
+
+// For strlen
+#include <string.h>
+
+// For CFISH_ALLOCA_OBJ.
+#include "Clownfish/Class.h"
+
+// For CFISH_ERR_FUNC_MACRO.
+#include "Clownfish/Err.h"
+
+__END_C__
+
+/**
+ * Immutable string holding Unicode characters.
+ */
+
+public final class Clownfish::String nickname Str
+    inherits Clownfish::Obj {
+
+    const char *ptr;
+    size_t      size;
+    String     *origin;
+
+    /** Return true if the string is valid UTF-8, false otherwise.
+     */
+    public inert bool
+    utf8_valid(const char *ptr, size_t len);
+
+    /** Throws an error if the string isn't valid UTF-8.
+     */
+    public inert void
+    validate_utf8(const char *text, size_t size, const char *file, int line,
+                  const char *func);
+
+    /** Returns true if the code point qualifies as Unicode whitespace.
+     */
+    public inert bool
+    is_whitespace(int32_t code_point);
+
+    /** Encode a Unicode code point to a UTF-8 sequence.
+     *
+     * @param code_point A legal unicode code point.
+     * @param buffer Write buffer which must hold at least 4 bytes (the
+     * maximum legal length for a UTF-8 char).
+     */
+    inert uint32_t
+    encode_utf8_char(int32_t code_point, void *buffer);
+
+    /** Return a String which holds a copy of the supplied UTF-8 character
+     * data after checking for validity.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_from_utf8(const char *utf8, size_t size);
+
+    /** Return a String which holds a copy of the supplied UTF-8 character
+     * data, skipping validity checks.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_from_trusted_utf8(const char *utf8, size_t size);
+
+    /** Initialize a String which holds a copy of the supplied UTF-8 character
+     * data, skipping validity checks.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert String*
+    init_from_trusted_utf8(String *self, const char *utf8, size_t size);
+
+    /** Return a String which assumes ownership of the supplied buffer
+     * containing UTF-8 character data after checking for validity.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_steal_utf8(char *utf8, size_t size);
+
+    /** Return a String which assumes ownership of the supplied buffer
+     * containing UTF-8 character data, skipping validity checks.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_steal_trusted_utf8(char *utf8, size_t size);
+
+    /** Initialize a String which assumes ownership of the supplied buffer
+     * containing UTF-8 character data, skipping validity checks.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert String*
+    init_steal_trusted_utf8(String *self, char *utf8, size_t size);
+
+    /** Return a String which wraps an external buffer containing UTF-8
+     * character data after checking for validity.  The buffer must stay
+     * unchanged for the lifetime of the String.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_wrap_utf8(const char *utf8, size_t size);
+
+    /** Return a String which wraps an external buffer containing UTF-8
+     * character data, skipping validity checks.  The buffer must stay
+     * unchanged for the lifetime of the String.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert incremented String*
+    new_wrap_trusted_utf8(const char *utf8, size_t size);
+
+    inert incremented String*
+    init_stack_string(void *allocation, const char *utf8, size_t size);
+
+    /** Initialize a String which wraps an external buffer containing UTF-8
+     * character data after checking for validity.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public inert String*
+    init_wrap_trusted_utf8(String *self, const char *utf8, size_t size);
+
+    /** Return a String which holds a single character.
+     *
+     * @param code_point Unicode code point of the character.
+     */
+    public inert incremented String*
+    new_from_char(int32_t code_point);
+
+    /** Return a String with content expanded from a pattern and arguments
+     * conforming to the spec defined by [](CharBuf.VCatF).
+     *
+     * Note: a user-supplied `pattern` string is a security hole
+     * and must not be allowed.
+     *
+     * @param pattern A format string.
+     */
+    public inert incremented String*
+    newf(const char *pattern, ...);
+
+    void*
+    To_Host(String *self, void *vcache);
+
+    /** Return the concatenation of the String and `other`.
+     */
+    public incremented String*
+    Cat(String *self, String *other);
+
+    /** Return the concatenation of the String and the supplied UTF-8
+     * character data after checking for validity.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public incremented String*
+    Cat_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Return the concatenation of the String and the supplied UTF-8
+     * character data, skipping validity checks.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public incremented String*
+    Cat_Trusted_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Extract a 64-bit integer from a decimal string.  See [](.BaseX_To_I64)
+     * for details.
+     */
+    public int64_t
+    To_I64(String *self);
+
+    /** Extract a 64-bit integer from a variable-base stringified version.
+     * Expects an optional minus sign followed by base-x digits, stopping at
+     * any non-digit character.  Returns zero if no digits are found.  If the
+     * value exceeds the range of an `int64_t`, the result is undefined.
+     *
+     * @param base A base between 2 and 36.
+     */
+    public int64_t
+    BaseX_To_I64(String *self, uint32_t base);
+
+    /** Convert a string to a floating-point number using the C library
+     * function `strtod`.
+     */
+    public double
+    To_F64(String *self);
+
+    /** Test whether the String starts with `prefix`.
+     */
+    public bool
+    Starts_With(String *self, String *prefix);
+
+    /** Test whether the String starts with a prefix supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public bool
+    Starts_With_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Test whether the String ends with `suffix`.
+     */
+    public bool
+    Ends_With(String *self, String *suffix);
+
+    /** Test whether the String ends with a suffix supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public bool
+    Ends_With_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Test whether the String contains `substring`.
+     */
+    public bool
+    Contains(String *self, String *substring);
+
+    /** Test whether the String contains a substring supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public bool
+    Contains_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Return a [](StringIterator) pointing to the first occurrence of
+     * `substring` within the String, or [](@null) if the substring does not
+     * match.
+     */
+    public incremented nullable StringIterator*
+    Find(String *self, String *substring);
+
+    /** Return a [](StringIterator) pointing to the first occurrence of the
+     * substring within the String, or [](@null) if the substring does not
+     * match.  The substring is supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public incremented nullable StringIterator*
+    Find_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Equality test.
+     *
+     * @return true if `other` is a String with the same character data as
+     * `self`.
+     */
+    public bool
+    Equals(String *self, Obj *other);
+
+    /** Test whether the String matches the supplied UTF-8 character data.
+     */
+    public bool
+    Equals_Utf8(String *self, const char *utf8, size_t size);
+
+    /** Return the number of Unicode code points the String contains.
+     */
+    public size_t
+    Length(String *self);
+
+    /** Return the number of bytes occupied by the String's internal content.
+     */
+    public size_t
+    Get_Size(String *self);
+
+    /** Return the internal backing array for the String if its internal
+     * encoding is UTF-8.  If it is not encoded as UTF-8 throw an exception.
+     * The character data is not null-terminated.
+     */
+    public const char*
+    Get_Ptr8(String *self);
+
+    /** Return a NULL-terminated copy of the string data in UTF-8 encoding.
+     * The buffer must be freed by the caller.
+     */
+    public char*
+    To_Utf8(String *self);
+
+    /** Return a ByteBuf which holds a copy of the String.
+     */
+    public incremented ByteBuf*
+    To_ByteBuf(String *self);
+
+    public incremented String*
+    Clone(String *self);
+
+    bool
+    Is_Copy_On_IncRef(String *self);
+
+    /** Indicate whether one String is less than, equal to, or greater than
+     * another.  The Unicode code points of the Strings are compared
+     * lexicographically.  Throws an exception if `other` is not a String.
+     *
+     * @return 0 if the Strings are equal, a negative number if `self` is less
+     * than `other`, and a positive number if `self` is greater than `other`.
+     */
+    public int32_t
+    Compare_To(String *self, Obj *other);
+
+    /** Return a hash code for the string.
+     */
+    size_t
+    Hash_Sum(String *self);
+
+    /** Return a copy of the String.
+     */
+    public incremented String*
+    To_String(String *self);
+
+    /** Return a copy of the String with Unicode whitespace characters
+     * removed from both top and tail.  Whitespace is any character that has
+     * the Unicode property `White_Space`.
+     */
+    public incremented String*
+    Trim(String *self);
+
+    /** Return a copy of the String with leading Unicode whitespace
+     * removed. Whitespace is any character that has the Unicode property
+     * `White_Space`.
+     */
+    public incremented String*
+    Trim_Top(String *self);
+
+    /** Return a copy of the String with trailing Unicode whitespace
+     * removed. Whitespace is any character that has the Unicode property
+     * `White_Space`.
+     */
+    public incremented String*
+    Trim_Tail(String *self);
+
+    /** Return the Unicode code point located `tick` code points in from the
+     * top.  Return `CFISH_STR_OOB` if out of bounds.
+     */
+    public int32_t
+    Code_Point_At(String *self, size_t tick);
+
+    /** Return the Unicode code point located `tick` code points counting
+     * backwards from the end.  Return `CFISH_STR_OOB` if out of bounds.
+     */
+    public int32_t
+    Code_Point_From(String *self, size_t tick);
+
+    /** Return a new substring containing a copy of the specified range.
+     *
+     * @param offset Offset from the top, in code points.
+     * @param length The desired length of the substring, in code points.
+     */
+    public incremented String*
+    SubString(String *self, size_t offset, size_t length);
+
+    /** Return an iterator initialized to the start of the string.
+     */
+    public incremented StringIterator*
+    Top(String *self);
+
+    /** Return an iterator initialized to the end of the string.
+     */
+    public incremented StringIterator*
+    Tail(String *self);
+
+    public void
+    Destroy(String *self);
+}
+
+/**
+ * Iterate Unicode code points in a String.
+ */
+
+public final class Clownfish::StringIterator nickname StrIter
+    inherits Clownfish::Obj {
+
+    String *string;
+    size_t  byte_offset;
+
+    inert incremented StringIterator*
+    new(String *string, size_t byte_offset);
+
+    /** Return the substring between the top and tail iterators.
+     *
+     * @param top Top iterator. Use start of string if [](@null).
+     * @param tail Tail iterator. Use end of string if [](@null).
+     */
+    public inert incremented String*
+    crop(StringIterator *top, StringIterator *tail);
+
+    public incremented StringIterator*
+    Clone(StringIterator *self);
+
+    /** Assign the source string and current position of `other` to `self`.
+     */
+    public void
+    Assign(StringIterator *self, StringIterator *other);
+
+    /** Equality test.
+     *
+     * @return true if `other` is a StringIterator with the same source
+     * string and character position as `self`.
+     */
+    public bool
+    Equals(StringIterator *self, Obj *other);
+
+    /** Indicate whether one StringIterator is less than, equal to, or
+     * greater than another by comparing their character positions. Throws an
+     * exception if `other` is not a StringIterator pointing to the same
+     * source string as `self`.
+     *
+     * @return 0 if the StringIterators are equal, a negative number if `self`
+     * is less than `other`, and a positive number if `self` is greater than
+     * `other`.
+     */
+    public int32_t
+    Compare_To(StringIterator *self, Obj *other);
+
+    /** Return true if the iterator is not at the end of the string.
+     */
+    public bool
+    Has_Next(StringIterator *self);
+
+    /** Return true if the iterator is not at the start of the string.
+     */
+    public bool
+    Has_Prev(StringIterator *self);
+
+    /** Return the code point after the current position and advance the
+     * iterator. Return `CFISH_STR_OOB` at the end of the string.
+     */
+    public int32_t
+    Next(StringIterator *self);
+
+    /** Return the code point before the current position and go one step back.
+     * Return `CFISH_STR_OOB` at the start of the string.
+     */
+    public int32_t
+    Prev(StringIterator *self);
+
+    /** Skip code points.
+     *
+     * @param num The number of code points to skip.
+     * @return the number of code points actually skipped. This can be less
+     * than the requested number if the end of the string is reached.
+     */
+    public size_t
+    Advance(StringIterator *self, size_t num);
+
+    /** Skip code points backward.
+     *
+     * @param num The number of code points to skip.
+     * @return the number of code points actually skipped. This can be less
+     * than the requested number if the start of the string is reached.
+     */
+    public size_t
+    Recede(StringIterator *self, size_t num);
+
+    /** Skip whitespace.  Whitespace is any character that has the Unicode
+     * property `White_Space`.
+     *
+     * @return the number of code points skipped.
+     */
+    public size_t
+    Skip_Whitespace(StringIterator *self);
+
+    /** Skip whitespace backward.  Whitespace is any character that has the
+     * Unicode property `White_Space`.
+     *
+     * @return the number of code points skipped.
+     */
+    public size_t
+    Skip_Whitespace_Back(StringIterator *self);
+
+    /** Test whether the content after the iterator starts with `prefix`.
+     */
+    public bool
+    Starts_With(StringIterator *self, String *prefix);
+
+    /** Test whether the content after the iterator starts with a prefix
+     * supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public bool
+    Starts_With_Utf8(StringIterator *self, const char *utf8, size_t size);
+
+    /** Test whether the content before the iterator ends with `suffix`.
+     */
+    public bool
+    Ends_With(StringIterator *self, String *suffix);
+
+    /** Test whether the content before the iterator ends with a suffix
+     * supplied as raw UTF-8.
+     *
+     * @param utf8 Pointer to UTF-8 character data.
+     * @param size Size of UTF-8 character data in bytes.
+     */
+    public bool
+    Ends_With_Utf8(StringIterator *self, const char *utf8, size_t size);
+
+    public void
+    Destroy(StringIterator *self);
+}
+
+__C__
+
+#define CFISH_VALIDATE_UTF8(text, size) \
+    cfish_Str_validate_utf8(text, size, \
+                            __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+
+#define CFISH_SSTR_BLANK() \
+    cfish_Str_init_stack_string(CFISH_ALLOCA_OBJ(CFISH_STRING), "", 0)
+
+#define CFISH_SSTR_WRAP_C(ptr) \
+    cfish_Str_init_stack_string(CFISH_ALLOCA_OBJ(CFISH_STRING), ptr, \
+                                strlen(ptr))
+
+#define CFISH_SSTR_WRAP_UTF8(ptr, size) \
+    cfish_Str_init_stack_string(CFISH_ALLOCA_OBJ(CFISH_STRING), ptr, size)
+
+#define CFISH_STR_OOB       -1
+
+#ifdef CFISH_USE_SHORT_NAMES
+  #define VALIDATE_UTF8          CFISH_VALIDATE_UTF8
+  #define SSTR_BLANK             CFISH_SSTR_BLANK
+  #define SSTR_WRAP_C            CFISH_SSTR_WRAP_C
+  #define SSTR_WRAP_UTF8         CFISH_SSTR_WRAP_UTF8
+  #define STR_OOB                CFISH_STR_OOB
+#endif
+__END_C__
+
+

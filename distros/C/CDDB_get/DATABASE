@@ -1,0 +1,20 @@
+; this a the database example of Falko
+
+CREATE TABLE cds (
+  cddbid varchar(20) NOT NULL default '',
+  artist varchar(250) NOT NULL default '',
+  title varchar(250) NOT NULL default '',
+  category varchar(250) NOT NULL default '',
+  tracks varchar(250) NOT NULL default '',
+  PRIMARY KEY  (cddbid)
+);
+
+CREATE TABLE tracks (
+  cddbid varchar(20) NOT NULL default '',
+  title varchar(250) NOT NULL default '',
+  ; better for mysql: trackno tinyint(2)
+  ; better for postgres: trackno smallint
+  trackno integer NOT NULL default '0',
+  time time NOT NULL default '00:00:00'
+);
+

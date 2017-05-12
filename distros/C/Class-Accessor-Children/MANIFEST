@@ -1,0 +1,16 @@
+lib/Class/Accessor/Children.pm
+lib/Class/Accessor/Children/Fast.pm
+MANIFEST
+README
+Makefile.PL
+Changes
+make-dist.sh
+t/00_pod.t
+t/01_new.t
+t/10_accessors.t
+t/11_children.t
+t/12_error.t
+t/20_accessors_fast.t
+t/21_children_fast.t
+t/22_error_fast.t
+META.yml                                 Module meta-data (added by MakeMaker)

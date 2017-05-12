@@ -1,0 +1,13 @@
+[% FOREACH lyric = lyrics %]
+    <a href="[% c.uri_for(c.controller('Resource::Lyric').action_for('show'), [ artist.id, album.id, lyric.id ]) %]">[% lyric.name %]</a>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Lyric').action_for('move_previous'), [ artist.id, album.id, lyric.id ] ) %]">
+        <input type="submit" value="move previous">
+    </form>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Lyric').action_for('move_next'), [ artist.id, album.id, lyric.id ] ) %]">
+        <input type="submit" value="move next">
+    </form>
+    <form method="post" action="[% c.uri_for(c.controller('Resource::Lyric').action_for('move_to'), [ artist.id, album.id, lyric.id ], 4 ) %]">
+        <input type="submit" value="move to pos 4">
+    </form>
+    <br/>
+[% END %]

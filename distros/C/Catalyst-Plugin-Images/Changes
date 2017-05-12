@@ -1,0 +1,8 @@
+0.02
+    - Switch to Module::Install
+    - Require TWMC in Makefile.PL (RT#42453)
+    - Fix POD
+    - Switch from NEXT to MRO::Compat's next::method
+    
+0.01
+    - Initial release

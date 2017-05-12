@@ -1,0 +1,167 @@
+#!/usr/bin/env perl
+
+#
+# $Id: sendevent 64 2007-11-02 12:01:18Z sini $
+#
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2007 Sinisa Susnjar <sini@cpan.org>
+# See LICENSE for terms of distribution.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+=head1 NAME
+
+sendevent - A rather naive and incomplete remake of the "sendevent" tool.
+
+=head1 SYNOPSIS
+
+sendevent [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-E event | --event event>
+
+Specify the event to be sent. See man page for list of possible events.
+
+=item B<-J jobname | --job jobname>
+
+Specify the target job of this event (if any). The job name must be fully qualified,
+i.e. no wildcards may be used.
+
+=item B<-T timespec | --time timespec>
+
+Specify the start time for the event, i.e. the event will be queued and send by the system
+when the specified time is reached. Timespec should look like: 'mm/dd/yyyy HH:MM:SS'.
+
+=item B<-s status | --status status>
+
+Specify the job status for the event CHANGE_STATUS. See man page for a list of possible states.
+
+=item B<--dsn dsn>
+
+Specify the AutoSys' database dsn to connect to.
+COMPATIBILITY NOTE: this option does not exist in CA's original sendevent tool.
+
+=item B<-S server | --server server>
+
+Specify the AutoSys' database server to connect to. Either this option or the dsn option above must be given.
+Please note, that when specifying this server option, a Sybase database backend is assumed.
+COMPATIBILITY NOTE: this option does not exist in CA's original sendevent tool.
+
+=item B<-U user | --user user>
+
+Specify the database user. With an out-of-the-box AutoSys installation, the default user should work.
+COMPATIBILITY NOTE: this option does not exist in CA's original sendevent tool.
+
+=item B<-P password | --password password>
+
+Specify the database password. With an out-of-the-box AutoSys installation, the default password should work.
+COMPATIBILITY NOTE: this option does not exist in CA's original sendevent tool.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+This program will send an event a la CA's original sendevent tool.
+Please be aware that this tool does not perform the security checks like AutoSys' original sendevent,
+i.e. it allows you to send events to virtually all jobs & boxes on an AutoSys instance - regardless
+if you have been allowed to or not by the job creator.
+
+Quick overview of possible events in alphabetical order:
+
+    ALARM                  CHANGE_PRIORITY        CHANGE_STATUS
+    CHECK_HEARTBEAT        CHK_BOX_TERM           CHK_MAX_ALARM
+    CHK_N_START            CHK_RUN_WINDOW         COMMENT
+    DELETEJOB              EXTERNAL_DEPENDENCY    FORCE_STARTJOB
+    HEARTBEAT              JOB_OFF_HOLD           JOB_OFF_ICE
+    JOB_ON_HOLD            JOB_ON_ICE             KILLJOB
+    QUE_RECOVERY           REFRESH_BROKER         RESEND_EXTERNAL_STATUS
+    SEND_SIGNAL            SET_GLOBAL             STARTJOB
+    STOP_DEMON
+
+Quick overview of possible states for event CHANGE_STATUS in alphabetical order:
+
+    ACTIVATED              FAILURE                INACTIVE
+    ON_HOLD                ON_ICE                 QUE_WAIT
+    REFRESH_DEPENDENCIES   REFRESH_FILEWATCHER    RESTART
+    RUNNING                STARTING               SUCCESS
+    TERMINATED
+
+=head1 TODO
+
+The following options are not yet implemented:
+    -A Alarm, -P Event Priority, -G Global=Value,
+    -C Comment, -U (Un-SENDEVENT), -K Signal(s)
+
+=head1 AUTHOR
+
+Sinisa Susnjar <sini@cpan.org>
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use CA::AutoSys;
+use Pod::Usage;
+
+my ($jobname, $event, $status, $dsn, $eventtime, $hdl, %event_args);
+my ($server, $user, $password) = qw(AUTOSYS_DEV autosys autosys);
+
+GetOptions(	"event|E=s"		=> \$event,
+			"job|J=s"		=> \$jobname,
+			"time|T=s"		=> \$eventtime,
+			"status|s=s"	=> \$status,
+			"dsn=s"			=> \$dsn,
+			"server|S=s"	=> \$server,
+			"user|U=s"		=> \$user,
+			"password|P=s"	=> \$password,
+			"help|?"		=> sub { pod2usage(1); exit(0); },
+			"man"			=> sub { pod2usage(-verbose => 2); exit(0); } ) or pod2usage(1);
+
+if (!$event) {
+	die("No event given!\n");
+}
+
+if ($dsn) {
+	$hdl = CA::AutoSys->new(dsn => $dsn, user => $user, password => $password);
+} else {
+	$hdl = CA::AutoSys->new(server => $server, user => $user, password => $password);
+}
+
+if (defined($jobname)) { $event_args{job_name} = $jobname; }
+
+if (defined($event)) { $event_args{event} = $event; }
+
+if (defined($status)) { $event_args{status} = $status; }
+
+if (defined($eventtime)) { $event_args{eventtime} = $eventtime; }
+
+# send off the event
+my $rc = $hdl->send_event(%event_args);
+
+exit($rc == 1 ? 0 : 1);

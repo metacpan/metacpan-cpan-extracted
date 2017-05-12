@@ -1,0 +1,184 @@
+$Id: INSTALL,v 1.33 2000/01/27 18:08:36 loic Exp $
+
+The Catalog home page is http://www.senga.org/
+
+Quick start (assuming you have installed MySQL and Perl):
+---------------------------------------------------------
+          #
+          # replace /home/httpd/cgi-bin by your cgi-bin directory
+          # replace /home/httpd/html by the directory where you put your
+          #     HTML pages.
+	  #
+	  # Install using CPAN automatic installer
+	  #
+	  MYSQL_HOME=/usr IN_MYSQL_DISTRIBUTION=1 \
+	     DBI_DB=mysql DBI_DSN=dbi:mysql:mysql DBI_USER=root DBI_PASS=passpass \
+             USE_CONFIG='' HTMLDIR=/home/httpd/html/Catalog HTMLPATH=/Catalog \
+             CGIDIR=/home/httpd/cgi-bin CGIPATH=/cgi-bin \
+	     USERID=nobody \
+	     MYSQL_USER=root MYSQL_PASSWORD=passpass MYSQL_BASE=mysql \
+	     USE_DEFAULTS=1 \
+	     perl -MCPAN -e 'force install Bundle::Catalog'
+          #
+          # Read the Setup chapter in the documentation. It will 
+          # teach you how to configure catalog and create your first catalog.
+          #
+          netscape http://www.mymachine.org/Catalog/catalog_toc.html
+          #
+          # Go to URL http://www.mymachine.org/cgi-bin/Catalog?context=ccontrol_panel
+          # to get the Catalog Control Panel.
+          #
+          netscape http://www.mymachine.org/cgi-bin/Catalog?context=ccontrol_panel
+
+Requires: 
+---------
+          At the end of this file you will find scripts that will help
+          you install these components on specific plateforms. The 
+          distributions packages of all these specific versions can be 
+          found on the senga site at http://www.senga.org/download.html.
+
+          To build the software you will need:
+
+          perl5.005_02 or higher (http://www.perl.org/)
+          mysql-3.22.19a or higher (http://www.tcx.se/)
+
+	  Catalog depends on other Perl modules. You can either install them
+	  yourself or use the Bundle facility as shown in the Quick start
+	  section. Here is a complete list of the modules needed to run
+	  Catalog with minimal version number. All of them may be found on 
+	  CPAN (http://www.perl.com/CPAN/).
+
+	  DBI 1.13 - Database independent interface for Perl
+
+	  DBD::mysql 2.0410 - mysql drivers for the Perl Database Interface (DBI)
+	          found in Msql-Mysql-modules-1.2210. Example configuration is
+		  perl Makefile.PL --config --noprompt --mysql-install --nomsql-install \
+	               --nomsql1-install --mysql-incdir=${prefix}/include/mysql \
+	               --mysql-libdir=${prefix}/lib/mysql
+
+	  MD5 1.7 - Perl interface to the MD5 Message-Digest Algorithm
+
+	  CGI 2.56 - Simple Common Gateway Interface Class
+
+	  XML::Parser 2.27 - parsing XML documents
+
+	  XML::DOM 1.25 - building DOM Level 1 compliant document structures
+
+	  MIME::Base64 2.11 - base64 and a quoted-printable encoder/decoder
+
+	  Unicode::String 2.05 - String of Unicode characters
+
+	  Unicode::Map8 0.09 - Mapping table between 8-bit chars and Unicode
+
+	  Text::Query 0.07     - Query parsing and resolver framework
+
+	  Text::Query::BuildSQL 0.05 - Query implementation for SQL databases
+
+          An HTTP server (Apache for instance) running on your local machine.
+	  If you want really good performances you must build Apache with
+	  mod_perl. See the INSTALL.apache file for instructions.
+
+          To build the documentation (optional) you will need:
+
+          HTML format : texi2html-1.51a or any version handling @image
+          PS format : texi2dvi, TeX, dvips
+          Emacs info format : makeinfo-3.12 or higher
+
+Configuration:
+--------------
+
+          tar -zxvf Catalog-*.tar.gz
+
+          cd Catalog-*
+
+          perl Makefile.PL
+
+              At this point you can either answer the questions or
+                pre-define the answers using the following environment 
+                variables:
+
+	      USE_CONFIG if you already have a working configuration installed
+		         specify the directory containing the install.conf and
+	                 mysql.conf files in this variable. USE_DEFAULTS=1 is
+			 set if USE_CONFIG is set.
+              CGIDIR for the path of the directory where the cgi-bin 
+                     programs will be installed.
+	      CGIPATH for the location of the cgi-bin scripts when browsing
+	              from a navgigator. Typically if you've set CGIDIR to
+	              /home/httpd/cgi-bin this will be /cgi-bin.
+              CONFIG_DIR If not specified it will default to CGIDIR. 
+                     CONFIG_DIR is the path of the directory where the default 
+                     configuration files will be installed. Existing
+                     configuration files, if any, will be preserved. 
+                     The cgi-bin programs will only be able to find the
+                     configuration files if they have the CONFIG_DIR variable
+                     properly set in their environment.
+              HTMLDIR for the path of the HTML directory where the
+                      HTML material (doc, images...) will be installed. Note 
+		      that images in the documentation will only be included if
+	              you have texi2html version 1.51a (by default on GNU
+	              Linux RedHat 5.2, if you installed everything from 
+	              the distribution).
+	      HTMLPATH for the location of the Catalog material when browsing
+	               from a navgigator. Typically if you've set HTMLDIR to
+	               /home/httpd/html/Catalog this will be /Catalog.
+              INFODIR for the path of the info directory where the
+                      documentation will be installed.
+              USERID The user id of the HTTP daemon. The configuration files
+                     must have the same owner because the HTML interface
+                     must be able to modify them.
+	      MYSQL_HOME Directory in which MySQL is installed. For instance
+			 if you have /usr/local/bin/mysqldump then the directory
+			 is /usr/local. If you have /opt/mysql-3.21/bin/mysqldump
+			 then use /opt/mysql-3.21 as the directory.
+	      MYSQL_BASE name of the MySQL database that will be used.
+	      MYSQL_USER name of the user for authentification when connecting
+		     to the MySQL server (--user option).
+	      MYSQL_PASSWORD password of the user for authentification when
+		     connecting to the MySQL server (--password option).
+	      MYSQL_HOST host name of the machine where the MySQL server is
+		     located (--host option).
+              MYSQL_PORT TCP/IP port to use to connect to the server, if not
+		     the default (--port option).
+	      MYSQL_UNIX_PORT file name of the socket file to use when 
+	             connecting to a server on the local 
+	             machine (--socket option).
+	      DOC_HTML if set to 'yes' format documenation in HTML, if set to
+		     'no' do not format. If conversion utility is missing, skip
+		     formating anyway. Default is yes.
+	      DOC_PS if set to 'yes' format documenation in Postscript, if set 
+		     to 'no' do not format. If conversion utility is missing, 
+		     skip formating anyway. Default is no.
+	      DOC_INFO if set to 'yes' format documenation in Emacs info, if
+		     set to 'no' do not format. If conversion utility is 
+		     missing, skip formating anyway. Default is no.
+
+	      Alternatively you can hand edit the conf/install.conf and
+	      conf/mysql.conf files. The mysql.conf file contains the values
+	      associated to the environment variables starting with MYSQL_
+	      and the install.conf file contains all the others.
+
+	      When the Makefile.PL is executed, it reads the conf/install.conf
+	      and conf/mysql.conf files and re-use existing values as 
+	      defaults. An environment variable will override the corresponding
+	      value found in the files. If a value is specified using an
+	      environment variable, the interactive mode is disabled for
+	      this value. At completion the the conf/install.conf and 
+	      conf/mysql.conf files are updated with the new values.
+
+	      If the configuration contained in the conf/install.conf and 
+	      conf/mysql.conf files is correct and you simply want to
+	      execute Makefile.PL again (after a make clean, for instance)
+	      you can completely skip user interaction using the following
+
+			USE_DEFAULTS=1 perl Makefile.PL
+
+	  make 
+
+	  make test
+
+          make install
+
+Loic Dachary
+loic@senga.org
+http://www.senga.org/

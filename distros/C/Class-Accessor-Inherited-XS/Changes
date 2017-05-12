@@ -1,0 +1,124 @@
+Revision history for Class::Accessor::Inherited::XS.
+
+0.31 Tue Sep 27 00:11:42 MSK 2016
+    - fix goto &accessor under Devel::NYTProf
+    - fix overload corner cases
+    - fix &accessor style sub calls
+
+0.30 Sat May 28 21:18:49 MSK 2016
+    - fix compilation for perl 5.10
+
+0.29 Sat May 28 19:53:22 MSK 2016
+    - support for PERL_OP_PARENT builds
+    - support calling multiply accessors from a single op
+
+0.28 Mon May 16 10:27:59 MSK 2016
+    - fix recursive lazy accessors
+
+0.27 Sat Mar 12 03:10:22 MSK 2016
+    - special-case 'undef' for constructor
+
+0.26 Fri Mar  4 18:53:13 MSK 2016
+    - fix 32bit arch compilation
+
+0.25 Fri Mar  4 01:09:42 MSK 2016
+    - use callback names according to docs in custom inherited type installer
+    - CXA compability aliases
+
+0.24 Mon Feb 29 01:05:47 MSK 2016
+    - O(1) inherited accessors
+
+0.23 Mon Jan 18 02:57:36 MSK 2016
+    - add CAIXS alias
+    - implement lazy class accessors
+
+0.22 Thu Jan  7 21:11:15 MSK 2016
+    - fix compilation for older perls
+
+0.21 Thu Jan  7 20:13:46 MSK 2016
+    - readonly accessors
+    - change hash arg for class/varclass into default value
+
+0.20 Fri Dec 25 15:41:46 MSK 2015
+    - fix docs mistake
+
+0.19 Fri Dec 25 15:18:30 MSK 2015
+    - add 'object' accessor type
+    - add fast XS 'constructor'
+    - fix 'class'/'varclass' installer bugs
+
+0.18 Mon Dec 21 02:17:37 MSK 2015
+    - hijack OP_METHOD in addition to OP_METHOD_NAMED
+
+0.17 Fri Dec 18 03:21:05 MSK 2015
+    - fix coredump when accessors were called through subref
+    - optimize subref call case (for DBIx::Class)
+
+0.16 Mon Dec  7 19:09:41 MSK 2015
+    - fix coredump in call_sv(acc, G_METHOD_NAMED)
+
+0.15 Wed Dec  2 23:41:14 MSK 2015
+    - use our own OP_METHOD_NAMED to get another ~15% performance boost
+
+0.14 Tue Sep  8 00:42:01 MSK 2015
+    - fix Windows compilation
+    - export BINARY_UNSAFE constant
+    - croak on BINARY_UNSAFE platforms for binary input
+
+0.13 Fri Aug 28 17:27:37 MSK 2015
+    - fix installing accessors with \0 in names
+
+0.12 Sat Aug 22 13:15:04 MSK 2015
+    - enhanced interface for callback accessors
+    - add benchmark results for callback accessors
+
+0.11 Mon Jul  6 01:28:49 MSK 2015
+    - fix compilation on Strawberry
+    - fix compilation on FreeBSD 9.x with gcc 4.2
+
+0.10 Fri Jun 19 13:46:53 MSK 2015
+    - add class/varclass accessors
+
+0.09 Mon Jun 15 22:28:01 MSK 2015
+    - add hooks to set callback for an accessor call
+    - switch to c++ compiler
+    - add 'register_type' API
+
+0.08 Mon May 11 19:56:33 MSK 2015
+    - fix compilation on VC and some older perls
+    - more tests and docs
+
+0.07 Tue Dec 30 23:35:13 MSK 2014
+    - PL_op->op_ppaddr optimization trick
+    - %ENV kill switch
+    - update benchmark results
+    - notes about profiling
+
+0.06 Sun Dec 28 14:17:08 MSK 2014
+    - fix coredump under threaded builds, when accessor was created in parent thread
+        and then destoryed in it after child creation
+    - change internal refs accounting scheme
+
+0.05 Sat Dec 27 19:18:19 MSK 2014
+    - use newSVpvn_share to hold hash keys, thus avoiding one strcmp() in hash lookup
+    - avoid unnecessary double-fetch for own pkg when descending into hierarchy chain
+    - better errors handling
+
+0.04 Mon Dec  8 11:36:27 MSK 2014
+    - use even less memory for accessor data
+    - correct tests for 5.16.0
+
+0.03 Tue Dec  2 17:01:24 MSK 2014
+    - change compiler to be pure c
+    - save up to 3 bytes per accessor
+    - minor optimizations
+
+0.02 Sat Nov 29 23:53:35 MSK 2014 
+    - complete internal redesign
+    - 5x-12x times faster than Class::Accessor::Grouped
+    - full thread-safety
+    - utf8 accessors names support
+
+0.01  Fri Oct  9 22:52:06 2009
+    - never released to public
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title><% dist_module %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/all.css" rel="stylesheet">
+    <link href="/css/datatables.css" rel="stylesheet">
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.dataTables.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/DT_bootstrap.js"></script>
+
+    <!-- IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="[% c.uri_for('/') %]"><% dist_module %></a>
+              <p class="navbar-text pull-right">
+              [% IF c.user_exists %]
+                  <a href="[% uri('Login', 'logout') %]" class="navbar-link">Logout ([% c.user.name %])</a>
+              [% ELSE %]
+                  <a href="[% uri('Login', 'login') %]" class="navbar-link">Login</a>
+              [% END %]
+              </p>
+
+          <ul class="nav">
+              [% IF c.check_user_roles('can_manage_users') %]
+                <li><a href="[% uri('User', 'list') %]">Users</a></li>
+              [% END %]
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+        [% IF error_msg %]
+        <div class="alert alert-error">
+            <button class="close" data-dismiss="alert">&times;</button>
+            [% error_msg %]
+        </div>
+        [% END %]
+        [% IF msg %]
+        <div class="alert alert-success">
+            <button class="close" data-dismiss="alert">&times;</button>
+            [% msg %]
+        </div>
+        [% END %]
+        [% content %]
+    </div> <!-- /container -->
+
+  </body>
+</html>

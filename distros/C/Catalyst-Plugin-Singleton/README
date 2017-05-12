@@ -1,0 +1,23 @@
+NAME
+    Catalyst::Plugin::Singleton - Singleton to context
+
+SYNOPSIS
+        use Catalyst qw[Singleton];
+
+        # Retrieve a instance of context
+        my $c = MyApp->instance;
+        my $c = MyApp->context;
+
+DESCRIPTION
+    Singleton to context.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

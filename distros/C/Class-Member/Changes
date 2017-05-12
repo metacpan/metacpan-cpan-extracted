@@ -1,0 +1,20 @@
+Revision history for Perl extension Class::Member.
+
+1.6 Fri Aug  8 13:23:01 CEST 2008
+	- provide a way for the contructor to work for derived classes as well
+
+1.5  Wed Jun 25 12:25:19 CEST 2008
+	- "use 5.008_000" instead of "use 5.8.0" to silence a warning
+	- new() method added to ::HASH and ::GLOB
+
+1.2a Wed Oct  1 12:08:44 CEST 2003
+	- I forgot to mention the new files in MANIFEST
+
+1.2  Wed Oct  1 11:12:15 CEST 2003
+	- Class::Member and Class::Member::Dynamic functionality added
+
+1.1  Sat Sep 27 12:55:38 CEST 2003
+	- Carp::confess if called as class method
+
+1.0  Tue Nov 12 09:29:54 2002
+	- initial version

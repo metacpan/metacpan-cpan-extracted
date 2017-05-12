@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+testreplies.txt
+t/Chatbot-Alpha.t
+lib/Chatbot/Alpha.pm
+lib/Chatbot/Alpha/Sort.pm
+lib/Chatbot/Alpha/Syntax.pm
+lib/Chatbot/Alpha/Tutorial.pm
+META.yml                                 Module meta-data (added by MakeMaker)

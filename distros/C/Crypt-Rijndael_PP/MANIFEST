@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+Rijndael_PP.pm
+TODO
+comp.pl
+README
+t/00base.t
+t/01re_all_knb.t
+t/02rnd_hin_u_her.t
+t/03compxs.t
+t/04cbc.t
+META.yml                                 Module meta-data (added by MakeMaker)

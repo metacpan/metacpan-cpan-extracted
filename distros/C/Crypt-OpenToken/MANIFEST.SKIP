@@ -1,0 +1,6 @@
+Build
+_build/
+blib/
+\.git/
+\..*\.sw[a-z]
+^MYMETA.yml$

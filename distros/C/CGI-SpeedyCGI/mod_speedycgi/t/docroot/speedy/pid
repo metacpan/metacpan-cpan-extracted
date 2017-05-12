@@ -1,0 +1,2 @@
+#!/usr/bin/speedy
+print "Content-type: text/html\n\n$$\n";

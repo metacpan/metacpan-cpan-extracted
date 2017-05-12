@@ -1,0 +1,65 @@
+0.009 2017-04-02T19:23:37
+ - Switch to croaks so entry points are more apparent (Meredith Howard)
+ - Make string comparison work in terms of the enumeration (Meredith
+   Howard)
+
+0.008 2017-04-02T03:26:26Z
+ - Fix inflate/deflate under strict arg checks (Meredith Howard)
+ - Use metacpan url on github (Meredith Howard)
+
+0.007 2017-04-02T01:55:08Z
+ - Update for Function::Parameters 2 (Meredith Howard)
+
+0.006 2016-03-06T07:46:43Z
+ - Fix DBIC inflation. (Meredith Howard)
+
+0.005 2015-12-23T08:51:56Z
+ - Fixed broken link in the pod of package Class::Type::Enum. (Mohammad S
+   Anwar)
+
+0.004 2015-12-22T00:24:03Z
+ - Some testers seem confused about minimum version using `v1.33` (Meredith
+   Howard)
+ - Add test for case sorta like the synopsis (Meredith Howard)
+ - Add 00-load-all (Meredith Howard)
+
+0.003 2015-11-09T10:25:12Z
+ - Fix up Moo example (Meredith Howard)
+
+0.002 2015-11-09T10:15:13Z
+ - Require List::Util min 1.33 (Meredith Howard)
+ - Clarify is() doc (Meredith Howard)
+ - Add more interface checks (Meredith Howard)
+ - Drop methods that return functions. Create test_{ordinal,symbol} and
+   coerce_{ordinal,symbol,any} (Meredith Howard)
+ - Rename inflate* to inflate_symbol and inflate_ordinal (Meredith Howard)
+ - Rename extra option enum_is_ord to enum_ordinal_storage (Meredith
+   Howard)
+ - Rename to sym_to_ord and ord_to_sym; move toward better use of terms.
+   (Meredith Howard)
+ - Drop init and bits options as unnecessary, document values hashref
+   option. (Meredith Howard)
+ - Allow ->new on instances (Meredith Howard)
+
+0.001 2015-10-25T02:37:10Z
+ - Add empty Changes (Meredith Howard)
+ - add stability / feedback note to pod (Meredith Howard)
+ - Mention DBIC again (Meredith Howard)
+ - Readme updates (Meredith Howard)
+ - Fix up some links, add see-also sections (Meredith Howard)
+ - Add docs! (Meredith Howard)
+ - Support inflate from ordinal (Meredith Howard)
+ - add .gitignore (Meredith Howard)
+ - Add dist.init and weaver.ini (Meredith Howard)
+ - Switch to a good ol' hashref, as DBIC doesn't try deflating scalar refs
+   (Meredith Howard)
+ - Update readme (Meredith Howard)
+ - Add DBIx::Class::InflateColumn::ClassTypeEnum.pm (Meredith Howard)
+ - use the term 'ord' for ordinal rather than 'raw' (Meredith Howard)
+ - Add any and none (Meredith Howard)
+ - Rename to Class::Type::Enum (Meredith Howard)
+ - Drop Moo::Role and ::Parameterized, install into the caller with C::M::M
+   (Meredith Howard)
+ - Test that we can use the role more than once (Meredith Howard)
+ - Add code, test, and a readme note (Meredith Howard)
+ - init (Meredith Howard)

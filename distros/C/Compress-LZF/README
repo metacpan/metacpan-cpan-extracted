@@ -1,0 +1,116 @@
+NAME
+    Compress::LZF - extremely light-weight Lempel-Ziv-Free compression
+
+SYNOPSIS
+       # import compress/decompress functions
+       use Compress::LZF;
+       # the same as above
+       use Compress::LZF ':compress';
+
+       $compressed = compress $uncompressed_data;
+       $original_data = decompress $compressed;
+
+       # import sfreeze, sfreeze_cref and sfreeze_c
+       use Compress::LZF ':freeze';
+
+       $serialized = sfreeze_c [4,5,6];
+       $original_data = sthaw $serialized;
+
+DESCRIPTION
+    LZF is an extremely fast (not that much slower than a pure memcpy)
+    compression algorithm. It is ideal for applications where you want to
+    save *some* space but not at the cost of speed. It is ideal for
+    repetitive data as well. The module is self-contained and very small (no
+    large library to be pulled in). It is also free, so there should be no
+    problems incorporating this module into commercial programs.
+
+    I have no idea wether any patents in any countries apply to this
+    algorithm, but at the moment it is believed that it is free from any
+    patents.
+
+FUNCTIONS
+    $compressed = compress $uncompressed
+    $compressed = compress_best $uncompressed
+        Try to compress the given string as quickly and as much as possible.
+        In the worst case, the string can enlarge by 1 byte, but that should
+        be the absolute exception. You can expect a 45% compression ratio on
+        large, binary strings.
+
+        The "compress_best" function uses a different algorithm that is
+        slower but usually achieves better compression.
+
+    $decompressed = decompress $compressed
+        Uncompress the string (compressed by "compress") and return the
+        original data. Decompression errors can result in either broken data
+        (there is no checksum kept) or a runtime error.
+
+    $serialized = sfreeze $value (simplified freeze)
+    $serialized = sfreeze_best $value
+        Often there is the need to serialize data into a string. This
+        function does that, by using the Storable module. It does the
+        following transforms:
+
+          undef (the perl undefined value)
+             => a special cookie (undef'ness is being preserved)
+          IV, NV, PV (i.e. a _plain_ perl scalar):
+             => stays as is when it contains normal text/numbers
+             => gets serialized into a string
+          RV, undef, other funny objects (magical ones for example):
+             => data structure is freeze'd into a string.
+
+        That is, it tries to leave "normal", human-readable data untouched
+        but still serializes complex data structures into strings. The idea
+        is to keep readability as high as possible, and in cases readability
+        can't be helped anyways, it tries to compress the string.
+
+        The "sfreeze" functions will enlarge the original data one byte at
+        most and will only load the Storable method when neccessary.
+
+        The "sfreeze_best" function uses a different algorithm that is
+        slower but usually achieves better compression.
+
+    $serialized = sfreeze_c $value (sfreeze and compress)
+    $serialized = sfreeze_c_best $value
+        Similar to "sfreeze", but always tries to "c"ompress the resulting
+        string. This still leaves most small objects (most numbers)
+        untouched.
+
+        The "sfreeze_c" function uses a different algorithm that is slower
+        but usually achieves better compression.
+
+    $serialized = sfreeze_cr $value (sfreeze and compress references)
+    $serialized = sfreeze_cr_best $value
+        Similar to "sfreeze", but tries to "c"ompress the resulting string
+        unless it's a "simple" string. References for example are not
+        "simple" and as such are being compressed.
+
+        The "sfreeze_cr_best" function uses a different algorithm that is
+        slower but usually achieves better compression.
+
+    $original_data = sthaw $serialized
+        Recreate the original object from it's serialized representation.
+        This function automatically detects all the different sfreeze
+        formats.
+
+    Compress::LZF::set_serializer $package, $freeze, $thaw
+        Set the serialize module and functions to use. The default is
+        "Storable", "Storable::net_mstore" and "Storable::mretrieve", which
+        should be fine for most purposes.
+
+SUPPORT FOR THE PERL MULTICORE SPECIFICATION
+    This module supports the perl multicore specification
+    (<http://perlmulticore.schmorp.de/>) for all compression (> 2000 octets)
+    and decompression (> 4000 octets) functions.
+
+SEE ALSO
+    Other Compress::* modules, especially Compress::LZV1 (an older, less
+    speedy module that guarentees only 1 byte overhead worst case) and
+    Compress::Zlib.
+
+    http://liblzf.plan9.de/
+
+AUTHOR
+    This perl extension and the underlying liblzf were written by Marc
+    Lehmann <schmorp@schmorp.de> (See also http://liblzf.plan9.de/).
+
+BUGS

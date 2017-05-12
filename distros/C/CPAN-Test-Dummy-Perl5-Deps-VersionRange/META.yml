@@ -1,0 +1,31 @@
+---
+abstract: 'Dummy package that has version range in prereqs'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Test-Dummy-Perl5-Deps-VersionRange
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Try::Tiny: '>= 0.12, != 0.14'
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange/issues
+  homepage: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange
+  repository: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange.git
+version: 0.01

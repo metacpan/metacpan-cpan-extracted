@@ -1,0 +1,10 @@
+In order to run the tests you need a working mysql server running with
+permissions to create and delete tables.
+
+The connection information is taken from the following environment
+variables which you can set to control this behaviour:
+
+dbname:   ENV{DBD_MYSQL_DBNAME}, or default to 'test'
+user:     ENV{DBD_MYSQL_USER},   or default to ''
+password: ENV{DBD_MYSQL_PASSWD}, or default to ''
+table:    ENV{DBD_MYSQL_TABLE},  or default to 'tbcdbitest'

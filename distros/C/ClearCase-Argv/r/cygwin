@@ -1,0 +1,84 @@
+# -*- cperl -*-
+use strict;
+use Benchmark;
+use Cwd;
+exit 0 unless $^O eq 'cygwin';
+
+use Test::More tests => 11;
+select(STDERR); $| = 1; select(STDOUT); $| = 1;
+use ClearCase::Argv qw(chdir);
+use File::Temp qw(tempfile);
+use vars qw($out @out);
+
+ClearCase::Argv->summary;      # start keeping stats
+ClearCase::Argv->ipc(1);
+my $ct = ClearCase::Argv->new({autochomp=>1});
+# 1
+my ($csfh, $tmpcs) = tempfile('/tmp/XXXX', SUFFIX => '.cs');
+$ct->argv(q(setcs), $tmpcs); #Do not run!
+$ct->_cvt_input_cw();
+my $cygpfx = (split/ +/,(`df /tmp`)[1])[0];
+ok ${$ct->{AV_ARGS}}[0] =~ /^${cygpfx}/,
+  'Input with rooted path, outside a vob';
+unlink $tmpcs;
+# 2
+SKIP: {
+  skip "Requires more thought", 2;
+$out = q(des -s .@@\main\1 \n) . "\n";
+$ct->unixpath($out);
+chomp $out;
+ok $out eq 'des -s .@@/main/1 \n', 'Output: \'s in version, not in \n';
+# 3
+@out = (q(des -s .@@\LB \n) . "\n", q(des -s aa\bb\cc \n) . "\n");
+$ct->unixpath(@out);
+chomp @out;
+ok (($out[0] eq 'des -s .@@/LB \n' and $out[1] eq 'des -s aa/bb/cc \n'),
+    'Same thing in list');
+}
+#4
+$out = "aaa\r\n";
+$ct->unixpath($out);
+chomp $out;
+ok $out =~ /\w$/, 'Output: \r removed';
+#5
+$out = q(des -s o:\aa\bb@@\main\br\2) . "\n";
+$ct->unixpath($out);
+chomp $out;
+ok $out eq 'des -s /cygdrive/o/aa/bb@@/main/br/2',
+  'Output: drive changed into /cygdrive path';
+#6
+@out = (q(o:\aa\bb@@\main\1) . "\n",
+	q(o:\aa\bb@@\main\1) . "\n");
+$ct->unixpath(@out);
+chomp @out;
+ok(($out[0] eq '/cygdrive/o/aa/bb@@/main/1' and
+      $out[1] eq '/cygdrive/o/aa/bb@@/main/1'), 'Output: /cygdrive in list');
+#7
+$out = q(Marc's comment);
+$ct->unixpath($out);
+chomp $out;
+ok $out eq q(Marc's comment), 'Preserved string with one single quote';
+#8
+$out = q(<  if ($ele =~ /\.demo"/i) {); #from diff
+$ct->unixpath($out);
+chomp $out;
+ok $out eq q(<  if ($ele =~ /\.demo"/i) {),
+  'Preserved string with one double quote';
+#9
+$out = q(> 	ccfiles="$(CCFILES)";\\); #from diff
+$ct->unixpath($out);
+chomp $out;
+ok $out eq q(> 	ccfiles="$(CCFILES)";\\),
+  'Preserved string ending in backslash';
+#10
+my @args = qw(-out /tmp/cw -nc foo);
+$ct->_cw_map(@args);
+ok $args[1] =~ "^$cygpfx",
+  'Converted -out input argument: non-existing path outside vobs';
+#11
+my $vdir = cwd;
+$out = $ct->argv(qw(des -s), "vob:$vdir")->stderr(0)->qx;
+ok $out, 'Converted in-vob full path';
+
+print STDERR "\n", ClearCase::Argv->summary;   # print out the stats we kept
+# only for ClearCase commands! None used so far in this test...

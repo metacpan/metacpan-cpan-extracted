@@ -1,0 +1,31 @@
+---
+abstract: 'Catalyst model for the Akismet anti-spam protocol'
+author:
+  - 'Marcus Ramberg <mramberg@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-Akismet
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Catalyst::Component::InstancePerContext: 0.001000
+  Catalyst::Runtime: 5.70
+  Class::C3: 0.20
+  Moose: 0
+  Net::Akismet::Protocol: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Model-Akismet/
+version: 0.04

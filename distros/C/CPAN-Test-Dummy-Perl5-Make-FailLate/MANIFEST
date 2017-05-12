@@ -1,0 +1,13 @@
+Build.PL
+Changes
+Die.PL
+lib/CPAN/Test/Dummy/Perl5/Make/FailLate.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/pass.t
+xt/criticrc
+xt/perl-critic.t
+xt/pod-coverage.t
+xt/pod.t

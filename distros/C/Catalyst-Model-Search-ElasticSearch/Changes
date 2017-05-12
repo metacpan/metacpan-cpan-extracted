@@ -1,0 +1,151 @@
+==================================================
+Changes from 2013-09-12 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 1.142550 at 2014-09-12 14:59:17 +0000
+---------------------------------------------
+
+  Change: 3e8572f8c1ef3cc8c64afa75b09122cd1780d106
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-12 16:48:05 +0000
+
+    Add MetaJSON plugin to create a META.json file 
+
+  Change: c9dcc98d5998857ce2439f8c8a148b7f3451dada
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-12 16:46:56 +0000
+
+    Add two release plugins to create and execute Pod tests 
+
+  Change: c37a6804791ec7c3b66ae9d09c5847c75c6c3ceb
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-12 14:19:21 +0000
+
+    Add Git::Tag plugin to dist.ini
+
+    This automates tagging when doing a release. 
+
+  Change: dabe4278848864dfca63cd4010581bef360d793e
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-12 16:10:10 +0000
+
+    Use https:// for homepage, git:// for repository.url
+
+    This avoids a redirect and might enable the 'Repository' menu item on
+    MetaCPAN. 
+
+  Change: 3da830851869edd79cc1dca78c7df0d90980eca9
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-12 16:02:55 +0000
+
+    Pod improvements, add PodWeaver plug-in to dist.ini
+
+    Add more items to SEE ALSO section and remove NAME section which is
+    now handled by PodWeaver (which also adds a COPYRIGHT and AUTHORS
+    section to the module on build). 
+
+  Change: 2ebad23a2c25bf6b9ff75d8976238a7ddc0b5cf8
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-09 22:40:28 +0000
+
+    Add brackets around version in tag_regexp of ChangelogFromGit plugin
+
+    This avoids empty version strings in the generated Changes file. 
+
+  Change: 4ce593f9752e9c2a299331da3a3ee20a6e170812
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-09 20:14:12 +0000
+
+    Remove UploadToCPAN plugin
+
+    It's already part of Dist::Zilla::PluginBundle::Basic, which results
+    in two upload attempts to CPAN where the second one fails. 
+
+---------------------------------------------
+version 1.142520 at 2014-09-09 19:48:38 +0000
+---------------------------------------------
+
+  Change: 2ca9ac55e7dd55bf7d17debb875b737acd1604ff
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-09 19:48:38 +0000
+
+    Add myself to author list
+
+    I bear the blame for some potentially breaking changes and bugs
+    introduced during the migration to Search::Elasticsearch, and this
+    adds a hint to the metadata about this. 
+
+  Change: 4bc0974d11d2de2b6a46dc4680d9a45365d88f97
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-09-09 19:47:48 +0000
+
+    Add empty line after package declaration
+
+    This avoids a warning emitted by newer versions of the PkgVersion
+    plugin. 
+
+  Change: ef22d8594675fc28bfbc63e39de0f6f1f5df1746
+  Author: Manfred Stock <ms-gh@stradax.net>
+  Date : 2014-09-09 21:36:31 +0000
+
+    Merge pull request #1 from
+    mstock/feature/search-elasticsearch-migration
+
+    Use Search::Elasticsearch instead of deprecated Elasticsearch 
+
+  Change: fd413b4e1ab50f02336b26da3ee1154f31e23bea
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-08-31 16:33:23 +0000
+
+    Rename 'servers' to 'nodes' for consistency with
+    Search::Elasticsearch
+
+    Also add some code to the BUILDARGS wrapper which emits a warning and
+    copies the 'servers' parameter to the 'nodes' parameter to stay
+    backwards compatible (as long as nobody used the 'servers' accessor).
+    As this affects the model object construction, add a few tests for
+    the configuration handling, too. 
+
+  Change: f6d5c5577719f8c8d1a1740d77a1d6f8a80b97a6
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-08-29 19:47:37 +0000
+
+    Adapt pod to the change to Search::Elasticsearch 
+
+  Change: 04e599fe41ed84ae5289f88fdd4fc59c35cd8b8f
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2014-08-29 19:47:31 +0000
+
+    Use Search::Elasticsearch instead of Elasticsearch, adapt code and
+    tests
+
+    Elasticsearch is deprecated since 2014-03-05, and
+    Search::Elasticsearch replaces it. There were also some API changes
+    which required changes to the code and tests. 
+
+---------------------------------------------
+version 1.140560 at 2014-02-25 22:56:13 +0000
+---------------------------------------------
+
+  Change: a757c79d65e4d1ce42721251e8a2fdf28e412a87
+  Author: Devin Austin <devin.austin@gmail.com>
+  Date : 2014-02-25 15:56:13 +0000
+
+    ElasticSearch->Elasticsearch, updated deps, updated .gitiginore 
+
+  Change: 01d7e70385b20bb4bd2524c8fe33849f19d37995
+  Author: Devin Austin <devin.austin@gmail.com>
+  Date : 2012-05-09 11:24:02 +0000
+
+    added a few more search methods to delegate to 
+
+  Change: 1d122a5772a5c3efbb15c6c86a7c78b4cf23db14
+  Author: Devin Austin <dhoss@cpan.org>
+  Date : 2012-01-20 14:23:56 +0000
+
+    stop gap to get tests to stop failing 
+
+================================================
+Plus 2 releases after 2013-09-12 00:00:00 +0000.
+================================================

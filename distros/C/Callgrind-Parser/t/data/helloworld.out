@@ -1,0 +1,15 @@
+version: 1
+creator: xdebug 2.2.7
+cmd: /var/www/html/wordpress/output.php
+part: 1
+positions: line
+
+events: Time
+
+fl=/var/www/html/wordpress/output.php
+fn={main}
+
+summary: 13
+
+1 13
+

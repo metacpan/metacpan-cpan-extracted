@@ -1,0 +1,13 @@
+Revision history for Perl extension Catalyst::Plugin::CGI::Untaint.
+
+0.02  Sat Apr 29 13:01:56 BST 2006
+    Initial version for CPAN
+
+0.03  Mon Nov 06 18:32:00 UTC 2006
+    Remove annoying debug output
+
+0.04  Thu Nov 30 15:00:00 UTC 2006
+    Fixes around error reporting.
+
+0.05  Mon Dec 04 12:00:00 UTC 2006
+    Fix version number.

@@ -1,0 +1,12 @@
+NAME
+    Config::Natural - Module that can read easy-to-use configuration files
+
+DESCRIPTION
+    You can use this module to read generic configuration files based 
+    on a one key-value pair per line. It has very few constraints on 
+    the data and has support for multi-lines values. It also supports 
+    nested lists. 
+
+    Its object oriented API is compatible with modules like CGI or 
+    HTML::Template, and can be safely associate()d with this last one.
+

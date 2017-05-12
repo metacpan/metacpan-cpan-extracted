@@ -1,0 +1,68 @@
+Revision history for Catmandu-Store-ElasticSearch
+
+0.0509  2017-03-28 10:11:49 CEST
+  - escape spaces in query string terms, remove quoting
+
+0.0508  2017-03-23 14:22:20 CET
+  - use Catmandu's new CQLSearchable role
+  - support JSON encoded sort param
+
+0.0507  2017-03-10 14:06:16 CET
+  - Elasticsearch 5.0 iteration compatibility
+
+0.0506  2017-02-23 09:53:51 CET
+  - more pod
+
+0.0505  2017-02-16 15:55:34 CET
+  - correctly quote query string terms
+
+0.0504  2017-01-03 13:35:26 CET
+  - support escaping of special CQL characters
+
+0.0503  2016-12-20 11:38:16 CET
+  - fuzzy CQL queries are now analyzed
+
+0.0502  2016-12-20 11:32:10 CET
+  - fuzzy CQL queries are now analyzed
+
+0.0501  2016-08-23 13:33:19 CEST
+  - minimal pod for all packages
+
+0.05  2016-05-26 11:11:57 CEST
+  - Elasticsearch 2.0 compatibility (if you use a custom key_prefix or id_key)
+  - add the Catmandu::Droppable role to the store and bag
+
+0.04_01  2016-03-15 11:57:49 CET
+  - Elasticsearch 2.0 compatibility (this is only possible by field renaming
+    and needs reindexing)
+  - add the Catmandu::Droppable role to the store and bag
+
+0.0306  2016-01-12 11:21:12 CET
+  - drop support
+
+0.0305  2015-10-15 13:24:08 CEST
+  - fix on_error bug
+
+0.0304  2015-02-06 12:10:05 CET
+  - revert to the Catmandu::Store::ElasticSearch name to avoid
+    installation troubles
+
+0.0303  2015-02-02 11:17:35 CET
+  - [more of nothing]
+
+0.0302  2015-02-02 10:57:13 CET
+  - [nothing]
+
+0.0301  2014-11-20 11:01:09 CET
+  - fix typo
+
+0.03  2014-11-17 10:23:11 CET
+  - fix get missing doc
+
+0.02  2014-11-14 17:17:54 CET
+  - fix error handler bug
+
+0.01  2014-11-06 10:26:12 CET
+  - Continue development from Catmandu::Store::ElasticSearch with the
+    official Search::Elasticsearch client
+

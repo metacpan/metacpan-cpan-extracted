@@ -1,0 +1,16 @@
+[% WRAPPER page.tt %]
+
+<h1>Sample HTML::FormFu Application</h1>
+
+<p>Available functionality:</p>
+
+<ul>
+
+	<li><a href="[% c.uri_for(c.controller('Book').action_for('list')) %]">List books</a></li>
+	<li><a href="[% c.uri_for(c.controller('Book').action_for('create')) %]">Create a new book</a></li>
+	<li><a href="[% c.uri_for(c.controller('Author').action_for('list')) %]">List authors</a></li>
+	<li><a href="[% c.uri_for(c.controller('Author').action_for('create')) %]">Create a new author</a></li>
+
+</ul>
+
+[% END %]

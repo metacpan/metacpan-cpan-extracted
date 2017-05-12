@@ -1,0 +1,23 @@
+.cvsignore
+Build.PL
+Changes
+lib/CGI/Application/Plugin/Authentication/Driver/DBIC.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+META.yml			# Will be created by "make dist"
+README
+t/00-signature.t
+t/01-load.t
+t/authenticate.t
+t/authenticate_crypt.t
+t/authenticate_md5.t
+t/lib/TestAppAuthcrypt.pm
+t/lib/TestAppAuthenticate.pm
+t/lib/TestAppAuthMD5.pm
+t/lib/TestAppAuthPlain.pm
+t/lib/TestDB.pm
+t/lib/TestDB/Users.pm
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

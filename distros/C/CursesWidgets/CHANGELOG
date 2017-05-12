@@ -1,0 +1,92 @@
+----------------------------
+revision 1.997  locked by: corliss;
+date: 2002/11/14 01:30:19;  author: corliss;  state: Exp;  lines: +34 -7
+--POD fixes
+--Compatibility fix for curses without attr_get/attr_set functions
+--Introduction of the multi-column list box
+ListBox:
+--Fixed VALUE initialisation bug when when in multi-select mode
+--Fixed cursor position bug for large jumps down the last (past the
+  viewable window)
+--Changed arrow placement to go by window bounds to make inherited
+  behaviour more predictable
+--Added printable character navigation (thanks to Eric Lenio)
+Menu:
+--Checking for defined code reference before attempting to execute
+TextMemo:
+--Changed arrow placement to go by window bounds to make inherited
+  behaviour more predictable
+----------------------------
+revision 1.996  locked by: corliss;
+date: 2002/11/03 23:25:01;  author: corliss;  state: Exp;  lines: +450 -75
+--Added test_colour function
+--Added DEFAULTFG and DEFAULTBG scalars
+--Removed hard coded black:white colour pair, now detecting
+  actual colours
+--select_colour now correctly applies terminal default bg colour
+  rather than black
+--select_colour now accepts any case of colour strings
+--_conf method now applies terminal defaults to all standard
+  colour keys
+--draw method is now a standard handler for all widgets,
+  content printing is now done in _content and _cursor
+--Border and captions are handled by default in Widgets.pm now,
+  with _border and _caption
+--Content is now drawn in it's own private derived window,
+  removing any need to adjust coordinates for a border
+--Added _geometry, _cgeometry, and _canvas methods
+--Added _save and _restore to save the window default colours and
+  attributes
+--Fixed a few bugs in how textwrap handled and returned trailing
+  newlines
+--Changed LENGTH attribute to COLUMNS in applicable widgets
+--Removed touchwin calls for more efficient refresh
+--Newlines no longer count as a character space in textwrap
+All Widgets:
+--Removed undef colour keys
+--Reworked to work with new Widgets.pm internals
+Calendar:
+--Added header colour selection support
+--VALUE now holds the date the cursor is on in the current calendar
+ComboBox:
+--Fixed bug to allow a user not to select something from the list
+ListBox:
+--Entire widget is now underlined correctly in non-borderd mode
+--VALUE now holds selected items instead of SELECTED
+TextField & TextMemo:
+--Fixed underline mode to correctly underline entire field, instead
+  of just text
+--Added regex to accept only printable characters as part of the value
+--Fixed bugs in cursor placement and scrolling
+----------------------------
+revision 1.995	locked by: corliss;
+date: 2002/10/22 18:00:23;  author: corliss;  
+--Added Menu and Label widgets
+--Auto-applying the list length based on list entries was getting lost
+  at times in the ComboBox.  Fixed.
+--Popup wouldn't show up in the right location on combos on newwins that
+  didn't start at 0,0.  Fixed.
+--VALUE in ListBox wasn't getting updated.  Fixed.
+----------------------------
+revision 1.994
+date: 2002/10/22 17:56:08;  author: corliss; 
+--Added shift+tab support for execute method
+--Pod updates
+----------------------------
+revision 1.993
+date: 2002/10/16 06:05:04;  author: corliss;
+--Fix for empty lines in textwrap
+--Changed _input to input_key
+--Various style changes
+--Added callback capabilities for year/month/day changes in Calendar
+----------------------------
+revision 1.100
+date: 2001/12/10 10:56:20;  author: corliss;
+--Documentation updates
+--Using Carp
+--Fixed bug that wasn't getting all of the field values in getField
+----------------------------
+revision 1.99
+date: 2001/12/05 09:52:40;  author: corliss;
+--Initial revision of new OO class
+=============================================================================

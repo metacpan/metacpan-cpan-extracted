@@ -1,0 +1,19 @@
+0.3.0  2015-07-01 12:19:40 CEST
+    - additional option 'header' 
+    - fixed and extended documentation
+    - fixed dependencies
+
+0.2.1  2014-07-16 10:23:56 CEST
+    - added support of JSON Table Schema
+
+0.2.0  2014-07-11 10:20:47 CEST
+    - moved core parts to Text::MarkdownTable, renamed 
+
+0.1.2  2014-06-25 11:23:48 CEST
+    - better align with Catmandu::Exporter::CSV
+
+0.1.1  2014-06-18 12:40:42 CEST
+    - support fixed column widths and truncation
+
+0.1.0  2014-06-15 10:39:39 CEST
+    - inital release

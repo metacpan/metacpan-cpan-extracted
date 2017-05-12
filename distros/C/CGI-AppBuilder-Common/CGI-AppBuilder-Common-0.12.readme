@@ -1,0 +1,117 @@
+NAME
+    CGI::AppBuilder::Common - Create or display Task froms
+
+SYNOPSIS
+      use CGI::AppBuilder::Common;
+
+      my $sec = CGI::AppBuilder::Common->new();
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  cc_andwhere ($str,$obj,$typ,$esc)
+    Input variables:
+
+      $str  - string containing object pattern
+      $obj  - object name such as column name
+      $typ  - type: where, and or andnot
+      $esc  - where to escape the character
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  new_form ($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History: mm/dd/yyyy (developer) - description
+
+      03/28/2011 (htu) - added $add_check, $f_ir, $f_ip, and $add_test
+      04/02/2012 (htu) - added $f_if in new_form
+      07/22/2013 (htu) - added id for <tr> and JS:<js_code> type
+
+  disp_task_form($q,$ar,$txt)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+            pid             : project id such as ckpt, owb, dba, etc.
+            task            : task name required such as task1,task2,etc.
+            target(sel_sn1) : select one (DB/server name) defining sid
+            args(sel_sn2)   : select two (Arguments)
+            task_fn         : task file name containing all the tasks defined
+            svr_conn        : host/server connection info
+            db_conn         : db connection info for each target/server
+            task_conn       : special connection for tasks. 
+                              It overwrites db_conn for the task
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: $pr will contain the parameters adn output from running the
+    PL/SQL.
+
+  set_args ($ar)
+    Input variables:
+
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+HISTORY
+    *   Version 0.10
+
+        This version extracted from jp2.pl on 09/08/2010.
+
+    *   Version 0.20
+
+          09/21/2010 (htu): start this PM
+          10/16/2010 (htu): added get_jobid and get_hjobid
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2009 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 433:
+        You forgot a '=back' before '=head1'
+

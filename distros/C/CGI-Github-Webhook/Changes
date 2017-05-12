@@ -1,0 +1,43 @@
+Revision history for CGI-Github-Webhook
+
+0.06    2016-07-21 17:32:23+0200
+        Enforce autoflush inside CGI::Github::Webhook::run() to avoid
+        race condition. Fixes #2. Thanks to Slaven Rezić for testing!
+
+0.05    2016-07-01 22:12:23+0200
+        Add ugly hack to dummy CGI script to be executed with the
+        correct perl binary. Hopefully fixes #1 and most test failures
+        with CPAN testers.
+
+0.04    2016-06-09 02:12:57+0200
+        Use CGI::Test for the test suite.
+
+        Always use "sub { … }" around default values. (Needed to
+        support Moo ≤ 1.000008.)
+
+        Fix isa test for log: The log doesn't need to exist in
+        advance, but the directory it will be in needs to exist.
+
+        Fix "Use of uninitialized value in subroutine entry" when no
+        payload is passed.
+
+        Sanitize JSON decoding error message so it can be used inside
+        an JSON string.
+
+        Add more tests.
+
+0.03    2016-01-13 00:43:48+0100
+        Skip t/basic-functionality.t under dos-ish operating systems
+        as it contains Bourne shell code.
+
+        Add Shields.io based passed/failed/errored badges and hooks to
+        put the according one into a deployment directory.
+
+        Also verify a failed authentication case in t/methods.t.
+
+0.02    2015-01-11 10:13:35+0100
+        Fix test suite when being run with a perl interpeter not in
+        $PATH. Thanks Slaven Rezić (SREZIC)!
+
+0.01    2015-01-11 02:43:36+0100
+        First published version, released to an unsuspecting Github.

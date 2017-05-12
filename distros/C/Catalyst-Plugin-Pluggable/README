@@ -1,0 +1,31 @@
+NAME
+    Catalyst::Plugin::Pluggable - Plugin for Pluggable Catalyst applications
+
+SYNOPSIS
+        # use it
+        use Catalyst qw/Pluggable/;
+
+        $c->forward_all('do_stuff');
+
+DESCRIPTION
+    Pluggable Catalyst applications.
+
+  METHODS
+   $c->forward_all($action,[$argsref $sortref])
+        Like C<forward>, but forwards to all actions with the same name in the
+        whole application, ordered by class name by default.
+        The optional $sortref parameter allows you to pass a code reference
+        to a function that will be used in the sort function. The default
+        here is { $a->{class} cmp $b->{class} }
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Helper
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

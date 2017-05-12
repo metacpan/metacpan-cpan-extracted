@@ -1,0 +1,14 @@
+single_hash_node
+{
+    foo    bar baz
+}
+
+repeating_hash_node
+{
+    foo    bar
+}
+
+repeating_hash_node
+{
+    baz    etc
+}

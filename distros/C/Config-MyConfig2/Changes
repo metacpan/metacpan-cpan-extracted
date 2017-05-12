@@ -1,0 +1,14 @@
+Revision history for MyConfig2
+2.20	2015-01-26
+	Fixed a bug, causing invalid values of keywords not to generate a syntax error
+2.19	2013-06-18
+	Some useful enhancements
+2.18	2013-05-31
+        Couple of bugfixes
+2.17    2013-05-24
+        Bugfix in the method GetGlobalValue
+2.16    2013-05-20
+        Some minor bugfixes and typos in the POD
+2.15    2013-05-18
+        First release of this module for CPAN
+

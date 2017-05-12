@@ -1,0 +1,17 @@
+[%# this page lists all the nodes in the site, along with their contents.
+    Yes, this is probably a really silly thing to do. Fortunately, it's
+    broken at the moment.
+-%]
+
+[%- INCLUDE header.tt node_name = "All Nodes" %]
+
+<h1>All Nodes</h1>
+
+[% FOREACH node = nodes %]
+  <div class="node">
+    <h2><a href="[% node.url %]">[% node.name %]</a></h2>
+    [% node.formatted_content %]
+  </div>
+[% END %]
+
+[% INCLUDE footer.tt %]

@@ -1,0 +1,36 @@
+---
+abstract: 'flatten cpan module requirements without install'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Flatten
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CPAN::Meta::YAML: '0'
+  HTTP::Tiny: '0'
+  Module::CoreList: '0'
+  parent: '0'
+  perl: '5.008005'
+  version: '0'
+resources:
+  bugtracker: https://github.com/skaji/CPAN-Flatten/issues
+  homepage: https://github.com/skaji/CPAN-Flatten
+  repository: https://github.com/skaji/CPAN-Flatten.git
+version: '0.01'
+x_static_install: '1'

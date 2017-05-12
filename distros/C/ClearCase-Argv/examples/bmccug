@@ -1,0 +1,25 @@
+use ClearCase::Argv qw(ctsystem ctqx);
+use Argv qw(qv);
+
+ClearCase::Argv->attropts;
+
+#ClearCase::Argv->autochomp(1);
+
+# Use the vanilla qv() for a non-cleartool operation. Perl doesn't
+# allow the builtin qx() operator to be overridden so we must use qv().
+my $year = qv(qw(date +%Y));
+print "The year is $year\n";
+
+# Use the ClearCase::Argv::system for a 'cleartool pwv'.
+ctsystem('pwv');
+
+# Same, but send output to stderr.
+ctsystem({stdout=>2}, 'pwv');
+
+# Show how to use ctqx() to capture stderr and not stdout,
+# in a way that will work on UNIX or Windows.
+my @errmsgs = ctqx({stdout=>0, stderr=>1}, 'ls', [qw(-d -s)], qw(. nosuchfile));
+print "==@errmsgs==\n";
+
+my @errmsgs = ClearCase::Argv->ls({stdout=>0, stderr=>1}, [qw(-d -s)], qw(. nosuchfile))->qx;
+print "==@errmsgs==\n";

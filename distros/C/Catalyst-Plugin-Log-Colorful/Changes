@@ -1,0 +1,29 @@
+Revision history for Catalyst-Plugin-Log-Colorful
+
+0.15    2009-05-11/00:08
+        - added require modules to Makefile.PL
+
+0.14    2009-05-07/16:55
+        - migrated to Catalyst 5.8.x
+        - changed to Module::Install
+
+0.13    2008-10-17/22:30
+        - #40124 fix typo.
+
+0.12    2008-04-04/21:12
+        - fix POD
+
+0.11    2008-03-30/22:06
+        - $c->log->color() is now backward compability
+        - debug,info,warn,error,fatal methods are colorful.
+        - you must use on_backward_compatibility if you want to use color() way.
+
+0.03    2007-10-14/12:53
+        - Change config key to Plugin::Log::Colorful from log_colorful
+
+0.02    2007-06-30/11:32
+        - Check log()->is_debug() now.
+
+0.01    2007-04-28/14:27
+        First version, released on an unsuspecting world.
+

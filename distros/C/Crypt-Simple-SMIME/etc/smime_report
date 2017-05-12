@@ -1,0 +1,135 @@
+[if value payment_method eq credit][set payment]Credit Card[/set]
+[elsif value payment_method eq check][set payment]Online Check[/set][/elsif]
+[elsif value payment_method eq po][set payment]Company P.O.[/set][/elsif]
+[elsif value payment_method eq postal][set payment]Postal Billing[/set][/elsif]
+[/if]
+[seti order_text][userdb function="get_shipping" nickname="Default" hide="1"][seti usemode][value mv_shipmode][/seti][userdb function="load" hide="1"]
+      ORDER DATE: [tag time]%c[/tag]
+    ORDER NUMBER: [value mv_order_number]
+   REFERRING URL: [data session referer]
+
+BILLING 
+===============================================================================
+            Name: [value b_fname] [value b_lname]
+[if value b_company]         Company: [value b_company][/if]
+   Email address: [value email][if value email_copy] - EMAIL COPY REQUESTED[/if]
+   Mail List Req: [value b_mail_list]
+
+         Address: [value b_address1][if value b_address2]
+                  [value b_address2][/if]
+City, State, Zip: [value b_city], [value b_state]  [value b_zip]
+         Country: [value b_country]
+           Phone: [value b_phone_day]
+  Payment Method: [value mv_payment]
+
+[if value payment_method eq credit]  Account Number: CREDIT_CARD_NUM      Expiration: [value mv_credit_card_exp_month]/[value mv_credit_card_exp_year][/if]
+[if value payment_method eq check]  Account Number: [value check_acct]  Routing Number: [value check_route]    Check Number: [value check_num][/if]
+[if value payment_method eq po]  Company Name: [value po_company]  P.O. Number: [value po_number][/if]
+SHIPMENTS
+===============================================================================
+[set mtotal]0[/set][set mshiptotal]0[/set][perl] $Scratch->{shipctr} = 0; [/perl][loop arg="[shipments]"]
+
+    Shipment # [perl] $Scratch->{shipctr} += 1; [/perl][userdb function=get_shipping nickname="[loop-code]" hide=1]
+    ---------------------------------------------------------------------------
+    SHIP TO:
+                Name: [value fname] [value lname]
+[if value company]             Company: [value company][/if]
+             Address: [value address1][if value address2]
+                      [value address2][/if]
+    City, State, Zip: [value city], [value state]  [value zip]
+             Country: [value country]
+               Phone: [value phone_day]
+
+[if value address3 ne ""]    Gift Note or Special Instructions:
+    ---------------------------------------------------
+    [value address3]
+    
+[/if][set msubtotal]0[/set][if items]
+    Quan  Item No.    Description                          Price     Extension
+    ---- ----------- -------------------------------- ----------- ------------- 
+[item-list modular=1][seti size][perl interpolate=1 ]
+	# Display Size
+	#
+	my $item_num = "[item-modifier mv_ip]";
+	my $size     = $Carts->{main}[$item_num]{size};
+
+	if ( $size ne "" ) {
+
+		$out = "Size: $size";
+	}
+	return $out;
+[/perl][/seti][set item_nickname][item-modifier mv_an][/set][if scratch item_nickname eq "[loop-code]"][row 82][column width=4             gutter=0 align=right][/column]
+[column width=5             gutter=1 align=right][item-quantity][/column]
+[column width=12            gutter=1]  [item-sku] [/column]
+[column width=32 align=left gutter=1 wrap=1]
+[item-data products description][scratch size][/column]
+
+[column width=12 align=right gutter=1] [item-price noformat=1] [/column]   
+[column width=13 align=right gutter=0] [item-subtotal noformat=1] [/column]
+[/row][seti mshipcost][nickname_ship_cost mode="[scratch usemode]" nickname="[loop-code]"][/seti][perl interpolate=1 no_return=1]
+
+                      my $price    = [item-price noformat=1];
+                      my $quantity = [item-quantity];
+					  my $shipcost = $Scratch->{mshipcost};
+                      my $subtotal = ($price * $quantity) + $shipcost;
+
+					  $Scratch->{mshiptotal} += $shipcost ;
+					  $Scratch->{msubtotal} += $subtotal ;
+					  $Scratch->{mtotal} += $subtotal ;
+				   [/perl][/if][/item-list][/if]
+[row 82]
+	[column width=3  gutter=0 align=right][/column]
+	[column width=5  align=right gutter=1][/column]
+	[column width=12             gutter=1][/column]
+	[column width=32 align=right gutter=1 wrap=1][/column]
+	[column width=12             gutter=1]SHIPPING[/column]
+	[column width=13 align=right gutter=0][scratch mshipcost][/column]
+[/row]
+[row 82]
+[column width=3  gutter=0 align=right][/column]
+[column width=5  align=right gutter=1][/column]
+[column width=12             gutter=1][/column]
+[column width=32 align=right gutter=1 wrap=1][/column]
+[column width=12             gutter=1]#[scratch shipctr] TOTAL[/column]
+[column width=13 align=right gutter=0][scratch msubtotal][/column]
+[/row]
+
+[/loop]
+[if scratch shipctr > 1 ]
+[row 82]
+	[column width=3  gutter=0 align=right][/column]
+	[column width=5  align=right gutter=1][/column]
+	[column width=12             gutter=1][/column]
+	[column width=32 align=right gutter=1 wrap=1][/column]
+	[column width=12             gutter=1]SHIPPING[/column]
+	[column width=13 align=right gutter=0][currency][scratch mshiptotal][/currency][/column]
+[/row]
+[row 82]
+[column width=3  gutter=0 align=right][/column]
+[column width=5  align=right gutter=1][/column]
+[column width=12             gutter=1][/column]
+[column width=32 align=right gutter=1 wrap=1][/column]
+[column width=12             gutter=1]ORDER TOTAL[/column]
+[column width=13 align=right gutter=0][currency][scratch mtotal][/currency][/column]
+[/row]
+[else]
+   
+	 Shipping:[shipping-desc mode="[scratch usemode]" ]
+   
+[/else]
+[/if][perl noreturn=1]
+     $Scratch->{msubtotal} = 0;
+     $Scratch->{mtotal} = 0; 
+[/perl]
+[/seti]
+[tag op=mime description="Order Text" interpolate=1]
+[smime subject="Encrypted Order Details" ][scratch order_text][/smime]
+[/tag]
+[if value mv_credit_card_info]
+[tag	op=mime
+		interpolate=1
+		type=application/pgp-encrypted
+		description="CreditCard_[value mv_order_number]"]
+[value mv_credit_card_info]
+[/tag]
+[/if]

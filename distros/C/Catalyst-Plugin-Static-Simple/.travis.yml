@@ -1,0 +1,33 @@
+language: perl
+perl:
+   - "5.20"
+   - "5.18"
+   - "5.16"
+   - "5.14"
+   - "5.12"
+   - "5.10"
+   - "5.8"
+
+install:
+  # Based on Catalyst travis cfg:
+
+   # M::I deps
+   - cpanm --notest --metacpan --skip-satisfied Module::Install Module::Install::AuthorRequires Module::Install::CheckConflicts Module::Install::AuthorTests Module::Install::Authority
+
+   # author deps -- wish there was a better way
+   - cpanm --notest --metacpan --skip-satisfied CatalystX::LeakChecker Catalyst::Devel Catalyst::Engine::PSGI Starman MooseX::Daemonize Test::WWW::Mechanize::Catalyst Catalyst::Plugin::Params::Nested
+   - cpanm --notest --metacpan --skip-satisfied Test::Without::Module Test::NoTabs Test::Pod Test::Pod::Coverage Test::Spelling Pod::Coverage::TrustPod
+   - cpanm --notest --metacpan --skip-satisfied --installdeps .
+   - echo y | perl Makefile.PL
+
+   # enable various test options, including parallel testing
+   - export AUTOMATED_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
+
+   # we want these for our tests, but not for any others
+   - export AUTHOR_TESTING=1
+   - export RELEASE_TESTING=1
+
+   - make manifest
+
+script:
+   - make disttest

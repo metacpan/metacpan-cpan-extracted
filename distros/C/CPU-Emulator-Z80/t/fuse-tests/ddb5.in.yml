@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 181
+name: ddb5
+registers:
+  AF: 18100
+  AF_: 0
+  BC: 64659
+  BC_: 0
+  DE: 31238
+  DE_: 0
+  HL: 1304
+  HL_: 0
+  I: 0
+  IX: 2757
+  IY: 16720
+  PC: 0
+  R: 0
+  SP: 0

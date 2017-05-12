@@ -1,0 +1,105 @@
+---
+pod_spelling_common:
+  skip: 1
+
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - Clustericious
+    - Duggan
+    - GSFC
+    - Tilmes
+    - autodata
+    - renderer
+    - PlugAuth
+    - plackup
+    - plack
+    - hypnotoad
+    - Hypnotoad
+    - MyApp
+    - myapp
+    - lighttpd
+    - JSON
+    - del
+    - namespace
+    - websocket
+    - MyApp's
+    - ProxyPassReverse
+    - clustericious
+    - nginx
+    - apache
+    - conf
+    - proxying
+    - url
+    - URLs
+    - filename
+    - ok
+    - json
+    - Apache's
+    - customizations
+    - ramping
+    - api
+    - YAML
+    - yaml
+    - CPAN
+    - Postgres
+    - README
+    - RESTful
+    - SQLite
+    - TODO
+    - testdata
+    - auth
+    - errorstring
+    - getopt
+    - logtail
+    - xt
+    - yamldoc
+    - preprocess
+    - tx
+    - fooclient
+    - ethernet
+    - app
+    - MyApp1
+    - MyApp2
+    - 2xx
+    - cgi
+    - configdebug
+    - configpath
+    - configtest
+    - FCGI
+    - daemonize
+    - morbo
+    - apps
+    - apache24
+    - AutodataHandler
+    - ua
+    - handlelogoptions
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - Clustericious::Command::.*#description
+    - Clustericious::Command::.*#usage
+    - Clustericious::Command::.*#run
+    - Clustericious::Commands#namespaces
+    - Clustericious::Command::generate#namespaces
+    - Clustericious::Plugin::.*#register
+    - Clustericious::Commands#app
+    - Clustericious::Commands#namespace
+    - Clustericious::Commands#start
+    - auto::.*
+    - Clustericious::Config#pre_rendered
+    - Clustericious::Config#rendered
+    - Clustericious::Command::configdebug#description
+    - Clustericious::Command::configdebug#run
+    - Clustericious::Command::configdebug#usage
+    - Clustericious::Config::Password#.*
+    - Clustericious::Config::Helpers#cluster
+    - Clustericious::Util#.*
+    - Clustericious::Coder::[A-Za-z]+#coder
+    - Test::Clustericious::Command
+    
+version:
+  dir: lib

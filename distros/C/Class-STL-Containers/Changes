@@ -1,0 +1,114 @@
+Revision history for Perl extension Class::STL::Containers.
+
+0.35 Tue April 3 19:33:14 GMT 2007
+	- Fixed sort pragma usage when perl version <5.8.
+	- In tests qualify all stl imports instead of importing names due to some odd
+		import handling with perl 5.9.
+
+0.34 Thu Jan 18 19:33:14 GMT 2007
+	- Public release;
+
+0.33 Wed Nov 14 23:44:24 GMT 2006
+	- Changed default import method for all modules; all module now require explicit function/member export; 
+		export names ':all', ':containers', ':algorithms', ':utilities', ':iterators';
+
+0.32 Fri Nov 10 20:29:15 GMT 2006
+	- Changed factory() container member function to eval factory function just once.
+
+0.31 Wed Sep 27 19:08:14 GMT 2006
+	- changed 'sort' to '_sort' (algorithm) to avoid confusion with perl sort.
+	- _new() constructor -- same as new() but without call to new_extra.
+	- Algorithms to correctly traverse Tree nodes.
+	- Added datamember 'undefine' function. 
+	- Removed caller_str from datamember hash-key.
+	- In container ctor distinguish between raw data and derived class members.
+
+0.28 Wed May 24 18:44:32 GMTDT 2006
+	- Added data member class name to members() and members_local() array info.
+
+0.27 Tue May 16 19:20:22 GMTDT 2006
+	- Combine SingletonConstructor into Constructor via 'singleton' parameter.
+	- Pass through named parameter initialisation list with Constructor.
+
+0.26 Mon May 15 18:19:37 GMTDT 2006
+	- Changed Class::STL::Containers::Abstract->data_type member to 'element_type'.
+	- Deep container inheritence corrected.
+	- ClassMembers members_local() replaces members() function, and new
+		members() function returns all data members included those
+		all base classes.
+	- ClassMembes allow empty data member list.
+	- Class::STL::ClassMembers::Constructor.
+	- Singleton class implementation with Class::STL::ClassMembers::SingletonConstructor.
+
+0.18 Fri Apr 28 21:11:02 2006
+	- stl.pm -- wrapper package to import all STL classes.
+	- Replaced Class::STL::DataMembers with Class::STL::ClassMembers, 
+		Class::STL::ClassMembers::DataMember.pm, Class::STL::ClassMembers::FunctionMember;
+	- Class::STL::ClassMembers::FunctionMember::New for producing class new() function.
+	- Class::STL::ClassMembers::FunctionMember::Disable to disable class function.
+	- Class::STL::ClassMembers::DataMember replaces Class::STL::DataMembers::Attributes;
+	- Example:
+		use stl;
+		{
+			package MyPack;
+			use Class::STL::ClassMembers (
+					qw(msg_text msg_type),
+					Class::STL::ClassMembers::DataMember->new(
+						name => 'on', validate => '^(input|output)$', default => 'input'),
+					Class::STL::ClassMembers::DataMember->new(
+						name => 'count', validate => '^\d+$', default => '100'),
+					Class::STL::ClassMembers::FunctionMember::New->new(),
+					Class::STL::ClassMembers::FunctionMember::Disable->new(qw(somfunc)),
+			); 
+		}
+
+0.16 Wed Apr 26 22:12:32 2006
+	- Fixed members_init function to call SUPER::members_init where appropriate.
+	- DataMembers new() function generation via make_new().
+	- accumulate algorithm.
+	- sort and stable_sort algorithm.
+	- Containers join() member function.
+	- back_insert_iterator class and back_inserter helper function.
+	- front_insert_iterator class and front_inserter helper function.
+	- insert_iterator class and inserter helper function.
+	- The insert() container member function will now advance the position (1st) argument up one
+		prior to returning.
+	- not1(), not2(), negate() utility functions.
+
+0.14 Tues Apr 12 20:19:22 2006
+	- Added algorithms: generate generate_n fill fill_n equal reverse reverse_copy
+		rotate rotate_copy partition stable_partition min_element max_element
+		unique unique_copy adjacent_find
+	- Iterators: advance, distance, operator+, operator+=, operator-, operator-=
+
+0.12 Mon Apr 10 22:13:24 2006
+	- Fixed bug caused by Perl 5.8 interpolating apparent hash!
+
+0.11 Mon Apr 10 20:13:24 2006
+	- Major changes and additions -- please view Programmer's Reference for details
+
+0.06 Mon Apr 3 21:12:34 2006
+	- Additional algorithms.
+	- Fixed Makefind to call 'find_if()'.
+	- Rename 'foreach' to 'for_each'.
+
+0.05  Tue Mar 28 21:24:22 2006
+	- Major recode/redesign of Algorithms, Iterators, Utilities classes -- pre-0.04 code not 
+		compatible (sorry!).
+	- Class::STL::Utilities::MakeFind;
+	- Class::STL::DataMembers;
+	- Class::STL::Members::Disable;
+	- New count_if, transform, remove_if algorithms.
+	- Changed argument requirements for algorithm functions.
+	- New utilities: bind1st, bind2nd, mem_fun, 
+	- changed to_array() functionality: now will return array of 
+		elements objects (not element.data() values).
+	- The container begin(), end(), rbegin() and rend() functions now return a newly constructed 
+		Iterator object.
+	- Overloaded increment (++) and decrement (--) operators for Iterator classes.
+	- Bug fixes.
+	- Additional example scripts.
+
+0.01  Fri Feb 24 13:25:44 2006
+	- original version; created by h2xs 1.23 with options
+		-X Class::STL::Containers

@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                CGI-Application-Plugin-DBIProfile
+version:             0.07
+abstract:            DBI profiling plugin
+license:             ~
+author:              
+    - Sam Tregar <sam@tregar.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CGI::Application:              4
+    Data::JavaScript:              0
+    DBI:                           1.49
+    HTML::Template:                2.6
+    IO::Scalar:                    0
+    Symbol:                        0
+    Test::More:                    0
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

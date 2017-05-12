@@ -1,0 +1,14 @@
+Revision history for Perl extension CGI::Application::Plugin::I18N.
+
+0.03  Tue Jan  10 01:35:49 2009
+	- Now nothing is exported by default
+	  New loc method
+
+0.02  Tue Jan  8 00:48:22 2009
+	- Added Guide.pod and potest sample app
+	  Fixed issue with L::M::S Encode setting that was causing a strange error
+
+0.01  Tue Jan  6 23:25:06 2009
+	- First version that works... Needs some automated tests 
+	  and docs but couldn't wait to get it on CPAN :)
+

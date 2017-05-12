@@ -1,0 +1,37 @@
+0.07   2011-03-10
+
+- Fix test failure on machines which don't support 64-bit time_t.
+
+
+0.06   2011-03-09
+
+- Fix bug that made tests stop passing after March 3, 2011.
+
+- This module is now deprecated. Use CatalystX::AuthenCookie instead.
+
+
+0.05   2009-09-12
+
+- The docs mentioned a nonexistent method, unset_auth_cookie, which should be
+  unset_authen_cookie. Reported by Tomáš Znamenáček. RT #49121.
+
+
+0.04   2009-04-20
+
+- Use MRO::Compat to play nice with Catalyst 5.80.
+
+
+0.03   2009-01-30
+
+- The name you proivded in config was always overwritten during the
+  plugin's setup. Reported by Marc Sebastian Pelzer. RT #42918.
+
+
+0.02   2008-03-04
+
+- Add missing prereq: Class::Accessor::Fast.
+
+
+0.01   2008-03-03
+
+- First version, released on an unsuspecting world.

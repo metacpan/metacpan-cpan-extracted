@@ -1,0 +1,34 @@
+2009-09-20  Andreas J. Koenig  <andk@cpan.org>
+
+	* Ryan Niebur sent me a note that we have no copyright information in
+	the whole package. So although I have LICENSE stuff in the Makefile.PL,
+	the copyrigth escaped me somehow. How many other distros will have this
+	deficiency!
+
+	"In Debian we need copyright/license information for all of the packages
+	we upload. Could you give us (replying to this email is fine): years of
+	copyright, copyright holders' names, copyright holders' e-mail
+	addresses. Unfortunately without this information we cannot upload it."
+
+	That's only Audrey and Steve Peters and me.
+
+2005-12-11  Andreas Koenig  <andk@cpan.org>
+
+	* running updateddir on all 4012 checksummed directories on CPAN takes a
+	hell lot of time (over an hour) and slows other processes down, so I
+	wonder where the time is spent. If it were ungzip, we could lax our
+	interest to only computing it for files that have a new ungzip checksum
+	or so ($SKIP_UNGZ_IF_GZ_UNCHANGED or so).
+
+	But if we can make sure that updatedir is always run after a change
+	(both upload and delete), we can run the whole find/update thing just
+	once a week. For now I have reduced it to every 6 hours so I can
+	investigate changes better.
+
+	#########################################################################
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Todo"
+	tab-width: 2
+	left-margin: 2
+	End:

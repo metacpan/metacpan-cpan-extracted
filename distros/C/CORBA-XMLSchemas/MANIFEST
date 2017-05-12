@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/CORBA/XMLSchemas.pm
+lib/CORBA/XMLSchemas/BaseVisitor.pm
+lib/CORBA/XMLSchemas/NameVisitor.pm
+lib/CORBA/XMLSchemas/RelaxngVisitor.pm
+lib/CORBA/XMLSchemas/RelaxngImportVisitor.pm
+lib/CORBA/XMLSchemas/WsdlVisitor.pm
+lib/CORBA/XMLSchemas/WsdlSoapBindingVisitor.pm
+lib/CORBA/XMLSchemas/XsdVisitor.pm
+lib/CORBA/XMLSchemas/XsdImportVisitor.pm
+bin/idl2xsd
+bin/idl2wsdl
+bin/idl2soap
+bin/idl2rng
+corba/corba.xsd
+corba/corba.wsdl
+corba/corba.rnc
+corba/corba.rng
+
+META.yml                                 Module meta-data (added by MakeMaker)

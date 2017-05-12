@@ -1,0 +1,17 @@
+---
+abstract: 'CGI::Plus -- Extra utilities for CGI'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: CGI-Plus
+provides:
+    CGI::Plus:
+        file: lib/CGI/Plus.pm
+        version: 0.15
+requires:
+    CGI::Cookie: 0
+    CGI::Safe: 0
+    String::Util: 1.24
+    perl: 5.003
+version: 0.15

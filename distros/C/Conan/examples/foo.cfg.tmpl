@@ -1,0 +1,11 @@
+kernel      = '/xen/prod/boot/vmlinuz-2.6.24-xen_ubuntu1-trond1-toro'
+memory      = '4096'
+vcpus       = '2'
+vif         = [ 'bridge=xenbr311' ]
+netmask     = '255.255.255.0'
+gateway     = '10.5.11.254'
+on_poweroff = 'destroy'
+on_reboot   = 'restart'
+on_crash    = 'restart'
+NFS         = '10.5.11.238:/vol/prod_xen01/domains/foo/'
+version     = 'foo-3.7'

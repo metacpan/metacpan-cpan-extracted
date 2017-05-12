@@ -1,0 +1,62 @@
+CCCP-AttributeInspector version 0.01
+====================================
+
+CCCP::AttributeInspector - show list methods and attributes from package
+
+SYNOPSIS
+
+    package Bar;
+    use base qw[CCCP::AttributeInspector];
+    sub new {}
+    sub bar_method1 :Chain :CustomBar('any_custom') {}
+    sub bar_method2 :CustomBar :AbsPath('/some/abs/path') {}
+    1;
+    
+    # ------------------
+    
+    package Foo;
+    use base qw[CCCP::AttributeInspector];
+    sub new {}
+    sub foo_method1 :Local :Custom('any_custom') {}
+    sub foo_method2 :Private :Custom('some_attribute') {}
+    1;    
+    
+    # ------------------
+    
+    package SomeDispatcher;
+    use Foo;
+    use Bar;
+    
+    my @methods = Foo->all_methods();
+    #  'foo_method1'
+    #  'foo_method2'
+    #  'new'
+
+    @methods = Foo->att_methods();
+    #  'foo_method1'
+    #  'foo_method2'    
+    
+    @methods = Bar->all_methods()
+    #  'bar_method2'
+    #  'bar_method1'
+    #  'new'
+    
+    @methods = Bar->att_methods()
+    #  'bar_method2'
+    #  'bar_method1'
+    
+    @methods = Bar->att_methods(['Chain','CustomBar'])
+    #  'bar_method1'
+    
+    @methods =  Bar->att_methods(['CustomBar'])
+    #  'bar_method2'
+    #  'bar_method1'   
+    
+    @methods =  Bar->att_methods({'AbsPath' => '/some/abs/path'})
+    #  'bar_method2'
+    
+    my $att_list =  Bar->get_attributes('bar_method2')
+    #  HASH(0xf126f0)
+    #   'AbsPath' => '/some/abs/path'
+    #   'CustomBar' => ''    
+

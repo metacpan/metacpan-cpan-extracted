@@ -1,0 +1,139 @@
+=head1 NAME
+
+CGI::Bus::Base - Base class for CGI::Bus subobjects
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus::Base;
+ use vars qw(@ISA);
+ @ISA =qw(CGI::Bus::Base);
+
+
+=head1 DESCRIPTION
+
+This module provides common to all L<CGI::Bus|CGI/Bus> subobject classes
+properties and functionality.
+
+
+=head1 SLOTS
+
+=over
+
+
+=item 'CGI::Bus'
+
+Contains parent application object reference.
+Is cached by C<parent>.
+
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+=item AUTOLOAD
+
+Delegate method call given to C<parent> object.
+All parent object's methods may be used as a subobject methods.
+
+
+=item cgi () -> L<CGI|CGI> L<CGI::Bus|CGI/Bus> subobject
+
+L<CGI|CGI> subobject of parent L<CGI::Bus|CGI/Bus> object,
+optimising C<AUTOLOAD>ing
+
+
+=item class () -> class name
+
+Class name of the object.
+
+
+=item classt () -> subclass name
+
+The last part of the class name of the object.
+
+
+=item DESTROY
+
+Deletes self C<'CGI::Bus'> slot.
+
+
+=item htmlescape ( args ) -> escaped
+
+Parent L<CGI::Bus|CGI/Bus> object's C<htmlescape> call,
+optimising C<AUTOLOAD>ing
+
+
+=item initialize (?-slot => value)
+
+Initialize new object slots, used within C<new>.
+
+
+=item new -> new object
+
+=item new ( -slot => value...) -> new object
+
+Create new object.
+See also C<set>
+
+
+=item param (?args) -> L<CGI|CGI> L<CGI::Bus|CGI/Bus> subobject C<param> call
+
+L<CGI|CGI> subobject of parent L<CGI::Bus|CGI/Bus> object C<param> call,
+optimising C<AUTOLOAD>ing
+
+
+=item parent () -> superobject
+
+Returns parent L<CGI::Bus|CGI/Bus> application object.
+It is cached in C<'CGI::Bus'> slot and calculated if needed.
+
+
+=item print (?args) -> L<CGI::Bus|CGI/Bus> C<print> call
+
+Parent L<CGI::Bus|CGI/Bus> object C<print> call,
+optimising C<AUTOLOAD>ing
+
+
+=item qparam (?args) -> L<CGI::Bus|CGI/Bus> C<qparam> call
+
+Parent L<CGI::Bus|CGI/Bus> object C<qparam> call,
+optimising C<AUTOLOAD>ing
+
+
+=item set (-slot) -> value
+
+=item set (-slot=>value,...) -> object
+
+Retrieve or set object slots.
+See also C<new>.
+
+
+=item urlescape ( args ) -> escaped
+
+Parent L<CGI::Bus|CGI/Bus> object's C<urlescape> call,
+optimising C<AUTOLOAD>ing
+
+
+=head1 VERSION
+
+=over
+
+=head2 15/10/2001 - 08/11/2001 - 30/01/2002
+
+Implemented and Documented.
+25/01/2002 C<cgi>, C<param>, C<print>, C<qparam> methods added to
+optimise C<AUTOLOAD>ing;
+30/01/2002 C<classt>, C<htmlescape>, C<urlescape> added also.
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

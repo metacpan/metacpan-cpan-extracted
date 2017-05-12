@@ -1,0 +1,7 @@
+Catmandu::MediaMosa - low level API for MediaMosa digital asset management
+
+Catmandu::Importer::MediaMosa - a Catmandu Plugin for MediaMosa asset metadata
+
+See also: the LibreCat project at http://librecat.org
+
+Thanks to Nicolas Franck (Nicolas.Franck@UGent.be) for the MediaMosa Perl APIS

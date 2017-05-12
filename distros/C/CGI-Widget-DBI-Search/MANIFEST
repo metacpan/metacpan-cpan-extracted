@@ -1,0 +1,17 @@
+AGPL
+Changes
+MANIFEST
+Makefile.PL
+README
+t/01search.t
+t/02display_table.t
+t/03display_grid.t
+lib/CGI/Widget/DBI/TEST/Search.pm
+lib/CGI/Widget/DBI/TEST/TestCase.pm
+lib/CGI/Widget/DBI/Search/AbstractDisplay.pm
+lib/CGI/Widget/DBI/Search/Display/Grid.pm
+lib/CGI/Widget/DBI/Search/Display/TEST/Grid.pm
+lib/CGI/Widget/DBI/Search/Display/TEST/Table.pm
+lib/CGI/Widget/DBI/Search/Display/Table.pm
+lib/CGI/Widget/DBI/Search/Base.pm
+lib/CGI/Widget/DBI/Search.pm

@@ -1,0 +1,23 @@
+[% FOREACH sheet IN CMS.css.unique %]
+ <link rel="stylesheet" type="text/css" media="all" 
+       href="[% CMS.static %]/css/[% sheet %].css" />
+[% END %]
+[% FOREACH js IN CMS.js.unique %]
+ <script type="text/javascript" 
+     src="[% CMS.static %]/js/[% js %].js"></script>
+[% END %]
+    
+[% IF CMS.meta;
+    FOREACH m IN CMS.meta;
+      v       = m.each;   # pairs ?
+      name    = v.shift;
+      cont    = v.shift;
+                    
+      SWITCH name %]
+      [% CASE "refresh" %]
+      <meta http-equiv="refresh" content="[% cont %]" />
+      [% CASE %]
+      <meta name="[% name %]" content="[% cont %]" />
+      [% END # end SWITCH %]  
+    [% END # end FOREACH %]
+[% END # end CMS.meta %]

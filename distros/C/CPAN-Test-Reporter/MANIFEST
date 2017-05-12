@@ -1,0 +1,9 @@
+Makefile.PL
+MANIFEST
+Changes
+
+lib/CPAN/Test/Reporter.pm
+
+t/embedded-CPAN-Test-Reporter.t
+
+

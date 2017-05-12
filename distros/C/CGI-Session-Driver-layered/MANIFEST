@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/CGI/Session/Driver/layered.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01-load.t
+t/02-errors.t
+t/03-layers.t
+t/04-traverse.t
+t/05-latest.t
+t/06-exceptions.t

@@ -1,0 +1,8 @@
+XML.pm
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+examples/cgi2xml.pl
+examples/cgi.xml
+examples/xml2cgi.pl

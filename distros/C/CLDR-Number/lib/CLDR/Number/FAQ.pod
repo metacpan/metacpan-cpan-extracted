@@ -1,0 +1,81 @@
+=encoding UTF-8
+
+=head1 NAME
+
+CLDR::Number::FAQ - FAQ for CLDR::Number
+
+=head1 VERSION
+
+This document describes CLDR::Number v0.19, built with Unicode CLDR v29.
+
+=head1 FAQ
+
+=over
+
+=item What’s the status of this project?
+
+L<CLDR::Number> is a stable project used for over a year in production by
+Shutterstock on L<www.shutterstock.com> for formatting numbers, percents, and
+prices in twenty languages, ten currencies, and myriad countries. It is also
+used by L<other projects on the
+CPAN|https://metacpan.org/requires/distribution/CLDR-Number?sort=[[2,1]]>.
+
+=item How do I set precision?
+
+The attributes C<minimum_fraction_digits> and C<maximum_fraction_digits> can be
+used. If you always want a specific number of fraction digits, also known as
+I<precision>, set both of these attributes to the same number.
+
+=item How do I remove cents?
+
+When displaying whole monetary numbers, it is sometimes desired to leave off the
+fraction digits (e.g. cents) for marketing purposes. To do this, set the
+C<maximum_fraction_digits> attribute to C<0>. Beware though that some currencies
+have a number of fraction digits other than two, so it is not safe to set
+C<minimum_fraction_digits> and C<maximum_fraction_digits> to C<2> for arbitrary
+currencies.
+
+=item How do I set a default currency?
+
+L<CLDR::Number::Format::Currency> does not provide a default currency for the
+C<currency_code> attribute like we have for the C<locale> attribute nor does it
+provide a I<default_currency_code> attribute like the C<default_locale>
+attribute. This is because a price without a known currency has no known value.
+Setting a default currency is just as inaccurate as setting a default number. If
+your application depends on a default currency, the C<currency_code> attribute
+can be explicitly set.
+
+“B<Note:> I<Currency values should B<never> be interchanged without a known
+currency code. You never want the number 3.5 interpreted as $3.50 by one user
+and €3.50 by another.> Locale data contains localization information for
+currencies, not a currency value for a country. A currency amount logically
+consists of a numeric value, plus an accompanying currency code (or
+equivalent).” —L<Unicode Technical Standard
+#35|http://www.unicode.org/reports/tr35/tr35-numbers.html#Currencies>
+
+=item How do I format years?
+
+Years are a type of date, and dates have very different formatting rules than
+regular numbers. Resources for localized date/time formatting include
+L<DateTime>, L<DateTime::Locale>, and L<UTS #35: Unicode LDML, Part 4:
+Dates|http://unicode.org/reports/tr35/tr35-dates.html>.
+
+=item Why is the format different than expected?
+
+Users occasionally report incorrect formatting for several non-existent locales.
+This is most often the result of specifying a locale composed of an unrecognized
+combination of language and country, which will cause the formatting to default
+to the base language. Two common examples of this are C<en-MX> (Mexican English)
+and C<es-BR> (Brazilian Spanish), which would default to C<en> (English) and
+C<es> (Spanish), respectively. However, if demand is shown for them, they may be
+added to the CLDR, such as C<es-BR>, which was added to CLDR v29.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CLDR::Number::TODO>
+
+=back

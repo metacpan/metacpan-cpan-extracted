@@ -1,0 +1,16 @@
+META.yml
+
+blib/
+
+/Makefile
+*.sw[po]
+*.bak
+blib/
+*.o
+*.bs
+*.swp
+*.tar.gz
+MYMETA.json
+MYMETA.yml
+cache.c
+pm_to_blib

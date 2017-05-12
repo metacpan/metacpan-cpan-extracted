@@ -1,0 +1,212 @@
+# NAME
+
+Catalyst::Plugin::EnableMiddleware - Enable Plack Middleware via Configuration
+
+# SYNOPSIS
+
+    package MyApp::Web;
+
+    our $VERSION = '0.01';
+
+    use Moose;
+    use Catalyst qw/EnableMiddleware/;
+    use Plack::Middleware::StackTrace;
+
+    extends 'Catalyst';
+
+    my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+        'Debug',
+        '+MyApp::Custom',
+        $stacktrace_middleware,
+        'Session' => {store => 'File'},
+        sub {
+          my $app = shift;
+          return sub {
+            my $env = shift;
+            $env->{myapp.customkey} = 'helloworld';
+            $app->($env);
+          },
+        },
+      ],
+    );
+
+    __PACKAGE__->setup;
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+Modern versions of [Catalyst](http://search.cpan.org/perldoc?Catalyst) use [Plack](http://search.cpan.org/perldoc?Plack) as the underlying engine to
+connect your application to an http server.  This means that you can take
+advantage of the full [Plack](http://search.cpan.org/perldoc?Plack) software ecosystem to grow your application
+and to better componentize and re-use your code.
+
+Middleware is a large part of this ecosystem.  [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware) wraps your
+PSGI application with additional functionality, such as adding Sessions ( as in
+[Plack::Middleware::Session](http://search.cpan.org/perldoc?Plack::Middleware::Session)), Debugging (as in [Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug))
+and logging (as in [Plack::Middleware::LogDispatch](http://search.cpan.org/perldoc?Plack::Middleware::LogDispatch) or
+[Plack::Middleware::Log4Perl](http://search.cpan.org/perldoc?Plack::Middleware::Log4Perl)).
+
+Generally you can enable middleware in your `psgi` file, as in the following
+example
+
+    #!/usr/bin/env plackup
+
+    use strict;
+    use warnings;
+
+    use MyApp::Web;  ## Your subclass of 'Catalyst'
+    use Plack::Builder;
+
+    builder {
+
+      enable 'Debug';
+      enable 'Session', store => 'File';
+
+      mount '/' => MyApp::Web->psgi_app;
+
+    };
+
+Here we are using our `psgi` file and tools that come with [Plack](http://search.cpan.org/perldoc?Plack) in order
+to enable [Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug) and [Plack::Middleware::Session](http://search.cpan.org/perldoc?Plack::Middleware::Session).  This
+is a nice, clean approach that cleanly separates your [Catalyst](http://search.cpan.org/perldoc?Catalyst) application
+from enabled middleware.
+
+However there may be cases when you'd rather enable middleware via you [Catalyst](http://search.cpan.org/perldoc?Catalyst)
+application, rather in a stand alone file.  For example, you may wish to let your
+[Catalyst](http://search.cpan.org/perldoc?Catalyst) application have control over the middleware configuration.
+
+This plugin lets you enable [Plack](http://search.cpan.org/perldoc?Plack) middleware via configuration. For example,
+the above mapping could be re-written as follows:
+
+    package MyApp::Web;
+    our $VERSION = '0.01';
+
+    use Moose;
+    use Catalyst qw/EnableMiddleware/;
+
+    extends 'Catalyst';
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+        'Debug',
+        'Session' => {store => 'File'},
+      ]);
+
+    __PACKAGE__->setup;
+    __PACKAGE__->meta->make_immutable;
+
+Then your `myapp_web.psgi` would simply become:
+
+    #!/usr/bin/env plackup
+
+    use strict;
+    use warnings;
+
+    use MyApp::Web;  ## Your subclass of 'Catalyst'
+    MyApp::Web->psgi_app;
+
+You can of course use a configuration file and format (like Config::General)
+instead of hard coding your configuration into the main application class.
+This would allow you the ability to configure things differently in different
+environments (one of the key reasons to take this approach).
+
+The approach isn't 'either/or' and merits to each are apparent.  Choosing one
+doesn't preclude the other.
+
+# CONFIGURATION
+
+Configuration for this plugin should be a ArrayRef under the top level key
+`Plugin::EnableMiddleware`, as in the following:
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', \@middleware);
+
+Where `@middleware` is one or more of the following, applied in the REVERSE of
+the order listed (to make it function similarly to [Plack::Builder](http://search.cpan.org/perldoc?Plack::Builder):
+
+- Middleware Object
+
+An already initialized object that conforms to the [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware)
+specification:
+
+    my $stacktrace_middleware = Plack::Middleware::StackTrace->new;
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+        $stacktrace_middleware,
+      ]);
+
+
+
+- coderef
+
+A coderef that is an inlined middleware:
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+        sub {
+          my $app = shift;
+          return sub {
+            my $env = shift;
+            if($env->{PATH_INFO} =~m/forced/) {
+              Plack::App::File
+                ->new(file=>TestApp->path_to(qw/share static forced.txt/))
+                ->call($env);
+            } else {
+              return $app->($env);
+            }
+         },
+      },
+    ]);
+
+
+
+
+
+- a scalar
+
+We assume the scalar refers to a namespace after normalizing it in the same way
+that [Plack::Builder](http://search.cpan.org/perldoc?Plack::Builder) does (it assumes we want something under the
+'Plack::Middleware' unless prefixed with a `+`).
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+        'Debug',  ## 'Plack::Middleware::Debug->wrap(...)'
+        '+MyApp::Custom',  ## 'MyApp::Custom->wrap(...)'
+      ],
+    );
+
+- a scalar followed by a hashref
+
+Just like the previous, except the following `HashRef` is used as arguments
+to initialize the middleware object.
+
+    __PACKAGE__->config(
+      'Plugin::EnableMiddleware', [
+         'Session' => {store => 'File'},
+    ]);
+
+# VERSION NOTES
+
+Versions prior to `0.006` applied middleware in the order lists.  This led to
+unexpected problems when porting over middleware from [Plack::Builder](http://search.cpan.org/perldoc?Plack::Builder) since
+that applies middleware in reverse order.  This change makes this plugin behave
+as you might expect.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Plack](http://search.cpan.org/perldoc?Plack), [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware), [Catalyst](http://search.cpan.org/perldoc?Catalyst)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

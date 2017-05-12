@@ -1,0 +1,57 @@
+requires "Capture::Tiny" => "0";
+requires "Data::Rmap" => "0";
+requires "DateTime::Format::DateParse" => "0";
+requires "DateTime::Format::ISO8601" => "0";
+requires "File::HomeDir" => "0.91";
+requires "File::ReadBackwards" => "0";
+requires "File::ShareDir" => "0";
+requires "File::Which" => "0";
+requires "Hash::Merge" => "0";
+requires "JSON::MaybeXS" => "0";
+requires "List::MoreUtils" => "0";
+requires "Log::Log4perl" => "0";
+requires "Log::Log4perl::Appender::TAP" => "0.02";
+requires "MojoX::Log::Log4perl" => "0";
+requires "Mojolicious" => "7.31";
+requires "Path::Class" => "0.26";
+requires "PerlX::Maybe" => "0.003";
+requires "Sub::Exporter" => "0";
+requires "Sub::Identify" => "0.05";
+requires "Term::Prompt" => "0";
+requires "YAML::XS" => "0";
+requires "autodie" => "0";
+requires "perl" => "5.010001";
+recommends "Cpanel::JSON::XS" => "0";
+recommends "EV" => "0";
+recommends "PerlX::Maybe::XS" => "0";
+
+on 'test' => sub {
+  requires "File::chdir" => "0";
+  requires "PlugAuth::Lite" => "0";
+  requires "Test2::Suite" => "0.000060";
+  requires "Test::Clustericious::Cluster" => "0.35";
+  requires "Test::More" => "0.94";
+  requires "Test::Script" => "1.10";
+  requires "Test::Warn" => "0";
+  requires "perl" => "5.010001";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "File::ShareDir::Install" => "0.06";
+  requires "perl" => "5.010001";
+};
+
+on 'develop' => sub {
+  requires "FindBin" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};

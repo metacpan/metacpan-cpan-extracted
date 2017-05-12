@@ -1,0 +1,72 @@
+Revision history for Catmandu-Solr
+
+0.0302  2017-04-20 15:36:51 CEST
+       - fix typo
+       - more pod
+
+0.0301  2017-04-06 18:15:24 CEST
+       - use Catmandu::Bag provided id/key/id_field
+
+0.03  2017-03-23 14:31:04 CET
+       - use new Catmandu::CQLSearchable role
+
+0.02154  2016-12-15 15:28:58 CET
+       - fix bug that prevents records from last page to be returned
+
+0.02153  2016-12-12 12:24:20 CET
+       - fix typo in Catmandu::Store::Solr::SQL that made cql mapping field 'field' impossible
+
+0.02152  2016-05-31 13:32:22 CEST
+       - method search contains key 'highlighting' now
+
+0.02151  2016-04-21 14:59:26 CEST
+       - fix perlpod errors in Catmandu::Store::Solr
+
+0.0215  2016-02-26 15:07:19 CET
+       - add option 'fl' to Catmandu::Store::Solr::Searcher to optimize access
+       - fix bug in Catmandu::Store::Solr::Bag ( 'throw' )
+       - make more store transaction safe
+       - fix bug Catmandu::Importer::Solr->count
+
+0.0214  2016-02-25 14:47:24 CET
+       - normalize_query now delivers explicit lucene query to match all documents
+
+0.0213  2016-02-23
+       - Catmandu::Store::Solr has role Catmandu::Transactional
+       - dependency on Catmandu 1.0
+0.0212  2016-02-12
+       - set query type in filters explicit to lucene
+0.0211  2016-02-11
+       - make cql parser object oriënted
+       - add documentation for cql_mapping
+0.0210  2015-11-30
+       - add option "on_error" to Catmandu::Store::Solr
+0.0209  2015-02-25
+       - removed the need to flush buffers within transactions. When the transaction is done, all buffers of all bags are now flushed automatically.
+0.0208  2014-01-26
+       - added support for transactions
+0.0207  2014-12-05
+       - bug fix: delete by query only supports lucene queries. LocalParams are forbidden
+0.0206  2014-11-18
+       - merged pull request from Jakob Voss to make the field '_id' and '_bag' configurable
+
+0.0205  2014-11-17
+       - changed distribution name to Catmandu-Solr
+       - added Catmandu::Importer::Solr
+
+0.0204  2014-03-25
+       - fq can be an array ref
+       - optimized versions of count and total
+       - include spellcheck in hits
+
+0.0203  2013-09-04
+       - update dependencies
+
+0.0202  2013-09-02
+       - disable facets, spellcheck if not needed
+
+0.0201  2013-03-26
+       - import confess
+
+0.02    2012-12-03
+       - initial release

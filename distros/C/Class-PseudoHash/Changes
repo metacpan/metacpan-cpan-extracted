@@ -1,0 +1,27 @@
+[Changes for 1.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  (except for the bundled libsyck code) are now under the permissive
+  "MIT" license.
+* Tidy up source code, documentations, test files, and this changelog.
+
+[Changes for 1.01 - 2002-06-19]
+
+* Build system cleanups.
+
+[Changes for 1.00 - 2001-11-13]
+
+* Fixed POD nits.
+* Fixed CLEAR bug.
+* Fixed numerical overloading.
+* Upgrade to ExtUtils::AutoInstall to work around the Test::* condition.
+
+[Changes for 0.02 - 2001-09-03]
+
+* Fixed stringification bug in 5.005.
+* Minor POD tweaks.
+* Uses Test::More for test now, thanks to Schwern.
+
+[Changes for 0.01 - 2001-08-01]
+
+* Initial CPAN release.

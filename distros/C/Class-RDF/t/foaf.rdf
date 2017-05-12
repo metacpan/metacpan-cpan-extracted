@@ -1,0 +1,39 @@
+<rdf:RDF 
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+        xmlns:foaf="http://xmlns.com/foaf/0.1/">
+
+<foaf:Person rdf:ID="zool">
+	<foaf:name>Jo Walsh</foaf:name>
+	<foaf:mbox_sha1sum>d27e571be703d3d7346183d0c5e387e93e20c0d9</foaf:mbox_sha1sum>
+	<foaf:homepage rdf:resource="http://frot.org"/>
+
+	<foaf:holdsAccount>
+	    <foaf:OnlineChatAccount 
+		rdf:resource="irc://irc.oftc.net"
+		foaf:accountName="metazool" />
+	</foaf:holdsAccount>
+
+	<foaf:knows>
+	<foaf:Person>
+		<foaf:name>Schuyler Erle</foaf:name>
+		<foaf:mbox_sha1sum>4eb63c697f5b945727bad08cd889b19be41bd9aa</foaf:mbox_sha1sum>
+		<foaf:nick>octothorp</foaf:nick>
+		<foaf:homepage rdf:resource="http://iconocla.st/"/>
+	</foaf:Person>
+	</foaf:knows>
+
+	<foaf:knows>
+	<foaf:Person rdf:ID="liz">
+		<foaf:name>Liz Turner</foaf:name>
+		<foaf:mbox_sha1sum>632054bd9d1d119f99d6858ef64d3f13a3caab87</foaf:mbox_sha1sum>
+	</foaf:Person>
+	</foaf:knows>
+	
+	<foaf:knows>
+	<foaf:Person rdf:ID="lisa">
+		<foaf:mbox_sha1sum>9cf74ea839ed9349b7110fa1e0d1e40ba53b4e1d</foaf:mbox_sha1sum>
+	</foaf:Person>
+	</foaf:knows>
+</foaf:Person>
+</rdf:RDF>

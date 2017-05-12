@@ -1,0 +1,41 @@
+---
+abstract: 'Catmandu modules for working with OCLC web services'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-OCLC
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0'
+  Catmandu::Importer::MARC: '0'
+  JSON: '0'
+  LWP::Simple: '0'
+  Moo: '1.0'
+  REST::Client: '0'
+  URI::Escape: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-OCLC/issues
+  homepage: https://github.com/LibreCat/Catmandu-OCLC
+  repository: https://github.com/LibreCat/Catmandu-OCLC.git
+version: '0.006'
+x_contributors:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

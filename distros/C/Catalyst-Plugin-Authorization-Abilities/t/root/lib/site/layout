@@ -1,0 +1,11 @@
+<div class="span-24">
+  <div id="header">[% PROCESS site/header %]</div>
+</div>
+
+<div class="span-24" id="content" >
+  [% content %]
+</div>
+
+<div class="span-24">
+  <div id="header">[% PROCESS site/footer %]</div>
+</div>

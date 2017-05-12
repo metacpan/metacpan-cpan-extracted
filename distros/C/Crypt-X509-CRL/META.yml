@@ -1,0 +1,6 @@
+name:         Crypt-X509-CRL
+version:      0.1
+version_from: lib/Crypt/X509/CRL.pm
+installdirs:  site
+requires:	  Convert::ASN1
+distribution_type: module

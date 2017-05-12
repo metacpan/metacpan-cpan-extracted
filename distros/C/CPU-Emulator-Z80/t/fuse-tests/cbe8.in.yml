@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 232
+  18949:
+    - 230
+name: cbe8
+registers:
+  AF: 28928
+  AF_: 0
+  BC: 47896
+  BC_: 0
+  DE: 26348
+  DE_: 0
+  HL: 18949
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

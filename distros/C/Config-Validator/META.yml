@@ -1,0 +1,24 @@
+---
+abstract: 'schema based configuration validation'
+author:
+  - 'Lionel Cons <lionel.cons@cern.ch>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Validator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  No::Worries: 1.1
+  Scalar::Util: 0
+  URI::Escape: 0
+version: 1.3

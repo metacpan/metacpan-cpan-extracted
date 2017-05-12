@@ -1,0 +1,13 @@
+lib/Catalyst/Plugin/Navigation.pm
+lib/CatalystX/NavigationMenu.pm
+lib/CatalystX/NavigationMenuItem.pm
+Changes
+t/02-pod-coverage.t
+t/01-pod.t
+t/03-perlcritic.t
+t/01-pragmas.t
+t/perlcriticrc
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

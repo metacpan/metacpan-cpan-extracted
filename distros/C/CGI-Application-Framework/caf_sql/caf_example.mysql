@@ -1,0 +1,125 @@
+-- MySQL dump 9.11
+--
+-- Host: localhost    Database: example
+-- ------------------------------------------------------
+-- Server version	4.0.21-log
+
+--
+-- Current Database: example
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `example`;
+
+USE example;
+
+--
+-- Table structure for table `album`
+--
+
+DROP TABLE IF EXISTS `album`;
+CREATE TABLE `album` (
+  `album_id` int(10) unsigned NOT NULL auto_increment,
+  `artist_id` int(10) unsigned NOT NULL default '0',
+  `album_name` varchar(100) NOT NULL default '',
+  `album_year` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`album_id`),
+  KEY `album_year` (`album_year`),
+  KEY `artist_id` (`artist_id`),
+  KEY `album_name` (`album_name`)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `album_song`
+--
+
+DROP TABLE IF EXISTS `album_song`;
+CREATE TABLE `album_song` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `album_id` int(10) unsigned NOT NULL default '0',
+  `song_id` int(10) unsigned NOT NULL default '0',
+  `track_num` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY album_song_album_song_id (`album_id`,`song_id`),
+  KEY `album_id` (`album_id`),
+  KEY `song_id` (`song_id`)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `artist`
+--
+
+DROP TABLE IF EXISTS `artist`;
+CREATE TABLE `artist` (
+  `artist_id` int(10) unsigned NOT NULL auto_increment,
+  `artist_name` varchar(100) NOT NULL default '',
+  PRIMARY KEY  (`artist_id`),
+  KEY `artist_name` (`artist_name`)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `song`
+--
+
+DROP TABLE IF EXISTS `song`;
+CREATE TABLE `song` (
+  `song_id` int(10) unsigned NOT NULL auto_increment,
+  `artist_id` int(10) unsigned NOT NULL default '0',
+  `song_name` varchar(100) NOT NULL default '',
+  PRIMARY KEY  (`song_id`),
+  KEY `song_name` (`song_name`),
+  KEY `artist_id` (`artist_id`)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `user_album`
+--
+
+DROP TABLE IF EXISTS `user_album`;
+CREATE TABLE `user_album` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `user_id` int(10) unsigned NOT NULL default '0',
+  `album_id` int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `user_album_user_album_id` (`user_id`,`album_id`),
+  KEY `user_id` (`user_id`),
+  KEY `album_id` (`album_id`)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `user_album`
+--
+
+INSERT INTO `user_album` (user_id, album_id) VALUES (1,1);
+INSERT INTO `user_album` (user_id, album_id) VALUES (1,3);
+INSERT INTO `user_album` (user_id, album_id) VALUES (1,4);
+INSERT INTO `user_album` (user_id, album_id) VALUES (1,6);
+INSERT INTO `user_album` (user_id, album_id) VALUES (1,7);
+INSERT INTO `user_album` (user_id, album_id) VALUES (2,1);
+INSERT INTO `user_album` (user_id, album_id) VALUES (2,2);
+INSERT INTO `user_album` (user_id, album_id) VALUES (2,6);
+INSERT INTO `user_album` (user_id, album_id) VALUES (2,7);
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `uid` int(10) unsigned NOT NULL auto_increment,
+  `username` varchar(50) NOT NULL default '',
+  `fullname` varchar(100) NOT NULL default '',
+  `password` varchar(50) NOT NULL default '',
+  PRIMARY KEY  (`uid`),
+  UNIQUE KEY `username` (`username`),
+  KEY `fullname` (`fullname`)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` VALUES (1,'rdice','Richard Dice','foobar');
+INSERT INTO `users` VALUES (2,'woody','Sheriff Woody','buckaroo');
+INSERT INTO `users` VALUES (3,'pete','Prospector Pete','doggie');
+INSERT INTO `users` VALUES (4,'buzz','Buzz Lightyear','infinity');
+

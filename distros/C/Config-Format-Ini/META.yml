@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Config-Format-Ini
+version:             0.07
+abstract:            Reads INI configuration files
+license:             perl
+author:              
+    - Ioannis Tambouras <ioannis@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Attribute::Handlers:           0
+    File::Slurp:                   0
+    Parse::RecDescent:             0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

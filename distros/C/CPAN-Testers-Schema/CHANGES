@@ -1,0 +1,54 @@
+Changelog for CPAN-Testers-Schema
+
+0.005     2016-12-11 00:36:54-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed dependency declaration for DateTime and
+      DateTime::Format::ISO8601
+
+0.004     2016-12-10 02:45:36-06:00 America/Chicago
+
+    [Fixed]
+
+    - Properly inflate CPAN upload `released` column into a DateTime
+      object. This makes for a better API so that we can, eventually,
+      change the data type from epoch timestamp to ISO8601 date/time.
+
+0.003     2016-12-09 19:55:09-06:00 America/Chicago
+
+    [Added]
+
+    - Added CPAN uploads data query module
+      (CPAN::Testers::Schema::ResultSet::Upload) to query data from CPAN
+      uploads.
+
+    [Other]
+
+    - Switched to DBIx::Class::Candy for cleaner result classes
+
+0.002     2016-11-19 11:53:54-06:00 America/Chicago
+
+    [Added]
+
+    - Added relationship between report statistics and release
+      summaries. This relationship can be used to see when the release
+      summary was last updated.
+
+    - Added release data query module
+      (CPAN::Testers::Schema::ResultSet::Release) for easier querying of
+      release data. This will be used to provide summary data for
+      metacpan and various CPAN author dashboards.
+
+    [Fixed]
+
+    - Properly enabled all Perl 5.24 features. Since we're relying on
+      it, we should be using it to the fullest!
+
+0.001     2016-11-18 15:06:56-06:00 America/Chicago
+
+ - This initial release contains a schema for some tables in the
+   `cpanstats` database, with more tables to come later. This release is
+   minimal to enable its use in the new CPAN Testers API, coming later.
+
+   Hello from meta::hack 2016 in Chicago!

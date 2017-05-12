@@ -1,0 +1,28 @@
+---
+abstract: "Convert paginated DBIx::Class::ResultSet's to JSON-style structures"
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-ExtJS
+requires:
+  CGI::Application: 0
+  CGI::Application::Plugin::DBH: 0
+  CGI::Application::Plugin::DBIx::Class: 0
+  DBIx::Class: 0.08113
+  FindBin: 0
+  Readonly: 0
+  Test::Deep: 0
+  Test::More: 0
+  UNIVERSAL: 0
+  parent: 0
+resources:
+  repository: git://github.com/frioux/CGI-Application-Plugin-ExtJS
+version: 1.000001

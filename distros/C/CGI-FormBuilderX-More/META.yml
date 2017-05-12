@@ -1,0 +1,27 @@
+---
+name: CGI-FormBuilderX-More
+version: 0.020
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+abstract: 'Additional input gathering/interrogating functionality for CGI::FormBuilder '
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::FormBuilder: 3.050100
+  Carp::Clan: 0
+  Sub::Exporter: 0
+build_requires:
+  CGI: 0
+  Test::Deep: 0
+  Test::More: 0
+provides:
+  CGI::FormBuilderX::More:
+    file: lib/CGI/FormBuilderX/More.pm
+    version: 0.020
+  CGI::FormBuilderX::More::InputTie:
+    file: lib/CGI/FormBuilderX/More/InputTie.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

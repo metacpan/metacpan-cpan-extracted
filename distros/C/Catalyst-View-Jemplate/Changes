@@ -1,0 +1,23 @@
+Revision history for Perl extension Catalyst::View::Jemplate
+
+0.06  Fri May  4 15:16:09 PDT 2007
+        - Document update to remove TODO for caching
+          (Thanks to nothingmuch)
+
+0.05  Tue May  1 00:11:30 PDT 2007
+        - Fixed cache to work with new Catalyst::Plugin::Cache modules
+          (Thanks to Takeda Akihito)
+
+0.04  Fri Feb 23 09:59:06 PST 2007
+        - Added 'runtime' functionality to serve Jemplate.js (Fujiwara Shuichiro)
+
+0.03  Fri Dec  1 02:16:38 PST 2006
+        - Added caching and the ability to specify which file to jemplatize (Daisuke Maki)
+        - Added Helper Catalyst::Helper::View::Jemplate (Daisuke Maki)
+
+0.02  Fri Apr 28 03:39:16 JST 2006
+        - Updated to Jemplate new API
+          (Thanks to Fujiwara Shuichiro)
+
+0.01  Tue Feb  7 10:02:24 2006
+	- original version

@@ -1,0 +1,42 @@
+<div class=path>&nbsp;
+[% results.size %] [% pages.results %]
+</div>
+[% chap_link = results.0.chap_link %]
+[% class = 's' %]
+<div class=box>
+<table width="100%">
+<tr>
+<td class=chaps colspan=3><b>
+<a href="[% home %]/chapter/[% chap_link %]">[% results.0.chap_desc %]</a>
+</b></td>
+</tr>
+[% USE table(results, rows=3) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item.chap_link != chap_link %]
+<tr>
+<td class=chaps colspan=3><b>
+<a href="[% home %]/chapter/[% item.chap_link %]">[% item.chap_desc %]</a>
+</b></td>
+</tr>
+[% chap_link = item.chap_link %]
+[% END %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END -%]
+[% IF item.dist_name %]
+<td>
+<a href="[% home %]/dist/[% item.dist_name %]">[% item.dist_name %]</a>
+[% IF item.dist_abs %]
+<br /><small>[% item.dist_abs %]</small>
+[% END -%]
+[% END -%]
+</td>
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>
+</div>

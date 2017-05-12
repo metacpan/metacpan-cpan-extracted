@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb58
+registers:
+  AF: 50744
+  AF_: 0
+  BC: 57768
+  BC_: 0
+  DE: 40300
+  DE_: 0
+  HL: 48835
+  HL_: 0
+  I: 0
+  IX: 27206
+  IY: 46700
+  PC: 4
+  R: 2
+  SP: 0

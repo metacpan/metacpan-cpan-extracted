@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Class/DispatchToAll.pm
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/99_pod.t
+t/99_pod_coverage.t
+t/test.t
+META.yml

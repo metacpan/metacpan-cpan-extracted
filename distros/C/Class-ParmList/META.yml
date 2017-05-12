@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-ParmList
+version: 1.05
+author:
+  - Benjamin Franz <snowhare@nihongo.org>
+abstract: Methods for processing named parameter lists
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

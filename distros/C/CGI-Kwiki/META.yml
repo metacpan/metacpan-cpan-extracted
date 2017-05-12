@@ -1,0 +1,12 @@
+name: CGI-Kwiki
+version: 0.18
+abstract: A Quickie Wiki that's not too Tricky
+author: Brian Ingerson <ingy@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.19_99

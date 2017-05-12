@@ -1,0 +1,51 @@
+--- #YAML:1.0
+name:                   Calendar-List
+version:                0.28
+abstract:               A module for creating date lists
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                artistic_2
+distribution_type:      module
+installdirs:            site
+
+requires:
+  perl:                   5.006
+  Clone:                  0
+  Tie::IxHash:            0
+  Time::Local:            0
+recommends:
+  Date::ICal:             0
+  DateTime:               0
+  Time::Piece:            0
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  Test::More:             0.70
+  IO::File:               0
+
+provides:
+  Calendar::List:
+    file:     lib/Calendar/List.pm
+    version:  0.28
+  Calendar::Functions:
+    file:     lib/Calendar/Functions.pm
+    version:  0.28
+no_index:
+  file:
+    - t/TestData.pm
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Calendar-List
+  repository: http://github.com/barbie/calendar-list.git
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

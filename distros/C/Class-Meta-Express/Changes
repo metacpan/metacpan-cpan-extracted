@@ -1,0 +1,65 @@
+Revision history for Perl extension Class::Meta::Express.
+
+0.13  2011-06-20T23:09:39
+      - Removed redundant bug reporting email address from the documentation.
+      - Fixed failing test on Perl 5.14 on Win32.
+
+0.12  2011-06-20T00:50:10
+      - Moved repostitory to
+        [GitHub](https://github.com/theory/class-meta-express/).
+      - Switched to a "traditional" `Makefile.PL`.
+
+0.11  2008-05-22T03:17:58
+      - Removed the spelling test from the distribution, since it can fail on
+        systems without a spell program or using a different locale.
+      - Fixed test failures on Perl 5.6.
+      - Added Module::Build to the `build_requires` parameter in Build.PL.
+
+0.10  2008-05-13T03:45:58
+      - Added a link to the Subversion repository.
+      - Updated the documentation so that all examples use `class`
+        rather than the deprecated `build`.
+      - Calling the `meta` function is now optional. If it is not called,
+        Class::Meta::Express will create a key name from the last part of the
+        class name. Suggested by Jon Swartz.
+      - Moved the justification for creating this module towards the end of
+        the documentation, so that the important description of how to use it
+        is more prominently towards the top. Suggested by Jon Swartz.
+      - Added brief descriptions of the parameters supported by Class::Meta
+        for each function.
+      - Added tests to ensure that the `view` parameter is properly respected.
+      - Now requiring Class::Meta 0.60 or later to take advantage of its
+        integrated `default_type` parameter.
+      - The `reexport` parameter now respects many of the other parameters
+        passed to `meta`, not just `meta_class` and `default_type`.
+      - Added a spelling test. This has the benefit of reducing the number of
+        annoying spelling errors in the documentation.
+
+0.05  2008-05-02T02:15:26
+      - Added the "configure_requires", and "recommends" parameters to
+        Build.PL.
+      - Fixed for Perl 5.6.2.
+
+0.04  2006-08-19T02:31:49
+      - Fixed bad example of splicing @_ in the "Overriding Functions"
+        documentation.
+      - Added the 'class' keyword to make class declarations more natural--
+        that is, without needing to call the 'build' function.
+      - Deprecated the 'build' function. It will be removed in a future
+        release.
+
+0.03  2006-07-04T22:35:42
+      - Added ability to override the exported functions by subclassing
+        Class::Meta::Express. See the new "Overriding Functions" section of
+        the documentation.
+
+0.02  2006-05-30T03:22:30
+      - Documented that the 'reexport' parameter to meta() can take a code
+        reference argument.
+      - Fixed the 'reexport' parameter so that when it is a coderef it
+        actually works.
+      - Added POD coverage test.
+      - Added README to MANIFEST (and therefore to distribution)
+
+0.01  2006-05-30T00:56:44
+      - Initial public release.

@@ -1,0 +1,68 @@
+CGI::Builder::TT2
+-----------------
+
+DESCRIPTION
+    This module transparently integrates "CGI::Builder" and "Template" in a
+    very handy, powerful and flexible framework that can save you a lot of
+    coding, time and resources.
+
+    With this module, you don't need to produce the "page_content" within
+    your page handlers anymore (unless you want to); you don't even need to
+    manage a template system yourself (unless you want to).
+
+    If you use a template system on your own (i.e. not integrated in a CBF
+    extension), you will have to write all this code explicitly:
+
+    *   create a page handler for each page as usual
+
+    *   create a new template object and assign a new template file
+
+    *   find the runtime values and assign them to the template object
+
+    *   run the template process and set the "page_content" to the produced
+        output
+
+    You can save all that by just including this module in your build,
+    because it implements an internal transparent and automatic template
+    system that even without your explicit intervention is capable of
+    finding the correct template and the correct runtime values to fill it,
+    and generates the page_content auto-magically. With this module you can
+    even eliminate the page handlers that are just setting the page_content,
+    because the page is automatically sent by the template system.
+
+INSTALLATION
+    Prerequisites
+            CGI::Builder    >= 1.12
+            Template        >= 2.0
+
+    CPAN
+            perl -MCPAN -e 'install CGI::Builder::TT2'
+
+    Standard installation
+        From the directory where this file is located, type:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+SYNOPSIS
+        # just include it in your build
+    
+        use CGI::Builder
+        qw| CGI::Builder::TT2
+          |;
+
+AUTHORS
+    Stefano Rodighiero, <larsen@perl.it> (<http://larsen.perlmonk.org>)
+
+    Vince Veselosky (<http://control-escape.com>) - Contributed with many
+    ideas, comments and clever solutions to daunting problems. And the
+    extended example, too.
+
+COPYRIGHT
+    (c) 2004 by Stefano Rodighiero <larsen@perl.it>
+
+    All Rights Reserved. This module is free software. It may be used,
+    redistributed and/or modified under the same terms as perl itself.
+

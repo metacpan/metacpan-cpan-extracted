@@ -1,0 +1,17 @@
+Changes
+example.xml
+Makefile.PL
+MANIFEST
+README
+RSS.pm
+RSS.pod
+t/01_load_them.t
+t/02_xmllint.t
+t/03_rss_validator.t
+t/04_date_format_switcher.t
+t/05_imports.t
+t/05_no_import.t
+t/05_test_cgi-fast.t
+t/06_test_main_things.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,15 @@
+[% PROCESS show_user.tt %]
+<ul>
+  [% IF c.user %]
+  <li><a href="[% c.uri_for('/logout') %]">Logout</a></li>
+  <li><a href="[% c.uri_for('/admin') %]">Admin</a></li>
+  [% ELSE %]
+  <li><a href="[% c.uri_for('/login') %]">Login</a> <pre>(admin/admin, joe/joe or jack/jack)</pre></li>
+  [% END %]
+
+  <li><a href="[% c.uri_for('/with_role_admin') %]">/with_role_admin</a></li>
+  <li><a href="[% c.uri_for('/with_role_member_and_moderator') %]">/with_role_member_and_moderator</a></li>
+  <li><a href="[% c.uri_for('/can_create_Page') %]">/can_create_Page</a></li>
+  <li><a href="[% c.uri_for('/can_delete_Comment') %]">/can_delete_Comment</a></li>
+  <li><a href="[% c.uri_for('/can_recursive_roles') %]">/can_recursive_roles</a></li>
+</ul>

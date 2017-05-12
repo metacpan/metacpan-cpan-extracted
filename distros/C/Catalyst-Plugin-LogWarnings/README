@@ -1,0 +1,45 @@
+Catalyst-Plugin-LogWarnings
+
+This plugin redirects perl's warn() warnings to a Catalyst log
+($c->log->warn), allowing you to filter warnings, log warnings to a
+database, Log4Perl, etc.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Catalyst::Plugin::LogWarnings
+
+You can also look for information at:
+
+    Catalyst Project Website
+        http://www.catalystframework.org/
+
+    Search CPAN
+        http://search.cpan.org/dist/Catalyst-Plugin-LogWarnings
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-LogWarnings
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Catalyst-Plugin-LogWarnings
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Catalyst-Plugin-LogWarnings
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Jonathan Rockway
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

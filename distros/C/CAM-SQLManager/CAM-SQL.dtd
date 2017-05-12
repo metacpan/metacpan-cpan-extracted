@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!ELEMENT sqlxml (table?, query+)>
+
+<!ELEMENT table EMPTY>
+<!ATTLIST table
+          name CDATA ""
+          primarykey CDATA ""
+>
+
+<!ELEMENT query (result?, sql+)>
+<!ATTLIST query
+          name CDATA ""
+>
+
+<!ELEMENT sql (#PCDATA|bind|retrieve|replace)*>
+
+<!ELEMENT result EMPTY>
+<!ATTLIST result
+          key CDATA #IMPLIED
+          mutator CDATA #IMPLIED
+>
+
+<!ELEMENT bind EMPTY>
+<!ATTLIST bind
+          key CDATA #IMPLIED
+          accessor CDATA #IMPLIED
+          default CDATA #IMPLIED
+>
+
+<!ELEMENT retrieve EMPTY>
+<!ATTLIST retrieve 
+          key CDATA #IMPLIED
+          as CDATA #IMPLIED
+          mutator CDATA #IMPLIED
+>
+
+<!ELEMENT replace EMPTY>
+<!ATTLIST replace
+          key CDATA #IMPLIED
+          accessor CDATA #IMPLIED
+>

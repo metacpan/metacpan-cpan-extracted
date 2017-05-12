@@ -1,0 +1,37 @@
+Revision history for Perl extension Crypt::OpenSSL::Bignum.
+
+0.08    2017/02/08
+        - Makefile.PL MSWin32 fix
+
+0.07    2016/10/25
+        - Makefile.PL supports OPENSSL_PREFIX or OPENSSL_LIB+OPENSSL_INCLUDE env variables
+        - Makefile.PL tries to find libcrypto via pkg-config
+
+0.06    2015/02/06
+        - fix for #77911 Patch to add more functions
+        - new constructors: new, rand, pseudo_rand, rand_range
+        - new methods: ucmp, num_bits, num_bytes, rshift, lshift, swap
+        - improved pod documentation (added missing functions)
+        - XS code cleanup
+
+0.05    2015/02/04
+        - fix for #84369 Win32 compatibility patch
+        - fix for #100993 Memory not reclaimed when CTX object goes out of scope
+        - fix for #86561 typo fixes
+        - fix for #82959 Error in synopsis: Crypt::OpenSSL::Bignum->new_from_hex("0x3e8") returns "0"
+        - fix for #81537 to_bin method returns garbage when value is zero
+
+0.04    2007/05/20
+        - Add a LICENSE file.
+        - Add -DOPENSSL_NO_KRB5 to DEFINE to keep redhat happy.
+
+0.03    2003/04/27
+        - Revert back to old declaration style so that we no longer
+          break under perl 5.005 (spotted by Rob Brown <bbb@cpan.org>).
+
+0.02    2003/02/21
+        - link against libcrypto instead of libssl
+        - more documentation
+
+0.01    2003/02/17
+        - original version

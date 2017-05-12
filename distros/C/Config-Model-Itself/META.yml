@@ -1,0 +1,51 @@
+---
+abstract: 'Model editor for Config::Model'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  App::Cmd::Tester: '0'
+  App::Cme: '1.002'
+  File::Copy: '0'
+  File::Copy::Recursive: '0'
+  Module::Build: '0.34'
+  Test::Differences: '0'
+  Test::File::Contents: '0'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+configure_requires:
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-Itself
+requires:
+  App::Cme: '1.002'
+  App::Cme::Common: '0'
+  Carp: '0'
+  Config::Model: '2.101'
+  Config::Model::TkUI: '0'
+  Config::Model::Value: '0'
+  Data::Compare: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  IO::File: '0'
+  Log::Log4perl: '1.11'
+  Mouse: '0'
+  Mouse::Util::TypeConstraints: '0'
+  Path::Tiny: '0.062'
+  Pod::POM: '0'
+  Tk: '0'
+  YAML::Tiny: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dod38fr/config-model-itself/issues
+  homepage: https://github.com/dod38fr/config-model/wiki
+  repository: git://github.com/dod38fr/config-model-itself.git
+version: '2.009'
+x_serialization_backend: 'YAML::Tiny version 1.70'

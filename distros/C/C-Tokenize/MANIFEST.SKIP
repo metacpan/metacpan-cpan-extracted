@@ -1,0 +1,17 @@
+# Repository
+^\.git
+\.gitignore
+# Personal thing
+^build\.pl$
+# Local build files
+^blib
+^Makefile$
+# Auto-files not to be distributed
+^MYMETA\.(json|yml)$
+^pm_to_blib$
+# Source file
+^lib/C/Tokenize\.pod\.tmpl$
+^examples/.*-out.txt$
+^make-pod\.pl$
+# Author tests
+^xt/.*$

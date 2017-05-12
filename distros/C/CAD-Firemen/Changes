@@ -1,0 +1,105 @@
+0.7.2 2015-09-18
+  * Fixed compiling error with Perl v5.12.2 win32 (s. http://www.cpantesters.org/cpan/report/0da16443-6bfc-1014-b3eb-08d6c7cd22ef)
+	* Added check for json parsing result in Creo3.pm now
+	* Added number of duplicated, added, removed and changed options to the html table header in fm_diff_cdb
+0.7.1 2015-09-15
+  * fm_diff_cdb: Added option --html to create a html file with the changes
+	* Added Pod::Usage and Getopt::Long auto_help to provide help from perl doc synopsis
+	* Fixed lower cased option names in Creo3.pm
+0.7.0 2015-09-11
+	* Adapted fm_check_struct to reflect new Creo 3 directory layout
+	* Added --force option to fm_check_struct, to force archive creation, even if tests have failed
+	* Fixed Common::untaint, which now allows ~ and ; as characters. Added additional tests too.
+	* fm_create_help is now able to parse Creo 3 and older help to extract information about option 
+	  * Old documentation parsing (< Creo 3) is now in ParseHelp::Wildfire5.pm
+		* New documentation parsing (>= Creo 3) is now in ParseHelp::Creo3.pm
+		* fm_create_help determines which to use, calls the appropriate one and process the extracted information
+0.6.3 2015-07-13
+	* Adapted Common getInstallationPath to find Common Files directory in new Creo 3 directory layout.
+0.6.2 2014-02-07
+	* Fixed errors in comparing cdb files fm_diff_cdb and Analyze::compare()
+	* Fixed typo in help of fm_diff_cdb
+0.6.1 2013-08-26
+  * Fixed compile error in fm_admin
+0.6.0 2013-08-23
+	* fixed overrided databases array of config file in CAD::Firemen::Common::dbConnect()
+	* Created databases are now named after APP-NAME-VERSION-PATCH-VERSION, to allow the presende of mutliple patch-versions of one main version (like Creo 2 M10 and Creo 2 M20)
+	* fixed error caused by not defined $dbh at END of the scripts
+	* Added fm_admin to administer configuration of CAD::Firemen
+0.5.4 2013-08-23
+	* more error handling in CAD::Firemen/Common printBlock() and printColored()
+	* fixed windows linendings in 00-load.t
+	* fixed not disconnected database connection in fm_option_info, fm_diff_cdb, fm_diff_config, fm_check_config, fm_check_struct and fm_create_help
+0.5.3 2012-08-15
+	* fm_create_help fixed not escaped character
+0.5.2 2011-10-21
+  * fm_create_help is able to create user defined language for Notepad++ with auto completion support
+	* fm_create_help now searches toc files case insensitive (e.g. en_US or en_us is found)
+	* fm_check_struct excludes all string starting with http:// from path and file checking
+0.5.1 2011-10-19
+  * Fixing naming issue Firemen to CAD-Firemen
+  * Fixing some other naming issues within the documentation and CAD::Firemen::Common::printVersion()
+0.5.0 2011-10-19
+  * Generall: Moved to namespace CAD::Firemen
+  * fm_check_struct
+    * Exclude numbers like 1.5 from directory and files checkings, because they are not files or directories
+    * Checks the tree config files for empty lines with help of Analyze::checkTreeConfig()
+  * Analyze.pm
+    * Added function checkTreeConfig() to check the tree config file (actual only for empty lines)
+  * fm_create_help added option --crossfire which causes fm_create_help to output the file in crossfires help format
+0.4.1 2011-09-20
+  * fm_check_struct
+    * config.win is also moved into correct place when creating test environments
+  * fm_create_help
+    * fixed typo in HTML::TreeBuilder
+0.4 2011-09-06
+  * fm_diff_config
+    * Added --binary or -b to switch to binary mode
+    * Binary files can be supported now. Per default, all files ending with
+      * win
+      * prt
+      * asm
+      * frm
+      * tbl
+      are treated as binary files and all files where -B returns true.
+  * Fixed not working duplicate checking, therefore changed structure in Load.pm functions. This causes many changes in all files.
+  * fm_check_struct
+    * Added option -e or --environment. If set, fm_check_struct creates an proe working directory with the selected structure.
+      It also creates a shortcut on the desktop, so that proe can be started easily with the structure to test.
+0.3 2011-08-23
+  * Renamed into Firemen (struggling with Wildfire ;-) )
+    * all ptc_ commands are renamed to fm_
+  * fm_option_info
+    * FIXED "Can't use an undefined value as an ARRAY reference"
+  * fm_check_struct
+    * File names of created archives contain an date time string like YYYYmmdd-HHMMSS now
+  * Load.pm
+    * loadConfig: Ignores lines with mapkeys
+  * Introduced a database with options, their values and default value
+    * fm_create_help - creates those databases with help of the installed html help
+    * All other scripts are adapted to use those databases
+      * if useful, they support the option --description|-d to print out the help string for each displayed option.
+    * see perldoc Firemen for hints
+  * Introduced settings file (in c:\ProgrammData\Firemen) in YAML syntax see perldoc Firemen for hints.
+0.2 2011-08-18
+  * PTC
+    * Added printVersion
+  * Analyze.pm
+    * Provides functionalitity to compare (compare()) and check (checkConfig()) config files
+    * Changed ptc_check_config to use checkConfig()
+  * Change.pm and Change::Type.pm
+    * Change object to handle informations about made changes of option values
+  * All scripts
+    * added --version and --help to SYNOPSIS and help()
+  * ptc_option_info
+    * New special notice of value -Fs
+    * Regex support for option names with -r switch
+  * ptc_check_struct
+    * Calls PTC::Analyze::checkConfig() to check the config
+    * Also checks, that all referenced files from config.pro are in the correct relative location to given config.pro
+  * Common.pm
+    * Added three functions to avoid to detect all ptc installations, let the user choose one and return
+      path to config.cdb and config.pro wihtin the choosen installation.
+  * Combined LoadCDB.pm and LoadConfig.pm into Load.pm
+0.1 2011-08-15
+	* First version for internal use

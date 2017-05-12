@@ -1,0 +1,17 @@
+
+                        CHANGELOG for Crypt::RSA
+           $Id: Changes,v 1.25 2001/05/30 13:10:32 vipul Exp $
+
+--------------------------------------------------------------------------
+
+0.50                                                      January 16, 2003
+
+    * Patch by Dave Paris to fix a limit problem in trialdiv().
+
+    * Removed references to /home/vipul from @INC.
+
+0.49                                                         June 10, 2000
+
+    * Patch by Ashish Gulhati that modifies maurer() to return
+      intermediate primes and factors.
+

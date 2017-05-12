@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/Class/DBI/FormTools.pm
+MANIFEST			This list of files
+README
+t/00.load.t
+t/10.local_fields.t
+t/20.one_to_many_fields.t
+t/21.one_to_many_fields.t
+t/22.one_to_many_fields.t
+t/30.many_to_many_fields.t
+t/31.many_to_many_fields.t
+t/32.many_to_many_fields.t
+t/lib/Actor.pm
+t/lib/Film.pm
+t/lib/Location.pm
+t/lib/Role.pm
+t/pod-coverage.t
+t/pod.t
+TODO.txt
+META.yml

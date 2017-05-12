@@ -1,0 +1,35 @@
+Revision history for Perl extension Convert::BulkDecoder.
+
+1.03  Sun Jun 19 17:23:00 2005
+
+        * Release 1.03
+
+	* Fix some problems with file creation and dups detection.
+
+1.02  Mon Mar 31 12:35:00 2003
+
+	* Release 1.02
+
+	* BulkDecoder: Add binmode for non-Unix systems.
+
+	* mfetch: cleanups.
+
+1.00  Mon Feb  3 18:18:00 2003
+
+	* Release 1.00
+
+0.03  Fri Jan 31 22:23:32 2003
+
+	* BulkDecoder.pm: Allow multiple return values.
+	Add "force" option. Check constructor attributes.
+
+0.02  Thue Jan 30 2003
+
+	* Add checksumming for non-split yencoded files.
+
+	* Add size calculation.
+
+0.01  Wed Jan 29 12:51:44 2003
+
+	* Initial version; created from existing tools.
+

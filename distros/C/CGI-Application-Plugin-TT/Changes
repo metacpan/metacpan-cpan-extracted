@@ -1,0 +1,106 @@
+Revision history for Perl extension CGI::Application::Plugin::TT.
+
+1.05  Fri Jun  4 14:25:49 EST 2010
+
+    - fix dev popup support by html encoding the data sent
+      to the popup window (patch by Clayton L. Scott)
+    - fix test failure on windows (patch by Alexandr Ciornii)
+
+1.04  Wed Nov  1 07:08:50 EST 2006
+
+    - add TEMPLATE_PRECOMPILE_DIR option which can
+      automatically compile all your templates on startup
+      (patch by Michael Peters)
+    - slightly refactored the default tt_template_name code
+    - doc fix (Trammell Hudson/Robert Sedlacek)
+
+1.03  Thu May 18 12:27:26 EDT 2006
+
+    - the default tt_template_name method now accepts
+      a parameter that specifies how many caller levels
+      we walk up (from the calling method) to find the
+      method name to use as a base for the template name
+      (defaults to 0)
+    - a side effect of this change is that you can now
+      pass any parameters you like to your custom
+      TEMPLATE_NAME_GENERATOR method, when calling
+      $self->tt_template_name(...).
+
+1.02  Sun Feb  5 20:11:23 EST 2006
+
+    - Allow call to tt_process with no parameters 
+      (brad -at- footle.org)
+
+1.01  Wed Jan 25 16:00:38 EST 2006
+
+    - Fix doc error in synopsis (Jonathan Anderson)
+    - Before calling 'call_hook' make sure it exists
+    - Update pod coverage tests
+
+1.00  Wed Oct 19 14:11:22 EDT 2005
+
+    - added support for tt_include_path to return the
+      current value of INCLUDE_PATH
+
+0.10  Fri Sep 23 08:58:34 EDT 2005
+
+    - fix tests for DevPopup so it doesn't fail if it is not
+      installed (Thanks to Jason Purdy and Rhesa Rozendaal)
+
+0.09  Wed Sep 21 15:59:03 EDT 2005
+
+    - added support for the load_tmpl hook in CGI::App
+    - added support for the DevPopup plugin
+    - added pod coverage tests
+
+0.08  Sun Jul 31 17:38:16 EDT 2005
+
+    - Made some small doc changes that I meant to put in the
+      last release.
+
+0.07  Sat Jul 30 9:18:46 EDT 2005
+
+    - fixed Windows path bug in test suite (Emanuele Zeppieri)
+    - Simplify the pod tests according to Test::Pod docs
+    - Support the new callback hooks in CGI::Application 4.0
+    - Automatically add { c => $self } to template params
+        (see docs under DEFAULT PARAMETERS)
+    - minor doc cleanups
+
+0.06  Thu Feb  3 15:38:39 EST 2005
+
+    - Document use of tt_config as a class method for singleton
+      support
+    - Some other small documentation cleanups
+
+0.05  Mon Jan 24 11:47:06 EST 2005
+
+    - add tt_template_name which autogenerates template filenames
+    - tt_process will call tt_template_name if the template
+      name is not provided as an arguement
+    - add Singleton support for TT object
+
+0.04  Fri Dec  3 12:02:56 EST 2004
+
+    - die if there is an error processing a template in tt_process
+
+0.03  Sun Sep 19 18:13:03 EST 2004
+
+    - scrap CGI::Application::Plugin support for simple Exporter
+      system.
+    - Moved module to the CGI::Application::Plugin namespace.
+    - module no longer depends on inheritance, so just use'ing
+      the module will suffice to import the required methods
+      into the current class.
+
+0.02  Mon Jul 26 23:44:39 EST 2004
+
+    - add support for the new CGI::Application::Plugin base class.
+      This means the usage has changed.  Altering the inheritance
+      tree is no longer necesary, as you only need to use the module
+      and it will import the plugin methods into the callers
+      namespace automatically.  See the docs for more details...
+
+0.01  Sun Feb 15 16:10:39 EST 2004
+
+    - original version

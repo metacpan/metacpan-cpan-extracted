@@ -1,0 +1,14 @@
+Revision history for CGI-Session-Flash
+
+Version 0.02 - November 21, 2008
+    * Removed auto_cleanup parameter.  Instead we keep track of the cleanup
+      process and don't allow it to be run more than once unless a force
+      parameter is specified.
+    * Added a cleanup_done accessor to note if the cleanup process has already
+      taken place.
+    * flush() now calls cleanup()
+    * Documentation updates.  Specially note more about the automatic cleanup
+      process and caveats.
+
+Version 0.01 - March 25, 2008
+    * First version, released on an unsuspecting world.

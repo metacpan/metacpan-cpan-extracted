@@ -1,0 +1,6 @@
+These demo scripts are some examples to show how to do something with
+Chart::Gnuplot.
+
+To generate the results, you make type "make" if you have GNU make utility.
+Alternatively, you may execute them one by one. Then, you may browse
+index.html.

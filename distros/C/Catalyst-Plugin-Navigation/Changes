@@ -1,0 +1,11 @@
+Revision History for CatalystX::Plugin::Navigation
+
+1.002 Fri, 1 April 2011 15:11:00 -0400 derek
+	Fixing problems with build on some dists.
+
+1.001 Wed, 9 March 2011 11:30:00 -0400 derek
+	Fixing condition testing.
+
+1.000 Mon, 7 March 2011 11:07:00 -0400 derek
+	Initial Release.
+

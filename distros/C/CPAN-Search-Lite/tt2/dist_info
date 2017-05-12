@@ -1,0 +1,151 @@
+<div class=path>
+<a href="[% home %]/[% mode %]">[% pages.list.$mode %]</a>
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<a href="[% home %]/[% mode %]/[% letter %]/">
+[% letter %]</a>
+[% IF subletter %]
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<a href="[% home %]/[% mode %]/[% subletter %]/">
+[% subletter %]</a>
+[% END -%]
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<b>[% results.dist_name %]</b>
+</div>
+<div class=box>
+<table><tr>
+[% host = mirror ? mirror : download %]
+<td class=label>[% pages.distribution %]</td>
+<td class=cell>
+[% results.dist_name %]
+&nbsp;[<a
+href="[% host %]/authors/id/[% results.download %]">[% pages.download%]</a>]
+[% IF webstart %]
+&nbsp;[<a
+href="[% cpaninstall %]?dist=[% results.dist_file %];cpanid=[% results.cpanid %]">[% pages.install %]</a>]
+[% END -%]
+</td></tr><tr>
+<td class=label>[% pages.author %]</td>
+<td class=cell>
+<a href="[% home %]/~[% results.cpanid | lower %]">
+[% results.cpanid %]</a> [ [% results.fullname %] ]</td>
+</tr><tr>
+<td class=label>[% pages.version %]</td>
+<td class=cell>[% results.dist_vers %]</td>
+</tr><tr>
+<td class=label>[% pages.abstract %]</td>
+<td class=cell>[% results.dist_abs %]</td>
+</tr><tr>
+<td class=label>[% pages.released %]</td>
+<td class=cell>[% results.birth %]</td>
+</tr><tr>
+<td class=label>[% pages.size %]</td>
+<td class=cell>[% results.size %] </td>
+</tr><tr>
+<td class=label>[% pages.cs %]</td>
+[% IF results.md5 %]
+<td class=cell>[% results.md5 %] </td>
+[% END -%]
+</tr><tr>
+<td class=label>[% pages.additional %]</td>
+<td class=cell>
+[% FOREACH file = ['readme', 'meta', 'changes', 'install' ] %]
+[% IF results.$file %]
+<a href="[% doc %]/[% results.dist_name %]/[% extra_files.$file.link %]">
+[% extra_files.$file.name %]</a> &nbsp; | &nbsp;
+[% END -%]
+[% END -%]
+</td></tr><tr>
+<td class=label>[% pages.links %]</td>
+<td class=cell>
+<a href="[% searchcpan %]~[% results.cpanid %]/[% results.dist_name %]/">search.cpan.org</a> &nbsp; | &nbsp;
+<a href="[% forum %][% results.dist_name %]">Discussion forum</a>&nbsp; | &nbsp;
+<a href="[% anno %][% results.dist_name %]">AnnoCPAN</a>&nbsp; | &nbsp;
+<a href="[% rt %][% results.dist_name %]">rt.cpan.org bugs</a>&nbsp; | &nbsp;
+<a href="[% rate %][% results.dist_name %]">Rating</a>&nbsp; | 
+<a href="[% testers %][% results.dist_name %].html">CPAN testers</a>
+</td></tr>
+[% IF results.reqs %]
+<td class=label>[% pages.prereqs %]</td>
+<td class=cell>
+[% FOREACH item = results.reqs %]
+<a href="[% home %]/module/[% item.mod_name %]">
+[% item.mod_name %]</a>&nbsp; | &nbsp;
+[% END -%]
+</td></tr>
+[% END -%]
+</table></div>
+<div class=box>
+<h2 class=t2>[% pages.list.module %]</h2>
+<table width="100%" class=mods>
+[% FOREACH item = results.mods %]
+<tr><td>
+[% IF item.html %]
+<a href="[% doc %]/[% item.html %]">[% item.mod_name %]</a>
+[% IF item.htmlsrc %]
+&nbsp;[<a href="[% doc %]/[% item.htmlsrc %]">source</a>]
+[% END -%]
+[% ELSE %]
+[% item.mod_name %]
+[% IF item.htmlsrc %]
+&nbsp;[<a href="[% doc %]/[% item.htmlsrc %]">source</a>]
+[% END -%]
+[% END -%]
+[% IF item.mod_vers %]
+&nbsp; [v [% item.mod_vers %]]
+[% END -%]
+</td><td align="left">
+[% item.mod_abs %]
+</td></tr>
+[% END -%]
+</table></div>
+[% IF results.chaps %]
+<div class=box>
+<h2 class=t2><a href="[% home %]/chapter">[% pages.categories %]</a></h1>
+<table width=100% class=cats>
+[% FOREACH item = results.chaps %]
+<tr><td colspan=2>
+<a href="[% home %]/chapter/[% item.chap_link %]">
+[% item.chap_desc %]</a>
+&nbsp; &nbsp;<b>&gt;&gt;</b> &nbsp; &nbsp;
+<a href="[% home %]/chapter/[% item.chap_link %]/[% item.subchapter %]">
+[% item.subchapter %]</a>
+</td></tr>
+[% END -%]
+</table>
+</div>
+[% END -%]
+[% IF results.dslip %]
+<div class=box>
+<h2 class=t2><a href="[% dslip %]">dslip</a> [% pages.info %]</h2>
+<table class=dslip width=100%>
+[% FOREACH item = results.dslip_info %]
+<tr>
+<td>[% item.desc %]</td>
+<td>[% item.what %]</td>
+</tr>
+[% END -%]
+</table>
+</div>
+[% END -%]
+<div class=box>
+<h2 class=t2>Win32 
+<a href="[% ppm %]">PPM</a> [% pages.packages %] &quot;[% results.dist_name %]&quot; [<a href="[% ppmrequest %]dist=[% results.dist_name %]"><font size=-1>ppm-request</font></a>]</h2>
+<table width=100% class=ppm>
+[% IF results.ppms %]
+[% FOREACH item = results.ppms %]
+<tr><td>
+<a href="[% item.browse %]">[% item.abs %]</a>
+&nbsp; [ &nbsp;v [% item.ppm_vers %] &nbsp; ]
+[% IF webstart %]
+&nbsp;[<a
+href="[% ppminstall %]?dist=[% results.dist_name %];rep=[% item.alias %]">[% pages.install %]</a>]
+[% END -%]
+</td></tr>
+[% END -%]
+[% ELSE -%]
+<tr><td>
+[% pages.nada %]
+</td></tr>
+[% END -%]
+</table></div>
+

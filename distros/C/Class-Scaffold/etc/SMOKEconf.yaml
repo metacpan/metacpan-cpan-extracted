@@ -1,0 +1,6 @@
+--- #YAML:1.0
+#
+# Use this configuration file for development of Class-Scaffold
+#
+environment: Class::Scaffold::Environment
+core_storage_name: STG_NULL

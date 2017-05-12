@@ -1,0 +1,31 @@
+// File: CORBA_Policy.idl
+// CORBA 3.0, Chapter 4
+
+#ifdef _PRE_3_0_COMPILER_
+#pragma prefix "omg.org/CORBA"
+#endif
+
+    typedef unsigned long PolicyType;
+
+    // Basic IDL definition
+    interface Policy {
+        readonly attribute PolicyType policy_type;
+        Policy copy();
+        void destroy();
+    };
+
+    typedef sequence <Policy> PolicyList;
+    typedef sequence <PolicyType> PolicyTypeSeq;
+
+    typedef short PolicyErrorCode;
+
+    native AbstractBase;
+
+    exception PolicyError {PolicyErrorCode reason;};
+
+    const PolicyErrorCode BAD_POLICY = 0;
+    const PolicyErrorCode UNSUPPORTED_POLICY = 1;
+    const PolicyErrorCode BAD_POLICY_TYPE = 2;
+    const PolicyErrorCode BAD_POLICY_VALUE = 3;
+    const PolicyErrorCode UNSUPPORTED_POLICY_VALUE = 4;
+

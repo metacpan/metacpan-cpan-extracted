@@ -1,0 +1,33 @@
+# Use brutal severity, with the caveats below.
+severity = 1
+
+# This is a todo: add the usual POD sections.
+[-Documentation::RequirePodSections]
+
+# I like postfix control structures
+[-ControlStructures::ProhibitPostfixControls]
+
+# I use parentheses with builtins most of the time.
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+# I haven't set up a perltidy config to match my coding
+# style yet.
+[-CodeLayout::RequireTidyCode]
+
+# Empty quotes are handy, especially inline.
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+# This code uses string eval of necessity to load optional libraries.
+[-BuiltinFunctions::ProhibitStringyEval]
+
+# Where I use eval, the return value evaluates to false every time.
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# I define homonyms of builtins, but they're methods; perlcritic
+# can't tell the difference.
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+# I don't care about the return values of print, most of the time.
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print

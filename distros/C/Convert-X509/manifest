@@ -1,0 +1,9 @@
+Makefile.PL
+manifest
+lib\Convert\X509.pm
+lib\Convert\X509.pod
+lib\Convert\X509\Certificate.pm
+lib\Convert\X509\CRL.pm
+lib\Convert\X509\minipkcs7.pm
+lib\Convert\X509\Parser.pm
+lib\Convert\X509\Request.pm

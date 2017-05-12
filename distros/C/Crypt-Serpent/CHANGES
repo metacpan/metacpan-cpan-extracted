@@ -1,0 +1,21 @@
+Revision history for Perl extension Crypt::Serpent
+
+1.01   March 30, 2002
+
+    -- Removed the line continuation characters from serpentsboxes.h so
+       that it'll compile on Solaris and FreeBSD.
+
+1.0    March 28, 2002
+
+    -- Fixed a significant bug regarding the use of the makeKey function.
+    -- Incorporated AES test vectors into test.pl and t/00_load.t.
+
+0.50   November 12, 2001
+
+    -- Made the distribution Crypt::CBC compliant.
+
+0.01   September 24, 2001
+
+    -- Right now, this module only supports ECB mode. I'll try
+       to get CBC and CFB working shortly.
+

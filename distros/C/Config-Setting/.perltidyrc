@@ -1,0 +1,6 @@
+# Defaults that I like for perltidy.
+-i=8
+-ce
+-ci=4
+-pt=0
+-bt=0

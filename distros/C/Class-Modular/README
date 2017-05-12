@@ -1,0 +1,13 @@
+Class::Modular is a superclass for generating modular classes, where
+methods can be added into the class from the perspective of the
+object, rather than from the perspective of the class.
+
+See perldoc Class::Modular for more information, and COPYING for
+copyright and licensing information.
+
+Current development versions are available at
+http://rzlab.ucr.edu/cgi-bin/viewcvs.cgi/trunk/?root=Class+Modular
+
+Da::DB makes extensive use of Class::Modular, and is available at
+http://rzlab.ucr.edu/cgi-bin/viewcvs.cgi/?root=Da+DB and should be
+comming soon to a CPAN mirror near you.

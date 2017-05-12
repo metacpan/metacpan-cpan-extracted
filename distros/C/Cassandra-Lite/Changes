@@ -1,0 +1,50 @@
+0.4.0   July 29, 2011
+        - INCOMPATIBLE: The arguments of delete() is changed.  $column is not
+          needed.
+        - INCOMPATIBLE: The return value of get() is changed.  If $column is
+          scalar, then just return a simple hash.
+        - Support cql().
+        - Support truncate().
+
+0.3.0   July 29, 2011
+        - INCOMPATIBLE: The return value of get() is much simpler now.
+
+0.2.1   July 27, 2011
+        - Add development warning.
+
+0.2.0   July 26, 2011
+        - INCOMPATIBLE: Change get_count() arguments.
+
+0.1.0   July 26, 2011
+        - INCOMPATIBLE: Remove insert(), use put() instead.
+        - INCOMPATIBLE: Remove remove(), use delete() instead.
+        - INCOMPATIBLE: Remove get_slice(), merge its functionality into get().
+        - Support custom Thrift transport read/write.
+
+0.0.7   July 23, 2011
+        - Support get operations for multiple keys.
+
+0.0.6   July 18, 2011
+        - Rename "insert" to "put" and setup alias to keep compatibility.
+        - Rename "remove" to "delete" and setup alias to keep compatibility.
+        - Fix multiple columns insert bug.
+
+0.0.5   July 17, 2011
+        - Support for count and reverse in get_slice and get_count
+          functions. (thanks for jcbf, issue #4)
+        - Fix typo in sample.
+        - Upgrade Thrift interface to 0.8.1 generated version.
+
+0.0.4   April 18, 2011
+        - Support consistency level.
+
+0.0.3   April 18, 2011
+        - Support timestamp.
+        - Remove unnecessary file.
+
+0.0.2   April 18, 2011
+        - Rename count() to get_count().
+        - Import Cassandra thrift-generated code.
+
+0.0.1   April 18, 2011
+        - Initial release.

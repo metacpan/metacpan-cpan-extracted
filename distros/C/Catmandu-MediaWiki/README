@@ -1,0 +1,16 @@
+NAME
+
+    Catmandu::MediaWiki - Catmandu modules for MediaWiki
+
+AUTHORS
+
+    Nicolas Franck <nicolas.franck at ugent.be>
+
+MODULES
+
+    Catmandu::Importer::MediaWiki
+
+SEE ALSO
+
+    Catmandu, MediaWiki::API
+

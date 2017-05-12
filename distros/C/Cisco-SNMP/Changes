@@ -1,0 +1,25 @@
+Revision history for Perl extension Cisco::SNMP.
+
+1.02  Fri Dec  9 12:30:00 2016
+      - Fix version compare for Socket module (for IPv6) with 'use version'.
+
+1.01  Wed Apr 22 20:30:00 2015
+      - Updated this changelog.
+
+1.00  Wed Apr 22 20:30:00 2015
+      - Major rewrite of Cisco::Management!!!
+      - Maintains 99% backward compatible (save for replaceing 
+        Cisco::Management with Cisco::SNMP).
+      - Created separate packages for management specific functions.
+      - _snmpgetnext() => _snmpwalk().
+      - cpu_info() order changed (type 1,2,3 => 3,2,1).
+      - Changed system_inventory() to entity_info(); 
+      - Expired many legacy accessors.
+      - bin\cisco-intf.pl options -u and -U switched and -d became -D.
+      - Many bin\* script updates to separate functionality.
+      - Changed @IPKEYS: IPAddress -> Addr, IPMask -> NetMask to match 
+        OID names.
+      - Removed access to *KEYS arrays directly; use accessors instead.
+      - interface_ip() moved to C::M::IP->ip_info().
+
+Was Cisco::Management prior to this.

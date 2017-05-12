@@ -1,0 +1,14 @@
+<tmpl_var name=notes>
+<span class="cgi_app_box">
+	<table>
+		<tmpl_loop name=tr_loop>
+			<tr>
+				<tmpl_loop name=td_loop>
+					<tmpl_if name=count><th class="cgi_app_no_submit"><tmpl_var name=count></th></tmpl_if>
+					<td><input type="radio" name="<tmpl_var name=kind>" <tmpl_var name="checked"> value="<tmpl_var name=td>" /><span class="cgi_app_no_submit"><tmpl_var name=td></span></td>
+				</tmpl_loop>
+			</tr>
+		</tmpl_loop>
+	</table>
+</span>
+<tmpl_var name=commands>

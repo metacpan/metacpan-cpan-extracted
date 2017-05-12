@@ -1,0 +1,17 @@
+Revision history for Catalyst-View-PDF-Reuse
+
+0.04    21-Jun-2010
+        Fixed bug which prevented templates from being found when
+        using relative paths
+
+0.03    08-Feb-2009 10:06
+        Added missing prereq for parent.pm (reported by CPAN testers,
+        thanks Chris!)
+
+0.02    07-Feb-2009 12:19
+        Added option to control the Content-Disposition header
+        Added 'render' method to access the raw PDF data
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

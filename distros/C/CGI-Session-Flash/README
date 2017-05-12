@@ -1,0 +1,47 @@
+CGI-Session-Flash
+
+This module implements a Flash object.  A flash is session data with a
+specific life cycle.  When you put something into the flash it stays there
+until two C<cleanup> calls have been made.  What this generally means is
+that in a web application the data in the flash will stay until the end
+of the next request.  This allows you to use it for storing messages that
+can be accessed after a redirect, but then are automatically cleaned up.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Session::Flash
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Session-Flash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Session-Flash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Session-Flash
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Session-Flash
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Bradley C Bailey
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

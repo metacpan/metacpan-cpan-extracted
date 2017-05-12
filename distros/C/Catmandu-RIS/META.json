@@ -1,0 +1,75 @@
+{
+   "abstract" : "Catmandu modules for working with RIS data",
+   "author" : [
+      "Vitali Peil"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-RIS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0",
+            "Catmandu::Importer::CSV" : "0",
+            "Encode" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-RIS/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-RIS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-RIS.git",
+         "web" : "https://github.com/LibreCat/Catmandu-RIS"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "vpeil <vitali.peil@uni-bielefeld.de>"
+   ]
+}
+

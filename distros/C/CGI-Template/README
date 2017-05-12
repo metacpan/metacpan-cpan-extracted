@@ -1,0 +1,30 @@
+CGI-Template version 0.01
+=========================
+
+CGI::Template is an easy to use and intuitive template system for Perl 
+web application development.
+
+This is the initial version of CGI::Template.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by David J. Venable, davidjvenable@gmail.com 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

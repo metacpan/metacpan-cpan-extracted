@@ -1,0 +1,31 @@
+---
+abstract: 'generate a dashboard of information about a selection of CPAN dists'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Dashboard
+requires:
+  CPAN::ReverseDependencies: '0'
+  CPAN::Testers::WWW::Reports::Query::AJAX: '0'
+  Carp: '0'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  Moo: '0'
+  PAUSE::Packages: '0'
+  PAUSE::Permissions: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/neilbowers/CPAN-Dashboard
+  repository: https://github.com/neilbowers/CPAN-Dashboard.git
+version: '0.02'

@@ -1,0 +1,9 @@
+<ul>
+[%- FOREACH link = c.model('TextLinkAds').fetch( my_inventory_key ) %]
+    <li>
+        [% link.beforeText %]
+        <a href="[% link.URL %]">[% link.Text %]</a>
+        [% link.afterText %]
+    </li>
+[%- END %]
+</ul>

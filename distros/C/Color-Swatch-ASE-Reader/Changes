@@ -1,0 +1,45 @@
+Release history for Color-Swatch-ASE-Reader
+
+0.001004 2017-03-09T19:15:23Z 2964226
+ - BugFix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+0.001003 2014-08-16T05:38:21Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - Tests augmented.
+ - metdata updated.
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Metadata]
+ - migrate to kentnl org.
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.001002 2014-06-29T03:57:50Z
+ - Minor documentation fixes.
+
+0.001001 2014-06-27T19:27:46Z
+ [Bugfix]
+ - Attempt to solve problem with comparison due to different amounts of precision by reducing required comparative
+   precision to 8 bits, by translating into an int between 0 and 255
+
+0.001000 2014-06-26T14:03:41Z
+ - First version.

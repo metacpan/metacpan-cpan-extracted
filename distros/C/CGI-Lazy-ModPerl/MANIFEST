@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Lazy-ModPerl.t
+lib/CGI/Lazy/ModPerl.pm

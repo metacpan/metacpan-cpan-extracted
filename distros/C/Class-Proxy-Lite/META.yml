@@ -1,0 +1,16 @@
+---
+name: Class-Proxy-Lite
+version: 1.01
+author: []
+abstract: 'Simple, lightweight object proxies'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Class::Proxy::Lite:
+    file: lib/Class/Proxy/Lite.pm
+    version: 1.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,17 @@
+Revision history for Perl extension Crypt::SmbHash.
+
+0.01  Wed Sep 26 10:58:41 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Crypt::SmbHash
+0.02  Mon Oct  8 12:07:08 2001
+	- workaround for Digest::MD4, other machines didn't like the
+		way I was calling it
+0.12  Sun Oct 17 17:00:00 2004
+	- Woke up from long sleep.
+	- Finally applied patch supplied to me from
+		Alexander Zangerl <az@snafu.priv.at>, for support of
+		non-ascii characters, and correct handling for passwords
+		like "0"
+	- Included SMBNTEncrypt subroutine, which is used in
+		challenge/response authentication. I added it and can't be
+		bothered to take it out =)

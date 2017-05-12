@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Convert-Number-Greek
+version:      0.02a
+version_from: 
+installdirs:  site
+requires:
+    Exporter:                      0
+    POSIX:                         0
+    strict:                        0
+    Test:                          0
+    utf8:                          0
+    warnings:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

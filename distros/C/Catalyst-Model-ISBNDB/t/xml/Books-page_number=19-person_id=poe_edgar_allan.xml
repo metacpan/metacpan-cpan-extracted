@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:48Z">
+<BookList total_results="252" page_size="10" page_number="19" shown_results="10">
+<BookData book_id="the_letters_from_george_w_eveleth_to_edgar_allan_poe" isbn="0848218191">
+<Title>The letters from George W. Eveleth to Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited by Thomas Ollive Mabbott</AuthorsText>
+<PublisherText publisher_id="norwood_editions">Norwood, Pa. : Norwood Editions, 1976.</PublisherText>
+<Details dewey_decimal="" physical_description_text="27 p. ; 30 cm." language="eng" edition_info="$10.00" dewey_decimal_normalized="" lcc_number="" change_time="2005-05-13T21:50:27Z" price_time="2006-10-08T08:01:59Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1922 ed. published by the New York Public Library.
+
+Includes bibliographical references.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_correspondence">Poe, Edgar Allan,1809-1849 -- Correspondence</Subject>
+<Subject subject_id="eveleth_george_washington">Eveleth, George Washington</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Missouri" last_update="2005-05-13T21:50:27Z" marc_url="http://isbndb.com/x/libdata/isbndb-113-the_letters_from_george_w_eveleth_to_edgar_allan_poe-20050513.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="eveleth_george_washington">Eveleth, George Washington</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="mabbott_thomas_ollive">Mabbott, Thomas Ollive</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_life_and_poems_of_edgar_allan_poe" isbn="083831726X">
+<Title>The life and poems of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>a new memoir by Eugene L. Didier, and an introductory letter by Sarah Helen Whitman</AuthorsText>
+<PublisherText publisher_id="haskell_house">New York, Haskell House, 1974.</PublisherText>
+<Details dewey_decimal="" physical_description_text="305 p. illus. 23 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2003-10-20T10:14:46Z" price_time="2006-10-08T08:02:02Z" />
+<Summary></Summary>
+<Notes>Reprint of the 1879 ed. published by W. J. Widdleton, New York.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Life and Poems of Edgar Allan Poe (Studies in Poe : No 23)" store_url="http://isbndb.com/x/book/the_life_and_poems_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:11Z" currency_rate="1" price="75" />
+<Price store_isbn="" store_title="Life and Poems of Edgar Allen Poe" store_url="http://isbndb.com/x/book/the_life_and_poems_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:55:37Z" currency_rate="1" price="70.5" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Arizona State University" last_update="2003-10-20T10:14:46Z" marc_url="http://isbndb.com/x/libdata/isbndb-31-the_life_and_poems_of_edgar_allan_poe-20031020.mrc" />
+<MARC library_name="North Carolina (Coastal) Database" last_update="2004-03-24T14:42:06Z" marc_url="http://isbndb.com/x/libdata/isbndb-122-the_life_and_poems_of_edgar_allan_poe-20040324.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="didier_eugene_lemoine">Didier, Eugene Lemoine</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_literary_life_of_thingum_bob_esq" isbn="0585052026">
+<Title>The literary life of Thingum Bob, Esq</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:05Z" price_time="2006-10-08T08:02:06Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085998 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:05Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_literary_life_of_thingum_bob_esq-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_man_that_was_used_up" isbn="0585052050">
+<Title>The man that was used up</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:09Z" price_time="2006-10-08T08:02:10Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086001 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_man_that_was_used_up-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_mask_of_the_red_death" isbn="0585065969">
+<Title>The mask of the red death</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2003-11-26T17:26:29Z" price_time="2006-10-08T08:02:14Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086157 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:29Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-the_mask_of_the_red_death-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:09:45Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_mask_of_the_red_death-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:30:34Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-the_mask_of_the_red_death-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:35:30Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-the_mask_of_the_red_death-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:51:57Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-the_mask_of_the_red_death-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:42Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-the_mask_of_the_red_death-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_mesmeric_revelation" isbn="0585052085">
+<Title>The mesmeric revelation</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:16Z" price_time="2006-10-08T08:02:18Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086004 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_mesmeric_revelation-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur" isbn="9626347767">
+<Title>The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter</Title>
+<TitleLong>The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter: The Dupin Stories</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="naxos_audiobooks">Naxos Audiobooks</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Audio Cassette; 2002-11-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-07-20T21:57:25Z" price_time="2005-10-09T09:55:50Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-07-20T21:57:31Z" currency_rate="1" price="21.86" />
+<Price store_isbn="" store_title="The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter: The Dupin Stories" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-17T01:15:16Z" currency_rate="1" price="20.82" />
+<Price store_isbn="" store_title="The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter: The Dupin Stories" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-10-09T09:09:51Z" currency_rate="1" price="22.98" />
+<Price store_isbn="" store_title="The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter: The Dupin Stories" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-10-09T09:09:51Z" currency_rate="1" price="20.03" />
+<Price store_isbn="" store_title="The Murders in the Rue Morgue/Mystery of Marie Roget/the Purloined Letter: the Dupin Stories" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-10-09T09:32:05Z" currency_rate="1" price="19.03" />
+<Price store_isbn="" store_title="The Murders in the Rue Morgue/The Mystery of Marie Roget/The Purloined Letter: The Dupin Stories" store_url="http://isbndb.com/x/book/the_murders_in_the_rue_morgue_mystery_of_marie_roget_the_pur/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-10-09T09:32:05Z" currency_rate="1" price="22.41" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_narrative_of_arthur_gordon_pym_a02" isbn="0879230622">
+<Title>The narrative of Arthur Gordon Pym</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="d_r_godine">[Boston] D. R. Godine [c1973]</PublisherText>
+<Details dewey_decimal="" physical_description_text="xxv, 157 p. illus. 28 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PZ3" change_time="2006-07-01T23:50:39Z" price_time="2006-07-02T00:44:55Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-01T23:50:41Z" currency_rate="1" price="8" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-01T23:50:42Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="THE NARRATIVE OF ARTHUR GORDON PYM:" store_url="http://www.biblio.com/details.php?dcx=33249820&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-01T23:50:42Z" currency_rate="1" price="9.5" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780879230623" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-01T23:50:42Z" currency_rate="1" price="9.97" />
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-01T23:50:45Z" currency_rate="1" price="9.45" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="University of Massachusetts Boston" last_update="2006-07-01T23:50:39Z" marc_url="http://isbndb.com/x/libdata/isbndb-284-the_narrative_of_arthur_gordon_pym_a02-20060701.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_narrative_of_arthur_gordon_pym_of_nantucket" isbn="0585052166">
+<Title>The narrative of Arthur Gordon Pym of Nantucket</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:24:30Z" price_time="2005-08-27T02:58:12Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086012 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="young_men_massachusetts_nantucket_island_fiction">Young men -- Massachusetts -- Nantucket Island -- Fiction</Subject>
+<Subject subject_id="nantucket_island_mass_fiction">Nantucket Island (Mass.) -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:24:30Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_narrative_of_arthur_gordon_pym_of_nantucket-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_narrative_of_arthur_gordon_pym_of_nantucket_a01" isbn="0375760075">
+<Title>The Narrative of Arthur Gordon Pym of Nantucket</Title>
+<TitleLong>The Narrative of Arthur Gordon Pym of Nantucket (Modern Library Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, Jeffrey Meyers (Introduction)</AuthorsText>
+<PublisherText publisher_id="modern_library">Modern Library</PublisherText>
+<Details dewey_decimal="" physical_description_text="224 pages" language="" edition_info="Paperback; 2002-05-14" dewey_decimal_normalized="" lcc_number="" change_time="2005-09-05T01:03:29Z" price_time="2006-06-20T21:03:45Z" />
+<Summary>After reading an 1836 newspaper account of a shipwreck and its two survivors, Edgar Allan Poe penned his only novel, The Narrative of Arthur Gordon Pym of Nantucket, the story of a stowaway on a Nantucket whaleship who finds himself enmeshed in the dark side of life at sea: mutiny, cannibalism, savagery—even death. As Jeffrey Meyers writes in his Introduction: “[Poe] remains contemporary because he appeals to basic human feelings and expresses universal themes common to all men in all languages: dreams, love, loss; grief, mourning, alienation; terror, revenge, murder; insanity, disease, and death.” Within the pages of this novel, we encounter nearly all of them.This Modern Library Paperback Classic reprints the text of the original 1838 American edition.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym of Nantucket (Modern Library Classics)" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-06T02:38:21Z" currency_rate="1" price="9.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-05-06T02:38:21Z" currency_rate="1" price="7.46" />
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym of Nantucket (Modern Library Classics)" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-05-06T02:38:21Z" currency_rate="1" price="2.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-05-06T02:38:21Z" currency_rate="1" price="7.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:09Z" currency_rate="1" price="6.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-20T21:03:09Z" currency_rate="1" price="7.02" />
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym of Nantucket (Modern Library Classics)" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:10Z" currency_rate="1" price="2.4" />
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym of Nantucket Product 1735518" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1735518&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-20T21:03:10Z" currency_rate="1" price="9.35" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=33943543&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:11Z" currency_rate="1" price="8.5" />
+<Price store_isbn="" store_title="Narrative of Arthur Gordon Pym of Nantucket" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-20T21:03:13Z" currency_rate="1" price="6.04" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780375760075" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:13Z" currency_rate="1" price="5.5" />
+<Price store_isbn="" store_title="The Narrative of Arthur Gordon Pym of Nantucket (Modern Library Classics)" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:13Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-20T21:03:16Z" currency_rate="1" price="5.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-20T21:03:16Z" currency_rate="1" price="9.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_narrative_of_arthur_gordon_pym_of_nantucket_a01/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-20T21:03:45Z" currency_rate="1" price="9.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="meyers_jeffrey">Meyers, Jeffrey</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

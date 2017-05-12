@@ -1,0 +1,10 @@
+Revision history for CSS::SpriteBuilder.
+
+0.03    2013-08-21
+        Fixbug: gd warning: one parameter to a memory allocation multiplication is negative or zero.
+
+0.02    2013-08-17
+        Replaced "use parent" with "use base".
+
+0.01    2013-08-11
+        First version

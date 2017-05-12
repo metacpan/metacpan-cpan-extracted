@@ -1,0 +1,46 @@
+Revision history for Crypt::Image
+
+0.11  2016-11-01T09:10:00+01:00
+      - Updated test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.10  2016-10-01T10:25:00+01:00
+      - Improved type definitions for 'FileType' and 'FilePath'.
+
+0.09  2016-09-27T07:00:00+01:00
+      - Updated copyright year information.
+      - Tidied up unit test script t/00-load.t
+
+0.08  2015-05-18T10:50:00+01:00
+      - Fixed the broken link in the section "ACKNOWLEDGEMENT".
+      - Updated pod document for method encrypt() and decrypt().
+
+0.07  2015-01-14T19:45:00+01:00
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Added unit test to test META files.
+      - Removed SIGNATURE file.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+      - Tidied up the test scripts in general.
+
+0.06  2014-10-27T23:55:25+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+
+0.05  2014-10-25T06:52:20+01:00
+      - Restructured the code using 'Moo'.
+      - Added section 'Repository' to the pod document.
+      - Removed the dependency on 'Readonly'.
+
+0.04  2014-10-25T05:15:00+01:00
+      - Removed the Build.PL file.
+      - Removed the dependency on Carp::Always package.
+
+0.03  2011-09-06T10:11:12+01:00
+      - Added more unit test for method encrypt() and decrypt().
+      - Updated the error message thrown by method encrypt() and decrypt().
+
+0.02  2011-09-05T05 09:10:11+01:00
+      - Minor pod changes.
+
+0.01  2011-09-02T16:17:18+01:00
+      - Module Created.

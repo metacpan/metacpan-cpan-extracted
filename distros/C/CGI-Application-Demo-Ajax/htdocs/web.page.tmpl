@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+
+<title>CGI::Application::Demo::Ajax</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<style type="text/css">
+body
+{
+margin: 0;
+padding: 0;
+}
+
+.blue_center
+{
+	background-color: #60c0ff;
+	font-weight: bold;
+	text-align: center;
+}
+
+.submit
+{
+background: #80c0ff;
+border-top-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 1px;
+border-right-width: 1px;
+color: navy;
+font-family: Verdana, Helvetica, Arial, sans-serif;
+font-size: 12pt;
+font-weight: bold;
+width: auto;
+}
+
+</style>
+
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/datatable/assets/skins/sam/datatable.css">
+
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/element/element-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/json/json-min.js"></script>
+
+<script type="text/javascript">
+<tmpl_var name=head_js>
+
+function init()
+{ 
+<tmpl_var name=head_init>
+}
+YAHOO.util.Event.onDOMReady(init);
+</script>
+
+</head>
+
+<body class="yui-skin-sam">
+
+<h3 class="blue_center">CGI::Application::Demo::Ajax</h3>
+
+<table align="center">
+<tr><td><tmpl_var name="container"></td></tr>
+</table>
+
+</body>
+
+</html>

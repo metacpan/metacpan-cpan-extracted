@@ -1,0 +1,49 @@
+---
+abstract: 'Create get and set methods and simplify object initialization'
+author:
+  - 'Nat Goodman <natg@shore.net>'
+build_requires:
+  Carp: 1.2
+  Exporter: 5.68
+  File::Spec: 3.4
+  Hash::AutoHash::Args: 1.18
+  IO::Scalar: 2.11
+  Module::Build: 0.4007
+  Scalar::Util: 1.23
+  Storable: 2.3
+  Test::Deep: 0.11
+  Test::More: 0.98
+  Test::Pod: 1.48
+  Test::Pod::Content: v0.0.6
+configure_requires:
+  Module::Build: 0.4007
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-AutoClass
+provides:
+  Class::AutoClass:
+    file: lib/Class/AutoClass.pm
+    version: 1.56
+  Class::AutoClass::Root:
+    file: lib/Class/AutoClass/Root.pm
+    version: 1
+requires:
+  Carp: 1.2
+  Cwd: 3.4
+  Exporter: 5.68
+  Fcntl: 1.11
+  Hash::AutoHash: 1.17
+  Hash::AutoHash::Args: 1.18
+  IO::Scalar: 2.11
+  List::MoreUtils: 0.33
+  List::Util: 1.32
+  Storable: 2.3
+  Tie::ToObject: 0.03
+  XSLoader: 0.15
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.56

@@ -1,0 +1,21 @@
+Revision history for Catalyst-Engine-JobQueue-POE
+
+0.0.1  Fri Sep 15 18:50:13 EET 2006
+       - Initial release.
+
+0.0.2  Wed Dec 13 12:07:05 EET 2006
+       - HTTP request header to allow controller to make distinguish between
+         job queue generated request and request from the network
+       - Rendering of response to log and email
+       - Helper for crontab and jobqueue runner
+       - Jobs have their own class now (JobQueue::Job)
+
+0.0.3  Tue Jan 23 15:53:28 EET 2007
+       - rename clear_tmp_data to cleanup in Catalyst::JobQueue::Job
+       - add method to retrieve job by ID
+       - jobs returning an error status (>= 400) will be removed from job queue
+
+0.04   Sat Jul 16 19:08:44 EET 2011
+       - fix shebang line in helper (fixes https://rt.cpan.org/Public/Bug/Display.html?id=56575)
+       - replace NEXT with MRO::Compat (fixes https://rt.cpan.org/Public/Bug/Display.html?id=64056)
+       - add version to some use statements (to line up with prerequisites)

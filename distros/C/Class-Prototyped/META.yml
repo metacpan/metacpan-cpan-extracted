@@ -1,0 +1,42 @@
+---
+abstract: 'Fast prototype-based OO programming in Perl'
+author:
+  - 'Written by Ned Konz, perl@bike-nomad.com and Toby Ovod-Everett, toby@ovod-everett.org. 5.005_03 porting by chromatic.'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Prototyped
+provides:
+  Class::Prototyped:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Mirror:
+    file: lib/Class/Prototyped/Graph.pm
+    version: 1.13
+  Class::Prototyped::Mirror::Normal:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Mirror::PROFILE:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Mirror::SUPER:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Tied:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Tied::AutoVivify:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+  Class::Prototyped::Tied::Default:
+    file: lib/Class/Prototyped.pm
+    version: 1.13
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.13

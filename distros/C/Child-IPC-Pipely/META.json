@@ -1,0 +1,48 @@
+{
+   "abstract" : "use Child with IO::Pipely for more portable IPC",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.42",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Child-IPC-Pipely",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Child" : "0",
+            "IO::Pipely" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Child::IPC::Pipely" : {
+         "file" : "lib/Child/IPC/Pipely.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jberger/Child-IPC-Pipely/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jberger/Child-IPC-Pipely"
+      }
+   },
+   "version" : "0.01"
+}

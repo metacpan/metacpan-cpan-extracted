@@ -1,0 +1,24 @@
+Revision history for Class-DBI-FormTools
+
+0.0.7   Sun  6 Jun 2010 13:42:13 CEST
+        - Test spring cleaning
+        - Added Data::Dump to build requires
+        - Removed all references to Data::Dumper
+
+0.0.6   Mon Jan 28 23:14:19 CET 2008
+        - Fixed missing dependency
+
+0.0.4   Thu Dec 22 15:06:10 CET 2005
+        - Initial public release
+        - Added support for has_many
+
+0.0.3  Thu Oct 13 16:28:05 CEST 2005
+        - Internal release.
+        - First version that actually works.
+        - Inclues support for textfields, hidden fields and has_a relations
+
+0.0.2  Mon Oct 10 15:56:42 CEST 2005
+        - Internal release.
+
+0.0.1  Thu Oct  6 13:30:56 2005
+        - Initial internal release.

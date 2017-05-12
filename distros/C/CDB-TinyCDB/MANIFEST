@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+TinyCDB.xs
+cdb-check.h
+typemap
+lib/CDB/TinyCDB.pm
+t/CDB-TinyCDB.t
+t/create.t
+t/data.cdb
+t/bin-file.cdb
+t/mem-usage.t
+t/open-load-for-update.t
+t/open-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

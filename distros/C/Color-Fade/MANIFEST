@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+demo.html
+demo.pl
+t/Color-Fade.t
+lib/Color/Fade.pm
+META.yml                                 Module meta-data (added by MakeMaker)

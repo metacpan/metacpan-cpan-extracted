@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb68
+registers:
+  AF: 58196
+  AF_: 0
+  BC: 14843
+  BC_: 0
+  DE: 41018
+  DE_: 0
+  HL: 22972
+  HL_: 0
+  I: 0
+  IX: 57418
+  IY: 958
+  PC: 4
+  R: 2
+  SP: 0

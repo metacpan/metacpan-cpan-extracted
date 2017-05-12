@@ -1,0 +1,42 @@
+NAME
+	Catalyst::Plugin::Navigation - A navigation plugin for Catalyst
+
+DESCRIPTION
+
+	The Catalyst::Plugin::Navigation plugin provides a way to define the
+	navigation elements and hierarchy within the Catalyst controllers. By
+	defining the menu structure from the controller attributes a controller can
+	then ask for any level of menu and be presented with the current chain to
+	the active page as well as all other visable menus from the hirearchy.
+	Instead of having to define the menu structure and navigation elements and
+	links in an external source this can be done from the infomation available
+	from the controllers themselves.
+
+INSTALLATION
+
+	To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+	After installing you can find documentation for this module using the perldoc 
+	command.
+
+	perldoc Catalyst::Plugin::Navigation
+
+DEPENDENCIES
+	Catalyst
+
+AUTHOR
+	Derek Wueppelmann <derek@roaringpenguin.com>
+
+LICENSE AND COPYRIGHT
+	Copyright (c) 2011 Roaring Penguin Software, Inc.
+
+	This program is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself.
+

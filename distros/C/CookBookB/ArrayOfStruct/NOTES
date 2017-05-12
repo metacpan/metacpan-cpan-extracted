@@ -1,0 +1,303 @@
+From roehrich Sat Jan 27 20:57:06 1996
+To: john_vinh@il.us.swissbank.com, perl5-porters@africa.nicoh.com
+Subject: Re: C structures in perl
+Content-Length: 3575
+
+>From: john_vinh@il.us.swissbank.com (John Vinh)
+
+>i'm calling a C function from perl which returns a struct parameter PAIR;
+>	int foo(PAIR curve[])
+
+You don't say how foo() is supposed to know the size of that array, so I will
+use an array which uses a sentinel value in its last element.
+
+>where
+>	typedef struct {
+>    		double  time;
+>    		double  rate;
+>	} PAIR;
+>
+>how should i set up my typemap and .xs files?
+>
+>also, i assume this would return a perl ref once i have this set up correctly;  
+>how would i access the elements in perl?
+
+That struct is an opaque object, from Perl's viewpoint, so just make a
+constructor/destructor pair to malloc an array of PAIRs and then to free
+them.  (I've added some code to fill in default values and to make debugging
+a little easier for myself.)  A generic typemap for opaque objects should be
+used--I'll deal with that later.
+
+----------
+PAIR *
+new(CLASS,cnt)
+	char *CLASS
+	int cnt
+    PREINIT:
+	int x = 0;
+	PAIR *c;
+    CODE:
+	RETVAL = (PAIR *)safemalloc(sizeof(PAIR) * cnt);
+	for( c = RETVAL; x < (cnt - 1); c = RETVAL + x ){
+		c->time = 0.1 + (double)x;
+		c->rate = 0.1 + (double)x;
+		++x;
+	}
+	c = RETVAL + x;
+	c->time = -0.1;
+	c->rate = -0.1;
+    OUTPUT:
+	RETVAL
+
+void
+DESTROY(self)
+	PAIR *self
+    CODE:
+	safefree(self);
+--------
+
+
+To call your foo() function you can use the following XSUB:
+
+-----
+int
+foo(self)
+	PAIR *self
+
+-----
+
+
+The actual foo() C function that I'm using for debugging purposes looks like
+this.
+
+-------
+int foo( PAIR curve[] ){
+	PAIR *c;
+	int x = 0;
+
+	for( c = curve + x; c->time > -0.1; c = curve + x ){
+		printf("idx = %d\n", x );
+		printf("  time = %f\n", c->time );
+		printf("  rate = %f\n", c->rate );
+		++x;
+	}
+	c = curve + x;
+	printf("idx = %d\n", x );
+	printf("  time = %f\n", c->time );
+	printf("  rate = %f\n", c->rate );
+}
+
+-------
+
+
+Then I can use the following Perl code to make an array of 4 PAIRs and to
+call foo() with that array:
+
+$a = CookBookB::ArrayOfStruct->new(4);
+$a->foo;
+
+The output looks like this:
+
+	idx = 0
+	  time = 0.100000
+	  rate = 0.100000
+	idx = 1
+	  time = 1.100000
+	  rate = 1.100000
+	idx = 2
+	  time = 2.100000
+	  rate = 2.100000
+	idx = 3
+	  time = -0.100000
+	  rate = -0.100000
+
+Now, say I want to be able to alter any given PAIR in that list.  I used
+this XSUB:
+
+-------
+void
+fill(self,index,newtime,newrate)
+	PAIR *self
+	int index
+	double newtime
+	double newrate
+    PREINIT:
+	PAIR *c;
+    CODE:
+	c = self + index;
+	c->time = newtime;
+	c->rate = newrate;
+--------
+
+With the following Perl code I was able to set the values of the second PAIR:
+
+$a = CookBookB::ArrayOfStruct->new(4);
+$a->fill(2,42.1,42.2);
+$a->foo;
+
+The output looks like this:
+
+	idx = 0
+	  time = 0.100000
+	  rate = 0.100000
+	idx = 1
+	  time = 1.100000
+	  rate = 1.100000
+	idx = 2
+	  time = 42.100000
+	  rate = 42.200000
+	idx = 3
+	  time = -0.100000
+	  rate = -0.100000
+
+The typemap is another story.  You can use T_PTRREF or T_PTROBJ, and they
+are explained in the typemaps section of the perlxs manpage.  However, I
+prefer something a little less tedious such as my O_OBJECT (opaque object)
+map.
+
+----------------
+TYPEMAP
+
+PAIR *	O_OBJECT
+
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+INPUT
+
+O_OBJECT
+	if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	else{
+		warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+		XSRETURN_UNDEF;
+	}
+
+---------
+
+
+and now it's time to go home...
+
+Dean
+
+From roehrich Tue Jan 30 19:17:28 1996
+To: john_vinh@il.us.swissbank.com, perl5-porters@africa.nicoh.com
+Subject: Re: C structures in perl
+Content-Length: 2994
+
+>From: John Vinh <john_vinh@il.us.swissbank.com>
+>
+>1) Can I pass in a perl ref to an array of structures as a non-opaque  
+>structure. I'd like to do something like the following:
+>
+>	$ref->[0]->{time};
+>	$ref->[0]->{rate};
+>	$ref->[1]->{time};
+>	$ref->[1]->{rate};
+>	
+>	$result = foo($ref);
+>
+>not sure about syntax. how do i need to set up my .xs files in order to do  
+>this? i've read the docs for this. perlxs has an example where it defines a  
+>struct, but it's not clear to me how you access the struct from perl.
+
+Paul already indicated that a future version of xsubpp has a feature which
+will set this up for you.  Without that, you can use the fill() XSUB as an
+example of how to make general getter/setter functions.
+
+You can access $ref->[0]->{time} using this:
+	$time = $ref->time(0);
+and $ref->[1]->{time} using this,
+	$time = $ref->time(1);
+
+Here's the getter.  A setter is pretty similar.
+
+----------(untested)
+double
+time(self,index)
+	PAIR *self
+	int index
+    PREINIT:
+	PAIR *c;
+    CODE:
+	c = self + index;
+	RETVAL = c->time;
+    OUTPUT:
+	RETVAL
+--------
+
+
+I'll often condense the getter and setter into a single XSUB, maybe
+something like the following (the variable 'ex2_debug_c' is a C variable,
+and the function 'ex2_debug_c' is the getter/setter).
+
+------
+int
+ex2_debug_c(...)
+        CODE:
+        if( items > 0 ){
+                ex2_debug_c = SvIV( ST(0) );
+        }
+        RETVAL = ex2_debug_c;
+        printf("# On the C side, ex2_debug_c = %d\n", RETVAL );
+        OUTPUT:
+        RETVAL
+-----
+
+That could be called from Perl as any of these:
+	$debug = ex2_debug_c();
+	ex2_debug_c(1);
+	
+
+Once I have that much working I usually stop.  I like opaque data types.
+Some people like to build tie() interfaces on top of these getter/setter
+functions.  After the tie interface has been added you can use your
+<$ref->[0]->{time}> style of accessing the variables.
+
+Unfortunately, I don't have a tie() example that handles two layers of
+indirection.  I do, however, have an example which handles a single layer.
+This is used for the ex2_debug_c() XSUB above.
+
+------
+# A tie() interface to share a variable living on the C side.
+sub TIESCALAR {
+	my $type = shift;
+	my $x;
+	bless \$x, $type;
+}
+
+sub STORE {
+	my $self = shift;
+	my $val = shift;
+	ex2_debug_c( $val );
+}
+
+sub FETCH {
+	my $self = shift;
+	my $ret;
+	$ret = ex2_debug_c();
+	$ret;
+}
+
+# Here's the tie'd variable.
+tie( $ex2_debug_c, 'CookBook::Ex2' ) || die "Tie of CookBook::Ex2 failed";
+---------
+
+With that I can access the C ex2_debug_c variable as a (mostly) normal Perl
+variable:
+	print "debugging = $ex2_debug_c\n";
+	$ex2_debug_c = 3;
+
+This is about the most complex thing I've done with tie(), though, and I'm
+not at all eager to spend time trying to figure out how to make it work for
+your double-indirection example :)  If you get a working example, I'd love
+to see it.
+
+The easy ways out, of course, are to either stop at the getter/setter
+functions or to wait for Paul's new version of xsubpp.
+
+Dean

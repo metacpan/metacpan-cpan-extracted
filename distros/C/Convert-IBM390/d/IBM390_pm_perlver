@@ -1,0 +1,571 @@
+package Convert::IBM390;
+
+use Carp;
+use POSIX qw(mktime);
+use strict;
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+
+require Exporter;
+
+@ISA = qw(Exporter);
+@EXPORT = qw();
+@EXPORT_OK = qw(asc2eb eb2asc eb2ascp packeb unpackeb hexdump
+  packed2num num2packed zoned2num num2zoned fcs_xlate
+  set_codepage set_translation);
+$VERSION = '0.29';
+
+%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+
+# $warninv = issue warning message if a field is invalid.  Default
+# is FALSE (don't issue the message).  Used by packed2num, num2packed,
+# zoned2num, num2zoned.
+$Convert::IBM390::warninv = 0;
+
+my ($a2e_table, $e2a_table, $e2ap_table);
+$a2e_table = pack "H512",
+ "00010203372d2e2f1605150b0c0d0e0f101112133c3d322618193f271c1d1e1f".
+ "405a7f7b5b6c507d4d5d5c4e6b604b61f0f1f2f3f4f5f6f7f8f97a5e4c7e6e6f".
+ "7cc1c2c3c4c5c6c7c8c9d1d2d3d4d5d6d7d8d9e2e3e4e5e6e7e8e9ade0bd5f6d".
+ "79818283848586878889919293949596979899a2a3a4a5a6a7a8a9c04fd0a107".
+ "202122232425061728292a2b2c090a1b30311a333435360838393a3b04143eff".
+ "41aa4ab19fb26ab5bbb49a8ab0caafbc908feafabea0b6b39dda9b8bb7b8b9ab".
+ "6465626663679e687471727378757677ac69edeeebefecbf80fdfefbfcbaae59".
+ "4445424643479c4854515253585556578c49cdcecbcfcce170dddedbdc8d8edf";
+
+$e2a_table = pack "H512",
+ "000102039c09867f978d8e0b0c0d0e0f101112139d0a08871819928f1c1d1e1f".
+ "808182838485171b88898a8b8c050607909116939495960498999a9b14159e1a".
+ "20a0e2e4e0e1e3e5e7f1a22e3c282b7c26e9eaebe8edeeefecdf21242a293b5e".
+ "2d2fc2c4c0c1c3c5c7d1a62c255f3e3ff8c9cacbc8cdcecfcc603a2340273d22".
+ "d8616263646566676869abbbf0fdfeb1b06a6b6c6d6e6f707172aabae6b8c6a4".
+ "b57e737475767778797aa1bfd05bdeaeaca3a5b7a9a7b6bcbdbedda8af5db4d7".
+ "7b414243444546474849adf4f6f2f3f57d4a4b4c4d4e4f505152b9fbfcf9faff".
+ "5cf7535455565758595ab2d4d6d2d3d530313233343536373839b3dbdcd9da9f";
+
+$e2ap_table =
+  ' ' x 64 .
+  '           .<(+|&         !$*); -/         ,%_>?         `:#@\'="'.
+  ' abcdefghi       jklmnopqr       ~stuvwxyz   [               ]  '.
+  '{ABCDEFGHI      }JKLMNOPQR      \\ STUVWXYZ      0123456789      ';
+
+# Days Before This Month, Leap and Common years
+my @dbtm_com =
+  ( 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 );
+my @dbtm_leap =
+  ( 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335 );
+
+# ASCII to EBCDIC
+sub asc2eb {
+ my $String = shift;
+ return "" if $String eq "";
+ return fcs_xlate($String, $a2e_table);
+}
+
+# EBCDIC to ASCII
+sub eb2asc {
+ my $String = shift;
+ return "" if $String eq "";
+ return fcs_xlate($String, $e2a_table);
+}
+
+# EBCDIC to ASCII printable
+sub eb2ascp {
+ my $String = shift;
+ return "" if $String eq "";
+ return fcs_xlate($String, $e2ap_table);
+}
+
+# Pack a Perl list into an EBCDIC record (structure).
+sub packeb {
+ my ($template, @inlist) = @_;
+ my ($datumtype, $len, $star, $ndec, $item, $ebstring, $padl);
+
+ my $espace = "\x40";  # EBCDIC space
+ my $nspace = ' ';     # Native space
+ my $ii = 0;
+ my $tp = 0;  # Template position -- where are we in the template?
+ my $result = "";
+
+ while ($tp < length($template)) {
+# Have we gone past the end of the list of values?  If so, stop.
+    last if $ii >= @inlist;
+
+    $star = ' ';  # '*' if a star is found, blank otherwise
+    $datumtype = substr($template, $tp, 1);
+    $tp++;
+    next if $datumtype =~ /\s/;
+    if (substr($template, $tp, 1) eq '*') {
+       $star = '*';
+       $len = ($datumtype =~ /[pz]/) ? 8 :
+         ($datumtype =~ /[x\@]/) ? 0 : @inlist - $ii;
+       $tp++;
+    } elsif (substr($template, $tp, 1) =~ /\d/) {
+       substr($template, $tp) =~ m/^(\d+)/;
+       $len = $1;  $tp += length($len);
+# Decimal places (this result will be ignored if the datumtype
+# is not packed or zoned).
+       $ndec = 0;
+       if (substr($template, $tp, 1) eq '.') {
+          $tp++;
+          substr($template, $tp) =~ m/^(\d+)/;
+          $ndec = $1;  $tp += length($ndec);
+       }
+    } else {
+       $len = ($datumtype =~ /[pz]/) ? 8 : 1;
+    }
+
+    if ($len > 32767) {
+      Carp::croak("Field length too large in packeb: $datumtype$len");
+    }
+    $_ = $datumtype;
+    DSWITCH: {
+     if (/\@/) {  # Here $len is really an offset.
+        my $Lr = length($result);
+        if ($len > $Lr) {	# Grow
+           $result .= "\x00" x ($len - $Lr);
+        } elsif ($len < $Lr) {	# Shrink
+           $result = substr($result, 0, $len);
+        } else { ; }
+        last DSWITCH;
+     }
+     if (/x/) {
+        $result .= "\x00" x $len;
+        last DSWITCH;
+     }
+     # [Ee]:  EBCDIC character string
+     if (/[Ee]/) {
+        $item = $inlist[$ii];  $ii++;
+        $len = length($item) if $star eq '*';
+        $ebstring = asc2eb($item);
+        $padl = $len - length($ebstring);
+        if ($padl == 0) { ; }
+        elsif ($padl < 0) {
+           $ebstring = substr($ebstring, 0, $len);
+        } else {
+           if ($datumtype eq 'E') {  # Pad with EBCDIC spaces
+              $ebstring .= $espace x $padl;
+           } else {
+              $ebstring .= "\x00" x $padl;
+           }
+        }
+        $result .= $ebstring;
+        last DSWITCH;
+     }
+     # [Cc]: characters without translation.  Same as Perl's [Aa].
+     if (/[Cc]/) {
+        $item = $inlist[$ii];  $ii++;
+        $len = length($item) if $star eq '*';
+        if ($datumtype eq 'C') {
+           $result .= pack("A$len", $item);
+        } else {
+           $result .= pack("a$len", $item);
+        }
+        last DSWITCH;
+     }
+
+     # [pP]: S/390 packed decimal.  $len is a field length.
+     if (/[pP]/) {
+        Carp::croak("Field length too large in packeb: $datumtype$len")
+            if $len > 16;
+        $item = $inlist[$ii];  $ii++;
+        $result .= num2packed($item, $len, $ndec, $datumtype eq 'P');
+        last DSWITCH;
+     }
+
+     # i: S/390 fullword (signed). */
+     if (/i/) {
+        for (my $j = 0; $j < $len; $j++) {
+           $item = $inlist[$ii];  $ii++;
+           $result .= pack("N", $item);
+        }
+        last DSWITCH;
+     }
+     # s: S/390 halfword (signed). */
+     if (/s/) {
+        for (my $j = 0; $j < $len; $j++) {
+           $item = $inlist[$ii];  $ii++;
+           $result .= pack("n", $item);
+        }
+        last DSWITCH;
+     }
+     # S: S/390 halfword (unsigned). */
+     if (/S/) {
+        for (my $j = 0; $j < $len; $j++) {
+           $item = $inlist[$ii];  $ii++;
+           $result .= substr(pack("N", $item), 2,2);
+        }
+        last DSWITCH;
+     }
+
+     # [zZ]: S/390 zoned decimal.  $len is a field length.
+     if (/[zZ]/) {
+        Carp::croak("Field length too large in packeb: z$len") if $len > 32;
+        $item = $inlist[$ii];  $ii++;
+        $result .= num2zoned($item, $len, $ndec, $datumtype eq 'Z');
+        last DSWITCH;
+     }
+     # [Hh]: hex, high-order nybble always first
+     if (/[Hh]/) {
+        $item = $inlist[$ii];  $ii++;
+        $len = length($item) if $star eq '*';
+        $result .= pack("H$len", $item);
+        last DSWITCH;
+     }
+
+     Carp::croak("Invalid type in packeb: '$datumtype'");
+    }
+ }
+ return $result;
+}
+
+# Unpack an EBCDIC record into a Perl list.
+sub unpackeb {
+ my ($template, $ebrecord) = @_;
+ my ($datumtype, $len, $ndec, $brem);
+
+ my $s = 0;   # Points to current position within $ebrecord
+ my $tp = 0;  # Template position -- where are we in the template?
+ my @rlist = ();	# Result list
+
+ while ($tp < length($template)) {
+    $datumtype = substr($template, $tp, 1);
+    $tp++;
+# Have we gone past the end of the input?  If so, stop, unless they
+# want to reposition within the record.
+    last if $s >= length($ebrecord) && $datumtype ne '@';
+
+    next if $datumtype =~ /\s/;
+    $ndec = 0;
+    if (substr($template, $tp, 1) eq '*') {
+       $len = length($ebrecord) - $s;
+       $len = int($len / 4)  if $datumtype =~ /[iI]/;
+       $len = int($len / 2)  if $datumtype =~ /[sS]/;
+       $tp++;
+    } elsif (substr($template, $tp, 1) =~ /\d/) {
+       substr($template, $tp) =~ m/^(\d+)/;
+       $len = $1;  $tp += length($len);
+# Decimal places (this result will be ignored if the datumtype
+# is not packed or zoned).
+       $ndec = 0;
+       if (substr($template, $tp, 1) eq '.') {
+          $tp++;
+          substr($template, $tp) =~ m/^(\d+)/;
+          $ndec = $1;  $tp += length($ndec);
+       }
+    } else {
+       $len = 1;
+    }
+    if ($len > 32767) {
+       Carp::croak("Field length too large in unpackeb: $datumtype$len");
+    }
+
+    $_ = $datumtype;
+    $brem = length($ebrecord) - $s;  # Bytes REMaining
+    DSWITCH: {
+     # @: absolute offset
+     if (/\@/) {
+        if ($len >= length($ebrecord) || $len < 0) {
+           Carp::croak("Absolute position is outside string: \@$len");
+        }
+        $s = $len;
+        last DSWITCH;
+     }
+
+     # [Ee]:  EBCDIC character string.  $len is a field length.
+     if (/[Ee]/) {
+        $len = $brem  if $len > $brem;
+        $a = eb2asc(substr($ebrecord, $s, $len));
+        $a =~ s/[\0 ]+$//  if $datumtype eq 'E';
+        push @rlist, $a;
+        $s += $len;
+        last DSWITCH;
+     }
+
+     # p: S/390 packed decimal.  $len is a field length.
+     if (/p/) {
+        $len = $brem  if $len > $brem;
+        if ($len > 16) {
+           Carp::croak("Field length too large in unpackeb: p$len");
+        }
+        push @rlist, packed2num(substr($ebrecord, $s, $len), $ndec);
+        $s += $len;
+        last DSWITCH;
+     }
+     # z: S/390 zoned decimal.  $len is a field length.
+     if (/z/) {
+        $len = $brem  if $len > $brem;
+        if ($len > 32) {
+           Carp::croak("Field length too large in unpackeb: z$len");
+        }
+        push @rlist, zoned2num(substr($ebrecord, $s, $len), $ndec);
+        $s += $len;
+        last DSWITCH;
+     }
+     # [Cc]: characters without translation
+     if (/[Cc]/) {
+        $len = $brem  if $len > $brem;
+        push @rlist, substr($ebrecord, $s, $len);
+        $s += $len;
+        last DSWITCH;
+     }
+
+     # i: signed integer (System/390 fullword)
+     if (/i/) {
+        $len = int($brem / 4)  if $len > int($brem / 4);
+        for (my $i = 0; $i < $len; $i++) {
+           my @byt = unpack('cC3', substr($ebrecord, $s, 4));
+           push @rlist, (16777216 * $byt[0] + 65536 * $byt[1] +
+             256 * $byt[2] + $byt[3]);
+           $s += 4;
+        }
+        last DSWITCH;
+     }
+     # s: signed short integer (System/390 halfword)
+     if (/s/) {
+        $len = int($brem / 2)  if $len > int($brem / 2);
+        for (my $i = 0; $i < $len; $i++) {
+           my @byt = unpack('cC', substr($ebrecord, $s, 2));
+           push @rlist, (256 * $byt[0] + $byt[1]);
+           $s += 2;
+        }
+        last DSWITCH;
+     }
+
+     # [hH]: unpack to printable hex digits
+     if (/[hH]/) {
+        $len = $brem * 2  if $len > $brem * 2;
+        my $bytes = int($len/2);
+        push @rlist, unpack("H$len", substr($ebrecord, $s, $bytes));
+        $s += $bytes;
+        last DSWITCH;
+     }
+
+     # v: varchar EBCDIC character string; i.e., a string of
+     # EBCDIC characters preceded by a halfword length field (as
+     # in DB2/MVS, for instance).  $len here is a repeat count,
+     # but don't go beyond the end of the record.
+     if (/v/) {
+        for (my $i=0; $i < $len; $i++) {
+            last if $len > $brem;
+            my @byt = unpack('cC', substr($ebrecord, $s, 2));
+            my $fieldlen = 256 * $byt[0] + $byt[1];
+            $s += 2;
+            $brem = length($ebrecord) - $s;
+
+            $fieldlen = $brem  if $fieldlen > $brem;
+            if ($fieldlen > 0) {
+               push @rlist, eb2asc(substr($ebrecord, $s, $fieldlen));
+            } elsif ($fieldlen == 0) {
+               push @rlist, "";
+            } else {
+               push @rlist, undef();
+            }
+            $s += $fieldlen;
+            $brem = length($ebrecord) - $s;
+        }
+        last DSWITCH;
+     }
+
+     # V: varchar string in a fixed-length field
+     if (/[V]/) {
+        $len = $brem  if $len > $brem;
+        my @byt = unpack('cC', substr($ebrecord, $s, 2));
+        my $fieldlen = 256 * $byt[0] + $byt[1];
+        $s += 2;
+        $brem = length($ebrecord) - $s;
+        $fieldlen = $brem  if $fieldlen > $brem;
+
+        if ($fieldlen > 0) {
+           push @rlist, eb2asc(substr($ebrecord, $s, $fieldlen));
+        } elsif ($fieldlen == 0) {
+           push @rlist, "";
+        } else {
+           push @rlist, undef();
+        }
+        $s += $len;
+        last DSWITCH;
+     }
+
+     # x: ignore these bytes (do not return an element)
+     if (/x/) {
+        $len = $brem  if $len > $brem;
+        $s += $len;
+        last DSWITCH;
+     }
+
+     # I: unsigned integer (4 bytes).  Same as Perl's 'N'.
+     if (/I/) {
+        $len = int($brem / 4)  if $len > int($brem / 4);
+        for (my $i = 0; $i < $len; $i++) {
+           push @rlist, unpack('N', substr($ebrecord, $s, 4));
+           $s += 4;
+        }
+        last DSWITCH;
+     }
+     # S: unsigned short integer (2 bytes).  Same as Perl's 'n'.
+     if (/S/) {
+        $len = int($brem / 2)  if $len > int($brem / 2);
+        for (my $i = 0; $i < $len; $i++) {
+           push @rlist, unpack('n', substr($ebrecord, $s, 2));
+           $s += 2;
+        }
+        last DSWITCH;
+     }
+
+     Carp::croak("Invalid type in unpackeb: '$datumtype'");
+    }
+ }
+
+ return (wantarray) ? @rlist : $rlist[0];
+}
+
+
+# Print an entire string in hexdump format, 32 bytes at a time
+# (like a sysabend dump).
+sub hexdump {
+ my ($String, $startad, $charset) = @_;
+ $startad ||= 0;
+ $charset ||= "ascii";
+ my ($i, $j, $d, $str, $pri, $hexes);
+ my @outlines = ();
+ my $L = length($String);
+ for ($i = 0; $i < $L; $i += 32) {
+    $str = substr($String, $i,32);
+#   Generate a printable version of the string.
+    if ($charset =~ m/ebc/i) {
+       $pri = eb2ascp $str;
+    } else {
+       $pri = $str;
+       $pri =~ tr/\000-\037\177-\377/ /;
+    }
+    $hexes = unpack("H64", $str);
+    $hexes =~ tr/a-f/A-F/;
+    if (($L - $i) < 32) {   # Pad with blanks if necessary.
+       $pri = pack("A32", $pri);
+       $hexes = pack("A64", $hexes);
+    }
+    $d = sprintf("%06X: ", $startad + $i);
+    for ($j = 0; $j < 64; $j += 8) {
+       $d .= substr($hexes, $j, 8) . " ";
+       $d .= " " if $j == 24;
+    }
+    $d .= " *$pri*\n";
+    push @outlines, $d;
+ }
+ return @outlines;
+}
+
+# Convert a Packed Decimal field to a Perl number.
+sub packed2num {
+ my ($packed, $ndec) = @_;
+ $ndec ||= 0;
+ my ($w, $xdigits, $arabic, $sign);
+ $w = 2 * length($packed);
+ $xdigits = unpack("H$w", $packed);
+ $arabic = substr($xdigits, 0, $w-1);
+ $sign = substr($xdigits, $w-1, 1);
+ if ( $arabic !~ /^\d+$/ || $sign !~ /^[a-f]$/ ) {
+    Carp::carp "packed2num: Invalid packed value $xdigits"
+      if $Convert::IBM390::warninv;
+    return undef();
+ }
+ $arabic = 0 - $arabic  if $sign =~ /[bd]/;
+ $arabic /= 10 ** $ndec  if $ndec != 0;
+ return $arabic + 0;
+}
+
+# Convert a Perl number to a packed field.
+sub num2packed {
+ my ($num, $outwidth, $ndec, $fsign) = @_;
+ $outwidth ||= 8;
+ $ndec ||= 0;
+ if ( $num !~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ) {
+    Carp::carp "num2packed: Input is not a number"
+      if $Convert::IBM390::warninv;
+    return undef();
+ }
+ my ($outdig, $digits, $sign);
+ $outdig = $outwidth * 2 - 1;
+# sprintf will round to the appropriate number of places.
+ $digits = sprintf("%0${outdig}.0f", abs($num * (10 ** $ndec)));
+ Carp::croak("Number $num too long for packed decimal")
+    if length($digits) > 31;
+ $digits = substr($digits, -$outdig);
+ $sign = ($num >= 0) ? (($fsign) ? "F" : "C") : "D";
+ $outwidth *= 2;
+ return pack("H$outwidth", $digits . $sign);
+}
+
+# Convert a Zoned Decimal field to a Perl number.
+sub zoned2num {
+ my ($zoned, $ndec) = @_;
+ $ndec ||= 0;
+ my ($w, $digits, $sign, $final);
+ if ($zoned =~ m/[\xD0-\xD9]/) { $sign = -1; }
+ else  { $sign = 1; }
+ $zoned = eb2asc($zoned);
+ $zoned =~ tr/ {ABCDEFGHI}JKLMNOPQR/001234567890123456789/;
+ if ( $zoned !~ /^\d+$/ ) {
+    Carp::carp "zoned2num: Invalid zoned value $zoned"
+      if $Convert::IBM390::warninv;
+    return undef();
+ }
+ $final = $sign * $zoned;
+ $final /= 10 ** $ndec  if $ndec != 0;
+ return $final + 0;
+}
+
+# Convert a Perl number to a zoned field.
+# Last arg: use F instead of C for positives?
+sub num2zoned {
+ my ($num, $outwidth, $ndec, $unsigned) = @_;
+ $outwidth ||= 8;
+ $ndec ||= 0;
+ if ( $num !~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/ ) {
+    Carp::carp "num2zoned: Input is not a number"
+      if $Convert::IBM390::warninv;
+    return undef();
+ }
+ my ($digits, $sign);
+# sprintf will round to the appropriate number of places.
+ $digits = sprintf("%0${outwidth}.0f", abs($num * (10 ** $ndec)));
+ Carp::croak("Number $num too long for zoned decimal")
+    if length($digits) > 31;
+ $digits = substr($digits, -$outwidth);
+ my $last = length($digits) - 1;
+ unless ($unsigned) {
+    if ($num >= 0) {
+       substr($digits, $last, 1) =~ tr/0123456789/{ABCDEFGHI/;
+    } else {
+       substr($digits, $last, 1) =~ tr/0123456789/}JKLMNOPQR/;
+    }
+ }
+ return asc2eb($digits);
+}
+
+# Full Collating Sequence Translate -- like tr///, but assumes that
+# the searchstring is a complete 8-bit collating sequence
+# (x'00' - x'FF').  I couldn't get tr to do this, and I have my
+# doubts about whether it would be possible on systems where char
+# is signed.  This approach works on AIX, where char is unsigned,
+# and at least has a fighting chance of working elsewhere.
+# The second argument is one of the translation tables defined
+# above ($a2e_table, etc.).
+sub fcs_xlate {
+ my ($instring, $to_table) = @_;
+ my ($i, $outstring);
+ $outstring = "";
+ for ($i = 0; $i < length($instring); $i++) {
+    $outstring .= substr($to_table, ord(substr($instring, $i,1)), 1);
+ }
+ return $outstring;
+}
+
+sub _set_translation {
+  die "Invalid tables" if @_ != 3 or grep { length($_) != 256 } @_;
+  ($a2e_table, $e2a_table, $e2ap_table) = @_;
+}
+
+sub version {
+ return "Convert::IBM390 version $VERSION Perl only";
+}

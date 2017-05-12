@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+   <record>
+      <control>
+         <sourcerecordid>004400000</sourcerecordid>
+         <sourceid>BBI</sourceid>
+         <recordid>BBI004400000</recordid>
+         <originalsourceid>PRM01</originalsourceid>
+         <sourceformat>MARC21</sourceformat>
+         <sourcesystem>ILS</sourcesystem>
+      </control>
+      <display>
+       <type>book</type>
+       <title>The songs of the comic opera of Rosina: or, Love in a cottage. As performed at the New Theatre,</title>
+       <creator>Frances Brooke 1724?-1789.</creator>
+       <contributor>William Rowson d. 1842 ed. Favart, M. (Charles-Simon), 1710-1792.; Readex.</contributor>
+       <publisher>Philadelphia: : Printed by Mathew Carey,</publisher>
+       <creationdate>March 15, 1794. (Price, six cents.)</creationdate>
+       <format>12 p. ; 17 cm..</format>
+       <subject>Operas -- Librettos; Electronic books; Songs</subject>
+       <language>eng</language>
+       <relation>$$Cseries $$VEarly American imprints. 1st series no. 26702.</relation>
+       <availlibrary>$$INORTH$$LNINTE$$1General collection$$Savailable$$31$$40$$5N$$60</availlibrary>
+       <source>BBI</source>
+       <availinstitution>$$INORTH$$Savailable</availinstitution>
+       <availpnx>available</availpnx>
+      </display>
+      <links>
+       <backlink>$$TILS_backlink$$DThis item in the Library Catalog</backlink>
+       <linktorsrc>$$Uhttp://www.lib.umn.edu/slog.phtml?u...26702$$DOnline Version</linktorsrc>
+       <linktoholdings>$$TILS_holdings</linktoholdings>
+       <openurl>$$Topenurl_journal</openurl>
+       <openurlfulltext>$$Topenurlfull_journal</openurlfulltext>
+      </links>
+      <search>
+       <creatorcontrib>Frances, Brooke</creatorcontrib>
+       <creatorcontrib>Brooke, F</creatorcontrib>
+       <creatorcontrib>corrected, with permission of the managers, by W. Rowson, prompter.</creatorcontrib>
+       <creatorcontrib>William, Rowson d. 1842 ed.</creatorcontrib>
+       <creatorcontrib>Favart, M. (Charles-Simon), 1710-1792.</creatorcontrib>
+       <creatorcontrib>Rowson, W</creatorcontrib>
+       <creatorcontrib>Favart</creatorcontrib>
+       <creatorcontrib>Readex.</creatorcontrib>
+       <creatorcontrib>Singleton, Mary, 1724?-1789</creatorcontrib>
+       <creatorcontrib>Translator of Lady Catesby's letters, 1724?-1789</creatorcontrib>
+       <creatorcontrib>Author of Lady Julia Mandeville, 1724?-1789</creatorcontrib>
+       <creatorcontrib>Brooke, Mrs. (Frances), 1724?-1789</creatorcontrib>
+       <creatorcontrib>Brookes, Mrs. (Frances), 1724?-1789</creatorcontrib>
+       <creatorcontrib>Lady Catesby's letters, Translator of, 1724?-1789</creatorcontrib>
+       <creatorcontrib>Lady Julia Mandeville, Author of, 1724?-1789</creatorcontrib>
+       <title>The songs of the comic opera of Rosina: or, Love in a cottage. As performed at the New Theatre, /</title>
+       <subject>Operas Librettos.</subject>
+       <subject>Electronic books.</subject>
+       <subject>Songs.</subject>
+       <general>Printed by Mathew Carey,,</general>
+       <general>[electronic resource] :</general>
+       <creationdate>1794</creationdate>
+       <addtitle>Moissonneurs.</addtitle>
+       <addtitle>Early American imprints. 1st series no. 26702.</addtitle>
+       <sourceid>BBI</sourceid>
+       <recordid>BBI004400000</recordid>
+       <rsrctype>book</rsrctype>
+       <searchscope>NORTH</searchscope>
+       <searchscope>BBI</searchscope>
+       <scope>NORTH</scope>
+       <scope>BBI</scope>
+      </search>
+      <sort>
+       <creationdate>1794</creationdate>
+      </sort>
+      <facets>
+       <language>eng</language>
+       <creationdate>1794</creationdate>
+       <topic>Operas-Librettos</topic>
+       <collection>NINTE</collection>
+       <toplevel>available</toplevel>
+       <toplevel>online_resources</toplevel>
+       <creatorcontrib>Brooke, F</creatorcontrib>
+       <creatorcontrib>Rowson, W</creatorcontrib>
+       <creatorcontrib>Favart</creatorcontrib>
+       <creatorcontrib>Readex</creatorcontrib>
+       <genre>Librettos</genre>
+       <genre>Electronic books</genre>
+       <genre>Songs</genre>
+       <prefilter>books</prefilter>
+       <rsrctype>books</rsrctype>
+      </facets>
+      <dedup>
+       <t>1</t>
+       <c3>songsofthecomicoperanewtheatre</c3>
+       <c4>1794</c4>
+       <f5>songsofthecomicoperanewtheatre</f5>
+       <f6>1794</f6>
+       <f7>songs of the comic opera of rosina or love in a cottage as performed at the new theatre</f7>
+       <f8>pau</f8>
+       <f9>12 p. ;</f9>
+       <f10>printed by mathew carey</f10>
+       <f11>brooke frances 1724 1789</f11>
+      </dedup>
+      <frbr>
+       <t>1</t>
+       <k1>$$Kbrooke frances 1724 1789$$AA</k1>
+       <k3>$$Ksongs of the comic opera of rosina or love in a cottage as performed at the new theatre$$AT</k3>
+      </frbr>
+      <delivery>
+       <institution>NORTH</institution>
+       <delcategory>Online Resource</delcategory>
+      </delivery>
+      <ranking>
+       <booster1>1</booster1>
+       <booster2>1</booster2>
+      </ranking>
+      <addata>
+       <aulast>Brooke</aulast>
+       <aufirst>Frances,</aufirst>
+       <au>Brooke, Frances, 1724?-1789</au>
+       <addau>Rowson, William, d. 1842 ed</addau>
+       <addau>Favart, M. (Charles-Simon), 1710-1792</addau>
+       <addau>Readex</addau>
+       <seriestitle>Early American imprints. 1st series no. 26702</seriestitle>
+       <date>1794</date>
+       <risdate>March 15, 1794. (Price, six cents.)</risdate>
+       <format>book</format>
+       <ristype>BOOK</ristype>
+       <cop>Philadelphia:</cop>
+       <pub>Printed by Mathew Carey,</pub>
+       <btitle>The songs of the comic opera of Rosina: or, Love in a cottage. As performed at the New Theatre,</btitle>
+       <genre>book</genre>
+      </addata>
+   </record>

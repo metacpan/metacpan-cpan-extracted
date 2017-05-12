@@ -1,0 +1,37 @@
+---
+name: Chemistry-ESPT
+version: 0.01
+author:
+  - 'Jason L. Sonnenberg <sonnenberg.11@osu.edu>'
+abstract: Electronic structure data accessor objects
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.8.8
+provides:
+  Chemistry::ESPT::ADFout:
+    file: lib/Chemistry/ESPT/ADFout.pm
+    version: 0.02
+  Chemistry::ESPT::Aprmcrd:
+    file: lib/Chemistry/ESPT/Aprmcrd.pm
+    version: 0.02
+  Chemistry::ESPT::Aprmtop:
+    file: lib/Chemistry/ESPT/Aprmtop.pm
+    version: 0.03
+  Chemistry::ESPT::ESSfile:
+    file: lib/Chemistry/ESPT/ESSfile.pm
+    version: 0.03
+  Chemistry::ESPT::Gfchk:
+    file: lib/Chemistry/ESPT/Gfchk.pm
+    version: 0.03
+  Chemistry::ESPT::Glib:
+    file: lib/Chemistry/ESPT/Glib.pm
+    version: 0.01
+  Chemistry::ESPT::Glog:
+    file: lib/Chemistry/ESPT/Glog.pm
+    version: 0.08
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

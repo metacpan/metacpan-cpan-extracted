@@ -1,0 +1,29 @@
+commit aaa960e15c89975b7c236bfd0c660dedd6263bf3
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Dec 19 23:31:36 2008 +0100
+
+    CHANGED: distribution under git version control
+    CHANGED: moved tests to xt/author
+
+commit 4c20f4b9348c4d7ecfa65ce549be0708da974a10
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Dec 19 23:26:39 2008 +0100
+
+    ADDED: previous version changes to log
+    	0.04
+    		CHANGED: switched from Test::Spelling to
+    		Documentation::PodSpelling
+    
+    	0.03
+    		CHANGED: possibility to call the functions with	a single argument
+    		CHANGED: podification always on
+    		CHANGED: accept call without arguments
+    
+    	0.02
+    		ADDED: test file to the manifest (oops!)
+
+commit 54861a49cc4234edfc86c96075eb40ff354e0b72
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Fri Dec 19 23:22:03 2008 +0100
+
+    ADDED: initial commit

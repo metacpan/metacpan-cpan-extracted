@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+PKT-SP-MM-I05-091029.pdf
+lib/COPS/Client.pm
+examples/new_cops_test.pl
+examples/profiles/list
+examples/profiles/BestEffortService.pl
+examples/profiles/DOCSISServiceClassName.pl
+examples/profiles/DownStream.pl
+examples/profiles/FlowSpec.pl
+examples/profiles/NonRealTimePollingService.pl
+examples/profiles/RealTimePollingService.pl
+examples/profiles/UnsolicitedGrantService.pl
+examples/profiles/UnsolicitedGrantServiceWithActivityDetection.pl
+examples/PacketCaptures/gate_delete.cap
+examples/PacketCaptures/gate_info.cap 
+examples/PacketCaptures/gate_set.cap 
+examples/PacketCaptures/gate_synch.cap
+t/64bitTest.t
+META.yml                                 Module meta-data (added by MakeMaker)

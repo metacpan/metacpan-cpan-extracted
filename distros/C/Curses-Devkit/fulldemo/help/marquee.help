@@ -1,0 +1,92 @@
+</R>Purpose<!R>
+The marquee widget creates a scrolling marquee on the screen. This helps to
+emphasize a point or draw attention to something.
+
+</R>Construction Options<!R>
+A marquee widget is defined using the following syntax. The variable
+</B>$marqueeObject<!B> contains the reference to the marquee object.
+<C></B>$marqueeObject = new Cdk::Marquee ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Width       Required            Scalar     This is the actual width of the marquee window.
+Xpos        Center              Scalar     This is the position of the window on the X axis.
+Ypos        Center              Scalar     This is the position of the window on the Y axis.
+Shadow      False               Scalar     This Boolean states whether the dialog box will have a shadow on the box.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The 
+following example demonstrates how to activate a marquee widget.
+<C></B>$marqueeObject->activate ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Mesg        Required            Scalar     This is the message to display in the marquee.
+Delay       Required            Scalar     This is a value telling the marquee how long to wait before moving the message.
+Repeat      Required            Scalar     This states how many times the message will scroll across the marquee.
+Box         True                Scalar     This Boolean states whether the dialog box will have a box drawn around it.
+
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+<C></B>$marqueeObject->draw ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Box         True                Scalar     Draws the window with a box around it.
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+<C></B>$marqueeObject->erase ();
+
+</B>raise<!B>
+The raise method raises the widget to the top of the screen. This means if there
+were any widgets obscuring part of the view, raising the object would bring the
+complete object into view. The following example demonstrates how to call the 
+raise method.
+<C></B>$marqueeObject->raise();
+
+</B>lower<!B>
+The lower method lowers the object so it doesn't obscure the view of any other 
+objects. The following example demonstrates how to call the lower method.
+<C></B>$marqueeObject->lower();
+
+</B>register<!B>
+The register method registers the object to the default screen. This does </R>NOT<!R>
+have to be called since the objects are registered automatically. This method
+should be called if the </B>unregister<!B> method was called. The following
+example demonstrates how to call the register method.
+<C></B>$marqueeObject->register();
+
+</B>unregister<!B>
+The unregister method should be called when a widget, which is part of the
+default screen, needs to be taken away temporarily. This does not delete or free
+the object, it just unmaps it from any future screen refreshes. The object can
+be registered by calling the </B>register<!B> method. The following example
+demonstrates how to call the unregister method.
+<C></B>$marqueeObject->unregister();
+
+</B>getwin<!B>
+This method returns a pointer to the window of the object. Not much use for this
+yet. It will be useful in the future when the drawing methods are added. The
+following example demonstrates how to call the getwin method.
+<C></B>$marqueeObject->getwin();
+
+</R>Tips & Tricks<!R>
+None.
+
+</R>Physical Restrictions<!R>
+None.
+
+</R>Example Use Of The Widget<!R>
+<F=../examples/marquee>
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995
+<C>Document Revised: March,    1996

@@ -1,0 +1,11 @@
+Revision history for CGI-Application-Plugin-RequireSSL
+
+0.04    12 July 2007
+        Changed the check for a 302 response in the tests
+0.03    04 June 2007
+        Added CGI::Application prerequisite
+0.02    01 June 2007
+        Removed backup test file
+0.01    31 May 2007
+        First version, released on an unsuspecting world.
+

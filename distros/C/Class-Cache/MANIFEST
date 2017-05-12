@@ -1,0 +1,18 @@
+Changes
+lib/Class/Cache.pm
+lib/Class/Cache/Test/Adder.pm
+lib/Class/Cache/Test/Lazy.pm
+lib/Class/Cache/Test/MeaningOfUniverse.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_usage.t
+t/003_lazy.t
+t/004_args.t
+t/005_all_defaults.t
+t/006_keyvaries.t
+t/007_custom.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

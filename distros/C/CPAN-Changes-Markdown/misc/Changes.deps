@@ -1,0 +1,82 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000002
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.000001 2015-06-22T01:13:07Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - File::Spec
+ - charnames
+ - perl 5.006
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000000 2014-04-13T02:01:38Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - Carp
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4007
+
+ [Removed / configure requires]
+ - Module::Build 0.4007
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+ - utf8
+
+0.2.2 2013-09-25T02:07:11Z
+ [Added / test requires]
+ - File::Spec
+
+0.2.1 2013-08-30T19:50:44Z
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.2.0 2013-08-23T15:11:49Z
+ [Added / runtime requires]
+ - Path::Tiny
+ - Role::Tiny
+ - Sub::Exporter::Progressive
+
+ [Added / test requires]
+ - utf8

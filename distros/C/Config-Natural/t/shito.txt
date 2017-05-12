@@ -1,0 +1,16 @@
+Shito_01 = Adam
+Shito_03 = Sachiel
+Shito_04 = Samsiel
+Shito_05 = Ramiel
+Shito_06 = Gagiel
+Shito_07 = Israfel
+Shito_08 = Sandalfon
+Shito_09 = Matarael
+Shito_10 = Saraqiel
+Shito_11 = Iroel
+Shito_12 = Leliel
+Shito_13 = Bardiel
+Shito_14 = Zeruel
+Shito_15 = Arael
+Shito_16 = Armisael
+Shito_17 = Tabris

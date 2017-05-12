@@ -1,0 +1,55 @@
+Things we could add
+-------------------
+
+- include directive is flexible but ugly.
+  allow either a name for a directive eg. @import or #include
+  or a regular expression as we have now.
+  allow a string or an array-ref
+
+- add a postprocess directive allowing to use eg. scss
+  Postprocessing happens before minifiying
+
+- does it make sense to add a way to auto-generate CSS files from sass
+  using eg. compass?
+  http://github.com/chriseppstein/compass
+  if we do, do we have a way to cache files efficiently somewhere?
+
+- document examples for pseudo-versioning by adding a version-number into URL
+
+- looks like uri_for() magic stops working after some Moose version. find out.
+
+### done.
+- allow some kind of 'include' directive in the config section:
+  $1 will contain a file to include
+  (will work recursively)
+    include => [
+        qr{\@import \s+ (?:url\s*\()? ["']? ([^"')]+) ["']? [)]? .*? ;}xms
+    ],
+
+## done 2010-04-13 by Phil Soehnlein. 'Expires' is cool.
+- find out clever HTTP Headers to set.
+
+### done.
+- add to config section:
+    replace => {
+                       # for every file -- how to quote '$1' ??? --> s{$regex}{qq{qq{$replace}}}ee
+        '*'         => [ 'url\\(images/([^)]+)\\)' => 'url(/static/images/$1)' ],
+        
+                       # some files only
+        'jquery*'   => [ qr'color:\s*#123456' => 'color: #987654' ],
+        
+                       # just this file
+        'jquery-ui' => [ ... => ... ],
+    },
+
+--------------
+
+package My::Controller::Js;
+
+BEGIN { extends 'Catalyst::Controller::Combine' }
+with 'Catalyst::Controller::Combine::Role::Whatever';
+
+interception of
+  - dependency generation
+  - contents of a single file after loading
+  - contents of summary stream

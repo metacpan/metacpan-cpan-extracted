@@ -1,0 +1,67 @@
+NAME
+    Class::DBI::UUID - Provide Globally Unique Column Values
+
+SYNOPSIS
+      package MyApp::User;
+      use base qw[Class::DBI];
+
+      __PACKAGE__->connection('dbi:SQLite:dbfile', '', '');
+      __PACKAGE__->table(q[users]);
+      __PACKAGE__->columns(Primary => 'id');
+      __PACKAGE__->columns(Essential => qw[username password]);
+
+      use Class::DBI::UUID;
+      __PACKAGE__->uuid_columns('id');
+
+      # Elsewhere..
+      my $user = MyApp::User->create({
+          username => 'user',
+          password => 'pass',
+      });
+  
+      print $user->id; # A UUID string.
+
+DESCRIPTION
+    This module implements globally unique columns values. When an object is
+    created, the columns specified are given unique IDs. This is
+    particularly helpful when running in an environment where auto
+    incremented primary keys won't work, such as multi-master replication.
+
+  uuid_columns
+      MyApp::User->uuid_columns(MyApp::User->columns('Primary'));
+
+    A "before_create" trigger will be set up to set the values of each
+    column listed as input to a "Data::UUID" string. Change the type of
+    string output using the "uuid_columns_type" class method.
+
+  uuid_columns_type
+      MyApp::User->uuid_columns_type('bin'); # keep it small
+
+    By default the type will be "str". It's the largest, but its also the
+    safest for general use. Possible values are "bin", "str", "hex", and
+    "b64". Basically, anything that you can append to "create_" and still
+    get a valid method name from "Data::UUID". Also returns the type to be
+    used.
+
+    Do not change this value on a whim. If you do change it, change it
+    before your call to "uuid_columns", or, call "uuid_columns" again after
+    it is changed (therefore calling it before "uuid_columns", but also
+    adding extra triggers without need).
+
+EXPORTS
+    This module is implemented as a mixin and therefore exports the
+    functions "uuid_columns", and "uuid_columns_type" into the caller's
+    namespace. If you don't want these to be exported, then load this module
+    using "require".
+
+SEE ALSO
+    Class::DBI, Data::UUID, perl.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2005 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

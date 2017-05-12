@@ -1,0 +1,71 @@
+
+
+EXE = properl.exe
+EXE_DLL = properl.dll
+
+EXE_IMPLIB = properlexe.lib
+DLL_IMPLIB = properldll.lib
+
+EXE_DEF = properlexe.def
+DLL_DEF = properldll.def
+
+# Compiling
+CC = cl
+MACH = -DPRO_MACHINE=29 -DPRO_OS=4
+
+CCFLAGS = -O1 -MD -DNDEBUG -DWIN32 -D_CONSOLE -DNO_STRICT \
+          -DHAVE_DES_FCRYPT  -DPERL_IMPLICIT_CONTEXT \
+          -DPERL_IMPLICIT_SYS -DPERL_MSVCRT_READFIX
+
+# PTFLAGS = -Dhypot=_hypot -DMSB_LEFT -Dfar=ptc_far -Dhuge=p_huge \
+#           -Dnear=p_near -c -W2 -G4 -Za -D_X86_=1 -D_WSTDIO_DEFINED
+
+PTFLAGS = -Dhypot=_hypot -DMSB_LEFT -Dfar=ptc_far -Dhuge=p_huge \
+          -Dnear=p_near -c -W2 -G4 -D_X86_=1 -D_WSTDIO_DEFINED
+
+INCS = -ID:/Perl/lib/CORE \
+       -Id:/ptc-apps/protk23-2002270/protoolkit/includes
+
+CFLAGS = $(CCFLAGS) $(PTFLAGS) $(INCS) $(MACH)
+
+
+# Object Files
+OBJS = properl.obj
+
+
+# Linking
+LINK = link
+
+LDFLAGS = -nologo -nodefaultlib -release /force \
+          -libpath:"D:\Perl\lib\CORE" -machine:x86
+
+PTC_LIBS = ./protkmd.lib
+PTCLIBS_DLL = ./protk_dllmd.lib
+
+LIBS = perl56.lib oldnames.lib kernel32.lib \
+       user32.lib gdi32.lib winspool.lib \
+       comdlg32.lib advapi32.lib shell32.lib \
+       ole32.lib oleaut32.lib netapi32.lib \
+       uuid.lib wsock32.lib mpr.lib \
+       winmm.lib version.lib odbc32.lib \
+       odbccp32.lib msvcrt.lib
+
+
+$(EXE): $(OBJS) $(EXE_DEF)
+	$(LINK) /def:$(EXE_DEF) /NODEFAULTLIB:libcmd.lib /subsystem:console \
+	-out:$(EXE) /implib:$(EXE_IMPLIB) /debug:none /debugtype:coff /machine:i386 \
+	$(LDFLAGS) $(OBJS) $(PTC_LIBS) $(LIBS)
+
+
+$(EXE_DLL):  $(OBJS) $(DLL_DEF)
+	$(LINK) /def:$(DLL_DEF) /NODEFAULTLIB:libcmd.lib /subsystem:console \
+	-out:$(EXE_DLL) /implib:$(DLL_IMPLIB) /debug:none /debugtype:coff /machine:i386 \
+	/dll $(LDFLAGS) $(OBJS) $(PTCLIBS_DLL) $(LIBS)
+
+
+$(EXE_DEF): $(PTC_LIBS)
+	dumpbin /symbols $(PTC_LIBS) | perl dumpbin.pl > $(EXE_DEF)
+
+$(DLL_DEF): $(PTCLIBS_DLL)
+	dumpbin /symbols $(PTCLIBS_DLL) | perl dumpbin.pl > $(DLL_DEF)
+

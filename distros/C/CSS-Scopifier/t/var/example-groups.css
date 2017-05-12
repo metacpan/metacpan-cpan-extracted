@@ -1,0 +1,47 @@
+body {
+  font-family: "Palatino Linotype", Freeserif, serif;
+  letter-spacing: .05em;
+}
+h1, h2 {
+  font-family: Georgia, "DejaVu Serif", serif;
+  letter-spacing: .1em;
+}
+
+
+
+@media (min-width:768px) {
+  .form-inline .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle
+  }
+  .form-inline .form-control {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle
+  }
+}
+
+h1 {font-size: 1.5em;}
+h2 {font-size: 1.4em;}
+
+
+@media print {
+* {
+	text-shadow: none!important;
+	color: #000!important;
+	background: transparent!important;
+	box-shadow: none!important
+}
+a, a:visited {
+	text-decoration: underline
+}
+}
+
+/* Groups can theoretically be nested multiple levels: */
+@media print {
+  h5 { font-size: 200%; }
+  @media (min-width:768px) {
+    h5 { font-size: 250%; }
+  }
+}

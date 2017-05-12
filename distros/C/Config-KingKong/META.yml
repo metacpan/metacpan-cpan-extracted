@@ -1,0 +1,35 @@
+---
+name: Config-KingKong
+version: 0.002
+author:
+  - 'RaphaÃ«l Pinson <raphink@cpan.org>'
+abstract: KingKong Is Not a Genuine KONfiguration Generator
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+  repository: https://github.com/raphink/kingkong
+build_requires:
+  Test::More: 0
+requires:
+  Class::Accessor: 0
+  File::Basename: 0
+  Getopt::Long: 0
+  Hash::Merge: 0
+  Template: 0
+  YAML: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  Config::KingKong:
+    file: lib/Config/KingKong.pm
+    version: 0.002
+  Config::KingKong::File:
+    file: lib/Config/KingKong/File.pm
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - configuration
+  - configuration management
+  - template

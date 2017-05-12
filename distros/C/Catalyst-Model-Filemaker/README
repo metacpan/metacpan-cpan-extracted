@@ -1,0 +1,95 @@
+NAME
+    Catalyst::Model::Filemaker - Catalyst model for Filemaker's XML services
+
+SYNOPSIS
+        # Use the helper to add a L<Net::FileMaker::XML> model to your application...
+        script/myapp_create.pl create model Filemaker Filemaker host=myhost user=myuser pass=mypassword db=mydb 
+        
+    or
+        
+    # lib/MyApp/Model/Filemaker.pm
+        
+    package MyApp::Model::Filemaker;
+        
+    use base qw/ Catalyst::Model::Filemaker /;
+        
+    __PACKAGE__->config(
+            host    => 'myhostname',
+            user    => 'myusername',
+            pass    => 'mypassword',
+            db      => 'mydb.fpX'
+        );
+        
+    1;
+        
+    
+    # In a controller...
+        my $fm = $c->model('Filemaker');
+        print ref($fm);  # Net::FileMaker::XML
+
+DESCRIPTION
+    This is a Catalyst model class that interfaces with Filemaker's XML
+    service. See the Net::FileMaker::XML documentation for a description of
+    the methods available.
+
+METHODS
+  ->new()
+    Instantiate a new Net::FileMaker::XML Model. See Net::FileMaker::XML's
+    new method for the options available.
+
+  ACCEPT_CONTEXT
+    Return the Net::FileMaker::XML object. Called automatically via
+    "$c->model('Filemaker');"
+
+SEE ALSO
+    Catalyst, Catalyst::Helper::Model::Filemaker, Net::FileMaker::XML
+
+DEPENDENCIES
+    *   Carp
+
+    *   Catalyst::Model
+
+    *   Catalyst::Utils
+
+    *   Net::FileMaker::XML::ResultSet
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-model-filemaker at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-Filemaker
+    >.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Model::Filemaker
+
+    You may also look for information at:
+
+    *   Catalyst::Model::Filemaker
+
+        <https://github.com/micheleo/Catalyst--Model--Filemaker>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Model-Filemaker/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-Filem
+        aker>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Model-Filemaker/>
+
+AUTHOR
+     <micheleo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2011 Michele Ongaro. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

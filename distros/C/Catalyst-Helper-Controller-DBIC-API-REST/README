@@ -1,0 +1,189 @@
+NAME
+
+    Catalyst::Helper::Controller::DBIC::API::REST
+
+SYNOPSIS
+
+        $ catalyst.pl MyApp
+        $ cd MyApp
+        $ script/myapp_create.pl controller API::REST DBIC::API::REST \
+            MyApp::Schema MyApp::Model::DB
+    
+    
+        ...
+    
+        package MyApp::Controller::API::REST::Producer;
+    
+        use strict;
+        use warnings;
+        use base qw/MyApp::ControllerBase::REST/;
+        use JSON::XS;
+    
+        __PACKAGE__->config(
+            action             =>  { setup => {
+                                        PathPart => 'producer',
+                                        Chained => '/api/rest/rest_base' }
+                                    }, # define parent chain action and partpath
+            class              =>  'DB::Producer',        # DBIC result class
+            create_requires    =>  [qw/name/],            # columns required
+                                                          # to create
+            create_allows      =>  [qw//],                # additional non-required
+                                                          # columns that
+                                                          # create allows
+            update_allows      =>  [qw/name/],            # columns that
+                                                          # update allows
+            list_returns       =>  [qw/producerid name/], # columns that
+                                                          # list returns
+    
+            list_prefetch_allows => [ # every possible prefetch param allowed
+                [qw/cd_to_producer/], { 'cd_to_producer' => [qw//] },
+                [qw/tags/],           { 'tags'           => [qw//] },
+                [qw/tracks/],         { 'tracks'         => [qw//] },
+            ],
+    
+            list_ordered_by         => [ qw/producerid/ ],
+                                        # order of generated list
+            list_search_exposes     => [ qw/producerid name/ ],
+                                        # columns that can be searched on via list
+        );
+
+DESCRIPTION
+
+      This creates REST controllers according to the specifications at
+      L<Catalyst::Controller::DBIC::API> and L<Catalyst::Controller::DBIC::API::REST>
+      for all the classes in your Catalyst app.
+    
+      It creates the following files:
+    
+        MyApp/lib/MyApp/Controller/API.pm
+        MyApp/lib/MyApp/Controller/API/REST.pm
+        MyApp/lib/MyApp/Controller/API/REST/*
+        MyApp/lib/MyApp/ControllerBase/REST.pm
+    
+      Individual class controllers are under MyApp/lib/MyApp/Controller/API/REST/*.
+
+ CONFIGURATION
+
+        The idea is to make configuration as painless and as automatic as possible, so most
+        of the work has been done for you.
+    
+        There are 8 __PACKAGE__->config(...) options for L<Catalyst::Controller::DBIC::API/CONFIGURATION>.
+        Here are the defaults.
+
+ create_requires
+
+        All non-nullable columns that are (1) not autoincrementing,
+        (2) don't have a default value, are neither (3) nextvals,
+        (4) sequences, nor (5) timestamps.
+
+ create_allows
+
+        All nullable columns that are (1) not autoincrementing,
+        (2) don't have a default value, are neither (3) nextvals,
+        (4) sequences, nor (5) timestamps.
+
+ update_allows
+
+        The union of create_requires and create_allows.
+
+ list_returns
+
+        Every column in the class.
+
+ list_prefetch
+
+        Nothing is prefetched by default.
+
+ list_prefetch_allows
+
+        (1) An arrayref consisting of the name of each of the class's
+        has_many relationships, accompanied by (2) a hashref keyed on
+        the name of that relationship, whose values are the names of
+        its has_many's, e.g., in the "Producer" controller above, a
+        Producer has many cd_to_producers, many tags, and many tracks.
+        None of those classes have any has_many's:
+    
+        list_prefetch_allows    =>  [
+            [qw/cd_to_producer/], { 'cd_to_producer'  => [qw//] },
+            [qw/tags/],           { 'tags'            => [qw//] },
+            [qw/tracks/],         { 'tracks'          => [qw//] },
+        ],
+
+ list_ordered_by
+
+        The primary key.
+
+ list_search_exposes
+
+        (1) An arrayref consisting of the name of each column in the class,
+        and (2) a hashref keyed on the name of each of the class's has many
+        relationships, the values of which are all the columns in the
+        corresponding class, e.g.,
+    
+        list_search_exposes => [
+            qw/cdid artist title year/,
+            { 'cd_to_producer' => [qw/cd producer/] },
+            { 'tags'           => [qw/tagid cd tag/] },
+            { 'tracks'         => [qw/trackid cd position title last_updated_on/] },
+        ],    # columns that can be searched on via list
+
+CONTROLLERBASE
+
+        Following the advice in L<Catalyst::Controller::DBIC::API/EXTENDING>, this
+        module creates an intermediate class between your controllers and
+        L<Catalyst::Controller::DBIC::API::REST>.  It contains one method, create,
+        which serializes object information and stores it in the stash, which is
+        not the default behavior.
+
+METHODS
+
+ mk_compclass
+
+        This is the meat of the helper. It writes the directory structure if it is
+        not in place, API.pm, REST.pm, the controllerbase, and the result class
+        controllers. It replaces $helper->{} values as it goes through, rendering
+        the files for each.
+
+AUTHOR
+
+    Amiri Barksdale <amiri@roosterpirates.com>
+
+CONTRIBUTORS
+
+    Franck Cuny (lumberjaph) <franck@lumberjaph.net>
+
+    Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+    Chris Weyl (RsrchBoy) <cweyl@alumni.drew.edu>
+
+SEE ALSO
+
+    Catalyst::Controller::DBIC::API Catalyst::Controller::DBIC::API::REST
+    Catalyst::Controller::DBIC::API::RPC
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+NAME
+
+    [% PACKAGE %] - REST Controller for [% schema_class %]
+
+DESCRIPTION
+
+    REST Methods to access the DBIC Result Class [% class_name %]
+
+AUTHOR
+
+    [% author %]
+
+SEE ALSO
+
+    Catalyst::Controller::DBIC::API Catalyst::Controller::DBIC::API::REST
+    Catalyst::Controller::DBIC::API::RPC
+
+LICENSE
+
+    [% license %]
+

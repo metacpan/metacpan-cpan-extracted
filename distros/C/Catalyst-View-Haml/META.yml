@@ -1,0 +1,36 @@
+---
+abstract: 'Haml View Class for Catalyst'
+author:
+  - 'Breno G. de Oliveira, C<< <garu at cpan.org> >>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Haml
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Catalyst: 5.80
+  Encode: 0
+  Moose: 1.00
+  Path::Class::File: 0.17
+  Text::Haml: 0
+  Try::Tiny: 0.04
+  namespace::autoclean: 0
+resources:
+  homepage: https://github.com/garu/Catalyst-View-Haml/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/garu/Catalyst-View-Haml.git
+version: 1.00

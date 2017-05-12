@@ -1,0 +1,19 @@
+.gitignore
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+Random.pm
+Random.xs
+hints/MSWin32.pl
+t/0-basic.t
+t/z_kwalitee.t
+t/z_manifest.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

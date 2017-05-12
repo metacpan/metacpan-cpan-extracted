@@ -1,0 +1,131 @@
+Revision history for Catalyst::Authentication::Credential::OpenID
+
+0.19 Wed Oct 10 17:53:00 BST 2012
+      - Drop Catalyst::Engine::HTTP dependency. RT#70417
+
+0.18 Sat Aug 18 16:19:00 BST 2012
+      - Fix RT#79072, fixing dist Makefile.PL
+
+0.17 Sun Jul 15 21:03:00 BST 2012
+      - Fix Makefile.PL, release dev release.
+
+0.16_02 Fri Oct 15 18:54:24 PDT 2010
+      - Experimental, undocumented flatten_extensions_into_user added
+        which flattens the namespaced key vals from extensions into
+        the user object.
+
+0.16_01 Tue Apr  6 19:50:55 PDT 2010
+      - extension_args are no longer honored as deprecated synonym for
+        extensions.
+      - extensions is now a hash ref which facilitates multiple
+        extensions being allowed; suggested by TREVELYAN.
+      - trust_root URI suggested by EVDB.
+
+0.16  Tue Oct 13 07:39:18 PDT 2009
+      - Quick fix to dependencies and Pod to get CPAN testers passing.
+
+0.15  Mon Oct 12 18:18:21 PDT 2009
+      - Patches from Zbigniew Lukasiak to correct inappropriate configuration settings applied.
+      - Spelling fixes, argument clarification in Pod.
+
+0.14_05 Sat Sep 26 16:17:15 PDT 2009
+      - Moving live-app.t back to on demand and only if everything is
+        there to even try.
+      
+0.14_04 Fri Sep  4 15:00:09 PDT 2009
+      - Just making the live-app.t run for all installs to see if the
+        testers pick up any problems with it.
+
+0.14_03 Sun Aug 23 21:13:33 PDT 2009
+      - Made errors non-fatal to match behavior of other credentials.
+        Provided legacy setting for those who still prefer it.
+      - Note that tickets #46916 and #45006 were fixed a couple
+        releases back.
+
+0.14_02 Sun Aug 23 17:43:46 PDT 2009
+      - Fixed #48952.
+
+0.14_01 Thu Aug 20 21:30:32 PDT 2009
+      - I had an old Test::Pod that didn't catch unsupported L<>
+        usage; CPAN testers found it.
+      - Changed use of LWPx::PA when a ua_class isn't set to test for
+        its successful eval and to use LWP::UserAgent on failure.
+      - Rearranged the extensions and extension_args so there is no
+        duplication necessary in the config.
+
+0.14  Tue Aug 18 22:37:51 PDT 2009
+      - Split live tests into two test apps to avoid the need to fork
+        to have a self-answering server; crudely done, it's the same
+        exact code as before doubled for now.
+      - Took LWPx::ParanoidAgent out of tests. It's been too long
+        since it's been broken by the LWP debug deprecation.
+
+0.13  Mon Dec  1 19:42:31 PST 2008
+      - s/Meno/Menno/ and version fix in the Pod are the only changes. Sigh.
+
+0.12  Mon Dec  1 19:28:02 PST 2008
+      - Everything is finally passing tests so I put most of the
+        previous versions on the backpan because they're nearly
+        identical except for Makefile changes.
+      - Applied code from Menno Blom to allow simple registration
+        to work. Considered experimental for now, I think. Not because
+        it won't stay but because it might not work as expected.
+      - Bumped reqs on OpenID family to support 2.0 features.
+
+0.11  Sun Oct  5 00:41:37 PDT 2008
+      - Added LWPx paranoid to build_requires.
+      - Put some experimental mdash entities into the Pod.
+
+0.10  Thu Oct  2 19:13:42 PDT 2008
+      - Just twiddled the requirements calls in the Makefile. I can't
+        figure out why testers are failing it for prereqs it *is*
+        listing. Someone recently mentioned this same problem on
+        use.perl so I'm giving this a shot.
+      - Spelling fix in Pod.
+      - Updated tests and test server script too.
+
+0.09  Mon Sep 29 18:29:59 PDT 2008
+      - Bug patch for boneheaded return v detach bug given by M. Blom.
+
+0.08  Sat Jul  5 13:13:14 PDT 2008
+      - Again, only change is to Makefile.PL reqs.
+
+0.07  Thu Jul  3 21:26:12 PDT 2008
+      - Only changes are to Makefile for prereqs. The failures on CPAN
+        testers are really weird. I think I misunderstood
+        build_requires() in ModInst.
+
+0.06  Thu Jul  3 17:20:39 PDT 2008
+      - All CPAN reports for 0.05 are failing. Added Catalyst::Devel and
+        Catalyst to prereqs. It was just Catalyst::Runtime before.
+      - Also changed around Test App storage a bit to avoid permission
+        errors on tmp cache file from different user runs.
+
+0.05  Wed Jul  2 20:17:21 PDT 2008
+      - Removed UNIVERSAL::require to shrink prereqs and protect
+        namespaces.
+      - Turned on test app tests. I want to know if it's failing for
+        others.
+      - Swapped LWPx::ParanoidAgent for LWP::UA in the test.
+
+0.04  Thu Jun 19 23:20:00 PDT 2008
+      - Fixed some of the .conf example. Sigh.
+      - Other minor Pod tweaks.
+
+0.03  Thu Jun 19 20:48:04 PDT 2008
+      - Updated config information with Config::General examples.
+      - Cleaned up TestApp a little.
+      - Swapped some code order around to make Perl::Critic my friend.
+      - Extended SEE ALSO.
+      - Updated Makefile a bit.
+
+0.02  Tue Apr  8 22:18:22 PDT 2008
+      - Changed "use base" to "use parent."
+      - Moved SVN to Catalyst dev box.
+      - Took out left over toss copy of earlier Credential module.
+      - Took out weird closure over secret; not just sets it plainly.
+      - Put config stuff in POD a bit differently and added info on consumer_secret.
+      - POD tweaks.
+
+0.01  Sat Apr  5 21:35:25 PDT 2008
+      - Initial release.

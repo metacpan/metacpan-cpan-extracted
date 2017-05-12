@@ -1,0 +1,191 @@
+<RDF xmlns:r="http://www.w3.org/TR/RDF/"
+     xmlns:d="http://purl.org/dc/elements/1.0/"  
+     xmlns="http://dmoz.org/rdf">
+
+<Topic r:id="Top/Arts">
+  <catid>2</catid>>
+  <d:Title>Arts</d:Title>
+  <narrow r:resource="Top/Arts/Books"/>
+  <narrow r:resource="Top/Arts/Music"/>
+  <narrow r:resource="Top/Arts/Television"/>
+  <narrow r:resource="Top/Arts/Writing"/>
+  <narrow r:resource="Top/Arts/Animation"/>
+  <narrow r:resource="Top/Arts/Anime"/>
+  <narrow r:resource="Top/Arts/Bodyart"/>
+  <narrow r:resource="Top/Arts/Comics"/>
+  <narrow r:resource="Top/Arts/Fine_Arts"/>
+  <narrow r:resource="Top/Arts/Movies"/>
+  <narrow r:resource="Top/Arts/Poetry"/>
+  <narrow r:resource="Top/Arts/Photography"/>
+  <narrow r:resource="Top/Arts/Design"/>
+  <narrow r:resource="Top/Arts/Radio"/>
+  <narrow r:resource="Top/Arts/Online_Galleries"/>
+  <narrow r:resource="Top/Arts/Digital"/>
+  <narrow r:resource="Top/Arts/Graphic_Design"/>
+  <narrow r:resource="Top/Arts/Humanities"/>
+  <narrow r:resource="Top/Arts/Publishing"/>
+  <narrow r:resource="Top/Arts/Asian_Arts"/>
+  <narrow r:resource="Top/Arts/Architecture"/>
+  <narrow r:resource="Top/Arts/Decorative_Arts"/>
+  <narrow r:resource="Top/Arts/Art_Directories_and_Links"/>
+  <narrow r:resource="Top/Arts/Illustration"/>
+  <narrow r:resource="Top/Arts/Magazines"/>
+  <narrow r:resource="Top/Arts/Literature"/>
+  <narrow r:resource="Top/Arts/Art_Theft_and_Crime"/>
+  <narrow r:resource="Top/Arts/Calligraphy"/>
+  <narrow r:resource="Top/Arts/People"/>
+  <narrow r:resource="Top/Arts/Video"/>
+  <narrow r:resource="Top/Arts/Performing_Arts"/>
+  <narrow r:resource="Top/Arts/ASCII"/>
+  <narrow r:resource="Top/Arts/Genres"/>
+  <narrow r:resource="Top/Arts/Artists"/>
+  <narrow r:resource="Top/Arts/Original_Writing"/>
+  <narrow r:resource="Top/Arts/Bonsai_and_Suiseki"/>
+  <symbolic r:resource="Dance:Top/Arts/Performing_Arts/Dance"/>
+  <symbolic r:resource="Art Education:Top/Reference/Education/Art_Education"/>
+  <symbolic r:resource="Theatre:Top/Arts/Performing_Arts/Theatre"/>
+  <symbolic r:resource="Typography:Top/Computers/Fonts"/>
+  <editor r:resource="bobtest6"/>
+  <editor r:resource="chrisr"/>
+  <editor r:resource="dami"/>
+  <editor r:resource="johnt"/>
+  <editor r:resource="joemcomber"/>
+  <editor r:resource="ron"/>
+  <editor r:resource="sean"/>
+  <editor r:resource="shadow"/>
+  <editor r:resource="tedhusted"/>
+  <editor r:resource="terryriw"/>
+  <editor r:resource="dannyboy"/>
+</Topic>
+
+<Alias r:id="Dance:Top/Arts/Performing_Arts/Dance">
+  <d:Title>Dance</d:Title>
+  <Target r:resource="Top/Arts/Performing_Arts/Dance"/>
+</Alias>
+
+<Alias r:id="Art Education:Top/Reference/Education/Art_Education">
+  <d:Title>Art Education</d:Title>
+  <Target r:resource="Top/Reference/Education/Art_Education"/>
+</Alias>
+
+<Alias r:id="Theatre:Top/Arts/Performing_Arts/Theatre">
+  <d:Title>Theatre</d:Title>
+  <Target r:resource="Top/Arts/Performing_Arts/Theatre"/>
+</Alias>
+
+<Alias r:id="Typography:Top/Computers/Fonts">
+  <d:Title>Typography</d:Title>
+  <Target r:resource="Top/Computers/Fonts"/>
+</Alias>
+
+<Topic r:id="Top/Arts/Books">
+  <catid>26</catid>>
+  <d:Title>Books</d:Title>
+  <narrow r:resource="Top/Arts/Books/News"/>
+  <narrow r:resource="Top/Arts/Books/Reviews"/>
+  <narrow1 r:resource="Top/Arts/Books/Genres"/>
+  <narrow r:resource="Top/Arts/Books/Directories"/>
+  <narrow r:resource="Top/Arts/Books/Authors"/>
+  <narrow r:resource="Top/Arts/Books/Publishers"/>
+  <narrow r:resource="Top/Arts/Books/Electronic_Texts"/>
+  <narrow r:resource="Top/Arts/Books/Antiquarian"/>
+  <narrow r:resource="Top/Arts/Books/Reading_Groups"/>
+  <narrow r:resource="Top/Arts/Books/Spirituality"/>
+  <related r:resource="Top/Arts/Humanities/Great_Books_Indices"/>
+  <related r:resource="Top/Arts/Literature"/>
+  <related r:resource="Top/Arts/Publishing"/>
+  <related r:resource="Top/Arts/Writing"/>
+  <related r:resource="Top/Business/Books/Publishers"/>
+  <related r:resource="Top/Shopping/Books"/>
+  <symbolic r:resource="Retailers:Top/Business/Books/Book_Sellers"/>
+  <editor r:resource="alvar"/>
+  <editor r:resource="dacard"/>
+  <editor r:resource="infoserv"/>
+  <editor r:resource="jakie"/>
+  <editor r:resource="lwinn"/>
+  <editor r:resource="vindictu"/>
+  <editor r:resource="walts"/>
+  <editor r:resource="spelman"/>
+  <newsGroup r:resource="news:alt.books"/>
+  <newsGroup r:resource="news:rec.arts.books"/>
+  <newsGroup r:resource="news:rec.arts.books.marketplace"/>
+</Topic>
+
+<Alias r:id="Retailers:Top/Business/Books/Book_Sellers">
+  <d:Title>Retailers</d:Title>
+  <Target r:resource="Top/Business/Books/Book_Sellers"/>
+</Alias>
+
+<Topic r:id="Top/Arts/Books/News">
+  <d:Title>News</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Reviews">
+  <catid>908</catid>>
+  <d:Title>Reviews</d:Title>
+  <narrow r:resource="Top/Arts/Books/Reviews/Magazines_and_Newspapers"/>
+  <narrow r:resource="Top/Arts/Books/Reviews/Computer_Books"/>
+  <editor r:resource="helen313"/>
+  <editor r:resource="mrwrite"/>
+  <newsGroup r:resource="news:rec.arts.books.reviews"/>
+  <newsGroup r:resource="news:rec.arts.sf.reviews"/>
+  <newsGroup r:resource="news:alt.books.reviews"/>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Reviews/Magazines_and_Newspapers">
+  <catid>941</catid>>
+  <d:Title>Magazines_and_Newspapers</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Reviews/Computer_Books">
+  <catid>942</catid>>
+  <d:Title>Computer_Books</d:Title>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Genres">
+  <catid>41214</catid>>
+  <d:Title>Genres</d:Title>
+  <narrow r:resource="Top/Arts/Books/Genres/Science_Fiction"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Horror"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Romance"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Mystery"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Cyberpunk"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Fantasy"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Children"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Computers"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Gay_and_Lesbian"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Outdoors"/>
+  <narrow r:resource="Top/Arts/Books/Genres/True_Crime"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Prehistoric_Fiction"/>
+  <related r:resource="Top/Games/Role-Playing_Games/Gamebooks"/>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Genres/Science_Fiction">
+  <catid>906</catid>>
+  <d:Title>Science_Fiction</d:Title>
+  <narrow r:resource="Top/Arts/Books/Genres/Science_Fiction/Science"/>
+  <narrow r:resource="Top/Arts/Books/Genres/Science_Fiction/Authors"/>
+  <related r:resource="Top/Arts/Books/Authors/Science_Fiction"/>
+  <related r:resource="Top/Arts/Books/Genres/Cyberpunk"/>
+  <related r:resource="Top/Arts/Literature/Science_Fiction"/>
+  <related r:resource="Top/Arts/Magazines/Science_Fiction"/>
+  <related r:resource="Top/Arts/Movies/Genres/Science_Fiction"/>
+  <related r:resource="Top/Arts/Television/Science_Fiction"/>
+  <related r:resource="Top/Arts/Writing/Organizations/Science_Fiction"/>
+  <editor r:resource="ambrosia"/>
+  <editor r:resource="carigana"/>
+  <editor r:resource="dartrac"/>
+  <editor r:resource="hikeeba"/>
+  <editor r:resource="sunhater"/>
+  <editor r:resource="tedhusted"/>
+  <editor r:resource="clope"/>
+  <newsGroup r:resource="news:rec.arts.sf.written"/>
+</Topic>
+
+<Topic r:id="Top/Arts/Books/Genres/Science_Fiction/Science">
+  <catid>927</catid>>
+  <d:Title>Science</d:Title>
+  <newsGroup r:resource="news:rec.arts.sf.science"/>
+</Topic>
+
+</RDF>

@@ -1,0 +1,29 @@
+Revision history for Perl extension Crypt::Random::Seed
+
+0.03  16 Feb 2013
+
+  - Allow tests to run even if TESHA2 isn't installed.  Thanks to
+    Salvatore Bonaccorso for suggestion.
+
+  - Use binmode on file reads.  Thanks for David Dick for idea.
+
+  - Minor documentation updates.
+
+
+0.02  29 Jan 2013
+
+  - Add EGD/PRNGD source.
+
+  - More documentation.
+
+  - More strict with perlcritic (used Bytes::Random::Secure for some reference)
+
+  - Remove 'Weak' constructor option.  There was too little logic behind what
+    got called strong or weak.  The is_strong() call remains, so the calle can
+    use it possibly in conjunction with the name() value to make a more
+    informed decision.
+
+
+0.01  12 Jan 2013
+
+  - Initial development

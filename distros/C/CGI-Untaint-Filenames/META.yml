@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: CGI-Untaint-Filenames
+version: 0.3
+author: ~
+abstract: |-
+  CGI::Untaint::Filenames - untaint filename values from CGI programs
+license: perl
+provides:
+  CGI::Untaint::Filenames:
+    file: lib/CGI/Untaint/Filenames.pm
+    version: 0.3
+  CGI::Untaint::Winfilename:
+    file: lib/CGI/Untaint/Winfilename.pm
+    version: 0.1
+generated_by: Module::Build version 0.25

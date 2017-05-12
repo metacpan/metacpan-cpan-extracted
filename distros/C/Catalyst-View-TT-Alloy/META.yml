@@ -1,0 +1,30 @@
+---
+abstract: 'Template::Alloy (TT) View Class'
+author:
+  - 'Dean Hamstead <dean@bytefoundry.com.au>'
+build_requires:
+  Catalyst::Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-TT-Alloy
+requires:
+  Carp: '0'
+  Catalyst: '5.7'
+  Data::Dump: '0'
+  Path::Class: '0'
+  Scalar::Util: '0'
+  Template::Alloy: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/djzort/Catalyst-View-TT-Alloy
+  repository: https://github.com/djzort/Catalyst-View-TT-Alloy.git
+version: '0.00007'

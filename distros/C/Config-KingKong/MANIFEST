@@ -1,0 +1,16 @@
+bin/kingkong
+Build.PL
+ChangeLog
+COPYING
+example/distributions.tmpl
+example/includes/architectures.conf
+example/includes/ubuntu_releases.conf
+example/kingkong.conf
+lib/Config/KingKong.pm
+lib/Config/KingKong/File.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/pod.t

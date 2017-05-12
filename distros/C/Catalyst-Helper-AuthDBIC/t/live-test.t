@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Test::More;
+
+BEGIN {
+    eval { require Test::WWW::Mechanize::Catalyst }
+    or plan skip_all => 'Need Test::WWW::Mechanize::Catalyst to run this test';
+}
+
+# setup library path
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+# make sure testapp works
+use ok 'TestApp';
+
+# a live test against TestApp, the test application
+use Test::WWW::Mechanize::Catalyst 'TestApp';
+my $mech = Test::WWW::Mechanize::Catalyst->new;
+$mech->get_ok('http://localhost/', 'get main page');
+$mech->content_like(qr/it works/i, 'see if it has our text');
+
+done_testing;
+

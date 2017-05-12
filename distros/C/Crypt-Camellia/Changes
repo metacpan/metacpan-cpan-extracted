@@ -1,0 +1,22 @@
+#
+#  Revision history for Perl extension Crypt::Camellia.
+#
+2.02  Fri Mar  4 12:31:43 JST 2011
+	- Replace the cipher engine version 1.2.0.
+
+2.01  Fri Oct 20 00:23:52 2006
+	- Replaced the cipher engine of version 1.1.0.
+	- Fixed byte-order problem on SPARC.
+2.00  Fri Jul 21 06:49:22 2006
+	- Hiroyuki OYAMA now takes over the module from Dan Kogai.
+	- Support to 128/192bit private key.
+	- Limit to accept only with 128/192/256bit private key.
+	- Limit to accept only with 16byte plain/cipher text.
+	- Fix to octet unit with $cipher->keysize return value.
+	- Add test case 02-test-vectors-simple.t, 03-test-vectors-full.t
+	- Fix test case 00 and 01.
+
+0.01  Sun Apr 30 18:43:05 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::Camellia camellia.h
+

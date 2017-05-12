@@ -1,0 +1,20 @@
+---
+abstract: 'CouchDB model class for Catalyst'
+author:
+  - 'Robin Berjon, <robin @t berjon d.t com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.750'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Catalyst-Model-CouchDB
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 0
+  CouchDB::Client: 0.04
+  perl: 5.6.0
+version: 0.01

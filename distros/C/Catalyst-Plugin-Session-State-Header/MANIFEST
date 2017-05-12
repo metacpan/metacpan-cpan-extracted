@@ -1,0 +1,10 @@
+lib/Catalyst/Plugin/Session/State/Header.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+Cnahges
+t/00-deps.t
+t/01-import.t
+t/03-logic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

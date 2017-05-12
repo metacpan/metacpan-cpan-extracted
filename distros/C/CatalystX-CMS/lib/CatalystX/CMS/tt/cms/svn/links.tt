@@ -1,0 +1,116 @@
+<div id="top-panel">
+<script type="text/javascript">
+  CMS.HEADER   = 
+    'You are [% CMS.mode %]ing: <span class="url">[% cmspage_url.path %]</span>';
+  CMS.THIS_URL = '[% cmspage_url %]';
+</script>
+
+<div id="admin_links">
+ <ul class="navlist">
+  <li><a href="[% c.uri_for('cms_list') %]">List all pages</a></li>
+  <li><a href="#" onclick="CMS.CreateDialog.show(); return false">Create new page</a></li>
+  [%- IF cmspage.url -%]
+  [%- IF CMS.mode != 'edit' -%]
+  <li><a href="[% cmspage_url %]?cxcms=edit">Edit page</a></li>
+  [%- END -%]
+  <li><a href="#" onclick="CMS.RenameDialog.show(); return false">Rename page</a></li>
+  <li><a href="[% cmspage_url %]?cxcms=delete">Delete page</a></li>
+  [%- IF cmspage.committed -%]
+  <li><a href="[% cmspage_url %]?cxcms=history">Page History</a></li>
+  [%- IF cmspage.has_unsaved_changes -%]
+  <li><a href="[% cmspage_url %]?cxcms=diff">View Unsaved Changes</a></li>
+  [%- END # diff -%]
+  [%- END # uncommitted -%]
+  [%- END # url -%]
+ </ul>
+</div>
+ 
+<div id="create_new_dialog">
+ <div class="hd">Create new page</div>
+ <div class="bd">
+  <form method="post" action="[% cmspage_url %]?cxcms=create">
+   <input type="text" size="50" maxsize="255" name="cxcms-url" value="" />
+  </form>
+ </div>
+</div>
+
+<div id="rename_dialog">
+ <div class="hd">Rename page</div>
+ <div class="bd">
+  <form method="post" action="[% cmspage_url %]?cxcms=rename">
+   <input type="text" size="50" maxsize="255" name="cxcms-url" value="" />
+  </form>
+ </div>
+</div>
+
+</div><!-- end top-panel -->
+
+<div id="right-panel">
+[% IF cmspage.locked %]
+ [% 
+   SET datearr  = [];
+   USE datestr  = date(format = '%Y,%m,%d,%H,%M,%S');
+   ltime        = cmspage.lock_time + (c.config.cms.lock_period || 3600);
+   datearr      = datestr.format( ltime ).split(',');
+   datearr.1    = datearr.1 - 1;  # fix month
+ %]
+<script type="text/javascript">
+ <!-- //start
+ CMS.LOCK_EXPIRES = new Date([% datearr.join(',') %]);
+ //-->
+</script>
+
+ <div id="countbox_cont">
+ Page lock remaining: <span id="countbox"></span>
+ </div>
+[% END # cmspage.locked %]
+
+ <div id="cms_attrs" class="boxed padded">
+  <span id="cms_attrs_template" style="display:none">
+   <input class="label" type="text" name="new_attr_name" value="meta name" />
+   <input               type="text" name="new_attr_val"  value="meta value" />
+   <br />
+  </span>
+ [% FOREACH m = cmspage.attrs.keys.sort %]
+   <label>[% m | html %]</label>
+   <input type="text" name="[% m | html %]" value="[% cmspage.attrs.$m %]" />
+   <br />
+ [% END %]
+   <a href="#" onclick="YAHOO.CMS.add_meta_item(); return false">Add new meta info</a>
+   <br />
+ </div>
+ 
+ <div id="tree" class="padded boxed">
+ Related Pages:
+  <div id="wrapper_tree">
+  [% INCLUDE make_tree items = cmspage.tree %]
+  </div>
+ </div>
+
+ <div id="status">Status:</div>
+
+</div><!-- end right-panel -->
+
+[% BLOCK make_tree %]
+<ul>
+[% FOREACH i = items %]
+ <li>
+ [%- IF i.url == cmspage.url -%]
+ [%- i.text -%]
+ [%- ELSE -%]
+ <a href="[% USE myurl = url(cmspage_url); 
+             myurl( 
+                  'cxcms' => 'edit', 
+                  'cxcms-url' => i.url, 
+                  'cxcms-type' => (i.type || cmspage.type),
+                  'cxcms-flavour' => (i.flavour || cmspage.flavour)
+             ) %]"
+  >[% i.text %]</a>
+ [%- END -%]
+ </li>
+ [%- IF i.exists('tree') -%]
+ [% INCLUDE make_tree items = i.tree %]
+ [%- END -%]
+ [%- END # FOREACH -%]
+</ul>
+[% END # make_tree %]

@@ -1,0 +1,96 @@
+WELCOME TO Chess::PGN::Parse
+    Chess::PGN::Parse is a module to parse chess games. PGN stands for
+    Portable Game Notation and it is regulated by a standard
+    (http://www.schachprobleme.de/chessml/faq/pgn/). It is among the
+    preferred means of chess games distribution. Being a public, well
+    established standard, PGN is understood by many chess archive programs.
+
+INSTALLATION
+    Standard module installation procedure. Unpack the compressed archive,
+    and then run 
+
+    perl Makefile.PL 
+    make 
+    make test 
+    make install
+
+USAGE
+    Chess::PGN::Parse has a typical Perl Object Oriented interface. You need
+    to create an object, and then use its methods.
+
+    Simple usage:
+
+            use Chess::PGN::Parse;
+            my $pgnfile = "kk_2001.pgn"; # name of the file containing PGN games
+
+            # create an object, passing the file name as parameter
+            # 
+            my $pgn = new Chess::PGN::Parse $pgnfile 
+                    or die "can't open $pgnfile\n";
+        
+            # Then, we can loop through the games, using the
+            # read_game() method.
+            # No special parsing in this phase. The game is
+            # returned as text, without checking for comments
+            # or errors
+            while ($pgn->read_game()) {
+                    print $pgn->white, ", " , $pgn->black, ", ", 
+                            $pgn->result, ", ",
+                            $pgn->game, "\n";
+            }
+
+    A more complete usage requires actual game parsing. After reading the
+    game, a parse_game() method is called, and as a result we have the moves
+    available in an array, comments and errors in two hashes, where the keys
+    are the move numbers and the values are comments or errors.
+
+            use Data::Dumper;
+            while ($pgn->read_game()) {
+                if ($pgn->parse_game({save_comments => 'yes', 
+                        log_errors => 'yes' })) 
+                {
+                print Data::Dumper->Dump([$pgn->moves],["moves"]), "\n ";
+                print Data::Dumper->Dump([$pgn->comments],["comments"]), "\n ";
+                print Data::Dumper->Dump([$pgn->errors],["errors"]), "\n ";
+                }
+            }
+
+    A simplified approach uses the built-in method read_all(), which reads
+    and parses and returns an array of hashes with all the game details.
+
+            use Chess::PGN::Parse;
+            use Data::Dumper;
+            my $pgnfile = "kk_2001.pgn";
+            my $pgn = Chess::PGN::Parse->new $pgnfile 
+                    or die "can't open $pgnfile\n";
+            my @games = $pgn->read_all({save_comments => 'yes',
+                    log_errors => 'yes' });
+            print Data::Dumper->Dump([\@games}],["games"]), "\n ";
+
+DISTRIBUTION LIST
+   Changes                       A change log for this module
+   MANIFEST                      The list of included files
+   README                        This file
+   Makefile.PL                   The Perl makefile
+   Parse.pm                      The module itself
+   test.pl                       The test script
+   examples/kk_2001.pgn          a sample collection of PGN games
+   examples/kk_game4_test.pgn    a sample PGN file with most of the strange things
+                                 that a PGN could have, including errors
+   examples/test_1_PGN.pl        a test script to show some features
+   examples/test_2_PGN.pl        a more advanced test script
+   examples/test_3_PGN.pl        a test script to parse a PGN from string
+   examples/test_4_PGN.pl        a more advanced PGN string capability
+                                 with also examples of customized output
+   examples/test_non_standard.pl Another test with some unorthodox input
+                                 to demonstrate how the enhanced version
+                                 can handle these things.
+   examples/test_recursion.pl    A test of RAV recursive parsing
+   
+AUTHOR
+    Chess::PGN::Parse is copyright (C) Giuseppe Maxia 2002. All rights
+    reserved. Released under the GPL (GNU General Public License) version 2,
+    April 1991.
+
+    My contact for bugs, comments, advice: gmax@cpan.org
+

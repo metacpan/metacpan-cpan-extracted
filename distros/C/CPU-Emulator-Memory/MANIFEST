@@ -1,0 +1,21 @@
+MANIFEST
+Makefile.PL
+README
+lib/CPU/Emulator/Memory/Banked.pm
+t/00-ranges.t
+t/01-peek-poke-8-16.t
+t/02-file.t
+t/03-banked-memory-ROM.t
+t/04-banked-memory-dynamic.t
+lib/CPU/Emulator/Memory.pm
+t/05-banked-memory-ranges.t
+TODO
+t/06-initialise-from-string.t
+CHANGELOG
+t/coverage.sh
+t/pod-coverage.t
+t/pod.t
+t/read_write_binary.pl
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

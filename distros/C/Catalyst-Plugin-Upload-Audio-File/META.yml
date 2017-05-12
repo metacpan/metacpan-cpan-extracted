@@ -1,0 +1,21 @@
+---
+abstract: 'Get an Audio::File from an upload'
+author:
+  - 'Nathaniel Heinrichs, C<nheinric@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Upload-Audio-File
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Audio::File: 0
+  Catalyst: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

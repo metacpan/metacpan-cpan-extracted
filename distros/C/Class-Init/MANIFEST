@@ -1,0 +1,18 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/PAR.pm
+inc/Module/Install/Win32.pm
+lib/Class/Init.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE			Module signature (added by Module::Signature)
+t/01_basic.t
+t/02_universal.t

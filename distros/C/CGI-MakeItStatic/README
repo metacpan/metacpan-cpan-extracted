@@ -1,0 +1,31 @@
+CGI-MakeItStatic version 0.03
+=============================
+
+This module makes CGI program static. It is for not good CGI programs.
+For examle, Here is the program which display some statistics for each month.
+But it is no need to calculate past month statistics because it never be changed.
+If it takes too much time to calcurate past month statistics, ... it is too bad.
+CGI::MakeItStatic provides the simple way to make it static.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::Scalar
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by ktat
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

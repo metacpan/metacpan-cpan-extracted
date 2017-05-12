@@ -1,0 +1,77 @@
+Revision history for Perl extension Cinnamon
+
+0.28 2015-08-23T06:20:47Z
+    - Fixed a problem that Cinnamon does not work with Moo version 2.000000 or above
+
+0.27 2014-08-04T05:23:38Z
+    - Skip sudo password prompt if specifying empty string
+
+0.26 2013-10-20T07:20:22Z
+    - add call DSL
+
+0.25 2013-07-25T10:21:13Z
+    - remove @args in task, because we can specify parameter by -s option
+
+0.24 2013-07-21T06:50:50Z
+    - refactor management of task, role and params
+    - handle error on open3
+
+0.23 2013-07-06T06:19:48Z
+    - fix bug to run task on same host, when concurrency running
+    - fix bug to misunderstand the result of running command on local
+
+0.22 2013-05-25T05:41:30Z
+    - fix to handle \r\n in output correctly.  Thanks to yteraoka.
+
+0.21 2013-04-16T12:00:26Z
+    - Minillize
+
+0.20    Tue Apr 16 19:27:04 2013
+    - official concurrency support
+    - NOTICE: Since current version, a task is executed in parallel by all the hosts by default.  See documentation for details.
+
+0.13_02 Sun Apr 14 02:20:58 2013
+    - add concurrency setting
+
+0.13_01 Sat Apr 13 19:57:15 2013
+    - concurrency support
+
+0.12    Thu Mar 28 21:00:10 2013
+    - fixed to run correct if overwrite $_ in remote block
+
+0.11    Thu Mar 14 08:16:50 2013
+    - fixed typo in a document. Thanks to syohex@github
+
+0.10    Wed Mar 13 20:38:13 2013
+    - show executing command before input sudo password. Thanks to hayajo@github
+
+0.09    Mon Mar 11 22:53:35 2013
+    - fixed wrong message. Thanks to hayajo@github
+
+0.08    Sun Mar 10 21:42:09 2013
+    - support tty. Thanks to hayajo@github
+
+0.07    Mon Feb 25 00:06:06 2013
+    - cli returns error exit code if command failed. Thanks to hayajo@github
+
+0.06    Fri Feb 22 00:42:24 2013
+    - multi task support
+
+0.05    Thu Jan 31 15:47:09 2013
+    - Added -i/--info command to dump roles/tasks info.
+
+0.04    Sun Jan 20 08:28:45 2013
+    - add config example
+    - accept command-line arguments using -s (--set) option. Thanks to hatyuki@github.
+
+0.03    Mon Jun 18 23:20:54 2012
+    - perl 5.10.1 or later is required
+    - fix error message output
+    - synchronous output
+
+0.02    Wed May 23 01:19:17 2012
+    - feedback when specified role or task is not defined
+    - some bug fix
+
+0.01    Sun May  6 21:08:32 2012
+    - initial version

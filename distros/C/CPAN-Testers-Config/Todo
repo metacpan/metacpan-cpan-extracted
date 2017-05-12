@@ -1,0 +1,4 @@
+Todo for CPAN-Testers-Config
+
+- file locking
+- have $class->write() generate a default config

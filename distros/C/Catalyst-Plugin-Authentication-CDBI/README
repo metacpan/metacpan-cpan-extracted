@@ -1,0 +1,81 @@
+NAME
+    Catalyst::Plugin::Authentication::CDBI - CDBI Authentication for
+    Catalyst
+
+SYNOPSIS
+        use Catalyst 'Authentication::CDBI';
+        __PACKAGE__->config->{authentication} = (
+            user_class           => 'PetStore::Model::CDBI::Customer',
+            user_field           => 'email',
+            role_class           => 'PetStore::Model::CDBI::Role',
+            user_role_class      => 'PetStore::Model::CDBI::CustomerRole',
+            user_role_user_field => 'customer'
+        );
+        $c->login( $user, $password );
+        $c->logout;
+        $c->session_login( $user, $password );
+        $c->session_logout;
+        $c->roles(qw/customer admin/);
+
+        CREATE TABLE customer (
+            id INTEGER PRIMARY KEY,
+            email TEXT,
+            password TEXT
+        );
+
+        CREATE TABLE role (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+        );
+
+        CREATE TABLE customer_role (
+            id INTEGER PRIMARY KEY,
+            customer INTEGER REFERENCES customer,
+            role INTEGER REFERENCES role
+        );
+
+DESCRIPTION
+    Note that this plugin requires a session plugin like
+    "Catalyst::Plugin::Session::FastMmap".
+
+  EXTENDED METHODS
+   prepare_action
+   setup
+  OVERLOADED METHODS
+   process_roles
+  METHODS
+   login
+    Login.
+
+        $c->login( $user, $password );
+
+   logout
+    Logout.
+
+   roles
+    Check permissions for roles and return true or false.
+
+        $c->roles(qw/foo bar/);
+
+    Returns an arrayref containing the verified roles.
+
+        my @roles = @{ $c->roles };
+
+   session_login
+    Login.
+
+        $c->session_login( $user, $password );
+
+   session_logout
+    Session logout.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

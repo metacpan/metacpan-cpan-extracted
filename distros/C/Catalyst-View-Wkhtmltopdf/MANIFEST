@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.txt
+dist.ini
+lib/Catalyst/Helper/View/Wkhtmltopdf.pm
+lib/Catalyst/View/Wkhtmltopdf.pm
+t/00basic.t

@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+  <title>Bouquet Search Engine</title>
+  <!--CSS file (default YUI Sam Skin) --> 
+  <link type="text/css" rel="stylesheet" href="<tmpl_var name=js_path>/build/datatable/assets/skins/sam/datatable.css"> 
+ 
+  <!-- Dependencies --> 
+  <script type="text/javascript" src="<tmpl_var name=js_path>/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+  <script type="text/javascript" src="<tmpl_var name=js_path>/build/element/element-beta-min.js"></script> 
+  <script type="text/javascript" src="<tmpl_var name=js_path>/build/datasource/datasource-beta-min.js"></script> 
+
+  <!-- Source files -->
+  <script type="text/javascript" src="<tmpl_var name=js_path>/build/datatable/datatable-beta-min.js"></script>
+</head>
+
+<body>
+<h3 align="center" style="{color: #80c0ff;}">Bouquet Search Engine</h3>
+<tmpl_if name=main_menu>
+  <h5 align="center" style="{color: #80c0ff;}"><a href="<tmpl_var name=main_menu>">Main Menu</a></h5>
+</tmpl_if>
+<tmpl_if name=table_name>
+  <h5 align="center" style="{color: #80c0ff;}">Table: <tmpl_var name=table_name></h5>
+</tmpl_if>
+<tmpl_if name=results>
+  <div align="center" class="yui-skin-sam"><div id="myContainer"></div></div>
+  <script type="text/javascript">
+	<tmpl_var name=results>
+	  var myDataTable = new YAHOO.widget.DataTable("myContainer", myColumnDefs, myDataSource, oConfigs);
+  </script>
+  <h5 align="center" style="{color: #80c0ff;}">Records found: <tmpl_var name=search_count></h5>
+</tmpl_if>
+<tmpl_var name=content>
+</body>
+</html>

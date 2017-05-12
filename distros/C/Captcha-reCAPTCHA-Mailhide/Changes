@@ -1,0 +1,49 @@
+Revision history for Captcha-reCAPTCHA
+
+0.1     2007-05-25
+        Initial release.
+    
+0.2     2007-05-25
+        Added t/20.check_answer.t, minor doc fixes.
+    
+0.3     2007-05-26
+        Minor doc fixes
+    
+0.4     2007-05-26
+        Made LWP::UserAgent creation lazy
+        Added Mailhide support
+    
+0.5     2007-05-27
+        Added better validation for keys to provide helpful diagnostics in
+        the case where the wrong key is used.
+        Improved test coverage.
+        Added support for generation of RecaptchaOptions options hash.
+    
+0.6     2007-05-29
+        Remove key validation code: keys may change format in the future.
+        Switched server error code to 'recaptcha-not-reachable'
+    
+0.7     2007-05-31
+        Switched to HTML::Tiny for markup generation.
+        Split Captcha::reCAPTCHA::Mailhide into a separate module
+    
+0.8     2007-11-01
+        s/incorrect-challenge-sol/incorrect-captcha-sol/g #29693
+        Thanks to William Campbell for finding it.
+
+0.9     2007-11-01
+        Code unchanged. Version bump because I packaged the last version
+        with Leopard's tar - which likes to add Apple specific extended
+        attrs. Grrr.
+        
+0.91    2007-11-07
+        Ditched use of version.pm. Sick of version number confusion.
+
+0.92    2007-11-19
+        Split from mail Captcha::reCAPTCHA distro.
+
+0.93    2007-12-18
+        Handle versions of HTML::Tiny that encode &apos; as &#39;
+
+0.94    2010-07-03
+        Updated Perl plugin to use Google infrastructure.

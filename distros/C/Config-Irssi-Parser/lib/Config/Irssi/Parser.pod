@@ -1,0 +1,60 @@
+
+=head1 NAME
+
+Config::Irssi::Parser - Yapp-based LALR parser for the irssi config files.
+
+=head1 SYNOPSIS
+
+  use Config::Irssi::Parser;
+  my $p = new Config::Irssi::Parser;
+  my $hashref = $p->parse(\*STDIN);
+
+=head1 DESCRIPTION
+
+This parses an irssi config file into the equivelent perl data structure.
+It's quite simple, really.
+
+=head1 METHODS
+
+=head2 new(Z<>)
+
+This is a simple constructor that returns a new Config::Irssi::Parser
+object.
+
+=head2 parse($fh)
+
+Parser the contents of $fh and return a hashref
+of its contents, or undef on failure.
+
+
+=head1 LIMITATIONS
+
+The current implementation loses all comments and empty lines,
+which is in contrast to irssi's own parser which preserves
+both comments and empty lines. If anyone has an elegant way of
+fixing this, patches are welcome.
+
+=head1 BUGS
+
+There might be issues with backslashes... Quite likely
+there are many other bugs.
+
+=head1 SEE ALSO
+
+This is part of the pirssi project. L<http://dylan.hardison.net/software/projects/pirssi>.
+
+Irssi's homepage: L<http://irssi.org>.
+
+=head1 AUTHOR
+
+Dylan William Hardison E<lt>dhardison@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 by Dylan William Hardison
+
+This module is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+This module contains code copyright (C) 1998-2001 by Francois Desarmenien,
+which is licensed under either the perl artistic licence or the GPL.

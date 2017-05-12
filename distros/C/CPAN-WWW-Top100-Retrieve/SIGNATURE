@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5a21a6939e38807f6b9e3d1383a17b7f8b7ee883 AUTHOR_PLEDGE
+SHA1 0331fd61228db55c9e1c4978c2fc6fe93b68e9d3 Build.PL
+SHA1 e414bebb6b3a66a33ab9a87d9e0d7fed172f90b4 Changes
+SHA1 87ef3433265769ed58077bd60e427942f48d73a5 CommitLog
+SHA1 05d2587af58407c50cdb0699eeec2a211407a6ab INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 25d89cfdf0d9298d8ac92512b24873db6e6799ad MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 2eee6970375609afd32e8393fef86c355dc3b7b7 META.json
+SHA1 fe1b871eeb28b56386746d65ec055cd66e5303e0 META.yml
+SHA1 3b62945eb4753e461d570c72a658544f220b43b4 Makefile.PL
+SHA1 4199f9059050b1f0b5ad23efc9fbe9d8f49865f1 README
+SHA1 4f3141d2b553213474ca86c1d5ab055a6715a894 cpanfile
+SHA1 80c4d97de8be1dd5e2142497913992b6fbf343ce dist.ini
+SHA1 1462e3e28a219dec2ec74bc7ff946b31e37a5e93 doap.xml
+SHA1 90ba1ae681349b05397cd8ded70cd7198dea2fc4 examples/simple.pl
+SHA1 7d2ab2b2c7ab8ce3a1745b0ada1d4405712f1bbe lib/CPAN/WWW/Top100/Retrieve.pm
+SHA1 58a7ec3546d3b073d0cce8f6f5ddefe2ef3d6a11 lib/CPAN/WWW/Top100/Retrieve/Dist.pm
+SHA1 bba61e8d3c59a4af064885fc00cea8d7b5047743 lib/CPAN/WWW/Top100/Retrieve/Utils.pm
+SHA1 919760872c8d402dfdc983e98b9663cc99b2d7b6 t/00-compile.t
+SHA1 f4d39cf2cf6f05171f9f47b0f6db845cb3684b50 t/00-report-prereqs.dd
+SHA1 aec8dec1cce92374a31b9b582e9168739a6ebdbf t/00-report-prereqs.t
+SHA1 ca82d8ea87b3429ef22c2aa810b0bf1f944e5577 t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRbtegACgkQGfr7vsGKgxwn2QCg11oPQ1YzWzpzQbMTdYOw4mJa
+1XAAn2nD+LzUNLHSUTMIDSMxSKzPtRl5
+=+ak5
+-----END PGP SIGNATURE-----

@@ -1,0 +1,117 @@
+Revision history for Perl extension C::DynaLib 
+(formerly ExtUtils::DynaLib, very formerly CLib).
+
+0.61  2010-12-21 rurban
+	Added experimental calling conventions cdecl3, cdecl6, 
+          cdecltr ("typed return") and dummy stdcall (NYI)
+	Fix t/win32.t
+	Better detect gcc
+	Improve perl Makefile.PL Verbose
+	added experimental script/hparse.pl header parser
+        added sample script/cpuid,pl
+        removed Test::Simple dependency
+	added repository http://github.com/rurban/c-dynalib
+	fix Quad issues introduced with 0.59
+	added dl_unload_file as used by dlopen/win32 platforms 
+          (most fortunately)
+	fix msvc6 activeperl 5.10 against malloc/free/realloc defines
+        work on C::DynaLib::Struct::Parse
+        fix old symbols on Dynalib.xs for >5.12: na, errgv
+
+0.60  2010-04-20 23:55:12 rurban
+        Improve library search and windows resolution:
+          know about their libc, try dllimport on importlibs.
+
+0.59  2010-04-18 15:55:36 rurban
+	Added C::DynaLib::Struct->Parse with the help of 
+	  Convert::Binary::C struct parser.
+        Make Convert::Binary::C optional
+        Generate C::DynaLib::PerlTypes
+        Added testreverse check.
+        Added is_big_endian check.
+        Added check_ieee_fp check.
+        Add -g on -DDEBUGGING
+
+0.58  2008-06-29 12:59:11 rurban
+	removed C::DynaLib::Struct::VERSION
+	work on failing win32 test
+
+0.57  2008-01-18 12:34:43 rurban
+	Fix optimize for non-gcc, non-msvc
+        define $C::DynaLib::decl to "cdecl", "hack30", ...
+        skip hack30 pow() double test
+	reversed Changes
+
+0.56  2005-09-20 18:34:43 - 2007-12-26 22:38:11 rurban
+	Maintainer changed to Reini Urban <rurban@cpan.org>
+	Allow to build under cygwin and gcc >= 3.4
+	Added script/pl2exe.pl, moved tests to t/
+
+0.55  Fri Feb 11 19:54:34 EST 2000
+	Allow to build with recent perls.
+
+0.53  Sat Oct 25 12:47:32  1997
+	Improved error checking and reporting.  Function calls occur
+in the sub declarer's package.  Second arg to C::DynaLib->new will be
+passed along to DynaLoader::dl_load_file.
+
+0.52  Sat Oct 18 18:41:42  1997
+	Some efforts toward portability, especially among Sparc
+compilers.
+
+0.51  Fri Oct  3 23:55:27  1997
+	Renamed as C::DynaLib.  Fixed Makefile.PL bug that resulted
+in NUL chars in DynaLib.c.  Errors in loading libs, finding symbols,
+and allocating callbacks are no longer fatal.
+
+0.50  Sat Sep 27 01:35:55  1997
+	Much nicification and many added arg/return types.  Rewrote
+a lot of the guts.
+
+0.31  Thu Aug 28 23:42  1997
+	Digital Unix on the Alpha is supported, at least for gcc,
+thanks to help from Achim Bohnet <ach@mpe.mpg.de>.  Added PTR_TYPE.
+
+0.30  Mon Aug 11 00:58:55  1997
+	Added testcall configuration utility to find system
+dependencies for cdecl convention.  Rewrote some docs.
+
+0.22  Wed Jul 30 01:12 1997
+	Renamed methods to avoid possible future keyword conflict:
+declare_sub became DeclareSub, poke became Poke, etc.  Added
+ExtUtils::DynaLib::Struct package.  Got it to work on Windows 95 with
+Borland C++ (but probably not repeatably ;-) )
+
+0.21  Sat Jul 12 02:01:12  1997
+	die works with callbacks (except in certain complex cases).
+Added a few bits & pieces.
+Sun's cc is now supported (thanks to lvirden@cas.org).
+
+0.20  Mon Jul  7 23:42:00  1997
+	Support for callbacks.  Major and minor bugfixes.
+
+0.13-0.14  Nicified for CPAN.
+
+0.12  Sun Jun 22 10:34:21  1997
+	Minor stuff.  Renamed to ExtUtils::DynaLib.
+
+0.11  Thu Jun 19 23:43:29  1997
+	Added sparc convention.
+
+0.10  Wed Jun 18 13:31:07 EDT 1997
+	Got `hack30' to return ints correctly on sparc/solaris.
+Made compatible with perl 5.003.
+
+0.04  Tue Jun 17 04:15:57  1997
+	Generalized the default calling convention; constructor
+accepts filename; declare_sub accepts function pointer; added ``hack30''
+calling convention
+
+0.03  Sun Jun 15 22:56:26  1997
+	Fixed problem with Perl prototypes.
+
+0.02  Sat Jun 14 19:22:36  1997
+	First release, only "cdecl" convention supported.
+
+0.01  Thu Jun 12 01:17:41 1997
+	- original version; created by h2xs 1.18

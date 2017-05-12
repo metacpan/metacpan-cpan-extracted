@@ -1,0 +1,42 @@
+---
+abstract: 'parse an application configuration file with wildcard keywords'
+author:
+  - '-2015 Smithsonian Astrophysical Observatory'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::pushd: '0'
+  Log::Any: '0'
+  Log::Any::Test: '0'
+  Path::Tiny: '0.018'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Wild
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::pushd: '0'
+  Lingua::Boolean::Tiny: '0'
+  List::Util: '1.24'
+  Log::Any: '0'
+  Path::Tiny: '0.018'
+  Try::Tiny: '0'
+  custom::failures: '0'
+  failures: '0'
+resources:
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/config-wild
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

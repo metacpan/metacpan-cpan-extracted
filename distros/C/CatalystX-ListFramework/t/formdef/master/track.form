@@ -1,0 +1,25 @@
+{
+ title  => 'Music track',
+ model  => 'TestModel::Track',
+ uses   => {
+            fromalbum      => 'album',
+            trackcopyright => 'copyright',
+           },
+
+ columns => {
+             OBJECT => {primary_key => 'id'},
+             tid    => {field=>'id', not_editable=>1, heading => 'Track ID'},
+             ttitle => {field=>'tracktitle', heading => 'Track title', default_value=>'New track'},
+             tsales => {field=>'tracksales', heading => 'Sales'},
+             tlen   => {field=>'tracklength', heading => 'Track length (m:s)'},
+             treleasedate => {field=>'trackreleasedate', heading => 'Release date', type=>'date'},
+            },
+
+ searches => {
+             },
+             
+ create_uri => '/create/track',
+ delete_uri => '/delete/track',
+             
+}
+

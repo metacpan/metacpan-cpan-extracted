@@ -1,0 +1,24 @@
+<html>
+<head>
+<title>%TITLE%</title>
+</head>
+<body bgcolor="#ffffff">
+<center>
+%INDEX%
+</center>
+<hr>
+%HTML%
+<hr>
+<div align="right">
+<form method="get" action="%URL%">
+Search:
+<input type="text" name="search" size="12"/>
+</form>
+powered by <a class="button" href="/pWiki/pWiki.wiki">pWiki</a>
+<form method="POST" action="%URL%?edit">
+<a class="button" href="/pWiki/copyleft.wiki">&copy;</a>
+1997-2002
+<input type="submit" value="Edit">
+</div>
+</body>
+</html>

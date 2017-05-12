@@ -1,0 +1,34 @@
+---
+- !!perl/hash:MyClass
+  _class_component_components: &1 []
+  _class_component_config: {}
+  _class_component_default_plugins: &2
+    - Default
+  _class_component_hooks: {}
+  _class_component_methods:
+    default: &3 !!perl/hash:MyClass::Plugin::Default
+      config: {}
+  _class_component_plugins:
+    - *3
+- !!perl/hash:MyClass
+  _class_component_components: *1
+  _class_component_config: {}
+  _class_component_default_plugins: *2
+  _class_component_hooks:
+    hello:
+      - method: hello_hook
+        plugin: &4 !!perl/hash:MyClass::Plugin::Hello
+          config: {}
+    hello2:
+      - method: hello_hook2
+        plugin: *4
+  _class_component_methods:
+    default: &5 !!perl/hash:MyClass::Plugin::Default
+      config: {}
+    hello: *4
+    hello2: *4
+  _class_component_plugins:
+    - *5
+    - *4
+  load_plugins:
+    - Hello

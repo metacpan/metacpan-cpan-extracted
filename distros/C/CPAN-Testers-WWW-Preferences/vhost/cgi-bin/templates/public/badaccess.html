@@ -1,0 +1,22 @@
+[% 
+    title = "Permission Denied" ;
+
+    crumb1_name = 'Permission Denied' ;
+%]
+
+<p>
+[% IF loggedin == 0 %]
+
+I'm sorry, you have attempted to access a page that requires appropriate login access.
+Please use the appropriate menu buttons to either login or register yourself on the site.
+Thank you.
+
+[% ELSE %]
+
+I'm sorry, your login does not provide the necessary level of access to view this page.
+Should you feel this is an error, please contact the site
+<a href="mailto:[% administrator %]">administrator</a> with details of the page you wish
+to access. Thank you.
+
+[% END %]
+</p>

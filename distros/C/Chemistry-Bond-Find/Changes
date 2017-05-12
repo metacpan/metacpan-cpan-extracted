@@ -1,0 +1,24 @@
+Revision history for Perl extension Chemistry::Bond::Find
+
+0.23  May 10 2009
+        - Turned the variables with the covalent radii into globals in case
+          someone really needs them (per Perl's no-shotgun policy).
+        - Added an undocumented 'valid_bonds' method (Liliana Felix Avila).
+
+0.22  Apr 12 2005
+        - Fixed bug in Baber algorithm for terminal methyls with no hydrogens.
+          Added a modification to improve results for conjugated systems.
+
+0.21  Jun 16 2004
+        - New options for assign_bond_orders: scratch.
+
+0.20  May 18 2004
+        - Added assign_bon_orders.
+
+0.10  May 12 2004
+        - Changed the recursive algorithm for a hash bucket algorithm, which
+          is 2-3 times faster for larger molecules.
+
+0.05  May 11 2004
+	- First CPAN release
+

@@ -1,0 +1,45 @@
+Revision history for Perl extension CGI::Application::Plugin::Authorization.
+
+0.07
+
+    - Allow for code-refs to be provided to 'authz_runmodes', so that you can
+      create more elaborate authorization restrictions.
+    - Rebuilt/simplified test suite for 'authz_runmodes'.
+    - squelch 'uninitialized value' warnings in SimpleGroup Driver
+      (matt -at- summersault.com)
+
+0.06
+
+    - Add 'authz_runmodes' method which can register runmodes that should
+      be protected (George Hartzell)
+    - Perform redirection the same way that CAP::Authentication does.
+      (Graham TerMarsch)
+
+0.05  Fri Jun 16 19:48:43 EDT 2006
+
+    - Fix caching of named configs (reported by Michael Petnuch)
+
+0.04  Wed Mar 29 21:03:24 EST 2006
+
+    - New SimpleGroup driver provided by Mark Stosberg (See docs for usage)
+    - Implemented the __USERNAME__ and __GROUP__ constraint variables
+      in the DBI driver which were already documented in the examples
+      given in the Authorization module docs 
+    - the DBI driver was assuming that a USERNAME option was being passed
+      in, which could result in an invalid SQL statement (Hugh Esco)
+
+0.03  Sun Feb  5 18:10:30 EST 2006
+
+    - Lots of doc patches (Mark Stosberg)
+    - Remove the DSN option in the DBI driver and suggest
+      that users us the CGI::Application::Plugin::DBH module
+      instead (Mark Stosberg)
+
+0.02  Mon Oct 31 11:56:09 EST 2005
+
+    - Add DBI Driver
+    - updated examples to conform to the new DBI driver
+
+0.01
+
+    - original version

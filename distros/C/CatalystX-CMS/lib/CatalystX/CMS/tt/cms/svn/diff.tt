@@ -1,0 +1,33 @@
+[% # diff output %]
+
+<ul class="sub inline">
+ <li>
+ <a href="[% c.uri_for(cmspage.url, { 'cxcms' => 'blame' }) %]">Show line-by-line attribution</a>
+ </li>
+ [% IF prev_rev %]
+ <li>
+ <a href="[% c.uri_for(cmspage.url, { 'cxcms' => 'diff' }) %]">Previous revision</a>
+ </li>
+ [% END %]
+ [% IF next_rev %]
+ <li>
+ <a href="[% c.uri_for(cmspage.url, { 'cxcms' => 'diff' }) %]">Next revision</a>
+ </li>
+ [% END %]
+</ul>
+
+
+<pre class="diff">
+[% FOREACH line = diff -%]
+[% IF line.match('^(\+\+\+|\-\-\-)') %]
+[% line | html -%]
+[% ELSIF line.match('^\-') %]
+<span class="red">[% line | html -%]</span>
+[% ELSIF line.match('^\+') %]
+<span class="green">[% line | html -%]</span>
+[% ELSE %]
+[% line | html -%]
+[% END -%]
+[% END -%]
+</pre>
+

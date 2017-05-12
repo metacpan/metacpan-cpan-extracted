@@ -1,0 +1,9 @@
+Revision history for Perl extension Config::Lite.
+
+0.01  Thu Jan  1 11:33:16 2014
+	- original version; created by h2xs 1.23 with options -AX -n Config::Lite
+0.02  Fri Apr 18 17:04:38 2014
+	- user could defind separator
+0.03  Fri Apr 18 17:27:21 2014
+	- add test file
+

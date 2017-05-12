@@ -1,0 +1,166 @@
+#!/usr/local/bin/perl -w  
+
+use strict;
+
+use Getopt::Long;
+
+use Log::Log4perl;
+use ClearCase::Vob;
+
+my(@vobs			) = ();
+my($vname			) = "";
+my($logger			) = "";
+
+###############################################################################
+sub printusage   #called if incorrect parameters passed in - dies at end!!
+{   
+	use strict;
+
+	my(@message			)   = @_ ;
+	my($list			) = "";
+	my($printline		) = join(" ", @message);
+
+	$logger->info("\n\n$printline\n");
+	$logger->info("+-----------------------------------------------------------------+\n");
+	$logger->info("| Usage: Vob_test\n");
+
+	$logger->info("|\n");
+	$list = "[";
+	foreach $vname (@vobs) {
+		$list = $list . ' -' . $vname . ' |';
+	}
+	$list =~ s/\|$/]/m;
+	$logger->info("|                   $list               |\n");
+
+	$logger->info("|\n");
+	$logger->info("+-----------------------------------------------------------------+\n");
+}
+
+###############################################################################
+#  MAIN
+###############################################################################
+sub mainprog
+{
+	use strict;
+	use Carp;
+
+	my($myvob			) = "";
+	my($src_dir			) = "";
+	my(@lib_dirs		) = ();
+	my(@relnums			) = ();
+	my(@active			) = ();
+	my(@actrel			) = "";
+	my($configFile		) = "";
+	my($configFile_found) = 0;
+	my($dir				) = "";
+	my($i				) = 0;
+	my($vob_name		) = undef;
+	my($sum				) = 0;
+	my($flg				) = 0;  
+	my(%options			) = ();		# command line parameters
+	my($retval			) = 0;
+	my($stg				) = "";
+	my($vob				) = "";
+	my(@vob_flags		) = ();
+	my($blanks			) = "                                 ";
+	my($subregion		) = undef;
+
+	foreach $dir (@INC) {
+		if ( -f "$dir/Vob_test.conf" ) {
+			$configFile = "$dir/Vob_test.conf";
+			$configFile_found = 1;
+			last;
+		}
+	}
+	croak("Error: Vob_test.conf not found in any \@INC directory\n")
+		unless $configFile_found;
+	
+	Log::Log4perl->init($configFile);
+	$logger = Log::Log4perl->get_logger("Main");
+	
+	
+	#
+	#	Set Class Variables and print
+	#
+	@vobs = Vob->list_all();
+	$logger->info("All known vobs: @vobs\n");
+	
+	#
+	#	Add Vobs to options hash
+	#
+	$i = 0;
+	foreach $vname (@vobs) {
+		$vob_flags[$i] = 0;
+		$options{$vname . '!'} = \$vob_flags[$i];
+		$i++;
+	}
+	
+	#
+	# GetOptions is built-in perl function, will deal with abbrev. on cmd line
+	#
+	$retval = GetOptions(%options);
+	if ($retval == 0) {
+		$logger->error("Error in parameter specification.\n");
+		exit 1;
+	}
+
+	#
+	# Determine if the vob was set on the command line
+	# 
+	$i = 0;
+	foreach $flg (@vob_flags) {
+		$sum += $flg;
+		if ( $flg > 0 ) {
+			$vob_name = $vobs[$i];
+		}
+		$i++;
+	}
+
+	#
+	# Determine if more than one vob was set on command line
+	#
+	if ($sum > 1) {
+		$logger->error("only one vob option can be specified.\n");
+		exit 1;
+	}
+
+	for ($i = 0 ; $i <= $#vobs ; $i++) {
+		$stg = $vobs[$i] . $blanks;
+		$stg = substr($stg, 0, 17);
+		$logger->debug("Got $stg : $vob_flags[$i]\n");
+	}
+	
+	#
+	#	Set Vob Variables and print
+	#
+	if (! defined $vob_name) {
+		$myvob = Vob->new(undef, undef);
+	}
+	else {
+		$subregion = Vob->subregion($vob_name);
+		$myvob = Vob->new($subregion, $vob_name);
+	}
+
+	if (! defined $myvob) {
+		printusage("\n");
+		exit 1;
+	}
+	$vob = $myvob->vob();
+	$logger->info("Selected vob is $vob\n");
+	$subregion = Vob->subregion($vob);
+	$logger->info("Vob subregion via class method is $subregion\n");
+	$subregion = $myvob->subregion();
+	$logger->info("Vob subregion via object method is $subregion\n");
+	$src_dir = $myvob->src_dir();
+	$logger->info("src_dir is \"$src_dir\"\n");
+	@lib_dirs = $myvob->lib_dirs();
+	$logger->info("lib_dirs is \"@lib_dirs\"\n");
+	@relnums = $myvob->relnums();
+	$logger->info("relnums is \"@relnums\"\n");
+	@active = $myvob->active();
+	$logger->info("active is \"@active\"\n");
+	@actrel = $myvob->active_rels();
+	$logger->info("active releases: \"@actrel\"\n");
+}
+
+mainprog;

@@ -1,0 +1,62 @@
+Revision history for Class-C3-XS
+
+0.14      2016-08-07 00:14:09Z
+        - fix naming of test packages, now that . is no longer in @INC while
+          base.pm is running. (RT#116566, perl RT#128769)
+
+0.13    2009-09-24 00:00:00Z
+        - Release 0.12_03 as a stable release, without further modifications.
+
+0.12_03 2009-09-21 00:00:00Z
+        - Fix compatibility with perl 5.6.x. Thanks again, Nicholas.
+
+0.12_02 2009-09-07 00:00:00Z
+        - Actually ship with the changes 0.12_01 claimed to have. Thanks for
+          catching this, Nicholas.
+
+0.12_01 2009-08-22 00:00:00Z
+        - Backport a couple of performance tweaks from bleadperl. This gives a
+          performance improvement of about 40% in calculating the linearized
+          isa for hierarchies with single parents only.
+
+0.11    2009-03-30 00:00:00Z
+        - Define SVfARG if the perl we're compiling for doesn't have
+          it (Florian Ragwitz).
+
+0.10    2009-03-28 00:00:00Z
+        - Improve error message on merge errors (Florian Ragwitz).
+
+0.09    2009-03-25 00:00:00Z
+        - Use I32 instead of int (Brandon L Black).
+        - Explicitly specify xs prototyping behaviour (Florian Ragwitz).
+        - Fix several compiler warnings (Florian Ragwitz).
+        - Check return values when storing values in hashes and error
+          out if it didn't work (Florian Ragwitz).
+        - Stop using auto_install in Makefile.PL (Florian Ragwitz).
+        - Remove fake Build.PL (Florian Ragwitz).
+
+0.08    2007-06-13 00:00:00Z
+        - Fixed next::method, etc under the Perl debugger
+
+0.07    2007-06-04 00:00:00Z
+        - Fixed "goto &next::method" and related gotos, which fixes
+        - Catalyst::Plugin::C3.
+
+0.06    2007-05-16 00:00:00Z
+        - Removed the "assert(HvAUX(stash))" that was failing for some
+        - Now 5.6.x-compatible, thanks to some testing from dec
+
+0.05    2007-05-14 00:00:00Z
+        - Backported optimizations and memory-management fixes from bleadperl
+
+0.04    2007-05-12 00:00:00Z
+        - Small new private feature to help MRO::Compat
+
+0.03    2007-05-08 00:00:00Z
+        - Remove Build.PL from the dist
+
+0.02    - 2007-05-03 00:00:00Z
+        First non-dev release
+
+0.01_01 - 2007-04-15 00:00:00Z
+        Initial development release

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcba5
+registers:
+  AF: 6677
+  AF_: 0
+  BC: 1227
+  BC_: 0
+  DE: 17234
+  DE_: 0
+  HL: 61035
+  HL_: 0
+  I: 0
+  IX: 31527
+  IY: 14496
+  PC: 4
+  R: 2
+  SP: 0

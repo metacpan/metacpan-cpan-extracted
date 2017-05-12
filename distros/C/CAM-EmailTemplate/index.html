@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-EmailTemplate/index.html">
+<title>CAM-EmailTemplate</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-EmailTemplate</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-EmailTemplate-0.92-docs">v0.92</a>, 2005-04-22</p>
+
+
+
+<p>
+This module extends the CAM:<!-- -->:Template search-and-replace API to with a
+send() method to enable simplified delivery of automated but
+customized emails.  This module is NOT intended for spam delivery (and
+it's definitely not very efficient for that purpose).
+</p>
+
+<p>
+See the documentation for templating examples.
+</p>
+
+<p>
+This module most closely resembles Mail:<!-- -->:Send with the sendmail
+option.  It has the following advantages:
+</p>
+
+<p>
+  * Integration of templating
+  * More readable code (IMHO)
+</p>
+
+<p>
+and the following disadvantages:
+</p>
+
+<p>
+  * Only supports sendmail delivery (but see also
+    CAM:<!-- -->:EmailTemplate:<!-- -->:SMTP)
+  * Doesn't offer an easy-to-understand API for building the header
+  * Fewer mail delivery options
+</p>
+
+<p>
+If you wish to take advantage of CAM:<!-- -->:Template's ability to use a
+custom template syntax, then you should create a new subclass that
+inherits from both your custom template and from this module.  A
+simple example:
+</p>
+
+<p>
+  package MyTemplate;
+  use CAM:<!-- -->:Template;
+  our @ISA = qw(CAM:<!-- -->:Template);
+</p>
+
+<p>
+  sub patterns {
+    my $pkg = shift;
+    return {
+      $pkg->SUPER:<!-- -->:patterns(),
+      # include syntax:  <? include("subfile.tmpl") ?>
+      include => qr/<? *include\(\"([^\"]+)\"\) *?>/,
+    };
+  }
+</p>
+
+<p>
+  package MyEmailTemplate;
+  use MyTemplate;
+  use CAM:<!-- -->:EmailTemplate;
+  our @ISA = qw(MyTemplate CAM:<!-- -->:EmailTemplate);
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-EmailTemplate-0.92.tgz">CAM-EmailTemplate-0.92.tgz</a>
+          (<a href="perl/CAM-EmailTemplate-0.92.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-EmailTemplate-0.92.zip">CAM-EmailTemplate-0.92.zip</a>
+          (<a href="perl/CAM-EmailTemplate-0.92.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-EmailTemplate-0.92-docs">CAM-EmailTemplate-0.92-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr 22 22:05:34 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-EmailTemplate-0.91.tgz">CAM-EmailTemplate-0.91.tgz</a>
+          (<a href="gpl/CAM-EmailTemplate-0.91.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-EmailTemplate-0.91.zip">CAM-EmailTemplate-0.91.zip</a>
+          (<a href="gpl/CAM-EmailTemplate-0.91.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-EmailTemplate-0.91-docs">CAM-EmailTemplate-0.91-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr  9 17:47:40 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-EmailTemplate-0.91.tgz">CAM-EmailTemplate-0.91.tgz</a>
+          (<a href="clotho/CAM-EmailTemplate-0.91.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-EmailTemplate-0.91.zip">CAM-EmailTemplate-0.91.zip</a>
+          (<a href="clotho/CAM-EmailTemplate-0.91.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-EmailTemplate-0.91-docs">CAM-EmailTemplate-0.91-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr  9 17:47:40 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-EmailTemplate-0.90.tgz">CAM-EmailTemplate-0.90.tgz</a>
+          (<a href="gpl/CAM-EmailTemplate-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-EmailTemplate-0.90.zip">CAM-EmailTemplate-0.90.zip</a>
+          (<a href="gpl/CAM-EmailTemplate-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-EmailTemplate-0.90-docs">CAM-EmailTemplate-0.90-docs</a>
+          
+        </td>
+        <td valign="top">Tue Oct  7 14:55:09 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-EmailTemplate-0.90.tgz">CAM-EmailTemplate-0.90.tgz</a>
+          (<a href="clotho/CAM-EmailTemplate-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-EmailTemplate-0.90.zip">CAM-EmailTemplate-0.90.zip</a>
+          (<a href="clotho/CAM-EmailTemplate-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-EmailTemplate-0.90-docs">CAM-EmailTemplate-0.90-docs</a>
+          
+        </td>
+        <td valign="top">Tue Oct  7 14:55:09 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

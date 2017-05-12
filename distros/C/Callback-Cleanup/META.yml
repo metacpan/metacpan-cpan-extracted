@@ -1,0 +1,22 @@
+---
+name: Callback-Cleanup
+version: 0.03
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+abstract: Declare callbacks that clean themselves up
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Hash::Util::FieldHash::Compat: 0
+  Sub::Clone: 0
+  Sub::Exporter: 0
+  ok: 0
+provides:
+  Callback::Cleanup:
+    file: lib/Callback/Cleanup.pm
+    version: 0.03
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

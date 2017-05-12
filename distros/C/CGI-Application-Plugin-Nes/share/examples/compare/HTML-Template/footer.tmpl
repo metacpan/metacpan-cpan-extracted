@@ -1,0 +1,17 @@
+<TMPL_IF NAME="PROFILE">
+      <a href="<TMPL_VAR NAME=MYURL>?rm=logout">Logout</a>
+<TMPL_ELSE>
+   <TMPL_IF NAME="BADLOGINS">
+       Wrong nick or password. <TMPL_VAR NAME=BADLOGINS> attempts.<br/>
+         </TMPL_IF>
+   <form method="post" action="<TMPL_VAR NAME=MYURL>" enctype="application/x-www-form-urlencoded">
+         nick: <input type="text" name="lg_nick"/><br/>
+         pass: <input type="password" name="lg_pass"/><br/>
+         <input type="submit" name="submit" value="Login" />
+   </form>
+   <hr/>
+   <a href="<TMPL_VAR NAME=MYURL>?rm=regform">Register</a>
+</TMPL_IF>
+</html>
+
+ 

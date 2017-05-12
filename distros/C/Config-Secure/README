@@ -1,0 +1,68 @@
+Config::Secure version 0.0.1
+==========================
+
+Welcome to Config::Secure
+
+  This module opens and parses data passed in from PSC 
+(See DEPENDANCIES below). I have tried to make it simple
+and robust, but keep in mind this is the first alpha
+release, and my first CPAN module. It will improve I am
+sure.
+
+INSTALLATION
+
+Ideally this module would be installed as a system-wide module, 
+but we do not live in an ideal world...
+
+To install this module system-wide type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install it somewhere else like /home/ant/perl/
+you would run
+
+   perl Makefile.PL PREFIX=/home/ant/perl/
+   make
+   make test
+   make install
+
+You will see output similar to 
+Installing /home/ant/perl/lib/site_perl/5.6.1/auto/Config/Secure/autosplit.ix
+Installing /home/ant/perl/lib/site_perl/5.6.1/Config/Secure.pm
+Installing /home/ant/perl/share/man/man3/Config::Secure.3pm
+
+You need this:
+Installing /home/ant/perl/lib/site_perl/5.6.1/Config/Secure.pm
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You would then need to put this:
+use lib '/home/ant/perl/lib/site_perl/5.6.1/';
+
+in any of your scripts that use this version of Config::Secure
+It should always be the same except for the last dir, which
+is the version of perl you are running.   
+
+DEPENDENCIES
+
+This module interfaces data passed when a script is called by
+Perl Secure Conf (PSC). To get PSC go to the website
+http://psc.sourceforge.net/
+This is also the home of the Config::Secure module, since I wrote
+both.
+
+COPYRIGHT AND LICENCE
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, i.e., under the
+terms of the "Artistic License" or the "GNU General Public License".
+
+The C library at the core of this Perl module can additionally
+be redistributed and/or modified under the terms of the
+"GNU Library General Public License".
+
+Please refer to the files "Artistic.txt", "GNU_GPL.txt" and
+"GNU_LGPL.txt" in this distribution for details!
+
+Copyright (C) 2001 Anthony Ball

@@ -1,0 +1,26 @@
+Revision history for Perl extension Crypt::Spritz
+
+1.02 Sun Mar  5 17:33:35 CET 2017
+	- spritz seriously attacked, see WARNING section.
+
+1.01 Tue Jun 30 03:19:47 CEST 2015
+	- fix a bug in Crypt::Spritz::Cipher::new that could cause the
+          IV to be ignored or the program to crash.
+
+1.0  Tue Jun 30 02:42:27 CEST 2015
+	- improved/fixed documentation.
+        - support perl multicore specification (http://perlmulticore.schmorp.de/)
+          for compression and decompression.
+        - added stability canary support.
+
+0.2  Sat Jan 10 10:46:20 CET 2015
+	- add clone method.
+        - implement non-xor variants of simple cipher and aead.
+	- properly add past-end 0 byte in scalars.
+
+0.1  Sat Jan 10 08:19:40 CET 2015
+	- first release.
+
+0.0  Sat Jan 10 01:03:21 CET 2015
+	- original version; cloned from Crypt::Twofish2.
+

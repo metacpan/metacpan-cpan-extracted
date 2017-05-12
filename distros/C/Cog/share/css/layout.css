@@ -1,0 +1,130 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+
+    margin: 0;
+    border: 0;
+    padding: 0;
+
+    background-color: #ccc;
+    font-family: Helvetica;
+    font-size: 100%;
+}
+
+.header {
+    background: #8f8;
+    background-color: #8f8;
+    border-bottom: 20px solid #888;
+    height: 100px;
+    padding: 10px;
+}
+
+.logo {
+    float: left;
+    width: 80px;
+    margin: 15px 0px;
+}
+
+.layout {
+    height: 100%;
+    /*min-height: 400px;*/
+}
+
+.bottom {
+    height: 100%;
+    /*min-height: 400px;*/
+}
+
+.site-navigation {
+    background-color: #444;
+    color: #fff;
+    float: left;
+    height: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-top: 20px;
+    width: 200px;
+}
+
+.site-navigation ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+.site-navigation ul ul {
+    display: none;
+    padding-left: 20px;
+}
+
+.site-navigation a, .site-navigation a:visited {
+    color: #fff;
+    text-decoration: none;
+}
+
+.main {
+    background-color: #cc8;
+    float: left;
+    min-height: 100%;
+    padding: 15px;
+    width: 700px;
+}
+
+.wide {
+    width: 1200px;
+}
+
+.main a, .main a:visited {
+    color: #00f;
+    text-decoration: none;
+}
+
+.main p, h1, h2, h3 {
+    margin: 15px 5px;
+}
+
+.main pre {
+    margin-left: 20px;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Site-Name Logo */
+@-webkit-keyframes shiny {
+    from { }
+    to {
+        text-shadow: 0 0 20px #000;
+    }
+}
+
+a:hover {
+    -webkit-animation-direction: alternate;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-name: shiny;
+    -webkit-animation-timing-function: ease-in-out;
+}
+
+#site-name {
+    font-family: Courier, "Courier New";
+    font-size: 400%;
+    padding-left: 220px;
+    text-shadow: 1px 1px 5px #999;
+}
+
+#site-name a {
+    color: #000;
+    text-decoration: none;
+}
+
+#site-name a span {
+    padding-right: 15px;
+}

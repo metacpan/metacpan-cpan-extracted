@@ -1,0 +1,176 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>CaCOREperl objects</title>
+<base target="mainFrame">
+</head>
+
+<body>
+
+<h2>Table of Contents</h2>
+<a href="intro.html">Introduction</a><br>
+<a href="#appSvc" target="navFrame">Utility Objects</a><br>
+<a href="#cabio" target="navFrame">CaBIO Objects</a><br>
+<a href="#cadsr" target="navFrame">CaDSR Objects</a><br>
+<a href="#umlproject" target="navFrame">CaDSR::UMLProject Objects</a><br>
+<a href="#evs" target="navFrame">EVS Objects</a><br>
+<a href="#common" target="navFrame">Common Objects</a><br>
+<a href="#provenance" target="navFrame">Common::Provenance Objects</a><br>
+<a href="Release_Notes.txt">Release Notes</a><br>
+
+<h3><A NAME="appSvc">Utility objects</A></h3>
+<a href="ApplicationService.html">ApplicationService</a><br>
+<!-- END Utility objects -->
+
+<h3><A NAME="cabio">CaBIO objects</A></h3>
+<a href="CaBIO.html#agent">Agent</a><br>
+<a href="CaBIO.html#anomaly">Anomaly</a><br>
+<a href="CaBIO.html#chromosome">Chromosome</a><br>
+<a href="CaBIO.html#clinicaltrialprotocol">ClinicalTrialProtocol</a><br>
+<a href="CaBIO.html#clone">Clone</a><br>
+<a href="CaBIO.html#clonerelativelocation">CloneRelativeLocation</a><br>
+<a href="CaBIO.html#cytoband">Cytoband</a><br>
+<a href="CaBIO.html#cytogeneticlocation">CytogeneticLocation</a><br>
+<a href="CaBIO.html#diseaseontology">DiseaseOntology</a><br>
+<a href="CaBIO.html#diseaseontologyrelationship">DiseaseOntologyRelationship</a><br>
+<a href="CaBIO.html#gene">Gene</a><br>
+<a href="CaBIO.html#genealias">GeneAlias</a><br>
+<a href="CaBIO.html#geneontology">GeneOntology</a><br>
+<a href="CaBIO.html#geneontologyrelationship">GeneOntologyRelationship</a><br>
+<a href="CaBIO.html#generelativelocation">GeneRelativeLocation</a><br>
+<a href="CaBIO.html#genericarray">GenericArray</a><br>
+<a href="CaBIO.html#genericreporter">GenericReporter</a><br>
+<a href="CaBIO.html#histopathology">Histopathology</a><br>
+<a href="CaBIO.html#homologousassociation">HomologousAssociation</a><br>
+<a href="CaBIO.html#library">Library</a><br>
+<a href="CaBIO.html#location">Location</a><br>
+<a href="CaBIO.html#nucleicacidsequence">NucleicAcidSequence</a><br>
+<a href="CaBIO.html#organontology">OrganOntology</a><br>
+<a href="CaBIO.html#organontologyrelationship">OrganOntologyRelationship</a><br>
+<a href="CaBIO.html#pathway">Pathway</a><br>
+<a href="CaBIO.html#physicallocation">PhysicalLocation</a><br>
+<a href="CaBIO.html#populationfrequency">PopulationFrequency</a><br>
+<a href="CaBIO.html#protein">Protein</a><br>
+<a href="CaBIO.html#proteinalias">ProteinAlias</a><br>
+<a href="CaBIO.html#proteinsequence">ProteinSequence</a><br>
+<a href="CaBIO.html#protocol">Protocol</a><br>
+<a href="CaBIO.html#protocolassociation">ProtocolAssociation</a><br>
+<a href="CaBIO.html#snp">SNP</a><br>
+<a href="CaBIO.html#target">Target</a><br>
+<a href="CaBIO.html#taxon">Taxon</a><br>
+<a href="CaBIO.html#tissue">Tissue</a><br>
+<a href="CaBIO.html#vocabulary">Vocabulary</a><br>
+<!-- END CaBIO objects -->
+
+<h3><A NAME="cadsr">CaDSR objects</A></h3>
+<a href="CaDSR.html#address">Address</a><br>
+<a href="CaDSR.html#administeredcomponent">AdministeredComponent</a><br>
+<a href="CaDSR.html#administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a><br>
+<a href="CaDSR.html#administeredcomponentcontact">AdministeredComponentContact</a><br>
+<a href="CaDSR.html#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a><br>
+<a href="CaDSR.html#classificationscheme">ClassificationScheme</a><br>
+<a href="CaDSR.html#classificationschemeitem">ClassificationSchemeItem</a><br>
+<a href="CaDSR.html#classificationschemeitemrelationship">ClassificationSchemeItemRelationship</a><br>
+<a href="CaDSR.html#classificationschemerelationship">ClassificationSchemeRelationship</a><br>
+<a href="CaDSR.html#componentconcept">ComponentConcept</a><br>
+<a href="CaDSR.html#componentlevel">ComponentLevel</a><br>
+<a href="CaDSR.html#concept">Concept</a><br>
+<a href="CaDSR.html#conceptderivationrule">ConceptDerivationRule</a><br>
+<a href="CaDSR.html#conceptualdomain">ConceptualDomain</a><br>
+<a href="CaDSR.html#conditionmessage">ConditionMessage</a><br>
+<a href="CaDSR.html#contactcommunication">ContactCommunication</a><br>
+<a href="CaDSR.html#context">Context</a><br>
+<a href="CaDSR.html#dataelement">DataElement</a><br>
+<a href="CaDSR.html#dataelementconcept">DataElementConcept</a><br>
+<a href="CaDSR.html#dataelementconceptrelationship">DataElementConceptRelationship</a><br>
+<a href="CaDSR.html#dataelementderivation">DataElementDerivation</a><br>
+<a href="CaDSR.html#dataelementrelationship">DataElementRelationship</a><br>
+<a href="CaDSR.html#definition">Definition</a><br>
+<a href="CaDSR.html#definitionclassschemeitem">DefinitionClassSchemeItem</a><br>
+<a href="CaDSR.html#derivationtype">DerivationType</a><br>
+<a href="CaDSR.html#deriveddataelement">DerivedDataElement</a><br>
+<a href="CaDSR.html#designation">Designation</a><br>
+<a href="CaDSR.html#designationclassschemeitem">DesignationClassSchemeItem</a><br>
+<a href="CaDSR.html#enumeratedvaluedomain">EnumeratedValueDomain</a><br>
+<a href="CaDSR.html#form">Form</a><br>
+<a href="CaDSR.html#formelement">FormElement</a><br>
+<a href="CaDSR.html#function">Function</a><br>
+<a href="CaDSR.html#instruction">Instruction</a><br>
+<a href="CaDSR.html#module">Module</a><br>
+<a href="CaDSR.html#nonenumeratedvaluedomain">NonenumeratedValueDomain</a><br>
+<a href="CaDSR.html#objectclass">ObjectClass</a><br>
+<a href="CaDSR.html#objectclassrelationship">ObjectClassRelationship</a><br>
+<a href="CaDSR.html#organization">Organization</a><br>
+<a href="CaDSR.html#permissiblevalue">PermissibleValue</a><br>
+<a href="CaDSR.html#person">Person</a><br>
+<a href="CaDSR.html#property">Property</a><br>
+<a href="CaDSR.html#protocol">Protocol</a><br>
+<a href="CaDSR.html#question">Question</a><br>
+<a href="CaDSR.html#questioncondition">QuestionCondition</a><br>
+<a href="CaDSR.html#questionconditioncomponents">QuestionConditionComponents</a><br>
+<a href="CaDSR.html#questionrepetition">QuestionRepetition</a><br>
+<a href="CaDSR.html#referencedocument">ReferenceDocument</a><br>
+<a href="CaDSR.html#representation">Representation</a><br>
+<a href="CaDSR.html#triggeraction">TriggerAction</a><br>
+<a href="CaDSR.html#validvalue">ValidValue</a><br>
+<a href="CaDSR.html#valuedomain">ValueDomain</a><br>
+<a href="CaDSR.html#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a><br>
+<a href="CaDSR.html#valuedomainrelationship">ValueDomainRelationship</a><br>
+<a href="CaDSR.html#valuemeaning">ValueMeaning</a><br>
+<!-- END CaDSR objects -->
+
+<h3><A NAME="umlproject">CaDSR::UMLProject objects</A></h3>
+<a href="CaDSR/UMLProject.html#attributetypemetadata">AttributeTypeMetadata</a><br>
+<a href="CaDSR/UMLProject.html#project">Project</a><br>
+<a href="CaDSR/UMLProject.html#semanticmetadata">SemanticMetadata</a><br>
+<a href="CaDSR/UMLProject.html#subproject">SubProject</a><br>
+<a href="CaDSR/UMLProject.html#typeenumerationmetadata">TypeEnumerationMetadata</a><br>
+<a href="CaDSR/UMLProject.html#umlassociationmetadata">UMLAssociationMetadata</a><br>
+<a href="CaDSR/UMLProject.html#umlattributemetadata">UMLAttributeMetadata</a><br>
+<a href="CaDSR/UMLProject.html#umlclassmetadata">UMLClassMetadata</a><br>
+<a href="CaDSR/UMLProject.html#umlgeneralizationmetadata">UMLGeneralizationMetadata</a><br>
+<a href="CaDSR/UMLProject.html#umlpackagemetadata">UMLPackageMetadata</a><br>
+<!-- END CaDSR::UMLProject objects -->
+
+<h3><A NAME="evs">EVS objects</A></h3>
+<a href="EVS.html#association">Association</a><br>
+<a href="EVS.html#atom">Atom</a><br>
+<a href="EVS.html#attributesetdescriptor">AttributeSetDescriptor</a><br>
+<a href="EVS.html#definition">Definition</a><br>
+<a href="EVS.html#desclogicconcept">DescLogicConcept</a><br>
+<a href="EVS.html#edgeproperties">EdgeProperties</a><br>
+<a href="EVS.html#editactiondate">EditActionDate</a><br>
+<a href="EVS.html#hashset">HashSet</a><br>
+<a href="EVS.html#history">History</a><br>
+<a href="EVS.html#historyrecord">HistoryRecord</a><br>
+<a href="EVS.html#metathesaurusconcept">MetaThesaurusConcept</a><br>
+<a href="EVS.html#property">Property</a><br>
+<a href="EVS.html#qualifier">Qualifier</a><br>
+<a href="EVS.html#role">Role</a><br>
+<a href="EVS.html#semantictype">SemanticType</a><br>
+<a href="EVS.html#silo">Silo</a><br>
+<a href="EVS.html#source">Source</a><br>
+<a href="EVS.html#treenode">TreeNode</a><br>
+<a href="EVS.html#vocabulary">Vocabulary</a><br>
+<!-- END EVS objects -->
+
+<h3><A NAME="common">Common objects</A></h3>
+<a href="Common.html#databasecrossreference">DatabaseCrossReference</a><br>
+<!-- END Common objects -->
+
+<h3><A NAME="provenance">Common::Provenance objects</A></h3>
+<a href="Common/Provenance.html#internetsource">InternetSource</a><br>
+<a href="Common/Provenance.html#provenance">Provenance</a><br>
+<a href="Common/Provenance.html#publicationsource">PublicationSource</a><br>
+<a href="Common/Provenance.html#researchinstitutionsource">ResearchInstitutionSource</a><br>
+<a href="Common/Provenance.html#source">Source</a><br>
+<a href="Common/Provenance.html#sourcereference">SourceReference</a><br>
+<a href="Common/Provenance.html#urlsourcereference">URLSourceReference</a><br>
+<a href="Common/Provenance.html#webservicessourcereference">WebServicesSourceReference</a><br>
+<!-- END Common::Provenance objects -->
+<br>
+
+</body>
+</html>
+

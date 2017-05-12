@@ -1,0 +1,14 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Class/ConfigHash.pm
+t/00-load.t
+t/01_sanity.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

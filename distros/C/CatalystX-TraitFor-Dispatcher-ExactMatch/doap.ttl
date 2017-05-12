@@ -1,0 +1,79 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Moose::Role"^^doap-deps:CpanId ], [
+		doap-deps:on "Catalyst::Runtime 5.80"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "CatalystX::RoleApplicator"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=CatalystX-TraitFor-Dispatcher-ExactMatch>;
+	doap:created         "2011-11-14"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/CatalystX-TraitFor-Dispatcher-ExactMatch>;
+	doap:homepage        <https://metacpan.org/release/CatalystX-TraitFor-Dispatcher-ExactMatch>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "CatalystX-TraitFor-Dispatcher-ExactMatch";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-001>, <http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-002>, <http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-003>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-catalystx-traitfor-dispatcher-exactmatch>;
+	];
+	doap:shortdesc       "handle trailing slashes properly".
+
+<http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2011-11-14"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/CatalystX-TraitFor-Dispatcher-ExactMatch-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2011-11-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add 'package' line to module to allow CPAN to figure out the package name. (It can't handle MooseX::Declare-declared package names.)"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/CatalystX-TraitFor-Dispatcher-ExactMatch-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/CatalystX-TraitFor-Dispatcher-ExactMatch/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "CatalystX-TraitFor-Dispatcher-ExactMatch-0.003"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Copyright 2014.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use plain Moose instead of MooseX::Declare.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/CatalystX-TraitFor-Dispatcher-ExactMatch-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+

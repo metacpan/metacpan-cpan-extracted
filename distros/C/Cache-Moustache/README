@@ -1,0 +1,125 @@
+NAME
+    Cache::Moustache - you'd have to be insane to use a module called
+    Cache::Moustache, wouldn't you?
+
+SYNOPSIS
+      my $cache = Cache::Moustache->new;
+      $cache->set($key, $object);
+  
+      # later ...
+      $object = $cache->get($key);
+
+DESCRIPTION
+    If you subscribe to the worse-is-better philosophy, then this is quite
+    possibly the best cache module available on CPAN. It's the kind of module
+    a five-year-old might write if you gave them a project to write a caching
+    module. Not a particularly gifted five-year-old.
+
+    It provides an interface similar to CHI, Cache::Cache and other
+    commonly-used caching modules. Thus, via polymorphism, Cache::Moustache
+    objects can often (if you're lucky) be used when one of those is expected.
+
+    Why would you want to use such a dumb module instead of something
+    brilliant like CHI? Because Cache::Moustache is pretty fast, has a low
+    memory footprint (except for the memory required to store the cached
+    objects), and has no dependencies. I didn't say "no non-core
+    dependencies"; I said no dependencies. This thing doesn't even `use
+    strict`. It's basically just a hashref with methods.
+
+    I would have called it Cache::Tiny, but then people might have been
+    tempted to actually use it.
+
+  Constructor
+    `new(%options)`
+        Called as a class method returns a shiny new cache. Called as an
+        object (instance) method, just returns $self.
+
+        Supported options:
+
+        default_expires_in
+            The length of time (in seconds) before a cached value should be
+            considered expired. The default is an hour. If you specify -1,
+            then things will never expire. If you specify 0, that's dumb, so
+            Cache::Moustache will assume that you meant an hour.
+
+        clone_references
+            If true, then Cache::Moustache will clone any references you ask
+            it to cache. This feature uses the `dclone` function from
+            Storable, so violates Cache::Moustache's "no dependencies" rule.
+            Yeah, we're so cool we don't even follow our own rules!
+
+            This slows down the cache, so don't use it unless you have to. (I
+            only added this feature to pass some test cases, I don't actually
+            want to use it myself.)
+
+  Methods
+    `set($key, $value, $expires_in)`
+        Stores something in the cache. $expires_in is an optional argument
+        that allows you to override *default_expires_in*. You can use strings
+        like "3 minutes" like what Cache::Cache supports, but I don't
+        recommend it.
+
+        Cache::Moustache uses keys beginning with "~~~~" for its own internal
+        purposes. If you try to store a value with a key like that, no error
+        will be thrown, but it will not be stored; the value will effectively
+        expire instantly.
+
+    `get($key)`
+        Retrieve the value associated with a key (unless it's expired).
+
+    `remove($key)`
+        Removes a key/value pair from the cache. Returns the number of pairs
+        removed (one or none).
+
+    `clear`
+        Empty everything from the cache. Returns the number of key/value pairs
+        removed.
+
+    `purge`
+        Remove any expired key/value pairs from the cache. Returns the number
+        of pairs removed.
+
+    `size`
+        Returns the number of items in the cache (including expired items that
+        have not been purged). Note that unlike Cache::Cache and CHI, it does
+        not return the total size of all items in bytes.
+
+    `size`
+        Returns the number of items in the cache (including expired items that
+        have not been purged). Note that unlike Cache::Cache and CHI, it does
+        not return the total size of all items in bytes.
+
+    `get_keys`
+        Returns the keys of the items in the cache (including expired items
+        that have not been purged).
+
+    `isa($class)`
+        Returns true if $class is one of 'Cache::Moustache', 'Cache',
+        'Cache::Cache', 'Cache::FastMmap', 'Cache::Ref', 'CHI' or
+        'Mojo::Cache'.
+
+        In other words, it tells great big porky pie lies.
+
+    Calling any other method returns nothing, but does not die.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Cache-Moustache>.
+
+SEE ALSO
+    CHI, Cache::Cache, <http://www.worldbeardchampionships.com/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

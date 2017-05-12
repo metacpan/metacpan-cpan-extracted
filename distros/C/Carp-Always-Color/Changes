@@ -1,0 +1,30 @@
+Revision history for Carp::Always::Color
+
+0.08  2016-08-30
+      - test fixes for blead (Slaven_Rezic, #117314)
+
+0.07  2013-01-02
+      - Carp::Always::Color now no longer falls back to HTML coloring by
+        default (you can get this behavior by using Carp::Always::Color::HTML
+        explicitly, if desired). Carp::Always::Color itself now just leaves the
+        output uncolored for non-terminal outputs.
+
+0.06  2012-03-08
+      - fix some test stuff
+
+0.05  2011-09-04
+      - un-todo some stuff (and fix a broken test) for the fixes in
+        Carp::Always 0.10
+
+0.04  2010-06-14
+      - add strict and warnings
+      - convert to more dzil stuff
+
+0.03  2010-04-30
+      - Sigh, stupid packaging (remove stray test.pl from dist)
+
+0.02  2010-04-30
+      - Fix some bugs dealing with evals and non-string exceptions
+
+0.01  2010-04-30
+      - Initial release

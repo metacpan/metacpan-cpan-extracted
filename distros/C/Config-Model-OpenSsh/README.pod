@@ -1,0 +1,134 @@
+
+=head1 Config::Model::OpenSsh - OpenSSH graphical configuration editor
+
+This module provides a graphical configuration editor for:
+
+=over
+
+=item C</etc/ssh/sshd_config>
+
+=item C</etc/ssh/ssh_config>
+
+=item C<~/.ssh/config>
+
+=back
+
+=head1 Installation
+
+=head2 Debian or Ubuntu
+
+As root,type:
+
+ sudo apt install cme libconfig-model-openssh-perl
+
+To get the GUI, you should also do:
+
+ sudo apt install libconfig-model-tkui-perl
+
+=head2 On Mac or Windows
+
+The easiest way is to:
+
+=over
+
+=item *
+
+install Perl from L<ActiveState|http://www.activestate.com/activeperl>,
+
+=item *
+
+Run PPM
+
+=item *
+
+Select and install C<app-cme>, C<config-model-openssh> and C<config-model-tkui>
+
+=back
+
+=head2 Other
+
+You can also install these modules from CPAN:
+
+ cpanm App::Cme
+ cpanm Config::Model::OpenSsh
+ cpanm Config::Model::TkUI
+
+=head1 Usage
+
+Once this module is installed, you can launch a GUI to edit C</etc/ssh/sshd_config> with:
+
+ $ sudo cme edit sshd
+
+If L<cme> fails to load your C<sshd_config>, you can try L<cme> with
+C<-force> option.
+
+Likewise, you can edit your C<~/.ssh/config> file with:
+
+ $ cme edit ssh
+
+Or to edit C</etc/ssh/ssh_config>, run as root:
+
+ $ sudo cme edit system-ssh
+
+=head1 More information
+
+For more information, see:
+
+=over
+
+=item *
+
+L<Managing ssh configuration with cme|https://github.com/dod38fr/config-model/wiki/Managing-ssh-configuration-with-cme> wiki page
+
+=item *
+
+L<Using cme|https://github.com/dod38fr/config-model/wiki/Using-cme> wiki page
+
+=item *
+
+L<config-model wiki|https://github.com/dod38fr/config-model/wiki>
+
+=item *
+
+L<config-model user mailing list|https://lists.sourceforge.net/lists/listinfo/config-model-users>
+
+=back
+
+=head1 Installation from git
+
+L<Config::Model::OpenSsh> is built with L<Dist::Zilla>.
+
+Please follow the L<instructions to build Config::Model with git|https://github.com/dod38fr/config-model/blob/master/README.build-from-git> to install all modules related to L<Dist::Zilla>.
+
+Then, make sure that L<Config::Model> is installed.
+
+On debian or ubuntu, do:
+
+ sudo apt-get build-dep libconfig-model-openssh-perl
+
+Then run:
+
+ dzil build
+
+If you want to install this software without packaging, you can also run:
+
+ dzil install
+
+=head1 Update OpenSSH model
+
+To update the model, the easiest way is to use the following command in the git repo:
+
+   $ cme meta edit
+
+This command requires L<Config::Model::Itself>.
+
+On  debian or ubuntu, do:
+
+	sudo apt install libconfig-model-itself-perl
+
+Then you can explore the configuration elements in the GUI.
+
+For more information on model update, see this
+L<wiki page|https://github.com/dod38fr/config-model/wiki/How-to-add-a-new-parameter-to-an-existing-model>
+
+

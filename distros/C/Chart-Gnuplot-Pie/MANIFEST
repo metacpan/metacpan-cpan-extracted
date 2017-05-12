@@ -1,0 +1,10 @@
+lib/Chart/Gnuplot/Pie.pm
+t/thaw.t
+t/title_1.gp
+t/title.t
+t/use.t
+Changes
+README
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

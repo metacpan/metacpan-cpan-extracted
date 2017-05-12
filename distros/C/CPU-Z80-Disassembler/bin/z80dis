@@ -1,0 +1,26 @@
+#!perl
+
+use strict;
+use warnings;
+
+use CPU::Z80::Disassembler;
+use Getopt::Std;
+use File::Basename;
+
+our $opt_a;		# address
+our $opt_o;		# output file
+
+getopts('a:o:') && @ARGV == 1 
+	or die "Usage: ",basename($0)," [-a hexaddr] [-o output] binfile\n";
+my $file = shift;
+
+my $dis = CPU::Z80::Disassembler->new;
+
+$opt_a = (defined $opt_a) ? hex($opt_a) : 0;
+$dis->memory->load_file($file, $opt_a);
+
+my $fh;
+if ($opt_o) {
+	open($fh, ">", $opt_o) or die "write $opt_o: $!\n";
+}
+$dis->write_dump($opt_o);

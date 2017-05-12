@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbb7
+registers:
+  AF: 14389
+  AF_: 0
+  BC: 42393
+  BC_: 0
+  DE: 40895
+  DE_: 0
+  HL: 49425
+  HL_: 0
+  I: 0
+  IX: 35781
+  IY: 169
+  PC: 4
+  R: 2
+  SP: 0

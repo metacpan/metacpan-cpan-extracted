@@ -1,0 +1,8 @@
+README for Class-Data-Annotated package
+
+Installation
+
+perl Makefile.PL
+make
+make test
+make install

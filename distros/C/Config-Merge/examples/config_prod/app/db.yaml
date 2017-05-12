@@ -1,0 +1,20 @@
+# Config file for database connections
+
+---
+inactive_timeout:   30
+connections:
+    default_settings:
+        driver:         DBI:mysql
+        host:           localhost
+        database:       example
+        character_set:  utf8
+        time_zone:      +0:00
+        username:       iannounce 
+        password:       SeCrEt
+        attributes:
+            RaiseError:             1
+            PrintError:             0
+            AutoCommit:             1
+        params:
+            mysql_connect_timeout:   5
+            mysql_client_found_rows: 1

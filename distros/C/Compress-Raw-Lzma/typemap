@@ -1,0 +1,129 @@
+Compress::Raw::Lzma             T_PTROBJ
+Lzma::Filter                    T_PTROBJ
+Lzma::Filter::Lzma              T_PTROBJ
+Lzma::Filter::BCJ               T_PTROBJ
+Lzma::Filter::Delta             T_PTROBJ
+Lzma::Filter::SubBlock          T_PTROBJ
+Compress::Raw::Lzma::Encoder    T_PTROBJ
+Compress::Raw::Lzma::Decoder    T_PTROBJ
+Compress::Raw::Lzma::Options    T_PTROBJ
+
+const char *		T_PV
+lzma_filter *	T_PV
+char *			    T_PV_taint
+uLong		        T_UV
+uint32_t            T_UV
+DualType            T_DUAL
+int_undef           T_IV_undef
+
+lzma_bool           T_BOOL
+lzma_ret            T_ENUM
+lzma_action         T_ENUM
+lzma_mode           T_ENUM
+lzma_match_finder   T_ENUM
+lzma_check          T_ENUM
+lzma_delta_type     T_ENUM
+lzma_subfilter_mode T_ENUM
+
+uint64_t            T_UV64
+lzma_vli            T_UV64
+
+AV *			T_AV
+
+
+#############################################################################
+INPUT
+
+T_BOOL
+        $var = (bool)SvTRUE($arg)
+
+T_ENUM
+        $var = ($type)SvIV($arg)
+
+T_UV
+	$var = (unsigned long)SvUV($arg)
+T_UV64
+	$var = (unsigned long)SvUV($arg)
+T_IV_undef
+	if (SvOK($arg))
+        $var = SvIV($arg);
+    else
+        $var = 0 ;
+T_PV
+	if (SvOK($arg))
+            $var = ($type)SvPVbyte_nolen($arg);
+	else
+            $var = NULL ;
+T_PV_taint
+	if (SvOK($arg))
+            $var = ($type)SvPVbyte_nolen($arg);
+	else
+            $var = NULL ;
+
+T_PTROBJ
+        if (sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV((SV*)SvRV($arg));
+            $var = INT2PTR($type,tmp);
+        }
+        else
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"$ntype\")
+
+T_PTROBJ_AV
+        if ($arg == &PL_sv_undef || $arg == NULL)
+            $var = NULL ;
+        else if (sv_derived_from($arg, \"${ntype}\")) {
+            IV tmp = SvIV(getInnerObject($arg)) ;
+            $var = INT2PTR($type, tmp);
+            
+        }
+        else
+            croak(\"$var is not of type ${ntype}\")
+
+T_AV
+	if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV)
+        /* if (sv_isa($arg, \"${ntype}\")) */
+            $var = (AV*)SvRV($arg);
+        else
+            croak(\"$var is not an array reference\")
+
+
+
+#############################################################################
+OUTPUT
+
+T_BOOL
+        $arg = boolSV($var);
+
+T_ENUM
+        sv_setiv($arg, (IV)$var);
+
+T_UV_taint
+	sv_setuv($arg, (IV)$var);
+    //if (is_tainted) setTainted($arg);
+
+T_UV
+	sv_setuv($arg, (IV)$var);
+
+T_UV64
+	sv_setuv($arg, (IV)$var);
+
+
+T_DUAL
+        setDUALstatus($arg, $var) ;
+        //if (is_tainted) setTainted($arg);
+
+
+T_PV
+        sv_setpv((SV*)$arg, $var);
+        
+T_PV_taint
+        sv_setpv((SV*)$arg, $var);
+        //if (is_tainted) setTainted($arg);
+
+
+T_PTROBJ
+        sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+

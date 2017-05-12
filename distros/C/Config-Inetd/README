@@ -1,0 +1,108 @@
+NAME
+    Config::Inetd - Interface inetd's configuration file
+
+SYNOPSIS
+     use Config::Inetd;
+
+     $inetd = Config::Inetd->new;
+
+     if ($inetd->is_enabled(telnet => 'tcp')) {
+         $inetd->disable(telnet => 'tcp');
+     }
+
+     print $inetd->dump_enabled;
+     print $inetd->dump_disabled;
+
+     print $inetd->config->[6];
+
+DESCRIPTION
+    `Config::Inetd' provides an interface to inetd's configuration file
+    (usually named inetd.conf); it basically simplifies checking and setting
+    the enabled/disabled status of services and also allows for dumping them
+    by a given status.
+
+CONSTRUCTOR
+  new
+     $inetd = Config::Inetd->new('/path/to/inetd.conf');
+
+    Omitting the path to inetd.conf will cause the default /etc/inetd.conf
+    to be used.
+
+METHODS
+  is_enabled
+    Checks whether a service is enlisted as enabled.
+
+     $inetd->is_enabled($service => $protocol);
+
+    Returns true if the service is enlisted as enabled, false if enlisted as
+    disabled and undef if the service does not exist.
+
+  enable
+    Enables a service.
+
+     $inetd->enable($service => $protocol);
+
+    Returns true if the service has been enabled, false if no action has
+    been taken.
+
+    It is recommended to precedingly call `is_enabled()' with according
+    arguments supplied to determine whether a service is disabled.
+
+  disable
+    Disables a service.
+
+     $inetd->disable($service => $protocol);
+
+    Returns true if the service has been disabled, false if no action has
+    been taken.
+
+    It is recommended to precedingly call `is_enabled()' with according
+    arguments supplied to determine whether a service is enabled.
+
+  dump_enabled
+    Dumps the enabled services.
+
+     @dump = $inetd->dump_enabled;
+
+    Returns a flat list that consists of the enabled entries as seen in the
+    configuration file.
+
+  dump_disabled
+    Dumps the disabled services.
+
+     @dump = $inetd->dump_disabled;
+
+    Returns a flat list that consists of the disabled entries as seen in the
+    configuration file.
+
+  config
+    Access the tied configuration file.
+
+     @config = @{$inetd->config};
+
+    Returns an array reference.
+
+INSTANCE DATA
+    The inetd configuration file is tied as instance data with newlines
+    preserved; it may be accessed via `$inetd->config'.
+
+BUGS & CAVEATS
+    It is strongly advised that the configuration file is backuped first if
+    one is intending to work with the default (i.e., system-wide)
+    configuration file and not a customized one.
+
+    Accessing `@{$inetd->{CONF}}' is deprecated and superseded by
+    `$inetd->config'.
+
+SEE ALSO
+    Tie::File, inetd.conf(5)
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://dev.perl.org/licenses/
+

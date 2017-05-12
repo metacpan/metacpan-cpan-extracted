@@ -1,0 +1,56 @@
+SYNOPSIS
+
+        my $git = Cogit->new(
+            directory => '/path/to/git/'
+        );
+        $git->master->committer;
+        $git->master->comment;
+        $git->get_object($git->master->tree);
+
+HERE BE DRAGONS
+
+    This module's API is not yet battle tested. Feel free to try it out,
+    but don't depend on it for serious stuff yet. Comments regarding the
+    API very welcome.
+
+DESCRIPTION
+
+    This module is a Pure Perl interface to Git repositories.
+
+    It was mostly based on Grit http://grit.rubyforge.org/.
+
+METHODS
+
+    master
+
+    get_object
+
+    get_object_packed
+
+    get_object_loose
+
+    create_object
+
+    all_sha1s
+
+FORK
+
+    This module was forked from Git::PurePerl for a couple reasons. First
+    and foremost, Git::PurePerl is based on Moose, which is not pure perl.
+    Secondarily the API was very weird, with differentiations made based on
+    whether or not an object was in the repo or not.
+
+CONTRIBUTORS
+
+    Alex Vandiver
+
+    Chris Reinhardt
+
+    Dagfinn Ilmari Mannsåker
+
+    Dan (broquaint) Brook
+
+    Leon Brocard
+
+    Tomas (t0m) Doran
+

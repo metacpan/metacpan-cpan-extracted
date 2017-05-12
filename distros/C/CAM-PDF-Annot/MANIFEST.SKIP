@@ -1,0 +1,9 @@
+Makefile$
+^blib
+^pm_to_blib
+^.*.bak
+^.*.old
+^.*\.swp$
+^.*\.tar\.gz$
+^.git
+MYMETA.*

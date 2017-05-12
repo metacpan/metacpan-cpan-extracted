@@ -1,0 +1,13 @@
+
+DROP TABLE IF EXISTS family;
+CREATE TABLE `family` (
+  `id_family` bigint(20) unsigned NOT NULL auto_increment,
+  `address` char(128) NOT NULL,
+  `city` char(128) NOT NULL,
+  `name` char(128) NOT NULL,
+  `state` char(128) NOT NULL,
+  `zip` char(128) NOT NULL,
+
+  PRIMARY KEY  (`id_family`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ 

@@ -1,0 +1,78 @@
+#! /usr/bin/perl
+##
+##  demo2  -- play around with some weird stuff, use object model
+##
+##  Copyright (c) 2000  William Setzer
+##
+##  You may distribute under the terms of either the Artistic License
+##  or the GNU General Public License, as specified in the README file.
+
+use ExtUtils::testlib;
+use Curses;
+
+sub message {
+    my $win = shift;
+
+    $win->addstr(0, 0, "@_\n");
+    $win->addstr(3, 4, "-->");
+    $win->move($LINES - 1, 0);
+    $win->refresh();
+    sleep 2;
+}
+
+my $win = Curses->new  or die "Can't get new window\n";
+
+##  You have to pack chtypes.  Be sure to get that trailing zero.
+#
+eval {
+    my $chstr = pack "I*",
+        ACS_BLOCK, ord(A), ACS_CKBOARD, ord(B), ACS_PLMINUS, 0;
+
+    $win->addchstr(3, 8, $chstr);
+    message $win, "addchstr: block, A, checkerboard, B, plus/minus";
+};
+
+$win->clrtoeol(3, 8);
+
+##  Attrs
+#
+eval {
+    $win->attron(A_BOLD|A_UNDERLINE);
+    $win->addstr(3, 8, "hello");
+    $win->attrset(0);
+    message $win, "attr: BOLD|UNDERLINE";
+    $win->attron(A_BOLD|A_UNDERLINE);
+    $win->attroff(A_BOLD);
+    $win->addstr(3, 8, "hello");
+    $win->attrset(0);
+    message $win, "attr: UNDERLINE";
+};
+
+$win->clrtoeol(3, 8);
+
+##  Color
+#
+eval {
+    start_color;
+    init_pair 1, COLOR_GREEN,  COLOR_BLACK;
+    init_pair 2, COLOR_RED,    COLOR_BLACK;
+
+    my $GREEN = COLOR_PAIR(1);
+    my $RED   = COLOR_PAIR(2);
+
+    $win->attron($RED);
+    $win->addstr(3, 8, "hello");
+    $win->attroff($RED);
+    message $win, "color: red";
+    $win->attron($GREEN);
+    $win->addstr(3, 8, "hello");
+    $win->attroff($GREEN);
+    message $win, "color: green";
+
+    my $chstr = $RED | ACS_CKBOARD;
+    $win->clrtoeol(3, 8);
+    $win->addch(3, 8, $chstr);
+    message $win, "addch: red checkerboard";
+};
+
+endwin();

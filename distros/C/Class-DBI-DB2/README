@@ -1,0 +1,27 @@
+Class::DBI::DB2
+==================
+
+Class::DBI::DB2 extends the Class::DBI class for use with IBM DB2.  Instead of setting Class::DBI as your base class, use this instead.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module won't do much without Class::DBI!
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Mark Ferris
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+

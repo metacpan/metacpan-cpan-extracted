@@ -1,0 +1,74 @@
+Revision history for Perl extension Catalyst::Plugin::SubRequest
+
+0.21  2015-04-03
+        - Make this work on more modern Catalyst versions.
+
+0.20  2012-08-07 18:03:00 BRT
+        - Fix RT#78821
+
+0.19  2012-07-19 23:50:58 BRT
+        - Fixed non-propagation of parameters to subrequests
+
+0.18  2012-06-20 08:58:54 BRT
+        - Major refactor using Plack
+        - Fix RT#77830 side-effect propagation to original request
+
+0.17  2011-03-22 09:08:00 GMT
+        - Added subrequest and subrequest_response names aliased to 
+          sub_request and sub_request_response methods
+        - Fix RT#66126 debug mode path display bug.
+
+0.16  2010-01-28 21:09:04 GMT
+        - Add subreq_res to get the full Catalyst::Response back
+          from the sub request. RT#39486
+
+0.15  2009-11-23 22:47:32 GMT
+        - Be compatible with Catalyst 5.80014 by not writing to the
+          request body directly.
+        - Remove deprecation warnings by moving actions out of the test app.
+
+0.14  2009-10-18 18:30:00 BST
+        - Tweak copyright info to ease downstream packaging.
+
+0.13  2008-01-06 22:33:00 CET
+        - Update to work with new Stats package.
+
+0.12  2007-09-12 13:08:00 CET
+        - Switch to Module::Install
+        - Fixed README (RT #16459)
+
+0.11  2007-04-03 14:13:00
+        - $c->req->params restored after sub_request
+
+0.10  2005-12-08 13:15:00  
+        - Updated test suite to work with new catalyst.
+
+0.09  2005-10-28 01:07:00 
+    	- localize body rather than output, which is an alias
+
+0.08  2005-12-10 01:34:00 
+	    - patch to handle NEXT trouble.
+
+0.07  2005-08-01 12:08:00 
+        - reset path.
+        - allow passing params.
+
+0.06  2005-06-08 20:27:00 
+        - Flush params as well
+        - allow stuff to be passed to the stash
+
+0.05  2005-03-19 20:27:00 
+        - Added a log message in debug mode.
+
+0.04  2005-03-19 20:27:00
+        - Updated forward to cat5 style
+        - Using Catalyst::Dispatch::dispatch instead of forward.
+
+0.03  2005-03-19 20:27:00
+        - Fixed documentation.
+
+0.02  2005-03-19 10:32:00
+        - Ooops, missed MANIFEST
+
+0.01  2005-03-05 22:00:00
+        - first release

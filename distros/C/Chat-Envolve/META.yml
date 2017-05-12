@@ -1,0 +1,28 @@
+---
+abstract: 'A Perl API for the Envolve web chat system.'
+author:
+  - 'JT Smith <RIZEN@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chat-Envolve
+no_index:
+  directory:
+    - author.t
+    - eg
+requires:
+  Any::Moose: 0.13
+  Digest::HMAC_SHA1: 1.01
+  Encode: 0
+  MIME::Base64: 3.11
+  Test::More: 0
+resources:
+  bugtracker: http://github.com/rizen/Chat-Envolve/issues
+  repository: git://github.com/rizen/Chat-Envolve.git
+version: 1.0007

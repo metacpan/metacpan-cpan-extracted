@@ -1,0 +1,24 @@
+Source: libconfig-record-perl
+Section: interpreters
+Priority: optional
+Build-Depends: debhelper (>= 3.0.5), perl (>= 5.6.0-17)
+Maintainer: Daniel Berrange <dan@berrange.com>
+Standards-Version: 3.5.1
+
+Package: libconfig-record-perl
+Architecture: all
+Depends: ${perl:Depends}
+Description:  loading of configuration records
+ This module provides for loading and saving of simple configuration
+ file records. Entries in the configuration file are essentially
+ key,value pairs, with the key and values separated by a single equals
+ symbol. The key consists only of alphanumeric characters. There are
+ three types of values, scalar values can contain anything except newlines.
+ Trailing whitespace will be trimmed unless the value is surrounded in
+ double quotes. eg
+ .
+ foo = Wizz
+ foo = "Wizz....    "
+ .
+ Array values  consist of a single right round bracket, following by
+ one value per line, terminated by a single left round bracket. eg

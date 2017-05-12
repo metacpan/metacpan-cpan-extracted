@@ -1,0 +1,75 @@
+NAME
+    Class::DBI::Replication - Class::DBI for replicated database
+
+SYNOPSIS
+      package Film;
+      use base qw(Class::DBI::Replication);
+    
+      Film->set_master('dbi:mysql:host=master', $user, $pw);
+      Film->set_slaves(
+          [ 'dbi:mysql:host=slave1', $user, $pw ],
+          [ 'dbi:mysql:host=slave2', $user, $pw ],
+      );
+
+DESCRIPTION
+    Classs::DBI::Replication extends Class::DBI's persistence for replicated
+    databases.
+
+    The idea is very simple. SELECT from slaves, INSERT/UPDATE/DELETE to
+    master.
+
+    From http://www.mysql.com/doc/R/e/Replication_FAQ.html,
+
+      Q: What should I do to prepare my client code to use
+      performance-enhancing replication?
+
+      A: If the part of your code that is responsible for database access
+      has been properly abstracted/modularized, converting it to run with
+      the replicated setup should be very smooth and easy - just change
+      the implementation of your database access to read from some slave
+      or the master, and to always write to the master.
+
+    With Class::DBI::Replication, it can be done easily!
+
+METHODS
+    set_master
+          Film->set_master($datasource, $user, $password, \%attr);
+
+        This spcifies your master database. INSERT/UPDATE/DELETE are done
+        only to this database. Some SELECT queries also done to master for
+        concurrency problem.
+
+        If you don't want master to be distinct from slaves in SELECT
+        queries, put master in slaves, too.
+
+    set_slaves
+          Film->set_slaves(
+               [ 'dbi:mysql:host=slave1', $user, $password, \%attr ],
+               [ 'dbi:mysql:host=slave2', $user, $password, \%attr ],
+          );
+
+        This specifies your slave databases. SELECT are done to these
+        databases randomly. If you don't specify slaves, all queries are
+        gone to master, as always.
+
+TODO
+    *   More docs
+
+    *   More testing
+
+    *   retrieve() adter create() problem. Currently, SELECT calls inside
+        Class::DBI are done to master database.
+
+    *   Concurrency problems
+
+    *   Customizable slave picking algorithm like Round-Robin
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Class::DBI manpage, the Class::DBI::mysql manpage
+

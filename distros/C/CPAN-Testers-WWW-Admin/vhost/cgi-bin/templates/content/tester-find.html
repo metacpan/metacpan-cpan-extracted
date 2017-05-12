@@ -1,0 +1,32 @@
+[%
+
+    title = 'Find Report by GUID' ;
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    ELSE ; crumb2_name = 'Tester' ; END ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Find Report by GUID' ;
+
+%]
+
+<p>Enter a GUID in the box below to search for the report and associated distribution.</p>
+
+<form method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-found" />
+<p>GUID: <input type="text" name="guid" value="" size="40" /> <input type="submit" value='GO!' /></p>
+</form>
+
+[% IF errmess %]<p class="alert">[% errmess %]</p>[% END %]
+
+<hr />
+<h2>What is an GUID?</h2>
+
+<p>If you're new to CPAN Testers, then you may not be aware of what a GUID is. When CPAN Testers 
+reports are submitted to the Metabase, they are given a GUID. This uniquely identifies the report
+within the system. If you have received a Daily Report, the GUID is the alphanumeric part at the 
+end of each report link.</p>
+<p>Examples below highlight the GUID in URLs you are likely to see:</p>
+
+<ul>
+<li>http://www.cpantesters.org/cpan/report/<span class="emphasis">b047901a-db39-11e2-8f8c-89af0fcc62a0</span></li>
+<li>http://www.cpantesters.org/cpan/report/<span class="emphasis">873aae7a-e17c-11e2-8a30-d9c249c51b80</span></li>
+</ul>

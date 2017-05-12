@@ -1,0 +1,24 @@
+Changes
+lib/Class/Property.pm
+lib/Class/Property/RO.pm
+lib/Class/Property/RO/CustomGet.pm
+lib/Class/Property/RO/Lazy.pm
+lib/Class/Property/RW.pm
+lib/Class/Property/RW/Custom.pm
+lib/Class/Property/RW/CustomGet.pm
+lib/Class/Property/RW/CustomSet.pm
+lib/Class/Property/RW/Lazy.pm
+lib/Class/Property/RW/Lazy/CustomSet.pm
+lib/Class/Property/WO.pm
+lib/Class/Property/WO/CustomSet.pm
+Makefile.PL
+MANIFEST
+README
+t/Bar.pm
+t/Class-Property.t
+t/critic.t
+t/Foo.pm
+timethese/compare.pl
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

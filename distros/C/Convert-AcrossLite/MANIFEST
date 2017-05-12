@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+eg/acrosslite-convert1.pl
+eg/acrosslite-convert2.pl
+eg/acrosslite-convert3.pl
+eg/acrosslite-convert4.pl
+eg/puz2xml.pl
+lib/Convert/AcrossLite.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

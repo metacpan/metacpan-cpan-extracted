@@ -1,0 +1,18 @@
+Revision history for CPAN-Search-Tester
+
+0.04  Mon Jan 19 13:45:00 2015
+      - Updated Makefile.PL to generate the key 'provides' for META file correctly.
+      - Removed SIGNATURE file.
+      - Removed Build.PL file.
+      - Added unit test to test META files.
+      - Added LICENSE file.
+      - Updated Copyright year information.
+
+0.03  Sun Mar 02 21:47:00 2014
+      - Corrected module name in the pod section "Name".
+
+0.02  Mon Aug 22 14:15:16 2011
+      - Minor changes to pod.
+
+0.01  Sun Aug 21 13:37:01 2011
+      - First version released.

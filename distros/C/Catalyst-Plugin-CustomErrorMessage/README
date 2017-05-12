@@ -1,0 +1,73 @@
+NAME
+    Catalyst::Plugin::CustomErrorMessage - Catalyst plugin to have more
+    "cute" error message.
+
+SYNOPSIS
+            use Catalyst qw( CustomErrorMessage );
+        
+            # optional (values in this example are the defaults)
+            __PACKAGE__->config->{'custom-error-message'}->{'uri-for-not-found'} = '/';
+            __PACKAGE__->config->{'custom-error-message'}->{'error-template'}    = 'error.tt2';
+            __PACKAGE__->config->{'custom-error-message'}->{'content-type'}      = 'text/html; charset=utf-8';
+            __PACKAGE__->config->{'custom-error-message'}->{'view-name'}         = 'TT';
+            __PACKAGE__->config->{'custom-error-message'}->{'response-status'}   = 500;
+
+DESCRIPTION
+    You can use this module if you want to get rid of:
+
+            (en) Please come back later
+            (fr) SVP veuillez revenir plus tard
+            (de) Bitte versuchen sie es spaeter nocheinmal
+            (at) Konnten's bitt'schoen spaeter nochmal reinschauen
+            (no) Vennligst prov igjen senere
+            (dk) Venligst prov igen senere
+            (pl) Prosze sprobowac pozniej
+
+    What it does is that it inherites finalize_error to $c object.
+
+    See finalize_error() function.
+
+FUNCTIONS
+  finalize_error
+    In debug mode this function is skipped and user sees the original
+    Catalyst error page in debug mode.
+
+    In "production" (non debug) mode it will return page with template set
+    in
+
+            $c->config->{'custom-error-message'}->{'error-template'}
+            ||
+            'error.tt2'
+
+    $c->stash->{'finalize_error'} will be set to contain the error message.
+
+    For non existing resources (like misspelled url-s) if will do http
+    redirect to
+
+            $c->uri_for(
+                    $c->config->{'custom-error-message'}->{'uri-for-not-found'}
+                    ||
+                    '/'
+            )
+
+    $c->flash->{'finalize_error'} will be set to contain the error message.
+
+    To set different view name configure:
+
+            $c->config->{'custom-error-message'}->{'view-name'} = 'Mason';
+
+    Content-type and response status can be configured via:
+
+            $c->config->{'custom-error-message'}->{'content-type'}    = 'text/plain; charset=utf-8';
+            $c->config->{'custom-error-message'}->{'response-status'} = 500;
+
+AUTHOR
+    Jozef Kutej - <jkutej@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Jozef Kutej
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.4 or, at
+    your option, any later version of Perl 5 you may have available.
+

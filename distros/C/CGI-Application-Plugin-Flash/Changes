@@ -1,0 +1,9 @@
+Revision history for CGI-Application-Plugin-Flash
+
+0.02 - November 21, 2008
+    * Fixed bug when flash_config() returned undef if you had never set any
+      configuration.  Now it will return an empty hashref.
+    * Documentation and test updates.
+
+0.01 - March 25, 2008
+    * First version, released on an unsuspecting world.

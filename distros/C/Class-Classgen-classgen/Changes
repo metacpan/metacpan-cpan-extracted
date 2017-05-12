@@ -1,0 +1,48 @@
+Revision history for Perl extension Class::Classgen.
+
+3.03  Fri Dec 08 2000
+	- Section::add() corrected. Duplicate lines should not occur now.
+	- README changed
+	- introduced a little more convenience in the perldoc template
+      
+      Sat Dec 16 2000
+      	- archive functionality introduced for .pm and .gs files
+
+      Fri Dec 29 2000
+        - In order to make 'make install' copy the .gs file as well, the
+	  files are named differently now:
+	  
+	  old:	Test.pm   and   Test.gs
+	  new:  Test.pm   and   Test_gs.pm
+	  
+	- An available MANIFEST file is changed automatically now, if necessary.
+	  The archive()-function is not affected from this change.
+	  
+	- $VERSION=1.00; and 1.00 in section VERSION of the perlpod skeleton
+	  are now automatically added.
+	  
+	- Examples for associations started.
+	
+
+3.03  Mon Oct 02 2000
+	- introduced creation of and splitting into .pm and .gs
+
+3.02  Thu Jun 06 2000
+	- according to lieting@mailconcept.com using a variable $type
+	  in the control file gets confused with the internal variable
+	  my $type = ref($self)||$self;  in the constructor new().
+	  This problem has been corrected in New.pm.
+	  
+
+3.01  Fri May 19 2000
+	- extended documentation of Class::Classgen::Attribute
+	  including parameter specification for subroutine calls
+	- get_h_.._at($key) introduced to simplify access to 
+	  internal hashes
+	- delete_h_.._at($key) to delete one specific element from internal hash
+	- Comments::just_var() corrected
+
+
+0.01  Sat Mar 18 13:07:32 2000
+	- original version; created by h2xs 1.19
+

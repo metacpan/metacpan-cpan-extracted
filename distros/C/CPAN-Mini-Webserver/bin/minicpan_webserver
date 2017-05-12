@@ -1,0 +1,142 @@
+#!perl
+use strict;
+use warnings;
+
+package minicpan_webserver;
+
+# ABSTRACT: run a CPAN::Mini web server on the command line
+
+our $VERSION = '0.58'; # VERSION
+
+use lib '../lib';
+use lib 'lib';
+use CPAN::Mini::Webserver;
+use Getopt::Long;
+
+my $port = 2963;
+GetOptions( "port=i" => \$port, );
+
+my $server = CPAN::Mini::Webserver->new( $port );
+$server->run;
+
+
+
+=pod
+
+=head1 NAME
+
+minicpan_webserver - run a CPAN::Mini web server on the command line
+
+=head1 VERSION
+
+version 0.58
+
+=head1 SYNOPSIS
+
+First you must install CPAN::Mini and create a local copy of CPAN using
+minicpan. Then you may run minicpan_webserver and search and browse Mini CPAN at
+http://localhost:2963/. The listening port can be configured with C<--port>
+command line option.
+
+  % minicpan_webserver
+  % minicpan_webserver --port 8090
+
+=head1 DESCRIPTION
+
+This program provides a web server that allows you to search and browse Mini
+CPAN.
+
+=head1 MINICPAN CONFIGURATION
+
+=head2 Real Author Names
+
+CPAN::Mini::Webserver can optionally return the real names of authors
+instead of an ascii representation of them. This depends on the file
+'authors/00whois.xml' being mirrored from CPAN. CPAN::Mini doesn't do
+this by default. You can tell it to mirror this file by putting the
+following line in your .minicpanrc:
+
+  also_mirror: authors/00whois.xml
+
+=head2 Cache Directory
+
+CPAN::Mini::Webserver uses L<App::Cache> internally to cache index data about
+the cpan mirror. The directory it defaults to is inside the user's home dir,
+but by adding this to .minicpanrc it can be configured:
+
+  cache_dir: /tmp/your/cache/dir
+
+=head2 Full-Text Indexing
+
+CPAN::Mini::Webserver normally only indexes author, module and distribution
+names for its search, but it can be configured to inspect the tarballs in the
+cpan mirror and do a full-text index of the POD inside them. Naturally this is
+not advised for big mirrors as it is very memory-intensive. It can be enabled by
+adding this to .minicpanrc:
+
+  full_text: 1
+
+=head3 Subroutine Indexing
+
+When full text indexing is enabled, indexing of subroutines via PPI can be
+enabled additionally. This will add a checkbox to the search field, restricting
+the autocomplete, as well as search results to subs found in packages. It can
+be enabled by adding this to .minicpanrc:
+
+  index_subs: 1
+
+=head2 Side Bar With All Packages
+
+On smaller mirrors it can be useful to have a side bar with all present
+packages on the left. This can be enabled by adding the following to
+.minicpanrc:
+
+  side_bar: 1
+
+=head2 Base Url
+
+Sometimes it is desirable to host CMW not at an url root, but at an arbitrary
+path inside it. For that purpose a base_url parameter can be set in in
+.minicpanrc to any string that will be prepended to all urls inside the
+application (a trailing / is expected, but not enforced):
+
+  base_url: /v2/cgi-bin/docs/server.cgi/
+
+=head2 Doc Mode
+
+Sometimes it can be desirable to have CMW display only POD documentation and not
+the underlying code. This can be achieved by setting the doc_mode parameter in
+.minicpanrc:
+
+  doc_mode: 1
+
+=head1 CURRENT MAINTAINER
+
+Christian Walde <walde.christian@googlemail.com>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Leon Brocard <acme@astray.com>
+
+=item *
+
+Christian Walde <walde.christian@googlemail.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Christian Walde.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

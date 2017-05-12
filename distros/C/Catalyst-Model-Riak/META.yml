@@ -1,0 +1,27 @@
+---
+name: Catalyst-Model-Riak
+version: 0.07
+author:
+  - 'Theo Bot <nltbo@cpan.org>'
+abstract: Catalyst model for Basho Riak
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Catalyst::Model: 0
+  Catalyst::Utils: 0
+  Net::Riak: 0.16
+build_requires:
+  Test::More: 0
+provides:
+  Catalyst::Helper::Model::Riak:
+    file: lib/Catalyst/Helper/Model/Riak.pm
+    version: 0.02
+  Catalyst::Model::Riak:
+    file: lib/Catalyst/Model/Riak.pm
+    version: 0.07
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

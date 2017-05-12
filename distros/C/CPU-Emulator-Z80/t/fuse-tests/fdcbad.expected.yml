@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  38109:
+    - 23
+name: fdcbad
+registers:
+  AF: 20496
+  AF_: 0
+  BC: 37262
+  BC_: 0
+  DE: 56764
+  DE_: 0
+  HL: 20247
+  HL_: 0
+  I: 0
+  IX: 35013
+  IY: 38031
+  PC: 4
+  R: 2
+  SP: 0

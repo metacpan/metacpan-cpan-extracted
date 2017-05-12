@@ -1,0 +1,153 @@
+NAME
+    Catalyst::Plugin::Snippets - Make sharing data with clients easy
+
+SYNOPSIS
+        package MyApp;
+
+        # use this plugin, and any Cache plugin
+            use Catalyst qw/
+            Cache::FastMmap
+            Snippets
+        /;
+
+        package MyApp::Controller::Foo;
+
+        sub action : Local {
+            my ( $self, $c ) = @_;
+            # ...
+            $c->snippet( $namespace, $key, $value );
+        }
+
+        sub foo : Local {
+            my ( $self, $c ) = @_;
+            $c->serve_snippet( $namespace, \%options ); # namespace defaults to $c->action->name;
+        }
+
+        sub other_action : Private {
+            my ( $self, $c ) = @_;
+            my $value = $c->snippet( $namespace, $key );
+        }
+
+DESCRIPTION
+    This plugin provides a means of setting data that can then be queried by
+    a client in a different request.
+
+    This is useful for making things such as progress meters and statistics
+    amongst other things.
+
+    This plugin provides an API for storing data, and a way to conveniently
+    fetch it too.
+
+METHODS
+    snippet $namespace, $key, [ $value ]
+        This is an accessor for the client exposed data.
+
+        If given a value it will set the value, and otherwise it will
+        retrieve it.
+
+    serve_snippet [ $namespace, ] [ %options ]
+        This method will serve data bits to the client based on a key. The
+        namespace defaults to the action name.
+
+        The optional options array reference will take this values. This
+        array will take it's default first from
+        "$c->config->{"snippets:$namespace"}" and then it will revert to
+        "$c->config->{snippets}".
+
+        See the "CONFIGURATION" section for detailed options.
+
+    serialize_snippet $value, \%options
+        This method is automatically called by "serve_snippet" to serialize
+        the value in question.
+
+    send_snippet $value, \%options
+        This method is automatically called by "serve_snippet" to set the
+        response body.
+
+INTERNAL METHODS
+    setup
+        Set up configuration defaults, etc.
+
+CONFIGURATION
+    format
+        This takes either "json", "plain" (the default) or a code reference.
+
+        The "json" format specifies that all values values will be
+        serialized as a JSON expression suitable for consumption by
+        javascript. This is reccomended for deep structures.
+
+        You can also use a code reference to implement your own serializer.
+        This code reference should return two values: the content type, and
+        a a value to set "$c->response->body" to
+
+    allow_refs
+        If this is disabled reference values will raise an error instead of
+        being returned to the client.
+
+        This is true by default.
+
+    use_session_id
+        This fields allows you to automatically create a different
+        "namespace" for each user, when used in conjunction with
+        Catalyst::Plugin::Session.
+
+        This is false by default.
+
+    content_type
+        When the formatter type is "plain" you may use this field to specify
+        the content-type header to use.
+
+        This option defaults to "text/plain".
+
+    json_content_type
+        Since no one seems to agree on what the "right" content type for
+        JSON data is, we have this option too ;-).
+
+        This option defaults to "application/javascript+json"
+
+PRIVACY CONCERNS
+    Like session keys, if the values are private the key used by your code
+    should be sufficiently hard to guess to protect the privacy of your
+    users.
+
+    Please use the "use_session_id" option for the appropriate namespace
+    unless you have a good reason not to.
+
+RECIPES
+  Ajax Progress Meter
+    Suppuse your app runs a long running process in the server.
+
+        sub do_it {
+            my ( $self, $c ) = @_;
+
+            IPC::Run::run(\@cmd);
+
+            # done
+        }
+
+    The user might be upset that this takes a long while. If you can track
+    progress, along these lines:
+
+        my $progress = 0;
+
+        IPC::Run::run(\@cmd, ">", sub {
+            my $output = shift;
+            $progress++ if ( $output =~ /made_progress/ );
+        });
+
+    then you can make use of this data to report progress to the user:
+
+        $c->snippet( progress => $task_id => ++$progress )
+            if ( $output =~ /made_progress/  );
+
+    Meanwhile, javascript code with timers could periodically poll the
+    server using an ajax request to update the progress level. To expose
+    this data to the client create an action somewhere:
+
+        sub progress : Local {
+            my ( $self, $c ) = @_;
+            $c->serve_snippet;
+        }
+
+    and have the client query for "/controller/progress/$task_id".
+

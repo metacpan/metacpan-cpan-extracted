@@ -1,0 +1,8 @@
+.svn/
+.git/
+blib/
+Makefile$
+Makefile.old
+MANIFEST.bak
+pm_to_blib
+.swp$

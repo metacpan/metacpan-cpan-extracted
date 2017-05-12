@@ -1,0 +1,4 @@
+^tmp/
+^Makefile$
+TODO
+.*bak

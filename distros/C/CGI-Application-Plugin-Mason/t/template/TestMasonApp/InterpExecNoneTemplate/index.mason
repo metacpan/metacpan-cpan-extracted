@@ -1,0 +1,12 @@
+<%args>
+$param
+</%args>
+<html>
+<head>
+<title>InterpExecNoneTemplate</title>
+</head>
+
+<body>
+param : <% $param %>
+</body>
+</html>

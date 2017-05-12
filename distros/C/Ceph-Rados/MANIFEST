@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+Rados.xs
+XS/IO.xs
+XS/List.xs
+typemap
+README
+META.yml
+t/001_smoke.t
+t/100_raw_api_crud.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Ceph/Rados.pm
+lib/Ceph/Rados/IO.pm
+lib/Ceph/Rados/List.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

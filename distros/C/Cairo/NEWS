@@ -1,0 +1,357 @@
+Overview of changes in Cairo 1.106
+==================================
+
+* Generate cairo-perl-auto.typemap and cairo-perl-auto.h in a deterministic
+  fashion
+* Use the pthread compatibility workaround on NetBSD as well
+* Fix a test failure in t/CairoFont.t
+
+Overview of changes in Cairo 1.105
+==================================
+
+* Fix libpthread-related building issues on OpenBSD
+
+Overview of changes in Cairo 1.104
+==================================
+
+* Avoid misusing the macro PL_na, thus preventing potential issues when Cairo
+  is used in conjunction with certain XS modules, among them XML::Parser and
+  String::Approx.
+
+Overview of changes in Cairo 1.103
+==================================
+
+* Hush a few compiler warnings
+* Updated copyright date
+
+Overview of changes in Cairo 1.102
+==================================
+
+* Fix building with perl <= 5.14
+* Prevent crashes on exit with Cairo::Path on perl 5.6.
+
+Overview of changes in Cairo 1.101
+==================================
+
+* Properly specify our dependencies.
+* Fix some erroneous POD links.
+* Distribute a missing test file.
+
+Overview of changes in Cairo 1.100
+==================================
+
+Since 1.08x (the previous stable series)
+----------------------------------------
+* Make "use Cairo x.yyy" work.  This required renaming the old
+  Cairo::VERSION, a wrapper for CAIRO_VERSION, to Cairo::LIB_VERSION --
+  but we kept the old way of calling it working.  Cairo::version,
+  Cairo::version_string and Cairo::VERSION_ENCODE got the same treatment
+  for consistency.
+* Auto-upgrade strings to utf8.  Note that this means that calling
+  utf8::encode() on strings before passing them into Cairo will now
+  yield doubly-encoded and thus broken strings.  Also, having
+  utf8-encoded literals in your code without an accompanying "use utf8"
+  line will also lead to double encoding.
+* Expand and improve the README and META.yml files.
+* Many compilation and test suite fixes.
+
+Since 1.091
+-----------
+* Do not assume that sizeof(void*) == sizeof(long)
+* Calculate a string length more efficiently
+* added updated README text for RT#74870
+* Created %meta_merge which follows v2 of meta-spec
+
+Overview of changes in Cairo 1.091
+==================================
+
+* Auto-upgrade strings to utf8.  Note that this means that calling
+  utf8::encode() on strings before passing them into Cairo will now
+  yield doubly-encoded and thus broken strings.  Also, having
+  utf8-encoded literals in your code without an accompanying "use utf8"
+  line will also lead to double encoding.
+* Fix compiling and testing against older versions of cairo.
+* Make the test suite more robust.
+
+Overview of changes in Cairo 1.090
+==================================
+
+* Make "use Cairo x.yyy" work; fixes RT#72783.  This required renaming the old
+  Cairo::VERSION, a wrapper for CAIRO_VERSION, to Cairo::LIB_VERSION -- but we
+  kept the old way of calling it working.  Cairo::version,
+  Cairo::version_string and Cairo::VERSION_ENCODE got the same treatment for
+  consistency.
+* Updated FSF LGPL notice address (RT#72664)
+
+Overview of changes in Cairo 1.082
+==================================
+
+* Update the symbol export list for linking on win32
+  (https://bugzilla.gnome.org/show_bug.cgi?id=665265)
+
+Overview of changes in Cairo 1.081
+==================================
+
+* Add a missing cairo_font_type_t value.
+* Fix a test failure.
+
+Overview of changes in Cairo 1.080
+==================================
+
+Since 1.06x
+-----------
+* Wrap new 1.8 and 1.10 API.
+* Make Cairo::Pattern->set_extend, get_extend, set_filter and get_filter
+  available to all pattern types, not just surface patterns.
+* Make it possible to modify and create paths.
+
+Since 1.071
+-----------
+* Add support for missing operator types.
+* Fix compilation agains perl 5.15.x.
+
+Overview of changes in Cairo 1.071
+==================================
+
+* Add new API:
+  - recording surface
+  - region functions
+  - toy font face
+  - PDF version functions
+  - Cairo::in_clip
+  - Cairo::Surface::create_for_rectangle
+* Make it possible to modify and create paths.
+* Make Cairo::Surface::create_similar callable as a class-static method, for
+  consistency with Cairo::Surface::create_for_rectangle.
+* Fix a few test failures.
+* Add more examples.
+
+Overview of changes in Cairo 1.070
+==================================
+
+* Wrap 1.8 API:
+  - cairo_show_text_glyphs
+  - cairo_scaled_font_text_to_glyphs and
+    cairo_scaled_font_get_scale_matrix
+  - cairo_surface_get_fallback_resolution and
+    cairo_surface_has_show_text_glyphs
+* Make Cairo::Pattern->set_extend, get_extend, set_filter and get_filter
+  available to all pattern types, not just surface patterns.
+* Fix a memory manage bug in Cairo::FtFontFace.
+* Fix a bug in the enum conversion code that made it more lenient than
+  intended.
+* Add a few examples.
+* Fix a few test failures.
+
+Overview of changes in Cairo 1.062
+==================================
+
+* Cairo::FtFontFace: Keep the FT_Face alive long enough to avoid
+  segfaults
+* Add two new example programs
+* Fix test failures
+
+Overview of changes in Cairo 1.061
+==================================
+
+* Support the enum value CAIRO_FONT_TYPE_QUARTZ.
+* Improve the documentation slightly.
+* Fix a few test failures.
+* Fix a few build issues.
+
+Overview of changes in Cairo 1.060
+==================================
+
+Since 1.04x
+-----------
+* Wrap new API:
+  - cairo_has_current_point
+  - cairo_path_extents
+  - cairo_format_stride_for_width
+  - cairo_surface_copy_page and cairo_surface_show_page
+  - cairo_ps_surface_restrict_to_level, cairo_ps_get_levels, and
+    cairo_ps_level_to_string
+  - cairo_ps_surface_set_eps and cairo_ps_surface_get_eps
+* Provide Cairo::FtFontFace::create which can be used with Font::FreeType.
+* Complete the API listing POD.
+
+Since 1.053
+-----------
+* Document new API.
+
+Overview of changes in Cairo 1.053
+==================================
+
+* Wrap new API:
+  - cairo_has_current_point
+
+Overview of changes in Cairo 1.052
+==================================
+
+* Adapt to API changes: cairo_surface_copy_page and cairo_surface_show_page
+  don't return cairo_status_t anymore.
+* Wrap new API:
+  - cairo_path_extents
+  - cairo_format_stride_for_width
+* Fix the tied interface for paths on perl 5.6.
+
+Overview of changes in Cairo 1.051
+==================================
+
+* Fix memory allocation errors on win32.  [T.J. Ferraro]
+* Wrap new API:
+  - cairo_surface_copy_page and cairo_surface_show_page
+  - cairo_ps_surface_restrict_to_level, cairo_ps_get_levels, and
+    cairo_ps_level_to_string
+  - cairo_ps_surface_set_eps and cairo_ps_surface_get_eps
+
+Overview of changes in Cairo 1.050
+==================================
+
+* Provide Cairo::FtFontFace::create which can be used with Font::FreeType.
+* Add entries for the various kinds of surfaces to the API listing.
+* Fix some test suite and build issues.
+
+Overview of changes in Cairo 1.045
+==================================
+
+* Fix memory allocation errors on win32.  [T.J. Ferraro]
+
+Overview of changes in Cairo 1.044
+==================================
+
+* Add entries for the various kinds of surfaces to the API listing.
+* Fix some test suite and build issues.
+
+Overview of changes in Cairo 1.043
+==================================
+
+* Fix a few build and compatibility problems.
+
+Overview of changes in Cairo 1.042
+==================================
+
+* Fix a few build and test failures.
+
+Overview of changes in Cairo 1.041
+==================================
+
+* Use Test::Numer::Delta to make floating point tests more reliable.
+
+Overview of changes in Cairo 1.040
+==================================
+
+* Re-add Cairo::Surface::finish.
+* Add support for cairo_get_scaled_font.
+* Document the new API.
+
+Overview of changes in Cairo 1.031
+==================================
+
+* Track upstream API improvements.
+* Fix enum error messages to display the correct list of allowed values.
+* Fix a endianness-related test failure.
+
+Overview of changes in Cairo 1.030
+==================================
+
+* Add support for new API:
+  - cairo_get_dash, cairo_copy_clip_rectangles, and cairo_clip_extents.
+  - cairo_pattern_get_rgba, cairo_pattern_get_surface,
+    cairo_pattern_get_color_stop_rgba, cairo_pattern_get_points, and
+    cairo_pattern_get_circles.
+* Make Cairo::ImageSurface::get_data usable.
+
+Overview of changes in Cairo 1.021
+==================================
+
+* Fix test failure.
+
+Overview of changes in Cairo 1.02
+=================================
+
+* Fix a bug that caused the content type value 'content-alpha' to be
+  interpreted as just 'content'.
+
+Overview of changes in Cairo 1.01
+=================================
+
+* Fix a few test failures.
+
+Overview of changes in Cairo 1.00
+=================================
+
+* Improve compilation compatibility with cairo 1.0.x.
+* Export public symbols on win32.
+
+Overview of changes in Cairo 0.92
+=================================
+
+* Fix compilation and tests with cairo 1.0.x when the PDF and/or PS backend are
+  enabled.  [Yaakov S]
+* Fix a problem in the PNG stream stuff that occured with perl 5.8.8.
+* Add an example that demonstrates the PNG stream stuff.
+
+Overview of changes in Cairo 0.91
+=================================
+
+* Make it possible to use the bindings with cairo 1.0.x and later.  This makes
+  it possible to drop the cairo requirement back to 1.0.0.
+
+Overview of changes in Cairo 0.90
+=================================
+
+* Require cairo 1.2.0.
+* Add support for SVG surfaces.
+* Add Cairo::VERSION and Cairo::VERSION_ENCODE.
+* Wrap CAIRO_FORMAT_RGB16_565.
+* Remove Cairo::HAS_XLIB_SURFACE and HAS_FT_FONT.
+
+Overview of changes in Cairo 0.04
+=================================
+
+* Remove the wrappers for cairo_pdf_surface_set_dpi and
+  cairo_ps_surface_set_dpi.  Developers should use
+  cairo_surface_set_fallback_resolution instead.
+* Improve the enum converters to produce more useful error messages.
+* Wrap the streaming functions:
+  - cairo_surface_write_to_png_stream
+  - cairo_image_surface_create_from_png_stream
+  - cairo_pdf_surface_create_for_stream
+  - cairo_ps_surface_create_for_stream
+* Wrap new API:
+  - cairo_version, cairo_version_string, cairo_push_group,
+    cairo_push_group_with_content, cairo_pop_group, cairo_pop_group_to_source,
+    cairo_new_sub_path, cairo_set_scaled_font, cairo_get_group_target
+  - cairo_font_face_get_type, cairo_scaled_font_get_type,
+    cairo_scaled_font_text_extents, cairo_scaled_font_get_font_face,
+    cairo_scaled_font_get_font_matrix, cairo_scaled_font_get_ctm,
+    cairo_scaled_font_get_font_options
+  - cairo_pattern_get_type
+  - cairo_surface_get_device_offset, cairo_surface_get_type,
+    cairo_surface_get_content, cairo_surface_set_fallback_resolution
+  - cairo_image_surface_get_data, cairo_image_surface_get_format,
+    cairo_image_surface_get_stride
+  - cairo_pdf_surface_set_size
+  - cairo_ps_surface_set_dpi, cairo_ps_surface_set_size,
+    cairo_ps_surface_dsc_comment, cairo_ps_surface_dsc_begin_setup,
+    cairo_ps_surface_dsc_begin_setup
+* Port more examples from cairo-demo.
+
+Overview of changes in Cairo 0.03
+=================================
+
+* Export a sane type conversion API for other modules to use.
+* Add lots of documentation in the form of API listings.
+* Add Cairo::SolidPattern::create_rgb and create_rgba.
+
+Overview of changes in Cairo 0.02
+=================================
+
+* Fix compilation error that occured when the PS and PDF backends of cairo were
+  disabled.  [Reported by Christopher Oezbek]
+
+Overview of changes in Cairo 0.01
+=================================
+
+* Initial release.

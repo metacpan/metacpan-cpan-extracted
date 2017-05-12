@@ -1,0 +1,15 @@
+<tmpl_var name=start_form>
+<table align="center" summary = "Search fields">
+<tmpl_loop name=tr_loop>
+	<tr>
+	<th><tmpl_var name=th></th><td colspan="2"><tmpl_var name=td></td>
+	</tr>
+</tmpl_loop>
+	<tr>
+	<td><input type="submit" name="previous" value="Previous" style="{color: #80c0ff;}" onclick="adjust_page_and_submit(-1)" /></td>
+	<td><input type="submit" name="next"     value="Next"     style="{color: #80c0ff;}" onclick="adjust_page_and_submit(1)" /></td>
+	<td><input type="submit" name="submit"   value="Search"   style="{color: #80c0ff;}" /></td>
+	</tr>
+</table>
+<input type="hidden" name="_page" value="<tmpl_var name=_page>"/>
+<tmpl_var name=end_form>

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Catmandu importer for importing log entries",
+   "author" : [
+      "Nicolas Franck"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-Importer-ApacheLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Log::Parser" : "0",
+            "Catmandu" : "0.2003",
+            "Moo" : "1.000003",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-Importer-ApacheLog/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-Importer-ApacheLog",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-Importer-ApacheLog.git",
+         "web" : "https://github.com/LibreCat/Catmandu-Importer-ApacheLog"
+      }
+   },
+   "version" : "0.0112",
+   "x_contributors" : [
+      "Jakob Voß <jakob@nichtich.de>",
+      "Nicolas Franck <Nicolas.Franck@ugent.be>",
+      "njfranck <njfranck@ca20c521.ugent.be>"
+   ]
+}
+

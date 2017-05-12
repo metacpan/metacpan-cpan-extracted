@@ -1,0 +1,13 @@
+Revision history for Perl extension Catalyst::Authentication::Credential::Crowd.
+
+0.01  Thu Jul  20 18:00:00 2012
+	- Initial release.
+
+0.05  Wed Aug  15 12:00:00 2012
+    - Working release.
+
+0.06  Fri May  03 20:05:00 2013
+    - Send catalyst context to find_user method.
+
+0.07  Sat May  10 01:00:00 2014
+    - Log errors from tomcat

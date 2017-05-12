@@ -1,0 +1,27 @@
+---
+abstract: 'Get information about a class and its structure'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Inspector
+requires:
+  File::Spec: '0.80'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Class-Inspector/issues
+  homepage: https://metacpan.org/pod/Class::Inspector
+  repository: git://github.com/plicease/Class-Inspector.git
+version: '1.31'
+x_serialization_backend: 'YAML::Tiny version 1.69'

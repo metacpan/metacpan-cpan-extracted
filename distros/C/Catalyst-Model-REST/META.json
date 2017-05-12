@@ -1,0 +1,60 @@
+{
+   "abstract" : "REST model class for Catalyst",
+   "author" : [
+      "Kaare Rasmussen <kaare at cpan dot net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Model-REST",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Model" : 0,
+            "Moose" : 0,
+            "Role::REST::Client" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Serializer" : 0,
+            "Data::Serializer::JSON" : 0,
+            "Data::Serializer::XML::Simple" : 0,
+            "Data::Serializer::YAML" : 0,
+            "JSON" : "2.00",
+            "Test::More" : "0.88",
+            "XML::Simple" : 0,
+            "YAML" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaare/Catalyst-Model-REST.git",
+         "web" : "http://github.com/kaare/Catalyst-Model-REST"
+      }
+   },
+   "version" : "0.27"
+}
+

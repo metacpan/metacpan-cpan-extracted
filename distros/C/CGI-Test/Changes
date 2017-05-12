@@ -1,0 +1,262 @@
+Tue Feb  2 21:15:03 PST 2016    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.111
+
+        Accept HTTPS scheme in base URL
+        Fixed license in Makefile.PL
+
+Thu Apr 30 22:23:51 PDT 2015    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.110
+
+        $ENV{TMPDIR} for CGI scripts is now forcibly set to
+        whatever temporary directory value was resolved when
+        creating a new CGI::Test instance. This is to work around
+        an issue with older CGI.pm in Windows when $ENV{TMP}
+        and $ENV{TEMP} are unavailable for some reason.
+
+Fri Mar 20 21:50:04 PDT 2015    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.100
+
+        Response headers were never handled before; they are now.
+        Also refactored the old code that read responses
+        while I was at it.
+
+Mon Mar  2 20:21:30 PST 2015    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.002
+
+        Some of the fixes in 1.001 were too advanced for older
+        Perls, so reverting them.
+
+        Added 'use warnings' to all Perl scripts in the distro;
+        thanks to Hunter McMillen for the pull request.
+
+        Updated license notice to include Perl version that the
+        corresponding Artistic License was contained in, added
+        LICENSE section in the main pod.
+
+Fri Feb 27 23:11:34 PST 2015    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.001
+
+        Fixed test CGI scripts to be more compatible with old
+        Solaris /bin/sh.
+
+Sun Oct 26 22:06:02 PDT 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 1.000
+
+        Windows support looks good, and the codebase is stable
+        enough to call it a release.
+
+        Also fixed a bug that caused test failures in Perls
+        older than 5.8.9.
+
+Sat Sep 13 10:52:26 PDT 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.52
+
+        Fixed a bug that caused test failures in Windows.
+
+        Fixed a bug in Makefile.PL that made Github repository
+        gone missing.
+
+Sat Sep  6 23:15:57 PDT 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.51
+
+        Recently released CGI.pm deprecated some function exports
+        which broke test scripts for CGI::Test. This minor update
+        fixes the breakage.
+
+Fri Sep  5 22:02:29 PDT 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.50
+
+        Windows compatibility! Tested with ActiveState and Strawberry
+        Perls 5.18.2.
+
+        ok() method exported by CGI::Test was deprecated and removed.
+
+        All tests rebased to Test::More, somewhat improved, and made
+        compatible with Windows environment.
+
+Fri May 16 20:03:11 PSD 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.32
+
+        Makefile.PL will now bail out in Windows with CPAN Testers
+        friendly message to avoid bogus FAIL reports.
+
+Fri Apr 11 21:58:37 PSD 2014    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.31
+
+        Added methods that return base URI to CGI::Test.
+
+        An error page is now returned if the script failed with 5xx
+        HTTP status; an ordinary page was returned previously.
+
+        Besides PERL5LIB, a new environment variable PERL will be
+        populated now for CGI scripts, containing the path to perl
+        binary. CGI scripts can use it to ensure they are running
+        under the same Perl version as CGI::Test itself.
+
+        It is now possible to set raw POST data and MIME type in
+        the Input field objects.
+
+Mon May 28 18:37:24 PSD 2012    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.3
+
+        Completely removed all traces of dependency on Log::Agent and
+        Getargs::Long. Both are long obsolete, hardly maintained
+        anymore and at least one of these (Log::Agent) is failing its
+        tests.
+
+        Changed bugtracker attribute in Makefile.PL to point to
+        Git tracker.
+
+Sun Mar 25 15:49:33 PSD 2012    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.2.4
+
+        Fixed a bug in test CGI scripts that cause them to be executed
+        with perl from $PATH rather than the one used to test the
+        module itself. This sometimes resulted in weird errors deep
+        within Carp module.
+
+Mon Nov 21 00:17:38 MSD 2011    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.2.3
+
+        Made an attempt to fix a nasty bug that manifests itself
+        with custom Perl builds: test suite fails saying that it
+        can't load Fcntl shared object. I don't think this is
+        exactly *my* problem but it seems that majority of CPAN
+        testers are using customized Perl builds so FAIL to PASS
+        rate is like 2:1, which is clearly not good.
+
+        The fix is quite simple: I'm adding path to Perl executable
+        to PATH environment variable before anything else. This
+        seems to fix the problem on my machine, will see how it
+        fares with CPAN testers.
+
+        No other changes were made.
+
+Sun Oct 16 23:46:11 MSD 2011    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.2.2
+
+        Bumping version up a notch to have CPAN indexer accept this
+        module. No other changes were made.
+
+Wed Oct  5 22:21:38 MSD 2011    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.2.1
+
+        I am new maintainer of this module as of today; this little
+        bump of a release deals with changes in documentation
+        following ownership changes.
+
+Fri Sep 30 14:22:14 MSD 2011    Alex Tokarev <tokarev@cpan.org>
+
+        Version 0.2.0
+
+        Forked from unauthorized 0.1.4 version, using Github as
+        repository: http://github.com/nohuhu/CGI-Test
+
+        Removed all dependencies on Carp::Datum as it is long outdated
+        and unsupported.
+
+        Updated Makefile.PL to new format, with modules in lib/ and
+        ChangeLog renamed to Changes.
+
+        Updated dependencies to reflect the changes in CPAN module
+        distribution. For one, HTTP::Status module was split from LWP
+        along with several others in HTTP::Message bundle which
+        requires Perl 5.8.8+ to build and it breaks CGI::Test build
+        pattern. Now Makefile.PL will choose either LWP or HTTP::Message
+        depending on Perl version.
+
+        Added small feature: HTTP response headers are now stored in
+        CGI::Test object and can be read with headers() method. Maybe
+        it would be better to place them in CGI::Test::Page object but
+        by CGI::Test logic Page represents an actual page not HTTP
+        response.
+
+        Updated code to be compatible with Perl 5.14.
+
+        Added Pod testing script and fixed Pod errors it discovered.
+
+        Test suite now runs successfully under Linux, Solaris and Darwin
+        platforms; Perls 5.6.1 to 5.14.1 were used to run tests.
+
+        Bumped version to clearly reflect changes.
+
+Sat Oct  4 12:26:30 EDT 2003    Steven Hilton <mshiltonj@mshiltonj.com>
+
+. Description:
+
+        Version 0.1.4.
+
+        CGI::Test has changed ownership. The new owner is Steven Hilton
+        <mshiltonj@mshiltonj.com>.  Many thanks to Raphael Manfredi
+        and Steve Fink.
+
+        CGI::Test is now hosted as a SourceForge project. It is located 
+        at <http://cgi-test.sourceforge.net>.
+
+        POD updated to reflect the above.
+
+        make() method on various objects has been deprecated, and has been
+        replaced by more conventional (for me, at least) new() method. 
+        Support for make() may be removed in a later release.
+
+        Entire codebase reformatted using perltidy
+        Go to <http://perltidy.sourceforge.net/> to see how neat it is.
+
+        Self-referential object variable name standardized to '$this'
+        throughout code.
+
+Tue Apr 17 13:27:06 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+        Version 0.1.3.
+
+        Changed test 22 in t/browse.pl to perform explicit sorting
+        of the month parameter string, so that the string comparison
+        is reliable.
+
+Tue Apr 17 12:44:16 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+        Version 0.1.2.
+
+        Discard parameters when figuring out content-type, so that
+        we build proper Page objects.
+
+        Added note about possible parameters in content_type in
+        the man page for CGI::Test::Page.
+
+        Fixed t/parsing regression test so that it works even when there
+        are parameters in the returned content-type field.
+
+Sat Apr 14 10:52:17 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+        Version 0.1.1.
+
+        Set PERL5LIB in child to mirror parent's @INC, so that the CGI
+        program, if written in Perl, can get the same include path.
+
+Sat Mar 31 12:39:37 MEST 2001  Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+        Version 0.1.0.
+        Initial public alpha relase.
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Realtime file upload information'
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-UploadProgress
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.90017
+  Moose: 0
+  MooseX::RelatedClassRoles: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-UploadProgress/
+version: 0.06

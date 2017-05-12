@@ -1,0 +1,119 @@
+Later versions of the Ettools package will feature localization.  The below
+illustrates the direction I'll be going in unless advised otherwise.
+
+
+
+Convert::
+::Ethiopic       # Perl XS module to the libeth library.
+  ::System       # Returns System objects for conversion requests
+  ::Cstocs       # String & File conversion between charsets.
+  ::Time         # Time conversion services.
+  ::Names        # Map English transcribed names back onto Ethiopic string.
+
+
+
+Lingua::
+  ::AM
+    ::Numeric    # Essentially Nums2Words for Amharic
+    ::Syllable   # Syllable counts using Amharic rules on Amharic words
+    ::Inflect    # ...future...
+    ::Conjugate  # ...future...
+  ::GZ
+    ::Numeric    # Essentially Nums2Words for Ge'ez
+    ::Syllable   # Syllable counts using Ge'ez rules on Ge'ez words
+    ::Inflect    # ...future...
+    ::Conjugate  # ...future...
+  ::OM
+    ::Numeric    # Essentially Nums2Words for Oromigna
+    ::Syllable   # Syllable counts using Orominga rules on Oromigna words
+    ::Inflect    # ...future...
+    ::Conjugate  # ...future...
+
+
+
+Locale::
+  ::AM
+    ::Arabic
+      ::Time     # Inherits Ethiopic::Time   object, uses Amharic in Arabic
+      ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Amharic in Arabic
+    ::Ethiopic
+      ::Time     # Inherits Ethiopic::Time   object, uses Amharic in Ethiopic
+      ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Amharic in Ethiopic
+    ::Roman
+      ::Time     # Inherits Ethiopic::Time   object, uses Amharic in Roman
+      ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Amharic in Roman
+  ::GZ
+    ::Time       # Inherits Ethiopic::Time   object, uses Ge'ez in Ethiopic
+    ::Cstocs     # Inherits Ethiopic::Cstocs object, uses Ge'ez in Ethiopic
+  ::OM
+    ::Arabic
+      ::Time       # Inherits Ethiopic::Time   object, uses Oromigna in Arabic
+      ::Cstocs     # Inherits Ethiopic::Cstocs object, uses Oromigna in Arabic
+    ::Ethiopic
+      ::Time       # Inherits Ethiopic::Time   object, uses Oromigna in Ethiopic
+      ::Cstocs     # Inherits Ethiopic::Cstocs object, uses Oromigna in Ethiopic
+    ::Roman
+      ::Time       # Inherits Ethiopic::Time   object, uses Oromigna in Roman
+      ::Cstocs     # Inherits Ethiopic::Cstocs object, uses Oromigna in Roman
+  ::TI 
+    ::ER
+      ::Ethiopic
+        ::Time     # Inherits Ethiopic::Time   object, Eritirean-Tigrigna
+                     in Ethiopic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, Eritirean-Tigrigna
+                     in Ethiopic
+    ::ET
+      ::Ethiopic
+        ::Time     # Inherits Ethiopic::Time   object, uses Ethiopian-Tigrigna
+                     in Ethiopic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Ethiopian-Tigrigna
+                     in Ethiopic
+  ::AA 
+    ::ER
+      ::Arabic
+        ::Time     # Inherits Ethiopic::Time   object, Eritirean-Afarigna
+                     in Arabic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, Eritirean-Afarigna
+                     in Arabic
+      ::Ethiopic
+        ::Time     # Inherits Ethiopic::Time   object, Eritirean-Afarigna
+                     in Ethiopic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, Eritirean-Afarigna
+                     in Ethiopic
+      ::Roman
+        ::Time     # Inherits Ethiopic::Time   object, Eritirean-Afarigna
+                     in Roman
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, Eritirean-Afarigna
+                     in Roman
+    ::ET
+      ::Arabic
+        ::Time     # Inherits Ethiopic::Time   object, uses Ethiopian-Afarigna
+                     in Arabic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Ethiopian-Afarigna
+                     in Arabic
+      ::Ethiopic
+        ::Time     # Inherits Ethiopic::Time   object, uses Ethiopian-Afarigna
+                     in Ethiopic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Ethiopian-Afarigna
+                     in Ethiopic
+      ::Roman
+        ::Time     # Inherits Ethiopic::Time   object, uses Ethiopian-Afarigna
+                     in Roman
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Ethiopian-Afarigna
+                     in Roman
+    ::DJ
+      ::Arabic
+        ::Time     # Inherits Arabic::Time   object, uses Djiboutian-Afarigna
+                     in Arabic
+        ::Cstocs   # Inherits Arabic::Cstocs object, uses Djiboutian-Afarigna
+                     in Arabic
+      ::Ethiopic
+        ::Time     # Inherits Ethiopic::Time   object, uses Djiboutian-Afarigna
+                     in Ethiopic
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Djiboutian-Afarigna
+                     in Ethiopic
+      ::Roman
+        ::Time     # Inherits Ethiopic::Time   object, uses Djiboutian-Afarigna
+                     in Roman
+        ::Cstocs   # Inherits Ethiopic::Cstocs object, uses Djiboutian-Afarigna
+                     in Roman

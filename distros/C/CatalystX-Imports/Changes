@@ -1,0 +1,27 @@
+  0.05 - Sun Apr 26 05:31:55 CEST 2009
+    - Replace the _action_cache hack with method modifiers now Catalyst 5.8
+      allows us to do that.
+
+  0.04 - Thu Jan  8 12:50:47 CET 2009
+    - Use Sub::Name to name the wrapper actions we install into the symbol
+      table. This allows Class::MOP to recognize them as local methods and
+      avoids breakage on Catalyst 5.80 (groditi).
+
+  0.03 - Tue Jul 15 18:15:37 CEST 2008
+    - Revert the previous change to use Scope::Guard instead of Filter::EOF.
+      It was broken.
+
+  0.02 - Mon Jul 14 22:11:33 CEST 2008
+    - Use Scope::Guard and %^H instead of Filter::EOF.
+    - test_require Test::WWW::Mechanize::Catalyst
+
+  0.01 - Sun Jul 13 14:13:32 CEST 2008
+    - First non-dev release.
+    - Remove BIG FAT WARNING.
+    - Implement flash vars.
+    - Test session and flash vars.
+    - Require C::P::S{,::State::Cookie,::Store::FastMmap} for testing.
+    - Documentation typo fix.
+
+  0.01_01 - Mon Jan 22 19:55:59 CET 2007
+    - Initial version

@@ -1,0 +1,8 @@
+To play with C:P:A:A :
+cd ..
+perl -Ilib t/01-schema.t
+cd -
+./script/myapp_server.pl
+
+To create DBIx file from mysql database:
+script/myapp_create.pl model DBIC DBIC::Schema Schema::Abilities  create=static components=DateTime::Epoch,TimeStamp,EncodedColumn 'dbi:mysql:database=test;host=localhost' root roo

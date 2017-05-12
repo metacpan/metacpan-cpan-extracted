@@ -1,0 +1,1234 @@
+=head1 NAME
+
+CGI::Ex::Validate - The "Just Right" form validator with javascript in parallel
+
+=head1 SYNOPSIS
+
+use CGI::Ex::Validate;
+
+    # THE SHORT
+
+    my $errobj = CGI::Ex::Validate->new->validate($form, $val_hash);
+
+    # THE LONG
+
+    my $form = CGI->new;
+    # OR #
+    my $form = CGI::Ex->new; # OR CGI::Ex->get_form;
+    # OR #
+    my $form = {key1 => 'val1', key2 => 'val2'};
+
+
+    # simplest
+    my $val_hash = {
+        'group order' => [qw(username email email2)],
+        username => {
+            required => 1,
+            max_len  => 30,
+            field    => 'username',
+            # field is optional in this case - will use key name
+        },
+        email    => {
+            required => 1,
+            max_len  => 100,
+            type     => 'email',
+        },
+        email2   => {
+            equals   => 'email',
+        },
+    };
+
+    # ordered
+    my $val_hash = {
+        'group order' => [{
+            field    => 'username', # field is not optional in this case
+            required => 1,
+            max_len  => 30,
+        }, {
+            field    => 'email',
+            required => 1,
+            max_len  => 100,
+        }, {
+            field    => 'email2',
+            equals   => 'email',
+        }],
+    };
+
+
+    my $vob    = CGI::Ex::Validate->new;
+    my $errobj = $vob->validate($form, $val_hash);
+    if ($errobj) {
+        # get errors back in any of several useful ways
+        my $error_heading = $errobj->as_string; # OR "$errobj";
+        my $error_list    = $errobj->as_array;  # ordered list of what when wrong
+        my $error_hash    = $errobj->as_hash;   # hash of arrayrefs of errors
+    } else {
+        # the form passed validation
+    }
+
+
+    my $js_uri_path = '/js/';     # static or dynamic URI path to find CGI/Ex/validate.js
+    my $form_name   = "the_form"; # name of the form to attach javascript to
+
+    # generate javascript to validate an existing form
+    my $javascript = $vob->generate_js($val_hash, {
+        form_name   => $form_name,
+        js_uri_path => $js_uri_path,
+    });
+
+    # OR let Validate create the form and javascript for you
+    my $form = $vob->generate_form($val_hash, {
+        form_name   => $form_name,   # will use a random name if not passed
+        js_uri_path => $js_uri_path,
+    });
+
+
+=head1 DESCRIPTION
+
+CGI::Ex::Validate is one of many validation modules.  It aims to have
+all of the basic data validation functions, avoid adding all of
+the millions of possible types, while still giving the capability
+for the developer to add their own types for the rare cases that
+the basic ones don't suffice.  Generally anything more than basic
+validation probably needs programmatic or data based validation.
+
+CGI::Ex::Validate also has full support for providing the same
+validation in javascript.  It provides methods for attaching the
+javascript to existing forms.  This ability is tightly integrated into
+CGI::Ex::App, but it should be easy to add validation just about
+anywhere using any type of controller.
+
+As opposed to other kitchen sync validation modules, CGI::Ex::Validate
+offers the simple types of validation, and makes it easy to add your
+own custom types.  Asside from custom and custom_js, all validation
+markup is declarative.
+
+=head1 METHODS
+
+=over 4
+
+=item C<new>
+
+Used to instantiate the object.  Arguments are either a hash, or hashref,
+or nothing at all.  Keys of the hash become the keys of the object.
+
+=item C<get_validation>
+
+Uses CGI::Ex::Conf::conf_read to read in the hash.  conf_read will all passing
+a filename or YAML string or a hashref.
+
+=item C<get_validation_keys>
+
+Takes the validation hashref returned from get_validation.  Will return all
+of the possible keys found in the validation hashref.  This can be used to
+check to see if extra items have been passed to validate.  If a second
+argument contains a form hash is passed, get_validation_keys will only
+return the keys of groups that were validated.
+
+    my $key_hashref = $self->get_validation_keys($val_hash);
+
+The keys of the hash are the names of the fields.
+
+=item C<validate>
+
+Arguments are a form hashref or cgi object, a validation hashref or
+filename, and an optional what_was_validated arrayref (discussed
+further later on).  If a CGI object is passed, CGI::Ex::get_form will
+be called on that object to turn it into a hashref.  If a filename is
+given for the validation, get_validation will be called on that
+filename.  If the what_was_validated_arrayref is passed - it will be
+populated (pushed) with the field hashes that were actually validated
+(anything that was skipped because of validate_if will not be in the
+array).
+
+If the form passes validation, validate will return undef.  If it
+fails validation, it will return a CGI::Ex::Validate::Error object.
+If the 'raise_error' option has been set, validate will die with a
+CGI::Ex::validate::Error object as the value.
+
+    my $err_obj = $self->validate($form, $val_hash);
+
+    # OR #
+
+    $self->{raise_error} = 1; # can also be listed in the val_hash
+    eval { $self->validate($form, $val_hash) };
+    if ($@) { my $err_obj = $@; }
+
+=item C<generate_form>
+
+Takes a validation hash, and additional arguments and generates an HTML form suitable
+for inclusion in a web based application.
+
+    my $html = $self->generate_form($val_hash, {
+        form_name   => 'my_form',
+        js_uri_path => '/cgi-bin/js', # will be used by generate_js
+    });
+
+=item C<generate_js>
+
+Works with CGI::Ex::JSONDump.
+
+Takes a validation hash, a form name, and an optional javascript uri
+path and returns Javascript that can be embedded on a page and will
+perform identical validations as the server side.  The form name must be
+the name of the form that the validation will act upon - the name is
+used to register an onsubmit function.  The javascript uri path is
+used to embed the locations of javascript source files included
+with the CGI::Ex distribution.
+
+The javascript uri path is highly dependent upon the server
+configuration and therefore must be configured manually.  It may be
+passed to generate_js, or it may be specified in $JS_URI_PATH.
+There is one file included with this module that is needed -
+CGI/Ex/validate.js.  When generating the js code, generate_js will
+look in $JS_URI_PATH_VALIDATE.  If this is not set,
+generate_js will use "$JS_URI_PATH/CGI/Ex/validate.js".
+
+    my $js = $self->generate_js($val_hash, 'my_form', "/cgi-bin/js")
+    # OR
+    my $js = $self->generate_js($val_hash, {
+        form_name   => 'my_form',
+        js_uri_path => '/cgi-bin/js',
+    });
+
+    # would generate something like the following...
+
+    <script src="/cgi-bin/js/CGI/Ex/validate.js"></script>
+    ... more js follows ...
+
+    $CGI::Ex::Validate::JS_URI_PATH = "/stock/js";
+    $self->generate_js($val_hash, 'my_form')
+
+    # would generate something like the following...
+
+    <script src="/stock/js/CGI/Ex/validate.js"></script>
+    ... more js follows ...
+
+Referencing validate.js can be done in any of
+several ways.  It can be copied to or symlinked to a fixed location
+in the server's html directory.  It can also be printed out by a cgi.
+The method C<-E<gt>print_js> has been provided in CGI::Ex for printing
+js files found in the perl hierarchy.  See L<CGI::Ex> for more details.
+The $JS_URI_PATH of "/cgi-bin/js" could contain the following:
+
+    #!/usr/bin/perl -w
+
+    use strict;
+    use CGI::Ex;
+
+    # path_info should contain something like /CGI/Ex/validate.js
+    my $info = $ENV{PATH_INFO} || '';
+    die "Invalid path" if $info !~ m|^(/\w+)+.js$|;
+    $info =~ s|^/+||;
+
+    CGI::Ex->new->print_js($info);
+    exit;
+
+The print_js method in CGI::Ex is designed to cache the javascript in
+the browser.
+
+=item C<-E<gt>cgix>
+
+Returns a CGI::Ex object.  Used internally if a CGI object is
+passed to validate rather than a straight form hash.
+
+=back
+
+=head1 VALIDATION HASH
+
+The validation hash may be passed as a hashref or as a filename, or as
+a YAML document string.  Experience has shown it to be better
+programming to pass in a hashref.  If the validation "hash" is a
+filename or a YAML string, it will be translated into a hash using
+CGI::Ex::Conf.
+
+Keys matching the regex m/^group \s+ (\w+)$/x such as "group
+onevent" are reserved and are counted as GROUP OPTIONS.  Other keys
+(if any, should be field names that need validation).
+
+If the GROUP OPTION 'group validate_if' is set, the validation will
+only be validated if the conditions of the validate_if are met.  If
+'group validate_if' is not specified, then the validation will
+proceed.  See the validate_if VALIDATION type for more information.
+
+Each of the items listed in the validation will be validated.  The
+validation order is determined the following ways:
+
+=over 4
+
+=item Specify 'group order' arrayref with hashrefs.
+
+    # order will be (username, password, 'm/\w+_foo/', somethingelse)
+    {
+        'group title' => "User Information",
+        'group order' => [
+            {field => 'username',   required => 1},
+            {field => 'password',   required => 1},
+            {field => 'm/\w+_foo/', required => 1},
+        ],
+        somethingelse => {required => 1},
+        }
+
+=item Specify 'group order' arrayref with field key names.
+
+    # order will be (username, password, 'm/\w+_foo/', somethingelse)
+    {
+        'group title' => "User Information",
+        'group order' => [qw(username password), 'm/\w+_foo/'],
+        username      => {required => 1},
+        password      => {required => 1},
+        'm/\w+_foo/'  => {required => 1},
+        somethingelse => {required => 1},
+    }
+
+=item Do nothing - use sorted order.
+
+    # order will be ('m/\w+_foo/', password, somethingelse, username)
+    {
+        'group title' => "User Information",
+        username      => {required => 1},
+        password      => {required => 1},
+        'm/\w+_foo/'  => {required => 1},
+        somethingelse => {required => 1},
+    }
+
+=back
+
+Optionally the 'group order' may contain the word 'OR' as a special
+keyword.  If the item preceding 'OR' fails validation the item after
+'OR' will be tested instead.  If the item preceding 'OR' passes
+validation the item after 'OR' will not be tested.
+
+    'group order' => [qw(zip OR postalcode state OR region)],
+
+At this time, only "group onevent" submit works with this option.
+Using OR is not needed if testing for one or more values -- instead you
+should use min_in_set or max_in_set (OR is still useful for other cases).
+
+    'zip' => {
+      max_in_set: '1 of zip, postalcode',
+    },
+    'state' => {
+      max_in_set: '1 of state, region',
+    },
+
+Each individual field validation hashref will operate on the field contained
+in the 'field' key.  This key may also be a regular expression in the
+form of 'm/somepattern/'.  If a regular expression is used, all keys
+matching that pattern will be validated.  If the field key is
+not specified, the key from the top level hash will be used.
+
+    foobar => {   # "foobar" is not used as key because field is specified
+        field    => 'real_key_name',
+        required => 1,
+    },
+    real_key_name2 => {
+        required => 1,
+    },
+    'm/\w+/' => { # this will apply to all fields matching this regex
+        required => 1,
+    },
+
+Each of the individual field validation hashrefs should contain the
+types listed in VALIDATION TYPES.
+
+=head1 VALIDATION TYPES
+
+This section lists the available validation types.  Multiple instances
+of the same type may be used for some validation types by adding a
+number to the type (ie match, match2, match232).  Multiple instances
+are validated in sorted order.  Types that allow multiple values are:
+compare, custom, custom_js, equals, match, required_if, sql, validate_if,
+and replace (replace is a MODIFICATION TYPE).
+
+=over 4
+
+=item C<compare>
+
+Allows for custom comparisons.  Available types are
+>, <, >=, <=, !=, ==, gt, lt, ge, le, ne, and eq.  Comparisons
+also work in the JS.
+
+    {
+        field    => 'my_number',
+        match    => 'm/^\d+$/',
+        compare1 => '> 100',
+        compare2 => '< 255',
+        compare3 => '!= 150',
+    }
+
+=item C<custom>
+
+Custom value - not available in JS.  Allows for extra programming types.
+May be either a boolean value predetermined before calling validate, or may be
+a coderef that will be called during validation.  If coderef is called, it will
+be passed the field name, the form value for that name, and a reference to the
+field validation hash.  If the custom type returns false the element fails
+validation and an error is added.
+
+    {
+        field => 'username',
+        custom => sub {
+            my ($key, $val, $field_val_hash, $checktype, $form) = @_;
+            # do something here
+            return 0;
+        },
+        custom_error => '$name was not valid',
+    }
+
+Often it is desirable to specify a different message depending upon
+the code passed to custom.  To use a custom error message simply die
+with the error message.  Note that you will want to add a newline or
+else perl will add the line number and file for you -
+CGI::Ex::Validate will remove the trailing newline.
+
+    {
+        field => 'username',
+        custom => sub {
+            my ($key, $val) = @_;
+            die "Custom error message 1\n" if $val eq '1';
+            die "Custom error message 2\n" if $val eq '2';
+            return 0;
+        },
+        custom_error => '$name default custom error message',
+    }
+
+=item C<custom_js>
+
+Custom value - only available in JS.  Allows for extra programming
+types.  May be a javascript function (if fully declared in
+javascript), a string containing a javascript function (that will be
+eval'ed into a real function), a boolean value pre-determined before
+calling validate, or may be section of javascript that will be eval'ed
+(the last value of the eval'ed javascript will determine if validation
+passed).  A false response indicates the value did not pass
+validation.  A true response indicates that it did.  See the
+samples/validate_js_0_tests.html page for a sample of usages.
+
+    {
+        field => 'date',
+        required => 1,
+        match    => 'm|^\d\d\d\d/\d\d/\d\d$|',
+        match_error => 'Please enter date in YYYY/MM/DD format',
+        custom_js => "function (args) {
+            var t = new Date();
+            var y = t.getYear()+1900;
+            var m = t.getMonth() + 1;
+            var d = t.getDate();
+            if (m < 10) m = '0'+m;
+            if (d < 10) d = '0'+d;
+            (args.value > ''+y+'/'+m+'/'+d) ? 1 : 0;
+        }",
+        custom_js_error => 'The date was not greater than today.',
+    }
+
+Often it is desirable to specify a different message depending upon
+the function passed to custom_js.  To use a custom error message simply throw
+the error message.
+
+    {
+        field => 'username',
+        custom_js => 'function (args) {
+            if (args.value == 1) throw "Custom error message 1";
+            if (args.value == 2) throw "Custom error message 2";
+            return 0;
+        }',
+        custom_js_error => '$name default custom error message',
+    }
+
+=item C<enum>
+
+Allows for checking whether an item matches a set of options.  In perl
+the value may be passed as an arrayref.  In the conf or in perl the
+value may be passed of the options joined with ||.
+
+    {
+        field => 'password_type',
+        enum  => 'plaintext||crypt||md5', # OR enum => [qw(plaintext crypt md5)],
+    }
+
+=item C<equals>
+
+Allows for comparison of two form elements.  Can have an optional !.
+
+    {
+        field  => 'password',
+        equals => 'password_verify',
+    },
+    {
+        field  => 'domain1',
+        equals => '!domain2', # make sure the fields are not the same
+    }
+
+=item C<had_error>
+
+Typically used by a validate_if.  Allows for checking if this item has had
+an error.
+
+    {
+        field => 'alt_password',
+        validate_if => {field => 'password', had_error => 1},
+    }
+
+This is basically the opposite of was_valid.
+
+=item C<match>
+
+Allows for regular expression comparison.  Multiple matches may
+be concatenated with ||.  Available in JS.
+
+    {
+        field   => 'my_ip',
+        match   => 'm/^\d{1,3}(\.\d{1,3})3$/',
+        match_2 => '!m/^0\./ || !m/^192\./',
+    }
+
+=item C<max_in_set> and C<min_in_set>
+
+Somewhat like min_values and max_values except that you specify the
+fields that participate in the count.  Also - entries that are not
+defined or do not have length are not counted.  An optional "of" can
+be placed after the number for human readability.
+
+    min_in_set => "2 of foo bar baz",
+      # two of the fields foo, bar or baz must be set
+      # same as
+    min_in_set => "2 foo bar baz",
+      # same as
+    min_in_set => "2 OF foo bar baz",
+
+    validate_if => {field => 'whatever', max_in_set => '0 of whatever'},
+      # only run validation if there were zero occurrences of whatever
+
+=item C<max_len and min_len>
+
+Allows for check on the length of fields
+
+    {
+        field   => 'site',
+        min_len => 4,
+        max_len => 100,
+    }
+
+=item C<max_values> and C<min_values>
+
+Allows for specifying the maximum number of form elements passed.
+max_values defaults to 1 (You must explicitly set it higher
+to allow more than one item by any given name).
+
+=item C<required>
+
+Requires the form field to have some value.  If the field is not present,
+no other checks will be run and an error will be given.
+
+It has been common for code to try C<required => 0> which essentially has
+no effect - instead use C<validate_if => 'fieldname', required => 1>.  This
+results in the fieldname only being required if the fieldname is present.
+
+=item C<required_if>
+
+Requires the form field if the condition is satisfied.  The conditions
+available are the same as for validate_if.  This is somewhat the same
+as saying:
+
+    validate_if => 'some_condition',
+    required    => 1
+
+    required_if => 'some_condition',
+
+It is different in that other checks will run - whereas validate_if skips
+all validation if some condition is not met.
+
+If a regex is used for the field name, the required_if
+field will have any match patterns swapped in.
+
+    {
+        field       => 'm/^(\w+)_pass/',
+        required_if => '$1_user',
+    }
+
+This example would require the "foobar_pass" field to be set
+if the "foobar_user" field was passed.
+
+=item C<sql>
+
+SQL query based - not available in JS.  The database handle will be looked
+for in the value $self->{dbhs}->{foo} if sql_db_type is set to 'foo',
+otherwise it will default to $self->{dbh}.  If $self->{dbhs}->{foo} or
+$self->{dbh} is a coderef - they will be called and should return a dbh.
+
+    {
+        field => 'username',
+        sql   => 'SELECT COUNT(*) FROM users WHERE username = ?',
+        sql_error_if => 1, # default is 1 - set to 0 to negate result
+        # sql_db_type  => 'foo', # will look for a dbh under $self->{dbhs}->{foo}
+    }
+
+=item C<type>
+
+Allows for more strict type checking.  Currently supported types
+include CC (credit card), EMAIL, DOMAIN, IP, URL, INT, UINT, and NUM.
+Other types will be added upon request provided we can add a perl and
+a javascript version (extra types often aren't necessary as the custom and
+custom_js options give arbitrary checking).  If a type checks fails - other
+compare, custom, or length checks will not be ran.
+
+    {
+        field => 'credit_card',
+        type  => 'CC',
+    }
+
+=over 4
+
+=item C<CC>
+
+Simple Luhn-10 check.  Note that spaces and dashes are left in place.
+
+=item C<EMAIL>
+
+Very basic check to see if the value looks like an address.  The local part
+must only contain [\w.~!\#\$%\^&*\-=+?] and the domain must be a domain or ip.
+If you want full fledged RFC compliant checking consider something like:
+
+    {
+        field => 'email',
+        custom => sub {
+            my ($key, $val, $fv, $type, $form) = @_;
+            require Mail::Address;
+            my @a = Mail::Address->parse($val);
+            die "Invalid address\n" if @a != 1;
+            return $form->{$key} = $a[0]->address;
+         },
+     }
+
+=item C<DOMAIN>
+
+Checks for a valid domain name - does no lookup of the domain.  For that use
+a custom sub.
+
+=item C<IP>
+
+Basic IPv4 check.
+
+=item C<URL>
+
+Basic check that string matches something resembling an http or https url.
+
+=item C<INT>
+
+Checks for an integer between -2147483648 and 2147483648
+
+=item C<UINT>
+
+Checks for an unsigned integer between 0 and 4294967295.
+
+=item C<NUM>
+
+Checks for something that looks like a number.  Scientic notation is not allowed.  No range enforced.
+
+=back
+
+=item C<validate_if>
+
+If validate_if is specified, the field will only be validated
+if the conditions are met.  Works in JS.
+
+    validate_if => {field => 'name', required => 1, max_len => 30}
+    # Will only validate if the field "name" is present and is less than 30 chars.
+
+    validate_if => 'name',
+    # SAME as
+    validate_if => {field => 'name', required => 1},
+
+    validate_if => '! name',
+    # SAME as
+    validate_if => {field => 'name', max_in_set => '0 of name'},
+
+    validate_if => 'name was_valid',
+    # SAME as
+    validate_if => {field => 'name', was_valid => 1},
+
+    validate_if => {field => 'country', compare => "eq US"},
+    # only if country's value is equal to US
+
+    validate_if => {field => 'country', compare => "ne US"},
+    # if country doesn't equal US
+
+    validate_if => {field => 'password', match => 'm/^md5\([a-z0-9]{20}\)$/'},
+    # if password looks like md5(12345678901234567890)
+
+    {
+        field       => 'm/^(\w+)_pass/',
+        validate_if => '$1_user',
+        required    => 1,
+    },
+    {
+        field       => 'm/^(\w+)_pass2/',
+        validate_if => '$1_pass',
+        equals      => '$1_pass',
+        required    => 1,
+    }
+
+    # will validate foo_pass only if foo_user was present.
+
+The validate_if may also contain an arrayref of validation items.  So that
+multiple checks can be run.  They will be run in order.  validate_if will
+return true only if all options returned true.
+
+    validate_if => ['email', 'phone', 'fax']
+
+Optionally, if validate_if is an arrayref, it may contain the word
+'OR' as a special keyword.  If the item preceding 'OR' fails validation
+the item after 'OR' will be tested instead.  If the item preceding 'OR'
+passes validation the item after 'OR' will not be tested.
+
+    validate_if => [qw(zip OR postalcode)],
+
+=item C<was_valid>
+
+Typically used by a validate_if.  Allows for checking if this item has successfully
+been validated.
+
+    {
+        field => 'password2',
+        validate_if => {field => 'password', was_valid => 1},
+    }
+
+This is basically the opposite of had_error.
+
+=back
+
+=head1 SPECIAL VALIDATION TYPES
+
+=over 4
+
+=item C<field>
+
+Specify which field to work on.  Key may be a regex in the form
+'m/\w+_user/'.  This key is required in a hashref passed to 'group
+order'.  It can optionally be used with other types to specify a
+different form element to operate on.  On errors, if a non-default
+error is found, $field will be swapped with the value found in field.
+
+The field name may also be a regular expression in the
+form of 'm/somepattern/'.  If a regular expression is used, all keys
+matching that pattern will be validated.
+
+=item C<name>
+
+Name to use for errors.  If a name is not specified, default errors will use
+"The field $field" as the name.  If a non-default error is found, $name
+will be swapped with this name.
+
+=item C<delegate_error>
+
+This option allows for any errors generated on a field to delegate to
+a different field.  If the field name was a regex, any patterns will
+be swapped into the delegate_error value. This option is generally only
+useful with the as_hash method of the error object (for inline errors).
+
+    {
+        field => 'zip',
+        match => 'm/^\d{5}/',
+    },
+    {
+        field => 'zip_plus4',
+        match => 'm/^\d{4}/',
+        delegate_error => 'zip',
+    },
+    {
+        field => 'm/^(id_[\d+])_user$/',
+        delegate_error => '$1',
+    },
+
+=item C<exclude_js>
+
+This allows the cgi to do checking while keeping the checks from
+being run in JavaScript
+
+    {
+        field      => 'cgi_var',
+        required   => 1,
+        exclude_js => 1,
+    }
+
+=item C<exclude_cgi>
+
+This allows the js to do checking while keeping the checks from
+being run in the cgi
+
+    {
+        field       => 'js_var',
+        required    => 1,
+        exclude_cgi => 1,
+    }
+
+=item C<vif_disable>
+
+Only functions in javascript.  Will mark set the form element to
+disabled if validate_if fails.  It will mark it as enabled if
+validate_if is successful.  This item should normally only be used
+when onevent includes "change" or "blur".
+
+=back
+
+=head1 MODIFYING VALIDATION TYPES
+
+The following types will modify the form value before it is processed.
+They work in both the perl and in javascript as well.  The javascript
+version changes the actual value in the form on appropriate form types.
+
+=over 4
+
+=item C<do_not_trim>
+
+By default, validate will trim leading and trailing whitespace
+from submitted values.  Set do_not_trim to 1 to allow it to
+not trim.
+
+    {field => 'foo', do_not_trim => 1}
+
+=item C<trim_control_chars>
+
+Off by default.  If set to true, removes characters in the
+\x00 to \x31 range (Tabs are translated to a single space).
+
+    {field => 'foo', trim_control_chars => 1}
+
+=item C<replace>
+
+Pass a swap pattern to change the actual value of the form.
+Any perl regex can be passed but it is suggested that javascript
+compatible regexes are used to make generate_js possible.
+
+    {field => 'foo', replace => 's/(\d{3})(\d{3})(\d{3})/($1) $2-$3/'}
+
+=item C<default>
+
+Set item to default value if there is no existing value (undefined
+or zero length string).
+
+    {field => 'country', default => 'EN'}
+
+=item C<to_upper_case> and C<to_lower_case>
+
+Do what they say they do.
+
+=item C<untaint>
+
+Requires that the validated field has been also checked with
+an enum, equals, match, compare, custom, or type check.  If the
+field has been checked and there are no errors - the field is "untainted."
+
+This is for use in conjunction with perl's -T switch.
+
+=item C<clear_on_error>
+
+Clears the form field should a validation error occur.  Only supported
+on the Javascript side (no affect on the server side).
+
+=back
+
+=head1 ERROR OBJECT
+
+Failed validation results in an error an error object created via the
+new_error method.  The default error class is CGI::Ex::Validate::Error.
+
+The error object has several methods for determining what the errors were.
+
+=over 4
+
+=item C<as_array>
+
+Returns an array or arrayref (depending on scalar context) of errors that
+occurred in the order that they occurred.  Individual groups may have a heading
+and the entire validation will have a heading (the default heading can be changed
+via the 'as_array_title' group option).  Each error that occurred is a separate
+item and are pre-pended with 'as_array_prefix' (which is a group option - default
+is '  ').  The as_array_ options may also be set via a hashref passed to as_array.
+as_array_title defaults to 'Please correct the following items:'.
+
+    # if this returns the following
+    my $array = $err_obj->as_array;
+    # $array looks like
+    # ['Please correct the following items:', '  error1', '  error2']
+
+    # then this would return the following
+    my $array = $err_obj->as_array({
+        as_array_prefix => '  - ',
+        as_array_title  => 'Something went wrong:',
+    });
+    # $array looks like
+    # ['Something went wrong:', '  - error1', '  - error2']
+
+=item C<as_string>
+
+Returns values of as_array joined with a newline.  This method is used as
+the stringification for the error object.  Values of as_array are joined with
+'as_string_join' which defaults to "\n".  If 'as_string_header' is set, it will
+be pre-pended onto the error string.  If 'as_string_footer' is set, it will be
+appended onto the error string.
+
+    # if this returns the following
+    my $string = $err_obj->as_string;
+    # $string looks like
+    # "Please correct the following items:\n  error1\n  error2"
+
+    # then this would return the following
+    my $string = $err_obj->as_string({
+        as_array_prefix  => '  - ',
+        as_array_title   => 'Something went wrong:',
+        as_string_join   => '<br />',
+        as_string_header => '<span class="error">',
+        as_string_footer => '</span>',
+    });
+    # $string looks like
+    # '<span class="error">Something went wrong:<br />  - error1<br />  - error2</span>'
+
+=item C<as_hash>
+
+Returns a hash or hashref (depending on scalar context) of errors that
+occurred.  Each key is the field name of the form that failed
+validation with 'as_hash_suffix' added on as a suffix.  as_hash_suffix
+is available as a group option and may also be passed in via a
+hashref as the only argument to as_hash.  The default value is
+'_error'.  The values of the hash are arrayrefs of errors that
+occurred to that form element.
+
+By default as_hash will return the values of the hash as arrayrefs (a
+list of the errors that occurred to that key).  It is possible to also
+return the values as strings.  Three options are available for
+formatting: 'as_hash_header' which will be pre-pended onto the error
+string, 'as_hash_footer' which will be appended, and 'as_hash_join'
+which will be used to join the arrayref.  The only argument required
+to force the stringification is 'as_hash_join'.
+
+    # if this returns the following
+    my $hash = $err_obj->as_hash;
+    # $hash looks like
+    # {key1_error => ['error1', 'error2']}
+
+    # then this would return the following
+    my $hash = $err_obj->as_hash({
+        as_hash_suffix => '_foo',
+        as_hash_join   => '<br />',
+        as_hash_header => '<span class="error">'
+        as_hash_footer => '</span>'
+    });
+    # $hash looks like
+    # {key1_foo => '<span class="error">error1<br />error2</span>'}
+
+=back
+
+=head1 GROUP OPTIONS
+
+Any key in a validation hash matching the pattern
+m/^group \s+ (\w+)$/x is considered a group option (the reason
+that either group or general may be used is that CGI::Ex::Validate
+used to have the concept of validation groups - these were not
+commonly used so support has been removed as of the 2.10 release).
+(the old name of 'general' vs 'group' is still supported but deprecated)
+
+=over 4
+
+=item C<title>
+
+Used as a group section heading when as_array or as_string is called
+by the error object.
+
+    'group title' => 'Title of errors',
+
+=item C<order>
+
+Order in which to validate key/value pairs of group.
+
+    'group order' => [qw(user pass email OR phone)],
+
+    # OR
+
+    'group order' => [{
+        field    => 'field1',
+        required => 1,
+    }, {
+        field    => 'field2',
+        required => 1,
+    }],
+
+=item C<fields>
+
+Alias for 'group order'.
+
+=item C<validate_if>
+
+If specified - the entire hashref will only be validated if
+the "if" conditions are met.
+
+    'group validate_if => {field => 'email', required => 1},
+
+This group would only validate all fields if the email field
+was present.
+
+=item C<raise_error>
+
+If raise_error is true, any call to validate that fails validation
+will die with an error object as the value.
+
+=item C<no_extra_fields>
+
+If no_extra_fields is true, validate will add errors for any field found
+in form that does not have a field_val hashref in the validation hash.
+Default is false.  If no_extra_fields is set to 'used', it will check for
+any keys that were not in a group that was validated.
+
+An important exception to this is that field_val hashrefs or field names listed
+in a validate_if or required_if statement will not be included.  You must
+have an explicit entry for each key.
+
+=item C<\w+_error>
+
+These items allow for an override of the default errors.
+
+    'group required_error' => '$name is really required',
+    'group max_len_error'  => '$name must be shorter than $value characters',
+      # OR #
+    my $self = CGI::Ex::Validate->new({
+        max_len_error => '$name must be shorter than $value characters',
+    });
+
+=item C<as_array_title>
+
+Used as the section title for all errors that occur, when as_array
+or as_string is called by the error object.
+
+=item C<as_array_prefix>
+
+Used as prefix to individual errors that occur, when as_array
+or as_string is called by the error object.  Each individual error
+will be prefixed with this string.  Headings will not be prefixed.
+Default is '  '.
+
+=item C<as_string_join>
+
+When as_string is called, the values from as_array will be joined with
+as_string_join.  Default value is "\n".
+
+=item C<as_string_header>
+
+If set, will be pre-pended onto the string when as_string is called.
+
+=item C<as_string_footer>
+
+If set, will be pre-pended onto the string when as_string is called.
+
+=item C<as_hash_suffix>
+
+Added on to key names during the call to as_hash.  Default is '_error'.
+
+=item C<as_hash_join>
+
+By default, as_hash will return hashref values that are errors joined with
+the default as_hash_join value of <br />.  It can also return values that are
+arrayrefs of the errors.  This can be done by setting as_hash_join to a non-true value
+(for example '')
+
+=item C<as_hash_header>
+
+If as_hash_join has been set to a true value, as_hash_header may be set to
+a string that will be pre-pended on to the error string.
+
+=item C<as_hash_footer>
+
+If as_hash_join has been set to a true value, as_hash_footer may be set to
+a string that will be postpended on to the error string.
+
+=item C<onevent>
+
+Defaults to {submit => 1}.  This controls when the javascript validation
+will take place.  May be passed any or all or load, submit, change, or blur.
+Multiple events may be passed in the hash.
+
+    'group onevent' => {submit => 1, change => 1}',
+
+A comma separated string of types may also be passed:
+
+    'group onevent' => 'submit,change,blur,load',
+
+Currently, change and blur will not work for dynamically matched
+field names such as 'm/\w+/'.  Support will be added.
+
+=item C<set_hook>
+
+Defaults document.validate_set_hook which defaults to nothing.  If
+"group set_hook" or document.validate_set_hook are set to a function,
+they will be passed the key name of a form element that had a
+validation error and the error that will be set.  If a true value is
+returned, then validate will not also the inline error.  If no value
+or false is returned (default) the validate will continue setting the
+inline error.  This gives full control over setting inline
+errors. samples/validate_js_2_onchange.html has a good example of
+using these hooks.
+
+    'group set_hook' => "function (args) {
+        alert("Setting error to field "+args.key);
+    }",
+
+The args parameter includes key, value, val_hash, and form.
+
+The document.validate_set_hook option is probably the better option to use,
+as it helps to separate display functionality out into your html templates
+rather than storing too much html logic in your CGI.
+
+=item C<clear_hook>
+
+Similar to set_hook, but called when inline error is cleared.  Its
+corresponding default is document.validate_clear_hook.  The clear hook
+is also sampled in samples/validate_js_2_onchange.html
+
+    'group clear_hook' => "function (args) {
+        alert("Clear error on field "+args.key);
+    }",
+
+The args parameter includes key, val_hash, form, and was_valid.
+
+=item C<no_inline>
+
+If set to true, the javascript validation will not attempt to generate
+inline errors when the only "group onevent" type is "submit".  Default
+is true.  Inline errors are independent of confirm and alert errors.
+
+    'group no_inline' => 1,
+
+=item C<no_confirm>
+
+If set to true, the javascript validation will try to use an alert
+instead of a confirm to inform the user of errors when one of the
+"group onevent" types is "submit".  Alert and confirm are independent
+or inline errors.  Default is false.
+
+    'group no_confirm' => 1,
+
+=item C<no_alert>
+
+If set to true, the javascript validation will not show an alert box
+when errors occur.  Default is false.  This option only comes into
+play if no_confirm is also set.  This option is only in effect if
+"group onevent" includes "submit".  This option is independent of
+inline errors.  Although it is possible to turn off all errors by
+setting no_inline, no_confirm, and no_alert all to 1, it is suggested
+that at least one of the error reporting facilities is left on.
+
+    'group no_alert' => 1,
+
+=back
+
+=head1 JAVASCRIPT
+
+CGI::Ex::Validate provides for having duplicate validation on the
+client side as on the server side.  Errors can be shown in any
+combination of inline and confirm, inline and alert, inline only,
+confirm only, alert only, and none.  These combinations are controlled
+by the group options no_inline, no_confirm, and no_alert.
+Javascript validation can be generated for a page using the
+C<-E<gt>generate_js> method of CGI::Ex::Validate.
+
+(Note: It is also possible to store the validation inline with the
+html as YAML and have it read in using the HTML conf handler - but
+this feature has been deprecated - see the included html samples for
+how to do this).
+
+Generate JS will create something similar to the following (based on your validation):
+
+    <script src="/cgi-bin/js/CGI/Ex/validate.js"></script>
+    <script>
+    document.validation = {
+      'group no_confirm': 1,
+      'group no_alert':   1,
+      'group onevent':    'change,blur,submit',
+      'group order': ['username', 'password'],
+      username: {
+        required: 1,
+        max_len: 20
+      },
+      password: {
+        required: 1,
+        max_len: 30
+      }
+    };
+    if (document.check_form) document.check_form('my_form_name');
+    </script>
+
+If inline errors are enabled (default), each error that occurs will attempt
+to find an html element with its name as the id.  For example, if
+the field "username" failed validation and created a "username_error",
+the javascript would set the html of <span id="username_error"></span>
+to the error message.
+
+It is suggested to use something like the following so that you can
+have inline javascript validation as well as report validation errors
+from the server side as well.
+
+   <span class=error id=password_error>[% password_error %]</span><br>
+
+If the javascript fails for some reason, the form should still be able
+to submit as normal (fail gracefully).
+
+Additionally, there are two hooks that are called when ever an inline
+error is set or cleared.  The following hooks are used in
+samples/validate_js_2_onchange.html to highlight the row and set an icon.
+
+    document.validate_set_hook = function (args) {
+      document.getElementById(args.key+'_img').innerHTML
+        = '<span style="font-weight:bold;color:red">!</span>';
+      document.getElementById(args.key+'_row').style.background
+        = '#ffdddd';
+    };
+
+    document.validate_clear_hook = function (args) {
+      if (args.was_valid) {
+        document.getElementById(args.key+'_img').innerHTML
+            = '<span style="font-weight:bold;color:green">+</span>';
+        document.getElementById(args.key+'_row').style.background
+            = '#ddffdd';
+      } else {
+        document.getElementById(args.key+'_img').innerHTML = '';
+        document.getElementById(args.key+'_row').style.background = '#fff';
+      }
+    };
+
+If you have jquery that looks like:
+
+    document.validate_set_hook = function (args) {
+      $('#'+args.key+'_img').html('<span style="font-weight:bold;color:red">!</span>');
+      $('#'+args.key+'_row').css('backgroundColor', '#ffdddd');
+    };
+
+    document.validate_clear_hook = function (args) {
+      if (args.was_valid) {
+        $('#'+args.key+'_img').html('<span style="font-weight:bold;color:green">+</span>');
+        $('#'+args.key+'_row').css('backgroundColor', '#ddffdd');
+      } else {
+        $('#'+args.key+'_img').html('');
+        $('#'+args.key+'_row').css('backgroundColor', '#fff');
+      }
+    };
+
+These hooks can also be set as "group clear_hook" and "group set_hook"
+    which are defined further above.
+
+    If the confirm option is used ("group onevent" includes submit and
+    "group no_confirm" is false), the errors will be displayed to the
+    user.  If they choose OK they will be able to try and fix the errors.
+    If they choose cancel, the form will submit anyway and will rely on
+    the server to do the validation.  This is for fail safety to make sure
+    that if the javascript didn't validate correctly, the user can still
+submit the data.
+
+=head1 LICENSE
+
+This module may be distributed under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Paul Seamons <perl at seamons dot com>
+
+=cut

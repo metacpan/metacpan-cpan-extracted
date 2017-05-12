@@ -1,0 +1,45 @@
+Changelog.ini
+Changes
+lib/CGI/Snapp.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/basic.pl
+t/callbacks.pl
+t/defaults.pl
+t/forward.t
+t/headers.pl
+t/hook.test.a.pl
+t/hook.test.b.pl
+t/hook.test.c.pl
+t/hook.test.d.pl
+t/hook.tests.pl
+t/isa.pl
+t/lib/CGI/Snapp/Callback.pm
+t/lib/CGI/Snapp/ForwardTest.pm
+t/lib/CGI/Snapp/Header.pm
+t/lib/CGI/Snapp/HookTestA.pm
+t/lib/CGI/Snapp/HookTestB.pm
+t/lib/CGI/Snapp/HookTestC.pm
+t/lib/CGI/Snapp/HookTestD.pm
+t/lib/CGI/Snapp/Overrides.pm
+t/lib/CGI/Snapp/Plugin/HookTest/HookTest3.pm
+t/lib/CGI/Snapp/Plugin/HookTest1.pm
+t/lib/CGI/Snapp/Plugin/HookTest2.pm
+t/lib/CGI/Snapp/RedirectTest.pm
+t/lib/CGI/Snapp/RunModes.pm
+t/lib/CGI/Snapp/RunScript.pm
+t/lib/CGI/Snapp/SubClass.pm
+t/override.a.pl
+t/overrides.pl
+t/params.pl
+t/psgi.basic.pl
+t/redirect.t
+t/run.modes.pl
+t/subclass.pl
+t/test.t
+xt/author/pod.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

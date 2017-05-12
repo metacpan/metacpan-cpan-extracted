@@ -1,0 +1,22 @@
+0.96    2011-11-27
+        - fix test failure
+
+0.95    2011-11-20
+        - switch Class::Data::Accessor to Catalyst::ClassData
+        - address rt #68997 "log levels too high" ticket
+
+0.94    2011-06-29
+        - Add option to kill through HUP signal instead of exit.
+                
+0.93	2010-01-29
+		- Changing Class::C3 to MRO::Compat 
+
+0.92	2008-07-30
+		- no longer using $c->config to store state
+		- configuration for memory type checked (rss, virt, etc) 
+
+0.91	2008-05-21 
+		- Actually read the config correctly 
+
+0.90	2008-05-16 
+		- Initial release.

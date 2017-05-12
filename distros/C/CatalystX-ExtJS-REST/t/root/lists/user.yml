@@ -1,0 +1,6 @@
+---
+  elements:
+    - name: id
+      type: Hidden
+    - name: password
+    - name: name

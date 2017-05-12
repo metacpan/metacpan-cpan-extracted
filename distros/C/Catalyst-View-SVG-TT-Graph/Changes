@@ -1,0 +1,44 @@
+0.0226 Mon, Aug 17, 2015
+ * Replaced deprecated Regex action in test suite controller
+
+0.0225 Thu, Jun 02, 2011
+
+ * ICO live test was failing due to large image - reduced
+ * Removed use 5.8.8 from Makefile.PL
+
+0.0224 Wed, Jun 01, 2011
+
+ * Added Catalyst::Action::RenderView dependency
+
+0.0223 Sat, May 28, 2011
+
+ * FindBin version reduced to 1.42
+ * Added cat plugins Static::Simple, ConfigLoader dependencies
+
+0.0222 Wed, May 25, 2011
+
+ * Reduced FindBin dependency version to 1.47
+ * Fixed incorrect use_ok syntax in live test case
+
+0.0221 Wed, Mar 2, 2011
+
+ * Tests for different image output formats in live testing
+
+0.022 Tue, Mar 1, 2011
+
+ * Live testcase using Test::WWW::Mechanize::Catalyst TestApp
+ * pod for methods
+
+0.021 Sat, Feb 26, 2011
+
+ * Show graph_title if set
+ * Removed error when (optional) param chart_title not stashed
+ * Moose, SVG::TT::Graph module dependencies
+ * Documented stashed variables, sample charts
+
+0.02 Fri, Feb 25, 2011
+
+ * Allowing common output formats (gif, jpeg, png, bmp, ico, pnm, xbm, xpm)
+ * Using chart_conf and format Moose attributes
+ * Helper pod typo fix + cleanup
+

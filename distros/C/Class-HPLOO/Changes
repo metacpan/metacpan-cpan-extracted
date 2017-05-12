@@ -1,0 +1,112 @@
+Revision history for Perl extension Class::HPLOO.
+
+0.23  2005-03-07
+      - Minor fix on pseudo syntax.
+
+0.22  2005-03-07
+      - Added pseudo syntax for easier way to work with SV* from sub[C] functions.
+
+
+0.21  2004-12-16
+      - Added Inline::MakeMaker support for inline functions.
+
+
+0.20  2004-12-15
+      - Fixed some warnings.
+
+
+0.19  2004-12-14
+      - Fixed bug of change made on version 0.18 on fixer for q|qq|qr|qw|qx|tr|x|y|s|m.
+
+
+0.18  2004-12-12
+      - Fixed some new() recursion bug.
+      - Fixed push() of atributes of type array*.
+      - FETCH of attributes of type array* and hash* will be set as changed like on STORE.
+      - Added inline functions syntax:  sub[C] void foo( int x ) {...}
+
+
+0.17  2004-10-16
+      - Added method ATTRS that returns the list of attributes in the declaration order.
+      - Added support for object atributes.
+      - Added USE_BASE parameter and Class::HPLOO::Base to save code when generating classes as an option.
+
+
+0.16  2004-09-21
+      - Added support for use of HDB::Object as a base class for persistence.
+
+
+0.15  2004-08-28
+      - Added support for the method SUPER(...), like super() in Java.
+      - Added use of SUPER::new() when initializer is not defined in the class.
+
+
+0.14  2004-08-20
+      - Fixed comment placeholder when $#_ found.
+
+
+0.13  2004-07-12
+      - Fied handler of comments.
+      - Added support for attr sub.
+
+
+0.12  2004-04-09
+      - Added support for version number after class name: class Foo [0.1] {...}
+      - Fixed bug with patterns and "/" when used for division.
+
+
+0.11  2004-02-08
+      - Added support for attributes with attr().
+      - Preparating for object persistence.
+
+
+0.10  2004-02-05
+      - Bug fix for "-s foo", due bug on Filter::Simple.
+      - Added recursivety for build-hploo script.
+
+
+0.09  2004-01-23
+      - Just some bug fixes.
+
+
+0.08  2004-01-17
+      - Changed behavior of return 0 for object initializer.
+        Now is reutnr UNDEF, where UNDEF is a constant.
+      - Fixed bug with q|qq|qr|qw|qx|tr|y|s|m. (where still buggy!)
+      - Fixed bug on comments place holder.
+
+
+0.07  2004-01-17
+      - Fixed bug with subclasses recursion.
+
+
+0.06  2004-01-17
+      - Fixed bug with $this and strict.
+
+
+0.05  2004-01-17
+      - Fixed bug with subclasses, where subs were parsed more than 1 time.
+
+
+0.04  2004-01-17
+      - Added #line handler to keep the original line number.
+      - Added support for declaration o sub classes: class foo { class subfoo {...} }
+
+
+0.03  2004-01-16
+      - Fixed bug with q|qq|qr|qw|qx|tr|y|s|m.
+      - Enable syntax "use vars ($var)", since is common to add the "use" before.
+      - Added die alert for extract_block() for non well closed blocks.
+      - Now __END__.* is striped from the source.
+
+
+0.02  2004-01-16
+      - Now produce better formatted code when using import option "nice" or "dump"
+      - New script nuil-hploo.pl, to convert .hploo files to .pm.
+      - Added support to ePod at the __END__ of a hploo file.
+
+
+0.01  Tue Sep 30 14:35:04 2003
+	- original version; created by h2xs 1.21 with options
+		-X Class::HPLOO
+

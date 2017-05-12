@@ -1,0 +1,43 @@
+Revision history for Crypt::Affine
+
+0.12  2017-04-14T23:10:00+01:00
+      - Improved type handling.
+
+0.11  2017-02-15T12:50:00+01:00
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.10  2017-02-01T12:25:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.09  2016-08-27T08:20:00+01:00
+      - Updated Copyright year information.
+      - Tidied up unit test script t/00-load.t.
+
+0.08  2015-12-11T10:00:00+01:00
+      - Added LICENSE file.
+
+0.07  2015-01-16T15:25:00+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.06  2014-10-26T18:28:00+01:00
+      - Rebuild the distribution using ExtUtils::MakeMaker v7.00 so that META files created with dependencies.
+
+0.05  2014-10-25T23:55:25+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+
+0.04  2014-10-25T21:50:25+01:00
+      - Restructured code using 'Moo'.
+      - Added section 'Repository' to the pod document.
+
+0.03  2014-10-25T20:30:00+01:00
+      - Removed Build.PL file.
+      - Tidied up MANIFEST file.
+
+0.02  2011-08-22T14:15:16+01:00
+      - Minor changes to pod.
+
+0.01  2011-08-11T11:22:00+01:00
+      - First version, released.

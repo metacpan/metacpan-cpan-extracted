@@ -1,0 +1,56 @@
+Revision history for CatalystX-CRUD-ModelAdapter-DBIC
+
+0.15 04 Jan 2016
+ - fix number of skipped tests if sqlite not present
+
+0.14 07 Dec 2015
+ - fix https://rt.cpan.org/Ticket/Display.html?id=110092
+
+0.13 28 Feb 2014
+ - add tests for Search::QueryParser::SQL 0.010
+
+0.12 03 Dec 2012
+ - fix RT https://rt.cpan.org/Ticket/Display.html?id=81079 SQL::Abstrct
+   order_by syntax
+
+0.11 1 Dec 2009
+ - fix order by logic to check for cxc-m2m param (still a TODO item)
+ - refactor tests to put Root methods in their own controller
+
+0.10 14 July 2009
+ - fix tests so that (a) sql is complete and (b) skip if sqlite3 cmd tool
+   not found
+
+0.09 13 June 2009
+ - fix ORDER BY via cxc-order so that it actually works, including tests
+   for multi-column sort.
+
+0.08 29 April 2009
+ - switch to MRO::Compat from Class::C3
+
+0.07 11 Sept 2008
+ - implement Utils features for ne_sign() use_ilike() and treat_like_int()
+ - tweek make_sql_query() output to match DBIC syntax for -or and -and
+   searches
+ - get relationships from source not class
+
+0.06 27 Aug 2008
+ - tweek make_query() to return hash struct like RDBO does
+
+0.05 26 Aug 2008
+ - fix ORDER BY feature and override make_sql_query()
+
+0.04 24 Aug 2008
+ - switch to DBIx::Class::RDBOHelpers for rel introspection.
+
+0.03 23 Aug 2008
+ - fix make_query() to return hash ref like  other Models do.
+ - updates for new core API in 0.29
+
+0.02 12 Aug 2008
+ - fix bug in order of params to make_query()
+ - add example app in t/example/MyApp
+
+0.01 11 Aug 2008
+ - First version, released on an unsuspecting world.
+

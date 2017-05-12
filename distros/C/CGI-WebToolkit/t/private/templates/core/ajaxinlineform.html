@@ -1,0 +1,19 @@
+<form class="inline" action="{script_url}" method="post" id="js_{name}" name="{name}" enctype="multipart/form-data">
+	<input type="hidden" name="to" value="{to}"/>
+	{elements}
+</form>
+<script language="javascript">
+	//alert("hey");
+	Event.observe('js_{name}', 'submit', function(event) {
+		//alert("submit!");
+		$('js_{name}').request({
+			onFailure: function() {
+				$('{target}').update("Error while submitting form.");
+			},
+			onSuccess: function(t) {
+				$('{target}').update(t.responseText);
+			}
+		});
+		Event.stop(event); // stop the form from submitting
+	});
+</script>

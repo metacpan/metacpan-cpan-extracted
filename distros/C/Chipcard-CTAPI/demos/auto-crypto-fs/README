@@ -1,0 +1,28 @@
+This directory demonstrates how encrypted file systems can be created
+with a random password, which is then stored on a smartcard, in Linux.
+
+You should know how to create encrypted loopback file systems manually
+before trying to understand this. You'll have to do several adjustments
+to the scripts to fit your local configuration (like encryption algorithm
+to use, etc.). Make sure you read through all the scripts and understand
+what they do. Unless losetup and mount are suidroot on your system,
+these scripts will have to be executed as root - so you better be aware
+of what they do!
+
+The first script needs to be run only once for each file system you want
+to create.
+The second script is for mounting your encrypted file system. It downloads
+the password from your memory card, sets up the loopback device and
+mounts it.
+The third script is actually a shell-, not a Perl-script for unmounting
+your encrypted file system. This is only necessary if you want to unmount
+it manually. Automatic unmounting is done at system shutdown.
+
+Note that you require the Perl "Expect" module for these scripts to work.
+To install it, run 
+
+perl -MCPAN -eshell
+(possible first-time-configuration process here)
+Then, at the CPAN shell, enter this command:
+install IO::Pty IO::Tty Expect
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbbb
+registers:
+  AF: 56523
+  AF_: 0
+  BC: 31411
+  BC_: 0
+  DE: 30318
+  DE_: 0
+  HL: 16737
+  HL_: 0
+  I: 0
+  IX: 10562
+  IY: 58110
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdb4
+registers:
+  AF: 53132
+  AF_: 0
+  BC: 13409
+  BC_: 0
+  DE: 61811
+  DE_: 0
+  HL: 35539
+  HL_: 0
+  I: 0
+  IX: 49570
+  IY: 33381
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,32 @@
+---
+abstract: 'Manage settings'
+author:
+  - 'cho45 <cho45@lowreal.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Pit
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::HomeDir: 0
+  File::Spec: 0
+  File::Temp: 0.2
+  Filter::Util::Call: 0
+  List::MoreUtils: 0
+  Path::Class: 0
+  YAML::Syck: 1
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

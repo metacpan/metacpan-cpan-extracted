@@ -1,0 +1,16 @@
+Revision history 
+
+1.00  Mon Sep 26 13:58:49 UTC 2005
+	+ Fix documentation for UK vs US date formats 
+  + Allow easier overriding of date format preferences
+
+0.03  Sun Feb  3 14:22:29 GMT 2002
+	+ The CPAN shell doesn't like my prerequisites
+
+0.02  Sun Dec 16 20:29:34 GMT 2001
+	+ Made taint safe. (Ironic, isn't it)
+
+0.01  Fri Oct 26 14:46:53 BST 2001
+	- Created this
+
+

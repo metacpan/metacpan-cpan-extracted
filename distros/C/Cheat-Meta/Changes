@@ -1,0 +1,32 @@
+Revision history for Cheat-Meta
+
+0.0.5   2011-08-08 03:25:44
+    - Require in Build.PL, version.pm 0.77.
+
+0.0.4   2010-10-06 23:20:09
+    - Fix underbars (q|_|) in List::Compare methods.
+
+0.0.3   2010-09-27 15:14:58
+    - Fix some namespacing.
+
+0.0.2   2010-09-26 02:57:01
+    - Change namespacing entirely.
+        - Cheat-Meta            => the dist
+        - Cheat::Meta           => the base module
+        - Cheat::Meta::Spec     => (TODO) tell how to use the namespace
+        - Bundle::Cheat::Sheet  => Bundle of actual cheat sheets
+        - Cheat::Sheet:Test     => Cheat sheet for testing modules
+        - Cheat::Sheet:Util     => Cheat sheet for utility modules
+    - ::Util written.
+    - Create util/cheat-build.pl
+        - Development file      => .agi
+        - Editor file           => .perl
+        - POD file              => .pod
+
+0.0.1   2010-09-18 03:15:47
+    - Base module Bundle::Cheat okay.
+    - ::Test written.
+
+2010-09-14 01:12:55
+    - Launch project.
+

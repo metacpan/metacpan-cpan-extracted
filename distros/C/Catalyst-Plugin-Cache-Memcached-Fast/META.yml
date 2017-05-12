@@ -1,0 +1,26 @@
+---
+name: Catalyst-Plugin-Cache-Memcached-Fast
+version: 0.14
+author:
+  - Vasiliy Voloshin <vasilus@cpan.org
+abstract: Catalyst Plugin for Cache::Memcached::Fast
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  Cache::Memcached::Fast: 0
+  Catalyst: 0
+  Class::Data::Inheritable: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Catalyst::Plugin::Cache::Memcached::Fast:
+    file: lib/Catalyst/Plugin/Cache/Memcached/Fast.pm
+    version: 0.14
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Simple base class with get/put accessors",
+   "author" : [
+      "Xiong Changnian <xiong@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [
+      "devel",
+      "development",
+      "OO",
+      "object-oriented",
+      "class",
+      "object",
+      "method",
+      "base",
+      "constructor",
+      "accessor",
+      "accessors",
+      "lite",
+      "lightweight",
+      "tiny"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Lite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::Comments" : "v1.1.4"
+         },
+         "requires" : {
+            "perl" : "5.008008",
+            "version" : "0.99"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Lite" : {
+         "file" : "lib/Class/Lite.pm",
+         "version" : "v0.1.0"
+      },
+      "Module::Empty" : {
+         "file" : "lib/Module/Empty.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/Xiong/class-lite"
+      }
+   },
+   "version" : "v0.1.0"
+}

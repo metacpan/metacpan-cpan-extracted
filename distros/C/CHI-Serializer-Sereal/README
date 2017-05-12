@@ -1,0 +1,32 @@
+NAME
+    CHI::Serializer::Sereal - Sereal serializer for CHI
+
+VERSION
+    This document describes version 0.01 of CHI::Serializer::Sereal (from
+    Perl distribution CHI-Serializer-Sereal), released on 2014-06-29.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CHI-Serializer-Sereal>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-CHI-Serializer-Sereal>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CHI-Serializer-Sereal
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

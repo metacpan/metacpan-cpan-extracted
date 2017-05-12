@@ -1,0 +1,26 @@
+Crypt::NSS::X509 - A perl wrapper to the NSS X509 API
+=====================================================
+
+This library offers a wrapper around NSS providing a small, usable subset of the X509 
+functionality of NSS.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2012 by Johanna Amann
+
+This Library is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of 
+the MPL was not distributed with this library, You can obtain one at 
+http://mozilla.org/MPL/2.0/.
+
+The library contains source code of the Mozilla Network Security Services; for NSS license 
+information please see http://www.mozilla.org/projects/security/pki/nss/.
+

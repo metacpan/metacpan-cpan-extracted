@@ -1,0 +1,32 @@
+---
+abstract: 'class accessors generation with lazy accessors and fast mode support.'
+author:
+  - 'Alexandr Evstigneev <hurricup@evstigneev.com>'
+build_requires:
+  Test::Harness: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Accessor-Lazy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  Class::Accessor::Fast: '0'
+  Exporter: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/hurricup/Class-Accessor-Lazy/issues
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: git://github.com/hurricup/Class-Accessor-Lazy.git
+version: '1.003'

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+$PERL -x 3<&0 <<'END_OF_SCRIPT'
+#!perl
+
+use CGI::ExtDirect;
+
+use RPC::ExtDirect::API     Namespace       => 'Namespace',
+                            Router_path     => '/cgi-bin/router.cgi',
+                            Poll_path       => '/cgi-bin/events.cgi',
+                            Remoting_var    => 'Ext.app.CALL',
+                            Polling_var     => 'Ext.app.POLL',
+                        ;
+
+use RPC::ExtDirect::Test::Pkg::Foo;
+use RPC::ExtDirect::Test::Pkg::Bar;
+use RPC::ExtDirect::Test::Pkg::Qux;
+use RPC::ExtDirect::Test::Pkg::PollProvider;
+use RPC::ExtDirect::Test::Pkg::Meta;
+
+# 2 argument open() is here for older Perls
+open STDIN, '<&3' or die "Can't reopen STDIN";
+
+my $cgi = CGI::ExtDirect->new({ debug => 1 });
+
+print $cgi->api();
+
+exit 0;
+
+END_OF_SCRIPT
+

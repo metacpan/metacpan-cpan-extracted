@@ -1,0 +1,300 @@
+NAME
+    Catalyst::Plugin::Authorization::CDBI::GroupToken - CDBI Authorization
+    for Catalyst
+
+SYNOPSIS
+        use Catalyst qw/Authorization::CDBI::GroupToken/;
+
+        __PACKAGE__->config->{authorization} = {
+             user_class               => 'MyApp::Model::CDBI::User'        
+            ,token_class              => 'MyApp::Model::CDBI::Token'
+            ,token_field              => 'name'
+            ,user_token_class         => 'MyApp::Model::CDBI::UserToken'
+            ,user_token_user_field    => 'user'
+            ,user_token_token_field   => 'token'
+            ,group_class              => 'MyApp::Model::CDBI::Group'
+            ,group_field              => 'name'
+            ,group_description_field  => 'description'
+            ,user_group_class         => 'MyApp::Model::CDBI::UserGroup'
+            ,user_group_user_field    => 'user'
+            ,user_group_group_field   => 'group'
+            ,token_group_class        => 'MyApp::Model::CDBI::TokenGroup'
+            ,token_group_token_field  => 'token'
+            ,token_group_group_field  => 'group'
+            ,group_group_class        => 'MyApp::Model::CDBI::GroupGroup'
+            ,group_group_parent_field => 'parent'
+            ,group_group_child_field  => 'child'
+        };
+
+        $c->token(qw/myapp.access/);
+
+        # the basic setup
+        CREATE TABLE user (
+            id INTEGER PRIMARY KEY,
+            email TEXT,
+            password TEXT
+        );
+
+        CREATE TABLE token (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+        );
+
+        CREATE TABLE user_token (
+            id INTEGER PRIMARY KEY,
+            user INTEGER REFERENCES customer,
+            token INTEGER REFERENCES token
+        );
+
+        # user-groups and token-groups
+        CREATE TABLE group (
+            id INTEGER PRIMARY KEY,
+            group TEXT
+        );
+
+        CREATE TABLE token_group (
+            id INTEGER PRIMARY KEY,
+            token INTEGER REFERENCES token,
+            group INTEGER REFERENCES group
+        );
+
+        CREATE TABLE user_group (
+            id INTEGER PRIMARY KEY,
+            customer INTEGER REFERENCES user,
+            group INTEGER REFERENCES group
+        );
+
+        # group-groups
+        CREATE TABLE group_group (
+            id INTEGER PRIMARY KEY,
+            parent INTEGER REFERENCES group
+            child INTEGER REFERENCES group
+        );
+
+DESCRIPTION
+    This is a simplified version of the group-role-permission-token
+    paradigm. Working from the theory that at the end of the day all the
+    developer really cares about is whether someone has permission to access
+    something or not. Traditional roles and groups are just storage and
+    assignment mechanisms. This model changes the notion of a permission to
+    a "token". Roles and groups are simplified to "group". And a user is
+    still a user. Tokens (permissions) are assigned to a user and or a
+    group. A user is assigned to groups. Groups can also be assigned to
+    groups (think of roles assigned to groups without all the headaches of
+    realizing that a role has suddenly morphed into a group or into a
+    permission). The flexibility is that exceptions are easily handled. If
+    Rob is in Group A, but also needs also needs a permission for something
+    from group B we just give him the permission directly. These alleviates
+    the need to build another role or group just to handle the special case
+    for Rob. Why all this you ask? Again it gets back to the concept of "all
+    I really care about is can this user do this". So outside of an
+    administrative interface the only thing to query is the tokens
+    (permissions). This is similar to testing for a particular capability in
+    javascript versus doing a browser detect and branching off from there.
+
+    For example given the following setup:
+
+       User Rob
+          Group WholeDamnCompany
+          Group Foo
+          widgets_inc.sales.leads
+   
+       Group Accounting
+          widgets_inc.acct.access
+          widgets_inc.acct.edit
+   
+       Group HR
+          widgets_inc.hr.admin.access
+          widgets_inc.hr.admin.add_user
+   
+       Group WholeDamnCompany
+          Group Accounting
+          Group HR
+          widgets_inc.widget_view
+   
+       Group Foo
+          widgets_inc.bar
+   
+       Group IT
+          widgets_inc.it.root
+   
+       Token
+          widgets_inc.bldg1.access
+   
+    We test with $c->tokens('[token name]'), each of these will return true
+    for Rob:
+
+            widgets_inc.wizbang.feature
+            widgets_inc.acct.access
+            widgets_inc.acct.edit
+            widgets_inc.hr.admin.access
+            widgets_inc.hr.admin.add_user
+            widgets_inc.sales.leads
+            widgets_inc.bar
+
+    Each of these will return false for Rob as he is not in IT nor has the
+    widgets_inc.bldg1.access directly assigned:
+
+            widgets_inc.it.root
+            widgets_inc.bldg1.access
+
+    So why the hierarchy in the token naming? Really this is a matter of
+    preference. You can name your tokens whatever works best for your needs,
+    but the idea here is to make the permission self describing. I also have
+    some interesting future features in mind, such as tying user specific
+    data to a given token via key/value and predefining settings for these
+    keys(See TODO). Why "tokens"? No real reason, its what the group I work
+    with has been calling them for years, so just what I am used to. Also it
+    is to clearly delineate this school of thought from "roles". Oh and I
+    could not come up with a catchy acronym for Tokens Aint Roles like YAML.
+
+    Note that this plugin is designed to work with
+    "Catalyst::Plugin::Authentication::CDBI" and works much the same way as
+    the roles method in this plugin. It will pick up the user_class and
+    user_field settings from Authentication::CDBI if omitted. In theory it
+    should work with any Authentication plugin that sets
+    $c->request->{user_id}.
+
+CONFIGURATION
+    Most of configuration is optional. The _class suffixed configuration
+    options essentially enable a given feature. There are three different
+    setups that build upon one another:
+
+  Basic Configuration
+    Start with the user and a simple token assignment. This is identical to
+    roles in Catalyst::Plugin::Authentication::CDBI v0.09
+
+    user_class
+        The User Model Class. i.e., 'MyApp::Model::CDBI::User' Optional.
+        Defaults to $c->config->{authentication}->{user_class}
+
+    token_class
+        The Token Model Class. i.e., 'MyApp::Model::CDBI::Token' Required.
+
+    token_field
+        The Token Field from the Token Model Class. i.e., 'name' Optional.
+        Defaults to 'name'
+
+    user_token_class
+        The User-Token Model Class. i.e., 'MyApp::Model::CDBI::UserToken'
+        Required.
+
+    user_token_user_field
+        The User Field from the User-Token Model Class. i.e., 'user'
+        Optional. Defaults to 'user'
+
+    user_token_token_field
+        The Token Field from the User-Token Model Class. i.e., 'token'
+        Optional. Defaults to 'token'
+
+  Group Configuration
+    This builds upon all the settings above. It adds User-Group and
+    Token-Group to the setup.
+
+    group_class
+        The Group Model Class. i.e., 'MyApp::Model::CDBI::Group' Optional.
+        Future plans include an out of the box admin scripts.
+
+    group_field
+        The Group Field from the Group Model Class. i.e., 'name' Optional.
+        Defaults to 'name'
+
+    group_description_field
+        The Description Field from the Group Model Class. i.e.,
+        'description' Optional. Defaults to 'description'
+
+    user_group_class
+        The User-Group Model Class. i.e., 'MyApp::Model::CDBI::UserGroup'
+        Optional. If omitted then just User-Token will be used. Enables
+        Group Configuration along with token_group_class
+
+    user_group_user_field
+        The User Field from the User-Group Model Class. i.e., 'user'
+        Optional. Defaults to 'user'
+
+    user_group_group_field
+        The Group Field from the User-Group Model Class. i.e., 'group'
+        Optional. Defaults to 'group'
+
+    token_group_class
+        The Token-Group Model Class. i.e., 'MyApp::Model::CDBI::TokenGroup'
+        Optional. If omitted then just User-Token will be used. Enables
+        Group Configuration along with user_group_class
+
+    token_group_token_field
+        The Token Field from the Token-Group Model Class. i.e., 'token'
+        Optional. Defaults to 'token'
+
+    token_group_group_field
+        The Group Field from the Token-Group Model Class. i.e., 'group'
+        Optional. Defaults to 'group'
+
+  Group Group Configuration
+    This builds upon all the settings above. It adds Group-Group to the
+    setup.
+
+    group_group_class
+        The Group_Group Model Class. i.e., 'MyApp::Model::CDBI::GroupGroup'
+        Enables use of Group Group Configuration
+
+    group_group_parent_field
+        The Parent Group Field from the Group-Group Model Class. i.e.,
+        'parent' Optional. Defaults to 'parent'
+
+    group_group_child_field
+        The Child Group Field from the Group-Group Model Class. i.e.,
+        'child' Optional. Defaults to 'child'
+
+  A Minimal Configuration Example
+       __PACKAGE__->config->{authorization} = {
+           user_class       => 'MyApp::Model::CDBI::User'
+          ,token_class      => 'MyApp::Model::CDBI::Token'
+          ,user_token_class => 'MyApp::Model::CDBI::UserToken'
+       };      
+
+METHODS
+    token
+        Check permissions return true or false.
+
+            $c->tokens(qw/widgets_inc.foo widgets_inc.bar/);
+
+        Returns an arrayref containing the verified tokens. This is the same
+        as "Catalyst::Plugin::Authentic ation::CDBI"->roles
+
+            my @tokens = @{ $c->tokens };
+
+  EXTENDED METHODS
+    setup
+        sets up $c->config->{authorization}.
+
+  OVERLOADED METHODS
+    process_tokens
+        Takes an arrayref of tokens and checks if user has the supplied
+        tokens. Returns 1/0.
+
+TODO
+    -structure to restrict parent group assignment to child exceptions
+    -OTB admin interface
+    -implement token attributes
+            if ( my $token = $c->tokens('widgets_inc.sales') ) {
+                 my $region = $token->attribute('region'); # specific region for current user
+            }
+
+SEE ALSO
+    Catalyst Catalyst::Plugin::Authentication::CDBI.
+
+AUTHOR
+    Scott Connelly, "ssc@cpan.org"
+
+THANKS
+    Andy Grundman, "andy@hyrbidized.org"
+
+    The authors of Catalyst::Plugin::Authentication::CDBI
+
+       Sebastian Riedel, C<sri@cpan.org>
+       Marcus Ramberg, C<mramberg@cpan.org>
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

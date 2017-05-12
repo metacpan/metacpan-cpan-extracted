@@ -1,0 +1,27 @@
+---
+abstract: 'Make subrequests to actions in Catalyst'
+author:
+  - 'Marcus Ramberg, C<mramberg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-SubRequest
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: '5.9'
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-SubRequest/
+version: '0.21'

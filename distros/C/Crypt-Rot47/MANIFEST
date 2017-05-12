@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-basic.t
+t/pod.t
+t/pod-coverage.t
+lib/Crypt/Rot47.pm
+script/rot47.pl

@@ -1,0 +1,27 @@
+---
+abstract: 'Load and merge locale-specific configuration files.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Locale
+requires:
+  Algorithm::Loops: 1.031
+  Carp: 0
+  Config::Any: 0.04
+  Hash::Merge: 0.12
+  List::MoreUtils: 0
+  Path::Class: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: https://github.com/bluefeet/Config-Locale/issues
+  repository: git://github.com/bluefeet/Config-Locale.git
+version: 0.05

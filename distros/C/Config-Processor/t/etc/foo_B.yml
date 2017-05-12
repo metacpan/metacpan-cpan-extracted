@@ -1,0 +1,23 @@
+foo:
+  param1: "foo_B:val1"
+
+  param3:
+    param3_1: "foo_B:val3_1"
+    param3_3: "foo_B:val3_3"
+
+  param4:
+    - "foo_B:val4_1"
+    - "foo_B:val4_2"
+
+  param5:
+    - "foo_B:val5_1"
+    - param5_2_1: "foo_B:val5_2_1"
+      param5_2_2: "foo_B:val5_2_2"
+
+  param6:
+    param6_1: "foo_B:val6_1"
+    param6_2:
+      - "foo_B:val6_2_1"
+      - "foo_B:val6_2_2"
+    param6_4: "foo_B:val6_4"
+

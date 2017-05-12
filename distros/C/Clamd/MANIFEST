@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Clamd.pm
+t/00basic.t
+t/01ping.t
+t/02reload.t
+t/03quit.t
+t/04scan.t
+t/05rawscan.t
+t/mkconf.pl
+testfiles/clamavtest
+testfiles/clamavtest.gz
+testfiles/clamavtest.zip
+testfiles/innocent

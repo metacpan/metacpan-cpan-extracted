@@ -1,0 +1,69 @@
+NAME
+    CGI::Application::Plugin::FillInForm - integrate with HTML::FillInForm
+
+SYNOPSIS
+        use CGI::Application::Plugin::FillInForm (qw/fill_form/);
+
+        my $t = $self->load_tmpl('farm.html');
+        $t->param( organic => 'less_pesticides' );
+
+        return $self->fill_form( \$t->output );
+
+DESCRIPTION
+    This plugin provides a mix-in method to make using HTML::FillInForm more
+    convenient.
+
+  fill_form()
+     # fill an HTML form with data in a hashref or from an object with with a param() method
+     my $filled_html = $self->fill_form($html, $data);
+
+     # ...or fill from a list of data sources
+     # (each item in the list can be either a hashref or an object)
+     my $filled_html = $self->fill_form($html, [$user, $group, $query]);
+
+     # ...or default to getting data from $self->query()
+     my $filled_html = $self->fill_form($html);
+
+     # extra fields will be passed on through:
+     my $filled_html = $self->fill_form($html, undef, fill_password => 0 );
+
+    This method provides an easier syntax for calling HTML::FillInForm, and
+    an intelligent default of using $self->query() as the default data
+    source.
+
+    By default, the mode param (usually 'rm') of every data source will be
+    ignored. This prevents accidently clobbering your run mode for the next
+    page, which may be stored in a hidden field.
+
+    $html must be a scalarref, or a reference to a scalarref. $filled_html
+    will be a reference to a string.
+
+    Because this method only loads HTML::FillInForm if it's needed, it
+    should be reasonable to load it in a base class and always have it
+    available:
+
+      use CGI::Application::Plugin::FillInForm (qw/fill_form/);
+
+AUTHORS
+     Cees Hek published the first draft on the CGI::App wiki
+     Mark Stosberg, C<< <mark@summersault.com> >> polished it for release.
+     Michael Graham, C<< <mag-perl@occamstoothbrush.com> >> added tests and some new features.
+     The module is now co-maintained by Mark and Michael.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-cgi-application-plugin-fillinform@rt.cpan.org", or through the web
+    interface at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+CONTRIBUTING
+    Patches, questions and feedback are welcome. This project is managed
+    using the darcs source control system ( http://www.darcs.net/ ). My
+    darcs archive is here: http://mark.stosberg.com/darcs_hive/cap-fif/
+
+Copyright & License
+    Copyright 2005 Mark Stosberg, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

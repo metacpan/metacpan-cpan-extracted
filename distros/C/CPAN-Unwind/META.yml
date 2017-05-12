@@ -1,0 +1,35 @@
+--- #YAML:1.0
+name:               CPAN-Unwind
+version:            0.06
+abstract:           Recursively determines dependencies of CPAN modules
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Algorithm::Dependency::Ordered:  0
+    Archive::Tar:         0
+    Cache::Cache:         0
+    Cache::FileCache:     0
+    CPAN:                 0
+    Data::Dumper:         0
+    File::Temp:           0
+    Log::Log4perl:        0
+    LWP::Simple:          0
+    Module::Depends::Intrusive:  0
+    Pod::Usage:           0
+    Storable:             0
+resources:
+    repository:  http://github.com/mschilli/cpan-unwind-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

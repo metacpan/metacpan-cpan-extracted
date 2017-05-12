@@ -1,0 +1,30 @@
+[%# YUI stuff to include in <head> for html %]
+
+[%    
+    DEFAULT YUI = {
+        url     => 'http://yui.yahooapis.com',
+        version => '2.6.0',
+        css     => [],
+        js      => [],
+    };
+    YUI.css.push('build/reset-fonts-grids/reset-fonts-grids');
+    YUI.css.push('build/assets/skins/sam/skin');
+    YUI.css.push('build/layout/assets/skins/sam/layout');
+    YUI.css.push('build/resize/assets/skins/sam/resize');
+    YUI.css.push('build/button/assets/skins/sam/button');
+    YUI.css.push('build/treeview/assets/skins/sam/treeview');
+    
+
+    YUI.js.push('build/yahoo-dom-event/yahoo-dom-event');
+    YUI.js.push('build/animation/animation-min');
+    YUI.js.push('build/element/element-beta-min');
+    YUI.js.push('build/dragdrop/dragdrop-min');
+    YUI.js.push('build/resize/resize-min');
+    YUI.js.push('build/container/container-min');
+    YUI.js.push('build/menu/menu-min');
+    YUI.js.push('build/button/button-min');
+    YUI.js.push('build/editor/editor-min');
+    YUI.js.push('build/json/json-min');
+    YUI.js.push('build/layout/layout-min');
+    YUI.js.push('build/treeview/treeview-min');
+%]

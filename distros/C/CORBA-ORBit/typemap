@@ -1,0 +1,45 @@
+TYPEMAP
+CORBA::Object	            T_OBJREF
+CORBA_char *	            T_CORBACHAR
+CORBA::ORB	            T_PTROBJ
+CORBA::TypeCode	            T_PTROBJ
+CORBA::ORBit::RootObject    T_PTROBJ
+PortableServer::POA         T_PTROBJ
+PortableServer::POAManager  T_PTROBJ
+PortableServer::ServantBase T_SERVANT
+
+CORBA::LongLong             T_LONGLONG
+CORBA::ULongLong            T_ULONGLONG
+CORBA::LongDouble           T_LONGDOUBLE
+
+#####################################################################
+INPUT
+T_SERVANT
+	$var = porbit_sv_to_servant ($arg)
+T_OBJREF
+	$var = porbit_sv_to_objref ($arg)
+T_CORBACHAR
+	$var = ($type)SvPV($arg,PL_na)
+T_LONGLONG
+        $var = SvLLV ($arg)
+T_ULONGLONG
+        $var = SvULLV ($arg)
+T_LONGDOUBLE
+        $var = SvLDV ($arg)
+
+#####################################################################
+OUTPUT
+T_SERVANT
+	$arg = porbit_servant_to_sv ($var);
+T_OBJREF
+	$arg = porbit_objref_to_sv ($var);
+T_CORBACHAR
+	sv_setpv((SV*)$arg, $var);
+	CORBA_free ($var);
+T_LONGLONG
+	$arg = ll_from_longlong ($var);
+T_ULONGLONG
+	$arg = ull_from_ulonglong ($var);
+T_LONGDOUBLE
+	$arg = ld_from_longdouble ($var);
+

@@ -1,0 +1,30 @@
+NAME
+    CGI::Untaint::datetime - validate a date
+
+SYNOPSIS
+      use CGI::Untaint;
+      my $handler = CGI::Untaint->new($q->Vars);
+
+      my $date = $handler->extract(-as_datetime => 'timestamp');
+
+DESCRIPTION
+    This Input Handler verifies that the input is a valid datetime, as
+    specified by ISO 8601, that is, something resembling YYYY-MM-DDTHH:MM:SS
+    it can even handle YYYY-MM-DD HH::MM::SS or YYYY-MM-D HH::MM
+
+METHODS
+    is_valid
+        The actual validation check. See CGI::Untaint for more information.
+
+SEE ALSO
+    Time::Piece. CGI::Untaint
+
+AUTHOR
+    Marcus Ramberg <marcus@thefeed.no>
+
+COPYRIGHT
+    Copyright (C) 2004 Marcus Ramberg. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

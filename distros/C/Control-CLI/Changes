@@ -1,0 +1,103 @@
+Revision history for Control-CLI
+
+1.00    2011-03-27
+        First version, released on an unsuspecting world.
+
+1.01    2011-04-03
+	* Module installation test script now requires (build_requires) Net::Telnet
+	* Changed test script for detection of Serial port under unix which was not working on most Linux systems
+	* Ported Device::SerialPort ability to manually specify a TESTPORT=<DEVICE> when running Makefile.PL/Build.PL
+	* Added use of Exporter module for optionally importing class methods
+
+1.02    2011-05-08
+	* Still a few Linux systems where my serial port detection failed; modified the test script
+	* Corrected uninitialized $fh warning in input_log, output_log, dump_log when no argument and telnet connection 
+
+1.03    2011-08-24
+	* Implemented eof() method
+	* Corrected sleep timer in readwait() which was doing non-blocking reads much faster than 0.1 seconds intervals
+	* Corrected read() which was not logging to input/dump logs in non-blocking mode for SSH & Serial, if read buffer was "0"
+	* Login stage variable was not re-initialized correctly after a disconnect(); could cause errors on subsequent login()
+
+1.04    2013-01-04
+	* Reversed a change made in 1.03 under readwait, older versions of Perl generate a warning when doing length(undef)
+	* Net-SSH2's eof does not seem to work; modified eof method to make it behave consistently for both Telnet & SSH
+	* SSH stderr is now merged onto regular channel; using Net-SSH2 ext_data('merge') call
+	* Implemented ssh_channel() method to be able to return underlying SSH channel object
+	* Module now detects errors from SerialPort's read_const_time used before reads and updates eof
+	* When errmode() is set to $arrayref the error message is now appended as the last argument to &$coderef
+	* Added an interactive mode to the test script so that a connection to a device can be easily tested after installation
+	* Enhanced alternative form of login() method allows login sequence/banner to be captured and returned
+	* Modified default login/password prompts expected by login() method
+	* Implemented break() method
+	* No more calls to debug() method when the debug level is not changed; eliminates carping from Device::SerialPort
+
+1.05    2013-08-25
+	* As of this version, Telnet & SSH connections can now be run over IPv6, as long as IO::Socket::IP is installed
+	* SSH failed connection now gives error message "SSH unable to connect" instead of "SSH unable to password authenticate"
+	* Net-SSH2 (libssh2) eof still not working, and now returning a different error on disconnection; updated eof method
+	* Some devices have a crude SSH implementation with no authentication and instead use an interactive login after the SSH
+	  connection is established (just like Telnet does); the connect() method is now changed to allow these SSH connections
+	* Added connection_timeout for Telnet and SSH connections; previously no consistent connection timeout was enforced
+	* Method connect() now accepts '$host [$port]' which will work for IPv6 addresses; syntax '$host[:$port]' is deprecated
+	* Serial port disconnect() now flushes recent writes before closing the connection; needed with Device::SerialPort
+	* Method waitfor() now catches invalid Perl regular expression patterns passed to it and performs the error mode action
+	* Added a flush_credentials method to undefine stored credentials
+	* Code changes to pass Perl Critic severity 4 and above violations
+
+1.06	2014-04-21
+	* Method login() in list context did not return output received from host device if the login failed
+	* Version 1.05 on MSWin32 was not working anymore with newest Net::Telnet 3.04 (due to bug id 94913); added workaround
+
+2.00	2014-12-31
+	* As of this version, methods connect(), login(), cmd() and waitfor() support a non-blocking mode for
+	  which they now have a poll method: connect_poll(), login_poll(), cmd_poll() and waitfor_poll()
+	* New generic non-blocking poll() object/class method to poll multiple objects of this class simultaneously
+	* Method waitfor() was incorrectly setting s option on match, i.e. treating string as single line (. matches a newline)
+	* Method change_baudrate() was incorrectly returning undef if the requested baudrate was already set
+	* Error mode 'die' would always show CLI.pm as the die file and not the actual file where the error occurred
+	* Error message for blocking read() timeout was incorrectly reported as "Received eof from connection"
+	* Timer for readwait() method, previously hard coded to 100 millisecs, is now configurable via readwait_timer() method
+	* Method break() now accepts a configurable duration argument for generating break signal over serial port connections
+	* Prompt_credentials now resets Term::ReadKey ReadMode to whatever was in use before calling connect() / login()
+	* Debug levels are now bit based; only bits 1 & 2 are defined in this class; new debugMsg() method for sub-classes
+	* Added a socket method to return the IO::Socket::IP or IO::Socket::INET object
+	* Fixed "Can't call method "ext_data" on an undefined value at Control/CLI.pm line X" which was caused by SSH
+	  connecting to a device that only accepts publickey authentication, with no keys provided
+	* SSH & Serial, methods input_log, output_log and dump_log were not returning the filehandle when called with no arguments
+	* All methods now handle error mode correctly if called before a connection is established or after disconnect
+	* Added a connected() method to check status of connection
+	* Carp messages from Win32::SerialPort are now always suppressed, unless debug level is active on bit1
+	* Method change_baudrate() now can also be used to change Parity, Databits, Stopbits and Handshake settings
+	* Method read(Blocking => 1, Timeout => $secs) using Device::SerialPort was ignoring the Timeout argument
+	* SSH connect() is now able to also handle keyboard-interactive authentication method 
+
+2.01	2015-03-08
+	* poll_read() and poll_readwait() were not catching errors from non-blocking read in non-blocking poll mode
+	* change_baudrate() was not working properly on some devices; had to add a 100ms delay between tearing down and restarting
+	  the connection; to avoid this delay in non-blocking mode, the method is now pollable via new poll_change_baudrate()
+	* prompt_credentials can now be set either as a code ref or as an array ref where the 1st element is a code ref
+	* poll() poll_code argument will now also accept an array ref where the 1st element is a code ref
+	* 2.00 destroy method could cause: (in cleanup) Can't call method X on an undefined value ... during global destruction
+
+2.02	2016-02-07
+	* Added data_with_error() and argument to readwait() for handling case where some data is read followed by a read error
+	* Sub-classing method syntax changed to more flexible hash style arguments (old list style format still accepted)
+	* Added match_list argument to waitfor() method
+	* When setting error mode or prompt_credentials or poll() poll_code to an array ref with 1st element a code ref, this was
+	  working on the first call but not in subsequent calls as the array was shifted in callCodeRef during the first call
+	* Sub-classing method poll_readwait() was incorrectly triggering error mode action twice on non-blocking read error
+	* Net::Telnet always appends a null character to carriage returns which are not followed by a line feed, which becomes
+	  a problem (inability to login) when the output_record_separator is set to just carriage return, as required by certain
+	  devices. Control::CLI is now enhanced with logic to prevent Net::Telnet from behaving in that manner. The new logic
+	  consists of resetting Net::Telnet's telnetmode to 0 for the duration of any transmits over the Telnet connection.
+	  This new logic only applies to Telnet use and only when output_record_separator() has been set to just carriage return
+	* Added terminal_type() and window_size() methods to negotiate terminal parameters for both SSH and Telnet connections
+	* Added ssh_authentication() method to indicate the ssh authentication used: publickey, password or keyboard-interactive
+
+2.03	2016-04-20
+	* Methods input_log(), output_log() and dump_log(), when called with no argument were not returning the open filehandle
+	  but an undefined or empty value; this problem was happening only for Telnet connections
+	* Added callback argument to connect() which can be used to verify the SSH host key against a list of known host keys
+	* Added errmsg_format() method and argument to errmsg(); it is now possible to specify the format of error messages
+	* Added host() method to retrieve hostname or IP address which was supplied to connect()

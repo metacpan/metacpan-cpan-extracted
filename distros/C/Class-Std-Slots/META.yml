@@ -1,0 +1,23 @@
+---
+name: Class-Std-Slots
+version: 0.31
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Provide signals and slots for standard classes.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Std-Slots
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Class--Std--Slots.git
+requires:
+  Class::Std: 0
+  Test::More: 0
+  version: 0
+provides:
+  Class::Std::Slots:
+    file: lib/Class/Std/Slots.pm
+    version: 0.31
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

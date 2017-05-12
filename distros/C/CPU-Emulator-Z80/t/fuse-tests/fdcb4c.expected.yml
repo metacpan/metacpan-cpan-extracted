@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb4c
+registers:
+  AF: 19068
+  AF_: 0
+  BC: 7771
+  BC_: 0
+  DE: 48686
+  DE_: 0
+  HL: 16100
+  HL_: 0
+  I: 0
+  IX: 44921
+  IY: 32546
+  PC: 4
+  R: 2
+  SP: 0

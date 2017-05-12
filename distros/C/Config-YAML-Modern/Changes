@@ -1,0 +1,28 @@
+Revision history for Config-YAML-Modern
+
+0.34		2011/08/25
+				New interface, old method names mark as deprecated, fix docs
+
+0.32		2011/07/29
+				Fix searching files without extention, fix doc
+
+0.31		2011/07/01
+				Fix 'error on parsing file |t/data/empty|', fix misstyping in doc
+
+0.29		2011/06/28
+				Big improve - add 'ignore_empty_file' property.
+
+0.27		2011/06/28
+				Fix method dive - now its wrapper on Data::Diver->Dive and allow wrong/non-existanse path
+				Add strict version dive_die - its wrapper on Data::Diver->DiveDie and die if path wrong/non-existanse.
+
+0.23		2011/06/27
+				Fix misstyping key_conversation -> key_conversion property
+
+0.21		2011/06/27
+				Add methods: hash_add, file_add, dir_add.
+				Improve test and documentation
+
+0.15    2011/06/26
+        First version, beta-version with documentation.
+

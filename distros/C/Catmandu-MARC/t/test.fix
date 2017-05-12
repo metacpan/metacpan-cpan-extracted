@@ -1,0 +1,35 @@
+marc_map('001', 'my.id')
+marc_map('245a', 'my.title')
+marc_map('666', 'my.references.$append')
+
+marc_map('001/3-5', 'my.substr_id')
+marc_map('001/3-5', 'my.substr_id2',split:1)
+marc_map('001/1003-1005', 'my.failed_substr_id')
+
+marc_map('245', 'my.split_title', split:1)
+
+add_field('my.found005',0)
+
+if marc_match('005','20000613133448.0')
+	set_field('my.found005',1)
+end
+
+add_field('my.found008','0')
+
+if marc_match('008_/6-7','s')
+	set_field('my.found008','1')
+end
+
+marc_map('050ba','my.pluck', pluck:1)
+
+marc_map('245','my.has_title', value:'Y')
+
+marc_map('245','my.has_title', value:'Y')
+
+marc_map('260c','has_260c', value:'OK')
+marc_map('260h','has_260h', value:'BAD')
+
+marc_map('500^c','has_500_not_c', value: 'OK')
+marc_map('500^a','has_500_not_a', value: 'BAD')
+
+marc_xml('record')

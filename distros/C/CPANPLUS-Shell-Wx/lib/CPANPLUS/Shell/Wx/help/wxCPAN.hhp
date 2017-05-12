@@ -1,0 +1,26 @@
+[OPTIONS]
+Auto Index=Yes
+Auto TOC=9
+Compatibility=1.0
+Compiled file=wxCPAN.chm
+Contents file=contents.hhc
+Default topic=index.html
+Display compile progress=Yes
+Enhanced decompilation=Yes
+Error log file=o:\wxCPANPLUS\CPANPLUS-Shell-Wx-0.01\lib\CPANPLUS\Shell\Wx\help\wxCPAN-hhw.log
+Full-text search=Yes
+Index file=wxCPAN.hhk
+Language=0x409 English (United States)
+Title=wxCPAN Help
+
+
+[FILES]
+index.html
+info_pane.html
+menubar.html
+notebook.html
+searching.html
+toolbar.html
+
+[INFOTYPES]
+

@@ -1,0 +1,37 @@
+Class::FakeAttributes
+
+Provide fake attributes for non-hash-based objects
+
+version 0.01
+
+Most Perl classes use hash-based objects, and subclasses can easily add more
+attributes (instance data) with new hash keys.  But some classes are not based
+on hashes.  A subclass of such a class can use "Class::FakeAttributes" to add
+attributes (or at least to emulate doing so).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   perl Build
+   perl Build install
+
+For more details see Module::Build.
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  NEXT
+  Module::Build
+
+
+COPYRIGHT
+
+(c) Copyright Smylers 2003.  All rights reserved.  This module is software
+libre.  It may be used, redistributed, or modified under the terms of the
+Artistic License (the unnumbered version that comes with Perl 5.6.1, among
+others) or the GNU General Public License version 2.

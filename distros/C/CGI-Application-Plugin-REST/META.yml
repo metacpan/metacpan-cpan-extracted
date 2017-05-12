@@ -1,0 +1,30 @@
+---
+abstract: 'Helps implement RESTful architecture in CGI applications'
+author:
+  - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
+build_requires:
+  CGI::Application::Plugin::DevPopup: 0
+  Test::LongString: 0
+  Test::WWW::Mechanize::CGIApp: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-REST
+provides:
+  CGI::Application::Plugin::REST:
+    file: lib/CGI/Application/Plugin/REST.pm
+    version: 0.3
+requires:
+  CGI::Application: 4.04
+  REST::Utils: 0.4
+  perl: 5.008
+resources:
+  homepage: http://jaldhar.github.com/CGI-Application-Plugin-REST
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jaldhar/CGI-Application-Plugin-REST
+version: 0.3

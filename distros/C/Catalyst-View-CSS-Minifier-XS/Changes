@@ -1,0 +1,41 @@
+Revision history for Catalyst-View-CSS-Minifier-XS
+
+2.000002  2013-05-07 18:36:56 CST6CDT
+         Fix path munging regex to only grab extensions (William Lang)
+         Abandon RT
+
+2.000001  2012-11-17 17:17:49 CST6CDT
+         Put MetaYAML back in dist
+
+2.000000  2011-03-01 22:48:09 CST6CDT
+         Add last-modified header for great justice (rbuels)
+         Rename 'path' config var to 'css_dir' (with an alias for
+         backcompat).  Path is too easy to
+         confuse with other kinds of paths.
+         Stop using RJBS-versions
+         Fix module such that the debug output only shows if the
+           server is in debug mode
+
+1.093530  2009-12-19 15:55:43 CST6CDT
+         Add autodie so you get errors for js files that don't exist
+
+1.093050    2009-11-01 1:26 AM, CST
+               Don't duplicate pod.  It looks ridiculous.
+
+1.093030    2009-10-30 3:36 AM, CST
+                Significant changes migrated from sister module
+                C::V::JavaScript::Minifier::XS.  Mostly to the end
+                user this means that:
+                Configuration will work from all correct places
+                and referrers are necesary as often
+
+0.03    23.02.2009/13:25
+                [bugfix] when no files parsed print nothing
+
+0.02  18.02.2009/13:00
+      Shows nothing when no referer
+      Added helper
+
+0.01    23.12.2008/16:54
+        First version, released on an unsuspecting world.
+

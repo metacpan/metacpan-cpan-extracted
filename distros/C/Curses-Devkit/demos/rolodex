@@ -1,0 +1,1035 @@
+#!../../../perl
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Declare global variables.
+$GGroupInfoChanged = 0;
+@GLineType = ("Voice", "Cell", "Pager", 
+			"First FAX", "Second FAX", "Third FAX",
+			"First Data Line", "Second Data Line", "Third Data Line");
+
+# Create the menu list items.
+my $fMenu = ["</5/B>File", "</5/B>Open   ", "</5/B>Save   ", "</5/B>Save As", "</5/B>Quit   "];
+my $eMenu = ["</5/B>Groups", "</5/B>New   ", "</5/B>Open  ", "</5/B>Delete"];
+my $pMenu = ["</5/B>Print", "</5/B>Print Rolodex"];
+my $hMenu = ["</5/B>Help", "</5/B>About Rolodex     ", "</5/B>Rolodex Statistics"];
+my $menulist = [$fMenu, $eMenu, $pMenu, $hMenu];
+my $menuloc = ["LEFT", "LEFT", "LEFT", "RIGHT"];
+
+# Create the menu object.
+my $menu = new Cdk::Menu ('Menulist' => $menulist, 'Menuloc' => $menuloc);
+$menu->draw();
+
+# Create the title.
+my @title = ("<C></16/U>Cdk/Perl5 Rolodex", "<C></16>Written by Mike Glover");
+my $rolodexTitle = new Cdk::Label ('Message' => \@title, 'Box' => "FALSE");
+$rolodexTitle->draw("Box" => "FALSE");
+
+# Load up the RC file.
+my $filename = $ENV{"HOME"} . "/.rolorc";
+my $dbmDir = $ENV{"HOME"} . "/.rolodex";
+my %groupInfo = readRCFile ($filename);
+my $groupCount = keys %groupInfo;
+
+# Pop up a message stating how many groups were loaded.
+if ($groupCount == 0)
+{
+   my $groupMessage = ["</B>Empty rolodex RC file. No groups loaded.",
+			"<C></B>Press any key to continue."];
+   popupLabel ($groupMessage);
+}
+elsif ($groupCount == 1)
+{
+   my $groupMessage = ["</B>There was 1 group loaded from the RC file.",
+			"<C></B>Press any key to continue."];
+   popupLabel ($groupMessage);
+}
+else
+{
+   my $groupMessage = ["</B>There were $groupCount groups loaded from the RC file.",
+			"<C></B>Press any key to continue."];
+   popupLabel ($groupMessage);
+}
+
+# Start the main loop
+for (;;)
+{
+   # Activate the object.
+   my ($menuItem, $submenuItem) = $menu->activate();
+  
+   # Make sure they didn't hit escape.
+   next if ! defined $menuItem;
+
+   # Determine which menuitem was selected.
+   if ($menuItem == 0)
+   {
+      if ($submenuItem == 1)
+      {
+         # Open a new RC file.
+         my $fselect = new Cdk::Fselect ('Label' => "Filename:",
+						'Height' => 20,
+						'Width' => 55);
+         my $file = $fselect->activate();
+         undef $fselect;
+
+         # Make sure they chose a file.
+         if (defined $file)
+         {
+            my %tmpGroup = readRCFile ($file);
+
+            # Check the results.
+            if (! defined %tmpGroup)
+            {
+               my $mesg = ["<C></16>There were too many errors in the file", 
+				"<C></16>$file.",
+				"<C></16>Are you sure it is a rolodex RC file?"];
+               popupLabel ($mesg);
+            }
+            else
+            {
+               %groupInfo = %tmpGroup;
+            }
+         }
+      }
+      elsif ($submenuItem == 2)
+      {
+         # Save the RC file.
+         saveRCFile ($filename, %groupInfo);
+      }
+      elsif ($submenuItem == 3)
+      {
+         # Save As...
+         my $entry = new Cdk::Entry ('Label' => "</24/B>Save As",
+					'Max' => 256,
+					'Width' => 20,
+					'Min' => 2,
+					'Filler' => "_");
+         $filename = $entry->activate();
+
+         # Check if they supplied a value.
+         if (!defined $filename)
+         {
+            my $mesg = ["<C>No name provided.", "<C>Information not saved."];
+            popupLabel ($mesg);
+         }
+         else
+         {
+            saveRCFile ($filename, %groupInfo);
+         }
+         undef $entry;
+      }
+      elsif ($submenuItem == 4)
+      {
+         # Quit
+         saveRCFile ($filename, %groupInfo) if $GGroupInfoChanged == 1;
+         exit;
+      }
+   }
+   elsif ($menuItem == 1)
+   {
+      if ($submenuItem == 1)
+      {
+         my %tmp = addRolodexGroup (%groupInfo);
+         %groupInfo = %tmp;
+      }
+      elsif ($submenuItem == 2)
+      {
+         useRolodexGroup (%groupInfo);
+      }
+      elsif ($submenuItem == 3)
+      {
+         my %tmp = deleteRolodexGroup (%groupInfo);
+         %groupInfo = %tmp;
+      }
+   }
+   elsif ($menuItem == 2)
+   {
+      printRolodexGroups (%groupInfo);
+   }
+   elsif ($menuItem == 3)
+   {
+      if ($submenuItem == 1)
+      {
+         # About rolodex.
+         my $roloInfo = ["<C></U>About Cdk/Perl5 Rolodex", "",
+			"This demo was written to demonstrate the widgets",
+			"available with the Cdk Perl5 extension. Not all of",
+			"the Cdk widgets are used, but most of them have",
+			"been. I hope this little demonstration helps give",
+			"you an understanding of what the Cdk Perl5",
+			"extension offers.", "Have fun with it.", "",
+			"ttfn,", "<C>Mike", "<C><#HL(30)>", "<C>March 1996"];
+         popupLabel ($roloInfo);
+      }
+      elsif ($submenuItem == 2)
+      {
+         # Rolodex statistics.
+         my $groupCount = keys %groupInfo;
+         my $roloInfo = ["<C></U>Rolodex Statistics",
+			"</R>Read Command Filename<!R> </U>$filename",
+			"</R>Group Count          <!R> </U>$groupCount"];
+         popupLabel ($roloInfo);
+      }
+   }
+}
+
+#
+# This reads an RC file.
+#
+sub readRCFile 
+{
+   my $filename = shift;
+   my %groupList = ();
+
+   # Open the RC file.
+   open (FILE, $filename) || return (0,"");
+
+   # Start ripping through the file.
+   for $row (<FILE>)
+   {
+      # Ingore comments and white space.
+      next if ($row =~ /^#/);
+      next if ($row =~ /^$/);
+      chomp $row;
+
+      # Split the line.
+      my @tmp = split (//, $row);
+      
+      # Check if the file is in the correct format.
+      if ($#tmp == 2)
+      {
+         $groupList{$tmp[0]} = "$tmp[1]$tmp[2]";
+      }
+   }
+   return %groupList;
+}
+
+#
+# This saves the group information to a RC file.
+#
+sub saveRCFile 
+{
+   my ($filename, %info) = @_;
+   my $date = qx (date);
+   my $count = 0;
+
+   # Open the file.
+   if (!open (FILE, ">$filename"))
+   {
+      my $mesg = ["<C>Could not write RC file to",
+			"<C>$filename", "<C>Try </R>Save As<!R> option."];
+      popupLabel ($mesg);
+      return;
+   }
+
+   # Attach the header to the file.
+   print FILE "#\n";
+   print FILE "# This file was automatically created on $date";
+   print FILE "#\n";
+
+   # Start writing the info to the file.
+   foreach $name (keys %info)
+   {
+      print FILE "$name$info{$name}\n";
+      $count++;
+   }
+
+   # Close the file.
+   close (FILE);
+
+   # Pop up a little message.
+   if ($count == 1)
+   {
+      my $mesg = ["<C>There was 1 group saved to file",
+			"<C>$filename", "<C>Press any key to continue."];
+      popupLabel ($mesg);
+   }
+   else
+   {
+      my $mesg = ["<C>There were $count groups saved to file",
+			"<C>$filename", "<C>Press any key to continue."];
+      popupLabel ($mesg);
+   }
+   
+   # Reset the global flag.
+   $GGroupInfoChanged = 0;
+   return;
+}
+
+#
+# This adds a new rolodex group to the current list of rolodex groups.
+#
+sub addRolodexGroup
+{
+   my (%info) = @_;
+   my $description;
+   
+   # Create the entry fields.
+   my $name = new Cdk::Entry ('Label' => "</R>   New Group Name",
+				'Width' => 20,
+				'Filler' => "_",
+				'Min' => 2,
+				'Max' =>256,
+				'Ypos' => 8);
+   my $desc = new Cdk::Entry ('Label' => "</R>Group Description",
+				'Width' => 20,
+				'Filler' => "_",
+				'Min' => 2,
+				'Max' =>256,
+				'Ypos' => 11);
+
+   # Get the group name.
+   my $newName = $name->activate();
+
+   # Did they send in a name.
+   if (!defined $newName)
+   {
+      my $mesg = ["<C>No name provided.", "<C>Group not added."];
+      popupLabel ($mesg);
+      return %info;
+   }
+   else
+   {
+      # Check if the group already exists.
+      if (defined $info{$newName})
+      {
+         my $mesg = ["<C>Sorry the group ($newName) already exists."];
+         popupLabel ($mesg);
+         return %info;
+      }
+   }
+				
+   # Get the group description.
+   while (!defined $description)
+   {
+      $description = $desc->activate();
+
+      # If there is no description given then tell them they need one.
+      if (!defined $description)
+      {
+         popupLabel (["The group has to have a description."]);
+         $name->draw();
+      }
+   }
+
+   # Create the DBM filename.
+   my $dbm = "${dbmDir}/${newName}.phl";
+
+   # Add it to the groupList.
+   $info{$newName} = "${description}${dbm}";
+   $GGroupInfoChanged = 1;
+
+   return %info;
+}
+
+#
+# This allows a user to open and play with a rolodex group.
+#
+sub useRolodexGroup
+{
+   my (%info) = @_;
+   my @list = ();
+
+   # Pick which group to open.
+   my $name = pickRolodexGroup ("<C></U>Open Rolodex Group", %info);
+   return if (! defined $name);
+
+   # Read the group database.
+   my $database = (split (//, $info{$name}))[1];
+   my @rolodexData = readPhoneDataFile ($database);
+
+   # Create the list.
+   for ($x=0; $x <= $#rolodexData; $x++)
+   {
+      my $name = $rolodexData[$x]->{'Name'};
+      my $type = $GLineType[$rolodexData[$x]->{'Type'}];
+      push (@list, "</B/40>$name ($type)");
+   }
+   my $height = ($#rolodexData > 5 ? 8 : $#rolodexData+4);
+
+   # Create the help window.
+   my $helpMesg = ["<C><#HL(30)",
+			"Press </B>?<!B> to get detailed help.",
+			"<C><#HL(30)>"];
+   my $helpWindow = new Cdk::Label ('Message' => $helpMesg, 
+					'Box' => "FALSE",
+					'Xpos' => "BOTTOM");
+   $helpWindow->draw('Box' => "FALSE");
+
+   # If the list if empty, ask them if they want to add an entry.
+   if ($#list < 0)
+   {
+      my $mesg = ["<C>There were no entries in this group.",
+			"<C>Do you want to add a new listng?"];
+      my $buttons = ["<<Yes>>", "<<No>>"];
+
+      # Go ahead and ask.
+      if (popupDialog ($mesg, $buttons) == 0)
+      {
+         # Get the new record.
+         my $newRecord = getNewPhoneRecord();
+         if (defined $newRecord)
+         {
+            my $name = $newRecord->{'Name'};
+            my $type = $GLineType [$newRecord->{'Type'}];
+            $rolodexData[0] = $newRecord;
+            push (@list, "$name ($type)");
+         }
+         else
+         {
+            return;
+         }
+      }
+      else
+      {
+         return;
+      }
+   }
+
+   # Create the scrolling list.
+   my $scroll = new Cdk::Scroll ('Title' => "<C></48>Listing of Group </U>$name",
+					'Height' => $height,
+					'Width' => 50,
+					'Numbers' => "TRUE",
+					'List' => \@list);
+
+   # Create a key binding for the widget.
+   $scroll->bind ('Key' => '?', 'Function' => sub {rolodexHelpCB();});
+   $scroll->bind ('Key' => 'i', 'Function' => sub {insertPhoneEntryCB($scroll, \@rolodexData, \@list);});
+   $scroll->bind ('Key' => 'd', 'Function' => sub {deletePhoneEntryCB($scroll, \@rolodexData, \@list);});
+
+   # Do this until they hit escape.
+   for (;;)
+   {
+      # Let the user play.
+      $selection = $scroll->activate();
+      last if !defined $selection;
+
+      # Display the phone record.
+      displayPhoneRecord ($rolodexData[$selection]);
+   }
+
+   # Save the information into the file.
+   if (!open (FILE, ">$database"))
+   {
+      my $mesg = ["<C>Can not save phone information to",
+			"<C></U>$database", "<C>$!",
+			"<C>Press any key to continue."];
+      popupLabel ($mesg);
+   }
+
+   # Start writing.
+   my $date = qx (date);
+   print FILE "#\n";
+   print FILE "# This file was automatically generated on $date";
+   print FILE "#\n";
+   for ($x=0; $x <= $#rolodexData; $x++)
+   {
+     my $object = $rolodexData[$x];
+     print FILE "$object->{'Name'}$object->{'Type'}$object->{'Number'}$object->{'Address'}$object->{'City'}$object->{'Province'}$object->{'Postal Code'}$object->{'Description'}\n";
+   }
+   close FILE;
+   undef $scroll;
+}
+
+#
+# This deletes a rolodex group from the given list.
+#
+sub deleteRolodexGroup
+{
+   my (%info) = @_;
+
+   # Pick which group to delete.
+   my $name = pickRolodexGroup ("<C></U>Delete Which Rolodex Group?", %info);
+   if (! defined $name)
+   { 
+      my $mesg = ["<C>   Delete Canceled   ", "<C>No Group Deleted"];
+      popupLabel ($mesg);
+      return;
+   }
+
+   # Confirm the delete
+   my $mesg = ["<C></U>Confirm Delete", 
+		"<C>Are you sure you want to delete the group",
+		"<C></R>$name<!R>?"];
+   my $buttons = ["<<No>>", "<<Yes>>"];
+   if (popupDialog ($mesg, $buttons) == 1)
+   {
+      # Delete the group.
+      my $dbm = (split (//, $info{$name}))[1];
+      delete $info{$name};
+      unlink $dbm;
+      $GGroupInfoChanged = 1;
+   }
+   return %info;
+}
+
+#
+# This allows the user to pick a rolodex group.
+#
+sub pickRolodexGroup
+{
+   my ($title, %info) = @_;
+   my @list = ();
+   my $height = keys %info;
+   my @items = sort keys %info;
+
+   # Create the scrolling list item list.
+   foreach $item (@items)
+   {
+      push (@list, "<C></24>$item");
+   }
+
+   # Determine the height of the scrolling list.
+   if ($height > 5)
+   {
+      $height = 5;
+   }
+   $height += 3;
+
+   # Create the scrolling list.
+   my $scroll = new Cdk::Scroll ('Title' => "$title",
+					'Height' => $height,
+					'Width' => 50,
+					'List' => \@list);
+   my $item = $scroll->activate();
+   
+   return $items[$item] if (defined $item);
+   return;
+}
+
+#
+# This reads a phone data file and stores it in an object.
+#
+sub readPhoneDataFile
+{
+   my ($database) = @_;
+   my @phoneRecords = ();
+
+   # Open the database.
+   if (!open (DB, $database))
+   {
+      my $mesg = ["<C></R>Error",
+			"<C>Could not open the database",
+			"<C>$database", "<C></U>$!", "",
+			"<C>Press any key to continue."];
+      popupLabel ($mesg);
+      return;
+   }
+   
+   # Start scanning through the file.
+   foreach $row (<DB>)
+   {
+      next if $row =~ /^#/;
+      next if $row =~ /^$/;
+      chomp $row;
+
+      # Split the row and create an object.
+      my $object = new PhoneData ($row);
+      push (@phoneRecords, $object);
+   }
+   return @phoneRecords;
+}
+
+#
+# This is a callback to the scrolling list.
+#
+sub rolodexHelpCB
+{
+   my $mesg = ["<C></R>Rolodex Phone Editor",
+		"</B>i      <!B> Inserts a new phone entry.",
+		"</B>d      <!B> Deletes the currently selected phone entry.",
+		"</B>Escape <!B> Exits the scrolling list.",
+		"</B>?      <!B> Pops up this help window."];
+   popupLabel ($mesg);
+}
+
+#
+# This displays a phone record.
+#
+sub displayPhoneRecord
+{
+   my $record = shift;
+   my $type = $GLineType[$record->{'Type'}];
+   my $mesg = "";
+
+   # Assemble the phone record details.
+   if ($type =~ /cell/i || $type =~ /pager/i)
+   {
+      $mesg = ["<C></U>$type Phone Record",
+		"</B/5>Name        <!B!5>$record->{'Name'}",
+		"</B/5>Phone Number<!B!5>$record->{'Number'}",
+		"</B/5>Comment     <!B!5>$record->{'Description'}"];
+   }
+   else
+   {
+      $mesg = ["<C></U>$type Phone Record",
+		"</B/5>Name        <!B!5>$record->{'Name'}",
+		"</B/5>Phone Number<!B!5>$record->{'Number'}",
+		"</B/5>Address     <!B!5>$record->{'Address'}",
+		"</B/5>City        <!B!5>$record->{'City'}",
+		"</B/5>Province    <!B!5>$record->{'Province'}",
+		"</B/5>Postal Code <!B!5>$record->{'Postal Code'}",
+		"</B/5>Comment     <!B!5>$record->{'Description'}"];
+   }
+   popupLabel ($mesg);
+}
+
+#
+# This gets a new phone record.
+#
+sub getNewPhoneRecord
+{
+   my @list = ();
+   my ($record, $type);
+
+   # Create a list.
+   foreach $item (@GLineType)
+   {
+      push (@list, "<C></U>$item");
+   }
+
+   # Create the title label.
+   my $mesg = ["<C></R>Add New Phone Record"];
+   my $title = new Cdk::Label ('Message' => $mesg, 
+				'Box' => "FALSE",
+				'Xpos' => "TOP");
+   $title->draw ('Box' => "FALSE");
+ 
+   # Ask the user what type of line it it.
+   my $itemList = new Cdk::Itemlist ('Label' => "What Type Of Line Is It?",
+					'List' => \@list);
+
+   while (!defined $type)
+   {
+      $type = $itemList->activate();
+
+      if (!defined $type)
+      {
+         popupLabel (["Please specify a line type."]);
+      }
+   }
+   undef $itemList;
+
+   # Given the type, ask certain questions.
+   if ($GLineType[$type] =~ /Cell/ || $GLineType[$type] =~ /Pager/)
+   {
+      $record = getSmallPhoneRecord($type);
+   }
+   else
+   {
+      $record = getLargePhoneRecord($type);
+   }
+   return $record;
+}
+
+#
+# This gets a small phone record.
+#
+sub getSmallPhoneRecord
+{
+   my $type = shift;
+   my $mesg = ["<C></U>Confirm New Phone Entry", 
+		"<C>Do you want to add this phone number?"];
+   my $buttons = ["<<Add Phone Number>>",
+			"<<Cancel>>", "<<Modify Information>>"];
+   my ($name, $unmixedPhone, $desc);
+
+   # Create the entry fields.
+   my $nameEntry = new Cdk::Entry ('Label' => "</R>Name",
+					'Ypos' => 8,
+					'Width' => 20,
+					'Min' => 2,
+					'Max' => 256,
+					'Filler' => "_");
+   my $phoneTemp = new Cdk::Template ('Label' => "</R>Number",
+					'Plate' => "(###) ###-####",
+					'Overlay' => "(___) ___-____",
+					'Ypos' => 11);
+   my $descEntry = new Cdk::Entry ('Label' => "</R>Description",
+					'Ypos' => 14,
+					'Width' => 20,
+					'Min' => 2,
+					'Max' => 256,
+					'Filler' => "_");
+
+   # Start the loop.
+   for (;;)
+   {
+      # Draw the objects.
+      $nameEntry->draw();
+      $phoneTemp->draw();
+      $descEntry->draw();
+
+      # Get the information.
+      $name = $nameEntry->activate();
+      $unmixedPhone = $phoneTemp->activate();
+      $desc = $descEntry->activate();
+
+      # Make sure they want to add this number.
+      my $answer = popupDialog ($mesg, $buttons);
+      last if $answer == 0;
+      return if $answer == 1;
+   }
+
+   # Assemble the information and create the object.
+   my $phone = $phoneTemp->mix();
+   my $temp = "$name$type$phone----$desc";
+   my $object = new PhoneData ($temp);
+   return $object;
+}
+
+#
+# This gets a large phone record.
+#
+sub getLargePhoneRecord
+{
+   my $type = shift;
+   my $mesg = ["<C></U>Confirm New Phone Entry", 
+		"<C>Do you want to add this phone number?"];
+   my $buttons = ["<<Add Phone Number>>",
+			"<<Cancel>>", "<<Modify Information>>"];
+   my ($name, $address, $city, $prov, $postal, $unmixedPhone, $desc);
+
+   # Create the widgets.
+   my $nameEntry = new Cdk::Entry ('Label' => "</R>Name",
+					'Ypos' => 5, 'Xpos' => "LEFT",
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 20);
+   my $addressEntry = new Cdk::Entry ('Label' => "</R>Address",
+					'Ypos' => 5, 'Xpos' => "RIGHT",
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 40);
+   my $cityEntry = new Cdk::Entry ('Label' => "</R>City",
+					'Ypos' => 8, 'Xpos' => "LEFT",
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 20);
+   my $provEntry = new Cdk::Entry ('Label' => "</R>Province",
+					'Ypos' => 8, 'Xpos' => 29,
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 15);
+   my $postalEntry = new Cdk::Entry ('Label' => "</R>Postal Code",
+					'Ypos' => 8, 'Xpos' => "RIGHT",
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 10,
+					'Dtype' => "UMIXED");
+   my $phoneTemp = new Cdk::Template ('Label' => "</R>Number",
+					'Ypos' => 11, 'Xpos' => "LEFT",
+					'Overlay' => "(___) ___-____",
+					'Plate' => "(###) ###-####");
+   my $descEntry = new Cdk::Entry ('Label' => "</R>Description",
+					'Ypos' => 11, 'Xpos' => "RIGHT",
+					'Min' => 2, 'Max' => 256,
+					'Filler' => "_", 'Width' => 20);
+
+   # Start the loop.
+   for (;;)
+   {
+      # Draw the screen.
+      $nameEntry->draw();
+      $addressEntry->draw();
+      $cityEntry->draw();
+      $provEntry->draw();
+      $postalEntry->draw();
+      $phoneTemp->draw();
+      $descEntry->draw();
+
+      # Get the information.
+      $name = $nameEntry->activate();
+      $address = $addressEntry->activate();
+      $city = $cityEntry->activate();
+      $prov = $provEntry->activate();
+      $postal = $postalEntry->activate();
+      $unmixedPhone = $phoneTemp->activate();
+      $desc = $descEntry->activate();
+
+      # Make sure they want to add this number.
+      my $answer = popupDialog ($mesg, $buttons);
+      last if $answer == 0;
+      return if $answer == 1;
+   }
+
+   # Assemble the information and create the object.
+   my $phone = $phoneTemp->mix();
+   my $temp = "$name$type$phone$address$city$prov$postal$desc";
+   my $object = new PhoneData ($temp);
+   return $object;
+}
+
+#
+# This inserts an entry into the phone scrolling list.
+#
+sub insertPhoneEntryCB 
+{
+   my ($scroll, $data, $list) = @_;
+   my ($size, $currentItem) = $scroll->info();
+   my $itemName = $list->[$currentItem];
+
+   # Erase the scrolling list.
+   $scroll->erase();
+
+   # Get a new phone record.
+   my $newRecord = getNewPhoneRecord();
+
+   # Make sure there is a record to add.
+   if (!defined $newRecord)
+   {
+      $scroll->draw();
+      return;
+   }
+
+   # Push the information onto the record array.
+   push (@$data, $newRecord);
+
+   # Push the information onto the list array.
+   my $name = $newRecord->{'Name'};
+   my $namedTyped = $GLineType[$newRecord->{'Type'}];
+   my $temp = "$name ($namedTyped)";
+   push (@$list, $temp);
+
+   # Add it to the scrolling list.
+   $scroll->add ('Item' => $temp);
+   $scroll->draw();
+}
+
+#
+# This deletes an entry from a scrolling list.
+#
+sub deletePhoneEntryCB 
+{
+   my ($scroll, $data, $list) = @_;
+   my ($size, $currentItem) = $scroll->info();
+   my $itemName = $list->[$currentItem];
+   my $buttons = ["<<No>>", "<<Yes>>"];
+   my $mesg = ["Do you really want to delete the phone entry",
+		"<C></R>$itemName"];
+   my @array = @$data;
+
+   # Ask the user if they really want to delete this item.
+   if (popupDialog ($mesg, $buttons) == 1)
+   {
+      # Nuke it.
+      $scroll->delete ('Position' => $currentItem);
+ 
+      # Remove it from the arrays.
+      for ($x=$currentItem; $x < $#array; $x++)
+      {
+         $data->[$x] = $data->[$x+1];
+         $list->[$x] = $list->[$x+1];
+      }
+      pop (@$data);
+      pop (@$list);
+   }
+   $scroll->erase();
+   $scroll->draw();
+}
+
+#
+# This prints out certain rolodex groups.
+#
+sub printRolodexGroups
+{
+   my (%groupInfo) = @_;
+   my $options = ["Print to Printer ", "Print to File ", "Don't Print "];
+   my $title = "<C></U>Select Which Groups To Print";
+   my @list = ();
+   my ($height, $filename);
+
+   # Create the group list to print.
+   foreach $key (sort keys %groupInfo)
+   {
+      push (@list, $key);
+   }
+
+   # Determine the height of the selection box.
+   $height = ($#list > 5 ? 8 : $#list + 4);
+
+   # Create the selection list.
+   my $select = new Cdk::Selection ('Title' => $title,
+					'Height' => $height,
+					'Width' => 40,
+					'List' => \@list,
+					'Choices' => $options);
+
+   # Get the selections to print.
+   my @answer = $select->activate();
+   undef $select;
+   
+   # check if the user canceled.
+   if (!defined @answer)
+   {
+      my $mesg = ["Print Canceled"];
+      popupLabel ($mesg);
+      return;
+   }
+
+   # Start printing the groups.
+   for ($x=0; $x <= $#answer; $x++)
+   {
+      my $groupName = $list[$x];
+      if ($answer[$x] == 0)
+      {
+         # Create a label for a title.
+         my $mesg = ["<C></R>Printing Group [$groupName] to Printer"];
+         my $title = new Cdk::Label ('Message' => $mesg,
+					'Box' => "FALSE",
+					'Xpos' => "TOP");
+         $title->draw ('Box' => "FALSE");
+
+         # Print to Printer.
+         my $printEntry = new Cdk::Entry ('Label' => "</R>Printer Name",
+						'Filler' => "_",
+						'Width' => 20,
+						'Min' => 2,
+						'Max' => 256);
+         
+         # Set the default value as the PRINTER ENV variable.
+         if (defined $ENV{'PRINTER'})
+         {
+            $printEntry->set ('Value' => "$ENV{'PRINTER'}",
+				'Min' => 2, 'Max' => 256);
+         }
+         my $printer = $printEntry->activate();
+         printGroup ($groupName, %groupInfo, "/tmp/rolodex.$$");
+         system ("lpr /tmp/rolodex.$$");
+         unlink "/tmp/rolodex.$$";
+      }
+      elsif ($answer[$x] == 1)
+      {
+         # Create a label for a title.
+         my $mesg = ["<C></R>Printing Group [$groupName] to File"];
+         my $title = new Cdk::Label ('Message' => $mesg,
+					'Box' => "FALSE",
+					'Xpos' => "TOP");
+         $title->draw ('Box' => "FALSE");
+
+         # Print to file.
+         my $fileEntry = new Cdk::Entry ('Label' => "</R>Filename",
+						'Filler' => "_",
+						'Width' => 20,
+						'Min' => 2,
+						'Max' => 256);
+
+         # Make sure that a filename is given.
+         while (!defined $filename)
+         {
+            $filename = $fileEntry->activate();
+
+            if (!defined $filename)
+            {
+               popupLabel (["Please supply a filename."]);
+            }
+         }
+
+         # Print the group to a file.
+         printGroup ($groupName, %groupInfo, $filename);
+      }
+   }
+}
+
+#
+# This opens a phone database file and prints it to the given filename.
+#
+sub printGroup
+{
+   my ($name, %groupInfo, $filename) = @_;
+
+   # Try to open the file.
+   if (!open (PHONE, ">$filename"))
+   {
+      my $mesg = ["<C></R>Error",
+			"<C>Could not print the group </B>$name<!B> to </B>$filename<!B>.",
+			"<C></U>$!", "<C>Press any key to continue."];
+      popupLabel ($mesg);
+      return;
+   }
+
+   # Open the phone database file and read in the contents.
+   my ($desc, $dbm) = split (//, $groupInfo{$name});
+   my @rolodexData = readPhoneDataFile ($dbm);
+   select (PHONE); $| =1;
+
+   # Set variables for the report.
+   foreach $object (@rolodexData)
+   {
+      $fullName = $object->{'Name'};
+      $number = $object->{'Number'};
+      $address = $object->{'Address'};
+      $city = $object->{'City'};
+      $province = $object->{'Province'};
+      $postalCode = $object->{'Postal Code'};
+      $description = $object->{'Description'};
+      write;
+   }
+   close (PHONE);
+}
+
+#########################################
+format PHONE=
+Name  @<<<<<<<<<<<<<<<<<<<<<<<<<<   Phone Number @<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fullName, $number
+Address @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< City @<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$address, $city
+City @<<<<<<<<<<<<< Province @<<<<<<<<<<<<<<<<<< Postal Code @<<<<<<<<<<<<<<<
+$city, $province, $postalCode
+Description @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$description
+-----------------------------------------------------------------------------
+.
+
+#########################################
+package PhoneData;
+
+#
+# This creates a new object.
+#
+sub new
+{
+   my $junk = shift;
+   my $record = shift;
+   my $self = {};
+
+   # Split the record apart.
+   my ($name, $type, $phone, $address, $city, $prov, $postal, $desc) = split (//, $record);
+
+   # Store the info in the object.
+   $self->{'Name'}		= $name;
+   $self->{'Type'}		= $type;
+   $self->{'Number'}		= $phone;
+   $self->{'Address'}		= $address;
+   $self->{'City'}		= $city;
+   $self->{'Province'}		= $prov;
+   $self->{'Postal Code'}	= $postal;
+   $self->{'Description'}	= $desc;
+   
+   return bless $self;
+}
+
+#
+# This prints out the contents of an object.
+#
+sub display
+{
+   my $self = shift;
+   my %object = %$self;
+   my @mesg = ();
+
+   foreach $key (sort keys %object)
+   {
+      push (@mesg, sprintf ("Key = %-10s Value = %-30s", $key, $object{$key}));
+   }
+   main::popupLabel (\@mesg);
+}
+sub print
+{
+   my $object = shift;
+
+   foreach $key (sort keys %info)
+   {
+      print "Key = $key Value = $info{$key}\n";
+   }
+}

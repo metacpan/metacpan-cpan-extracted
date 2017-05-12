@@ -1,0 +1,89 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+This is public
+    <script language="javascript">
+    var devpopup_window = window.open("", "devpopup_window", "height=400,width=600,scrollbars,resizable");
+    devpopup_window.document.write("<?xml version=\"1.0\"?>\n" + 
+	"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n" + 
+	"    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" + 
+	"\n" + 
+	"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" + 
+	"<head>\n" + 
+	"    <title>Devpopup results</title>\n" + 
+	"    <style type=\"text/css\">\n" + 
+	"        div.report { border: dotted 1px black; margin: 1em;}\n" + 
+	"        div.report h2 { color: #000; background-color: #ddd; padding:.2em; margin-top:0;}\n" + 
+	"        div.report_full, div.report_summary { padding: 0em 1em; }\n" + 
+	"        a:hover, div.report h2:hover, a.print_button:hover { cursor: pointer; background-color: #eee; }\n" + 
+	"        a { text-decoration: underline }\n" + 
+	"        a.print_button { text-align: right; float: right; clear: right; padding: .2em; margin-right: 1em; color: #000; background-color:#ddd; border:solid 1px #444; }\n" + 
+	"        // severity colors\n" + 
+	"        .sev_debug             { background-color: #ccffcc; color: #000; }\n" + 
+	"        .sev_info              { } // default\n" + 
+	"        .sev_warning           { background-color: #ffff99; color: #000; }\n" + 
+	"        .sev_error             { background-color: #ff9999; color: #000; }\n" + 
+	"        .sev_fatal             { background-color: #ff6600; color: #fff; font-weight: bold; }\n" + 
+	"    </style>\n" + 
+	"");
+    devpopup_window.document.write("	<s");
+    devpopup_window.document.write("cript type=\"text/javascript\">\n");
+    devpopup_window.document.write("//"+"<"+"![CDATA[\n");
+    
+    devpopup_window.document.write("        function swap(id1,id2)\n" + 
+	"        {\n" + 
+	"            var d1 = document.getElementById(id1);\n" + 
+	"            var d2 = document.getElementById(id2);\n" + 
+	"            var s = d1.style.display;\n" + 
+	"            d1.style.display = d2.style.display;\n" + 
+	"            d2.style.display = s;\n" + 
+	"        }\n" + 
+	"");
+    devpopup_window.document.write("//]"+"]>\n");
+    devpopup_window.document.write("	<");
+    devpopup_window.document.write("/script>");
+    devpopup_window.document.write("</head>\n" + 
+	"<body>\n" + 
+	"<h1>Devpopup report for TestAppAuthenticate -&gt; unprotected</h1>\n" + 
+	"<a href=\"javascript:window.print()\" class=\"print_button\">Print</a>\n" + 
+	"<div id=\"titles\">\n" + 
+	"<ul>\n" + 
+	"\n" + 
+	"    <li class=\"sev_info\">\n" + 
+	"        <a onclick=\"swap('#DPS1','#DPR1')\">Authentication</a> - \n" + 
+	"    </li>\n" + 
+	"\n" + 
+	"</ul>\n" + 
+	"</div>\n" + 
+	"\n" + 
+	"\n" + 
+	"<div id=\"#DP1\" class=\"report\">\n" + 
+	"    <h2 id=\"#DPH1\"\n" + 
+	"        class=\"sev_info\"\n" + 
+	"        onclick=\"swap('#DPS1','#DPR1')\">\n" + 
+	"        Authentication\n" + 
+	"    </h2>\n" + 
+	"    <div id=\"#DPS1\" class=\"report_summary\">\n" + 
+	"        \n" + 
+	"    </div>\n" + 
+	"    <div id=\"#DPR1\" class=\"report_full\" style=\"display:none\">\n" + 
+	"            <style type=\"text/css\">\n" + 
+	"              tr.even{background-color:#eee}\n" + 
+	"            </style>\n" + 
+	"            <div style=\"font-size: 80%\">\n" + 
+	"              <table>\n" + 
+	"                <thead><tr><th>Parameter</th><th>Value</th></tr></thead>\n" + 
+	"                <tbody><tr class=\"odd\"><td valign=\"top\">authen_username</td><td></td></tr>\n" + 
+	"<tr class=\"even\"><td valign=\"top\">authen_password</td><td></td></tr></tbody>\n" + 
+	"              </table>\n" + 
+	"            </div>\n" + 
+	"        </div>\n" + 
+	"</div>\n" + 
+	"\n" + 
+	"\n" + 
+	"</body>\n" + 
+	"</html>\n" + 
+	"");
+    devpopup_window.document.close();
+    devpopup_window.focus();
+    </script>
+    

@@ -1,0 +1,11 @@
+NAME
+	CPANXR - Comprehensive Perl Archive Network Cross Reference
+
+DESCRIPTION
+	CPANXR is a piece of software that cross-references CPAN.
+
+AUTHOR
+	Claes Jacobsson <claes@surfar.nu>
+
+LICENSE
+	This software is distributed under the same license as Perl.

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 12
+    - 14
+  61999:
+    - 247
+name: fdcb0e
+registers:
+  AF: 36260
+  AF_: 0
+  BC: 36753
+  BC_: 0
+  DE: 64602
+  DE_: 0
+  HL: 24108
+  HL_: 0
+  I: 0
+  IX: 45810
+  IY: 61987
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,53 @@
+2001-02-26 15:47  Nikolai Logvinov <logvinon@mail.ru>
+
+	* Makefile.PL: clean account.ref
+
+2001-02-26 15:37  Nikolai Logvinov <logvinon@mail.ru>
+
+	* tictactoe: rand() returns fractional number, truncate it
+
+2001-02-26 15:34  Nikolai Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, server.cc: duplicate reference to PortableServer::POA
+	adapter before convert it to SV due to PortableServer::POA::DESTROY
+	()
+
+2001-02-26 15:23  Nikolai Logvinov <logvinon@mail.ru>
+
+	* MICO.xs, errors.cc, exttypes.h, interfaces.cc, server.cc,
+	types.cc: Due to perl5005delta:"All Perl global variables that are
+	visible for use by extensions now have a `PL_' prefix." necessary
+	changes have been made. Adopt for MICO v2.3.5
+
+1999-06-13 18:35  Owen Taylor  <otaylor@redhat.com>
+
+	* Account.idl, ChangeLog, LICENSE-LGPL, MANIFEST, MICO.pm, MICO.xs,
+	Makefile.PL, Performance, README, TODO, Tictactoe.idl, account.ref,
+	client, client-activate, constsub.c, dispatcher.cc, dispatcher.h,
+	empty.xpm, errors.cc, exttypes.cc, exttypes.h, fixedtest,
+	gtkmico.cc, gtkmico.h, interfaces.cc, mico-2.2.7-checker.patch,
+	opponent.xpm, perl-idl, pmico.h, self.xpm, server, server.cc,
+	server.h, start-servers.sh, tictactoe, typemap, types.cc,
+	MICO/Fixed.pm, MICO/LongDouble.pm, MICO/LongLong.pm,
+	MICO/ULongLong.pm, MICO/internals.fig, MICO/internals.pod,
+	MICO/internals.ps, MICO/mapping.pod, ir-browser/README,
+	ir-browser/TCUtils.pm, ir-browser/browser, shlib/hello,
+	shlib/hello.idl, shlib/perl-client, shlib/server.cc, mico/ir.idl,
+	mico/ir_base.idl: Initial revision
+
+1999-06-13 18:35  Owen Taylor  <otaylor@redhat.com>
+
+	* Account.idl, ChangeLog, LICENSE-LGPL, MANIFEST, MICO.pm, MICO.xs,
+	Makefile.PL, Performance, README, TODO, Tictactoe.idl, account.ref,
+	client, client-activate, constsub.c, dispatcher.cc, dispatcher.h,
+	empty.xpm, errors.cc, exttypes.cc, exttypes.h, fixedtest,
+	gtkmico.cc, gtkmico.h, interfaces.cc, mico-2.2.7-checker.patch,
+	opponent.xpm, perl-idl, pmico.h, self.xpm, server, server.cc,
+	server.h, start-servers.sh, tictactoe, typemap, types.cc,
+	MICO/Fixed.pm, MICO/LongDouble.pm, MICO/LongLong.pm,
+	MICO/ULongLong.pm, MICO/internals.fig, MICO/internals.pod,
+	MICO/internals.ps, MICO/mapping.pod, ir-browser/README,
+	ir-browser/TCUtils.pm, ir-browser/browser, shlib/hello,
+	shlib/hello.idl, shlib/perl-client, shlib/server.cc, mico/ir.idl,
+	mico/ir_base.idl: Initial import of Perl bindings for MICO
+

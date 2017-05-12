@@ -1,0 +1,22 @@
+Changes
+unLZMA.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Compress-unLZMA.t
+t/README
+t/README.lzma
+t/test.png
+t/test.png.lzma
+t/empty
+t/empty.lzma
+lib/Compress/unLZMA.pm
+lzma_sdk/License.txt
+lzma_sdk/copying.txt
+lzma_sdk/history.txt
+lzma_sdk/lzma.txt
+lzma_sdk/Source/LzmaDecode.c
+lzma_sdk/Source/LzmaDecode.h
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

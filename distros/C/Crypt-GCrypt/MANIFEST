@@ -1,0 +1,24 @@
+Changelog
+GCrypt.xs
+inc/Devel/CheckLib.pm
+lib/Crypt/GCrypt.pm
+lib/Crypt/GCrypt/MPI.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+t/01-cipher.t
+t/02-compatibility.t
+t/03-pod.t
+t/04-podcoverage.t
+t/05-size.t
+t/06-multi.t
+t/07-thread.t
+t/08-digest.t
+t/09-clone-digest.t
+t/10-versions.t
+t/20-mpi.t
+typemap
+META.json                                Module JSON meta-data (added by MakeMaker)

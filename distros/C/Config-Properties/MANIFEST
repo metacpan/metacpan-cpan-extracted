@@ -1,0 +1,14 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/Config/Properties.pm
+t/1_parse.t
+t/2_error.t
+t/3_valid.t
+t/4_invalid.t
+t/5_save.t
+t/6_sorted.t
+t/utf8.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

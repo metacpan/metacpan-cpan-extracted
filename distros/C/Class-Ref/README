@@ -1,0 +1,166 @@
+NAME
+    Class::Ref - Automatic OO wrapping of container references
+
+SYNOPSIS
+        $o = Class::Ref->new({ foo => { bar => 'Hello World!' } });
+        $o->foo->bar;    # returns "Hello World!"
+        $o->baz({ blah => 123 });
+        $o->baz->blah;    # returns 123
+
+        $o = Class::Ref->new({ foo => [{ bar => 'Hello Again!' }] });
+        $o->foo->[0]->bar;    # returns "Hello Again!"
+
+DESCRIPTION
+    Class::Ref provides an OO wrapping layer around Hash and Array
+    references. Part of the magic is that it does this deeply and across
+    array/hash boundaries.
+
+OPTIONS
+    Some of the behavior of the encapsulation can be modified by the
+    following options:
+
+    $raw_access (Default: 0)
+            $o = Class::Ref->new({ foo => { bar => 1 } });
+            {
+                $Class::Ref::raw_access = 1;
+                $o->foo;    # returns { bar => 1 }
+            }
+
+        Should you ever need to work with the raw contents of the data
+        structure, setting $raw_access with cause every member retrieval to
+        just the referenced data rather than a wrapped form of it.
+
+        The observant reader will note that this does not provide access to
+        the base data. In order to access that, you must dereference the
+        object:
+
+            $$o;    # returns { foo => { bar => 1 } } unblessed
+
+        See GUTS for more information.
+
+    $allow_undef (Default: 0)
+            $o = Class::Ref->new({ foo => { bar => 1 } });
+            {
+                $Class::Ref::allow_undef = 1;
+                $o->not_here;    # returns undef
+            }
+            $o->not_here;        # raises exception
+
+        By default, an excpetion will be raised if you try read from a HASH
+        key that is non-existent.
+
+METHODS
+    There is only the constructor.
+
+    new
+            $o = Class::Ref->new({...});
+            $o = Class::Ref->new([...]);
+
+        Wrap the provided reference in OO getters and setters.
+
+PHILOSOPHY
+    A lot of effort has been made to ensure that the only code that changes
+    your wrapped data is your code. There is no blessing of any of the data
+    wrapped by Class::Ref.
+
+    With that being said, the goal has been to reduce the syntax need to
+    access values deep inside a HASH/ARRAY reference.
+
+HASH Refs
+    Wrapping a HASH is a fairly straightforward process. All keys of the
+    hash will be made available as a method call.
+
+    There is a bit more here however. If, for example, you accessed the
+    actual hash, Class::Ref will still encapsulate the return value if that
+    value is a HASH or an ARRAY:
+
+        $o = Class::Ref->new({ foo => { bar => 1 } });
+        $o->{foo}->bar;    # works
+
+    But all without modifying, blessing, or otherwise messing with the
+    value. The data referenced with $o remains the same as when it
+    originally wrapped.
+
+ARRAY Refs
+    Wrapping ARRAYs is much less straightforward. Using an "AUTOLOAD" method
+    doesn't help because perl symbols cannot begin with a number. Makes it a
+    little difficult to do the following:
+
+        $o->0;    # compile error
+
+    So for the purpose of this module, wrapped ARRAYs exactly like an ARRAY
+    reference:
+
+        $o->[0];    # ahh, much better
+
+    The tricky part comes in wanting to make sure that values returned from
+    such a call would still be wrapped:
+
+        $o->[0]->foo;    # $o = [{ foo => 'bar' }]
+
+    See GUTS for more discussion on how this is done.
+
+    I am still debating if adding formal accessors moethods would be helpful
+    in this context.
+
+GUTS
+    All objects created and returned by Class::Ref are blessed REF types.
+    This is what protects the original reference from being blessed into an
+    unwanted package. The "ref" type of the given value is what determines
+    what package the REF is blessed into. HASHes go into "Class::Ref::HASH"
+    and ARRAYs go into "Class::Ref::ARRAY".
+
+    The use of the overload pragma to overload the dereference operators
+    allows the REF object to still be accesed as HASH refs and ARRAY refs.
+    When these REFs are coerced into their approriate type, they are wrapped
+    in a tie mechanism to retain control over the return of member values.
+
+    The only way to fully bypass all of this is to manually dereference the
+    REF object:
+
+        $o = Class::Ref->new({ foo => 1 });
+        $$o->{foo};
+
+CAVEATS
+    When dealing with a wrapped HASH, there is no way to access keys named
+    "isa" and "can". They are core methods perl uses to interact with OO
+    values.
+
+    Accessing HASH members with invalid perl symbols is possible with a
+    little work:
+
+        my $method = '0) key';
+        $o->$method;    # access $o->{'0) key'};
+
+SEE ALSO
+    I've always wanted to have this kind of functionality for hashes that
+    really needed a more formal interface. However, I found myself wanting
+    more from the existing modules out there in the wild. So I borrowed some
+    the great ideas out there and brewed my own implementation to have the
+    level of flexibility that I desire. And if it helps others, that's
+    awesome too.
+
+    *   Class::Hash
+
+        Probably the defacto module for creating accessors to a hash.
+        However, it only provides a single layer of encapsulation.
+
+    *   Class::ConfigHash
+
+        Provides a deeper implementaion but takes (avoids) steps to make the
+        hash read-only.
+
+    *   Hash::AsObject
+
+        Also provides a deep implemetation. Goes further to provide access
+        to methods like "AUTOLOAD" and "DESTROY".
+
+AUTHOR
+    William Cox <mydimension@gmail.com>
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://dev.perl.org/licenses/>
+

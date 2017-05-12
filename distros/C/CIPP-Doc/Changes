@@ -1,0 +1,22 @@
+$Id: Changes,v 1.6 2001/03/07 17:00:38 joern Exp $
+
+Revision history for CIPP documentation:
+
+2.28  Wed Mar 07 2001
+	- sorry, a long time without an update ;) This version
+	  now covers CIPP 2.28.
+
+2.11  Thu Sep 30 1999
+	- now the whole documentation is in English. Thanks to
+	  Stefan Eissing for proofreading some chapters.
+	  Please be patient: English is not my motherlanguage,
+	  so there may be some grammatical errors. If you find
+	  mistakes, please tell me, I will fix them as soon
+	  as possible.
+
+1.93  Thu Feb 25 1999
+	- hint about use of NOQUOTE option of <?INCINTERFACE> command
+	  for passing array, hash and reference parameters
+
+1.90  Sat Jan 16 1999
+	- first version published on CPAN, in german language

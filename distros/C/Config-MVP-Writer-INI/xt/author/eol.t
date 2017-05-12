@@ -1,0 +1,21 @@
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'lib/Config/MVP/Writer/INI.pm',
+    't/00-compile.t',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
+    't/ini.t',
+    't/lib/IniTests.pm',
+    't/rewrite_package.t',
+    't/spacing.t'
+);
+
+eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
+done_testing;

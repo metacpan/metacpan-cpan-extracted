@@ -1,0 +1,52 @@
+{
+   "abstract" : "Extend your favourite .INI parser module to read MySQL configuration file",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Extend-MySQL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Tiny" : "0",
+            "File::Basename" : "0",
+            "File::Read" : "0",
+            "File::Spec::Functions" : "0",
+            "UNIVERSAL::require" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Extend::MySQL" : {
+         "file" : "lib/Config/Extend/MySQL.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

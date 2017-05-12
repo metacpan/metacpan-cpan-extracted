@@ -1,0 +1,32 @@
+---
+name: Chess-GameClock-GameClock
+version: 1.0
+author:
+  - 'Charles Minc <charles.minc@wanadoo.fr>'
+abstract: lib/Chess/GameClock/GameClock.pm
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  Tk: 0
+provides:
+  GameClock:
+    file: lib/Chess/GameClock/GameClock.pm
+    version: 1.2
+  GclkCounter:
+    file: lib/Chess/GameClock/GclkCounter.pm
+    version: 1.0
+  GclkData:
+    file: lib/Chess/GameClock/GclkData.pm
+    version: 1.8
+  GclkDisplay:
+    file: lib/Chess/GameClock/GclkDisplay.pm
+    version: 1.1
+  GclkSettings:
+    file: lib/Chess/GameClock/GclkSettings.pm
+    version: 1.0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

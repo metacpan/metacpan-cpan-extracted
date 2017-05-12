@@ -1,0 +1,37 @@
+Revision history for Perl extension Class::Constructor.
+
+1.1.4  Mon Sep 26, 2005
+    - added pod tests
+
+1.1.3  Tue Dec 23, 2003
+    - fixed tests to specify number of tests (no_plan requires newer
+      version of Test::Harness)
+
+1.1.2  Fri Dec 19, 2003
+    - added an option to prevent Class::Constructor from converting
+      method names to lower case.  Thanks to Clayton Scott
+    - updated to include the latest Test::Simple
+
+1.1.1  Thu Dec 18, 2003
+    - added an option to prevent Class::Constructor from converting
+      method names to lower case.  Thanks to Dana Hudes <dhudes@hudes.org>
+
+1.0.0  Thu Nov 29, 2001
+    - minor doc change in Readme to note relationship with Class::Accessor
+    - added Class::Accessor as a prerequisite in Makefile.PL
+    - released to CPAN
+
+0.9.2  Mon Nov 19, 2001
+    - rewrote test script, removing dependency on Class::Accessor
+    - first public release
+
+0.9.1  Mon Nov 19, 2001
+    - Changed hardcoded path '/' separators into File::Spec->join()
+    - Included Test::Harness, Test::More and Test::Harness in t/lib
+    - minor doc changes
+
+0.9.0  Wed Oct 31, 2001
+    - converted into proper CPAN style distribution
+	- used h2xs 1.21 with options
+		-AX -n Class::Constructor
+

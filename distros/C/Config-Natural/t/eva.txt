@@ -1,0 +1,6 @@
+Eva_00 = Prototype Unit
+Eva_01 = Test Unit
+Eva_02 = First Unit of Production Serie 1
+Eva_03 = Second Unit of Production Serie 1
+Eva_04 = Third Unit of Production Serie 1
+Eva_05 = First Unit of Production Serie 2

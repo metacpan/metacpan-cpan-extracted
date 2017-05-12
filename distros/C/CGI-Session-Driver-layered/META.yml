@@ -1,0 +1,22 @@
+---
+name: CGI-Session-Driver-layered
+version: 0.8
+author:
+  - 'Chris Reinhardt <creinhardt@liquidweb.com>'
+abstract: Use multiple layered drivers
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Session: 4
+  Time::HiRes: 0
+build_requires:
+  Test::More: 0
+provides:
+  CGI::Session::Driver::layered:
+    file: lib/CGI/Session/Driver/layered.pm
+    version: 0.8
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

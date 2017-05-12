@@ -1,0 +1,130 @@
+[%
+    title = data.realname _ ' (Edit)' ;
+
+    crumb2_name = 'People' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=user-admin' ;
+    crumb1_name = 'Edit' ;
+%]
+
+<script type="text/javascript" src="[% webpath %]/js/tiny_mce/tiny_mce.js"></script>
+<script  type="text/javascript">
+tinyMCE.init({
+    mode : "textareas",
+    theme : "advanced",
+    plugins : "preview,searchreplace",
+    theme_advanced_buttons1 : "bold,italic,underline,strikethrough,sub,sup,formatselect,hr,|,justifyleft,justifycenter,justifyright,justifyfull",
+    theme_advanced_buttons2 : "bullist,numlist,|,link,unlink,anchor,|,undo,redo,search,replace,|,cleanup,help,preview",
+    theme_advanced_buttons3 : "",
+    theme_advanced_toolbar_location : "top",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_path_location : "bottom",
+    extended_valid_elements : "hr[class|width|size|noshade]",
+    force_br_newlines : true,
+    force_p_newlines : false,
+    convert_urls : false
+});
+</script>
+
+[% IF thanks %]<p>User saved successfully.</p>[% END %]
+<p>Fields marked '*' are mandatory fields and must be completed.</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="user-pass" />
+<input type="hidden" name="userid" value="[% users.data.userid %]" />
+<p align="center"><input type="submit" name="submit" value="CHANGE PASSWORD" /></p>
+</form>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-save" />
+<input type="hidden" name="userid" value="[% IF users.data.userid %][% users.data.userid %][% ELSE %]0[% END %]" />
+
+<div class="box">
+    <table width="100%">
+    <tr><td width="150">Email *</td>
+        <td class="alert">[% users.data.email_err %]</td>
+        <td><input type="text" name="email" value="[% users.data.email %]" size="50" /></td>
+    </tr>
+[% IF newuser %]
+    <tr><td>Password *</td>
+        <td class="alert">[% users.data.effect_err %]</td>
+        <td><input type="text" name="effect" value="[% users.data.effect %]" size="50" /></td>
+    </tr>
+[% END %]
+
+    <tr><td>Display Name *</td>
+        <td class="alert">[% users.data.realname_err %]</td>
+        <td><input type="text" name="realname" value="[% users.data.realname %]" size="50" /></td>
+    </tr>
+    <tr><td>Tag</td>
+        <td class="alert">[% users.data.nickname_err %]</td>
+        <td><input type="text" name="nickname" value="[% users.data.nickname %]" size="20" /></td>
+    </tr>
+    <tr><td>About Me</td>
+        <td class="alert">[% users.data.aboutme_err %]</td>
+        <td><textarea name="aboutme" rows="10" cols="50">[% users.data.aboutme %]</textarea></td>
+    </tr>
+    <tr><td>Web Page</td>
+        <td class="alert">[% users.data.url_err %]</td>
+        <td><input type="text" name="url" value="[% users.data.url %]" size="50" /></td>
+    </tr>
+<!--
+    <tr><td>Avatar</td>
+        <td class="alert">[% users.data.image_err %]</td>
+        <td><input type="file" name="image" />
+[% IF users.data.link %]
+        <img src="[% webpath %]/[% users.data.link %]" alt="[% users.data.tag %]" />
+[% END %]
+        <input type="hidden" name="imageid" value="[% users.data.imageid %]" /></td>
+    </tr>
+-->
+    <tr><td>Realm</td>
+        <td class="alert">[% users.data.realm_err %]</td>
+        <td>[% users.data.ddrealms %]</td>
+    </tr>
+    </table>
+</div>
+
+[% IF newuser %][% ELSE %]
+<p align="center">
+[ <a href="[% cgipath %]/pages.cgi?act=user-pass&amp;userid=[% users.data.userid %]">change password</a>
+| <a href="[% cgipath %]/pages.cgi?act=user-acl&amp;userid=[% users.data.userid %]">change access rights</a> ]</p>
+[% END %]
+
+<p align="center"><input type="submit" name="submit" value="UPDATE" /></p>
+</form>
+
+<h2>Preview</h2>
+
+<div class="users">
+  <div class="userpic">
+    [% IF users.preview.gravatar %]
+      <img src="[% users.preview.gravatar %]" alt="[% users.preview.realname %]" width="80" height="80" />
+    [% END %]
+
+    <!--
+    [% IF users.preview.link %]
+      <img src="[% webpath %]/[% users.preview.link %]" alt="[% users.preview.tag %]" align="right"
+      [% IF users.preview.width  %]width="[% users.preview.width %]"[% END %]
+      [% IF users.preview.height %]height="[% users.preview.height %]"[% END %]
+      />
+    [% END %]
+    -->
+  </div>
+
+  <div class="userbits">
+    [% IF user.access == 5 %]
+    <div class="username"><a href="[% cgipath %]/pages.cgi?act=user-adminedit&amp;userid=[% users.preview.userid %]">[% users.preview.realname %]</a></div>
+    [% ELSE %]
+    <div class="username">[% users.preview.realname %]</div>
+    [% END %]
+  </div>
+  <div class="userinfo">
+    [% IF users.preview.aboutme ; users.preview.aboutme ; END %]
+    [% IF users.preview.url %]<p><strong>My Web Page:</strong> <a href="[% users.preview.url %]">[% users.preview.url %]</a></p>[% END %]
+    [% IF ! users.preview.aboutme AND ! users.preview.url %]<p>... to be completed.</p>[% END %]
+  </div>
+</div>

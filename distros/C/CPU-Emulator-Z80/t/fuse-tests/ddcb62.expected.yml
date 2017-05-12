@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb62
+registers:
+  AF: 13917
+  AF_: 0
+  BC: 16469
+  BC_: 0
+  DE: 25866
+  DE_: 0
+  HL: 16280
+  HL_: 0
+  I: 0
+  IX: 2764
+  IY: 41218
+  PC: 4
+  R: 2
+  SP: 0

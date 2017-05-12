@@ -1,0 +1,10 @@
+Revision history for Perl extension CPAN::Mini::Growl
+
+0.03  Mon Apr 27 16:33:09 PDT 2009
+        - Skip if AUTHOR record is not found with PAUSE id
+
+0.02  Sat Apr 11 20:55:09 PDT 2009
+        - Fixed .minicpanrc sample format
+
+0.01  Thu Apr  9 02:39:59 2009
+        - original version

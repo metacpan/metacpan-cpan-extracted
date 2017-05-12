@@ -1,0 +1,68 @@
+NAME
+    Class::DBI::DATA::Schema - Execute Class::DBI SQL from DATA sections
+
+SYNOPSIS
+      package Film.pm;
+      use base 'Class::DBI';
+              # ... normal Class::DBI setup
+
+      use 'Class::DBI::DATA::Schema';
+
+      Film->run_data_sql;
+
+            __DATA__
+            CREATE TABLE IF NOT EXISTS film (....);
+            REPLACE INTO film VALUES (...);
+            REPLACE INTO film VALUES (...);
+
+DESCRIPTION
+    This is an extension to Class::DBI which injects a method into your
+    class to find and execute all SQL statements in the DATA section of the
+    package.
+
+METHODS
+  run_data_sql
+      Film->run_data_sql;
+
+    Using this module will export a run_data_sql method into your class.
+    This method will find SQL statements in the DATA section of the class it
+    is called from, and execute them against the database that that class is
+    set up to use.
+
+    It is safe to import this method into a Class::DBI subclass being used
+    as the superclass for a range of classes.
+
+    WARNING: this does not do anything fancy to work out what is SQL. It
+    merely assumes that everything in the DATA section is SQL, and applies
+    each thing it finds (separated by semi-colons) in turn to your database.
+    Similarly there is no security checking, or validation of the DATA in
+    any way.
+
+TRANSLATION and CACHING
+    There are undocumented arguments that will allow this module to
+    translate the SQL from one database schema to another, and also to cache
+    the result of that translation. People are relying on these, so they're
+    not going to go away, but you're going to need to read the source to
+    work out how to use them.
+
+SEE ALSO
+    Class::DBI.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-DATA-Schema@rt.cpan.org
+
+COPYRIGHT
+      Copyright (C) 2003-2005 Kasei 
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

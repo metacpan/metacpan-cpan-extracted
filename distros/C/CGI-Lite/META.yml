@@ -1,0 +1,27 @@
+---
+abstract: 'Process and decode WWW forms and cookies'
+author:
+  - 'Pete Houston (cpan@openstrike.co.uk)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Lite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Symbol: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lite
+  repository: https://github.com/openstrike/perl-CGI-Lite
+version: '3.01'

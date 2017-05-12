@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  
+      Schemas for IDL to WSDL CORBA Namespace
+  
+-->
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" 
+    targetNamespace="http://www.omg.org/IDL-WSDL/1.0/"
+    xmlns:corba="http://www.omg.org/IDL-WSDL/1.0/">
+  <xs:element name="SourceIDL">
+    <xs:annotation>
+      <xs:documentation>IDL/WSDL Mapping Info</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="source" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="version" type="xs:string" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SourceRepositoryID">
+    <xs:annotation>
+      <xs:documentation>IDL Mapped Repository ID</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="repositoryID" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="version" type="xs:string" minOccurs="1" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ObjectReference">
+    <xs:sequence>
+      <xs:element name="url" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CORBA.TypeCode">
+    <xs:sequence>
+      <xs:element name="definition" type="xs:anyURI" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="typename" type="xs:string" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CORBA.Any">
+    <xs:sequence>
+      <xs:element name="type" type="corba:CORBA.TypeCode" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="value" type="xs:anyType" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>  
+  <xs:simpleType name="CORBA.completion_status">          
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="COMPLETED_YES"/>
+      <xs:enumeration value="COMPLETED_NO"/>
+      <xs:enumeration value="COMPLETED_MAYBE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="CORBA.SystemException">
+    <xs:sequence>
+      <xs:element name="minor" type="xs:unsignedInt" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="completion_status" type="corba:CORBA.completion_status" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="_VALREF">
+    <xs:attribute name="ref" type="xs:IDREF" use="optional"/>
+    <!-- empty attribute used for null semantics, i.e., value graph end nodes -->
+  </xs:complexType>
+</xs:schema>

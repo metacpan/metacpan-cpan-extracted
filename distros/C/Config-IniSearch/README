@@ -1,0 +1,62 @@
+Config/IniSearch version 0.03
+=============================
+
+This module provides a wrapper class for Config::IniHash to allow the
+user to select different INI files at runtime without the need to
+modify scripts that access the INI file parameters.  For instance, a
+developer working with a production script can run with a development
+INI file independent from a user who is also using the production
+script, but with a "global" INI file suitable for production.  This
+eliminates the need to create two or more copies of a script for the
+sole purpose of modifying configuration parameters within the script.
+
+This is a "true" wrapper class in that all options not specific to
+this module are passed unmodified to Config::IniHash.  It is not a
+subclass, however, of Config::IniHash in that it does not add
+functionality to Config::IniHash.  This module simply provides the
+user of Config::IniHash with the added convenience of being able to
+manage multiple INI files for a given application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test (see TEST NOTES below)
+   make install
+
+TEST NOTES
+
+Tests 1, 6, and 7 will fail unless you also copy the following files
+to /etc (read-only access is sufficient):
+
+    t/global.ini.etc => /etc/global.ini
+    t/testSection.ini.etc => /etc/testSection.ini
+
+Version 2.4 of Config::IniHash generates a run-time warning running
+under 'strict' (the default when you run 'make test').  The warning
+itself does not affect the results of the tests, but if it bothers you,
+feel free to apply the included patch to you copy of IniHash.pm:
+
+    patch -p0 < IniHash-2.4.patch
+
+DEPENDENCIES
+
+This module requires Config::IniHash.
+
+CHANGES
+
+0.01  Sat Jul  5 00:58:21 2003
+	- original version
+0.02  Wed Dec 16 21:40:00 2009
+    - finally fixed the tests after 6 years
+0.03  Wed Dec 16 22:15:00 2009
+    - version number updates
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Copyright (C) 2009 Brian Koontz <brian@pongonova.net>

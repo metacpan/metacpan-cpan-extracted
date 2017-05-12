@@ -1,0 +1,53 @@
+{
+   "abstract" : "Provide strong randomness for seeding",
+   "author" : [
+      "Dana A Jacobsen <dana@acm.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Random-Seed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.45"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::Random::TESHA2" : "0",
+            "Exporter" : "5.562",
+            "Fcntl" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/danaj/Crypt-Random-Seed",
+      "repository" : {
+         "url" : "https://github.com/danaj/Crypt-Random-Seed"
+      }
+   },
+   "version" : "0.03"
+}

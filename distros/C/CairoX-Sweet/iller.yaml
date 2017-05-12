@@ -1,0 +1,51 @@
+---
+doctype: dist
+
+header:
+  name: CairoX-Sweet
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - MooseX::AttributeShortcuts: 0.028
+      - MooseX::StrictConstructor
+      - List::Util
+      - List::SomeUtils: 0.53
+      - Eponymous::Hash
+      - Path::Tiny
+      - Type::Tiny
+      - Types::Path::Tiny
+      - Cairo: 1.000
+      - namespace::autoclean
+  test:
+    requires:
+      - Test::Requires: 0.08
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: Git::GatherDir
+    exclude_match: \.png
+
+  - +replace_plugin: TravisYML
+    sudo: 1
+    perl_version: 5.10 5.14 5.18 5.22
+    post_before_install: sudo apt-get install libcairo2-dev
+    pre_install: cpanm Cairo
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - CairoX-Sweet-*

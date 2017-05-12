@@ -1,0 +1,14 @@
+Revision history for Catalyst-Plugin-Authentication-Credential-JugemKey
+
+0.04    Thu Mar 29 16:15:44 JST 2007
+        - A patch for t/01-methods.t from typester-san.Thanks! 
+
+0.03    Sat Aug 06 00:15:00 2006
+        - Fix synopsys.
+
+0.02    Fri June 03 11:38:00 2006
+        - Fix synopsys typo.Thanks to typester-san!
+
+0.01    Fri June 02 21:30:00 2006
+        - First version, released on an unsuspecting world.
+

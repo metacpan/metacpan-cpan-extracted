@@ -1,0 +1,65 @@
+NAME
+    Crypt::Twofish - The Twofish Encryption Algorithm
+
+SYNOPSIS
+    use Crypt::Twofish;
+
+    $cipher = Crypt::Twofish->new($key);
+
+    $ciphertext = $cipher->encrypt($plaintext);
+
+    $plaintext = $cipher->decrypt($ciphertext);
+
+DESCRIPTION
+    Twofish is a 128-bit symmetric block cipher with a variable
+    length (128, 192, or 256-bit) key, developed by Counterpane
+    Labs. It is unpatented and free for all uses, as described at
+    <URL:http://www.counterpane.com/twofish.html>.
+
+    This module implements Twofish encryption. It supports the
+    Crypt::CBC interface, with the functions described below. It also
+    provides an interface that is call- compatible with Crypt::Twofish
+    1.0, but its use in new code is strongly discouraged.
+
+  Functions
+
+    blocksize
+        Returns the size (in bytes) of the block (16, in this case).
+
+    keysize
+        Returns the size (in bytes) of the key. Although the module
+        understands 128, 192, and 256-bit keys, it returns 16 for
+        compatibility with Crypt::CBC.
+
+    new($key)
+        This creates a new Crypt::Twofish object with the specified
+        key (which should be 16, 24, or 32 bytes long).
+
+    encrypt($data)
+        Encrypts blocksize() bytes of $data and returns the
+        corresponding ciphertext.
+
+    decrypt($data)
+        Decrypts blocksize() bytes of $data and returns the
+        corresponding plaintext.
+
+SEE ALSO
+    Crypt::CBC, Crypt::Blowfish, Crypt::TEA
+
+ACKNOWLEDGEMENTS
+    Nishant Kakani
+        For writing Crypt::Twofish 1.0 (this version is a complete
+        rewrite).
+
+    Tony Cook
+        For making the module work under Activeperl, testing on
+        several platforms, and suggesting that I probe for features
+        via %Config.
+
+AUTHOR
+    Abhijit Menon-Sen <ams@toroid.org>
+
+    Copyright 2001 Abhijit Menon-Sen.
+
+    This module is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

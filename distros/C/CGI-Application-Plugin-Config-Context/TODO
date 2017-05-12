@@ -1,0 +1,4 @@
+ - Add CGI::Application hook that gets called whenever the config file
+   is reloaded.  This gives the app an opportunity to do calculations
+   based on config data and add these values to the config hash.
+

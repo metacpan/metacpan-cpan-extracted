@@ -1,0 +1,19 @@
+Changes
+Abstract.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+testdata.pl
+test
+Ini/Changes
+Ini/Ini.pm
+Ini/MANIFEST
+Ini/README
+Ini/Makefile.PL
+Ini/inidiff
+Ini/testdata.ini
+Ini/test2.ini
+Ini/test.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

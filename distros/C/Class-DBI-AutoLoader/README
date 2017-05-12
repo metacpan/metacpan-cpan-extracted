@@ -1,0 +1,45 @@
+Class/DBI/AutoLoader version 0.09
+=================================
+
+use Class::DBI::AutoLoader (
+	dsn       => 'dbi:mysql:database',
+	username  => 'username',
+	password  => 'passw0rd',
+	options   => { RaiseError => 1 },
+	tables    => [qw(list of tables)],
+	namespace => 'Data'
+);
+  
+my $row = Data::FavoriteFilms->retrieve(1);
+
+Class::DBI::AutoLoader scans the tables in a given database,
+and auto-generates the Class::DBI classes. These are loaded into
+your package when you import Class::DBI::AutoLoader, as though
+you had created the Data::FavoriteFilms class and "use"d that
+directly.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBI
+Class::DBI
+Class::DBI::BaseDSN
+
+Additionally, if you plan to use this with a MySQL database you 
+need Class::DBI::mysql. If used with a PostgreSQL database, 
+Class::DBI::Pg. If with a SQLite database, Class::DBI::SQLite.
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

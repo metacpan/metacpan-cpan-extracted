@@ -1,0 +1,229 @@
+Revision history for Perl module CPAN::Reporter::Smoker
+
+0.29      2017-04-15 09:52:48-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed tests for perls without '.' in @INC.
+
+0.28      2016-02-29 19:06:11-05:00 America/New_York
+
+    [ADDED]
+
+    - More tests (CHORNY)
+
+    - New experimental option to skip distributions released before some date (CHORNY)
+
+    - New experimental option _hook_after_test (CHORNY)
+
+    [FIXED]
+
+    - Skips Perl 6 distributions
+
+0.27      2015-03-10 04:33:13-04:00 America/New_York
+
+    [ADDED]
+
+    - New option 'random' to randomize distribution test order (GREGOA)
+
+0.26      2014-03-14 15:52:43+01:00 Europe/Paris
+
+    [ADDED]
+
+    - New option 'skip_dev_versions' to work on minicpans (CHORNY)
+
+0.25      2013-11-06 10:06:15 America/New_York
+
+    - Add reloading history of modules smoked (CHORNY)
+
+    - Add support for custom filtering (CHORNY)
+
+0.24      2011-07-21 00:12:34 America/New_York
+
+    - Fixes test failures with CPAN::Reporter 1.19_04
+
+0.23      2011-06-01 17:54:27 America/New_York
+
+    - Fix cache cleanup with newer CPAN.pm (STSC)
+
+0.22      2010-12-07 16:05:46 EST5EDT
+
+    - Force localization of index files (don't allow cached copies)
+
+    - Convert distribution to Dist::Zilla management
+
+0.21 - Wed Sep 29 07:45:04 EDT 2010
+
+    Fixed:
+
+    - Skips t/smoke-disabled.t unless YAML is installed
+
+0.20 Mon Sep 27 21:02:21 EDT 2010
+
+    Added:
+
+    - Checks distroprefs for skipping before firing up a CPAN test process
+      [Christian Walde]
+
+    - New 'reverse' option to reverse distribution test order
+      [Serguei Trouchelle]
+
+    - New 'force_trust' option to switch on CPAN's trust_test_report_history
+      (instead of relying on the existing CPAN configuration)
+
+    Fixed:
+
+    - Temporary directories are labeled "C-R-Smoker-XXXXXX" to help
+      identify them
+
+0.19 Fri Jun  5 07:08:10 EDT 2009
+
+    - Added: 'install' argument to install modules rather than just test
+      them (without installing).  This helps avoid growing PERL5LIB at
+      the cost of disk space of installed modules.  (Patch from 
+      Serguei Trouchelle)
+
+0.18 -- NEVER RELEASED
+
+    - Changed: bumped CPAN, CPAN::Reporter, Module::Build and 
+      ExtUtils::MakeMaker prereqs to latest versions
+
+    - Fixed: don't treat .ppm.zip files in CPAN mirror as distributions
+
+0.17 Sat Sep 20 10:11:00 EDT 2008
+
+    - Added: 'list' argument may also be a filename
+    
+0.16 Sat Sep 20 08:54:49 EDT 2008
+
+    - Added: 'list' argument to specify a particular list of distributions
+      to test instead of testing all of CPAN in reverse order
+
+    - Changed: sets PERL_EXTUTILS_AUTOINSTALL=--defaultdeps environment
+      variable for automatic handling of Auto Install dependency
+
+    - Changed: bumped up the CPAN::Reporter and Test::Reporter prereqs
+
+0.15 Sun Jun 22 23:53:26 EDT 2008
+
+    - Test fixed: smoke.t and smoke-restart.t no longer fail if PERL5OPT is
+      set (as by CPAN::Reporter dev releases)
+
+0.14 Wed Jun 18 19:13:27 EDT 2008
+
+    - Fixed: localizing CPAN config was causing some segfaults on 5.6.2;
+      removed the call to local() as a workaround
+
+0.13 Tue Jun 10 22:38:15 EDT 2008
+
+    - Fixed: under build_dir_reuse, be sure to regenerate build dirs before
+      calling reset_tested
+
+0.12 Tue Jun  3 11:52:49 EDT 2008
+
+    - Added: 'status_file' argument used to record distribution being
+      tested into a file; helps in determining which distribution is at
+      fault if testing some distribution crashes or hangs the computer
+    
+    - Added: shows count of distributions found when index is processed
+      and number of the current distribution being tested
+
+    - Changed: CPAN::Reporter history is cached at startup for faster 
+      processing of distributions already tested
+    
+0.11 Sat May 17 11:59:08 EDT 2008
+
+    - Documented: support for 'build_dir_reuse' is experimental and needs
+      CPAN 1.92_62 (as yet unreleased) to work properly
+    
+0.10 Fri May 16 08:27:47 EDT 2008
+
+    - Added: 'clean_cache_after' argument to have CPAN clean its build cache
+      after a certain number of distributions are smoked (default 100)
+
+    - Added: 'set_term_title' boolean argument to control whether the terminal
+      title is updated or not (default 1)
+
+    - Changed: if CPAN config option 'build_dir_reuse' is true and CPAN has
+      the 'reset_tested' method, then 'reset_tested' will be called prior
+      to each distribution's smoke test to limit PERL5INC to direct
+      dependencies only instead of all available build directories
+
+    - Documented: how to use (and limitations of) CPAN's build_dir_reuse
+      config option
+
+0.09 Wed Apr 23 22:56:17 EDT 2008
+
+    - Documented: CPAN distroprefs option is 'prefs_dir' not 'pref_dir'
+      (Serguei Trouchelle)
+
+0.08 Mon Mar 24 13:46:46 EDT 2008
+
+    - Changed: smoker now maintains a cache of distributions seen during 
+      a session to speed up skipping distributions already tested when
+      the smoker rechecks indices and restarts testing
+    
+    - Fixed: our $SIG{INT} handler now installed *after* CPAN.pm installs its 
+      handler so we take precedence
+
+0.07 Mon Mar 10 08:32:50 EDT 2008
+
+    - Added: Sets title of terminal window (xterm or Win32) to indicate 
+      current distribution being smoked (adds Term::Title as prereq)
+
+    - Changed: interrupting smoker with CTRL-C now shows what distribution
+      was interrupted (helpful for disabling in distroprefs)
+
+    - Changed: progress message -- added blank line before to help it stand out
+      and localtime() timestamp to help see how long a test has been running
+      (e.g is it hung?)
+
+    - Documented: how to use 'trust_test_report_history' and 'halt_on_failure' 
+      config options from the latest dev release of CPAN.pm
+
+    - Documented: cache purge happens when indices are checked for new distros
+
+0.06 Thu Mar  6 10:12:26 EST 2008
+
+    - Added documentation on using distroprefs to skip building and testing
+      certain distributions
+
+    - Edited other usage hints for clarity
+
+0.05 Tue Feb 26 22:56:12 EST 2008
+
+    - Smoker now periodically checks for new distributions; added
+      "restart_delay" option (default 12 hours) to control frequency
+    
+    - Added support for CPAN cache scanning on start and at each restart (if
+      configured in CPAN::Config)
+    
+    - Changed invocation of CPAN so trust_test_report_history option will work
+
+    - Skips Bundles and mod_perl
+
+0.04 Mon Feb  4 11:51:16 EST 2008
+
+    - Quick fix of broken distribution (added missing prereq and restored
+      a private function that was mistakenly deleted)
+
+0.03 Mon Feb  4 11:23:43 EST 2008
+
+    - Vastly improved logic for selecting distributions to test
+
+    - Test suite confirms smoke tester picks up a developer version
+      (still could be improved)
+    
+0.02 Mon Jan 28 11:55:35 EST 2008
+
+    - Added rudimentary test of smoke testing
+
+    - Updated prerequisites
+
+0.01_02 Mon Jan 21 19:28:58 EST 2008
+
+    - Added support for smoking developer releases 
+
+0.01_01 Sun Jan 20 22:55:20 EST 2008
+
+    - initial alpha release

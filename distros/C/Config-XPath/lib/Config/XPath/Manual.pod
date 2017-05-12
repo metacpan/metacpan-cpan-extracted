@@ -1,0 +1,202 @@
+=head1 NAME
+
+C<Config::XPath::Manual> - Manual to accompany C<Config::XPath> class
+
+=head1 INTRODUCTION
+
+This module provides easy access to configuration data stored in an XML file.
+Configuration is retrieved using XPath keys; various methods exist to
+convert the result to a variety of convenient forms.
+
+Because the operation of this module centres around XPath expressions, the
+reader is assumed to be familiar with them. For more information on XPath in
+general, see http://www.w3.org/TR/xpath.
+
+=head1 EXAMPLE DATA FILE
+
+The methods are best explained by example. The following examples will all use
+the following data file
+
+ <elements>
+   <el name="hydrogen" symbol="H">
+     <isotope number="1" NA="0.99985" name="protium"></isotope>
+     <isotope number="2" NA="0.00115" name="deuterium"></isotope>
+     <isotope number="3" name="tritium">
+       <halflife unit="years">12.32</halflife>
+     </isotope>
+   </el>
+ 
+   <el name="carbon" symbol="C" state="solid">
+     <isotope number="12" NA="0.989"></isotope>
+     <isotope number="13" NA="0.011"></isotope>
+     <isotope number="14">
+       <halflife unit="years">5730</halflife>
+     </isotope>
+   </el>
+ 
+   <el name="oxygen" symbol="O">
+     <isotope number="16" NA="0.9978"></isotope>
+     <isotope number="17" NA="0.00038"></isotope>
+     <isotope number="18" NA="0.0021"></isotope>
+   </el>
+ </elements>
+
+The following examples will presume this file has been loaded with:
+
+ use Config::XPath;
+
+ my $config = Config::XPath->new( filename => "example.xml" );
+
+=head1 DATA ACCESS METHODS
+
+=head2 Strings
+
+XPath expressions that yield strings, integers or booleans can be evaluated
+using the C<get_string()> method.
+
+ my $hydrogen_symbol = 
+     $config->get_string( '//el[@name="hydrogen"]/@symbol' );
+
+ my $C_name = $config->get_string( '//el[@symbol="C"]/@name' );
+
+ my $number_of_elements = $config->get_string( 'count(//el)' );
+
+A default value can be provided which will be returned if the specified node
+does not exist in the XML data.
+
+ my $oxygen_state =
+     $config->get_string( '//el[@name="oxygen"]/@state',
+                          default => "gas" );
+
+If no XML node is found and a default value is not supplied, an exception is
+thrown. A value of C<undef> may be passed as the default, which can be used
+instead of catching an exception, to tell if the requested node was absent
+from the XML data because no real XPath string result will ever yield
+C<undef>.
+
+=head2 Structures
+
+Beyond simple strings, entire structures can be queried at once, with the
+C<get()> method. These consist of XPath expressions as the leaves of a tree,
+formed out of anonymous array and hash references. The result will be returned
+in a structure of identical layout to the input.
+
+ my $hydrogen = $config->get( { name   => '//el[1]/@name',
+                                symbol => '//el[1]/@symbol' } );
+
+ print "$hydrogen->{name}'s symbol is $hydrogen->{symbol}\n";
+
+As with C<get_string()>, default values can be supplied. These are given in a
+tree of similar structure to the paths.
+
+ $hydrogen = $config->get(
+    [ '//el[1]/@oranges', '//el[1]/@name' ],
+    default => [ undef, "name" ]
+ );
+
+ # $hydrogen is now [ undef, 'hydrogen' ]
+
+If arrays are used (as in this example), the C<undef> values used to fill
+"holes" in the array will cause C<undef> to be returned rather than exceptions
+being thrown.
+
+If this distinction is important to your program, make sure to use hashes
+instead of arrays when dealing with structures that have default values.
+
+ my $tritium = $config->get(
+    {
+       name     => '//el[1]/isotope[3]/@name',
+       halflife => '//el[1]/isotope[3]/halflife'
+    },
+    default => { halflife => "none" }
+ );
+
+=head2 Lists
+
+To obtain a list of values from a nodeset expression use the C<get_list()>
+method.
+
+ my @element_names = $config->get_list( '//el/@name' );
+
+The one-argument form of C<get_list()> will obtain the string value of each
+node in the nodeset directly. A second argument can specify an alternate
+expression to obtain.
+
+ my @element_names = $config->get_list( '//el', '@name' );
+ # Equivalent to the previous example
+
+ my @number_of_isotopes = $config->get_list( '//el', 'count(isotope)' );
+
+As with the C<get()> method, a structure of XPath expressions can be given
+which will cause structures of results to be returned, and default values can
+be provided.
+
+ my @iso = $config->get_list( '//el',
+                              { name          => '@name',
+                                first_isotope => 'isotope[1]/@number' } );
+
+ my @hydrogen_halflives = $config->get_list(
+    '//el[@name="hydrogen"]/isotope',
+    { number => '@number', value => 'halflife', unit => 'halflife/@unit' },
+    default => { unit => 'forever', value => '0' }
+ );
+
+=head2 Mappings
+
+An association from keys to values can be obtained with the C<get_map()>
+method.
+
+ my $symbols = $config->get_map( '//el', '@name', '@symbol' );
+ print "The symbol for carbon is $symbols->{carbon}\n";
+
+A structure of XPath expressions and default values work the same way as
+C<get_list()>.
+
+=head1 SUBCONFIGURATIONS
+
+In a newly-constructed C<Config::XPath> object, the XPath context is at the
+root node. In order to make several related lookups easier to perform on other
+nodes in the data, a subconfiguration object can be constructed with the
+C<get_sub>. This is an object where the context is at another node in the
+data.
+
+ my $oxygen_config = $config->get_sub( '//el[@name="oxygen"]' );
+
+ my $oxygen_symbol = $oxygen_config->get_string( '@symbol' );
+ my $n_isotopes    = $oxygen_config->get_string( 'count(isotope)' );
+
+ my @isotopes = $oxygen_config->get_list( 'isotope/@number' );
+
+ my $abundances = $oxygen_config->get_map(
+                     'isotope',
+                     '@number', '@NA',
+                     default => 'trace' );
+
+A list of subconfigurations can be generated with C<get_sub_list>
+
+ foreach my $element_config ( $config->get_sub_list( '//el' ) ) {
+    my $name  = $element_config->get_string( '@name' );
+    my $state = $element_config->get_string( '@state',
+                                             default => "gas" );
+    print "$name is a $state at STP\n";
+ }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<XML::XPath> - Perl XML module that implements XPath queries
+
+=item *
+
+http://www.w3.org/TR/xpath - XML Path Language (XPath) Version 1.0
+
+=back
+
+=head1 AUTHOR
+
+Paul Evans E<lt>leonerd@leonerd.org.ukE<gt>
+
+=cut

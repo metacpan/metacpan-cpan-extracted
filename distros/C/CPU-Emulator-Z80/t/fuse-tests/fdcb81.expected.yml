@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb81
+registers:
+  AF: 15677
+  AF_: 0
+  BC: 45818
+  BC_: 0
+  DE: 34649
+  DE_: 0
+  HL: 3248
+  HL_: 0
+  I: 0
+  IX: 57464
+  IY: 33445
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,65 @@
+NAME
+    Callback - object interface for function callbacks
+
+SYNOPSIS
+            use Callback;
+
+            my $callback = new Callback (\&myfunc, @myargs);
+            my $callback = new Callback ($myobj, $mymethod, @myargs);
+            my $callback = new Callback ($old_callback, @myargs);
+
+            $callback->call(@some_more_args);
+
+DESCRIPTION
+    Callback provides a standard interface to register callbacks. Those
+    callbacks can be either purely functional (i.e. a function call with
+    arguments) or object-oriented (a method call on an object).
+
+    When a callback is constructed, a base set of arguments can be provided.
+    These function arguments will preceed any arguments added at the time
+    the call is made.
+
+    There are two forms for the callback constructor, depending on whether
+    the call is a pure functional call or a method call. The rule is that if
+    the first argument is an object, then the second argument is a method
+    name to be called on that object. Method resolution happens at the time
+    the Callback object is built: an error will be raised if it cannot be
+    found.
+
+    Callback objects built for object-oriented calls also have the property
+    of being serializable via Storable. Purely functional callabacks cannot
+    be serialized because CODE references are not supported by Storable.
+
+    Callback objects can be created from existing Callback objects. Any
+    arguments will be appended onto the original list of arguments.
+
+TRACING
+            use Callback qw(@callbackTrace);
+
+    If you're writing a debugging routine that provides a stack-dump (for
+    example, Carp::confess) it is useful to know where a callback was
+    registered.
+
+            my $ct = 0;
+            while (($package, $file, $line, $subname, $hasargs, $wantarray) = caller($i++)) {
+                ...
+
+                if ($subname eq 'Callback::call') {
+                    print "callback registered $Callback::callbackTrace[$ct]\n";
+                    $ct++;
+                }
+            }
+
+    Without such code, it becomes very hard to know what's going on.
+
+COPYRIGHT
+    Copyright (C) 1994, 2000, 2002 David Muir Sharnoff. All rights reserved.
+    This module may be licensed on the same terms as Perl itself.
+
+AUTHORS
+    David Muir Sharnoff <muir@idiom.com> and Raphael Manfredi
+    <Raphael_Manfredi@pobox.com>
+
+SEE ALSO
+    Storable(3).
+

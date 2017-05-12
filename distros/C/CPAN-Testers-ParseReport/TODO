@@ -1,0 +1,124 @@
+2009-05-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* while releasing the MIME fix discovered a wrongly broken long line in
+	3876519 which isn't parsed "correctly". I mean the line is buggy in
+	itself and our way to parse it doesn't correct for the bug in the
+	original report. No time and inclination to deal with that. Here are the
+	lines for a reference:
+
+    config_args='-sde -Darchname=powerpc-netbsd -Dcc=cc -Doptimize=-O2 -pthread -I/usr/include -Ui_malloc -Uusemymalloc -Uinstallusrbinperl -Dinstallstyle=lib/perl5 -Dprefix=/usr/pkg -Dsiteprefix=/usr/pkg -Dvendorprefix=/usr/pkg -Dscriptdir=/usr/pkg/lib/perl5/bin -Dsitescript=/usr/pkg/lib/perl5/site_perl/bin -Dvendorscript=/usr/pkg/lib/perl5/vendor_perl/bin -Dsitebin=/usr/pkg/lib/perl5/site_perl/bin -Dvendorbin=/usr/pkg/lib/perl5/vendor_perl/bin -Dprivlib=/usr/pkg/lib/perl5/5.10.0 -Dsitelib=/usr/pkg/lib/perl5/site_perl/5.10.0 -Dvendorlib=/usr/pkg/lib/perl5/vendor_perl/5.10.0 -Dsitelib_stem=/usr/pkg/lib/perl5/site_perl -Dvendorlib_stem=/usr/pkg/lib/perl5/vendor_perl -Dman1ext=1 -Dman1dir=/usr/pkg/lib/perl5/man/man1 -Dsiteman1dir=/usr/pkg/lib/perl5/site_perl/man/man1 -Dvendorman1dir=/usr/pkg/lib/perl5/vendor_perl/man/man1 -Dman3ext=3 -Dman3dir=/usr/pkg/lib/perl5/man/man3 -Dsiteman3dir=/usr/pkg/lib/perl5/site_perl/man/man3 -Dvendorman3dir=/usr/pkg/lib/perl5/vendor_perl/man/man3 
+ -Duseshrplib -Daphostname=/bin/hostname -Dln=/bin/ln -Dsed=/usr/bin/sed -Dsh=/bin/sh -Dissymlink=test -h -Dperl5=false -Duseithreads -Dlibswanted=m crypt '
+
+2008-12-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* collect oneliners. here we filter the testreports from
+	ctgetreports.out after APC@34000, only 5.10 and 5.11 and only look at
+	ok, perl, from.
+
+perl -e '
+use strict; use YAML::Syck;
+my $y = YAML::Syck::LoadFile "ctgetreports.out";
+for my $r (@{$y->{"==DATA=="}}){
+  next unless $r->{"meta:perl"} =~ /^(.+)\@(\d+)/;
+  my($b,$n) = ($1,$2);
+  next if $n < 34000 || $b !~ /\.1/;
+  print join "  ", @$r{"id","meta:ok","meta:perl","meta:from"}, "\n";
+}          
+' | sort -n
+
+
+2008-12-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* report bug in nntp server:
+
+	  DB<147> x $N = Net::NNTP->new("nntp.perl.org")
+0  Net::NNTP=GLOB(0x9307f7c)
+   -> *Symbol::GEN7
+         FileHandle({*Symbol::GEN7}) => fileno(8)
+  DB<148> x $N->group("perl.cpan.testers")
+0  2829109
+1  1
+2  2829109
+3  'perl.cpan.testers'
+  DB<149> x map { ref $N->head($_) } 1000000,2000000,2500000,2599999,2600000
+0  'ARRAY'
+1  ''
+2  ''
+3  ''
+4  'ARRAY'
+
+
+2008-11-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* perl -MNet::NNTP -e '$nntp=Net::NNTP->new("nntp.perl.org"); $nntp->group("perl.cpan.testers"); warn "@{$nntp->head(shift)}"' 123456
+
+	above was posted by Slaven to cpantesters-discuss -- a late thanks, Slaven!
+
+	 PASS  2323945 meta:perl[5.8.4] conf:archname[i386-netbsd-thread-multi-64int] conf:usethreads[define] conf:optimize[-O] meta:writer[CPANPLUS::Dist::YACSmoke 0.10] meta:from[chris]
+
+2008-10-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: FileArchiveIndexer produced not a singel result for --solve. In
+	such a case we must write a word about the nothingness. DONE
+
+2008-10-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* upload as bz2
+
+	* Todo: --solve switch
+
+	* env seems to be stepping into config, I see env:optimize for example.
+
+2008-10-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: entities, namely &amp; good to test in overload-eval and -q
+	qr:(.*main::.*)
+
+2008-09-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Todo: write a test that parses copies of these downloaded files and
+	does not write to ~/var. Needs further options.
+
+2008-09-07  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* ENV? We seem to neglect the parsing of the environment! DONE
+
+2008-08-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Bug: vdistro and ctformat=yaml do not seem to work together:
+
+/home/src/perl/repoperls/installed-perls/*/p*/perl-*@32642/bin/perl -I lib bin/ctgetreports --q conf:archname --q mod:Perl::Critic -q mod:Test:Perl:Critic --ctformat=yaml --vdistro=Shipwright-1.13 Shipwright                                                      
+SELECTED: Shipwright-1.13_10
+[...]
+	
+	Without the ctformat it indeed gets me 1.13
+
+2008-06-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* write a real-download-test, but ask for permission during Build.PL
+
+2008-06-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* should not be dependent on the HTML markup provided by cpantesters
+	(should read NNTP version)
+
+	* Should be able to produce CPAN::Testers::Report objects. Should be
+	able to parse individual test results.
+
+2008-06-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* POE-Component-Proxy-TCP: the html page exposes a bug, maybe the same
+	as DateTime-Format-Strptime-1.0702: the HTML is not up to date while the
+	YAML is.
+
+	* write a test for the switches
+
+	* new switch: --cpantesters-format=yaml DONE
+
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "TODO"
+	tab-width: 2
+	left-margin: 2
+	End:

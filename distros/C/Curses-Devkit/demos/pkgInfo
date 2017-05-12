@@ -1,0 +1,272 @@
+#!../../../perl
+
+# $Author: glover $
+# $Date: 1996/06/14 07:51:05 $
+# $Revision: 1.2 $
+
+#
+# This script provideds a user interface to packages on the system.
+#
+use Cdk;
+Cdk::init();
+
+# Create a dialog box with options.
+my @dialogMessge = ("<C></U>Unix Package Interface",
+			"<C>Select an option.");
+ 
+# Create the buutons for the dialog box.
+my @buttons = ("<Add Package>", "<Remove Package>", "<Package Info>", "<Exit>");
+ 
+# Create the dialog widget.
+my $dialog = new Cdk::Dialog ('Message' => \@dialogMessge, 'Buttons' => \@buttons);
+
+# Do this forever.
+for (;;)
+{
+   # Activate the dialog box.
+   my $choice = $dialog->activate();
+   next if ! defined $choice;
+
+   # Check the answer.
+   if ($choice == 0)
+   {
+      addPackage();
+   }
+   elsif ($choice == 1)
+   {
+      removePackage();
+   }
+   elsif ($choice == 2)
+   {
+      packageInfo();
+   }
+   elsif ($choice == 3)
+   {
+      # Exit. 
+      Cdk::end();
+      exit;
+   }
+}
+
+#
+# This function adds a package.
+#
+sub addPackage
+{
+   my @packageList = ();
+   my $x;
+
+   # Set up the entry field.
+   my $mesg = "Enter the source package directory:";
+   my $entry = new Cdk::Entry ('Label' => $mesg,
+				'Max' => 512,
+				'Width' => 30);
+
+   # Get the package directory.
+   my $pkgDir = $entry->activate();
+   return if ! defined $pkgDir;
+
+   # Open the given directory.
+   if (!opendir (DIR, $pkgDir))
+   {
+      # Couldn't open the directory.
+      my @mesg = ("<C></B/U>Error",
+			"<C>Could not open the directory </B>$pkgDir",
+			"<C></U>$!", "",
+			"<C>Press any key to continue.");
+      my $label = new Cdk::Label ('Message' => \@mesg);
+      $label->draw();
+      $label->wait();
+      return;
+   }
+   
+   # Get the directory listing of the given directory.
+   my @contents = readdir(DIR); closedir (DIR);
+
+   # Create a list of all of the directories under the given directory.
+   foreach $file (@contents)
+   {
+      next if $file =~ /^\./;
+      push (@packageList, $file) if (-d "$pkgDir/$file");
+   }
+
+   # Create a selection list and display the known packages.
+   my $select = new Cdk::Selection ('Title' => "Add Which Packages?",
+					'List' => \@packageList,
+					'Choices' => ["Yes ", "No"],
+					'Height' => 20,
+					'Width' => 50);
+   
+   # Activate the packages.
+   my @choiceList = $select->activate();
+   my @selectedPackages = ();
+   return if ! defined @choiceList;
+
+   # Generate the names of the selected packages.
+   for ($x=0; $x <= $#choiceList; $x++)
+   {
+      if ($choiceList[$x] == 1)
+      {
+         push (@selectedPackages, $packageNames[$x]);
+      }
+   }
+   my $label = new Cdk::Label ('Message' => \@selectedPackages);
+   $label->draw();
+   $label->wait();
+}
+
+#
+# This function removes a package.
+#
+sub removePackage
+{
+   # Get the packages to remove.
+   my @packageNames = selectPackages("<C></U>Select the packages to delete.");
+   my @buttons = ("<No>", "<Yes>", "<Yes To ALL>");
+   my $yesToAll = 0;
+
+   # Now that we have the package names, ask for each one.
+   foreach $name (@packageNames)
+   {  
+      # If they asked for all to be deleted, no need to ask
+      if (! $yesToAll)
+      {
+         # Create the dialog message.
+         my @mesg = ("<C>Are you sure you want",
+			"to delete the package </U>$name<!U>?");
+
+         # Make sure they want to do it.
+         my $dialog = new Cdk::Dialog ('Message' => \@mesg,
+					 'Buttons' => \@buttons);
+ 
+         # Activate it.
+         my $answer = $dialog->activate();
+         
+         # If the user hit escape, let the user know the package
+         # was NOT deleted.
+         if (!defined $answer)
+         {
+            popupLabel (["<C>Escape Hit", "<C>The package was </R>Not<!R> deleted."]);
+            next;
+         }
+
+         # Check the answer
+         if ($answer == 1)
+         {
+            # Delete the package
+            system ("pkgrm $name");
+         }
+         else
+         {
+            # Set the yes to all flag.
+            $yesToAll = 1;
+
+            # Delete the package
+            system ("pkgrm $name");
+         }
+      }  
+      else
+      {
+         # Delete the package
+         system ("pkgrm $name");
+      }
+   }
+}
+
+#
+# This function provides information about packages.
+#
+sub packageInfo
+{
+   # Get the package to view.
+   my $packageName = selectPackage("<C></U>Select a package to view.");
+
+   # Get the information about the selected package.
+   my @pinfo = qx (pkginfo -l $packageName); chomp @pinfo;
+ 
+   # Create the information viewer.
+   my $viewer = new Cdk::Viewer ('Buttons' => ["OK"],
+					'Height' => -2,
+					'Width' => -4);
+
+   # Activate the viewer.
+   $viewer->set ('Title' => "<C>Package Name: </U>$packageName<!U>",
+			'Info' => \@pinfo,
+			'Interp' => "FALSE");
+   $viewer->activate ();
+}
+
+#
+# This function creates a scrolling list of all the packages on the system
+# and returns the name of the package selected.
+#
+sub selectPackage
+{
+   my $title = shift;
+
+   # Get a list of all the packages installed on the system.
+   my @packageList = qx (pkginfo);
+   my @packageNames = ();
+
+   # Strip out the names of the packages.
+   foreach $PKG (@packageList)
+   {
+      my $pkgName = (split (/\s+/, $PKG))[1];
+      push (@packageNames, $pkgName);
+   }
+
+   # Create the scrolling list.
+   my $packageList = new Cdk::Scroll ('Title' => $title,
+					'List' => \@packageNames,
+					'Numbers' => "TRUE",
+					'Height' => 20,
+					'Width' => 50);
+
+   # Return the selected name.
+   my $choice =  $packageList->activate();
+   return ($packageNames[$choice]);
+}
+
+#
+# This function creates a selection list of all the packages on the system
+# and returns the name of the package selected.
+#
+sub selectPackages
+{
+   my $title = shift;
+   my @options = qw (Keep Delete);
+   my @selectedNames = ();
+
+   # Get a list of all the packages installed on the system.
+   my @packageList = qx (pkginfo);
+   my @packageNames = ();
+   my @selectedPackages = ();
+   my $x = 0;
+
+   # Strip out the names of the packages.
+   foreach $PKG (@packageList)
+   {
+      my $pkgName = (split (/\s+/, $PKG))[1];
+      push (@packageNames, $pkgName);
+   }
+
+   # Create the selection list.
+   my $select = new Cdk::Selection ('Title' => $title,
+					'List' => \@packageNames,
+					'Choices' => \@options,
+					'Height' => 20,
+					'Width' => 50);
+
+   # Activate the selection list.
+   my @list = $select->activate();
+
+   # Generate the names of the selected packages.
+   for ($x=0; $x <= $#packageNames; $x++)
+   {
+      if ($list[$x] == 1)
+      {
+         push (@selectedPackages, $packageNames[$x]);
+      }
+   }
+   return (@selectedPackages);
+}

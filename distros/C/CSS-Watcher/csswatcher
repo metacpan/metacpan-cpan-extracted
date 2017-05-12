@@ -1,0 +1,331 @@
+#!/usr/bin/perl -w -Ilib
+
+=head1 NAME
+
+csswatcher - daemon/client for scanning css, less files and build Emacs ac-html completion.
+
+=head1 DESCRIPTION
+
+CSS completion generator for emacs ac-html.el.
+
+=head1 USAGE
+
+=head2 Run as daemon
+
+   % csswatcher --daemon
+
+You don't need start in this way, because csswatcher automatically daemonize self.
+To stop manually:
+
+   % csswatcher --stop
+
+=head2 Build completions for your project.
+
+The concept of  a project is pretty basic like  projectile.el. Currently  git, mercurial and
+bazaar repos are considered projects by  default.  If you want to mark
+a folder  manually as a  project just  create an empty  .projectile or
+.csswatcher file in it.
+
+I hope you have no .git in root directory (or home ~/.git),
+because it may be occasion for full system scanning if you forgot setup project directory.
+
+   % touch      ~/work/bootstrap/dist/.csswatcher
+   % csswatcher ~/work/bootstrap/dist/css/bootstrap.min.css
+   PROJECT: ~/work/bootstrap/dist/
+   ACSOURCE: ~/.emacs.d/ac-html-csswatcher/completion/9ba471294f1c47ce596177c978b79c95
+
+Above example, show how to parse "~/work/bootstrap/" project directory.
+
+=over 2
+
+=item PROJECT
+
+Found project directory for object "~/work/bootstrap/dist/css/bootstrap.min.css"
+
+=item ACSOURCE
+
+Directory where completion sources located.
+
+=back
+
+=head1 File .csswatcher
+
+This file, as like .projectile, .git, etc, used to get project directory.
+But it olso may have some extra, example:
+
+    % cat .csswatcher
+    # ignore minified css files "min.css"
+    ignore: min\.css$
+    # ignore bootstrap css files
+    ignore: bootstrap.*css$
+    # skip recursive scanning node_modules, it may be slow!
+    skip: node_modules
+
+Another example:
+
+    % cat .csswatcher
+    # ignore all css
+    ignore: \.css$
+    # except app.css
+    use: app\.css
+    # and skip recursive scanning node_modules, it may be slow!
+    skip: node_modules
+
+=over 2
+
+=item IGNORE:
+
+Regexp for files that be ignored when scanning.
+
+=item USE:
+
+Regexp for match files that allowed to be parsed. Have higher order than "ignore".
+
+=item SKIP:
+
+Regexp to avoid recursive scan of directories. "node_modules", ".meteor" are good candidates for it!
+
+=back
+
+=head1 SYMLINKS PROBLEM
+
+Symlink that have "../" ignored to prevent circular symlink, however I hope you don't symlink to upper directory
+(ex. "~/projects" ) that contains your project (ex. ~/projects/myproject).
+If so, you need ignore it in ".csswatcher"
+
+=head1 COMMAND LINE PARAMETERS
+
+See
+
+    % csswatcher --help
+
+=head1 SEE ALSO
+
+https://github.com/osv/ac-html-csswatcher
+
+https://github.com/cheunghy/ac-html
+
+https://github.com/osv/company-web
+
+=head1 AUTHOR
+
+Olexandr Sydorchuk (olexandr.syd@gmail.com)
+
+=cut
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+use File::Slurp qw/read_file write_file/;
+use Path::Tiny;
+use IO::Socket::INET;
+use POSIX qw(setsid);
+use Log::Log4perl qw(:easy);
+use PID::File;
+
+use CSS::Watcher;
+
+use constant AC_HTML_ATTRIBUTES            => 'html-attributes-list';
+use constant SOCKET_FILE                   => '~/.emacs.d/ac-html-csswatcher/csswatcher.socket';
+use constant LOG_FILE                      => '~/.emacs.d/ac-html-csswatcher/csswatcher.log';
+use constant PID_FILE                      => '~/.emacs.d/ac-html-csswatcher/csswatcher.pid';
+use constant HTML_STUFF                    => CSS::Watcher::DEFAULT_HTML_STUFF_DIR;
+
+sub usage {
+
+    my $Line;
+    my ($Script) = ( $0 =~ m#([^\\/]+)$# );
+
+    $Line = "-" x length( "$Script v$CSS::Watcher::VERSION" );
+
+    print << "EOT";
+
+$Script v$CSS::Watcher::VERSION
+$Line
+Monitor project and create completion for ac-html
+
+  Usage:
+    $0 [--help]
+    $0 [options] OBJECT
+
+    OBJECT......Directory or file, this script will find project home like projectile
+    socket......Socket file, default
+                @{[SOCKET_FILE]}
+    version.....Print version
+
+Daemon options:
+    daemon......Start daemon (it automatically start if OBJECT defined).
+    restart.....Restart daemon
+    stop........Stop daemon
+    logfile.....Set log file for daemon, default
+                @{[LOG_FILE]}
+    outputdir...Output root directory where place generated files for ac-html
+                @{[HTML_STUFF]}
+    pidfile.....PID file for daemon, default
+                @{[PID_FILE]}
+    debug.......Debug level, default INFO. You can set
+                OFF FATAL ERROR WARN INFO DEBUG TRACE ALL.
+
+See also https://github.com/cheunghy/ac-html
+EOT
+}
+
+my $socket_file = SOCKET_FILE;
+my $log_file = LOG_FILE;
+my $html_stuff_dir = HTML_STUFF;
+my $pid_file = PID_FILE;
+my $help = 0;
+my $debug_level = 'INFO';
+my $restart = 0;
+my $daemon = 0;
+my $stop = 0;
+my $show_version = 0;
+
+GetOptions ( "socket=s" => \$socket_file,
+             'logfile=s' => \$log_file,
+             'outputdir=s' => \$html_stuff_dir,
+             'debug=s' => \$debug_level,
+             'pidfile=s' => \$pid_file,
+             'restart' => \$restart,
+             'daemon' => \$daemon,
+             'stop' => \$stop,
+             'version' => \$show_version,
+             "help|?"  => \$help);
+
+
+$socket_file = path( $socket_file );
+$log_file = path( $log_file );
+$html_stuff_dir = path( $html_stuff_dir );
+$pid_file = path( $pid_file );
+
+my $file = $ARGV[0];
+
+if ($show_version) {
+    print "csswatcher $CSS::Watcher::VERSION\n";
+    exit;
+}
+
+if ($help || (!($restart || $daemon || $stop) && ($file // '') eq '')) {
+    usage();
+    exit(0);
+}
+
+if ($stop) {
+    my $pid = PID::File->new(file => $pid_file);
+    if ($pid->running) {
+        kill "TERM", $pid->pid;
+    }
+    unlink $pid_file;
+    exit
+}
+
+# try connect to daemon
+my $probe = IO::Socket::UNIX->new(
+     Type => SOCK_STREAM(),
+     Peer => $socket_file,
+);
+
+# looks daemon not running, fork server
+# when --reload param.
+if (!defined $probe || $restart) {
+
+    my $pid = fork();
+    defined($pid) || die "Fork failed: $!";
+
+    if (!$pid) {
+        setsid();               # Become session leader
+
+        $socket_file->parent->mkpath;
+        $log_file->parent->mkpath;
+        $pid_file->parent->mkpath;
+
+        # kill old daemon
+        my $pid = PID::File->new(file => $pid_file);
+        if ($pid->running) {
+            kill "TERM", $pid->pid;
+        }
+
+        # start server
+        unlink $log_file;
+        unlink $socket_file;
+        unlink $pid_file;
+
+        die "can't create pid file"
+            if ! $pid->create;
+        $pid->guard;
+
+
+        my $conf = qq(
+    log4perl.rootLogger=$debug_level, Logfile
+    log4perl.appender.Logfile          = Log::Log4perl::Appender::File
+    log4perl.appender.Logfile.filename = $log_file
+    log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.Logfile.layout.ConversionPattern = [\%d{HH:mm:ss}] %p{1} \%-20c{2} \%m\%n
+
+  );
+        Log::Log4perl::init( \$conf );
+
+        my $server = IO::Socket::UNIX->new(
+            Type => SOCK_STREAM(),
+            Local => $socket_file,
+            Listen => 1,
+        );
+
+        LOGDIE "Can't create socket for server" unless defined $server;
+
+        my $watcher = CSS::Watcher->new({outputdir => $html_stuff_dir});
+
+        DEBUG "Ready for connections";
+
+        while (1) {
+            my $clientsocket = $server->accept();
+
+            # read the data from the client
+            my $task = <$clientsocket>;
+            next unless defined $task;
+            INFO " **** New Client Connected ****";
+
+            # "WATCH: " command
+            if (my ($watchobj) = $task =~/WATCH: (.+)/) {
+                my ($project_dir, $ac_html_stuff_dir);
+                eval {
+                    ($project_dir, $ac_html_stuff_dir) = $watcher->get_html_stuff ($watchobj);
+                };
+                
+                if ($@) {
+                    ERROR "Object parse fail \"$watchobj\", reason: $@";
+                }
+
+                if (defined $ac_html_stuff_dir) {
+                    print $clientsocket "PROJECT: $project_dir\n";
+                    print $clientsocket "ACSOURCE: $ac_html_stuff_dir\n";
+                }
+            }
+        }
+        $server->close();
+        DEBUG "Exiting";
+        exit;
+    }
+    sleep 2;                    # Wait few for daemon start well
+}
+
+$probe->close() if (defined $probe);
+
+# good, we connect to daemon, send job and print returned
+
+if (($file // '') ne '') {
+    my $client = IO::Socket::UNIX->new(
+        Type => SOCK_STREAM(),
+        Peer => $socket_file,
+    );
+
+    die "Can't create socket for client"
+        unless defined $client;
+
+    print $client "WATCH: $file\n";
+    while (my $response = <$client>) {
+        print "$response";
+    }
+}
+

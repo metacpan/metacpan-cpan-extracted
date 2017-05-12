@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb56
+registers:
+  AF: 37244
+  AF_: 0
+  BC: 11448
+  BC_: 0
+  DE: 22300
+  DE_: 0
+  HL: 62717
+  HL_: 0
+  I: 0
+  IX: 27952
+  IY: 44738
+  PC: 4
+  R: 2
+  SP: 0

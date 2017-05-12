@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  47582:
+    - 105
+name: ed67
+registers:
+  AF: 13092
+  AF_: 0
+  BC: 45418
+  BC_: 0
+  DE: 42203
+  DE_: 0
+  HL: 47582
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

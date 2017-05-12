@@ -1,0 +1,8 @@
+Revision history for Color-Model-Munsell
+
+0.01    30 Sep 2010
+        First version.
+
+0.02    22 Oct 2010
+        - Appended subroutine, Munsell().
+        - Modified POD.

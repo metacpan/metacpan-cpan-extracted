@@ -1,0 +1,25 @@
+---
+abstract: 'Rewrite URLs generated with uri_for'
+author:
+  - 'Jose Luis Martinez Torres <jlmartin@cpan.org>'
+build_requires:
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-ExternalURI
+requires:
+  Catalyst::Runtime: 5.8
+  Regexp::Common: 0
+resources:
+  bugtracker: https://github.com/pplu/catalyst-plugin-externaluri/issues
+  repository: git://github.com/pplu/catalyst-plugin-externaluri.git
+version: 0.02

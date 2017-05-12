@@ -1,0 +1,54 @@
+---
+abstract: 'preemptive HTTP cache control'
+author:
+  - 'Interactive Information, Ltd C<< <cpan at interactive.co.uk> >>'
+build_requires:
+  Catalyst::Runtime: 0
+  DateTime::Format::HTTP: 0
+  Digest::MD5: 0
+  ExtUtils::MakeMaker: 6.59
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Test::More: 0.88
+  Test::WWW::Mechanize::Catalyst: 0
+  URI: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Cache-HTTP-Preempt
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Readonly::XS: 0
+requires:
+  Catalyst::Utils: 0
+  DateTime: 0
+  English: 0
+  File::Find: 0
+  HTTP::Headers::ETag: 0
+  HTTP::Status: 6.03
+  List::Util: 0
+  Moose::Role: 0
+  Perl::MinimumVersion: 0
+  Pod::Readme: 0
+  Readonly: 0
+  Test::CheckManifest: 0
+  Test::Perl::Critic: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+  Test::PureASCII: 0
+  Test::Synopsis: 0
+  perl: 5.010
+  version: 0.77
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 0.001003

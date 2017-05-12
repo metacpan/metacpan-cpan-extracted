@@ -1,0 +1,33 @@
+---
+abstract: 'REST model class for Catalyst'
+author:
+  - 'Kaare Rasmussen <kaare at cpan dot net>'
+build_requires:
+  Data::Serializer: 0
+  Data::Serializer::JSON: 0
+  Data::Serializer::XML::Simple: 0
+  Data::Serializer::YAML: 0
+  JSON: 2.00
+  Module::Build: 0.3601
+  Test::More: 0.88
+  XML::Simple: 0
+  YAML: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-REST
+requires:
+  Catalyst::Model: 0
+  Moose: 0
+  Role::REST::Client: 0
+resources:
+  repository: git://github.com/kaare/Catalyst-Model-REST.git
+version: 0.27

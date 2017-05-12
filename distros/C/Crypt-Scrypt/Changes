@@ -1,0 +1,18 @@
+Revision history for Crypt-Scrypt
+
+0.05  Fri Jul 22 08:32:34 UTC 2011
+    - Skipped tests if scrypt doesn't work on the system.
+    - Removed -Wall compiler flag.
+
+0.04  Thu Apr 28 12:35:50 UTC 2011
+    - Updated test for -fPIC flag to include archnames with amd64.
+
+0.03  Mon Apr 25 19:49:58 UTC 2011
+    - Fixed compilation on x86_64 by adding -fPIC flag.
+
+0.02  Thu Apr 21 19:35:50 UTC 2011
+    - Linked in librt library, when found.
+    - Installed libscrypt outside of LT_OBJDIR, for portability.
+
+0.01  Thu Apr 21 01:55:31 UTC 2011
+    - Initial distribution.

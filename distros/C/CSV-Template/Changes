@@ -1,0 +1,16 @@
+Revision history for Perl extension CSV-Template.
+
+0.03 Thurs Feb 17 2004
+    - some documentation changes and corrections
+        - thanks to Steve Knoblock
+    - removed the redudant 'use HTML::Template' line
+    - added pod.t and pod_coverage.t files
+
+0.02 Mon, May 24, 2004
+    - quote_string method added
+        - documentation created for it
+        - tests created for it
+
+0.01 Sun May 23 22:33:47 2004
+    - module created
+

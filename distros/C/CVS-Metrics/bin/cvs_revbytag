@@ -1,0 +1,525 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Path;
+use Getopt::Std;
+use HTML::Template;
+use Pod::Usage;
+
+use CVS::Metrics;
+use CVS::Metrics::Graph;
+
+my %opts;
+getopts('d:f:ho:st:v', \%opts);
+
+if ($opts{h}) {
+    pod2usage(-verbose => 1);
+}
+
+if ($opts{v}) {
+    print "$0\n";
+    print "CVS::Metrics Version $CVS::Metrics::VERSION\n";
+    exit(0);
+}
+
+my $cfg = '.cvs_metrics';
+our ($title, $regex_tag, @dirs, $flg_head, $flg_dead, $flg_css, $regex_ignore_tag);
+if ( -r $cfg) {
+    print "reading $cfg\n";
+    require $cfg;
+}
+
+my $cvs_logfile;
+if ($opts{f}) {
+    $cvs_logfile = $opts{f};
+}
+else {
+    my $cvs = FindCvs();
+    $cvs_logfile = $cvs . ' log |';
+}
+
+if ($opts{d}) {
+    my $dirs = $opts{d};
+    @dirs = split / /, $dirs;
+}
+
+if ($opts{t}) {
+    $title = $opts{t};
+}
+else {
+    $title = 'total' unless (defined $title);
+}
+
+if ($opts{H}) {
+    $flg_head = 1;
+}
+
+if ($opts{s}) {
+    $flg_css = 1;
+}
+
+unless (defined $regex_tag) {
+    $regex_tag = '\d+';
+}
+
+my $output = $opts{o};
+if ($output and ! -d $output) {
+    mkpath $output
+            or die "can't create $output ($!).";
+}
+
+=head1 NAME
+
+cvs_revbytag - Extract from cvs log
+
+=head1 SYNOPSIS
+
+cvs_revbytag [B<-f> I<file.log>] [B<-o> I<dir>] [B<-t> I<title>] [B<-s>] [B<-d> "I<dirs> ..."] [B<-S> I<yyyy/mm/dd>]
+
+=head1 OPTIONS
+
+=over 8
+
+=item -d
+
+List of directories.
+
+=item -f
+
+Mode off-line.
+
+=item -h
+
+Display Usage.
+
+=item -o
+
+Output directory.
+
+=item -s
+
+use an extern style sheet (cvs_revbytag.css).
+
+=item -t
+
+Specify the main title.
+
+=item -v
+
+Display Version.
+
+=item -D
+
+suppress 'dead' files in tree.
+
+=back
+
+=head1 DESCRIPTION
+
+B<cvs_revbytag> parses B<cvs log> and produces HTML reports.
+
+Each report is composed of two parts :
+
+- a energy plot
+
+- a table (a row for each file, a column for each tag) where the cell
+cointains the revision of the file for the tag.
+
+This tool needs File::Which, GD, Chart::Plot::Canvas, HTML::Template
+and Parse::RecDescent modules.
+
+=head2 Configuration file (.cvs_metrics)
+
+If present, B<cvs_revbytag> reads the configuration file F<.cvs_metrics>
+in the current directory. The file could contains the following variables :
+
+ $title = "main";
+
+ $regex_tag = '^V\d+';
+
+ @dirs = ( "abc", "def" , "def/hij" );
+
+=head1 SEE ALSO
+
+cvs_current, cvs_activity, cvs_energy, cvs_tklog, cvs_wxlog
+
+=head1 COPYRIGHT
+
+(c) 2005-2010 Francois PERRAD, France. All rights reserved.
+
+This library is distributed under the terms of the Artistic Licence.
+
+=head1 AUTHOR
+
+Francois PERRAD, francois.perrad@gadz.org
+
+=cut
+
+our $cvs_log = CVS::Metrics::CvsLog(
+        stream      => $cvs_logfile,
+        use_cache   => 1,
+#       force       => 1,
+);
+if ($cvs_log) {
+    our @tags;
+    my $timed = $cvs_log->getTimedTag($regex_ignore_tag);
+    my %matched;
+    while (my ($tag, $date) = each %{$timed}) {
+        print 'Tag: ', $tag;
+        if ($tag =~ /$regex_tag/) {
+            $matched{$date.$tag} = $tag;
+            print ' ... matched';
+        }
+        print "\n";
+    }
+    foreach (sort keys %matched) {
+        push @tags, $matched{$_};
+    }
+
+    if ($flg_head) {
+        push @tags, 'HEAD';
+        $cvs_log->insertHead();
+    }
+
+    my @html = ();
+    push @html, Generate($cvs_log, \@tags, $title, '.', $flg_css, $output);
+    for my $path (@dirs) {
+        push @html, Generate($cvs_log, \@tags, $title, $path, $flg_css, $output);
+    }
+    GenerateSummary($title, $flg_css, \@html, $output);
+}
+
+sub FindCvs {
+    my $cvs;
+    if ($^O eq 'MSWin32') {
+        eval 'use File::Which';
+        $cvs = which('cvs');
+        unless (defined $cvs) {
+            eval 'use Win32::TieRegistry(Delimiter => "/")';
+            my $cvs_setting;
+            my $hkey = 'HKEY_CURRENT_USER/Software/WinCvs/wincvs/CVS settings';
+            eval '$cvs_setting = $Registry->{$hkey}';
+            $cvs = $cvs_setting->{'/P_WhichCvs'};
+            if (defined $cvs) {
+                $cvs =~ s/[\000\001]//g;
+                $cvs =~ s/wincvs\.exe\@$//;
+                if ( -e "${cvs}CVSNT\\\\cvs.exe") {
+                    $cvs .= "CVSNT\\\\cvs.exe";
+                }
+                else {
+                    $cvs .= 'cvs.exe';
+                }
+            }
+        }
+        die "cvs not found !\n" unless (defined $cvs);
+        warn "Using CVS : $cvs\n";
+        return q{"} . $cvs . q{"};
+    }
+    else {
+        return 'cvs';
+    }
+}
+
+#######################################################################
+
+sub Generate {
+    my ($cvs_log, $tags, $title, $path, $flg_css, $output) = @_;
+
+    my $evol = $cvs_log->getRevByTag($tags, $path);
+
+    my $dir = $path eq '.' ? 'all' : $path;
+    my $title_full = "${title} ${dir}";
+    my $basename = $title_full;
+    $basename =~ s/[ \/]/_/g;
+    my $filename = (defined $output) ? $output . '/' . $basename : $basename;
+    open my $CSV, '>', "$filename.csv"
+            or die "can't open $filename.csv ($!)\n";
+    print $CSV 'files';
+    foreach (@{$tags}) {
+        print $CSV ',',$_;
+    }
+    print $CSV "\n";
+    foreach my $dirname (sort keys %{$evol}) {
+        foreach my $filename (sort keys %{$evol->{$dirname}}) {
+            print $CSV $filename;
+            my $curr = q{};
+            foreach (@{$evol->{$dirname}->{$filename}}) {
+                print $CSV ',';
+                if (defined $_) {
+                    if ($_ eq $curr) {
+                        print $CSV '-';
+                    }
+                    else {
+                        print $CSV $_;
+                        $curr = $_;
+                    }
+                }
+            }
+            print $CSV "\n";
+        }
+    }
+    close $CSV;
+
+my $html = q{
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' />
+    <meta name='generator' content='<TMPL_VAR NAME=generator>' />
+    <meta name='date' content='<TMPL_VAR NAME=date>' />
+    <title>cvs_revbytag <!-- TMPL_VAR NAME=title --></title>
+    <!-- TMPL_IF NAME=css -->
+    <link href='cvs_revbytag.css' rel='stylesheet' type='text/css'/>
+    <!-- TMPL_ELSE -->
+    <style type='text/css'>
+      <!-- TMPL_VAR NAME=style -->
+    </style>
+    <!-- /TMPL_IF -->
+  </head>
+  <body>
+  <h1>Revision by Tag</h1>
+  <h1><!-- TMPL_VAR NAME=title --></h1>
+  <hr />
+  <h2>Context</h2>
+  <table class='layout'>
+    <tr>
+      <td valign='top'><img src='<TMPL_VAR NAME=e_img>' /></td>
+      <td valign='top'>
+        <table border='1' cellpadding='5'>
+          <tr>
+            <th>Tag</th>
+            <th>Date</th>
+          </tr>
+        <!-- TMPL_LOOP NAME=timed_tag -->
+          <tr>
+            <td><!-- TMPL_VAR NAME=tag --></td>
+            <td><!-- TMPL_VAR NAME=timed --></td>
+          </tr>
+        <!-- /TMPL_LOOP -->
+        </table>
+      </td>
+    </tr>
+  </table>
+  <hr />
+  <h2>Detailed Report</h2>
+  <table border='1' cellpadding='5'>
+    <tr>
+      <th>Files</th>
+    <!-- TMPL_LOOP NAME=tagnames -->
+      <th class='tag'><!-- TMPL_VAR NAME=name --></th>
+    <!-- /TMPL_LOOP -->
+    </tr>
+  <!-- TMPL_LOOP NAME=files --><tr>
+      <td><!-- TMPL_VAR NAME=name --></td>
+    <!-- TMPL_LOOP NAME=tags -->
+      <td><!-- TMPL_VAR NAME=rev --></td>
+    <!-- /TMPL_LOOP -->
+  </tr><!-- /TMPL_LOOP -->
+  </table>
+  <hr />
+  <cite>Generated by cvs_revbytag (<!-- TMPL_VAR NAME=date -->)</cite>
+  </body>
+</html>
+};
+
+my $style = q{
+      body           { background-color: #FFFFCC }
+      table          { background-color: #FFFFFF }
+      table.layout   { background-color: #FFFFCC }
+      h1             { text-align: center }
+      h2             { color: red }
+      th             { background-color: #DCDCDC }
+      th.tag         { writing-mode: tb-rl } /* CSS-3 */
+};
+
+    my $template = HTML::Template->new(
+            loop_context_vars   => 1,
+            scalarref           => \$html,
+    );
+    die "can't create template ($!).\n"
+            unless (defined $template);
+
+    my $now = localtime();
+    my $generator = 'cvs_revbytag ' . $CVS::Metrics::VERSION . ' (Perl ' . $] . ')';
+
+    my $image = $cvs_log->EnergyGD($tags, $path, $dir, 600, 400);
+
+    my $e_img = "e_${title_full}.png";
+    $e_img =~ s/[ \/]/_/g;
+    $filename = (defined $output) ? $output . '/' . $e_img : $e_img;
+    if (defined $image) {
+        open my $OUT, '>', $filename
+                or die "can't open $filename ($!).\n";
+        binmode $OUT, ':raw';
+        print $OUT $image->png();
+        close $OUT;
+    }
+
+    my $timed_tag = $cvs_log->getTimedTag($regex_ignore_tag);
+    my @timed_tag = ();
+    foreach my $tag (@{$tags}) {
+        if ($tag eq 'HEAD') {
+            push @timed_tag, {
+                    tag     => $tag,
+                    timed   => "now",
+            };
+        }
+        else {
+            push @timed_tag, {
+                    tag     => $tag,
+                    timed   => substr($timed_tag->{$tag}, 0, 10),
+            };
+        }
+    }
+
+    my @tagnames;
+    foreach (@{$tags}) {
+        push @tagnames, {
+                name    => $_,
+        };
+    }
+    my @files;
+    foreach my $dirname (sort keys %{$evol}) {
+        foreach my $filename (sort keys %{$evol->{$dirname}}) {
+            my @tags = ();
+            my $curr = q{};
+            foreach (@{$evol->{$dirname}->{$filename}}) {
+                my $revname;
+                if (defined $_) {
+                    if ($_ eq $curr) {
+                        $revname = '-';
+                    }
+                    else {
+                        $revname = $_;
+                        $curr = $_;
+                    }
+                }
+                else {
+                    $revname = '&nbsp;';
+                }
+                push @tags, {
+                        rev     => $revname,
+                };
+            }
+            push @files, {
+                    name    => $filename,
+                    tags    => \@tags,
+            };
+        }
+    }
+
+    $template->param(
+            css             => $flg_css,
+            style           => $style,
+            generator       => $generator,
+            date            => $now,
+            title           => $title_full,
+            e_img           => $e_img,
+            timed_tag       => \@timed_tag,
+            tagnames        => \@tagnames,
+            files           => \@files,
+    );
+
+    $basename = "${title_full}.html";
+    $basename =~ s/[ \/]/_/g;
+    $filename = (defined $output) ? $output . '/' . $basename : $basename;
+    open my $OUT, '>', $filename
+            or die "can't open $filename ($!)\n";
+    print $OUT $template->output();
+    close $OUT;
+
+    if ($flg_css) {
+        my $stylesheet = 'cvs_revbytag.css';
+        $stylesheet = $output . '/' . $stylesheet
+                if ($output);
+        unless (-e $stylesheet) {
+            open my $OUT, '>', $stylesheet
+                    or die "can't open $stylesheet ($!)\n";
+            print $OUT $style;
+            close $OUT;
+        }
+    }
+
+    return $basename;
+}
+
+sub GenerateSummary {
+    my ($title, $flg_css, $r_html, $output) = @_;
+
+my $html = q{
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=ISO-8859-1' />
+    <meta name='generator' content='<TMPL_VAR NAME=generator>' />
+    <meta name='date' content='<TMPL_VAR NAME=date>' />
+    <title>cvs_revbytag <!-- TMPL_VAR NAME=title --></title>
+    <!-- TMPL_IF NAME=css -->
+    <link href='cvs_revbytag.css' rel='stylesheet' type='text/css'/>
+    <!-- TMPL_ELSE -->
+    <style type='text/css'>
+      <!-- TMPL_VAR NAME=style -->
+    </style>
+    <!-- /TMPL_IF -->
+  </head>
+  <body>
+  <h1><!-- TMPL_VAR NAME=title --></h1>
+  <hr />
+  <h2>Reports Index</h2>
+  <ul>
+  <!-- TMPL_LOOP NAME=rpts -->
+    <li><a href='<TMPL_VAR NAME=href>'><!-- TMPL_VAR NAME=href --></a></li>
+  <!-- /TMPL_LOOP -->
+  </ul>
+  <hr />
+  <cite>Generated by cvs_revbytag (<!-- TMPL_VAR NAME=date -->)</cite>
+  </body>
+</html>
+};
+
+my $style = q{
+      body  { background-color: #FFFFCC }
+      h1    { text-align: center }
+      h2    { color: red }
+};
+
+    my $template = HTML::Template->new(
+            loop_context_vars   => 1,
+            scalarref           => \$html,
+    );
+    die "can't create template ($!).\n"
+            unless (defined $template);
+
+    my $now = localtime();
+    my $generator = 'cvs_revbytag ' . $CVS::Metrics::VERSION . ' (Perl ' . $] . ')';
+
+    my @rpts = ();
+    foreach (@{$r_html}) {
+        push @rpts, {
+            href        => $_,
+        }
+    }
+
+    $template->param(
+            css         => $flg_css,
+            style       => $style,
+            generator   => $generator,
+            date        => $now,
+            title       => $title,
+            rpts        => \@rpts,
+    );
+
+    my $filename = 'revbytag.html';
+    $filename = $output . '/' . $filename
+            if ($output);
+    open my $OUT, '>', $filename
+            or die "can't open $filename ($!)\n";
+    print $OUT $template->output();
+    close $OUT;
+}
+

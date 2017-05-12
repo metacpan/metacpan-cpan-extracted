@@ -1,0 +1,44 @@
+# this file holds stuff that can be used by
+# other *.tech files. with a 
+# INCLUDE common.tech 
+# statement or just on its own...
+ruler {
+	rulerTips (3,0,8);
+    rulerColor "green";
+}
+
+grid {
+    majorXgrid = 1;
+    majorYgrid = 1;
+    minorXgrid = 0.1;
+    minorYgrid = 0.1;
+    snapXgrid = 0.05;
+    snapYgrid = 0.05;
+}
+
+layer {
+##    # layer: the GDS2 layer number
+##    # datatype: the GDS2 datatype (use "all" or 0 for now - not using)
+##    # name: layer name (in quotes)
+##    # group: common layer name (in quotes)
+##    # color: color std hex rgb "#cc0000" or any one field name in /usr/openwin/lib/X11/rgb.txt
+##    # name of stipple file in ~/.gds2tool/stipple/ (minus the extension)
+# layer; datatype;       name;     group; fill color; outline color;  stipple; visible; selectable;
+      4;      all;     "Poly";        "";  "#66ccff";     "#66ccff";       "";       y;          y;
+      0;      all;     "Zero";        "";         "";       "white";       "";       y;          y;
+      2;      all; "N Island";    "diff";  "#9900cc";     "#9900cc";    "dot";       y;          y;
+      3;      all; "P Island";    "diff";  "#cc9900";     "#cc9900";    "dot";       y;          y;
+      5;      all;  "Contact";     "via";  "#ffff00";     "#ffff00";       "";       y;          y;
+      6;      all;  "Metal 1";   "metal";  "#cc0000";     "#cc0000"; "fslash";       y;          y;
+     10;      all;    "Nwell";    "diff";  "#cc33ff";     "#cc33ff"; "bslash";       y;          y;
+     16;      all; "Boundary";    "info";         "";     "#ffff00";       "";       y;          y;
+     18;      all;  "Metal 2";   "metal";  "#0000cc";     "#0000cc"; "bslash";       y;          y;
+     48;      all;  "Metal 4";   "metal";  "#cc00cc";     "#cc00cc"; "bslash";       y;          y;
+     51;      all;  "Metal 4";   "metal";  "#cc00cc";     "#cc00cc"; "bslash";       y;          y;
+     65;      all;"Metal1 text";  "text";  "#66ffff";     "#66ffff";       "";       y;          y;
+     71;      all;"Metal1 text";  "text";  "#cc0000";     "#cc0000";       "";       y;          y;
+     72;      all;"Metal2 text";  "text";  "#0000cc";     "#0000cc";       "";       y;          y;
+     73;      all;"Metal3 text";  "text";  "#cc0000";     "#cc0000";       "";       n;          n;
+     74;      all;"Metal4 text";  "text";  "#cc00cc";     "#cc00cc";       "";       n;          n;
+}
+

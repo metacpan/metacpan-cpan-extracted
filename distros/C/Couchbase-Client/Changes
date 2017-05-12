@@ -1,0 +1,411 @@
+commit d34d6e2a1ae18e11a9c2bcc59050b25359a079cb
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Jun 19 14:31:33 2014 -0700
+
+    GH-15: Remove erroneous return statement
+
+commit 1724d3d28e9c8c3471b9a854db532021b901a1dd
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Mar 20 19:02:21 2013 -0700
+
+    Release 1.0.1
+
+commit b8bcaf047759859215e64d66f503516285a4bc32
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Mar 20 19:02:01 2013 -0700
+
+    Version bump
+
+commit 69d3c3578c56447848fb969c1da8a84bf486df11
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Mar 20 19:00:53 2013 -0700
+
+    GH-4: Fix set_multi with single arrayref
+    
+    Previously set_multi would crash when a single arrayref was used as part
+    of the list. This fixes that issue
+
+commit e3c9f9fd03a69c5de651a7fa54fa8e36d5ce495a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Dec 26 13:26:32 2012 -0800
+
+    Version bump
+
+commit 198bcd9a0a590e233933b54340e6aa08b1c1b6e3
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Dec 26 13:21:10 2012 -0800
+
+    GH-2: Allow stringified expiry
+
+commit a38f05534f31ad4140d67d0d11e4c07da9f53ef6
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Dec 19 13:52:35 2012 -0800
+
+    Fix compat mode
+
+commit 4a94bce7ea39dfae85c077b0b62a452da7fe1e82
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 2 23:51:47 2012 -0700
+
+    Version bump. Removed unstable warning from docs
+
+commit 836832cc1593e5df139e24e9cb0c81ca2f05ea86
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 2 23:44:56 2012 -0700
+
+    Make compatible with newer libcouchbase versions (with less deps)
+    
+    - Fixed bundled building (user can force this even if libcouchbase is
+      installed)
+    
+    - Removed libisasl build process (libisasl is now shipped with
+      libcouchbase)
+    
+    - Removed memcached headers extraction (this too is shipped with
+      libcouchbase)
+
+commit 3e117b7966e91bedca967b7e55cbb89529d48381
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 2 23:43:21 2012 -0700
+
+    replace libcouchbase_create_io_event_ops with ..
+    
+    proper API usage
+
+commit b509a068fc46858c1b80735f7844bb42088a4315
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Feb 27 12:18:04 2012 -0800
+
+    First non-dev release
+    
+    - Fixed and added tests for stat command
+    - Fixed and added tests for compat wrappers
+    - Removed auto-generated files from git tracking
+    - Added repository in Makefile.PL
+
+commit c25036baca3a3888173b77da11f0c0fc719b6014
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Feb 25 13:41:26 2012 -0800
+
+    Build script and test enhancements
+    
+    Bundled libcouchbase version with consistent error reporting
+    
+    Tests now more consistent with connection errors
+    
+    Removed sasl dependency in favor of libcouchbase embedded isasl
+    
+    Prompt for Java and whether to build dependencies
+    
+    Fixed Makefile target for libcouchbase.so/EU::MM for non-gmake make
+    variants
+    
+    Added dependency for proper version of ExtUtils::CBuilder which includes
+    env CFLAGS
+    
+    Removed Log::Fu from src/Makefile.PL, one way to our step of removing
+    un-needed deps
+    
+    Include Perl's @Config{qw(cflags ldflags} for ultimate target, stripping
+    defines, optimization and other compiler/linker directives
+
+commit fdc0e6abaa60ec86e5275bc36aed87e46e33f542
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Feb 23 00:01:44 2012 -0800
+
+    Build fixes, 32 bit support
+    
+    - 32 bit support based and developed on NetBSD
+    - MockServer bug when SIGSTOP to netbsd java
+    - Typos and extra cruft in src/Makefile.PL
+    - Fixed redefine bugs for perls 5.15.x
+    - Compression interop tests for memcached (and bugfixes related to
+        option specifiers)
+    - Added 'known issues' section in README
+    - Handle $Config{lddlflags} if it contains rpath directives
+
+commit 34d6bd7776088a6467ebe49eab6e2173fb60f904
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Feb 20 20:40:18 2012 -0800
+
+    Fixed slight dependency, and..
+    
+    skip interop tests if Couchbase::Config not installed
+    moved Log::Fu as a Makefile.PL dependency
+    moved ExtUtils::H2PM as configure dependency
+    removed unneeded modules from MockServer.pm
+    added parens around (qw())
+
+commit e067c89f8e36d41357b2997b847aa3c95fc36ba5
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Feb 19 10:02:37 2012 -0800
+
+    Updated to newer version of libisasl
+    
+    and fixed some more bugs in the ac scripts
+
+commit 9c6277d601479fd1f33c987f353cedd4f7423c1b
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Feb 19 00:09:42 2012 -0800
+
+    Fixed build scripts, changed absolute to relative time offsets
+    
+    Builds should now work on most other systems which were failing before
+
+commit 22fe27c90f13aa754d1f8b8a268a71f0aefb7477
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 14 17:21:37 2012 -0800
+
+    Cleaned up source tree, build process is now cleaner
+
+commit bf5f7864cb5797ec546595582421c9d80f8515a5
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Feb 13 23:53:32 2012 -0800
+
+    Version bump
+
+commit 2aec41cf438be4689c45af0e264d8ec18d0a8c97
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Feb 13 23:51:27 2012 -0800
+
+    A whole bunch of changes, mainly build-related.. ugh
+
+commit 5025f6164cbc9472562ae62ec6bde6ce92a88a1c
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Feb 11 20:13:58 2012 -0800
+
+    Polished up some build script stuff
+
+commit 8c78e34aabbb5d3c530ef062cf5be95e1ee0f8f7
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Feb 9 21:09:38 2012 -0800
+
+    Updated dependency tracking on submodules
+
+commit b19ed93d00099bb2864575052a15a683d36ccb1d
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Feb 9 21:06:54 2012 -0800
+
+    Make tests more resilient, and make client less noisy
+    
+    Tests can work well on both real and mock servers.
+    Better display output for skipped tests
+    Fixed some quirks (and skipped some tests) for 5.8.8
+
+commit a4456f8e119a9f465d096fa01aa7c1ec3cf2c53a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Feb 9 09:25:29 2012 -0800
+
+    Changed .gitmodules bad repo url
+
+commit 94b63d3ed06860d90440d0daa10264ac89f1692d
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Feb 9 09:21:30 2012 -0800
+
+    Lots and lots of fixes
+    
+    Network failure tests
+    
+    Memcached interop compatibility tests
+    
+    Conversion/Deconversion settings tested
+    Timeout settings tested
+    Network failure behavior tested
+    Some more build utilities
+
+commit 6892af58ede10003d7529c643f8f6f01a7b38c03
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 7 01:23:54 2012 -0800
+
+    Updated tests, dual-mode for testing on real cluster, too
+
+commit b4de233a425c571a9afe26b0b16bd922b26b1deb
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Feb 6 17:40:01 2012 -0800
+
+    Refactored some common error reporting functions.
+    
+    Added backbones for memcached compatibility tests (pending on
+    CouchbaseMock).
+    
+    Make subdirectory distributions for VBucket and Config
+    
+    Added error constants to reflect newer libcouchbase
+
+commit e7d3f39909287355e265197ba5b5d7255cd0ef30
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jan 31 23:53:54 2012 -0800
+
+    Closer to C89 compliance, fixed store_flags bug
+    
+    store_flags would not be set when no conversion was needed, storage_free
+    would get wrong and uninitialized values
+
+commit 90c6b30a38000e4f4e5aaf8e4459f49240fbbcc7
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jan 31 18:06:44 2012 -0800
+
+    Multi-interface for synchronouse mode
+    
+    Synchronous interface has multi-mode
+    
+    Callbacks refactored to manipulate opaque AV* directly, instead of
+    proxying values to PLCB_sync_t.
+    
+    Provided functions to switch callbacks between multi and non-multi mode
+    
+    CAS is now an IV on 64 bit perls.
+    
+    Tests for multi-mode
+
+commit 18390812c7247362f2110424ed5d8eb652d86b1f
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jan 30 00:31:18 2012 -0800
+
+    Extra settings and tunables (WIP)
+    
+    This should allow for finer grained next stage testing, fake subclassing
+    and 'composition'; and also
+    accidentally provide more backwards compatibility (and maybe even some
+    nice features)
+    
+    Work in progress.
+
+commit ab97851cf877b39d22823551d52fe22486f2373a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 29 15:58:04 2012 -0800
+
+    Updated dependencies and documentation.
+    
+    Builds on EL5
+
+commit a2b5db4b674d407331ad24898c1461b6fc366697
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 29 15:57:50 2012 -0800
+
+    Refactored messy and buggy conversion functions
+
+commit ffd6d9d5993f919733adadd74b6dfa85ab8ab792
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 29 15:56:25 2012 -0800
+
+    &err only populated when io_opts == NULL
+
+commit 532f92ec4a253dd41685ae99d8f1ab21be1626fa
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 29 15:55:59 2012 -0800
+
+    dummy 'destructor' for cbc io_opts
+
+commit dded9e6ca246862f51a4b5bd759d5edc774af017
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 29 00:43:03 2012 -0800
+
+    Asynchronous tests
+
+commit dbe6cfaba6a57baee86713b86239b002372bd452
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Jan 28 19:01:42 2012 -0800
+
+    Test files (based on Test::Class). README glorified.
+
+commit 93a8d506cccdf95f90e7a566df4b48bd2bdbddb1
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Jan 28 17:23:53 2012 -0800
+
+    CAS is populated on SET
+
+commit d47cf35bf80be5755c16db7a85a4c5c1e11941b1
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Jan 27 17:40:41 2012 -0800
+
+    Documentation for Async.pm
+
+commit b7fd258936059c5722e204ced45a9a1ea483f75c
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Jan 27 15:49:26 2012 -0800
+
+    Make compatible with new master
+    
+    Refactored sync client to use start_event_loop directly instead of
+    libcouchbase_wait()
+    
+    Added timers for async client
+
+commit 15f6c4434e2136141a38ac55666b20f1cdc772d1
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Jan 26 01:36:20 2012 -0800
+
+    Async client - got basic operations working
+
+commit cb7ebbb3f5ccafd40aadf294239d032d54e13f67
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jan 24 00:28:49 2012 -0800
+
+    Asynchronous client framework for Perl event loops
+    
+    Refactored lots of common code out to other smaller files. WIP
+
+commit c4f5ffe5abfb45cb101bb87c338070f196397084
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Jan 22 00:22:08 2012 -0800
+
+    Fixed indentation issues
+
+commit 4e47012100f55a21f3cc7de6f2d2e2166dca28dd
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Jan 21 17:40:15 2012 -0800
+
+    stats(), and compression/conversion fixes
+
+commit 2a3a82da2a27372892cfa4c776fe01a6ea37a4e9
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sat Jan 21 01:57:33 2012 -0800
+
+    Compression/Storable flag compat
+    
+    - Fixed bug in delete/remove
+    Refactored debugging code into separate test module
+
+commit cac72dbf829be7cfc74693582ff48ca306b17b66
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Jan 20 15:13:01 2012 -0800
+
+    Implemented arithmetic, delete operations
+    
+    Refactored callbacks to a separate file.
+    
+    Refactored some redundant code into macros
+    
+    Added dependencies in Makefile.PL
+
+commit 31e11ff07d095cb49266444d82d19f28c51774d4
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Jan 19 19:26:47 2012 -0800
+
+    Cache::Memcached::* compatible interface,
+    
+    More documentation about errors
+    
+    Aliased add/replace/prepend/append to set with slight
+    modifications
+
+commit ce100c2882167b41502e7d8a2d25fcc5a69cb485
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Jan 19 17:59:04 2012 -0800
+
+    Blessed into return object, more docs.
+
+commit 621e7a655940fb7ae88af76f5f69b63501eee9c4
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Thu Jan 19 17:06:38 2012 -0800
+
+    Fixed bugs in error reset and perl stack manipulation
+    
+    Moved get and cas to XS section
+
+commit 7ad43af7e79772c28dc68358bca6ae1dbc1530c1
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Jan 18 21:29:48 2012 -0800
+
+    Initial commit

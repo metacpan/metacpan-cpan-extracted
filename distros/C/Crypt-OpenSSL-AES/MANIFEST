@@ -1,0 +1,10 @@
+AES.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Crypt-OpenSSL-AES.t
+lib/Crypt/OpenSSL/AES.pm
+META.yml                                 Module meta-data (added by MakeMaker)

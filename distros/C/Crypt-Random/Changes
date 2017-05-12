@@ -1,0 +1,117 @@
+
+                       CHANGELOG for Crypt::Random
+           $Id: Changes,v 1.6 2001/07/12 15:59:46 vipul Exp $
+
+--------------------------------------------------------------------------
+
+1.25                                                        March 07, 2005
+
+  * Crypt::Random now uses a BEGIN block when exporting its
+    functions. There was a circular reference between
+    Crypt::Random and Crypt::Random::Generator, and depending on
+    the order the modules were used in, it lead to an 'Undefined
+    subroutine' error. Patch by ceeshek@cpan.org.
+
+1.24                                                        March 07, 2005   
+
+  * Removed int() from one of the computations to make
+    "forbidden division t_REAL % t_INT" error disappear.
+
+1.23                                                         June 02, 2004
+
+  * Another patch by Micheal Schwern to make the File provider faster.
+    Instead of sysread'ing, a byte at a time, we read the required number
+    of bytes in one go.
+
+1.22                                                         June 01, 2004
+
+  * Patch by Michael Schwern to replace open/read with sysopen()/sysread()
+    so Crypt::Random doesn't waste entropy in /dev/u?random by reading a
+    buffer and throwing away unnecessary data.
+
+1.21                                                          May 24, 2004
+
+  * Patch by dorian to workaround Math::Pari's serialization problem.
+    
+
+1.20                                                        April 21, 2004
+
+ * Added a Uniform option to makerandom() and makerandom_itv() that 
+   doesn't set the high bit of the generated random, and produces
+   a number uniformally distributed in the interval. Thanks to Len
+   Budney for pointing this out.  
+
+   Here's his explaination:
+
+       If Size is increased to 4 bits, then of 16 values, there are 5 ways
+       to get a 1, 5 ways to get a 2, but 6 ways to get a 0. Thus 0 will
+       occur 6/5 = 1.2 times more often than 1 or 2. Increasing size to 6
+       bits, there are (2^6-1)/3 ways to get a 1 or 2, but there are
+       (2^6+2)/3 ways to get a 0, and a 0 will occur more often by a
+       factor of (2^6+2)/(2^6-1).
+
+       If Size is then bumped up to 40, as makerandom_itv does, then 0
+       will still happen more often than 1 or 2, but now it happens only
+       (2^40+2)/(2^40-1) times more often, or about 1 + 2.7*10^-12 times
+       more often. This difference is too small to observe in a practical
+       experiment, but it is still a deviation from uniformity.
+
+       What's going on is that when ($b-$a) does not evenly divide 2^N,
+       the outcome ($b-1) is less likely to happen than the outcome $a.
+       The case that Size=2, $a=0 and $b=3 illustrates this most clearly.
+
+       This is easy to correct: we simply want to make the largest value
+       of makerandom() to be evenly divisible by ($b-$a), by ignoring any
+       result which is >= (2^Size - (2^Size % ($b-$a))). The second
+       attached file includes the fix, which you will see produces uniform
+       probabilities if you perform the test given above.
+
+
+1.13                                                        March 11, 2003
+
+  * Changed the die() message at provider contruction to include the 
+    name of the provider.
+
+1.12                                                         January, 2003
+
+  * Updated documentation.
+
+  * Removed all /home/vipul/* entries from @INC.
+
+1.11                                                         July 12, 2001
+
+  * Applied a patch by Benjamin Trott to make egd detection more 
+    robust.
+
+1.10                                                         July 09, 2001
+
+  * Fix in _pickprovider(), thanks to Benjamin Trott for the patch.
+
+1.08                                                         June 22, 2001 
+
+  * Small fixes.
+
+1.07                                                         June 21, 2001
+
+  * A bug fix in ::Provider::egd::get_data().
+
+1.05                                                         June 21, 2001
+
+  * Integrated and extended Benjamin Trott's patches to add provider
+    architechture and egd support to Crypt::Random.
+
+  * Wrote Crypt::Random::Generator, and OO interface to Crypt::Random that
+    automagically selects a suitable provider.
+
+  * Wrote a Provider that uses perl's rand(). This provider is used when
+    no other stronger provider is available.
+
+
+0.34                                                        April 17, 2001 
+
+  * Wrote exportable makerandom_octet() that generates random octet
+    strings. See documentation for details.
+
+  * Wrote a test for makerandom_octet() in t/octet_string.t
+
+

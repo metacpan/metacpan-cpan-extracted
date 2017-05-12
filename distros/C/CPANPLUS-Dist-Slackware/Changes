@@ -1,0 +1,128 @@
+Revision history for CPANPLUS-Dist-Slackware
+
+1.024  2016-09-11 23:37:16 CEST
+
+  - The package architecture now defaults to "i586" on x86-based platforms.
+
+1.023  2015-11-01 10:13:52 CET
+
+  - Add a Search::Xapian plugin that fixes the distributions's Makefile.PL
+    script.
+  - Update the documentation.
+
+1.022  2015-08-18 08:41:04 CEST
+
+  - Escape a left brace in a regex to get rid of a deprecation warning.
+
+1.021  2015-01-18 09:16:51 CET
+
+  - Remove the YAML::LibYAML plugin as the RT tickets #46507 and #74238 have
+    been solved.
+  - Check whether a dependency is still distributed with Perl.
+  - Depend on Perl 5.12.3.
+
+1.020  2014-12-30 13:26:13 CET
+
+  - Revert to Dist::Zilla.
+
+1.019  2014-12-30 08:31:51 CET
+
+  - Avoid a warning in Module::CoreList.
+  - Keep the .packlist files.
+  - Depend on Perl 5.12.
+  - Build the distribution with Dist::Milla.
+  - Add a cpanfile.
+
+1.018  2014-12-05 18:03:07 CET
+
+  - Adapt the GD plugin to GD 2.56.
+
+1.017  2014-08-17 21:03:26 CEST
+
+  - Add a GD plugin, which patches the module's tests.
+  - Make Alien::wxWidgets use the system's wxWidgets library if the environment
+    variable WX_CONFIG is set to the full path to wx-config.
+  - Patch the Crypt::SSLeay distribution's Makefile.PL if necessary.
+  - Remove the Padre plugin as the development seems to have stopped.
+  - Update the list of modules that SpamAssassin can optionally utilize.
+  - Add Dist::Zilla and Dist::Zilla::Test::Perl::Critic to dist.ini.
+
+1.016  2013-12-21 19:22:16 CET
+
+  - Use parent instead of base.
+
+1.015  2013-10-13 10:55:57 CEST
+
+  - Update the Net::Pcap plugin.
+  - The Convert::BinHex plugin is no longer needed.
+
+1.014  2013-09-11 12:12:12 CEST
+
+  - List prerequisites that are distributed with Perl in README.SLACKWARE if
+    the required version is higher than the supplied version.
+
+1.013  2013-06-09 17:41:02 CEST
+
+  - Remove Build.PL.
+
+1.012  2013-06-09 12:07:57 CEST
+
+  - Use Dist::Zilla to build the distribution.
+  - Use _perl_mb_opt() in _fake_install() instead of hardcoded path names.
+
+1.011  2013-05-30 10:56:48 CEST
+
+  - Support Module::Build::Tiny by passing command-line options to 'Build
+    install'.
+  - Respect the environment variable BUILD.  As packages may be built
+    recursively, setting the build number is mainly useful when all packages
+    are rebuilt, e.g. after Perl has been upgraded.
+
+1.010  2012-08-23 03:12:31 CEST
+
+  - Use three digit version numbers.  Use the same version number everywhere.
+  - The Padre plugin creates a doinst.sh file that runs update-desktop-database
+    and gtk-update-icon-cache.
+  - The YAML::Syck plugin is no longer needed.
+  - Use the CPAN mail address as the contact address.
+
+1.00  2012-02-13 09:48:12 CET
+
+  - List required packages instead of module names in README.SLACKWARE.
+  - Update the YAML::LibYAML plugin.  Add a YAML::Syck plugin.  Fix errors that
+    occur when these modules are built with the GCC compiler flag
+    "-Werror=format-security".
+  - Add a Convert::BinHex plugin, which fixes a bug in the module's test suite.
+  - Add a Net::Pcap plugin, which fixes the module's Makefile.PL.
+
+0.05  2012-02-01 19:31:33 CET
+
+  - Document the plugin interface.
+  - Add a Padre plugin, which installs a desktop entry and an icon for Padre.
+  - Add a Mail::SpamAssassin plugin, which installs an init script and additional
+    documentation.
+  - Don't prepend "perl-" to module names like "perl-ldap" that already start
+    with "perl-".
+
+0.04  2012-01-24 07:25:41 CET
+
+  - Add plugins, which may be used to fix quirks or customize packages.
+  - Make sure that makepkg can access the staging directory if fakeroot is not
+    available.
+
+0.03  2012-01-18 14:51:26 CET
+
+  - Make sure that the staging directory's parent directory exists.
+
+0.02  2012-01-18 11:13:00 CET
+
+  - Warn if files are installed in non-standard directories.
+  - Unless --keepsource is given, the staging directory is removed after a
+    package has been built successfully.
+  - Link to https://metacpan.org/release instead of /module.
+  - Mention cpan2tgz, which I wasn't aware of.
+
+0.01  2012-01-12 18:58:56 CET
+
+  - First version, released on an unsuspecting world.
+

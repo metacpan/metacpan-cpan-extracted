@@ -1,0 +1,92 @@
+Class::Multimethods version 1.701
+    Class::Multimethods - Support multimethods and subroutine overloading in Perl
+
+SYNOPSIS
+
+    # ONLY WORKS UNDER 5.005 OR LATER (NEEDS qr//)
+
+          use 5.005;
+
+        # IMPORT THE multimethod DECLARATION SUB...
+
+              use Class::Multimethods;
+
+        # DECLARE VARIOUS MULTIMETHODS CALLED find...
+
+        # 1. DO THIS IF find IS CALLED WITH A Container REF AND A Query REF...
+
+              multimethod find => (Container, Query)
+                               => sub { $_[0]->findquery($_[1]) };
+
+        # 2. DO THIS IF find IS CALLED WITH A Container REF AND A Sample REF...
+
+              multimethod find => (Container, Sample)
+                               => sub { $_[0]->findlike($_[1]) };
+
+        # 3. DO THIS IF find IS CALLED WITH AN Index REF AND A Word REF...
+
+              multimethod find => (Index, Word)
+                               => sub { $_[0]->lookup_word($_[1]) };
+
+        # 4. DO THIS IF find IS CALLED WITH AN Index REF AND A qr// PATTERN
+
+              multimethod find => (Index, Regexp)
+                               => sub { $_[0]->lookup_rx($_[1]) };
+
+        # 5. DO THIS IF find IS CALLED WITH AN Index REF AND A NUMERIC SCALAR
+
+              multimethod find => (Index, '#')
+                               => sub { $_[0]->lookup_elem($_[1]) };
+
+        # 6. DO THIS IF find IS CALLED WITH AN Index REF AND
+    #    A NON-NUMERIC SCALAR
+
+              multimethod find => (Index, '$')
+                               => sub { $_[0]->lookup_str($_[1]) };
+
+        # 7. DO THIS IF find IS CALLED WITH AN Index REF AND AN UNBLESSED
+    #    ARRAY REF (NOTE THE RECURSIVE CALL TO THE find MULTIMETHOD)
+
+              multimethod find => (Index, ARRAY)
+                               => sub { map { find($_[0],$_) } @{$_[1]} };
+
+        # SET UP SOME OBJECTS...
+
+              my $cntr = new Container ('./datafile');
+              my $indx = $cntr->get_index();
+
+        # ...AND SOME INHERITANCE...
+
+              @BadWord::ISA = qw( Word );
+              my $badword = new BadWord("fubar");
+
+        # ...AND EXERCISE THEM...
+
+              print find($cntr, new Query('cpan OR Perl'));           # CALLS 1.
+              print find($cntr, new Example('by a committee'));       # CALLS 2.
+
+              print find($indx, new Word('sugar'));                   # CALLS 3.
+              print find($indx, $badword);                            # CALLS 3.
+              print find($indx, qr/another brick in the Wall/);       # CALLS 4.
+              print find($indx, 7);                                   # CALLS 5.
+              print find($indx, 'But don't do that.');                # CALLS 6.
+              print find($indx, [1,"one"]);                           # CALLS 7,
+                                                                      # THEN 5,
+                                                                      # THEN 6.
+
+INSTALLATION
+
+    It's all pure Perl, so just put the .pm file in its appropriate
+    local Perl subdirectory.
+
+
+AUTHOR
+
+    Damian Conway (damian@cs.monash.edu.au)
+
+
+COPYRIGHT
+
+       Copyright (c) 1999-2000, Damian Conway. All Rights Reserved.
+     This module is free software. It may be used, redistributed
+         and/or modified under the same terms as Perl itself.

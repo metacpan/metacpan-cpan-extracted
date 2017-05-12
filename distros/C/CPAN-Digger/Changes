@@ -1,0 +1,30 @@
+0.08 2013.01.14
+  - remove 3 prereqs that failed on Windows.
+
+0.07 2013.01.13
+  - Add all the Perl::Critic::* packages to the list of prereqs.
+  - Include the reports from those in the tests.
+
+0.06 2012.06.06
+  - fixing some tests
+  - stop using YAML::Any
+
+0.05 2012.05.29
+  - fixing test
+
+0.04 2012.05.28
+  - missing requiremend DBD::SQLite
+  - specify the policies better
+
+0.03 2012.05.26
+  - replace before by hook before as Dancer has deprecated the former
+    (reported by Father Chrysostomos)
+  - perltidy the whole project
+
+0.02 2011.05.15
+  - Add missing prerequisites.
+  - use modules instead of require-ing them.
+
+0.01 2011.05.14
+  - Initial version that can already index CPAN and display it
+    in an ugly but slightly usable way.

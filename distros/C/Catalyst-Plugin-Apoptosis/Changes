@@ -1,0 +1,11 @@
+Changes
+=======
+
+0.00002 - 19 Sep 2007
+  - Fix t/02_gtop.t
+  - Older versions of DBIx::Class gets confused by the GTop's attempt
+    to load threads.pm. Make sure this doesn't happen on non-threaded
+    applications by deleting threads.pm from %INC
+
+0.00001 - 18 Sep 2007
+  - Initial release

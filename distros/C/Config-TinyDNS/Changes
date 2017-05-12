@@ -1,0 +1,6 @@
+Changelog for Config-TinyDNS
+
+1   2011-01-01
+    - Initial version
+    - Supports filters 'null', 'vars', 'include', 'lresolv', 'rresolv'
+      and 'site'.

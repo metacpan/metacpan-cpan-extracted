@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-PropertiesSequence
+version:      1.003
+version_from: 
+installdirs:  site
+requires:
+    Carp::Assert:                  0.17
+    Config::Properties:            0.56
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

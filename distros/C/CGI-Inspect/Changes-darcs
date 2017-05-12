@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+# This is an active-changelog! Run it to update it using Darcs.
+# See below for the actual Changelog stuff!
+
+open my $out,"+<",$0;
+seek $out,0,0;
+seek DATA,0,0;
+print $out ($l = <DATA>) until $l eq "__DATA__\n";
+# Get the Darcs changelog
+$f = `darcs changes`;
+# Chop off the timestamps (but keep the date)
+$f =~ s/\d\d:\d\d:\d\d ... //g;
+# Combine like sections. This might need a bit of work.
+1 while($f =~ s/^(... ...\s+\d+ \d\d\d\d  [\w@\.\-]+)$(.*)^\1$/$1$2/gms);
+# Clear out the extra space we just made
+$f =~ s/\n\n\n/\n/g;
+print $out $f;
+
+# ***************************************
+# *** This is the actual Changelog :) ***
+# ***************************************
+__DATA__
+Fri Jun 26 2009  awwaiid@thelackthereof.org
+  * Version bump and README update
+
+Thu Jun 25 2009  awwaiid@thelackthereof.org
+  * update changelog and documentation
+  * Add longer disabled die handler
+
+Sun Jun  7 2009  awwaiid@thelackthereof.org
+  * Update counter.pl to use CGI::Inspect... but it is broken
+
+Sat Jun  6 2009  awwaiid@thelackthereof.org
+  * Turn on persistent tree state for the callstack
+  * Print the before value in our hello demo
+  * Check the errors from evaling a new value
+  * Clean up some of the value-edit related code
+  * Remove some of the window.close things that were't actually being used
+  * Make lexical editing work for regular hashes and arrays
+  tagged 0.4
+  * Update changelogs
+  * add notes.txt file
+  * Add experimental LIQ::Inspect::Here
+  * update cgi_hello.pl a bit
+  * Teach the REPL to deal without lexicals
+  * Update CallStack plugin, including editability
+  * print plugin load errors to STDERR
+  * version bump
+  * Update documentation
+  * Bump Continuity dependency
+  * Add cookie example from pod
+  * Update changelog
+
+Thu Jun  4 2009  awwaiid@thelackthereof.org
+  * Bump version and update manifest
+
+Tue Jun  2 2009  awwaiid@thelackthereof.org
+  * Add missing files
+
+Sat May 30 2009  awwaiid@thelackthereof.org
+  * Update Changelog and manifest some more
+  * Update POD
+  * Remove dead files (some will be back!)
+  * Update makefiles and such
+  * Add some more ideas
+  * Add TODO file
+  tagged 0.2
+  * Update CallStack plugin and include it by default
+
+Fri May 29 2009  awwaiid@thelackthereof.org
+  * Preliminary window open/close and inspect-on-die
+  * Change background color
+  * Update REPL
+  * Update stuff
+
+Sat May  9 2009  awwaiid@thelackthereof.org
+  * More renames and further trimming
+  * Rename Continuity::Monitor::CGI to CGI::Inspect
+  * shuffle files
+  * Add new simple REPL (thanks scott!)
+  * Massive refactor -- cleanup and trim
+
+Sat Jan  3 2009  scott@slowass.net
+  * new inspect API
+
+Thu Jan  1 2009  awwaiid@thelackthereof.org
+  * Fix closing ul in session list
+  * Fix docroot of C::Monitor
+  * Remove Continuity::Monitor::REPL reference
+  * Add explicit server to counter example monitor
+
+Wed Dec 31 2008  scott@slowass.net
+  * Continuity::Monitor wit [_^H_][_^H_][_^H_]orking with the C::MM[_^H_]::CGI plugins
+
+Mon Dec 29 2008  scott@slowass.net
+  * cleanups and fixes for my fixes n [_^H_][_^H_]in Monitor.pm
+  * bug fix - losing track of the server it started s[_^H_][_^H_], failing to find sessions
+
+Wed Oct 15 2008  awwaiid@thelackthereof.org
+  tagged 0.01
+  * add Module::Refresh as a dependency
+
+Tue Oct 14 2008  awwaiid@thelackthereof.org
+  * update manifest
+  * Move docroot and add Coro::Generator dependency
+  * Move test
+  * update manifest
+  * Add darcs-changes
+  * Remove padwalker usage and add note about Continuity::Monitor not working
+  * Kill some old files
+  * Update build config stuff
+  * Update changelog
+  * add js deps
+  * add js deps
+  * add js deps
+  * add js deps
+  * add js deps
+  * JS dependencies
+
+Mon Oct 13 2008  awwaiid@thelackthereof.org
+  * Add js dependencies
+  * Remove lots of unused js experiments
+  * Simplify cgi example
+
+Sun Oct 12 2008  awwaiid@thelackthereof.org
+  * Updates to FileEdit
+  * Disable plugins by default
+  * Sends posts to /
+  * Encode file editing content
+  * Add missing files
+  * All sorts of horrible things
+
+Wed Oct  8 2008  awwaiid@thelackthereof.org
+  * Add C::M::CGI related files
+  * Change around default REPL plugins
+  * Disable Devel::REPL default term
+
+Fri May 30 2008  awwaiid@thelackthereof.org
+  * Initial import

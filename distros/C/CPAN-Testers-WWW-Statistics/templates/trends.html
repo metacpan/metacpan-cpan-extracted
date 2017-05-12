@@ -1,0 +1,55 @@
+[% 
+    title = 'CPAN Trends' ;
+    box_sites = 1
+
+    crumb1_name = 'CPAN Trends' ;
+%]
+
+<h2>Contents</h2>
+<ul class="contents">
+<li><a href="#stats6"   title="All Distribution Uploads per Month">All Distribution Uploads per Month</a></li>
+<li><a href="#stats12"  title="New Distribution Uploads per Month">New Distribution Uploads per Month</a></li>
+<li><a href="#raw"      title="Raw Data">Raw Data</a></li>
+<li><a href="#new"      title="New Distributions">New Distributions</a></li>
+<li><a href="#versions" title="Versions">Versions</a></li>
+</ul>
+
+<h2>Graphs</h2>
+<p>Please click the graphs below to view the archived graphs for the respective statistics.</p>
+<h3>All Distribution Uploads per Month</h3>
+<p><a href="/graphs6.html" title="graphs of All Distribution Uploads per Month"><img id="stats6" src="/stats/stats6.png" alt="graphs of All Distribution Uploads per Month" /></a></p>
+<h3>New Distribution Uploads per Month</h3>
+<p><a href="/graphs12.html" title="graphs of New Distribution Uploads per Month"><img id="stats12" src="/stats/stats12.png" alt="graphs of New Distribution Uploads per Month" /></a></p>
+
+<h2 id="raw">Raw Data</h2>
+<p>The raw data files are available here:</p>
+<ul>
+<li><a href="/stats/stats6.txt"   title="raw data for All Uploads">All Distribution Uploads per Month</a></li>
+<li><a href="/stats/stats12.txt"  title="raw data for New Uploads">New Distribution Uploads per Month</a></li>
+</ul>
+
+<h2 id="new">New Distributions</h2>
+<table>
+[% inx = 0 %]
+[% FOREACH year = [ 1995 .. maxyear ] %]
+[% IF inx % 4 == 0 %]
+<tr>
+[% END %]
+  <td><a href="/newdistros/[% year %].html" title="New Distributions for [% year %]">[% year %]</a></td>
+[% inx = inx + 1 %]
+[% IF inx % 4 == 0 %]
+</tr>
+[% END %]
+[% END %]
+[% IF inx % 4 > 0 %]
+</tr>
+[% END %]
+</table>
+
+<h2 id="versions">Versions</h2>
+<ul>
+<li><a href="/newdistros/newversions.html" title="First Versions">First Versions</a></li>
+<li><a href="/newdistros/allversions.html" title="All Versions">All Versions</a></li>
+</ul>
+
+<p>Graphs generated using the <a href="http://code.google.com/apis/chart/" title="Google Chart API">Google Chart API</a>.</p>

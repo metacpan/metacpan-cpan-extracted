@@ -1,0 +1,21 @@
+.perlcriticrc
+Changes
+ignore.txt
+lib/Carp/Capture.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.bak
+README
+t/00-manifest.t
+t/01-load.t
+t/10-in_practice.t
+t/10-pod_examples.t
+t/20-meth-retrieve_annotation.t
+t/20-meth-stacktrace.t
+t/20-uncaptured.t
+t/30-exceptions.t
+t/99-pod.t
+t/99-pod_coverage.t
+t/call_func
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

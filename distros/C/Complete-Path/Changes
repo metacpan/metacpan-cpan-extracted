@@ -1,0 +1,150 @@
+Revision history for Complete-Path
+
+0.23    2016-06-17 (PERLANCAR)
+
+	- [Bugfix] Finding exact match of an intermediate path was still
+	  wrong: first the result from list_func has path separator suffix
+	  and we compare it with the string without, second due to fuzzy
+	  matching we cannot rely on length() alone but must use eq.
+
+	- [Bugfix] EXP_IM_PATH=0 option was not respected.
+
+
+0.22    2016-04-13 (PERLANCAR)
+
+	- [Bugfix] Fix calculating exact matches (which caused e.g.
+	  f/bar<tab> to fail matching f directly when there is f and foo).
+
+        - Observe COMPLETE_PATH_TRACE to enable extra logging for debugging.
+
+
+0.21    2016-01-14 (PERLANCAR)
+
+	- [Bugfix] dig_leaf option should still respect filter.
+
+
+0.20    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21
+
+        - [Removed] For more consistent user experience, remove options
+	  ci/word_mode/fuzzy/map_case/exp_im_path/dig_leaf, users are now
+	  encouraged to set this behavior globally via Complete::Common.
+
+
+0.19    2015-09-22 (PERLANCAR)
+
+	- [Bugfix] Avoid error when list_func doesn't return array.
+
+	- Update documentation.
+
+
+0.18    2015-09-17 (PERLANCAR)
+
+	- Add fuzzy matching, use Complete::Util::complete_array_elem's
+	  map_case (+ci, +fuzzy) instead of doing our own.
+
+
+0.17    2015-09-16 (PERLANCAR)
+
+	- No longer uses $Complete::Setting::OPT_EXP_IM_PATH_MAX_LEN.
+
+
+0.16    2015-09-16 (PERLANCAR)
+
+	- [Bugfix] Fix exact match matching for intermediate path (missed
+	  the path separator).
+
+
+0.15    2015-09-09 (PERLANCAR)
+
+	- Tweak exp_im_path behavior: if a single exact match of an
+	  intermediate dir is found, don't expand all alternatives but
+	  instead of just that exact match. This is the desired behavior
+	  most of the time.
+
+
+0.14    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.13    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.12    2015-01-09 (PERLANCAR)
+
+	- Implement dig_leaf option (Complete 0.11).
+
+
+0.09    2015-01-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] needed to use label to exit loop due to added block
+	  level (broke Complete::File test) [CT].
+
+
+0.08    2015-01-07 (PERLANCAR)
+
+	- Add convenience of locally setting $_ for filter_func/is_dir_func
+	  routine.
+
+
+0.07    2015-01-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Perform is_dir_func test on the original path, not the
+	  postprocessed one.
+
+
+0.06    2014-12-27 (PERLANCAR)
+
+	- Adjust to Complete 0.10, respect OPT_EXP_IM_PATH_MAX_LEN setting.
+
+
+0.05    2014-12-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] More explanation about 'list_func', 'filter_func',
+	  'is_dir_func'.
+
+
+0.04    2014-12-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- Derp, forgot to comment-out debugging prints.
+
+
+0.03    2014-12-25 (PERLANCAR)
+
+	- [Bugfix] Cut too much if starting_path ends with path_sep.
+
+
+0.02    2014-12-25 (PERLANCAR)
+
+	- [Bugfix] Tweak regex so that things still work if list_func
+	  returns items suffixed by path separator (like the case in
+	  Complete::Module).
+
+
+0.01    2014-12-24 (PERLANCAR) - ♪ another year has gone by
+
+        - First release. Refactored from Complete::Util's complete_file() to
+          avoid code duplication, as the functionality is also needed in
+          Complete::Module, Complete::Riap, and others in the future whenever we
+          need ci/exp_im_path/map_case/... options when completing anything
+          path-like.

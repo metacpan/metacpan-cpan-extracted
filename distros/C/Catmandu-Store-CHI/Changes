@@ -1,0 +1,9 @@
+Revision history for Catmandu-Store-CHI
+
+0.02  2014-06-28 08:50:41 CEST
+  - adding pod
+  - adding Dist::Milla 
+  - adding tests
+
+0.01    2014-06-28
+  - initial release

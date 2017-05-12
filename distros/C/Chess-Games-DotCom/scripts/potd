@@ -1,0 +1,3 @@
+CHESS=$HOME/chess
+chessgames-dotcom pod
+winboard.exe /lgf $CHESS/puzzle_of_day.pgn /ncp

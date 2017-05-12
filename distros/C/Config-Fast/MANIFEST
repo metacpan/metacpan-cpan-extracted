@@ -1,0 +1,12 @@
+lib/Config/Fast.pm
+Makefile.PL
+README
+Changes
+t/02bournesque.t
+t/config.cf2
+t/03megafancy.t
+t/config.cf3
+t/04importvars.t
+t/config.cf1
+t/01stdconfig.t
+t/05multiple.t

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Catalyst/Plugin/URLMap.pm
+t/basic.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Custom.pm
+t/lib/TestApp/share/static/message.txt
+t/lib/TestApp/share/static/mydog.jpg
+t/use.t

@@ -1,0 +1,26 @@
+[% 
+    box_sites = 1 ;
+
+    title = 'New Distributions submitted during ' _ year;
+    crumb2_name = 'New Distributions' ;
+    crumb2_href = '/newdistros.html' ;
+    crumb1_name = year ;
+%]
+
+<h2>Contents</h2>
+<p>Below are all the distributions released for the first time during [% year %]</p>
+<ul>
+[% FOREACH month = newdistros.keys.nsort %]
+<li><a href="#month[% month %]">New Distributions for [% newdistros.$month.month %] [% year %]</a> ([% newdistros.$month.counter || '0' %])</li>
+[% END %]
+</ul>
+
+[% FOREACH month = newdistros.keys.nsort %]
+<h2 id="month[% month %]">New Distributions for [% newdistros.$month.month %] [% year %] ([% newdistros.$month.counter || '0' %])</h2>
+<table>
+<tr><th class="top">Author</th><th class="top">Distribution</th><th class="top">Version</th><th class="top">Release Date/Time</th></tr>
+[% FOREACH dist = newdistros.$month.dists %]
+<tr><td>[% dist.author %]</td><td><a href="http://metacpan.org/release/[% dist.dist %]">[% dist.dist %]</a></td><td>[% dist.version %]</td><td class="timestamp1">[% dist.reldate %]</td></tr>
+[% END %]
+</table>
+[% END %]

@@ -1,0 +1,3060 @@
+2.101 2017-04-28
+
+  Model improvement:
+    * Add assign_char and assign_with to IniFile backend. So it can
+      be used for files with "key: value" lines.
+    * add option to write hash key with empty values. By default empty
+      hash values are dropped and the hash keys of these values are lost.
+
+  Usability improvement:
+    * Value: if possible show why a fix is applied, i.e. show the warning
+      that triggered the fix
+    * improved log levels (i.e. move some log from debug to info or trace)
+
+  Improvement:
+    * Model: add log_level parameter, so logs can be shown with a cme
+      command line option
+    * prevent undef warnings on Windows
+
+  Deprecation warning:
+    * Model: warn in case of undef constructor argument
+
+2.100 2017-03-18
+
+  Usability improvement:
+    * Unknown element excetption show instructions to report a bug.
+
+  Improvement of doc generated from model:
+    * add compute information in generated doc
+    * pod generator: show default values in item list
+
+  Bug fix:
+    * Fix file mode test (fix CPAN smoke tests)
+
+2.099 2017-03-05
+
+  Model improvement:
+  * add file_mode parameter to backend specification. This
+    parameter sets the permission (mode) of written configuration
+    files (need Config::Model::Tester 2.059 to test)
+
+2.098 2017-02-26
+
+  This release bring some improvements to enable more feature on
+  Debian Dpkg model.
+
+  Build:
+    * build depends on Config::Model::Tester 2.059
+    * bump © year in dist.ini
+
+  Model improvements:
+    * allow injection of model snippet in another configuration class.
+      This is used by dpkg model: a dpkg-control default value is
+      computed from a value in dpkg model only when dpkg-control model
+      is loaded with dpkg model,
+    * add doc for has_instance and get_instance methods
+
+  Plainfile backend improvements:
+    * handle deletion of file managed by Plainfile backend
+    * plainfile backend can handle file named with &element and &index
+      functions, i.e the config file name can depend on the location
+      of the value in the configuration tree. (used by dpkg model for
+      debian/<pkg>.install files)
+
+  Value computer improvements:
+    * doc: mention that functions are allowed in variable definition
+    * allow '- -' or '--' param to &index
+
+  Bug fix:
+    * fix error forwarding in BackendMgr
+    * warn when Term::ReadLine::Gnu is not installed
+    * fix term UI  set command to accept white spaces
+    * Loader: allow creation of empty hash leaf
+
+2.097 2016-12-22
+
+  Bug fix:
+    * fix a regression seen when starting curses interface
+      (fix retrieval of an instance using an instance name)
+      
+2.096 2016-12-11
+
+  Term UI improvement
+    * fix  autocompletion of 'cd' command
+    * add -nz and -v option to ll command
+    * ll command accept several patterns
+    * improved ll output
+
+  Bug fix:
+    * show complete stack trace of rethrown exceptions
+    * Node: propagate check param when calling init
+      (which fix cme's -force option)
+
+  Build:
+    * dist.ini Add missing prereq 'parent' as plugin
+      [AutoPrereqs] missed it (Mohammad S Anwar++)
+    * new dependencies: List::Util Regexp::Common
+
+2.095 2016-12-06
+
+  New feature usable by cme:
+    * loader: add .insort() command for hash element
+    * Hash element: add insort method
+
+  Term UI improvement
+    * better format the output of 'desc' command (transform
+      pod doc to text). This requires Pod::Text and
+      Pod::Simple 3.23
+
+  Bug fix:
+    * track and save annotation changes (gh #12)
+    * Node: propagate check override in init() (which fixes
+      loading of a systemd config that contains an error)
+
+2.094 2016-11-09
+
+  Fix compatibility with older Term::ReadLine::Gnu:
+    * TermUI: skip call to enableUTF8 if not available
+      (gh #11)
+    
+2.093 2016-11-08
+
+  Hygiene:
+    * Add Travis CI file (Thanks Jose Luis Perez Diez)
+
+  New feature in read/write backend:
+    * Allow alternate comment char in INI config file (gh #10)
+      required to support Systemd config files
+
+  Bug fix:
+    * Better support of utf8 in term UI
+
+2.092 2016-09-23
+
+  * New feature in shell UI:
+    * 'll' command shows a warning sign when an element
+      has a warning that may be fixed
+    * added 'check' command
+    * 'fix' command can be applied to selected element instead
+      on the whole config.
+
+  Other bug fixes:
+    * Node: fix deep_check propagation
+    * Iterator triggers a call_back if a hash element has a warning
+      (required to fix the wizard of the graphical interface which
+      did not stop on a hash element when needed)
+
+2.091 2016-09-13
+
+  Bug fix:
+    * really fix issue with '.' removal from @INC
+      (needed to close Debian #837682)
+
+2.090 2016-09-10
+
+  New feature:
+    * Model developer can use $std_value in warning messages tp
+      provide better feedback to user. This variable is substituted
+      with preset, computed or default value when the message is
+      generated.
+
+  Cleanup:
+    * remove obsolete skip_read parameter
+      (breaks App::Cme older than v1.011)
+
+  Bug fix:
+    * Add double quote when dumping value that contain '#' 
+    * Value: generates same error messages for warn_if, warn_if_match
+    * fix other collaterals of '.' removal from @INC
+
+2.089 2016-09-04
+
+  New feature:
+    Now 3 types of check can be used on hash or array elements:
+    content check, id check (as usual) and deep_check (should be used
+    to check between if value and other part of config tree). Only the
+    index check is run whenever an element of the hash/array is
+    read. The other are used when check() or apply_fixes methods are
+    called.
+
+  Documentation:
+    * converted README.pod to markdown
+
+  Bug fix:
+    * load perl data file even if @INC does not contain '.' (required
+      for perl 5.14 or Debian perl 5.22.2-4)
+    * Loader: trap another syntax error in load steps. This may breaks existing
+      tests or cme scripts that contain such an error.
+
+2.088 2016-07-09
+
+  Documentation improvements:
+    * document repo structure in CONTRIBUTE file
+    * document Instance application method
+    * add auto_delete param in pod doc
+    * add CREDITS section in main doc
+
+  New instructions for 'cme modify' (in Config::Model::Loader):
+    * add copy command for list
+    * add clear command for list and hash
+
+  Bug fix:
+    * use sort keys to get consistent warning order
+      (which is important for non-regression tests)
+    * fix regexps for Perl 5.22 (gh #6) Tx mat813
+
+2.087 2016-06-29
+
+  A release with mostly documentation improvements:
+    * Fixed many grammatical issues in all pod docs
+    * Added CONTRIBUTE.md 
+    * Instance doc:
+      * separate data change methods from internal methods
+      * specify value returned by load()
+
+  Model specification change
+    * move warp info in warp param in WarpedNode.
+      The change is backward compatible and will show a
+      notification on STDOUT. This notification will
+      become later a warning.
+    * always show a message when using some parameters that were
+      deprecated in 2007. This may break tests.
+      It's time to fix them.
+
+  Bug fixes:
+    * add as_string method to all exception classes
+    * BackendMgr: correctly handle Path::Tiny exceptions
+    * Value: show changes of boolean values as they are
+      written in configuration file
+
+2.086 2016-06-04
+
+   Fixed some bugs so that cme() works with new Systemd model:  
+    * cme() uses config_dir from app file
+    * Node: element_type works on not yet accepted element
+    * Node: improved doc of accept_element()
+
+2.085 2016-05-29
+
+  The new releases brings new functions to simplify script that modify
+  configuration files. For instance, the following line is enough to
+  update popcon's configuration file:
+    cme('popcon')->modify("PARTICIPATE=yes");
+
+  In more details:
+    * Config::Model provides a 'cme' exported function
+      (see also the SYNOPSIS of Config::Model doc)
+    * Instance: added modify and save() methods
+
+  Other changes:
+    * Term::ReadLine is not required for build or tests
+    * Instance skip_read parameter is deprecated
+
+
+2.084 2016-05-26
+
+  Doc updates:
+    * Model doc:
+      * use cme meta instead of config-model-edit
+      * removed Log4Perl init for synopsis..
+      * improved instance method doc
+    * removed obsolete (and broken) example directory
+    * Instance: clarified constructor doc
+
+  Dependencies changes:
+    * TermUI is now optional (like FuseUI).
+      So Term::ReadLine dependency is now recommended
+      instead of required.
+
+  Bug fixes:
+    * Fix gen_class_pod which skipped some classes
+      (fix reproducible build of libconfig-model-openssh-perl)
+    * Model: instance() accepts application param
+    * Removed FATAL warnings from Instance
+    * all tree elements: added has_data method
+    * read model files (and doc) as utf8
+
+2.083 2016-04-20
+
+  Functional improvements:
+    * backend parameters: added auto_delete parameter so
+      that a config file can be removed when it no longer
+      contains data
+    * attributes specified in a model plugin can override
+      attributes of the base model.
+
+  Bug fixes:
+    * BackendMgr: do not remove links to config files
+    * Fix ini backend to parse values that contain '='
+
+  Doc updates:
+    * Improved instructions to specify a backend in
+      Config::Model::BackendMgr doc
+    * Added instructions to create your own backend in
+      Config::Model::Backend::Any doc
+    * updated model creation intro doc
+    * Mentions Itself generated doc as reference doc
+    * update  CreateModelFromDoc to use cme meta edit
+
+2.082 2016-03-29
+
+  No big change this time, but a lot of small improvements
+  required by the systemd model I'm working on...
+
+  Functional improvements:
+    * Loader: list operator :~ with no argument loops
+      over all values of a hash element
+    * DumpAsData: also accepts 'mode' param like fetch from
+      Config::Model::Value
+
+  Bug fixes:
+    * Fix tests broken by C::M::Tester 2.053 (required)
+    * Loader: fix loop bug which exited too soon
+    * Improve hash dump readability ...
+    * DumpAsData: Fix corrupted output...
+    * BackendMgr: always translate dir with ~/
+
+  Doc updates:
+    * removed Log4Perl instructions from synopsis.
+      Log4Perl initialisation is handled by Config::Model
+      constructor since v2.057
+    * Improved C::M::Warper and C::M:Lister docs
+
+2.081 2016-02-29
+
+  Bug fixes: 
+    * Fix error handling in Value. This should fix freebsd smoke tests.
+      The weird thing is that these tests should have failed in all arch...
+
+2.080 2016-02-27
+
+  Functional improvements:
+    * storing a wrong value is no longer ignored but now
+      triggers an exception. 
+
+  Other bug fixes:
+    * Trigger change notif when store_set reduces the nb of items
+      (closes gh #4)
+    * Improved change message shown to user
+    * Value: don't display grammar in case of error
+
+2.079 2016-02-12
+
+  YAML backend changes:
+    * Remove YAML file when no data is left
+    * When a root class has only one element, the backend
+      write (and read) only the content of that element (this
+      reduce the depth of the written data structure by one).
+
+  Functional improvements:
+    * Added "ChangeTracker" log class and traces (Log::Log4Perl)
+    * HashId: load_data can load ordered data in non-ordered hash
+
+  Bug fixes: 
+    * Removed Exception::Class from warper error handler
+      (gh #5, Thanks jplesnik)
+    * Dumper/Loader: handle literal \\n
+
+2.078 2016-01-24
+
+ A cleanup (and breaking) release: Error handling no longer uses
+ Exception::Class. Config::Model::Exception was re-written to emulate
+ most of Exception::Class behavior. This will break modules which
+ traps or throw exceptions using Exception::Class (at least
+ Config::Model::CursesUI will break).
+
+ * Config::Model: fix get_element_property (fix a bug with cme dpkg where
+   XS-Autobuild is wrongly added to debian/control file)
+ * Config::Model::Value:
+   * don't check value when loading layered config (aka system
+     default values). These values are assumed to be correct.
+   * accept when a mandatory value is set by a layered value.
+     (this fixes hangs in Config::Model::Itself tests)
+
+2.077 2016-01-20
+
+  New features:
+    * Loader: added hash copy command. This new command can be used with
+      something like: "cme modify stuff some_hash:.copy(from,to)"
+    * Instance: added config_dir (used when provided by application info
+      and not by model)
+
+  Bug fix:
+    * ValueComputer: escape variables containing a quote (Debian #810768)
+    * Value: fix check of reference values
+
+
+2.076 2016-01-14
+
+  One major feature of Config::Model is the possibility to change the
+  structure of the tree depending on a configuration paramater value.
+  This "warp" feature is used in lcdproc model: when a driver is
+  choosen by user, the configuration parameter of this driver are
+  shown and parameters for other drivers are hidden. Up to now, only
+  one driver could be selected at a time because the warp mechanism
+  could be driven only by a leaf value.
+
+  Now this warp feature can be driven by a check list. So lcdproc
+  model can now select more that one driver at a time.
+
+  Other functionality improvements:
+    * Ini backend: doc mentions "IniFile" instead of ini_file to match
+      Config::Model::Backend::IniFile class name.
+    * IniFile backend can read/write check list
+
+2.075 2015-11-22
+  
+  Functionality improvements:
+    * Lister: can list local (dev) application
+
+  Support:
+    * changed bugtracker to github's
+
+2.074 2015-09-30
+
+  Functionality improvements:
+    * Loader: added navigation with upward search. E.g. with a
+      command like '/foo', the loader will go up the tree until
+      a node containing a 'foo' element is found.
+    * C::M::Node: added backend_support_annotation method. This will
+      ne used by the Tk GUI to decide whether to display a widget to
+      edit annotation (aka comments)
+
+  Doc improvements:
+    * Backend::Any: added missing doc about method that can or must
+      be overloaded by a read/write backend.
+
+2.073 2015-07-19
+
+  Bug fix:
+    * Fix typo in module name loaded in tests that led to
+      impossible build requirement (RT #105938)
+
+2.072 2015-07-18
+
+  Functionality improvements:
+    * Loader: convert literal "\n" into real \n
+    * shell UI: added 'tree' command to show config tree from current node
+
+  Improvement of messages shown to user:
+    * Node: Warn if an accepted element is likely a typo (Debian #789568)
+      (this feature requires recommended module Text::Levenshtein::Damerau
+      to be installed)
+    * All: improved location_short output (truncates long path with '[...]'
+      instead of '[truncated...]')
+    * All: improved change summary message
+
+  Documentation improvements:
+    * Loader: Added examples using cme modify in pod doc
+    * AnyThing: Added missing doc for location_short and composite_name_short
+    * Updated wordpress link to use config-model tag
+
+  Cruft cleanup:
+    * removed cme-old command
+
+2.071 2015-05-23
+
+  Bug and doc fix release:
+    * shell like user interface:
+      * fixed completion of commands (like set, clear...)
+      * improved error message sent when command is wrong
+      * use item location as prompt
+    * Loader: fixed parding of command like foo:.insort("bar( stuff )")
+      which are also used in shell UI.
+    * Backend::Any: mention cme command used to edit config file in
+      comment header when writing back files. (e.g. "You can run 
+      'cme edit lcdproc' to modify this file" is written in header
+      of /etc/LCDd.conf)
+    * Value: fixed formatting and errors in pod doc
+
+2.070 2015-05-03
+
+  Added minor features and bug fixes:
+    * Model:
+      + added include_backend model parameter for xorg
+      * include no longer include read/write spec... (Debian #783952)
+    * Hash and Array: clear now triggers notify_change
+    * Value: boolean conversion (e.g yes/no to 1/0) during initial load
+      must not trigger a change notification...
+    * shell UI:
+      + added fix command
+      * added clear command for list hash and value...
+
+2.069 2015-04-25
+
+  * Model: Allow inclusion of read/write specification
+
+2.068 2015-03-29
+
+  Small improvements:
+    * Value: request configuration save when initial load
+      detects problem like duplicated or mismatched values in config file
+    * Loader: raise an exception when ':' action is used with a value element
+
+  New features:
+    * C::M::Anything::grab: type param can also be an array ref
+    * Instance: added 'update' method
+
+2.067 2015-03-01
+
+  Bug fix release:
+    * SimpleUI: fix 'll' command (failed without argument)
+    * C::M::Backend::Any:
+      + added show_message method (delegated to node)
+      * added missing doc for node attribute
+    * C::M::Instance: callback attributes are now rw
+      (should fix test failures of Config::Model::Itself)
+    * C::M::AnyThing: delegates show_message to instance
+
+2.066 2015-02-15
+
+    * C::M::Instance:
+      + added on_message_cb and show_message parameters
+    * C::M::GenClassPod:
+      * added missing doc for gen_class_pod parameters
+      * generate doc in a reproducible way by using "sort keys". This should
+        fix Debian problem with unreproducible build found on libconfig-model-dpkg-perl
+        and libconfig-model-itself-perl
+    * dist.ini: use free.fr address instead of cpan.org to avoid problems with
+      automated release e-mail
+
+2.065 2015-01-06
+
+  Bug fixes:
+    * Value: avoid undef warning when creating error message
+    * Node: Must load override class to be able to use it...
+
+  New (small) feature:
+    * Value: warning or error message defined in a model can contain
+	  a $_ to show the bad value to user
+
+2.064 2014-12-04
+
+  A small change for this release:
+  
+    * Version 2.062 added the possibility to override the Perl class
+      implementing a configuration node by adding a class parameter in a
+      place that is confusing. This release fix this bug: this optional
+      override class is now declared at the top of a configuration class.
+
+2.063 2014-11-28
+
+  Bug fix release:
+    * GenClassPod: use Exporter instead of Exporter::Lite.
+    * adapted contrib/bash_completion for cme-old
+
+2.062 2014-11-23
+
+  Big change for this release:
+    * cme command is no longer delivered with this distribution. cme
+      is now delivered by App::Cme distribution.
+
+  To help the transition, this distribution delivers cme-old. You can
+  use this command until App::Cme is available in CPAN (next few days)
+  or if you find bugs in the new cme command (which now uses App::Cmd).
+
+  Other incompatible changes:
+	* old config-edit command is now really gone
+	* cme extensions are obsolete. Extension mechanism is now provided
+	  by App::Cmd
+
+  New feature:
+    * The Perl class used to implement node, list and hash
+	  configuration element can be overridden using a new 'class'
+	  parameter. The Perl class passed to this parameter must inherit
+	  Config::Model::Node, or Config::Model::HashId or Config::Model::ListId.
+
+  Bug fixes:
+    * Value: skip notification if migrate yields an empty value
+    * Model: use logger for tracing legacy translation
+
+2.061 2014-09-23
+
+  Bug fix release:
+
+  * ValueComputer: leave $@ and $! alone in formula.
+    Also skip variables like '$ foo'
+
+2.060 2014-08-19
+
+  Bug fix release:
+
+    * value.t: avoid smoke test failures
+    * Avoid new perl 5.20 warning (Debian #758320)
+    * Value: improved notify change message (computed vs preset vs default)
+    * fix pod doc in cme (RT 97605, Debian #756433)
+    * depends directly on YAML, not YAML::Any which will be deprecated
+
+2.059 2014-06-29
+
+  New features:
+
+    * cme:
+      + added shell command as a shortcut to 'cme edit -ui shell'.
+	    E.g 'cme shell ssh' to edit ssh_config through a shell like UI
+      + add :@ and :.sort sub command for ordered hash.
+        E.g.: "cme modify  dpkg-control ~~ 'binary:~/.*/ Depends:.sort' -save"
+        or "cme modify dpkg-copyright ~~ 'Files:.sort' -save "
+    * Config::Model::Value: added warn_if parameter
+
+  Bug fixes:
+
+    * cme shell mode:
+      * fix or add completion for several commands
+      * added shell style pattern match to ll and ls command (e.g 'ls foo*')
+    * remove version req from use YAML::Any 0.303 (resolve issues with
+      Debian FTBS)
+    * Value: fix crash when default value raises a warning and code fix
+      returns undef.
+
+2.058 2014-06-19
+
+    Bug fix release
+
+    * cme: modify cryptic user message about "Fixing stuff"
+    * Value: tweak migrate_value to always return something, even undef.
+      This fixes 'cme check dpkg-copyright' crash (thanks gregoa)
+    * Loader: fix pod doc about list operators
+    * AnyThing: avoid undef warning that breaks test on freebsd perl 5.10.1
+
+2.057 2014-06-12
+
+  New features:
+
+    * Config::Model: initialise log4perl during construction
+    * Value: added file and dir value type. A warning is issued when file
+      or dir is not found.
+
+  Other bug fixes:
+
+    * Shortens long index to limit the length of warning and error messages
+    * Value: fix check done during apply_fixes...
+    * ObjTreeScanner: tolerate deprecated experience parameter.
+
+2.056 2014-05-18
+
+	This release deprecates experience associated with configuration element.
+    experience specification in models is now ignored.
+
+	Other Changes:
+    * added bash_completion snippet associated to a model. This will be useful
+ 	  for dpkg-patch model
+    * C::M::Lister: skip backup files when listing available applications
+	* replace File::Slurp with Path::Tiny in yaml backend test and gen-class-pod
+      (RT #95692). (which changes the dependencies)
+    * replaced Path::Class with Path::Tiny dependency
+
+2.055 2014-05-02
+
+    This release removes all code related to asynchronous stores.  This code was
+    buggy. Making this work correctly would require re-writing most of
+    Config::Model.
+
+    * Config::Model::Value:
+      * added deprecation warning about callback parameter
+      * C::M::Value: removed async code
+    * perltidy run on all files
+    * removed dependency on namepace::autoclean
+    * Removed AnyEvent dependency
+
+2.054 2014-04-01
+
+  Bug fix release:
+    * Loader Dumper: fix quote handling (Closes Debian 743097)
+    * Loader: return 'ok' after dispatching an action (avoid undef warning
+      during tests)
+    * cme: -save options force a save even if no semantic change was done
+    * ListId: sort may trigger notify_change is elements are actually
+      moved around, so 'cme modify stuff list:.sort' will save the file
+      as expected.
+
+2.053 2014-03-25
+
+   Bug fix release:
+   * Loader: fix broken list leaf assignment (like 'list:4=foo')
+
+2.052 2014-03-23
+
+    This release provides new functionalities to 'cme modify stuff'
+    and to the shell like interface ('cme edit -ui shell stuff). See
+    Config::Model::Loader doc for details:
+
+      + added remove by value on list and hash ( :-= and :-~ )
+        (Closes Debian #741453)
+	  + added lots of list and hash operator usable on 'cme modify stuff'.
+        E.g. :.insort :.insert_before :.insert_at :.unshift  :.push :.sort
+      + handle list/hash value substitution ( e.g. list:=~s/foo/bar/ )
+      * warn when trying to remove a list element with a non numeric index
+      * rationalize list and hash commands: list assignment is now
+        list:=a,b,c instead of list=a,b,c
+
+	Other changes:
+
+    * Dumper: use new syntax when dumping a list of value (i.e. list:=a,b,c)
+    * Instance: don't print change if old and new value are undef
+
+2.051 2014-03-06
+
+    * cme: fix command like "cme modify foo ~~ <load_instructions>"
+    * ValueComputer: formula with eval no longer mess with $& and ${^MATCH}
+      variables used in regexp
+
+2.050 2014-02-27
+
+	* Restore NAME section in Config::Model::Manual::* man pages
+
+2.049 2014-02-26
+
+    Bug fix and minor new feature release:
+    * C::M::AnyThing: added has_warning fallback method (always return 0)
+	  (RT 93329)
+    * C::M::Anything: added clear_annotation method
+
+2.048 2014-02-23
+
+    The main changes of this release are the new features of cme
+    command:
+
+      * add possibility to override config file (for appli with
+        allow_config_file_override) (part of Debian #739387) if config
+        file override is '-', open STDIN to read and STDOUT to write.
+        This way, cme can be used as a filter.
+      * added -strict option so cme exits 1 when warnings are found
+        (Closes Debian #736972)
+      * added -save option to force save. Useful when just reformatting
+        is desired
+      * modify command can apply Perl substitution (s/foo/bar) to
+        configuration values
+
+    Other changes:
+
+    * C::M::Loader:
+      * changed hash selection =~ sub-command to :~
+      + added =~ subcommand to apply Perl substitution to values
+    * Config::Model: load EV at compile time (Debian #738975)
+    * C::M::Value: limit the number of re-try when applying fix to
+      avoid deep recursion errors
+    * C::M::Node: force a save when reading a deprecated parameter (RT 92639)
+    * C::M::Instance: use msg parameter when listing changes
+    * C::M::AnyThing: added doc for notify_change
+
+2.047 2014-01-25
+
+    * Value: store a good value cancels the error stored in Instance
+    * Term UI:
+      * list unsaved changes and propose to save on exit or quit
+      * fixed "save" command
+      * added 'changes' command to list unsaved changes
+      * allow also delete command on leaf element
+      * added reset command to set a leaf element to undef
+      * allow spaces around '=' and ':'
+    * tweak cme-gen-class-pod so it can be run without cme (handy for tests)
+    * Model generate_doc: write file if new doc is different from old
+      (don't try to be smart with timestamps)
+
+2.046 2013-12-15
+
+    * cme:
+      + added -create option to force creation of missing configuration
+        file
+      * improved message about applied changes and don't show '0' as <undef>
+      * added examples in pod doc
+    * BackendMgr:
+      + add note about cme in header of saved file (if comments
+         are supported in the configuration file format)
+      * Improved error message when no config file is found
+      * skip backup copy if no original file is found
+    * Node: avoid unknown element failure when check is 'no'
+    * ValueComputer:
+      * added note in doc about compute variable usage
+      * correctly handles &index(-x) where x is a number > 1
+      * improved error message if 'follow' parameter does not point to
+        a leaf in configuration tree
+    * overdue doc changes: s/WarpedThing/Warper/g in pod docs
+
+2.045 2013-10-18
+
+  * Manually restored dep on MouseX::NativeTraits
+  * bumped dep on Config::Model::Tester to 2.046
+  * cme: print an error message when no application is
+    specified (Closes Debian #726447)
+
+2.044 2013-10-13
+
+   The main change of this release is the addition of a JSON backend
+   so that cme can read and write JSON configuration files. Given that
+   JSON is more and more used, this new backend is bound to be useful.
+
+   Other fixes:
+    * cme:
+	  * force write back if -force option is used
+      * updated doc
+
+2.043 2013-09-20
+
+	* build depends on Config::Model::Tester 2.046 to avoid dependency
+      issues 
+    * Value: accept yes/no true/false as default value for Boolean.
+      This can make model declaration more consistent when boolean
+      value must be written as true/false, yes/no. In this case, 
+      forcing model developer to write default value as 0/1 was not
+      cool and prevented generation of model like LcdProc's model. 
+
+2.042 2013-09-15
+
+    * Config::Model: load AnyEvent as soon as possible to avoid
+      test issues
+    * ListId: fix typos in pod doc
+    * scripts: use /usr/bin/env to be more portable (e.g. for Mac OSX)
+
+2.041 2013-08-14
+
+    Main changes for this release are:
+
+    * The ENCRYPT parameter of Popularity contest model was changed from
+      boolean type to a yes,maybe,no value, thus allowing a
+      "réponse de Normand" ;) This follows up resolution of Debian
+      bug #714917.
+
+    * Config::Model::Tester class was moved in its own distribution.
+      Hence this distribution now build depends on Config::Model::Tester
+
+	Other bug fixes:
+    * Avoid warning with 'cme list' (Closes Debian #719197)
+    * ShellVar backend: Allow variable assignement like "foo = value".
+      This is not legal is Shell but sometimes used in configuration files
+      using a shell like syntax (Closes Debian #719256)
+
+    Other changes:
+    * Removed build-dep on File::Copy::Recursive
+
+2.040 2013-07-20
+   * Fix '~' in path substitution in BackendMgr
+   * Skip cme command test on non unix-like systems
+
+2.039 2013-07-18
+
+  Framework changes:
+    * CheckList: 
+	  + Added clear_item and clear_layered methods
+	  + added user mode to retrieve data
+      * clear now reset (undefs) a check-list instead of setting items to 0
+      * load_data accepts hash ref
+      * get_check_list_as_hash: added user mode, don't return 0 for undef items
+      * set_checked_list_as_hash: Missing items in the given list of parameters are now reset
+    * Added dependency on Module::Runtime to avoid test failure on Mac and Windows
+
+  Backends:
+    * BackendAny: lack of suffix method is now an info not a warning
+    * BackendMgr: 
+      + added $home override for tests
+      + added default_layer backend parameter
+      + added os_config_dir parameter
+      - die if obsolete read_config_dir or write_config_dir is specified
+
+  Test framework:
+    * Tester: 
+      + allow override of home directory for tests
+      +  can also use $model for internal tests
+      * check test item now accepts array refs
+
+  Doc:
+    * added log config file in contrib
+
+2.038 2013-07-03
+
+  Framework changes:
+    * cme: added -backup option.
+
+  Application changes:
+    * popcon model: 
+	  * replace yes/no enum value with boolean written as yes/no
+      + added ENCRYPT support
+
+  Backends:
+    * all: don't loose part of comment when '#' is embedded in comment
+    * Ini backend: handle storage to non available element by ditching data
+
+2.037 2013-06-15
+
+  Framework changes:
+    * renamed ChangeLog in Changes to conform to Perl standards
+    * added missing dep on File::Slurp
+    * cme: added -try-app-as-model option (experimental)
+    * Most pod docs: Replaced obsolete links to Config::Model::AutoRead 
+      with Config::Model::BackendMgr
+
+  Application changes:
+    * Removed LcdProc model (now in its own Perl distribution)
+
+2.036 2013-05-25
+
+  Framework changes:
+    * config-edit: added deprecation warning
+    * Value:
+	* fix pod doc error in L<> which tripped smoke tests
+        * apply_fixes: check after fix must be asynchronous
+    * Node::load_data: use a predictable order to accept elements.
+      This change fixes the smoke test error in t/backend_ini.t
+      (Closes Debian #709785)
+
+  Test changes:
+    * make t/pod.t run only when AUTHOR_TESTING is set
+      (Closes RT 8533 and Debian #709784)
+
+2.035 2013-04-27
+
+    * Node has_element: small optimisation for common case
+    * cme:
+      * make sure that async store is used before actual check
+      * load Tk only when using edit command (avoids issues on exit
+	with AnyEvent)
+
+2.034 2013-04-17
+
+    * Model: fix generation of model doc that broke with 2.032
+
+2.033 2013-04-15
+
+    * Model: load returns loaded class in the correct order. Otherwise
+      Config::Model::Itself will write back config classes in a random
+      order (for files declaring more than one class)
+
+2.032 2013-04-15
+
+  Framework Changes:
+    * Model: completely re-organized the way a model is loaded to
+      be able to add model extensions to an included class
+    * Doc: clarified and moved model plugin doc in advanced manual
+    * config-edit: added deprecation warning in Synopsis
+
+  Application changes:
+    * Fstab model: added missing relatime option
+
+2.031 2013-04-03
+
+  Framework Changes:
+    * All: use directly Mouse instead of going through Any::Moose
+      (which is deprecated)
+    * Removed dependency on Any::Moose
+
+2.030 2013-03-23
+
+  Framework Changes:
+    * Value: fix reset value for mandatory with default value
+    * Node load_data: added kludge to avoid breaking C::M::Itself
+
+  Application changes:
+    * LCDproc model generator: Added a more special treatment for
+      Hello and GoodBye parameters to cope with new INI backend
+      (which is more strict than previous versions)
+
+01 2013-02-27
+
+  The main change of this release is to provide asynchronous store
+  check.  Now, a model can check the validity of a configuration
+  value against a remote resource in a non-blocking way. This is
+  currently used by Dpkg model to check the validity of package
+  names with Debian server through several concurent http
+  requests. This change is backward compatible except for Value
+  store method: it returns now 1 instead of the stored value. OTOH,
+  that feature was not documented. Classes inheriting
+  Config::Model::Value may be impacted, although old version
+  of Config::Model::Dpkg::Dependency is still working.
+
+  In more details...
+
+  Framework Changes:
+    * Instance:
+      * propagate check parameter to root node
+      * store path of tree items having an error condition
+    * ListId:
+      * changed load_data signature to accept named parameters
+      * load_data accepts hash_ref and store them in the first element
+    * Value:
+      * croak if notify_change is called for nothing
+      * make sure that all fixes are applied
+      * limit the number of times a fix can be tried
+      * store always returns 1
+
+  Backend changes:
+    * rewrote INI parser so that check is enabled directly on store
+
+  Test Changes:
+    * fixed multistrap tests
+    * test ini backend: test split_reg parameter
+
+2.029 2012-11-28
+
+    * cme-gen-class-pod: pod doc can be generated from
+      a class specified on command line argument (really this
+      time, previous version was broken)
+    * cme: run the first extension found in @INC, not the last one
+
+2.028 2012-11-27
+
+    * cme:
+      + added a BUGS section in man page
+      * Improved error message for unknown elements
+    * cme-gen-class-pod: pod doc can be generated from
+      a class specified on command line argument
+    * fix test that broke with perl 5.17
+    * removed unneeded 'use UNIVERSAL'. (should fix smoke tests)
+
+2.027 2012-10-30
+
+    * fix checklist problem with writing default values
+      (which broke openssh demo). (Closes: Debian #691338)
+    * Dumper: fix wrong module reference in pod doc
+
+2.026 2012-09-27
+
+  * Re-released 2.026_2 as good to go.
+
+02 2012-09-20
+
+  * Added build-time dep on YAML::Any
+
+01 2012-09-20
+
+  * Application changes:
+    * IMPORTANT: Debian Dpkg model was removed. It will be
+      available on Debian soon as a native package. It will also
+      be published on CPAN in Config::Model::Dpkg.
+  * Framework changes:
+    * cme: added possibility to run extensions. The first extension
+      is gen-class-pod. I.e. you can run 'cme gen-class-pod' (which
+      is useful only if you develop a configuration model...)
+
+2.025 2012-09-10
+
+  * Test: Fix fuseui test regression that shows on
+    non-linux systems
+
+2.024 2012-09-04
+
+  * Debian dpkg dependency:
+    * Warn and can remove unversioned dependency on essential 
+      package (Debian bug 684208)
+    * Warn and replace perl-modules dependency with perl
+    * Don't mess with alternate dependency with < relation 
+      (Closes Debian #682730)
+    * remove Debian epoch when checking perl module version 
+      from corelist (Debian bug # 683861)
+
+  * Framework changes:
+    * Lister: use @INC to get available application models. This is
+      mostly useful to use local models for tests
+
+  * cme command changes:
+    * added bash completion for 'fix' subcommand
+    * fix pod doc (gregoa)
+    * improved notification change (avoid duplication and added a
+      clear message for swap)
+    * cme: added -dir-char option for fusefs command
+
+2.023 2012-07-04
+
+  * Application changes:
+    * Debian dpkg control binary: 
+      * In control binary Depends, replace 'perl' dep with ${perl:Depends}
+        This is implemented as a warning and is changed only if apply_fix is
+        called. Duplicates ${perl:Depends} will also be removed by apply_fix.
+
+2.022 2012-07-03
+
+  * Application changes:
+    * Debian::Dpkg
+      * fix a race condition between the various calls to Debian's madison site
+
+  * Framework changes:
+    * added -from and -filter option to cme fix command
+
+2.021 2012-06-28
+
+  * Application changes:
+    * Debian::Dpkg
+      * Bump default compat level to 9 (for hardening)
+      * dependency model:
+	* Make concurrent calls to madison to reduce user wait 
+	  with AnyEvent::HTTP
+	* make sure that apply_fix trigger notification changes 
+	  so the fixes are indeed saved when running apply_fix 
+	  (thanks to gregoa for the heads up)
+      * copyright: allow any non-space character for license short name
+
+  * Framework changes:
+    - Removed dependency on LWP::Simple
+    + Added dependency on AnyEvent and AnyEvent::HTTP
+    * cme: clean up the mess after AnyEvent headbutts Tk :-/
+
+2.020 2012-06-18
+
+  * Application changes:
+    * Fix DEP-3 model:
+      + added missing parameters (Subject ...)
+      + accept Bug-* parameters
+      * Better cope with unstructured text after Subject keyword
+
+  * Framework changes:
+    * prepare release. depends on List::MoreUtils
+    * fix cme doc example (Closes Debian: #677069)
+    * Node: accept stuff: added 'accept_after' parameter
+
+  * Tester framework:
+    * force write_back during tests
+
+2.019 2012-06-05
+
+  * Framework changes:
+    + doc generated from model now provides details on status
+      (e.g. deprecation) and migration (HEAD, master)
+    * check_list: make sure that apply_fixes can be called
+      on check_list even though it does nothing there
+
+2.018 2012-05-29
+
+  * Application changes:
+    + Debian::Dependency: Added a check and fix for debhelper version
+      requirement taking into account compat value. This check is
+      available only with full dpkg model (i.e. "cme xxx dpkg"
+      command). It is disabled when using only dpkg-contol model ("cme
+      xxx dpkg-control").
+    * Debian::Dpkg model: fix default Vcs-Git URL for debian-perl packages
+
+  * Framework changes:
+    * Value:
+      * avoid issuing the same warning twice
+      * send a notif warning only when default data is different
+        from current data as already seen by user (i.e.  // )
+    * cme: better formatting when printing changes
+    * WarpedNode: Don't call notify_change when not needed.
+    * added a note parameter for notify_change
+    * Instance: initial_load default value is now 0. 
+    * Node: correctly set initial_load mode when init is called 
+      recursively
+
+2.017 2012-05-21
+
+   * Framework changes:
+        * Fix missing YAML dependency in configure require
+
+2.016 2012-05-20
+
+   * Framework changes:
+        * Having dependencies in prereq does not mean they are listed
+	in runtime require. The dependency list is now duplicated to have
+	them in prereq (for smoke tests) and runtime require. This should
+	help smoke tests for modules depending on Config::Model
+	* Fixed small doc mistake in Tester
+
+2.015 2012-05-14
+
+    * Application changes:
+        * Copyright model: replace migrate_keys_from with new 
+	   migrate_values_from. This simplifies the model
+
+    * Framework changes: 
+	  + List or Hash: added migrate_values_from to enable migration 
+	    from another hash or list. migrate_keys_from for list element
+	    is now deprecated.
+        * List, Hash, Value: ensure that migration is done after initial
+	  load, i.e. once all data from configuration file is loaded.
+        * AnyId, List, Hash: deprecated get_all_indexes in favor of 
+	  fetch_all_indexes
+        * Value:
+            * make sure that setting a default value triggers
+	      notify_change so the resulting modification in the 
+	      config file can be saved
+            * don't trigger notify_change with update undef -> undef
+
+    * Test changes:
+        * Tester: added file_contents_like and file_contents_unlike tests
+
+2.014 2012-05-03
+
+    * Application changes:
+	* cme: list changes before saving data (unless save is handled by
+  	  user interface) (HEAD, master)
+	* Dpkg backend: reworked the internal data structure used between
+	  DpkgSyntax and the other modules. The new data structure feature
+	  the file line number to provide error messages with the line
+	  number where the error was found. This patch also tracks what was
+	  changed during parsing (see "altered" keyword) to call
+	  change_notify with new option "really => 1" (closes debian #670441)
+
+    * Framework changes:
+	+ all: added tracking of changes performed by user. The change list can
+	  retrieved from Instance object with list_changes method (this list can be
+	  cleared with clear_changes).
+	+ Depends on Text::Diff
+
+2.013 2012-04-06
+
+    * Application changes:
+	* Debian Dpkg model: Moved libtiff4 transition warning
+	  from source Build-Depends to binary Depends
+
+    * Framework changes:
+	Model doc generation: small formatting fix to avoid Pod::Html
+	errors with Debian/Dpkg/Source.pod (should fix ActiveState breakage)
+
+    * Test changes:
+	* multitrap tests: really ignore warnings coming from Text::Balanced
+        (which pop up in Perl smoke tests with perl 5.15.9)
+
+2.012 2012-04-05
+
+    * Application changes:
+	* Debian Dep-3 patch parser: quilt formats patch in a very concise
+	way.  There's no Index: line and no '====='. OTOH, imported patch
+	may contain this lines until the patch is refreshed. This commit
+	makes sure that both types of patch are parsed
+	correctly.
+	* Debian model: changed meta element into my-config. This should
+	make clear that this element stores user's config regarding dpkg
+	files.
+	* Tester: Produced file order is not important. Make sure both
+	list are sorted before being compared (Closes Debian #666705)
+
+    * Test changes:
+	* multistrap test: ignore load warnings (which pop up in Perl
+	smoke tests with perl 5.15.9)
+
+    * Framework changes:
+	* Instance: added on_change_cb to take action when something is
+	modified in the config tree
+
+2.011 2012-03-19
+
+    * Application changes:
+      + Debian copyright: added deprecated License-Alias paramater. 
+        When set to 'Perl', this parameter is migrated into 
+        License: Artistic or GPL-1+
+      + Debian DpkgSyntax: better error message. This was really annoying for DEP-3
+        patch parser.
+      + cme: added forgotten -stack-trace option
+
+    * Tester changes:
+      - removed check_* parameter. 
+      + Added wr_check parameter
+      + added possibility to pass options to grab and fetch with check and wr_check.
+
+2.010 2012-03-13
+
+    * Application changes:
+      * Debian control:
+	* fix warning of section and priority fields
+        + added check and fix for libpng and libtiff4 transistions
+	* Debian Copyright: added warnings if Files uses either [ ] or |
+	(thanks gregoa for the suggestion)
+      * cme: check must check all values
+
+    * Framework changes:
+      * IdElementReference: use fetch in user mode to get choice list
+        (means values in layered mode)
+      * Value: fetch with allow_undef mode must behave like user mode,
+        not backend mode (fix warp problem in layeredmode)
+      * ValueComputer: added usage of compute as an upstream default
+        value. Some cleanup was done around that
+
+2.008 2012-03-01
+
+    * Application changes:
+      * Debian control:
+        + comments are now parsed correctly
+      * Debian copyright model:
+        + added support for deprecated X-Comment. X-Comment fields are converted
+          to Comment fields (note that regular comments are forbidden)
+
+    * Framework changes:
+      * Requires perl 5.10.1 instead of 5.10.0
+      * provide file name and line number in syntax error message
+
+2.007 2012-02-26
+
+    * cme: fix 'migrate' command.
+
+2.006 2012-02-25
+
+    * Application changes:
+      * Debian control model: 
+        * bumped default Debian source standards version to 3.9.3
+        - no longer try to enforce first lowercase in Synopsis. 
+          Too many false positives (fix debian #661184)
+        - Removed check for virtual package (source packages are seen as
+          virtual packages). Unfortunately, virtual packages are now reported 
+          as unknown packages. Suggestions on how to fix this are welcome.
+      * Debian copyright model:
+        * changed copyright type from line based list to string leaf
+    * Framework changes:
+      + cme: added forgotten 'migrate' command (i.e. cme migrate stuff)
+
+2.005 2012-02-23
+
+    * Application changes:
+      * Debian copyright model: updated url for dep-5 format with new 
+        Debian approved one. URL is no longer updated silently, user 
+        will have to request it with 'cme fix' command
+
+2.004 2012-02-09
+
+  * Build.PL runs gen_class_pod.pl which loads Config::Model from lib,
+    hence most of the runtime dependencies are now moved in
+    configure_requires. This should improve Perl smoke tests.
+
+2.003 2012-02-08
+   
+   * Added configure_requires on File::Slurp (Fix RT#73611)
+   * Updated meta-data to point toward github instead of sourceforge
+
+2.002 2012-02-08
+
+    Most of the fixes aim to solve issues with Perl smoke tests
+
+    * Application changes:
+      * fix bash completion for cme options
+
+    * Framework changes:
+      * Added dependency on namespace::clean and Mouse
+      * AnyId: remove deprecation warning. check is useful as an alias to check_content
+      * Lister: no need to require perl 5.10
+      * Tester: don't use next to exit from sub
+    
+    * Tests: 
+      * avoid undef $ENV{HOME} problems on Windows
+
+2.001 2012-02-06
+
+    Big change this time, hence the version bump tp 2.001. The main
+    change for users is the deprecation of the config-edit program in
+    favor of cme. Instead of using options, this cme uses command
+    keywords like git, so users will have more possibilities while
+    typing less. Internally, some performance improvements were
+    implemented. Given the work required, core Config::Model classes
+    were converted to Moose.
+
+    In more details:
+
+    * Application changes:
+      + New cme program to edit/validate configuration.
+      * model Debian::Dpkg: 
+        * fixed computed default value for VcsBrowser
+        + added rules element for debian/rules file
+        * DEP-5 model: updated doc and removed obsolete URL. Thanks to skaet 
+	  for raising this point
+        * Debian/Dpkg/Control/Binary model:
+	  + Added deprecated XC-Package-Type. 
+	  + Added migration from XC-Package-Type to Package-Type
+    * Framework changes:
+      * All:
+        + Improved performance by running validation only when data 
+	  is modified. (implemented with notify_changes method)
+        * breaks memory cycles in backend manager
+        * Converted to Moose all classes inheriting Config::Model::AnyThing
+
+1.265 2011-12-06
+
+    * Application changes:
+        * model Debian::Dpkg: 
+          + added Multi-Arch parameter
+          * don't fail when debian/copyright is missing or empty
+
+    * Framework changes:
+        * Config::Model::Value: layered value is also part of a standard value
+        * Config::Model::CheckList: in custom mode, checklist must return the whole
+          list when queried by user, not just the changed items. 
+          (Fix Config::Model::OpenSsh RT#72916)
+
+1.264 2011-11-29
+
+    * Application changes:
+        * model Debian::Dpkg:
+          - removed another email check (was hiding in a hg branch)
+
+1.263 2011-11-29
+
+    * Application changes:
+        * model Multistrap:
+          * Use convert =>lc on most parameters to match multistrap's behavior
+          + added deprecated forceunpack parameter (migrated to unpack). 
+          + force sections and key names to be lowercase
+          + added components parameter to Multistrap::Section model
+        * model Debian::Dpkg:
+          - removed email checks
+	* bash_completion: use new Lister class to gain a lot of speed
+
+    * Framework changes:
+        + Config::Model::HashId: added convert parameter
+        * Config::Model::Value: recompute choice before checking 
+          if a reference matches available choices.
+        + Config::Model::Lister: new bunch of functions to list models
+	  and applications. Used only by bash_completion. 
+    * Inifile backend changes:
+        * delay validation after read because read order depends on the
+          INI file and not on the model.
+        + added force_lc_(key|name|value) parameter to take care of case 
+          insensitive INI files
+
+1.262 2011-11-18
+
+    * Config/Model/Tester: avoid test failure by sorting file list 
+      before comparing them 
+
+1.261 2011-11-17
+
+    * Test changes (Config/Model/Tester):
+      * reworked cfg file list check
+      * Avoid test conf pollution from one test to the other
+      + added possibility to specify arbitrary file name (for multistrap)
+
+    * Application changes:
+      + new multistrap model. Supports multistrap's layered configuration
+      * lcdproc:
+        * lcdconf2model.pl: added better check of info in square brackets
+        * lcdproc/LCDd.conf: resync with upstream lcdproc LCDd.conf 
+
+    * Inifile backend changes:
+      + added write_boolean_as, split_list_value, section_map and
+	join_list_value parameters to cope with special conventions
+	regaring INI files
+      * No longer write empty list parameter (i.e. just "foo=" lines)
+      * ensure that empty sections are not written
+
+    * Framework changes:
+      * Config::Model::Value:
+	+ added write_as parameter for booleans
+        + added clear_preset method
+      + C::M::CheckList, C::M::Instance, C::M::Value: added layered value
+      + C::M::Value::LayeredInclude: new class to include sub-layer
+        of configuration data
+      + config-edit: added -config_file option
+      + added Test::File::Contents build dependency
+
+1.260 2011-10-28
+
+    * Application changes
+        * Backend Debian::Dpkg: skip empty lines in patch series files
+    * Framework changes:
+        + Config::Model::Tester: new class extracted from t/model_tests.t
+          to test config files and models. 
+        * Config/Model/Loader.pm: Make sure that load("!") goes to root 
+          even if load was called from a child node. Fix RT#69480
+
+1.259 2011-10-16
+
+    * Application changes
+        * model Debian::Dpkg: Bumped compat default value to 8
+    * fixed test to work even if lcdproc is not installed
+
+1.258 2011-10-14
+
+    * Application changes
+        * model Debian::Dpkg::Patch: Synopsis is no longer mandatory. 
+          Issue a warning for empty Synopsis and propose a value based 
+          on patch name
+        + model Debian::Dpkg::Meta: added email element
+        + model Debian::Dpkg::Copyright::LicenseSpec: compute license 
+          text from Software::License (requires version patched for Debian)
+        * Backend::Debian::Dpkg::Copyright: Rewrote parser to classify 
+          correctly Files and Licenses paragraph even if extra fields are 
+          prepended.
+        * model Debian::Dpkg::Control::Source: Vcs-browser must also accep
+          https URLs
+        * lcdproc:  fixed some specs in square brackets in LCDd.conf template.
+          Reworked model generator to better specs in square brackets and
+          handle model snippets in curly brackets 
+
+    * Framework changes:
+        * ValueComputer: &index and &element can only work with parent 
+          or ancestors in tree. Fixed grammar inside of {} statements. 
+          It is now able to return '' when no replacement is found
+        * Value: fix warn_if warn_unless check in custom mode. Cleaned up 
+          mess about mandatory value checks. Custom values are no
+          longer checked this way
+
+1.257 2011-09-16
+
+    * Framework changes:
+        * config-edit: avoid deprecation warning
+        * C::M::AnyId: enable automtic fix of duplicated values
+        * C::M::Node: Create BackendMgr when read_config or write_config 
+          is defined (Fixes Debian FTBS in Config::Model::TkUI See #642157)
+
+    * Application changes
+        + models Debian::Dpkg::Control::Binary and Source:
+          added duplicates warning in dependencies
+        + model Debian::Dpkg::Control::Source:
+          compute Vcs-Browser and Vcs-Git default value for pkg-perl team
+        * model Debian::Dpkg::Patch: No need for a first capital letter 
+          restriction. Look for debian patches in the correct places
+
+1.256 2011-09-16
+
+    * Application changes
+        * Dpkg control model: warn (and offer to fix) duplicated 
+          dependencies
+        + Dpkg model: new compat docs and dirs parameters
+
+    * Framework changes:
+        * TreeSearcher.pm: properly fix conflict between method name and
+          Moose::Util::TypeConstraints
+
+1.255 2011-09-15
+
+    * Framework changes:
+        * Instance.pm, Node.pm: take into account force_load 
+          with delayed loading of config files
+        * BackendMgr.pm: New Moose class (renamed from AutoLoader)
+
+1.254 2011-09-04
+
+    * fix tests that blow up with Debian build tools
+
+1.253 2011-09-02
+
+    * Framework changes:
+        * AnyId: reworked warning storage and display
+        * Value: check can be called without arg to check current value
+        
+1.252 2011-09-01
+
+    * Framework changes:
+        * AutoRead.pm: correctly handle ~ as home dir (thanks fabreg)
+        * Backend/ShellVar.pm: do not write global comments if 
+          there's no data to write
+        * AutoRead.pm: do not leave empty files
+
+1.251 2011-08-30
+
+    * Application changes
+        * Backend Debian/Dpkg/Copyright.pm:
+            Fixed parser to avoid confusing License and License-Alias
+        + model Debian/Dpkg/Control/Source.pl:
+          warn in case of duplicated dependencies
+        * Debian/Dependency.pm: Fixed handling of dependency alternates
+        * Backend Debian/Dpkg/Patch.pm: patch write is now working
+
+    * Framework changes:
+        * Value.pm: rewrote apply_fix to use check to apply fixes. 
+          No longer stores fixes as sub ref.
+        * AnyId.pm: rewrote apply_fix to use check to apply fixes. 
+          Split check in a global check and dedicated index (check_idx) check
+        * AnyId.pm: Added fix_duplicates feature
+        * Instance.pm: apply_fixes: now relay the call to hash and lists objects
+        * OjTreeScanner.pm: added hooks for node_content hash_element and list_element
+
+1.250 2011-07-22
+
+    * Test changes
+        * Debian dpkg tests: reworked cache file syntax (text instead of
+          Perl). Perl file did change randomly depending on order of
+          hash keys. That caused trouble when building Debian packages
+          because running tests did change a source file.
+
+    * Application changes
+        * Debian Dpkg License model and backend: 
+          Reworked Licence models to allow comments and arbitrary parameters
+          in stand-alone licences section (Closes Debian #633847)
+        * Backend Debian::DpkgSyntax: Better handle newlines
+
+    * Framework changes:
+        * lib/Config/Model/Loader.pm: Raise an exception if a hash of
+          node gets a load string like hash:foo=bar (this one is
+          reserved for hash of leaves)
+
+1.249 2011-07-12
+
+    * Framework changes:
+        * Config/Model/Value.pm: 
+          * apply_fixes applies all available fixes of a 
+            value *then* save the value.
+          * Emit one warning per problem instead of one 
+            warning per problematic values (with embedded newlines)
+
+    * Application changes:
+        * Config/Model/Debian/Dependency.pm: reworked to take buildd 
+        limitation into account (check if Perl version is available 
+        in sid to decide the order of the alternates dependencies)
+   
+1.248 2011-07-05
+
+    * Framework changes:
+        * Reworked test framework 
+        * New test require new build dependency: File::Copy::Recursive
+        * C::M::Value: allow an enum to have an empty ('') value.
+        * Yaml backend: Do not try to call load_data when YAML 
+          file is almost empty (file present but no data in there)
+        * config-edit: force save when command are passed in command
+          line arguements
+
+    * Application changes:
+        * Debian::Dependency: Do not issue warning when a package 
+        is pure virtual (found from local apt cache)
+        * Debian::Dpkg::Control backend: read control information 
+          according to element order in config class. This avoids 
+          problems when Maintainer field is declared after
+          the Dependencies
+
+1.247 2011-06-27
+
+    * Application changes:
+        * examples/lcdproc/LCDd.conf: fix typos
+    * Framework changes:
+        * lib/Config/Model/Backend/IniFile.pm: Fix failure to load in 
+          debug trace: do not call location when $obj is undef
+
+1.246 2011-06-17
+
+    * Application changes:
+        * LCDd.pl model: re-generated with new C::M::Itself to avoid spurious pod
+          formatting. Fix issue with embedded quotes in Hello and GoodBye parameters.
+
+1.245 2011-06-17
+
+    * Application changes:
+        * models Debian::Dpkg::Copyright::License:
+          Allow any license exception keyword (fix Debian bug #627874)
+        + New model for lcdproc: 
+          The model for lcdproc (LCDd) is generated from the template 
+          LCDd.conf file provided by lcdproc project. This model can be 
+          generated by running Dist::Zilla (when working from Mercurial) or
+          by running Build.PL (when working from Config::Model Perl 
+          distribution). 
+          Note to packagers: LCDd conf files are 
+          (c) 1999-2011 William Ferrell and others, GPL-2. 
+          Consequently, all LCDd models files (generated from LCDd.conf) are 
+          (c) 1999-2011, D Dumont, William Ferrell and others, GPL-2. 
+          
+    * Framework changes:
+        * lib/Config/Model/Backend/IniFile.pm:
+        - Do not write twice leaf comments
+        - handle warped_node like nodes
+        * lib/Config/Model/Loader.pm:
+          Do not remove first and last escaped quotes
+        * Build.PL:
+            Check (and may be generate) pod doc at build time 
+            (on top of release time)
+        * lib/Config/Model.pm:
+          Fix doc generator to test correctly for time stamp 
+          before re-writing docs
+        * lib/Config/Model/Backend/IniFile.pm:
+          When check is 'no', discard data that belongs to unavailable
+          elements
+
+1.244 2011-05-16
+
+    * Application changes:
+        * Fstab model: Prevent wrong value in fs_passno and fs_freq with 
+          bound mount point
+        * Dpkg: Added doc for control Architecture. Fix pod doc in DpkgSyntax 
+          backend
+        * Debian/Dpkg/Meta.pl: applied Debian patch fix_perl_group_filter 
+          (set group_filter of debian perl team to 'etch' instead of 'lenny')
+        
+    * Framework changes:
+        * config-edit: added -search and -narrow-search options. This options
+          enable search in tree element, values and tree documentation. 
+        * config-edit: cleaned up option names (always accept '-' in place of '_')
+        * Config/Model/AnyThing.pm: fix location string and fix grab function
+
+1.243 2011-05-02
+
+    * Application changes:
+        * dpkg control: bumped standard version to 3.9.2
+        * dpkg: fix spelling . Closes RT# 67783 and 67784. Thanks carnil
+        * dpkg control license: tweaked grammar to accept commas in license
+          fields. Closes Debian #624305. Thanks Niko Tyni.
+        * Dpkg/Control/Source.pl : added XS-Python-Version ans X-Python-Version
+          (first steo to solve Debian #624321)
+        * Debian Dpkg Meta model: package filter is computed from group-filter
+          OR private policy
+          
+    * Framework changes:
+        * reworked warp registration mechanism (Changed inherited WarpedThing into
+          delegation to Warper)
+        * t/debian*.t: Put back Apt::Pkg test to avoid smoke test failure
+        * ValueComputer: Fixed bug to allow temporary variables and $_ in eval'ed 
+          formulas
+
+1.242 2011-04-07
+
+    * Application changes:
+        * dpkg control: added Build-Conflicts field
+        * dpkg: Added model for debian/source/options and debian/clean files
+
+    * Framework changes:
+       * Value: don't perform value check when fetching standard or default value
+       * Backend/Plainfile: now support list element in the form of multi line file.
+         Each line of the file is a value of the list.
+       * t/fuse_ui.t: skip test if lsmod cannot be used (e.g. Mandriva)
+       * t/debian*.t: skip test when /etc/debian_version is not found
+
+1.241 2011-04-07
+    
+    * Framework changes:
+       * Build depend on Test::Differences
+       * Load and grab: fix to accept '-' in element names 
+       * Model.pm: Added value help and summary in generated documentation
+       * DumpAsData: skip hash keys containing undef values
+
+1.240 2011-04-05
+    
+    * Framework changes:
+        * Most *.pm: replaced 'no Moose' by 'no Any::Moose' 
+        
+1.238 2011-04-05
+    
+    * Framework changes:
+        * Build.PL: removed dead code that cause downstream pacaking problems.
+        * Model.pm: fix cosmetic issue with doc generation.
+        
+1.237 2011-04-04
+    
+    * Framework changes:
+        * added MouseX::NativeTraits dependency (fix RT #67196)
+        * config-edit: fixed typo (fix RT #66403)
+        * Value, Node, AnyId: use dclone to backup constructor parameters
+        * Model: Correctly write author and copyright in doc (i.e not as ARRAY0x0...)
+        * Yaml backend: fill full_dump option (did not work when set to 0)
+    * Application changes:
+        * dpkg control dependency: 
+            - Dependency filtering mechanism uses source package name to find
+              filter value in Meta. This makes more sense than using binary package
+              name
+              
+1.236 2011-04-01
+    
+    * Application changes:
+        * dpkg control dependency: 
+          - Dependency filtering mechanism now use dpkg meta 
+            package_dependency_filter value (i.e. a user parameter).
+            Debian_perl package will be filtered on lenny by default
+            Filter mechanism can be overriden in a package by package basis
+            See Debian::Dpkg::Meta config class for details. 
+          - Warn if a package is unknown.
+          - Accepts version specified with dpkg variables.
+        * dpkg control and copyright: warn if dh-make-perl boilerplate is found
+        * dpkg control: added Package-Type parameter (Peter Pentchev)
+        * Dpkg meta: new class to enable user to customize dpkg editor. 
+          (email-updates and dependency-filter). Content of meta is saved in
+          ~/.dpkg-meta.yml
+        * Dpkg control: change e-mail address based on content of meta 
+          email-updates
+
+    * Framework changes:
+        * Value: added replace_follow parameter to specify automatic
+          replacement based on a hash somewhere in the configuration
+          tree (used by dpkg e-mail update)
+        * Extracted initialisation of reader and writer from new() and moved in 
+          init() method to avoid deep recursion on startup.
+        * Use Any::Moose instead of plain Moose
+        * Removed dependency on MooseX::Singleton
+        * Model: added author, copyright, license fields. This data is not used by
+          Config::Model, but can be used in the user interface or to generate config
+          class doc
+        * AnyThing: Fix parsing of multi line annotations. Now use Pod::POM 
+          to load annocation from Pod document
+        * dist.ini: Depends on Pod::POM
+        * Model.pm: added generate_doc method
+        * config-edit: new -gen-pod option to generate pod document from config class
+        * HashId: fix default_with_init to be able to auto-create leaf values 
+          specified in the model
+
+1.235 2011-03-01
+    
+    * Application changes:
+        * dpkg control source model: Encourage Standard-Version 3.9.1
+        * dpkg control dependency: only versions older than old-stable (i.e. 
+          not found on madison) will trigger a warning
+        * dpkg copyright: Handle license in header (Closes Debian #614776)
+        * Dpkg copyright backend: skip empty copyright lines
+        
+    * Framework changes:
+        * WarpedThing: Can warp based on the location in a tree. For instance to make
+        an element mandatory in one place and not in another. Used by Debian copyright model
+        * Value: mandatory values also require non-empty strings
+        * config-edit: Force to load all sub-models (i.e. control, copyright) of
+        a top-model (err.. dpkg) when run with option -ui none
+
+1.234 2011-02-21
+    
+    * factor out comment extraction: code that retrieve comments and tie it to 
+      actual config data is generic. Now this is handled by 
+      C::M::B::Any::associates_comments_with_data
+    * factored out comment writing in C::M::B::Any::write_global_comments
+      and C::M::B::Any::write_data_and_comments
+    * Fix bad handling of leaf type Ini backend (Thanks Krzysztof for the notice)
+    
+
+1.233 2011-02-11
+    
+    * Application changes:
+        * dpkg control source model: Added DM-Upload-Allowed and all Vcs-* tags defined 
+        in Debian reference guide (Thanks Peter Pentchev for the patch)
+          (Fix RT 65575)
+        
+    * Framework changes:
+        * Backend Ini file: Fixed comment handling
+        * All modules: Improved synopsis. You can now save them in a file and 
+          have a working program
+        * Remove crappy handling of comments in load_data methods. 
+        * DumpAsData: Write annotations as pod in method dump_annotations_as_pod
+        * Anything: load_pod_annotation load annotations from a pod document 
+        * Instance write back: now correctly call all write_back when several
+          nodes in model needs to be called back
+
+1.232 2011-01-30
+
+    * Added missing Text::Autoformat dependency
+
+1.231 2011-01-30
+
+    * Application changes:
+        * Debian::Dependency: reworked to reduce calls to madison. Report available
+          versions when unnessary version issue is found.). Source is optional.
+        * dpkg control model: added forgotten Enhances and Pre-Depends. Added warnings for
+          too long lines in Description (plus fixes based on Text::Autoformat). Added 
+          Synopsis element to better tune warnings and fixes
+    * Framework changes:
+        * FuseUI: Fix undef warning. Ensure that files finish with "\n". 
+          Fix bug where value 0 was shown as an empty file.
+        * Added PlainFile backend (each config parameter is stored in its own file. useful for
+        some dpkg data)
+
+1.230 2011-01-21
+
+    * Application changes:
+        * Debian::Dependency: don't check debhelper
+        * Debian::Copyright: removed license keyword warnings. (fix Debian #610242), lots
+          of other bug fixes (including debian bug #609889 #610231)
+
+    * Framework changes:
+        * AnyId: added migrate_keys_from to migrate list or hash content 
+          during updgrades.
+        * ObjTreeScanner: Added node_dispatch_cb parameter to setup callback
+          dedicated to specific configuration classes.
+        * ValueComputer: added 'undef_is' to allow undef value in formulas. Useful for
+          complex migration scenario where migration can come from several alternative parmeters.
+        * FuseUI: Fix bug that disabled write in a boolean value
+        
+1.229 2011-01-10
+
+        * config-edit: added -apply-fixes option
+        * Value: can specify wider replace instruction by using regexp as
+          key of the 'replace' parameter
+        * Debian::Dpkg::Copyright: updtead to new CANDIDATE DEP-5
+          specification. Copyright files written for older
+          specifications are migrated to the new specification. This
+          should save a lot of typing from my fellow Debian packagers.
+          Feedbacks are welcome.
+
+
+1.228 2011-01-09
+
+        * Specifically require DB_File as this module is not available by default on Ubuntu
+        * Skip Debian dependency tests when AptPkg::Config is not available (non Debian systems)
+
+1.227 2011-01-07
+
+        * Model.pm: deprecated name_match parameter in accept
+          specification. The regexp should now be specified as a
+          key of a hash. 
+        * Value.pm: warn_if_match and warn_unless_match can speficy instructions to "fix"
+          the value.
+        * WizardHelper: can be set to stop on items with warnings. Added bail_out method to bail
+          out cleanly from wizard helper.
+        * model Debian::Dpkg::Control::Binary: Depends element specifies 
+          Perl cargo class Config::Model::Debian::Dependency (see below)
+        * Likewise for Debian::Dpkg::Control::Source Build-Depends*
+        * Debian::Dependency: new class derived from Value to provide checks specific
+          to Debian dependencies (syntax, whether a "(>= vers)" is necessary or not, ... )
+        * New dependency: LWP::Simple
+
+
+1.226 2010-12-08
+
+        * config-edit: mount fuse file system in the background. (like sshfs)
+        * FuseUI: Improved doc
+        * C::M::Backend::Fstab: improved doc
+
+1.225 2010-12-06
+
+        * Build.PL: build depends on Test::Command 0.08 to avoid smoke test problems
+
+1.224 2010-12-06
+
+        * Node AnyId Value: get() now accepts check parameter, autoadd parameter 
+        * Node AnyId: added children method
+        * Added Fuse interface: configuration tree is mapped to a virtual directory. 
+          Use config-edit -ui fuse -fuse_dir some/where to use. 
+          Stop with 'fusermount -u some/where'
+        * Recommends Fuse (to be able to use fuse user interface)
+        
+1.223 2010-11-28
+
+        * Debian/Dpkg/Copyright: removed restrictions on copyright format
+        * dist.ini: added build dependency on Probe::Perl (to run tests that invoke config-edit)
+        * Model.pm: can now load model snippet from Foo.d directory. I.e. *.pl files found in Foo.d 
+          are used to augment Foo model. This will be useful to agregate models coming from several
+          teams. For instance any team can extends the Fstab model provided in this distribution.
+
+1.222 2010-11-22
+
+        * bash-completion: fixed missing application option
+        * Fstab model: specify '/etc' dir inst
+
+1.221 2010-11-21
+
+        * Annotation: can now save annotation for node and list objects
+        * Added new Fstab model and backend. Supports ext2 to ext4 and
+        other file systems.  Please contact the author if options are
+        missing.
+        * Fix pod spelling errors (RT #62947). Thanks to carnil for the
+        report and patches.
+        * added config-edit test (build requires Test::Command)
+        * config-edit: added -application option, added -list
+          model|applications option
+        * Model.pm: updated doc
+        * bash_completion.config-edit: is now *not* executable
+
+1.220 2010-11-10
+
+        * Fix Build.PL to install files found in lib/Config/Model/*.d
+        * Added Cookbook::CreateModelFromDoc from SF wiki
+
+1.219 2010-11-09
+
+        * config-edit: fixed syntax error
+        * replaced command lines generated from template by bash-autocompletion.
+        * Removed dependency on Text::Template
+        * Added Config::Model::Manual::ModelCreationIntroduction doc from SF wiki
+
+1.218 2010-11-05
+
+        * Moved doc from README into model.pm
+        * Copyright: added deprecated parameters (Upstream-Name
+          Upstream-Maintainer Upstream-Source). Added migrate_from
+          instruction to migrate user data from old parameters to new
+          parameters.
+        * Copyright: Removed fuzziness around trailing '+' in licence names
+        * AnyThing.pm: grab() : accept '+' without surrounding quotes in argument
+        * WarpedNode: delegates copy_from and dump_tree to Node (fixes hash 
+          copy with warped nodes)
+        * config-edit: added -open_item option
+        * Build.PL: configure_depends on Text::Template to avoid CPANPLUS 
+          installation failure
+
+1.217 2010-10-26
+
+        * Fix issue where value reference did not follow refered
+          to parameters after creation.
+        * Fstab example: split the model for the Debian mini-debconf
+        workshop
+
+1.216 2010-10-26
+
+        * Control.pl: fixed control fields order to be less confusing (thanks to ansgar
+          for the advice)
+        * Backend IniFile: Bug fix to write top level parameters before the first INI class
+        * Node.pm: Bug fix when calling fetch_element with accepted parameters
+        * Model.pm: updated doc to point to overview and introduction on SourceForge wiki
+        * example/fstab/Fstab.pl: Fix model so it can be loaded by config-model-edit
+
+1.215 2010-10-19
+
+        * Instance.pm and Loader.pm: added some stub to preserve backwards compatibility 
+
+1.213 2010-10-19
+
+        * AutoRead.pm: do not clobber configuration file when trying to write erroneous data
+        * Value.pm: fix value check based on Parse::RecDescent
+        * Dpkg::Copyright: fix bugs masked by above problem
+        * Dpkg::Copyright: Fix read/write issues with License that can be stored either 
+          in Files section or their own sections
+
+1.212 2010-10-15
+
+        * Value and AnyId: store wrong values when store check is disabled 
+        (i.e. config-edit is run with -force option).
+        * Debian::Dpkg::Copyright: cosmetic improvements on written file
+        * Instance.pm: Removed all overengineered push_no_value_check, pop_no_value_check. 
+        This stuff had too many drawbacks of global variables. An optional check parameter 
+        was added to a lot of calls on Config::Model. The API was also sanitized with some 
+        positional parameters replaced by named parameters. Most of these changes should 
+        be internal. The main impact is that read/write backends must now explicitely
+        pass this check parameter lest the force_load will not work.
+        * ValueComputer: Remove req on Parse::RecDescent version. (Debian bug #597794)
+        * Value.pm: added silent parameter to fetch method to avoid displaying warnings on STDOUT
+        * Enable read and write of utf8 characters
+
+1.211 2010-10-01
+        * Value.pm: added warn_if_match and warn_unless_match parameters.
+        Value will issue a warning if the stored value match (or does not) 
+        match a Perl regular expression specified in the model.
+        * AnyId.pm: Likewise, added warn_if_key_match and 
+        warn_unless_key_match. 
+        * Value.pm: added warn parameter. Unconditionaly issue a warning with
+        a string specified in the model. Mostly usefull for deprecated or accept'ed 
+        parameters
+        * Loader.pm: load string can now undef a leaf with '~' action. 
+        E.g load("foo~") will set foo parameter to undef.
+        * Copyright model: warn if unknown license is used.
+
+1.210 2010-09-30
+        * renamed config-edit-dep5 in config-edit-dpkg-copyright
+        * renamed Debian::Dep5 model to Debian::Dpkg::Copyright
+        * renamed Config::Model::Backend::Debian::Dep5 backend to 
+          Config::Model::Backend::Debian::Dpkg::Copyright
+        * Factored out code to read/write control files in 
+          Config::Model::Backend::Debian::DpkgSyntax
+        * Created model and backend for Debian control files
+        * added config-edit-dpkg-control command line
+
+1.209 2010-09-20
+        * Fixed Debian::Dep5 parser: fixed read issue and added write
+        capability
+
+1.208 2010-09-16
+        * Fixed missing dependencies in Build.PL (Building from hg
+        requires Dist::Zilla and Dist-Zilla-Plugins-CJM >= 3.01)
+
+1.207 2010-09-14
+        * Added Debian's Dep-5 model (with config-edit-dep5 CLI)
+        * Value.pm: Added validation of value based on a Parse::RecDescent
+        grammar
+        * AnyId.pm: Authorized keys can also be based of a
+        Parse::RecDescent grammar
+        * Node.pm (find_element): returns the element name (if known). Can
+        also find the element in a case insensitive manner
+
+1.206 2010-07-23
+
+        First version to feature code written during Google Summer of Code 2010.
+        For this GSoC, Krzysztof Tyszecki has provided:
+        * a new backend for INI file that can:
+            * read and write comments to and from annotations. This way
+              users comments are preserved
+            * read and write parameters that are repeated in the INI file. This
+              repeated parameters will be loaded in list elements
+        * the capacity to load annotation from perl data structure
+        * a new model feature to accept unknown element. This will enable
+        loading and writing configuration files even if parameters are
+        unknown. This feature is required to create models targeted for
+        configuration upgrades: only upgrade and migration specifications
+        need to be specified in a model. Parameters that don't change from
+        one version to another need not to be specified in the model.
+
+        Other changes:
+        * lib/Config/Model/Loader.pm (_walk_node): bug fix to load node
+        element annotation
+        * lib/Config/Model/Dumper.pm (): bug fix to dump hash and list
+        element annotations
+        * Fixed Fstab example
+
+1.205 2010-06-04
+
+        * t/node.t: patch by Niko Tyni to avoid Carp::Heavy failure. Fix
+        Debian FTBS bug #582915 and countless CPAN smoke tests failures
+
+1.204 2010-06-03
+
+        * MANIFEST.SKIP: Prompt re-release because 1.203 tarball contains
+        debian packages used for tests (oops)
+
+1.203 2010-06-03
+
+        * lib/Config/Model/Loader.pm (_load_hash): Bug fix: can load
+        annotation tied to hash values (node or leaf).
+
+1.202 2010-04-22
+
+        SUMMARY:
+
+        * New core feature: user can store annotation (e.g. structured
+        comments) with each configuration object of the configuration
+        tree, be it node, leaf, hash or list. Read backend can parse
+        confguration file comments and store them in annotations.
+
+        For instance ShellVar read backend will parse comments and store
+        them in the configuration tree. ShellVar write backend will put
+        them back in the configuration file.
+
+        * PopCon editor preserve comments in configuration file.
+
+        * Code: Uses Moose for C::M::Annotation and C::M::Backend::Any. Moose
+        looks good. I may use Moose for all other Config::Model classes later.
+
+
+        * lib/Config/Model/Backend/ShellVar.pm (read): Tries its best to
+        read user comments and store them in annotations.
+        (write): Write annotation as comments. Write model documentation
+        as comments starting with '##'
+
+
+        * lib/Config/Model/AnyThing.pm (grab_annotation): new method
+
+
+        * lib/Config/Model/Loader.pm (load): Can load string with annotations
+
+        * lib/Config/Model/Dumper.pm (dump_tree): Dumps annotations in
+        data string
+
+
+        * lib/Config/Model/AnyThing.pm (annotation): new accessor method
+        for annotations.
+
+        * lib/Config/Model/Annotation.pm : New file to load and save
+        configuration annotations (just like comments with a structure)
+
+        * Build.PL: added dependency on Moose
+
+
+        * lib/Config/Model/models/PopCon.pl: Fixed PopCon config
+        directory. Cosmetic improvements for descriptions.
+
+
+        * lib/Config/Model/*.pm: Put back VERSION number and bumped them
+        all to 1.201 to make CPAN indexer happy
+
+1.001 2010-03-28
+
+        * Build.PL (process_tmpl_files): Build depends on
+        Text::Template. Generates config-edit-popcon
+
+        * config-edit.tmpl: New file to create dedicated config-edit-foo
+        commands
+
+        * lib/Config/Model.pm: Version bumped to 1.001
+
+
+        * lib/Config/Model/Backend/ShellVar.pm : New backend to read and
+        write configuration files used by shells (sourced by scripts)
+
+
+        * lib/Config/Model/WizardHelper.pm (node_content_cb): no longer
+        forget to scan element that are warped in while scanning the node.
+
+        * lib/Config/Model/Node.pm (previous_element): new method to
+        iterate through availalble node elements
+
+
+        * lib/Config/Model/Value.pm (setup_match_regexp): added new
+        'match' parameter to validate a value against a Perl regular
+        expression.
+
+
+        * lib/Config/Model/Node.pm (load_data): can load data in hidden
+        element when store check is ignored.
+
+0.644 2010-03-11
+
+        * lib/Config/Model/Loader.pm (load): Load string now support:
+        - '.=' operator to append to config values.
+        - '=~' to loop configurations instruction over list or hash elements
+
+
+        * all: Applied spelling corrections done by Debian Perl
+        team (thanks gregoa)
+
+0.643 2010-02-23
+
+        * lib/Config/Model/DumpAsData.pm (dump_as_data): Can dump ordered
+        hash in hash ref with __order key to specify order of hash
+        elements
+
+        * lib/Config/Model/HashId.pm (load_data): Accept hash ref with
+        __order to load ordered data
+
+
+        * lib/Config/Model/AnyId.pm: For better clarity, Hash and List
+        parameter max and min are changed to max_index and
+        min_index. Backward compatibility is kept, but warning will be
+        displayed on the terminal when the old parameters are used.
+
+        * lib/Config/Model/Backend/Yaml.pm: New backend to read and write
+        YAML configuration files.
+
+
+        * lib/Config/Model/CheckList.pm (set): buf fix: split input value
+        to get the list of checked items.
+        Migrated to Log4perl
+
+
+        * lib/Config/Model/CheckList.pm: Fixed default and upstream
+        default handling
+
+0.642 2010-01-21
+
+        * lib/Config/Model/WarpedNode.pm: added get_help to methods
+        forwarded to Node object to avoid breaking the graphical model
+        editor
+
+0.641 2010-01-19
+
+        * lib/Config/Model/Node.pm: Ported to Log4Perl (Tree::Node class)
+
+        * lib/Config/Model/AutoRead.pm: Doc updates on plugin mechanism
+        for read/write classes
+
+        * lib/Config/Model/Value.pm: model example updates
+
+        * lib/Config/Model/Dumper.pm (dump_tree): Correctly quote values
+        in list elements
+
+
+        * lib/Config/Model/HashId.pm: Ported to
+        Log4Perl (Tree::Element::Hash class)
+
+
+        * lib/Config/Model/Instance.pm (write_back): Croak if no
+        write_back callbacks were registered
+
+0.640 2009-09-09
+
+        * lib/Config/Model/WizardHelper.pm (new): Correctly scan list
+        element.
+
+0.639 2009-07-30
+
+        * lib/Config/Model/WizardHelper.pm (leaf_element_cb): bug fix:
+        scan correctly leaf elements of a hash.
+        * lib/Config/Model/WizardHelper.pm: use Log4perl
+
+
+        * config-edit: Tk cosmetic improvement. Thanks to Jerome Quelin
+        for the suggestion
+
+        * lib/Config/Model/WarpedThing.pm (_do_warp): Use
+        Log4Perl. Improved error message
+
+        * lib/Config/Model/Searcher.pm (): replace prints with
+        Log4perl. Fixed data structure bug
+
+0.638 2009-06-29
+
+        * lib/Config/Model/WarpedNode.pm (is_auto_write_for_type): Added
+        new method that need to be forwarded to Node to avoid write
+        cds_file bug.
+
+0.637 2009-06-23
+
+        * lib/Config/Model/Value.pm: As suggested by Jonas Smedegaard,
+        replaced 'built_in' parameter with 'upstream_default'. This change
+        will trigger warnings but no errors with existing model. To get
+        rid of the warnings, the easiest solution is to update the model
+        by running "config-model-edit -model Foo -save" (config-model-edit
+        is provided by Config::Model::Itself)
+
+        * lib/Config/Model/CheckList.pm: replaced 'built_in_list'
+        parameter with 'upstream_default_list'. This change may also
+        trigger warnings. These warnings will also be fixed by running the
+        config-model-edit command described above.
+
+        * lib/Config/Model/Value.pm: use Log::Log4perl with categories
+        Tree::Element::Value and Tree::Element::Warper
+
+0.636 2009-05-30
+
+        * lib/Config/Model/AutoRead.pm: Added skip_open to avoid opening
+        config target file when the open must be done by the
+        backend (e.g. for Augeas backend)
+
+        * lib/Config/Model.pm (instance): name parameter is no longer
+        mandatory. Uses 'default' as default instance name.
+
+
+        * lib/Config/Model/AutoRead.pm: When calling backend, 'file'
+        parameter contains configuration file name without path and
+        'file_path' parameter contains complete path and file name
+
+0.635 2009-04-17
+
+        * config-edit: added -dumptype option. -dump can now be used to
+        specify a file name
+
+        * lib/Config/Model/Instance.pm (new): Added skip_read parameter
+
+        * lib/Config/Model/Node.pm (new): Added skip_read parameter
+
+
+        * config-edit: Fix broken Log4Perl default config. Added -load option
+
+
+        * lib/Config/Model/AutoRead.pm (): Reworked doc. Aligned read and
+        write specs (now have same parameters). Read and write callback
+        are passed an opened file handle if possible. Now use Log::Log4perl.
+
+
+        * lib/Config/Model.pm (include_one_class): Can no longer clobber
+        element with 'include' class feature.
+
+
+        * lib/Config/Model.pm (check_class_parameters): Accept summary
+        parameter. Summary is optional and will be used either to generate
+        user interface or may be used to provide comments in saved
+        configuration files.
+
+        * lib/Config/Model/Node.pm (get_help): added options to get either
+        summary or description of an element
+
+
+        * config-edit: added -dump and -load options
+        
+0.634 2009-02-24
+
+        * config-edit: removed kludgy read_root_dir and write_root_dir
+        options. For test, only one root_dir can be specified (like Augeas)
+
+        * lib/Config/Model/ListId.pm: auto_create parameter is replaced by
+        auto_create_ids (still trap wrong parameter to avoid memory
+        problems)
+ 
+        * lib/Config/Model/HashId.pm: auto_create parameter is replaced by
+        auto_create_keys
+
+
+        * lib/Config/Model/ListId.pm (auto_create_elements): Trap wrong
+        auto_create argument (avoid massive memory consumption)
+
+0.633 2008-12-23
+
+        * lib/Config/Model/AutoRead.pm : Added -allow_empty parameter so
+        starting a configuration from scratch can be allowed by
+        configuration model designer. No longer die if 'augeas'
+        backend (or any other optional backend) is not found. Just emit a
+        warning.
+
+0.632 2008-12-16
+
+        * config-edit: added -backend parameter so (advanced) user can
+        specify which read/write backend to use. The actual backed to use
+        depends on the model loaded with -model option
+
+
+        * lib/Config/Model/Instance.pm (write_back): Added backend
+        parameter to specify which backend to use to write. By default,
+        all backend are tried until one succeeds. This parameter can also
+        be specified when calling the constructor
+
+0.631 2008-11-10
+
+        * lib/Config/Model/Value.pm (_pre_fetch): removed dependency on Error
+
+        * lib/Config/Model/WizardHelper.pm : removed dependency on Error
+
+        * lib/Config/Model/AutoRead.pm (auto_write_init): Move Augeas
+        read/write feature out of Config::Model. This feature is now
+        available in an additional class: Config::Model::Backend::Augeas.
+        This class is distributed in its own Perl distribution.
+
+
+        * lib/Config/Model/Dumper.pm (dump_tree): No longer dump list
+        elements that contain only undef values. No longer dump node that
+        do not contain data.
+
+0.630 2008-10-21
+
+        * t/augeas_backend.t: Skip sshd_config tests if Augeas library <= 0.3.1
+
+0.629 2008-10-13
+
+        * lib/Config/Model/CheckList.pm (set_properties): Added ordered
+        parameter to checklist. Ordered checklist feature is required by
+        Ssh model for Ciphers list (see Config::Model::OpenSsh).
+
+
+        * lib/Config/Model/AnyId.pm (get_cargo_info): New method
+
+0.628 2008-09-29
+
+        * lib/Config/Model.pm: Allow include of read or write config
+        parameters (required by Xorg model)
+
+0.627 2008-09-23
+
+        * ChangeLog: I plainly forgot to update this file for v0.626. This
+        is fixed now.
+        
+0.626 2008-09-22
+
+        * lib/Config/Model/AutoRead.pm (read_augeas): Lot of bug fix to
+        read and write through Augeas. Now, lens containing 'seq' lenses
+        must be explicitely declared.
+
+
+        * lib/Config/Model/Value.pm (migrate_value): No longer fails when
+        a migrated value is also a mandatory value.
+
+        * lib/Config/Model.pm (create_config_class): No longer creates
+        empty include in model when skip_include is true (breaks
+        Config::Itself tests)
+
+0.625 2008-07-30
+
+        * lib/Config/Model/ListId.pm (swap): Swapped or moved values in a
+        list no longer provides wrong location in config
+        tree. (index_value were not updated in objects contained in List
+        after a swap or a move)
+
+0.624 2008-07-24
+
+        * lib/Config/Model/Value.pm and others: Modified to allow smooth
+        configuration data upgrades without requiring user input (if used
+        by packaging, this should really help in avoiding rpmsave or
+        dpkg-old files) (See migrate_from parameter)
+
+        * lib/Config/Model/ValueComputer.pm: added 'use_eval' parameter to
+        allow more complex computation like regexp in string or uniline
+        values
+  
+
+        * lib/Config/Model/AutoRead.pm: Major changes to interface
+        Config::Model with Augeas (http://augeas.net). Changes are
+        compatible but new warnings are issued:
+        - 'syntax' is replaced by 'backend' to indicate that permanent
+          storage of configuration data is more than a matter of writing 
+          a configuration file.
+        - introduced 'config_dir' and 'root' paramater so a backend can 
+          specify a configuration dir (e.g. /etc/foo) and a pseudo-root 
+          to perform tests (so the config file can land in my_root/etc/foo).
+
+        * lib/Config/Model/Dumper.pm (new): skip_auto_write now take a
+        storage backend name as a parameter instead of a boolean (See
+        AutoRead for explanations about backends)
+
+        * lib/Config/Model/Node.pm (set): New method to emulate (part of)
+        augeas API
+        (get): New method to emulate (part of) augeas API
+
+        * lib/Config/Model/Loader.pm (): Added load command '~' which was
+        forgotten. This command can delete hash or list
+        item. I.e. load("foo~") will delete element 'a' for hash 'foo'
+        (_load_list): command '=' now clear all values before storing the
+        set of values in the list.
+
+        * lib/Config/Model/AnyId.pm (clear_values): New method to clear
+        values without destroying underlying objects.
+        (set): New method to emulate (part of) augeas API
+        (get): New method to emulate (part of) augeas API
+
+
+        * lib/Config/Model/AutoRead.pm: Changed 'syntax' paramter to
+        'backend' as configuration data may be stored to files or through
+        dedicated libraries like Augeas, gconf ... Backend now can be
+        cds_file, perl_file, ini_file and custom
+
+0.623 2008-05-19
+
+        * Build.PL: Moved from Makefile.PL to Build.PL
+
+
+        * lib/Config/Model/CheckList.pm: added support for built_in
+        default list
+
+
+        * lib/Config/Model/SimpleUI.pm: Some cleanup. Added possibility to
+        add and element name to 'll' command
+
+
+        * config-edit: added "dev" and "experience" options. With "dev"
+        option, config-edit will add "lib" to @INC and look for models in
+        "lib"
+
+
+        * lib/Config/Model/Node.pm (fetch_element): Bails out if element
+        is hidden (this feature was forgotten)
+
+
+        * lib/Config/Model/Value.pm (submit_to_compute): Fix bug where a
+        compute variable in the form 'foo' => '- - &element' did not work
+        (new): allow_compute_override is deprecated in favor of
+        allow_override within the compute parameter (backward compatible
+        change)
+
+
+        * lib/Config/Model/AnyThing.pm (dump_as_data): dump_as_data can
+        now be called on all configuration elements. (before, it could
+        only be called on nodes)
+
+
+        * lib/Config/Model/AutoRead.pm: Changed the way to specify auto
+        read and write for better clarity. Now they must be specified with
+           read_config => [ { syntax => 'ini'},
+                            { syntax => 'custom', 
+                              class => 'Mine',
+                              function=>'my_read'
+                            }
+                          ]
+        instead of 
+           read_config => [ 'ini', { class => 'Mine',function=>'my_read'}]
+        likewise for write_config
+
+
+        * lib/Config/Model.pm: Changed 'permission' to 'experience' and
+        'intermediate' to 'beginner' for better clarify. Changes are
+        backward compatible.
+
+
+        * lib/Config/Model/HashId.pm (move): New method to take into
+        account move within ordered hash
+
+        * lib/Config/Model/WarpedThing.pm (compute_bool): warp rule no
+        longer fail with eval $foo == 1 when $foo is undef
+
+0.622 2008-04-18
+
+        * Value.pm (fetch): added 'allow_undef' mode to allow reading
+        undefined mandatory value (fix morphing warped node containing
+        undefined mandatory values)
+
+        * Node.pm (copy_from): No longer die when copying undefined
+        mandatory value.
+
+
+        * AutoRead.pm (get_cfg_file_name): Do not use ':' in file
+        names. This breaks windows. Now use sub-directories
+
+
+        * Dumper.pm (dump_tree): skip undefined values in list element
+
+        * DumpAsData.pm (dump_as_data): idem
+
+
+        * Model.pm (list_class_element): New method to help debugging of
+        configuration models
+
+
+        * Model.pm (include_class): allow multiple includes
+
+
+        * AnyId.pm: Changed the way the cargo parameter are specified. Now
+        the cargo parameter holds all the information related to the
+        payload of the hash or list. Instead of having :
+        cargo_type => ... , cargo_args => {}, config_class_name => ...
+        you now have:
+        cargo => { type => ..., config_class_name => ..., <other_parm> => ... }
+        Model.pm provides a translation from the old way to the new way so
+        this change is (95%) backward compatible.
+        
+
+        * CheckList.pm (set): Fix bug that prevented to use level or
+        permission or status parameter with check_list elements
+
+
+        * Value.pm (pre_store): Fix bug that prevented to load models with
+        errors even in tolerant mode.
+
+0.621 2008-04-03
+
+        * Dumper.pm (dump_tree): Added auto_vivify parameter
+
+        * DumpAsData.pm (dump_as_data): By default, now provide full
+        dump (with default values). Added auto_vivify parameter
+
+        * Value.pm (fetch): Check for mandatory values even if fetching
+        only custom values
+
+
+        * Value.pm (): Cannot warp value_type anymore (this feature was
+        hard to use and encouraged too complex model).
+
+
+        * HashId.pm (swap): Fix swap problem which led to duplicated keys
+        in ordered hash
+        (move_after): New method
+
+
+        * ListId.pm (swap): new method
+        (remove): New method, equivalent to splice (@list,$idx,1)
+
+0.6201 2008-03-20
+
+        * Makefile.PL: Removed dependency on Term::ReadLine::Gnu. This module
+        is just suggested (as well as Term::ReadLine::Perl)
+
+0.620 2008-03-18
+
+        * TermUI.pm: Fixed to work with Term::ReadLine::Gnu or
+        Term::ReadLine::Perl. Can also work in degraded mode without these
+        2 modules. 
+        The command handling part was moved to SimpleUI.pm
+
+        * config-edit: added Simple UI mode so config-edit can be used
+        with stdin and stdout
+
+0.619 2008-02-29
+
+        * Value.pm: removed kludgy enum_integer value type 
+
+
+        * Instance.pm (write_back): can override directory where config
+        data is written back (necessary for GUI menu like "save in dir
+        ...")
+
+
+        * Node.pm (get_help): do not mangle description text (don't remove
+        spurious \s and \n. Leave that to user)
+
+0.618 2008-02-12
+
+        * AnyThing.pm (composite_name): new method to return a name
+        like element:index or element.
+
+
+        * CheckList.pm (): added refer_to and computed_refer_to accessors 
+
+0.617 2008-01-28
+
+        * config-edit: added possibility to load Tk GUI (still under
+        development)
+
+        * Exception.pm (): Fixed misleading error message for
+        UnavailableElement exception
+
+
+        * Value.pm (): added "replace" parameter for enum Value. This
+        enables to specify a substitution when storing value.
+
+
+        * WarpedNode.pm (check): no longer die when trying to retrieve
+        warped out node, just return undef. This is necessary to be able
+        to load configuration files with important error (e.g. a xorg.conf
+        file with a wrong device driver: all driver option are no longer
+        valid.)
+
+        * Value.pm (check): Added doc for check.  
+
+        * ObjTreeScanner.pm (permission): new method to get or set the
+        permission of the scanner (after creation).
+
+0.616 2007-12-04
+
+        * AutoRead.pm (read_ini): added capability to read configuration
+        data from ini file (See Config::Tiny)
+        (write_ini): can use ini files to store configuration data
+        (read_perl): added capability to read configuration data from a
+        perl data structure (see Config::Model::DumpAsData) from a .pl
+        (write_perl): can use perl file to store configuration data (.pl
+        file)
+        (auto_read_init): configuration model can specify cds (dump string
+        see Config::Model::Dumper), perl or ini with 'read_config' and
+        'write_config' parameter.
+
+0.615 2007-11-15
+
+        * config-edit: added '-force-load' option to load erroneous
+        configuration data. bad data is discarded.
+
+        * Value.pm : handle 'preset' mode to store values
+        (fetch):accept mode parameter ( [ custom | preset |
+        standard | default | non_built_in ] )
+
+        * Loader.pm (_load_list): When loading list, empty value are
+        considered as undef values. I.e 'list_a=a,,"",d' will
+        load ('a',undef,'','d') to lista element
+
+        * Instance.pm (new): added 'force_load' parameter to load
+        erronueus configuration data. In this case, wrong data will be
+        discarded.
+        (preset_start): new. Use this method, then load configuration data
+        that will be used as "preset data". You can use this feature to
+        load data discovered by an automatic mechanism, like hardware
+        scan.
+        (preset_stop): new. Stop preset mode. Then all data entered will
+        be considered as 'custom' data. These custom data can be compared
+        to 'default' or 'preset' data for audit purpose
+        (preset): new. Query if the instance is in 'preset' mode.
+
+        * Dumper.pm (dump_tree): changed 'full_dump' parameter (0|1) to 
+        'mode' (full | preset)
+        (dump_tree): if a list contain undef values, they are dumped as
+        a_list=a,b,,d. Empty values are dumped as a_list=a,b,"",d
+
+        * CheckList.pm (store): work in preset mode
+        (set_checked_list_as_hash): accept a mode parameter ([ custom |
+        preset | standard | default ]) to be able to audit config data
+        (fetch): idem
+
+0.614 2007-10-19
+
+        * Value.pm: added 'uniline' value type for string with no embedded
+        newline. (no "\n")
+
+
+        * Model.pm (translate_id_names): new method to translate AnyId
+        parameter changes
+
+        * AnyId.pm: Changed some parameters: follow -> follow_keys,
+        allow -> allow_keys, allow_from -> allow_keys_from
+
+
+        * Model.pm (translate_id_default_info): provides backward
+        compatibility for AnyId parameter changes.
+
+        * AnyId.pm: default parameter is replaced by 'default_keys' and
+        'default_with_init'.
+
+0.613 2007-09-25
+
+        * IdElementReference.pm: Changes the API of IdElementReference so
+        that API is more explicit (Like the API change for
+        ValueComputer). This change is backward compatible (model
+        translation)
+
+
+        * ValueComputer.pm: Now compute paramater must use explicit
+        parameters for compute formula, variables and replace.  Backward
+        compatibility is kept by translating old compute declaration in
+        Model.pm
+        
+
+        * Model.pm (include_class): permission, level and description
+        parameters can also be declared within the element declaration.
+        (i.e. at the same level than 'type' )
+        
+        * IdElementReference.pm (): A reference to a list will now take
+        into account the values of the list instead of the indexes of the
+        list. This makes more sense...
+
+        * CheckList.pm: Change the name of 'default' parameter to
+         'default_list' ('default' is still accepted but is deprecated)
+
+
+        * WarpedNode.pm: improved synopsis in doc
+        (load_data): new method (forgotten in 0.612)
+
+        * Model.pm: -doc: added synopsis
+        - inherit is deprecated in favor of include 
+        - inherit_after is deprecated in favor of include_after
+        - Raise an exception if an element is declared twice in a
+          model (even through include mechanism: overriding an
+          included element leads to confusion)
+
+0.612 2007-07-26
+
+        * HashId.pm : can preserve hash key order (when created with
+        ordered => 1). New method to manipulate hash key order are swap,
+        move_up, move_down.
+
+        * Exception.pm :new error class  Config::Model::Exception::LoadData
+
+        * AnyThing.pm (grab): added 'grab_non_available' parameter.
+
+        * AnyId.pm: added "ordered" parameter to create ordered hash
+        elements. I.e. hashes where the order of the keys is kept (like
+        Tie::IxHash)
+
+
+        * Value.pm (load_data): new method
+
+        * Node.pm (load_data): new method
+        (dump_as_data): new method 
+
+        * Model.pm (inherit_class): added inherit_after parameter. In a
+        model, the order of the elements is important. This parameter
+        enable a model to inherit elements from another class and to place
+        them in a specific place among the original elements.
+        (load): returns the names of the class loaded by this method.
+
+        * ListId.pm (load_data): new method
+
+        * HashId.pm (load_data): new method
+
+        * CheckList.pm (load_data): new method
+
+0.611 2007-07-03
+
+        * WarpedThing.pm: Modified the way to specify complex warped
+        rules. The former way based on list of lists was confusing. Now
+        you can specify boolean expressions to find the warp rule to apply.
+        
+        * Model.pm: Simplified config class inheritance mechanism: inherit
+        all or nothing. Added translation of legacy warp parameter (based
+        on list of lists) to new warp parameters (based on boolean
+        expressions). So the change done in WarpedThing is backward
+        compatible.
+        
+0.610 2007-06-06
+
+        * Model.pm (inherit_class): Fix configuration class inheritance
+        mechanism
+
+
+        * Value.pm: can also warp help for enum value
+
+0.609 2007-05-09
+
+        * config-edit: renamed from config-model
+
+
+        * examples/fstab/fstab_test.pl (produce_fstab): added curses
+        interface example (need to install Config::Model::CursesUI to
+        work)
+
+
+        * config-model: added possibility to use the curses interface
+        provided by Config::Model::CursesUI (if this one is installed)
+
+        * ValueComputer.pm: Modified so compute may return an undef value
+        if one of the variable (extracted from the configuration data) of
+        the formula is undefined. In other word, propagate undef instead
+        of croaking.
+
+        * Searcher.pm: Lots of bug fixes
+        (get_searchable_elements): new method
+        (prepare): new method. Search is now done in 3 moves: create the
+        searcher object, prepare the search, and run the search
+
+        * Value.pm: removed unique_value parameter which was a bad idea
+        for a check list implementation. Moved reference handling into new
+        IdElementReference class
+
+        * IdElementReference.pm: New class extracted from Value object so
+        reference can be used also by CheckList
+
+        * CheckList.pm: re-wrote as a "check_list" type and not a "list"
+        type
+
+
+        * Instance.pm (reset_config): new method
+        (searcher): renamed search_element to
+        searcher. searcher retunrs a Config::Model::Searcher object.
+        
+        * AnyThing.pm (searcher): renamed search_element to
+        searcher. searcher retunrs a Config::Model::Searcher object.
+
+        * AnyId.pm (copy): new method to deep-copy the content of a hash
+        or id element.
+
+
+        * Value.pm: moved out reference facility in
+        Config::Model::IdElementReference
+
+
+        * Value.pm (fetch_no_check): new method
+
+0.608 2007-02-23
+
+        * ObjTreeScanner.pm: Clarified call-back names.
+
+0.607 2007-01-12
+
+        * t/term_ui.t: Changed tests to try to load Term::ReadLine and
+        skip tests if Term::ReadLine cannot be loaded.
+
+0.606 2007-01-11
+
+        * config-model: Corrected wrong doc for options.
+
+        * Describe.pm: Small cosmetic changes in output.
+
+0.605 2007-01-08
+
+        * config-model: Now uses Log::Log4perl. (Still need to use
+        Log4perl for all *.pm files though). Now write config files back.
+        Added option to read and write config in test directories.
+
+        * *.pm: Changed e-mail address to reduce spam.
+
+        * *.pm: Small bug and doc fixes.
+        
+
+        * Model.pm (load): Model files are expected to be delivered as
+        Perl module and are searched using @INC. (E.g. Xorg.pl model will
+        be searched as Config/Model/models/Xorg.pl in @INC elements)
+
+        * Exception.pm (full_message): Clarified error message of
+        RestrictedElement exception
+
+        * examples/fstab/fstab_test.pl: Clarified notifications shown to
+        user. Adapted to changes of 0.604
+
+0.604 2006-12-06
+
+        * Node.pm: added check_list in possible element of a node.
+
+        * Value.pm (set): Changed reference declaration: now value_type
+        must be set to 'reference' when using 'refer_to' parameter.
+
+        * WarpedThing.pm: can group rules declaration in warp argument to
+        save typing
+
+        * WizardHelper.pm: adapted for ObjTreeScanner changes
+
+
+        * ObjTreeScanner.pm: Modified the callback signature so the user
+        does no longer have to play with closures.
+        - added check_list_cb for CheckList elements
+        - improved doc
+        - added callback example in doc
+
+        * AutoRead.pm (auto_write_init): bug fix in auto_write functions
+
+        * AnyId.pm (new): New allow and allow_from parameters to set
+        "allowed" keys of a hash or list. This list of allowed keys can be
+        fixed or dynamic.
+
+        * AnyThing.pm (root): new method. Returns the root node of the
+        configuration tree.
+        (grab): bug fix so hash identifier can contain white spaces when
+        calling grab (e.g. InputDevice:"Configured Mouse")
+
+        * CheckList.pm: New class to implement a check list. 
+
+        * Describe.pm: adapted for ObjTreeScanner changes and new
+        CheckList element type
+
+        * Dumper.pm: idem
+
+        * Report.pm: idem
+
+0.603 2006-10-19
+
+        * Value.pm (set): forbids to specify both 'refer_to' and
+        'value_type' in value declaration
+
+
+        * Loader.pm (load): Accepts now to load configuration data where
+        index can contain white space. (e.g. Monitor:"Hercules Pro")
+
+        * AnyId.pm: changed 'element_args' to 'cargo_args'. Changed
+        'element_class' to 'cargo_class'. Added 'follow' parameter so a
+        hash key can mimic the keys of another hash in the configuration
+        tree.
+
+        * TermUI.pm: removed debug print. This makes auto-completion much
+        easier to understand ;-)
+
+
+        * Value.pm (set_default): added built_in default
+        parameter. Built_in default parameter are not written in
+        configuration files but can be used to audit configuration data.
+        
+        * AutoRead.pm (auto_read_init): bug fix: override of read_dir was
+        not taken into account
+        (auto_write_init): idem for write_dir
+
+
+        * Instance.pm: added doc for the possibility to specify where to
+        read or write the configuration files.
+
+
+        * AnyId.pm (move): also change index value when moving items.
+
+0.602 2006-09-07
+
+        * config-model: added -help and -man options to command line
+
+        * Model.pm (load): model file now must return an array ref and not
+        invoke Model methods. See t/big_model.pm for an example
+        (load): can load model file for model class that contain '::'. In
+        this case the model file is searched in a sub-directory just like
+        a perl class (E.g Model::Foo -> Model/Foo.pm)
+
+        * HashId.pm (create_default): can initialise children nodes while
+        creating default keys. (Necessary to be able to write a
+        configuration model for Xorg)
+
+        * AnyId.pm (move): new method
+
+0.601 2006-07-20
+
+        * config-model: new program. This programs can be invoked to
+        modify configuration files (provided the corresponding model is
+        available in /etc/config-model.d). (Still shaky. Don't run as
+        root)
+
+
+        * Node.pm (get_type): new method
+        (get_cargo_type): new method
+        (get_element_name): added type and cargo_type parameters to filter
+        returned element depending on their type or cargo (contained) type
+        (describe): new method. Uses new Describe.pm file
+
+        * Value.pm (get_type): new method
+        (get_cargo_type): new method
+
+
+        * Model.pm (load): new method. Model can load model declaration
+        from /etc/config-model.d. The model must be valid perl script that
+        ends with an array ref containing configuraiton class declaration
+        like the one accepted by create_config_class
+
+        * ListId.pm (get_type): new method
+
+        * HashId.pm (get_type): new method
+
+        * Exception.pm : Added WrongType exception for new grab parameters
+
+        * AnyThing.pm (get_type): New method
+        (grab): added strict, autoadd, type parameter.
+
+        * AnyId.pm (get_cargo_type): new method.
+        (config_class_name): new mehtod
+
+        * Describe.pm: New file. Provides a human readable description of
+        a configuration node.
+
+0.507 2006-06-15
+
+        * TermUI.pm: New file. Provides a shell like interactive user
+        interface.
+
+        * Node.pm: Now inherit AutoRead class
+
+        * Instance.pm: Adapted for auto read/write.
+
+
+        * AutoRead.pm: New file. Provides node the capabilities to load
+        config data when creating a configuration node.
+
+0.506 2006-05-19
+
+        * examples/fstab/FstabModel.pl: added Fstab example with its fstab
+        configuration model. This example includes a small program that
+        use this model to show some ways to extract configuration
+        informations.
+
+
+        * Report.pm: new file. Provides report and audit facility for
+        Node.pm
+
+        * Node.pm (report): new method
+        (audit): new method
+
+        * Model.pm (create_config_class): added inheritance of
+        configuration models.
+
+        * HashId.pm (_get_all_indexes): sort returned indexes
+
+        * Dumper.pm (dump_tree): fix list dump which did not work
+
+        * AnyId.pm (fetch_all_values): new method
+
+0.505 2006-04-21
+
+        * WizardHelper.pm: New file. This class helps to create wizard
+        widget for config models
+
+        * Makefile.PL: ValueFormula is no longer compiled at build-time
+        but on the fly at run-time. Hopefully this will fix Windows
+        problem and ease integration downstream for a minor performance
+        penalty at start time.
+
+0.504 2006-04-10
+
+        * Searcher.pm: Added search element feature. This feature provides
+        a way to search for a configuration element in a configuration
+        tree. The search can be launcher from an instance or any node of a
+        configuration tree. Getting to searched target can be manual or
+        automatic (with call-backs provided by user)
+
+
+        * Makefile.PL: Changed grammar pre-compilation to add a "1;" at
+        the end of ValueFormulaParser.pm (Makes Windows happy)
+
+0.503 2006-03-16
+
+        * Makefile.PL (MY::postamble): Corrected CPAN dependencies
+

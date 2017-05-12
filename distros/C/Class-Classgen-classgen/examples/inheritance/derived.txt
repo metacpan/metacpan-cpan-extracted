@@ -1,0 +1,7 @@
+header:
+	package Derived;
+	use Base;		# <<< this is new
+	@ISA=("Base");		# <<< this is new
+
+variables:
+	%another_bunsch_of_data	# if you like

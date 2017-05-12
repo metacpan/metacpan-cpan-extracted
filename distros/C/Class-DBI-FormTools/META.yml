@@ -1,0 +1,26 @@
+---
+name: Class-DBI-FormTools
+version: 0.000007
+author:
+  - 'David Jack Olrik <david@olrik.dk>'
+abstract: Build forms with multiple interconnected objects.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  DBD::SQLite: 0
+  Data::Dump: 0
+  Test::More: 0
+requires:
+  Class::DBI: 0
+  HTML::Element: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Class::DBI::FormTools:
+    file: lib/Class/DBI/FormTools.pm
+    version: 0.000007
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

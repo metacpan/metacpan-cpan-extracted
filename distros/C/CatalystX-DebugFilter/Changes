@@ -1,0 +1,28 @@
+Revision history for CatalystX-DebugFilter
+
+0.13      2015-10-06 10:53:21-05:00 America/Chicago
+
+0.12      2015-09-09 14:50:24-05:00 America/Chicago
+        * Make test for debug output more tolerant of white-space (espizo)
+0.11      2012-11-14 21:33:27 America/Chicago
+        * fix failing test (due to case sensitive header names)
+0.10      2012-10-12 08:07:06 America/Chicago
+        * tolerate non-hashref params (per https://rt.cpan.org/Public/Bug/Display.html?id=80149)
+0.09      2011-02-24 11:43:25 America/Chicago
+        * add support for filtering the session since that gets dumped when using Catalyst::Plugin::Session
+0.08      2011-01-31 12:41:19 America/Chicago
+        * the simple (aka dumb/shallow) cloning wasn't quite deep enough (the request params were getting modified in place)
+0.07      2011-01-21 15:42:43 America/Chicago
+        * Rip out all of the Clone nonsense and just use simple (aka dumb/shallow) cloning.  It's always causing trouble...
+0.06      2010-09-07 18:54:27 America/Chicago
+        * Switch to Clone::PP (vs. Clone::Fast) as this seems to be causing more problems than Clone was <sigh>
+0.05      2010-08-30 10:06:47 America/Chicago
+        * make sure we don't bundle extlib
+0.04      2010-08-30 09:17:00 America/Chicago
+        * Switch to Clone::Fast (vs. Clone) to avoid some killing of dbh's on dumping
+0.03      2010-03-30 21:56:29 America/Chicago
+        * Switch to Module::Build to get predictable build_requires/configure_requires capabilities
+0.02 2010-03-30
+        * Fix some POD oddities and prereq's for unit tests
+0.01 2010-03-29
+        * Initial Release

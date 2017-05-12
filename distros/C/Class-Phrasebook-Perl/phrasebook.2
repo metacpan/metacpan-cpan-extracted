@@ -1,0 +1,11 @@
+{
+  'example' => {
+                 'array' => [ 'biff!', 'bam!', 'chicka-pow!' ],
+                 'hash'  => { sound => 'bork!', noise => 'bonk!' },
+                 'code'  => sub { return "ka-plooey!\n" },
+                 'code-with-args' => sub {
+                                       my $arg = shift;
+                                       return "$arg, $arg, $arg!\n"
+                                     }
+	       }
+}

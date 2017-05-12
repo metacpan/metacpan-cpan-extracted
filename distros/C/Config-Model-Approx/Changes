@@ -1,0 +1,55 @@
+2013-08-21 - 1.009
+
+    * Build-depends on Config::Model::Tester
+    * Removed tests dependency now handler by Config::Model::Tester
+
+2013-05-05 - 1.008
+
+    * Fixed pod test
+
+2013-05-04 - 1.007
+
+    * depends directly on Mouse instead of Any::Moose
+    * Build.PL: fix pod doc generation
+
+2012-11-19  Dominique Dumont  <domi.dumont@free.fr> 1.006
+
+    * require Config::Model 2.026 (HEAD, master)
+    * added more complete test for Approx model
+    * changed backend from 'custom' to 'Approx'
+    * setup Build.PL to refresh models pod doc
+    * added accept instruction in model to accept new parameters
+      that the author may have missed.
+
+2012-11-02  Dominique Dumont  <domi.dumont@free.fr> 1.005
+
+    * updated doc with cme instead of config-edit
+    * replace deprecated call with new one (fetch_all_indexes)
+    * die honorably when no approx.conf is found
+    * removed utf-8 char from description
+    * added forgotten log of version 1.004 (sorry)
+
+2011-06-27  Dominique Dumont  <domi.dumont@free.fr> 1.004
+
+    * no longer ship config-edit-approx. Replaced by
+      config-edit -appli approx
+    * added legal stuff and global doc to Approx model
+    * Updated model with cache and interval parameters
+
+2009-10-22  Dominique Dumont  <domi.dumont@free.fr> 1.003
+
+	* lib/Config/Model/Approx.pm (read): Convert old style
+	parameters ( without leading '$' - approx < 2.9.0) to new
+	style (with '$'). I.e. 'verbose 1' will be converted to
+	'$verbose 1'
+
+2009-09-27  Dominique Dumont  <domi.dumont@free.fr> 1.002
+
+	* README : updated license
+
+	* lib/Config/Model/Approx.pm : added missing doc
+
+2009-09-24  Dominique Dumont  <domi.dumont@free.fr> 1.001
+
+	* Initial release
+

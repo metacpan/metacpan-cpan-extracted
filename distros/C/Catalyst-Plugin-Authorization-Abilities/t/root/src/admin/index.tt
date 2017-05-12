@@ -1,0 +1,7 @@
+Administration:<br />
+<ul>
+  <li><a href="/admin/user">Users</a></li>
+  <li><a href="/admin/role">Roles</a></li>
+  <li><a href="/admin/action">Actions</a></li>
+  <li><a href="/">Home</a></li>
+</ul>

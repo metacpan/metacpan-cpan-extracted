@@ -1,0 +1,38 @@
+Revision history for CPAN-Testers-Data-Uploads-Mailer
+=====================================================
+
+0.06    2014-09-15
+        - fixed license fields in META.json to be lists.
+        - updated resources links in META.yml.
+        - extended META testing.
+
+0.05    2013-05-12
+        - CHANGES => Changes.
+        - change file dates changed to meet W3CDTF standards.
+        - added LICENSE file.
+        - test suite updated.
+        - added test script for help().
+
+0.04    2012-06-24
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - slimmed down sample file.
+
+0.03    2010-08-12
+        - added META.json to the package files.
+        - fix to headers in mail template.
+
+0.02    2010-02-06
+        - documentation updates.
+        - fixed repository and bugtracker links in META.yml.
+        - refined parsing of command line and argument options.
+        - refined filters for bad uploads.
+        - added more tests & samples.
+        - reworked mail template to include headers.
+        - template variables reworked in code.
+        - include other failed parses for admins only.
+
+0.01    2010-01-29
+        - initial release

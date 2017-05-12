@@ -1,0 +1,92 @@
+NAME
+    Convert::RACE - Conversion between Unicode and RACE
+
+SYNOPSIS
+      use Convert::RACE;
+
+      $domain = to_race($utf16str);
+      $utf16str = from_race($domain);
+
+DESCRIPTION
+    This module provides functions to convert between RACE (Row-based ASCII-
+    Compatible Encoding) and Unicode Encodings.
+
+    RACE converts strings with internationalized characters into strings of
+    US-ASCII that are acceptable as host name parts in current DNS host
+    naming usage.
+
+    See http://www.ietf.org/internet-drafts/draft-ietf-idn-race-03.txt for
+    more details.
+
+FUNCTION
+    Following functions are provided; they are all in @EXPORT array. See the
+    Exporter manpage for details.
+
+    to_race($utf16)
+        to_race() takes UTF-16 encoding and returns RACE-encoded strings
+        such as 'bq--aewrcsy'.
+
+        This function throws an exception such as 'String includes no
+        internationalized characters', 'String too long' and 'Invalid
+        encoding to compress'. Exceptions are thrown with Carp::croak(), so
+        you can cath 'em with eval {};
+
+    from_race($domain_name)
+        from_race() takes 'bq--' prefixed string and returns original UTF-16
+        string.
+
+        This function throws an exception such as 'String not begin with bq-
+        -', 'Decoded string includes no internationalized characters' and '
+        Invalid format to decompress'. Exceptions are thrown with
+        Carp::croak(), so you can cath 'em with eval {};
+
+    See the Unicode::String manpage, the Unicode::Map8 manpage, the Jcode
+    manpage for Unicode conversions.
+
+CLASS METHOD
+    Following class methods are provided to change the behaviour of
+    Convert::RACE.
+
+    prefix_tag()
+        Set and get the domain prefix tag. By default, 'bq--'.
+
+EXAMPLES
+      use Jcode;
+      use Unicode::String 'latin1';
+      use Convert::RACE 'to_race';
+
+      # EUC-japanese here
+      $name = to_race(Jcode->new('ÆüËÜ¸ì','euc')->ucs2);
+      
+      # or, Latin here
+      $name = to_race(latin1($latin_string)->utf16);
+
+      # in doubt of exception
+      eval { $name = to_race($utf); };
+      if ($@) { 
+          warn "Can't encode to RACE: $@";
+      }
+
+      # change the prefix
+      Convert::RACE->prefix_tag('xx--');
+
+BIG FAT CAVEAT
+    *   This module does NOT implement Nameprep phase. See mDNkit
+        (http://www.nic.ad.jp/jp/research/idn/mdnkit/download/) for complete
+        implementations.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>, with much help from Eugen
+    SAVIN <seugen@serifu.com>, Philip Newton <pne@cpan.org>, Michael J
+    Schout <mschout@gkg.net>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    There comes NO WARRANTY with this module.
+
+SEE ALSO
+    http://www.i-d-n.net/, http://www.ietf.org/internet-drafts/draft-ietf-
+    idn-race-03.txt, RFC 1035, the Unicode::String manpage, the Jcode
+    manpage, the Convert::Base32 manpage.
+

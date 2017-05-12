@@ -1,0 +1,41 @@
+#!perl
+
+use Crypt::Mimetic;
+
+#See doc about Error::Mimetic for debug levels details.
+use Error;
+$Error::Debug = 1;
+
+&Crypt::Mimetic::Main(@ARGV);
+
+=pod
+
+=head1 NAME
+
+mimetic - Crypt a file and mask it behind another file
+
+=head1 SYNOPSIS
+
+ to camouflage a file with a mask:
+   mimetic original-file mask-file destination-file [algorithm]
+
+ to split camouflaged file in original file and mask:
+   mimetic mimetic-file
+
+=head1 DESCRIPTION
+
+This is a very trivial use of Crypt::Mimetic module but I think that could be useful as demo.
+
+=head1 SEE ALSO
+
+Crypt::Mimetic(3)
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself (Artistic/GPL2).
+
+=head1 AUTHOR
+
+Erich Roncarolo <erich-roncarolo@users.sourceforge.net>
+
+=cut

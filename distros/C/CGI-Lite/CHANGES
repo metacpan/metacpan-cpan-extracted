@@ -1,0 +1,378 @@
+* v3.01 - 10th December 2015
+
+No changes from v3.00_02
+
+* v3.00_02 - 27th November 2015
+
+Dual subs/methods have improved detection of how they have been called.
+
+Misc small documentation improvements.
+
+* v3.00_01 - 15th October 2015
+
+BUG FIX: Uploads with enctype "multipart/form-data" and at least one
+    non-file param now process without warnings. (issue 107570)
+
+* v3.00 - 21st May 2015
+
+No changes from v2.99_04.
+
+* v2.99_04 (pre-release for 3.0) - 18th May 2015
+
+Uploaded files with duplicate field names are treated in the
+same ways as other data with duplicate field names.
+
+* v2.99_03 (pre-release for 3.0) - 5th April 2015
+
+BUG FIX: Additional change to forms.t to prevent MS Windows systems
+    hanging. (issue 103315)
+
+* v2.99_02 (pre-release for 3.0) - 4th April 2015
+
+Added force_unique_cookies method and equivalent parsing code and tests.
+
+Improved test suite: better coverage, skipped failling tests for
+Microsoft systems which don't use/honour normal permissions, silenced
+noisy tests on older perls.
+
+* v2.99_01 (pre-release for 3.0) - 31st March 2015
+
+Source amended to pass perlcritic. String evals removed or replaced.
+Strictures added to module and examples. All filehandles are now
+lexicals. Consistent source formatting applied to module (perltidy).
+
+deny_uploads and set_size_limit added.
+
+All active public subroutines are now methods.
+
+print_cookie_data and print_form_data have been removed. They had been
+deprecated for well over a decade.
+
+escape_dangerous_chars has been removed. It has been considered a
+security risk since version 2.0.
+
+* v2.04_05 - 11th October 2014
+
+binmode forced on all file writes to avoid corruption when converting
+EOLs on MSWin32.
+
+* v2.04_04 - 8th October 2014
+
+Conversion section of _store() replaced to remove dependence on \K
+escape which was only introduced in perl 5.10.
+
+* v2.04_03 - Not released
+
+Upload tests fixed again to solve problems for MSWin32 users:
+binmode had been erroneously left off the inputs.
+
+Fixed generation of MYMETA/META files as spec 2.0 not yet supported
+in the local build environment.
+
+* v2.04_02 - 7th October 2014
+
+Upload tests fixed to solve two problems for MSWin32 users:
+permissions-based tests skipped and coversion algorithms for text MIME
+types improved.
+
+* v2.04_01 - 6th October 2014
+
+Full test coverage of non-deprecated features.
+
+BUG FIX: Multi-file uploads could break if the buffer end occured in the
+    headers of one of the files. (issue 99294)
+
+BUG FIX: $cgi->set_platform ('macintosh') erroneously set platform to
+    'PC' because the regex was not anchored to the start. 'macintosh'
+    now results in platform 'Mac' as it should.
+
+Version control moved to git.
+
+Makefile.PL extended to include resources (where available).
+
+* v2.04 - 4th July 2014
+
+Minor documentation fixes and explanation of the proposed split into
+legacy/trunk branches. No code changes from 2.03_02.
+
+* v2.03_02 - 17th June 2014
+
+The uploads have had a minor change which may solve the windows size
+difference failures. More diagnostics were added to the failures if it
+does not.
+
+* v2.03_01 - 13th June 2014
+
+The test multi-part upload data in the test suite has been fixed to have
+the correct (CRLF) line terminators. These tests should now pass for
+Microsoft users.
+
+The documentation has been amended to reflect the change of maintainer.
+
+* v2.03 - 25th May 2014
+
+Maintainer change: Pete Houston has taken over maintenance from Smylers.
+
+A test suite has been created.
+
+BUG FIX: Cleared up some uninitialised value warnings emitted when query
+	strings are missing an entire key-value pair eg: "&foo=bar" (issue
+	38448).
+
+BUG FIX: If the user calls parse_form_data as a class method without a
+	query string, the method now gives up early and silently
+	(issue 6180).
+
+BUG FIX: In form-data uploads, the boundary string was not properly
+	escaped and therefore would not match when it contained
+	metacharacters (issue 29053).
+
+BUG FIX: The content type for url-encoded forms now matches on the MIME
+	type only, so additional charset fields are allowed (issues 16236,
+	34827 and 41666).
+
+BUG FIX: Leading/trailling whitespace is now stripped from cookie names
+	and values.
+
+BUG FIX: Cookies now no longer need to be separated by whitespace.
+	Commas can now be used as separators too. (issue 32329).
+
+BUG FIX: The semicolon is now a permitted delimiter in the query string
+	along with the ampersand (issue 8212).
+
+* v2.02 - May 18, 2003
+
+I've taken over CGI::Lite.  Thanks to Andreas for making the security release,
+and ensuring the transfer went so well.
+
+url_decode now interprets "+"s correctly, as encoded spaces.
+
+url_encode ensures that all hex-encodings are padded correctly, to 2 digits (so
+"%09" for a tab, not "%9").  The fake-encoding done on standard input when
+testing at the command-line has been fixed equivalently.
+
+url_encode also converts spaces to "+"s and emits hex characters in upper-case,
+since this what web-browsers seem to do.  Encoding is now performed on all but
+known-safe characters, rather listing all the characters believed to be in need
+of encoding.
+
+The internal method _decode_url_encoded_data now uses url_decode, rather than
+duplicating its content.
+
+Thanks to Aaron Crane for the above fixes.
+
+This file has been renamed from HISTORY to CHANGES, with the hope that that
+will make it show up on search.cpan.org.
+
+More development of this module is planned.  I'm making this release now to get
+those bug fixes available as soon as possible, and to get the hang of making a
+CPAN release.  Future changes will have tickets in the CPAN Request Tracker
+queue for this distribution.
+
+(The version number v2.01 has been skipped, to avoid possible confusion with
+v2.001.)
+
+Smylers <smylers@cpan.org> 
+
+
+* v2.001 - Feb 17, 2003
+
+This 2.001 release is just an emergency release that fixes the most urgent
+security need. It is not endorsed by the original author. It was put together
+by me after the advisory on the bugtraq mailing list:
+
+  http://msgs.securepoint.com/cgi-bin/get/bugtraq0302/94.html
+  
+Thanks to Ronald F. Guilmette for bringing up this issue.
+
+andreas koenig
+
+* v2.0 - Aug 20, 2000 b.d.low@ieee.org
+
+I (Ben Low) have assumed maintenance over CGI_Lite. First point of action 
+(and probably last, the module is quite stable both bug- and feature-wise :-) 
+is to change the name to fit in with perl's module naming conventions: 
+CGI_Lite is dead, long live CGI::Lite.
+
+* v1.9 - Jan 31, 1999; Apr 17, 2000 BDL
+
+Added parse_new_form_data(), for use under persistant applications 
+(e.g. FCGI, mod_perl). This function simply clears the CGI object's 
+state before calling parse_form_data().
+i.e. rather than creating a new CGI object for each request, you can 
+now write
+  $CGI = new CGI_Lite;
+  while (FCGI::accept > 0)
+  {
+      $Query = $CGI->parse_new_form_data();
+      <process query>
+  }
+
+Minor change in _decode_url_encoded_data() to avoid warnings when 
+no value is provided in the query. 
+
+All changes marked with "BDL". Ben Low <ben@snrc.uow.edu.au>
+
+* v1.8 - May 10, 1997
+
+Removed $` and $' from the code, and "optimized" an important regexp.
+As a result, the module is much more efficient. Fixed a minor bug in 
+multipart boundary parsing. Corrected an error when storing a key that 
+has multiple values which caused more than one array to be allocated. 
+Just a note: if you call get_multiple_values method with a scalar
+value, the method no longer returns an undef, but the value itself.
+
+As of this version, you can pass a request method (optional) to the 
+parse_form_data method. This gives you a bit more flexibility when 
+dealing with forms.
+
+The set_file_type method now works as it should. In earlier versions,
+CGI_Lite created "handles" in all cases. Added the close_all_files
+method to close uploaded files that are opened as a result of passing
+"handle" to set_file_type.
+
+The print_form_data and print_cookie_data are deprecated as of this
+version, but have not been removed (for compatibility reasons). It's 
+better to use the print_data method, which prints the key/value pairs 
+in the order they were parsed. As a side effect of this change,
+if you want to parse form data and cookies in an application,
+you have to create two instances of the CGI_Lite object, which
+only makes sense.
+
+Added the get_ordered_keys method which will return the list
+of _keys_ in the order in which they were parsed. Modified the
+wrap_textarea method; it now works properly.
+
+Also, added the add_mime_type, remove_mime_type and get_mime_types
+methods to deal with EOL translation based on MIME types. Added
+the filter_filename method to alter the way in which uploaded
+files are named. Added the add_timestamp method which allows you 
+to turn off timestamps on uploaded files. NOTE: CGI_Lite no longer 
+returns the full path of the uploaded file, but simply, the file name.
+
+Added a set of miscellaneous functions: browser_escape, url_encode,
+url_decode, is_dangerous, escape_dangerous_chars. CGI_Lite now handles
+errors better; you can use the newly implemented is_error, and 
+get_error_message methods. I've bought back the return_error
+method, which you can use to return errors to the browser and
+exit. However, this method no longer outputs the HTTP header,
+as it did in versions prior to v1.7.
+
+In addition, this version allows you to debug your CGI scripts
+"offline" by letting you pass query information through standard
+input. I got this idea from CGI.pm, though it's handled a bit
+differently. Thanks Lincoln!
+
+* v1.7 - December 28, 1996
+
+Maybe, I should release this version as 2.0 :-) There were a lot of 
+changes made:
+
+    - *Totally* re-wrote the multipart form parsing algorithm. It's
+      _much_ more efficient with large uploads. It still needs tweaking
+      to remove the $` and $' -- maybe in the next release.
+    - Multiple values per field are no longer returned as a null-character
+      delimited string. Instead, a reference to an array is returned.
+      You need to de-reference, or call the get_multiple_values method
+      to get at the array. There was no way I could make this backward
+      compatible. Please check your scripts, because a few might break.
+      I apologize.
+    - Fields containing more than one value in multipart forms are now
+      handled correctly.      
+    - Added the wrap_textarea method that allows you to neatly "wrap" 
+      long strings.
+    - You can now parse/decode cookies in much the same manner as forms.
+    - When saving uploaded files, the module adds a timestamp. As of this
+      version, the timestamp is added to the front of the file,
+      as opposed to the end, so that file extensions are preserved.
+      Note: this module makes no effort to URL decode the filename for
+      security reasons.
+    - Added the following new methods: set_buffer_size, parse_cookies,
+      print_cookie_data, wrap_textarea, get_multiple_values and
+      create_variables.
+    - Removed the return_error subroutine and, instead, added _error,
+      which dumps a message to STDERR and dies.
+    - You can now install this module in a convenient manner. Also,
+      fixed up the docs, moved this list of revisions from the module
+      to a separate file, and added a directory with simple examples.
+    - Fixed up numerous little bugs, including the "Use of uninitialized..."
+      warnings.
+
+* v1.62 - January 17, 1996
+
+Modified the parse_multipart_data subroutine so that it
+returns the name of the file as the filehandle -- if set_file_type
+function is called with the "handle" parameter.
+
+Added the function determine_package to determine the 
+calling package.
+
+* v1.61 - January 1, 1996
+
+Fixed a minor bug that resulted in end of line characters being removed
+from certain binary files.
+
+* v1.6 - December 30, 1995
+
+Added code to handle other header information that the browser might
+send after the "Content-Disposition" header.
+
+Added set_platform function so that uploaded text files display
+properly.
+
+The function set_file_type no longer returns a status.
+
+Fixed spacing within code.
+
+* v1.5 - November 13, 1995
+
+Corrected two major bugs that caused several fields to be lost (when
+the fields before them were either too small or too large).
+
+Added code to make sure that there are no "\r\n" characters in the
+regular form fields. Textarea elements and fields that contain uploaded
+information from different platforms (i.e Macintosh and PC) will
+contain "\r" characters.
+
+* v1.4 - October 15, 1995
+
+Added pod style documentation. Now you can see this manual page by doing
+the following:
+
+    pod2man CGI_Lite.pm | nroff -man | more
+
+Also, modified the parse_form_data method so that it can return
+the actual associative array (if called within an array context).
+
+* v1.3 - October 12, 1995
+
+Completely modified the parse_multipart_data method. It no longer
+reads the multipart message line by line, but rather in small size
+blocks (or "chunks"). This also eliminated a major bug that caused
+Netscape to hang.
+
+Since some browsers do not send a "\r\n" character string at the end
+of header lines, the parse_multipart_data method conditionally checks
+for and removes them. This also allows you to emulate a multipart/form-data
+request by storing a sample request in a file and piping it to your program:
+
+    cat multipart.txt | test.pl
+
+* v1.2 - October 12, 1995
+
+Added the set_file_type method to return filehandles for the stored
+files.
+
+* v1.1 - October 10, 1995
+
+The environment variable CONTENT_TYPE is used to determine the type of
+encoding scheme. In v1.0, the body of the POST request was parsed.
+
+This module no longer outputs an error message if an invalid directory
+is passed to the set_directory method. Instead, it returns a status
+of 0 to indicate failure.
+
+* v1.0 - September 26, 1995
+
+Initial Release
+

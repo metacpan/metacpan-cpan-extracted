@@ -1,0 +1,29 @@
+Copyright
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Crypt/Passwd/XS.pm
+crypt_to64.c
+crypt_to64.h
+md5.c
+md5.h
+md5crypt.c
+md5crypt.h
+des.c
+des.h
+sha256crypt.c
+sha256crypt.h
+sha512crypt.c
+sha512crypt.h
+XS.xs
+t/00_module_load.t
+t/01_md5.t
+t/02_des.t
+t/03_sha256.t
+t/04_sha512.t
+t/05_combined.t
+t/06_apr.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

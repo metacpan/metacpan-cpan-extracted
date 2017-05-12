@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  8093:
+    - 113
+name: fdcb17
+registers:
+  AF: 28965
+  AF_: 0
+  BC: 53270
+  BC_: 0
+  DE: 1646
+  DE_: 0
+  HL: 26168
+  HL_: 0
+  I: 0
+  IX: 24210
+  IY: 8211
+  PC: 4
+  R: 2
+  SP: 0

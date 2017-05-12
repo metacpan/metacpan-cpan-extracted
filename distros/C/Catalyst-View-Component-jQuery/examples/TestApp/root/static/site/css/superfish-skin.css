@@ -1,0 +1,52 @@
+/*** SKIN ***/
+
+.navbar {
+    border-top: 1px solid #CFDEFF;
+    background: #80AF5C;
+}
+.sf-navbar {
+    border-top: 1px solid #CFDEFF;
+    background: #80AF5C;
+}
+.sf-menu li ul {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+.sf-menu {
+	float:			left;
+	margin-bottom:	1em;
+    font-family: sans-serif;
+    font-size: 85%;
+}
+.sf-label {
+    cursor: default;
+}
+/* 66 */
+.sf-menu a,
+.sf-menu span.sf-label, .sf-menu span.sf-label:visited  { /* visited pseudo selector so IE6 applies text colour*/
+	color:			#29371D !important;
+}
+/* 78 */
+.sf-menu span.sf-label:focus, .sf-menu span.sf-label:hover, .sf-menu span.sf-label:active {
+	background:		#AEDAAF;
+	outline:		0;
+}
+/*** END OF SKIN ***/
+
+
+.sf-menu li {
+	background:		#80AF5C;
+}
+.sf-menu li li {
+	background:		#A4CDA5;
+    border-top:     1px solid #FFFFFF;
+}
+.sf-menu li li li {
+	background:		#96BB96;
+}
+.sf-menu li:hover, .sf-menu li.sfHover,
+.sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active {
+	background:		#AEDAAF;
+	outline:		0;
+}
+

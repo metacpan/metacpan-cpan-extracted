@@ -1,0 +1,8 @@
+Changes
+=======
+
+0.00002 - 13 Dec 2009
+    * Remove ConfigLoader from t/lib/TestApp.pm
+
+0.00001 - 10 Dec 2009
+    * Initial Release

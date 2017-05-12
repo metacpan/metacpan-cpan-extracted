@@ -1,0 +1,19 @@
+Catalyst-Authentication-Credential-TypeKey-0.004.tar.gz
+Catalyst-Authentication-Credential-TypeKey-0.005.tar.gz
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Authentication/Credential/TypeKey.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-app.t
+t/lib/AuthTestApp.pm
+t/lib/AuthTestApp/Controller/Root.pm
+t/live_app.t

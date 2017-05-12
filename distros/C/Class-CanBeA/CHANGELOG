@@ -1,0 +1,11 @@
+1.4     2016-09-27      Clean up some nasty old code, no functional changes
+
+1.3     2012-09-30      Add POD tests;
+                        Remove 'use diagnostics' from tests
+
+1.2     2005-12-27      Bug-fix for 0:: namespace for perl 5.8.7 on Windows,
+                          thanks to Eduardo Oliveros
+
+1.1     2004-12-16      Removed "use diagnostics"
+
+1.0     2004-07-10      Initial release

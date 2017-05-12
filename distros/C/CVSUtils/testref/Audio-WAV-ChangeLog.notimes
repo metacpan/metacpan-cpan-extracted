@@ -1,0 +1,255 @@
+2001-10-20  martyn
+
+	* lib/Audio/WAV.pm: Undocument total_samples
+
+2001-09-20  martyn
+
+	* Makefile.PL: Add List::Utils for wav_split
+
+2001-09-18  martyn
+
+	* bin/wav_split: Correct foo in OPTIONS to wav_split
+
+2001-07-12  martyn
+
+	* README: Update date
+
+2001-07-12  martyn
+
+	* bin/wav_trim: Update deprecated total_samples to frames
+
+2001-07-12  martyn
+
+	* wav_badd, wav_cross, wav_fade, wav_info, wav_test, wav_trim:
+	Moved to bin/
+
+2001-07-08  martyn
+
+	* bin/: wav_cross, wav_fade, wav_trim: Upgrade deprecated function
+	calls
+
+2001-07-08  martyn
+
+	* bin/wav_fade: Upgrade deprecated function calls
+
+2001-07-08  martyn
+
+	* bin/wav_fade: Correct bug when no -O given
+
+2001-07-08  martyn
+
+	* README: Up date to 8th July
+
+2001-07-08  martyn
+
+	* bin/wav_trim: Much POD Correction
+
+2001-07-08  martyn
+
+	* bin/wav_fade: Check for errors during arg processing (die
+	'!FINISH') Check for too few args Check for args after --
+
+2001-07-08  martyn
+
+	* bin/wav_info: Check for errors during arg processing (die
+	'!FINISH') Add length accumulation, mm:ss capabilities
+
+2001-07-08  martyn
+
+	* bin/: wav_fade, wav_info, wav_split: Much POD Correction
+
+2001-07-08  martyn
+
+	* bin/wav_cross: Move DESCRIPTION
+
+2001-07-08  martyn
+
+	* bin/wav_cross: Remove Exratneous =back
+
+2001-07-08  martyn
+
+	* bin/wav_cross: Much POD Correction
+
+2001-07-08  martyn
+
+	* bin/wav_badd: Much POD correction
+
+2001-07-08  martyn
+
+	* MANIFEST: Remove wav_test
+
+2001-07-08  martyn
+
+	* bin/wav_test: no longer needed; wav_info more than suffices
+
+2001-07-07  martyn
+
+	* README: Correct Heading
+
+2001-07-07  martyn
+
+	* README: Add newline
+
+2001-07-07  martyn
+
+	* README: New format, new bits
+
+2001-07-07  martyn
+
+	* bin/wav_info: Amend name in POD
+
+2001-07-07  martyn
+
+	* bin/: wav_split, wav_trim, wav_badd, wav_cross: Very minor POD
+	correction
+
+2001-07-07  martyn
+
+	* lib/Audio/WAV.pm: Updated POD to new standards.
+
+2001-07-07  martyn
+
+	* MANIFEST: Move execs to bin/, add wav_split
+
+2001-07-07  martyn
+
+	* MANIFEST: Move WAV.pm to lib Add tests
+
+2001-07-07  martyn
+
+	* Makefile.PL: Uprate to recent template
+
+2001-07-07  martyn
+
+	* bin/: wav_badd, wav_cross, wav_fade, wav_info, wav_test,
+	wav_trim: Moved here from root
+
+2001-06-27  martyn
+
+	* bin/wav_split: Tested, working version.
+
+2001-06-27  martyn
+
+	* lib/Audio/WAV.pm: Enhance diagnostic in seek
+
+2001-06-27  martyn
+
+	* lib/Audio/WAV.pm: Replace uses of s_position with f_position
+
+2001-06-27  martyn
+
+	* bin/wav_split: First version; compiles, but untested
+
+2001-06-27  martyn
+
+	* lib/Audio/WAV.pm: Change doco from sample to frame for seek
+
+2001-06-27  martyn
+
+	* lib/Audio/WAV.pm: Deprecate f_position in favour of s_position
+
+2001-06-27  martyn
+
+	* lib/Audio/WAV.pm: Change doco from sample to frame for append_to
+	& pad
+
+2001-06-25  martyn
+
+	* lib/Audio/WAV.pm: Amend synopsis to use foreach_frame
+
+2001-06-25  martyn
+
+	* lib/Audio/WAV.pm: Deprecate foreach_sample in favour of
+	foreach_frame
+
+2001-06-01  martyn
+
+	* lib/Audio/WAV.pm: Update version to 1.01
+
+2001-05-31  martyn
+
+	* wav_cross: Bring up to recent module standards (e.g., --version)
+
+2001-05-31  martyn
+
+	* wav_badd: Improved layout of option docs.
+
+2001-05-31  martyn
+
+	* wav_badd: Update option documentation
+
+2001-05-31  martyn
+
+	* wav_badd: Bring up to recent module standards (e.g., --version)
+
+2001-05-31  martyn
+
+	* Makefile.PL: Moved lib files to lib/
+
+2001-05-31  martyn
+
+	* Changes: Added 1.01 changes
+
+2001-05-31  martyn
+
+	* t/: gameover.bad.wav, gameover.wav, wav_badd.t, wav_info.t: At
+	last!  A test harness!
+
+2001-05-31  martyn
+
+	* wav_info: Moved from wav_stat
+
+2001-05-31  martyn
+
+	* wav_badd: Use new vocab. for WAV.pm
+
+2001-05-31  martyn
+
+	* lib/Audio/WAV.pm: Moved here from root; updated terms, header
+	reading
+
+2001-05-31  martyn
+
+	* WAV.pm: Moved to lib/Audio
+
+2001-05-31  martyn
+
+	* CRC.pm, t/CRC.t, t/nlmda.lyr: Moved to TestUtils package
+
+2001-05-24  martyn
+
+	* MANIFEST, Makefile.PL: Changed wav_stat to wav_info
+
+2001-05-24  martyn
+
+	* wav_stat: moved to wav_info
+
+2001-05-22  martyn
+
+	* gameover.wav: moved to t/
+
+2001-05-22  martyn
+
+	* t/CRC.t: Oops, mis-counted the tests
+
+2001-05-22  martyn
+
+	* CRC.pm, t/CRC.t, t/WAV.t, t/nlmda.lyr, t/wav_badd.t: Enhanced
+	testing with CRC checker
+
+2001-05-22  martyn
+
+	* test.pl: replaced by t/*.t
+
+2001-05-20  martyn
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, WAV.pm,
+	gameover.wav, test.pl, wav_badd, wav_cross, wav_fade, wav_stat,
+	wav_test, wav_trim: First MakeMaker Version
+
+2001-05-20  martyn
+
+	* Changes, MANIFEST, Makefile.PL, README, TODO, WAV.pm,
+	gameover.wav, test.pl, wav_badd, wav_cross, wav_fade, wav_stat,
+	wav_test, wav_trim: Initial revision
+

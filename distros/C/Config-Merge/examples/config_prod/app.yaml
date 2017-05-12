@@ -1,0 +1,92 @@
+# Global config file
+
+---
+#=======================================================================
+root:                           /srv/www/sites/example
+#=======================================================================
+
+#=======================================================================
+webserver:
+#=======================================================================
+    virtual_hosts:
+        - sites:            example1 example2
+          http:             *:80
+          https:            *:443
+          aliases:
+              example1.co.uk:      example1
+              example2.co.uk:      examples
+          options:
+                name_virtual_host: 0
+                listen:            0
+
+#=======================================================================
+feed_parser:
+#=======================================================================
+    incoming_dir:       cron/feed/incoming
+    working_dir:        cron/feed/working
+    archive_dir:        cron/feed/archive
+    log_dir:            cron/feed
+    send_user_emails:   0
+
+#=======================================================================
+images:
+#=======================================================================
+    path:                       /var/images/
+    autolevels:                 1
+    jpeg:
+        jpegquality:            80
+    large:
+        X:                      600
+        Y:                      600
+    medium:
+        X:                      160
+        Y:                      160
+        min_ratio:              0.5
+    small:
+        X:                      100
+        Y:                      100
+        min_ratio:              0.5
+
+#=======================================================================
+upload:
+#=======================================================================
+    max_size:
+        total:                  3500000
+        file:                   2500000
+    types:
+      - image/bmp
+      - image/gif
+      - image/jpef
+      - image/jpeg
+      - image/pjpeg
+      - image/png
+      - image/pnm
+      - image/raw
+      - image/rgb
+      - image/tga
+      - image/tiff
+    path:                       /var/images/temp/
+    expiry:                     900
+
+#=======================================================================
+search:
+#=======================================================================
+    rows:                       10
+    cache_pages:                3
+    show_pages:                 9
+    expiry:                     300
+
+#=======================================================================
+accounting:
+#=======================================================================
+    vat_rate:                   0.175
+    email:
+        to:                     john@example.com
+        from:                   jack@example.com
+        text: |
+                                Please find attached this month's invoice for
+                                hosting, plus a spreadsheet containing
+                                a breakdown of your announcements.
+
+    temp_dir:                   cron/accounts/temp/
+    archive_dir:                cron/accounts/archive/

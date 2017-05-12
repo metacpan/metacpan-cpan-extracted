@@ -1,0 +1,46 @@
+Revision history for Perl extension Config::Processor.
+
+0.26 Fri Mar 24 11:22:54 MSK 2017
+  - README.pod replaced by README.md.
+
+0.24 Thu Feb 16 12:16:38 MSK 2017
+  - Added README.pod file instead of README file.
+
+0.22 Wed Feb 15 11:46:27 MSK 2017
+  - Added resolving of relative variable names.
+
+0.20 Sat Jan 28 15:50:37 MSK 2017
+  - Fixed the bug of the modification of a read-only value. Thanks to Andrey
+    Kuzmin.
+
+0.18 Wed Jan 4 18:02:45 MSK 2017
+  - Leading and trailing spaces now removes from variable names.
+
+0.16 Tue Nov 29 17:14:05 MSK 2016
+  - FEATURE: Added export of environment variables to configuration tree.
+
+0.14 Fri Nov 25 16:34:45 MSK 2016
+  - BUGFIX: Fixed assignment of default list of configuration directories.
+
+0.12 Thu Nov 24 11:36:40 MSK 2016
+  - Decreased version of required modules YAML::XS and Cpanel::JSON::XS.
+
+0.10 Tue Jun 21 11:00:00 MSK 2016
+  - Now module will always try to search configuration files in current
+    directory.
+  - Slight POD changes.
+
+0.08 Fri Apr 29 11:11:42 MSK 2016
+  - Fixed unit tests. Do not passed tests on Windows platform.
+
+0.06 Thu Apr 28 20:51:52 MSK 2016
+  - Minor changes in POD
+
+0.04 Thu Apr 28 14:39:38 MSK 2016
+  - Data::Rmap was replaced by own function.
+  - BUGFIX: Fixed wrong behavior during processing of directives.
+  - Improved logic of tree traversal.
+  - Improved logic of variable resolving.
+
+0.02 Wed Apr 27 11:55:00 MSK 2016
+  - Initial release.

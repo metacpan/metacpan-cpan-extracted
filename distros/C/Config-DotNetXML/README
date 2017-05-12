@@ -1,0 +1,74 @@
+Config::DotNetXML
+=================
+
+## Introduction
+
+This module provides a configuration facility similiar to that provided by
+the .NET Framework inasmuch as it will read an XML file with the name
+of $0.config of the format:
+
+
+	<configuration>
+		<appSettings>
+			<add key="Foo" value="Bar" />
+		</appSettings>
+	</configuration>
+
+and will by default populate the hash %appSettings with the keys specified
+by the <add /> elements.  For more information see the POD documentation.
+
+This may or may not be useful to you as it is limited to a one dimensional
+configuration structure - but it was born out of a requirement to share a
+configuration between Perl and C# programs.
+
+## Prerequisites
+
+This module requires XML::XPath to operate.  This is a change from the initial
+release that implemented its own Parser using XML::Parser.
+
+## Installation
+
+Install the module by executing the following in the directory where you have
+unpacked the module distribution:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may need to use a different program than make on various different OS.
+
+You will need to run the last step as a user with sufficient permissions to
+create files in the Perl library directories - if you require the module to
+be installed in an alternative location then you should run the first step as:
+
+	perl Makefile.PL PREFIX=/my/library/directory
+
+You will need to then specify the appropriate location with :
+
+	use lib '/my/library/directory';
+
+
+## BUGS
+
+It might be considered a bug that the hash %appSettings will be stomped on.
+
+## SUPPORT
+
+All bug reports and patches should be made via Github https://github.com/jonathanstowe/Config-DotNetXML
+
+
+## AUTHOR
+
+Jonathan Stowe <jns@gellyfish.co.uk>
+
+
+## COPYRIGHT AND LICENCE
+
+This library is free software and comes with no warranty whatsoever.
+
+It can be distributed under the same terms as Perl itself. The full text
+of the Perl licence can be found in the README in the Perl distribution.
+
+Copyright © 2004, 2005, 2016 Jonathan Stowe
+

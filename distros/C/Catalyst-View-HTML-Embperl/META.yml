@@ -1,0 +1,17 @@
+---
+name: Catalyst-View-HTML-Template
+version: 0.01
+author:
+  - 'Aldo LeTellier, C<aletellier@epsiloninteractive.com>'
+abstract: HTML::Embperl View Class
+license: perl
+requires:
+  Catalyst: 5
+  HTML::Embperl: 0
+provides:
+  Catalyst::Helper::View::HTML::Embperl:
+    file: lib/Catalyst/Helper/View/HTML/Embperl.pm
+  Catalyst::View::HTML::Embperl:
+    file: lib/Catalyst/View/HTML/Embperl.pm
+    version: 0.01
+generated_by: Module::Build version 0.2609

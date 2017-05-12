@@ -1,0 +1,65 @@
+
+  Cache::Bounded - A size-aware in-memory cache optimized for speed - 1.09
+
+================================================================================
+SYNOPSIS:
+================================================================================
+
+    Cache::Bounded is designed for caching items into memory in a very fast
+    but rudimentarily size-aware fashion.
+
+================================================================================
+INSTALLATION:
+================================================================================
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+================================================================================
+DESCRIPTION:
+================================================================================
+
+    Most intelligent caches take either a size-aware or use-aware approach.
+    They do so by either anlysing the size of all the elements in the cache
+    or their frequency of usage before determining which elements to drop
+    from the cache. Unfortunately, the processing overhead for this logic
+    (usually applied on insert) will often slow these caches singnificantly
+    when frequent insertions are needed.
+
+    This module was designed address when this speed-penalty becomes a
+    problem. Specifically, it is a rudimentarily size-aware cache that is
+    optimized to be very fast.
+
+    For its size analysis, this module merely checks the number of elements
+    in the cache against a raw size limit. (The default limit is 500,000)
+    Additionally, to aid speed, the "size" check doesn't occur on every
+    insertion. Only after a count of a certain number of insertions (default
+    1,000) is the size check performed. If the size limit has been exceeded,
+    the entire cache is purged. (Since there is no usage analysis, there is
+    no other logical depreciation that can be applied)
+
+    This produces a very fast in-memory cache that you can tune to
+    approximate size based upon your data elements.
+
+================================================================================
+USAGE:
+================================================================================
+
+    Refer to the module's POD for detailed usage.
+
+================================================================================
+AUTHORISHIP:
+================================================================================
+
+    Cache::Bounded 1.09 2015/06/18
+
+    (c) 2004-2015, Phillip Pollard <bennie@cpan.org>
+    Released under the Perl Artistic License
+
+    Derived from Cache::Sloppy v1.3 2004/03/02
+    With permission granted from Health Market Science, Inc.
+

@@ -1,0 +1,102 @@
+[% 
+    title = "User List" ;
+
+    crumb2_name = 'User' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=user-admin' ;
+    crumb1_name = 'List' ;
+%]
+
+    <form method="POST" name="SEARCH" id="SEARCH" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="user-admin" />
+    <input type="hidden" name="searched" value="[% searched %]" />
+    <input type="hidden" name='doaction' value='' />
+    <input type="hidden" name='recordid' value='' />
+
+    <p>
+      <a href="[% cgipath %]/pages.cgi?act=user-admin&amp;all=1" title="view all users">view all</a>
+    | <a href="[% cgipath %]/pages.cgi?act=user-add" title="create a new user">create a new user</a>
+    <br />
+    Search by Name: <input type="text" name="searchname" /> <input type="checkbox" name="ordered" /> by Realm <input type=submit value="GO" />
+	</p>
+
+    <p>Search by Letter:
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=A' title="Search for member names beginning with A">A</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=B' title="Search for member names beginning with B">B</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=C' title="Search for member names beginning with C">C</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=D' title="Search for member names beginning with D">D</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=E' title="Search for member names beginning with E">E</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=F' title="Search for member names beginning with F">F</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=G' title="Search for member names beginning with G">G</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=H' title="Search for member names beginning with H">H</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=I' title="Search for member names beginning with I">I</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=J' title="Search for member names beginning with J">J</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=K' title="Search for member names beginning with K">K</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=L' title="Search for member names beginning with L">L</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=M' title="Search for member names beginning with M">M</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=N' title="Search for member names beginning with N">N</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=O' title="Search for member names beginning with O">O</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=P' title="Search for member names beginning with P">P</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=Q' title="Search for member names beginning with Q">Q</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=R' title="Search for member names beginning with R">R</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=S' title="Search for member names beginning with S">S</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=T' title="Search for member names beginning with T">T</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=U' title="Search for member names beginning with U">U</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=V' title="Search for member names beginning with V">V</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=W' title="Search for member names beginning with W">W</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=X' title="Search for member names beginning with X">X</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=Y' title="Search for member names beginning with Y">Y</a>
+    <a href='[% cgipath %]/pages.cgi?act=user-admin&amp;letter=Z' title="Search for member names beginning with Z">Z</a>
+	</p>
+
+<div class="boxer">
+<table width="100%">
+<tr>
+    <th>Display Name</th>
+    <th>Realm</th>
+    <th>Email</th>
+    <th>Action</th>
+</tr>
+
+[% FOREACH item = users %]
+
+<tr>
+    <td>
+        [% IF item.accessid < user.access || item.userid == user.userid %]
+        <a href="[% cgipath %]/pages.cgi?act=user-adminedit&amp;userid=[% item.userid %]">[% item.realname %]</a>
+        [% ELSE %]
+        [% item.realname %]
+        [% END %]
+        [% IF item.password == '-banned-' %](BANNED USER)[% END %]
+    </td>
+    <td>[% item.realm %]</td>
+    <td>[% item.email %]</td>
+    <td>
+        [% IF item.userid < 5 %]n/a
+        [% ELSIF item.password != '-deleted-' %]
+            <input type="checkbox" name="LISTED" value="[% item.userid %]" />
+        [% ELSE %]
+            Account Deleted
+        [% END %]
+    </td>
+</tr>
+
+[% END %]
+
+[% IF users %]
+<tr><td colspan="6">
+        <input type="button" value='Ban'     onClick="doSubmit('Ban')" />
+        <input type="button" value='Delete'  onClick="doSubmit('Delete')" />
+    </td></tr>
+[% END %]
+
+</table>
+
+[% IF searched %]
+[% IF !users %]<p>No users listed for search.[% END %]
+[% ELSE %]
+<p>Please select a search criteria from the options above.</p>
+[% END %]
+
+</div>
+</form>
+

@@ -1,0 +1,31 @@
+Revision history for CatalystX-CRUD-View-Excel
+
+0.01    19 Dec 2007
+        First version, released on an unsuspecting world.
+
+0.02    20 Dec 2007
+        * Added SYNOPSIS and DESCRIPTION to docs.
+        * Updated Makefile.PL for correct dependencies.
+
+0.03    21 Dec 2007
+        * fix INCLUDE -> INCLUDE_PATH bug (it was wrong in ETP docs)
+
+0.04    06 May 2008
+        * escape all values with 'html' filter in default template
+        * support iterator as well as results arrayref
+
+0.05    13 June 2008
+        * tweek default template for CX::CRUD 0.27 API
+
+0.06    26 Sept 2008
+        * fix doc re: config INCLUDE_PATH variable
+        * switch to Class::C3
+
+0.07    17 Feb 2010
+        * fix bug in get_template_filename with extra dot on .tt
+        * add debugging
+        * switch to MRO::Compat from Class::C3
+
+
+
+

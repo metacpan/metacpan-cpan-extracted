@@ -1,0 +1,14 @@
+
+DROP TABLE IF EXISTS child;
+CREATE TABLE `child` (
+  `id_child` bigint(20) unsigned NOT NULL auto_increment,
+  `birthday` date NOT NULL,
+  `name` char(128) NOT NULL,
+
+  `id_family` bigint(20) unsigned NOT NULL,
+  KEY `child_family` (`id_family`),
+  CONSTRAINT `child_family` FOREIGN KEY (`id_family`) REFERENCES `family` (`id_family`),
+
+  PRIMARY KEY  (`id_child`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ 

@@ -1,0 +1,7 @@
+[Unit]
+Description=Tunnel IMAPS connections to Gmail with corkscrew
+
+[Service]
+#ExecStart=-/usr/bin/corkscrew 127.0.0.1 8888 imap.gmail.com 143
+ExecStart=-/usr/bin/socat - PROXY:127.0.0.1:imap.gmail.com:993,proxyport=8888
+StandardInput=socket

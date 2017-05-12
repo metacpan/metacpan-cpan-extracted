@@ -1,0 +1,16 @@
+--begin inner1--
+one:<!-- TMPL_VAR NAME=one -->
+two:<!-- TMPL_VAR NAME=two -->
+three:<!-- TMPL_VAR NAME=three -->
+four:<!-- TMPL_VAR NAME=four -->
+outer_var1:<!-- TMPL_VAR NAME=outer_var1 -->
+zzz:<!-- TMPL_VAR NAME=param1a -->
+zzz:<!-- TMPL_VAR NAME=param2a -->
+zzz:<!-- TMPL_VAR NAME=param1b -->
+zzz:<!-- TMPL_VAR NAME=param2b -->
+<!-- TMPL_VAR NAME="cgiapp.embed('embed_inner2', param1a, 'literal1a', param2a, 'literal2a')" -->outer_var2:<!-- TMPL_VAR NAME=outer_var2 -->
+<!-- TMPL_VAR NAME="cgiapp.embed('embed_inner2', param1b, 'literal1b', param2b, 'literal2b')" -->outer_var3:<!-- TMPL_VAR NAME=outer_var3 -->
+inner1_var1:<!-- TMPL_VAR NAME=inner1_var1 -->
+inner1_var2:<!-- TMPL_VAR NAME=inner1_var2 -->
+inner1_var3:<!-- TMPL_VAR NAME=inner1_var3 -->
+--end inner1--

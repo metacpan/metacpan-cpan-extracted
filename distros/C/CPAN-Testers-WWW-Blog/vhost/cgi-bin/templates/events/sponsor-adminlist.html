@@ -1,0 +1,30 @@
+[% 
+    title = 'Sponsor Admin' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Sponsor' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=spon-admin' ;
+    crumb1_name = 'List' ;
+%]
+
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click on a sponsor name amend details or click the add or delete options.
+<p><a href="[% cgipath %]/pages.cgi?act=spon-add">add a new sponsor</a>
+
+<div class="boxer">
+<table class="blocker" summary="Sponsor List">
+<tr>
+    <th>Sponsor</th>
+    <th>Link</th>
+    <th>Actions</th>
+</tr>
+[% FOREACH item = data %]
+<tr>
+    <td><a href="[% cgipath %]/pages.cgi?act=spon-edit&amp;sponsorid=[% item.sponsorid %]">[% IF item.sponsor %][% item.sponsor %][% ELSE %]No Title[% END %]</a></td>
+    <td>[% IF item.sponsorlink %]YES[% ELSE %]NO[% END %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=spon-delete&amp;sponsorid=[% item.sponsorid %]"><img src="[% webpath %]/images/icons/icon_delete.gif" alt="delete" height="15" /></a></td>
+</tr>
+[% END %]
+</table>
+</div>

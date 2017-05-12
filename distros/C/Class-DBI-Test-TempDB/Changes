@@ -1,0 +1,7 @@
+Revision history for Class-DBI-Test-TempDB
+
+1.0     Sept. 27, 2004
+    - First version, released on an unsuspecting world.
+
+1.01    Sept. 28, 2004
+    - Fixed test that was broken by Class::DBI 0.96.

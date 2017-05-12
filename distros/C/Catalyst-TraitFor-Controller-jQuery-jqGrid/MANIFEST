@@ -1,0 +1,11 @@
+Changes
+lib/Catalyst/TraitFor/Controller/jQuery/jqGrid.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01_basic.t
+t/tlib/Icydee/MockCatalyst.pm
+t/tlib/Icydee/TestObject.pm
+t/tlib/TestSchema.pm
+t/tlib/TestSchema/Gridable.pm

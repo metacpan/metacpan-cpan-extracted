@@ -1,0 +1,15 @@
+Changes
+=======
+
+Deprecated
+
+1.00000_01 - 25 Dec 2007
+  - Rename render_class_args to tt_args
+  - Use proper type case
+  - Require newer HTML::FormFu
+
+0.99999 - 16 Aug 2007
+  - Rename from Catalyst::Model::FormFu to Catalyst::Model::HTML::FormFu
+  - Fix cache stuff
+  - Update docs, include config_dir
+  - Add Catalyst tests

@@ -1,0 +1,6 @@
+Revision history for Perl extension Country::Codes.
+
+0.01  Wed Aug  7 09:26:59 2013
+	- original version; created by h2xs 1.23 with options
+		-XA -n Country::Codes
+

@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<cdrs>
+  <cdb tag="1090" name="Header">
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161862617">2006-10-26T11:36:57</cde>
+    <cde name="call_reference_id" tag="4002">0000000000000000</cde>
+    <cde name="source" tag="6000">TestLab</cde>
+    <cde name="file_start_time" tag="6001" raw="1161862617">2006-10-26T11:36:57</cde>
+    <cde name="version" tag="6004">9.6(1)</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">8090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">02</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">02</cde>
+    <cde name="called_number_nature_of_address" tag="3007">02</cde>
+    <cde name="reason_code" tag="3008">809f</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">2</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161863623">2006-10-26T11:53:43</cde>
+    <cde name="call_reference_id" tag="4002">4540a1c7000001df</cde>
+    <cde name="originating_trunk_group" tag="4008">5004</cde>
+    <cde name="originating_member" tag="4009">1</cde>
+    <cde name="calling_number" tag="4010">25</cde>
+    <cde name="charged_number" tag="4011">25</cde>
+    <cde name="dialled_number" tag="4012">796441781</cde>
+    <cde name="called_number" tag="4014">796441781</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">0</cde>
+    <cde name="ingress_destination_code" tag="4035">0</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000001</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">25</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161863623-454">2006-10-26T11:53:43.454</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161863623-469">2006-10-26T11:53:43.469</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161863623-680">2006-10-26T11:53:43.680</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">cb73d89165b111db81df0003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">8090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">02</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">02</cde>
+    <cde name="called_number_nature_of_address" tag="3007">02</cde>
+    <cde name="reason_code" tag="3008">8092</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">2</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161863663">2006-10-26T11:54:23</cde>
+    <cde name="call_reference_id" tag="4002">4540a1e7000001e3</cde>
+    <cde name="originating_trunk_group" tag="4008">5004</cde>
+    <cde name="originating_member" tag="4009">1</cde>
+    <cde name="calling_number" tag="4010">32</cde>
+    <cde name="charged_number" tag="4011">32</cde>
+    <cde name="dialled_number" tag="4012">796441781</cde>
+    <cde name="called_number" tag="4014">796441781</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">0</cde>
+    <cde name="ingress_destination_code" tag="4035">0</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000001</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">32</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161863655-214">2006-10-26T11:54:15.214</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161863655-216">2006-10-26T11:54:15.216</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161863663-200">2006-10-26T11:54:23.200</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">de620cc265b111db81e30003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">8090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">02</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">02</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8092</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">3</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161863895">2006-10-26T11:58:15</cde>
+    <cde name="call_reference_id" tag="4002">4540a2ce000001fb</cde>
+    <cde name="originating_trunk_group" tag="4008">5004</cde>
+    <cde name="originating_member" tag="4009">1</cde>
+    <cde name="calling_number" tag="4010">32</cde>
+    <cde name="charged_number" tag="4011">445346061</cde>
+    <cde name="dialled_number" tag="4012">0796441781</cde>
+    <cde name="called_number" tag="4014">796441781</cde>
+    <cde name="terminating_trunk_group" tag="4015">3011</cde>
+    <cde name="terminating_member" tag="4016">20</cde>
+    <cde name="first_release_source" tag="4028">0</cde>
+    <cde name="ingress_originating_point_code" tag="4034">0</cde>
+    <cde name="ingress_destination_code" tag="4035">0</cde>
+    <cde name="egress_originating_point_code" tag="4036">4001</cde>
+    <cde name="egress_destination_code" tag="4037">11</cde>
+    <cde name="ingress_packet_info" tag="4046">338-338-0-54080-54080-65-0-0</cde>
+    <cde name="egress_packet_info" tag="4047">1-338-0-160-54080-80-1-0</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000001</cde>
+    <cde name="egress_bearchan_id" tag="4072">00000014</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="charge_indicator" tag="4083">2</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">445346061</cde>
+    <cde name="ingress_mgcp_dlcx_return_code" tag="4087">250</cde>
+    <cde name="egress_mgcp_dlcx_return_code" tag="4088">250</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">rtlist-hiq9200</cde>
+    <cde name="route_name" tag="4096">rt-hiq9200</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161863886-934">2006-10-26T11:58:06.934</cde>
+    <cde name="iam_timepoint_sent" tag="4101" raw="1161863887-284">2006-10-26T11:58:07.284</cde>
+    <cde name="acm_timepoint_received" tag="4102" raw="1161863891-471">2006-10-26T11:58:11.471</cde>
+    <cde name="acm_timepoint_sent" tag="4103" raw="1161863891-471">2006-10-26T11:58:11.471</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161863894-941">2006-10-26T11:58:14.941</cde>
+    <cde name="second_rel_timepoint_ms" tag="4107" raw="1161863894-941">2006-10-26T11:58:14.941</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161863895-210">2006-10-26T11:58:15.210</cde>
+    <cde name="rlc_timepoint_sent" tag="4109" raw="1161863894-972">2006-10-26T11:58:14.972</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">687fbb1b65b211db81fb0003ba683767</cde>
+    <cde name="interim_cdb" tag="6005">0</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">8090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">02</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">02</cde>
+    <cde name="called_number_nature_of_address" tag="3007">02</cde>
+    <cde name="reason_code" tag="3008">8081</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">2</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161863915">2006-10-26T11:58:35</cde>
+    <cde name="call_reference_id" tag="4002">4540a2eb000001ff</cde>
+    <cde name="originating_trunk_group" tag="4008">5004</cde>
+    <cde name="originating_member" tag="4009">1</cde>
+    <cde name="calling_number" tag="4010">32</cde>
+    <cde name="charged_number" tag="4011">32</cde>
+    <cde name="dialled_number" tag="4012">796441781</cde>
+    <cde name="called_number" tag="4014">796441781</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">0</cde>
+    <cde name="ingress_destination_code" tag="4035">0</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000001</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">32</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161863915-594">2006-10-26T11:58:35.594</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161863915-596">2006-10-26T11:58:35.596</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161863915-720">2006-10-26T11:58:35.720</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7994e96b65b211db81ff0003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864284">2006-10-26T12:04:44</cde>
+    <cde name="call_reference_id" tag="4002">4540a45b00000225</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">27</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000001b</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864283-765">2006-10-26T12:04:43.765</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864283-773">2006-10-26T12:04:43.773</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864284-20">2006-10-26T12:04:44.20</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">5507431565b311db82250003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864285">2006-10-26T12:04:45</cde>
+    <cde name="call_reference_id" tag="4002">4540a45d00000226</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">29</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000001d</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864285-55">2006-10-26T12:04:45.55</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864285-57">2006-10-26T12:04:45.57</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864285-310">2006-10-26T12:04:45.310</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">55cc193065b311db82260003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864286">2006-10-26T12:04:46</cde>
+    <cde name="call_reference_id" tag="4002">4540a45e00000227</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">31</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000001f</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864286-345">2006-10-26T12:04:46.345</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864286-347">2006-10-26T12:04:46.347</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864286-590">2006-10-26T12:04:46.590</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">5690f30765b311db82270003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864303">2006-10-26T12:05:03</cde>
+    <cde name="call_reference_id" tag="4002">4540a46f0000022a</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">1</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000001</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864303-534">2006-10-26T12:05:03.534</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864303-537">2006-10-26T12:05:03.537</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864303-800">2006-10-26T12:05:03.800</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">60cfeb3065b311db822a0003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864305">2006-10-26T12:05:05</cde>
+    <cde name="call_reference_id" tag="4002">4540a4700000022b</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">3</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000003</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864304-825">2006-10-26T12:05:04.825</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864304-827">2006-10-26T12:05:04.827</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864305-80">2006-10-26T12:05:05.80</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">6194c64d65b311db822b0003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864306">2006-10-26T12:05:06</cde>
+    <cde name="call_reference_id" tag="4002">4540a4720000022c</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">5</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000005</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864306-75">2006-10-26T12:05:06.75</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864306-77">2006-10-26T12:05:06.77</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864306-330">2006-10-26T12:05:06.330</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">6253802f65b311db822c0003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864343">2006-10-26T12:05:43</cde>
+    <cde name="call_reference_id" tag="4002">4540a49700000231</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">7</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000007</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864343-445">2006-10-26T12:05:43.445</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864343-447">2006-10-26T12:05:43.447</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864343-701">2006-10-26T12:05:43.701</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7899b79d65b311db82310003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864345">2006-10-26T12:05:45</cde>
+    <cde name="call_reference_id" tag="4002">4540a49800000232</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">9</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000009</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864344-755">2006-10-26T12:05:44.755</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864344-757">2006-10-26T12:05:44.757</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864345-12">2006-10-26T12:05:45.12</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">79619af765b311db82320003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864346">2006-10-26T12:05:46</cde>
+    <cde name="call_reference_id" tag="4002">4540a49900000233</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">11</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000000b</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864345-935">2006-10-26T12:05:45.935</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864345-937">2006-10-26T12:05:45.937</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864346-190">2006-10-26T12:05:46.190</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7a15ab7365b311db82330003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864348">2006-10-26T12:05:48</cde>
+    <cde name="call_reference_id" tag="4002">4540a49b00000234</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">13</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000000d</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864347-905">2006-10-26T12:05:47.905</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864347-907">2006-10-26T12:05:47.907</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864348-170">2006-10-26T12:05:48.170</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7b423f8165b311db82340003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864349">2006-10-26T12:05:49</cde>
+    <cde name="call_reference_id" tag="4002">4540a49d00000235</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">15</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">0000000f</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864349-194">2006-10-26T12:05:49.194</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864349-197">2006-10-26T12:05:49.197</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864349-510">2006-10-26T12:05:49.510</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7c0711f265b311db82350003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864350">2006-10-26T12:05:50</cde>
+    <cde name="call_reference_id" tag="4002">4540a49e00000237</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">21</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000015</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864350-505">2006-10-26T12:05:50.505</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864350-507">2006-10-26T12:05:50.507</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864350-780">2006-10-26T12:05:50.780</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7ccf05ea65b311db82370003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864352">2006-10-26T12:05:52</cde>
+    <cde name="call_reference_id" tag="4002">4540a4a000000238</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">19</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000013</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864352-555">2006-10-26T12:05:52.555</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864352-557">2006-10-26T12:05:52.557</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864352-800">2006-10-26T12:05:52.800</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7e07d07c65b311db82380003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864354">2006-10-26T12:05:54</cde>
+    <cde name="call_reference_id" tag="4002">4540a4a100000239</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">17</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000011</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864353-844">2006-10-26T12:05:53.844</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864353-847">2006-10-26T12:05:53.847</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864354-100">2006-10-26T12:05:54.100</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7ecc9e3365b311db82390003ba683767</cde>
+  </cdb>
+  <cdb tag="1110" name="EndOfCall">
+    <cde name="calling_party_category" tag="3000">0a</cde>
+    <cde name="user_service_info" tag="3001">9090a3</cde>
+    <cde name="calling_number_nature_of_address" tag="3003">04</cde>
+    <cde name="dialled_number_nature_of_address" tag="3005">03</cde>
+    <cde name="called_number_nature_of_address" tag="3007">03</cde>
+    <cde name="reason_code" tag="3008">8aa6</cde>
+    <cde name="egress_calling_number_nature_of_address" tag="3018">4</cde>
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161864355">2006-10-26T12:05:55</cde>
+    <cde name="call_reference_id" tag="4002">4540a4a30000023a</cde>
+    <cde name="originating_trunk_group" tag="4008">3011</cde>
+    <cde name="originating_member" tag="4009">25</cde>
+    <cde name="calling_number" tag="4010">8645182910307</cde>
+    <cde name="charged_number" tag="4011">8645182910307</cde>
+    <cde name="dialled_number" tag="4012">445346096</cde>
+    <cde name="called_number" tag="4014">445346096</cde>
+    <cde name="first_release_source" tag="4028">2</cde>
+    <cde name="ingress_originating_point_code" tag="4034">11</cde>
+    <cde name="ingress_destination_code" tag="4035">4001</cde>
+    <cde name="ingress_bearchan_id" tag="4068">00000019</cde>
+    <cde name="fax_call" tag="4081">0</cde>
+    <cde name="outgoing_calling_party_number" tag="4084">8645182910307</cde>
+    <cde name="reservation_request_accepted" tag="4090">0</cde>
+    <cde name="reservation_request_error_count" tag="4091">0</cde>
+    <cde name="route_list_name" tag="4095">lvgotf004-rl5011</cde>
+    <cde name="route_name" tag="4096">lvgotf004-tr5011</cde>
+    <cde name="iam_timepoint_received" tag="4100" raw="1161864355-44">2006-10-26T12:05:55.44</cde>
+    <cde name="first_rel_timepoint_ms" tag="4106" raw="1161864355-47">2006-10-26T12:05:55.47</cde>
+    <cde name="rlc_timepoint_received" tag="4108" raw="1161864355-300">2006-10-26T12:05:55.300</cde>
+    <cde name="meter_pulse_received" tag="4213">0</cde>
+    <cde name="meter_pulse_sent" tag="4214">0</cde>
+    <cde name="short_call_indicator" tag="4217">1</cde>
+    <cde name="unique_call_correlator_id" tag="5000">7f83b46e65b311db823a0003ba683767</cde>
+  </cdb>
+  <cdb tag="1100" name="Footer">
+    <cde name="version" tag="4000">1</cde>
+    <cde name="timepoint" tag="4001" raw="1161866217">2006-10-26T12:36:57</cde>
+    <cde name="call_reference_id" tag="4002">0000000000000000</cde>
+    <cde name="source" tag="6000">Lab_PGW</cde>
+    <cde name="file_end_time" tag="6002" raw="1161866217">2006-10-26T12:36:57</cde>
+    <cde name="record_count" tag="6003">21</cde>
+    <cde name="version" tag="6004">9.6(1)</cde>
+  </cdb>
+</cdrs>

@@ -1,0 +1,99 @@
+NAME
+    Catalyst::Plugin::Authentication::Store::HTTP - Remote HTTP
+    authentication storage
+
+SYNOPSIS
+        # load plugins
+        use Catalyst qw/
+            Session
+            Session::State::Cookie
+            Session::Store::FastMmap
+
+            Authentication
+            Authentication::Store::HTTP
+            Authentication::Credential::Password
+            # or Authentication::Credential::HTTP
+            /;
+
+        # configure your authentication host
+        MyApp->config(
+            authentication => {
+                http => {
+                    auth_url => 'http://example.com/',
+                },
+            },
+        );
+
+        # and in action
+        sub login : Global {
+            my ( $self, $c ) = @_;
+
+            $c->login( $username, $password );
+        }
+
+DESCRIPTION
+    This module is Catalyst authentication storage plugin that authenticates
+    based on a URL HTTP HEAD fetch using the supplied credentials. If the
+    fetch succeeds then the authentication succeeds.
+
+    LWP::UserAgent is used to fetch the URL which requires authentication,
+    so any authentication method supported by that module can be used.
+
+    Remote authentication methods known to work are:-
+
+    *   Basic
+
+    *   Digest
+
+    *   NTLM - but see notes below
+
+    This is re-implementation of
+    Catalyst::Plugin::Authentication::Basic::Remote.
+
+CONFIGURATION
+    Configuration is done in the standard Catalyst fashion. All
+    configuration keys are under "authentication/http".
+
+    The supported keys are:-
+
+    auth_url
+        The URL that is fetched to demonstrate that the supplied credentials
+        work. This can be any URL that LWP::UserAgent will support and that
+        will support a "HEAD" method. This item must be supplied.
+
+    keep_alive
+        A boolean value that sets whether keep alive is used on the URL
+        fetch. This must be set for NTLM authentication - and the *ntlm*
+        configuration key forces it to be set.
+
+    domain
+        An optional domain value for authentication. If set the presented
+        username for authentication has this domain prepended to it - this
+        is really of use only for NTLM authentication mode.
+
+    ntlm
+        A boolean value that should be set if NTLM authentication is
+        required. If this is set then *domain* must be set and *keep_alive*
+        is forced on.
+
+EXTENDED METHODS
+  setup
+    Checks the configuration information and sets up the
+    "default_auth_store". This method is not intended to be called directly
+    by user code.
+
+SEE ALSO
+    Catalyst::Plugin::Authentication.
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+    Nigel Metheringham <nigelm@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

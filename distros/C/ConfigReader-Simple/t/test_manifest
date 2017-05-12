@@ -1,0 +1,17 @@
+load.t
+pod.t
+pod_coverage.t
+validate_keys.t
+parse.t
+parse_line.t
+parse_string.t
+new_multiple.t
+add_config_file.t
+exists.t
+get.t
+set.t
+remove.t
+clone.t
+_save.t
+save.t
+new_string.t

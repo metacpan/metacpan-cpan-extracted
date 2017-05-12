@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-UntaintPatched.t
+lib/CGI/UntaintPatched.pm
+META.yml                                 Module meta-data (added by MakeMaker)

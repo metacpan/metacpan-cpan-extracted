@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perl interface to Cassandra's native protocol",
+   "author" : [
+      "Tom van der Woerdt <tvdw@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cassandra-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Compress::LZ4" : "0.20",
+            "Compress::Snappy" : "0.23",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0.36",
+            "EV" : "4.0",
+            "Net::SSLeay" : "1.63",
+            "Promises" : "0.94",
+            "Ref::Util" : "0.008",
+            "Sub::Current" : "0.02",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

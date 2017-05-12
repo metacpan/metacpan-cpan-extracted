@@ -1,0 +1,49 @@
+{
+   "abstract" : "If something dies in a chain, stop the chain. DEPRECATED IN FAVOR OF CATALYST 5.90040",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-ActionRole-DetachOnDie",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.90006",
+            "Catalyst::Action::RenderView" : "0.16",
+            "Catalyst::Controller::ActionRole" : "0.15",
+            "Test::More" : "0.98",
+            "Try::Tiny" : "0.11"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frioux/Catalyst-ActionRole-DetachOnDie.git",
+         "web" : "http://github.com/frioux/Catalyst-ActionRole-DetachOnDie"
+      }
+   },
+   "version" : "0.001006"
+}
+

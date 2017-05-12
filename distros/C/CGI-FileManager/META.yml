@@ -1,0 +1,29 @@
+---
+name: CGI-FileManager
+version: 0.06
+author:
+  - 'Gabor Szabo <gabor@pti.co.il>'
+abstract: Managing a directory structure on an HTTP server
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Application: 3.31
+  CGI::Application::Plugin::Session: 0.03
+  CGI::Upload: 1.10
+  HTML::Template: 2.6
+  Test::More: 0.47
+  Test::Warn: 0
+  Unix::ConfigFile: 0.06
+provides:
+  CGI::FileManager:
+    file: lib/CGI/FileManager.pm
+    version: 0.06
+  CGI::FileManager::Auth:
+    file: lib/CGI/FileManager/Auth.pm
+  CGI::FileManager::Templates:
+    file: lib/CGI/FileManager/Templates.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,50 @@
+NAME
+
+    Catmandu::Fix::Datahub - Utility functions and generic fixes developed
+    for the Datahub project
+
+SYNOPSIS
+
+    Catmandu::Fix::Datahub::Util:
+
+      use Catmandu::Fix::Datahub::Util;
+
+    Catmandu::Fix::Bind::each:
+
+      do each(path: demo, var: d)
+        
+        copy_field(d.key, var.$append)
+      
+      end
+
+DESCRIPTION
+
+ Catmandu::Fix::Datahub::Util
+
+    Utility functions for use in Catmandu fixes.
+
+    declare_source($fixer, $var, $declared_var)
+
+    walk($fixer, $path, $key, $h)
+
+ Catmandu::Fix::Bind::each
+
+    A bind to iterate over a hash.
+
+AUTHOR
+
+    Pieter De Praetere <pieter@packed.be>
+
+COPYRIGHT
+
+    Copyright 2017- PACKED vzw
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Catmandu
+

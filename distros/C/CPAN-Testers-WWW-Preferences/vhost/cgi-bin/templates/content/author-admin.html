@@ -1,0 +1,12 @@
+[% 
+    title = "Impersonate an Author" ;
+    crumb1_name = 'Impersonate an Author' ;
+%]
+
+<p>Enter author's PAUSE ID to impersonate</p>
+
+<form method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="author-imposter" />
+<p>PAUSE ID: <input type="text" name="pause" value="" size="10" /> <input type="submit" value='GO!' /></p>
+</form>
+

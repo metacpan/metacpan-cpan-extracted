@@ -1,0 +1,21 @@
+--- 
+abstract: Emulates Pseudo-Hash behaviour via overload
+author: Audrey Tang <cpan@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: mit
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Class-PseudoHash
+no_index: 
+  directory: 
+    - inc
+    - t
+provides: 
+  Class::PseudoHash: 
+    file: lib/Class/PseudoHash.pm
+    version: 1.10
+requires: 
+  perl: 5.005
+version: 1.10

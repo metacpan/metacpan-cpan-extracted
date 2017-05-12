@@ -1,0 +1,56 @@
+{
+   "abstract" : "get Catalyst actions with example paths included!",
+   "author" : [
+      "David Farrell <dfarrell@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-ActionPaths",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Moose::Role" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dnmfarrell/Catalyst-Plugin-ActionPaths",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dnmfarrell/Catalyst-Plugin-ActionPaths.git",
+         "web" : "https://github.com/dnmfarrell/Catalyst-Plugin-ActionPaths"
+      }
+   },
+   "version" : "0.01"
+}
+

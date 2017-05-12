@@ -1,0 +1,36 @@
+---
+abstract: 'Extract recent test statuses from metabase log'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Path::Tiny: '0.070'
+  Test::More: '0.89'
+  Time::HiRes: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.016, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Testers-TailLog
+provides:
+  CPAN::Testers::TailLog:
+    file: lib/CPAN/Testers/TailLog.pm
+    version: '0.001001'
+  CPAN::Testers::TailLog::Result:
+    file: lib/CPAN/Testers/TailLog/Result.pm
+    version: '0.001001'
+requires:
+  File::Temp: '0'
+  HTTP::Tiny: '0'
+  Path::Tiny: '0.040'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/CPAN-Testers-TailLog/issues
+  repository: https://github.com/kentnl/CPAN-Testers-TailLog
+version: '0.001001'
+x_contributors:
+  - 'Slaven Rezic <srezic@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,91 @@
+NAME
+    CGI::AppBuilder::Log - Gather and write log entries for CGI applications
+
+SYNOPSIS
+        my $self = bless {}, "main";
+        use CGI::AppBuilder::Log /:log/;
+
+DESCRIPTION
+    The package contains the methods for gathering and creating log file.
+
+   new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  start_log($dtl, $brf, $cns, $arg, $lvl)
+    Input variables:
+
+      $dtl - file name for detailed log
+      $brf - file name for brief log
+      $cns - a list of fields which are stored in brief log
+      $arg - command line arguments
+      $lvl - log levle
+             1 - default:start_time,end_time,elapsed_time,user,args,result
+             2 - 1 plus: remote_addr,http_user_agent,http_accept_language,
+                         http_accept_charset
+
+    Variables used or routines called:
+
+      echoMSG - print debug messages
+
+    How to use:
+
+      use CGI::AppBuilder::Log qw(:log);
+      my $self= bless {}, "main";
+      my $ar = $self->start_log('details.log','brief.log',
+        'start_time,end_time,elapsed_time,file_tranferred,status');
+
+    Return: a hash array containing the fields in $cns.
+
+    This method creates log files if they do not exist and prepare a hash
+    array to store needed fields for end_log. The hash array has the
+    following elements:
+
+      cns    - a list of field names separated by commas
+      fld    - a hash array containing the field defined in cns.
+      fn_brf - file name for brief log
+      fh_brf - file handler for brief log
+      fn_dtl - file name for detail log
+      fh_dtl - file handler for detail log
+
+    If the *cns* is not specifed, then it defaults to
+    start_time,end_time,elapsed_time,user,args,result.
+
+  end_log($ar)
+    Input variables:
+
+      $ar  - array ref returned from start_log. The elements can
+             be populated in before end_log.
+
+    Variables used or routines called:
+
+      strftime - time formater from POSIX
+      disp_param - display parameters
+
+    How to use:
+
+      use CGI::AppBuilder::Log qw(:log);
+      my $self= bless {}, "main";
+      my $ar = $self->start_log('details.log','brief.log');
+      $self->end_log($ar);
+
+    Return: none.
+
+CODING HISTORY
+    *   Version 0.10
+
+        Extract start_log and end_log from Debug::EchoMessage.
+
+    *   Version 0.11
+
+FUTURE IMPLEMENTATION
+    *   no plan yet
+
+AUTHOR
+    Copyright (c) 2004 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+

@@ -1,0 +1,37 @@
+NAME
+    CGI::Untaint::uk_postcode - validate a UK postcode
+
+SYNOPSIS
+      use CGI::Untaint;
+      my $handler = CGI::Untaint->new($q->Vars);
+
+      my $url = $handler->extract( -as_uk_postcode => 'postcode' );
+
+DESCRIPTION
+    This CGI::Untaint input handler verifies that it is dealing with a
+    reasonable UK postcode, as defined by the Royal Mail. It does not check
+    that the postcode is valid.
+
+SEE ALSO
+    http://en.wikipedia.org/wiki/Postcode
+
+    CGI::Untaint
+
+AUTHOR
+    Tony Bowden. Regular expression from Craig Berry.
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-CGI-Untaint-uk_postcode@rt.cpan.org
+
+COPYRIGHT
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

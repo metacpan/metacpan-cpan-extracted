@@ -1,0 +1,2 @@
+
+# accept a single argument and use it both for diagnostic and normal carping

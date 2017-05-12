@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb6a
+registers:
+  AF: 18004
+  AF_: 0
+  BC: 3032
+  BC_: 0
+  DE: 24
+  DE_: 0
+  HL: 6851
+  HL_: 0
+  I: 0
+  IX: 34486
+  IY: 7634
+  PC: 4
+  R: 2
+  SP: 0

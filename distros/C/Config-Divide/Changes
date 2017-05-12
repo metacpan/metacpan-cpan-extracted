@@ -1,0 +1,28 @@
+Revision history for Perl extension Config::Divide
+
+0.036 Wed Jun 27 17:31:42 JST 2012
+        - try to fix deps for test
+
+0.035 Wed Jun 27 02:38:22 JST 2012
+        - try to fix deps
+
+0.034 Wed Jun 27 00:07:04 JST 2012
+        - fix test, no use YAML
+
+0.033 Mon Jun 25 20:33:55 JST 2012
+        - try to fix deps
+
+0.032 Sun Jun 24 14:42:09 JST 2012
+        - use YAML::XS instead of YAML::Syck
+
+0.031 Wed Mar  9 18:33:01 JST 2011
+        - pod fix (thanks to wols)
+
+0.03  Tue Jun  2 13:31:41 JST 2009
+        - solves dependences
+
+0.02  17 May 2009
+        - fix method interface
+
+0.01  Tue May 12 11:17:49 2009
+        - original version

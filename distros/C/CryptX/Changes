@@ -1,0 +1,226 @@
+Changes for CryptX
+
+TODO:
+        - add support for PKCS#8 encrypted RSA+ECC private keys  "-----BEGIN ENCRYPTED PRIVATE KEY-----"
+        - RSA|DSA|ECC: verify_key($level) (basic check + extented primality test)
+        - better primality testing: http://questhub.io/realm/perl/quest/519032ee1088c76505000035 (idea: mp_prime_lucas)
+        - DSA: generate_key($p, $q, $g), generate_key(\$dsa_params_der), generate_key($dsa_params_file)
+        - XS croaks should report the "real caller" (Crypt::Mac::*, Crypt::Mode::*, ...)
+        - maybe: add CCM interface for new-add-add-done mode
+        - maybe: switch yarrow > fortuna for Crypt::PK::*
+        - maybe: add encode_b32/decode_b32
+        - maybe: x509_rsa_pubkey + x509_rsa_pubkey_alg
+
+0.047   2017/04/05
+        - fix #32 Compile "ar" step fails when Perl built with -flto (better version)
+        - fix #33 build fails on freebsd 9.2 and 10.0 (ar: fatal: Numeric group ID too large)
+
+0.046   2017/04/04
+        - fix #32 Compile "ar" step fails when Perl built with -flto
+
+0.045   2017/03/31
+        - sync with libtomcrypt/develop
+        - fix #30 fix on SPARC+SolarisStudio
+        - fix #31 Fails tests without '.' in @INC
+        - polish compiler warnings
+
+0.044   2016/11/28
+        - fix #27 Math::BigInt::LTM compatibility with older Math::BigInt
+
+0.043   2016/11/27
+        - fix #26 Math::BigInt::LTM compatibility with Math::BigInt 1.999801+
+
+0.042   2016/11/12
+        - RSA: sign/verify functions now support 'none' padding (INSECURE!)
+        - RC2: min keylen 40bit, used to be 64bit (INSECURE!)
+
+0.041   2016/10/12
+        - ECC: ltc_ecc_is_point memory leak
+        - DSA: properly handle FIPS 186-4 (4.6 + 4.7)
+        - GCM: counter incrementation isn't stopped at 2^32 blocks, which breaks GCM
+        - fix issue #24 Crypt::PK::ECC needs $VERSION (all *.pm have $VERSION)
+
+0.040   2016/09/12
+        - fix file permissions
+        - fix compiler warnings
+
+0.039   2016/08/02
+        - fix build troubles for MacOS / PPC
+
+0.038   2016/07/06
+        - fix issue #20 DSA/RSA/ECC/DH key2hash - hexadecimal numbers are missing leading zero
+        - Math::BigInt::LTM fixed mp_invmod(a,b,c) for b == 1
+        - Math::BigInt::LTM fixed _log_int()
+        - Math::BigInt::LTM fixed _alen()
+        - fix 'Please specify prototyping behavior for CryptX.xs'
+        - libtomcrypt (renaming *tab.c > *tab.c.inc not needed anymore)
+
+0.037   2016/06/16
+        - fix issue #18 Minor issue with comment syntax
+        - fix issue #19 t/checksum.t fails on AIX-5.3
+
+0.036   2016/06/07
+        - fix issue #17 ability to export ecc keys in short/oid form
+
+0.035   2016/06/03
+        - fix issue #14 Ensure Crypt::PK::ECC->key2hash()->{curve_name} is lowercase
+        - fix issue #15 OpenSSL interoperability broken
+
+0.034   2016/05/11
+        - Prevent RSA import_key() from altering a JWK hash reference
+
+0.033   2016/05/09
+        - MSVC6 related fixes (needed for older ActivePerl@MSWin32)
+
+0.032   2016/05/04
+        - Crypt::PK::DH - accept base/prime values
+        - new: DH methods export_key_raw, import_key_raw, params2hash
+        - enhanced: DH method generate_key
+        - new: Crypt::Checksum, Crypt::Checksum::CRC32, Crypt::Checksum::Adler32
+
+0.031   2016/05/01
+        - new: RSA+ECC method export_key_jwk_thumbprint()
+        - new: Crypt::Misc functions random_v4uuid + is_v4uuid
+        - fix: RSA+ECC export_key_jwk produces canonical JSON
+        - fix: RSA+DSA public key export now produces PEM/DER compatible with openssl
+                  public keys exported be previous version can still be imported
+        - fix: ECC import_key now accepts non-standard JWK curve names e.g. "secp112r1", "secp521r1"
+
+0.030   2016/04/13
+        - fix: 0.029 + 0.028 by mistake installed *.inc files to perl/(lib|site|vendor)
+
+0.029   2016/04/13
+        - NEW module: Math::BigInt::LTM
+        - NEW module: Crypt::Misc
+
+0.028   2016/03/23
+        - IMPORTANT: switch from Module::Build to ExtUtils::MakeMaker
+        - fix for broken DSA key (ssh format) loading
+
+0.027   2016/01/25
+        - sync with https://github.com/libtom/libtomcrypt (branch develop)
+        - sync with https://github.com/libtom/libtommath (branch develop)
+        - HP-UX related fixes
+        - JSON dependency is now optional (we check JSON::PP, JSON::XS, Cpanel::JSON::XS)
+        - skip jwk.t if no JSON::* module available
+        - does not require MIME::Base64 (we use base64 routines from libtomcrypt)
+
+0.026   2015/11/28
+        - switch to JSON::MaybeXS
+        - Crypt::PRNG - rand/irand related cosmetics
+        - consistently using UNIX newlines
+
+0.025   2015/07/07
+        - Crypt::PK::ECC+RSA export_key_jwk() allows to export a perl HASH with JWK structure
+
+0.024   2015/06/29
+        - new Crypt::PK::ECC methods
+            verify_message_rfc7518()
+            sign_message_rfc7518()
+            curve2hash()
+        - fix for Crypt::PK::RSA - bug in loading private key in JWK format
+
+0.023   2015/06/10
+        - support for older compilers (gcc3, vc6)
+        - typo in documentation (by tomhukins)
+
+0.022   2015/05/22
+        - new: Crypt::PK::ECC+RSA export_key_jwk() - exporting JWK format
+        - new: Crypt::Digest::SHA512_224
+        - new: Crypt::Digest::SHA512_256
+        - Crypt::PK::ECC+RSA import_key() - support for:
+          * public/private keys in JWK format
+          * private keys in PKCS8 PEM/DER format (unencrypted only)
+        - Crypt::PK::ECC+RSA+DSA import_key() - support for:
+          * public keys in SSH format
+          * public/private keys as a hashref exported via key2hash
+        - libtomcrypt updated to the latest develop branch, commit aeaa6d4a51 Apr 17 08:59:35 2015 +0200
+        - libtommath  updated to the latest develop branch, commit 0fd5e6c17f Dec 11 14:59:35 2014 +0100
+        - documentation fixes
+
+0.021   2014/01/23
+        - fixed asm(...) related compiler failures
+        - dsa_encrypt_key small correction
+        - optimized ecc_encrypt_key
+
+0.020   2014/01/18
+        - INCOMPATIBLE CHANGE: huge redesign of Crypt::PK::ECC
+        - ECC now supports curves y^2 = x^3 + a*x + b
+        - ECC you can use custom curves
+        - ECC import/export of keys in DER/PEM format now compatible with openssl
+        - enabling compile options ASM + ECC_TIMING_RESISTANT
+        - added many test vectors (RSA, DSA, EC) for interoperability with openssl
+
+0.019   2013/10/20
+        - fixed broken CAMELLIA implementation
+
+0.018   2013/10/18
+        - DSA: make_key + sign_hash fixes
+
+0.017   2013/09/24
+        - lowering MIME::Base64 version requirement
+        - support for import/export of password protected RSA/DSA keys
+        - RSA: added - export_key_pem('public_x509')
+        - better handling of dh_free/rsa_free/dsa_free/ecc_free
+        - added openssl test vectors
+        - fixed compiler warnings (RSA/DSA/ECC/DH)
+
+0.016   2013/09/15
+        - added missing test for key2hash, sign_hash, verify_hash
+        - fixed build failures on VC6
+
+0.015   2013/09/12
+        - only documentation fixes
+
+0.014   2013/09/11
+        - Crypt::Digest::NNN + Crypt::Mac::NNN - can produce Base64-URL-Safe encoded digest/mac
+        - Crypt::PRNG + Crypt::PRNG::NNN - Base64-URL-Safe encoded random bytes (random_bytes_b64u/bytes_b64u)
+        - Crypt::PK::RSA/DSA/DH/ECC - sign/verify replaced by sign_message/verify_message + sign_hash/verify_hash
+        - Crypt::PK::RSA/DSA/DH/ECC - new method key2hash
+        - documentation fixes
+
+0.013   2013/08/28
+        - DSA/RSA/ECC/DH - importing keys from string changed - now: $pk->import_key(\$buffer_with_key)
+        - DSA/RSA/ECC/DH - size() and is_private() now return undef if no key loaded
+        - improved RSA doc
+
+0.012   2013/06/17
+        - README, LICENSE etc. to improve CPANTS score
+        - somehow works with perl 5.6.2
+
+0.011   2013/06/15
+        - fixing various compiler warnings
+
+0.009   2013/05/19
+        - doc fixes
+        - requires perl 5.8.8 or higher
+        - INCOMPATIBILITY: all digest related 'xxx_base64' functions renamed to 'xxx_b64'
+
+0.008   2013/05/02
+        - fixed prng test failures
+        - Crypt::Digest::* croaks with the "real caller" (not a nice solution)
+
+0.007   2013/04/23
+        - Crypt::PRNG supports add_entropy() - without params
+        - Crypt::PRNG fork-safe & thread-safe
+        - random_string has default $len = 20
+        - doc fixes
+        - cpan tester failure fix for pk_dsa.t
+
+0.006   2013/04/19
+        - added Crypt::KeyDerivation
+        - Win64 compatibility
+
+0.005   2013/04/18
+        - added Crypt::PRNG::Fortuna|RC4|Sober128|Yarrow
+        - added Crypt::PK::RSA|DSA|ECC|DH
+
+0.004   2013/04/16
+        - removing illegal Crypt::Random
+
+0.003   2013/04/16
+        - added Crypt::Mode::CBC|CFB|CTR|ECB|OFB
+        - added Crypt::AuthEnc::CCM|EAX|GCM|OCB
+
+0.002   2013/04/11
+        - first release on CPAN

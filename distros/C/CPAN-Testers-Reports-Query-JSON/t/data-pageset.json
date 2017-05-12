@@ -1,0 +1,55 @@
+[
+   {
+      "version" : "1.05",
+      "status" : "PASS",
+      "csspatch" : "unp",
+      "state" : "pass",
+      "perl" : "5.8.8",
+      "osname" : "linux",
+      "platform" : "i686-linux"
+   },
+   {
+      "version" : "1.05",
+      "status" : "PASS",
+      "csspatch" : "unp",
+      "state" : "pass",
+      "perl" : "5.10.1",
+      "osname" : "linux",
+      "platform" : "i686-linux"
+   },
+   {
+      "version" : "1.05",
+      "status" : "FAIL",
+      "csspatch" : "unp",
+      "state" : "fail",
+      "perl" : "5.1",
+      "osname" : "linux",
+      "platform" : "i686-linux"
+   },
+   {
+      "ostext" : "Windows (Win32)",
+      "version" : "1.05",
+      "status" : "PASS",
+      "dist" : "Data-Pageset",
+      "osvers" : "5.1",
+      "csspatch" : "unp",
+      "state" : "pass",
+      "distribution" : "Data-Pageset",
+      "perl" : "5.10.0",
+      "distversion" : "Data-Pageset-1.05",
+      "cssperl" : "rel",
+      "osname" : "MSWin32",
+      "platform" : "MSWin32-x86-multi-thread",
+      "id" : "6130927"
+   },
+   {
+      "version" : "1.02",
+      "status" : "FAIL",
+      "csspatch" : "unp",
+      "state" : "fail",
+      "perl" : "5.1",
+      "osname" : "linux",
+      "platform" : "i686-linux"
+   }
+
+]

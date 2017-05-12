@@ -1,0 +1,36 @@
+---
+abstract: 'streaming PSGI adapter for CGI'
+author:
+  - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
+build_requires:
+  CGI: '0'
+  Data::Dump: '0'
+  Plack::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Emulate-PSGI-Streaming
+no_index:
+  directory:
+    - t/lib
+requires:
+  CGI::Emulate::PSGI: '0'
+  Carp: '0'
+  HTTP::Response: '0'
+  POSIX: '0'
+  SelectSaver: '0'
+  Tie::Handle: '0'
+  parent: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://bitbucket.org/broadbean/p5-cgi-emulate-psgi-streaming.git
+version: 1.0.0

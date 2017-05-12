@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-Plugin-Calendar
+version:      0.18
+version_from: lib/Class/DBI/Plugin/Calendar.pm
+installdirs:  site
+requires:
+    Calendar::Simple:              1.13
+    DBD::mysql:                    1
+    DBI:                           1
+    Time::Piece:                   1.08
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

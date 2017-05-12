@@ -1,0 +1,10 @@
+INSERT INTO address (addressid,testerid,address,email) VALUES ('1583','469','andreas.koenig.gmwojprw@franz.ak.mind.de','gmwojprw@franz.ak.mind.de');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('2261','530','CPAN.DCOLLINS@comcast.net','dcollins@comcast.net');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('2204','38','cpan@sourcentral.org ("Oliver Paukstadt")','cpan@sourcentral.org');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('1074','325','imacat@mail.imacat.idv.tw','imacat@mail.imacat.idv.tw');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('2065','682','jj@jonallen.info ("JJ")','jj@jonallen.info');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('2143','26','JOST@cpan.org ("Josts Smokehouse")','jost@cpan.org');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('586','26','kriegjcb@mi.ruhr-uni-bochum.de ((Jost Krieger))','kriegjcb@mi.ruhr-uni-bochum.de');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('2246','746','rhaen@cpan.org (Ulrich Habel)','rhaen@cpan.org');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('1553','8','srezic@cpan.org','srezic@cpan.org');
+INSERT INTO address (addressid,testerid,address,email) VALUES ('1742','538','stro@cpan.org','stro@cpan.org');

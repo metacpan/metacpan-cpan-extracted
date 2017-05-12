@@ -1,0 +1,52 @@
+README FOR CGI::XMLPost
+======================
+
+This module is designed to support CGI-like applications that are designed
+to receive XML data as the body part of an HTTP POST request.  This is likely
+to be useful in Message Oriented Middleware or Business to Business type
+applications.  In principle it could be also be used to support SOAP or
+XML-RPC server applications, but bearing in mind that there are modules
+that already do that well it probably isn't necessary.
+
+INSTALLATION
+============
+
+The module is installed in the standard way :
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The last step may have to be done as a user with administrative privileges.
+If you want to install the module in an alternative location then the first
+command will become:
+
+    perl Makefile.PL PREFIX=/my/install/directory
+
+and then in any programs that use the module you will need to add the
+directory to @INC with something like:
+
+   use lib '/home/gellyfish/foo/lib/perl5/site_perl/5.6.1'   
+
+(with the obvious adjustment to your PREFIX and perl version.
+
+DEPENDENCIES
+============
+
+The module has no absolute external dependencies, except as of version
+1.3 if you require to use the as_xpath() method you will need to have
+XML::XPath installed - however the module will function otherwise
+without it.  However the test suite does require that Test::More is
+installed (this is part of the 5.8.0 distribution anyhow).
+
+COPYRIGHT AND LICENSE
+=====================
+
+Copyright (c)  Jonathan Stowe 2002 - 2016
+
+This module is free software.  It can be distributed under the same terms
+as Perl itself.  The Perl license can be found in the file README in the
+Perl source distribution.
+
+/J\

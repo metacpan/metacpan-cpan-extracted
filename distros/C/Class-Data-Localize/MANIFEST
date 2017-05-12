@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Class/Data/Localize.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/Inheritable.t
+t/Localizable.t
+t/NoBase.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,19 @@
+---
+name: CGI-Session-Driver-bitbucket
+version: 1.06
+author:
+  - Jonathan Buhacoff <jonathan@pnc.net> wrote CGI::Session::Driver::bitbucket
+abstract: a module that loses your session data
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Session: 4.00
+provides:
+  CGI::Session::Driver::bitbucket:
+    file: lib/CGI/Session/Driver/bitbucket.pm
+    version: 1.06
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

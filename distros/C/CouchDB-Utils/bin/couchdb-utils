@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use CouchDB::Utils::App;
+
+# PODNAME: couchdb-utils
+
+CouchDB::Utils::App->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+couchdb-utils
+
+=head1 VERSION
+
+version 0.3
+
+=head1 AUTHOR
+
+Maroun NAJM <mnajm@cinemoz.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Cinemoz Inc.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

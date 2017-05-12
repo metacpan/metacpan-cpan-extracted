@@ -1,0 +1,23 @@
+Convert-Wiki
+============
+
+This module can be used to convert various formats from and to Wiki code.
+
+Wiki code is what is used in popular wikis, like Wikipedia and others.
+
+See also exsamples/ for some sample converter scripts.
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Have fun,
+
+Tels
+

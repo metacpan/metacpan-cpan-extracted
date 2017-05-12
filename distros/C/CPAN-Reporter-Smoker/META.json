@@ -1,0 +1,131 @@
+{
+   "abstract" : "Turnkey CPAN Testers smoking",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Reporter-Smoker",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Encoding" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "1.93",
+            "CPAN::HandleConfig" : "0",
+            "CPAN::Reporter::History" : "1.1702",
+            "CPAN::Tarzip" : "0",
+            "Carp" : "0",
+            "Compress::Zlib" : "1.2",
+            "Exporter" : "0",
+            "ExtUtils::MakeMaker" : "6.46",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "3.27",
+            "File::Temp" : "0.20",
+            "List::Util" : "1.03",
+            "Module::Build" : "0.30",
+            "Probe::Perl" : "0.01",
+            "Term::Title" : "0.01",
+            "Test::Reporter" : "1.58",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "CPAN::Checksums" : "0",
+            "Cwd" : "3.27",
+            "ExtUtils::MakeMaker" : "6.46",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "3.27",
+            "IO::CaptureOutput" : "1.06",
+            "IO::File" : "0",
+            "Test::More" : "0.62",
+            "lib" : "0",
+            "perl" : "5.010",
+            "vars" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Reporter::Smoker" : {
+         "file" : "lib/CPAN/Reporter/Smoker.pm",
+         "version" : "0.29"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-testers/CPAN-Reporter-Smoker/issues"
+      },
+      "homepage" : "https://github.com/cpan-testers/CPAN-Reporter-Smoker",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cpan-testers/CPAN-Reporter-Smoker.git",
+         "web" : "https://github.com/cpan-testers/CPAN-Reporter-Smoker"
+      }
+   },
+   "version" : "0.29",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "gregor herrmann <gregoa@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,144 @@
+[% 
+    htmltitle = 'News &amp; Views' ;
+    title = 'News & Views' ;
+
+    crumb1_name = 'News &amp; Views' ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<div class="diaryhead">
+    <div class="posted">Posted by <a href="/user/[% article.data.userid %]" title="About [% article.data.name %]">[% article.data.name %]</a><br />on [% article.data.postdate %]</div>
+    <div class="titled"><a href="/diary/[% article.data.articleid %]" rel="bookmark" title="[% article.data.title %]">[% article.data.title %]</a></div>
+</div>
+
+<div class="diaryitem">
+
+[% FOREACH item = article.body %]
+[% IF item.type == 1 %]
+    [% IF item.link %]
+    [% IF item.align  %][% class = item.align %][% ELSE %][% class = "inline" %][% END %]
+    [% IF item.href %]
+        <div class="thumb[% item.align %]" >
+        <a href='[% item.href %]' title="[% item.tag %]"><img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        /></a>
+        [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% ELSE %]
+        <div class="thumb[% item.align %]" >
+        <img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]"
+        [% IF item.width  %]width="[% item.width %]"[% END %]
+        [% IF item.height %]height="[% item.height %]"[% END %]
+        />
+        [% IF item.tag %]<p>[% item.tag | html %]</p>[% END -%]
+        </div>
+    [% END %]
+    [% END %]
+[% END %]
+[% IF item.type == 2 %]
+        [% item.body %]
+[% END %]
+[% IF item.type == 3 %]
+        <a href='[% item.href %]' title="[% item.tag | html %]">[% item.body %]</a>
+[% END %]
+[% END %]
+</div>
+
+    <div class="fileunder">
+    [% IF article.meta %]
+      File Under:
+      [% count = 0 %]
+      [% FOREACH meta = article.meta %]
+        [% IF count > 0 %]/[% END %]
+        <a href="/meta/[% meta %]" title="Meta search for '[% meta %]'">[% meta %]</a>
+        [% count = count + 1 %]
+      [% END %]
+      <br />
+    [% END %]
+      <a href="/diary/[% article.data.articleid %]#comments" title="View comments">
+      [% IF article.comments && article.comments > 0 %]
+        [% article.comments %] COMMENT[% IF article.comments > 1 %]S[% END %]
+      [% ELSE %]
+        NO COMMENTS
+      [% END %]
+      </a>
+    [% IF user.admin %]
+    | Edit | Delete
+    [% END %]
+    </div>
+
+[% IF article.data.latest %]
+<p id="comments">Comments Disabled.</p>
+[% ELSE %]
+<h3 id="comments">Comments</h3>
+
+[% IF comments.0 %]
+    [% FOREACH item = comments %]
+        [% IF item.subject %]<h4>[% item.subject %]</h4>[% END %]
+        [% item.body %]
+        <p class="small">Posted by <em><strong>[% IF item.href %]<a href="[% item.href %]" title="About [% item.author %]">[% END ; item.author ; IF item.href %]</a>[% END %]</strong></em> on [% item.postdate %]</p>
+        <hr />
+    [% END %]
+[% ELSE %]
+    <p>No Comments</p>
+    <hr />
+[% END %]
+
+<a name="addcomment"></a>
+<h3>Add A Comment</h3>
+
+[% IF thanks == 1 %]<p>Thank you, your comment has been submitted and is awaiting approval.</p>
+[% ELSIF thanks == 2 %]<p>Your comment was successfully submitted, thanks.</p>
+[% ELSIF thanks == 3 %]<p>Sorry, your comment has been rejected due to spamming. If this
+was done in error and you were posting a relevant comment, please contact the
+<a href="mailto:[% administrator %]" title="Contact the administrator">administrator</a>.</p>
+[% ELSE %]
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol. Please try again.</p>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="diary-comment" />
+<input type="hidden" name="articleid" value="[% article.data.articleid %]" />
+<input type="hidden" name="loopback" value="[% ipaddr %]" />
+
+<div class="accessibility">
+<label for="typekey">Ignore this:</label> <input type="text" id="typekey" name="typekey" value="" />
+</div>
+
+<p>Comments now have limited rich text support thanks to <a href="http://tinymce.moxiecode.com/" title="TinyMCE website">TinyMCE</a>.</p>
+
+<table class="blocker" summary="Comment Form">
+<tr><th><label for="author">Your Name</label> *</th>
+    <td class="alert">[% data.author_err %]</td>
+    <td><input type="text" id="author" name="author" value="[% data.author %]" size="50" /></td>
+</tr>
+<tr><th><label for="subject">Subject</label></th>
+    <td width="10" class="alert">[% data.subject_err %]</td>
+    <td><input type="text" id="subject" name="subject" value="[% data.subject %]" size="50" /></td>
+</tr>
+<tr><th><label for="body">Comment</label> *</th>
+    <td class="alert">[% comment.body_err %]</td>
+    <td><textarea id="body" name="body" rows="20" cols="45">[% data.body %]</textarea></td>
+</tr>
+<tr><th><label for="href">Link</label></th>
+    <td class="alert">[% data.href_err %]</td>
+    <td><input type="text" id="href" name="href" value="[% data.href %]" size="50" /></td>
+</tr>
+<tr><th></th>
+    <td></td>
+    <td><input type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>
+[% END %]
+[% END %]
+
+[% IF thanks %]
+<script>
+window.scrollByPages(100);                       // scroll to the bottom (it could be a popular post!)
+document.getElementById('addcomment').focus();   // refocus
+</script>
+[% END %]

@@ -1,0 +1,14 @@
+Revision history for Convert-TBX-RNG
+
+0.04      2013-10-28 15:43:15 America/Los_Angeles
+    Use XML::LibXML::RelaxNG instead of XML::Jing to speed up test suite
+    Updated repository information
+    Removed unused variables
+0.03      2013-06-05 23:00:38 America/Los_Angeles
+    Fixed incorrect sharedir arguments
+    Fixed incorrect arguments in script
+0.02      2013-06-05 21:49:12 America/Los_Angeles
+    Update forTermComp to match update in TBX::XCS
+    Added conversion script
+0.01      2013-05-31 18:16:26 America/Los_Angeles
+	initial release

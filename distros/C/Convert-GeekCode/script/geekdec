@@ -1,0 +1,68 @@
+#!/usr/bin/perl -w
+use strict;
+use Text::Wrap;
+use Convert::GeekCode;
+binmode STDOUT, ':utf8' if $] >= 5.008;
+
+my $VERSION = '0.6';
+
+=head1 NAME
+
+geekdec - Geek Code decoder
+
+=head1 SYNOPSIS
+
+B<geekdec> [I<code>|I<version>|I<lang>...] < F<file>
+
+=head1 DESCRIPRTION
+
+This script parses Geek Code sequences read from the stanard
+input, and prints out explanations.
+
+=cut
+
+if (@ARGV and $ARGV[0] eq '-h') {
+    print "Usage: $0 [code|version|lang] << file\n";
+    exit;
+}
+
+my ($code, $ver, $lang) = ('geekcode', 3.12, 'en_us');
+
+foreach (@ARGV) {
+    if (/^[\d\.]+$/) {
+        $ver = $_;
+    }
+    elsif (/^(\w\w)[\-_](\w\w)$/) {
+        $lang = lc "$1_$2"; # converts en-us to en_us
+    }
+    elsif ($_) {
+        $code = $_;
+    }
+}
+
+my @out = geek_decode(join('', <STDIN>), $code, $ver, $lang);
+
+while (my ($key, $val) = splice(@out, 0, 2)) {
+    print "[$key]\n$val\n\n";
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<Convert::GeekCode>, L<geekgen>
+
+=head1 AUTHORS
+
+唐鳳 E<lt>cpan@audreyt.orgE<gt>
+
+=head1 CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Module-Signature.
+
+This work is published from Taiwan.
+
+L<http://creativecommons.org/publicdomain/zero/1.0>
+
+=cut

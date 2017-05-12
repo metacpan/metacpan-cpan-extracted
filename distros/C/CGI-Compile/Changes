@@ -1,0 +1,80 @@
+Revision history for Perl extension CGI::Compile
+
+0.22  2017-02-02 09:59:06 PST
+        - fix tests in signal-masked environment (lemrouch) #20
+
+0.21  2016-01-01 13:13:10 PST
+        - fix warnings with non-numeric return values (rkitover) #18
+        - fix uninitialized value in open warning on perl 5.8 (rkitover)
+
+0.20  2015-10-16 13:55:13 PDT
+        - Compile Perl code via a tempfile to support source filters (rkitover) #17
+        - chain to original $SIG{__WARN__} when suppressing signal warnings on
+          Win32 (rkitover) #16
+
+0.19  2015-03-06 11:33:32 PST
+        - fix signal related test fails on Win32 (rkitover) #16
+
+0.18  2014-10-27 15:16:55 PDT
+        - Skip tests when CGI.pm is not available #15
+        - Avoid CGI.pm warnings in tests
+
+0.17  2014-05-24 11:03:19 PDT
+        - fix %SIG localization (preserve magic) (torsten)
+        - fix script exit code handling (torsten, rkitover)
+        - hide my and our variables from the generated sub (torsten)
+        - allow parameters to CGI coderef (rkitover)
+
+0.16  Sun Mar 10 00:12:45 PST 2013
+        - Fixed warnings on 5.10 (rkitover)
+
+0.15  Tue May 24 09:41:52 PDT 2011
+        - handle DOS line endings (rkitover)
+
+0.14  Thu Jan 20 15:07:59 PST 2011
+        - Enable the warnings (rkitover)
+
+0.13  Mon Jan 17 14:36:27 PST 2011
+        - Improved documents about nested closure
+        - check -w switch on CGIs (rkitover)
+
+0.12  Sun Aug  8 23:35:52 PDT 2010
+        - better mod_perl compatibility (chain to CORE::GLOBAL::exit) (rkitover)
+
+0.11  Wed Mar 10 23:57:55 JST 2010
+        - Strip __END__ (lestrrat)
+        - Refactored tests and added an unit test for __DATA__ and __END__
+
+0.10  Mon Feb 22 07:19:00 PST 2010
+        - repackaging the distribution with Module::Install 0.92 because 0.93's
+          author_tests support is broken. https://rt.cpan.org/Public/Bug/Display.html?id=54878
+
+0.09  Mon Feb 22 02:51:56 PST 2010
+        - support exit() in use'd modules (rkitover)
+        - make compile.t run on Perl < 5.8.9 (rkitover)
+
+0.08  Sun Jan 10 09:30:52 PST 2010
+        - Skip compile.t with Perl < 5.8.9 since it appears to have in %SIG restore (Andreask Koenig)
+
+0.07  Sun Dec 27 02:56:44 JST 2009
+        - Fixed %SIG tests (rkitover)
+
+0.06  Mon Dec 21 09:50:57 PST 2009
+        - support __DATA__ sections (rkitover)
+        - support CGIs that call exit() (rkitover)
+        - preserve %SIG on compile and run (rkitover)
+
+0.05  Fri Dec  4 21:45:36 GMT 2009
+        - Really fix the chdir bug by saving the return value of pushd
+
+0.04  Fri Dec  4 20:27:02 GMT 2009
+        - Fixed more chdir stuff using File::pushd
+
+0.03  Fri Dec  4 19:20:20 GMT 2009
+        - Fixed a bug with chdir
+
+0.02  Fri Dec  4 16:55:28 GMT 2009
+        - include Test::Requires
+
+0.01  Fri Dec  4 04:56:55 2009
+        - original version

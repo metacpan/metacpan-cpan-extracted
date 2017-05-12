@@ -1,0 +1,26 @@
+Crypt/GOST_PP version 1.10
+===========================
+
+Crypt::GOST_PP is a pure perl implementation of GOST, a 64-bit 
+symmetrical block cipher with a 256-bit key from the former Soviet
+Union. Please read the Pod documentation contained in the module 
+itself for additional information, including the rationale behind 
+the writing of this module.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This module is free software and may be modified and/or 
+redistributed under the same terms as Perl itself.
+
+Copyright (C) 2002, Kurt Kincaid <sifukurt@yahoo.com>
+

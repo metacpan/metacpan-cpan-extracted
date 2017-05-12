@@ -1,0 +1,6 @@
+Linux's sparse binding to perl
+
+$perl Makefile.PL
+$make 
+$make install
+

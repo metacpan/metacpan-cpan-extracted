@@ -1,0 +1,32 @@
+---
+abstract: 'Document Object Model for Cascading Style Sheets'
+author:
+  - 'Father Chrysostomos <sprout & cpan . org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CSS-DOM
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.01'
+  Clone: '0.09'
+  Encode: '2.1'
+  Exporter: '5.57'
+  Scalar::Util: '1.09'
+  Test::More: '0'
+  constant: '1.03'
+  overload: '0'
+  re: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.16'

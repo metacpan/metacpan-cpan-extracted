@@ -1,0 +1,5 @@
+First_Children = Ayanami Rei
+Second_Children = Soryu Asuka Langley
+Third_Children = Ikari Shinji
+Fourth_Children = Suzuhara Toji
+Fifth_Children = Nagisa Kaoru

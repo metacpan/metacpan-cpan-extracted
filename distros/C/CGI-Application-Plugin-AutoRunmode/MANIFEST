@@ -1,0 +1,19 @@
+AutoRunmode.pm
+AutoRunmode/FileDelegate.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/delegate.t
+t/file_delegate.t
+t/runmodes/mode1.pl
+t/startrunmode.t
+t/is_auto_runmode.t
+t/is_delegate_auto_runmode.t
+t/attribute_handlers.t
+t/error_runmode.t
+t/apache2_reload.t
+t/mocklibs/Apache2/Reload.pm
+t/runmodes/sub/submode.pl
+META.yml                                Module meta-data (added by MakeMaker)

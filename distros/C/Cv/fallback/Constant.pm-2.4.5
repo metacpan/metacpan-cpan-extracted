@@ -1,0 +1,1100 @@
+# -*- mode: perl; coding: utf-8; tab-width: 4; -*-
+
+package Cv::Constant;
+
+use 5.008008;
+use strict;
+use warnings;
+# use Carp;
+
+our $VERSION = '0.19';
+
+# Following constants were made from OpenCV Version: 2.4.5.
+
+*cvSlice = \&Cv::cvSlice;
+
+sub CV_MAKETYPE {
+	my ($depth, $cn) = @_;
+	Carp::croak "CV_MAKETYPE: ?cn" unless $cn >= 1 && $cn <= &CV_CN_MAX;
+	(&CV_MAT_DEPTH($depth) + ((($cn)-1) <<  &CV_CN_SHIFT));
+}
+
+sub CV_MAKE_TYPE { goto &CV_MAKETYPE }
+
+sub CV_8UC  { unshift(@_, &CV_8U); goto &CV_MAKETYPE }
+sub CV_8SC  { unshift(@_, &CV_8S); goto &CV_MAKETYPE }
+sub CV_16UC { unshift(@_, &CV_16U); goto &CV_MAKETYPE }
+sub CV_16SC { unshift(@_, &CV_16S); goto &CV_MAKETYPE }
+sub CV_32SC { unshift(@_, &CV_32S); goto &CV_MAKETYPE }
+sub CV_32FC { unshift(@_, &CV_32F); goto &CV_MAKETYPE }
+sub CV_64FC { unshift(@_, &CV_64F); goto &CV_MAKETYPE }
+
+sub CV_MAT_CN {
+	my ($flags) = @_;
+	(((($flags) &  &CV_MAT_CN_MASK) >>  &CV_CN_SHIFT) + 1);
+}
+
+sub CV_MAT_DEPTH {
+	my ($flags) = @_;
+	(($flags) &  &CV_MAT_DEPTH_MASK);
+}
+
+sub CV_MAT_TYPE {
+	my ($flags) = @_;
+	(($flags) &  &CV_MAT_TYPE_MASK);
+}
+
+sub CV_FOURCC {
+	my ($c1, $c2, $c3, $c4) = map { split(//, $_) } @_;
+	ord($c1) + (ord($c2) << 8) + (ord($c3) << 16) + (ord($c4) << 24);
+}
+
+sub CV_FOURCC_DEFAULT { CV_FOURCC('IYUV') }
+
+our @CV2IPL_DEPTH = (
+	&IPL_DEPTH_8U,
+	&IPL_DEPTH_8S,
+	&IPL_DEPTH_16U,
+	&IPL_DEPTH_16S,
+	&IPL_DEPTH_32S,
+	&IPL_DEPTH_32F,
+	&IPL_DEPTH_64F,
+	0,
+	);
+
+sub CV2IPL_DEPTH {
+	my ($type) = @_;
+	$CV2IPL_DEPTH[&CV_MAT_DEPTH($type)];
+}
+
+sub IPL2CV_DEPTH {
+    my ($depth) = @_;
+    ( ( (&CV_8U) + (&CV_16U << 4) + (&CV_32F << 8) + (&CV_64F << 16) +
+		(&CV_8S  << 20) + (&CV_16S << 24) + (&CV_32S << 28) )
+	  >> ((($depth & 0xF0) >> 2) + (($depth & &IPL_DEPTH_SIGN)? 20 : 0)
+	  )
+	) & 15;
+}
+
+sub CV_16S () { 3 }
+sub CV_16SC1 () { &CV_MAKETYPE(&CV_16S, 1) }
+sub CV_16SC2 () { &CV_MAKETYPE(&CV_16S, 2) }
+sub CV_16SC3 () { &CV_MAKETYPE(&CV_16S, 3) }
+sub CV_16SC4 () { &CV_MAKETYPE(&CV_16S, 4) }
+sub CV_16U () { 2 }
+sub CV_16UC1 () { &CV_MAKETYPE(&CV_16U, 1) }
+sub CV_16UC2 () { &CV_MAKETYPE(&CV_16U, 2) }
+sub CV_16UC3 () { &CV_MAKETYPE(&CV_16U, 3) }
+sub CV_16UC4 () { &CV_MAKETYPE(&CV_16U, 4) }
+sub CV_32F () { 5 }
+sub CV_32FC1 () { &CV_MAKETYPE(&CV_32F, 1) }
+sub CV_32FC2 () { &CV_MAKETYPE(&CV_32F, 2) }
+sub CV_32FC3 () { &CV_MAKETYPE(&CV_32F, 3) }
+sub CV_32FC4 () { &CV_MAKETYPE(&CV_32F, 4) }
+sub CV_32S () { 4 }
+sub CV_32SC1 () { &CV_MAKETYPE(&CV_32S, 1) }
+sub CV_32SC2 () { &CV_MAKETYPE(&CV_32S, 2) }
+sub CV_32SC3 () { &CV_MAKETYPE(&CV_32S, 3) }
+sub CV_32SC4 () { &CV_MAKETYPE(&CV_32S, 4) }
+sub CV_64F () { 6 }
+sub CV_64FC1 () { &CV_MAKETYPE(&CV_64F, 1) }
+sub CV_64FC2 () { &CV_MAKETYPE(&CV_64F, 2) }
+sub CV_64FC3 () { &CV_MAKETYPE(&CV_64F, 3) }
+sub CV_64FC4 () { &CV_MAKETYPE(&CV_64F, 4) }
+sub CV_8S () { 1 }
+sub CV_8SC1 () { &CV_MAKETYPE(&CV_8S, 1) }
+sub CV_8SC2 () { &CV_MAKETYPE(&CV_8S, 2) }
+sub CV_8SC3 () { &CV_MAKETYPE(&CV_8S, 3) }
+sub CV_8SC4 () { &CV_MAKETYPE(&CV_8S, 4) }
+sub CV_8U () { 0 }
+sub CV_8UC1 () { &CV_MAKETYPE(&CV_8U, 1) }
+sub CV_8UC2 () { &CV_MAKETYPE(&CV_8U, 2) }
+sub CV_8UC3 () { &CV_MAKETYPE(&CV_8U, 3) }
+sub CV_8UC4 () { &CV_MAKETYPE(&CV_8U, 4) }
+sub CV_AA () { 16 }
+sub CV_ADAPTIVE_THRESH_GAUSSIAN_C () { 1 }
+sub CV_ADAPTIVE_THRESH_MEAN_C () { 0 }
+sub CV_ARRAY () { 2 }
+sub CV_AUTOSTEP () { 2147483647 }
+sub CV_AUTO_STEP () { 2147483647 }
+sub CV_BACK () { 0 }
+sub CV_BGFG_FGD_ALPHA_1 () { 0.1 }
+sub CV_BGFG_FGD_ALPHA_2 () { 0.005 }
+sub CV_BGFG_FGD_ALPHA_3 () { 0.1 }
+sub CV_BGFG_FGD_BG_UPDATE_TRESH () { 0.5 }
+sub CV_BGFG_FGD_DELTA () { 2 }
+sub CV_BGFG_FGD_LC () { 128 }
+sub CV_BGFG_FGD_LCC () { 64 }
+sub CV_BGFG_FGD_MINAREA () { 15 }
+sub CV_BGFG_FGD_N1C () { 15 }
+sub CV_BGFG_FGD_N1CC () { 25 }
+sub CV_BGFG_FGD_N2C () { 25 }
+sub CV_BGFG_FGD_N2CC () { 40 }
+sub CV_BGFG_FGD_T () { 0.9 }
+sub CV_BGFG_MOG_BACKGROUND_THRESHOLD () { 0.7 }
+sub CV_BGFG_MOG_MAX_NGAUSSIANS () { 500 }
+sub CV_BGFG_MOG_MINAREA () { 15 }
+sub CV_BGFG_MOG_NCOLORS () { 3 }
+sub CV_BGFG_MOG_NGAUSSIANS () { 5 }
+sub CV_BGFG_MOG_SIGMA_INIT () { 30 }
+sub CV_BGFG_MOG_STD_THRESHOLD () { 2.5 }
+sub CV_BGFG_MOG_WEIGHT_INIT () { 0.05 }
+sub CV_BGFG_MOG_WINDOW_SIZE () { 200 }
+sub CV_BGR2BGR555 () { 22 }
+sub CV_BGR2BGR565 () { 12 }
+sub CV_BGR2BGRA () { 0 }
+sub CV_BGR2GRAY () { 6 }
+sub CV_BGR2HLS () { 52 }
+sub CV_BGR2HLS_FULL () { 68 }
+sub CV_BGR2HSV () { 40 }
+sub CV_BGR2HSV_FULL () { 66 }
+sub CV_BGR2Lab () { 44 }
+sub CV_BGR2Luv () { 50 }
+sub CV_BGR2RGB () { 4 }
+sub CV_BGR2RGBA () { 2 }
+sub CV_BGR2XYZ () { 32 }
+sub CV_BGR2YCrCb () { 36 }
+sub CV_BGR2YUV () { 82 }
+sub CV_BGR2YUV_I420 () { 128 }
+sub CV_BGR2YUV_IYUV () { 128 }
+sub CV_BGR2YUV_YV12 () { 132 }
+sub CV_BGR5552BGR () { 24 }
+sub CV_BGR5552BGRA () { 28 }
+sub CV_BGR5552GRAY () { 31 }
+sub CV_BGR5552RGB () { 25 }
+sub CV_BGR5552RGBA () { 29 }
+sub CV_BGR5652BGR () { 14 }
+sub CV_BGR5652BGRA () { 18 }
+sub CV_BGR5652GRAY () { 21 }
+sub CV_BGR5652RGB () { 15 }
+sub CV_BGR5652RGBA () { 19 }
+sub CV_BGRA2BGR () { 1 }
+sub CV_BGRA2BGR555 () { 26 }
+sub CV_BGRA2BGR565 () { 16 }
+sub CV_BGRA2GRAY () { 10 }
+sub CV_BGRA2RGB () { 3 }
+sub CV_BGRA2RGBA () { 5 }
+sub CV_BGRA2YUV_I420 () { 130 }
+sub CV_BGRA2YUV_IYUV () { 130 }
+sub CV_BGRA2YUV_YV12 () { 134 }
+sub CV_BG_MODEL_FGD () { 0 }
+sub CV_BG_MODEL_FGD_SIMPLE () { 2 }
+sub CV_BG_MODEL_MOG () { 1 }
+sub CV_BILATERAL () { 4 }
+sub CV_BLOB_MINH () { 5 }
+sub CV_BLOB_MINW () { 5 }
+sub CV_BLUR () { 1 }
+sub CV_BLUR_NO_SCALE () { 0 }
+sub CV_BT_HIST_TYPE_H () { 3 }
+sub CV_BT_HIST_TYPE_MG () { 1 }
+sub CV_BT_HIST_TYPE_MG2 () { 2 }
+sub CV_BT_HIST_TYPE_S () { 0 }
+sub CV_BadAlign () { -21 }
+sub CV_BadAlphaChannel () { -18 }
+sub CV_BadCOI () { -24 }
+sub CV_BadCallBack () { -22 }
+sub CV_BadDataPtr () { -12 }
+sub CV_BadDepth () { -17 }
+sub CV_BadImageSize () { -10 }
+sub CV_BadModelOrChSeq () { -14 }
+sub CV_BadNumChannel1U () { -16 }
+sub CV_BadNumChannels () { -15 }
+sub CV_BadOffset () { -11 }
+sub CV_BadOrder () { -19 }
+sub CV_BadOrigin () { -20 }
+sub CV_BadROISize () { -25 }
+sub CV_BadStep () { -13 }
+sub CV_BadTileSize () { -23 }
+sub CV_BayerBG2BGR () { 46 }
+sub CV_BayerBG2BGR_VNG () { 62 }
+sub CV_BayerBG2GRAY () { 86 }
+sub CV_BayerBG2RGB () { 48 }
+sub CV_BayerBG2RGB_VNG () { 64 }
+sub CV_BayerGB2BGR () { 47 }
+sub CV_BayerGB2BGR_VNG () { 63 }
+sub CV_BayerGB2GRAY () { 87 }
+sub CV_BayerGB2RGB () { 49 }
+sub CV_BayerGB2RGB_VNG () { 65 }
+sub CV_BayerGR2BGR () { 49 }
+sub CV_BayerGR2BGR_VNG () { 65 }
+sub CV_BayerGR2GRAY () { 89 }
+sub CV_BayerGR2RGB () { 47 }
+sub CV_BayerGR2RGB_VNG () { 63 }
+sub CV_BayerRG2BGR () { 48 }
+sub CV_BayerRG2BGR_VNG () { 64 }
+sub CV_BayerRG2GRAY () { 88 }
+sub CV_BayerRG2RGB () { 46 }
+sub CV_BayerRG2RGB_VNG () { 62 }
+sub CV_C () { 1 }
+sub CV_CALIB_CB_ADAPTIVE_THRESH () { 1 }
+sub CV_CALIB_CB_FAST_CHECK () { 8 }
+sub CV_CALIB_CB_FILTER_QUADS () { 4 }
+sub CV_CALIB_CB_NORMALIZE_IMAGE () { 2 }
+sub CV_CALIB_FIX_ASPECT_RATIO () { 2 }
+sub CV_CALIB_FIX_FOCAL_LENGTH () { 16 }
+sub CV_CALIB_FIX_INTRINSIC () { 256 }
+sub CV_CALIB_FIX_K1 () { 32 }
+sub CV_CALIB_FIX_K2 () { 64 }
+sub CV_CALIB_FIX_K3 () { 128 }
+sub CV_CALIB_FIX_K4 () { 2048 }
+sub CV_CALIB_FIX_K5 () { 4096 }
+sub CV_CALIB_FIX_K6 () { 8192 }
+sub CV_CALIB_FIX_PRINCIPAL_POINT () { 4 }
+sub CV_CALIB_RATIONAL_MODEL () { 16384 }
+sub CV_CALIB_SAME_FOCAL_LENGTH () { 512 }
+sub CV_CALIB_USE_INTRINSIC_GUESS () { 1 }
+sub CV_CALIB_ZERO_DISPARITY () { 1024 }
+sub CV_CALIB_ZERO_TANGENT_DIST () { 8 }
+sub CV_CAMERA_TO_WARP () { 1 }
+sub CV_CANNY_L2_GRADIENT () { 2147483648 }
+sub CV_CAP_ANDROID () { 1000 }
+sub CV_CAP_ANDROID_ANTIBANDING_50HZ () { 0 }
+sub CV_CAP_ANDROID_ANTIBANDING_60HZ () { 1 }
+sub CV_CAP_ANDROID_ANTIBANDING_AUTO () { 2 }
+sub CV_CAP_ANDROID_ANTIBANDING_OFF () { 3 }
+sub CV_CAP_ANDROID_COLOR_FRAME () { 0 }
+sub CV_CAP_ANDROID_COLOR_FRAME_BGR () { 0 }
+sub CV_CAP_ANDROID_COLOR_FRAME_BGRA () { 3 }
+sub CV_CAP_ANDROID_COLOR_FRAME_RGB () { 2 }
+sub CV_CAP_ANDROID_COLOR_FRAME_RGBA () { 4 }
+sub CV_CAP_ANDROID_FLASH_MODE_AUTO () { 0 }
+sub CV_CAP_ANDROID_FLASH_MODE_OFF () { 1 }
+sub CV_CAP_ANDROID_FLASH_MODE_ON () { 2 }
+sub CV_CAP_ANDROID_FLASH_MODE_RED_EYE () { 3 }
+sub CV_CAP_ANDROID_FLASH_MODE_TORCH () { 4 }
+sub CV_CAP_ANDROID_FOCUS_MODE_AUTO () { 0 }
+sub CV_CAP_ANDROID_FOCUS_MODE_CONTINUOUS_VIDEO () { 1 }
+sub CV_CAP_ANDROID_FOCUS_MODE_EDOF () { 2 }
+sub CV_CAP_ANDROID_FOCUS_MODE_FIXED () { 3 }
+sub CV_CAP_ANDROID_FOCUS_MODE_INFINITY () { 4 }
+sub CV_CAP_ANDROID_FOCUS_MODE_MACRO () { 5 }
+sub CV_CAP_ANDROID_GREY_FRAME () { 1 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_AUTO () { 0 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_CLOUDY_DAYLIGHT () { 1 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_DAYLIGHT () { 2 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_FLUORESCENT () { 3 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_INCANDESCENT () { 4 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_SHADE () { 5 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_TWILIGHT () { 6 }
+sub CV_CAP_ANDROID_WHITE_BALANCE_WARM_FLUORESCENT () { 7 }
+sub CV_CAP_ANY () { 0 }
+sub CV_CAP_AVFOUNDATION () { 1200 }
+sub CV_CAP_CMU1394 () { 300 }
+sub CV_CAP_DC1394 () { 300 }
+sub CV_CAP_DSHOW () { 700 }
+sub CV_CAP_FIREWARE () { 300 }
+sub CV_CAP_FIREWIRE () { 300 }
+sub CV_CAP_GIGANETIX () { 1300 }
+sub CV_CAP_GSTREAMER_QUEUE_LENGTH () { 200 }
+sub CV_CAP_IEEE1394 () { 300 }
+sub CV_CAP_MIL () { 100 }
+sub CV_CAP_MSMF () { 1400 }
+sub CV_CAP_OPENNI () { 900 }
+sub CV_CAP_OPENNI_ASUS () { 910 }
+sub CV_CAP_OPENNI_BGR_IMAGE () { 5 }
+sub CV_CAP_OPENNI_DEPTH_GENERATOR () { 2147483648 }
+sub CV_CAP_OPENNI_DEPTH_GENERATOR_BASELINE () { 2147483750 }
+sub CV_CAP_OPENNI_DEPTH_GENERATOR_FOCAL_LENGTH () { 2147483751 }
+sub CV_CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION () { 2147483752 }
+sub CV_CAP_OPENNI_DEPTH_GENERATOR_REGISTRATION_ON () { 2147483752 }
+sub CV_CAP_OPENNI_DEPTH_MAP () { 0 }
+sub CV_CAP_OPENNI_DISPARITY_MAP () { 2 }
+sub CV_CAP_OPENNI_DISPARITY_MAP_32F () { 3 }
+sub CV_CAP_OPENNI_GENERATORS_MASK () { 3221225472 }
+sub CV_CAP_OPENNI_GRAY_IMAGE () { 6 }
+sub CV_CAP_OPENNI_IMAGE_GENERATOR () { 1073741824 }
+sub CV_CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE () { 1073741924 }
+sub CV_CAP_OPENNI_IMAGE_GENERATOR_PRESENT () { 1073741933 }
+sub CV_CAP_OPENNI_POINT_CLOUD_MAP () { 1 }
+sub CV_CAP_OPENNI_QVGA_30HZ () { 3 }
+sub CV_CAP_OPENNI_QVGA_60HZ () { 4 }
+sub CV_CAP_OPENNI_SXGA_15HZ () { 1 }
+sub CV_CAP_OPENNI_SXGA_30HZ () { 2 }
+sub CV_CAP_OPENNI_VALID_DEPTH_MASK () { 4 }
+sub CV_CAP_OPENNI_VGA_30HZ () { 0 }
+sub CV_CAP_PROP_ANDROID_ANTIBANDING () { 8004 }
+sub CV_CAP_PROP_ANDROID_FLASH_MODE () { 8001 }
+sub CV_CAP_PROP_ANDROID_FOCAL_LENGTH () { 8005 }
+sub CV_CAP_PROP_ANDROID_FOCUS_DISTANCE_FAR () { 8008 }
+sub CV_CAP_PROP_ANDROID_FOCUS_DISTANCE_NEAR () { 8006 }
+sub CV_CAP_PROP_ANDROID_FOCUS_DISTANCE_OPTIMAL () { 8007 }
+sub CV_CAP_PROP_ANDROID_FOCUS_MODE () { 8002 }
+sub CV_CAP_PROP_ANDROID_WHITE_BALANCE () { 8003 }
+sub CV_CAP_PROP_AUTOGRAB () { 1024 }
+sub CV_CAP_PROP_AUTO_EXPOSURE () { 21 }
+sub CV_CAP_PROP_BACKLIGHT () { 32 }
+sub CV_CAP_PROP_BRIGHTNESS () { 10 }
+sub CV_CAP_PROP_CONTRAST () { 11 }
+sub CV_CAP_PROP_CONVERT_RGB () { 16 }
+sub CV_CAP_PROP_DC1394_MODE_AUTO () { -2 }
+sub CV_CAP_PROP_DC1394_MODE_MANUAL () { -3 }
+sub CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO () { -1 }
+sub CV_CAP_PROP_DC1394_OFF () { -4 }
+sub CV_CAP_PROP_EXPOSURE () { 15 }
+sub CV_CAP_PROP_FOCUS () { 28 }
+sub CV_CAP_PROP_FORMAT () { 8 }
+sub CV_CAP_PROP_FOURCC () { 6 }
+sub CV_CAP_PROP_FPS () { 5 }
+sub CV_CAP_PROP_FRAME_COUNT () { 7 }
+sub CV_CAP_PROP_FRAME_HEIGHT () { 4 }
+sub CV_CAP_PROP_FRAME_WIDTH () { 3 }
+sub CV_CAP_PROP_GAIN () { 14 }
+sub CV_CAP_PROP_GAMMA () { 22 }
+sub CV_CAP_PROP_GIGA_FRAME_HEIGH_MAX () { 10004 }
+sub CV_CAP_PROP_GIGA_FRAME_OFFSET_X () { 10001 }
+sub CV_CAP_PROP_GIGA_FRAME_OFFSET_Y () { 10002 }
+sub CV_CAP_PROP_GIGA_FRAME_SENS_HEIGH () { 10006 }
+sub CV_CAP_PROP_GIGA_FRAME_SENS_WIDTH () { 10005 }
+sub CV_CAP_PROP_GIGA_FRAME_WIDTH_MAX () { 10003 }
+sub CV_CAP_PROP_GUID () { 29 }
+sub CV_CAP_PROP_HUE () { 13 }
+sub CV_CAP_PROP_IOS_DEVICE_EXPOSURE () { 9002 }
+sub CV_CAP_PROP_IOS_DEVICE_FLASH () { 9003 }
+sub CV_CAP_PROP_IOS_DEVICE_FOCUS () { 9001 }
+sub CV_CAP_PROP_IOS_DEVICE_TORCH () { 9005 }
+sub CV_CAP_PROP_IOS_DEVICE_WHITEBALANCE () { 9004 }
+sub CV_CAP_PROP_IRIS () { 36 }
+sub CV_CAP_PROP_ISO_SPEED () { 30 }
+sub CV_CAP_PROP_MAX_DC1394 () { 31 }
+sub CV_CAP_PROP_MODE () { 9 }
+sub CV_CAP_PROP_MONOCROME () { 19 }
+sub CV_CAP_PROP_OPENNI_APPROX_FRAME_SYNC () { 105 }
+sub CV_CAP_PROP_OPENNI_BASELINE () { 102 }
+sub CV_CAP_PROP_OPENNI_CIRCLE_BUFFER () { 107 }
+sub CV_CAP_PROP_OPENNI_FOCAL_LENGTH () { 103 }
+sub CV_CAP_PROP_OPENNI_FRAME_MAX_DEPTH () { 101 }
+sub CV_CAP_PROP_OPENNI_GENERATOR_PRESENT () { 109 }
+sub CV_CAP_PROP_OPENNI_MAX_BUFFER_SIZE () { 106 }
+sub CV_CAP_PROP_OPENNI_MAX_TIME_DURATION () { 108 }
+sub CV_CAP_PROP_OPENNI_OUTPUT_MODE () { 100 }
+sub CV_CAP_PROP_OPENNI_REGISTRATION () { 104 }
+sub CV_CAP_PROP_OPENNI_REGISTRATION_ON () { 104 }
+sub CV_CAP_PROP_PAN () { 33 }
+sub CV_CAP_PROP_POS_AVI_RATIO () { 2 }
+sub CV_CAP_PROP_POS_FRAMES () { 1 }
+sub CV_CAP_PROP_POS_MSEC () { 0 }
+sub CV_CAP_PROP_PREVIEW_FORMAT () { 1026 }
+sub CV_CAP_PROP_PVAPI_MULTICASTIP () { 300 }
+sub CV_CAP_PROP_RECTIFICATION () { 18 }
+sub CV_CAP_PROP_ROLL () { 35 }
+sub CV_CAP_PROP_SATURATION () { 12 }
+sub CV_CAP_PROP_SETTINGS () { 37 }
+sub CV_CAP_PROP_SHARPNESS () { 20 }
+sub CV_CAP_PROP_SUPPORTED_PREVIEW_SIZES_STRING () { 1025 }
+sub CV_CAP_PROP_TEMPERATURE () { 23 }
+sub CV_CAP_PROP_TILT () { 34 }
+sub CV_CAP_PROP_TRIGGER () { 24 }
+sub CV_CAP_PROP_TRIGGER_DELAY () { 25 }
+sub CV_CAP_PROP_WHITE_BALANCE_BLUE_U () { 17 }
+sub CV_CAP_PROP_WHITE_BALANCE_RED_V () { 26 }
+sub CV_CAP_PROP_XI_AEAG () { 415 }
+sub CV_CAP_PROP_XI_AEAG_LEVEL () { 419 }
+sub CV_CAP_PROP_XI_AE_MAX_LIMIT () { 417 }
+sub CV_CAP_PROP_XI_AG_MAX_LIMIT () { 418 }
+sub CV_CAP_PROP_XI_AUTO_WB () { 414 }
+sub CV_CAP_PROP_XI_DATA_FORMAT () { 401 }
+sub CV_CAP_PROP_XI_DOWNSAMPLING () { 400 }
+sub CV_CAP_PROP_XI_EXP_PRIORITY () { 416 }
+sub CV_CAP_PROP_XI_GPI_LEVEL () { 408 }
+sub CV_CAP_PROP_XI_GPI_MODE () { 407 }
+sub CV_CAP_PROP_XI_GPI_SELECTOR () { 406 }
+sub CV_CAP_PROP_XI_GPO_MODE () { 410 }
+sub CV_CAP_PROP_XI_GPO_SELECTOR () { 409 }
+sub CV_CAP_PROP_XI_LED_MODE () { 412 }
+sub CV_CAP_PROP_XI_LED_SELECTOR () { 411 }
+sub CV_CAP_PROP_XI_MANUAL_WB () { 413 }
+sub CV_CAP_PROP_XI_OFFSET_X () { 402 }
+sub CV_CAP_PROP_XI_OFFSET_Y () { 403 }
+sub CV_CAP_PROP_XI_TIMEOUT () { 420 }
+sub CV_CAP_PROP_XI_TRG_SOFTWARE () { 405 }
+sub CV_CAP_PROP_XI_TRG_SOURCE () { 404 }
+sub CV_CAP_PROP_ZOOM () { 27 }
+sub CV_CAP_PVAPI () { 800 }
+sub CV_CAP_QT () { 500 }
+sub CV_CAP_STEREO () { 400 }
+sub CV_CAP_TYZX () { 400 }
+sub CV_CAP_UNICAP () { 600 }
+sub CV_CAP_V4L () { 200 }
+sub CV_CAP_V4L2 () { 200 }
+sub CV_CAP_VFW () { 200 }
+sub CV_CAP_XIAPI () { 1100 }
+sub CV_CHAIN_APPROX_NONE () { 1 }
+sub CV_CHAIN_APPROX_SIMPLE () { 2 }
+sub CV_CHAIN_APPROX_TC89_KCOS () { 4 }
+sub CV_CHAIN_APPROX_TC89_L1 () { 3 }
+sub CV_CHAIN_CODE () { 0 }
+sub CV_CHECKBOX () { 1 }
+sub CV_CHECK_QUIET () { 2 }
+sub CV_CHECK_RANGE () { 1 }
+sub CV_CHOLESKY () { 3 }
+sub CV_CLOCKWISE () { 1 }
+sub CV_CMP_EQ () { 0 }
+sub CV_CMP_GE () { 2 }
+sub CV_CMP_GT () { 1 }
+sub CV_CMP_LE () { 4 }
+sub CV_CMP_LT () { 3 }
+sub CV_CMP_NE () { 5 }
+sub CV_CN_MAX () { 512 }
+sub CV_CN_SHIFT () { 3 }
+sub CV_COLORCVT_MAX () { 135 }
+sub CV_COMP_BHATTACHARYYA () { 3 }
+sub CV_COMP_CHISQR () { 1 }
+sub CV_COMP_CORREL () { 0 }
+sub CV_COMP_HELLINGER () { 3 }
+sub CV_COMP_INTERSECT () { 2 }
+sub CV_CONTOURS_MATCH_I1 () { 1 }
+sub CV_CONTOURS_MATCH_I2 () { 2 }
+sub CV_CONTOURS_MATCH_I3 () { 3 }
+sub CV_CONTOUR_TREES_MATCH_I1 () { 1 }
+sub CV_COUNTER_CLOCKWISE () { 2 }
+sub CV_COVAR_COLS () { 16 }
+sub CV_COVAR_NORMAL () { 1 }
+sub CV_COVAR_ROWS () { 8 }
+sub CV_COVAR_SCALE () { 4 }
+sub CV_COVAR_SCRAMBLED () { 0 }
+sub CV_COVAR_USE_AVG () { 2 }
+sub CV_CPU_AVX () { 10 }
+sub CV_CPU_MMX () { 1 }
+sub CV_CPU_NONE () { 0 }
+sub CV_CPU_POPCNT () { 8 }
+sub CV_CPU_SSE () { 2 }
+sub CV_CPU_SSE2 () { 3 }
+sub CV_CPU_SSE3 () { 4 }
+sub CV_CPU_SSE4_1 () { 6 }
+sub CV_CPU_SSE4_2 () { 7 }
+sub CV_CPU_SSSE3 () { 5 }
+sub CV_CVTIMG_FLIP () { 1 }
+sub CV_CVTIMG_SWAP_RB () { 2 }
+sub CV_DEPTH_MAX () { 1 << &CV_CN_SHIFT }
+sub CV_DIFF () { 16 }
+sub CV_DIFF_C () { &CV_DIFF | &CV_C }
+sub CV_DIFF_L1 () { &CV_DIFF | &CV_L1 }
+sub CV_DIFF_L2 () { &CV_DIFF | &CV_L2 }
+sub CV_DISPARITY_BIRCHFIELD () { 0 }
+sub CV_DIST_C () { 3 }
+sub CV_DIST_FAIR () { 5 }
+sub CV_DIST_HUBER () { 7 }
+sub CV_DIST_L1 () { 1 }
+sub CV_DIST_L12 () { 4 }
+sub CV_DIST_L2 () { 2 }
+sub CV_DIST_LABEL_CCOMP () { 0 }
+sub CV_DIST_LABEL_PIXEL () { 1 }
+sub CV_DIST_MASK_3 () { 3 }
+sub CV_DIST_MASK_5 () { 5 }
+sub CV_DIST_MASK_PRECISE () { 0 }
+sub CV_DIST_USER () { -1 }
+sub CV_DIST_WELSCH () { 6 }
+sub CV_DOMINANT_IPAN () { 1 }
+sub CV_DXT_FORWARD () { 0 }
+sub CV_DXT_INVERSE () { 1 }
+sub CV_DXT_INVERSE_SCALE () { &CV_DXT_INV_SCALE }
+sub CV_DXT_INV_SCALE () { &CV_DXT_INVERSE + &CV_DXT_SCALE }
+sub CV_DXT_MUL_CONJ () { 8 }
+sub CV_DXT_ROWS () { 4 }
+sub CV_DXT_SCALE () { 2 }
+sub CV_EIGOBJ_BOTH_CALLBACK () { 3 }
+sub CV_EIGOBJ_INPUT_CALLBACK () { 1 }
+sub CV_EIGOBJ_NO_CALLBACK () { 0 }
+sub CV_EIGOBJ_OUTPUT_CALLBACK () { 2 }
+sub CV_ENABLE_UNROLLED () { 1 }
+sub CV_EPNP () { 1 }
+sub CV_EVENT_FLAG_ALTKEY () { 32 }
+sub CV_EVENT_FLAG_CTRLKEY () { 8 }
+sub CV_EVENT_FLAG_LBUTTON () { 1 }
+sub CV_EVENT_FLAG_MBUTTON () { 4 }
+sub CV_EVENT_FLAG_RBUTTON () { 2 }
+sub CV_EVENT_FLAG_SHIFTKEY () { 16 }
+sub CV_EVENT_LBUTTONDBLCLK () { 7 }
+sub CV_EVENT_LBUTTONDOWN () { 1 }
+sub CV_EVENT_LBUTTONUP () { 4 }
+sub CV_EVENT_MBUTTONDBLCLK () { 9 }
+sub CV_EVENT_MBUTTONDOWN () { 3 }
+sub CV_EVENT_MBUTTONUP () { 6 }
+sub CV_EVENT_MOUSEMOVE () { 0 }
+sub CV_EVENT_RBUTTONDBLCLK () { 8 }
+sub CV_EVENT_RBUTTONDOWN () { 2 }
+sub CV_EVENT_RBUTTONUP () { 5 }
+sub CV_ErrModeLeaf () { 0 }
+sub CV_ErrModeParent () { 1 }
+sub CV_ErrModeSilent () { 2 }
+sub CV_FACE_LEFT_EYE () { 1 }
+sub CV_FACE_MOUTH () { 0 }
+sub CV_FACE_RIGHT_EYE () { 2 }
+sub CV_FILLED () { -1 }
+sub CV_FLOODFILL_FIXED_RANGE () { 65536 }
+sub CV_FLOODFILL_MASK_ONLY () { 131072 }
+sub CV_FM_7POINT () { 1 }
+sub CV_FM_8POINT () { 2 }
+sub CV_FM_LMEDS () { &CV_LMEDS }
+sub CV_FM_LMEDS_ONLY () { &CV_LMEDS }
+sub CV_FM_RANSAC () { &CV_RANSAC }
+sub CV_FM_RANSAC_ONLY () { &CV_RANSAC }
+sub CV_FONT_BLACK () { 87 }
+sub CV_FONT_BOLD () { 75 }
+sub CV_FONT_DEMIBOLD () { 63 }
+sub CV_FONT_HERSHEY_COMPLEX () { 3 }
+sub CV_FONT_HERSHEY_COMPLEX_SMALL () { 5 }
+sub CV_FONT_HERSHEY_DUPLEX () { 2 }
+sub CV_FONT_HERSHEY_PLAIN () { 1 }
+sub CV_FONT_HERSHEY_SCRIPT_COMPLEX () { 7 }
+sub CV_FONT_HERSHEY_SCRIPT_SIMPLEX () { 6 }
+sub CV_FONT_HERSHEY_SIMPLEX () { 0 }
+sub CV_FONT_HERSHEY_TRIPLEX () { 4 }
+sub CV_FONT_ITALIC () { 16 }
+sub CV_FONT_LIGHT () { 25 }
+sub CV_FONT_NORMAL () { 50 }
+sub CV_FONT_VECTOR0 () { &CV_FONT_HERSHEY_SIMPLEX }
+sub CV_FOURCC_PROMPT () { -1 }
+sub CV_FRONT () { 1 }
+sub CV_GAUSSIAN () { 2 }
+sub CV_GAUSSIAN_5x5 () { 7 }
+sub CV_GEMM_A_T () { 1 }
+sub CV_GEMM_B_T () { 2 }
+sub CV_GEMM_C_T () { 4 }
+sub CV_GLCMDESC_CLUSTERSHADE () { 5 }
+sub CV_GLCMDESC_CLUSTERTENDENCY () { 4 }
+sub CV_GLCMDESC_CONTRAST () { 3 }
+sub CV_GLCMDESC_CORRELATION () { 6 }
+sub CV_GLCMDESC_CORRELATIONINFO1 () { 7 }
+sub CV_GLCMDESC_CORRELATIONINFO2 () { 8 }
+sub CV_GLCMDESC_ENERGY () { 1 }
+sub CV_GLCMDESC_ENTROPY () { 0 }
+sub CV_GLCMDESC_HOMOGENITY () { 2 }
+sub CV_GLCMDESC_MAXIMUMPROBABILITY () { 9 }
+sub CV_GLCMDESC_OPTIMIZATION_ALLOWDOUBLENEST () { 10 }
+sub CV_GLCMDESC_OPTIMIZATION_ALLOWTRIPLENEST () { 11 }
+sub CV_GLCMDESC_OPTIMIZATION_HISTOGRAM () { 4 }
+sub CV_GLCM_ALL () { 0 }
+sub CV_GLCM_DESC () { 2 }
+sub CV_GLCM_GLCM () { 1 }
+sub CV_GLCM_OPTIMIZATION_HISTOGRAM () { 0 }
+sub CV_GLCM_OPTIMIZATION_LUT () { -1 }
+sub CV_GLCM_OPTIMIZATION_NONE () { -2 }
+sub CV_GRAPH () { &CV_SEQ_KIND_GRAPH }
+sub CV_GRAPH_ALL_ITEMS () { -1 }
+sub CV_GRAPH_ANY_EDGE () { 30 }
+sub CV_GRAPH_BACKTRACKING () { 64 }
+sub CV_GRAPH_BACK_EDGE () { 4 }
+sub CV_GRAPH_CROSS_EDGE () { 16 }
+sub CV_GRAPH_FLAG_ORIENTED () { 1 << &CV_SEQ_FLAG_SHIFT }
+sub CV_GRAPH_FORWARD_EDGE () { 8 }
+sub CV_GRAPH_FORWARD_EDGE_FLAG () { 268435456 }
+sub CV_GRAPH_ITEM_VISITED_FLAG () { 1073741824 }
+sub CV_GRAPH_NEW_TREE () { 32 }
+sub CV_GRAPH_OVER () { -1 }
+sub CV_GRAPH_SEARCH_TREE_NODE_FLAG () { 536870912 }
+sub CV_GRAPH_TREE_EDGE () { 2 }
+sub CV_GRAPH_VERTEX () { 1 }
+sub CV_GRAY2BGR () { 8 }
+sub CV_GRAY2BGR555 () { 30 }
+sub CV_GRAY2BGR565 () { 20 }
+sub CV_GRAY2BGRA () { 9 }
+sub CV_GRAY2RGB () { 8 }
+sub CV_GRAY2RGBA () { 9 }
+sub CV_GUI_EXPANDED () { 0 }
+sub CV_GUI_NORMAL () { 16 }
+sub CV_GpuApiCallError () { -217 }
+sub CV_GpuNotSupported () { -216 }
+sub CV_HAAR_DO_CANNY_PRUNING () { 1 }
+sub CV_HAAR_DO_ROUGH_SEARCH () { 8 }
+sub CV_HAAR_FEATURE_MAX () { 3 }
+sub CV_HAAR_FIND_BIGGEST_OBJECT () { 4 }
+sub CV_HAAR_MAGIC_VAL () { 1112539136 }
+sub CV_HAAR_SCALE_IMAGE () { 2 }
+sub CV_HARDWARE_MAX_FEATURE () { 255 }
+sub CV_HIST_ARRAY () { 0 }
+sub CV_HIST_MAGIC_VAL () { 1111818240 }
+sub CV_HIST_RANGES_FLAG () { 2048 }
+sub CV_HIST_SPARSE () { 1 }
+sub CV_HIST_TREE () { &CV_HIST_SPARSE }
+sub CV_HIST_UNIFORM () { 1 }
+sub CV_HIST_UNIFORM_FLAG () { 1024 }
+sub CV_HLS2BGR () { 60 }
+sub CV_HLS2BGR_FULL () { 72 }
+sub CV_HLS2RGB () { 61 }
+sub CV_HLS2RGB_FULL () { 73 }
+sub CV_HOUGH_GRADIENT () { 3 }
+sub CV_HOUGH_MULTI_SCALE () { 2 }
+sub CV_HOUGH_PROBABILISTIC () { 1 }
+sub CV_HOUGH_STANDARD () { 0 }
+sub CV_HSV2BGR () { 54 }
+sub CV_HSV2BGR_FULL () { 70 }
+sub CV_HSV2RGB () { 55 }
+sub CV_HSV2RGB_FULL () { 71 }
+sub CV_HeaderIsNull () { -9 }
+sub CV_IDP_BIRCHFIELD_PARAM1 () { 25 }
+sub CV_IDP_BIRCHFIELD_PARAM2 () { 5 }
+sub CV_IDP_BIRCHFIELD_PARAM3 () { 12 }
+sub CV_IDP_BIRCHFIELD_PARAM4 () { 15 }
+sub CV_IDP_BIRCHFIELD_PARAM5 () { 25 }
+sub CV_IMWRITE_JPEG_QUALITY () { 1 }
+sub CV_IMWRITE_PNG_BILEVEL () { 18 }
+sub CV_IMWRITE_PNG_COMPRESSION () { 16 }
+sub CV_IMWRITE_PNG_STRATEGY () { 17 }
+sub CV_IMWRITE_PNG_STRATEGY_DEFAULT () { 0 }
+sub CV_IMWRITE_PNG_STRATEGY_FILTERED () { 1 }
+sub CV_IMWRITE_PNG_STRATEGY_FIXED () { 4 }
+sub CV_IMWRITE_PNG_STRATEGY_HUFFMAN_ONLY () { 2 }
+sub CV_IMWRITE_PNG_STRATEGY_RLE () { 3 }
+sub CV_IMWRITE_PXM_BINARY () { 32 }
+sub CV_INPAINT_NS () { 0 }
+sub CV_INPAINT_TELEA () { 1 }
+sub CV_INTER_AREA () { 3 }
+sub CV_INTER_CUBIC () { 2 }
+sub CV_INTER_LANCZOS4 () { 4 }
+sub CV_INTER_LINEAR () { 1 }
+sub CV_INTER_NN () { 0 }
+sub CV_ITERATIVE () { 0 }
+sub CV_KMEANS_USE_INITIAL_LABELS () { 1 }
+sub CV_L1 () { 2 }
+sub CV_L2 () { 4 }
+sub CV_LBGR2Lab () { 74 }
+sub CV_LBGR2Luv () { 76 }
+sub CV_LEE_AUTO () { -1 }
+sub CV_LEE_DOUBLE () { 2 }
+sub CV_LEE_ERODE () { 0 }
+sub CV_LEE_FLOAT () { 1 }
+sub CV_LEE_INT () { 0 }
+sub CV_LEE_NON () { 2 }
+sub CV_LEE_ZOOM () { 1 }
+sub CV_LINK_RUNS () { 5 }
+sub CV_LKFLOW_GET_MIN_EIGENVALS () { 8 }
+sub CV_LKFLOW_INITIAL_GUESSES () { 4 }
+sub CV_LKFLOW_PYR_A_READY () { 1 }
+sub CV_LKFLOW_PYR_B_READY () { 2 }
+sub CV_LMEDS () { 4 }
+sub CV_LOAD_IMAGE_ANYCOLOR () { 4 }
+sub CV_LOAD_IMAGE_ANYDEPTH () { 2 }
+sub CV_LOAD_IMAGE_COLOR () { 1 }
+sub CV_LOAD_IMAGE_GRAYSCALE () { 0 }
+sub CV_LOAD_IMAGE_UNCHANGED () { -1 }
+sub CV_LOG2 () { 0.69314718055994528623 }
+sub CV_LRGB2Lab () { 75 }
+sub CV_LRGB2Luv () { 77 }
+sub CV_LU () { 0 }
+sub CV_Lab2BGR () { 56 }
+sub CV_Lab2LBGR () { 78 }
+sub CV_Lab2LRGB () { 79 }
+sub CV_Lab2RGB () { 57 }
+sub CV_Luv2BGR () { 58 }
+sub CV_Luv2LBGR () { 80 }
+sub CV_Luv2LRGB () { 81 }
+sub CV_Luv2RGB () { 59 }
+sub CV_MAGIC_MASK () { 4294901760 }
+sub CV_MAJOR_VERSION () { &CV_VERSION_EPOCH }
+sub CV_MAT32F () { CV_32FC1 }
+sub CV_MAT3x1_32F () { CV_32FC1 }
+sub CV_MAT3x1_64D () { CV_64FC1 }
+sub CV_MAT3x3_32F () { CV_32FC1 }
+sub CV_MAT3x3_64D () { CV_64FC1 }
+sub CV_MAT4x1_32F () { CV_32FC1 }
+sub CV_MAT4x1_64D () { CV_64FC1 }
+sub CV_MAT4x4_32F () { CV_32FC1 }
+sub CV_MAT4x4_64D () { CV_64FC1 }
+sub CV_MAT64D () { CV_64FC1 }
+sub CV_MATND_MAGIC_VAL () { 1111687168 }
+sub CV_MAT_CN_MASK () { &CV_CN_MAX - 1 << &CV_CN_SHIFT }
+sub CV_MAT_CONT_FLAG () { 1 << &CV_MAT_CONT_FLAG_SHIFT }
+sub CV_MAT_CONT_FLAG_SHIFT () { 14 }
+sub CV_MAT_DEPTH_MASK () { &CV_DEPTH_MAX - 1 }
+sub CV_MAT_MAGIC_VAL () { 1111621632 }
+sub CV_MAT_TYPE_MASK () { &CV_DEPTH_MAX * &CV_CN_MAX - 1 }
+sub CV_MAX_ARR () { 10 }
+sub CV_MAX_DIM () { 32 }
+sub CV_MAX_DIM_HEAP () { 1024 }
+sub CV_MAX_SOBEL_KSIZE () { 7 }
+sub CV_MEDIAN () { 3 }
+sub CV_MINMAX () { 32 }
+sub CV_MINOR_VERSION () { &CV_VERSION_MAJOR }
+sub CV_MOP_BLACKHAT () { 6 }
+sub CV_MOP_CLOSE () { 3 }
+sub CV_MOP_DILATE () { 1 }
+sub CV_MOP_ERODE () { 0 }
+sub CV_MOP_GRADIENT () { 4 }
+sub CV_MOP_OPEN () { 2 }
+sub CV_MOP_TOPHAT () { 5 }
+sub CV_MaskIsTiled () { -26 }
+sub CV_NEXT_AROUND_DST () { 34 }
+sub CV_NEXT_AROUND_LEFT () { 19 }
+sub CV_NEXT_AROUND_ORG () { 0 }
+sub CV_NEXT_AROUND_RIGHT () { 49 }
+sub CV_NODE_EMPTY () { 32 }
+sub CV_NODE_FLOAT () { &CV_NODE_REAL }
+sub CV_NODE_FLOW () { 8 }
+sub CV_NODE_INT () { 1 }
+sub CV_NODE_INTEGER () { &CV_NODE_INT }
+sub CV_NODE_MAP () { 6 }
+sub CV_NODE_NAMED () { 64 }
+sub CV_NODE_NONE () { 0 }
+sub CV_NODE_REAL () { 2 }
+sub CV_NODE_REF () { 4 }
+sub CV_NODE_SEQ () { 5 }
+sub CV_NODE_SEQ_SIMPLE () { 256 }
+sub CV_NODE_STR () { 3 }
+sub CV_NODE_STRING () { &CV_NODE_STR }
+sub CV_NODE_TYPE_MASK () { 7 }
+sub CV_NODE_USER () { 16 }
+sub CV_NOISE_GAUSSIAN () { 1 }
+sub CV_NOISE_NONE () { 0 }
+sub CV_NOISE_SALT_AND_PEPPER () { 4 }
+sub CV_NOISE_SPECKLE () { 3 }
+sub CV_NOISE_UNIFORM () { 2 }
+sub CV_NORMAL () { 16 }
+sub CV_NORM_MASK () { 7 }
+sub CV_NOT_WEIGHTED () { 0 }
+sub CV_NO_CN_CHECK () { 2 }
+sub CV_NO_DEPTH_CHECK () { 1 }
+sub CV_NO_SIZE_CHECK () { 4 }
+sub CV_NUM_FACE_ELEMENTS () { 3 }
+sub CV_ORIENTED_GRAPH () { &CV_SEQ_KIND_GRAPH | &CV_GRAPH_FLAG_ORIENTED }
+sub CV_OpenGlApiCallError () { -219 }
+sub CV_OpenGlNotSupported () { -218 }
+sub CV_P3P () { 2 }
+sub CV_PCA_DATA_AS_COL () { 1 }
+sub CV_PCA_DATA_AS_ROW () { 0 }
+sub CV_PCA_USE_AVG () { 2 }
+sub CV_PI () { 3.141592653589793116 }
+sub CV_POLY_APPROX_DP () { 0 }
+sub CV_PREV_AROUND_DST () { 51 }
+sub CV_PREV_AROUND_LEFT () { 32 }
+sub CV_PREV_AROUND_ORG () { 17 }
+sub CV_PREV_AROUND_RIGHT () { 2 }
+sub CV_PTLOC_ERROR () { -2 }
+sub CV_PTLOC_INSIDE () { 0 }
+sub CV_PTLOC_ON_EDGE () { 2 }
+sub CV_PTLOC_OUTSIDE_RECT () { -1 }
+sub CV_PTLOC_VERTEX () { 1 }
+sub CV_PUSH_BUTTON () { 0 }
+sub CV_QR () { 4 }
+sub CV_RADIOBOX () { 2 }
+sub CV_RAND_NORMAL () { 1 }
+sub CV_RAND_UNI () { 0 }
+sub CV_RANSAC () { 8 }
+sub CV_REDUCE_AVG () { 1 }
+sub CV_REDUCE_MAX () { 2 }
+sub CV_REDUCE_MIN () { 3 }
+sub CV_REDUCE_SUM () { 0 }
+sub CV_RELATIVE () { 8 }
+sub CV_RELATIVE_C () { &CV_RELATIVE | &CV_C }
+sub CV_RELATIVE_L1 () { &CV_RELATIVE | &CV_L1 }
+sub CV_RELATIVE_L2 () { &CV_RELATIVE | &CV_L2 }
+sub CV_RETR_CCOMP () { 2 }
+sub CV_RETR_EXTERNAL () { 0 }
+sub CV_RETR_FLOODFILL () { 4 }
+sub CV_RETR_LIST () { 1 }
+sub CV_RETR_TREE () { 3 }
+sub CV_RGB2BGR () { 4 }
+sub CV_RGB2BGR555 () { 23 }
+sub CV_RGB2BGR565 () { 13 }
+sub CV_RGB2BGRA () { 2 }
+sub CV_RGB2GRAY () { 7 }
+sub CV_RGB2HLS () { 53 }
+sub CV_RGB2HLS_FULL () { 69 }
+sub CV_RGB2HSV () { 41 }
+sub CV_RGB2HSV_FULL () { 67 }
+sub CV_RGB2Lab () { 45 }
+sub CV_RGB2Luv () { 51 }
+sub CV_RGB2RGBA () { 0 }
+sub CV_RGB2XYZ () { 33 }
+sub CV_RGB2YCrCb () { 37 }
+sub CV_RGB2YUV () { 83 }
+sub CV_RGB2YUV_I420 () { 127 }
+sub CV_RGB2YUV_IYUV () { 127 }
+sub CV_RGB2YUV_YV12 () { 131 }
+sub CV_RGBA2BGR () { 3 }
+sub CV_RGBA2BGR555 () { 27 }
+sub CV_RGBA2BGR565 () { 17 }
+sub CV_RGBA2BGRA () { 5 }
+sub CV_RGBA2GRAY () { 11 }
+sub CV_RGBA2RGB () { 1 }
+sub CV_RGBA2YUV_I420 () { 129 }
+sub CV_RGBA2YUV_IYUV () { 129 }
+sub CV_RGBA2YUV_YV12 () { 133 }
+sub CV_RGBA2mRGBA () { 125 }
+sub CV_RNG_COEFF () { 4164903690 }
+sub CV_RODRIGUES_M2V () { 0 }
+sub CV_RODRIGUES_V2M () { 1 }
+sub CV_SCHARR () { -1 }
+sub CV_SEQ_CHAIN () { &CV_SEQ_KIND_CURVE | &CV_SEQ_ELTYPE_CODE }
+sub CV_SEQ_CHAIN_CONTOUR () { &CV_SEQ_FLAG_CLOSED | &CV_SEQ_CHAIN }
+sub CV_SEQ_CONNECTED_COMP () { &CV_SEQ_KIND_GENERIC | &CV_SEQ_ELTYPE_CONNECTED_COMP }
+sub CV_SEQ_CONTOUR () { &CV_SEQ_POLYGON }
+sub CV_SEQ_ELTYPE_BITS () { 12 }
+sub CV_SEQ_ELTYPE_CODE () { &CV_8UC1 }
+sub CV_SEQ_ELTYPE_CONNECTED_COMP () { 0 }
+sub CV_SEQ_ELTYPE_GENERIC () { 0 }
+sub CV_SEQ_ELTYPE_GRAPH_EDGE () { 0 }
+sub CV_SEQ_ELTYPE_GRAPH_VERTEX () { 0 }
+sub CV_SEQ_ELTYPE_INDEX () { &CV_32SC1 }
+sub CV_SEQ_ELTYPE_MASK () { (1 << &CV_SEQ_ELTYPE_BITS) - 1 }
+sub CV_SEQ_ELTYPE_POINT () { &CV_32SC2 }
+sub CV_SEQ_ELTYPE_POINT3D () { &CV_32FC3 }
+sub CV_SEQ_ELTYPE_PPOINT () { &CV_SEQ_ELTYPE_PTR }
+sub CV_SEQ_ELTYPE_PTR () { &CV_USRTYPE1 }
+sub CV_SEQ_ELTYPE_TRIAN_ATR () { 0 }
+sub CV_SEQ_FLAG_CLOSED () { 1 << &CV_SEQ_FLAG_SHIFT }
+sub CV_SEQ_FLAG_CONVEX () { 0 << &CV_SEQ_FLAG_SHIFT }
+sub CV_SEQ_FLAG_HOLE () { 2 << &CV_SEQ_FLAG_SHIFT }
+sub CV_SEQ_FLAG_SHIFT () { &CV_SEQ_KIND_BITS + &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_FLAG_SIMPLE () { 0 << &CV_SEQ_FLAG_SHIFT }
+sub CV_SEQ_INDEX () { &CV_SEQ_KIND_GENERIC | &CV_SEQ_ELTYPE_INDEX }
+sub CV_SEQ_KIND_BIN_TREE () { 2 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_KIND_BITS () { 2 }
+sub CV_SEQ_KIND_CURVE () { 1 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_KIND_GENERIC () { 0 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_KIND_GRAPH () { 1 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_KIND_MASK () { (1 << &CV_SEQ_KIND_BITS) - 1 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_KIND_SUBDIV2D () { 2 << &CV_SEQ_ELTYPE_BITS }
+sub CV_SEQ_MAGIC_VAL () { 1117323264 }
+sub CV_SEQ_POINT3D_SET () { &CV_SEQ_KIND_GENERIC | &CV_SEQ_ELTYPE_POINT3D }
+sub CV_SEQ_POINT_SET () { &CV_SEQ_KIND_GENERIC | &CV_SEQ_ELTYPE_POINT }
+sub CV_SEQ_POLYGON () { &CV_SEQ_FLAG_CLOSED | &CV_SEQ_POLYLINE }
+sub CV_SEQ_POLYGON_TREE () { &CV_SEQ_KIND_BIN_TREE | &CV_SEQ_ELTYPE_TRIAN_ATR }
+sub CV_SEQ_POLYLINE () { &CV_SEQ_KIND_CURVE | &CV_SEQ_ELTYPE_POINT }
+sub CV_SEQ_SIMPLE_POLYGON () { &CV_SEQ_FLAG_SIMPLE | &CV_SEQ_POLYGON }
+sub CV_SET_ELEM_IDX_MASK () { 67108863 }
+sub CV_SET_MAGIC_VAL () { 1117257728 }
+sub CV_SHAPE_CROSS () { 1 }
+sub CV_SHAPE_CUSTOM () { 100 }
+sub CV_SHAPE_ELLIPSE () { 2 }
+sub CV_SHAPE_RECT () { 0 }
+sub CV_SHIFT_DOWN () { 10 }
+sub CV_SHIFT_LD () { 9 }
+sub CV_SHIFT_LEFT () { 1 }
+sub CV_SHIFT_LU () { 5 }
+sub CV_SHIFT_NONE () { 2 }
+sub CV_SHIFT_RD () { 11 }
+sub CV_SHIFT_RIGHT () { 3 }
+sub CV_SHIFT_RU () { 7 }
+sub CV_SHIFT_UP () { 6 }
+sub CV_SORT_ASCENDING () { 0 }
+sub CV_SORT_DESCENDING () { 16 }
+sub CV_SORT_EVERY_COLUMN () { 1 }
+sub CV_SORT_EVERY_ROW () { 0 }
+sub CV_SPARSE_MAT_MAGIC_VAL () { 1111752704 }
+sub CV_STEREO_BM_BASIC () { 0 }
+sub CV_STEREO_BM_FISH_EYE () { 1 }
+sub CV_STEREO_BM_NARROW () { 2 }
+sub CV_STEREO_BM_NORMALIZED_RESPONSE () { 0 }
+sub CV_STEREO_BM_XSOBEL () { 1 }
+sub CV_STORAGE_APPEND () { 2 }
+sub CV_STORAGE_FORMAT_AUTO () { 0 }
+sub CV_STORAGE_FORMAT_MASK () { 56 }
+sub CV_STORAGE_FORMAT_XML () { 8 }
+sub CV_STORAGE_FORMAT_YAML () { 16 }
+sub CV_STORAGE_MAGIC_VAL () { 1116274688 }
+sub CV_STORAGE_MEMORY () { 4 }
+sub CV_STORAGE_READ () { 0 }
+sub CV_STORAGE_WRITE () { 1 }
+sub CV_STORAGE_WRITE_BINARY () { &CV_STORAGE_WRITE }
+sub CV_STORAGE_WRITE_TEXT () { &CV_STORAGE_WRITE }
+sub CV_STYLE_ITALIC () { 1 }
+sub CV_STYLE_NORMAL () { 0 }
+sub CV_STYLE_OBLIQUE () { 2 }
+sub CV_SUBDIV2D_VIRTUAL_POINT_FLAG () { 1073741824 }
+sub CV_SUBMAT_FLAG () { 1 << &CV_SUBMAT_FLAG_SHIFT }
+sub CV_SUBMAT_FLAG_SHIFT () { 15 }
+sub CV_SUBMINOR_VERSION () { &CV_VERSION_MINOR }
+sub CV_SVD () { 1 }
+sub CV_SVD_MODIFY_A () { 1 }
+sub CV_SVD_SYM () { 2 }
+sub CV_SVD_U_T () { 2 }
+sub CV_SVD_V_T () { 4 }
+sub CV_StsAssert () { -215 }
+sub CV_StsAutoTrace () { -8 }
+sub CV_StsBackTrace () { -1 }
+sub CV_StsBadArg () { -5 }
+sub CV_StsBadFlag () { -206 }
+sub CV_StsBadFunc () { -6 }
+sub CV_StsBadMask () { -208 }
+sub CV_StsBadMemBlock () { -214 }
+sub CV_StsBadPoint () { -207 }
+sub CV_StsBadSize () { -201 }
+sub CV_StsDivByZero () { -202 }
+sub CV_StsError () { -2 }
+sub CV_StsFilterOffsetErr () { -31 }
+sub CV_StsFilterStructContentErr () { -29 }
+sub CV_StsInplaceNotSupported () { -203 }
+sub CV_StsInternal () { -3 }
+sub CV_StsKernelStructContentErr () { -30 }
+sub CV_StsNoConv () { -7 }
+sub CV_StsNoMem () { -4 }
+sub CV_StsNotImplemented () { -213 }
+sub CV_StsNullPtr () { -27 }
+sub CV_StsObjectNotFound () { -204 }
+sub CV_StsOk () { 0 }
+sub CV_StsOutOfRange () { -211 }
+sub CV_StsParseError () { -212 }
+sub CV_StsUnmatchedFormats () { -205 }
+sub CV_StsUnmatchedSizes () { -209 }
+sub CV_StsUnsupportedFormat () { -210 }
+sub CV_StsVecLengthErr () { -28 }
+sub CV_TERMCRIT_EPS () { 2 }
+sub CV_TERMCRIT_ITER () { 1 }
+sub CV_TERMCRIT_NUMBER () { &CV_TERMCRIT_ITER }
+sub CV_THRESH_BINARY () { 0 }
+sub CV_THRESH_BINARY_INV () { 1 }
+sub CV_THRESH_MASK () { 7 }
+sub CV_THRESH_OTSU () { 8 }
+sub CV_THRESH_TOZERO () { 3 }
+sub CV_THRESH_TOZERO_INV () { 4 }
+sub CV_THRESH_TRUNC () { 2 }
+sub CV_TM_CCOEFF () { 4 }
+sub CV_TM_CCOEFF_NORMED () { 5 }
+sub CV_TM_CCORR () { 2 }
+sub CV_TM_CCORR_NORMED () { 3 }
+sub CV_TM_SQDIFF () { 0 }
+sub CV_TM_SQDIFF_NORMED () { 1 }
+sub CV_TYPE_NAME_GRAPH () { 'opencv-graph' }
+sub CV_TYPE_NAME_HAAR () { 'opencv-haar-classifier' }
+sub CV_TYPE_NAME_IMAGE () { 'opencv-image' }
+sub CV_TYPE_NAME_MAT () { 'opencv-matrix' }
+sub CV_TYPE_NAME_MATND () { 'opencv-nd-matrix' }
+sub CV_TYPE_NAME_SEQ () { 'opencv-sequence' }
+sub CV_TYPE_NAME_SEQ_TREE () { 'opencv-sequence-tree' }
+sub CV_TYPE_NAME_SPARSE_MAT () { 'opencv-sparse-matrix' }
+sub CV_TYZX_COLOR () { 402 }
+sub CV_TYZX_LEFT () { 400 }
+sub CV_TYZX_RIGHT () { 401 }
+sub CV_TYZX_Z () { 403 }
+sub CV_UNDEF_SC_PARAM () { 12345 }
+sub CV_USRTYPE1 () { 7 }
+sub CV_VALUE () { 1 }
+sub CV_VERSION_EPOCH () { 2 }
+sub CV_VERSION_MAJOR () { 4 }
+sub CV_VERSION_MINOR () { 5 }
+sub CV_VERSION_REVISION () { 0 }
+sub CV_WARP_FILL_OUTLIERS () { 8 }
+sub CV_WARP_INVERSE_MAP () { 16 }
+sub CV_WARP_TO_CAMERA () { 2 }
+sub CV_WEIGHTED_ALL () { 3 }
+sub CV_WEIGHTED_EDGE () { 2 }
+sub CV_WEIGHTED_VTX () { 1 }
+sub CV_WHOLE_ARR () { &cvSlice(0, 1073741823) }
+sub CV_WHOLE_SEQ () { &cvSlice(0, &CV_WHOLE_SEQ_END_INDEX) }
+sub CV_WHOLE_SEQ_END_INDEX () { 1073741823 }
+sub CV_WINDOW_AUTOSIZE () { 1 }
+sub CV_WINDOW_FREERATIO () { 256 }
+sub CV_WINDOW_FULLSCREEN () { 1 }
+sub CV_WINDOW_KEEPRATIO () { 0 }
+sub CV_WINDOW_NORMAL () { 0 }
+sub CV_WINDOW_OPENGL () { 4096 }
+sub CV_WND_PROP_ASPECTRATIO () { 2 }
+sub CV_WND_PROP_AUTOSIZE () { 1 }
+sub CV_WND_PROP_FULLSCREEN () { 0 }
+sub CV_WND_PROP_OPENGL () { 3 }
+sub CV_XYZ2BGR () { 34 }
+sub CV_XYZ2RGB () { 35 }
+sub CV_YCrCb2BGR () { 38 }
+sub CV_YCrCb2RGB () { 39 }
+sub CV_YUV2BGR () { 84 }
+sub CV_YUV2BGRA_I420 () { 105 }
+sub CV_YUV2BGRA_IYUV () { 105 }
+sub CV_YUV2BGRA_NV12 () { 95 }
+sub CV_YUV2BGRA_NV21 () { 97 }
+sub CV_YUV2BGRA_UYNV () { 112 }
+sub CV_YUV2BGRA_UYVY () { 112 }
+sub CV_YUV2BGRA_Y422 () { 112 }
+sub CV_YUV2BGRA_YUNV () { 120 }
+sub CV_YUV2BGRA_YUY2 () { 120 }
+sub CV_YUV2BGRA_YUYV () { 120 }
+sub CV_YUV2BGRA_YV12 () { 103 }
+sub CV_YUV2BGRA_YVYU () { 122 }
+sub CV_YUV2BGR_I420 () { 101 }
+sub CV_YUV2BGR_IYUV () { 101 }
+sub CV_YUV2BGR_NV12 () { 91 }
+sub CV_YUV2BGR_NV21 () { 93 }
+sub CV_YUV2BGR_UYNV () { 108 }
+sub CV_YUV2BGR_UYVY () { 108 }
+sub CV_YUV2BGR_Y422 () { 108 }
+sub CV_YUV2BGR_YUNV () { 116 }
+sub CV_YUV2BGR_YUY2 () { 116 }
+sub CV_YUV2BGR_YUYV () { 116 }
+sub CV_YUV2BGR_YV12 () { 99 }
+sub CV_YUV2BGR_YVYU () { 118 }
+sub CV_YUV2GRAY_420 () { 106 }
+sub CV_YUV2GRAY_I420 () { 106 }
+sub CV_YUV2GRAY_IYUV () { 106 }
+sub CV_YUV2GRAY_NV12 () { 106 }
+sub CV_YUV2GRAY_NV21 () { 106 }
+sub CV_YUV2GRAY_UYNV () { 123 }
+sub CV_YUV2GRAY_UYVY () { 123 }
+sub CV_YUV2GRAY_Y422 () { 123 }
+sub CV_YUV2GRAY_YUNV () { 124 }
+sub CV_YUV2GRAY_YUY2 () { 124 }
+sub CV_YUV2GRAY_YUYV () { 124 }
+sub CV_YUV2GRAY_YV12 () { 106 }
+sub CV_YUV2GRAY_YVYU () { 124 }
+sub CV_YUV2RGB () { 85 }
+sub CV_YUV2RGBA_I420 () { 104 }
+sub CV_YUV2RGBA_IYUV () { 104 }
+sub CV_YUV2RGBA_NV12 () { 94 }
+sub CV_YUV2RGBA_NV21 () { 96 }
+sub CV_YUV2RGBA_UYNV () { 111 }
+sub CV_YUV2RGBA_UYVY () { 111 }
+sub CV_YUV2RGBA_Y422 () { 111 }
+sub CV_YUV2RGBA_YUNV () { 119 }
+sub CV_YUV2RGBA_YUY2 () { 119 }
+sub CV_YUV2RGBA_YUYV () { 119 }
+sub CV_YUV2RGBA_YV12 () { 102 }
+sub CV_YUV2RGBA_YVYU () { 121 }
+sub CV_YUV2RGB_I420 () { 100 }
+sub CV_YUV2RGB_IYUV () { 100 }
+sub CV_YUV2RGB_NV12 () { 90 }
+sub CV_YUV2RGB_NV21 () { 92 }
+sub CV_YUV2RGB_UYNV () { 107 }
+sub CV_YUV2RGB_UYVY () { 107 }
+sub CV_YUV2RGB_Y422 () { 107 }
+sub CV_YUV2RGB_YUNV () { 115 }
+sub CV_YUV2RGB_YUY2 () { 115 }
+sub CV_YUV2RGB_YUYV () { 115 }
+sub CV_YUV2RGB_YV12 () { 98 }
+sub CV_YUV2RGB_YVYU () { 117 }
+sub CV_YUV420p2BGR () { 99 }
+sub CV_YUV420p2BGRA () { 103 }
+sub CV_YUV420p2GRAY () { 106 }
+sub CV_YUV420p2RGB () { 98 }
+sub CV_YUV420p2RGBA () { 102 }
+sub CV_YUV420sp2BGR () { 93 }
+sub CV_YUV420sp2BGRA () { 97 }
+sub CV_YUV420sp2GRAY () { 106 }
+sub CV_YUV420sp2RGB () { 92 }
+sub CV_YUV420sp2RGBA () { 96 }
+sub CV_mRGBA2RGBA () { 126 }
+sub IPL_BORDER_CONSTANT () { 0 }
+sub IPL_BORDER_REFLECT () { 2 }
+sub IPL_BORDER_REFLECT_101 () { 4 }
+sub IPL_BORDER_REPLICATE () { 1 }
+sub IPL_BORDER_TRANSPARENT () { 5 }
+sub IPL_BORDER_WRAP () { 3 }
+sub IPL_DATA_ORDER_PIXEL () { 0 }
+sub IPL_DATA_ORDER_PLANE () { 1 }
+sub IPL_DEPTH_16S () { &IPL_DEPTH_SIGN | 16 }
+sub IPL_DEPTH_16U () { 16 }
+sub IPL_DEPTH_1U () { 1 }
+sub IPL_DEPTH_32F () { 32 }
+sub IPL_DEPTH_32S () { &IPL_DEPTH_SIGN | 32 }
+sub IPL_DEPTH_64F () { 64 }
+sub IPL_DEPTH_8S () { &IPL_DEPTH_SIGN | 8 }
+sub IPL_DEPTH_8U () { 8 }
+sub IPL_DEPTH_SIGN () { 2147483648 }
+sub IPL_GAUSSIAN_5x5 () { 7 }
+sub IPL_IMAGE_DATA () { 2 }
+sub IPL_IMAGE_HEADER () { 1 }
+sub IPL_IMAGE_ROI () { 4 }
+sub IPL_ORIGIN_BL () { 1 }
+sub IPL_ORIGIN_TL () { 0 }
+
+require Exporter;
+
+our @ISA = qw(Exporter);
+
+our %EXPORT_TAGS = (
+	'all' => [ grep { /^(IPL|CV)/ && !/VERSION/ } keys %Cv::Constant:: ],
+	);
+
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+our @EXPORT = ( );
+
+1;

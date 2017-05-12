@@ -1,0 +1,11 @@
+Build.PL
+ChangeLog
+lib/CGI/Alert.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/01basic.t
+t/02hide.t
+t/03http_die.t

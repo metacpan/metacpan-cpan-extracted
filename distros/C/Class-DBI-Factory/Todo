@@ -1,0 +1,27 @@
+to do list for Perl extension Class::DBI::Factory.
+
+* Handler base class that works transparently with mod_perls 1 and 2
+
+* Authentication base class
+
+* Independence from libapreq
+
+* better shorter docs
+
+* wiki & mailing list
+
+* proper debugging hooks
+  - in 0.73
+
+* proper exception-handling and bailing-out mechanism that respects 
+  apache configuration and plays nicely with downstream handlers
+  - in 0.8
+
+* spring cleaning
+  - in 0.99
+
+* Makefile installation of demo app
+  - in 0.994
+
+* mod_perl2 version of Handler
+  - in 0.994

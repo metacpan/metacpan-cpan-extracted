@@ -1,0 +1,9 @@
+[Unit]
+Description=Socket for Gmail IMAP tunnel
+
+[Install]
+WantedBy=sockets.target
+
+[Socket]
+ListenStream=9995
+Accept=1

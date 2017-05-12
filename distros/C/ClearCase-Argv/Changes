@@ -1,0 +1,378 @@
+Revision history for Perl extension ClearCase::Argv.
+
+0.01  Thu Sep  2 17:38:37 1999
+	- A simple subclass of the Argv module for cleartool-
+	  specific use.
+
+0.10  Tue Nov 16 18:00:33 EST 1999
+	- added integration with Argv->ipc_childsafe (allows
+	  IPC::ClearTool to be used for speed).
+
+0.12  Wed Dec  8 22:45:07 EST 1999
+	- Added hacks required to get $obj->comment method working.
+	  This works around a flaw in cleartool quoting rules such that
+	  there's no way to specify a multiline comment on the
+	  command line, in interactive mode. The workaround is to
+	  now use $obj->comment("my multi-\nline comment here").
+	  This hack is only needed in "ipc mode" but is supported
+	  in regular mode as well for consistency.
+
+0.13 Wed Dec 22 13:12:37 EST 1999
+	- New README.html/pod overview document.
+
+0.14 Tue Jan  4 10:20:15 EST 2000
+	- Some syntax mods to track Argv cleanup.
+
+0.15 Mon Jan 10 11:33:07 EST 2000
+	- First public release.
+
+0.16 Fri Jan 14 17:45:23 EST 2000
+	- Added ccqv() alias to ccqx() for consistency.
+
+0.17 Sun Jan 16 21:19:19 EST 2000
+	- Clean up, add comments, more POD sections.
+	- Track similar cleanups in Argv 0.46.
+
+0.18 Tue Jan 18 08:28:38 EST 2000
+	- Improved behavior in setuid/root case, cleaned up PATH setting
+
+0.19 Tue Feb  1 09:51:54 EST 2000
+	INCOMPATIBLE CHANGES:
+	- Renamed ccsystem() et al to ctsystem() et al.
+	  Apologies to anyone inconvenienced but my hope is that
+	  the module is still young enough that nobody's depending
+	  heavily on it. The new names are more in line with their
+	  semantics (they prepend 'cleartool') and this frees up future
+	  namespace for possible 'mtsystem()' or whatever.
+	- Renamed 'systemxargs' to 'syxargs'.
+	- Renamed 'pathnorm' to 'inpathnorm', and added
+	  an 'outpathnorm' method as well.
+	- Renamed 'cmd' method to 'argv' (to avoid confusion
+	  with the $self->ipc_cleartool->cmd() method).
+	OTHER CHANGES:
+	- Added ->syfail and ->qxfail attributes.
+	- Allow hashref attr specifiers to have a leading '-'.
+	- Modified the ipc_cleartool method to return the underlying
+	  ChildSafe object when called with no args and a non-void context.
+
+0.20 Wed Feb  2 14:53:50 EST 2000
+	- Cleaned up ipc_cleartool/Win32 error handling from COM object.
+
+0.21 Thu Feb 10 22:54:32 EST 2000
+	- Fixed typo in previous (affected only 'comment' method).
+	- Fixed 'comment' method to stop piling up -cq flags.
+
+0.23 Wed May 31 15:43:08 EDT 2000
+	- Bugfix: allow single-string commands to manipulate
+	  files matching /.*cleartool.*/ without it being mistaken
+	  for a command prefix.
+	- Fixed spurious warning.
+
+0.24 Fri Aug  4 14:37:07 EDT 2000
+	- Changed the test script to abort more gracefully (exit 0)
+	  if not run within a VOB.
+	- Require Argv 0.53 (no particular reason).
+
+0.25 Sat Dec  9 23:16:25 EST 2000
+	- Scripts in ./examples had drifted out of alignment with module,
+	  as reported by Martina Riedel.
+
+0.26 Fri Apr  6 11:24:16 EDT 2001
+	- Minor improvements to documentation.
+
+----------------------------------------------------------------------------
+
+1.00 Sat Aug 25 10:14:16 EDT 2001
+	= Test Env: Solaris8/Win2KSP2/Perl5.6/CC4.2
+	- Recognizing that the API has reached maturity,
+	  I've moved the version to indicate a released state.
+	  I'll try hard to stay compatible with 1.00 in
+	  subsequent releases.
+
+1.02 Tue Sep 25 11:16:37 EDT 2001
+	- Subclass Argv->outpathnorm attribute (to change \ to / after @@).
+	- Removed stdopts() backward compatibility alias
+
+1.06 Fri Dec 21 07:50:06 EST 2001
+	= Test Env: Solaris8/Win2KSP2/Perl5.6.1/CC5.0
+	- Added support for CtCmd.
+	- Require use of Argv 1.06 since there are a couple
+	  significant bugfixes there.
+
+1.07 Sun Jan 13 22:24:55 EST 2002
+	- Work around the spurious "bad free" warning emitted by CtCmd
+	  (not clear whether the bug is in Perl, CtCmd, or Solaris
+	  but in any case we suppress it here with a scoping hack).
+
+1.08 Fri Apr 12 12:43:19 EDT 2002
+	- Added ->purpose method subclass (see Argv 1.08+ PODs).
+	  Extends Argv->purpose to allow a value of 'auto'.
+	- The CtCmd module (see) was renamed to ClearCase::CtCmd,
+	  necessitating a renaming of its uses here.
+
+1.09 Mon Apr 15 07:24:35 EDT 2002
+	- Fixed a versioning typo. The previous version was incorrectly
+	  requiring a version of 'Argv' (1.08) which wasn't yet
+	  released. This was just a finger fumble.
+
+1.10 Sun Apr 21 12:22:31 EDT 2002
+	- The integration of ClearCase::Argv and ClearCase::CtCmd
+	  didn't work with ClearCase::CtCmd 1.00 due to a bug.
+	  The bug was fixed in CtCmd 1.01; this version simply
+	  indicates that fact by requiring CtCmd 1.01.
+	- Added a :functional tag for completeness.
+
+1.11 Wed May  8 16:49:48 EDT 2002
+	- Modified quoting code to fix bugs in IPC::ClearTool mode.
+
+1.12 Fri May 10 11:32:52 EDT 2002
+	- Added a README for example section
+	- Corrected PREREQ_PM to match actual requirements.
+	- Functionally identical to 1.11.
+
+1.14 Tue May 21 13:29:20 EDT 2002
+	- Added new sample scripts to ./examples/ctcmd area
+	- Renamed ->ipc_cleartool() to ->ipc(), leaving an alias
+	- Allow automatic switching between ipc and ctcmd modes
+	- NEW FEATURE: incorporates ClearCase::CtCmd fallback
+	  functionality. If CtCmd is not installed on Windows,
+	  ClearCase::Argv is now capable of sending commands
+	  directly to CAL. See POD for details.
+
+1.15 Thu Jul 18 12:27:46 EDT 2002
+	- Improved default for ->ctcmd() method in void context
+	  (now same as specifying 2).
+	- Added ->fork-exec method (syntactic sugar to let you make
+	  it clear that you aren't using ->ctcmd or ->ipc modes).
+	- Fixed bug involving ->stdout(0) and ->ctcmd mode.
+	- Added scripts to benchmark fork/exec vs ctcmd modes.
+
+1.16 Tue Sep  3 12:28:43 EDT 2002
+	- Improved CtCmd benchmark scripts.
+
+1.17 Sun Apr 27 10:12:51 EDT 2003
+	- Added some sample scripts to the ./examples dir.
+
+1.18 Tue Jul 22 10:37:12 EDT 2003
+	- Fixed contact data.
+
+1.19 Mon Mar 14 11:10:26 EST 2005
+	- Allow ->stdout() and ->stderr() to specify any EXPR
+	  which is valid to open(), e.g. ->stdout(">>/tmp/foo");
+
+1.20 Sun May  1 09:53:01 EDT 2005
+	- Fixes to deal with new deprecations involving AUTOLOAD
+	  in Perl 5.8.*.
+	- Removed overrides of system/exec/qv - too confusing and I
+	  don't believe they ever worked right or were used by anyone.
+	  You can still get the Argv (as opposed to ClearCase::Argv)
+	  overrides of these.
+
+1.21 Tue Oct 24 14:38:10 EDT 2006
+	- Contributions from Kenneth Olving:
+	-   Added overload of the Argv->pipe method
+	-   Added test code for ->pipe.
+	-   Updated docs.
+	- Now requires Argv 1.16.
+
+1.22 Fri Oct 27 10:05:35 EDT 2006
+	- Attempt to work around CPAN indexer complaint by
+	  tweaking version numbers.
+
+1.23 Sun Oct 29 22:24:53 EST 2006
+	- Bugfix to recent ->pipe code changes.
+
+1.24 Wed Dec 27 11:26:52 EST 2006
+	- No change - dealing with CPAN versioning mistake.
+
+1.25 Tue Jul 31 16:44:44 EDT 2007
+	- Significant change - removed dependence on IPC::ClearTool.
+	  Still implements the same IPC interface but now using
+	  pure perl. There may be some differences in quoting
+	  behavior in edge cases - time will tell. One known but
+	  minor incompatibility is that the method formerly
+	  known as ->ipc_cleartool() and often abbreviated as
+	  ->ipc() is now known only as ->ipc(). The long name
+	  is no longer valid. On the other hand, signal handling
+	  ought to be more normal because there's no longer any
+	  messing around with process groups and sessions as was
+	  present in the XS code of IPC::ClearTool.
+	- Minor speedup - the ->ctcmd method was loading CtCmd
+	  even when used only to check whether CtCmd was in use. It
+	  is now loaded only if it plans to use it. This is significant
+	  because CtCmd in turn loads a large number of DLLs.
+
+1.26 Fri Sep 14 10:03:40 EDT 2007
+	- Fixed Windows bugs reported by James Anderson.
+	  Bugs remain, particularly in the area of quoting for
+	  IPC mode on Windows, but this version is released
+	  because it is far better on Windows than the previous.
+
+1.27 Wed Sep 19 09:54:43 EDT 2007
+	- Fixed more Windows bugs reported by James Anderson.
+	  - The $self->ctcmd method continued to return true even
+	    after ctcmd mode was turned off.
+	  - Quoting of arguments containing whitespace was improved
+	    in IPC mode.
+
+1.27a Tue Apr  1 17:14:30 BST 2008
+	- Reference count on co-process pid, and sharing
+	- Fixed the DOWN and BACK globs after cloning
+
+1.28 Sun Apr 13 21:23:07 BST 2008
+	- Invoking cleartool from the path computed previously
+	- Support in ipc a cleartool output not ending in a newline
+	- The autochomp mode shouldn't affect calls via system method
+	- Piping requires a dedicatd co-process and special cleanup
+
+1.29 Mon Apr 14 21:21:14 BST 2008
+	- Fix to pid reference counting
+	- Overloaded CORE::chdir
+
+1.30 Wed Apr 16 09:13:42 BST 2008
+	- More fixes to reference counting. Avoid creating an IPC
+	  substructure by side-effect.
+	- chdir also works as member in ipc object with distinct process
+
+1.31 Thu Apr 17 20:05:08 BST 2008
+	- pipe: reverting temporarily to fork model from ipc as well
+	- added 2 tests with independent cleartool processes
+
+1.32 Sun Apr 27 20:41:14 BST 2008
+	- Reverted to plain cleartool, simulating -status, to work around bug
+	- Added a setview test in ipc mode to verify the result
+	- Removed dead code in _ipc_cmd, once pipe uses fork
+	- When inserting $ct in prog, to use the fork mode, parse cmd into list
+	- Added quoting tests; commented those failing for imported reasons
+	- Fixed stdout(0) in ipc mode.
+
+1.33 Mon Apr 28 12:27:24 BST 2008
+	- ctcmd(0) sets CCAV_CTCMD to 0 in Windows, under CAL
+	- Skipped setview test on Windows
+	- Windows: all paths in test through outpathnorm for comparison
+
+1.34 Tue May  6 11:53:54 GMTDT 2008
+	- Avoid printing empty stdout in error case with CAL on Windows.
+
+1.35 Sun Jun  8 15:08:17 BST 2008
+	- Merged in 1.27
+	- Support for stderr(0) in ipc mode
+
+1.36 Tue Jun 17 09:15:31 BST 2008
+	- END clause to kill remaining cleartool coprocesses, esp in Windows
+	- sdterr(0) fix for CAL mode
+	- Redirection to STDERR in ipc mode
+	- Fix (James Anderson) to reference counting if already in ipc mode
+	- Fixes to example/setview
+
+1.37 Fri Sep  5 10:36:23 BST 2008
+	- Fix to multiline return in scalar context, in ipc mode
+	- Uncommented fork model quoting tests after fix in Argv.pm 1.23
+	- Flaky/dubious support for interactive comments in unix in ipc mode
+
+1.38 Fri Sep  5 23:26:44 EDT 2008
+	- Represent 'cleartool' as a list instead of a scalar.
+	  The idea is to allow 'cleartool' to be replaced by something
+	  like qw(sudo cleartool). See ./examples/ctsudo.
+
+1.39 Sat Sep  6 10:47:09 EDT 2008
+	- Renamed 'find_cleartool' to more intuitive 'cleartool_path'.
+
+1.40 Mon Sep  8 12:46:08 EDT 2008
+	- Fixed merge skew in setview and CCreport example scripts.
+
+1.41 Mon Oct  6 18:17:31 GMTDT 2008
+	- Preliminary, tentative changes for CygWin support
+
+1.42 Sun Dec 14 10:13:21 GMT 2008
+	- exit code in the END clause and in DESTROY, from the cygwin branch
+	- restored cleartool -status, new workaround for ClearCase setview bug
+	- restricted the setview test to dynamic views
+	- added one test case for setview -exec constructs
+	- fix (Tatiana Shpichko) to bmccug example
+	- reintroduced the handling of interactive comments in ipc mode
+
+1.43 Sat Feb 21 19:19:26 GMTST 2009
+	- under CYGWIN, force the default to ipc mode (in exec)
+	- extracted the setview tests under an r directory (regression)
+	- moved the stout/stderr test cases there as well
+	- setview handling in unix directly via system and qx
+	- removed a case of stickiness of stderr(0)
+	- support for stdout(0)->qx: returning only stderr
+	- removed testing for bad quoting patterns
+	- under ctcmd, reset ipc apart on cygwin (CtCmd won't install there)
+	- fix to respect \n in comments under cygwin, and testing
+
+1.44 Sun Mar  1 17:11:39 GMTST 2009
+	- cygwin: restored \r removal at the end of lines, unskipped test
+	- ctcmd: skipped the failing test in stdouterr
+	- cygwin: respect the whitespace in cleartool output
+	- cygwin: convert the backslashes of vob tags as well (I/O)
+	- ipc: quote all input arguments containing special characters
+	- removed function prototypes (code style consistency)
+
+1.45 Sat Apr 25 15:56:41 BST 2009
+	- mkattr: added a regression test case, and quoting of string values
+	- quoting of quotes revisited, especially under cygwin
+	- support for /view under cygwin
+	- unix/ipc/setview: managed the standard error
+	- r/stdouterr: fork was ok and ipc wrong--fixed the test cases, added 2
+	- fixed both ipc and ctcmd to get the stdouterr tests pass
+
+1.46 
+	- cygwin: odd numbers of quotes in the output
+	- debug mode: print the commands as sent to cleartool (after quoting)
+	- ipc mode: fix for examples of errors in the text of man pages
+	- ipc mode: question marks in the comments
+	- cygwin: support for ci -from outside the vob
+	- cygwin: support for mounting views under /view
+
+1.47 Sat Jan  9 18:55:04 GMTST 2010
+        - cygwin: convert vob:/path input arguments
+	- cygwin: return an error code for system
+	- ipc: quote an empty string in the command sent to cleartool
+	- cygwin: parsing output lines ending in backslash (e.g. from diff)
+	- cygwin: convert non-existing path outside vobs (e.g. arg of: co -out)
+	- ipc: return value for diff
+	- stopped shifting exit codes: $? == 256 results in 0...
+	- cygwin/exec: ipc mode not forced anymore
+
+1.48 Sun Feb 21 16:26:59 GMT 2010
+        - _ipc_cmd: localize $_ to avoid modifying it in the caller context
+
+1.49 Sun Apr 25 12:53:36 GMTDT 2010
+        - Removed an extra newline in fork mode under cygwin.
+	- cygwin: one more case of converting backslashes: vob:\foo (e.g. hyperlink)
+	- mkattr: support for single quotes in string values
+	- ipc: support for multiline comments; added test case
+
+1.50 Sat Dec 18 14:49:48 GMT 2010
+        - cygwin: converted backslashes in output more aggressively
+	- ctcmd: 2 dbg outputs to stderr (Stephen Rauch)
+	- setview: fix bug reported by Dirk Heinrichs, and other glitches
+
+1.51 Tue Apr 12 14:46:48 GMTDT 2011
+	- defined(%hash) deprecated in Perl 5.12
+	- cygwin: use perlcygwin API to convert paths (e.g. /usr/lib is c:\cygwin\lib)
+
+1.52 Wed Jan  2 10:03:14 EST 2013
+        - fix in unixpath under cygwin: was skipping '0's
+	- fix to pipe: conditionally prepend cleartool to command in ctcmd mode.
+	- new example: cleanuplf --cleanup lost+found
+	- support for using multitool, and mtfunc example
+	- fix: broken pipe after failed setview in ipc mode
+
+1.53 Wed Apr 17 15:25:54 CEST 2013
+        - one more example: elthier (vob element type hierarchy)
+	- minor documentation fixes and additions
+	- fix to bug in relation to setview
+	- parsing command given as strings with embedded quotes
+	- reference count for different ipc processes
+	- test case updates for wrapper uses
+	- skip cygwin conversions, if wrapper used as ipc process
+	- require Argv 1.28 for Summary
+	- protect print to socket in ipc against the use of 'perl -le'
+
+1.54 Tue May 28 07:01:15 EDT 2013
+	- Fix RT #85666 - version mismatch between code and Makefile.PL
+	- ALL CHANGES FROM 1.41 THROUGH HERE CONTRIBUTED BY Marc Girod.

@@ -1,0 +1,10 @@
+index.html
+ChangeLog
+Build.PL
+LICENSE
+MANIFEST
+Makefile.PL
+lib/CAM/SQLObject.pm
+test.pl
+README
+META.yml

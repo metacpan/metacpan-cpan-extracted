@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Versioned
+abstract: this has a version
+version: 2.00
+provides:
+  Versioned:
+    version: 2.00
+    file: lib/Versioned.pm

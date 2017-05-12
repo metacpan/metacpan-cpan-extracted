@@ -1,0 +1,10 @@
+[% IF query %]
+[% pages.error1 %]
+<b>&quot;[% query %]&quot;</b>
+[% pages.error2 %] <b>[% mode %]</b> [% pages.error3 %].
+[% ELSE %]
+[% pages.error4 %]
+[% END -%]
+[% pages.error5 %]
+<A HREF="mailto:[% maintainer_email %]">[% maintainer %]</A>
+[% pages.error6 %]

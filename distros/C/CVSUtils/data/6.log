@@ -1,0 +1,82 @@
+
+RCS file: /home/cvs/test/0/bar,v
+Working file: 0/bar
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2002/10/26 12:04:50;  author: martyn;  state: Exp;
+Random Message
+=============================================================================
+
+RCS file: /home/cvs/test/0/foo,v
+Working file: 0/foo
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+	r1_00: 1.0.0.1
+	fluffy: 1.0.0
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.1
+date: 2002/10/26 12:04:50;  author: martyn;  state: Exp;  lines: +67 -0
+Random Message
+----------------------------
+revision 1.0
+date: 2002/10/26 11:54:40;  author: martyn;  state: Exp;
+branches:  1.0.0;
+Initial revision
+----------------------------
+revision 1.0.0.1
+date: 2002/10/26 11:54:40;  author: martyn;  state: Exp;  lines: +0 -0
+Test dir for cvs2cl
+=============================================================================
+
+RCS file: /home/cvs/test/1/foo,v
+Working file: 1/foo
+head: 1.0
+branch: 1.0.0
+locks: strict
+access list:
+symbolic names:
+	r1_00: 1.0.0.1
+	fluffy: 1.0.0
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.0
+date: 2002/10/26 11:54:40;  author: martyn;  state: Exp;
+branches:  1.0.0;
+Initial revision
+----------------------------
+revision 1.0.0.1
+date: 2002/10/26 11:54:40;  author: martyn;  state: Exp;  lines: +0 -0
+Test dir for cvs2cl
+=============================================================================
+
+RCS file: /home/cvs/test/2/0/bar,v
+Working file: 2/0/bar
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2002/10/26 11:56:54;  author: martyn;  state: Exp;
+*** empty log message ***
+=============================================================================

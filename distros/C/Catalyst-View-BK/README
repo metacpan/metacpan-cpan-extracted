@@ -1,0 +1,5 @@
+README file for Catalyst::View::BK
+
+Catalyst::View::BK is a Catalyst View Template class. It uses Bricklayer::Templater as it's templating engine.
+
+Catalyst::View::BK is avalailable under the same license and terms as Perl itself.

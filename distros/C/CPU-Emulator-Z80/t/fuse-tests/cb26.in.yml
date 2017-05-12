@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 38
+  10298:
+    - 238
+name: cb26
+registers:
+  AF: 2560
+  AF_: 0
+  BC: 14126
+  BC_: 0
+  DE: 58133
+  DE_: 0
+  HL: 10298
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

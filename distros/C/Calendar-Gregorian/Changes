@@ -1,0 +1,56 @@
+Revision history for Calendar::Gregorian
+
+0.15  Mon Jan 23 10:40:00 2017
+      - Updated dependency on Date::Gregorian::Simple v0.10.
+
+0.14  Sat Jan 07 22:20:00 2017
+      - Added dependency on Calendar::Plugin::Renderer v0.12.
+      - Removed method validate_params(), no longer required.
+
+0.13  Mon Jan 02 12:45:00 2017
+      - Added sample code for method as_text() in the SYNOPSIS section.
+      - Updated pod document for method as_text().
+
+0.12  Sun Dec 18 02:45:00 2016
+      - Updated dependency on Date::Gregorian::Simple v0.09.
+
+0.11  Mon Dec 05 12:50:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.10  Fri Nov 11 05:55:00 2016
+      - Updated dependency on Date::Gregorian::Simple v0.08.
+
+0.09  Sun Oct 16 09:00:00 2016
+      - Added dependency on Calendar::Plugin::Renderer v0.11.
+
+0.08  Wed Sep 28 09:40:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.07  Mon Aug 08 08:40:00 2016
+      - Updated dependency on Date::Gregorian::Simple v0.07.
+
+0.06  Sat Jul 02 03:15:00 2016
+      - Added method as_text().
+      - Updated method as_svg() with regard to start index.
+      - Added dependency on Calendar::Plugin::Renderer v0.07.
+      - Added test for method as_svg().
+
+0.05  Sun May 15 09:20:00 2016
+      - Merge pull request #1, thanks polettix.
+      - Updated dependency on Date::Gregorian::Simple v0.05.
+      - Updated method as_svg().
+
+0.04  Fri May 06 10:45:00 2016
+      - Fixed missing import (Module::Pluggable).
+      - Updated pod document in general.
+
+0.03  Tue May 03 11:10:00 2016
+      - Added method as_svg() using the plugin Calendar::Plugin::Renderer.
+      - Upgraded to use Date::Gregorian::Simple v0.04.
+      - Added section "SEE ALSO".
+
+0.02  Sun Apr 03 21:45:00 2016
+      - Added LICENSE file.
+
+0.01  Wed Mar 16 12:00:00 2016
+      - First version released.

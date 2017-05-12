@@ -1,0 +1,93 @@
+# Build perl code that calculates the key schedule
+# The key schedule is a maze of twisty little bit operations,
+# all different. You'd go nuts doing it by hand.
+
+use strict;
+use warnings;
+
+# This key schedule specification is right out of RFC2144
+$_ = <<END;
+   z0z1z2z3 = x0x1x2x3 ^ S5[xD] ^ S6[xF] ^ S7[xC] ^ S8[xE] ^ S7[x8]
+   z4z5z6z7 = x8x9xAxB ^ S5[z0] ^ S6[z2] ^ S7[z1] ^ S8[z3] ^ S8[xA]
+   z8z9zAzB = xCxDxExF ^ S5[z7] ^ S6[z6] ^ S7[z5] ^ S8[z4] ^ S5[x9]
+   zCzDzEzF = x4x5x6x7 ^ S5[zA] ^ S6[z9] ^ S7[zB] ^ S8[z8] ^ S6[xB]
+   K1  = S5[z8] ^ S6[z9] ^ S7[z7] ^ S8[z6] ^ S5[z2]
+   K2  = S5[zA] ^ S6[zB] ^ S7[z5] ^ S8[z4] ^ S6[z6]
+   K3  = S5[zC] ^ S6[zD] ^ S7[z3] ^ S8[z2] ^ S7[z9]
+   K4  = S5[zE] ^ S6[zF] ^ S7[z1] ^ S8[z0] ^ S8[zC]
+   x0x1x2x3 = z8z9zAzB ^ S5[z5] ^ S6[z7] ^ S7[z4] ^ S8[z6] ^ S7[z0]
+   x4x5x6x7 = z0z1z2z3 ^ S5[x0] ^ S6[x2] ^ S7[x1] ^ S8[x3] ^ S8[z2]
+   x8x9xAxB = z4z5z6z7 ^ S5[x7] ^ S6[x6] ^ S7[x5] ^ S8[x4] ^ S5[z1]
+   xCxDxExF = zCzDzEzF ^ S5[xA] ^ S6[x9] ^ S7[xB] ^ S8[x8] ^ S6[z3]
+   K5  = S5[x3] ^ S6[x2] ^ S7[xC] ^ S8[xD] ^ S5[x8]
+   K6  = S5[x1] ^ S6[x0] ^ S7[xE] ^ S8[xF] ^ S6[xD]
+   K7  = S5[x7] ^ S6[x6] ^ S7[x8] ^ S8[x9] ^ S7[x3]
+   K8  = S5[x5] ^ S6[x4] ^ S7[xA] ^ S8[xB] ^ S8[x7]
+   z0z1z2z3 = x0x1x2x3 ^ S5[xD] ^ S6[xF] ^ S7[xC] ^ S8[xE] ^ S7[x8]
+   z4z5z6z7 = x8x9xAxB ^ S5[z0] ^ S6[z2] ^ S7[z1] ^ S8[z3] ^ S8[xA]
+   z8z9zAzB = xCxDxExF ^ S5[z7] ^ S6[z6] ^ S7[z5] ^ S8[z4] ^ S5[x9]
+   zCzDzEzF = x4x5x6x7 ^ S5[zA] ^ S6[z9] ^ S7[zB] ^ S8[z8] ^ S6[xB]
+   K9  = S5[z3] ^ S6[z2] ^ S7[zC] ^ S8[zD] ^ S5[z9]
+   K10 = S5[z1] ^ S6[z0] ^ S7[zE] ^ S8[zF] ^ S6[zC]
+   K11 = S5[z7] ^ S6[z6] ^ S7[z8] ^ S8[z9] ^ S7[z2]
+   K12 = S5[z5] ^ S6[z4] ^ S7[zA] ^ S8[zB] ^ S8[z6]
+   x0x1x2x3 = z8z9zAzB ^ S5[z5] ^ S6[z7] ^ S7[z4] ^ S8[z6] ^ S7[z0]
+   x4x5x6x7 = z0z1z2z3 ^ S5[x0] ^ S6[x2] ^ S7[x1] ^ S8[x3] ^ S8[z2]
+   x8x9xAxB = z4z5z6z7 ^ S5[x7] ^ S6[x6] ^ S7[x5] ^ S8[x4] ^ S5[z1]
+   xCxDxExF = zCzDzEzF ^ S5[xA] ^ S6[x9] ^ S7[xB] ^ S8[x8] ^ S6[z3]
+   K13 = S5[x8] ^ S6[x9] ^ S7[x7] ^ S8[x6] ^ S5[x3]
+   K14 = S5[xA] ^ S6[xB] ^ S7[x5] ^ S8[x4] ^ S6[x7]
+   K15 = S5[xC] ^ S6[xD] ^ S7[x3] ^ S8[x2] ^ S7[x8]
+   K16 = S5[xE] ^ S6[xF] ^ S7[x1] ^ S8[x0] ^ S8[xD]
+END
+
+my %table = (
+'x0x1x2x3' => '$s',
+'x4x5x6x7' => '$t',
+'x8x9xAxB' => '$u',
+'xCxDxExF' => '$v',
+'z0z1z2z3' => '$w',
+'z4z5z6z7' => '$x',
+'z8z9zAzB' => '$y',
+'zCzDzEzF' => '$z',
+'x0' => '$s>>24&255',
+'x1' => '$s>>16&255',
+'x2' => '$s>>8&255',
+'x3' => '$s&255',
+'x4' => '$t>>24&255',
+'x5' => '$t>>16&255',
+'x6' => '$t>>8&255',
+'x7' => '$t&255',
+'x8' => '$u>>24&255',
+'x9' => '$u>>16&255',
+'xA' => '$u>>8&255',
+'xB' => '$u&255',
+'xC' => '$v>>24&255',
+'xD' => '$v>>16&255',
+'xE' => '$v>>8&255',
+'xF' => '$v&255',
+'z0' => '$w>>24&255',
+'z1' => '$w>>16&255',
+'z2' => '$w>>8&255',
+'z3' => '$w&255',
+'z4' => '$x>>24&255',
+'z5' => '$x>>16&255',
+'z6' => '$x>>8&255',
+'z7' => '$x&255',
+'z8' => '$y>>24&255',
+'z9' => '$y>>16&255',
+'zA' => '$y>>8&255',
+'zB' => '$y&255',
+'zC' => '$z>>24&255',
+'zD' => '$z>>16&255',
+'zE' => '$z>>8&255',
+'zF' => '$z&255',
+);
+
+s/ //g;
+s/\n/;\n/g;
+s/S/\$s/g;
+s/K\d+=/push\@k,/g;
+s/((?:[xz][0-9A-F])+)/$table{$1}||$1/eg;
+print;
+

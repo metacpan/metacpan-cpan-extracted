@@ -1,0 +1,1 @@
+This module includes a helper which creates a working sample. Please use it :)

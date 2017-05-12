@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  26702:
+    - 134
+name: cb16
+registers:
+  AF: 13953
+  AF_: 0
+  BC: 15187
+  BC_: 0
+  DE: 6730
+  DE_: 0
+  HL: 26702
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

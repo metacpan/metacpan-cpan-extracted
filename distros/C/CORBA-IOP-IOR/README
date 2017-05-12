@@ -1,0 +1,55 @@
+NAME
+     CORBA::IOP::IOR -  Decode, munge, and re-encode CORBA IORs.
+
+SYNOPSIS
+
+     #!/usr/local/bin/perl -w
+
+     require CORBA::IOP::IOR;
+
+     $ior = new CORBA::IOP::IOR;
+     $ior->parseIOR($ARGV[0]);
+
+     $ior->printHash();
+
+     $ior->{IIOP_profile}->{host} = "host.domain.name";
+
+     print $ior->stringifyIOR(), "\n";
+
+
+INSTALLATION
+     The installation uses ExtUtils::MakeMaker. Uncompress and extract
+     the files from the tar, then:
+
+   	perl Makefile.PL
+	make
+   	make install
+
+DESCRIPTION
+     CORBA::IOP::IOR is a handy module for processing IORs. I've found
+     it very useful for debugging CORBA interoperability.
+
+     It was written without much of a look at other Perl CORBA efforts
+     (COPE etc.), and is small and understandable.
+
+TO DO
+     Some documentation might be nice.
+
+     I think whats here is correct, but it needs to be checked against
+     the OMG spec.'s a bit more rigorously.
+
+     Decode TAG_MULTIPLE_COMPONENTS.
+
+
+CREDITS
+     Originally based on Alan Noble's <alan@cruzio.com> iiop.pl "grid"
+     client.
+
+
+AUTHOR
+     Philip Aston <philipa@parallax.co.uk>
+
+COPYRIGHT
+     Copyright (c) 1998 Philip Aston. All rights reserved. This
+     program is free software; you can redistribute it and/or modify
+     it under the same terms as Perl itself.

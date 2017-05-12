@@ -1,0 +1,5 @@
+MANIFEST
+Changes
+Makefile.PL
+lib/Class/MethodMapper.pm
+test.pl

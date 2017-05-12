@@ -1,0 +1,7 @@
+README
+MANIFEST
+Makefile.PL
+t/basic.t
+lib/WAIT/Client.pm
+lib/CPAN/WAIT.pm
+ChangeLog

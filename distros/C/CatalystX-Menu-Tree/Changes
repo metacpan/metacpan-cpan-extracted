@@ -1,0 +1,6 @@
+0.02  Tue May 19 01:39:28 CDT 2009
+  - Do not add menutitle key to nodes unless the menutitle_attr cons param is truthy value.
+  - Fixed tests that were doing nothing of any value. They now do something of some value.
+0.01  Mon Apr 27 15:12:57 CDT 2009
+  - Alpha release
+

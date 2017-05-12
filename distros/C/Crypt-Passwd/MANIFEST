@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+Passwd.pm
+Passwd.xs
+README
+config.h
+passwd.h
+t/std.t
+test.pl

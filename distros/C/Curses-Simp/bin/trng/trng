@@ -1,0 +1,805 @@
+#!/usr/bin/perl
+# 643B19t-649FOrQ: trng by PipStuart <Pip@CPAN.Org> as a Simp Tringo clone
+# Board is 5x5 (like Bingo).
+#
+# Pieces:
+#                       *   *
+#   @   @   @*  @   @   @* *@
+#       *        * *
+#
+#           *  * *      *  *
+#   @* *@  *@*  @  *@*  @   @
+#   *   *   *  * *      *    *
+#
+#    * **  * *  **     *     *
+#   @   @  *@*  @  *@* *@   @*
+#  *   **       ** * *  *   *
+#
+#               *   *   *   *
+#  *@   @* *@* *@  *@*  @*  @
+#   ** **   *   *       *   **
+#
+#      **    *  *  *    **
+#  *@*  @  *@*  @  *@*  @  *@*
+#  *    *      **       *    *
+#
+# It should be easy to play normally or to choose to pick the piece that came up
+# in a Second Life game (for logging or input advice).  Maybe then the
+# possibilities could be exhausted && suggestions could be made for blocks &&
+# positioning most likely to allow any next piece to be successfully placed &&
+# secondarily to get big boxes.
+#
+# Exhaustion should be done in C because there are too many possibilities for
+# Perl to be fast enough.  Also have option for just random moves with heuristic
+# for devaluing branches that make pieces unplaceable and valuing high scoring.
+#
+# Beyond re-implementation of Tringo, some other derivative ideas:
+#
+#   Trisgo - S for Speed (&& Selection?) where random order is chosen at start,
+#     players get bonus for finishing quickly, can undo moves, games start
+#     automatically 1 minute after the first player pays (or enters if no
+#     pay-to-play)
+#     options: pay-to-play, min bet, max bet, show contributors, early bonus
+#       scale (where eventually nobody can catch the first finisher), Selection
+#
+#   Tricko - C for Children (K for Kids) is like Trisgo except:
+#     play is free (maybe house always contributes L$1 to each pot or something)
+#     there is no per-move time-limit (but maybe cap games to 10-minute)
+#     players can toggle hints
+#     players can rotate pieces
+#     players can flip   pieces
+#
+#   Tango - Two-player cooperative variation?
+#     One player places new pieces while the other can toggle up to two board
+#       blocks each turn (effectively able to relocate any grid piece by turning
+#       one off and it back on somewhere else as well as removing up to two
+#       problem pieces or creating two advantageous ones)
+#
+#   Tingo - Two-player competitive variation?
+#     Maybe like Tango except that each player places regular pieces on their
+#     own board, then they each toggle one grid piece of their opponent's
+#     board (trying to mess them up), each has seven undo tokens which, when
+#     used, prevent the opponent from toggling the same grid unit as they did
+#     before, maybe bonuses for unused undo tokens, winner has higher score,
+#     players are head-to-head for their own pot, maybe players need to be
+#     able to rotate or flip pieces (or both)
+#
+# Maybe have Tango and Tingo tournaments w/ in-SL sponsorships for prizes/L$.
+#
+# Spectators should be allowed to contribute to the pot or create their own
+# side bets.
+#
+# I should make up many more 2-player competitive versions (maybe Sirlin would
+# like to help).
+#
+# Board is 5x5 (like Bingo).                    Pieces:               @   @
+#                                                 X   X   X@  X   X   X@ @X
+#                                                     @        @ @
+#
+#                                                         @  @ @      @  @
+#                                                 X@ @X  @X@  X  @X@  X   X
+#                                                 @   @   @  @ @      @    @
+#
+#                                                  @ @@  @ @  @@     @     @
+#                                                 X   X  @X@  X  @X@ @X   X@
+#                                                @   @@       @@ @ @  @   @
+#
+#                                                             @   @   @   @
+#                                                @X   X@ @X@ @X  @X@  X@  X
+#                                                 @@ @@   @   @       @   @@
+#
+#                                                    @@    @  @  @    @@
+#                                                @X@  X  @X@  X  @X@  X  @X@
+#                                                @    @      @@       @    @
+# notz: within about a minute from start, takes 675MB with 1,161,202 kids to depth 2
+# 2do:
+#   mk Curses quit cleaner (i.e., without requiring `reset` && pal restore) maybe up in Simp
+#   re-enable RecuDpth with bottom while(0&&
+#   enhance visible exhaustion && fix bug that upper-left is only result returning from BestPlac()... maybe using $rndx instead of $pick->[0] somewhere?
+#     maybe $tbrd is getting both real && exhaustion data at once?  maybe recursion limits are off-by-one?
+#   mk BestPlac() determine initial piece position && then another key will update it again (so I won't have to fight it for early dumb placements)
+#   compress xhst array-set data further into b64 values for at least plst && bord if not actual_ndx && flags together too (kid_coun,heur_val,[kids],scor sep)
+#   try binary instead of b64
+#   port RecuDpth to multi-threaded C through Open2 or Inline
+#   mk basic heuristic with phases:
+#     0) early game - heavily avoids exploring discard branches, lightly avoids making 4s, sets up strong guaranteed 6s with good chances for 9s
+#     1) late  game - explores all uniformly
+#   fix undo bugs (test in RandPick mode $rflg == 1 too)
+#   dump XML action logs w/ pt-stamps
+#   mk pgrd blox 3x2 in double-draw mode && add triple
+use strict;
+use warnings;
+use Curses::Simp;
+use Games::Cards::Poker;
+use Math::BaseCnv qw(:all);
+
+my $mjvr = 1; my $mnvr = 0; my $ptvr = '6CP1QfZ'; my $auth = 'Pip Stuart <Pip@CPAN.Org>'; my $name = $0; $name =~ s/.*\///;
+my $keey =''; my @text =(); my @fclr =();         my $ascl = 'CCC CCCCCC WGGGWYYYYWCCCW';
+my $gkey =''; my $simp = tie(@text, 'Curses::Simp', 'flagaudr' => 0); tie(@fclr, 'Curses::Simp::FClr', $simp);
+my $bpky = 2; my $bpkx = 2; my $ppky = 2; my $ppkx = 3; my $mbrd = 'a' x 25; my $tbrd = $mbrd; my $plst = 'a' x 35; my($rflg, $dflg, $vflg, $fflg)=(0,0,0,0);
+my $klim = 1161201; my @olut = ( -6, 1, 1, 3, 2, 3, 1, 1 ); # board Offset LookUpTable for placing the eight bits (corresponding to sub-blocks) of each piece
+my $govr; my $scor; my $mode; my $pcou; my $okay; my @next; my @hist; my $hmod; my $xndx; my $xhst; my $dpth; my $tbgn; my $tprv; my $time; my $kids; my $done;
+my @pshp = qw( 00000000 00000010 00001000 00000001 00000100 01001000 01010000
+               00001010 00010010 01011010 10100101 00011000 01000010 10000001
+               00100100 11000110 10111000 01100011 00011101 10010010 00101010
+               00010011 00001110 00011010 01010010 01011000 01001010 01000011
+               00011100 11000010 00111000 01000110 10011000 01100010 00011001 ); # piece shapes using 8 bits to designate piece population around common center
+    InitGame();
+sub InitGame { # Initialize a new Game
+  my $dscl; my $bscl; my $btop; my $bbot; my $blef; my $brit; my $tppy; my $tppx;
+  $govr = $scor = $pcou = $hmod = $dpth = $kids = 0; @next = (0..34); Shuffle(\@next); @hist = (); $okay = 1;
+  $mode = 0 unless($rflg);
+  $tbrd = $mbrd = 'a' x 25; $plst = 'a' x 35;
+  if($rflg) { # pick next piece randomly
+    $mode = 1;
+    RandPiec();
+  } else {    # pick next piece manually
+    $ppky = 2; $ppkx = 3;
+    substr($plst, (($ppky * 7) + $ppkx), 1, 'p');
+  }
+  @text = (                " $name v$mjvr.$mnvr.$ptvr - by $auth     Score:    "); # initialize screen with text and foreground colors
+  @fclr = (' ' . 'G' x length($name) . " WYWCWROYGCBP B WW $ascl     wwwwwWCCCC");
+  for(1..$simp->Hite()) { push(@text, ' ' x $simp->Widt()); push(@fclr, 'w' x $simp->Widt()); }
+  $text[1] = '#' x $simp->Widt(); $fclr[1] = 'w' x $simp->Widt();
+  $dscl = 4; $dscl =  7 if($dflg);
+  $bscl = 6; $bscl = 11 if($dflg);
+  substr($text[2], 0, 1, '+');
+  for(0..6) {
+    substr($text[2], (( $_ * $dscl)               + 1), $dscl, ('-' x ($dscl - 1)) . '+');
+  }
+    substr($text[2], (                (7 * $dscl) + 5),     1,                       '+');
+  for(0..4) {
+    substr($text[2], (( $_ * $bscl) + (7 * $dscl) + 6), $bscl, ('-' x ($bscl - 1)) . '+');
+  }
+  for(0..4) {
+    for my $yndx (0..($dscl-2)) {
+      substr($text[3 + $yndx + ($_ * $dscl)], 0, 1, '|');
+    }
+      substr($text[2 + $dscl + ($_ * $dscl)], 0, 1, '+');
+    for $xndx (0..6) {
+      for my $yndx (0..($dscl-2)) {
+        substr($text[3 + $yndx + ($_ * $dscl)], (($xndx * $dscl) + 1), $dscl, (' ' x ($dscl - 1)) . '|');
+      }
+        substr($text[2 + $dscl + ($_ * $dscl)], (($xndx * $dscl) + 1), $dscl, ('-' x ($dscl - 1)) . '+');
+    }
+    for my $yndx (0..($dscl-2)) {
+      substr($text[3 + $yndx + ($_ * $dscl)], ((7 * $dscl) + 1), 5, (' ' x 4) . '|');
+    }
+      substr($text[2 + $dscl + ($_ * $dscl)], ((7 * $dscl) + 1), 5, (' ' x 4) . '+');
+    for $xndx (0..4) {
+      for my $yndx (0..($dscl-2)) {
+        substr($text[3 + $yndx + ($_ * $dscl)], ((7 * $dscl) + ($xndx * $bscl) + 6), $bscl, (' ' x ($bscl - 1)) . '|');
+      }
+        substr($text[2 + $dscl + ($_ * $dscl)], ((7 * $dscl) + ($xndx * $bscl) + 6), $bscl, ('-' x ($bscl - 1)) . '+');
+    }
+  }
+  for(0..4) {
+    if($dflg) { for $xndx (0..6) { PrntPiec(($_ * 7) + 4, ($xndx *  7) +  2, ($_ * 7) + $xndx); } }
+    else      { for $xndx (0..6) { PrntPiec(($_ * 4) + 4, ($xndx *  4) +  2, ($_ * 7) + $xndx); } }
+  }
+  $tbgn = $tprv = $time = time(); $xhst = undef; # initialize $xhst array-ref with first level of data
+  for my $pndx (0..34) { # build first phase (top layer) of exhaustion array where any piece could be chosen
+    $tppy = int($pndx / 7); $tppx = ($pndx % 7);
+    push(@{$xhst}, [ $pndx, 0, 0, 0, $scor, $plst, [] ]);
+    substr($xhst->[$pndx][5], $pndx, 1, 't'); # designate each piece as "taken" from the child piece-list
+    # build secondary phase (layer) of first depth level of exhaustion array where piece already chosen && all placements vs. discard option to be explored
+    $btop = $blef = 0; # compute the board left  && top    edge indices where the current piece could possibly have its center
+    $bbot = $brit = 4; # compute the board right && bottom edge indices where the current piece could possibly have its center
+    $btop++ if(substr($pshp[$pndx], 0, 1) eq '1' || substr($pshp[$pndx], 1, 1) eq '1' || substr($pshp[$pndx], 2, 1) eq '1');
+    $bbot-- if(substr($pshp[$pndx], 5, 1) eq '1' || substr($pshp[$pndx], 6, 1) eq '1' || substr($pshp[$pndx], 7, 1) eq '1');
+    $blef++ if(substr($pshp[$pndx], 0, 1) eq '1' || substr($pshp[$pndx], 3, 1) eq '1' || substr($pshp[$pndx], 5, 1) eq '1');
+    $brit-- if(substr($pshp[$pndx], 2, 1) eq '1' || substr($pshp[$pndx], 4, 1) eq '1' || substr($pshp[$pndx], 7, 1) eq '1');
+    for my $tbpy ($btop..$bbot) { # $bpky
+      for my $tbpx ($blef..$brit) { # $bpkx
+        $tbrd = $mbrd;
+        PrntTPie($tppy, $tppx, $tbpy, $tbpx);
+        if($okay) {
+          push(@{$xhst->[$pndx][6]}, [ (($tbpy * 5) + $tbpx), 0, 0, 0, $scor, $mbrd, [], $scor ]); # start each new available placement array-set
+          PrntBPie(\$xhst->[$pndx][6][-1][5], $tppy, $tppx, $tbpy, $tbpx); # print the placed piece into the local board
+          ClerBlkz(\$xhst->[$pndx][6][-1][5], \$xhst->[$pndx][6][-1][7]);     # clear any local blocks (&& update local score)
+                    $xhst->[$pndx][6][-1][4] = $xhst->[$pndx][6][-1][7];      # assign local score to heuristic value to start
+        }
+      }
+    } # always add a discard option to explore (last) for any possible picked piece
+    push(@{$xhst->[$pndx][6]}, [ -1, 0, 0, 0, ($scor - 7), $mbrd, [], ($scor - 7) ]); # start each new available placement array-set
+    $xhst->[$pndx][3] = scalar(@{$xhst->[$pndx][6]}); # only kids at start are immediate possible placements for current pick
+    $kids += $xhst->[$pndx][3];
+  }
+  $tbrd = $mbrd;
+  DrawText();
+}
+sub ShowInfo { # Display an Info dialog window
+  $simp->Mesg('type' => 'info',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+ 
+$name - a Simp Tringo clone.
+ 
+ Shout out to Keith && all the LBox.Org crew.  Thanks to Beppu-san for
+being a good friend.  I hope you find $name useful.  Please don't 
+hesitate to let me know if you app-ree-see-ate it or if you'd like
+me to add something for you.  I'd be glad to improve it given new 
+suggestions.  Please support FSF.Org && EFF.Org.  Thanks.  TTFN.
+ 
+                                                       -Pip
+ 
+");
+}
+sub ShowHelp { # uhh
+  $simp->Mesg('type' => 'help',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+
+                        Global Keys:                                    
+  h          - displays this Help screen                                
+  r          - toggle Random piece picking flag (manual pick is default)
+ space       - select piece from grid or place piece on board           
+ Up   Arrow  - move selector or piece up                                
+ Down Arrow  - move selector or piece down                              
+ Left Arrow  - move selector or piece left                              
+ RightArrow  - move selector or piece right                             
+ Backspace/u - undo last selection or placement                         
+  i          - Initialize a new game                                    
+
+                        System Stuff:
+       ?/H/F1  - Help  :  I - Info  :  x/q/Esc - eXit");
+}
+sub DrawText { # Draw the current piece grid, board, and current selection to the Text screen
+  substr($text[0], 61, 3, sprintf("%3s", $scor));
+  for(0..4) {
+    if($dflg) { for $xndx (0..6) { PrntPiec(($_ * 7) + 4, ($xndx *  7) +  2, ($_ * 7) + $xndx, 1); }
+                for $xndx (0..4) { PrntBlok(($_ * 7) + 4, ($xndx * 11) + 56, ($_ * 5) + $xndx   ); } }
+    else      { for $xndx (0..6) { PrntPiec(($_ * 4) + 4, ($xndx *  4) +  2, ($_ * 7) + $xndx, 1); }
+                for $xndx (0..4) { PrntBlok(($_ * 4) + 4, ($xndx *  6) + 36, ($_ * 5) + $xndx   ); } }
+  }
+if(0){ # print debugging history and piece-grid
+  for(0..31    ) { $text[24+$_] = ''; }
+  for(0..$#hist) { $text[24+$_] = "$_ " . join(' ', @{$hist[$_]}); }
+}
+  $simp->Draw();
+}
+sub PrntPiec { # Print a particular piece within the Piece grid on the left side of the screen
+  my $pycr = shift(); my $pxcr = shift(); my $pndx = shift(); my $cflg = shift() || 0; # last optional parameter only updates colors if provided && true
+  my $pclr = 'B'; $pclr = 'K' if(substr($plst, $pndx, 1) eq 't'); # taken
+                  $pclr = 'P' if(substr($plst, $pndx, 1) eq 'c'); # chosen
+                  $pclr = 'C' if(substr($plst, $pndx, 1) eq 'p'); # placeable
+  if($dflg) {
+    for(0..2) { # blank all 18 spaces first
+      substr($fclr[$pycr + (2 * $_) - 1], $pxcr - 1, 6, $pclr x 6);
+      substr($fclr[$pycr + (2 * $_)    ], $pxcr - 1, 6, $pclr x 6);
+    }
+    unless($cflg) {
+      substr($text[$pycr - 1], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 0, 1) eq '1');
+      substr($text[$pycr    ], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 0, 1) eq '1');
+      substr($text[$pycr - 1], $pxcr + 1, 2, '@@') if(substr($pshp[$pndx], 1, 1) eq '1');
+      substr($text[$pycr    ], $pxcr + 1, 2, '@@') if(substr($pshp[$pndx], 1, 1) eq '1');
+      substr($text[$pycr - 1], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 2, 1) eq '1');
+      substr($text[$pycr    ], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 2, 1) eq '1');
+      substr($text[$pycr + 1], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 3, 1) eq '1');
+      substr($text[$pycr + 2], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 3, 1) eq '1');
+      substr($text[$pycr + 1], $pxcr + 1, 2, 'XX');
+      substr($text[$pycr + 2], $pxcr + 1, 2, 'XX');
+      substr($text[$pycr + 1], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 4, 1) eq '1');
+      substr($text[$pycr + 2], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 4, 1) eq '1');
+      substr($text[$pycr + 3], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 5, 1) eq '1');
+      substr($text[$pycr + 4], $pxcr - 1, 2, '@@') if(substr($pshp[$pndx], 5, 1) eq '1');
+      substr($text[$pycr + 3], $pxcr + 1, 2, '@@') if(substr($pshp[$pndx], 6, 1) eq '1');
+      substr($text[$pycr + 4], $pxcr + 1, 2, '@@') if(substr($pshp[$pndx], 6, 1) eq '1');
+      substr($text[$pycr + 3], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 7, 1) eq '1');
+      substr($text[$pycr + 4], $pxcr + 3, 2, '@@') if(substr($pshp[$pndx], 7, 1) eq '1');
+    }
+  } else {
+    for(0..2) { # blank all 9 spaces first
+      substr($text[$pycr + $_ - 1], $pxcr - 1, 3, ' '   x 3) unless($cflg);
+      substr($fclr[$pycr + $_ - 1], $pxcr - 1, 3, $pclr x 3);
+    }
+    unless($cflg) {
+      substr($text[$pycr - 1], $pxcr - 1, 1, '@') if(substr($pshp[$pndx], 0, 1) eq '1');
+      substr($text[$pycr - 1], $pxcr    , 1, '@') if(substr($pshp[$pndx], 1, 1) eq '1');
+      substr($text[$pycr - 1], $pxcr + 1, 1, '@') if(substr($pshp[$pndx], 2, 1) eq '1');
+      substr($text[$pycr    ], $pxcr - 1, 1, '@') if(substr($pshp[$pndx], 3, 1) eq '1');
+      substr($text[$pycr    ], $pxcr    , 1, 'X');
+      substr($text[$pycr    ], $pxcr + 1, 1, '@') if(substr($pshp[$pndx], 4, 1) eq '1');
+      substr($text[$pycr + 1], $pxcr - 1, 1, '@') if(substr($pshp[$pndx], 5, 1) eq '1');
+      substr($text[$pycr + 1], $pxcr    , 1, '@') if(substr($pshp[$pndx], 6, 1) eq '1');
+      substr($text[$pycr + 1], $pxcr + 1, 1, '@') if(substr($pshp[$pndx], 7, 1) eq '1');
+    }
+  }
+}
+sub PrntTPie { # Print a Temporary board Piece (into $tbrd, not the @text screen)
+  my $tppy = shift(); $tppy = $ppky unless(defined($tppy)); my $tppx = shift(); $tppx = $ppkx unless(defined($tppx));
+  my $tbpy = shift(); $tbpy = $bpky unless(defined($tbpy)); my $tbpx = shift(); $tbpx = $bpkx unless(defined($tbpx));
+  my $pndx = ($tppy * 7) + $tppx; my $bndx = ($tbpy * 5) + $tbpx; $okay = 1;
+  if    (substr($tbrd, $bndx, 1) ne 'a') { substr($tbrd, $bndx, 1, 'C'); $okay = 0; } # (!avail) ? Conflict :
+  else                                   { substr($tbrd, $bndx, 1, 'p');            } #            placeable;
+  for(0..7) {
+    $bndx += $olut[$_];
+    if(substr($pshp[$pndx], $_, 1) eq '1') {
+      if(substr($tbrd, $bndx, 1) ne 'a') { substr($tbrd, $bndx, 1, 'C'); $okay = 0; } # (!avail) ? Conflict :
+      else                               { substr($tbrd, $bndx, 1, 'p');            } #            placeable;
+    }
+  }
+}
+sub PrntBPie { # Print a Board Piece (into a $bord string [$mbrd - the Main Board by default], not the @text screen)
+  my $bref = shift() || \$mbrd;
+  my $tppy = shift(); $tppy = $ppky unless(defined($tppy)); my $tppx = shift(); $tppx = $ppkx unless(defined($tppx));
+  my $tbpy = shift(); $tbpy = $bpky unless(defined($tbpy)); my $tbpx = shift(); $tbpx = $bpkx unless(defined($tbpx));
+  my $pndx = ($tppy * 7) + $tppx; my $bndx = ($tbpy * 5) + $tbpx;
+  substr($$bref, $bndx, 1, 't');
+  for(0..7) {
+    $bndx += $olut[$_];
+    substr($$bref, $bndx, 1, 't') if(substr($pshp[$pndx], $_, 1) eq '1');
+  }
+}
+sub PrntBlok { # Print a single board Block on the @text screen
+  my $bycr = shift(); my $bxcr = shift(); my $bndx = shift(); my $bgrw = int($bndx / 5); my $bgcl = ($bndx % 5);
+  my $bchr = ' '; $bchr = '@' if( substr($tbrd, $bndx, 1) ne 'a');                                      # !avail
+                  $bchr = 'X' if( substr($tbrd, $bndx, 1) eq 'C' ||                                     # Conflict or
+                                 (substr($tbrd, $bndx, 1) eq 'p' && $bgrw == $bpky && $bgcl == $bpkx)); # placeable but center focal-block of piece
+  my $bclr = ' '; $bclr = 'O' if( substr($tbrd, $bndx, 1) eq 't');                                      # taken
+                  $bclr = 'C' if( substr($tbrd, $bndx, 1) eq 'p');                                      # placeable
+                  $bclr = 'R' if( substr($tbrd, $bndx, 1) eq 'C');                                      # Conflict
+  if($dflg) {
+    for(0..5) {
+      substr($text[$bycr + $_ - 1], $bxcr - 1, 10, $bchr x 10);
+      substr($fclr[$bycr + $_ - 1], $bxcr - 1, 10, $bclr x 10);
+      substr($fclr[$bycr + $_ - 1], $bxcr + 2,  4, 'RRRR'    ) if(2 <= $_ && $_ <= 3 && $bgrw == $bpky && $bgcl == $bpkx); # mk red center in focal-block
+    }
+  } else {
+    for(0..2) { # overwrite all 12 characters in block
+      substr($text[$bycr + $_ - 1], $bxcr - 2, 5, $bchr x 5);
+      substr($fclr[$bycr + $_ - 1], $bxcr - 2, 5, $bclr x 5);
+      substr($fclr[$bycr + $_ - 1], $bxcr - 1, 3, 'RRR'    ) if($_ == 1 && $bgrw == $bpky && $bgcl == $bpkx); # mk red center in focal-block of piece
+    }
+  }
+}
+sub RandPiec { # pick a new random grid piece
+  $ppky = int($next[$pcou] / 7); $ppkx = ($next[$pcou] % 7);
+  substr($plst, $next[$pcou++], 1, 'p');
+  push(@hist, ['pick', $ppky, $ppkx]) unless($hmod);
+  $tbrd = $mbrd;
+  BestPlac() unless($hmod);
+}
+sub PlacPiec { # place the new piece (into board, not screen)
+  my $pndx; my $bndx; my $sndx; my $endx;
+  if(!$mode) { # pick the piece from the grid
+    substr($plst, (($ppky * 7) + $ppkx), 1, 'p');
+    push(@hist, ['pick', $ppky, $ppkx]) unless($hmod);
+    $pcou++;
+    $mode ^= 1;
+    $tbrd = $mbrd;
+    BestPlac() unless($hmod);
+  } elsif($okay) {     # place the piece onto the board
+    unless($govr) {
+      $pndx = (($ppky * 7) + $ppkx);
+      $bndx = (($bpky * 5) + $bpkx);
+      substr($plst, $pndx, 1, 't');
+      push(@hist, ['plac', $ppky, $ppkx, $bpky, $bpkx]) unless($hmod);
+      PrntBPie();
+      ClerBlkz();
+      $tbrd = $mbrd;
+      if($dpth && scalar(@{$xhst})) { # if there is any depth explored && any kids stored beneath the exhaust array-ref
+        for(my $qndx = 0; $qndx < scalar(@{$xhst}); $qndx++) { # loop through top depth level of picks through indirect pick-indices...
+          if($xhst->[$qndx][0] != $pndx) { $kids -= $xhst->[$qndx][3]; } # drop global total kids count by the sizes of all unpicked pieces' exploration trees
+          else                           {
+            $sndx = $qndx; # save the indirect index corresponding to the picked piece's array-set...
+            for(my $cndx = 0; $cndx < scalar(@{$xhst->[$qndx][6]}); $cndx++) { # && loop through 2nd-phase of top depth level through indirect plac-indices...
+              if($xhst->[$qndx][6][$cndx][0] != $bndx) { $kids -= $xhst->[$qndx][6][$cndx][3]; } # drop glob totl kids coun by siz of all unchosen placements
+              else                                     { $endx  =                   $cndx    ; } # save indirect index corresponding to chosen placement's aset
+            }
+          }
+        }
+        $xhst = $xhst->[$sndx][6][$endx][6]; # zoom exhaustion data into itself based on chosen piece-pick and placement of the highest depth level...
+        $dpth--; # && drop depth level count
+      }
+      if($hmod) { # don't do all the next pick setup if rebuilding from undo history
+        $mode ^= 1;
+      } else {    # pick next piece manually
+        GOvrChek();
+        unless($govr) {
+          if($rflg) { # pick next piece randomly
+            RandPiec();
+          } else {    # pick next piece manually
+            $pndx = 17;
+            while(substr($plst, $pndx, 1) ne 'a') { $pndx++; $pndx = 0 if($pndx > 34); } # find next available piece (with MoveRite() behavior from center)
+            substr($plst, $pndx, 1, 'p');
+            $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+            $mode ^= 1;
+          }
+        }
+      }
+    }
+  } else { # tried to place piece into board in !$okay position so warn player
+    $simp->Mesg('wait' => 3, 'titl' => "Bad Position!", 'flagprsk' => 1,
+      "\nThat position does not fit the piece you are trying to place!\n\n  Please try another location or press \"d\" to discard.");
+    PrntTPie();
+  }
+}
+sub DiscPiec { # Discard Piece
+  my $pndx = ($ppky * 7) + $ppkx; my $sndx;
+  my $bndx = ($bpky * 5) + $bpkx; my $endx;
+  if($mode) {
+    $scor -= 7; $scor = 0 if($scor < 0);
+    substr($plst, $pndx, 1, 't');
+    push(@hist, ['disc', $ppky, $ppkx]) unless($hmod);
+    $tbrd = $mbrd;
+    if($dpth && scalar(@{$xhst})) { # if there is any depth explored && any kids stored beneath the exhaust array-ref
+      for(my $qndx = 0; $qndx < scalar(@{$xhst}); $qndx++) { # loop through top depth level of picks through indirect pick-indices...
+        if($xhst->[$qndx][0] != $pndx) { $kids -= $xhst->[$qndx][3]; } # drop global total kids count by the sizes of all unpicked pieces' exploration trees
+        else                           {
+          $sndx = $qndx; # save the indirect index corresponding to the picked piece's array-set...
+          for(my $cndx = 0; $cndx < scalar(@{$xhst->[$qndx][6]}); $cndx++) { # && loop through 2nd-phase of top depth level through indirect plac-indices...
+            if($xhst->[$qndx][6][$cndx][0] != $bndx) { $kids -= $xhst->[$qndx][6][$cndx][3]; } # drop glob totl kids coun by siz of all unchosen placements
+            else                                     { $endx  =                   $cndx    ; } # save indirect index corresponding to chosen placement's aset
+          }
+        }
+      }
+      $xhst = $xhst->[$sndx][6][$endx][6]; # zoom exhaustion data into itself based on chosen piece-pick and placement of the highest depth level...
+      $dpth--; # && drop depth level count
+    }
+    if($hmod) {
+      $mode ^= 1;
+    } else {
+      GOvrChek();
+      unless($govr) {
+        if($rflg) {
+          RandPiec();
+        } else {
+          $pndx = 17;
+          while(substr($plst, $pndx, 1) ne 'a') { $pndx++; $pndx = 0 if($pndx > 34); } # find next available piece (with MoveRite() behavior from center)
+          substr($plst, $pndx, 1, 'p');
+          $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+          $mode ^= 1;
+        }
+      }
+    }
+  }
+}
+sub ClerBlkz { # clear out all large board blocks
+  my $bref = shift() || \$mbrd; my $sref = shift() || \$scor; my $foun = 0;
+  for(0..2) { # ck all upper-lefts of possible 9s
+    for $xndx (0..2) {
+      if(substr($$bref, (( $_      * 5) + $xndx), 3) eq 'ttt' &&
+         substr($$bref, ((($_ + 1) * 5) + $xndx), 3) eq 'ttt' &&
+         substr($$bref, ((($_ + 2) * 5) + $xndx), 3) eq 'ttt') { # found         9 (adjascent taken board blocks)
+         substr($$bref, (( $_      * 5) + $xndx), 3,    'aaa');
+         substr($$bref, ((($_ + 1) * 5) + $xndx), 3,    'aaa');
+         substr($$bref, ((($_ + 2) * 5) + $xndx), 3,    'aaa');  # clear out the 9 (now   available board blocks)
+        $$sref += 30; $foun = 1; last;
+      }
+    }
+    last if($foun);
+  }
+  $foun = 0;
+  for(0..3) { # ck all upper-lefts of possible 6s
+    $foun = $_ = 0 if($foun); # start search over if any 6 found last time (just to be safe)
+    for $xndx (0..3) {
+      if(substr($$bref, (( $_      * 5) + $xndx), 2) eq 'tt' &&
+         substr($$bref, ((($_ + 1) * 5) + $xndx), 2) eq 'tt') { # first find 4 then try to extend lower for 6 then right for 6
+        if     ($_    < 3 && substr($$bref, ((($_ + 2) * 5) + $xndx    ), 2) eq 'tt') { # ck down  6
+                             substr($$bref, (( $_      * 5) + $xndx    ), 2,    'aa');
+                             substr($$bref, ((($_ + 1) * 5) + $xndx    ), 2,    'aa');
+                             substr($$bref, ((($_ + 2) * 5) + $xndx    ), 2,    'aa');  # clear out the down  6 (now   available board blocks)
+          $$sref += 15; $foun = 1; last;
+        } elsif($xndx < 3 && substr($$bref, (( $_      * 5) + $xndx + 2), 1) eq 't' &&
+                             substr($$bref, ((($_ + 1) * 5) + $xndx + 2), 1) eq 't') {  # ck right 6
+                             substr($$bref, (( $_      * 5) + $xndx    ), 3,    'aaa');
+                             substr($$bref, ((($_ + 1) * 5) + $xndx    ), 3,    'aaa'); # clear out the right 6 (now   available board blocks)
+          $$sref += 15; $foun = 1; last;
+        }
+      }
+    }
+  }
+  for(0..3) { # ck all upper-lefts of possible 4s
+    for $xndx (0..3) {
+      if(substr($$bref, (($_ * 5) + $xndx), 2) eq 'tt' && substr($$bref, ((($_ + 1) * 5) + $xndx), 2) eq 'tt') { # found         4
+         substr($$bref, (($_ * 5) + $xndx), 2,    'aa');  substr($$bref, ((($_ + 1) * 5) + $xndx), 2,    'aa');  # clear out the 4
+        $$sref += 5;
+      }
+    }
+  }
+}
+sub MoveUppp { # Move the current selection or piece Up
+  my $ondx; my $pndx;
+  if(!$mode) {
+    if($pcou < 34) {
+      $ondx = $pndx = ($ppky * 7) + $ppkx;
+      while(substr($plst, $pndx, 1) ne 'a') { $pndx -= 7; $pndx = 34 if($pndx == -7); $pndx += 34 if($pndx < 0); } # find next available piece
+      substr($plst, $ondx, 1, 'a'); substr($plst, $pndx, 1, 'p'); $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+    }
+  } else {
+    $pndx = ($ppky * 7) + $ppkx;
+    if($bpky > 1 || ($bpky == 1 && substr($pshp[$pndx], 0, 3) eq '000')) {
+      $bpky--; $tbrd = $mbrd;
+    }
+    PrntTPie();
+  }
+}
+sub MoveDown { # Move the current selection or piece Down
+  my $ondx; my $pndx;
+  if(!$mode) {
+    if($pcou < 34) {
+      $ondx = $pndx = ($ppky * 7) + $ppkx;
+      while(substr($plst, $pndx, 1) ne 'a') { $pndx += 7; $pndx = 0 if($pndx == 41); $pndx -= 34 if($pndx > 34); } # find next available piece
+      substr($plst, $ondx, 1, 'a'); substr($plst, $pndx, 1, 'p'); $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+    }
+  } else {
+    $pndx = ($ppky * 7) + $ppkx;
+    if($bpky < 3 || ($bpky == 3 && substr($pshp[$pndx], 5, 3) eq '000')) {
+      $bpky++; $tbrd = $mbrd;
+    }
+    PrntTPie();
+  }
+}
+sub MoveLeft { # Move the current selection or piece Left
+  my $ondx; my $pndx;
+  if(!$mode) {
+    if($pcou < 34) {
+      $ondx = $pndx = ($ppky * 7) + $ppkx;
+      while(substr($plst, $pndx, 1) ne 'a') { $pndx--; $pndx = 34 if($pndx < 0); } # find next available piece
+      substr($plst, $ondx, 1, 'a'); substr($plst, $pndx, 1, 'p'); $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+    }
+  } else {
+    $pndx = ($ppky * 7) + $ppkx;
+    if($bpkx > 1 || ($bpkx == 1 && substr($pshp[$pndx], 0, 1) eq '0' && substr($pshp[$pndx], 3, 1) eq '0' && substr($pshp[$pndx], 5, 1) eq '0')) {
+      $bpkx--; $tbrd = $mbrd;
+    }
+    PrntTPie();
+  }
+}
+sub MoveRite { # Move the current selection or piece Right
+  my $ondx; my $pndx;
+  if(!$mode) {
+    if($pcou < 34) {
+      $ondx = $pndx = ($ppky * 7) + $ppkx;
+      while(substr($plst, $pndx, 1) ne 'a') { $pndx++; $pndx = 0 if($pndx > 34); } # find next available piece
+      substr($plst, $ondx, 1, 'a'); substr($plst, $pndx, 1, 'p'); $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+    }
+  } else {
+    $pndx = ($ppky * 7) + $ppkx;
+    if($bpkx < 3 || ($bpkx == 3 && substr($pshp[$pndx], 2, 1) eq '0' && substr($pshp[$pndx], 4, 1) eq '0' && substr($pshp[$pndx], 7, 1) eq '0')) {
+      $bpkx++; $tbrd = $mbrd;
+    }
+    PrntTPie();
+  }
+}
+sub UndoMove { # pop the last history event, reset everything (except @next and @hist), then rebuild from remaining history
+  my $pndx;
+  if(@hist) {
+    $_ = pop(@hist); pop(@hist) if($_->[0] eq 'disc');
+    $govr = $scor = $pcou = $mode = 0; $tbrd = $mbrd = 'a' x 25; $plst = 'a' x 35; # reset main-board && piece-list
+    if(@hist) {
+      $hmod = 1;  # flag to designate history-rebuilding mode so the calls below don't redundantly compound the history
+      for(@hist) {
+        $ppky = $_->[1];
+        $ppkx = $_->[2];
+        if     ($_->[0] eq 'plac') {
+          $bpky = $_->[3];
+          $bpkx = $_->[4];
+        }
+        if     ($_->[0] eq 'disc') { DiscPiec(); }
+        else                       { PlacPiec(); }
+      }
+      $hmod = 0;
+      unless($mode) { # pick next piece if history leaves you in pick mode
+        if($rflg) { # pick next piece randomly
+          RandPiec();
+        } else {    # pick next piece manually
+          $pndx = 17;
+          while(substr($plst, $pndx, 1) ne 'a') { $pndx++; $pndx = 0 if($pndx > 34); } # find next available piece (with MoveRite() behavior from center)
+          substr($plst, $pndx, 1, 'p');
+          $ppky = int($pndx / 7); $ppkx = ($pndx % 7);
+        }
+      }
+    } else {
+      if($rflg) { # pick next piece randomly
+        $mode = 1;
+        RandPiec();
+      } else {    # pick next piece manually
+        $pndx = 17; $ppky = 2; $ppkx = 3;
+        substr($plst, $pndx, 1, 'p');
+      }
+    }
+  }
+}
+sub GOvrChek { # test for GameOver condition
+  if($pcou == 35) { # final piece placed (or discarded) so...
+    $govr = 1;
+    substr($text[0], 61, 3, sprintf("%3s", $scor));
+    DrawText(); # print some status, final score, etc.
+    $gkey = $simp->Mesg('wait' => 7, 'titl' => "Game Over!", 'flagprsk' => 1,
+      "\n             Final Score: $scor\n\nPlease press \"i\" to initialize a new game.");
+  }
+}
+sub BestPlac { # show Best piece Placement in Board (according to latest exhaust data)
+  #$bpky = $bpkx = 2; $tbrd = $mbrd; PrntTPie();
+  my $dscf = 0; my $best = undef; # discard recommended flag && the best heuristic value so far && update board placement choices accordingly
+  my $pndx = (($ppky * 7) + $ppkx);
+  for my $pick (@{$xhst}) {
+    if($pick->[0] == $pndx) { # find correct pick-index in kids
+      if(scalar(@{$pick->[6]}) == 1) { # only one entry must be discard so do it automatically
+        DiscPiec(); # auto-discard piece that can't be placed
+      } else {
+        for my $plac (@{$pick->[6]}) {
+          if(!defined($best) || $best < $plac->[3]) {
+            $best = $plac->[3];
+            if($plac->[0] == -1) { $dscf = 1; $bpky = $bpkx = 2; }
+            else                 { $dscf = 0; $bpky = int($plac->[0] / 5); $bpkx = ($plac->[0] % 5); }
+          }
+        }
+        $tbrd = $mbrd; PrntTPie();
+        $text[63] = "best:$best dscf:$dscf bpky:$bpky bpkx:$bpkx";
+        if($dscf) { $fclr[63] = 'R'; $text[63] .= '  Discard recommended!'; }
+        else      { $fclr[63] = 'W'; }
+      }
+      last;
+    }
+  }
+}
+sub RecuDpth { # Recurse into exhaustion hash Depth first
+  my $rdpt = shift(); my $xhrf = shift(); my $pndx; my $btop; my $bbot; my $blef; my $brit; my $tppy; my $tppx;
+  my $tpls; my $tpbp; # temp-parent piece-list && board-placement
+#       $xhst->[0..34]  (first possible piece picked)
+#         [   $actual_piece_ndx,     $xhst_flag, $kids_to_depth_flag, $total_kids_count, $heur_val, $local_plst, [0..24] (possible placements )        ]
+#           [ $actual_placement_ndx, $xhst_flag, $kids_to_depth_flag, $total_kids_count, $heur_val, $local_bord, [0..33] (possible piece picks), $scor ]
+#       the length($local_(plst|bord)) tells which (pick|plac) any set is (35|25) as well as item count (7|8)
+#       $actual_placement_ndx of -1 means discard
+#       $actual_p(iece|lacement)_ndx of $local_(plst|bord) should always eq 't'
+#       $xhst_flag propagates to parents if done looping kids && all kids have true $xhst_flag (don't delete fully exhausted tree parts this time!)
+#       $kids_to_depth_flag is always cleared upon recursive function entry && can be set like $xhst_flag (done looping && all kids true)
+#       $total_kids_count always set as sum of all kids' $total_kids_counts when done looping
+#       $heur_val is highest of kids for piece_ndx sets && $scor + average of kids for placement_ndx sets propagated only when $kids_to_depth_flag was just set
+#       $scor is result after placement_ndx applied to create local_bord (&& assigned to heur_val when no kids yet)
+#     always populate in sets of possible piece_ndx sets + possible placement_ndx sets for each depth
+#     at timer breaks (second intervals) print latest best (i.e., root's $heur_val), $dpth, root's, $xhst_flag, $kids_to_depth_flag, && $total_kids_count
+#     at lowest recursive exhaustion routine, handle movement key events in place but finish current set && fall all the way out before handling (pick|plac)
+  if($xhrf && @{$xhrf}) {
+    if(scalar(@{$xhrf->[0]}) == 7) { # test to determine which phase of depth level is first
+      for(my $qndx = 0; $qndx < @{$xhrf}; $qndx++) { # loop through first phase of current rec-depth (qndx since not direct pndx but $xhrf->[$qndx][0] is)
+        unless($xhrf->[$qndx][1] || $fflg) { # mk sure current pick branch is not already exhausted && not needing to fall-out of recursion for new placement
+               $xhrf->[$qndx][2] = 0; # reset kids_to_depth_flag upon every pick entry
+          for(my $cndx = 0; $cndx < @{$xhrf->[$qndx][6]}; $cndx++) { # loop through second phase of current rec-depth (cndx indirect placements like bndx)
+            unless($xhrf->[$qndx][6][$cndx][1] || $fflg || $kids >= $klim) { # mk sure cur plac branch !already exhausted && !need to fallout && !too many kids
+                   $xhrf->[$qndx][6][$cndx][2] = 0; # reset kids_to_depth_flag upon every plac entry
+#if($gkey ne 'x') { $text[60] = "qndx:$qndx cndx:$cndx fflg;$fflg kids:$kids";
+#$tbrd = $xhrf->[$qndx][6][$cndx][5]; DrawText(); if($gkey eq 'w') { $gkey = $simp->GetK(-1); } else { $gkey = $simp->GetK(0); } }
+              if($rdpt) { # still not at bottom (lowest depth) so go deeper
+                RecuDpth(($rdpt - 1), $xhrf->[$qndx][6][$cndx][6]);
+                # propagate xhst && kids flags && count (only post-recursion to get children after all have been dealt with to depth level)
+                if(      scalar(@{$xhrf->[$qndx][6][$cndx][6]})) {  # mk sure current placement has kids at all to count
+                                  $xhrf->[$qndx][6][$cndx][1]  = 1; # init  current placement exhausted flag to true which becomes false if any kid is !xhsted
+                                  $xhrf->[$qndx][6][$cndx][2]  = 1; # init  current placement kids_to_depth_flag to true
+                                  $xhrf->[$qndx][6][$cndx][3]  = 0; # empty current placement child count to build new accurate count
+                  for my $pick (@{$xhrf->[$qndx][6][$cndx][6]}) { # loop through all pick children
+                                  $xhrf->[$qndx][6][$cndx][1]  = 0 unless($pick->[1]); # propagate non-exhaustion        of child pick to parent placement
+                                  $xhrf->[$qndx][6][$cndx][2]  = 0 unless($pick->[2]); # propagate non-children_to_depth of child pick to parent placement
+                                  $xhrf->[$qndx][6][$cndx][3]++;                       # increment count for each child themself
+                                  $xhrf->[$qndx][6][$cndx][3] += $pick->[3];           # && add in each pick kids' own child counts
+                  }
+                } else { # no kids so mark as exhausted (even though that maybe should have been done already in recursion)
+                                  $xhrf->[$qndx][6][$cndx][1]  = 1;
+                }
+              } else { # at bottom so explore && add data
+# Ugh!  These counts are messed up somehow.  One stage needs previous - 2 && another needs -1?
+                if(@{$xhrf} - 1) { # mk sure there's at least one piece left to pick
+                  $tpls = $xhrf->[$qndx][5];
+                  for(my $rndx = 0; $rndx < (@{$xhrf} - 1); $rndx++) { # create new first phase of lowest rec-depth (rndx is indirect pndx && 2 less parent?)
+                    $pndx = index($tpls, 'a'); # get the first occurrence of 'a' (available) in the temporary parent's piece-list
+                    substr($tpls, $pndx, 1, 't'); # mark that piece as 't' (taken) in the string so that next loop will find next available piece index
+                    $tppy = int($pndx / 7); $tppx = ($pndx % 7);
+                    $kids++; # next line is adding a new kid pick set at the bottom depth
+                    push(@{$xhrf->[$qndx][6][$cndx][6]}, [ $pndx, 0, 0, 0, $xhrf->[$qndx][6][$cndx][7], $xhrf->[$qndx][5], [] ]);
+                    substr($xhrf->[$qndx][6][$cndx][6][-1][5], $pndx, 1, 't'); # designate each piece as "taken" from the child piece-list
+                    # build secondary phase (layer) of first depth level where piece already chosen && all placements vs. discard option to be explored
+                    $btop = $blef = 0; # compute the board left  && top    edge indices where the current piece could possibly have its center
+                    $bbot = $brit = 4; # compute the board right && bottom edge indices where the current piece could possibly have its center
+                    $btop++ if(substr($pshp[$pndx], 0, 1) eq '1' || substr($pshp[$pndx], 1, 1) eq '1' || substr($pshp[$pndx], 2, 1) eq '1');
+                    $bbot-- if(substr($pshp[$pndx], 5, 1) eq '1' || substr($pshp[$pndx], 6, 1) eq '1' || substr($pshp[$pndx], 7, 1) eq '1');
+                    $blef++ if(substr($pshp[$pndx], 0, 1) eq '1' || substr($pshp[$pndx], 3, 1) eq '1' || substr($pshp[$pndx], 5, 1) eq '1');
+                    $brit-- if(substr($pshp[$pndx], 2, 1) eq '1' || substr($pshp[$pndx], 4, 1) eq '1' || substr($pshp[$pndx], 7, 1) eq '1');
+                    for my $tbpy ($btop..$bbot) { # $bpky
+                      for my $tbpx ($blef..$brit) { # $bpkx
+                        $tbrd = $xhrf->[$qndx][6][$cndx][5]; # parent's bord
+                        PrntTPie($tppy, $tppx, $tbpy, $tbpx); # try placing piece
+                        if($okay) {
+#if($gkey ne 'x') { $text[61] = "qndx:$qndx cndx:$cndx rndx:$rndx tppy:$tppy tppx:$tppx tbpy:$tbpy tbpx:$tbpx btop:$btop bbot:$bbot blef:$blef brit:$brit tbrd:$tbrd"; DrawText(); if($gkey eq 'w') { $gkey = $simp->GetK(-1); } else { $gkey = $simp->GetK(0); } }
+                          $kids++; # next line is adding a new kid plac set at the bottom depth
+                          push(@{$xhrf->[$qndx][6][$cndx][6][-1][6]}, [ (($tbpy * 5) + $tbpx), 0, 0, 0, $xhrf->[$qndx][6][$cndx][7],
+                                                                       $xhrf->[$qndx][6][$cndx][5], [], $xhrf->[$qndx][6][$cndx][7] ]); # Pip's Haiku!
+                          PrntBPie(\$xhrf->[$qndx][6][$cndx][6][-1][6][-1][5], $tppy, $tppx, $tbpy, $tbpx); # print the placed piece into the local board
+                          ClerBlkz(\$xhrf->[$qndx][6][$cndx][6][-1][6][-1][5], \$xhrf->[$qndx][6][$cndx][6][-1][6][-1][7]); # clr locl blox (&& updt locl scor)
+                                    $xhrf->[$qndx][6][$cndx][6][-1][6][-1][4] = $xhrf->[$qndx][6][$cndx][6][-1][6][-1][7];  # asin locl scor 2 heur val 2 strt
+                        }
+                      }
+                    } # always add a discard option to explore (last) for any possible picked piece
+                    $kids++; # next line is adding a new kid disc set at the bottom depth
+                    push(@{$xhrf->[$qndx][6][$cndx][6][-1][6]}, [ -1, 0, 0, 0, ($xhrf->[$qndx][6][$cndx][7] - 7),
+                                              $xhrf->[$qndx][6][$cndx][5], [], ($xhrf->[$qndx][6][$cndx][7] - 7) ]); # start new avail placement array-set
+                    $xhrf->[$qndx][6][$cndx][6][-1][3] = scalar(@{$xhrf->[$qndx][6][$cndx][6][-1][6]}); # add in end placement kid count to total kids for pick
+                  }
+                } else { # since no pieces left to pick...
+                  $xhrf->[$qndx][6][$cndx][1] = 1; # set exhausted flag
+                }
+              }
+            }
+            if($xhrf->[$qndx][6][$cndx][1] || $xhrf->[$qndx][6][$cndx][2]) { # if all kids exhausted or at least just reached bottom depth...
+              if(      scalar(@{$xhrf->[$qndx][6][$cndx][6]})) {  # mk sure current placement has kids at all to count
+                                $xhrf->[$qndx][6][$cndx][4]  = $xhrf->[$qndx][6][$cndx][7]; # init heuristic_value to score after current placement
+                for my $pick (@{$xhrf->[$qndx][6][$cndx][6]}) { # loop through all pick kids...
+                                $xhrf->[$qndx][6][$cndx][4] += ($pick->[4] / scalar(@{$xhrf->[$qndx][6][$cndx][6]})); # && add their heur_val / sizeof set
+                }
+              }
+            }
+          }
+unless($fflg) { # ck keys && time at least a couple times each second (maybe tune $kids % $x into)
+  $keey = $simp->GetK(0); if(defined($keey) && $keey ne '-1') { if($mode && $keey =~ /[ diD]/) { $fflg = 1; } else { HndlKeys() } }
+  $time = time(); if($tprv != $time && ($time - $tbgn) % 2) { $tprv = $time; BestPlac(); DrawText(); } # print BestPlac every other second
+}
+          # propagate xhrf && kids flags && count (only post-recursion to get children after all have been dealt with to depth level)
+          if(      scalar(@{$xhrf->[$qndx][6]})) {  # mk sure current pick has kids at all to count
+                            $xhrf->[$qndx][1]  = 1; # init  current pick exhausted flag to true which becomes false if any kid is !xhrfed
+                            $xhrf->[$qndx][2]  = 1; # init  current pick kids_to_depth_flag to true
+                            $xhrf->[$qndx][3]  = 0; # empty current pick child count to build new accurate count
+            for my $plac (@{$xhrf->[$qndx][6]}) { # loop through all placement children
+                            $xhrf->[$qndx][1]  = 0 unless($plac->[1]); # propagate non-exhaustion        of child pick to parent placement
+                            $xhrf->[$qndx][2]  = 0 unless($plac->[2]); # propagate non-children_to_depth of child pick to parent placement
+                            $xhrf->[$qndx][3]++;                       # increment count for each child themself
+                            $xhrf->[$qndx][3] += $plac->[3];           # && add in each plac kids' own child counts
+            }
+          } else { # no kids so mark as exhausted (even though that maybe should have been done already in initial recursion depth that created this node)
+                            $xhrf->[$qndx][1]  = 1;
+          }
+        }
+        if($xhrf->[$qndx][1] || $xhrf->[$qndx][2]) { # if all kids exhausted or at least just reached bottom depth...
+          if(      scalar(@{$xhrf->[$qndx][6]})) {  # mk sure current pick has kids at all to count
+                            $xhrf->[$qndx][4] = 0; # init heuristic_value to zero after pick
+            for my $plac (@{$xhrf->[$qndx][6]}) { # loop through all plac kids...
+                            $xhrf->[$qndx][4] = $plac->[4] if($xhrf->[$qndx][4] < $plac->[4]); # pick heur_vals are the best of all kid placements' heur_vals
+            }
+          }
+        }
+      }
+    } else { # should always be second phase at top w/ 8 elements
+      for(my $cndx = 0; $cndx < @{$xhrf}; $cndx++) { # loop through second phase of first rec-depth (cndx indirect placements like bndx)
+        # fill in from just 2nd phase stuff from above...
+        #   or just don't cull $xhrf data until a whole depth level (both phases) can be shed at once (i.e., only ever set $xhrf to a post-placement grandkid)
+      }
+    }
+  }
+}
+sub HndlKeys {
+  $tbrd = $mbrd;
+  if($gkey eq 'i') { $keey = $gkey; }
+  $gkey = '';
+  if(defined($keey) && $keey ne '-1') {
+    if   (   $keey  eq ' '                                     ) { PlacPiec(); }
+    elsif(   $keey  eq 'i'                                     ) { InitGame(); }
+    elsif(   $keey  eq 'd'                                     ) { DiscPiec(); }
+    elsif(   $keey  eq 'D'                                     ) {    $dflg ^= 1; InitGame(); }
+#    elsif(lc($keey) eq 'r'                                     ) { if($rflg ^= 1) { $mode = 1; substr($plst, (($ppky * 7) + $ppkx), 1, 'a'); RandPiec(); } }
+#    elsif(lc($keey) eq 'v'                                     ) { if($vflg ^= 1) { $tlim = 5555555; } else { $tlim = 5; } }
+    elsif(   $keey  eq 'KEY_LEFT'                              ) { MoveLeft(); }
+    elsif(   $keey  eq 'KEY_RIGHT'                             ) { MoveRite(); }
+    elsif(   $keey  eq 'KEY_UP'                                ) { MoveUppp(); }
+    elsif(   $keey  eq 'KEY_DOWN'                              ) { MoveDown(); }
+    elsif(   $keey  eq 'KEY_BACKSPACE' || lc($keey) eq 'u'     ) { UndoMove(); }
+    elsif(   $keey  eq 'I'                                     ) { ShowInfo(); }
+    elsif(lc($keey) eq 'h' || $keey eq '?' || $keey eq 'KEY_F1') { ShowHelp(); }
+    elsif(lc($keey) eq 'x' || lc($keey) eq 'q' || ord($keey) == 27) { exit(0); }
+    DrawText();
+  }
+}
+while(1) {
+  if(@{$xhst}) { # if there's any data
+    $done = 0;
+    while(0&& $kids < $klim && !$done) { # only exhaust up to $klim (kids-limit) number of child array-sets
+      $fflg = 0; # reset fall-out of recursion flag
+      RecuDpth($dpth++, $xhst); # recurse passing $dpth && array-ref
+      $done = 1; for(@{$xhst}) { $done  = 0 unless($_->[1]); } # test if everything exhausted
+      if($done) { $text[62] = 'Possibilities completely exhausted!'; }
+      else      { $text[62] = "Searching dpth:$dpth kids:$kids klim:$klim..."; }
+      HndlKeys() if($fflg);
+      DrawText();
+    }
+    $keey = $simp->GetK(-1); # if too many kids or done (totally exhausted), just get blocking key presses && handle them until things change
+    HndlKeys();
+  }
+}

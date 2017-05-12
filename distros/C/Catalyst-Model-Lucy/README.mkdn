@@ -1,0 +1,100 @@
+# NAME
+
+Catalyst::Model::Lucy
+
+# SYNOPSIS
+
+    # 1. Setup the Model
+    package MyCatApplication::Model::Lucy;
+    use base qw(Catalyst::Model::Lucy);
+
+    my $other_type = Lucy::Plan::FullTextType->new(
+        analyzer => Lucy::Analysis::PolyAnalyzer->new( language => 'en' )
+    );
+
+    __PACKAGE__->config(
+        index_path     => File::Spec->catfile($FindBin::Bin,'index/path/'),
+        num_wanted     => 20,
+        language       => 'en',
+        create_index   => 1,   # Optional
+        truncate_index => 1,   # Optional
+        schema_params  => [    # Optional schema params
+                              { name => 'title' },   # defaults to Lucy::Plan::FullTextType
+                              { name => 'desc', type => $other_type }
+                          ]
+    );
+
+
+
+    # 2. Use in a controller
+    my $results = $c->model('Lucy')->hits( query => 'foo' );
+    while ( my $hit = $results->next ) {
+        print $hit->{title},"\n";
+    }
+
+
+
+
+
+# DESCRIPTION
+
+This is a catalyst model for Apache [Lucy](http://search.cpan.org/perldoc?Lucy). 
+
+# ATTRIBUTES
+
+## create_index( 1|0 )
+
+Sets the create_index flag to either 1 or 0 when initializing
+[Lucy::Index::Indexer](http://search.cpan.org/perldoc?Lucy::Index::Indexer). Default value is 0.
+
+## index_path( $path )
+
+Specifies the path to the index. The default path is $FindBin::Bin/index.
+
+## index_searcher
+
+This is [Lucy::Search::IndexSearcher](http://search.cpan.org/perldoc?Lucy::Search::IndexSearcher)
+
+## indexer
+
+This is [Lucy::Index::Indexer](http://search.cpan.org/perldoc?Lucy::Index::Indexer)
+
+## language( $lang )
+
+This is the index language, the default value is en.
+
+## num_wanted($num)
+
+This is the number of hits the index_searcher will return. This is for
+pagination.
+
+## schema
+
+Accessor to [Lucy::Plan::Schema](http://search.cpan.org/perldoc?Lucy::Plan::Schema)
+
+## schema_params( $array_ref )
+
+Used when the indexer is initialized. The values of this are used to define
+any custom scheme for index creation. See <Lucy::Plan::Schema>
+
+## truncate_index( 1|0 )
+
+Sets the truncate flag to either 1 or 0 when initializing
+[Lucy::Index::Indexer](http://search.cpan.org/perldoc?Lucy::Index::Indexer). Default value is 0.
+
+# METHODS
+
+# AUTHOR
+
+Logan Bell [email:logie@cpan.org](email:logie@cpan.org)
+
+# SEE ALSO
+
+[Lucy](http://search.cpan.org/perldoc?Lucy), [Catalyst::Model](http://search.cpan.org/perldoc?Catalyst::Model)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, Logan Bell [email:logie@cpan.org](email:logie@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

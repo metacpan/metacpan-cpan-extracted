@@ -1,0 +1,112 @@
+From catalyst-bounces@lists.rawmode.org  Thu Apr 27 02:43:02 2006
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+X-Original-To: archive_catalyst_lists.rawmode.org@mazrmail.com
+Delivered-To: archive_catalyst_lists.rawmode.org@mazrmail.com
+Received: from rawmode.org (HELO rawmode.org) (213.239.209.201)
+    by s69759.xenosight.com (qpsmtpd/0.32) with ESMTP; Thu, 27 Apr 2006 02:43:01 -0500
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.60)
+        (envelope-from <catalyst-bounces@lists.rawmode.org>)
+        id 1FZ13j-0007dJ-Fk; Thu, 27 Apr 2006 09:37:07 +0200
+Received: from [72.232.3.146] (helo=jack.jumba.net.au)
+        by rawmode.org with esmtp (Exim 4.60)
+        (envelope-from <bjdean@jack.jumba.net.au>) id 1FZ13g-00027K-Us
+        for catalyst@lists.rawmode.org; Thu, 27 Apr 2006 09:37:05 +0200
+Received: from bjdean by jack.jumba.net.au with local (Exim 4.52)
+        id 1FZ10j-0000Sx-Ii
+        for catalyst@lists.rawmode.org; Thu, 27 Apr 2006 17:34:01 +1000
+Date: Thu, 27 Apr 2006 17:34:01 +1000
+From: Bradley Dean <catalyst@bjdean.id.au>
+To: Catalyst <catalyst@lists.rawmode.org>
+Message-ID: <20060427073401.GA757@unimelb.edu.au>
+Mime-Version: 1.0
+User-Agent: Mutt/1.4.1i
+X-AntiAbuse: This header was added to track abuse,
+        please include it with any abuse report
+X-AntiAbuse: Primary Hostname - jack.jumba.net.au
+X-AntiAbuse: Original Domain - lists.rawmode.org
+X-AntiAbuse: Originator/Caller UID/GID - [32077 579] / [47 12]
+X-AntiAbuse: Sender Address Domain - jack.jumba.net.au
+X-Source:
+X-Source-Args:
+X-Source-Dir:
+Subject: [Catalyst] Has anybody seen PluginTestApp.pm?
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.7
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0331247181=="
+Mime-version: 1.0
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Status: O
+X-Status:
+X-Keywords:
+X-UID: 1484
+
+--===============0331247181==
+Content-Type: text/plain; charset=unknown-8bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+
+Greetings folks,
+
+just beginning to dip my toe into Catalyst - incidentally, despite the
+trolling, the recent "What a waste of time" thread had some useful
+information... :)
+
+> At 07:21 PM 4/26/2006, Scott Karns wrote:
+> >I am just now trying to install Catalyst-5.68 as downloaded from CPAN,
+> >but I'm getting a test failed on:
+> >t/unit_core_plugin................................Can't locate
+> >PluginTestApp.pm
+> >
+> >I see that there is a PluginTestApp.pm in the Catalyst-Plugin-Scheduler
+> >distribution package, but I can't find one in Catalyst-5.68.
+> >
+> >--
+> >Scott Karns
+>
+> Me, too!  (I hadn't gone back to see if anybody'd reported this yet)
+> I had only investigated to the point of seeing that 5.66 had a
+> package PluginTestApp;
+> in the unit_core_plugin.t source, but that that had disappeared by
+> 5.68.
+
+I'm seeing the same thing in Catalyst 5.68, in another install I've done
+recently I have Catalyst 5.678 which has a very different
+t/unit_core_plugin.t which includes a package declaration for
+PluginTestApp.
+
+Cheerio,
+
+ Brad
+
+--
+Bradley Dean ... å¹³é<9d><99>
+Software Engineer - http://bjdean.id.au/
+Email: bjdean@bjdean.id.au Mobile: +61-413014395
+AICSA - webmaster@aicsa.org.au - http://www.aicsa.org.au/
+ICICLES Ski Club - webmaster@icicles.com.au - http://www.icicles.com.au/
+
+
+--===============0331247181==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst
+
+--===============0331247181==--

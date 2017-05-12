@@ -1,0 +1,142 @@
+NAME
+    Class::Dot::Model - Simple way of defining models for DBIx::Class.
+
+VERSION
+    This document describes Class::Dot::Model version v%%VERSION%%
+
+SYNOPSIS
+         package My::Model;
+         use Class::Dot::Model   domain => 'org.mydomain.myapp';
+ 
+         package My::Model::Cat;
+         use Class::Dot::Model::Table qw(:has_many);
+ 
+         Table       'cats';
+         Columns     qw( id gender dna action colour );
+         Primary_Key 'id';
+         Has_Many    'memories'
+             => 'My::Model::Cat::Memory';
+ 
+         package My::Model::Cat::Memory;
+         use Class::Dot::Model::Table qw(:belongs_to);
+ 
+         Table       'memory';
+         Columns     qw( id cat content );
+         Primary_Key 'id';
+         Belongs_To  'cat'
+             => 'My::Model::Cat';
+
+    Then you would have to initialize the database configuration for
+    org.mydomain.myapp:
+
+         use Config::PlConfig;
+         my $DOMAIN   = 'org.mydomain.myapp';
+ 
+         my $dbconfig = {
+             driver      => 'mysql',
+             database    => 'myappdb',
+             hostname    => 'localhost',
+             username    => 'me',
+             password    => 'secret',
+         };
+ 
+         my $plconfig = Config::PlConfig->new({
+             domain  => $DOMAIN,
+         });
+         my $config = $plconfig->load();
+         $config->{database} = $dbconfig;
+         $plconfig->save();
+
+DESCRIPTION
+    A module for making DBIx::Class even simpler.
+
+SUBROUTINES/METHODS
+    None of this modules functions should be used directly.
+
+  PRIVATE CLASS METHODS
+   "_create_dsn_with_config($config)"
+    Create a DBI DSN out of a configuration hash.
+
+   "_install_constructor($call_class, $dsn, $config)"
+    Create an install a C<new> function into the callers namespace. This new
+    function is responsible for connecting to the database etc.
+
+    The property is a string.
+
+   "_load_dbconfig($config_domain, $config_host)"
+    Load the database configuration using a Config::PlConfig host and
+    domain.
+
+  PRIVATE SUBROUTINES
+   "requires()"
+    Used by L<Class::Dot::Model::Preload> to know which modules this module
+    requires.
+
+DIAGNOSTICS
+    None.
+
+CONFIGURATION AND ENVIRONMENT
+    This module uses Config::PlConfig to load configuration if a domain is
+    given as import argument.
+
+DEPENDENCIES
+    *   DBIx::Class
+
+    *   Class::Dot
+
+    *   Class::Plugin::Util
+
+    *   Params::Util
+
+    *   Config::PlConfig
+
+    *   version
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    bug-class-dot-model@rt.cpan.org, or through the web interface at CPAN
+    Bug tracker.
+
+SEE ALSO
+  DBIx::Class
+  Class::Dot::Model::Table
+  Class::Dot
+AUTHOR
+    Ask Solem, ask@0x61736b.net.
+
+LICENSE AND COPYRIGHT
+    Copyright (c), 2007 Ask Solem ask@0x61736b.net.
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

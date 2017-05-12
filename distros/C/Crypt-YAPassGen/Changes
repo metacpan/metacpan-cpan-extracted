@@ -1,0 +1,9 @@
+Revision history for Perl extension Crypt::YAPassGen.
+
+0.02  Sun May 30 10:35:49 CEST 2004
+    - fixed META.yml
+
+0.01  Tue May 25 08:05:26 2004
+	- original version; created by h2xs 1.23 with options
+		-AXb 5.6.0 Crypt::YAPassGen
+

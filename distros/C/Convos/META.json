@@ -1,0 +1,62 @@
+{
+   "abstract" : "Multiuser IRC proxy with web interface",
+   "author" : [
+      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convos",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.90"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Daemon::Control" : "0.001006",
+            "IO::Socket::SSL" : "1.84",
+            "IRC::Utils" : "0.12",
+            "Mojo::IRC" : "0.16",
+            "Mojo::Redis" : "1.01",
+            "Mojolicious" : "5.3",
+            "Mojolicious::Plugin::AssetPack" : "0.31",
+            "Mojolicious::Plugin::FontAwesome4" : "4.2004",
+            "Mojolicious::Plugin::LinkEmbedder" : "0.18",
+            "Parse::IRC" : "1.18",
+            "Time::Piece" : "1.2",
+            "URI::Find" : "20111103",
+            "Unicode::UTF8" : "0.58"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Nordaaker/convos/issues"
+      },
+      "homepage" : "http://convos.by/",
+      "repository" : {
+         "url" : "https://github.com/nordaaker/convos.git"
+      }
+   },
+   "version" : "0.8604"
+}

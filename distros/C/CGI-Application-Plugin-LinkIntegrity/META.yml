@@ -1,0 +1,21 @@
+---
+name: CGI-Application-Plugin-LinkIntegrity
+version: 0.06
+author:
+  - Michael Graham <mag-perl@occamstoothbrush.com>
+abstract: Make tamper-resisistent links in CGI::Application
+license: perl
+requires:
+  CGI: 2.37
+  CGI::Application: 4
+  Digest::HMAC: 0
+  Digest::MD5: 0
+  Test::More: 0
+  URI: 0
+  URI::Escape: 0
+  URI::QueryParam: 0
+provides:
+  CGI::Application::Plugin::LinkIntegrity:
+    file: lib/CGI/Application/Plugin/LinkIntegrity.pm
+    version: 0.06
+generated_by: Module::Build version 0.2611

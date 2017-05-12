@@ -1,0 +1,50 @@
+NAME
+    Config::Any::TOML - Load TOML config files
+
+VERSION
+    version 0.002
+
+DESCRIPTION
+    Loads TOML files. See <https://github.com/mojombo/toml>
+
+METHODS
+  extensions()
+    return an array of valid extensions ("toml").
+
+  load( $file )
+    Attempts to load $file as an TOML file.
+
+  requires_any_of()
+    Specifies that this module requires one of the following TOML modules in
+    order to work.
+
+    *   TOML
+
+SEE ALSO
+    *   Config::Any
+
+    *   TOML
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mjemmeson/config-any-toml/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mjemmeson/config-any-toml>
+
+      git clone git://github.com/mjemmeson/config-any-toml.git
+
+AUTHOR
+    Michael Jemmeson <mjemmeson@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Michael Jemmeson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

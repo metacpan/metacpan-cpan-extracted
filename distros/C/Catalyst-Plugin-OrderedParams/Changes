@@ -1,0 +1,26 @@
+Revision history for Perl extension Catalyst::Plugin::OrderedParams
+
+0.06    2007-03-20 23:25:00
+        - Fixed compatibility with Catalyst 5.7007.
+
+0.05    2005-11-17 12:00:00
+        - Replaced Text::ASCIITable with Text::SimpleTable.
+        - Fixed 01use.t.
+
+0.04    2005-11-02 19:15:00
+        - Fixed alignment of multi-value keys in the debug output.
+        - Added support for Catalyst 5.5.  Will still work with older
+          versions of Catalyst, too.
+        - Switched from Tie::IxHash to Tie::Hash::Indexed, which is
+          written in XS.
+
+0.03    2005-09-08 14:15:00
+        - Added tests.
+        - Code cleanup.
+
+0.02    2005-08-30 12:12:00
+        - added note about this behavior not being RFC-compliant
+          (Tom Shinnick)
+
+0.01    2005-07-28 18:20:00
+        - initial release

@@ -1,0 +1,68 @@
+       		     _                         ___
+		    /      ._ _  _   _ o o | |  |
+		    \_ |_| | _> (/_ _> o o |_| _|_
+
+	   A curses based user interface framework in perl
+
+
+What is Curses::UI?
+-------------------
+A UI framework based on the curses library. Curses::UI contains
+several widgets which can be used to build a user interface:
+
+- Buttonbox 
+- Calendar
+- Checkbox
+- Container (container base element)
+- Label
+- Listbox 
+- Menubar
+- PasswordEntry
+- Popupmenu (a.k.a. pulldown- or dropdown menu)
+- Progressbar
+- Radiobuttonbox
+- Texteditor (has features like word wrapping and undo)
+- Textentry
+- Textviewer
+- Widget (widget base element)
+- Window
+
+There are also prefabricated dialog windows available:
+
+- Basic dialog window 
+- Error dialog window
+- Filebrowser 
+- Status window 
+- Progress window
+- Calendar dialog window
+
+
+Localization
+------------
+Curses::UI can easily be configured to use a specific language.
+If you want a language that is not yet supported, please let me
+know. If you want to translate the needed strings, I'll add 
+the language to the distribution. Currently the following languages
+are supported:
+
+- English
+- Dutch
+- German
+- Russian
+- Italian
+- Polish
+- Portuguese
+- Norwegian
+- Slovak
+
+
+Examples
+--------
+Examples are in the distribution's "examples" directory.
+You do not have to install this distribution to test these
+examples.
+
+
+More Information
+----------------
+Please see 'perldoc ./lib/Curses/UI.pm' for more information.

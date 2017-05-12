@@ -1,0 +1,55 @@
+Collision::2D
+
+An object-oriented continuous collision detection library.
+
+Here's how to use Collision::2D
+1. Create some entities. Say you want detect a collision
+   betwixt 2 rectangles. I recommend using hash2rect for
+   DWIMMY goodness, or the constructor
+   Collision::2D::Entity::Rect->new(%params).
+   Parameters are x, y, h, w, xv, and yv.
+2. Detect collisions with 
+   my $collision = Collision::2D::dynamic_collision($ent1, $ent2, interval=>1);
+   A Collision::2D::Collision object is returned in the event of a collision.
+   This will return undef if the entities do not collide.
+2. Alternatively, to detect static collision, i.e. intersection, 
+   my $intersects = Collision::2D::intersection($ent1, $ent2);
+   $intersects is a true or false value.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Collision::2D
+
+You can also look for information at:
+
+   Search CPAN
+   http://search.cpan.org/dist/Collision-2D/
+   
+   Github
+   http://github.com/zpmorgan/collision-2D
+   
+   irc.perl.org
+   #sdl
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Zach Morgan
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

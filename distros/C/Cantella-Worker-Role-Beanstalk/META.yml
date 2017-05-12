@@ -1,0 +1,33 @@
+---
+abstract: 'Fetch Cantella::Worker jobs from beanstalkd'
+author:
+  - 'Guillermo Roditi (groditi) <groditi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Log::Dispatch::Array: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cantella-Worker-Role-Beanstalk
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Beanstalk::Client: 1.06
+  Cantella::Worker: 0.001000
+  List::Util: 0
+  Log::Dispatch: 2.26
+  Moose: 0.94
+  MooseX::Types::Common::Numeric: 0.001000
+resources:
+  IRC: irc://irc.perl.org/#poe
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/groditi/Cantella-Worker-Role-Beanstalk.git
+version: 0.001000

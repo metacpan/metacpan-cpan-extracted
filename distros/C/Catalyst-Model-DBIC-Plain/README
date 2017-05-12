@@ -1,0 +1,9 @@
+This is the C<DBIx::Class> model class for Catalyst. Whilst it allows you to
+use DBIC as your model in Catalyst, it does not make your tables classes
+Catalyst-specific, so you can still use them in a non-Catalyst context.
+
+INSTALLATION:
+
+perl Makefile.PL
+make
+sudo make install

@@ -1,0 +1,53 @@
+NAME
+    Chemistry::MolecularMass - Perl extension for calculating molecular mass of a chemical compound given its chemical formula.
+
+VERSION
+    0.1
+
+AUTHOR AND COPYRIGHT
+    Copyright (C) 2000, Maksim A. Khrapov maksim@recursivemind.com http://www.recursivemind.com
+
+    This program is distributed under Perl Artistic Lisence. No warranty. Use at your own risk.
+
+SYNOPSIS
+       use Chemistry::MolecularMass;
+       my $mm = new Chemistry::MolecularMass;
+       my $mass = $mm->calc_mass("C2H5OH");
+       print $mass if defined($mass);
+
+       my %default_macros = $mm->all_macros;
+       $mm->add_macros("Ts" => "CH3C6H4SO2", "Bs" => "BrC6H4SO2");
+       $mass = $mm->calc_mass("TsOEt");
+       $mass = $mm->calc_mass("{[(CH3)3Si]2N}2CHCH<CH2Br>2");
+
+       ### if you are an organic chemist, you might want to do this:
+       $mm->add_macros("Pr" => "C3H7", "Ac" => "CH3COO");
+
+       my %elements = $mm->all_elements;
+       $mm->replace_elements("Na" => 24.00, "Cl" => 37.00);
+       $mass = $mm->calc_mass("NaCl");
+
+DESCRIPTION
+       Chemistry::MolecularMass is an Object Oriented Perl module for calculating
+       molcular mass of chemical compounds implemented with Perl and C.
+       Molecular masses of elements stored in the module follow recommendations
+       of IUPAC (1995). The module includes elements from H(1) through
+       Uuu(113) and isotopes of hydrogen: deuterium and tritium. The module
+       also allows a programmer to change the default masses of elements
+       for work with isotopes. It also includes some of the more common
+       chemical abbreviations as macros and allows to add new macros and
+       change the values of old macros. A hash of all macros and a hash
+       of all elements can be returned.
+
+       Arbitrary element names can be added, they are expected, however, to
+       start with an upper case letter followed by zero or more lower case
+       letters. Macros can be any string of characters. Macros are substituted
+       only once, so a macro should not evaluate to another macro. Legal
+       characters in a formula are: A-Za-z0-9<>{}[]()
+       Spaces are not allowed. Parentheses can be nested arbitrarily deep.
+
+       Each MolecularMass object has its own hashes of macros and element 
+       masses, so modifications made to one MolecularMass object do NOT
+       affect another. The whole thing was programmed with reentrancy
+       in mind, so it should be thread safe as well.
+

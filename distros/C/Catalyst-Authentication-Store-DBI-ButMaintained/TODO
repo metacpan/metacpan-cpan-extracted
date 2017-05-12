@@ -1,0 +1,22 @@
+
+Roles:
+* Roles should defer to store for role lookup
+  Reversal: See other notes
+* Add ROLE lookup on custom information (like find_user)
+  Reversal: Accomplished through subclassing User, to much work to build an ORM that permits M2M O2M with role_ids and role_names...
+
+* Schema qualification
+* Use a real serialization so the session doens't require a hit to the DB
+
+Statements of direction:
+* *store* should do all database interaction
+	Reversal: this was not a good idea because there is no context-insensitive way to store a database handle currently. This means that retreiving the handle require $c and storing it means you remembering the model which might (using ACCEPT_CONTEXT) be specific to $c. Currently, this problem isn't solved, but we store the $c->model('DBI') on the user during creation which at least protects us against contextual model for different users. All bets are off the table if the user isn't fully retreived prior to serializing with Store->for_user. If we lose $c->model('DBI') we can never ensure we get the same one. See ACCEPT_CONTEXT.
+* User can /defer/ to store, but not access database
+  Reversal: see above
+
+DONE:
+sub from_session:
+* Permit custom info like the find_user stuff
+* User class needs to be customizable like DBIx::Class
+* Add tests for ROLE
+* If the user can be reduced to a single index lookup, we should optimize to use that too (no mandatorily using the find_user info)

@@ -1,0 +1,105 @@
+                   =========================================
+                     Package "Config::Manager" Version 1.7
+                   =========================================
+
+
+             Copyright (c) 2003 by Steffen Beyer & Gerhard Albers.
+                             All rights reserved.
+
+
+Contents:
+---------
+
+    +   Prerequisites
+    +   Preliminary steps for use with Perl prior to version 5.002
+    +   Preliminary steps for use with ActiveState's port of Perl 5.005
+    +   Installation
+
+
+Prerequisites:
+--------------
+
+Perl version 5.000 or higher, modules IO::File, File::Compare,
+File::Copy, Net::SMTP and MD5.
+
+
+Preliminary steps for use with Perl prior to version 5.002:
+-----------------------------------------------------------
+
+Edit the file "Makefile.PL" and change the line
+
+    'VERSION_FROM'      => 'Manager.pm',
+to
+    'VERSION'           => '1.7',
+
+Also edit the file "t/00____version.t" and change the line
+
+    use Config::Manager 1.7;
+to
+    use Config::Manager;
+
+
+Preliminary steps for use with ActiveState's port of Perl 5.005:
+----------------------------------------------------------------
+
+(For the Win32 platform)
+
+Edit the file "Makefile.PL" and remove all of the "#" characters
+which currently comment out the attributes "ABSTRACT", "AUTHOR"
+and "CAPI".
+
+
+Installation:
+-------------
+
+=============================================================================
+ALWAYS unpack and build Perl modules OUTSIDE the Perl source and installation
+tree! (You might otherwise inadvertently corrupt your Perl installation!)
+=============================================================================
+
+Quick installation guide for experienced users:
+-----------------------------------------------
+
+    UNIX:                 Win32/Borland C++:      Win32/MS Visual C++:
+    =====                 ==================      ====================
+
+    > perl Makefile.PL    > perl Makefile.PL      > perl Makefile.PL
+    > make                > dmake                 > nmake
+    > make test           > dmake test            > nmake test
+    > make install        > dmake install         > nmake install
+
+Detailed installation guide:
+----------------------------
+
+ 1) Change directory to the directory that has been created by unpacking this
+    package ("cd Config-Manager-1.7").
+
+ 2) Type "perl Makefile.PL" (or whatever the name and path of your Perl 5
+    binary is).
+
+    This will create a "Makefile" with the appropriate parameters for your
+    system (for instance, where the install directories are, and so on).
+
+ 3) Type "make".
+
+    (For installation under Windows NT/95, use "dmake" (Borland C++) or
+    "nmake" (MS Visual C++) instead!)
+
+    This will create a dynamically linkable library file that will be linked
+    to Perl later, at runtime, provided your system supports dynamic linking.
+
+    Please refer to the MakeMaker documentation for instructions on how
+    to build a new Perl with statically linked libraries (invoke "perldoc
+    ExtUtils::MakeMaker" for this), if your system does NOT support dynamic
+    linking!
+
+ 4) Now issue "make test" (or "dmake test" or "nmake test", respectively).
+
+    The output should look somewhat like this:
+
+
+ 5) At last, type "make install" (or "dmake install", "nmake install").
+
+ 7) Enjoy!
+
+

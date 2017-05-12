@@ -1,0 +1,24 @@
+---
+name: CAM-DBF
+version: 1.02
+author:
+  - 'Clotho Advanced Media, Inc. <cpan@clotho.com>'
+abstract: Perl extension for reading and writing dBASE III DBF files
+license: perl
+resources:
+  license: perl://dev.perl.org/licenses/
+requires:
+  Getopt::Long: 2.0
+  Pod::Usage: 1.0
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+  Time::HiRes: 0
+provides:
+  CAM::DBF:
+    file: lib/CAM/DBF.pm
+    version: 1.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

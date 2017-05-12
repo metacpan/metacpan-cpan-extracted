@@ -1,0 +1,135 @@
+SYNOPSIS
+      use Attache;
+      # Create 
+      my $a=Attache->new('alfo_webteam');
+      # Run a command
+      $a->lsws() or warn("Problems on lsws"); 
+      # Check errors, warnings, output
+      if($attache->hasErrors()) {
+          print STDOUT
+              "completed, with ERRORS:\n",
+              join("\n", $attache->errors()),"\n";
+      } 
+      if($attache->hasWarnings()) {
+          print STDOUT
+              "completed, with WARNINGS:\n",
+              join("\n", $attache->warnings()),"\n";
+      }
+      print STDOUT "Output:\n",join("\n",$attache->lastoutput()),"\n";
+
+DESCRIPTION
+    Attache.pm is an OO interface to the ClearCase CLI facility on Win32
+    systems (attcmd). You need attcmd installed to be able to use this
+    module.
+
+  METHODS
+
+    new($ws,[$attcmd])
+        Constructs a new attache command: takes the workspace as a mandatory
+        argument. Optional argument is the path to attcmd.
+
+    getWs()
+        returns the curent workspace
+
+    setWs($ws)
+        sets the current workspace
+
+    vault()
+        Returns the local physical location for the current workspace, e.g:
+
+            my $a=Attache->new("alfo_dev7");
+            print $a->vault(),"\n";
+            # prints F:\home\alf\ClearCase\alfo_dev7 on my machine
+    
+    lastoutput()
+        returns the output of the last issued command, as an array of lines
+        (trailing newlines and CR removed)
+
+    hasErrors()
+        true if the last command had erros
+
+    errors()
+        returns the error diagnostics of the last issued command, as an
+        array of lines (trailing newlines and CR removed)
+
+    hasWarnings()
+        true if the last command had warnings
+
+    warnings()
+        returns the warning diagnostics of the last issued command, as an
+        array of lines (trailing newlines and CR removed)
+
+    [any_attcmd_command]($argstring)
+        executes any given attache command, with the given args, for
+        instance:
+
+            my $a=Attache->new("alfo_dev7");
+            $a->co(' -c "None of your business" /tt_vob/foo/bar/baz.cpp'); 
+
+        Arguments are processed by the shell, so caution with quoting,
+        special characters etc. should be exercised. DO NOT include any
+        workspace indication - it is automatically inserted.
+
+        Please consult the attache documentation to find out which commands
+        are supported.
+
+    setlog($path,[$appendflag])
+        Calling setlog directs attache to direct the comand output ti the
+        given file. If the (optional) $appendflag is true, the file is
+        opened in append mode and any previous content is preserved, rather
+        than truncated (the default). Calling
+
+            $a->setlog(undef)
+
+        Disables logging.
+
+  EXPORT
+
+    None
+
+  INSTALLATION
+
+    Just drop in any directory of your INCLUDE path, or read the FindBin
+    docs and do something along the lines of:
+
+      use FindBin qw($Bin);
+      use lib ($Bin,"$Bin/../perl/lib", "$Bin/../lib/perl","$Bin/../lib");
+      #
+      use Attache;
+
+  SUPPORTED VERSIONS AND PLATFORMS
+
+    Tested with perl 5.6 (ActiveState build 623) on Windows NT. For Unix,
+    check the Clearcase wrapper on the nearest CPAN site
+    (http://search.cpan.org/search?mode=module&query=Clearcase).
+
+    Lesser perl versions may work (I'm almost positive about 5.5). Windowze
+    (non-NT) may also work, but I doubt it, as command.com is even more
+    broken than cmd.exe .
+
+  BUGS AND LIMITATIONS
+
+    No effort is made to ensure workspace validity. Setlog should accept
+    filehandle objects, and it should be possible to log directly to STDOUT
+    or STDERR.
+
+    Due to the cretin way in which cmd.exe handles command line quoting,
+    some combinations of (legitimate) arguments may break Attache - when
+    this happens, please direct your grievances to:
+
+        Microsoft Corp., Redmond, WA, U.S.A.
+
+    Every command starts a new attcmd.exe. If anybody knows a way to use
+    attcmd over a pipe (or a COM interface, or something else) pls. let me
+    know.
+
+AUTHOR
+    Alessandro Forghieri, alf@orion.it
+
+SEE ALSO
+    The attache documentation, perl(1).
+
+LICENSE
+    This code is released under the No-Copyright provisions of the GNU
+    Public License
+

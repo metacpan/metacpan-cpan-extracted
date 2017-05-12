@@ -1,0 +1,28 @@
+---
+abstract: "all you want to do with parameters for your program (or someone else's)"
+author:
+  - 'Thomas Orgis <thomas@orgis.org>'
+build_requires:
+  File::Spec: '0'
+  Storable: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Param
+provides:
+  Config::Param:
+    file: lib/Config/Param.pm
+    version: '3.002000'
+  Config::Param::FileWorker:
+    file: lib/Config/Param/FileWorker.pm
+requires:
+  perl: '5.008'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '3.002000'

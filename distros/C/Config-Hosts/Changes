@@ -1,0 +1,10 @@
+Revision history for Config-Hosts
+
+0.01    Wed Mar 16 13:11:23 IST 2011
+        First version.
+
+0.02    Thu Jan 24 17:00:00 PST 2013
+	Fixed problem with delete/replace due to index offset
+
+0.03	Thu Jan 31 17:00:00 PST 2013
+	Patched a test to run properly on windows.

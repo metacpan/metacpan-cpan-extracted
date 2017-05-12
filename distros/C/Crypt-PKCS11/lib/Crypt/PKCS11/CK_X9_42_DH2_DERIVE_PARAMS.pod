@@ -1,0 +1,156 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS - Perl interface to PKCS #11 CK_X9_42_DH2_DERIVE_PARAMS structure
+
+=head1 SYNPOSIS
+
+  use Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS;
+  my $obj = Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS->new;
+  $obj->set...;
+  $obj->get...;
+
+=head1 DESCRIPTION
+
+This is the Perl interface for the C structure CK_X9_42_DH2_DERIVE_PARAMS in PKCS #11.
+See PKCS #11 documentation for more information about the structure and what it
+is used for.
+
+=head1 METHODS
+
+=over 4
+
+=item $obj = Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS->new
+
+Returns a new Crypt::PKCS11::CK_X9_42_DH2_DERIVE_PARAMS object.
+
+=item $rv = $obj->get_kdf($kdf)
+
+Retrieve the value B<kdf> from the structure into C<$kdf>.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $kdf = $obj->kdf
+
+Returns the value B<kdf> from the structure or undef on error.
+
+=item $rv = $obj->set_kdf($kdf)
+
+Set the value B<kdf> in the structure.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $rv = $obj->get_pOtherInfo($pOtherInfo)
+
+Retrieve the value B<pOtherInfo> from the structure into C<$pOtherInfo>.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $pOtherInfo = $obj->pOtherInfo
+
+Returns the value B<pOtherInfo> from the structure or undef on error.
+
+=item $rv = $obj->set_pOtherInfo($pOtherInfo)
+
+Set the value B<pOtherInfo> in the structure.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $rv = $obj->get_pPublicData($pPublicData)
+
+Retrieve the value B<pPublicData> from the structure into C<$pPublicData>.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $pPublicData = $obj->pPublicData
+
+Returns the value B<pPublicData> from the structure or undef on error.
+
+=item $rv = $obj->set_pPublicData($pPublicData)
+
+Set the value B<pPublicData> in the structure.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $rv = $obj->get_hPrivateData($hPrivateData)
+
+Retrieve the value B<hPrivateData> from the structure into C<$hPrivateData>.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $hPrivateData = $obj->hPrivateData
+
+Returns the value B<hPrivateData> from the structure or undef on error.
+
+=item $rv = $obj->set_hPrivateData($hPrivateData)
+
+Set the value B<hPrivateData> in the structure.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $rv = $obj->get_pPublicData2($pPublicData2)
+
+Retrieve the value B<pPublicData2> from the structure into C<$pPublicData2>.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=item $pPublicData2 = $obj->pPublicData2
+
+Returns the value B<pPublicData2> from the structure or undef on error.
+
+=item $rv = $obj->set_pPublicData2($pPublicData2)
+
+Set the value B<pPublicData2> in the structure.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=back
+
+=head1 PRIVATE METHODS
+
+These are the private methods used within the module and should not be used
+elsewhere.
+
+=over 4
+
+=item $bytes = $obj->toBytes
+
+Return the structure represented as bytes or undef on error.
+
+=item $rv = $obj->fromBytes($bytes)
+
+Sets the structure from a representation in bytes.
+Returns C<CKR_OK> on success otherwise a CKR describing the error.
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

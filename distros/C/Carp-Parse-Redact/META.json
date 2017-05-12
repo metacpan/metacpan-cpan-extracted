@@ -1,0 +1,64 @@
+{
+   "abstract" : "Parse a Carp stack trace into an array of caller information, while redacting sensitive function parameters out.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>",
+      "Kate Kirby <kate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Carp-Parse-Redact",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Parse" : "0",
+            "Data::Dump" : "0",
+            "Data::Validate::Type" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Carp::Parse::CallerInformation::Redacted" : {
+         "file" : "lib/Carp/Parse/CallerInformation/Redacted.pm",
+         "version" : "v1.1.5"
+      },
+      "Carp::Parse::Redact" : {
+         "file" : "lib/Carp/Parse/Redact.pm",
+         "version" : "v1.1.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/ReportBug.html?Queue=carp-parse-redact"
+      },
+      "homepage" : "https://metacpan.org/release/Carp-Parse-Redact",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/katekirby/Carp-Parse-Redact.git"
+      }
+   },
+   "version" : "v1.1.5"
+}

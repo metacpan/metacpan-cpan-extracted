@@ -1,0 +1,17 @@
+Revision history for Perl extension Crypt::Vigenere.
+
+0.07	2002.01.29
+	- fixed further decryption/encryption bug, now a true implementation of
+		the Vigenere Cipher.
+
+0.06	2002.01.29
+	- fixed outstanding bugs, as near as pre-release as it will get.
+
+0.05	2002.01.27
+	- fix key length bug. 
+
+0.04	2002.01.25
+	- minor fixes to fix distribution files
+
+0.03	2002.01.15
+	- original working version

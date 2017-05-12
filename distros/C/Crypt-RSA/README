@@ -1,0 +1,34 @@
+$Id$
+
+README for Crypt::RSA
+
+Introduction
+
+    Crypt::RSA is a pure-perl, cleanroom implementation of the RSA
+    public-key cryptosystem. It uses Math::Pari(3), a perl interface to the
+    blazingly fast PARI library, for big integer arithmetic and number
+    theoretic computations.
+
+    Crypt::RSA provides arbitrary size key-pair generation, plaintext-aware
+    encryption (OAEP) and digital signatures with appendix (PSS). For
+    compatibility with SSLv3, RSAREF2, PGP and other applications that
+    follow the PKCS #1 v1.5 standard, it also provides PKCS #1 v1.5
+    encryption and signatures.
+
+Documentation
+
+    Crypt::RSA has extensive POD documentation. Start at 
+
+        "perldoc lib/Crypt/RSA.pm"
+     or "perldoc Crypt::RSA"
+
+Stability 
+
+    Crypt::RSA is considered to be stable, production
+    quality code.
+
+Author 
+
+    Vipul Ved Prakash <mail@vipul.net>
+
+

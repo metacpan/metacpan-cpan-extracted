@@ -1,0 +1,35 @@
+Revision history for Perl module Catalyst::View::GD::Barcode::QRcode
+0.10 Fri Oct  9 2009
+	- fixed warning at cat 5.8 (thanks: arisawa)
+
+0.09 Fri Aug  7 2009
+	- no change, reset version of Helper module
+
+0.08 Fri Aug  7 2009
+	- no change, just failed to shipit, AGAIN
+
+0.07 Fri Aug  7 2009
+	- no change, just failed to shipit
+
+0.06 Fri Aug  7 2009
+	- moved github 
+	  http://github.com/hidek/Catalyst-View-GD-Barcode-QRcode/tree/master
+	- fixed new method (thanks: Hu Hailin)
+
+0.05 Mon Apr 27 11:19:28 2009
+    - Use MRO::Compat instead of NEXT. (thx: ZARQUON)
+    - switch to Module::Install base
+    - fixed pod
+
+0.04 Fri Nov  3 2006
+    - pod synopsis fix
+    - bug: add use GD::Barcode::QRcode (thx: miyagawa)
+
+0.03 Wed May 17 19:40:19 2006
+    - typo fix
+
+0.02 Wed May 17 19:24:22 2006
+    - pod fix
+
+0.01 Wed May 17 11:15:07 2006
+    - initial release

@@ -1,0 +1,5 @@
+This directory hold resource files for the 
+Perl program gds2tool (a tool to read GDS2
+files). In particular this directory is where
+gds2tool looks for *.tech files.
+

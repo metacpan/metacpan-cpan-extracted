@@ -1,0 +1,31 @@
+---
+abstract: 'Flexible caching support for Catalyst.'
+author:
+  - 'Yuval Kogman, C<nothingmuch@woobling.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Cache
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.8
+  MRO::Compat: 0
+  Storable: 0
+  Task::Weaken: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Cache.git
+version: 0.12

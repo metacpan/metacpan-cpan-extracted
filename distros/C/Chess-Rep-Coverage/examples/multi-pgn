@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# Read the PGN into a LoH.
+my $games = [];
+my $moves = '';
+my $i = 0;
+
+while (<>)
+{
+    chomp;
+    my $line = $_;
+
+    # Handle blank lines.
+    if ( $line =~ /^\s*$/ )
+    {
+        # If we have seen moves... 
+        if ($moves)
+        { 
+            # Add the game moves.
+            $games->[$i]{moves} = $moves;
+
+            # Reset the game moves.
+            $moves = '';
+
+            # Increment our game.
+            $i++;
+        }
+
+        # Skip to the next line.
+        next;
+    }
+
+    # Are we looking at a meta-data or move line?
+    if ( $line =~ /^\[(\w+)\s+"(.+?)"\]\s*$/ )
+    {
+        # Add meta-data to the current game.
+        $games->[$i]{$1} = $2;
+    }
+    else
+    {
+        # Append the move line.
+        $moves .= " $line";
+    }
+}
+
+# Isolate the game moves.
+for my $game (@$games)
+{
+    $game->{moves} =~ s/\n/ /g; # De-wrap.
+    my @pairs = split /\s*\d+\.\s+/, $game->{moves};
+    my @moves = ();
+    for my $pair (@pairs) {
+        next if $pair =~ /^\s*$/;
+        push @moves, split /\s+/, $pair;
+    }
+    # Reset game moves to the list of pairs.
+    $game->{moves} = \@moves;
+}
+use Data::Dumper;warn Data::Dumper->new([$games])->Indent(1)->Terse(1)->Quotekeys(0)->Sortkeys(1)->Dump;

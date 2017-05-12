@@ -1,0 +1,126 @@
+Revision history for Perl extension Catalyst::View::Email.
+
+0.34    2014-05-17
+        - switched from Class::MOP::load_class to Module::Runtime::require_module per
+          cf. https://rt.cpan.org/Public/Bug/Display.html?id=91013
+        - canonical repo now on github as noted in Makefile.PL
+        - typo fix per https://rt.cpan.org/Public/Bug/Display.html?id=87370
+        - packaged with /usr/bin/gnutar on OSX
+          cf. https://rt.cpan.org/Public/Bug/Display.html?id=83970
+
+0.33    2013-02-13
+        - applied patch to fix Moo->Moose inflation that Email::Sender does per https://rt.cpan.org/Ticket/Display.html?id=83241
+        - removed inc/ so running perl Makefile.PL would do so in author mode
+        - removed META.yml, MANIFEST, and various other files that shouldn't be in git
+        - updated Makefile.PL to use version_from "lib/Catalyst/View/Email.pm" per https://rt.cpan.org/Ticket/Display.html?id=83195&results=0eb39711cb23f5f318a3738cf7d089df
+
+0.32    2013-01-15
+        - Removed Bcc references per https://rt.cpan.org/Public/Bug/Display.html?id=75775
+        - Fixed documentation bug, changed 'Host' to 'host' per https://rt.cpan.org/Ticket/Display.html?id=58748
+        - Added patch (with additional tests) to enable proper content_type setting for email templates
+          per https://rt.cpan.org/Ticket/Display.html?id=66495&results=73b48805c7d356914e91ea95e31ddef6
+        - Removed unneccesary test
+        - Added documentation for specifying envelope info per https://rt.cpan.org/Ticket/Display.html?id=64162
+
+0.31    2011-01-17
+        - Added handling and test for encoding and quoting parts RT #56391 
+
+0.30    2010-05-22
+        - Added Test::Requires to 06config.t
+
+0.29    2010-05-21
+        - Using Test::Requires for Mason and Template::Toolkit dependency check
+        - Removed Template::Toolkit and Mason as prereqs
+
+0.28    2010-05-14
+        - Added  version numbers to Helpers
+
+0.27    2010-03-23
+        - made ::View::TT and ::View::Mason hard deps
+        - adjusted tests to reflect the aforementioned
+        - patches welcome
+
+0.25_02 2010-02-21
+        - cleaned up tests
+        - made Test::More 0.88 a prereq
+
+0.25_01 2010-02-21
+        - updated/corrected docs
+        - added proper svn repo url
+
+0.25    2010-02-01
+        - converted to Module::Install
+
+0.23    2010-01-30
+        - removed Email::Send::Test from t/lib/* views
+
+0.22    2010-01-28
+        - small fixes, version bumpage etc
+
+0.21_01 2010-01-27
+        - dev release to test recent fixes
+
+0.21    2010-01-27
+        - provided a sane MANIFEST.SKIP for dzil
+
+0.20    2010-01-26
+        - fix transport instantiation thanks to Chris Nehren <apeiron@cpan.org>
+
+0.19    2010-01-18
+        - fixed optional dependencies
+		- added META stuff back in
+
+0.18    2010-01-17
+        - Fixed version dependencies for failing regressions
+		- added Email::Send::Test as a dependency
+
+0.17    2010-01-14
+        - fixed MANIFEST
+
+0.16    2010-01-12
+        - Fixed a Makefile.PL issue
+
+0.15    2010-01-12
+        - Fixed teeny version issue with Email::Sender::Simple
+
+0.14    2010-01-09
+        - Ported over to using Email::Sender::Simple, and Moose
+		- Fixed Mason test so that it doesn't choke, as around 'process' seems to make
+		  it die.
+
+0.13    2009-02-22 14:06:00
+        - bcc: POD corrections thanks to Lance Brown <lance@bearcircle.net>
+
+0.12    2009-01-22 06:52:00
+        - Fixing tests for new versions of MIME::Creator
+        - Better structure of the code so that ::Template can also handle
+          plain text views
+        - Added onto troubleshooting
+
+0.11    2008-07-04 09:14:00
+        - Fixing a bug where content-type was ignored so multipart/alternative
+          failed.  RT #32215
+
+0.10    2007-11-22 23:00:00
+        - Refactored by Alexander Hartmaier with api changes
+          and POD improvements
+
+0.06
+        - Fixing some slight issues with configuration not being handled
+          appropriately (thanks dwc and mst)
+0.05
+        - Better support for configuration
+        - Adding Mason tests
+
+0.04
+        - Fixing MANIFEST, distribution
+
+0.03
+        - Improved handling of configuration, thanks to mst.
+
+0.02
+        - Allow configuration from application or ConfigLoader
+        - Minor POD updates
+
+0.01  2007-06-03
+        - Initial release

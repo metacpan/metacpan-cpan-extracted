@@ -1,0 +1,14 @@
+Revision history for Perl extension Class::STAF.
+
+0.03  Jun 9, 2008
+    - Changed Class::STAF error reporting style
+    - Made marshalled objects blessed
+    - Made Class::STAF thread safe
+
+0.02  Jun 3, 2008
+    - continued.
+    - Added warpper around STAF::Handle
+
+0.01  Dec 28, 2007
+	- original version; created by Shmuel Fomberg.
+

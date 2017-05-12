@@ -1,0 +1,17 @@
+Revision history for Perl extension Chess::PGN::Moves.
+
+0.01  Fri Feb  8 11:53:15 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X Chess::PGN::Moves
+0.02  Wed Feb 13 6:14:30 2002
+        - remove illegal (off board!) moves from %King_Moves and %Knight_Moves found
+		by sadpeterpan@rocketmail.com, thanks spdan!
+0.03  Sat Feb 23 09:35:41 2002
+        - documentation changes and corrections only
+0.04  Tue Jun 25 17:03:43 2002
+	- Fix typo in pod found by dalgoda@ix.netcom.com, thanks Mike!
+0.05  Tue Oct 19 03:46:09 2010
+        - Add missing tables for Chess::PGN::Piece
+		%pawnWhite and %pawnBlack
+	- Add %engWhite, %engBlack, %Whiteeng and %Blackeng as needed for english
+		to PGN conversion

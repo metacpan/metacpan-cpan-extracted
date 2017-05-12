@@ -1,0 +1,21 @@
+0.003		2009-12-29
+
+Tweak Makefile.PL to add a requirement that was thrown up by smoke testing
+
+0.002           2009-12-08
+
+Cache results of validation (which is an expensive operation).
+
+Various bug fixes thrown up by smoke testing (mostly relating to missing build
+    time deps)
+    
+Rework template loading to resolve a bug.
+
+Remove (undocumented) template configuration option until the bug can be solved
+    in a better way.
+
+Improve tests a little
+
+0.001		2009-12-05
+
+Initial release

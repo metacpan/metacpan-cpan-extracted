@@ -1,0 +1,9 @@
+Revision history for Perl extension Config::IniSearch.
+
+0.01  Sat Jul  5 00:58:21 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Config::IniSearch
+0.02  Wed Dec 16 21:40:00 2009
+    - finally fixed the tests after 6 years
+0.03  Wed Dec 16 22:15:00 2009
+    - version number updates

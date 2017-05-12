@@ -1,0 +1,32 @@
+[%-
+    IF (!form.defined);
+        THROW crud '"form" must be defined in ' _ component.name;
+    END;
+    IF (!results.defined);
+        THROW crud '"results" must be defined in ' _ component.name;
+    END;
+    
+    DEFAULT controller  = c.controller();
+    DEFAULT method_name = 0;
+    DEFAULT field_names = form.metadata.field_methods;
+    SET no_wrapper = 1;    
+    SET livegrid  = yui.livegrid(
+         'results'      => results, 
+         'controller'   => controller, 
+         'form'         => form,
+         'col_names'    => field_names,
+         'method_name'  => method_name,
+         'show_remove_button' => c.req.params.item('cxc-add_rm_button'),
+         'c'            => c,
+    ); 
+    SET res     = { items       => livegrid.serialize };
+    SET json    = { response    => { value => res } };
+    res.total_count  = results.count + 0;  # force int
+    res.version      = 1;
+    res.offset      = c.req.params.item('cxc-offset');
+    res.limit       = livegrid.results.pager.entries_per_page;
+    res.page        = livegrid.results.pager.current_page;
+    res.sort        = c.req.params.item('cxc-sort');
+    res.dir         = c.req.params.item('cxc-dir');
+    json.as_json(1);   # render
+-%]

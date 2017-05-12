@@ -1,0 +1,179 @@
+=head1 NAME
+
+Catalyst::Manual::DevelopmentProcess - Administrative structure of the Catalyst Development Process
+
+=head1 Contributing to Catalyst
+
+The main philosophy behind Catalyst development can be summarized as:
+
+    Patches welcome!
+
+Everyone is welcome (and will be encouraged) to contribute to Catalyst
+in whatever capacity they're able to. People in #catalyst-dev will be
+more than happy to talk newcomers through contributing their first patch,
+or how best to go about their first CPAN extension module....
+
+=head1 Catalyst development
+
+=head2 Discussing proposed bugfixes or improvements
+
+L<http://wiki.catalystframework.org/wiki/#Community> has information about how
+to get in touch with the Catalyst "community".  In particular, you would
+want to discuss a proposed change on the mailing list:
+
+    http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
+
+or on IRC:
+
+    irc://irc.perl.org/catalyst-dev
+    http://wiki.catalystframework.org/wiki/livegroups
+
+Usually, the core team will be more than happy for you to contribute, and
+will talk you through how to submit a patch, or get a "commit bit".
+
+=head2 Repositories
+
+The Catalyst git repository can be found at:
+
+    read: git://git.shadowcat.co.uk/catagits/PROJECTNAME
+    write: catagits@git.shadowcat.co.uk:PROJECTNAME
+    browser: https://git.shadowcat.co.uk/gitweb/gitweb.cgi
+
+The Catalyst subversion repository can be found at:
+
+    svn: http://dev.catalyst.perl.org/repos/Catalyst
+    browser: http://dev.catalyst.perl.org/svnweb/Catalyst
+
+=head2 Schedule
+
+There is no dated release cycle for Catalyst. New releases will be made
+when sufficient small fixes have accumulated; or an important bugfix, or
+significant feature addition, is completed.
+
+=head2 Roadmap for features
+
+The Catalyst Roadmap is kept at
+L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=blob_plain;f=lib/Catalyst/ROADMAP.pod;hb=master>
+
+=head2 Bug list
+
+The TODO list with known bugs / deficiencies is kept at
+L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=catagits/Catalyst-Runtime.git;a=blob_plain;f=TODO;hb=master>
+
+=head1 The Catalyst Core Team
+
+The intention of the Catalyst Core Team is to maintain and support the
+Catalyst framework, in order for it to be a viable and stable framework
+for developing web-based MVC applications. This includes both technical
+decisions about the Catalyst core distribution, and public relations
+relating to the Catalyst framework as a whole.
+
+The current goals of the Catalyst core development team are stability,
+performance, and a properly paced addition of features, with a focus on
+extensibility.
+
+The core team is concerned with the 'core' Catalyst distributions
+(i.e. L<Catalyst::Runtime>, L<Catalyst::Devel> and L<Catalyst::Manual>),
+and also tries to encourage best practices for extension authors, and
+cooperation and shared vision within the Catalyst community.
+
+=head2 Membership
+
+The Catalyst Core Team consists of the developers who have full commit
+privileges to the entire Catalyst source tree, and who have made a significant
+contribution to the core Catalyst distributions, and various extensions and
+plugins.
+
+In addition, the core team includes members that have non-technical
+roles, such as marketing, legal, or economic responsibilities.
+
+Currently, the Core Team consists of the following people:
+
+=over 4
+
+=item Brian Cassidy
+
+=item Andy Grundman
+
+=item Christian Hansen
+
+=item Yuval Kogman
+
+=item Marcus Ramberg
+
+=item Jonathan Rockway
+
+=item Jesse Sheidlower
+
+=item Matt S. Trout
+
+=item Florian Ragwitz
+
+=item Tomas Doran
+
+=back
+
+New members of the Core Team must be accepted by a 2/3 majority by the
+current members.
+
+=head2 Technical Decisions.
+
+Any change to the Catalyst core which can not be conceived as a
+correction of an error in the current feature set will need to be
+accepted by at least 3 members of the Core Team before it can be
+committed to master (which is the basis for CPAN releases). Anyone
+with access is at any time free to make a branch to develop a proof of
+concept for a feature to be committed to master.
+
+=head2 Organizational and Philosophical Decisions.
+
+Any organizational or philosophical decision should be decided by
+majority vote. Thus it should be a goal of the organization that its
+membership number should at any time be an odd number, to render it
+effective with regards to decision making. The exceptions to this rule
+are changes to this charter and additions to the membership of the Core
+Team, which require a 2/3 majority.
+
+=head2 CPAN Releases
+
+Planned releases to CPAN should be performed by the release manager, at
+the time of writing Marcus Ramberg, or the deputy release manager, at
+the time of writing Florian Ragwitz. In the case of critical error
+correction, any member of the Core Team can perform a rescue release.
+
+=head2 Public statements from the Core Team
+
+The Core Team should strive to appear publicly as a group when answering
+questions or other correspondence. In cases where this is not possible,
+the same order as for CPAN releases applies.
+
+=head2 New Catalyst Extensions
+
+As Catalyst is deliberately designed for extension, there is an ecosystem of
+several hundred Catalyst extensions that can be found on CPAN.
+
+See L<Catalyst::Manual::ExtendingCatalyst> for more information on how
+to extend Catalyst in various ways and how to write CPANable components
+for Catalyst which can be reused in many applications.
+
+It is recommended to post a request for comments to the Catalyst mailing
+list, or ask around in the #catalyst IRC channel before starting to
+implement something, as another member of the community is likely to
+have example or prototype code that you can reuse, and members of the
+community and core team are happy to advise on the best way to implement
+a generic solution to a particular problem.
+
+This could save you duplicate work, and will help you produce a better
+thought out and designed extension.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

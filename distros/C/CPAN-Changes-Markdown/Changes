@@ -1,0 +1,91 @@
+Release history for CPAN-Changes-Markdown
+
+1.000002 2017-03-07T13:47:32Z 9f91053
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Tests made compatible with older Test::More
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: +4 ↑2 (suggests: ↑2)
+ - test: ↓1
+
+1.000001 2015-06-22T01:13:07Z 9cee3a7
+ [00 Minor]
+ - A trivial release to reduce cruft and restore order to the repository.
+ - Code had somehow bitrotted and I'd lost part of the commits that didn't replicate.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: +1 ↓1 (recommends: ↑1)
+ - develop: +15 ↑3 -6 (recommends: +1, suggests: +2 -1)
+ - runtime: ↓1 -1 (recommends: +1)
+ - test: +3 -3 (recommends: ↑2 ↓1 -1)
+
+ [Metadata]
+ - Change author ID data
+ - migrate to KENTNL
+
+1.000000 2014-04-13T02:01:38Z
+ [00 Major]
+ - Plumbing changes that may be relevant to non-cpan downstreams.
+
+ [01 EUMM]
+ - Tooling switched to EUMM
+ - Tooling dependencies are softened
+
+ [02 Version Scheme]
+ - Versions moved to floating instead of dotted-decimal.
+ - This is the primary reason for the 1.x on the box.
+
+ [03 Utility]
+ - This release sports a new tool, cpan-changes-markdown, which does something minimally useful.
+
+ [Bugfix]
+ - Documentation fix for "GitHub". Thanks Shlomi Fish.
+
+ [Dependencies::Aggregate]
+ - 5.010 : 35
+ - 5.019 : 18
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.2, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +42 ↑1 -2 (recommends: -1, suggests: +1 -1)
+ - runtime: +2 ↓1
+ - test: +4 ↓1 -4 (recommends: +4)
+
+0.2.2 2013-09-25T02:07:11Z
+ [Bugfix]
+ - Get latest compile test to avoid bugs on Win32
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.1, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: +1
+
+0.2.1 2013-08-30T19:50:44Z
+ [!Minor]
+ - Bump to get new compile test
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - test: +2 -2
+
+0.2.0 2013-08-23T15:11:49Z
+ [!Major]
+ - Now filters headers/change lines optimisitically.
+
+ [Dependencies::Noteworthy]
+ - use Path::Tiny
+ - use Role::Tiny
+ - use Sub::Exporter::Progressive
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - runtime: +3
+ - test: +1
+
+0.1.0 2013-08-09T23:57:02Z
+ - First version.

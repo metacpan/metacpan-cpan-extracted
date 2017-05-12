@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/Authentication/CDBI/Basic.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/pod.t
+t/pod_coverage.t
+Todo

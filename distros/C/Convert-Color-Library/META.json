@@ -1,0 +1,46 @@
+{
+   "abstract" : "named lookup of colors from C<Color::Library>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-Color-Library",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Color::Library" : "0",
+            "Convert::Color" : "0.06"
+         }
+      }
+   },
+   "provides" : {
+      "Convert::Color::HTML" : {
+         "file" : "lib/Convert/Color/HTML.pm",
+         "version" : "0.05"
+      },
+      "Convert::Color::Library" : {
+         "file" : "lib/Convert/Color/Library.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

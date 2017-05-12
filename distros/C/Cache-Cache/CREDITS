@@ -1,0 +1,146 @@
+- Stefano Rodighiero for catching the extra "use vars" in CacheUtils
+
+- dwright at cpan.org for the fix on the infinite loop for
+  auto_purge_on_get
+
+- thanks to <info at whawes.co.uk> for catching the windows directory
+  path bug
+
+- worked with andrew velikoredchanin <andrew at rodtext.ru> to fix
+  a bug with file permissions at File::Temp
+
+- thomas.acunzo at ubs.com identified some issues with SharedMemoryCache
+  which led to better error checking
+
+- siracusa at mindspring.com suggested using $1 on all error messages
+
+- Stephen Edmonds <Stephen.Edmonds at its.monash.edu.au> caught a bug where
+  invalid frozen data could be returned.
+
+- Shailen Bellare <Shailen.Bellare at lehman.com> assisted in the work 
+  required to migrated to Storable's "nfreeze" instead of "freeze" 
+
+- Simran <simran at cse.unsw.edu.au> submitted a patch to correctly initialize
+  the MemoryBackend hash
+
+- Rob Mueller <robm at fastmail.fm> and Jeremy Howard <jhoward at fastmail.fm> 
+  provided a patch to ensure consistent state if the filesystem fills up
+
+- Glady.Junsay <Glady.Junsay at target.com> noticed that get_keys was 
+  defined twice in NullCache
+
+- Sterling Swartwout <sterling_swartwout at standardandpoors.com> helped
+  track down an issue with the regex quoting in older versions of perl
+
+- Yves Orton <yves.orton at mciworldcom.de>, a CPAN tester, submitted a
+  patch to _Make_Path to fix warnings on Win32
+
+- Adam Tricket <ATricket at alarismed.com> and <yves.orton at mciworldcom.de> 
+  helped debug the make test failure (due to fileglobs in Makefile.PL) on 
+  Windows
+
+- Christian Gilmore <cgilmore at tivoli.com> suggested that I expose the
+  get_namespaces method through the Cache interface
+
+- Jonathan Swartz submitted a patch for a much better untainting regex
+
+- Richard Chen <chenri at snet.net> informed me of a better way to call
+  static methods without knowing the type of the class until runtime
+
+- Christophe Marcant <bl3rw5pv001 at sneakemail.com> offered a patch to
+  allow spaces to be used in the filenames
+
+- Eric Cholet <cholet at logilune.com> offered a patch to fix the missing
+  import in Cache::CacheUtils and is helping debug using a Backend on
+  its own
+
+- Axel Beckert <abe at cs.uni-sb.de> submitted a patch to fix a bug in
+  the expiration units
+
+- Ken Williams <ken at forum.swarthmore.edu> submitted a patch to workaround
+  a File::Path bug that was causing make test to fail
+
+- Randal Schwartz <merlyn at stonehenge.com> discovered a nasty bug on
+  the construction of cache instances that use the auto_purge_interval
+
+- Chris Fairbanks <cfairbanks at site59.com> helped think through
+  the factory-like model for construction using private constructors
+  that allow for the proper initialization of child classes
+
+- Rob Bloodgood <robb at empire2.com> discovered that the documentation
+  should better reflect that size means size in bytes
+
+- Bjorn Jacobsen <maybe at yes.no> suggested that I use the OO interface
+  to File::Spec to avoid inadvertently importing those methods into 
+  the global namespace
+
+- Jay Sachs <jay at eziba.com> for suggesting and writing the NullCache 
+  implementation
+
+- Randal Schwartz <merlyn at stonehenge.com> wrote about an automatic purging
+  mechanism for the cache in Web Techniques, and helped me implement
+  that feature as part of the framework
+
+- Matt Sly <matt at eziba.com> for catching a bug with erroneously
+  importing an unused module
+  
+- Dave Rolsky <autarch at urth.org> for helping me rewrite the Makefile.PL to
+  do conditional installation and testing based on dependency detection
+
+- Greg Cope <greg at rubberplant.freeserve.co.uk> suggested that I switch
+  to IPC::ShareLite, and helped debug version 0.05
+
+- Daniel Little <danl at metrex.net> suggested that I write the 
+  SizeAwareMemoryCache module
+
+- Jonathan Swartz <jswartz at users.sourceforge.net>, a Perl Cache
+  project developer, for the expanded expiration format code and all of
+  the great dialog in the list server, continued testing, and
+  a million good ideas!  A big thanks, Jonathan.
+
+- Sergey Polyakov <alexei at samara.net> for numerous bug reports and for
+  being an early adopter of Perl Cache
+
+# The follow credits were copied from File::Cache, the previous
+# incarnation of this library
+
+- David Coppit <david at coppit.org> added: max_size, auto_purge,
+  get_stale(), reduce_size(), username, and filemode, fixed a bug that
+  prevented expired cache items from being unlinked by purge(), and
+  added the get_creation_time() and get_expiration_time() routines. (a
+  big thanks David!)  Also, David added the Data::Dumper persistence 
+  format for cross-OS operability and greatly improved the documentation,
+  and many many other things
+
+- Larry Moore <ljmoore at freespace.net>, a cpan tester, noticed that
+  version 0.04 failed to compile on MacOS (thanks Larry!)
+
+- Frey Kuo <frey at engineer.com> pointed out that the example in the
+  README was rather buggy.  (thanks Frey!)
+
+- Doug Steinwand <dsteinwand at etoys.com> found that on FreeBSD, the
+  _purge routine failed due to an issue with File::Find and even
+  provided a fix.  (thanks Doug!)
+
+- Chris Winters <cwinters at intes.net> needed the cache_depth code, so I
+  added it, and he was gracious enough to help test it
+
+- Jessica Mintz provided valuable debugging information that tracked
+  down the unlink file race
+
+- Jeremy Howard (jhoward at fastmail.fm) added two great patches that
+  made File::Cache taint safe, plus he's using it at fastmail.fm!
+
+- Randal L. Schwartz (merlyn at stonehenge.com) caught a version dependency
+  on the File::Path, which led to some major changes to the entire
+  library finally passing taint checking.  Also, he suggested the
+  temp->rename change to _WRITE_FILE. (Thanks Randal!)
+
+- Michael Blakeley (mike at blakeley.com) caught the bug with
+  .description files not being readable when the umask is restrictive and 
+  offered a patch.  (Thanks Mike!)
+
+- Neil Conway (nconway at klamath.dyndns.org) suggested documenting the 
+  optional dependency on Storable, adding a dependency for File::Spec
+  0.82, and removing the "use Data::Dumper" line.  (Thanks Neil!)
+

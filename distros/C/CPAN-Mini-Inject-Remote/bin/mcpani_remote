@@ -1,0 +1,256 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+=head1 NAME
+
+mcpani_remote - A command line tool to talk to a CPAN::Mini::Inject::Server
+
+=head1 SYNOPSIS
+
+mcpani_remote [options]
+
+Commands:
+
+    -add               Add a new package to the repository
+          -module      Name of the module to add
+          -authorid    Author ID of the module
+          -modversion  Version number of the module
+          -file        tar.gz file of the module
+
+    -update            Update local CPAN mirror and inject modules
+    -inject            Add modules from repository to CPAN mirror
+
+ Options:
+    -help           brief help message
+    -man            full documentation
+    -remote_server  The url of the remote server to talk to
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-add>
+
+Add a module to the repository for later inclusion in the CPAN Mini
+mirror. The add command requires the following parameters:
+
+=over 4
+
+=item B<-module>
+
+This is the name of the module (ie CPAN::Mini::Inject).
+
+=item B<-authorid>
+
+A CPAN 'like' author ID for the module. The author ID does not need to
+exist on CPAN.
+
+=item B<-modversion>
+
+Version number of the module. This must match the version number in the 
+file name.
+
+=item B<-file>
+
+File name and path of the module. The file name must follow the
+standard CPAN naming convention (the resulting file from a 
+C<make tardist>).
+
+=back
+
+  Example:
+
+  mcpani_remote --add --module CPAN::Mini::Inject::Remote --authorid CHRISM
+                --modversion 0.01 --file ./CPAN-Mini-Inject-Remote-0.01.tar.gz
+
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-remote_server>
+
+The remote url to use to contact the CPAN server
+
+=back
+
+=head1 DESCRIPTION
+
+Remote version of mcpani that talks to a CPAN::Mini::Inject::Server instance to
+perform its functionality
+
+=cut
+
+=head1 VERSION
+
+Version 0.04
+
+=cut
+
+our $VERSION = '0.04';
+
+use Carp;
+use Getopt::Long;
+use Pod::Usage;
+use CPAN::Mini::Inject::Remote;
+
+my ($help, $man);
+my $verbose = 0;
+
+my %options;
+
+GetOptions(
+    'help|?' => \$help,
+    'man' => \$man,
+    'verbose+' => \$verbose,
+    'remote_server=s' => \$options{remote_server},
+    'add' => \($options{action}->{add}),
+    'module=s' => \($options{add}->{module}),
+    'authorid=s' => \($options{add}->{authorid}),
+    'modversion=s' => \($options{add}->{version}),
+    'file=s' => \($options{add}->{file}),
+    'update' => \($options{action}->{update}),
+    'inject' => \($options{action}->{inject}), 
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+use Archive::Tar;
+use CPAN::Meta;
+
+sub get_name_version {
+    my $file = shift;
+    (my $tar = Archive::Tar->new) or die "can't new Archive::Tar";
+    if ($tar->read($file, { filter => qr/META/ }))
+    {
+	my @list = $tar->list_files([qw(name)]);
+	for (grep /META/, @list)
+	{
+	    next unless my $string = $tar->get_content($_);
+	    print $string if $verbose > 1;
+	    next unless my $meta = CPAN::Meta->load_string($string);
+	    (my $scan_version = $meta->version) .= '(?:_\d+)?';
+	    my ($modversion) = $file =~ /($scan_version)/;
+	    (my $scan_name = $meta->name) =~ s{-}{[/-]}g;
+	    my ($modname) = map { /\b($scan_name)(\.\w+)?$/? $1 : () } @list;
+	    $modname =~ s/\//::/g;
+	    return ($modname, $modversion) if $modname && $modversion;
+	}
+    }
+}
+
+if (not (grep $options{action}->{$_}, qw/add update inject/)
+    and not $options{add}->{module}
+    and not $options{add}->{version}
+    and not $options{add}->{file})
+{
+    my $inject;
+    for (@ARGV)
+    {
+	if (my ($modname, $modversion) = get_name_version($_))
+	{
+	    $options{add}->{authorid} or warn "$0: authorid DUMMY\n";
+	    my @mcpani = (
+		$0, '-add', '-file', $_,
+		'-module', $modname, '-modversion', $modversion,
+		'-author', $options{add}->{authorid} || 'DUMMY',
+		);
+	    warn "@mcpani\n" if $verbose;
+	    exit 1 unless (system @mcpani) == 0;
+	    $inject++;
+	}
+    }
+    $options{action}->{inject} = $inject;
+}
+
+if (not ($options{action}->{add}
+         or $options{action}->{update}
+         or $options{action}->{inject}))
+{
+   pod2usage('An action must be supplied'); 
+}
+
+if ($options{action}->{add}
+    and not $options{add}->{module})
+{
+    pod2usage('A module name must be supplied for adding');
+}
+
+if ($options{action}->{add}
+    and not $options{add}->{authorid})
+{
+    pod2usage('An authorid must be supplied for adding');
+}
+
+if ($options{action}->{add}
+    and not $options{add}->{version})
+{
+    pod2usage('A module version must be supplied for adding');
+}
+
+if ($options{action}->{add}
+    and not $options{add}->{file})
+{
+    pod2usage('A module file must be supplied for adding');
+}
+
+my $cpan_mini = CPAN::Mini::Inject::Remote->new(
+    (
+        $options{remote_server}
+        ? (remote_server => $options{remote_server})
+        : ()
+    )
+);
+
+if ($options{action}->{add})
+{
+    exit 1 unless $cpan_mini->add(
+        module_name => $options{add}->{module},
+        author_id => $options{add}->{authorid},
+        version => $options{add}->{version},
+        file_name => $options{add}->{file},
+    )->is_success();
+}
+
+if ($options{action}->{inject})
+{
+    exit 1 unless $cpan_mini->inject()->is_success();
+}
+
+if ($options{action}->{update})
+{
+    exit 1 unless $cpan_mini->update()->is_success();
+}
+
+=head1 AUTHOR
+
+Christopher Mckay (cmckay), C<< <cmckay@iseek.com.au> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+perldoc mcpani_remote
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 iseek Communications, all rights reserved.
+
+This program is released under the following license: restrictive
+
+
+=cut
+
+# End of mcpani_remote
+

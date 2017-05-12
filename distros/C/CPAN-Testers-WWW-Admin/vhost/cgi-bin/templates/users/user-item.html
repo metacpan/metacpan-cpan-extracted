@@ -1,0 +1,15 @@
+<h2>User Details</h2>
+
+<div class="box">
+    <table width="100%">
+    <tr><td><b>[% data.realname %]</b>
+            [% IF data.link %]<br /><img src='[% webpath %]/[% data.link %]' alt='[% data.tag %]'/>[% END %]
+            [% IF data.nickname %]<br />[% data.nickname %][% END %]
+            <br />Posted: [% userposts %] times
+        </td>
+        <td>[% IF data.aboutme %]<p>[% data.aboutme %][% END %]
+            [% IF data.url %]<p>My Web Page: <a href="[% data.url %]">[% data.url %]</a>[% END %]
+        </td>
+    </tr>
+    </table>
+</div>

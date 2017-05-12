@@ -1,0 +1,20 @@
+---
+name: CAM-Session
+version: 1.03
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: DBI and cookie CGI session state maintenance
+license: perl
+requires:
+  CGI: 2.0
+  CGI::Cookie: 1.0
+  DBI: 1.0
+  Digest::MD5: 2.0
+build_requires:
+  DBD::mysql: 0.01
+  Test::More: 0.01
+provides:
+  CAM::Session:
+    file: lib/CAM/Session.pm
+    version: 1.03
+generated_by: Module::Build version 0.2609

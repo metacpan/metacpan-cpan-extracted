@@ -1,0 +1,66 @@
+TODO list for Perl module Class::InsideOut
+
+# Todos after 1.0
+
+- change to Apache license
+- add support for new DDS serialization hooks
+- test DDS on other serialization tests
+- document DDS support
+- accessor style options
+- write FAQs
+- expand documentation (cookbook? quick-start? notes on writing Builders)
+- document some internal introspection functions (e.g. _evert/_revert)
+
+# Possible todos depending on demand
+
+- class accessors via "public foo => my $foo";
+- add public introspection methods (property list and options?)
+- accessor privacy => "protected" and matching property alias
+- look into support for cloning tied objects(?) in the blessed hash(?)
+- pre-clone user hook?? (waiting for someone to say they need it)
+- BUILD method
+
+#--------------------------------------------------------------------------#
+# Thoughts about property accessor styles and options
+#--------------------------------------------------------------------------#
+
+# have to be careful of interrelationship between style and custom prefixes;
+# maybe don't allow custom prefixes at all
+
+Class::InsideOut::options(
+  accessor_style => 'perl', # default
+        # "combined"; "perl" => foo() and foo(x)
+        # "get_set"; "java"  => get_foo() and set_foo(x)
+        # "eiffel"           => foo() and set_foo(x)
+        
+  get_prefix => 'get_', # maybe don't bother (YAGNI)
+  set_prefix => 'set_', # maybe don't bother (YAGNI)
+  privacy => 'public',  # create accessors for everything given to properties
+                       # or 'readonly' or 'protected' or 'private'
+  set_hook => \&coderef,  # mutator argument filtered through this
+                            # will catch die message for error
+  set_returns => 'self' # or 'newvalue' or 'oldvalue'
+);
+
+#--------------------------------------------------------------------------#
+# FAQ ideas
+#--------------------------------------------------------------------------#
+
+* Security (c.f use perl post)
+
+* advisory encapsulation
+
+* Why "public *foo*" separate from "my %foo"  (e.g. for "my %foo_of")
+
+* Another advantage of InsideOut over accessors -- can use as Lvalue for
+  things like increments: $count_of{ id $self }
+
+#--------------------------------------------------------------------------#
+# Cookbook ideas
+#--------------------------------------------------------------------------#
+
+* Outside-in pattern
+
+* Property aliasing:  ( should work, but what about Storable? )
+    assets => my %assets;
+    wealth => my %assets;

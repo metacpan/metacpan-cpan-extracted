@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 22
+    - 217
+  2684:
+    - 244
+name: fdcbd9
+registers:
+  AF: 4015
+  AF_: 0
+  BC: 20186
+  BC_: 0
+  DE: 50518
+  DE_: 0
+  HL: 28371
+  HL_: 0
+  I: 0
+  IX: 16323
+  IY: 2662
+  PC: 0
+  R: 0
+  SP: 0

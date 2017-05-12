@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+
+use 5.008;
+use strict;
+use warnings;
+use utf8;
+
+use Crypt::XkcdPassword;
+use Getopt::Long;
+
+my $words  = "EN";
+my $length = 4;
+my $count  = 1;
+
+GetOptions(
+	'words|w=s'     => \$words,
+	'length|l=i'    => \$length,
+	'count|n=i'     => \$count,
+);
+
+$words = [ split /,/, $words ]
+	if $words =~ /,/;
+
+my $gen = Crypt::XkcdPassword->new(words => $words);
+print $gen->make_password($length), $/ for 1 .. $count;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+passphrase - quickly generate an XKCD-style passphrase
+
+=head1 SYNOPSIS
+
+ passphrase --length=4 --words=EN
+
+=head1 DESCRIPTION
+
+Prints a passphrase to STDOUT.
+
+=over
+
+=item C<< -l N >>, C<< --length=N >>
+
+The length of the phrase (in words, not characters).
+
+Defaults to 4.
+
+=item C<< -w CLASS >>, C<< --words=CLASS >>
+
+The Perl class that will be used as a dictionary. Whatever string you
+specify will be prefixed with C<< Crypt::XkcdPassword::Words:: >>.
+Case-sensitive.
+
+If this string contains a comma, it will be split into arguments which
+will be passed to the class' constructor. Currently C<< sys >> is the
+only class where this is useful.
+
+Defaults to C<< EN >>.
+
+=item C<< -n N >>, C<< --count=N >>
+
+The number of passphrases to generate.
+
+Defaults to 1.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Crypt-XkcdPassword>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,28 @@
+Revision history for Perl extension Ceph::Rados.
+
+0.06  Mon Oct 26 12:46:17 UTC 2015
+    - test requires added to META.yml and WriteMakefile, removed (unnecessary) strictures.pm
+
+0.05  Mon Oct 26 11:36:13 UTC 2015
+    - META.yml spec / requires updated to v2.0
+
+0.04  Thu Oct 22 16:14:34 UTC 2015
+    - missing requires on Devel::CheckLib
+
+0.03  Thu Oct 22 13:13:02 UTC 2015
+    - correct license
+    - no bareword filehandles
+    - adds mtime and size methods
+    - handle writing files over osd_write_size_limit
+    (patch contributed by joseph evans)
+    - adds stat functionality, and ability to read object without knowing length
+
+0.02  Tue Feb 24 17:42:46 GMT 2015
+    (patch contributed by adam@cpanel.net)
+    - fixes: garbage received when guessing the read length (bug RT#102154)
+    - synopsis lets user know to provide read length
+
+0.01  Tue Oct 28 15:51:38 2014
+	- original version; created by h2xs 1.23 with options
+		/usr/include/rados/librados.h -n Ceph::Rados --skip-exporter --skip-autoloader
+

@@ -1,0 +1,32 @@
+CGI-Session-YAML version 0.1
+=============================
+
+CGI::Session::YAML is a CGI module proxy that adds CGI parameter persistence
+via a YAML backend file.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    CGI
+    YAML
+    Data::UUID
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Michael P. Soulier <msoulier@digitaltorque.ca>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

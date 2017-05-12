@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>AutoSys Job Console</title>
+	<!-- the following "style" is only needed when you're using ie -->
+	<style type="text/css">
+	<!-- @media screen{ blink { behavior:url(blink.htc);} } -->
+	</style>
+	<style type=text/css>
+	/* input hovering only works in *real* browsers... */
+	input.button {font-size: 11px; font-family: verdana; background-color: #ccc; border:1px; solid: #fff;}
+	input.button:hover {background-color: #ddd;}
+	.select_box {font-size: 10px; font-family: verdana; background-color: #feb; border:1px; solid: #fff;}
+	.select_job {font-size: 10px; font-family: verdana; background-color: #fff; border:1px; solid: #fff;}
+	.select_box:hover {background-color: #eda;}
+	.select_job:hover {background-color: #eee;}
+	</style>
+</head>
+
+<body>
+	<form name="autosys" action="/" method="post">
+		<table style="width: 100%; text-align: left;" border="0" cellpadding="1" cellspacing="1"><tbody>
+			<tr style="font-family: verdana; font-size: 11px; color: rgb(255, 255, 255); background-color: rgb(238, 137, 57); text-align: center; vertical-align: top;">
+				<th>Job Name</th>
+				<th>Last Start</th>
+				<th>Last End</th>
+				<th>Status</th>
+				<th>Event</th>
+			</tr>
+
+			<loop id="jobs">
+				<tr style="font-family: verdana; font-size: 10px; color: rgb(0, 0, 0); background-color: #background#; text-align: left; vertical-align: middle;">
+					<td>#job_name1#</td>
+					<td>#last_start#</td>
+					<td>#last_end#</td>
+					#status#
+					<td>
+						<select class="#select_class#" size="1" name="job:#job_name2#">
+							<option></option>
+							<option>FORCE_STARTJOB</option>
+							<option>JOB_ON_HOLD</option>
+							<option>JOB_OFF_HOLD</option>
+							<option>JOB_ON_ICE</option>
+							<option>JOB_OFF_ICE</option>
+							<option>KILLJOB</option>
+							<option>STATUS:SUCCESS</option>
+							<option>STATUS:INACTIVE</option>
+						</select>
+					</td>
+				</tr>
+			</loop>
+		</tbody></table>
+		<br>
+		<input class="button" value="Send Events / Refresh" type="submit"></form>
+	</form>
+</body>
+</html>

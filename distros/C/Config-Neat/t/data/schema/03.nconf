@@ -1,0 +1,7 @@
+foo {
+    etc {
+        some_key
+        {
+        }
+    }
+}

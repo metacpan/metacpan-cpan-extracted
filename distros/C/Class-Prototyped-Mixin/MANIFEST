@@ -1,0 +1,13 @@
+Changes
+lib/Class/Prototyped/Mixin.pm
+lib/Class/Prototyped/Mixin/Changes.pod
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001_load.t
+t/002_runtime.t
+t/003_compiletime.t
+t/packages.pl
+Todo

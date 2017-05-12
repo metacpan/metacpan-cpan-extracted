@@ -1,0 +1,15 @@
+To: "[% name %]" <[% email %]>
+From: CPAN Testers Webmaster <webmaster@cpantesters.org>
+Subject: CPAN Testers Reports Admin Confirmation
+
+Dear [% name %],
+
+This email is being sent to you, because someone (hopefully you) indicated that you wished to register an email address to the account you have set up on The CPAN Testers Reports Admin website. 
+
+Please click the link below, login if requested to do so, and the email address will be registered to your account. You will then be able to remove or unmark reports as appropriate.
+
+Regsiter: [% webpath %]/tester-confirm/[% code %]
+
+
+Regards,
+The CPAN Testers Administration Team

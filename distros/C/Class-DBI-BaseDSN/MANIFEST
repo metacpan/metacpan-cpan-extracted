@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+Build.PL
+Changes
+README
+t/lib/Class/DBI/ATeam.pm
+t/lib/Class/DBI/CompileError.pm
+t/lib/Class/DBI/UpwardsCompileError.pm
+t/ateam.t
+lib/Class/DBI/BaseDSN.pm

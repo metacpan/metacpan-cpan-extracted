@@ -1,0 +1,9 @@
+Makefile.PL
+MANIFEST
+lib/Chromosome/Map.pm
+lib/Chromosome/Map/Block.pm
+lib/Chromosome/Map/Element.pm
+lib/Chromosome/Map/Feature.pm
+lib/Chromosome/Map/Track.pm
+t/use.t
+t/test.t

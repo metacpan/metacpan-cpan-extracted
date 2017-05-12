@@ -1,0 +1,28 @@
+H1 { font-size: 18pt; text-align: center; }
+H2 { font-size: 14pt; }
+A { font-size: 10pt; text-decoration: none; color: #0000e0; }
+A:visited { color: #0000e0; }
+A:hover { text-decoration: underline overline; background-color: #e0e0ff }
+A.qindex {}
+A.qindexRef {}
+A.el { text-decoration: none; font-weight: bold }
+A.elRef { font-weight: bold }
+A.code { text-decoration: none; font-weight: normal; color: #4444ee }
+A.codeRef { font-weight: normal; color: #4444ee }
+DL.el { margin-left: -1cm }
+DIV.fragment { width: 100%; border: solid; border-width: 1px; background-color: #eeeeee; margin-top: 6px; padding-top: 10pt; padding-left: 10pt; }
+DIV.ah { background-color: black; font-weight: bold; color: #ffffff; margin-bottom: 3px; margin-top: 3px }
+TD { font-size: 10pt; }
+TD.md { background-color: #f2f2ff; font-weight: bold; }
+TD.mdname1 { background-color: #f2f2ff; font-weight: bold; }
+TD.mdname { background-color: #f2f2ff; font-weight: bold; width: 600px; }
+DIV { font-size: 10pt; }
+DIV.groupHeader { margin-left: 16px; margin-top: 12px; margin-bottom: 6px; font-weight: bold }
+DIV.groupText { margin-left: 16px; font-style: italic; font-size: smaller }
+FONT.keyword       { color: #008000 }
+FONT.keywordtype   { color: #604020 }
+FONT.keywordflow   { color: #e08000 }
+FONT.comment       { color: #800000 }
+FONT.preprocessor  { color: #806020 }
+FONT.stringliteral { color: #002080 }
+FONT.charliteral   { color: #008080 }

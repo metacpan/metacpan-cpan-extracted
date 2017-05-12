@@ -1,0 +1,29 @@
+The ct.bat file is an example of a redirector. If you have a UNIX/SMB
+solution such as Samba running you should be able to use this to
+execute the exact same script, same copy, on Unix and Windows.
+
+The MySite.tar.gz file is a sample enhancement overlay. To create
+your own cleartool enhancements, you should be able to simply
+unpack MySite.tar.gz, change all references to 'MySite' (including
+the containing directory) to something which makes more sense for
+your site. Then add subroutines to the (renamed) MySite.pm file
+and go through the standard
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+sequence and test your additions. Don't forget to put your new module
+under source (ClearCase) control.
+
+Alternatively, if you want to develop an enhancement which isn't
+site-specific and that you want to release to CPAN, remove the 'Site'
+part from the package namespace, add copyright and license information,
+and you're away.
+
+The CGC.tar.gz file is similar to MySite, but it's a real site-specific
+overlay that I use. Normally the whole point of overlays in the Site::*
+namespace is that they're not released but I ship mine for pedagogical
+purposes. So please don't install it as is; use it as a reference
+for site-specific overlays.

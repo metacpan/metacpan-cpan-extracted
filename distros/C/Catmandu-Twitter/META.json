@@ -1,0 +1,55 @@
+{
+   "abstract" : "Package that imports Twitter feeds",
+   "author" : [
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-Twitter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.09",
+            "Catmandu::Atom" : "0.02",
+            "Config::Any::JSON" : "0",
+            "Date::Parse" : "2.30",
+            "Moo" : "0.009011",
+            "Net::Twitter" : "4.00003",
+            "URI::Escape" : "3.31",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Catmandu::Importer::Twitter" : {
+         "file" : "lib/Catmandu/Importer/Twitter.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

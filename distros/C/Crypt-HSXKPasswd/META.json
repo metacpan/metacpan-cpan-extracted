@@ -1,0 +1,155 @@
+{
+   "abstract" : "A secure memorable password generator inspired by Steve Gibson's Passord Haystacks (https://www.grc.com/haystack.htm), and the famous XKCD password cartoon (https://xkcd.com/936/).",
+   "author" : [
+      "Bart Busschots <bart@bartificer.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-HSXKPasswd",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Share" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Entropy::Algorithms" : "0",
+            "Devel::StackTrace" : "0",
+            "Email::Valid" : "0",
+            "LWP::UserAgent" : "0",
+            "Math::Random::Secure" : "0",
+            "Mozilla::CA" : "0",
+            "URI" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "English" : "0",
+            "Fatal" : "0",
+            "File::HomeDir" : "0",
+            "File::ShareDir" : "1.00",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "Math::BigInt" : "0",
+            "Math::Round" : "0",
+            "Module::Load" : "0",
+            "Pod::Usage" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Text::Unidecode" : "0",
+            "Type::Library" : "0",
+            "Type::Params" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::HSXKPasswd" : {
+         "file" : "lib/Crypt/HSXKPasswd.pm",
+         "version" : "v3.6.0"
+      },
+      "Crypt::HSXKPasswd::Dictionary" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::Dictionary::Basic" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/Basic.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::Dictionary::DE" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/DE.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::EN" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/EN.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::ES" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/ES.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::FR" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/FR.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::IT" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/IT.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::NL" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/NL.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::PT" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/PT.pm",
+         "version" : "v3.2_1"
+      },
+      "Crypt::HSXKPasswd::Dictionary::System" : {
+         "file" : "lib/Crypt/HSXKPasswd/Dictionary/System.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::Helper" : {
+         "file" : "lib/Crypt/HSXKPasswd/Helper.pm",
+         "version" : "v1.0.0"
+      },
+      "Crypt::HSXKPasswd::RNG" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::RNG::Basic" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG/Basic.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::RNG::Data_Entropy" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG/Data_Entropy.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::RNG::DevUrandom" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG/DevUrandom.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::RNG::Math_Random_Secure" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG/Math_Random_Secure.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::RNG::RandomDotOrg" : {
+         "file" : "lib/Crypt/HSXKPasswd/RNG/RandomDotOrg.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::Types" : {
+         "file" : "lib/Crypt/HSXKPasswd/Types.pm",
+         "version" : "v1.2.0"
+      },
+      "Crypt::HSXKPasswd::Util" : {
+         "file" : "lib/Crypt/HSXKPasswd/Util.pm",
+         "version" : "v1.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "v3.6"
+}

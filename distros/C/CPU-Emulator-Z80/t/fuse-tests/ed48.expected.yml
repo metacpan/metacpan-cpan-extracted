@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ed48
+registers:
+  AF: 56237
+  AF_: 0
+  BC: 32255
+  BC_: 0
+  DE: 5149
+  DE_: 0
+  HL: 24500
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

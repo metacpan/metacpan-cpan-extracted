@@ -1,0 +1,24 @@
+<html>
+<head>
+<title>cgiapp messagestack output template</title>
+<style type="text/css">
+   .INFO {
+     font-weight: bold;
+   }
+   .ERROR {
+     color: red;
+   }
+</style>
+</head>
+<body>
+
+<p>hello world</p>
+
+[% FOREACH CAP_Messages %]
+
+    <div class="[% classification %]">[% message %]</div>
+
+[% END %]
+
+</body>
+</html>

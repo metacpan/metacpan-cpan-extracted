@@ -1,0 +1,14 @@
+Date: Sat, 26 Nov 2011 20:22:35 GMT
+Via: 1.0 localhost (squid/3.1.6)
+Accept-Ranges: bytes
+ETag: "165c092-6fcf4-4b27e82631e80"
+Server: Apache/2.2.16 (Debian)
+Content-Length: 457972
+Content-Type: text/plain; charset=UTF-8
+Last-Modified: Thu, 24 Nov 2011 17:38:50 GMT
+Client-Date: Sat, 26 Nov 2011 20:22:36 GMT
+Client-Peer: 127.0.0.1:3128
+Client-Response-Num: 1
+Proxy-Connection: keep-alive
+X-Cache: MISS from localhost
+X-Cache-Lookup: MISS from localhost:3128

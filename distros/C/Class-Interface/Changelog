@@ -1,0 +1,8 @@
+1.0.1
+  - Fixed unit tests. They assumed the presence of class::accessormaker.
+  - Changed prereq of Carp from 1 to 0. Carp doesn't have a $VERSION in 
+    older distros.
+
+1.0
+  - No changes yet. First version
+

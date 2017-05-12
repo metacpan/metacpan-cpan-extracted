@@ -1,0 +1,465 @@
+0.44     2016-12-05
+
+- The changes to use Params::ValidationCompiler in 0.43 were not quite
+  correct, and since Params::ValidationCompiler 0.20 started doing more
+  validation of calls to validation_for(), this cause an exception. Reported
+  by Todd Bruner. RT #119137.
+
+
+0.43     2016-11-13
+
+- Replaced MooseX::Params::Validate with Params::ValidationCompiler.
+
+
+0.42     2016-07-04
+
+- Require the latest version of DateTime::Format::Mail in order to avoid
+  warnings from DateTime 1.32+ that will cause some tests to fail. Reported by
+  Olaf Alders. RT #115868.
+
+
+0.41     2016-03-05
+
+- Fixed header folding for headers that contain non-true values like
+  '0'. Based on a patch for Email::Simple from
+  pali. https://github.com/rjbs/Email-Simple/pull/11.
+
+
+0.40     2016-01-30
+
+- Fixed the stringification of some headers with regards to encoding. The
+  Received header should never be encoded (and thus should never contain
+  non-ASCII).
+
+- Fixed headers which contain email addresses (To, From, CC) so that email
+  addresses are properly encoded (I think). The phrase and comment portions of
+  the address can contain encoded-words, but the address itself should never
+  be encoded. Note that per RFC6531 addresses may contain UTF-8, but the MTA
+  must support the SMTPUTF8 extension in order for the mail to be
+  delivered. As of this release, SMTPUTF8 support does not appear to be very
+  widespread, so I would strongly discourage the use of UTF-8 in email
+  addresses!
+
+
+0.39     2015-08-04
+
+- Changed Email::Abstract::Courriel's ->get_body() method to return the entire
+  email as a string, making it equivalent to ->as_string(). This is confusing,
+  but looking at the few instances of code in Email::Transport that call
+  ->get_body(), it seems like that's what this method is expected to
+  do. Reported by Greg Oschwald. RT #106176.
+
+
+0.38     2015-08-04
+
+- Somewhat screwy release now deleted from PAUSE.
+
+
+0.37     2015-02-26
+
+- Fixed a test failure when MooseX::Params::Validate 0.21+ is
+  installed. Reported by Slaven Rezic. RT #102382.
+
+
+0.36     2014-08-15
+
+- Trying to build an email with a header that started with a space caused the
+  header value to be dropped entirely from the generated email. Patch by Greg
+  Oschwald. PR #2.
+
+
+0.35     2014-05-12
+
+- Replaced all uses of File::Slurp with File::Slurp::Tiny. See RT #95479 for
+  the initial bug report and discussion on why File::Slurp should not be used.
+
+
+0.34     2014-05-02
+
+- More test fixes - relax the date parsing more.
+
+
+0.33     2014-04-19
+
+- Fixed tests so they pass with the most recent DateTime::Format::Mail (0.400)
+  as well as older versions.
+
+
+0.32     2014-04-19
+
+- Courriel parsing is now more liberal and will accept an email with mixed
+  line endings (some newline, some CRLF, etc.). Apparently this happens in the
+  wild (of course it does). Reported by Joseph Crotty. RT #94837.
+
+
+0.31     2013-04-03
+
+[MISC]
+
+- Removed the "this is very alpha" warning from the docs. It's really not very
+  alpha any more.
+
+
+0.30     2012-08-20
+
+[API CHANGES]
+
+- Courriel::Builder no longer exports a bcc() subroutine. Creating Bcc headers
+  in emails does not make any sense whatsoever. See
+  https://metacpan.org/module/Email::Sender::Manual::QuickStart#Hey-wheres-my-Bcc-support-
+  for an explanation of why there is no such thing as a Bcc header.
+
+
+0.29     2012-03-07
+
+[BUG FIXES]
+
+- Courriel now allows an email to have an empty subject when parsing, as does
+  Courriel::Builder. Based on a patch from Zbigniew Łukasiak.
+
+
+0.28     2012-02-01
+
+[BUG FIXES]
+
+- Header attribute names need to be looked up case-insensitively, according to
+  the spec. The original casing is preserved in the Courriel::HeaderAttribute
+  object's name(), method, but looking up an attribute by name on a
+  Courriel::Header object now accepts any casing for the name.
+
+
+0.27     2011-09-24
+
+[ENHANCEMENTS]
+
+- All objects which can stringify now support a ->stream_to API as well. This
+  lets you stream their string output to a sub ref, filehandle, or an object
+  with a ->print() method. If you are dealing with large emails, this API may
+  be more efficient than generating a single string in memory.
+
+[API CHANGES]
+
+- Renamed the Header->as_header_string and HeaderAttribute->as_header_string
+  methods to as_string, so that all objects have the same stringification API.
+
+
+0.26     2011-09-19
+
+[BUG FIXES]
+
+- Add missing prereq for MooseX::Role::Parameterized. Reported by zby.
+
+
+0.25     2011-09-15
+
+[BUG FIXES]
+
+- When a header value contained any non-ASCII content, Courriel would
+  mistakenly MIME encode the whole value. In some cases, this is okay, but for
+  some header fields it is wrong. For example, when a field contains an email
+  address the actual address portion must be unencoded.
+
+
+0.24     2011-09-13
+
+[ENHANCEMENTS]
+
+- The is_binary flag has been replaced with an is_character flag. This flag
+  defaults to false. Suggested by zby.
+
+
+0.23     2011-09-13
+
+[ENHANCEMENTS]
+
+- Courriel->parse now accepts an is_binary flag so you can pass decoded
+  (utf-8) data as the email text. However, it's probably smarter to simply
+  pass binary data to Courriel and let it do the decoding. The issue was
+  brought up by zby.
+
+
+0.22     2011-09-13
+
+[BUG FIXES]
+
+- Require List::MoreUtils 0.28+, as tests fail with earlier versions.
+
+- Added missing prereq on File::Slurp.
+
+
+0.21     2011-09-12
+
+[API CHANGES]
+
+- The ->get_attribute() method for Courriel::ContentType and ::Disposition
+  objects was replaced by ->attribute in 0.20.
+
+[ENHANCEMENTS]
+
+- Added a new ->get_values() method to Courriel::Headers. This lets you get
+  the header string values directly.
+
+- Added a new ->attribute_value() for Courriel::Header::ContentType and
+  ::Disposition. This lets you get the attribute's string value, if the
+  attribute exists. Suggested by zby.
+
+[BUG FIXES]
+
+- The previous release documented a method ->get_attribute() for
+  Courriel::Header::ContentType and ::Disposition objects. This method was
+  removed in 0.20 and replaced with a method named ->attribute().
+
+
+0.20     2011-09-11
+
+[API CHANGES]
+
+- The way headers are represented has been changed quite a bit
+  internally. Read on for details.
+
+  All headers are now represented as Courriel::Header objects instead of plain
+  strings. This means that calling $headers->get('Foo') returns objects. To
+  get the value, you need to call ->value on the individual objects.
+
+  See Courriel::Header for the new class for headers.
+
+- As a corrolary, the Courriel::ContentType and Courriel::Disposition classes
+  have been renamed to Courriel::Header::ContentType and
+  Courriel::Header::Disposition. They are both now subclasses of
+  Courriel::Header. The APIs of these classes have remained mostly the same,
+  except for attribute handling (see below).
+
+  The old classes are still shipped in the distro, but they die when
+  loaded. This avoids leaving behind old modules which no longer work with
+  newer versions of Courriel.
+
+  Methods which returned the old object now return the new one. The
+  Courriel::Headers class will return the appropriate object when the header
+  is fetched with $headers->get().
+
+- Header attributes for the Content-Type and Content-Disposition object are
+  now represented as Courriel::HeaderAttribute objects. This is necessary
+  because these attributes may contain information about their character set
+  and language, per RFC2231.
+
+[ENHANCEMENTS]
+
+- Header attributes with character set and language data per RFC2231 are now
+  parsed properly. Reported by zby. RT #70801.
+
+- Header attribute parsing is much laxer and will not die on bad attributes
+  syntax (in most cases). It simply stops parsing and ignores bad data.
+
+
+0.19     2011-08-21
+
+- Fixed some test failures with older versions of Test::More, which stringify
+  objects passed to is() rather than using their overloading. Reported by
+  Maximilian Gaß. RT #70395.
+
+- The Courriel::Disposition methods which return DateTime objects now
+  explicitly set the time zone of the objects to UTC before returning it.
+
+
+0.18     2011-08-20
+
+- More improvements in handling broken email based on jwang's corpus of broken
+  messages.
+
+- Courriel tries a lot harder to find a date for the email. It now looks at
+  all the Received headers, and it also uses DateTime::Format::Natural to
+  parse dates if DateTime::Format::Mail fails.
+
+- Courriel handles the charset "unknown-8bit" (by ignoring it and treating it
+  as ASCII).
+
+
+0.17     2011-08-19
+
+- Email parsing is now much more flexible, and throws fewer
+  exceptions. Ultimately, it's likely that Courriel will never throw an
+  exception from parsing, since email in the wild is often broken, and it's
+  better to return something than just give up. Thanks to jwang of
+  grokbase.com for providing a corpus of broken messages to test against.
+
+- The Courriel->plain_body_part() and ->html_body_part() methods ignore the case
+  of an attachment's mime type, per RFC 2045.
+
+- The Courriel::ContentType->mime_type() method always returns a value in
+  lower case, but it preserves the original casing when constructing a header
+  value.
+
+
+0.16     2011-07-21
+
+- Add Courriel->from(), ->to(), and ->cc() methods.
+
+- Skip another test which may fail on other people's machines, as
+  File::LibMagic does not return consistent results on all machines.
+
+
+0.15     2011-06-28
+
+- Skip a test which may fail on other people's machines, as File::LibMagic
+  does not return consistent results on all machines.
+
+
+0.14     2011-06-25
+
+- An email part with non-text content would still be treated as character data
+  rather than binary data, and its Content-Type header would end up with a
+  charset of us-ascii. This has been fixed, and now you must explicitly ask
+  for a charset in the Content-Type header when creating a
+  Courriel::ContentType object. Note that plain and html body parts created
+  via Courriel::Builder are unaffected, since these always default to UTF-8 as
+  the charset. Reported by ico. RT #69085.
+
+- Added Courriel::ContentType->has_charset() and
+  Courriel::ContentType->is_binary() methods.
+
+
+0.13     2011-06-20
+
+- A multipart email built with Courriel::Builder would have a broken
+  Content-Type header, missing the required boundary attribute. Reported by
+  ico. RT #68694.
+
+- If you explicitly passed unencoded content when creating a part (which
+  happens when using Courriel::Builder), that content would be modified so it
+  had CRLF line endings. Now, such content is left untouched. Reported by
+  ico. RT #68695.
+
+- When passing encoded content to the Courriel::Part::Single constructor, the
+  constructor used to modify the content so it had CRLF line endings. Now it
+  is left alone.
+
+- Note that if you're passing raw content to the Single constructor _and_
+  setting the transfer encoding to 7bit, 8bit, or binary, then you'll end up
+  with a noncomformant email. However, by default all raw content is base64
+  encoded. It is strongly recommended that you pass raw content and let
+  Courriel take care of the transfer encoding.
+
+
+0.12     2011-06-07
+
+[BUG FIXES]
+
+- The value returned by Courriel::Part::Single->content() was not decoded to
+  Perl's native utf-8 character set. Similarly, when encoding content for
+  transfer, it was not first transformed to raw bytes.
+
+
+0.11     2011-06-07
+
+[BUG FIXES]
+
+- Courriel::Builder now adds a "MIME-Version: 1.0" header to all emails it
+  creates unless you explicitly set this header, which you probably shouldn't,
+  since the only valid value is "1.0". This is a required header for MIME
+  emails per RFC2045.
+
+
+0.10     2011-06-07
+
+[BUG FIXES]
+
+- When parsing an email, the encoding attribute for parts was not set
+  correctly, and ended up defaulting to 8bit for all parts. Now the encoding
+  is set based on the part's Content-Transfer-Encoding header.
+
+
+0.09     2011-06-06
+
+[NEW FEATURES]
+
+- This distro now ships a plugin for Email::Abstract, meaning you can use
+  Courriel with Email::Sender.
+
+
+0.08     2011-06-06
+
+[API CHANGES]
+
+- The content() and encoded_content() methods for Courriel::Part::Single now
+  return strings, rather than references. This makes the typical use
+  simpler. You can still get the reference directly by calling content_ref()
+  and encoded_content_ref().
+
+[BUG FIXES]
+
+- Make sure that any Content-ID header set via Courriel::Builder is formatted
+  properly (the id value should be wrapped in angle brackets).
+
+
+0.07     2011-06-06
+
+- Some tests were failing because File::LibMagic may return slightly different
+  results on different systems (application/x-perl versus text/x-perl).
+
+
+0.06     2011-06-05
+
+- Add missing test prereq on File::Slurp.
+
+- The clone_without_attachments() method could end up setting the wrong
+  encoding when creating a new single part email.
+
+
+0.05     2011-06-04
+
+- The clone_without_attachments() method would die when calling on an email
+  that contained both plain and html inline parts.
+
+
+0.04     2011-06-04
+
+- Add missing prereq on File::LibMagic (needed since 0.02).
+
+
+0.03     2011-06-04
+
+- The encoding parameter is now always set in a part's headers.
+
+
+0.02     2011-06-04
+
+- Added all_parts_matching() method to Courriel class.
+
+- Added clone_without_attachments() method to Courriel class.
+
+- The Courriel::Part::Single attribute raw_content has been renamed as
+  encoded_content.
+
+- The text_body_part() method is now called plain_body_part().
+
+- The add() and unshift() methods in Courriel::Headers now accept only one
+  value.
+
+- Added Courriel::Headers->replace as a convenience method.
+
+- A header with attributes (like Content-Type) can escape values inside a
+  quoted string, like value="foo \" bar". Courriel wasn't unescaping these
+  values.
+
+- It is now possible to pass a Courriel::Disposition object explicitly when
+  constructing a Courriel::Part::Single object. The docs said this was
+  possible in 0.01, but the parameter was just ignored.
+
+- If a part is created with an explicit content_type and/or disposition
+  object, the part's headers will be updated so that the Content-Type and
+  Content-Disposition match the given object.
+
+- The boundary for a Multipart part and the boundary in its ContentType's
+  attributes will always be the same.
+
+- All classes now use MooseX::StrictConstructor.
+
+- Some hacks to make it possible for Courriel to play nice with
+  Email::Abstract.
+
+- Fixed some small doc errors.
+
+
+0.01     2011-05-31
+
+- First release upon an unsuspecting world.

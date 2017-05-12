@@ -1,0 +1,57 @@
+Revision history for Perl extension CVSUtils.
+
+1.01  Fri Mar  7 7:29 PM GMT 2003
+	- Add test for --delta option
+	- Document --delta option
+	- Add --gecos, --domain options
+	  patch supplied by Robin Hugh Johnson <robbat2@orbis-terrarum.net>
+	- Add --FSF option
+	- Add test for -W option
+	- Add --no-common-dir option
+	  patch supplied by Simon Josefsson <jas@extundo.com>
+	- Exclude duplicate file information items from info lines
+	- Add --show-tag option, tweak implementation of ignore-tag option
+	  Document both
+	- Add tests for --ignore-tags option
+	- Make sort order deterministic for equal timestamps
+	- Fix bug #25 (Option to write output in chronologically ascending 
+          order)
+	  patch supplied by Reid Ellis <rae@tnir.org>
+	- Fix bug #24 (Option to not print HH:MM on timestamps)
+	  patch supplied by Simon Josefsson <jas@extundo.com>
+	- Remove shell magic #! (let perl insert it upon installation)
+	- Fix bug #22 (spurious extra square brackets)
+	- Fix bug #19 (carriage returns on windoze)
+	- Fix bug #18 (malformed utf-8 warnings)
+	- Fix bug #14 (Conflict with --accum and -D)
+	  patch based on code supplied by Claus Klein <Claus.Klein@marconi.com>
+	- Fix bug #11 (add '--tagdates' option)
+	  patch supplied by Henrik Nordstrom <hno@marasystems.com>
+	- Fix bug #8 (add '--delta' option)
+	  patch supplied by Nathan Bryant <nbryant@allegientsystems.com>
+	- Fix bug #5 (-W fails on argument '0')
+	- Tweak eval line for fun & profit (and to make it work with perl
+	  -I lib cvs2cl)
+	- Add fix for really long file names (so they don't get wrapped).
+	  This only works with later versions of Text::Wrap, unfortunately;
+	  specifically not with the version that comes in 5.005_03
+	- Add fix for direcories called '0' containing multiple files
+	    Fix from Joachim Achtzehnter <joachim@kraut.ca>,
+	    also from Rich Bowen <rbowen@cre8tivegroup.com>
+	- Add --xml-encoding option (bug #17)
+	  based on code from Patrick Ficheux <patrick.ficheux@bigfoot.com>
+
+1.00  Tue Jul 23  7:08 AM GMT 2002
+	- Add redbean tests
+	- Uses cvs2cl (almost) completely unchanged from redbean source
+	- Add (simple) make target for cvs2cl.pl
+	- Add test mechanism for cvs2cl.pl as for cvs2cl
+	- Make it all 5.00503-compatible
+	- sort utags on cvs2cl output
+
+0.01  Fri Dec 21  7:21 PM GMT 2001
+	- original version
+	- cvs2cl.pl from red-bean.com
+	- with added option --ignore-tag
+	- not pmcompat-ible
+

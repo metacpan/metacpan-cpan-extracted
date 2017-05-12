@@ -1,0 +1,33 @@
+<div class=path> <b>[% pages.uploads %] [% age %] [% pages.days %]</b>.</div>
+[% host = mirror ? mirror : download %]
+[% birth = results.0.birth %]
+<table width="100%"><tr>
+<td colspan=2>&nbsp;</td>
+<td align="right">
+<a href="http://cpan.uwinnipeg.ca/htdocs/cpan.xml">
+<img src="[% rssimg %]" alt="RSS" /></a>
+</td></tr><tr>
+<td class=datecell colspan=3><b>[% birth %]</b></td>
+</tr></table><ul>
+[% FOREACH item = results %]
+[% IF item.birth != birth %]
+</ul><table width="100%"><tr>
+<td class=datecell colspan=3><b>[% item.birth %]</b></td>
+</tr></table><ul>
+[% birth = item.birth %]
+[% END -%]
+[% IF item.dist_id %]
+<li><a href="[% home %]/dist/[% item.dist_name %]"> 
+<b>[% item.dist_name %]-[% item.dist_vers %]</b></a>
+&nbsp;<small>&nbsp;[<a
+href="[% host %]/authors/id/[% item.download %]">[% pages.download %]</a>]
+</small>
+[% IF webstart %]
+&nbsp;<small>[<a
+href="[% cpaninstall %]?dist=[% item.dist_file %];cpanid=[% item.cpanid %]">[% pages.install %]</a>]
+</small>
+[% END -%]
+&nbsp;<small>[% item.dist_abs %]</small></li>
+[% END -%]
+[% END -%]
+</ul>

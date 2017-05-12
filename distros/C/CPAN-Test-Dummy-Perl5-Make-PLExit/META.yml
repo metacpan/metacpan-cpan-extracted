@@ -1,0 +1,17 @@
+---
+name: CPAN-Test-Dummy-Perl5-Make-PLExit
+version: 1.01
+author:
+  - 'David A. Golden <dagolden@cpan.org>'
+abstract: CPAN Test Dummy
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  CPAN::Test::Dummy::Perl5::Make::PLExit:
+    file: lib/CPAN/Test/Dummy/Perl5/Make/PLExit.pm
+    version: 1.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

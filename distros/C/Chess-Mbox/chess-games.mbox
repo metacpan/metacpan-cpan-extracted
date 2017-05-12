@@ -1,0 +1,167 @@
+From icc@www.chessclub.com Sun Feb 10 10:11:22 2002
+Status:  U
+Return-Path: <icc@www.chessclub.com>
+Received: from cali-3.pobox.com ([64.71.166.116])
+	by eagle (EarthLink SMTP Server) with ESMTP id u6d3ao.1j4.37tiu0o
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 07:10:16 -0800 (PST)
+Received: from cali-3.pobox.com (localhost.localdomain [127.0.0.1])
+	by cali-3.pobox.com (Postfix) with ESMTP id 155FC3E69A
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 10:10:16 -0500 (EST)
+Delivered-To: metaperl@pobox.com
+Received: from smtpout.mac.com (smtpout.mac.com [204.179.120.88])
+	by cali-3.pobox.com (Postfix) with ESMTP id 67B463E692
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 10:10:15 -0500 (EST)
+Received: from ms05.mac.com (server-source-si02 [10.13.10.6])
+	by smtpout.mac.com (8.12.1/8.10.2/1.0) with ESMTP id g1AFAF3k010015
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 07:10:15 -0800 (PST)
+Received: from smtpin01.mac.com ([10.13.10.146]) by ms05.mac.com
+          (Netscape Messaging Server 4.15) with ESMTP id GRBOT300.HHE for
+          <metaperl@pobox.com>; Sun, 10 Feb 2002 07:10:15 -0800 
+Received: from www.chessclub.com (chessclub.com [204.178.125.65])
+	by smtpin01.mac.com (8.12.1/8.12.1/1.0) with ESMTP id g1AFADjm026903
+	for <metaperl@mac.com>; Sun, 10 Feb 2002 07:10:13 -0800 (PST)
+Received: (from icc@localhost)
+	by www.chessclub.com (8.11.6/8.11.6) id g1AFACk51754
+	for metaperl@mac.com; Sun, 10 Feb 2002 10:10:12 -0500 (EST)
+	(envelope-from icc)
+Date: Sun, 10 Feb 2002 10:10:12 -0500 (EST)
+From: Internet Chess Club <icc@www.chessclub.com>
+Message-Id: <200202101510.g1AFACk51754@www.chessclub.com>
+To: princepawn <metaperl@mac.com>
+Subject: ICC game: princepawn vs UTJAG1
+
+[Event "ICC 4 10"]
+[Site "Internet Chess Club"]
+[Date "2002.02.10"]
+[Round "-"]
+[White "princepawn"]
+[Black "UTJAG1"]
+[Result "1/2-1/2"]
+[ICCResult "White stalemated"]
+[WhiteElo "640"]
+[BlackElo "721"]
+[Opening "English opening"]
+[ECO "A10"]
+[NIC "EO.64"]
+[Time "09:42:41"]
+[TimeControl "240+10"]
+
+1. c4 d6 2. Nc3 d5 3. e3 dxc4 4. Bxc4 Nf6 5. d4 Nc6 6. Nf3 Nb4 7. O-O Bg4 8.
+Qa4+ Nc6 9. Ne5 e6 10. Nxc6 bxc6 11. Qxc6+ Nd7 12. d5 Bb4 13. Rd1 Bxd1 14.
+Nxd1 O-O 15. e4 Ne5 16. Qb5 Rb8 17. Qa6 Bc5 18. Nc3 Qh4 19. Be3 Bxe3 20.
+fxe3 Nxc4 21. Qxc4 Rxb2 22. dxe6 Qg4 23. Nd1 Re2 24. exf7+ Kh8 25. Nf2 Qh4
+26. Qxe2 Rxf7 27. g3 Qd8 28. Rd1 Rd7 29. e5 Qe7 30. Rxd7 Qxd7 31. Qd1 Qe6
+32. Qd8+ Qg8 33. Qxc7 Qxa2 34. Qb8+ Qg8 35. Qxa7 h6 36. Nd3 Qb3 37. Qa8+ Kh7
+38. Qd8 Qd1+ 39. Kf2 Qd2+ 40. Kf3 Qd1+ 41. Ke4 Qh1+ 42. Kf5 Qf3+ 43. Ke6
+Qg4+ 44. Kd5 Qf3+ 45. Kc4 Qxe3 46. g4 Qe4+ 47. Kc3 Qc6+ 48. Kd4 Qf3 49. e6
+Qxg4+ 50. Kc5 Qxe6 51. Nf4 Qe3+ 52. Kc6 Qxf4 53. Qc7 Qc4+ 54. Kd7 Qf7+ 55.
+Kc8 Qf5+ 56. Kb7 Qb5+ 57. Kc8 Qa6+ 58. Kd8 Qd3+ 59. Qd7 Qxd7+ 60. Kxd7 g5
+61. Ke6 Kg6 62. Ke5 h5 63. Ke4 h4 64. Kf3 Kh5 65. h3 Kh6 66. Kg2 Kh5 67. Kf3
+Kg6 68. Kg2 Kf5 69. Kf3 g4+ 70. hxg4+ Kg5 71. Kg2 Kxg4 72. Kh2 h3 73. Kh1
+Kg3 74. Kg1 h2+ 75. Kh1 Kh3 {White stalemated} 1/2-1/2
+
+
+From icc@www.chessclub.com Sun Feb 10 10:28:12 2002
+Status:  U
+Return-Path: <icc@www.chessclub.com>
+Received: from cali-3.pobox.com ([64.71.166.116])
+	by merlin (EarthLink SMTP Server) with ESMTP id u6d4b3.cvm.37tiu4s
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 07:27:31 -0800 (PST)
+Received: from cali-3.pobox.com (localhost.localdomain [127.0.0.1])
+	by cali-3.pobox.com (Postfix) with ESMTP id 6F1383E69B
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 10:27:30 -0500 (EST)
+Delivered-To: metaperl@pobox.com
+Received: from smtpout.mac.com (smtpout.mac.com [204.179.120.88])
+	by cali-3.pobox.com (Postfix) with ESMTP id 06EED3E6A4
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 10:27:30 -0500 (EST)
+Received: from ms05.mac.com (server-source-si02 [10.13.10.6])
+	by smtpout.mac.com (8.12.1/8.10.2/1.0) with ESMTP id g1AFRT3k012471
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 07:27:29 -0800 (PST)
+Received: from smtpin02.mac.com ([10.13.10.147]) by ms05.mac.com
+          (Netscape Messaging Server 4.15) with ESMTP id GRBPLT00.DME for
+          <metaperl@pobox.com>; Sun, 10 Feb 2002 07:27:29 -0800 
+Received: from www.chessclub.com (chessclub.com [204.178.125.65])
+	by smtpin02.mac.com (8.12.1/8.12.1/1.0) with ESMTP id g1AFRRUv000442
+	for <metaperl@mac.com>; Sun, 10 Feb 2002 07:27:28 -0800 (PST)
+Received: (from icc@localhost)
+	by www.chessclub.com (8.11.6/8.11.6) id g1AFRR953414
+	for metaperl@mac.com; Sun, 10 Feb 2002 10:27:27 -0500 (EST)
+	(envelope-from icc)
+Date: Sun, 10 Feb 2002 10:27:27 -0500 (EST)
+From: Internet Chess Club <icc@www.chessclub.com>
+Message-Id: <200202101527.g1AFRR953414@www.chessclub.com>
+To: princepawn <metaperl@mac.com>
+Subject: ICC game: originalweasel vs princepawn
+
+[Event "ICC 10 10"]
+[Site "Internet Chess Club"]
+[Date "2002.02.10"]
+[Round "-"]
+[White "originalweasel"]
+[Black "princepawn"]
+[Result "1-0"]
+[ICCResult "Black checkmated"]
+[WhiteElo "1239"]
+[BlackElo "932"]
+[Opening "Sicilian: Smith-Morra gambit"]
+[ECO "B21"]
+[NIC "SI.48"]
+[Time "10:15:49"]
+[TimeControl "600+10"]
+
+1. e4 c5 2. d4 cxd4 3. Qxd4 Nc6 4. Qa4 d6 5. Bb5 Bd7 6. c3 g6 7. Na3 f5 8.
+b3 Nf6 9. f3 e6 10. Bg5 Qc8 11. Bxf6 Rg8 12. exf5 Ne5 13. Bxe5 dxe5 14. b4
+Qxc3+ 15. Kf2 Rg7 16. Bxd7+ Rxd7 17. fxe6 Qxa1 18. Qxd7# {Black checkmated}
+1-0
+
+
+From icc@www.chessclub.com Sun Feb 10 10:28:13 2002
+Status:  U
+Return-Path: <icc@www.chessclub.com>
+Received: from cali-3.pobox.com ([64.71.166.116])
+	by robin (EarthLink SMTP Server) with ESMTP id u6d4cl.ki3.37tiu21
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 07:28:21 -0800 (PST)
+Received: from cali-3.pobox.com (localhost.localdomain [127.0.0.1])
+	by cali-3.pobox.com (Postfix) with ESMTP id D84003E69A
+	for <princepawn@earthlink.net>; Sun, 10 Feb 2002 10:28:20 -0500 (EST)
+Delivered-To: metaperl@pobox.com
+Received: from smtpout.mac.com (unknown [204.179.120.85])
+	by cali-3.pobox.com (Postfix) with ESMTP id 8A2163E698
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 10:28:20 -0500 (EST)
+Received: from ms05.mac.com (server-source-si02 [10.13.10.6])
+	by smtpout.mac.com (8.12.1/8.10.2/1.0) with ESMTP id g1AFSKFV015117
+	for <metaperl@pobox.com>; Sun, 10 Feb 2002 07:28:20 -0800 (PST)
+Received: from smtpin07.mac.com ([10.13.10.152]) by ms05.mac.com
+          (Netscape Messaging Server 4.15) with ESMTP id GRBPN700.4HI for
+          <metaperl@pobox.com>; Sun, 10 Feb 2002 07:28:19 -0800 
+Received: from www.chessclub.com (chessclub.com [204.178.125.65])
+	by smtpin07.mac.com (8.12.1/8.12.1/1.0) with ESMTP id g1AFSIV7017014
+	for <metaperl@mac.com>; Sun, 10 Feb 2002 07:28:18 -0800 (PST)
+Received: (from icc@localhost)
+	by www.chessclub.com (8.11.6/8.11.6) id g1AFSHW53501
+	for metaperl@mac.com; Sun, 10 Feb 2002 10:28:17 -0500 (EST)
+	(envelope-from icc)
+Date: Sun, 10 Feb 2002 10:28:17 -0500 (EST)
+From: Internet Chess Club <icc@www.chessclub.com>
+Message-Id: <200202101528.g1AFSHW53501@www.chessclub.com>
+To: princepawn <metaperl@mac.com>
+Subject: ICC game: princepawn vs TrainingBot
+
+[Event "ICC w20 20 10 u"]
+[Site "Internet Chess Club"]
+[Date "2002.02.10"]
+[Round "-"]
+[White "princepawn"]
+[Black "TrainingBot"]
+[Result "1-0"]
+[ICCResult "Black checkmated"]
+[WhiteElo "644"]
+[BlackElo "1600"]
+[Time "10:27:39"]
+[TimeControl "1200+10"]
+[SetUp "1"]
+[FEN "8/5K2/6Nk/8/8/8/8/6R1 w - - 0 1"]
+
+1. Nf4 Kh7 2. Rh1# {Black checkmated} 1-0
+
+

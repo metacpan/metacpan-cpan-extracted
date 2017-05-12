@@ -1,0 +1,62 @@
+marc_spec('001', my.id)
+
+marc_spec('000', my.no.field, value:'nofield')
+
+marc_spec('666', my.references.$append)
+
+add_field(my.references2.$first, 'first')
+marc_map('003', my.references2.$append);
+
+marc_spec('245', my.title.all)
+
+marc_spec('245', my.title.default, value:'the title')
+
+marc_spec('650', my.subjects.all)
+
+marc_spec('650', my.subjects.joined, join:'###')
+
+marc_spec('650', my.append.subjects.$append)
+
+marc_spec('650', my.split.subjects, split:1)
+
+marc_spec('650', my.append.split.subjects.$append, split:1)
+
+marc_spec('..._10', my.fields.indicators10.$append)
+
+marc_spec('...__0', my.fields.indicators_0, split:1)
+
+marc_spec('LDR', my.ldr.all)
+
+marc_spec('LDR/0-3', my.firstcharpos.ldr)
+
+marc_spec('LDR/#-3', my.lastcharpos.ldr)
+
+marc_spec('245$a', my.title.proper)
+
+marc_spec('245_10$a', my.title.indicator.proper)
+
+marc_spec('245$a/0-1', my.title.charpos)
+
+marc_spec('650[1]', my.second.subject)
+marc_spec('650[#]', my.last.subject)
+marc_spec('650[0-1]', my.two.split.subjects, split:1)
+marc_spec('650[#-1]', my.two.join.subjects, join:'###')
+
+marc_add('020', 'a', '0491001304', 'a', 'test0491001304', 'q', 'black leather', 'q', 'blue pigskin', 'q', 'easel binding')
+marc_spec('020$a', my.isbn.number)
+marc_spec('020$a[0]', my.isbn.numbers)
+marc_spec('020$q[0]', my.isbn.qual.first)
+marc_spec('020[0]$q[0]', my.isbn.qual.none)
+marc_spec('020$q[1]', my.isbn.qual.second)
+marc_spec('020$q[#]', my.isbn.qual.last)
+marc_spec('020$q$a', my.isbns.all, split:1)
+marc_spec('020$q$a', my.isbns.pluck.all, split:1, pluck:1)
+marc_spec('020$q[#]$a[1]', my.isbn.qual.other, split:1)
+marc_spec('020$q[#-1]$a[0-1]', my.isbn.qual.range, split:1)
+marc_spec('020$q[#]/0-4$a[1]/#-0', my.isbn.qual.substring.other, split:1)
+
+
+marc_spec('260[#]$b$a', my.level3.inverted, invert:1)
+marc_spec('020$a$q[#]', my.level2.inverted, invert:1)
+marc_spec('020[#]$a$q[#]/1-5', my.level1.inverted, invert:1)
+marc_spec('020[#]$a$q[0]/1-5$q[1]/1-5$q[2]/1-5', my.multi.level1.inverted, invert:1)

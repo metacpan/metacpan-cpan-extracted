@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 80
+    - 181
+  36653:
+    - 15
+name: fdcbb5
+registers:
+  AF: 12090
+  AF_: 0
+  BC: 46857
+  BC_: 0
+  DE: 16743
+  DE_: 0
+  HL: 22462
+  HL_: 0
+  I: 0
+  IX: 46403
+  IY: 36573
+  PC: 0
+  R: 0
+  SP: 0

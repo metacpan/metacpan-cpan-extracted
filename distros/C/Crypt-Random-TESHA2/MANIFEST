@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+LICENSE
+MANIFEST
+README
+TODO
+lib/Crypt/Random/TESHA2.pm
+lib/Crypt/Random/TESHA2/Config.pm
+t/01-load.t
+t/02-export.t
+t/10-functionality.t
+t/11-fips140.t
+t/12-dispersion.t
+t/13-timereval.t
+t/14-entropy.t
+t/90-release-perlcritic.t
+t/91-release-pod-syntax.t
+t/92-release-pod-coverage.t
+t/93-release-kwalitee.t
+examples/TrulyRandom.pm
+examples/threads.pl
+.travis.yml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

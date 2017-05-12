@@ -1,0 +1,26 @@
+Changes
+inc/ExtUtils/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Plugin/MortalForward.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/builtin_actions.t
+t/lib/TestApp.pm
+t/lib/TestApp/C/Auto.pm
+t/lib/TestApp/C/Auto/Auto.pm
+t/lib/TestApp/C/Auto2.pm
+t/lib/TestApp/C/Begin.pm
+t/lib/TestApp/C/Begin2.pm
+t/lib/TestApp/C/Elsewhere.pm
+t/user_actions.t

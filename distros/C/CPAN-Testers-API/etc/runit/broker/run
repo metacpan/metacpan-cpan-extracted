@@ -1,0 +1,4 @@
+#!/bin/bash
+. /opt/local/perlbrew/etc/bashrc
+eval $( perl -Mlocal::lib )
+exec mercury broker -i 14400 -l http://*:9000 2>&1

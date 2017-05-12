@@ -1,0 +1,97 @@
+{
+   "abstract" : "Text::Xslate View Class",
+   "author" : [
+      "Copyright (c) 2010 Daisuke Maki C<< <daisuke@endeworks.jp> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-Xslate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.8",
+            "File::Find" : "0",
+            "Scalar::Util" : "0",
+            "Text::Xslate" : "0.1045"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cycle" : "0",
+            "PadWalker" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Helper::View::Xslate" : {
+         "file" : "lib/Catalyst/Helper/View/Xslate.pm"
+      },
+      "Catalyst::View::Xslate" : {
+         "file" : "lib/Catalyst/View/Xslate.pm",
+         "version" : "0.00019"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/Catalyst-View-Xslate/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/Catalyst-View-Xslate",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/Catalyst-View-Xslate.git",
+         "web" : "https://github.com/lestrrat/Catalyst-View-Xslate"
+      }
+   },
+   "version" : "0.00019",
+   "x_contributors" : [
+      "hidek <hide@hide-k.net>",
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "hiratara <hiratara@cpan.org>",
+      "Fuji, Goro <gfuji@cpan.org>",
+      "Torsten Raudssus <github@raudssus.de>",
+      "sunnavy <sunnavy@gmail.com>",
+      "Wallace Reis <wreis@123people.com>",
+      "Wallace Reis <wallace@reis.me>",
+      "John Napiorkowski <jjn1056@yahoo.com>",
+      "lestrrat <lestrrat+github@gmail.com>"
+   ]
+}

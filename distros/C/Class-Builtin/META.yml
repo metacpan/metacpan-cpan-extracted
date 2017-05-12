@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Class-Builtin
+version:            0.05
+abstract:           Scalar/Array/Hash as objects
+author:
+    - Dan Kogai <dankogai@dan.co.jp>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Dumper:  0
+    Encode:        0
+    List::Util:    0
+    Scalar::Util:  0
+    Test::More:    0
+resources:
+    repository:  http://github.com/dankogai/p5-class-builtin
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

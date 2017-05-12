@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Convert/Base32.pm
+t/00_enc_dec.t
+t/01_error_checks.t
+META.yml                                 Module meta-data (added by MakeMaker)

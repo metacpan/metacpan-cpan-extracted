@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Net::SSH::Perl;
+
+# This is meant to be suid enabled
+# This is the version using ssh. There is an alternative version using sudo.
+
+my $fsc ='/usr/local/bin/fixsrccont';
+my $sshhost = 'my.unix.sshd.host';
+my $view = 'my_view';
+my $ct = '/opt/rational/clearcase/bin/cleartool';
+
+sub ssh() {
+  my ($account, $host) = @_;
+  my $ssh = Net::SSH::Perl->new($host);
+  $ssh->login($account);
+  return $ssh;
+}
+
+sub dispatch {
+  my ($owner, $arg) = @_;
+  my $cmd = qq($fsc '$arg'); #dir, oid of v0, oid of branch, oid of previous
+  my($out, $err, $ret) = ssh($owner, $sshhost)->cmd(
+    qq($ct setview -exec "$cmd" $view));
+}
+
+for (@ARGV) {
+  my ($owner, $arg) =~ /^(\w+?):(.*)$/;
+  dispatch($owner, $arg);
+}

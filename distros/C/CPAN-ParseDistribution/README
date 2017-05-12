@@ -1,0 +1,11 @@
+This module parses a tarball or zip file from the CPAN or BackPAN
+and figures out what versions of what modules are in it.
+
+YOU MUST READ THE NOTES ABOUT SECURITY IN THE DOCUMENTATION
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

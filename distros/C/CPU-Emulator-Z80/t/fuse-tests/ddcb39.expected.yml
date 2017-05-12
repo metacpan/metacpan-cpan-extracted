@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  43121:
+    - 65
+name: ddcb39
+registers:
+  AF: 1285
+  AF_: 0
+  BC: 39489
+  BC_: 0
+  DE: 41691
+  DE_: 0
+  HL: 57205
+  HL_: 0
+  I: 0
+  IX: 43157
+  IY: 57923
+  PC: 4
+  R: 2
+  SP: 0

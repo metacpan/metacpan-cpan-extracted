@@ -1,0 +1,7 @@
+Changes
+lib/Config/File/Simple.pm
+Makefile.PL
+MANIFEST
+README
+t/Config-File-Simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

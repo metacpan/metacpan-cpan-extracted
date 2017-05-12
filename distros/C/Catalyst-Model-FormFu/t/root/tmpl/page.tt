@@ -1,0 +1,12 @@
+<html>
+<head>
+	<title>HTML::FormFu Test</title>
+	<style>
+		label { display: block }
+	</style>
+</head>
+<body>
+
+[% content %]
+
+</body>

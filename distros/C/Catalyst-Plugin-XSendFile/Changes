@@ -1,0 +1,7 @@
+Revision history for Perl module Catalyst::Plugin::XSendFile
+
+0.02 2006-07-21T19:07:42+09:00
+     - Fixed Build.PL to remove wrong provides parameters on META.yml
+
+0.01 2006-07-21T17:29:09+09:00
+     - initial release.

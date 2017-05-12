@@ -1,0 +1,57 @@
+This module provides an object-oriented interface for converting
+'numbers' with scientific postfix scale factors (really strings) to
+real numbers and back, i.e.
+
+2.5u <--> 2.5e-6
+25K  <--> 2.5e4
+
+The column on the left is typical of simulator and tester output, while
+the column on the right are numbers that you can actually do math on
+in perl.
+
+(As a sidenote, I've tried to keep current with new modules that have
+come out like Number::Format and Interpolation.  Neither of those
+modules provide the functionality that this module does in a generic
+sense, that of being a "conversion tool".  They both format numbers
+pretty easily, but neither 'unformat'.)
+
+Each object that is created allow the user to define the format of
+numbers as postfix scale factors are added (number to string
+conversion), and provides functions for converting from string to
+numbers. (See the module documentation for details).
+
+Three different styles of postfixes are supported, SPICE, SI, and CS.  The
+main difference between the first two is the capatilization of the postfixes
+for all fixes greater than one, ie kilo, mega, and so on.  A list of
+the abbreviations can be found in the module documentation.  The third
+format, CS, refers to "computer science" and is used to format numbers
+based on powers of two, rather than ten.
+
+The format of numbers as they are converted from strings can
+be set by the user to be any valid format to sprintf.  This is
+checked by Convert::SciEng as matching the following regexp:
+
+/^\%\d+\.\d+([scduxoefg]|l[duxo])$/
+
+This code should be considered beta.  I have been using it for
+scripting here at work, but of course I may have missed something.
+
+This module has wandered a lot since its original creation.  Only God
+knows what its's going next.  Here are some of the things that have
+occurred to me:
+
+1)Strings that are converted to numbers aren't given any particular
+  format.  I could see where this might be important, but then again,
+  it might not.
+
+2)The most important format isn't available, that is, engineering
+  fix in scientific notation.  Take for example the numbers used
+  above:
+
+  2.5u <--> 2.5e-6  #This is fine
+  25k  <--> 2.5e4   #This is okay
+  25k  <--> 25e3    #This is great!
+
+  I got a hold of the source for lib stdio and found a great big
+  incredible mess.  I would love to find a competent C programmer
+  who was interested in taking on this project.

@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+# $Id: cindy 97 2010-06-18 17:09:02Z jo $
+
+use strict;
+use warnings;
+
+use Cindy;
+
+#
+# read_file
+# read a file into memory 
+#
+sub read_file
+{
+  my ($name) = @_;
+  open(FILE, $name) 
+  or die "Failed to open $name:$!";
+  read(FILE, my $rtn, -s $name);
+  close(FILE);
+  return $rtn;
+}
+
+#
+# parse_ml
+# Parse markup
+#
+sub parse_ml 
+{
+  my ($sfile) = @_;
+  my $is_xml = ($sfile =~ /^<\?xml/);
+  my $rtn;
+  if ($is_xml) {
+    $rtn  = parse_xml_string($sfile);
+  } else {
+    $rtn  = parse_html_string($sfile);
+  }
+  return ($rtn, $is_xml);
+}
+
+#
+# cindy
+# Run a cindy injection on named files
+#
+sub cindy {
+  my ($doc, $cis, $data) = @_;
+  my $sdoc = read_file($doc);
+  my ($xdoc, $is_xml_doc) = parse_ml(
+    read_file($doc)
+  );
+  my ($xdata, $is_xml_data) = parse_ml(
+    read_file($data)
+  );
+
+  my $xcis  = parse_cis_string (
+    read_file($cis)
+  );
+
+  # Data will not be modified
+  $xdata->indexElements();
+
+  my $xout = inject($xdata, $xdoc, $xcis);
+
+  if ($is_xml_doc) {
+    return $xout->toString();
+  } else {
+    return $xout->toStringHTML();
+  }
+}
+
+
+if (@ARGV != 3) {
+  print qq|
+Usage: cindy <doc> <cjs> <data> 
+|;
+  exit;
+}
+
+print cindy(@ARGV);
+

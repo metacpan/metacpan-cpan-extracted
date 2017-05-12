@@ -1,0 +1,12 @@
+Revision history for Perl extension Class::DBI::Plugin::Factory.
+
+0.03  Sat Jul  9 02:00:00 2005
+	- fixed pod
+
+0.02  Fri Jul  8 10:00:00 2005
+	- CPAN release version
+
+0.01  Thu Jul  7 15:14:50 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Class::DBI::Plugin::Factory
+

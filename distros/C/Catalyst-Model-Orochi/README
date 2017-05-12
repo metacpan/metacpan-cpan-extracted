@@ -1,0 +1,64 @@
+NAME
+    Catalyst::Model::Orochi - Catalyst-Orochi Integration
+
+SYNOPSIS
+        # in your  MyApp::Model::Orochi
+        package MyApp::Model::Orochi;
+        use Moose;
+        use namespace::autoclean;
+
+        extends 'Catalyst::Model::Orochi';
+
+        __PACKAGE__->meta->make_immutable();
+
+        1;
+
+        # in your config (watch out for indentation, this is YAML)
+        Model::Orochi:
+            injections: # for literal values
+                name01: value01 
+            classes:
+                - ClassName01
+                - ClassName02
+            namespaces:
+                - Namespace01
+                - Namespace02
+    
+        # in your Catalyst code:
+
+        my $value = $c->model('Orochi')->get('registered/path');
+
+DESCRIPTION
+    This model integrates Orochi DI container with Catalyst. The same
+    caveats from Orochi apply.
+
+CONFIGURATION KEYS
+    injections
+        A hashref of literal values. Same as inject_literal() or
+        Orochi::Injection::Literal
+
+    classes
+        A list of class names. These classes should be using MooseX::Orochi.
+        If the class does not use, or have an ancestor that uses
+        MooseX::Orochi, the class will be silently ignored
+
+    namespaces
+        A list of namespaces. Any class files found under the namespace that
+        uses MooseX::Orochi will be included.
+
+AUTHOR
+    Daisuke Maki "<daisuke@endeworks.jp>"
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 155:
+        You forgot a '=back' before '=head1'
+

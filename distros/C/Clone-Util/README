@@ -1,0 +1,49 @@
+SYNOPSIS
+
+     use Clone::Util qw(modclone sclone);
+    
+     my $row = {name=>'ujang', gender=>'m', nationality=>'id'};
+     my $table = [
+         $row,
+         modclone { $_->{name} = 'budi' } $row,
+         modclone { $_->{name} = 'asep' } $row,
+         modclone { $_->{name} = 'rini'; $_->{gender} = 'f' } $row,
+     ];
+    
+     my $shallow_clone = sclone($data);
+
+FUNCTIONS
+
+    None of the functions are exported by default, but they are exportable.
+
+ clone($data) => $cloned
+
+    This is just re-exported Function::Fallback::CoreOrPP's clone().
+
+ modclone(\&code, $data) => $clone
+
+    Clone $data and then run code. Code will be given the clone of data.
+    For convenience, $_ will also be localized and set to the clone of
+    data. So you can access the clone using $_ in addition to $_[0].
+
+ sclone($data) => $clone
+
+    Shallow-clone $data, which must be an arrayref or a hashref. Shallow
+    cloning means only copying the first level of data.
+
+     my $array = [0,1,2,[3]];
+     my $clone = sclone $array; # => [0,1,2,[3]], but [3] is still the same reference
+    
+     $clone->[3][0] = "three"; # $clone as well as $array become [0,1,2,["three"]]
+    
+     $clone->[0] = "zero"; # $clone becomes ["zero",1,...] but $array still [0,1,...]
+
+    You can perform shallow copying trivially yourself using:
+
+     my $cloned_array = [@$array];
+     my $cloned_hash  = {%$hash};
+
+SEE ALSO
+
+    Function::Fallback::CoreOrPP
+

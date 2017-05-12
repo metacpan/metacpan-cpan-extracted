@@ -1,0 +1,199 @@
+Revision history for Perl extension Class-Autouse
+
+2.01 Fri 3 Feb 2012
+	- Removing the use of "defined @array" deprecated in 5.16
+
+2.00 Tue 18 Jan 2011
+	- Switching to a production release
+
+1.99_04 Thu 13 Jan 2011
+	- Upgrading to Module::Install::DSL 1.00
+	- Bumping minimum version of Perl to 5.006
+	- Fixing indenting, style and layout issues.
+	- Added debugging entries to all the new code.
+	- Removed on use of _load_ancestors that was not needed
+	- Updating copyright a couple of times :/
+
+1.99_03 Fri  4 Jul 2008
+	- Upgrading to Module::Install 0.76
+	- Localising $@ during evals
+
+1.99_02 Thu 24 Jan 2008
+	- Fixing some back-compatibility bugs in the new tests
+
+1.99_01 Tue 15 Jan 2008
+	- Vast swathes of additional functionality from Scott Smith
+
+1.29 Mon 12 Nov 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.68
+	- Updating to newer author tests
+	- Removing the use of base.pm
+
+1.28 Tue 17 Jul 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.65
+	- Updating List::Util dependency to 1.19.
+	  (Fixes memory leak AND resolving the Win32 problem listed below)
+
+1.27 Mon  4 Sep 2006
+	- Upgrading to Module::Install 0.64
+
+1.26 Wed Apr 12 2006
+	- Debugging change in 1.25 regressed an undocumented 5.6-related
+	  bug first fixed in 1.20. Make sure $DEBUG is always defined
+	  (Michael Schwern)
+	- Re-introduced the List::Util 1.18 dependency, but stay at 1.17
+	  if on a Win32 (and cygwin, just in case) platform.
+	- Module::Install updated to pre-release of 0.62
+
+1.25 Fri Apr  7 2006
+	- Expands the can hook to also hook isa (Michael Schwern)
+	- Minor change to debugging (Michael Schwern)
+	- Optimised out the warnings.pm hook change (Michael Schwern)
+	- Module::Install updated to 0.61
+
+1.24 Fri Jan 13 2006
+	- No functional changes. No need to upgrade.
+	- Updated copyright notice to 2006.
+	- Added t/05_base.t to try and chase down base.pm bug
+	  (Failed to find it, but left test so CPAN Tests can validate my
+	  assumptions on what should happen and that it happens for them)
+	- Added base.pm as a dep (although unversioned dep) to make sure
+	  it is installed on older perls.
+	- Module::Install updated to 0.52
+	- Decrement List::Util dep to 1.17 as 1.18 fails to build on some
+	  platforms.
+
+1.23 Thu Dec 29 2005
+	- In moving from CVS to SVN I forgot to bring ::Parent with it.
+	  (The tests passed spuriously because it found the old version.)
+	- Upgraded Module::Install and shrunk Makefile.PL again to reflect
+	  the new features in it.
+	- Upgraded List::Util dependency to 1.18 because of memory leaks
+	  and problems with non XS versions of functions we use.
+
+1.22 Wed Dec 21 2005
+	- Apparently generating spurious warnings on Perl 5.8.1
+	  on Mac OS X when using SVK. Tentatively applying solution.
+	- No change in functionality on any platform.
+	- No need to upgrade unless you are seeing lots of warnings.
+	- Rolled back the File::Spec dependency from 0.82 to 0.80
+	  to avoid needless upgrades in some 5.005 and 5.006 situations.
+	- Moved from older CVS repository to newer SVN repository
+	- Updated Makefile.PL to Module::Install 0.45
+
+1.21 Wed Sep 28 2005
+	- Documenting ->autouse(@classes)
+	- Tidying up the POD a little to refer to features
+	  in an order much more relevant to the reader.
+
+1.20 Tue Aug 18 2005
+	- Catch and rethrow all error when autoloading during a ->can.
+	- Debugging can now only be done at compile time, and thus is
+	  optimised out. The :debug flag is removed and instead you need
+	  to preset $Class::Autouse::DEBUG.
+	  Given that this was only for my benefit in the first place, it's
+	  not appropriate to slow down everything else because of it.
+
+1.18 Tue Jul 26 2005
+	- Added :nostat module to disable the initial stat checks
+	  of modules.
+
+1.17 Tue Mar  8 2005
+	- Added include('ExtUtils::AutoInstall') by request, to make
+	  life easier when installing svk, although I have NFI why :/
+
+1.16 Tue Feb 15 2005
+	- Removing braindead pass-through Build.PL file
+
+1.15 Wed Feb  9 2005
+	- Reorganisation of method order over the last half a dozen
+	  versions allowed some invalid uses of indirect object syntax
+	  to slip in. This was stupid of me, and I've gotten a lot more
+	  explicit in the calling of internal functions now.
+
+1.14 Wed Jan 19 2005
+	- Allowed a bug to slip in to autouse_recursive (resolved)
+	- Added regression test for the case
+
+1.13 Tue Jan 11 2005
+	- Updated copyright date
+	- Added no_index entry to makefile to prevent indexing A.pm etc
+
+1.12 Mon Nov 15 2004
+	- A small change to compile properly when prefork not installed
+
+1.11 Sun Nov 14 2004
+	- Made dependency on prefork optional
+	- Removed useless $UNIX variable
+	- A few other housekeeping items
+
+1.10 Sat Nov 13 2004
+	- Integrated with prefork.pm
+	- devel loads all outstanding modules when called
+	- Added some more unit tests
+
+1.04 Mon Jul  6 2004
+	- Only hijack UNIVERSAL::can for the period that we have
+	  live autoload hooks
+	- Various other small improvements
+
+1.03 Mon Dec  8 2003
+	- Adding another couple of minor error validating changes
+
+1.02 Wed Dec  3 2003
+	- Minor optimisation, and some pod bugs fixed.
+
+1.01 Sun Nov  9 2003
+	- Another bug in _can
+
+1.0  Sun Sep 21 2003
+	- Fixed a bug in _can
+
+0.9  Unknown Date
+	- Unknown Changes
+	
+	
+0.8  Unknown Date
+	- Converted to File::Spec.
+	- Added Class::Autouse::Parent
+	- Major changes in the load sequencing to support ->SUPER:: 
+	- Lots and lots of general refactoring
+
+0.7  Fri Nov 1 15:52:01 2002
+        - Debugging Fix
+        - Remove some warnings
+        - Documentation updates
+
+0.6  Wed Apr 3 20:31:41 2002
+        - Fixed a serious bug that was missed.
+        - Added a load cache to cut back on stat calls
+        - Minor logic speed ups in recursive code        
+
+0.5  Fri Mar 15 20:53:34 2002
+        - Better, nested debugging messages
+        - Debug can be enabled in pragma
+        - One major bug fix
+        - Various minor speed improvements
+
+0.4  Wed Nov 7 14:03:48 2001
+        - Added autouse_recursive and load_recursive
+        - Fixed major bug in class_exists
+        - Miscellaneous code clean ups
+        - Cleaned up comments
+
+0.3  Wed Sep 26 23:18:10 2001
+	- Improved hook and loader efficiency
+	- Fixed load method. It works now
+	- Added class_exists method
+	- Documentation tweaks
+
+0.2  Wed Aug 29 22:14:41 2001
+	- Code cleaned up and much more solid
+	- Added developer mode
+	- Added superloader
+	- Behaves with Carp properly
+
+0.1  Wed Jan 17 11:46:41 2001
+	- original version

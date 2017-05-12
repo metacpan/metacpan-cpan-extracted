@@ -1,0 +1,29 @@
+---
+abstract: 'Controller that serves files from a directory'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-ActionRole-Public
+requires:
+  Catalyst: '5.90082'
+  Cwd: '0'
+  HTTP::Date: '0'
+  Moose: '2.1403'
+  MooseX::MethodAttributes: '0.29'
+  Plack: '1.0033'
+  Plack::MIME: '0'
+  Plack::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-ActionRole-Public/issues
+  homepage: https://github.com/jjn1056/Catalyst-ActionRole-Public
+  repository: https://github.com/jjn1056/Catalyst-ActionRole-Public.git
+version: '0.009'

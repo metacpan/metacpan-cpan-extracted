@@ -1,0 +1,54 @@
+Revision history for CPAN-Testers-Common-DBUtils
+================================================
+
+0.11    2014-09-09
+        - fixed license fields in META.json to be lists.
+
+0.10    2014-09-08
+        - fixed license fields in META.json to be lists.
+        - added resources to META.yml.
+        - extended test suite.
+        - remove old style function calls.
+        - added rollback functionality.
+        - updated documentation.
+        - return number of rows entered when repeating.
+        - test MySQL and SQLite if they are available.
+
+0.09    2014-01-24
+        - if we don't have the driver for tests, don't try and load it!
+
+0.08    2012-11-04
+        - fixed SQLite lastid capture.
+
+0.07    2012-11-01
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - change file dates changed to meet W3CDTF standards.
+        - added META.json & test script.
+        - Artistic License v2 now sole license.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated test scripts.
+        - added tests using Test::Database.
+        - added explicit LICENSE file.
+
+0.06    2011-08-01
+        - added repeat query methods to send multiple common statements in a 
+          single connection.
+
+0.05    2010-02-27
+        - added better error detection on prepare and execute statements.
+
+0.04    2009-11-01
+        - bugfix for POD coverage.
+        - extended tests for META.yml file.
+        - added tests for Changes file.
+
+0.03    2008-12-17
+        - commit fix - don't try and commit non-connected dbs :(
+
+0.02    2008-12-15
+        - added do_commit
+        - renamed some methods to split words
+
+0.01    2008-12-14
+        - First public release

@@ -1,0 +1,25 @@
+---
+abstract: 'Encode and decode Z85 strings'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Z85
+requires:
+  Exporter::Tiny: '0'
+  parent: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/avenj/convert-z85.git
+version: '1.001001'

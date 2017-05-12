@@ -1,0 +1,5 @@
+TODO for Cache
+
+* See the 'CAVEATS' section in the pod documentation of Cache::File
+* Fix issues in taint mode for Cache::File
+* Add better handling of corrupted cache directories in Cache::File

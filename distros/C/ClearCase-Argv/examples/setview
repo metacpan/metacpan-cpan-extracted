@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl
+
+## This is an example of how to set the child process into a view
+## and control it. Note that this will work on UNIX; on
+## Windows support for setview was withdrawn with the 4.0
+## release.
+
+use ClearCase::Argv;
+
+## Setting a view requires that you be in IPC mode.
+ClearCase::Argv->ipc(3);
+
+# Print out each command before executing it (like sh -x).
+ClearCase::Argv->dbglevel(1);
+
+my $ct = ClearCase::Argv->new;
+
+# Get a list of the local views.
+my @views = $ct->argv('lsview -s')->qx;
+chomp @views;
+
+print "\n*Show that we can set the coprocess into a view and keep it there.\n";
+$ct->argv('pwv -s')->system;
+$ct->argv('setview', [], $views[0])->system;
+# Prove that we've retained the setview state.
+$ct->argv('pwv -s')->system;

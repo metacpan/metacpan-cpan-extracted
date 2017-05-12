@@ -1,0 +1,47 @@
+CloudApp-REST
+
+This is a Perl Interface to the CloudApp REST API.  You can find more information about
+CloudApp at L<http://www.getcloudapp.com/>.  Take a look at the POD of the modules
+to find out how to use them!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CloudApp::REST
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CloudApp-REST
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CloudApp-REST
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CloudApp-REST
+
+    Search CPAN
+        http://search.cpan.org/dist/CloudApp-REST/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Matthias Dietrich
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

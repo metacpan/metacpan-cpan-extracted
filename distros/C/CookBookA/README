@@ -1,0 +1,47 @@
+CookBookA - Dean's Extension-Building Cookbook, part A.
+
+This is a collection of recipes for mixing C and Perl objects, methods, and
+classes.  The reader should be familiar with the XS language and with the
+process of creating new extensions.  The XS language is described in
+L<perlxs>, and L<perlxstut> is a tutorial describing how to create new
+extensions.  The reader should also be familiar with Perl's internal data
+types and API macros and functions (i.e.  SV, HV, AV, SvIV, newRV) as
+described in L<perlguts> and L<perlcall>.
+
+The topics covered are:
+
+=head2 Linking a C struct to a blessed or unblessed Perl object.
+=head2 Creating and destroying objects.
+=head2 Creating a Perl subclass of a C superclass.
+=head2 Creating a C subclass of a Perl superclass.
+=head2 Sharing a variable between Perl and C.
+=head2 Using a Perl hash object in C.
+=head2 Using a Perl array object in C.
+=head2 Using a C array in Perl.
+=head2 Illuminating an opaque C object for Perl.
+=head2 Illuminating an opaque Perl object for C.
+=head2 Sending messages to Perl objects from C.
+=head2 Storing a Perl object inside a C object.
+=head2 Creating double-typed Perl variables.
+=head2 Sharing a char** type between C and Perl
+=head2 Linking Perl and C++ classes and objects.
+=head2 Knowing your typemap.
+
+Consult the CookBookA.pod document in this package for more information.
+
+Some of these examples rely on my perlobject.map typemap, which is included
+in the package and can also be found on CPAN in the same place you found
+this package.
+
+If you are going to do datatype conversions between C and Perl, which is
+what XS programming is all about, then you would be doing yourself a favor
+to install Devel::Peek and to learn how to use its Dump() function.  The
+DevelPeek.pod document in this package is a preliminary manpage/tutorial.
+
+For other examples of extension-building to let Perl manipulate C structures
+and C++ objects consult the CookBookB package, which is part B of this
+Extension-Building CookBook series.  CookBookB can be found on CPAN in the
+same place you found this CookBookA package.
+
+Dean Roehrich
+apr 30,96

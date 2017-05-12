@@ -1,0 +1,21 @@
+---
+name: Class-XML
+version: 0.06
+author:
+  - Matt S Trout <mstrout@cpan.org>
+abstract: Simple XML Abstraction
+license: perl
+requires:
+  Carp: 0.0
+  Class::Accessor: 0.19
+  Class::Data::Inheritable: 0.02
+  Test::More: 0.0
+  XML::XPath: 1.13
+provides:
+  Class::XML:
+    file: lib/Class/XML.pm
+    version: 0.06
+  Class::XML::DummyLayer:
+    file: lib/Class/XML.pm
+    version: 0.06
+generated_by: Module::Build version 0.25

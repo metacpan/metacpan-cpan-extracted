@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+use CGI::Capture ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '1.14';
+}
+
+# Capture the CGI environment
+my $cgi = CGI::Capture->capture;
+
+# Print the output
+print "Content-type: text/plain\n\n";
+print $cgi->as_yaml_string . "\n";
+
+exit(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cgicapture - Capture the CGI environment
+
+=head1 SYNOPSIS
+
+ > wget http://web.server/cgi-bin/cgicapture
+
+=head1 DESCRIPTION
+
+L<CGI::Capture> is a module used to capture and replay a full CGI
+environment (primarily for debugging purposes).
+
+B<cgicapture> is a script you can copy into your cgi-bin directory
+that will capture the CGI environment and return it as a text/plain
+document containing the L<CGI::Capture> object, serialized as a YAML
+document.
+
+Because B<cgicapture> is providing ALL the detailed data for your CGI
+environment this is an EXTREMELY dangerous program to have in your
+F<cgi-bin> from a security perspective.
+
+You should only be using it for testing and debugging reasons, and never
+on production systems more than temporarily.
+
+=head1 SUPPORT
+
+All bugs should be filed via the bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Capture>
+
+For other issues, or commercial enhancement or support, contact the author.
+
+=head1 AUTHORS
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<http://ali.as/>, L<CGI>
+
+=head1 COPYRIGHT
+
+Copyright 2004 - 2009 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

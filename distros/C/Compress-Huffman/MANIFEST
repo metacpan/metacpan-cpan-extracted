@@ -1,0 +1,15 @@
+Changes
+examples/encode-decode.pl
+examples/synopsis.pl
+lib/Compress/Huffman.pm
+lib/Compress/Huffman.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/compress-huffman.t
+t/save-load.t
+xt/checkpod.t
+xt/git.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

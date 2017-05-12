@@ -1,0 +1,15 @@
+ChangeLog
+lib/CGI/Session/Driver/redis.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/g4_redis.t
+t/pod.t
+t/style-no-tabs.t
+t/style-no-trailing-whitespace.t
+t/test-strict.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

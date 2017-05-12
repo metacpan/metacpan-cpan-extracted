@@ -1,0 +1,13 @@
+2.0.3:
+2.0.3 - April 9 2015
+ * Fixed view memory leak
+ * Refactored view internals to use libcouchbase' view system
+ * Added N1QL support
+ * Added spatial view support
+ * Cleaner view API. no need for ->info (which is deprecated)
+ * Remove JSON::SL dependency. We use jsonsl internally in libcouchbase.
+ * Added JSON::MaybeXS dependency
+ * Declared proper 'URI' dependency
+ * Update tests to always use mock (which now supports views)
+ * Add additional examples
+ * Changes now contains proper release notes

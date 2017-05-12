@@ -1,0 +1,54 @@
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: you@your.org\n"
+"POT-Creation-Date: 2013-12-22 18:08+0100\n"
+"PO-Revision-Date: 2013-12-22 18:08+0100\n"
+"Last-Translator: you <you@your.org>\n"
+"Language-Team: Team <yourteam@your.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: afb/ui/AutoForm.js:73
+msgid "dd.MM.yyyy"
+msgstr ""
+
+#: afb/ui/Footer.js:19
+msgid "Created by OETIKER+PARTNER AG, #VERSION#, #DATE#"
+msgstr ""
+
+#: afb/ui/Login.js:25 afb/ui/Login.js:72
+msgid "Login"
+msgstr ""
+
+#: afb/ui/Login.js:84
+msgid "Password"
+msgstr ""
+
+#: afb/ui/Login.js:110
+msgid ""
+"release %1, %2<br/>created by <a href=\"http://www.oetiker.ch/\" "
+"style=\"color: #444;\" target=\"o+p\">OETIKER+PARTNER AG</a>"
+msgstr ""
+
+#: afb/ui/MsgBox.js:67
+msgid "Cancel"
+msgstr ""
+
+#: afb/ui/MsgBox.js:80
+msgid "Apply"
+msgstr ""
+
+#: afb/ui/MsgBox.js:89
+msgid "OK"
+msgstr ""
+
+#: afb/ui/MsgBox.js:182
+msgid "%1 (Error Code %2)%3"
+msgstr ""
+
+#: afb/ui/MsgBox.js:182
+msgid "RPC Error %1"
+msgstr ""

@@ -1,0 +1,101 @@
+
+# make sure we can do sockets
+use IO::Socket ();
+use Data::Dumper ();
+
+# some local lexicals
+my $text;
+
+# satisy -require-
+1;
+
+#------------------------------------------------------------------------
+# anyport
+#
+# Return a free port for listening
+#
+#  IN: 1 servername or IP address (defaults to "localhost")
+# OUT: 1 random port number
+
+sub anyport {
+
+    # attempt to obtain a port to work on
+    my $port = '';
+    if (my $socket = IO::Socket::INET->new(
+      Listen    => 5,
+      LocalAddr => (shift || '127.0.0.1'),
+    ) ) {
+        $port = $socket->sockport;
+    }
+
+    # make sure the system's freed up the port
+    sleep 1;
+    return $port;
+} #anyport
+
+#------------------------------------------------------------------------
+# ft
+#
+# Helper sub for doing tests inside a forked process
+#
+# a. called without parameter in void context: initialize
+# b. called with parameter in void context: add test result + comment
+# c. called without parameter in scalar context: return result
+
+sub ft {
+
+    # completed, return what we got
+    if ( defined wantarray ) {
+        return $text;
+    }
+
+    # we're getting a test, return its result
+    elsif (@_) {
+        $text .= ($_[0] || '')."#$_[1]\n";
+    }
+
+    # we're initializing
+    else {
+        $text = '';
+    }
+} #ft
+
+#------------------------------------------------------------------------
+# pft
+#
+# Process forked test results
+#
+#  IN: 1 filename to read
+
+sub pft {
+
+    # open the file
+    open my $handle, $_[0] or die "Could not open '$_[0]': $!";
+
+    # process all lines
+    chomp,&ok( split "#" ) while <$handle>;
+
+    # deny all further knowledge
+    close $handle;
+    unlink $_[0];
+} #pft
+
+#------------------------------------------------------------------------
+# slurp
+#
+# Slurp the contents of a file
+#
+#  IN: 1 filename
+# OUT: 1 contents of file
+
+sub slurp { open my $handle,$_[0]; local $/; <$handle> } #slurp
+
+#------------------------------------------------------------------------
+# splat
+#
+# Splat contents to a file
+#
+#  IN: 1 filename
+#      2 contents of file
+
+sub splat { open my $handle,">$_[0]"; print $handle $_[1] } #splat

@@ -1,0 +1,210 @@
+=head1 NAME
+
+Catalyst::Manual::Monthly::2012::February::TestDBICWithBellsOn
+
+=head2 Testing difficult-to-test database models
+
+In this article we're going to describe a technique for testing database-heavy
+web applications using either a temporary testing database, or using the DSN
+defined in your Catalyst application depending on the presence of an
+environment variable. If the latter, we will not delete the contents of the
+database afterwards, because this workflow suggests that we will want to poke
+around our application manually with the application in a known state.
+
+Basically, providing automated testing of complex databases is a pain. For
+generic type functions (e.g. the development of libraries rather than
+applications), mock objects (objects that mimic the interface of a real
+object) are useful for unit testing. But in the running on the
+seat-of-your-pants development style that commercial web applications often
+require, small changes to functionality can wreak havoc with your mock
+objects, and they rapidly become more trouble than they're worth.
+
+Which is where L<Test::DBIx::Class> comes in.  The rest of this article
+will explain how to achieve three different use-cases for Test::DBIx::Class
+and Catalyst.
+
+=head2 The easy use case - Inferring the Database from the DBIC result classes.
+
+For a straightforward database schema where the L<DBIx::Class> (DBIC)
+result classes can be used out of the box, one can simply use
+L<Test::DBIx::Class> to infer the database schema into a temporary
+database, using a temporary Postgresql instance via
+L<Test::DBIx::Class::SchemaManager::Trait::Testpostgresql>:
+
+ use Test::More;
+
+ use strict;
+ use warnings;
+ use Test::WWW::Mechanize::Catalyst 'MyApp';
+
+ use Test::DBIx::Class {
+  schema_class => MyApp->model('DB')->schema_class,
+  traits       => ['Testpostgresql']
+  },
+ 'User', 'Adverts'; # only create the tables for the User and Advert Result
+                    # classes
+
+As an alternative to naming specific tables in the last part of the C<use
+Test::DBIx::Class> declaration, you can use L<qw/:resultsets/> instead of
+C<'User', 'Adverts'> in the example avove, to import all Result classes
+defined in the C<schema_class>.
+
+The next thing to produce the appropriate L<Moose> meta-object incantation
+to swap out the configured C<< MyApp->model('DB')->schema >> with the
+temporary one we want to use instead (note, this works even when we start
+doing the clever override things in the next two sections):
+
+  #  make TDBIC schema and app schema the same
+  my $db_meta = MyApp::Model::DB->meta;
+  $db_meta->make_mutable;
+  $db_meta->add_around_method_modifier( schema => sub { Schema() } );
+  $db_meta->make_immutable;
+
+Now that we've done this we can start making requests:
+
+  my $mech = Test::WWW::Mechanize::Catalyst->new;
+  $mech->get('whatever');
+  ### etc.
+
+And the database operations should all really happen, but to a temporary
+database that gets deleted at the end of the run.  This is especially
+useful if you have lots of tests that all need a pristine copy of the
+database with their own fixtures, as it means you can speed things up by
+running in parallel (e.g. to run 3 tests in parallel run C< prove -l -j 3
+t >).
+
+=head2 OK Good. This time let's optionally override the temporary database
+with the developer's DSN
+
+One development style which works fairly well is to write tests to run on
+the development database, and then have a play around at the end of the
+test run either with the Perl debugger or using the built in development
+server.  However this means that one can't always rely on having a
+temporary testing database for running tests.
+
+So in this case we use the application's configured database instead.  Note
+this requires a bit more trickery than when we're just using a temporary TDBIC
+database:
+
+ use Test::More;
+
+ use FindBin qw/$Bin/;
+ use lib "$Bin/lib";
+ use Test::WWW::Mechanize::Catalyst qw/MyApp/;
+
+ BEGIN {
+     use MyApp;
+     my %tdbic_args = ( schema_class => MyApp->model('DB')->schema_class,
+                        traits       => [qw/Testpostgresql/],
+                    );
+     if ($ENV{DEV_DB}) {
+         %tdbic_args = (
+             connect_info     =>
+                MyApp->model('DB')->schema_class->storage->connect_info,
+             force_drop_table => 1,
+             keep_db => 1,          # assume we want to keep the test db at
+                                    # the end of the test run
+             %tdbic_args
+         )
+     };
+
+ # this pattern because we're messing with instantiation in BEGIN
+ require Test::DBIx::Class;
+ Test::DBIx::Class->import(\%tdbic_args, qw/:resultsets/);
+
+=head2  Fine, that's the simple cases, what about the harder cases?
+
+In many situations it's not desirable to infer the database directly from
+the DBIC schema classes.  While it is possible to put all the metadata (for
+example including stuff that requires custom database engine extensions)
+into the DBIC schema, this is not necessarily desirable. For example if you
+have a process whereby your database schemas are signed off (and likely
+modified) by a DBA you're likely going to want the master copy of your
+database in SQL rather than DBIC files.  Likewise if you have evil business
+logic that's best encapsulated in a database trigger, you'll likely hit the
+same type of problems.
+
+Given we're using a Postgres database in this instance, we need some
+Pg-specific code to spin up either a temporary database or to repopulate the
+development database. So to complement
+L<Test::DBIx::Class::SchemaManager::Trait::Testpostgresql>, we've written our
+own internal C<Test::DBIx::Class::SchemaManager::Trait::DeploySQL> class that
+should be kept in C< t/lib/Test/DBIx/Class/SchemaManager/Trait/DeploySQL.pm >
+in your app's directory tree. It's possible this could be released as a CPAN
+module one day, but at this stage we suspect that every development situation
+is sufficiently different that it's probably better just to leave these
+particular bits of wheel lying around for other people to adapt, rather than
+offering an explicit canned solution that's supposed to work for everybody.
+
+Meanwhile here's what we have for our Postgres database populated by SQL statements:
+
+ use Moose::Role;
+ use MyApp;
+
+ before prepare_schema_class => sub {
+   my ($self, $schema_class) = @_;
+   { no warnings 'redefine';
+     no strict 'refs';
+     *{$schema_class.'::deploy'} = sub { $self->_deploy_sql(@_) };
+   }
+ };
+
+ sub _deploy_sql {
+   my($self, $schema) = @_;
+   my $port = $self->postgresqlobj->port;
+   my $args = $self->postgresqlobj->postmaster_args;
+   my $storage = $schema->storage;
+   my $app_root = MyApp->path_to();
+   my ($db_name) = $storage->connect_info->[0]->{dsn} =~ /dbname=(.*?)(;|$)/;
+   my ($db_user) = $storage->connect_info->[0]->{user};
+   my @sql_files = qw/list of sql files here/;
+   my $psql_cmd;
+   unless ($ENV{DEV_DB}) {
+       $psql_cmd = "/usr/bin/psql $args -p $port";
+       $storage->dbh_do(sub {
+                            system qq{$psql_cmd -U$db_user $db_name -q -c "create language plpgsql"}});
+   }
+   else {
+       $psql_cmd = "/usr/bin/psql";
+   }
+   $storage->dbh_do(sub {
+                      system "$psql_cmd -U$db_user $db_name  -f $app_root/misc/db/$_"})
+       for @sql_files;
+ }
+
+ 1;
+
+The main thing to note here is that wrapping the C<system> calls in a
+C<< $storage->dbh_do > call ensures that the database handle from DBI is
+connected to the database using the failsafe mechanisms in
+L<DBIx::Class::Schema::Storage>.
+
+So finally, deploying to our temporary database using L<Test::DBIx::Class>
+and either a temporary or a development database from SQL files is done.
+Now to start up the test file we change the traits in C<%tdbic_args> to
+this:
+
+  traits       => [qw/Testpostgresql DeploySQL/],
+
+Somewhat intricate, but for complicated development situations definitely
+worth it.
+
+=head2 TODO
+
+Our development team is still working out the best way to use this system,
+but so far it's been really very handy indeed.  What would be good next is
+to work out how to modularise a lot of the boilerplate above so it can be
+C<use>d or C<require>d as a single line in each test file.  We'll get there
+soon.
+
+=head3 AUTHORS AND COPYRIGHT
+
+Words and a little bit of code:
+Kieren Diment <zarquon@cpan.org>
+
+Most of the code:
+Eden Cardim <edencardim@gmail.com>
+
+=head3 LICENCE
+
+This documentation can be redistributed it and/or modified  under the same terms as Perl itself.

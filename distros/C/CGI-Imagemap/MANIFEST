@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/CGI/Imagemap.pm
+t/1.t
+t/2.t
+examples/ismap.cgi

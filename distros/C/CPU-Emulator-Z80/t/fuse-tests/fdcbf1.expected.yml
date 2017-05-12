@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbf1
+registers:
+  AF: 5890
+  AF_: 0
+  BC: 50396
+  BC_: 0
+  DE: 53560
+  DE_: 0
+  HL: 12655
+  HL_: 0
+  I: 0
+  IX: 32871
+  IY: 18307
+  PC: 4
+  R: 2
+  SP: 0

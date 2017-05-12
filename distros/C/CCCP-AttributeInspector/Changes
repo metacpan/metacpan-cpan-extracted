@@ -1,0 +1,6 @@
+Revision history for Perl extension CCCP::AttributeInspector.
+
+0.01  Tue Jun  1 10:29:00 2010
+	- original version; created by h2xs 1.23 with options
+		-AX CCCP::AttributeInspector
+

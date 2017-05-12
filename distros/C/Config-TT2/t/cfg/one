@@ -1,0 +1,1 @@
+[% filename = component.name or template.name %]

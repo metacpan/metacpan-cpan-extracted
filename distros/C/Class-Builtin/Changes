@@ -1,0 +1,35 @@
+#
+# $Id: Changes,v 0.5 2011/05/21 21:40:54 dankogai Exp dankogai $
+#
+# Revision history for Class-Builtin
+$Revision: 0.5 $ $Date: 2011/05/21 21:40:54 $
+! t/02-array.t
+  Addressed:  #57766: Tests fail with Test-Simple-0.95_02
+  https://rt.cpan.org/Public/Bug/Display.html?id=57766
+
+0.04 2009/07/29 09:03:04
+! Makefile.PL 02-array.t
+  merged giftnuss/p5-class-builtin
+  http://github.com/giftnuss/p5-class-builtin/tree
+
+0.03 2009/06/22 15:52:18
+! *.pm *.t
+  + more methods
+  + more tests
+
+0.02 2009/06/21 15:44:41
+- lib/Class/Scalar.pm
+- lib/Class/Array.pm
+- lib/Class/Hash.pm
++ lib/Class/Builtin/Scalar.pm
++ lib/Class/Builtin/Array.pm
++ lib/Class/Builtin/Hash.pm
+! MANIFEST t/*.t
+  renamed worker modules to avoid namespace collision.
+  (sorry, hanenkamp)
+
+
+0.01 2009/06/21 09:09:26
++ *
+  First version, released on an unsuspecting world.
+

@@ -1,0 +1,14 @@
+Revision history for Color-Model-RGB
+
+1.00    2010/03/09
+        First version, released on an unsuspecting world.
+
+1.01    2010/03/10
+         - Corrected META.yml file. Thank you for advice, Marc Olzheim.
+         - Corrected and add description to POD.
+         - Multiply operation improved.
+           - Now the module can calculate scalar * Math::MatrixReal
+
+1.02    2010/03/13
+         - Corrected Makefile.PL to correct META.yml. shit!
+         - Corrected and modified description to POD.

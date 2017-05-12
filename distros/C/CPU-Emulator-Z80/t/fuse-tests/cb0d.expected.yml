@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb0d
+registers:
+  AF: 25356
+  AF_: 0
+  BC: 38307
+  BC_: 0
+  DE: 64722
+  DE_: 0
+  HL: 20813
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

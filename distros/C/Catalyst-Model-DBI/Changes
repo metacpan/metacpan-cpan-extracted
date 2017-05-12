@@ -1,0 +1,49 @@
+Revision history for Perl extension Catalyst::Model::DBI.
+0.32  Fri May 03 23:23:00 2013
+  - make use of basic log level
+0.31  Fri May 03 23:08:00 2013
+  - added support for log levels
+0.30  Fri Apr 27 18:00:00 2012
+  - rewrote internals to use DBIx::Connector and updated documentation
+0.29  Fri Mar 30 14:00:00 2012
+  - added support for settings being loaded from config file
+0.28  Thu Jan 28 15:30:00 2010
+  - Corrected PREREQ_PM
+0.27  Thu Jan 28 15:00:00 2010
+  - Reverted to MRO::Compat
+0.26  Thu Jan 28 14:00:00 2010
+  - Corrected PREREQ_PM 
+0.25  Thu Jan 21 18:00:00 2010
+  - Added support for Class::C3
+0.24  Sun Oct 18 19:30:00 2009
+  - Fixup copyright info
+0.23  Fri Oct 02 10:30:00 2009
+  - Corrected Changes file
+0.22  Fri Oct 02 10:00:00 2009
+  - Change from NEXT to MRO::Compat
+0.21  Fri Oct 02 10:00:00 2009
+  - Added support for configs named either "user" or "username" and "password" or "pass"
+  - Updated the helper to use parent instead of base
+0.20  Sun Dec 07 17:36:00 2008 
+  - fixed issue: http://rt.cpan.org/Public/Bug/Display.html?id=38121
+  - fixed issue: http://rt.cpan.org/Public/Bug/Display.html?id=39884
+0.19  Fri Sep 07 18:00:00 2007
+  - cleaned up a few things
+0.18  Mon May 07 18:40:00 2007
+  - reverting back to 0.15 as per Evan Caroll request, model behaving as expected 
+0.17  Mon May 07 08:00:00 2007
+  - made $self->_pid($$) "non lazy", fixed a few things
+0.16  Sun May 06 14:48:00 2007
+  - added fix to support ACCEPT_CONTEXT as per issue brought up by Evan Caroll
+0.15  Sun Dec 10 23:00:00 2006
+  - added fix to support config
+0.14  Sat Jun 24 18:00:00 2006
+  - added additional check for stay_connected
+0.13  Tue May 30 22:00:00 2006
+  - inherits from Catalyst::Model rather then Catalyst::Base
+0.12  Tue May 30 12:00:00 2006
+  - made code mod_perl safe
+0.11  Sun Nov 27 18:00:00 2005
+  - fixed a TT comment in helper class
+0.10  Sun Nov 27 15:00:00 2005
+  - first release

@@ -1,0 +1,51 @@
+---
+abstract: 'Simple initialization for command-line scripts'
+author:
+  - 'Len Budney <len.budney@gmail.com>'
+build_requires:
+  Cwd: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Trap: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.33'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CLI-Startup
+provides:
+  CLI::Startup:
+    file: lib/CLI/Startup.pm
+    version: '0.17'
+recommends:
+  Config::INI::Writer: '0'
+  Config::Tiny: '0'
+  JSON::Any: '0'
+  XML::Simple: '0'
+  YAML::Any: '0'
+requires:
+  Class::Std: '0.01'
+  Clone: '0'
+  Config::Any: '0'
+  Data::Dumper: '0'
+  English: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::HomeDir: '0.97'
+  Getopt::Long: '2.38'
+  Hash::Merge: '0'
+  List::Util: '0'
+  Pod::Text: '3.01'
+  Symbol: '0'
+  Text::CSV: '0'
+  perl: v5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.17'

@@ -1,0 +1,41 @@
+Dear CPAN Testers,
+
+It has been noted that one or more test reports you have submitted, regarding CPAN distribution uploads, have unfortunately been sent with incorrectly formatted subjects, which means that the automated reporting tools, are unable to parse and record your reports correctly.
+
+Please Note: If any of these reports are due to non-standard formatted uploads, the authors of those respective uploads will have been notified, and you can disregard this email.
+
+The reports in question are:
+
+[% subjects %]
+
+The number at the beginning of the line is the NNTP ID of the report as recorded by the CPAN testers NNTP server, and can be seen by searching list archives replace the <NNTP ID> in the following URL with the appropriate number:
+
+http://www.nntp.perl.org/group/perl.cpan.testers/<NNTP ID>
+
+The correct format of the distribution should be:
+
+<distribution name>-<distribution version>
+
+while the correct format for the subject line should be:
+
+<grade> <distribution name>-<distribution version> <platform>
+
+For example:
+
+PASS Acme-Example-3.1.7 openbsd 4.0
+
+If you have since corrected this subject formatting in your reports, please ignore this mail. These mails are generated based on the past months uploads, and only notes the reports which have not been parsed correctly for the CPAN Testers and CPAN Statistics sites.
+
+On the other hand, if this is not part of a simple fix to part of your smoke testing script/application, but is a fault one of the recommended automated tools, please let me know which ones you are using, as this will help to identify any potential bugs within the tools. Note that I do not review these emails, so please reference the affected test reports listed above in any correspondance. Thanks.
+
+If you have any questions about the CPAN testers mechanisms, please don't hesitate to ask. For more information about CPAN Testers, please see the CPAN Testers Wiki - http://wiki.cpantesters.org - or join the CPAN Testers Discuss mailing list by sending a blank email to cpan-testers-discuss-subscribe@perl.org.
+
+Thanks for contributing to CPAN and Perl by being a CPAN Tester.
+
+Regards,
+Barbie.
+--
+CPAN Testers Reports    - http://www.cpantesters.org
+CPAN Testers Statistics - http://stats.cpantesters.org
+CPAN Testers Wiki       - http://wiki.cpantesters.org
+CPAN Testers Discuss    - cpan-testers-discuss@perl.org

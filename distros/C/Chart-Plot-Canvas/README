@@ -1,0 +1,35 @@
+Chart/Plot/Canvas
+=================
+
+    Chart::Plot::Canvas - Plot two dimensional data in an Tk Canvas.
+
+    This package overloads Chart::Plot and supplies a new method 'canvas'
+    that returns a Tk Canvas equivalent to GD::Image returned by the method
+    'draw' of Chart::Plot.
+
+    The graphs are descripted by same way as for Chart::Plot.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk, Chart::Plot (0.11)
+
+COPYRIGHT AND LICENCE
+
+  (c) 2003-2011 Francois PERRAD, France. All rights reserved.
+.
+  This library is distributed under the terms of the Artistic Licence 2.0.
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org
+

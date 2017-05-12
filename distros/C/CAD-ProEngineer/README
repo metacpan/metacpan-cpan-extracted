@@ -1,0 +1,45 @@
+CAD/ProEngineer
+===============
+
+COPYRIGHT AND LICENCE:
+  Copyright (C) 2003 Marc Mettes
+  See COPYRIGHT section in ProEngineer.pm for usage and distribution rights.
+
+
+CAD::ProEngineer is an XS wrapper around the Pro/Toolkit (Pro/Engineer API) 
+libraries to provide the functions as perl subroutines.  A required element 
+is a Pro/Toolkit program with an embedded perl interpreter, which will use 
+this module to access Pro/Toolkit code.  An example of the necessary 
+interpreter code can be found in the 'perl561' subfolder, which also contains 
+unlocked binaries for Windows and Solaris.  These binaries may have hardcoded 
+paths so your mileage may vary.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires:
+
+  + A perl installation
+      + Perl 5.6.1 works
+      + Perl 5.8 and 6 have not been tested
+
+  + C compiler (whichever compiled your main perl install)
+      + Win32 ActiveState Perl requires MS Visual C++
+
+  + A perl interpreter embedded into a toolkit program
+      + See the 'perl561' folder for source code and unlocked binaries
+      + A Pro/Toolkit license is required to compile the interpreter
+
+  + The Pro/Tookit header files
+
+

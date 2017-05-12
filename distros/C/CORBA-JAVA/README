@@ -1,0 +1,32 @@
+CORBA::JAVA - IDL compiler to language JAVA mapping
+
+Description:
+------------
+    idl2java parses the given input file (IDL) and generates JAVA files
+    following the language JAVA mapping rules.
+
+    idl2java is a Perl OO application what uses the Visitor design pattern.
+
+Prerequisites:
+--------------
+    CORBA::IDL
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation
+    CORBA::C - Compiler to C include
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    IDL to JAVA Language Mapping are available on <http://www.omg.org/>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

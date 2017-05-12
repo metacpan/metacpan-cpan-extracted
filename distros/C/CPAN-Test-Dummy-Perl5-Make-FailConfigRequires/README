@@ -1,0 +1,27 @@
+NAME
+    CPAN::Test::Dummy::Perl5::Make::FailConfigRequires - CPAN Test Dummy
+
+VERSION
+    This documentation refers to version 1.00.
+
+SYNOPSIS
+        use CPAN::Test::Dummy::Perl5::Make::FailLate;
+
+DESCRIPTION
+    This module has been developed with the single purpose of testing
+    CPAN.pm itself.
+
+    Contains no functionality, and will never do so. On the contrary, it
+    dies during Makefile.PL due to an impossible configure_requires in
+    META.yml.
+
+AUTHOR
+    David A. Golden, based on CPAN::Test::Dummy::Perl5::Make::Failearly by
+    Andreas Koenig.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 David Golden
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

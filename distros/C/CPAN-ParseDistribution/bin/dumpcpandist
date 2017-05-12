@@ -1,0 +1,45 @@
+#!perl
+
+use strict;
+use warnings;
+use CPAN::ParseDistribution;
+use Data::Dumper;
+
+my $c = CPAN::ParseDistribution->new(@ARGV);
+
+print "Distribution: ".$c->dist()." version ".$c->distversion()."\n\n";
+print "This is a developer-only release.\n\n" if($c->isdevversion());
+print "Contains modules:\n";
+my $m = $c->modules();
+print "  $_: version ".(defined($m->{$_}) ? $m->{$_} : 'undef')."\n" foreach(keys %{$m});
+print "\n";
+
+=head1 NAME
+
+dumpcpandist - show some details for a distribution from the CPAN
+
+=head1 SYNOPSIS
+
+dumpcpandist $filename [use_tar => ...]
+
+Where $filename is a tarball or zipfile from the CPAN.  The arguments
+are the same as CPAN::ParseDistribution's C<new()> method.
+
+=head1 SEE ALSO
+
+L<CPAN::ParseDistribution>
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Copyright 2009 David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence.  It's
+up to you which one you use.  The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This module is also free-as-in-mason software.
+

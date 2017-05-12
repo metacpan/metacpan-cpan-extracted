@@ -1,0 +1,93 @@
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11::Attribute::Value - An array of CK_BYTE values or a RFC2279 string as an PKCS #11 attribute.
+
+=head1 SYNPOSIS
+
+  use Crypt::PKCS11::Attribute::Value;
+  my $attribute = Crypt::PKCS11::Attribute::Value->new;
+  $attribute->set(0, 1, 2);
+  $attribute->set("abc");
+
+=head1 DESCRIPTION
+
+A PKCS #11 attribute containing either an array of CK_BYTE values or a RFC2279
+string. This attribute has the type CKA_VALUE.
+
+=head1 METHODS
+
+See also L<Crypt::PKCS11::Attribute> for the base module methods.
+
+=over 4
+
+=item $attribute = $attribute->set (< @bytes || $string >)
+
+Set the array of CK_BYTE values for the attribute from the list of arguments or
+sets the RFC2279 string value within the attribute. May croak on error and
+returns itself on success.
+
+=over 4
+
+=item @bytes
+
+A list of CK_BYTE values, each must be an unsigned integer value between 0 and
+255.
+
+=item $string
+
+A defined scalar.
+
+=back
+
+=item < @bytes || $string > = $attribute->get
+
+Return a list of CK_BYTE values within the attribute, if called in list context,
+or return the RFC2279 string value within the attribute, if called in scalar
+context. Returns undef if not set.
+
+=item $attribute->type
+
+Return the type of the attribute which is CKA_VALUE.
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

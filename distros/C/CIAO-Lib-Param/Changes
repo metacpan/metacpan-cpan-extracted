@@ -1,0 +1,51 @@
+Revision history for Perl extension CIAO::Lib::Param.
+
+0.08  Sat Feb  9 17:18:57 EST 2008
+        - handle parameter values greater than SZ_PFLINE in length
+
+0.07  Thu Jun  7 15:10:29 EDT 2007
+        - tweak to Solaris -R ld flag kludge
+
+0.06  Tue Sep 19 10:20:47 EDT 2006
+        - minor cleanups
+	- fix compilation on systems that don't have ncurses
+	- redhat systems have non-standard ExtUtils::MakeMaker setup; 
+	  workaround it
+
+0.05  Mon Jun 20 16:54:12 EDT 2005
+
+	- level 0 errors to paramerr are non-fatal but were being
+	  treated as fatal.  they are now printed to stderr as
+	  cxcparam uses them only in areas where a terminal is assumed
+	  to be present.  kludgy, but it works for now.
+
+
+0.04  Tue Jun 14 12:50:13 EDT 2005
+	- one more try to get the set() method to properly distinguish
+          Perl booleans from strings so that boolean strings ('yes',
+          'no') are passed through while Perl booleans are converted
+          to strings.
+	- added pquery() class method
+
+0.03  Tue Jun 14 11:48:19 EDT 2005
+	- set() now automatically converts from Perl booleans to the
+	  string form required by cxcparam.
+
+	- the internal mechanism used to report errors was rewritten;
+	  it was too complicated and caused problems when a Param object
+	  was destroyed during the cleanup phase.
+
+0.02  Fri Jun 10 09:02:17 EDT 2005
+
+        - can now pass extra arguments to pget, as in new.
+
+	- passing of extra arguments to paramopen was done incorrectly,
+	  leading to segv's
+
+	- now supports paramopen's two methods of supplying a
+          parameter file name.
+
+0.01  Fri Apr  8 11:00:15 2005
+	- original version; created by h2xs 1.23 with options
+		-O -n CIAO::Lib::Param -x --omit-constant -A parameter_perl.h
+

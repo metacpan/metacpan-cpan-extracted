@@ -1,0 +1,6 @@
+Revision history for Perl extension Costume::Doublet.
+
+0.01  Sat Feb 14 19:11:08 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Costume::Doublet
+

@@ -1,0 +1,92 @@
+NAME
+    Catalyst::Plugin::C3 - Catalyst Plugin to subvert NEXT to use Class::C3
+
+SYNOPSIS
+    Use it in an application:
+
+      package MyCatApp;
+      use Catalyst qw/ -Debug C3 Static::Simple /;
+
+    Use it in another plugin:
+
+      package Catalyst::Plugin::FooBar;
+      use base qw/ Catalyst::Plugin::C3 /;
+
+DESCRIPTION
+    *** WARNING *** THIS MODULE IS STILL EXPERIMENTAL !!!
+
+    This module is related to the possible transition of Catalyst from NEXT
+    to Class::C3. This transition hasn't happened yet, and might not for a
+    while.
+
+    This module is only intended for use by Catalyst module developers at
+    this time. You would know it if you should be using this module.
+
+    *** END WARNING ***
+
+    This module makes the use of the following idiom:
+
+      use NEXT;
+
+      sub foo {
+        my $self = shift->NEXT::foo(@_);
+      }
+
+    actually accomplish something more like:
+
+      use Class::C3;
+
+      sub foo {
+        my $self = shift->next::method(@_);
+      }
+
+    It does this by temporarily replacing "AUTOLOAD" in NEXT during the
+    entire Catalyst request-handling phase. The behavior of the replacement
+    function is dependant upon the class (or the class of the object) that
+    NEXT was being called on.
+
+    If the class is not Catalyst-related, the function falls back to normal
+    NEXT behavior. If the class is Catalyst-related, but its inheritance
+    hierarchy is not C3-compatible, the function warns about the situation
+    (once per class per interpreter) and again falls back to normal NEXT
+    behavior.
+
+    If the class is both Catalyst-related and has a C3-compatible hierarchy,
+    then NEXT calls are silently upgraded to their Class::C3 equivalents.
+
+    The difference between "$self->NEXT::foo()" and
+    "$self->NEXT::ACTUAL::foo()" is preserved (the former becomes
+    "maybe::next::method" and the latter becomes "next::method").
+
+    If you are going to place this module in your plugins list for a
+    Catalyst app, it is best placed at the top of the list, above all other
+    plugins.
+
+    Some other plugins may need require this plugin as a base-class in order
+    to transition themselves to Class::C3 without worrying about being
+    broken by other plugins which haven't made the transition. Most plugins
+    will *not* need to do so. Any that do would have wierd hacks involving
+    "*{NEXT::NEXT}" in them prior to their C3 conversion, so you'd know it.
+
+    In other words, a plugin should only base on this plugin if it needed
+    NEXT hacks to work right under NEXT, and you're transitioning it to use
+    Class::C3.
+
+METHODS
+  handle_request
+    This plugin hooks into the "handle_request" method, sets up a "local"
+    override of the standard version of "AUTOLOAD" in NEXT for the entire
+    request.
+
+CAVEAT
+    Because calculating the MRO of every class every time ->NEXT::foo is
+    used from within it is too expensive, runtime manipulations of @ISA are
+    prohibited.
+
+AUTHOR
+    Brandon Black "blblack@gmail.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

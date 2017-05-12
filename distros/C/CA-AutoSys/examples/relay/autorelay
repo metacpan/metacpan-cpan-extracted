@@ -1,0 +1,305 @@
+#!/usr/bin/env perl
+
+#
+# $Id: autorelay 61 2007-10-29 17:46:55Z sini $
+#
+# CA::AutoSys - Perl Interface to CA's AutoSys job control.
+# Copyright (c) 2007 Sinisa Susnjar <sini@cpan.org>
+# See LICENSE for terms of distribution.
+# 
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+use strict;
+use warnings;
+use Config::IniFiles;
+use Getopt::Long;
+use CA::AutoSys;
+use Pod::Usage;
+use DBI;
+
+my $cfgfile = "autorelay.conf";
+my $def_user = "autosys";
+my $def_pass = "autosys";
+my $force = 0;
+
+GetOptions(	"config=s"	=> \$cfgfile,
+			"force"		=> \$force,
+			"help|?"	=> sub { pod2usage(1); exit(0); },
+			"man"		=> sub { pod2usage(-verbose => 2); exit(0); } ) or pod2usage(1);
+
+my $cfg = Config::IniFiles->new(-file => $cfgfile);
+
+# Remember start time (not really, if force is in effect).
+my $start_time = $force ? 0 : time();
+
+# Get general configuration parameters.
+my $poll_time = $cfg->val("CONFIG", "POLLTIME", 60);
+
+$| = 1;
+
+# Load all database connections.
+my %hdl;
+my @dbs = $cfg->GroupMembers("DATABASE");
+foreach my $db (@dbs) {
+	my ($name, $dsn, $user, $pass) = ($db, undef, undef, undef);
+	$name =~ s/^DATABASE\s+//;
+	if (!defined($dsn = $cfg->val($db, "DBI_DSN")))		{ die("No DBI_DSN defined for database $name!\n"); }
+	if (!defined($user = $cfg->val($db, "DBI_USER")))	{ $user = $def_user; }
+	if (!defined($pass = $cfg->val($db, "DBI_PASS")))	{ $pass = $def_pass; }
+	$hdl{$name} = CA::AutoSys->new(dsn => $dsn, user => $user, password => $pass);
+}
+
+# Load all job dependencies.
+my %jobs;
+my @alljobs = $cfg->GroupMembers("JOB");
+if (scalar(@alljobs) == 0) { die("No jobs defined!\n"); }
+foreach my $job (@alljobs) {
+	my $name = $job;
+	$name =~ s/^JOB\s+//;
+	if (defined($cfg->val($job, "DATABASE")))	{ $jobs{$name}{DATABASE} = $cfg->val($job, "DATABASE"); }
+	if (defined($cfg->val($job, "DEPENDS")))	{ $jobs{$name}{DEPENDS} = $cfg->val($job, "DEPENDS"); }
+	if (defined($cfg->val($job, "EVENT")))		{ $jobs{$name}{EVENT} = $cfg->val($job, "EVENT"); }
+	if (defined($cfg->val($job, "SCRIPT")))		{ $jobs{$name}{SCRIPT} = $cfg->val($job, "SCRIPT"); }
+	$jobs{$name}{last_start_time} = $start_time;
+}
+
+# Perform some consistency checking.
+foreach my $job (keys %jobs) {
+	if (defined($jobs{$job}{DATABASE})) {
+		if (!defined($hdl{$jobs{$job}{DATABASE}})) {
+			die("Job $job references database $jobs{$job}{DATABASE}, which isn't defined!\n");
+		}
+		if (!$hdl{$jobs{$job}{DATABASE}}->find_jobs($job)->next_job()) {;
+			die("Job $job not found in database $jobs{$job}{DATABASE}!\n");
+		}
+	} elsif (defined($jobs{$job}{SCRIPT})) {
+		if (! -x $jobs{$job}{SCRIPT}) {
+			die("Script $jobs{$job}{SCRIPT} does not exist or is not executable!\n");
+		}
+	} else {
+		die("Job $job must either refer to a DATABASE or a SCRIPT\n");
+	}
+
+	if (defined($jobs{$job}{DEPENDS})) {
+		if (!exists($jobs{$jobs{$job}{DEPENDS}})) {
+			die("Job $job references job $jobs{$job}{DEPENDS}, which isn't defined!\n");
+		}
+	}
+}
+
+# Perform event relaying...
+while (42) {
+	foreach my $job (keys %jobs) {
+		if (defined($jobs{$job}{DEPENDS})) {
+			my $dep = $jobs{$job}{DEPENDS};
+			if (defined($jobs{$dep}{DATABASE})) {
+				my $st = $hdl{$jobs{$dep}{DATABASE}}->find_jobs($dep)->next_job()->get_status();
+				if (!$st) {
+					die("Job $dep somehow vanished from database $jobs{$dep}{DATABASE}!\n");
+				}
+				if (defined($jobs{$job}{EVENT})) {
+					logprint("$job depends on $jobs{$job}{EVENT} of $dep...");
+					if ($st->{name} eq $jobs{$job}{EVENT}) {
+						if ($st->{status_time} >= $jobs{$job}{last_start_time}) {
+							if (relay_event(\%hdl, \%jobs, $job) == 0) {
+								$jobs{$job}{last_start_time} = time();
+							}
+						}
+					}
+				}
+			} elsif (defined($jobs{$dep}{SCRIPT})) {
+				logprint("$job depends on SCRIPT $dep...");
+				logprint("calling script $jobs{$dep}{SCRIPT}");
+				my $rc = system($jobs{$dep}{SCRIPT});
+				logprint("rc: $rc");
+				if ($rc == 0) {
+					relay_event(\%hdl, \%jobs, $job);
+				}
+			}
+		}
+	}
+	logprint("going to sleep - Zzzz...\n");
+	sleep($poll_time);
+}
+
+sub relay_event {
+	my ($hdl, $jobs, $job) = @_;
+	my ($rc, %event_args);
+	if (defined($jobs{$job}{DATABASE})) {
+		logprint("sending event FORCE_STARTJOB to $job @ $jobs{$job}{DATABASE}");
+		$event_args{job_name} = $job;
+		$event_args{event} = "FORCE_STARTJOB";
+		$rc = $hdl{$jobs{$job}{DATABASE}}->send_event(%event_args);
+		$rc = $rc == 1 ? 0 : 1;
+	} elsif (defined($jobs{$job}{SCRIPT})) {
+		logprint("calling script $jobs{$job}{SCRIPT}");
+		$rc = system($jobs{$job}{SCRIPT});
+		logprint("rc: $rc");
+	}
+	return $rc;
+}	# relay_event()
+
+sub logprint {
+	my ($msg) = @_;
+	print scalar(localtime()).": ".$msg."\n";
+}	# logprint()
+
+1;
+
+__END__
+
+=head1 NAME
+
+autorelay - A quick and dirty way to relay events from one AutoSys instance to another,
+			e.g. from PROD to DEV...
+
+=head1 SYNOPSIS
+
+autorelay [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--config cfg-file>
+
+Specify the name of the configuration file to be loaded. If not specified, "./autorelay.conf" will be assumed.
+
+=item B<--force>
+
+Forces events to be sent, even if the given job's status was last changed before starting this script.
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+This program will relay AutoSys events from one instance (e.g. PROD) to another one (e.g. DEV). Additionally,
+it can start shell scripts based on the outcome of AutoSys jobs, or start AutoSys jobs based on the outcome of
+shell scripts. It can also start a shell script based on shell scripts.
+Please be aware that when you make an AutoSys job dependend on a shell script, the AutoSys job will be triggered
+each time the shell script returns with an exit code of 0.
+One can also make one shell script depend on the outcome of another - the same applies as above.
+
+=head1 CONFIG FILE SYNTAX
+
+The program autorelay uses the module Config::IniFiles - see it's POD for the general syntax of the config file.
+Sections are used to define general options, database connections, or dependencies between jobs.
+A job can either be an AutoSys job or a script. When defining a dependency on an AutoSys job, one has at least
+to specify the DATABASE attribute.
+Depending on circumstances, one also may have to define the DEPENDS and EVENT attributes as well. A job that
+consists of a script needs the SCRIPT attribute.
+The following sections are currently understood:
+
+=head2 B<[CONFIG]>
+
+This section currently only supports one attribute:
+
+=over 4
+
+=item B<POLLTIME> = secs_between_polls
+
+As the name implies, this specifies the number of seconds to sleep between polls.
+If ommited, a default of 60 seconds is taken.
+
+=back
+
+=head2 B<[DATABASE db_name]>
+
+In this section one can define the database connections used to monitor status changes in AutoSys jobs.
+This section can contain the following attributes:
+
+=over 4
+
+=item B<DBI_DSN> = dsn
+
+Specifies the DSN to connect to, e.g. dbi:Sybase:server=AUTOSYS_DEV;database=autosysdb
+
+=item B<DBI_USER> = user
+
+AutoSys' database user, defaults to "autosys".
+
+=item B<DBI_PASS> = pass
+
+Password of above user, defaults to "autosys".
+
+=back
+
+=head2 B<[JOB job_name]>
+
+In this section one can define jobs and their mutual dependencies.
+This section can contain the following attributes:
+
+=over 4
+
+=item B<DATABASE> = db_name
+
+This must be the name of a previously defined database.
+
+=item B<DEPENDS> = job_name
+
+This must be the name of another defined job.
+Use this attribute, when you want to make the current job dependant on another one.
+
+=item B<EVENT> = status_name
+
+This should be a valid AutoSys status name - see CA::AutoSys for valid status names.
+
+=item B<SCRIPT> = script_name
+
+When defining a script based job, place the full pathname to the appropriate script here.
+Environment variables are not yet expanded, sorry...
+
+=back
+
+=head1 EXAMPLE CONFIG
+
+    [CONFIG]
+    POLLTIME =  30
+
+    [DATABASE DEV]
+    DBI_DSN =   dbi:Sybase:server=AUTOSYS_DEV;database=autosysdb
+
+    [DATABASE PROD]
+    DBI_DSN =   dbi:Sybase:server=AUTOSYS_PROD;database=autosys
+
+    [JOB UPLOAD_DEV]
+    DATABASE =  DEV
+    DEPENDS =   UPLOAD_PROD
+    EVENT =     SUCCESS
+
+    [JOB UPLOAD_PROD]
+    DATABASE =  PROD
+
+    [JOB PREPARE_DATA]
+    DATABASE =  DEV
+    DEPENDS =   CHECK_STATUS
+
+    [JOB CHECK_STATUS]
+    SCRIPT =    /home/sini/etc/check_status.sh
+
+=head1 AUTHOR
+
+Sinisa Susnjar <sini@cpan.org>
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Model::Tarantool.
+
+0.01  Tue Sep  3 23:28:02 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Catalyst::Model::Tarantool
+

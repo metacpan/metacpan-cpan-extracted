@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Cwd/Ext.pm
+lib/Cwd/Ext.pod
+t/0.t
+t/1.t
+t/a/junk.txt
+META.yml                                 Module meta-data (added by MakeMaker)

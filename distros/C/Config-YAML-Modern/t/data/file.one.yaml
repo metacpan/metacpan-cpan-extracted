@@ -1,0 +1,9 @@
+# this is valid .yaml file
+hash : 
+    key1 : value1
+    key2 : value2
+    key3 : value3
+array :
+    - one
+    - two
+    - three

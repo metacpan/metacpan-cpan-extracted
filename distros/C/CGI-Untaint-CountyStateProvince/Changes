@@ -1,0 +1,16 @@
+Revision history for CGI-Untaint-CountyStateProvince
+
+0.05
+	No need to pass value to is_valid() any more
+
+0.04	Sat Jan 21 17:47:28 GMT 2012
+	Support changes of data from the country tables
+
+0.03	Fri Jan 20 16:59:09 GMT 2012
+	Renamed from CGI::Untaint::CSP
+
+0.02	Wed Jan 18 21:37:18 GMT 2012
+	Added real validations - 0.01 was just a template
+
+0.01	Wed Jan 18 15:59:42 GMT 2012
+        First draft

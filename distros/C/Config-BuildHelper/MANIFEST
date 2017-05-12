@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Config-BuildHelper.t
+lib/Config/BuildHelper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# Tento skript dostane na standardní vstup skript. Tento skript ulo¾í a spustí.
+
+if [ "$1" != "--act" ]; then
+    cat <<EOS >&2
+Tento skript akceptuje shellový skript ze standardního vstupu. Ulo¾í jej pod
+zadaným jménem a spustí. Tedy, opravdu jej ulo¾í a spustí pouze v okam¾iku, kdy
+dostane vstup "#COMMIT".
+
+This script accepts a script (shell unless #! is given) on standard input. It
+saves it under specified name and executes it, if the input ends with "#COMMIT"
+(further input is not processed). If "#ROLLBACK" is encountered or if the input
+ends before "#COMMIT" is seen, nothing is done and script exits with non-zero
+status.
+
+The script can be invoked in two ways. Either as:
+$0 --act
+And then name of the script to save must be on the first line of input
+preceeded by: "\#NAME ", or as:
+$0 --act <name-of-script>
+EOS
+    exit 2
+fi
+
+if [ "$#" = 1 ]; then
+    saveas=''
+elif [ "$#" = 2 -a -n "$2" ]; then
+    saveas=$2
+else
+    exit 2
+fi
+
+tmp=/tmp/run-and-save-$$.sh
+
+set -C -e
+trap "rm -f $tmp" EXIT HUP INT QUIT ILL ABRT FPE SEGV PIPE ALRM TERM USR1 USR2
+exec 3> "$tmp"
+
+#printf '#!/bin/sh\n\n' >&3
+
+if test -z "$saveas"; then
+    read -r line
+    case $line in
+	\#NAME\ *)
+	    saveas=${line##\#NAME };;
+	*)
+	    echo "Name not given" >&2
+	    exit 1;;
+    esac
+fi
+
+read -r line
+case $line in
+    \#!*)
+	printf '%s\n\n' "$line" >&3;;
+    \#COMMIT)
+	printf '#!/bin/sh\n\n:\n' >&3
+	chmod u+x "$saveas"
+	exec 3>&-
+	test "${saveas#/}" = "$saveas" && exec "./$saveas"
+	exec "$saveas";;
+    \#ROLLBACK)
+	exit 1;;
+    \#NAME)
+	echo "Duplicit name given" >&2
+	exit 1;;
+    *)
+	printf '#!/bin/sh\n\n%s\n' "$line" >&3;;
+esac
+
+while read -r line; do
+    case $line in
+	\#COMMIT)
+	    mv -b -f "$tmp" "$saveas"
+	    chmod u+x "$saveas"
+	    exec 3>&-
+	    test "${saveas#/}" = "$saveas" && exec "./$saveas"
+	    exec "$saveas";;
+	\#ROLLBACK)
+	    exit 1;;
+	*)
+	    printf '%s\n' "$line" >&3;;
+    esac
+done
+
+exit 1
+
+# vim: set ft=sh:
+# arch-tag: c6ce15ba-eb15-490f-977d-8482d5f3c5b8

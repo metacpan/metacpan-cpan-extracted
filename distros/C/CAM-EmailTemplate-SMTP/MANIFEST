@@ -1,0 +1,10 @@
+index.html
+ChangeLog
+Build.PL
+LICENSE
+Makefile.PL
+MANIFEST
+README
+lib/CAM/EmailTemplate/SMTP.pm
+test.pl
+META.yml

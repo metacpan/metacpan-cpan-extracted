@@ -1,0 +1,18 @@
+Revision history for Color-RGB-Util
+
+0.58    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.57    2014-12-05 (PERLANCAR)
+
+        - Rename module/dist from SHARYANTO-Color-Util to Color-RGB-Util.
+
+
+0.56    2013-09-10 (SHARYANTO)
+
+        - No functional changes. Split from SHARYANTO-Utils to minimize
+          dependencies (I'm trying to make Text::ANSITable work under Windows).

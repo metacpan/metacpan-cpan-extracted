@@ -1,0 +1,22 @@
+--- 
+abstract: Parsing pleasant configuration files
+author: 
+  - Anders Nor Berle <berle@cpan.org>
+build_requires: 
+  Test::Exception: 0.21
+  Test::More: 0.47
+  Test::Pod: 1.26
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Config-Settings
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Parse::RecDescent: 1.95.1
+version: 0.00_04

@@ -1,0 +1,8 @@
+CHANGES
+README
+MANIFEST
+Makefile.PL
+Bar.pm
+Bar.xs
+test.pl
+bin/foobar.pl

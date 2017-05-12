@@ -1,0 +1,23 @@
+NAME
+    Compress::LZF_PP - A pure-Perl LZF decompressor
+
+SYNOPSIS
+      use Compress::LZF_PP;
+      my $decompressed = decompress($compressed);
+ 
+DESCRIPTION
+    This module is a pure-Perl LZF decompressor. LZF is an extremely fast
+    (not that much slower than a pure memcpy) compression algorithm. It is
+    implemented in XS in Compress::LZF module. This is a pure-Perl LZF
+    decompressor. Being pure-Perl, it is about 50x slower than
+    Compress::LZF. Only use this if you can not use Compress::LZF.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard.
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

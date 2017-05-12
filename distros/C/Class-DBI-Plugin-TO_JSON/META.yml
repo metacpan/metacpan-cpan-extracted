@@ -1,0 +1,23 @@
+---
+name: Class-DBI-Plugin-TO_JSON
+version: 0.03
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: Help integrate Class::DBI with JSON::XS
+license: perl
+resources:
+  license: ~
+requires:
+  Class::DBI: 0
+build_requires:
+  DBD::SQLite: 0
+  JSON::XS: 2
+  Test::More: 0
+provides:
+  Class::DBI::Plugin::TO_JSON:
+    file: lib/Class/DBI/Plugin/TO_JSON.pm
+    version: 0.03
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

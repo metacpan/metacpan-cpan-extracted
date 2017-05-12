@@ -1,0 +1,27 @@
+Test multiple DBs
+
+Warn on case clashes
+
+Rename to uuid?
+
+Test derived classes
+
+Test derived attributes
+
+utf8
+
+Document structure of STATE
+
+Document all methods
+
+Mark's list:
+
+Work out all code we have that uses it
+
+Logical tidy up of method names
+
+New accessors for DB getting setting
+
+Get rid of explicit calls to CRM::Persistent::Deleted
+
+Make db_table et all chained accessors

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/synopsis.pl
+lib/Config/IPFilter.pm
+lib/Config/IPFilter/Rule.pm
+lib/Config/IPFilter/Types.pm
+MANIFEST			This list of files
+META.json
+README
+t/000_basic/Config/IPFilter.t
+t/000_basic/Config/IPFilter/Rule.t
+t/000_basic/Config/IPFilter_path.t
+t/900_data/960_ipfilter.dat

@@ -1,0 +1,34 @@
+#!perl -w
+
+use strict;
+use warnings;
+use lib 'lib';
+use Carp;
+
+use Benchmark;
+use Test::More tests=>5;
+
+ package SysInfo;
+  use Class::Builder {
+    passwd => {hashref => {huang => 'passwdinsecret', phantom=>'longpasswd'}},
+  };
+
+  1;
+
+  package main;
+  my $sysinfo = new SysInfo;
+  $sysinfo->passwd->{newuser} = 'validpasswd';
+  ok($sysinfo->passwd('newuser') eq 'validpasswd', 'add new.');
+  ok($sysinfo->passwd_exists('huang'), 'key exists');
+  my $i = 0;
+  foreach my $user ($sysinfo->passwd_keys){ $i++; }
+  ok($i == $sysinfo->passwd_keys, 'count keys.');
+
+  $sysinfo->passwd_delete('huang');
+  ok (!$sysinfo->passwd('huang'), 'delete');
+
+  my $totalnew = {ggo=>'ggo'};
+  $sysinfo->passwd($totalnew);
+  ok ($sysinfo->passwd('ggo') eq 'ggo', 'totally renew.');
+
+

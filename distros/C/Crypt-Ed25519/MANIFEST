@@ -1,0 +1,38 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+perlmulticore.h
+Ed25519.pm
+Ed25519.xs
+
+t/00_load.t
+t/01_python.t
+t/sign.input
+t/02_native.t
+
+extract-sign.input
+
+ed25519/.git/config
+ed25519/src/ge.h
+ed25519/src/seed.c
+ed25519/src/sha512.c
+ed25519/src/keypair.c
+ed25519/src/precomp_data.h
+ed25519/src/fe.c
+ed25519/src/fe.h
+ed25519/src/sign.c
+ed25519/src/sc.c
+ed25519/src/sc.h
+# ed25519/src/key_exchange.c
+ed25519/src/ge.c
+ed25519/src/ed25519.h
+ed25519/src/verify.c
+ed25519/src/sha512.h
+# ed25519/src/add_scalar.c
+ed25519/src/fixedint.h
+ed25519/license.txt
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

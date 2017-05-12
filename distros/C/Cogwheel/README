@@ -1,0 +1,109 @@
+Cogwheel(3)           User Contributed Perl Documentation          Cogwheel(3)
+
+
+
+NNAAMMEE
+       Cogwheel - A Client/Server Networking Framework based on Moose and
+       Sprocket
+
+VVEERRSSIIOONN
+       Version 0.01
+
+SSYYNNOOPPSSIISS
+           package main;
+           use MyApp::Plugin;
+           use Cogwheel::Client;
+           use Cogwheel::Server;
+
+           my $server = Cogwheel::Server->new(
+               Plugins => [
+                   {
+                       plugin   => MyApp::Plugin;->new(),
+                       priority => 0,
+                   },
+               ],
+           );
+
+           my $client = Cogwheel::Client->new(
+               ClientList => ['localhost:31337'],
+               Plugins    => [
+                   {
+                       Plugin   => MyApp::Plugin;->new(),
+                       Priority => 0,
+                   },
+               ],
+           );
+
+           POE::Kernel->run();
+
+DDEESSCCRRIIPPTTIIOONN
+       Cogwheel is a framework for building Network Clients and Servers. It is
+       based off the Sprocket library and Moose.
+
+MMEETTHHOODDSS
+       None of the methods in Cogheel itself are truely public, but they are
+       documented here for completeness.
+
+       import
+           Called via "use Cogwheel;" this will setup the metaclass system
+           properly so that Coghweel objects inherit from "Cogwheel::Object".
+           This also enables "strict" and "warnings".
+
+       unimport
+           Unimports any methods exported by import;
+
+       meta
+           Imported from Moose.
+
+DDEEPPEENNDDEENNCCIIEESS
+       Obviously Moose, and Sprocket
+
+IINNCCOOMMPPAATTIIBBIILLIITTIIEESS
+       None reported.
+
+BBUUGGSS AANNDD LLIIMMIITTAATTIIOONNSS
+       No bugs have been reported.
+
+       Please report any bugs or feature requests to
+       "bug-acme-dahut-call@rt.cpan.org", or through the web interface at
+       <http://rt.cpan.org>.
+
+SSEEEE AALLSSOO
+       Moose, and Sprocket
+
+AAUUTTHHOORR
+       Chris Prather  "<perigrin@cpan.org>"
+
+CCOOPPYYRRIIGGHHTT AANNDD LLIICCEENNSSEE
+       Copyright 2006, 2007 by Infinity Interactive, Inc.
+
+       <http://www.iinteractive.com>
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+DDIISSCCLLAAIIMMEERR OOFF WWAARRRRAANNTTYY
+       BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+       FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+       WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+       PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+       EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+       WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+       ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+       YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+       NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+       IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+       WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+       REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+       TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+       CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+       SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+       RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+       FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+       SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+       DAMAGES.
+
+
+
+perl v5.8.8                       2007-10-10                       Cogwheel(3)

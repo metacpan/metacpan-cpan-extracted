@@ -1,0 +1,78 @@
+{
+   "abstract" : "role for actions to dispatch based on JMSType",
+   "author" : [
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-ActionRole-JMS",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Action::REST" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Runtime" : "5.90013",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Action::Deserialize::JSON" : "0",
+            "Catalyst::Action::Serialize::JSON" : "0",
+            "Catalyst::Runtime" : "5.90013",
+            "Catalyst::ScriptRunner" : "0",
+            "Catalyst::Test" : "0",
+            "Data::Printer" : "0",
+            "FindBin::libs" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "Net::Stomp" : "0",
+            "Test::Most" : "0",
+            "bytes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dakkar/Catalyst-ActionRole-JMS.git",
+         "web" : "https://github.com/dakkar/Catalyst-ActionRole-JMS"
+      }
+   },
+   "version" : "1.3"
+}
+

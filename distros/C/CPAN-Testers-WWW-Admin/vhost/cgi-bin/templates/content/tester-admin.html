@@ -1,0 +1,38 @@
+[%
+
+    title = 'Impersonate a Tester' ;
+    crumb2_name = 'Admin' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Impersonate a Tester' ;
+
+%]
+
+<p>Enter tester email to impersonate, or select one from the list below.</p>
+
+<form method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-admin" />
+<p>Tester Email Search: <input type="text" name="searchname" value="[% searched %]" size="10" /> <input type="submit" value='GO!' /></p>
+</form>
+
+<form method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-imposter" />
+<table class="reports">
+<tr><th>Email</th>
+	<th>DisplayName</th>
+	<th></th>
+</tr>
+[% FOREACH item = users %]
+[% IF item.password == '-banned-' %]
+<tr><td>[% item.email %]</td>
+	<td>[% item.realname %]</td>
+	<td>(BANNED USER)</td>
+</tr>
+[% ELSE %]
+<tr><td><a href="[% cgipath %]/pages.cgi?act=tester-imposter&amp;userid=[% item.userid %]">[% item.email %]</a></td>
+	<td>[% item.realname %]</td>
+	<td></td>
+</tr>
+[% END %]
+[% END %]
+</table>
+</form>

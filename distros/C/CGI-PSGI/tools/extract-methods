@@ -1,0 +1,14 @@
+#!perl
+chomp(my $file = `perldoc -l CGI`);
+open my $io, "<", $file or die $!;
+
+my $sub;
+while (<$io>) {
+    chomp;
+    /^sub (\w+)/ and $sub = $1;
+    /^}\s*$/ and do {
+        print "$sub\n" if $code{$sub} =~ /([\%\$]ENV|http\()/; undef $sub
+    };
+   $code{$sub} .= "$_\n" if $sub;
+    /^\s*package [^C]/ and exit;
+}

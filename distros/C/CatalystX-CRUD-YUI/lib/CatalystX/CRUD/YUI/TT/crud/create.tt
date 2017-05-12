@@ -1,0 +1,4 @@
+[% # just call edit with special OID '0';
+    object_id = 0;
+    PROCESS crud/edit.tt;
+%]

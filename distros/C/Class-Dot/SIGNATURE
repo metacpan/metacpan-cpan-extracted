@@ -1,0 +1,79 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9a3bfa60daeb47b075a30105a9080e5d75cfdd82 Changes
+SHA1 6c15705fa1d3f9a66d2d4faaabbc05c7186c9289 MANIFEST
+SHA1 fd1c4e25ef71d12ae5361d2a7dd870008f6f8b0c META.yml
+SHA1 7e0075c95f10f16eff12091b23624c3ee0aa7b5c Makefile.PL
+SHA1 09e43c85db8337afe217e5e80d0e5578665038eb README
+SHA1 d15224b790e424ea02ba0ea0b3108dc7bfe1901c contrib/dotperltags
+SHA1 a1e7f39f0143f18fc57c6d85d49c31bdd9840c70 contrib/vim/README
+SHA1 ad71b01905836ef612467b0d29bcc6683bca8c36 contrib/vim/syntax/perl.vim
+SHA1 82f422c11a6fc9dbeaf46eca7d3400bb2ac0c522 contrib/vim/taglist.vim
+SHA1 7ea3b5c2d144d0b91ec707af0c601fbeda95519c devel/build_wikidoc.pl
+SHA1 a132d74212822c20ecf4704b215a87852cbb6f48 devel/curversion
+SHA1 bc0316b51ebe88f527eec920c41fd1e65facc88e devel/grepversion.sh
+SHA1 d161ba99a55ec8bdda464b31add26e58bc375428 devel/incrementversion.sh
+SHA1 0285ad6bcaf85818e5e6cd27832b0afa9531edee examples/Cat.pm
+SHA1 88bbcad1c8e918e425bbb04733def59fda4ff213 examples/Simple.pm
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 182a0df45b65151afdc2be0b7246a2d02d0f0567 inc/Module/Install/AutoInstall.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 4933b00c3a646da8d223c6957f94552bbd62f8c6 inc/Module/Install/Include.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 b7927b177a318b6333f1f52ed726a9aea2164e92 lib/Class/Dot.pm
+SHA1 6f9c6a8dab9475a47ab6f08ca9e816e8d3160e54 lib/Class/Dot.pod
+SHA1 9e3539e12000de07c95aad7490254404e1c93e7d lib/Class/Dot/Types.pm
+SHA1 bef2abd0c250e5726efb89e15a307e82d1ab1819 lib/Class/Dot/Types.pod
+SHA1 802d87b078988db3ade6ff79bf000433fa35e2bd lib/Perl/Tags/ClassDot.pm
+SHA1 1526b12a4202b4610e1d52da9b86a0f63bd940e5 lib/Perl/Tags/ClassDot.pod
+SHA1 e0cc4ddf954cbe5ed100de5696747b005aeff711 lib/Perl/Tags/ClassDot/Tag/Property.pm
+SHA1 067a0209f79ac32fe46c1f5c23ed40769972ea6c lib/Perl/Tags/ClassDot/Tag/Property.pod
+SHA1 16b968332d807eb4482a38a64775975f287f97f3 t/.01-basic.t.swp
+SHA1 938071e962db52c619a4accad40ad0df34ae2bc3 t/00-Kwalitee.t
+SHA1 2cb43f96ccd830b18a6191b5bb9d7b289500f90d t/00-YAML-META_valid.t
+SHA1 60ba9ecb85418f99cb2cdf5f77ea1d00b8652242 t/Cat.pm
+SHA1 106bb7ba022d632fef28dc02bbe7da4ea2ed77b7 t/Mammal.pm
+SHA1 1bc20d89df2e7ba35e1035ae0beac85c885a0e0d t/TestChained.pm
+SHA1 d86c0db5ddf2a1d6ce090007d848233995b0590e t/TestComplete.pm
+SHA1 ddd41e745f842b64c655134e969fb39ea7bc4a14 t/TestComplete/Base.pm
+SHA1 499c2d43e89ab8d8d70a7cc6a6bbe509f3aad7dd t/TestComplete/Type1.pm
+SHA1 a13f7cbaf1e43861c3f45b7cbe929c5caf1bb332 t/TestComplete/Type2.pm
+SHA1 ab3726e962a925fc1f5ae0269b9ca1afe0c0f8ae t/TestProperties.pm
+SHA1 42466adc8d51e9709ca77d20936b41cc871062c7 t/cat.t
+SHA1 178b0ffcb99b27e5f09e552d11fa1433737e272f t/minimum_version.t
+SHA1 320c45b828f5ce76c08afe8aab216d26939c6973 t/perlcritic.t
+SHA1 17476e3901529a486d55570e2f2fb12da6d79bd6 t/perlcriticrc
+SHA1 8bfa7a83f420dff8a91043bda77e07ff26ee411a t/pod-coverage.t
+SHA1 52dec673ff29a3501725ccf2277dcb205df99ac4 t/pod-spell.t
+SHA1 3749526d6fd79f68d7b9b6b80b678693026ec52b t/pod.t
+SHA1 3f4d722678bdd14c2914b4a022941ce4f2c63f7c t/properties.t
+SHA1 7ccc33fda466df84dcf5a4cd1ee16c94c6139a78 t/stopwords-asksh.txt
+SHA1 d15662e735e1916173a97ca8af0aa1b2932b5d61 t/testchained.t
+SHA1 a249f6743a5b765dbe1a444d4c5b053b7fc91965 t/testcomplete.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (Darwin)
+
+iD8DBQFHLOR1J6CUX3jsf/oRAj0nAJ9CRw3hCP+FWLPIokdzJ1MrE1izpACeJxY/
+cYDhrVakb00Tw5yJuT5EY+w=
+=2W7Y
+-----END PGP SIGNATURE-----

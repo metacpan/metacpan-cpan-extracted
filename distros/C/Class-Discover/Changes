@@ -1,0 +1,14 @@
+Version history for Class::Discover
+
+1.000003 - 15 Jun 2010
+  - Re-building tarball without BSD tar extensions. No code changes.
+
+1.000002 - 02 Jun 2010
+  - Fix test failures on Win32 due to differences in paths format ('/' vs '\')
+    ( RT#56996, Christian Walde )
+
+1.000001 - 17 Aug 2009
+  - Fixed Random-Order test failure ( RT#48571 , KENTNL )
+
+1.000000 - 18 Jul 2009
+  - Initial version of code split out from Module::Install::ProvidesClass

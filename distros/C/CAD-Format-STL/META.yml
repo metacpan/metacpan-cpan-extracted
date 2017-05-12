@@ -1,0 +1,30 @@
+---
+name: CAD-Format-STL
+version: v0.2.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: read/write 3D stereolithography files
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CAD-Format-STL
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/CAD-Format-STL/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+requires:
+  Class::Accessor::Classy: v0.1.3
+configure_requires:
+  Module::Build: 0.35
+provides:
+  CAD::Format::STL:
+    file: lib/CAD/Format/STL.pm
+    version: v0.2.1
+  CAD::Format::STL::part:
+    file: lib/CAD/Format/STL/part.pm
+    version: v0.2.1
+generated_by: Module::Build version 0.350201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

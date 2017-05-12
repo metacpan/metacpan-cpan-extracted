@@ -1,0 +1,8 @@
+blib*
+Makefile
+Makefile.old
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+CGI-Application-Plugin-Config-General-*
+cover_db

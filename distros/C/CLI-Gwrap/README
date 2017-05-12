@@ -1,0 +1,25 @@
+CLI::Gwrap
+----------
+
+A general purpose Graphical User Interface (GUI) wrapper for command line
+programs.
+
+Installation:
+
+    tar xvzf CLI-Gwrap-<ver>.tgz
+    cd CLI-Gwrap
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+See the example wrapper for the 'ls' directory listing command in
+
+    CLI-Gwrap/bin/gwrap_ls.pl
+
+The example is long, but only because 'ls' has zillions of options.  To run
+the example before 'make install', use:
+
+    perl -I lib bin/gwrap_ls.pl
+
+from the CLI-Gwrap directory.

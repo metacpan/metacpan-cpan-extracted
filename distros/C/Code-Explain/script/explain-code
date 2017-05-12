@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Code::Explain;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+usage() if not @ARGV;
+my %opt;
+GetOptions(\%opt,
+	'help',
+	'explain',
+	'ppidump',
+	'ppiexplain',
+	'all',
+) or usage();
+usage() if $opt{help};
+usage() if @ARGV != 1;
+
+my $str = shift;
+my $ce = Code::Explain->new( code => $str );
+if ($opt{ppidump}) {
+	print map {"$_\n"} $ce->ppi_dump;
+} elsif ($opt{ppiexplain}) {
+	print map {"$_->{code}   $_->{text}\n"} $ce->ppi_explain;
+} elsif ($opt{explain}) {
+	print $ce->explain, "\n";
+} elsif ($opt{all}) {
+	print "Explain\n";
+	print $ce->explain, "\n";
+	print "\n";
+	print "PPI Dump\n";
+	print map {"$_\n"} $ce->ppi_dump;
+	print "\n";
+	print "PPI Explain\n";
+	print map {"$_->{code}   $_->{text}\n"} $ce->ppi_explain;
+} else {
+	usage();
+}
+exit;
+
+sub usage {
+	print <<"END_USAGE";
+This is version $Code::Explain::VERSION of Code::Explain
+
+Usage: $0  'code snippet'
+END_USAGE
+pod2usage( '-input' => $INC{'Code/Explain.pm'}, '-sections' => 'COMMAND LINE OPTIONS', '-verbose' => 99 );
+die "xx";
+}
+

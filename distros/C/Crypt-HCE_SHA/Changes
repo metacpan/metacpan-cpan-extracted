@@ -1,0 +1,36 @@
+Revision history for Perl extension Crypt::HCE_SHA.
+
+0.01  Wed Oct 14 16:23:57 1998
+	- original version; created by h2xs 1.18
+
+
+0.02
+	- implementation
+
+0.03  Fri Oct 16 14:41:33 1998
+	- moved example modules to the examples directory
+
+0.40 Tue Apr 06 1999
+	- updated man documentation
+	- updated to use Digest::SHA1 by Gisle Aas
+
+0.45 Tue Aug 17 1999
+	- bug fix on chaining key selection
+	- bug report submitted by Jake Angerman (Thanks Jake!)
+
+0.60 Fri Feb 18 2000
+	- fixed length issue caused by mime inserting returns
+	- updated Client.pm and Server.pm to reflect the changes
+
+0.65 Fri Mar 26 2004
+	- removed syslog from test.pl to support ActiveState
+
+0.70 Fri Mar 26 2004
+	- removed the other syslogs from test.pl
+
+0.75 Fri Apr 01 2016
+    - fix defined deprecations
+    - cleanup whitespace
+    - switch to more general Digest::SHA
+      allowing use of other sizes 224, 256, 384, and 512
+      SHA1 remains the default so it should remain compatible

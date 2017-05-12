@@ -1,0 +1,10 @@
+index.html
+lib/CAM/Template/Cache.pm
+ChangeLog
+LICENSE
+Build.PL
+Makefile.PL
+MANIFEST
+README
+test.pl
+META.yml

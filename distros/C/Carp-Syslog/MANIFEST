@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Carp/Syslog.pm
+t/import.t
+t/lib/Mock/Syslog.pm
+t/syslog.t

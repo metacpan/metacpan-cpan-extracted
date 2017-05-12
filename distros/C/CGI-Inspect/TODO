@@ -1,0 +1,27 @@
+
+== General ==
+
+* Config (parameters when use-d)
+** List of plugins
+** Specify port (or random)
+
+== Plugins ==
+
+* StackTrace
+** Inline editing
+** Don't collapse each reload (maybe AJAXify)
+** View code of each sub
+
+* DBI
+** Trace
+** Statistics
+
+* NYTProf
+** Just process and provide the same output
+** Need to specify temp directory
+
+* Code Browser
+** File editor
+** Alow to eval code
+** Ideally -- set breakpoints and step through code
+

@@ -1,0 +1,10 @@
+#validation_errors {
+    display:                block;
+    font-size:              83%;
+    border:                 1px dashed #89d;
+    margin-top:             10px;
+    margin-bottom:          10px;
+    margin-left:            25px;
+    margin-right:           25px;
+    padding:                3px;
+}

@@ -1,0 +1,8 @@
+[sea]
+some = foo
+[sea]
+[cars]
+should = not
+[cars]
+fiat= 
+reno= white

@@ -1,0 +1,7 @@
+Revision history for CPAN-Test-Dummy-Perl5-PackageWithBlock
+
+0.03  2013-05-08 14:18:52 PDT
+        - Fix perl requirement to be 5.14.0 everywhere
+
+0.01  2013-05-08 14:04:22 PDT
+        - Initial release

@@ -1,0 +1,45 @@
+foo
+{
+    foo_inner
+    {
+        :label1
+        {
+            key1    value1
+        }
+
+        {
+            key2    value2
+        }
+
+        :label3
+        {
+            key3    value3
+        }
+    }
+}
+
+foo2
+{
+    @inherit    .#foo
+
+    foo_inner
+    {
+        {
+            key4    value4
+        }
+
+        :label3
+        {
+            key3    value3 replacement
+        }
+
+        :label1
+        {
+            key1    value1 replacement
+        }
+
+        {
+            key5    value5
+        }
+    }
+}

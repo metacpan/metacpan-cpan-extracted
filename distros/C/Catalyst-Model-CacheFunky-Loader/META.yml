@@ -1,0 +1,18 @@
+abstract: Load Cache::Funky Modules.
+author: Tomohiro Teranishi <tomohiro.teranishi@gmail.com>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Model-CacheFunky-Loader
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cache::Funky: 0
+  Catalyst: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Module::Recursive::Require: 0.04
+  Test::More: 0
+  Test::Spelling: 0
+version: 0.06

@@ -1,0 +1,26 @@
+---
+abstract: 'use Child with IO::Pipely for more portable IPC'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.42, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Child-IPC-Pipely
+provides:
+  Child::IPC::Pipely:
+    file: lib/Child/IPC/Pipely.pm
+    version: 0.01
+requires:
+  Child: 0
+  IO::Pipely: 0
+resources:
+  bugtracker: https://github.com/jberger/Child-IPC-Pipely/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Child-IPC-Pipely
+version: 0.01

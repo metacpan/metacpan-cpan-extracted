@@ -1,0 +1,42 @@
+---
+abstract: 'Modules for handling PNX data within the Catmandu framework'
+author:
+  - 'Patrick Hochstenbach'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '1.001003'
+  Test::Pod: '0'
+  Test::Simple: '1.001003'
+  Test::Warnings: '0'
+  XML::XPath: '1.13'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-PNX
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Catmandu: '1.0'
+  XML::Compile: '0'
+  XML::Compile::Cache: '0'
+  XML::LibXML: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-PNX/issues
+  homepage: https://github.com/LibreCat/Catmandu-PNX
+  repository: https://github.com/LibreCat/Catmandu-PNX.git
+version: '0.02'
+x_contributors:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

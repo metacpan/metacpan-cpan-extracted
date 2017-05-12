@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-basic.t
+t/Class-LazyFactory.t
+lib/Class/LazyFactory.pm
+META.yml                                 Module meta-data (added by MakeMaker)

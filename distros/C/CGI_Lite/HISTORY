@@ -1,0 +1,163 @@
+* v1.8 - May 10, 1997
+
+Removed $` and $' from the code, and "optimized" an important regexp.
+As a result, the module is much more efficient. Fixed a minor bug in 
+multipart boundary parsing. Corrected an error when storing a key that 
+has multiple values which caused more than one array to be allocated. 
+Just a note: if you call get_multiple_values method with a scalar
+value, the method no longer returns an undef, but the value itself.
+
+As of this version, you can pass a request method (optional) to the 
+parse_form_data method. This gives you a bit more flexibility when 
+dealing with forms.
+
+The set_file_type method now works as it should. In earlier versions,
+CGI_Lite created "handles" in all cases. Added the close_all_files
+method to close uploaded files that are opened as a result of passing
+"handle" to set_file_type.
+
+The print_form_data and print_cookie_data are deprecated as of this
+version, but have not been removed (for compatibility reasons). It's 
+better to use the print_data method, which prints the key/value pairs 
+in the order they were parsed. As a side effect of this change,
+if you want to parse form data and cookies in an application,
+you have to create two instances of the CGI_Lite object, which
+only makes sense.
+
+Added the get_ordered_keys method which will return the list
+of _keys_ in the order in which they were parsed. Modified the
+wrap_textarea method; it now works properly.
+
+Also, added the add_mime_type, remove_mime_type and get_mime_types
+methods to deal with EOL translation based on MIME types. Added
+the filter_filename method to alter the way in which uploaded
+files are named. Added the add_timestamp method which allows you 
+to turn off timestamps on uploaded files. NOTE: CGI_Lite no longer 
+returns the full path of the uploaded file, but simply, the file name.
+
+Added a set of miscellaneous functions: browser_escape, url_encode,
+url_decode, is_dangerous, escape_dangerous_chars. CGI_Lite now handles
+errors better; you can use the newly implemented is_error, and 
+get_error_message methods. I've bought back the return_error
+method, which you can use to return errors to the browser and
+exit. However, this method no longer outputs the HTTP header,
+as it did in versions prior to v1.7.
+
+In addition, this version allows you to debug your CGI scripts
+"offline" by letting you pass query information through standard
+input. I got this idea from CGI.pm, though it's handled a bit
+differently. Thanks Lincoln!
+
+* v1.7 - December 28, 1996
+
+Maybe, I should release this version as 2.0 :-) There were a lot of 
+changes made:
+
+    - *Totally* re-wrote the multipart form parsing algorithm. It's
+      _much_ more efficient with large uploads. It still needs tweaking
+      to remove the $` and $' -- maybe in the next release.
+    - Multiple values per field are no longer returned as a null-character
+      delimited string. Instead, a reference to an array is returned.
+      You need to de-reference, or call the get_multiple_values method
+      to get at the array. There was no way I could make this backward
+      compatible. Please check your scripts, because a few might break.
+      I apologize.
+    - Fields containing more than one value in multipart forms are now
+      handled correctly.      
+    - Added the wrap_textarea method that allows you to neatly "wrap" 
+      long strings.
+    - You can now parse/decode cookies in much the same manner as forms.
+    - When saving uploaded files, the module adds a timestamp. As of this
+      version, the timestamp is added to the front of the file,
+      as opposed to the end, so that file extensions are preserved.
+      Note: this module makes no effort to URL decode the filename for
+      security reasons.
+    - Added the following new methods: set_buffer_size, parse_cookies,
+      print_cookie_data, wrap_textarea, get_multiple_values and
+      create_variables.
+    - Removed the return_error subroutine and, instead, added _error,
+      which dumps a message to STDERR and dies.
+    - You can now install this module in a convenient manner. Also,
+      fixed up the docs, moved this list of revisions from the module
+      to a separate file, and added a directory with simple examples.
+    - Fixed up numerous little bugs, including the "Use of uninitialized..."
+      warnings.
+
+* v1.62 - January 17, 1996
+
+Modified the parse_multipart_data subroutine so that it
+returns the name of the file as the filehandle -- if set_file_type
+function is called with the "handle" parameter.
+
+Added the function determine_package to determine the 
+calling package.
+
+* v1.61 - January 1, 1996
+
+Fixed a minor bug that resulted in end of line characters being removed
+from certain binary files.
+
+* v1.6 - December 30, 1995
+
+Added code to handle other header information that the browser might
+send after the "Content-Disposition" header.
+
+Added set_platform function so that uploaded text files display
+properly.
+
+The function set_file_type no longer returns a status.
+
+Fixed spacing within code.
+
+* v1.5 - November 13, 1995
+
+Corrected two major bugs that caused several fields to be lost (when
+the fields before them were either too small or too large).
+
+Added code to make sure that there are no "\r\n" characters in the
+regular form fields. Textarea elements and fields that contain uploaded
+information from different platforms (i.e Macintosh and PC) will
+contain "\r" characters.
+
+* v1.4 - October 15, 1995
+
+Added pod style documentation. Now you can see this manual page by doing
+the following:
+
+    pod2man CGI_Lite.pm | nroff -man | more
+
+Also, modified the parse_form_data method so that it can return
+the actual associative array (if called within an array context).
+
+* v1.3 - October 12, 1995
+
+Completely modified the parse_multipart_data method. It no longer
+reads the multipart message line by line, but rather in small size
+blocks (or "chunks"). This also eliminated a major bug that caused
+Netscape to hang.
+
+Since some browsers do not send a "\r\n" character string at the end
+of header lines, the parse_multipart_data method conditionally checks
+for and removes them. This also allows you to emulate a multipart/form-data
+request by storing a sample request in a file and piping it to your program:
+
+    cat multipart.txt | test.pl
+
+* v1.2 - October 12, 1995
+
+Added the set_file_type method to return filehandles for the stored
+files.
+
+* v1.1 - October 10, 1995
+
+The environment variable CONTENT_TYPE is used to determine the type of
+encoding scheme. In v1.0, the body of the POST request was parsed.
+
+This module no longer outputs an error message if an invalid directory
+is passed to the set_directory method. Instead, it returns a status
+of 0 to indicate failure.
+
+* v1.0 - September 26, 1995
+
+Initial Release
+

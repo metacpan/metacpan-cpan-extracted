@@ -1,0 +1,12 @@
+All content on this site is Copyright &copy; 1997-2002 by the contributing
+authors and all rights are hereby reserved. All material on this website
+and mailing lists are property of their corresponding authors.
+
+The material may not be copied or quoted outside the mailing lists or this
+website without express permission of the contributing authors. 
+
+If you write it - it belongs to you.
+
+Current [pWiki] author: kraehe@copyleft.de
+ pWiki source origin see [history]
+ see also RightsAndRestrictions

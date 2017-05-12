@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+# Example that shows the effect of wrap_textarea.
+# Let's assume we're getting three fields: name, bio, skills.
+
+use strict;
+use warnings;
+use CGI::Lite;
+
+my $cgi         = CGI::Lite->new;
+my %form        = $cgi->parse_form_data;
+my @all_skills  = ();
+
+print "Content-type: text/plain\n\n";
+
+if (ref $form{skills}) {
+    @all_skills = $cgi->get_multiple_values ($form{skills});
+}
+
+my $nice_bio = $cgi->wrap_textarea ($form{bio});
+
+print <<End_of_Display;
+
+Name:   $form{name}
+Skills: @all_skills
+Bio:
+
+$nice_bio
+
+End_of_Display
+
+exit;

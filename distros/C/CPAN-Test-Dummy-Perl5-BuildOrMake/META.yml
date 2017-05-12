@@ -1,0 +1,17 @@
+---
+name: CPAN-Test-Dummy-Perl5-BuildOrMake
+version: 1.02
+author:
+  - Andreas Koenig
+abstract: CPAN Test Dummy
+license: perl
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  CPAN::Test::Dummy::Perl5::BuildOrMake:
+    file: lib/CPAN/Test/Dummy/Perl5/BuildOrMake.pm
+    version: 1.02
+resources:
+  license: http://dev.perl.org/licenses/

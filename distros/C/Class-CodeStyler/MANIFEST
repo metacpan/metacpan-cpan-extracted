@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-CodeStyler.t
+lib/Class/CodeStyler.pm
+examples/perlcode.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+docs/class-codestyler.pod
+docs/class-codestyler.pdf

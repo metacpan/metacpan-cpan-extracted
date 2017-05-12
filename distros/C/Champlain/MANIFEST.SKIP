@@ -1,0 +1,13 @@
+^build/
+^Makefile$
+^Makefile[.]old$
+^xs/.*[.][co]$
+^blib/
+^Champlain[.]bs
+^Champlain-
+^pm_to_blib$
+[.]gitignore
+^[.]xs-coverage[.]ignore
+^perl-Champlain[.]doap$
+^[.]git/
+^test-cache/

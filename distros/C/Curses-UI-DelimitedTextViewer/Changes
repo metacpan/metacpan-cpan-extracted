@@ -1,0 +1,6 @@
+Revision history for Perl extension Curses::UI::DelimitedTextViewer.
+
+0.01  Sat Oct 26 19:11:33 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Curses::UI::DelimitedTextViewer
+

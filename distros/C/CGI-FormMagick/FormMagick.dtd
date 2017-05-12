@@ -1,0 +1,80 @@
+<!--
+
+FormMagick Form Description DTD
+Kirrily "Skud" Robert (skud@infotrope.net)
+
+Copyright (c) 2000-2001 Kirrily Robert <skud@cpan.org>
+Copyright (c) 2000-2002 Mitel Networks Corporation 
+This software is distributed under the same licenses as Perl itself;
+see the file COPYING for details.
+
+-->
+
+<!-- General purpose elements (used below) -->
+
+<!ELEMENT TITLE (#CDATA)				>
+<!ELEMENT DESCRIPTION (#CDATA)				>
+<!ELEMENT LABEL (#CDATA)				>
+
+<!-- The top level element is the form.  A form must contain a title
+element, and must contain one or more pages.  Other information about a
+form is kept in attributes. -->
+
+<!ELEMENT FORM (TITLE,PAGE+)>
+
+<!ATTLIST FORM HEADER-TEMPLATE 	CDATA	#IMPLIED	>
+<!ATTLIST FORM FOOTER-TEMPLATE 	CDATA	#IMPLIED	>
+<!ATTLIST FORM PRE-EVENT	CDATA	#IMPLIED	>
+<!ATTLIST FORM POST-EVENT	CDATA	#IMPLIED	>
+
+<!-- A page must have a title and at least one field, and may also
+optionally contain fragments. Various other information about pages is
+kept in attributes. -->
+
+<!ELEMENT PAGE (TITLE,FIELD+,FRAGMENT*)>
+
+<!ATTLIST PAGE NAME		CDATA	#REQUIRED	>
+<!ATTLIST PAGE PAGE-TEMPLATE 	CDATA	#IMPLIED	>
+<!ATTLIST PAGE PRE-EVENT 	CDATA	#IMPLIED	>
+<!ATTLIST PAGE POST-EVENT 	CDATA	#IMPLIED	>
+
+<!-- Fields within a page must have a label, and may optionally have a
+description.  All the other field-related information is in attributes.
+-->
+
+<!ELEMENT FIELD (LABEL,DESCRIPTION?)>
+
+<!ATTLIST FIELD NAME		#REQUIRED	>
+<!ATTLIST FIELD VALUE 		CDATA	#IMPLIED	>
+<!ATTLIST FIELD VALIDATION	CDATA	#IMPLIED	>
+<!ATTLIST FIELD VALIDATION-ERROR-MESSAGE	CDATA	#IMPLIED	>
+<!ATTLIST FIELD TYPE		(TEXT|CHECKBOX|RADIO|SELECT|TEXTAREA) "TEXT">
+<!ATTLIST FIELD OPTIONS		CDATA	#IMPLIED	>
+<!ATTLIST FIELD CHECKED		CDATA	#IMPLIED	>
+<!ATTLIST FIELD MULTIPLE    (YES|NO) "NO"       >
+<!ATTLIST FIELD SIZE        CDATA   #IMPLIED    >
+<!ATTLIST FIELD ROWS        CDATA   #IMPLIED    >
+<!ATTLIST FIELD COLS        CDATA   #IMPLIED    >
+
+<!-- An HTML fragment contains CDATA for HTML to put in that place -->
+
+<!ELEMENT HTML (#CDATA)>
+
+<!-- A SUBROUTINE fragment gives the name of a subroutine to run -->
+
+<!ELEMENT SUBROUTINE>
+<!ATTLIST FRAGMENT SRC   	CDATA	#REQUIRED       >
+
+
+<!-- Lexicon stuff.  LEXICON is a top-level element with a required LANG
+attribute, which contains one or more LEXENTRYs, each of which contain a
+BASE and a TRANSlation. -->
+
+<!ELEMENT LEXICON (ENTRY+)>
+<!ATTLIST LEXICON LANG          CDATA   #REQUIRED       >
+
+<!ELEMENT LEXENTRY (BASE,TRANS)>
+
+<!ELEMENT BASE  (#CDATA)>
+<!ELEMENT TRANS (#CDATA)>
+

@@ -1,0 +1,9 @@
+Revision history for Class-DBI-AutoIncrement-Simple
+
+0.02    2006-06-07
+	POD updates
+	t/csv.t will now skip if missing deps
+
+0.01    2006-06-06
+	Initial release
+

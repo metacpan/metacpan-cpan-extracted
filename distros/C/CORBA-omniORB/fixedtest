@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB::Fixed;
+
+$a = new CORBA::Fixed "123321", 3;
+$b = new CORBA::Fixed "200", 1;
+$c = new CORBA::Fixed "5050", 3;
+
+print $a+$b,"\n";
+print $a-$b,"\n";
+print $a*$b,"\n";
+print $a/$b,"\n";
+print $a+1.1,"\n";
+print $c->to_digits(3, 1),"\n";
+print $a->to_digits(1, 1),"\n";
+
+print $b <=> $b,"\n";
+print $b <=> $c,"\n";
+print $c <=> $b,"\n";

@@ -1,0 +1,63 @@
+---
+abstract: 'General-purpose content-addressed storage (CAS) for Catalyst'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  FindBin: 0
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-SimpleCAS
+requires:
+  Carp: 0
+  Catalyst::Controller: 0
+  Catalyst::Utils: 0
+  CatalystX::InjectComponent: 0
+  Data::Dumper: 0
+  Digest::SHA1: 0
+  Email::MIME: 1.929
+  Email::MIME::CreateHTML: 1.041
+  Email::MIME::CreateHTML::Resolver::LWP: 0
+  Email::Simple: 2.206
+  Encode: 0
+  File::Copy: 0
+  File::MimeInfo::Magic: 0
+  File::Spec::Functions: 0
+  HTML::Encoding: 0
+  HTML::TokeParser::Simple: 0
+  IO::All: 0
+  IO::File: 0
+  Image::Size: 0
+  JSON: 0
+  MIME::Base64: 0
+  Module::Runtime: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::MethodAttributes::Role: 0.29
+  Path::Class: 0
+  Scalar::Util: 0
+  Storable: 0
+  String::Random: 0
+  Tie::IxHash: 0
+  Try::Tiny: 0
+  Types::Standard: 0
+  bytes: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  IRC: irc://irc.perl.org/#rapidapp
+  bugtracker: https://github.com/vanstyn/Catalyst-Controller-SimpleCAS/issues
+  repository: https://github.com/vanstyn/Catalyst-Controller-SimpleCAS.git
+version: 1.001
+x_contributors:
+  - 'Torsten Raudssus <torsten@raudss.us>'
+  - 'Michael Conrad <mconrad@intellitree.com>'

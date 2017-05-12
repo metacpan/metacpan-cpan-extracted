@@ -1,0 +1,23 @@
+Changes
+examples/MyApp.pm
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+INSTALL
+lib/Class/Accessor/Fast/Contained.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/09-twoobjects.t
+t/10-accessors.t
+t/20-aliases.t
+t/30-bestpractice.t
+t/40-croak.t
+t/pod-coverage.t
+t/pod.t

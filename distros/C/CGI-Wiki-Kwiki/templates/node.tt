@@ -1,0 +1,13 @@
+[%# The main 'looking at a wiki page' page.
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>
+  [% IF version %]Historical version [% version %] of [% END %]
+  [% node_name %] - [% site_name %]
+</h1>
+
+[% content %]
+
+[% INCLUDE footer.tt %]

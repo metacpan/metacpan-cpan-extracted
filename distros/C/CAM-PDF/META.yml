@@ -1,0 +1,63 @@
+---
+abstract: 'PDF manipulation library'
+author:
+  - 'Clotho Advanced Media, Inc. <cpan@clotho.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CAM-PDF
+provides:
+  CAM::PDF:
+    file: lib/CAM/PDF.pm
+    version: 1.60
+  CAM::PDF::Content:
+    file: lib/CAM/PDF/Content.pm
+    version: 1.60
+  CAM::PDF::Decrypt:
+    file: lib/CAM/PDF/Decrypt.pm
+    version: 1.60
+  CAM::PDF::GS:
+    file: lib/CAM/PDF/GS.pm
+    version: 1.60
+  CAM::PDF::GS::NoText:
+    file: lib/CAM/PDF/GS/NoText.pm
+    version: 1.60
+  CAM::PDF::Node:
+    file: lib/CAM/PDF/Node.pm
+    version: 1.60
+  CAM::PDF::PageText:
+    file: lib/CAM/PDF/PageText.pm
+    version: 1.60
+  CAM::PDF::Renderer::Dump:
+    file: lib/CAM/PDF/Renderer/Dump.pm
+    version: 1.60
+  CAM::PDF::Renderer::Images:
+    file: lib/CAM/PDF/Renderer/Images.pm
+    version: 1.60
+  CAM::PDF::Renderer::Text:
+    file: lib/CAM/PDF/Renderer/Text.pm
+    version: 1.60
+  CAM::PDF::Renderer::TextFB:
+    file: lib/CAM/PDF/Renderer/TextFB.pm
+    version: 1.60
+recommends:
+  Getopt::Long: 2.0
+  Pod::Usage: 1.0
+  Test::Memory::Cycle: 1.02
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+requires:
+  Crypt::RC4: 2.02
+  Digest::MD5: 2.16
+  Text::PDF: 0.29
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.60

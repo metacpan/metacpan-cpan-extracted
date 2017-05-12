@@ -1,0 +1,11 @@
+[% IF template.name.match('\.(css|js|txt|html)');
+     debug("Passing page through as text: $template.name");
+     content;
+   ELSIF template.name.match('\.(tt2x)');
+     debug("Applying simple HTML page layout wrappers to $template.name\n");
+     content WRAPPER simplehtml;
+   ELSE;
+     debug("Applying HTML page layout wrappers to $template.name\n");
+     content WRAPPER html + layout;
+   END;
+-%]

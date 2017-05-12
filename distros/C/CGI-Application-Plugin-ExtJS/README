@@ -1,0 +1,106 @@
+NAME
+    CGI::Application::Plugin::ExtJS - Convert paginated
+    DBIx::Class::ResultSet's to JSON-style structures
+
+VERSION
+    version 1.000001
+
+SYNOPSIS
+      use CGI::Application::Plugin::ExtJS ':all';
+
+      sub people {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs);
+         # ...
+      }
+
+      sub people_lite {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs, sub {
+            my $person = shift;
+            return {
+               first_name => $person->first_name,
+               last_name => $person->last_name,
+            }
+         });
+         # ...
+      }
+
+      # this will call the 'foo' method on each person and put the returned
+      # value into the datastructure
+      sub people_more_different {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs, 'foo');
+         # ...
+      }
+
+      sub programmers_do_it_by_hand {
+         # ...
+         my $data = [qw{foo bar baz}];
+         my $total = 10;
+         my $json = $self->ext_parcel($data, $total);
+         # ...
+      }
+
+      # defaults total to amount of items passed in
+      sub some_programmers_do_it_by_hand_partially {
+         # ...
+         my $data = [qw{foo bar baz}];
+         my $json = $self->ext_parcel($data);
+         # ...
+      }
+
+DESCRIPTION
+    This module is mostly for sending DBIx::Class paginated data to ExtJS
+    based javascript code.
+
+METHODS
+  ext_paginate
+      my $resultset = $self->schema->resultset('Foo');
+      my $results   = $self->paginate($resultset);
+      my $json      = $self->ext_paginate($resultset);
+      my $json_str  = to_json($json);
+
+   Description
+    Returns a structure like the following from the ResultSet:
+
+      {
+         data  => [@results],
+         total => $count_before_pagination
+      }
+
+   Valid arguments are:
+      rs      - paginated ResultSet to get the data from
+      coderef - any valid scalar that can be called on the result object
+
+  ext_parcel
+      my $items    = [qw{foo bar baz}];
+      my $total    = 7;
+      my $json     = $self->ext_parcel($data, $total);
+      my $json_str = to_json($json);
+
+   Description
+    Returns a structure like the following:
+
+      {
+         data  => [@{$items}],
+         total => $total || scalar @{$items}
+      }
+
+   Valid arguments are:
+      list  - a list of anything you want to be in the data structure
+      total - whatever you want to say the total is.  Defaults to size of
+              the list passed in.
+
+SEE ALSO
+    CGI::Application::Plugin::DBIx::Class.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

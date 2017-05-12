@@ -1,0 +1,5 @@
+IGNORE: ign.*\.css$  
+ignore: \.css$
+use: override\.css
+use: simple\.css
+sds

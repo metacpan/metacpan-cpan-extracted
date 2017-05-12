@@ -1,0 +1,7 @@
+Sat Jun 22 06:29:45 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* 0.03: Two test classes (P and Q) were missing from MANIFEST.  Ooops.
+
+Sat Jun 22 03:01:34 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* 0.02: Documentation tweaks, no functional changes.

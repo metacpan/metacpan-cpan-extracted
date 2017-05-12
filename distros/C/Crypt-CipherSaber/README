@@ -1,0 +1,34 @@
+Crypt::CipherSaber
+------------------
+
+version 1.00 Wed Jul 13 01:37:53 UTC 2005
+
+Crypt::CipherSaber is a Perl module providing an object oriented interface to
+CipherSaber-1 and CipherSaber-2 encryption.  See the POD for further details on
+use.  See http://ciphersaber.gurus.com for more information about CipherSaber.
+
+After unpacking the tarball, to install this module type:
+
+    $ perl Build.PL
+    $ ./Build
+    $ ./Build test
+    # ./Build install
+
+You can also use the Makefile.PL, but I don't.
+
+The encryption itself is simple, relatively fast, and fairly secure.  It uses a
+shared secret system, and is suitable even for binary files.  It should run
+without modification anywhere Perl runs.  This ought to work as far back as
+Perl 5.004, so please let me know how it does.
+
+Prerequisites:                Scalar::Util
+Test requirements:            Test::More, Test::Warn
+
+Potential enhancements and plans:            
+
+ * built-in support for a better randomization scheme?
+ * support changing keys in an object rather than creating a new one?
+
+Copyright (c) 2001, 2005 chromatic (chromatic at wgz dot org), all rights
+reserved.  This program is free software; you can use, modify, and redistribute
+it under the same terms as Perl 5.8.x itself.

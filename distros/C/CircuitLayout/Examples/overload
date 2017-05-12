@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib '..'; ## for testing from this Examples directory
+use CircuitLayout;
+$|++;
+$\="\n";
+my @xys=(0,2, 20,2, 20,10); # triangle
+my $boundary = new CircuitLayout::Boundary(-xy=>\@xys);
+print 'boundary coords=',$boundary -> printableCoords,' -> triangle';
+my $c1 = new CircuitLayout::Coord(-x=>0,-y=>10);
+#$boundary = $boundary + $c1; ## this works too
+#$boundary += [0,10]; ## so does this!!
+$boundary += $c1;
+print 'boundary coords=',$boundary -> printableCoords;
+
+

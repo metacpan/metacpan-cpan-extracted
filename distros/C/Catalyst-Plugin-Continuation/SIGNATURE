@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.52.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fe0be94ae8bd164557f4bc9a0f64202ade37ed0e Build.PL
+SHA1 47ad3c8aa53fb9969f8006a966c12be61bf1335b Changes
+SHA1 feaf48414d0c255e30574fa340677e7d6bac623a MANIFEST
+SHA1 7780565c93f9bc9157bf4da7eb42e9627d991d37 META.yml
+SHA1 6e0b81c59c8beea453797687dd93d7151582e598 Makefile.PL
+SHA1 61be8325a74044bb3d583597cfe0ad56bf1e48a9 README
+SHA1 56c5e7c20dc571f413d47da44a809bdfcb4d97e3 lib/Catalyst/Continuation.pm
+SHA1 ae6cb7eeee9ba151893eb06d347ebbf5ad2746df lib/Catalyst/Plugin/Continuation.pm
+SHA1 07eef01b3ab8b039ec6714a9dcc680672521b868 t/01use.t
+SHA1 86d255a7c9f065a13049108362c949b3e35a4c24 t/02pod.t
+SHA1 e923679a1bbd8eb8f727e46f5906af25de27ec97 t/03podcoverage.t
+SHA1 1063573c2c938115f213bcba657dc705e05113a5 t/04_diff_req.t
+SHA1 3d34913a8a18d19fa8220a39a2df571ac23cf26c t/05_login_example.t
+SHA1 4aee5ceddfd592f1f2cba07b6d4415e895588dd0 t/lib/ContTestApp.pm
+SHA1 d15bba7f665f7ec092c508b12cc45c32edfc981b t/lib/ContTestApp/Controller/Foo.pm
+SHA1 906b92a1d27ab7aa3fd960f5510522a02cfa2c36 t/lib/ContTestApp/Controller/NeedsLogin.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (Darwin)
+
+iD8DBQFEWLl7VCwRwOvSdBgRAsd8AJ9E7Y4+KDLPnLSh7DZ+Zrjz6EJo+wCfXBrK
+5GCPWq682W2kDobqI9AgLxY=
+=3o73
+-----END PGP SIGNATURE-----

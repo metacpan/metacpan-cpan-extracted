@@ -1,0 +1,23 @@
+Changes for Catalyst::View::Excel::Template::Plus
+# Date format "%A, %B %d, %Y"
+
+0.04 Tues. Jan. 13, 2015
+    - Add support for Content-Disposition via stash options
+        - thanks to Alex Balhatchet for this work
+
+0.03 Sunday, April 25, 2010
+    - Simple release from the developement release 0.02_2
+
+0.02_2 Tuesday, April 20, 2010
+    - Last development release was shipped with an old Makefile.PL
+
+0.02_1 Monday, April 19, 2010
+    - add missing build requirement 'parent'
+
+0.02 Thursday, April 15, 2010
+    - fixed rt#53781 / NEXT deprecated
+    - fixed rt#42166 / Auto determining template filename broken
+    - Add helper class, Catalyst::Helper::View::Excel::Template::Plus
+    
+0.01 Monday, July 9, 2007
+    - initial release

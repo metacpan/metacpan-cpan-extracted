@@ -1,0 +1,7 @@
+Revision history for Config-INI-Serializer
+
+0.002     2015-10-03
+        - Kwalitee hygiene: polish pod, whitespace, perl version
+
+0.001     2012-04-04 13:17:43 Europe/Berlin
+        - initial carved out version with tests and dzil config

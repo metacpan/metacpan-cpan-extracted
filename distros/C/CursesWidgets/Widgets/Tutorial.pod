@@ -1,0 +1,230 @@
+# Curses::Widget::Tutorial.pod -- Widget Usage Tutorial
+#
+# (c) 2001, Arthur Corliss <corliss@digitalmages.com>
+#
+# $Id: Tutorial.pod,v 1.2 2002/11/04 00:44:04 corliss Exp corliss $
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#####################################################################
+
+=head1 NAME
+
+Curses::Widget::Tutorial -- Widget Usage Tutorial
+
+=head1 POD VERSION
+
+$Id: Tutorial.pod,v 1.2 2002/11/04 00:44:04 corliss Exp corliss $
+
+=head1 DESCRIPTION
+
+Usage of any given widget is fairly simple, but plenty of flexibility is built
+into the system in order to allow you to completely control every aspect of
+their behaviour.
+
+=head2 ENVIRONMENT
+
+Due to the usage of Curses constants and the way that the screen is
+controlled, care must be taken in how the running environment is set up.  To
+begin, one would initiate a Curses session on the console in a typical
+fashion:
+
+	$mwh = new Curses;
+
+We then turn off echoing, since the widgets will determine what and were any
+input is sent to the display:
+
+	noecho();
+
+I typically use half-blocking input reads, since there may be periodic
+routines that I want to run while waiting for input.  If you're comfortable 
+with that, you can do the same:
+
+	halfdelay(5);
+
+Next, I turned on cooked input, since the widgets make heavy use of constants
+for recognising special keys:
+
+	$mwh->keypad(1);
+
+Finally, we set the cursor visibility to invisible, since the widgets will
+provide their own as necessary:
+
+	curs_set(0);
+
+From this point, we're not ready to start splashing widgets to the screen and
+start handling input.
+
+=head1 USAGE INSTRUCTIONS
+
+=head2 BASIC USAGE
+
+When using the widgets, you must have B<use> line for each type of widget used
+in your program.  In addition, it's good practice to include the base class as
+well, since it provides some useful functions for handling both reading input
+and managing colour pairs.
+
+	Example:
+	========
+
+	use Curses;
+	use Curses::Widgets;
+	use Curses::Widgets::TextField;
+
+	# Initialise the environment
+	$mwh = new Curses;
+	noecho();
+	halfdelay(5);
+	$mwh->keypad(1);
+	curs_set(0);
+
+Next, we instantiate the widget(s) we want to use.
+
+	$tf = Curses::Widgets::TextField->new({
+		X		=> 5,
+		Y		=> 5,
+		COLUMNS		=> 10,
+		CAPTION		=> 'Login'
+		});
+
+One thing you need to remember is that B<COLUMNS> (and B<LINES>, for those
+widgets that support it) always pertain to the I<content> area in the widget.
+If the widget supports a bordered mode, the actual dimensions will increase by
+two in both the Y and the X axis.  In other words, since TextFields have
+borders on by default, the actual number of columns and lines that will be
+used by the above widget is 10 and 3, respectively.
+
+To cause the widget to display itself, call the B<draw> method:
+
+	$tf->draw($mwh, 0);
+
+The first argument is a handle to the window in which you want the widget to
+draw itself.  All widgets are drawn in derived windows.  The second argument
+should be a Perlish boolean value which instructs the draw method whether or
+not to draw the cursor.
+
+When you're ready to accept input, the simplest method is to use the
+B<execute> method:
+
+	$tf->execute($mwh);
+
+This method is a blocking call until the widget is fed a character matching
+the class defined by FOCUSSWITCH ([\n\t] by default).  Until it recieves a
+matching character, the widget will respond appropriately to all user input
+and update the display automatically.
+
+Once the B<execute> method call exits, you can retrieve the final value of the
+widget via the B<getField> method:
+
+	$login = $tf->getField('VALUE');
+
+=head2 ADVANCED USAGE
+
+You may have a need to run period routines while waiting for (or handling)
+user input.  The simplest way add this functionality is to create your own
+input handler.  The default handler (provided by Curses::Widgets: B<scankey>)
+is coded as such:
+
+	sub scankey {
+		my $mwh = shift;
+		my $key = -1;
+
+		while ($key eq -1) {
+			$key = $mwh->getch;
+		}
+
+		return $key;
+	}
+
+If, for example, we wanted that function to update a clock (the actual code
+for which we'll pretend is in the B<update_clock> function) we could insert
+that call inside of our new input handler's while loop:
+
+	sub myscankey {
+		my $mwh = shift;
+		my $key = -1;
+
+		while ($key eq -1) {
+			$key = $mwh->getch;
+			update_clock($mwh);
+		}
+
+		return $key;
+	}
+
+We can then hand this function to the widgets during instantiation, or via the
+B<setField> method:
+
+	$tf = Curses::Widgets::TextField->new({
+		X		=> 5,
+		Y		=> 5,
+		INPUTFUNC	=> \&myscankey
+		});
+
+	-- Or --
+
+	$tf->setField(INPUTFUNC => \&myscankey);
+
+Another way to handle this is to set up your own loop, and instead of each
+widget calling it privately, handle all input yourself, sending it to the
+appropriate widget via each widget's B<input> method:
+
+	while (1) {
+
+		while ($key eq -1) {
+			$key = $mwh->getch;
+			update_clock($mwh);
+		}
+
+		# Send numbers to one field
+		if ($key =~ /^\d$/) {
+			$tf1->input($key);
+
+		# Send alphas to another
+		} elsif ($key =~ /^\w$/) {
+			$tf2->input($key);
+
+		# Send KEY_UP/DOWN to a list box
+		} elsif ($key eq KEY_UP || $key eq KEY_DOWN) {
+			$lb->input($key);
+		}
+
+		# Update the display
+		foreach ($tf1, $tf2, $lb) {
+			$_->draw($mwh, 0);
+		}
+
+	}
+
+This is a rather simplistic example, but hopefully the applications of this
+are obvious.  One could easily set hot key sequences for switching focus to
+various widgets, or use input from one widget to update another, and so on.
+
+=head2 CONCLUSION
+
+That, in a nutshell, is how to use the widgets.  Hopefully the system is
+flexible enough to be bound to the event model and input systems of your
+choice.
+
+=head1 HISTORY
+
+2001/12/09 -- First draft.
+
+=head1 AUTHOR/COPYRIGHT
+
+(c) 2001 Arthur Corliss (corliss@digitalmages.com)
+
+=cut
+

@@ -1,0 +1,27 @@
+REGEDIT4
+
+;; DO NOT APPLY THIS DIRECTLY - IT'S JUST A SAMPLE OF THE REG FILE
+;; CREATED BY THE CLEARCASE CONTEXT MENU EDITOR. USE THAT TO MAKE YOUR OWN.
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer]
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer\MenuContents]
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer\MenuContents\ElemDir]
+"SelSingle"="62,28,61,28,6,28,21,42,12,28,15,53,28,8,28,20"
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer\MenuContents\VpDir]
+"SelSingle"="62,28,1,501,28,40,28,8,28,20"
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer\MenuTable]
+
+[HKEY_LOCAL_MACHINE\Software\Atria\ClearCase\CurrentVersion\ContextMenus\MsExplorer\MenuTable\501]
+"Text"="Recursive Add to Source Control..."
+"HelpText"="Turn all private files under selected dir into versioned elements"
+"DoHelpSubst"="FALSE"
+"DispType"="Executable"
+"Exe"="perl"
+"Params"="-S ct mkelem -ci -nc -rec -ok -P -/ipc=1"
+"DirParams"="$file"
+"ShowDlg"="FALSE"
+"Comment"="GUI access to 'ct mkelem'"

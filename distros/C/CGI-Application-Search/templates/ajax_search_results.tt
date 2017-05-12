@@ -1,0 +1,214 @@
+<!--
+
+EXAMPLE TEMPLATE
+
+Designed to be used for the TEMPLATE configuration with
+a TEMPLATE_TYPE of 'TemplateToolkit'. This
+should be used in conjunction with the AJAX configuration param
+(but not as the AJAX template; that's 'ajax_results_listing.tt')
+
+This template demonstrates the following features of C::A::Search:
+
+  AJAX search (contains necessary Javascript calls)
+  AUTO_SUGGEST (contains necessary Javascript calls)
+  highlight_local_page (contains link with appropriate parameters)
+
+-->
+
+[% UNLESS ajax %]
+
+<html>
+<head>
+<!--
+  Prototype and Scriptaculous Javascript libraries
+  Latest versions available at http://script.aculo.us/
+
+  It's best to use the following <script> tags with a 'src'
+  attribute to remotely pull this JS code in since that allows
+  the browser to cache the compiled JS code, instead of reparsing
+  and compiling it on each request.
+
+  <script src="/prototype.js" type="text/javascript"></script>
+  <script src="/scriptaculous.js" type="text/javascript"></script>
+
+  But for the example templates, we'll just include it in there
+-->
+[% INCLUDE 'prototype_javascript.tmpl' %]
+
+<!--
+  auto_complete styles needed for AUTO_SUGGEST functionality
+-->
+<style>
+
+label {
+    font-weight: bold;
+}
+div.pagination {
+    background: #eff7e9;
+    border: 1px solid #888888;
+}
+div.auto_complete {
+    width: 350px;
+    background: #fff;
+}
+div.auto_complete ul {
+    border:1px solid #888;
+    margin:0;
+    padding:0;
+    width:100%;
+    list-style-type:none;
+}
+div.auto_complete ul li {
+    margin:0;
+    padding:3px;
+}
+div.auto_complete ul li.selected {
+    background-color: #B82619;
+    color: #ffffff;
+}
+div.auto_complete ul strong.highlight {
+    color: #800;
+    margin:0;
+    padding:0;
+}
+</style>
+
+</head>
+<body>
+
+<h2>Search[% IF searched %] Results[% END %]</h2>
+
+<form id="search" name="search" onsubmit="return ajax_form_search(this);" >
+<input name="rm" value="perform_search" type="hidden">
+
+<table summary="layout">
+<tr>
+  <td><label for="keywords">Keyword(s)</label></td>
+  <td colspan="2">
+    <input id="keywords" name="keywords" value="" size="50" autocomplete="off">
+    <div class="auto_complete" id="keywords_auto_complete"></div>
+  </td>
+</tr>
+<tr>
+  <td colspan="2" align="right"><input value="Search" type="submit" name=".submit"></td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+<!--
+// THIS IS THE URL of the search app. The Ajax JS libraries need it
+var url = '[% url %]';
+new Ajax.Autocompleter( 'keywords', 'keywords_auto_complete', url, { parameters: "rm=suggestions"  })
+//-->
+</script>
+
+<div id="search_listing">
+  <!-- 
+    If we don't have the ajax flag (eg, when we first come to this page)
+    then we need to include the listing in this template. Afterwards, submitting
+    the above form will just replace this div with the contents of the AJAX_TEMPLATE
+  -->
+[% END %]
+
+[% IF searched %]
+  [% IF hits %]
+    <em>(Elapsed Time: [% elapsed_time %]s)</em>
+
+    <div class="pagination">
+
+    [% IF pages %]
+    <div>
+    Pages:
+    [% IF first_page %]
+        &laquo;Prev
+    [% ELSE %]
+        <a href="javascript:ajax_search('rm=perform_search&amp;keywords=[% keywords | uri %]&amp;page=[% prev_page %]', 'Loading Page #[% prev_page %]')">&laquo;Prev</a>
+    [% END %]
+
+    [% FOREACH page IN pages %]
+        [% IF page.current %]
+          [% page.page_num %]
+        [% ELSE %]
+          <a href="javascript:ajax_search('rm=perform_search&amp;keywords=[% keywords | uri %]&amp;page=[% page.page_num %]', 'Loading Page #[% page.page_num %]')">[% page.page_num %]</a>
+        [% END %]
+        &nbsp;
+    [% END %]
+
+    [% IF last_page %]
+        Next&raquo;
+    [% ELSE %]
+        <a href="javascript:ajax_search('rm=perform_search&amp;keywords=[% keywords | uri %]>&amp;page=[% next_page %]', 'Loading Page #[% next_page %]')">Next&raquo;</a>
+    [% END %]
+    </div>
+    [% END %]
+
+    Results: [% start_num %] to [% stop_num %] of [% total_entries %]
+
+    </div>
+
+
+    <dl>
+    [% FOREACH hit IN hits %]
+      <dt>
+      <a href="?rm=highlight_local_page&amp;path=[% hit.path | uri %]&amp;keywords=[% keywords | uri %]">
+      [% IF hit.title %]
+        [% hit.title %]
+      [% ELSE %]
+        [% hit.path | html %]
+      [% END %]
+      </a>
+      <em>[% hit.last_modified %] - [% hit.size %]</em>
+      </dt>
+      <dd><p>[% hit.description %]</p></dd>
+    [% END %]
+    </dl>
+  [% ELSE %]
+  <p><strong>No results found</strong></p>
+  [% END %]
+[% END %]
+
+[% UNLESS ajax %]
+
+</div>
+
+<script type="text/javascript">
+<!--
+// search with a query string and a message to display
+function ajax_search(query, msg) {
+     if( Ajax.getTransport != false ) {
+         query = query + '&ajax=1';
+         new Ajax.Updater( 
+            'search_listing',  
+            url,
+            { 
+                parameters: query,
+                asynchronous: 1,
+                onLoading: function(request) {
+                    $('search_listing').innerHTML = "<strong>" + msg + " ...</strong>";
+                } 
+            } 
+        );
+    } else {
+        location.href = location.protocol + '//' +  location.hostname + url + "?" + query;
+    }
+}
+
+// serialize the form into a query string and display it
+function ajax_form_search(form) {
+    if( Ajax.getTransport != false ) {
+        ajax_search(Form.serialize(form), 'Searching');
+        return false;
+    } else {
+        return true;
+    }
+}
+//-->
+</script>
+
+
+</html>
+</body>
+
+[% END %]

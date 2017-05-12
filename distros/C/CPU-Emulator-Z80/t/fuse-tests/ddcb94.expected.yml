@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  24213:
+    - 179
+name: ddcb94
+registers:
+  AF: 58253
+  AF_: 0
+  BC: 13733
+  BC_: 0
+  DE: 36103
+  DE_: 0
+  HL: 46008
+  HL_: 0
+  I: 0
+  IX: 24196
+  IY: 24356
+  PC: 4
+  R: 2
+  SP: 0

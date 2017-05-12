@@ -1,0 +1,35 @@
+---
+abstract: 'Apache Clownfish Runtime'
+author:
+  - 'The Apache Lucy Project <dev at lucy dot apache dot org>'
+build_requires:
+  Clownfish::CFC: '0.006001'
+  Devel::PPPort: '3.14'
+  ExtUtils::CBuilder: '0.21'
+  ExtUtils::ParseXS: '3'
+  Module::Build: '0.280801'
+configure_requires:
+  Clownfish::CFC::Perl::Build: '0.006001'
+  Module::Build: '0.280801'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - clownfish
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clownfish
+no_index:
+  directory:
+    - buildlib
+  package:
+    - Clownfish::Test
+requires:
+  perl: v5.8.3
+resources:
+  bugtracker: https://issues.apache.org/jira/browse/CLOWNFISH
+  homepage: http://lucy.apache.org
+  repository: https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+version: v0.6.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

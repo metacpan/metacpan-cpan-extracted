@@ -1,0 +1,28 @@
+Catalyst::Plugin::DateTime
+
+A Catalyst Plugin for DateTime.
+
+INSTALLATION
+
+To install this module perform the typical four-part Perl salute:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Catalyst
+DateTime
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 James Kiser.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+AUTHORS
+
+James Kiser <james.kiser@gmail.com>

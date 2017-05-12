@@ -1,0 +1,9 @@
+Revision history for Perl extension CGI::Session::YAML.
+
+0.2  Wed May 16 2007
+    Added POD documentation.
+
+0.1  Fri Apr  6 21:10:01 2007
+    original version; created by h2xs 1.23 with options
+    -AXc -n CGI::Session::YAML
+

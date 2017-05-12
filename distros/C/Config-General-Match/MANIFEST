@@ -1,0 +1,24 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Config/General/Match.pm
+t/00-load.t
+t/pod.t
+t/pod-coverage.t
+t/01-lower_case_sections.t
+t/02-substring.t
+t/03-regex.t
+t/04-path.t
+t/05-module.t
+t/06-regex_hash_merge_reverse.t
+t/07-section_type_example.t
+t/08-section_type.t
+t/09-trim_section_names.t
+t/10-escaping.t
+t/11-multi-level-merge.t
+t/12-exact.t
+t/13-nesting.t
+t/14-nesting_pod_example.t

@@ -1,0 +1,59 @@
+Revision history for Catalyst-Authentication-AuthTkt
+
+0.15 18 Dec 2013
+ - move src repos to github
+ - switch to Module::Install
+ - Moose-ify
+ - fix renew_ticket bug 
+
+0.14 19 Aug 2013
+ - document use_req_address and ignore_ip
+
+0.13 31 Oct 2012
+ - pod fix in SYNOPSIS
+
+0.12 11 Jan 2012
+ - patches from t0m via
+   https://rt.cpan.org/Public/Bug/Display.html?id=73786 to fix for Catalyst
+   5.9
+
+0.11_01 03 May 2011
+ - dev release with extra debugging to try and track down cpantesters
+   failures.
+
+0.11 25 June 2009
+ - fix bug when cookie domain not configured. Defaults now to undef, which
+   should result in no domain (which the browser should interpret as the
+   responding fqdn). Patch from Jose Luís Martínez.
+
+0.10 7 May 2009
+ - explicit $c->logout anytime AuthTkt parsing fails, since if Session
+   plugin is being used, the $c->user object is cached in session.
+
+0.09 30 April 2009
+ - set REMOTE_ADDR to $c->req->address if $c->req->address != REMOTE_ADDR.
+   This fixes bug when running dev server behind proxy (similar to fcgi).
+ - add patch from https://rt.cpan.org/Ticket/Display.html?id=43482 to check
+   that authtkt cookie has a value.
+
+0.08 16 Dec 2008
+ - fix bug in Store->expire_ticket() where cookie not found
+
+0.07 20 Nov 2008
+ - add 'mock' feature for running in development.
+ - pass all relevant config args to Apache::AuthTkt->new 
+
+0.06 2 Sept 2008
+ - add missing req to Makefile.PL
+
+0.05 29 Aug 2008
+ - fix POD for search.cpan.org display
+
+0.04 29 Aug 2008
+ - add Static::Simple plugin to Makefile.PL reqs (not that it is actually
+   used yet...)
+
+0.03 28 Aug 2008
+ - Renamed from Catalyst::Plugin::Authentication::AuthTkt
+ - updates to support Apache::AuthTkt 0.08 API changes
+

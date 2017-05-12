@@ -1,0 +1,63 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Store::DBI
+
+0.16    2010-03-23 22:46:37
+        - Make the table metadata configurable (wreis).
+
+0.15    2009-10-17 19:29:30
+        - Fixed to work with the new config key for sessions, Plugin::Session
+          (Dave Rolsky)
+        - Fix a couple of problems and warnings in the test suite.
+        - Stop treating model names as class names.
+
+0.14    2008-09-17 09:53:47
+        - Added a POD warning about MySQL TEXT field size. (Jay Hannah)
+
+0.13    2008-04-29 08:30:00
+        - Fixed ping() check to work properly. (Olivier Thauvin)
+
+0.12    2007-10-05 11:00:00
+        - Added support for Catalyst::Model::DBI models. (Geoffrey Giesemann)
+        - Switched to Module::Install.
+
+0.11    2007-03-22 17:00:00
+        - Reset cached statement handles if the dbh goes away or changes.
+          (Peter Karman)
+        - Pre-generate all SQL statements at startup.
+
+0.10    2007-03-15 12:00:00
+        - Fixed Rose::DB::Object dbh call.
+        - Forgot to document Rose::DB::Object support.
+
+0.09	2007-03-14 22:00:00
+        - Added support for using a Rose::DB::Object to get the dbh.
+        (Peter Karman)
+
+0.08	2007-02-15 11:00:00
+        - Fixed DBIC tests.
+        - Added DBIC Schema tests.
+        - Improved logic for getting a dbh, will return a proper error
+          if it can't get one.
+
+0.07    2006-04-07 11:35:00
+        - Added support for DBIx::Class schema models. (ejh)
+
+0.06    2006-01-30 22:15:00
+        - Throw an exception if the user has not fully configured sessions.
+        - Allow users to override DBI connect options via dbi_options param.
+
+0.05    2006-01-01 04:35:00
+        - Updated to support changes to the Session API.
+
+0.04    2005-12-15 15:15:00
+        - Fixed id column size in Synopsis.
+
+0.03    2005-12-15 11:30:00
+        - Refactored to better handle dbh connection/reconnection.
+        - Cache prepared SQL statements to improve performance.
+        - Changed recommended id column size from 40 to 72.
+
+0.02    2005-11-29 11:40:00
+        - Fixed tests.
+
+0.01    2005-11-14 13:02:00
+        - initial release

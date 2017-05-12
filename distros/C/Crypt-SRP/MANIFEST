@@ -1,0 +1,14 @@
+Changes
+examples/srp_client.pl
+examples/srp_server.pl
+lib/Crypt/SRP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+t/octets2bigint.t
+t/server_client.t
+t/test_vectors.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

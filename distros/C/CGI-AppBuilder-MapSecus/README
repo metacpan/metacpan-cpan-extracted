@@ -1,0 +1,70 @@
+NAME
+    CGI::AppBuilder::Security - Security Procedures
+
+SYNOPSIS
+      use CGI::AppBuilder::Security;
+
+      my $sec = CGI::AppBuilder::Security->new();
+      my ($sta, $msg) = $sec->access_ok($ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  access_ok2($q,$ar)
+    Input variables:
+
+      $q   - CGI object
+      $ar  - array ref containing the following variables:
+      task          : task name required ($t)
+      sel_sn1       : select one (DB/server name)
+      sel_sn2       : select two (Argument)
+      allowed_ip    : allowed ip address for each task
+      roles         : roles allowed to access a list of tasks
+      svr_allowed   : server allowed for each task
+      arg_required  : required argument for each task
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      See access_ok
+
+    Return: ($status, $msg) where $status is 1 (ok) or 0 (not), and the msg
+    is the error message.
+
+HISTORY
+    *   Version 0.10
+
+        This version extracted from jp2.pl on 09/08/2010.
+
+    *   Version 0.20
+
+          02/08/2012 (htu): added access_ok2
+          02/10/2012 (htu): added get_guid, set_guid and sel_guid
+          02/14/2012 (htu): added set_ids
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2012 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 391:
+        You forgot a '=back' before '=head1'
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Crypt::Camellia_PP.
+
+0.02 Sun Jan  7 00:04:13 JST 2007
+	- support 192 and 256 bit key.
+
+0.01 Mon Jan  1 01:28:10 JST 2007
+	- initial import form my HDD.

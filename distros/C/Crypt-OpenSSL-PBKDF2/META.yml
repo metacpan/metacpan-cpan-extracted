@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               Crypt-OpenSSL-PBKDF2
+version:            0.04
+abstract:           wrapper for PBKDF2 keys derivation function of the OpenSSL library
+author:
+    - R.Scussat - OpenDiogene Project  <rscussat@dsplabs.net>
+license:            gplv2+ or artistic 
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:  {}
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

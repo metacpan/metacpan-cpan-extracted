@@ -1,0 +1,55 @@
+{
+   "abstract" : "Find a DBIC Results from Arguments",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-ActionRole-BuildDBICResult",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::Model::DBIC::Schema" : "0.43",
+            "Catalyst::Runtime" : "5.80025",
+            "DBD::SQLite" : "1.35",
+            "DBIx::Class" : "0.08123",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Controller::ActionRole" : "0.15",
+            "Catalyst::Model::DBIC::Schema" : "0.43",
+            "Catalyst::Runtime" : "5.80025",
+            "DBD::SQLite" : "1.35",
+            "DBIx::Class" : "0.08123",
+            "Moose" : "1.10",
+            "MooseX::Types" : "0.23",
+            "Perl6::Junction" : "1.40000",
+            "Test::More" : "0.94",
+            "Try::Tiny" : "0.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

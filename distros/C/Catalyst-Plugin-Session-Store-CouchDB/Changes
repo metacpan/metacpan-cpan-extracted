@@ -1,0 +1,6 @@
+0.03 2013-05-06
+  - Change configuration parameters to mention Couch to avoid conflicts
+  - Change from CouchDB::Client to AnyEvent::CouchDB
+
+0.02 2013-03-17
+  - initial release

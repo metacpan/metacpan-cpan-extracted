@@ -1,0 +1,66 @@
+CGI::Application::Generator - Dynamically build CGI::Application modules
+==========================================================================
+
+CGI::Application::Generator provides a means by which a CGI::Application
+module can be created from code, as opposed to being written by hand.
+
+
+Download site for CGI::Application::Generator:
+
+  http://search.cpan.org/search?dist=CGI-Application-Generator
+
+
+CHANGES SINCE VERSION 0.01:
+- First release version of CGI::Application::Generator, a
+  module intended to allow the creation of CGI::Application
+  modules dynamically.
+- Implemented an Object-Oriented interface to specify the
+  functionality of your intended CGI::Application, used to 
+  build the structure automatically using a (configurable)
+  template file. 
+
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+CGI::Application::Generator is intended to create a shell of an
+application module based on the specification you provide. It will not
+output a completely functional application without additional coding. It
+will, however, handle the creation of all the structural parts of your
+application common to all CGI::Application-based modules.
+
+The goal of CGI::Application::Generator is two-fold:
+
+1. To ease the creation of new CGI::Application modules.
+2. To allow standardization of CGI::Application coding styles to be
+   more uniformly applied.
+
+It is also the hope of this module that Computer Assisted Software
+Engineering (CASE) tools will eventually emerge which will allow the
+development process for web-based applications to be greatly improved.
+These CASE tools could more easily convert visual notation (such as UML
+state-transition diagrams) into method calls to this module, thereby
+creating actual code.
+
+CGI::Application::Generator is not a system for HTML templates. If
+you're looking for a Perl module which will allow you to separate Perl
+from HTML then I recommend you download and install HTML::Template.
+
+
+SUPPORT MAILING LIST
+
+If you have any questions, comments, bug reports or feature suggestions, 
+post them to the support mailing list!  To join the mailing list, simply
+send a blank message to "cgiapp-subscribe@lists.erlbaum.net".
+
+
+
+# $Id: README,v 1.4 2003/02/16 03:44:17 jesse Exp $

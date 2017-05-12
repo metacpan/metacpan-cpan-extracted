@@ -1,0 +1,5 @@
+[%  
+    # master wrapper file arbitrates which sub-wrapper to call.
+    # CMS.wrappers.dump_stderr;
+    PROCESS "$CMS.wrappers.wrapper";
+%]

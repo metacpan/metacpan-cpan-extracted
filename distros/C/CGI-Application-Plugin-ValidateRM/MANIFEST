@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/CGI/Application/Plugin/ValidateRM.pm
+t/01_basic.t
+t/01_display.html
+t/99_pod.t
+t/TestApp1.pm
+t/forward.t
+t/fif_class.t
+t/fif_defaults.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use diagnostics;
+
+use Crypt::C_LockTite;
+
+my %keys = (
+	2147000000	=> '4927a289d5308320bb88b4b0d408c148',
+);
+
+my $MAC_txt	= 'MAC generator text';
+
+my $cl = Crypt::C_LockTite->new;
+foreach(keys %keys) {		# get the one and only key
+  @_ = ($MAC_txt,$_);
+  my $prekey = $cl->md5(@_);
+  $cl->new_crypt($prekey);
+  my $realkey = pack('H*', $keys{$_});
+  $cl->decrypt($realkey);
+  my $rk2 = $realkey;
+  $cl->new_crypt($realkey);
+  print unpack('H*', $realkey), "\n";
+}
+# the other way
+
+my $id		= '12345';
+my $seed	= 'BizSystems';
+my $p = Crypt::C_LockTite->new;
+my $tmp = $p->md5($id);					# md5 of client ID
+my $otherkey = $p->new_md5_crypt($seed)->encrypt($tmp);	# encrypt with seed
+print unpack('H*', $otherkey), "\n";

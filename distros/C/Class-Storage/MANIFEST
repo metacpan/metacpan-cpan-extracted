@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Class/Storage.pm
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/pack.t
+Makefile.PL
+META.yml
+META.json

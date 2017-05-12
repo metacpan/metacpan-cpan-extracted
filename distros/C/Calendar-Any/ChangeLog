@@ -1,0 +1,47 @@
+2012-05-18  Ye Wenbin  <dabing.ywb@taobao.com>
+
+	* lib/Calendar/Any.pm: Rename module name to Calendar::Any
+
+2008-01-01  Ye Wenbin  <wenbinye@gmail.com>
+
+	* lib/Calendar.pm (AUTOLOAD): Generate new_from_pacakge and
+	convert_to_package functions, not eval everytime.
+
+2007-12-11  Ye Wenbin  <wenbinye@gmail.com>
+
+	* lib/Calendar.pm: update version for distribution
+
+	* Makefile.PL: Remove restriction of perl version
+
+2007-07-15  Ye Wenbin  <wenbinye@163.com>
+
+	* lib/Calendar.pm: update version number to upload to PAUSE.
+
+2007-07-14  Ye Wenbin  <wenbinye@163.com>
+
+	* lib/Calendar.pm: Fix A typo error. Thanks to Chihiro Fukazawa!
+
+2007-07-13  Ye Wenbin  <wenbinye@163.com>
+
+	* lib/Calendar/China.pm (absolute_date): Fix deep recursive when call this function.
+
+2007-06-20  Ye Wenbin  <wenbinye@163.com>
+
+	* lib/Calendar/Gregorian.pm (absolute_date): Validate parameter
+	before calculate absolute date
+
+	* lib/Calendar/Julian.pm (check_date): add check_date to validate
+	parameter in constructor.
+	(absolute_date): Validate parameter before calculate absolute
+	date.
+
+	* lib/Calendar/China.pm: Fix document error in SYNOPSIS.
+	(check_date): add check_date to validate parameter in constructor.
+
+	* bin/cal.pl: Add default value for $week_start_day to fix error
+	when compile. Initial upcase $type to allow lower case calendar
+	type. Add document to advice set configuration.
+
+
+2006-12-15 Ye Wenbin  <wenbinye@163.com>
+	* original version created by h2xs 1.23 with options -A -n Calendar

@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Untaint/email.pm
+t/00_email.t

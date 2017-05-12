@@ -1,0 +1,23 @@
+Crypt/OTP version 2.00
+======================
+
+Crypt::OTP is a pure perl implementation of One Time Pad (hence
+OTP) encryption. Please read the pod documentation carefully
+regarding usage and best practices.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+This module is free software and may be modified and/or 
+redistributed under the same terms as Perl itself.
+
+Copyright (C) 2002, Kurt Kincaid <sifukurt@yahoo.com>
+

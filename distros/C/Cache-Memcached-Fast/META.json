@@ -1,0 +1,33 @@
+{
+   "abstract" : "Perl client for B<memcached>, in C language",
+   "author" : [
+      "Tomash Brechko <tomash.brechko@gmail.com>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cache-Memcached-Fast",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Storable" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/JRaspass/Cache-Memcached-Fast.git",
+         "web" : "https://github.com/JRaspass/Cache-Memcached-Fast"
+      }
+   },
+   "version" : "0.25"
+}
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+lib/Class/DBI/Plugin/TimePiece.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+Revision history for Perl extension Class::Multimethods::Pure.
+
+0.01  Sat Jul 16 04:55:28 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -X -n Class::Multimethods::Pure
+
+0.02  Tue Aug 2 00:00:00 2005
+        - internals changes: ripped out the EQUAL method by noticing that
+                A == B iff A (= B and B (= A
+
+0.03  Wed Aug 3 00:05:00 2005
+        - added support for multis with varying numbers of invocants
+
+0.04  Fri Aug 5 13:16:00 2005
+        - added multiple dispatchers support
+        - renamed the old default dispatcher DominatingOrder
+        - made a new, slow, simple dispatcher called Slow, and made it the default
+                because it actually works
+        - DominatingOrder is deprecated
+        - began work on a new dispatcher
+
+0.05  Sat Aug 6 18:50:00 2005
+        - added the unblessed types IO, FORMAT, and Regexp
+        - thanks rgs
+
+0.06  Sat Aug 6 21:05:00 2005
+        - fixed a bug where a subtype would not be considered a subset of its parent
+
+0.07-0.09  Some dates
+        - Added a new multi core called DumbCache, did some minor maintenance.
+
+0.10  Mon Sep 19 23:09:00 2005
+        - Rejigged the registration process to be much more pluggable.  Now you just
+          have to specify your own registry like $REGISTRY if you're doing anything
+          at all reasonable in your extension.
+
+0.11  Tue Sep 20 01:18:00 2005
+        - Fixed a major minor bug that surfaced itself in Symbol::Opaque where
+          if you imported a multimethod before (in control flow sense) you
+          defined it, the import wouldn't work.
+
+0.12  Set Feb 3 12:58:00 2007
+        - Added a fast DecisionTree core.  Fixed some documentation bugs.
+
+0.13  Sun Feb 4 00:12:00 2007
+        - A few documentation fixes.

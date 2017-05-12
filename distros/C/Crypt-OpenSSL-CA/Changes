@@ -1,0 +1,95 @@
+Revision history for Crypt-OpenSSL-CA
+
+0.24    22 May 2014
+      - Fix RT #83507, #95385 and #95437
+      - Fix compile-time and test-time warnings
+      - Fix spurious XS rebuilds on Mac OS X
+
+0.23    9 Dec 2011
+      - Fix a leaks_bytes_ok false positive on Perl 5.12.4 from Gentoo amd64
+        stable.
+
+0.22    8 Dec 2011
+      - Fix RT #73102: parse and remove whitespace from pkg-config stdout's
+        to accomodate Inline 0.49 changes.
+      - Minor code legibility and test coverage improvements
+
+0.21    31 Aug 2010
+      - Use configure_requires in Build.PL, thereby fixing RT #43281.
+      - Fix a test failure: on some systems, integers cast from pointers
+        can be negative.
+
+0.20    27 Aug 2010
+      - Yet another cpan-testers-bugfix-only release (YACTBOR). Work around a
+        breakage in Test::Group introduced by the new Test::Builder.
+
+0.19    14 Feb 2008
+      - YACTBOR for FreeBSD with ccache and another OpenSSL setup lacking basic
+        dignity
+
+0.18    12 Sep 2008
+      - YACTBOR; don't try to use `openssl req` to create a PKCS#10, as this is
+        known to fail on OpenSSL-installation-challenged cpan-testers systems.
+
+0.17    14 Feb 2008
+      - YACTBOR.  Fixes spurious test failures with FreeBSD 6.2's backward
+        OpenSSL.
+
+0.16    14 Feb 2008
+      - YACTBOR.  Can now detect OpenSSL version before attempting the
+        whole compile despite CPAN.pm's quirks.
+=======
+      - YACTBOR.  Fixes
+        spurious test failures with FreeBSD 6.2's backward OpenSSL.
+
+0.16    14 Feb 2008
+      - YACTBOR. Hopefully will now be able to detect OpenSSL version before
+        attempting the whole compile despite CPAN.pm's quirks.
+>>>>>>> Prepare version 0.20 in $VERSION and Changes file
+
+0.15    13 Feb 2008
+      - Added ->supported_digests(). Now the OpenSSL version is validated
+        at perl Build.PL time. Works with 0.9.7. More cpan-testers
+        bugfixes.
+
+0.14    08 Feb 2008
+      - Fixes bug in the build process that caused it to fail
+        on Perl 5.10; improved memory leak checking with
+        Devel::Mallinfo.  No actual code changes.
+
+0.12    06 Feb 2008
+      - Improved readability of code examples (in examples/) as per
+        the suggestions of Richard Hartmann
+      - Tested on Mac OS X 10.5 with Macports Perl
+
+0.11    05 Apr 2007
+      - Got rid of Memchmark; replaced with a homebrew leak checker
+        that also works on VMWare
+
+0.09    05 Apr 2007
+      - Tested on Gentoo
+      - Added ::X509->verify
+      - OpenSSL algorithms and error strings are now loaded by
+        the XS BOOT section, which improves testability
+
+0.08    19 Mar 2007
+      - Attempt to fix the bugs found by CPAN-Testers and
+        shamelessy raise my Kwalitee
+
+0.07    19 Mar 2007
+      - Minor tidy-up
+
+0.06    12 Mar 2007
+      - Minor bugfix release (0.05 was a tad too hasty)
+
+0.05    09 Mar 2007
+      - Added support for issuer + serial in authorityKeyIdentifier's
+      - Added various read accessors to certificates and CRLs
+
+0.04    23 Feb 2007
+      - Added CRLv2 support
+      - POD cleanup for public release
+
+0.03    08 Feb 2007
+      - First release; X509v3 support
+

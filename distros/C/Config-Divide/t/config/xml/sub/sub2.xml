@@ -1,0 +1,7 @@
+<config>
+    <main2_overwritten_by_sub2_scalar>o1</main2_overwritten_by_sub2_scalar>
+    <main2_overwritten_by_sub2_hash>
+        <o1>o2</o1>
+        <o3>o4</o3>
+    </main2_overwritten_by_sub2_hash>
+</config>

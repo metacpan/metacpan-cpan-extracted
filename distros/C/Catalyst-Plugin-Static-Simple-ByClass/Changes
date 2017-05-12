@@ -1,0 +1,16 @@
+Revision history for Catalyst-Plugin-Static-Simple-ByClass
+
+0.001   9 March 2009
+        First version, released on an unsuspecting world.
+
+0.002   10 March 2009
+        * add missing deps
+
+0.003   23 Feb 2010
+        * re-write as Moose::Role to work with latest Static::Simple
+
+0.004   28 Feb 2010
+        * trim stuff out of MyApp test files to remove false dependencies.
+
+0.005   31 Oct 2012
+        * use new config style and deprecate 'static' key

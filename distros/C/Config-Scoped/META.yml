@@ -1,0 +1,55 @@
+---
+abstract: 'feature rich configuration file parser'
+author:
+  - 'Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>'
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Scoped
+provides:
+  Config::Scoped:
+    file: lib/Config/Scoped.pm
+    version: 0.22
+  Config::Scoped::Error:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::IO:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Parse:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Validate:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Validate::Declaration:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Validate::Macro:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Validate::Parameter:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+  Config::Scoped::Error::Validate::Permissions:
+    file: lib/Config/Scoped/Error.pm
+    version: 0.22
+requires:
+  Carp: 0
+  Digest::MD5: 0
+  Error: 0
+  File::Basename: 0
+  File::Spec: 0
+  Parse::RecDescent: 1.94
+  Safe: 0
+  Storable: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.22

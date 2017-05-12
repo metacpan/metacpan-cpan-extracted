@@ -1,0 +1,77 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Getopt::Long;
+use Crypt::CBC;    # CBC automatically loads Khazad for us
+
+my ($encrypt, $decrypt, $help);
+GetOptions("encrypt" => \$encrypt, "decrypt" => \$decrypt,
+    "help" => \$help);
+
+sub usage
+{
+    print "USAGE:\n";
+    print "    $0 --encrypt file1 > outputfile\n";
+    print "    $0 --decrypt file1 > outputfile\n\n";
+    print "ENCRYPTION EXAMPLE:\n";
+    print "    $0 --encrypt cbc-mode > cbc-mode.enc\n\n";
+    print "Encrypted file is \"cbc-mode.enc\"\n\n";
+    print "DECRYPTION EXAMPLE:\n";
+    print "    $0 --decrypt cbc-mode.enc > cbc-mode2\n\n";
+    print "Decrypted file is \"cbc-mode2\"\n\n";
+    exit 0;
+}
+
+sub get_input
+{
+    my ($message) = @_;
+    local $| = 1;
+    local *TTY;
+    open TTY,"/dev/tty";
+    my ($tkey1, $tkey2);
+    system "stty -echo </dev/tty";
+    do {
+        print STDERR "Enter $message: "; chomp($tkey1 = <TTY>);
+        print STDERR "\nRe-type $message: "; chomp($tkey2 = <TTY>);
+        print STDERR "\n";
+        print STDERR "\nThe two $message", "s don't match. ",
+            "Please try again.\n\n" unless $tkey1 eq $tkey2;
+    } until $tkey1 eq $tkey2;
+
+    system "stty echo </dev/tty";
+    close TTY;
+    return $tkey1;
+}
+
+&usage() if (!$encrypt and !$decrypt);
+&usage() if ($help);
+
+my $key = &get_input("password");
+
+# For better security, IV must be randomly
+# generated AND must be used ONLY ONCE!
+# So, this example is *very* weak!
+my $IV = pack "H16", "0102030405060708";
+
+my $cipher = Crypt::CBC->new({'key' => $key,
+                              'cipher' => 'Khazad',
+                              'iv' => $IV,
+                              'regenerate_key' => 1,
+                              'padding' => 'standard',
+                              'prepend_iv' => 0
+                            });
+
+local $/ = undef;   # slurp whole file
+chomp $ARGV[0];
+open INFILE, $ARGV[0];
+$_ = <INFILE>;
+close INFILE;
+
+my $output;
+
+$output = $cipher->encrypt($_) if ($encrypt);
+$output = $cipher->decrypt($_) if ($decrypt);
+print $output;    # output to screen
+

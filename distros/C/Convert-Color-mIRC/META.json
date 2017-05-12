@@ -1,0 +1,42 @@
+{
+   "abstract" : "indexed colors used by mIRC",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-Color-mIRC",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Convert::Color::RGB" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::Color::RGB8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Convert::Color::mIRC" : {
+         "file" : "lib/Convert/Color/mIRC.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

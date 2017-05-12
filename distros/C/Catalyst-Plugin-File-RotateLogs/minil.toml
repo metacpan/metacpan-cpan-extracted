@@ -1,0 +1,4 @@
+name = "Catalyst-Plugin-File-RotateLogs"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

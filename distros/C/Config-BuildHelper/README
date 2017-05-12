@@ -1,0 +1,92 @@
+Config-BuildHelper version 0.01
+===============================
+
+This module provides a tool to help you generate configuration files for a 
+large number of hosts where the hosts share common configuration elements but
+edge cases are still handled gracefully. 
+
+EXAMPLE
+
+use strict;
+use warnings;
+
+use Config::BuildHelper;
+
+my $yaml = <<EOY;
+---
+name: Root
+data:
+      config: [[SET, CHECK_BRAKES, CHECK_SPARK_PLUGS]]
+children:
+    - name: Car
+      match: 
+            model: "^(\\d{3}[a-z]?|[A-Z]\\d)\$"
+      data:
+            config: [[ADD, ROTATE_TIRES]]
+      children:
+          - name: Diesel
+            match:
+                  model: "d\$"
+            data: 
+                  config: [[REMOVE, CHECK_SPARK_PLUGS], [ADD, CHECK_GLOW_PLUGS]]
+    - name: Motorcycle
+      match:
+            model: "^[A-Z]\\d{3,4}[^\\d]"
+      data: 
+            config: [[ADD, CHECK_REAR_TIRE_ALIGNMENT]]
+EOY
+
+my @customer_vehicles = (
+	{ customer_id => 1, model => '325i' },
+	{ customer_id => 2, model => '535d' },
+	{ customer_id => 3, model => 'M3' },
+	{ customer_id => 4, model => 'R1200RT' },
+);
+
+my $helper = Config::BuildHelper->new(yaml => $yaml);
+
+for (@customer_vehicles) {
+	my $result = $helper->process($_);
+
+	print "$_->{customer_id}: ";
+	
+	if (! defined($result->class)) {
+		print "could not classify data\n";
+		next;
+	}
+
+	print "$_->{model} ", join(' ', $result->config_list), "\n";
+}
+
+__END__
+
+Which will output:
+
+1: 325i CHECK_SPARK_PLUGS ROTATE_TIRES CHECK_BRAKES
+2: 535d ROTATE_TIRES CHECK_BRAKES CHECK_GLOW_PLUGS
+3: M3 CHECK_SPARK_PLUGS ROTATE_TIRES CHECK_BRAKES
+4: R1200RT CHECK_SPARK_PLUGS CHECK_BRAKES CHECK_REAR_TIRE_ALIGNMENT
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::Classifier
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Tyler Riddle <triddle@gmail.com>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,28 @@
+---
+name: Catalyst-Plugin-Authentication-Store-HTTP
+version: 0.05
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+  - 'Nigel Metheringham <nigelm@cpan.org>'
+abstract: Remote HTTP authentication storage
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.30
+  Catalyst::Plugin::Authentication: 0.05
+  LWP::UserAgent: 0
+provides:
+  Catalyst::Plugin::Authentication::Store::HTTP:
+    file: lib/Catalyst/Plugin/Authentication/Store/HTTP.pm
+    version: 0.05
+  Catalyst::Plugin::Authentication::Store::HTTP::Backend:
+    file: lib/Catalyst/Plugin/Authentication/Store/HTTP/Backend.pm
+  Catalyst::Plugin::Authentication::Store::HTTP::User:
+    file: lib/Catalyst/Plugin/Authentication/Store/HTTP/User.pm
+  Catalyst::Plugin::Authentication::Store::HTTP::UserAgent:
+    file: lib/Catalyst/Plugin/Authentication/Store/HTTP/UserAgent.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

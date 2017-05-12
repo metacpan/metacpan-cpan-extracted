@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+    <xml>
+        <not>empty</not>
+        <empty></empty>
+    </xml>
+</config>

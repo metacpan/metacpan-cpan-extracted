@@ -1,0 +1,31 @@
+---
+abstract: 'Code::TidyAll plugin for pg_format'
+author:
+  - 'Andy Jack <andyjack@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-PgFormatter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Code::TidyAll: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter/issues
+  homepage: https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter
+  repository: https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter.git
+version: '0.01'

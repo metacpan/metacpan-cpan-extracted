@@ -1,0 +1,16 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+Makefile.PL
+
+lib/Class/AccessorMaker.pm
+lib/Class/AccessorMaker/Private.pm
+
+t/01_load.t
+t/02_new.t
+t/03_init.t
+t/04_chains.t
+t/TestIt.pm
+t/TestPriv.pm

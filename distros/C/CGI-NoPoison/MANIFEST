@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/CGI/NoPoison.pm
+t/000_signature.t
+t/001_load.t
+Makefile.PL
+SIGNATURE
+META.yml                                 Module meta-data (added by MakeMaker)

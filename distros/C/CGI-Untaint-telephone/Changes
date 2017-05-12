@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI::Untaint::telephone.
+0.03  Wed Aug 30 14:12:00 BST 2006
+    * Update to allow spaces in telephone numbers (which are stripped out,
+      like dashes and dots).
+    * Update Makefile.PL to reflect dependancies correctly.
+    * Improve tests
+0.02  Sat Apr 29 12:51:04 BST 2006
+    Initial CPAN version.

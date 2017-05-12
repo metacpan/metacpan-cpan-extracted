@@ -1,0 +1,27 @@
+Changes
+config_files/datasource-config.properties
+config_files/log-config.properties
+debian/cohortexplorer_0.14-1_all.deb
+lib/CohortExplorer.pm
+lib/CohortExplorer/Application.pm
+lib/CohortExplorer/Application/Opal/Datasource.pm
+lib/CohortExplorer/Application/REDCap/Datasource.pm
+lib/CohortExplorer/Command/Describe.pm
+lib/CohortExplorer/Command/Find.pm
+lib/CohortExplorer/Command/Help.pm
+lib/CohortExplorer/Command/History.pm
+lib/CohortExplorer/Command/Menu.pm
+lib/CohortExplorer/Command/Query.pm
+lib/CohortExplorer/Command/Query/Compare.pm
+lib/CohortExplorer/Command/Query/Search.pm
+lib/CohortExplorer/Datasource.pm
+LICENSE
+Makefile.PL
+MANIFEST            This list of files
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

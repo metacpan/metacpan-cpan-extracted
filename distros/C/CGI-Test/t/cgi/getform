@@ -1,0 +1,105 @@
+#!/bin/sh
+
+$PERL -x 3<&0 <<'END_OF_SCRIPT'
+#!perl
+
+use CGI qw/:standard :no_xhtml/;
+
+# 2 argument open here for older Perls
+open STDIN, '<&3' or die "Can't reopen STDIN";
+
+local $CGI::LIST_CONTEXT_WARN = 0;
+
+my $content = '';
+
+my $method = param("method") || request_method();
+my $action = param("action") || url();
+
+$content .= start_html("$method form");
+$content .= h1("$method form");
+$content .= start_form(
+	-action  => $action,
+	-method  => $method eq "POST" ? "POST" : "GET",
+	-enctype => param("enctype") eq "M" ?
+			"multipart/form-data" : "application/x-www-form-urlencoded",
+);
+
+my $counter = param("counter") + 1;
+param("counter", $counter);
+
+$content .= hidden("counter");
+$content .= hidden("enctype");
+
+$content .= "Title: " . radio_group(
+	-name		=> "title",
+	-values		=> [qw(Mr Ms Miss)],
+	-default	=> 'Mr'
+) . br;
+
+$content .= "Name: " . textfield("name") . br;
+
+$content .= "Skills: " . checkbox_group(
+	-name		=> "skills",
+	-values		=> [qw(cooking drawing teaching listening)],
+	-defaults	=> ['listening'],
+) . br;
+
+$content .= "New here: " . checkbox(
+	-name		=> "new",
+	-checked	=> 1,
+	-value		=> "ON",
+	-label		=> "click me",
+) . br;
+
+$content .= "Color: " . popup_menu(
+	-name		=> "color",
+	-values		=> [qw(white black green red blue)],
+	-default	=> "white",
+) . br;
+
+$content .= "Note: " . textarea("note") . br;
+
+$content .= "Prefers: " . scrolling_list(
+	-name		=> "months",
+	-values		=> [qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)],
+	-size		=> 5,
+	-multiple	=> 1,
+	-default	=> [qw(Jul)],
+) . br;
+
+$content .= "Password: " . password_field(
+	-name		=> "passwd",
+	-size		=> 10,
+	-maxlength	=> 15,
+) . br;
+
+$content .= "Portrait: " . filefield(
+	-name		=> "portrait",
+	-size		=> 30,
+	-maxlength	=> 80,
+) . br;
+
+$content .= p(
+	reset(),
+	defaults("default"),
+	submit("Send"),
+	image_button(
+		-name	=> "img_send",
+		-alt	=> "GO!",
+		-src	=> "go.png",
+		-width	=> 50,
+		-height	=> 30,
+		-border	=> 0,
+	),
+);
+
+$content .= end_form;
+$content .= end_html;
+
+print header(
+    -Content_Length => length $content,
+);
+
+print $content;
+
+END_OF_SCRIPT

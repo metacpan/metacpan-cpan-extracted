@@ -1,0 +1,150 @@
+Revision history for Common-CLI
+
+changeset:   17:e4e725e3be92
+tag:         tip
+user:        igorsutton@igor-suttons-computer.local
+date:        Sat Feb 16 22:55:23 2008 +0100
+files:       Makefile.PL lib/Common/CLI.pm
+description:
+missing new line in end of file; fixed dependencies on Makefile.PL
+
+
+changeset:   16:ce316c1add61
+user:        igorsutton@igor-suttons-computer.local
+date:        Sat Feb 16 22:52:40 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+arguments() documentation
+
+
+changeset:   15:a2bf222f89c1
+user:        igorsutton@igor-suttons-computer.local
+date:        Sat Feb 16 22:44:44 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+fixed typo, fixed routine name
+
+
+changeset:   14:010d327b8f24
+user:        igorsutton@igor-suttons-computer.local
+date:        Sat Feb 16 22:41:23 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+checking if $args{profile} exists, instead of %args hash
+
+
+changeset:   13:7adbf7e45f45
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:47:18 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+__display_usage(), __display_missing() and __display_invalid() documentation
+
+
+changeset:   12:42d245b901c4
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:42:57 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+__parse_command_line_options() documentation
+
+
+changeset:   11:b92c8dac0031
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:36:01 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+more documentation
+
+
+changeset:   10:025d55cef95d
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:32:01 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+more documentation
+
+
+changeset:   9:05409bdf96c4
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:20:05 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+more documentation
+
+
+changeset:   8:d9d7bcbabc45
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 17:15:26 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+more documentation
+
+
+changeset:   7:af21795c7a06
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 16:28:46 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+more documentation
+
+
+changeset:   6:3d1157014f9e
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 16:06:17 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+english typo
+
+
+changeset:   5:a9353a76424f
+user:        igorsutton@ams2-dhcp-82-160.ams2.corp.booking.com
+date:        Thu Feb 14 16:01:32 2008 +0100
+files:       lib/Common/CLI.pm
+description:
+improved documentation, not finished yet.
+
+
+changeset:   4:dc033e27f2ac
+user:        igorsutton@igor-suttons-computer.local
+date:        Wed Feb 13 23:41:44 2008 +0100
+files:       MANIFEST MANIFEST.SKIP lib/Common/CLI.pm t/01-basic.t
+description:
+added files to MANIFEST
+created MANIFEST.SKIP
+added arguments() subroutine, for better application encapsulation
+added tests for arguments() subroutine
+
+
+changeset:   3:e7cdf537f554
+user:        igorsutton@igor-suttons-computer.local
+date:        Wed Feb 13 23:40:38 2008 +0100
+files:       .hgignore
+description:
+some more exclusions
+
+
+changeset:   2:c9321029e637
+user:        igorsutton@igor-suttons-computer.local
+date:        Wed Feb 13 22:58:54 2008 +0100
+files:       TODO
+description:
+initial release
+
+
+changeset:   1:96bce036b704
+user:        igorsutton@igor-suttons-computer.local
+date:        Wed Feb 13 22:56:07 2008 +0100
+files:       Changes MANIFEST Makefile.PL README lib/Common/CLI.pm t/00-load.t t/01-basic.t t/boilerplate.t t/pod-coverage.t t/pod.t
+description:
+initial release
+
+
+changeset:   0:70c8c0f89952
+user:        igorsutton@igor-suttons-computer.local
+date:        Wed Feb 13 22:55:02 2008 +0100
+files:       .hgignore
+description:
+initial release
+
+

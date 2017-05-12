@@ -1,0 +1,11 @@
+WARNING: Version 2.03 contains a change to the way that the "hostname" is
+determined. In previous versions, hostname was extracted by means of the
+hard coded call '/bin/hostname --long'. This is not implemented on all
+platforms and thus does not work for some installations of Crypt::License.
+
+This call has been replaced with a call to Sys::Hostname::hostname which is
+a part of the standard Perl distribution and is implemented on all known
+platforms. HOWEVER, the returned string is usually the SHORT version of
+the hostname. This may break some existing License certificates and require 
+re-authorization / replacement of the keys when upgrading from versions 2.02
+and earlier.

@@ -1,0 +1,74 @@
+Class::Exporter version 0.03
+=============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DESCRIPTION
+
+  This module makes it much easier to set up a hybrid interface ala
+  CGI.pm. You can take any old module that has an object-oriented
+  interface and convert it to have a hybrid interface by simply adding
+  "use base 'Class::Exporter'" to your code.
+
+  This package allows you to export object methods as regular
+  subroutines. It supports C<import()>, C<@EXPORT> and C<@EXPORT_OK>
+  and not a whole lot else. Each package into which your object
+  methods are imported gets its own instance of the object. This
+  ensures that there are no interaction effects between multiple
+  packages that use your object.
+
+USAGE
+
+  package MagicNumber;
+  use base 'Class::Exporter';
+
+  # Export object-oriented methods!
+  @EXPORT_OK       = qw(magic_number);
+
+  sub new {
+    my $class = shift;
+    bless { magic_number=>3, @_ }, $class
+  }
+    
+  sub magic_number {
+    my $self = shift;
+    @_ and $self->{magic_number} = shift;
+    $self->{magic_number}
+  }
+
+  # Meanwhile, in another piece of code!
+  package Bar;
+  use MagicNumber;  # exports magic_number
+  print magic_number; # prints 3
+  magic_number(7);
+  print magic_number; # prints 7
+  
+  # Each package gets its own instance of the object. This ensures that
+  # two packages both using your module via import semantics don't mess
+  # with each other.
+  
+  package Baz;
+  use MagicNumber; # exports magic_number
+  print magic_number; # prints 3!
+  
+VERSIONS
+  0.03 -- Renamed from Object::Exporter to Class::Exporter
+  0.02 -- Updated documentation, added README file.
+  0.01 -- Initial Release
+  
+AUTHOR
+  David James <david@jamesgang.com>
+
+COPYRIGHT
+   Copyright 2003, David James.  All Rights Reserved.
+   This program is free software.
+   You may copy or redistribute it under the same terms as Perl itself.
+

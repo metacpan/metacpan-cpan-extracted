@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.50.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7fd1daf575e9d6b375fe6c60c8f1fdf509eb812f .releaserc
+SHA1 f0fa41ec44d88996c3c75687213127c3690e563e Changes
+SHA1 664f521ff2c4de84b4bfa8662a267ec935d2466f MANIFEST
+SHA1 2e9800a3262df7fad528db551599296cb244a86e META.yml
+SHA1 2911997f2d49c8b2ac735e8aa1b4308747615fc1 Makefile.PL
+SHA1 112dbd490187957df3d07ae10807c6edfdcd005f README
+SHA1 8c49ec16e5927c577b835a8ecf8836b3a872c936 lib/Class/Agreement.pm
+SHA1 fba73d30aa3fbe2204e6aa9d54c04b4d608b09c6 t/0-signature.t
+SHA1 66d41734e4a2e2f678d364b6c3b33a3d8c5b7390 t/00-load.t
+SHA1 ad4bab42b9d007be04b57ef0c4f90373275eacde t/context.t
+SHA1 26cc5783757d24d776fc27ba7a225b811948ee2e t/data-validate.t
+SHA1 fd9f0ad1edb08dcb2d706f4b9c8ba7704f3f083c t/dependent-function.t
+SHA1 1643174595069cba99de6ea561f65de12d74b9c2 t/dependent-method.t
+SHA1 5a0ab8e8cb68f5f0999166d15c8f352497403c2f t/explicitpackage.t
+SHA1 5d5c82c7989931773d71d028fb0256b08e3a35ae t/firstorder-blame.t
+SHA1 c419fe3a3d754307692ed7c7569a413c3fdd877d t/generate-assertions.t
+SHA1 a908bf936fe666c89e326c6f75dbd8553368d3e6 t/generated-methods.t
+SHA1 06308511a7dd3979435761f8b2de35cc0e9870e2 t/invariant.t
+SHA1 e67649170b448c17b03a2c3522a2a471a01030ed t/overrides.t
+SHA1 5e709075696355ba0ef16c51edb32a90c5b8adc4 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 3f62a253ca6a02a41ee62728d9bc41981c1bfbe2 t/postcondition-function.t
+SHA1 a8adaeebc1c7435b9c72ef65392d778933e6500f t/postcondition-method.t
+SHA1 ba35c628d2cd6f2dc47c4661ea38808637d94df1 t/precondition-function.t
+SHA1 2bbc7bc4baa9039b07ea652b7080b7e2dd43d1ab t/precondition-method.t
+SHA1 62688d27d93b884a0cedde222370ecb6e9dfb2bc t/propagate-to-subclasses.t
+SHA1 a08e0f1509d24c1311062961609a96b12eefe3bb t/result-badusage.t
+SHA1 380b671396aa904bc2146d5e54304622df666b56 t/specify-constructors.t
+SHA1 74cfc37300fb2ea545eadf7b537f222a29127d7d t/use-twice.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDnk4EL3e/8OaAfH4RAqTIAJ9XCT6FY+Lhnh3i2CoreLlET9aKlACeJ9eh
+N2qJBU9XlaH5NHFFoeDkF2g=
+=T8ge
+-----END PGP SIGNATURE-----

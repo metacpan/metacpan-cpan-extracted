@@ -1,0 +1,29 @@
+Revision history for Catalyst-View-Template-Declare
+
+0.04
+        - Pass arguments to template functions. Patch from David
+          Wheeler.
+
+0.03    14 September 2007
+        - use a smarter way of finding the Catalyst context
+        - strip off leading newlines (so that XML is valid)
+
+0.02    18 August 2007
+        - Convert to Catalyst::View::Templated API, deprecate
+          templates in subclass
+
+0.01    9 July 2007
+        - Require T::D::Tags again (Catalyst pre-loading issue)
+        - Helper generates valid code now
+
+0.00_03 8 April 2007
+        - No longer require "use Template::Declare::Tags"
+        - Add a Catalyst Helper
+
+0.00_02 7 April 2007
+        - Remove duplicate output
+        - Allow templates in subfiles (MyApp::View::TD::*)
+        - Auto-load those subfiles
+
+0.00_01 7 April 2007
+        First version, released on an unsuspecting world.

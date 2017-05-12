@@ -1,0 +1,73 @@
+- Broke query logging (it no longer logs queries).
+- Broke querying of feeds.
+- post-processors have been removed.
+
+- Database inserts are NOT optimal, at the moment. Commits are being
+  performed between each insert.
+
+Dependencies:
+  - AFAICT, the libs are down to:
+    - libc
+    - libpq (DBD::Pg)
+    - libssl (Net::SSLeay)
+    - libcrypto (Net::SSLeay)
+    - libxml2 (LibXML, XML::RSS::LibXML)
+
+Installation instructions for UBUNTU 12.04:
+
+- Install dep libraries.
+sudo apt-get install libssl-dev libxml2-dev libpq-dev
+
+sudo apt-get install perl rabbitmq-server postgresql
+
+- Install carton
+sudo cpan Carton
+
+- Clone the repo and switch to v1_fork
+git clone  git@github.com:justfalter/cif-v1.git
+cd cif-v1
+git checkout v1_fork
+
+# IMPORTANT: ANY TIME YOU EXECUTE PERL, PREFIX WITH "carton exec -- " 
+
+- Have carton install all of the dependencies.
+carton install
+
+- Configure the database
+cd libcif-dbi
+carton exec -- perl Makefile.PL
+make dropdb
+make initdb
+cd ..
+
+- Create your cikl.conf:
+cp cikl.conf.example cikl.conf
+
+- Create the API keys:
+carton exec -- libcif-dbi/bin/cif_apikeys -C cikl.conf --add -u mike
+carton exec -- libcif-dbi/bin/cif_apikeys -C cikl.conf --add -u cif-smrt -w
+
+- Add the keys to your cikl.conf...
+
+- Open up a new terminal window, and start up the QUERY server
+cd /path/to/cif-v1
+carton exec -- perl  cif-router/bin/processor.pl -C cikl.conf query
+
+- Open up a new terminal window, and start up the SUBMISSION server
+cd /path/to/cif-v1
+carton exec -- perl  cif-router/bin/processor.pl -C cikl.conf submit
+
+- Switch back to the first terminal window. 
+
+- Import some data:
+carton exec -- perl cif-smrt/bin/cif_smrt -C cikl.conf  -r cif-smrt/rules/etc/00_alexa_whitelist.cfg -f top10 -v2
+
+- Now query the data:
+carton exec -- libcif/bin/cif -C cikl.conf -n -q google.com,yahoo.com
+
+- You should see something like:
+restriction |guid    |assessment|description  |confidence|detecttime          |reporttime          |address   |alternativeid_restriction|alternativeid                          |
+need-to-know|everyone|whitelist |alexa #<rank>|95        |2013-10-31T17:09:36Z|2013-10-31T17:09:36Z|google.com|public                   |http://www.alexa.com/siteinfo/<address>|
+need-to-know|everyone|whitelist |alexa #<rank>|95        |2013-10-31T17:09:36Z|2013-10-31T17:09:36Z|yahoo.com |public                   |http://www.alexa.com/siteinfo/<address>|
+
+

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Use Memcached for cache storage",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CHI-Driver-Memcached",
+   "no_index" : {
+      "directory" : [
+         "lib/CHI/Driver/Memcached/t",
+         "lib/CHI/Driver/Memcached/Test"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.33",
+            "Moose" : "0.66"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-chi-driver-memcached@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Driver-Memcached"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-chi-driver-memcached.git",
+         "web" : "https://github.com/jonswar/perl-chi-driver-memcached"
+      }
+   },
+   "version" : "0.16"
+}
+

@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+# PODNAME: cpantesters-api
+our $VERSION = '0.006';
+
+#pod =head1 NAME
+#pod
+#pod cpantesters-api -- Start the CPAN Testers API web application
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod   cpantesters-api daemon
+#pod   cpantesters-api help
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This program loads the CPAN Testers API web application,
+#pod a L<Mojolicious> web application. For more detailed help, see
+#pod C<cpantesters-api help>.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<CPAN::Testers::API>, L<Mojolicious>
+#pod
+#pod =cut
+
+use strict;
+use warnings;
+use File::Spec::Functions qw( catdir updir );
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app( 'CPAN::Testers::API' );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cpantesters-api
+
+=head1 VERSION
+
+version 0.006
+
+=head1 SYNOPSIS
+
+  cpantesters-api daemon
+  cpantesters-api help
+
+=head1 DESCRIPTION
+
+This program loads the CPAN Testers API web application,
+a L<Mojolicious> web application. For more detailed help, see
+C<cpantesters-api help>.
+
+=head1 NAME
+
+cpantesters-api -- Start the CPAN Testers API web application
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::API>, L<Mojolicious>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

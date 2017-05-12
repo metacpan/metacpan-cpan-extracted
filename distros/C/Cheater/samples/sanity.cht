@@ -1,0 +1,22 @@
+#!/usr/bin/env cheater
+
+table users (
+    id serial;
+    #user_id strid unique;
+    nick text not null;
+)
+
+table posts (
+    title text;
+    rank integer;
+    blah integer {1,3,5,7};
+    blah2 integer {1,3,5,7} not null;
+    author references users.id;
+)
+
+#users.nick ~ null (0.3)
+#users.nick ~ null (0.3)
+
+20 users;
+10 posts;
+

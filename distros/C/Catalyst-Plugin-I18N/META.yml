@@ -1,0 +1,32 @@
+---
+abstract: 'I18N for Catalyst'
+author:
+  - 'Sebastian Riedel <sri@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-I18N
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 0
+  I18N::LangTags: 0.35
+  Locale::Maketext::Lexicon: 0
+  Locale::Maketext::Simple: 0.19
+  MRO::Compat: 0.10
+  Test::More: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-I18N/trunk/
+version: 0.10

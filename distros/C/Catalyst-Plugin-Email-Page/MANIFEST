@@ -1,0 +1,29 @@
+Build.PL
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Build.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Plugin/Email/Page.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/01.distribution.t
+t/02._construct_url.t
+t/03.email_page_url.t
+t/04.load_catalyst.t
+t/05.load_catalyst_request.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

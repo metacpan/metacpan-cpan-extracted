@@ -1,0 +1,39 @@
+---
+abstract: 'Colors determined by the XKCD Color Survey.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::File::ShareDir::Dist: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Color-Library-Dictionary-XKCD
+provides:
+  Color::Library::Dictionary::XKCD:
+    file: lib/Color/Library/Dictionary/XKCD.pm
+    version: '1.000001'
+recommends:
+  Moo: '1.000008'
+requires:
+  Color::Library: '0.021'
+  Color::Library::Dictionary: '0'
+  File::ShareDir: '0'
+  Moo: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Color-Library-Dictionary-XKCD/issues
+  homepage: https://github.com/kentnl/Color-Library-Dictionary-XKCD
+  repository: https://github.com/kentnl/Color-Library-Dictionary-XKCD.git
+version: '1.000001'

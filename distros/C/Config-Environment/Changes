@@ -1,0 +1,180 @@
+==================================================
+Changes from 2012-12-27 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 0.000010 at 2013-12-27 06:28:37 +0000
+---------------------------------------------
+
+  Change: d6e8df255468c5933062a3d21fb56d753bfea398
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-12-27 01:27:31 +0000
+
+    modified the environment method to include/merge stash data 
+
+---------------------------------------------
+version 0.000009 at 2013-12-27 05:41:01 +0000
+---------------------------------------------
+
+  Change: e14ac4228d30365a78f78c1bd74ad18561a9f467
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-12-27 00:41:01 +0000
+
+    v0.000009 
+
+  Change: 36ae0d4f4da6fc5dcec0045957b658a315d01b7a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-12-27 00:39:15 +0000
+
+    added a stash feature with access via the param method 
+
+  Change: 64e1cce1e5b249a221eeff589f6b5615d349cce2
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-12-26 23:02:32 +0000
+
+    replaced Hash::Merge with Hash::Merge::Simple 
+
+  Change: bf65af1efc1ece8a8dbee10361a8714cdb0022ba
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-24 06:19:27 +0000
+
+    return void from hashref-loading 
+
+---------------------------------------------
+version 0.000008 at 2013-10-24 09:30:27 +0000
+---------------------------------------------
+
+  Change: 699dd4833d2a3a96e4e3a143977f244dbc310b1e
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-24 05:30:27 +0000
+
+    v0.000008 
+
+  Change: c0dc30b70803c616d30ee91979ae5306af5a3837
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-24 05:30:14 +0000
+
+    load hash-references using the params method 
+
+---------------------------------------------
+version 0.000007 at 2013-10-19 02:00:22 +0000
+---------------------------------------------
+
+  Change: 30d62591af0a7664e7adc8c214f497ff1712bdbb
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-18 22:00:22 +0000
+
+    v0.000007 
+
+  Change: 9c32164aaacfc2faf4e3303bb4673bb0e6614351
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-18 21:59:31 +0000
+
+    instantiate with a subdomain 
+
+---------------------------------------------
+version 0.000006 at 2013-10-06 05:13:14 +0000
+---------------------------------------------
+
+  Change: af2985d53c0f2b453dfd405aac495cd64e8ed8ef
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-06 01:13:14 +0000
+
+    v0.000006 
+
+  Change: 9a2e4e717003d843b3e680522d376dddd870c830
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-06 01:13:00 +0000
+
+    update to cleanup internal data structures 
+
+---------------------------------------------
+version 0.000005 at 2013-10-06 04:11:55 +0000
+---------------------------------------------
+
+  Change: ee360cd400243974c43788c18f10d5cc83cc9d25
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-06 00:11:55 +0000
+
+    v0.000005 
+
+  Change: bf8431b14cf12ddf6a23d68d45fa3d86a3f3f8f3
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-10-06 00:11:29 +0000
+
+    added better handling of parameter assignment and updated the
+    documentation 
+
+---------------------------------------------
+version 0.000004 at 2013-09-10 05:59:48 +0000
+---------------------------------------------
+
+  Change: fb9313e2f53bf682805318a14611e81eeef03cf5
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-10 01:59:48 +0000
+
+    v0.000004 
+
+  Change: dcf5f16cab907db2932009352291898e3bbf4448
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-10 01:59:33 +0000
+
+    added the lifecycle and mirror attributes 
+
+---------------------------------------------
+version 0.000003 at 2013-09-08 16:39:57 +0000
+---------------------------------------------
+
+  Change: d72cf64644af690cdf8ac8e9f85538e069f46b41
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-08 12:39:57 +0000
+
+    v0.000003 
+
+  Change: 4164a3cabff7fddb19a7a07d828a84fdeac0d181
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-08 12:39:27 +0000
+
+    added the subdomain method and the autoload and override attributes 
+
+---------------------------------------------
+version 0.000002 at 2013-09-06 10:18:44 +0000
+---------------------------------------------
+
+  Change: 13a5e88d9cf8094c306e09c9cca6fed80e5b39ff
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-06 06:18:44 +0000
+
+    v0.000002 
+
+  Change: 77a03842165f51d2c923da52da8b9d4fc4cf4ead
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-06 06:18:29 +0000
+
+    documentation update and full test coverage 
+
+  Change: 9bb869f6ebc763cce7c6f1552b932321e4b08493
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-06 04:35:41 +0000
+
+    updated documentation 
+
+---------------------------------------------
+version 0.000001 at 2013-09-06 08:04:50 +0000
+---------------------------------------------
+
+  Change: e4456ff1c4a88451809b5dfadbf6a3aac1731613
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-06 04:04:50 +0000
+
+    v0.000001 
+
+  Change: 8952e857193ee3ecd54b7c36699336143276d03a
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2013-09-06 04:04:30 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

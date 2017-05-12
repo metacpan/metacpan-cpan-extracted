@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1a5c0f8aef93f0e8119d686f54acfcdfd81c64ff Changes
+SHA1 88dacb7b53e8fb6249fb824c901b42c9422c5131 MANIFEST
+SHA1 00492e752194f558365590f278e5649170315820 META.yml
+SHA1 c7df333509b7180804e9f0656b40a50f397a57c9 Makefile.PL
+SHA1 451e4be446e3ab398a5037183846f9d241490cb1 lib/Class/Fields.pm
+SHA1 99ea82aec43c6f587ea822daeda14576dbbac9e1 lib/Class/Fields/Attribs.pm
+SHA1 51cc7b21d8a95e708384e82b42f37869963493c1 lib/Class/Fields/Fuxor.pm
+SHA1 01b2f72fed16139a4c0d1a481b3cd3eae286d828 lib/Class/Fields/Inherit.pm
+SHA1 670cf47ee4b737d04ecc2114977e64de9ce9094c lib/private.pm
+SHA1 9b0e7601cdf543edbfc48e58c0464fbb0cca130b lib/protected.pm
+SHA1 ebb8fca5a23c966635fc9ac872ebbfd5968fafab lib/public.pm
+SHA1 82b8d66b4a3634ee7f75c08f8de94b2034b25f53 t/Attribs.t
+SHA1 fdba6bf6b99739c5fb79ac056250ad685bea108f t/Class-Fields.t
+SHA1 095b18d78bb86aea53d73dd297b2c4803521cddc t/Fuxor.t
+SHA1 860e5773f34decf746eb75f37838edb66e537e56 t/Inherit.t
+SHA1 5b3ce9d86d50628a3d6858ac26cd60db667fcbeb t/bugs.t
+SHA1 6f7c4c5c51e9748adbe0fcf22b3e21015fbc7163 t/examples.t
+SHA1 5fa5bbff1b8e252b198e093210b4463981e56842 t/members.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (Darwin)
+
+iEYEARECAAYFAk1MxZgACgkQWMohlhD1QyfoggCfeyB1/xN7X/q/3xZsMxB/Cl1S
+fqEAnAwNWv07PRnSLUf1tYR7rve6wP9i
+=XNTz
+-----END PGP SIGNATURE-----

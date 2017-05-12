@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Class/CGI/Email/Valid.pm
+t/00-load.t
+t/10-email.t
+t/pod.t
+Makefile.PL

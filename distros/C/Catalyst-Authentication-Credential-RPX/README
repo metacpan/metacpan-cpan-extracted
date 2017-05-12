@@ -1,0 +1,99 @@
+NAME
+    Catalyst::Authentication::Credential::RPX - Use JanRain's RPX service
+    for Credentials
+
+VERSION
+    version 0.10060100
+
+SYNOPSIS
+        use Catalyst qw/ Authentication /;
+
+        package MyApp::Controller::Auth;
+
+        sub login : Local {
+            my ( $self , $c ) = @_;
+            $c->authenticate();
+        }
+
+CONFIGURATION
+        __PACKAGE__->config('Plugin::Authentication' => {
+          default_realm => 'RPX_Service',
+          realms        => {
+            RPX_Service => {
+              credential => {
+                class => 'RPX',
+
+                # Package Options
+                api_key => 'ASDF...',
+
+                # optional fields
+                base_url    => 'http://foo.bar.org',
+                ua          => 'Firefox',
+                token_field => 'token',
+              }
+            }
+          }
+        });
+
+ATTRIBUTES
+  api_key Str[ro]*
+    The API Key for connecting to the RPX server.
+
+  base_url Str[ro]
+    The URL The RPX server interconnects with.
+
+  ua Str[ro]
+    The User-Agent String.
+
+  token_field Str[ro] = 'token'
+    The token to look for in request parameters
+
+  last_auth_info HashRef[rw]X
+    The results of the last call to "->auth_info"
+
+AUTHENTICATION METHODS
+  authenticate
+  authenticate ( $context, $realm, $authinfo )
+        ->authenticate( $context, $realm, $authinfo )
+
+  authenticate_rpx
+  authenticate_rpx ( @args )
+        ->authenticate_rpx( @args )
+
+CONSTRUCTOR METHODS
+  new
+  new ( $config, $app, $realm );
+    This method is called by the Authentication API.
+
+        ->new( $config , $app , $realm );
+
+ATTRIBUTE METHODS
+  has_base_url <- predicate('base_url')
+  has_ua <- predicate('ua')
+  has_last_auth_info <- predicate('last_auth_info')
+  clear_last_auth_info <- clearer('last_auth_info')
+  auth_info <- _api_driver
+  map <- _api_driver
+  "unmap" <- _api_driver
+  mappings <- _api_driver
+PRIVATE ATTRIBUTES
+  _config HashRef[rw]*
+  _app Object|ClassName [rw]*
+  _realm Object[rw]*
+  _api_driver Object[ro]
+PRIVATE BUILDERS
+  _build__api_driver
+    Creates an instance of "Net::API::RPX" for us to communicate with.
+
+        ->_build__api_driver
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by 'Cloudtone Studios'.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

@@ -1,0 +1,96 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 5c5031c93cf1cdc90a98b17f638ffb6abbc16468 Changes
+SHA1 45ff92c6e9f46afa2664f8013dea8aaeead845ee INSTALL
+SHA1 5871fd7faef68c2fee84d2dfe288497f718b499c LICENSE
+SHA1 06d039b4d9a1bbc26084f6dfdbeafc261126c469 MANIFEST
+SHA1 487c6b5cc18bcf3a36cf1ff8d367a7a3e13ce98d META.yml
+SHA1 dad8a455c11e8da58cbb33e3689066575a05fe0d Makefile.PL
+SHA1 221d6877f055f1050c2011b6be32dcca7a340845 README
+SHA1 92b9403b2ee8dde898d724ca736a742d98c5249a bin/fm_admin
+SHA1 64e0287e6d2214a4982bf3b00a678d9dc7e87ccf bin/fm_check_config
+SHA1 14e8944f82a46b708f57156a0b43913ad1af954d bin/fm_check_struct
+SHA1 f4d5cca656de9b8ef078c372591531495532b2aa bin/fm_create_help
+SHA1 0bb895698e116232b2d4f9d450e763d2feae9610 bin/fm_diff_cdb
+SHA1 b040766362100741006d9890141f118835bfe554 bin/fm_diff_config
+SHA1 6e729d04a0f79eb342a54b08705953e6b1d4f8c2 bin/fm_option_info
+SHA1 746948ffaed8e263439725b7eefc92af120943e6 corpus/config-changed-doubles-new.pro
+SHA1 370ac717b1ce0db6b912e5672095c8ce432c538a corpus/config-changed-doubles-old.pro
+SHA1 e179a77f4ee0a42fa0547d93c22a25ea711c6ac1 corpus/config-checkConfig.cdb
+SHA1 602451b3c5fc4427a9e3f7d5dfe24644e04acf09 corpus/config-error-absolutepaths.pro
+SHA1 da1550b62cf8d9469f09026627ba104e55cde705 corpus/config-error-compare.pro
+SHA1 2c7e1e7d1d2bf5055072c012280e338c809f972b corpus/config-error-duplicates.pro
+SHA1 be526fa6cf60127504210a3ad207f838111900cc corpus/config-error-values-case.pro
+SHA1 05ec526e25487168273d472ef7ff8d44844b0297 corpus/config-error-values-emptyfs.pro
+SHA1 85705a82761d983e456e5b5743fb85b3e0b940cb corpus/config-malformed.cdb
+SHA1 4f889e9cf8c4c0f48c18518ba364daa601fe8c41 corpus/config-new.cdb
+SHA1 775557dc641b53ca5357f24b823d20957af61150 corpus/config-new.pro
+SHA1 481d5ca633adaeb943047d58e5cf305127722f5c corpus/config-ok.pro
+SHA1 8635c7b7fc82b2a4d9694322d5fd9c69b213bf95 corpus/config-old.cdb
+SHA1 783ca149d2b2d06415cb6f2f429ead6dcb0e9184 corpus/config-old.pro
+SHA1 b3b3c659593a540bebf9390518aa94d003761347 corpus/tree-malformed.cfg
+SHA1 7e07d7377d7d17857eae3f0266e55f350c26c99f corpus/tree-ok.cfg
+SHA1 466f35d07c1af8a71ce2a9527a7c3b8a4a2d3b64 dist.ini
+SHA1 1df5d0bcc7f759e44613efb14d4cfb26f734b74b ignore.txt
+SHA1 1cf8a8277a9ebc8317b05bbae0854f54782b9865 lib/CAD/Firemen.pm
+SHA1 36ddcab4840e19aafd6970e1c1b672203f92ad61 lib/CAD/Firemen/Analyze.pm
+SHA1 801641a63435aa1be44fbc430c028726165a4be5 lib/CAD/Firemen/Change.pm
+SHA1 f6a6a625e82e2bb5feade8e35cc4d46cc8fb063e lib/CAD/Firemen/Change/Type.pm
+SHA1 7d4cf3709c110f271d47d2e1fa3eda450313e75c lib/CAD/Firemen/Common.pm
+SHA1 969e17643a15f004bf5906cee3c4b7bd7a87325a lib/CAD/Firemen/Load.pm
+SHA1 8c45092824045c6329e19621aa4aa2742af1ddc6 lib/CAD/Firemen/Option/Check.pm
+SHA1 3dff4256987fae662856c01668e4aff3010550a0 lib/CAD/Firemen/ParseHelp/Creo3.pm
+SHA1 f2d4030fe52248d4e1dcc4ee64ef9b869c4327fb lib/CAD/Firemen/ParseHelp/Wildfire5.pm
+SHA1 67f3570f1776b0c0fa7145ca98c99125b6e40611 t/00-compile.t
+SHA1 642fb0da36045331665278d2100986f0891a9e7b t/00-load.t
+SHA1 db1dcd0756f3e909f16ff025d4db6538e0a93b91 t/01-Common.t
+SHA1 bec7e9fe4a387d61a4c308e4a19ce09c662fe414 t/02-Change.t
+SHA1 27369a1e785a4e63c73b6e4490ce64587d9f4d92 t/03-OptionCheck.t
+SHA1 ef07e8e90bff76b8d5ce7f2f604234a73f6e7efb t/04-LoadCDB.t
+SHA1 be756376078b4974f158e5153a2411519b75f81c t/05-LoadConfig.t
+SHA1 a9fa12954b7d1dd1b4b2f3742f2b924a8d84ba5c t/06-Analyze-CDB.t
+SHA1 22eb2926a3b2cf227b0dc81b174759d393568c0f t/07-Analyze-Config.t
+SHA1 4af05bba8e07c60f42be2b7b6b68b9b24f0921d9 t/08-Analyze-CheckConfig.t
+SHA1 607a28d81af7ceed53551ad5b0f7779a04949f98 t/09-Analyze-CheckTreeConfig.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 6abeb9902080f3ec6e0ae873f408e8a880b9b36d t/author-test-eol.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
+SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 be1ff04ade66c334e56a388626b85cd5d27ed9c9 t/release-kwalitee.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 54b7f39e355424cbc367105b84ff02a6cb29d93b t/release-mojibake.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 4f2933df3566db6f337817aa885889deb213960b t/release-pod-linkcheck.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 bf4fdda27bd4e8ec177c38cca43083317494cba8 t/release-portability.t
+SHA1 e647f89568819f60f56e2c7202e10b21acb77652 t/release-synopsis.t
+SHA1 b3350d3d17bb2fa4e23075ec8d786505cc565539 t/release-test-version.t
+SHA1 d7221447937ab93002a123801def7be09748c106 t/release-unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJV/AeIAAoJEHNCTFOF/FVD+W0H/0UFvK88aMjuX+rbcS3PQtw8
+PAhvMrICwL2HfjtSXhwITL7qWIcQh79B77Duc7Fcuwca88eduYBSNjuPxl465xFb
+alTUwoZBfmbSHshxt8GNAjC2STzGJOn1LDugoyp/MjxAQcLT3mUcKuvxaKET6Ca2
+B3tymT5ufmpkmQjy0damrMCZOxwVQY2Wa7tLwr3hMhbAvYD6Pl8372sTiyQUQOOk
+NyvR/zXFzYbVlxoq7nG4St1HQ79VM5wnYFC7Nc28x/rdoDtABCFzCx6fT7CqoO0W
+dsCC6+3pjZhjex1tCYzDAF2TTbB+5IJ4mOTLgny4VhqQS7QYStRyAz1PXtDgUtw=
+=bALU
+-----END PGP SIGNATURE-----

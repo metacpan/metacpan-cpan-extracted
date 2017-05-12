@@ -1,0 +1,41 @@
+---
+abstract: 'Help study usage of CGI::Application::Dispatch'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0.96
+  Test::Pod: 1.44
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Demo-Dispatch
+provides:
+  CGI::Application::Demo::Dispatch:
+    file: lib/CGI/Application/Demo/Dispatch.pm
+    version: 1.05
+  CGI::Application::Demo::Dispatch::Base:
+    file: lib/CGI/Application/Demo/Dispatch/Base.pm
+    version: 1.05
+  CGI::Application::Demo::Dispatch::Menu:
+    file: lib/CGI/Application/Demo/Dispatch/Menu.pm
+    version: 1.05
+  CGI::Application::Demo::Dispatch::Organization:
+    file: lib/CGI/Application/Demo/Dispatch/Organization.pm
+    version: 1.05
+  CGI::Application::Demo::Dispatch::Person:
+    file: lib/CGI/Application/Demo/Dispatch/Person.pm
+    version: 1.05
+requires:
+  CGI: 3.52
+  CGI::Application: 4.31
+  CGI::Application::Dispatch: 2.18
+  FCGI::ProcManager: 0.19
+  HTML::Template: 2.9
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+version: 1.05

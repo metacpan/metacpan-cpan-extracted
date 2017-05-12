@@ -1,0 +1,19 @@
+[% 
+    title = 'Hits' ;
+
+    crumb1_name = 'Hits' ;
+%]
+
+<h3>Counters for main site pages</h3>
+<table summary="Hit Counters">
+<tr>
+    <th>Area</th>
+    <th>Counter</th>
+</tr>
+[% FOREACH record = pages %]
+<tr>
+    <td>[% record.area %]</td>
+    <td>[% record.counter %]</td>
+</tr>
+[% END %]
+</table>

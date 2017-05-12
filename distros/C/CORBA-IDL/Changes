@@ -1,0 +1,109 @@
+Revision history for Perl extension CORBA::IDL.
+
+2.64  Sat Mar 28 14:30:00 2009
+	- lexer.pm : add a patch for GCC preprocessor (thanks to Aaron Christensen)
+		idl --include=a.idl b.idl
+
+2.63  Wed Mar 19 18:30:00 2008
+	- performance profiling
+
+2.62  Wed Oct 24 12:30:00 2007
+	- UidVisitor.pm : fix a regression (from 2.61)
+
+2.61  Fri Oct 19 08:30:00 2007
+	- package refactoring (avoid PAUSE indexer errors)
+
+2.60  Fri Oct 12 08:30:00 2007
+	- package refactoring (not compatible with 2.4x version)
+	- some Perl Best Practices
+
+2.47  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+2.46  Thu May 18 12:30:00 2006
+	- node.pm & repos_id.pm : minor fix
+
+2.45  Tue Jul 19 18:30:00 2005
+	- node.pm : native exception
+	- repos_id.pm : add uidVisitor
+
+2.44  Sun Apr  3 20:30;00 2005
+	- lexer.pm : /**< doxygen comment */
+	- parser* : BooleanLiteral->{value}
+	- repos_id.pm : generalization
+	- Specification->{full} = ''
+
+2.43  Tue Jan  4 18:30:00 2005
+	- bug [cpan #9366] AST for Enum-discriminated Unions always indicates 'need_default'
+
+2.42  Tue Jul 27 12:30:00 2004
+	- node.pm : 'float' 0 is out of range (ticket 7114 on rt.cpan.org)
+	- bug : [props] for 'typedef'
+	- parserxp.yp : add [props] for member
+
+2.41  Mon Jun  7 08:30:00 2004
+	- better support of 'import'
+
+2.40  Tue May 18 18:30:00 2004
+	- modification of the AST (not compatible with 2.2x version) : add NativeType node
+
+2.22  Wed Mar 31 12:30:00 2004
+	- prerequest Math::BigInt 1.66 (incompatible with 0.01)
+	- symbtab.pm : add a flag 'collision_allowed'
+	- lexer.pm : delete grammar after parsing
+
+2.21  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+	- node.pm : bug with Math::BigInt 1.66 (Perl 5.8)
+
+2.20  Thu Feb 19 18:30:00 2004
+	- modifications of the AST (not compatible with 2.0x version)
+	- node.pm : bug with Math::BigInt 1.66 (Perl 5.8)
+	- add parser for XPIDL (Mozilla)
+	- idl.pl : add option -h (display help)
+	- idl.pl : add optinn -v (display version)
+
+2.05  Wed Dec 17 12:30:00 2003
+	- improvement for EnumType
+        - improvement for value and boxed value
+	- add extra rules in grammar (export for value)
+	- bug in _StringLexer
+
+2.04  Mon Sep 22 12:30:00 2003
+	- support cpp GCC 3.2.3
+	- bug : value inheritance
+
+2.03  Mon Aug 11 12:30:00 2003
+	- add extra rules in grammar
+
+2.02  Fri Aug 01 18:30:00 2003
+	- lexer.pm : better handling C-preprocessor
+
+2.01  Fri Mar 14 12:30:00 2003
+	- lexer.pm : add patch for SUN C-preprocessor (thanks to Chad Elliott)
+
+2.00  Mon Jan 13 12:30:00 2003
+	- support CORBA 3.0
+	- and refactoring (the AST is not compatible with 1.0x version)
+	- add orb.idl files
+
+1.04  Tue Sep 17 08:30:00 2002
+	- add single line doc comment (/// comment)
+	- add getopts function
+	- add TypeCode.idl file
+	- use yapp version 1.05
+
+1.03  Tue May 21 09:30:00 2002
+	- bug when reopen a module
+
+1.02  Tue May 14 08:30:00 2002
+	- some improvements (union, valuetype, ...)
+
+1.01  Mar Mar 04 12:30:00 2002
+
+1.0   Fri Dec 14 15:30:00 2001
+	- first release
+
+0.01  Mon Nov 19 11:34:14 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,9 @@
+// Import test
+@import (less) '90_test_part-import.less';
+// Import test for other directory (../data_sub/)
+@import (less) '90_test_part-import-sub.less';
+
+@base_color: #000000;
+a:link {
+	color: lighten(@base_color, 10%);
+}

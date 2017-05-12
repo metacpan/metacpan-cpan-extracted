@@ -1,0 +1,44 @@
+# cme(1) completion -*- shell-script -*-
+#
+#
+# This file is part of Config::Model::Itself
+#
+# This software is Copyright (c) 2015 by Dominique Dumont
+#
+# This is free software, licensed under:
+#
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+#
+
+
+_cme_cmd_meta()
+{
+    local cur
+
+    COMPREPLY=()
+    _get_comp_words_by_ref -n : cur prev
+
+    global_options='-dev -force-load -create -backend -trace -quiet -file'
+
+    if [[ $COMP_CWORD -eq 2 ]] ; then
+        COMPREPLY=( $( compgen -W 'edit check save plugin dump dump-yaml gen-dot' -- $cur ) )
+    elif [[ $COMP_CWORD -eq 3 ]] ; then
+        MODELS=$(/usr/bin/perl -MConfig::Model::Lister -e'print Config::Model::Lister::applications(1);')
+        COMPREPLY=( $( compgen -W "$MODELS" -- $cur ) )
+    elif [[ $COMP_CWORD -eq 4 ]] ; then
+        OPTIONS='-dir -dumptype -open-item -plugin-file -load-yaml -load -system'
+        COMPREPLY=( $( compgen -W "$OPTIONS" -- $cur ) )
+    else 
+        case $prev in
+           -dir|-open-item|-plugin-file|-load-yaml|-load)
+                _filedir -d
+            ;;
+           -dumptype)
+                COMPREPLY=( $( compgen -W 'full preset custom' -- $cur ) )
+            ;;
+             *)
+        esac
+    fi
+    true;
+}
+

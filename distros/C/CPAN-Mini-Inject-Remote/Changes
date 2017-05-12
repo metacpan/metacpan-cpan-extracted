@@ -1,0 +1,12 @@
+Revision history for CPAN-Mini-Inject-Remote
+
+0.04	2014-12-08/08:00
+        adds checking HTTP::Response and exit 1 if not success
+0.03	2014-12-06/19:00
+        adds ssl_opts
+        guesses -module and -modversion from the file
+0.02    2010-02-08/11:44
+        Corrected some documentation
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

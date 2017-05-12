@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::SingletonProxy.
+
+0.01  Tue Jun 28 22:14:42 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Class::SingletonProxy
+

@@ -1,0 +1,22 @@
+Changes
+lib/Catalyst/Authentication/Store/Jifty/DBI.pm
+lib/Catalyst/Authentication/Store/Jifty/DBI/User.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_auth.t
+t/20_session.t
+t/30_auth_roles_relationship.t
+t/40_auth_roles_column.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Auth.pm
+t/lib/TestApp/Controller/DB.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Model/TestDB.pm
+t/lib/TestApp/Schema/Role.pm
+t/lib/TestApp/Schema/User.pm
+t/lib/TestApp/Schema/UserRole.pm
+META.yml                                 Module meta-data (added by MakeMaker)

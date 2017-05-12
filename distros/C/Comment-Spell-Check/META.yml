@@ -1,0 +1,41 @@
+---
+abstract: 'Check words from Comment::Spell vs a system spell checker.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Comment-Spell-Check
+provides:
+  Comment::Spell::Check:
+    file: lib/Comment/Spell/Check.pm
+    version: '0.002001'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  Comment::Spell: '0'
+  Devel::CheckBin: '0'
+  File::Spec: '0'
+  IPC::Run: '0'
+  Moo: '0'
+  Text::Wrap: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Comment-Spell-Check/issues
+  homepage: https://github.com/kentnl/Comment-Spell-Check
+  repository: https://github.com/kentnl/Comment-Spell-Check.git
+version: '0.002001'

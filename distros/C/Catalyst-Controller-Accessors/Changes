@@ -1,0 +1,22 @@
+Release history for Catalyst-Controller-Accessors
+
+0.003003  2013-08-01 18:23:16 CST6CDT
+  - Fix `can` check on ancient perls (older than 5.18)
+
+0.003002  2013-07-30 13:05:11 CST6CDT
+  - Die with error if user forgets to pass $c or passes something without a
+    stash method
+  - Abandon RT
+
+0.003001  2012-11-17 17:09:10 CST6CDT
+  - Put MetaYAML back in dist
+
+0.003000  2012-04-18 13:15:02 America/Chicago
+  - Add Moo style validation
+
+0.002000  2011-12-12 15:31:59 CST6CDT
+  - Add ability to choose the slot an accessor uses
+
+0.001000  2011-09-24 02:02:13 CST6CDT
+
+  - Initial Release

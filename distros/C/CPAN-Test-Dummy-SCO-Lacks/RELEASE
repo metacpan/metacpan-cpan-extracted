@@ -1,0 +1,8 @@
+perl Makefile.PL
+make
+make manifest
+make distdir
+
+rm CPAN-Test-Dummy-SCO-Lacks-0.01/META.json
+
+edit CPAN-Test-Dummy-SCO-Lacks-0.01//MANIFEST    remove META.json

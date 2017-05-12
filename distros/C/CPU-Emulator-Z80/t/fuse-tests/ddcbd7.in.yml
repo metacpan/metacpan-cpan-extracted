@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 128
+    - 215
+  59045:
+    - 96
+name: ddcbd7
+registers:
+  AF: 9243
+  AF_: 0
+  BC: 60944
+  BC_: 0
+  DE: 49490
+  DE_: 0
+  HL: 12141
+  HL_: 0
+  I: 0
+  IX: 59173
+  IY: 49367
+  PC: 0
+  R: 0
+  SP: 0

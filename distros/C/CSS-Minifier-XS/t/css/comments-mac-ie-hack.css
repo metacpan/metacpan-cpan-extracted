@@ -1,0 +1,7 @@
+/* comments get removed */
+/* except those implementing the "Mac/IE Comment Hack" \*/
+ul {
+    /* unless we're already "in" the hack \*/
+    font-size: 80%;
+}
+/* and those that close the hack */

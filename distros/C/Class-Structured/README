@@ -1,0 +1,30 @@
+Class/Structured version 0.1
+=============================
+
+Class::Structured, first introduced in the debut issue of The Perl Review,
+allows for creation of classes with more structured features like private
+and public variables, abstract functions, and constructors.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Set::Scalar
+
+COPYRIGHT AND LICENCE
+
+This module was written by Robby Walker (robwalker@cpan.org) for Point Writer 
+(www.pointwriter.com) and The Perl Review (www.perl.org/ThePerlReview)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

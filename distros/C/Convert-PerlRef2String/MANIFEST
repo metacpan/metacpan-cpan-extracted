@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Convert-PerlRef2String.t
+lib/Convert/PerlRef2String.pm
+META.yml                                 Module meta-data (added by MakeMaker)

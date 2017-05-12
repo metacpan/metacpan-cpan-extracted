@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Helper-Controller-Scaffold
+version:      0.04
+version_from: lib/Catalyst/Helper/Controller/Scaffold.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.23
+    Catalyst::Plugin::FormValidator: 0
+    Catalyst::View::TT:            0
+    Class::DBI:                    0
+    Class::DBI::AsForm:            0
+    Class::DBI::FromForm:          0
+    Path::Class:                   0
+    Template::Plugin::Class:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

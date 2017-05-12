@@ -1,0 +1,11 @@
+Revision history for Perl CPAN module Class::Role
+
+0.04 2016-07-05 NEILB
+    - Renamed the PARENT pseudo class to PARENTCLASS, to resolve
+      permissions conflict with the core "parent" module.
+    - Added use of strict and warnings, and fixed resulting issues.
+    - Switched to Dist::Zilla
+
+0.03 2003-12-07 LPALMER
+    - First release to CPAN
+

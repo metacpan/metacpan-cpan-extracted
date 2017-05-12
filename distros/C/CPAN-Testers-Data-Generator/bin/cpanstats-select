@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+use strict;
+$|++;
+
+my $VERSION = '0.12';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+cpanstats-select - select stats from the CPAN Testers Statistics database.
+
+=head1 SYNOPSIS
+
+  perl cpanstats-select             \
+    --config=<file>                 \
+    --database=<dbcode>             \
+                                    \
+    [--sql=<sql>]                   \
+                                    \
+    [--id|-i=<id>]                  \
+    [--guid=<id>]                   \
+    [--grade|-g=<grade>]            \
+    [--disto|-m=<distname>]         \
+    [--dist|-d=<distname>]          \
+    [--version|-v=<distversion>]    \
+    [--date|-y=<YYYYMM>]            \
+    [--tester|-t=<email>]           \
+    [--platform|-o=<platform>]      \
+    [--perl|-p=<perlversion>]
+
+=head1 DESCRIPTION
+
+Using the cpanstats database, which should be in the local directory, extracts
+all the required data.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --config
+
+Configuration file contain database access details.
+
+=item --database
+
+Specify the database to use, CPANSTATS or LITESTATS
+
+=back
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use Config::IniFiles;
+use CPAN::Testers::Common::DBUtils;
+use Getopt::ArgvFile default=>1;
+use Getopt::Long;
+
+# -------------------------------------
+# Variables
+
+my (%options,$dbi);
+
+# -------------------------------------
+# Program
+
+##### INITIALISE #####
+
+init_options();
+
+##### MAIN #####
+
+#       '(id,state,postdate,tester,dist,version,platform,perl) '.
+
+if($options{sql}) {
+    my @rows = $dbi->get_query('array',$options{sql});
+    if(@rows) {
+        for my $row (@rows) {
+            print join(",",@$row) . "\n";
+        }
+    } else {
+        print "Sorry, no results returned for SQL [$options{sql}]\n";
+    }
+} else {
+    my $sql = "SELECT * FROM cpanstats WHERE ";
+    my @where;
+
+    # only one of the following at a time
+    @where = ("dist LIKE '\%$options{distro}\%'")           if(defined $options{distro});
+    @where = ("dist='$options{dist}'")                      if(defined $options{dist});
+    @where = ("id=$options{id}")                            if(defined $options{id});
+    @where = ("guid=$options{guid}")                        if(defined $options{guid});
+
+    push @where, "state='$options{grade}'"                  if(defined $options{grade});
+    push @where, "version='$options{version}'"              if(defined $options{version});
+    push @where, "version LIKE '\%$options{distversion}\%'" if(defined $options{distversion});
+    push @where, "postdate='$options{date}'"                if(defined $options{date});
+    push @where, "tester LIKE '\%$options{tester}\%'"       if(defined $options{tester} && $options{tester} ne '-');
+    push @where, "tester=''"                                if(defined $options{tester} && $options{tester} eq '-');
+    push @where, "platform LIKE '$options{platform}\%'"     if(defined $options{platform} && $options{platform} ne '-');
+    push @where, "platform=''"                              if(defined $options{platform} && $options{platform} eq '-');
+    push @where, "perl='$options{perl}'"                    if(defined $options{perl} && $options{perl} ne '-');
+    push @where, "perl=''"                                  if(defined $options{perl} && $options{perl} eq '-');
+
+    if(@where) {
+        $sql .= join(' AND ',@where);
+        my @rows = $dbi->get_query('array',$sql);
+        if(@rows) {
+            for my $row (@rows) {
+                print join(",",@$row) . "\n";
+            }
+        } else {
+            print "Sorry, no results returned for SQL [$sql]\n";
+        }
+    } else {
+        print "No SQL arguments given\n";
+    }
+}
+
+# -------------------------------------
+# Subroutines
+
+sub init_options {
+    GetOptions( \%options,
+        'config=s',
+        'database=s',
+        'sql=s',
+        'id|i=s',
+        'guid=s',
+        'grade|g=s',
+        'distro|m=s',
+        'dist|d=s',
+        'distversion|x=s',
+        'platform|o=s',
+        'perl|p=s',
+        'tester|t=s',
+        'version|v=s',
+        'date|y=s',
+        'help|h',
+    );
+
+    help(1) if($options{help});
+
+    $options{grade} = lc $options{grade}    if($options{grade});
+
+    help(1,"Must specify the configuration file")               unless(   $options{config});
+    help(1,"Configuration file [$options{config}] not found")   unless(-f $options{config});
+
+    help(1,"Must specify the database code (CPANSTATS or LITESTATS)")
+        unless($options{database} && $options{database} =~ /^CPANSTATS|LITESTATS$/);
+
+    # load configuration
+    my $cfg = Config::IniFiles->new( -file => $options{config} );
+
+    # configure databases
+    my $db = $options{database};
+    die "No configuration for $db database\n"   unless($cfg->SectionExists($db));
+    my %opts = map {$_ => $cfg->val($db,$_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
+    $dbi = CPAN::Testers::Common::DBUtils->new(%opts);
+    die "Cannot configure $db database\n" unless($dbi);
+}
+
+sub help {
+    my ($full,$mess) = @_;
+
+    print "\n$mess\n\n" if($mess);
+
+    if($full) {
+        print <<HERE;
+
+Usage: $0
+     --config=<file>                - configuration file
+     --database=<dbcode>            - CPANSTATS or LITESTATS
+
+    [--id|-i=<id>]                  - cpanstats report id
+    [--guid=<guid>]                 - metabase report guid
+    [--grade|-g=<grade>]            - report grade
+    [--dist|-d=<distname>]          - distribution name
+    [--disto|-m=<distname>]         - distribution name (partial match)
+    [--version|-v=<distversion>]    - distribution version
+    [--date|-y=<YYYYMM>]            - year/month
+    [--tester|-t=<email>]           - tester email
+    [--platform|-o=<platform>]      - platform (partial match)
+    [--perl|-p=<perlversion>]       - perl version
+
+    [--help|-h]                     - this screen
+
+Notes:
+    - combine options (except help) to refine your search
+    - all entries (except distro and paltform) require an exact match
+    - only one of nntp, dist or distro (in order of preference) is accepted
+    - use '-' for tester, perl and platform to find blank entries
+
+HERE
+
+    }
+
+    print "$0 v$VERSION\n";
+    exit(0);
+}
+
+
+__END__
+
+=back
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to the RT Queue (see below).
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::WWW::Reports>,
+L<CPAN::Testers::WWW::Statistics>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 AUTHOR
+
+Barbie, E<lt>barbie@cpan.orgE<gt>
+for Miss Barbell Productions L<http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2012 Barbie for Miss Barbell Productions
+  All Rights Reserved.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.
+
+=cut

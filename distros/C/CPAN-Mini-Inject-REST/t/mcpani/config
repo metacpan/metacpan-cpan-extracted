@@ -1,0 +1,4 @@
+local: t/mcpani/mirror
+remote: http://cpan.cpantesters.org
+repository: t/mcpani/repository
+dirmode: 0755

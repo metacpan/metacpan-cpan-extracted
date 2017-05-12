@@ -1,0 +1,33 @@
+---
+abstract: "Puts the context's current user into your Catalyst::Model::DBIC::Schema schema."
+author:
+  - 'Amiri Barksdale <amiri@roosterpirates.com>'
+build_requires:
+  Catalyst::Component: 0
+  DBIx::Class::Schema: 0
+  Moose: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::More: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Model-DBIC-Schema-WithCurrentUser
+requires:
+  Catalyst::Model::DBIC::Schema: 0.60
+  Catalyst::TraitFor::Model::DBIC::Schema::PerRequestSchema: 0
+  Moose::Role: 0
+  MooseX::MarkAsMethods: 0.15
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/amiri/Catalyst-TraitFor-Model-DBIC-Schema-WithCurrentUser/issues
+  repository: git://github.com/amiri/Catalyst-TraitFor-Model-DBIC-Schema-WithCurrentUser.git
+version: 0.07

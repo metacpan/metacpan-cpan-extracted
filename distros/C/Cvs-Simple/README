@@ -1,0 +1,45 @@
+Cvs-Simple version 0.06
+=======================
+
+Cvs::Simple is an attempt to provide an easy-to-use wrapper that allows cvs
+commands to be executed from within a Perl program, without the programmer
+having to wade through the (many) cvs global and command-specific options.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You will be prompted for the path to your cvs binary (/usr/bin/cvs on most
+Unix-like systems), and for any value you wish to set for CVSROOT , i.e C<cvs -d>, e.g.
+C<:ext:user@cvs.remoterepo.tld:/path/to/repo> (you can leave this blank if you
+have set CVSROOT in you environment, or you have C<cvs -d> in your C<.cvsrc>.
+
+See C<man cvs> for more on C<cvs -d>, C<CVSROOT> and C<.cvsrc>.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  version
+  Class::Std::Utils
+  File::Copy
+  File::Spec
+  File::Path
+  Test::More
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007,2008 by Stephen Cardie <stephenca@ls26.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

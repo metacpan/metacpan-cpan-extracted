@@ -1,0 +1,6 @@
+ScriptAlias /cgi-bin/ "@ServerRoot@/cgi-bin/"
+
+<IfModule mod_perl.c>
+    PerlSwitches -Mlib=@ServerRoot@/../../blib/lib
+    PerlSwitches -Mlib=@ServerRoot@/../../blib/lib/Apache2
+</IfModule>

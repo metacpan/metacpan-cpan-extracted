@@ -1,0 +1,40 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Radio Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the radio list.
+my @radioList = ("Item 1", "Item 2", "Item 3",
+			"Item 4", "Item 5", "Item 6",
+			"Item 7", "Item 8", "Item 9",
+			"Item 10", "Item 11", "Item 12");
+
+# Create the radio list object.
+my $radioWidget = new Cdk::Radio ('Title' => ["<C></5>Radio List"],
+					'List' => \@radioList,
+					'Height' => 10,
+					'Width' => 20);
+
+# Activate the radio object.
+$radioWidget->set ('Choice' => "#");
+my $choice = $radioWidget->activate ();
+
+# Check the results.
+if (!defined $choice)
+{
+   popupLabel (["<C>Escape hit. No item selected."]);
+}
+else
+{
+   popupLabel (["<C>You selected $choice."]);
+}
+
+# Exit Cdk.
+Cdk::end();

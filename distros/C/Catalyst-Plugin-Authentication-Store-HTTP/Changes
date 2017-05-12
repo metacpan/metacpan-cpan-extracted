@@ -1,0 +1,23 @@
+Revision history for Perl module Catalyst::Plugin::Authentication::Store::HTTP
+
+0.05 2006-09-22T02:03:12+09:00
+     - changed to more generic authentication method which
+       should work for basic, digest & NTLM
+     - added some NTLM helpers
+     - fleshed out some documentation
+     - NB The more generic method will mean that in the basic case
+       of using basic auth it will now do an initial HEAD that fails
+       and then fall back to using auth information
+
+0.04 2006-03-15T22:03:47+09:00
+     - forget update manifest file
+
+0.03 2006-03-15T21:55:12+09:00
+     - added user class
+
+0.02 2006-03-15T17:42:53+09:00
+     - fixed a doc typo
+     - removed some no used codes
+
+0.01 2006-03-15T15:29:38+09:00
+     - original version;

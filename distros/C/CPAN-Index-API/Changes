@@ -1,0 +1,33 @@
+Revision history for CPAN-Index-API
+
+0.007   1 October 2012
+
+        * Normalize all missign values to undef
+
+0.006   28 September 2012
+
+        * Remove obsolete CPAN::Index::API::File
+
+0.005   28 September 2012
+
+        * Make base class for files a role instead
+        * Add roles for more common functionality
+
+0.004   26 September 2012
+
+        * Support for 00whois.xml
+
+0.003   18 September 2012
+
+        * Better performance by using hashes instead of objects for records
+        * Refactor 'default_locations'
+        * Make attributes read-only, provide a clone method instead
+
+0.002   14 August 2012
+
+        * Replace File::Path::make_path with Path::Class::Dir::mkpath
+
+0.001   30 July 2012
+
+        * Initial release
+

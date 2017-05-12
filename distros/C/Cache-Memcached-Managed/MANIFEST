@@ -1,0 +1,21 @@
+MANIFEST
+CHANGELOG
+COPYING
+GNUGPL
+README
+TODO
+Makefile.PL
+flush_interval.patch
+lib/Cache/Memcached/Managed.pm
+lib/Cache/Memcached/Managed/Inactive.pm
+lib/Cache/Memcached/Managed/Multi.pm
+t/001basic.t
+t/002inactive.t
+t/003multi.t
+t/004expiration.t
+t/010fork.t
+t/020grab.t
+t/030configs.t
+testlib
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

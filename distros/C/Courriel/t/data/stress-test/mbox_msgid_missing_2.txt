@@ -1,0 +1,67 @@
+From tomcat-user-return-131967-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Fri Aug 26 10:05:24 2005
+Return-Path: <tomcat-user-return-131967-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 75611 invoked from network); 26 Aug 2005 10:05:24 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 26 Aug 2005 10:05:24 -0000
+Received: (qmail 88296 invoked by uid 500); 26 Aug 2005 10:05:04 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 88264 invoked by uid 500); 26 Aug 2005 10:05:03 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 88249 invoked by uid 99); 26 Aug 2005 10:05:03 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Fri, 26 Aug 2005 03:05:02 -0700
+X-ASF-Spam-Status: No, hits=0.2 required=10.0
+        tests=INVALID_DATE
+X-Spam-Check-By: apache.org
+Received-SPF: neutral (asf.osuosl.org: local policy)
+Received: from [62.189.43.68] (HELO flmsw06.fimat.com) (62.189.43.68)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Fri, 26 Aug 2005 03:05:19 -0700
+Received: from SPLDN001.fimat.co.uk (unverified) by flmsw06.fimat.com
+    (Content Technologies SMTPRS 4.3.12) with ESMTP id
+    <T72fee974d680190403970@flmsw06.fimat.com> for
+    <tomcat-user@jakarta.apache.org>; Fri, 26 Aug 2005 11:16:24 +0100
+Subject: Re: Viewing PDF in Internet Explorer
+To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Cc:
+X-Mailer: Lotus Notes Release 5.0.8  June 18, 2001
+From: "Mark Sutton" <Mark.Sutton@fimat.com>
+Date: 26-Aug-2005 11:04:57 GDT
+Message-ID:
+X-MIMETrack: Serialize by Router on SPLDN001/SRV/FIMAT
+    (Release 5.0.8 |June 18, 2001) at 26/08/2005 11:04:58
+MIME-Version: 1.0
+Content-type: text/plain; charset="us-ascii"
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+
+
+
+
+
+This may be due to the version of Tomcat you are using.  It sounds a lot
+like this bug:
+
+http://issues.apache.org/bugzilla/show_bug.cgi?id=24970
+
+This hit me when I tried upgrading from 4.1.27 to 4.1.29.  I am not sure in
+which subsequest version it was fixed.  It may have been 4.1.31.  You could
+always try 5.X?
+
+Mark Sutton
+Client Services IT Development
+Fimat International Banque SA (UK Branch)
+SG House
+41 Tower Hill
+London  EC3N 4SG
+Tel:  +44 20 7676 8311
+
+e-mail:mark.sutton@fimat.com

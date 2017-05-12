@@ -1,0 +1,44 @@
+---
+abstract: 'Config::ENV supported Multi ENV'
+author:
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+build_requires:
+  Test::Clear: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-ENV-Multi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Config::ENV::Multi:
+    file: lib/Config/ENV/Multi.pm
+    version: '0.03'
+  Config::ENV::Multi::ConfigInstance:
+    file: lib/Config/ENV/Multi.pm
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hixi-hyi/p5-Config-ENV-Multi/issues
+  homepage: https://github.com/hixi-hyi/p5-Config-ENV-Multi
+  repository: git://github.com/hixi-hyi/p5-Config-ENV-Multi.git
+version: '0.03'
+x_authority: cpan:HIXI
+x_contributors:
+  - 'Tanaka Tatsuya <ta.ts.yt@gmail.com>'

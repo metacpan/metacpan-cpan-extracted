@@ -1,0 +1,323 @@
+Convert/AcrossLite version 0.10
+===============================
+NAME
+    Convert::AcrossLite - Convert binary AcrossLite puzzle files to text.
+
+SYNOPSIS
+    use Convert::AcrossLite;
+
+    my $ac = Convert::AcrossLite->new();
+    $ac->in_file('/home/doug/puzzles/Easy.puz');
+    $ac->out_file('/home/doug/puzzles/Easy.txt');
+    $ac->puz2text;
+
+    or
+
+    use Convert::AcrossLite;
+
+    my $ac = Convert::AcrossLite->new();
+    $ac->in_file('/home/doug/puzzles/Easy.puz');
+    my $text = $ac->puz2text;
+
+    or
+
+    use Convert::AcrossLite;
+
+    my $ac = Convert::AcrossLite->new();
+    $ac->in_file('/home/doug/puzzles/Easy.puz');
+    my $ac->parse_file;
+    my $title = $ac->get_title;
+    my $author = $ac->get_author;
+    my $copyright = $ac->get_copyright;
+    my @solution = $ac->get_solution;
+    my @diagram = $ac->get_diagram;
+    my $across_clues = $ac->get_across_clues;
+    my $down_clues = $ac->get_down_clues;
+
+    or
+
+    use Convert::AcrossLite;
+
+    my $ac = Convert::AcrossLite->new();
+    $ac->in_file('/home/doug/puzzles/Easy.puz');
+
+    my($across_hashref, $down_hashref) = get_across_down;
+
+    my %across= %$across_hashref;
+    foreach my $key (sort { $a <=> $b } keys %across) {
+        print "Direction: $across{$key}{direction}\n";
+        print "Clue Number: $across{$key}{clue_number}\n";
+        print "Row: $across{$key}{row}\n";
+        print "Col: $across{$key}{column}\n";
+        print "Clue: $across{$key}{clue}\n";
+        print "Solution: $across{$key}{solution}\n";
+        print "Length: $across{$key}{length}\n\n";
+    }
+
+    my %down= %$down_hashref;
+    foreach my $key (sort { $a <=> $b } keys %down) {
+        print "Direction: $down{$key}{direction}\n";
+        print "Clue Number: $down{$key}{clue_number}\n";
+        print "Row: $down{$key}{row}\n";
+        print "Col: $down{$key}{column}\n";
+        print "Clue: $down{$key}{clue}\n";
+        print "Solution: $down{$key}{solution}\n";
+        print "Length: $down{$key}{length}\n\n";
+    }
+
+
+DESCRIPTION
+    Convert::AcrossLite is used to convert binary AcrossLite puzzle files 
+    to text.
+
+    Convert::AcrossLite is loosely based on the C program written by Bob 
+    Newell (http://www.gtoal.com/wordgames/gene/AcrossLite).
+
+CONSTRUCTOR
+  new
+
+    This is the contructor. You can pass the full path to the puzzle file.
+
+      my $ac = Convert::AcrossLite->new(file => '/home/doug/puzzles/Easy.puz');
+
+    The default value is 'Default.puz'.
+
+METHODS
+  in_file
+
+    This method returns the current puzzle input path/filename. 
+
+      my $in_filename = $ac->in_file;
+
+    You may also set the puzzle input file by passing the path/filename.
+
+      $ac->in_file('/home/doug/puzzles/Easy.puz');
+
+  out_file
+
+    This method returns the current puzzle output path/filename. 
+
+      my $out_filename = $ac->out_file;
+
+    You may also set the puzzle output file by passing the path/filename.
+
+      $ac->out_file('/home/doug/puzzles/Easy.txt');
+
+  puz2text
+
+    This method will produce a basic text file in the same format as the 
+    easy.txt file provided with AcrossLite. This method will read the
+    input file set by in_file and write to the file set by out_file.
+
+      $ac->puz2text;
+
+    If out_file is not set, then the text is returned.
+
+      my $text = $ac->puz2text;
+
+      or
+ 
+      print $ac->puz2text;
+
+  get_across_down
+
+    This method will get all the information needed to build any type of output 
+    you may need(some info is set by parse_file): direction (across/down), 
+    clue_number, clue, solution, solution length, grid row and column. This
+    method will return two hash references (across and down).
+
+      my($across_hashref, $down_hashref) = get_across_down;
+
+      my %across= %$across_hashref;
+      foreach my $key (sort { $a <=> $b } keys %across) {
+          print "Direction: $across{$key}{direction}\n";
+          print "Clue Number: $across{$key}{clue_number}\n";
+          print "Row: $across{$key}{row}\n";
+          print "Col: $across{$key}{column}\n";
+          print "Clue: $across{$key}{clue}\n";
+          print "Solution: $across{$key}{solution}\n";
+          print "Length: $across{$key}{length}\n\n";
+      }
+
+      my %down= %$down_hashref;
+      foreach my $key (sort { $a <=> $b } keys %down) {
+          print "Direction: $down{$key}{direction}\n";
+          print "Clue Number: $down{$key}{clue_number}\n";
+          print "Row: $down{$key}{row}\n";
+          print "Col: $down{$key}{column}\n";
+          print "Clue: $down{$key}{clue}\n";
+          print "Solution: $down{$key}{solution}\n";
+          print "Length: $down{$key}{length}\n\n";
+      }
+
+  get_across
+
+    This method will return all the across information (some info is set by
+    parse_file): direction, clue_number, clue, solution, solution length, 
+    grid row and column. This method will return a hash reference.
+
+      my $across_hashref = get_across;
+ 
+      my %across= %$across_hashref;
+      foreach my $key (sort { $a <=> $b } keys %across) {
+          print "Direction: $across{$key}{direction}\n";
+          print "Clue Number: $across{$key}{clue_number}\n";
+          print "Row: $across{$key}{row}\n";
+          print "Col: $across{$key}{column}\n";
+          print "Clue: $across{$key}{clue}\n";
+          print "Solution: $across{$key}{solution}\n";
+          print "Length: $across{$key}{length}\n\n";
+      }
+
+  get_down
+
+    This method will return all the down information (some info is set by
+    parse_file): direction, clue_number, clue, solution, solution length, 
+    grid row and column. This method will return a hash reference.
+
+      my $down_hashref = get_down;
+
+      my %down= %$down_hashref;
+      foreach my $key (sort { $a <=> $b } keys %down) {
+          print "Direction: $down{$key}{direction}\n";
+          print "Clue Number: $down{$key}{clue_number}\n";
+          print "Row: $down{$key}{row}\n";
+          print "Col: $down{$key}{column}\n";
+          print "Clue: $down{$key}{clue}\n";
+          print "Solution: $down{$key}{solution}\n";
+          print "Length: $down{$key}{length}\n\n";
+      }
+
+  parse_file
+
+    This method will parse the puzzle file by calling _parse_file.
+
+  _parse_file
+
+    This helper method does the actual parsing of the puz file.
+
+  is_parsed
+
+    This method returns file parse status: 
+      0 if input file has not been parsed
+      1 if input file has been parsed.
+
+  get_rows
+
+    This method returns the number of rows in puzzle.
+
+       my $rows = $ac->get_rows;
+
+  get_columns
+
+    This method returns the number of columns in puzzle.
+
+      my $columns = $ac->get_columns;
+
+  get_solution
+
+    This method returns the puzzle solution.
+
+      my @solution = $ac->get_solution;
+
+  get_diagram
+
+    This method returns the puzzle solution diagram.
+
+      my @solution = $ac->get_diagram;
+
+  get_title
+
+    This method returns the puzzle title.
+
+      my $title = $ac->get_title;
+
+  get_author
+
+    This method returns the puzzle author.
+
+      my $author = $ac->get_author;
+
+  get_copyright
+
+    This method returns the puzzle copyright.
+
+      my $copyright = $ac->get_copyright;
+
+  get_across_clues
+
+    This method returns the puzzle across clues.
+
+      my $across_clues = $ac->get_across_clues;
+
+  get_down_clues
+
+    This method returns the puzzle down clues.
+
+      my $down_clues = $ac->get_down_clues;
+
+INSTALLATION
+
+  To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+  After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Convert::AcrossLite
+
+    You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Convert-AcrossLite
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-AcrossLite
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Convert-AcrossLite
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Convert-AcrossLite
+
+DEPENDENCIES
+
+    Carp
+
+OTHER
+
+    US Crossword Rules: 
+    http://www.maa.org/editorial/mathgames/mathgames_05_10_04.html
+
+    The rules for American crosswords are as follows:
+
+    1. The pattern of black-and-white squares must be symmetrical.  Generally this rule means that if you turn the grid upside-down, the pattern will look the same as it does right-side-up.
+    2. Do not use too many black squares.  In the old days of puzzles, black squares were not allowed to occupy more than 16% of a grid.  Nowadays there is no strict limit, in order to allow maximum flexibility for the placement of theme entries.  Still, "cheater" black squares (ones that do not affect the number of words in the puzzle, but are added to make constructing easier) should be kept to a minimum, and large clumps of black squares anywhere in a grid are strongly discouraged.
+    3. Do not use unkeyed letters (letters that appear in only one word across or down).  In fairness to solvers, every letter has to be appear in both an Across and a Down word.
+    4. Do not use two-letter words.  The minimum word length is three letters.
+    5. The grid must have all-over interlock.  In other words, the black squares may not cut the grid up into separate pieces.  A solver, theoretically, should be able to able to proceed from any section of the grid to any other without having to stop and start over.
+    6. Long theme entries must be symmetrically placed.  If there is a major theme entry three rows down from the top of the grid, for instance, then there must be another theme entry in the same position three rows up from the bottom.  Also, as a general rule, no nontheme entry should be longer than any theme entry.
+    7. Do not repeat words in the grid.
+    8. Do not make up words and phrases.  Every answer must have a reference or else be in common use in everyday speech or writing.
+    9. (Modern rule) The vocabulary in a crossword must be lively and have very little obscurity.
+
+ACKNOWLEDGEMENTS
+
+Changed <eq '-'> to <ne '.'> so filled-in puzzles will parse
+Patch from Ed Santiago
+
+AUTHOR
+
+    Doug Sparling <dougsparling@yahoo.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2006 Douglas Sparling. All rights reserved. 
+
+    This program is free software; you can redistribute it and/or 
+    modify it under the same terms as Perl itself.

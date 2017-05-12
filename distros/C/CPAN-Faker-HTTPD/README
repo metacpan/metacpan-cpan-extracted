@@ -1,0 +1,107 @@
+NAME
+    CPAN::Faker::HTTPD - Run a bogus CPAN web server for testing
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      use CPAN::Faker::HTTPD;
+      use LWP::Simple;
+
+      my $cpan = CPAN::Faker::HTTPD->new({ source => './eg' });
+      $cpan->make_cpan;
+
+      my $uri = $cpan->endpoint;
+      $uri->path( '/authors/id/P/PS/PSHANGOV/Miril-0.008.tar.gz' );
+
+      my $content = LWP::Simple::get( $uri );
+
+    $cpan->make_cpan;
+
+DESCRIPTION
+    This module is a subclass of CPAN::Faker that additionally supplies a
+    running webserver (via Test::Fake::HTTPD). It is useful for testing code
+    that interacts with remote CPAN mirrors.
+
+METHODS
+  port
+    Port number of the running server. The port is dynamically determined by
+    Test::Fake::HTTPD during initialization. If you need to specify the port
+    number explicitly, you will have to create a Test::Fake::HTTPD object
+    with the respective options manually, and pass it to CPAN::Faker::HTTPD
+    as the "httpd" parameter on construction.
+
+    See Test::Fake::HTTPD for details.
+
+    -head2 host_port
+
+    Host and port of the running server.
+
+    See Test::Fake::HTTPD for details.
+
+  endpoint
+    URI object for the full address of the running server (e.g.
+    "http://127.0.0.1:{port}").
+
+    See Test::Fake::HTTPD for details.
+
+  httpd
+    An instance of Test::Fake::HTTPD. Can be overriden during construction.
+
+    See Test::Fake::HTTPD for details.
+
+  server
+    Plack application that will handle the serving of files. The default is
+    an instance of Plack::App::File, which will simply serve any static
+    files under the fake CPAN. Can be overriden during construction.
+
+  app
+    Coderef that will be passed to "run" in Test::Fake::HTTPD. It converts
+    the HTTP::Request object to a PSGI environment hash before transferring
+    control on to the "server". Can be overriden during construction.
+
+  dest
+    Directory in which to construct the CPAN instance. Same as in
+    CPAN::Faker, but not required any more. If not supplied, a temporary
+    directory will be used, as presumably it is the repository uri rather
+    than the repository path that users of this module will test against.
+
+    See CPAN::Faker for details.
+
+  make_cpan
+    See "make_cpan" in CPAN::Faker.
+
+  add_author
+    See "add_author" in CPAN::Faker
+
+  index_package
+    See "index_package" in CPAN::Faker.
+
+  write_author_index
+    See "write_author_index" in CPAN::Faker.
+
+  write_package_index
+    See "write_package_index" in CPAN::Faker.
+
+  write_modlist_index
+    See "write_modlist_index" in CPAN::Faker.
+
+  write_perms_index
+    See "write_perms_index" in CPAN::Faker.
+
+  add_dist
+    See "add_dist" in CPAN::Faker.
+
+SEE ALSO
+    CPAN::Faker
+    Test::Fake::HTTPD
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Venda, Inc..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

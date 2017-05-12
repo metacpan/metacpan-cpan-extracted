@@ -1,0 +1,558 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_check_struct
+# ABSTRACT: Runs some tests on a given file structure with custom files.
+
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Archive::Zip qw/ :ERROR_CODES :CONSTANTS/;
+use File::Path qw(make_path);
+use File::Copy::Recursive qw(dircopy);
+use File::Copy qw(move);
+BEGIN {
+  if($^O eq "MSWin32"){
+    require Win32::Shortcut;
+  }
+}
+use CAD::Firemen;
+use CAD::Firemen::Analyze qw(checkConfig checkTreeConfig optionsToIngoreAtPathCheckings);
+use CAD::Firemen::Common qw(
+  strip
+  :PRINTING
+  getInstallationPath
+  getInstallationConfigCdb
+  getInstallationConfigPro
+  dbConnect
+  loadSettings
+  saveSettings
+  cleanSvn);
+use CAD::Firemen::Load qw(loadConfig);
+
+
+sub addDirToArchive {
+  my $zip = shift;
+  my $dirPath = shift;
+  my $baseUrl = shift;
+  my $verbose = shift;
+  my $dir;
+
+  if(!opendir($dir, $dirPath)){
+    if($verbose > 0){
+      print "Could not open directory ". $dirPath ."\n";
+    }
+    return 0;
+  }
+
+  while(my $entry = readdir($dir)){
+    if($entry !~ m/^\./){
+      my $absPath = $dirPath ."/". $entry;
+      if(-d $absPath){
+        my $member = $zip->addDirectory($entry);
+        if(!addDirToArchive($zip, $absPath, $baseUrl, $verbose)){
+          closedir($dir);
+          return 0;
+        }
+      }
+      if(-f $absPath){
+        my $zipFileName = $absPath;
+        # \Q mades sure, that all regex special chars are commented
+        $zipFileName =~ s/\Q$baseUrl//;
+        my $tmp = $zip->addFile($absPath, $zipFileName);
+        # To only compress the files in the if regex below,
+        # mades the archive much bigger
+        #if($entry =~ m/\.(:pro|dtl|tbl|txt)$/){
+          $tmp->desiredCompressionMethod(COMPRESSION_DEFLATED);
+          $tmp->desiredCompressionLevel(COMPRESSION_LEVEL_DEFAULT);
+        #}
+        #else{
+        #  $tmp->desiredCompressionMethod(COMPRESSION_STORED);
+        #}
+      }
+    }
+  }
+
+  closedir($dir);
+  return 1;
+}
+
+my $showVersion = 0;
+my $verbose = 0;
+my $caseInsensitive = 0;
+my $description = 0;
+my $archive = 0;
+my $force = 0;
+my $environment = 0;
+my %pathsNotFound = ();
+
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions(
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'case-insensitive|i' => \$caseInsensitive,
+  'description|d' => \$description,
+  'archive|a' => \$archive,
+  'force|f' => \$force,
+  'environment|e' => \$environment
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+my $dbh = undef;
+my $cdbUrl = shift;
+my $structUrl = shift;
+
+my $installPath = getInstallationPath();
+if(!defined($structUrl)){
+  if(!defined($cdbUrl)){
+    pod2usage(2);
+  }
+  $structUrl = $cdbUrl;
+  $dbh = dbConnect($installPath, $verbose);
+  if(!$dbh){
+    # if $structUrl is empty, getInstallationConfigCdb let the user
+    # choose a path
+    $cdbUrl = getInstallationConfigCdb($installPath);
+  }
+  else{
+    $cdbUrl = "";
+  }
+}
+
+if(!defined($dbh) && (!defined($cdbUrl) || $cdbUrl eq "")){
+  pod2usage(2);
+}
+
+my $cfgUrl = getInstallationConfigPro($structUrl);
+if($verbose > 1){
+  print "CDB URL:       ". $cdbUrl ."\n";
+  print "Structure URL: ". $structUrl ."\n";
+  print "Config URL:    ". $cfgUrl ."\n";
+}
+
+if(!-e $cfgUrl){
+  print "Could not find config file within structure\n";
+  exit 1;
+}
+
+my $result = 1;
+my $resultCheckConfig = checkConfig(
+  "databaseHandle" => $dbh,
+  "cdbUrl" => $cdbUrl,
+  "cfgUrl" => $cfgUrl,
+  "caseInsensitive" => $caseInsensitive,
+  "description" => $description,
+  "verbose" => $verbose
+);
+if(!$resultCheckConfig){
+  $result = 0;
+}
+if($verbose == 0){
+  # checkConfig already printed output if $verbose > 0
+  if(!$resultCheckConfig){
+    testFailed("CONFIG CHECK");
+  }
+  else{
+    testPassed("CONFIG CHECK");
+  }
+}
+
+# check structure and tree config file
+# load config
+my ($resultRef, $errorRef, $parsedLines) = loadConfig($cfgUrl);
+my %cfgOptions = %{$resultRef};
+my %errors = %{$errorRef};
+
+# check tree config
+my @keys = sort { $a <=> $b } keys(%{$cfgOptions{"MDL_TREE_CFG_FILE"}});
+if(scalar(@keys) > 0){
+  my $treeCfg = $cfgOptions{"MDL_TREE_CFG_FILE"}->{$keys[0]};
+  # replace $PRO_DIRECTORY
+  $treeCfg =~ s/\$PRO_DIRECTORY/$structUrl/;
+  if(!checkTreeConfig($treeCfg, $verbose)){
+    $result = 0;
+    if($verbose == 0){
+      testFailed("TREE CONFIG CHECK");
+    }
+  }
+  else{
+    if($verbose == 0){
+      testPassed("TREE CONFIG CHECK");
+    }
+  }
+}
+
+# extract all paths
+my %optionsToIgnore = optionsToIngoreAtPathCheckings();
+foreach my $opt (keys(%cfgOptions)){
+  if(!exists($optionsToIgnore{$opt})){
+    foreach my $line (keys(%{$cfgOptions{$opt}})){
+      # The first regex detects all strings containing $PRO_DIRECTORY
+      # and all strings with *.[A-Za-z0-9]{1,5} as ending.
+	  # The middle cause excludes urls starting with http
+      # The last regex matches all numbers, which are excluded (!~), because they are matched by the first regex.
+      if(($cfgOptions{$opt}->{$line} =~ m/\$PRO_DIRECTORY|[^\.]+\.[0-9a-zA-Z]{1,5}$/) && (substr($cfgOptions{$opt}->{$line}, 0, 7) ne "http://") && ($cfgOptions{$opt}->{$line} !~ m/^[0-9\.]+$/)){
+        my $url = $cfgOptions{$opt}->{$line};
+        $url =~ s/\$PRO_DIRECTORY/$structUrl/;
+        # check whether file or directory exists
+        if((!-f $url) && (!-d $url)){
+          $pathsNotFound{$line} = "The file or directory from option ". $opt ." does not exists (". $url .")";
+        }
+      }
+    }
+  }
+}
+
+# print the result of the path checks
+@keys = sort { $a <=> $b } keys(%pathsNotFound);
+
+my $resultFilesAndDirs = 0;
+if(scalar(@keys) > 0){
+  $result = 0;
+  testFailed("FILES AND DIRECTORIES EXISTS");
+  if($verbose > 0){
+    my $length = length($keys[scalar(@keys) - 1]);
+    foreach my $key (@keys){
+      printColored(sprintf("%". $length ."s", $key) .": ". $pathsNotFound{$key} ."\n", "red");;
+    }
+  }
+}
+else{
+  $resultFilesAndDirs = 1;
+  testPassed("FILES AND DIRECTORIES EXISTS");
+}
+
+# if all is ok and we should create an archive, create it now
+if($archive){
+  if(!$result && !$force){
+    printColored("Not creating archive, because of failed tests. You may like to add -f to force archive creation\n", "red");
+  }
+  else{
+    my $zip = Archive::Zip->new();
+    my $parent = $zip->addDirectory($structUrl);
+    if(!addDirToArchive($zip, $structUrl, $structUrl ."/", $verbose)){
+      testFailed("CREATE ARCHIVE");
+    }
+    my $zipUrl = $structUrl ."-". strftime("%Y%m%d-%H%M%S", localtime()) .".zip";
+    if($zip->writeToFileNamed($zipUrl) == AZ_OK){
+      testPassed("CREATE ARCHIVE (". $zipUrl .")");
+    }
+    else{
+      testFailed("CREATE ARCHIVE (". $zipUrl .")");
+      if($verbose > 0){
+        print "Could not write archive to file\n";
+      }
+    }
+  }
+}
+
+if($environment){
+  my $test = "CREATE ENVIRONMENT";
+  my $settings = loadSettings();
+  if(!exists($settings->{"defaultEnvironmentPath"})){
+    # we need to get default env path
+    my $defaultEnv = "e:\\proe-testing";
+    print "Please enter a default path, where environment structures are created [". $defaultEnv ."]: ";
+    my $input = <>;
+    $input = strip($input);
+    if($input eq ""){
+      $input = $defaultEnv;
+    }
+    if(!-d $input){
+      print "Should we create the path? (Y|n) [n]: ";
+      my $create = <>;
+      $create = strip($create);
+      if($create ne "Y"){
+        testFailed($test);
+        if($verbose > 0){
+          print "Should not create path\n";
+        }
+        exit 1;
+      }
+      my $error;
+      make_path($input, {error => \$error});
+      if(@$error){
+        testFailed($test);
+        if($verbose > 0){
+          print "Could not create path ". $input ."\n";
+        }
+        exit 1;
+      }
+    }
+    $settings->{"defaultEnvironmentPath"} = $input;
+    saveSettings($settings);
+  }
+  my $path = $settings->{"defaultEnvironmentPath"};
+  my $extension = "";
+  if($structUrl =~ m/[\\\/]?([^\\\/]+)[\\\/]?$/){
+    $extension = $1 ."_". strftime("%Y%m%d-%H%M%S", localtime());
+  }
+  else{
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not extend environment path for current structure\n";
+    }
+    exit 1;
+  }
+  $path .= "/". $extension;
+
+  # Copy all needed stuff into that environment
+  if(!dircopy($structUrl, $path)){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not copy ". $structUrl ." to ". $path ."\n";
+    }
+    exit 1;
+  }
+  # strip out all \.svn files
+  cleanSvn($path);
+
+  # adapt config.pro
+  my $envCfg = $path ."/config.pro";
+  my $oldCfg = $path ."/config.pro.orig";
+  my %allowedRelativePaths = optionsToIngoreAtPathCheckings();
+  my $fhOld;
+  my $fhNew;
+  # get current one
+  if(!-e $cfgUrl){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not find copied config.pro\n";
+    }
+    exit 1;
+  }
+  # move config.pro to create a new adapted one
+  if(!move(getInstallationConfigPro($path), $oldCfg)){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not backup ". $envCfg ."\n";
+    }
+    exit 1;
+  }
+  # adapt config
+  if(!open($fhOld, "<", $oldCfg)){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not open ". $oldCfg ." for reading\n";
+    }
+    exit 1;
+  }
+  if(!open($fhNew, ">", $envCfg)){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not open ". $envCfg ." for reading\n";
+    }
+    exit 1;
+  }
+  while(<$fhOld>){
+    my $line = strip($_);
+    if($line =~ m/^([^\s]+)\s+([^!]+)/){
+      my $opt = uc($1);
+      if(!exists($allowedRelativePaths{$opt})){
+        $line =~ s/\$PRO_DIRECTORY/$path/i;
+      }
+    }
+    print $fhNew $line ."\n";
+  }
+
+  # move config.win
+  my $newWin = $path ."/config.win";
+  my $oldWin = $path ."/text/config.win";
+  # move config.pro to create a new adapted one
+  if(!move($oldWin, $newWin)){
+    testFailed($test);
+    if($verbose > 0){
+      print "Could not move config.win in place (". $newWin .")\n";
+    }
+    exit 1;
+  }
+
+  # create shortcut
+  # determine executable
+  my $exe = "";
+  if(-e $installPath ."\\bin\\proe.exe"){
+    $exe = $installPath ."\\bin\\proe.exe";
+  }
+  if(-e $installPath ."\\..\\..\\Parametric\\bin\\parametric.exe"){
+    $exe = $installPath ."\\..\\..\\Parametric\\bin\\parametric.exe";
+  }
+  # Creo 3 path structure
+  if(-e $installPath ."\\..\\Parametric\\bin\\parametric.exe"){
+    $exe = $installPath ."\\..\\Parametric\\bin\\parametric.exe";
+  }
+  if(!-e $exe){
+    if($verbose > 0){
+      print "Could not create shortcut\n";
+    }
+  }
+  else{
+    eval{
+      my $username = Win32::LoginName;
+      my $link = Win32::Shortcut::new();
+      $link->{'Path'} = $exe;
+      $link->{'Description'} = "ProE config test - ". $extension;
+      $link->{'WorkingDirectory'} = $path;
+      $link->Save("c:\\Users\\". $username ."\\Desktop\\". $link->{'Description'}.".lnk");
+      $link->Close();
+      $test .= " (Use shortcut \"". $link->{'Description'} ."\" at your Desktop to test it)";
+    };
+    if( $@ ){
+      print "Could not create shortcut\n";
+    }
+  }
+
+  testPassed($test);
+}
+
+END {
+  if(defined($dbh) && ($dbh != 0) && !$dbh->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_check_struct - Runs some tests on a given file structure with custom files.
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_check_struct [options] [-e] [PATH_TO_CONFIG.CDB] PATH_TO_STRUCTURE
+
+This script compares a given config.pro file with the loaded options within
+the given cdb file. The config.pro file is also checked against duplicate
+entries of options.
+
+Options:
+
+  --help             -?   Prints this help.
+  --version               Prints current version.
+  --verbose          -v   The verbose level. 0 - least output, 2 most output (Default: 1).
+  --case-insensitive -i   Ignores all differences, with existing value, but different cases (e.g. YES and yes)
+                          The default is to print those differences in cyan. The count of ignored
+                          values is displayed.
+  --description      -d   Displays the description of each printed option.
+                          Only available, if a database can be queried.
+  --archive          -a   Create a zip archive from checked structure (Excludes all hidden files and directories.
+  --force            -f   Forces to create the archive, even tests have failed.
+  --environment      -e   Create a new environment to start ProE with all settings and files from PATH_TO_STRUCTURE
+
+Normally you won't specify a cdb file. Just run fm_create_help before you run this script
+to create a database. If you do not want or cannot create a database for the installtion
+you want to use, specify a cdb file.
+If no cdb file is given, it tries to figure out the correct installation with help of $ENV{PATH}.
+
+If you enable environment without giving a path, this script uses the default environment directory from
+the settings file and creates an folder with the same name as the PATH_TO_STRUCTURE, but with actual date
+suffixed.
+
+Example:
+
+  fm_check_struct c:\proeWildfire5\text\config.cdb c:\proeWildfire5\
+
+=head1 DESCRIPTION
+
+C<fm_check_struct> checks the given directory with config and other custom files
+for consistency. Therefore it parses the config.pro, and checks that all referenced
+files are in there relative location to this config.pro. The aim is, to make sure, that
+all files are at their place on all stations, after copying the checked structure
+into the existing installations.
+
+An example of an expected structure for the following config.pro can be:
+
+ DRAWING_SETUP_FILE $PRO_DIRECTORY\text\din.dtl
+ SYSTEM_COLORS_FILE $PRO_DIRECTORY\text\syscol.scl
+ !PEN_TABLE_FILE    $PRO_DIRECTORY\text\table.pnt
+ TEMPLATE_SOLIDPART $PRO_DIRECTORY\templates\mmns_part_solid.prt
+
+=over 2
+
+=item PATH_TO_STRUCTURE
+
+=over
+
+=item text
+
+fm_check_struct expects all files referenced with $PRO_DIRECTORY\text in config.pro
+within this directory. According to the above config.pro it is din.dtl and syscol.dtl, but not PEN_TABLE_FILE,
+because it's commented out.
+
+=over
+
+=item config.pro
+
+See related content above.
+
+=item din.dtl
+
+Because of the option in config.pro
+
+=back
+
+=item templates
+
+Same as for text directory explained above. According to above config.pro it expects
+the TEMPLATE_SOLIDPART here.
+
+=over
+
+=item solid_mmns.part
+
+Because of the option "template_solidpart" in config.pro
+
+=back
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

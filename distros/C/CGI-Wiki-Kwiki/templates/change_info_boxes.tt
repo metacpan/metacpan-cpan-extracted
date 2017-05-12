@@ -1,0 +1,29 @@
+[%# These are the form elements at the bottom of the page edit box, where
+    you enter your name, pick the type of edit, etc.
+-%]
+
+<table border="0">
+  <tr>
+    <td>
+      <strong>Your username:</strong>
+    </td>
+    <td>
+      <input type="text" size="30" name="username" value="[% username %]" />
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Comment about your changes:</strong></td>
+    <td>
+      <input type="text" size="30" name="comment" value="[% comment %]" />
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Type of edit:</strong></td>
+    <td>
+      <select name="edit_type">
+        <option [% IF edit_type == "Normal edit" %] selected="1" [% END %] value="Normal edit">Normal edit</option>
+        <option [% IF edit_type == "Minor tidying" %] selected="1" [% END %] value="Minor tidying">Minor tidying</option>
+      </select>
+    </td>
+  </tr>
+</table>

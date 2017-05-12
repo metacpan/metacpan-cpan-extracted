@@ -1,0 +1,43 @@
+Revision history for Perl extension CORBA::Perl.
+
+0.43  Wed Jul 16 18:30:00 2008
+	- add Vi & Emacs macros
+
+0.42  Wed Jan  2 18:30:00 2008
+	- some Perl Best Practices
+	- add a t/pod.t
+
+0.41  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+	- package refactoring (avoid PAUSE indexer errors)
+	- add RPC-GIOP example
+
+0.40  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+0.24  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+0.23  Wed Aug 22 12:30:00 2007
+	- add idl2pmcli.pl & client.pm (rpc)
+
+0.22  Mon Nov 15 12:30:00 2004
+	- implementation of visitBaseInterface
+
+0.21  Mon Jun  7 08:30:00 2004
+	- better support for 'import'
+
+0.20  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+
+0.11  Wed Mar 17 18:30:00 2004
+	- bug in Makefile.PL
+
+0.10  Tue Mar 16 12:30:00 2004
+	- first release : extraction from CORBA::XS
+
+0.01  Fri May  3 16:02:11 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n CORBA::XS
+

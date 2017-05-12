@@ -1,0 +1,21 @@
+Revision history for Convert-Color-Library
+
+0.05    2014/11/17 16:09:36
+        [BUGFIXES]
+         * Ignore the incorrectly-spelled "fuscia" HTML colour (RT100404)
+
+0.04    2014/11/13 19:15:06
+        [CHANGES]
+         * Expose Convert::Color::HTML as a toplevel colorspace; give it
+           HTML-specific abilities with #RRGGBB notation
+         * General distribution updates
+
+0.03    CHANGES:
+         * Updated for Convert::Color 0.06
+
+0.02    CHANGES:
+         * Added 'use warnings'
+         * Various updates to keep CPANTS happy
+
+0.01    First version, released on an unsuspecting world.
+

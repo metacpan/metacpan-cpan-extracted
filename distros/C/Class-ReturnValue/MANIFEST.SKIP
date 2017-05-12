@@ -1,0 +1,5 @@
+^config$
+^aegis.log$
+^Makefile$
+^blib/
+^pm_to_blib/

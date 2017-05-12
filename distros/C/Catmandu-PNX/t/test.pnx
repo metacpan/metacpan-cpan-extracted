@@ -1,0 +1,43 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+        http://www.openarchives.org/OAI/2.0/  http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<ListRecords>
+<record>
+<header>
+<identifier>004400000</identifier>
+</header>
+<metadata>
+<record>
+  <control>
+    <sourcerecordid>004400000</sourcerecordid>
+    <sourcesystem>ILS</sourcesystem>
+  </control>
+  <display>
+    <subject>Plantkunde</subject>
+    <subject>Erfelijkheid</subject>
+    <title>Inventaris van het archief vanHugo de Vries</title>
+    <lds02>ok</lds02>
+  </display>
+  <links>
+    <openurlfulltext>$$Topenurlfull_journal</openurlfulltext>
+  </links>
+  <search>
+    <general>Faber and Faber</general>
+    <general>UBM: P 45-3159</general>
+    <general>UBM: P 69-326</general>
+  </search>
+</record>
+</metadata>
+</record>
+<record>
+<header status="deleted">
+<identifier>undefined</identifier>
+</header>
+<metadata>
+<record/>
+</metadata>
+</record>
+</ListRecords>
+</OAI-PMH>

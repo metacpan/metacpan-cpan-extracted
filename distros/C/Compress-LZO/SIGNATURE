@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 2ef383201bca08c7aa40593b9463fa3cb548c5d4 COPYING
+SHA1 cb5345d37900c01975a4b792efb4cfe1f5943d3f Changes
+SHA1 ffdc61432557c04d9ce16fe806ef10eae55012cb INSTALL
+SHA1 aee9c3c9960c0dd53ac616871fda128f421ddabf LICENSE
+SHA1 0a3be44f84a8ebcd1122b1661a07df010f78191a LZO.xs
+SHA1 e48c03ef168a1880437eec1e28f5ef0c0912a727 MANIFEST
+SHA1 f4816995e451bbe6c62eb65a3a146395e475a496 MANIFEST.SKIP
+SHA1 d68a14f9afabc5c65e25ec1dfde8ee9b14833ef4 META.json
+SHA1 746091510360f0bf01e99a971e4fd0c4324efc99 META.yml
+SHA1 bb6d56ce4f96a4d9b290ad9a7f3f6016b77cab39 Makefile.PL
+SHA1 5d012519eb55ef484e4ea0fff52362d1dd3f7626 README
+SHA1 a7fc93dfc5a6f9d1e714fb9dd3a3f7a55fe59818 README.md
+SHA1 0e83f0f31108e0740fc314983de67d6266dd8862 lib/Compress/LZO.pm
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 f406569e6d2f498d09ae9f62baeb9b5b0c84ffbc t/author-pod-syntax.t
+SHA1 d3e88eec25bf0a819341c114e60d4f1f88d75d91 t/perlcriticrc
+SHA1 6969f5c148895a55b39ecd63703098d3757e7ec7 t/release-dist-manifest.t
+SHA1 e8f41653e89c5ca386a465cfd7ba0aefaee7735e t/release-distmeta.t
+SHA1 127dd2e847b97b03fb5acd4a29a832701f0e4618 t/release-eol.t
+SHA1 96f27ccf2e4d62018e399494dcd63659f014f6ae t/release-has-version.t
+SHA1 5c16f8c732992a6a0c81d3fec1bf4a38b9122ba6 t/release-kwalitee.t
+SHA1 744f4d8a9d86fbb0f270d6f797adf51a681f31ec t/release-portability.t
+SHA1 76edc69211aeb53d5302be5bdc8c60c21f19d120 t/release-unused-vars.t
+SHA1 bd0cca12ae8e1358768d5260e3333297ad8efe36 t/test.t
+SHA1 fcb039b4f382343e2c4e2b2f179b0dcf2a717d3b typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJXyp6oAAoJEGyU/X9Gt/PI78sQAJVF1TzYIa+2bPQ2tEVFFPM6
+MEiwDXMS9EiFRXGRqHTQWCtef9qtxr19fBBT1/7puMN7orProJAi22XNoMJ1jmh1
+LJERGLGNYdgazbKtqE6Al9ZaZ6KDjwUGyIru96cwUeNV7/4QfPsSrdLi6ux+TJGa
+gD8iCURIoqI6Ittn/4jwya5+UEpuMZYJhxGylQAP0XuGd+H5odSAP0gQURLEqw+1
+TkCOnu2wAd+y5/0f3qyGkIJCuSabNeu4As1N7f67qrc8dnIcbT2mCtQnOmYFCEEf
+VfxirCbEgPZqdanBphDpRwFI1JhQPR9HjzkOpD7KjwAyV6G7UXFOKsmEij7NEVRC
+aY2rvc/N5ZhAsG+2mmhebmsCYpZ5cmy8ucj93QqwoFAlyPzyz3WqBFaghEsiS9B9
+fYeecHeQbigKa4bhkUbU31l+muOgWCD5C4o9589XyozMWNRxkm/KIRjCVce6kQGs
+svN9FTniKT1vetnFk2JczEiiUxaPcY3cHOaRY8zHIBby4ngdaqXo5kvvl7hvwuh4
+pgQ1EAhVm97q8Dv0AIriO0u5yVuz4WBPN4NlFSA1KLVdhcAogMyVhyhSrHqhEOT/
+BmkzwLU/fGzbDtNf8e93qszzBEJxu+dyNjkLArLgcwDLWDBRraB+zV9UNAVZehSc
+zzkUT8zqHNX2eB8mbmQI
+=k1x1
+-----END PGP SIGNATURE-----

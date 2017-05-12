@@ -1,0 +1,234 @@
+Revision history for Perl extension Class::Contract.
+
+Planned for next release:
+
+  - Long overdue documentation update
+
+  - Rewrite tests using MSCHWERN's new Test::Harness
+
+  - Flattening and shortening
+
+
+1.14    Mon Jun 18 16:28:02 2001
+
+  - <C>croak</C> and <C>carp</C> are wrapped to facilitate reporting
+    correct file and line numbers within <C>impl</C>. Previously it was
+    hard to get useful file/line information when throwing an exception
+    within implementations.
+
+  - <C>private</C>
+    Forgetting to declare an inherited private method private
+    will cause croak. If for example you are adding pre/post-conditions
+    or defining a new implementation for a derived method, you must
+    declare it 'private', or an exception will be raised.
+
+  - <C>old</C> is now off by default. I have noticed, and others have
+    complained that it caused too much overhead. To toggle on/off per package:
+      use Class::Contract 'old';
+      no Class::Contract 'old';
+
+
+1.13    Mon May 07 10:47:21 2001
+
+  - Fixed deep copy of scalar references. Was breaking <C>old</C> and
+    <C>clone</C>.
+
+
+1.12    Tue Mar 13 08:53:06 2001
+
+  - Removed cruft from t/method.t test which was causing a false 
+    indication of test failures on some platforms. No code changes
+    to Class::Contract itself.
+
+
+1.11    Mon Mar 05 10:31:54 2001
+
+  - Added support for clone method which may be used as you might imagine.
+    To clone an object. Like ctor you may use clon to define initialization
+    pre, impl, post, and invar clauses to execute when cloning an object.
+
+  - Fixed problem working with objects which weren't created with
+    Class::Contract. Problems arose when an object wasn't a scalar reference.
+
+  - Fixed typo in _dcopy which broke deep copying of scalar references
+
+
+1.10    Sun Feb 09 12:15:31 2001
+
+  - Added missing <C>old</C>. It was documented but not implemented
+
+  - &self is now only way to access object/class reference. Use
+    self(self->next) instead of $_[0] = $_[0]->next.
+
+  - refactored all condition checking to use <C>generic_check</C> function
+
+  - revisted _inheritence and generic_check. Think I've finally got
+    weakening pre-conditional checks working correctly. There is a good
+    test covering this in t/method.t
+
+
+1.04    Wed Jan 31 15:45:42 2001
+
+  - Begun the process of writing extensive tests. Finding and
+    fixing many bugs.
+
+  - Calling a class accessor or method with an object reference
+    will now auto-magically change &self into a class name reference.
+    This was documented but not implemented. The converse, calling an
+    object accessor or method with a class reference causes an assertion
+
+  - Added keyword 'private'. Methods declared private can only be
+    invoked by the class or its descendants.
+
+  - Added optional exportation of shortcuts: scalar_attrs, array_attrs,
+    hash_attrs, methods. Allows defining clauses like:
+    abstract methods qw( foo bar baz );
+
+  - Fixed inheritence of pre-condition and implementation sub-clauses.
+    Sub-clauses weren't always inherited when the derived class
+    failed to define one.
+
+  - Fixed pre-condition checks. Satisfying self or any ancestor
+    wasn't working correctly when either the ancestor or the
+    derived class did not define any preconditions.
+
+  - &inherits now croaks on circular references in inheritence
+
+  - Rewrote _location so we can now use eval within the
+    contract statement to generate attribs, methods, etc.
+
+  - Post conditions and invariants can no longer modify by 
+    reference a method's @_. Now conditional checks receive a
+    @{[@_]} shallow copy.
+
+  - Fixed flyweight objects returned by constructor to avoid a
+    dangling reference which was preventing garbage collection.
+
+    The flyweight object is a blessed reference to $key which is
+    itself a reference to an undefined lexical scalar. $key is
+    also used as the hash key to the lexical %Class::Contract::data
+    which stores a given object's data. Previously constructors
+    returned $key. Consequently, when an object went out of scope
+    in your script, %data continued to reference $key. Now, when the
+    flyweight, which is not internally referenced by Class::Contract,
+    goes out of scope its destructor clears $data{$key}, and Perl's
+    garbage collection takes place. For a coherent explanation of 
+    such issues read section 13.13 of the Perl Cookbook, 1st Edition.
+
+  - Fixed multiple inheritence to appropriately handle cases where
+    a descendant might inherit the same base class through 2 or 
+    more intermediary classes. I.e. diamond patterns in inheritence
+    tree. This affects inheritence of invars, attributes, methods,
+    constructors, and destructors. Previously, it was possible to have
+    a base class' initialization code called multiple times by a
+    descendant's constructor. Once for each ancestor with the common
+    base class. 
+
+  - Fixed multiple inheritence with regard to constructor
+    initialization to be left-most depth-first, instead of
+    right-most depth-first. Destructors are the symetrical opposite
+    right-most derived-first.
+
+
+1.03  Wed Dec 27 14:06:11 2000
+
+  - Reformatted source to new maintainer's tastes. 2 space indent
+    and tabs, removal of barewords, foreach instead of for, etc.
+    Otherwise no changes to the underlying code.
+
+
+1.02  Fri Dec 21 10:22:48 2000
+
+  - One line change to C<generic_precheck> to fix improper skipping 
+    pre-conditional checks in some cases (thanks Jeff)
+
+
+1.01  Fri Dec  9 09:52:02 2000
+
+  - Change to generic constructor to work around magical limitations
+    of overload.pm. Should now play nicer with overload.pm
+
+  - Reversed ordering of Changes (this document)
+
+  - Updated documentation to reflect probationary new maintainer
+    C. Garrett Goebel, GGOEBEL, <ggoebel@cpan.org>
+
+
+1.00  Sun Aug  6 07:11:35 2000
+
+  - Changed semantics of preconditions.
+    Now only inherited if not defined in same class
+    (this conforms with the notion of derived classes
+    being allowed to weaken, but not strengthen preconditions).
+
+  - Added postconditions on SCALAR, ARRAY, and HASH attributes
+
+  - Added &value for attr conditions
+
+  - Removed &result -- now uses &value instead
+
+  - Added warning when explicit preconditions in derived
+    class override inherited preconditions from base class.
+
+  - Added default ctor ('new') if none specified.
+
+  - Modified flyweight implementation (more robust, secure, and
+    efficient)
+
+  - Modified ctors to refuse to instantiate classes with
+    1+ abstract methods.
+
+  - Added class constructors and destructors
+
+  - Changed production code mechanism
+    (now a separate, accelerated class: Class::Contract::Production)
+
+
+0.05  Wed Nov 24 14:11:22 1999
+
+  - First beta version
+
+
+0.01    Fri Jul 23 14:35:54 1999
+
+  - original version; created by h2xs 1.18
+    (very much alpha)
+
+
+Future Plans and Ponderings:
+
+  - Someday rewrite to use Attribute::Handlers
+
+  - Damian's Legacy
+    o  Class Flattening and shortening
+    o  Easier mechanisms for porting code to use CC. Like allowing 
+       pre-declared subroutines to be assimilated into contract
+
+  - Update documentation...
+    o  better examples of using objects in contracts
+    o  functions: scalar_attrs, array_attrs, hash_attrs, private, clon
+
+  - Constructor
+    o  Allow user-defined default values for attributes
+    o  Ponder whether or not it would be a good idea to provide a better
+       default mechanism for setting object attribute values during
+       construction. Particularly attributes which are themselves objects.
+
+  - <C>old</C>
+    o  Reexamine implementation of <C>old</C> with attention to destructors
+       and cleanup of the temporarily allocated package namespace better. 
+       Worry about magic and stash de-allocation.
+
+  - <C>post</C>: Add support for post-conditions on objects? How? Scalars,
+    arrays, and hashes are actually tied objects and do this on destruction.
+    Perhaps support post conditions on objects created via Class::Contract
+    by return a blessed reference to the same $key used to lookup object data
+    in the lexical Class::Contract %data. And provide an object attribute
+    for post-conditions that gets called by doppleganger on destruction?
+
+  - Tests 
+    o  Restructure and expand
+    o  Check out new version of Test::Harness and see if I can drop the
+       Magic.pm hack used for testing.
+
+  - Add support for <C>friend</C> classes?

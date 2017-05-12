@@ -1,0 +1,11 @@
+TYPEMAP
+Apache2::RequestRec T_APACHEOBJ
+
+OUTPUT
+T_APACHEOBJ
+        sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+INPUT
+T_APACHEOBJ
+        $var = modperl_xs_sv2request_rec(aTHX_ $arg, \"$ntype\", cv)
+

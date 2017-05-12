@@ -1,0 +1,13 @@
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README
+lib/Crypt/RS14_PP.pm
+lib/Crypt/RS14_PP.pod
+t/00-load.t
+t/01-crypt.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

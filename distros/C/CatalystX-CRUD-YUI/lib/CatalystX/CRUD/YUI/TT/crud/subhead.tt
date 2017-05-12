@@ -1,0 +1,12 @@
+<div id="head">
+ <div id="welcome">Welcome to [% c.config.name %]</div>
+ <!-- TODO implement a "all unique columns" search feature
+ <div id="quicksearch">
+  <form action="[% c.uri_for('/crud/search/fuzzy') %]">
+   <input type="text" size="30" name="q" value="[% c.req.params.q %]" />
+   <input type="submit" name="Search" value="Search" />
+  </form>
+ </div>
+ -->
+ <br style="clear:both" />
+</div>

@@ -1,0 +1,103 @@
+Revision history for Perl extension Catalyst::Plugin::Session
+
+0.20 2009-02-05
+        - No code changes since 0.19_01 dev release.
+        - Add IDEAS.txt which is an irc log of discussion about the next-generation
+          session plugin from discussion on #catalyst-dev
+        - Remove TODO file, which is no longer relevant.
+
+0.19_01 2009-01-09
+        - Switch from using NEXT to Class::C3 for method re-dispatch.
+        - Use shipit to package the dist.
+        - Switch to Module::install.
+        - Flash data is now stored inside the session (key "__flash") to avoid
+          duplicate entry errors caused by simultaneous select/insert/delete of
+          flash rows when using DBI as a Store. (Sergio Salvi)
+        - Fix session finalization order that caused HTTP responses to be sent
+          before the session is actually finalized and stored in its Store.
+          (Sergio Salvi)
+
+0.19    2007-10-08
+
+0.18    2007-08-15
+        - Fix Apache engine issue (RT #28845)
+
+0.17    2007-07-16
+        - Skip a test if Cookie is not installed (RT #28137)
+
+0.16    2007-07-03
+        - Stupid makefile
+
+0.15    2007-06-24
+        - Fix the bug that caused sessions to expire immediately when another
+          session was deleted previously in the same request cycle
+        - Changed finalize() to redispatch before saving session
+          so other finalize methods still have access to it.
+
+0.14    2007-01-31
+        - Disable verify_address.
+        - update flash to work like session
+
+0.13    2006-10-12
+        - Rerelease with slightly changed test due to a behavior change in
+          Test::MockObject
+        - add `clear_flash`
+        - improve debug logging
+
+0.12    2006-08-26
+        - refactor out a hookable finalize_session method, for plugins
+        - make _clear_session_instance_data call NEXT::, so that plugins can
+          hook on to that too
+
+0.11    2006-08-10
+        - Lazify expiry calculation and store it in a different instance data
+          slot. This provides greater flexibility for implementing hooks like
+          DynamicExpiry the "right" way.
+
+0.10    2006-08-01
+        - Implement a more well defined finalization order for Session stuff.
+          This solves a problem that was introduced by some value cleanups in
+          the 0.06 release.
+
+0.09    2006-07-31
+        - Fix Catalyst::Plugin::Session::Test::Store
+
+0.08    2006-07-31
+        - rerelease because Module::Bane broke the META.yml. HURAAH
+
+0.07    2006-07-30
+        - Make build tool complain loudly on incompatible versions of state
+          plugins.
+
+0.06    2006-07-29
+        - Change State plugin API to be pull oriented
+        - Lazify more correctly (mostly performance improvements)
+        - Don't try to compute digest of hash when there is no hash
+
+0.05    2006-01-01
+        - Un-workaround the Cache::FastMmap (actually Storable) limitation -
+          it's not C::P::Session's business.
+        - add $c->session_expires
+        - refactor guts
+        - improve semantics of session deletion (now deletes flash data too)
+        - improve lazy-load-ness of session data in the light of expiration
+
+0.04    2005-12-28 09:42:00
+        - Work around a limitation in Cache::FastMmap - must store only
+          references, while expiration was an NV.
+
+0.03    2005-12-26 10:22:00
+        - Lazify loading of session data for better performance and less chance
+          of race conditions
+        - support for $c->flash a la Ruby on Rails
+        - Fixed bug in sessionid algorithm detection.
+        - Separate __expires from the session data - we write it every time
+        - Lazify saving of session data for better performance and less chance
+          of race conditions
+
+0.02    2005-11-23 09:40:00
+        - Doc fixes
+        - No more -Engine=Test
+
+0.01    2005-11-14 12:41:00
+        - Initial release.

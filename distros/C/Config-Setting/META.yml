@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name: Config-Setting
+version: 0.04
+author: ~
+abstract: Perl extension for configuration files.
+license: bsd
+requires:
+  Test::More: 0
+recommends:
+  Test::Pod: 1
+provides:
+  Config::Setting:
+    file: lib/Config/Setting.pm
+    version: 0.04
+  Config::Setting::Chunk:
+    file: lib/Config/Setting/Chunk.pm
+    version: 765
+  Config::Setting::FileProvider:
+    file: lib/Config/Setting/FileProvider.pm
+    version: 765
+  Config::Setting::IniParser:
+    file: lib/Config/Setting/IniParser.pm
+    version: 765
+  Config::Setting::XMLParser:
+    file: lib/Config/Setting/XMLParser.pm
+    version: 765
+generated_by: Module::Build version 0.26

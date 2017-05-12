@@ -1,0 +1,32 @@
+(*) denotes features requiring Circle features
+(**) denotes features requiring Circle and Tangence features
+(#) denotes features requiring NaMatrix features
+
+
+App::MatrixClient feature parity:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Send typing notifications (*)
+My own displayname
+  - commands to change it
+Online/away status
+  - display it
+  - commands to change it
+  - automatic management on idleness (*)
+Incoming invites
+Non-text media events
+Sending media (* - FE->BE file transfer somehow??)
+
+
+Other TODOs:
+~~~~~~~~~~~~
+
+Send formatted messages:
+  - consider more than *italic* **bold** `monospace`
+  - /html command
+  - rich text editor (*)
+Sending invites
+Tab-completion group for member names
+Memberlist display (* - some sort of list item widget)
+Dynamic history replay by infinite scrollback (** - dequeue in Tangence)
+Some special handling of 1:1 rooms (# - requires account_data)

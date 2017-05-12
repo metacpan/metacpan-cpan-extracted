@@ -1,0 +1,14 @@
+0.04 Thu Apr  1 22:26:03 CEST 2010
+      - Don't raise errors if session data couldn't be looked up in the store
+        because it doesn't exist.
+
+0.03 Fri Oct  9 00:37:22 CEST 2009
+      - Port to new session config key
+      - do all database reads/writes in a txn; fixes bug on 5.8.9/centos
+
+0.02 Mon Feb  2 11:24:32 CST 2009
+      - unfuck apps where the session store is loaded
+        before the session state plugin (rafl)
+
+0.01 Thu Dec 11 04:33:50 CST 2008
+      - initial release

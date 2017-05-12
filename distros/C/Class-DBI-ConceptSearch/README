@@ -1,0 +1,144 @@
+Class-DBI-ConceptSearch version 0.01
+====================================
+
+Given the example Class::DBI classes (Music::CD, Music::Artist,
+Music::Track), lets add another one, Music::Dbxref, which contains
+external database accessions outside our control. Music::Dbxref includes
+things like UPC IDs, ASIN and ISBN numbers, vendor and manufacturer part
+numbers, person IDs (for artists), etc.
+
+Now, imagine a website with a basic search function that gives the users
+the option of searching in "Albums", "Artists", "Tracks", and (my
+favorite) "Anything".
+
+(1) In a simple implementation, a user search for "Britney Spears" in
+"Artists" is going to do something like:
+
+ Music::Artist->search( name => 'Britney Spears');
+
+(2) But suppose the user had accidentally searched in "Albums". The
+executed search would be:
+
+ Music::CD->search( title => 'Britney Spears');
+
+which doesn't produce any hits, and wouldn't even using search_like().
+Doh!
+
+(3) Likewise, if the user were to search in *any* category for Britney's
+CD "In the Zone" by its ASIN B0000DD7LB, no hits would be found.
+
+In a slightly more complex implementation, searches in each category
+might try to match fields in multiple different tables. Query (2) might
+try to match "Britney Spears" in both Artist.name and CD.title, but this
+would be hardcoded into a class that performs the search. If the search
+should be returning only CDs, we would also have to hardcode how to
+transform any matching Music::Artist instance to Music::CD instance(s).
+
+This is where Class::DBI::ConceptSearch comes in. It contains a generic
+search function that, given a configuration file, allows arbitrary
+mappings of search categories to database table fields. You specify what
+the available categories are, and where to look for data when a category
+is searched.
+
+You also specify any transforms that need to be performed on the
+resulting matches. This is where the Artist->CD mapping in query (2) is
+set up.
+
+You're also able to search in sections of the database which are private
+internals, and return public data. For instance, in query (3), we might
+have searched in "Artist" for the ASID. Behind the scenes,
+Class::DBI::ConceptSearch finds the ID and follows up with a:
+
+ Dbxref -> CD -> Artist
+
+transform and returns the Music::Artist objects.
+
+As we can imagine, there may be multiple possible paths within the
+database between Dbxref and Artist. It is also possible to specify
+these, see CONFIGURATION for details on how to define multiple sources
+
+NOTE: This example is contrived, and the usefulness of
+
+ Concept -> Table.Field(s)
+
+mapping may not be readily apparent. Class::DBI::ConceptSearch really
+shines when you have a more complex data model.
+
+
+
+  CONFIGURATION aka CONCEPT MAP FORMAT
+    An example
+
+    <?xml version="1.0" encoding="UTF-8"?> 
+    <conceptsearch> 
+
+      <!--
+      Find artists with name matching search term
+      -->
+      <concept label="Artist" name="artist">
+        <source class="Music::Artist" field="name"/>
+      </concept>
+
+      <!--
+        Find albums with title matching search term,
+         -OR-
+        artist with name matching search term,
+         -OR-
+        album with dbxref (ASIN, UPC, etc) matching search term
+      -->
+      <concept label="Album" name="cd">
+        <source class="Music::CD" field="title"/>
+        <source class="Music::Artist" field="name">
+          <transform sourceclass="Music::Artist" sourcefield="artistid" targetclass="Music::CD" targetfield="artistid"/>
+        </source>
+        <source class="Music::Dbxref" field="accession">
+          <transform sourceclass="Music::Dbxref" sourcefield="dbxrefid" targetclass="Music::CD_Dbxref" targetfield="dbxrefid"/>
+          <transform sourceclass="Music::CD_Dbxref" sourcefield="cdid" targetclass="Music::CD" targetfield="cdid"/>
+        </source>
+      </concept>
+
+      <!--
+        Find songs matching search term
+         -OR-
+        songs by artist matching search term
+         -OR-
+        songs matching dbxref (iTunes ID, perhaps)
+      -->
+      <concept label="Song" name="track">
+        <source class="Music::Track" field="title"/>
+        <source class="Music::Artist" field="name">
+          <transform sourceclass="Music::Artist" sourcefield="artistid" targetclass="Music::CD" targetfield="artistid"/>
+        </source>
+        <source class="Music::Dbxref" field="accession">
+          <transform sourceclass="Music::Dbxref" sourcefield="dbxrefid" targetclass="Music::Track_Dbxref" targetfield="dbxrefid"/>
+          <transform sourceclass="Music::Track_Dbxref" sourcefield="trackid" targetclass="Music::Track" targetfield="trackid"/>
+        </source>
+      </concept>
+    </conceptsearch>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Allen Day
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,42 @@
+---
+abstract: 'CPAN test dummy with optional prereqs'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120920'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Test-Dummy-Perl5-RecSug
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  CPAN::Test::Dummy::Perl5::RecSug:
+    file: lib/CPAN/Test/Dummy/Perl5/RecSug.pm
+    version: 0.001
+recommends:
+  CPAN::Test::Dummy::Perl5::Make::PerlReq::Fail: 0
+  File::Marker: 0
+requires:
+  autodie: 2.00
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Test-Dummy-Perl5-RecSug
+  homepage: https://github.com/dagolden/cpan-test-dummy-perl5-recsug
+  repository: https://github.com/dagolden/cpan-test-dummy-perl5-recsug.git
+version: 0.001

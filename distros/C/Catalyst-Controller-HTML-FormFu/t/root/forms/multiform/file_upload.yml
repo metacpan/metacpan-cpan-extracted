@@ -1,0 +1,17 @@
+---
+id: file-upload
+params_ignore_underscore: 1
+
+crypt_args:
+  -key: 'my secret'
+
+forms:
+  -
+    element:
+      type: File
+      name: image1
+
+  -
+    element:
+      type: File
+      name: image2

@@ -1,0 +1,14 @@
+Build.PL
+lib/Cal/DAV.pm
+MANIFEST			This list of files
+META.yml
+t/00use.t
+t/01basics.t
+t/02locks.t
+t/03auto_commit.t
+t/CalDAVTest.pm
+t/ics/birthdays.ics
+t/ics/new.ics
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

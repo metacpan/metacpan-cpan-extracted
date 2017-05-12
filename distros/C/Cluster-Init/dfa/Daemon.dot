@@ -1,0 +1,32 @@
+digraph "Cluster::Init::DFA::Daemon"
+{
+  
+  size="7.5,10";
+  //rankdir=LR;
+  //ratio=fill;
+
+
+  //async: 
+  start -> start [label="idle/read_cltab"];
+  start -> listen [label="cltab_ok/start_listener"];
+  //async: socketio
+  start -> halt [label="cltab_nok/"];
+  listen -> accept [label="socketio/watch_client"];
+  //async: socketio clientio
+  listen -> halt [label="socket_error/"];
+  listen -> listen [label="writetime/writestat"];
+  accept -> readline [label="clientio/getcmd"];
+  accept -> listen [label="timeout/putres"];
+  readline -> listen [label="timeout/putres"];
+  readline -> listen [label="cmderr/putres"];
+  readline -> cltab [label="tell/read_cltab"];
+  readline -> halting [label="shutdown/haltall"];
+  cltab -> listen [label="cltab_nok/putres"];
+  cltab -> telling [label="cltab_ok/tellgroup"];
+  telling -> listen [label="group_nok/putres"];
+  telling -> listen [label="grouptold/putres"];
+  telling -> halting [label="shutdown/haltall"];
+  halting -> halt [label="halted/putres"];
+  halt -> halt [label="halttime/bye"];
+
+}

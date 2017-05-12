@@ -1,0 +1,19 @@
+requires "Catalyst" => "5.90100";
+requires "File::Spec" => "0";
+requires "HTTP::Status" => "0";
+requires "Mojo::DOM58" => "1.000";
+requires "Scalar::Util" => "0";
+requires "Template::Pure" => "0.031";
+
+on 'test' => sub {
+  requires "Catalyst::Runtime" => "5.90100";
+  requires "Catalyst::Test" => "0";
+  requires "DateTime" => "0";
+  requires "File::Spec" => "0";
+  requires "Mojo::DOM58" => "1.000";
+  requires "Test::Most" => "0.34";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

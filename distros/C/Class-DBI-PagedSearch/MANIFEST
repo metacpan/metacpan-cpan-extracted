@@ -1,0 +1,13 @@
+Build.PL
+lib/Class/DBI/PagedSearch.pm
+Changes
+MANIFEST			This list of files
+t/000compile.t
+t/001pragmas.t
+t/003pod.t
+t/004uselib.t
+t/page.t
+META.yml
+Makefile.PL
+README
+mbk/Module/Build/Kwalitee.pm

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Session-ODBC
+version:      0.5
+version_from: ODBC.pm
+installdirs:  site
+requires:
+    CGI::Session:                  
+    DBD::ODBC:                     
+    DBI:                           
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

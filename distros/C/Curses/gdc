@@ -1,0 +1,150 @@
+#! /usr/bin/perl
+
+# This file a port from test/gdc.c in the ncurses-1.9.8a distribution.
+# No copyright license is publicly offered, but I don't think the
+# writer would mind the port.  It's not exact, because I was
+# simplifying things to find a bug in my port.
+#
+# Also note that this is basically a direct port.  If it looks like C
+# written in perl, that's because it is.  :-)
+#
+# /*
+#  * Grand digital clock for curses compatible terminals
+#  * Usage: gdc [-s] [n]   -- run for n seconds (default infinity)
+#  * Flags: -s: scroll
+#  *
+#  * modified 10-18-89 for curses (jrl)
+#  * 10-18-89 added signal handling
+#  */
+
+use ExtUtils::testlib;
+use Curses;
+
+$YBASE   = 10;
+$XBASE   = 10;
+$YDEPTH  =  5;
+$XLENGTH = 54;
+
+@disp = (075557, 011111, 071747, 071717, 055711, 074717,
+	 074757, 071111, 075757, 075717, 002020);
+
+
+$SIG{INT}  = \&sighndl;
+$SIG{TERM} = \&sighndl;
+
+initscr();
+cbreak();
+noecho();
+clear();
+refresh();
+
+$n = -1;
+for (@ARGV) {
+    /-s/ and $scroll = 1;
+    $n = $_;
+}
+$hascolor = eval { has_colors() };
+
+if ($hascolor) {	
+    start_color();
+    init_pair(1, COLOR_BLACK, COLOR_RED);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_WHITE, COLOR_BLACK);
+    attrset(COLOR_PAIR(3));
+
+    addch($YBASE - 1,  $XBASE - 1, ACS_ULCORNER);
+    hline(ACS_HLINE, $XLENGTH);
+    addch($YBASE - 1,  $XBASE + $XLENGTH, ACS_URCORNER);
+
+    addch($YBASE + $YDEPTH,  $XBASE - 1, ACS_LLCORNER);
+    hline(ACS_HLINE, $XLENGTH);
+    addch($YBASE + $YDEPTH,  $XBASE + $XLENGTH, ACS_LRCORNER);
+
+    move($YBASE,  $XBASE - 1);
+    vline(ACS_VLINE, $YDEPTH);
+
+    move($YBASE,  $XBASE + $XLENGTH);
+    vline(ACS_VLINE, $YDEPTH);
+
+    attrset(COLOR_PAIR(2));
+}
+
+while ($n--) {
+    $mask = 0;
+    $time = time;
+    my($sec, $min, $hour) = localtime $time;
+    set($sec  % 10,  0);
+    set($sec  / 10,  4);
+    set($min  % 10, 10);
+    set($min  / 10, 14);
+    set($hour % 10, 20);
+    set($hour / 10, 24);
+    set(10,          7);
+    set(10,         17);
+    foreach $k (0..5) {
+	if($scroll) {
+	    foreach $i (0..4) {
+		$new[$i] = ($new[$i] & ~$mask) | ($new[$i+1] & $mask);
+	    }
+	    $new[5] = ($new[5] & ~$mask) | ($next[$k] & $mask);
+	}
+	else { $new[$k] = ($new[$k] & ~$mask) | ($next[$k] & $mask) }
+	$next[$k] = 0;
+	for($s = 1; $s >= 0; $s--) {
+	    standt($s);
+	    foreach $i (0..5) {
+		if($a = (($new[$i] ^ $old[$i]) & ($s ? $new[$i] : $old[$i]))) {
+		    for ($j = 0, $t = 1 << 26; $t; $t >>= 1, $j++) {
+			if($a & $t) {
+			    if(!($a & ($t << 1))) {
+				move($YBASE + $i, $XBASE + 2*$j);
+			    }
+			    addstr("  ");
+			}
+		    }
+		}
+		if(!$s) { $old[$i] = $new[$i]; }
+	    }
+	}
+	refresh();
+    }
+#    /* this depends on the detailed format of ctime(3) */
+    my($ctime) = scalar localtime $time;
+    addstr(16, 30, substr($ctime, 0, 10) . substr($ctime, 19));
+    
+    move(0, 0);
+    refresh();
+    sleep(1);
+    if ($sigtermed) {
+	last;
+    }
+}
+standend();
+clear();
+refresh();
+endwin();
+print STDERR "gdc terminated by signal $sigtermed\n" if $sigtermed;
+
+sub set {
+    my($t, $n) = @_;
+    my($m)     = 7 << $n;
+
+    foreach $i (0..4) {
+	$next[$i] |= (($disp[$t] >> (4-$i)*3) & 07) << $n;
+	$mask     |= ($next[$i] ^ $old[$i]) & $m;
+    }
+    if ($mask & $m) { $mask |= $m }
+}
+
+sub standt {
+    my($on) = @_;
+
+    if ($on) { $hascolor ? attron(COLOR_PAIR(1)) : standout() }
+    else     { $hascolor ? attron(COLOR_PAIR(2)) : standend() }
+}
+
+sub sighndl {
+    local($sig) = @_;
+
+    $sigtermed = $sig;
+}

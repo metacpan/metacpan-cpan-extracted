@@ -1,0 +1,77 @@
+Courier::Filter 0.200
+A purely Perl-based mail filter framework for the Courier MTA.
+(C) 2003-2008 Julian Mehnle <julian@mehnle.net>
+<http://www.mehnle.net/software/courier-filter>
+==============================================================================
+
+The Courier MTA's courierfilter interface
+-----------------------------------------
+
+The Courier MTA <http://www.courier-mta.org> offers an interface for
+daemon-style processes to act as mail filters, called courierfilters.  For
+every incoming mail message, right after the DATA command in the SMTP
+transaction phase has completed, Courier calls every registered mail filter
+through a UNIX domain socket the filter is listening on, and feeds it the file
+names of the incoming message and one or more control files.  The mail filter
+processes the message and its control file(s), and returns an SMTP-style
+status response.  If the status response is a positive ("2xx") one, Courier
+accepts the message.  Otherwise, Courier rejects the message using the
+returned response code and text.
+
+About Courier::Filter
+---------------------
+
+Courier::Filter implements the courierfilter interface as a framework for mail
+filter modules that frees modules from the duties of creating and handling the
+UNIX domain sockets, waiting for connections from Courier, and reading and
+parsing message and control files.  Thus, authors of filter modules can
+concentrate on writing the actual filter logic without having to care about
+things that can easily be abstracted and can be performed by the framework.
+
+Courier::Filter allows multiple filter modules to be installed, and filter
+modules can be stacked and grouped hierarchically, and even a module's polarity
+can be reversed, so some modules can be used for explicitly accepting messages
+while others are used in the traditional way for rejecting messages.
+
+Getting started
+---------------
+
+Read the following perldocs in order to get started with Courier::Filter:
+
+  * Courier::Filter::Overview
+  * Courier::Filter
+  * Courier::Filter::Module
+
+Upgrading from versions prior to 0.15
+-------------------------------------
+
+Starting from version 0.15, the Courier::* Perl modules are no longer being
+installed in your Perl's configured "vendorlib" path, but in the private path
+'/usr/share/courier-filter-perl/perl5'.  (This is because Courier::Filter is
+primarily a plug-in for the Courier MTA, and not a library of Perl modules that
+are intended to be used by other programs or modules.  However some of the
+modules (e.g. Courier::Message) are indeed designed genericly, and should any
+other program or module actually make use of them in the future, I will split
+them off into a separate library package.)
+
+Due to this partial relocation, upgrading from a version prior to 0.15 is
+probably best achieved by removing the old version and doing a fresh install.
+You can of course keep your old configuration file(s).
+
+Reporting Bugs
+--------------
+
+Please report bugs in Courier::Filter and its documentation to the CPAN bug
+tracker:
+
+    http://rt.cpan.org/Public/Dist/Display.html?Name=Courier-Filter
+
+License
+-------
+
+Courier::Filter is free software.  You may use, modify, and distribute it under
+the same terms as Perl itself, i.e. under the GNU GPL (version 2 or later) or
+the Artistic License.  See LICENSE for the license texts.
+
+# $Id: README 210 2008-03-21 19:30:31Z julian $
+# vim:tw=79

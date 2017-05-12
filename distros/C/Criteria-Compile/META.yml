@@ -1,0 +1,31 @@
+---
+abstract: 'Describe wanted objects / data using grammar'
+author:
+  - 'A. J. Lucas <alucas@perl.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Criteria-Compile
+provides:
+  Criteria::Compile:
+    file: lib/Criteria/Compile.pm
+    version: 0.047
+  Criteria::Compile::HASH:
+    file: lib/Criteria/Compile.pm
+  Criteria::Compile::OBJECT:
+    file: lib/Criteria/Compile.pm
+  Criteria::DateTime:
+    file: lib/Criteria/DateTime.pm
+    version: 0.047
+requires:
+  DateTime: 0
+  Tie::IxHash: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.047

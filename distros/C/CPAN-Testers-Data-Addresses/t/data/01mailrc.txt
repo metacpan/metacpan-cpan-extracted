@@ -1,0 +1,5 @@
+alias BARBIE     "Barbie <barbie@missbarbell.co.uk>"
+alias BINGOS     "Chris Williams <chris@bingosnet.co.uk>"
+alias JONALLEN   "Jon Allen <jj@jonallen.info>"
+alias JOST       "Jost Krieger <Jost.Krieger+pppause@ruhr-uni-bochum.de>"
+alias SREZIC     "Slaven Rezic <slaven@rezic.de>"

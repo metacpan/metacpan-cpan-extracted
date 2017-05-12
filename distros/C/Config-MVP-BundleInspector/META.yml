@@ -1,0 +1,349 @@
+---
+abstract: 'Determine prereqs and INI string from PluginBundles'
+author:
+  - 'Randy Stauner <rwstauner@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::Differences: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-MVP-BundleInspector
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+  namespace:
+    - Local
+    - t::lib
+  package:
+    - DB
+provides:
+  Config::MVP::BundleInspector:
+    file: lib/Config/MVP/BundleInspector.pm
+    version: 0.001
+requires:
+  CPAN::Meta::Requirements: 0
+  Class::Load: 0
+  Config::MVP::Writer::INI: 0.002
+  Moose: 0
+  MooseX::AttributeShortcuts: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Perl: 0
+  namespace::autoclean: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Config-MVP-BundleInspector
+  homepage: https://github.com/rwstauner/Config-MVP-BundleInspector
+  repository: https://github.com/rwstauner/Config-MVP-BundleInspector.git
+version: 0.001
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Author::RWSTAUNER/Git::NextVersion'
+      version: 2.009
+    -
+      class: Dist::Zilla::Plugin::GenerateFile
+      name: '@Author::RWSTAUNER/GenerateManifestSkip'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::RWSTAUNER/GatherDir'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::RWSTAUNER/PruneCruft'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::RWSTAUNER/ManifestSkip'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::RWSTAUNER/PruneDevelCoverDatabase'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::RWSTAUNER/PruneCodeStatCollection'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::RWSTAUNER/PruneTags'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::RWSTAUNER/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::RWSTAUNER/NextRelease'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Git::Describe
+      name: '@Author::RWSTAUNER/Git::Describe'
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::RWSTAUNER/PkgVersion'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: '@Author::RWSTAUNER/Prepender'
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Author::RWSTAUNER/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::RWSTAUNER/License'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::RWSTAUNER/Readme'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::RWSTAUNER/ReadmeAnyFromPod'
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: '@Author::RWSTAUNER/Bugtracker'
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@Author::RWSTAUNER/Repository'
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@Author::RWSTAUNER/GithubMeta'
+      version: 0.28
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::RWSTAUNER/AutoPrereqs'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::RWSTAUNER/MetaNoIndex'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@Author::RWSTAUNER/MetaProvides::Package'
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::RWSTAUNER/MinimumPerl'
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::RWSTAUNER/MetaConfig'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::RWSTAUNER/MetaYAML'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::RWSTAUNER/MetaJSON'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::RWSTAUNER/ExecDir'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::RWSTAUNER/ShareDir'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::RWSTAUNER/MakeMaker'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Author::RWSTAUNER/Test::ReportPrereqs'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::RWSTAUNER/Test::ChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      name: '@Author::RWSTAUNER/Test::PodSpelling'
+      version: 2.004003
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@Author::RWSTAUNER/@TestingMania/Test::UnusedVars'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Synopsis'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Portability'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Version'
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::RWSTAUNER/@TestingMania/PodCoverageTests'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Perl::Critic'
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Changes'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::RWSTAUNER/@TestingMania/Test::DistManifest'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::RWSTAUNER/@TestingMania/MetaTests'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Compile'
+      version: 2.001
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Kwalitee'
+      version: 2.03
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@Author::RWSTAUNER/@TestingMania/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::RWSTAUNER/@TestingMania/Test::MinimumVersion'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Pod::LinkCheck'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@Author::RWSTAUNER/@TestingMania/Test::EOL'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::RWSTAUNER/@TestingMania/PodSyntaxTests'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::RWSTAUNER/@TestingMania/MojibakeTests'
+      version: 0.5
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::RWSTAUNER/Manifest'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@Author::RWSTAUNER/CheckExtraTests'
+      version: 0.011
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Author::RWSTAUNER/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@Author::RWSTAUNER/CheckPrereqsIndexed'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::RWSTAUNER/TestRelease'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Author::RWSTAUNER/@Git/Check'
+      version: 2.009
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::RWSTAUNER/@Git/Commit'
+      version: 2.009
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::RWSTAUNER/@Git/Tag'
+      version: 2.009
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Author::RWSTAUNER/@Git/Push'
+      version: 2.009
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::RWSTAUNER/ConfirmRelease'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::RWSTAUNER/UploadToCPAN'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::RWSTAUNER/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300030
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300030
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300030
+x_authority: cpan:RWSTAUNER

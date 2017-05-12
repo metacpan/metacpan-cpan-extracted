@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Model::WebService::Solr
+
+0.04  Mon May 17 2010
+    - Update synopsis to use Moose (RT #57533)
+
+0.03  Mon Nov 23 2009
+    - Fix the way config info is read (RT #51803)
+
+0.02  Wed Jun 24 2009
+    - Moosified so it will work properly with Catalyst 5.8x
+
+0.01  Wed Oct 08 2008
+    - original version
+

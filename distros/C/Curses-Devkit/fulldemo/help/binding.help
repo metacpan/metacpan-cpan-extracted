@@ -1,0 +1,17 @@
+All interactive widgets have the ability to bind specific keys to specific
+functions. This allows programmers to customize the widgets to perform 
+specific actions when a key is hit. The following example demonstrates how
+to call the bind function.
+<C></B>$widget->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the callback function.
+
+</R>Example Use Of The Bind Method<!R>
+<F=../examples/bind>
+
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995

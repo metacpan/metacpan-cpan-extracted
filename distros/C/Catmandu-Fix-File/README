@@ -1,0 +1,36 @@
+NAME
+
+    Catmandu::Fix::File - Catmandu fixes to check file attributes
+
+SYNOPSIS
+
+      use Catmandu::Fix::File;
+    
+      # all fix functions are exported by default
+
+DESCRIPTION
+
+    Catmandu::Fix::File includes the following Catmandu::Fix functions:
+
+      * Catmandu::Fix::basename
+
+      * Catmandu::Fix::dirname
+
+      * Catmandu::Fix::file_size
+
+      * Catmandu::Fix::human_byte_size
+
+      * Catmandu::Fix::Condition::file_test
+
+AUTHOR
+
+    Nicolas Franck, <nicolas.franck at ugent.be>
+
+LICENSE AND COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

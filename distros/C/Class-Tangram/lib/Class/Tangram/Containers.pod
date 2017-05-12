@@ -1,0 +1,288 @@
+
+=head1 NAME
+
+Class::Tangram::Containers - information on the new container methods
+
+=head1 DESCRIPTION
+
+The way that Class::Tangram accessors work for `collection' types
+changed radically since the last CPAN release.
+
+They can now all respond to the same signals, regardless of whether
+they are being implemented by a Set::Object, array or a hash in the
+data schema.  Being able to hide the characteristics of the underlying
+data structure is generally considered a Good Thing(tm), so the
+features have stuck.
+
+=head2 BACKGROUND
+
+These features were, believe it or not, partially inspired by a short
+PHP job I did last year.
+
+You see, one thing that PHP does very well is associative arrays.
+They behave very much like Tie::ixHash ordered hashes; a single
+associative array can be accessed numerically OR with a key, with
+sensible default behaviour when you change the way you access it
+`mid-flight'.
+
+It is actually a fairly rare condition where you actually I<need> an
+ordered hash.  But pragmatically, not having to care whether you were
+passing a hash or an array around really started to become handy.  I
+found myself using it more often than I thought I would, and this
+subtle linguistic difference in PHP paying off handsomely here and
+there.
+
+There I was thinking that I had been blind not to realise that PHP
+could have been a much more sensible language for most things - until
+I actually started to use it, and I started to come across the many
+nasty bodges at the language design level that PHP is infested with.
+Languages without a decent convention or method of encapsulation suck,
+which is just one of the many reasons why PHP sucks.  But don't get me
+started on that.
+
+Actually, encapsulation was my primary motivation for writing
+Class::Tangram in the first place, to avoid the breaking of it I saw
+all the way through the Tangram guided tour (which obviously
+Jean-Louis did for the sake of brevity, not because he likes flaunts
+OO principles).
+
+But back to the main point; PHP took two similar types of collections
+- indexed arrays and associative arrays - and coaxed them into
+equivalence.
+
+So, I'm attempting to apply a similar principle with associations with
+Class::Tangram.
+
+=head2 Associations, ordering, and multiplicity
+
+An `association' is some kind of relationship between two things.  In
+Class::Tangram terms, this means a reference, set, array or hash to
+another object.
+
+The `multiplicity' of a relationship describes the number of items
+that exist on either end of the relationship.
+
+The `ordering' of a relationship describes what, if any, B<indices>
+apply to the elements in the collection.
+
+To summarise the available types in Class::Tangram and Tangram;
+
+   1. reference, an unordered * to 1 association
+   2. set,       an unordered * to * association
+   3. iset,      an unordered 1 to * association
+   4. array,     an   ordered * to * association
+   5. iarray,    an   ordered 1 to * association
+   6. hash,       a   keyed   * to * association
+   7. ihash,      a   keyed   1 to * association
+
+(note: Tangram 2.07.1 or later required for storage of ihash)
+
+=head2 Defining a common message set
+
+So how do we go about making Sets, References, Arrays and Hashes
+manipulextrous?
+
+Jean-Louis' Set::Object class defines the operations applicable to
+unordered collections - where each object may only exist once in the
+collection (if objects could exist in it twice, it would be called a
+bag, but personally I've never wanted to use this type of collection
+where an ordered collection like an array would not suffice).
+
+Those operations are:
+
+   $set->insert(@objs)
+   $set->includes(@objs)
+   $set->members()
+   $set->size()
+   $set->remove(@objs)
+   $set->clear()
+
+[All the other methods of Set::Object do not affect the invocant
+Set::Object, so I'm not concerned with them.]
+
+In Class::Tangram version 1.04 (? I think - somewhere like that :)),
+the keen eyed/clairvoyant Class::Tangram user may have noticed that I
+added corresponding $instance->attribute_foo() functions, where foo is
+a function from the above list.  All in the name of encapsulation.
+
+So you'd replace
+
+   $obj->{set}->insert(@objs) with $obj->set_insert(@objs);
+   $obj->{set}->includes(@x)  with $obj->set_includes(@x);
+   $obj->{set}->members()     with ($obj->set)
+   $obj->{set}->size()        with $obj->set_size();
+   $obj->{set}->remove(@objs) with $obj->set_remove(@objs);
+   $obj->{set}->clear()       with $obj->set_clear()
+
+You may notice that the `members' method is conspicuously absent from
+the Class::Tangram auto-defined functions; I decided that array vs
+scalar context was explicit enough.  In scalar context, you still get
+the container back, if you need it.
+
+My primary motivation for this was that I wasn't happy with dealing
+with the container objects in my application logic.  It seemed to be a
+kind of implicit violation of encapsulation, to assume that an
+attribute of an object was a set, and could therefore have all these
+->insert() etc methods called on it.
+
+Just think - if you changed a set attribute to an array, you would
+have to do something really hairy with overloading or tie to present
+an array as a set, or face re-writing the code that uses it.
+
+However, using the Class::Tangram autogenerated methods, you could
+just write the $obj->attribute_insert(), $obj->attribute_includes, etc
+functions to remain backwards compatibility with an unknown quantity
+of application logic that assumed that the attribute was a set.  Of
+course, it would not help going the other way.  This still perplexed
+me.
+
+At about the same time, I made `array' and `hash' attribute types do
+something similar;
+
+   @{$obj->{array}}       would become ($obj->array)
+   $obj->{array}->[7]     would become $obj->array(7)
+   @{$obj->{array}}[7,42] would become ($obj->array(7,42))
+
+Of course, in scalar context it still returned the ARRAY reference, so
+these would also work, if it suited you:
+
+   @{$obj->{array}}       could also become @{$obj->array}
+   $obj->{array}->[7]     could also become $obj->array->[7]
+   @{$obj->{array}}[7,42] could also become @{$obj->array}[7,42]
+
+Similarly with HASH collections;
+
+  %{$obj->{hash}}        would become ($obj->hash)
+  $obj->{hash}->{$key}   would become $obj->hash($key)
+  @{$obj->{hash}}{@keys} would become ($obj->hash(@keys))
+
+[note: the second of those probably didn't even work due to a
+ scalar/list context bug, fixed in this release]
+
+So, in some sense this is already blurring the distinction between
+hash and array attributes - in list context, you're getting back a
+list of objects, and fetching them by ID (be it numerical or textual)
+is performed in the same way.  But how do we make them really, really
+fantastically identical?
+
+Well, make them all conform to the same `interface', of course.
+Unfortunately interface definitions are absent from a Perl
+programmer's lexical toolset.
+
+The nicest way to solve this problem would be to make a generic
+``Container'' class, that Set::Object, Ref::Object, Array::Object and
+Hash::Object derive from.  This would provide a nice class structure
+to overload all of the collection manipulation operations, and us OO
+purists could go nuts. (note: to my knowledge, only Set::Object has
+actually been written, the builtin types generally serving the
+required functions).
+
+Then, we could safely use $object->collection->insert("Foo") and
+everyone would be happy.  Unfortunately, Perl's inbuilt Classes for
+RV's (Reference Values - the type of scalar that `ref($scalar)'
+returns a true value to), hashes and arrays are not subject to
+manipulation using OO terms.  Heritable::Types goes some of the way,
+but cannot apply to unblessed structures.
+
+For now I've taken what seems to be the easy way out, and am defining
+$object->collection_insert(), $object->collection_clear(), etc
+functions for all the collection types.  These can easily be emulated
+with wrappers calling $object->collection->insert() once the above
+module is finished.
+
+=head2 Available methods for collections
+
+So, now the following functions are recommended for general use; these
+collectively form the Class::Tangram collection interface definition.
+
+=over
+
+=item B<Inserting into a collection>
+
+  $object->foo_insert([$key => ] $value)
+
+  instead of push @{$object->foo}
+
+          or @{$object->foo} =
+	         ( @{$object->foo}[0 .. $key-1],
+ 	           $value,
+                   @{$object->foo}[$key .. $#{$object->foo}] )
+           [these four lines of nonsense are just inserting into an
+	    array, of course]
+
+          or $object->foo->{$key} = $value
+	  or $object->set->insert($value)
+          or $object->set_foo($value)
+
+A key is detected in the passed parameters by virtue of being a flat
+value rather than a reference.  Keys provided for (non-keyed)
+Set::Object and reference containers are silently ignored.  If a
+string key is provided for an array type, then it is silently
+converted to a PUSH to the end of the array.  If a numeric key is
+provided for a hash key, then it is treated as a string.
+
+Inserting an object into a reference collection - which can only
+contain one element - is a different matter.  This generates a run
+time warning that your container has overflowed.  If necessary, the
+object which is `pushed out' is `told' of the fact - see the later
+section on COMPANION CLASSES.
+
+=item B<Replacing an existing value in a collection>
+
+  $object->foo_replace([$key =>] $value)
+
+  instead of $object->foo->[$key] = $value    # i?array
+          or $object->foo->{$key} = $value    # i?hash
+          or $object->{foo}       = $value    # ref
+          or $object->foo->insert($value)     # i?set
+
+Keys used in non-keyed sets are ignored.  A key is detected in the
+passed parameters by virtue of being a scalar.
+
+Note that for unordered sets, this function is exactly equivalent to
+$object->foo_insert($value)
+
+=item B<Removing an object from a collection>
+
+  $object->foo_remove($key | $value);
+
+=item B<Testing for the presence of an item in a collection>
+
+  $object->foo_includes($key | $value);
+
+=item B<Testing for the number of items in a collection>
+
+  $object->foo_size();
+
+=item B<Emptying a collection>
+
+  $object->foo_clear()
+
+=item B<Setting a collection to consist of only a single object>
+
+  $object->set_foo($object)
+
+=back
+
+=head1 Companion associations
+
+Right.  Now you've got all that, the first application of it;
+companion associations.
+
+If you add the special keyword `companion' to an attribute definition,
+the `set_attribute' function will do something special; on every
+update of the attribute, it will compare the members of the collection
+before and after.
+
+Objects that are new will have their `companion_insert' method called.
+Objects that are gone will have their `companion_remove' method called.
+
+See the test script t/04-containers.t for a few examples of what this
+does.
+
+=head1 SEE ALSO
+
+L<Class::Tangram>, L<Tangram>
+
+=cut
+

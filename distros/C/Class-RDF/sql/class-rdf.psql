@@ -1,0 +1,25 @@
+create table ns (
+    prefix char(16),
+    uri char(255)
+);
+
+create table node (
+    id serial primary key,
+    created timestamp,
+    value text,
+    is_resource integer
+);
+
+create table statement (
+    id serial primary key,
+    created timestamp,
+    subject integer,
+    predicate integer,
+    object integer,
+    context integer
+);
+
+create index subject on statement (subject);
+create index predicate on statement (predicate);
+create index object on statement (object);
+create index context on statement (context);

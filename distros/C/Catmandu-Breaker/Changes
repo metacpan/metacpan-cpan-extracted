@@ -1,0 +1,19 @@
+Revision history for Catmandu-Breaker
+
+0.10  2016-06-30 15:03:48 CEST
+  - Adding verbose option
+  - Adding the maxscan option to limit preprocessing
+  - Adding the fields option to specify which fields to use in the report
+  - Adding a fields option to the Exporter to save the unique fields in a file
+
+0.03  2016-06-16 09:07:37 CEST
+  - Fixed bugs in the statistical format
+  - Breaker for MARC breaks on every MARC-subfield
+  - Deleted OAI-DC breaker
+  - More POD
+
+0.02  2016-06-15 16:21:56 CEST
+  - Adding the breaker command line tool
+
+0.01  2016-06-15 14:59:07 CEST
+  - initial release

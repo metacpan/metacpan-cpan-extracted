@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 229
+name: dde5
+registers:
+  AF: 29794
+  AF_: 0
+  BC: 39788
+  BC_: 0
+  DE: 49125
+  DE_: 0
+  HL: 816
+  HL_: 0
+  I: 0
+  IX: 45698
+  IY: 57970
+  PC: 0
+  R: 0
+  SP: 1889

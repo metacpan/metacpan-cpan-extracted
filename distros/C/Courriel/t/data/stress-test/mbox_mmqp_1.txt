@@ -1,0 +1,40 @@
+Received: from localhost (HELO [127.0.0.1]) (127.0.0.1)
+    by montreal (qpsmtpd/0.32) with ESMTP; Sat, 29 Apr 2006 06:13:14 -0700
+Return-Path: <john@www.mazrmail.com>
+X-Original-To: grokbase-test1@lists.grokbase.com
+Delivered-To: grokbase-test1@lists.grokbase.com
+Received: from Unknown (HELO www.mazrmail.com) (192.168.1.6)
+	by montreal (qpsmtpd/0.32) with ESMTP; Sat, 29 Apr 2006 06:13:09 -0700
+Received: by www.mazrmail.com (Postfix, from userid 500)
+	id EA28E5B8277; Mon, 10 Apr 2006 16:36:12 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by www.mazrmail.com (Postfix) with ESMTP id E722C5B80AB
+	for <grokbase-test1@lists.grokbase.com>;
+	Mon, 10 Apr 2006 16:36:12 -0700 (PDT)
+Date: Mon, 10 Apr 2006 16:36:12 -0700 (PDT)
+From: John <john@www.mazrmail.com>
+To: grokbase-test1@lists.grokbase.com
+Message-ID: <Pine.LNX.4.64.0604101635590.11349@www.mazrmail.com>
+MIME-Version: 1.0
+Subject: [Grokbase-test1] a6
+X-BeenThere: grokbase-test1@lists.grokbase.com
+X-Mailman-Version: 2.1.7
+Precedence: list
+List-Id: <grokbase-test1.lists.grokbase.com>
+List-Unsubscribe: <http://lists.grokbase.com/mailman/listinfo/grokbase-test1>, 
+	<mailto:grokbase-test1-request@lists.grokbase.com?subject=unsubscribe>
+List-Archive: <http://lists.grokbase.com/pipermail/grokbase-test1>
+List-Post: <mailto:grokbase-test1@lists.grokbase.com>
+List-Help: <mailto:grokbase-test1-request@lists.grokbase.com?subject=help>
+List-Subscribe: <http://lists.grokbase.com/mailman/listinfo/grokbase-test1>,
+	<mailto:grokbase-test1-request@lists.grokbase.com?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Sender: grokbase-test1-bounces@lists.grokbase.com
+Errors-To: grokbase-test1-bounces@lists.grokbase.com
+
+z
+_______________________________________________
+Grokbase-test1 mailing list
+Grokbase-test1@lists.grokbase.com
+http://lists.grokbase.com/mailman/listinfo/grokbase-test1

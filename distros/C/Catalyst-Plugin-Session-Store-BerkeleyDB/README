@@ -1,0 +1,6 @@
+This is a CPAN module, just do:
+
+perl Makefile.PL
+make
+make test
+make install

@@ -1,0 +1,74 @@
+CGI::Session::Auth
+==================
+$Id: README 26 2006-02-21 12:26:19Z geewiz $
+
+CGI::Session::Auth is a Perl class that provides the necessary
+functions for authentication in CGI scripts. It uses CGI::Session for
+session management and supports several backends for credentials
+storage, such as flat file and DBI.
+
+CGI::Session::Auth offers an alternative approach to HTTP 
+authentication. Its goal is to integrate the authentication
+process into the web application as seamless as possible while keeping
+the programming interface simple.
+
+Users can authenticate themselves by entering their user
+name and password into a login form. This is the most common way 
+of authenticating a web site visitor.
+
+Alternatively, a user can automatically be authenticated by his IP address.
+This is useful when authorized users can't be bothered to log in manually
+but can be identified by a range of fixed IP addresses.
+
+CGI::Session::Auth manages a profile for every user account,
+containing his user name, his password and his user id. The user id is
+a 32-character string unique for every user. A user profile can
+contain additional fields for arbitrary data.
+
+Assistance in the development of this modules is encouraged and
+greatly appreciated. Please contact me!
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Session
+  NetAddr::IP
+  DBI (in CGI::Session::Auth::DBI)
+
+
+DOCUMENTATION AND SUPPORT
+
+Module documentation is provided as POD.
+
+See the examples/ subdirectory for small usage examples.
+
+For further information regarding this module, please visit the 
+project website at https://launchpad.net/perl-cgi-session-auth.
+
+
+BUGS
+
+Please report all bugs via the issue tracking on the project website.
+
+Assistance in the development of this modules is encouraged and
+greatly appreciated.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003-2010 Jochen Lillich <geewiz@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

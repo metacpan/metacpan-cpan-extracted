@@ -1,0 +1,30 @@
+---
+abstract: 'A template-free demo of CGI::Snapp using just 1 run mode'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0.94
+  Test::Pod: 1.44
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Snapp-Demo-One
+provides:
+  CGI::Snapp::Demo::One:
+    file: lib/CGI/Snapp/Demo/One.pm
+    version: 1.02
+requires:
+  CGI: 3
+  CGI::Emulate::PSGI: 0.14
+  CGI::Snapp: 1.03
+  parent: 0
+  strict: 1.03
+  warnings: 1.03
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.02

@@ -1,0 +1,63 @@
+# encoding: Latin3
+# This file is encoded in Latin-3.
+die "This file is not encoded in Latin-3.\n" if q{‚ } ne "\x82\xa0";
+
+use strict;
+use Latin3;
+
+my $__FILE__ = __FILE__;
+
+my %uc = ();
+@uc{qw(a b c d e f g h i j k l m n o p q r s t u v w x y z)} =
+    qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z);
+%uc = (%uc,
+    "\xB1" => "\xA1", # LATIN LETTER H WITH STROKE
+    "\xB6" => "\xA6", # LATIN LETTER H WITH CIRCUMFLEX
+    "\xBA" => "\xAA", # LATIN LETTER S WITH CEDILLA
+    "\xBB" => "\xAB", # LATIN LETTER G WITH BREVE
+    "\xBC" => "\xAC", # LATIN LETTER J WITH CIRCUMFLEX
+    "\xBF" => "\xAF", # LATIN LETTER Z WITH DOT ABOVE
+    "\xE0" => "\xC0", # LATIN LETTER A WITH GRAVE
+    "\xE1" => "\xC1", # LATIN LETTER A WITH ACUTE
+    "\xE2" => "\xC2", # LATIN LETTER A WITH CIRCUMFLEX
+    "\xE4" => "\xC4", # LATIN LETTER A WITH DIAERESIS
+    "\xE5" => "\xC5", # LATIN LETTER C WITH DOT ABOVE
+    "\xE6" => "\xC6", # LATIN LETTER C WITH CIRCUMFLEX
+    "\xE7" => "\xC7", # LATIN LETTER C WITH CEDILLA
+    "\xE8" => "\xC8", # LATIN LETTER E WITH GRAVE
+    "\xE9" => "\xC9", # LATIN LETTER E WITH ACUTE
+    "\xEA" => "\xCA", # LATIN LETTER E WITH CIRCUMFLEX
+    "\xEB" => "\xCB", # LATIN LETTER E WITH DIAERESIS
+    "\xEC" => "\xCC", # LATIN LETTER I WITH GRAVE
+    "\xED" => "\xCD", # LATIN LETTER I WITH ACUTE
+    "\xEE" => "\xCE", # LATIN LETTER I WITH CIRCUMFLEX
+    "\xEF" => "\xCF", # LATIN LETTER I WITH DIAERESIS
+    "\xF1" => "\xD1", # LATIN LETTER N WITH TILDE
+    "\xF2" => "\xD2", # LATIN LETTER O WITH GRAVE
+    "\xF3" => "\xD3", # LATIN LETTER O WITH ACUTE
+    "\xF4" => "\xD4", # LATIN LETTER O WITH CIRCUMFLEX
+    "\xF5" => "\xD5", # LATIN LETTER G WITH DOT ABOVE
+    "\xF6" => "\xD6", # LATIN LETTER O WITH DIAERESIS
+    "\xF8" => "\xD8", # LATIN LETTER G WITH CIRCUMFLEX
+    "\xF9" => "\xD9", # LATIN LETTER U WITH GRAVE
+    "\xFA" => "\xDA", # LATIN LETTER U WITH ACUTE
+    "\xFB" => "\xDB", # LATIN LETTER U WITH CIRCUMFLEX
+    "\xFC" => "\xDC", # LATIN LETTER U WITH DIAERESIS
+    "\xFD" => "\xDD", # LATIN LETTER U WITH BREVE
+    "\xFE" => "\xDE", # LATIN LETTER S WITH CIRCUMFLEX
+);
+
+printf("1..%d\n", scalar(keys %uc));
+
+my $tno = 1;
+for my $char (sort keys %uc){
+    if (uc($char) eq $uc{$char}) {
+        printf(qq{ok - $tno uc("\\x%02X") eq "\\x%02X" $^X $__FILE__\n}, ord($char), ord($uc{$char}));
+    }
+    else {
+        printf(qq{not ok - $tno uc("\\x%02X") eq "\\x%02X" $^X $__FILE__\n}, ord($char), ord($uc{$char}));
+    }
+    $tno++;
+}
+
+__END__

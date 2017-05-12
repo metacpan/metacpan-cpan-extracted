@@ -1,0 +1,20 @@
+bin/find_duplicate_perl
+Build.PL
+Changes
+lib/B/CutNPaste.pm
+lib/Code/CutNPaste.pm
+lib/Code/CutNPaste/Duplicate.pm
+lib/Code/CutNPaste/Duplicate/Item.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/basic.t
+t/fixtures/MyBase.pm
+t/fixtures/MyBaseExact.pm
+t/fixtures/MyBaseRenamed.pm
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml
+META.json

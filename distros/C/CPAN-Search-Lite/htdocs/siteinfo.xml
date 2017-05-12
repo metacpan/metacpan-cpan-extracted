@@ -1,0 +1,108 @@
+<siteinfo xmlns="http://a9.com/-/spec/siteinfo/1.0/">
+  <webmenu>
+    <name>CPAN services at the University of Winnipeg</name>
+    <menu>
+      <item>
+        <text>Home</text>
+        <url>http://cpan.uwinnipeg.ca/</url>
+      </item>
+      <item>
+        <text>Perl documentation</text>
+        <menu>
+           <item>
+              <text>Index</text>
+              <textSearch>Search documentation: [[:SEARCHTERMS:]]</textSearch>
+              <url>http://cpan.uwinnipeg.ca/htdocs/perl/</url>
+              <urlSearch>http://cpan.uwinnipeg.ca/cgi-bin/docperl?si=0;query=[[:SEARCHTERMS:]]</urlSearch>
+           </item>
+           <item>
+              <text>FAQs</text>
+              <textSearch>Search FAQs: [[:SEARCHTERMS:]]</textSearch>
+              <url>http://cpan.uwinnipeg.ca/htdocs/perl/perlfaq.html</url>
+              <urlSearch>http://cpan.uwinnipeg.ca/cgi-bin/docperl?si=1;query=[[:SEARCHTERMS:]]</urlSearch>
+           </item>
+           <item>
+              <text>Functions</text>
+              <textSearch>Search functions: [[:SEARCHTERMS:]]</textSearch>
+              <url>http://cpan.uwinnipeg.ca/htdocs/perl/perlfunc.html</url>
+              <urlSearch>http://cpan.uwinnipeg.ca/cgi-bin/docperl?si=2;query=[[:SEARCHTERMS:]]</urlSearch>
+           </item>
+        </menu>
+      </item>
+      <item>
+        <text>Win32 ppm repositories</text>
+        <menu>
+            <item>
+              <text>ActivePerl 8xx</text>
+              <url>http://theoryx5.uwinnipeg.ca/ppms/</url>
+             </item>
+            <item>
+              <text>ActivePerl 6xx</text>
+              <url>http://theoryx5.uwinnipeg.ca/ppmpackages/</url>
+             </item>
+        </menu>
+      </item>
+      <item>
+        <text>mod_perl documentation</text>
+        <url>http://theoryx5.uwinnipeg.ca/modperl/</url>
+      </item>
+      <item>
+        <text>Introductory programming</text>
+        <url>http://theoryx5.uwinnipeg.ca/programming/</url>
+      </item>
+      <item>
+        <text>Perl/Tk programming</text>
+        <url>http://theoryx5.uwinnipeg.ca/perltk/</url>
+      </item>
+
+      <separator/>
+      <item>
+        <text>Browse and search CPAN</text>
+        <url>http://cpan.uwinnipeg.ca/htdocs/faqs/cpan-search.html</url>
+      </item>
+      <item>
+        <text>Search</text>
+        <menu>
+          <item>
+            <text>Distribution</text>
+            <textSearch>Search by distribution: [[:SEARCHTERMS:]]</textSearch>
+            <url>http://cpan.uwinnipeg.ca/dist</url>
+            <urlSearch>http://cpan.uwinnipeg.ca/search?mode=dist;query=[[:SEARCHTERMS:]]</urlSearch>
+          </item>
+          <item>
+            <text>Module</text>
+            <textSearch>Search by module: [[:SEARCHTERMS:]]</textSearch>
+            <url>http://cpan.uwinnipeg.ca/module</url>
+            <urlSearch>http://cpan.uwinnipeg.ca/search?mode=module;query=[[:SEARCHTERMS:]]</urlSearch>
+          </item>
+          <item>
+            <text>Author</text>
+            <textSearch>Search by author: [[:SEARCHTERMS:]]</textSearch>
+            <url>http://cpan.uwinnipeg.ca/author</url>
+            <urlSearch>http://cpan.uwinnipeg.ca/search?mode=author;query=[[:SEARCHTERMS:]]</urlSearch>
+          </item>
+          <item>
+            <text>Chapter</text>
+            <textSearch>Search by chapter: [[:SEARCHTERMS:]]</textSearch>
+            <url>http://cpan.uwinnipeg.ca/chapter</url>
+            <urlSearch>http://cpan.uwinnipeg.ca/search?mode=chapter;query=[[:SEARCHTERMS:]]</urlSearch>
+          </item>
+          <item>
+            <text>perldoc</text>
+            <textSearch>perldoc: [[:SEARCHTERMS:]]</textSearch>
+            <url>http://cpan.uwinnipeg.ca/module</url>
+            <urlSearch>http://cpan.uwinnipeg.ca/perldoc/[[:SEARCHTERMS:]]</urlSearch>
+          </item>
+        </menu>
+      </item>
+      <item>
+        <text>Recent arrivals</text>
+        <url>http://cpan.uwinnipeg.ca/recent</url>
+      </item>
+      <item>
+        <text>Help</text>
+        <url>http://cpan.uwinnipeg.ca/htdocs/faqs/faq.html</url>
+      </item>
+    </menu>
+  </webmenu>
+</siteinfo>

@@ -1,0 +1,14 @@
+options
+{
+    opt1                1
+    opt2                ON
+    opt3                YES
+    opt4                Y
+    opt5                TRUE
+
+    opt6                0
+    opt7                OFF
+    opt8                NO
+    opt9                N
+    opt10               FALSE
+}

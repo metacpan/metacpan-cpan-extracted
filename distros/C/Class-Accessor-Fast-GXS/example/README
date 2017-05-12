@@ -1,0 +1,6 @@
+an example
+
+use the following command to benchmark:
+    perl Makefile.PL; make; perl -I blib/arch/ -I blib/lib/ bench.pl
+
+send benchmarks with `perl -V` output

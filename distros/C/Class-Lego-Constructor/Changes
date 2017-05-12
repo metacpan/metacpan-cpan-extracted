@@ -1,0 +1,22 @@
+Revision history for Class-Lego-Constructor.
+
+0.004    ????
+        - Exporter::Lite is no longer a prerequisite
+        - defer/lazy are not exported anymore
+          (which hides the dependency on Scalar::Defer)
+        - new mk_constructor1
+        - usage pattern of mk_constructor0 changed
+          (not backwards compatible)
+
+0.003    Mon Feb 18 2008
+        - dist renamed from Class-Constructor-Factory to
+          Class-Lego-Constructor
+
+0.002    Tue Jan  2 2008
+        - dependency upgraded to Scalar::Defer 0.13
+        - mk_constructor0 is a class method and
+          should not be exported
+
+0.001    Wed Dec 27 2007
+        - first CPAN release
+        - ugly, undocumented, but working

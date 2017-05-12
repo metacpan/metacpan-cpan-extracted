@@ -1,0 +1,32 @@
+---
+abstract: 'A searchable store backed by CouchDB'
+author:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+build_requires:
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catmandu-Store-CouchDB
+provides:
+  Catmandu::Store::CouchDB:
+    file: lib/Catmandu/Store/CouchDB.pm
+    version: 0.01
+  Catmandu::Store::CouchDB::Bag:
+    file: lib/Catmandu/Store/CouchDB/Bag.pm
+    version: 0
+requires:
+  Catmandu: 0.01
+  Moo: 1.000008
+  Store::CouchDB: 2.8
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,68 @@
+#!perl
+package cpanmirrorhttpd;
+{
+  $cpanmirrorhttpd::VERSION = '0.04';
+}
+#ABSTRACT: simple CPAN mirror HTTP server
+use strict;
+use warnings;
+use CPAN::Mirror::Server::HTTP;
+CPAN::Mirror::Server::HTTP->run();
+exit 0;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+cpanmirrorhttpd - simple CPAN mirror HTTP server
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+ cpanmirrorhttpd [options]
+
+ Options:
+    --root   - the webserver root path to use, default to '.'
+    --port   - the port to listen on, default is 8080
+
+=head1 DESCRIPTION
+
+C<cpanmirrorhttpd> is a simple HTTP server for serving a full CPAN mirror or
+a minimal CPAN mirror created with L<CPAN::Mini>.
+
+It is based on L<HTTP::Daemon> and employs C<fork> to service multiple requests.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--root>
+
+This is the path to the CPAN mirror on the local disk to serve. It defaults to the current
+working directory if it is not supplied.
+
+=item C<--port>
+
+This is the TCP port that the server will listen on for requests. It defaults to C<8080> if it
+is not supplied.
+
+=back
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

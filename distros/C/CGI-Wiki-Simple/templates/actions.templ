@@ -1,0 +1,9 @@
+<TMPL_IF NAME=display>
+  [ <a href='<TMPL_VAR NAME=script_name>/display/<TMPL_VAR NAME=node_title ESCAPE=URL>'>display</a> ]
+</TMPL_IF>
+<TMPL_IF NAME=preview>
+  [ <a href='<TMPL_VAR NAME=script_name>/preview/<TMPL_VAR NAME=node_title ESCAPE=URL>'>edit</a> ]
+</TMPL_IF>
+<TMPL_IF NAME=commit>
+  <input type='submit' name='save' value='commit'><input type='hidden' name='checksum' value='<TMPL_VAR NAME=checksum>'>
+</TMPL_IF>

@@ -1,0 +1,51 @@
+CPANPLUS::Dist::Fedora
+===================
+
+CPANPLUS::Dist::Fedora is a distribution class to create Fedora packages
+from a CPAN module, including for all of its dependencies. This allows you to
+have the most recent copies of CPAN modules installed, using your package
+manager of choice, but without having to wait for central repositories
+to be updated.
+
+You can either install them using the API provided in this package, or
+manually via rpm.
+
+
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or, using ExtUtils::MakeMaker:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the perldoc
+command:
+
+    perldoc CPANPLUS::Dist::Fedora
+
+You can also look for information at:
+    - https://metacpan.org/release/CPANPLUS-Dist-Fedora
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (c) 2007 Jerome Quelin, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Modified by Shlomi Fish, while disclaiming all rights.

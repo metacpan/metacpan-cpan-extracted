@@ -1,0 +1,19 @@
+data
+{
+    base
+    {
+        foo
+        {
+            bar     a b c
+            baz     a b c
+        }
+    }
+}
+
+@inherit .#data/base
+
+foo
+{
+    +bar            d e f
+    +baz            d e f
+}

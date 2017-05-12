@@ -1,0 +1,16 @@
+---
+name: Class-DBI-Plugin-AutoUntaint
+version: 0.1
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: untaint columns automatically
+license: perl
+requires:
+  Class::DBI::FromCGI: 0
+  Class::DBI::Plugin::Type: 0
+  Test::More: 0
+provides:
+  Class::DBI::Plugin::AutoUntaint:
+    file: lib/Class/DBI/Plugin/AutoUntaint.pm
+    version: 0.1
+generated_by: Module::Build version 0.2609

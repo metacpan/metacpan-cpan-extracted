@@ -1,0 +1,31 @@
+{ "bar": {
+    "param1": "bar_A:val1",
+    "param2": "bar_A:val2",
+
+    "param3": {
+      "param3_1": "bar_A:val3_1",
+      "param3_2": "bar_A:val3_2"
+    },
+
+    "param4": [
+      "bar_A:val4_1",
+      "bar_A:val4_2"
+    ],
+
+    "param5": [
+      "bar_A:val5_1",
+      { "param5_2_1": "bar_A:val5_2_1",
+        "param5_2_2": "bar_A:val5_2_2"
+      }
+    ],
+
+    "param6": {
+      "param6_1": "bar_A:val6_1",
+      "param6_2": [
+        "bar_A:val6_2_1",
+        "bar_A:val6_2_2"
+      ],
+      "param6_3": "bar_A:val6_3"
+    }
+  }
+}

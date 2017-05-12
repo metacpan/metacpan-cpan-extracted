@@ -1,0 +1,111 @@
+{
+   "abstract" : "A small wrapper around the Chef 'knife' command line utility",
+   "author" : [
+      "Eric Johnson <eric.git@iijo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chef-Knife-Cmd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "Shell::Carapace" : "0.18",
+            "String::ShellQuote" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Chef::Knife::Cmd" : {
+         "file" : "lib/Chef/Knife/Cmd.pm",
+         "version" : "0.15"
+      },
+      "Chef::Knife::Cmd::Client" : {
+         "file" : "lib/Chef/Knife/Cmd/Client.pm"
+      },
+      "Chef::Knife::Cmd::DataBag" : {
+         "file" : "lib/Chef/Knife/Cmd/DataBag.pm"
+      },
+      "Chef::Knife::Cmd::EC2" : {
+         "file" : "lib/Chef/Knife/Cmd/EC2.pm"
+      },
+      "Chef::Knife::Cmd::EC2::Server" : {
+         "file" : "lib/Chef/Knife/Cmd/EC2/Server.pm"
+      },
+      "Chef::Knife::Cmd::Node" : {
+         "file" : "lib/Chef/Knife/Cmd/Node.pm"
+      },
+      "Chef::Knife::Cmd::Node::From" : {
+         "file" : "lib/Chef/Knife/Cmd/Node/From.pm"
+      },
+      "Chef::Knife::Cmd::Node::RunList" : {
+         "file" : "lib/Chef/Knife/Cmd/Node/RunList.pm"
+      },
+      "Chef::Knife::Cmd::Search" : {
+         "file" : "lib/Chef/Knife/Cmd/Search.pm"
+      },
+      "Chef::Knife::Cmd::Vault" : {
+         "file" : "lib/Chef/Knife/Cmd/Vault.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kablamo/p5-chef-knife-cmd/issues"
+      },
+      "homepage" : "https://github.com/kablamo/p5-chef-knife-cmd",
+      "repository" : {
+         "url" : "git://github.com/kablamo/p5-chef-knife-cmd.git",
+         "web" : "https://github.com/kablamo/p5-chef-knife-cmd"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:KABLAMO",
+   "x_contributors" : [
+      "Marc Soda <marc@duckduckgo.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Eric Johnson <github@iijo.org>"
+   ]
+}

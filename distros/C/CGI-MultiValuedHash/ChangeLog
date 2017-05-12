@@ -1,0 +1,304 @@
+2004-06-06   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.09.
+
+	* Updated CGI::MultiValuedHash (now v1.09 up from v1.081) to fix a bug in
+	the to_html_encoded_table() method where key names were not being output in
+	the generated HTML table.  No other changes.
+
+2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.081.
+
+	* This is a small maintenance release that is mainly for improving
+	documentation.  Similar maintenance releases are being done with all of my
+	distributions simultaneously.  A lot of it was formatting issues that were
+	easy to miss before; the other bullet points below list the non-formatting
+	issues.  These files had formatting fixes: MultiValuedHash.pm, ChangeLog.
+
+	* The distribution file layouts have also been standardized, with modules
+	going in a "lib" folder and tests going in a "t" folder.  "test.pl" was
+	changed to "t/CGI-MultiValuedHash.t" and "MultiValuedHash.pm" was changed
+	to "lib/CGI/MultiValuedHash.pm".
+
+	* Updated NAME in MultiValuedHash.pm to match the official registered
+	module list.
+
+	* Updated all Copyright statements to a better (and longer) version, which
+	is dated 1999-2003.  Your rights to use these modules haven't changed, but
+	they may now be easier to understand.  These statements appear once in the
+	ReadMe file at the bottom (under "AUTHOR"), and twice in each module (.pm
+	file), a full version at the bottom (under "AUTHOR") and a shorter version
+	at the top (in code comments).
+
+	* Added the "use warnings" pragma at the top of all files beside "use
+	strict"; every occurance of "use strict" gained a "use warnings" whether it
+	was in the module proper or in its test script or in its SYNOPSIS.  This
+	should save users from having to put -w on the command line for them.
+
+	* Incremented the module $VERSION number by 0.001, and all test scripts to
+	require the new version.  Also, where any of my modules use others of my
+	modules, they now require the latest version as of this writing, for
+	simplicity of maintenance.
+
+	* Updated all test scripts to read $verbose from @ARGV (command line
+	arguments), and other test script improvements.
+
+	* Updated these sections of the ReadMe file: INSTALLATION.
+
+2002-12-01   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.08.
+
+	* The modules Data::MultiValuedHash and CGI::MultiValuedHash are now being 
+	distributed separately from each other, largely so they can be maintained as 
+	independant entities.  The 2 new distributions, Data-MultiValuedHash-1.08 
+	and CGI-MultiValuedHash-1.08, replace the older MultiValuedHash-1.0703.  
+	That said, to use the CGI module you still need the Data module, since the 
+	first is a subclass of the second.
+
+	* As part of the above separation, each of the new distributions has a copy
+	of all the old supporting files with alterations to focus on the one module
+	it is staying with: ChangeLog, Makefile.PL, MANIFEST, ReadMe, test.pl.  
+	Both ChangeLog copies are identical for all releases before and including 
+	1.08 (applying to both modules), but will differ for any later releases.
+
+	* Minor bug fix release to remove any 'uninitialized value' warnings that
+	appear when running the test suite with the -w option.  All of the
+	uncovered warnings were in the Data::MultiValuedHash module, of which the
+	test suite has already covered every method and method argument variation 
+	(but the module had correct output before). 
+
+	* However, many of the methods in CGI::MultiValuedHash are not yet included
+	in the test suite, and may conceal bugs that a thorough suite would expose:
+	to_file(), from_file(), to_html_encoded_table(),
+	to_html_encoded_hidden_fields(), trim_bounding_whitespace(),
+	batch_to_file(), batch_from_file().  That said, many of those methods have 
+	been used in a production environment without problems to date.  
+	These methods *have* been tested, with all their argument variations: 
+	to_url_encoded_string(), from_url_encoded_string().
+
+	* Updated the HTML generating methods in CGI::MultiValuedHash,
+	to_html_encoded_table() and to_html_encoded_hidden_fields(), to add support
+	for the stricter requirements of W3C's XHTML standard where possible.  See
+	"http://www.w3.org/TR/xhtml1" for details on how this standard compares to
+	HTML 4.  Mainly this means that the HTML now has lowercased tag and
+	attribute names, and solitary tags like 'input' and 'br' have a trailing
+	slash in them (eg: '<br />').  However, the changes should be
+	backwards-compatible with older user agents (web browsers).  A bug was also
+	fixed in the first method involving a mis-matched pair of 'table' tags.
+
+	* Minor documentation fix in Data::MultiValuedHash for the splice() method; 
+	the new version indicates which arguments are optional.
+
+	* Several documentation updates in the README file; one is so that someone 
+	can get an idea what this module does after looking only at the README.
+
+2001-07-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0703.
+
+	* This minor release deals with some more "ambiguous call" warnings of the 
+	sort that release 1.07 addressed, since I didn't get to them all in 1.0702.  
+	Both modules are now at version 1.0703.  In CGI::MultiValuedHash, the POD 
+	was updated in Synopsis and The Default File Format; for the latter case, I 
+	hope that I removed ambiguity regarding how compatible my default file 
+	format is with Boulderio.  Thanks to Jonathan Snyder 
+	<jonathan@mail.method.com> for alerting me to the fixed problems.
+
+2001-05-28   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0702.
+
+	* This minor release deals with some more "ambiguous call" warnings of the 
+	sort that release 1.07 addressed, since I didn't get to them all that time.  
+	There are also minor POD updates in this release.  Both modules are now at 
+	version 1.0702.
+
+2001-04-20   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0701.
+
+	* This release should take care of some install problems because the modules 
+	are now inside folders like lib/CGI and lib/Data whereas they were just in 
+	CGI and Data before.  Thanks to Jost (kriegjcb@CMC01SE.rz.ruhr-uni-bochum.de) 
+	for alerting me to this problem.  I'm afraid I still don't know much about 
+	Makefiles.
+
+2001-04-12   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.07.
+
+	* This release should take care of a number of warnings like 
+	"Ambiguous call resolved as CORE::values()" which appear on some systems 
+	when -w is used.  These spring from the fact that Data::MultiValuedHash 
+	has methods with the same names as the following built-in functions: keys(), 
+	values(), exists(), push(), unshift(), pop(), shift(), delete().  To fix 
+	this, I have changed all such calls to built-in functions so that they 
+	explicitely say CORE::*.  However, the modules were working before, as Perl 
+	seemed to be resolving the ambiguity in the correct way.
+
+	* Thanks to Geir Johannessen (geir.johannessen@nextra.com) for alerting me 
+	to the above warnings.
+
+2001-03-17   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.06.
+
+	* This release is the first one that includes the CPAN standard file
+	"test.pl", which was created following the previous release.  The install 
+	instructions in the ReadMe file were updated to reflect that "make test" 
+	should now work.  "Test.pl" was used to discover several bugs that my 
+	production use of the modules didn't; their fixes are detailed below.
+
+	* Removed gratuitous arguments from clone() that allowed one to specify a 
+	subset of keys for the clone to have.  This way, clone() is fully standard 
+	and does what one would intuitively expect, namely make an identical copy.
+
+	* Added new method fetch_mvh() to Data::MultiValuedHash which replaces the 
+	functionality dropped from clone().  fetch_mvh() has the same calling 
+	conventions as fetch_all(), except that an MVH object is returned instead of 
+	a literal hash of array refs.
+
+	* Fixed bug in Data::MultiValuedHash where the store_all() method didn't 
+	properly handle the import of case-sensitive keys into a case-insensitive 
+	MVH.  Specifically, keys were added but associated values were lost.
+
+	* Fixed bug in Data::MultiValuedHash where the splice() method didn't 
+	properly handle missing LENGTH arguments.  That is, if one called 
+	"splice( KEY, -1 )" then that should remove the last element of the array, 
+	but it instead acted like LENGTH had a value of 0, so nothing was removed 
+	or returned.  This issue appears to be related to Perl's built-in splice 
+	function, which treats "splice( KEY, 1 )" and "splice( KEY, 1, undef )" or 
+	"splice( KEY, 1, () )" differently.  So the fix for my splice() method 
+	involved having two separate calls to Perl's splice() depending on whether 
+	its OFFSET argument is defined or not.
+
+	* Added several new POD sections to the end of CGI::MultiValuedHash that give 
+	an overview of using url-encoding/decoding and file-import/export features, 
+	mainly describing what the file format or encoding formats look like.
+
+2001-03-14   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0501.
+
+	* Fixed bug in CGI::MultiValuedHash where the method to_html_encoded_table() 
+	was misnamed as to_html_encoded_hidden_fields(), which is the same as a 
+	separate method that also exists.  This module's version was increased to 
+	1.0501 to reflect the change.
+
+2001-03-08   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.05.
+
+	* Added method splice() to Data::MultiValuedHash so as to round out the set 
+	of standard array manipulation functions.
+
+	* Added static function batch_new() to Data::HashOfArrays which emulates the 
+	symantecs of calling new() multiple times with a list of initializers; as 
+	many new MVH objects are made as there are elements in the list.
+
+	* Added programmer documentation to the private method 
+	_reduce_hash_from_subset() so people know how to use this method.  Due to its 
+	private nature, it is not covered in the POD.
+
+	* Added static functions batch_to_file() and batch_from_file() to 
+	CGI::MultiValuedHash so that an entire list of MVH objects can be written to 
+	or read from a file at once.  Symantecs are similar to calling the to_file() 
+	and from_file() methods.  batch_from_file() will read to the end of the file 
+	by default, but can be restricted by an argument to stop after a certain 
+	number of objects are retrieved.
+
+2001-03-07   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.04.
+
+	* This release is the first one that includes the CPAN standard files 
+	"Makefile.PL" and "MANIFEST", which were all created following 
+	the previous release.  The content of "Manifest" was previously inside the 
+	"ReadMe" file.  Improved the install instructions in my ReadMe file.
+
+	* Added a hook to the initialize() method in Data::MultiValuedHash for 
+	handling initializers that aren't hashes.  CGI::MultiValuedHash now uses 
+	that hook for handling more initializer types, rather than overloading all 
+	of initialize().
+
+	* Many small changes were made to methods in Data::MultiValuedHash so that 
+	they work better or the code is more readable.
+
+	* Added "Method Relationship Overview" section to the POD of Data::MVH.
+
+	* Changed the ignores_case() method so that you can now change that property.
+	When changing this property from false to true, any existing keys are 
+	lowercased, which can not be reversed (except from a backup).
+
+	* Added method fetch_hash() to Data::MVH which returns a hash containing 
+	all of the keys and one for each; values are all taken from the array 
+	index specified with an argument.  fetch_first() and fetch_last() have 
+	been changed to use this to implement themselves, since they are the same 
+	except with implicit indexes of 0 or -1.
+
+	* Added INDEXES argument to fetch() and fetch_all() so that a caller can 
+	restrict a range of values to be returned for each key, much as the KEYS 
+	argument of some methods restrict which keys are returned; the new argument
+	does not have a COMPLEMENT modifier, however. 
+
+	* Added a method to CGI::MultiValuedHash for outputting the object's keys 
+	and values in an HTML table.
+
+2001-01-03   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.03.
+
+	* This release is the first one following official registrations with 
+	"The Perl 5 Module List".  The updated entries would look like this:
+
+Data::
+::MultiValuedHash bdpO Hash whose keys have multiple ordered values DUNCAND
+
+CGI::
+::MultiValuedHash bdpO Store and manipulate url-encoded data        DUNCAND
+
+	* This release contains my "Data::MultiValuedHash" and "CGI::MultiValuedHash" 
+	modules, which were previously a part of the following distributions 
+	under the temporary name of "CGI::HashOfArrays":
+		- "libdwg": v1.0 r2000-07-23, v1.11 r2000-08-23
+		- "CGI-FormGenerator": v0.9 r2000-09-04, v0.9201 r2000-12-26
+
+	* These modules require Perl version 5.004.
+
+	* Code changes since CGI::HashOfArrays consist mainly in its separation into 
+	two modules, named above.  This took care of a longstanding logistical 
+	problem concerning whether the module was a generic data structure 
+	or a tool for encoding/decoding CGI data.  The CGI:: module is a subclass of 
+	the Data:: module, so you can use it like you used the old module.
+	Thanks to Johan Vromans <jvromans@squirrel.nl> for suggesting the split.
+
+	* The POD also received significant updates.  Thanks to Steve Benson 
+	<steve.benson@stanford.edu> for suggesting improvements to initialize().
+
+	* Added method store_value() to Data::MultiValuedHash.
+
+2000-12-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* CGI-FormGenerator 0.9201, the last version of any distribution to include
+CGI::HashOfArrays, was released.
+
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+CGI::HashOfArrays, was released on CPAN.
+
+2000-04-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on this module.
+
+2000-01-28   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final version of this module.
+
+	* Module based on a template created by h2xs 1.18.
+
+1999-07-29 thru 1999-11-13
+
+	* Worked on prototype of code that ended up in this module.

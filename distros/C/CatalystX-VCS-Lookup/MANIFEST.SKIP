@@ -1,0 +1,12 @@
+^\.git\/
+^\.hg\/
+^\.hgignore
+Makefile$
+^MYMETA\..*
+^blib
+^cache/
+^pm_to_blib
+^.*.bak
+^.*.old
+^.*\.swp$
+^CatalystX-VCS-Lookup-.*

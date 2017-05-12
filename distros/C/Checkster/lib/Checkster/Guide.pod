@@ -1,0 +1,19 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Checkster::Guide - Guide for Checkster use
+
+=head1 DESCRIPTION
+
+This module is a concept idea and I advice to dont use it under production.
+
+Guide is under I<development>!
+
+=head1 AUTHOR
+
+Daniel Vinciguerra <daniel.vinciguerra@bivee.com>
+
+=cut

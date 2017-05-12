@@ -1,0 +1,6 @@
+ChangeLog
+lib/Class/ParamParser.pm
+Makefile.PL
+MANIFEST
+ReadMe
+t/Class-ParamParser.t

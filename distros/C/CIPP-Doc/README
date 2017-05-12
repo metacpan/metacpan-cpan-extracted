@@ -1,0 +1,38 @@
+NAME
+    CIPP::Doc - CgI Perl Preprocessor Documentation
+
+DESCRIPTION
+    CIPP is a Perl module for translating CIPP sources to pure
+    Perl programs. CIPP defines a HTML embedding language also
+    called CIPP which has powerful features for CGI and database
+    developers.
+
+    Many standard CGI and database operations (and much more)
+    are covered by CIPP, so the developer does not need to code
+    them again and again.
+
+WHY CIPP::Doc?
+    This is a extra package, because the format of the documentation
+    is PDF and the uncompressed file has more than 500kb. Also not
+    every modification of CIPP leads to modification of the
+    documentation.
+
+    The CIPP::Manual module is part of the CIPP distribution. It is
+    the POD version of the CIPP Reference chapter.
+
+BUG REPORTING
+    Please send any bug reports or comments to
+    
+        cipp@dimedis.de
+
+AUTHOR
+    Joern Reder <joern@dimedis.de>
+
+COPYRIGHT
+    Copyright (C) 1999 by Joern Reder and
+    dimedis GmbH, 50170 Koeln, Germany
+
+    All Rights Reserved.
+
+    This documantation is free; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

@@ -1,0 +1,68 @@
+[% WRAPPER 'view/en/layout.tt' %]
+
+<div class="span-8">
+
+ <h4>Login to the Network</h4>
+
+ [%- IF msg_type == 'info' %]
+ <p class="info">[% msg_text %]</p>
+ [% END -%]
+
+ [%- IF msg_type == 'error' %]
+ <p class="error">[% msg_text %]</p>
+ [% END -%]
+
+ [%- IF ssl_required %]
+ <script src="/orig/js/jquery.js" type="text/javascript"></script>
+ <script src="/orig/js/splash.js" type="text/javascript"></script>
+ [% END -%]
+
+ <form id="login-form" action="" method="post" accept-charset="UTF-8">
+  <fieldset>
+   <label for="username">Username:</label>
+   <br />
+   <input type="text" id="username" name="username" title="fred.smith@acme.org" 
+   value="[%- username -%]" />
+   <br />
+   <label for="password">Password:</label>
+   <br />
+   <input type="password" id="password" name="password" />
+   <br />
+   <br />
+   <p class="error" id="hint">IMPORTANT: Make sure that the address bar starts with 
+   <strong>https</strong> before submitting your user data!
+   <br />
+   <br />
+   <input type="submit" value="Login" id="login" name="login" />
+   </p>
+  </fieldset>
+ </form>
+
+ <h4>Problems and issues</h4>
+ <div class="box">
+  <p>Please contact the helpdesk at</p>
+  <ul>
+   <li>Office hours: Mon - Fri 08:00 - 18:00 clock</li>
+   <li>Phone: +49 (0) yyy/zz-xxxxx</li>
+  </ul>
+ </div>
+
+</div>
+
+<div class="prepend-1 span-15 last">
+
+ <h4>Infobox 1</h4>
+ <p>lorem ipsum ... </p>
+
+ <h4>Infobox 2</h4>
+ <p>lorem ipsum ... </p>
+
+ <h4>Infobox 3</h4>
+ <p>lorem ipsum ... </p>
+
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

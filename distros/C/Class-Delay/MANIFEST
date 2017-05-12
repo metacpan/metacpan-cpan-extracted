@@ -1,0 +1,10 @@
+Makefile.PL
+Build.PL
+META.yml
+README
+Changes
+MANIFEST
+MANIFEST.SKIP
+lib/Class/Delay.pm
+lib/Class/Delay/Message.pm
+t/delay.t

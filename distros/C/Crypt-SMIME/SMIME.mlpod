@@ -1,0 +1,396 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Crypt::SMIME - S/MIME message signing, verification, encryption and decryption
+J<< ja; Crypt::SMIME::JA - S/MIMEの署名、検証、暗号化、復号 >>
+
+=head1 SYNOPSIS
+
+  use Crypt::SMIME;
+
+  my $plain = <<'EOF';
+  From: alice@example.org
+  To: bob@example.com
+  Subject: Crypt::SMIME test
+
+  This is a test mail. Please ignore...
+  EOF
+
+  my $smime = Crypt::SMIME->new();
+  $smime->setPrivateKey($privkey, $crt);
+  # $smime->setPublicKey([$icacert]); # if need be.
+
+  my $signed = $smime->sign($plain);
+  print $signed;
+
+=head1 DESCRIPTION
+
+This module provides a class for handling S/MIME messages. It can sign, verify,
+encrypt and decrypt messages. It requires libcrypto (L<http://www.openssl.org>).
+J<< ja;
+S/MIMEの署名、検証、暗号化、復号を行うクラス。
+libcrypto (L<http://www.openssl.org>) が必要。
+>>
+
+=head1 EXPORTS
+
+No symbols are exported by default. The following symbols can
+optionally be exported:
+J<< ja;
+既定でエクスポートされるシンボルは無いが、次のシンボルはエクスポート可能である。
+>>
+
+=over
+
+=item C<NO_CHECK_CERTIFICATE>
+
+See L</"check()">.
+J<< ja;
+L</"check()"> を参照。
+>>
+
+=item C<FORMAT_SMIME>
+
+=item C<FORMAT_ASN1>
+
+=item C<FORMAT_PEM>
+
+See L</"extractCertificates()">.
+J<< ja;
+L</"extractCertificates()"> を参照。
+>>
+
+=item C<:constants>
+
+Export all of the above.
+J<< ja;
+上記のもの全てをエクスポートする。
+>>
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item new()
+
+  my $smime = Crypt::SMIME->new();
+
+The constructor takes no arguments.
+J<< ja;
+引数無し
+>>
+
+=item setPrivateKey()
+
+  $smime->setPrivateKey($key, $crt);
+  $smime->setPrivateKey($key, $crt, $password);
+
+Store a private key and its X.509 certificate into the instance. The private key
+will be used for signing and decryption. Note that this method takes a PEM
+string, not a name of a file which contains a key or a certificate.
+J<< ja;
+秘密鍵を設定する。ここで設定された秘密鍵は署名と復号の際に用いられる。
+ファイル名ではなく、鍵本体を渡す。
+>>
+
+The private key and certificate must be encoded in PEM format. The method dies
+if it fails to load the key.
+J<< ja;
+対応しているフォーマットは PEM のみ。鍵の読み込みに失敗した場合はdieする。
+>>
+
+=item setPrivateKeyPkcs12()
+
+  $smime->setPrivateKeyPkcs12($key, $pkcs12);
+  $smime->setPrivateKeyPkcs12($key, $pkcs12, $password);
+
+Load a private key and its X.509 certificate from PKCS#12 into the instance.
+The private key will be used for signing and decryption. The method dies if
+it fails to load PKCS12.
+J<< ja;
+秘密鍵およびその X.509 証明書を PKCS#12 から読み込んで設定する。秘密鍵は署名と復号の際に用いられる。
+読み込みに失敗した場合は die する。
+>>
+
+=item setPublicKey()
+
+  $smime->setPublicKey($crt);
+  $smime->setPublicKey([$crt1, $crt2, ...]);
+
+Store one or more X.509 certificates into the instance. The public keys will be
+used for signing, verification and encryption.
+J<< ja;
+公開鍵を設定する。ここで設定された公開鍵は署名への添付、署名の検証、
+そして暗号化の際に用いられる。
+>>
+
+The certificates must be encoded in PEM format. The method dies if it fails to
+load the certificates.
+J<< ja;
+対応しているフォーマットは PEM のみ。鍵の読み込みに失敗した場合はdieする。
+>>
+
+=item setPublicKeyStore()
+
+  $smime->setPublicKeyStore($path, ...);
+
+Set the paths of file or directory containing trusted certificates.
+The certificate stores will be used for verification.
+J<< ja;
+信頼している証明書 (複数可)
+が入ったファイルやディレクトリのパス (複数可)
+を設定する。ここで設定された証明書ストアは、署名の検証の際に用いられる。
+>>
+
+The method dies if it fails to load the certificate stores.
+J<< ja;
+証明書ストアの読み込みに失敗した場合はdieする。
+>>
+
+=item sign()
+
+  $signed_mime = $smime->sign($raw_mime);
+
+Sign a MIME message and return an S/MIME message. The signature is always
+detached.
+J<< ja;
+署名を行い、MIMEメッセージを返す。可能な署名はクリア署名のみ。
+>>
+
+Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
+top-level of the MIME message. C<Subject> header will be copied to both of the
+plain text part and the top-level for mail clients which can't properly handle
+S/MIME messages.
+J<< ja;
+C<Content-*>, C<MIME-*> 及び C<Subject> を除いたヘッダは
+multipartのトップレベルに移される。
+C<Subject> はS/MIMEを認識できないメーラのために, multipartの
+トップレベルと保護されるメッセージの両側に配置される。
+>>
+
+The resulting message will be tainted if any of the original MIME
+message, the private key or its certificate is tainted.
+J<< ja;
+元の MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、署名されたメッセージも汚染される。
+>>
+
+=item signonly()
+
+  $sign = $smime->signonly($prepared_mime);
+
+Generate a signature from a MIME message. The resulting signature is encoded in
+Base64. The MIME message to be passed to this method should be preprocessed
+beforehand by the prepareSmimeMessage() method. You would rarely need to call
+this method directly.
+J<< ja;
+署名の計算を行う。
+C<$sign> はBASE64でエンコードされて返る。
+C<$prepared_mime> には, L</prepareSmimeMessage> で返される値を渡す。
+>>
+
+The resulting signature will be tainted if any of the original MIME
+message, the private key or its certificate is tainted.
+J<< ja;
+元の MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、生成された署名も汚染される。
+>>
+
+=item prepareSmimeMessage()
+
+  ($prepared_mime, $outer_header)
+      = $smime->prepareSmimeMessage($source_mime);
+
+Preprocess a MIME message to be signed. C<$prepared_mime> will be a string
+containing the processed MIME message, and C<$outer_header> will be a string
+that is a list of headers to be moved to the top-level of MIME message. You
+would rarely need to call this method directly.
+J<< ja;
+署名用のメッセージを準備する。
+C<$prepared_mime> には署名用に修正されたMIMEメッセージを返す。
+C<$outer_header> は、S/MIMEの外側に付与するヘッダを返す。
+>>
+
+The entity body of C<$source_mime> will be directly copied to
+C<$prepared_mime>. Any headers of C<$source_mime> except C<Content-*>, C<MIME-*>
+and C<Subject> will be copied to C<$prepared_mime>, and those excluded headers
+will be copied to C<$outer_header>. Note that the C<Subject> header will be
+copied to both side exceptionally.
+J<< ja;
+C<$prepared_mime> の本文はC<$source_mime>と同じ物となるが、
+ヘッダに関してはC<Content-*>, C<MIME-*>, C<Subject> を除く全てが
+取り除かれる。取り除かれたヘッダは C<$outer_header> に返される。
+S/MIMEメッセージを構築する際にはこれをS/MIMEメッセージのヘッダに追加する。
+C<Subject> ヘッダのみは C<$prepared_mime> と C<$outer_header> の両方に
+現れる点に注意。
+>>
+
+=item check()
+
+  use Crypt::SMIME qw(:constants);
+
+  $source_mime = $smime->check($signed_mime);
+  $source_mime = $smime->check($signed_mime, $flags);
+
+Verify a signature of S/MIME message and return a MIME message. The method dies
+if it fails to verify it.
+J<< ja;
+検証を行う。検証に失敗した場合はその理由と共にdieする。
+>>
+
+When the option C<Crypt::SMIME::NO_CHECK_CERTIFICATE> is given as
+C<$flags>, the signer's certificate chain is not verified. The default
+value for C<$flags> is C<0>, which performs all the verifications.
+J<< ja;
+C<$flags> として C<Crypt::SMIME::NO_CHECK_CERTIFICATE>
+オプションを指定した場合には、署名者の証明書チェーンを検証しない。
+C<$flags> のデフォルト値は C<0>
+であり、この場合には全ての整合性についての検証を行う。
+>>
+
+The resulting message will be tainted if the original S/MIME message,
+the C<$flags>, or at least one public key is tainted.
+J<< ja;
+元の S/MIME メッセージ, C<$flags>, または公開鍵の少なくとも一つが汚染されている
+(tainted) ならば、検証されたメッセージも汚染される。
+>>
+
+=item encrypt()
+
+  $encrypted_mime = $smime->encrypt($raw_mime);
+
+Encrypt a MIME message and return a S/MIME message.
+J<< ja;
+暗号化を行う。
+>>
+
+Any headers except C<Content-*>, C<MIME-*> and C<Subject> will be moved to the
+top-level of the MIME message. C<Subject> header will be copied to both of the
+plain text part and the top-level for mail clients which can't properly handle
+S/MIME messages.
+J<< ja;
+C<Content-*>, C<MIME-*> 及び C<Subject> を除いたヘッダは
+multipartのトップレベルにコピーされる。
+C<Subject> はS/MIMEを認識できないメーラのために, multipartの
+トップレベルと保護されるメッセージの両側に配置される。
+>>
+
+The resulting message will be tainted if the original MIME message or
+at least one public key is tainted.
+J<< ja;
+元の MIME メッセージ、または公開鍵の少なくとも一つが汚染されている
+(tainted) ならば、暗号化されたメッセージも汚染される。
+>>
+
+=item decrypt()
+
+  $decrypted_mime = $smime->decrypt($encrypted_mime);
+
+Decrypt an S/MIME and return a MIME message. This method dies if it fails to
+decrypt it.
+J<< ja;
+復号を行う。復号に失敗した場合はその理由と共にdieする。
+>>
+
+The resulting message will be tainted if any of the original S/MIME
+message, the private key or its certificate is tainted.
+J<< ja;
+元の S/MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、復号されたメッセージも汚染される。
+>>
+
+=item isSigned()
+
+  $is_signed = $smime->isSigned($mime);
+
+Return true if the given string is a signed S/MIME message. Note that if the
+message was encrypted after signing, this method returns false because in that
+case the signature is hidden in the encrypted message.
+J<< ja;
+渡されたMIMEメッセージがS/MIMEで署名されたものなら真を返す。
+クリア署名かどうかは問わない。
+署名後に暗号化したメッセージを渡した場合は、署名が直接見えない為、
+偽を返す事に注意。
+>>
+
+=item isEncrypted()
+
+  $is_encrypted = $smime->isEncrypted($mime);
+
+Return true if the given string is an encrypted S/MIME message. Note that if the
+message was signed with non-detached signature after encryption, this method
+returns false because in that case the encrypted message is hidden in the
+signature.
+J<< ja;
+渡されたMIMEメッセージがS/MIMEで暗号化されたものなら真を返す。
+暗号化後に署名したメッセージを渡した場合は、暗号文が直接見えない為、
+偽を返す事に注意。
+>>
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item extractCertificates()
+
+  use Crypt::SMIME qw(:constants);
+
+  @certs = @{Crypt::SMIME::extractCertificates($data)};
+  @certs = @{Crypt::SMIME::extractCertificates($data, FORMAT_SMIME)};
+
+Get all X.509 certificates (and CRLs, if any) included in S/MIME
+message or PKCS#7 object $data. Optional C<$type> parameter may
+specify type of data:
+C<Crypt::SMIME::FORMAT_SMIME> (default) for S/MIME message;
+C<Crypt::SMIME::FORMAT_ASN1> for binary format;
+C<Crypt::SMIME::FORMAT_PEM> for PEM format.
+J<< ja;
+<S/MIMEメッセージまたはPKCS#7オブジェクトに含まれるX.509証明書
+(や証明書失効リスト) をすべて取得する。
+オプションの C<$type> パラメータでデータの種類を指定できる。
+C<Crypt::SMIME::FORMAT_SMIME> (初期値) はS/MIMEメッセージ、
+C<Crypt::SMIME::FORMAT_ASN1>はバイナリ形式、
+C<Crypt::SMIME::FORMAT_PEM>はPEM形式。
+>>
+
+=item getSigners()
+
+  @certs = @{Crypt::SMIME::getSigners($data)};
+  @certs = @{Crypt::SMIME::getSigners($data, $type)};
+
+Get X.509 certificates of signers included in S/MIME message or PKCS#7 object.
+Optional $type parameter may specify type of data.
+J<< ja;
+S/MIMEメッセージまたはPKCS#7オブジェクトに含まれる、署名者の
+X.509証明書を取得する。オプションの$typeパラメータでデータの種類を指定できる。
+>>
+
+Note that any public keys returned by this function are not verified.
+check() should be executed to ensure public keys are valid.
+J<< ja;
+この関数が返す公開鍵は検証されていないことに注意。
+公開鍵が有効であることを確かめるにはcheck()を実行すること。
+>>
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2006-2014 YMIRLINK Inc. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+Bug reports and comments to: tl@tripletail.jp
+
+=for comment
+Local Variables:
+mode: cperl
+End:
+
+=cut

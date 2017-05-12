@@ -1,0 +1,38 @@
+[% 
+    title = 'All Time CPAN Testers Leaderboard' ;
+    box_sites = 1
+
+    crumb1_name = 'Tester Leaderboard' ;
+%]
+
+<p>Click below to see alternative OS Leaderboards</p>
+<table class="col3" summary="Leaderboard Navigation">
+[% inx = 0 %]
+[% FOREACH item = osnames %]
+[% IF inx % 3 == 0 %]<tr>[% END %]
+<td><a href="/leaders/leaders-[% item.osname %]-all.html" title="[% item.ostitle %] Tester Leaderboard (All Months)">[% item.ostitle %]</a></td>
+[% inx = inx + 1 %]
+[% IF inx % 3 == 0 %]</tr>[% END %]
+[% END %]
+[% IF inx % 3 > 0 %]</tr>[% END %]
+</table>
+
+
+<h2>TOP TESTERS OF ALL TIME</h2>
+<table summary="Tester Leaderboard">
+<tr><th class="top">POSITION</th><th class="top">SUBMISSIONS</th><th class="top">TESTER</th></tr>
+[% FOREACH row = STATS %]
+<tr><td align="right">[% row.0 %]</td><td align="right">[% row.1 %]</td><td>[% row.2 %]</td></tr>
+[% END %]
+</table>
+
+<h3>Current Counts for known/unknown testers</h3>
+<table summary="Tester Totals">
+<tr><th class="top">Unknown Addresses:	</th><td align="right">[% COUNTS.0 %]</td></tr>
+<tr><th class="top">Known Addresses:	</th><td align="right">[% COUNTS.1 %]</td></tr>
+<tr><th class="top">Listed Addresses:	</th><td align="right">[% COUNTS.2 %]</td></tr>
+<tr><td colspan="2" class="blank">&nbsp;</td></tr>
+<tr><th class="top">Unknown Testers:	</th><td align="right">[% COUNTS.3 %]</td></tr>
+<tr><th class="top">Known Testers:		</th><td align="right">[% COUNTS.4 %]</td></tr>
+<tr><th class="top">Listed Testers:		</th><td align="right">[% COUNTS.5 %]</td></tr>
+</table>

@@ -1,0 +1,28 @@
+A flexible pager utility for Class::DBI
+
+You can install this module in the usual Perl fashion:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Copyright (c) 2008 by Mark V. Grimes. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. 
+
+********************************************************************
+By using this module you agree to take all responsibility for any
+problems which occur including, but not limited to, any unexpected
+data loss.
+********************************************************************
+
+The documentation is included in the module file. Once the module is
+installed, view the documentation with:
+
+	perldoc Class::DBI::Pageset
+
+For convience, the documentaion is also reproduced in the README file.
+
+

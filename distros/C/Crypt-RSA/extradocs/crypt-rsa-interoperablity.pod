@@ -1,0 +1,63 @@
+=head1 NAME
+
+Interoperability Chart for Crypt::RSA.
+
+=head1 SYNOPSIS
+
+    Crpyt::RSA <--> Other Cryptography Software
+
+=head1 DESCRIPTION
+
+This is the Crypt::RSA interoperability chart. It contains names and
+versions of cryptographic applications/libraries that are known to work
+with Crypt::RSA. Wherever possible, a mapping from Crypt::RSA methods
+to compatible methods/functions from the external library/application
+is provided.
+
+If you happen to get a library/application to play nicely with Crypt::RSA,
+please fill out crypt-rsa-interoperability-template(3) and send it in for
+inclusion in this chart.
+
+=head1 RSAREF 2.0 
+
+=over 4
+
+=item B<General Information>
+
+ Type: C Library
+ Availability: http://rsalabs.com/
+
+=item B<Signatures>
+
+ Standard: PKCS #1 v1.5 
+
+ Output of ::SS::PKCS1v15::sign() is compatible with 
+        rsaref.h R_SignInit, R_SignUpdate, R_SignFinal
+
+ Output of ::SS::PKCS1v15::verify() is compatible with
+        rsaref.h R_VerifyInit, R_VerifyUpdate, R_VerifyFinal
+
+ Crypt::RSA Version: 1.33
+ Submitted By: Vipul Ved Prakash <mail@vipul.net>
+
+=item B<Encryption>
+
+ Standard: PKCS #1 v1.5 
+
+ Output of ::SS::PKCS1v15::encrypt() is compatible with 
+        rsa.h RSAPublicEncrypt
+
+ Output of ::SS::PKCS1v15::decrypt() is compatible with
+        rsa.h RSAPublicDecrypt
+
+ Crypt::RSA Version: 1.33
+ Submitted By: Vipul Ved Prakash <mail@vipul.net>
+
+=back
+
+
+=head1 SEE ALSO
+
+Crypt::RSA(3), crypt-rsa-interoperability-table(3)
+
+=cut

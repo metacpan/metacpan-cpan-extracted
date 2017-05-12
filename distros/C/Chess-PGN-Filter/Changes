@@ -1,0 +1,65 @@
+Revision history for Perl extension Chess::PGN::Filter.
+
+0.01  Fri Feb 22 17:41:42 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Chess::PGN::Filter
+0.02  Fri Mar 15 22:48:27 2002
+        - slight revision to pgn.xsl, code simplification
+0.03  Tue Mar 19 10:51:55 2002
+	- document corrections
+	- add TEXT filter type
+	- normalize tag names for XML filter type, with changes to .dtd and .xsl files
+0.04  Wed Mar 20 07:55:32 2002
+        - fix problem with 'substitute', shouldn't crash if none supplied
+	- add 'position' to XML
+	- add 'fen' to XML
+	- rename 'type' to 'font' for TEXT, font map will come from table lookup
+	- ready POD for publishing
+0.05  Thu Mar 28 15:21:49 2002
+        - re-organize code around a document object model (DOM)
+	- add Parms object to simplify parameter initialization and subroutine usage
+	- add DOM output as a debugging aid
+	- re-work XML filter
+	- re-work TEXT filter
+	- add RAV expansion to XML filter
+	- add RAV expansion to TEXT filter
+	- add notion of 'sticky' contents to Event, Site and Date tags
+	- add notion of 'autoincrement' to Round tag
+	- add tag exception list
+	- continue POD editing
+0.06  Fri Mar 29 10:20:57 2002
+        - edit Makefile.PL to reflect dependance on Chess::PGN::EPD 0.08
+	- added name and email to Makefile.PL
+0.07  Sat Mar 30 09:08:58 2002
+	- this time include the edited Makefile.PL in the distribution
+	- take advantage of the golden opp. to correct the version number
+0.08  Sun Mar 31 09:00:29 2002
+	- add the rest of the dependance list to Makefile.PL
+0.09  Sun Mar 31 13:28:35 2002
+	- next include the revised version of Makefile.PL in the distribution again!!!
+	- and as before again correct the version number!!!
+0.10  Fri Apr 05 11:33:38 2002
+	- change '$/ = undef;' to 'local $/ = undef;'
+	- switch to 'make dist' instead of hand process
+	- begin work on meaningful tests for test.pl
+	- add Test 1.15 to dependancy list
+	- change code to use Text::DelimMatch 1.1, not 1.4 (which is not on CPAN)
+	- patch bug in filterXML, RAV GAMETERMINATION was wrong, should be 'UNKNOWN'
+0.11  Sun Jul 28 12:48:31 2002
+	- restore examples to distrubution
+0.12  Mon May 24 10:05:00 2004
+	- Incorporate patch from Gene Boggs [gb@ology.net] which adds verbose switch
+	  that toggles between filter result to STDOUT (default) or returned as an
+	  array reference.
+	- Fix errors in test.pl
+	- Add new test for verbose mode to test.pl
+	- Fix really stupid design error in filter sub. Now uses Parms method as called
+	  for in original concept.
+0.13  Mon May 24 16:25:00 2004
+	- Synchronize version number across Filter.pm, readme and Changes.
+	- Change Gene's email to [gene@cpan.org].
+0.14  Fri Apr 22 03:35:43 2011
+        - Dust off.
+	- Change my email to current value.
+0.15  Fri Apr 22 07:08:56 2011
+        - Continue dusting--- this time to fix argument with PAUSE over 'World Writable' files

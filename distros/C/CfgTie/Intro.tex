@@ -1,0 +1,189 @@
+@c CfgTie --> Environment manager
+@c Copyright 1998-1999, Randall Maas.  All rights reserved.  This program is
+@c free software; you can redistribute it and/or modify it under the same terms
+@c as PERL itself.                                                                   
+@chapter CfgTie:: A Configuration Interface thru Perl
+@heading Introduction
+
+CfgTie is a package of Perl modules and tools.  These make it easier to
+configure and maintain Unix computers.
+
+The idea is that just about everything in your machines environment can --
+nay should -- be operable thru a single consistent interface.  This is a
+set of tools that make many of the various configuration subsystem in your
+machine appear to be Perl variables of some sort.  (There are other modules
+available from CPAN for the other aspects of your environment).
+
+@subheading Problem Domain
+This module makes the configuration text files and subsystems available to
+Perl as conventional objects.  These are mapped into Perl, usually as hash
+arrays, but providing object methods where appropriate.  Any changes to these
+is mapped back into the various text files and other subsystems.
+
+@subheading Installation
+After unpacking the tar file, do:
+@example
+        perl Makefile.PL 
+        make 
+        make test
+        make install
+@end example
+
+@subheading Additional, post-install tests
+There are some extra tests that can also be done after a successful install.
+This are not intended for normal installs, but for developpers working on
+CfgTie and various extensions.
+
+@subheading Optional Modules
+@itemize @bullet
+@item Rcs
+@item Getopts::Long
+@end itemize
+
+@subheading How to find out more
+@table @emph
+@item online documentation
+There is a set of online documentation.
+@url{http://www.geocities.com/CapeCanaveral/Lab/1862/script/CfgTie_toc.html}
+
+@item mailling list
+There is a mailling list to discuss this package.
+
+@table @asis
+@item Send email to @email{cfgtie@@onelist.com}
+@item You can subscribe by going to
+@url{http://www.onelist.com/subscribe.cgi/cfgtie}
+@item You can browse through the archives by going to
+ @url{http://www.onelist.com/archives.cgi/cfgtie}
+
+@item You can subscribe by going to OneList's homepage.
+ @url{http://www.onelist.com/}
+
+@end table
+
+@item Contact the author:
+Randall Maas (@email{randym@@acm.org})
+@end table
+
+@subheading Copyright
+
+Copyright @copyright{} 1998-1999, Randall Maas. All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+@node Overview, SS, Introduction, Top
+@include docs/Overview.tex
+
+@node SS, CSS, Overview, Top
+@include docs/Security.tex
+
+@node CSS, Modules, SS, Top
+@include docs/CSS.tex
+
+@c --- Configuration --------------------------------------------------------
+@node Modules, Related Work, CSS, Top
+@chapter Modules
+
+@c nodes it should add: by type, all
+@c right now I am going to have by category
+
+@menu
+
+* bykind::
+
+* bytype::
+
+* alphabetical::
+
+@end menu
+
+@node bykind, bytype, Modules, Modules
+@section Modules, by kind
+
+@menu
+
+* Examples:: Example utilities
+
+* Network::  Network related configuration
+
+* Users::    Users, Groups, etc. Stuff
+
+@end menu
+
+@c Add a way to look at the code by sections
+@c Start-up stuff
+@c Email stuff
+@c Servicer stuff
+@c Client Stuff
+
+
+@node Examples, Network, bykind, bykind
+@section Examples
+@menu
+
+* CfgAliases:: A Command Line Tool to manage @file{/etc/aliases}
+
+* CfgNamed:: A Command line tool to manage your DNS server
+
+* mail-validate:: A tool that describes possible problems with the mail spool
+
+* sys.cgi :: A CGI script to browse thru the configuration
+
+@end menu
+
+@node Network, Users, Examples, bykind
+@section Network
+
+@menu
+
+* CfgNamed::	
+
+* CfgTie-TieHost::	
+
+* CfgTie-TieNamed::	
+
+* CfgTie-TieNet::	
+
+* CfgTie-TieProto::	
+
+* CfgTie-TieServ::	
+
+@end menu
+
+@node Users, , Network, bykind
+@section User and Group Configuration
+
+@menu
+
+* CfgTie-TieGroup::
+
+* CfgTie-TieShadow::
+
+* CfgTie-TieUser:: 
+
+@end menu
+
+@include CfgTie2.tex
+
+
+@node Related Work, Revisions, Modules, Top
+@include docs/Related.tex
+
+
+@node Revisions, Function Index, Related Work, Top
+@unnumbered File Revisions
+@menu
+
+* Files bykind::
+
+* Files bytype::
+
+* Files alphabetical::
+
+@end menu
+
+@node Files bykind, Files bytype, Revisions, Revisions
+@unnumbered Files bykind
+
+@include CfgTie-revs.tex
+

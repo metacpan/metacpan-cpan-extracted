@@ -1,0 +1,39 @@
+Revision history for Perl extension Catalyst-ActionSignatures
+
+0.010   14 October 2015
+        - Fixed Backcompat fix in the last release thatintroduced
+          a regression
+
+0.009   09 October 2015
+        - $c is now defaulted to exist, if it exists.
+        - Increased dependency versions to close errors.
+
+0.008   25 September 2015
+        - Increase dependency versions to take advantage of some
+          downstream bugfixes.
+
+0.007   24 September 2015
+        - Increase dependency versions to take advantage of some
+          downstream bugfixes.
+
+0.006   15 JUNE 2015
+        - Support for shortcut access to current model/view
+
+0.005   11 June 2015
+        - Fixed support for parameterized models.
+
+0.004   10 June 2015
+        - New 'Rationale' document which is a start on explaining the
+          whole point of this.
+
+0.003   03 June 2015
+        - Play nice with the new 'required' syntax.  Tests
+        - increased dependency requirements to make sure we are
+          synchronized with known bug fixes.
+
+0.002   31 May 2015
+        - Fixed incorrect Changes information
+        - Fixed issue with parsing when you run attributes onto
+          the second or more lines.
+0.001   30 May 2015
+        - original version.

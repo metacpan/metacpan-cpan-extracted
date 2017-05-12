@@ -1,0 +1,33 @@
+---
+abstract: 'Cascading configuration files processor with additional features'
+author:
+  - 'Eugene Ponizovsky <ponizovsky@gmail.com>'
+build_requires:
+  Test::Fatal: '0.013'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Processor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Cpanel::JSON::XS: '3.0104'
+  File::Spec: '0'
+  Hash::Merge: '0.200'
+  Scalar::Util: '0'
+  YAML::XS: '0.41'
+resources:
+  bugtracker: https://github.com/iph0/Config-Processor/issues
+  homepage: https://github.com/iph0/Config-Processor
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/iph0/Config-Processor
+version: '0.26'

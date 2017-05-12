@@ -1,0 +1,25 @@
+Revision history for Perl module Class::Accessor::TrackDirty
+
+0.10  2016-01-05 07:39:48 UTC
+    - Fresh empty fields are considered as clean. This is API-breaking change
+
+0.06  2014-08-16 10:57:10 JST
+    - Add the method to get names of modified fields (Advised by @bonnu)
+
+0.05  2014-02-03 21:23:18 JST
+    - Implement raw() and is_new() methods
+
+0.04  2013-09-17 15:30:00 JST
+    - Start using Dist-Milla
+
+0.03 2013-03-29
+    - Fix the bug by which to_hash() may break $self again.
+      Don't use Class::Accessor::TrackDirty-0.02.
+
+0.02 2013-03-29
+    - Fix the bug by which to_hash() may break $self.
+
+0.01 2013-02-22
+    - original version; created by dim
+      at Sat Feb 16 12:19:36 2013.
+

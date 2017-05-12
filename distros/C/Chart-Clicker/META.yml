@@ -1,0 +1,67 @@
+---
+abstract: 'Powerful, extensible charting.'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chart-Clicker
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Color::Scheme: '0'
+  DateTime: '0'
+  DateTime::Set: '0'
+  English: '0'
+  Geometry::Primitive::Arc: '0'
+  Geometry::Primitive::Circle: '0'
+  Geometry::Primitive::Point: '0'
+  Graphics::Color::RGB: '0'
+  Graphics::Primitive::Border: '0'
+  Graphics::Primitive::Brush: '0'
+  Graphics::Primitive::Canvas: '0'
+  Graphics::Primitive::Component: '0'
+  Graphics::Primitive::Container: '0'
+  Graphics::Primitive::Driver::Cairo: '0'
+  Graphics::Primitive::Font: '0'
+  Graphics::Primitive::Insets: '0'
+  Graphics::Primitive::Operation::Fill: '0'
+  Graphics::Primitive::Operation::Stroke: '0'
+  Graphics::Primitive::Oriented: '0'
+  Graphics::Primitive::Paint::Gradient::Linear: '0'
+  Graphics::Primitive::Paint::Gradient::Radial: '0'
+  Graphics::Primitive::Paint::Solid: '0'
+  Graphics::Primitive::Path: '0'
+  Graphics::Primitive::TextBox: '0'
+  Layout::Manager::Absolute: '0'
+  Layout::Manager::Axis: '0'
+  Layout::Manager::Compass: '0'
+  Layout::Manager::Flow: '0'
+  Layout::Manager::Grid: '0'
+  Layout::Manager::Single: '0'
+  List::Util: '0'
+  Math::Trig: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Moose::Util::TypeConstraints: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gphat/chart-clicker/issues
+  homepage: https://github.com/gphat/chart-clicker
+  repository: https://github.com/gphat/chart-clicker.git
+version: '2.90'
+x_serialization_backend: 'YAML::Tiny version 1.69'

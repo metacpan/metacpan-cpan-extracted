@@ -1,0 +1,27 @@
+---
+abstract: 'CSS sprite builder.'
+author:
+  - 'Yuriy Ustushenko <yoreek@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CSS-SpriteBuilder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: 0
+  File::Glob: 0
+  File::Spec: 0
+  Scalar::Util: 0
+  Test::More: 0
+  perl: 5.008008
+version: 0.03

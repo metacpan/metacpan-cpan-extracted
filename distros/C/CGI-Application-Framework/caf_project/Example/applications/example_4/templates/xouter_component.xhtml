@@ -1,0 +1,19 @@
+<!-- beginning of included file -->
+<html xmlns:tal="http://purl.org/petal/1.0/">
+<h3>
+Here's a little bit of stuff to be included
+</h3>
+
+<p>
+The current time (from within the included component):
+<span tal:replace="time_within_include">time_within_include</span>
+</p>
+
+<span tal:replace="structure CGIAPP/embed 'inner_component'">inner component goes here</span>
+
+<p>
+The current time (from within the included component):
+<span tal:replace="time_within_include">time_within_include</span>
+</p>
+</html>
+<!-- end of included file -->

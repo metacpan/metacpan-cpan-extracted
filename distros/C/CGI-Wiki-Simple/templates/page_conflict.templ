@@ -1,0 +1,8 @@
+<TMPL_INCLUDE NAME="title.templ">
+<hr /><p class='errorMessage'>While you were editing this node, somebody else changed it already. Please integrate your changes into the changed node text to resolve the conflict.</p><hr />
+<p>Your content:</p><pre>
+<TMPL_VAR NAME="submitted_content">
+</pre>
+<p>Current node content:</p>
+<TMPL_INCLUDE NAME="editform.templ">
+<TMPL_INCLUDE NAME="footer.templ">

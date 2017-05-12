@@ -1,0 +1,36 @@
+---
+abstract: 'DSA Signatures and Key Generation'
+author:
+  - 'Benjamin Trott <ben@sixapart.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Crypt::DSA
+name: Crypt-DSA
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Data::Buffer: 0.01
+  Digest::SHA1: 0
+  File::Spec: 0
+  File::Which: 0.05
+  IPC::Open3: 0
+  MIME::Base64: 0
+  Math::BigInt: 1.78
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Crypt-DSA
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Crypt-DSA
+version: 1.17

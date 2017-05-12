@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 8
+  12002:
+    - 83
+name: cb08
+registers:
+  AF: 32768
+  AF_: 0
+  BC: 52661
+  BC_: 0
+  DE: 33166
+  DE_: 0
+  HL: 12002
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

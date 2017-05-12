@@ -1,0 +1,26 @@
+Attributes.pm
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Class/Declare/Attributes/Test.pm
+t/Class/Declare/Attributes/Multi/One.pm
+t/Class/Declare/Attributes/Multi/Two.pm
+t/Class/Declare/Attributes/Multi/Three.pm
+t/01compile.t
+t/02test.t
+t/03class.t
+t/04static.t
+t/05restricted.t
+t/06public.t
+t/07private.t
+t/08protected.t
+t/09multiple.t
+t/10strict.t
+t/11export.t
+t/12modifiers.t
+t/13readonly.t
+t/14readwrite.t
+t/15abstract.t
+META.json                                Module JSON meta-data (added by MakeMaker)

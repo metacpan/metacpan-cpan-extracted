@@ -1,0 +1,30 @@
+Calendar-Japanese-Holiday version 0.01
+======================================
+
+Calendar::Japanese::Holiday treats holidays in Japanese calendar.
+The list of holidays can be acquired, and you can examine whether
+a day is holiday or not. You can acquire the holiday name too.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Kazuyoshi Tomita
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,33 @@
+NAME
+    CatalystX::Debug::RequestHeaders - Log the full request headers sent to
+    a Catalyst application in debug mode
+
+SYNOPSIS
+        use Catalyst qw/
+            +CatalystX::Debug::RequestHeaders
+        /;
+
+DESCRIPTION
+    Prints a Text::SimpleTable style table containing all the headers sent
+    from the user's browser to the application for each request when the
+    application is in debug mode.
+
+METHODS
+  log_request_headers
+    This hook method in Catalyst is wrapped to call the "log_headers" in
+    Catalyst method for the request headers.
+
+BUGS
+    None known, but there probably are some.
+
+    Patches are welcome, as are bug reports in the rt.cpan.org bug tracker.
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>".
+
+COPYRIGHT & LICENSE
+    Copyright 2010 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

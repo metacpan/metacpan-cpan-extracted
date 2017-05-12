@@ -1,0 +1,9 @@
+LICENSE
+Changes
+Makefile.PL
+README
+MANIFEST.SKIP
+.cvsignore
+lib/CGI/Panel.pm
+t/01_ini.t
+MANIFEST

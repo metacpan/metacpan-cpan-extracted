@@ -1,0 +1,93 @@
+Installing CORBA::omniORB on Win32 platforms                        2002/11/21
+============================================
+
+This document describes how to perform a native Win32 build (i.e., not
+based on a Unix emulation layer such as Cygwin) of the CORBA::omniORB
+Perl interface on Win32 platforms.
+
+
+Requirements
+------------
+
+The installation procedure below has been tested using the following
+configuration:
+
+- Visual Studio 6.0 (SP5)
+- omniORB 4.0.x sources, compiled with the above
+- ActivePerl 5.8.7 Build 813
+- Windows XP SP2
+
+Of course your setup may differ, but generally you should keep the
+following in mind when attempting to build CORBA::omniORB on Win32:
+
+- When building modules for Perl, it is definitely recommended that
+  you use the same compiler environment that was used for building
+  your Perl distribution.
+
+  For a binary Perl distribution like ActivePerl (from ActiveState)
+  this means using Microsoft's Visual Studio development suite,
+  specifically VS6.
+  
+  If you built Perl from sources using another compiler environment, you
+  will most probably have to modify the compiler/linker settings in the
+  CONFIG.win32 file, and perhaps the Makefile.PL itself.
+  
+  (Tell us the recipe if you succeed.)
+  
+- You should compile omniORB from its source distribution following
+  the procedure described in its README.win32.txt file, then leave the
+  resulting source-tree untouched until you've successfully finished
+  building and installing the CORBA::omniORB Perl interface.
+  
+  This ensures that any required win32 omniORB header files and libraries
+  will be available during compilation of CORBA::omniORB.
+
+- Avoid spaces or any unusual characters in the directory paths that lead
+  to the Perl distribution or the omniORB source tree. Use slashes '/', not
+  backslashes '\', when specifying paths in configuration parameters.
+
+Here we go:
+
+
+Installation
+------------
+
+The win32 build procedure for the omniORB Perl interface tries to
+stick as closely as possible to the general build procedure of most
+CPAN modules, i.e., the same used for building CORBA::omniORB on Unix
+systems.
+
+One difference, however, is the method used for guessing the location
+of omniORB's header- and compiled library files, which are required
+for compiling CORBA::omniORB, since there is no pkg-config database
+available on Win32. Therefore, you have to specify the location of
+your win32 build of omniORB in a separate configuration file
+(CONFIG.win32)
+
+The procedure for installing CORBA::omniORB on Win32 platforms is as follows:
+
+1. Edit the CONFIG.win32 file and set OMNIPREFIX to the root directory
+   of your omniORB source/binary hierarchy.
+   
+   For example:
+   
+        OMNIORBPREFIX = C:/omniORB
+    
+   You normally shouldn't have to modify the other parameters (compiler and
+   linker flags) in the CONFIG.win32 file if you are using ActivePerl and
+   the Visual Studio C++ compiler environment.
+  
+  
+2. Then proceed as usual:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+   (Note: At the time of this writing, 'nmake test' is not implemented yet!)
+
+Good luck!
+
+Nico Mack - neckelatius@users.sourceforge.net (original CORBA::MICO port)
+Peter Housel - housel@users.sourceforge.net (CORBA::omniORB port)

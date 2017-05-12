@@ -1,0 +1,8 @@
+# The type of this app. app_class is required.
+app:
+  app_class: [% app_class || "''" +%]
+
+# Server Options
+server:
+  host: localhost
+  port: 1234

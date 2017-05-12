@@ -1,0 +1,173 @@
+Put changes under the appropriate header. Headers can include API CHANGES,
+DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
+OTHER. Entries should be in chronological order, i.e. oldest at the top
+
+0.42  Fri, Dec 9, 2016
+
+  [NEW FEATURES]
+  
+  * It is now possible to indicate filter functions by name, rather than
+    by package.
+  
+  [BUG FIXES]
+  
+  * Build.PL now removes names.txt and share/perl.h.cache. This is not
+    important for basic installation, but shows up when the distribution
+    is repeatedly compiled in the same directory against different
+    versions of Perl.
+  
+  * Executable code is now relocated to a location in memory that is
+    properly aligned with modern CPU page alignments. This is hard-coded
+    at the moment at 4096 bytes. Without this alignment, code compiled in
+    clex blocks would sometimes perform dismally. This showed up most
+    obviously in the rng and random-access benchmarks that were recently
+    added to the benchmarks folder. Before this fix, the C::Blocks rng
+    implementation would often perform as slowly as the Perl one.
+
+0.41  Mon, Nov 28, 2016
+
+  [API CHANGES]
+  
+  * cisa has been removed! C::Blocks now uses the built-in type
+    annotation facilities of Perl. Short type names are provided by
+    C::Blocks::Types.
+  
+  [DEPENDENCIES]
+  
+  * Bumped Alien::TinyCCx dependency to v0.12, which fixes struct
+    alignment issues and enum handling.
+  
+  [ENHANCEMENTS]
+  
+  * Perl package globals are now properly resolved. If you make a
+    reference some $Some::Package::Scalar in your C code, it'll properly
+    retrieve the SV named $Scalar from the package Some::Package.
+  
+  [NEW FEATURES]
+  
+  * New module C::Blocks::Types provides short type names
+  
+  * Double-colons are now processed by the code extractor and converted
+    into double-underscores. So if you use Some::Thing in your C code
+    block, it'll be immediately converted to Some__Thing.
+  
+  * Source filters! C::Blocks source filters are given the contents of
+    the C code, start to finish, to manipulate. While it would be nicer
+    to hook directly into the parser, this provides 99% of the desired
+    functionality with 1% of the required effort of a parser hook.
+  
+0.40  Fri, Aug 12, 2016
+
+  [DEPENDENCIES]
+  
+  * Bumped Alien::TinyCCx dependency to v0.11, which should properly
+    support 64-bit Macs.
+  
+  [BUG FIXES]
+  
+  * Revised the perl.h symbol table caching in PerlAPI.xs.PL to use the
+	tcc -run option instead of producing a shared object file. It does
+	not need to produce anything---it just needs to cache the symbol
+	table---but in order to get the default tcc to do that, I need to
+	give it a compile target. Shared objects gave trouble on Macs, but
+	tcc -run does not. An alternative fix would be to change tcc itself
+	to add a "no output" target, or some such. In the meantime, this
+	seems to solve the problem.
+  
+0.05  Thu, June 2, 2016
+
+  [DIFFERENT BEHAVIOR]
+  
+  * When a C::Blocks package has one or more cshare blocks, C::Blocks
+    used to add C::Blocks::libloader to the package's @ISA list. Now it
+    directly injects the import method from C::Blocks::libloader into
+    the current package, or warns if the package already has an import
+    glob entry in its stash. This makes it possible to use cshare in a
+    class defined using Moo (and probably many other OO frameworks).
+  
+  [DEPENDENCIES]
+  
+  * The build process now depends upon Test::Warn, which is used (not
+    surprisingly) to test warning messages, and the lexical control
+    thereof.
+  
+  * Bumped Alien::TinyCCx dependency to v0.10, which should properly
+    support Macs.
+  
+  [NEW FEATURES]
+  
+  * C::Blocks provides lexically-scoped warnings categories of
+    C::Blocks::import, C::Blocks::compiler, and C::Blocks::linker.
+
+0.04  Tue, May 3, 2016
+
+  [API CHANGES]
+  
+  * Shared libraries are now indicated with the package array
+    @C::Blocks::libraries_to_link rather than the package scalar
+    $C::Blocks::library_to_link.
+  
+  [DEPENDENCIES]
+  
+  * Bumped Alien::TinyCCx dependency to v0.08.
+  
+  [BUG FIXES]
+  
+  * csub works!
+  
+  [ENHANCEMENTS]
+  
+  * Can now link multiple shared libraries to a single block, though
+    the functionality is not yet tested.
+  
+  * Using sigiled variables automatically loads the PerlAPI symtab.
+  
+  [NEW FEATURES]
+  
+  * Added interpolation blocks! It is now possible to use Perl to
+    produce C code. They're kinda like fancy C macros, sorta.
+  
+  * Added cisa, providing a system akin to typemaps.
+  
+  * Added C::Blocks::Object::Magic, a port of XS::Object::Magic. This
+    makes it much easier to safely attach C structs to Perl variables.
+  
+  [OTHER]
+  
+  * The use of preprocessor branching in Blocks.xs has been cleaned
+    up a bit, which will hopefully make the distribution more robust.
+
+0.03  Fri, Dec 4, 2015
+
+  [DEPENDENCIES]
+  
+  * Added explicit dependency on ExtUtils::ParseXS v3.0. With prior
+    versions, if you had multiple .xs files, the boot sections would
+    collide in very, very strange ways. The default EU::PXS for v5.14
+    (on perlbrew at least) is old, so this ensures correctness.
+  
+  [BUG FIXES]
+  
+  * Revised symbol detection and building logic for Linux systems
+  
+  * Scrubbed various command-line preprocessor defines which sometimes
+    caused trouble on Debian systems. Similar corrections will surely be
+    needed for other flavors of linux.
+  
+0.02  Thu, Aug 6, 2015
+
+  [ENHANCEMENTS]
+  
+  * Sigil variable incorporation works for much older Perls
+  
+  * Can now incorporate sigiled variables with @ and % sigils
+  
+  * Gentle name mangling means C variables can have the same name as
+    Perl variables
+  
+  * Much more robust handling of sigil characters and braces in quoted
+    strings, as well as braces in comments
+
+0.01  Mon, Aug 3, 2015
+
+  Initial release!

@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  44367:
+    - 231
+    - 235
+name: dd22
+registers:
+  AF: 23325
+  AF_: 0
+  BC: 17825
+  BC_: 0
+  DE: 28136
+  DE_: 0
+  HL: 14803
+  HL_: 0
+  I: 0
+  IX: 60391
+  IY: 1456
+  PC: 4
+  R: 2
+  SP: 0

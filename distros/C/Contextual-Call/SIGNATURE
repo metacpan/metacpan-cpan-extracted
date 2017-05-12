@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 18c06e2235194e1657ab31c6222b5903fc6ca6c8 Changes
+SHA1 61f89cac235f4c7f858c0e83728a651a28020a50 MANIFEST
+SHA1 df8bc06991a67e563250be69b37945a0e152c951 META.yml
+SHA1 97e30d8e0e4788bf2c9b0b7d3727924c89bf81d8 Makefile.PL
+SHA1 0aca345ffddfd28d151d08fc92565294fc83baa1 README
+SHA1 2d014ec5636bdcd81afd170f3312d349cd299fbe example/sample.pl
+SHA1 3aca1cdbbdc13088fd636531f0d885560b64cd61 inc/ExtUtils/MY_Metafile.pm
+SHA1 28dc06a618d91801d1f58162c7c38654765de09c lib/Contextual/Call.mlpod
+SHA1 0b445d9199572cc2eb4fde927d4b130184a25291 lib/Contextual/Call.pm
+SHA1 eefe8e8658fd6607a6d5f75c0aa14267003887c9 lib/Contextual/Call/JA.pod
+SHA1 4b22d140ec4787a43e7de085f8c5055a25ed2535 t/00-load.t
+SHA1 fe2b4d9e659fd7937fbdd5f033fecf7b0531758c t/01-tests.t
+SHA1 dd65735a7f056f37cd0d50243336b16498afe6e3 t/boilerplate.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQFGBUIiewjCT38k4dkRAi2rAJ9/PHwfG572uU3a2vKoB+z0QPP2mgCcCBEC
+htZcaqi4QjFnQMCuQSSHF2Y=
+=d8kB
+-----END PGP SIGNATURE-----

@@ -1,0 +1,87 @@
+Class-AutoDB
+
+This class works closely with Class::AutoClass to provide almost
+transparent object persistence.  You can declare any class to be
+persistent and can easily store any objects of a persistent class.
+You can retrieve a stored object explicitly through a query
+mechansism, or implicitly by following a reference pointing to the
+object.  The persistence mechanism preserves the structure of the
+object network: if objects A and B pointed to C when they were stored,
+the retrieval process will reconstruct this relationship.
+
+This class presently works only with MySQL. 
+
+CAUTION: This module is old. We use it internally, and while it works
+well for our purposes, we urge new users to heed the warnings in the
+documentation.  This release brings the CPAN version of the module
+up-to-date relative to our internal version, something we should have
+done long ago.  
+
+We are resuming active development of the code and expect to release
+improved versions over the next several months.  See the "Roadmap"
+section in the main documentation.
+
+The 't' directory includes separate 'user' and 'developer' test
+suites.  The installation procedure below runs the user test suite.
+See t/README for more information.
+
+The 'docs' directory contains additional documentation.  All of this
+is presently for internal classes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+The first step, 'perl Build.PL', makes sure that MySQL is available
+and that the preson doing the installation has sufficient privileges
+to run the test suite. If this check fails, Build.PL does not generate
+the Build script and exits with a 0 return code. This is the idiom
+recommended for automated CPAN testing but may be too severe for
+normal installs.
+
+The module includes a modified version of Data::Dumper, renamed
+Class::AutoDB::Dumper.  We include both the pure Perl and much faster
+C (.xs) implementations. Build automatically compiles the C
+implementation if your system has a C compiler. We see a few compiler
+warnings when Build does this. These seem benign and can be
+ignored. The Data::Dumper docs claim that the code will fall back to
+the pure Perl implementation if the C version is not available.  We
+haven't checked this claim.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Class::AutoDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-AutoDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Class-AutoDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Class-AutoDB
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-AutoDB/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nat Goodman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

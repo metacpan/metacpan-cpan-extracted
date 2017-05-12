@@ -1,0 +1,78 @@
+[% 
+    title = "Set your viewing preferences" ;
+    onload = 'onload="resetPrefs()"'
+
+    box_help  = 1 ;
+
+    crumb1_name = 'Preferences' ;
+%]
+
+  <h2>Default Preferences</h2>
+  <p>Below you can select your favourite options that will be permanently
+	saved in your browser's cookie cache. These will then be loaded by
+	default when you view any page on the CPAN Testers Reports website
+	(providing you enable Cookies and Javascript).</p>
+
+	<table>
+	<tr><td>Grade:</td>
+	    <td><select id="grade_pref" name="grade">
+		    <option value="0">All Reports</option>
+		    <option value="1">PASS ONLY</option>
+		    <option value="2">FAIL ONLY</option>
+		    <option value="3">NA ONLY</option>
+		    <option value="4">UNKNOWN ONLY</option>
+		</select></td></tr>
+
+	<tr><td>Availability:</td>
+	    <td><select id="oncpan_pref" name="oncpan">
+		    <option value="0">All Distributions</option>
+		    <option value="1">On CPAN ONLY</option>
+		    <option value="2">BACKPAN ONLY</option>
+		</select></td></tr>
+
+	<tr><td>Distribution Maturity:</td>
+	    <td><select id="distmat_pref" name="distmat">
+		    <option value="0">All Releases</option>
+		    <option value="1">Official ONLY</option>
+		    <option value="2">Development ONLY</option>
+		</select></td></tr>
+
+	<tr><td>Perl Maturity:</td>
+	    <td><select id="perlmat_pref" name="perlmat">
+		    <option value="0">All Versions</option>
+		    <option value="1">Official ONLY</option>
+		    <option value="2">Development ONLY</option>
+		</select></td></tr>
+
+	<tr><td>Patched Perl:</td>
+	    <td><select id="patches_pref" name="patches">
+		    <option value="0">Include Patches</option>
+		    <option value="1">Exclude Patches</option>
+		    <option value="2">Patches ONLY</option>
+		</select></td></tr>
+
+	<tr><td>Perl Version:</td>
+	    <td><select id="perlver_pref" name="perlver" onchange="check_perlver(this)">
+            <option value="ALL">ALL</option>
+			[% FOREACH item = perlvers %]
+            <option value="[% item %]">[% item %]</option>
+			[% END %]
+	</select></td></tr>
+
+	<tr><td>OS Name:</td>
+	    <td><select id="osname_pref" name="osname" onchange="check_osname(this)">
+            <option value="ALL">ALL</option>
+			[% FOREACH item = osnames.sort %]
+            <option value="[% item %]">[% osnames.$item %]</option>
+			[% END %]
+	</select></td></tr>
+	</table>
+
+	<p>Once you are happy with your selection, click the SAVE button below. If
+	you wish to restore your previous default preferences, click the RESET button.</p>
+
+	<p>
+	<input type="submit" onclick="savePrefs();return false;"  value="SAVE" /> 
+	<input type="submit" onclick="resetPrefs();return false;" value="RESET" /> 
+	</p>
+

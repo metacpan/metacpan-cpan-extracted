@@ -1,0 +1,38 @@
+Clarion.pm version 1.02
+=======================
+
+Clarion.pm - Perl module for reading CLARION 2.1 data files
+
+NOTE
+
+This version is for Little-endian architectire only,
+as Clarion 2.1 itself runs only on Intel.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+or, alternatively, you may type:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or, since Clarion.pm is pure perl, you can simply copy it to your perl's @INC.
+
+BUGS
+
+Sometimes ./Build test (or make test) fails comparing floating point numbers
+(eg. got '4.04000000000000004', expected '4.04'). Probably such errors could
+be ignored.
+
+COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

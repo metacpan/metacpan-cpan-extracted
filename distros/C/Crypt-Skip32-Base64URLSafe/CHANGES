@@ -1,0 +1,8 @@
+Revision history for Perl module Crypt::Skip32::Base64URLSafe:
+
+0.33 Wed Oct  8 14:48:12 BST 2008
+     - added human-readable license to the documentation
+     - added abstract to the Makefile.PL
+
+0.32 Mon Aug 25 18:10:24 BST 2008
+     - initial release

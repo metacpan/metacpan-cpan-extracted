@@ -1,0 +1,43 @@
+Revision history for Catalyst-Plugin-Log-Handler
+
+0.08    Thu Sep 23 14:21:15 CEST 2010
+        Fix dependencies:
+          * NEXT -> MRO::Compat
+          * Current version for Log::Handler.
+
+0.07_01 Wed Sep 22 17:37:15 CEST 2010
+        Switch from "NEXT" to "next" as required by current Catalyst versions.
+        Adopt API changes for Log::Handler.
+        Thanks to Peter Flanigan for providing the patch.
+
+0.07    Fri Jul 13 02:39:40 CEST 2007
+        Log::Handler (LH) has been using the name is_debug rather than
+        would_log_debug etc. since version 0.33.  Log::Handler 0.38 won't have
+        would_log_* for downwards compatibility any more, so I have to change
+        Catalyst::Plugin::Log::Handler (CPLH).
+
+        NB: CPLH   0.07 requires LH >= 0.33
+            CPLH < 0.07 requires LH <= 0.37
+
+        Added new tests to check that is_* methods can be called.
+
+0.06    Apr 26 18:11:11 CEST 2007
+        Change dependency for Log::Handler to 0.32
+
+0.05    Apr 25 22:21:11 CEST 2007
+        Removed pm_to_blib, which was accidentally added.
+
+0.04    Apr 25 18:17:17 CEST 2007
+        * Make the "handler" method public
+        * Fix dependencies
+        * Add a new test
+
+0.03    Apr 25 13:25:00 CEST 2007
+        Map Catalyst's "warn" to Log::Handler's "warning".  Previously it was
+        mapped to "warn", but that didn't exist in Log::Handler.
+
+0.02    Apr 25 12:23:00 CEST 2007
+        Fixed some dependencies.
+
+0.01    Apr 25 01:00:00 CEST 2007
+        First version, released on an unsuspecting world.

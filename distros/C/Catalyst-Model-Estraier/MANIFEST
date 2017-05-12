@@ -1,0 +1,16 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile
+Makefile.PL
+README
+lib/Catalyst/Helper/Model/Estraier.pm
+lib/Catalyst/Model/Estraier.pm
+t/00.load.t
+t/01.live.t
+t/lib/TestApp.pm
+t/lib/TestApp/Model/Search.pm
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

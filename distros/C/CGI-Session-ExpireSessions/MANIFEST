@@ -1,0 +1,15 @@
+Build.PL
+Changelog.ini
+CHANGES
+examples/expire-sessions.pl
+examples/expire-set.pl
+lib/CGI/Session/ExpireSessions.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/delete-via-find.t
+t/new-line.t
+t/pod.t
+t/use.t

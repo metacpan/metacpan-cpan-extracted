@@ -1,0 +1,72 @@
+{
+   "abstract" : "Catalyst view to resize images for thumbnails",
+   "author" : [
+      "Jon Allen (JJ) <jj@jonallen.info>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-View-Thumbnail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::View" : "0",
+            "ExtUtils::MakeMaker" : "6.42",
+            "Image::Info" : "0",
+            "Imager" : "0",
+            "Test::More" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Helper::View::Thumbnail" : {
+         "file" : "lib/Catalyst/Helper/View/Thumbnail.pm",
+         "version" : "0.03"
+      },
+      "Catalyst::View::Thumbnail" : {
+         "file" : "lib/Catalyst/View/Thumbnail.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/Catalyst-View-Thumbnail/issues"
+      },
+      "homepage" : "https://github.com/Altreus/Catalyst-View-Thumbnail",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/Catalyst-View-Thumbnail.git",
+         "web" : "https://github.com/Altreus/Catalyst-View-Thumbnail"
+      }
+   },
+   "version" : "0.03"
+}
+

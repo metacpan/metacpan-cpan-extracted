@@ -1,0 +1,10 @@
+CHANGES file for Catalyst::Plugin::SimpleAuth:
+
+0.33 Tue Aug 11 10:54:13 BST 2009
+  - only print debugging messages under debug
+
+0.32 Wed Sep 10 20:42:44 BST 2008
+  - added machine- and human-readable license
+
+0.31 Wed Feb 13 14:38:53 GMT 2008
+  - first release

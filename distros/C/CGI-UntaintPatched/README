@@ -1,0 +1,33 @@
+CGI-UntaintPatched version 0.01
+===============================
+
+This module is exactly like CGI::Untaint except it contains a patch
+for a bug or two that i wanted fixed.  I made every effort to work 
+with the maintainer however he quit discussing it so I thought I would
+release my own patch.  Initially, the bug fixed is the one introduced 
+Dec. 2004 into CGI::Untaint that makes it not handle empty inputs 
+the like it used to. See the Changes file for the list.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Untaint
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Peter Speltz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

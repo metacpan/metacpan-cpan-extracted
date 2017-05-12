@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl Utility for Recent Releases",
+   "author" : [
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-Importer-Purr",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.8005",
+            "MetaCPAN::API::Tiny" : "1.131730",
+            "Moo" : "1.000003",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Catmandu::Importer::Purr" : {
+         "file" : "lib/Catmandu/Importer/Purr.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-Importer-Purr/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/LibreCat/Catmandu-Importer-Purr"
+      }
+   },
+   "version" : "0.02"
+}

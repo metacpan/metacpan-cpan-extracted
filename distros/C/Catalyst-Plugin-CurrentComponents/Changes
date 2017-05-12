@@ -1,0 +1,28 @@
+# This file documents the revision history for Perl extension Catalyst::Plugin::CurrentComponents.
+
+0.007 - 2017-01-23
+  - Fixed typo in view setup
+  - if allowing one to set the current model instance via state, be more
+    generous in the type of object we allow
+
+0.006 - 2016-12-21
+  - More lax detect of models or view on action return
+
+0.005 - 2016-12-21
+  - Changed to Moo.
+  - You can now set both the current view instance and the current model instance
+    from the action return, if you want that.
+  - Tweaked docs.
+
+0.004 - 2015-09-25
+  - Fixed code to reflect docs
+
+0.003 - 2015-08-20
+  - Allow you to set the current model instance in the return value of an
+    action (via configuration).
+
+0.002 - 2015-05-01
+  - let you set view/model instance with less typing
+
+0.001 - 2015-03-16
+  - initial release

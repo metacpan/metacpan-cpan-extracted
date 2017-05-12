@@ -1,0 +1,38 @@
+---
+abstract: 'unAPI webservice based on Catmandu'
+author:
+  - 'Jakob Voß'
+build_requires:
+  HTTP::Request::Common: '0'
+  Moo: '0'
+  Plack::Test: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Plack-unAPI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9204'
+  Plack: '1.0'
+  Plack::App::unAPI: '0.61'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/gbv/Catmandu-Plack-unAPI/issues
+  homepage: https://github.com/gbv/Catmandu-Plack-unAPI
+  repository: https://github.com/gbv/Catmandu-Plack-unAPI.git
+version: '0.11'
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'

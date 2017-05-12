@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+# Very much like the reference.pl example, except for the fact 
+# that we're calling the parse_form_data in a different context;
+# the method returns a hash, so we don't need to dereference.
+
+use strict;
+use warnings;
+use CGI::Lite;
+
+my $cgi         = CGI::Lite->new;
+my %data        = $cgi->parse_form_data;
+my @all_values  = ();
+
+print "Content-type: text/plain", "\n\n";
+
+while (my ($key, $value) = each %data) {
+
+    # Let's check to see if a value is a reference to an array,
+    # which indicates multiple values for the field.
+
+    if (ref $value) {
+	@all_values = $cgi->get_multiple_values ($value);
+
+	print "$key = @all_values\n";
+    } else {
+	print "$key = $value\n";
+    }
+}
+
+print "\nHere are the same key/value pairs in order:\n";
+
+foreach my $key ($cgi->get_ordered_keys) {
+    my $value = $data{$key};
+
+    if (ref $value) {
+	@all_values = $cgi->get_multiple_values ($value);
+
+	print "$key = @all_values\n";
+    } else {
+	print "$key = $value\n";
+    }
+}
+
+exit;

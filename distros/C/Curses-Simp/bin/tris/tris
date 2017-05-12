@@ -1,0 +1,309 @@
+#!/usr/bin/perl
+# 574194Q: tris by PipStuart <Pip@CPAN.Org> as a Simp Tetris clone
+# 2du:
+#   optimize drawing (don't keep re-printing next list when un-changed)
+#   mk PiecDrop on $dela heartbeat irrespective of key events
+#   clear all down key events at piece-lockdown
+#   add score thresholds where level increases and delay decreases
+#   study TNT (The Next Tetris) && imp suspended blocks falling after line clr
+# pieces:
+#   0     1     2     3     4     5     6
+#   @@   @@@@  @@    @@@   @@@    @@   @@@
+#   @@          @@     @    @    @@    @
+#
+#   XX    X    XX     X     X     XX    X
+#   XX    X     XX    X    XX    XX     X
+#         X          XX     X           XX
+#         X
+#   C     W     R     O     G     U     P
+# basin:   10x20 (or just whatever Hite fits?)
+# scoring: lines cleared: 1 = (level + 1) *   40
+#                         2 = (level + 1) *  100
+#                         3 = (level + 1) *  300
+#                         4 = (level + 1) * 1200
+use strict;
+use Curses::Simp;
+my $mjvr = 1; my $mnvr = 0; my $ptvr = 'A6GDY6C';
+my $auth = 'Pip Stuart <Pip@CPAN.Org>';
+my $name = $0; $name =~ s/.*\///; my $pchr = shift || '@';
+my @text = (); my @fclr = ();# my @bclr = ();
+my $simp = tie(@text, 'Curses::Simp', 'flagaudr' => 0);
+           tie(@fclr, 'Curses::Simp::FClr', $simp);
+#           tie(@bclr, 'Curses::Simp::BClr', $simp);
+my @basn = (); my $keey = ''; my $bwid = 10; my $bhit = 20; my $dela = 0.7;
+my @basf = (); my $crot =  0; my $cpic =  0; my $pfal =  0; my $dflg =   0;
+my @pcrd = (); my $levl =  0; my $scor =  0; my $gmov =  0;
+foreach(0..$bhit+1) { $basn[$_] = $basf[$_] = ' ' x $bwid; }
+my @next = (); foreach(0..3) { push(@next, int(rand(7))); } # rand next pieces
+my @smap = (   40,  100,  300, 1200 ); # scoring modifier map for lines cleared
+my @pshp = ( # piece shape coordinate lists (y,x) assuming X == common (0,0)
+#   0     1     2     3     4     5     6
+#   X@   @X@@  @X    @X@   @X@    X@   @X@
+#   @@          @@     @    @    @@    @
+  [ [ 0, 1, -1, 0, -1, 1 ], # 0
+    #1[DownEdge],2[LeftEdge],3[RiteEdge],4[DownFace],5[LeftFace],6[RiteFace]
+    [    2,3], [0,  2  ], [  1,  3], [       ], [       ], [       ] ],
+  [ [ 0,-1,  0, 1,  0, 2 ], # 1
+    [0,1,2,3], [  1    ], [      3], [       ], [       ], [       ] ],
+  [ [ 0,-1, -1, 0, -1, 1 ], # 2
+    [    2,3], [  1    ], [      3], [  1    ], [    2  ], [0      ] ],
+  [ [ 0,-1,  0, 1, -1, 1 ], # 3
+    [      3], [  1    ], [    2,3], [0,1    ], [      3], [       ] ],
+  [ [ 0,-1,  0, 1, -1, 0 ], # 4    @
+    [      3], [  1    ], [    2  ], [  1,2  ], [      3], [      3] ],
+  [ [ 0, 1, -1,-1, -1, 0 ], # 5    X
+    [    2,3], [    2  ], [  1    ], [  1    ], [0      ], [      3] ],
+  [ [ 0,-1,  0, 1, -1,-1 ], # 6    @  @
+    [      3], [  1,  3], [    2  ], [0,  2  ], [       ], [      3] ],
+  [ [ 1, 0, -1, 0, -2, 0 ], # 1 -> @ @X  @
+    [      3], [0,1,2,3], [0,1,2,3], [       ], [       ], [       ] ],
+  [ [ 1, 0,  0,-1, -1,-1 ], # 2 ---> @   X
+    [      3], [    2,3], [0,1    ], [0      ], [  1    ], [      3] ],
+  [ [ 1, 0, -1,-1, -1, 0 ], # 3 ------> @@  @    @@
+    [    2,3], [    2  ], [0,1,  3], [       ], [0,1    ], [       ] ],
+  [ [ 1,-1,  0,-1,  0, 1 ], # 3 ----------> @X@  X  @
+    [0,  2,3], [  1,2  ], [      3], [       ], [       ], [  1    ] ],
+  [ [ 1, 0,  1, 1, -1, 0 ], # 3 ---------------> @ @X
+    [      3], [0,1,  3], [    2  ], [    2  ], [       ], [0,    3] ],
+  [ [ 1, 0,  0,-1, -1, 0 ], # 4 ------------------> @   @   @
+    [      3], [    2  ], [0,1,  3], [    2  ], [  1,  3], [       ] ],
+  [ [ 1, 0,  0,-1,  0, 1 ], # 4 ---------------------> @X@  X@ @
+    [0,  2,3], [    2  ], [      3], [       ], [  1    ], [  1    ] ],
+  [ [ 1, 0,  0, 1, -1, 0 ], # 4 --------------------------> @  @X @@
+    [      3], [0,1,  3], [    2  ], [    2  ], [       ], [  1,  3] ],
+  [ [ 1,-1,  0,-1, -1, 0 ], # 5 ------------------------------> @  X
+    [      3], [  1,2  ], [0,    3], [    2  ], [      3], [  1    ] ],
+  [ [ 1,-1,  1, 0, -1, 0 ], # 6 ---------------------------------> @   @  @
+    [      3], [  1    ], [0,  2,3], [  1    ], [0,    3], [       ] ],
+  [ [ 1, 1,  0,-1,  0, 1 ], # 6 -----------------------------------> @X@  X
+    [0,  2,3], [    2  ], [  1,  3], [       ], [  1    ], [       ] ],
+  [ [ 1, 0, -1, 0, -1, 1 ], # 6 ----------------------------------------> @@
+    [    2,3], [0,1,2  ], [      3], [       ], [       ], [0,1    ] ],
+);
+my @pmap = ( # piece map of shapes in @pshp for each possible rotation
+  [  0,  0,  0,  0, 'C' ], #   0 C   1 W   2 R   3 O   4 G   5 U   6 P
+  [  1,  7,  1,  7, 'W' ], #   X@   @X@@  @X    @X@   @X@    X@   @X@
+  [  2,  8,  2,  8, 'R' ], #   @@          @@     @    @    @@    @
+  [  3,  9, 10, 11, 'O' ],
+  [  4, 12, 13, 14, 'G' ], #   @@@@  double-width 
+  [  5, 15,  5, 15, 'B' ], #   @@@@     1.5-height
+  [  6, 16, 17, 18, 'P' ], #   @@@@  better square
+);
+
+sub ShowInfo { # Display an Info dialog window
+  $simp->Mesg('type' => 'info',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+ 
+$name - a Simp Tetris clone.
+ 
+ Shout out to Keith && all the LBox.Org crew.  Thanks to Beppu-san for
+being a good friend.  I hope you find $name useful.  Please don't 
+hesitate to let me know if you app-ree-see-ate it or if you'd like
+me to add something for you.  I'd be glad to improve it given new 
+suggestions.  Please support FSF.Org && EFF.Org.  Thanks.  TTFN.
+ 
+                                                       -Pip
+ 
+");
+}
+
+sub ShowHelp { # uhh
+  $simp->Mesg('type' => 'help',
+" $name v$mjvr.$mnvr.$ptvr - by $auth
+
+                        Global Keys:                                
+  h         - displays this Help screen                             
+  d         - toggle double-width draw flag                         
+ z/a        - rotate piece counter/clockwise                        
+ Up   Arrow - rotate piece         clockwise                        
+ space      - drop   piece all the way down                         
+ Down Arrow - drop   piece one basin unit down                      
+ Left Arrow - move   piece left                                     
+ RightArrow - move   piece right                                    
+
+                        System Stuff:
+       ?/H/F1  - Help  :  i - Info  :  x/q/Esc - eXit");
+}
+
+sub DrawBasn{ # draw the current basin to the screen
+  @text = (" $name v$mjvr.$mnvr.$ptvr" .
+    ' - by Pip Stuart <Pip@CPAN.Org>     Score:' . $scor);
+  $fclr[$#text] = ' ' . 'G' x length($name) . ' WYWCWROYGCBP' .
+    ' B WW CCC CCCCCC WGGGWYYYYWCCCW     wwwwwW' . 'C' x length($scor);
+  my $nycr = 4; my $nxcr = int(($simp->Widt() - $bwid) / 2) + $bwid + 4;
+  push(@text, '#' x $simp->Widt()); $fclr[$#text] = 'w';
+  foreach(0..$bhit-1) {
+    if($dflg) {
+      my $line = $basn[$bhit - $_]; $line =~ s/\s/  /g; $line =~ s/\@/@@/g;
+      push(@text,     ' ' x (int(($simp->Widt() - $bwid*2) / 2) - 1) . '#' . $line . '#');
+         $line = $basf[$bhit - $_]; $line =~ s/\s/  /g; $line =~ s/(\S)/$1$1/g;
+      $fclr[$#text] = ' ' x (int(($simp->Widt() - $bwid*2) / 2) - 1) . 'w' . $line . 'w';
+    } else {
+      push(@text,     ' ' x (int(($simp->Widt() - $bwid  ) / 2) - 1) . '#' . $basn[$bhit - $_ - 1] . '#');
+      $fclr[$#text] = ' ' x (int(($simp->Widt() - $bwid  ) / 2) - 1) . 'w' . $basf[$bhit - $_ - 1] . 'w';
+    }
+    $text[-1] .= ' Next:' unless($_);
+  }
+  push(@text, '#' x $simp->Widt()); $fclr[$#text] = 'w';
+  $simp->Draw();
+  for(@next){PrntPiec($nycr, $nxcr, $_); $nycr += 3;}}
+sub PrntPiec{my $pycr = shift; my $pxcr = shift; my $pndx = shift; my $prot = shift || 0; my $pref = \@{$pshp[$pmap[$pndx][$prot]][0]};
+  $simp->Prnt('ycrs' => $pycr             , 'xcrs' => $pxcr             , 'fclr' => $pmap[$pndx][4]   , $pchr);
+  $simp->Prnt('ycrs' => $pycr - $pref->[0], 'xcrs' => $pxcr + $pref->[1], 'fclr' => $pmap[$pndx][4]   , $pchr);
+  $simp->Prnt('ycrs' => $pycr - $pref->[2], 'xcrs' => $pxcr + $pref->[3], 'fclr' => $pmap[$pndx][4]   , $pchr);
+  $simp->Prnt('ycrs' => $pycr - $pref->[4], 'xcrs' => $pxcr + $pref->[5], 'fclr' => $pmap[$pndx][4]   , $pchr);}
+sub PiecSpwn{ # Spawn a new Piece
+  $crot = 0; push(@next, int(rand(7))); $cpic = shift(@next);
+  my $pref = \@{$pshp[$pmap[$cpic][$crot]][0]};
+  @pcrd =($bhit             , 4             ,
+          $bhit + $pref->[0], 4 + $pref->[1],
+          $bhit + $pref->[2], 4 + $pref->[3],
+          $bhit + $pref->[4], 4 + $pref->[5]);
+  for(0..3){if(substr($basn[$pcrd[$_*2]-1], $pcrd[$_*2+1], 1) eq $pchr){
+      GameOver(); last;}}
+  $pfal = 1 unless($gmov);
+}
+sub ErasPiec{ # erase the falling piece (from basin, not screen)
+  for(0..3){
+    substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1], 1, ' ');
+    substr($basf[$pcrd[$_*2]], $pcrd[$_*2+1], 1, ' ');}}
+sub DrawPiec{ # draw  the falling piece (into basin, not screen)
+  for(0..3){
+    substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1], 1, $pchr);
+    substr($basf[$pcrd[$_*2]], $pcrd[$_*2+1], 1, $pmap[$cpic][4]);}}
+sub GameOver{ # handle GameOver condition
+  $gmov = 1; # set GameOver flag
+  $simp->Mesg('wait' => 7, 'titl' => "You Died!", 'flagprsk' => 0,
+    "\nFinal Score:$scor\n\n   Goodbye!");}
+sub PiecDrop{ # make piece fall one basin unit
+  PiecSpwn() unless($pfal);
+  unless($gmov){
+    for(@{$pshp[$pmap[$cpic][$crot]][1]}){
+      if(!$pcrd[$_*2] ||
+         substr($basn[$pcrd[$_*2]-1], $pcrd[$_*2+1], 1) ne ' ') {
+        $pfal = 0;}}
+    for(@{$pshp[$pmap[$cpic][$crot]][4]}){
+      if(substr($basn[$pcrd[$_*2]-1], $pcrd[$_*2+1], 1) ne ' ') {
+        $pfal = 0;}}
+    if($pfal){ # if falling (i.e., piece can still fall) ...
+      ErasPiec();
+      for(0..3){ $pcrd[$_*2]--; } # lower y-coords
+      DrawPiec();
+    }else{
+      ClerLinz();
+    }
+    DrawBasn();}}
+sub FullDrop{ # make piece fall all the way down at once
+  PiecDrop() while($pfal);
+}
+sub ClerLinz { # clear out all solid basin lines
+  my $linz = 0;
+  for(0..$#basn) {
+    while($basn[$_] eq $pchr x $bwid) {
+      splice(@basf, $_, 1);
+      splice(@basn, $_, 1);
+      push(  @basf, ' ' x $bwid);
+      push(  @basn, ' ' x $bwid);
+      $linz++;
+    }
+  }
+  $scor++;
+  $scor += ($levl + 1) * $smap[$linz - 1] if($linz);
+}
+
+sub MoveLeft { # move the falling piece left once if there's room
+  my $okay = 1;
+  foreach(@{$pshp[$pmap[$cpic][$crot]][2]}) {
+    if(!$pcrd[$_*2+1] ||
+       substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1]-1, 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  foreach(@{$pshp[$pmap[$cpic][$crot]][5]}) {
+    if(substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1]-1, 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  if($okay) { # if still okay to move...
+    ErasPiec();
+    foreach(0..3) { $pcrd[$_*2+1]--; } # lower x-coords
+    DrawPiec();
+  }
+  DrawBasn();
+}
+
+sub MoveRite { # move the falling piece right once if there's room
+  my $okay = 1;
+  foreach(@{$pshp[$pmap[$cpic][$crot]][3]}) {
+    if($pcrd[$_*2+1] >= ($bwid - 1) ||
+       substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1]+1, 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  foreach(@{$pshp[$pmap[$cpic][$crot]][6]}) {
+    if(substr($basn[$pcrd[$_*2]], $pcrd[$_*2+1]+1, 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  if($okay) { # if still okay to move...
+    ErasPiec();
+    foreach(0..3) { $pcrd[$_*2+1]++; } # raise x-coords
+    DrawPiec();
+  }
+  DrawBasn();
+}
+sub RotaRite { # Rotate Piece Right (        clockwise) 90-degrees
+  my $nrot = $crot + 1; $nrot = 0 if($nrot ==  4);
+  my $pref = \@{$pshp[$pmap[$cpic][$nrot]][0]}; my $okay = 1;
+  ErasPiec();
+  foreach(0..3) {
+    if(substr($basn[$pcrd[0] + $pref->[$_*2  ]],
+                    $pcrd[1] + $pref->[$_*2+1] , 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  if($okay) {
+    @pcrd =($pcrd[0]             , $pcrd[1]             ,
+            $pcrd[0] + $pref->[0], $pcrd[1] + $pref->[1],
+            $pcrd[0] + $pref->[2], $pcrd[1] + $pref->[3],
+            $pcrd[0] + $pref->[4], $pcrd[1] + $pref->[5]);
+    $crot = $nrot;
+  }
+  DrawPiec();
+}
+sub RotaLeft { # Rotate Piece Left  (counter-clockwise) 90-degrees
+  my $nrot = $crot - 1; $nrot = 3 if($nrot == -1);
+  my $pref = \@{$pshp[$pmap[$cpic][$nrot]][0]}; my $okay = 1;
+  ErasPiec();
+  foreach(0..3) {
+    if(substr($basn[$pcrd[0] + $pref->[$_*2  ]],
+                    $pcrd[1] + $pref->[$_*2+1] , 1) ne ' ') {
+      $okay = 0;
+    }
+  }
+  if($okay) {
+    @pcrd =($pcrd[0]             , $pcrd[1]             ,
+            $pcrd[0] + $pref->[0], $pcrd[1] + $pref->[1],
+            $pcrd[0] + $pref->[2], $pcrd[1] + $pref->[3],
+            $pcrd[0] + $pref->[4], $pcrd[1] + $pref->[5]);
+    $crot = $nrot;
+  }
+  DrawPiec();
+}
+while((!defined($keey) || ($keey !~ /^[xq]$/i && ord($keey) != 27)) && !$gmov){
+  PiecDrop(); # needs to be on $dela heartbeat irrespective of key events
+  $keey = $simp->GetK($dela);
+  if(defined($keey)) {
+    if   (   $keey  eq ' '     &&    $pfal        ) { FullDrop(); }
+    elsif(lc($keey) eq 'a'     || lc($keey) eq 'z') { RotaLeft(); }
+    elsif(lc($keey) eq 'd'                        ) { $dflg ^= 1; }
+    elsif($keey eq 'KEY_LEFT'  &&    $pfal        ) { MoveLeft(); }
+    elsif($keey eq 'KEY_RIGHT' &&    $pfal        ) { MoveRite(); }
+    elsif($keey eq 'KEY_UP'    || lc($keey) eq 'k') { RotaRite(); }
+    elsif($keey eq 'KEY_DOWN'  || lc($keey) eq 'j') { PiecDrop(); }
+    elsif(lc($keey) eq 'h' || lc($keey) eq '?' || $keey eq 'KEY_F1') {
+      ShowHelp();
+    } elsif($keey eq '-1') {
+    }
+  }
+}

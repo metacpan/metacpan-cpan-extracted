@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CMD-Colors.t
+lib/CMD/Colors.pm

@@ -1,0 +1,44 @@
+Revision history for Perl module Code-Statistics
+
+1.112980  2011-10-26 01:33:52 Asia/Kamchatka
+    - fixed argument-less calling of commands, ( thanks to Gregor Goldbach )
+
+1.103260  2010-11-22 10:28:37 Europe/Berlin
+    - actually added bin/codestat to the distribution now
+
+1.102530  2010-09-10 14:53:10 Europe/Berlin
+    - updated testing some more to handle cross-platform math inaccuracies
+
+1.102521  2010-09-10 01:28:33 Europe/Berlin
+    - updated tests to fit JSON sorting
+
+1.102520  2010-09-09 23:46:51 Europe/Berlin
+    - switched from Clone::Fast to Clone, due to Clone::Fast not working above perl 5.10 ( thanks to sergey.aleynikov@gmail.com )
+    - added nop target
+    - migrated to fixed MooseX::SlurpyConstructor ( thanks to Mark Morgan <makk384@gmail.com> )
+    - switched to a faster complexity calculation routine for the time being
+    - enabled canonical for JSON to see if that fixes the cross-platform issues with hash keys
+
+1.102390  2010-08-27 18:00:02 Europe/Berlin
+    - report columns are now always in alphabetic order
+    - cyclomatic complexity metric added
+    - made tests ignore a piece of cross-platform weirdness
+
+1.102371  2010-08-25 15:27:25 Europe/Berlin
+    - fixes reporter module so it now loads all metric plugins it needs
+
+1.102370  2010-08-25 12:38:42 Europe/Berlin
+    - some internal restructuring
+    - extended capabilities of metrics:
+        - they can declare themselves statistically insignificant now to hint
+          reporters as to how to handle them
+        - they can define a short name for themselves now, for reporters to use
+    - support/incompatible logic actually works now
+    - added calculation of deviation from the standard for each entry in the
+      top/bottom tables
+
+1.102360  2010-08-24 13:28:43 Europe/Berlin
+    - this should fix test results being unstable across platforms
+
+1.102351  2010-08-23 14:38:43 Europe/Berlin
+    - initial release

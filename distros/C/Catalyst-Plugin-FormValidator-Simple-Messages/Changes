@@ -1,0 +1,8 @@
+Revision history for Perl extension Catalyst::Plugin::FormValidator::Simple::Messages
+
+0.02  Tue Jul 08 16:47:21 2008
+        - fixed bug set_invalid_form
+          (thanks to Kazunori Watanabe)
+
+0.01  Wed Oct 17 16:36:18 2007
+        - original version

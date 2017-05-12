@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Convert/RACE.pm
+t/00load.t
+t/01race.t

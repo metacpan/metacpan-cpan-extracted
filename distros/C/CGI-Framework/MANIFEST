@@ -1,0 +1,8 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/CGI/Framework.pm
+t/001_load.t
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

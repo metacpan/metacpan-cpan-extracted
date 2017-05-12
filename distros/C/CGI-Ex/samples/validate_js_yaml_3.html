@@ -1,0 +1,80 @@
+<html>
+<style>
+.error {
+  color: red;
+  font-size: 75%;
+}
+</style>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script src="./yaml_load.js"></script>
+<script src="./validate.js"></script>
+<script>
+if (! document.yaml_load) {
+  document.writeln('<span style="color:red"><h1>Missing document.yaml_load</h1>Path to ../lib/CGI/Ex/yaml_load.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.yaml_load</h1></span>');
+}
+
+if (! document.validate) {
+  document.writeln('<span style="color:red"><h1>Missing document.validate</h1>Path to ../lib/CGI/Ex/validate.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.validate</h1></span>');
+}
+
+</script>
+
+
+<form name=a validation="
+group onevent: 'submit,change'
+group no_confirm: 1
+group no_alert: 1
+group as_array_prefix: ' -- '
+">
+<table border=0>
+<tr>
+  <td colspan=2 valign=top>Enter a date (YYYY/MM/DD) greater than today:<br>
+    (<script>var t=new Date();document.writeln(t.toGMTString())</script>)
+  </td>
+</tr>
+<tr>
+  <td width=100>
+    <input type=text size=20 name=date validation="
+ name: Date
+ required: 1
+ order: ['match','custom_js']
+ match: 'm|^\d\d\d\d/\d\d/\d\d$|'
+ match_error: 'Please enter date in YYYY/MM/DD format'
+ custom_js: |
+  function (args) {
+   if (args.errors.length) return 1;
+   var t=new Date();
+   var y=t.getYear()+1900;
+   var m=t.getMonth() + 1;
+   var d=t.getDate();
+   if (m<10) m = '0'+m;
+   if (d<10) d = '0'+d;
+   return (args.value > ''+y+'/'+m+'/'+d) ? 1 : 0;
+  }
+ custom_js_error: The date was not greater than today.
+">
+  </td>
+  <td><span id=date_error class=error></span></td>
+</tr>
+<tr>
+  <td align=right>
+    <input type=submit>
+  </td>
+  <td>&nbsp;</td>
+</tr>
+</table>
+</form>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+if (document.check_form) document.check_form('a');
+</script>
+
+</html>

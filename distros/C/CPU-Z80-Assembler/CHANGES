@@ -1,0 +1,222 @@
+2.15	2015-12-28
+	Other
+	* Add link to git repository
+
+2.14	2013-07-26
+	Other
+	* Use Asm::Preproc 1.00, where Asm::Preproc::Stream is removed, and 
+	  Iterator::Simple::Lookahead is used instead
+
+2.13	2010-11-21
+	Bug Fixes
+	* Bug detecting circular references: was giving false positives 
+	  in the following example code:
+			err equ 10
+			y0  equ err
+			ld a,(iy+err-y0) ; gives circular reference error, and should not
+
+	New Features
+	* Add defm, defmz, defm7, equ
+	* Add z80asm_file function.
+
+	Feature Changes
+	* Replace AsmTable by Asm::Z80::Table. This has the impacts:
+	  - accept 'jr <po|pe|p|m>,NN', compile 'jp ...' instead
+	  - no longer support for variants of ixh, ixl, iyh, iyl (e.g. xh, hx, ...)
+	  - no longer support variants db, dw, dt, dm of defb, defw, deft, defm
+	  - no longer support for [] instead of ()
+	  - no longer support for exa
+
+	Other
+	* Merge CPU::Z80::Assembler::Preprocessor and CPU::Z80::Assembler::Lexer
+	  into CPU::Z80::Assembler, they were just wrapper functions on other modules.
+
+2.12	2010-10-02
+	* Sequence (?|...) not recognized in regex in Perl 5.8
+
+2.11 	2010-10-01
+	* Make CPU::Z80::Assembler::Lexer as a wrapper to Asm::Preproc::Lexer, use 
+	  Asm::Preproc::Token instead of CPU::Z80::Assembler::Token
+	* Solve #59195 (use hex instead of eval)
+
+2.10 2010-09-12
+	* Make CPU::Z80::Assembler::Preprocessor as a wrapper to Asm::Preproc
+	* Error messages stopped showing actual text of line containing the 
+	  error - cluters the display
+	* Use L<zzz|zzz> instead of L<zzz> in POD to avoid "the zzz manpage" rendering
+
+2.09 2010-03-23
+	* bump version
+
+2.08_01 2010-03-22
+	* CPAN cannot unpack tarball, permission denied; give full control to
+	  Win7 source files before make dist, add noacl to cygwin fstab
+
+2.08 2010-03-21
+	* Failed t/JumpOpcode.t test 36 in perl 5.11.5, 
+	  operation "eq": no method found 
+	  when comparing two CPU::Z80::Assembler::Line; 
+	  convert to string before passing on to is()
+
+2.07 2009-11-12
+	* One test of t/Preprocessor-include.t failed on localized version of $!
+
+2.06 2009-10-26
+	* Bump up version number
+
+2.05_06 2009-09-22
+	* Move back to 5.008, CPAN of 5.006 did not compile, Regexp::Trie requires 5.008
+	* '$' no longer used as label prefix, to be able to support $FF syntax 
+	* '%' (bin), '$' (hex), '#' (hex) number prefixes
+	* removed ORG label - does not make sense with several segments
+	* Rename link() to _locate() : only address location is done; make it private, 
+	  called by bytes()
+	* Remove restriction on ORG - each new org creates a new segment,
+	  gaps between the segments are filled with 0xFF (configurable)
+	* Change 'JR' to 'JP', and 'DJNZ' to 'DEC B:JP NZ' if distance too far
+	* Publish AsmTable.pm - usefull for disassembler
+
+2.05_05 2009-08-26
+	* Fix Parser.pm version
+	* Remove dead code
+	* Improve documentation 
+	* Tests failed in Unix due to lack of \r processing
+	* Compatible with perl 5.006, downgraded requirement from 5.008.
+	* Error in macro expansion : was eating statement terminator
+
+2.05_04 2009-08-23
+	* New Stream class - faster than HOP::Stream, because head element is always 
+	  available to be read without computation (is_promise() in HOP::Stream) and 
+	  no test is needed to distinguish a stream node from a array-ref element
+	  (is_node() in HOP::Stream). The stream has an head element, and a list of
+	  the next elements, which may contain iterators.
+	* List object uses the input to the assembler to read the lines again during
+	  the listing phase, instead of globing all tokens in memory
+	* Remove usage of HOP::Stream
+	* Move the macro processing into the parser - removes one level of stream
+	  processing
+	* Added the unofficial Z80 opcodes to the test cases
+	* Benchmark assembly times:
+	  0.337 sjasmplus
+	  2.734 z80masm-2.01
+	  2.738 z80masm-2.05
+	  2.898 z80masm-current
+	  3.555 z80masm-2.05_03
+	 11.342 z80masm-1.03
+
+2.05_03 2009-08-11
+	* Performance : 
+	  - hand-coded contructor and accessor for Line.pm and Token.pm instead
+	    of Class::Struct, because too much time was being spent on Token->new()
+	* Remove Class.pm : plugin replacement to Class::Class to solve RT #42710
+	* Remove Node.pm : cannot use inheritance with Class::Struct; define different
+	  modules (Program.pm, Segment.pm, Opcode.pm, Expr.pm) with the same interface
+	  (child contains list of children of this node).
+	* All test scripts now pass
+	* Move test scripts data files to t\data
+	* Move all bechmarking scripts to tools\benchmark
+	* New List.pm class to handle output of the assembly file listing at the
+	  code generation stage.
+	* New ParserGenerator.pm class to generate a try-based non-backtracking parser.
+	  Builds a complete state table for the input grammar, where each state is a
+	  map of current-token => next-state, or current-token => accept-rule, or
+	  current-token => call-sub-rule. The input grammar accepts 
+	  rule => token token ... [sub-rule] ... action 
+	  The sub-rule call accepts optional ('?'), 0 or more ('*') or 1 or more ('+').
+	  The output is the new Parser.pm module with about 7K states and 20K lines
+	  of Perl code --> PERFORMANCE PENALTY.
+	* Remove ParserTable.pm : whole Parser.pm is now generated by
+	  tools\build_Parser.pl
+	* Expr.pm parser now checks for the correct syntax. The previous parser just
+	  extracted balanced parentheses.
+	* Lexer.pm : 
+	  - accept db, dw, dt, dm as alias to defb, defw, deft, defm
+	  - remove quotes from STRING token value
+	* Line.pm : added back is_equal() and is_different()
+	* Macro.pm : 
+	  - return the list of newline tokens parsed inside of a macro 
+	    definition back to the stream, so that the assembly listing contains 
+	    also these lines.
+	  - replace statement_end() by /[:\n]/ -> performance
+	* Program.pm, Segment.pm : new org() and add() methods to be called by code
+	  generator.
+
+	  The lexer is still the performance botleneck, together with the heavy usage
+	  of HOP::Stream.
+	%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+	 43.7   0.500  3.052  71417   0.0000 0.0000  HOP::Stream::tail
+	 33.6   0.385  0.665  98780   0.0000 0.0000  HOP::Stream::head
+	 24.6   0.282  0.466 170197   0.0000 0.0000  HOP::Stream::is_node
+	 22.4   0.257  1.214  17902   0.0000 0.0001  CPU::Z80::Assembler::Lexer::__ANON__
+	 21.3   0.244  0.257  67163   0.0000 0.0000  HOP::Stream::is_promise
+	 20.7   0.237  2.173  34954   0.0000 0.0001  CPU::Z80::Assembler::Macro::__ANON__
+	 20.4   0.234  0.250      9   0.0260 0.0278  CPU::Z80::Assembler::Macro::BEGIN
+	 19.6   0.225  0.225 242140   0.0000 0.0000  UNIVERSAL::isa
+	 18.6   0.213  3.250  71417   0.0000 0.0000  HOP::Stream::drop
+
+2.05_02	2009-04-25
+	* Line.pm, Token.pm : 
+	  - go back to Class::Struct instead of Class::Class (bad performance of the
+	    later)
+	  - do not use "eval(Data::Dump::dump())" for clone - bad performance
+	  - add overload for 'bool' and '0+' - '""' was being used, and is too slow
+	    because it uses Data::Dump::dump() internally
+	  - remomve is_equal() and is_different() methods (Line.pm)
+
+2.05_01	2009-04-23
+	* Add Line, Token classes. No need to create LINE tokens - each token carries the
+	  line number.
+	* Change to single-pass design.
+	* Use Class::Class hierarchy for parsed objects. 
+	* Several test scripts fail.
+	* Documentation needs update.
+	* Dead code needs to be removed.
+
+2.05    2009-01-04
+	* Fixed VERSION file - wrong version parsed by CPAN.
+
+2.04	2009-01-04
+	* Added MANIFEST.SKIP. Created VERSION file.
+
+2.03    2009-01-04 
+	* Fixed MANIFEST - missing files.
+
+2.02    2009-01-04 
+	* Support undocumented Z80 instructions (t/test_z80.asm)
+	* Auto-generate ParserTable.pm and test_z80.asm, cross
+	  check the assembly with the sjasmplus assembler.
+	* Fix documentation and show usage when called without arguments.
+	* Integer out of range is now a warning instead of a fatal error.
+	  "+d" in "(ix+d)" is optional.
+
+2.01    2008-07-13 
+	* 10-lexer.t and 11-z80pp.t tests failed in Unix.
+
+2.00    2008-07-13 
+	* Re-implemented for speed improvement.
+	* Split into three layers - lexical scanner, instructions 
+	  parser and code generator.
+	* Added Z80 undocumented instructions.
+	* $ in front of labels is optional, accepts lower case 
+	  assembly instructions, improved error messages, 
+	  accepts multiple assembly instructions in a line 
+	  separated by ':'
+
+1.03    2008-06-25 
+	* Bugfixes from Paulo Custodio:
+	  see https://rt.cpan.org/Ticket/Display.html?id=36991
+
+1.02    2008-06-22 
+	* Added INCLUDE
+	* Added support for #comments at start of line
+	  (for C pre-processor friendliness)
+
+1.01    2008-06-14 
+	* Macro parameters no longer clash with labels
+	  whose names start the same as a parameter.
+	  eg, a param $r no longer clashes with label
+	  $rr
+	* Likewise labels
+
+1.0     2008-06-13 
+	* Original release

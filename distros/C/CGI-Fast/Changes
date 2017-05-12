@@ -1,0 +1,90 @@
+Revision history for CGI::Fast
+
+2.12 2016-11-22
+    [DOCUMENTATION]
+    - tweak docs about overriding STDIN due to interference with POST
+      requests (GH #16, thanks to melak)
+
+2.11 2016-11-17
+    [FIX]
+    - make sure we use CGI::Carp as we depend on it (GH #15, thanks to melak)
+
+2.10 2015-06-22
+    [DOCUMENTATION]
+    - Kwalitee improvements in distribution
+
+2.09 2015-03-08
+    [DOCUMENTATION]
+    - Clarify order of use statements when using both CGI and CGI::Fast
+    - Replace indirect object notation with ->new
+
+    [TESTING]
+    - Tests for CGI imports and load order
+
+2.07 2015-02-23
+    [FIX]
+    - test added in 2.06 should use File::Temp
+
+2.06 2015-02-23
+    [FEATURE]
+    - Add support for changing socket permissions. Thanks to powerman
+      for the patch and tests
+
+2.05 2014-12-11
+    [TESTING]
+    remove useless use of Test::Deep in tests
+
+    this patch was sourced from the fedora perl-devel mailing list[1],
+    in which i see more patches for CGI - fedora perl-devel people: if
+    you're going to patch modules then please send those patches upstream
+    where relevant. many perl modules are now on github (including this
+    one) so it's easy, and it prevents alternate versions of modules
+    that could lead to frustrating debugging sessions because *your*
+    version of FCGI (2.04) is different to what the *real* version of
+    FCGI (2.04) is[2].
+
+     * [1] https://lists.fedoraproject.org/pipermail/perl-devel
+     * [2] the "real" version of FCGI being that available on CPAN
+
+2.04 2014-10-12
+    [TESTING]
+    - Fix tests for recent version of CGI (v4.05+), which removed the
+      -private_tempfiles pragma and PRIVATE_TEMPFILES variable, so use
+      on that is still available for testing
+    
+2.03 2014-09-06
+    [DOCUMENTATION]
+    - Kwalitee improvements in distribution (LICENSE)
+
+    [TESTING]
+    - Add t/006_changes.t to check Changes file
+
+2.02 2014-06-05
+
+    [INTERNALS]
+    - allow FCGI_SOCKET_PATH and FCGI_LISTEN_QUEUE ENV variables to be
+      passed in as import settings, although favour ENV variables if set
+    - delay creation of FCGI::Request until the first call to CGI::Fast->new
+      (RT #70609), removing the need to defined these in a BEGIN block
+    - add test to check ENV values are not recycled from old requests and not
+      set as defaults when the FCGI_SOCKET_PATH is used (RT #65492)
+    - add file_handles method to allow setting of file handles to be passed
+      to FCGI (RT #94423)
+
+    [DOCUMENTATION]
+    - document above changes
+    - general tidy up
+
+2.01 2014-05-27
+
+    [DOCUMENTATION]
+    - update perldoc to list current bugtracker and maintainer
+    - pod2readme the perldoc to replace content of README with something sane
+
+2.00 2014-05-22
+
+    [DOCUMENTATION]
+    - Repointing bugtracker at newly forked github repo
+    - Tickets migrated from RT to github issues (both CGI and CGI.pm distributions)
+    - Bump version to 2.00 for clear boundary of above changes
+    - For previous Changes please see CGI.pm prior to 3.65_01

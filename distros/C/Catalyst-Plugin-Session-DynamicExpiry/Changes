@@ -1,0 +1,15 @@
+Revision history for Perl extension Catalyst::Plugin::Session::DynamicExpiry
+
+0.04   2012-10-04
+        - Changed from NEXT to MRO::Compat
+        - Changed from Class::Accessor::Fast to Moose
+
+0.03    2007-09-06
+        - Added plugin order warning
+        - Switch to module::install
+
+0.02    2006-08-10 17:33
+        - Release new version with better hooks
+
+0.01    2006-02-29 08:08
+        - Initial release.

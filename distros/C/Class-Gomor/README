@@ -1,0 +1,25 @@
+Class::Gomor
+============
+
+DESCRIPTION
+
+   This module is yet another class builder. This one adds parameter
+   checking in the new() constructor, that is to check for attributes 
+   existence, and definedness.
+
+INSTALLATION
+
+   To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+
+   You may distribute this module under the terms of the Artistic license.
+   See LICENSE.Artistic file in the source distribution archive.
+
+   Copyright (c) 2004-2015, Patrice <GomoR> Auffret
+

@@ -1,0 +1,15 @@
+Revision history for Perl module Catalyst::Plugin::Flavour
+
+0.03 2006-09-02T17:41:05+09:00
+     - removed toplevel path flavour, because it's possible to replace Catalyst's Chained action.
+
+0.029_01 2006-04-08T17:59:03+09:00
+     - added extention flavour support (Blosxom compat)
+     - added date flavour support
+
+0.02 2006-03-26T08:27:53+09:00
+     - simplified
+     - changed config namecpace
+
+0.01 2005-12-27T00:13:42+09:00
+     - original version;

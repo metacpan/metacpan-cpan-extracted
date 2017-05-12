@@ -1,0 +1,9 @@
+Revision history for Catalyst-TraitFor-Controller-LocaleSelect
+
+0.02    04/08/2010
+        Fixed docs
+0.02    04/07/2010
+        Delete locale/set_locale from params on reading.
+0.01    04/06/2010
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,14 @@
+Revision history for Perl module CGI::Wiki::Plugin::Locator::UTM
+
+0.03 Sat Dec 10 2005
+        - Fixed pod error and added pod and pod coverage tests
+
+0.02 Sun Jun 27 2004
+        - Fixed problem with Postgres typecasting (use x::float).
+          Thanks to Alessio Bragadini for pointing this out.
+
+0.01 Sat Apr 10 2004
+        - Took code from CGI::Wiki::Plugin::Locator::UK
+          modifying it to use lat/long and zone/east/north UTM
+
+

@@ -1,0 +1,3 @@
+interface Hello {
+  void hello (in string s);
+};

@@ -1,0 +1,55 @@
+Revision history for Perl extension Crypt::X509.
+
+0.51 Wed Jul 06 2011 ajung
+    - removed the explicit exports of new() and error() not needed and pollute namespace (thanks for the notice to Daniel Kahn Gillmor)
+
+0.50 Fri Jan 07 2011 ajung
+	- incorporated patch from Tom Harrison to keep working, even after loading a unparsable Cert
+	- incorporated patch from Milan Kocian to access the location Attribute in the Subject DN
+	- incorporated patch from Daniel Kahn Gillmor to parse the names of digests in the SHA-2 family
+	- incorporated patch from Daniel Kahn Gillmor to parse/return PGPExtension (keyCreation time)
+	- incorporated patch from Daniel Kahn Gillmor to implement the request from Toby Inkster to return public key exponent
+
+0.40 Fri Apr 23 2009 ajung
+	- incorporated patch from Joerg-Cornelius Schneider to access ExtKeyUsage
+	- incorporated patch from Joerg-Cornelius Schneider to fix parsing DSA/ECDSA signed certificates
+	- incorporated patch from Rein Tollevik to fix keyusage parsing on 64bit machines
+
+0.32  Tue Jan 09 2007 ajung
+	- fixed problem with not found issuer and subject parts
+	  (found by Michael Steller)
+
+0.31  Mon Jan 08 2007 ajung
+	- included generalTime lookup as fallback for not_after and not_before
+	  (suggested by Michael Steller)
+	- some documentation layout fixups
+
+0.3   Wed Dec 27 2006 gigageek
+	- added CRLDistributionPoints2 function
+	- updated SubjectAltNames function
+	- added BasicConstraints function
+	- added CertificatePolicies function
+	- added SubjectInfoAccess function
+	- added SubjectDirectoryAttributes function
+	- added subject_keyidentifier funtion
+
+0.21  Tue Nov 30 2005 ajung
+	- removed dependency on Perl 5.8.5
+
+0.2   Tue Aug 25 2005 ajung
+	- integrating Convert::ASN1:X509 with Crypt::X509
+
+0.12  (Convert::ASN1:X509) Tue Aug 18 2005 ajung
+	- revised the interface: Parser is encapsulated in module, changed test, documentaion, code
+	- all needed data access methods implemented
+	- put dependency on Convert::ASN.1 into Makefile.PL
+
+0.1   (Convert::ASN1:X509) Tue Aug 16 2005 ajung 
+	- first draft of documentation
+	- built test
+	- first implementation
+
+0.01  Sun Jun 12 22:04:15 2005 jacksonm
+	- original version; created by h2xs 1.23 with options
+		-X -n Crypt::X509
+

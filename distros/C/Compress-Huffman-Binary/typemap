@@ -1,0 +1,2 @@
+compress_huffman_binary_t * T_PTROBJ
+Compress::Huffman::Binary T_PTROBJ

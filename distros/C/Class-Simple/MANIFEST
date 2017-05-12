@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/Class-Simple.t
+t/anon.t
+t/attributes.t
+t/inherit.t
+t/isa.t
+t/nonew.t
+t/override.t
+t/pod.t
+t/private1.t
+t/private2.t
+t/private3.t
+t/separate_vars.t
+t/storable.t
+lib/Class/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

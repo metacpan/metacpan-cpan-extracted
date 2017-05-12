@@ -1,0 +1,15 @@
+Revision history for Perl extension Crypt::U2F::Server.
+
+0.40  Sat May 07 14:00:00 2015
+	- Removed debug output (Thanks, Robert!)
+	- Allow installation from 5.8.8 upwards (Thanks, Robert!)
+
+0.31  Tue Feb 04 14:00:00 2015
+	- Bugfixes
+    - remove unneeded files from Manifest and dist
+
+0.30  Tue Feb 03 15:00:00 2015
+	- Rename from Crypt::U2F to Crypt::U2F::Server because of imminent release of the client module
+
+0.10  Wed Dec 17 17:00:00 2014
+	- Initial alpha release

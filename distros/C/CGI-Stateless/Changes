@@ -1,0 +1,13 @@
+Revision history for CGI-Stateless
+
+v2.0.0  2016-02-19 12:08:29 EET
+	- Switch to Dist::Milla.
+
+1.0.2   2013-10-03 16:25:09 EEST
+	- Remove MYMETA.*
+
+1.0.1	2012-05-13 06:01:33 EEST
+	- Fix requirements.
+
+1.0.0	2009-07-07 23:17:28 EEST
+	- Initial release.

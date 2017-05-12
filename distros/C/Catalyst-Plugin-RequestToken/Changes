@@ -1,0 +1,22 @@
+Revision history for Perl extension Catalyst::Plugin::RequestToken.
+0.06
+	- DEPRECATED in favor of Catalyst::Controller::RequestToken
+0.05
+	- fixed bug: validate_token method was broken
+0.04
+	- shift token generation algorithm from Data::UUID to hash function.
+	- if Catalyst::Plugin::FormValidator::Simple is loaded, automatically
+	  set_invalid_form with constraints named 'TOKEN'.
+
+0.03
+	- fixed bug: if request parameter already had token, create_token 
+				 method pushed duplicated token value into array.
+				 (thx Lyo Kato)
+	- add: prepare_token method (by Lyo Kato)
+
+0.02
+	- fixed pod document
+
+0.01  Tue Oct 11 20:32:36 2005
+	- first release
+

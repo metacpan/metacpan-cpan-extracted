@@ -1,0 +1,62 @@
+Revision history for Perl extension Class::Tables.
+
+0.28	Tue Jul 6 2004
+	- Use diag() in test.pl instead of print
+	- Schema cache with Storable
+	- field() accessor update
+	- undefs correctly handled as NULLs everywhere
+
+0.27	Sat Feb 7 2004
+	- More tests.
+	- Can now manually skip test suite in Makefile.PL (for jeffa).
+	- New Postgres support.
+
+0.26	Thu Jan 22 2004
+	- Added POD section about subclassing.
+	- Optional "tablename_" prefix for any column (idea from Ron Savage).
+	- Added support for SQLite, including first attempt to factor out
+	  driver-specific stuff.
+	- Changed interface for enabling/disabling Lingua::EN::Inflect stuff
+	  and cascading deletes.
+
+0.25	Sun Jan 12 2004
+	- Test suite bugfixes.
+	- Workaround for bizarro behavior with DBI::fetchall_arrayref.
+
+0.24	Sat Jan 10 2004
+	- DBI speedups & misc query optimizations.
+	- Test suite rewrite & cleanup, now get database info for `make test`
+	  from Makefile.PL (the *right* way (I think)).
+	- Cascading deletes implemented.
+
+0.23	Fri Dec 19 2003
+	- Big change: pluralization using Lingua::EN::Inflect. See the massive
+	  POD updates for what this means.
+	- Near rewrite of the POD.
+	- Different dump() method output, to better suit HTML::Template.
+	- Modularized accessor type detection. This made it easy to allow more
+	  flexible column naming. Now department_id column can be a foreign
+	  key ref (accessor is still named department). Also the primary key
+	  of the employee table can be employee_id.
+	- Indirect (reverse-mapped) foreign keys can now take additional
+	  query constraints.
+
+0.22	Thu Oct 16 2003
+	- An actual test suite, nice!
+	- Whaddya know, the test suite found a bug in foreign key mutators.
+	- POD updates, including adding a copyright notice. Oops!
+
+0.21	Wed Oct 15 2003
+	- First public release!
+	- Decided on a name: Class::Tables.
+	- Small improvements, like manual ref counting on the stub objects.
+
+0.20	Complete rewrite, with a lot of new ideas. Inside-out objects to avoid
+	concurrency problems, cached statement handles, etc. I posted an RFC on
+	Perlmonks and got a fairly positive response so decided to clean it up,
+	find a name, and release it.
+
+A long long time ago:
+	I wrote a little DB abstraction and called it MikeroDBI. I used it a
+	lot. The actual code, however, was kinda nasty. We'll call these dark
+	ages versions 0.0x through 0.1x.

@@ -1,0 +1,12 @@
+#!/bin/sh
+p4 edit lib/CGI/Kwiki/Pages.pm
+p4 edit lib/CGI/Kwiki/Javascript.pm
+p4 edit lib/CGI/Kwiki/Style.pm
+p4 edit lib/CGI/Kwiki/Template.pm
+
+perl lib/CGI/Kwiki/Pages.pm --rebuild
+perl lib/CGI/Kwiki/Javascript.pm --rebuild
+perl lib/CGI/Kwiki/Style.pm --rebuild
+perl lib/CGI/Kwiki/Template.pm --rebuild
+
+p4 diff -sr ... | p4 -x - revert

@@ -1,0 +1,72 @@
+[%
+    title = 'Registration' ;
+
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Registration' ;
+%]
+
+<div class="box">
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+<p>Please use the following rules to create your new password:</p>
+
+<ul>
+<li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.</li>
+<li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.</li>
+<li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.</li>
+<li>No whitespace characters allowed.</li>
+</ul>
+
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% ELSIF errmess == 2 %]
+<p class="alert">Sorry that user is already registered within the site.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+[% IF data.effect_err %]
+<p class="alert">The password you entered contained characters that are not currently accepted.</p>
+[% END %]
+</div>
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-regsave" />
+<input type="hidden" name="userid" value="0" />
+
+<div class="box">
+    <table width="100%">
+	  <tr><th width="110">Email *</th>
+        <td width="10" class="alert">[% data.email_err %]</td>
+        <td colspan="3"><input type="text" id="email" name="email" value="[% data.email %]" size="40" /></td>
+    </tr>
+
+	  <tr><th></th>
+        <td></td>
+        <td>This email address need not be an address you use for CPAN Testers, 
+            as it is only used as part of your login.</td>
+    </tr>
+    <tr><th>Password *</th>
+        <td class="alert">[% data.effect_err %]</td>
+        <td colspan="3"><input type="password" id="effect" name="effect" value='' size="40" /></td>
+    </tr>
+
+    <tr><th>Display Name *</th>
+        <td class="alert">[% data.realname_err %]</td>
+        <td colspan="3"><input type="text" id="realname" name="realname" value="[% data.realname %]" size="40" /></td>
+    </tr>
+    <tr><th width="150">PAUSE ID</th>
+        <td class="alert">[% data.nickname_err %]</td>
+        <td colspan="3"><input type="text" id="nickname" name="nickname" value="[% data.nickname %]" size="40" />
+        <p>Your PAUSE ID is used to help verify further addresses to you.</td>
+    </tr>
+    <tr><td></td>
+        <td></td>
+        <td><input type="submit" name="submit" value="REGISTER" /></td>
+    </tr>
+    </table>
+</div>
+
+</form>

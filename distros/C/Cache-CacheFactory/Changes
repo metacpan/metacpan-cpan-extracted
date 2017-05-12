@@ -1,0 +1,166 @@
+Revision history for Cache-CacheFactory
+
+1.10    Version released at 2010-02-16-12:26.
+        Version started at  2010-02-16-12:21.
+        Released rc 1.09_01 as 1.10 stable.
+
+1.09_01 Version released at 2010-02-09-12:32.  *** Development version. ***
+        Version started at  2010-02-09-09:56.
+        Unrolled get()'s use of foreach_policy() for speed.
+        - Reduces Cache::CacheFactory-induced overhead by ~60%.
+        Fixed version numbers for policy modules.
+
+1.09    Version released at 2009-10-07-10:41.
+        Version started at  2009-10-07-10:36.
+        Released rc 1.08_06 as stable version.
+        Summary of changes since 1.08:
+          Fixed Size.pm tests to work on 64-bit platforms.
+          Fixed time-based expiry tests to be more robust against slow setups.
+          Typo fixes in documentation.
+          Set dynamic_config => 0 for installer.
+
+1.08_06 Version released at 2009-09-07-10:58.  *** Development version. ***
+        Version started at  2009-09-04-22:43.
+        40-expiry-size.t:
+          Change test param to match tweaked 30-size-hack-with-devel-size.t.
+        30-size-hack-with-devel-size.t:
+        Size.pm:
+          Stripped diagnostics added for the 64-bit issues.
+
+1.08_05 Version released at 2009-09-04-22:37.  *** Development version. ***
+        Version started at  2009-09-04-21:44.
+        30-size-hack-with-devel-size.t:
+          Change test to be less sensitive to increased overhead of 64-bit.
+        Size.pm:
+          Tweak non-Devel::Size guestimate to have more accurate overhead.
+
+1.08_04 Version released at 2009-09-04-12:41.  *** Development version. ***
+        Version started at  2009-09-04-12:15.
+        30-size-hack-with-devel-size.t:
+        Size.pm:
+          More diag() to try to track down 64-bit platform fails.
+
+1.08_03 Version released at 2009-09-03-20:31.  *** Development version. ***
+        Version started at  2009-09-03-18:20.
+        Cosmetic POD changes for module description lines.
+        30-size-hack-with-devel-size.t:
+          Added diag() to try to track down 64-bit platform fails.
+
+1.08_02 Version released at 2009-09-01-12:12.  *** Development version. ***
+        Version started at  2009-09-01-12:09.
+        Cache::CacheFactory.pm:
+          Typo fixes in POD.
+        Build.PL
+          Added dynamic_config => 0 option.
+        Changes:
+          Reformatted slightly for clarity.
+
+1.08_01 Version released at 2008-10-08-13:58.  *** Development version. ***
+        Version started at  2008-10-08-13:45.
+        40-expiry-time.t:
+          Added retries of setting up test if it takes too long.
+          Skip time-critical tests if we still fail to set up in time.
+          Improved diagnostics if somehow the tests still run and fail.
+
+1.08    Version released at 2008-09-20-14:22.
+        Released rc 1.07_05 as stable version.
+
+
+1.07_05 Version released at 2008-09-15-14:34.  *** Development version. ***
+        Version started at  2008-09-15-14:24.
+        31-size-hack-force-missing-devel-size.t:
+          1.07_04 changes didn't fix taint issue either.
+          Reverted to using tempdir()'s CLEANUP option since rmtree() still
+          died under -T for 5.6.2 perls.
+          Removed -T flag, I give up trying to get it working for this test. :)
+
+1.07_04 Version started at  2008-09-09-17:20.  *** Development version. ***
+        31-size-hack-force-missing-devel-size.t:
+          1.07_03 changes didn't fix taint issue.
+          Do own tempdir cleanup rather than rely on File::Temp's cleanup
+          that appears to trigger tainted chmod in perl 5.6.2's File::Path
+          rmtree().
+          Use a template for tempdir name that makes it clear that
+          Cache::CacheFactory is the culprit if it fails to be cleaned up.
+        Version released at 2008-09-09-18:46.
+
+1.07_03 Version released at 2008-09-05-21:45.  *** Development version. ***
+        Version started at  2008-09-05-20:32.
+        31-size-hack-force-missing-devel-size.t:
+          Trimmed PERL5OPT trickery it was extra cut-n-paste code that
+          wasn't needed and possibly triggered taint issues.
+
+1.07_02 Version started at  2008-09-01-19:17.  *** Development version. ***
+        20-storage.t namespace check no longer breaks on systems that
+        already have existing namespaces for persistent cache storage policies.
+        Ensured there's a #!perl and use warnings/strict in each test.
+        Version released at 2008-09-02-09:13.
+
+1.07_01 Version released at 2008-08-28-16:40.  *** Development version. ***
+        Version started at  2008-07-17-11:02.
+        Added warnings for missing key/data param to set() in named param mode.
+        Bumped Cache::Cache version requirement to 1.0 for set_key() and
+        get_namespaces().
+        Added add/replace mode support to set().
+        Added exists(), delete(), add(), replace().
+        Beefed up tests in 20-storage.t.
+        Added get_namespaces() workaround for Cache::NullCache dying.
+        Added Size() workaround for Cache::FastMemoryCache dying.
+        Added section on other Cache::Cache replacements to documentation.
+
+1.07    Released rc 1.06_02 as stable version.
+        Version released at 2008-07-16-11:15.
+
+1.06_02 Version started at  2008-07-14-14:53.  *** Development version. ***
+        Removed old "$cache->limit() not implemented" documentation section.
+        Fixed accidental rename t/99-pod.t back to t/99-pod-coverage.t.
+        Fixed failed-touch skipping in t/40-expiry-last-modified.t.
+        Version released at 2008-07-14-20:22.
+
+1.06_01 Version released at 2008-07-14-14:01.  *** Development version. ***
+        Version started at  2008-07-08-19:49.
+        Stopped using CVS version for main module version.
+        Bumped distribution version to ensure greater than last module version.
+        $NO_MAX_SIZE test added to t/export.t.
+        t/expiry-last-modified.t now uses proper tempfile.
+        t/expiry-last-modified.t checks touch succeeeds.
+        t/expiry-last-modified.t checks post-touch wait succeeds.
+        Added missing Module::Build dependency.
+        Added no_deep_clone option and test file.
+        Added 'fastmemory' storage policy.
+        Renamed test files to run in a sane order.
+        Moved some modules into build_requires rather than requires.
+        Added create_makefile_pl option for compat with missing Module::Build.
+
+1.04_01 2008-07-07-22:57.  *** Development version. ***
+        $cache->limit() size added.
+        Purge pre/post hooks and per-storage hooks added to Expiry/Base.pm.
+        Cache-size caching during purge() in Size.pm.
+        no_cache_cache_size_during_purge option added to size policy.
+        $EXPIRES_NEVER support added.
+        Fiddled $VERSION lines so CPAN doesn't choke on them.
+        Expanded TODO list.
+
+1.04    2008-07-05-15:16.
+        Added t/size-hack-with-devel-size.t.
+        Added t/size-hack-force-missing-devel-size.t.
+        Added using_devel_size() method to Size.pm expiry policy.
+        Updated t/expiry-size.t to use data sizes certain to pass/fail
+        consistently regardless of size() workaround used.
+
+1.03    2008-07-04-09:29.
+        Added TODO document for future feature list.
+        Corrected t/storage.t to skip correct number of tests. (This time!)
+        Added t/expiry-size.t tests.
+        Added KNOWN ISSUES AND BUGS section to size expiry policy pod.
+        Workaround for Cache::MemoryCache->size() issue.
+        Added Devel::Size v0.69 to recommends list.
+        Added Scalar::Util to requires list.
+
+1.02    2008-07-03-22:57.
+        Fixed some oversights in the documentation.
+        Corrected some of the tests to behave on different installs.
+
+1.01    2008-06-27-12:21.
+        Inital release.
+

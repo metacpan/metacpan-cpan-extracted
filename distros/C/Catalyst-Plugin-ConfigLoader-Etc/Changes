@@ -1,0 +1,6 @@
+Revision history for Catalyst-Plugin-ConfigLoader-Etc
+
+0.01  Wed Feb  8 10:32:08 ICT 2012
+      - First version, released on an unsuspecting world.
+0.02  Wed Feb  8 21:15:21 ICT 2012
+      - Fix MANIFEST, META

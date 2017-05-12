@@ -1,0 +1,25 @@
+---
+abstract: 'Compresses all responses from the server, except excluded paths'
+author:
+  - 'Jody Clements <cpan@jodyclements.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Compress-WithExclusions
+provides:
+  Catalyst::Plugin::Compress::WithExclusions:
+    file: lib/Catalyst/Plugin/Compress/WithExclusions.pm
+    version: 0.02
+requires:
+  Catalyst::Plugin::Compress: 0.005
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,31 @@
+####################################################
+## insert_config_data.PL
+## Andrew N. Hicox	<andrew@hicox.com>
+##
+## This replaces values from a file into the target
+## module in pm_to_blib durring the make process.
+## this program should be specified as an argument
+## to the PM_FILTER option of 
+## ExtUtils::MakeMaker::WriteMakefile in your
+## Makefile.PL
+####################################################
+
+#take inbound file
+my $content = ();
+while (<>){ $content .= $_; }
+
+#open config.cache
+ open (conf, "./config.cache") || die ("can't open config.cache $!\n");
+ foreach (<conf>){ if ($_ =~/\{(.+?)\}\s+(.+)/){ $data{$1}=$2; }}
+ close (conf);
+#search/replace
+ while ($content =~/(<pop>)(.+?)(<\/pop>)/){
+    my $all = "$1$2$3"; my $key = $2;
+    if (exists($data{$key})){ 
+        $content =~s/$all/$data{$key}/g; 
+    }else{
+        $content =~s/$all//g;
+    }
+ }
+#output
+ print $content, "\n";

@@ -1,0 +1,23 @@
+---
+abstract: 'HTTP Cookie parser in C (Please use CGI::Cookie::XS instead)'
+author:
+  - 'Agent Zhang <agentzh@yahoo.cn>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cookie-XS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CGI::Cookie::XS: 0.15
+  perl: 5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

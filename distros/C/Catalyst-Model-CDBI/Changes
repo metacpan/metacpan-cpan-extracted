@@ -1,0 +1,42 @@
+Revision history for Perl extension Catalyst::Model::CDBI.
+0.12  Tue Jan 09 02:36:00
+    - Work around MRO problems in CDBI by massaging CDBI::__::Base's ISA
+    - Switch from NEXT to MRO::Compat
+    - Switch from Catalyst::Base to Catalyst::Component
+    - Fix RT#18197
+    - Add deprecation notice.
+
+0.11  Wed Nov 23 09:46:00 2005
+    - Throw an exception during startup if there is an error loading
+      tables.
+
+0.10  Thu Oct 27 17:40:00 2005
+	- Pass all args to constructor ( Fix global config )
+
+0.09  Sat Apr 30 23:13:00 2005
+        - Fixed helper templates
+
+0.08  Sat Apr 30 23:13:00 2005
+        - added dependency for Class::DBI::Loader 0.20
+
+0.07  Sat Apr 23 16:46:00 2005
+        - fixed helper (Robert Boone)
+
+0.06  Fri Apr 15 15:52:00 2005
+        - Added POD tests.
+        - Some doc fixes.
+
+0.05  Mon Mar 14 22:00:00 2005
+        - fixed helper
+
+0.04  Thu Mar 10 10:00:00 2005
+        - support for test directories
+
+0.03  Fri Mar 04 20:00:00 2005
+        - new helper api
+
+0.02  Tue Mar 01 10:00:00 2005
+        - added helper
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

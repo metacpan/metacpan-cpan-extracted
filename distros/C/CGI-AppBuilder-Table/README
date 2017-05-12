@@ -1,0 +1,180 @@
+NAME
+    CGI::AppBuilder::Table - Configuration initializer
+
+SYNOPSIS
+      use CGI::AppBuilder::Table;
+
+      my $ab = CGI::AppBuilder::Table->new(
+         'ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my ($q, $ar, $ar_log) = $ab->start_app($0, \%ARGV);
+      print $ab->disp_form($q, $ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  html_table($arf, $cns, $br)
+    Input variables:
+
+      $arf - array ref containing the content of the table
+      $cns - column names separated by comma or
+             AUTO|AH|HASH - use $k in AH Array ${$arf}[$i]{$k}
+      $br  - hash array ref for table format, it contains
+        css_table - CSS class name for <TABLE>
+        atr_table - attribute parameters for <TABLE>
+        css_tr    - CSS class name for <TR>
+        atr_tr    - attribute parameters for <TR>
+        atr_tr_odd  - attribute parameters for ODD <TR>
+        atr_tr_even - attribute parameters for EVEN <TR>
+        css_tr_odd  - CSS class name for ODD <TR>
+        css_tr_even - CSS class name for EVEN <TR>
+        css_select  - CSS class name for <SELECT ...>
+        css_input   - CSS class name for <INPUT type=input ...>
+        atr_sel   - attributes for itemized <SELECT ...> for instance:
+            atr_sel = {
+                var1 => 'style="display:none"',
+                var2 => 'style="display:block"',
+                var3 => 'class="FormSel"',
+            }
+        atr_inp   - attributes for itemized <INPUT type=input ...>
+        css_td    - CSS class name for <TD>
+        atr_td    - attribute parameters for <TD>
+        atr_cell  - an array ref to attribute parameters for each cell
+                    ${$br}{atr_cell}[$i][$j]
+        esc_vars  - a list of escaped variables separated by comma.
+        fh_out    - output file handler
+        cns_desc  - hash ref containing column name description
+        tab_caption - table caption/header
+        tab_footer  - table footer/notes
+        cel_title - a hash ref storing title attribute for defined cells.
+                    You can define cells by the value stored in the cell
+                    or 'row:col'.
+
+    Variables used or methods called:
+
+      CGI::AppBuilder::Message
+        set_param - get parameter from a hash
+
+    How to use:
+
+      my @a = (['ColA','ColB'],[1,2],[5,6],[7,8]);
+      my $txt = $self->html_table(\@a);
+      my @b = ({A=>1,B=>2},{A=>5,B=>6},{A=>7,B=>8});
+      my $txt = $self->html_table(\@b,"",'A,B');
+      my $txt = $self->html_table(\@b,"",'A,B');
+
+    Return: generates HTML Table codes.
+
+    This method convert all the < and > into &lt; and &gt; for displaying,
+    except variables are specified in *esc_vars*.
+
+  html_tag ($tag, $pr, $txt, $is_end)
+    Input variables:
+
+      $tag - HTML tag such as TR, TD, TABLE, SELECT, INPUT, etc.
+      $pr  - tag attribute array ref. It contains three elements:
+        class - CSS class name
+        attr  - attribute string such as 'width=5 onChange=js_func'
+        hr    - hash ref with key and value pairs
+        pretty - whether to add line breaks 
+      $txt - text to be incuded between the start and end tag such as
+             <TD>$txt</TD>
+      $is_end - whether to add an ending tag such as </TD>
+
+    Variables used or methods called:
+
+      None
+
+    How to use:
+
+      my $t1 = $self->html_tag('TD',{class=>'css_td'},'Text',1);
+      # $t1 contains: 
+      # <TD class='css_td'>Text</TD>
+      my $t2 = $self->html_tag('TD',{class=>'td1',pretty=>1},'Text2',1);
+      # $t2 contains: 
+      # <TD class='td1'>
+      #   Text2
+      # </TD>
+      my $t3 = $self->html_tag('TD',{class=>'td1',pretty=>1,
+        attr=>'colspan=2 align=left',hr=>{onChange=>'js_func'}},
+        'Text2',1);
+      # $t3 contains: 
+      # <TD class='td1' colspan=2 align=left onChange='js_func'>
+      #   Text2
+      # </TD>
+
+    Return: HTML codes.
+
+    This method generates HTML codes based on the information provided.
+
+  table_column ($cn,$pr,$cr)
+    Input variables:
+
+      $cn - column names separated by comma, or 
+        array ref containing column names , or 
+        hash ref containing column names as keys
+      $pr  - tag attribute array ref. It contains the following items:
+        css_tr   - TR class name 
+        atr_tr   - TR attributes 
+        css_td   - TD class name 
+        atr_td   - TD attributes 
+        pretty   - whether to add line breaks 
+        atr_cell - Cell attribute 
+      $cr  - column description hash ref $cr->{$k}{$itm} 
+        where $k is column name and the items ($itm) are : 
+        desc     - column description
+        name     - display name
+
+    Variables used or methods called:
+
+      html_tag - generate HTML tags
+
+    How to use:
+
+      my $cn = 'seq,fn,ln'; 
+      my $pr = {css_tr=>'tr_pretty',css_td=>'td_small',pretty=>1};
+      my $cr = {seq=>{name=>'Seq No',desc=>'Sequential number'},
+                fn =>{name=>'First Name',desc=>'First name'},
+                ln =>{name=>'Last Name',desc=>'Last name/family name'},
+        };
+      my $t = $self->table_column($cn,$pr,$cr);
+
+    Return: HTML codes.
+
+    This method generates HTML codes for table header row (TH) based on the
+    information provided.
+
+HISTORY
+    *   Version 0.10
+
+        This version extracts the disp_form method from CGI::Getopt class.
+
+          0.11 Inherited the new constructor from CGI::AppBuilder.
+          0.12 Added html_tag and table_column functions 
+               Modified html_table to use html_tag and table_column
+
+    *   Version 0.20
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 428:
+        You forgot a '=back' before '=head1'
+

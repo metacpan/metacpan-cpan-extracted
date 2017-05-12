@@ -1,0 +1,89 @@
+{
+   "abstract" : "ACL support for Catalyst applications.",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-Authorization-ACL",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catalyst::ClassData" : "0",
+            "Class::Throwable" : "0",
+            "Exporter" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Object" : "0",
+            "Scalar::Util" : "0",
+            "Tree::Simple" : "0",
+            "Tree::Simple::Visitor::FindByPath" : "0",
+            "Tree::Simple::Visitor::GetAllDescendents" : "0",
+            "mro" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Plugin::Authentication" : "0",
+            "Catalyst::Plugin::Authorization::Roles" : "0",
+            "Catalyst::Plugin::Session" : "0",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Plugin-Authorization-ACL@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-Authorization-ACL"
+      },
+      "homepage" : "http://metacpan.org/release/Catalyst-Plugin-Authorization-ACL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/catalyst-plugin-authorization-acl.git",
+         "web" : "http://github.com/rkitover/catalyst-plugin-authorization-acl"
+      }
+   },
+   "version" : "0.16",
+   "x_authority" : "cpan:RKITOVER"
+}
+

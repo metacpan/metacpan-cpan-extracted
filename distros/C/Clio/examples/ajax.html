@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Clio with AJAX</title>
+        <script type="text/javascript" src="jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="jquery.stream-1.2.min.js"></script>
+    </head>
+    <body>
+        <div id="commands">
+            <form id="commands_form" onsubmit="return send()">
+                <table>
+                    <tr>
+                        <th>input:</th>
+                        <th><input type="text" id="command_input"></th>
+                        <td><input type="submit"
+                            id="command_button" value="Send"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div id="output"></div>
+        <script type="text/javascript">
+            function msg(text) {
+                $('#output').prepend('<p>'+ text +'</p>');
+            };
+            function send() {
+                var cmd = $('#command_input').val();
+                msg(">> "+ cmd);
+                $.stream().send({
+                    message: cmd
+                });
+                return false;
+            }
+            $(document).ready(function(){
+                var url = "http://localhost:12345/";
+                $.stream.setup({
+                    type: 'http',
+                    enableXDR: true,
+                    reconnect: true
+                });
+                $.stream(url, {
+                    dataType: "text",
+                    open: function() {
+                        msg("Connection opened");
+                    },
+                    message: function( output ) {
+                        msg(  "<< "+ output.data );
+                    },
+                    error: function() {
+                        msg("Connection error");
+                    },
+                    close: function() {
+                        msg("Connection closed");
+                    }
+                });
+            });
+        </script>
+    </head>
+    </body>
+</html>

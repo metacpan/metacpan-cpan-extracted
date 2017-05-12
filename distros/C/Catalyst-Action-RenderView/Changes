@@ -1,0 +1,59 @@
+0.16 2011-01-05 19:28:00 GMT
+    - Fix bug accidentally introduced in the last version with response
+      3xx statuses.
+
+0.15 2011-01-04 14:19:36 CET
+    - Don't delegate to a view if the response body is set to `undef'.
+    - Make sure a Test::More with done_testing support is available.
+
+0.14 2009-12-03 03:13:23 GMT
+    - Remove warnings from tests about actions in the app root
+
+0.13 2009-10-24 04:48:03 PDT
+    - Re-release 0.12 without changes for reindexing by CPAN/PAUSE.
+
+0.12 2009-10-18 19:10:00 BST
+    - Fixup copyright information
+
+0.11 2009-06-28 19:29:16
+    - Update Module::Install to 0.87 to unbreak auto_install.
+      No functional changes.
+
+0.10 2009-04-29 18:24:50
+    - Depend on Data::Visitor 0.24 to avoid Class::MOP deprecation
+      warnings. (Florian Ragwitz)
+
+0.09 2009-02-18 21:32:00
+    - Store config in $c->config->{'Action::RenderView'}
+      instead of $c->config->{debug}.
+      Config from $c->config->{debug} is deprecated, but
+      still supported.
+    - Switch from NEXT to next::method
+
+0.08 2008-05-02 19:40:00
+    - Add AsCGI to list of test requirements.
+    - Check for defined()ness of $c->res->body so "0" is valid. (RT #30564)
+
+0.07 2007-09-01 11:03:00
+    - Add DateTime to default list of scrubbed objects
+    - Stringify rather than ref by default ,
+      more explicit message
+
+0.06 2007-08-29 16:35:00
+    - Add support for scrubbing stash objects.
+    - Remove undef warning
+
+0.05 2007-04-26
+    - switch to Module::Install
+
+0.04 2006-07-04 09:21:00
+    - That debug code wasn't quite production ready : /
+
+0.03 2006-07-02 11:26:00
+    - Forgot to update use test as well, silly git.
+
+0.02 2006-06-29 14:59:00
+    - Oops, moved content check ending brace up.
+
+0.01  2006-06-26 17:14:00
+    - Initial release

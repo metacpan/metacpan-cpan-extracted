@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Cache/Repository.pm
+lib/Cache/Repository/Filesys.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/01filesys.t
+TODO
+META.json

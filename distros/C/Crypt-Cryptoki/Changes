@@ -1,0 +1,6 @@
+Revision history for Perl extension Cryptoki.
+
+0.01  Fri Jan 24 14:36:00 2014
+	- original version; created by h2xs 1.23 with options
+		-n Cryptoki cryptoki/cryptoki.h
+

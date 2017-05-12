@@ -1,0 +1,21 @@
+Revision history for Perl module Clarion
+
+2007-11-01	1.02	Stas Ukolov <ukoloff@cpan.org>
+ * Version number changed
+
+2007-10-24	1.1.2	Stas Ukolov <ukoloff@cpan.org>
+ * Correct processing of 'GROUP' fields
+ + Memo fields can be padded with ' ' or \0
+ * Changed "decryption" algorithm to work on perl 5.6
+
+2007-06-14	1.1.1	Stas Ukolov <ukoloff@cpan.org>
+ + Reads memo fields (can be disabled)
+ * Correct processing of "encrypted" files
+ + Current record can be omited in calls to get_record
+
+2003-11-19	1.01	Ilya Chelpanov <ilya@macro.ru>
+ + encrypted files support
+ * some bugs fixed
+
+2000-05-11	1.00	Ilya Chelpanov <ilya@macro.ru>
+ + first version

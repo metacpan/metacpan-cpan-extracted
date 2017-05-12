@@ -1,0 +1,97 @@
+{
+   "abstract" : "Yet another line editing library ",
+   "author" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Caroline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::ReadLine" : "0"
+         },
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Storable" : "0",
+            "Term::Encoding" : "0",
+            "Term::ReadKey" : "2.3",
+            "Text::VisualWidth::PP" : "0.03",
+            "Unicode::EastAsianWidth::Detect" : "0.03",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Caroline" : {
+         "file" : "lib/Caroline.pm",
+         "version" : "0.22"
+      },
+      "Caroline::State" : {
+         "file" : "lib/Caroline.pm"
+      },
+      "Term::ReadLine::Caroline" : {
+         "file" : "lib/Term/ReadLine/Caroline.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Caroline/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Caroline",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Caroline.git",
+         "web" : "https://github.com/tokuhirom/Caroline"
+      }
+   },
+   "version" : "0.22",
+   "x_contributors" : [
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>",
+      "moznion <moznion@gmail.com>",
+      "Hiroaki Yoshida <yoshidaster@gmail.com>",
+      "Yasuhiro Matsumoto <mattn.jp@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

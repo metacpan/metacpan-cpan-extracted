@@ -1,0 +1,33 @@
+source 
+   Returns the class which has the method the current class is using. 
+
+tree 
+   Returns the inheritance tree of a class. 
+
+sources 
+   Returns the sources for a method for a class. Only those parents
+   in the tree which define the method are included. 
+
+tree_children 
+   All the children who could inherit a method from this class. 
+   Four cases and modifiers:
+       a. This class is in the tree. 
+       b. This class is the first entry in the tree. 
+       c. This class is a source of the method and is in the tree. 
+       d. This class is the first source of the method and it is in the tree.
+
+subclasses 
+   Makes a list of all the subclasses contained within a class. 
+
+source_all 
+   Gets all the classes which are a source for a method. 
+
+trees_all 
+   Gets all classes that have a method. Gets thier trees or source trees.
+
+function_in_isa
+   Detects if a method is inherited or if this class defined the method.
+ 
+method_return_type 
+   An internal function just arranging a returned value. 
+		   

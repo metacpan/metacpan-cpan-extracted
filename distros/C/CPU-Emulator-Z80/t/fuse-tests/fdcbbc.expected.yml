@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  44804:
+    - 79
+name: fdcbbc
+registers:
+  AF: 3591
+  AF_: 0
+  BC: 13557
+  BC_: 0
+  DE: 2453
+  DE_: 0
+  HL: 20290
+  HL_: 0
+  I: 0
+  IX: 40258
+  IY: 44812
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,68 @@
+Revision history for Perl extension Convert::Scalar
+
+1.11 Thu Jun 25 16:01:36 CEST 2015
+	- fix unmagic prototype.
+        - added stability canary support.
+
+1.1  Thu Aug 18 20:59:01 CEST 2011
+	- added readonly, readonly_on, readonly_off.
+        - add extend and len.
+        - modernise xs syntax, make some functions more efficient.
+
+1.04  Fri Mar  7 11:32:53 CET 2008
+	- work around 5.10 api changes in *ok functions
+          (reported by David Aguilar).
+ 
+1.03  Thu Mar  3 18:00:52 CET 2005
+	- require perl 5.008.
+        - change of contact address.
+
+1.02  Fri Nov 26 22:04:10 CET 2004
+	- return copies in all string-modifying functions
+          instead of the string itself.
+
+1.01  Sat Apr 24 08:38:21 CEST 2004
+	- minor documentation corrections.
+
+1.0   Sat Apr 24 08:21:11 CEST 2004
+	- minor documentation corrections.
+
+0.1   Wed Feb 12 21:40:14 CET 2003
+	- added *ok functions.
+
+0.09  Mon Sep 23 05:40:41 CEST 2002
+	- fixed utf8_length to actually work as documented.
+
+0.08  Fri Jul  5 13:44:17 CEST 2002
+	- check for readonly scalars before attempting to do utf8
+          conversions. perl will fail badly if not.
+
+0.07  Sun Jan 20 04:50:53 CET 2002
+	- added refcnt_inc, refcnt_dec, refcnt etc. methods.
+
+0.06  Thu Jan  4 02:24:23 CET 2001
+	- utf8_upgrade now really returns the argument
+        - all functions that return the argument now do so correctly
+          in all cases, but only when called in a non-void context.
+
+0.05  Thu Dec  7 03:54:50 CET 2000
+	- now handles get magic in the utf8 functions. I'm not sure
+          wether to SvGETMAGIC the other calls (sv_grow, sv_taint).
+
+0.04  Thu Sep 14 21:00:46 CEST 2000
+        - some functions now return the modified scalar, enabling a more
+          "functional" style, e.g. return utf2, join "",...;
+
+0.03  Sun Sep  3 04:55:53 CEST 2000
+	- added "utf8/utf8_on/utf8_off" functions.
+        - added grow as an interface to sv_grow.
+        - added "tainted" and fixed taint/untaint to use the published
+          interface.
+
+0.02  Sat Jul 15 22:37:36 CEST 2000
+	- added missing functions weaken and unmagic to EXPORT_OK.
+          This happens when you upload too quickly :*]
+
+0.01  Sat Jul 15 20:15:47 CEST 2000
+	- original version; leftover "garbage" from the PApp module
+

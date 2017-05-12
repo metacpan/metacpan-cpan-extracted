@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+lib/CatalystX/FeedbackMessages.pm
+t/01.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

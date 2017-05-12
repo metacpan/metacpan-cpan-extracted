@@ -1,0 +1,338 @@
+# NAME
+
+CLI::Helpers - Subroutines for making simple command line scripts
+
+# VERSION
+
+version 1.2
+
+# SYNOPSIS
+
+Use this module to make writing intelligent command line scripts easier.
+
+    #!/usr/bin/env perl
+    use CLI::Helpers qw(:all);
+
+    output({color=>'green'}, "Hello, World!");
+    verbose({indent=>1,color=>'yellow'}, "Shiny, happy people!");
+    verbose({level=>2,kv=>1,color=>'red'}, a => 1, b => 2);
+    debug_var({ c => 3, d => 4});
+
+    # Data
+    output({data=>1}, join(',', qw(a b c d)));
+
+    # Wait for confirmation
+    die "ABORTING" unless confirm("Are you sure?");
+
+    # Ask for a number
+    my $integer = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
+
+    # Ask for next move
+    my %menu = (
+        north => "Go north.",
+        south => "Go south.",
+    );
+    my $dir = prompt "Where to, adventurous explorer?", menu => \%menu;
+
+    # Ask for a favorite animal
+    my $favorite = menu("Select your favorite animal:", [qw(dog cat pig fish otter)]);
+
+Running as test.pl:
+
+    $ ./test.pl
+    Hello, World!
+    a,b,c,d
+    $ ./test.pl --verbose
+    Hello, World!
+      Shiny, Happy people!
+    a,b,c,d
+    $ ./test.pl -vv
+    Hello, World!
+      Shiny, Happy people!
+      a: 1
+      b: 2
+    a,b,c,d
+    $ ./test.pl --debug
+    Hello, World!
+      Shiny, Happy people!
+      a: 1
+      b: 2
+    ---
+    c: 3
+    d: 4
+    a,b,c,d
+
+    $ ./test.pl --data-file=output.csv
+    Hello, World!
+    a,b,c,d
+    $ cat output.csv
+    a,b,c,d
+
+Colors would be automatically enabled based on the user's ~/.gitconfig
+
+# OVERVIEW
+
+This module provides a libray of useful functions for constructing simple command
+line interfaces.  It is able to extract information from the environment and your
+~/.gitconfig to display data in a reasonable manner.
+
+Using this module adds argument parsing using [Getopt::Long](https://metacpan.org/pod/Getopt::Long) to your script.  It
+enables passthrough, so you can still use your own argument parsing routines or
+Getopt::Long in your script.
+
+# FUNCTIONS
+
+## def
+
+Not exported by default, returns the setting defined.
+
+## git\_color\_check
+
+Not exported by default.  Returns 1 if git is configured to output
+using color of 0 if color is not enabled.
+
+## colorize( $color => 'message to be output' )
+
+Not exported by default.  Checks if color is enabled and applies
+the specified color to the string.
+
+## output( \\%opts, @messages )
+
+Exported.  Takes an optional hash reference and a list of
+messages to be output.
+
+## verbose( \\%opts, @messages )
+
+Exported.  Takes an optional hash reference of formatting options.  Automatically
+overrides the **level** paramter to 1 if it's not set.
+
+## debug( \\%opts, @messages )
+
+Exported.  Takes an optional hash reference of formatting options.
+Does not output anything unless DEBUG is set.
+
+## debug\_var( \\%opts, \\%Variable )
+
+Exported.  Takes an optional hash reference of formatting options.
+Does not output anything unless DEBUG is set.
+
+## override( variable => 1 )
+
+Exported.  Allows a block of code to override the debug or verbose level.  This
+can be used during development to enable/disable the DEBUG/VERBOSE settings.
+
+## confirm("prompt")
+
+Exported.  Creates a Yes/No Prompt which accepts y/n or yes/no case insensitively
+but requires one or the other.
+
+Returns 1 for 'yes' and 0 for 'no'
+
+## text\_input("prompt", validate => { "too short" => sub { length $\_ > 10 } })
+
+Exported.  Provides a prompt to the user for input.  If validate is passed, it should be a hash reference
+containing keys of error messages and values which are subroutines to validate the input available as $\_.
+If a validator fails, it's error message will be displayed, and the user will be reprompted.
+
+Valid options are:
+
+- **default**
+
+    Any string which will be used as the default value if the user just presses enter.
+
+- **validate**
+
+    A hashref, keys are error messages, values are sub routines that return true when the value meets the criteria.
+
+- **noecho**
+
+    Set as a key with any value and the prompt will turn off echoing responses as well as disabling all
+    ReadLine magic.  See also **pwprompt**.
+
+Returns the text that has passed all validators.
+
+## menu("prompt", $ArrayOrHashRef)
+
+Exported.  Used to create a menu of options from a list.  Can be either a hash or array reference
+as the second argument.  In the case of a hash reference, the values will be displayed as options while
+the selected key is returned.  In the case of an array reference, each element in the list is displayed
+the selected element will be returned.
+
+Returns selected element (HashRef -> Key, ArrayRef -> The Element)
+
+## pwprompt("Prompt", options )
+
+Exported.  Synonym for text\_input("Password: ", noecho => 1);  Also requires the password to be longer than 0 characters.
+
+## prompt("Prompt", options )
+
+Exported.  Wrapper function with rudimentary mimickery of IO::Prompt(er).
+Uses:
+
+    # Mapping back to confirm();
+    my $value = prompt "Are you sure?", yn => 1;
+
+    # Mapping back to text_input();
+    my $value = prompt "Enter something:";
+
+    # With Validator
+    my $value = prompt "Enter an integer:", validate => { "not a number" => sub { /^\d+$/ } }
+
+    # Pass to menu();
+    my $value = prompt "Select your favorite animal:", menu => [qw(dog cat pig fish otter)];
+
+    # If you request a password, autodisable echo:
+    my $passwd = prompt "Password: ";  # sets noecho => 1, disables ReadLine history.
+
+See also: **text\_input**
+
+# EXPORT
+
+This module uses [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter) for flexible imports, the defaults provided by
+:all are as follows.
+
+## Exported Functions
+
+    output  ( \%options, @messages )
+    verbose ( \%options, @messages )
+    debug   ( \%options, @messages )
+    debug_var ( \$var )
+    override( option => $value )
+
+    menu       ( "Question", \%Options or \@Options )
+    text_input ( "Question", validate => { "error message" => sub { length $_[0] } } )
+    confirm    ( "Question" )
+
+    prompt()    Wrapper which mimicks IO::Prompt a bit
+    pwprompt()  Wrapper to get sensitive data
+
+# ARGS
+
+From CLI::Helpers:
+
+    --data-file         Path to a file to write lines tagged with 'data => 1'
+    --color             Boolean, enable/disable color, default use git settings
+    --verbose           Incremental, increase verbosity (Alias is -v)
+    --debug             Show developer output
+    --debug-class       Show debug messages originating from a specific package, default: main
+    --quiet             Show no output (for cron)
+    --syslog            Generate messages to syslog as well
+    --syslog-facility   Default "local0"
+    --syslog-tag        The program name, default is the script name
+    --syslog-debug      Enable debug messages to syslog if in use, default false
+
+# OUTPUT OPTIONS
+
+Every output function takes an optional HASH reference containing options for
+that output.  The hash may contain the following options:
+
+- **sticky**
+
+    Any lines tagged with 'sticky' will be replayed at the end program's end.  This
+    is to allow a developer to ensure message are seen at the termination of the program.
+
+- **color**
+
+    String. Using Term::ANSIColor for output, use the color designated, ie:
+
+        red,blue,green,yellow,cyan,magenta,white,black, etc..
+
+- **level**
+
+    Integer. For verbose output, this is basically the number of -v's necessary to see
+    this output.
+
+- **syslog\_level**
+
+    String.  Can be any valid syslog\_level as a string: debug, info, notice, warning, err, crit,
+    alert, emerg.
+
+- **no\_syslog**
+
+    Bool.  Even if the user specifies --syslog, these lines will not go to the syslog destination.
+    alert, emerg.
+
+- **IMPORTANT**
+
+    Bool. Even if --quiet is specified, output this message.  Use sparringly, and yes,
+    it is case sensitive.  You need to yell at it for it to yell at your users.
+
+- **stderr**
+
+    Bool. Use STDERR for this message instead of STDOUT.  The advantage to using this is the
+    "quiet" option will silence these messages as well.
+
+- **indent**
+
+    Integer.  This will indent by 2 times the specified integer the next string.  Useful
+    for creating nested output in a script.
+
+- **clear**
+
+    Integer.  The number of newlines before this output.
+
+- **kv**
+
+    Bool.  The array of messsages is actually a key/value pair, this implements special coloring and
+    expects the number of messages to be even.
+
+        output(qw(a 1 b 2));
+        # a
+        # 1
+        # b
+        # 2
+
+    Using kv, the output will look like this:
+
+        output({kv=>1}, qw(a 1 b 2));
+        # a: 1
+        # b: 2
+        #
+
+- **data**
+
+    Bool.  Lines tagged with "data => 1" will be output to the data-file if a user specifies it.  This allows
+    you to provide header/footers and inline context for the main CLI, but output just the data to a file for
+    piping elsewhere.
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
+
+# CONTRIBUTORS
+
+- Kang-min Liu <gugod@gugod.org>
+- Kevin M. Goess <kgoess@craigslist.org>
+- Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [http://metacpan.org/release/CLI-Helpers](http://metacpan.org/release/CLI-Helpers)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-Helpers](https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-Helpers)
+
+## Source Code
+
+This module's source code is available by visiting:
+[https://github.com/reyjrar/CLI-Helpers](https://github.com/reyjrar/CLI-Helpers)

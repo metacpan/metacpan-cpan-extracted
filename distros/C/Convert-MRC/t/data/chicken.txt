@@ -1,0 +1,9 @@
+=MRCtermTable
+A	workingLanguage	en
+A	sourceDesc	a restaurant menu in English and French
+C003	subjectField	Restaurant Menus
+C003fr1	term	poulet
+C003fr1	partOfSpeech	noun
+C003fr1	grammaticalGender	masculine
+C003en1	term	chicken
+C003en1	partOfSpeech	noun

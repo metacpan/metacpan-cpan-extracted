@@ -1,0 +1,4 @@
+#define clear_width 1
+#define clear_height 1
+static unsigned char clear_bits[] = {
+   0x00};

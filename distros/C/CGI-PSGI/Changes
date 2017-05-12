@@ -1,0 +1,46 @@
+Revision history for Perl extension CGI::PSGI
+
+0.15  Tue May 17 13:58:50 PDT 2011
+        - Updated the list of overriding methods per CGI.pm update
+        - Added a note that you can't use CGI::Pretty (reported by Maestro)
+
+0.14  Sat Dec 25 11:35:52 PST 2010
+        - Port fixes for header injection from CGI.pm (markstos)
+
+0.13  Sat Oct 30 23:09:06 PDT 2010
+        - Specify Test::More dep
+
+0.12  Mon Oct 25 11:06:59 PDT 2010
+        - Strip Status: header since to conform PSGI spec (clkao)
+
+0.11  Sat May  1 04:37:07 PDT 2010
+        - Upped CGI.pm dependency to 3.33 to fix the upload() issue in perl 5.10
+
+0.10  Wed Mar 31 01:14:43 PDT 2010
+        - Upped CGI.pm dependency to 3.15, released in 2005 and is core in perl 5.8.8
+
+0.09  Thu Feb 11 14:47:26 PST 2010
+        - Added ->psgi_redirect to make migration from CGI.pm even easier (markstos)
+        - POD overhaul and improvements (markstos)
+
+0.07  Tue Jan 12 10:21:19 PST 2010
+        - Unset $CGI::MOD_PERL in case CGI.pm is preloaded by other non-PSGI apps running on Apache
+          (confound, sukria)
+
+0.06  Wed Jan  6 18:12:45 PST 2010
+        - Added ->env method to access PSGI env from the object.
+
+0.05  Wed Jan  6 00:37:23 PST 2010
+        - Fixed a bug where uploaded files are not saved in temp files (fujiwara)
+
+0.04  Wed Dec  9 16:37:47 PST 2009
+        - Added virtual_host to the list because bad CGI.pm uses host() as a function not a method (kazuho)
+
+0.03  Fri Nov 27 17:32:50 JST 2009
+        - Speicify CGI.pm dependency since older one has different read_from_client params
+
+0.02  Mon Oct 19 20:16:25 PDT 2009
+        - Fix the test to skip if <= 3.45 not < 3.45
+
+0.01  Fri Sep 25 11:24:24 2009
+        - original version

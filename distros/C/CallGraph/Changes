@@ -1,0 +1,9 @@
+Revision history for Perl extension CallGraph
+
+0.55  Fri May 07 2004
+        - Added forward and reverse modes to pflow.
+        - Added subs() method to CallGraph.pm
+
+0.50  Mon May 03 2004
+	- First CPAN release
+

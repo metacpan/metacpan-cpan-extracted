@@ -1,0 +1,36 @@
+﻿# ASCII
+#
+2D_PALETTE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+ACCESSORY_WINDOW_DISPLAY  ( -Aw )
+{
+   UNDOCKED
+   DOCKED
+}
+ACIS_EXPORT_PARAMS  ( -Aw )
+{
+   YES
+   NO
+}
+# check that all options, but not values are stored in upper case
+# also trailing whitespaces are added here
+acis_export_units  ( -Aw )
+{
+   in  
+   ft   
+   m   
+   mm   
+   cm   
+   MICRON
+   EFAULT
+}
+ACIS_OUT_VERSION  ( -Aw )
+
+   4
+   5
+}
+DEPTHCUE_VALUE  ( -Aw )
+{
+}

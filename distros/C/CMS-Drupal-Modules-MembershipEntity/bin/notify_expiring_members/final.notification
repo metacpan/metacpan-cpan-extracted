@@ -1,0 +1,14 @@
+Dear [% name %],
+
+This is the final reminder notice that your Membership in the [% organization %] will expire on [% date %].
+
+I do hope you will reconsider renewing!
+
+To renew your Membership, go to the "My account" link after logging in to [% website %] . (Reminder: your user name is [% user %]. If you can't remember your password, you can request a reset link to be sent to you by email. First follow the instructions to reset and save your password, then go to "My account.")
+
+If you have any questions, I would be happy to assist you via email. We hope you will remain part of our organization and renew soon!
+
+
+Sincerely,
+[% signature %]
+

@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB;
+use Error qw(:try);
+
+use strict;
+
+my $ior = shift || Usage();
+my $orb = CORBA::ORB_init("omniORB4");
+
+my $obj = $orb->string_to_object($ior);
+my $repoid = $obj->_repoid();
+
+if ($obj->_non_existent()) {
+	print "Object non reachable !!\n";
+	print "Repository ID: $repoid\n";
+}
+else {
+	print "Object is Alive !!\n";
+	print "Repository ID: $repoid\n";
+}
+
+sub Usage
+{
+	print <<USAGE;
+Usage: $0 <IOR>
+IOR can be specified in any of the valid formats supported by omniORB
+
+    IOR:...
+    corbaloc:....
+    corbaname:...
+
+USAGE
+	exit(1);
+}
+

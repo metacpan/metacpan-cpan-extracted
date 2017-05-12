@@ -1,0 +1,83 @@
+NAME
+    Catalyst::View::TT::FunctionGenerator - Generate functions from ... to
+    be used from a TT view
+
+SYNOPSIS
+        # running this:
+
+        prompty_wompty> scripts/myapp_create.pl create view ViewName TT
+
+        # generates a Template Toolkit view component.
+        # change the base class like this:
+
+        use base 'Catalyst::View::TT::FunctionGenerator';
+
+        # In a nearby action method (in Controller code)
+        sub action : Local {
+            my ( $self, $c ) = @_;
+
+            $c->view("ViewName")->generate_functions('prototype');
+            # OR
+            $c->view("ViewName")->generate_functions($c->prototype);
+            # OR
+            $c->view("ViewName")->generate_functions([$c, 'uri_for']);
+
+        }
+
+        # In your template, we can now have:
+        [% link_to_remote("foo", { url => uri_for("blah")  } ) %]
+
+        # instead of saying this:
+        [% c.prototype.link_to_remote("foo", { url => c.uri_for("blah")  } ) %]
+
+    Note that the most appropriate place to put this code is probably in an
+    "end" action at the top level of your application so that access to
+    these functions in uniform accross your templates.
+
+DESCRIPTION
+    This module stuffs given methods as coderefs into your TT variables,
+    enabling the use of shorter names in your templates. To use this plugin,
+    you will need to be using the Singleton plugin as well (so that we only
+    populate one correct copy of the context object).
+
+    To use, first create a Catalyst::View::TT module in the usual way (see
+    synopsis), then change its base class to this module. To add the method
+    shortcuts, call the generate_functions method in your controller code,
+    in an action, before forwarding to your template.
+
+METHODS
+    generate_functions
+        This is the only available method. It's parameters are a list of one
+        or more of the following:
+
+        [ $object or method name, (list of method names)]
+            An arrayref, where the first item in the array is either an
+            object (e.g. what "$c->prototype" returns), or a method name
+            that will return an object, when called upon $c, e.g.
+            "prototype". The other array items are the method names of the
+            given object that will be created as template vars.
+
+        $object
+            An object (blessed reference). All methods found for the object
+            will be created as template vars.
+
+        A method name
+            The method name will be called upon <$c>, and all methods for
+            the resulting object will be added as template vars.
+
+  Overriden methods
+    template_vars
+
+SEE ALSO
+    Catalyst::View::TT Catalyst::Plugin::Singleton
+
+AUTHORS
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+    Jess Robinson, Marcus Ramberg (POD)
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

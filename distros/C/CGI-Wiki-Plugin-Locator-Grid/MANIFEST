@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Wiki/Plugin/Locator/Grid.pm
+t/01_load.t
+t/02_locator.t
+t/03_different_names.t
+META.yml

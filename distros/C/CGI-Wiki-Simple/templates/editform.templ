@@ -1,0 +1,6 @@
+<form method='post' enctype='multipart/form-data' action='<TMPL_VAR NAME=script_name>/commit/<TMPL_VAR NAME=node_title ESCAPE=URL>'>
+<textarea name='content' cols='60' rows='20'>
+<TMPL_VAR NAME=raw ESCAPE=HTML>
+</textarea><br />
+<TMPL_INCLUDE NAME="actions.templ">
+</form>

@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Cache/Weak.pm
+MANIFEST			This list of files
+README
+t/01_basic.t
+t/02_refcount.t
+t/99_pod.t
+META.yml

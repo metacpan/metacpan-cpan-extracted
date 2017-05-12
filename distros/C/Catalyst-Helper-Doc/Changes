@@ -1,0 +1,15 @@
+Revision history for Perl extension Catalyst::Helper::Doc.
+
+0.04  Sun Dec 11 02:59:48 2005
+  - fixed document, no code changed.
+
+0.03  Sun Dec 11 02:59:48 2005
+  - fixed bug
+
+0.02  Sun Dec 11 02:59:48 2005
+  - CPAN release version
+
+0.01  Sun Dec 11 01:59:48 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Catalyst::Helper::Doc
+

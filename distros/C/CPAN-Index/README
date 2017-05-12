@@ -1,0 +1,60 @@
+NAME
+    CPAN::Index - Robust and object-oriented access to the CPAN index
+
+DESCRIPTION
+    There are many parts of the CPAN toolchain that might benefit from
+    convenient access to the CPAN index metadata.
+
+    But for legacy compatibility reasons, most of this metadata is provided
+    in the form of three venerable uniquely-formatted text files.
+
+    Generally, this means that if you want access to them, you need to pull
+    the files from the CPAN, write a parser, store the objects in memory,
+    maybe cache them with Storable, and write your own hash indexing and
+    object-walking functions.
+
+    However, with the CPAN still growing, and further accelerating, it is
+    becoming increasingly unfeasible to store the CPAN metadata solely in
+    memory structures.
+
+    A more robust, richer, and more convenient approach is required.
+
+    CPAN::Index provides object-oriented access to the CPAN index, using a
+    collection of relatively common modules, and automates entire process of
+    fetching and accessing the index.
+
+    The index is stored in a DBD::SQLite database file, with an object model
+    implemented around it using DBIx::Class. To update the index, the
+    CPAN::Index::Loader class implements the logic to flush and reset the
+    database, fetch the index files, parse them, and repopulate the
+    database.
+
+TO DO
+    - Write the index file download code
+
+    - Verify CPAN::Index handles index unicode data properly
+
+    - A bunch of other things...
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Index>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <cpan@ali.as>
+
+SEE ALSO
+    CPAN::Index::Loader, DBD::SQLite, DBIx::Class
+
+COPYRIGHT
+    Copyright (c) 2006 Adam Kennedy. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

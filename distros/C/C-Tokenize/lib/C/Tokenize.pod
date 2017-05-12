@@ -1,0 +1,433 @@
+
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+C::Tokenize - reduce a C file to a series of tokens
+
+=head1 SYNOPSIS
+
+    
+    # Remove all C preprocessor instructions from a C program:
+    my $c = <<EOF;
+    #define X Y
+    #ifdef X
+    int X;
+    #endif
+    EOF
+    use C::Tokenize '$cpp_re';
+    $c =~ s/$cpp_re//g;
+    print "$c\n";
+    
+
+
+produces output
+
+    int X;
+    
+
+
+(This example is included as L<F<synopsis-cpp.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/synopsis-cpp.pl> in the distribution.)  
+
+    
+    # Print all the comments in a C program:
+    my $c = <<EOF;
+    /* This is the main program. */
+    int main ()
+    {
+        int i;
+        /* Increment i by 1. */
+        i++;
+        // Now exit with zero status.
+        return 0;
+    }
+    EOF
+    use C::Tokenize '$comment_re';
+    while ($c =~ /($comment_re)/g) {
+        print "$1\n";
+    }
+    
+
+
+produces output
+
+    /* This is the main program. */
+    /* Increment i by 1. */
+    // Now exit with zero status.
+    
+
+
+(This example is included as L<F<synopsis-comment.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/synopsis-comment.pl> in the distribution.)  
+
+=head1 VERSION
+
+This documents version 0.13 of C::Tokenize corresponding
+to git commit L<d887a78537b732d981aa07f72ce248a6c083056a|https://github.com/benkasminbullock/C-Tokenize/commit/d887a78537b732d981aa07f72ce248a6c083056a> released on Wed Dec 7 14:27:15 2016 +0900.
+
+=head1 DESCRIPTION
+
+This module provides a tokenizer, L</tokenize>, which breaks C source
+code into its smallest meaningful components, and the regular
+expressions which match each of these components. For example, the
+module supplies a regular expression L</$comment_re> which matches a C
+comment line.
+
+It also supplies some extra regular expressions for, for example,
+local include statements, L</$include_local>, or C variables,
+L</$cvar_re>, as well as extra functions, like L</decomment> for
+removing traditional C comments.
+
+=head1 REGULAR EXPRESSIONS
+
+The following regular expressions can be imported from this module
+using, for example,
+
+    use C::Tokenize '$cpp_re'
+
+to import C<$cpp_re>.
+
+Most of the following regular expressions do not do any capturing,
+except where noted. If you want to capture, add your own parentheses
+around the regular expression.
+
+=head2 Comments
+
+=over
+
+=item $trad_comment_re
+
+Match C</* */> comments.
+
+=item $cxx_comment_re
+
+Match C<//> comments.
+
+=item $comment_re
+
+Match both C</* */> and C<//> comments.
+
+=back
+
+=head2 Preprocessor instructions
+
+=over
+
+=item $cpp_re
+
+Match all C preprocessor instructions, such as #define, #include,
+#endif, and so on.
+
+=item $include_local
+
+Match an include statement which uses double quotes, like C<#include "some.c">.
+
+This captures the entire statement in C<$1> and the file name in C<$2>.
+
+This was added in version 0.10 of C::Tokenize.
+
+=item $include
+
+Match any include statement, like C<< #include <stdio.h> >>.
+
+This captures the entire statement in C<$1> and the file name in C<$2>.
+
+    
+    use C::Tokenize '$include';
+    my $c = <<EOF;
+    #include <this.h>
+    #include "that.h"
+    EOF
+    while ($c =~ /$include/g) {
+        print "Include statement $1 includes file $2.\n";
+    }
+
+
+produces output
+
+    Include statement #include <this.h> includes file this.h.
+    Include statement #include "that.h" includes file that.h.
+
+
+(This example is included as L<F<includes.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/includes.pl> in the distribution.)  
+
+This was added in version 0.12 of C::Tokenize.
+
+=back
+
+=head2 Values
+
+=over
+
+=item $octal_re
+
+Match an octal number, a number with digits 0 to 7 only which begins
+with a leading zero.
+
+=item $hex_re
+
+Match a hexadecimal number, a number with digits 0 to 9 and letters A
+to F, case insensitive, with a leading 0x or 0X and an optional
+trailing L or l for long.
+
+=item $decimal_re
+
+Match a decimal number, either integer or floating point.
+
+=item $number_re
+
+Match any number, either integer, floating point, hexadecimal, or
+octal.
+
+=item $char_const_re
+
+Match a character constant, such as C<'a'> or C<'\-'>.
+
+=item $single_string_re
+
+Match a single C string constant such as C<"this">.
+
+=item $string_re
+
+Match a full-blown C string constant, including compound strings
+C<"like" "this">.
+
+=back
+
+=head2 Operators, variables, and reserved words
+
+=over
+
+=item $operator_re
+
+Match an operator such as C<+> or C<-->.
+
+=item $word_re
+
+Match a word, such as a function or variable name or a keyword of the
+language. Use L</$reserved_re> to match only reserved words.
+
+=item $grammar_re
+
+Match non-operator syntactic characters such as C<{> or C<[>.
+
+=item $reserved_re
+
+Match a C reserved word like C<auto> or C<goto>. Use L</$word_re> to
+match non-reserved words.
+
+=item $cvar_re
+
+Match a C variable, for example anything which may be an lvalue or a
+function argument. It does not capture the result.
+
+    
+    use C::Tokenize '$cvar_re';
+    my $c = 'func (x->y, & z, ** a, & q);';
+    while ($c =~ /[,\(]\s*($cvar_re)/g) {
+        print "$1 is a C variable.\n";
+    }
+
+
+produces output
+
+    x->y is a C variable.
+    & z is a C variable.
+    ** a is a C variable.
+    & q is a C variable.
+
+
+(This example is included as L<F<cvar.pl>|https://api.metacpan.org/source/BKB/C-Tokenize-0.13/examples/cvar.pl> in the distribution.)  
+
+Because in theory this can contain very complex things, this regex is
+somewhat heuristic and there are edge cases where it is known to
+fail. See F<t/cvar_re.t> in the distribution for examples.
+
+This was added in version 0.11 of C::Tokenize.
+
+=back
+
+=head1 VARIABLES
+
+=head2 @fields
+
+The exported variable @fields contains a list of all the fields which
+are extracted by L</tokenize>.
+
+=head1 FUNCTIONS
+
+=head2 decomment
+
+    my $out = decomment ('/* comment */');
+    # $out = " comment ";
+
+Remove the traditional C comment marks C</*> and C<*/> from the
+beginning and end of a string, leaving only the comment contents. The
+string has to begin and end with comment marks.
+
+=head2 tokenize
+
+    my $tokens = tokenize ($file);
+
+Convert C<$file> into a series of tokens. The return value is an array
+reference which contains hash references. Each hash reference
+corresponds to one token in the C file. Each token contains the
+following keys:
+
+=over
+
+=item leading
+
+Any whitespace which comes before the token (called "leading
+whitespace").
+
+=item type
+
+The type of the token, which may be 
+
+=over
+
+=item comment
+
+A comment, like 
+
+    /* This */
+
+or
+
+    // this.
+
+=item cpp
+
+A C preprocessor instruction like
+
+    #define THIS 1
+
+or
+
+    #include "That.h".
+
+=item char_const
+
+A character constant, like C<'\0'> or C<'a'>.
+
+=item grammar
+
+A piece of C "grammar", like C<{> or C<]> or C<< -> >>.
+
+=item number
+
+A number such as C<42>,
+
+=item word
+
+A word, which may be a variable name or a function.
+
+=item string
+
+A string, like C<"this">, or even C<"like" "this">.
+
+=item reserved
+
+A C reserved word, like C<auto> or C<goto>.
+
+=back
+
+All of the fields which may be captured are available in the variable
+L</@fields> which can be exported from the module:
+
+    use C::Tokenize '@fields';
+
+=item $name
+
+The value of the type. For example, if C<< $token->{name} >> equals
+'comment', then the value of the type is in , C<< $token->{comment} >>.
+
+    if ($token->{name} eq 'string') {
+        my $c_string = $token->{string};
+    }
+
+=item line
+
+The line number of the C file where the token occured. For a
+multi-line comment or preprocessor instruction, the line number refers
+to the final line.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default.
+
+    use C::Tokenize ':all';
+
+exports all the regular expressions and functions from the module, and
+also L</@fields>.
+
+=head1 SEE ALSO
+
+=over
+
+=item 
+
+The regular expressions contained in this module are L<shown at this
+web page|http://www.lemoda.net/c/c-regex/index.html>.
+
+=item
+
+L<This example of use of this
+module|http://www.lemoda.net/perl/remove-unnecessary-c-headers/>
+demonstrates using C::Tokenize (version 0.12) to remove unnecessary
+header inclusions from C files.
+
+=item
+
+There is a C to HTML converter in the F<examples> subdirectory of the
+distribution called F<c2html.pl>.
+
+=back
+
+=head1 BUGS
+
+=over
+
+=item No trigraphs
+
+No handling of trigraphs.
+
+=item Requires Perl 5.10
+
+This module uses named captures in regular expressions, so it requires
+Perl 5.10 or more.
+
+=item No line directives
+
+The line numbers provided by L</tokenize> do not respect C line
+directives.
+
+=item Insufficient tests
+
+The module has been used somewhat, but the included tests do not
+exercise many of the features of C.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 185
+  24046:
+    - 204
+name: cbb9
+registers:
+  AF: 42240
+  AF_: 0
+  BC: 6986
+  BC_: 0
+  DE: 54660
+  DE_: 0
+  HL: 24046
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

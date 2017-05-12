@@ -1,0 +1,12 @@
+0.001     2010-01-31 hdp
+
+  * first release
+
+0.002     2010-01-31 hdp
+
+  * prereq on Test::More with done_testing()
+
+0.003     2011-11-06 yko
+
+  * multiple class selectors support
+  * class_as_array option

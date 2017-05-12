@@ -1,0 +1,147 @@
+=head1 NAME 
+
+omniORB::internals - omniORB module internals
+
+=head1 DESCRIPTION
+
+This document describes the internals of the Perl interface to omniORB.
+
+=head1 Overview
+
+The Perl omniORB module is rather unusual in that it doesn't
+generate stubs at all. Instead, it works from a
+FullInterfaceDescription loaded from the interface repository.
+
+These descriptions are cached locally so they will be only
+ever retrieved once. Retrieval is triggered when:
+
+=over 4
+
+=item *
+The user gives an 'ids' argument to C<use omniORB>
+
+=item *
+The user explicitly calls C<$orb-E<gt>preload(ID)>
+
+=item *
+An unknown method is invoked on an object whose interface
+has not yet been loaded.
+
+=back
+
+=head1 Object details
+
+Each CORBA object that is used by a Perl program has a Perl
+object associated with it. For objects not implemented in
+Perl, this object is an opaque reference. (Currently it
+is a hash reference, which could be useful for clients that
+want to store temporary data on the stub object, but it
+may be changed for efficiency reasons). For objects implemented
+in Perl, the type of object is chosen by the implementor.
+
+Attached to this object (via invisible "magic") is a structure
+holding information about the Perl object. (Of type
+POmniInstVars) When the perl object is destroyed, the reference
+count held on the associated C++ object is released, and for
+objects implemented in Perl, the field in the C++ object pointing
+to the Perl object is cleared.
+
+A "pin table" is kept to associate C++ CORBA::Object's with Perl
+objects. This means that two Perl references to the same omniORB
+object will always refer to the same Perl object, and that calls on a
+Perl object will be short-circuited locally.
+
+A Perl object holds a reference count on the associated C++
+CORBA::Object, but not vice versa. This means that a Perl server
+must hold onto a reference to any live objects that are being
+used locally in a different language. (This is identical to the
+situation for objects used remotely, so should not present undue
+hardship for the implementor)
+
+(See the file F<internals.[fig/ps]> for a graphical view of
+the setup)
+
+=head1 Actions upon loading an interface
+
+When an interface is loaded, omniORB/Perl:
+
+=over 4
+
+=item *
+Initializes the corresponding Perl package by pointing the
+@ISA array at the base interfaces, if any, and at 
+CORBA::Object otherwise.
+Stores the repository ID in a package variable.
+
+=item *
+For each exception referenced in the package, creates a
+Perl package with @ISA=qw(CORBA::UserException), and
+an appropriate $_repoid variable, if one does not exist,
+and stores the package name in a global hash table from
+repoid to package name
+
+=item *
+For each operation in the interface, creates an XS subroutine
+pointing to _pomni_callStub, stores the integer index of
+the method in:
+ 
+    CvXSUBANY(cv).any_i32
+
+And sets
+
+    CvSTASH (cv)
+
+so it correctly points to the current package.
+
+=item *
+For each attribute in the package, does the same thing,
+but offsets the stored index so that get methods can
+be distinguished from set methods, and from operations.
+
+=back
+
+=head1 Calling a stub routine
+
+When the application calls a stub method on an object,
+the call is forwarded to _pomni_callStub, which retrieves
+the package and method index. From this information, it
+finds the OperationDescription for the method that is
+being invoked. (or AttributeDescription, if appropriate)
+
+Then _pomni_callStub builds a DII request using the
+OperationDescription and the passed in parameters, invokes
+it and translates any return values or exceptions into
+Perl terms.
+
+
+=head1 Handling invocations on a Perl object
+
+When omniORB receives a request for an operation on an object
+implemented in Perl, it calls the invoke() method of the
+C<POmniServant>. The invoke description finds the 
+C<OperationDescription> or C<AttributeDescription> from the name which
+is passed in in the ServerRequest object. This currently
+can be quite slow since it can involve strcmp()'s with every
+method name in the interface and its base interfaces. There
+probably should be a "method => description" hash table computed
+when the interface is loaded, or simply acting as a cache.
+
+The sequence is quite similar to that above - A C<NamedValue> list is
+built using the C<Description>; this is used to populate the arguments
+for the Perl method from the C<ServerRequest>, the Perl method is called,
+then exceptions and results are copied back to the C<ServerRequest>.
+
+
+=head1 Translating from and to Perl data structures
+
+Most of the file F<types.cc> is concerned with translating Perl data
+structures from and to omniORB's C<Any>s.
+
+It should be realized that a omniORB C<Any> is basically a combination
+of a buffer and a typecode, so this is quite equivalent to the
+marshalling/unmarshalling from a buffer.
+
+The code is quite straightforward - it just uses the information in a
+typecode to either walk a Perl structure and create an C<Any> from it,
+or to create a Perl structure from an C<Any>.
+

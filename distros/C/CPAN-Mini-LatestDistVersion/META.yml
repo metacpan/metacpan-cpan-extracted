@@ -1,0 +1,31 @@
+---
+abstract: 'Create a CPAN mirror with only the latest version of each distribution'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Mini-LatestDistVersion
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  CPAN::DistnameInfo: 0
+  CPAN::Mini: 0
+  Parse::CPAN::Packages::Fast: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bricas/cpan-mini-latestdistversion
+version: 0.01

@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Catalyst-Model-SWISH
+version:            0.06
+abstract:           Catalyst model for Swish-e
+author:
+    - Peter Karman <perl@peknet.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Catalyst::Action::RenderView:  0
+    Catalyst::Plugin::ConfigLoader:  0
+    Catalyst::Plugin::Static::Simple:  0
+    Catalyst::Runtime:    5.7
+    Catalyst::View::TT:   0
+    Data::Pageset:        1.03
+    MRO::Compat:          0
+    Sort::SQL:            0.03
+    SWISH::API::Object:   0.09
+    Template::Plugin::Handy:  0
+    Time::HiRes:          1.86
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

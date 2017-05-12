@@ -1,0 +1,175 @@
+NAME
+    Curses::UI::Volume - Create and manipulate volume widgets.
+
+CLASS HIERARCHY
+     Curses::UI::Containter
+     Curses::UI::Widget
+        |
+        +----Curses::UI::ContainerWidget
+                |
+                +----Curses::UI::Volume
+
+SYNOPSIS
+     use Curses::UI;
+     my $win = $cui->add('window_id', 'Window');
+     my $volume = $win->add(
+             'myvolume', 'Curses::UI::Volume',
+             -volume => 50,
+     );
+     $volume->draw;
+
+DESCRIPTION
+    Curses::UI::Volume is a widget that shows a volume number in graphic
+    form. Precision is 8 stays in one character.
+
+STANDARD OPTIONS
+    "-parent", "-x", "-y", "-width", "-height", "-pad", "-padleft",
+    "-padright", "-padtop", "-padbottom", "-ipad", "-ipadleft",
+    "-ipadright", "-ipadtop", "-ipadbottom", "-title", "-titlefullwidth",
+    "-titlereverse", "-onfocus", "-onblur".
+
+    For an explanation of these standard options, see Curses::UI::Widget.
+
+REMOVED OPTIONS
+    "-text".
+
+WIDGET-SPECIFIC OPTIONS
+    *       "-bg" < COLOR >
+
+             Background color.
+             Possible values are defined in Curses::UI::Color.
+             Default value is 'black'.
+
+    *       "-fg" < COLOR >
+
+             Foreground color.
+             Possible values are defined in Curses::UI::Color.
+             Default value is 'white'.
+
+    *       "-volume" < PERCENT_NUMBER >
+
+             If PERCENT_NUMBER is set, text on the label will be drawn as volume level for this percent number.
+             Volume number is checked for 0 - 100% value.
+             Default value is 0.
+
+STANDARD METHODS
+    "layout", "draw", "intellidraw", "focus", "onFocus", "onBlur".
+
+    For an explanation of these standard methods, see Curses::UI::Widget.
+
+WIDGET-SPECIFIC METHODS
+    *       "new(%parameters)"
+
+             Constructor.
+             Create widget with volume in graphic form, defined by -volume number.
+             Returns object.
+
+    *       "volume([$volume])"
+
+             Get or set volume number.
+             In set mode volume number is checked for 0 - 100% value.
+             Returns volume number (0-100%).
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new;
+
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+
+     # Add volume.
+     $win->add(
+             undef, 'Curses::UI::Volume',
+             '-volume' => 50,
+     );
+
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # █▌
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new(
+             -color_support => 1,
+     );
+
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+
+     # Add volume.
+     my $vol = $win->add(
+             undef, 'Curses::UI::Volume',
+             '-border' => 1,
+             '-volume' => 0,
+             '-title' => 'foo',
+             '-width' => 10,
+     );
+
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+
+     # Time.
+     $cui->set_timer(
+             'timer',
+             sub {
+                     my $act = $vol->volume;
+                     $act += 5;
+                     if ($act > 100) {
+                             $act = 0;
+                     }
+                     $vol->volume($act);
+                     return;
+             },
+             1,
+     );
+
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # ┌ foo ───┐
+     # │▊       │
+     # └────────┘
+
+DEPENDENCIES
+    Curses, Curses::UI::Common, Curses::UI::ContainerWidget,
+    Curses::UI::Label, Curses::UI::Widget, Encode, Readonly.
+
+SEE ALSO
+    Task::Curses::UI
+        Install the Curses::UI modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Curses-UI-Volume>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

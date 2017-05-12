@@ -1,0 +1,12 @@
+0.013:
+    - Bring Carp::Clan::Share into 2009
+    - Dropped Build.PL support
+
+0.012 Friday January 25 12:29:43 PST 2008:
+    - Fixed some small testing issues
+
+0.011 Thursday January 24 01:52:06 PST 2008:
+    - Minor documentation tweaks
+
+0.010 Wednesday January 23 23:36:48 PST 2008:
+    - Initial release

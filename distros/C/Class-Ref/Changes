@@ -1,0 +1,29 @@
+0.05  2012-10-18
+    New features
+    * Iterator methods for arrays
+    * Methods in the calling package can be interpolated as Array indeces
+    Improvements
+    * Removed uses of regular expressions in favor of simpler patterns
+    Bug fixes
+    * 'shift' instead of 'pop' in $assign
+
+
+0.04  2012-07-12
+    Bug Fixes
+    * fixed test [20] to test and display the right loop variable
+    * Changed Ref.pm to use ref() instead of reftype()
+
+
+0.03  2012-07-12
+    Bug Fixes
+    * Use more reliable $] perl version variable in test [20]
+
+
+0.02  2012-07-11
+    Bug Fixes
+    * Fixed test [20] to only check FORMAT, Regexp, VSTRING in the approriate
+      versions of perl when they first appeared
+
+
+0.01  2012-07-11
+    Initial Release

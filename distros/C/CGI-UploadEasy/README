@@ -1,0 +1,37 @@
+CGI-UploadEasy version 1.00
+===========================
+
+CGI::UploadEasy is a wrapper around, and relies heavily on, CGI.pm.
+Its purpose is to provide a simple interface to the upload
+functionality of CGI.pm.
+
+At creation of the CGI::UploadEasy object, the module saves one or
+more files from a file upload request in the upload directory, and
+information about uploaded files is made available via the fileinfo()
+method. CGI::UploadEasy performs a number of tests, which limit the
+risk that you encounter difficulties when developing a file upload
+application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   CGI 2.76
+   File::Spec
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2009 by Gunnar Hjalmarsson
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

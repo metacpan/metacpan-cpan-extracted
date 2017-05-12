@@ -1,0 +1,71 @@
+Changes for Perl extension CPANDB
+
+0.18 Mon 10 Sep 2012
+	- Updated to Module::Install::DSL 1.06
+	- Updated to ORLite 1.92 for correct use of readonly
+	- Updated to ORLite::Mirror 1.22 for env_proxy support
+	- Removed the use of the (broken) ORLite::Statistics module
+
+0.17 Fri 25 Nov 2011
+	- Updated to ORLite 1.51 for overlay support
+	- Added CPANDB::Author->distributions method
+
+0.16 Thu 24 Nov 2011
+	- Added CPANDB->latest method
+	- Added CPANDB->latest_datetime method
+	- Added CPANDB->age_days method
+
+0.15 Sat 11 Sep 2010
+	- Added CPAN::Distribution::perl_version method
+
+0.14 Tue 11 May 2010
+	- Updated to Module::Install::DSL 0.96
+	- Updated to ORLite::Pod 0.08
+	- Updated to ORLite 1.41
+	- Updated to ORLite::Mirror 1.20
+
+0.13 Mon 19 Apr 2010
+	- Updated ORLite::POD-generated documentation.
+	- Added documentation on additional methods
+
+0.12 Mon 26 Oct 2009
+	- Added documentation for cpangraph (in POD)
+
+0.11 Thu  1 Oct 2009
+	- Updating ORLite::Statistics dependency to 0.03
+	- Adding basic implementation of age quadrants
+
+0.10 Sun 16 Aug 2009
+	- Integrating support for Statistics::Basic
+
+0.09 Thu 13 Aug 2009
+	- Typo, grr
+
+0.08 Thu 13 Aug 2009
+	- Ignore Task- modules in downstream dependants graphs
+
+0.07 Thu 13 Aug 2009
+	- Oopsi, typo
+
+0.06 Thu 13 Aug 2009
+	- Adding support for Graph::XGMML
+	- Adding support for downstream graphs
+
+0.05 Tue 21 Jul 2009
+	- Better, more varied, and more controllable graph support
+	- Added cpangraph command line graph generator
+	- Updated documentation to the newest schema
+
+0.04 Fri  3 Jul 2009
+	- Adding support for producing a Graph object for dependencies
+
+0.03 Thu  2 Jul 2009
+	- Removing superfluous indexes
+	- Prerun index stats for end user speed
+
+0.02 Thu  2 Jul 2009
+	- Updated to new URL.
+	- Generated a new version of the POD
+
+0.01 Wed  3 Jun 2009
+	- Created the initial implementation

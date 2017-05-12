@@ -1,0 +1,30 @@
+---
+abstract: 'A base view to create custom JSON Views'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: '5.90100'
+  JSON::MaybeXS: '1.003005'
+  Moo: '2.000001'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-Base-JSON
+requires:
+  Catalyst: '5.90100'
+  HTTP::Status: '0'
+  JSON::MaybeXS: '1.003005'
+  Moo: '2.000001'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-View-Base-JSON/issues
+  homepage: https://github.com/jjn1056/Catalyst-View-Base-JSON
+  repository: https://github.com/jjn1056/Catalyst-View-Base-JSON
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

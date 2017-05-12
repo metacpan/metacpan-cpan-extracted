@@ -1,0 +1,41 @@
+Config-Format-Ini version 0.01
+==============================
+ 
+ This module reads INI files by following the spec presently found at
+http://www.cloanto.com/specs/ini.html .  It supports most of the spec,
+including multi-valued keys (separated by commas), double-quoted val-
+ues, and free comments, and overide of earlier sections and keys.
+Escape and continuation strings are in the TODO list.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL    ( or perl Build.PL )
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ Attribute::Handlers
+ Parse::RecDescent
+ File::Slurp    
+
+
+The following Test modules are not required, but are recomended for testing:
+Test::Pod            1.20
+Test::Pod::Coverage  1.06
+                    
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

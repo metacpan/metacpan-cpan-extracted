@@ -1,0 +1,100 @@
+[% 
+    link = '<a href="http://search.cpan.org/~' _ author _ '">' _ author _ "</a>"
+    crosslink = '/author/' _ letter _ '/' _ author _ '.html'
+
+    rss = author _ '.rss'
+    rss2 = author _ '-nopass.rss'
+    onload = 'onload="init()"'
+    htmltitle = 'Reports for distributions by ' _ author
+    title = 'Reports for distributions by ' _ link
+
+    box_prefs = 1 ;
+    box_summ  = 1 ;
+
+    crumb3_name = 'Authors' ;
+    crumb3_href = '/' ;
+    crumb2_name = letter ;
+    crumb2_href = '/author/' _ crumb2_name ;
+    crumb1_name = author ;
+%]
+
+<input type="hidden" id="author_pref" name="author" value="[% author %]" />
+
+<div class="orange_buttons">
+<a rel="nofollow" href="[% author %].rss">RSS</a>
+<a rel="nofollow" href="[% author %]-nopass.rss">RSS (No PASSes)</a>
+<a rel="nofollow" href="[% author %].yaml">YAML</a>
+</div>
+
+<p>
+These are the test reports that we have for the most recent versions of each CPAN distribution uploaded by
+[% link %].[% IF processed %] This page was last updated on <strong>[% processed %]</strong>.[% END %]
+</p>
+
+<noscript>
+<div class="nv">
+<p><strong>THIS SITE REQUIRES YOUR BROWSER TO HAVE JAVASCRIPT ENABLED</strong></p>
+<p>Due to the high volume of reports, in order to more easily manage the
+display listings, Javascript is used to filter the reports displayed.</p>
+<p>If you wish to view the static version of this page, please 
+<a href="http://static.cpantesters.org/author/[% letter %]/[% author %].html">click here</a>.</p>
+</div>
+</noscript>
+
+[% IF update %]
+<div class="ud">
+<p>Please note that this page is in an update queue, and as such the latest data may not be currently available.</p>
+</div>
+[% END %]
+
+<h2>The Latest Distributions</h2>
+
+<p>To view individual reports, please click the grade text associated with each report.</p>
+
+[% FOREACH d = distributions %]
+<div class="[% d.csscurrent %][% d.cssrelease %]">
+<h2 id="[% d.dist %]"><a href="/distro/[% d.letter %]/[% d.dist | html %].html">[% d.dist | html %]</a> [% d.version | html %]
+
+[% IF d.summary.keys %]
+(<strong>
+[%- FOREACH status = d.summary.keys.sort -%]
+[%- c = d.summary.$status -%]
+<span class="[% status | html %]">[% c %] [% status -%]
+[% IF status != "ALL" -%]
+[% IF c > 1 %][% IF status == 'PASS' %]es[% ELSE %]s[% END %][% END -%]
+[% END -%]
+[% UNLESS loop.last %], [% END -%]
+</span>[% -%]
+[% END -%]</strong>)
+[% ELSE %] (No reports)[% END -%]</h2>
+
+[% IF d.reports %]
+
+    <table class="test_results">
+      <thead>
+        <tr>
+          <th>Grade</th>
+          <th>Perl version</th>
+          <th>OS name</th>
+          <th>OS version</th>
+          <th>Architecture</th>
+        </tr>
+      </thead>
+      <tbody id="data-[% d.dist %]">
+	  <tr><td colspan="5">Data loading please wait ....</td></tr>
+      </tbody>
+    </table>
+
+[% END %]
+
+</div>
+[% END %]
+
+<!--
+      <div class="nx">
+      <span id="reportsummary">
+	      <h3>Distribution Summary</h3>
+	      <img src="/images/layout/loader-orange.gif" alt="Loading..." />
+      </span>
+      </div>
+-->

@@ -1,0 +1,19 @@
+Revision history for Perl extension CGI::Application::Plugin::ProtectCSRF.
+
+1.01  Thu Jan 04 22:32:00 2008
+    - fixed test script
+
+1.00  Thu Jan 04 21:05:00 2008
+    - fixed all
+
+0.02  Thu Nov 16 01:03:40 2006
+    - fixed prerun callback _csrf_forbidden
+      (When runmode set with add_postonly_runmodes is requests other than POST, 
+      processing that does the access permission is added)
+    - add add_postonly_runmodes(new method)
+    - add delete_postonly_runmodes(new method)
+
+0.01  Sun Nov 12 21:51:15 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn CGI::Application::Plugin::ProtectCSRF
+

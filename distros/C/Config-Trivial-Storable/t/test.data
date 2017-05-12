@@ -1,0 +1,16 @@
+#	$Id: test.data 49 2014-05-02 11:30:14Z adam $
+
+test1	foo
+test2	bar \
+bar
+Test3	baz
+test0	0
+empty
+test6	foo \ bar
+test7	foo \ 		# Comment
+
+test_a	foo
+
+__END__
+
+test4	foo

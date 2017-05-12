@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 35
+name: dd23
+registers:
+  AF: 37013
+  AF_: 0
+  BC: 44092
+  BC_: 0
+  DE: 19856
+  DE_: 0
+  HL: 14235
+  HL_: 0
+  I: 0
+  IX: 54539
+  IY: 41303
+  PC: 0
+  R: 0
+  SP: 0

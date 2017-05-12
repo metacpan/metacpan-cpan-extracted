@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Config::Augeas::Exporter;
+use XML::LibXML;
+use Getopt::Long;
+
+my $file = '-';
+my $root = '/';
+my $create_dirs = 0;
+my $verbose;
+my $debug;
+my $help;
+
+my $result = GetOptions (
+   "file=s" => \$file,
+   "root=s" => \$root,
+   "create-dirs" => \$create_dirs,
+   "verbose" => \$verbose,
+   "debug" => \$debug,
+   "help" => \$help,
+   );
+
+if ($help) {
+   usage();
+   exit 0;
+}
+
+$verbose ||= $debug;
+
+open (my $fh, "<$file") 
+   or die "E: Could not open $file: $!\n" ;
+my $doc = XML::LibXML->load_xml(IO => $fh);
+close $fh;
+
+my $aug = Config::Augeas::Exporter->new(root => $root);
+$aug->from_xml(
+   xml => $doc,
+   create_dirs => $create_dirs,
+   );
+
+
+########
+# Subs
+########
+
+sub usage {
+   print "$0 [-f <file>] [-r fakeroot] [-v] [-d] [-h]
+
+ Flags:
+   -h, --help             Show this help
+   -v, --verbose          Verbose mode
+   -d, --debug            Debug mode
+
+ Options:
+   -f, --file <filename>  Read XML from file
+   -r, --root <fakeroot>  Set fakeroot for Augeas
+   -c, --create-dirs      Create directories if missing
+";
+}
+
+

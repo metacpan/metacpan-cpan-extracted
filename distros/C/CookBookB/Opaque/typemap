@@ -1,0 +1,2 @@
+TYPEMAP
+Record *	O_OBJECT

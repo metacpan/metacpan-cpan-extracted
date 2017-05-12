@@ -1,0 +1,36 @@
+benchmark/lexical.pl
+Changes
+cmmg.pl
+components/array.m
+components/CommonMethods.pmt
+components/hash.m
+components/scalar.m
+configure
+end.pod
+examples/simple1
+generate.PL
+Generate.pm
+INSTALL
+lib/Class/.placeholder
+lib/Class/MethodMaker.pm
+lib/Class/MethodMaker/Constants.pm
+lib/Class/MethodMaker/Engine.pm
+lib/Class/MethodMaker/OptExt.pm
+lib/Class/MethodMaker/V1Compat.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+MethodMaker.xs
+README
+t/array.t
+t/basic.t
+t/diffclass.t
+t/hash.t
+t/new.t
+t/redefine-warnings.t
+t/scalar.t
+t/test.pm
+t/warnings.t
+TODO
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,127 @@
+Revision history for Perl module CGI::Compress::Gzip
+
+1.03  17 Oct 2008
+      [FIXES]
+      - A speculative \n fix for Win32
+
+1.02  16 Oct 2008
+      [FIXES]
+      - Make the test code more robust against reordered headers
+
+1.01  07 Oct 2008
+      [FIXES]
+      - CGI.pm is downcasing headers on some smoke machines.  I don't know why.
+        srezic via http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2390972.html
+      [PREREQUISITES]
+      - Upped Compress::Zlib to v2.  Paul Marquess has pointed out
+        that I can use improvement in Compress::Zlib to get streaming
+        under mod_perl
+
+1.00  06 Oct 2008
+      [FIXES]
+      - OK, the last one didn't really fix it.  This time I think I nailed it with the help of:
+        srezic via http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2382496.html
+        (and many others)
+      [PREREQUISITES]
+      - Added Compress::Zlib.  At least one user was bitten by
+        IO::Zlib's support for shelling out to command-line gzip.
+
+0.23  05 Oct 2008
+      [FIXES]
+      - FINALLY fixed a long standing, spurious test failure due to
+        envvars not passed to subprocesses.  For example:
+        http://www.nntp.perl.org/group/perl.cpan.testers/2008/10/msg2380213.html
+      [INTERNALS]
+      - Comply with Perl::Critic v1.093
+      - Clean up test code
+
+0.22  07 Nov 2006
+      [FIXES]
+      - Set binmode in tests
+      [INTERNALS]
+      - Comply with Perl::Critic v0.21
+
+0.21  04 Oct 2005
+      [ENHANCEMENTS]
+      - Support 5.6.0's CGI.pm
+      - More regression tests
+      [FIXES]
+      - Unfreed scalar on 5.8.6 threaded on Linux
+      - Explicitly state 5.6.0 minimum
+      - Allow empty body
+      - Some header handling bug fixes
+      [INTERNALS]
+      - Break helper package out to its own file
+
+0.20  22 Apr 2005
+      [INCOMPATIBILITIES]
+      - Relicensed to Artistic/GPL
+
+0.19  21 Dec 2004
+      [FIXES]
+      - Add workaround for unbuffered CGI output
+
+0.18  30 Nov 2004
+      [ENHANCEMENTS]
+      - Support more of the standard CGI->header() arguments
+
+0.17  08 Jan 2004
+      [ENHANCEMENTS]
+      - Support -type CGI header flag
+      [DOCUMENTATION]
+      - Add caveat about explicit use of filehandles
+
+0.16  02 Jan 2004
+      [DOCUMENTATION]
+      - Clean up documentation
+      - Fix some URL errors
+
+0.15  30 Dec 2003
+      [FIXES]
+      - Fix README
+      - Fix bug parsing CGI header() arguments
+      - Add programmer-configurable mime-type selection
+
+0.14  16 Sep 2003
+      [ENHANCEMENTS]
+      - Support for Module::Build
+
+0.13  28 Aug 2003
+      [FIXES]
+      - Add support for CGI redirect() calls (if HTTP Status is not
+        200, content should not be compressed).
+
+0.12  22 Aug 2003
+      [FIXES]
+      - Headers were altered even when compression was inappropriate.
+
+0.11  14 Mar 2003
+      [ENHANCEMENTS]
+      - Handle default content-type of text/html
+      - Add helpful diagnostic HTTP headers, if requested
+
+0.10  13 Mar 2003
+      [FIXES]
+      - Fix for mod_perl -- use in-memory compression
+
+0.04  12 Feb 2003
+      [FIXES]
+      - Disable for mod_perl
+      - Case-insensitive content-encoding tests
+      [DOCUMENTATION]
+      - Acknowledge Windows failure
+      [INTERNALS]
+      - Rename the wrapper class to CGI::Compress::Gzip::wrapper
+
+0.03  06 Feb 2003
+      [ENHANCEMENTS]
+      - Header tweaks towards mod_perl functionality
+      - Work on the compression decision
+
+0.02  05 Feb 2003
+      [ENHANCEMENTS]
+      - Substantial overhaul.  Now it works under 5.6.0, but still not
+        under mod_perl.
+
+0.01  20 Jan 2003
+      Initial version

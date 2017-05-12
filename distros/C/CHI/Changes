@@ -1,0 +1,474 @@
+Revision history for CHI
+
+** denotes an incompatible change
+
+0.60  Jun 7, 2015
+
+* Fixes
+  - Switch JSON backends from JSON.pm to JSON::MaybeXS - https://github.com/jonswar/perl-chi/pull/20 (Karen Etheridge)
+
+0.59  Jan 7, 2015
+
+* Improvements
+  - Pass driver to expire_if - https://github.com/jonswar/perl-chi/pull/19 (rouzier)
+
+* Fixes
+  - Fix DiscardPolicy type - RT #95291 (Josh Rosenbaum)
+  - Don't mandate that get_namespaces returns in same order - RT #89892 (nhorne)
+
+0.58  May 18, 2014
+
+* Implementation
+  - Use Moo instead of Moose for object system.  This should be fully compatible
+    with existing code, including Moose drivers or other extensions.  This
+    reduces the startup time and memory overhead.
+
+* Improvements
+  - The Memory and RawMemory drivers now support zero as a valid value for
+    the global argument causing a new hashref datastore to be created. (Aran
+    Deltac)
+
+* Fixes
+  - Fix busted packaging
+  - Fix the loading of additional roles or traits (jrouzierinverse)
+
+0.57  Jan 26, 2014
+
+* Improvements
+  - Use nfreeze instead of freeze for network portability - RT #74188 (Jeffrey Fuller)
+
+0.56  Oct 22, 2012
+
+* Fixes
+  - Mention testing_driver_class in CHI/Driver/Development.pm - RT #78921 (Nigel Horne)
+
+* Tests
+  - Add test_multiple_processes for testing drivers under concurrent writes - RT #79132 (Nigel Horne)
+
+* Docs
+  - Mention that driver tests are responsible for their own cleanup - RT #79100 (Nigel Horne)
+  - Various spelling fixes thanks to Pod::Spell
+
+0.55  Jul 3, 2012
+
+* Improvements
+  - Compute derived/aggregate stats in CHI::Stats::parse_stats_logs
+
+* Fixes
+  - Eliminate "=for html" POD entries, which were mangling metacpan.org output (Pedro Melo)
+
+0.54  May 30, 2012
+
+** Incompatible Changes **
+  - ** Switch CHI::Stats format to JSON for easier generation and parsing
+
+0.53  May 30, 2012
+
+* Improvements
+  - Measure time elapsed in get, set, and compute; record in logs and stats. Only
+    measure when debug logging or stats are enabled.
+  - compute() now handles list or scalar caller context
+  - The driver parameter now accepts full classes prefixed by '+', as is standard.
+    driver_class is still accepted for backward compatibility but no longer documented.
+
+* Fixes
+  - compute() no longer modifies passed-in options hashref
+  - Fix get_multi_* with partially empty l1 cache - perl-chi/pull/12 (Mike Cartmell)
+  - Fix get_keys when file_extension set on CHI::Driver::File - RT #76489 (Vitaliy Tokarev)
+  - Have set_multi call store_multi underneath as documented in Development.pod - RT
+    #76621 (Oliver Paukstadt)
+  - Minor POD fixes (Alessandro Ghedini)
+
+0.52  Mar 7, 2012
+
+* Improvements
+  - Subclasses inherit configuration from their parents unless they also call config()
+
+* Fixes
+  - Fix Config test to not require memcached
+
+0.51  Mar 4, 2012
+
+* Improvements
+  - Add CHI->config() to register storage types, and set core and per-namespace defaults
+
+* Fixes
+  - Fix new test_max_key_length test to work on drivers that do not support get_keys
+
+0.50  Nov 30, 2011
+
+* Docs
+  - Clarify busy_lock doc, add obj_ref doc (perlover)
+
+* Fixes
+  - Override set() rather than set_object() in Role/HasSubcaches.pm so that
+    keys are not double-transformed when set in l1 or mirror caches. This is
+    simpler and should be more robust.
+  - Remove htdocs which were accidentally added into dist
+
+0.49  Jun 23, 2011
+
+* Fixes
+  - Go back to generating version numbers for all sub-modules again
+
+0.48  Jun 15, 2011
+
+* Fixes
+  - Disregard default expires_at and expires_in if either are provided - RT #67970 (spjw)
+
+0.47  Apr 28, 2011
+
+* Improvements
+  - Allow compute() to take get options - expire_if and busy_lock
+  - Add atomic operations: add, append, replace (alpha)
+
+0.46  Apr 22, 2011
+
+* Other
+  - Only generate version numbers for .pm files with documentation, to reduce inter-version churn
+
+0.45  Apr 18, 2011
+
+* Improvements
+  - Add expires_on_backend parameter
+
+0.44  Mar 17, 2011
+
+* Fixes
+  - Recreate tarball so that it can be read with older tars
+  - Remove more unnecessary packages from CPAN index
+
+0.43  Mar 17, 2011
+
+* Improvements
+  - Add compress_threshold parameter
+
+0.42  Mar 3, 2011
+
+* Fixes
+  - Put parens around qw in various places to fix for perl 5.13+
+
+* Improvements
+  - Improve accuracy of benchmarks (nothingmuch)
+
+0.41  Mar 1, 2011
+
+* Improvements
+  - Add RawMemory driver, a faster version of Memory that does not serialize/deserialize
+    values
+  - Add etc/bench/bench.pl for benchmarking CHI and non-CHI caches
+  - Publish current benchmarking results in CHI::Benchmarks
+
+* Testing
+  - Stop using test counts (http://stackoverflow.com/questions/690342/)
+
+0.40  Feb 27, 2011
+
+* Improvements
+  - Reverse order of 2nd and 3rd arguments in compute() (old order will still work)
+  - Throw error if arguments passed to clear() 
+
+* Fixes
+  - Fix CHI::Driver::Metacache::meta_cache to build lazily, eliminating intermittent bug
+    and making compatible with Moose 1.99+ (autarch)
+  - Check if get_object defined in purge - RT #63699 (forrest)
+
+0.39  Feb 6, 2011
+
+* Fixes
+  - Put missing module names back in POD
+
+0.38  Feb 6, 2011
+
+* Fixes
+  - Move some smoke tests back to author tests
+
+0.37  Feb 6, 2011
+
+* Fixes
+  - Eliminate Module::Load::Conditional which was causing problems with version.pm - RT
+    #64900 - reported by dgl@dgl.cx
+
+* Implementation
+  - Switch to Dist::Zilla
+
+0.36  Jun 9, 2010
+
+* Fixes
+  - Only encode keys with wide characters
+  - In escape_for_filename, replace \w with A-Za-z0-9_ to avoid The Unicode Bug
+
+0.35  Jun 4, 2010
+
+* Improvements
+  - Automatically serialize keys that are references
+  - Automatically digest long keys, based on max_key_length and key_digester
+  - Handle utf-8 characters in keys and values
+
+* Fixes
+  - Add Test::Builder and Test::Log::Dispatch to dependencies - RT #57091 - reported by Doug Bell
+  - Add line about installing Cache::FastMmap in CHI::Driver::FastMmap - RT #55920 - reported by RSAVAGE
+
+0.34  Feb 9, 2010
+
+* Improvements
+  - Add statistics recording with CHI::Stats
+  - Add max_build_depth to ward off accidental infinite subcache recursion
+
+* Fixes
+  - Change unique_id so as not to seg fault with threads - RT #53591 - reported by Marc Tobias
+  - Eliminate existence check in File remove(), as it is prone to race condition - RT #50104 - reported by Aran Deltac
+  - In File clear(), rename directory before removing to reduce chance of conflict
+
+0.33  Nov 29, 2009
+
+* Fixes
+  - In CacheContainer, ensure that fetch returns scalar
+  - Include Role::IsSubcache attributes in CHI::Driver->non_common_constructor_params
+
+0.32  Nov 24, 2009
+
+* Fixes
+  - get_keys not supported in File driver when key_digest is used, for now
+  - Replace deprecated Class::MOP get_attribute_map with get_attribute_list - RT #52019 -
+    reported by Todd Caine
+  - Include Role::HasSubcaches and Role::IsSizeAware attributes in
+    CHI::Driver->non_common_constructor_params
+
+0.31  Nov 17, 2009
+
+* Improvements
+  - ** Rename file_digest to key_digest, so it can be made a generic driver feature later on
+  - Allow key_digest to be passed as a string, hash or object
+  - Create Digest object once per CHI object, rather than once per read/write
+
+0.30  Nov 5, 2009
+
+* Fixes
+  - Fix bug with size-aware L1 cache not keeping track of size
+  - Fix description of never-expiring set in logs and errors
+
+* Improvements
+  - Add file_digest and file_extension options to File driver
+  - Improve l1 cache performance by reusing packed CacheObject data
+  - Document options that cannot be overriden by subcache, and warn if user tries to override these
+
+0.29  Oct 14, 2009
+
+* Fixes
+  - Make sure Memory cache is cleared when multiple objects use the same datastore, or when datastore hash itself is emptied
+  - Fix synopsis of Memory cache in main docs - RT #50360 - reported by zloyrusskiy
+  - Fix get_namespaces when File root dir doesn't exist
+  - Fix tests to use label for log matching
+
+0.28  Aug 31, 2009
+
+* Fixes
+  - Add Test::Exception, Log::Any::Adapter::Dispatch to dependencies
+  - Remove use of no-longer-existent CHI::Test::Logger from test modules - RT #49252
+  - Fix get_multi_* when $@ already contains an error - RT #48988 - reported by Sergey Panteleev
+  - Fix docs to mention root_dir - RT #43409 - reported by anirvan
+
+* Implementation
+  - Remove private debugging methods dp and dps
+
+0.27  Aug 27, 2009
+
+** Incompatible Changes **
+  - ** Switch to using Log::Any for controlling logging, instead of custom CHI->logger()
+
+* Implementation
+  - Move internal tests to xt/release, as per standard
+
+0.26  Jul 14, 2009
+
+* Fixes
+  - Eliminate is_subcache redefinition of attribute (causes CHI to fail to load under latest Moose)
+
+* Implementation
+  - Make sure that tests are only using keys from a particular list; this is necessary for
+    memcached tests, which has to simulate get_keys by checking for all the possible ones
+
+0.25  Jun 2, 2009
+
+* Improvements
+  - Non-Moose drivers should be fully functional again (reversing the change in 0.23)
+
+* Implementation
+  - Moved role composition to CHI.pm factory (ala MooseX::Traits), so that each role can have its
+    own attributes and initialization
+  - Moved all Moose types to CHI::Types
+  - Replaced require_dynamic with Class::MOP::load_class
+
+0.241  May 26, 2009
+
+* Fixes
+  - Actually add Moose to requirements, in place of Any::Moose
+
+0.24  May 26, 2009
+
+* Fixes
+  - Reverted test scripts to previous format, as they were causing problems with other
+    driver distributions
+
+0.23  May 24, 2009
+
+** Incompatible Changes **
+  - ** Drivers must now be Moose based to be fully functional, since we use Moose roles to
+    implement various features. For backward compatibility, non-Moose drivers will still work
+    at a basic level (for now).
+
+* Improvements
+  - Added concepts of size awareness, maximum size, and discard policies for any driver.
+    See "Size Awareness" section of docs.
+
+* Implementation
+  - Added a metacache, which resides in a separate _CHI_META namespace and stores meta-information
+    about caches. Initially for tracking size for size-aware caches.
+  - Added dependency on Carp::Assert
+  - Eliminate boilerplate in test scripts
+
+* Fixes
+  - Croak if specify both 'global' and 'datastore' for memory driver
+
+0.22  May 13, 2009
+
+* Implementation
+  - Switch from Mouse back to Moose - six week experiment over. Once we started using roles,
+    Mouse became increasingly unattractive and the Moose community encouraged us not to go
+    further with it. We can hope (or help ensure) that Moose installation and startup time improves.
+  - Moved subcache code to a separate role, CHI::Driver::Role::HasSubcaches. API remains
+    the same -- activated via l1_cache and mirror_cache options to CHI->new.
+
+0.21  May 5, 2009
+
+** Incompatible Changes **
+  - ** Deprecate get_multi_array - silly to have this along with get_multi_arrayref
+  - ** CHI::Driver::Memory will no longer use a global datastore by default - it was too easy
+    to accidentally share the same datstore in unrelated code. Either a datastore or the
+    'global' flag must be specified. Right now the absence of either will issue a warning,
+    eventually this may become an error.
+
+* Improvements
+  - To implement get_multi_*, drivers now define the simpler fetch_multi_hashref
+  - Made get_multi_* work optimally with l1 caches
+
+* Fixes
+  - Eliminated t/Multilevel.t which was causing test failures on new installations
+  - Fixed get_namespaces for File driver to ignore non-standard dir names
+
+* Docs
+  - Tidied pod with Pod::Tidy
+  - Added Features section and mention of Chris Leishman's Cache to docs
+
+0.2  Apr 25, 2009
+
+** Incompatibile Changes **
+  - ** Removed CHI::Driver::Multilevel, replaced with subcaches
+  - ** ref($driver) is no longer simply the driver class, it is an auto-generated wrapper
+    class like CHI::Wrapped::CHI::Driver::Memory - this is so that certain driver methods
+    can be automatically wrapped
+
+* Improvements
+  - Added a more practical and intuitive multi-level cache mechanism: subcaches. l1_cache
+    and mirror_cache are the first two supported subcaches
+  - Added customizable cache label, used in logs and error messages
+
+0.102  Mar 6, 2009
+
+* Fixes
+  - Skip get_namespaces in tests with drivers that don't support it
+  - Eliminate unconditional use of Data::Serializer in tests; improve error when Data::Serializer not installed
+
+0.101  Mar 2, 2009
+
+* Fixes
+  - Don't use Data::Serializer up front
+
+0.10  Feb 28, 2009
+
+- ** Deprecate expire_if method - this can easily be done manually, and it now differs
+    deceptively from the expire_if option to get()
+- ** Change expire_if option to simply return undef, without actually expiring the item
+- Switch to Mouse instead of Moose, to reduce install dependencies and overhead. Eliminate
+  Moose-isms as needed. Eventually may switch to Any::Moose but want to get comfortable
+  with Mouse first.
+- Eliminate dependencies on Data::Serializer, File::Slurp, and Module::Find
+- Revert Memory driver implementation to more readable and illustrative form
+- Handle value-too-large errors in FastMmap driver
+- When serializer passed as a string, use raw=>1 so as not to hex-encode or insert token
+- Allow serializer to be passed as a hashref
+- Fix bug when specifying serializer with multilevel driver
+
+0.091 Jan 2, 2009
+
+- Ensure that unlink_on_exit=0 is being passed to FastMmap
+- Allow serializer to be passed as a simple string
+- Documentation fixes
+
+0.09  Dec 30, 2008
+
+- Moved source to git
+- Added Null driver
+- Fixed main docs regarding Memcached driver
+- Changed FastMmap driver to pass all unrecognized options onto Cache::FastMmap, to better
+  handle future FastMmap versions
+- Fixed small get_keys bug in File driver
+- Added expires time to set logs
+- Added get_multi_array alongside get_multi_arrayref
+- Added test for get_namespaces
+
+0.081  Sep 24, 2008
+
+- Fix t/Driver/File.pm test so it does not depend on specific OS error message
+
+0.08  Sep 23, 2008
+
+- ** Move CHI::Driver::Memcached to its own distribution
+- Many internal changes to make greater use of Moose (Dave Rolsky).
+- Add serializer option, allowing control over how data is serialized/deserialized
+- The FastMmap driver was not actually making use of the init_file,
+  cache_size, page_size, or num_pages options. Reported by Mike
+  Astle. RT #35819. (Dave Rolsky)
+- Allow suppression of renames in CHI::Driver::File by overriding
+  generate_temporary_filename
+
+0.07  Mar 12, 2008
+
+- Add Date::Parse to build dependencies
+
+0.06  Feb 29, 2008
+
+- Created separate manual for developing drivers (CHI::Driver::Development)
+- Made standard CHI driver tests easily available to external drivers
+- Fixed clear() in Memcached driver - RT #32859 - reported by Justin Ellison
+- Add size to set logs
+
+0.05  Jan 30, 2008
+
+- Switched to Moose
+- Added maximum full path length check to File driver, mainly for MSWin32
+- Added TODO to pod
+
+0.04  Jan 25, 2008
+
+- Default unlink_on_exit to 0 for Cache::FastMmap to conform to the CHI API
+
+0.03  Jan 23, 2008
+
+- ** Eliminated automatic namespace selection based on caller; namespace now defaults to
+  'Default', as in Cache::Cache.
+- Added 5.6.0 requirement
+- Made Memcached test internal-only for now, since test success depends on presence and
+  configuration of an external server
+- Changed README to generate from CHI.pm
+
+0.02  Jan 19, 2008
+
+- Changed Multilevel-Single test to use a temporary root dir
+- Eliminated non-portable file permissions test
+- Concealed use of test package name (Foo::Bar) from PAUSE indexer
+
+0.01  Jan 15, 2008
+
+- Initial version

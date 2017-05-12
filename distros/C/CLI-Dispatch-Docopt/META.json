@@ -1,0 +1,56 @@
+{
+   "abstract" : "CLI dispatcher with affinity for Docopt",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CLI-Dispatch-Docopt",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0.88",
+            "Test::Output" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Docopt" : "0.03",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "CLI::Dispatch::Docopt" : {
+         "file" : "lib/CLI/Dispatch/Docopt.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/CLI-Dispatch-Docopt/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/CLI-Dispatch-Docopt"
+      }
+   },
+   "version" : "0.01"
+}

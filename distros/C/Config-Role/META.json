@@ -1,0 +1,57 @@
+{
+   "abstract" : "Moose config attribute loaded from file in home dir",
+   "author" : [
+      "Robin Smidsr\u00c3\u00b8d <robin@smidsrod.no>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Role",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : 0,
+            "File::HomeDir" : 0,
+            "Moose::Role" : 0,
+            "MooseX::Types" : 0,
+            "MooseX::Types::Moose" : 0,
+            "Path::Class::Dir" : 0,
+            "Path::Class::File" : 0,
+            "namespace::autoclean" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Tiny" : 0,
+            "English" : 0,
+            "File::Spec" : 0,
+            "Moose" : 0,
+            "Test::More" : 0,
+            "rlib" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robinsmidsrod/Config-Role.git",
+         "web" : "http://github.com/robinsmidsrod/Config-Role"
+      }
+   },
+   "version" : "0.1.1"
+}
+

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+LICENSE
+lib/Calendar/Saka.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/calendar-saka.t
+t/saka.xml
+t/fake-saka.xml
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

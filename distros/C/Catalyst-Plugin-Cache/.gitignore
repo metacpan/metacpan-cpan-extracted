@@ -1,0 +1,10 @@
+MANIFEST.bak
+Catalyst-Plugin-Cache*
+MANIFEST
+META.yml
+MYMETA.json
+MYMETA.yml
+Makefile
+blib/
+inc/
+pm_to_blib

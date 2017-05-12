@@ -1,0 +1,12 @@
+# $Id: .htaccess 15 2010-03-09 18:55:50Z jo $
+
+<Files "cindy.htm">
+PerlModule Cindy::Apache2
+SetHandler  perl-script
+PerlHandler Cindy::Apache2
+
+SetEnv  CINDY_DOC_URI   /cindy/cindy.html
+SetEnv  CINDY_DATA_URI  /cindy/cindy.xml
+SetEnv  CINDY_CIS_URI   /cindy/cindy.cjs
+</Files>
+

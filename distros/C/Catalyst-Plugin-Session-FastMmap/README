@@ -1,0 +1,31 @@
+NAME
+    Catalyst::Plugin::Session::FastMmap - FastMmap sessions for Catalyst
+
+SYNOPSIS
+        use Catalyst 'Session::FastMmap';
+
+        $c->session->{foo} = 'bar';
+        print $c->sessionid;
+
+DESCRIPTION
+  EXTENDED METHODS
+   finalize
+   prepare_action
+   setup
+  METHODS
+   session
+   uri
+    Extends an uri with session id if needed.
+
+        my $uri = $c->uri('http://localhost/foo');
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

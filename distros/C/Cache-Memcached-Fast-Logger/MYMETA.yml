@@ -1,0 +1,27 @@
+---
+abstract: 'Simple logging (in/out) to Memcached'
+author:
+  - 'Perlover <perlover@perlover.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-Memcached-Fast-Logger
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Cache::Memcached::Fast: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Perlover/Cache-Memcached-Fast-Logger.git
+version: 0.15

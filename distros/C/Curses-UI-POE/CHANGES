@@ -1,0 +1,119 @@
+------------------------------------------------------------------------
+r206 | scott | 2010-01-21 11:41:36 -0800 (Thu, 21 Jan 2010) | 1 line
+
+Fixed POD
+------------------------------------------------------------------------
+r131 | scott | 2009-07-08 17:10:15 -0700 (Wed, 08 Jul 2009) | 1 line
+
+Bumped to version 0.035
+------------------------------------------------------------------------
+r130 | scott | 2009-07-08 17:09:09 -0700 (Wed, 08 Jul 2009) | 11 lines
+
+Fix for the lost input issue.
+
+ * Simple bug in the use of while (been a little while since I've written any
+   code in perl).
+ * Cleaned up code.
+ * Replaced initialization-gpm hack with a call to flushkeys.
+
+For this to actually "fix" the issue, it requires that patch
+c247123f9ca7ef3d69442027d14f10b55823bea4 is applied to Curses::UI.
+
+
+------------------------------------------------------------------------
+r128 | scott | 2009-07-08 10:31:44 -0700 (Wed, 08 Jul 2009) | 1 line
+
+Added some commentary
+------------------------------------------------------------------------
+r127 | scott | 2009-07-08 10:30:10 -0700 (Wed, 08 Jul 2009) | 1 line
+
+Applied patch from RT for gpm-trash issue
+------------------------------------------------------------------------
+r126 | scott | 2009-07-08 10:28:03 -0700 (Wed, 08 Jul 2009) | 12 lines
+
+Various fixes and hacks...
+
+ * Fixes for all RTs:
+   * 41785: Now defaults package_states to an array and passes it in (wasn't
+     supporting it previously and was using it as a hashref).
+   * 19681, 25021: Now reads all extra keys in each loop by using a while-loop
+     run the feedkeyes portion of the keyin event handler.  This is a hack, but
+     it should do the trick.
+
+Bumped version to 0.033
+
+
+------------------------------------------------------------------------
+r96 | scott | 2009-04-17 20:18:19 -0700 (Fri, 17 Apr 2009) | 1 line
+
+Restructured Repository
+------------------------------------------------------------------------
+r69 | scott | 2008-05-06 14:20:49 -0700 (Tue, 06 May 2008) | 4 lines
+
+Fixed about menu and nicklist issues with quit
+ * quit wasn't removing users from the nicklist, fixed
+ * "About editor" label changed to "about"
+
+------------------------------------------------------------------------
+r68 | scott | 2008-05-06 12:49:23 -0700 (Tue, 06 May 2008) | 9 lines
+
+Various bug fixes for CuIRC...
+
+Client is almost usable now.  Fixes include:
+ * TextEditor input widget stays in focus at all times
+ * Page up and page down actually scroll the main screen (although the scroll
+   gets reset on incoming message).
+ * /msg no longer crashes client (same with /kick).  
+
+
+------------------------------------------------------------------------
+r67 | scott | 2008-05-04 15:30:03 -0700 (Sun, 04 May 2008) | 1 line
+
+Fixed IRC client example
+------------------------------------------------------------------------
+r66 | scott | 2008-05-04 11:27:23 -0700 (Sun, 04 May 2008) | 1 line
+
+Removed language tests -- dubious
+------------------------------------------------------------------------
+r65 | scott | 2008-05-03 23:10:55 -0700 (Sat, 03 May 2008) | 9 lines
+
+Finally, after hours and hours of futzing with it, I think I got
+Curses::UI::POE reasonably refactored.
+
+There is a bunch of commented out code that looks like it can be jettisoned,
+and I can't seem to find out the purpose of this "callbackmodalfocus" override,
+it seems nothing of this nature exists in Curses::UI.
+
+Fixed the tests, whoot.
+
+------------------------------------------------------------------------
+r64 | scott | 2008-05-03 17:32:00 -0700 (Sat, 03 May 2008) | 21 lines
+
+''Updated Tests and Major Refactor''
+This has been a major refactoring of Curses::UI::POE to make it a lot more
+palpable and easier to understand.  I've fallen out of love with programming in
+a big hash-ref.
+
+Fixes:
+ * Migrated to a object-states and a more OO approach.
+ * Cleaned up the handling of modality so as to not be so dependent upon odd
+   hash references, and the like.
+ * Extended session interaction to allow Curses::UI::POE constructor to take
+   more POE::Session options, including:
+    * package_states
+    * object_states
+    * options
+    * args
+ * Updated tests so they're compatible with latest Curses::UI version...should
+   probably remove language tests.
+ * Updated session test so it does full regression to ensure session
+   integration works.
+ * Bumped version to 0.03
+
+------------------------------------------------------------------------
+r13 | scottmc | 2006-04-04 23:52:04 -0700 (Tue, 04 Apr 2006) | 3 lines
+
+''Added old perl modules''
+'''Starting to think maybe I should structure the new repository differently'''
+
+------------------------------------------------------------------------

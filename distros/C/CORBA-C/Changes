@@ -1,0 +1,63 @@
+Revision history for Perl extension CORBA::C.
+
+2.62  Wed Jul 16 18:30:00 2008
+	- add Vi & Emacs macros
+
+2.61  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+
+2.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+2.46  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+2.45  Tue Oct 10 18:30:00 2006
+	- improve typedef in parameter
+
+2.44  Mon Nov 28 22:30:00 2005
+	- add repos_id for RegularInterface
+	- add skelCppVisitor compatible with C mapping
+
+2.43  Tue Jul 19 18:30:00 2005
+	- new enum mapping
+	- add uidVisitor
+
+2.42  Sat May 21 12:30:00 2005
+	- add skel.pm
+
+2.41  Mon Jun  7 08:30:00 2004
+	- better support for 'import'
+
+2.40  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+
+2.21  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+
+2.20  Thu Feb 19 18:30:00 2004
+	- compatible with CORBA::IDL 2.20
+	- idl2c.pl : add option -h (display help)
+	- idl2c.pl : add option -v (display version)
+
+2.00  Mon Jan 13 12:30:00 2003
+	- support CORBA IDL 3.0
+	- refactoring
+
+1.04  Tue Sep 17 08:30:00 2002
+
+1.03  Tue May 21 09:30:00 2002
+	- bug when reopen a module
+
+1.02  Tue May 14 08:30:00 2002
+	- some improvements (future C++) ...
+
+1.01  Sun Mar 04 12:30:00 2002
+
+1.0   Fri Dec 14 15:30:00 2001
+	- first release
+
+0.01  Mon Nov 19 11:34:18 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,354 @@
+X-RP-SendingIP: 72.9.105.148
+X-RP-SENDER-EPOCH: 1397336837000
+X-RP-DATE-HEADER-EPOCH: 1397336800000
+Received: from forward1-smtp.messagingengine.com (forward1-smtp.messagingengine.com [66.111.4.223])
+	by mxa.senderscore.net (Postfix) with ESMTP id 440FE140006
+	for <fastmailcomp@senderscore.net>; Tue, 15 Apr 2014 15:55:48 -0600 (MDT)
+Received: from imap22.nyi.mail.srv.osa (imap22.nyi.mail.srv.osa [10.202.2.72])
+	by gateway1.nyi.mail.srv.osa (Postfix) with ESMTP id 0150120E8C;
+	Tue, 15 Apr 2014 17:55:48 -0400 (EDT)
+Received: by imap22.nyi.mail.srv.osa (Postfix, from userid 99)
+	id F2F3D88000E; Tue, 15 Apr 2014 17:55:47 -0400 (EDT)
+Received: from compute3.internal (compute3.nyi.mail.srv.osa [10.202.2.43])
+	 by sloti22t13 (Cyrus git2.5+0-git-fastmail-9767) with LMTPA;
+	 Sat, 12 Apr 2014 17:07:18 -0400
+Received: from mx3 ([10.202.2.202])
+  by compute3.internal (LMTPProxy); Sat, 12 Apr 2014 17:07:18 -0400
+Received: from e2trrjf.snavo.snavo.snavo.me.uk (unknown [72.9.105.148])
+	by mx3.messagingengine.com (Postfix) with ESMTP id E0BB2C0068
+	for <vrwc1860csa@operamail.com>; Sat, 12 Apr 2014 17:07:17 -0400 (EDT)
+Received: by 016e524a.e2trrjf.snavo.snavo.snavo.me.uk
+	(amavisd-new, port 6731) with ESMTP id 01KHC6E52HCV4A;
+	for <vrwc1860csa@operamail.com>; Sat, 12 Apr 2014 14:06:40 -0700
+Message-ID: <3731882400351137311071034315757@e2trrjf.snavo.snavo.snavo.me.uk>
+To: vrwc1860csa@operamail.com
+Date: Sat, 12 Apr 2014 14:06:40 -0700
+From: "PMP Course" <PMPCourse@snavo.me.uk>
+Content-Type: text/html; charset=us-ascii
+Content-Language: en-us
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Learn how: To manage projects...like a Pro
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+
+
+<html>
+
+
+
+<head>
+
+
+
+<style type="text/css">
+
+
+
+#tab{width: 684px; background-color: #663300;}
+
+
+
+#tap{margin: 16px 0; font: 9px Trebuchet MS;}
+
+
+
+#subj{font: 21px  Tahoma; color: #33ff33 ; margin: auto auto 16px auto;}
+
+
+
+#imag{background-color:#663300; padding-top: 17px;}
+
+
+
+#imag1{max-width: 684px; background-color: #663300; padding: 16px; border: 3px double red;}
+
+
+
+#content{background-color: #FFFFFF; color: #FFFFFF; font-size: xx-small;}
+
+
+
+</style>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<center>
+
+
+
+<table id="tab">
+
+
+
+<tr>
+
+
+
+<td align="center">
+
+
+
+<p id="tap">
+
+
+
+Cannot view this newsletter mailing because of images being off? <a href="http://www.snavo.me.uk/l/lt1VULIL3731QW103BO/107AV431CGWNJ5757QGVTBS10BTV24003511ENMGM1208576404"> Please go right here to fix.</a>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+</p>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+<tr>
+
+
+
+<td align="center" style="padding: 10px;">
+
+
+
+<a target="" href="http://www.snavo.me.uk/l/lt1BEJON3731UF103KY/107VM431WXTWO5757DPUBMY10VNS24003511SRGFB1208576404" id="subj"> Learn how: To manage projects...like a Pro </a>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<tr>
+
+
+
+<td align="center" id="imag" >
+
+
+
+<a href="http://www.snavo.me.uk/l/lt1UIFEW3731SC103CG/107DX431SAXOY5757ORPMVC10LRP24003511GKINR1208576404"><img src="http://www.snavo.me.uk/im/LKAQP3731WM103TBUWBN/107Y431ADYQW5757ODS10QOLIV24003511XSLQE1208576404/img010310788.jpg" id="imag1" ></a>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<tr>
+
+
+
+<td align="center">
+
+
+
+<a href="http://www.snavo.me.uk/l/lc4VQXNQ3731KH103RF/107ET431UEVAD5757MATQSK10HGU24003511FFOQV1208576404"><img src="http://www.snavo.me.uk/im/UPOSD3731FD103LXKPTI/107V431PIYEK5757SUE10FFMDK24003511TRCPM1208576404/img110310788.jpg"/></a>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+<table style="width: 684px; background-color: #FFFFFF; border: 5px;">
+
+
+
+<tr>
+
+
+
+<td>
+
+
+
+<span id="content">
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<p align="left">effects of similar improvements in similar private undertakings at home and abroad. In such concerns it is still possible to ascertain the advantages 
+of reorganization because they<U>are surrounded by a society which is still based upon private ownership in the means of production and</U>the use of 
+hi. it is still possible for them to keep books and make calculations which for similar concerns in a purely socialist environment would be </p>
+<BR /><BR />
+<p align="center" style="font: 15px;">entirely out of the question. Without<u>calculation, economic activity is impossible. Since under Socialism</u>economic calculation is impossible, under Socialism there can be no 
+economic activity in our sense of the word. In small and insignificant things rational action might still persist. But, for the most part, it 
+would no longer be possible to speak of rational production. In the absence of criteria of rationality, production could not be consciously economical. </p>
+<BR /><BR /><span style="font-family: Tahoma, sans-serif, Helvetica, Arial;"></span>
+<p align="center" style="font: 15px;">[78] For some time possibly the accumulated tradition of thousands of years of economic hidom would preserve the art of economic administration from 
+complete disintegration. Men would preserve the old processes, not because they were rational, but because they were sanctified by tradition. In the 
+meantime, however, changing conditions would make them irrational.<u>They would become uneconomical as the result of changes brought about by</u>the 
+general decline of economic thought. It is true that production would no longer be “anarchical.” The command of a supreme authority would govern the 
+hi of supply. instead of the economy of “anarchical” production the senseless order of an irrational machine would be supreme. The wheels would </p>
+<BR />
+<p align="right" style="font: 9px;">go round, but to no effect. Let us try to imagine the position of a socialist community. There will be hundreds and thousands of establishments in which work is going on. A 
+minority of these will produce goods ready for use. The majority will produce capital goods and semi-manufactures. All these establishments will 
+be closely connected. each commodity produced will phi through a whole series of such establishments before it is ready for consumption. Yet in 
+the incessant press of all these processes the economic administration will have no real sense of direction. It will have no means of ascertaining 
+whether a given piece of work is really necessary, whether<b>labour and material</b>are not being wasted in completing it. How would it discover which 
+of two processes was the more satisfactory? At best, it could compare the quantity of ultimate products. But only rarely could it compare the 
+expenditure incurred in their production. It would know exactly—or it would imagine it knew—what it wanted to produce. It ought therefore to set about 
+obtaining the desired results with the smallest possible<I>expenditure. But to do this it would have to be able to make calculations.</I>And such 
+calculations<i>must be calculations of value. They could not be merely “technical,” they could not be calculations of</i>the objective use-value of </p>
+<BR /><BR />
+<p align="center" style="font: 16px;">goods and services; this is so obvious that it needs no further demonstration. Under a system based upon private ownership in the means of production, the 
+scale of values is the outcome of the actions of every independent member of society. Everyone plays a two-fold part in its establishment first as a 
+consumer, secondly<b>as producer. As consumer, he establishes the valuation of goods ready for</b>consumption. As producer, he guides production-goods 
+into those uses in which they yield the highest product. In this way all goods of higher orders also are graded in the way appropriate to them under .</p>
+
+
+
+
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+<br>
+
+
+
+</span>
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+</table>
+
+
+
+<tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr>
+
+
+
+</table>
+
+
+
+</center>
+
+
+
+<center><a href="http://www.snavo.me.uk/unsRHI3731WM103NIM/107BBI431JW5757AT10YFFTCL24003511CHAFS1208576404"><img src="http://www.snavo.me.uk/im/UWWKL3731QT103VNJKYV/107L431CFUYH5757QAM10XUPJY24003511YKERF1208576404/img210310788.jpg"/></a></center>
+</body>
+
+
+
+</html>
+

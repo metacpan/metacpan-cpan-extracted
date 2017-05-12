@@ -1,0 +1,13 @@
+115a116,119
+>  CC7_CacheBDBStorable => [ 'complex', 
+> 			      cache_root => "/tmp",
+> 			       namespace => "testcache_cache_bdb",
+> 			    ],
+723a728,734
+> package CC6_CacheBDBStorable;
+> use Cache::BDB;
+> use base 'Cache::BDB';
+> 
+> sub name { return "Cache::BDB Storable"; }
+> 1;
+> 

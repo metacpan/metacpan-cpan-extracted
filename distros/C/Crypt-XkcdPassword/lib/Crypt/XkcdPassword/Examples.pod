@@ -1,0 +1,120 @@
+=head1 NAME
+
+Crypt::XkcdPassword::Examples - practical uses of Crypt::XkcdPassword.
+
+=head1 FILTERING PROFANITY
+
+What is or is not offensive varies between contexts. L<Regexp::Common>
+includes a regular expression which matches many words commonly thought
+to be offensive, and may help you here.
+
+ use feature 'say';
+ use Crypt::XkcdPassword;
+ use Regexp::Common;
+ 
+ my $filter = sub { not /$RE{profanity}/ };
+ 
+ say Crypt::XkcdPassword->make_password(4, $filter);
+
+Bear in mind that even passphrases made up of individually inoffensive
+words could end up arranged in offensive ways. For example the five word
+pass phrase "i did you from behind" could be randomly generated (each of
+those five words are in the English dictionary).
+
+=head1 FILTERING NON-WORDS
+
+The defaut English dictionary supplied with Crypt::XkcdPassword is based
+on the most commonly used words in film scripts and television shows. It
+contains various colloquialisms, proper nouns and other terms that may be
+undesirable. 
+
+A solution is to filter words through a spell checker.
+
+ use feature 'say';
+ use Crypt::XkcdPassword;
+ use Text::Aspell;
+ 
+ my $aspell = Text::Aspell->new;
+ my $filter = sub { $aspell->check($_) };
+ 
+ say Crypt::XkcdPassword->make_password(4, $filter);
+
+=head2 Use EN::Roget
+
+An alternative English dictionary is provided which filters the standard
+English dictionary through Roget's thesaurus.
+
+ my $gen = Crypt::XkcdPassword->new(words => 'EN::Roget');
+
+=head1 COMBINING BOTH
+
+The following filter combines both of the above, and also filters out
+very short words:
+
+ use feature qw/say state/;
+ use Crypt::XkcdPassword;
+ use Regexp::Common;
+ use Text::Aspell;
+ 
+ my $filter = sub
+ {
+    state $aspell = Text::Aspell->new;
+    
+    /.{3}/
+    and $aspell->check($_)
+    and not /$RE{profanity}/
+ };
+ 
+ say Crypt::XkcdPassword->make_password(4, $filter);
+
+=head2 Why doesn't Crypt::XkcdPassword do this by default?
+
+It would add extra dependencies; not everybody would want it; but if you
+do want it, then it's not exactly a lot of work to do (the examples above
+show it's fairly simple).
+
+=head1 BETTER RANDOM NUMBERS
+
+The following uses Crypt::Random to generate better random numbers. (Note
+that it also includes a filter to ensure all words are at least three
+characters long.)
+
+ use feature 'say';
+ use Crypt::Random;
+ use Crypt::XkcdPassword;
+ 
+ my $rng = sub
+ {
+    Crypt::Random::makerandom(Size => 12, Strength => 1)
+ };
+ 
+ say Crypt::XkcdPassword
+    -> new(rng => $rng)
+    -> make_password(4, qr{...});
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Crypt-XkcdPassword>.
+
+=head1 SEE ALSO
+
+L<Crypt::XkcdPassword>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

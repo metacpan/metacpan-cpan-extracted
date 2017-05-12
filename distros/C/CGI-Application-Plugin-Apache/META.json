@@ -1,0 +1,60 @@
+{
+   "abstract" : "Allow CGI::Application to use Apache::* modules without interference",
+   "author" : [
+      "Michael Peters <mpeters@plusthree.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Plugin-Apache",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Apache::Test" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Cookie" : 0,
+            "Apache::Request" : 0,
+            "Apache::URI" : 0,
+            "CGI::Application" : "3.22",
+            "Exporter" : 0,
+            "HTML::GenerateUtil" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Plugin::Apache" : {
+         "file" : "lib/CGI/Application/Plugin/Apache.pm",
+         "version" : "1.02"
+      },
+      "CGI::Application::Plugin::Apache2::Request" : {
+         "file" : "lib/CGI/Application/Plugin/Apache2/Request.pm",
+         "version" : 0
+      },
+      "CGI::Application::Plugin::Apache::Request" : {
+         "file" : "lib/CGI/Application/Plugin/Apache/Request.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.02"
+}

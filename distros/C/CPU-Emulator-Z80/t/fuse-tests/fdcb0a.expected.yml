@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  61143:
+    - 140
+name: fdcb0a
+registers:
+  AF: 45961
+  AF_: 0
+  BC: 41659
+  BC_: 0
+  DE: 36054
+  DE_: 0
+  HL: 38423
+  HL_: 0
+  I: 0
+  IX: 63814
+  IY: 61174
+  PC: 4
+  R: 2
+  SP: 0

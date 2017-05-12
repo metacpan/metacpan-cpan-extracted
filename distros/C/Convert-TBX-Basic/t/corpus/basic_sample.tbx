@@ -1,0 +1,202 @@
+<?xml version='1.0'?>
+<!--Modified version from the TBX-Basic Package:
+    github.com/byutrg/TBX-Basic-Package-->
+<martif type="TBX-Basic" xml:lang="en-US">
+    <martifHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>TBX-Basic Sample File</title>
+                <note>This document is a sample TBX-Basic document instance showing various types of
+                    terminological entries. The entries in this file are for demonstration purposes
+                    only and do not reflect actual terminology data. Any references to real
+                    companies are fabricated for demonstration purposes only.</note>
+            </titleStmt>
+            <sourceDesc>
+                <p>This is a sample TBX-Basic file from the Translation Research Group (tbxconvert.gevterm.net).
+                Address any enquiries to akmtrg@gmail.com.</p>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <p type="XCSURI">TBXBasicXCSV02.xcs</p>
+        </encodingDesc>
+    </martifHeader>
+    <text>
+        <body>
+            <termEntry id="c5">
+                <langSet xml:lang="en">
+                    <tig>
+                        <term>e-mail</term>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="fr">
+                    <tig>
+                        <term>courriel</term>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="c6">
+                <langSet xml:lang="en">
+                    <tig>
+                        <term>federated database</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <descrip type="context">Users and applications interface with the federated
+                            database managed by the federated server. </descrip>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="fr">
+                    <tig>
+                        <term>base de donnees federee</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <descrip type="context">Une base de donnees federee est une base de donnees
+                            repartie heterogene constituee de donnees federees, et necessite donc
+                            une architecture qui permet la communication entre les differentes
+                            sources de donnees. </descrip>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="c7">
+                <descripGrp>
+                    <descrip type="definition">corrective lenses used in eyeglasses to correct
+                        presbyopia and other disorders of accommodation, characterised by a gradient
+                        of increasing lens power, added to the wearer's correction for the other
+                        refractive errors.</descrip>
+                    <admin type="source">Wikipedia</admin>
+                </descripGrp>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term>progressive lens</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term>progressive addition lens</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="termType">fullForm</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term>PAL</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="termType">acronym</termNote>
+                        <termNote type="administrativeStatus">deprecatedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term>progressive power lens</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                    </tig>
+                    <tig>
+                        <term>graduated lens</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="administrativeStatus">supersededTerm-admn-sts</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="fr">
+                    <tig>
+                        <term>lentille progressive</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="grammaticalGender">feminine</termNote>
+                    </tig>
+                </langSet>
+                <langSet xml:lang="de">
+                    <tig>
+                        <term>Gleitsichtglas</term>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="grammaticalGender">masculine</termNote>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="c1">
+                <descrip type="subjectField">manufacturing</descrip>
+                <descripGrp>
+                    <descrip type="definition">This is a sample definition at the entry level.</descrip>
+                    <admin type="source">Terminology SIG</admin>
+                </descripGrp>
+                <transacGrp>
+                    <transac type="transactionType">origination</transac>
+                    <transacNote target="US5001" type="responsibility">Jane</transacNote>
+                    <date>2007-07-22</date>
+                </transacGrp>
+                <transacGrp>
+                    <transac type="transactionType">modification</transac>
+                    <transacNote target="US5002" type="responsibility">John</transacNote>
+                    <date>2007-07-23</date>
+                </transacGrp>
+                <note>This is a sample entry with some data categories at the entry level. </note>
+                <ref target="c2" type="crossReference">unscheduled operation</ref>
+                <xref target="wikipedia.org" type="externalCrossReference">Wikipedia web site</xref>
+                <xref target="http://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg" type="xGraphic">Wikipedia logo</xref>
+                <langSet xml:lang="en">
+                    <tig>
+                        <term>scheduled operation</term>
+                        <termNote type="partOfSpeech">verb</termNote>
+                        <termNote type="termType">fullForm</termNote>
+                        <termNote type="grammaticalGender">masculine</termNote>
+                        <termNote type="administrativeStatus">preferredTerm-admn-sts</termNote>
+                        <termNote type="geographicalUsage">Canada</termNote>
+                        <termNote type="termLocation">menuItem</termNote>
+                        <descripGrp>
+                            <descrip type="context">One hour is required between scheduled operations.</descrip>
+                            <admin type="source">Tivoli Storage Manager Administrator's Guide</admin>
+                        </descripGrp>
+                        <admin type="customerSubset">IBM</admin>
+                        <admin type="source">IBM</admin>
+                        <admin type="projectSubset">Tivoli Storage Manager</admin>
+                    </tig>
+                </langSet>
+            </termEntry>
+            <termEntry id="c2">
+                <descrip type="subjectField">manufacturing</descrip>
+                <langSet xml:lang="en">
+                    <descrip type="definition">This is a sample definition at the language level.
+                        This one has no source information required therefore it is not embedded in
+                        a descripGrp.</descrip>
+                    <tig>
+                        <term>unscheduled operation</term>
+                        <termNote type="termType">fullForm</termNote>
+                        <termNote type="grammaticalGender">masculine</termNote>
+                        <termNote type="administrativeStatus">admittedTerm-admn-sts</termNote>
+                        <termNote type="geographicalUsage">en-US</termNote>
+                        <termNote type="partOfSpeech">noun</termNote>
+                        <termNote type="termLocation">radioButton</termNote>
+                        <descrip type="context">Unscheduled operations should be recorded in a log.</descrip>
+                        <admin type="customerSubset">SAX Manufacturing</admin>
+                        <admin type="source">Manufacturing Process Manual V2</admin>
+                        <admin type="projectSubset">Service department</admin>
+                        <admin type="customerSubset">SAX Manufacturing</admin>
+                        <admin type="source">Manufacturing Process Manual V2</admin>
+                        <admin type="projectSubset">Service department</admin>
+                        <transacGrp>
+                            <transac type="transactionType">origination</transac>
+                            <transacNote target="US5001" type="responsibility">Jane</transacNote>
+                            <date>2007-07-22</date>
+                        </transacGrp>
+                        <transacGrp>
+                            <transac type="transactionType">modification</transac>
+                            <transacNote target="US5002" type="responsibility">John</transacNote>
+                            <date>2007-07-23</date>
+                        </transacGrp>
+                        <note>This is a sample entry with some data categories at the term or
+                            language level</note>
+                        <ref target="c1" type="crossReference">scheduled operation</ref>
+                        <xref target="wikipedia.org" type="externalCrossReference">Wikipedia web site</xref>
+                    </tig>
+                </langSet>
+            </termEntry>
+        </body>
+        <back>
+            <refObjectList type="respPerson">
+                <refObject id="US5001">
+                    <item type="fn">Jane Doe</item>
+                    <item type="email">jane_doe@mymail.com</item>
+                    <item type="role">approver</item>
+                </refObject>
+                <refObject id="US5002">
+                    <item type="fn">John Smith</item>
+                    <item type="email">john_smith@mymail.com</item>
+                    <item type="role">inputter</item>
+                </refObject>
+            </refObjectList>
+        </back>
+    </text>
+</martif>

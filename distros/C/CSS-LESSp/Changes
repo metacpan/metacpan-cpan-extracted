@@ -1,0 +1,35 @@
+Revision history for Perl extension CSS::LESSp
+
+0.86
+		Fix for perl < 5.10
+		add MANIFEST
+
+0.85	01.03.2011/14:31
+		fix calculation result=0 inifinte loop bug [Michael Schout]
+		add support for expressions involving negative numbers [Michael Schout]
+
+0.83    30.12.2010/20:08
+		fixed tests - again
+
+0.82    30.12.2010/16:55
+		fixed tests
+
+0.81
+		28.07.2010/10:00
+		tests files changed to fix the tests		
+		
+0.80	21.07.2010/10:08
+		parts of lessp were rewritten
+		dash-prefix and mixins with variables support
+		a lot of other stuff supported ( see .pm file and search for specs )
+
+0.03	01.10.2009/09:15
+		chanes in pod documentation
+
+0.02	30.09.2009/15:53
+		fixed bug for negative values ( margin: -40px 0px 0px 0px )
+		fixed POD documentation to give correct test
+		fixed use of uninitialized value in string warning - line 74
+
+0.01    29.09.2009/16:33
+		initial public version

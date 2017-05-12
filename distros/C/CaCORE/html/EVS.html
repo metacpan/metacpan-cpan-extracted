@@ -1,0 +1,1369 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::EVS</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#association">Association</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_association">ATTRIBUTES of Association</a></li>
+		<li><a href="#associations_of_association">ASSOCIATIONS of Association</a></li>
+	</ul>
+
+	<li><a href="#atom">Atom</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_atom">ATTRIBUTES of Atom</a></li>
+		<li><a href="#associations_of_atom">ASSOCIATIONS of Atom</a></li>
+	</ul>
+
+	<li><a href="#attributesetdescriptor">AttributeSetDescriptor</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_attributesetdescriptor">ATTRIBUTES of AttributeSetDescriptor</a></li>
+		<li><a href="#associations_of_attributesetdescriptor">ASSOCIATIONS of AttributeSetDescriptor</a></li>
+	</ul>
+
+	<li><a href="#definition">Definition</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_definition">ATTRIBUTES of Definition</a></li>
+		<li><a href="#associations_of_definition">ASSOCIATIONS of Definition</a></li>
+	</ul>
+
+	<li><a href="#desclogicconcept">DescLogicConcept</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_desclogicconcept">ATTRIBUTES of DescLogicConcept</a></li>
+		<li><a href="#associations_of_desclogicconcept">ASSOCIATIONS of DescLogicConcept</a></li>
+	</ul>
+
+	<li><a href="#edgeproperties">EdgeProperties</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_edgeproperties">ATTRIBUTES of EdgeProperties</a></li>
+		<li><a href="#associations_of_edgeproperties">ASSOCIATIONS of EdgeProperties</a></li>
+	</ul>
+
+	<li><a href="#editactiondate">EditActionDate</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_editactiondate">ATTRIBUTES of EditActionDate</a></li>
+		<li><a href="#associations_of_editactiondate">ASSOCIATIONS of EditActionDate</a></li>
+	</ul>
+
+	<li><a href="#hashset">HashSet</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_hashset">ATTRIBUTES of HashSet</a></li>
+		<li><a href="#associations_of_hashset">ASSOCIATIONS of HashSet</a></li>
+	</ul>
+
+	<li><a href="#history">History</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_history">ATTRIBUTES of History</a></li>
+		<li><a href="#associations_of_history">ASSOCIATIONS of History</a></li>
+	</ul>
+
+	<li><a href="#historyrecord">HistoryRecord</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_historyrecord">ATTRIBUTES of HistoryRecord</a></li>
+		<li><a href="#associations_of_historyrecord">ASSOCIATIONS of HistoryRecord</a></li>
+	</ul>
+
+	<li><a href="#metathesaurusconcept">MetaThesaurusConcept</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_metathesaurusconcept">ATTRIBUTES of MetaThesaurusConcept</a></li>
+		<li><a href="#associations_of_metathesaurusconcept">ASSOCIATIONS of MetaThesaurusConcept</a></li>
+	</ul>
+
+	<li><a href="#property">Property</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_property">ATTRIBUTES of Property</a></li>
+		<li><a href="#associations_of_property">ASSOCIATIONS of Property</a></li>
+	</ul>
+
+	<li><a href="#qualifier">Qualifier</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_qualifier">ATTRIBUTES of Qualifier</a></li>
+		<li><a href="#associations_of_qualifier">ASSOCIATIONS of Qualifier</a></li>
+	</ul>
+
+	<li><a href="#role">Role</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_role">ATTRIBUTES of Role</a></li>
+		<li><a href="#associations_of_role">ASSOCIATIONS of Role</a></li>
+	</ul>
+
+	<li><a href="#semantictype">SemanticType</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_semantictype">ATTRIBUTES of SemanticType</a></li>
+		<li><a href="#associations_of_semantictype">ASSOCIATIONS of SemanticType</a></li>
+	</ul>
+
+	<li><a href="#silo">Silo</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_silo">ATTRIBUTES of Silo</a></li>
+		<li><a href="#associations_of_silo">ASSOCIATIONS of Silo</a></li>
+	</ul>
+
+	<li><a href="#source">Source</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_source">ATTRIBUTES of Source</a></li>
+		<li><a href="#associations_of_source">ASSOCIATIONS of Source</a></li>
+	</ul>
+
+	<li><a href="#treenode">TreeNode</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_treenode">ATTRIBUTES of TreeNode</a></li>
+		<li><a href="#associations_of_treenode">ASSOCIATIONS of TreeNode</a></li>
+	</ul>
+
+	<li><a href="#vocabulary">Vocabulary</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_vocabulary">ATTRIBUTES of Vocabulary</a></li>
+		<li><a href="#associations_of_vocabulary">ASSOCIATIONS of Vocabulary</a></li>
+	</ul>
+
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="association">Association</a></h1>
+<p>CaCORE::EVS::Association - Perl extension for Association.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Association is a Perl object representation of the
+CaCORE Association object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_association">ATTRIBUTES of Association</a></h2>
+<p>The following are all the attributes of the Association object and their data types:</p>
+<dl>
+<dt><strong><a name="item_name">name</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_value">value</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_association">ASSOCIATIONS of Association</a></h2>
+<p>The following are all the objects that are associated with the Association:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fqualifier_3a">Instance of <a href="#qualifier">Qualifier</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getQualifierCollection</code> to get a collection of associated Qualifier.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="atom">Atom</a></h1>
+<p>CaCORE::EVS::Atom - Perl extension for Atom.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Atom is a Perl object representation of the
+CaCORE Atom object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_atom">ATTRIBUTES of Atom</a></h2>
+<p>The following are all the attributes of the Atom object and their data types:</p>
+<dl>
+<dt><strong><a name="item_code">code</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_lui">lui</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_origin">origin</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_atom">ASSOCIATIONS of Atom</a></h2>
+<p>The following are all the objects that are associated with the Atom:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fsource_3a">Collection of <a href="#source">Source</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSource</code> to get the associated Source.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="attributesetdescriptor">AttributeSetDescriptor</a></h1>
+<p>CaCORE::EVS::AttributeSetDescriptor - Perl extension for AttributeSetDescriptor.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::AttributeSetDescriptor is a Perl object representation of the
+CaCORE AttributeSetDescriptor object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_attributesetdescriptor">ATTRIBUTES of AttributeSetDescriptor</a></h2>
+<p>The following are all the attributes of the AttributeSetDescriptor object and their data types:</p>
+<dl>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_attributesetdescriptor">ASSOCIATIONS of AttributeSetDescriptor</a></h2>
+<p>The following are all the objects that are associated with the AttributeSetDescriptor:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fproperty_3a">Instance of <a href="#property">Property</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPropertyCollection</code> to get a collection of associated Property.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2frole_3a">Instance of <a href="#role">Role</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getRoleCollection</code> to get a collection of associated Role.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="definition">Definition</a></h1>
+<p>CaCORE::EVS::Definition - Perl extension for Definition.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Definition is a Perl object representation of the
+CaCORE Definition object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_definition">ATTRIBUTES of Definition</a></h2>
+<p>The following are all the attributes of the Definition object and their data types:</p>
+<dl>
+<dt><strong><a name="item_definition">definition</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_definition">ASSOCIATIONS of Definition</a></h2>
+<p>The following are all the objects that are associated with the Definition:</p>
+<dl>
+<dt><strong>Collection of <a href="#source">Source</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSource</code> to get the associated Source.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="desclogicconcept">DescLogicConcept</a></h1>
+<p>CaCORE::EVS::DescLogicConcept - Perl extension for DescLogicConcept.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::DescLogicConcept is a Perl object representation of the
+CaCORE DescLogicConcept object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_desclogicconcept">ATTRIBUTES of DescLogicConcept</a></h2>
+<p>The following are all the attributes of the DescLogicConcept object and their data types:</p>
+<dl>
+<dt><strong>code</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_haschildren">hasChildren</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_hasparents">hasParents</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_isretired">isRetired</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_namespaceid">namespaceId</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_vocabularyname">vocabularyName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_desclogicconcept">ASSOCIATIONS of DescLogicConcept</a></h2>
+<p>The following are all the objects that are associated with the DescLogicConcept:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fassociation_3a">Instance of <a href="#association">Association</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAssociationCollection</code> to get a collection of associated Association.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fedgeproperties_3a">Collection of <a href="#edgeproperties">EdgeProperties</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getEdgeProperties</code> to get the associated EdgeProperties.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2finverseassociation_3a">Instance of <a href="#inverseassociation">InverseAssociation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getInverseAssociationCollection</code> to get a collection of associated InverseAssociation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2finverserole_3a">Instance of <a href="#inverserole">InverseRole</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getInverseRoleCollection</code> to get a collection of associated InverseRole.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#property">Property</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getPropertyCollection</code> to get a collection of associated Property.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#role">Role</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getRoleCollection</code> to get a collection of associated Role.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsemantictypevector_3a">Instance of <a href="#semantictypevector">SemanticTypeVector</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticTypeVectorCollection</code> to get a collection of associated SemanticTypeVector.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftreenode_3a">Collection of <a href="#treenode">TreeNode</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTreeNode</code> to get the associated TreeNode.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvocabulary_3a">Collection of <a href="#vocabulary">Vocabulary</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getVocabulary</code> to get the associated Vocabulary.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="edgeproperties">EdgeProperties</a></h1>
+<p>CaCORE::EVS::EdgeProperties - Perl extension for EdgeProperties.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::EdgeProperties is a Perl object representation of the
+CaCORE EdgeProperties object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_edgeproperties">ATTRIBUTES of EdgeProperties</a></h2>
+<p>The following are all the attributes of the EdgeProperties object and their data types:</p>
+<dl>
+<dt><strong><a name="item_isa">isA</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_traversedown">traverseDown</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_edgeproperties">ASSOCIATIONS of EdgeProperties</a></h2>
+<p>The following are all the objects that are associated with the EdgeProperties:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2flinks_3a">Instance of <a href="#links">Links</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getLinksCollection</code> to get a collection of associated Links.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="editactiondate">EditActionDate</a></h1>
+<p>CaCORE::EVS::EditActionDate - Perl extension for EditActionDate.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::EditActionDate is a Perl object representation of the
+CaCORE EditActionDate object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_editactiondate">ATTRIBUTES of EditActionDate</a></h2>
+<p>The following are all the attributes of the EditActionDate object and their data types:</p>
+<dl>
+<dt><strong><a name="item_action">action</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_editdate">editDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_editactiondate">ASSOCIATIONS of EditActionDate</a></h2>
+<p>The following are all the objects that are associated with the EditActionDate:</p>
+<p>
+</p>
+<hr />
+<h1><a name="hashset">HashSet</a></h1>
+<p>CaCORE::EVS::HashSet - Perl extension for HashSet.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::HashSet is a Perl object representation of the
+CaCORE HashSet object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_hashset">ATTRIBUTES of HashSet</a></h2>
+<p>The following are all the attributes of the HashSet object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_hashset">ASSOCIATIONS of HashSet</a></h2>
+<p>The following are all the objects that are associated with the HashSet:</p>
+<p>
+</p>
+<hr />
+<h1><a name="history">History</a></h1>
+<p>CaCORE::EVS::History - Perl extension for History.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::History is a Perl object representation of the
+CaCORE History object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_history">ATTRIBUTES of History</a></h2>
+<p>The following are all the attributes of the History object and their data types:</p>
+<dl>
+<dt><strong><a name="item_editaction">editAction</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_editactiondate">editActionDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>namespaceId</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_referencecode">referenceCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_history">ASSOCIATIONS of History</a></h2>
+<p>The following are all the objects that are associated with the History:</p>
+<p>
+</p>
+<hr />
+<h1><a name="historyrecord">HistoryRecord</a></h1>
+<p>CaCORE::EVS::HistoryRecord - Perl extension for HistoryRecord.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::HistoryRecord is a Perl object representation of the
+CaCORE HistoryRecord object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_historyrecord">ATTRIBUTES of HistoryRecord</a></h2>
+<p>The following are all the attributes of the HistoryRecord object and their data types:</p>
+<dl>
+<dt><strong><a name="item_desclogicconceptcode">descLogicConceptCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_historyrecord">ASSOCIATIONS of HistoryRecord</a></h2>
+<p>The following are all the objects that are associated with the HistoryRecord:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fhistory_3a">Instance of <a href="#history">History</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistoryCollection</code> to get a collection of associated History.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="metathesaurusconcept">MetaThesaurusConcept</a></h1>
+<p>CaCORE::EVS::MetaThesaurusConcept - Perl extension for MetaThesaurusConcept.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::MetaThesaurusConcept is a Perl object representation of the
+CaCORE MetaThesaurusConcept object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_metathesaurusconcept">ATTRIBUTES of MetaThesaurusConcept</a></h2>
+<p>The following are all the attributes of the MetaThesaurusConcept object and their data types:</p>
+<dl>
+<dt><strong><a name="item_cui">cui</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_metathesaurusconcept">ASSOCIATIONS of MetaThesaurusConcept</a></h2>
+<p>The following are all the objects that are associated with the MetaThesaurusConcept:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fatom_3a">Instance of <a href="#atom">Atom</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAtomCollection</code> to get a collection of associated Atom.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdefinition_3a">Instance of <a href="#definition">Definition</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDefinitionCollection</code> to get a collection of associated Definition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsemantictype_3a">Instance of <a href="#semantictype">SemanticType</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSemanticTypeCollection</code> to get a collection of associated SemanticType.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsource_3a">Instance of <a href="#source">Source</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSourceCollection</code> to get a collection of associated Source.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsynonym_3a">Instance of <a href="#synonym">Synonym</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSynonymCollection</code> to get a collection of associated Synonym.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="property">Property</a></h1>
+<p>CaCORE::EVS::Property - Perl extension for Property.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Property is a Perl object representation of the
+CaCORE Property object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_property">ATTRIBUTES of Property</a></h2>
+<p>The following are all the attributes of the Property object and their data types:</p>
+<dl>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_property">ASSOCIATIONS of Property</a></h2>
+<p>The following are all the objects that are associated with the Property:</p>
+<dl>
+<dt><strong>Instance of <a href="#qualifier">Qualifier</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getQualifierCollection</code> to get a collection of associated Qualifier.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="qualifier">Qualifier</a></h1>
+<p>CaCORE::EVS::Qualifier - Perl extension for Qualifier.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Qualifier is a Perl object representation of the
+CaCORE Qualifier object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_qualifier">ATTRIBUTES of Qualifier</a></h2>
+<p>The following are all the attributes of the Qualifier object and their data types:</p>
+<dl>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_qualifier">ASSOCIATIONS of Qualifier</a></h2>
+<p>The following are all the objects that are associated with the Qualifier:</p>
+<p>
+</p>
+<hr />
+<h1><a name="role">Role</a></h1>
+<p>CaCORE::EVS::Role - Perl extension for Role.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Role is a Perl object representation of the
+CaCORE Role object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_role">ATTRIBUTES of Role</a></h2>
+<p>The following are all the attributes of the Role object and their data types:</p>
+<dl>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_role">ASSOCIATIONS of Role</a></h2>
+<p>The following are all the objects that are associated with the Role:</p>
+<p>
+</p>
+<hr />
+<h1><a name="semantictype">SemanticType</a></h1>
+<p>CaCORE::EVS::SemanticType - Perl extension for SemanticType.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::SemanticType is a Perl object representation of the
+CaCORE SemanticType object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_semantictype">ATTRIBUTES of SemanticType</a></h2>
+<p>The following are all the attributes of the SemanticType object and their data types:</p>
+<dl>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_semantictype">ASSOCIATIONS of SemanticType</a></h2>
+<p>The following are all the objects that are associated with the SemanticType:
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="silo">Silo</a></h1>
+<p>CaCORE::EVS::Silo - Perl extension for Silo.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Silo is a Perl object representation of the
+CaCORE Silo object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_silo">ATTRIBUTES of Silo</a></h2>
+<p>The following are all the attributes of the Silo object and their data types:
+
+</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_silo">ASSOCIATIONS of Silo</a></h2>
+<p>The following are all the objects that are associated with the Silo:
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="source">Source</a></h1>
+<p>CaCORE::EVS::Source - Perl extension for Source.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Source is a Perl object representation of the
+CaCORE Source object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_source">ATTRIBUTES of Source</a></h2>
+<p>The following are all the attributes of the Source object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_abbreviation">abbreviation</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>code</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_description">description</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_source">ASSOCIATIONS of Source</a></h2>
+<p>The following are all the objects that are associated with the Source:
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="treenode">TreeNode</a></h1>
+<p>CaCORE::EVS::TreeNode - Perl extension for TreeNode.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::TreeNode is a Perl object representation of the
+CaCORE TreeNode object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_treenode">ATTRIBUTES of TreeNode</a></h2>
+<p>The following are all the attributes of the TreeNode object and their data types:
+
+</p>
+<dl>
+<dt><strong>isA</strong>
+
+<dd>
+<p>data type: <code>boolean</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>traverseDown</strong>
+
+<dd>
+<p>data type: <code>boolean</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_treenode">ASSOCIATIONS of TreeNode</a></h2>
+<p>The following are all the objects that are associated with the TreeNode:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#links">Links</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLinksCollection</code> to get a collection of associated Links.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="vocabulary">Vocabulary</a></h1>
+<p>CaCORE::EVS::Vocabulary - Perl extension for Vocabulary.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::EVS::Vocabulary is a Perl object representation of the
+CaCORE Vocabulary object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_vocabulary">ATTRIBUTES of Vocabulary</a></h2>
+<p>The following are all the attributes of the Vocabulary object and their data types:
+
+</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>namespaceId</strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_vocabulary">ASSOCIATIONS of Vocabulary</a></h2>
+<p>The following are all the objects that are associated with the Vocabulary:
+
+</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fsecuritytoken_3a">Collection of <a href="#securitytoken">SecurityToken</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSecurityToken</code> to get the associated SecurityToken.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsilo_3a">Instance of <a href="#silo">Silo</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSiloCollection</code> to get a collection of associated Silo.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>The CaCORE Software License, Version 1.0
+
+</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.
+
+</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.
+
+</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.
+
+</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.
+
+</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

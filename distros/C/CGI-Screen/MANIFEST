@@ -1,0 +1,8 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+lib/CGI/Screen.pm
+eg/screen
+README
+t/import.t
+t/method.t

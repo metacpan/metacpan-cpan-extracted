@@ -1,0 +1,64 @@
+Config-YAML-Modern
+
+Modern YAML-based config loader from file or directory.
+
+Config::YAML::Modern created to get dial with yaml-based configuration.
+Its possible to load single file, or all files in one directory (without recursion search).
+
+Data from many files was be merged properly (almost), also filename was be converted
+to top-level hash keys.
+
+Filename like 'file.data.yaml' was be converted to { file => { data => $file_content } }.
+
+Also module provide perfect dive() interface form Data::Diver.
+It may be used like 
+
+		my $file_content = $conf_object->dive(qw/file data/);
+
+Also module have add_x() methods for easily merge one config with another.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	sudo ./Build install
+
+DEVELOPMENT
+  
+    https://github.com/Meettya/Config-YAML-Modern
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::YAML::Modern
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-YAML-Modern
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config-YAML-Modern
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config-YAML-Modern
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-YAML-Modern/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Meettya
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use CGI::Fast;
+use FCGI::ProcManager;
+use <tmpl_var name=prefix>::Dispatcher;
+
+# ----------------------------
+
+my($proc_manager) = FCGI::ProcManager -> new({processes => 2});
+
+$proc_manager -> pm_manage();
+
+my($cgi);
+
+while ($cgi = CGI::Fast -> new() )
+{
+		$proc_manager -> pm_pre_dispatch();
+		<tmpl_var name=prefix>::Dispatcher -> dispatch();
+		$proc_manager -> pm_post_dispatch();
+}

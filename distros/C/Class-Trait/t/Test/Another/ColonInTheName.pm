@@ -1,0 +1,14 @@
+
+package Test::Another::ColonInTheName;
+
+use strict;
+use warnings;
+
+use Class::Trait 'base';
+
+sub isLoaded {
+    return __PACKAGE__;
+}
+
+1;
+

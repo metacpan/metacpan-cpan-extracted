@@ -1,0 +1,37 @@
+---
+abstract: 'Package that exports data in a Breaker format'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Breaker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9'
+  Catmandu::Stat: '0.10'
+  Path::Tiny: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Breaker/issues
+  homepage: https://github.com/LibreCat/Catmandu-Breaker
+  repository: https://github.com/LibreCat/Catmandu-Breaker.git
+version: '0.10'
+x_contributors:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

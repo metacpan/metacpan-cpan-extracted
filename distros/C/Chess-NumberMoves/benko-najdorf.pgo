@@ -1,0 +1,39 @@
+[Event "?"]
+[Site "Los Angeles"]
+[EventDate "1963"]
+[White "Benko"]
+[Black "Najdorf"]
+[Result "*"]
+
+
+
+d4 Nf6
+c4 c5
+d5 d6
+Nc3 g6
+e4 Bg7
+Be2 O-O
+Nf3 e5
+Bg5 h6
+Bh4 g5
+Bg3 Nh5
+h4 Nf4
+hxg5 hxg5
+Bf1 Bg4
+Qc2 Bxf3
+gxf3 Nd7
+O-O-O Re8
+Bh3 Nxh3
+Rxh3 Nf8
+Rdh1 Ng6
+Nd1 Rc8
+Ne3 Rc7
+Nf5 Rf8
+Qd1 f6
+f4 exf4
+Qh5 Ne5
+Qh7 Kf7
+Qxg7+ Ke8 
+Qxf8+ Kxf8
+Rh8+ Kf7
+Rxd8

@@ -1,0 +1,176 @@
+NAME
+    Cocoa::Growl - Yet another growl module using Growl.framework
+
+SYNOPSIS
+        use Cocoa::Growl ':all';
+    
+        my $installed = growl_installed(); # true if Growl is installed.
+        my $running   = growl_running();   # true if Growl is running.
+    
+        # register application
+        growl_register(
+            app           => 'My growl script',
+            icon          => '/path/to/icon.png', # or 'http://url/to/icon'
+            notifications => [qw(Notification1 Notification2)],
+        );
+    
+        # show growl notification
+        growl_notify(
+            name        => 'Notification1',
+            title       => 'Hello!',
+            description => 'Growl world!',
+        );
+
+DESCRIPTION
+FUNCTIONS
+    No function is exported by default, but all functions is exportable. And
+    ':all' tag export all functions.
+
+  growl_installed
+        my $installed = growl_installed();
+
+    Return true value if growl is installed.
+
+  growl_running
+        my $running = growl_running();
+
+    Return true value if growl is running.
+
+  growl_register(%parameters)
+    Register application to growl.
+
+        growl_register(
+            app           => 'My growl script',
+            icon          => '/path/to/icon.png', # or 'http://url/to/icon'
+            notifications => [qw(Notification1 Notification2)],
+        );
+
+    Available parameters are:
+
+    *   app => 'Str' (Required)
+
+        The name of the application. This is listed in Growl preference
+        panel.
+
+    *   icon => 'Str'
+
+        Application icon image path or URL. This image is showed in Growl
+        preference panel, and used notification default image.
+
+    *   notifications => 'ArrayRef' (Required)
+
+        List of notification names. These names will be displayed in Growl
+        preference pane to let users customize options for each
+        notification.
+
+    *   defaults => 'ArrayRef'
+
+        List of notification names to enable by default. If this parameter
+        is not set, all notifications is to become default.
+
+  growl_notify(%parameters)
+    Show growl notify.
+
+        growl_notify(
+            name        => 'Notification1',
+            title       => 'Hello!',
+            description => 'Growl world!',
+        );
+
+    Available options are:
+
+    *   name => 'Str' (Required)
+
+        The internal name of the notification. Should be human-readable, as
+        it will be displayed in the Growl preference pane. And this value is
+        required to be registered by "growl_register" before calling this
+        function.
+
+    *   title => 'Str'
+
+        The title of the notification displayed to the user.
+
+    *   description => 'Str'
+
+        The full description of the notification displayed to the user.
+
+    *   icon => 'Str'
+
+        Image file path or URL to show with the notification as its icon. If
+        this value is not set, the application's icon will be used instead.
+
+    *   sticky => 'Bool'
+
+        If true value is set, the notification will remain on screen until
+        clicked. Not all Growl displays support sticky notifications.
+
+    *   priority => 'Int'
+
+        The priority of the notification. The default value is 0; positive
+        values are higher priority and negative values are lower priority.
+        Not all Growl displays support priority.
+
+    *   on_click => 'CodeRef',
+
+        This callback is called when notification is clicked. See also
+        CALLBACK NOTICE below.
+
+    *   on_timeout => 'CodeRef',
+
+        This callback is called when notification is timeout. (also called
+        notification closed by close button)
+
+   CALLBACK NOTICE
+    You should run Cocoa's event loop NSRunLoop to be enable callbacks.
+    Simplest way to do that is use this module with Cocoa::EventLoop.
+
+        use Cocoa::EventLoop;
+        use Cocoa::Growl ':all';
+    
+        growl_register(
+            name          => 'test script',
+            notifications => ['test notification'],
+        );
+    
+        my $wait = 1;
+        growl_notify(
+            name        => 'test notification',
+            title       => 'Hello',
+            description => 'Growl World!',
+            on_click => sub {
+                warn 'click';
+                $wait = 0;
+            },
+            on_timeout => sub {
+                warn 'timeout';
+                $want = 0;
+            },
+        );
+    
+        Cocoa::EventLoop->run_while(0.1) while unless $wait;
+
+    If you want to write more complicated script, use AnyEvent. AnyEvent 5.3
+    or higher is support Cocoa::EventLoop internally, so you can use cocoa's
+    event loop transparently in your AnyEvent application. See
+    AnyEvent::Impl::Cocoa for more detail.
+
+USE YOUR OWN Growl.framework
+    Although this module bundle Growl.framework and load it by default, you
+    can load your own Growl.framework. To do that, save your Growl.framework
+    to "/Library/Frameworks/Growl.framework/", and add
+    "USE_LOCAL_GROWL_FRAMEWORK=1" option when run Makefile.PL
+
+        perl Makefile.PL USE_LOCAL_GROWL_FRAMEWORK=1
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2010 by KAYAC Inc.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,64 @@
+NAME
+    CPAN::Mini::Tested - Create a CPAN mirror using modules with passing test 
+    reports
+
+REQUIREMENTS
+    This module is designed for Perl 5.6.1. The following non-core
+    modules are required:
+
+      Cache::Simple::TimedExpiry
+      Config
+      CPAN::Mini
+      DBI
+      DBD::SQLite
+      LWP
+      Regexp::Assemble
+
+INSTALLATION
+
+    See the INSTALL file for detailed installation instructions.
+
+SYNOPSYS
+      use CPAN::Mini::Tested;
+
+      CPAN::Mini::Tested->update_mirror(
+       remote => "http://cpan.mirrors.comintern.su",
+       local  => "/usr/share/mirrors/cpan",
+       trace  => 1
+      );
+
+DESCRIPTION
+    This module is a subclass of CPAN::Mini which checks the CPAN Testers
+    database for passing tests of that distribution on your platform.
+    Distributions will only be downloaded if there are passing tests.
+
+    The major differences are that it will download the testers.db file from
+    the CPAN Testers web site when updating indices, and it will check if a
+    distribution has passed tests in the specified platform before applying
+    other filtering rules to it.
+
+    See the module documentation for more information.
+
+REVISION HISTORY
+
+    See the Changes file for a detailed revision history.
+
+SEE ALSO
+
+    CPAN::Mini
+
+    CPAN Testers <http://cpantesters.org>
+
+AUTHOR
+    
+    Robert Rothenberg <rrwo at cpan.org>
+
+    Barbie <barbie@cpan.org>
+
+COPYRIGHT AND LICENSE
+  
+    Copyright (C) 2005-2014 by Robert Rothenberg.  All Rights Reserved.
+    Copyright (C) 2014      by Barbie.
+
+    This distribution is free software; you can redistribute it and/or
+    modify it under the Artistic Licence v2.

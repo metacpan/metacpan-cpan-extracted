@@ -1,0 +1,46 @@
+Catalyst-Engine-Stomp
+=====================
+
+This is a Catalyst engine which allows you to build a message-driven
+application with STOMP. 
+
+Controllers indicate queues, and message types indicate actions. A
+controller base class is provided to handle YAML-serialized messages.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     Moose
+     Net::Stomp
+     YAML::XS
+     Data::Serializer
+     Catalyst::Engine::Embeddable
+     Catalyst::Runtime 5.80003
+     namespace::autoclean
+     
+The supplied workers script requires MooseX::Workers, and you'll need
+the relevant modules to support Data::Serializer if you choose
+something other than YAML as a message format. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Venda Ltd
+Copyright (C) 2011 Paul Mooney
+Copyright (C) 2011 Gianni Ceccarelli
+Copyright (C) 2011 chiselwright
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

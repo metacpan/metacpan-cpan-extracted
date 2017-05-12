@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<TMPL_VAR NAME="lang">-<TMPL_VAR NAME="collation">">
+<header>
+	<title><TMPL_VAR NAME="title"></title>
+</header>
+<body>
+<TMPL_IF NAME="loop.structure('title,check2')">
+    <ul>
+    <TMPL_LOOP NAME="loop.structure('title,check2')">
+        <li>
+                <a href="/<TMPL_VAR NAME="this.pageId">/"><TMPL_VAR NAME="this.title"> - <TMPL_VAR NAME="this.check2"></a>
+                <TMPL_IF NAME="this.structure('title,check2')">
+                <ul>
+                <TMPL_LOOP NAME="this.structure('title,check2')">
+                        <li>
+                                <a href="/<TMPL_VAR NAME="this.pageId">/"><TMPL_VAR NAME="this.title"> - <TMPL_VAR NAME="this.check2"></a>
+                                <TMPL_IF NAME="this.structure('title,check2')">
+                                <ul>
+                                <TMPL_LOOP NAME="this.structure('title,check2')">
+                                <li>
+                                        <a href="/<TMPL_VAR NAME="this.pageId">/"><TMPL_VAR NAME="this.title"> - <TMPL_VAR NAME="this.check2"></a>
+                                </li>
+                                </TMPL_LOOP>
+                                </ul>
+                                </TMPL_IF>
+                        </li>
+                </TMPL_LOOP>
+                </ul>
+                </TMPL_IF>
+        </li>
+    </TMPL_LOOP>
+    </ul>
+</TMPL_IF>
+</body>
+</html>

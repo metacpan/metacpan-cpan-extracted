@@ -1,0 +1,207 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:5698506
+Return-Path: <andreas.koenig.gmwojprw@franz.ak.mind.de>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 7770 invoked from network); 21 Oct 2009 17:35:08 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 21 Oct 2009 17:35:08 -0000
+Received: (qmail 11429 invoked by uid 225); 21 Oct 2009 17:35:08 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 11424 invoked by alias); 21 Oct 2009 17:35:07 -0000
+X-Spam-Status: No, hits=-2.0 required=8.0
+	tests=PERLBUG_CONF,URIBL_SBL
+X-Spam-Check-By: la.mx.develooper.com
+Received: from franz.ak.mind.de (HELO franz.ak.mind.de) (212.42.235.66)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Wed, 21 Oct 2009 10:35:05 -0700
+Received: from k81.linux.bogus (sand@k81.linux.bogus [192.168.0.81])
+	by k75.linux.bogus (8.14.3/8.14.3/Debian-6) with ESMTP id n9LHURsJ032152
+	for <cpan-testers@perl.org>; Wed, 21 Oct 2009 19:30:27 +0200
+Date: Wed, 21 Oct 2009 19:30:27 +0200
+Subject: FAIL Geo-ReadGRIB-1 x86_64-linux-ld 2.6.30-1-amd64
+To: cpan-testers@perl.org
+Message-ID: <1256146227.f7ABD0.5182@k81>
+X-Reported-Via: Test::Reporter 1.54, via CPAN::Reporter 1.1708
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: andreas.koenig.gmwojprw@franz.ak.mind.de
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Frank Cox,
+=20=20=20=20
+This is a computer-generated report for Geo-ReadGRIB-1
+on perl 5.10.1, created by CPAN-Reporter-1.1708.=20
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://wiki.cpantesters.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester:=20
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=3D1 /usr/local/perl-5.10.1-uld/bin/perl "-MExtUtils::Comman=
+d::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/0-Geo-ReadGRIB.t ............... ok
+t/1-Geo-ReadGRIB-Object.t ........ ok
+t/2-Geo-ReadGRIB-Data.t .......... ok
+t/3-Geo-ReadGRIB-Data-LaLo.t ..... ok
+t/4-Geo-ReadGRIB-Param.t ......... ok
+t/5-Geo-ReadGRIB-Iter.t .......... ok
+t/6-Geo-ReadGRIB-Data-CMC.t ...... ok
+t/7-Geo-ReadGRIB-Iter-CMS.t ...... ok
+
+#   Failed test at t/8-Geo-ReadGRIB-Dateline-CMS.t line 60.
+#=20
+# Looks like you failed 1 test of 305.
+t/8-Geo-ReadGRIB-Dateline-CMS.t ..=20
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/305 subtests=20
+
+Test Summary Report
+-------------------
+t/8-Geo-ReadGRIB-Dateline-CMS.t (Wstat: 256 Tests: 305 Failed: 1)
+  Failed test:  6
+  Non-zero exit status: 1
+Files=3D9, Tests=3D339,  1 wallclock secs ( 0.07 usr  0.02 sys +  1.04 cusr=
+  0.13 csys =3D  1.26 CPU)
+Result: FAIL
+Failed 1/9 test programs. 1/339 subtests failed.
+make: *** [test_dynamic] Error 1
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+configure_requires:
+
+    Module              Need Have=20=20=20
+    ------------------- ---- -------
+    ExtUtils::MakeMaker 0    6.55_02
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING =3D 1
+    LANG =3D en_US.UTF-8
+    PATH =3D /home/sand/bin:/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/=
+games:/usr/local/perl/bin:/usr/X11/bin:/sbin:/usr/sbin
+    PERL5LIB =3D=20
+    PERL5OPT =3D=20
+    PERL5_CPANPLUS_IS_RUNNING =3D 5182
+    PERL5_CPAN_IS_RUNNING =3D 5182
+    PERL_MM_USE_DEFAULT =3D 1
+    SHELL =3D /usr/bin/zsh
+    TERM =3D screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X =3D /usr/local/perl-5.10.1-uld/bin/perl
+    $UID/$EUID =3D 1001 / 1001
+    $GID =3D 1001 1001
+    $EGID =3D 1001 1001
+
+Perl module toolchain versions installed:
+
+    Module              Have=20=20=20=20=20
+    ------------------- ---------
+    CPAN                1.94_52=20=20
+    Cwd                 3.30_02=20=20
+    ExtUtils::CBuilder  0.26_04=20=20
+    ExtUtils::Command   1.16=20=20=20=20=20
+    ExtUtils::Install   1.54=20=20=20=20=20
+    ExtUtils::MakeMaker 6.55_02=20=20
+    ExtUtils::Manifest  1.57=20=20=20=20=20
+    ExtUtils::ParseXS   2.21=20=20=20=20=20
+    File::Spec          3.30=20=20=20=20=20
+    Module::Build       0.3500_01
+    Module::Signature   0.55=20=20=20=20=20
+    Test::Harness       3.17=20=20=20=20=20
+    Test::More          0.94=20=20=20=20=20
+    YAML                0.70=20=20=20=20=20
+    YAML::Syck          1.07=20=20=20=20=20
+    version             0.77=20=20=20=20=20
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 1) configuration:
+=20=20=20
+  Platform:
+    osname=3Dlinux, osvers=3D2.6.30-1-amd64, archname=3Dx86_64-linux-ld
+    uname=3D'linux k81 2.6.30-1-amd64 #1 smp sat aug 15 18:09:19 utc 2009 x=
+86_64 gnulinux '
+    config_args=3D'-Dprefix=3D/usr/local/perl-5.10.1-uld -Dinstallusrbinper=
+l=3Dn -Uversiononly -Dusedevel -des -Ui_db -Duselongdouble'
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Ddefine
+    useithreads=3Dundef, usemultiplicity=3Dundef
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef
+    use64bitint=3Ddefine, use64bitall=3Ddefine, uselongdouble=3Ddefine
+    usemymalloc=3Dn, bincompat5005=3Dundef
+  Compiler:
+    cc=3D'cc', ccflags =3D'-fno-strict-aliasing -pipe -fstack-protector -I/=
+usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=3D64',
+    optimize=3D'-O2',
+    cppflags=3D'-fno-strict-aliasing -pipe -fstack-protector -I/usr/local/i=
+nclude'
+    ccversion=3D'', gccversion=3D'4.3.4', gccosandvers=3D''
+    intsize=3D4, longsize=3D8, ptrsize=3D8, doublesize=3D8, byteorder=3D123=
+45678
+    d_longlong=3Ddefine, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D16
+    ivtype=3D'long', ivsize=3D8, nvtype=3D'long double', nvsize=3D16, Off_t=
+=3D'off_t', lseeksize=3D8
+    alignbytes=3D16, prototype=3Ddefine
+  Linker and Libraries:
+    ld=3D'cc', ldflags =3D' -fstack-protector -L/usr/local/lib'
+    libpth=3D/usr/local/lib /lib /usr/lib /lib64 /usr/lib64
+    libs=3D-lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc -lgdbm_compat
+    perllibs=3D-lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=3D/lib/libc-2.9.so, so=3Dso, useshrplib=3Dfalse, libperl=3Dlibperl=
+.a
+    gnulibc_version=3D'2.9'
+  Dynamic Linking:
+    dlsrc=3Ddl_dlopen.xs, dlext=3Dso, d_dlsymun=3Dundef, ccdlflags=3D'-Wl,-=
+E'
+    cccdlflags=3D'-fPIC', lddlflags=3D'-shared -O2 -L/usr/local/lib -fstack=
+-protector'=

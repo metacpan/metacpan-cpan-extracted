@@ -1,0 +1,13 @@
+---
+title:
+  required:  1
+  max_len:  30
+pid:
+  required:  1
+problem:
+  required:  1
+  min_len:  3
+solution:
+  required:  1
+  min_len:  3
+'group order': [title, pid, problem,solution]

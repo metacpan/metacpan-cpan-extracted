@@ -1,0 +1,14 @@
+Revision history for CPAN-Test-Dummy-Perl5-Make-FailLate
+
+1.02 Tue Sep 16 18:50:43 EDT 2008
+
+    - bumped version to encourage a new round of CPAN Testers reports
+
+1.01 Sat Nov  3 00:43:39 EDT 2007
+
+    - add pointless tests so I don't lower my average Kwalitee for releasing a
+      module that is designed to fail
+
+1.00 Tue Aug  7 16:11:30 EDT 2007
+
+     - started as copy of CPAN-Test-Dummy-Perl5-Make-Failearly

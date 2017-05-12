@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution CAD-Firemen,
+version 0.7.2:
+
+  Scripts and Modules to manage PTC(R) ProE/Engineer(R) / Creo(TM) configurations. Use perldoc CAD::Firemen to get an introduction to the usage of this distribution.
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+

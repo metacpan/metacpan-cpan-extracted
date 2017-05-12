@@ -1,0 +1,8 @@
+Are these things actually of use anymore?  Anyway, this module
+provides a little bit of helper code to allow you to decorate classes
+using NEXT.
+
+perl Build.PL
+./Build
+./Build test
+./Build install

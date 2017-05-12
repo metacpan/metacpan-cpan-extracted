@@ -1,0 +1,9 @@
+Revision history for Catalyst-ActionRole-MatchHost
+
+0.03    Tue 17 Nov 2009
+        Updated to use Catalyst::Controller::ActionRole
+        Renamed to Catalyst::ActionRole::MatchHost
+
+0.01    Mon 16 Nov 2009
+        First version, released on an unsuspecting world.
+

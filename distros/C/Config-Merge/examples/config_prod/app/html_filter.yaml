@@ -1,0 +1,19 @@
+AllowHref:          0
+AllowSrc:           1
+AllowRelURL:        1
+BanAllBut: 
+                  - blockquote
+                  - br
+                  - div
+                  - em
+                  - h1
+                  - h2
+                  - h3
+                  - hr
+                  - ol
+                  - p
+                  - span
+                  - strong
+                  - ul
+                  - li
+                  - img

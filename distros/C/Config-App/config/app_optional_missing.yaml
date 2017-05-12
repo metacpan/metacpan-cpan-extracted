@@ -1,0 +1,9 @@
+---
+default:
+    answer: 42
+    nested:
+        something:
+            else: good
+    optional_include: config/no_exist.json
++|this_should_not_be_a_real_user:
+    answer: 1138

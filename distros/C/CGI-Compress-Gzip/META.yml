@@ -1,0 +1,28 @@
+---
+name: CGI-Compress-Gzip
+version: 1.03
+author:
+  - 'Chris Dolan <cdolan@cpan.org>'
+abstract: CGI with automatically compressed output
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 2.00
+  Compress::Zlib: 2
+  IO::Zlib: 1.01
+  perl: 5.006
+build_requires:
+  File::Temp: 0
+  Test::More: 0.01
+provides:
+  CGI::Compress::Gzip:
+    file: lib/CGI/Compress/Gzip.pm
+    version: 1.03
+  CGI::Compress::Gzip::FileHandle:
+    file: lib/CGI/Compress/Gzip/FileHandle.pm
+    version: 1.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 88
+    - 212
+  61310:
+    - 94
+name: ddcbd4
+registers:
+  AF: 52252
+  AF_: 0
+  BC: 47236
+  BC_: 0
+  DE: 27346
+  DE_: 0
+  HL: 5665
+  HL_: 0
+  I: 0
+  IX: 61222
+  IY: 16862
+  PC: 0
+  R: 0
+  SP: 0

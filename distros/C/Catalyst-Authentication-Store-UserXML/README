@@ -1,0 +1,65 @@
+NAME
+    Catalyst::Authentication::Store::UserXML - Catalyst authentication
+    storage using xml files
+
+SYNOPSIS
+        use Catalyst qw(
+            ...
+            Authentication
+            Authentication::Store::UserXML
+        );
+
+        __PACKAGE__->config(
+            'Plugin::Authentication' => {
+                default_realm => 'members',
+                members => {
+                    credential => {
+                        class         => 'Password',
+                        password_type => 'self_check',
+                    },
+                    store => {
+                        class         => 'UserXML',
+                    }
+                }
+            },
+            'authentication' => {
+                'userxml' => {
+                    'folder' => 'members',
+                    'user_folder_file' => 'index.xml',   # optional if credentials stored one per folder
+                }
+            },
+        );
+
+        # later in controller (login)
+        $c->authenticate({
+            username => $c->req->param('username'),
+            password => $c->req->param('password'),
+        });
+
+DESCRIPTION
+    Catalyst authentication storage using xml files in a folder.
+
+SEE ALSO
+    Catalyst::Plugin::Authentication
+    Catalyst::Authentication::Store::UserXML::User
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+CONTRIBUTORS
+    The following people have contributed to the File::is by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advises, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        David Kamholz
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 jkutej@cpan.org
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

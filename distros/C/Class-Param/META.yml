@@ -1,0 +1,36 @@
+---
+name: Class-Param
+version: 0.1
+author:
+  - 'Christian Hansen C<chansen@cpan.org>'
+abstract: Param Class
+license: perl
+requires:
+  Carp: 0
+  Encode: 0
+  Params::Validate: 0
+  Tie::Hash::Indexed: 0.04
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Class::Param:
+    file: lib/Class/Param.pm
+    version: 0.1
+  Class::Param::Base:
+    file: lib/Class/Param/Base.pm
+  Class::Param::Callback:
+    file: lib/Class/Param/Callback.pm
+  Class::Param::Compound:
+    file: lib/Class/Param/Compound.pm
+  Class::Param::Decorator:
+    file: lib/Class/Param/Decorator.pm
+  Class::Param::Encoding:
+    file: lib/Class/Param/Encoding.pm
+  Class::Param::Ordered:
+    file: lib/Class/Param/Ordered.pm
+  Class::Param::Tie:
+    file: lib/Class/Param/Tie.pm
+  Class::Param::Tie::Param:
+    file: lib/Class/Param/Tie.pm
+generated_by: Module::Build version 0.2611

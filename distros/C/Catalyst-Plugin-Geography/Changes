@@ -1,0 +1,10 @@
+Revision history for Perl extension Catalyst::Plugin::Geography
+
+0.03  Thu Dec 02 09:36:00 2008
+        - Add CAF dependency to make smokers happy.
+
+0.02  Tue Dec 02 13:31:00 2008
+        - Switch to Module::Install
+        
+0.01  Sun May 01 13:28:00 2005
+        - packaged up chansen's original version.

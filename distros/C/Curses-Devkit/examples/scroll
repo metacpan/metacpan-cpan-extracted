@@ -1,0 +1,41 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Scroll Widget
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the scrolling list.
+@listItems = ("Item 1", "Item 2", "Item 3",
+		"Item 4", "Item 5", "Item 6",
+		"Item 7", "Item 8", "Item 9");
+
+# Create the scrolling list object.
+my $scroll = new Cdk::Scroll ('Title' => "<C>Scroll Title",
+				'Height' => -10,
+				'Width' => -10,
+				'Numbers' => "TRUE",
+				'Spos' => "RIGHT",
+				'List' => \@listItems);
+$scroll->add ('Item' => "HELLO");
+
+# Activate the scrolling list.
+my $itemPicked = $scroll->activate ();
+
+# Check the results.
+if (!defined $itemPicked)
+{
+   popupLabel (["<C>Escape hit. No menu item selected."]);
+}
+else
+{
+   popupLabel (["<C>You selected </R>$listItems[$itemPicked]"]);
+}
+
+# Exit Cdk.
+Cdk::end();

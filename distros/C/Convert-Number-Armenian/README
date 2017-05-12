@@ -1,0 +1,9 @@
+This is a simple Perl module for converting between Armenian and Western
+number systems. To install, run:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Further information can be found in the module POD.

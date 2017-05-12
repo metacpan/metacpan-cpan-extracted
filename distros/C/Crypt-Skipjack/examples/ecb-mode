@@ -1,0 +1,24 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::Skipjack;
+
+my $key = pack "H20", "00998877665544332211";
+my $cipher = new Crypt::Skipjack $key;
+
+print "blocksize : ", $cipher->blocksize, " bytes \n";
+print "keysize   : ", $cipher->keysize, " bytes \n";
+
+print "\n";
+
+my $plaintext1 = pack "H16", "33221100ddccbbaa";
+print "old plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1     : ", unpack("H*", $ciphertext1), "\n";
+
+my $decrypted1 = $cipher->decrypt($ciphertext1);
+print "new plaintext1  : ", unpack("H*", $decrypted1), "\n";
+

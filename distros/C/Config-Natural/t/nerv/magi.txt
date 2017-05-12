@@ -1,0 +1,22 @@
+magi {
+    name = MAGI
+    description = -
+System made by the interconnection of three supercomputers 
+called "brains", each one having a different personality. 
+    .
+
+    brain {
+      name = Melchior-1
+      personality = scientist
+    }
+
+    brain {
+      name = Balthasar-2
+      personality = mother
+    }
+
+    brain {
+      name = Casper-3
+      personality = woman
+    }
+}

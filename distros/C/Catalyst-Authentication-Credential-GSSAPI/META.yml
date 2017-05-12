@@ -1,0 +1,27 @@
+---
+abstract: 'rfc4559 SPNEGO/GSSAPI'
+author:
+  - 'Daniel Ruoso <druoso@bloomberg.net>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  Module::Build: '0.39'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Authentication-Credential-GSSAPI
+provides:
+  Catalyst::Authentication::Credential::GSSAPI:
+    file: lib/Catalyst/Authentication/Credential/GSSAPI.pm
+    version: v0.0.5
+requires:
+  perl: v5.10.0
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+  repository: https://github.com/bloomberg/Catalyst-Authentication-Credential-GSSAPI
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

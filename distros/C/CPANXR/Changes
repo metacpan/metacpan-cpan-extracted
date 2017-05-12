@@ -1,0 +1,8 @@
+Revision history for Perl extension CPANXR.
+
+0.01  Thu Aug 14 15:40:35 2003
+	- original version; created by h2xs 1.2 with options
+		-A -X -n CPANXR
+
+0.08  Thu Oct 07 2003
+	- First release to CPAN

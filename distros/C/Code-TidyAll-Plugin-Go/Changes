@@ -1,0 +1,9 @@
+0.02     2015-01-05
+
+- Fixed an issue where both "go vet" and "gofmt" errors would not be displayed
+  to the user.
+
+
+0.01     2014-10-14
+
+- First release upon an unsuspecting world.

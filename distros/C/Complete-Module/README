@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Complete::Module qw(complete_module);
+     my $res = complete_module(word => 'Text::A');
+     # -> ['Text::ANSI', 'Text::ANSITable', 'Text::ANSITable::', 'Text::Abbrev']
+
+SETTINGS
+
+ $Complete::Module::OPT_SHORTCUT_PREFIXES => hash
+
+    Shortcut prefixes. The default is:
+
+    # CODE: $Complete::Module::OPT_SHORTCUT_PREFIXES
+
+    If user types one of the keys, it will be replaced with the matching
+    value from this hash.
+
+ENVIRONMENT
+
+ COMPLETE_MODULE_OPT_SHORTCUT_PREFIXES => str
+
+    Can be used to set the default for
+    $Complete::Module::OPT_SHORTCUT_PREFIXES. It should be in the form of:
+
+     shortcut1=Value1;shortcut2=Value2;...
+
+    For example:
+
+     dzp=Dist/Zilla/Plugin/;pwp=Pod/Weaver/Plugin/
+

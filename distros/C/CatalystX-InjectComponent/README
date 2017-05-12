@@ -1,0 +1,79 @@
+NAME
+    CatalystX::InjectComponent - Inject components into your Catalyst
+    application
+
+VERSION
+    version 0.025
+
+SYNOPSIS
+        package My::App;
+
+        use Catalyst::Runtime '5.80';
+
+        use Moose;
+        BEGIN { extends qw/Catalyst/ }
+
+        ...
+
+        after 'setup_components' => sub {
+            my $class = shift;
+            CatalystX::InjectComponent->inject( into => $class, component => 'MyModel' );
+            if ( $class->config->{ ... ) {
+                CatalystX::InjectComponent->inject( into => $class, component => 'MyRootV2', as => 'Controller::Root' );
+            }
+            else {
+                CatalystX::InjectComponent->inject( into => $class, component => 'MyRootV1', as => 'Root' ); # Controller:: will be automatically prefixed
+            }
+        };
+
+DESCRIPTION
+    CatalystX::InjectComponent will inject Controller, Model, and View
+    components into your Catalyst application at setup (run)time. It does
+    this by creating a new package on-the-fly, having that package extend
+    the given component, and then having Catalyst setup the new component
+    (via "->setup_component")
+
+So, how do I use this thing?
+    You should inject your components when appropriate, typically after
+    "setup_compenents" runs
+
+    If you're using the Moose version of Catalyst, then you can use the
+    following technique:
+
+        use Moose;
+        BEGIN { extends qw/Catalyst/ }
+
+        after 'setup_components' => sub {
+            my $class = shift;
+
+            CatalystX::InjectComponent->inject( into => $class, ... )
+        };
+
+METHODS
+  CatalystX::InjectComponent->inject( ... )
+        into        The Catalyst package to inject into (e.g. My::App)
+        component   The component package to inject
+        as          An optional moniker to use as the package name for the derived component
+
+    For example:
+
+        ->inject( into => My::App, component => Other::App::Controller::Apple )
+        
+            The above will create 'My::App::Controller::Other::App::Controller::Apple'
+
+        ->inject( into => My::App, component => Other::App::Controller::Apple, as => Apple )
+
+            The above will create 'My::App::Controller::Apple'
+
+ACKNOWLEDGEMENTS
+    Inspired by Catalyst::Plugin::AutoCRUD
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

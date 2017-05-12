@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE TBXXCS SYSTEM "tbxxcsdtd.dtd">
+<TBXXCS name="Small" version="2" lang="en">
+    <header>
+        <title>Example XCS file</title>
+    </header>
+
+    <languages>
+        <langInfo>
+            <langCode>en</langCode>
+            <langName>English</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>fr</langCode>
+            <langName>French</langName>
+        </langInfo>
+        <langInfo>
+            <langCode>de</langCode>
+            <langName>German</langName>
+        </langInfo>
+    </languages>
+
+    <datCatSet>
+        <xrefSpec name="xrefFoo" datcatId="">
+            <contents targetType="external"/>
+        </xrefSpec>
+
+    </datCatSet>
+
+    <refObjectDefSet>
+        <refObjectDef>
+            <refObjectType>Foo</refObjectType>
+            <itemSpecSet type="validItemType">
+                <itemSpec type="validItemType">data</itemSpec>
+            </itemSpecSet>
+        </refObjectDef>
+    </refObjectDefSet>
+</TBXXCS>

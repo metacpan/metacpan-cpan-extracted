@@ -1,0 +1,213 @@
+Revision history for CSS::DOM
+
+0.16    29 November, 2015
+      • Work  around  an  incompatible  change  in  Encode  2.77  (RT
+        #107221, #107043).
+      • Specify Encoding in POD.  Thanks to Gregor Herrmann  for  the
+        patch (RT #85955).
+
+0.15    21 October, 2012
+      • compute_style  no longer produces an uninitialized warning if
+        the element’s own style attribute has a  property  for  which
+        there is no applicable property with the  same  name  in  the
+        style sheets (RT #79855).
+      • A minor backtracking bug in CSS::DOM::PropertyParser has been
+        fixed.  If a format for a list property can still match after
+        backtracking past a capturing group,  then extra items  (from
+        the pre-backtracking matches)  will end up in the list.  This
+        can happen with  property  formats  like  ‘[(foo) | (foo),]+’.
+        Any such format would  be  more  efficient  when  written  as
+       ‘[(foo),?]+’, which does not exhibit the bug.
+
+0.14    12 December, 2010
+      • The full text of the licence is now included in the  distribu-
+        tion.  Thanks to Ville Skyttä for providing  it  (RT  #60770).
+      • A few pod syntax errors have been corrected,  thanks to Nicho-
+        las Bamber (RT #63388).
+      • CSS::DOM::PropertyParser  has been fixed to  work  with  perl
+        5.13.8 and higher.
+      • New getStringValue method of CSS::DOM::Value::Primitive
+
+0.13    22 August, 2010
+        Oops.  Fix another problem,  introduced in 0.12.  I forgot to
+        add  a  file  to  MANIFEST.  (I  *thought*  I  had  run  make
+        disttest.)
+
+0.12    22 August, 2010
+        Fix dependency problem introduced in 0.11. (I tried to remove
+        the dependency on constant::lexical,  gave up and reverted my
+        changes, but forgot to add it back to Makefile.PL.  Oh well.)
+
+0.11    15 August, 2010
+      • setStringValue  and  setFloatValue  are  now  listed  in
+        CSS::DOM::Interface.
+      • CSS::DOM::Style’s  opacity  property is  now  listed  in
+        CSS::DOM::Interface. (This is a temporary workaround for
+        a design flaw.)
+
+0.10    28 March, 2010
+      • New setFloatValue and setStringValue methods of CSS::DOM::Val-
+        ue::Primitive
+      • Bug fix: CSS::DOM::Value::Primitive’s cssText did not set the
+        value when passed an argument if the  existing  value  was  a
+        string and there was no existing serialisation  recorded  (as
+        happens if you call the constructor directly  without  provid-
+        ing the css argument).
+      • Bug fix:  Sub-value objects of a list value  used  to  become
+       ‘unowned’ if their type changed (via cssText assignment),  mak-
+        ing further modification attempts fail.
+
+0.09    21 February, 2010
+      • The property parser no longer gets confused in cygwin’s  perl
+        5.10.0@34065 (maint;  aka ee8a906) when an rgb() colour comes
+        after something else in a property value.  This bug also  pro-
+        duced warnings.
+      • The property parser in cygwin’s perl no longer  gets  offsets
+        muddled  up  when  a  shorthand  property’s  format  contains
+        <colour> within a parenthetical group,  the  <colour>  is not
+        the first thing in  the  group  (e.g.,  ‘(<ident> <colour>)’),
+        and a value  assigned  has  a  colour  in  hex  format  (e.g.,
+       ‘honey #bee’,  which would cause just ‘#bee’,  not ‘honey #bee’
+        to be assigned to the subproperty).
+      • The property parser used  to  produces  warnings  and  create
+        CSS_CUSTOM value objects instead of ‘primitives’ when a short-
+        hand property was assigned to that had named  properties  [RT
+        #54809]. This only occurred in perl 5.10.0. It turns out that
+        this perl version’s  $^N  is more buggy than I  realised  and
+        it’s not just cygwin’s  maint  snapshot  that  needs  special
+        treatment.
+      • CSS::DOM::Style’s  length  method no longer dies if no proper-
+        ties have been added [RT #54810].
+
+0.08    22 November, 2009
+      • Incompatible change:  CSS::DOM::Value’s and CSS::DOM::Value::
+        Primitive’s constructors’ interfaces have changed.  They  now
+        take hash-style arguments.
+      • CSSPrimitiveValue  objects  for  colours  are  now  supported.
+      • %CSS::DOM::Constants::SuffixToConst,  mapping  dimension  suf-
+        fixes to constants
+      • CSS::DOM::Value::Primitive  now implements the Rect  and  RGB-
+        Color interfaces.
+      • CSS::DOM::Value::List  has  been  added.  It  implements  the
+        CSSValueList interface.
+      • CSS::DOM::Value::Primitive no longer inherits from CSS::DOM::
+        Value, but claims that it DOES it.
+      • getPropertyCSSValue now works with list properties.
+      • CSS::DOM::Style’s property_parser method
+      • CSS::DOM::Value::Primitive’s primitiveType and  getFloatValue
+        methods
+      • CSS::DOM::Primitive’s and CSS::DOM::Value’s  cssText  methods
+        are now writable.
+      • Assigning to a shorthand property  (like border-top)  a value
+        (like 'inset')  that causes some sub-properties to have their
+        initial values now deletes any  implied  sub-properties  that
+        do not have default values (like border-top-color).  (If that
+        makes  no  sense  to  you,  see  the  tests  at  the  end  of
+        property-parser.t.)
+      • Fixed to be compatible with 5.10.0@34065 (maint; aka ee8a906),
+        which is included with cygwin.
+
+0.07    16 August, 2009
+      • Support for specifications that describe  which  properties
+        are supported and  also  the  syntax  of  shorthand  proper-
+        ties  (CSS::DOM::PropertyParser  was  added;  CSS::DOM  and
+        CSS::DOM::Style constructors now take more args)
+      • Incompatible change:  CSS::DOM::Value is no longer used  with-
+        out a property spec.
+      • CSS::DOM has two new methods, url_fetcher and property_parser,
+        which return what was passed to the constructor.
+      • Bug fix  (broken in  0.06):  Assigning to a property an empty
+        string or a string beginning with whitespace or a CSS comment
+        no longer causes an error.
+      • Bug fix:  Assigning whitespace to a property now  deletes  it.
+      • Bug fix:  getPropertyCSSValue  used to  return  the  same  as
+        getPropertyValue the *second*  time it was called for a given
+        property, due to a weird caching problem.
+      • compute_style now considers user-agent  !important rules more
+        important that user and author normal rules.  CSS 2.1 doesn’t
+        say what to do with those,  but I just found that CSS 2 speci-
+        fies it clearly.
+
+0.06    8 April, 2009
+      • The CSSCharsetRule interface has been added.
+      • There is a new module named  CSS::DOM::Util,  which,  so  far,
+        provides functions for dealing with CSS  escapes  and  string
+        and URL tokens.
+      • The  CSSStyleDeclaration  interface  is  now  complete
+        (CSS::DOM::Style’s getPropertyCSSValue, removeProperty,
+        getPropertyPriority,  length  and  item  methods  have
+        been added).
+      • Property priorities (i.e., the !important thingy)
+      • CSS::DOM::Style’s setProperty  method now dies when passed an
+        invalid value.
+      • The CSSValue interface has been completed. (CSS::DOM::Value’s
+        constructor actually works  [it only applies  to  CSS_INHERIT
+        and  CSS_CUSTOM  value types]  and the interface methods have
+        been added.)
+      • CSS::DOM::Value::Primitive now supports counters, attr values
+        and rects.
+      • New module:  CSS::Constants, where all the DOM constants have
+        been moved
+      • Highly-experimental compute_style function
+
+0.05    2 September, 2008
+      • CSS::DOM now detects the encoding of CSS files and decodes
+        them (if you ask it to).
+      • CSS::DOM::Style  has  a  non-standard  (i.e., non-DOM)
+        modification_handler method that allows the assignment
+        of a handler that is called whenever the style  object
+        is modified or one of its sub-objects.
+
+0.04    20 August, 2008
+      • CSS::DOM::Style’s setProperty method now works when ::Style is
+        loaded before ::Parser.
+      • The CSSFontFaceRule interface has been added.
+
+0.03    19 August, 2008
+      • CSS.pm  is no longer used.  The  parsing  interface  has
+        changed. None of the CSS.pm-specific methods can be used
+        any more  (read_string,  etc.).  Use CSS::DOM::parse and
+        CSS::DOM::Style::parse instead (actually,  these are con-
+        structors so  you  should  normally  use  these  instead
+        of ‘new’).
+      • CSS rules no longer overload stringification.  That was some-
+        thing inherited from CSS.pm’s CSS::Style. If anyone wants me
+        to add it back, I can.
+      • CSS::DOM::Rule’s constructor’s interface has changed, and now
+        accepts the parent rule or style sheet as the  only  argument.
+        (It used to inherit a constructor from CSS::Style).
+      • CSS::DOM::Rule::Style has its selectorText method, so the
+        CSSStyleRule interface is complete.
+      • CSS::DOM::Rule now has its parentRule and parentStyleSheet
+        methods, so the CSSRule interface is complete.
+      • Started the CSSValue class. So far the constants and a con-
+        structor (doesn’t work yet) exist.
+      • Started the CSSPrimitiveValue class. So far the constants, the
+        constructor and the cssText method (currently read-only)  have
+        been implemented.  Counters,  rects,  and rgb() colors are not
+        yet supported.  This is not actually used by the other modules
+        yet, but you can play with it. It’s quite buggy.
+      • The CSSMediaRule, CSSPageRule and CSSImportRule interfaces
+        have been added.
+      • CSS::DOM’s ownerRule and parentStyleSheet methods are actually
+        capable of return useful  values  now  that  CSSImportRule  is
+        implemented.
+      • The CSS::DOM::StyleDecl module has been renamed to ::Style.
+      • The CSS::DOM  constructor now accepts the named argument
+       ‘url_fetcher’, which can be passed a coderef that will be
+        called by @import rules.
+      • CSS::DOM’s ownerNode now returns an empty list in list context
+        instead of (undef), if there is no owner.
+
+0.02    19 May, 2008
+      • CSS::DOM  now has its title  and  media  methods  (so  the
+        StyleSheet interface has been completed) and its ownerRule,
+        insertRule and deleteRule methods (the CSSStyleSheet inter-
+        face is now complete).
+      • CSS::DOM::MediaList and CSS::DOM::StyleSheetList have
+        been added.
+      • CSS::DOM::Rule now has type and cssText methods (the CSSRule
+        interface is complete).
+
+0.01    23 December, 2007
+        First release

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 159
+    - 170
+  26342:
+    - 80
+name: ddcbaa
+registers:
+  AF: 65142
+  AF_: 0
+  BC: 28566
+  BC_: 0
+  DE: 16363
+  DE_: 0
+  HL: 2849
+  HL_: 0
+  I: 0
+  IX: 26439
+  IY: 1978
+  PC: 0
+  R: 0
+  SP: 0

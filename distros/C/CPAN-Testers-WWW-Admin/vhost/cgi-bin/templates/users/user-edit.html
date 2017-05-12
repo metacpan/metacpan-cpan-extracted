@@ -1,0 +1,127 @@
+[%
+    title = 'Update Profile' ;
+
+    IF realm == 'admin' ; THEN ; 
+      crumb2_name = 'Admin' ;
+      IF user.tester ; THEN ;
+        editlink = 'tester-amend' ;
+      ELSE ;
+        editlink = 'user-amend' ;
+      END ;
+    ELSE ; 
+      crumb2_name = 'Tester' ; 
+      editlink = 'user-amend' ;
+    END ;
+
+    crumb2_href = '/' ;
+    crumb1_name = 'Update Profile' ;
+
+    javascript = 1 ;
+%]
+
+[% IF data %]
+<div class="box">
+[% IF thanks %]<p>Thank you. An email has been sent to requested address. Please click the link contained within to confirm address.</p>[% END %]
+<p><strong>Please take the time to enter your details, as it helps others to identify you when you make any
+changes to the pages on the site. Note that only the details shown in the preview at the bottom of
+the page, will be visible on the wiki.</strong></p>
+<p>Fields marked * are mandatory fields and must be completed.</p>
+</div>
+
+[% IF errmess %]
+<div class="box">
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+</div>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="[% editlink %]" />
+<input type="hidden" name="userid" value="[% user.userid %]" />
+<input type="hidden" name="testerid" value="[% data.testerid || 0 %]" />
+<div class="box">
+<table width="100%">
+<tr><th>Display Name *</th>
+    <th class="alert">[% data.realname_err %]</th>
+    <td colspan="3"><input type="text" name="realname" value="[% data.realname %]" size="40" /></td>
+</tr>
+<tr><th width="150">Site Email *</th>
+    <th width="10" class="alert">[% data.email_err %]</th>
+    <td><input type="text" name="email" value="[% data.email %]" size="40" />
+        <p>Your site email address will be used as your login, and will be used to send you communications, such as a new site password, should you forget your current one.</p>
+    </td>
+</tr>
+<tr><th width="150">PAUSE ID</th>
+    <th class="alert">[% data.nickname_err %]</th>
+    <td colspan="3"><input type="text" name="nickname" value="[% data.nickname %]" size="40" />
+      <p>Your PAUSE ID is used to help verify further addresses to you.</p>
+    </td>
+</tr>
+<tr><th width="150">Contact Email</th>
+    <th width="10" class="alert">[% data.email_err %]</th>
+    <td><input type="text" name="contact" value="[% data.contact %]" size="40" />
+        <p>Your contact email address will be used to promote how authors can contact you, such as 
+        via the Find a Tester tool.</p>
+    </td>
+</tr>
+<tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+</table>
+</div>
+</form>
+
+[% IF realm == 'tester' || (realm == 'admin' && user.tester) %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-remove" />
+<div class="box">
+<table width="100%">
+<tr><th width="150">Registered Emails</th>
+    <th width="10"></th>
+    <td>
+    <p>Confirmed addresses in <strong>bold</strong>, unconfirmed addresses in <em>italics</em>.</p>
+    [% IF data.confirmed %]
+			[% FOREACH mail = data.confirmed %]
+        <input type="checkbox" name="MAILS" value="[% mail.email %]" />
+        [% IF mail.confirmed == 1 %]
+          <strong>[% mail.email %]</strong>
+        [% ELSE %]
+          <em>[% mail.email %]</em>
+        [% END %]
+
+        [% IF realm == 'admin' && mail.confirmed == 0 %]
+        <button type="submit" name="confirm" value="[% mail.email %]">Confirm</button>
+        [% END %]
+        <br />
+      [% END %]
+			<input type="submit" name="submit" value="DELETE" />
+		[% ELSE %]
+      n/a
+    [% END %]
+    </td>
+</tr>
+</table>
+</div>
+</form>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-submit" />
+<div class="box">
+<table width="100%">
+<tr><th width="150">Register Email</th>
+    <th width="10" class="alert">[% data.confirm_err %]</th>
+    <td><input type="text"   id="email" name="email"     value="[% data.confirm %]" size="40" onkeypress="populate_emails( event )" />
+        <p>If you have submitted reports from multiple addresses, please confirm each in turn to add them to this profile.</p>
+        <div id="email_list"></div>
+    </td>
+</tr>
+<tr><td colspan="2"></td><td><input type="submit" name="submit" value="ADD" /></td></tr>
+</table>
+</div>
+</form>
+
+[% END %]
+
+[% ELSE %]
+
+<div class="box"><p>User not found.</div>
+
+[% END %]

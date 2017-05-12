@@ -1,0 +1,63 @@
+[% 
+    IF comment.commentid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Comment' ;
+
+    crumb3_name = 'Diary' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=diary-admin' ;
+    crumb2_name = 'Comment' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=diary-cadmin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+<div class="post justified">
+  <h2>[% comment.title %][% IF comment.subject ; THEN ; ' : ' _ comment.subject ; END %]</h2>
+  [% comment.body %]
+  <p class="small">Posted by <em>[% comment.author %]</em> on <em>[% date.format(comment.createdate, '%e %b %Y') %]</em> ([% comment.ipaddr %])
+    <br />
+    Contact: [% comment.href | html %]
+    <br />
+
+      <a href="[% cgipath %]/pages.cgi?act=diary-cmark&amp;mark=block&amp;commentid=[% comment.commentid %]">Block</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cmark&amp;mark=allow&amp;commentid=[% comment.commentid %]">Allow</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cpromote&amp;commentid=[% comment.commentid %]">Approve</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cdelete&amp;commentid=[% comment.commentid %]">Delete</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-clist">Back to Comment Admin</a></p>
+</div>
+
+
+[% IF comment.subject %]<h4>[% comment.subject %]</h4>[% END %]
+[% comment.body %]
+<p class="small">Posted by [% comment.author %] on [% comment.postdate %]</p>
+<hr />
+
+[% IF thanks %]<p>Comment has been updated.[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="diary-csave" />
+<input type="hidden" name="commentid" value="[% comment.commentid %]" />
+<input type="hidden" name="publish" value="[% comment.publish %]" />
+<table class="blocker" summary="Comment Form">
+<tr><th width="95"><label for="subject">Subject</label></th>
+    <td width="10" class="alert">[% comment.subject_err %]</td>
+    <td><input type="text" id="subject" name="subject" value="[% comment.subject %]" size="50" /></td>
+</tr>
+<tr><th><label for="author">Your Name</label> *</th>
+    <td class="alert">[% comment.author_err %]</td>
+    <td><input type="text" id="author" name="author" value="[% comment.author %]" size="50" /></td>
+</tr>
+<tr><th><label for="body">Comment</label> *</th>
+    <td class="alert">[% comment.body_err %]</td>
+    <td><textarea id="body" name="body" rows="15" cols="40" />[% comment.body %]</textarea></td>
+</tr>
+<tr><th><label for="href">Link</label></th>
+    <td class="alert">[% comment.href_err %]</td>
+    <td><input type="text" id="href" name="href" value="[% comment.href %]" size="50" /></td>
+</tr>
+<tr><th></th>
+    <td></td>
+    <td><input type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>

@@ -1,0 +1,34 @@
+Changes
+lib/Carp/REPL.pm
+lib/Devel/REPL/Plugin/Carp/REPL.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/00-load.t
+t/01-trivial.t
+t/02-lexicals.t
+t/03-subs.t
+t/04-scope.t
+t/05-interact.t
+t/06-remember.t
+t/07-frame.t
+t/08-alias.t
+t/09-args.t
+t/10-nodie.t
+t/11-warn.t
+t/12-env.t
+t/13-list.t
+t/99-bug.t
+t/lib/TestHelpers.pm
+t/scripts/01-trivial.pl
+t/scripts/02-lexicals.pl
+t/scripts/03-subs.pl
+t/scripts/04-scope.pl
+t/scripts/05-interact.pl
+t/scripts/07-frame.pl
+t/scripts/08-alias.pl
+t/scripts/09-args.pl
+t/scripts/11-warn.pl
+t/scripts/12-env.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

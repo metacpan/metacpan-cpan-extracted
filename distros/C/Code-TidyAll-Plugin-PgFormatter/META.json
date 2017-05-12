@@ -1,0 +1,64 @@
+{
+   "abstract" : "Code::TidyAll plugin for pg_format",
+   "author" : [
+      "Andy Jack <andyjack@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Code-TidyAll-Plugin-PgFormatter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter/issues"
+      },
+      "homepage" : "https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter.git",
+         "web" : "https://github.com/andyjack/perl-code-tidyall-plugin-pgformatter"
+      }
+   },
+   "version" : "0.01"
+}
+

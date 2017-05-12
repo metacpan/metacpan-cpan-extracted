@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use AnyEvent 5.3;
+use AnyEvent::Handle;
+use Cocoa::EventLoop;
+
+use Cocoa::Growl ':all';
+
+GetOptions(
+    \my %options,
+    qw/app=s icon=s name=s title=s help/
+);
+pod2usage(0) if $options{help};
+
+$options{app}   ||= 'stdin2growl';
+$options{title} ||= 'stdin2growl';
+$options{name}  ||= 'Default Notification';
+
+growl_register(
+    app => $options{app},
+    $options{icon} ? (icon => $options{icon}) : (),
+    notifications => [$options{name}],
+);
+
+my $cv = AnyEvent->condvar;
+
+my $h = AnyEvent::Handle->new( fh => *STDIN );
+$h->on_error(sub {
+    my ($h, $fatal, $msg) = @_;
+    warn "got error: $msg\n";
+    $h->destroy;
+    $cv->send;
+});
+$h->on_eof(sub {
+    $_[0]->destroy;
+    $cv->send;
+});
+$h->on_read(sub {
+    $_[0]->push_read(line => sub {
+        my ($h, $line) = @_;
+
+        growl_notify(
+            name        => $options{name},
+            title       => $options{title},
+            description => $line,
+        );
+    });
+});
+
+$cv->recv;
+
+__END__
+
+=head1 NAME
+
+stdin2growl - show growl notify every stdin line.
+
+=head1 SYNOPSIS
+
+    stdin2growl [options...]
+    
+    Options:
+      -h --help    show this help
+      -a --app     application name
+      -n --name    notiication name
+      -t --title   notification title
+
+=head1 AUTHOR
+
+Daisuke Murase <typester@cpan.org>
+
+=cut
+

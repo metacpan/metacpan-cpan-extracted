@@ -1,0 +1,81 @@
+# In bizarre behavior, DESTROY methods are treated specially
+# with s/OBJ$/REF/.
+
+TYPEMAP
+CORBA::Object	            T_OBJREF
+CORBA::ORB	            T_PTROBJ
+CORBA::TypeCode	            T_PTROBJ
+
+CORBA::LongLong             T_LONGLONG
+CORBA::ULongLong            T_ULONGLONG
+CORBA::LongDouble           T_LONGDOUBLE
+
+PortableServer::POA	        T_LOCALOBJREF
+PortableServer::POAManager	T_LOCALOBJREF
+PortableServer::Current         T_LOCALOBJREF
+PortableServer::ServantBase  T_SERVANT
+PortableServer::ObjectId     T_OBJECTID
+
+DynamicAny::DynAny		T_LOCALOBJREF
+DynamicAny::DynFixed		T_LOCALOBJREF
+DynamicAny::DynEnum		T_LOCALOBJREF
+DynamicAny::DynStruct		T_LOCALOBJREF
+DynamicAny::DynUnion		T_LOCALOBJREF
+DynamicAny::DynSequence		T_LOCALOBJREF
+DynamicAny::DynArray		T_LOCALOBJREF
+DynamicAny::DynValue		T_LOCALOBJREF
+DynamicAny::DynAnyFactory	T_LOCALOBJREF
+
+######################################################################
+INPUT
+T_SERVANT
+	$var = pomni_sv_to_servant (aTHX_ $arg)
+T_OBJREF
+	$var = pomni_sv_to_objref (aTHX_ $arg)
+T_LOCALOBJREF
+	$var = pomni_sv_to_local_objref (aTHX_ $arg, \"${ntype}\")
+T_OBJECTID
+	{
+		STRLEN len;
+		char *str;
+		str = SvPV($arg, len);
+		$var = new PortableServer::ObjectId (len);
+		$var->length(len);
+		for (STRLEN i = 0 ; i < len ; i++) {
+		    $var\[(unsigned long)i] = str[i];
+		}	
+	}
+T_LONGLONG
+        $var = SvLLV ($arg)
+T_ULONGLONG
+        $var = SvULLV ($arg)
+T_LONGDOUBLE
+        $var = SvLDV ($arg)
+
+######################################################################
+OUTPUT
+
+T_SERVANT
+	$arg = pomni_servant_to_sv (aTHX_ $var);
+T_OBJREF
+	$arg = pomni_objref_to_sv (aTHX_ $var);
+T_LOCALOBJREF
+	$arg = pomni_local_objref_to_sv (aTHX_ $var, \"${ntype}\");
+T_OBJECTID
+	{
+		sv_setpv($arg, "");
+		SvGROW($arg, $var->length()+1);
+		SvCUR_set($arg, $var->length());
+		char *pv = SvPVX ($arg);
+		
+		for (unsigned int i = 0 ; i < $var->length() ; i++) {
+		    pv[i] = $var\[(unsigned long)i];
+		}	
+		pv[$var->length()] = '\\0';
+	}
+T_LONGLONG
+	$arg = ll_from_longlong (aTHX_ $var);
+T_ULONGLONG
+	$arg = ull_from_ulonglong (aTHX_ $var);
+T_LONGDOUBLE
+	$arg = ld_from_longdouble (aTHX_ $var);

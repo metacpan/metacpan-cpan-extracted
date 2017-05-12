@@ -1,0 +1,4 @@
+#define solid_width 1
+#define solid_height 1
+static unsigned char solid_bits[] = {
+   0x01};

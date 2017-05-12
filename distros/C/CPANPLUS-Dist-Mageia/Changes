@@ -1,0 +1,46 @@
+Revision history for CPANPLUS-Dist-Mdv
+
+2.103     2016-05-20 14:13:04+02:00 Europe/Paris
+ - include configure requires (shlomif)
+ - use %make_install instead of %makeinstall (shlomif)
+ - typo fix (shlomif)
+
+2.102     2015-11-23 14:53:20+01:00 Europe/Paris
+ - more standard license (shlomif)
+ - switching to metacpan (shlomif)
+ - cleanup & comments (shlomif)
+
+2.101     2014-09-30 14:53:53+02:00 Europe/Paris
+
+2.100401  2014-09-30 14:52:08+02:00 Europe/Paris
+ - adding %{?perl_default_filter} (rpm 4.12)
+ - using --options for Build.PL
+
+2.000     2012-10-29 14:17:10 Europe/Paris
+ - insert an empty description instead of "no description found" to make
+   sure rpmlint catches the error
+
+**
+
+1.121710  2012-06-19 16:05:14 Europe/Paris
+ - use rpm macros for all dirs (buchan milne)
+
+1.112710  2011-09-28 10:37:58 Europe/Paris
+ - no need to clean %buildroot before install
+
+1.111890  2011-07-08 12:46:34 Europe/Paris
+ - prevent cpanplus to rebuild all deps if missing files detected
+
+1.111740  2011-06-23 13:35:06 Europe/Paris
+ - only root files can be added in %doc
+ - all-caps files will be listed in %doc
+
+1.111720  2011-06-21 16:27:57 Europe/Paris
+ - removing default %clean section
+ - removing default %defattr definition
+
+1.110471  2011-02-16 13:57:48 Europe/Paris
+ - no need for buildroot: in mageia
+
+1.110470  2011-02-16 13:36:37 Europe/Paris
+ - forked from cpanplus-dist-mdv

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 37
+    - 230
+  55435:
+    - 76
+name: ddcbe6
+registers:
+  AF: 8314
+  AF_: 0
+  BC: 42049
+  BC_: 0
+  DE: 7683
+  DE_: 0
+  HL: 44128
+  HL_: 0
+  I: 0
+  IX: 55398
+  IY: 24540
+  PC: 0
+  R: 0
+  SP: 0

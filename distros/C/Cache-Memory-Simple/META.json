@@ -1,0 +1,83 @@
+{
+   "abstract" : "Yet another on memory cache",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Memory-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Time" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "Cache::Memory::Simple" : {
+         "file" : "lib/Cache/Memory/Simple.pm",
+         "version" : "1.03"
+      },
+      "Cache::Memory::Simple::Scalar" : {
+         "file" : "lib/Cache/Memory/Simple/Scalar.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Cache-Memory-Simple/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Cache-Memory-Simple",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Cache-Memory-Simple.git",
+         "web" : "https://github.com/tokuhirom/Cache-Memory-Simple"
+      }
+   },
+   "version" : "1.03",
+   "x_contributors" : [
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

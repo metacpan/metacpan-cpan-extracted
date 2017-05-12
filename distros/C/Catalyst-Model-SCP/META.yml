@@ -1,0 +1,48 @@
+---
+abstract: 'SCP model class for Catalyst'
+author:
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Model: '0'
+  Expect: '1.14'
+  File::Temp: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  Net::IPv6Addr: '0.2'
+  Net::SCP::Expect: '0'
+  Term::ReadPassword: '0.01'
+  Test::More: '0'
+  Test::WWW::Mechanize::Catalyst: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Model-SCP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst: '0'
+  Catalyst::Model: '0'
+  Expect: '1.14'
+  File::Temp: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  Net::IPv6Addr: '0.2'
+  Net::SCP::Expect: '0'
+  Term::ReadPassword: '0.01'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/shardiwal/cpan-catalyst-model-SCP/issues
+  homepage: http://www.catalystframework.org/
+  repository: https://github.com/shardiwal/cpan-catalyst-model-SCP
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

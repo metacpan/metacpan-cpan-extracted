@@ -1,0 +1,40 @@
+0.09  Thu Feb  7 20:44:55 CET 2013
+	- prevent stringified document object errors (RT#80428) with
+	  a patch from Jozef Kutej
+
+0.08  Mon Apr  6 10:07:55 2009
+	- add test to check direct calls to render() work
+	- check for object references to prevent isa() on undefined values (RT#44783 from PEPL)
+
+0.07  Mon Mar  2 18:19:27 2009
+	- put $VERSIONs back to all files (RT#43774)
+	- add support to accept strings, filehandles and objects
+	  (XML::LibXML::Document) as templates and data
+
+0.06  Sat Dec  6 15:34:42 2008
+        - fix support for xsl template strings and add a corresponding test
+
+0.05  Tue Nov 25 23:38:40 2008
+        - POD enhancements
+        - just utilize require and get rid of UNIVERSAL::require dependency
+        - drop redundant $VERSIONs
+        - use warnings everywhere
+        - clean up whitespacing and unify indentation
+        - don't error out on windows as it just works as it should
+        - implement a render method in the way C::V::TT has it and add a corresponding test
+
+0.04  Tue Dec 19 20:00:00 2006
+        - Remove '=begin pod_to_ignore' from Catalyst/Helper/View/XSLT.pm to get rid of :
+                exists "script/../lib/App/View"
+                exists "script/../t"
+                readline() on unopened filehandle DATA at (eval 13) line 1.
+                Use of uninitialized value in split at /opt/local/lib/perl5/vendor_perl/5.8.8/Catalyst/Helper.pm line 47.
+
+0.03  Tue Dec 19 20:00:00 2006
+        - Explicitly use UNIVERSAL::require
+
+0.02  Fri Feb 20 21:00:00 2006
+        - POD improvements
+
+0.01  Fri Feb  3 22:00:00 2006
+        - first release

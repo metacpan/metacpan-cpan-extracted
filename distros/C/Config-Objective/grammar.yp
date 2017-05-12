@@ -1,0 +1,340 @@
+
+###
+###  Copyright 2002-2003 University of Illinois Board of Trustees
+###  Copyright 2002-2003 Mark D. Roth
+###  All rights reserved. 
+###
+###  grammar.yp - Parse::Yapp grammar for Config::Objective
+###
+###  Mark D. Roth <roth@uiuc.edu>
+###  Campus Information Technologies and Educational Services
+###  University of Illinois at Urbana-Champaign
+###
+
+
+###
+### Header section
+###
+
+%{
+use strict;
+
+###
+### constants for conditional evaluation state
+###
+
+### either we already found a true condition, or the parent conditional
+### block is not being evaluated, so:
+###  1. subsequent %else or %elif clauses are NOT evaluated
+###  2. enclosed statements are NOT evaluated
+use constant CS_NO_EVAL		=> -1;
+
+### have not yet found a true conditional in this block, which means:
+###  1. subsequent %else or %elif clauses are evaluated
+###  2. enclosed statements are NOT evaluated
+use constant CS_FALSE		=> 0;
+
+### immediately preceding condition was true, so:
+###  1. subsequent %else or %elif clauses are NOT evaluated
+###  2. enclosed statements are evaluated
+use constant CS_TRUE		=> 1;
+%}
+
+
+%left AND OR
+%right NOT
+
+
+%%
+
+###
+### Rules section
+###
+
+config	: #empty
+	| config directive 
+	;
+
+directive
+	: statement
+	| conditional
+	| include
+	;
+
+include	: INCLUDE string
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		return undef
+			if (@{$config->{'cond_stack'}}
+			    && $config->{'cond_stack'}->[-1] != CS_TRUE);
+
+		$_[2] = $config->{'include_dir'} . '/' . $_[2]
+			if ($_[2] !~ m|^/|);
+
+		$config->parse($_[2]);
+	}
+	;
+
+conditional
+	: cond_if config cond_endif
+	| cond_elif
+	| cond_else
+	;
+
+expression
+	: expr
+	| NOT expression
+	{
+		return (! $_[2]);
+	}
+	| expression OR expression
+	{
+		return ($_[1] || $_[3]);
+	}
+	| expression AND expression
+	{
+		return ($_[1] && $_[3]);
+	}
+	| PAREN_START expression PAREN_END
+	{
+		return $_[2];
+	}
+	;
+
+expr	:
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		$config->{'in_expr'} = 1;
+	}
+	method_call
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		$config->{'in_expr'} = 0;
+		return $_[2];
+	}
+	;
+
+cond_if	: IF PAREN_START expression PAREN_END
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		push(@{$config->{'cond_stack'}},
+		     ((@{$config->{'cond_stack'}}
+		       && $config->{'cond_stack'}->[-1] != CS_TRUE)
+		      ? CS_NO_EVAL
+		      : ($_[3]
+			 ? CS_TRUE
+			 : CS_FALSE)));
+	}
+	;
+
+cond_endif
+	: ENDIF
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		die "%endif: not in conditional\n"
+			if (! @{$config->{'cond_stack'}});
+
+		pop(@{$config->{'cond_stack'}});
+	}
+	;
+
+cond_elif
+	: ELIF PAREN_START expression PAREN_END
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		die "%elif: not in conditional\n"
+			if (! @{$config->{'cond_stack'}});
+
+		### all previous conditions were false, so evaluate this one
+		if ($config->{'cond_stack'}->[-1] == CS_FALSE)
+		{
+			$config->{'cond_stack'}->[-1] = ($_[3]
+							 ? CS_TRUE
+							 : CS_FALSE);
+		}
+
+		### the last condition was true, so all subsequent %else
+		### or %elif clauses must be false
+		elsif ($config->{'cond_stack'}->[-1] == CS_TRUE)
+		{
+			$config->{'cond_stack'}->[-1] = CS_NO_EVAL;
+		}
+
+		### if it's CS_NO_EVAL, leave it alone
+	}
+	;
+
+cond_else
+	: ELSE
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		die '%else: not in conditional'
+			if (! @{$config->{'cond_stack'}});
+
+		### all previous conditions were false, so set to true
+		if ($config->{'cond_stack'}->[-1] == CS_FALSE)
+		{
+			$config->{'cond_stack'}->[-1] = CS_TRUE;
+		}
+
+		### the last condition was true, so set to CS_NO_EVAL
+		elsif ($config->{'cond_stack'}->[-1] == CS_TRUE)
+		{
+			$config->{'cond_stack'}->[-1] = CS_NO_EVAL;
+		}
+
+		### if it's CS_NO_EVAL, leave it alone
+	}
+	;
+
+string	: WORD
+	| QSTRING
+	;
+
+value	: string
+	| list
+	| hash
+	;
+
+statement
+	: method_call EOS
+	;
+
+method_name
+	: #empty
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		return ($config->{'in_expr'} ? 'equals' : 'default');
+	}
+	| METHOD_ARROW WORD
+	{
+		return $_[2];
+	}
+	;
+
+method_args
+	: #empty
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{arg_stack}}, []);
+	}
+	| value
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{arg_stack}}, [ $_[1] ]);
+	}
+	| PAREN_START
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{'list_stack'}}, []);
+	}
+	list_values PAREN_END
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{arg_stack}}, pop(@{$config->{'list_stack'}}));
+	}
+	;
+
+method_call
+	: WORD method_name method_args
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+#		print "var='$_[1]' method='$_[2]' value='$_[3]'\n";
+
+		### for conditional expressions, don't bother evaluating
+		### if a previous condition was true
+		return undef
+			if ($config->{'in_expr'}
+			    && $config->{'cond_stack'}->[-1] == CS_NO_EVAL);
+
+		### for statements, don't evaluate if we're inside a
+		### false conditional block
+		return undef
+			if (! $config->{'in_expr'}
+			    && @{$config->{'cond_stack'}}
+			    && $config->{'cond_stack'}->[-1] != CS_TRUE);
+
+		return $config->_call_obj_method($_[1], $_[2],
+					@{pop(@{$config->{arg_stack}})});
+	}
+	;
+
+list	: LIST_START
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{'list_stack'}}, []);
+	}
+	list_values LIST_END
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		return pop(@{$config->{'list_stack'}});
+	}
+	;
+
+list_values
+	: #empty
+	| value
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{'list_stack'}->[-1]}, $_[1]);
+	}
+	| list_values COMMA value
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+		push(@{$config->{'list_stack'}->[-1]}, $_[3]);
+	}
+	;
+
+hash	: HASH_START HASH_END
+	{
+		return {};
+	}
+	| HASH_START
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		push(@{$config->{'hash_stack'}}, {});
+	}
+	hash_values HASH_END
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+		return pop(@{$config->{'hash_stack'}});
+	}
+	;
+
+hash_values
+	: hash_values COMMA hash_value
+	| hash_value
+	;
+
+hash_value
+	: string
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+#		print "\t'$_[1]' => undef\n";
+		$config->{'hash_stack'}->[-1]->{$_[1]} = undef;
+	}
+	| string HASH_ARROW value
+	{
+		my ($config) = $_[0]->YYData->{'config'};
+
+#		print "\t'$_[1]' => '$_[3]'\n";
+		$config->{'hash_stack'}->[-1]->{$_[1]} = $_[3];
+	}
+	;
+
+%%
+
+###
+### Footer section
+###
+
+

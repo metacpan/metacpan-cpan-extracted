@@ -1,0 +1,27 @@
+Changes
+=======
+
+0.06 - 18 Oct 2005
+  - No code change
+  - Added POD tests
+  - Added create_readme
+
+0.05 - 26 Jul 2005
+  - Things could have been a lot simpler. Refactor.
+
+0.04 - 04 Jul 2005
+  - Fix stupid typo.
+  - Make sure to load Class::DBI (we get confused in some corner cases)
+  - Migrate svn repository
+
+0.03_01 - 01 Jun 2005
+  - Class::DBI >= 0.96's inflate method takes two arguments. Reported by
+    Alex Vandiver.
+
+0.02 - 25 Feb 2005
+  - Allow fallback to default Class::DBI inflation procedure if
+    'inflate' is not specified to has_lazy()
+  - doc tweaks
+
+0.01 - 22 Feb 2005
+  - Initial CPAN release

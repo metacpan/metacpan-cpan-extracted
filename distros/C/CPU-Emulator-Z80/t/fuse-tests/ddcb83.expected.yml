@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  13391:
+    - 0
+name: ddcb83
+registers:
+  AF: 36476
+  AF_: 0
+  BC: 21894
+  BC_: 0
+  DE: 35840
+  DE_: 0
+  HL: 64256
+  HL_: 0
+  I: 0
+  IX: 13377
+  IY: 54117
+  PC: 4
+  R: 2
+  SP: 0

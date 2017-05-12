@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Config::Abstract::Ini;
+my($original,$target) = @ARGV;
+my $abstract = Config::Abstract::Ini->new($original);
+my $diffabstract = Config::Abstract::Ini->new($target);
+my $diff = $abstract->diff($diffabstract);
+print <<EOHEAD;
+# inidiff $Config::Abstract::VERSION
+# $original
+# $target
+EOHEAD
+
+print("$diff\n");

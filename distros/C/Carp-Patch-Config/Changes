@@ -1,0 +1,12 @@
+Revision history for Carp-Patch-Config
+
+0.002   2016-06-02 (PERLANCAR)
+
+        - Restore old values on unimport.
+
+        - [doc] Mention Devel::Confess.
+
+
+0.001   2016-06-02 (PERLANCAR)
+
+        - First release.

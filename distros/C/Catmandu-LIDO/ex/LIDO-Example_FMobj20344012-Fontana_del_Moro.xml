@@ -1,0 +1,1327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lido:lidoWrap xmlns:lido="http://www.lido-schema.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.lido-schema.org http://www.lido-schema.org/schema/v1.0/lido-v1.0.xsd">
+
+<lido:lido>
+      <lido:lidoRecID lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg" lido:type="local">DE-Mb112/lido-obj20344012</lido:lidoRecID>
+      <lido:category>
+         <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+         <lido:term xml:lang="en">Man-Made Object</lido:term>
+      </lido:category>
+      <lido:descriptiveMetadata xml:lang="en">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">fountain</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5230/523a">water distribution structure</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">fountain sculpture</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">sculpture</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rome, Piazza Navona, southern end</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="commune">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rome</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="province">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="nation">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italy</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap/>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap/>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,001</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012,T,001</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,001</lido:objectID>
+                        <lido:objectNote>Fontana del Moro — fountain basin with four tritons and masks - fountain</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>has part</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,002</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012,T,002</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,002</lido:objectID>
+                        <lido:objectNote>Fontana del Moro — Ethiopian fighting a dolphin - group (man and animal)</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>has part</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:descriptiveMetadata xml:lang="de">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">Brunnenanlage</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5230/523a">Brunnen</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">Brunnenskulptur</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">Skulptur</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rom, Piazza Navona, Südseite</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="Gemeinde">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rom</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="Staat">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italien</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap/>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap/>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,001</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012,T,001</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,001</lido:objectID>
+                        <lido:objectNote>Fontana del Moro — Brunnenbecken mit vier Tritonen und Masken - Brunnen</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>hat Teil</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,002</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012,T,002</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,002</lido:objectID>
+                        <lido:objectNote>Fontana del Moro — Äthiopier im Kampf gegen einen Delphin - Mensch-Tier-Gruppe</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>hat Teil</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:administrativeMetadata xml:lang="en">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012</lido:recordID>
+            <lido:recordType><lido:term>single object</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:recordInfoLink>
+            </lido:recordInfoSet>
+            <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:recordInfoID>
+            </lido:recordInfoSet>
+         </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.172.842</lido:resourceID>
+               <lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f05</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>digital image (digitized from analog source)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="holder of image">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata>
+      <lido:administrativeMetadata xml:lang="de">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012</lido:recordID>
+            <lido:recordType><lido:term>Einzelobjekt</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:recordInfoLink>
+            </lido:recordInfoSet>
+            <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:recordInfoID>
+            </lido:recordInfoSet>
+         </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.172.842</lido:resourceID>
+               <lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f05</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="Fotoverwalter">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata>
+   </lido:lido>
+<lido:lido>
+      <lido:lidoRecID lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg" lido:type="local">DE-Mb112/lido-obj20344012,T,001</lido:lidoRecID>
+      <lido:category>
+         <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+         <lido:term xml:lang="en">Man-Made Object</lido:term>
+      </lido:category>
+      <lido:descriptiveMetadata xml:lang="en">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">fountain</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">fountain sculpture</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">sculpture</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro — fountain basin with four tritons and masks</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rome, Piazza Navona, southern end</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="commune">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rome</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="province">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="nation">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italy</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>creation</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     07600032</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Porta, Giacomo della</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italy</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:earliestDate lido:type="estimatedDate">1537</lido:earliestDate>
+							   <lido:latestDate lido:type="deathDate">1602</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>male</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>sculptor</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                     <lido:date>
+                        <lido:earliestDate>1575</lido:earliestDate>
+                        <lido:latestDate>1576</lido:latestDate>
+                     </lido:date>
+                  </lido:eventDate>
+               </lido:event>
+            </lido:eventSet>
+         </lido:eventWrap>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap>
+               <lido:subjectSet>
+                  <lido:subject lido:type="description">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">92 H 39 1</lido:conceptID>
+                        <lido:term>92 H 39 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">triton(s)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton &amp; triton</lido:term>
+                       <lido:term lido:addedSearchTerm="yes">classical mythology und ancient history</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mythology &amp; ancient history &amp; history &amp; classical antiquity &amp; Religion &amp; Greek &amp; Roman</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">gods in classical mythology</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">god (non-christian)</lido:term>               
+                        <lido:term lido:addedSearchTerm="yes">gods of the waters: Neptune and his environment</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">sea-god &amp; god (non-christian)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">(story of) Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">offspring, companion(s), train etc. of Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">offspring &amp; train (retinue) &amp; companion &amp; Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">triton(s)</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="description">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">48 A 98 21 1</lido:conceptID>
+                        <lido:term>48 A 98 21 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mask, mascaron ~ornament</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mask &amp; mascaron</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">society, civilization, culture</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">society &amp; civilization &amp; culture</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">48A	art and the public; styles and ornaments</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">public &amp; art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">stylistic and formal differentiation of art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">style &amp; form &amp; art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">ornaments ~ art</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">ornament</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">anthropomorphic ornament</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human figure</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">ornament ~ human parts</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">limb</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mask, mascaron ~ornament</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+            </lido:subjectWrap>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:objectID>
+                        <lido:objectNote>Fontana del Moro - fountain</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>part of</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:descriptiveMetadata xml:lang="de">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">Brunnen</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">Brunnenskulptur</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">Skulptur</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro — Brunnenbecken mit vier Tritonen und Masken</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rom, Piazza Navona, Südseite</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="Gemeinde">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rom</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="Staat">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italien</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>Herstellung</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     07600032</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Porta, Giacomo della</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italien</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:earliestDate lido:type="estimatedDate">1537</lido:earliestDate>
+							   <lido:latestDate lido:type="deathDate">1602</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>männlich</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>Bildhauer</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                     <lido:date>
+                        <lido:earliestDate>1575</lido:earliestDate>
+                        <lido:latestDate>1576</lido:latestDate>
+                     </lido:date>
+                  </lido:eventDate>
+               </lido:event>
+            </lido:eventSet>
+         </lido:eventWrap>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap>
+               <lido:subjectSet>
+                  <lido:subject lido:type="Beschreibung">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">92 H 39 1</lido:conceptID>
+                        <lido:term>92 H 39 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton(en)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton &amp; Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Klassische Mythologie und Antike Geschichte</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mythologie &amp; antike Geschichte &amp; Geschichte &amp; Klassische Antike &amp; Religion &amp; griechisch &amp; römisch</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">die Götter in der klassischen Mythologie</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Gott (nicht-christlich)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Wassergottheiten: Neptun und sein Gefolge</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Meeresgott &amp; Gott (nicht-christlich)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">die Geschichte von Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Nachkommenschaft, Begleiter, Gefolge, etc. Tritons</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Verwandtschaft &amp; Zug &amp; Gefolge &amp; Triton</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Triton(en)</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="Beschreibung">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">48 A 98 21 1</lido:conceptID>
+                        <lido:term>48 A 98 21 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Maske (mascaron) als Ornament</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Maske &amp; Mascaron</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Gesellschaft, Zivilisation, Kultur</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Gesellschaft &amp; Zivilisation &amp; Kultur</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Kunst</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Kunst</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Kunst und Öffentlichkeit; Stile und Ornamente</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Öffentlichkeit &amp; öffentlich &amp; Kunst</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">stilistische und formale Kriterien für die Kunst</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Stil &amp; Gestalt &amp; Kunst</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Ornamente in der bildenden Kunst; naturalistisch</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Ornament &amp; naturalistisch</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">antropomorphe Ornamente</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">menschliche Figur</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Ornamente in Form von menschlichen Körperteilen</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Glied (Körper)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Maske (mascaron) als Ornament</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+            </lido:subjectWrap>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:objectID>
+                        <lido:objectNote>Fontana del Moro - Brunnenanlage</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>Teil von</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:administrativeMetadata xml:lang="en">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012,T,001</lido:recordID>
+            <lido:recordType><lido:term>single object</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,001</lido:recordInfoLink>
+            </lido:recordInfoSet>
+             <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,001</lido:recordInfoID>
+            </lido:recordInfoSet>
+        </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+                <lido:resourceID lido:type="local">1.188.710</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/fm1188710</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>digital image</lido:term>
+               </lido:resourceType>
+               <lido:resourceDescription>overall view (sculpture of the Ethopian designed by Bernini)</lido:resourceDescription>
+               <lido:resourceDateTaken><lido:date><lido:earliestDate>1900</lido:earliestDate><lido:latestDate>1940</lido:latestDate></lido:date></lido:resourceDateTaken>
+               <lido:resourceSource lido:type="holder of image">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.296.544</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f09</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>digital image (digitized from analog source)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="holder of image">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:resourceSource lido:type="photographer">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Schröder, Walter</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata>
+      <lido:administrativeMetadata xml:lang="de">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012,T,001</lido:recordID>
+            <lido:recordType><lido:term>Einzelobjekt</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,001</lido:recordInfoLink>
+            </lido:recordInfoSet>
+             <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,001</lido:recordInfoID>
+            </lido:recordInfoSet>
+        </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.188.710</lido:resourceID>
+               <lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/fm1188710</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild</lido:term>
+               </lido:resourceType>
+               <lido:resourceDescription>Gesamtansicht (Skulptur des Äthiopier von Bernini entworfen)</lido:resourceDescription>
+               <lido:resourceDateTaken><lido:date><lido:earliestDate>1900</lido:earliestDate><lido:latestDate>1940</lido:latestDate></lido:date></lido:resourceDateTaken>
+               <lido:resourceSource lido:type="Fotoverwalter">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.296.544</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f09</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="Fotograf">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Schröder, Walter</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:resourceSource lido:type="Fotoverwalter">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata>
+   </lido:lido>
+<lido:lido>
+      <lido:lidoRecID lido:source="Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg" lido:type="local">DE-Mb112/lido-obj20344012,T,002</lido:lidoRecID>
+      <lido:category>
+         <lido:conceptID lido:type="URI">http://www.cidoc-crm.org/crm-concepts/E22</lido:conceptID>
+         <lido:term xml:lang="en">Man-Made Object</lido:term>
+      </lido:category>
+      <lido:descriptiveMetadata xml:lang="en">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">group (man and animal)</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5230/523a">group</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">fountain sculpture</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">sculpture</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro — Ethiopian fighting a dolphin</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rome, Piazza Navona, southern end</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="commune">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rome</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="province">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="nation">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italy</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>design</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     10124810</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Bernini, Giovanni Lorenzo</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italy</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:earliestDate lido:type="birthDate">1598-12-07</lido:earliestDate>
+							   <lido:latestDate lido:type="deathDate">1680-11-28</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>male</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>sculptor</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+               </lido:event>
+            </lido:eventSet>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>creation</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     08120274</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Mari, Giovanni Antonio</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italy</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:latestDate lido:type="deathDate">1661</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>male</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>sculptor</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                     <lido:date>
+                        <lido:earliestDate>1654</lido:earliestDate>
+                        <lido:latestDate>1654</lido:latestDate>
+                     </lido:date>
+                  </lido:eventDate>
+               </lido:event>
+            </lido:eventSet>
+         </lido:eventWrap>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap>
+               <lido:subjectSet>
+                  <lido:subject lido:type="description">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">34 F 11</lido:conceptID>
+                        <lido:term>34 F 11</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">man struggling with animals</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">fighting animal &amp; animal &amp; fighting</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human being, man in general</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human being</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">man and animal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human being &amp; animal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">man and (wild) animal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">wild animal &amp; animal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">animals threatening man</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">threatening</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">man struggling with animals</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="description">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">32 B 32 1</lido:conceptID>
+                        <lido:term>32 B 32 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">African negroes</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Africans &amp; negro &amp; nationality</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human being, man in general</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human being</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human types; peoples and nationalities</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">race (human) &amp; nationality</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Rasse (menschlich) &amp; Nationalität</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">human races, peoples and nationalities (other than prehistoric or extinct)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">race (human) &amp; nationality</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Africans</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Africana &amp; race (human) &amp; nationality</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">African negroes</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="description">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">25 F 27 (DOLPHIN)</lido:conceptID>
+                        <lido:term>25 F 27 (DOLPHIN)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">swimming mammals: dolphin</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">dolphin</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">nature</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">nature</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">earth, world as celestial body</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">earth &amp; world &amp; mondo &amp; machina del mondo</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">animals</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">animal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mammal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">mammal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">sea-mammal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">sea-mammal</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">swimming mammals: dolphin</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+            </lido:subjectWrap>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:objectID>
+                        <lido:objectNote>Fontana del Moro - fountain</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>part of</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:descriptiveMetadata xml:lang="de">
+         <lido:objectClassificationWrap>
+            <lido:objectWorkTypeWrap>
+               <lido:objectWorkType>
+                  <lido:term lido:encodinganalog="5230/5230">Mensch-Tier-Gruppe</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5230/523a">Gruppe</lido:term>
+               </lido:objectWorkType>
+            </lido:objectWorkTypeWrap>
+            <lido:classificationWrap>
+               <lido:classification lido:type="europeana:type">
+                  <lido:term>IMAGE</lido:term>
+               </lido:classification>
+               <lido:classification>
+                  <lido:term lido:encodinganalog="5220/5220">Brunnenskulptur</lido:term>
+                  <lido:term lido:addedSearchTerm="yes" lido:encodinganalog="5220/520a">Skulptur</lido:term>
+               </lido:classification>
+            </lido:classificationWrap>
+         </lido:objectClassificationWrap>
+         <lido:objectIdentificationWrap>
+            <lido:titleWrap>
+               <lido:titleSet>
+                  <lido:appellationValue lido:pref="preferred">Fontana del Moro — Äthiopier im Kampf gegen einen Delphin</lido:appellationValue>
+               </lido:titleSet>
+            </lido:titleWrap>
+            <lido:inscriptionsWrap/>
+            <lido:repositoryWrap>
+               <lido:repositorySet lido:type="current">
+                  <lido:repositoryLocation>
+                     <lido:namePlaceSet>
+                        <lido:appellationValue>Rom, Piazza Navona, Südseite</lido:appellationValue>
+                     </lido:namePlaceSet>
+                        <lido:partOfPlace lido:politicalEntity="Gemeinde">
+                           <lido:placeID lido:type="local" lido:source="TGN">7000874</lido:placeID>
+                           <lido:namePlaceSet>
+                              <lido:appellationValue>Rom</lido:appellationValue>
+                           </lido:namePlaceSet>
+                           <lido:partOfPlace lido:politicalEntity="Regierungsbezirk/Provinz">
+                              <lido:namePlaceSet>
+                                 <lido:appellationValue>Roma</lido:appellationValue>
+                              </lido:namePlaceSet>
+                              <lido:partOfPlace lido:politicalEntity="Staat">
+                                 <lido:namePlaceSet>
+                                    <lido:appellationValue>Italien</lido:appellationValue>
+                                 </lido:namePlaceSet>
+                              </lido:partOfPlace>
+                           </lido:partOfPlace>
+                        </lido:partOfPlace>
+                  </lido:repositoryLocation>
+               </lido:repositorySet>
+            </lido:repositoryWrap>
+            <lido:displayStateEditionWrap/>
+            <lido:objectDescriptionWrap/>
+            <lido:objectMeasurementsWrap/>
+         </lido:objectIdentificationWrap>
+         <lido:eventWrap>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>Entwurf</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     10124810</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Bernini, Giovanni Lorenzo</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italien</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:earliestDate lido:type="birthDate">1598-12-07</lido:earliestDate>
+							   <lido:latestDate lido:type="deathDate">1680-11-28</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>männlich</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>Bildhauer</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+               </lido:event>
+            </lido:eventSet>
+            <lido:eventSet>
+               <lido:event>
+                  <lido:eventType>
+                     <lido:term>Herstellung</lido:term>
+                  </lido:eventType>
+                  <lido:eventActor>
+                     <lido:actorInRole>
+                        <lido:actor lido:type="person">
+                           <lido:actorID lido:source="Bildindex-KUE-Datei" lido:type="local">kue     08120274</lido:actorID>
+                           <lido:nameActorSet>
+                              <lido:appellationValue lido:pref="preferred">Mari, Giovanni Antonio</lido:appellationValue>
+                           </lido:nameActorSet>
+                           <lido:nationalityActor>
+                              <lido:term>Italien</lido:term>
+                           </lido:nationalityActor>
+                           <lido:vitalDatesActor>
+							   <lido:latestDate lido:type="deathDate">1661</lido:latestDate>
+                           </lido:vitalDatesActor>
+                           <lido:genderActor>männlich</lido:genderActor>
+                        </lido:actor>
+                        <lido:roleActor>
+                           <lido:term>Bildhauer</lido:term>
+                        </lido:roleActor>
+                     </lido:actorInRole>
+                  </lido:eventActor>
+                  <lido:eventDate>
+                     <lido:date>
+                        <lido:earliestDate>1654</lido:earliestDate>
+                        <lido:latestDate>1654</lido:latestDate>
+                     </lido:date>
+                  </lido:eventDate>
+               </lido:event>
+            </lido:eventSet>
+         </lido:eventWrap>
+         <lido:objectRelationWrap>
+            <lido:subjectWrap>
+               <lido:subjectSet>
+                  <lido:subject lido:type="Beschreibung">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">34 F 11</lido:conceptID>
+                        <lido:term>34 F 11</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Kampf zwischen Mensch und Tier</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">kämpfendes Tier &amp; Tier &amp; kämpfen</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">der Mensch (allgemein)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mensch</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mensch und Tier</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mensch &amp; Tier &amp; Besitz</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mensch und (wildes) Tier</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">wildes Tier &amp; Tier</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Tiere bedrohen (einen) Menschen</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">drohen &amp; Drohung</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Kampf zwischen Mensch und Tier</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="Beschreibung">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">32 B 32 1</lido:conceptID>
+                        <lido:term>32 B 32 1</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Schwarzafrikaner</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Afrikaner &amp; Schwarzafrikaner &amp; Volk</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">der Mensch (allgemein)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Mensch</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Menschentypen; Völker und Nationalitäten</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">menschliche Rassen; Völker; Nationalitäten</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Rasse (menschlich) &amp; Nationalität</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">menschliche Rassen, Völker und Nationalitäten (keine prähistorischen oder untergegangenen)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Rasse &amp; Volk</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Afrikaner</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Afrikaner &amp; Volk &amp; Nationalität</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Schwarzafrikaner</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+               <lido:subjectSet>
+                  <lido:subject lido:type="Beschreibung">
+                     <lido:subjectConcept>
+                        <lido:conceptID lido:source="Iconclass" lido:type="local">25 F 27 (DOLPHIN)</lido:conceptID>
+                        <lido:term>25 F 27 (DOLPHIN)</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Meeressäuger: Delphin</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Delphin</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Natur</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Natur</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">die Erde, die Welt als Himmelskörper</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Erde &amp; Welt &amp; mondo &amp; machina del mondo</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Tiere</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Tier</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Säugetiere</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Säugetiere</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Meeressäuger</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Meeressäuger</lido:term>
+                        <lido:term lido:addedSearchTerm="yes">Meeressäuger: Delphin</lido:term>
+                     </lido:subjectConcept>
+                  </lido:subject>
+               </lido:subjectSet>
+            </lido:subjectWrap>
+            <lido:relatedWorksWrap>
+               <lido:relatedWorkSet>
+                  <lido:relatedWork>
+                     <lido:object>
+                        <lido:objectWebResource lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012</lido:objectWebResource>
+                        <lido:objectID lido:source="" lido:type="local">20344012</lido:objectID>
+					    <lido:objectID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012</lido:objectID>
+                        <lido:objectNote>Fontana del Moro - Brunnenanlage</lido:objectNote>
+                     </lido:object>
+                  </lido:relatedWork>
+                  <lido:relatedWorkRelType>
+                     <lido:term>Teil von</lido:term>
+                  </lido:relatedWorkRelType>
+               </lido:relatedWorkSet>
+            </lido:relatedWorksWrap>
+         </lido:objectRelationWrap>
+      </lido:descriptiveMetadata>
+      <lido:administrativeMetadata xml:lang="en">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012,T,002</lido:recordID>
+            <lido:recordType><lido:term>single object</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,002</lido:recordInfoLink>
+            </lido:recordInfoSet>
+            <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,002</lido:recordInfoID>
+            </lido:recordInfoSet>
+         </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.188.735</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/fm1188735</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild</lido:term>
+               </lido:resourceType>
+               <lido:resourceDescription>overall view, from front</lido:resourceDescription>
+               <lido:resourceDateTaken><lido:date><lido:earliestDate>1900</lido:earliestDate><lido:latestDate>1940</lido:latestDate></lido:date></lido:resourceDateTaken>
+               <lido:resourceSource lido:type="holder of image">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">Z 20.244</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f14</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>digital image (digitized from analog source)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="holder of image">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata> 
+      <lido:administrativeMetadata xml:lang="de">
+         <lido:rightsWorkWrap/>
+         <lido:recordWrap>
+            <lido:recordID lido:type="local">20344012,T,002</lido:recordID>
+            <lido:recordType><lido:term>Einzelobjekt</lido:term></lido:recordType>
+            <lido:recordSource>
+               <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+               <lido:legalBodyName>
+                  <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+               </lido:legalBodyName>
+               <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+            </lido:recordSource>
+            <lido:recordRights>
+               <lido:rightsHolder>
+                  <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                  <lido:legalBodyName>
+                     <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                  </lido:legalBodyName>
+                  <lido:legalBodyWeblink>http://www.fotomarburg.de</lido:legalBodyWeblink>
+               </lido:rightsHolder>
+            </lido:recordRights>
+            <lido:recordInfoSet>
+               <lido:recordInfoLink lido:formatResource="html">http://www.bildindex.de/dokumente/html/obj20344012,T,002</lido:recordInfoLink>
+            </lido:recordInfoSet>
+            <lido:recordInfoSet>
+               <lido:recordInfoID lido:type="oai">oai:bildindex.de:lidoWrap::DE-Mb112/lido-obj20344012,T,002</lido:recordInfoID>
+            </lido:recordInfoSet>
+         </lido:recordWrap>
+         <lido:resourceWrap>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">1.188.735</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/fm1188735</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild</lido:term>
+               </lido:resourceType>
+               <lido:resourceDescription>gesamt, von vorne</lido:resourceDescription>
+               <lido:resourceDateTaken><lido:date><lido:earliestDate>1900</lido:earliestDate><lido:latestDate>1940</lido:latestDate></lido:date></lido:resourceDateTaken>
+               <lido:resourceSource lido:type="Fotoverwalter">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+            <lido:resourceSet>
+               <lido:resourceID lido:type="local">Z 20.244</lido:resourceID>
+				<lido:resourceRepresentation lido:type="image_thumb">
+				   <lido:linkResource lido:formatResource="jpg">http://www.bildindex.de/bilder/t/it00423f14</lido:linkResource>
+				</lido:resourceRepresentation>
+               <lido:resourceType>
+                  <lido:term>Digitales Bild (retrodigitalisiert)</lido:term>
+               </lido:resourceType>
+               <lido:resourceSource lido:type="Fotoverwalter">
+				   <lido:legalBodyName>
+						<lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+					</lido:legalBodyName>
+               </lido:resourceSource>
+               <lido:rightsResource>
+                  <lido:rightsHolder>
+                     <lido:legalBodyID lido:type="URI" lido:source="ISIL (ISO 15511)">info:isil/DE-Mb112</lido:legalBodyID>
+                     <lido:legalBodyName>
+                        <lido:appellationValue>Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg</lido:appellationValue>
+                     </lido:legalBodyName>
+                  </lido:rightsHolder>
+               </lido:rightsResource>
+            </lido:resourceSet>
+         </lido:resourceWrap>
+      </lido:administrativeMetadata>
+   </lido:lido> 
+ </lido:lidoWrap>

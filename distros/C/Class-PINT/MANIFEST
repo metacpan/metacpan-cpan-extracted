@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Address.pm
+t/class.t
+t/object.t
+examples/Address.pm
+examples/Address/DBI.pm
+examples/myaddress.pl
+lib/Class/PINT.pm
+lib/Class/PINT/DataTypes.pm
+lib/Class/PINT/DataTypes/Bitmask.pm
+lib/Class/PINT/Relationships.pm
+META.yml                                 Module meta-data (added by MakeMaker)

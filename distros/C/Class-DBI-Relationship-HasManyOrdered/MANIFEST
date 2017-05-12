@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+examples/cms.pl
+examples/ContentManager/DBI.pm
+examples/ContentManager/Page.pm
+examples/ContentManager/Image.pm
+t/Class-DBI-Relationship-HasManyOrdered.t
+lib/Class/DBI/Relationship/HasManyOrdered.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Low level Catmandu interface to the Fedora Commons REST API",
+   "author" : [
+      "=over"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-FedoraCommons",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.9301",
+            "Data::Validate::Type" : "v1.5.1",
+            "Data::Validate::URI" : "0.06",
+            "HTTP::Request::Common" : "6.04",
+            "IO::Socket::SSL" : "2.015",
+            "RDF::Trine" : "1.014",
+            "Test::JSON" : "0.11",
+            "XML::LibXML" : "2.0121",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "1.49",
+            "Test::Simple" : "1.001003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-FedoraCommons/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-FedoraCommons",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-FedoraCommons.git",
+         "web" : "https://github.com/LibreCat/Catmandu-FedoraCommons"
+      }
+   },
+   "version" : "0.274",
+   "x_contributors" : [
+      "njfranck <njfranck@ca20c521.ugent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
+   ]
+}
+

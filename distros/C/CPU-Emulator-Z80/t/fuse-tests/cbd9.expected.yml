@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cbd9
+registers:
+  AF: 15872
+  AF_: 0
+  BC: 15934
+  BC_: 0
+  DE: 12524
+  DE_: 0
+  HL: 61382
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

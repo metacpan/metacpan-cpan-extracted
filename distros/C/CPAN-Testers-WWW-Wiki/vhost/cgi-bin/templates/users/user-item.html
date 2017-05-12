@@ -1,0 +1,37 @@
+[%
+    title = 'User Details' ;
+
+    crumb2_name = 'People' ;
+    crumb2_href = '/user/list' ;
+    crumb1_name = 'User Details' ;
+%]
+
+<div class="users">
+  <div class="userpic">
+    [% IF data.gravatar %]
+      <img src="[% data.gravatar %]" alt="[% data.realname %]" width="80" height="80" />
+    [% END %]
+
+    <!--
+    [% IF data.link %]
+      <img src="[% webpath %]/[% data.link %]" alt="[% data.tag %]" align="right"
+      [% IF data.width  %]width="[% data.width %]"[% END %]
+      [% IF data.height %]height="[% data.height %]"[% END %]
+      />
+    [% END %]
+    -->
+  </div>
+
+  <div class="userbits">
+    [% IF user.access == 5 %]
+    <div class="username"><a href="[% cgipath %]/pages.cgi?act=user-adminedit&amp;userid=[% data.userid %]">[% data.realname %]</a></div>
+    [% ELSE %]
+    <div class="username">[% data.realname %]</div>
+    [% END %]
+  </div>
+  <div class="userinfo">
+    [% IF data.aboutme ; data.aboutme ; END %]
+    [% IF data.url %]<p><strong>My Web Page:</strong> <a href="[% data.url %]">[% data.url %]</a></p>[% END %]
+    [% IF ! data.aboutme AND ! data.url %]<p>... to be completed.</p>[% END %]
+  </div>
+</div>

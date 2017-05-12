@@ -1,0 +1,16 @@
+Changes
+lib/Class/DBI/Sweet/More.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/04join.t
+t/05count.t
+t/06object_cache.t
+t/07prefetch.t
+t/08pager.t
+t/09sequence.t
+t/11outer_join.t
+t/12has_many.t
+t/lib/SweetTest.pm

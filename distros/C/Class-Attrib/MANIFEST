@@ -1,0 +1,8 @@
+Makefile.PL
+Attrib.pm
+MANIFEST
+AUTHORS
+COPYING
+LGPL-2.1
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

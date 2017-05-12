@@ -1,0 +1,31 @@
+<&|/_elements/wrapper, title => _('Projects in %1',$repository->name) &>
+<% Jifty->web->form->start%>
+% my $projects = $repository->projects;
+<ul>
+% while (my $project = $projects->next) {
+% my $del = Jifty->web->new_action(class => 'DeleteProject', record => $project, moniker => 'delete-project-'.$project->id);
+<li><%Jifty->web->link( label=> $project->name, url => '/admin/project/'.$project->name)%> 
+<%$del->form_field('id')%>
+    <% $del->button( label    => 'Delete project',
+                               class    => 'delete',
+                               onclick  => qq|return confirm('Really delete this project?');| ) %>
+                               
+                               </li>
+% }
+</ul>
+<h2><%_('Add a new project')%></h2>
+% foreach my $arg ($new_project->argument_names) {
+<%$new_project->form_field($arg)%>
+%}
+<% Jifty->web->form->submit(submit => $new_project, label => 'Create project')%>
+<% Jifty->web->form->end%>
+</&>
+<%init>
+my $new_project = Jifty->web->new_action(
+    class     => 'CreateProject',
+    arguments => { repository => $repository->id }
+);
+</%init>
+<%args>
+$repository
+</%args>

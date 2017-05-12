@@ -1,0 +1,26 @@
+Changes
+lib/CSS/Packer.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-interface.t
+t/02-io.t
+t/03-leaks.t
+t/pod.t
+t/stylesheets/s1-expected.css
+t/stylesheets/s1.css
+t/stylesheets/s2-expected.css
+t/stylesheets/s2.css
+t/stylesheets/s3-expected.css
+t/stylesheets/s3.css
+t/stylesheets/s4-expected.css
+t/stylesheets/s4.css
+t/stylesheets/s5-expected.css
+t/stylesheets/s5.css
+t/stylesheets/s6-expected.css
+t/stylesheets/s6.css
+t/stylesheets/s7-expected.css
+t/stylesheets/s7.css
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+=encoding utf-8
+
+=head1 NAME
+
+Catalyst::Plugin::FormValidator::Simple::Messages::Nihongo - mod_perl上での複数のCatalystアプリケーションでFVS::Simpleを利用可能にする
+
+=head1 概要
+
+ use Catalyst qw/
+       :
+     FormValidator::Simple::Messages
+       :
+ /;
+
+=head1 説明
+
+mod_perl上で複数のCatalystアプリケーションを走らせる場合、C::P::FormValidator::Simpleのメッセージの値がサーバーで共通のものになってしまいます。
+
+それを回避するためにformメソッドに引数が渡された場合、もしくはset_invalid_formメソッドが呼ばれた場合にメッセージを設定し直すようにします。
+
+１つのCatalystアプリケーションしか走らせないケースでは今まで通りC::P::FormValidator::Simpleを使うのが良いかと思います。
+
+=head1 作者
+
+宮崎 一徹 E<lt>ittetsu.miyazaki@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Catalyst::Plugin::FormValidator::Simple>
+
+=cut

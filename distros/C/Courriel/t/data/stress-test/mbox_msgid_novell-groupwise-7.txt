@@ -1,0 +1,69 @@
+From users-return-150786-apmail-tomcat-users-archive=tomcat.apache.org@tomcat.apache.org Wed Sep 06 18:08:49 2006
+Return-Path: <users-return-150786-apmail-tomcat-users-archive=tomcat.apache.org@tomcat.apache.org>
+Delivered-To: apmail-tomcat-users-archive@www.apache.org
+Received: (qmail 19670 invoked from network); 6 Sep 2006 18:08:48 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 6 Sep 2006 18:08:48 -0000
+Received: (qmail 57748 invoked by uid 500); 6 Sep 2006 18:08:36 -0000
+Delivered-To: apmail-tomcat-users-archive@tomcat.apache.org
+Received: (qmail 57731 invoked by uid 500); 6 Sep 2006 18:08:36 -0000
+Mailing-List: contact users-help@tomcat.apache.org; run by ezmlm
+Precedence: bulk
+List-Help: <mailto:users-help@tomcat.apache.org>
+List-Unsubscribe: <mailto:users-unsubscribe@tomcat.apache.org>
+List-Post: <mailto:users@tomcat.apache.org>
+List-Id: <users.tomcat.apache.org>
+Reply-To: "Tomcat Users List" <users@tomcat.apache.org>
+Delivered-To: mailing list users@tomcat.apache.org
+Received: (qmail 57720 invoked by uid 99); 6 Sep 2006 18:08:36 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Wed, 06 Sep 2006 11:08:36 -0700
+X-ASF-Spam-Status: No, hits=3.6 required=10.0
+        tests=INVALID_MSGID,UNPARSEABLE_RELAY,X_IP
+X-Spam-Check-By: apache.org
+Received-SPF: pass (asf.osuosl.org: local policy)
+Received: from [161.149.240.177] (HELO cwmsmtpbs2.lacity.org) (161.149.240.177)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Wed, 06 Sep 2006 11:08:35 -0700
+Received: from unknown (HELO cwmsmtpd.ci.la.ca.us) ([161.149.50.21])
+  by cwmsmtpbs2.lacity.org with ESMTP; 06 Sep 2006 11:07:53 -0700
+X-IP: 161.149.50.21
+X-SBRS: None
+X-IP: $remote-ip
+X-IronPort-AV: i="4.08,221,1154934000";
+   d="scan'208"; a="141552384:sNHT22120364"
+X-EnvFrom: Jimmy.Lindsey@lacity.org
+Received: from cwgwia.lacity.org ([161.149.252.210])
+        by cwmsmtpd.ci.la.ca.us (8.11.7p1+Sun/8.11.7) with ESMTP id k86I7jp08957
+        for <users@tomcat.apache.org>; Wed, 6 Sep 2006 11:07:45 -0700 (PDT)
+Received: from GATEWAYS-MTA by cwgwia.lacity.org 161.149.252.210
+        with Novell_GroupWise; Wed, 06 Sep 2006 11:07:41 -0700
+Message-Id: <44FEABE9020000180005662A@cwgwia.lacity.org 161.149.252.210>
+X-Mailer: Novell GroupWise Internet Agent 7.0
+Date: Wed, 06 Sep 2006 11:07:21 -0700
+From: "Jimmy Lindsey" <Jimmy.Lindsey@lacity.org>
+To: <users@tomcat.apache.org>
+Subject: Re: Tomcat Administration & SQL Server 2005
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+
+I need help with the following Tomcat issues:
+
+1. I have Tomcat 5.5 running on a windows PC, but I am unable to get
+Tomcat Administration to work.
+
+2. I need help on getting SQL Server 2005 to work with Tomcat 5.5.
+
+3. How to setup Tomcat to work with Apache Web Server.
+
+Thanks
+
+---------------------------------------------------------------------
+To start a new topic, e-mail: users@tomcat.apache.org
+To unsubscribe, e-mail: users-unsubscribe@tomcat.apache.org
+For additional commands, e-mail: users-help@tomcat.apache.org
+

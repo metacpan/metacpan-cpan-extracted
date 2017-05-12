@@ -1,0 +1,15 @@
+\bCVS\b
+^blib/
+\bMakefile$
+\bMakefile.old$
+\bpm_to_blib$
+\.cvsignore$
+\.tar\.gz$
+tags
+^developers$
+\bChangeLog.my$
+\.o$
+\.bak$
+\.log$
+^omniORB.c$
+^omniORB.bs$

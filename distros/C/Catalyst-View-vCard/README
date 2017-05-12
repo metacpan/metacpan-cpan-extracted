@@ -1,0 +1,55 @@
+NAME
+    Catalyst::View::vCard - vCard view for Catalyst
+
+SYNOPSIS
+        # in a controller...
+        my $profile = $foo;
+    
+        $c->stash->{ vcards }   = [ $profile ];
+        $c->stash->{ filename } = $profile->username;
+        $c->forward( $c->view( 'vCard' ) );
+    
+        # in a view...
+        package MyApp::View::vCard;
+    
+        use base qw( Catalyst::View::vCard );
+    
+        sub convert_to_vcard {
+            my( $self, $c, $profile, $vcard ) = @_;
+        
+            $vcard->nickname( $profile->username );
+            $vcard->fullname( $profile->name ) if $profile->name;
+            $vcard->email( $profile->email ) if $profile->show_email;
+        }
+
+DESCRIPTION
+    This is a view to help you serialize objects to vCard output. You can
+    configure the output filename by supplying a name in "$c-"stash->{
+    filename }> (a ".vcf" extension will automatically added for you). A
+    default "convert_to_vcard" implementation is provided, however you can
+    provide your own to map your object to a Text::vCard object.
+
+METHODS
+  process( \@vcards )
+    This method will loop through and call "convert_to_vcard" on all of the
+    items in the "vcards" key of the stash.
+
+  convert_to_vcard( $self, $c, $in, $out )
+    This is a default implementation for converting your items to vCard
+    objects. It will try various hash keys or methods based on the naming
+    scheme of Text::vCard's methods.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Catalyst
+
+    *   Text::vCard
+

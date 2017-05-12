@@ -1,0 +1,49 @@
+[%
+    title = 'Recent Changes';
+
+    crumb1_name = 'Recent Changes' ;
+%]
+
+<ul>
+[% FOREACH item = wikihash.recent %]
+<li><a href="/wiki/[% item.pagename %]&amp;version=[% item.version %]">[% item.pagename %]</a>
+    (version [% item.version %])
+    [% item.postdate %] ([% item.realname %])[% IF item.comment %] => "[% item.comment %]"[% END %]</li>
+[% END %]
+</ul>
+
+<!--
+<table>
+<tr>
+  <th class="top">Page</th>
+  <th class="top">Version</th>
+  <th class="top">Date</th>
+  <th class="top">Editor</th>
+  <th class="top">Comment</th>
+</tr>
+[% FOREACH item = wikihash.recent %]
+<tr>
+  <td><a href="/wiki/[% item.pagename %]&amp;version=[% item.version %]">[% item.pagename %]</td>
+  <td>[% item.version %]</td>
+  <td>[% item.postdate %]</td>
+  <td>[% item.realname %]</td>
+  <td>[% item.comment %]</td>
+</tr>
+[% END %]
+</table>
+-->
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="wiki-recent" />
+Last
+<select name="entries" onchange='this.form.submit()'>
+<option value="10"  [% IF wikihash.entries == 10  %]selected="selected"[% END %]>10</option>
+<option value="20"  [% IF wikihash.entries == 20  %]selected="selected"[% END %]>20</option>
+<option value="50"  [% IF wikihash.entries == 50  %]selected="selected"[% END %]>50</option>
+<option value="100" [% IF wikihash.entries == 100 %]selected="selected"[% END %]>100</option>
+<option value="200" [% IF wikihash.entries == 200 %]selected="selected"[% END %]>200</option>
+<option value="500" [% IF wikihash.entries == 500 %]selected="selected"[% END %]>500</option>
+</select>
+Changes
+<noscript><input type="submit" value="Submit" /></noscript>
+</form>

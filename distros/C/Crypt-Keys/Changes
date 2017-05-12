@@ -1,0 +1,42 @@
+$Id: Changes,v 1.12 2002/02/16 18:28:00 btrott Exp $
+
+Revision history for Crypt::Keys
+
+0.06  2002.02.16
+    - First public release.
+    - Added Filename argument to Crypt::Keys->detect.
+    - Got rid of reliance upon File::Type; don't really need that much
+      overhead, just a couple of regular expressions will do.
+    - Added tests for Crypt::Keys->detect, for return value format
+      and contents ('Format' and 'Description' of keyfiles).
+    - Incorporated changes to Util::mp2bin and Util::bin2mp from
+      Crypt::OpenPGP::Util.
+    - Moved Crypt::DES3 code into Crypt::Keys::Private::RSA::SSH1, because
+      that's the only place it is used.
+
+0.05  2001.07.11
+    - Documented data structure formats for Private key return
+      values.
+    - Standardized RSA-private return values. Private::RSA::SSH1 now
+      calculates dp, dq, and iqmp on deserialize, and calculates u
+      on serialize, in order to conform to the specification for
+      RSA-private return values.
+
+0.04  2001.07.10
+    - Added test suite. Tests utilities (Util), buffer (Buffer),
+      3DES inner-CBC encrypt/decrypt (DES3), all private key
+      modules that are installed (Private), and all public key
+      modules that are installed (Public).
+
+0.03  2001.07.10
+    - Added docs to Crypt::Keys.
+    - Added bin/keydetect.
+    - Added better error-handling through ErrorHandler.
+    - Added Crypt::Keys::Buffer, which is a generalized
+      buffer built on top of Data::Buffer that can handle
+      any sort of SSH-style buffer.
+    - Added public key formats.
+
+0.01  2001.07.03
+    - Initial version, based on sources from Net::SSH::Perl::Key
+      classes.

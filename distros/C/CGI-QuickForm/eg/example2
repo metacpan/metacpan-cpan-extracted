@@ -1,0 +1,172 @@
+#!/usr/bin/perl -w
+
+# $Id: quickform,v 1.13 2000/04/23 14:04:36 root Exp root $
+
+# Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+# WARNING - this program is provided as an example of QuickForm use and not as
+# an example of production quality CGI code - it may not be secure. 
+
+use strict ;
+
+use CGI qw( :standard :html3 ) ;
+use CGI::QuickForm qw( show_form colour ) ;
+
+my $STYLE_HEADLINE   = 'style="background-color:black;color:white;font-weight:bold"' ;
+
+show_form(
+    -MULTI_COLUMN     => 1, # MULTI_COLUMN
+    -TITLE            => 'Test Form',
+    -ACCEPT           => \&on_valid_form, 
+    -SIZE             => 25,
+    -SPACE            => 1,
+    -CHECK            => ( query_string() =~ /QFCHK=0/o ? 0 : 1 ), 
+    -FOOTER           => qq{<a href="} . 
+                         url() . #"
+                         qq{?QFCHK=0\&Age=28\&Surname=Bloggs\&Forename=Freda">} . #"
+                         qq{Defaults</a>} . 
+                         end_html,
+    -BUTTONS          => [ { -name => 'Add' }, { -name => 'Del' } ],
+    -STYLE_BUTTONS    => 'center',
+    -STYLE_FIELDNAME  => 'style="background-color:#AAAAAA"',
+    -STYLE_FIELDVALUE => 'style="background-color:#DDDDDD"', 
+    -STYLE_WHY        => 'style="font-style:italic;color:red"',
+    -STYLE_DESC       => 'style="color:darkblue"',
+    -VALIDATE  => sub { ( int rand(2), "<P>" . colour( 'RED', 'Randomly Invalid' ) ) },
+    -FIELDS           => [
+        {
+            -LABEL           => 'Personal Information',
+            -END_ROW         => 1,
+            -HEADLINE        => 1,
+            -STYLE_FIELDNAME => $STYLE_HEADLINE,
+            -COLSPAN         => 4,
+        },
+        {
+            -LABEL      => 'Forename',
+            -CLEAN      => \&cleanup, 
+            -VALIDATE   => sub { 
+                            my $valid = length shift > 3 ; 
+                            ( $valid, '<br />Name too short' ) ;
+                        }
+        },
+        {
+            -LABEL      => 'Surname',
+            -END_ROW    => 1, # MULTI_COLUMN
+            -CLEAN      => \&cleanup, 
+            -REQUIRED   => 1,
+            -VALIDATE   => sub { 
+                                my $valid = length shift > 3 ; 
+                                ( $valid, '<br />Name too short' ) ;
+                            }
+        },
+        {
+            -LABEL      => 'Sex',
+            -TYPE       => 'radio_group',
+            '-values'   => [ qw( Female Male ) ],
+        },
+        {
+            -LABEL      => 'Age',
+            -END_ROW    => 1, # MULTI_COLUMN
+            -VALIDATE   => &mk_valid_number( 3, 130 ), 
+            -size       => 10,
+        },
+        { 
+            -LABEL     => 'Hair colour', 
+            -REQUIRED  => undef,
+            -TYPE      => 'scrolling_list',
+            -VALIDATE  => undef,
+            -name      => undef, # Defaults to -LABEL's value.
+            '-values'  => [ qw( Red Black Brown Grey White ) ],
+            -size      => 1,
+            -multiples => undef,
+        },
+        { 
+            -LABEL     => 'Password', 
+            -END_ROW   => 1, # MULTI_COLUMN
+            -REQUIRED  => undef,
+            -TYPE      => 'password_field',
+            -VALIDATE  => undef,
+            -name      => undef, # Defaults to -LABEL's value.
+            -value     => undef,
+            -size      => 10,
+            -maxlength => undef,
+        },
+        {
+            -LABEL           => 'Miscellaneous Information',
+            -END_ROW         => 1,
+            -HEADLINE        => 1,
+            -STYLE_FIELDNAME => $STYLE_HEADLINE,
+            -COLSPAN         => 4,
+        },
+        { 
+            -LABEL     => 'Address', 
+            -END_ROW   => 1,
+            -COLSPAN   => 3, # MULTI_COLUMN
+            -REQUIRED  => undef,
+            -TYPE      => 'textarea',
+            -VALIDATE  => undef,
+            -name      => undef, # Defaults to -LABEL's value.
+            -default   => undef,
+            -rows      => 3,
+            -columns   => 40,
+        },
+        { 
+            -LABEL     => 'Worst Sport', 
+            -REQUIRED  => undef,
+            -TYPE      => 'radio_group',
+            -COLSPAN   => 3, # MULTI_COLUMN
+            -VALIDATE  => undef,
+            -name      => undef, # Defaults to -LABEL's value.
+            '-values'  => [ qw( Boxing Cricket Golf ) ], 
+            -default   => 'Golf',
+            -size      => undef,
+            -multiples => undef,
+        },
+    ],
+) ;
+
+
+sub cleanup {
+    local $_ = shift ; # This is the value of param( <fieldname> )
+
+    tr/\t \n\r\f/ /s ; # Convert multiple whitespace to one space.
+    s/^\s*//o ; # Remove leading whitespace.
+    s/\s*$//o ; # Remove trailing whitespace.
+
+    $_ ;
+}
+
+
+sub on_valid_form {
+
+    my @keys = param ;
+
+    # Process the data in some way, e.g. save it to a file or database.
+
+    print
+        header,
+        start_html( 'Test Form Data Accepted' ),
+        h3( 'Test Form Data Accepted' ),
+        p( "Thank you ", param( 'Forename' ), " for your data." ),
+        ;
+    print qq{<table border="1" cellspacing="0">} ;
+    local $_ ;
+    foreach( @keys ) {
+        print "<tr><td>$_</td><td>", param( $_ ), "</td></tr>" ;
+    }
+    print "</table><p /><hr />" ,
+          qq{<a href="/perl/quickform.html#examples">QuickForm examples</a>},
+          end_html ;
+}
+
+
+sub mk_valid_number {
+    my( $min, $max ) = @_ ;
+
+    sub { 
+        my $valid = $_[0] ? ( $min <= $_[0] and $_[0] <= $max ) : 1 ;
+        ( $valid, "<br />Number should be between $min and $max inclusive" ) ;
+    } ;
+}
+

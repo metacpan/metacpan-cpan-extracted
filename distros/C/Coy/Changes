@@ -1,0 +1,18 @@
+0.06  Mon May 25 01:51:08 PDT 2009
+  Bug Fixes
+  * Removed broken Lingua::EN::Inflect
+
+  Other
+  * Minimal modernisation and re-release
+
+
+0.05  Thu Sep  9 17:39:02 1999
+  - Added user-configurable vocabulary
+  - Added user-configurable syllable checker
+  - Improved documentation
+
+
+0.01  Sat May 30 15:06:38 1998
+  - original version; created by h2xs 1.18
+
+

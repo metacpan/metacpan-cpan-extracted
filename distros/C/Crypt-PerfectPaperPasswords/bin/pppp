@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use App::PerlPPP;
+
+my $app = App::PerlPPP->new;
+$app->parse_args(@ARGV);
+$app->run;
+
+=head1 NAME
+
+pppp - Generate Perfect Paper Password cards
+
+=head1 SYNOPSIS
+
+ pppp command [options] [command] [args]
+
+=head1 OPTIONS
+
+Boolean options:
+
+ -h,  --help        Display this help
+ -?,                Display this help
+ -H,  --man         Longer manpage for prove
+
+Options that take arguments:
+
+      --key         Supply 64 character hex key
+      --passphrase  Supply an arbitrary passphrase
+      --columns     Width for generated table
+      --rows        Height for generated table
+      --title       Title for card
+      --alphabet    Alphabet to use
+
+Commands
+
+ card       Create a new card
+ newkey     Create a new random key
+ help       Display this help
+
+=head1 COMMANDS
+
+=head2 C<card>
+
+Generated a PPP card
+
+    $ pppp --passphrase something card 1
+    Perfect Paper Passwords [1]
+    =======================================
+          A    B    C    D    E    F    G  
+    =======================================
+       1 2mjF x?Zx WfrV BcYh R6jx R4sf XUjA
+       2 L@Np edmm 4y?i 8xxD UYEo ak9f a?2y
+       3 c=xr Nop6 Ks%u ZGMf sN7F pR8+ xTqw
+       4 6j#J J@t# o7DC :dbA ?ko= VZJD YhGG
+       5 =wtc nw#g !tqG S6e@ ppUM EnRm u2A+
+       6 8NR= YMKR y35j 7%AA Fe%w !gTd T#9T
+       7 qqXr Z4Da BvS% U8is Wx3k a6?w cNwE
+       8 Er=D PE!N ZUfw dwy! LPWd 49e7 Zq68
+       9 xbxn #aZX RAw: frm9 R%nf 3?N= JBPZ
+      10 tZ54 ?mki iZoW mtCk SPj= KtFg PUc!
+    =======================================
+
+=head2 C<newkey>
+
+Create a new random PPP key
+
+    $ pppp newkey
+    Generated key is 
+    ea524439750c464eca82ec4eb24e5268b1c17906bfe35fe53fc8f9a2b62da929
+
+=head1 AUTHOR
+
+Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>.
+
+Original Perfect Paper Passwords implementation by Steve Gibson. More details
+here:
+
+    http://www.grc.com/ppp.htm
+
+=head1 LICENCE AND COPYRIGHT
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.

@@ -1,0 +1,100 @@
+NAME
+    "Class::ByOS" - write object classes that load OS-specific subclasses at
+    runtime
+
+SYNOPSIS
+    This module is for authors of object classes. A class might be written
+    as
+
+     package System::Wobble;
+
+     use Class::ByOS;
+
+     # NOT new()
+     sub __new
+     {
+        my $class = shift;
+        my @args = @_;
+        ...
+
+        return bless { internals => here }, $class;
+     }
+
+     sub wobble
+     {
+        # we'll just shell out to the 'wobble' binary
+        system( "wobble" );
+     }
+
+     1;
+
+    The user of this class doesn't need to know the details; it can be used
+    like
+
+     use System::Wobble;
+
+     my $wobbler = System::Wobble->new();
+     $wobbler->wobble;
+
+    An OS-specific implementation can be provided in a subclass
+
+     package System::Wobble::wobblyos;
+
+     use base qw( System::Wobble );
+
+     use WobblyOS::Wobble qw( sys_wobble );
+
+     sub wobble { sys_wobble() }
+
+     1;
+
+DESCRIPTION
+    Often a module will provide a general functionallity that in some way
+    uses the host system's facilities, but in a way that can either benefit
+    from, or requires an implementation specific to that host OS. Examples
+    might be IO system calls, access to networking or hardware devices,
+    kernel state, or other specific system internals.
+
+    By implementing a base class using this module, a special constructor is
+    formed that, at runtime, probes the available modules, constructing an
+    instance of the most specific subclass that is appropriate. This allows
+    the object's methods, including its actual constructor, to be overridden
+    for particular OSes, in order to provide functionallity specifically to
+    that OS, without sacrificing the general nature of the base class.
+
+    The end-user program that uses such a module does not need to be aware
+    of this magic. It simply constructs an object in the usual way by
+    calling the class's "new()" method and use the object reference
+    returned.
+
+EXPORTED CONSTRUCTOR
+  $obj = $class->new( @args )
+    By default, this module exports a "new()" function into its importer,
+    which is the constructor actually called by the end-user code. This
+    constructor will determine the best subclass to use (see
+    "find_best_subclass()"), then invoke the "__new()" method on that class,
+    passing in all its arguments.
+
+FUNCTIONS
+  $class = find_best_subclass( $baseclass )
+    This function attempts to find suitable subclasses for the base class
+    name given. Candidates for being chosen will be
+
+    "$class::$^O"
+    $class
+        For each candidate, it will be picked if that package provides a
+        method called "__new". If it does not exist yet, then an attempt
+        will be made to load the package using "require". If this attempt
+        succeeds and the "__new" method now exists, then the candidate will
+        be picked.
+
+TODO
+    *   Get "find_best_subclass()" to check OS family names too. E.g.
+        "linux" would also try Unix, or POSIX, or something of that nature.
+        Need a source of these names from somewhere. Tempted to try
+        "Devel::CheckOS" but that can't distinguish OS names from families,
+        nor can it provide taxonomy ordering.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

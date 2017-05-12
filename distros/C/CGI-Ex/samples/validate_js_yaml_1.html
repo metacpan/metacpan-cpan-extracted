@@ -1,0 +1,206 @@
+<html>
+<style>
+.error {
+  color: red;
+  font-size: 75%;
+}
+</style>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script src="./yaml_load.js"></script>
+<script src="./validate.js"></script>
+<script>
+if (! document.yaml_load) {
+  document.writeln('<span style="color:red"><h1>Missing document.yaml_load</h1>Path to ../lib/CGI/Ex/yaml_load.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.yaml_load</h1></span>');
+}
+
+if (! document.validate) {
+  document.writeln('<span style="color:red"><h1>Missing document.validate</h1>Path to ../lib/CGI/Ex/validate.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.validate</h1></span>');
+}
+
+</script>
+
+
+<form name=a>
+<table>
+<tr>
+  <td valign=top>Username:</td>
+  <td>
+    <table border=0 cellspacing=0 cellpadding=0><tr><td><input type=text size=20 name=username></td><td> Try hitting enter rather than tab.</td></tr></table>
+    <span id=username_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Password:</td>
+  <td>
+    <input type=password size=20 name=password><br>
+    <span id=password_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Password:</td>
+  <td>
+    <input type=password size=20 name=password2><br>
+    <span id=password2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Email:</td>
+  <td>
+    <input type=text size=40 name=email><br>
+    <span id=email_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Email:</td>
+  <td>
+    <input type=text size=40 name=email2><br>
+    <span id=email2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>State/Region:</td>
+  <td>
+    Specify State <input type=text size=2 name=state><br>
+    OR Region <input type=text size=20 name=region>
+    <span id=state_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Enum Check:</td>
+  <td>
+    <input type=text size=10 name=enum><br>
+    <span id=enum_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Compare Check:</td>
+  <td>
+    <input type=text size=10 name=compare><br>
+    <span id=compare_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Check one:</td>
+  <td>
+    <input type=checkbox name=checkone value=1> Foo<br>
+    <input type=checkbox name=checkone value=2> Bar<br>
+    <input type=checkbox name=checkone value=3> Baz<br>
+    <span id=checkone_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Check two:</td>
+  <td>
+    <input type=checkbox name=checktwo value=1> Foo<br>
+    <input type=checkbox name=checktwo value=2> Bar<br>
+    <input type=checkbox name=checktwo value=3> Baz<br>
+    <span id=checktwo_error class=error></span>
+  </td>
+</tr>
+<tr><td colspan=2><hr></td></tr>
+<tr>
+  <td valign=top>Fill In two:</td>
+  <td>
+    <span id=foo_error class=error></span><br>
+    <input type=text name=foo value="" size=30> Foo<br>
+    <input type=text name=bar value="" size=30> Bar<br>
+    <input type=text name=baz value="" size=30> Baz<br>
+  </td>
+</tr>
+<tr>
+  <td colspan=2 align=right>
+    <input type=submit>
+  </td>
+</tr>
+</table>
+</form>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+document.validation = "\n\
+#general no_inline: 1\n\
+general no_confirm: 1\n\
+general no_alert: 1\n\
+general as_array_prefix: ' -- '\n\
+#general as_hash_header: '<ul><li>'\n\
+#general as_hash_join:   '</li><li>'\n\
+#general as_hash_footer: '</li></ul>'\n\
+group order: [username, password, password2, email, email2, state, region, s_r_combo, enum, compare, checkone, checktwo, foo]\n\
+username:\n\
+ name: Username\n\
+ required: 1\n\
+ min_len: 3\n\
+ max_len: 30\n\
+password: &pa\n\
+ name: Password\n\
+ required: 1\n\
+ min_len: 6\n\
+ max_len: 30\n\
+ match: [m/\\d/, 'm/[a-z]/']\n\
+ match_error: '$name must contain both a letter and a number.'\n\
+password2:\n\
+ name: Verify password\n\
+ validate_if: *pa\n\
+ equals: password\n\
+ equals_name: password\n\
+email: &em\n\
+ name: Email\n\
+ required: 1\n\
+ max_len: 100\n\
+ match: 'm/^[^@]+@([\\w-]+\.)+\\w+$/'\n\
+ match_error: '$name must be a valid email address.'\n\
+email2:\n\
+ name: Verify email\n\
+ validate_if: *em\n\
+ equals: email\n\
+ equals_name: email\n\
+state:\n\
+ validate_if: [state, '! region']\n\
+ match: 'm/^\\w{2}$/'\n\
+ match_error: Please type a two letter state code.\n\
+region:\n\
+ validate_if: [region, '! state']\n\
+ delegate_error: state\n\
+ compare: 'eq Manitoba'\n\
+ compare_error: For this test - the region should be Manitoba.\n\
+s_r_combo:\n\
+ field: state\n\
+ delegate_error: state\n\
+ max_in_set: 1 of state region\n\
+ max_in_set_error: Specify only one of state and region.\n\
+ min_in_set: 1 of state region\n\
+ min_in_set_error: Specify one of state and region.\n\
+enum:\n\
+ name: Enum check\n\
+ enum: [one, two, three, four]\n\
+ enum_error: '$name must be one of one, two, three, or four.'\n\
+compare:\n\
+ required: 1\n\
+ replace: 's/\\D//g'\n\
+ name: Compare check\n\
+ compare: ['> 99', '< 1000']\n\
+ compare_error: '$name must be greater than 99 and less than 1000.'\n\
+checkone:\n\
+ name: Check one\n\
+ required: 1\n\
+ max_values: 1\n\
+checktwo:\n\
+ name: Check two\n\
+ min_values: 2\n\
+ max_values: 2\n\
+foo:\n\
+ min_in_set: 2 of foo bar baz\n\
+ max_in_set: 2 of foo bar baz\n\
+";
+if (document.check_form) document.check_form('a');
+</script>
+
+</html>
+<script>window.onload = function () { document.a.username.focus() }</script>

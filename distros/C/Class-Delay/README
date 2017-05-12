@@ -1,0 +1,77 @@
+README for Class::Delay 0.02
+
+=head1 NAME
+
+Class::Delay - delay method dispatch until a trigerring event
+
+=head1 SYNOPSIS
+
+ package PrintOut;
+ sub write {
+    my $self = shift;
+    print "printing: ", @_, "\n";
+ }
+ sub flush {
+    print "flushed\n";
+ }
+
+ package DelayedPrint;
+ use base 'PrintOut';
+ use Class::Delay
+    methods => [ 'write' ],
+    release => [ 'flush' ];
+
+ package main;
+
+ DelayedPrint->write( "we'll write this later" ); # won't get through
+                                                  # to PrintOuts 'write' yet
+ DelayedPrint->write( "this too" );
+ DelayedPrint->flush;  # all of the queued call are dispatched
+ DelayedPrint->write( "this won't be delayed" );
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::Accessor::Fast
+ Test::More
+ perl	5.006
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.02	Wednesday 22nd October, 2003
+
+	Fixed a test failure - now the triggering method will also return the
+	nominated value also.
+
+
+=item 0.01	Tuesday 21st October, 2003
+
+	Initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

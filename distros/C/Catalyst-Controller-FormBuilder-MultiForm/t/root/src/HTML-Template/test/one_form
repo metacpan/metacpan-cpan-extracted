@@ -1,0 +1,9 @@
+<!-- Single form using Catalyst::Controller::FormBuilder::MultiForm render style -->
+
+<!-- Render foo form by name -->
+<tmpl_var foo-form-start>
+<tmpl_var foo-form-statetags>
+<tmpl_var foo-label-foo_one> <tmpl_var foo-field-foo_one>
+<tmpl_var foo-label-foo_two> <tmpl_var foo-field-foo_two>
+<tmpl_var foo-form-submit>
+<tmpl_var foo-form-end>

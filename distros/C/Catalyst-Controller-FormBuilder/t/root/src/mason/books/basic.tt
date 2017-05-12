@@ -1,0 +1,7 @@
+<%args>
+$form
+</%args>
+<% $form->{start} %>
+<% $form->{field}{email}{label} %> <% $form->{field}{email}{field} %>
+<% $form->{submit} %>
+<% $form->{end} %>

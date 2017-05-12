@@ -1,0 +1,34 @@
+NAME
+    CGI::Application::Plugin::DevPopup::Params - show CGI::Application
+    parameters in DevPopup window
+
+SYNOPSIS
+        use CGI::Application::Plugin::DevPopup;
+        use CGI::Application::Plugin::DevPopup::Params;
+
+        The rest of your application follows
+        ...
+
+VERSION
+    1.00
+
+SEE ALSO
+    CGI::Application::Plugin::DevPopup, CGI::Application
+
+INCOMPATIBILITIES
+    Not known.
+
+BUGS AND LIMITATIONS
+    Not known.
+
+AUTHOR
+    Serguei Trouchelle, stro@cpan.org
+
+    Most of code is based by CGI::Application::Plugin::DevPopup by Rhesa
+    Rozendaal, rhesa@cpan.org
+
+LICENSE AND COPYRIGHT
+    This module is distributed under the same terms as Perl itself.
+
+    Copyright (c) 2009 Serguei Trouchelle
+

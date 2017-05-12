@@ -1,0 +1,62 @@
+NAME
+    Crypt::CVS - Substitution cipher for CVS passwords
+
+SYNOPSIS
+        use Crypt::CVS qw(:all);
+
+        # AE00uy
+        my $scrambled = scramble "foobar";
+        # foobar
+        my $descrambled = descramble $scrambled;
+
+DESCRIPTION
+    The CVS protocol uses a substitution cipher for passwords going over the
+    wire. From src/scramble.c in GNU CVS's source distribution:
+
+        Trivially encode strings to protect them from innocent eyes (i.e.,
+        inadvertent password compromises, like a network administrator
+        who's watching packets for legitimate reasons and accidentally sees
+        the password protocol go by.
+
+    About the encoding:
+
+        Map characters to each other randomly and symmetrically, A <--> B.
+
+        We divide the ASCII character set into 3 domains: control chars (0
+        thru 31), printing chars (32 through 126), and "meta"-chars (127
+        through 255).  The control chars map _to_ themselves, the printing
+        chars map _among_ themselves, and the meta chars map _among_
+        themselves.  Why is this thus?
+
+        No character in any of these domains maps to a character in another
+        domain, because I'm not sure what characters are valid in
+        passwords, or what tools people are likely to use to cut and paste
+        them.  It seems prudent not to introduce control or meta chars,
+        unless the user introduced them first.  And having the control
+        chars all map to themselves insures that newline and
+        carriage-return are safely handled.
+
+FUNCTIONS
+scramble($plaintext)
+    Takes plaintext and returns a scrambled version of it. The first byte of
+    the scrambled string is a single letter indicating the scrambling
+    method. This has always been "A", it's very unlikely that there'll ever
+    be another scrambling method.
+
+unscramble($scrambled)
+    Takes a scrambled string and returns an unscrambled version. Dies if the
+    first letter isn't "A".
+
+EXPORTS
+    The functions "scramble" and "descramble" can be optionally exported.
+    "use Crypt::CVS ':all'" exports both of them.
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE
+    Copyright 2007-2010 Ævar Arnfjörð Bjarmason.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

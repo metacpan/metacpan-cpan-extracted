@@ -1,0 +1,9 @@
+Changes
+extras/test_algorithms.pl
+lib/Crypt/YAPassGen.pm
+lib/Crypt/YAPassGen/american-english.dat
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Crypt-YAPassGen.t

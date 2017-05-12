@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb7a
+registers:
+  AF: 51865
+  AF_: 0
+  BC: 22186
+  BC_: 0
+  DE: 27142
+  DE_: 0
+  HL: 27863
+  HL_: 0
+  I: 0
+  IX: 2729
+  IY: 38930
+  PC: 4
+  R: 2
+  SP: 0

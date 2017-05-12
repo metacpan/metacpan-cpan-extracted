@@ -1,0 +1,39 @@
+TYPEMAP
+char				T_CHAR
+int				T_INT
+int *				T_PTR
+float * 			T_PTR
+float				T_FLOAT
+Entity *			O_OBJECT
+Collision *		O_OBJECT
+Point *		   O_OBJECT
+Rect *		   O_OBJECT
+Grid *		   O_OBJECT
+Circle *		   O_OBJECT
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_OBJECT
+   if ($var) {
+      void** pointers = malloc(2 * sizeof(void*));
+      pointers[0] = (void*)$var;
+      pointers[1] = (void*)PERL_GET_CONTEXT;
+      sv_setref_pv( $arg, CLASS, (void*)pointers );
+   } else {
+      XSRETURN_UNDEF;
+   }
+
+INPUT
+
+O_OBJECT
+   if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ) {
+      void** pointers = (void**)(SvIV((SV*)SvRV( $arg ))); 
+      $var = ($type)(pointers[0]);
+   } else if ($arg == 0) {
+      XSRETURN(0);
+   } else {
+      XSRETURN_UNDEF;
+   }
+
+

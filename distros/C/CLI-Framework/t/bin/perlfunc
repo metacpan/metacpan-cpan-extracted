@@ -1,0 +1,21 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use lib 't/lib';
+
+use My::PerlFunctions;
+My::PerlFunctions->run();
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Application Script executable for demo application supporting searching for
+single-line summary descriptions of built-in Perl functions.
+
+=cut

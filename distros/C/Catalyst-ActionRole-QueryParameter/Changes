@@ -1,0 +1,40 @@
+Revision history for Perl extension Catalyst::ActionRole::QueryParameter
+
+0.08    29 September 2015
+        - Let a parameter be optional: "QueryParameter(?page:Int)"
+        - Let a parameter define a default "QueryParameter(page=1:Int)"
+
+0.07    20 November 2015
+        - Fixes from reported issues (contributors++)
+        - Migration to Dist::Zilla
+        - Conditions may now be Moose / Type::Tiny Types
+        - All constraints are now preloaded.
+        - Better check for numeric constraints.  We now use Scalar::Util::looks_like_number
+          to make sure the value is a valid number for numeric comparisons.  This is a
+          possible breaking change if you relied on numeric comparisons for non numeric
+          data.
+        - Improved tests
+
+0.06    05 May 2015
+        - Fixed a bug that might cause us to mess up captures when applied to an
+        action that was in the middle of a chain (and had captures).
+
+0.05    27 April 2015
+        - match_captures is now always defined in Catalyst::Action so we changed
+        the role to not overwrite it.
+        - Catalyst supports ActionRoles natively in a controller for a long time
+        so updated the Minimun Catalyst version and removed previous code.
+        
+0.04    19 December 2011
+        - support match_captures from newer version of catalyst.
+
+0.03    17 May 2011
+        - More documentation tweaks
+        - support =~ as a match operator.
+
+0.02    16 May 2011
+        - Fixed broken matching on alphabetic values in query params and a bit
+          of documentation enhancements.
+
+0.01    15 May 2011
+        - original version.

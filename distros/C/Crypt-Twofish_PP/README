@@ -1,0 +1,152 @@
+NAME
+    Crypt::Twofish_PP - The Twofish Algorithm in Pure Perl
+
+SYNOPSIS
+      use Crypt::Twofish_PP;
+
+      $cipher = Crypt::Twofish_PP->new ($key);
+      $ciphertext = $cipher->encrypt ($key);
+      $plaintext = $cipher->decrypt ($ciphertext);
+
+      $keysize = $cipher->keysize;
+      $blocksize = $cipher->blocksize;
+
+      $keysize = Crypt::Twofish_PP->keysize;
+      $blocksize = Crypt::Twofish_PP->blocksize;
+
+      use Crypt::CBC;
+      $cipher = Crypt::CBC->new (key    => 'my secret key',
+                                 cipher => 'Twofish_PP');
+      $cipher = Crypt::CBC->new (key    => 'my secret key',
+                                 cipher => 'Twofish_PP::Key24');
+      $cipher = Crypt::CBC->new (key    => 'my secret key',
+                                 cipher => 'Twofish_PP::Key16');
+
+      use Crypt::CBC;
+      use Crypt::Twofish_PP;
+      $Crypt::Twofish_PP::KEYSIZE = 24;
+      $cipher = Crypt::CBC->new (key   => 'my secret key',
+                                 cipher => 'Twofish_PP');
+      $Crypt::Twofish_PP::KEYSIZE = 32;
+      $cipher = Crypt::CBC->new (key   => 'my secret key',
+                                 cipher => 'Twofish_PP');
+
+DESCRIPTION
+    Twofish is a 128-bit symmetric block cipher with a variable key length
+    (128, 192, or 256 bits) key, developed by Counterpane Labs. It is
+    unpatented and free for all uses, as described at
+    <http://www.counterpane.com/twofish.html>. It has been one of the five
+    finalists for AES.
+
+    This module is written in pure Perl, it should run everywhere where Perl
+    runs.
+
+METHODS
+    The following methods are part of the Crypt::Twofish_PP API:
+
+    new KEY
+        The constructor takes as its single argument a key of 16, 24 or 32
+        bytes length. Calling it with other key lenghts, will cause the
+        module to throw an exception.
+
+    encrypt BLOCK
+        Returns the encrypted block. The length of the block must be exactly
+        16 bytes, otherwise the behaviour will be undefined. You can safely
+        right-pad shorter blocks with null bytes.
+
+    decrypt BLOCK
+        Returns the encrypted block. The length of the block must be exactly
+        16 bytes, otherwise the behaviour will be undefined. You can safely
+        right-pad shorter blocks with null bytes.
+
+    blocksize
+        Returns the constant value 16.
+
+    keysize
+        Returns the length of the key in bytes. When called as a class
+        method, it returns the value $Crypt::Twofish_PP::KEYSIZE which is
+        initialized to 32.
+
+CIPHER BLOCK CHAINING (CBC) MODE
+    When encrypting streams of data you will need an additional block
+    chaining mechanism like CBC as provided by Crypt::CBC(3). When used with
+    Crypt::CBC(3), Crypt::Twofish_PP(3) will usually work with a fixed key
+    length of 32 bytes, since Crypt::CBC(3) is not capable of handling
+    variable length keys.
+
+    If you need to use shorter keys with Crypt::CBC(3), you have two
+    choices: You can either overwrite the variable $Crypt::CBC::KEYSIZE with
+    the desired length (16 or 24) in bytes, or you can specify
+    'Twofish_PP::Key16' resp. 'Twofish_PP::Key24' as the cipher algorithm to
+    Crypt::CBC(3). The modules Crypt::Twofish_PP::Key32(3),
+    Crypt::Twofish_PP::Key24(3), and Crypt::Twofish_PP::Key16(3), inherit
+    all functionality from Crypt::Twofish_PP but overwrite the "keysize()"
+    method, such that another default key length is reported back to
+    Crypt::CBC(3).
+
+UTF-8 NUISANCES
+    Beginning with Perl 5.6, Perl scalars might be internally flagged as
+    being UTF-8 strings, and are treated as character-oriented data, not as
+    byte-oriented data (one character may require one to six bytes for its
+    internal representation). In most cases you will gain nothing from the
+    introduction of that flag, and rather find yourself trying to get rid of
+    it. Crypt::Twofish_PP uses byte-oriented keys, and encrypts/decrypts
+    blocks of 16 bytes, and it is the callers responsability to clean input
+    data from that flag.
+
+PERFORMANCE ISSUES
+    The most expansive method by far is the constructor. The constructor
+    will set up the key scheduling which is a time-consuming process that
+    has to be repeated for every new key. Processing one 16 byte key
+    currently (on my machine) takes about 15 times longer than encrypting
+    one 16 byte data block with that key. If you plan to use the same key
+    several times in your application, you will probably want to keep the
+    encryption/decryption module around for later perusal. By the way, this
+    behavior of Crypt::Twofish_PP is a typical characteristic of most modern
+    encryption algorithms. Although the details may differ a lot between
+    algorithms, setting up the decoder/encoder with a key usually takes a
+    lot more time than performing the encryption/decryption.
+
+    The length of your key is also important. The longer it is, the more
+    time is consumed to set up the key scheduling. Once you have the module
+    ready to encrypt/decrypt, the key length has no impact on performance.
+    This is a general property of the Twofish algorithm, other algorithms
+    show a different behavior, and may vary in speed depending on the
+    particular key length (Rijndael now AES is an example for this).
+
+    The subdirectory benchmark of the source distribution contains a script
+    benchmark.pl that you can use to test the performance of a variety of
+    cryptographic modules installed on your system.
+
+    There are two other modules available on CPAN that also implement the
+    Twofish algorith, but in C, not in Perl as Crypt::Twofish_PP does. Of
+    course the C implementations are a lot faster than the pure Perl
+    implementation, and you should rather use one of them whenever possible.
+    However, at the time of this writing (November 2003), Crypt::Twofish_PP
+    offers by far the fastest pure Perl 256 bit encryption available on
+    CPAN. For shorter key lengths Crypt::CAST5_PP(3) is faster only when
+    encrypting/decrypting large chunks of data.
+
+ENVIRONMENT
+    The environement variables LANG, LANGUAGE, LC_MESSAGES, resp. LC_ALL
+    control the language for messages produced by the module. The environemt
+    variable OUTPUT_CHARSET may be used to control the output character set.
+    See the file README-NLS in the source distribution for details.
+
+BUGS
+    The module has been tested on big- and little-endian machines with
+    integer sizes of 32 and 64 bits, and no bugs showed up. It should
+    therefore be considered safe to use it everywhere.
+
+AUTHOR
+    Copyright (C) 2003, Guido Flohr <guido@imperia.net>, all rights
+    reserved. See the source code for details.
+
+    This software is contributed to the Perl community by Imperia
+    (<http://www.imperia.net/>).
+
+SEE ALSO
+    Crypt::Twofish_PP::Key32(3), Crypt::Twofish_PP::Key24(3),
+    Crypt::Twofish_PP::Key16(3), Crypt::CBC(3), Crypt::Twofish2(3),
+    Crypt::Twofish(3), perl(1)
+

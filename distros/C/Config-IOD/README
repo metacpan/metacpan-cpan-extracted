@@ -1,0 +1,70 @@
+SYNOPSIS
+
+     use Config::IOD;
+     my $iod = Config::IOD->new(
+         # list of known attributes, with their default values
+         # default_section     => 'GLOBAL',
+         # enable_encoding     => 1,
+         # enable_quoting      => 1,
+         # enable_backet       => 1,
+         # enable_brace        => 1,
+         # allow_encodings     => undef, # or ['base64','json',...]
+         # disallow_encodings  => undef, # or ['base64','json',...]
+         # allow_directives    => undef, # or ['include','merge',...]
+         # disallow_directives => undef, # or ['include','merge',...]
+         # allow_bang_only     => 1,
+         # enable_expr         => 0,
+         # allow_duplicate_key => 1,
+         # ignore_unknown_directive => 0,
+     );
+
+    Read IOD/INI document from a file or string, return
+    Config::IOD::Document object:
+
+     my $doc = $iod->read_file("/path/to/some.iod");
+     my $doc = $iod->read_string("...");
+
+    See Config::IOD::Document for methods available for $doc.
+
+DESCRIPTION
+
+    This module is a round-trip parser for IOD configuration format (IOD is
+    an INI-like format with more precise specification, some extra
+    features, and 99% compatible with typical INI format). Round-trip means
+    all whitespaces and comments are preserved, so you get byte-by-byte
+    equivalence if you dump back the parsed document into string.
+
+    Aside from parsing, methods for modifying IOD documents (add/delete
+    sections & keys, etc) are also provided.
+
+    If you only need to read IOD configuration files, you might want to use
+    Config::IOD::Reader instead.
+
+ATTRIBUTES
+
+    # INSERT_BLOCK: Config::IOD::Base attributes
+
+METHODS
+
+ new(%attrs) => obj
+
+ $reader->read_file($filename) => obj
+
+    Read IOD configuration from a file. Return Config::IOD::Document
+    instance. Die on errors.
+
+ $reader->read_string($str) => obj
+
+    Read IOD configuration from a string. Return Config::IOD::Document
+    instance. Die on errors.
+
+SEE ALSO
+
+    IOD - specification
+
+    Config::IOD::Reader - if you just need to read a configuration file,
+    you should probably use this module instead. It's lighter, faster, and
+    has a simpler interface.
+
+    IOD::Examples - sample documents
+

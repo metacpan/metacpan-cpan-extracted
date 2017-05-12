@@ -1,0 +1,3 @@
+I am plain text.  I have no style.
+
+I was sent to [% $stash_key.to %] on [% time %]

@@ -1,0 +1,136 @@
+NAME
+    Catalyst::Authentication::Credential::GSSAPI - rfc4559 SPNEGO/GSSAPI
+
+SYNOPSIS
+    In your application configuration:
+
+      <authentication>
+        default_realm "myrealm"
+        <realms>
+          <myrealm>
+            <credential>
+              class "GSSAPI"
+            </credential>
+            <store>
+              class "LDAP"
+              ldap_server "myrealm.mydomain.com"
+              binddn "anonymous"
+              bindpw "dontcarehow"
+              user_basedn "OU=Users,DC=myrealm,DC=mydomain,DC=com"
+              user_field "userprincipalname"
+              user_filter "(userprincipalname=%s)"
+              user_scope "sub"
+            </store>
+          </myrealm>
+        </realms>
+      </authentication>
+
+    On your application code:
+
+      $c->authenticate({ });
+
+DESCRIPTION
+    This module implements the HTTP negotiation described in rfc4559. The
+    authentication is implemented by the natively calling the gssapi from
+    the krb5 library. It provides only the "Credential" part of the system.
+    You are required to plugin a different "Storage", such as LDAP, in order
+    to get the data for the user info.
+
+    This allows your application to perform Single-Sign-On (SSO) if you are
+    in an environment with Kerberos authentication. One example of such
+    scenario is for environments managed with Microsoft Active Directory.
+
+    This module will not, however, perform password-based authentication on
+    the Kerberos realm. It will only accept token-based negotiation with
+    GSSAPI.
+
+    Like Catalyst::Authentication::Credential::HTTP, this module will detach
+    your action for the HTTP negotiation to happen and will only return when
+    a valid user was authenticated and retrieved from the store.
+
+KEYTABS AND PRINCIPALS
+    When implementing GSSAPI negotiation over HTTP, the convention specify
+    that the name of the principal for the service will always be:
+
+      HTTP/hostname.of.the.server
+
+    Such that if the client is connecting to
+
+      http://myservice.mydomain.com
+
+    the name of Service Principal Name (SPN) will be required to be
+
+      HTTP/myservice.mydomain.com
+
+    The SPN needs to be registered with the kerberos server, and application
+    needs to be run with a keytab that contains that principal. One way to
+    verify that is by doing:
+
+      $ k5srvutil -f mykeytabfile.keytab list
+      Keytab name: FILE:mykeytabfile.keyttab
+      KVNO Principal
+      ---- --------------------------------------------------------------------
+       3 serviceaccount@MYREALM.MYDOMAIN.COM
+       3 HTTP/myservice.mydomain.com@MYREALM.MYDOMAIN.COM
+
+    With the MIT krb5 library, you can use the keytab by exporting the
+    following environment variable for the process running the application:
+
+      export KRB5_KTNAME=FILE:/full/path/to/mykeytabfile.keytab
+
+    That way the application will be able to participate in the
+    authentication.
+
+CLIENT SIDE
+    The client side, of course, also has to support this negotiation.
+
+  BROWSER SUPPORT
+    All major browsers support this negotiation, some configuration may be
+    required in order to enable it.
+
+  CURL
+    Curl can be built with krb5 support, at which point you should be able
+    to use:
+
+      curl --negotiate -u x:x http://myservice.mydomain.com
+
+    The "-u x:x" argument is necessary in order to tell curl to enable
+    authentication, the user name and password will not be used and can be
+    set to a dummy value, like "x:x".
+
+CONFIGURATION
+    username_field
+        This configures what field should the username be set to in the
+        authinfo hash. Defaults to "username".
+
+        The authentication will send the "src name" from gssapi as the user
+        name for the find_user call.
+
+    strip_realm
+        When using kerberos, the full principal name is returned, which is
+        usually in the form of user@REALM. Setting this will strip
+        everything after the '@' before sending it to the credential store.
+        This is useful if you are using a store that is not connected to the
+        kerberos authentication.
+
+USING WITH LDAP ON MICROSOFT ACTIVE DIRECTORY
+    Active Directory offers the LDAP attribute "userprincipalname" that will
+    match the kerberos principal used by this API. If you set the user_field
+    and user_filter configurations of the LDAP store, it will seamlessly
+    integrate and return you a valid LDAP user.
+
+COPYRIGHT
+    Copyright 2015 Bloomberg Finance L.P.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

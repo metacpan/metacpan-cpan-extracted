@@ -1,0 +1,39 @@
+---
+abstract: 'Catmandu modules for working with crossref data'
+author:
+  - 'Vitali Peil C<< <vitali.peil at uni-bielefeld.de> >>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::Exception: '0.32'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-CrossRef
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0'
+  Catmandu::XML: '0'
+  Furl: '0'
+  Moo: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-CrossRef/issues
+  homepage: https://github.com/LibreCat/Catmandu-CrossRef
+  repository: https://github.com/LibreCat/Catmandu-CrossRef.git
+version: '0.007'
+x_contributors:
+  - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
+  - 'vpeil <vitali.peil@uni-bielefeld.de>'

@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+INSTALL
+lib/Catalyst/Helper/Model/Akismet.pm
+lib/Catalyst/Model/Akismet.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00.load.t
+t/01.functionality.t
+t/02.perlcritic.t
+t/03.pod.t
+t/04.pod-coverage.t
+t/lib/TestApp.pm
+t/lib/TestApp/Model/Akismet.pm

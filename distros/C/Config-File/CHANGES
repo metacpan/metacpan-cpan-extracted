@@ -1,0 +1,24 @@
+UNRELEASED
+1.50 (20-Jan-2009):
+ - Added Test::Pod::Coverage as a build dependency, as some CPANTS
+   test hosts have died during the tests
+ - Removed the ConfigFile naming (deprecated for over a year)
+
+1.46 (11-Dec-2008):
+ - The 'stupid typos' release :-/
+
+1.45 (11-Dec-2008):
+ - Migrated from ExtUtils::MakeMaker to Module::Build, to properly
+   (and more easily) keep up-to-date and valid metadata
+ - Added Test::Pod, Test::Pod::Coverage
+ - Keeping CPANTS / Kwalitee happy! (hopefully)
+
+1.42 (04-Mar-2008):
+ - Explicitly closing the file after reading it, closing a bug on
+   wperl.exe on win32. Thanks to Peter Valdemar Mørch for spotting it!
+
+1.41 (20-Oct-2007):
+ - Dropped the old, deprecated ConfigFile naming
+
+1.4 (07-Sep-2006):
+ - Initial CPAN upload (was a native Debian package before)

@@ -1,0 +1,11 @@
+Trying to implement the "Context Sensitive Help" of Padre in a stand alone module.
+
+It has a command line interface that comes with this package.
+
+It is also implemented as part of the Hyppolit IRC bot used on the #padre channel in irc.perl.org
+
+The plan is to factor out all the "Context Sensitive Help" of Padre 
+and then make Padre depend on this module providing a GUI interface to this.
+
+There is a plan to build a web interface as well.
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Store sessions using KiokuDB'
+author:
+  - 'Robin Berjon, <robin@berjon.com>, L<http://robineko.com/>'
+distribution_type: module
+generated_by: 'Module::Install version 0.770'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Session-Store-KiokuDB
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::Session::Store: 0
+  KiokuDB: 0.07
+  KiokuDB::Backend::BDB::GIN: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

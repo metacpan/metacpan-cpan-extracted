@@ -1,0 +1,32 @@
+{
+  "documents": {
+    "format": "2"
+  },
+  "highlight": {
+    "format": "1"
+  },
+  "lexicon": {
+    "counts": {
+      "desc": "1",
+      "title": "1"
+    },
+    "format": "3",
+    "index_counts": {
+      "desc": "1",
+      "title": "1"
+    }
+  },
+  "postings": {
+    "format": "1"
+  },
+  "segmeta": {
+    "count": "2",
+    "field_names": [
+      "",
+      "desc",
+      "title"
+    ],
+    "format": "1",
+    "name": "seg_2"
+  }
+}

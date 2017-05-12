@@ -1,0 +1,7 @@
+Changes
+lib/Config/Backend/INIREG.pm
+lib/Config/Backend/Registry.pm
+Makefile.PL
+MANIFEST
+README
+t/4.t

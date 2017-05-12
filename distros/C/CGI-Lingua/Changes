@@ -1,0 +1,265 @@
+Revision history for CGI-Lingua
+
+0.58	Fri Dec 23 21:08:52 EST 2016
+	Remember the requested language
+	Ensure _sublanguage_code_alpha2 is stored in cache
+
+0.57:	Sat  3 Dec 09:20:33 EST 2016
+	Handle lang passed in as a CGI parameter to override the browser's settings
+
+0.56:	Tue Sep 20 12:05:29 EDT 2016
+	Handle IANA misreporting the country of some of my test data
+	Use geoplugin as an alternative to Whois
+	Use LANG environment when not in CGI mode
+	Added Coveralls integration
+	Handle RT117983
+
+0.55	Mon Oct 12 17:06:36 EDT 2015
+	Sometimes requested_language would return Unknown even though it could
+		have been figured out.
+	Don't look in the cache for LAN connections
+
+0.54	Sun Aug 16 20:14:59 EDT 2015
+	Handle connections over a LAN better
+	Ensure that Geo:IP has the file it will use
+
+0.53	Sun Jun 21 08:42:25 EDT 2015
+	Catch warning sent from Locale::Country::Object->new()
+	Created t/zz.t
+	Cache the entire object
+
+0.52	Sat Jan 24 10:07:39 EST 2015
+	Use Geo::IPfree if that is available
+	Various small performance improvements
+	country: now returns "Unknown" if set to 'eu'
+
+0.51	Thu Nov 13 17:32:45 EST 2014
+	Fix typo
+	Added test for GEOIP_COUNTRY_CODE
+	Slight optimisation to _warn()
+	Use IP::Country if it's installed
+	Try better to catch error messages from Local::Country::Object
+	Country really cannot be 'eu'
+	Handle Baidu which claims to be in the EU but is in Hong Kong
+	Store items in the IP->country code cache much more realistic lengths
+	Added workaround for RT 74338
+	Handle fixed clients which set en-uk instead of en-gb for their
+		language
+	Sublanguage() wasn't returning undef correctly if the requested one
+		wasn't supported.
+	Avoid setting the IP in the cache twice
+
+0.50	Sun Apr  7 11:24:51 EDT 2013
+	Bumped minimum version of I18N::LangTags::Detect to 1.04
+		See http://analysis.cpantesters.org/reports_by_field?distv=CGI-Lingua-0.49;field=mod%3AI18N%3A%3ALangTags%3A%3ADetect
+	Log cache set/get
+
+0.49	Sat Feb 23 09:59:17 EST 2013
+	Try to shutup messages about can't locate Geo::IP when it's not
+		installed
+	Allow arguments to new() to be hash or hashref
+
+0.48	Wed Jan 30 14:12:01 EST 2013
+	Fixed t/eu.t which gave false negatives on systems with Geo::IP
+		installed
+	Added CloudFlare optimisation to country()
+
+0.47	Sat Jan 19 09:21:56 EST 2013
+	Handle en-029
+	Remove t/unused.t - now use t/vars.t
+	Handle unknown country EU in locale().  Beefed up t/eu.t
+
+0.46	Sun Dec 30 11:07:15 EST 2012
+	Handle uninitialised variable in country()
+	Added t/strict.t
+
+0.45	Thu Dec  6 08:33:12 EST 2012
+	Fixed t/eu.t on systems with Geo::IP
+
+0.44	Mon Dec  3 08:47:12 EST 2012
+	Fixed t/unused.t for Windows - removed unneeded dependency
+	Added t/changes.t
+	Fixed some tests which failed when there is no Internet access
+	Fix Not a HASH reference which sometimes happens when Whois look ups
+		fail
+	Tried to handle Test::Log4perl better - it is a broken module!
+	Handle Whois records which contain comments, e.g 212.49.88.99
+
+0.43	Fri Oct 12 15:08:27 EDT 2012
+	Fix error on ACCEPT_LANGUAGE=es-419 (Latin American Spanish)
+
+0.42	Tue Sep  4 12:41:38 BST 2012
+	Renamed code_alpha2 to language_code_alpha2.
+	Add note about using Geo::IP
+	Simplified the cache key
+	IP addresses don't change country that often, so increase the time
+		in the cache from 10 minutes to 1 month
+
+0.41	Sun Aug 26 11:21:06 BST 2012
+	Handle Whois queries that return country codes in lower case
+	Prefer Geo::IP over Whois lookups, if that is available
+
+0.40	Wed Aug 15 16:39:16 BST 2012
+	Added some extra tests and error handling
+	Removed duplicate tests
+	Allow new() to take its params in a reference to
+		a hash as well as a hash since references
+		are quicker and use less memory
+	Added optional logger parameter to new()
+
+0.39	Fri Jul 13 09:44:11 BST 2012
+	Use mod_geoip as a fall back if it is installed
+	Fixed unitialized variable in test
+	Better handling of automatic build environments
+	
+0.38	Sat Jun  2 15:23:40 EDT 2012
+	Fix use of unitialised variable
+	Handle remote address '::1' (IPv6)
+	Added test for RT77332
+	locale(): better handling of whois failure
+	Handle case where Whois entry consists only of a newline
+
+0.37	Tue May 15 14:37:47 EDT 2012
+	Fix strange sublanguage handling when
+		'HTTP_ACCEPT_LANGUAGE = 'en-gb,en;q=0.5,x-ns1Gcc7A8xaNx1,x-ns294eMxcVGQb2'
+
+0.36	Sat May 12 09:04:04 EDT 2012
+	Catch connection timeouts to whois.apnic.net
+
+0.35	Thu May  3 10:17:04 BST 2012
+	Catch connection timeouts to whois.ripe.net
+
+0.34
+	Added dont_use_ip option
+	Use IO::Lambda style system to only run tests that require connection
+		to the Internet when requested
+
+0.33	Wed Apr 25 20:58:47 BST 2012
+	Remove CR and LF from country codes in Whois
+
+0.32	Thu Apr 19 12:00:56 BST 2012
+	More improvement to the parsing of HTTP_USER_AGENT
+
+0.31	Wed Apr 18 16:47:20 BST 2012
+	Improved parsing of HTTP_USER_AGENT to find local information
+
+0.30	Tue Nov 15 19:41:35 EST 2011
+	Fixed spelling mistakes in the documentation
+	Handle whois records containing \r, e.g. 190.24.1.122
+
+0.29	Fri Oct 21 17:27:15 EDT 2011
+	Improved caching
+
+0.28	Thu Oct  6 13:44:20 EDT 2011
+	Improved handling of connection failure to whois.arin.net
+	Fix the argument to syslog
+	Try to avoid the Carp call within Locale::Object::Country
+
+0.27	Mon Sep 19 15:07:58 EDT 2011
+	Improved handling
+	Added syslog argument to new
+
+0.26	Fri Sep  9 11:13:02 EDT 2011
+	Added some tests and clarified the locale() documentation
+	Added subcountry_code_alpha2()
+
+0.25	Tue Sep  6 13:08:06 EDT 2011
+	Only call HTTP::BrowserDetect if we're in a CGI environment
+
+0.24	Sun Sep  4 08:53:50 EDT 2011
+	locale now falls back to HTTP::BrowserDetect if it's present
+
+0.23	Fri Aug 26 13:19:51 EDT 2011
+	Added t/critic.t
+	Correct documentation about what class is returned by locale()
+
+0.22	Wed Aug 10 13:46:42 EDT 2011
+	Fixed unitialised variable in some circumstances when checking language
+
+0.21	Wed Jul 20 13:39:57 EDT 2011
+	Added locale method
+	Had another go at returning sensible values if a requested
+		sublanguage can't be honoured
+	Added test for RT69509
+
+0.20	Fixed some 'Can't call method "name" on an undefined value' when the
+		browser suggests more than one language and a requested
+		sublanguage isn't available
+
+0.19	More sensible choice of real world language requirements, for example
+		a browser requesting US English on a site that only delivers
+		British English will now see the site, AND the site author
+		will be able to trace with variables what's happened if he or
+		she wants to correctly support more variants
+	Added some extra tests
+	Corrected the cross reference to ISO639.
+
+0.18	Wed Jun 29 11:23:18 EDT 2011
+	Fix test for Norwegian - the IP I was using no longer works
+	Added pod-cm.t and kwalitee.t
+
+0.17	Mon Jun 20 10:24:00 EDT 2011
+	Added test for empty HTTP_ACCEPT_LANGUAGE with IP given
+	Prefer Net::Whois::IP over Net::Whois::IANA
+	Fix search where IP address gives lanauge such as Norwegian (Nynorsk),
+		in which case we now search for Norwegian
+
+0.16	Sat May 28 16:38:58 EDT 2011
+	Give an example of the use of the country method
+	Better unique names for the cache keys to avoid clashes
+	Handle unrecognised requested language
+
+0.15	Mon Feb 21 19:14:45 EST 2011
+	Added country()
+
+0.14	Mon Jan 10 20:02:41 EST 2011
+	Sometimes language would return 'undefined'
+
+0.13	Wed Jan  5 09:42:05 GMT 2011
+	Attempt to fix http://www.cpantesters.org/cpan/report/eae7b808-172d-11e0-a672-41e7f2486b6f, though I can't reproduce it
+
+0.12	Mon Jan  3 11:27:25 GMT 2011
+	Added name() and code_alpha2()
+
+0.11	Tue Dec 14 21:31:54 EST 2010
+	Added the cache option to new. This should speed up Whois lookups
+	Inadvertantly said that the Perl licence is used, in fact it's GPL
+
+0.10	Sat Dec 11 09:59:10 EST 2010
+	Tried to catch some places where language is set to undef. I can't
+		reproduce it so I can't be sure I've fixed it and I can't
+		write a test
+	Added dependency on Locale::Language
+
+0.09	Sat Dec  4 11:43:12 EST 2010
+	Fix spelling mistake
+	Handle Whois thinking Hong Kong is a country
+
+0.08	Wed Dec  1 13:31:04 EST 2010
+	Handle some cases where the language can't be determined from the IP
+	address
+
+0.07	Thu Nov 25 10:01:09 EST 2010
+	Another attempt to use Net::Whois::IP when Net::Whois::IANA fails
+	Improved testing
+
+0.06	Tue Nov 23 21:07:48 EST 2010
+	Fix test on Windows
+	If Net::Whois::IANA fails, try Net::Whois::IP
+
+0.05	Thu Nov 18 19:19:00 EST 2010
+	Fix test which could fail if you have $LANG set
+
+0.04	Wed Nov 17 09:55:49 EST 2010
+	Cope with I18N::LangTags::Detect failing to detect anything
+
+0.03	Tue Nov 16 10:40:54 EST 2010
+	Tidied the documentation
+	Tests that CGI::Lingua->requested_language is not undefined
+	Fixed the MANIFEST file (RELEASE_TESTING=1 make test)
+
+0.02	Mon Nov 15 08:11:04 EST 2010
+	Added dependencies
+
+0.01    Sun Nov 14 19:01:15 EST 2010
+        First draft

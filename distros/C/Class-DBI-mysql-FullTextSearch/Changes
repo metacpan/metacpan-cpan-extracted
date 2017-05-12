@@ -1,0 +1,23 @@
+Revision history 
+
+1.01   Tue Sep 27 09:19:18 UTC 2005
+	- Tiny doc fixes
+
+1.00   Wed Oct 27 2004
+	- Upped major version number
+	- Several tiny tweaks
+
+0.9   Tue Nov 11 2003
+	- DBIx::FullTextSearch doesn't like Column names being
+	  overloaded objects (Andrew McAlister) 
+	- bring in line with latest Class::DBI::mysql
+
+0.3   Thu Feb 21 2002
+	- optional 'sort' and 'nsort' arguments
+
+0.02  Sun Oct 28 2001
+	- index all existing records when creating index.
+
+0.01  Mon Oct  8 2001
+	- original version
+

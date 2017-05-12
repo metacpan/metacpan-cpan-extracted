@@ -1,0 +1,227 @@
+=encoding utf-8
+
+=head1 NAME
+
+Config::Column - あらゆるデリミタで区切られた設定ファイル・ログファイルの入出力を単純にパッケージ化する。
+
+=head1 SYNOPSIS
+
+	# タブ区切りのファイルの情報を読みやすくフォーマットされたテキストファイルへコピー
+	
+	use utf8;
+	use lib './lib';
+	use Config::Column;
+	my $order_delim = [qw(1 subject date value)];
+	my $order_nodelim = ['' => 1 => ': [' => subject => '] ' => date => ' : ' => value => ''];
+	my $delimiter = "\t";
+	
+	# MAIN file instance
+	my $ccmain = Config::Column->new(
+		'mainfile.dat', # データファイル
+		'utf8', # データファイルの文字コード
+		$order_delim, # キー名のリスト
+		$delimiter, # デリミタ
+		1, # インデックスのオフセット
+		"\0" # "行"のデリミタ
+	);
+	# SUB file (human readable)
+	my $ccsub = Config::Column->new(
+		'', # データファイルは外部で開いてファイルハンドルを渡す。
+		'',
+		$order_nodelim, # キー名のリスト
+		undef, # デリミタは定義しない
+		1, # インデックスのオフセット
+		# "行"のデリミタはデフォルトのものが使用される。
+	);
+	
+	# Read data from MAIN file.
+	my $data = $ccmain->readdata;
+	# Add new data.
+	push @$data,{subject => 'YATTA!', date => '2012/03/06T23:33:00+09:00', value => 'All tests passed!'};print $data;
+	# Write data to MAIN file.
+	$ccmain->writedata($data);
+	# Write header to SUB file
+	open my $fh,'+<:encoding(utf8)','subfile.txt';
+	flock $fh,2;
+	truncate $fh,0;
+	seek $fh,0,0;
+	print $fh 'Single line diary?',"\n";
+	# Add data to SUB file. Don't close and don't truncate $fh.
+	$ccsub->writedata($data,$fh,1,1);
+	print $fh 'The end of the worl^h^h^h^hfile';
+	close $fh;
+
+=head1 INTRODUCTION
+
+ログファイルのキーとデリミタのリストを一般化しログファイルのデータリスト入出力をパッケージ化する。
+
+扱うデータリストは単純なキーとデータの組み合わせでできた各1データのハッシュのリストである。
+
+	my $datalist = [
+		{}, # 最初のインデックスが1(インデックスのシフトが1)の場合、0番目に空の情報が入っているとして扱われる。
+		{title => "hoge",value => "huga"},
+		{title => "hoge2",value => "huga"},
+		{title => "hoge3",value => "huga"},
+	];
+
+その単純なデータリストの操作は基本的なPerlの操作に任せることにしてそのフォーマットの入出力のみを司ることにする。
+
+=head1 DESCRIPTION
+
+=head2 new
+
+=head3 デリミタを全て同じにする場合(delimiterを必ず記述する)
+
+	my $cc = Config::Column->new(
+		'filename.dat', # データファイル
+		'utf8', # データファイルの文字コード
+		[qw(1 author id title date summary)], # キー名のリスト *order
+		"\t", # デリミタ(必須)
+		1, # インデックスのシフト(省略可能 省略した場合0(インデックスは0から)が使われる。) *index
+		"\n" # 行デリミタ(省略可能 省略した場合Perlデフォルト(おそらく"\n")が使われる。)
+	);
+
+orderは各キーの名前
+
+indexは最初のデータナンバー(0または1からはじめるなど。デフォルトは0)
+
+=head3 デリミタを違える場合(delimiterは必ず空)
+
+	my $cc = Config::Column->new(
+		'filename.dat', # データファイル
+		'utf8', # データファイルの文字コード
+		[qw('' 1 ': ' author "\t" id "\t" title "\t" date "\t" summary)], # [delim key delim key ...] *order
+		"", # デリミタ(必ず空)
+		1, # インデックスのシフト(省略可能 省略した場合0(インデックスは0から)が使われる。) *index
+		"\n" # 行デリミタ(省略可能 省略した場合Perlデフォルト(おそらく"\n")が使われる。)
+	);
+
+orderは偶数番目がデリミタ(最初と最後も)、奇数番目がキーの名前
+
+indexは最初のデータナンバー(0または1からはじめるなど。デフォルトは0)
+
+=head2 Methods
+
+=head3 adddatalast()
+
+データをそれまでのデータに続くものとしてファイルに追記する。インデックスはファイルから最後のインデックスを自動的に読んで使う。
+
+	$cc->adddatalast($data,$fh,$fhflag);
+
+	my $data = {title => "hoge",value => "huga"} || [...]; # 1データのハッシュリファレンスか、複数データの配列リファレンスが許される。
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+
+与えられたファイルハンドルのファイルポインタが先頭でないなら、その位置から書き出します。
+
+成功なら第一返値に1、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=head3 adddata()
+
+データをファイルに書き出す。
+
+	$cc->adddata($datalist,$startindex,$fh,$fhflag);
+
+	my $datalist = {title => "hoge",value => "huga"} || [
+		{title => "hoge",value => "huga"},
+		{title => "hoge2",value => "huga"},
+		{title => "hoge3",value => "huga"},
+	];# 1データのハッシュリファレンスか、複数データの配列リファレンスが許される。
+	my $startindex = 12; # 書き出すデータリストの最初のインデックス。インデックスがいらない場合省略可能。
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+
+与えられたファイルハンドルのファイルポインタが先頭でないなら、その位置から書き出します。
+
+成功なら第一返値に1、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=head3 writedata()
+
+データをファイルに書き出す。
+
+	$cc->writedata($datalist,$fh,$fhflag,$noempty);
+
+	my $datalist = [
+		{title => "hoge",value => "huga"},
+		{title => "hoge2",value => "huga"},
+		{title => "hoge3",value => "huga"},
+	];# 複数データの配列リファレンスのみ許される。
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+	my $noempty = 1; # 真値を与えればファイルを空にせず、与えられたファイルハンドルのファイルポインタが先頭でないなら、その位置から書き出します。
+
+ファイルを空にしてから新たにデータを書き出します。
+
+成功なら第一返値に1、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=begin comment
+
+=head3 writedatarange()
+
+範囲内のデータをファイルに書き出す。
+
+	$cc->writedatarange($datalist,$startindex,$endindex,$fh,$fhflag);
+
+	my $datalist = [
+		{title => "hoge",value => "huga"},
+		{title => "hoge2",value => "huga"},
+		{title => "hoge3",value => "huga"},
+	];# 複数データの配列リファレンスのみ許される。
+	my $startindex = 2; # 書き出すデータリストの最初のインデックス。0番目のデータから書き出すなら省略可能。
+	my $endindex = 10; # 書き出すデータリストの最後のインデックス。最後のデータまで書き出すなら省略可能。
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+
+与えられたファイルハンドルのファイルポインタが先頭でないなら、その位置から書き出します。
+
+成功なら第一返値に1、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=end comment
+
+=head3 readdata()
+
+データをファイルから読み出す。
+
+	$cc->readdata($fh,$fhflag);
+
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+
+与えられたファイルハンドルのファイルポインタが先頭でないなら、その位置から読み出します。
+
+成功なら第一返値にデータリストのリファレンス、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=head3 readdatanum()
+
+データをファイルから読む操作を省略し、そのインデックスのみを数える。
+
+	$cc->readdatanum($fh,$fhflag);
+
+	my $fh; # 省略可能。ファイルハンドル。
+	my $fhflag = 1; # 真値を与えればファイルハンドルを維持する。
+
+成功なら第一返値にデータリストの最大のインデックスまたはデータ数、$fhflagが真なら第二返値にファイルハンドルを返す。失敗なら偽を返す。
+
+=head1 DEPENDENCIES
+
+このモジュールは他のモジュールやライブラリに依存しない。
+
+=head1 NOTES
+
+このモジュールは一応オブジェクト指向の作法に則って書かれているが、データの扱いを素の配列やファイルハンドルで行っているため、その内容の操作に手続き的な作法が必要となっている。
+
+例えばデータの3,6,8番目を根こそぎ削除したい場合には以下のコードが必要となるだろう。
+
+	splice @$datalist,$_,1 for sort {$b <=> $a} qw(3 6 8);
+
+従って、よりスマートなオブジェクト指向を目指すためには、配列やファイルハンドルをオブジェクトとしてラップする別モジュール(Object::Array等？)を利用するか、これを継承してpop,shift,splice,deleteなどが使えるConfig::Column::OOなどを作成した方が良いであろう。
+
+=head1 AUTHOR
+
+Narazaka (http://narazaka.net/)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2011-2012 by Narazaka, all rights reserved.
+
+このプログラムはフリーソフトウェアです。あなたはPerlと同じライセンスの元で再配布及び変更を行うことが出来ます。

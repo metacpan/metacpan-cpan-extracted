@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 5
+    - 59
+  53864:
+    - 178
+name: fdcb3b
+registers:
+  AF: 20541
+  AF_: 0
+  BC: 43099
+  BC_: 0
+  DE: 53179
+  DE_: 0
+  HL: 56972
+  HL_: 0
+  I: 0
+  IX: 40027
+  IY: 53859
+  PC: 0
+  R: 0
+  SP: 0

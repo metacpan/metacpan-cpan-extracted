@@ -1,0 +1,7 @@
+\.swp\z
+.svn/
+blib
+pm_to_blib
+MANIFEST.bak
+Makefile\z
+Makefile.old\z

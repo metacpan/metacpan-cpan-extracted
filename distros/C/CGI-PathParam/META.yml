@@ -1,0 +1,11 @@
+abstract: Add the feature of parsing path_info to CGI.
+author: Hironori Yoshida, C<< <yoshida@cpan.org> >>
+distribution_type: module
+generated_by: Module::Install version 0.62
+license: perl
+name: CGI-PathParam
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.04

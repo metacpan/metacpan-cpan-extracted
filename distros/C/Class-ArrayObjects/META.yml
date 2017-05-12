@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Class-ArrayObjects
+version:             1.03
+abstract:            utility class for array based objects
+license:             perl
+author:              
+    - Originan author: Robin Berjon, robin@knowscape.com\n\nManitained by: Ronan Oger, ronan@cpan.org
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Make functions faster with memoization via CHI",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CHI-Memoize",
+   "no_index" : {
+      "directory" : [
+         "lib/CHI/Memoize/t",
+         "lib/CHI/Memoize/Test"
+      ],
+      "file" : [
+         "lib/CHI/Memoize/Util.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.47",
+            "Hash::MoreUtils" : "0",
+            "Moo" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-chi-memoize@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=CHI-Memoize"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-chi-memoize.git",
+         "web" : "https://github.com/jonswar/perl-chi-memoize"
+      }
+   },
+   "version" : "0.07"
+}
+

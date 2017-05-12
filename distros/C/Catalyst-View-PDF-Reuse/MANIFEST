@@ -1,0 +1,13 @@
+Changes
+lib/Catalyst/Helper/View/PDF/Reuse.pm
+lib/Catalyst/View/PDF/Reuse.pm
+lib/Template/Plugin/Catalyst/View/PDF/Reuse.pm
+lib/Template/Plugin/Catalyst/View/PDF/Reuse/Barcode.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

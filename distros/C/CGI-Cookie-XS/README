@@ -1,0 +1,127 @@
+NAME
+    CGI::Cookie::XS - HTTP Cookie parser in pure C
+
+VERSION
+    This document describes CGI::Cookie::XS 0.18 released on September 2,
+    2009.
+
+SYNOPSIS
+        use CGI::Cookie::XS;
+
+        my $raw_cookie = 'foo=a%20phrase;weird; bar=yes%2C%20a%20phrase; baz=%5Ewibble&leiyh; qux=%27';
+        my $res = CGI::Cookie::XS->parse($raw_cookie);
+        # $res is something like:
+        #    {
+        #      'bar' => [
+        #                 'yes, a phrase'
+        #               ],
+        #      'baz' => [
+        #                 '^wibble',
+        #                 'leiyh'
+        #               ],
+        #      'foo' => [
+        #                 'a phrase'
+        #               ],
+        #      'qux' => [
+        #                 '\''
+        #               ]
+        #    };
+
+        # or directly read raw cookies from the CGI environments:
+        $res = CGI::Cookie::XS->fetch;
+
+DESCRIPTION
+    This module implements a very simple parser for cookies used in HTTP
+    applications. We've found CGI::Simple::Cookie and CGI::Cookie rather
+    slow according to the profiling results for our OpenResty project, hence
+    the rewrite in C.
+
+    This library is still in beta stage and the API is still in flux. We're
+    just following the "release early, releaes often" guideline. So please
+    check back often ;)
+
+    Special effort has been made to ensure this module works in the same way
+    as the latest CGI::Cookie (i.e., the pure Perl implementation). If you
+    find it doesn't, please let us know.
+
+METHODS
+    We currently provide 2 static methods, "parse" and "fetch". They work
+    mostly the same way as those methods found in CGI::Cookie and
+    CGI::Simple::Cookie but with the exception that our version returns
+    plain Perl data structures rather than hashes of Perl objects (due to
+    performance considerations).
+
+    We'll implement some cookie dump methods in the near future.
+
+    "$ref = CGI::Cookie::XS->parse($raw_cookie)"
+        Parses $raw_cookie and returns the reference of a hash of arrays.
+        The keys of the hash are cookie variables' names while the values of
+        the hash are lists of cookie variable's values.
+
+        There is a length limit on the $raw_cookie. If $raw_cookie is longer
+        than 4 KB (i.e. 4 * 1024 bytes, excluding the trailing '\0'), the
+        overflowing part will be truncated.
+
+        Also note that, "fetch" does not assume any encoding on the cookie
+        values. It just decodes the encoded entries verbatim and treat them
+        as plain "binary" stuff.
+
+    "$ref = CGI::Cookie::XS->fetch()"
+        Reads the raw cookie from the "HTTP_COOKIE" and "COOKIE"
+        environments (which are usually set by HTTP servers like lighttd or
+        apache) and then parses the value using the "parse" method and
+        finally returns the results.
+
+TODO
+    *   Removing trailing spaces in cookie values.
+
+SOURCE CONTROL
+    For the very latest version of this module, check out the source from
+    the Git repos below:
+
+    <http://github.com/agentzh/cookiexs/>
+
+    There is anonymous access to all. If you'd like a commit bit, please let
+    us know. :)
+
+BUGS
+    There must be some serious bugs lurking somewhere. We haven't done
+    comprehensive testing for our code yet. It's a TODO.
+
+    Please report bugs or send wish-list to
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Cookie-XS>.
+
+SEE ALSO
+    CGI::Cookie, CGI::Cookie::Simple.
+
+AUTHOR
+    yuting "<yuting at alibaba-inc.com>"
+    agentzh "<agentzh at yahoo.cn>"
+
+COPYRIGHT
+    Copyright (c) 2008 by Yahoo! China EEEE Works, Alibaba Inc.
+
+    Copyright (c) 2009 by Taobao Inc., Alibaba Group.
+
+License
+    The "MIT" License
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

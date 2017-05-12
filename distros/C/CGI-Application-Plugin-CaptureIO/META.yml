@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Application-Plugin-CaptureIO
+version:      0.01
+version_from: CaptureIO.pm
+installdirs:  site
+requires:
+    Digest::SHA1:                  2.1
+    Storable:                      2.14
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

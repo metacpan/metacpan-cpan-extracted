@@ -1,0 +1,246 @@
+0&&<<''; # this PGP-signed message is also valid perl
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+# CHECKSUMS file written on Sat Feb  8 11:02:56 2003 by CPAN::Checksums (v1.016)
+$cksum = {
+  'perl-5.6.1-TRIAL1.tar.gz' => {
+    'md5-ungz' => '3b372355c0c1d0c27f892755342f833e',
+    'mtime' => '2000-12-18',
+    'md5' => '87cbdf7f0c7a71b933df9c1842aff7a1',
+    'size' => '5894898'
+  },
+  'libwin32-0.18.zip' => {
+    'mtime' => '2001-11-13',
+    'md5' => 'f86722e4354562349a89568ebf92dfcd',
+    'size' => '750864'
+  },
+  'libwin32-0.151.tar.gz' => {
+    'md5-ungz' => '1758b8034b0493ced376fb3be73532c8',
+    'mtime' => '1999-09-27',
+    'md5' => 'd6bab8761d81f4856e40bdcaf9958a14',
+    'size' => '1570676'
+  },
+  'Data-Dumper-2.101.tar.gz' => {
+    'md5-ungz' => '2db3907cd41318cbbd5c9641b83da16c',
+    'mtime' => '1999-05-01',
+    'md5' => '681e53c028e80f71bafbb7687cbe375d',
+    'size' => '38263'
+  },
+  'libwin32-0.172.patch' => {
+    'mtime' => '2001-05-14',
+    'md5' => '54c95ddd1ce396370df9e034c226c431',
+    'size' => '185578'
+  },
+  'perl5.005_01.tar.gz' => {
+    'md5-ungz' => 'a754121f79c37fdf72cf77db54b13edc',
+    'mtime' => '1998-07-27',
+    'md5' => '984d8d3bd86662461692a4caef114428',
+    'size' => '3431435'
+  },
+  'perl-5.6.1-TRIAL3.patch.gz' => {
+    'md5-ungz' => '212a5112a4a05b1771e8eb914e25101b',
+    'mtime' => '2001-03-19',
+    'md5' => 'acd8ed8bd7f91f7c8eadd0eed695c51f',
+    'size' => '1922472'
+  },
+  'libwin32-0.151.zip' => {
+    'mtime' => '1999-09-27',
+    'md5' => 'cb37dab9f0b53a9d95b7aafc7f413539',
+    'size' => '1748391'
+  },
+  'dmake-4.1pl1-win32.zip' => {
+    'mtime' => '2000-02-04',
+    'md5' => 'cfc9fa6c0d3e43fa6591fb594a53a63b',
+    'size' => '161321'
+  },
+  'perl-5.6.1.announce' => {
+    'mtime' => '2001-04-16',
+    'md5' => 'fdb3481ff10e4dd1a49a5df39a15836f',
+    'size' => '27775'
+  },
+  'perl5.005_01.patch.gz' => {
+    'md5-ungz' => 'e413cd0965f1e642510f96d6f2ca7a7c',
+    'mtime' => '1998-07-27',
+    'md5' => 'ff48365087846bef5863dc60e91c0e46',
+    'size' => '10788'
+  },
+  'libwin32-0.16.tar.gz' => {
+    'md5-ungz' => '4785ab17ce684188199017128b4e332f',
+    'mtime' => '2000-05-23',
+    'md5' => 'f8c4f23b03b1161577b3cba68dded041',
+    'size' => '638255'
+  },
+  'Alias-2.32.tar.gz' => {
+    'md5-ungz' => '458d6794b719fa8d5eaa827d4149b170',
+    'mtime' => '1999-05-01',
+    'md5' => '74aee28a4a20e643dd7656c6d8096aa8',
+    'size' => '9659'
+  },
+  'perl-5.6.1-TRIAL2.tar.gz' => {
+    'md5-ungz' => '22be6593cd3458e82c9b2bcbed5caced',
+    'mtime' => '2001-01-31',
+    'md5' => '8ae9a1ea254605507b3197f772b7b107',
+    'size' => '5876706'
+  },
+  'DB_File-1.54-bin-v3-x86-mswin32-bc.zip' => {
+    'mtime' => '1997-12-30',
+    'md5' => 'ff2d139fb13a4546f78bd97f2d7ade42',
+    'size' => '356379'
+  },
+  'perl5.005_02.tar.gz' => {
+    'md5-ungz' => '422ac879c6c0fc1fb5d24a64f4537993',
+    'mtime' => '1998-08-08',
+    'md5' => 'de99ae45441f3c8c7d0749f35bdf47d5',
+    'size' => '3470355'
+  },
+  'perl-5.6.0.tar.gz' => {
+    'md5-ungz' => '9fb88478d18cecc58b7482fe969adb66',
+    'mtime' => '2000-03-23',
+    'md5' => 'b2940e2cc6312bcfa52355b684e70b9d',
+    'size' => '5443601'
+  },
+  'perl-5.6.1-TRIAL3.tar.gz' => {
+    'md5-ungz' => 'd9efe8c980d1409a6bff6fbbf295df0f',
+    'mtime' => '2001-03-19',
+    'md5' => '17ece7919ee84796434c0ac5c6c0c6b5',
+    'size' => '5939673'
+  },
+  'perl-5.6.1.patch.gz' => {
+    'md5-ungz' => '3db351c4616f73db54b4c509e0bade94',
+    'mtime' => '2001-04-09',
+    'md5' => '486d9962d9cb5db6f8e2467cfd76e40f',
+    'size' => '2020554'
+  },
+  'libwin32-0.18.tar.gz' => {
+    'md5-ungz' => 'd487f6cf76e43a11007a9c4f38d5e091',
+    'mtime' => '2001-11-13',
+    'md5' => '2f7a44b941cf75cdb1a5674ac59023ce',
+    'size' => '663011'
+  },
+  'perl-5.6.1.tar.gz' => {
+    'md5-ungz' => '83ab4cf7e7420c34595d5eed2adaffd1',
+    'mtime' => '2001-04-09',
+    'md5' => 'ec1ff15464809b562aecfaa2e65edba6',
+    'size' => '5983695'
+  },
+  'MLDBM-2.00.tar.gz' => {
+    'md5-ungz' => '1bb675b68e5d2310a5a84b47e23b2399',
+    'mtime' => '1998-05-10',
+    'md5' => 'a8b85ac11fc3db0f549b02102209ec50',
+    'size' => '8678'
+  },
+  'perl-5.6.1-TRIAL2.patch.gz' => {
+    'md5-ungz' => 'c9b5338a5ce22ace1acacdee6f8df72a',
+    'mtime' => '2001-01-31',
+    'md5' => '356cd27b2d72d719cc8315e43e97200d',
+    'size' => '1760575'
+  },
+  'perl-5.6.0.announce' => {
+    'mtime' => '2000-03-28',
+    'md5' => 'f0f41af7b94370d9e648ef713a0e2e22',
+    'size' => '17459'
+  },
+  'libwin32-0.191.zip' => {
+    'mtime' => '2002-07-09',
+    'md5' => '7149205de03f6c799f97b33330557d28',
+    'size' => '765570'
+  },
+  'libwin32-0.171.patch' => {
+    'mtime' => '2000-09-19',
+    'md5' => '93635f3351c0e101d9dbf79d2f52c945',
+    'size' => '170272'
+  },
+  'perl5.005_02.announce' => {
+    'mtime' => '1998-08-26',
+    'md5' => '58334455dc3421b79949eb23016802fc',
+    'size' => '4562'
+  },
+  'PerlInterp-0.02.tar.gz' => {
+    'md5-ungz' => '39120ba0ca7d0701443c008b36ecbbf4',
+    'mtime' => '1998-07-26',
+    'md5' => '1ac0978aa1b6dc2a554a31eb833b8876',
+    'size' => '2901'
+  },
+  'Archive-Tar-0.071.tar.gz' => {
+    'md5-ungz' => 'bb27b72ceef2033381f84a8df77f3e43',
+    'mtime' => '1998-02-02',
+    'md5' => '155d50970666fce9efff78ed3e041639',
+    'size' => '7869'
+  },
+  'perl5.005.announce' => {
+    'mtime' => '1998-07-27',
+    'md5' => '54ef636b6b73511be110da37346ee3e5',
+    'size' => '7997'
+  },
+  'libwin32-0.191.tar.gz' => {
+    'md5-ungz' => '1c5105d24e56e83ca958ed64f8950db2',
+    'mtime' => '2002-07-09',
+    'md5' => '33768b428cae00ea4ca48caf3343dbed',
+    'size' => '676576'
+  },
+  'Tie-IxHash-1.21.tar.gz' => {
+    'md5-ungz' => 'e8429262f6d71ab267457a947377523c',
+    'mtime' => '1998-01-28',
+    'md5' => '567ddc13081596b52cfe3d82218cb264',
+    'size' => '6446'
+  },
+  'perl5.00402-bindist04-bc.zip' => {
+    'mtime' => '1997-11-12',
+    'md5' => 'f1a5c02d1bb83cdf18781b9b415abd3f',
+    'size' => '6176370'
+  },
+  'perl-5.6.0.patch.gz' => {
+    'md5-ungz' => '78c65cbfe2cccf54e1f214cbcec8666d',
+    'mtime' => '2000-03-23',
+    'md5' => 'c432ab84d07033a7ae9a8b0d3dc3d42c',
+    'size' => '4504606'
+  },
+  'libwin32-0.173.patch' => {
+    'mtime' => '2001-08-18',
+    'md5' => '8d7eee37e2b67a829fef5310ba53092f',
+    'size' => '25854'
+  },
+  'perl5.005_02.patch.gz' => {
+    'md5-ungz' => 'c466ab0bcaec657ece1c15f974887f4b',
+    'mtime' => '1998-08-08',
+    'md5' => '36e5f2912aea3b28252e2a4aa3a0e504',
+    'size' => '176846'
+  },
+  'perl-5.6.1-TRIAL1.patch.gz' => {
+    'md5-ungz' => '36a88caf15b19e342b72d793ed3a312a',
+    'mtime' => '2000-12-18',
+    'md5' => 'e34c817489ddb422e05b804f798ef332',
+    'size' => '1637369'
+  },
+  'perl5.005.tar.gz' => {
+    'md5-ungz' => 'fba591d0d2d82eb0724f3ea36357c252',
+    'mtime' => '1998-07-23',
+    'md5' => '15b2ba66a2f4521b1301fae1b4df765d',
+    'size' => '3433102'
+  },
+  'dmake-4.1pl1-win32.patch' => {
+    'mtime' => '2000-02-04',
+    'md5' => '3f63dce9e9878663a6c940c04ddf63a9',
+    'size' => '22044'
+  },
+  'perl5.00402-bindist04-bc.tar.gz' => {
+    'md5-ungz' => 'a14744b38c0a2b9f26503628f6883439',
+    'mtime' => '1997-08-11',
+    'md5' => '0db59969ef79b1dbd4b2161c545591b6',
+    'size' => '5134365'
+  },
+  'libwin32-0.16.zip' => {
+    'mtime' => '2000-05-23',
+    'md5' => 'da3c010ecad38f04e1775d8ac93e7507',
+    'size' => '726400'
+  }
+};
+__END__
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQE+ROPgMo2oZ0UPiewRAroSAJwJERFobrcWSaJJhF35mAsBRQdGOgCfVEjN
+rOb0fC0pgiI3O77IJq3x4Fg=
+=gxpM
+-----END PGP SIGNATURE-----

@@ -1,0 +1,16 @@
+1.04    25 Aug 2014  Old File::Glob doesn't export :bsd_glob.
+
+1.03    18 Aug 2014  Switch to using bsd_glob to handle spaces in paths
+                     on Windows.
+
+1.02    16 Aug 2014  Handle spaces in path names - thanks to oliwel for the
+                     patch.
+
+1.01    12 Oct 2010  Removed dependency on Data::Alias - thanks to Graham Barr
+                     for the patch.
+                     Restructured the module to use the standard CPAN layout
+                     with lib/, and switched to Module::Build
+
+1.00    22 Oct 2007  First release of Config::Merge to CPAN.
+                     Replaces Config::Loader
+

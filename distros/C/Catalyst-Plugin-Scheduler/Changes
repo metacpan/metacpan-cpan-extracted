@@ -1,0 +1,42 @@
+Revision history for Perl extension Catalyst::Plugin::Scheduler
+
+0.10    2010-05-03 11:29:00
+        - Fix warnings in test suite (BRICAS)
+        - Switch to Module::Install (BRICAS)
+        - Fix pod typo (RT #47434)
+
+0.09    2009-05-07 09:15:00
+        - Change from NEXT to MRO::Compat. (agladdish)
+
+0.08    2008-01-12 11:00:00
+        - Clear existing state file during startup. (hovenko)
+
+0.07    2006-07-17 12:15:00
+        - Fix for loading the config with YAML 0.60+
+        - Prefer YAML::Syck, with fallback to YAML.pm
+
+0.06    2006-03-10 10:10:00
+        - Added $c->scheduler_state public method to allow users to
+          build admin screens detailing the current status of every
+          event, the last time it ran, and the last output or error.
+        - Store the last runtime and last output from each event for
+          display in scheduler_state/dump_these.
+        - Added additional YAML tests.
+
+0.05    2005-12-29 15:50:00
+        - Fixed bug when using @monthly.
+
+0.04    2005-12-28 15:15:00
+        - Added dump_these support to display all event info on the
+          debug screen.
+
+0.03    2005-12-15 16:00:00
+        - Fixed yaml_file option.
+
+0.02    2005-12-15 15:40:00
+        - Fixed pod coverage.
+        - Hide timezone warning unless logging is enabled.
+        - Hide expected errors during test 4.
+
+0.01    2005-12-15 15:30:00
+        - initial release

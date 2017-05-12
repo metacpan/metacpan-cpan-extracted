@@ -1,0 +1,108 @@
+#!perl
+#########################################################################
+#        This Perl script is Copyright (c) 2000, Peter J Billam         #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This program is free software; you can redistribute it and/or     #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+$^W=0;
+while ($ARGV[$[] =~ /^-/) {
+	if ($ARGV[$[] =~ /^-c/)      { $encrypt='yes'; shift;
+	} elsif ($ARGV[$[] =~ /^-s/) { $sign='yes'; shift;
+	} elsif ($ARGV[$[] =~ /^-o/) { $old='yes'; shift;
+	} elsif ($ARGV[$[] =~ /^-j/) {
+		require 'Crypt/Tea_JS.pm'; import Crypt::Tea_JS;
+		print &tea_in_javascript;  exit 0;
+	} else { require 'Crypt/Tea_JS.pm'; print <<EOT; exit;
+usage:
+   tea -c filename   # enCrypts filename
+   tea filename      # decrypts filename
+   tea -s filename   # calculates ascii digital Signature for filename
+   tea -j            # outputs Javascript code to do compatible encryption
+   tea -o            # set Old mode, for Crypt::Tea-compatibility
+   tea -h            # prints this Helpful message
+
+For encryption and decryption, you will be asked for a password.
+It should be a sufficiently longish string; say 17 random 8-bit bytes.
+This is Crypt::Tea_JS version ${Crypt::Tea_JS::VERSION}
+
+EOT
+		eval 'require "Crypt/Tea.pm"';
+		if ($@) { print<<'EOT';
+You'll need to install Crypt::Tea if you want to use the -o (Old) mode.
+EOT
+		}
+	}
+}
+
+if ($old) {
+	eval 'require "Crypt/Tea.pm"';
+	if ($@) { die "Sorry, -o (Old) mode needs Crypt::Tea installed\n"; }
+	import Crypt::Tea;
+} else { require 'Crypt/Tea_JS.pm'; import Crypt::Tea_JS;
+}
+undef $/; my $text = <>; $/="\n";
+if ($sign) { print &asciidigest ($text) . "\n"; exit 0; }
+
+open(TTY,  ">/dev/tty")  || die "Can't write /dev/tty: $!\n";
+open(TTYIN, "</dev/tty") || die "Can't read /dev/tty: $!\n";
+print TTY 'Password: '; my $key = <TTYIN>;
+close TTY; close TTYIN;
+$key =~ s/[\r\n]*$//;
+exit unless $key;
+
+if ($encrypt) {
+	print &encrypt ($text, $key), "\n";
+} else {
+	print &decrypt ($text, $key);
+}
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+tea - Perl script to give command-line access to Crypt::Tea_JS.pm
+
+=head1 SYNOPSIS
+
+  tea -c filename   # enCrypts filename
+  tea filename      # decrypts filename
+  tea -s filename   # calculates ascii digital Signature for filename
+  tea -j            # outputs Javascript code to do compatible encryption
+  tea -o            # set Old mode, for Crypt::Tea-compatibility
+  tea -h            # prints this Helpful message
+  ps axww | tea -s  # have the best password in town !
+
+For encryption and decryption, you will be asked for a password.
+It should be a sufficiently longish string; say 17 random 8-bit bytes.
+
+=head1 DESCRIPTION
+
+This script uses the Crypt::Tea_JS.pm module to offer new TEA, the Tiny
+Encryption Algorithm, and some Modes of Use based on CBC, compatibly in
+both Perl and JavaScript.
+
+The various options offer encryption, decryption and digest, and all
+cyphertext is ascii-encoded to prevent munging. Another option returns
+JavaScript code which offers identical functions in JS, and this can
+be used by CGIs to feed to the browser.
+
+=head1 AUTHOR
+
+Peter J Billam ( http://www.pjb.com.au/comp/contact.html )
+
+=head1 CREDITS
+
+Based on Crypt::Tea_JS (and, in Old-mode, Crypt::Tea)
+
+=head1 SEE ALSO
+
+http://www.pjb.com.au/ , Crypt::Tea_JS , Crypt::Tea ,
+http://search.cpan.org/~pjb , perl(1).
+
+=cut
+

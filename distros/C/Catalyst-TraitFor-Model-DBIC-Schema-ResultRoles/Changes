@@ -1,0 +1,24 @@
+Revision history for Catalyst-TraitFor-Model-DBIC-Schema-ResultRoles
+
+0.01    2011-01-15
+	First release
+
+0.0101    2011-01-16 18:22
+	minor changes in documentation
+	dependencies updated in Makefile.PL
+
+0.0102    2011-01-17 02:13
+	dependencies updated in Makefile.PL
+
+0.0104    2011-01-21 01:50
+	dependencies updated in Makefile.PL
+
+0.0106    2011-05-17 03:17
+	db-creation moved to an extra module
+
+0.0108    2011-05-17 03:36
+	fixed bug in pervious tests
+
+0.0110    2011-05-19 11:30
+	another fix in catalyst-tests
+

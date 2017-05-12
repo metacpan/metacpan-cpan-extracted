@@ -1,0 +1,4 @@
+---
+- at: '* * * * *'
+  event: /cron/every_minute
+  trigger: some_long_trigger_name

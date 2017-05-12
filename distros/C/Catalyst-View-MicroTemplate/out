@@ -1,0 +1,797 @@
+cp lib/Catalyst/View/MicroTemplate.pm blib/lib/Catalyst/View/MicroTemplate.pm
+PERL_DL_NONLAZY=1 /opt/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t
+require TestApp::View::MT::Default was successful but the package is not defined. at /Users/daisuke/perl5/lib/perl5/Catalyst/Utils.pm line 286.
+require TestApp::View::MT::PkgConfig was successful but the package is not defined. at /Users/daisuke/perl5/lib/perl5/Catalyst/Utils.pm line 286.
+{
+  'catalyst_component_name' => 'TestApp::View::MT::AppConfig',
+  'include_path' => [
+    bless( {
+      'dirs' => [
+        '',
+        'Users',
+        'daisuke',
+        'git',
+        'Catalyst-View-MicroTemplate',
+        't',
+        'lib',
+        'TestApp',
+        'root'
+      ],
+      'file_spec_class' => undef,
+      'volume' => ''
+    }, 'Path::Class::Dir' )
+  ],
+  'template_suffix' => '.mt'
+}
+[debug] Debug messages enabled
+[debug] Statistics enabled
+[debug] Loaded dispatcher "Catalyst::Dispatcher"
+[debug] Loaded engine "Catalyst::Engine::CGI"
+[debug] Found home "/Users/daisuke/git/Catalyst-View-MicroTemplate/t/lib/TestApp"
+[debug] Loaded components:
+.-----------------------------------------------------------------+----------.
+| Class                                                           | Type     |
++-----------------------------------------------------------------+----------+
+| TestApp::View::MT::AppConfig                                    | instance |
+| TestApp::View::MT::Default                                      | class    |
+| TestApp::View::MT::PkgConfig                                    | class    |
+'-----------------------------------------------------------------+----------'
+
+[warn] Action methods (default, test, test_includepath, test_render, test_msg, end) found defined in your application class, TestApp. This is deprecated, please move them into a Root controller.
+[debug] Loaded Private actions:
+.----------------------+--------------------------------------+--------------.
+| Private              | Class                                | Method       |
++----------------------+--------------------------------------+--------------+
+| /test_msg            | TestApp                              | test_msg     |
+| /test                | TestApp                              | test         |
+| /default             | TestApp                              | default      |
+| /test_render         | TestApp                              | test_render  |
+| /end                 | TestApp                              | end          |
+| /test_includepath    | TestApp                              | test_includ- |
+|                      |                                      | epath        |
+'----------------------+--------------------------------------+--------------'
+
+[debug] Loaded Path actions:
+.-------------------------------------+--------------------------------------.
+| Path                                | Private                              |
++-------------------------------------+--------------------------------------+
+| /test                               | /test                                |
+| /test_includepath                   | /test_includepath                    |
+| /test_msg                           | /test_msg                            |
+| /test_render                        | /test_render                         |
+'-------------------------------------+--------------------------------------'
+
+[info] TestApp powered by Catalyst 5.80013
+bless( {
+  'catalyst_component_name' => 'TestApp::View::MT::AppConfig',
+  'charset' => 'utf8',
+  'content_type' => 'text/html',
+  'include_path' => [
+    bless( {
+      'dirs' => [
+        '',
+        'Users',
+        'daisuke',
+        'git',
+        'Catalyst-View-MicroTemplate',
+        't',
+        'lib',
+        'TestApp',
+        'root'
+      ],
+      'file_spec_class' => undef,
+      'volume' => ''
+    }, 'Path::Class::Dir' )
+  ],
+  'template_suffix' => '.mt'
+}, 'TestApp::View::MT::AppConfig' )
+bless( {
+  'catalyst_component_name' => 'TestApp::View::MT::AppConfig',
+  'charset' => 'utf8',
+  'content_type' => 'text/html',
+  'context' => bless( {
+    'View::MT::AppConfig' => {
+      'include_path' => [
+        bless( {
+          'dirs' => [
+            '',
+            'Users',
+            'daisuke',
+            'git',
+            'Catalyst-View-MicroTemplate',
+            't',
+            'lib',
+            'TestApp',
+            'root'
+          ],
+          'file_spec_class' => undef,
+          'volume' => ''
+        }, 'Path::Class::Dir' )
+      ],
+      'template_suffix' => '.mt'
+    },
+    'action' => bless( {
+      'attributes' => {
+        'Path' => [
+          '/test'
+        ]
+      },
+      'class' => 'TestApp',
+      'code' => sub { "DUMMY" },
+      'name' => 'test',
+      'namespace' => '',
+      'reverse' => 'test'
+    }, 'Catalyst::Action' ),
+    'actions' => {},
+    'counter' => {
+      'end' => 1,
+      'test' => 1
+    },
+    'default_message' => 'hi',
+    'default_view' => 'Default',
+    'home' => '/Users/daisuke/git/Catalyst-View-MicroTemplate/t/lib/TestApp',
+    'name' => 'TestApp',
+    'namespace' => '',
+    'request' => bless( {
+      '_body' => 0,
+      '_context' => $VAR1->{'context'},
+      '_path' => 'test',
+      'action' => 'test',
+      'address' => '127.0.0.1',
+      'arguments' => [],
+      'base' => bless( do{\(my $o = 'http://localhost/')}, 'URI::http' ),
+      'body_parameters' => {},
+      'captures' => [],
+      'cookies' => {},
+      'headers' => bless( {
+        'host' => 'localhost:80',
+        'https' => 'OFF'
+      }, 'HTTP::Headers' ),
+      'hostname' => 'localhost',
+      'match' => 'test',
+      'method' => 'GET',
+      'parameters' => {
+        'view' => 'AppConfig'
+      },
+      'protocol' => 'HTTP/1.1',
+      'query_parameters' => {
+        'view' => 'AppConfig'
+      },
+      'remote_user' => undef,
+      'secure' => '0',
+      'uploads' => {},
+      'uri' => bless( do{\(my $o = 'http://localhost/test?view=AppConfig')}, 'URI::http' ),
+      'user' => undef
+    }, 'Catalyst::Request' ),
+    'response' => bless( {
+      '_context' => $VAR1->{'context'},
+      'body' => '',
+      'cookies' => {},
+      'finalized_headers' => '0',
+      'headers' => bless( {
+        'x-catalyst' => '5.80013'
+      }, 'HTTP::Headers' ),
+      'status' => '200'
+    }, 'Catalyst::Response' ),
+    'root' => bless( {
+      'dirs' => [
+        '',
+        'Users',
+        'daisuke',
+        'git',
+        'Catalyst-View-MicroTemplate',
+        't',
+        'lib',
+        'TestApp',
+        'root'
+      ],
+      'file_spec_class' => undef,
+      'volume' => ''
+    }, 'Path::Class::Dir' ),
+    'stack' => [
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => '_DISPATCH',
+        'namespace' => '',
+        'reverse' => '_DISPATCH'
+      }, 'Catalyst::Action' ),
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => '_END',
+        'namespace' => '',
+        'reverse' => '_END'
+      }, 'Catalyst::Action' ),
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => 'end',
+        'namespace' => '',
+        'reverse' => 'end'
+      }, 'Catalyst::Action' )
+    ],
+    'stash' => {
+      'message' => 'hi'
+    },
+    'state' => 0,
+    'stats' => bless( {
+      'enable' => 1,
+      'stack' => [
+        bless( {
+          '_children' => [
+            bless( {
+              '_children' => [],
+              '_depth' => 0,
+              '_height' => 1,
+              '_node' => {
+                'action' => '/test',
+                'comment' => '',
+                'elapsed' => '0.000214',
+                't' => [
+                  1258439439,
+                  89719
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'test1',
+              '_width' => 1
+            }, 'Tree::Simple' ),
+            bless( {
+              '_children' => [],
+              '_depth' => 0,
+              '_height' => 1,
+              '_node' => {
+                'action' => '/end',
+                'comment' => '',
+                'elapsed' => '0.000461',
+                't' => [
+                  1258439439,
+                  90180
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'end1',
+              '_width' => 1
+            }, 'Tree::Simple' )
+          ],
+          '_depth' => -1,
+          '_height' => 2,
+          '_node' => {
+            't' => [
+              1258439439,
+              87458
+            ]
+          },
+          '_parent' => 'root',
+          '_uid' => '0xcf68c0',
+          '_width' => 2
+        }, 'Tree::Simple' ),
+        $VAR1->{'context'}{'stats'}{'stack'}[0]{'_children'}[1]
+      ],
+      'tree' => $VAR1->{'context'}{'stats'}{'stack'}[0]
+    }, 'Catalyst::Stats' )
+  }, 'TestApp' ),
+  'include_path' => $VAR1->{'context'}{'View::MT::AppConfig'}{'include_path'},
+  'template_suffix' => '.mt'
+}, 'TestApp::View::MT::AppConfig' )
+[info] *** Request 1 (1.000/s) [4745] [Tue Nov 17 15:30:39 2009] ***
+[debug] Query Parameters are:
+.-------------------------------------+--------------------------------------.
+| Parameter                           | Value                                |
++-------------------------------------+--------------------------------------+
+| view                                | AppConfig                            |
+'-------------------------------------+--------------------------------------'
+[debug] "GET" request for "test" from "127.0.0.1"
+[debug] Path is "test"
+[debug] [TestApp::View::MT::AppConfig] rendering template test
+[info] Request took 0.006839s (146.220/s)
+.------------------------------------------------------------+-----------.
+| Action                                                     | Time      |
++------------------------------------------------------------+-----------+
+| /test                                                      | 0.000214s |
+| /end                                                       | 0.003130s |
+|  -> TestApp::View::MT::AppConfig->process                  | 0.001343s |
+'------------------------------------------------------------+-----------'
+
+bless( {
+  'catalyst_component_name' => 'TestApp::View::MT::AppConfig',
+  'charset' => 'utf8',
+  'content_type' => 'text/html',
+  'context' => bless( {
+    'View::MT::AppConfig' => {
+      'include_path' => [
+        bless( {
+          'dirs' => [
+            '',
+            'Users',
+            'daisuke',
+            'git',
+            'Catalyst-View-MicroTemplate',
+            't',
+            'lib',
+            'TestApp',
+            'root'
+          ],
+          'file_spec_class' => undef,
+          'volume' => ''
+        }, 'Path::Class::Dir' )
+      ],
+      'template_suffix' => '.mt'
+    },
+    'action' => bless( {
+      'attributes' => {
+        'Path' => [
+          '/test'
+        ]
+      },
+      'class' => 'TestApp',
+      'code' => sub { "DUMMY" },
+      'name' => 'test',
+      'namespace' => '',
+      'reverse' => 'test'
+    }, 'Catalyst::Action' ),
+    'actions' => {},
+    'counter' => {
+      'TestApp::View::MT::AppConfig->process' => 1,
+      'end' => 1,
+      'test' => 1
+    },
+    'default_message' => 'hi',
+    'default_view' => 'Default',
+    'home' => '/Users/daisuke/git/Catalyst-View-MicroTemplate/t/lib/TestApp',
+    'name' => 'TestApp',
+    'namespace' => '',
+    'request' => bless( {
+      '_body' => 0,
+      '_context' => $VAR1->{'context'},
+      '_path' => 'test',
+      'action' => 'test',
+      'address' => '127.0.0.1',
+      'arguments' => [],
+      'base' => bless( do{\(my $o = 'http://localhost/')}, 'URI::http' ),
+      'body_parameters' => {},
+      'captures' => [],
+      'cookies' => {},
+      'headers' => bless( {
+        'host' => 'localhost:80',
+        'https' => 'OFF'
+      }, 'HTTP::Headers' ),
+      'hostname' => 'localhost',
+      'match' => 'test',
+      'method' => 'GET',
+      'parameters' => {
+        'view' => 'AppConfig'
+      },
+      'protocol' => 'HTTP/1.1',
+      'query_parameters' => {
+        'view' => 'AppConfig'
+      },
+      'remote_user' => undef,
+      'secure' => '0',
+      'uploads' => {},
+      'uri' => bless( do{\(my $o = 'http://localhost/test?view=AppConfig')}, 'URI::http' ),
+      'user' => undef
+    }, 'Catalyst::Request' ),
+    'response' => bless( {
+      '_context' => $VAR1->{'context'},
+      'body' => bless( do{\(my $o = 'hi')}, 'Text::MicroTemplate::EncodedString' ),
+      'cookies' => {},
+      'finalized_headers' => 1,
+      'headers' => bless( {
+        'content-length' => 2,
+        'content-type' => 'text/html; charset=utf8',
+        'status' => '200',
+        'x-catalyst' => '5.80013'
+      }, 'HTTP::Headers' ),
+      'status' => '200'
+    }, 'Catalyst::Response' ),
+    'root' => bless( {
+      'dirs' => [
+        '',
+        'Users',
+        'daisuke',
+        'git',
+        'Catalyst-View-MicroTemplate',
+        't',
+        'lib',
+        'TestApp',
+        'root'
+      ],
+      'file_spec_class' => undef,
+      'volume' => ''
+    }, 'Path::Class::Dir' ),
+    'stack' => [],
+    'stash' => {
+      'message' => 'hi'
+    },
+    'state' => 1,
+    'stats' => bless( {
+      'enable' => 1,
+      'stack' => [
+        bless( {
+          '_children' => [
+            bless( {
+              '_children' => [],
+              '_depth' => 0,
+              '_height' => 1,
+              '_node' => {
+                'action' => '/test',
+                'comment' => '',
+                'elapsed' => '0.000214',
+                't' => [
+                  1258439439,
+                  89719
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'test1',
+              '_width' => 1
+            }, 'Tree::Simple' ),
+            bless( {
+              '_children' => [
+                bless( {
+                  '_children' => [],
+                  '_depth' => 1,
+                  '_height' => 1,
+                  '_node' => {
+                    'action' => '-> TestApp::View::MT::AppConfig->process',
+                    'comment' => '',
+                    'elapsed' => '0.001343',
+                    't' => [
+                      1258439439,
+                      91849
+                    ]
+                  },
+                  '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0]{'_children'}[1],
+                  '_uid' => 'TestApp::View::MT::AppConfig->process1',
+                  '_width' => 1
+                }, 'Tree::Simple' )
+              ],
+              '_depth' => 0,
+              '_height' => 2,
+              '_node' => {
+                'action' => '/end',
+                'comment' => '',
+                'elapsed' => '0.00313',
+                't' => [
+                  1258439439,
+                  90180
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'end1',
+              '_width' => 1
+            }, 'Tree::Simple' )
+          ],
+          '_depth' => -1,
+          '_height' => 3,
+          '_node' => {
+            't' => [
+              1258439439,
+              87458
+            ]
+          },
+          '_parent' => 'root',
+          '_uid' => '0xcf68c0',
+          '_width' => 2
+        }, 'Tree::Simple' )
+      ],
+      'tree' => $VAR1->{'context'}{'stats'}{'stack'}[0]
+    }, 'Catalyst::Stats' )
+  }, 'TestApp' ),
+  'include_path' => $VAR1->{'context'}{'View::MT::AppConfig'}{'include_path'},
+  'stash_key' => '__TestApp::View::MT::AppConfig_template',
+  'template' => bless( {
+    'cache' => {},
+    'code' => 'sub { my $_MT = \'\'; local $Catalyst::View::MicroTemplate::_MTREF = \\$_MT; my $_MT_T = \'\'; my ($c, $args) = @_ ;$_MT_T = scalar  $args->{message} ; $_MT .= ref $_MT_T eq \'Text::MicroTemplate::EncodedString\' ? $$_MT_T : Text::MicroTemplate::escape_html($_MT_T);return $_MT; }',
+    'comment_mark' => '#',
+    'escape_func' => 'Text::MicroTemplate::escape_html',
+    'expression_mark' => '=',
+    'extension' => '.mt',
+    'include_path' => $VAR1->{'context'}{'View::MT::AppConfig'}{'include_path'},
+    'line_start' => '?',
+    'macro' => {
+      'block' => sub { "DUMMY" },
+      'extends' => sub { "DUMMY" },
+      'include' => sub { "DUMMY" }
+    },
+    'open_layer' => ':utf8',
+    'package_name' => 'Catalyst::View::MicroTemplate',
+    'render_context' => undef,
+    'tag_end' => '?>',
+    'tag_start' => '<?',
+    'template' => '<? my ($c, $args) = @_ ?><?= $args->{message} ?>',
+    'template_args' => {},
+    'tree' => [
+      [
+        'code',
+        ' my ($c, $args) = @_ ',
+        'expr',
+        ' $args->{message} '
+      ]
+    ],
+    'use_cache' => 0
+  }, 'Text::MicroTemplate::Extended' ),
+  'template_args' => $VAR1->{'template'}{'template_args'},
+  'template_suffix' => '.mt'
+}, 'TestApp::View::MT::AppConfig' )
+bless( {
+  'catalyst_component_name' => 'TestApp::View::MT::AppConfig',
+  'charset' => 'utf8',
+  'content_type' => 'text/html',
+  'context' => bless( {
+    'View::MT::AppConfig' => {
+      'include_path' => [
+        bless( {
+          'dirs' => [
+            '',
+            'Users',
+            'daisuke',
+            'git',
+            'Catalyst-View-MicroTemplate',
+            't',
+            'lib',
+            'TestApp',
+            'root'
+          ],
+          'file_spec_class' => undef,
+          'volume' => ''
+        }, 'Path::Class::Dir' )
+      ],
+      'template_suffix' => '.mt'
+    },
+    'action' => bless( {
+      'attributes' => {
+        'Path' => [
+          '/test'
+        ]
+      },
+      'class' => 'TestApp',
+      'code' => sub { "DUMMY" },
+      'name' => 'test',
+      'namespace' => '',
+      'reverse' => 'test'
+    }, 'Catalyst::Action' ),
+    'actions' => {},
+    'counter' => {
+      'end' => 1,
+      'test' => 1
+    },
+    'default_message' => 'hi',
+    'default_view' => 'Default',
+    'home' => '/Users/daisuke/git/Catalyst-View-MicroTemplate/t/lib/TestApp',
+    'name' => 'TestApp',
+    'namespace' => '',
+    'request' => bless( {
+      '_body' => 0,
+      '_context' => $VAR1->{'context'},
+      '_path' => 'test',
+      'action' => 'test',
+      'address' => '127.0.0.1',
+      'arguments' => [],
+      'base' => bless( do{\(my $o = 'http://localhost/')}, 'URI::http' ),
+      'body_parameters' => {},
+      'captures' => [],
+      'cookies' => {},
+      'headers' => bless( {
+        'host' => 'localhost:80',
+        'https' => 'OFF'
+      }, 'HTTP::Headers' ),
+      'hostname' => 'localhost',
+      'match' => 'test',
+      'method' => 'GET',
+      'parameters' => {
+        'message' => 'Tue Nov 17 15:30:39 2009',
+        'view' => 'AppConfig'
+      },
+      'protocol' => 'HTTP/1.1',
+      'query_parameters' => {
+        'message' => 'Tue Nov 17 15:30:39 2009',
+        'view' => 'AppConfig'
+      },
+      'remote_user' => undef,
+      'secure' => '0',
+      'uploads' => {},
+      'uri' => bless( do{\(my $o = 'http://localhost/test?view=AppConfig&message=Tue%20Nov%2017%2015:30:39%202009')}, 'URI::http' ),
+      'user' => undef
+    }, 'Catalyst::Request' ),
+    'response' => bless( {
+      '_context' => $VAR1->{'context'},
+      'body' => '',
+      'cookies' => {},
+      'finalized_headers' => '0',
+      'headers' => bless( {
+        'x-catalyst' => '5.80013'
+      }, 'HTTP::Headers' ),
+      'status' => '200'
+    }, 'Catalyst::Response' ),
+    'root' => bless( {
+      'dirs' => [
+        '',
+        'Users',
+        'daisuke',
+        'git',
+        'Catalyst-View-MicroTemplate',
+        't',
+        'lib',
+        'TestApp',
+        'root'
+      ],
+      'file_spec_class' => undef,
+      'volume' => ''
+    }, 'Path::Class::Dir' ),
+    'stack' => [
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => '_DISPATCH',
+        'namespace' => '',
+        'reverse' => '_DISPATCH'
+      }, 'Catalyst::Action' ),
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => '_END',
+        'namespace' => '',
+        'reverse' => '_END'
+      }, 'Catalyst::Action' ),
+      bless( {
+        'attributes' => {
+          'Private' => [
+            undef
+          ]
+        },
+        'class' => 'TestApp',
+        'code' => sub { "DUMMY" },
+        'name' => 'end',
+        'namespace' => '',
+        'reverse' => 'end'
+      }, 'Catalyst::Action' )
+    ],
+    'stash' => {
+      'message' => 'Tue Nov 17 15:30:39 2009'
+    },
+    'state' => 0,
+    'stats' => bless( {
+      'enable' => 1,
+      'stack' => [
+        bless( {
+          '_children' => [
+            bless( {
+              '_children' => [],
+              '_depth' => 0,
+              '_height' => 1,
+              '_node' => {
+                'action' => '/test',
+                'comment' => '',
+                'elapsed' => '0.000187',
+                't' => [
+                  1258439439,
+                  103701
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'test1',
+              '_width' => 1
+            }, 'Tree::Simple' ),
+            bless( {
+              '_children' => [],
+              '_depth' => 0,
+              '_height' => 1,
+              '_node' => {
+                'action' => '/end',
+                'comment' => '',
+                'elapsed' => '0.000462',
+                't' => [
+                  1258439439,
+                  104163
+                ]
+              },
+              '_parent' => $VAR1->{'context'}{'stats'}{'stack'}[0],
+              '_uid' => 'end1',
+              '_width' => 1
+            }, 'Tree::Simple' )
+          ],
+          '_depth' => -1,
+          '_height' => 2,
+          '_node' => {
+            't' => [
+              1258439439,
+              101583
+            ]
+          },
+          '_parent' => 'root',
+          '_uid' => '0xd10b80',
+          '_width' => 2
+        }, 'Tree::Simple' ),
+        $VAR1->{'context'}{'stats'}{'stack'}[0]{'_children'}[1]
+      ],
+      'tree' => $VAR1->{'context'}{'stats'}{'stack'}[0]
+    }, 'Catalyst::Stats' )
+  }, 'TestApp' ),
+  'include_path' => $VAR1->{'context'}{'View::MT::AppConfig'}{'include_path'},
+  'stash_key' => '__TestApp::View::MT::AppConfig_template',
+  'template' => bless( {
+    'cache' => {},
+    'code' => 'sub { my $_MT = \'\'; local $Catalyst::View::MicroTemplate::_MTREF = \\$_MT; my $_MT_T = \'\'; my ($c, $args) = @_ ;$_MT_T = scalar  $args->{message} ; $_MT .= ref $_MT_T eq \'Text::MicroTemplate::EncodedString\' ? $$_MT_T : Text::MicroTemplate::escape_html($_MT_T);return $_MT; }',
+    'comment_mark' => '#',
+    'escape_func' => 'Text::MicroTemplate::escape_html',
+    'expression_mark' => '=',
+    'extension' => '.mt',
+    'include_path' => $VAR1->{'context'}{'View::MT::AppConfig'}{'include_path'},
+    'line_start' => '?',
+    'macro' => {
+      'block' => sub { "DUMMY" },
+      'extends' => sub { "DUMMY" },
+      'include' => sub { "DUMMY" }
+    },
+    'open_layer' => ':utf8',
+    'package_name' => 'Catalyst::View::MicroTemplate',
+    'render_context' => undef,
+    'tag_end' => '?>',
+    'tag_start' => '<?',
+    'template' => '<? my ($c, $args) = @_ ?><?= $args->{message} ?>',
+    'template_args' => {},
+    'tree' => [
+      [
+        'code',
+        ' my ($c, $args) = @_ ',
+        'expr',
+        ' $args->{message} '
+      ]
+    ],
+    'use_cache' => 0
+  }, 'Text::MicroTemplate::Extended' ),
+  'template_args' => $VAR1->{'template'}{'template_args'},
+  'template_suffix' => '.mt'
+}, 'TestApp::View::MT::AppConfig' )
+[info] *** Request 2 (2.000/s) [4745] [Tue Nov 17 15:30:39 2009] ***
+[debug] Query Parameters are:
+.-------------------------------------+--------------------------------------.
+| Parameter                           | Value                                |
++-------------------------------------+--------------------------------------+
+| message                             | Tue Nov 17 15:30:39 2009             |
+| view                                | AppConfig                            |
+'-------------------------------------+--------------------------------------'
+[debug] "GET" request for "test" from "127.0.0.1"
+[debug] Path is "test"
+[debug] [TestApp::View::MT::AppConfig] rendering template test
+[info] Request took 0.006755s (148.038/s)
+.------------------------------------------------------------+-----------.
+| Action                                                     | Time      |
++------------------------------------------------------------+-----------+
+| /test                                                      | 0.000187s |
+| /end                                                       | 0.003761s |
+|  -> TestApp::View::MT::AppConfig->process                  | 0.000930s |
+'------------------------------------------------------------+-----------'
+
+t/01_appconfig.t .. ok
+All tests successful.
+Files=1, Tests=6,  1 wallclock secs ( 0.02 usr  0.00 sys +  0.86 cusr  0.05 csys =  0.93 CPU)
+Result: PASS

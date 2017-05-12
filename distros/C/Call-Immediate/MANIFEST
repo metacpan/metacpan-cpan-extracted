@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+t/basic.t
+t/TestImmediate.pm
+lib/Call/Immediate.pm
+lib/Call/Immediate/Call.pm
+META.yml                                 Module meta-data (added by MakeMaker)

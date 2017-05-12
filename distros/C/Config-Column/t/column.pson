@@ -1,0 +1,5 @@
+[
+{name => '奈良阪某', subject => 'Config::Columnリリース', date => '2012/03/05 (月) 04:33:38', value => 'とうとうPerlにモジュールをcontributeするまでになりました。なんか感慨深いです。<br /><br />-- <br />奈良阪某', mail => 'info/at/narazaka.net', url => 'http://narazaka.net/', key => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', host => 'localhost', addr => '127.0.0.1'},
+{name => '編集', subject => 'おめでとうございます', date => '2012/03/05 (月) 18:33:00', value => 'ところで締め切り今日なんですが', mail => '', url => '', key => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', host => 'narazaka.net', addr => '192.168.0.1'},
+{name => '奈良阪某', subject => '', date => '2012/03/05 (月) 21:12:21', value => 'まじで', mail => 'info/at/narazaka.net', url => 'http://narazaka.net/', key => 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', host => 'localhost', addr => '127.0.0.1'}
+]

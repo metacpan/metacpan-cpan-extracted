@@ -1,0 +1,7 @@
+header:
+	package Base;
+	use strict;
+
+variables:
+	$some_var	# anything useful
+	%hash

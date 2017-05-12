@@ -1,0 +1,94 @@
+{
+   "abstract" : "A Perl implementation of reCAPTCHA API version 2",
+   "author" : [
+      "Pattawan Kaewduangdee <pattawan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captcha-reCAPTCHA-V2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Captcha::reCAPTCHA::V2" : {
+         "file" : "lib/Captcha/reCAPTCHA/V2.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Sidnet/p5-Captcha-reCAPTCHA-V2/issues"
+      },
+      "homepage" : "https://github.com/Sidnet/p5-Captcha-reCAPTCHA-V2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Sidnet/p5-Captcha-reCAPTCHA-V2.git",
+         "web" : "https://github.com/Sidnet/p5-Captcha-reCAPTCHA-V2"
+      }
+   },
+   "version" : "0.3",
+   "x_contributors" : [
+      "Michal Wojciechowski <odyniec@cpan.org>"
+   ]
+}
+

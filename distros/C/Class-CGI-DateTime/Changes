@@ -1,0 +1,8 @@
+Revision history for Class-CGI-DateTime
+
+0.02    2006-05-07
+        Upgraded to use Class::CGI 0.20.
+
+0.01    2006-04-25
+        First version, released on an unsuspecting world.
+

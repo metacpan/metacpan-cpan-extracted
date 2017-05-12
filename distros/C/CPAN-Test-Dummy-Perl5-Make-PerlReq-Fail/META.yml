@@ -1,0 +1,19 @@
+---
+name: CPAN-Test-Dummy-Perl5-Make-PerlReq-Fail
+version: 0.001
+author:
+  - 'David A. Golden <dagolden@cpan.org>'
+abstract: CPAN Test Dummy that fails to find a required version of Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 6
+provides:
+  CPAN::Test::Dummy::Perl5::Make::PerlReq::Fail:
+    file: lib/CPAN/Test/Dummy/Perl5/Make/PerlReq/Fail.pm
+    version: 0.001
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,21 @@
+Build.PL
+Changes
+lib/CGI/Application/Plugin/Forward.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+misc/dist
+misc/makedocs.pl
+misc/module-starter-opts.txt
+misc/prove_prereqs.pl
+misc/style.css
+README
+t/00.load.t
+t/01-forward.t
+t/02-examples.t
+t/03-coderefs.t
+t/04-forward_prerun_hook.t
+t/05-auto_runmode.t
+t/pod-coverage.t
+t/pod.t

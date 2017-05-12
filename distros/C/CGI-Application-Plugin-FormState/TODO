@@ -1,0 +1,26 @@
+
+
+The following options may eventually be added to C<init> if there is
+demand:
+
+=over 4
+
+=item digest_module
+
+Which digest module to use to create the checksum portion of the session
+key.  By default this is C<Digest::MD5>, but you could use any other
+module with the same interface, such as C<Digest::SHA1>.
+
+=item keyname_generator
+
+Normally the form state is stored in the user's session
+session using a key like:
+
+   form_state_storage_name_84eb13cfed01764d9c401219faa56d53
+
+If you want to name keys differently, you can provide a subroutine to
+generate the name.  The subroutine is passed the name of the form state
+storage.
+
+=back
+

@@ -1,0 +1,66 @@
+{
+   "abstract" : "extract data from Macintosh BinHex files",
+   "author" : [
+      "Eriq <eryq@zeegee.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Convert-BinHex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "FileHandle" : "0",
+            "Getopt::Std" : "0",
+            "POSIX" : "0",
+            "integer" : "0",
+            "lib" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Compare" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stephenenelson/convert-binhex",
+         "web" : "https://github.com/stephenenelson/convert-binhex"
+      }
+   },
+   "version" : "1.125"
+}
+

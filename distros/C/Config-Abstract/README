@@ -1,0 +1,47 @@
+Config/Abstract version 0.15
+============================
+
+Config::Abstract is not supposed to be used directly, but rather as
+the base class for a bundle of file format specific classes sharing
+the internal representation of the file data that lets us perform a
+bunch of operations on that data, such as converting files from one
+format to any other format, creating diffs between config  files of
+different formats, patching files based on keys-values, rather than
+line numbers and so on.
+
+STATUS
+Since this is work in the early  stages of  development and I  don't
+have the resources or the time to model this properly, the interface
+is likely to change every now and then.  Most notably I am currently
+reworking the accessor / mutator methods to use a 'path-based' name-
+space, which allows arbitrary depth of nesting in the handled config
+data.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Data::Dumper
+
+CREDITS
+
+I want to thank my mum, God and swedish education for getting me
+desperate enough to embark on an endeavour such as this.
+Seriously, I'd like to thank my fellow developers here at CNET
+Networks UK for valuable input and feedback that has been key
+to much of this code, even though none of them have contributed
+any actual code, yet :). I especially want to thank James Cohen
+and Aidan Fitzpatrick for being such code freaks.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003-2007 Eddie Olsson <ewt@avajadi.org>

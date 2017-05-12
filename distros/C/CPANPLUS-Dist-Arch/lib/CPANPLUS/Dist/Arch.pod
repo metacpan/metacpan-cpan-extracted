@@ -1,0 +1,598 @@
+=pod
+
+=head1 NAME
+
+CPANPLUS::Dist::Arch - CPANPLUS backend for building Archlinux pacman packages
+
+=head1 SYNOPSIS
+
+  (First, setup cpan to use us automatically)
+  $ setupdistarch
+
+  (Install the module as a pacman package)
+  $ cpanp -i Perl::Module::Here
+
+  (Use cpan2dist to make a package, but don't install it)
+  $ cpan2dist Acme::Bleach
+
+  (Use our included cpan2aur to make a source package in current dir)
+  $ cpan2aur CPANPLUS::Dist::Arch
+
+  (In case we need to customize our package build, create a directory
+   with a template we can use for future versions.)
+  $ cpan2aur -d CPANPLUS::Dist::Arch
+  ==> Creating new directory for CPANPLUS::Dist::Arch...
+    -> Looking up module for CPANPLUS::Dist::Arch on CPAN...
+  Running [/usr/bin/perl /usr/bin/perlbin/core/cpanp-run-perl /home/jnbek/.cpanplus/5.22.1/build/CPANPLUS-Dist-Arch-1.32/Makefile.PL INSTALLDIRS=site]...
+  Writing Makefile for CPANPLUS::Dist::Arch
+    -> Creating new PKGBUILD.tt template file...
+  ==> Created perl-cpanplus-dist-arch source package directory.
+
+  (Customize the template... add a optdepends, library depends, etc.
+   Just leave the rest of it alone.)
+  $ cd perl-cpanplus-dist-arch
+  $ ed PKGBUILD.tt
+
+  (Submit it to AUR!  Will ask for a login username/password or remember
+   the last one used)
+  $ cpan2aur -u
+
+=head1 DESCRIPTION
+
+This module is used as a plugin of CPANPLUS to transparently package
+CPAN distribution files into pacman packages as they are installed.
+This module can also be used by programmers to build packages in more
+complex ways.  For example, it can create source packages for the AUR
+by using the included L<cpan2aur> program.
+
+=head1 REQUIREMENTS
+
+You will need to have pacman installed, of course, to create package
+and to install these new packages.  Pacman is included with Archlinux
+but can even be used on other Linux distributions.
+(see http://wiki.archlinux.org/index.php/Pacman)
+
+=head1 SETUP
+
+Type L<setupdistarch> at the command line to install CPAN modules
+as packages by default.
+
+=head1 WHERE IS THE PACKAGE
+
+By default, packages are stored under the user's home directory in the
+I<.cpanplus> directory.  Two seperate directories are created for
+building packages and for storing the resulting package file.
+
+I<5.10.1> represents the version of perl you used to build the package
+and I<~/.cpanplus> represents the base directory chosen in your CPANPLUS
+config.
+
+=over 4
+
+=item * Build Directory: C<~/.cpanplus/5.10.1/pacman/build>
+
+=item * Package Directory: C<~/.cpanplus/5.10.1/pacman/pkg>
+
+=back
+
+=head1 CUSTOMIZATION
+
+You can change defaults settings machine-wide (for every user) or for
+one user or package.  The machine-wide settings are set in the
+I</etc/makepkg.conf> file.  The user/package customizations are set
+using environment variables.
+
+=over
+
+=item B<PKGDEST>
+
+Override where the package files end up.
+
+=item B<PACKAGER>
+
+Override the Contributor comment line at the top of the PKGBUILD.
+
+=back
+
+=for readme stop
+
+=head2 EXAMPLE
+
+Here is how you can use environment variables to put the package files
+in our I<~/pkgs> directory for the L<ALPM> module. (along with any
+modules we have to build and install to create it)
+
+  PACKAGER='jnbek1972 <jnbek at cpan dot org>' PKGDEST=~/pkgs cpanp -i ALPM
+
+=head1 COMMAND LINE OPTIONS
+
+There are many command line options to L<cpan2dist> and L<cpanp>.  A
+small number of these options are recognized by CPANPLUS::Dist::Arch.
+
+=over
+
+=item B<--verbose> I<(DISABLED)>
+
+We are now verbose by default!  Hope this is okay.
+
+=item B<--skiptest>
+
+This will pass the --nocheck option to makepkg. Automated tests
+that the module author has written for your benefit will be avoided
+when building a package for the module.
+
+  WARNING: This affects all pre-requisite module/packages that are
+           built and installed; not just the module you specify.
+
+=back
+
+=head1 DIST OPTIONS
+
+cpan2dist allows you specify CPANPLUS::Dist::Arch specific options on
+the command line using the I<--dist-opts> switch.  You can also pass
+these arguments when using CPANPLUS::Module methods like dist().
+
+=over
+
+=item B<pkgtype>
+
+This specifies whether to make a source package or a binary package.
+The default is to make a binary package.
+
+=item B<destdir>
+
+This overrides every other package destination specified.  Whether from
+the makepkg.conf file, environment variable, or default.
+
+=item B<quiet>
+
+If set to a true value, pipe makepkg output to /dev/null.
+
+=item B<nocolor>
+
+If set to a true value, disable colorized output from makepkg.  Use monochrome
+output only.
+
+=back
+
+=head1 PROGRAMMERS API
+
+The rest of the document describes how a programmer can use the module.
+You can use this module with the CPANPLUS module in order to install
+distributions/packages in more complex ways.
+
+Here is a quick example of how you use C::D::A with L<CPANPLUS::Backend>.
+
+=head2 EXAMPLE
+
+  use CPANPLUS::Backend;
+  use warnings;
+  use strict;
+
+  # Create a source package in our current directory, no verbosity.
+  my $cb  = CPANPLUS::Backend->new();
+  my $mod = $cb->module_tree( 'ALPM' );
+  $mod->install( target  => 'create',
+                 format  => 'CPANPLUS::Dist::Arch',
+                 pkg     => 'src',
+                 destdir => '.',
+                 verbose => 0
+               );
+
+See also L<CPANPLUS::Module>.  The C<create_dist_arch> sub in the
+L<cpan2aur> script shows how to use CPANPLUS::Module's dist() method,
+which is a little funky.  I<(I want to submit a patch to it when I get
+the chance)>
+
+=head2 EXPORT TAGS
+
+=over 4
+
+=item B<:all>
+
+This will import the functions C<dist_pkgname> and C<dist_pkgver> into
+your package.  These functions are not imported by default.
+
+=back
+
+=head2 EXPORTED FUNCTIONS
+
+=head3 dist_pkgname
+
+  Usage   : my $pkgname = dist_pkgname( 'Acme-Drunk' );
+  Purpose : Converts a module's distribution name to an
+            Archlinux style perl package name.
+  Params  : $dist_name - The name of the distribution (ex: Acme-Drunk)
+  Returns : The Archlinux perl package name (ex: perl-acme-drunk).
+            following the Archlinux packaging standards.
+
+=head3 dist_pkgver
+
+  Usage   : my $pkgver = dist_pkgver( '1.20.1_2A' );
+  Purpose : Convert a module's CPAN distribution version into our more
+            restrictive pacman package version number.
+  Params  : The version of the CPAN distribution file.
+  Returns : The Archlinux package version following the Archlinux
+            packaging standards.
+
+=head2 PUBLIC METHODS
+
+When using the CPANPLUS module in a perl script to create packages,
+these public methods are available.  See the cpanpkgbuild.pl script
+included in the examples directory for an example.
+
+=head3 get_pkgname
+
+  Usage   : say $dist->get_pkgname;
+  Returns : The name of the package.
+
+=head3 get_pkgver
+
+  Usage   : say $dist->get_pkgver;
+  Returns : The version of the package.
+
+=head3 get_pkgrel
+
+  Usage   : say "Release: ", $dist->get_pkgrel;
+  Notes   : Default is 1, unless set_pkgrel is used.
+  Returns : The package release number.
+
+=head3 set_pkgrel
+
+  Usage   : $newrel = $dist->set_pkgrel( 2 );
+  Params  : $new_relnum - Croaks if this is not a number.
+  Returns : The new release number.
+
+=head3 set_destdir
+
+  Usage   : $dist->set_destdir('~/pkg/perl');
+  Purpose : Overrides the directory to store the built package
+            for this particular object.
+  Returns : The directory that was set.
+
+=head3 get_destdir
+
+  Usage   : my $dest = $dist->get_destdir;
+  Returns : The directory previously specified by set_destdir.
+
+=head3 get_pkgpath
+
+  Usage   : my $fqp = $dist->get_pkgpath;
+  Returns : The fully qualified path of the built package
+            or undef if no package was built yet.
+
+=head3 get_cpandistdir
+
+  Usage   : my $distdir = $dist->get_cpandistdir;
+  Returns : The main directory name that will be inside the distribution
+            tarball.  This directory contains the entire distribution.
+  Example : If the distribution file of Acme-Bleach is in the tarball
+            Acme-Bleach-1.12.tar.gz or Acme-Bleach-1.12.tar.bz2
+            then $dist->get_cpandistdir will return 'Acme-Bleach-1.12'.
+  Notes   : Does not actually check if the directory exists in the tarball.
+            So far it always has...
+
+=head3 get_pkgvars
+
+  Usage   : my %pkgvars = $dist->get_pkgvars;
+  Returns : A hash containing all the PKGBUILD variables.
+            Keys are the bash variable names in the PKGBUILD.
+            Dependencies are converted to their pacman names.
+  Notes   : The keys are: pkgname, pkgver, pkgdesc, depends, url, source
+            md5sums, arch, pkglinks, and sha512sums (if Digest::SHA is
+            installed).
+ 
+            One key not named after a PKGBUILD field is 'pkglinks' whose
+            value is a hashref. Inside this hashref, the keys 'depends'
+            and 'makedepends' are always present, even if they are an
+            empty arrayref. The keys 'checkdepends' and 'conflicts' are
+            only present if they contain a non-empty arrayref.
+            
+            These values are package specifications. Each specification
+            is an arrayref of package name, a comparison operator,
+            and a version number.
+
+=head3 get_pkgvars_ref
+
+  Usage    : my $pkgvars_ref = $dist->get_pkgvars_ref;
+  Returns  : The same as get_pkgvars except as a hashref.
+
+=head3 get_pkgbuild
+
+  Usage    : my $pkgbuildtext = $dist->get_pkgbuild;
+  Returns  : A scalar containing the full text of the PKGBUILD that would
+             be generated in the perl pacman package.
+
+=head3 create_pkgbuild
+
+  Usage   : $self->create_pkgbuild( '/tmp', 1 );
+  Purpose : Creates a PKGBUILD file in the specified directory.
+  Params  : $destdir - The directory to put the new PKGBUILD in.
+  Precond : You must first call prepare or have CPANPLUS do it automatically.
+  Throws  : unknown installer type: '...'
+            failed to write PKGBUILD: ...
+            Invalid arguments to create_pkgbuild
+            Invalid directoy passed to create_pkgbuild: ...
+  Returns : Nothing.
+
+=head2 TEMPLATE METHODS
+
+=head3 get_pkgbuild_templ
+
+  Usage   : my $tt_text = $self->get_pkgbuild_templ();
+  Purpose : Mostly just to compliment L</set_pkgbuild_templ>.
+  Returns : The template used internally by L</get_pkgbuild>
+
+See L</PKGBUILD TEMPLATE>.
+
+=head3 set_pkgbuild_templ
+
+  Usage   : my $new_tt_text = $self->set_pkgbuild_templ( $templ_text );
+  Purpose : Create PKGBUILDs based on a custom template.
+  Params  : $templ_text - New template text to use for creating the PKGBUILD.
+  Returns : The new template text.
+
+See L</PKGBUILD TEMPLATE>.
+
+=head3 set_tt_init_args
+
+  Usage   : $self->set_tt_init_args( INCLUDE_PATH => '/home/jnbek/aur4/tt',
+                                     EVAL_PERL    => 1 );
+  Purpose : Change arguments that are given to the template module's
+            constructor when we create an object to process templates.
+  Params  : %init_args - A hash of config key/value pairs.
+  Returns : A hash reference to %init_args.
+
+What config value are supported depends on what template module is
+being used.  You'll have to look at the module's docs to be sure.
+
+=head3 set_tt_module
+
+  Usage   : $obj->set_tt_module( 0 );
+  Params  : $modname - The name of a template module to use or
+                       0 to force using the internal engine.
+  Warning : This sets the template module to use for ALL
+            CPANPLUS::Dist::Arch objects.
+  Returns : $modname
+
+=head3 get_tt_module
+
+  Usage   : my $modname = $obj->get_tt_module();
+            my $modname = CPANPLUS::Dist::Arch->get_tt_module();
+  Returns : The name of the template module that is being used or 0
+            if we are using our own internal template engine.
+
+=head2 PKGBUILD TEMPLATE
+
+Since version 0.19 we now use template modules if they are available.
+So if any of the following modules are installed and can be used,
+they will be used instead of our builtin template engine:
+
+=over
+
+=item 1. L<Template::Toolkit>
+
+=item 2. L<Template::Alloy>
+
+=item 3. L<Template::Tiny>
+
+=back
+
+The modules have the priority listed above.  We go through the list
+sequentially and use the first module that we find.
+
+=head3 BUILTIN TEMPLATE FORMAT
+
+The builtin template format is an extremely simplified ripoff of
+L<Template::Toolkit> syntax.  It only implements variable
+interpolation and the C<IF> directive.  To insert a template variable
+use the syntax C<[% foo %]>.  This will insert the value of the
+variable named 'foo'.  The C<get_pkgbuild()> method will croak with
+the message I<"Template variable ... was not provided"> if the
+variable was not defined.  C<[% IF var_name %] ... [% END %]> will
+remove what is in-between the C<IF> and C<END> tags if the variable
+named C<var_name> is not set to a true value.
+
+Trailing newlines will also be stripped if you use the C<-%]> syntax
+(notice the C<->) to close the L<Template::Toolkit> style blocks.
+
+See L</get_pkgvars> for a list of the variables that can be used
+inside the template.
+
+=head1 LIMITATIONS
+
+There are some limitations in the way CPANPLUS and pacman works
+together that I am not sure can be fixed automatically.  Instead you
+might need a human to intervene.  I called these limitations because
+they aren't exactly bugs.  More specific bugs with exact error messages
+are in the L</BUGS> section.
+
+=over 4
+
+=item B<Cannot detect non-perl dependencies>
+
+As of version 0.09, CPANPLUS will I<try> to find non-perl dependencies.
+This only works with ExtUtils::MakeMaker distributions.
+
+This means if you plan on distributing a perl module package (ie
+uploading to AUR) you should edit the PKGBUILD by hand to include
+the libraries needed by the XS module.
+
+The included L<cpan2aur> script helps creating customized AUR
+packages.
+
+=item B<A module is installed, but pacman says it isn't>
+
+CPAN[PLUS] considers a module installed if it can C<use> it.  That
+is, if it is in C<@INC> somewhere on your system.
+
+I<Pacman> considers a module installed if it has been packaged and
+installed with I<pacman>.
+
+So if you installed some modules in the past without packaging them
+first, they don't exist as far as I<pacman> is concerned.  Usually, you
+can just reinstall them using this module because CPANPLUS::Dist::Arch
+installs modules under the C<vendor_perl/> directories, such as
+C</usr/share/perl5/vendor_perl/...>, and CPAN installs under the
+C<site_perl/> directories, such as C</usr/share/perl5/site_perl/...>.
+
+Installing with this module will appease I<pacman>, but you may want
+to manually delete the previously installed modules to prevent
+version mismatch problems.
+
+=item B<Pre-requisites are always installed>
+
+CPANPLUS by default installs the pre-requisite modules before the
+module you requested.  This module does the same only it creates an
+Arch package and installs it with I<pacman> instead.
+
+You should be able to run I<pacman> under sudo for this to work properly.
+Or you could run cpan2dist as root, but I wouldn't recommend it.
+
+=item B<Readline is broken and I can't use cpanplus!>
+
+I had this problem recently.  A system upgrade had updated my readline
+package but the L<Term::ReadLine::Gnu> module was not updated.  Or
+perhaps I had the termcap-compat package, which breaks
+L<Term::ReadLine::Gnu>.
+
+I forget, in any case Term::ReadLine::Gnu was broken.  To be able to
+update the perl-term-readline-gnu package, I had to force the
+Term::ReadLine module to not try to load Term::ReadLine::Gnu with the
+PERL_RL environment variable:
+
+  PERL_RL=0 cpanp -i Term::ReadLine::Gnu
+
+=back
+
+=head1 BUGS
+
+Please email me or report any bugs or feature requests to C<<
+<bug-cpanplus-dist-arch at rt.cpan.org> >>, or through the web
+interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPANPLUS-Dist-Arch>.
+We will be notified, and then you'll automatically be notified of
+progress on your bug as we make changes.
+
+=head2 Known Bugs
+
+=over 4
+
+=item B<Dist creation of '...' skipped, build time exceeded: 300 seconds>
+
+If compiling a module takes a long time, this message will pop up.
+Interestingly, though, the module keeps compiling in the background...?
+
+This is something CPANPLUS does automatically.  If you had been trying
+to install the module, the install step will be aborted.  The package
+will still be created in the usual directory, so you can install it
+manually.
+
+We haven't been able to track this down yet... I think it has only happened
+with cpan2dist so far.  It happened when building L<PDL>, by the way.
+
+If you have any ideas or patches, feel free to create a pull request on GitHub
+
+L<https://github.com/jnbek/perl-cpanplus-dist-arch>
+
+=back
+
+=head1 TODO
+
+=over 4
+
+=item * Extract license information from META.yml, maybe use a YAML module.
+
+=back
+
+=for readme continue
+
+=head1 SUPPORT
+
+Email me at C<< <jnbek at cpan dot org> >> or message me as I<jnbek> on IRC
+
+Freenode: #archlinux
+
+really anywhere you see I<jnbek> or I<jnbek1972> online, it's me.
+
+To check why the build process failed, read the build logs CPANPLUS
+keeps in C<~/.cpanplus/install_logs/>.  The problem may be specific to
+the module you're building and not this module.
+
+=head1 ACKNOWLEDGEMENTS
+
+This module was inspired by the perl-cpanplus-pacman package and
+CPANPLUS::Dist::Pacman by Firmicus which is available at
+L<http://aur.archlinux.org/packages.php?ID=5954>.
+
+This mostly started from CPANPLUS::Dist::RPM which is on Google Code
+at L<http://code.google.com/p/cpanplus-dist-rpm/>.  This was a very
+helpful starting point to try to understand the internals of CPANPLUS.
+
+=head1 CONTRIBUTORS
+
+Contributors are credited in detail in the ChangeLog file.  The
+following people have been kind enough to submit bug reports:
+
+=over 4
+
+=item * Xenoterracide
+
+=item * IsaacG
+
+=back
+
+I<Thank you for your help!>
+
+=head1 SEE ALSO
+
+=over
+
+=item * AUR Package: perl-cpanplus-dist-arch
+
+L<http://aur.archlinux.org/packages.php?ID=24971>
+
+=item * Git Repository
+
+L<http://github.com/jnbek/perl-cpanplus-dist-arch>
+
+=item * Archlinux Perl Package Guidelines
+
+L<http://wiki.archlinux.org/index.php/Perl_Package_Guidelines>
+
+=item * pacman
+
+L<http://wiki.archlinux.org/index.php/Pacman>
+
+=item * makepkg
+
+L<http://wiki.archlinux.org/index.php/Makepkg>
+
+=item * CPANPLUS
+
+L<http://search.cpan.org/dist/CPANPLUS/>
+
+=back
+
+=head1 AUTHOR
+
+Created by: Justin Davis C<< <juster at cpan dot org> >>
+
+Serendipitously maintained by: John D Jones III C<< <jnbek at cpan dot org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010-2015 Justin Davis, all rights reserved.
+
+Copyright 2015 John D Jones III, all rights reserved
+
+Justin Davis C<< <juster at cpan dot org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Justin Davis, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,6 @@
+MANIFEST
+LICENSE
+Changes
+Makefile.PL
+lib/Catalyst/Model/Memcached.pm
+t/001_load.t

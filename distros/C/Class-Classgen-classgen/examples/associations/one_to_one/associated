@@ -1,0 +1,132 @@
+#!/usr/bin/perl -w
+
+	use Country;
+	use City;
+
+# --- to initialize a few Country- and a few City-objects --------
+	
+$co1=Country->new();		# adapt the new() function if you want
+$co1->set_name('Germany');	# to do this in one step
+$ci1=City->new();
+$ci1->set_name('Berlin');
+associate($co1, $ci1);		# establish a one-to-one association
+				# between this Country- and this City-instance
+
+	
+$co2=Country->new();
+$co2->set_name('United States of America');
+$ci2=City->new();
+$ci2->set_name('Washington DC');
+associate($co2, $ci2);
+
+
+	
+$co3=Country->new();
+$co3->set_name('France');
+$ci3=City->new();
+$ci3->set_name('Paris');
+associate($co3, $ci3);
+
+# --- some access to 'foreign' classes ------------------------------
+
+print "\n";
+print $ci2->get_name() . " is the capital from (the) ";
+print $ci2->get_a_is_capital_from()->get_name() . ".\n";
+
+print "The capital of ".$co1->get_name();
+print " is ". $co1->get_a_has_capital()->get_name() .".\n\n";
+
+$ci3->get_a_is_capital_from()->greetings();
+$ci1->get_a_is_capital_from()->greetings();
+	
+print "\n";	
+
+# --- run  perldoc associated  for more details ---------------------	
+	
+sub associate {		# to guarantee the correct associations
+	my ($country, $city)=@_;
+	$country->set_a_has_capital($city);	# store the City-instance
+	$city->set_a_is_capital_from($country);	# store the Country-instance
+}
+
+
+
+=head1 NAME 
+
+associated - A simple demo for one-to-one associations from UML (in Perl) (/examples).
+
+=head1 VERSION
+
+1.00
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+Rumbaugh uses this simple example to illustrate a one-to-one
+association between a Country- and a City-object in ch. 3.2 of
+"Object Oriented Modelling".
+
+The code may look clumsy and a little bit oversized for this simple problem.
+However the idea hopefully becomes evident: to access functions of other
+classes.
+
+Associations are essential to come up with a compact and very powerful
+object-model (several distinct classes, with defined functionalities, with well
+established associations).
+
+In this example the subroutine associate() assigns the Country- and the
+City-instances to link together country/city pairs. Running the debugger may
+produce results like this:
+
+	DB<6> x $ci1
+	0  City=HASH(0x81c6b3c)
+	   '_a_is_capital_from' => Country=HASH(0x81d04d0)
+	      '_a_has_capital' => City=HASH(0x81c6b3c)
+	         -> REUSED_ADDRESS
+	      '_name' => 'Germany'
+	   '_name' => 'Berlin'
+	DB<7> x $ci1->get_name
+	0  'Berlin'
+	  DB<8> x $ci1->get_a_is_capital_from()->get_name()
+	0  'Germany'
+
+which is all right.
+
+The general syntax to access functions from another associated class is:
+
+	class1.association.function_of_class2
+
+which translates into, e.g.:
+
+	$ci3->get_a_is_capital_from()->greetings();
+
+to call the greetings() function of the Country-class from the specific  
+City-instance $ci3.
+
+
+=head1 ENVIRONMENT
+
+=head1 DIAGNOSTICS
+
+=head1 BUGS
+
+=head1 FILES
+
+=head1 SEE ALSO
+
+	perldoc City.pm
+	perldoc Country.pm
+
+=head1 AUTHOR
+
+Name:  Michael Schlueter 
+
+email: mschlue@cpan.org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, Michael Schlueter. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.

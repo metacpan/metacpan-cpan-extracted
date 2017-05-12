@@ -1,0 +1,43 @@
+Revision history for Perl extension Color::Spectrum.
+
+1.14
+
+1.13
+    - update copyright date
+    - fix bug tracker location
+
+1.12
+    - added github meta to makefile
+
+1.11
+    - argument validation for color names
+
+1.10
+    - able to parse non hex color names
+      (now requires Color::Library)
+    - expands 3 char hex vals
+    - returned hex values are always upper case
+    - fix Exporter
+
+1.09
+    - convert tabs to spaces
+
+1.08  Mar 23 2013 
+    - structure built with Module::Starter
+    - uploaded to github
+
+1.06  Aug 25 2009 
+	- bug fixes, doc updates
+
+1.04  Jan 02 2004 
+	- doc updates
+
+1.03  Jan 02 2004 
+	- doc updates
+
+1.02  Jul 25 2003 
+	- added tests
+	- added README
+
+1.00  Jul 10 2003
+	- original version; created by h2xs 1.20 with options -A -X

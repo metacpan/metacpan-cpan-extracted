@@ -1,0 +1,91 @@
+Revision history for Perl extension PhotoGallery.
+
+0.16  Fri Mar 15 2013
+    - fix Image::Magick thumbnails (Adam Bernard)
+
+0.15  Fri Nov 20 2009
+    - added max_height to match max_width (tlhackque@yahoo.com)
+
+0.14  Mon Mar 17 2008
+    - added Imager adaptor
+    - caching configurability + fixes (tlhackque@yahoo.com, RT#33993)
+
+0.13  Mon Mar 10 2008
+    [Patched by "tlhackque@yahoo.com"]
+    - make the cache functional, finally (RT #33972)
+    - skip favicon.ico on dir read (RT #33972)
+
+0.12  Mon Mar 10 2008
+    - handle errors (not found, etc) more gracefully (RT #33907)
+    - fix warning when there is no "next" image (RT #33908)
+
+0.11  Sun Mar 09 2008
+    - enhance navigation between pics/galleries (RT #33908)
+    - fix URI escape on photo_single.tmpl (RT #33907)
+
+0.10  Wed Feb 06 2008
+    - added HTTP::Date to deps
+
+0.09  Tue Feb 05 2008
+    - sort dirs and files (RT #30317)
+    - leave empty dirs in the list of galleries in case they have sub-galleries
+      with photos (RT #30317)
+    - added a max_width option to limit the width of the image in the browser
+      (RT #30322)
+    - fix up photo_single.tmpl to break the image out of the 755px container
+
+0.08  Mon Nov 05 2007
+    - use HTTP::Date to parse If-Modified-Since header (RT #30317)
+
+0.07  Sat Oct 06 2007
+    - switched to Module::Install
+    - handle undef returns from MIME::Types (Alexander Becker)
+    - using File::ShareDir for default templates
+    - synchronize all version numbers
+
+0.06  Wed Sep 14 2005
+    - fixed removal of relative url-specified paths
+
+0.05  Tue Sep 13 2005
+    - changed Mime::Types to MIME::Types (closes RT #14564)
+
+0.04  Thu Sep 08 2005
+    - added pod_coverage.t
+    - major refactoring
+    - last-modified date used to ensure http caching
+    - new (table-less) templates
+
+    [INCOMPATIBLE CHANGES]
+    - new caching scheme
+    - you are now allowed to have photos in your photos_dir
+    - galleries can have sub-galleries
+    - no more thumbs_per_row
+    - no more extensions (mime types are detected)
+    - script_name not mandatory
+    - thumb_size is now numeric (default 100)
+    - s/image/photo/ in the urls
+    - captions are now stored in captions.txt right off of your
+      photos_dir
+
+0.03  Fri Jan 14 2005
+    - Re-organized the distro
+    - updated pod (closes RT #8805)
+    - added pod test
+
+0.02  Wed May 14 19:30:23 2003
+
+    Thanks to Mark Stosberg and Michael Heathman for their input
+
+    - Code cleanup
+    - Changed runmode names (full, english names)
+    - thumbnail size no longer specified in URL
+    - You can use either GD or Image::Magick (or you can write
+      your own interface)
+    - You can specify what extensions to read
+    - Crude thumbnail cache implemented
+    - $0 was doing funky stuff on Win32; it's been fixed
+
+0.01  Mon Sep  9 21:02:56 2002
+    - original version; created by h2xs 1.21 with options
+        -AX PhotoGallery
+

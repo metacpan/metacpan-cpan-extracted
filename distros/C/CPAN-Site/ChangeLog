@@ -1,0 +1,319 @@
+
+=== version history for CPAN::Site
+
+version 1.14: Thu 26 Jan 12:57:46 CET 2017
+
+	Fixes:
+	- accept package {} syntax [Heike Jansen]
+
+version 1.13: Fri 11 Mar 15:14:35 CET 2016
+
+	Fixes:
+	- auto-create $mycpan/authors
+	  rt.cpan.org#110331 [Martin Thurn]
+
+version 1.12: Wed Jun 17 10:16:10 CEST 2015
+
+	Fixes:
+	- stalled indexing on broken package
+	  rt.cpan.org#100843 [Jason McCarver]
+
+	Improvements:
+	- move t/99pod.t to xt/ and remove dependency on Test::Pod
+	- add warning that only pm files get indexed, not scripts
+	  [Thorsten Huhn]
+
+version 1.11: Sun Nov 18 22:11:21 CET 2012
+	- minor patch for Windows
+	  rt.cpan.org#81202 [Anthony Lucas]
+
+version 1.10: Sun Feb 12 22:26:22 CET 2012
+	- Fix bad change in 1.08, good version comparison.
+	  rt.cpan.org#72243 [Alexey Melezhik]
+
+version 1.09: Thu Aug  4 10:22:57 CEST 2011
+	Improvements:
+	- support zip files.
+	  requested by rt.cpan.org#69692 [Bartosz Jakubski]
+
+version 1.08: Mon Jun 20 16:45:43 CEST 2011
+	Improvements:
+	- handle errors found by qv() while parsing version strings
+	  rt.cpan.org#68716 [Alexey Melezhik]
+
+version 1.07: Sat Jun  4 00:10:52 CEST 2011
+	Fixes:
+	- support  "package NAME VERSION;" syntax.
+	- do not enforce numifying versions, because it does influence the
+	  comparisons.
+	  rt.cpan.org#67829 [Alexey Melezhik]
+
+	Improvements:
+	- Pause expects the "package" keyword to be on same line as package
+	  name.  This limitation is removed to cope with
+	  rt.cpan.org#68616 [Stephen R. Scaffidi]
+
+version 1.06: Tue May 18 16:50:11 CEST 2010
+	Fixes:
+	- adapt to newer version.pm, which broke interface.
+	  rt.cpan.org #57575 [Richard Huxton]
+
+version 1.05: Tue Mar  2 09:33:18 CET 2010
+	Improvements:
+	- add --env_proxy
+	  rt.cpan.org#55008 [Robert Bohne]
+
+version 1.04: Mon Oct 26 14:56:57 CET 2009
+	Improvements:
+	- produce error, not info, if a package cannot be collected.
+	- some informational messages from mirror and index processes
+	  decreased to "debug" level (-vvv or --mode="DEBUG").
+	- better attempt for VERSION parsing.
+	- use age of index to determine whether an archive has to
+	  be inspected again.
+
+version 1.03: Wed Oct  7 19:46:57 CEST 2009
+	Fixes:
+	- use $file->full_path i.s.o $file->name for files in a tar,
+	  required to correctly access some tar archives.
+	  rt.cpan.org#49795 [Matisse Enzer] and [Alex Efros]
+	- accept archives which end on .tgz
+	- keep highest version number of a pm, not the last [Alex Efros]
+
+version 1.02: Wed Sep  9 22:44:46 CEST 2009
+	Fixes:
+	- "version" action did not produce version
+	- "mirror" did not initialize LWP::UserAgent
+	- some modules, like DBI, specify package versions outside
+	  the package scope.
+
+	Improvements:
+	- prefer new CPANSITE_LOCAL as alternative for CPANSITE
+	  environment variable.
+
+version 1.01: Wed Sep  2 12:55:19 CEST 2009
+	Changes:
+	- removed the need for client-side CPAN::Site installation.
+	- update 02packages after 1 hour (was 1 day), because CPAN
+	  is refreshing more often, lately.
+	- removed [MYCPAN] argument to "index", because there is
+	  a --site option now.
+	- CPANSITE_CPAN renamed to CPANSITE_GLOBAL
+	- option --stand-alone replaces --cpan ''
+
+	Fixes:
+	- require Log::Report 0.25, not the non-existent 0.27
+
+	Improvements:
+	- indexer synchronizes with core CPAN after 1 hour (was 1 day)
+	  because CPAN is faster than previously.
+	- CPANSITE_CPAN environment variable as alternative to --site
+	- Replace IO::Compress::* by IO::Zlib, which is already required
+	  by Archive::Tar.
+	- explain changes in explain_101.txt
+	- --cpan option alternative added: -c
+
+version 1.00: Tue Sep  1 10:48:02 CEST 2009
+	Large version number jump to indicate structural rewrite
+	of internals.  This may trigger someones awareness to be
+	more careful in the upgrade.
+
+	Changes:
+	- removed mkpackages which was kept for backward compatibility
+	- do not extract readme's anymore, probably no-one uses them
+
+	Improvements:
+	- use Archive::Tar to unpack archives, to replace the tricky (but
+	  fast) scanning of the tar binary.
+	- replace use of external 'gzip' binary to IO::Compress
+	- use File::Spec in stead of UNIX syntax. The module is probably
+	  still not usable on Windows, but coming close.
+	- use Log::Report for error/trace/verbose
+	- rename t/CPAN-Site-Index.t into t/10index.t
+	- improved trace on index
+	- new 'mirror' option of cpansite
+
+version 0.26: Mon Aug 31 09:51:55 CEST 2009
+
+	Fixes:
+	- do not use /bin/pwd in t/pod.t
+	- accept http to retrieve data from central CPAN as alternative
+          to ftp, by using LWP in stead of Net::FTP
+
+	Improvements
+	- clean-up/extend manual of CPAN::Site
+
+version 0.25: Wed Jan 21 09:59:41 CET 2009
+
+	Fixes:
+	- also client requires HTTP::Date
+
+	Improvements:
+	- regressions tests for fix implemented in previous release.
+	  [Matisse Enzer]
+
+version 0.24: Tue Dec 30 11:36:39 CET 2008
+
+	Fixes:
+	- do only include package names found on usual locations.
+	  rt.cpan.org#41935 [Matisse Enzer]
+
+	Improvements:
+	- speed-up
+
+version 0.23: Tue Dec 23 13:30:25 CET 2008
+
+	Fixes:
+	- tests require Test::More 0.82 [cpantesters]
+
+version 0.22: Mon Dec 22 15:26:11 CET 2008
+
+	Fixes:
+	- pre-req version.pm [Sander Hulst]
+
+	Improvements:
+	- regression test by [Matisse Enzer]
+	- packages without version are enlisted [Matisse Enzer]
+	- without version, then enlisted as undef
+
+version 0.21: Thu May  8 13:15:22 CEST 2008
+
+	Fixes:
+	- use CPAN::HandleConfig if available.
+	  rt.cpan.org#34869 [Alexander Kühne]
+
+version 0.20: Thu Apr 10 12:13:26 CEST 2008
+	- accept version objects [Alex Efros]
+	- no warning "undef" when archive location is not specified
+	- 01mailrc and 03modlist are updated from the real CPAN, not
+	  just empty.  Motivated by contributions by [Alex Efros]
+	- create directory trees when missing.  Only the top-level
+	  must exist, to protect against errors.
+	- Makefile.PL query about role not used [Alex Efros]
+	- "Cpansite for the impatient" documentation by [Ales Efros]
+
+version 0.19: Fri Mar 21 08:13:19 CET 2008
+	- fix in distname [Matisse Enzer]
+
+version 0.18: Wed Mar 19 18:35:37 CET 2008
+	- cpansite script should strip file: with two slashes or none,
+	  to permit absolute path.
+	- fix when local archive is empty
+	- only take pm's from lib- and top-dir, not f.i. from the
+	  test-scripts [Matisse Enzer]
+
+version 0.17: Wed Jan 30 16:44:07 CET 2008
+	- fix for open file error [Matisse Enzer]
+	- different way of defining the README output filename [Matisse Enzer]
+	- minor output improvements. [Matisse Enzer]
+
+version 0.16: Fri Nov  9 23:38:10 CET 2007
+	- use package directory explicitly in the creation of the
+	  readme extract. [Matisse Enzer]
+
+version 0.15: Fri Jun  8 17:01:30 CEST 2007
+	- document how to change urllist from CPAN.pm shell [Abe Timmerman]
+	- removed short filename-support (MSDOS) from CPAN::Site
+	- use empty 03modlist.data.gz
+	- add t/pod.t
+
+version 0.14: Tue Dec 19 13:42:48 CET 2006
+	- use oodist (from OODoc) to produce manual pages
+	- official new maintainer MARKOV
+	- first public release of rewrite.
+
+version 0.13:
+	- depend on HTTP::Date if server
+	- index generation code moved from bin/cpansite into
+	  lib/CPAN/Site/Index.pm
+	- Add CPANSITE_ROLE environment variable to Makefile.PL
+	- show version of cpansite when shell is started
+
+version 0.12:
+	- 01mailrc is removed when the core cpan is merged in, and
+	  created otherwise.
+
+version 0.11:
+	- use HTTP::Date to produce timestamp on package
+
+version 0.10:
+	- use functions
+	- variables in CAPS are reserved for Perl
+	- %VERSION and %PATH combined in %pkgs, which contains
+	  [$version,$path] entries
+	- only install details file after success
+	- command-line option parsing
+	- trace to STDOUT, new option verbose
+	- CPAN::Site is very useful, and therefore don't call it ALPHA
+	- regex to find version now accepts "our"
+	- renamed mkpackages to 'cpansite index'
+	- cpansite also can start shell and install modules
+	- do not ask for URL at installation, because different people
+	  may want different local archives: use environment variable
+	  CPANSITE.
+	- moved Site.pm to lib/CPAN
+
+2006-03-19  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* mkpackages: applied patch from Matisse Enzer so that it uses
+	CPAN::Checksums to generate the CHECKSUMS files.  This probably
+	renders it useless for ancient per installations.  Even my debian
+	Perl 5.8 requires me to fetch these:
+
+	      Compress-Bzip2-2.09
+	      Compress-Zlib-1.41
+	      Data-Compare-0.13
+	      Text-Glob-0.06
+	      Number-Compare-0.01
+	      File-Find-Rule-0.28
+	      Digest-SHA-5.34
+	      CPAN-Checksums-1.039
+       
+	So fall back to the last version if that is too much hassle for
+	you.  I may think about a fall back mode if CPAN::Checksums is not
+	available.
+
+2005-09-18  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Integrated patch from Matisse Enzer to generate .readme files.
+	* Switching from MD5 to Digest::MD5
+	* Gzip now called with the local file name $_.  $File::Find::name
+	should not have worked?
+
+1999-07-26  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Site.pm: Added CPAN::Config->load call which is required by
+	newer CPAN.pm
+
+Wed May  6 13:26:13 1998  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* mkpackages: Rudimentary CHECKSUMS support
+
+Tue May  5 12:40:27 1998  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* mkpackages (wanted): 'package' now found even if in the first
+ 	line of a file.
+
+Tue Mar  3 12:45:42 1998  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* mkpackages (wanted): $VERSION is found now even if line crosses 
+	  block boundary.
+
+Tue Jan 13 11:58:31 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* mkpackages: Now removes 'id/' from path
+
+Thu Jan  8 12:26:42 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Makefile.PL: Ask for default URL
+
+Wed Jan  7 20:15:54 1998  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* mkpackages (wanted): now parses tar files to extract package
+ 	names and version
+
+Revision history for Perl extension CPAN::Site.
+
+0.01  Wed Jan  7 14:32:47 1998
+	- original version; created by h2xs 1.18
+

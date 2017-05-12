@@ -1,0 +1,6 @@
+<html><head><title><TMPL_VAR NAME=node_title> - CGI::Wiki::Simple</title><TMPL_VAR NAME=cgi_wiki_simple_style></head>
+<body>
+<table width='100%'>
+  <tr><td align='left'><a href='<TMPL_VAR NAME=script_name >/display/AllNodes'>AllNodes</a></td>
+      <td align='middle'><TMPL_VAR NAME=node_title ESCAPE=HTML> (v <TMPL_VAR NAME=version ESCAPE=HTML>)</td><td align='right'><form method=post action='<TMPL_VAR NAME=script_name>/display'><input type='text' name='node' /><input type='submit' value='go' /></form></td></tr>
+</table>

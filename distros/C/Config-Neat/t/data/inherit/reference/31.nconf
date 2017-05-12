@@ -1,0 +1,23 @@
+foo
+{
+    foo_inner
+    {
+        {
+            bar     baz
+        }
+    }
+}
+
+foo2
+{
+    foo_inner
+    {
+        {
+            bar     baz
+        }
+
+        {
+            bar2    baz2
+        }
+    }
+}

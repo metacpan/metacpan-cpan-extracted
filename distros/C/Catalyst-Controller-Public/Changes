@@ -1,0 +1,7 @@
+# This file documents the revision history for Perl extension Catalyst::Controller::Public.
+
+0.003 - 01 May 2015
+  - Fixed POD errors
+
+0.002 - 01 May 2015
+  - First Release. (Previous release borked, and removed from CPAN).

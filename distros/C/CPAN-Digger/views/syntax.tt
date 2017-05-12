@@ -1,0 +1,12 @@
+[%
+   title=  meta.name
+   description=meta.abstract
+%]
+[% INCLUDE incl/header.tt %]
+
+<div class="code">
+[% code %]
+</div>
+
+[% INCLUDE incl/footer.tt %]
+

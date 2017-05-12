@@ -1,0 +1,4 @@
+<%args>
+$message
+</%args>
+<% $message %>\

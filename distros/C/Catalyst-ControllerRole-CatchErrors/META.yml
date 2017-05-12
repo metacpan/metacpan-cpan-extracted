@@ -1,0 +1,29 @@
+---
+abstract: 'custom error handling in your controller.'
+author:
+  - 'David Schmidt <davewood@cpan.org>'
+build_requires:
+  Catalyst::Test: '0'
+  FindBin: '0'
+  HTTP::Exception: '0'
+  Test::Fatal: '0'
+  Test::More: '0.88'
+  Test::Warnings: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-ControllerRole-CatchErrors
+requires:
+  Catalyst::Runtime: '0'
+  Moose::Role: '0'
+resources:
+  bugtracker: https://github.com/davewood/catalyst-controllerrole-catcherrors/issues
+  homepage: https://github.com/davewood/catalyst-controllerrole-catcherrors
+  repository: https://github.com/davewood/catalyst-controllerrole-catcherrors.git
+version: '0.05'

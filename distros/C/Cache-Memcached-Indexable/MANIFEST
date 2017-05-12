@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Cache/Memcached/Indexable.pm
+lib/Cache/Memcached/Indexable/Logic.pm
+lib/Cache/Memcached/Indexable/Logic/Default.pm
+lib/Cache/Memcached/Indexable/Logic/DigestSHA1.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/logic_default.t
+t/logic_digest_sha1.t
+t/pod.t
+t/all.t
+t/perlcritic.t

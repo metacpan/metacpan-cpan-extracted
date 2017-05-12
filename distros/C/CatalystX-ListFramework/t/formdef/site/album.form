@@ -1,0 +1,24 @@
+{
+ display => {
+                default => [
+                             {id=>'albid', heading => 'Album Ref.', uri => '/get/album/'},
+                             {id=>'albrec'},
+                             {id=>'albtitle'},
+                           ],
+            },
+
+ search => [
+            {id=>'albtitle', heading=>'Title'},
+           ],
+
+ infoboxes => {
+                    album => [
+                                {id=>'albtitle', },
+                    ],
+ },
+
+ infobox_order => { album => 1 },
+
+
+}
+

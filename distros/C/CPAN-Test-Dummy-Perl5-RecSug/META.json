@@ -1,0 +1,88 @@
+{
+   "abstract" : "CPAN test dummy with optional prereqs",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120920",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-RecSug",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "recommends" : {
+            "CPAN::Test::Dummy::Perl5::Build::Fails" : "0",
+            "install" : "0"
+         },
+         "suggests" : {
+            "CPAN::Test::Dummy::Perl5::Build::DepeFails" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CPAN::Test::Dummy::Perl5::Make::PerlReq::Fail" : "0",
+            "File::Marker" : "0"
+         },
+         "requires" : {
+            "autodie" : "2.00",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "CPAN::Test::Dummy::Perl5::Make::FailLate" : "0",
+            "File::RandomLine" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Test::Dummy::Perl5::RecSug" : {
+         "file" : "lib/CPAN/Test/Dummy/Perl5/RecSug.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-cpan-test-dummy-perl5-recsug at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Test-Dummy-Perl5-RecSug"
+      },
+      "homepage" : "https://github.com/dagolden/cpan-test-dummy-perl5-recsug",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/cpan-test-dummy-perl5-recsug.git",
+         "web" : "https://github.com/dagolden/cpan-test-dummy-perl5-recsug"
+      }
+   },
+   "version" : "0.001"
+}
+

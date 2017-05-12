@@ -1,0 +1,18 @@
+Revision history for Perl extension Class::Init.
+
+1.1   Tue May  4 14:46:17 2004
+	- documentation code restructured, simplified
+	- first edition of Changes
+
+1.0   Tue May  4 14:46:17 2004
+	- uses Module::Install
+	- disable constructor inheritance to workaround an infinite recursion
+	  bug in NEXT (when mixed with UNIVERSAL)
+	- more tests
+
+0.9   Tue May  4 14:46:17 2004
+	- now with PAR
+
+0.8   Tue May  4 14:46:17 2004
+	- pre-release, with support for __init__ and such
+

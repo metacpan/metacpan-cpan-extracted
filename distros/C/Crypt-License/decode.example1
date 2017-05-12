@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+
+use lib qw(blib/arch blib/lib);
+
+# Change 1..1 below to 1..last_test_to_print .
+# (It may become useful if the test is moved to ./t subdirectory.)
+
+# version 1.01 12-1-00 michael@bizsystems.com
+
+BEGIN { $| = 1; print "1..9\n"; }
+END {print "not ok 1\n" unless $loaded;}
+
+my $module = 'Crypt::CapnMidNite';
+eval "use $module";
+
+$loaded = 1;
+print "ok 1\n";
+
+$test = 2;
+
+# for ID = '12345', seed = 'BizSystems';
+my $MAC_txt	= 'MAC generator text';
+my $expected	= 'this is the crypt text';
+my $CRYPT_hex	= '9e70d061b3942222ddd44bdbb47000a3d70251c890b5';
+# the key is the time in seconds from the epoch
+my $failtime = 960000000;						# Jun 2000
+my %keys	= (
+	2147000000	=>	'4927a289d5308320bb88b4b0d408c148',	# Jan 2038
+	2147000001	=>	'28850e5f577d83cad046f9d99594df76',
+);
+
+my $bu = $module->new;
+
+
+my $time = time;
+my $margin = 5;
+foreach(sort keys %keys) {
+print "key=$_\n";
+  @_ = ($MAC_txt,$_,$keys{$_});
+  $bu->reset->license(@_);
+
+  my $crypt_txt = pack('H*', $CRYPT_hex);
+  my $n = 4;
+  my $c1 = substr($crypt_txt,0,$n);
+  my $c2 = substr($crypt_txt,$n);
+#	mac txt, exp,key val, encrypted txt
+my ($y,$x1,$x2);
+if (1) {
+$x1=$bu->crypt($c1);
+$x2=$bu->crypt($c2);
+$y = $x1.$x2;
+} else {
+$y =$c1.$c2;
+$bu->crypt($y);
+}
+  print "
+exp=$expected
+got=$y\n";
+}
+
+print "###########################\n";
+
+# this is how to extract/create keys
+# without the CapnMidNite function 'license'
+
+foreach(sort keys %keys) {
+print "key=$_\n";
+  $crypt_txt = pack('H*', $CRYPT_hex);
+  my $n = 4;
+  my $c1 = substr($crypt_txt,0,$n);
+  my $c2 = substr($crypt_txt,$n);
+
+  @_ = ($MAC_txt,$_);
+  my $cl = Crypt::CapnMidNite->new;
+  my $prekey = $cl->md5(@_);;
+  $cl->new_crypt($prekey);
+  my $realkey = pack('H*', $keys{$_});
+  $cl->decrypt($realkey);
+  my $rk2 = $realkey;
+  $cl->new_crypt($realkey);
+
+
+
+  $cl->decrypt($crypt_txt);
+  print $crypt_txt, "\n";
+
+  $cl->new_crypt($rk2);
+  $cl->decrypt($c1);
+  $cl->decrypt($c2);
+  print $c1,$c2,"\n";
+
+}

@@ -1,0 +1,532 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+
+use CSS::Prepare;
+use File::stat;
+use FileHandle;
+use Getopt::Long    qw( :config bundling );
+use IO::Handle;
+use POSIX           qw( mkfifo );
+use Pod::Usage;
+use Term::ANSIColor;
+use Time::HiRes     qw( gettimeofday tv_interval );
+use Storable        qw( retrieve nstore );
+
+use constant OPTIONS => qw(
+              use-all-shasum|a
+              hierarchy-base|b=s
+                 cache-store|c=s
+                  output-dir|d=s
+             extended-syntax|e
+               disable-hacks
+                        help|h
+                    location|l=s
+               assets-output|m=s
+                 assets-base|n=s
+                    optimise|o
+                        pipe=s
+                      pretty|p
+                       quiet|q
+                      server
+        suboptimal-threshold|s=i
+                     timeout|t=i
+               warnings-only|w
+               exit-on-error|x
+    );
+
+
+
+my %options      = get_options_or_exit();
+my %prepare_args = get_prepare_arguments( %options );
+my $preparer     = CSS::Prepare->new( %prepare_args );
+my( $output, $total_saving, $total_errors, %cache );
+
+if ( $options{'cache-store'} ) {
+    if ( -f $options{'cache-store'} ) {
+        my $store = retrieve $options{'cache-store'};
+        %cache = %$store;
+    }
+}
+
+if ( $options{'server'} ) {
+    run_server( @ARGV );
+}
+elsif ( $options{'pipe'} ) {
+    run_pipe( @ARGV );
+}
+else {
+    my @files;
+    foreach my $arg ( @ARGV ) {
+        if ( -d $arg ) {
+            push @files, get_files_in_directory( $arg );
+        }
+        else {
+            push @files, $arg;
+        }
+    }
+    
+    foreach my $stylesheet ( @files ) {
+        my ( $processed, $saving, $error_count, $not_cached )
+            = process_stylesheet( $stylesheet );
+
+        $total_saving += $saving;
+        $total_errors += $error_count;
+        $output       .= $processed;
+    }
+
+    exit $total_errors
+        if defined $options{'warnings-only'};
+    die "Exiting - has ${total_errors} error(s)\n"
+        if $options{'exit-on-error'} && $total_errors;
+
+    status( "Total: ${total_saving} saved bytes"
+            . ( $total_errors ? "; ${total_errors} errors." : '' ) );
+    if ( $options{'output-dir'} ) {
+        my $filename = output_stylesheet_to_directory( $output );
+        status( "Saved to $filename" );
+    }
+    else {
+        print $output;
+    }
+}
+
+if ( $options{'cache-store'} ) {
+    nstore \%cache, $options{'cache-store'};
+}
+
+exit;
+
+
+
+sub run_server {
+    my @args = @_;
+    
+    eval {
+        require Plack::Runner;
+        require Plack::Request;
+    };
+    
+    my $runner = Plack::Runner->new();
+    $runner->parse_options( @args );
+    
+    my $preparer = sub {
+        my $env = shift;
+        my $req = Plack::Request->new( $env );
+        
+        my( $output, $total_saving, $total_errors );
+        
+        return [ 404, [], [] ]
+            unless $req->path_info eq '/';
+        
+        foreach my $stylesheet ( @args ) {
+            my ( $processed, $saving, $error_count, $not_cached )
+                = process_stylesheet( $stylesheet );
+            
+            $total_saving += $saving;
+            $total_errors += $error_count;
+            $output       .= $processed;
+        }
+        
+        return [
+                200,
+                [ 'Content-Type' => 'text/css' ],
+                [ $output ]
+            ];
+    };
+    
+    $runner->run( $preparer );
+}
+
+sub run_pipe {
+    my @args      = @_;
+    
+    my $pipe_name = $options{'pipe'};
+    my $pipe_mode = 0700;
+    
+    # clean up after ourselves
+    $SIG{'INT'} = sub {
+        unlink $pipe_name;
+        exit 0;
+    };
+    
+    while (1) {
+        # (re-)create the named pipe
+        unless ( -p $pipe_name ) {
+            unlink $pipe_name;
+            mkfifo( $pipe_name, $pipe_mode )
+                or die "Cannot make pipe ${pipe_name}: $!";
+            status( "Re-opened pipe ${pipe_name}" );
+        }
+        
+        my $pipe;
+        my $output;
+        
+        # this blocks until there is a reader on the other end,
+        # so any CSS processing is done just-in-time
+        open( $pipe, '>', $pipe_name )
+            or die "Cannot write to ${pipe_name}: $!";
+        
+        my @files;
+        foreach my $arg ( @args ) {
+            if ( -d $arg ) {
+                push @files, get_files_in_directory( $arg );
+            }
+            else {
+                push @files, $arg;
+            }
+        }
+        
+        our $updates = 0;
+        foreach my $stylesheet ( @files ) {
+            my ( $processed, $saving, $error_count, $not_cached )
+                = process_stylesheet( $stylesheet );
+            
+            $total_saving += $saving;
+            $total_errors += $error_count;
+            $output       .= $processed;
+            $updates      += $not_cached;
+        }
+        
+        print {$pipe} $output;
+        close $pipe;
+        
+        status('') if $updates;
+        
+        # avoid dup signals
+        select undef, undef, undef, 0.1;
+        
+        # touch the pipe to confound anything caching based upon the mtime
+        utime undef, undef, $pipe;
+    }
+}
+
+sub process_stylesheet {
+    my $stylesheet = shift;
+    
+    $cache{ $stylesheet } = { timestamp => 0, }
+        unless defined $cache{ $stylesheet };
+    my $cache = $cache{ $stylesheet };
+    
+    my $stat        = stat $stylesheet;
+    my $timestamp   = $stat->mtime;
+    my $recalculate = $timestamp != $cache->{'timestamp'}
+                      || $cache->{'error_count'};
+    
+    if ( $recalculate ) {
+        my $start = [ gettimeofday() ];
+        status( "Processing stylesheet '$stylesheet'" );
+        
+        my @structure = $preparer->parse_stylesheet( $stylesheet );
+        
+        $cache->{'saving'}      = 0;    # TODO
+        $cache->{'error_count'} = 0;
+        $cache->{'output'}      = '';
+        $cache->{'timestamp'}   = $timestamp;
+        
+        foreach my $block ( @structure ) {
+            foreach my $error ( @{$block->{'errors'}} ) {
+                my $selector = defined $block->{'selectors'}
+                             ? join ', ', @{$block->{'selectors'}}
+                             : '';
+                my( $level, $text ) = each %$error;
+                
+                status(
+                        "  [${level}] '${selector}' - ${text}",
+                        0,
+                        'bold red'
+                    );
+                $cache->{'error_count'}++;
+            }
+        }
+        
+        if ( !defined $options{'warnings-only'} ) {
+            @structure = $preparer->optimise( @structure )
+                if defined $options{'optimise'};
+            
+            $cache->{'output'}
+                = $preparer->output_as_string( @structure );
+            
+            my $interval = tv_interval( $start );
+            status( "\r  Time taken ${interval} seconds" );
+        }
+    }
+    
+    return (
+        $cache->{'output'},
+        $cache->{'saving'},
+        $cache->{'error_count'},
+        $recalculate,
+    );
+}
+sub output_stylesheet_to_directory {
+    my $output = shift;
+    
+    my $sha1      = sha1_base64( $output );
+       $sha1  =~ s{/}{_}g;
+    
+    if ( !defined $options{'use-all-shasum'} ) {
+        # ten characters is not as unique as the full SHA1 digest, but is 
+        # just about unique enough for our purposes
+        $sha1 = substr( $sha1, 0, 5 );
+    }
+    
+    my $filename = "$options{'output-dir'}/${sha1}.css";
+    my $handle   = FileHandle->new( $filename, 'w' )
+        or die "Cannot write $output: $!";
+    
+    print {$handle} $output;
+    
+    return $filename;
+}
+sub get_files_in_directory {
+    my $directory = shift;
+    
+    opendir my $handle, $directory
+        or return;
+    
+    my @files;
+    my @directories;
+    while ( my $entry = readdir $handle ) {
+        next if $entry =~ m{^\.};
+        
+        my $target = "$directory/$entry";
+        
+        push( @files, $target )
+            if -f $target && $target =~ m{\.css$};
+        push( @directories, $target ) if -d $target;
+    }
+    closedir $handle;
+    
+    foreach my $dir ( @directories ) {
+        my @subfiles;
+        
+        foreach my $file ( get_files_in_directory( $dir ) ) {
+            push @subfiles, $file;
+        }
+        
+        @files = ( @subfiles, @files );
+    }
+    
+    return sort @files;
+}
+
+
+sub get_options_or_exit {
+    my %getopts;
+    
+    my $known = GetOptions( \%getopts, OPTIONS );
+    my $usage = ! $known || $getopts{'help'};
+    
+    if ( $getopts{'output-dir'} ) {
+        eval {
+                require Digest::SHA1;
+                Digest::SHA1->import( 'sha1_base64' );
+            };
+        die( "Cannot generate output file--cssprepare requires the perl\n"
+             . "module 'Digest::SHA1' to be installed." )
+                if $@;
+    }
+    
+    pod2usage() if $usage;
+    
+    return %getopts;
+}
+sub get_prepare_arguments {
+    my %getopts = @_;
+    
+    my %args;
+    $args{'extended'} = 1
+        if defined $getopts{'extended-syntax'};
+    $args{'pretty'} = 1
+        if defined $getopts{'pretty'};
+    $args{'location'} = $getopts{'location'}
+        if defined $getopts{'location'};
+    $args{'hacks'} = 0
+        if defined $getopts{'disable-hacks'};
+    $args{'base_directory'} = $getopts{'hierarchy-base'}
+        if defined $getopts{'hierarchy-base'};
+    $args{'http_timeout'} = $getopts{'timeout'}
+        if defined $getopts{'timeout'};
+    $args{'suboptimal_threshold'} = $getopts{'suboptimal-threshold'}
+        if defined $getopts{'suboptimal-threshold'};
+    $args{'assets_output'} = $getopts{'assets-output'}
+        if defined $getopts{'assets-output'};
+    $args{'assets_base'} = $getopts{'assets-base'}
+        if defined $getopts{'assets-base'};
+    $args{'status'} = \&status;
+    
+    return %args;
+}
+
+sub status {
+    my $text   = shift;
+    my $temp   = shift;
+    my $colour = shift // '';
+    
+    if ( !defined $options{'quiet'} ) {
+        STDERR->autoflush(1);
+        my $output = ( $temp ? "\r" : '' )
+                     . $text
+                     . ( $temp ? '' : "\n" );
+        print STDERR colored( $output, $colour );
+    }
+}
+
+__END__
+
+=head1 NAME
+
+B<cssprepare> - pre-process CSS style sheet(s)
+
+=head1 SYNOPSIS
+
+B<cssprepare> [B<-afhoqwx>] [B<-b> F<dir>] [B<-d> F<dir>] [B<-l> F<path>]
+[B<-s> I<secs>] [B<-t> I<secs>]
+           F<style sheet> [F<...>]
+
+B<cssprepare> [B<--long-options ...>] F<style sheet> [F<...>]
+
+=head1 DESCRIPTION
+
+B<cssprepare> concatenates and minifies multiple cascading style sheets into
+one, optionally adding new features to the CSS syntax and optimising the
+result to save as much space as possible.
+
+=head1 OPTIONS
+
+=over
+
+=item -a, --use-all-shasum
+
+When automatically creating the output style sheet (C<-d>, C<--output-dir>),
+use the entire SHA1 checksum as the filename rather than truncating it to five
+characters.
+
+=item -b F<dir>, --hierarchy-base=F<dir>
+
+Use F<dir> as the hierarchy base. See L<Using hierarchical CSS> for more details.
+
+=item -d F<dir>, --output-dir=F<dir>
+
+Automatically create a file in F<dir> with the CSS output. This filename will
+be based upon the first five characters of the SHA1 checksum of the content.
+This means repeated runs of B<cssprepare> on the same files will only generate
+one output file, which is useful when using B<cssprepare> as part of a
+deployment script. See L<Deploying CSS> for more details.
+
+=item -e, --extended-syntax
+
+Turn on the extra features that cssprepare uses when parsing CSS. See
+L<Extending the CSS syntax> for details.
+
+=item -h, --disable-hacks
+
+Turn off support for the "star" and "underscore" CSS hacks, and the "zoom" and
+"filter" properties (the most common of the work-arounds needed to deal with
+earlier version of Internet Explorer). See L<Supported CSS hacks> for more
+details.
+
+=item -l F<dir>, --location=F<dir>
+
+Set the hierarchy location to F<dir>. See L<Using hierarchical CSS> for more
+details.
+
+=item -o, --optimise
+
+Attempt to optimise the structure of the CSS before outputting it. B<Warning:>
+this can break your CSS. See L<Optimising CSS> for a longer explanation as to
+why.
+
+=item --pipe=F<file>
+
+Create the output file F<file> as a named pipe; then enter an infinite loop.
+This allows you to use B<cssprepare> as a development environment, changing
+source files and seeing that change immediately reflected next time you read
+from the named pipe F<file>.
+
+=item --port=I<number>
+
+In conjunction with the C<--server> option, specify on which port the server
+should listen. Default is to listen on 5000.
+
+=item -q, --quiet
+
+Silence the status updates sent to STDERR during processing.
+
+=item --server
+
+Runs a local web server (using L<Plack>) to deliver the output of the combined
+style sheets, rather than saving it to a file. This allows you to develop
+your styles within the context of a web page, and see changes reflected
+immediately. Set the style sheet link to point to localhost, like so:
+
+    <link rel="stylesheet" href="http://localhost:5000/">
+
+You can change the port from 5000 with C<--port>.
+
+=item -s I<seconds>, --suboptimal-threshold=I<seconds>
+
+Set the length of time that can pass before cssprepare switches 
+optimisation to a faster (but less efficient) method. B<Note:> this applies to
+each style sheet, not to the length of time cssprepare will run.
+
+=item -t I<seconds>, --timeout=I<seconds>
+
+Set the length of time that can pass before any HTTP requests will fail
+when the remote server does not respond.
+
+=item -w, --warnings-only
+
+Only output warnings and errors found in the processed style sheet(s), and set
+the return value of cssprepare to the number of errors. This is useful for
+CSS validation.
+
+=item -x, --exit-on-error
+
+Exit before producing any output if there were any errors. This is useful for
+prematurely exiting from automatic build scripts, rather than generating
+incorrect output.
+
+=back
+
+=head1 REQUIREMENTS
+
+The only fixed requirement CSS::Prepare has is that the version of the perl
+interpreter must be at least 5.10.
+
+If you wish to use C<@import url(...);> in your style sheets you will need
+one of L<HTTP::Lite> or L<LWP::UserAgent> installed.
+
+Some parts of the extended CSS syntax are implemented as optional plugins. 
+For these to work you will need L<Module::Pluggable> installed.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<CSS::Prepare::Manual>.
+
+=item *
+
+CSS::Prepare online: L<http://cssprepare.com/>
+
+=item * 
+
+Yahoo! Yslow rules on content delivery networks:
+L<http://developer.yahoo.com/performance/rules.html#cdn>.
+
+=back
+
+=head1 AUTHOR
+
+Mark Norman Francis, L<norm@cackhanded.net>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010 Mark Norman Francis.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

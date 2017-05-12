@@ -1,0 +1,217 @@
+=head1 NAME
+
+Convert::X509 - interface module to help analizing X509 data
+
+=head1 SYNOPSYS
+
+ use Convert::X509;
+ use Data::Dumper;
+
+ my $d;
+ local $/;
+
+ open (F,'<', 'request.req');
+# binmode(F);
+# recommended for DER encoding, doesn't for BASE64
+ $d = Convert::X509::Request->new(<F>);
+ print 'Dumping request object:',Dumper ($d);
+ # ! scalar context
+ my $subj = $d->subject('cp1251','cp866') ; # localized Cyrillic
+ print "\n",'CN: ', $subj->{'CN'}[0];
+
+ open (F,'<', 'certificate.cer');
+# binmode(F);
+ $d = Convert::X509::Certificate->new(<F>,1); #debug flag
+ print "\n\n",'Dumping certificate object:',Dumper ($d);
+ # ! list context; UTF -> KOI8-R convertion
+ print 'Issuer: ',join(',',$d->issuer('','koi8-r')), "\n",
+  'valid from ',[$d->from()]->[0], ' to (exactly) ', scalar($d->to);
+
+ open (F,'<', 'crl.crl');
+# binmode(F);
+ $d = Convert::X509::CRL->new(<F>);
+ print "\n",'Dumping CRL object:',Dumper ($d);
+ my ($s) = sort {$d->{'crl'}{$a}{'date'}{'utcTime'} <=> $d->{'crl'}{$b}{'date'}{'utcTime'}}
+  keys %{$d->{'crl'}}; # example, take "first" serial
+ print 'Revocation reason for the earliest revoked certificate N ',$s,' : ',$d->reason($s),"\n",
+  'Get next CRL update ', scalar($d->next), ' from', "\n",
+  join("\n or\n", $d->cdp);
+        
+=head1 DESCRIPTION
+
+Convert::X509 really consists of six parts.
+
+1) Convert::X509 itself just for convinient usage.
+
+2) Convert::X509::Parser for internal usage (contains almost everything -
+ASN.1 sructure, OIDs "database", base data-processing, most logic and code).
+
+3,4,5) Request, Certificate and CRL to parse respectively requests, certificates and crl-s.
+Almost any valueble data could be easely extracted directly from returned object
+(look in Dumper output).
+For some convinience, there are a few methods with self-explaining names.
+
+6) Take a look on Convert::X509::minipkcs7 - it gets serials/oids from PKCS7 (encrypted/signed) messages.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor, creates a new object.
+It takes a parameter which contains req/cert/crl itself -
+both DER and BASE64 encoding supported.
+
+FYI: be careful with binary and ASCII Base64 data been readed from file.
+For binary form (DER) you must do "binmode", for Base64 - have NOT.
+Check if returned object is defined.
+
+You can set debug parameter to get a bit more debugging information
+ ...->new(<DATA>,1);
+
+=head2 subject
+
+Applicable to Request and Certificate.
+
+Result of method differs for scalar and list context:
+ - a hash-reference like {'C'=>['org'], 'OU'=>['cpan','search']};
+ values list often contains only one element, but many in general
+ - a list like ('CN=Name Surname','C=RU','L=Moscow')
+
+X509 data may contains unicode strings,
+so in general we have to decode it to localized one-byte oriented string.
+It is the _second_ parameter (result codepage) subject method could accept.
+
+But sometimes X509 data contains already "localized" one-byte string.
+And its codepage (_first_ param accepted by subject)
+can be different for console.
+
+That's why subject can get up to two codepages subject(cp_from,cp_to)
+(look Encode.pm).
+And pretty print subject with russian strings may looks like
+subject('cp1251','cp866') for Windows (R) console
+and subject('','koi8-r') for FreeBSD console.
+
+=head2 issuer
+
+Applicable to Certificate and CRL.
+
+See 'subject' for details
+(i.e. localization, scalar/list context)
+
+=head2 from
+
+Applicable to Certificate and CRL.
+
+Return a date-time (pure ANSI format) object is valid from.
+Result differs for scalar and list context:
+ - a string like '2008-02-29 09:00:01'
+ - a 2 elements list like ('2008-02-29', '09:00:01');
+
+!Important note!
+It deals only with utcTime-formatted value (no GeneralizedTime support)
+
+=head2 to
+
+Applicable to Certificate and CRL.
+
+Return a date-time (pure ANSI format) object is valid to.
+See 'from' for details.
+
+=head2 next
+
+Applicable to CRL only.
+
+Return a date-time (pure ANSI format) next CRL publish.
+See 'from' for details.
+
+=head2 expired
+
+Applicable to Certificate and CRL.
+
+Does object have been expired ?
+Simply return (TO<NOW or FROM>NOW)
+
+=head2 eku (EnhancedKeyUsage)
+
+Applicable to Request and Certificate.
+
+Returns a list with EKU OIDs (their descriptions if they are in OIDs hash
+i.e. wellknown).
+
+=head2 keyusage
+
+Applicable to Request and Certificate.
+
+Returns a list with descriptions for installed bits.
+
+=head2 serial
+
+Applicable to Certificate and CRL.
+
+Returns serial in hexadecimal view.
+
+=head2 reason
+
+Applicable to CRL only.
+
+Returns a revocation description for certificate with given serial.
+If reason totally hasn't been specified - returns 'Unspecified' anyway.
+
+=head2 cdp
+
+Applicable to Certificate and CRL.
+
+Returns list of CRL distribution point
+
+=head2 aia
+
+Applicable to Certificate only.
+
+Returns list of Authority Information Access locations
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+More supplemental functions.
+
+=item *
+
+More documentation.
+
+=item *
+
+More tests.
+
+=item *
+
+More OIDs/ASN structures.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+These modules were created with initial ideas on the Crypt::X509 package.
+Thanks to its authors
+Mike Jackson <mj@sci.fi>, 
+Alexander Jung <alexander.w.jung@gmail.com>,
+Duncan Segrest <duncan@gigageek.info>;
+
+And also
+Norbert Klasen (author of x509decode script, which was contributed to Convert::ASN1 in 2002)
+and
+Graham Barr <gbarr@pobox.com> (author of Convert::ASN1 package).
+
+=head1 P.S.
+
+Your PKCS#xx structures may contain many unusual things, which I haven't ever seen.
+Mail me any suggestions. And do not afraid to look inside modules!
+I hope they are quite simple.
+
+=head1 AUTHOR
+
+Leonid Cherepanov <grey.leo/gmail.com>
+
+=cut

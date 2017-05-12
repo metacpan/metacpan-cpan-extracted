@@ -1,0 +1,27 @@
+bin/cipp-link-static
+bin/cipp-l10n
+lib/CIPP.pm
+lib/CIPP/Debug.pm
+lib/CIPP/Manual.pm
+lib/CIPP/Compile/Apache.pm
+lib/CIPP/Compile/NewSpirit.pm
+lib/CIPP/Compile/Parser.pm
+lib/CIPP/Compile/PerlCheck.pm
+lib/CIPP/Compile/Generator.pm
+lib/CIPP/Compile/Message.pm
+lib/CIPP/Compile/Cache.pm
+lib/CIPP/Compile/cipp_perlcheck.pl
+lib/CIPP/Runtime.pm
+lib/CIPP/Runtime/Request.pm
+lib/CIPP/Runtime/NewSpirit.pm
+doc/create_pdf.sh
+doc/header.html
+doc/html2ps
+doc/html2psrc
+doc/htmlfilter.pl
+doc/podfilter.pl
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

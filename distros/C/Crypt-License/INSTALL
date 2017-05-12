@@ -1,0 +1,26 @@
+Last revised 12-20-02
+
+If you didn't read this first, then your Makefile complained about
+not being able to find Crypt::C_LockTite. The missing module is
+part of the Crypt::CapnMidNite distribution.
+
+Edit the CapnMidNite MakeFile.PL to select the C_LockTite name
+remake and install C_LockTite. 
+
+WARNING, do not install the License module tools or C_LockTite
+on your target production server. They are unneeded for License to 
+function in 'decode only' mode. The presence of the tools with their
+embedded License 'seed' will compromise the security of the License
+installation. 'seed' may be a string of any length. The MD5 hash of
+the 'seed' is used to produce the encryption key.
+
+MAKE SURE and edit makeCert.pl to include the unique 'seed' for your 
+installation. Change 'License.txt' to suite your needs, it is what I 
+use as a license for my clients and is only an example.
+
+now :-))
+
+perl Makefile.PL
+make
+make test
+make install

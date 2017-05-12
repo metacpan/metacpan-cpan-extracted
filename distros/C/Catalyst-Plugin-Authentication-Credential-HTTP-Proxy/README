@@ -1,0 +1,77 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::HTTP - HTTP Basic
+    authentication for Catlayst.
+
+SYNOPSIS
+        use Catalyst qw/
+            Authentication
+            Authentication::Store::Moose
+            Authentication::Store::Elk
+            Authentication::Credential::HTTP::Proxy
+        /;
+
+        $c->config->{authentication}{http_proxy}= {
+            url  =>'http://elkland.no/auth',
+            store => 'Authentication::Store::Moose'
+        };
+    
+        sub foo : Local { 
+            my ( $self, $c ) = @_;
+
+            $c->authorization_required( realm => "foo" ); # named after the status code ;-)
+
+            # either user gets authenticated or 401 is sent
+
+            do_stuff();
+        }
+
+        # with ACL plugin
+        __PACKAGE__->deny_access_unless("/path", sub { $_[0]->authenticate_http });
+
+        sub end : Private {
+            my ( $self, $c ) = @_;
+
+            $c->authorization_required_response( realm => "foo" );
+            $c->error(0);
+        }
+
+DESCRIPTION
+    This moduule lets you use HTTP Proxy authentication with
+    Catalyst::Plugin::Authentication.
+
+    Currently this module only supports the Basic scheme, but upon request
+    Digest will also be added. Patches welcome!
+
+CONFIG
+    This module reads config from $c->config->{authentication}{http_proxy}.
+    The following settings are supported:
+
+    url Required. A url protected with basic authentication to authenticate
+        against.
+
+    store
+        To specify what store to use. will use the default store if not set.
+
+METHODS
+    authorization_required
+        Tries to "authenticate_http_proxy", and if that fails calls
+        "authorization_required_response" and detaches the current action
+        call stack.
+
+    authenticate_http_proxy
+        Looks inside "$c->request->headers" and processes the basic (badly
+        named) authorization header. Then authenticates this against the
+        provided url.
+
+    authorization_required_response
+        Sets "$c->response" to the correct status code, and adds the correct
+        header to demand authentication data from the user agent.
+
+AUTHORS
+    Marcus Ramberg <mramberg@cpan.org
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

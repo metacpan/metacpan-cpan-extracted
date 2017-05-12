@@ -1,0 +1,13 @@
+Revision history for Perl extension Config::Tiny::Ordered
+
+1.02  Sun Feb 21 12:54:51 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.01  Wed Feb 10 14:01:38 2010
+	- Add MYMETA.yml. Add MANIFEST.SKIP.
+
+1.00 Thu 23 Apr 2009
+	 - Convert from Config::Tiny V 2.12 to preserve the order of keys within sections.
+	 - Add Build.PL to the distro.
+	 - Add MANIFEST.SKIP to the distro.

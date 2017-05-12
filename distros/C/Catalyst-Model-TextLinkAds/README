@@ -1,0 +1,103 @@
+NAME
+    Catalyst::Model::TextLinkAds - Catalyst model for Text Link Ads
+
+SYNOPSIS
+        # Use the helper to add a TextLinkAds model to your application...
+        script/myapp_create.pl create model TextLinkAds TextLinkAds
+        
+    
+    # lib/MyApp/Model/TextLinkAds.pm
+        
+    package MyApp::Model::TextLinkAds;
+        
+    use base qw/ Catalyst::Model::TextLinkAds /;
+        
+    __PACKAGE__->config(
+            cache  => 0,      # optional: default uses Cache::FileCache
+            tmpdir => '/tmp', # optional: default File::Spec->tmpdir
+        );
+        
+    
+    1;
+        
+    
+    # For Catalyst::View::TT...
+        <ul>
+        [%- FOREACH link = c.model('TextLinkAds').fetch( my_inventory_key ) %]
+            <li>
+                [% link.beforeText %]
+                <a href="[% link.URL %]">[% link.Text %]</a>
+                [% link.afterText %]
+            </li>
+        [%- END %]
+        </ul>
+
+DESCRIPTION
+    This is a Catalyst model class that fetches advertiser information for a
+    given Text Link Ads publisher account.
+
+    See <http://www.text-link-ads.com/publisher_program.php?ref=23206>.
+
+METHODS
+  ->new()
+    Instantiate a new TextLinkAds model. See TextLinkAds's new method for
+    the options available.
+
+  ACCEPT_CONTEXT
+    Return the "TextLinkAds" object. Called automatically via
+    "$c->model('TextLinkAds');"
+
+SEE ALSO
+    Catalyst, Catalyst::Helper::Model::TextLinkAds, TextLinkAds
+
+DEPENDENCIES
+    *   Carp
+
+    *   Catalyst::Model
+
+    *   Catalyst::Utils
+
+    *   Class::C3
+
+    *   TextLinkAds
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-model-textlinkads at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-TextLinkA
+    ds>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Model::TextLinkAds
+
+    You may also look for information at:
+
+    *   Catalyst::Model::TextLinkAds
+
+        <http://perlprogrammer.co.uk/modules/Catalyst::Model::TextLinkAds/>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Model-TextLinkAds/>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-TextL
+        inkAds>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Model-TextLinkAds/>
+
+AUTHOR
+    Dave Cardwell <dcardwell@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Dave Cardwell. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

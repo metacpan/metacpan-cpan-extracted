@@ -1,0 +1,31 @@
+---
+abstract: 'Couchbase Client Library'
+author:
+  - 'M. Nunberg <mnunberg@haskalah.org>'
+build_requires:
+  Dir::Self: '0'
+  ExtUtils::MakeMaker: '0'
+  Log::Fu: '0'
+  Test::Class: '0.36'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Couchbase
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::XSAccessor: '1.11'
+  Constant::Generate: '0.16'
+  JSON::MaybeXS: '0'
+  URI: '0'
+resources:
+  repository: https://github.com/mnunberg/perl-Couchbase-Client
+version: v2.0.3

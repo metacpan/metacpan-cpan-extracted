@@ -1,0 +1,27 @@
+NAME
+    Catalyst::Plugin::Markdown - Markdown for Catalyst
+
+SYNOPSIS
+        # include it in plugin list
+        use Catalyst qw/Markdown/;
+
+        my $html = $c->markdown->markdown($text);
+
+DESCRIPTION
+    Persistent Markdown processor for Catalyst.
+
+METHODS
+  $c->markdown;
+    Returns a ready to use Text::Markdown object.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Helper, Text::Markdown
+
+AUTHOR
+    Christopher H. Laco, <claco@chrislaco.com>
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               CGI-Application-Plugin-Thumbnail
+version:            1.05
+abstract:           ~
+author:  []
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:              1
+    CGI::Application:  4.06
+    Cwd:               3
+    Exporter:          5
+    File::Path:        2.07
+    File::PathInfo:    1.25
+    Image::Thumbnail:  0.63
+    LEOCHARRE::DEBUG:  1.13
+    Test::Simple:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

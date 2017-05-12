@@ -1,0 +1,8 @@
+severity = brutal
+
+[-Documentation::RequirePodAtEnd]
+
+[-Documentation::RequirePodSections]
+
+[-Documentation::PodSpelling]
+

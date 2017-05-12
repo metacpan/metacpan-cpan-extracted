@@ -1,0 +1,37 @@
+NAME
+    Catalyst::TraitFor::Request::DecodedParams - A request trait for params
+    decoding
+
+SYNOPSIS
+        package MyApp;
+
+        use Moose;
+        use namespace::autoclean;
+        use CatalystX::RoleApplicator;
+        use Catalyst;
+
+        extends 'Catalyst';
+
+        __PACKAGE__->apply_request_class_roles(qw/
+            Catalyst::TraitFor::Request::DecodedParams::JSON
+        /);
+
+        1;
+
+METHODS
+    decoded_query_parameters
+        decoded_query_params, dquery_params
+
+    decoded_body_parameters
+        decoded_body_params, dbody_params
+
+    decoded_parameters
+        decoded_params, dparams
+
+AUTHOR
+    Wallace Reis "<wreis at cpan.org>"
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

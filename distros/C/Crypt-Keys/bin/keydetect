@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w
+# $Id: keydetect,v 1.4 2001/08/28 23:31:01 btrott Exp $
+
+use strict;
+
+use Crypt::Keys;
+
+my $file = shift or die "usage: keydetect <keyfile>";
+
+my $type = Crypt::Keys->detect( Filename => $file );
+print $type ? $type->{Description} : "Unknown format", "\n";

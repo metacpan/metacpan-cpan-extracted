@@ -1,0 +1,117 @@
+{
+   "abstract" : "AnyEvent Compatible Memcached Client ",
+   "author" : [
+      "Daisuke Maki C<< <daisuke@endeworks.jp> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Memcached-AnyEvent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::Fatal" : "0",
+            "Test::Memcached" : "0.00003",
+            "Test::More" : "0.94",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Compress::Zlib" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Handle" : "0",
+            "AnyEvent::Socket" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Module::Runtime" : "0",
+            "Storable" : "0",
+            "String::CRC32" : "0",
+            "Task::Weaken" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cache::Memcached::AnyEvent" : {
+         "file" : "lib/Cache/Memcached/AnyEvent.pm",
+         "version" : "0.00023"
+      },
+      "Cache::Memcached::AnyEvent::Protocol" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Protocol.pm"
+      },
+      "Cache::Memcached::AnyEvent::Protocol::Binary" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Protocol/Binary.pm"
+      },
+      "Cache::Memcached::AnyEvent::Protocol::Text" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Protocol/Text.pm"
+      },
+      "Cache::Memcached::AnyEvent::Selector::Ketama" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Selector/Ketama.pm"
+      },
+      "Cache::Memcached::AnyEvent::Selector::Traditional" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Selector/Traditional.pm"
+      },
+      "Cache::Memcached::AnyEvent::Serializer::JSON" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Serializer/JSON.pm"
+      },
+      "Cache::Memcached::AnyEvent::Serializer::MessagePack" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Serializer/MessagePack.pm"
+      },
+      "Cache::Memcached::AnyEvent::Serializer::Storable" : {
+         "file" : "lib/Cache/Memcached/AnyEvent/Serializer/Storable.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/Cache-Memcached-AnyEvent/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/Cache-Memcached-AnyEvent",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/Cache-Memcached-AnyEvent.git",
+         "web" : "https://github.com/lestrrat/Cache-Memcached-AnyEvent"
+      }
+   },
+   "version" : "0.00023",
+   "x_contributors" : [
+      "Michael Alan Dorman <mdorman@ironicdesign.com>",
+      "Thomas Szukala <schuk@abusix.org>",
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Michael Gray <mg13@sanger.ac.uk>",
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

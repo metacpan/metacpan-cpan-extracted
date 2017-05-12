@@ -1,0 +1,77 @@
+#!perl -w ## no critic (RequireVersionVar)
+
+# This is a simple script that is used by t/gzip.t
+
+use 5.006;
+use warnings;
+use strict;
+use English qw(-no_match_vars);
+
+use CGI::Compress::Gzip;
+$CGI::Compress::Gzip::global_give_reason = 1;
+$OUTPUT_AUTOFLUSH = 0;  # aka $|
+
+# Pull out "-DVAR=val" arguments
+while (@ARGV && $ARGV[0] =~ m/\A -D([^=]+)=(.+) \z/xms) {
+   $ENV{$1} = $2;
+   shift @ARGV;
+}
+my ($op, @msg) = @ARGV;
+$op ||= q{};
+
+
+my $cgi = CGI::Compress::Gzip->new(q{});
+
+if ($op eq 'redirect') { ## no critic (ProhibitCascadingIfElse)
+   print $cgi->redirect(@msg);
+
+} elsif ($op eq 'charset') {
+   print $cgi->header('text/html; charset=UTF-8');
+   print @msg;
+
+} elsif ($op eq 'type') {
+   print $cgi->header(-Type => 'foo/bar');
+   print @msg;
+
+} elsif ($op eq 'mod_perl') {
+   # Deliberately initialize this AFTER creating the $cgi instance
+   $ENV{MOD_PERL} = 1;
+   print $cgi->header();
+   print @msg;
+
+} elsif ($op eq 'empty') {
+   print $cgi->header();
+
+} elsif ($op eq 'doublehead') {
+   $CGI::HEADERS_ONCE = 1;
+   print $cgi->header();
+   print $cgi->header();
+   print @msg;
+
+} elsif ($op eq 'unbuffer') {
+   $OUTPUT_AUTOFLUSH = 1;  # aka $|
+   print $cgi->header();
+   print @msg;
+
+} elsif ($op eq 'fh1') {
+   my $fh = \*STDOUT;
+   $cgi->useFileHandle($fh);
+   print $cgi->header('text/html');
+   print @msg;
+
+} elsif ($op eq 'fh2') {
+   $cgi->useFileHandle(\*STDOUT);
+   print {*STDOUT} $cgi->header('text/html');
+   print {*STDOUT} @msg;
+
+} elsif ($op eq 'fh3') {
+   my $fh = \*STDOUT;
+   $cgi->useFileHandle($fh);
+   print {$fh} $cgi->header('text/html');
+   print {$fh} @msg;
+
+} else {
+   print $cgi->header();
+   print @msg;
+
+}

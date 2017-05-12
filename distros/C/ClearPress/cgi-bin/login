@@ -1,0 +1,102 @@
+#!/usr/bin/env perl -T
+#########
+# Author:        rmp
+# Last Modified: $Date: 2010-01-04 13:02:42 +0000 (Mon, 04 Jan 2010) $
+# Id:            $Id: login 348 2010-01-04 13:02:42Z zerojinx $
+# Source:        $Source$
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/cgi-bin/login $
+#
+use strict;
+use warnings;
+use ClearPress::authdecor qw($AUTH_COOKIE);
+use ClearPress::authenticator::session;
+use ClearPress::authenticator::passwd;
+use Carp;
+
+main();
+exit;
+
+sub main {
+  my $decor    = ClearPress::authdecor->new();
+  my $cgi      = $decor->cgi();
+  my $username = $cgi->param('cred_0');
+  my $password = $cgi->param('cred_1');
+
+  if(!$username || !$password) {
+    #########
+    # force a logout
+    #
+    my $cookie = $cgi->cookie(
+			      -name    => $AUTH_COOKIE,
+			      -value   => q[],
+			      -expires => '-1d',
+			     );
+    $decor->username(q[]);
+    print qq[Set-Cookie: $cookie\n];
+    print $decor->header();
+    print login_form($decor);
+    print $decor->footer();
+    return 1;
+  }
+
+  my $authenticator = ClearPress::authenticator::passwd->new();
+  my $user_info     = $authenticator->authen_credentials({
+							  username => $username,
+							  password => $password,
+							 });
+
+  if($user_info) {
+    $decor->username($username);
+    my $session = ClearPress::authenticator::session->new();
+    my $encoded = $session->encode_token($user_info);
+
+    my $auth_cookie = $cgi->cookie(
+				   -name  => $AUTH_COOKIE,
+				   -value => $encoded,
+				  );
+    print qq[Set-Cookie: $auth_cookie\n];
+
+    print $decor->header();
+
+    #########
+    # server redirect, which would be preferable, doesn't want to set cookies
+    #
+    my $referer = $ENV{HTTP_REFERER} || q[];
+    $referer    =~ s/http:/https:/smx;
+
+    if($referer =~ m{/log(?:in|out)}) {
+      print qq[<script type="text/javascript">document.location.href="/";</script>];
+    } else {
+      print qq[<script type="text/javascript">document.location.href="$referer";</script>\n];
+    }
+
+    print qq[<h2>Welcome back, $username</h2>];
+    print $decor->footer();
+    return 1;
+  }
+
+  #########
+  # force a logout
+  #
+  my $cookie = $cgi->cookie(
+			    -name    => $AUTH_COOKIE,
+			    -value   => q[],
+			    -expires => '-1d',
+			   );
+  $decor->username(q[]);
+  print qq[Set-Cookie: $cookie\n];
+  print $decor->header();
+  print q[<h2>Login failed. Please try again</h2>];
+  print login_form($decor);
+  print $decor->footer();
+
+  return;
+}
+
+sub login_form {
+  my $decor = shift;
+
+  return q[<h2>Login with a registered account</h2><fieldset class="content" style="width:300px"><legend>Login</legend>] .
+         $decor->site_login_form() .
+	 q[</fieldset>];
+}

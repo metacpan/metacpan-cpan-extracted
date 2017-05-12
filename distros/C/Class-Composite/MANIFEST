@@ -1,0 +1,12 @@
+MANIFEST			This list of files
+Changes
+Makefile.PL
+README
+lib/Class/Composite.pm
+lib/Class/Composite/Container.pm
+lib/Class/Composite/Element.pm
+t/01.t
+t/02.t
+t/Container.pm
+t/Element.pm
+t/FOO.pm

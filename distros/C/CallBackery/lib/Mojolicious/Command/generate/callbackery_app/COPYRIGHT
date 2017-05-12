@@ -1,0 +1,9 @@
+% my $p = shift;
+<%= $p->{class} %>
+a cool web app with Mojolicious backend
+
+Copyright (c) <%= $p->{year}." ".$p->{fullName} %> and the other people listed in the
+AUTHORS file.
+
+All rights reserved.
+

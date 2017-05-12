@@ -1,0 +1,101 @@
+Catalyst::Authentication::Credential::YubiKey
+
+Version 0.06
+
+SYNOPSIS
+
+    Authenticate Catalyst apps with Yubico's YubiKey system.
+
+    Uses the Catalyst::Plugin::Authentication system.
+
+     use Catalyst qw(
+       ...
+       Authentication
+       ...
+     );
+
+     __PACKAGE__->config(
+       'Plugin::Authentication' => {
+         default => {
+           credential => {
+             class => 'YubiKey',
+
+             # This is your API ID, from http://api.yubico.com/get-api-key/
+             api_id => 666,
+
+             # This is your API Key, as above:
+             api_key => 'aaaaaaad34db33fzzzzzzzzzz/abc=',
+
+             # This is the column in your store that contains the yubikey ID,
+             # for mapping that ID to username or whatever.
+             id_for_store => 'id',
+           },
+           ...
+         },
+       },
+     );
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+TODO
+
+    I am currently using Auth::Yubikey_WebClient as the underlying library
+    for querying Yubico's webservice. However it would be nice if that
+    library was improved to return more of the details, rather than just
+    'OK'.
+
+    Also would be good to support in-house authentication servers. (Since
+    Yubico have open-sourced theirs, and some people may be using such.)
+
+AUTHOR
+
+    Toby Corkindale, "<tjc at cpan.org>"
+
+BUGS
+
+    Please report any bugs or feature requests to
+    "bug-catalyst-authentication-credential-yubikey at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Authentication-Credential-YubiKey>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+       perldoc Catalyst::Authentication::Credential::YubiKey
+
+    You can also look for information at:
+    http://github.com/TJC/Catalyst-Authentication-Credential-YubiKey
+
+    ·   RT: CPAN's request tracker
+
+       <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Authentication-Credential-YubiKey>
+
+    ·   AnnoCPAN: Annotated CPAN documentation
+
+       <http://annocpan.org/dist/Catalyst-Authentication-Credential-YubiKey>
+
+    ·   CPAN Ratings
+
+       <http://cpanratings.perl.org/d/Catalyst-Authentication-Credential-YubiKey>
+
+    ·   Search CPAN
+
+       <http://search.cpan.org/dist/Catalyst-Authentication-Credential-YubiKey/>
+
+COPYRIGHT AND LICENSE
+
+   Copyright 2010-2011 Toby Corkindale, all rights reserved.
+
+   This program is free software; you can redistribute it and/or modify it
+   under the same terms as Perl itself.
+

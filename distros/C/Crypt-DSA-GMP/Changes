@@ -1,0 +1,62 @@
+Revision history for Crypt::DSA::GMP
+
+0.02  2013-10-08
+
+    Turn off indexing for an internal helper package
+
+0.01  2013-10-07
+
+    Initial release.
+
+    Ported from Crypt::DSA with rewrite of most of the internals.
+
+    Primary high level changes from Crypt::DSA:
+
+       - Fixed the outstanding RTs (see below)
+       - Fixes a number of other security issues
+       - Don't use OpenSSL
+       - Requires GMP.  Definitely does not use Pari.
+       - Strong randomness on all platforms
+       - Significantly faster in some areas
+       - Follows FIPS 186-4, meaning increased security
+       - Optional primality proving for increased security
+       - Allows newer FIPS 186-4 methods if requested (SHA-2)
+       - Reads RFC4716 and OpenSSH keys
+       - The size of both p and q may be specified in key generation
+
+    The following RTs were fixed:
+
+      RT 88429 key generation issues          [fixed]
+      RT 88158 primality testing              [fixed]
+      RT 86424 typo fix                       [replaced with new typos]
+      RT 71342 Patch to use Digest::SHA       [using Digest::SHA]
+      RT 58094 3-arg open used                [we require 5.006]
+      RT 49668 openssl dsaparam output ...    [no longer using openssl]
+      RT 21917 openssl not found if in ...    [no longer using openssl]
+      RT 19812 Warning in make test           [no longer using openssl]
+      RT 19477 $key->write not writing public [use Convert::PEM 0.07]
+      RT 19263 which usage broken ...         [no longer using openssl]
+      RT 19184 using of which in KeyChain...  [no longer using openssl]
+      RT 18768 patch for MSWin32 support      [no longer using openssl]
+      RT 14281 makerandom() not portable      [using Crypt::Random::Seed]
+      RT 13862 getting error                  [no longer using openssl]
+
+      RT 71421 Systems without /dev/random... [using Crypt::Random::Seed]
+      RT 21968 /dev/random depletion          [see text below]
+         best randomness source (e.g. /dev/random) for private key generation
+         best non-blocking source used for all other randomness
+         All module tests allow non-blocking, so tests don't deplete entropy
+         system rand, MT, etc will never be used on any platform
+
+    The following RTs is not ready to close:
+
+      RT 26926 should Convert::PEM be a full dependency?
+               Absolutely not until RT 27574 is fixed (random test failures).
+
+    The following RTs should be closed:
+
+      RT 27144 Signature will croak during decode_base64.
+               Perhaps old MIME::Base64?  This is not the current behavior.
+      RT 54485 SSH2 format.  ssh-keygen writes a PEM file for private key.
+      RT 72371 CPAN install missing Math::Pari.
+               Crypt::DSA does not require Math::Pari.  Old other modules?

@@ -1,0 +1,29 @@
+<html>
+<title>User Info</title>
+Please update your info and hit "Submit".
+<% $jshead %>
+<p>
+<% $start %><% $state %>
+Enter your name: <% $field{name}{field}.$field{name}{comment} %>
+Select your <% $field{color}{label} %>: <select name="color" multiple>
+<%  my $ret = '';
+    for (@{$field{color}{options}}) {
+        if (ref $_) {
+            $ret .= qq(  <b><option VALUE="$_->[0]">$_->[1]</option></b>\n);
+        } else {
+            my $chk =  $_ eq $field{color}{value} ? 'selected="selected"' : '';
+            $ret .= qq(  <option $chk value="$_">$_</option>\n);
+        }
+    }
+    $ret;
+%>
+</select>
+<%  my $ret = "$field{sex}{label} = ";
+    for (@{$field{sex}{options}}) {
+        $ret .= qq(<radio name="sex" value="$_->[0]">$_->[1]<br>);
+    }
+    $ret;
+%>
+FYI, your dress size is <% $field{size}{value}.$field{size}{comment} %><br>
+<% $submit %>
+<% $end %>

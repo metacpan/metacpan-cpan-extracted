@@ -1,0 +1,50 @@
+Revision history for Config-YAML
+
+1.42    2005-09-26
+
+        * rt.cpan ticket #14625: Config::YAML appears not to be $_ safe
+          Fixes for this bug report
+
+1.41    2005-03-16
+
+        * Bug from 1.40 also occurred in fold(). Fixed.
+
+1.40    2005-03-15
+
+        * Fixed bug in hash slice operation in new() and read()
+          methods. RT#11886. Thanks to JFITZ for finding it and
+          mugwump for pointing out the syntax error.
+
+1.37    2005-01-16 2245EDT
+
+        * get() and set() methods deprecated in favor of autoloading
+          accessor functions /a la/ The Damian.
+        * Doc tweaks
+
+1.28    2004-11-14 2053EDT
+
+        * POD typos fixed, minor doc tweaks
+
+1.27    2004-11-13 1235EDT
+
+        * YAML.pl now listed as a dependancy (dur).
+        * More/better tests for get() and set() methods.
+        * Documentation improvements.
+
+1.22    2004-10-03 1945EST
+
+        * In new(), the 'config' and 'output' parameters must now be
+          the first and (still optionally) second parameters
+          passed. This is so that they can be repeated, allowing the
+          user to set their own non-special 'config' and 'output'
+          parameters in the actual configuration hash.
+        * Doc tweaks to reflect this as well as more general tweaks.
+
+1.21    2004-10-02 1448EST
+
+        * Doc cleanups
+
+1.00    2004-10-01 1550EST
+
+        * First version, released on an unsuspecting world.
+

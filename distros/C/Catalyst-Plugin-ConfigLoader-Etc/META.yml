@@ -1,0 +1,27 @@
+---
+abstract: 'Load etc config files'
+author:
+  - 'zdk (Warachet Samtalee), C<< <zdk at cpan.org> >>'
+build_requires:
+  Data::Dump: 0
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-ConfigLoader-Etc
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::ConfigLoader: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/zdk/catalyst-plugin-configloader-etc
+version: 0.02

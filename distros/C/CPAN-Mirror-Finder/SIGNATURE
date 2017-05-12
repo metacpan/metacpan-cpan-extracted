@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ba649d4738e170c8ed578833687d39a63a2cc700 Build.PL
+SHA1 3a5385b3ed6168e19cf2c4b9bbf338476f1b4b62 CHANGES
+SHA1 6e0ef6fd898cfeca712579753b0a69161dbabde9 LICENSE
+SHA1 609533e14ef173b2f4186f79bd07c68fbc2df1dc MANIFEST
+SHA1 0b9864b61fec16f7d256da01c1bd657984842dfa META.json
+SHA1 bf296a5cf16d85480d624f52952043e460448245 META.yml
+SHA1 b6e569a3060dba85ba5e96eff6a6c9f3dcd111a4 README
+SHA1 6a98491f4aa007334b793ac3e0701d6c08f6e188 lib/CPAN/Mirror/Finder.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5HfR4ACgkQnvdMljFk9hXnWACgiTBdlI5cjPzPTzwY8sH2aZ62
+mr4AoLEXS/wO0PpRtooIUmnWrI9sxLjl
+=0QPl
+-----END PGP SIGNATURE-----

@@ -1,0 +1,10 @@
+^pm_to_blib$
+^blib
+^\.git
+\.gitignore
+^MYMETA\.(json|yml)$
+^Makefile$
+^(build|make-pod)\.pl$
+^xt/.*\.t$
+^lib/C/Utility\.pod\.tmpl$
+^examples/.*-out\.txt$

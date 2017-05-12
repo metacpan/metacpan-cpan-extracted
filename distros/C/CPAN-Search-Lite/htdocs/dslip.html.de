@@ -1,0 +1,231 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html ; charset=iso-8859-1">
+  <title>DSLIP Informationen</title>
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+</head>
+<body>
+  Die volle Liste der m&ouml;glichen DSLIP Wahlen sind: 
+  <dl>
+    
+    <dt class="l1">D - Entwicklungsstatus (Anmerkung: * IMPLIZIERT KEINE ZEITSKALA *)</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>i</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Idee - nur zur Koordination oder als Platzhalter verzeichnet</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Pre-alpha Stadium (noch nicht freigegeben)</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Alphaphase</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Betaphase</td>
+        </tr>
+      
+        <tr>
+          <td>R</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Freigegeben</td>
+        </tr>
+      
+        <tr>
+          <td>M</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Ausgereift</td>
+        </tr>
+      
+        <tr>
+          <td>S</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Standard, geliefert mit Perl 5</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">S - Support Level</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>m</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Mailingliste</td>
+        </tr>
+      
+        <tr>
+          <td>d</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Entwickler</td>
+        </tr>
+      
+        <tr>
+          <td>u</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Usenet: comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Unbekannt, m&ouml;glicherweise &uuml;ber comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Aufgegeben, Autor k&uuml;mmert sich nicht mehr um sein Modul</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">L - Verwendete Sprache(n)</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl, kein Compiler n&ouml;tig, sollte plattformunabh&auml;ngig sein</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C und Perl, C Compiler erforderlich</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Hybrid, geschrieben in Perl mit optionalem C Code, Compiler nicht ben&ouml;tigt</td>
+        </tr>
+      
+        <tr>
+          <td>+</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C++ und Perl, C++ Compiler erforderlich</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl und weitere Sprache (weder C noch C++)</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">I - Art der Schnittstelle</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>f</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Normale Funktionen, keine Referenzen</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Hybrid, objektorientierte und funktionale Schnittstellen vorhanden</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Keinerlei Schnittstelle (nanu?)</td>
+        </tr>
+      
+        <tr>
+          <td>r</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Unblessed References oder Ties</td>
+        </tr>
+      
+        <tr>
+          <td>O</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Objektorientiert mit Blessed References und/oder Vererbung</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">P - Lizenz</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Standard-Perl: Freie Wahl zwischen GPL und Artistic License</td>
+        </tr>
+      
+        <tr>
+          <td>g</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>GPL: Gnu Public License</td>
+        </tr>
+      
+        <tr>
+          <td>l</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>LGPL: "GNU Lesser General Public License" (fr&uuml;her bekannt als "GNU Library General Public License")</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>BSD: Die BSD Lizenz</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Artistic License</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Andere Lizenz (Verteilung unbeschr&auml;nkt erlaubt)</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+  </dl>
+  <p><b>VERZICHT:</b> Der Status des allgemeinen Lizenzfeldes ist dort
+   nur zum informierenden Zweck und setzt nicht eine zugelassene
+   Schwerg&auml;ngigkeit irgendwie der Art fest. Um korrekte
+   Informationen &uuml;ber die Genehmigenbezeichnungen eines
+   Moduls und seiner angeschlossenen Akten einzuholen, beziehen
+   Sie bitte sich die auf Verteilung der Module oder treten Sie
+   mit dem Autor in Verbindung wie passend. Informieren Sie bitte
+   <a href="mailto:modules@perl.org">modules@perl.org,</a> wenn
+   Sie irgendeine Fehlanpassung zwischen dem Inhalt des
+   allgemeinen Lizenzfeldes antreffen und was die Verteilung
+   wirklich &uuml;ber sie sagt.
+</p>
+  <hr>
+</body>
+</html>
+

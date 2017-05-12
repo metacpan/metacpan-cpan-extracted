@@ -1,0 +1,46 @@
+Language Mapping Issues
+=======================
+
+- Support for WChar and WString (should be possible even though
+  ORBit doesn't support them itself)
+
+
+POA Issues
+==========
+
+- Fix/finish the non-default policies within ORBit
+
+- Add missing functions to ORBit.xs
+
+
+Interface Repository Interface
+==============================
+
+- Finish the ORBit interface repository
+
+- write the necessary code to convert ORBit C anys to constants
+  so that we can retrieve constant declarations from the
+  interface repository.
+
+
+General Tasks
+=============
+
+- Figure out how to get Perl to talk to C in the same process
+  (almost certainly requires some ORBit changes)
+
+Test Suite
+==========
+
+- Write a test suite; this should be a lot easier now with
+  the ability to read from .idl files than it was for 
+  the MICO module, where we had to fire up a interface repository
+  and feed it. All you need to do is make your testing
+  client program start the server program, which can write
+  the IOR to standard out.
+
+BUGS
+====
+
+- Raising a invalid exception propagates back a CORBA::UNKNOWN except
+with junk parameters.

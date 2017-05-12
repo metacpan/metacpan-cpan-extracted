@@ -1,0 +1,8 @@
+NOTES
+Changes
+MANIFEST
+Makefile.PL
+Opaque.pm
+Opaque.xs
+test.pl
+typemap

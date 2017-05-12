@@ -1,0 +1,15 @@
+.livegrid tr,
+.x-panel-body tr 
+{
+    cursor: pointer;
+}
+
+.x-grid3-row-over
+{
+    background: #ffdd77;
+    background-image: none;
+}
+
+.x-panel-header {
+    text-align:center;
+}

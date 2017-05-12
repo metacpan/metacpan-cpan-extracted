@@ -1,0 +1,14 @@
+name: Class-Tangram
+module_name: Class::Tangram
+version: 1.57
+license: unknown
+distribution_type: module
+requires:
+  perl: 5.004
+  Set::Object: 1.04
+  Date::Manip: 5.21
+  Test::Simple: 0.18
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.39

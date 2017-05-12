@@ -1,0 +1,9 @@
+# $Id: file-header.txt 2 2005-10-25 20:02:35Z evdb $
+# Copyright 2005 Edmund von der Burg
+# Distributed under the same license as Perl itself.
+# http://ecclestoad.co.uk
+
+use strict;
+use warnings;
+
+use Test::More 'no_plan';

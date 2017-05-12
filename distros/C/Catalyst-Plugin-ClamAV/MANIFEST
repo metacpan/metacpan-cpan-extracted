@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Catalyst/Plugin/ClamAV.pm
+t/00-load.t
+t/01-clamscan.t
+t/lib/TestApp.pm
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

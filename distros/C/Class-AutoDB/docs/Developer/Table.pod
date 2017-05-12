@@ -1,0 +1,47 @@
+=head1 NAME
+
+Class::AutoDB::Table - Schema information for one table
+
+=head1 SYNOPSIS
+
+This is a helper class for Class::AutoDB::Registry which represents the
+schema information for one table.
+
+ use Class::AutoDB::Table;
+ my $table=new Class::AutoDB::Table
+   (-name=>'Person',
+    -keys{name=>'string',dob=>'integer',grade_avg=>'float',friend=>'object'});
+ my $name=$table->name; 
+ my $keys=$table->keys;           # hash of key=>type pairs
+ my @sql=$table->schema;          # SQL statements to create table
+ my @sql=$table->schema('create');# same as above
+ my @sql=$table->schema('drop');  # SQL statements to drop table
+ my @sql=$table->schema('alter'); # SQL statements to add columns 
+                                  #   of this table to another
+
+=head1 DESCRIPTION
+
+This class represents schema information for one table. This class is
+fed a HASH of key=E<gt>type pairs. Each turns into one column of the
+table. In addition, the table has an 'object' column which is a foreign
+key pointing to the AutoDB object table and which is the primary key
+here. Indexes are defined on all keys (unless index=>0 is passed as an AutoDB 
+constructor argument). This class just creates SQL; 
+I<it does not talk to the database>.
+
+At present, only our special data types ('string', 'integer', 'float',
+'object') are supported. These can be abbreviated. These are translated
+into MySQL types as follows:
+
+ ----------------------------------
+ | AutoDB type    | MySQL type    |
+ ----------------------------------
+ |  string        |  longtext     |
+ |  integer       |  int          |
+ |  float         |  double       |
+ |  object        |  bigint       |
+ |                | (unsigned)    |
+ ----------------------------------
+
+=cut
+

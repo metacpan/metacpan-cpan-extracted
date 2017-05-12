@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+lib/Convert/EBCDIC.pm
+t/fun.t
+t/obj.t
+tools/mkctbl.pl
+tools/mkrtbl.pl

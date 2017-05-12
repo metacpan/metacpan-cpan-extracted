@@ -1,0 +1,58 @@
+Revison history for Catalyst-Helper-Controller-DBIC-API-REST
+
+
+0.09      2016-11-20
+
+        - Allow sub paths. (pablrod)
+          https://github.com/amiri/Catalyst-Helper-Controller-DBIC-API-REST-0.01/pull/3
+
+0.08    2011-11-04
+        - a bugfix, cleanups, and enhancements (RsrchBoy)
+          https://github.com/amiri/Catalyst-Helper-Controller-DBIC-API-REST-0.01/pull/1
+
+        - model name can now be something other than "DB" (RsrchBoy)
+        
+        - app name can now be more than one level deep (e.g. My::App now works rather
+          than abending) (RsrchBoy)
+          
+        -  No more Module::Load, require namespace::autoclean (RsrchBoy)
+
+        - use Dist::Zilla (amiri)
+
+        - Clean and rearrange test lib and tests (amiri)
+
+0.07    Sat Oct 24 10:40:53 2009
+
+        - Remove swaps (amiri)
+
+0.06    Sat Oct 24 10:37:56 2009
+
+        - Hide test modules from PAUSE. (amiri)
+
+0.05    Sat Oct 24 10:08:07 2009
+
+        - Add prereqs to fix make failures. Use parent instead of base. (amiri)
+
+
+0.04    Thu Aug 20 12:45:08 2009
+
+        - some code cleanup (franck cuny)
+
+        - Autogenerate README (amiri)
+
+
+0.03    Sat Jul 4 12:55:05 2009
+
+0.02    Fri Jun 26 11:02:10 2009
+
+        - Removed Test::Deep from tests. Full documentation. (amiri)
+        
+        - Conditional insertion of list_prefetch and list_prefetch_allows;
+          comprehensive list_search_exposes.
+        
+        - Much smarter prefetch. ControllerBase creation and subclassing.
+
+
+0.01    Sun Jun 14 11:50:52 2009
+
+        - original version

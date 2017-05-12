@@ -1,0 +1,25 @@
+---
+name: Class-DBI-Pageset
+version: 0.14
+author:
+  - 'Mark Grimes E<lt>mgrimes@cpan.orgE<gt>'
+  - |-
+    Most of this code was shamelessly taken from the very nice
+    C<Class::DBI::Pager> by Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>.
+abstract: A flexible pager utility for Class::DBI using Data::Pageset
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::DBI: 0.90
+  Data::Pageset: 1.04
+recommends:
+  Data::Pageset::Render: 0
+provides:
+  Class::DBI::Pageset:
+    file: lib/Class/DBI/Pageset.pm
+    version: 0.14
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

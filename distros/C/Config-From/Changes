@@ -1,0 +1,17 @@
+Revision history for Config-From
+
+0.05    2015-07-30
+        update dependencies another time
+        update pod
+
+0.04    2015-07-28
+        update dependencies to pass tests :(
+
+0.03    2015-07-27
+        update dependencies to pass tests
+
+0.02    2015-07-26
+        add DBIx backend
+
+0.01    2015-07-26
+        First version

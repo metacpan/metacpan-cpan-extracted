@@ -1,0 +1,49 @@
+Revision history for CPAN-Meta-Check
+
+0.014     2016-11-25 13:09:01+01:00 Europe/Amsterdam
+          - Undef versions are now passed through to CPAN::Meta::Requirements
+            for the check, rather than failing with "Missing version" errors.
+
+0.013     2016-07-20 22:26:07+02:00 Europe/Amsterdam
+          Make tests more resilient against dev versions of dependencies
+
+0.012     2015-06-18 23:20:54+02:00 Europe/Amsterdam
+          Drop dependency on Exporter 5.57
+
+0.011     2015-03-22 10:07:52+01:00 Europe/Amsterdam
+          Declare the minimum version required for the "merged_requirements" interface
+
+0.010     2015-01-30 19:10:49+01:00 Europe/Amsterdam
+          bump Module::Metadata prereq for $VERSION parsing (RT#101095)
+          Consistently require same version of CPAN::Meta::Requirements
+
+0.009     2014-06-20 19:37:43+02:00 Europe/Amsterdam
+          Various POD fixes
+
+0.008     2013-10-17 16:44:57 Europe/Amsterdam
+          Switch to using merged_requirements
+          Test Env instead of Carp for version overshoot [#89591]
+          Document $incdirs in the right function
+
+0.007     2013-07-31 14:37:58 Europe/Amsterdam
+          Swap conflicts test, as underscore versions broke it
+
+0.006     2013-07-27 00:24:21 Europe/Amsterdam
+          Fixed bad dereference during conflicts checking
+
+0.005     2013-04-22 17:27:50 Europe/Amsterdam
+          Converted from Test::Differences to Test::Deep
+          Don't load CPAN::Meta from CPAN::Meta::Check
+
+0.004     2012-05-24 21:35:08 Europe/Amsterdam
+          Depend on recent enough CPAN::Meta
+
+0.003     2012-05-09 20:48:01 Europe/Amsterdam
+          Allow explicit setting of the include dir
+
+0.002     2012-04-05 01:05:34 Europe/Amsterdam
+          Add explicit dependency on CPAN::Meta 2.120920
+          Allow CPAN::Meta::Requirements instead of CPAN::Meta
+
+0.001     2012-04-01 12:46:04 Europe/Amsterdam
+          Initial release

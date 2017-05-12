@@ -1,0 +1,518 @@
+Revision history for Catalyst-Action-REST
+
+1.20      2015-10-29 15:28:27-05:00 America/Chicago
+
+ - Documentation fixes.
+ - Don't clobber some response headers if they are already set.
+
+1.19      2015-02-06 09:40:02-06:00 America/Chicago
+
+ - Make LWP a test dep instead of a hard dep (Fixes GH#3, thanks Alexander
+   Hartmaier for the report!)
+ - Hard dep on JSON::MaybeXS (Fixes RT#101854, thanks Emmanuel Seyman for the
+   report and Karen Etheridge for help tracking down the cause!)
+
+1.18      2015-01-20 12:20:46-06:00 America/Chicago
+ - Fix tests on travisci so that Catalyst proper can run on travisci
+   (Thanks André Walker!)
+
+1.17      2014-10-23 19:58:46-05:00 America/Chicago
+ - Make 3xx status codes skip serialization when there is no data to serialize
+   (Thanks Jesse Sheidlower!)
+
+1.16      2014-09-12 13:21:43-05:00 America/Chicago
+ - Switch from JSON to JSON::MaybeXS to get a better choice of JSON parsers.
+
+1.15      2014-05-07 09:02:44-05:00 CST6CDT
+
+ - Added new status_see_other method for returning a 303 redirect.
+ - Added new status_moved method for returning a 301 redirect. (Matthew Keller)
+
+1.14      2013-12-27 15:32:19 America/Chicago
+
+ - Stop prompting for features at install time
+
+1.13  2013-11-08 09:40:00 EST
+
+ - Fix tests to skip if YAML::Syck is not installed (Arthur Axel fREW Schmidt)
+
+1.12  2013-09-03 13:00:00 EST
+
+ WARNING BACK COMPAT BREAKAGE FOLLOWS
+
+ Removed The YAML and HTML parser from the distro.  You
+ should install these if you actually use them.  They are listed as
+ optional dependencies going forward.
+
+ This is possibly a breaking change, but necessary for security and
+ considered acceptable since those formats have not generally
+ become preferred for web services.
+
+ In addition, the default de/serialization mappings for HTML and YAML
+ have been removed.  You can add that back by adding the following to
+ you Configuration for the subclass of Catalyst::Controller::REST -
+
+    package Foo::Controller::Bar;
+
+    use Moose;
+    use namespace::autoclean;
+
+    BEGIN { extends 'Catalyst::Controller::REST' }
+    __PACKAGE__->config(
+      'map' => {
+        'text/html'          => 'YAML::HTML',
+        'text/x-yaml'        => 'YAML',
+      },
+    );
+
+ You should do this if you are using these de/serialization formats.
+
+1.11  2013-06-16 15:23:03 BST
+
+ - Fix infinite recursion in tests under Catalyst 5.90040
+
+1.10  2013-04-22 14:36:53 BST
+
+ - Use YAML rather than JSON in basic tests
+
+1.09  2013-04-19 13:34:38 BST
+
+ - Don't load Data::Serializer unnecessarily in tests
+
+1.08  2013-04-16 08:33:00 BST
+
+ - Factor Data::Serializable into it's own dist to stop breakages.
+
+     If you use any of:
+
+     * Data::Dumper
+     * Data::Denter
+     * Data::Taxi
+     * Config::General
+     * PHP::Serialization
+
+     You'll need to install Catalyst-Action-Serialize-Data-Serializer and add the
+     appropriate lines to your controller config.  Said lines may be:
+
+         'text/x-data-dumper' => [ 'Data::Serializer', 'Data::Dumper' ],
+         'text/x-data-denter' => [ 'Data::Serializer', 'Data::Denter' ],
+         'text/x-data-taxi'   => [ 'Data::Serializer', 'Data::Taxi'   ],
+         'text/x-config-general'    => [ 'Data::Serializer', 'Config::General' ],
+         'text/x-php-serialization' => [ 'Data::Serializer', 'PHP::Serialization' ],
+
+1.07  2013-04-11 20:20:00 BST
+
+ - Don't serialize if a view is explicitly set.
+
+  - If the controller sets the view in $c->stash->{current_view} or
+    $c->stash->{current_view_instance}, then it is explicitly requesting a
+    certain kind of serialization and C::A::Serialize shouldn't override
+    that.
+
+ - Remove Storable and FreezeThaw from the list
+   of serialization methods offered by default, and
+   from the docs - they're totally unsafe :/
+
+1.06  2012-12-11 22:04:00 UTC
+
+ - Sort list of allowed methods. RT#81825
+
+1.05  2012-07-02 20:13:00 BST
+
+ - Bugfix get_allowed_methods list:
+    - include HEAD
+    - remove "not_implemented"
+
+1.04  2012-06-30 10:25:00 BST
+
+ - Bugfix to _dispatch_rest_method
+
+1.03  2012-06-28 00:40:00 BST
+
+ - Expose _get_allowed_methods to the API (wreis)
+
+ - Fix default OPTIONS handler: As the ->body is defined, then serialization
+   won't happen and we don't get wrong responses. (wreis)
+
+ - Add default HEAD handler: auto dispatches to _GET method if it exists (wreis)
+
+1.02  2012-06-05 22:23:00 BST
+
+ - Fix forwarded REST methods, e.g. foo_GET to be more
+   correctly displayed as a forward in the stats info.
+
+ - Make public response building methods for errors
+   _unsupported_media_type and _serialize_bad_request which
+   can be extended from an action-role to return custom
+   error response.
+
+1.01  2012-05-29 20:19:00 BST
+
+ - Add Catalyst::Action::Deserialize::JSON::XS
+
+ - Fix JSON::XS useage to depend on JSON.pm v2.0, and rely on the
+   fact that can be backed by XS code, by explicitly setting
+   $ENV{'PERL_JSON_BACKEND'} = 2
+
+1.00  2012-04-13 09:31:00 BST
+
+ - Repack without auto_include to stop Module::Install inlining
+   Test::More without Test::Builder. RT#76524
+
+0.99  2012-02-28 09:09:00 UTC
+
+ - Repack with new Module::Install to stop depending on an unnecessary
+   ExtUtils::MakeMaker version.
+
+0.98  2012-02-21 11:40:00 UTC
+
+ - More fixes as per last release.
+
+0.97  2012-02-21 09:58:00 UTC
+
+ - Fix test with latest Catalyst version which passes _log into
+   requests.
+
+0.96  2012-01-20 11:22:00 UTC
+
+ - Added fix for RT 63537 (from Gerv) and tests to check it.
+
+0.95  2012-01-04 19:34:00 UTC
+
+ - Fix regex for JSONP parameter name to be able to include the . character
+   in Catalyst::Action::Serialize::JSONP. RT#73741
+
+ - Add optional location parameter to status_accepted handler. RT#73691 (ghenry)
+
+0.94  2011-12-09 08:35:00 UTC
+
+ - Add 403 Forbidden and 302 Not Found status methods to
+   Catalyst::Controller::REST (Caleb Cushing)
+
+0.93  2011-10-12 11:37:00 America/Chicago
+
+ - Add a "Callback" serializer/deserializer to allow for more customization in
+   how the REST data is parsed/generated (bphillips)
+
+0.92  2011-10-01 11:04:00 BST
+
+ - Add a Catalyst::Action::DeserializeMultiPart, allowing one part of a multipart
+   request to be deserialized as the REST data (allowing other parts to be used for
+   file uploads, for example) (bphillips)
+
+0.91  2011-08-04 14:37:21 Europe/Berlin
+
+ - For the deserialization action class, make the HTTP methods it operates on
+   configurable on a per-action level (plu, rafl).
+
+0.90  2011-02-25 13:56:00 UTC
+
+ - Remove test which is no longer applicable and fails in the latest Catalyst
+   release.
+
+0.89  2011-01-24 21:57:42 UTC
+
+ - All classes are now made immutable. (Dave Rolsky)
+
+ - Added a Catalyst::Action::REST::ForBrowsers class. This will try to dispatch
+   GET requests to a foo_GET_html method before trying foo_GET. (Dave Rolsky)
+
+0.88  2011-01-11 23:07:00 UTC
+
+ - Fix documentation for overriding Serialize and Deserialize actions
+   in Catalyst::Controller::REST.
+
+ - Avoid warning with empty response bodies and new Catalyst version
+   (>= 5.80030)
+
+ - Returning a body of '' is now possible - Catalyst::Action::Serialize
+   acts like Catalyst::Action::RenderView (>= 0.16) by using the has_body
+   predicate in Catalyst::Response (>= 5.80030)
+
+0.87  2010-11-03 19:46:00 UTC
+
+ - Fix Request class role when used with new Moose and other request
+   class roles.
+
+0.86  2010-09-01 23:14:00 BST
+
+ - Add rest_serializer_json_options config key useable to set options
+   like relaxed => 1 to be passed to the JSON serializer (Ton Voon)
+
+ - Make Data::Dumper unserializer safer by using a Safe compartment (Ton Voon)
+
+0.85  2010-05-13 10:09:19 Europe/Berlin
+
+ - Make Catalyst::Action::Serialize::View return directly rather than serializing
+   a response for 3XX status codes. This stops back-compat breakage from the
+   previous change (in 0.84), whilst also allowing actual data serializers
+   to still handle 3XX.
+
+ - Fix docs in Catalyst::TraitFor::Request::REST::ForBrowsers. (RT#54983)
+
+0.84  2010-05-06 09:27:56 BST
+
+ - Revert always using a trait rather than Catalyst::Request::REST to improve
+   debug messages.
+
+ - Add a status_multiple_choices helper method to the Controller base class.
+
+ - Allow 3XX responses to be serialized.
+
+0.83  2010-02-08 22:17:12 UTC
+
+ - Make it possible to deserialize a request with a DELETE method. This probably
+   breaks 'strict' REST guidelines, but is useful for being able to delete multiple
+   resources from a single call by providing a batch delete method.
+
+ - Remove JSONP from the list of default serializers (RT#54336)
+   Fix MANIFEST (RT#54408)
+
+0.82  2010-02-04 22:31:57 UTC
+
+ - Integrated Catalyst::Request::REST::ForBrowsers as
+   Catalyst::TraitFor::Request::ForBrowsers. (Dave Rolsky)
+
+ - Clarified docs so that they encourage the use of the request traits, rather
+   than using Catalyst::Request::REST. (Dave Rolsky)
+
+ - When Catalyst::Action::REST or Controller::REST automatically add the trait,
+   your request class will no longer end up getting set to
+   Catalyst::Request::REST. Instead, creates an anon class with the appropriate
+   role. (Dave Rolsky)
+
+ - Shut up log output from the tests. (Dave Rolsky)
+
+ - Added a $VERSION to every module, mostly to make sure that when people
+   install Catalyst::Request::REST::ForBrowsers, they get the version in this
+   distro. (Dave Rolsky)
+
+ - Change Catalyst::Action::Serialize, Catalyst::Action::Deserialize and
+   Catalyst::Action::SerializeBase to be more Moose like.
+
+ - Fix JSON and JSON::XS to encode_blessed. (fREW)
+ - Fix Catalyst::Action::Serialize to use objects instead of classes. (fREW)
+ - Fix doc nits. (RT#53780)
+
+0.81  2010-01-14 20:56:00 UTC
+
+ - Add a JSONP serialization type.
+
+0.80  2009-12-19 14:54:00 UTC
+
+ - Convert all classes to Moose
+
+ - Change Catalyst::Request::REST to be a mostly empty class, with
+   all the functionality in Catalyst::TraitFor::Request::REST
+
+ - Simplify _get_allowed_methods method (aristotle)
+
+ - Rework serializer return so that serializers throw an exception in
+   the case of issues serializing the data (hobbs).
+
+0.79  2009-12-11 01:08:00 UTC
+
+ - Cope with invalid (missing required q parameter) header like:
+   application/json; charset="utf-8"
+
+ - Fix documentation to not mention deprecated things and generally be
+   in better style.
+
+ - Make author information consistant and only in one module.
+
+0.78  2009-09-28 15:01:03 BST
+
+ - Require Moose for the tests (RT#50066).
+
+0.77  2009-08-27 02:21:09 BST
+
+ - Allow dispatching to Catalyst Actions, for use with ActionClasses
+   etc - fREW
+
+ - Fix test if CATALYST_DEBUG environment variable is set
+
+0.76  2009-08-21 21:20:52 BST
+
+ - Added two new status response helpers (202 no content and 410 gone),
+   and tests - Franck Cuny
+
+0.75  2009-08-17 14:07:41 BST
+
+ - Fix optional test failures in catalyst-action-serialize-accept.t
+ - Added a serializer for JSON::XS
+ - Made test independent of YAML::Syck bugs (dandv)
+
+0.74  2009-07-22 23:49:16 BST (t0m)
+
+ - Switch from NEXT to MRO::Compat (agladdish).
+
+ - Add display of additional REST actions in the stats, and also fix a warning
+   in Catalyst 5.80 when you forward to another action from inside an
+   action_FOO method (as it was confusing the stats).
+
+ - POD fixes
+ - Catalyst::Action::REST no longer @ISA Catalyst or Catalyst::Controller.
+ - Change constructor to call next::method instead of SUPER::
+ - Change method used to find the application class to be more correct
+
+0.73  2009-06-27 20:20:09 America/New_York (hdp)
+
+ - Packaging fixes
+
+0.72  2009-06-25 14:52:29 America/New_York (hdp)
+
+ - Refresh Module::Install
+
+0.71  2009-03-28 09:16:09 America/Los_Angeles (hdp)
+
+ - Fix RT#44641, missing documented 'end' action
+
+0.70  2009-03-27 23:21:17 America/Los_Angeles (hdp)
+
+ - Tests that use JSON were either not checking for the version or checking in a
+ - way that was a syntax error.
+
+0.69  2009-03-26 14:16:03 America/Los_Angeles (hdp)
+
+ - Fix RT#32342, deprecated config loses default map (hdp)
+ - Fix broken insertion of Catalyst::Request::REST for Action::REST (jshirley)
+
+0.68  2009-03-25 22:33:38 America/Los_Angeles (hdp)
+
+ - Remove prompt for ancient and deprecated Data::Denter from Makefile.PL
+ - Remove Data::Dump, which was entirely unused
+ - Stop tests from dying with Catalyst 5.80
+
+0.67  2009-03-25 21:59:59 America/Los_Angeles (hdp)
+
+ - (no changes from 0.67_01)
+
+0.67_01  2009-03-25 09:36:00 America/Los_Angeles (hdp)
+
+ - Fix RT#43840, improper app-level config handling
+ - Fix RT#42859, 'wrong' Catalyst dependency
+ - Fix RT#42025, stepping on custom request classes
+
+0.65  2008-08-20 10:42:00 America/Los_Angeles (jshirley)
+
+ - Fully revamped tests to work without any JSON support
+ - Final removal of JSON::Syck
+ - Special thanks to jgoulah for helping test this release
+
+0.64  2008-08-13 08:55:00 America/Los_Angeles (jshirley)
+
+ - New dist to fix issue with Module::Install
+
+0.63  2008-07-09 11:16:00 America/Los_Angeles (jshirley)
+
+ - Changing from JSON::Syck to JSON/JSON::XS
+ - Refactored tests to be more applicable to current state of affairs
+
+0.62  2008-07-02 07:53:00 America/Los_Angeles (jshirley)
+
+ - Reshipping with current Module::Install included due to error reports
+   about failed installs
+
+0.61  2008-06-30 12:28:00 America/Los_Angeles (jshirley)
+
+ - Support official application/json and carp about text/x-json
+
+ - Accepted patch from Luke Saunders for processing all accepted content types
+
+0.60  2008-01-03 17:23:58 America/Los_Angeles (adam)
+
+ - Updated my contact information.
+
+ - Fixed RT#30498 - REST controller references Catalyst without
+   loading it first.
+
+ - Fixed RT#32042 - Import of Params::Validate :all plays badly
+   with subclasses that have their own validate()
+
+ - Fixed RT#30456 - Debug messages print even with debugging disabled
+
+ - Fixed an issue where YAML::Syck versions 0.92 require $c->request->body to
+   be stringified
+
+ - Updated the configuration specifiers to operate more in line with the way
+   Catalyst expects.  Most notably component based configuration through
+   "Controller::RestClass" now works.  "serialize" at the top level simply
+   is suggested defaults that all REST classes inherit.
+
+ - Fixed 'default' serializer to set a valid Content-Type: header.  Fixes
+   RT ticket 27949.  Note that behavior has changed -- the default
+   serializer must now be specified as a content-type, not as a plugin
+   name. (dmo@roaringpenguin.com)
+
+0.41  2007-05-24 14:01:06 America/Los_Angeles (adam)
+
+ - Moved a bogus $self->class to $c->component($self->class)
+
+0.40  2007-03-09 14:13:29 America/Los_Angeles (adam)
+
+ - Refactored the Content-Type negotiation to live in Catalyst::Request::REST.  (drolsky)
+ - Added some useful debugging. (drolsky)
+ - Added a View serializer/deserializer, which simply calls the correct
+ - Catalyst view.  ('text/html' => [ 'View', 'TT' ]) (claco, adam)
+
+0.31  2006-12-06 00:45:02 America/Los_Angeles (adam)
+
+ - Fixed a bug where we would report a blank content-type negotiation.
+ - Added Data::Dump as a dependency.
+
+ - Made the YAML::HTML view automatically append content-type=text/html on
+   the resulting URLs.
+
+0.30  2006-12-03 12:24:16 America/Los_Angeles (adam)
+
+ - Updated the Makefile to support optional installation of the different
+   Serialization formats.
+
+ - Renamed some of the test cases, since the execution order doesn't
+   matter.
+
+ - Fixed things so that not having a Serialization module returns 415.
+ - Fixed things so that failure to Deserialize sends the proper status.
+ - Refactored the Plugin loading to Catalyst::Action::SerializeBase.
+ - Updated the Documentation.
+
+ - Added a whole raft of serializers. (JSON, all the Data::Serializer
+   supported ones, and XML::Simple)
+
+ - Added test cases.
+
+ - Refactored the Catalyst::Action::REST dispatch, so that the default
+   method is called before any _METHOD handlers.  In addition, moved
+   the 405 Not Implemented handler to be foo_not_implemented, instead
+   of the default sub.  (daisuke++ pointed out the inconsistency and
+   provided a patch, and I added the foo_not_implemented support)
+
+ - Added in automated OPTIONS handler, which constructs the allow
+   header for you, just like the 405 handler.  Can be overridden
+   with a normal _METHOD sub.
+
+ - Refactored Test::Rest, so that it uses closures to create the
+   very similar $test->method() subs.
+
+ - Added tests for Catalyst::Action::REST.
+
+0.2  2006-11-30 17:14:51 America/Los_Angeles (adam)
+
+ - Added documentation patch from Daisuke Maki (daisuke@endeworks.jp)
+ - Added dependency patch from Daisuke Maki (daisuke@endeworks.jp)
+
+0.1  2006-11-19 16:24:20 America/Los_Angeles (adam)
+
+ - Added status_accepted (Code 202)
+ - Added a first pass at documentation.
+ - Added in Test Suite
+ - Created Catalyst::Action::Serialize and Catalyst::Action::Deserialize
+ - Added Data::Serializer actions
+ - Added status_created helper method
+ - Added more status_ helpers
+
+ - Converted error helpers to return an object instead of plain-text.  It's
+   a more consistent model than a text/plain error message.
+
+ - Added logging to 4xx status handlers
+

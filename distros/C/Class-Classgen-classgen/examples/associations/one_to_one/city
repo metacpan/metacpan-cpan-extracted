@@ -1,0 +1,6 @@
+header:
+	package City;
+
+variables:
+	$name
+	$a_is_capital_from

@@ -1,0 +1,85 @@
+                               Class::Maker
+                               ============
+
+	        ! THIS IS ALPHA SOFTWARE - DO NOT USE THIS MODULE !
+
+            THIS SOFTWARE SHIPS WITHOUT ANY WARRANTY OF ANY KIND
+
+	Everything except the basic functionalities are still under constant
+	reorganisation. Also major parts of the	documentation are wrong or already
+	outdated.
+
+NAME
+    Class::Maker - classes, reflection, schemas, serialization, attribute-
+    and multiple inheritance
+
+EXAMPLE
+	use Class::Maker qw(class);
+
+	class Something;
+
+	class Person,
+	{
+		isa => [ 'Something' ],
+
+        public =>
+        {
+                scalar => [qw( name age internal )],
+        },
+
+        private
+        {
+                int => [qw( internal )],
+        }
+	};
+
+	sub Person::hello
+	{
+		my $this = shift;
+
+		$this->_internal( 2123 );
+
+		printf "Here is %s and i am %d years old.\n",  $this->name, $this->age;
+	};
+
+	my $p = Person->new( name => Murat, age => 27 );
+
+	$p->hello;
+
+DESCRIPTION
+    Class::Maker introduces the concept of classes via a "class" function.
+    It automatically creates packages, ISA, new and attribute-handlers (accessors).
+    The classes can inherit from common perl-classes and class-maker classes.
+    Single and multiple and attribute inheritance is supported.
+
+AUDIENCE
+    This package is for the intermediate-to-pro oo-perl programmer. While it has basicly
+    similarities to Class::Struct and Class::MethodMaker, this package has significant
+    differences and additional functionalities.
+
+ATTRIBUTE INHERITANCE
+	Because all attributes are accessible through accessors, they are
+	following ISA inheritance / overloading as normal methods do.
+
+MULTIPLE INHERITANCE
+	Per default, Class::Maker cares for constructing all parent objects via its 'new'
+	or '_init' constructors. It uses a trick to derive from even non Class::Maker
+	classes	correctly.
+
+REFLECTION/CLASS INTROSPECTION
+    Java-like reflection or recursive class introspectiong for methods/attribute/
+    triggers are available during runtime. This is helpfull for implementing
+    persistance, serialization, class tree charting and some other nifty tricks.
+
+OBJECT PERSISTANCE
+    A recursive Tangram (see cpan) schema generator is also available, which
+    significantly  eases the use of object-persistance as long as you use
+    Class::Maker classes and following some simple guidelines.
+
+AUTHOR
+    Murat Uenalan (muenalan@cpan.org)
+
+COPYRIGHT
+    (c) 2001 by Murat Uenalan. All rights reserved. Note: This program is
+    free software; you can redistribute it and/or modify it under the same
+	terms as perl itself.

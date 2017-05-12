@@ -1,0 +1,7 @@
+Revision history for Catalyst-Action-Serialize-XML-Hash-LX
+
+0.06    2009-09-15
+        Fix dist: remove cpants.pl from install
+
+0.05    2009-08-29
+        Separated from XML::Hash::LX

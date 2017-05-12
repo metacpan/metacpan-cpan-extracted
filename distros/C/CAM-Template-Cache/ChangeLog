@@ -1,0 +1,118 @@
+2005-04-22 22:12  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/Template/Cache.pm: v0.91 Relicense
+
+2003-09-16 14:23  chris
+
+	* Build.PL, COPYRIGHT, LICENSE, MANIFEST, Makefile.PL, README,
+	  index.html, test.pl, lib/CAM/Template/Cache.pm: v0.90 Update for
+	  new build and license infrastructure
+
+2003-08-18 14:56  tasc
+
+	* Cache.pm: Improvement to the previous fix.  Plus, catch case of
+	  zero expiration time in clean().
+
+2003-08-18 14:36  tasc
+
+	* Cache.pm: v0.26 Fix error in setup() where table name was
+	  hardcoded by mistake.
+
+2003-04-07 12:33  chris
+
+	* Cache.pm: v0.25 Update clear() to be either a class or an
+	  instance method
+
+2003-03-26 14:52  chris
+
+	* Cache.pm: Bugfix
+
+2003-03-26 08:53  chris
+
+	* Cache.pm: v0.24 Add clear() method to manually invalidate the
+	  cache Change "my" globals to "our" Add mention of the License in
+	  the POD Minor comment cleanup to shorten .pm file
+
+2003-03-09 10:17  chris
+
+	* Cache.pm: trivial doc fix
+
+2003-01-31 13:11  chris
+
+	* Cache.pm: Fix index command
+
+2003-01-31 11:26  tasc
+
+	* Cache.pm: Set locking default to off.
+
+2003-01-31 11:22  chris
+
+	* Cache.pm: v0.23 * Add an option to turn off table locking * Add
+	  index creation to the seyup() function
+
+2003-01-17 10:57  chris
+
+	* Cache.pm: Make the template still work if there is not cachekey
+	  specified
+
+2003-01-07 10:53  chris
+
+	* COPYRIGHT, Cache.pm, MANIFEST, README, test.pl: v0.21: prep for
+	  release * Add save method to make it easier to subclass * Add
+	  lots of documentation * Add apologies in the lame test script
+
+2002-06-10 16:38  tasc
+
+	* Cache.pm: Change all class methods to require PACKAGE->method()
+	  syntax.  Bumped version
+
+2002-06-07 15:24  tasc
+
+	* Cache.pm: Change default column names Trivial code formatting
+	  fixes
+
+2002-06-06 16:01  tasc
+
+	* Makefile.PL: Fix CAM::Template number
+
+2002-06-06 15:57  tasc
+
+	* Cache.pm: Fix bug (called toString instead of toStringCache)
+	  Added some diagnostics
+
+2002-06-06 15:40  tasc
+
+	* Cache.pm: Allow more arguments to new() to go to SUPER::new() Fix
+	  doc typo
+
+2002-06-06 15:29  tasc
+
+	* Cache.pm: Fix timestamp comparison bug
+
+2002-06-06 15:20  chris
+
+	* Makefile.PL: set dependency
+
+2002-06-06 15:19  tasc
+
+	* Cache.pm: Bug fixes
+
+2002-06-06 14:54  chris
+
+	* Cache.pm: Fix typos
+
+2002-06-06 14:51  chris
+
+	* Makefile: Oops, didn't mean to import this
+
+2002-06-06 14:50  chris
+
+	* Cache.pm, MANIFEST, Makefile, Makefile.PL, test.pl: Initial
+	  revision
+
+2002-06-06 14:50  chris
+
+	* Cache.pm, MANIFEST, Makefile, Makefile.PL, test.pl: initial
+	  import
+

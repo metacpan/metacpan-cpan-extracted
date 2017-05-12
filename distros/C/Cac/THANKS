@@ -1,0 +1,19 @@
+Some people or companies that really helped me during development
+of this module:
+
+Marc Lehmann <pcg@goof.com>
+     Marc is one of the authors of Perl and known for his high-performance
+     pgcc-compiler. He answered a lot of question and even more important
+     he asked a lot of questions.
+
+Gerd Nachtsheim <gerd@nachtsheim.name>
+     Gerd is a sales engineer of Intersystems and known for hating Perl.
+     The fact that he is constantly talking down Perl motivated me a
+     lot. He also suggested to release this framework to public which
+     caused a lot of cleanup work to be done.
+
+KW-Computer Ges.m.b.H <kwc@kwc.at>
+     The company I (currently :) work for. I wrote parts of the first
+     release of this framework in working hours. Cache-Perl runs
+     on more than hundred sites in production. They allowed
+     me to release parts of stuff I wrote under LGPL license.

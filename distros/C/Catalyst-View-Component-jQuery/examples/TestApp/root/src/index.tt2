@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>Catalyst::View::Component::jQuery Demo</title>
+[% jquery.link_elements %]
+[% jquery.script_src_elements %]
+</head>
+<body>
+    <h2>Catalyst::View::Component::jQuery Demo</h2>
+<p>
+    Navigation menu generated automatically from Catalyst application action attributes (MenuPath and MenuTitle).
+</p>
+<div style="float: left">
+[% menu %]
+</div>
+<p style="clear: both">
+    This page demonstrates the use of <a href="http://search.cpan.org/perldoc?Catalyst::View::Component::jQuery">Catalyst::View::Component::jQuery</a>
+    to make a "jquery" method available in your TT templates.
+</p>
+<p><a href="http://search.cpan.org/perldoc?CatalystX::Menu::Suckerfish">CatalystX::Menu::Suckerfish</a>
+    is used to generate a Suckerfish-style menu from action attributes defined in the TestApp application.
+    Modify the MenuPath and MenuTitle attributes and restart the application to see how the menu is
+    automatically generated on-the-fly.
+</p>
+<p>
+    Running the testapp_server.pl script with the -r switch will automatically restart the script if you 
+    want a quick way to test changes.
+</p>
+<p>
+The following three lines in the template print the html elements required to fetch the stylesheets and
+JavaScript files required by your jQuery plugins, and then the jQuery ready event.
+[% stag = "[\%"
+   etag = "%\]"
+%]
+<p>
+<strong><code>
+[% stag; ' jquery.link_elements '; etag %]
+</code></strong>
+</p>
+<p>Inserts:</p>
+<pre>
+&lt;link type="text/css" href="/static/css/theme/jquery-ui.custom.css" rel="stylesheet" media="all" /&gt;
+&lt;link type="text/css" href="/static/css/superfish.css" rel="stylesheet" media="all" /&gt;
+&lt;link type="text/css" href="/static/css/superfish-vertical.css" rel="stylesheet" media="all" /&gt;
+&lt;link type="text/css" href="/static/css/superfish-navbar.css" rel="stylesheet" media="all" /&gt;
+&lt;link type="text/css" href="/static/site/css/superfish.css" rel="stylesheet" media="all" /&gt;
+&lt;link type="text/css" href="/static/site/css/superfish-skin.css" rel="stylesheet" media="all" /&gt;
+</pre>
+
+<p>
+<strong><code>
+[% stag; ' jquery.script_src_elements '; etag %]
+</code></strong>
+</p>
+<p>Inserts:</p>
+<pre>
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/jquery-ui.min.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/static/js/hoverIntent.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/static/js/superfish.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/static/js/supersubs.js"&gt;&lt;/script&gt;
+</pre>
+
+<p>
+<strong><code>
+[% stag; ' jquery.document_ready '; etag %]
+</code></strong>
+</p>
+</p>
+<p>Inserts:</p>
+<pre>
+&lt;script type="text/javascript"&gt;
+//&lt;![CDATA[
+$(document).ready(function (){
+$("ul.sf-menu").supersubs({
+minWidth : 12,
+maxWidth : 13,
+extraWidth : 1
+}).superfish({
+delay : 500,
+animation : { opacity : "show" },
+dropShadows : true
+});
+});
+//]]&gt;
+&lt;/script&gt;
+</pre>
+
+[% jquery.document_ready %]
+</body>
+</html>

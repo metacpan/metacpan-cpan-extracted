@@ -1,0 +1,49 @@
+=for HTML <a href="https://travis-ci.org/mnunberg/perl-Couchbase-Client"><img src="https://travis-ci.org/mnunberg/perl-Couchbase-Client.svg?branch=sdk20"></a>
+
+
+=head1 NAME
+
+Couchbase::README - README for Couchbase
+
+=head1 Introduction
+
+Couchbase is a Perl client for Couchbase (http://www.couchbase.org). This
+I<replaces> the older L<Couchbase::Client>
+
+Installing this module depends on the C<libcouchbase> library
+(L<http://couchbase.com/communities/c>,
+L<http://packages.couchbase.com/clients/c/index.html>). You must
+have at least version I<2.4.2> installed. The library should exist in your
+current compiler's search path (this is usually the case if you've used
+the default installation methods). Inspect the C<author_utils/do_make.pl>
+script in the source repository for ways to link against a custom install
+prefix.
+
+
+Using this library will mainly deal with the L<Couchbase::Bucket> class,
+so have a look there!
+
+
+
+=head1 SUPPORT
+
+Support for this module is provided by the author. You can find him on
+the C<#libcouchbase> IRC channel on the freenode network under the name
+C<mnunberg> (number of trailing underscores may vary depending on his
+network).
+
+You can also try to file a bug in the github repository
+(L<https://github.com/mnunberg/perl-Couchbase-Client>).
+
+
+=head1 CONTRIBUTING
+
+
+This module is primarily authored in XS. The C<xs> directory contains
+the relevant C source code.
+
+
+To run the tests you will need a copy of C<CouchbaseMock.jar> in the C<t/tmp>
+directory. You may obtain this by glancing into the source code of libcouchbase
+itself and downloading from the URL. Here's an example from the 2.4.2 version:
+L<https://github.com/couchbase/libcouchbase/blob/2.4.2/Makefile.am#L241>

@@ -1,0 +1,26 @@
+Changes
+lib/CatalystX/CRUD/Model/RDBO.pm
+lib/CatalystX/CRUD/Object/RDBO.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-rdbo.t
+t/02-rest.t
+t/boilerplate.t
+t/lib/My/Bar.pm
+t/lib/My/DB.pm
+t/lib/My/Foo.pm
+t/lib/My/FooBar.pm
+t/lib/MyApp.pm
+t/lib/MyApp/Base/RDBO.pm
+t/lib/MyApp/Controller/Foo.pm
+t/lib/MyApp/Controller/REST/Foo.pm
+t/lib/MyApp/Form/Foo.pm
+t/lib/MyApp/Model/Bar.pm
+t/lib/MyApp/Model/Foo.pm
+t/lib/MyApp/Object.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

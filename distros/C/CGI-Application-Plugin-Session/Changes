@@ -1,0 +1,121 @@
+Revision history for Perl extension CGI::Application::Plugin::Session.
+
+1.05      2013-12-21 11:31:00 America/Chicago
+    - Stop depending on ->DESTROY to call ->flush (reported by Gareth Tunley)
+
+1.04      2013-11-14 10:48:29 America/Chicago
+
+    - Fix hash randomization bug tickled by perl 5.18
+      (Arthur Axel 'fREW' Schmidt)
+    - Delete some dead code (RT#46587, Nate Smith)
+    - Use instance name instead of global CGI::Session->name (Lee Carmichael)
+
+1.03
+
+    - Add session_recreate method (suggested by Robert Bauck Hamar)
+    - Add session_loaded method (Sven Neuhaus)
+
+1.02  Tue May 23 12:03:19 EDT 2006
+
+    - When calling session_delete, make sure that the session is
+      created first, in case the user hasn't called $self->session
+      (Yuji Maeda)
+    - When session_delete is called, make sure that we remove any
+      session cookies that may be in the outgoing headers before
+      adding in the session timeout cookie.
+
+1.01  Fri Mar  3 21:03:45 EDT 2006
+
+    - Fix bug when using CGI::Fast (reported by Yuji Maeda)
+    - Clarify the SEND_COOKIE docs to mention that a cookie is only
+      set if the session object is created during the request
+      (Mark Stosberg)
+
+1.00  Sun Feb  5 16:44:33 EDT 2006
+
+  Bug fixes:
+    - Test return value from CGI::Session to make sure the session
+      object was created properly. (perlmonkey -at- gmail.com)
+
+0.09  Sun Sep 11 21:22:06 EDT 2005
+
+    - Added session_delete() method to send expired cookie to client
+      (Jason Purdy)
+
+0.08  Wed Jul  6 12:06:04 EDT 2005
+
+    - Simplify the pod tests according to Test::Pod docs
+    - Allow -expires attribute for the cookie header to be blank
+      so that an expiry date is not put on the session automatically
+      (Curtis Hawthorne)
+
+0.07  Sat Jun 11 13:24:38 EDT 2005
+
+    - New config option DEFAULT_EXPIRY which will automatically call
+      the CGI::Session 'expire' method for all newly created sessions
+    - The cookie now sets the Expires header based on the expiry
+      time of the CGI::Session object (patch by Mark Stosberg)
+    - Changed the hash key where we store all the private info in
+      the CGI::Application object to be a bit more unique to this
+      plugin module
+    - expanded the coverage of the test suite
+  Bug fixes:
+    - If you didn't import the session_cookie method into your
+      namespace, calls to $self->session would fail.
+    - If you called session_cookie manually, it was possible under
+      specific conditions that the session wasn't created yet,
+      and the cookie would not be created properly
+
+0.06  Tue Oct 19 22:15:48 EST 2004
+
+    - CGI::Session will currently only work with CGI.pm so check to see
+      if CGI::Application is configured to use another CGI.pm like
+      module like CGI::Simple
+    - Be more intelligent about choosing a default temporary directory
+      for windows users (suggested by Dan Horne)
+    - Add a doc note to warn users when they change the name of the
+      cookie, to also notify CGI::Session->name
+
+0.05  Sun Sep 19 18:13:03 EST 2004
+
+    - scrap CGI::Application::Plugin support for simple Exporter
+      system.
+    - Moved module to the CGI::Application::Plugin namespace
+
+0.04  Mon Jul 26 23:44:39 EST 2004
+
+    - add support for the new CGI::Application::Plugin base class
+
+0.03  Tue Feb 10 22:12:29 EST 2004
+
+  - fool Module::Build into ignoring the 'package CGI::Application'
+    directive in CGI::Application::Session so that it doesn't list
+    CGI::Application as being provided by the distribution in the
+    META.yml file. (there must be a better way!)
+
+  - updated the Build.PL script
+
+  - Fixed a silly documentation error
+
+
+0.02  Tue Feb 10 14:59:51 EST 2004
+
+  - WARNING: changed the way in which session_config accepts
+    parameters.  Please check the docs because this will
+    affect anyone that was using the session_config method
+    in version 0.01.  It is more flexible now, and will allow
+    for future additions.
+
+  - altered doc example by moving authentication check
+    to cgiapp_prerun to co-inside with the examples in the
+    CGI::Application docs - "Clayton L. Scott" tex -at- engsoc.org
+
+  - automatically add a cookie to the outgoing headers if there
+    isn't one there already (requires CGI::Application 3.21)
+
+  - changed the code to conform to some of the CGI::Application
+    coding standards
+
+0.01  Sun Jan 18 11:06:49 2004
+	- original version; created by h2xs 1.19
+

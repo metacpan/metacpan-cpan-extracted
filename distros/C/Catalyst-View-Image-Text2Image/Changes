@@ -1,0 +1,12 @@
+Revision history for Catalyst-View-Image-Text2Image
+
+0.02	2012-03-14
+		- testet "transparent"-Option.
+		- added "clear"-Option to set background-gcolor of canvas.
+		- Bug in parameter check in &text2image.
+		- check for GD::Simple and Catalyst::View in tests and PREREQ_PM.
+		- improved documentation and examples.
+
+0.01    2012-03-13
+        Initial Release
+

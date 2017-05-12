@@ -1,0 +1,160 @@
+[% 
+    IF (!r.defined);
+        THROW crud '"r" must be defined in ' _ component.name;
+    END;
+    
+    SET base_url = c.uri_for('/' _ r.livegrid.controller.path_prefix);
+    SET foreign = {
+        'url'           => base_url,
+        'chooser_url'   => base_url _ '/livegrid?',
+        'column_map'    => r.rel_info.cmap.list('each') || 0,
+        'action'        => (c.session.prefs.default_crud_action 
+                            || (rel_info.controller.can_write(c) 
+                                    ? 'edit' : 'view')),
+        'name'          => r.method,
+        'can_read'      => r.authz_controller.can_read(c),
+        'can_write'     => r.authz_controller.can_write(c),
+        'rm_button'     => 0,
+        'm2m'           => 0
+    };
+    
+    # controller can define extra query params to limit the returned dataset
+    IF (rel_info.controller.can('livegrid_filter'));
+        SET extra_params = r.rel_info.controller.livegrid_filter(c, object, r.rel_info);
+        foreign.chooser_url = foreign.chooser_url _ extra_params;
+    END;
+    
+    # UI controls
+    IF r.rel_info.map_class;
+        #r.rel_info.as_hash.dump_data;
+        SET foreign.m2m = 1;
+        SET foreign.column_map = [r.rel_info.map_from_column, r.rel_info.map_to_column];
+        IF EDITMODE != 0;
+            SET foreign.rm_button = 1;
+        END;
+    END;
+    SET parent = { 
+        'column_map'    => [], 
+        'url'           => c.uri_for(oid),
+        'oid'           => oid,
+        'oidLabel'      => object.unique_value,
+        'livegrid'      => c.uri_for(oid, 'livegrid_related', r.method, 
+                                {   'cxc-m2m'           => foreign.m2m
+                                }),
+    };
+    CALL r.livegrid.url( parent.livegrid );
+                                
+    FOR col_name = r.rel_info.cmap.keys;
+        parent.column_map.push( col_name );
+        parent.column_map.push( object.$col_name );
+    END;    
+
+%]
+<div id="livegrid[% r.livegrid.counter %]"></div>
+<div id="livegrid[% r.livegrid.counter %]-chooser" class="chooser"></div>
+<div id="livegrid[% r.livegrid.counter %]-form" class=""></div>
+<script type="text/javascript">
+/* <![CDATA[ */
+  var relTab    = YAHOO.crud.new_relTab();
+  relTab.index  = [% r.livegrid.counter %];
+  relTab.id     = '[% r.method %]Tab';
+  relTab.name   = '[% r.method %]';
+  var buttons = ['-'];
+  [% IF (
+            foreign.can_write 
+        && !RelOpts.hide_create.exists(r.method)
+        )
+        && !foreign.m2m # o2m only
+     %]
+  buttons.push({
+        text    : 'Create new [% r.thisLabel %]',
+        handler : function(btn){ 
+            window.location = '[% r.create_new_url %]';
+        }
+  }, '-');
+  [%- END -%]
+  [% IF foreign.can_write %]
+   [% UNLESS RelOpts.lock.exists( r.method ) %]
+  buttons.push({
+        text    : '[% foreign.m2m ? 'Add' : 'Reassign' %] [% r.thisLabel %]',
+        tooltip :'Add a new row',
+        iconCls :'plus-button',
+        handler : function(btn) { 
+            YAHOO.crud.add_livegrid_row({
+                'index' : [% r.livegrid.counter %],
+                'btn'   : btn
+            });
+        }
+  }, '-');
+   [%- END -%]
+  [%- END # can_write -%]
+  [% IF !r.rel_info.map_class # TODO support excel export for m2m records %]
+  buttons.push({
+         text : 'Export as Excel',
+         handler: function(btn) {
+            window.location = '[% r.export_as_xls_url %]';
+         }
+  }, '-');
+  [%- END -%]
+  [% IF EDITMODE != 0 -%]
+    [% IF foreign.rm_button # m2m may be deleted %]
+  buttons.push({
+         text    : 'Remove selected rows',
+         tooltip : 'Dis-associate the selected [% r.method %]',
+         iconCls : 'remove',
+         handler : function(btn) {
+             YAHOO.crud.rm_livegrid_rows({
+                "index"    :[% r.livegrid.counter %],
+                'btn'      :btn
+             });
+         }
+  }, '-');
+    [%- END -%]
+  [% ELSE # i.e. in view mode %]
+  buttons.push({
+        text    : 'Edit [% r.thisLabel %]',
+        handler : function(btn){ window.location = 
+            '[% ThisURL # defined in edit.tt %]/edit#tabview=[% r.method %]Tab'}
+  }, '-');
+  [% END # end EDITMODE %]
+  relTab.grid.opts = {
+        index       : [% r.livegrid.counter %],
+        reader : {
+            opts    : [% r.livegrid.json_reader_opts.as_json %], 
+            columns : [% r.livegrid.json_reader_columns.as_json %]
+        },
+        sort_by     : '[% r.livegrid.sort_by %]',
+        sort_dir    : '[% r.livegrid.sort_dir %]',
+        url         : '[% r.livegrid.url %]',
+        div_id      : 'livegrid[% r.livegrid.counter %]',
+        parent      : [% parent.as_json %],
+        foreign     : [% foreign.as_json %],
+        column_defs : [% r.livegrid.column_defs.as_json %],
+        pk          : [% r.livegrid.pk.as_json %],
+        hidePKs     : [% r.livegrid.hide_pk_columns ? 'true' : 'false' %],
+        name        : "[% foreign.name | ucfirst %]",
+        tools       : buttons,
+        title       : '[% r.thisLabel %]',
+        defer_load  : true,
+        num_fields  : [% r.num_fields %],
+        rm_button   : [% foreign.rm_button ? 'true' : 'false' %],
+        clickhandler: function(sm, rowIndex, rec) {
+            YAHOO.crud.handle_related_livegrid_click({
+                'sm'        : sm,
+                'rowIndex'  : rowIndex,
+                'rec'       : rec,
+                'index'     : [% r.livegrid.counter %],
+                'url'       : '[% r.base_url %]/',
+                'm2m_url'   : '[% r.map_class_url %]/',
+                'action'    : '[% r.rowclick_action %]'
+            });
+        },
+        filters     : [% r.livegrid.col_filter.as_json %],
+        text_columns: [% r.livegrid.text_columns.as_json || '[]' %]
+  };
+  YAHOO.util.Event.onDOMReady(function() {
+    YAHOO.crud.new_livegrid([% r.livegrid.counter %]); 
+  });
+  YAHOO.crud.TABS[[% r.livegrid.counter %]] = relTab;
+/* ]]> */
+</script>

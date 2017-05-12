@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  55922:
+    - 146
+name: fdcb1e
+registers:
+  AF: 12161
+  AF_: 0
+  BC: 9328
+  BC_: 0
+  DE: 46369
+  DE_: 0
+  HL: 27811
+  HL_: 0
+  I: 0
+  IX: 4198
+  IY: 55864
+  PC: 4
+  R: 2
+  SP: 0

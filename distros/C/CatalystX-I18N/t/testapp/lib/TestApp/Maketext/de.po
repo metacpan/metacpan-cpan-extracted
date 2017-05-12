@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: plurals=2; plural=n != 1\n;"
+
+msgid "string1"
+msgstr "string1 de"
+
+msgid "string2"
+msgstr "string2 de"
+
+msgid "string4"
+msgstr "string4 de %quant(%1,hase,hasen)"
+
+msgid "string5"
+msgstr "string5 de"

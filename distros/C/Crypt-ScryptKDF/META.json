@@ -1,0 +1,55 @@
+{
+   "abstract" : "Scrypt password based key derivation function",
+   "author" : [
+      "Karel Miko"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-ScryptKDF",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "MIME::Base64" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.59",
+            "MIME::Base64" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::ScryptKDF" : {
+         "file" : "lib/Crypt/ScryptKDF.pm",
+         "version" : "0.010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/DCIT/perl-Crypt-ScryptKDF"
+      }
+   },
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

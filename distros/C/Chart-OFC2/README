@@ -1,0 +1,147 @@
+NAME
+    Chart::OFC2 - Generate html and data files for use with Open Flash Chart
+    version 2
+
+SYNOPSIS
+    OFC2 html:
+
+        use Chart::OFC2;
+    
+        my $chart = Chart::OFC2->new(
+            'title'  => 'Bar chart test',
+        );
+        print $chart->render_swf(600, 400, 'chart-data.json', 'test-chart');
+
+    OFC2 bar chart data:
+
+        use Chart::OFC2;
+        use Chart::OFC2::Axis;
+        use Chart::OFC2::Bar;
+    
+        my $chart = Chart::OFC2->new(
+            'title'  => 'Bar chart test',
+            x_axis => {
+                labels => {
+                    labels => [ 'Jan', 'Feb', 'Mar', 'Apr', 'May' ],
+                }
+            },
+        );
+    
+        my $bar = Chart::OFC2::Bar->new();
+        $bar->values([ 1..5 ]);
+        $chart->add_element($bar);
+
+        print $chart->render_chart_data();
+
+WARNING
+    Current version implements just subset of functionality that Open Flash
+    Chart 2 is offering. But it should help you to starting creating OFC2
+    graphs quite fast. The JSON format is quite intuitive and can be created
+    from any hash. This module is more like guideline.
+
+    This is early version PROTOTYPE so the API WILL change, be careful when
+    upgrading versions.
+
+DESCRIPTION
+    OFC2 is a flash script for creating graphs. To have a graph we need an
+    open-flash-chart.swf and a JSON data file describing graph data.
+    Complete examples you can find after successful run of this module tests
+    in t/output/ folder - t/output/bar.html, t/output/pie.html,
+    t/output/hbar.html are html graphs and t/output/bad-data.json,
+    t/output/pie-data.json, t/output/hbar-data.json are the data files.
+
+PROPERTIES
+        has 'data_load_type' => (is => 'rw', isa => 'Str',  default => 'inline_js');
+        has 'bootstrap'      => (is => 'rw', isa => 'Bool', default => '1');
+        has 'title'          => (is => 'rw', isa => 'Chart::OFC2::Title', default => sub { Chart::OFC2::Title->new() }, lazy => 1, coerce  => 1);
+        has 'x_axis'         => (is => 'rw', isa => 'Chart::OFC2::XAxis', default => sub { Chart::OFC2::XAxis->new() }, lazy => 1,);
+        has 'y_axis'         => (is => 'rw', isa => 'Chart::OFC2::YAxis', default => sub { Chart::OFC2::YAxis->new() }, lazy => 1, );
+        has 'elements'       => (is => 'rw', isa => 'ArrayRef', default => sub{[]}, lazy => 1);
+        has 'extremes'       => (is => 'rw', isa => 'Chart::OFC2::Extremes',  default => sub { Chart::OFC2::Extremes->new() }, lazy => 1);
+        has 'tooltip'        => (is => 'rw', isa => 'Chart::OFC2::ToolTip',);
+        has 'bg_colour'      => (is => 'rw', isa => 'Str',  default => 'f8f8d8', alias => 'bg_color' );
+
+METHODS
+  new()
+    Object constructor.
+
+  get_element($type)
+    Returns new chart object of selected type. Currently only `bar' and
+    `pie' is available.
+
+  add_element($element)
+    Adds passed element to the graph.
+
+  render_chart_data
+    Returns stringified JSON encoded graph data.
+
+  auto_extremes
+    Recalculate graph auto extremes.
+
+  render_swf($width, $height, $data_url, $div_id)
+    Returns html snippet that will represent one graph in a html document.
+
+    WARN: the arguments format will change to `key =' value> in the next
+    releases.
+
+FUNCTIONS
+  smoother_number
+    round the number up a bit to a nice round number also changes number to
+    an int
+
+  smooth($axis_name, $axis_type)
+    Smooth axis min/max.
+
+  bg_color()
+    Same as bg_colour().
+
+NOTE
+    Refresh button will not cause the data file of the graph to be reloaded
+    so either use proper expiration settings for it or change the name of
+    the file in html every time you generate new data. Like
+    `"data.json?".time()'.
+
+SEE ALSO
+    Chart::OFC, http://teethgrinder.co.uk/open-flash-chart-2/,
+    http://github.com/jozef/chart-ofc2/
+
+AUTHOR
+    Jozef Kutej `<jkutej@cpan.org>'
+
+    I've used some of the code from the perl-ofc-library/open_flash_chart.pm
+    that is shipped together with all the rest OFC2 files.
+
+CONTRIBUTORS
+    The following people have contributed to the Chart::OFC2 by commiting
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advices, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        Rodney Webster
+        John Goulah C<< <jgoulah@cpan.org> >>
+        Noë Snaterse
+        Adam J. Foxson C<< <atom@cpan.org> >>
+        Jeff Tam
+
+SUPPORT
+    * Mailinglist
+        http://lists.meon.sk/mailman/listinfo/chart-ofc2
+
+    * GitHub: issues
+        http://github.com/jozef/chart-ofc2/issues
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chart-OFC2
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Chart-OFC2
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Chart-OFC2
+
+    * Search CPAN
+        http://search.cpan.org/dist/Chart-OFC2
+
+COPYRIGHT AND LICENSE
+    GNU GPL
+

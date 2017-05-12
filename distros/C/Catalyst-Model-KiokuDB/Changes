@@ -1,0 +1,31 @@
+0.12  09 Aug 2010
+  - Make the prefix used to look up users configurable.
+
+0.11
+  - Passing random args to the config is now deprecated, use 'model_args' and
+    give it a hash (dsn is still supported)
+
+0.10 29 Sep 2009
+  - WARNING: This release is backward-incompatible with previous ones, if you
+    define methods directly in your catalyst model class and expect to be able
+    to call them as ->model('KiokuDB')->your_method.
+  - Make ->model('KiokuDB') return an instance of the configured model_class
+    (or KiokuX::Model by default) instead of a Catalyst::Model::KiokuDB
+    instance. This way, you can define custom methods in your KiokuX::Model
+    subclass and be able to access them as via ->model('KiokuDB')->your_method,
+    instead of only having the methods defined by KiokuDB::Role::API delegated
+    to your KiokuX::Model.
+
+0.03 28 Sep 2009
+  - Support ->authenticate({ username => ... }) in addition to
+    ->authenticate({ id => ... }), because the former is used in almost all
+    docs available and should therefore Just Work.
+
+0.02
+  - Require Catalyst 5.8 and so remove nasty back compatibility hack (t0m)
+  - When find_user is implemented by the model the 'id' field is no longer
+    mandatory. (Jason Kohles)
+
+0.01 28 Feb 2009
+  - Initial version
+

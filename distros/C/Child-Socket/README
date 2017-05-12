@@ -1,0 +1,68 @@
+NAME
+    Child::Socket - Socket based IPC plugin for Child
+
+DESCRIPTION
+    Lets you create a Child object, disconnect from it, and reconnect later
+    in the same or different process.
+
+REQUIREMENT NOTE
+    Requires UNIX socket support.
+
+SYNOPSIS
+        use Child qw/child/;
+
+        # Build with Socket IPC
+        my $proc = child {
+            my $parent = shift;
+            $parent->say("message1");
+            my $reply = $parent->read();
+        } socket => 1;
+
+        my $message1 = $proc->read();
+        $proc->say("reply");
+
+DISCONNECTING AND RECONNECTING
+    sript1.pl:
+
+        #!/usr/bin/perl;
+        use Child qw/child/;
+
+        $proc = child {
+            my $parent = shift;
+
+            # detach will remove the child from the parents process group.
+            $parent->detach;
+
+            $parent->disconnect;
+
+            # $parent->connect accepts a client connection
+            # argument is timeout in seconds
+            $parent->connect(10);
+
+            $parent->say( "Hi" );
+        } socket => '/tmp/my-socket';
+
+        $proc->disconnect;
+
+    script2.pl:
+
+        #!/usr/bin/perl;
+        use Child qw/proc_connect/;
+
+        my $proc = proc_connect( '/tmp/my-socket' );
+
+        my $msg = $proc->read; # "Hi\n"
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Chad Granum
+
+    Child-Socket is free software; Standard perl licence.
+
+    Child-Socket is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

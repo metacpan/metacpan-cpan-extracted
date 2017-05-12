@@ -1,0 +1,28 @@
+---
+name: CGI-Application-Plugin-Authentication-Driver-DBIC
+version: 0.02
+author:
+  - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
+abstract: DBIx::Class Authentication Driver
+license: perl
+requires:
+  CGI::Application::Plugin::Authentication: 0.06
+  DBIx::Class: 0
+recommends:
+  CGI::Application::Plugin::Session: 0
+  DBD::SQLite: 0
+  Digest::MD5: 0
+  Module::Signature: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+build_requires:
+  CGI: 0
+  CGI::Application::Plugin::Authentication: 0.06
+  DBIx::Class: 0
+  File::Path: 0
+  Test::More: 0
+provides:
+  CGI::Application::Plugin::Authentication::Driver::DBIC:
+    file: lib/CGI/Application/Plugin/Authentication/Driver/DBIC.pm
+    version: 0.02
+generated_by: Module::Build version 0.26

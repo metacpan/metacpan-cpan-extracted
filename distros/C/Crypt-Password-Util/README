@@ -1,0 +1,94 @@
+SYNOPSIS
+
+     use Crypt::Password::Util qw(
+         crypt
+         looks_like_crypt
+         crypt_type
+     );
+
+    Generating crypted password:
+
+     say crypt('pass'); # automatically choose the appropriate type and salt
+
+    Recognizing whether a string is a crypted password:
+
+     # return yes/no
+     say looks_like_crypt('62F4a6/89.12z');   # 1
+     say looks_like_crypt('foo');             # 0
+    
+     # return the crypt type
+     say crypt_type('62F4a6/89.12z');                    # CRYPT
+     say crypt_type('$1$$...');                          # MD5-CRYPT
+     say crypt_type('$apr1$4DdvgCFk$...');               # MD5-CRYPT
+     say crypt_type('$5$4DdvgCFk$...');                  # SSHA256
+     say crypt_type('$6$4DdvgCFk$...');                  # SSHA512
+     say crypt_type('1a1dc91c907325c69271ddf0c944bc72'); # PLAIN-MD5
+     say crypt_type('$2a$08$TTSynMjJTrXiv3qEZFyM1.H9tjv71i57p2r63QEJe/2p0p/m1GIy2'); # BCRYPT
+     say crypt_type('foo');                              # undef
+    
+     # return detailed information
+     my $res = crypt_type('$1$$oXYGukVGYa16SN.Pw5vNt/', 1);
+     # => {type=>'MD5-CRYPT', header=>'$1$', salt=>'', hash=>'oXYGukVGYa16SN.Pw5vNt/'}
+     $res = crypt_type('foo', 1);
+     # => undef
+
+DESCRIPTION
+
+    Crypt::Password::Util provides routines to: 1) generate crypted
+    password; 2) recognition of whether a string is a crypted password or
+    not, and its crypt type.
+
+    It recognizes several types of crypt methods:
+
+    # CODE: require Crypt::Password::Util; my $types =
+    \%Crypt::Password::Util::CRYPT_TYPES; print "=over\n\n"; for my $type
+    (sort keys %$types) { print "=item *
+    $type\n\n$types->{$type}{summary}.\n\nRecognized by:
+    $types->{$type}{re_summary}.\n\nMore info: $types-{$type}{link}>\n\n" }
+    print "=back\n\n";
+
+FUNCTIONS
+
+ looks_like_crypt($str) => bool
+
+    Return true if $str looks like a crypted password. If you want more
+    information instead of just a yes/no, use crypt_type().
+
+ crypt_type($str[, $detail]) => str|hash
+
+    Return crypt type, or undef if $str does not look like a crypted
+    password. Currently known types:
+
+    If $detail is set to true, will return a hashref of information
+    instead. This include type, as well as the parsed header, salt, etc.
+
+ crypt($str) => str
+
+    Try to create a "reasonably secure" crypt password with the support
+    available from the system's crypt().
+
+    Will first try to create a cost-based crypt, using rounds value that
+    will approximately take ~10ms (on my PC computer, an Intel Core i5-2400
+    CPU, that is) to create. This lets a server verify ~100 passwords per
+    second, which should be enough for many cases. On OpenBSD, will try
+    BCRYPT with cost=7. On other systems, will try SSHA512 with
+    rounds=15000.
+
+    If the above fails (unsupported by your crypt()), will fallback to
+    MD5-CRYPT (supported by NetBSD), then CRYPT. Will die if that also
+    fails.
+
+SEE ALSO
+
+    Authen::Passphrase which recognizes more encodings (but currently not
+    SSHA256 and SSHA512).
+
+    Crypt::Bcrypt::Easy to generate BCRYPT crypts on systems that do not
+    natively support it.
+
+    Crypt::PasswdMD5 to generate MD5-CRYPT crypts on systems that do not
+    natively support it.
+
+    Crypt::Password which also provides a routine to compare a password
+    with a crypted password.
+

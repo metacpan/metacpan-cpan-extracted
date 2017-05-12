@@ -1,0 +1,284 @@
+NAME
+    Crypt::DSA::GMP - DSA Signatures and Key Generation
+
+SYNOPSIS
+        use Crypt::DSA::GMP;
+        my $dsa = Crypt::DSA::GMP->new;
+
+        my $key = $dsa->keygen(
+                       Size      => 512,
+                       Seed      => $seed,
+                       Verbosity => 1
+                  );
+
+        my $sig = $dsa->sign(
+                       Message   => "foo bar",
+                       Key       => $key
+                  );
+
+        my $verified = $dsa->verify(
+                       Message   => "foo bar",
+                       Signature => $sig,
+                       Key       => $key,
+                  );
+
+DESCRIPTION
+    Crypt::DSA::GMP is an implementation of the DSA (Digital Signature
+    Algorithm) signature verification system. The implementation itself is
+    pure Perl, with mathematics support from Math::BigInt::GMP and
+    Math::Prime::Util::GMP.
+
+    This package provides DSA signing, signature verification, and key
+    generation.
+
+    This module is backwards compatible with Crypt::DSA. It removes a number
+    of dependencies that were portability concerns. It requires GMP.
+    Importantly, it follows FIPS 186-4 wherever possible, and has support
+    for the new hash methods.
+
+USAGE
+    The public interface is a superset of Crypt::DSA, and is intentionally
+    very similar to Crypt::RSA.
+
+  Crypt::DSA::GMP->new
+      my $dsa_2 = Crypt::DSA::GMP->new;
+      my $dsa_4 = Crypt::DSA::GMP->new( Standard => "FIPS 186-4" );
+
+    Constructs and returns a new Crypt::DSA::GMP object. This is the object
+    used to perform other useful actions.
+
+    The standard to follow may be given in this call, where it will be used
+    in all methods unless overridden. Currently only two standards exist:
+
+       FIPS 186-2 (includes FIPS 186-1)
+       FIPS 186-4 (includes FIPS 186-3)
+
+    FIPS 186-2 is used as the default to preserve backwards compatibility.
+    The primary differences:
+
+      - NIST deprecated the old standard in 2009.
+
+      - Crypt::DSA only supports the old standard.
+
+      - FIPS 186-4 uses SHA-2 rather than SHA-1 for random number
+        generation.  This produces better quality data.
+
+      - FIPS 186-2 allows I<q> to be 160 bits only, where using
+        FIPS 186-4 allows I<q> to be set between 1 and 512.
+
+      - The default size for I<q> is 160 bits in all cases with
+        FIPS 186-2, whereas for FIPS 186-4 it is 256 if I<Size>
+        is 2048 or larger (this matches C<openssl> v1.0.1).
+
+      - The signing and verification are done using SHA-1 for
+        FIPS 186-2, whereas FIPS 186-4 applies SHA256 when I<q> is
+        256 bits or smaller, and SHA512 otherwise.  Note that a
+        digest may be passed in to these functions, bypassing the
+        selected hashes.
+
+  $key = $dsa->keygen(%arg)
+    Generates a new of DSA key, including both the public and private
+    portions of the key.
+
+    *%arg* can contain:
+
+    *   Standard
+
+        If not provided or contains "186-1" or "186-2" then the backward
+        compatible implementation is used, using SHA-1. If it is provided
+        and contains "186-3" or "186-4" then the newer and recommended FIPS
+        186-4 standard is used.
+
+        For key generation this means different default and allowed sizes
+        for *q*, the use of SHA-256 or SHA-512 during random prime
+        generation, and the FIPS 186-4 updated prime generation method.
+
+        The FIPS 186-4 recommended primality tests are always used as they
+        are more stringent than FIPS 186-2.
+
+    *   Size
+
+        The size in bits of the *p* value to generate.
+
+        This argument is mandatory, and must be at least 256.
+
+    *   QSize
+
+        The size in bits of the *q* value to generate. This is optional.
+
+        If FIPS 186-2 is being used or *Size* is less than 2048, then the
+        default value will be 160. If FIPS 186-4 is being used and *Size* is
+        2048 or larger, then the default value is 256.
+
+        NIST SP 800-57 describes the cryptographic strengths of different
+        *Size* and *QSize* selections. Their table 2 includes:
+
+            Bits     L      N
+            -----  -----  -----
+              80    1024    160
+             112    2048    224       Bits = Bits of security
+             128    3072    256       L    = Size  = bit length of I<p>
+             192    7680    384       N    = QSize = bit length of I<q>
+             256   15360    512
+
+        In addition, if SHA-1 is used (the default without FIPS 186-4) then
+        the bits of security provided is strictly less than 80 bits.
+
+    *   Seed
+
+        A seed with which *q* generation will begin. If this seed does not
+        lead to a suitable prime, it will be discarded, and a new random
+        seed chosen in its place, until a suitable prime can be found.
+
+        A seed that is shorter than the size of *q* will be immediately
+        discarded.
+
+        This is entirely optional, and if not provided a random seed will be
+        generated automatically.
+
+    *   Verbosity
+
+        Should be either 0 or 1. A value of 1 will give you a progress meter
+        during *p* and *q* generation--this can be useful, since the process
+        can be relatively long.
+
+        The default is 0.
+
+    *   Prove
+
+        Should be 0, 1, *P*, or *Q*. If defined and true, then both the
+        primes for *p* and *q* will have a primality proof constructed and
+        verified. Setting to *P* or *Q* will result in just that prime being
+        proven. The time for proving *q* should be minimal, but proving *p*
+        when Size is larger than 1024 can be very time consuming.
+
+        The default is 0, which means the standard FIPS 186-4 probable prime
+        tests are done.
+
+  $key = $dsa->keyset(%arg)
+    Creates a key with given elements, typically read from another source or
+    via another module. *p*, *q*, and *g* are all required. One or both of
+    *priv_key* and *pub_key* are required. *pub_key* will be constructed if
+    it is not supplied but *priv_key* is not.
+
+  $signature = $dsa->sign(%arg)
+    Signs a message (or the digest of a message) using the private portion
+    of the DSA key and returns the signature.
+
+    The return value (the signature) is a *Crypt::DSA::GMP::Signature*
+    object.
+
+    *%arg* can include:
+
+    *   Standard
+
+        If not provided or contains "186-1" or "186-2" then the backward
+        compatible implementation is used, using SHA-1. If it is provided
+        and contains "186-3" or "186-4" then the newer and recommended FIPS
+        186-4 standard is used.
+
+        For message signing this means FIPS 186-2 uses SHA-1 for digest
+        construction and at most 160 bits of the digest is used. With FIPS
+        186-4, SHA-256 is used if the bit length of *q* is 256 or less and
+        SHA-512 is used otherwise. If the input is a Digest rather than a
+        Message, then there will be no difference.
+
+    *   Digest
+
+        A digest to be signed. If the digest length is larger than *N*, the
+        bit length of *q*, then only the leftmost *N* bits will be used (as
+        specified in FIPS 186-4).
+
+        You must provide either this argument or *Message* (see below).
+
+    *   Key
+
+        The *Crypt::DSA::GMP::Key* object with which the signature will be
+        generated. Should contain a private key attribute (*priv_key*).
+
+        This argument is required.
+
+    *   Message
+
+        A plaintext message to be signed. If you provide this argument,
+        *sign* will first produce a digest of the plaintext, then use that
+        as the digest to sign. Thus writing
+
+            my $sign = $dsa->sign(Message => $message, ... );
+
+        is a shorter way of writing
+
+            # FIPS 186-2:
+            use Digest::SHA qw( sha1 );
+            my $sig = $dsa->sign(Digest => sha1( $message ), ... );
+
+            # FIPS 186-4:
+            use Digest::SHA qw( sha256 );
+            my $sig = $dsa->sign(Digest => sha256( $message ), ... );
+
+  $verified = $dsa->verify(%arg)
+    Verifies a signature generated with "sign". Returns a true value on
+    success and false on failure.
+
+    *%arg* can contain:
+
+    *   Standard
+
+        If not provided or contains "186-1" or "186-2" then the backward
+        compatible implementation is used, using SHA-1. If it is provided
+        and contains "186-3" or "186-4" then the newer and recommended FIPS
+        186-4 standard is used.
+
+        For message verification this means FIPS 186-2 uses SHA-1 for digest
+        construction and at most 160 bits of the digest is used. With FIPS
+        186-4, SHA-256 is used if the bit length of *q* is 256 or less and
+        SHA-512 is used otherwise. If the input is a Digest rather than a
+        Message, then there will be no difference.
+
+    *   Key
+
+        Key of the signer of the message; a *Crypt::DSA::GMP::Key* object.
+        The public portion of the key is used to verify the signature.
+
+        This argument is required.
+
+    *   Signature
+
+        The signature itself. Should be in the same format as returned from
+        "sign", a Crypt::DSA::GMP::Signature object.
+
+        This argument is required.
+
+    *   Digest
+
+        The original signed digest. This must be computed using the same
+        hash that was used to sign the message.
+
+        Either this argument or *Message* (see below) must be present.
+
+    *   Message
+
+        As above in *sign*, the plaintext message that was signed, a string
+        of arbitrary length. A digest of this message will be created and
+        used in the verification process.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Crypt-DSA-GMP>
+
+    For other issues, contact the author.
+
+AUTHORS
+    Dana Jacobsen <dana@acm.org> wrote the new internals.
+
+    Benjamin Trott <ben@sixapart.com> wrote Crypt::DSA which was the basis
+    for this module. The PEM module remains almost entirely his code.
+
+COPYRIGHT
+    Copyright 2013 by Dana Jacobsen <dana@acm.org>. Portions Copyright
+    2006-2011 by Benjamin Trott.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

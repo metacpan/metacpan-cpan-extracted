@@ -1,0 +1,30 @@
+---
+abstract: 'User role-based authorization action class'
+author:
+  - 'David P.C. Wollmann <converter42@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-ActionRole-ACL
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Controller::ActionRole: 0
+  Catalyst::Runtime: 5.90013
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bobtfish/catalyst-actionrole-acl.git
+version: 0.07

@@ -1,0 +1,13 @@
+Revision history for CGI-Wiki-Store-Mediawiki
+
+0.02    August 28, 2006
+
+	- Enable user creation.
+	- Add list_dangling_links & list_backlinks methods.
+	- Return rc_patrolled as metadata.
+	- Minor bug fixes.
+	- Minor code & doc cleanup.
+
+0.01    August 15, 2006
+        First version, released on an unsuspecting world.
+

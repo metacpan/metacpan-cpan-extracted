@@ -1,0 +1,1247 @@
+.rn '' }`
+''' $RCSfile$$Revision$$Date$
+'''
+''' $Log$
+'''
+.de Sh
+.br
+.if t .Sp
+.ne 5
+.PP
+\fB\\$1\fR
+.PP
+..
+.de Sp
+.if t .sp .5v
+.if n .sp
+..
+.de Ip
+.br
+.ie \\n(.$>=3 .ne \\$3
+.el .ne 3
+.IP "\\$1" \\$2
+..
+.de Vb
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve
+.ft R
+
+.fi
+..
+'''
+'''
+'''     Set up \*(-- to give an unbreakable dash;
+'''     string Tr holds user defined translation string.
+'''     Bell System Logo is used as a dummy character.
+'''
+.tr \(*W-|\(bv\*(Tr
+.ie n \{\
+.ds -- \(*W-
+.ds PI pi
+.if (\n(.H=4u)&(1m=24u) .ds -- \(*W\h'-12u'\(*W\h'-12u'-\" diablo 10 pitch
+.if (\n(.H=4u)&(1m=20u) .ds -- \(*W\h'-12u'\(*W\h'-8u'-\" diablo 12 pitch
+.ds L" ""
+.ds R" ""
+'''   \*(M", \*(S", \*(N" and \*(T" are the equivalent of
+'''   \*(L" and \*(R", except that they are used on ".xx" lines,
+'''   such as .IP and .SH, which do another additional levels of
+'''   double-quote interpretation
+.ds M" """
+.ds S" """
+.ds N" """""
+.ds T" """""
+.ds L' '
+.ds R' '
+.ds M' '
+.ds S' '
+.ds N' '
+.ds T' '
+'br\}
+.el\{\
+.ds -- \(em\|
+.tr \*(Tr
+.ds L" ``
+.ds R" ''
+.ds M" ``
+.ds S" ''
+.ds N" ``
+.ds T" ''
+.ds L' `
+.ds R' '
+.ds M' `
+.ds S' '
+.ds N' `
+.ds T' '
+.ds PI \(*p
+'br\}
+.\"	If the F register is turned on, we'll generate
+.\"	index entries out stderr for the following things:
+.\"		TH	Title 
+.\"		SH	Header
+.\"		Sh	Subsection 
+.\"		Ip	Item
+.\"		X<>	Xref  (embedded
+.\"	Of course, you have to process the output yourself
+.\"	in some meaninful fashion.
+.if \nF \{
+.de IX
+.tm Index:\\$1\t\\n%\t"\\$2"
+..
+.nr % 0
+.rr F
+.\}
+.TH Session 3 "perl 5.005, patch 03" "14/Mar/2002" "User Contributed Perl Documentation"
+.UC
+.if n .hy 0
+.if n .na
+.ds C+ C\v'-.1v'\h'-1p'\s-2+\h'-1p'+\s0\v'.1v'\h'-1p'
+.de CQ          \" put $1 in typewriter font
+.ft CW
+'if n "\c
+'if t \\&\\$1\c
+'if n \\&\\$1\c
+'if n \&"
+\\&\\$2 \\$3 \\$4 \\$5 \\$6 \\$7
+'.ft R
+..
+.\" @(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2
+.	\" AM - accent mark definitions
+.bd B 3
+.	\" fudge factors for nroff and troff
+.if n \{\
+.	ds #H 0
+.	ds #V .8m
+.	ds #F .3m
+.	ds #[ \f1
+.	ds #] \fP
+.\}
+.if t \{\
+.	ds #H ((1u-(\\\\n(.fu%2u))*.13m)
+.	ds #V .6m
+.	ds #F 0
+.	ds #[ \&
+.	ds #] \&
+.\}
+.	\" simple accents for nroff and troff
+.if n \{\
+.	ds ' \&
+.	ds ` \&
+.	ds ^ \&
+.	ds , \&
+.	ds ~ ~
+.	ds ? ?
+.	ds ! !
+.	ds /
+.	ds q
+.\}
+.if t \{\
+.	ds ' \\k:\h'-(\\n(.wu*8/10-\*(#H)'\'\h"|\\n:u"
+.	ds ` \\k:\h'-(\\n(.wu*8/10-\*(#H)'\`\h'|\\n:u'
+.	ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'^\h'|\\n:u'
+.	ds , \\k:\h'-(\\n(.wu*8/10)',\h'|\\n:u'
+.	ds ~ \\k:\h'-(\\n(.wu-\*(#H-.1m)'~\h'|\\n:u'
+.	ds ? \s-2c\h'-\w'c'u*7/10'\u\h'\*(#H'\zi\d\s+2\h'\w'c'u*8/10'
+.	ds ! \s-2\(or\s+2\h'-\w'\(or'u'\v'-.8m'.\v'.8m'
+.	ds / \\k:\h'-(\\n(.wu*8/10-\*(#H)'\z\(sl\h'|\\n:u'
+.	ds q o\h'-\w'o'u*8/10'\s-4\v'.4m'\z\(*i\v'-.4m'\s+4\h'\w'o'u*8/10'
+.\}
+.	\" troff and (daisy-wheel) nroff accents
+.ds : \\k:\h'-(\\n(.wu*8/10-\*(#H+.1m+\*(#F)'\v'-\*(#V'\z.\h'.2m+\*(#F'.\h'|\\n:u'\v'\*(#V'
+.ds 8 \h'\*(#H'\(*b\h'-\*(#H'
+.ds v \\k:\h'-(\\n(.wu*9/10-\*(#H)'\v'-\*(#V'\*(#[\s-4v\s0\v'\*(#V'\h'|\\n:u'\*(#]
+.ds _ \\k:\h'-(\\n(.wu*9/10-\*(#H+(\*(#F*2/3))'\v'-.4m'\z\(hy\v'.4m'\h'|\\n:u'
+.ds . \\k:\h'-(\\n(.wu*8/10)'\v'\*(#V*4/10'\z.\v'-\*(#V*4/10'\h'|\\n:u'
+.ds 3 \*(#[\v'.2m'\s-2\&3\s0\v'-.2m'\*(#]
+.ds o \\k:\h'-(\\n(.wu+\w'\(de'u-\*(#H)/2u'\v'-.3n'\*(#[\z\(de\v'.3n'\h'|\\n:u'\*(#]
+.ds d- \h'\*(#H'\(pd\h'-\w'~'u'\v'-.25m'\f2\(hy\fP\v'.25m'\h'-\*(#H'
+.ds D- D\\k:\h'-\w'D'u'\v'-.11m'\z\(hy\v'.11m'\h'|\\n:u'
+.ds th \*(#[\v'.3m'\s+1I\s-1\v'-.3m'\h'-(\w'I'u*2/3)'\s-1o\s+1\*(#]
+.ds Th \*(#[\s+2I\s-2\h'-\w'I'u*3/5'\v'-.3m'o\v'.3m'\*(#]
+.ds ae a\h'-(\w'a'u*4/10)'e
+.ds Ae A\h'-(\w'A'u*4/10)'E
+.ds oe o\h'-(\w'o'u*4/10)'e
+.ds Oe O\h'-(\w'O'u*4/10)'E
+.	\" corrections for vroff
+.if v .ds ~ \\k:\h'-(\\n(.wu*9/10-\*(#H)'\s-2\u~\d\s+2\h'|\\n:u'
+.if v .ds ^ \\k:\h'-(\\n(.wu*10/11-\*(#H)'\v'-.4m'^\v'.4m'\h'|\\n:u'
+.	\" for low resolution devices (crt and lpr)
+.if \n(.H>23 .if \n(.V>19 \
+\{\
+.	ds : e
+.	ds 8 ss
+.	ds v \h'-1'\o'\(aa\(ga'
+.	ds _ \h'-1'^
+.	ds . \h'-1'.
+.	ds 3 3
+.	ds o a
+.	ds d- d\h'-1'\(ga
+.	ds D- D\h'-1'\(hy
+.	ds th \o'bp'
+.	ds Th \o'LP'
+.	ds ae ae
+.	ds Ae AE
+.	ds oe oe
+.	ds Oe OE
+.\}
+.rm #[ #] #H #V #F C
+.SH "NAME"
+.PP
+.Vb 1
+\&  CGI::Session - CGI cookie authentication against an LDAP database
+.Ve
+.SH "ABSTRACT"
+.PP
+.Vb 3
+\&  Provides a simple API authenticate users against an LDAP server, and then
+\&  to cache this authentication information between invokations of CGI scripts
+\&  without sending passwords subsequent to login.
+.Ve
+.Vb 4
+\&  The state information is maintained in a combination of a cookie, a database,
+\&  and a magic passkey which is sent in the contents of the web page.  Acquiring
+\&  the login thus requires stealing both the cookie and a current copy of the
+\&  web page.
+.Ve
+.Vb 2
+\&  CGI::Session also contains a subclass of CGI which transparently injects
+\&  the passkey into forms.  It is strongly suggested that you use this class.
+.Ve
+.SH "SYNOPSIS"
+.Sh "Setting Things Up"
+use \s-1CGI::\s0Session;
+use \s-1CGI\s0;
+.PP
+.Vb 3
+\&  my $cgi = new CGI::Session::CGI;
+\&  my $session = new CGI::Session( $cgi );
+\&  $cgi->session( $session );
+.Ve
+.Vb 8
+\&  my $session_store = new CGI::Session::CookieJar::DBI;
+\&  $session_store->set( -cookie_name=>'cookie_name',
+\&                       -username=>'myuser',
+\&                       -password=>'kjsdfdf',
+\&                       -host=>'dbhost',
+\&                       -database=>'mydb',
+\&                       -cookie_table=>'cookiejar' );
+\&  $session->set( -cookie_jar => $session_store );
+.Ve
+.Vb 8
+\&  $session->auth_servers(
+\&        [ new CGI::Session::LDAPServer(
+\&            'ldap.server.my.domain',                  # host
+\&            389,                                      # port
+\&            'ou=my,ou=domain',                        # root
+\&            'ou=people,ou=my,ou=domain'               # base
+\&            'uid=$username,ou=people,ou=my,ou=domain' # bind
+\&        ) ] );
+.Ve
+.Vb 1
+\&   $session->open;
+.Ve
+.Sh "Performing the Initial Login"
+.PP
+.Vb 2
+\&   my $action = $cgi->param('action');
+\&   my $passkey = $cgi->param('passkey');
+.Ve
+.Vb 8
+\&   if ( defined $action and $action eq 'Log In' )
+\&     {
+\&       my $username = $cgi->param('username');
+\&       my $password = $cgi->param('password');
+\&       if ( $session->authenticated( $username, $password ) )
+\&         {
+\&           $session->set_passkey( $user );
+\&           $session->set_login_cookie( $user );
+.Ve
+.Vb 5
+\&           # Notice that we use $session->header and not $cgi->header
+\&           #
+\&           print $session->header();
+\&           print $cgi->start_html( 'Login Succeeded' );
+\&           ...
+.Ve
+.Vb 4
+\&           # The passkey is sent via the cgi wrapper.
+\&           #
+\&           my $passkey = $session->passkey;
+\&           print $cgi->start_form( -action=>'http://my.stupid/script.cgi' );
+.Ve
+.Vb 1
+\&           print ...your form here...
+.Ve
+.Vb 14
+\&           print $cgi->end_form;
+\&           ...
+\&           print $cgi->end_html;
+\&           exit 0;
+\&         }
+\&       else
+\&         {
+\&           ...
+\&           Login Failed
+\&           ...
+\&           $session->close;
+\&           exit 0;
+\&         }
+\&     }
+.Ve
+.Sh "Confirming an Existing Session"
+.PP
+.Vb 7
+\&     my $passkey = $cgi->param('passkey');
+\&     if ( defined $passkey and !$session->confirm_userlogin( $passkey ) )
+\&       {
+\&         print $session->header();
+\&         print $cgi->start_html( 'Open Session' );
+\&         ...
+\&         my $passkey = $session->passkey;
+.Ve
+.Vb 1
+\&         print $cgi->start_form( -action=>'http://my.stupid/script.cgi' );
+.Ve
+.Vb 1
+\&         print ...your form here...
+.Ve
+.Vb 10
+\&         print $cgi->end_form;
+\&         ... 
+\&         print $cgi->end_html;
+\&         $session->close;
+\&         exit 0;
+\&       }
+\&     else
+\&       {
+\&         ... Authentication Failed Page ...
+\&       }
+.Ve
+.Sh "Logging out of an Existing Session"
+.PP
+.Vb 6
+\&      $session->set_logout_cookie;
+\&      print $session->header;
+\&      print $cgi->start_html( 'Logout Complete' );
+\&      print "You have logged out.";
+\&      print $cgi->end_html;
+\&      exit 0;
+.Ve
+.SH "REQUIRES"
+CGI.pm
+CGI::Carp
+DBI (and at least one DBD)
+Mozilla::LDAP
+Date::Format
+.SH "DESCRIPTION"
+When a user first authenticates the LDAP database is consulted.  If
+the user is successfully authenticated the information is cached. For
+subsequent login attempts.  The successful login is recorded in a
+database, and opaque references to this information are passed back to
+the client.
+.PP
+One of the opaque references is a cookie which is managed by the
+client, and the other is a randomly chosen string which is passed
+within the content of the web pages.  The random string is referred to
+as a passkey, and it must be resent with every page.
+.PP
+On subsequent executions the cookie and the passkey are checked.  If
+either of these do not match the record in the database then the user
+is rejected.
+.PP
+When the program is complete the user is logged out by expiring the
+cookie.
+.SH "USAGE"
+There are four major operations.  The first is setting up the
+CGIviaLDAP.  Gotta do this every time.  The second is authenticating a
+new user/connection.  The third is authenticating an existing session.
+The fourth is logging out an existing session.  ( And somewhere in there
+you have to send the cookie and passkey back to the client. )
+.Sh "Setting up the Authentication Object"
+The first step is to include the necessary libraries.  These are
+\s-1CGI::\s0Session.pm and \s-1CGI\s0.
+.PP
+.Vb 2
+\&    use CGI::Session::CGI;
+\&    use CGI::Session;
+.Ve
+The second step is to create the \s-1CGI::\s0Session object which will be
+used.  It requires a \s-1CGI\s0 object when it is created.  The \s-1CGI\s0 object
+provides the machinery to manage cookies.
+.PP
+.Vb 3
+\&    my $cgi = new CGI::Session::CGI;
+\&    my $session = new CGI::Session( $cgi );
+\&    $cgi->session( $cgi );
+.Ve
+Now you have to tell the CGIviaLDAP several things.  You have to tell it
+which \s-1LDAP\s0 servers it should use for authentication.  You need to tell it
+how to connect to the database.  You need to describe the database table
+in which it will store its information.  You need to describe the cookie
+that it will send to the client's web browser.  Finally, you need to
+describe various aspects of the login behavior.
+.Sh "Setting the Authentication Servers"
+.PP
+.Vb 3
+\&  $session->auth_servers( new CGI::Session::LDAPServer( -host=>'my.host.my.domain',
+\&                                                            -port=>389,
+\&                                                            -bind=>'uid=$username,ou=people,dc=my,dc=domain' ) );
+.Ve
+The string \*(L'$username\*(R' within the \-bind argument will be replaced with
+the username when authentication occurrs.
+.PP
+You can also supply more than one ldap server by passing an array of
+servers.  The servers will be checked from first to last in the array.
+.PP
+.Vb 7
+\&  my $server1 = new CGI::Session::LDAPServer( -host=>'ldap1.my.domain',
+\&                                                  -port=>389,
+\&                                                  -bind=>'uid=$username,ou=people,dc=my,dc=domain' );
+\&  my $server2 = new CGI::Session::LDAPServer( -host=>'ldap2.your.domain',
+\&                                                  -port=>389,
+\&                                                  -bind=>'uid=$username,ou=people,dc=your,dc=domain' );
+\&  $session->auth_servers( [ $server1, $server2 ] );
+.Ve
+.Sh "Describing the Database Connection"
+CGIviaLDAP uses perl \s-1DBI\s0 modules to access the database.  There are
+three items of major importance.  These are the connection \s-1DN\s0, the
+the database user, and their associated password.
+.PP
+.Vb 3
+\&  $session->dbi_dn( 'dbi:mysql:my_apps_database' );
+\&  $session->dbi_username( 'my_apps_user' );
+\&  $session->dbi_password( '!CENSORED' );
+.Ve
+.Sh "Describing the Database Table"
+You've now told the object how to connect to the database.  Now you need
+to tell it what the table it stores the information in will look like.
+The most important is the name of the table in which the information
+will be stored.
+.PP
+.Vb 1
+\&  $session->cookie_table( 'login_cookies' );
+.Ve
+There are three columns it expects.  The first is the name of the
+user; the second is the contents of the cookie; and the third is the
+passkey.  By default these are called, respectively, \*(L'user_id\*(R',
+\&'cookie\*(R', and \*(L'cookie\*(R', and \*(L'passkey\*(R'.  You may never need to change
+these.  If you do need to change them then you would write:
+.PP
+.Vb 3
+\&  $session->user_column('username');
+\&  $session->cookie_column('login_cookie');
+\&  $session->passkey_column('login_passkey');
+.Ve
+.Sh "Setting Cookie Parameters"
+When your program sends back a cookie, the cookie needs to have several
+parameters set.  These include the name of the cookie, the path which it
+covers, the domain for which it is good, and wether or not it should
+be used without a secure connection.
+.PP
+.Vb 5
+\&  $session->cookie_name( 'MySessionCookie123587098' );  # The name of the cookie
+\&  $session->cookie_path( '/' );
+\&  $session->cookie_domain( '.drinktomi.com' );
+\&  $session->secure( 1 );  # 1=requires secure transport
+\&                          # 0=does not require secure transport
+.Ve
+Most importantly you need describe how long the cookie should be valid
+for.  This is the expiration.  It is given in seconds.  If using the
+refresh option (more on this later) then the expiration determines how
+long the web browser can sit idle.  If not using the refresh option
+then it determines how long the user will remain logged in.
+.PP
+.Vb 1
+\&  $session->cookie_expiration( 60*60*2 );  # Cookies will be good for two hours.
+.Ve
+.Sh "Setting Login Behavior"
+Setting the auto refresh cookie option to 1 will the cookie's expiration
+time to be updated every time a page is sent to the client.  As long as
+the user keeps using the application they will never be logged out.
+.PP
+.Vb 2
+\&  $session->auto_refresh_cookie(1) # 1=always refresh the session cookie
+\&                                   # 0=never automatically refresh the session cookie
+.Ve
+In some instances you only want people to log in when they have a
+pre-existing database entry.  In this case there are two ways of
+managing things.  The first is to create an external file containing
+the valid user IDs.  This is kind of a hack.
+.PP
+.Vb 3
+\&  $session->allowed_user_file( '/var/etc/allowed_users' );
+\&  $session->restricted_access( 1 )  # 1=use allowed user file
+\&                                    # 0=do not use allowed user file
+.Ve
+The second way of managing things is a little more to my taste.  Normally
+the auth object will register the user (create an entry for them) in the
+cookie table.  You can change this so it will not log a person in unless
+they already have an entry in the cookie table.
+.PP
+.Vb 2
+\&  $session->register(1);     # 1=automatically register users in the cookie table.
+\&                             # 0=do not automatically register users in the cookie table.
+.Ve
+Some day we may support check \s-1LDAP\s0 group memberships as a third mechanism.
+.Sh "Sending Back a Page"
+You have to do two things.  The first is that you have to generate the \s-1HTTP\s0 header
+using \s-1CGI::\s0Session instead of \s-1CGI\s0, and the second is that you have to make sure
+that the passkey gets sent back with the results of the next page.  
+.PP
+The call \s-1CGI::\s0Session::header is used _exactly_ like \s-1CGI::\s0header.
+The only difference is that it automatically injects the session
+cookie if it needs to.
+.PP
+.Vb 1
+\&    print $session->header;
+.Ve
+The best way to get the passkey back to the user is by using
+\s-1CGI::\s0Session::\s-1CGI\s0 instead of \s-1CGI\s0, and using the start_form
+and end_form functions.  These will automatically inject the
+necessary html.  The code looks something like this:
+.PP
+.Vb 3
+\&   print $cgi->start_form( -action=>$cgi->self_url );
+\&   print "YOUR FORM HERE";
+\&   print $cgi->end_form;
+.Ve
+As long as you use \s-1CGI::\s0Session::\s-1CGI\s0 then you don't have to do
+anything else.
+.PP
+If you want to inject passkey into the document yourself then the
+simplest way is to use a hidden text field.  The current passcode is
+contained in \s-1CGI::\s0Session::passkey.  The code to create the form
+might look something like the next snippet.
+.PP
+.Vb 6
+\&    print "<form...>"
+\&    ...
+\&    my $key = $session->passkey;
+\&    print "<input type=hidden name=passkey value=$key>";
+\&    ...
+\&    print "</form>"
+.Ve
+If you don't send the passkey along then confirmation of the next
+session login will fail.
+.Sh "Authenticating a New Session"
+Read the user name, and password from the incoming \s-1CGI\s0 form, and then
+pass them to CGIviaLDAP::authenticated.  If the user is authenticated
+the we must generate a passkey and a session cookie.
+.PP
+.Vb 16
+\&  my $username = $cgi->param('username');
+\&  my $password = $cgi->param('password');
+\&  if ( $session->authenticated( $username, $password ) )
+\&    {
+\&      $session->set_passkey( $username );
+\&      $session->set_login_cookie( $username );
+\&      ...
+\&      Successfully authenticated, send response
+\&      ...
+\&    }
+\&  else
+\&    {
+\&      ...
+\&      Login Failed
+\&      ...
+\&    }
+.Ve
+.Sh "Confirming an Existing Session"
+.PP
+.Vb 2
+\&  Read the passkey from the incoming CGI form, and then ask
+\&  CGIviaLDAP to confirm it.
+.Ve
+.Vb 13
+\&  my $key = $cgi->param('passkey');
+\&  if ( $session->confirmed($key) )
+\&    {
+\&      ...
+\&      Session was confirmed and this is a valid session
+\&      ...
+\&    }
+\&  else
+\&    {
+\&      ...
+\&      Session was not confirmed, and this is not a valid session
+\&      ...
+\&    }
+.Ve
+Once a session has been confirmed you can do several things with it.
+You can change the passcode; you can change the cookie identifier; or
+you can refresh the cookie so that the expiration time will be reset.
+.Sh "Changing the Passcode"
+.PP
+.Vb 7
+\&  if ( $session->confirmed( $key ) )
+\&    {
+\&      $session->set_passcode;
+\&      ...
+\&      Session was confirmed and this is a valid session
+\&      ...
+\&    }
+.Ve
+.Sh "Changing the Cookie Identifier"
+.PP
+.Vb 7
+\&  if ( $session->confirmed( $key ) )
+\&    {
+\&      $session->set_login_cookie;
+\&      ...
+\&      Session was confirmed and this is a valid session
+\&      ...
+\&    }
+.Ve
+.Sh "Refreshing the Cookie Expiration"
+.PP
+.Vb 7
+\&  if ( $session->confirmed( $key ) )
+\&    {
+\&      $session->refresh_login_cookie;
+\&      ...
+\&      Session was confirmed and this is a valid session
+\&      ...
+\&    }
+.Ve
+.Sh "Logging Out"
+.PP
+.Vb 11
+\&  if ( $session->confirmed( $key ) and $logout )
+\&    {
+\&      $session->set_logout_cookie;
+\&      ...
+\&      print $session->header() # You must send back a cookie using the $session
+\&      print $cgi->start_html( 'Logout Page' );
+\&      print "You have been logged out.";        # Notice that the passkey does not
+\&                                                # need to be sent back.
+\&      print $cgi->end_html;
+\&      exit 0;
+\&    }
+.Ve
+.Sh "Creating the Cookie Table"
+Guess what? Once you have configured your CGIviaLDAP there is a function
+which will create the table that you have described.  It only works for
+MySQL at the moment, but in the future it may work for other databases.
+.PP
+.Vb 1
+\&  $session->create_cookie_table;
+.Ve
+.SH "TO DO"
+.Ip "1. Provide function to retreive username from the database using the cookie." 4
+.Ip "2. Provide support for Net::\s-1LDAP\s0" 4
+.Ip "3. Clean up \s-1DBI\s0 code. (\s-1DBI\s0 provides the independence that the old routines did.)" 4
+.Ip "4. Clean up \s-1DBI\s0 connection creation. (Makes way too many database connections.)" 4
+.Ip "5. Make an \*(N'add_cookie_table\*(T' function to alter existing tables." 4
+.Ip "6. Date tracking and garbage collection of expired cookie entries for auto-registered tables." 4
+.SH "REFERENCE"
+Creates a new session object.  Requires at least one argument.  This
+argument is a \s-1CGI\s0 object of some kind.
+.Sp
+.Vb 2
+\&  my $cgi = new CGI::Session::CGI;
+\&  my $session = new CGI::Session( $cgi );
+.Ve
+You can then set values with function calls.  Or, you can use the
+handy-dandy \*(L'\-\s-1PARAMETER\s0=>\s-1VALUE\s0\*(R' syntax just like the standard module
+\s-1CGI\s0.pm uses.  This is in fact the prefered method, and I strongly
+suggest that you use it.
+.Sp
+.Vb 20
+\&  my $cgi = new CGI::Session::CGI;
+\&  my $session = new CGI::Session( $cgi,
+\&                                      -auth_servers => [ $ldap1, $ldap2 ],
+\&                                      
+\&                                      -dbi_dn => 'dbi:mysql:stock',
+\&                                      -cookie_table => 'everyones_cookies',
+\&                                      -dbi_username => 'your_mythical_db_user',
+\&                                      -dbi_password => 'its_password',
+\&                                      
+\&                                      -cookie_expiration => 900,
+\&                                      -cookie_name => '1FA6FAACE01B7A2677',
+\&                                      -cookie_path => '/',
+\&                                      -cookie_domain => '.inktomi.com',
+\&                                      -cookie_secure => 0,
+\&                                      
+\&                                      -passkey_name => 'passkey',
+\&                                      
+\&                                      -restricted_access => 0,
+\&                                      -register => 1,
+\&                                      -auto_refresh_cookie => 1 );
+.Ve
+.Sh "Parameters for a new \s-1CGI::\s0Session"
+.Ip "-cookie_name" 12
+.Sp
+.Vb 1
+\&  The name of the cookie that will be passed back to the browser.
+.Ve
+.Ip "-cookie_expiration" 12
+.Sp
+.Vb 1
+\&  The lifetime of the cookie in seconds.
+.Ve
+.Ip "-cookie_path" 12
+.Sp
+.Vb 1
+\&  The path of the cookie.
+.Ve
+.Ip "-cookie_domain" 12
+.Sp
+.Vb 1
+\&  The domain of the cookie.
+.Ve
+.Ip "-cookie_secure" 12
+.Sp
+.Vb 3
+\&  If set to 1 (-cookie_secure=>1) then SSL will be required for this
+\&  connection. If set to 0 or undef then then normal http can be used.
+\&  Defaults to 1.
+.Ve
+.Ip "-auth_servers" 12
+.Sp
+.Vb 5
+\&  Points to either a single authentication server, or an anonymous
+\&  array of authentication servers.  Currently authentication servers
+\&  are defined using CGI::Session::LDAPServer.  Others may be added
+\&  in the future.  (At that time this will become a very poorly named
+\&  module.)
+.Ve
+.Vb 6
+\&  my $ldap1 = new CGI::Session::LDAPServer( -host=>'ldap.inktomi.com',
+\&                                                -port=>389,
+\&                                                -bind=>'uid=$username,ou=People,dc=inktomi,dc=com' );
+\&  my $ldap2 = new CGI::Session::LDAPServer( -host=>'mccoy.inktomi.com',
+\&                                                -port=>389,
+\&                                                -bind=>'uid=$username,ou=People,dc=inktomi,dc=com' );
+.Ve
+.Vb 1
+\&  $session => new CGI::Session( $cgi, -auth_servers => $ldap1 );
+.Ve
+.Vb 1
+\&  --or--
+.Ve
+.Vb 1
+\&  $session => new CGI::Session( $cgi, -auth_servers => [ $ldap1, $ldap2 ] );
+.Ve
+.Ip "-restricted_access" 12
+.Sp
+.Vb 5
+\& This is set to either a 1 or 0 (undef is the same as 0).  If set to a
+\& one then access will be restricted to those users which are specfied
+\& in the file corresponding to -allowed_user_file.  This file contains
+\& the names of the users which can be successfully authenticated. One
+\& username is listed on each line of this file.
+.Ve
+.Ip "-allowed_user_file" 12
+.Sp
+.Vb 4
+\& The full path to a file containing the usernames of the users which
+\& can be successfully authenticated.  Each line of the file contains one
+\& username.  If a user is not specified in this file then authentication
+\& will fail.
+.Ve
+.Vb 1
+\& This file is only consulted if -restricted_access is set to 1.
+.Ve
+.Ip "-unikey" 12
+.Sp
+.Vb 3
+\& DANGER. The password for a back door.  If this value is set to 0
+\& or undef then no back door exists.  This is ONLY A TESTING feature.
+\& DO NOT SET THIS VARIABLE IN PRODUCTION CODE.
+.Ve
+.Ip "-register" 12
+.Sp
+.Vb 3
+\& If set to 1 then an entry is automatically created in the cookie
+\& table if one does not exist.  If set to 0 then authentication will
+\& fail if the user does not exist.
+.Ve
+.Ip "-dbi_dn" 12
+.Sp
+.Vb 2
+\& The DBI connection string which will be used to connect to the
+\& database.
+.Ve
+.Ip "-dbi_username" 12
+.Sp
+.Vb 1
+\& The username which will be used to connect to the database.
+.Ve
+.Ip "-dbi_password" 12
+.Sp
+.Vb 1
+\& The password which will be used to connect to the database.
+.Ve
+.Ip "-cookie_table" 12
+.Sp
+.Vb 1
+\& The database table in which the cookie information will be stored.
+.Ve
+.Ip "-user_column" 12
+.Sp
+.Vb 1
+\& The column in the cookie_table containing the username.
+.Ve
+.Ip "-passkey_column" 12
+.Sp
+.Vb 1
+\& The column in the cookie_table containing the passkey.
+.Ve
+.Ip "-cookie_column" 12
+.Sp
+.Vb 1
+\& The column in the cookie_table containing the cookie value.
+.Ve
+.Ip "-cookie_name_column" 12
+.Sp
+.Vb 1
+\& The column in the cookie_table containing the cookie name.
+.Ve
+.Ip "-login_expiration_column. \s-1CURRENTLY\s0 \s-1UNUSED\s0" 12
+.Sp
+.Vb 2
+\& The column in the cookie_table containing the session expiration time.
+\& 
+.Ve
+.Ip "-passkey_name" 12
+.Sp
+.Vb 1
+\& The name of the CGI parameter which contains the passkey.
+.Ve
+.Ip "-debug" 12
+.Sp
+.Vb 1
+\& Set to non-zero to generate debugging information.
+.Ve
+.Ip "\s-1CGI::\s0Session::open" 4
+Internal function.  Opens up the cookie jar.  This function is called by
+methods just before they first access a cookie jar.
+.Sp
+$session->open;
+.Ip "\s-1CGI::\s0Session::cgi" 4
+Accessor method.  The cgi to which the session is attached.
+.Ip "\s-1CGI::\s0Session::cookie" 4
+Accessor method.  The value of the current cookie.
+.Ip "\s-1CGI::\s0Session::passkey" 4
+Accessor method.  The value of the current passkey.  Set by \fIconfirmed()\fR and \fIauthenticated()\fR.
+.Ip "\s-1CGI::\s0Session::is_authenticated" 4
+Accessor method.  Authentication state. True if the session has been successfully authenticated.  False if it has not.
+.Ip "\s-1CGI::\s0Session::cookie_name" 4
+Accessor method.  The name of the login cookie.
+.Ip "\s-1CGI::\s0Session::cookie_logged_out" 4
+Accessor method.  Vestigial logout cookie.  Unused.  Like the wings of an
+archeopertyx.  But with no hairy feathers.  Left here for strictly
+archeological reasons.
+.Ip "\s-1CGI::\s0Session::cookie_expiration" 4
+Accessor method.  The lifetime of the cookie specified in seconds.
+.Ip "\s-1CGI::\s0Session::cookie_path" 4
+Accessor method.  The path of the cookie.
+.Ip "\s-1CGI::\s0Session::cookie_domain" 4
+Accessor method.  The domain of the cookie.
+.Ip "\s-1CGI::\s0Session::cookie_secure" 4
+Accessor method.  True if the cookie requires \s-1SSL\s0.  False otherwise.
+.Ip "Authentication Behavior Variables" 4
+These are variables which affect the behavior of the authentication mechanism.
+.Ip "\s-1CGI::\s0Session::auth_servers" 4
+Accessor method.  The list of authentication servers which will be contacted.  This value can either
+be a single server or a reference to an array of servers.
+.Sp
+Currently these servers are definied by \s-1CGI::\s0Session::LDAPServer objects.
+.Ip "\s-1CGI::\s0Session::restricted_access" 4
+Accessor method.  If set to a non-zero value then the allowed_user_file is turned on.
+.Ip "\s-1CGI::\s0Session::allowed_user_file" 4
+Accessor method.  The full path to the allowed_user_file.
+.Ip "\s-1CGI::\s0Session::unikey" 4
+Accessor method.  Boy this one sucks.  This is a backdoor value.  If this is
+set then any user matching this \s-1ID\s0 will be successfully authenticated.  Why?  Strictly
+for testing.  \s-1NEVER\s0, \s-1EVER\s0 \s-1SET\s0 \s-1THIS\s0 \s-1VALUE\s0 \s-1UNLESS\s0 \s-1YOU\s0 \s-1KNOW\s0 \s-1WHAT\s0 \s-1THE\s0 \s-1FUCK\s0 \s-1YOU\s0 \s-1ARE\s0 \s-1DOING\s0.
+.Ip "\s-1CGI::\s0Session::register" 4
+Accessor method.  Login requires an entry to exist in the cookie table for each user.
+If this variable is set then an entry will automatically be created for users which are
+successfully authenticated.
+.Ip "\s-1CGI::\s0Session::auto_refresh_cookie" 4
+Accessor method.  Normally the cookie will expire X seconds after it is created, where X is
+specified by \s-1CGI::\s0Session::cookie_expiration.  Whenever the cookie is refreshed this
+timer resets.  Setting this variable to a non-zero value causes the cookie to be refreshed
+every time that it is successfully verified.
+.Ip "\s-1CGI::\s0Session::used_with_custom_cgi" 4
+Forget about this one.  This is an internal function used by \s-1CGI::\s0Session and \s-1CGI::\s0Session::\s-1CGI\s0.
+Normally set to zero.  Setting \s-1CGI::\s0Session::\s-1CGI::\s0session causes this value to be set.
+.Ip "\s-1CGI::\s0Session::cookie_jar" 4
+# Cookiejar.  This handles all cookie storage.
+#
+Accessor method.  The object encapsulating cookie storage.
+.Ip "\s-1CGI::\s0Session::passkey_name" 4
+Accessor method.  The name of the passkey field in the form is stored here.
+Not currently important, but it will be if/when the table becomes a shared
+resource.
+.Ip "\s-1CGI::\s0Session::debug" 4
+Accessor method.  Turns on debugging.  Currently this doesn't do much.  I need
+to add more instrumentation.
+.Ip "\s-1CGI::\s0Session::has_passkey" 4
+.Sp
+.Vb 2
+\&  True if the CGI session has a value for the parameter specified with
+\&  -passkey_name.
+.Ve
+.Vb 1
+\&  print "Session has passkey: ".( $session->has_passkey ? "YES" : "NO" )."\en";
+.Ve
+.Ip "\s-1CGI::\s0Session::passkey_field" 4
+.Sp
+.Vb 1
+\& The value of the CGI parameter specified by -passkey_name.
+.Ve
+.Vb 1
+\& $passkey_field = $session->passkey_field;
+.Ve
+.Ip "\s-1CGI::\s0Session::confirmed" 4
+.Sp
+.Vb 3
+\&  Confirms that the cookie and a passkey constitute a valid login.  If
+\&  the session confirmation succeeds then it will return a true value.
+\&  If the session confirmation fails then it will return a false value.
+.Ve
+.Vb 3
+\&  Once this routine is called the variable of
+\&  CGI::Session::is_authenticated will contain the status of the
+\&  session.
+.Ve
+.Vb 4
+\&  The function may be called in one of two ways.  You can either let
+\&  it extract the passkey value on its own, or you can hand it the
+\&  passkey value to be checked.  It is much less work to let it extract
+\&  the passkey value.
+.Ve
+.Vb 4
+\&  if ( $session->confirmed )
+\&  {
+\&    Session was confirmed...
+\&  }
+.Ve
+.Vb 1
+\&  If you want to handle the extraction of the passkey on your own...
+.Ve
+.Vb 5
+\&  my $passkey = $cgi->param( 'passkey_name' );
+\&  if ( $session->confirmed( $passkey ) )
+\&  {
+\&    Session was confirmed...
+\&  }
+.Ve
+.Ip "\s-1CGI::\s0Session::confirm" 4
+The preferred way of confirming a valid login session.  It extracts
+the cookie and session key from the \s-1CGI\s0, checks their validity, and
+then sets the variable \s-1CGI::\s0Session::is_authenticated.  Used as
+follows:
+.Sp
+.Vb 9
+\&  $session->confirm;
+\&  if ( $session->is_authenticated )
+\&  { 
+\&    Authentication Succeeded
+\&  }
+\&  else
+\&  {
+\&    Authentication Failed
+\&  }
+.Ve
+.Ip "\s-1CGI::\s0Session::authenticate" 4
+Call the method authenticated with the username and password that you
+want to check.  Authenticated will check their validity.  If user was
+successfully authenticated then it will return a true value.  If the
+user was not successfully authenticated then it will return a false
+value.
+.Sp
+Once authenticated is called then is_authenticated will return the
+authentication status.
+.Sp
+.Vb 2
+\&  $username = $cgi->param('your_username_field');
+\&  $password = $cgi->param('your_password_field');
+.Ve
+.Vb 8
+\&  if ( $session->authenticated( $username, $password ) )
+\&    {
+\&      Authentication Succeeded
+\&    }
+\&  else
+\&    {
+\&      Authentication Failed
+\&    }
+.Ve
+.Ip "\s-1CGI::\s0Session::authenticate" 4
+The preferred method of authenticating a user. Call the method
+authenticate with the username and password that you want to check.
+Authenticate will check their validity and then set the variable
+is_authenticated with the status.  For example:
+.Sp
+.Vb 2
+\&  $username = $cgi->param('your_username_field');
+\&  $password = $cgi->param('your_password_field');
+.Ve
+.Vb 9
+\&  $session->authenticate( $username, $password );
+\&  if ( $session->is_authenticated )
+\&    {
+\&      Authentication Succeeded
+\&    }
+\&  else
+\&    {
+\&      Authentication Failed
+\&    }
+.Ve
+.Ip "\s-1CGI::\s0Session::header" 4
+Acts just like \s-1CGI\s0.pm's header function, but it injects
+the authentication cookie.
+.Sp
+If you are using \s-1CGI::\s0Session::\s-1CGI\s0 then this function will not be
+used.  If you are using \s-1CGI\s0.pm directly then call this function instead
+of \s-1CGI\s0.pm's header method.
+.Sp
+.Vb 3
+\&  print $session->header;
+\&  print $cgi->start_html( 'my html' );
+\&  ...
+.Ve
+.Ip "\s-1CGI::\s0Session::user_exists" 0
+Internal function.  Checks the database to see if a user has an existing
+record within the cookie table.  True if the cookie table contains
+an entry for the username, and false if it does not.
+.PP
+.Vb 4
+\&  if ( $self->user_exists( $username ) )
+\&    {
+\&      ... perform action for defined user ...
+\&    }
+.Ve
+.Ip "\s-1CGI::\s0Session::register_user" 0
+Internal function.  Creates an entry for the specified user within the cookie table.
+.PP
+.Vb 4
+\&  if ( ! $self->user_exists( $username ) )
+\&    {
+\&      $self->register_user( $username );
+\&    }
+.Ve
+.Ip "\s-1CGI::\s0Session::login_cookie" 0
+Internal function.  Returns the cookie string for the current session. The
+expiration time is a unix timestamp as returned by the function \fItime()\fR. The
+expiration time is not a lifetime in seconds.
+.PP
+.Vb 1
+\&  my $cookie_string = $self->login_cookie( $cookie_name, $expiration_time );
+.Ve
+.Ip "\s-1CGI::\s0Session::refresh_login_cookie" 0
+Resets the expiration time for the current cookie.
+.PP
+.Vb 1
+\&  $self->refresh_login_cookie();
+.Ve
+.Ip "\s-1CGI::\s0Session::user($)" 0
+The cached name.
+.PP
+.Vb 1
+\&   my $username = $self->user();
+.Ve
+.Ip "\s-1CGI::\s0Session::username($)" 0
+Pulls the username for the current cookie/passkey pair from
+the database or local cache.
+.PP
+.Vb 1
+\&   my $username = $self->username();
+.Ve
+.Ip "\s-1CGI::\s0Session::logout_cookie" 0
+Returns a login_cookie which has expired.  (Expiration date
+is set to epoch.)
+.PP
+.Vb 1
+\&    my $cookie = $self->logout_cookie();
+.Ve
+
+.rn }` ''
+.IX Title "Session 3"
+.IX Name "CGI::Session - CGI cookie authentication against an LDAP database"
+
+.IX Header "NAME"
+
+.IX Header "ABSTRACT"
+
+.IX Header "SYNOPSIS"
+
+.IX Subsection "Setting Things Up"
+
+.IX Subsection "Performing the Initial Login"
+
+.IX Subsection "Confirming an Existing Session"
+
+.IX Subsection "Logging out of an Existing Session"
+
+.IX Header "REQUIRES"
+
+.IX Header "DESCRIPTION"
+
+.IX Header "USAGE"
+
+.IX Subsection "Setting up the Authentication Object"
+
+.IX Subsection "Setting the Authentication Servers"
+
+.IX Subsection "Describing the Database Connection"
+
+.IX Subsection "Describing the Database Table"
+
+.IX Subsection "Setting Cookie Parameters"
+
+.IX Subsection "Setting Login Behavior"
+
+.IX Subsection "Sending Back a Page"
+
+.IX Subsection "Authenticating a New Session"
+
+.IX Subsection "Confirming an Existing Session"
+
+.IX Subsection "Changing the Passcode"
+
+.IX Subsection "Changing the Cookie Identifier"
+
+.IX Subsection "Refreshing the Cookie Expiration"
+
+.IX Subsection "Logging Out"
+
+.IX Subsection "Creating the Cookie Table"
+
+.IX Header "TO DO"
+
+.IX Item "1. Provide function to retreive username from the database using the cookie."
+
+.IX Item "2. Provide support for Net::\s-1LDAP\s0"
+
+.IX Item "3. Clean up \s-1DBI\s0 code. (\s-1DBI\s0 provides the independence that the old routines did.)"
+
+.IX Item "4. Clean up \s-1DBI\s0 connection creation. (Makes way too many database connections.)"
+
+.IX Item "5. Make an \*(N'add_cookie_table\*(T' function to alter existing tables."
+
+.IX Item "6. Date tracking and garbage collection of expired cookie entries for auto-registered tables."
+
+.IX Header "REFERENCE"
+
+.IX Subsection "Parameters for a new \s-1CGI::\s0Session"
+
+.IX Item "-cookie_name"
+
+.IX Item "-cookie_expiration"
+
+.IX Item "-cookie_path"
+
+.IX Item "-cookie_domain"
+
+.IX Item "-cookie_secure"
+
+.IX Item "-auth_servers"
+
+.IX Item "-restricted_access"
+
+.IX Item "-allowed_user_file"
+
+.IX Item "-unikey"
+
+.IX Item "-register"
+
+.IX Item "-dbi_dn"
+
+.IX Item "-dbi_username"
+
+.IX Item "-dbi_password"
+
+.IX Item "-cookie_table"
+
+.IX Item "-user_column"
+
+.IX Item "-passkey_column"
+
+.IX Item "-cookie_column"
+
+.IX Item "-cookie_name_column"
+
+.IX Item "-login_expiration_column. \s-1CURRENTLY\s0 \s-1UNUSED\s0"
+
+.IX Item "-passkey_name"
+
+.IX Item "-debug"
+
+.IX Item "\s-1CGI::\s0Session::open"
+
+.IX Item "\s-1CGI::\s0Session::cgi"
+
+.IX Item "\s-1CGI::\s0Session::cookie"
+
+.IX Item "\s-1CGI::\s0Session::passkey"
+
+.IX Item "\s-1CGI::\s0Session::is_authenticated"
+
+.IX Item "\s-1CGI::\s0Session::cookie_name"
+
+.IX Item "\s-1CGI::\s0Session::cookie_logged_out"
+
+.IX Item "\s-1CGI::\s0Session::cookie_expiration"
+
+.IX Item "\s-1CGI::\s0Session::cookie_path"
+
+.IX Item "\s-1CGI::\s0Session::cookie_domain"
+
+.IX Item "\s-1CGI::\s0Session::cookie_secure"
+
+.IX Item "Authentication Behavior Variables"
+
+.IX Item "\s-1CGI::\s0Session::auth_servers"
+
+.IX Item "\s-1CGI::\s0Session::restricted_access"
+
+.IX Item "\s-1CGI::\s0Session::allowed_user_file"
+
+.IX Item "\s-1CGI::\s0Session::unikey"
+
+.IX Item "\s-1CGI::\s0Session::register"
+
+.IX Item "\s-1CGI::\s0Session::auto_refresh_cookie"
+
+.IX Item "\s-1CGI::\s0Session::used_with_custom_cgi"
+
+.IX Item "\s-1CGI::\s0Session::cookie_jar"
+
+.IX Item "\s-1CGI::\s0Session::passkey_name"
+
+.IX Item "\s-1CGI::\s0Session::debug"
+
+.IX Item "\s-1CGI::\s0Session::has_passkey"
+
+.IX Item "\s-1CGI::\s0Session::passkey_field"
+
+.IX Item "\s-1CGI::\s0Session::confirmed"
+
+.IX Item "\s-1CGI::\s0Session::confirm"
+
+.IX Item "\s-1CGI::\s0Session::authenticate"
+
+.IX Item "\s-1CGI::\s0Session::authenticate"
+
+.IX Item "\s-1CGI::\s0Session::header"
+
+.IX Item "\s-1CGI::\s0Session::user_exists"
+
+.IX Item "\s-1CGI::\s0Session::register_user"
+
+.IX Item "\s-1CGI::\s0Session::login_cookie"
+
+.IX Item "\s-1CGI::\s0Session::refresh_login_cookie"
+
+.IX Item "\s-1CGI::\s0Session::user($)"
+
+.IX Item "\s-1CGI::\s0Session::username($)"
+
+.IX Item "\s-1CGI::\s0Session::logout_cookie"
+

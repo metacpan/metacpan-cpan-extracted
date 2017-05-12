@@ -1,0 +1,5 @@
+name: Cx
+version: 2
+deps:
+  - Dx
+  - Ex

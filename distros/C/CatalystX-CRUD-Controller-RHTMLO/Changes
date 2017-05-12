@@ -1,0 +1,80 @@
+Revision history for CatalystX-CRUD-Controller-RHTMLO
+
+0.01    19 Oct 2007
+        First version, released on an unsuspecting world.
+
+0.02    20 Oct 2007
+        * fix POD line so that CPAN doesn't think there's doc separate from code
+
+0.03    23 Oct 2007
+
+0.04    25 Oct 2007
+        * override form() to stash the $c object in app()
+
+0.05    1 November 2007
+        * return from do_search() if no input to form
+        * pass field names on to NEXT do_search so they make it to make_query()
+
+0.06    9 Nov 2007
+        * fix legacy refactoring bug in form_to_object() (no such thing as param_hash() method)
+          Thanks to John Siracusa for the catch.
+
+0.07    16 Nov 2007
+        * fix bug with form->init_fields where values were being un-initialized if params were not
+          present.
+
+0.08    17 Nov 2007
+        * fix bug when checking for whether do_search() should be performed.
+
+0.09    31 Dec 2007
+        * implement field_names() per CXC::Controller API.
+        * fix bug in form() where app() would be set to undef if $c was not passed.
+        * added custom create() to allow for form prepopulation via $c->req->params
+        * make debug() statement in do_search() conditional on $c->debug
+
+0.10    29 Jan 2008
+        * fix bug to allow for PKs that are not serial ints
+
+0.11    06 May 2008
+        * add all_form_errors() method
+        * now passes $obj instead of $obj->delegate to form/object init methods.
+          This relies on the AUTOLOAD magic in CX::CRUD::Object to work correctly,
+          but it means that authors can have more methods than just the c/r/u/d
+          types on their Object wrappers (as CX::CRUD::Object::File does).
+        * use Class::C3
+        * prime object as well as form in create() 
+
+0.12    12 June 2008
+        * pass $c in to form->new() as value to 'app' param, as well as setting in in app() method.
+          this is so that $c is available to build_form() et al.
+        * field_names() now requires $c (context) be passed
+
+
+0.13    11 Aug 2008
+        * change form_to_object() to support PKs of multiple columns
+
+0.14    11 Aug 2008
+        * fix Makefile.PL to reflect CXCRUD 0.28 required
+
+0.15    24 Aug 2008
+        * fix the form_to_object() method to work with 0.29 core REST api
+
+0.16    25 Aug 2008
+        * refactor the form_to_object() to avoid setting the PK value for a new object
+
+0.17    11 Sept 2008
+        * change tact altogether in form_to_object() and assume there are no autoincrement fields in $form
+        * move the form/object seeding in create() to the core Controller create() method. This change
+          is as much to solve a strange Class::C3/Dispatcher issue with multiple inheritance as anything.
+        * add missing $c in call to $self->form
+        * do_search calls field_names() on controller rather than form object
+
+0.18    09 Oct 2008
+        * fix bug where form was not cleared during initial search
+
+0.19    03 Dec 2008
+        * fix bug where form error was not set correctly
+
+0.20    17 Feb 2010
+        * change from Class::C3 to MRO::Compat
+ 

@@ -1,0 +1,48 @@
+CGI::Application::Plugin::AnyCGI
+
+Use your favourite CGI::* module with CGI::Application (instead of 
+CGI.pm)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+    
+DEPENDENCIES
+
+While this plugin is made for use with CGI::Application >= 4.0, it 
+should also work without it.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc CGI::Application::Plugin::AnyCGI
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Application-Plugin-AnyCGI
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-AnyCGI
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/CGI-Application-Plugin-AnyCGI
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/CGI-Application-Plugin-AnyCGI
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Bianka Martinovic
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

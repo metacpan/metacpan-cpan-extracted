@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Class/DBI/ViewLoader.pm
+lib/Class/DBI/ViewLoader/Auto.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01..accessors.t
+t/02..load_views.t
+t/03..exceptions.t
+t/04..plugin.t
+t/05..pod.t
+t/06..auto.t
+t/07..cdbi_version.t
+t/lib/Class/DBI/Mock.pm
+t/lib/Class/DBI/MockPlugin.pm
+t/lib/Class/DBI/NullBase.pm
+t/lib/Class/DBI/NullPlugin.pm
+t/lib/Class/DBI/ViewLoader/Bad.pm
+t/lib/Class/DBI/ViewLoader/Mock.pm
+META.json

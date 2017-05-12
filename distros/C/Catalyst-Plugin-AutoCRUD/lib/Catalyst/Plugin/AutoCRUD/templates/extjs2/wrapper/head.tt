@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=[% cpac.g.html_charset OR 'utf-8' | html %]" />
+<title>[% cpac.g.title %][% ' - Powered by ' IF cpac.g.title %][% cpac.g.version %]</title>
+
+[%
+    SET extjs_base_uri = cpac.g.extjs2 OR (
+        c.req.secure
+            ? 'https://extjs.cachefly.net/ext-2.2'
+            : 'http://extjs.cachefly.net/ext-2.2'
+    )
+%]
+
+<link rel="stylesheet" type="text/css" href="[% extjs_base_uri %]/resources/css/ext-all.css" />
+
+<link rel="stylesheet" type="text/css" href="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "body.css" ) %]" />
+<link rel="stylesheet" type="text/css" href="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "cpac.css" ) %]" />
+[% IF c.req.user_agent.match('\.NET CLR') %]
+<link rel="stylesheet" type="text/css" href="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "iefix.css" ) %]" />
+[% END %]
+
+<script type="text/javascript" src="[% extjs_base_uri %]/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="[% extjs_base_uri %]/ext-all.js"></script>
+
+<script type="text/javascript" src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "xdatetime.js" ) %]"></script>
+</head>

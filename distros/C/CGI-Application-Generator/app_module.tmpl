@@ -1,0 +1,123 @@
+package <tmpl_var package_name>;
+use strict;
+use warnings;
+
+
+use base qw/<tmpl_var base_module>/;
+
+
+<tmpl_loop use_modules>use <tmpl_var module_name>;
+</tmpl_loop>
+
+
+
+##############################
+#####  OVERRIDE METHODS  #####
+##############################
+
+sub setup {
+	my $self = shift;
+
+	$self->start_mode('<tmpl_var start_mode>');
+
+	$self->run_modes([qw/<tmpl_loop run_modes>
+		<tmpl_var mode_name></tmpl_loop>
+	/]);
+
+<tmpl_if tmpl_path>	$self->tmpl_path('<tmpl_var tmpl_path>');</tmpl_if>
+<tmpl_if new_dbh_method>	$self->param('DBH' => <tmpl_var new_dbh_method>);</tmpl_if>
+}
+
+
+sub teardown {
+	my $self = shift;<tmpl_if new_dbh_method>
+	my $dbh = $self->param('DBH');
+	$dbh->disconnect();</tmpl_if>
+}
+
+
+
+##############################
+#####  RUN-MODE METHODS  #####
+##############################
+
+<tmpl_loop run_modes>
+sub <tmpl_var mode_name> {
+	my $self = shift;
+
+	my $q = $self->query();<tmpl_if new_dbh_method>
+	my $dbh = $self->param('DBH');</tmpl_if>
+
+	return $self->dump_html();
+}
+
+
+</tmpl_loop>
+
+
+
+
+#############################
+#####  PRIVATE METHODS  #####
+#############################
+
+
+
+1;
+
+
+
+=pod
+
+
+=head1 NAME
+
+<tmpl_var package_name> - 
+Abstract of web application....
+
+
+=head1 SYNOPSIS
+
+  use <tmpl_var package_name>;
+  my $app = <tmpl_var package_name>->new();
+  $app->run();
+
+
+=head1 DESCRIPTION
+
+Overview of functionality and purpose of 
+web application module <tmpl_var package_name>...
+
+
+=head1 RUN MODES
+
+=over 4
+
+<tmpl_loop run_modes>
+=item <tmpl_var mode_name>
+
+Description of run-mode <tmpl_var mode_name>...
+
+  * Purpose
+  * Expected parameters
+  * Function on success
+  * Function on failure
+
+
+</tmpl_loop>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Author of Module <author@module>
+
+
+=head1 SEE ALSO
+
+<tmpl_loop use_modules>L<<tmpl_var module_name>>, </tmpl_loop>L<<tmpl_var base_module>>
+
+=cut
+

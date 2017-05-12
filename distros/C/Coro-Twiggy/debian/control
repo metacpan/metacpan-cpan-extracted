@@ -1,0 +1,21 @@
+Source: libcoro-twiggy-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/Coro-Twiggy/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs,
+ libanyevent-perl,
+ libcoro-perl,
+ twiggy
+Standards-Version: 3.9.3
+Priority: extra
+VCS-Browser: https://github.com/unera/coro-twiggy
+
+Package: libcoro-twiggy-perl
+Depends: ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends},
+ libanyevent-perl,
+ libcoro-perl,
+ twiggy
+Architecture: all
+Description: Coro interface for Twiggy
+ The package provides Coro(utine) interface for Twiggy webserver,
+ so You can use Twiggy as http backend of Coro applications.

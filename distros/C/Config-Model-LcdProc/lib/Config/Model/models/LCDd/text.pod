@@ -1,0 +1,32 @@
+# PODNAME: Config::Model::models::LCDd::text
+# ABSTRACT:  Configuration class LCDd::text
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::LCDd::text - Configuration class LCDd::text
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+generated from LCDd.conf
+
+=head1 Elements
+
+=head2 Size
+
+Set the display size I<< Optional. Type uniline. upstream_default: '20x4'.  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

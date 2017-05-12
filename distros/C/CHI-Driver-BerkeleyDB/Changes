@@ -1,0 +1,17 @@
+Revision history for CHI-Driver-BerkeleyDB
+
+** denotes an incompatible change
+
+0.03  Jun 19, 2010
+
+- Eliminate unnecessary use of non-dependency File::Slurp
+
+0.02  Jun 14, 2010
+
+- ** Just use BerkeleyDB instead of BerkeleyDB::Manager - some people were having trouble
+  installing BerkeleyDB::Manager and/or seeing extremely bad write performance
+
+0.01  Jun 23, 2009
+
+- Initial version
+

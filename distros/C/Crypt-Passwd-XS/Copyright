@@ -1,0 +1,18 @@
+Copyright (c) 2011 cPanel, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+The following files are adapted from other sources (primarily DragonFly BSD.)
+See the copyright notices in these files for full details:
+
+crypt_to64.c - copyright 1991 University of California
+crypt_to64.h - copyright 1991 University of California
+des.c - copyright 1994 David Burren, Geoffrey M. Rehmet, Mark R V Murray
+md5.c - copyright 1999, 2000, 2002 Aladdin Enterprises
+md5.h - copyright 1999, 2000, 2002 Aladdin Enterprises
+md5crypt.c - copyright Poul-Henning Kamp
+md5crypt.h - copyright Poul-Henning Kamp
+sha256crypt.c - public domain reference implementation by Ulrich Drepper
+sha512crypt.c - public domain reference implementation by Ulrich Drepper

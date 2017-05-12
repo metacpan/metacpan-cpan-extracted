@@ -1,0 +1,27 @@
+<form title="Hello" header="head.tmpl" footer="foot.tmpl" post-event="say_hello">
+    <page name="Name">
+        <title>I'm the FormMagickian</title>
+        <field id="name" type="text" validation="nonblank">
+            <label>Your name</label>
+        </field>
+    </page>
+    
+    <lexicon lang="FR">
+        <entry>
+            <base>yes</base>
+            <trans>oui</trans>
+        </entry>
+        <entry>
+            <base>Hello</base>
+            <trans>Bonjour</trans>
+        </entry>
+    </lexicon>
+
+    <lexicon lang="fr">
+        <entry>
+            <base>yes</base>
+            <trans>certainement</trans>
+        </entry>
+    </lexicon>
+
+</form>

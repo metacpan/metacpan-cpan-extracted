@@ -1,0 +1,51 @@
+Version History for Config-Properties-Commons
+Mithun Ayachit
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.4.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.04
+
+
+-   Fix issue where token delimiters were not being escaped/unescaped.
+    Thanks to Roy Ledochowski for repoting the bug
+-   Allow option aliases to be used when initializing the object
+
+
+
+0.03
+
+
+-   Fix CPANTesters failures for:
+    -   Bad Data::Printer usage. Oops.
+    -   Fix _unescaped regex_ errors on perl-5.17+
+
+
+
+0.02
+
+
+-   Correct save_combined_tokens documentation in POD
+-   Allow empty values to be parsed and set. This means undef values are
+    string-ified to empty strings
+
+
+
+0.01
+
+
+-   Initial Version

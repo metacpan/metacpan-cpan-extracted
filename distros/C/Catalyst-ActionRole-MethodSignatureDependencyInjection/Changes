@@ -1,0 +1,93 @@
+# This file documents the revision history for Perl extension Catalyst::ActionRole::MethodSignatureDependencyInjection.
+
+0.020 - 2015-09-29
+  - Fix for incorrect version in prior release
+
+0.019 - 2015-09-27
+  - Fixed failing test cases on older versions of Perl
+
+0.018 - 2015-09-25
+  - Properly derefence body and query paramters into a hash and not an array
+
+0.017 - 2015-09-24
+  - Even more careful use of the stash to hold temporary information
+
+0.016 - 2015-09-24
+  - More aggressively remove any temporary stash keys generated while matching
+    a signature.  Caused trouble with some views that looked at the stash.
+
+0.015 - 2015-08-27
+  - Added special variables $env (for PSGI $env), $state (for $c->state) as
+    well as a few more aliases for things like request and parameters.
+  - Required declaration now properly checks that a value is defined, and not
+    just true or false.
+
+0.014 - 2015-06-14
+  - Shortcut to get the current view or model in the declaration, for example
+    "sub myaction(View $v, Model $m) { .. }".
+
+0.013 - 2015-06-11
+  - Lots of little parser improvements to handle more edge cases, particularly
+    with parameterized models.
+
+0.012 - 2015-06-03
+  - More strict checking of your injected components to make sure they
+    are an already defined component.
+  - Tweaked some regexp to make sure we more carefully extract a component
+    name from the signature.
+
+0.011 - 2015-06-03
+  - Dependency injection rules are now precompiled and stored.  This
+    should result in some minor runtime efficiency.
+  - You now need to declare injected component as 'required' if you
+    want to resolve them during match/ match_captures.  This is because
+    context is not complete at match/match_captures phase and if you have
+    a model that ACCEPT_CONTEXT you may wish to defer injection until
+    execute phase when it is complete.  Its also I think less surprising
+    behavior.
+
+0.010 - 2015-05-30
+  - Better errors when you make a bad signature.
+  - moved Catalyst::ActionSignatures out to its own distribution
+
+0.009 - 2015-05-29
+  - Support for quoted attributes (Chained('ddd')).
+  - $ENV{CATALYST_METHODSIGNATURES_DEBUG} added.
+
+0.008 - 2015-05-29
+  - Added support for chained actions
+  - Ability to infer Args and CaptureArgs from declared method
+    signature (when using Catalyst::ActionSignature).
+  - Declare type constraints on args and captureargs.
+  - Implicitly use CaptureArgs(0) in chained actions when no
+    Args or Captures is declared.
+  - Lots of small documentation inprovements.
+
+0.007 - 2015-05-28
+  - New support for signatures via Catalyst::ActionSignatures.
+  - You must now declare $c if you need it (this is a breaking change
+    from earlier releases.  I promise I won't do this again.
+
+0.006 - 2015-05-18
+  - Added missing test dependency
+
+0.005 - 2015-05-07
+  - Experimental support for Function::Parameters
+
+0.004 - 2015-05-06
+  - added the subroutine attribute approach for people that fear
+    the prototype approach.
+  - some code refactoring and tests so that we move toward something
+    I can imagine as stable.
+
+0.003 - 2015-05-03
+  - fixed a problem where we don't play nice with other
+    actionroles.
+  - make it so you alwasy get '$c' since this I think is rather
+    expected.
+
+0.002 - 2015-05-01
+  - Fixed missing readme
+
+0.001 - 2015-05-01
+  - First Release 

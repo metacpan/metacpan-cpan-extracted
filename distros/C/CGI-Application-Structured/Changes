@@ -1,0 +1,27 @@
+Revision history for Perl module Attanium
+
+0.007 Sun Mar 27 22:24:30 EDT 2011
+  - removed old examples from MANIFEST (obsolete)
+  - 
+
+0.006 Sun Mar 27 02:04:20 EDT 2011
+  - included Plugin::Debug screen in Makefile.PL
+
+0.005 Sun Mar 27 02:04:20 EDT 2011
+  - included Plugin::Debug screen and updated tutorial on using it
+  
+0.004
+  - removed dependencie on CGI::Application::FastCGI (removed experimental feature)
+  - update documentation to reflect changes in CGI::Application::Structured::Tools v 0.008
+    - change default config file name and remove need to export ENV var.
+    - fixed bug in generation of db schema name
+    - moved db schema name to config file
+
+0.003 Thu Oct 15 12:43:17 EDT 2009
+   - fixed ugliness in the link to rt.cpan.org
+   - fix a couple typos in pod for tutorial
+   
+0.01 Tue Sep  8 16:41:42 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

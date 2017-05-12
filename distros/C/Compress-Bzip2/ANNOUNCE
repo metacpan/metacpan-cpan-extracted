@@ -1,0 +1,49 @@
+Compress::Bzip2 2.08 has been released.
+
+Features:
+=========
+
+* built on top of bzip2 1.0.2
+
+* extensive set of unit tests.
+
+* a new file I/O interface with bzopen, bzread, bzwrite, bzclose, etc.
+
+* a new stream interface.
+
+* compatibility with Compress::Bzip2 1.03
+
+* a Compress::Zlib clone interface, so that programs built for
+  Compress::Zlib should work with Compress::Bzip2 with no changes,
+  simply replace use Compress::Zlib; with use Compress::Bzip2
+  qw(:gzip);
+
+* includes bzip2 1.0.2 source code, so that it will build on systems
+  without bzip2 installed.  The build process tests for the presence
+  of a useable installation of bzip2.  If none is found, the internal
+  source code is used.  If bzip2 is not installed in a standard
+  location, the correct location can be specified either with
+  environment variables or with a config file.
+
+Bug fixes:
+==========
+
+* previous versions were either not functional or not interoperable
+  with bzip2 when dealing with files larger than the internal buffer
+  size (100k to 900k).  The 2.x series uses the logical eof rollover
+  method described in the bzip2 docs.
+
+What is Bzip2 ?
+===============
+
+Bzip2 is a portable lossless data compression library written in ANSI
+C.  It offers pretty fast compression and fast decompression.  Bzip2
+has very good results, if you want to compress ASCII Documents.
+
+Bzip2 is probably not great for streaming compression.  It fills it's
+internal buffer, which depending of parameters is between 100k and
+900k in size, before it outputs ANY compressed data.  It works best
+compressing an entire document.
+
+Streaming decompression on the other hand, gives a steady torrent of
+bytes.

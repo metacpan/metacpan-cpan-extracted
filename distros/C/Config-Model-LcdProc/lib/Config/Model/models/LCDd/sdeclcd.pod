@@ -1,0 +1,28 @@
+# PODNAME: Config::Model::models::LCDd::sdeclcd
+# ABSTRACT:  Configuration class LCDd::sdeclcd
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::LCDd::sdeclcd - Configuration class LCDd::sdeclcd
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+generated from LCDd.conf
+
+=head1 Elements
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=cut
+

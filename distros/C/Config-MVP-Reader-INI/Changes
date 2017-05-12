@@ -1,0 +1,51 @@
+Revision history for Config-MVP-Reader-INI
+
+2.101463  2014-06-30 21:43:49-04:00 America/New_York
+          replace base with parent
+
+2.101462  2013-07-01 22:00:07 America/New_York
+          repackage, fix bugtracker, repo data, etc
+
+2.101461  2010-10-14 23:32:52 America/New_York
+          allow spaces in section name (thanks, Nick Perez)
+
+2.101460  2010-05-26 22:30:18 America/New_York
+          now implements the new Reader interface from Config::MVP v2
+
+1.101460  2010-05-26 08:30:54 America/New_York
+          remove outdated test
+
+1.101450  2010-05-25 18:16:05 America/New_York
+          [BREAKS BACKWARD COMPATIBILITY]
+
+          now implements the new Reader interface from Config::MVP v1
+
+          Config::INI::MVP::Reader has been removed; it will either be put in
+          its own dist or allowed to fade away
+
+0.024     2009-10-26
+          include Config::MVP::Reader class with an unfortunate name
+
+0.023     2009-07-26
+          bump moose version in response to
+          http://www.nntp.perl.org/group/perl.cpan.testers/2009/07/msg4777153.html
+
+0.022     2009-07-23
+          make the MVP object public
+          allow alternate assembler class to be passed in
+
+0.021     2009-07-23
+          refactor MVP bits into Config::MVP
+
+0.019     2009-01-16
+          add repo to metadata
+
+0.018     2008-06-07
+          reverse order of section name parts
+
+0.017     2008-06-03
+          fix lookup of per-pkg multivalue names
+          add some more private stubs for experimentation locally
+
+0.016     2008-05-29
+          first version, refactored out of App::Addex::Config

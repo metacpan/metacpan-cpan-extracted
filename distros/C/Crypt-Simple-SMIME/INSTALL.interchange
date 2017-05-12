@@ -1,0 +1,35 @@
+
+This tag allows you to securly email order credit card information to store
+owners in Interchange.
+
+cp UserTag/smime.tag /usr/lib/interchange/code/UserTag/ (location of UserTag directory)
+
+
+Copy certificate pem file to home directory.
+- mkdir /home/taters/.crt
+- cp taters.pem /home/taters/.crt/taters.pem
+- chown -R taters:taters /home/taters/.crt
+
+
+Add smime to the end of the "Require UserTag" line in catalog.cfg
+- vi catalog.cfg
+
+
+Find the "Route main" line in your catalog.cfg and change "report  etc/report"
+to "report  etc/smime_report"
+
+
+Copy the current etc/report file to etc/smime_report
+
+- ex: cp etc/smime_report /home/taters/catalogs/demo/etc
+
+
+Add the following to variable.txt using the actual path to the file you copied above:
+
+SMIME_CERT_PATH	/home/taters/.crt/taters.pem	Payment
+
+
+Delete variable.gdbm 
+
+
+Restart Interchange

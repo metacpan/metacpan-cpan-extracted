@@ -1,0 +1,64 @@
+NAME
+
+      CGI-Prototype - Create a CGI application by prototyped subclasssing
+
+SYNOPSIS
+      package My::HelloWorld;
+      use base CGI::Prototype;
+
+      sub template { \ <<'END_OF_TEMPLATE' }
+      [% self.CGI.header; %]
+      Hello world at [% USE Date; Date.format(date.now) | html %]!
+      END_OF_TEMPLATE
+
+      My::HelloWorld->activate;
+
+DESCRIPTION
+    The core of every CGI application seems to be roughly the same:
+
+    *   Analyze the incoming parameters, cookies, and URLs to determine the
+        state of the application (let's call this "dispatch").
+
+    *   Based on the current state, analyze the incoming parameters to
+        respond to any form submitted ("respond").
+
+    *   From there, decide what response page should be generated, and
+        produce it ("render").
+
+    CGI::Prototype creates a "Class::Prototyped" engine for doing all this,
+    with the right amount of callback hooks to customize the process.
+    Because I'm biased toward Template Toolkit for rendering HTML, I've also
+    integrated that as my rendering engine of choice. And, being a fan of
+    clean MVC designs, the classes become the controllers, and the templates
+    become the views, with clean separation of responsibilities, and
+    "CGI::Prototype" a sort of "archetypal" controller.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Prototyped
+  Template (aka Template Toolkit)
+
+AUTHOR
+    Randal L. Schwartz, <merlyn@stonehenge.com>
+
+    Special thanks to Geekcruises.com and an unnamed large university for
+    providing funding for the development of this module.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003, 2004 by Randal L. Schwartz
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

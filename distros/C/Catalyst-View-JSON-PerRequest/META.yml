@@ -1,0 +1,30 @@
+---
+abstract: 'A JSON View that owns its own data'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: '5.90060'
+  JSON::MaybeXS: '1.003005'
+  Moo: '2.000001'
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-JSON-PerRequest
+requires:
+  Catalyst::Component::InstancePerContext: '0.001001'
+  CatalystX::InjectComponent: '0.025'
+  Data::Perl: '0.002009'
+  HTTP::Status: '0'
+  JSON::MaybeXS: '1.003005'
+  Moo: '2.000001'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-View-JSON-PerRequest/issues
+  homepage: https://github.com/jjn1056/Catalyst-View-JSON-PerRequest
+  repository: https://github.com/jjn1056/Catalyst-View-JSON-PerRequest
+version: '0.009'

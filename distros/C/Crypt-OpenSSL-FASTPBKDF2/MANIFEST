@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+FASTPBKDF2.xs
+lib/Crypt/OpenSSL/FASTPBKDF2.pm
+README
+typemap
+ppport.h
+src/README.md
+src/Makefile
+src/fastpbkdf2.c
+src/fastpbkdf2.h
+t/Crypt-OpenSSL-FASTPBKDF2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

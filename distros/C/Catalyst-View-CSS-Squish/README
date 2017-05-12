@@ -1,0 +1,36 @@
+NAME
+    Catalyst::View::CSS::Squish - Concenate your CSS files.
+
+SYNOPSIS
+        ./script/myapp_create.pl view Squish CSS::Squish
+
+        sub css : Local {
+            my ($self,$c) = @_;
+            $c->stash->{template} = [ qw|/css/small.css /css/big.css| ];
+            # or "/css/small.css /css/big.css"
+            $c->forward($c->view('Squish'));
+        }
+
+DESCRIPTION
+    Take a set of CSS files and integrate them into one big file using
+    CSS::Squish. The files are read from the 'template' stash variable, and
+    can be provided as a hashref or a space separated scalar.
+
+CONFIG
+  INCLUDE_PATH
+    The path where we should look for CSS files. Will default to the project
+    'root' dir under the home directory.
+
+SEE ALSO
+    Catalyst , Catalyst::View, CSS::Squish
+
+AUTHOR
+    Marcus Ramberg "mramberg@cpan.org".
+
+THANKS
+    To Jesse Vincent for pointing me towards this module.
+
+LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

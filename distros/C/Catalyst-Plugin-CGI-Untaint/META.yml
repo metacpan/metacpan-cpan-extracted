@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Plugin-CGI-Untaint
+version:      0.05
+version_from: lib/Catalyst/Plugin/CGI/Untaint.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.5
+    CGI::Untaint:                  1.2
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

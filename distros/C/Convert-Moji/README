@@ -1,0 +1,101 @@
+    ____                          _           __  __       _ _ 
+   / ___|___  _ ____   _____ _ __| |_   _ _  |  \/  | ___ (_|_)
+  | |   / _ \| '_ \ \ / / _ \ '__| __| (_|_) | |\/| |/ _ \| | |
+  | |__| (_) | | | \ V /  __/ |  | |_   _ _  | |  | | (_) | | |
+   \____\___/|_| |_|\_/ \___|_|   \__| (_|_) |_|  |_|\___// |_|
+                                                        |__/   
+
+
+This is the README for Convert::Moji version 0.09.
+
+Convert::Moji is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Convert::Moji - objects to convert alphabets
+
+Convert::Moji objects convert between different alphabets. For
+example, a Convert::Moji object can convert between Greek letters and
+the English alphabet, or convert between phonetic symbols in Unicode
+and a representation of them in ASCII.
+
+This started as a helper module for "Lingua::JA::Moji", where it is
+used for converting between various Japanese methods of writing. It
+was split out of that module to be a general-purpose converter for any
+alphabets.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Convert::Moji
+    * http://metacpan.org/release/Convert-Moji
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Convert::Moji
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Convert::Moji
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Convert::Moji
+
+To install the module from the source file, Convert-Moji-0.09.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Convert-Moji-0.09.tar.gz
+    cd Convert-Moji-0.09
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Convert-Moji/issues>,
+
+or if you want to alter the source code of Convert::Moji, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Convert-Moji>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Sun Mar 26 11:46:09 2017.
+
+-----------------------------------------------------------------------------

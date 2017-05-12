@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+CHANGELOG
+README
+lib/CGI/Out.pm
+lib/CGI/Wrap.pm
+lib/CGI/BigDeath.pm
+META.yml                                 Module meta-data (added by MakeMaker)

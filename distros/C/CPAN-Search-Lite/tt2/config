@@ -1,0 +1,30 @@
+[% home = 'http://localhost' %]
+[%
+   search = "$home/search"
+   download = "$home/cpan"
+   cpaninstall = "$home/cpan_install"
+   ppminstall = "$home/ppm_install"
+   ppmrequest = "$home/cgi-bin/ppm-request?"
+   doc = "$home/htdocs"
+   cpanimg = "$home/icons/cpan.jpg"
+   rssimg = "$home/icons/rss-10.gif"
+   testers = 'http://testers.cpan.org/show/'
+   testers_author = 'http://testers.cpan.org/author/'
+   searchcpan = 'http://search.cpan.org/'
+   rt = 'http://rt.cpan.org/NoAuth/Bugs.html?Dist='
+   cpan = 'http://www.cpan.org'
+   forum = 'http://www.cpanforum.com/dist/'
+   anno = 'http://annocpan.org/dist/'
+   rate = 'http://cpanratings.perl.org/d/'
+   backpan = 'http://backpan.cpan.org'
+   maintainer = 'Randy Kobes'
+   maintainer_email = 'randy@theoryx5.uwinnipeg.ca'
+   faq =  "$home/htdocs/faq.html"
+   dslip = "$home/htdocs/dslip.html"
+   ppm = "$home/htdocs/ppm.html"
+   extra_files = { readme => {name => 'README', link => 'README.html'},
+                   meta => {name => 'META', link => 'META.html'},
+                   changes => {name => 'Changes', link => 'Changes.html'},
+                   install => {name => 'INSTALL', link => 'INSTALL.html'},
+                }
+%]

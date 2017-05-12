@@ -1,0 +1,45 @@
+SYNOPSIS
+
+     use Config::Apachish::Reader;
+     my $reader = Config::Apachish::Reader->new(
+         # list of known attributes, with their default values
+     );
+     my $config_array = $reader->read_file('config.conf');
+
+DESCRIPTION
+
+    This module reads Apachish configuration files (a format mostly
+    compatible with Apache webserver configuration format). It is a
+    minimalist alternative to the more fully-featured Config::Apachish. It
+    cannot write/modify Apachish files and is optimized for low startup
+    overhead.
+
+ATTRIBUTES
+
+    # INSERT_BLOCK: lib/Config/Apachish/Base.pm attributes
+
+METHODS
+
+ new(%attrs) => obj
+
+ $reader->read_file($filename) => hash
+
+    Read configuration from a file. Die on errors.
+
+ $reader->read_string($str) => hash
+
+    Read configuration from a string. Die on errors.
+
+SEE ALSO
+
+    Apachish - specification
+
+    Config::Apachish - round-trip parser for reading as well as writing
+    Apachish documents
+
+    Apachish::Examples - sample documents
+
+    Prior arts: Config::ApacheFormat, Apache::ConfigFile, Config::General,
+    Config::ApacheExtended. A more in-depth comparison between these
+    modules and Apachish will be made in the future.
+

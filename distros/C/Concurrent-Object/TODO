@@ -1,0 +1,26 @@
+
+                           TODO for Concurrent::Object
+            $Id: TODO,v 1.1.1.1 2001/06/10 14:39:39 vipul Exp $
+
+-------------------------------------------------------------------------------
+P No Task                                              Status
+- -- ------------------------------------------------  ------------------------
+
+   1 waitpid() in C::O::Proxy 
+   2 fix for restoring overloadedness at thaw()
+   3 create proxies for new object returned            Jun 10, 2001
+     by method calls
+   4 error handling mechanism
+   5 return values tied scalars                        Intractible.
+   6 implement ready() in ::Channel::LinkedPipes
+   7 creation of object processes on remote 
+     machines
+   8 SOAP::Lite integration
+
+-------------------------------------------------------------------------------
+
+LEGEND
+ - Date in the Status field indicates the task was completed on that date.
+ - `*' in P field distinguishes pending tasks.
+ - `+' before the task description indicates a sub-task.
+

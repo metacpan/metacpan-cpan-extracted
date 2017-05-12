@@ -1,0 +1,148 @@
+Revision history for Config::Find.
+
+0.31    2015-05-26
+        - Fix tests for meta files
+        - Generate META.(yml|json) on the fly when the dist is built
+        - Several doc fixes, remove non-ASCII characters
+
+0.30    2015-05-25
+        - Fix testing on Windows (bug report and patch by Alexandr
+          Ciornii)
+
+0.29    2015-04-21
+        - Config::Find::Any::_find must return undef when file not found. 
+          PBP does not apply.
+        - added initial test script for find() method.
+        - default to WinAny for Windows OSes, and separate exceptions.
+        - report versions when testing.
+
+0.28    2015-04-17
+        - documentation updates.
+        - fixed error message typo.
+        - added POD coverage tests.
+        - acknowledged Barbie's contribution, at Salvador's request. 
+        - switched to correct POD encoding.
+
+0.27    2015-04-16
+        - added POD UTF8 encoding directives. (RT#78944)
+        - fixed minor typos. (RT#82001)
+        - added Win7.pm. (RT#57625)
+        - change file dates changed to meet W3CDTF standards.
+        - updated module versions to be consistent for the distribution.
+        - added META.json & updated META.yml.
+        - added META and changefile tests.
+        - moved older test scripts to newer names.
+
+0.26    2008-11-24
+        - remove warning from File::Spec
+
+0.25    2008-11-20
+        - paths began with '//' on cygwin, use catpath to undo
+          splitpath (bug report from Pablo Torres).
+
+0.24    2008-11-12
+        - add Config::Find::Where->script_dir()
+        - some minor doc improvements
+
+0.23    2008-09-17
+        - add Config::Find::Where->lib_dir method
+        - Config::Find::Where->application_dir documented
+        - update to use new File::HomeDir API
+
+0.22    2005-09-22
+        - pod errors corrected on Config::Find::Where and now using
+          Test::Pod for automatically finding those errors.
+
+0.21    2005-08-08
+        - added work around on WinAny module when ${APPDATA} or
+          ${LOCAL_APPDATA} point to the user desktop to ignore them.
+
+0.20    2005-07-27
+        - look for ~/.foo.conf and ~/.foo.cfg in addition to ~/.foo
+
+0.19    2005-07-13
+        - bug on look_for_dir_file passing the wrong app name to
+          app_dir.
+
+0.18    2005-04-13
+        - bug on parent_dir('') going to an inf. loop corrected.
+        - convert path to absolute on create_dir and create_parent_dir
+        - create_parent_dirs renamed to create_parent_dir and exported
+          via Config::Find::Where.
+
+0.17    2005-04-13
+        - bug on var_dir corrected, when using scope 'app' a 'var'
+          part was missing on the path.
+        - Config::Find::Where::var_dir documented
+
+0.16    2004-09-16
+        - create_dir function exported on Config::Find::Where
+        - support for 'dir' option on Where module functions.
+
+0.15    2004-02-11
+        - Corrected bug on "names" handling reported by Bart Schaefer
+        - Better handling of Win32::GetFolderPath returning invalid
+          results
+
+0.14    2004-01-15
+        - Win2k3.pm missing from MANIFEST
+        - Use regexps to match Win OSs
+        - corrected bug on guess_script_dir
+
+0.13    2004-01-13
+        - NT4 was not being recognised as NT (bug reported by
+          Philip Grivell).
+
+0.12    2003-09-30
+        - Unix module accepts .cfg extension for read mode
+
+0.11    2003-06-12
+        - improved Config::Find::Where->var_dir(scope=>user) on Unix.
+        - new Config::Find::Where->helper_path method
+
+0.10    2003-06-12
+        - corrected several bugs in Windows modules
+        - new test script 2_where.t
+
+0.09    2003-06-05
+        - new file layout, now all the .pm files are under a common
+          lib dir.
+        - new Config::Find::Where module with some utility methods
+          (maybe unrelated to Config::Find, but useful anyway).
+        - Win32.pm module deleted.
+        - added supoprt for Windows 2003
+        - corrected some errors in the docs
+
+0.08    2003-05-29
+        - look for script on current dir when it doesn't have the path
+          included in its name and it has not been found on the system
+          path.
+
+0.07    2003-04-29
+        - Accept "WinXP/.NET" as OS
+
+0.06    2003-04-15
+        - File::HomeDir dependency added to main module, CPANPLUS
+          doesn't catch it on the inner module
+
+0.05    2003-04-14
+        - support for one liners added to Unix module
+
+0.04    2003-04-10
+        - added File::HomeDir dependecy to Config::Find::Unix
+
+0.03    2003-04-09
+        - corrected bug in open that returned a valid file handler
+          even when the configuration file was not found
+
+0.02    2003-04-09
+        - corrected bug in 'parent_dir' that was not correctly
+          handling trailing '/'
+        - corrected bug in 'guess_script_dir' that was not removing
+          the script name
+        - support for 'file' option added
+        - dependencies added in Makefile.PL
+
+0.01    2003-03-31T13:09:40
+        - original version; created by h2xs 1.22 with options
+        - AX -n Config::Find

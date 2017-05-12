@@ -1,0 +1,24 @@
+---
+abstract: 'get Catalyst actions with example paths included!'
+author:
+  - 'David Farrell <dfarrell@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-ActionPaths
+requires:
+  Encode: '0'
+  Moose::Role: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dnmfarrell/Catalyst-Plugin-ActionPaths
+  repository: https://github.com/dnmfarrell/Catalyst-Plugin-ActionPaths.git
+version: '0.01'

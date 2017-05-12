@@ -1,0 +1,9 @@
+sub get_auth_info {
+	my $access_key = 'not a secret';
+	my $secret_key = 'actually a secret';
+	my $url	       = 'https://rados2.dev.liquidweb.com/'; # you probably want your own host here.
+
+	return ($access_key, $secret_key, $url);
+}
+
+1;

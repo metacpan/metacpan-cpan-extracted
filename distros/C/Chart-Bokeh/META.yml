@@ -1,0 +1,35 @@
+---
+abstract: 'Generate html/javascript charts from perl data using javascript library BokehJS'
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chart-Bokeh
+requires:
+  Exporter: '0'
+  HTML::Show: '0'
+  JSON: '0'
+  Module::Load: '0'
+  Params::Validate: '0'
+  Ref::Util: '0'
+  Text::Template: '0'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/p5-Chart-Bokeh/issues
+  homepage: https://github.com/pablrod/p5-Chart-Bokeh
+  repository: https://github.com/pablrod/p5-Chart-Bokeh.git
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

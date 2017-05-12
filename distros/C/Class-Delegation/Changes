@@ -1,0 +1,50 @@
+Revision history for Perl extension Class::Delegation.
+
+0.01  Sun Sep  3 15:10:12 2000
+	- original version; created by h2xs 1.18
+
+
+1.05	Sat Dec  1 18:30:12 2001
+
+	- Localized modification to %SIG (thanks Tatsuhiko)
+
+	- Preserved $AUTOLOAD in classes that both delegate and AUTOLOAD
+	  (thanks Michael)
+
+
+1.06	Tue Apr 23 14:20:20 2002
+
+	- Made delegation inherited
+
+	- Added 'to => -SELF' option (thanks Piers)
+
+	- Added 'to => -SELF->method' option (thanks Piers)
+
+	- Allowed 'as' to take an array (thanks Piers)
+
+	- Allowed 'to' subs to return an object to be delegated to
+
+
+
+1.7.1  Fri Feb 17 19:10:58 2006
+
+	- Fixed test suite to be independent of hash key ordering
+	  (thanks Andreas)
+
+	- Allowed delegation to AUTOLOADed methods (thanks Corion)
+
+	- Fixed debugging output (thanks Steve)
+
+	- Removed superfluous and buggy C<eval>
+
+	- Fixed pod nits (thanks Dmitry)
+
+
+
+1.9.0  Fri Jul 15 07:23:13 2016
+
+    - Reconfigured SELF package to resolve CPAN indexer conflict
+      (thanks, Neil)
+
+
+

@@ -1,0 +1,22 @@
+---
+name: Catalyst-Plugin-UserAgent
+version: 0.01
+author:
+  - 'Andrew Sterling Hanenkamp, E<lt>hanenkamp@cpan.orgE<gt>'
+abstract: Add a singleton LWP::UserAgent to the context
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 0
+  Class::Data::Inheritable: 0
+  LWP::UserAgent: 0
+  Test::MockObject: 0
+provides:
+  Catalyst::Plugin::UserAgent:
+    file: lib/Catalyst/Plugin/UserAgent.pm
+    version: 0.01
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

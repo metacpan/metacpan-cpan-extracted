@@ -1,0 +1,56 @@
+NAME
+    Class::Discover - detect MooseX::Declare's 'class' keyword in files.
+
+SYNOPSIS
+DESCRIPTION
+    This class is designed primarily for tools that whish to populate the
+    "provides" field of META.{yml,json} files so that the CPAN indexer will
+    pay attention to the existance of your classes, rather than blithely
+    ignoring them.
+
+    The version parsing is basically the same as what M::I's
+    "->version_form" does, so should hopefully work as well as it does.
+
+METHODS
+  discover_classes
+     Class::Discover->discover_classes(\%opts)
+
+    Takes a single options hash-ref, and returns a array-ref of hashes with
+    the following format:
+
+     { MyClass => { file => "lib/MtClass.pm", type => "class", version => "1" } }
+
+    "version" will only be present if the class has a (detected) version.
+    "type" is the "keyword" match that triggered this class.
+
+    The following options are understood:
+
+    dir The (absolute) directory from which files should be given relative
+        to. If "files" is not passed, then the dir under which to search for
+        modules.
+
+    files
+        Array-ref of files in which to look. If provided, then only these
+        files will be searched.
+
+    keywords
+        List of 'keywords' which are treated as being class declarators.
+        Defaults to "class" and "role".
+
+    no_index
+        A hash of arrays with keys of "directory" and "file" which are
+        ignored when searching for packages.
+
+SEE ALSO
+    MooseX::Declare for the main reason for this module to exist.
+
+    Module::Install::ProvidesClass
+
+    Dist::Zilla
+
+AUTHOR
+    Ash Berlin "<ash@cpan.org>". (C) 2009. All rights reserved.
+
+LICENSE
+    Licensed under the same terms as Perl itself.
+

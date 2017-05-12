@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  17155:
+    - 214
+name: fdcb2e
+registers:
+  AF: 62593
+  AF_: 0
+  BC: 47154
+  BC_: 0
+  DE: 19327
+  DE_: 0
+  HL: 58039
+  HL_: 0
+  I: 0
+  IX: 37766
+  IY: 17149
+  PC: 4
+  R: 2
+  SP: 0

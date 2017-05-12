@@ -1,0 +1,4 @@
+* comment support (to be released)
+* token support
+* code completion support
+* other (see python's cindex)

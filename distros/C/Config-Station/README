@@ -1,0 +1,126 @@
+SYNOPSIS
+
+    Define your config class:
+
+     package MyApp::Config;
+    
+     use Moo;
+    
+     has www_port => (
+       is => 'ro',
+       required => 1,
+     );
+    
+     has static_path => (
+       is => 'ro',
+       default => 'view/static',
+     );
+    
+     1;
+
+    And elsewhere you load it up:
+
+     my $station = Config::Station->new(
+       config_class => 'MyApp::Config',
+       env_key      => 'MYAPP',
+       location     => '.config.json',
+     );
+    
+     my $config = $station->load;
+
+DESCRIPTION
+
+    This config loader offers a couple of major features that make it
+    compelling for the user:
+
+    1. Object based configuration
+
+      This is a huge deal. This means that you can trivially set defaults,
+      add validation, and an other number of cool things. On top of that
+      this means that unless you do something silly, your configuration has
+      clearly defined fields, instead of being a shapeless hash.
+
+    2. Environment based overriding
+
+      Presumably many users of this module will be loading their config
+      from a file. That's fine and normal, but baked into the module is and
+      an environment based config solution. This allows the user to change,
+      for example, a port, by just running the application as follows:
+
+       MYAPP_WWW_PORT=8080 perl bin/myapp.pl
+
+ATTRIBUTES
+
+     my $station = Config::Station->new( env_key => 'MYAPP' )
+
+ env_key
+
+    The env_key is a required attribute which affects everything about this
+    module.
+
+    env_key affects two classes of values:
+
+  Meta Configuration
+
+    These values use the env_key as a suffix, and are documented further
+    down.
+
+  Normal Configuration
+
+    These values use the env_key as a prefix for env vars that override
+    configuration keys. To be clear, if you specify an env_key of FOO, an
+    env var of FOO_BAR=BAZ will pass bar => 'BAZ' to the constructor of
+    "config_class".
+
+ config_class
+
+    The config_class is a required attribute which determines the class
+    that will be used when loading the configuration. The config class
+    absolutely must have a new method which takes a hash. What it returns
+    is up to you.
+
+    If you care to, you can define a serialize method on the object which
+    supports the "store" method, but I suspect that is likely not a typical
+    use case.
+
+ debug
+
+    Debugging is critical feature of this module. If you set this attribute
+    directly, or indirectly by setting the env var 'DEBUG_' . $env_key, you
+    will get some handy debugging output warned. It looks like this:
+
+     CONFIGSTATION FROM FILE:
+       name: herp
+     CONFIGSTATION FROM ENV:
+       id: 1
+       name: wins
+
+    If the file can't be loaded or parsed, for some reason, instead of
+    listing key-value pairs, the output for the file will be:
+
+     CONFIGSTATION FROM FILE: $exception
+
+    Note that failure to load or deserialize the file is not considered an
+    error. If you want to enforce that data is set do that by making your
+    object constructor more strict.
+
+ location
+
+    The location can be set directly, or indirectly by setting the env var
+    'FILE_' . $env_key. As noted above, it is neither required to be set or
+    parseable at all.
+
+ decode_via
+
+     my $station = Config::Station->new( ..., decode_via => sub { \&YAML::Load );
+
+    A code reference which can inflate a string into a hash reference.
+    Default uses JSON.
+
+ encode_via
+
+     my $station = Config::Station->new( ..., encode_via => sub { \&YAML::Dump );
+
+    A code reference which can deflate a hash reference into a string.
+    Default uses JSON.
+

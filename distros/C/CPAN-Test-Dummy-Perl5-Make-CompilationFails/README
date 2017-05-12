@@ -1,0 +1,5 @@
+Nothing of much use here.
+
+This module aims at exposing cpan-tester configurations that
+are broken in that they report FAIL when they should be
+reporting UNKNOWN.

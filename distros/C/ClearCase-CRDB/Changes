@@ -1,0 +1,58 @@
+Revision history for Perl extension ClearCase::CRDB.
+
+0.01 Tue Sep  5 11:48:14 EDT 2000
+	- original version
+
+0.02 Mon Oct 15 20:53:05 EDT 2001
+	- Doc cleanup. No functional change.
+
+0.03 Mon Oct 15 23:40:44 EDT 2001
+	- Still tweaking docs.
+
+0.04 Tue Oct 16 11:09:28 EDT 2001
+	- More doc work.
+
+0.05 Wed Oct 17 13:52:21 EDT 2001
+
+0.06 Thu Oct 18 13:53:57 EDT 2001
+	- Slight reworking of object layout; allow for multiple
+	  iwd's in case of recursive builds.
+	- Added recursive-make sample makefile and recmake.t test.
+
+0.07 Sat Oct 27 21:37:12 EDT 2001
+	- Added 'schema' number to deal with potential future reorgs.
+
+0.08 Tue Jan  8 08:16:12 EST 2002
+	- Allow Perl 5.005 - said to pass tests by a user.
+
+0.09 Fri Nov 22 14:09:55 EST 2002
+	- Fix test to insist on running within a view context.
+
+0.10 Tue Jul 22 10:48:02 EDT 2003
+	- Fixed contact data.
+
+0.11 Thu Nov 10 07:59:11 EST 2005
+	- Dealt with a slight change in CR format introduced in CC 6.0.
+	  This simply suppresses a warning issued with the new format.
+
+0.12 Mon Nov 21 16:53:48 EST 2005
+	- Fixed a number of Windows-specific bugs involving paths
+	  (/-vs-\, case sensitivity, and drive letters).
+	- Fix: do not assume a variables section between MVFS Objects
+	  and Build Script in a CR.
+
+0.15 Fri Oct 20 07:38:16 EDT 2006
+	- Major cleanup of code.
+	- Added cr2mf script suite for regeneration of Makefiles
+	  from config records (proof of concept only)
+	- Removed support for Data::Denter, which is deprecated
+	  nowadays and in any case was only ever here as a proof
+	  of concept.
+	- Actually, all support for alternate storage formats
+	  has been removed. I don't believe it was being used and
+	  I'm not in a position to test it. There's nothing to
+	  stop it from being put back in later.
+	- Now uses catcr in -long mode, allowing more intelligent
+	  handling of sibling derived objects.
+	- Whouses adds a new interactive mode so you can "browse"
+	  your way through dependencies.

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-PINT
+version:      0.01
+version_from: lib/Class/PINT.pm
+installdirs:  site
+requires:
+    Class::DBI:                    0.96
+    Class::DBI::AbstractSearch:    0.05
+    Class::DBI::Relationship::IsA: 0.02
+    Test::More:                    0
+    URI::Escape:                   3
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

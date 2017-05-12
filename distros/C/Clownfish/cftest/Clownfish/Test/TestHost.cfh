@@ -1,0 +1,81 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel TestClownfish;
+
+/** Clownfish test suite.
+ */
+class Clownfish::Test::TestHost {
+    inert incremented TestHost*
+    new();
+
+    Obj*
+    Test_Obj_Pos_Arg(TestHost *self, Obj *arg);
+
+    Obj*
+    Test_Obj_Pos_Arg_Def(TestHost *self, nullable Obj *arg = NULL);
+
+    Obj*
+    Test_Obj_Label_Arg(TestHost *self, Obj *arg, bool unused = false);
+
+    Obj*
+    Test_Obj_Label_Arg_Def(TestHost *self, nullable Obj *arg = NULL,
+                           bool unused = false);
+
+    int32_t
+    Test_Int32_Pos_Arg(TestHost *self, int32_t arg);
+
+    int32_t
+    Test_Int32_Pos_Arg_Def(TestHost *self, int32_t arg = 101);
+
+    int32_t
+    Test_Int32_Label_Arg(TestHost *self, int32_t arg, bool unused = false);
+
+    int32_t
+    Test_Int32_Label_Arg_Def(TestHost *self, int32_t arg = 101,
+                             bool unused = false);
+
+    bool
+    Test_Bool_Pos_Arg(TestHost *self, bool arg);
+
+    bool
+    Test_Bool_Pos_Arg_Def(TestHost *self, bool arg = true);
+
+    bool
+    Test_Bool_Label_Arg(TestHost *self, bool arg, bool unused = false);
+
+    bool
+    Test_Bool_Label_Arg_Def(TestHost *self, bool arg = true,
+                            bool unused = false);
+
+    /** A method that can't be overridden from the host language.
+     */
+    abstract void*
+    Invalid_Callback(TestHost *self);
+
+    void
+    Invoke_Invalid_Callback_From_C(TestHost *self);
+
+    /** A method with a custom host language alias.
+     */
+    incremented String*
+    Aliased(TestHost *self);
+
+    incremented String*
+    Invoke_Aliased_From_C(TestHost* self);
+}
+
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Handle method and function keywords with tidyall'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-Perl-IgnoreMethodSignaturesSimple
+no_index: {}
+requires:
+  Code::TidyAll: '0.04'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Code-TidyAll-Plugin-Perl-IgnoreMethodSignaturesSimple
+  repository: git://github.com/jonswar/perl-code-tidyall-plugin-perl-ignoremethodsignaturessimple.git
+version: '0.03'

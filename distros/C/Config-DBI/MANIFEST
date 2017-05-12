@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+dbi.conf
+lib/Config/DBI.pm
+scripts/caf.pl
+scripts/try-connect.pl
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

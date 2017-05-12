@@ -1,0 +1,41 @@
+NAME
+    Catalyst::Model::Gedcom - Gedcom Model Class
+
+SYNOPSIS
+        # lib/MyApp/Model/Gedcom.pm
+        package MyApp::Model::Gedcom;
+    
+        use base qw( Catalyst::Model::Gedcom );
+    
+        __PACKAGE__->config(
+            gedcom_file => 'root/my.ged',
+            read_only   => 1
+        );
+    
+        1;
+    
+        my $gedcom = $c->model( 'Gedcom' );
+    
+        my @individuals = $gedcom->individuals;
+
+DESCRIPTION
+    This is a model class to connect "Gedcom" files to "Catalyst".
+
+METHODS
+  COMPONENT( )
+    passes your config options to "Gedcom"'s "new" method.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   Catalyst
+
+    *   Gedcom
+

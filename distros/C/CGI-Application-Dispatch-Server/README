@@ -1,0 +1,38 @@
+CGI::Application::Dispatch::Server 
+=====================================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    HTTP::Request
+    HTTP::Status
+    IO::Capture::Stdout
+    CGI::Application
+    HTTP::Server::Simple
+    HTTP::Server::Simple::Static
+    HTTP::Server::Simple::CGI
+
+And requires these modules for testing:
+
+    Test::More
+
+COPYRIGHT AND LICENCE
+
+Parts Copyright (C) 2006 George Hartzell
+Parts Copyright (C) 2007 Mark Stosberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

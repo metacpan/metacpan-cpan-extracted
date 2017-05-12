@@ -1,0 +1,6 @@
+MapSpec.pm
+test.pl
+Makefile.PL
+./t/AppBuilder::MapSpec.t
+CGI-AppBuilder-MapSpec-0.10.readme
+README

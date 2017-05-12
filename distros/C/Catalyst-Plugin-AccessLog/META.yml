@@ -1,0 +1,34 @@
+---
+abstract: 'Request logging from within Catalyst'
+author:
+  - 'Andrew Rodland <andrew@hbslabs.com>'
+  - 'Murray <sysmon@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-AccessLog
+no_index:
+  directory:
+    - t
+requires:
+  Catalyst::Runtime: '5.80008'
+  Catalyst::Utils: '0'
+  DateTime: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Scalar::Util: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-AccessLog
+  homepage: http://metacpan.org/release/Catalyst-Plugin-AccessLog
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/Catalyst-Plugin-AccessLog.git
+version: '1.10'
+x_authority: cpan:ARODLAND

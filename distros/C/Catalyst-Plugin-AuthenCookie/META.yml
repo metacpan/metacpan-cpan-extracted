@@ -1,0 +1,28 @@
+---
+abstract: 'DEPRECATED - use CatalystX::AuthenCookie'
+author:
+  - 'Dave Rolsky, C<< <autarch@urth.org> >>'
+build_requires:
+  Catalyst::Test: 0
+  HTTP::Cookies: 0
+  HTTP::Date: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-AuthenCookie
+provides:
+  Catalyst::Plugin::AuthenCookie:
+    file: lib/Catalyst/Plugin/AuthenCookie.pm
+    version: 0.07
+requires:
+  Class::Accessor::Fast: 0
+  Digest::SHA: 0
+  Params::Validate: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

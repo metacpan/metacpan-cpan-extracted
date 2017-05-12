@@ -1,0 +1,8 @@
+Revision history for Catalyst-ActionRole-NotCacheableHeaders
+
+0.02    Sun Sep 19 22:01:10 2010
+        Fix package name typo, reported by Kent Fredric [RT #61461]
+
+0.01    Wed May 26 14:39:26 2010
+        First version.
+

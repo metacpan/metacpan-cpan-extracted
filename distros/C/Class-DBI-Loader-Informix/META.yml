@@ -1,0 +1,26 @@
+---
+name: Class-DBI-Loader-Informix
+version: 1.4
+author:
+  - 'Jonathan Stowe <jns@gellyfish.com>'
+abstract: Class::DBI::Loader Informix Implementation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::DBI: 0.89
+  Class::DBI::Loader: 0.29
+  DBD::Informix: 2005.02
+  Test::More: 0.32
+  perl: 5.6.1
+provides:
+  Class::DBI::Informix:
+    file: lib/Class/DBI/Informix.pm
+    version: 1.4
+  Class::DBI::Loader::Informix:
+    file: lib/Class/DBI/Loader/Informix.pm
+    version: 1.4
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

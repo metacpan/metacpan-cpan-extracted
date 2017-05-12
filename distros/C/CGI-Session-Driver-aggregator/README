@@ -1,0 +1,25 @@
+                    ========================================
+                       CGI::Session::Driver::aggregator
+                    ========================================
+
+CGI::Session::Driver::memcached is CGI::Session driver for memcached.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Session
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - 2006 Kazuhiro Oinuma <oinume@cpan.org>. All rights reserved. This library is free software. You can modify and or distribute it under the same terms as Perl itself.
+

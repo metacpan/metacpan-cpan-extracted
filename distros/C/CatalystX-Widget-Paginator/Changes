@@ -1,0 +1,29 @@
+Revision history for CatalystX-Widget-Paginator
+
+0.07    2015-11-27
+        * Added META.yml into distribution
+
+0.06    2015-09-28
+        * Test (#28) fixed.
+        * Added cpanfile for testing
+
+0.05
+        * POD improvemens
+
+0.04    2010-11-18
+        * Now depends on the Catalyst::Plugin::Widget 0.04
+          (new widget namespace logic)
+        * Test for namespace
+        * POD and test for subclassing
+        * POD mistakes fixed
+
+0.03    2010-11-17
+        * POD corrected
+        * Tests are ready
+
+0.02    2010-11-16
+        * Add Module::Install bootstrap code
+
+0.01    2010-11-16
+        First version, released on an unsuspecting world.
+

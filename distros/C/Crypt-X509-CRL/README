@@ -1,0 +1,344 @@
+Crypt-X509::CRL version 0.1
+===========================
+    Crypt::X509::CRL is an object oriented X.509 certificate revocation list
+    parser with numerous methods for directly extracting information from
+    certificate revocation lists.
+
+INSTALLATION
+    To install this module type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+DEPENDENCIES
+    This module requires:
+
+      Convert::ASN1
+
+NAME
+    Crypt::X509::CRL - Parses an X.509 certificate revocation list
+
+SYNOPSIS
+     use Crypt::X509::CRL;
+
+     $decoded = Crypt::X509::CRL->new( crl => $crl );
+
+     $subject_email = $decoded->subject_email;
+     print "do not use after: ".gmtime($decoded->not_after)." GMT\n";
+
+REQUIRES
+    Convert::ASN1
+
+DESCRIPTION
+    Crypt::X509::CRL parses X.509 certificate revocation lists. Methods are
+    provided for accessing most CRL elements.
+
+    It is based on the generic ASN.1 module by Graham Barr, on the
+    x509decode example by Norbert Klasen and contributions on the
+    perl-ldap-dev-Mailinglist by Chriss Ridd. It is also based upon the
+    works of Mike Jackson and Alexander Jung perl module Crypt::X509.
+
+    The following RFC 3280 Extensions are available (noted are the ones I
+    have implemented).
+
+            Authority Key Identifier (implemented)
+            CRL Number (implemented)
+            Issuing Distribution Point (implemented)
+            Issuer Alternative Name
+            Delta CRL Indicator
+            Freshest CRL (a.k.a. Delta CRL Distribution Point)
+
+    The following RFC 3280 CRL Entry Extensions are available (noted are the
+    ones I have implemented).
+
+            Reason Code (implemented)
+            Hold Instruction Code (implemented)
+            Invalidity Date (implemented)
+            Certificate Issuer
+
+    NOTE: The use of 'utcTime' in determining the revocation date of a given
+    certificate is based on RFC 3280 for dates through the year 2049.
+    Starting with dates in 2050 and beyond the RFC calls for revocation
+    dates to be listed as 'generalTime'.
+
+CONSTRUCTOR
+  new ( OPTIONS )
+    Creates and returns a parsed X.509 CRL hash, containing the parsed
+    contents. The data is organised as specified in RFC 2459. By default
+    only the first ASN.1 Layer is decoded. Nested decoding is done
+    automagically through the data access methods.
+
+    crl => $crl
+        A variable containing the DER formatted crl to be parsed (eg. as
+        stored in "certificateRevocationList;binary" attribute in an
+        LDAP-directory).
+
+   Example:
+      use Crypt::X509::CRL;
+      use Data::Dumper;
+
+      $decoded = Crypt::X509::CRL->new( crl => $crl );
+
+      print Dumper $decoded;
+
+METHODS
+  error
+    Returns the last error from parsing, "undef" when no error occured. This
+    error is updated on deeper parsing with the data access methods.
+
+   Example:
+      $decoded= Crypt::X509::CRL->new(crl => $crl);
+      if ( $decoded->error ) {
+            warn "Error on parsing Certificate Revocation List: ", $decoded->error;
+      }
+
+DATA ACCESS METHODS
+    You can access all parsed data directly from the returned hash. For
+    convenience the following data access methods have been implemented to
+    give quick access to the most-used crl attributes.
+
+  version
+    Returns the certificate revocation list's version as an integer. Returns
+    undef if the version is not specified, since it is an optional field in
+    some cases.
+
+   NOTE that version is defined as an Integer where:
+            0 = v1
+            1 = v2
+            2 = v3
+
+  version_string
+    Returns the certificate revocation list's version as a string value.
+
+   NOTE that version is defined as an Integer where:
+            0 = v1
+            1 = v2
+            2 = v3
+
+  this_update
+    Returns either the utcTime or generalTime of the certificate revocation
+    list's date of publication. Returns undef if not defined.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new(crl => $crl);
+      print "CRL was published at ", gmtime( $decoded->this_update ), " GMT\n";
+
+  next_update
+    Returns either the utcTime or generalTime of the certificate revocation
+    list's date of expiration. Returns undef if not defined.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new(crl => $crl);
+      if ( $decoded->next_update > time() ) {
+            warn "CRL has expired!";
+      }
+
+  signature
+    Return's the certificate's signature in binary DER format.
+
+  signature_length
+    Return's the length of the certificate's signature.
+
+  signature_algorithm
+    Returns the certificate's signature algorithm as an OID string.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new(crl => $crl);
+      print "CRL signature is encrypted with:", $decoded->signature_algorithm, "\n";
+
+      Example Output: CRL signature is encrypted with: 1.2.840.113549.1.1.5
+
+  SigEncAlg
+    Returns the signature encryption algorithm (e.g. 'RSA') as a string.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new(crl => $crl);
+      print "CRL signature is encrypted with:", $decoded->SigEncAlg, "\n";
+
+      Example Output: CRL signature is encrypted with: RSA
+
+  SigHashAlg
+    Returns the signature hashing algorithm (e.g. 'SHA1') as a string.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new(crl => $crl);
+      print "CRL signature is hashed with:", $decoded->SigHashAlg, "\n";
+
+      Example Output: CRL signature is encrypted with: SHA1
+
+  Issuer
+    Returns a pointer to an array of strings building the DN of the
+    certificate issuer (= the DN of the CA). Attribute names for the most
+    common Attributes are translated from the OID-Numbers, unknown numbers
+    are output verbatim.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new( $crl );
+      print "CRL was issued by: ", join( ', ' , @{ $decoded->Issuer } ), "\n";
+
+  issuer_cn
+    Returns the string value for issuer's common name (= the value with the
+    OID 2.5.4.3 or in DN Syntax everything after "CN="). Only the first
+    entry is returned. "undef" if issuer contains no common name attribute.
+
+  issuer_country
+    Returns the string value for issuer's country (= the value with the OID
+    2.5.4.6 or in DN Syntax everything after "C="). Only the first entry is
+    returned. "undef" if issuer contains no country attribute.
+
+  issuer_state
+    Returns the string value for issuer's state or province (= the value
+    with the OID 2.5.4.8 or in DN Syntax everything after "S="). Only the
+    first entry is returned. "undef" if issuer contains no state attribute.
+
+  issuer_locality
+    Returns the string value for issuer's locality (= the value with the OID
+    2.5.4.7 or in DN Syntax everything after "L="). Only the first entry is
+    returned. "undef" if issuer contains no locality attribute.
+
+  issuer_org
+    Returns the string value for issuer's organization (= the value with the
+    OID 2.5.4.10 or in DN Syntax everything after "O="). Only the first
+    entry is returned. "undef" if issuer contains no organization attribute.
+
+  issuer_email
+    Returns the string value for issuer's email address (= the value with
+    the OID 1.2.840.113549.1.9.1 or in DN Syntax everything after "E=").
+    Only the first entry is returned. "undef" if issuer contains no email
+    attribute.
+
+  key_identifier
+    Returns the authority key identifier as a bit string.
+
+   Example:
+            $decoded = Crypt::X509::CRL->new( $crl );
+            my $s = unpack("H*" , $decoded->key_identifier);
+            print "The Authority Key Identifier in HEX is: $s\n";
+
+            Example output:
+            The Authority Key Identifier in HEX is: 86595f93caf32da620a4f9595a4a935370e792c9
+
+  authorityCertIssuer
+    Returns a pointer to an array of strings building the DN of the
+    Authority Cert Issuer. Attribute names for the most common Attributes
+    are translated from the OID-Numbers, unknown numbers are output
+    verbatim. Returns undef if the extension is not set in the certificate.
+
+   Example:
+      $decoded = Crypt::X509::CRL->new($cert);
+      print "Certificate was authorised by:", join( ', ', @{ $decoded->authorityCertIssuer } ), "\n";
+
+  authority_serial
+    Returns the authority's certificate serial number.
+
+  authority_cn
+    Returns the authority's ca.
+
+  authority_country
+    Returns the authority's country.
+
+  authority_state
+    Returns the authority's state.
+
+  authority_locality
+    Returns the authority's locality.
+
+  authority_org
+    Returns the authority's organization.
+
+  authority_email
+    Returns the authority's email.
+
+  crl_number
+    Returns the CRL Number as an integer.
+
+  IDPs
+    Returns the Issuing Distribution Points as a hash providing for the
+    default values.
+
+   Example:
+            print "Issuing Distribution Points:\n";
+            my $IDPs = $decoded->IDPs;
+            for my $key ( sort keys %{ $IDPs } ) {
+                    print "$key = ";
+                    if ( defined $IDPs->{ $key } ) {
+                            print $IDPs->{ $key }, "\n";
+                    } else {
+                            print "undef\n";
+                    }
+            }
+
+   Example Output:
+            Issuing Distribution Points:
+            critical = 1
+            directory_addr = CN=CRL2, O=U.S. Government, C=US
+            indirectCRL = 0
+            onlyAttribCerts = 0
+            onlyCaCerts = 0
+            onlyUserCerts = 1
+            reasonFlags = undef
+            url = undef
+
+   Example of returned data structure:
+            critical        = 0 or 1 # default is FALSE
+            directory_addr  = CN=CR1,c=US # default is undef
+            url             = ldap://ldap.gov/cn=CRL1,c=US # default is undef
+            onlyUserCerts   = 0 or 1 # default is FALSE
+            onlyCaCerts     = 0 or 1 # default is FALSE
+            onlyAttribCerts = 0 or 1 # default is FALSE
+            indirectCRL     = 0 or 1 # default is FALSE
+            reasonFlags     = BIT STRING # default is undef
+
+  revocation_list
+    Returns an array of hashes for the revoked certificates listed on the
+    given CRL. The keys to the hash are the certificate serial numbers in
+    decimal format.
+
+   Example:
+            print "Revocation List:\n";
+            my $rls = $decoded->revocation_list;
+            my $count_of_rls = keys %{ $rls };
+            print "Found $count_of_rls revoked certificate(s) on this CRL.\n";
+            for my $key ( sort keys %{ $rls } ) {
+                    print "Certificate: ", DecimalToHex( $key ), "\n";
+                    for my $extn ( sort keys %{ $rls->{ $key } } ) {
+                            if ( $extn =~ /date/i ) {
+                                    print "\t$extn: ", ConvertTime( $rls->{ $key }{ $extn } ), "\n";
+                            } else {
+                                    print "\t$extn: ", $rls->{ $key }{ $extn }, "\n";
+                            }
+                    }
+            }
+
+   Example Output:
+            Revocation List:
+            Found 1 revoked certificate(s) on this CRL.
+            Certificate: 44 53 a0 f3
+                    crlReason: keyCompromise
+                    invalidityDate: Wednesday, September 27, 2006 12:54:51 PM
+                    revocationDate: Wednesday, September 27, 2006 1:29:36 PM
+
+SEE ALSO
+    See the examples of "Convert::ASN1" and the <perl-ldap@perl.org> Mailing
+    List. An example on how to load certificates can be found in
+    t\Crypt-X509-CRL.t.
+
+ACKNOWLEDGEMENTS
+    This module is based on the x509decode script, which was contributed to
+    Convert::ASN1 in 2002 by Norbert Klasen.
+
+    It is also based on the Crypt::X509 perl module, which was contributed
+    by Mike Jackson and Alexander Jung.
+
+AUTHOR
+    Duncan Segrest <CPAN@GigaGeek.info> ,
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 by Duncan Segrest <CPAN@GigaGeek.info>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

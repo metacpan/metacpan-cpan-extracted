@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd84
+registers:
+  AF: 32557
+  AF_: 0
+  BC: 31918
+  BC_: 0
+  DE: 50394
+  DE_: 0
+  HL: 31470
+  HL_: 0
+  I: 0
+  IX: 17390
+  IY: 49294
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,14 @@
+Revision history for Catmandu-OAI
+
+0.274  2016-02-24 15:44:52 CET
+  - Fixing code fo Catmandu 1.0 release
+  
+0.273  2015-11-17 14:42:02 CET
+  - Adding describeRepository command
+  - Adding support for reading and adding to the Fedora default namespace
+  - Adding support to switch namespaces using the bag('name') 
+  - Listing all objects is only within one namespace
+  
+0.272  2015-05-21 09:49:18 CEST
+  - Upgrade to Dist::Milla
+  - Upgrade to latest Catmandu

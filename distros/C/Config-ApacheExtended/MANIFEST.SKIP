@@ -1,0 +1,17 @@
+CVS/.*
+\.bak$
+\.swp$/
+\.sw[a-z]$
+\.tar$
+\.tgz$
+\.tar\.gz$
+\.prd$
+^mess/
+^tmp/
+^blib/
+^scripts/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$
+~$
+^RD_TRACE$

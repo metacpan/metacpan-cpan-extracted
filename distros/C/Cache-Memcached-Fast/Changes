@@ -1,0 +1,594 @@
+Revision history for Perl extension Cache::Memcached::Fast.
+
+
+0.25  2017-03-15
+        - ensure we build on modern EUMM, restore dynamic_config in
+        META.
+
+        Changes since 0.24:
+
+        Alexandr Ciornii (alexchorny@gmail.com) provided patches to
+        workaround RT#117800: ExtUtils-MakeMaker: don't know how to
+        make dynamic.
+
+        Olli-Antti Kivilahti (olli-antti.kivilahti@jns.fi) provided
+        patches to test that we return undef on server errors.
+
+
+0.24  2017-03-12
+        - prevent undefined values causing a segmentation fault,
+        avoid a superfluous eval require in calls to new.
+
+        Changes since 0.23:
+
+        Hunter McMillen (mcmillhj@gmail.com) provided patches to fix
+        RT#43537: undefined values passed to the multi functions no
+        longer cause segmentation faults.
+
+        Dmitry Shalashov (dimaniac83@mail.ru) provided patches that
+        replace the openhack project home reference with github.
+
+        Avoid an eval require on Scalar::Util per call to new,
+        just use sv_rvweaken directly.
+
+
+0.23  2014-11-15
+        - add touch and touch_multi commands, speedup for the case
+        when application threads have per-thread Perl interpreters
+        (multithreaded Apache, etc.).
+
+        Changes since 0.22:
+
+        Alexandr Evstigneev (hurricup@gmail.com) provided patches that
+        make querying per-thread Perl state more efficient, and also
+        fix compilation warnings on Win64.
+
+        neguse (negcee@gmail.com) provided patches that implement
+        "touch" and "touch_multi" commands that appeared in memcached
+        1.4.8.
+
+
+0.22  2014-04-28
+        - warn about UTF-8 strings when utf8 option is disabled.
+
+        Changes since 0.21:
+
+        Fix RT#92678: behaviour with utf8=0.  When utf8 option is
+        disabled C::M::F will try to downgrade UTF-8 strings and will
+        croak if failed to do so.
+
+        Also updated ppport.h and removed outdated test case
+        encoding.t.
+
+
+0.21  2013-04-06
+        - regenerate distribution archive to include META.json and
+        META.yml.  There's no need to upgrade as these files are used
+        only by CPAN itself.
+
+        Changes since 0.20:
+
+        There are no changes since 0.20.  CPAN::Meta hasn't been
+        installed on the build host and this resulted in creation of
+        0.20 distribution missing META.json/META.yml without any
+        warning.  Turns out the absence of these files prevents the
+        released module from being tested on CPAN tester network.
+
+
+0.20  2013-04-03
+        - finally fix magic.t failure.  Magic handling introduced in
+        0.18 wasn't correct until this release.  Upgrade if you use
+        Perl 'tie' feature or its derivatives like Readonly.
+
+        Changes since 0.19:
+
+        Fix RT#57150, RT#67106: magic.t failure.  Thanks to
+        <listposter@...> for instructions on how to reproduce the
+        problem.
+
+        Fix RT#77254: typo in POD documentation.  Tnanks to Alex
+        <alex112358@...>.
+
+        Fix RT#81782: Unnecessary string eval in constructor.  Thanks
+        to Andrew Holland for the patch.
+
+
+0.19  2010-04-24
+        - revert SIGPIPE suppression change.  Upgrade if you couldn't
+        build 0.18.
+
+        Changes since 0.18:
+
+        Turned out some orthodox systems do not have sigtimedwait().
+        Since advanced systems that have sigtimedwait() also have
+        MSG_NOSIGNAL and thus do not use SIGPIPE suppression code in
+        question, and other systems have neither MSG_NOSIGNAL nor
+        sigtimedwait(), the only option is to revert to the previous
+        suppression code.  It works correctly unless your program is
+        multi-threaded.
+
+
+0.18  2010-04-06
+        - make module thread-safe, and fix several bugs.  No need to
+        upgrade unless you experienced limitations mentioned below.
+
+        Changes since 0.17:
+
+        Fix RT#56142: handle Perl magic.  Tied scalars, arrays and
+        hashes are supported now, as well as Readonly variables and
+        other magic stuff.
+
+        Fix t/command.t failure on some Solaris distributions.
+
+        Make module thread-safe with Perl >= 5.7.2.
+
+
+0.17  2009-11-02
+        - remove delete expiration aka delay parameter.  Upgrade is
+        required for use with memcached >= 1.3.2.
+
+        Changes since 0.16:
+
+        Warn about ignoring non-zero delete expiration time.
+        Expiration time for "delete" command has been optional in
+        older versions of memcached, and was dropped in memcached
+        1.3.2 (in an incompatible manner).  Not knowing server version
+        it's impossible to tell whether the server will handle the
+        parameter or not, so we simply do not send it at all.
+        Explicit zero passed to delete() or delete_multi() is silently
+        ignored, and a warning is given if you pass non-zero delete
+        expiration time.  Furthermore the syntax delete($key, $delay)
+        and delete_multi([$key, $delay]) is obsoleted and no more
+        documented.
+
+
+0.16  2009-06-15
+        - add missing files.  This is a fix for the previous release.
+
+        Changes since 0.15:
+
+        Add src/addrinfo_hostent.c and src/addrinfo_hostent.h to
+        MANIFEST.  Oops :(.
+
+
+0.15  2009-06-15
+        - no need to upgrade for existing users.  This release fixes
+        issues that new users may encounter (lack of getaddrinfo() on
+        some Windows systems; failing test case due to behaviour
+        change in memcached 1.3.3 that would break automatic
+        installation from CPAN).
+
+        Changes since 0.14:
+
+        Previous release (0.14) featured the change in the Ketama
+        algorithm.  While that was a necessary move to improve key
+        distribution across servers, it introduced incompatibility
+        with earlier versions, and provided no means for smooth
+        transition for existing users of Ketama algorithm (i.e.,
+        without complete loss of cached data).  The following
+        workaround was suggested by Masahiro Nagano---thanks!:
+
+          - apply the patch at http://limilic.com/entry/ljlt0sksbiqi16p3
+
+          - create two instances of C::M::F, one with enabled
+            old_ketama_algo => 1.
+
+          - for some time populate caches via both client instances,
+            while serving gets through old_ketama_algo.  For this you
+            may use Cache::Migrate (http://gist.github.com/110981).
+
+          - after some time (depends on cache refresh rate) you may
+            drop old_ketama_algo, as new data is now distributed
+            according to the new Ketama implementation as well (this
+            doubles memory use though).
+
+        I do not include the named patch in the distribution, because
+        it's use is limited for one-time transition for existing
+        Ketama users only.
+
+        On systems lacking getaddrinfo() implement it with
+        gethostbyname(). In particular this should fix the build on
+        Win32 (Cygwin, Mingw32).  Problem report (for Windows 2000 and
+        below) and initial patch are by Yasuhiro Matsumoto.
+
+        Fix t/commands.t: starting with memcached 1.3.3 incr/decr
+        commands expect numeric value in the cache.  Patch by Jason
+        M. Mills (RT#46883).
+
+
+0.14  2009-02-07
+        - improve Ketama distribution.  The change is incompatible
+        with Ketama implementation in previous versions.
+
+        Changes since 0.13:
+
+        Change calculation of Ketama points for a given server to get
+        mapping ratios closer to server weight ratios.  New Ketama
+        mode is compatible with nginx's module memcached_hash
+        (http://openhack.ru/nginx-patched/wiki/MemcachedHash) version
+        0.4, which has the same change, and is incompatible with
+        earlier versions of both named and this module.
+
+        Add script/ketama-distr.pl to compute server's share of
+        continuum.  Real-world example:
+
+          script/ketama-distr.pl --ketama_points=150 \
+                                 --server=10.0.143.4:11211 \
+                                 --server=10.0.143.6:11211 \
+                                 --server=10.0.143.7:11211 \
+                                 --server=10.0.143.8:11211
+
+        outputs:
+
+          Old:
+          server 1: 10.0.143.4:11211  total =  671585356 (15.64%)
+          server 2: 10.0.143.6:11211  total =  601117590 (14.00%)
+          server 3: 10.0.143.7:11211  total = 1771239512 (41.24%)
+          server 4: 10.0.143.8:11211  total = 1251024837 (29.13%)
+
+          New:
+          server 1: 10.0.143.4:11211  total = 1057134262 (24.61%)
+          server 2: 10.0.143.6:11211  total = 1111432463 (25.88%)
+          server 3: 10.0.143.7:11211  total = 1017280856 (23.69%)
+          server 4: 10.0.143.8:11211  total = 1109119714 (25.82%)
+
+          Continuum array size = 4800 bytes
+
+        I.e. "Old" is what we were getting before the change, and
+        "New" is what we are getting now.  "Continuum array size" is
+        how much memory is used to store the continuum array.  Try
+        this script on your servers to see your distribution, and
+        possibly to tweak ketama_points and/or server weights to get a
+        better one.
+
+        Fix RT#41077 (http://rt.cpan.org/Ticket/Display.html?id=41077):
+        implement disconnect_all().  Patch is by norbi.nix.hu, with
+        minor corrections---thanks!.
+
+
+0.13  2008-10-13
+        - introduce Win32 support (based on the patch by Yasuhiro
+        Matsumoto---arigatou!), and use poll() instead of select()
+        (suggested by Vladimir Timofeev).
+
+        Changes since 0.12:
+
+        Add support for Win32.  I personally don't have the system nor
+        compiler, so I can't even test the build.  Win32 port is
+        expected to be supported by community.  Note: on Win32 below
+        Windows Vista max number of memcached servers is 64.  See
+        comment on FD_SETSIZE in src/socket_win32.h to learn how to
+        increase this value if you need to connect to more than 64
+        servers.
+
+        Use poll() system call instead of select().  The latter has
+        the limit on the file descriptor value.  I.e. even when the
+        number of memcached servers is low, but your application opens
+        lots of other files, then after some point socket() returns
+        fd value larger that select() can handle.  poll() doesn't have
+        this limitation.  On a side note, we don't have to use
+        advanced calls like epoll()/kqueue(), because number of
+        memcached servers is normally not very large (and single
+        request touches even a smaller subset).
+
+        Add bench make target ('make bench').  You may change initial
+        parameters at the top of script/benchmark.pl to benchmark
+        different types of loads.
+
+        Do not install libclient.a.  Thanks to Vladimir Timofeev for
+        finding out how to prevent the installation.
+
+
+0.12  2008-07-21
+        - this release fixes compilation on Solaris broken in 0.11.
+        If you were able to compile 0.11, then you weren't affected.
+
+        Changes since 0.11:
+
+        Fix compilation on Solaris.  Ironically, 0.11 was supposed to
+        fix unrecognized format problem on Solaris, but instead broke
+        the compilation.  Back in May the line
+
+          return XSRETURN_EMPTY;
+
+        has been introduced to the code, whereas it should be
+
+          XSRETURN_EMPTY;
+
+        It went unnoticed because expansion produces the code
+        permitted by compilers like GCC that allow blocks to return a
+        value.  But Perl on Solaris has a different definition of this
+        macro that is not an expression.  Hence the problem.
+
+
+0.11  2008-07-17
+        - this release fixes %zu problem on Solaris.
+
+        Changes since 0.10:
+
+        Replace size_t/%zu with unsigned long/%lu for benefit of
+        systems that do not recognize the former format (Solaris 9).
+        Thanks to Michael Vychizhanin!
+
+        Add new parameter max_size (suggested by Alex Kapranoff, see
+        RT#35588, http://rt.cpan.org/Ticket/Display.html?id=35588).
+
+        Fix RT#36074 (http://rt.cpan.org/Ticket/Display.html?id=36074):
+        ExtUtils::MakeMaker version 6.17 and below generated invalid
+        Makefile.
+
+
+0.10  2008-05-01
+        - this is a bugfix release fixing key distribution in
+        compatible mode (reported by Anton Yuzhaninov---thanks!), and
+        minor fixes in Ketama mode for collision case (very rare).
+
+        Changes since 0.09:
+
+        Fix key distribution bug in compatible mode.  Because of
+        accumulated rounding error some keys were mapped to the
+        different server than with Cache::Memcached.
+
+        Remove explicit OPTIMIZE setting from the makefiles.  It ought
+        to be set explicitly by the user.  You can run 'perl -V:optimize'  
+        to learn the default.  It is safe to increase optimization
+        level to -O3.
+
+        Fix hash_namespace parameter: it didn't work for the namespace
+        specified in the constructor.
+
+        Minor fixes in Ketama mode for rare collision case.
+
+
+0.09  2008-03-06
+        - this release makes 'noreply' mode official, and improves
+        latency for some command patterns by managing TCP_NODELAY flag.
+
+        Changes since 0.08:
+
+        Enable TCP_NODELAY to reduce latency of commands that wait for
+        the reply, and disable it for throughput of commands that don't
+        need any reply.
+
+        t/encoding.t was removed from distribution.  It doesn't work
+        with Perl 5.6, which has no 'encoding' pragma, and I don't
+        know how to fix it (beautifully, there's a number of ugly
+        ways).
+
+        'noreply' mode is documented as the official feature of
+        memcached 1.2.5.  script/benchmark.pl uses it automatically
+        when available.
+
+        Add parameter 'hash_namespace' (see docs).
+
+        Add method 'namespace' to get and/or set the namespace prefix.
+        This is handy when you "lease" C::M::F object for different
+        parts of your application that do unrelated things.
+
+
+0.08  2008-01-24
+        - this is mostly a cleanup release, that also improves
+        decompression speed.
+
+        Changes since 0.07:
+
+        compress_alog was replaced with more generic compress_methods.
+        It turned out that IO::Uncompress::Gunzip is much (~4x) slower
+        than Compress::Zlib, so the latter is used as the default for
+        compress_methods.  Besides, previous mechanism didn't scale
+        well.
+
+        Implemented the check of constructor arguments to catch
+        various typos (enabled by default), and new 'check_args'
+        parameter to disable it.
+
+        Workaround "cast from integer to pointer of different size"
+        warning on 64-bit platforms.
+
+        Removed 127.0.0.x from test cases since not all hosts resolve
+        such addresses when x is not 1.
+
+        Use plain malloc()/free() instead of Newx()/Safefree() in XS.
+        This should fix the build with Perl versions 5.6.0--5.8.6.
+
+
+0.07  2008-01-18
+        - this is a major release that features a significant speed
+        improvement and introduces multi update commands.  It also
+        fixes a bug in nowait mode that was introduced in 0.06.
+        Upgrade is recommended if you are using nowait => 1, or want
+        to employ new features and speed.
+
+        Changes since 0.06:
+
+        For performance reasons all Perl code was converted to XS.  If
+        you performed any benchmarks, you may want to repeat them ;).
+        This change has a drawback that now you can't derive from
+        C::M::F easily.
+
+        Every update command now has its multi equivalent: set_multi,
+        add_multi, replace_multi, append_multi, prepend_multi,
+        incr_multi, decr_multi and delete_multi.  By using multi
+        commands you will reduce request latency: several requests
+        would be sent in one packet, and the client would talk to all
+        servers simultaneously.
+
+        Improved results of update commands: commands that previously
+        returned boolean value now return true for positive server
+        reply, false for negative server reply, and undef on error.
+        Similar to DBI, decr returns "0E0" for positive zero reply,
+        which evaluates to true in a boolean context.
+
+        flush_all now returns a hash 'server_name' => 'bool_result'.
+
+        New commands 'server_versions' and 'nowait_push'.
+
+        New 'utf8' and 'serialize_methods' parameters for constructor.
+
+        script/compare.pl was removed.  Instead script/benchmark.pl
+        takes an optional last argument "compare".
+
+        t/03-flush_all.t was removed.  We use PID as a part of a
+        namespace prefix now, so we don't need clear cache any more.
+        And there are good reasons not to have flush_all: the user may
+        flush a valuable cache by mistake, and "flush_all 0" doesn't
+        work on memcached 1.2.2, so the outcome was uncertain anyway.
+        Without flush_all it's possible to execute in parallel more
+        than one 'make test'.
+
+        Fixed bug in 'nowait' mode that could cause false negative
+        replies to subsequent requests that you are waiting for.
+
+        Workaround the loss of the last 'noreply' request on the
+        server.  'noreply' is still an undocumented feature.
+
+        To support multi commands the API of internal client
+        implementation was changed.  If you were using it as a
+        standalone library---sorry :).  After API will freeze C client
+        library will likely be released on its own.
+
+
+0.06  2007-12-20
+        - this release fixes a serious bug and features the 'nowait'
+        mode.  Upgrade is recommended.
+
+        Changes since 0.05:
+
+        Fix a subtle race bug present since 0.02 that could mix
+        several values into one when you have more than one memcached
+        server and executed get_multi or gets_multi.  If you have seen
+        the following in your logs or on the console:
+
+          Attempt to free unreferenced scalar: SV 0x9e89d34 at
+          /tmp/Cache-Memcached-Fast/blib/lib/Cache/Memcached/Fast.pm line 688.
+
+        that was it.
+
+        Added 'nowait' mode that allows the client to not wait the
+        reply, and thus reduces the wallclock time.  Run
+        script/benchmark.pl and see how it affects wallclock time,
+        especially over the wire.
+
+        Made undocumented 'noreply' parameter a per-server setting.
+
+
+0.05  2007-12-18
+        - more fixes to build and pass tests on different platforms.
+        There's no functional changes again.
+
+        Changes since 0.04:
+
+        At least on Perl 5.6.2 SVREF typemap entry has the meaning of
+        the class based on blessed SV.  So instead of SVREF we use
+        custom Ref_SV and custom typemap entry.  Found by CPAN
+        testers.
+
+        Do not use AUTOLOAD for normal commands, only for undocumented
+        ones.
+
+        Add incr() and decr() to script/compare.pl and
+        script/benchmark.pl.
+
+        Test case is split into several files and cleaned a bit.
+
+        Rename 'sun' -> 's_unix' in connect.c, because 'sun' is
+        reserved on... guesses?  Right, Sun systems!  Found by CPAN
+        testers.
+
+        Fix test case for FreeBSD and derivatives: do not use
+        localhost.localdomain address, which FreeBSD doesn't resolve
+        by default.
+
+        Added docs section "UTF-8 and tainted data".
+
+
+0.04  2007-12-16
+        - CPAN testers found more issues on different platforms,
+        fixing these.
+
+        Changes since 0.03:
+
+        const char * is missing from typemap in Perl 5.6.2, fixed by
+        using plain char * for class name in new().
+
+        Use AI_ADDRCONFIG conditionally, some systems do not have it
+        (NetBSD 3.1).
+
+
+0.03  2007-12-16
+        - this release has no new functionality compared to 0.02.  It
+          only fixes some test and documentation problems that were
+          discovered, as it always happens, after the upload to CPAN.
+
+        Changes since 0.02:
+
+        Fixed internal documentation references.
+
+        Added missing docs for incr and decr.
+
+        Fixed test case to test server version and use
+        cas/gets/append/prepend only for 1.2.4 and up.
+
+        Actually there's new _undocumented_ command server_versions,
+        is has broken interface, you can't say which version
+        corresponds to which server when some of them do not respond.
+        This command is subject to change.
+
+
+0.02  2007-12-15
+        - first public release.
+
+        Changes since 0.01:
+
+        Fully restartable code was replaced with classic
+        fill-the-buffer-first approach: it turned out that
+        restartability doesn't add much advantage.  Lots of beautiful
+        and ugly code gone away.
+
+        Added support for multiple servers (select machine, CRC32,
+        timeouts).
+
+        Added script/compare.pl to compare this module to the original
+        Cache::Memcached, and also to measure speed in general.
+
+        Added Unix socket support, SIGPIPE handling (proper ignoring
+        actually ;)).
+
+        Added support for serialization of Perl data structures, and
+        for compression.
+
+        New commands: incr, decr, gets, gets_multi, cas,
+        enable_compression, remove (alias to delete).
+
+        New client parameters: connect_timeout, io_timeout (aka
+        select_timeout), compress_threshold, compress_ratio,
+        compress_algo, max_failure, failure_timeout.
+
+        Finally added documentation!
+
+        Added support for server weights.
+
+        Added the Ketama consistent hashing algorithm.
+
+        Added default tests as generated with Module::Starter.  Main
+        test case is still messy, should be split into several tests.
+
+        There's also support for 'noreply'-enabled memcached, but
+        those patches are not (yet) accepted to mainline, so 'noreply'
+        is not an official feature and is not documented.
+
+
+0.01  2007-11-26
+        - first internal release.
+
+        Supported only one server connection (TCP).  Commands are
+        set(), add(), replace(), prepend(), append(), delete(),
+        flush_all(), get(), get_multi().  Client parameters are
+        'servers', 'namespace', 'close_on_error'.  There's no
+        documentation.  Test case is messy (but does its job).
+
+
+0.00  2007-11-19
+        - original version; created by h2xs 1.23 with options
+            -O --omit-autoload --compat-version=5.6.0 \
+            --use-new-tests --name=Cache::Memcached::Fast

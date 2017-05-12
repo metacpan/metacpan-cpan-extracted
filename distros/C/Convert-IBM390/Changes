@@ -1,0 +1,140 @@
+Revision history for Perl extension Convert::IBM390.
+
+0.01  Tue Jan 12 12:36:20 1999
+	- original version; created by h2xs 1.18
+	- Geoffrey Rommel (grommel@sears.com)
+
+0.02  Mon Apr 12 13:11:16 1999
+	- made compatible with 5.004 and earlier releases
+	- Original version had a bug when char was unsigned, but it
+	  was not revealed by 'make test'.  Squished the bug; smoothed
+	  out the signed/unsigned business; added test for the buggy
+	  condition.
+
+0.03  Wed Jun  9 14:34:17 1999
+	- Added unpackeb(), ":all" tag.
+	- Eliminated the superfluous IBM390lib subdirectory.
+	- Smoothed out the signed/unsigned business some more.
+	- Corrected the package name in IBM390.xs.
+
+0.04  Wed Jun 23 08:11:54 1999
+	- Made $warninv global.
+	- Further (final?) signed/unsigned improvements.
+	- Added validity checking and 'x' option to unpackeb.
+	- Added debugging option.
+
+0.05  Tue Jul 20 14:43:17 1999
+	- Transitional release.
+	- pdi and pdo renamed to packed2num and num2packed.
+	- Added zoned2num and num2zoned functions.
+	- Added packeb function.
+	- Added zoned support to unpackeb.
+
+0.06  Wed Jul 28 07:45:05 1999
+	- Removed separate functions for packed and zoned conversions.
+	- Removed $warninv.
+	- Diverged from IBM390p.
+
+0.07  Tue Sep  7 13:16:47 1999
+	- Merged Perl and Perl/XS versions into one distribution
+	  with identical functions.
+	- Added packeb() and unpackeb() to Perl-only version.
+
+0.08  Tue Sep  7 13:16:47 1999
+	- Added a dummy IBM390.pm to the top directory so that CPAN
+	  could find it.  It includes the POD for the use of
+	  search.cpan.org.
+
+0.10  Tue Oct 17 10:29:35 2000
+	- Changed 'sv_undef' to 'PL_sv_undef' to conform with current
+	  perl5 lingo.  Otherwise identical to 0.09.
+
+0.11  Fri Dec 15 12:45:21 2000
+	- Added "#include <stdio.h>" to IBM390lib.ccc (don't know how
+	  I missed that one!).
+	- Small cosmetic changes.
+
+0.12  Mon Jan 15 08:51:47 2001
+	- Redesigned XS version to correct a bad memory leak.  Thanks
+	  to Barry Roomberg and another user for pointing this out
+	  and providing test code.  Unfortunately, I had to put a
+	  limit on the number of values returned by unpackeb, but
+	  it's fairly generous (4400).
+	- New e-mail address for yours truly.
+
+0.14  Mon Mar 12 14:41:31 2001
+	- Modified Makefile.PL to see whether Perl is using sv_undef
+	  or PL_sv_undef and adjust things automatically.
+	- Small cosmetic changes.
+
+0.15  Tue Apr  9 14:20:12 2002
+	- Corrected bug in asc2eb, eb2asc, and eb2ascp when translating
+	  empty strings.
+	- Added 'P' option to packeb (suggested by a requirement from
+	  Tony Maa).
+	- Added version function.
+
+0.16  Tue Nov 18 08:44:02 2003
+	- Rewritten to pull the packeb.c code into the XS routine.
+	- Used "unsigned long" rather than "long long" to correct a
+	  bug when building under Windows.
+	- Math library (-lm) is no longer required.
+
+0.17  Wed Dec 24 09:19:59 2003
+	- Added the SMF timestamp data type at the request of Champ
+	  Lee.
+
+0.18  Mon Mar 15 14:02:30 2004
+	- Made performance improvements to the XS/C version: moved the
+	  translation tables into the C code, moved asc2eb etc. to
+	  the .xs file rather than .pm, avoided storage allocations.
+	- Added trailing blank/null suppression to unpackeb('E'...).
+	- Thanks are due to Jeffrey Horner for these suggestions.
+
+0.19  Wed Jul 14 16:39:54 2004
+	- Corrected a bug in unpackeb's integer conversions. Thanks
+	  to Taavo Raykoff for pointing this out.
+
+0.20  Wed Mar  9 08:17:03 2005
+	- Corrected memory leaks in CF_num2packed and CF_num2zoned.
+	  This was pointed out by a few people, but it seemed to appear
+	  only under Linux; anyhow, Chris Madsen came up with a good
+	  solution to the problem.
+
+0.21  Wed Nov  2 13:30:50 2005
+	- Added '@' option to unpackeb at the request of Marc (CPAN
+	  bug 15461).
+
+0.22  Thu Jan 26 10:26:30 2006
+	- Updated references for the IBM documents.
+	- Put the POD in a separate .pod file.
+	- Removed _valid_packed and _valid_zoned.
+
+0.23  Tue Aug 28 16:53:43 2007
+	- Added 'Z' option for unsigned zoned decimal. Thanks to Craig
+	  Frooninckx for the suggestion.
+
+0.24  Apr 15 2008
+	- Minor corrections to POD.
+
+0.25  Mon Jul  7 16:52:59 2008
+	- Use setenv() rather than putenv() for Linux.
+
+0.26  Mon Dec  8 17:18:29 2008
+	- Allow user-specified translation tables
+	- Perl-only unpackeb 'E' not stripping nulls
+	- XS packeb might read unallocated memory
+	- Above changes made by Chris Madsen.
+	- Removed the little-used SMF timestamp option.
+
+0.27  Dec 17 2008
+	- Corrected the README.
+	- Removed 'config_re' from Makefile.PL.
+
+0.28  Sat Sep 19 20:00:21 2015
+	- Added 'V' option to unpackeb. Inspired by SDAT Business Charter
+	  files from State of Maryland.
+
+0.29  Wed Mar 22 20:36:50 2017
+	- Added 'V' option to unpackeb, perl version.
+	- Added Cobol descriptions in POD.

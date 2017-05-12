@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+t/Class-Variable.t
+t/Foo.pm
+t/Bar.pm
+timethese/benchmark.pl
+lib/Class/Variable.pm
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)

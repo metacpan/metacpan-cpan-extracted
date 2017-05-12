@@ -1,0 +1,8 @@
+Revision history for Perl extension Crypt::Random::TESHA2
+
+0.01  Tue Jan  8 20:00:00 PST 2013
+
+      - Initial development
+
+      - New configuration setup.  Thanks to David Oswald for suggestions and
+        help with this.

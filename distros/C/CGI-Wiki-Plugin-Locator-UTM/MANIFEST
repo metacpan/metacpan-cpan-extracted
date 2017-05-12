@@ -1,0 +1,17 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/CGI/Wiki/Plugin/Locator/UTM.pm
+t/00_setup.t
+t/01_add_test_data.t
+t/02_locator.t
+t/03_openguides.t
+t/pod.t
+t/pod_coverage.t
+t/wiki1.conf
+t/wiki2.conf
+t/wiki3.conf
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

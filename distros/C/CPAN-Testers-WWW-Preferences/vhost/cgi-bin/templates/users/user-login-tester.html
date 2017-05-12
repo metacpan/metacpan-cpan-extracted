@@ -1,0 +1,42 @@
+[% 
+
+    title = 'Tester Login' ;
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Tester Login' ;
+
+%]
+
+[% IF errmess == 1 %]
+<p>I'm sorry but that login was not recognised. Please try again, ensuring you 
+enter the correct email address and password. Thank you.
+[% ELSE %]<p>[% errmess %]</p>
+[% END %]
+
+<p>If you are a tester, please use the primary email address you have 
+registered with. If you have not created a tester account, please sign-up and
+register. You will then be able to register all the email addresses you have 
+used, currently use or plan to use for reports submissions, to this account.</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name='act' value='user-logged' />
+
+    <table width="100%">
+    <tr><td>Email</td>
+        <td><input type="text" name="cause" /></td>
+        <td rowspan="2">
+            <p>Forgotten your password? Just enter your email
+            and click the 'forgot my password' button below. We will then
+            send you a new password.</td>
+     </tr>
+     <tr><td>Password</td>
+         <td><input type="password" name="effect" /></td>
+     </tr>
+     <tr><td></td>
+         <td><input type="submit" name="submit" value='LOGIN' /></td>
+         <td><input type="submit" name="forgot" value='FORGOT MY PASSWORD' /> or
+             <a href="[% cgipath %]/pages.cgi?act=user-reg"><input type="button" value="SIGN-UP" /></a></td>
+     </tr>
+     </table>
+</form>
+

@@ -1,0 +1,22 @@
+Revision history for Config-Apt-Sources
+
+0.10    2007-07-16
+        Cleaned up tests.
+        Added/tweaked tests to improve code coverage (now 100%)
+	Fixed two bugs involving comments
+
+0.04    2007-06-22
+        Fixed SourceEntry's handling of whitespace
+
+0.03    2007-06-18
+        Allowed creation of SourceEntry with no components.
+        Documentation patch in Sources.pm.
+
+
+0.02    2007-06-14
+        Fixed bug where get_sources() returned references, breaking
+        encapsulation.  Improved documentation.
+
+0.01    2007-06-11
+        First version, released on an unsuspecting world.
+

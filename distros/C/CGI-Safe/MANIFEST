@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/CGI/Safe.pm
+Makefile.PL
+MANIFEST
+README
+t/f-admin-interface.t
+t/function-interface.t
+t/oo-admin-interface.t
+t/oo-interface.t
+t/pod-coverage.t
+t/pod.t
+META.yml

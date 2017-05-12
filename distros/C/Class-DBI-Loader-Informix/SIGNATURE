@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ebc322e1161d0452a4cbc906687ec8d8f89b9d4b Build.PL
+SHA1 b08e18c6ad0daa3109cf7499fc231728d5d665c5 ChangeLog
+SHA1 16ab1098dea2511336372d3904db06b3e4d53fa0 MANIFEST
+SHA1 b569d12561a045d3d8c63681b824342b6a90897f MANIFEST.SKIP
+SHA1 5448ec92d6e2e34673471a757dae102600724c78 META.yml
+SHA1 3108efe3a6ce29c9de320a451928d5703746266f Makefile.PL
+SHA1 24f7efa3f24816916dea765db3f536d07e8ed152 README
+SHA1 2ef9ded90b04f1456c241e3dd9919a2c566f46d3 examples/stores.pl
+SHA1 895fe0e43b54f7303f042ce2e6c972a3eb66550c lib/Class/DBI/Informix.pm
+SHA1 524828513864d18a52f8ab9beec16976f214553d lib/Class/DBI/Loader/Informix.pm
+SHA1 d964e3770c3a62bdb12a2b25042f9f4ea0cf21c0 t/0-signature.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/00pod.t
+SHA1 98b6f9362ac03319c0f19d2b4af70f831c1a4843 t/01load.t
+SHA1 13e1f347fd03e818868f3974e1a1031bfbd19be6 t/02tables.t
+SHA1 e1c71e3aa4da576a909d8344ce2626224a7a078f t/03stores.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (GNU/Linux)
+
+iD8DBQFFSJWsC2tmbJ6qZ5IRAlxmAJ9E/msDuB5pIWVkbpBw0a7BrbwZKgCfR2A0
+LAEkd2embhY9ZbRNe+aj5W0=
+=jtlq
+-----END PGP SIGNATURE-----

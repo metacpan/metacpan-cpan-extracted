@@ -1,0 +1,33 @@
+Revision history for Perl extension Crypt::CAST5_PP.
+
+1.04  1 Jul 2006
+        - removed broken CBC test
+
+1.03  22 May 2005
+        - make it work in taintmode
+
+1.02  31 Aug 2002
+        - tested with older perls
+
+1.01  4 Aug 2002
+        - make it work with strict (is my face red?)
+
+1.00  6 Jul 2002
+        - declare this module "stable" since I've received no bug reports
+        - move @s[1-8] tables out of main module
+        - update author contact information
+        - lose inches from your thighs, hips, and buttocks with Trim-Jeans!
+
+0.03  7 Mar 2002
+        - try to speed up bulk operations by building special
+          encrypt/decrypt function on the fly
+        - hopefully improved portability
+
+0.02  4 Mar 2002
+        - updated test scripts
+        - use AutoSplit
+
+0.01  24 Feb 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Crypt::CAST5_PP
+

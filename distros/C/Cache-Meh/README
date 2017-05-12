@@ -1,0 +1,113 @@
+NAME
+    Cache::Meh - A cache of indifferent quality
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+        use 5.008;
+        use Cache::Meh;
+        use Digest::SHA qw(sha1);
+
+        my $cache = Cache::Meh->new(
+            filename => 'blort',
+            validity => 10, # seconds
+            lookup => sub { 
+                my $key = shift;
+                return sha1($key);
+            },
+        );
+
+        my $value = $cache->get('some_key');
+
+        if ( sha1('some_key') eq $value ) {
+            print "equal\n";
+        }
+        else {
+            print "not equal\n";
+        }
+
+OVERVIEW
+    This module is intended to implement a very simple memory cache where
+    the internal cache state is serialized to disk by Storable so that the
+    cached data persists beyond a single execution environment which makes
+    it suitable for things like cron tasks or CGI handlers and the like.
+
+    You may optionally disable disk access by setting the "only_memory"
+    attribute.
+
+    Cache state is stored to disk when a key is set in the cache; keys are
+    only purged from the cache when they expire and there is no "lookup"
+    function available. These are arguably bad design decisions which may
+    encourage you to seek your caching pleasure elsewhere. On the other
+    hand, pull requests are welcome.
+
+    Since this module is intended to be run under Perl 5.8 (but preferably
+    much much more recent Perls) it sadly eschews fancy object systems like
+    Moo. It doesn't require any dependencies beyond core modules. I maybe
+    would have called it Cache::Tiny, but then people might use it.
+
+    Besides, this is a cache of indifferent quality. You probably ought to
+    be using something awesome like CHI or Cache::Cache or Cache.
+
+ATTRIBUTES
+  filename
+    This is the filename for your Storable file. Required unless you specify
+    "only_memory".
+
+    The file is written to the "temporary" path as provided by File::Spec
+    "tmpdir". On Unix systems, you may influence this directory by setting
+    the "TMPDIR" environment variable.
+
+  only_memory
+    If this attribute is set, then DO NOT access the disk for reads or
+    writes. Only store cache values in memory. This option is mutually
+    exclusive from the "filename" attribute above.
+
+  validity
+    Pass an argument to set it; no argument to get its current value.
+
+    How long keys should be considered valid in seconds. Arguments must be
+    positive integers.
+
+    Each key has an insert time; when the insert time + validity is greater
+    than the current time, the cache refreshes the cached value by executing
+    the lookup function or evicting the key from the cache if no lookup
+    function is provided.
+
+    This value defaults to 300 seconds (5 minutes) if not provided.
+
+  lookup
+    Pass an argument to set it; no argument to get its current value.
+
+    A coderef which is executed when a key is no longer valid or not found
+    in the cache. The coderef is given the cache key as a parameter.
+
+    Optional; no default.
+
+METHODS
+  new
+    A constructor. You must provide the filename unless "only_memory" is
+    set. You may optionally provide a validity time and lookup function. The
+    cache state is loaded (if available) as part of object construction.
+
+  get
+    Takes a key which can be any valid Perl hash key term. Returns the
+    cached value or undef if no lookup function is defined.
+
+  set
+    Takes a key and a value which is unconditionally inserted into the
+    cache. Returns the cache object.
+
+    The cache state is serialized during set operations unless "only_memory"
+    is set.
+
+AUTHOR
+    Mark Allen <mrallen1@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Mark Allen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

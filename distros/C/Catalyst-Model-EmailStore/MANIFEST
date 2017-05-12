@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Catalyst/Helper/Model/EmailStore.pm
+lib/Catalyst/Model/EmailStore.pm
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-models.t
+t/02_usage.t
+t/boilerplate.t
+t/lib/TestApp/Model/EmailStore.pm
+t/pod-coverage.t
+t/pod.t

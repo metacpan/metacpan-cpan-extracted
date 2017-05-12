@@ -1,0 +1,34 @@
+---
+abstract: 'Run a bogus CPAN web server for testing'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  File::Find: 0
+  LWP::Simple: 0
+  Module::Faker::Dist: 0
+  Module::Faker::Package: 0
+  Path::Class: 0
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Faker-HTTPD
+requires:
+  CPAN::Faker: 0
+  File::Temp: 0
+  HTTP::Message::PSGI: 0
+  Moose: 0
+  Plack::App::File: 0
+  Test::Fake::HTTPD: 0
+  namespace::clean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Faker-HTTPD
+version: 0.002

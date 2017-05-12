@@ -1,0 +1,34 @@
+---
+abstract: 'Yet another growl module using Growl.framework'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::More: 0.88
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cocoa-Growl
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  File::ShareDir: 0
+  URI: 0
+  XSLoader: 0.1
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/cocoa-growl-perl.git
+version: 0.05

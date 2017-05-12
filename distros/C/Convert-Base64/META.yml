@@ -1,0 +1,22 @@
+---
+abstract: 'Encoding and decoding of Base64 strings'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Base64
+requires:
+  Exporter: '0'
+  MIME::Base64: '0'
+resources:
+  bugtracker: https://github.com/robn/Convert-Base64/issues
+  repository: git://github.com/robn/Convert-Base64.git
+version: '0.001'

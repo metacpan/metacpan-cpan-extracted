@@ -1,0 +1,11 @@
+0.011  2017-02-24 14:18:37 CET
+  - fix write documentation
+
+0.01  2017-02-20 13:46:08 CET
+	- fix basename
+	- fix dirname
+	- fix file_size
+	- fix human_byte_size
+	- fix Condition::file_test
+	- pod documentation
+  - add travis integration

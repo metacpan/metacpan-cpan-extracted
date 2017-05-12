@@ -1,0 +1,326 @@
+
+INSTALLATION
+------------
+
+*********************************************************************************
+*********************************************************************************
+********  
+********  WARNING!  ACHTUNG!  DANGER, WIL ROBINSON!
+********  
+********  This installation document is mostly superceded by the handy-dandy
+********  interactive Q & A style installation that comes as part of the 
+********  Module::Build "Build.PL" script.  Just the standard 
+********  
+********     perl Build.PL && make && make test && make install
+********  
+********  so do the trick in these enlightened and civilized days.  This
+********  installation document has been kept so that you have a ghost of
+********  a chance of fixing things if things go wrong, or of customizing
+********  to your tastes.
+********  
+********  This document will be rewritten to reflect the new reality just
+********  as soon as my order of Round To-Its comes in from the factory.
+********  
+*********************************************************************************
+*********************************************************************************
+
+This document describes the procedure for the installing the
+CGI::Application::Framework (CAF), a fully-featured web application
+development platform built on CGI::Application.
+
+The other documentation is in POD format:
+
+    CGI::Application::Framework - general docs
+    Examples.pod                - guide to the Example apps
+
+
+You can read these documents online in HTML format by visiting:
+
+    http://search.cpan.org/dist/CGI-Application-Framework/lib/CGI/Application/Framework.pm
+
+The docs are also available onlin at the CAF web site:
+
+    http://www.cafweb.org/
+
+The Examples.pod provides a good overview of how to develop applications
+using this framework.
+
+
+Required Core System Components
+===============================
+
+    * Unix-like operation system such as:
+
+         + Solaris
+         + Linux (e.g. Red Hat Linux 9, SuSE Linux, Debian GNU/Linux)
+
+      (E.g. Debian GNU/Linux 'unstable' was used in the creation of the
+      system and in producing its documentation.)  Conceivably the
+      framework could be installed on a Windows-based system with some
+      extra work but this hasn't been attempted yet.
+
+    * Perl programming language (v5.005+ needed, v5.8.4+ suggested)
+
+         + Test to see what you have installed on your system first
+           with:
+
+                   $ which perl
+
+           If this yields a Perl on your $PATH (e.g. /usr/bin/perl or
+           /usr/local/bin/perl) then follow this up with
+
+                   $ perl -v
+
+           to see which version your $PATH perl is.
+
+    * Apache web server (v1.3 needed, v1.3.27+ recommended, v2+
+      supported for CGI operation but not for mod_perl operation)
+
+         + http://httpd.apache.org/
+
+    * mod_perl module add-on to Apache web server (recommended)
+
+         + Special installation section for this follows later in this
+           document
+
+         + http://perl.apache.org/
+
+    * Any database server that is supported by Class::DBI.
+      The framework has been tested with:
+
+           MySQL:      http://www.mysql.com/
+           PostgreSQL: http://www.postgres.org/
+           SQLite      (can be installed directly from CPAN)
+
+      Others database systems may work.
+
+Deciding where to install the Examples
+======================================
+If you choose to install the example applications, you will need to be
+running a local webserver such as Apache.
+
+You can install the Example applications into your existing web space,
+or you can install them into a new virtual host.  There is also a
+portion of the application (the "framework" directory) that should be
+installed outside of your web space.
+
+Before you install you will need to know the locations of the following
+with respect to your web server:
+
+   * The cgi-bin directoy
+   * The public webroot (e.g. htdocs or public_html)
+   * Where you intend to install the "framework" directory.
+
+
+Installing CPAN
+===============
+
+The CGI::Application::Framework is based on the Perl programming
+language and makes use of a great number of existing Perl modules,
+primarily CGI::Application.  These modules are collected on the CPAN
+(Comprehensive Perl Repository Network), the standard collection of Perl
+resources.
+
+The easiest way to install CGI::Application::Framework and all of the
+modules it depends on is to install and run the CPAN module on your Perl
+system.  Many operating systems already have the CPAN module installed.
+To check to see if this is the case, first try:
+
+    $ su -
+    # which cpan
+
+This might yield /usr/bin/cpan or /usr/local/bin/cpan.  Note that I
+recommend you "su -" to become root because the $PATH of root might be
+different from your own regular user's $PATH, and as you need to be
+root in order to install CPAN modules properly you may as well act as
+root when you check for the existance of the 'cpan' executable script.
+
+It is possible that the CPAN module is installed even "which cpan"
+does not show a 'cpan' executable script in your $PATH.  Here is
+another way to test for its presence:
+
+    # perl -MCPAN -e 'print "$CPAN::VERSION\n"';
+
+Now, you will invoke the interactive CPAN shell in order to install
+the needed modules.  (Make sure you are still root.)  If "which cpan"
+showed a result then type
+
+    # cpan
+
+If not, then use:
+
+    # perl -MCPAN -e shell;
+
+Caveats / Notes
+---------------
+
+    * If the CPAN module is not currently installed on your system
+      then go down to the instructions in the next section that
+      tell you how to install it, do so, and then come back here.
+
+    * If you like installing Perl modules by hand then go ahead and
+      install all of them this way, but I don't recommend it; there are
+      a LOT of modules.
+
+    * If you regularly use something other than CPAN to install Perl
+      modules on your system (for instance, CPANPLUS) then go ahead
+      and use it, but I have to mention that I don't have any
+      experience with those alternative module installation packages.
+
+    * Your own operating system might provide a variety of Perl
+      modules through its own packaging system.  If you like you can
+      install as many of those as you like before installing via CPAN.
+
+    * Occasionally, the 'cpan' shell's installation technique crashes
+      and burns when trying to install a given Perl module.  This
+      usually happens when the Perl module (or one of its Perl module
+      dependencies) has a C language component to it and depends on
+      having a certain set of C language libraries already installed
+      on the system.  If this happens then pay attention to the error
+      output the CPAN shell tells you and then you've got to go
+      digging to figure out how you can get that C language dependency
+      on your system.  (On Debian systems I recommend heavy use of
+      http://packages.debian.org/.  If you use something else then
+      I'll have to trust you to know how to work with your own system
+      best.  Either way, you can always try emailing me for support.
+      See the "Contact" information in this document.)
+
+You can use the CPAN shell to install any of the Perl modules hosted on
+the CPAN.
+
+Installation of CPAN module
+===========================
+
+If you don't already have the CPAN module installed on your computer,
+you can get it from the web at:
+
+    http://www.cpan.org/modules/by-module/CPAN/
+
+In this directory you will find a file called CPAN-1.xx.tar.gz; for
+example:
+
+    http://www.cpan.org/modules/by-module/CPAN/CPAN-1.76.tar.gz
+
+Download the most recent (that is, highest numerical value) of this
+file.  Install this Perl module using the established procedure for
+installing Perl modules:
+
+    $ tar xzvf CPAN-1.xx.tar.gz
+    $ cd CPAN-1.xx
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ su -
+    # make install
+
+The first time you run the interactive 'cpan' shell (using either of
+the methods described earlier) you will be presented with a list of
+questions that are needed to configure your CPAN installation.  How to
+answer these should be mostly self-evident.  More information about
+the CPAN module and its configuration can be found at
+http://search.cpan.org/~andk/CPAN/lib/CPAN.pm. I recommend that you
+answer "follow" to the question that asks you for your policy on
+building prerequisites.
+
+
+Using CPAN to installing CGI::Application::Framework
+====================================================
+
+From within the CPAN shell type:
+
+    install CGI::Application::Framework
+
+The CGI::Application::Framework depends on a large number of modules.
+CPAN will install them for you.
+
+After the prerequisites are installed and the
+CGI::Application::Framework installer starts running, you will be asked
+a series of questions to let the installer know where you want the
+Example applications to be installed.
+
+
+Optional Database Modules
+=========================
+CGI::Application::Framework supports multiple database types.  The
+example applications use sqlite, which allows them to run in an
+environment that doesn't have a webserver installed.
+
+Any of the following are supported:
+
+    DBD::mysql  - driver for the MySQL database
+    DBD::Pg     - driver for the PostgreSQL database
+
+Other databases (Oracle, Sybase, DB2, MSSQL, ODBC) should work, but have
+not been tested with the CAF.
+
+In order to get a new database working with the CAF, you will have to do
+the following three things:
+
+    * install the database server
+    * set up the database schema
+    * configure CAF to use the database
+
+These are described in detail in the CGI::Application::Framework docs.
+
+
+Optional Modules
+================
+Here are 5 more modules you might want to install now, but it is not
+necessary.
+
+
+    Apache::DBI
+    FreezeThaw
+    Log::Dispatch
+    Devel::ptkdb
+    DBI::Shell
+
+"Apache::DBI"
+-------------
+If you plan on using this kit under a mod_perl environment then this
+will create persistent database connections and a database connection
+pool for you, speeding up your application considerably.
+
+"FreezeThaw"
+------------
+Not currently needed, but will be in future versions of the MVC kit.
+
+"Log::Dispatch"
+---------------
+Not currently needed, but might be in future versions.  Also, you might
+want to use it to enhance your own Log::Log4perl usage.
+
+"Devel::ptkdb"
+--------------
+Devel::ptkdb is the Tk debugger for Perl, which is a graphical user
+interface for Perl debugging.  It's quite nice!  This is not required
+for the functioning of the MVC framework but it is very handy for Perl
+application debugging, including CGI-based Perl application
+debugging. (But not ones run through Apache::Registry.)  When you try
+to install this via the CPAN module you have to make sure that your
+root account has permission to access the X display.  For instance,
+from the non-root account that owns your X session, type "xhost +",
+copy the .Xauthority file from the home directory of the non-root user
+who owns the X session to /root, and make sure that your root user has
+the correct DISPLAY environment variable.  Information regarding how
+to use Devel::ptkdb in a CGI run of an MVC framework program is found
+in the GETTING_STARTED.txt document, and you can see it in action in
+the various ".cgi" versions of the .pl web application scripts
+included in this distribution.
+
+"DBI::shell"
+------------
+Useful for opening a command prompt to the SQLite database which doesn't
+have its own command prompt.  This is used to load an SQLite database with
+seed data.  See the sql/mvc_example.sqlite file for details.
+
+
+Further Reading
+===============
+The framework and its example applications are now installed.  Proceed
+to the Examples.pod document and the POD-format docs within
+CGI::Application::Framework itself to learn how to understand the
+example applications and how to create your own.
+
+
+

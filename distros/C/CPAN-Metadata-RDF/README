@@ -1,0 +1,44 @@
+NAME
+    CPAN::Metadata::RDF - Generate metadata about CPAN in RDF
+
+SYNOPSIS
+      use strict;
+      use CPAN::Metadata::RDF;
+
+      # To generate metadata
+      my $m = CPAN::Metadata::RDF->new();
+      $m->backpan("/home/acme/backpan/BACKPAN/");
+      $m->cpan("/home/acme/cpan/CPAN/");
+      $m->directory(".");
+      $m->create_db; # once
+      $m->generate;
+
+      # To output metadata
+      my $m = CPAN::Metadata::RDF->new();
+      $m->directory(".");
+      print $m->output; # RDF
+
+      # Methods to parse and query RDF soon...
+
+DESCRIPTION
+    This module generates metadata about CPAN modules (and BACKPAN) modules
+    in RDF format.
+
+    It requires a local CPAN mirror (for example, mirrored using
+    "/usr/bin/rsync -av --delete ftp.nic.funet.fi::CPAN
+    /path/to/local/cpan/") as well as a local BACKPAN mirror (for example,
+    mirrored using "/usr/bin/rsync -av --delete pause.perl.org::backpan
+    /path/to/local/backpan/").
+
+    It currently uses an SQLite database as a temporary datastore. It takes
+    about two hours to generate the RDF file from scratch. I don't expect
+    many people to run this module. I run it occasionally, and you should be
+    able to fetch the latest version from:
+    http://www.cpan.org/authors/id/L/LB/LBROCARD/cpan.rdf.gz
+
+AUTHOR
+    Leon Brocard <leon@astray.com>
+
+LICENSE
+    This code is distributed under the same license as Perl.
+

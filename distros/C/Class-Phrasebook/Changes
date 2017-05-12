@@ -1,0 +1,60 @@
+Revision history for Perl extension Class::Phrasebook.
+
+0.88  Wed Feb 19 13:01:49 CET 2003
+	- Fixed the way absolute path is identified for cygwin OS.
+
+0.87  Sun Feb  9 12:30:00 CET 2003
+	- See Phrasebook::SQL Changes file.
+
+0.86  Fri Nov  8 21:36:48 CET 2002
+	- Fixed a bug on Windows OS where absolute path was not 
+	  identified correctly. 
+	  Thanks for Andrew Alakozow that reported the bug and 
+	  supplied a patch.	
+
+0.85  Tue Sep 24 14:11:39 CEST 2002
+        - Just fixed the copyright notice.  
+
+0.84  Thu Aug  1 12:01:23 CEST 2002
+	- Added the class method clean_out_of_scope_dictionaries.
+
+0.83  Mon Feb 25 10:48:57 CET 2002
+	- The classes now use bytes. I did this change because I found  
+	  out that the regular expressions sometimes work as unicode
+	  and sometimes as bytes. What I prefer to have is kind of a
+	  class switch that will let the user of the class choose if
+	  he wants the class to run using 'bytes' or 'utf8'. I think
+	  that if the user uses encoding="UTF8" in his XML, he should
+	  be able to tell the class to run using 'utf8' pragma. But
+	  in other cases, the user might want to run it using the
+	  'bytes' pragma. But I don't know how to program such a
+	  switch between pragams. Probably, if it is a problem for
+	  you, you know more about unicode, and maybe you have an idea
+	  how to solve it. So please write me your ideas.
+
+        - Fixed the way the class reads the phrases from the XML file. 
+          Specifically - fixed the way white characters are treated.
+          Now the phrase will be accppted as it is between the tags 
+	  and will include all the white characters there.
+          Added the as_is_between_tags method, and the 
+	  PHRASEBOOK_AS_IS_BETWEEN_TAGS environment to provide the 
+          ability to get back to the old behavior of the classes -
+          for legacy purposes.
+
+0.82  Fri Feb  8 09:42:43 CET 2002
+	- The dictionaries are cached now in a class data.
+
+0.81  Sat Jan 19 19:08:56 CET 2002
+	- At last the Devel::CallerItem is removed from this class.
+	  Instead I use the caller build-in-function.0.8   
+
+0.8   Sat Dec 15 19:44:09 CET 2001
+	- Actually a very small fix, to have correctly the new lines 
+	  from the XML source. 
+	  Yet, I upgraded the VERSION number to 0.8, because we use
+	  this class for quite a time now, and had no problems expect
+	  this small fix.
+
+0.2   Fri Feb  9 15:21:28 CET 2001
+	- first distribution on CPAN
+

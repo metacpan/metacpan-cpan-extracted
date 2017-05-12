@@ -1,0 +1,50 @@
+---
+abstract: 'patch CPAN distributions'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  File::Temp: 0
+  File::chdir: 0
+  Module::Build::SysPath: 0.13
+  Test::Differences: 0
+  Test::Dirs: 0.03
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  File::Which: 0
+  Module::Build: 0.36
+  Module::Build::SysPath: 0.16
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.132830'
+keywords:
+  - cpan
+  - patch
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Patches
+provides:
+  CPAN::Patches:
+    file: lib/CPAN/Patches.pm
+    version: 0.05
+  CPAN::Patches::SPc:
+    file: lib/CPAN/Patches/SPc.pm
+    version: 0.04
+requires:
+  Carp: 0
+  File::Find::Rule: 0
+  File::chdir: 0
+  Getopt::Long: 0
+  IO::Any: 0
+  JSON::Util: 0
+  Module::Pluggable: 0
+  Moose: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  YAML::Syck: 0
+resources:
+  bugtracker: http://github.com/jozef/CPAN-Patches/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/CPAN-Patches.git
+version: 0.05

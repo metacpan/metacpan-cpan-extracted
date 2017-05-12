@@ -1,0 +1,129 @@
+{
+   "abstract" : "Web Application Framework (Perl5)",
+   "author" : [
+      "Takuho Yoshizu <yoshizu@s2factory.co.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cmd-Dwarf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "Class::Method::Modifiers" : "0",
+            "DBD::Pg" : "0",
+            "DBI" : "0",
+            "Data::DPath" : "0",
+            "Data::Section::Simple" : "0",
+            "Data::Validator" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "DateTime::Format::Pg" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Email::MIME" : "0",
+            "Email::Sender::Simple" : "0",
+            "Exporter::Lite" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FormValidator::Lite" : "0",
+            "HTML::FillInForm::Lite" : "0",
+            "HTTP::Session" : "0",
+            "HTTP::Session::Store::DBI" : "0",
+            "Image::Info" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Dispatch" : "0",
+            "Log::Dispatch::FileRotate" : "0",
+            "Module::Find" : "0",
+            "Net::OAuth" : "0",
+            "Plack" : "0",
+            "Plack::Handler::CLI" : "0",
+            "Router::Simple" : "0",
+            "Scalar::Util" : "0",
+            "Starman" : "0",
+            "String::CamelCase" : "0",
+            "Teng" : "v0.2.0",
+            "Test::PostgreSQL" : "0",
+            "Text::Xslate" : "0",
+            "UNIVERSAL::require" : "0",
+            "WWW::Mechanize" : "0",
+            "XML::Simple" : "0",
+            "autobox" : "0",
+            "autobox::Core" : "0",
+            "boolean" : "0.30",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Cmd::Dwarf" : {
+         "file" : "lib/Cmd/Dwarf.pm",
+         "version" : "1.42"
+      },
+      "Dwarf" : {
+         "file" : "lib/Dwarf.pm",
+         "version" : "1.42"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/seagirl/dwarf/issues"
+      },
+      "homepage" : "https://github.com/seagirl/dwarf",
+      "repository" : {
+         "url" : "git://github.com/seagirl/dwarf.git",
+         "web" : "https://github.com/seagirl/dwarf"
+      }
+   },
+   "version" : "1.42",
+   "x_authority" : "cpan:seagirl",
+   "x_contributors" : [
+      "tak <yoshizu@sb163.s2factory.co.jp>",
+      "seagirl <yoshizu@sb106.s2factory.co.jp>",
+      "Takuho Yoshizu <n0.sigur@gmail.com>",
+      "Naoko Umeta <umeta@s2factory.co.jp>",
+      "takano <takano@s2factory.co.jp>",
+      "Jun Kuriyama <kuriyama@s2factory.co.jp>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

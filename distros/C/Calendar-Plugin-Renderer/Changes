@@ -1,0 +1,44 @@
+Revision history for Calendar::Plugin::Renderer
+
+0.12  Fri Jan 06 12:00:00 2017
+      - Added method validate_params() for <month> and <year>.
+
+0.11  Wed Sep 14 10:30:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.10  Sat Jul 16 22:00:00 2016
+      - Update pod document for method text_calendar().
+      - Added key 'provides' to the Makefile.PL script as suggested by CPANTS.
+
+0.09  Mon Jul 04 03:15:00 2016
+      - Addressed issue raised in the CPAN Tester Report.
+        http://www.cpantesters.org/cpan/report/c3d0dba4-3fc8-11e6-b825-5b09fd635119
+
+0.08  Tue Jun 21 12:20:00 2016
+      - Fixed 'consistent version' issue raised by CPANTS.
+
+0.07  Sun Jun 19 05:15:00 2016
+      - Added method text_calendar().
+      - Updated method svg_calendar().
+      - Made start index starts with 0 (Sun) for SVG format.
+      - Refactored package Calendar::Plugin::Renderer::SVG.
+
+0.06  Thu May 05 10:15:00 2016
+      - Fixed max week row issue with regard to the Calendar::Hijri in particular.
+      - Added test for every supported calendars.
+      - Updated copyright year information.
+
+0.05  Thu Dec 31 01:05:00 2015
+      - Proposed fix for issue RT #110764.
+
+0.04  Tue Dec 29 09:15:00 2015
+      - Earlier attempt failed to fix the issue, giving another shot.
+
+0.03  Tue Dec 29 02:00:00 2015
+      - Attempted to fix the test failure reported by CPAN Testers.
+
+0.02  Thu Dec 17 14:50:00 2015
+      - Fixed typo in the pod document.
+
+0.01  Thu Dec 17 14:35:00 2015
+      - First version, released.

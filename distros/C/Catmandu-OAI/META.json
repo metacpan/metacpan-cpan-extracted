@@ -1,0 +1,97 @@
+{
+   "abstract" : "Catmandu modules for working with OAI repositories",
+   "author" : [
+      "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-OAI",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "xslt" : {
+         "description" : "xslt",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Catmandu::XML" : "0.15"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "1.0306",
+            "HTTP::OAI" : "4.03",
+            "IO::Socket::SSL" : "1.993",
+            "IO::String" : "0",
+            "MODS::Record" : "0.11",
+            "Moo" : "1.0",
+            "URI" : "0",
+            "XML::Struct" : "0.18",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0",
+            "Test::Simple" : "1.001003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-OAI/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-OAI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-OAI.git",
+         "web" : "https://github.com/LibreCat/Catmandu-OAI"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "Christian Pietsch <christian.pietsch@uni-bielefeld.de>",
+      "Jakob Voss <voss@gbv.de>",
+      "Matthias Vandermaesen <matthias@colada.be>",
+      "Nicolas Franck <Nicolas.Franck@ugent.be>",
+      "Nicolas Franck <njfranck@ca20c533.ugent.be>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

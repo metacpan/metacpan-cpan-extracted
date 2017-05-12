@@ -1,0 +1,7 @@
+Changes file for Chart::Sequence
+
+    - Add color attr to messages
+    - Fix font metrics
+
+0.000_1 Fri Dec 20 05:15:07 2002
+    - Created

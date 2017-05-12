@@ -1,0 +1,38 @@
+0.15 Wed Aug 29 17:20:23 CEST 2012
+  * FIX bug with new slots that are over old ones
+  * FIX bug for slots with date == date
+
+0.14 Wed Aug 29 12:59:43 CEST 2012
+  * FIX crossing slots of different type
+  * NEW merge option materialize now treats dates and weekdays the same
+  * NEW week_of parameter
+  * NEW as_table - for pretty printing
+
+0.13 Mon Aug 27 18:59:10 CEST 2012
+  * Fixed slot data missing
+
+0.12 Mon Aug 27 18:46:28 CEST 2012
+  * Fixed an overlapping bug, see t/overlap.t for test case
+
+0.11  Mon Aug 20 22:00:23 CEST 2012
+  * Added support for $slot->data attribute
+
+0.10  Mon Aug 20 20:05:00 CEST 2012
+  * Fixed slot name bug - spaces and other chars removed inadvertently
+  * Added weekday to date conversions for slot finding
+
+0.05  Thu Nov 12 09:49:06 CET 2009
+  * Fixed failed tests with missing dependency II
+
+0.04  Sun, 08 Nov 2009 10:34:04 +0100
+  * Fixed failed tests with missing dependency
+
+0.03  Wed, 01 Oct 2009 09:00:04 +0100
+  * Span ranges over dates: start_date, end_date
+
+0.02  Wed, 30 Sep 2009 01:45:04 +0100
+  * Fix dependencies
+
+0.01  Sun, 27 Jun 2009 20:59:11 +0100
+  * Initial release
+

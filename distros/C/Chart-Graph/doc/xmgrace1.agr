@@ -1,0 +1,205 @@
+# Grace project file
+# 
+@version 50005
+@page size 640, 480
+@page scroll 5%
+@page inout 5%
+@link page off
+@reference date 0
+@date wrap off
+@date wrap year 1950
+@g0 stacked false
+@g0 hidden false
+@g0 type Chart
+@g0 bar hgap 0.000000
+@g0 fixedpoint off
+@g0 fixedpoint type 0
+@g0 fixedpoint xy 0.000000, 0.000000
+@g0 fixedpoint format general general
+@g0 fixedpoint prec 6, 6
+@with g0
+@    world xmin 0
+@    world xmax 1
+@    world ymin 0
+@    world ymax 1
+@    stack world 0, 0, 0, 0
+@    view xmin 0.150000
+@    view xmax 1.150000
+@    view ymin 0.150000
+@    view ymax 0.850000
+@    title "Example of a BAR graph"
+@    title font 0
+@    title size 1.250000
+@    title color 1
+@    subtitle "optional subtitle"
+@    subtitle font 0
+@    subtitle size 1.000000
+@    subtitle color 1
+@    xaxes scale Normal
+@    xaxes invert off
+@    yaxes scale Normal
+@    yaxes invert off
+@    xaxis  on
+@    xaxis  type zero false
+@    xaxis  offset 0.000000, 0.000000
+@    xaxis  bar on
+@    xaxis  bar color 1
+@    xaxis  bar linestyle 1
+@    xaxis  bar linewidth 1.0
+@    xaxis  label "my x-axis label"
+@    xaxis  label layout para
+@    xaxis  label place auto
+@    xaxis  label char size 1.000000
+@    xaxis  label font 0
+@    xaxis  label color 1
+@    xaxis  label place auto
+@    xaxis  tick on
+@    xaxis  tick default 6
+@    xaxis  tick place rounded true
+@    xaxis  tick major size 1
+@    xaxis  tick major color 1
+@    xaxis  tick major linewidth 1.0
+@    xaxis  tick major linestyle 1.000000
+@    xaxis  tick major grid off
+@    xaxis  tick minor size 1
+@    xaxis  tick minor color 1
+@    xaxis  tick minor linewidth 1.0
+@    xaxis  tick minor linestyle 1.000000
+@    xaxis  tick minor grid off
+@    xaxis  tick in
+@    xaxis  tick place both
+@    xaxis  tick type spec
+@    xaxis  ticklabel on
+@    xaxis  ticklabel prec 5
+@    xaxis  ticklabel format general
+@    xaxis  ticklabel append ""
+@    xaxis  ticklabel prepend ""
+@    xaxis  ticklabel angle 0
+@    xaxis  ticklabel skip 0
+@    xaxis  ticklabel stagger 0
+@    xaxis  ticklabel place normal
+@    xaxis  ticklabel offset 0.000000, 0.000000
+@    xaxis  ticklabel sign normal
+@    xaxis  ticklabel start type auto
+@    xaxis  ticklabel start 0.000000
+@    xaxis  ticklabel stop type auto
+@    xaxis  ticklabel stop 0.000000
+@    xaxis  ticklabel char size 1.000000
+@    xaxis  ticklabel font 0
+@    xaxis  ticklabel color 1
+@    xaxis  ticklabel type spec
+@    xaxis  tick spec 3
+@    xaxis  tick major 0,		1
+@    xaxis  ticklabel 0, "one"
+@    xaxis  tick major 1,		2
+@    xaxis  ticklabel 1, "two"
+@    xaxis  tick major 2,		3
+@    xaxis  ticklabel 2, "three"
+@    yaxis  on
+@    yaxis  type zero false
+@    yaxis  offset 0.000000, 0.000000
+@    yaxis  bar on
+@    yaxis  bar color 1
+@    yaxis  bar linestyle 1
+@    yaxis  bar linewidth 1.0
+@    yaxis  label "my y-axis label"
+@    yaxis  label layout para
+@    yaxis  label place auto
+@    yaxis  label char size 1.000000
+@    yaxis  label font 0
+@    yaxis  label color 1
+@    yaxis  label place auto
+@    yaxis  tick on
+@    yaxis  tick default 6
+@    yaxis  tick place rounded true
+@    yaxis  tick major size 1
+@    yaxis  tick major color 1
+@    yaxis  tick major linewidth 1.0
+@    yaxis  tick major linestyle 1.000000
+@    yaxis  tick major grid off
+@    yaxis  tick minor size 1
+@    yaxis  tick minor color 1
+@    yaxis  tick minor linewidth 1.0
+@    yaxis  tick minor linestyle 1.000000
+@    yaxis  tick minor grid off
+@    yaxis  tick in
+@    yaxis  tick place both
+@    yaxis  tick type spec
+@    yaxis  ticklabel on
+@    yaxis  ticklabel prec 5
+@    yaxis  ticklabel format general
+@    yaxis  ticklabel append ""
+@    yaxis  ticklabel prepend ""
+@    yaxis  ticklabel angle 0
+@    yaxis  ticklabel skip 0
+@    yaxis  ticklabel stagger 0
+@    yaxis  ticklabel place normal
+@    yaxis  ticklabel offset 0.000000, 0.000000
+@    yaxis  ticklabel sign normal
+@    yaxis  ticklabel start type auto
+@    yaxis  ticklabel start 0.000000
+@    yaxis  ticklabel stop type auto
+@    yaxis  ticklabel stop 0.000000
+@    yaxis  ticklabel char size 1.000000
+@    yaxis  ticklabel font 0
+@    yaxis  ticklabel color 1
+@    yaxis  ticklabel type spec
+@    yaxis  tick spec 3
+@    yaxis  tick major 0,		1
+@    yaxis  ticklabel 0, "one"
+@    yaxis  tick major 1,		2
+@    yaxis  ticklabel 1, "two"
+@    yaxis  tick major 2,		3
+@    yaxis  ticklabel 2, "three"
+@    altxaxis  off
+@    altyaxis  off
+@    legend on
+@    legend loctype view
+@    legend x1 0.85
+@    legend y1 0.8
+@    legend box color 1
+@    legend box pattern 1
+@    legend box linewidth 1.0
+@    legend box linestyle 1
+@    legend box fill color 0
+@    legend box fill pattern 1
+@    legend font 0
+@    legend char size 1.000000
+@    legend color 1
+@    legend length 4
+@    legend vgap 1
+@    legend hgap 1
+@    legend invert false
+@    frame type 0
+@    frame linestyle 1
+@    frame linewidth 1.0
+@    frame color 1
+@    frame pattern 1
+@    frame background color 0
+@    frame background pattern 0
+@ target G0.S0
+@ type XY
+		1		2
+		2		4
+		3		6
+		4		8
+		5		10
+		6		12
+		7		14
+		8		16
+		9		18
+		10		20
+&
+@ target G0.S1
+@ type XY
+		1		3
+		2		6
+		3		9
+		4		12
+		5		15
+		6		18
+		7		21
+		8		24
+		9		27
+		10		30
+&

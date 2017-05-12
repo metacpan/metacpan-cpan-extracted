@@ -1,0 +1,22 @@
+Revision history for Catalyst::Action::SubDomain
+
+0.07  2009-06-03 12:33:00
+    - RT #46619 fix and POD note
+
+0.06  2009-05-25 02:32:00
+    - Test fix
+
+0.05  2009-05-25 02:32:00
+    - Bug fix
+
+0.04  2009-05-25 02:32:00
+    - Optimization and POD fixes
+
+0.03  2009-05-25 02:32:00
+    - Test fix
+
+0.02  2009-05-24 19:46:00
+    - Version fix
+
+0.01  2009-05-23 21:00:00
+    - Initial release

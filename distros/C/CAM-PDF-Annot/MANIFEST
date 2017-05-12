@@ -1,0 +1,17 @@
+.travis.yml
+Changes
+lib/CAM/PDF/Annot.pm
+lib/CAM/PDF/Annot/Parsed.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/CAM-PDF-Annot.t
+t/pdf-yaml-tiny.pdf
+t/pdf1.pdf
+t/pdf1multi.pdf
+t/pdf2.pdf
+t/pdf2multi.pdf
+t/YAML-Tiny.t
+META.json                                Module JSON meta-data (added by MakeMaker)

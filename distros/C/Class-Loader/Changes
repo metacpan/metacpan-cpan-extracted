@@ -1,0 +1,40 @@
+
+                      CHANGELOG for Class::Loader
+           $Id: Changes,v 1.4 2001/07/18 20:21:38 vipul Exp $
+
+--------------------------------------------------------------------------
+
+2.03                                                          Apr 27, 2005
+
+    * Taint fix.
+
+2.02                                                         July 18, 2001
+
+    * CPAN.pm is loaded on demand only. Thanks to Benjamin Trott for the 
+      patch.
+
+2.00                                                          May 29, 2001
+
+    * A versioning fix.  No change to the code.
+
+1.12                                                        April 30, 2001
+
+    * Changed the code to handle escaping of Args in _load(). Args are now
+      serialized with Data::Dumper (and processed a bit) before eval().
+      This lets us handle references & nested structures properly.
+
+1.8                                                         April 28, 2001
+
+    * Included tests in the distribition.
+
+1.7                                                         April 28, 2001
+
+    * Introduced CPAN switch in calls to _load()
+
+    * Wrote ::new()
+
+    * Small Documentation changes.
+
+1.6                                                         April 27, 2001
+
+    * First release.

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  62070:
+    - 155
+name: ddcb31
+registers:
+  AF: 60297
+  AF_: 0
+  BC: 16795
+  BC_: 0
+  DE: 37531
+  DE_: 0
+  HL: 32071
+  HL_: 0
+  I: 0
+  IX: 61997
+  IY: 35139
+  PC: 4
+  R: 2
+  SP: 0

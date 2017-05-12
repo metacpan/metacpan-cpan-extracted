@@ -1,0 +1,45 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Catalyst::Controller' => '0',
+                                      'Catalyst::DispatchType::Regex' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Role' => '0',
+                                      'Path::Tiny' => '0',
+                                      'URI::QueryParam' => '0',
+                                      'perl' => 'v5.10.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Catalyst' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'Test::WWW::Mechanize::Catalyst' => '0',
+                                   'lib' => '0',
+                                   'parent' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

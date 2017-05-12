@@ -1,0 +1,86 @@
+#!/usr/bin/perl -w
+
+BEGIN
+  {
+  use lib '../lib';			# if run with module not yet installed
+  chdir 'examples' if -d 'examples';	# wrong dir?
+  $|++;					# buffer off
+  }
+
+use Convert::Wiki;
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+
+my $opt = { debug => 0 };
+my ($input, $output, $links);
+
+pod2usage(2) unless GetOptions (
+  "debug" => \$opt->{debug},
+  "interlink=s" => \$links,
+  "input=s" => \$input,
+  "output=s" => \$output,
+  );
+
+if ($links)
+  {
+  $opt->{interlink} = [ split /\n/, read_file ($links) ];
+  }
+my $cvt = Convert::Wiki->new( $opt );	# create conversion object
+
+local $/ = undef;			# slurp mode
+
+open STDIN, $input or die ("Cannot open $input: $!") if $input;
+open STDOUT, ">$output" or die ("Cannot write to $output: $!") if $output;
+
+$cvt->from_txt( <> );			# read in input from stdin
+print $cvt->as_wiki();			# output converted text
+
+print STDERR "txt2wiki error: " . $cvt->error() if $cvt->error();
+
+1;
+
+sub read_file
+  {
+  my $f = shift;
+
+  local $/ = undef;             # slurp mode
+  open FILE, $f or die ("Cannot open file '$f': $!");
+  my $doc = <FILE>;
+  close FILE;
+
+  $doc;
+  }
+
+__END__
+
+=pod
+
+=head1 DESCRIPTION
+
+Convert a plain text file into Wikicode, that can be used on sites
+running the Wikimedia software.
+
+=head1 SYNOPSIS
+
+	./txt2wiki [options] <input.txt >output.txt
+	./txt2wiki [options] --input=input.txt --output=output.txt
+
+  Options are:
+
+	--debug			enable debug mode
+	--interlink=file	name of file with phrases to be
+				turned into inter-wiki links, one
+				phrase per line
+
+=head1 SEE ALSO
+
+L<Convert::Wiki>, L<http://www.mediawiki.org/>.
+
+=head1 AUTHOR
+
+(c) by Tels 2004. This program is free software, and is distributed
+under the General Public License. See the LICENSE in Convert-Wikie
+for details.
+
+=cut

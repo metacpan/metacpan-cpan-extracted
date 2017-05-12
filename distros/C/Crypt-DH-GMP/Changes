@@ -1,0 +1,56 @@
+Changes
+=======
+
+0.00012 - 22 Mar 2014
+    - pr #1 add repo location in metadata (dsteinbrunner)
+    - apply changes from https://rt.cpan.org/Ticket/Display.html?id=56794#txn-1341476
+
+0.00011 - 07 Sep 2013
+    - Make generate_keys way more random by using Perl_seed
+      (reported by karupanerura).
+      Upgrade is strongly advised for anybody using Crypt::DH::GMP (and hence
+      Net::OpenID::Consumer)
+
+0.00010 - 17 Nov 2011
+    - Split CCFLAGS and LFLAGS into words (rt #72464)
+    - Fix t/02_binhack.t to work with modern Net::OpenID::Consumer
+    - Don't rely on hardcoded size_t
+
+0.00009 - 02 Jul 2010
+  - No code change
+  - Tweak Makefile.PL to work better with MacPorts (with or without it)
+
+0.00008 - 11 May 2010
+  - Use Test::Requires in tests
+  - Update docs
+  - Update benchmark results
+
+0.00007 - 11 May 2010
+  - Modernize file layout
+  - Refactor XS code
+  - Should now run on threaded perls
+
+0.00006 - 05 Feb 2010
+  - Fix how CCFLAGS/LDFLAGS are set and passed. Hopefully resolves rt #54265
+
+0.00005 - 24 Apr 2008
+  - Add pub_key_twoc and compute_key_twoc to directly compute the two's
+    complement in binary form
+
+0.00004 - 23 Apr 2008
+  - Fix an off-by-one error when calling mpz_get_str.
+    This fixes segfaults that seemed to appear only on linux flavours.
+
+0.00003 - 15 Apr 2008
+  - Make g() and p() both getter /and/ setter
+  - Properly initialize priv_key if nothing was given in the constructor
+    (Net::SSH::Perl uses Crypt::DH this way)
+  - Update benchmarks
+
+0.00002 - 15 Apr 2008
+  - Fix t/99-compat.t so that it properly detectes Crypt::DH
+  - Fix warnings about incompatible pointer types
+  - Add mpz_clear() calls prior to calling free
+
+0.00001 - 14 Apr 2008
+  - Initial release

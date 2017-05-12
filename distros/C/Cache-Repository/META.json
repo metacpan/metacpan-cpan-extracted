@@ -1,0 +1,50 @@
+{
+   "abstract" : "Generic repository of files",
+   "author" : [
+      "Darin McBride - dmcbride@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Repository",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Filesys::Statvfs" : "0"
+         },
+         "requires" : {
+            "Filesys::DiskUsage" : "0.04",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Cache::Repository" : {
+         "file" : "lib/Cache/Repository.pm",
+         "version" : "0.07"
+      },
+      "Cache::Repository::Filesys" : {
+         "file" : "lib/Cache/Repository/Filesys.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

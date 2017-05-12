@@ -1,0 +1,20 @@
+Revision history for Perl extension IPPhone.
+
+0.01  Fri Jul 12 14:38:57 2002
+	- original version; created by h2xs 1.20 with options
+		-AXc -n IPPhone
+0.02  Fri Oct 25 14:22:01 2002
+	- Removed CTRL-M's from several modules
+0.03  Fri Nov 1 11:22:01 2002
+	- Added wantarray return values
+	- fixed parsing bugs in nfl.cgi
+	- modified execute.cgi to push objects to IPPhones
+0.04  Tue Nov  5 14:14:26  2002
+	- Added Pure Perl graphics capability to convert images to CIP
+          and CIP to images using Perl GD module. Code contributed by
+          Nate Mueller - nate@cs.wisc.edu
+	- Added all header fields recognized by the phone including 
+	  Refresh, URL, Location, Cookie, Location, Expires, Date
+0.05  Tue Dec  3 12:00:34  2002
+	- Changed expires header to lower case
+	- Fixed bug in IconMenu

@@ -1,0 +1,8 @@
+NOTES
+Changes
+MANIFEST
+Makefile.PL
+Struct1.pm
+Struct1.xs
+test.pl
+typemap

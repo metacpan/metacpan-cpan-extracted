@@ -1,0 +1,70 @@
+{
+   "abstract" : "Extract recent test statuses from metabase log",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.016",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Testers-TailLog",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.016",
+            "CPAN::Meta" : "2.150010"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "HTTP::Tiny" : "0",
+            "Path::Tiny" : "0.040",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.070",
+            "Test::More" : "0.89",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Testers::TailLog" : {
+         "file" : "lib/CPAN/Testers/TailLog.pm",
+         "version" : "0.001001"
+      },
+      "CPAN::Testers::TailLog::Result" : {
+         "file" : "lib/CPAN/Testers/TailLog/Result.pm",
+         "version" : "0.001001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentnl/CPAN-Testers-TailLog/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kentnl/CPAN-Testers-TailLog",
+         "web" : "https://github.com/kentnl/CPAN-Testers-TailLog"
+      }
+   },
+   "version" : "0.001001",
+   "x_contributors" : [
+      "Slaven Rezic <srezic@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_01"
+}

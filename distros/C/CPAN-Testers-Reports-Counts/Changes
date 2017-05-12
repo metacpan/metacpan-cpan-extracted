@@ -1,0 +1,26 @@
+Revision history for Perl module CPAN::Testers::Reports::Counts
+
+0.05 2015-10-27
+    - Updated github repo URL after changing my github username
+    - Include a META.json in releases, and tag & push to github on release
+
+0.04 2014-02-14
+    - Lazy loading of the data from CPAN Testers. The site was recently
+      down, and all the test runs failed because of the require test.
+    - Added a SEE ALSO section to doc.
+
+0.03 2014-02-10
+    - Stopped using LWP::Online in the tests (occasional failures from
+      CPAN Testers website were causing failing tests) and instead
+      wrapped up http_get():
+          CPAN::Testers::Reports::Counts::TestWrapper
+      If the http_get() request fails, then we provide fallback data,
+      if we have some.
+
+0.02 2014-02-01
+    - Bumped min perl to 5.8.0, as use of Internals::SvREADONLY requires it
+      (and submitted a pull request to Perl::MinimumVersion to fix that :-)
+
+0.01 2014-01-29
+    - Initial release to CPAN
+

@@ -1,0 +1,76 @@
+<script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // name: radio group or multiple checkboxes
+    var name = null;
+    var selected_name = 0;
+    for (var loop = 0; loop < form.elements['name'].length; loop++) {
+        if (form.elements['name'][loop].checked) {
+            name = form.elements['name'][loop].value;
+            selected_name++;
+            if (name == null || name === "") {
+                alertstr += '- Choose one of the "Name" options\n';
+                invalid++;
+                invalid_fields.push('name');
+            }
+        } // if
+    } // for name
+    if (! selected_name) {
+        alertstr += '- Choose one of the "Name" options\n';
+        invalid++;
+        invalid_fields.push('name');
+    }
+
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+<noscript><font color="#cc0000"><b>Please enable Javascript or use a newer browser.</b></font></noscript>
+<p>Fields that are <b>highlighted</b> are required.</p>
+<form action="TEST" method="get" onsubmit="return validate(this);">
+<div><input id="_submitted" name="_submitted" type="hidden" value="1" /></div>
+<table>
+<tr valign="top">
+  <td><b>Name</b></td>
+  <td><table>
+  <tr>
+    <td><input id="name_lower" name="name" type="radio" value="lower" /></td>
+    <td><label for="name_lower">Lower</label></td>
+  </tr>
+  <tr>
+    <td><input id="name_UPPER" name="name" type="radio" value="UPPER" /></td>
+    <td><label for="name_UPPER">UPPER</label></td>
+  </tr>
+  </table></td>
+</tr>
+<tr valign="top">
+  <td>Favorite Color</td>
+  <td><table>
+  <tr>
+    <td><input id="color_red" name="color" type="checkbox" value="red&gt;" /></td>
+    <td><label for="color_red">red></label></td>
+  </tr>
+  <tr>
+    <td><input id="color_green" name="color" type="checkbox" value="green&amp;" /></td>
+    <td><label for="color_green">green&</label></td>
+  </tr>
+  <tr>
+    <td><input id="color_blue" name="color" type="checkbox" value="blue&quot;" /></td>
+    <td><label for="color_blue">blue"</label></td>
+  </tr>
+  </table></td>
+</tr>
+<tr valign="top">
+  <td align="center" colspan="2"><input id="_submit" name="_submit" type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>

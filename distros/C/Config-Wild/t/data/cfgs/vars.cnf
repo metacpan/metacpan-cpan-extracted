@@ -1,0 +1,18 @@
+root = here
+twig = $(root)/there
+
+entvar = ${CWTEST} or then
+
+bothvarenv = $CWTEST or where
+
+bothvarint = $root or not
+
+nest0 = 0
+nest1 = $(nest0)/1
+nest2 = $(nest1)/2
+nest3 = $(nest2)/3
+
+enest0 = ${CWTEST}
+enest1 = $(enest0)/or then
+enest2 = $(enest1)/or how
+

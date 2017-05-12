@@ -1,0 +1,130 @@
+Revision history for Perl extension Class::DBI::Loader
+
+0.34  Thu Mar 22 20:30:00 2007
+       - Apply patch by Kim Scheibel to allow mysql table with catalog
+         name separators
+
+0.33  Thu May 25 00:00:00 2006
+       - Implement the 'require' parameter. Suggested by esh at exile.ru
+
+0.32  Sun Mar 05 01:10:00 2006
+        - Explicitly disconnect inside _table() for SQLite.pm and Pg.pm
+        - Apply patch from rt #17546, and work with foreign keys in mysql 5.
+
+0.31  Thu Feb 23 18:10:00 2006
+        - Fix Class::DBI::Loader::mysql (rt #13689). Patch by Raphael Kraus
+        - Add missing use lib in t/04mysql.t
+
+0.30  Sat Feb 04 23:05:00 2006
+        - I had completely misunderstood the subtle semantics of the
+          way the classes were being constructed, especially the
+          class hierarchy created by additional_base and left_base.
+          The old behavior has been restored.
+
+0.29  Tue Jan 31 11:12:00 2006
+        - Document 'options' parameter
+        - Explicitly require Class::DBI::Pg >= 0.07 when the target
+          database is PostgreSQL 8.x
+
+0.28  Sat Jan 28 08:45:00 2006
+        - Forgot to update MANIFEST, which lead to failing tests. 
+
+0.27  Fri Jan 27 11:43:00 2006
+        - Inline use base () calls when generating classes.
+        - Use connection() over set_db(), if available.
+        - Test for additional_base_classes and left_base_classes
+        - Shut up t/03podcoverage.t failure. Reporeted by Kenichi Ishigaki
+
+0.26  Thu Jan 26 11:26:00 2006
+        - Changes that went into 0.25 didn't fix the problems described in
+          dbdpg-general mailing lists.
+
+            http://gborg.postgresql.org/pipermail/dbdpg-general/2006-January/001954.html
+
+          Toby Corkindale gave me the tests to properly test the problem, and
+          I was able to verify it.
+
+0.25  Thu Jan 26 02:14:00 2006
+        - Pg: disconnect from database after getting the list of tables
+        - Maintainer changed to Daisuke Maki.
+
+0.24  Tue XXX XX 00:00:00 2005
+        - Strip punctuations around key and table names for SQLite
+          (Autrijus Tang)
+
+0.23  Tue Jun 14 01:00:00 2005
+        - fixed mysql loader, escape with backticks (Andy Grundman)
+        - debug output is now usable code!!!
+
+0.22  Thu Jun 11 23:00:00 2005
+        - fixed pod
+        - second try for a sane release
+
+0.21  Thu Jun 09 23:00:00 2005
+        - added inflect support (Uwe Voelker)
+        - added Class::DBI::Sweet support (Uwe Voelker)
+
+0.20  Sun May 29 01:00:00 2005
+        - better errors
+
+0.19  Sat Apr 16 23:00:00 2005
+        - improved SQLite support (multi column keys, comments...)
+          (David Naughton)
+
+0.18  Fri Apr 08 18:00:00 2005
+        - added pod tests for kwalitee
+        - fixed that annoying mysql quoter bug (Andy Grundman)
+
+0.17  Sat Feb 12 01:00:00 2005
+        - exclude support (David Naughton)
+
+0.16  Sun Feb 20 17:00:00 2005
+        - added $dbh->disconnect to mysql loader (Dan Kubb)
+
+0.15  Sat Feb 19 20:00:00 2005
+        - fixed DBD::Pg 1.39_02 compatibility (chocolateboy)
+
+0.14  Fri Feb 04 18:00:00 2005
+        - bugfixes
+
+0.13  Fri Feb 04 02:00:00 2005
+        - misc mysql fixes (Dan Kubb)
+
+0.12  Thu Jan 27 07:00:00 2004
+        - automatic relationships for SQLite
+        - automatic relationships for MySQL (Adam Anderson)
+
+0.11  Mon Dec 20 20:00:00 2004
+        - support for SQLite2 (Marcus Ramberg)
+
+0.10  Wed Dec 15 01:00:00 2004
+        - support for automatic has_a and has_many relationships,
+          big thanks to Randal Schwartz for his article about this!
+        - better documentation
+        - cleanup
+
+0.07  Thu Dec 14 22:00:00 2004
+        - better documentation
+
+0.06  Thu Dec 14 21:00:00 2004
+        - cleanup, driver classes now just define _tables() and
+          _db_class() (Simon Flack)
+        - constraint support, only load tables matching regex
+        - aditional_classes support (Simon Flack)
+        - additional_base_classes support
+        - new tests
+
+0.05  Sat Nov 13 19:30:00 2004
+        - more cleanup
+
+0.04  Sat Nov 13 19:00:00 2004
+        - cleanup
+
+0.03  Sun Jul 11 00:00:00 2004
+        - fixed Pg $dbh->tables. 
+
+0.02  Tue Feb 24 00:00:00 2004
+        - fixed mysql quoted table names problem.
+
+0.01  Mon Aug 26 00:00:00 2004
+        - original version.

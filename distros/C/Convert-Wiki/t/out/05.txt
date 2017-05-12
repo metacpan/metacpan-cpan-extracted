@@ -1,0 +1,18 @@
+== [[Headline]] ==
+
+Long interlinking example.
+
+* bullet [[One|one]]
+* bullet [[two|Two]]
+
+Some text in a paragraph for interlinking. and some [[more]] and more and
+[[Foobar|Foo]] and [[Barbar|baz]].
+
+Something inside a word: barfoo. foober.
+
+ No interlinks here: Foo and baz.
+
+A web link: [http://bloodgate.com/ bloodgate.com].
+
+This paragraph has an example that spans [[multiple lines]].
+

@@ -1,0 +1,2 @@
+greeting=Hello World
+special_greeting=Hello :name

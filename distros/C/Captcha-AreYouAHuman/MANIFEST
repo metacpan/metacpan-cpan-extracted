@@ -1,0 +1,14 @@
+Changes
+README.txt
+examples/mod_perl/AYAHDemoHandler.pm
+examples/mod_perl/README.txt
+examples/mod_perl/startup.pl
+examples/mod_perl/template.html
+README
+t/00basic.t
+dist.ini
+lib/Captcha/AreYouAHuman.pm
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

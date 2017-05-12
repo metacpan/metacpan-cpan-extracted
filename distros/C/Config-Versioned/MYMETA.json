@@ -1,0 +1,56 @@
+{
+   "abstract" : "Simple, versioned access to configuration data",
+   "author" : [
+      "Scott T. Hardin, C<< <mrscotty at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Versioned",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Path::Class" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::Any" : "0",
+            "Config::Merge" : "0",
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "Config::Std" : "0",
+            "Git::PurePerl" : "0",
+            "Moose" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.01"
+}

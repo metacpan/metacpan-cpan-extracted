@@ -1,0 +1,51 @@
+#
+# This file is part of Config-Model-Systemd
+#
+# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The GNU Lesser General Public License, Version 2.1, February 1999
+#
+[
+  {
+    'element' => [
+      'service',
+      {
+        'cargo' => {
+          'config_class_name' => 'Systemd::Service',
+          'type' => 'node'
+        },
+        'index_type' => 'string',
+        'type' => 'hash'
+      },
+      'socket',
+      {
+        'cargo' => {
+          'config_class_name' => 'Systemd::Socket',
+          'type' => 'node'
+        },
+        'index_type' => 'string',
+        'type' => 'hash'
+      },
+      'timer',
+      {
+        'cargo' => {
+          'config_class_name' => 'Systemd::Timer',
+          'type' => 'node'
+        },
+        'index_type' => 'string',
+        'type' => 'hash'
+      }
+    ],
+    'name' => 'Systemd',
+    'read_config' => [
+      {
+        'auto_create' => '1',
+        'backend' => 'Systemd'
+      }
+    ]
+  }
+]
+;
+

@@ -1,0 +1,82 @@
+\input texinfo   @c -*-texinfo-*-
+@c Copyright 1998-1999, Randall Maas.  All rights reserved.  This program is
+@c free software; you can redistribute it and/or modify it under the same terms
+@c as PERL itself.                                                                   
+@c %**start of header
+@setfilename CfgTie.info
+@settitle CfgTie
+@c %**end of header
+
+@setchapternewpage odd
+@paragraphindent 0
+
+@ifinfo
+This is the documentation for the CfgTie library
+
+Copyright (c) 1996-9 Randall Maas
+@end ifinfo
+
+@titlepage
+@sp 10
+@comment The title is printed in a large font.
+@center @titlefont{CfgTie}
+
+@c The following two commands start the copyright page.
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1996-9 Randall Maas
+@end titlepage
+@defindex fl
+
+@node    Top,       Introduction,  (dir),    (dir)
+@comment node-name, next,          previous, up
+
+@menu
+* Introduction::           An introduction
+
+* Overview::		   An overview of the CfgTie world
+
+* SS::			   Safety & Security
+
+* CSS::                    Style Sheet for example CGI scripts.
+
+* Modules ::               A collection of code
+
+* Related Work::
+
+* Revisions::              A journal of all the file changes
+
+* Function Index::         The index of all procedure and functions
+
+* Variable Index::
+
+* Concept Index::
+
+* File Index::
+
+@end menu
+
+@node    Introduction, Overview, Top,      Top
+@comment node-name,    next,                  previous, up
+@include Intro.tex
+
+@node Function Index, Variable Index, Revisions, Top
+@unnumbered Function Index
+@printindex fn
+
+@node Variable Index, Concept Index, Function Index, Top
+@unnumbered Variable Index
+@printindex vr
+
+@node Concept Index, File Index, Variable Index,Top
+@unnumbered Concept Index
+@printindex cp
+
+@node File Index, , Concept Index, Top
+@unnumbered File Index
+@printindex fl
+
+@shortcontents
+@contents
+@bye
+

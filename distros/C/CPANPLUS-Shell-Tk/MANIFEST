@@ -1,0 +1,8 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+lib/CPANPLUS/Shell/cpanplus.ppm
+lib/CPANPLUS/Shell/Tk.pm
+t/1.t

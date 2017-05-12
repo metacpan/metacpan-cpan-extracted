@@ -1,0 +1,88 @@
+/* pagination */
+.yui-skin-sam .pager_wrapper
+{
+    border: 1px solid #aaa;
+    background-color: #fff;
+    padding: 4px;
+    margin-left: 1em;
+    /* width: 80%; */
+}
+
+.yui-skin-sam .panel.pager_wrapper,
+.yui-skin-sam .results.pager_wrapper
+{
+    margin-left: 0;
+    width: none;    /* override 100% to make it fit nicely */
+}
+
+/* .yui-skin-sam .panel.pager_wrapper
+{
+    height: 36px;
+}
+ */
+.yui-skin-sam .results.pager_wrapper
+{
+    margin-left: -1px;
+    margin-bottom: 1em;
+}
+
+.pager_wrapper input.autocomplete
+{
+    position:static;
+}
+
+.yui-skin-sam .pager a
+{
+    color: #7a0019;
+}
+
+.panel.pager_wrapper .pager,
+.results.pager_wrapper .pager
+{
+    float: left;
+}
+
+#panel_autocomplete,
+#results_autocomplete
+{
+    border: 1px solid #aaa;
+    background-color: #7a0019;
+    padding: 4px;
+    color: #fff;
+    float: right;
+    margin:4px 0;
+}
+
+.pager_wrapper br
+{
+    clear: both;
+}
+
+.crud .pager a.hover,
+.crud .pager a:hover,
+.yui-skin-sam a.yui-pg-page.hover,
+.yui-skin-sam a.yui-pg-page:hover,
+.yui-skin-sam a.yui-pg-first.hover,
+.yui-skin-sam a.yui-pg-first:hover,
+.yui-skin-sam a.yui-pg-previous.hover,
+.yui-skin-sam a.yui-pg-previous:hover,
+.yui-skin-sam a.yui-pg-next.hover,
+.yui-skin-sam a.yui-pg-next:hover,
+.yui-skin-sam a.yui-pg-last.hover,
+.yui-skin-sam a.yui-pg-last:hover
+{
+    background-color: #ffdd77;
+    color: #7a0019;
+    border: 1px solid #7a0019;
+}
+
+
+/* pager popup */
+form.crud div.pager_wrapper select,
+#results select.yui-pg-rpp-options
+{
+    float: none;
+    margin: 0;
+    padding: 0;
+}
+

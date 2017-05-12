@@ -1,0 +1,35 @@
+---
+abstract: 'use plain classes as a Catalyst Model'
+author:
+  - 'dann <techmemo@gmail.com>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Test: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-MultiAdaptor
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::C3: 0
+  Class::MOP: 0
+  Filter::Util::Call: 0
+  MRO::Compat: 0
+  Module::Pluggable::Object: 0
+  Moose: 0
+  Sub::Install: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.11

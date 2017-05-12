@@ -1,0 +1,117 @@
+#!/opt/perl/bin/perl
+# $Id: perltags,v 1.1 2007/06/27 23:53:45 ask Exp $
+# $Source: /opt/CVS/Getopt-LL/examples/perltags,v $
+# $Author: ask $
+# $HeadURL$
+# $Revision: 1.1 $
+# $Date: 2007/06/27 23:53:45 $
+use strict;
+use warnings;
+use Carp;
+use Perl6::Say;
+use Perl::Tags::ClassDot;
+use Params::Util qw(_INSTANCE);
+use Readonly;
+use Fatal qw(open close);
+use version;
+use English qw(-no_match_vars);
+use Getopt::LL;
+
+our $VERSION    = qv('0.0.1');
+our $gsysret    = 0; # exit status;
+our $gmaxlevels = 1;
+
+# Path to the exuberant ctags program.
+# Get it here: http://ctags.sourceforge.net/
+# If our arguments doesn't include --language-force=perl
+# we pass everything on to this program.
+Readonly my $EXUBERANT_CTAGS     => 'ctags-exuberant';
+
+Readonly my $CTAGS_OUT_FILENAME  => 'tags';
+
+my %OUTPUT_METHODS = (
+    'stdout'    => sub {
+        my ($tags) = @_;
+        say $tags;
+    },
+
+    'file'      => sub {
+        my ($tags, $filename_out) = @_;
+        open my $out_fh, '>', $filename_out;
+        print {$out_fh} $tags;
+        close $out_fh;
+    },
+);
+
+exit main(@ARGV);
+
+sub main {
+    my @argv = @_;
+
+    my $use_perltags  = 0;
+    my $output_method = 'file';
+    my $filename_out  = $CTAGS_OUT_FILENAME;
+
+    my $getopts_rules = {
+
+        '--language-force' => sub {
+            my ($self, $node, $name, $value) = @_;
+
+            if ($value eq 'perl') {
+                $use_perltags = 1;
+            }
+        },
+
+        '--maxlevels'      => sub {
+            my ($self, $node, $name, $value) = @_;
+            $gmaxlevels = $value;
+            @ARGV = grep { !/--maxlevels/ } @ARGV;
+        },
+
+        '-f'                => sub {
+            my ($self, $node, $name, $value) = @_;
+            my $next_arg = $self->get_next_arg($node);
+            
+            $output_method = $next_arg eq '-' ? 'stdout'
+                                              : 'file';
+            $filename_out = $next_arg;
+        },
+    };
+
+    my $getopts = Getopt::LL->new($getopts_rules, {
+        allow_unspecified => 1,   
+    }, \@argv);
+    my $files_to_process = $getopts->leftovers;
+
+    my $tags =
+        $use_perltags
+        ? run_perl_tags(@{ $files_to_process })
+        : run_exuberant(@ARGV);
+
+    $OUTPUT_METHODS{$output_method}->($tags, $filename_out);
+
+
+    return $gsysret;
+
+}
+
+sub run_perl_tags {
+
+    my @files_to_process = @_;
+
+    my $tagger = Perl::Tags::ClassDot->new(
+        max_level => $gmaxlevels,
+        exts      => 1,  # use the exuberant extensions.
+    );
+
+    $gsysret = !$tagger->process(
+        files       => [@files_to_process],
+        refresh     => 1,
+    );
+
+    return $tagger;
+}
+
+sub run_exuberant {
+    $gsysret = system $EXUBERANT_CTAGS, @_;
+}

@@ -1,0 +1,4 @@
+0.02 - 25 May 2012
+     - Test no longer relies on Catalyst::Engine
+0.01 - 18 May 2012
+     - Initial release

@@ -1,0 +1,47 @@
+
+RCS file: /home/nwiger/perlmod/lib/Config/RCS/Fast.pm,v
+Working file: /home/nwiger/perlmod/lib/Config/Fast.pm
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 7;	selected revisions: 7
+description:
+Config::Fast - extremely fast configuration file reader parser
+----------------------------
+revision 1.7
+date: 2006/03/06 22:18:41;  author: nwiger;  state: Exp;  lines: +140 -76
+- changed defines to MixedCase for DataDumper consistency
+- added @Define array that's pre-parsed
+- wrapped everything inside an eval'ed package for safety
+----------------------------
+revision 1.6
+date: 2006/02/26 18:52:03;  author: nwiger;  state: Exp;  lines: +47 -15
+- fixed internal $Var substitution errors
+- Added $ARRAYS setting to parse bourne array[n] syntax
+----------------------------
+revision 1.5
+date: 2005/10/11 23:46:22;  author: nwiger;  state: Exp;  lines: +145 -84
+Rewrote entire parsing methodology to use an embedded eval in a
+safe compartment, in order to get Perl's quote-parsing correct.
+Updated documentation appropriately.
+----------------------------
+revision 1.4
+date: 2003/11/03 21:42:12;  author: nwiger;  state: Exp;  lines: +146 -85
+changed variables to being case-insensitive, and also fixed a
+bug w/ the caching of multiple configuration files
+----------------------------
+revision 1.3
+date: 2003/04/05 02:06:28;  author: nwiger;  state: Exp;  lines: +69 -65
+doc updates and clarifications
+----------------------------
+revision 1.2
+date: 2003/04/05 01:25:01;  author: nwiger;  state: Exp;  lines: +26 -9
+misc bugfixes, escaping, test suite authoring
+----------------------------
+revision 1.1
+date: 2003/04/05 00:03:19;  author: nwiger;  state: Exp;
+Initial revision
+=============================================================================

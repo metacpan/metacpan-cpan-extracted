@@ -1,0 +1,29 @@
+---
+abstract: 'A plugin which uses Config::Tiny'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0.94
+  Test::Pod: 1.44
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Plugin-Tiny
+provides:
+  Config::Plugin::Tiny:
+    file: lib/Config/Plugin/Tiny.pm
+    version: 1.01
+requires:
+  Carp: 1.01
+  Config::Tiny: 2.14
+  strict: 1.03
+  vars: 1.01
+  warnings: 1.03
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.01

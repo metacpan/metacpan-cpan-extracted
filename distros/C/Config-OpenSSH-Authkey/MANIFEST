@@ -1,0 +1,18 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+eg/authkey-merge
+eg/ssh1-authkey-audit
+lib/Config/OpenSSH/Authkey.pm
+lib/Config/OpenSSH/Authkey/Entry.pm
+lib/Config/OpenSSH/Authkey/Entry/Options.pm
+t/020-entry.t
+t/040-authkey.t
+t/042-options.t
+t/authorized_keys
+t/pod.t
+SIGNATURE
+META.json                                Module JSON meta-data (added by MakeMaker)

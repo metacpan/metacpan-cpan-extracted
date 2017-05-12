@@ -1,0 +1,31 @@
+---
+abstract: "A Modern Perl interface to CyberSource's SOAP API."
+author:
+  - 'Amiri Barksdale <amiri@arisdottle.net>'
+build_requires:
+  Data::Dumper: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Checkout-CyberSource-SOAP
+requires:
+  Business::CreditCard: 0
+  Moose: 0
+  SOAP::Lite: 0
+  Time::HiRes: 0
+  namespace::autoclean: 0
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/amiri/Checkout--CyberSource--SOAP/issues
+  repository: git://github.com/amiri/Checkout--CyberSource--SOAP.git
+version: 0.07

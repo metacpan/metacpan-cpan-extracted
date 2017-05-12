@@ -1,0 +1,53 @@
+Release history for CPAN-Meta-Prereqs-Diff
+
+0.001004 2017-03-04T09:14:59Z d028807
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/CPAN-Meta-Prereqs-Diff/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - develop: +3 ↑2 (suggests: ↑2)
+ - test: ↓1
+
+0.001003 2015-07-16T20:41:42Z 22579fa
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +12 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -2
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Minor]
+ - Remove dependency on LMU:uniq ( was not actually being used )
+
+0.001002 2014-08-15T21:14:04Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - adjust whitespace.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+0.001001 2014-08-09T00:44:44Z
+ [00 Bugfix]
+ - Use newer version of CPAN::Meta::Requirements to avoid test failures.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑2)
+ - runtime: +1 ↑1
+ - test: +1 -2 (recommends: ↑1 -1)
+
+ [Misc]
+ - Update Test::ReportPrereqs
+ - Move repository to kentnl org
+
+0.001000 2014-06-19T09:16:18Z
+ - First version.

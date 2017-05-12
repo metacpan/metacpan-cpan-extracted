@@ -1,0 +1,34 @@
+---
+abstract: 'Moose Role for verifying request parameters on a per action basis.'
+author:
+  - 'J. Shirley <jshirley@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Request: 0
+  Catalyst::Test: 0
+  FindBin: 0
+  Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Controller-Verifier
+requires:
+  Carp: 0
+  Catalyst: 0
+  Data::Manager: 0.07
+  Data::Verifier: 0
+  Message::Stack: 0
+  Moose: 0
+  Moose::Role: 0
+  Scalar::Util: 0
+  Test::More: 0
+resources:
+  repository: https://github.com/jshirley/catalystx-controller-verifier
+version: 0.02

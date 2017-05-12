@@ -1,0 +1,294 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Class::GAPI - Generic API, Base class with autoloaded methods, stub objects, cloning etc.</title>
+<link rev="made" href="mailto:gp@familiehaase.de" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#autoloaded_methods">AUTOLOADED METHODS</a></li>
+	<li><a href="#object_initialization">OBJECT INITIALIZATION</a></li>
+	<li><a href="#other_functions">OTHER FUNCTIONS</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_licence">COPYRIGHT AND LICENCE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Class::GAPI - Generic API, Base class with autoloaded methods, stub objects, cloning etc.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        package Guppy ;</pre>
+<pre>
+        use Class::GAPI                 ; # All of its cool stuff 
+        our @ISA = qw(Class::GAPI)      ; # is now in our namespace</pre>
+<pre>
+        our @Children = qw(Class::GAPI::Fin Class::List::Eyeballs CGI)  ; # Autoconstruct Subordinates
+        our @Default_Properties = qw(scaly small sushi)                         ; # Call at constructor time</pre>
+<pre>
+        use strict ;
+ 
+        sub _init { # Last stage of initialization
+                  my $self = shift ; 
+                  $self-&gt;fillet(1) if defined $self-&gt;{'sushi'}; # sushi exists but is undefined
+                return 1;
+        }
+        1 ;</pre>
+<pre>
+        package Petstore ; 
+        use Guppy        ; 
+        my $pet = Guppy-&gt;new(color =&gt; 'orange', price =&gt; '.50', small =&gt; 1, -sushi =&gt; 1) ; # envoke these functions
+        $pet-&gt;Eyeballs-&gt;[0] = &quot;left&quot;    ; # Access a special list subclass
+        $pet-&gt;Eyeballs-&gt;[1] = &quot;right&quot;   ; # 
+        $pet-&gt;Fin-&gt;dorsal(&quot;polkadot&quot;)   ; # Access a subordinate Class::GAPI object
+        $pet-&gt;Fin-&gt;tail(&quot;orange&quot;)       ; #</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This is a foundation class. It is intended to be inhertied and used as a framework for other 
+objects. This module features autoloaded methods (set+get as one method), three styles of 
+initialization, tools for handling stub objects, and cloning. It is particularly well suited 
+to handling record list type structures, deeply nested trees and those on-the-fly data structures
+that give Perl a reputation as being a language of line noise.  GAPI breaks a few rules and 
+create a few others. Overall it just makes coding complex nested data structures a heck of a lot 
+easier.</p>
+<p>
+</p>
+<hr />
+<h1><a name="autoloaded_methods">AUTOLOADED METHODS</a></h1>
+<p>Probably the most used part of this module is the autoloaded methods. One can access them from 
+a few places. First by constructing the widget with a hash</p>
+<pre>
+        my $pet = Guppy-&gt;new(foo =&gt; &quot;bar&quot;) ;</pre>
+<p>This is the same as saying:</p>
+<pre>
+        my $pet = Guppy-&gt;new() ;
+        $pet-&gt;foo(&quot;bar&quot;)       ;</pre>
+<p>which is the same thing as saying:</p>
+<pre>
+        my $pet = Guppy-&gt;new() ;
+        $pet-&gt;{'foo'} = 'bar'  ;</pre>
+<p>So all methods are autoloaded. A side effect is that typo'd function calls 
+generally will not cause a crash, but rather quitely create an additional 
+property. This can also be viewed as a feature, in that you can call nonexistant 
+functions in GAPI objects, thereby allowing you to write you code a bit more top-down 
+and it will be more tolerable of things you haven't added yet.</p>
+<p>All autoloaded methods add properties, never deleting them. To undefine something 
+call it as a hash.  (the variable ``_init'' is reserved and does not autoload, 
+you'll see why later)</p>
+<pre>
+        undef $pet-&gt;{'foo'}  ; # no foo for you 
+        delete $pet-&gt;{'foo'} ; # de-exist foo.</pre>
+<p>Passing a hash or array to a function returns a reference to the respective type, as does just 
+calling an empty function on a property that contains a hash or array.  And they may be constructed 
+on the fly. So you can:</p>
+<pre>
+        my $hashref = $pet-&gt;magician(tophat =&gt; 'bunny') ;</pre>
+<p>But don't do this. Forget I mentioned it. Instead use the <code>sprout()</code> function 
+which is GAPI for creating GAPI based subclasses. sprout()ed classes will 
+then also support autoloaded methods and other GAPI functions. 
+</p>
+<pre>
+
+        $pet-&gt;sprout('magician', tophat =&gt; 'bunny')        ; # $pet-&gt;{'magician'} is now a Class::GAPI object</pre>
+<pre>
+        my $wascallywabit = $pet-&gt;magician-&gt;tophat()       ; # get the rabbit  
+        $pet-&gt;magician-&gt;tophat('dove')                     ; # replace it with a dove</pre>
+<p>Now, back to the constructor:</p>
+<pre>
+        my $pet = Guppy-&gt;new(foo =&gt; &quot;bar&quot;) ;</pre>
+<p>This does not just set $pet-&gt;{'foo'} to ``bar'', it invoke the function 'foo' on ``bar'', and 
+the autoloaded function is what does the set/get. So it is important to note that one can preempt 
+this behavior simply by defining a function as follows:</p>
+<pre>
+        sub foo { 
+                my $self = shift ; 
+                my $bar = shift  ; 
+                print &quot;a guppy walks into a $bar and says: Ouch.\n&quot; ;
+        }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="object_initialization">OBJECT INITIALIZATION</a></h1>
+<p>Class::GAPI has three stages of initialization at constructor time. The first which we just 
+discussed is by calling passed arguments as functions. The second is by evaluating two class 
+wide predefined arrays. They are:</p>
+<pre>
+        our @Default_Properties = qw(scaly small sushi) ; # execute some functions during new()
+        our @Children = qw(Class::GAPI::Fin Class::List::Eyeballs) ; # make some branches on our tree</pre>
+<p>@Default_Properties is easy. Anything named here is called just as if it was passed as an 
+option with an undefined value. So the example above is the same as:</p>
+<pre>
+        my $pet = Guppy-&gt;new(scaly =&gt; undef, small =&gt; undef, sushi =&gt; undef) ;</pre>
+<p>@Default_Properties is not used that often, in that the other Initialization stages can 
+do more than @Default_Properties. It is handy from time to time when you want to add 
+something complicated to the objects initialization and don't need to pass any special 
+arguments. (Like I said, rarely used) It is also trumped by any same-named passed option 
+pair from stage 1. So you you can define this as a hail marry for any function that should 
+be run at constructor time, even if the caller doesn't send an option pair.</p>
+<p>@Children is a list of subordinate objects to call -&gt;<code>new()</code> on at constructor time. This allows 
+Class::GAPI based objects to include other classes in a sem-codeless fashion. Just ``use'' something 
+and stick it in Children, and you will get one built. (No options will be passed, but it will 
+built.) So for example you can do this:</p>
+<pre>
+        package Guppy ;</pre>
+<pre>
+        use CGI                    ;
+        use Class::GAPI            ; 
+        our @ISA = qw(Class::GAPI) ;  
+        our @Children = qw(CGI)    ;
+        1 ;</pre>
+<p>Which will then allow you to do this:</p>
+<pre>
+        my $pet = Guppy-&gt;new()      ; 
+        my $SwimTowardstheLight = $pet-&gt;CGI-&gt;param(&quot;fishhook&quot;) ; # Extract CGI parameter &quot;fishhook&quot; 
+ 
+Class::GAPI will always use the right-most namespace fragment as the option in the option =&gt; value pair. (This may 
+cause a namespace conflict from time to time, in those cases just use the third stage _init instead.) So for example:</pre>
+<pre>
+        package SpyGuppy           ; 
+        use Crypt::CBC             ; # block handler
+        use Crypt::DES             ; # Encryption Algorythm. 
+        use Class::GAPI            ; 
+        our @ISA = qw(Class::GAPI) ;  
+        our @Children = qw(Crypt::CBC Crypt::DES) ;
+        1 ;</pre>
+<p>and then do:</p>
+<pre>
+        my $pet = SpyGuppy-&gt;new()       ; 
+        $pet-&gt;CBC-&gt;something()          ;
+        $pet-&gt;DES-&gt;somethingelse()      ;</pre>
+<p>@Children also conveiniently has 2 special class names. Class::GAPI::Foo, and Class::List::Foo. In 
+this case ``Foo'' can be anything you like, and will correspondingly be used to create a 
+sprout()ed object. Note that Class::GAPI::Foo is a a sprouted hash, while Class::List::Foo 
+is a sprouted array. This is very convenient for making lists of objects. The technique below can be used 
+to quickly create a variety of styles of record manager classes.</p>
+<pre>
+        package Guppy::School   ; 
+        use Guppy               ; 
+        our @ISA = qw(Guppy)    ; # We are derived from a Guppy, which is derived from a GAPI  
+        our @Children = qw(Class::List::School) ; # $self-&gt;{'School'} is now an array</pre>
+<pre>
+        sub doSpawn { # Add a new Guppy Object
+                my $self = shift                         ;       
+                my $fish = Guppy-&gt;new()          ; 
+                push @{$self-&gt;School()}, $fish ; 
+        }</pre>
+<pre>
+        sub fishNet { # Get a specific Guppy object 
+                my $self = shift                 ; 
+                my $n = shift                    ; 
+                my $fish = $self-&gt;School-&gt;[$n] ;
+                return($fish)                    ;   
+        }
+        1 ;</pre>
+<p>The third stage of initialization is by defining a local &amp;_init subroutine. This gets called after everything else. So if one desires to 
+do something with passed variables after the class is blessed, this is where to do it. If you call an autoloaded function here, it takes place 
+after autoloaded functions from -&gt;new(), and Default_Properties. So you do have access to data passed or processed during invokation.</p>
+<p>passed at invokation:</p>
+<pre>
+        package Guppy           ; 
+        use Class::GAPI         ; 
+        our @ISA = (Class::GAPI);
+        use strict              ; 
+ 
+        sub _init {
+                my $self = shift ; 
+                $self-&gt;chopchopchop() if $self-&gt;sushi() &amp;&amp; $self-&gt;filet() ; 
+        }
+        1 ;</pre>
+<pre>
+        package PetShop ; 
+        use Guppy       ;</pre>
+<pre>
+        my $pet = Guppy-&gt;new(-sushi =&gt; 0, -filet =&gt; undef) ; 
+        my $lunch = Guppy-&gt;new(-sushi =&gt; 1, -filet =&gt; 1)   ;</pre>
+<p>In this case the execution of method chopchopchop would occur 
+in the case of lunch but not in the case of pet.</p>
+<p>
+</p>
+<hr />
+<h1><a name="other_functions">OTHER FUNCTIONS</a></h1>
+<p>Cloning is supported for Class::GAPI objects and any subordinate objects based on Class::GAPI
+or that Inherit Class::GAPI. This includes Class::List objects. This is function is eval()d, so it 
+will not crash if you have other stuff in their, just don't expect that other stuff copy.</p>
+<pre>
+        my $twin = $pet-&gt;clone(); # Make the FDA nervous</pre>
+<p>The <code>overlay()</code> function allows one to execute a block of functions by passing hash.  This is equivilant 
+to what happens when constructed with new(). This is typically usefull when you want to copy a hash 
+into several objects as you might in a record table:</p>
+<pre>
+        package Guppy::School   ; 
+        use Guppy               ; 
+        our @ISA = qw(Guppy)    ; # We are derived from a Guppy, which is derived from a GAPI  
+        our @Children = qw(Class::List::School) ; # $self-&gt;{'School'} is now an array</pre>
+<pre>
+        sub doSpawn { # Add a new Guppy Object
+                my $self = shift                ;
+                my $fish = Guppy-&gt;new(@_)       ; # Pass options pairs to the new fish 
+                push @{$self-&gt;School()}, $fish  ; 
+        }</pre>
+<pre>
+        sub fishGrow { # Add a block of options like so: fishGrow(2, foo =&gt; 'bar') ;  
+                my $self = shift                ; 
+                my $n = shift                   ; 
+                $self-&gt;School-&gt;[$n]-&gt;overlay(@_); 
+                return($fish)                   ;   
+        }
+        1 ;</pre>
+<p>The <code>warn_self()</code> function is pretty much what it sounds like. You can call it at any level with 
+a tree of nested GAPI and it will produce a table of the object as a warning. Obviously this 
+handy for debugging:</p>
+<pre>
+        $self-&gt;warn_self() ;
+        $self-&gt;Foo-&gt;Bar-&gt;warn_self() ;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>It is worth noting that GAPI uses a lot of <code>eval()</code> calls. So it is fairly slow. Also special 
+care should be given to using this module in CGI because of that. You should probably 
+read the code and understand how the constructor works before even considering using this 
+thing in cgi code. Consider yourself warned.</p>
+<p>This was written on an Win32 box running cygwin and Activestate, and it works on both with Perl 5.8. 
+I expect it should work with anything later than 5.6.1, but It hasn't been tested.</p>
+<p>Autoloaded methods tend to cause silent failure modes. Essentailly typos that would have 
+normally crashed perl will often just end up creating a dangling property somewhere. 
+Use $self-&gt;<code>warn_self()</code> to take snapshots of objects if something is not getting properly 
+populated. If you see two similarly named properties, you've found the culprit.</p>
+<p>No animals were harmed in the development of this module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Matthew Sibley 
+<a href="mailto:matt@itoperators.com">matt@itoperators.com</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_licence">COPYRIGHT AND LICENCE</a></h1>
+<p>Copyright (C) 2005 IT Operators <A HREF="http://www.itoperators.com">http://www.itoperators.com</A></p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.</p>
+
+</body>
+
+</html>

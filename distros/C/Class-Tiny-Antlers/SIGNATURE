@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 f1ebb6a26383b9eb65567f635111648f4b9c6a50 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 1cc770e97e44045796838540664ad3b8e6730eab Changes
+SHA1 2ab29123fbb9e15a319d7ce5e17475889ebd8c5e INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 31c5acd572e84dae762c29a5ffe0db1ff1ac5fa7 MANIFEST
+SHA1 3bb2b180b3c552bf3b1174b0a0e4774b64ea5068 META.json
+SHA1 bef0cb12ee2caac658d81a5a59de6c714a6eeb87 META.yml
+SHA1 f71b0443b85ecf2ba724291e9473dcea25e7cb5c Makefile.PL
+SHA1 bb8b9763e814af7a5a18a3d0a917cb37cf634446 README
+SHA1 e80c97aa5cb5d4c4f61ce9d5c61a576ec3013d2b dist.ini
+SHA1 efb4614a1f4c709ee80a93496a364c7723adbd0c doap.ttl
+SHA1 aacd4ebf353adb919f65d47ec7a21db471633f27 lib/Class/Tiny/Antlers.pm
+SHA1 342ee9474bf97dff7f8415762bbc0e4fc6a0da90 t/01basic.t
+SHA1 28e687a6d40b97b795c00e5c15dd74c05065769d t/02ro-rw-rwp-bare.t
+SHA1 cdea614a91676553f22fa35d70e32f250c4bf4c6 t/03defaults.t
+SHA1 a2a7ef592ee4f72d56e68b627d18b9beba7b4c64 t/04predicates-clearers.t
+SHA1 a0751bcd2235c5813b5bf20fbfbdade5c03b3b97 t/05init_arg.t
+SHA1 5a01e86038fbb0d1cd47b7418f90668de7b444b8 t/06required.t
+SHA1 c0b17a70e1e0ef12a335d4231cc964038de1113f t/07extends.t
+SHA1 9d54dba5f9d44737cf8461c9df83e68c52c82ece t/08with.t
+SHA1 e49c84e1d6ab13a20c6a3ebc6ebc97d66b333bc9 t/09hygiene.t
+SHA1 38b134104c3609f5289e1ac953f942c1a92cba5a t/10modifiers.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQanRAACgkQzr+BKGoqfTkCbQCgj4n+gPBzOn+hA8EGOHZRwQIW
+g84AoKafu3EtZJ4i89wvjtibjFaeNU/D
+=dzDx
+-----END PGP SIGNATURE-----

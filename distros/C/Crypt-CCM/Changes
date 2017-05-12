@@ -1,0 +1,13 @@
+Revision history for Perl extension Crypt::CCM.
+
+0.03  Sun Oct 28 12:48:08 JST 2007
+	- remove unuse module.
+
+0.02  Sat Sep 29 19:17:31 JST 2007
+	- add test case.
+	- support decrypt.
+
+0.01  Thu Sep 5 01:47:17 JST 2006
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::CCM
+

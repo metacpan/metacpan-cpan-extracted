@@ -1,0 +1,7 @@
+kSession.pm v 0.5.3 by Marcin Krzyzanowski <krzak at linux.net.pl> 
+http://krzak.linux.net.pl/
+License : GPL
+    
+You can use it everywhere you need sessions.
+Use files to handle sessions.
+Syntax is little bit similar to session as you known from php.

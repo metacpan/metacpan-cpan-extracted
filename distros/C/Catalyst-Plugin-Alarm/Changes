@@ -1,0 +1,18 @@
+Revision history for Catalyst::Plugin::Alarm.
+
+0.01  Wed Apr 19 10:04:23 2006
+	- initial version
+
+0.02  Thu May  4 11:39:45 CDT 2006
+    - reorg POD to put C::Alarm methods together
+
+0.03  19 Oct 2007
+    - fixed Makefile.pm to add dependencies
+
+0.04  29 July 2009
+    - updates for Catalyst 5.8, including switch to MRO::Compat
+      instead of NEXT.
+
+0.05  21 Aug 2010
+    - add 'use_native_signals' config option to avoid dependency
+      on Sys::SigAction (see https://rt.cpan.org/Ticket/Display.html?id=60566)

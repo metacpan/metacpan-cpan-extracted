@@ -1,0 +1,37 @@
+Description
+-----------
+This is version 0.01 of CGI::Widget::Path
+
+This package is a simple HTML navigation path bar builder.
+CGI::Widget::Path lets you build a navigation path bar (you know: "You are
+here: Home > some > page") in order to put it your HTML pages.
+This module is very simple but it can be useful if you create a path component
+at the top of your application and share it among all sub-pages.
+
+See perldoc CGI::Widget::Path for module documentation and use
+
+Changes from previous version
+-----------------------------
+This is the first pubblic release
+
+Installation
+------------
+In order to install and use this package you will need Perl version 5.005 or
+better. Installation as usual:
+
+   % perl Makefile.PL
+   % make
+   % make test
+   % su
+     Password: *******
+   % make install
+
+Prerequisites
+-------------
+No thirdy-part modules are required.
+
+
+Copyright (C) 2004 Enrico Sorcinelli <enrico@sorcinelli.it>. All rights reserved.
+This program is free software; you can redistribute it  and/or modify it under
+the same terms as Perl itself. 
+

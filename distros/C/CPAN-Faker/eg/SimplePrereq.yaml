@@ -1,0 +1,6 @@
+--- #YAML:1.0
+name: Simple-Prereq
+abstract: we have needs
+requires:
+  Mostly::Auto: 1.00
+  Provides::Inner: ~

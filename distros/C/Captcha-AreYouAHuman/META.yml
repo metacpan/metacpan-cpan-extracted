@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Captcha-AreYouAHuman
+version:            0.00003
+abstract:           Integrate the AreYouAHuman.com CAPTCHA-alterantive human verification into your Perl application
+author:
+    - Jonathan Brown <jonathan@areyouahuman.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.31
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    JSON:            2.17
+    LWP::UserAgent:  5.834
+    URI::Escape:     3.29
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,37 @@
+SYNOPSIS
+
+    By default files larger than 10MB will be skipped:
+
+     % minicpan -c CPAN::Mini::NoLargeFiles ...
+
+    To specify size:
+
+     % MAX_FILE_SIZE=20000000 minicpan -c CPAN::Mini::NoLargeFiles ...
+
+DESCRIPTION
+
+    There are files uploaded to CPAN that are quite large (over 100MB). For
+    those like me who are often on a limited mobile data plan, or using a
+    miniscule-sized SSD, this CPAN::Mini subclass might be useful.
+
+    This is a thin wrapper for LWP::UserAgent::Patch::FilterMirrorMaxSize,
+    so instead of:
+
+     % PERL5OPT="-MLWP::UserAgent::Patch::FilterMirrorMaxSize=-size,10485760,-verbose,1" minicpan ...
+
+    you can just do:
+
+     % cpan -c CPAN::Mini::NoLargeFiles ...
+
+FAQ
+
+ How to mix with other subclasses (e.g. I also want to use
+ CPAN::Mini::LatestDistVersion)
+
+    Use the patch directly instead of this subclass (see Description).
+
+SEE ALSO
+
+    http://blogs.perl.org/users/steven_haryanto/2014/06/skipping-large-file
+    s-when-mirroring-your-mini-cpan.html
+

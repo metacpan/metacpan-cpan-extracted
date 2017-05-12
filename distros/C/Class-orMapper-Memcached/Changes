@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::orMapper::Memcached.
+
+0.01  Fri Aug 31 00:07:35 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n Class::orMapper::Memcached
+
+0.03  Fri Jun 07 09:37:00 2013
+      Fixed several bugs.
+

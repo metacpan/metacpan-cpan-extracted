@@ -1,0 +1,14 @@
+10/24/2001
+
+- use Perl subrange operator (0..10)
+- convert gnuplot filehandles to using the FileHandle module
+- do parameter checking on subroutines that are accessed by user
+- set up multiple level of debugging
+- find more robust way to handle temporary files. use MkTemp.pm.
+- more support for xrt
+- turn on display of the x2tics and y2tics
+- Look into serious code integration and streamlining.  All use of
+  ppmtogif should be handled by one routine in one module.  Right now
+  Gnuplot and Xrt?d handle separately.
+- If there is actually interest, allow for greyscale output from
+  Gnuplot instead of our default of color.

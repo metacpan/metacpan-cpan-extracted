@@ -1,0 +1,35 @@
+[% 
+    title = "Menu Admin" ;
+
+    crumb2_name = 'Menu' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=menu-admin' ;
+    crumb1_name = 'Admin' ;
+%]
+
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click on menu to add, amend or delete options.
+<p><a href="[% cgipath %]/pages.cgi?act=menu-add">add a new menu</a>
+
+<form name="datalist" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='menu-admin' />
+
+<table summary="Diary List">
+<tr>
+    <th>Title</th>
+    <th>Type</th>
+    <th>Realm</th>
+    <th>Select</th>
+</tr>
+[% FOREACH record = data %]
+<tr>
+    <td nowrap><a href="[% cgipath %]/pages.cgi?act=menu-edit&amp;menuid=[% record.menuid %]">[% IF record.name %][% record.name %][% ELSE %]No Title[% END %]</a></td>
+    <td>[% record.type %]</td>
+    <td>[% record.realm %]</td>
+    <td><input type="checkbox" name="LISTED" value="[% item.linkid %]" /></td>
+</tr>
+[% END %]
+</table>
+
+<p align="right">
+<input type="submit" name='doaction' value='Delete' />
+</form>

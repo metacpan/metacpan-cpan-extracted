@@ -1,0 +1,80 @@
+{
+   "abstract" : "Namespace for handling/fixing identifier, e.g. ISBN, ISSN",
+   "author" : [
+      "Vitali Peil"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-Identifier",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.007"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::ISBN" : "2.010",
+            "Business::ISSN" : "0.91",
+            "Catmandu" : "0.94",
+            "Data::UUID" : "0",
+            "Data::Validate::URI" : "0",
+            "LWP::Simple" : "0",
+            "WWW::ORCID" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Log::Any::Test" : "1.03",
+            "Test::Deep" : "0.112",
+            "Test::Exception" : "0.32",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-Identifier/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-Identifier",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-Identifier.git",
+         "web" : "https://github.com/LibreCat/Catmandu-Identifier"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "brian d foy <brian.d.foy@gmail.com>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "Vitali Peil <vitali.peil@uni-bielefeld.de>"
+   ]
+}
+

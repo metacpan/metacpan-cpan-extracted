@@ -1,0 +1,36 @@
+0.10
+	- use MooseX::Clone for cloning
+	- fix for new warnings from Moose
+	- add by name querying to has_transition
+	- various doc fixes
+	- describe the use of roles in the context definition
+	- describe KiokuDB in the PERSISTENCE section of the cookbook
+
+0.09
+	- Update for more recent Moose
+
+0.08
+	- Allow 'class' param to Class::Workflow->{state,transition}() in order to
+	  facilitate per object custom classes
+	- Add a fully featured and documented DBIC example
+
+0.07
+	- Unbreak dist
+
+0.06
+	- add 'misc' field for fun
+
+0.05
+	- YAML, not YAML::Syck should be the skip cond in the yaml test
+
+0.04
+	- Fix the .pmc file *again*
+
+0.03
+	- Add Data::Compare to prereqs
+
+0.02
+	- Fix borked .pmc file
+
+0.01
+	- Initial release

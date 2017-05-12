@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  39249:
+    - 18
+name: ddcb28
+registers:
+  AF: 31236
+  AF_: 0
+  BC: 4792
+  BC_: 0
+  DE: 20983
+  DE_: 0
+  HL: 29028
+  HL_: 0
+  I: 0
+  IX: 39323
+  IY: 34903
+  PC: 4
+  R: 2
+  SP: 0

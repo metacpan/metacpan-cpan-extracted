@@ -1,0 +1,58 @@
+
+EXE = properl
+EXE_DLL = properl.dll
+
+# Include File Paths
+INCS = -I. -Iincludes 
+
+PERL_INCS = -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64  -I/usr/perl/lib/5.6.1/sun4-solaris/CORE
+
+# Compiler Flags
+CC = gcc
+MACH = -DPRO_MACHINE=19 -DPRO_OS=3 -DSOLARIS
+CCFLAGS = -c -fPIC -fpic
+CFLAGS = $(CCFLAGS) $(MACH) $(INCS) $(PERL_INCS)
+
+# Link Flags
+LD = ld
+LDFLAGS = -G -Bsymbolic 
+
+# Libraries
+SYSLIBS = -lsocket -lnsl -lw -lm -ldl -lc
+PTCLIBS = ./protoolkit.a
+PTCLIBS_DLL = ./protk_dll.a
+
+PERL_LIBS = /usr/perl/lib/5.6.1/sun4-solaris/auto/DynaLoader/DynaLoader.a \
+            -L/usr/perl/lib/5.6.1/sun4-solaris/CORE -lperl \
+            -L/opt/gcc-2.95.3/lib/gcc-lib/sparc-sun-solaris2.6/2.95.3 -lgcc
+
+# Object files
+#
+OBJS = properl.o
+
+
+# Spawn mode target
+#
+$(EXE):  $(OBJS) $(PTCLIBS)
+	$(CC) -o $(EXE) $(OBJS) $(PTCLIBS) $(SYSLIBS) $(PERL_LIBS)
+
+# DLL mode target
+#
+# Note DLL mode does not work on Solaris due to Pro/Engineer not using RTLD_GLOBAL 
+# flag to dlopen().  No dynamically loaded XSUB's will work.
+#
+$(EXE_DLL):  $(OBJS) $(PTCLIBS_DLL)
+	$(LD) $(LDFLAGS) -o $(EXE_DLL) $(OBJS) $(PTCLIBS_DLL) $(PERL_LIBS) $(SYSLIBS)
+
+
+# object dependencies
+#
+properl.o:  properl.c Makefile
+	$(CC) $(CFLAGS) properl.c
+
+
+# Shortcut target, can use: make dll
+#
+dll: $(EXE_DLL)
+
+

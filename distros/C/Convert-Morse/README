@@ -1,0 +1,20 @@
+Convert/Morse.pm -- package to convert between ASCII and MORSE code.
+
+(C) ..--- ----- ----- ----- -....- --... by - . .-.. ... .-.-.-
+  
+To install, simple change to root, then run
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You can get detailed help with
+	
+	perldoc Convert::Morse 
+
+which should explain anything you need to know.
+
+Any suggestions, comments, etc are welcome. Thank you!
+
+Tels <http://bloodgate.com/>

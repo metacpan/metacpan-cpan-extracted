@@ -1,0 +1,77 @@
+
+TYPEMAP
+CROMParser *      T_CROMPARSER
+CRStyleSheet *      T_CRSTYLESHEET
+CRStatement *      T_CRSTATEMENT
+CRDeclaration *      T_CRDECLARATION
+CRTerm *      T_CRTERM
+CRSelector *      T_CRSELECTOR
+
+INPUT
+T_CRDECLARATION
+        if ( sv_derived_from($arg, \"CSS::Croco::Declaration\") || sv_derived_from( $arg,
+            \"CSS::Croco::DeclarationList\" ))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CRDeclaration *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco::Declaration\");
+        
+T_CRSTYLESHEET
+        if ( sv_derived_from($arg, \"CSS::Croco::StyleSheet\"))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CRStyleSheet *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco::StyleSheet\");
+
+T_CROMPARSER
+        if (sv_derived_from($arg, \"CSS::Croco\"))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CROMParser *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco\");
+
+T_CRSTATEMENT
+        if (sv_derived_from($arg, \"CSS::Croco::Statement\"))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CRStatement *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco::Statement\");
+
+T_CRTERM
+        if (sv_derived_from($arg, \"CSS::Croco::Term\"))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CRTerm *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco::Term\");
+T_CRSELECTOR
+        if (sv_derived_from($arg, \"CSS::Croco::Selector\"))
+          {
+            IV tmp = SvIV((SV *) SvRV($arg));
+            $var = INT2PTR(CRSelector *, tmp);
+          }
+        else
+          croak(\"$var is not of type CSS::Croco::Selector\");
+
+OUTPUT
+T_CRSTYLESHEET
+        sv_setref_pv($arg, "CSS::Croco::StyleSheet", (void*) $var);
+T_CROMPARSER
+        sv_setref_pv($arg, class, (void*) $var);
+T_CRSTATEMENT
+        sv_setref_pv($arg, class, (void*) $var);
+T_CRDECLARATION
+        sv_setref_pv($arg, "CSS::Croco::Declaration", (void*) $var);
+T_CRTERM
+        sv_setref_pv($arg, "CSS::Croco::Term", (void*) $var);
+T_CRSELECTOR
+        sv_setref_pv($arg, "CSS::Croco::Selector", (void*) $var);

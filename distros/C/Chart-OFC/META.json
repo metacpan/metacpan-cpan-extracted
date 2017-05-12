@@ -1,0 +1,72 @@
+{
+   "abstract" : "Generate data files for use with Open Flash Chart",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chart-OFC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graphics::ColorNames" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "0.56",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-chart-ofc@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Chart-OFC"
+      },
+      "homepage" : "http://metacpan.org/release/Chart-OFC",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/Chart-OFC.git",
+         "web" : "http://git.urth.org/Chart-OFC.git"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:DROLSKY",
+   "x_contributors" : [
+      "autarch <devnull@localhost>",
+      "convert-repo <devnull@localhost>"
+   ]
+}
+

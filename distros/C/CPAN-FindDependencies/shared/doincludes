@@ -1,0 +1,23 @@
+use blib;
+use CPAN::FindDependencies;
+
+foreach my $file (map { "CPAN-FindDependencies-$CPAN::FindDependencies::VERSION/$_" } @ARGV) {
+    print "Looking for includes in $file\n";
+    open(FOO, $file);
+    my @contents = <FOO>;
+    close(FOO);
+
+    foreach (@contents) {
+	local $/;
+        $_ =~ s/^#include (.*)/
+   	    print "  including $1\n";
+            open(FOO, $1);
+    	    my $include = <FOO>;
+	    close(FOO);
+	    $include;
+        /ge;
+    }
+    open(FOO, ">$file");
+    print FOO @contents;
+    close(FOO);
+}

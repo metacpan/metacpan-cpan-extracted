@@ -1,0 +1,24 @@
+Changes
+lib/Cisco/Reconfig.pm
+lib/Cisco/Reconfig.pod
+Makefile.PL
+MANIFEST
+README
+t/banner.t
+t/banner2.t
+t/cisco.t
+t/classmap-12-4.t
+t/indentbug.t
+t/intzoom.t
+t/lib/Local/NoWeak.pm
+t/smalltest.t
+t/stringconfig.t
+t/trailingindent.t
+t/weak_ref_to_obj.t
+t/datadir/a1
+t/datadir/a2
+t/datadir/a3
+t/datadir/a4
+t/datadir/bannertest
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,30 @@
+---
+abstract: 'Handle Instant Payment Notifications and PayPal Button Generation'
+author:
+  - 'Matt S Trout C<mst@shadowcatsystems.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-PayPal-IPN
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Business::PayPal::IPN: 0
+  Catalyst::Runtime: 5.7006
+  Crypt::SSLeay: 0
+  Moose: 0.20
+  namespace::clean: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Model-PayPal-IPN/
+version: 0.04

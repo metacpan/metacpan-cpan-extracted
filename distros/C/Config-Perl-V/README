@@ -1,0 +1,44 @@
+Config::Perl::V
+
+    A module that will return you the output of 'perl -V' in a structure.
+
+DESCRIPTION
+
+    The command 'perl -V' will return you an excerpt from the %Config hash
+    combined with the output of 'perl -V' that is not stored inside %Config,
+    but only available to the perl binary itself.
+
+PREREQUISITES
+
+    A working perl
+
+BUILDING AND INSTALLATION
+
+    As most perl modules
+
+	$ perl Makefile.PL
+	$ make test
+	$ make install UNINST=1
+
+SOURCE CODE
+
+    Recent changes can be (re)viewed in the public GIT repository at
+    http://repo.or.cz/w/Config-Perl-V
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/Tux/Config-Perl-V Config-Perl-V
+
+    or get it as a tgz:
+
+     $ wget --output-document=Config-Perl-V.tgz \
+	   https://github.com/Tux/Config-Perl-V/archive/master.tar.gz
+
+CHANGES
+
+    See Changelog
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009-2016 H.Merijn Brand
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself. 

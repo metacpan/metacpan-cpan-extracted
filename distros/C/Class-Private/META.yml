@@ -1,0 +1,30 @@
+---
+name: Class-Private
+version: 0.05
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+abstract: Private hashes for your objects
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Private
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Leont/class-private/tree
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+requires:
+  perl: 5.01
+configure_requires:
+  Module::Build: 0
+provides:
+  Class::Private:
+    file: lib/Class/Private.pm
+    version: 0.05
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+keywords:
+  - OO
+  - privacy

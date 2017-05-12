@@ -1,0 +1,27 @@
+Revision history for Perl extension Catalyst::Plugin::FormValidator.
+
+0.94      Mon Mar 1  16:09
+       - bumped version
+	   - official release 
+0.093_01  Tue Feb 23 15:04
+       - Class::C3::Adopt::NEXT is not used so is removed.
+       - MRO::Compat added for maybe::next::method per https://rt.cpan.org/Public/Bug/Display.html?id=54917
+       - Pod tests now author only and must pass.
+
+0.092  Sun Feb 21  16:04:00
+       - added proper Class::C3::Adopt::NEXT method calls
+       - added shipit stuff
+0.091 Sun Feb 21  16:00:00
+       - Removed extra plugins from Cat test app
+0.05  Mon Feb  15 13:35:00 2010
+       - removed NEXT 
+       - turned into Moose::Role
+       - fleshed out tests more
+       - switched to Module::Install
+0.04  Thu Apr  2 18:45:00 2009
+       - Add deprecation notice
+	   - Added quotes on prereq.
+0.02  Fri Apr 15 15:00:00 2005
+        - Updated documentation.
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

@@ -1,0 +1,57 @@
+NAME
+
+    CPAN::Recent::Uploads - Find the distributions recently uploaded to
+    CPAN
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+      use CPAN::Recent::Uploads;
+    
+      my $weekago = time() - ( 7 * 24 * 60 * 60 );
+    
+      my @uploads = CPAN::Recent::Uploads->recent( $weekago );
+    
+      # as a one liner (seeing the weeks worth of uploads).
+    
+      perl -MCPAN::Recent::Uploads -le 'print for CPAN::Recent::Uploads->recent;'
+
+DESCRIPTION
+
+    CPAN::Recent::Uploads provides a mechanism for obtaining a list of the
+    RECENT uploads to CPAN as determined from the files produced by
+    File::Rsync::Mirror::Recentfile that exist in the authors/ directory on
+    CPAN.
+
+FUNCTIONS
+
+    recent
+
+      Takes two optional arguments. The first argument is an epoch time you
+      wish to find the uploads since. If it is not supplied the default is
+      the current time minus one week. The second argument is the URL of a
+      CPAN mirror you wish to query. If it is not supplied then
+      http://www.cpan.org/ is used.
+
+      In a list context it returns a list of uploaded distributions ordered
+      by the time they were uploaded (ie. oldest first, increasing in
+      recentness ).
+
+      In a scalar context it returns a hash reference keyed on distribution
+      with the values being the epoch time that that distribution entered
+      CPAN.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

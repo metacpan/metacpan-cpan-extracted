@@ -1,0 +1,21 @@
+---
+name: Catalyst-Plugin-Session-Defaults
+version: 0.01
+author:
+  - 'Yuval Kogman, C<nothingmuch@woobling.org>'
+abstract: Default values in your session.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst::Plugin::Session: 0
+  Storable: 0
+  Test::use::ok: 0
+provides:
+  Catalyst::Plugin::Session::Defaults:
+    file: lib/Catalyst/Plugin/Session/Defaults.pm
+    version: 0.01
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

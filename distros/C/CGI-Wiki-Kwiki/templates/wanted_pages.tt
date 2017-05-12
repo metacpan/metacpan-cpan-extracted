@@ -1,0 +1,21 @@
+[%# This displays the 'wanted pages' - all pages linked to, but that don't
+    actually exist.
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>[% site_name %] - [% node_name %]</h1>
+
+[% content %]
+
+<ul>
+  [% FOREACH node = wanted %]
+     <li>[% node.name %] ......
+         [<a href="[% node.edit_link %]"><b>Create</b></a>]
+         ......
+         [<a href="[% node.backlink_link %]">Show nodes linking to this</a>]
+     </li>
+  [% END %]
+</ul>
+
+[% INCLUDE footer.tt %]

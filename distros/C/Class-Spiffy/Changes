@@ -1,0 +1,36 @@
+---
+version: 0.15
+date:    Mon Jan 30 08:38:32 PST 2006
+changes:
+- Make examples not show affects of source filtering. draven++
+
+---
+version: 0.14
+date:    Sun Jan 29 23:50:19 PST 2006
+changes:
+- Fixed bug in field3.t
+
+---
+version: 0.13
+date:    Sun Jan 29 12:24:59 PST 2006
+changes:
+- Use faster runtime code in `field`.
+- Added Class::Spiffy::mixin.pm to stop Apache::Reload warnings
+
+---
+version: 0.12
+date:    Thu Jan 19 08:12:40 PST 2006
+changes:
+- Squelch redefine warnings
+
+---
+version: 0.11
+date:    Thu Jan 19 07:42:49 PST 2006
+changes:
+- Test patch from Nicholas for older perls
+
+---
+version: 0.10
+date:    Thu Jan 19 05:15:27 PST 2006
+changes:
+- Maiden voyage

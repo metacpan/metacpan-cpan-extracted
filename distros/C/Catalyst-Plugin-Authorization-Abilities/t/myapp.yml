@@ -1,0 +1,17 @@
+---
+name: MyApp
+
+# Database Model
+Model::DBIC:
+  schema_class: Schema::Abilities
+  connect_info:
+    - dbi:SQLite:db/test.db
+
+default_model: DBIC
+
+
+Authorization::Abilities:
+  debug: 1
+  model: Model::DBIC
+
+static_url_path: /static

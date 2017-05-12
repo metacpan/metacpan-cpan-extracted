@@ -1,0 +1,7 @@
+Makefile$
+Makefile\.old
+CVS
+~$
+MANIFEST\.bak
+tmon\.out
+Config-ApacheFormat-.*$

@@ -1,0 +1,43 @@
+---
+abstract: 'Perl interface to the Zstd (Zstandard) (de)compressor'
+author:
+  - ', Jiro Nishiguchi'
+build_requires:
+  ExtUtils::ParseXS: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Compress-Zstd
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - vendor
+provides:
+  Compress::Zstd:
+    file: lib/Compress/Zstd.pm
+    version: '0.05'
+requires:
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/spiritloose/Compress-Zstd/issues
+  homepage: https://github.com/spiritloose/Compress-Zstd
+  repository: git://github.com/spiritloose/Compress-Zstd.git
+version: '0.05'
+x_contributors:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+  - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

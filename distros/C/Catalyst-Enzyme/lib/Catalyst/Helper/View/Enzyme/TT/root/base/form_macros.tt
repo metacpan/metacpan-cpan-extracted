@@ -1,0 +1,53 @@
+[% MACRO form_add_column_input(do_action, column, column_moniker)  BLOCK; %]
+        <label>
+
+        [% form_field_item(column, column_moniker, ['list'], 'input_field') %]
+        [% element = c.view("TT").element_req(c, do_action, column); %]
+        [% element.as_HTML('<>&"\'') %]
+
+        [% IF c.form.missing(column); %]
+            <span class="error_text">[% c.form.msgs.$column || 'Missing'; %]</span>
+        [% ELSIF c.form.invalid(column); %]
+            <span class="error_text">[% c.form.msgs.$column || 'Invalid'; %]</span>
+        [% END; %]
+	    </label>
+
+[% END; %]
+
+
+
+[% MACRO form_edit_column_input(do_action, column, column_moniker)  BLOCK; %]
+        <label>
+
+        [% form_field_item(column, column_moniker, ['list'], 'input_field') %]
+
+        [%
+        IF c.action.name == do_action;       #invalid, redisplay req            
+            element = c.view("TT").element_req(c, do_action, column);
+        ELSE;                                #display item
+            element = item.to_field(column);
+        END;
+        %]
+        [% element.as_HTML('<>&"\'') %]
+
+        [% IF c.form.missing(column); %]
+            <span class="error_text">[% c.form.msgs.$column || 'Missing'; %]</span>
+        [% ELSIF c.form.invalid(column); %]
+            <span class="error_text">[% c.form.msgs.$column || 'Invalid'; %]</span>
+        [% END; %]
+        </label>
+
+[% END; %]
+
+
+
+[% MACRO form_field_item(column, column_moniker, link_params, span_class)  BLOCK; %]
+        [% namespace = crud.model.namespace_of_column_has_a(c, column); %]
+        [% IF span_class %]<span class="[% span_class %]">[% END %]
+            [% IF namespace; %]
+                <a href="[% c.uri_for(namespace, link_params.0, link_params.1) %]">[% column_moniker | html %]</a>
+            [% ELSE; %]
+                [% column_moniker | html %]
+            [% END %]
+        [% IF span_class %]</span>[% END %]
+[% END; %]

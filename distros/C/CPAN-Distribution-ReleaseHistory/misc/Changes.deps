@@ -1,0 +1,41 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002005
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002004 2016-11-08T09:19:00Z
+ [Removed / runtime requires]
+ - Search::Elasticsearch::Scroll
+
+0.002003 2014-11-12T16:48:51Z
+ [Added / test requires]
+ - Test::Fatal
+
+0.002002 2014-11-08T02:54:43Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - Test::RequiresInternet
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+0.002001 2014-08-16T07:19:26Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.002000 2014-06-12T20:47:43Z

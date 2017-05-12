@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/CustomErrorMessage.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-distribution.t
+t/01-Catalyst-Plugin-CustomErrorMessage.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

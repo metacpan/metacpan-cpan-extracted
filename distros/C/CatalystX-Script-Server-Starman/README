@@ -1,0 +1,74 @@
+NAME
+    CatalystX::Script::Server::Starman - Replace the development server with
+    Starman
+
+SYNOPSIS
+        myapp_server.pl [options]
+
+           -d --debug           force debug mode
+           -f --fork            handle each request in a new process
+                                (defaults to false)
+           -? --help            display this help and exits
+           -h --host            host (defaults to all)
+           -p --port            port (defaults to 3000)
+           --follow_symlinks    follow symlinks in search directories
+                                (defaults to false. this is a no-op on Win32)
+           --background         run the process in the background
+           --pidfile            specify filename for pid file
+           --workers            Initial number of workers to spawn (defaults to 5)
+           --min_servers        Minimum number of worker processes runnning
+           --min_spare_servers  Minimum number of spare workers (more are forked
+                                if there are less spare than this)
+           --max_spare_servers  Maximum number of spare workers (workers are killed
+                                if there are more spare than this)
+           --max_servers        Maximum number of workers in total.
+           --max_requests       Maximum number of requests each worker will handle
+           --backlog            Number of backlogged connections allowed
+           --user               User to run as
+           --group              Group to run as
+
+         See also:
+           perldoc Starman
+           perldoc plackup
+           perldoc Catalyst::PSGI
+
+DESCRIPTION
+    A Catalyst extension to replace the development server with Starman.
+
+    This module replaces the functionality of
+    Catalyst::Engine::HTTP::Prefork, which is now deprecated.
+
+    It provides access to the prefork engine specific options which were
+    previously added by hacking your server script.
+
+Adding this to your application
+    Just add a server script module to your application which inherits from
+    this package.
+
+    Catalyst::ScriptRunner will automatically detect and use it when
+    script/myapp_server.pl is started.
+
+    For example:
+
+        package MyApp::Script::Server;
+        use Moose;
+        use namespace::autoclean;
+
+        extends 'CatalystX::Script::Server::Starman';
+
+        1;
+
+SEE ALSO
+    plackup - can be used to start your application ".psgi" under Starman
+
+    Catalyst::PSGI
+
+AUTHOR
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

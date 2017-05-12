@@ -1,0 +1,9 @@
+    // toolkit for checkbox cols
+    var CheckTable = new Array();
+    [% FOREACH col IN cpac.tc.cols %]
+      [% NEXT UNLESS cpac.tm.f.$col.extra('extjs_xtype') == 'checkbox' %]
+      CheckTable['[% col %]'] = 1;
+    [% END %]
+    function isCheck (c) {
+        return !! CheckTable[c];
+    }

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd86
+registers:
+  AF: 43452
+  AF_: 0
+  BC: 53381
+  BC_: 0
+  DE: 23468
+  DE_: 0
+  HL: 58212
+  HL_: 0
+  I: 0
+  IX: 46517
+  IY: 65082
+  PC: 3
+  R: 2
+  SP: 0

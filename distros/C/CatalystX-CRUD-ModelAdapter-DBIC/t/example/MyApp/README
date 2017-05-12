@@ -1,0 +1,7 @@
+Example app using CatalystX::CRUD::Controller::RHTMLO and CatalystX::CRUD::ModelAdapter::DBIC
+
+Create the db with:
+
+ % sqlite3 mycrud.db < mycrud.sql
+
+Run script/myapp_server.pl to test the application.

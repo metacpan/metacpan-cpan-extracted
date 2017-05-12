@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Class/CGI.pm
+lib/Class/CGI/Handler.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-basic.t
+t/20-instance.t
+t/30-multifields.t
+t/40-reused-handlers.t
+t/50-profile-file.t
+t/60-handler-base.t
+t/data/profiles.cfg
+t/lib/Class/CGI/Args.pm
+t/lib/Class/CGI/Customer.pm
+t/lib/Class/CGI/Customer2.pm
+t/lib/Class/CGI/Date.pm
+t/lib/Class/CGI/SyntaxError.pm
+t/lib/Example/Customer.pm
+t/lib/Example/Date.pm
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,20 @@
+[%
+    title = 'Wiki Search';
+
+    crumb1_name = 'Search' ;
+%]
+
+[% IF errmess %]
+<p class="alert">Error: [% errmess %]</p>
+
+[% ELSIF wikihash.results %]
+<ul>
+[% FOREACH item = wikihash.results %]
+<li><a href="/wiki/[% item.pagename %]&amp;version=[% item.version %]">[% item.pagename %]</a>
+    [% item.postdate %] ([% item.realname %])[% IF item.comment %] => "[% item.comment %]"[% END %]</li>
+[% END %]
+</ul>
+
+[% ELSE %]
+<p>search for '[% wikihash.key %]' not found.</p>
+[% END %]

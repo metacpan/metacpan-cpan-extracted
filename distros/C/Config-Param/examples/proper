@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+
+use strict;
+
+# Only needed to find modules in the dist archive.
+use FindBin qw($Bin);
+use File::Spec;
+use lib File::Spec->catfile($Bin,'..','lib');
+
+# actual example code
+
+use Config::Param;
+
+my $p = Config::Param::get
+(
+	{
+		 version=>'0.0.1'
+		#,verbose=>1
+		,program=>'the_program'
+		,tagline=>'the best program ever'
+		,usage=>'the_program [parameters] whatever'
+		,author=>'Unsung Hero <some@place.tld>'
+		,copyright=>"Copyright (C) 1045-2334 Unsung Hero and previous incarnations\nThis is Free Software under the Bugroff License."
+		,bugs=>'This software should not cointain any bugs. Report bugs to the author anyway.'
+		,extrapod=>
+		[
+			{
+				head=>'SEE ALSO',
+				body=>'Look around yourself, isn\'t the world beautiful? It can even include POD I<markup>.',
+				verbatim=>1
+			},
+			{
+				head=>'TRIVIA',
+				body=>"Did you know that B<fat> would be in bold if his were verbatim POD? But here, the markup is neutralized, just like in\n\n\tthis indented line with some B<fat>\n\nLalala."
+			}
+		] 
+		,info=>'That is the best program ever written. This is the best description I can give you. Peace.'
+	},
+	[
+		{
+			long=>'para',
+			value=>0,
+			short=>'p',
+			help=>'A parameter.'
+		},{
+			long=>'meter',
+			value=>'I got value but no help text, neither short name.'
+		},{
+			long=>'hash',
+			value=>{key=>'value'},
+			short=>'H',
+			help=>'Yes, a hash parameter.'
+		},{
+			long=>'array',
+			value=>[1, 2, 3, 4, 5, 'end'],
+			short=>'A',
+			help=>'Yes, an array parameter.'
+		}
+	]
+);
+
+print "I could have done some work with '$p->{para}' and '$p->{meter}'.\n";

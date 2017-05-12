@@ -1,0 +1,82 @@
+{
+   "abstract" : "Perl implementation of L<RNCryptor|https://github.com/RNCryptor/RNCryptor>",
+   "author" : [
+      "Shintaro Seki <s2pch.luck@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-RNCryptor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Crypt::CBC" : "0",
+            "Crypt::OpenSSL::AES" : "0",
+            "Crypt::PBKDF2" : "0",
+            "Digest::SHA" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Pretty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::RNCryptor" : {
+         "file" : "lib/Crypt/RNCryptor.pm",
+         "version" : "0.01"
+      },
+      "Crypt::RNCryptor::V3" : {
+         "file" : "lib/Crypt/RNCryptor/V3.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/s-shin/p5-Crypt-RNCryptor/issues"
+      },
+      "homepage" : "https://github.com/s-shin/p5-Crypt-RNCryptor",
+      "repository" : {
+         "url" : "git://github.com/s-shin/p5-Crypt-RNCryptor.git",
+         "web" : "https://github.com/s-shin/p5-Crypt-RNCryptor"
+      }
+   },
+   "version" : "0.01"
+}

@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use 5.008005;
+use strict;
+use warnings;
+use CPANTS::Weight ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.15';
+}
+
+print STDERR "# Running CPANTS::Weight->run\n";
+CPANTS::Weight->run;

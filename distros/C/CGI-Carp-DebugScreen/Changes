@@ -1,0 +1,63 @@
+Revision history for CGI::Carp::DebugScreen
+
+0.16  2009/07/28
+  - fixed pod (L<NAME|http://...> style links are not permitted)
+
+0.15  2008/11/22
+  - major refactoring; internals are changed a lot
+  - now accepts any engine/view with "as_html" method
+  - some of the name of the options are changed and
+    waiting for deprecation. If you have used a custom
+    view, see the sources and find "XXX"s.
+  - added some tests
+
+0.14  2007/05/27
+  - maintenance release: no significant code changes
+  - added license to Makefile.PL
+  - updated version of META.yml
+
+0.13  2006/01/23
+  - changed internal behavior to support mod_perl (1, and
+    probably 2)
+  - changed view's (internal) APIs (view->as_html)
+
+0.12  2006/01/16
+  - added link to Sledge::Plugin::DebugScreen
+  - added pod / pod-coverage testing and fixed pods.
+
+0.11  2006/01/14
+  - now Dumper (watchlist) can ignore overloading, thus
+    poking into the object further.
+
+0.10  2006/01/14
+  - fixed a parsing error
+
+0.09  2006/01/13
+  - fixed a parsing error to show multi-lines message correctly
+
+0.08  2006/01/04
+  - fixed TT and DefaultView templates to hide the box and
+    the navigation without data
+
+0.07  2006/01/03
+  - added CGI::Carp::DebugScreen::Dumper and a watchlist function
+  - templates output the C::C::DS' version and the engine name
+  - separated tests on TT and HTML::Template
+
+0.06  2005/12/27
+  - fixed a parsing error (with <DATA> line)
+
+0.05  2005/12/27
+  - fixed some 'uninitialized' errors
+
+0.04  2005/12/25
+  - fixed lt escape for DefaultView and TT
+
+0.03  2005/12/22
+  - fixed a packaging error; sorry again
+
+0.02  2005/12/21
+  - fixed a packaging error
+
+0.01  2005/12/21
+  - Initial release

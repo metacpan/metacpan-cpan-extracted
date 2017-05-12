@@ -1,0 +1,10 @@
+Changes
+lib/Compass/Points.pm
+Makefile.PL
+MANIFEST
+README.md
+t/000_load.t
+t/010_basic.t
+t/020_abbr2deg.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

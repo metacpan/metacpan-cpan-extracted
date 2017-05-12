@@ -1,0 +1,17 @@
+Class::Publisher - A simple publish-subscribe event framework
+
+See the LICENSE section in lib/Class/Publisher.pm for usage and distribution
+rights
+
+QUICK START:
+
+commands in the source directory:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    Then delete the source directory tree since it's no longer needed.
+
+    run 'perldoc Class::Publisher' to read the full documentation.
+

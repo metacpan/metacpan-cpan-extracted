@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use CPAN::Distribution;
+use CPAN::Plugin::Sysdeps;
+use Getopt::Long;
+
+sub usage (;$) {
+    my $msg = shift;
+    if ($msg) { warn $msg, "\n" }
+    die "usage: $0 [--cpandist Dist-Name | --cpanmod Mod::Name]\n";
+}
+
+GetOptions(
+	   'cpandist|dist=s'       => \my $cpandist,
+	   'cpanmod|mod=s'         => \my $cpanmod,
+	   'os=s'                  => \my $os,
+	   'osvers=s'              => \my $osvers,
+	   'linuxdistro=s'         => \my $linuxdistro,
+	   'linuxdistroversion=s'  => \my $linuxdistroversion,
+	   'linuxdistrocodename=s' => \my $linuxdistrocodename,
+	   'uninstalled'           => \my $uninstalled,
+	   'debug'                 => \my $debug,
+	   'n|dryrun'              => \my $dryrun,
+	   'run'                   => \my $run,
+	  )
+    or usage;
+
+($cpandist or $cpanmod) or usage;
+
+if ($cpandist) {
+    if (!$cpanmod) {
+	($cpanmod = $cpandist) =~ s{-[\d\.]+$}{}; # XXX hack
+	$cpanmod =~ s{-}{::}g; # XXX hack
+    }
+} else {
+    ($cpandist = $cpanmod) =~ s{::}{-}g; # XXX hack
+}
+
+my $dist = CPAN::Distribution->new(
+				   ID           => "X/XX/XXX/$cpandist.tar.gz", # XXX
+				   CONTAINSMODS => {$cpanmod=>1},
+				  );
+
+my $sysdeps = CPAN::Plugin::Sysdeps->new({
+					  os                  => $os,
+					  osvers              => $osvers,
+					  linuxdistro         => $linuxdistro,
+					  linuxdistroversion  => $linuxdistroversion,
+					  linuxdistrocodename => $linuxdistrocodename,
+					 },
+					 ($debug ? 'debug' : ()),
+					 ($dryrun? 'dryrun' : ()),
+					);
+my @packages = $sysdeps->_map_cpandist($dist);
+if (@packages) {
+    if ($uninstalled) {
+	@packages = $sysdeps->_filter_uninstalled_packages(@packages);
+    }
+    print "$_\n" for @packages;
+}
+
+# When proposing a dryrun, output the commands we would run:
+$sysdeps->post_get($dist)
+    if $dryrun or $run;
+
+__END__
+
+=head1 NAME
+
+cpan-sysdeps - report system dependencies for CPAN modules
+
+=head1 SYNOPSIS
+
+    cpan-sysdeps --cpanmod Foo::Bar
+    cpan-sysdeps --cpandist Foo-Bar-1.23.tar.gz
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+Option to select a CPAN distribution. At least one of these two is
+mandatory:
+
+=over
+
+=item C<--cpandist=I<Dist-Name>>
+
+=item C<--cpanmod=I<Dist::Name>>
+
+=back
+
+Options to simulate another environment:
+
+=over
+
+=item C<--os=I<operatingsystem>>
+
+Change the operating system name. Values are the same as in perl's
+C<$^O>.
+
+=item C<--osvers=I<version>>
+
+Change the operating system version. On FreeBSD systems this is the
+output of C<uname -r>.
+
+=item C<--linuxdistro=I<distid>>
+
+For C<--os=linux> only: change the distribution id. This is a
+lowercase name like C<debian> or C<fedora>.
+
+=item C<--linuxdistrocodename=I<codename>>
+
+For C<--os=linux> only: change the distribution version code name.
+This is a name like C<wheezy> or C<jessie>.
+
+=item C<--linuxdistroversion=I<version>>
+
+For C<--os=linux> only: change the distribution version.
+
+=back
+
+Other options:
+
+=over
+
+=item C<--uninstalled>
+
+Show only the packages which are currently uninstalled. Of course,
+this makes only sense if the environment is not simulated to something
+else.
+
+If there happen to be alternatives in the package specifications and
+all of these are not installed, then these will be reduced to the
+first package in the specification.
+
+=item C<--dryrun>
+
+Show the package installation commands which would run.
+
+=item C<--run>
+
+Actually run the package installation commands.
+
+=item C<--debug>
+
+Enable the C<debug> option of L<CPAN::Plugin::Sysdeps>.
+
+=back
+
+=head1 BUGS
+
+=over
+
+=item * There's no real mapping from CPAN module names to distribution
+names and vice versa. Currently it's best to stick to just module
+names, as currently the mapping file only uses module names. A real
+solution would have to use CPAN.pm or a suitable web service.
+
+=item * Currently both C<--linuxdistrocodename> and
+C<--linuxdistroversion> have to be set; there's no automatic
+conversion between those two. Currently the mapping file uses only
+codenames, so it may be sufficient to specify only this one.
+
+=item * It's not possible to specify a custom mapping like in
+L<CPAN::Plugin::Sysdeps>.
+
+=back
+
+=head1 EXAMPLES
+
+C<cpan-sysdeps> may be used to utilize
+L<CPAN::Plugin::Sysdeps::Mapping> outside of L<CPAN.pm|CPAN>. For
+example on a Debian-like system:
+
+    apt-get install $(cpan-sysdeps --uninstalled --cpanmod Foo::Bar)
+
+Or everywhere:
+
+    cpan-sysdeps --cpanmod Foo::Bar --run
+
+=head1 AUTHOR
+
+Slaven Rezic
+
+=head1 SEE ALSO
+
+L<CPAN::Plugin::Sysdeps>.
+
+=cut

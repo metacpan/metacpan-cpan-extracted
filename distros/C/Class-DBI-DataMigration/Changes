@@ -1,0 +1,10 @@
+Revision history for Class-DBI-DataMigration
+
+0.01    9 Feb 2005
+        First version, released on an unsuspecting world.
+
+0.02    14 Feb 2005
+        - better documentation of config_path() in Synchronizer.pm
+        - Thanks to Steve McNabb for:
+            - fixed POD typos
+            - added a carp() in case of failed eval in Migrator.pm

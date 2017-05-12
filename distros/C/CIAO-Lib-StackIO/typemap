@@ -1,0 +1,32 @@
+TYPEMAP
+
+CIAO_Lib_StackIO * T_PTROBJ_SPECIAL
+
+char *		    T_STRING	    
+
+#############################################################################
+INPUT
+
+T_PTROBJ_SPECIAL
+	if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")) {
+		IV tmp = SvIV((SV*)SvRV($arg));
+		$var = ($type) tmp;
+	}
+	else
+		croak(\"$var is not of type ${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\")
+
+
+T_STRING
+	$var = SvOK($arg) ? ($type)SvPV_nolen($arg) : ($type)NULL;
+
+
+
+#############################################################################
+OUTPUT
+
+T_PTROBJ_SPECIAL
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", (void*)$var);
+
+T_STRING
+	if ($var != NULL) sv_setpv((SV *)$arg, $var);
+	else              sv_setsv((SV *)$arg, &PL_sv_undef);

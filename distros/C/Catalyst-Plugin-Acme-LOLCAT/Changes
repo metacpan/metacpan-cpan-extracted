@@ -1,0 +1,16 @@
+Revision history for Catalyst-Plugin-Acme-LOLCAT
+
+0.03    Sat Mar 29 19:01:37 PDT 2008
+        - There was a bug that let map/areas shut down the converter.
+
+0.02    Sat Nov 10 18:47:06 PST 2007
+        - Corrected this, wrong, changes file which had been copied
+          from antoher module.
+        - Correct wrong README too.
+        - Changed HTML translations to not translate unless there is a
+          \w otherwise you get KTHX everywhere there is just whitespace.
+
+0.01    Wed Nov 07 23:01:16 PST 2007
+        - First dist.
+
+

@@ -1,0 +1,18 @@
+abstract: Atom Server implementation for Catalyst applications
+author: Six Apart <cpan@sixapart.com>
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: Catalyst-Plugin-AtomServer
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Catalyst: 0
+  Catalyst::Plugin::Authentication: 0
+  Digest::SHA1: 0
+  MIME::Base64: 0
+  XML::Atom: 0
+version: 0.04

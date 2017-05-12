@@ -1,0 +1,53 @@
+NAME
+    Catalyst::View::RDF - RDF view for your data
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        # lib/MyApp/View/RDF.pm
+        package lib::MyApp::View::RDF;
+        use base qw( Catalyst::View::RDF );
+        1;
+
+        # configure in lib/MyApp.pm
+        MyApp->config({
+            ...
+            'View::RDF' => {
+                nodeid_prefix => 'a:',
+                nss => { foaf => 'http://xmlns.com/foaf/0.1/' },
+                enconding => 'utf-8',
+            },
+
+        });
+
+        sub foaf : Local {
+            my ( $self, $c ) = @_;
+            my @triples = (
+                ['http://example.com/url#', 'dc:creator', 'zool@example.com'],
+                ['http://example.com/url#', 'foaf:Topic', '_id:1234'],
+                ['_id:1234','http://www.w3.org/2003/01/geo/wgs84_pos#lat','51.334422'],
+                [$node1, 'foaf:name', 'Jo Walsh'],
+                [$node1, 'foaf:knows', $node2],
+                [$node2, 'foaf:name', 'Robin Berjon'],
+                [$node1, 'rdf:type', 'foaf:Person'],
+                [$node2, 'rdf:type','http://xmlns.com/foaf/0.1/Person']
+                [$node2, 'foaf:url', \'http://server.com/NOT/an/rdf/uri.html'],
+            );
+            $c->stash->{triples} = \@triples;
+            $c->forward('View::RDF');
+        }
+
+DESCRIPTION
+    Catalyst::View::RDF is a Catalyst View handler that returns stash data
+    in RDF format, based on RDF::Simple::Serialiser.
+
+AUTHOR
+    Thiago Rondon <thiago@aware.com.br>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Thiago Rondon.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

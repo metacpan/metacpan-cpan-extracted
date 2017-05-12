@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Session-ID-sha.t
+lib/CGI/Session/ID/sha.pm
+lib/CGI/Session/ID/sha256.pm
+lib/CGI/Session/ID/sha512.pm

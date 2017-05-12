@@ -1,0 +1,11 @@
+libcoro-twiggy-perl (0.03-1) unstable; urgency=low
+
+  * PSGI can throw utf8 exception.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 13 Jul 2012 22:14:56 +0400
+
+libcoro-twiggy-perl (0.02-1) unstable; urgency=low
+
+  * Initial release. (Closes: #681296)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 12 Jul 2012 11:31:48 +0400

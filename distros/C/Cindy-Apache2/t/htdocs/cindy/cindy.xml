@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: cindy.xml 15 2010-03-09 18:55:50Z jo $ -->
+<data>
+  <title>This is the Cindy Test Page</title>
+  <content>Hello Test</content>
+	<replace>This is NOT bold.</replace>
+	<omit>1</omit>
+	<!-- attributes are done with content -->
+	<size>+2</size>
+	<color>red</color>
+  <repeat>
+    <row>
+      <value>1</value>
+      <text>one</text>
+    </row>
+    <row>
+      <value>2</value>
+      <text>two</text>
+      <selected>1</selected>
+    </row>
+    <row>
+      <value>3</value>
+      <text>three</text>
+    </row>
+  </repeat>
+	<cfalse>0</cfalse>
+	<ctrue>1</ctrue>
+</data>
+

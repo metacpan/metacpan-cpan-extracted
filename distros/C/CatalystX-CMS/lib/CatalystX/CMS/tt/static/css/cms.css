@@ -1,0 +1,186 @@
+/* default CatalystX::CMS style */
+
+body {
+    text-align: left;
+}
+
+.padded { padding: 0.5em }
+.boxed  { border: 1px solid #aaa; }
+
+.url {
+    white-space: nowrap;
+    font-family: monospace;
+}
+
+.history caption
+{
+    font-weight: bold;
+    font-size: 110%;
+    padding: .50em;
+}
+
+.history tr, .history td
+{
+    padding: .25em;
+    
+}
+
+.history tr.diff:hover
+{
+    cursor: pointer;
+    background: #ffffe0;
+}
+
+.alt { background: #eee; }
+
+#countbox_cont {
+    border: 1px dotted #aaa;
+    margin: 4px;
+    padding: 4px;
+}
+
+#status {
+    border: 1px solid #aaa;
+    background: #fff;
+    height: 100px;
+    padding: 0.5em;
+}
+
+/*
+#editor {
+    border: 1px solid #aaa;
+    margin: 1em;
+}
+*/
+
+.editor-hidden {
+    visibility: hidden;
+    top: -9999px;
+    left: -9999px;
+    position: absolute;
+}
+
+code.tt {
+    color: blue;
+}
+
+#cms_attrs label, 
+#cms_attrs .label
+{
+    font-weight: bold;
+    padding-right: 6px;
+    text-align: right;
+    width: 80px;
+}
+
+#cms_attrs label,
+#cms_attrs .label,
+#cms_attrs input
+{
+    display: block;
+    float: left;
+    margin-top: .25em;
+}
+
+#cms_attrs input
+{
+    border: 1px solid #aaa;
+    padding: 2px;
+}
+
+#cms_attrs br
+{
+    clear: left;
+}
+
+#message, #error
+{
+    background: #fff;
+    padding: 0.5em;
+    margin: 1em;
+}
+
+#admin_links ul {
+    margin-top: 2px;
+}
+
+#admin_links ul li {
+    display:inline;
+    list-style-type: none;
+    background-color: #f5f5f5;
+    padding: 4px;
+    margin: 0;
+    border: 1px dotted #bbb;
+}
+
+#admin_links ul li:hover {
+    list-style-type: none;
+    background-color: #fff;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+#error
+{
+    color: red;
+    overflow: auto;
+    border: 2px solid red;
+}
+
+#message
+{
+    color: green;
+}
+
+.sub {
+    margin-bottom: 1em;
+}
+
+
+.list, .list td 
+{ 
+    padding: .25em;
+}
+.list:hover
+{
+    background: #ffffe0; 
+}
+
+.diff
+{
+    font-family: monospace;
+    font-size: 14px;
+    text-align: left;
+}
+
+.red
+{
+    background: #ff8080;
+    
+}
+
+.green
+{
+    background: #a0ffc0;
+}
+
+
+#footer {
+    text-align: center;
+}
+
+.yui-skin-sam .yui-layout .yui-layout-unit div.yui-layout-bd {
+    background-color: #fff;
+}
+
+/* treeview links */
+.ygtvlabel:hover {
+    text-decoration: underline;
+}

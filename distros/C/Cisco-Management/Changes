@@ -1,0 +1,84 @@
+Revision history for Perl extension Cisco::Management.
+
+0.09  Fri Apr 24 00:30:00 2015
+      - No updates - change to deprecated.
+      - See Cisco::SNMP.
+
+Version 0.08 will the last in this line of support.  The next version
+will be a complete rewrite separating functions into sub classes allowing
+for quicker and easier development as well as allowing others to
+contribute to the Cisco::Management package.  For the most part, the
+initial release will be 99% backward compatible with several warnings
+for deprecated calls that should be updated to the new API.
+
+0.08  Sun Jul 27 00:30:00 2014
+      - Fix erroneous test fail for t/00-...
+      - Warning for last support in Pod.
+
+0.07  Fri Jul 18 00:30:00 2014
+      - Bug fix in interface_info() erroneously attributing duplex to
+        first interface indexes.
+      - Removed excess 'bless' in interface_info(), interface_metrics(),
+        interface_utilization(), line_info().
+      - Net::IPv6Addr made optional in Makefile.PL and proxy_ping()
+        dependent on Socket >= 1.94
+      - Error 'use blib' removed from bin\cisco-conf.pl
+      - License in Makefile.PL
+      - Top-down ordered this Changes file
+
+0.06  Tue Oct  8 22:30:00 2012
+      - Timeout on advanced tests with EU::MM prompt().
+      - Enabled IPv6 support if Socket 1.94, else IPv4 only as before.
+      - IPv6 for new() connections and config_copy() and proxy_ping()
+        destinations.
+
+IPv4/v6 support above - requires Socket 1.94 minimum for IPv6
+----
+IPv4 Only support below
+
+0.05  Wed Oct 12 23:30:40 2011
+      - Changed/updated @_KEY variables.
+      - Added system_inventory() method.
+      - Fixed minor glitch in system_info() method.
+      - Fixed typos/mistakes in POD.
+      - Fixed and added inventory option to bin/cisco-info.pl
+        script.
+      - User Toby provided -version option to new() method
+        for SNMP version.
+      - Added pass through of options for Net::SNMP.
+      - Updated code for config_copy to reuse.
+      - User Toby added finish check for CatOS.
+
+0.04  Thu May  7 14:10:40 2010
+      - Extra files from Apple 'make dist' causes issues on all
+        other OS's.  Damn perl.org world-writeable issue with
+        Windows.
+
+0.03  Thu May  4 14:10:40 2010
+      - Fixed bug in line_sessions(); too many for iterations.
+      - Fixed bug in interface_info(); if duplex not defined.
+      - Added option for /xx instead of dotted-octet format for
+        IP Mask in interface_ip().
+      - Updated error message details.
+
+0.02  Thu Feb  4 14:10:40 2010
+      - Fixed bugs in bin/cisco-intf.pl script.
+      - Changed line_info_sessions and interface_info_ip to
+        'root' level methods so the line_info and interface_info
+        methods do not need to be called before session and IP
+        information is available, respectively.
+            - Updated cisco-intf.pl and cisco-line.pl bin scripts
+              to reflect this change.
+      - POD updates.
+            - Removed examples from 'Examples' POD section and
+              instead referenced this distribution's included
+              'bin' scripts.
+            - Cleaned up mistakes, typos and standardized.
+      - Consolidated bin scripts cisco-cpui.pl, cisco-memi.pl
+        and cisco-sysi.pl into cisco-info.pl.
+      - Added interface_metrics method.
+      - Added interface_utilization method.
+
+0.01  Thu Jan 21 14:10:40 2010
+      - original version; created by h2xs 1.23 with options
+	      -b 5.6.1 -v 0.01 -XAn Cisco::Management

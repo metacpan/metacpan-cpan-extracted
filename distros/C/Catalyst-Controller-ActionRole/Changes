@@ -1,0 +1,70 @@
+Revision history for Catalyst-Controller-ActionRole
+
+0.17      2015-02-02 03:14:19Z
+  - mark module as deprecated in metadata
+
+0.16      2014-05-09 00:40:08Z
+  - remove use of deprecated Class::MOP functions
+  - added deprecation notice to documentation -- this module only remains for
+    legacy use
+
+0.15   2010-08-25 22:22:42Z
+  - Improvements to documentation (William King, Tomas Doran)
+  - Don't apply roles to special internal catalyst actions
+    (Alex J. G. Burzyński)
+  - Honour action_args configuration to allow setting role attributes
+    (John Napiorkowski)
+
+0.14   2010-05-01 22:58:39Z
+  - Add repository metadata (Tomas Doran).
+
+0.13   2010-03-20 11:23:14Z
+  - Make the reader methods for _action_roles and _action_role_args not be
+    context-sensitive and always return a plain list.
+
+0.12   2009-07-17 23:41:15Z
+  - More correct method for getting the app class. Can't test this yet,
+    as the canonical example ($self being an anon class) doesn't work in
+    core Catalyst yet :(
+  - Do not need an _action_role_prefix method, so that in future it is easier to
+    pull the code out into a role.
+  - Add tests for compatibility when used with Action::REST
+
+0.11   2009-05-24 15:57:15Z
+  - Retain compatibility with latest Catalyst-Runtime (NAKAGAWA Masaki).
+
+0.10   2009-04-09 23:46:36Z
+  - No changes since 0.09, except for actually including the changelog entries.
+
+0.09   2009-04-09 23:45:48Z
+  - Change the default role search path from ::Action::Role:: to
+    ::ActionRole::.
+
+0.08   2009-04-02 19:00:59Z
+  - Minor POD tweaks (hdp)
+
+0.07   2009-04-01 19:18:43Z
+  - Make empty prefix ('Foo') search MyApp::Action::Role before falling back to
+    Catalyst::Action::Role (hdp)
+
+0.06   2009-04-01 14:29:37Z
+  - Don't depend on parent.pm for the tests.
+
+0.05   2009-03-30 22:27:54Z
+  - Replace BUILDARGS hack that also doesn't work with
+    Catalyst-Runtime 5.71001 (hdp)
+
+0.04_01   2009-03-29 11:28:24Z
+  - Remove moose component backward-compatibility hacks. Depend
+    on Catalyst 5.71001 instead, which should provide sufficient
+    backward-compat now.
+
+0.03   2009-03-28 03:12:49Z
+  - Don't screw up ActionClass attributes.
+    - Add tests for this (Jason Kohles).
+
+0.02   2009-02-21 01:08:40Z
+  - Don't rely on parent being installed for the test suite.
+
+0.01   2009-02-20 12:43:10Z
+  - Initial release.

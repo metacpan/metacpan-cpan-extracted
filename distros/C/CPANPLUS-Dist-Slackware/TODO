@@ -1,0 +1,10 @@
+* Add --with-recommends and --with-suggests.  See cpanm for details.
+
+* List the shared libraries that XS modules depend on in README.SLACKWARE.
+
+* _summary_from_pod() does not return summaries for
+  Class::C3::Componentised, WWW::Mechanize::TreeBuilder and possibly other
+  modules.
+
+* The Clipboard distribution depends on xclip, which is available at
+  slackbuilds.org.  The module's test suite fails if xclip is not installed.

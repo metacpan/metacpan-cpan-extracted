@@ -1,0 +1,66 @@
+- Hugo Salgado H. suggested to have different XML:
+	                          ...it would be great to arrange the 
+	 XML file in such a way that the "phrases" of different idioms 
+	 could go one next to other, i mean something like
+
+	 <phrase name="HELLO">
+	 <dictionary name="ES">Hola $name !!!</dictionary>
+	 <dictionary name="EN">Hello $name !!!</dictionary>
+	 </phrase>
+
+	 In such a form that changing for example one phrase in all
+	 languages could be more direct that searching for the phrase
+	 in every dictionary.
+
+  I find it a great idea and will include an option for it in future
+  versions. This will be done probably by having a method that will
+  define the format of the used XML. Something like
+     $phrasebook->xml_format("DICTIONARIES_IN_PHRASES");
+  or 
+     $phrasebook->xml_format("PHRASES_IN_DICTIONARIES"); # will be the
+                                                         # default to 
+							 # keep compatibility 
+ 
+- Jeff Bisbee suggested to add the ability to remove lines that
+  contain undefined variables from the where clause in the select
+  statement. I would like still to think about it a bit, but probably
+  I will add it as follows:
+    use Class::Phrasebook::SQL;
+    my $sql = new Class::Phrasebook::SQL($log, "test.xml");
+    $sql->load("Pg");
+    # here is the new methods:
+    $sql->clean_where_clauses_from_undefs(1);
+    $sql->clean_set_clauses_from_undefs(1); # not really needed because it 
+                                            # is set by default.
+  What is not yet clear for me is if I should include it also in the
+  where clause of the set statement, and if I should make a difference
+  between those where clauses - something like:
+    clean_where_clauses_of_select_from_undefs
+  and 
+    clean_where_clauses_of_set_from_undefs
+  
+- Scott Lamb pointed out that there are huge security problems in the
+  class:
+    You escape quotes in values if they are enclosed in quotes. But
+    there are two security problems with this:
+
+    - your quoting doesn't work correctly on PostgreSQL. There "\" is
+      an escape character as well (in violation of the ANSI SQL spec,
+      I believe). So the string "\'" after going through your function
+      becomes "\''" - an escape quoted followed by an unescaped
+      quote. 
+
+    - unquoted values are put in in-place. Presumably these are
+      integers, but since Perl is not strongly typed, it'd be easy to
+      assume this incorrectly when they come from the user. They could
+      instead be something like "'5'); drop table var; insert into
+      table (a) values ('5'". 
+
+  Scott also offered solutions to those problems. One of them is to
+  use the DBI->quote method. Yet, this means that the user suppose to
+  send to the class the DBH object. 
+
+  In general, I don't see those problems so big. I assume (maybe
+  wrongly?) that the programmer suppose to check the variables that
+  are sent to the get method, before they are sent. Anyway, I will
+  check how to make the class more secure anyway.

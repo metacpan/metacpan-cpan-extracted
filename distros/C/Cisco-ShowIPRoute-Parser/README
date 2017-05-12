@@ -1,0 +1,111 @@
+Cisco/ShowIPRoute/Parser version 1.01
+=====================================
+
+NAME
+    Cisco::ShowIPRoute::Parser - parse Cisco 'show ip route' command
+
+SYNOPSIS
+		use Cisco::ShowIPRoute::Parser; 
+
+		# Router.log holds the output from 'show ip route'
+		my $log = 'Router.log';
+		my $r = new Cisco::ShowIPRoute::Parser($log);
+
+		my $dest   = '10.159.25.44';
+		my @routes = $r->getroutes($dest);
+
+		print "@routes\n";
+
+DESCRIPTION
+
+    This File contains the encapsulation of Raj's route parser. It will
+    parse the output from a Cisco 'show ip route' command and return all the
+    routes to a specified IP address.
+
+    When collecting the routes please ensure it is in decimal format. This
+    can be enabled by doing the following at the router prompt:
+
+		term len 0
+		terminal ip netmask-format decimal
+		show ip route
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	No direct dependencies on other modules outside core perl modules
+
+	You need a C compiler
+
+	If you don't have a C compiler then look in Parser.pm for netCheck and
+	read the comments there. It might help you out.
+
+OTHER USEFUL MODULES
+
+Even though you don't need these modules it would be useful to have them
+as they can add a lot to visualisation of the ouput.
+
+	GraphViz
+	Data::Dumper
+
+SCRIPTS
+
+The following scripts are provided for your edification:
+
+	plot-route.pl  - plot routes using GraphViz you need GraphViz
+
+	findroute.pl   - find all routes between two points. You can pipe
+	                 the output of this to plot-route.pl
+
+	iproute-parents - simple front end script to this code
+
+FURTHER COMMENTS
+
+There are also a number of log files provided of Cisco routes that can be
+used to do some testing. They should give you an idea of what we are
+looking at.
+
+We have used this code as a base to a web front end. It is used to show
+routes from any where on our network to any other place in a diagramatic
+fashion. If you need more code or would like some help in setting these
+sorts of things up just conatct us. We might be able to help.
+
+We also have code to pull the log files. However, this is a very simple
+exercise for any one who has access to Net::Telnet::Cisco :-) Just watch
+out for large route maps. This code isn't provided here as it would need
+significant mods to make it work out side its frame work.
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2003 Rajiv Santiago and Mark Pfeiffer. All rights
+    reserved. This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+	Cisco is a registered trade mark of Cisco Systems, Inc.
+	This code is in no way associated with Cisco Systems, Inc.
+	
+	All other trademarks mentioned in this document are the property of
+	their respective owners.
+
+
+DISCLAIMER
+
+We make no warranties, implied or otherwise, about the suitability
+of this software. We shall not in any case be liable for special,
+incidental, consequential, indirect or other similar damages arising
+from the transfer, storage, or use of this code.
+
+This code is offered in good faith and in the hope that it may be of use.
+
+cheers
+markpf
+

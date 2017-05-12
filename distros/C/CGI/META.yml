@@ -1,0 +1,52 @@
+---
+abstract: 'Handle Common Gateway Interface requests and responses'
+author:
+  - unknown
+build_requires:
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Find: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  POSIX: '0'
+  Test::Deep: '0.11'
+  Test::More: '0.98'
+  Test::NoWarnings: '0'
+  Test::Warn: '0.3'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Carp: '0'
+  Config: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Spec: '0.82'
+  File::Temp: '0.17'
+  HTML::Entities: '3.69'
+  base: '0'
+  if: '0'
+  overload: '0'
+  parent: '0.225'
+  perl: '5.008001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/leejo/CGI.pm/issues
+  homepage: https://metacpan.org/module/CGI
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/leejo/CGI.pm
+version: '4.36'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

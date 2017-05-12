@@ -1,0 +1,133 @@
+
+=head1 NAME
+
+Catalyst::Authentication::Store - All about authentication stores
+
+=head1 MULTIPLE BACKENDS
+
+B<NOTE> This is documentation for the old store system used in versions of
+L<Catalyst::Plugin::Authentication> prior to 0.10.  This is NOT how the 
+new realm-based stores work. This is here for reference only.
+
+See L<Catalyst::Plugin::Authentication::Internals> instead.
+
+=head1 OLD STORE DOCUMENTATION BELOW
+
+A key issue to understand about authentication stores is that there are
+potentially many of them. Each one is registered into the application, and has
+a name.
+
+For most applications, there is only one, and in this framework it is called
+'default'.
+
+When you use a plugin, like
+
+    use Catalyst qw/
+        Authentication
+        Authentication::Store::Foo
+    /;
+
+the Store plugins typically only act at setup time. They rarely do more than
+check out the configuration, and register e.g. Store::Foo, and set it
+as the default store.
+
+    __PACKAGE__->default_auth_store( $store );
+
+    # the same as
+
+    __PACKAGE__->register_auth_stores( default => $store );
+
+=head1 WORKING WITH USERS
+
+All credential verifiers should accept either a user object, or a user ID.
+
+If a user ID is provided, then they will fetch the user object from the default
+store, and check against it.
+
+This should be pretty much DWIM all the time.
+
+When you need multiple authentication backends per application then you must
+fetch things yourself. For example:
+
+    my $user = $c->get_auth_store("other_store")->get_user($id);
+
+    $c->login( $user, $supplied_password );
+
+Instead of just:
+
+    $c->login( $id, $supplied_password );
+
+which will go to the default store.
+
+=head1 WRITING A BACKEND
+
+Writing an authentication storage backend is a very simple matter.
+
+The only method you really need to support is C<get_user>.
+
+This method should accept an arbitrary list of parameters (determined by you or
+the credential verifyer), and return an object inheriting
+L<Catalyst::Authentication::User>.
+
+For introspection purposes you can also define the C<user_supports> method. See
+below for optional features. This is not necessary, but might be in the future.
+
+=head2 Integrating with Catalyst::Plugin::Session
+
+If your users support sessions, your store should also define the
+C<from_session> method. When the user object is saved in the session the
+C<for_session> method is called, and that is used as the value in the session
+(typically a user id). The store is also saved in the hash. If
+C<< $user->store >> returns something registered, that store's name is used. If
+not, the user's class is used as if it were a store (and must also support
+C<from_session>).
+
+=head2 Optional Features
+
+Each user has the C<supports> method. For example:
+
+    $user->supports(qw/password clear/);
+
+should return a true value if this specific user has a clear text password.
+
+This is on a per user (not necessarily a per store) basis. To make assumptions
+about the store as a whole,
+
+    $store->user_supports(qw/password clear/);
+
+is supposed to be the lowest common denominator.
+
+The standardization of these values is to be goverened by the community,
+typically defined by the credential verification plugins.
+
+=head2 Stores implying certain credentials
+
+Sometimes a store is agnostic to the credentials (DB storage, for example), but
+sometimes it isn't (like an Htpasswd file).
+
+If you are writing a backend that wraps around a module, like
+L<Catalyst::Authentication::Store::Htpasswd> wraps around
+L<Authen::Htpasswd>, it makes sense to delegate the credential checks.
+
+This particular example caused the following "feature" to be added:
+
+    $user->supports(qw/password self_check/);
+
+=head2 Writing a plugin to go with the backend
+
+Typically the backend will do the heavy lifting, by registering a store.
+
+These plugins should look something like this:
+
+    sub setup {
+        my $c = shift;
+
+        $c->default_auth_store(
+            # a store can be an object or a class
+            Catalyst::Authentication::Store::Foo::Backend->new(
+                ...
+            )
+        );
+
+        $c->NEXT::setup(@_);
+    }

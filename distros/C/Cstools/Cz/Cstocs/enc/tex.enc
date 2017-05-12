@@ -1,0 +1,32 @@
+
+~	nobreakspace
+
+\.	abovedot
+\'	acute
+\u	breve
+\v	caron
+\c	cedilla
+\^	circumflex
+\"	diaeresis
+\H	doubleacute
+\k	ogonek
+\accent23	ring
+\r	ring
+
+\L	Lstroke 
+\S	section 
+\r	degree 
+\l	lstroke 
+
+
+\eth	eth 
+\ss	ssharp 
+\Eth	Eth 
+\ae	ae
+\AE	AE
+\dj	eth
+\Dj	Eth
+
+\div	division
+\times	multiply
+

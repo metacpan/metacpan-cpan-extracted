@@ -1,0 +1,84 @@
+Revision history for Carp-REPL
+
+0.18    Fri  5 Jun 2015 19:57:52 PDT
+        * Fix tests that started failing since Test::Expect 0.32 (Gianni
+          Ceccarelli, RT#103414)
+
+0.17    Fri Nov 21 10:18:19 PST 2014
+        * Fix compatibility with Devel::StackTrace 2.00, thanks to DAKKAR.
+          The incompat manifested as lots of test failures about refs.  Fixes
+          [rt.cpan.org #100314].
+
+0.16    Tue May 28 15:10:26 PDT 2013
+        * Fix hash ordering dependence in test (ilmari)
+        * don't return stack frames inside Carp (DOY)
+
+0.15    Mon Apr 5 15:24:24 2010
+        Fix tests to use the right Perl (jjore)
+        Shebang for Makefile.PL (jjore)
+        fix the 'repl' can't be exported bug (sunnavy)
+        Use Sub::Exporter since it's irrevocably in our dep tree
+            anyway (sunnavy)
+        Silence warning about v-string (doy)
+        Documentation fixes (Sartak)
+        Passing in an explicit undef to repl will silence the
+            stacktrace (Sartak)
+
+0.14    Mon Feb 9 17:21:13 2009
+        Devel::REPL no longer depends on Lexical::Persistence, so we must
+
+0.13    Tue Aug 12 06:50:18 2008
+        perl -MCarp::REPL=test t/foo.t give you a REPL on each failing test!
+        Fix longstanding "not nested deeply enough" bug
+            Caused by not skipping over "eval" frames, which PadWalker does
+        Move a lot of code into a new dist, Devel::StackTrace::WithLexicals
+        Remove excess newlines in :l code listings
+        :top and :bottom stack traversal commands
+
+0.12    Fri May 16 11:17:55 2008
+        :l(ist) command for printing source code
+        Rename Devel::REPL::Plugin::LexEnvCarp to
+            Devel::REPL::Plugin::Carp::REPL
+        Allow importing of the 'repl' procedure
+        Internal cleanup
+
+0.11    Thu Sep 20 21:43:56 2007
+        Devel::REPL configuration is now applied
+
+0.10    Tue Sep 11 20:07:10 2007
+        :e command to display the current environment
+
+0.09    Thu Jul 12 12:32:12 2007
+        Move to Module::Install
+
+0.08    Wed Jul 11 16:56:08 2007
+        Add 'nodie' and 'warn' arguments
+
+0.07    Tue Jul 10 22:34:55 2007
+        Made sub arguments available in $_a
+
+0.06    Sat Jul  7 13:43:14 EDT 2007
+        Proper aliasing support
+        Cleaned up the internals
+
+0.05    Fri Jul  6 18:47:33 EDT 2007
+        :bt command to redisplay the backtrace
+        REPL now has History plugin loaded
+        Various bug fixes
+        :q command
+
+0.04    Fri Jul  6 14:57:33 EDT 2007
+        Fix annoying global variable issue.
+        But now REPL doesn't have use strict 'vars'.
+        Will be fixed as soon as my Devel::EvalContext patch is applied.
+
+0.03    Fri Jul  6 14:17:46 EDT 2007
+        Add ability to move up and down the stack (:u and :d).
+        Moose startup penalty now only paid if you get a REPL.
+
+0.02    Fri Jul  6 01:04:33 EDT 2007
+        Add the somewhat bloaty dependencies to Makefile.PL.
+
+0.01    Fri Jul  6 00:35:37 EDT 2007
+        First version, released on an unsuspecting world.
+

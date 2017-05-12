@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Convert/Temperature.pm
+t/Convert-Temperature.t
+META.yml                                 Module meta-data (added by MakeMaker)

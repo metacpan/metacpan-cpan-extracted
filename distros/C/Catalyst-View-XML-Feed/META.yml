@@ -1,0 +1,33 @@
+---
+abstract: 'Catalyst view for RSS, Atom, or other XML feeds'
+author:
+  - 'Mark A. Stratman <stratman@gmail.com>'
+build_requires:
+  Catalyst::Runtime: 5.80015
+  Catalyst::Test: 0
+  DateTime: 0
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-XML-Feed
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  Scalar::Util: 0
+  XML::Feed: 0.43
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mstratman/Catalyst-View-XML-Feed.git
+version: 0.09

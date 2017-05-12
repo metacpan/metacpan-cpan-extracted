@@ -1,0 +1,213 @@
+=pod
+
+=head1 NAME
+
+Crypt::MagicSignatures::Key - MagicKeys for the Salmon Protocol
+
+
+=head1 SYNOPSIS
+
+  use Crypt::MagicSignatures::Key;
+
+  my $mkey = Crypt::MagicSignatures::Key->new('RSA.mVgY...');
+
+  my $sig = $mkey->sign('This is a message');
+
+  if ($mkey->verify('This is a message', $sig)) {
+    print 'The signature is valid for ' . $mkey->to_string;
+  };
+
+
+=head1 DESCRIPTION
+
+L<Crypt::MagicSignatures::Key> implements MagicKeys as described in the
+L<MagicSignatures Specification|https://cdn.rawgit.com/salmon-protocol/salmon-protocol/master/draft-panzer-magicsig-01.html>
+to sign messages of the L<Salmon Protocol|http://www.salmon-protocol.org/>.
+MagicSignatures is a "robust mechanism for digitally signing nearly arbitrary messages".
+See L<Crypt::MagicSignatures::Envelope> for using MagicKeys to sign MagicEnvelopes.
+
+
+=head1 ATTRIBUTES
+
+
+=head2 n
+
+  print $mkey->n;
+  $mkey->n('456789...');
+
+The MagicKey modulus.
+
+
+=head2 e
+
+  print $mkey->e;
+  $mkey->e(3);
+
+The MagicKey public exponent.
+Defaults to 65537.
+
+
+=head2 d
+
+  print $mkey->d;
+  $mkey->d('234567...');
+
+The MagicKey private exponent.
+
+
+=head2 size
+
+  print $mkey->size;
+
+The MagicKey keysize in bits.
+
+
+=head1 METHODS
+
+=head2 new
+
+  my $mkey = Crypt::MagicSignatures::Key->new(<<'MKEY');
+    RSA.
+    mVgY8RN6URBTstndvmUUPb4UZTdwvw
+    mddSKE5z_jvKUEK6yk1u3rrC9yN8k6
+    FilGj9K0eeUPe2hf4Pj-5CmHww==.
+    AQAB.
+    Lgy_yL3hsLBngkFdDw1Jy9TmSRMiH6
+    yihYetQ8jy-jZXdsZXd8V5ub3kuBHH
+    k4M39i3TduIkcrjcsiWQb77D8Q==
+  MKEY
+
+  $mkey = Crypt::MagicSignatures::Key->new(
+    n => '13145688881420345...',
+    d => '87637925876135637...',
+    e => 3
+  );
+
+
+The Constructor accepts MagicKeys in
+L<compact notation|https://cdn.rawgit.com/salmon-protocol/salmon-protocol/master/draft-panzer-magicsig-01.html#anchor13>
+or by attributes.
+
+
+=head2 generate
+
+  my $mkey = Crypt::MagicSignatures::Key->new(size => 1024);
+
+Generate a new key. Requires L<Math::Prime::Util> to be installed.
+
+Accepts the attributes C<size> and C<e>.
+In case no C<size> attribute is given, the default key size
+for generation is 512 bits, which is also the minimum size.
+The maximum size is 4096 bits.
+Random prime trials are limited to 100 rounds.
+
+
+=head2 sign
+
+  my $sig = $mkey->sign('This is a message');
+
+Signs a message and returns the signature.
+The key needs to be a private key.
+The signature algorithm is based on
+L<RFC3447|http://www.ietf.org/rfc/rfc3447.txt>.
+
+
+=head2 verify
+
+  my $sig = $priv_key->sign('This is a message');
+
+  # Successfully verify signature
+  if ($pub_key->verify('This is a message', $sig)) {
+    print 'The signature is okay.';
+  }
+
+  # Fail to verify signature
+  else {
+    print 'The signature is wrong!';
+  };
+
+Verifies a signature of a message based on the public
+component of the key.
+Returns a C<true> value on success and C<false> otherwise.
+
+
+=head2 to_string
+
+  my $pub_key = $mkey->to_string;
+  my $priv_key = $mkey->to_string(1);
+
+Returns the public key as a string in
+L<compact notation|https://cdn.rawgit.com/salmon-protocol/salmon-protocol/master/draft-panzer-magicsig-01.html#anchor13>.
+If a C<true> value is passed to the method,
+the full key (including the private exponent if existing)
+is returned.
+
+
+=head1 FUNCTIONS
+
+=head2 b64url_encode
+
+  use Crypt::MagicSignatures::Key qw/b64url_encode/;
+
+  print b64url_encode('This is a message');
+  print b64url_encode('This is a message', 0);
+
+Encodes a string as base-64 with URL safe characters.
+A second parameter indicates, if trailing equal signs
+are wanted. The default is C<true>.
+This differs from
+L<MIME::Base64::encode_base64|MIME::Base64/"encode_base64">.
+The function can be exported.
+
+
+=head2 b64url_decode
+
+  use Crypt::MagicSignatures::Key qw/b64url_decode/;
+
+  print b64url_decode('VGhpcyBpcyBhIG1lc3NhZ2U=');
+
+Decodes a base-64 string with URL safe characters.
+Characters not part of the character set are silently ignored.
+The function can be exported.
+
+
+=head1 DEPENDENCIES
+
+For signing and verification there are no dependencies
+other than Perl v5.10.1 and core modules.
+For key generation L<Math::Prime::Util> v0.21 is necessary.
+
+Either L<Math::BigInt::GMP> (preferred) or L<Math::BigInt::Pari>
+is strongly recommended for speed improvement
+(signing and verification) as well as
+L<Math::Prime::Util::GMP> and L<Math::Random::ISAAC::XS>
+(key generation).
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+The signing and verification is not guaranteed to be
+compatible with other implementations!
+
+
+=head1 SEE ALSO
+
+L<Crypt::MagicSignatures::Envelope>,
+L<Crypt::RSA::DataFormat>,
+L<Alt::Crypt::RSA::BigInt>,
+L<https://github.com/sivy/Salmon>.
+
+
+=head1 AVAILABILITY
+
+  https://github.com/Akron/Crypt-MagicSignatures-Key
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2017, L<Nils Diewald|http://nils-diewald.de/>.
+
+This program is free software, you can redistribute it
+and/or modify it under the terms of the Artistic License version 2.0.
+
+=cut

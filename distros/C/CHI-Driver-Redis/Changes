@@ -1,0 +1,48 @@
+Revision history for CHI-Driver-Redis
+
+0.10 January 22, 2016
+  * Doc fixes (#6)
+
+0.09 February 24, 2015
+  * Change how parameters are stored and passed to the Redis constructor
+  * Migrate to Moo
+  * Jettison _verify_redis_connection
+
+0.08 August 13, 2014
+  * Use Test::Mock::Redis for tests when CHI_REDIS_SERVER not set
+
+0.07 August 11, 2014
+  * Add prefix option to prefix all keys
+
+0.06 August 4, 2014
+  * Set Redis encoding option to undef to disable encoding
+  * Fix store to use expires_in (RT#78120)
+  * Revert "Use hashes."
+  * Change maintainer
+  * Add support for password option to Redis (RT#97382)
+
+0.05
+  * Use hashes to store info rather than crazy sets and keys.
+  * Indiscriminately turn off the UTF-8 flag on data coming out of
+    Redis.pm so CHI can handle it.
+  * Bump dependency versions.
+
+0.04    March 17, 2010
+  * Separate ping check from reconnection exceptions so that being disconnected
+    doesn't become a permanent problem.  We now reconnect when Redis comes back.
+
+0.03    March 17, 2010
+  * PODed implementation details
+  * Conditional tests
+
+0.02    December 22nd, 2009
+  * POD updates
+  * Rename _redis attribute to redis
+  * Lazily set redis attribute so that it is not populated until the first
+    use.  This – plus some new error handling – prevent crazy explosions when
+    Redis isn't available at instantiation time.
+  * Add warning for when ->ping fails
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

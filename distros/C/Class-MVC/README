@@ -1,0 +1,88 @@
+Class::MVC
+==========
+
+SYNOPSIS
+
+	use Class::Maker 'class';
+	
+	class 'Widget',
+	{
+		isa => [qw( Class::MVC )]
+	};
+
+	class 'Widget::ViewModel',
+	{			
+		isa => [qw( Device::Output::Channel )],
+		
+		public =>
+		{
+			string => [qw( info )],
+		},
+	};
+
+	class 'Widget::Model',
+	{
+		isa => [qw( Class::MVC::Model Shell::Widget::ViewModel)],
+	};
+
+	class 'Widget::View',
+	{
+		isa => [qw( Class::MVC::CompositeView )],
+		
+		public =>
+		{
+			ref => [qw( device )],
+		},
+	};
+
+	class 'Widget::Controller',
+	{
+		isa => [qw( Class::MVC::Controller )],		
+		
+		public => 
+		{
+			ref => [qw( sensor )],
+		},
+		
+		default =>
+		{
+			sensor => Device::Input->new(),
+		},
+	};	
+	
+DESCRIPTION
+    The Model-View-Controller (MVC) is a general paradigma mostly used for
+    GUI-development. It is very well known and tons of publications are
+    available through your favorite search engine. 
+
+                              Application Changes                                       
+
+                                      ||
+                                      \/
+                                +------------+
+                                |   Model    |
+                                +------------+
+                               /\ .          /\
+                               / .            \
+                        read  / . notify       \ update
+                             / .                \
+                            / \/                 \
+                      +------------+ <------ +------------+
+     Graphical  <==== |    View    |         | Controller |  <==== User Input
+      Output          +------------+ ......> +------------+
+	  	  
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Murat Uenalan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

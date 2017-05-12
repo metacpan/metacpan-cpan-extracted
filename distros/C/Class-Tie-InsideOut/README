@@ -1,0 +1,103 @@
+NAME
+    Class::Tie::InsideOut - Inside-out objects on the cheap using tied
+    hashes
+
+REQUIREMENTS
+    Perl 5.6.1, and Scalar::Util.
+
+INSTALLATION
+    Installation can be done using the traditional Makefile.PL method:
+
+    Using Makefile.PL:
+
+      perl Makefile.PL
+      make test
+      make install
+
+SYNOPSIS
+      package MyClass;
+
+      use Class::Tie::InsideOut;
+
+      our @ISA = qw( Class::Tie::InsideOut );
+
+      our %GoodKey;
+
+      sub bad_method {
+        my $self = shift;
+        return $self->{BadKey}; # this won't work
+      }
+
+      sub good_method {
+        my $self = shift;
+        return $self->{GoodKey}; # %GoodKey is defined
+      }
+
+DESCRIPTION
+    This module is a proof-of-concept for implementing inside-out objects
+    using tied hashes. It makes use of the Tie::InsideOut package to tie
+    hash keys to hashes in the calling package's namespace.
+
+    Fields are accessed as hash keys, so in traditional Perl objects can be
+    easily converted into inside-out objects.
+
+    More information can be found in the module documentation.
+
+REVISION HISTORY
+    A brief list of changes since the previous release:
+
+    0.11   2014-02-19
+    
+           - No functional changes to distro.
+    
+           - Added note about status.
+    
+           - Removed reference to Build.PL from POD and README.
+    
+           - Deleted matching version test.
+    
+           - Added note about Hash::Utils in SEE ALSO section.
+    
+    0.10   2014-02-19
+    
+           - No functional changes to distro.
+    
+           - Reformatted Changes to CPAN::Changes::Spec.
+    
+           - Changes to use Module::Install for Makefile.PL and removed
+                 Build.PL.
+    
+           - Modernised distribution for GitHub.
+
+    For a detailed history see the Changes file included in this
+    distribution.
+
+SEE ALSO
+    There are various other inside-out object packages on CPAN. Among them:
+
+      Class::InsideOut
+      Class::Std
+      Object::InsideOut
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+  Acknowledgements
+    Thanks to Ovid (via Chromatic) and Steven Little for advice in PerlMonks
+    on the namespace issues with Class::Accessor.
+
+  Suggestions and Bug Reporting
+    Feedback is always welcome. Please use the CPAN Request Tracker at
+    http://rt.cpan.org to submit bug reports.
+
+STATUS
+    This module has not been seriously updated since 2006, and inside-out
+    objects have largely fallen out of favor since then.
+
+    It has been marked as `ADOPTME' on CPAN.
+
+LICENSE
+    Copyright (c) 2006,2014 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

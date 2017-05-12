@@ -1,0 +1,82 @@
+#!/usr/local/bin/perl
+
+##   This script goes through all known VOBs, locking them and backing
+## them up with GNU tar into compressed archive files in a place of your
+## choosing. Or specific VOB tags can be given on the command line.
+## It deliberately does not back up the c/cdft area as this is large
+## and recoverable. It deals gracefully with the case where d/ddft or
+## s/sdft are symlinks. It requires that GNU tar be available on PATH
+## as 'gtar', and the same for 'gzip' if you plan to compress. You must
+## use GNU tar, not traditional tar, as non-GNU tars tend to hobble the
+## scrubber by updating access times of backed-up files.
+##   Conceptually portable to Windows but untested there.
+
+use ClearCase::Argv;
+
+Argv->stdout(0);	# suppress stdout by default
+Argv->attropts;		# parse @ARGV for -/flags
+
+# Must specify cleartool location since we'll be running as root.
+ClearCase::Argv->cleartool('/usr/atria/bin/cleartool');
+
+use Getopt::Long;
+use vars qw(%opt);
+GetOptions(\%opt, qw(backupdir=s comment=s rgy z));
+
+chomp(@ARGV = grep !/tmp$/,
+    ClearCase::Argv->new(qw(lsvob -s))->noexec(0)->stdout(1)->qx) if !@ARGV;
+
+my $rc = 0;
+
+my $lock = ClearCase::Argv->new('lock');
+$lock->opts('-c', $opt{comment}) if $opt{comment};
+my $unlock = ClearCase::Argv->new('unlock');
+my $tar = Argv->new;
+
+my @backups;
+
+Argv->dbglevel(1);
+
+my $lsvob = ClearCase::Argv->new(
+	    {stdout=>1, noexec=>0, dbglevel=>0, autochomp=>1}, 'lsvob', []);
+
+for my $tag (@ARGV) {
+    my $pass = 0;
+    my $stg = $lsvob->args($tag)->noexec(0)->dbglevel(0)->autochomp(1)->qx;
+    $stg =~ s%^\S*\s+\S+\s+(\S+)/[^/]+\.vbs\s+.*%$1%;
+    if (!chdir($stg)) {
+	warn "$stg: $!";
+	next;
+    } else {
+	warn "\n= ", scalar(localtime), "\n+ cd $stg\n";
+    }
+    my $d = $opt{backupdir} || $stg;
+    (my $v = $tag) =~ s%^\W+%%;
+    next if $lock->args("vob:$tag")->system;
+    unlink("$d/$v.tar") if !$tar->noexec;
+    my $cmd = "gtar -cf $d/$v.tar $v.vbs $v.vbs/d/ddft/* $v.vbs/s/sdft/*";
+    $pass++ if $tar->args($cmd)->stdout(1)->system;
+    $pass++ if $unlock->args("vob:$tag")->system;
+    $rc += $pass;
+    next if $pass;
+    push(@backups, "$v.tar");
+    unlink("$d/$v.tar.gz") if !$tar->noexec;
+}
+warn "\n= ", scalar(localtime), "\n";
+
+if ($opt{rgy}) {
+    my $r = ($opt{backupdir} || '/var/tmp') . 'config.tar.gz';
+    my $d = '/var/adm/rational/clearcase';
+    $rc++ if Argv->new(qw(gtar -cf), $r, $d)->system;
+}
+
+if ($opt{z} && @backups) {
+    if ($opt{backupdir}) {
+	die "$opt{backupdir}: $!" if !chdir($opt{backupdir});
+	warn "\n+ cd $opt{backupdir}\n";
+    }
+    $rc++ if Argv->new(qw(gzip --force), @backups)->system;
+    warn "\n= ", scalar(localtime), "\n";
+}
+
+exit $rc;

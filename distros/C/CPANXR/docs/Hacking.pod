@@ -1,0 +1,37 @@
+# $Id: Hacking.pod,v 1.1 2003/10/07 20:06:39 clajac Exp $
+
+=pod
+
+=head1 NAME
+
+CPAN Hacking
+
+=head1 DESCRIPTION
+
+This document describes how to hack on CPANXR
+
+=head1 NOTES
+
+=head2 Apache configuration
+
+To avoid having to run C<make install> every time you make a change, add the following line to your httpd.conf
+
+ <Perl>
+  use lib '/path/to/CPANXR/lib';
+ </Perl>
+
+And change your DocumentRoot to point at I</path/to/CPANXR/setup/html>.
+
+=head2 Running the indexer
+
+Run the indexer with C<perl -Ilib bin/cpanxr index> from your CPANXR development dir
+
+=head1 PATCHING
+
+Patches to CPANXR are prefered in the unified format, but any format GNU diff and patch understans is fine. In the subject of your mail, please add the prefix [PATCH].
+
+=head1 Reporting bugs
+
+Use rt.perl.org (CPAN Request Tracker) to report bugs to CPANXR
+
+=cut

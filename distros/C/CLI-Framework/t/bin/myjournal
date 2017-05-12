@@ -1,0 +1,24 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+use lib 't/lib';
+
+use My::Journal;
+my $journal = My::Journal->new();
+
+$journal->set_default_command( 'console' );
+$journal->run();
+
+__END__
+
+=pod
+
+=head1 PURPOSE
+
+Application Script executable for demo application implementing a personal
+journal.
+
+=cut

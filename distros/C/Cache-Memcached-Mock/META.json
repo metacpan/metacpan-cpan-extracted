@@ -1,0 +1,42 @@
+{
+   "abstract" : "A mock class for Cache::Memcached",
+   "author" : [
+      "Cosimo Streppone <cosimo@opera.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Memcached-Mock",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-cache-memcached-mock@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Cache-Memcached-Mock"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/operasoftware/perl5-cache-memcached-mock.git",
+         "web" : "http://github.com/operasoftware/perl5-cache-memcached-mock"
+      }
+   },
+   "version" : "0.07"
+}
+

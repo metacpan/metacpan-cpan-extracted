@@ -1,0 +1,59 @@
+---
+abstract: '(re)start dead process'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Continual-Process
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Continual::Process:
+    file: lib/Continual/Process.pm
+    version: v0.2.0
+  Continual::Process::Helper:
+    file: lib/Continual/Process/Helper.pm
+  Continual::Process::Instance:
+    file: lib/Continual/Process/Instance.pm
+  Continual::Process::Loop:
+    file: lib/Continual/Process/Loop.pm
+  Continual::Process::Loop::AnyEvent:
+    file: lib/Continual/Process/Loop/AnyEvent.pm
+  Continual::Process::Loop::IOAsync:
+    file: lib/Continual/Process/Loop/IOAsync.pm
+  Continual::Process::Loop::Mojo:
+    file: lib/Continual/Process/Loop/Mojo.pm
+  Continual::Process::Loop::Simple:
+    file: lib/Continual/Process/Loop/Simple.pm
+requires:
+  Class::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/JaSei/Continual-Process/issues
+  homepage: https://github.com/JaSei/Continual-Process
+  repository: git://github.com/JaSei/Continual-Process.git
+version: 0.2.0
+x_authority: cpan:JASEI
+x_contributors:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+  - 'Konstantin Yakunin <yakudza@debian>'
+  - 'Konstantin Yakunin <twinhooker@gmail.com>'
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

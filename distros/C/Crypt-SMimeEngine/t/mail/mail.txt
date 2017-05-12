@@ -1,0 +1,27 @@
+Received: by 10.141.33.2 with HTTP; Tue, 5 Feb 2008 02:14:55 -0800 (PST)
+Message-ID: <a5f4dedd0802050214o1186def5m2edce8332442acd1@mail.gmail.com>
+Date: Tue, 5 Feb 2008 11:14:55 +0100
+From: "Flavio Fanton" <flazan@exentrica.it>
+To: modules@perl.org
+Subject: Namespace proposal: Crypt::SMimeEngine
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Delivered-To: flazan@gmail.com
+X-Google-Sender-Auth: b88796a9c8d769c5
+
+Hi,
+
+I would upload a new module to process messages SMIME with hardware
+engines also.
+I believe an appropriate namespace is Crypt:: SMimeEngine.
+
+Let me know if a problem occurs.
+
+-- 
+*** Fanton Flavio
+EXEntrica - www.exentrica.it
+Office: +39050754703
+Fax: +39050754707
+ICQ: #241547295 - flazan

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  27472:
+    - 255
+    - 255
+    - 255
+    - 255
+    - 255
+    - 255
+name: edba
+registers:
+  AF: 9538
+  AF_: 0
+  BC: 159
+  BC_: 0
+  DE: 54285
+  DE_: 0
+  HL: 27471
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 12
+  SP: 0

@@ -1,0 +1,30 @@
+---
+abstract: 'Random numbers using timer/schedule entropy, aka userspace voodoo entropy'
+author:
+  - 'Dana A Jacobsen <dana@acm.org>'
+build_requires:
+  Test::More: 0.45
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-Random-TESHA2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Digest::SHA: 5.22
+  Exporter: 5.562
+  Time::HiRes: 1.9711
+  base: 0
+  perl: 5.006002
+resources:
+  homepage: https://github.com/danaj/Crypt-Random-TESHA2
+  repository: https://github.com/danaj/Crypt-Random-TESHA2
+version: 0.01

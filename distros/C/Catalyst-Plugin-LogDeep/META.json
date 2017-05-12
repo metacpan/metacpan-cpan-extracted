@@ -1,0 +1,69 @@
+{
+   "abstract" : "Sets up L<Log::Deep> for Catalyst logging",
+   "author" : [
+      "Ivan Wills <ivan.wills@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-LogDeep",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Coverage" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Spelling" : "0"
+         },
+         "requires" : {
+            "Catalyst" : "5.7",
+            "Catalyst::Plugin::ConfigLoader" : "0",
+            "Catalyst::Plugin::Static::Simple" : "0",
+            "Catalyst::Runtime" : "0",
+            "Class::C3::Adopt::NEXT" : "0",
+            "List::Util" : "0",
+            "Log::Deep" : "0.000006",
+            "parent" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::LogDeep" : {
+         "file" : "lib/Catalyst/Plugin/LogDeep.pm",
+         "version" : "v0.0.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-LogDeep"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/ivanwills/Catalyst-Plugin-LogDeep.git"
+      }
+   },
+   "version" : "v0.0.4"
+}

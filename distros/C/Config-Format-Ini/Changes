@@ -1,0 +1,33 @@
+Revision history for Perl extension Config::Format::Ini.
+
+0.07  Wed Jul 23 21:48:23 2008
+        - Fixed license entry (to perl)
+
+0.06  Tue Jul  1 12:20:44 2008
+	- Fixt Perl dependacy to 5.008
+
+0.05  Tue Jul  1 12:20:44 2008
+	- added global $Config::Format::Init::SIMPLIFY
+          When enabled (disabled by default), single-element-lists
+	  are converted to simple string; that is,
+          the array_ref [ 'john'] is converted to string 'john';
+          In addition, if the list (or section) has is blank, it
+          results to a simple undef (instead [] in previous versions).
+
+0.04  Sun Oct  1 01:54:02 2006
+	- values can occupy multiple lines if continued with \<newline>
+	- Added tests for this continuation charter:  '\', followed by "\n" .
+
+0.03  Thu Sep 28 03:21:24 2006
+	- values can contain \x000 and ansi escapes
+	- Added tests for escaped hexdigits and ansi chars
+
+0.02  Tue Sep 26 06:03:39 2006
+	- Unrecognized keys are skipped
+	- Unrecognized sections are skipped
+	- Added resync tests
+
+0.01  Sun Sep 24 18:03:39 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Config::Format::Ini
+

@@ -1,0 +1,27 @@
+inc
+{
+    foo
+    {
+        bar    baz
+    }
+}
+
+foo_2
+{
+    bar        baz
+}
+
+foo_3
+{
+    bar        baz
+}
+
+foo_4
+{
+    bar        baz
+}
+
+foo_5
+{
+    bar        baz
+}

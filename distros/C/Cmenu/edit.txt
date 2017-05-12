@@ -1,0 +1,11 @@
+Field editing activates the following keys
+  HOME   start of field
+  END    end of field
+  BACKSPACE delete character left
+  DEL       delete character right
+  INS       toggle Insert/Overwrite mode
+Buffer storage is also available
+  ^X        copy field to buffer
+  ^V        yank field from buffer
+  ^K        kill the field
+

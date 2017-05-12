@@ -1,0 +1,175 @@
+NAME
+    CGI::Getopt - Configuration initializer
+
+SYNOPSIS
+      use CGI::Getopt;
+
+      my $cg = CGI::Getopt->new('ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my $ar = $cg->get_inputs; 
+
+DESCRIPTION
+    This program enables CGI and command line inputs. It uses CGI and
+    Getopt::Std modules.
+
+   new (ifn => 'file.cfg', opt => 'hvS:')
+
+    Input variables:
+
+      $ifn  - input/initial file name. 
+      $opt  - options for Getopt::Std
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $cg = new CGI::Getopt;      # or
+       my $cg = CGI::Getopt->new;     # or
+       my $cg = CGI::Getopt->new(ifn=>'file.cfg',opt=>'hvS:'); # or
+       my $cg = CGI::Getopt->new('ifn', 'file.cfg','opt','hvS:'); 
+
+    Return: new empty or initialized CGI::Getopt object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      $self->{ifn} = ""
+      $self->{opt} = 'hvS:'; 
+
+   get_inputs($ifn, $opt)
+
+    Input variables:
+
+      $ifn  - input/initial file name. 
+      $opt  - options for Getopt::Std, for instance 'vhS:a:'
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $ar = $self->get_inputs('/tmp/my_init.cfg','vhS:');
+
+    Return: ($q, $ar) where $q is the CGI object and $ar is a hash array
+    reference containing parameters from web form, or command line and/or
+    configuration file if specified.
+
+    This method performs the following tasks:
+
+      1) create a CGI object
+      2) get input from CGI web form or command line 
+      3) read initial file if provided
+      4) merge the two inputs into one hash array
+
+    This method uses the following rules:
+
+      1) All parameters in the initial file can not be changed through
+         command line or web form;
+      2) The "-S" option in command line can be used to set non-single
+         char parameters in the format of 
+         -S k1=value1:k2=value2
+      3) Single char parameters are included only if they are listed
+         in $opt input variable.
+
+    Some parameters are dfined automatically:
+
+      script_name - $ENV{SCRIPT_NAME} 
+      url_dn      - $ENV{HTTP_HOST}
+      home_url    - http://$ENV{HTTP_HOST}
+      HomeLoc     - http://$ENV{HTTP_HOST}/
+      version     - $VERSION
+      action      - https://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}
+      encoding    - application/x-www-form-urlencoded
+      method      - POST
+
+   read_init_file($fn)
+
+    Input variables:
+
+      $fn - full path to a file name
+
+    Variables used or routines called:
+
+      None 
+
+    How to use:
+
+      my $ar = $self->read_init_file('crop.cfg');
+
+    Return: a hash array ref
+
+    This method reads a configuraton file containing parameters in the
+    format of key=values. Multiple lines is allowed for values as long as
+    the lines after the "key=" line are indented as least with two blanks.
+    For instance:
+
+      width = 80
+      desc  = This is a long
+              description about the value
+
+    This will create a hash array of
+
+      ${$ar}{width} = 80
+      ${$ar}{desc}  = "This is a long description about the value"
+
+   read_cfg_file($fn,$ot, $fs)
+
+    Input variables:
+
+      $fn - full path to a file name
+      $ot - output array type: A(array) or H(hash)
+      $fs - field separator, default to vertical bar (|)
+
+    Variables used or routines called:
+
+      echoMSG  - display message
+
+    How to use:
+
+      my $arf = $self->read_cfg_file('crop.cfg', 'H');
+
+    Return: an array or hash array ref containing (${$arf}[$i]{$itm},
+    ${$arf}[$i][$j];
+
+    This method reads a configuraton file containing delimited fields. It
+    looks a line starting with '#CN:' for column names. If it finds the
+    line, it uses to define the first row in the array or use the column
+    names as keys in the hash array.
+
+    The default output type is A(array). It will read the field names into
+    the first row ([0][0]~[0][n]). If output array type is hash, then it
+    uses the columns name as keys such as ${$arf}[$i]{key}. If it does not
+    find '#CN:' line, it will use 'FD001' ~ 'FD###' as keys.
+
+      #Form: fm1
+      #CN: Step|VarName|DispName|Action|Description                         
+      0.0|t1|Title||CROP Worksheet                          
+
+HISTORY
+    * Version 0.1
+        This version is to test the concept and routines.
+
+    * Version 0.11
+        04/29/2005 (htu) - fixed a few minor things such as module title.
+
+    * Version 0.12
+        Make sure Debug::EchoMessage installed as pre-required.
+
+    * Version 0.13
+        Added read_cfg_file routine.
+
+SEE ALSO (some of docs that I check often)
+        Data::Describe, Oracle::Loader, CGI::Getopt, File::Xcopy,
+        perltoot(1), perlobj(1), perlbot(1), perlsub(1), perldata(1),
+        perlsub(1), perlmod(1), perlmodlib(1), perlref(1), perlreftut(1).
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

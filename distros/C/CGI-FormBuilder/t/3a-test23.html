@@ -1,0 +1,50 @@
+<script type="text/javascript"><!-- hide from old browsers
+var fb_counter = new Object;  // for assigning unique ids; keyed by field name
+var fb_limit   = new Object;  // for limiting the size of growable fields
+function fb_grow (baseID) {
+    // inititalize the counter for this ID
+    if (isNaN(fb_counter[baseID])) fb_counter[baseID] = 1;
+
+    // don't go past the growth limit for this field
+    if (fb_counter[baseID] >= fb_limit[baseID]) return;
+
+    var base = document.getElementById(baseID + '_' + (fb_counter[baseID] - 1));
+
+    // we are inserting after the last field
+    insertPoint = base.nextSibling;
+
+    // line break
+    base.parentNode.insertBefore(document.createElement('br'), insertPoint);
+
+    var dup = base.cloneNode(true);
+
+    dup.setAttribute('id', baseID + '_' + fb_counter[baseID]);
+    base.parentNode.insertBefore(dup, insertPoint);
+
+    // add some padding space between the field and the "add field" button
+    base.parentNode.insertBefore(document.createTextNode(' '), insertPoint);
+
+    fb_counter[baseID]++;
+
+    // disable the "add field" button if we are at the limit
+    if (fb_counter[baseID] >= fb_limit[baseID]) {
+        var addButton = document.getElementById('_grow' + '_' + baseID);
+        addButton.setAttribute('disabled', 'disabled');
+    }    
+}
+
+//-->
+</script>
+<noscript><font color="#cc0000"><b>Please enable Javascript or use a newer browser.</b></font></noscript>
+<form action="TEST" method="get">
+<input id="_submitted" name="_submitted" type="hidden" value="1" />
+<table>
+<tr valign="top">
+  <td>Favorite Color</td>
+  <td><input id="favorite_color_0" name="favorite_color" type="text" /> <input id="_grow_favorite_color" onclick="fb_grow('favorite_color')" type="button" value="Additional Favorite Color" /></td>
+</tr>
+<tr valign="top">
+  <td align="center" colspan="2"><input id="_submit" name="_submit" type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>

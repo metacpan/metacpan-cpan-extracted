@@ -1,0 +1,71 @@
+{
+   "abstract" : "Find Duplicate Perl Code",
+   "author" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Code-CutNPaste",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0.25"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.17",
+            "File::Find::Rule" : "0.33",
+            "File::HomeDir" : "0",
+            "File::Slurp" : "9999.19",
+            "Moo" : "0",
+            "Parallel::ForkManager" : "0.007009",
+            "Term::ProgressBar" : "0",
+            "aliased" : "0",
+            "autodie" : "2.10",
+            "perl" : "5.006",
+            "utf8::all" : "0.004"
+         }
+      }
+   },
+   "provides" : {
+      "B::CutNPaste" : {
+         "file" : "lib/B/CutNPaste.pm",
+         "version" : "0.31"
+      },
+      "Code::CutNPaste" : {
+         "file" : "lib/Code/CutNPaste.pm",
+         "version" : "0.31"
+      },
+      "Code::CutNPaste::Duplicate" : {
+         "file" : "lib/Code/CutNPaste/Duplicate.pm",
+         "version" : "0.31"
+      },
+      "Code::CutNPaste::Duplicate::Item" : {
+         "file" : "lib/Code/CutNPaste/Duplicate/Item.pm",
+         "version" : "0.31"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Ovid/code-cutnpaste"
+      }
+   },
+   "version" : "0.31"
+}

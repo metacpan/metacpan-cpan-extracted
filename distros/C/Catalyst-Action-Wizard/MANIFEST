@@ -1,0 +1,25 @@
+Build.PL
+lib/Catalyst/Action/Wizard.pm
+lib/Catalyst/Wizard.pm
+lib/CatalystX/Wizarded.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01plain/01wizard.t
+t/01plain/02subwizard.t
+t/01plain/03last.t
+t/01plain/lib/Wizard/Test.pm
+t/mechanize/01wizard.t
+t/mechanize/02subwizard.t
+t/mechanize/03wizard_detach.t
+t/mechanize/04subwizard_detach.t
+t/mechanize/05wizard_complex.t
+t/mechanize/06wizard_catalyst.t
+t/mechanize/lib/Test/Wizard.pm
+t/mechanize/lib/WizardTest/ComplexWizardTestApp.pm
+t/mechanize/lib/WizardTest/ComplexWizardTestApp/Controller/First.pm
+t/mechanize/lib/WizardTest/ComplexWizardTestApp/Controller/Second.pm
+t/mechanize/lib/WizardTest/WizardTestApp.pm
+t/mechanize/lib/WizardTest/WizardTestApp/Controller/First.pm
+t/mechanize/lib/WizardTest/WizardTestApp/Controller/Second.pm
+META.json

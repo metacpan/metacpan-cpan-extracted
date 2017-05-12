@@ -1,0 +1,115 @@
+[% 
+    title = "Distribution Notification Filters" ;
+
+    crumb2_name = 'Author' ;
+    crumb2_href = '/';
+    crumb1_name = 'Distributions' ;
+%]
+
+<p>The summary table below lists all the distributions released by yourself to
+CPAN. The table includes the current settings where they have been set up 
+specifically for a distribution. Where no settings have been set, your default
+settings will be used. Click on the 'edit' link to create, update or delete the
+settings for that distribution.</p>
+<p>As a shortcut to quickly disable notifications for specific distributions, 
+use the checkboxes in the 'X' column next to the distributions you wish to 
+disable notifications for, then click the 'Update Disabled Distributions' 
+button below the table.</p>
+
+[% IF thanks %]
+<p class="alert">Distribution filters saved successfully</p>
+[% END %]
+
+<form action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act"    value="author-distros" />
+<input type="hidden" name="enable" value="1" />
+
+<table width="100%">
+<tr><th>X</th>
+	<th>Distribution</th>
+	<th>Grade</th>
+	<th>Tuple</th>
+	<th>Versions</th>
+	<th>Perls</th>
+	<th>OSs</th>
+	<th></th>
+</tr>
+
+[% FOREACH d = data.dists %]
+[% IF d.ignored %]
+<tr class="greyed">
+	<td><input type="checkbox" name="dists" value="[% d.name %]" [% IF d.ignored %]checked="checked"[% END %] /></td>
+    <td>[% d.name %]</td>
+    <td colspan="5" align="center">(reporting disabled)</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% d.name %]">edit</a></td>
+</tr>
+[% ELSIF d.grade == "" %]
+<tr><td><input type="checkbox" name="dists" value="[% d.name %]" /></td>
+    <td>[% d.name %]</td>
+    <td colspan="5" align="center">(author defaults)</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% d.name %]">edit</a></td>
+</tr>
+[% ELSE %]
+<tr><td><input type="checkbox" name="dists" value="[% d.name %]" /></td>
+    <td>[% d.name %]</td>
+    <td>[% d.grade %]</td>
+    <td>[% d.tuple %]</td>
+    <td>[% d.version %]</td>
+    <td>[% d.perl %]</td>
+    <td>[% d.platform %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% d.name %]">edit</a></td>
+</tr>
+[% END %]
+[% END %]
+</table>
+
+<p class="smalltext"><br />
+<input type="submit" value='Update Disabled Distributions' />
+</form>
+
+<h2>Notes</h2>
+
+<p>By setting a Disable checkbox, reports for that specific distributions will
+not be used within the notification system. If you later enable a distribution, 
+note that any settings you set previously will still be available. However, if 
+that distribution did not previously have its settings edited by you, the author
+defaults will be reinstated.</p>
+
+<h2>Keys</h2>
+
+<ul>
+<li>For Grade:
+	<ul>
+	<li>P = PASS</li>
+	<li>F = FAIL</li>
+	<li>U = UNKNOWN</li>
+	<li>N = NA</li>
+	</ul>
+</li>
+<li>For Tuple:
+	<ul>
+	<li>A = ALL</li>
+	<li>F = FIRST</li>
+	</ul>
+</li>
+<li>For Distribution Versions:
+	<ul>
+	<li>A = ALL</li>
+	<li>L = LATEST</li>
+	<li>C = CUSTOM</li>
+	</ul>
+</li>
+<li>For Perl Versions:
+	<ul>
+	<li>A = ALL</li>
+	<li>A+P = ALL including patches</li>
+	<li>C = CUSTOM</li>
+	</ul>
+</li>
+<li>For Platforms:
+	<ul>
+	<li>A = ALL</li>
+	<li>C = CUSTOM</li>
+	</ul>
+</li>
+</ul>

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/DBI/MSSQL.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/perl-critic.t
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

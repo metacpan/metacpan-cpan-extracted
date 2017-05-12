@@ -1,0 +1,17 @@
+[% PROCESS furniture/head.html title=thing.title %]
+
+<h1>[% error %]</h1>
+
+<p>[% report.text %]</p>
+
+<p class="small">
+at [% report.file %] line [% report.line %]<br>
+</p>
+
+<p class="small"><b>trace:</b><br>
+[% report.stacktrace %]
+</pre>
+
+[% PROCESS furniture/status.html %]
+
+[% PROCESS furniture/foot.html %]

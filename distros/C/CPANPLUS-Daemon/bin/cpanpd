@@ -1,0 +1,102 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Std;
+use CPANPLUS::Daemon;
+
+=head1 NAME
+
+cpanpd 
+
+=head1 SYNOPSIS
+
+    cpanpd -P 666 -u my_user_name -p secret_pass
+
+=head1 DESCRIPTION
+
+C<cpanpd> let's you run a daemon that listens on a specified port
+and can act as a remote backend to your L<CPANPLUS::Shell::Default>.
+
+You can use the L<CPANPLUS::Shell::Default> shell to connect to the
+daemon. 
+Note that both sides (ie, both the server and the client) ideally 
+should run the same version of the L<CPANPLUS::Shell::Default>, to 
+ensure maximum compatibillity
+
+=head1 OPTIONS
+
+=over 4
+
+=item -P
+
+This is the port number the daemon will listen on. This defaults to
+the port number mentioned in your L<CPANPLUS::Config>, which by 
+default is C<1337>.
+
+=item -u
+
+This the username allowed to connect to the daemon. This defaults to
+the username mentioned in your L<CPANPLUS::Config>.
+
+=item -p
+
+This the password allowed to connect to the daemon. This defaults to
+the username mentioned in your L<CPANPLUS::Config>.
+
+=head1 SECURITY
+
+This program is not meant to be secure; all data goes over the 
+network plain text, and with the C<!> command from the shell, the 
+remote user is allowed to executy any perl code as the user under
+which this daemon is run.
+
+Keep this in mind at all times!
+
+=head1 NOTES
+
+This program required both L<POE> and L<IO::String> installed to 
+function. You can use L<CPANPLUS> to install them for you.
+
+=head1 AUTHOR
+
+This module by
+Jos Boumans E<lt>kane@cpan.orgE<gt>.
+
+=head1 COPYRIGHT
+
+This module is
+copyright (c) 2003 Jos Boumans E<lt>kane@cpan.orgE<gt>.
+All rights reserved.
+
+This library is free software;
+you may redistribute and/or modify it under the same
+terms as Perl itself.
+
+=cut
+
+
+my $opts = {};
+getopt('Pup', $opts);
+
+my $map = {
+    p   => 'password',
+    u   => 'username',
+    P   => 'port',
+};
+
+my %args;
+while( my($key,$val) = each %$map ) {
+    $args{$val} = $opts->{$key} if defined $opts->{$key};
+}    
+
+my $cpanpd = CPANPLUS::Daemon->new( %args ) 
+                or die loc("Could not initiate daemon\n");
+
+$cpanpd->run;
+
+# Local variables:
+# c-indentation-style: bsd
+# c-basic-offset: 4
+# indent-tabs-mode: nil
+# End:
+# vim: expandtab shiftwidth=4:

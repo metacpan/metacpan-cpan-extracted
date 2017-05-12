@@ -1,0 +1,30 @@
+---
+abstract: 'A higher level interface for CWB::CQP'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CWB-CQP-More
+requires:
+  CWB: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  POSIX::Open3: '0'
+  Try::Tiny: '0'
+  base: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://natura.di.uminho.pt/svn/main/CWB-CQP-More/
+version: '0.08'

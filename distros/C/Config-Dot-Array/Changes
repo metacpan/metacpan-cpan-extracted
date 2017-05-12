@@ -1,0 +1,28 @@
+0.05 2015-10-01T12:42:34+02:00
+ - Fix SEE ALSO section in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.04 2014-11-22T23:37:36+01:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add tests for new() method.
+ - Add tests for serialize() method.
+ - Fix LICENSE file.
+ - Fix LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.14 version.
+
+0.03 2013-11-07
+ - Add minimal Perl version.
+ - Fix ERRORS section in doc.
+ - Rewrite B<> to C<> in doc for code parameters and methods.
+
+0.02 2013-09-21
+ - Add Test::NoWarnings to tests.
+ - Add LICENSE file.
+ - Add SIGNATURE file.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2012-08-03
+ - First version.

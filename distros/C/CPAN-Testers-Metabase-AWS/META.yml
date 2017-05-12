@@ -1,0 +1,45 @@
+---
+abstract: 'Metabase backend on Amazon Web Services'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Testers-Metabase-AWS
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  CPAN::Testers::Metabase::AWS:
+    file: lib/CPAN/Testers/Metabase/AWS.pm
+    version: 1.999002
+requires:
+  Metabase::Archive::S3: 1.000
+  Metabase::Gateway: 0
+  Metabase::Index::SimpleDB: 1.000
+  Metabase::Librarian: 1.000
+  Moose: 0
+  Net::Amazon::Config: 0
+  namespace::autoclean: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Metabase-AWS
+  homepage: https://github.com/dagolden/cpan-testers-metabase-aws
+  repository: https://github.com/dagolden/cpan-testers-metabase-aws.git
+version: 1.999002

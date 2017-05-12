@@ -1,0 +1,100 @@
+
+# Philosophy.pod,v 1.3 2003/09/09 00:12:00 sherzodr Exp
+
+=pod
+
+=head1 NAME
+
+Class::PObject::Philosophy - Philosophy behind object persistence
+
+=head1 OVERVIEW
+
+Idea behind Object Persistence is to represent data as a software object. Another way of looking
+at it is, to make objects persist across processes instead of simply being destroyed
+exiting the scope.
+
+=head2 MORE ABOUT DATA
+
+In a plain text database, for instance, each line could represent a single record. Different pieces of the
+record could be separated by some commonly agreed delimiter, such as a comma (,), pipe sign (|) etc.
+Unique identifier for individual records can be the line number that particular record resides on.
+For example:
+
+    # in person.txt
+    Sherzod Ruzmetov, sherzodr[AT]cpan.org
+    Leyla Ivanitskaya, leyla[AT]handalak.com
+
+In a BerkeleyDB (or DBM) each key/value pair of the hash can be considered a single record.
+A unique identifier for individual records can be the key of the hash. Pieces of records
+could be delimited by a commonly agreed delimiter, just like in a plain text database.
+For example:
+
+    # in person.db
+    217  => "Sherzod Ruzmetov|sherzodr[AT]cpan.org"
+    218  => "Leyla Ivanitskaya|leyla[AT]handalak.com"
+
+In a Relational Database System, each row of a database table is considered a single record,
+and each piece of the record has its own column in the table. A unique identifier for individual
+records can be a single column marked as primary key, or multiple columns marked so:
+
+    # in person
+    +-----+----------------+------------------------+
+    | id  | name           | email                  |
+    +-----+----------------+------------------------+
+    | 217 | Sherzod        | sherzodr[AT]cpan.org   |
+    +-----+----------------+------------------------+
+
+As you noticed, they all have something in common - they all have the same logical structure,
+a record identifier, several pieces of different records, and a container (single line, key/value pair
+or a single row).
+
+=head2 DATA AS OBJECTS
+
+All above representations are low-level.  Why couldn't we try to represent them all
+as a software object and forget what they really look like in the disk?
+
+For example, we could treat a single record from either of the above databases as an object, say
+a Person object. According to above databases, this object may have three attributes, I<id>,
+C<name> and C<email>. Sounds so natural, doesn't it?
+
+Your programs, instead of dealing with low-level disk access each time a record should be
+accessed (for either writing or reading purposes), could just play with objects. And those
+objects could deal with low-level disk access behind the scenes.
+
+=head2 WHAT ARE THE ADVANTAGES
+
+First off, data, regardless of the storage mechanism, is always accessed through the same
+programming API. So your programs can work with any database system without any change at all.
+
+Will help make a cleaner code base, because your application will never be making use of any
+low-level procedures to access the data such as running any SQL queries. Everything happens
+through objects and their supported methods.
+
+Your applications will be more modular and code base will be more compact. As a developer
+you will have less code to maintain.
+
+Your programming API will be easily accessible by 3rd parties, thus making your applications
+easily integrative as well as extensible without having to undergo time consuming, costly
+training. All they will need to read is about a page of POD manual of your related class in
+order to be able to make use of it.
+
+=head2 WHAT ARE THE DISADVANTAGES
+
+Object API may not be able to provide all the flexibility and optimization of the underlying
+database engine. To remedy this some tools provide sort of backdoors for the programmers
+to be able to interact with the underlying database engine more directly.
+
+=head1 SEE ALSO
+
+L<Class::PObject::PObject>,
+L<Class::DBI>,
+L<SPOPS>,
+L<Alzabo>,
+L<Tangram>
+
+=head1 COPYRIGHT AND LICENSE
+
+For author and copyright information refer to Class::PObject's L<online manual|Class::PObject>.
+
+=cut
+

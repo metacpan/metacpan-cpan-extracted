@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Cache-Memcached-Mock,
+version 0.07:
+
+  A mock class for Cache::Memcached
+
+This software is copyright (c) 2013 by Opera Software ASA.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

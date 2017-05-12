@@ -1,0 +1,280 @@
+NAME
+    Catalyst::View::Seamstress - Seamstress View Class
+
+SYNOPSIS
+    # use the helper to create MyApp::View::Seamstress myapp_create.pl view
+    Seamstress Seamstress
+
+    # edit the comp_root in lib/MyApp/View/Seamstress.pm
+
+     BEGIN {
+      # IMPORTANT: last character must be "/"
+      $comp_root = "/ernest/dev/catalyst-simpleapp/MyApp/root/";
+     }
+
+    # the above is correct assuming your HTML files exist in #
+    /ernest/dev/catalyst-simpleapp/MyApp/root/";
+
+    # render view from lib/MyApp.pm or lib/MyApp::C::SomeController.pm
+
+        sub message : Global {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'html::hello_world';
+            $c->stash->{name}     = 'Mister GreenJeans';
+            $c->stash->{date}     = 'Today';
+            $c->forward('MyApp::View::Seamstress');
+        }
+
+    # html::hello_world is a Perl package with 2 methods: # - new() #
+    auto-created by spkg.pl in the Seamstress distro # - process() #
+    handwritten by you to rewrite the HTML tree as you need
+
+    # it was created as follows:
+
+     metaperl@pool-71-109-151-76:/ernest/dev/catalyst-simpleapp/MyApp/root/html$ cat hello_world.html 
+     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+     <html>
+      <head>
+        <title>Hello World</title>
+      </head>
+      <body>
+      <h1>Hello World</h1>
+        <p>Hello, my name is <span id="name">dummy_name</span>.
+        <p>Today's date is <span id="date">dummy_date</span>.
+      </body>
+     </html>
+
+     metaperl@pool-71-109-151-76:/ernest/dev/catalyst-simpleapp/MyApp/root/html$
+     metaperl@pool-71-109-151-76:/ernest/dev/catalyst-simpleapp/MyApp/root/html$ spkg.pl --base_pkg=MyApp::View::Seamstress --base_pkg_root=`pwd`/../../lib hello_world.html
+     comp_root........ /ernest/dev/catalyst-simpleapp/MyApp/root/
+     html_file_path... /ernest/dev/catalyst-simpleapp/MyApp/root/html/
+     html_file........ hello_world.html
+     html_file sans... hello_world
+     hello_world.html compiled to package html::hello_world
+     metaperl@pool-71-109-151-76:/ernest/dev/catalyst-simpleapp/MyApp/root/html$ 
+
+    # Lets see what html::hello_world looks like. Everything other than #
+    "process()" was auto-generated
+
+     package html::hello_world;
+
+     use strict;
+     use warnings;
+
+     use HTML::TreeBuilder;
+
+     use lib '/ernest/dev/catalyst-simpleapp/MyApp/root/html/../../lib';
+     use base qw(MyApp::View::Seamstress); 
+
+     our $tree;
+
+     sub new {
+      my $file = __PACKAGE__->comp_root() . 'html/hello_world.html' ;
+
+      -e $file or die "$file does not exist. Therefore cannot load";
+
+      $tree =HTML::TreeBuilder->new;
+      $tree->store_declarations;
+      $tree->parse_file($file);
+      $tree->eof;
+  
+      bless $tree, __PACKAGE__;
+     }
+
+     sub process {
+      my ($self, $c) = @_;
+
+      $tree->look_down(id => 'name')->replace_content($c->stash->{$_})
+          for qw(name date);
+     }
+
+     1;
+
+DESCRIPTION
+    This is the Catalyst view class for HTML::Seamstress. Your application
+    should define a view class which is a subclass of this module. The
+    easiest way to achieve this is using the myapp_create.pl script (where
+    myapp should be replaced with whatever your application is called). This
+    script is created as part of the Catalyst setup.
+
+        $ script/myapp_create.pl view Seamstress Seamstress
+
+    This creates a MyApp::View::Seamstress.pm module in the lib directory
+    (again, replacing "MyApp" with the name of your application) which looks
+    something like this:
+
+        package FooBar::View::Seamstress;
+    
+        use strict;
+         use base 'Catalyst::View::Seamstress';
+
+        __PACKAGE__->config->{DEBUG} = 'all';
+
+    Now you can modify your action handlers in the main application and/or
+    controllers to forward to your view class. You might choose to do this
+    in the end() method, for example, to automatically forward all actions
+    to the Seamstress view class.
+
+        # In MyApp or MyApp::Controller::SomeController
+    
+        sub end : Private {
+            my( $self, $c ) = @_;
+            $c->forward('MyApp::V::Seamstress');
+        }
+
+  CONFIGURATION
+    There are a three different ways to configure your view class. The first
+    way is to call the "config()" method in the view subclass. This happens
+    when the module is first loaded.
+
+        package MyApp::V::Seamstress;
+    
+        use strict;
+        use base 'Catalyst::View::Seamstress';
+
+        MyApp::V::Seamstress->config({
+          comp_root '/absolute/path/to/html/files/'
+        });
+
+    The second way is to define a "new()" method in your view subclass. This
+    performs the configuration when the view object is created, shortly
+    after being loaded. Remember to delegate to the base class "new()"
+    method (via "$self->NEXT::new()" in the example below) after performing
+    any configuration.
+
+        sub new {
+            my $self = shift;
+            $self->config({
+                comp_root '/absolute/path/to/html/files/'
+            });
+            return $self->NEXT::new(@_);
+        }
+ 
+    The final, and perhaps most direct way, is to define a class item in
+    your main application configuration, again by calling the uniquitous
+    "config()" method. The items in the class hash are added to those
+    already defined by the above two methods. This happens in the base class
+    new() method (which is one reason why you must remember to call it via
+    "NEXT" if you redefine the "new()" method in a subclass).
+
+        package MyApp;
+    
+        use strict;
+        use Catalyst;
+    
+        MyApp->config({
+                comp_root '/absolute/path/to/html/files/'
+        });
+
+    Note that any configuration items defined by one of the earlier methods
+    will be overwritten by items of the same name provided by the latter
+    methods.
+
+  RENDERING VIEWS
+    The view plugin renders using the class named in the "template" item in
+    the stash. The items defined in the stash are passed to the Seamstress
+    "process()" method in the same class:
+
+        sub message : Global {
+            my ( $self, $c ) = @_;
+            $c->stash->{template} = 'html::hello_world';
+            $c->stash->{name}     = 'Billy Bob';
+            $c->stash->{date}     = 'medjool sahara';
+            $c->forward('MyApp::View::Seamstress');
+        }
+
+    A "process()" method was shown in the SYNOPSIS.
+
+    The output generated by the template is stored in
+    "$c->response->output".
+
+  TEMPLATE PROFILING
+  METHODS
+    new The constructor for the Seamstress view (uses inherited "new").
+
+    process
+        eval-requires the module specified in "$c->stash->{template}". Gets
+        the "HTML::Tree" representation of the file via "new" and then calls
+        "process()" to rewrite the tree. Template arguments are $c. Output
+        is stored in "$c->response->body".
+
+    template_vars
+        Returns a list of keys/values to be used as the variables in the
+        template.
+
+        "CATALYST_VAR"
+          Allows you to change the name of the Catalyst context object. If
+          set, it will also remove the base and name aliases, so you will
+          have access them through <context>.
+
+          For example:
+
+              MyApp->config({
+                  name     => 'MyApp',
+                  root     => MyApp->path_to('root'),
+                  'V::Seamstress' => {
+                      CATALYST_VAR => 'Catalyst',
+                  },
+              });
+
+          message.tt2:
+
+              The base is [% Catalyst.req.base %]
+              The name is [% Catalyst.config.name %]
+
+        "TIMER"
+          If you have configured Catalyst for debug output, and turned on
+          the TIMER setting, "Catalyst::View::Seamstress" will enable
+          profiling of template processing (using Seamstress::Timer). This
+          will embed HTML comments in the output from your templates, such
+          as:
+
+              <!-- TIMER START: process mainmenu/mainmenu.ttml -->
+              <!-- TIMER START: include mainmenu/cssindex.tt -->
+              <!-- TIMER START: process mainmenu/cssindex.tt -->
+              <!-- TIMER END: process mainmenu/cssindex.tt (0.017279 seconds) -->
+              <!-- TIMER END: include mainmenu/cssindex.tt (0.017401 seconds) -->
+
+              ....
+
+              <!-- TIMER END: process mainmenu/footer.tt (0.003016 seconds) -->
+
+        "TEMPLATE_EXTENSION"
+          a sufix to add when looking for templates bases on the "match"
+          method in Catalyst::Request.
+
+          For example:
+
+            package MyApp::C::Test;
+            sub test : Local { .. } 
+
+          Would by default look for a template in <root>/test/test. If you
+          set TEMPLATE_EXTENSION to '.tt', it will look for
+          <root>/test/test.tt.
+
+  HELPERS
+    The Catalyst::Helper::View::Seamstress and
+    Catalyst::Helper::View::SeamstressSite helper modules are provided to
+    create your view module. There are invoked by the myapp_create.pl
+    script:
+
+        $ script/myapp_create.pl view Seamstress Seamstress
+
+        $ script/myapp_create.pl view Seamstress SeamstressSite
+
+    The Catalyst::Helper::View::Seamstress module creates a basic Seamstress
+    view module. The Catalyst::Helper::View::SeamstressSite module goes a
+    little further. It also creates a default set of templates to get you
+    started. It also configures the view module to locate the templates
+    automatically.
+
+SEE ALSO
+    Catalyst, Catalyst::Helper::View::Seamstress, HTML::Seamstress
+
+AUTHORS
+    Terrence Brannon <metaperl@gmail.com>
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

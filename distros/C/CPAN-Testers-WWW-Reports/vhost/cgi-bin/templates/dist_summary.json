@@ -1,0 +1,13 @@
+{
+[% IF versions -%]
+[
+[% inx = versions.count -%]
+[% FOREACH version = versions -%]
+[%- s = summary.$version -%]
+[% inx = inx - 1 - %]
+  { "version": "[% version %]", "all": [%- s.ALL || 0 -%], "pass": [%- s.PASS || 0 -%], "fail": [%- s.FAIL || 0 -%], "na": [%- s.NA || 0 -%], "unknown": [%- s.UNKNOWN || 0 -%]
+  [% IF inx > 0 %]},[% ELSE %]}[% END %]
+[% END -%]
+]
+[% END -%]
+}

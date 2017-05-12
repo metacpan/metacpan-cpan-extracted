@@ -1,0 +1,33 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Slider Widget
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the slider object.
+my $slider = new Cdk::Slider ('Label' => "</5>Pick A Number: ",
+				'Low' => 1,
+				'High' => 10,
+				'Width' => 50);
+
+# Activate the object.
+my $number = $slider->activate ();
+
+# Check the results.
+if (!defined $number)
+{
+   popupLabel (["<C>Escape hit. No menu item selected."]);
+}
+else
+{
+   popupLabel (["<C>You chose $number"]);
+}
+
+# Exit Cdk.
+Cdk::end();

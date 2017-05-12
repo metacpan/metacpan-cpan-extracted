@@ -1,0 +1,32 @@
+---
+abstract: 'Generate a set of CGI::Application-based classes'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Bouquet-Rose
+provides:
+  CGI::Application::Bouquet::Rose:
+    file: lib/CGI/Application/Bouquet/Rose.pm
+    version: 1.05
+  CGI::Application::Bouquet::Rose::Config:
+    file: lib/CGI/Application/Bouquet/Rose/Config.pm
+    version: 1.05
+requires:
+  Carp: 0
+  Config::IniFiles: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Spec: 0
+  HTML::Template: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.05

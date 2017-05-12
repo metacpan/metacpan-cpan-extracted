@@ -1,0 +1,33 @@
+Release history for Comment-Spell-Check
+
+0.002001 2017-03-08T14:30:07Z b34f930
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +11 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+0.002000 2014-10-05T18:05:33Z 12320c6
+ [00 Major]
+ - Now paragraph oriented instead of line oriented.
+ - Pod::Wordlist application now happens **after** passing to your spell checker.
+ - these changes intended to improve behaviour of full-grammar based checkers like hunspell which may automatically
+   filter out words based on context, which eliminating stopwords can prove detrimental to.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑1)
+
+0.001002 2014-10-01T13:23:27Z
+ [Internals]
+ - Make sure the auto-selected spell checker can in fact spell check words before finalising the selection.
+
+0.001001 2014-09-30T02:50:57Z
+ [Tests]
+ - Report command to be invoked.
+
+0.001000 2014-09-29T18:30:20Z
+ - First version.

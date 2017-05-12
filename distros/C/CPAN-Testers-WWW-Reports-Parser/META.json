@@ -1,0 +1,99 @@
+{
+    "name": "CPAN-Testers-WWW-Reports-Parser",
+    "version": "0.06",
+    "abstract": "CPAN Testers reports data parser",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "qa",
+        "cpan",
+        "testing"
+    ],
+
+    "optional_features" : {
+        "json" : {
+            "description" : "for JSON support",
+            "prereqs" : {
+                "runtime" : {
+                    "requires" : {
+                        "JSON::XS": "0"
+                    }
+                }
+            }
+        },
+        "yaml" : {
+            "description" : "for YAML support",
+            "prereqs" : {
+                "runtime" : {
+                    "requires" : {
+                        "YAML::XS": "0"
+                    }
+                }
+            }
+        }
+    },
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Carp": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Testers::WWW::Reports::Parser": {
+            "file": "lib/CPAN/Testers/WWW/Reports/Parser.pm",
+            "version": "0.06"
+        },
+        "CPAN::Testers::WWW::Reports::Parser::JSON": {
+            "file": "lib/CPAN/Testers/WWW/Reports/Parser/JSON.pm",
+            "version": "0.06"
+        },
+        "CPAN::Testers::WWW::Reports::Parser::YAML": {
+            "file": "lib/CPAN/Testers/WWW/Reports/Parser/YAML.pm",
+            "version": "0.06"
+        },
+        "CPAN::Testers::WWW::Reports::Report": {
+            "file": "lib/CPAN/Testers/WWW/Reports/Report.pm",
+            "version": "0.06"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "homepage": "http://www.cpantesters.org",
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Parser" },
+        "repository": {
+            "url": "git://github.com/barbie/CPAN-Testers-WWW-Reports-Parser.git",
+            "web": "http://github.com/barbie/CPAN-Testers-WWW-Reports-Parser",
+            "type": "git"
+        }
+    }
+}

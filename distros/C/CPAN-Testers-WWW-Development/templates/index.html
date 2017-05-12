@@ -1,0 +1,413 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+    <title>CPAN Testers Development</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en-gb" />
+
+    <meta name="description" content="CPAN Testers development tools and data files"/>
+    <meta name="keywords"    content="perl, cpan, test, testers, open source"/> 
+    <meta name="author"      content="Barbie"/> 
+    <meta name="copyright"   content="Copyright (C) 2008-2015 CPAN Testers" />
+
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_setup.css" />
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_text.css" />
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-1826389-17");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+    Original CSS/XHTML Template Design by Wolfgang.
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+    Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body>
+
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->      
+    <div class="header">
+      
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/">CPAN Testers Development</a></h1>
+          <h3>devel.cpantesters.org</h3>
+          <h2>Welcome</h2>
+        </div>
+      </div>
+
+        [% INCLUDE "box-sites.html" %]
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li>Welcome</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- B. MAIN -->
+    <div class="main">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+            <h1>Menu</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+            </ul>
+            <ul>
+            <li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+            </ul>
+
+<div class="adverts">
+<h1>Our Sponsors</h1>
+<div id="iheart"></div>
+</div>  
+
+            [% INCLUDE "quote.html" %]
+        </div>
+
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">Development Tools</h1>
+        <div class="column1-unit">
+
+          <h2>A brief introduction</h2>
+          <p>This site has been created to store the data files and additional tools used to create the CPAN Testers family of websites.</p>
+          <p>Please note that although this site is dynamically generated, only the database file sizes are updated. The links below are generic, 
+          and will access the appropriate files as they are updated.</p>
+          <p>If you have any suggestions for improving the codebase or wish to report any bugs, please use the relevant bug tracking systems
+          as referenced in the links below.</p>
+
+          <h2 class="rule">Sections</h2>
+          <ul>
+          <li><a href="#smoker">Smoker Clients</a></li>
+          <li><a href="#metabase">Metabase Tools</a></li>
+          <li><a href="#database">Database Tools</a></li>
+          <li><a href="#website">Website Packages</a></li>
+          <li><a href="#common">Additional Packages</a></li>
+          </ul>
+
+          <a name="smoker"></a>
+          <h2 class="rule">Smoker Clients</h2>
+          <p>These are the downloads related to the CPAN Testers smoke testing clients. Two primary installation
+          tools exist, CPAN.pm and CPANPLUS, upon which two sets of tools are used to test distributions
+          uploaded to CPAN.</p>
+
+          <h3>CPAN Reporter Tools</h3>
+          <p>The following downloads relate to the tools built on the CPAN.pm installation tool.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Reporter">CPAN-Reporter</a> 
+                (<a href="https://github.com/dagolden/cpan-reporter">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Reporter">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/CPAN-Reporter-Smoker">CPAN-Reporter-Smoker</a> 
+                (<a href="https://github.com/dagolden/cpan-reporter-smoker">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Reporter-Smoker">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/CPAN-Reporter-Smoker-Safer">CPAN-Reporter-Smoker-Safer</a> 
+                (<a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Reporter-Smoker-Safer">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/POE-Component-CPAN-Reporter">POE-Component-CPAN-Reporter</a> 
+                (<a href="https://github.com/bingos/poe-component-cpan-reporter">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-CPAN-Reporter">RT Queue</a>)</li>
+          </ul>
+
+          <h3>CPANPLUS YACSmoke Tools</h3>
+          <p>The following downloads relate to the tools built on the CPANPLUS installation tool.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPANPLUS-YACSmoke">CPANPLUS-YACSmoke</a> 
+                (<a href="https://github.com/bingos/cpan-reporter">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPANPLUS-YACSmoke">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/POE-Component-CPAN-Reporter">POE-Component-CPANPLUS-YACSmoke</a> 
+                (<a href="https://github.com/bingos/poe-component-cpanplus-yacsmoke">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-CPANPLUS-YACSmoke">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/POE-Component-SmokeBox">POE-Component-SmokeBox</a> 
+                (<a href="https://github.com/bingos/poe-component-smokebox">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-SmokeBox">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/smokebrew">smokebrew</a> 
+                (<a href="https://github.com/bingos/smokebrew">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=smokebrew">RT Queue</a>)</li>
+          </ul>
+
+          <h3>cpanminus Smoke Tools</h3>
+          <p>The following downloads relate to the tools built on the cpanminus installation tool.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/App-cpanminus-reporter">App-cpanminus-reporter</a> 
+                (<a href="https://github.com/garu/App-cpanminus-reporter">GitHub</a> / 
+                <a href="https://rt.cpan.org/Dist/Display.html?Name=App-cpanminus-reporter">RT Queue</a>)</li>
+          </ul>
+
+          <h3>Common Smoker Client Packages</h3>
+          <p>The following downloads relate to the common libraries used by the smoke test clients.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/Test-Reporter">Test-Reporter</a> 
+                (<a href="https://github.com/dagolden/test-reporter">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Reporter">RT Queue</a>)</li>
+          </ul>
+
+
+          <a name="metabase"></a>
+          <h2 class="rule">Metabase Tools</h2>
+          <h3>Metabase Server Packages</h3>
+          <p>The following downloads relate to the packages to access the Metabase server.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/Metabase">Metabase</a> 
+                (<a href="https://github.com/dagolden/metabase">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Metabase">CPAN-Testers-Metabase</a> 
+                (<a href="https://github.com/dagolden/cpan-testers-metabase">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Metabase">RT Queue</a>)</li>
+          </ul>
+
+          <h3>Metabase Client Packages</h3>
+          <p>The following downloads relate to the packages to submit reports to the Metabase server.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/Metabase-Client-Simple">Metabase-Client-Simple</a> 
+                (<a href="https://github.com/dagolden/metabase-client-simple">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Client-Simple">RT Queue</a>)</li>
+          </ul>
+
+          <h3>Metabase Common Packages</h3>
+          <p>The following downloads relate to the packages used to define the contents of the Metabase (i.e. the facts).</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/Metabase-Fact">Metabase-Fact</a> 
+                (<a href="https://github.com/dagolden/metabase-fact">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase-Fact">RT Queue</a>)</li>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Report">CPAN-Testers-Report</a> 
+                (<a href="https://github.com/dagolden/cpan-testers-report">GitHub</a> / 
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Report">RT Queue</a>)</li>
+          </ul>
+
+          <a name="database"></a>
+          <h2 class="rule">Database Tools</h2>
+
+          <h3>CPAN Testers Statistics Database Generator</h3>
+          <p>Downloads for the CPAN Testers 'cpanstats' database</p>
+          <p>The following data files and tools are provided for use in building and expanding the data storage, used
+          by the CPAN Testers family of websites, containing the reports metadata as posted to the cpan-testers
+          mailing list by the testers.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Data-Generator">CPAN-Testers-Data-Generator</a> (<a href="https://github.com/barbie/cpan-testers-data-generator">GitHub</a> / <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator">RT queue</a>)</li>
+          </ul>
+
+          <p>The SQLite database that was previously available for download is no longer maintained.</p>
+
+          <h3>CPAN Testers Upload Database Generator</h3>
+          <p>Downloads for the CPAN Testers 'uploads' database</p>
+          <p>The following data files and tools are provided for use in building and expanding the data storage, used
+          by the CPAN Testers family of websites, containing the uploads metadata as posted to the cpan-uploads
+          mailing list by PAUSE.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Data-Uploads">CPAN-Testers-Data-Uploads</a> 
+            (<a href="https://github.com/barbie/cpan-testers-data-uploads">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Uploads">RT queue</a>)</li>
+            <li><a href="https://metacpan.org/release/ORDB-CPANUploads">ORDB-CPANUploads</a></li>
+          </ul>
+
+          <p>Uncompressed size of the SQLite database is <b>[% UPLOADSDB %]</b>.</p>
+          <ul>
+            <li>Latest SQLite database: <a rel="nofollow" href="/uploads/uploads.db.gz"  >Gzip </a> (<b>[% UPLOADSSQLGZ %]</b>) / 
+                                        <a rel="nofollow" href="/uploads/uploads.db.bz2" >Bzip2</a> (<b>[% UPLOADSSQLBZ %]</b>)</li>
+            <li>Latest CSV database:    <a rel="nofollow" href="/uploads/uploads.csv.gz" >Gzip </a> (<b>[% UPLOADSCSVGZ %]</b>) / 
+                                        <a rel="nofollow" href="/uploads/uploads.csv.bz2">Bzip2</a> (<b>[% UPLOADSCSVBZ %]</b>)</li>
+          </ul>
+
+          <h3>CPAN Testers Release Summary Database Generator</h3>
+          <p>Downloads for the CPAN Testers 'release' database</p>
+          <p>The following data files and tools are provided for use in building the data storage, used
+          by the CPAN Testers family of websites, containing the release summary metadata.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Data-Release">CPAN-Testers-Data-Release</a> 
+            (<a href="https://github.com/barbie/CPAN-Testers-Data-Release">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Release">RT queue</a>)</li>
+            <li><a href="https://metacpan.org/release/ORDB-CPANRelease">ORDB-CPANRelease</a></li>
+          </ul>
+
+          <p>Uncompressed size of the SQLite database is <b>[% RELEASEDB %]</b>.</p>
+          <ul>
+            <li>Latest SQLite database: <a rel="nofollow" href="/release/release.db.gz" >Gzip </a> (<b>[% RELEASEGZ %]</b>) / 
+                                        <a rel="nofollow" href="/release/release.db.bz2">Bzip2</a> (<b>[% RELEASEBZ %]</b>)</li>
+          </ul>
+
+          <a name="website"></a>
+          <h2 class="rule">Website Packages</h2>
+
+          <h3>CPAN Testers Statistics</h3>
+          <p>Downloads for the CPAN Testers Statistics website</p>
+          <p>The following data files and tools are provided for use in building and expanding the website.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Statistics">CPAN-Testers-WWW-Statistics</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-statistics">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Statistics">RT queue</a>)</li>
+            <li><a href="/cpanstats-data-latest.tar.gz">cpanstats-data-latest.tar.gz</a></li>
+          </ul>
+
+          <h3>CPAN Testers Reports</h3>
+          <p>Downloads for the CPAN Testers Reports website</p>
+          <p>The following data files and tools for building the current website are not currently available. 
+          This will change as soon as I have time to properly package all the moving parts.
+          Note that this is a <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> based site.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Reports">CPAN-Testers-WWW-Reports</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-reports">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Reports Parser</h3>
+          <p>Downloads for the CPAN Testers reports data parser</p>
+          <p>The following data files and tools are used to parse the YAML and JSON files stored on the Reports website.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Reports-Parser">CPAN-Testers-WWW-Reports-Parser</a> 
+            (<a href="https://github.com/barbie/CPAN-Testers-WWW-Reports-Parser">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Parser">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Reports Mailer</h3>
+          <p>Downloads for the CPAN Testers reports summary mailer</p>
+          <p>The following data files and tools are used to parse the reports data and mail the summaries to authors.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Reports-Mailer">CPAN-Testers-WWW-Reports-Mailer</a> 
+            (<a href="https://github.com/barbie/CPAN-Testers-WWW-Reports-Mailer">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Mailer">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Wiki</h3>
+          <p>Downloads for the CPAN Testers Wiki website</p>
+          <p>The following data files and tools are provided for use in building and expanding the website. 
+          Note that this is a <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> based site.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Wiki">CPAN-Testers-WWW-Wiki</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-wiki">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Wiki">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Blog</h3>
+          <p>Downloads for the CPAN Testers Blog website</p>
+          <p>The following data files and tools are provided for use in building and expanding the website. 
+          Note that this is a <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> based site.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Blog">CPAN-Testers-WWW-Blog</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-blog">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Blog">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Preferences</h3>
+          <p>Downloads for the CPAN Testers Preferences website</p>
+          <p>The following data files and tools for building the current website are not currently available. 
+          This will change as soon as I have time to properly package all the moving parts.
+          Note that this is a <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> based site.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Preferences">CPAN-Testers-WWW-Blog</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-preferences">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Preferences">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Admin</h3>
+          <p>Downloads for the CPAN Testers Admin website</p>
+          <p>The following data files and tools are provided for use in building and expanding the website. 
+          Note that this is a <a href="http://labyrinth.missbarbell.co.uk">Labyrinth</a> based site.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Admin">CPAN-Testers-WWW-Admin</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-admin">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Admin">RT queue</a>)</li>
+          </ul>
+
+          <h3>CPAN Testers Development</h3>
+          <p>Downloads for the CPAN Testers Development website</p>
+          <p>The following data files and tools for building the current website are not currently available. 
+          This will change as soon as I have time to properly package all the moving parts.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-WWW-Development">CPAN-Testers-WWW-Blog</a> 
+            (<a href="https://github.com/barbie/cpan-testers-www-development">GitHub</a> / 
+            <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Development">RT queue</a>)</li>
+          </ul>
+
+
+          <a name="common"></a>
+          <h2 class="rule">Additional Packages</h2>
+
+          <h3>CPAN Testers Common Code</h3>
+          <p>Downloads for commonly used code required by the CPAN Testers applications listed above</p>
+          <p>The following package files are provided for use in building and expanding the CPAN Testers code base. If you have
+          suggestions for improving the codebase, please use the respective bug trackers listed below.</p>
+          <ul>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Common-Article">CPAN-Testers-Common-Article</a> (<a href="https://github.com/barbie/cpan-testers-common-article">GitHub</a>) -
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Common-Article">RT queue</a></li>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Common-DBUtils">CPAN-Testers-Common-DBUtils</a> (<a href="https://github.com/barbie/cpan-testers-common-dbutils">GitHub</a>) -
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Common-DBUtils">RT queue</a></li>
+            <li><a href="https://metacpan.org/release/CPAN-Testers-Common-Utils">CPAN-Testers-Common-Utils</a> (<a href="https://github.com/dagolden/cpan-testers-common-utils">GitHub</a>) -
+                <a href="http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Common-Utils">RT queue</a></li>
+          </ul>
+ 
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    <div class="footer">
+      <p>
+        CPAN Testers Development v[% VERSION %].
+        &copy; 2008-2016 CPAN Testers. Comments and design patches to <a href="mailto:barbie@cpan.org">barbie@cpan.org</a>.
+      </p>
+    
+      <p>
+        The CPAN Testers Family: <br />
+        <a href="http://blog.cpantesters.org"     title="CPAN Testers Blog"       >Blog</a>         &#8226;
+        <a href="http://www.cpantesters.org"      title="CPAN Testers Reports"    >Reports</a>      &#8226;
+        <a href="http://wiki.cpantesters.org"     title="CPAN Testers Wiki"       >Wiki</a>         &#8226;
+        <a href="http://stats.cpantesters.org"    title="CPAN Testers Statistics" >Statistics</a>   &#8226;
+        <a href="http://pass.cpantesters.org"     title="CPAN Testers PASS Matrix">PASS Matrix</a>  &#8226;
+        <a href="http://prefs.cpantesters.org"    title="CPAN Testers Preferences">Preferences</a>  &#8226;
+        <a href="http://metabase.cpantesters.org" title="CPAN Testers Metabase"   >Metabase</a>     &#8226;
+        <a href="http://devel.cpantesters.org"    title="CPAN Testers Development">Development</a>  &#8226;
+        <a href="http://deps.cpantesters.org"     title="CPAN Dependencies"       >Dependencies</a> &#8226;
+        <a href="http://matrix.cpantesters.org"   title="CPAN Testers Matrix"     >Matrix</a>       &#8226;
+        <a href="http://analysis.cpantesters.org" title="CPAN Testers Analysis"   >Analysis</a>     &#8226;
+        <a href="http://admin.cpantesters.org"    title="CPAN Testers Admin"      >Admin</a>
+      </p>
+
+      <p>
+        CPAN Testers, supporting the Perl programming language since 1999.
+      </p>
+    </div>
+
+  </div> 
+
+  <script type="text/javascript" src="/js/iheart.js"></script>
+
+</body>
+</html>

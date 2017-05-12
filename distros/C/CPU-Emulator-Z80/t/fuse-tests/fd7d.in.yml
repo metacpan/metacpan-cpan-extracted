@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 125
+name: fd7d
+registers:
+  AF: 37861
+  AF_: 0
+  BC: 15550
+  BC_: 0
+  DE: 707
+  DE_: 0
+  HL: 9922
+  HL_: 0
+  I: 0
+  IX: 51841
+  IY: 37561
+  PC: 0
+  R: 0
+  SP: 0

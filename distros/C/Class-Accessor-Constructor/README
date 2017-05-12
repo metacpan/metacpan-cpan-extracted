@@ -1,0 +1,219 @@
+NAME
+    Class::Accessor::Constructor - Constructor generator
+
+VERSION
+    version 1.111590
+
+SYNOPSIS
+      package MyClass;
+      use base 'Class::Accessor::Constructor';
+      __PACKAGE__->mk_constructor;
+
+DESCRIPTION
+    This module generates accessors for your class in the same spirit as
+    Class::Accessor does. While the latter deals with accessors for scalar
+    values, this module provides accessor makers for rather flexible
+    constructors.
+
+    The accessor generators also generate documentation ready to be used
+    with Sub::Documentation.
+
+METHODS
+  mk_constructor
+    Takes an array of strings as its argument. If no argument is given, it
+    uses "new" as the default. For each string it creates a class
+    constructor which is quite powerful and flexible. It supports
+
+    "customizable munging of arguments"
+    "customizable sorting of arguments"
+    "inherited default values"
+    "an optional init() method"
+
+    The constructor accepts named arguments - that is, a hash - and will set
+    the hash values on the accessor methods denoted by the keys. For
+    example,
+
+        package MyClass;
+        use base 'Class::Accessor::Constructor';
+        __PACKAGE__->mk_constructor;
+
+        package main;
+        use MyClass;
+
+        my $o = MyClass->new(foo => 12, bar => [ 1..5 ]);
+
+    is the same as
+
+        my $o = MyClass->new;
+        $o->foo(12);
+        $o->bar([1..5]);
+
+    The constructor will also call an "init()" method, if there is one.
+
+    The arguments are munged beforehand - if a single argument is a hashref
+    is passed in, it is expanded out, the the key/value pairs - whether
+    originally as a hash ref or a list - may be reordered as typically
+    occurs with perl hashes.
+
+    For example:
+
+        package Simple;
+        use base 'Class::Accessor::Constructor';
+
+        __PACKAGE__
+            ->mk_constructor
+            ->mk_accessors(qw(a b));
+
+        use constant DEFAULTS => (a => 7, b => 'default') ;
+
+    Somewhere else:
+
+        use Simple;
+        my $test1 = Simple->new;                  # now a == 7, b == 'default'
+        my $test2 = Simple->new(a => 1);          # now a == 1, b == 'default'
+        my $test3 = Simple->new(a => 1, b => 2);  # now a == 1, b == 2
+
+    Defaults can be inherited per Data::Inherited's "every_hash()". Example:
+
+        package A;
+        use base 'Class::Accessor::Constructor';
+
+        __PACKAGE__->mk_constructor->mk_accessors(qw(a b));
+
+        use constant DEFAULTS => (a => 7, b => 'default');
+
+    and
+
+        package B;
+        use base 'A';
+        use constant DEFAULTS => (a => 23);
+
+    then
+
+        use A;
+        use B;
+        my $test1 = A->new;   # now a ==  7, b == 'default'
+        my $test2 = B->new;   # now a == 23, b == 'default'
+
+    If a class wants to order some args first, it can define a
+    "FIRST_CONSTRUCTOR_ARGS()" list, which will be cumulative over
+    inheritance tree due to Data::Inherited. "FIRST_CONSTRUCTOR_ARGS()"
+    should return a list of argument names that have to come first; if a
+    constructor is called, those arguments are set first, whereas the other
+    ones are set in an unspecified order.
+
+    Example:
+
+        package Simple;
+        use base 'Class::Accessor::Constructor';
+
+        __PACKAGE__->mk_constructor->mk_accessors(qw(b));
+
+        use constant FIRST_CONSTRUCTOR_ARGS => ('b');
+
+        # make 'a' dependent on 'b'
+        sub a {
+            return $_[0]->{a} if @_ == 1;
+            $_[0]->{a} = $_[1] + $_[0]->b;
+        }
+
+    then
+
+        my $test = Simple->new(a => 1, b => 2);
+
+    will set "b" first, then set "a" (to 3).
+
+    As mentioned, arguments are munged beforehand automatically, but you can
+    also customize the munging. By default,
+
+        my $test = Simple->new(a => 1, b => 2)
+
+    is the same as
+
+        my $test = Simple->new({ a => 1, b => 2 })
+
+    Suppose you have a class that has one preferred accessor, and you want
+    to simplify its usage so that if the constructor is called with a single
+    value, it is passed to that preferred accessor.
+
+    Given that the "Simple" class defines
+
+        sub MUNGE_CONSTRUCTOR_ARGS {
+            my $self = shift;
+            return %{ $_[0] }    if @_ == 1 && ref($_[0]) eq 'HASH';
+            return (b => @_) if @_ % 2;      # odd number of args
+            return @_;
+        }
+
+    then an object could be constructed like this
+
+        my $test = Simple->new('blah');
+
+    which would be munged to be equivalent to
+
+        my $test = Simple->new(b => 'blah');
+
+    If you define an "init()" method, the constructor calls it with the
+    munged args as the very last thing.
+
+  mk_constructor_with_dirty
+    Like "mk_constructor()", but also keeps track of whether the object has
+    been modified. This is useful, for example, when you have read the
+    object from a storage and at the end you want to write it back if it has
+    changed. This method generated saves you from having to update a
+    dirty-flag in each accessor. It achieves its purpose by doing a tie() on
+    the blessed hash that is the object, so there is some performance
+    penalty. But it also works when someone tries to break encapsulation by
+    accessing hash elements directly instead of going via the accessors. See
+    Class::Accessor::Constructor::Base for details.
+
+    If you want that behaviour only in a part of your inheritance tree,
+    redefine the constructor at the appropriate point. For example:
+
+        package Foo;
+        use base 'Class::Accessor::Constructor';
+
+        __PACKAGE__->mk_constructor;
+
+        package Bar;
+        use base 'Foo';
+        __PACKAGE__->mk_constructor_with_dirty;
+
+    Now objects of type "Foo" will not keep a dirty-flag, but objects of
+    type "Bar" and its descendants will.
+
+  mk_singleton_constructor
+    Like "constructor" but constructs a singleton object.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Constru
+    ctor>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Class-Accessor-Constructor/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Class-Accessor-Constructor> and may be
+    cloned from <git://github.com/hanekomu/Class-Accessor-Constructor.git>.
+    Instead of sending patches, please fork this project using the standard
+    git and github infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 148
+name: dd94
+registers:
+  AF: 32497
+  AF_: 0
+  BC: 40702
+  BC_: 0
+  DE: 28321
+  DE_: 0
+  HL: 64597
+  HL_: 0
+  I: 0
+  IX: 2569
+  IY: 35269
+  PC: 0
+  R: 0
+  SP: 0

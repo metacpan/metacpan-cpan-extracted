@@ -1,0 +1,151 @@
+{
+   "selection" : 0,
+   "worksheets" : [
+      {
+         "cells" : [
+            [
+               {
+                  "contents" : "Colored Cell",
+                  "format" : {
+                     "bg_color" : "#9BBB59",
+                     "color" : "#FFFF00",
+                     "pattern" : "solid",
+                     "size" : 12
+                  },
+                  "type" : "string"
+               },
+               {
+                  "contents" : "Wide Cell (25.00)",
+                  "type" : "string"
+               },
+               {
+                  "contents" : "Bordered Cell w/ Text Wrap",
+                  "format" : {
+                     "border" : [
+                        "thin",
+                        "thin",
+                        "thin",
+                        "thin"
+                     ],
+                     "border_color" : [
+                        "#000000",
+                        "#000000",
+                        "#000000",
+                        "#000000"
+                     ],
+                     "text_wrap" : true
+                  },
+                  "type" : "string"
+               },
+               {
+                  "contents" : "Middle Valigned",
+                  "format" : {
+                     "valign" : "vcenter"
+                  },
+                  "type" : "string"
+               },
+               {
+                  "contents" : "Right Aligned and text wrapped",
+                  "format" : {
+                     "align" : "right",
+                     "text_wrap" : true
+                  },
+                  "type" : "string"
+               }
+            ],
+            [
+               {},
+               {},
+               {},
+               {},
+               {}
+            ],
+            [
+               {
+                  "contents" : 10,
+                  "type" : "number"
+               },
+               {},
+               {},
+               {},
+               {}
+            ],
+            [
+               {
+                  "contents" : 20,
+                  "type" : "number"
+               },
+               {},
+               {},
+               {
+                  "contents" : 2.5,
+                  "format" : {
+                     "num_format" : "\"$\"#,##0.00"
+                  },
+                  "type" : "number"
+               },
+               {
+                  "contents" : "<< currency cell",
+                  "format" : {
+                     "align" : "center",
+                     "color" : "#4BACC6",
+                     "size" : 12
+                  },
+                  "type" : "string"
+               }
+            ],
+            [
+               {
+                  "contents" : 30,
+                  "type" : "number"
+               },
+               {},
+               {},
+               {},
+               {}
+            ],
+            [
+               {
+                  "contents" : 60,
+                  "formula" : "SUM(A3:A5)",
+                  "type" : "number"
+               },
+               {
+                  "contents" : "<< formula cell",
+                  "format" : {
+                     "align" : "right",
+                     "bg_color" : "#EEECE1",
+                     "color" : "#F79646",
+                     "pattern" : "solid",
+                     "size" : 12
+                  },
+                  "type" : "string"
+               },
+               {},
+               {},
+               {}
+            ]
+         ],
+         "column_widths" : [
+            10.83203125,
+            25.83203125,
+            10,
+            15,
+            18.1640625
+         ],
+         "name" : "Sheet1",
+         "row_heights" : [
+            45,
+            15,
+            15,
+            15,
+            15,
+            15
+         ],
+         "selection" : [
+            3,
+            4
+         ]
+      }
+   ]
+}

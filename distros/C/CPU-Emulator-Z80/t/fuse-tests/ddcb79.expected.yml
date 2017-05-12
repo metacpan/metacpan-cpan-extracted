@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb79
+registers:
+  AF: 59024
+  AF_: 0
+  BC: 61098
+  BC_: 0
+  DE: 16887
+  DE_: 0
+  HL: 23970
+  HL_: 0
+  I: 0
+  IX: 16862
+  IY: 16777
+  PC: 4
+  R: 2
+  SP: 0

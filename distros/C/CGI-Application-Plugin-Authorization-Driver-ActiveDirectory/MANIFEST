@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Application-Plugin-Authorization-Driver-ActiveDirectory.t
+lib/CGI/Application/Plugin/Authorization/Driver/ActiveDirectory.pm

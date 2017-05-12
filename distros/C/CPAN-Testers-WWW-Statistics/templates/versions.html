@@ -1,0 +1,21 @@
+[% 
+    box_sites = 1 ;
+
+    title = type _ ' Versions';
+    crumb2_name = 'New Distributions' ;
+    crumb2_href = '/newdistros.html' ;
+    crumb1_name = type _ ' Versions' ;
+%]
+
+[% IF type == 'New' %]
+<p>The versions listed below are the versions used by distributions when submitted to the CPAN for the first time.</p>
+[% ELSE %]
+<p>The versions listed below are all the versions used by distributions when submitted to the CPAN.</p>
+[% END %]
+
+<table class="sortable">
+<tr><th class="top">Version</th><th class="top">Count</th></tr>
+[% FOREACH vers = versions %]
+<tr><td>[% vers.version %]</td><td>[% vers.count %]</td></tr>
+[% END %]
+</table>

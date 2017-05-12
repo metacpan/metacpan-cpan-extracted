@@ -1,0 +1,5 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+<http://example.org> a rdfs:Resource ;
+  <http://example.org/foo> "b\u00e4r"@en ; 
+  <http://purl.org/dc/elements/1.1/title> "B\u00c4R" ;
+  <http://purl.org/dc/elements/1.1/extent> 42 .

@@ -1,0 +1,20 @@
+[% # generic view.tt page.
+   # just like edit.tt but all fields are readonly
+   
+    UNLESS fields.defined;
+        SET fields = { order = [], readonly = {} };
+    END;
+    UNLESS fields.order.size;
+        fields.order    = form.field_names_by_rank;
+    END;
+    UNLESS fields.readonly.size;
+        FOREACH f = fields.order;
+            fields.readonly.$f = 1;
+        END;
+    END;
+
+    SET CRUD_MODE  = 'view';
+    SET EDITMODE = 0;
+    PROCESS crud/edit.tt;
+   
+%]

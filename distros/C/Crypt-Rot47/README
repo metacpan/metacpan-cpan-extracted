@@ -1,0 +1,44 @@
+Crypt::Rot47 version 0.06
+================================
+
+This module applies the ROT47 substitution cipher to ASCII text, thereby scrambling
+it and making it difficult for others to read. Applying the same ROT47 substitution
+cipher on the scrambled text will then restore the original text.
+
+The ROT47 substitution cipher is a very simple form of encryption that works simply by
+rotating the ASCII characters from '!" to '~' by 47 positions (hence its name). Therefore,
+spaces in the plain text remain unchanged, but other characters are replaced with their
+rotated equivalents.
+
+For example, a 'B' (ASCII 66) becomes a 'q' (ASCII 113) because 66 + 47 = 113. When the
+sum exceeds ASCII 126 ('~'), it simply wraps around starting at ASCII 33 ('!').
+
+Because there are 94 characters between '!' and '~' in the ASCII table, rotating them
+twice by 47 places has no net effect. Therefore, encryption and decryption are identical
+operations with ROT47.
+
+For more information about ROT47, see L<http://en.wikipedia.org/wiki/ROT13>.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Zachary Blair
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

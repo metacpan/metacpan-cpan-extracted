@@ -1,0 +1,7 @@
+Revision history for CGI-ACL
+
+0.02	Tue Feb 21 11:11:32 EST 2017
+	Fixed t/country.t
+
+0.01	Wed Feb 15 15:52:08 EST 2017
+        First draft

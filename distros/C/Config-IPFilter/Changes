@@ -1,0 +1,31 @@
+Version 1.00 | 2011-02-01 15:34:19Z (Tue, 01 Feb 2011) | 53e0787
+
+    Notes:
+     * PAUSE choked on v0.99 so 1.00 brings nothing new
+
+Version 0.99 | 2010-12-27 05:26:21Z (Mon, 27 Dec 2010) | c785a0b
+
+    API Changes/Compatibility Information:
+     * See below
+
+    Resolved Issues/Bug Fixes:
+     * See below
+
+    Protocol/Behavioral Changes:
+     * It exists
+
+    Documentation/Sample Code/Test Suite:
+     * See above
+
+    Notes:
+     * This code was originally included with Net::BitTorrent as
+        Net::BitTorrent::Network::IPFilter
+
+
+_ -.-. .... .- -. --. . ... _________________________________________
+For more information, see the commit log:
+    http://github.com/sanko/config-ipfilter/commits/
+
+$Ver: 1.00 $ from git $Rev: 53e0787 $
+$Date: 2011-02-01 15:34:19Z (Tue, 01 Feb 2011) $
+$Url: http://github.com/sanko/config-ipfilter/tree//raw/master/Changes $

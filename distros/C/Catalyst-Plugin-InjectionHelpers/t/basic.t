@@ -1,0 +1,144 @@
+use Scalar::Util qw/refaddr/;
+
+BEGIN {
+  use Test::Most;
+  eval "use Catalyst 5.90090; 1" || do {
+    plan skip_all => "Need a newer version of Catalyst => $@";
+  };
+}
+
+BEGIN {
+  package MyApp::Role::Foo;
+  $INC{'MyApp/Role/Foo.pm'} = __FILE__;
+
+  use Moose::Role;
+
+  sub foo { 'foo' }
+
+  package MyApp::Singleton;
+  $INC{'MyApp/Singleton.pm'} = __FILE__;
+
+  use Moose;
+
+  has aaa => (is=>'ro', required=>1);
+  has bbb => (is=>'ro');
+
+  package MyApp::PerRequest;
+  $INC{'MyApp/PerRequest.pm'} = __FILE__;
+
+  use Moose;
+
+  has ctx => (
+    is=>'ro',
+    required=>1,
+    isa=>'Object',
+    weak_ref=>1);
+}
+
+{
+  package MyApp::Model::Normal;
+  $INC{'MyApp/Model/Normal.pm'} = __FILE__;
+
+  use Moose;
+  extends 'Catalyst::Model';
+
+  has ccc => (is=>'ro', required=>1);
+
+  package MyApp::Controller::Example;
+  $INC{'MyApp/Controller/Example.pm'} = __FILE__;
+
+  use base 'Catalyst::Controller';
+
+  sub test :Local Args(0) {
+    my ($self, $c) = @_;
+    $c->res->body('test');
+  }
+
+  sub per_session :Local Args(0) {
+    my ($self, $c) = @_;
+    $c->res->body($c->model('PerSession')->request_name);
+  }
+
+  package MyApp;
+  use Catalyst qw/
+    InjectionHelpers
+    Session
+    Session::Store::Dummy
+    Session::State::Cookie/;
+
+  MyApp->inject_components(
+    'Model::FromCode' => { from_code => sub { my ($adaptor, $code, $app, %args) = @_;  return bless {a=>1}, 'AAAA' } },
+    'Model::SingletonA' => { from_class=>'MyApp::Singleton', adaptor=>'Application', roles=>['MyApp::Role::Foo'], method=>'new' },
+    'Model::SingletonB' => {
+      from_class=>'MyApp::Singleton', 
+      adaptor=>'Application', 
+      roles=>['MyApp::Role::Foo'], 
+      method=>sub {
+        my ($adaptor, $class, $app, %args) = @_;
+        return $class->new(aaa=>$args{arg});
+      },
+    },
+    'Model::PerRequest2' => {
+      from_class=>'MyApp::PerRequest',
+      adaptor=>'PerRequest',
+      roles=>['MyApp::Role::Foo'],
+      method=>sub {
+        my ($adaptor, $class, $ctx, %args) = @_;
+        return $class->new(ctx=>$ctx);
+      },
+    },
+    'Model::Factory' => { from_class=>'MyApp::Singleton', adaptor=>'Factory' },
+    'Model::PerRequest' => { from_class=>'MyApp::Singleton', adaptor=>'PerRequest' },
+  );
+
+  MyApp->config(
+    'Model::SingletonA' => { aaa=>100 },
+    'Model::SingletonB' => { arg=>300 },
+    'Model::Factory' => {aaa=>444},
+    'Model::Normal' => { ccc=>200 },
+  );
+
+  MyApp->setup;
+}
+
+use Catalyst::Test 'MyApp';
+use HTTP::Request::Common;
+
+{
+  my ($res, $c) = ctx_request( '/example/test' );
+  is $c->model('Normal')->ccc, 200;
+  is $c->model('SingletonA')->aaa, 100;
+  is $c->model('SingletonA')->foo, 'foo';
+  is $c->model('SingletonB')->aaa, 300;
+  is $c->model('SingletonB')->foo, 'foo';
+  is refaddr($c->model('SingletonB')), refaddr($c->model('SingletonB'));
+  is $c->model('FromCode')->{a}, 1;
+  ok $c->model('PerRequest2')->ctx->isa('MyApp');
+
+  {
+    ok my $f = $c->model('Factory', bbb=>'bbb');
+    is $f->aaa, 444;
+    is $f->bbb, 'bbb';
+    isnt refaddr($f), refaddr($c->model('Factory'));
+    isnt refaddr($c->model('Factory')), refaddr($c->model('Factory'));
+  }
+
+  {
+    ok my $p = $c->model('PerRequest', aaa=>1, bbb=>2);
+    is $p->aaa, 1;
+    is $p->bbb, 2;
+    is refaddr($p), refaddr($c->model('PerRequest'));
+
+    {
+      my ($res, $c) = ctx_request( '/example/test' );
+      ok my $p2 = $c->model('PerRequest', aaa=>3, bbb=>4);
+      is $p2->aaa, 3;
+      is $p2->bbb, 4;
+      is refaddr($p2), refaddr($c->model('PerRequest'));
+      isnt refaddr($p), refaddr($c->model('PerRequest'));
+      isnt refaddr($p), refaddr($p2);
+    }
+  }
+}
+
+done_testing;

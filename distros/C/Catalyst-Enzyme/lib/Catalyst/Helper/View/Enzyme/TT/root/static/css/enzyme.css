@@ -1,0 +1,258 @@
+html {
+  padding-right: 0px;
+  padding-left: 0px; 
+  padding-bottom: 0px; 
+  margin: 0px; 
+  padding-top: 0px
+}
+body {
+  font-family: sans-serif;
+  padding-right: 0px; 
+  padding-left: 0px; 
+  padding-bottom: 0px;
+  margin: 0px;
+  padding-top: 0px;
+  background-color: #FFFFCC;/*c1*/
+}
+
+.content {
+  padding: 16px;
+}
+
+
+a { 
+  text-decoration: none; 
+  color: #336699;/*c2*/
+}
+
+a:hover { 
+  text-decoration: underline; 
+  color: #003399;/*c2-highlight*/
+}
+
+
+/* CRUD Tables*/
+
+table {
+  margin-top: 1em;
+}
+
+#matrix {
+  width: 100%;
+  font: 12px Verdana, sans-serif;
+}
+
+#matrix th {
+  background-color: #99CC99;/*c3*/
+  border: 1px solid #000000;
+  font: bold 12px Verdana, sans-serif;
+}
+
+#matrix tr.alternate {
+  background-color: #DDDDAA;/*c1-light*/
+}
+
+#matrix tr:hover {
+  background-color: #CCCC99;/*c1-dark*/
+}
+
+#matrix #actionth {
+  width: 1px; 
+  padding: 0em 1em 0em 1em;
+}
+
+#matrix .actions {
+  white-space: nowrap;
+}
+
+
+
+
+#title {
+  width: 100%;
+  height: 18px;
+  margin-top: 10px;
+  font-size: 90%;
+  border-bottom: 1px solid #ddf;
+  text-align: left;
+}
+
+
+.message {
+  margin-top: 1em;
+  padding: 0.5em;
+  background-color: #DDDDAA;/*c1-light*/
+  font: bold 80%/1 sans-serif;
+  border:1px solid #000000;
+}
+
+
+.error {
+  color: #dd0000;/*c erorr-text*/
+  background-color: #DDDDAA;/*c1-light*/
+  border: 1px solid #000000;
+  margin-top: 1em;
+  padding: 0.5em;
+  font: 60%/1 sans-serif;
+}
+
+
+
+
+/* add/edit */
+
+fieldset {
+  padding: 1em;
+  margin-top: 1em;
+  background-color: #DDDDAA;/*c1-light*/
+  font: 0.8em sans-serif;
+  border:1px solid #000000;
+}
+
+legend {
+  padding: 0.15em 0.7em;
+  background-color: #99CC99;/*c3*/
+  border: 1px solid #000000;
+  font: bold 12px Verdana, sans-serif;
+
+}
+
+label {
+  display:block;
+  padding-bottom: 1em;
+}
+
+label .input_field {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  font-weight:bold;
+}
+
+label .input_field a {
+  color: #000000;
+}
+
+label .input_field a:hover {
+  color: #336699;/*c2*/
+}
+
+
+label input {
+  width: 50%;
+}
+
+label select {
+  width: 50%;
+}
+
+label textarea {
+  width: 50%;
+}
+
+fieldset input[type=submit] {
+  width: 60px;
+  font-family: sans-serif;
+  border: 1px outset;
+  background-color: #CCCC99;/*c1-dark*/
+  padding: 0px 0px 2px 0px;
+//  margin-bottom: 5px;
+}
+
+fieldset input:hover[type=submit] {
+  background-color: #DDDDAA;/*c1-light*/
+//  color: #003399;/*c2-highlight*/
+}
+
+fieldset .error_text {
+  color: #dd0000;/*c erorr-text*/
+}
+
+
+
+/* view */
+
+span .item_field_data {
+  display:block;
+}
+
+span .item_field {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-bottom:0.2em;
+  text-align:right;
+  font-weight:bold;
+}
+
+span .item_field a {
+  color: #000000;
+}
+
+span .item_field a:hover {
+  color: #336699;/*c2*/
+}
+
+span .item_data {
+  width:75%;
+  margin-right: 0.5em;
+}
+
+.item_local_action {
+  float: right;
+}
+
+
+
+
+
+
+.pager {
+  font: 11px Arial, Helvetica, sans-serif;
+  text-align: center;
+  border-left: 0;
+  border-right: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: 0px;
+}
+
+.pager a {
+  background: #DDDDAA;/*c1-light*/
+  padding: 2px 6px;
+  border: solid 1px #CCCC99;/*c1-dark*/
+  text-decoration: none;
+}
+
+.pager a:hover {
+/*  color: #fff;*/
+  background: #CCCC99;/*c1-dark*/
+  border-color: #003399;/*c2-highlight*/
+  text-decoration: none;
+}
+
+.pager .pager_current_page {
+  padding: 2px 6px;
+  font-weight: bold;
+  border: solid 1px #CCCC99;/*c1-dark*/
+  background: #CCCC99;/*c1-dark*/
+  text-decoration: none;
+}
+
+.pager .pager_previous {
+  color:#aaa;
+  padding: 2px 6px;
+  border: solid 1px #CCCC99;/*c1-dark*/
+  background: #DDDDAA;/*c1-light*/
+  text-decoration: none;
+}
+
+.pager .pager_next {
+  color:#aaa;
+  padding: 2px 6px;
+  border: solid 1px #CCCC99;/*c1-dark*/
+  background: #DDDDAA;/*c1-light*/
+  text-decoration: none;
+}

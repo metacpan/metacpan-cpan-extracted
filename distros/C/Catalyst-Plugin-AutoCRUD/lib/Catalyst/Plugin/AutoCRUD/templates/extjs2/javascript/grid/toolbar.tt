@@ -1,0 +1,58 @@
+    // this is the bar at the top of the grid
+
+    var toolbar = new Ext.Toolbar({
+        id: 'toolbar'
+        ,items: [
+            {
+                text: 'Clear Filters'
+                ,cls: 'x-btn-text-icon'
+                ,icon: '[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "bin_closed.png" ) %]'
+                // XXX private method to refresh
+                ,handler: function (){
+                    store.baseParams = {}; // clear search opts
+                    // need to remove query string to reset
+                    store.proxy.conn.url = '[% c.uri_for( c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list'),
+                                                    [cpac.g.site,cpac_db,cpac_table] ) %]'
+                    [% IF cpac.g.site == 'default' %]
+                    Ext.get('cpac_browse_link').set({href: '[% c.uri_for( c.controller('AutoCRUD::Root').action_for('table'),
+                            [cpac_db], cpac_table, 'browse' ) %]'});
+                    [% ELSE %]
+                    Ext.get('cpac_browse_link').set({href: '[% c.uri_for( c.controller('AutoCRUD::Root').action_for('source'),
+                            [cpac.g.site,cpac_db], cpac_table, 'browse' ) %]'});
+                    [% END %]
+                    pagebar.doLoad(pagebar.cursor);
+                }
+            }
+            ,' ' ,{
+                text: 'Apply Filters'
+                ,cls: 'x-btn-text-icon'
+                ,icon: '[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "find.png" ) %]'
+                ,handler: function (){
+                    var params = {};
+                    var searchrow = grid.getStore().getAt(0).data;
+                    for (var key in searchrow) {
+                        var curval = searchrow[key] + ''; // stringify to allow indexOf
+                        if ((curval.indexOf('(click to add filter)') !== -1) || (curval === '')) {
+                            // don't submit if still the default, or empty
+                            continue;
+                        }
+                        params['cpac_filter.' + key] = curval;
+                    }
+                    store.baseParams = params;
+                    pagebar.doLoad(0); // reset to first page
+                }
+            }
+          [% IF cpac.tc.create_allowed == 'yes' %]
+            ,'->' ,{
+                text: 'Add New [% cpac.tc.display_name %]'
+                ,cls: 'x-btn-text-icon'
+                ,icon: '[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "add.png" ) %]'
+                ,handler: function(){
+                    // draw the window!
+                    var win = generate_win('create');
+                    win.show(this);
+                }
+            }
+          [% END %]
+        ]
+    });

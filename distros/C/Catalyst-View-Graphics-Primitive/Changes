@@ -1,0 +1,23 @@
+Revision history for Catalyst-View-Graphics-Primitive
+
+0.06    2014-01-04
+  - Use Class::Load (reported by Lucas Moraes)
+
+0.05    November 19, 2009
+  - Fix broken M:I
+
+0.04
+  - Remove Pod::Coverage::Moose dependency (rafl)
+  - Don't pass undef to a Moose constructor (rafl)
+  - Remove useless new method (gphat)
+  - Move pod tests to xt/author (gphat)
+
+0.03
+  - Catch test mock driver up with real GP so tests pass
+
+0.02
+  - Keep up with API changes in Graphics::Primitive
+
+0.01
+        First version, released on an unsuspecting world.
+

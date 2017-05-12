@@ -1,0 +1,50 @@
+Module Crypt::ECB
+-----------------
+
+
+DESCRIPTION
+
+This module is a Perl-only implementation of the ECB mode.  In
+combination with a block cipher such as DES, IDEA or Blowfish, you can
+encrypt and decrypt messages of arbitrarily long length.  Though for
+security reasons other modes than ECB such as CBC should be preferred.
+See textbooks on cryptography if you want to know why.
+
+The functionality of the module can be accessed via OO methods or via
+standard function calls.  Remember that some crypting module like for
+example Blowfish has to be installed.  The syntax follows that of
+Crypt::CBC meaning you can access Crypt::ECB exactly like Crypt::CBC,
+though Crypt::ECB is more flexible.
+
+
+INSTALLATION
+
+To install, just type
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a MS system, you possibly won't have make.  But don't
+worry, for there is nothing to be compiled, installation is trivial:
+Just make a directory 'Crypt' in Perl's libpath if not existing. Then
+copy 'ECB.pm' to that directory, that's all.  Perl's libpath will be
+something like 'c:\perl\site\lib'.
+
+
+COPYING
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.

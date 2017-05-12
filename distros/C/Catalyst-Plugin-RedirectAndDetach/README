@@ -1,0 +1,54 @@
+NAME
+    Catalyst::Plugin::RedirectAndDetach - Redirect and detach at the same
+    time
+
+SYNOPSIS
+        # load the plugin
+
+        use Catalyst qw( RedirectAndDetach );
+
+        # in your controller ...
+
+        sub admin
+        {
+            my $self = shift;
+            my $c    = shift;
+
+            $c->redirect_and_detach('/')
+                unless $c->stash()->{user}->is_admin();
+
+            ...
+        }
+
+DESCRIPTION
+    I generally find that if I want to issue a redirect in my web app, I
+    want to stop processing right there. This plugin adds a ridiculously
+    simply method to your Catalyst objects to do just that.
+
+    The reason to use "detach()" instead of simply returning from the
+    current sub is that "detach()" throws an exception that effectively
+    aborts all execution, rather than simply exiting the current method.
+
+METHODS
+    This class provides one method:
+
+  $c->redirect_and_detach( $uri, $status )
+    The $uri parameter is required, and $status is optional. Internally,
+    this just calls "redirect()" on the Response object, followed by
+    "detach()".
+
+AUTHOR
+    Dave Rolsky, "<autarch@urth.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-redirectanddetach@rt.cpan.org", or through the web
+    interface at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Dave Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

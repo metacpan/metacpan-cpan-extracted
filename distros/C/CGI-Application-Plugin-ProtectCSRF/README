@@ -1,0 +1,170 @@
+NAME
+    CGI::Application::Plugin::ProtectCSRF - Plug-in protected from CSRF
+
+VERSION
+    1.01
+
+SYNPSIS
+      use Your::App;
+      use base qw(CGI::Application);
+      use CGI::Application::Plugin::Session; # require!!
+      use CGI::Application::Plugin::ProtectCSRF;
+
+      sub input_form : PublishCSRFID {
+        my $self = shift;
+        do_something();
+      }
+
+      sub finish : ProtectCSRF {
+        my $self = shift;
+        $self->clear_csrf_id;
+        do_something();
+      }
+
+DESCRIPTION
+    CGI::Application::Plugin::ProtectCSRF is C::A::P protected from CSRF.
+
+    When CSRF is detected, Forbidden is returned and processing is
+    interrupted.
+
+ACTION
+  PublishCSRFID
+    PublishCSRFID is action publishes CSRF ticket. CSRF ticket is published
+    when I define it as an attribute of runmode method publishing CSRF
+    ticket, and it is saved in session. If there is form tag in HTML to
+    display after the processing end, as for runmode method to publish, CSRF
+    ticket is set automatically by hidden field
+
+      # publish CSRF ticket
+      sub input_form : PublishCSRFID {
+        my $self = shift;
+        return <<HTML;
+      <form action="foo" method="post">
+      <input type="text" name="name">
+      <input type="submit" value="submit!">
+      <input type="hidden" name="rm" value="finish">
+      </form>
+      HTML
+      }
+  
+      # display html source
+      <form action="foo" method="post">
+      <input type="hidden" name="_csrf_id" value="random string" /> <- insert hidden field
+      <input type="text" name="name">
+      <input type="submit" value="submit!">
+      <input type="hidden" name="rm" value="finish">
+      </form>
+
+  ProtectCSRF
+    ProtectCSRF is action to protect from CSRF Attack. If session CSRF
+    ticket does not accord with query CSRF ticket, application consideres it
+    to be CSRF attack and refuse to access it. Carry out the processing that
+    you want to perform after having carried out clear_csrf_id method when
+    access it, and it was admitted.
+
+      sub finish : ProtectCSRF {
+        my $self = shift;
+        $self->clear_csrf_id; # require! There is not a meaning unless I do it
+        do_something();       # The processing that you want to perform (DB processing etc)
+      }
+
+METHOD
+  csrf_id
+    Get ticket for protect CSRF
+
+    Example:
+
+      sub input_form : PublishCSRFID {
+        my $self = shift;
+
+        my $csrf_id = $self->csrf_id;
+        do_something();
+      }
+
+  protect_csrf_config
+    Initialize ProtectCSRF
+
+    Option:
+
+      csrf_error_status      : CSRF error status code (default: 200)
+      csrf_error_mode        : CSRF error runmode name (default: _csrf_error)
+      csrf_error_tmpl        : CSRF error display html. scalarref or filepath or filehandle (default: $CSRF_ERROR_TMPL - scalarref)
+      csrf_error_tmpl_param  : CSRF error display html parameter (for HTML::Template)
+      csrf_id                : CSRF ticket name (default: _csrf_id)
+      csrf_post_only         : CSRF protect runmode request method check(default:0  1:POST Only)
+
+    Example:
+
+      sub cgiapp_init {
+        my $self = shift;
+        $self->tmpl_path("/path/to/template");
+        $self->protect_csrf_config(
+                               csrf_error_status     => 403, # change forbidden
+                               csrf_error_tmpl       => "csrf_error.tmpl",
+                               csrf_error_tmpl_param => { TITLE => "CSRF ERROR", MESSAGE => "your access is csrf!"},
+                               csrf_id               => "ticket_id",
+                               csrf_post_only        => 1
+                             );
+      }
+
+      # csrf_error.tmpl
+      <html><head><title><TMPL_VAR NAME=TITLE ESCAPE=HTML></title></head>
+      <body>
+      <h1>CSRF Error</h1>
+      <span style="color: red"><TMPL_VAR NAME=MESSAGE ESCAPE=HTML></span>
+      </body>
+      </html>
+
+  clear_csrf_id
+    Clear csrfid. It is preferable to make it execute after processing ends.
+
+    Example :
+
+      sub cgiapp_init {
+        my $self = shift;
+        $self->protect_csrf_config;
+      }
+
+      sub input {
+        my $self = shift;
+        do_something(). # input form display..
+      }
+  
+      sub confirm : PublishCSRFID {
+        my $self = shift;
+        do_something(). # publish csrf_id and input check and confirm display..
+      }
+
+      sub complete : ProtectCSRF {
+        my $self = shift;
+        $self->clear_csrf_id(1); # clear csrf_id for CSRF protect
+        do_something();          # DB insert etc..
+      }
+
+CALLBACK
+  _publish_csrf_id
+    prerun callback
+
+  _csrf_forbidden
+    prerun callback
+
+  _add_csrf_id
+    postrun callback
+
+CAUTION
+    It has only the protection function of basic CSRF,and mount other
+    security checks in the application, please.
+
+SEE ALSO
+    Attribute::Handlers Carp CGI::Application
+    CGI::Application::Plugin::Session Digest::SHA1 Exporter HTML::TokeParser
+
+AUTHOR
+    Akira Horimoto <kurt0027@gmail.com>
+
+COPYRIGHT
+    Copyright (C) 2006 - 2008 Akira Horimoto
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

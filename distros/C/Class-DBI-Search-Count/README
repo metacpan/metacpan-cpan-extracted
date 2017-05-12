@@ -1,0 +1,54 @@
+NAME
+    Class::DBI::Search::Count - return count of results rather than results
+
+SYNOPSIS
+            use base 'Class::DBI';
+
+            __PACKAGE__->add_searcher(
+                    search_count => 'Class::DBI::Search::Count'
+            );
+
+            my $recent = CD->search_count(year => 2005);
+
+    This is equivalent to, but, as the counting is done at the database
+    rather than in perl, faster than:
+
+      my $recent = CD->search(year => 2005)->count;
+
+DESCRIPTION
+    This is a simple search plugin for Class::DBI to return a count of
+    results rather than the results themselves.
+
+METHODS
+  add_searcher
+            __PACKAGE__->add_searcher(
+                    method_name => 'Class::DBI::Search::Count'
+            );
+
+    As with all Search plugins you can choose the method name for the search
+    that it generates.
+
+  sql
+    We override the SQL to be our own COUNT(*) version
+
+  run_search
+    We override this to return our count rather than the search results.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-Search-Count@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

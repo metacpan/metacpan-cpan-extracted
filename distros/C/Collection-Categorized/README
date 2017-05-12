@@ -1,0 +1,7 @@
+
+  make
+  make test
+  sudo make install
+
+see
+  perldoc lib/Collection/Categorized.pm

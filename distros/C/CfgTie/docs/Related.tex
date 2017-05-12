@@ -1,0 +1,126 @@
+@c CfgTie --> Environment manager
+@c Copyright 1998-1999, Randall Maas.  All rights reserved.  This program is
+@c free software; you can redistribute it and/or modify it under the same terms
+@c as PERL itself.                                                                   
+@chapter Related Work and things to do
+
+@heading Related Modules
+The following is a table of related modules.  They are different from this
+module.  Any feedback or work on determining if this difference should be
+reduced would be appreciated.  Of course, doing the work too.
+
+@table @asis
+@item HTTPD
+There is a Perl module, @code{HTTPD-Tools} that help configure the HTTPD
+daemon.
+
+@item .newsrc associative array
+The Perl module that already does this is @code{News-Newsrc}
+
+@item Process associative arrays
+@c open "ps -awxhjch|"; ppid,pid,pgid,sid,tty,tpgid, stat,uid, time, command
+@c if tty not equal to '?'
+The relevant existing Perl module is @code{Proc-ProcessTable}.
+If it used an associative array interface, in part, this would make
+signalling named services easier.
+
+@item Quotas
+The relevant Perl module is @code{Quota}
+The quota subsystem works with the C<CfgTie::TieUser> and the
+C<CfgTie::TieMTab> hash-spaces.
+
+@item Windows INI files
+The relevenat Perl module is @code{Win32_Tie_Ini_Source}
+
+@item Windows Registry Files
+The relevant Perl module is @code{Win32_TieRegistry}
+@end table
+
+@heading What needs to be or could be written
+@table @asis
+@item Get tested on Win32 platforms
+@item Get tested on Qube platforms
+@item Get tested on Solaris platforms
+@item Get tested on MacPerl platforms
+@item Ability to add or remove a service from various run levels
+@item Ability to add or remove a service altogether
+@item Ability to change the defaults for a service
+@item IO descriptor associative array
+manipulate sockets and files and such
+
+@item semaphore associative array
+
+@item shared memory associative array
+
+@item arp interface
+
+@item session associative array
+
+@item tty associative array
+
+@item folder associate array
+Scan folders and such.  Not necessarily good idea.
+
+@end table
+
+The future:
+@table @asis 
+@item Boundaries, routers, gateways and bridges
+@itemize @bullet
+@item ascend
+@item cisco
+@end itemize
+
+@item Interlink services
+@itemize @bullet
+@item sendmail
+@item qmail
+@item apache
+(see the HTTPD thing above.)
+@item INN
+@item modifying services table (media protocols, and service protocols)
+@end itemize
+
+@item Monitor services
+@itemize @bullet
+@item NOCOL
+@item statusd
+@end itemize
+
+@item Distribution services
+@itemize @bullet
+@item rsync, rdist
+@end itemize
+
+@item User interfaces
+@itemize @bullet
+@item XWindows
+ Window managers (FVWM2)
+ .Xresources
+@item C shell
+@item POSIXly shells --  Korn & Bourne & BASH
+@end itemize
+
+@item Local system
+@itemize @bullet
+@item filesystem tables
+@item tunefs
+@end itemize
+
+@item Ability to receive batch changes
+@item CVS
+@item Handle symbolic links better.
+@item Work with cfengine
+@url{http://www.delorie.com/gnu/docs/cfengine/}
+
+@item Possibly work with RFC 2244
+@url{ftp://ftp.isi.edu/in-notes/rfc2244.txt}
+
+@item Work with linuxconf
+@url{http://www.solucorp.qc.ca/linuxconf/}
+@item Work with webmin
+@url{http://www.webmin.com/webmin/}
+@item Possibly work with opStore
+@url{http://24.1.97.22/gmd/opStore/framedIndex.html}
+@end table
+

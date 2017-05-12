@@ -1,0 +1,86 @@
+NAME
+    Catalyst::View::RRDGraph - RRD Graph View Class
+
+SYNOPSIS
+    use the helper to create your View myapp_create.pl view RRDGraph
+    RRDGraph
+
+    from the controller:
+
+      sub routine :Local {
+        my ($self, $c) = @_;
+
+        $c->stash->{'graph'} = [
+                "--lower-limit", "0",
+                "--start", "end-1d",
+                "--vertical-label", "My Label",
+                "--height", 600,
+                "--width", 300,
+                "DEF:Data=/path/to/rrd.rrd:data:AVERAGE",
+                "AREA:Data#0000FF:Data "
+        ];
+        $c->forward('MyApp::View::RRDGraph');
+      }
+
+DESCRIPTION
+    This view generates RRD graph images from the graph defintion placed in
+    the stash. The controller is responsable of placing an ARRAYREF in
+    $c-stash->{'graph'}> with the same data as to generate a graph with the
+    RRDs module, except for *filename*, that will be automatically generated
+    by the view.
+
+    It doesn't depend on RRDs, but *does* need it to work (and for the tests
+    to pass). You can install RRDs, for instance, using Alien::RRDtool, or
+    compiling it manually from <http://oss.oetiker.ch/rrdtool/>
+
+CONFIGURATION
+    Configurations for the view are:
+
+  IMG_DIR
+    Directory to generate temporary image files. Defaults to /tmp/
+
+  IMG_FORMAT
+    Image format for the generated files. 'PNG' by default.
+
+  ON_ERROR_SERVE
+    On error, if this config value is set, the file to which it points will
+    be served (so you can serve an "error image" file to the user).
+    Alternately, it can be set to a code reference, that will called with
+    $self, $c and $error. You can then generate your own content in this
+    handler. Default (leaving undefined) is to throw an expception.
+
+    See <http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html> for more info.
+
+METHODS
+  new
+    Constructor.
+
+  process
+    Called internally by Catalyst when the view is used.
+
+AUTHOR
+        Jose Luis Martinez
+        CPAN ID: JLMARTIN
+        CAPSiDE
+        jlmartinez@capside.com
+        L<http://www.pplusdomain.net>
+
+THANKS
+    To Ton Voon for sending in patches, tests, and ideas.
+
+    Alexander Kabenin
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    RRDs: <http://oss.oetiker.ch/rrdtool/prog/RRDs.en.html>
+
+    RRD graph docs: <http://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html>,
+    <http://oss.oetiker.ch/rrdtool/doc/rrdgraph_data.en.html>,
+    <http://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html>
+

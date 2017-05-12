@@ -1,0 +1,282 @@
+NAME
+    CGI::EncryptForm - Implement trusted stateful CGI Form Data using
+    cryptography.
+
+CHANGES
+    Revision history for CGI::EncryptForm
+
+1.02 1999-10-25
+
+  - NOTICE: CGI scripts written for versions prior to 1.02 are incompatible
+            with this release. See below.
+
+  - Changed the way we flag an error. Instead of returning -1 we now return
+    undef. The reason being CGI scripts that have the -w switch turned on
+    would produce a warning saying the lvalue of the test condition
+    $result == -1 isnt numeric, when there was no error.
+    Thanks to Howard Lowndes for bringing this to my attention.
+
+  - Prefixed all error messages return by error() with the method's name
+    where the error occured and a unique number within [] to
+    cross reference the number against the operation.
+    e.g. decrypt [1] Encrypted string is inconsistent.
+
+  - Modified _random_key method to ensure the random key is not persistent
+    when run under mod_perl or CGI::SpeedyCGI.
+
+  - Changed the way we autoescape the encrypted string. Instead of URL
+    escaping the string, we now use our own character set where by an array
+    reference contains from 0 to 255 elements, and each element is 2 characters.
+    The elements in the array represent the translation $array->[ord($char)].
+    The method charset() is provided to allow you to define your own character
+    set. If no character set is defined, the default character set will apply,
+    which is suitable for storing the encrypted result in form fields,
+    URL's and cookies.  The autoescape method/paramater is now known as
+    usecharset.
+
+1.01 1999-10-20
+
+  - Removed dependancy on Math::TrulyRandom because of portability issues.
+    Replaced random number generator with perl's builtin rand(). Given
+    the purpose of this module, I believe rand() will surfice.
+    If you disagree make me understand why and I will look into it further.
+
+1.00 1999-10-18
+
+  - First Release
+
+SYNOPSIS
+      use CGI::EncryptForm;
+      
+      my $cfo = new CGI::EncryptForm(secret_key => 'my secret');
+      
+      my $hashref = { username => 'joe', password => 'test' };
+
+      my $encrypted_string = $cfo->encrypt($hashref);
+      if (!defined($encrypted_string)) {
+        print $cfo->error();
+        return;
+      }
+
+      my $newhashref = $cfo->decrypt($encrypted_string);
+      if (!defined($newhashref)) {
+        print $cfo->error();
+        return;
+      }
+
+      print $newhashref->{'username'};
+
+PREREQUISITES
+    This modules requires the following perl modules:
+
+    Digest::SHA1, Crypt::HCE_SHA and Storable
+
+ABSTRACT
+    Many CGI programmers take for granted the validity of stateful CGI form
+    data.
+
+    Im talking about the common scenario where you present a form to the
+    browser, the user fills in the form, you verify the form values, store
+    them in the next form as hidden fields, the user fills in another form,
+    the script appends these results to the next form in hidden fields and
+    so on.
+
+    Using hidden form fields is one mechanism where by CGI scripts can
+    maintain state in the process of collecting information from the user.
+
+    Unfortunately, it is also one of the weakest to implement because the
+    CGI script must trust the hidden form fields and there values, provided
+    by the users browser. At some point in time the CGI program does
+    something with this stateful information. To be completely sure the
+    hidden fields haven't been altered along the way and thus rendered
+    initial verification checks useless, the programmer must continually
+    verify all new form fields and previous state (encapsulated in hidden
+    form fields) to be sure the desired constraints are met. This process of
+    verification becomes tedious to program especially if there are many
+    forms required to produce a final result.
+
+    To tackle this problem I created CGI::EncryptForm, where by instead of
+    including state in hidden form fields verbatim, we use SHA1 encryption
+    algorithm to provide a satisfactory level of trust between the users
+    browser and the CGI script.
+
+DESCRIPTION
+    An object is created with a secret key defined by the CGI script. The
+    objects encrypt() method is called with a perl data structure, which in
+    the context of CGI scripts would normally contain key/value pairs. The
+    encrypt() method returns an encrypted string. The encrypted string is
+    stored in a hidden form field. The user fills in the form. The CGI
+    script processes the form, extracts the encrypted string from the hidden
+    form field, decrypts the string and returns the original data structure.
+    Further results from the form are added to the data structure, then it
+    is encrypted again and stored in the next form as a hidden field. This
+    process continues until the CGI script has all the desired information
+    and is ready to process it. To process the results, the CGI script
+    decrypts the encrypted string from the last hidden form field, which
+    contains the collective state of all previous form input.
+
+    Along the way, the users input was verified only once. The fact that
+    state was encrypted and therefore trusted, renders the process of
+    continually verifying all state for each form processed, unnecessary.
+
+METHODS
+    new CGI::EncryptForm([secret_key => $s [, usecharset => $a]])
+        Create a new CGI::EncryptForm object. All of the paramaters are
+        optional. $s specifies the secret key to use during
+        encryption/decryption. $a specifies whether to enable (1) or disable
+        (0) the character set encoding/decoding of the encrypted/decrypted
+        result. By default this is enabled.
+
+    encrypt($hashref)
+        Encrypt the data structure and return an encrypted string. $hashref
+        must be a reference to an associative array supported by the
+        Storable module. If called with no arguement, returns the previous
+        encrypted string.
+
+        Upon error, the method returns undef and sets error().
+
+    decrypt($encrypted_string)
+        Decrypt the encrypted string and return a reference to an
+        associative array. $encrypted_string must be a scalar previously
+        generated by encrypt(). If called with no arguement, returns the
+        previous reference.
+
+        Upon error, the method returns undef and sets error(). If the
+        encrypted string is tampered with the decryption routine should fail
+        with undef, but this is ultimately dependant on the strength of SHA1
+        digests.
+
+    secret_key($secret)
+        Sets the secret key for use during encryption/decryption. This
+        method is analogues to the secret_key paramater when creating a
+        CGI::EncryptForm object. If called with no $secret it returns the
+        current secret key or undef if undefined.
+
+        Upon error, the method returns undef and sets error().
+
+    usecharset(1)
+        Enables or disables the character set encoding/decoding of
+        encrypted/decrypted strings. This method is analogues to the
+        usecharset paramater when creating a CGI::EncryptForm object. By
+        default usecharset is enabled (1) and should be ignored unless you
+        use this module in non CGI programs. The encode/decode routine
+        applies the default or use defined (see charset()) character set to
+        encode/decode the encrypted string, before returning to the caller.
+
+    charset($arrayref)
+        Sets the character set which will be used to encode/decode the
+        encrypted/decrypted string. This method accepts a single array
+        reference that must contain a character set from 0 to 255, where by
+        each element must be 2 characters and UNIQUE. e.g.
+
+          charset(qw[/aA aB aC aD ... /])
+
+        If this method is not called with your own character set, a default
+        character set will be used which produces suitable output to store
+        the result of the encrypt() method in form fields, URL's and
+        cookies.
+
+        Upon error, the method returns undef and sets error().
+
+    error()
+        Returns the last error as a scalar. You would normally read this if
+        any method returns undef. error() is always cleared for each method
+        that executes successfully.
+
+EXAMPLE
+    This example illustrates the use of CGI::EncryptForm in combination with
+    CGI.pm to maintain stateful information in a multi-form CGI script.
+
+      #!/usr/local/bin/perl
+
+      use CGI::EncryptForm;
+      use CGI;
+      use vars qw($cgi $cfo);
+
+      $cgi = new CGI();
+      $cfo = new CGI::EncryptForm(secret_key => 'blah');
+
+      print $cgi->header(), $cgi->start_html(), $cgi->start_form();
+
+      if (defined $cgi->param('enc')) {
+          form3();
+      }
+      elsif (defined $cgi->param('something')) {
+          form2();
+      }
+      else {
+          form1();
+      }
+
+      print $cgi->end_html(), $cgi->end_form();
+
+      sub form1 {
+
+        print "<h1>form1</h1>",
+              "Type something and we will remember it: ",
+              $cgi->textfield('something'), $cgi->submit();
+      }
+
+      sub form2 {
+
+        print "<h1>form2</h1>",
+              $cgi->hidden(-name=>'enc', value=>$cfo->encrypt({ $cgi->Vars })),
+              "Now click here and I will tell you what you typed based on ",
+              "the encrypted hidden form field, which you would normally ",
+              "only see if you view the HTML source. For the sake of this ",
+              "demonstration the encrypted field is included below.<p>",
+              $cfo->encrypt(), "<p>",
+              "Before proceeding with this form I suggest you take note of ",
+              "what the encrypted field looks like, then click the back ",
+              "button and resubmit the previous form with the same value ",
+              "again. What you will notice is the encrypted field will ",
+              "change. This is because the SHA encryption algorithm is ",
+              "based on a secret key and a random key. In the module we ",
+              "take care of generating a unique random key for each ",
+              "invocation of the encryption routine, which is why a ",
+              "distinct encrypted string is produced each time.",
+              "<p>", $cgi->submit();
+      }
+
+      sub form3 {
+
+        my $hashref = $cfo->decrypt($cgi->param('enc'));
+        if (!defined($hashref)) {
+          print $cfo->error();
+          return;
+        }
+        print "<h1>form3</h1>",
+              "Previously in the first form you typed:<p>", $hashref->{something},
+              "<p>We reproduced this data by decrypting the hidden form ",
+              "field called 'enc', which was passed to us from the previous ",
+              "form. You may like to try and tamper with the hidden form ",
+              "field in form2, to see if you can alter the result of the ",
+              "data as it originally flows from form 1 to form 3. Good luck";
+      }
+
+NOTES
+    CGI::EncryptForm is not limited to form fields. The encrypted result can
+    be stored in cookies and URL's as well. Personally though, I discourage
+    this because your more likely to exceed size limitations with various
+    web browsers and servers.
+
+BUGS
+    None that I know of.
+
+TODO
+    None.
+
+AUTHOR
+    Copyright 1999, Peter Marelas. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Bug reports and comments to maral@phase-one.com.au.
+
+    Thanks to the authors of these fine perl modules Storable, Digest::SHA1
+    and Crypt::HCE_SHA.
+
+SEE ALSO
+    Storable, Digest::SHA1, Digest::HCE_SHA1
+

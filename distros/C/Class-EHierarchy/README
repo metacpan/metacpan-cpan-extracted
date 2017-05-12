@@ -1,0 +1,16 @@
+Class::EHierarchy
+=================
+
+NOTICE:  One might wonder how we've jumped from 0.x releases to 2.x.  I've
+decided to skip the 1.x releases to make it (hopefully) more obvious that
+the API has changed and is not compatible with the 0.x series.  My fear was
+that the average devmight see 0.x to 1.x and assume that I was simply
+declaring the API stable.  While 2.x is a stable API it is not compatible
+with 0.x.
+
+--
+
+Class::EHierarchy is intended to provide a base class for objects that
+require both object and class hierarchal features.  For more information on
+what that means, please see the POD.
+

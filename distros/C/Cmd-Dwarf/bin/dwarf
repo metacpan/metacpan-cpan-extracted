@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Cwd qw/abs_path getcwd/;
+use File::Path 'mkpath';
+use File::ShareDir 'dist_dir';
+use FindBin;
+use Getopt::Long;
+use Pod::Usage 'pod2usage';
+
+my $bin = $FindBin::RealBin;
+
+my $opts = { output => getcwd };
+GetOptions($opts, 'name=s', 'output=s', 'share_dir=s', 'help');
+
+if (@ARGV) {
+	$opts->{name} = $ARGV[0];
+	$opts->{output} = $ARGV[1] if $ARGV[1];
+}
+
+if (not $opts->{name} or $opts->{help}) {
+	pod2usage;
+}
+
+$opts->{share_dir} ||= dist_dir("Cmd-Dwarf");
+
+my $dst = $opts->{output} . "/" . $opts->{name};
+
+my $src;
+for my $a (qw/app htdocs/) {
+	$src = $opts->{share_dir} . "/$a";
+	mkpath $dst unless -d $dst;
+	system "cp -rf $src $dst";
+	print "created $dst/$a\n";
+}
+
+system "mkdir $dst/app/lib/App/Model" unless -d "$dst/app/lib/App/Model";
+system "mkdir $dst/app/lib/App/Controller/Web" unless -d "$dst/app/lib/App/Controller/Web";
+system "mkdir $dst/app/lib/App/Validator" unless -d "$dst/app/lib/App/Validator";
+
+system "chmod +x $dst/app/script/*";
+system "find $dst -type f | xargs perl -i -pe 's/<APP_NAME>/$opts->{name}/g'";
+system "find $dst -type f | xargs chmod +w";
+system "chmod +x $dst/htdocs/dwarf/run.cgi";
+
+=head1 SYNOPSIS
+
+dwarf [--output=OUTPUT_DIR] [--share_dir=SHARE_DIR] APP_NAME
+
+=cut
+

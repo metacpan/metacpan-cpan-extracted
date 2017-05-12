@@ -1,0 +1,30 @@
+Changes for Catalyst::Plugin::AccessLog
+
+1.02 2010-04-28
+  * Updated dist.ini for Dist::Zilla v2
+  * Require Catalyst 5.80008 and remove the hack to support 5.80003..7
+  * Repository in META (thanks chorny).
+
+1.01 2009-12-18
+  * Tidied code.
+  * Add support for query strings to the formatter. 
+  * Fix Catalyst version dependency; we mistakenly required 5.8004 instead
+    of the correct 5.80004.
+
+1.00 2009-08-14
+  * The interaction between the plugin and the formatter has changed,
+    necessitating a change in the configuration format. Check the docs for
+    details on formatter config if you were suppling format / time_format /
+    time_zone options before v1.00.
+  * A test suite has been added.
+
+0.02 2009-08-06
+  * Bug fix: literal \v in a regex isn't recognized properly. Change it
+    to \x0b.
+  * Use the stats object to get the time at the beginning of the request
+    instead of the time the log is printed.
+  * Enable stats for the application all the time, unless the user gives
+    enable_stats => 0.
+
+0.01 2009-08-05
+  * Initial release to CPAN.

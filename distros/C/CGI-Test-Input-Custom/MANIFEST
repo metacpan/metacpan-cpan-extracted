@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Test-Input-Custom.t
+lib/CGI/Test/Input/Custom.pm
+META.yml                                 Module meta-data (added by MakeMaker)

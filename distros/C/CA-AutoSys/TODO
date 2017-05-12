@@ -1,0 +1,41 @@
+#
+# $Id: TODO 38 2007-06-21 10:47:06Z sini $
+#
+
+This is a short todo list for myself:
+
+1) Make it more robust, add better error handling.
+
+2) Add more features.
+
+3) Add more documentation / examples.
+
+4) Perform automatic sorting of displayed jobs in autorep based on start times,
+   job dependencies, etc... (original autorep doesn't have that and I think
+   it's a nifty feature...)
+
+5) Improve performance of job / sub-job queries:
+
+6) Add more automatic tests.
+
+7) Implement "jil" ;-)
+
+#
+# First, we will get the jobs matching the given job name:
+#
+# select	j.job_name, j.joid, s.last_start, s.last_end, s.status, s.run_num, s.ntry
+# from		job j join job_status s
+# on		j.joid = s.joid
+# where		j.job_name like 'CRISP%'
+# order by j.joid;
+#
+
+#
+# Then, we will feed the joids of the found jobs into the next select statement to
+# get the child jobs. 
+#
+# select	j.job_name, j.joid, j.box_joid, s.last_start, s.last_end, s.status, s.run_num, s.ntry
+# from		job j join job_status s
+# on		j.joid = s.joid
+# where		j.box_joid in (202091, 202093, 202095, 202097, 202099, 202101, 202103, 202105);
+#

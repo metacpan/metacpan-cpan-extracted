@@ -1,0 +1,52 @@
+0.94      2015-08-02 22:44:35-07:00 America/Los_Angeles
+
+Add Perl minimum version to Makefile.PL using
+Perl::MinimumVersionFast dzil plugin
+
+0.93      2015-07-26 15:57:21-07:00 America/Los_Angeles
+
+Allow any string as the table prefix
+
+Implement Test::Exception in the test suite
+
+0.92      2015-07-25 15:31:02-07:00 America/Los_Angeles
+
+Syntax cleanup.
+
+0.91      2015-07-14 09:23:44-07:00 America/Los_Angeles
+
+Update always-on connectability to match
+CMS::Drupal::Modules, add more documentation
+
+0.90      2015-07-14 05:39:03-07:00 America/Los_Angeles
+
+Make connecting always available with the environment
+variable DRUPAL_TEST_CREDS if it is set
+
+0.095     2015-07-12 17:09:25-07:00 America/Los_Angeles
+
+Fix weird bug with TAP::Harness
+
+0.094     2015-07-12 16:28:07-07:00 America/Los_Angeles
+
+Retrograded code to run on perls back to 5.6.0
+
+Changed POD to use Pod::Weaver
+
+Added CMS::Drupal::Modules.pm
+
+------------------------------------------
+version 0.093 at 2015-07-11 15:18:10 +0000
+------------------------------------------
+
+------------------------------------------
+version 0.092 at 2015-07-11 14:54:12 +0000
+------------------------------------------
+
+------------------------------------------
+version 0.091 at 2015-07-10 17:08:11 +0000
+------------------------------------------
+
+================
+End of releases.
+================

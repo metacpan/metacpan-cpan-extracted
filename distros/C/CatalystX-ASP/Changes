@@ -1,0 +1,159 @@
+Revision history for CatalystX-ASP
+
+1.13    Wed Mar 22 11:29:27 2017 -0700
+        - If Status is set to 500, then error in Catalyst
+        - Set $Redirect->{Status} to 302 on redirects
+
+1.12    Wed Jan 25 13:10:43 2017 -0800
+        - Shouldn't return list for Hash attrs
+
+1.11    Mon Jan 23 16:47:40 2017 -0800
+        - Fix Request attribute types
+
+1.10    Tue Dec 6 14:37:51 2016 -0800
+        - Fix assumption that resp cookies are always arrays
+
+1.09    Tue Dec 6 11:18:40 2016 -0800
+        - Fix case where $c->resp->cookies not from Catalyst
+        - Fix Unix-biased test
+
+1.08    Fri Nov 18 14:46:46 2016 -0800
+        - More small fixes on documentation
+        - Prematurely released 1.07 without this merge!
+
+1.07    Tue Nov 22 12:34:28 2016 -0800
+        - More documentation fixes
+        - Require Catalyst 5.90090 when $c->inject_components was included
+        - Don't assume locale is en_US.UTF-8 for error message
+
+1.06    Fri Nov 18 11:38:34 2016 -0800
+        - Fix LICENSE back to Perl5
+        - Declare some dependencies for Kwalitee
+
+1.05    Fri Nov 18 01:06:46 2016 -0800
+        - Documentation tweaks for Minilla
+
+1.04    Fri Nov 18 00:48:04 2016 -0800
+        - Start using Minilla
+
+1.03    Thu Nov 17 23:37:33 2016 -0800
+        - Fix 01-parser.t on catching catalyst_detach
+        - https://rt.cpan.org/Public/Bug/Display.html?id=118828
+
+1.02    Thu Nov 17 23:14:05 2016 -0800
+        - More documentation tweaks
+
+1.01    Thu Nov 17 22:53:46 2016 -0800
+        - Fix some documentation issues
+          - Now that I see it on metacpan :-)
+
+1.00    Thu Nov 17 17:57:23 2016 -0800
+        - First major release 1.00!
+
+0.24    Thu Nov 17 17:06:22 2016 -0800
+        - Finalize unit tests
+        - Added tests:
+          - 12-response.t
+          - 13-session.t
+          - 14-application.t
+
+0.23    Wed Nov 16 10:54:18 2016 -0800
+        - perltidy'd and perlcritic'd
+        - Implement CatalystX::ASP::Exception::End
+        - Rethrow Catalyst::Exception::Detach when caught
+        - More unit tests for 11-request.t
+
+0.22    Fri Nov 11 17:15:58 2016 -0800
+        - Add unit tests
+        - Tests:
+          - 01-parser.t
+          - 02-compiler.t
+          - 10-server.t
+          - 11-request.t
+          - 30-testapp.t
+        - Further optimize by loading ASP object during setup
+
+0.21    Thu Oct 20 10:47:55 2016 -0700
+        - Make Dispatcher match pattern configurable
+
+0.20    Tue Oct 18 18:43:13 2016 -0700
+        - Make %ENV cleaner (without refs)
+        - Actually, localizing needs to make copy still
+
+0.l9    Fri Oct 14 15:03:39 2016 -0700
+        - Refactor error handling code, use Try::Tiny
+        - Localize %ENV!! It's very important!
+
+0.l8    Thu Oct 13 16:01:04 2016 -0700
+        - Allow for contextual values for Request attrs
+
+0.17    Thu Oct 13 01:38:56 2016 -0700
+        - Keep ASP object in View
+        - Destroy global objects in right order
+
+0.16    Wed Oct 12 18:29:43 2016 -0700
+        - Empty definition of TIEHANDLE caused weird bug
+
+0.15    Wed Oct 12 03:54:49 2016 -0700
+        - Refactored cleanup phase
+        - Transient global objects are now properly destroyed!
+
+0.14    Tue Oct 11 17:09:30 2016 -0700
+        - Getting objects destroyed in proper order
+        - It's been a struggle :-(
+        - Also C::P::iP::Session has two sessions so need second clear
+
+0.13    Tue Oct 11 14:46:20 2016 -0700
+        - Ensure cleanup of objects
+        - Better ordering of cleanup
+
+0.12    Mon Oct 10 16:49:09 2016 -0700
+        - Optimize DispatchType
+
+0.11    Mon Oct 10 15:20:14 2016 -0700
+        - Better caching of ASP object
+        - As well as cleanup of transient objects
+
+0.10    Thu Oct 6 16:48:28 2016 -0700
+        - Abandon session on destruction
+        - Correct misspelling of Mr. Chamas's name
+
+0.09    Thu Oct 6 14:52:59 2016 -0700
+        - Handle request cookies smarter
+        - Use weak references to ASP object for better cleanup
+
+0.08    Wed Oct 5 17:20:53 2016 -0700
+        - Add cleanup of objects
+        - Cleanup after requests as opposed to beginning of each
+        - Better caching of ASP object, keeping some attributes intact
+        - Always run Script_OnFlush, right before Script_OnEnd
+
+0.07    Thu Sep 29 16:23:42 2016 -0700
+        - Plagiarize more documentation from Apache::ASP
+        - The documentation is now complete
+        - Make into CPAN module
+
+0.06    Wed Sep 28 01:51:51 2016 -0700
+        - Plagiarize documentation from Apache::ASP
+
+0.05    Tue Sep 27 17:46:00 2016 -0700
+        - Better catching of ASP requests
+
+0.04    Tue Sep 27 15:58:39 2016 -0700
+        - Properly deal with 404 and 500
+
+0.03    Thu Sep 22 15:40:06 2016 -0700
+        - Better backwards compatiblity with Apache::ASP
+        - Attributes in $Request and $Response are accessible through internal
+          hash interface, eg. $Response->{Cookies}
+
+0.02    Thu Sep 22 13:49:51 2016 -0700
+        - Support uploads in CatalystX::ASP
+        - Implement $Response->End correctly
+        - Don't need to include Catalyst::ASP::ControllerRole anymore
+
+0.01    Mon Sep 19 16:13:03 2016 -0700
+        - First and three quarters pass at CatalystX::ASP
+
+0.00    Tue Sep 27 21:12:37 2016 -0700
+        - Initial commit

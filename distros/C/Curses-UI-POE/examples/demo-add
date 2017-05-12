@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+# 2004 (c) by Marcus Thiesen (marcus@thiesen.org)
+# This file is a part of Curses::UI::POE and might be distributed 
+# under the same terms as perl itself.
+
+# Use the libraries from the distribution, instead of 
+# system wide libraries.
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+
+use strict;
+use Curses::UI::POE;
+$Curses::UI::debug = 0;
+
+my $cui = new Curses::UI::POE( -color_support => 1 );
+
+my $win1 = $cui->add(
+		     'win1', 'Window',
+		     -border => 1,
+		     -y    => 1,
+		     -bfg  => 'red',
+		     );
+
+
+$win1->add("d1", "TextEntry", 
+	      -border => 0,
+	      -fg => "green",
+	      -x => 2 ,
+	      -y => 1 ,
+	      -width => 5,
+	      -text => "A",
+	      -focusable => 0,
+	      -readonly => 1,);
+
+
+my $ent1 = $win1->add("ent1", "TextEntry", 
+		      -border => 1,
+		      -bfg => "green",
+		      -x => 10 ,
+		      -width => 10);
+
+
+$win1->add("d2", "TextEntry", 
+	      -border => 0,
+	      -fg => "blue",
+	      -x => 2 ,
+	      -y => 4 ,
+	      -width => 5,
+	      -text => "B",
+	      -focusable => 0,
+	      -readonly => 1,);
+
+
+my $ent2 = $win1->add("ent2", "TextEntry", 
+		      -border => 1, 
+		      -bfg => "blue",
+		      -y => 3, 
+		      -x => 10,  
+		      -width => 10);
+
+
+$win1->add("d3", "TextEntry", 
+	      -border => 0,
+	      -fg => "red",
+	      -x => 2 ,
+	      -y => 11 ,
+	      -width => 5,
+	      -text => "C",
+	      -focusable => 0,
+	      -readonly => 1,);
+
+
+my $ent3 = $win1->add("ent3", "TextEntry", 
+		      -border => 1, 
+		      -bfg => "red",
+		      -y => 10,
+		      -x => 10 , 
+		      -width => 10, 
+		      -readonly => 1,
+		      -focusable => 0,
+		      ) ;
+
+
+my $but1 = $win1->add("addbutton", "Buttonbox" ,
+	   -buttons => [ {
+	       -label => "< ADD >",
+	       -onpress => \&add } ] ,
+	      -y => 15, -x => 5
+	   );
+
+sub add {
+    if (($ent1->get() =~ /[\d.]+/) &&
+	($ent2->get() =~ /[\d.]+/)) {   
+	$ent3->text($ent1->get() + $ent2->get());
+    } else {
+	$cui->error("You have to enter a number in A and B");
+    }
+
+}
+
+	       
+$cui->set_binding( sub {exit 0;}, "q");
+$cui->MainLoop;
+			 
+

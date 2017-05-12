@@ -1,0 +1,43 @@
+NAME
+    CPAN::Unpack - Unpack CPAN distributions
+
+SYNOPSIS
+      use CPAN::Unpack;
+      my $u = CPAN::Unpack->new;
+      $u->cpan("path/to/CPAN/");
+      $u->destination("cpan_unpacked/");
+      $u->quiet(1);
+      $u->unpack;
+
+DESCRIPTION
+    The Comprehensive Perl Archive Network (CPAN) is a very useful
+    collection of Perl code. It has a whole lot of module distributions.
+    This module unpacks the latest version of each distribution. It places
+    it in a directory of your choice with directories being the name of the
+    distribution.
+
+    It requires a local CPAN mirror to run. You can construct one using
+    something similar to:
+
+      /usr/bin/rsync -av --delete ftp.nic.funet.fi::CPAN /Users/acme/cpan/CPAN/
+
+    Note that a CPAN mirror can take up about 1.5G of space (and will take a
+    while to rsync initially). Additionally, unpacking will use up about
+    another 1.6G.
+
+    This can be handy for code metrics, searching CPAN, or just being very
+    nosy indeed.
+
+    This uses Parse::CPAN::Packages::Fast's latest_distributions method for
+    finding the latest distribution.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004-8, Leon Brocard
+                  2012, Dennis Kaarsemaker
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Config::KeyValue
+
+0.02    20081219 15:46
+        * Added "get_tidy()" for getting values without quotes.
+
+0.01    20081118 11:17
+        * First version of Config::KeyValue, a module for reading simple configuration files.
+

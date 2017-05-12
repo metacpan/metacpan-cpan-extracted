@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/Controller/Accessors.pm
+t/basic.t
+t/lib/A/App.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

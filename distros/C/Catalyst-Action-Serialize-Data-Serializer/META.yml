@@ -1,0 +1,34 @@
+---
+abstract: 'Serialize with Data::Serializer'
+author:
+  - 'Adam Jacob <adam@stalecoffee.org>, with lots of help from mst and jrockway'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Action-Serialize-Data-Serializer
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst::Action::REST: 1.08
+  Catalyst::Runtime: 5.80030
+  Data::Serializer: 0.36
+  Moose: 1.03
+  namespace::autoclean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Action-Serialize-Data-Serializer.git
+version: 1.08
+x_authority: cpan:BOBTFISH

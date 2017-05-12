@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Catalyst/Plugin/MessageStack.pm
+t/dispatch.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Model/Messages.pm
+t/load.t
+t/messages.t
+t/release-pod-syntax.t
+t/release-synopsis.t

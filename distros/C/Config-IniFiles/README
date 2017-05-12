@@ -1,0 +1,35 @@
+Config::IniFiles - A module for reading .ini-style configuration files.
+
+DESCRIPTION
+
+Config::IniFiles provides a way to have readable configuration files
+outside your Perl script. Configurations can be imported (inherited,
+stacked,...), sections can be grouped, and settings can be accessed from
+a tied hash.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Alternatively use the CPAN.pm module:
+
+    # perl -MCPAN -e 'install Config::IniFiles'
+
+Or the newer CPANPLUS.pm module
+
+    # perl -MCPANPLUS -e 'install Config::IniFiles'
+
+DEPENDENCIES
+
+The module's only dependency is a recent-enough version of perl5.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

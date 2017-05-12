@@ -1,0 +1,17 @@
+Revision history for Catalyst-Model-Facebook
+
+0.101     2011-03-31 00:13:53 America/Chicago
+	- Fix to generate object without signed_request or cookie
+
+0.100     2011-02-11 18:41:04 America/Chicago
+
+0.006     2010-12-24 06:15:27 Europe/Berlin
+	- API change, consider please reinstalling the model
+	- Requirement of Facebook 0.010
+
+0.005     2010-12-09 20:12:52 Europe/Berlin
+	- Fixed requirements
+
+0.004     2010-12-08 02:09:36 Europe/Berlin
+	- Switched to Dist::Zilla
+	- Actually started a Changes file

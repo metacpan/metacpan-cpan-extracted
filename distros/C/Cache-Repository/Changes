@@ -1,0 +1,29 @@
+Revision history for Cache::Repository
+
+0.01
+	* Initial revision
+
+0.02
+	! Removed dependancy on File::Copy inside Cache::Repository::Filesys
+          File::Copy::copy cannot handle copying from string GLOBs such that
+          C<open my $fh, '<', \$buffer> would give you a filehandle that could
+          be used to create a file in the repository.
+        ! Cleaned up retrieval code
+        + Added dir_mapping to C::R::Filesys
+
+0.03
+        + Added checking for retrieval of non-existant tags.
+
+0.04
+        + Replaced the disk-usage code with a call to Filesys::DiskUsage
+          which has been updated specifically for this type of use.
+        * Improved Kwalitee by adding pod tests
+
+0.05
+        * Added SEE ALSO section.  See that section on why.
+
+0.06
+        * Added pod tests (CPANTS game)
+
+0.07
+        ! Remove bad test (hash randomisation)

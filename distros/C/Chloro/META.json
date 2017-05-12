@@ -1,0 +1,54 @@
+{
+   "abstract" : "Form Processing So Easy It Will Knock You Out",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chloro",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::AllUtils" : 0,
+            "Moose" : "1.25",
+            "MooseX::Params::Validate" : 0,
+            "MooseX::StrictConstructor" : "0.15",
+            "MooseX::Types" : 0,
+            "MooseX::Types::Common::String" : 0,
+            "Tie::IxHash" : 0,
+            "namespace::autoclean" : "0.12"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-chloro@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chloro"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/Chloro.git",
+         "web" : "http://git.urth.org/Chloro.git"
+      }
+   },
+   "version" : "0.06"
+}
+

@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>TinyURL</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- link rel="stylesheet" href="styles.css" / -->
+    <style type="text/css">
+    <!--
+      #centre {
+      border:1px solid #202020;
+      border-bottom:0;
+      border-top:0;
+      color:#000;
+      padding:1.5em;
+      }
+
+      #conteneur {
+      background-color:#fafafa;
+      margin:1em 5%;
+      min-width:60em;
+      position:absolute;
+      width:90%;
+      }
+
+      #haut {
+      background-color:#202020;
+      height:2.4em;
+      max-height:2.4em;
+      }
+
+      #header {
+      background-color:#2D4B9B;
+      border:1px solid #fafafa;
+      color:#fafafa;
+      font-size:2em;
+      height:2.5em;
+      padding-left:2em;
+      padding-top:1em;
+      }
+
+      #pied {
+      border:1px solid #202020;
+      border-top:0;
+      padding:0.5em;
+      text-align:right;
+      }
+
+      .menuhaut {
+      font-size:1em;
+      list-style-type:none;
+      margin:0;
+      padding:0;
+      }
+
+      .menuhaut a {
+      color:#fafafa;
+      margin:0 0.4em;
+      text-decoration:none;
+      }
+
+      .menuhaut a:hover {
+      color:#FF0;
+      text-decoration:none;
+      }
+
+      .menuhaut li {
+      border-right:1px solid #fff;
+      display:inline;
+      float:left;
+      margin:0;
+      padding:0.6em 10px;
+      }
+
+      a {
+      color:#000;
+      text-decoration:underline;
+      }
+
+      body {
+      background-color:#CDCDCD;
+      font-family:Verdana, Arial, Helvetica, sans-serif;
+      font-size:0.75em;
+      }
+
+      h1 {
+      font-size:1.6em;
+      margin:0.5em 0.5em 1em 0;
+      }
+
+      h2 {
+      font-size:1.2em;
+      margin:0.8em 0.5em 0.3em 0.6em;
+      }
+
+      h3 {
+      font-size:1.1em;
+      margin:0.8em 0.5em 0.3em 0.8em;
+      }
+
+      h4 {
+      font-size:1em;
+      margin:0.7em 0.5em 0.3em 1em;
+      }
+
+      h5 {
+      font-size:0.9em;
+      margin:0.6em 0.5em 0.2em 1.5em;
+      }
+
+      p {
+      margin:1px 0.5em 0.5em 1.5em;
+      }
+
+      table {
+      border-collapse: collapse;
+      margin:1px 0.5em 0.5em 1.5em;
+      }
+
+      th {
+      background-color: #C0C0C0;
+      border: 1px solid #202020;
+      padding: 3px;
+      color: #202020;
+      }
+
+      td {
+      background-color: #FFFFFF;
+      border: 1px solid #202020;
+      padding: 3px;
+      }
+    -->
+    </style>
+  </head>
+  <body>
+    <div id="conteneur">
+      <!-- header -->
+      <div id="header">TinyURL</div>
+      <!-- menu -->
+      <div id="haut">
+        <ul class="menuhaut">
+          <li><a href="/tinyurl/create">[% c.loc('New') %]</a></li>
+          <li><a href="/tinyurl/list">[% c.loc('List') %]</a></li>
+        </ul>
+      </div>
+      <!-- contents -->
+      <div id="centre">
+

@@ -1,0 +1,48 @@
+Crypt::Rabbit
+=============
+
+Rabbit is a new stream cipher based on the properties of counter
+assisted stream ciphers, invented by Martin Boesgaard, Mette Vesterager,
+Thomas Pedersen, Jesper Christiansen, and Ove Scavenius of Cryptico A/S.
+
+BONUS
+
+The C file, _rabbit.c, is a standalone Rabbit implementation. To
+compile it, type:
+
+        gcc -Wall -DTEST _rabbit.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Julius C. Duque
+Copyright (C) 2003 Cryptico A/S
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as the GNU General Public License.
+
+This implementation of the Rabbit stream cipher is derived from the
+reference ANSI C code provided in the appendix of the paper, "Rabbit:
+A New High-Performance Stream Cipher", by Martin Boesgaard,
+Mette Vesterager, Thomas Pedersen, Jesper Christiansen, and
+Ove Scavenius of Cryptico A/S.
+
+For more information, please visit the Cryptico website at
+http://www.cryptico.com.
+
+The Rabbit stream cipher is the copyrighted work of Cryptico A/S, and
+use of Rabbit may only be used for non-commercial purposes. Any
+reproduction or redistribution of Rabbit not in accordance with
+Cryptico's license agreement is expressly prohibited by law, and may
+result in severe civil and criminal penalties. Violators will be
+prosecuted to the maximum extent possible.
+
+This copyright does not prohibit distribution of any version of Perl
+containing this extension under the terms of the GNU or Artistic
+licenses.
+

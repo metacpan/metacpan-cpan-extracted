@@ -1,0 +1,83 @@
+Revision history for Perl extension Catalyst::Plugin::XMLRPC
+
+0.28  Thu Jul 08 20:30:00 CEST 2010 
+===================================
+* Upgrade the plugin for Catalyt 5.8 series
+* Changes for adopting MRO::compat where not complete. Calls to next::method
+  instead of NEXT::...()
+* Change name of paths and compiled base class properties in Cat 5.8
+* Clone the result before serializing, as RPC::XML won't clone already seen
+  refs (thanks t0m)
+* Fix the test suite (some tests were lost from 0.24->0.26)
+* Don't warn about the breakage of XML::RPC, as the author has already
+  fixed the backcompat breakage
+
+0.26  Fri Sep 25 13:50:41 CEST 2009
+===================================
+* Important notice: RPC::XML 0.69 introduced a backwards incompatible
+  change. For now, this module will only work with RPC::XML 0.67 or
+  before. See this bug report for RPC::XML for details:
+    https://rt.cpan.org/Ticket/Display.html?id=50013
+* Address: #44995: Instruction to disable RenderView action. 
+  Updated tutorial accordingly.
+* Address: #46316: Catalyst::Plugin::Server is trying to use NEXT, which 
+  is deprecated. We are now using MRO::compat instead.
+* Address: #45709 Documentation Ambiguity leads to confusion; The use of 
+  $c->req->xmlrpc->error is now documented in more detail.
+* Add unicode tests
+* Other small test improvements
+
+0.24  Tue Jan  2 16:26:59 CET 2007
+==================================
+* Removed circular reference which caused memory leak
+  in XMLRPC::Request object
+* Added config option for changing the default RPC::XML::Encoding
+
+0.22  Fri Dec  1 14:59:13 CET 2006
+==================================
+* Moved system.listMethods to XMLRPC
+* Fixed stupid subref in system.listMethods
+* Added description of errors in debug log when XMLRPC server throws to
+  client Internal Server 500 error
+* Fixed documentation bug showing C:P:S:XMLRPC::RemoteRegex instead of
+  C:P:S:XMLRPC:XMLRPCRegex
+
+0.20  Mon Aug 14 18:40:16 CEST 2006
+==================================
+* First public release, version 0.20
+* Removed global Data::Dumper::Indent
+* Fixed use of 'an undefined value as a HASH reference' warning when
+  having no xmlrpc methods
+* Bugfix: removed debugscreen garbage showing ARRAY instead of action
+  path
+* Custom fault code handling patch from Alex Pavlovic
+
+0.10  Wed Mar  1 15:20:54 CET 2006
+==================================
+* Complete redesign, offering a much more Catalyst
+  like way of using XMLRPC
+
+0.06  Sun Nov 20 00:00:00 2005
+==================================
+* Added live tests
+
+0.05  Sun Nov 20 00:00:00 2005
+==================================
+* Fixed bugs
+
+0.04  Fri Nov 11 00:00:00 2005
+==================================
+* updated for Catalyst 5.5
+
+0.03  Sun May 15 00:00:00 2005
+==================================
+* added failure handling
+
+0.02  Sat Apr 23 23:00:00 2005
+==================================
+* changed namespace handling, now fooBar.barFoo will be
+  dispatched to fooBarbarFoo() in the actual class
+
+0.01  Thu Apr 07 16:00:00 2005
+==================================
+* original version.

@@ -1,0 +1,25 @@
+---
+name: Catalyst-Model-DBIC-Schema-QueryLog
+version: 0.10
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: (DEPERCATED) DBIx::Class::QueryLog Model Class
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Catalyst: 0
+  Catalyst::Component::InstancePerContext: 0
+  Catalyst::Model::DBIC::Schema: 0
+  DBIx::Class::QueryLog: 0
+  Moose: 0
+  MooseX::Emulate::Class::Accessor::Fast: 0
+  Test::More: 0
+provides:
+  Catalyst::Model::DBIC::Schema::QueryLog:
+    file: lib/Catalyst/Model/DBIC/Schema/QueryLog.pm
+    version: 0.10
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

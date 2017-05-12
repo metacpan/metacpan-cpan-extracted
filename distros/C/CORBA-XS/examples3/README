@@ -1,0 +1,16 @@
+  EXAMPLE 3
+
+    Variante of a complex calculator with two IDL files. This is another
+    decomposition of IDL specification.
+
+    Cplx.idl is the same, CalcCplx.idl contains :
+
+        #include "Cplx.idl"
+        module Cplx {
+            interface CalcCplx {
+                Complex Add(in Complex val1, in Complex val2);
+                Complex Sub(in Complex val1, in Complex val2);
+            };
+        };
+
+    The build process is the same.

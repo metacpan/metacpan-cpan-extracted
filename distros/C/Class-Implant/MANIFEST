@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+examples/simple
+lib/Class/Implant.pm
+t/00-compile.t
+t/01-mixin.t
+t/02-inherit.t
+t/03-outside.t
+t/lib/Bar.pm
+t/lib/Foo.pm

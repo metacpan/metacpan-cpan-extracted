@@ -1,0 +1,35 @@
+= OVERVIEW =
+
+The Connector is generic connection to a data set, typically configuration
+data in a hierarchical structure. Each connector object accepts the get(KEY)
+method, which, when given a key, returns the associated value from the
+connector's data source.
+
+Typically, a connector acts as a proxy to a simple data source like
+YAML, Config::Std, Config::Versioned, or to a more complex data source
+like an LDAP server or Proc::SafeExec. The standard calling convention
+via get(KEY) makes the connectors interchangeable.
+
+In addition, a set of meta-connectors may be used to combine multiple
+connectors into more complex chains. The Connector::Multi, for example,
+allows for redirection to delegate connectors via symbolic links. If
+you have a list of connectors and want to use them in a load-balancing,
+round-robin fashion or have the list iterated until a value is found,
+use Connector::List and choose the algorithm to perform.
+
+= USAGE =
+
+In general, the following steps are needed (replace MODULENAME with the
+name of the Connector module you need):
+
+    use Connector::MODULENAME;
+
+    my $conn = Connector::MODULENAME->new({
+        LOCATION => $path_to_config_for_module,
+    });
+
+    my $val = $conn->get('full.name.of.key');
+
+See the POD for the modules as well as the test scripts for more details
+and examples on the individual connectors.
+

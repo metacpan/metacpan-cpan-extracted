@@ -1,0 +1,6 @@
+
+* Saving and re-loading form data
+* Convenient way to output HTTP headers (including cookies)
+* Creating HTML tables from arrays
+* Support for ISINDEX. Does anyone still use this?
+

@@ -1,0 +1,8 @@
+---
+name: StompTestApp
+'Engine::Stomp':
+  tries_per_server: 3
+  servers:
+    - hostname: localhost
+      port: 61613
+  utf8: 1

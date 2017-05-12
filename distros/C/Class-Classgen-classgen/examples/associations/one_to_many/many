@@ -1,0 +1,121 @@
+#!/usr/bin/perl -w
+
+	use Polygon;
+	use Point;
+	
+# --- 1. Polygon -------------------------------------
+	
+$pol=Polygon->new();	# a new Polygon-instance
+
+$pol->add(-1, 0);	# add a few new Point-instances
+$pol->add( 0, 1);	# see Point.pm for details
+$pol->add(-1,-1);
+$pol->add(2.78, -1.41);
+
+# --- 2. Polygon ---------------------------------------
+
+$POL=Polygon->new();	# another new Polygon-instance
+
+$POL->add(100, 250);
+$POL->add(210, 310);
+
+# --- some actions ------------------------------------
+
+print "pol consists of ". $pol->get_N() . " points\n";
+print "POL consists of ". $POL->get_N() . " points\n";
+
+$pol->delete(2);	# delete the 3. Point-instance
+
+# --- retrieve a Point-isntance and do some 'magic' --------------------
+
+$point=$POL->get_points_at(0);	# retrieve the 1. Point-instance
+				# it is an object-instance on its own
+
+$n=$point->get_a_belongs_to()->get_N();	# backtrace the association and call
+					# a function from the Polygon-instance
+
+print "\nThe selected Point-instance belongs to a Polygon with $n points.\n";
+
+
+$point->get_a_belongs_to()->add(3, 6);
+$n=$point->get_a_belongs_to()->get_N();	# backtrace the association and call
+					# a function from the Polygon-instance
+
+print "Now the selected Point-instance belongs to a Polygon with $n points.\n\n";
+
+print "";
+
+
+1;
+
+__END__
+
+=head1 NAME 
+
+many - A simple script to demonstrate a one-to-many association (/examples).
+
+=head1 VERSION
+
+1.00
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+many creates two Polygons (Polygon-instances to be exact) and allows some
+manipulations back and forth the association.
+
+The Poygon-to-Point direction is associated via the internal Polygon::@points
+list. The Point-to-Polygon direction is explicitely associated in the
+Polygon->add() function.
+
+Within the debugger you may find:
+
+
+	main::(many:20):        $POL->add(210, 310);
+	  DB<2> 
+	main::(many:24):        print "pol consists of ". $pol->get_N() . " points\n";
+	  DB<2> 
+	pol consists of 4 points
+	main::(many:25):        print "POL consists of ". $POL->get_N() . " points\n";
+	  DB<2> x $POL
+	0  Polygon=HASH(0x8223c0c)
+	   '_a_has' => undef
+	   '_l_points' => ARRAY(0x8221110)
+	      0  Point=HASH(0x8223bc4)
+	         '_a_belongs_to' => Polygon=HASH(0x8223c0c)
+	            -> REUSED_ADDRESS
+	         '_x' => 100
+	         '_y' => 250
+	      1  Point=HASH(0x8223b40)
+	         '_a_belongs_to' => Polygon=HASH(0x8223c0c)
+	            -> REUSED_ADDRESS
+	         '_x' => 210
+	         '_y' => 310
+
+which is ok.
+
+=head1 ENVIRONMENT
+
+=head1 DIAGNOSTICS
+
+=head1 BUGS
+
+=head1 FILES
+
+=head1 SEE ALSO
+
+	perldoc Polygon.pm
+	perldoc Point.pm
+
+=head1 AUTHOR
+
+Name:  Michael Schlueter 
+
+email: mschlue@cpan.org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, Michael Schlueter. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.

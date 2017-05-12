@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-View-Jemplate
+version:      0.06
+version_from: lib/Catalyst/View/Jemplate.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.5
+    File::Find::Rule:              0
+    Jemplate:                      0.19
+    Test::More:                    0.32
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

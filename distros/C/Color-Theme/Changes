@@ -1,0 +1,8 @@
+Revision history for Color-Theme
+
+0.01    2014-12-11 (PERLANCAR)
+
+        - First release, split from SHARYANTO-Roles and renamed module from
+          SHARYANTO::Role::ColorTheme to Color::Theme::Role. Some other changes:
+          split into two roles (Role and Role::ANSI for ANSI-specific stuffs),
+          rename some methods.

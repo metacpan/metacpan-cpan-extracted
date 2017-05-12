@@ -1,0 +1,21 @@
+---
+name: CAM-SQLManager
+version: 1.13
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Encapsulated SQL statements in XML
+license: perl
+requires:
+  CAM::XML: 0.25
+  DBI: 1.0
+  File::Spec: 0
+recommends:
+  CGI: 2.0
+  XML::Xerces: 2.3.0
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::SQLManager:
+    file: lib/CAM/SQLManager.pm
+    version: 1.13
+generated_by: Module::Build version 0.2609

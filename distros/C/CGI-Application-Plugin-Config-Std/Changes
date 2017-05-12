@@ -1,0 +1,15 @@
+Revision history for Perl extension CGI::Application::Plugin::Config::Std
+
+1.003  Mon Oct 10 17:48:59 2011 +0100
+ - Fix broken tests. (Stephen Cardie)
+
+1.002 Mon Oct 10 16:50:11 2011 +0100
+ - Documentation: add github links. (Stephen Cardie)
+
+1.001 Mon Oct 10 16:38:48 2011 +0100
+ - Remove automatic writing of config changes to file. Add commit_config()
+method. (Stephen Cardie)
+
+1.000 Mon Oct 10 11:56:40 2011 +0100
+ - First version. (Stephen Cardie)
+

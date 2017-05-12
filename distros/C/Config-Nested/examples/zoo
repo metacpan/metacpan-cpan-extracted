@@ -1,0 +1,92 @@
+#! /usr/bin/perl
+
+use 5;
+use warnings;
+use strict;
+
+use Data::Dumper;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+use Config::Nested;
+
+my $c = new Config::Nested(
+	section => [qw( location animal)],
+	boolean => [qw( happy hungry alive)],
+	variable => [qw( sex name colour owner) ],
+	array => 'breed exercise',
+);
+
+# Slurp configuration data
+$/=undef;
+my $conf = <DATA>;
+
+# Parse defaults.
+$c->parse("alive !hungry") || die "Parsing defaults failed\n";
+$c->parse("owner 'Peter the Great' happy") || die "Parsing defaults failed\n";
+$c->parse("sex = male") || die "Parsing defaults failed\n";
+$c->parse("animal Fred") || die "Parsing defaults failed\n";
+
+
+# Parse configuration
+$c->parse($conf) || die "Parsing failed\n";
+
+for my $s ($c->sections())
+{
+	print "================= $s ====================\n";
+	my @obj	= $c->section($s);
+	print Dumper(\@obj);
+}
+
+exit;
+
+__DATA__
+owner George
+
+location home {
+	animal fish 
+	{
+		name Fred
+		sex male
+		colour yellow
+		happy
+		alive
+	}
+
+	{
+		owner  Gladys
+
+		animal rat
+		{
+			name Bob
+			!alive
+		}
+		animal bird
+		{
+			name Clyde
+			sex female
+			colour yellow
+			alive
+		}
+	}
+}
+
+location work
+{
+	animal horse
+	{
+		name "A Horse"
+		sex male
+	}
+}
+
+animal dog
+{
+	name Rover
+
+	animal flea
+	{
+	}
+}
+

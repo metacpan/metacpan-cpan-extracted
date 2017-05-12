@@ -1,0 +1,53 @@
+CPAN-Testers
+============
+
+DESCRIPTION
+
+This distribution provides an overview of the CPAN Testers project, with
+links to further resources to help you find out more or better still get you
+involved as a CPAN Tester.
+
+INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+However, this distribution is a collection of documents, rather than something
+to install and use.
+
+CHANGES
+
+For a complete list of changes, see the Changes file.
+
+SUPPORT
+
+There are no known typos, errors or bugs at the time of this release. However, 
+if you spot any inaccuracies, please submit a bug to the RT system. It would 
+also help greatly if you are able to pinpoint problems or even supply a patch. 
+
+Fixes are dependent upon their severity and our availability. Should a fix not
+be forthcoming, please feel free to (politely) remind us.
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers
+
+AUTHOR
+
+Adam J. Foxson <afoxson@pobox.com>, having been involved with the
+CPAN Testers for over half a decade, is the principal author of Test::Reporter.
+
+Barbie, <barbie@cpan.org>
+for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2007-2010 Adam J. Foxson and the CPAN Testers
+  Copyright (C) 2010-2015 CPAN Testers
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

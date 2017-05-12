@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd9d
+registers:
+  AF: 58786
+  AF_: 0
+  BC: 3291
+  BC_: 0
+  DE: 57138
+  DE_: 0
+  HL: 53476
+  HL_: 0
+  I: 0
+  IX: 39698
+  IY: 32007
+  PC: 2
+  R: 2
+  SP: 0

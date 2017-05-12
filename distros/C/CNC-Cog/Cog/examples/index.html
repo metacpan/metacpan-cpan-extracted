@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>cog</title>
+</head>
+<body>
+<h1>Profile Cutting Gear Wheels<br>
+</h1>
+Profile cutting of gear wheels does not seem to have many
+advocates on the Internet. In my opinion it has several advantages and
+is the way that nearly all gear wheels should be cut. <br>
+<p>Mark Winder<br>
+October 2005<br>
+The source code for the cog.pm module is available. <br>
+Comments and suggestions to <br>
+mail: Mark.Winder4&nbsp; at&nbsp; btinternet.com<br>
+<h1>What Is Profile Cutting?</h1>
+Profile cutting gear wheels is any method that involves a cutter moving
+in
+x and y plane. A good example is a traditional vertical cnc milling
+machine
+using a cylindrical cutter. These days there are many examples of other
+types of cutting machine, but all can work on a similar
+principle.&nbsp; This cannot be done with a non-cnc machine (well maybe
+with a special fitting!) because x and y slides need to be moved
+simultaniously. <br>
+<h1>Advantages of Form Cutting</h1>
+The advantages of profile cutting are as follows: <br>
+<ul>
+  <li>Within very wide limits the wheel and tooth parameters are not
+dependent on the cutter but can be software generated. <br>
+  </li>
+  <li>The same software can be used to generate wheels in a variety of
+different materials, eg wood, and metal: historically different methods
+have been required for wood. <br>
+  </li>
+  <li>Unusual shapes are no problem, eg eleptical wheels. <br>
+  </li>
+  <li>Use of general purpose machinery means that very large wheels can
+be cut by those in possession of&nbsp; appropriate general purpose
+machines. <br>
+  </li>
+</ul>
+The disadvantages are as follows: <br>
+<ul>
+  <li>Thick wheels can pose a problem particularly when fine teeth are
+required. This is particularly the case when using milling machines. <br>
+  </li>
+  <li>Bosses on wheels may be time consuming or expensive if machined
+out of a solid block. <br>
+  </li>
+  <li>Unusual shapes can be a problem: eg worm, or bevels. <br>
+  </li>
+</ul>
+<h1>cog.pm <br>
+</h1>
+This document presents cog.pm, a Perl module that generates g code
+suitable for a CNC milling machine for form cutting small gear wheels
+out of sheet metal. The software is designed so that you may call the
+functions with what ever parameters you desire and G-code for the wheel
+will be generated. <br>
+<br>
+The software currently covers horrelogical tooth shapes, spoked wheels,
+and there is also a graham style escarpment and yoke. <br>
+<br>
+There cog.pm uses one of two modules for generating output: G-code.pm
+generates G-code in a file, gdcode.pm generates a jpeg image of the
+outline that&nbsp; would be generated. <br>
+<br>
+Parameters are provided for feed and multiple passes all of which can
+be controlled from a high level. <br>
+<br>
+A function for stacking objects one on top of the other, eg a pinion on
+top of a wheel, is also provided.&nbsp; The stack routine automatically
+machines out the space around the smaller top object so that the lower
+object can be machined. <br>
+<br>
+<h1>Some Examples</h1>
+Below are some examples, with code, photographs of the finished
+objects, and comments. Naturally these examples have been made over
+time as the code evolves, so that I cannot promise absolutly that all
+examples are currently error free, although I believe they are and
+would like to&nbsp; hear from anyone one who thinks otherwise!<br>
+<br>
+<a href="#Example_1">Example 1</a><br>
+<a href="#eg2">Example 2</a><br>
+<a href="#eg3">Example 3</a><br>
+<a href="#eg4">Example 4</a><br>
+<br>
+<h2><a name="Example_1"></a>Example 1</h2>
+<h3>Code</h3>
+<code>#!/usr/bin/perl<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# This contains the cog cutting functions. <br>
+use
+cog;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# This contains the jpeg output functions<br>
+use
+gdcode;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# and this the G-code output functions<br>
+use
+G-code;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# Actually you only need one of these. <br>
+<br>
+$c=newcogpair cog(3.0,7,18);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # make a
+pinion and a wheel module 3, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# with 7 and 18 teeth.<br>
+<br>
+$c-&gt;cutset({cuttersize=&gt;0.125,passes=&gt;3,passdepth=&gt; -0.025
+}); <br>
+<br>
+$c-&gt;{wheel}-&gt;hole(0.125); <br>
+$c-&gt;{pinion}-&gt;hole(0.25); <br>
+<br>
+my $feed=3; <br>
+#my $g=new
+G-code("test.ngc",$feed,5);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #
+for G-code out use this line<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# output file, feed rate, tool number for offset commands <br>
+my $g=new gdcode("test.png",4.50 ,1300,1300);# for jpg use this line <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# file, size in inches horizontally, x and y size in pixels<br>
+$g-&gt;ginit();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+<br>
+$c-&gt;{wheel}-&gt;cut($g,0,-0.75,0); # x,y,z. <br>
+$c-&gt;{pinion}-&gt;cut($g,0,1.25,0);<br>
+<br>
+$g-&gt;gend();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# finalise graphics operations, write files etc.&nbsp; </code><br>
+<br>
+This is about as simple as it gets.&nbsp; The code generates a large
+jpg image, on your screen you may need to zoom in as the lines are just
+a single pixel wide and some viewers do not show this&nbsp; at full
+size. You can change the resolution to suit. Below is a 200 x200 image
+produced by the code above. <br>
+<h3>Images</h3>
+<br>
+<img alt="Eg1.png" src="eg1/eg1.png"
+ style="width: 300px; height: 300px;"> <img
+ alt="Metal work cut by the example." src="eg1/IMG_3259cs.jpg"
+ style="width: 300px; height: 291px;"><br>
+<br>
+<h3>About The Images</h3>
+The following points can be noted about the images: <br>
+<br>
+<ol>
+  <li>There is a fairly obvious mistake in the lower wheel on east-most
+tooth. This while unfortunate, is nothing to do with any code!</li>
+  <li>On first appearances the holes in the center of the wheels do
+noyt appear to match those on the jpeg. In fact it seems to be missing
+on the lower wheel on the jpeg. This is because the jpeg takes no
+account of the size of the tool. The hole on the larger wheel, which is
+1/8" is the same size as the cutter, so it is a simple plunge and would
+be represented by one pixel on the Jpeg. The hole on the pinion would
+show as a 1/8" hole on the Jpeg, since that how it has to move to
+generate a 1/4" hole with a 1/8" cutter. <br>
+  </li>
+  <li>The hole in the pinion is probably too big for this wheel!<br>
+  </li>
+  <li>So if thats the case, why then do the teeth clearly not show
+similar characteristics? The reason is that for holes, the cog.pm
+calculates its own tool path, and the inbuilt G-code cutter
+compensation
+is not used, while for the teeth it is. So that what is plotted (after
+turning on compensation) is exactly what you get. Sorry, you just have
+to know this! <br>
+  </li>
+  <li>Note in particular that these were the first two piieces I made,
+and are nearly as small as you can go with a cutter as large as this. I
+do not advocate mettal gears this size (2.5" accross) !!!</li>
+  <li>The green lines in the jpeg are movements made with z &gt; 0 ,
+assumed to be non-cutting movements. <br>
+  </li>
+  <li>Note that the order of operations is considered significant.
+Normally, the exterior, at least, will be clamped. It is therefor
+better to drill holes first and then cut the teeth since otherwise you
+would be drilling in an otherwise unsecured piece of work.&nbsp; With
+other clamping methods (double sided tape, vacuum tables etc) this may
+not be an issue. <br>
+  </li>
+</ol>
+<br>
+<h3>Gcode</h3>
+The following GCODE is produced:. This is of course rather long, and in
+subsequesnt examples I do not
+intend to quote the code (It will be longer!) but it gives you an idea
+of the output. <br>
+<a href="eg1/eg1.ngc">Click to see the G-Code</a><br>
+<br>
+<br>
+<code></code>
+<h2><a name="eg2"></a>Example 2</h2>
+<h3>Code</h3>
+<br>
+<code>#!/usr/bin/perl<br>
+<br>
+use cog;<br>
+use gdcode; <br>
+use G-code; <br>
+$VERSION=0.02; <br>
+<br>
+# process options. Use getopts if you like. <br>
+my %opt; <br>
+$opt{allowed}='p'; <br>
+@ARGV=grep { s/^-([$opt{allowed}])//?(($opt{$1}=1)&amp;&amp;0):1 }
+@ARGV; # set options allowed in opt<br>
+grep { m/^-/ } @ARGV and die "Illegal option in @ARGV"; <br>
+<br>
+my ($g);<br>
+if ($opt{p})<br>
+{<br>
+&nbsp; $g=new gdcode("test.png",1.5,300,300);&nbsp;&nbsp; # this uses
+the GD module to generate a .png file size 1950 pixels square. <br>
+}<br>
+else<br>
+{<br>
+&nbsp;&nbsp; my
+$feed=3.0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# feed rate for cut. <br>
+&nbsp;&nbsp; $g=new
+G-code("test.ngc",$feed);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# and this produces G-code in the file test.ngc. <br>
+}<br>
+<br>
+$c=newcogpair cog(1.6,7,16); # Creates a pair of meshing wheels, with
+teeth module 1.6 (mm) one with 7 teeth, one with 16. <br>
+$c-&gt;{wheel}-&gt;hole(0.16); <br>
+$c-&gt;{wheel}-&gt;cutset(0.0625,4,-0.015); # cuttersize, passes,
+passdepth <br>
+<br>
+$c-&gt;{wheel}-&gt;trepan(5,0.2,0.175,0.35,0.05,1.0,0.05);<br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $spoken, # number of spokes<br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $wos,&nbsp;&nbsp;&nbsp; &nbsp;#
+total width of spokes<br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $bsf,&nbsp;&nbsp;&nbsp; # boss
+radius in inches<br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $rsf,&nbsp;&nbsp;&nbsp; # rim
+size factor as proportion of pitch radius. <br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $roe,&nbsp;&nbsp;&nbsp; # radius
+of window edge for trepan<br>
+#&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; $wobf,&nbsp;&nbsp; # width at
+base factor, &gt; 1 for narrower at spoke rim <br>
+#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $rot,&nbsp;&nbsp;&nbsp; #
+rotation factor for inside of spokes relative to outside 1= 1
+revolution 0 to 0.2 are good. <br>
+<br>
+$c-&gt;{wheel}-&gt;bossindent(0.25,-0.01,1); # diameter of indent,
+depth of indent, how many passes, feedrate<br>
+<br>
+$g-&gt;ginit(); <br>
+$c-&gt;{wheel}-&gt;cut($g,0.0,0.0,0.0); <br>
+$g-&gt;gend(); <br>
+</code><br>
+<h3>Images</h3>
+<img alt="Result of eg2.pl -p" src="eg2/eg2.png"
+ style="width: 300px; height: 300px;"> <img alt=""
+ src="eg2/IMG_3260as.jpg" style="width: 400px; height: 422px;">&nbsp;
+<img alt="" src="eg2/IMG_3262s.jpg" style="width: 300px; height: 261px;"><br>
+<br>
+The caliper shown in the second picture has an upper scale in inches,
+lower in cm. <br>
+<h3>Notes</h3>
+<br>
+A few new features are introduced in this example.&nbsp; First, the use
+of a command line option to choose between graphical output and G-code.
+Pretty essential in practice, but absolutly nothing to do with the
+example in fact. <br>
+<br>
+Second, I introduce the trepan function. This allows a wheel to be
+"lightened" by cutting out sections from the center of the wheel . The
+result is that the rim is supported by spokes. This function allows the
+number of spokes to be varied, and also allows the center of the wheel
+to be "roted" with respect to the rim. (Think spokes made of rubber.)
+This is really for artistic effect. But you could argue that it
+increases the strength of the wheel. You can also choose to have
+tapered spokes. Naturally, since you are going to cut this out with a
+circular tool, all window corners must be radiused at a radius greater
+than the tool radius. <br>
+<br>
+Lastly there is a feature called bossindent that is implemented on this
+wheel. This creates a small circular indentaion which was to be used to
+aid in registration if fixing an external boss to the wheel. Not sure
+if this is useful or not. <br>
+<h2><a name="eg3"></a>Example 3<br>
+</h2>
+<h3>Code</h3>
+<code>#!/usr/bin/perl<br>
+<br>
+use cog;<br>
+use gdcode; <br>
+use G-code; <br>
+$VERSION=0.02; <br>
+<br>
+my %opt; <br>
+$opt{allowed}='p'; <br>
+@ARGV=grep { s/^-([$opt{allowed}])//?(($opt{$1}=1)&amp;&amp;0):1 }
+@ARGV;<br>
+grep { m/^-/ } @ARGV and die "Illegal option in @ARGV"; <br>
+<br>
+my ($g);<br>
+if ($opt{p})<br>
+{<br>
+&nbsp; $g=new gdcode("test.png",1.25,800,800);&nbsp;&nbsp; # this uses
+the GD module to generate a .png file<br>
+}<br>
+else<br>
+{<br>
+&nbsp;&nbsp; my
+$feed=5.0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# feed rate for cut. <br>
+&nbsp;&nbsp; $g=new
+G-code("test.ngc",$feed);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# and this produces G-code in the file test.ngc. <br>
+}<br>
+<br>
+$c=newcogpair cog(1.6,9,16); # Creates a pair of meshing wheels, with
+teeth module 1.6 (mm) one with 9, one with 16 teeth. <br>
+$c-&gt;{wheel}-&gt;cutset(0.0625,4,-0.0125); # cuttersize, passes,
+passdepth <br>
+<br>
+$c-&gt;{pinion}-&gt;{passes}=8;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# need more depth on pinion. <br>
+$c-&gt;{pinion}-&gt;{fillet}=1; <br>
+<br>
+$s=new stack(0.125,4,-0.025,-0.005);&nbsp;&nbsp; #
+$cuttersize,$passes,$passdepth,$facedepth<br>
+$boss=new boss(0.125,8,-0.0125,0.13);<br>
+$boss-&gt;{name}='Jim';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# used in comments in G-code<br>
+<br>
+$c-&gt;{pinion}-&gt;{name}='pinion';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+# used in comments <br>
+$c-&gt;{wheel}-&gt;{name
+}='wheel';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # used
+in comments <br>
+<br>
+$s-&gt;add($boss,$c-&gt;{pinion},$c-&gt;{wheel});<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+$g-&gt;ginit(); <br>
+$s-&gt;cut($g,0,0,0); <br>
+$g-&gt;gend(); </code><br>
+<br>
+<h3>Images</h3>
+<img alt="Output from eg3.pl -p" src="eg3/eg3.png"
+ style="width: 400px; height: 400px;"> <img alt=""
+ src="eg3/IMG_3263s.jpg" style="width: 400px; height: 392px;"> <img
+ alt="" src="eg3/IMG_3264cs.jpg" style="width: 400px; height: 242px;"><br>
+<br>
+<h3>Notes</h3>
+This example introduces the concept of stacked objects. The idea is
+that objects can be defined and then stacked one on top of the other.
+The cut function for the stack object&nbsp; calls the individual cut
+functions for all objects in the stack, and also inserts extra objects
+that are necessary for the machining to go ahead. These objects extra
+objects are of two types. Firstly,&nbsp; if two or more objects are
+machined on top of each other, it is assumed (at the very least) that
+the top object is smaller than the lower one (other wise you couldnt
+machine it could you!) An anulus is machined outside the top object so
+that the lower object can be machined. Secondly this anulus is widened
+so that the top anulus is at least as wide as the anulus or all objects
+below it. This (nearly) enables wheels to be stacked on top of each
+other and machiened from a soliid piece of metal. In the exaple 3 items
+are stacked. The wheel from example 2, a pinion to fit it with as many
+leaves as I could fit in, and lastly a boss with the same diameter as
+the dedendum of the pinion. All this out of a solid piece of brass 1/4"
+thick. I use two cutters. A big one for roughing out the anulus's 1/8""
+and&nbsp; 1/16"" for cutting the teeth. Note that except for the
+outermost cut, cuts cutting an annular space are at slightly different
+radii&nbsp; and appear double in the diagram above. <br>
+<br>
+The second type of cut that is made here, I call a fillet. This is to
+get round the problem that when you cut a wheel "one sided" as it were,
+and leave it atached to a back plate, as is the case with the pinion,
+its no good just cutting out the profile, as this leaves&nbsp; some
+pieces attached to the wheel.&nbsp; These are removed by the lines that
+go into the gaps between the teeth. The algorithmn is very ad-hoc but
+seems to work ok-ish in the few cases I've tried.&nbsp; To activate the
+fillet function you need to set the fillet flag&nbsp; as is done in the
+pinion above.&nbsp; The remains of the fillets can be seen well in the
+second picture: it seems like I didnt go quite deep enough when I made
+this piece. <br>
+<br>
+There are many objects all generating similar code, but crucially with
+different numbers. In order to debug this I have allowed objects to
+have names that can be used in the comments printed out in the G-code
+and that you can see as the metal is being cut. In the above, the wheel
+boss is called Jim. <br>
+<br>
+Its not shown at any stage here, but a manual tool change at the right
+point is needed here. How you do this will depend on your hardware. <br>
+<br>
+An attempt has been made to make cuts at different depths come out in
+different colours. If you stare very hard at the image you will see
+that some cuts are black and some brown. The blacker lines are supposed
+to be nearer the viewer.&nbsp; You'll notice that the two innermost
+circles in the image above are black for example. This doesnt work
+well, not sure why. <br>
+<br>
+There is no particular reason for there being no hole in the center of
+this piece. <br>
+<h2><a name="eg4"></a>Example 4 - A Graham Escapement<br>
+</h2>
+Its worth pointing out that far more able people than me have written
+whole books on the graham escapement.&nbsp; I have concentrated on
+making it possible to make. This work is not completed yet and although
+I have made one escapement, so far it has not been possible to test
+this. <br>
+<h3>Code</h3>
+<h3>Images</h3>
+<img alt="" src="eg4/gray1.png" style="width: 400px; height: 400px;">&nbsp;<img
+ alt="" src="eg4/IMG_3243s.jpg" style="width: 356px; height: 400px;"><img
+ alt="" src="eg4/IMG_3268c.jpg" style="width: 1079px; height: 400px;"> <br>
+<br>
+<h3>Notes</h3>
+The wheel on the left was a first attempt. After making it (and yes
+there is one small mistake that probably makes the wheel
+unusable in any case!) I decided that it was built like a tank and
+that as angular inertia is very important to the graham escapement a
+second attempt was warranted. This had the following changes: <br>
+<ul>
+  <li>Much thinner rim. <br>
+  </li>
+  <li>Many more spokes to give more even support to the thinner rim</li>
+  <li>Tapered spokes to further decrease the angular momentum. <br>
+  </li>
+  <li>A slightly deeper boss indent, 0.015 instead of 0.01 inches. <br>
+  </li>
+  <li>Bigger boss at the wheel center. (Weight at the wheel center is
+not an issue so far as momentum is concerned. )</li>
+  <li>The&nbsp; Angle subtended at the tooth top was changed from 6 to
+8 % of the tooth gap, making the tooth tops wider and less sharp. I
+doubt you can see
+that in the picture though. <br>
+  </li>
+</ul>
+The new wheel weighs about half the old one, and has a far lower moment
+of
+inertia. <br>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

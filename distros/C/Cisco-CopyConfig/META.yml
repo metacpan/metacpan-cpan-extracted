@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Cisco-CopyConfig
+version:      1.03
+version_from: CopyConfig.pm
+installdirs:  site
+requires:
+    Socket:                        0
+    Net::SNMP:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

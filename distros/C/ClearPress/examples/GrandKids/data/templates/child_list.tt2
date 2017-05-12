@@ -1,0 +1,16 @@
+
+<h2>children </h2>
+<table id="child_list">
+ <caption>child list</caption>
+ <thead><tr><th>birthday</th><th>name</th></tr></thead>
+ <tbody>
+[% FOREACH child = model.children %]
+<tr>
+ <td>[% child.birthday %]</td><td>[% child.name %]</td>
+ <td>[<a href="[% SCRIPT_NAME %]/child/[% child.id_child %]">details</a>]</td>
+</tr>
+[% END %]
+ </tbody>
+</table>
+
+ 

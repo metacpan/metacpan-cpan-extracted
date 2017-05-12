@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::Proxy.
+
+0.01  Wed Jan  8 22:54:21 2003
+	- original version; created by h2xs 1.21 with options
+		-A -X -a -n Class::Proxy
+

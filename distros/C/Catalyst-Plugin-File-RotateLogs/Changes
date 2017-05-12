@@ -1,0 +1,23 @@
+Revision history for Perl extension Catalyst-Plugin-File-RotateLogs
+
+0.05 2014-11-07T02:24:41Z
+
+    - fix documentation
+
+0.04 2014-10-11T08:14:32Z
+
+    - fix documentation for Catalyst configuration
+
+0.03 2014-10-11T08:08:09Z
+
+    - added autodump option
+    - fix maxage option of config
+
+0.02 2014-10-06T06:54:32Z
+
+    - log directory was changed
+
+0.01 2014-09-09T07:51:37Z
+
+    - original version
+

@@ -1,0 +1,51 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/CPAN-Command/",
+      "repository" : "http://github.com/hanekomu/CPAN-Command",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Command"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100840",
+   "name" : "CPAN-Command",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "CPAN::Command::Homepage" : {
+         "version" : "1.100840",
+         "file" : "lib/CPAN/Command/Homepage.pm"
+      },
+      "CPAN::Command::Bugtracker" : {
+         "version" : "1.100840",
+         "file" : "lib/CPAN/Command/Bugtracker.pm"
+      },
+      "CPAN::Command" : {
+         "version" : "1.100840",
+         "file" : "lib/CPAN/Command.pm"
+      }
+   },
+   "requires" : {
+      "Module::Pluggable" : "0",
+      "Scalar::Util" : "0",
+      "URI" : "0",
+      "English" : "0",
+      "Carp" : "0",
+      "perl" : "5.008_001",
+      "Test::More" : "0.88",
+      "Regexp::Common" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "CPAN" : "0"
+   },
+   "abstract" : "Load CPAN command plugins",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

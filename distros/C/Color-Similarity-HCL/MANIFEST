@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+lib/Color/Similarity/HCL.pm
+t/001_load.t
+t/002_sanity.t
+t/zzy_pod_coverage.t
+t/zzz_pod.t

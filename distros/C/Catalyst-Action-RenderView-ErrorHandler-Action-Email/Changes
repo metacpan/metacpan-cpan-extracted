@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Action::RenderView::ErrorHandler::Action::Email.
+
+0.04  2011-10-29 21:20:00
+	- Added changelog
+
+0.03  2011-10-29 21:20:00
+	- Added ignorePath option
+	- Improved Template
+
+0.01  Wed Sep 14 18:43:49 2011
+	- original version; created by h2xs 1.23 with options
+		-AXn Catalyst::Action::RenderView::ErrorHandler::Action::Email
+
+

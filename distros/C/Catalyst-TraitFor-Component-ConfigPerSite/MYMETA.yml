@@ -1,0 +1,36 @@
+---
+abstract: unknown
+author:
+  - 'Aaron Trevena <teejay@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Component-ConfigPerSite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::View::TT: 0
+  Config::General: 0
+  DBIx::Class::TimeStamp: 0
+  DateTime: 0
+  Moose: 0
+  Test::HTML::Form: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+resources:
+  repository: https://github.com/hashbangperl/Catalyst-TraitFor-Component-ConfigPerSite
+version: 0.12

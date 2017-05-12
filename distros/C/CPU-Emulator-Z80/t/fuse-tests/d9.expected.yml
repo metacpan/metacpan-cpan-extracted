@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: d9
+registers:
+  AF: 19860
+  AF_: 6756
+  BC: 51504
+  BC_: 57466
+  DE: 15617
+  DE_: 58203
+  HL: 32002
+  HL_: 40292
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 1
+  R: 1
+  SP: 0

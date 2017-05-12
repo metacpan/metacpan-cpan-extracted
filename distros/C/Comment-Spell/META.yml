@@ -1,0 +1,43 @@
+---
+abstract: 'Spell Checking for your comments'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Comment-Spell
+provides:
+  Comment::Spell:
+    file: lib/Comment/Spell.pm
+    version: '0.001002'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  IO::Handle: '0'
+  IO::Scalar: '0'
+  Moo: '0'
+  PPI: '0'
+  Path::Tiny: '0'
+  Pod::Wordlist: '1.07'
+  Text::Wrap: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Comment-Spell/issues
+  homepage: https://github.com/kentnl/Comment-Spell
+  repository: https://github.com/kentnl/Comment-Spell.git
+version: '0.001002'

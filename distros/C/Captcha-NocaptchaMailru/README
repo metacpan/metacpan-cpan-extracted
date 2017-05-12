@@ -1,0 +1,40 @@
+Captcha-Nocaptcha
+=================
+
+Nocaptcha is an intelligent CAPTCHA service that can deliver a majority of real
+users from solving a CAPTCHA riddle with the same protection level from spam
+scripts. The service has been successfully used in our internal projects and on
+sites unrelated to Mail.Ru.
+
+This module is Perl implementation of Nocaptcha Mail.Ru service API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Captcha::Nocaptcha
+
+You can also look for information at:
+
+    Official site
+        https://nocaptcha.mail.ru
+
+    Documentation
+        https://nocaptcha.mail.ru/docs
+
+    PHP module
+        https://github.com/mailru/nocaptcha-php
+
+    Python module
+        https://github.com/mailru/nocaptcha-python
+
+Use this email for feedback: nocaptcha@corp.mail.ru

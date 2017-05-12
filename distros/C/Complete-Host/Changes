@@ -1,0 +1,31 @@
+Revision history for Complete-Host
+
+0.04    2016-10-18 (PERLANCAR)
+
+	- Add logging (enabled if COMPLETE_HOST_TRACE is set to true).
+
+        - Add IP's from ifconfig output.
+
+        - [Bugfix] Fix Rinci metadata (didn't set result_naked=1).
+
+
+0.03    2016-10-18 (PERLANCAR)
+
+	- [Bugfix] Fix Rinci metadata (didn't set result_naked=1).
+
+
+0.02    2016-10-18 (PERLANCAR)
+
+        - First implementation of complete_known_host().
+
+
+0.01    2015-11-29 (PERLANCAR)
+
+        - No functional changes.
+
+        - Adjust to Complete::Common 0.21.
+
+
+0.00    2015-09-16 (PERLANCAR)
+
+        - First release, not yet implemented.

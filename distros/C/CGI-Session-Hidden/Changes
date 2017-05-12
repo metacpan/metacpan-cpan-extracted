@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::Session::Hidden.
+
+0.03  Thu Jan  1 18:26:23 CET 2009
+	- Make tests more reliable.
+
+0.02  Mon Oct  2 21:52:42 CEST 2006
+	- Compatibility with CGI::Session 4.x.
+	- Added some "real" tests.
+
+0.01  Wed Jun 01 20:12:30 CEST 2005
+	- First public release.
+

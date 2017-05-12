@@ -1,0 +1,754 @@
+NAME
+    Config::General::Match - Add "<Location>" and "<LocationMatch>" style
+    matching to Config::General
+
+VERSION
+    Version 0.05
+
+NOTE
+    This module is obsolete and has now been superceded by Config::Context.
+
+SYNOPSIS
+        use Config::General::Match;
+
+        my $config_text = '
+
+            <Location /users>
+                title = "User Area"
+            </Location>
+
+            <LocationMatch \.*(jpg|gif|png)$>
+                image_file = 1
+            </Location>
+
+        ';
+
+        my $conf = Config::General::Match->new(
+            -String => $config_text,
+            -MatchSections => [
+                {
+                    -Name          => 'Location',
+                    -MatchType     => 'path',
+                },
+                {
+                    -Name          => 'LocationMatch',
+                    -MatchType     => 'regex',
+                },
+            ],
+        );
+
+        my %config = $conf->getall_matching('/users/~mary/index.html');
+        use Data::Dumper;
+        print Dumper(\%config);
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => undef,
+        };
+
+        my %config = $conf->getall_matching('/users/~biff/images/flaming_logo.gif');
+        print Dumper(\%config);
+        $VAR1 = {
+            'title'         => 'User Area',
+            'image_file'    => 1,
+        };
+
+DESCRIPTION
+  Introduction
+    This module extends "Config::General" by providing support for
+    configuration sections that match only for a particular file or path or
+    URL.
+
+    Typically you would use this to support the Apache-style conditional
+    blocks, for instance:
+
+        <FilesMatch .jpg$>
+            # ... some configuration ...
+        </FilesMatch>
+
+        <Location /users>
+            # ... some configuration ...
+        </Location>
+
+        <LocationMatch .html$>
+            # ... some configuration ...
+        </LocationMatch>
+
+    To read the configuration use "$conf->getall_matching" instead of
+    "$conf->getall":
+
+        my $conf         = Config::General::Match->new(...);
+        my %config       = $conf->getall_matching('/users/joe/index.html');
+        my %other_config = $conf->getall_matching('/images/banner.jpg');
+
+  Matching things other than paths
+    The Match feature is general enough that you can use it to match other
+    things besides paths and URLs. For instance you could specify a
+    "-PathSeparator" of "::" and use the feature to match against Perl
+    modules:
+
+        my $config_text = "
+
+            is_core_module 0
+            <Module NET::FTP>
+                is_core_module 1
+                author         Nathan Torkington
+            </Module>
+
+            <Module NET::FTPServer>
+                author Richard Jone
+            </Module>
+
+        ";
+
+        my $conf = Config::General::Match->new(
+            -String => $config_text,
+            -MatchSections => [
+                {
+                    -Name          => 'Module',
+                    -PathSeparator => '::',
+                    -MatchType     => 'path',
+                },
+            ],
+        );
+
+        my %config = $conf->getall_matching('Net::FTP');
+        use Data::Dumper;
+        print Dumper(\%config);
+        $VAR1 = {
+            'is_core_module' => 1,
+            'author'         => 'Nathan Torkington',
+        };
+
+  Merging
+   Merging with the implied 'Default' section
+    Config values that appear outside of any block act like defaults. Values
+    in matching sections are merged with the default values. For instance:
+
+        private_area = 0
+        client_area  = 0
+
+        <Location /admin>
+            private_area = 1
+        </Location>
+
+        <Location /clients>
+            client_area  = 1
+        </Location>
+
+        # Admin Area URL
+        my %config = $conf->getall_matching('/admin/index.html');
+        use Data::Dumper;
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 1,
+            'client_area' => 0,
+        };
+
+        # Client Area URL
+        my %config = $conf->getall_matching('/clients/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 0,
+            'client_area'  => 1,
+        };
+
+        # Neither Client nor Admin
+        my %config = $conf->getall_matching('/public/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+            'private_area' => 0,
+            'client_area'  => 0,
+        };
+
+   Multiple Level Merging
+    Sections and subsections are merged along with single values. For
+    instance:
+
+        private_area = 0
+        client_area  = 0
+        <page_settings>
+            title       = "The Widget Emporium"
+            logo        = logo.gif
+            advanced_ui = 0
+        </page_settings>
+
+        <Location /admin>
+            private_area = 1
+            <page_settings>
+                title       = "The Widget Emporium - Admin Area"
+                logo        = admin_logo.gif
+                advanced_ui = 1
+            </page_settings>
+        </Location>
+
+        <Location /clients>
+            client_area  = 1
+            <page_settings>
+                title = "The Widget Emporium - Wholesalers"
+                logo  = client_logo.gif
+            </page_settings>
+        </Location>
+
+        # Admin Area URL
+        my %config = $conf->getall_matching('/admin/index.html');
+        use Data::Dumper;
+        print Dumper(\%config);
+        $VAR1 = {
+            'page_settings' => {
+                                'advanced_ui' => '1',
+                                'title' => 'The Widget Emporium - Admin Area',
+                                'logo' => 'admin_logo.gif'
+                               },
+            'private_area' => '1',
+            'client_area' => '0'
+        };
+        # Client Area URL
+        my %config = $conf->getall_matching('/clients/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+            'page_settings' => {
+                                'advanced_ui' => '0',
+                                'title' => 'The Widget Emporium - Wholesalers',
+                                'logo' => 'client_logo.gif'
+                               },
+            'client_area' => '1',
+            'private_area' => '0'
+        };
+
+        # Neither Client nor Admin
+        my %config = $conf->getall_matching('/public/index.html');
+        print Dumper(\%config);
+        $VAR1 = {
+
+            'page_settings' => {
+                                'advanced_ui' => '0',
+                                'title' => 'The Widget Emporium',
+                                'logo' => 'logo.gif'
+                               },
+            'client_area' => '0',
+            'private_area' => '0'
+
+        };
+
+   Merging Multiple Matching Sections
+    Often more than one section will match the target string. When this
+    happens, the matching sections are merged together using the
+    "Hash::Merge" module. Typically this means that sections that are merged
+    later override the values set in earlier sections. (But you can change
+    this behaviour. See "Changing Hash::Merge behaviour" below.)
+
+    The order of merging matters. The sections are merged first according to
+    each section's "-MergePriority" value (lowest values are merged first),
+    and second by the length of the substring that matched (shortest matches
+    are merged first). If you don't specify "-MergePriority" for any
+    section, they all default to a priority of 0 which means all sections
+    are treated equally and matches are prioritized based soley on the
+    length of the matching strings.
+
+    The order of sections in the config file is ignored.
+
+    For instance, if your config file looks like this:
+
+        <Dir /foo/bar/baz>
+            # section 1
+        </Dir>
+
+        <Path /foo>
+            # section 2
+        </Path>
+
+        <Dir /foo/bar>
+            # section 3
+        </Dir>
+
+        <Directory /foo/bar/baz/bam>
+            # section 4
+        </Directory>
+
+    ...and you construct your $conf object like this:
+
+        my $conf         = Config::General::Match->new(
+            -MatchSections => [
+                { -Name    => 'Directory',  -MatchType => 'path' -MergePriority => 1 },
+                { -Name    => 'Dir',        -MatchType => 'path' -MergePriority => 1 },
+                { -Name    => 'Path',       -MatchType => 'path' -MergePriority => 2 },
+            ],
+        );
+
+    ...then the target string '/foo/bar/baz/bam/boom' would match all
+    sections the order of 1, 3, 4, 2.
+
+CONSTRUCTOR
+  new(...)
+    Creates and returns a new "Config::General::Match" object.
+
+        my $conf = Config::General::Match->new(
+            -MatchSections => [
+               {  -Name  => 'Directory',  -MatchType => 'path' },
+            ],
+            -ConfigFile => 'somefile.conf',
+        );
+
+    The arguments to "new()" are the same as you would provide to
+    "Config::General", with the addition of "-MatchSections". (But see see
+    the "BUGS" section for limitations on compatibility with
+    "Config::General".)
+
+    The "-MatchSections" parameter takes a list of specification hashrefs.
+    Each specification has the following fields:
+
+    -Name
+        The name of the section. For a name of 'Location', the section would
+        look like:
+
+            <Location /somepath>
+            </Location>
+
+        This parameter is affected by the "Config::General" option
+        "-LowerCaseNames". If "-LowerCaseNames" is true, then the following
+        would all be valid 'Location' sections.
+
+            <Location /somepath>
+            </Location>
+
+            <loCATtion /somepath>
+            </Location>
+
+            <lOcAtion /somepath>
+            </LOCATION>
+
+    -MatchType
+        Specifies the method by which the section strings should match the
+        target string.
+
+        The valid types of matches are 'exact', 'substring', 'regex',
+        'path', and 'hierarchical'
+
+        exact
+            The config section string matches only if it is equal to the
+            target string. For instance:
+
+                # somefile.conf
+                <Site mysite>
+                    ...
+                </Site>
+                ...
+
+                my $conf = Config::General::Match->new(
+                    -MatchSections => [
+                        {
+                            -Name      => 'Site',
+                            -MatchType => 'exact',
+                        },
+                    ],
+                    -ConfigFile => 'somefile.conf',
+                );
+
+            In this case, only the string "mysite" would match the section.
+
+        substring
+            The config section string is tested to see if it is a substring
+            of the target string. For instance:
+
+                # somefile.conf
+                <Location foo>
+                    ...
+                </Location>
+
+                ...
+
+                my $conf = Config::General::Match->new(
+                    -MatchSections => [
+                        {
+                            -Name      => 'LocationMatch',
+                            -MatchType => 'substring',
+                        },
+                    ],
+                    -ConfigFile => 'somefile.conf',
+                );
+
+            In this case, the following target strings would all match:
+
+                /foo
+                big_foo.html
+                /hotfood
+
+            Do not quote the match string; it will not work if you do so.
+
+        regex
+            The config section string is treated as a regular expression
+            against which the target string is matched. For instance:
+
+                # somefile.conf
+                <LocationMatch (\.jpg)|(\.gif)(\.png)$>
+                    Image = 1
+                </LocationMatch>
+
+                ...
+
+                my $conf = Config::General::Match->new(
+                    -MatchSections => [
+                        {
+                            -Name      => 'LocationMatch',
+                            -MatchType => 'regex',
+                        },
+                    ],
+                    -ConfigFile => 'somefile.conf',
+                );
+
+                my %config = $conf->getall_matching('banner.jpg');
+
+            The regex can contain any valid Perl regular expression. So to
+            match case-insensitively you can use the "(?i:)" syntax:
+
+                <LocationMatch (?i:/UsErS)>
+                    UserDir = 1
+                </LocationMatch>
+
+            Also note that the regex is not tied to the beginning of the
+            target string by default. So for regexes involving paths you
+            will probably want to do so explicitly:
+
+                <LocationMatch ^/users>
+                    UserDir = 1
+                </LocationMatch>
+
+            Do not quote a regex; it will not work if you do so.
+
+        path
+            This method is useful for matching paths, URLs, Perl Modules and
+            other hierarchical strings.
+
+            The config section string is tested against the the target
+            string according to the following rules:
+
+            *   The section string is a substring of the target string
+
+            *   The section string starts at the first character of the
+                target string
+
+            *   In the target string, the section string is followed
+                immediately by "-PathSeparator" or the end-of-string.
+
+            For instance:
+
+                # somefile.conf
+                <Location /foo>
+                </Location>
+
+                ...
+
+                my $conf = Config::General::Match->new(
+                    -MatchSections => [
+                        {
+                            -Name      => 'LocationMatch',
+                            -MatchType => 'path',
+                        },
+                    ],
+                    -ConfigFile => 'somefile.conf',
+                );
+
+            In this case, the following target strings would all match:
+
+                /foo
+                /foo/
+                /foo/bar
+                /foo/bar.txt
+
+            But the following strings would not match:
+
+                /foo.txt
+                /food
+                /food/bar.txt
+                foo.txt
+
+            Do not quote the path; it will not work if you do so.
+
+        hierarchical
+            A synonym for 'path'.
+
+    -PathSeparator
+        The path separator when matching hierarchical strings (paths, URLs,
+        Module names, etc.). It defaults to '/'.
+
+        This parameter is ignored unless the "-MatchType" is 'path' or
+        'hierarchical'.
+
+    -SectionType
+        Allows you to only process certain sections for certain types of
+        strings. For instance, you could match some sections against a given
+        filesystem path and some sections against a Perl module name, using
+        the same config file.
+
+            # somefile.conf
+            # section 1
+            <FileMatch \.pm$>
+                Perl_Module      = 1
+                Core_Module      = 1
+                Installed_Module = 0
+            </FileMatch>
+
+            # section 2
+            <FileMatch ^/.*/lib/perl5/site_perl>
+                Core_Module = 0
+            </FileMatch>
+
+            # section 3
+            # Note the whitespace at the end of the section name, to prevent File from
+            # being parsed as a stand-alone block by Config::General
+            <File /usr/lib/perl5/ >
+                Installed_Module = 1
+            </File>
+
+            # section 4
+            <Module NET::FTP>
+                FTP_Module = 1
+            </Module>
+
+            my $conf = Config::General::Match->new(
+                -MatchSections => [
+                    {
+                        -Name        => 'FileMatch',
+                        -MatchType   => 'regex',
+                        -SectionType => 'file',
+                    },
+                    {
+                        -Name        => 'File',
+                        -MatchType   => 'path',
+                        -SectionType => 'file',
+                    },
+                    {
+                        -Name        => 'Module',
+                        -MatchType   => 'path',
+                        -Separator   => '::',
+                        -SectionType => 'module',
+                    },
+                ],
+                -ConfigFile => 'somefile.conf',
+
+                # need to turn off C-style comment parsing because of the
+                # */ in the name of section 3
+                -CComments => 0,
+            );
+
+            my %config = $conf->getall_matching(
+                file   => '/usr/lib/perl5/site_perl/5.6.1/NET/FTP/Common.pm',
+                module => 'NET::FTP::Common',
+            );
+
+        This tests "/usr/lib/perl5/site_perl/5.6.1/NET/FTP/Common.pm"
+        against sections 1, 2 and 3 (and merging them in the order of
+        shortest to longest match, i.e. 1, 3, 2).
+
+        Then it tests 'NET::FTP::Common' against section 4 (which also
+        matches). The resulting configuration is:
+
+            use Data::Dumper;
+            print Dumper(\%config);
+            $VAR1 = {
+                'Perl_Module'      => 1,
+                'Core_Module'      => 0,
+                'FTP_Module'       => 1,
+                'Installed_Module' => 1,
+            };
+
+        Another example:
+
+            my %config = $conf->getall_matching(
+                file   => '/var/www/cgi-lib/FTP/FTPServer.pm',
+                module => 'NET::FTPServer',
+            );
+
+        This tests "/var/www/cgi-lib/NET/FTPServer.pm" against sections 1, 2
+        and 3, and matches only against section 1. Then it matches
+        'NET::FTPServer' against section 4 (which does not match). The
+        result is:
+
+            use Data::Dumper;
+            print Dumper(\%config);
+            $VAR1 = {
+                'Perl_Module'      => 1,
+                'Core_Module'      => 0,
+                'FTP_Module'       => 0,
+                'Installed_Module' => 0,
+            };
+
+        If a "-SectionType" is not specified in a "-MatchSections" block,
+        then target strings of a named type will not match it.
+
+        Matching by "-SectionType" is used in
+        "CGI::Application::Plugin::Config::General" to generate
+        configurations based both on the URL of the request and of the name
+        of the Perl Module and runmode handling the request.
+
+    -TrimSectionNames
+        By default, section names are trimmed of leading and trailing
+        whitespace before they are used to match. This is to allow for
+        sections like:
+
+            <Path /foo/bar/ >
+            </Path>
+
+        The whitespace at the end of the section name is necessary to
+        prevent Config::General's parser from thinking that the first tag is
+        an empty "<Path />" block.
+
+            <Path /foo/bar/>  # Config::General parses this as <Path />
+            </Path>           # Config::General now considers this to be spurious
+
+        If leading and trailing whitespace is significant to your matches,
+        you can disable trimming by setting -TrimSectionNames to 0 or
+        "undef".
+
+    -MergePriority
+        Sections with a lower "-MergePriority" are merged before sections
+        with a higher "-MergePriority". If two or more sections have the
+        same "-MergePriority" they are weighted the same and they are merged
+        according to the "best match" against the target string (i.e. the
+        longest matching substring).
+
+        See the description above under "Merging Multiple Matching
+        Sections".
+
+METHODS
+    "Config::General::Match" is a subclass of "Config::General", so you can
+    use of "Config::General"'s methods. In particular, you can use
+    "getall()" to get the entire configuration without concern for any
+    section matching.
+
+  getall_matching( $target_string )
+    Returns the merged configuration of all sections matching
+    $target_string, according to the rules set up in the "-MatchSections" in
+    "new()". All "-MatchSections" are included, regardless of their
+    "-SectionType".
+
+  getall_matching( $type => $target_string )
+    Returns the merged configuration matching $target_string, based only the
+    "-MatchSection"s that have a "-SectionType" of $type.
+
+  getall_matching( $type1 => $target_string1, $type2 => $target_string2 )
+    Returns the merged configuration of all sections of "-SectionType"
+    $type1 matching $target_string1 and all sections of "-SectionType"
+    $type2 matching $target_string2.
+
+    The order of the parameters to "getall_matching()" is retained, so
+    $type1 sections will be matched first, followed by $type2 sections.
+
+    If you call "getall_matching" in a scalar context, you will receive a
+    reference to the config hash:
+
+        my $config = $conf->getall_matching($target_string);
+        my $value = $config->{'somekey'};
+
+  getall_matching_nested( $level, ... )
+    Behaves the same as "getall_matching", except that it can match nested
+    structures.
+
+        # stories.conf
+        <Story Three Little Pigs>
+            antagonist = Big Bad Wolf
+            moral      = obey the protestant work ethic
+        </Story>
+
+        <Location /aesop>
+            <Story Wolf in Sheep's Clothing>
+                antagonist = Big Bad Wolf
+                moral      = appearances are deceptive
+            </Story>
+        </Location>
+
+        <Story Little Red Riding Hood>
+            antagonist = Big Bad Wolf
+
+            <Location /perrault>
+                moral      = never talk to strangers
+            </Location>
+
+            <Location /grimm>
+                moral      = talk to strangers and then chop them up
+            </Location>
+        </Story>
+
+        my $conf = Config::General::Match->new(
+            -MatchSections => [
+                {
+                    -Name        => 'Story',
+                    -MatchType   => 'substring',
+                    -SectionType => 'story',
+                },
+                {
+                    -Name        => 'Location',
+                    -MatchType   => 'path',
+                    -SectionType => 'path',
+                },
+            ],
+            -ConfigFile => 'stories.conf',
+        );
+
+        my $depth = 2;
+        $config = $conf->getall_matching_nested(
+            $depth,
+            story => 'Wolf in Sheep\'s Clothing',
+            path  => '/aesop/wolf-in-sheeps-clothing',
+        );
+
+        use Data::Dumper;
+        print Dumper($config);
+        $VAR1 = {
+            'antagonist' => 'Big Bad Wolf',
+            'moral'      => 'appearances are deceptive'
+        };
+
+Changing Hash::Merge behaviour
+    Matching sections are merged together using the "Hash::Merge" module. If
+    you want to change how this module does its work you can call
+    subroutines in the "Hash::Merge" package directly. For instance, to
+    change the merge strategy so that earlier sections have precidence over
+    later sections, you could call:
+
+        # Note American Spelling :)
+        Hash::Merge::set_behavior('RIGHT_PRECEDENT')
+
+    You should do this before you call "getall_matching()".
+
+    For more information on how to change merge options, see the
+    "Hash::Merge" docs.
+
+AUTHOR
+    Michael Graham, "<mag-perl@occamstoothbrush.com>"
+
+BUGS
+    *   This module does not support the functional interface to
+        "Config::General" (e.g. "ParseConfig()").
+
+    *   This module only supports the following constructor form:
+
+            my $self = Config::General::Match->new( %options );
+
+        It does not support the other two "Config::General" constructor
+        styles:
+
+            # NOT supported
+            my $self = Config::General->new( "rcfile" );
+            my $self = Config::General->new( \%some_hash );
+
+    Please report any bugs or feature requests to
+    "bug-config-general-match@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+SEE ALSO
+        Config::General
+        CGI::Application::Plugin::Config::General
+        Hash::Merge
+
+ACKNOWLEDGEMENTS
+    This module would not be possible without Thomas Linden's excellent
+    "Config::General" module.
+
+COPYRIGHT & LICENSE
+    Copyright 2004-2005 Michael Graham, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

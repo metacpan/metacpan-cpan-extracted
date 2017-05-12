@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution CPAN-Mini-FromList,
+version 0.05:
+
+  create a minimal CPAN mirror from a list of modules you specify
+
+This software is copyright (c) 2012 by Thomas Klausner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Copy-and-paste usage lines for lazy coders'
+author:
+  - 'Xiong Changnian <xiong@cpan.org>'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - help
+  - usage
+  - docs
+  - documentation
+  - cheat
+  - sheet
+  - cheatsheet
+  - summary
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cheat-Meta
+provides:
+  Bundle::Cheat::Sheet:
+    file: lib/Bundle/Cheat/Sheet.pm
+    version: v0.0.5
+  Cheat::Meta:
+    file: lib/Cheat/Meta.pm
+    version: v0.0.5
+requires:
+  perl: 5.008008
+  version: 0.77
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/Xiong/cheat-meta
+version: v0.0.5

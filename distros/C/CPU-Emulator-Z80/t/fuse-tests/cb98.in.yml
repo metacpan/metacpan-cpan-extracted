@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 152
+  23902:
+    - 164
+name: cb98
+registers:
+  AF: 13312
+  AF_: 0
+  BC: 46620
+  BC_: 0
+  DE: 30493
+  DE_: 0
+  HL: 23902
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

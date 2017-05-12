@@ -1,0 +1,4 @@
+/* parent begin */
+@import "include_child1.css";
+@import "include_child3.css";
+/* parent end */

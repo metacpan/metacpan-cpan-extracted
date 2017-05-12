@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: CGI-Application-Standard-Config
+version: 1.01
+author:
+  - Mark Stosberg <mark@summersault.com>
+abstract: ~
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  CGI::Application::Standard::Config:
+    file: lib/CGI/Application/Standard/Config.pm
+    version: 1.01
+generated_by: Module::Build version 0.2611

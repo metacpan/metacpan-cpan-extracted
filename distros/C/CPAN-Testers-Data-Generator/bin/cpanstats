@@ -1,0 +1,214 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $VERSION = '1.05';
+
+#----------------------------------------------------------------------------
+# Library Modules
+
+use lib qw(../lib lib);
+
+use Getopt::ArgvFile default=>1;
+use Getopt::Long;
+
+use CPAN::Testers::Data::Generator   '1.05';
+
+#----------------------------------------------------------------------------
+# Variables
+
+my %options;
+
+#----------------------------------------------------------------------------
+# Progam
+
+init_options();
+
+my $t = CPAN::Testers::Data::Generator->new(
+    config      => $options{config},
+    logfile     => $options{log},
+);
+
+if($options{regenerate})    { $t->regenerate( { map { $_ => $options{$_} } qw(gstart gend dstart dend file) } ); }
+elsif($options{rebuild})    { $t->rebuild(    { map { $_ => $options{$_} } qw(gstart gend dstart dend localonly check) } ); }
+elsif($options{reparse})    { $t->reparse(    { map { $_ => $options{$_} } qw(guid file force localonly check) } ); }
+elsif($options{parse})      { $t->parse(      { map { $_ => $options{$_} } qw(guid file force) } ); }
+elsif($options{tail})       { $t->tail(       { map { $_ => $options{$_} } qw(file) } ); }
+else                        { $t->generate(   $options{nonstop} ); }
+
+# -------------------------------------
+# Subroutines
+
+sub init_options {
+    GetOptions( \%options,
+        'config|c=s',
+        'log|l=s',
+        'nonstop|n',
+
+        'rebuild',
+        'regenerate',
+        'reparse',
+        'parse',
+        'tail',
+
+        'gstart=s',
+        'gend=s',
+        'dstart=s',
+        'dend=s',
+
+        'file=s',
+        'guid=s',
+        'force',
+
+        'check',
+        'localonly',
+
+        'help|h',
+        'version|v'
+    ) or help(1);
+
+    help(1) if($options{help});
+    help(0) if($options{version});
+}
+
+sub help {
+    my $full = shift;
+
+    if($full) {
+        print <<HERE;
+
+Usage: $0 \
+    [--confile=<file>] [--log=<file>]                                                  \
+    [--rebuild    ( --gstart=s [--gend=s] | --dstart=s [--dend=s] )]           \
+    [--regenerate ( --gstart=s  --gend=s  | --dstart=s  --dend=s | --file=s )] \
+    [--reparse    [--force] (--guid=s | --file=s )]                            \
+    [--parse      [--force] (--guid=s | --file=s )]                            \
+    [--tail                             --file=s  ]                            \
+    [--check] [--localonly]                                                    \
+    [-n] [-h] [-v]
+
+  -c=<file>     configuration file
+  -l=<file>     output log file
+  -n            nonstop, repeat until no more articles
+
+  --rebuild     rebuild cpanstats from local metabase
+  --gstart      start rebuild from guid
+  --gend        end rebuild at guid
+  --dstart      start rebuild from date (YYYY-MM-DDThh-mm-ssZ)
+  --dend        end rebuild at date (YYYY-MM-DDThh-mm-ssZ)
+
+  --regenerate  regenerate between two dates/guids.
+  --file=<file> file of guid/date ranges, one per line
+
+  --reparse     reparse a specific guid from the metabase
+  --force       force a request from Metabase rather than local database
+  --guid=<guid> reparse specific guid
+  --file=<file> file of guid/date ranges, one per line
+
+  --parse       parse a specific set of guids from the metabase
+
+  --tail        tail of GUIDs from the metabase
+  --file=<file> output file of GUIDs, one per line
+
+  --check       check whether expected results (dry run)
+  --localonly   only use local database where appropriate [rebuild, reparse]
+
+  -h            this help screen
+  -v            program version
+
+HERE
+
+    }
+
+    print "$0 v$VERSION\n";
+    exit(0);
+}
+
+__END__
+
+=head1 NAME
+
+cpanstats - script to access the Metabase server and update the database.
+
+=head1 SYNOPSIS
+
+  # single run (max 2500 reports) update from remote metabase
+  cpanstats -c=data/settings.ini
+
+  # continually update database from remote metabase, until no more
+  # reports are returned
+  cpanstats -c=data/settings.ini --nonstop
+
+  # rebuild default database from local cache
+  cpanstats -c=data/settings.ini --rebuild  # rebuild entire local dataset
+  cpanstats -c=data/settings.ini --rebuild --gstart=$guid1
+  cpanstats -c=data/settings.ini --rebuild --gstart=$guid1 --gend=$guid2
+  cpanstats -c=data/settings.ini --rebuild --dstart=$date1
+  cpanstats -c=data/settings.ini --rebuild --dstart=$date1 --dend=$date2
+
+  # regenerate reports between to given points
+  cpanstats -c=data/settings.ini --regenerate --gstart=$guid1 --gend=$guid2
+  cpanstats -c=data/settings.ini --regenerate --dstart=$date1 --dend=$date2
+  cpanstats -c=data/settings.ini --regenerate --file=$file
+
+  # parse a single report from remote metabase
+  cpanstats -c=data/settings.ini --parse --guid=$guid1
+  cpanstats -c=data/settings.ini --parse --file=$file
+  cpanstats -c=data/settings.ini --parse --guid=$guid1 --force
+
+'parse' will only request a new report from the Metabase, if one doesn't
+exist in the local database.
+
+  # reparse a single report from remote metabase
+  cpanstats -c=data/settings.ini --reparse --guid=$guid1
+  cpanstats -c=data/settings.ini --reparse --file=$file
+  cpanstats -c=data/settings.ini --reparse --guid=$guid1 --check --localonly
+  cpanstats -c=data/settings.ini --reparse --guid=$guid1 --force
+
+Note that by default 'reparse' will request a new report from the Metabase,
+but won't update the local copies if the already exist. The 'force' option
+will ensure that the even local copies are updated.
+
+  # tail the reports last entered into the remote metabase
+  cpanstats -c=data/settings.ini --tail --file=$file
+
+=head1 DESCRIPTION
+
+Acts as a wrapper script to the underlying CPAN::Testers::Data::Generator code
+that interfaces with the Metabase server, parsing and storing facts relating to
+submitted CPAN Testers reports.
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send an email to barbie@cpan.org. However, it would help
+greatly if you are able to pinpoint problems or even supply a patch.
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::WWW::Reports>,
+L<CPAN::Testers::WWW::Statistics>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2012 Barbie for Miss Barbell Productions.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.
+
+=cut

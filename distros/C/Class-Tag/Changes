@@ -1,0 +1,17 @@
+Revision history for Class::Tag module:
+
+0.01  March 2013
+	- Original prototype (Big Bang) version used internally by early versions of Object::Hybrid 
+
+0.02_01 18 April 2013
+	- Complete revision and growing test suit. This is the first version released to CPAN as separate module.
+	
+0.03 22 April 2013
+	- First more or less decent version, with concept articulated more clearly. Many changes. Object::Hybrid now depends on it.
+	
+0.04 22 April 2013
+0.05 23 April 2013
+0.06 23 April 2013
+	- Documentation improvements.
+0.10 18 November 2013
+	- Documentation improvements.

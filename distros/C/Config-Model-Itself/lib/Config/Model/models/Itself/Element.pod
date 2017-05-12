@@ -1,0 +1,315 @@
+# PODNAME: Config::Model::models::Itself::Element
+# ABSTRACT:  Configuration class Itself::Element
+
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Itself::Element - Configuration class Itself::Element
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 type
+
+specify the type of the configuration element.Leaf is used for plain value. I< Mandatory. Type enum. choice: 'node', 'warped_node', 'hash', 'list', 'leaf', 'check_list'.  > 
+
+=head2 value_type
+
+I< Optional. Type enum. choice: 'boolean', 'enum', 'integer', 'reference', 'number', 'uniline', 'string', 'file', 'dir'.  > 
+
+Here are some explanations on the possible values:
+
+=over
+
+=item 'integer'
+
+positive or negative integer
+
+=item 'uniline'
+
+string with no embedded newline
+
+=back
+
+
+
+=head2 class - Override implementation of element
+
+Perl class name used to override the implementation of the configuration element. This override Perl class must inherit a Config::Model class that matches the element type, i.e. Config::Model::Value, Config::Model::HashId or Config::Model::ListId. Use with care. I< Optional. Type uniline.  > 
+
+=head2 morph
+
+When set, a recurse copy of the value from the old object to the new object is attemped. Old values are dropped when  a copy is not possible (usually because of mismatching types) I< Optional. Type boolean.  > 
+
+=head2 refer_to
+
+points to an array or hash element in the configuration tree using the path syntax. The available choice of this reference value (or check list)is made from the available keys of the pointed hash element or the values of the pointed array element. I< Optional. Type uniline.  > 
+
+=head2 computed_refer_to
+
+points to an array or hash element in the configuration tree using a path computed with value from several other elements in the configuration tree. The available choice of this reference value (or check list) is made from the available keys of the pointed hash element or the values of the pointed array element. I< Optional. Type warped_node.  > 
+
+=head2 replace_follow
+
+Path specifying a hash of value element in the configuration tree. The hash if used in a way similar to the replace parameter. In this case, the replacement is not coded in the model but specified by the configuration. I< Optional. Type uniline.  > 
+
+=head2 compute
+
+compute the default value according to a formula and value from other elements in the configuration tree. I< Optional. Type warped_node.  > 
+
+=head2 migrate_from
+
+Specify an upgrade path from an old value and compute the value to store in the new element. I< Optional. Type warped_node.  > 
+
+=head2 write_as
+
+Specify how to write a boolean value. Example 'no' 'yes'. I< Optional. Type list of uniline.  > 
+
+=head2 migrate_values_from
+
+Specifies that the values of the hash or list are copied from another hash or list in the configuration tree once configuration data are loaded. I< Optional. Type uniline.  > 
+
+=head2 migrate_keys_from
+
+Specifies that the keys of the hash are copied from another hash in the configuration tree only when the hash is created. I< Optional. Type uniline.  > 
+
+=head2 write_empty_value
+
+By default, hash entries without data are not saved in configuration files. Set this parameter to 1 if a key must be saved in the configuration file even if the hash contains no value for that key. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
+
+=head2 mandatory
+
+I< Optional. Type boolean.  > 
+
+=head2 config_class_name
+
+I< Optional. Type reference.  > 
+
+=head2 choice
+
+Specify the possible values. I< Optional. Type list of uniline.  > 
+
+=head2 min
+
+minimum value. I< Optional. Type number.  > 
+
+=head2 max
+
+maximum value. I< Optional. Type number.  > 
+
+=head2 min_index
+
+minimum number of keys. I< Optional. Type integer.  > 
+
+=head2 max_index
+
+maximum number of keys. I< Optional. Type integer.  > 
+
+=head2 default
+
+Specify default value. This default value is written in the configuration data. I< Optional. Type string.  > 
+
+=head2 upstream_default
+
+Another way to specify a default value. But this default value is considered as "built_in" the application and is not written in the configuration data (unless modified) I< Optional. Type string.  > 
+
+=head2 convert
+
+Convert value or index to uppercase (uc) or lowercase (lc). I< Optional. Type enum.  > 
+
+=head2 match
+
+Perl regular expression to assert the validity of the value. To check the whole value, use C<^> and C<$>. For instance C<^foo|bar$> allows C<foo> or C<bar> but not C<foobar>. To be case insentive, use the C<(?i)> extended pattern. For instance, the regexp C<^(?i)foo|bar$> also allows the values C<Foo> and C<Bar>. I< Optional. Type uniline.  > 
+
+=head2 assert
+
+Raise an error if the test code snippet does returns false. Note this snippet is also run on undefined value, which may not be what you want. I< Optional. Type hash of node of class L<Itself::CommonElement::Assert|Config::Model::models::Itself::CommonElement::Assert> .  > 
+
+=head2 warn_if
+
+Warn user if the code snippet returns true. I< Optional. Type hash of node of class L<Itself::CommonElement::Assert|Config::Model::models::Itself::CommonElement::Assert> .  > 
+
+=head2 warn_unless
+
+Warn user if the code snippet returns false. I< Optional. Type hash of node of class L<Itself::CommonElement::Assert|Config::Model::models::Itself::CommonElement::Assert> .  > 
+
+=head2 warn_if_match
+
+Warn user if a I<defined> value matches the regular expression. I< Optional. Type hash of node of class L<Itself::CommonElement::WarnIfMatch|Config::Model::models::Itself::CommonElement::WarnIfMatch> .  > 
+
+=head2 warn_unless_match
+
+Warn user if I<defined> value does not match the regular expression. I< Optional. Type hash of node of class L<Itself::CommonElement::WarnIfMatch|Config::Model::models::Itself::CommonElement::WarnIfMatch> .  > 
+
+=head2 warn
+
+Unconditionally issue a warning with this string when this parameter is used. This should be used mostly with "accept" I< Optional. Type string.  > 
+
+=head2 grammar
+
+Feed this grammar to Parse::RecDescent to perform validation. I< Optional. Type string.  > 
+
+=head2 default_list
+
+Specify items checked by default. I< Optional. Type check_list.  > 
+
+=head2 upstream_default_list
+
+Specify items checked by default in the application. I< Optional. Type check_list.  > 
+
+=head2 allow_keys_from
+
+this hash allows keys from the keys of the hash pointed by the path string. I< Optional. Type uniline.  > 
+
+=head2 allow_keys_matching
+
+Keys must match the specified regular expression. I< Optional. Type uniline.  > 
+
+=head2 follow_keys_from
+
+this hash contains the same keys as the hash pointed by the path string. I< Optional. Type uniline.  > 
+
+=head2 warn_if_key_match
+
+Warn user if a key is created matching this regular expression. I< Optional. Type uniline.  > 
+
+=head2 warn_unless_key_match
+
+Warn user if a key is created not matching this regular expression. I< Optional. Type uniline.  > 
+
+=head2 ordered
+
+keep track of the order of the elements of this hash. I< Optional. Type boolean.  > 
+
+=head2 default_keys
+
+default keys hashes. I< Optional. Type list of string.  > 
+
+=head2 auto_create_keys
+
+always create a set of keys specified in this list. I< Optional. Type list of string.  > 
+
+=head2 allow_keys
+
+specify a set of allowed keys. I< Optional. Type list of string.  > 
+
+=head2 auto_create_ids
+
+always create the number of id specified in this integer. I< Optional. Type string.  > 
+
+=head2 default_with_init
+
+specify a set of keys to create and initialization on some elements . E.g. ' foo => "X=Av Y=Bv", bar => "Y=Av Z=Cz"' I< Optional. Type hash of string.  > 
+
+=head2 max_nb
+
+I< Optional. Type integer.  > 
+
+=head2 replace
+
+Used for enum to substitute one value with another. This parameter must be used to enable user to upgrade a configuration with obsolete values. The old value is the key of the hash, the new one is the value of the hash. I< Optional. Type hash of string.  > 
+
+=head2 duplicates
+
+Specify the policy regarding duplicated values stored in the list or as hash values (valid only when cargo type is "leaf"). The policy can be "allow" (default), "suppress", "warn" (which offers the possibility to apply a fix), "forbid". I< Optional. Type enum. choice: 'allow', 'suppress', 'warn', 'forbid'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+allow
+
+=back
+
+
+
+=head2 help
+
+Specify help string specific to possible values. E.g for "light" value, you could write " red => 'stop', green => 'walk' I< Optional. Type hash of string.  > 
+
+=head2 status
+
+I< Optional. Type enum. choice: 'obsolete', 'deprecated', 'standard'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+standard
+
+=back
+
+
+
+=head2 level
+
+Used to highlight important parameter or to hide others. Hidden parameter are mostly used to hide features that are unavailable at start time. They can be made available later using warp mechanism. I< Optional. Type enum. choice: 'important', 'normal', 'hidden'.  > 
+
+=over 4
+
+=item upstream_default value :
+
+normal
+
+=back
+
+
+
+=head2 summary
+
+enter short information regarding this element. I< Optional. Type uniline.  > 
+
+=head2 description
+
+enter detailed help information regarding this element. I< Optional. Type string.  > 
+
+=head2 warp
+
+change the properties (i.e. default value or its value_type) dynamically according to the value of another Value object located elsewhere in the configuration tree. I< Optional. Type warped_node of class L<Itself::WarpValue|Config::Model::models::Itself::WarpValue> .  > 
+
+=head2 index_type
+
+Specify the type of allowed index for the hash. "String" means no restriction. I< Optional. Type enum.  > 
+
+=head2 cargo
+
+Specify the properties of the configuration element configuration in this hash or list. I< Optional. Type warped_node.  > 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Itself::CommonElement::Assert>
+
+=item *
+
+L<Config::Model::models::Itself::CommonElement::WarnIfMatch>
+
+=item *
+
+L<Config::Model::models::Itself::WarpValue>
+
+=back
+
+=cut
+

@@ -1,0 +1,34 @@
+---
+abstract: 'modules for handling XML data within the Catmandu framework'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.15, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-XML
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9'
+  XML::LibXSLT: '1.78'
+  XML::Struct: '0.26'
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-XML/issues
+  homepage: https://github.com/LibreCat/Catmandu-XML
+  repository: https://github.com/LibreCat/Catmandu-XML.git
+version: '0.16'
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'

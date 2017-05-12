@@ -1,0 +1,11 @@
+Revision history for CMS-JoomlaToDrupal
+
+0.04 	Thu Feb 26 09:46:18 EST 2009
+	initial public release
+	now migrates authors -> users
+	plus stories and comments
+	and the relationships among them.
+
+0.01    early January 2009 
+        First version, though not released to an unsuspecting world.
+

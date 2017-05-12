@@ -1,0 +1,67 @@
+#!perl
+use strict;
+
+# fastboot
+if ($ARGV[0] eq 'exec') {
+    require Carmel::Runner;
+    exit Carmel::Runner->new->execute(@ARGV[1..$#ARGV]);
+}
+
+require Carmel::App;
+exit Carmel::App->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+carmel - CPAN Artifact Repository Manager
+
+=head1 SYNOPSIS
+
+  # Run with a directory with cpanfile or cpanfile.snapshot
+  carmel install
+
+  # Manually pull a module if you don't have it
+  carmel inject DBI@1.633 Plack@1.0000
+
+  # list all the modules to be loaded
+  carmel list
+
+  # list all the modules in a tree
+  carmel tree
+
+  # show a location where a module is installed
+  carmel show Plack
+
+  # update snapshot
+  carmel update
+
+  # Runs your perl script with modules from artifacts
+  carmel exec perl ...
+
+  # Requires all your modules in cpanfile in one shot
+  carmel exec perl -e 'use Carmel::Preload;'
+
+  # Roll out the currently selected modules into ./local
+  carmel rollout
+
+  # package modules tarballs and index into ./vendor/cache
+  carmel package
+
+  # use Carmel packages inside a script (without carmel exec)
+  perl -e 'use Carmel::Setup; ...'
+
+  # prints export PATH=... etc for shell scripting
+  carmel export
+
+  # find a module in a repository
+  carmel find DBI
+
+  # find a module matching the version query
+  carmel find Plack ">= 1.0000, < 1.1000"
+
+=head1 SEE ALSO
+
+L<Carmel>
+
+=cut

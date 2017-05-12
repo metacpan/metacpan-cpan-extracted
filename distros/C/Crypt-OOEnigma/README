@@ -1,0 +1,38 @@
+Crypt/OOEnigma version 0.01
+===========================
+
+A flexible, object-oriented interface to a WWII Enigma machine.  
+
+Commercial and Military Enigmas are provided for use and modification.  You can
+easily construct your own with any number of rotors, your own ciphers in each
+component etc.
+
+Those who wish to explore an Enigma with historically accurate ciphers should
+try Crypt::Enigma or use this module to create their own Enigma with WWII
+ciphers.
+
+See the included Enigma.pl, the manpages and the tests for further information.
+
+INSTALLATION
+
+To install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  For the tests only:
+    Test::More => 0.41
+    Storable => 0.6.1.11,
+
+COPYRIGHT AND LICENCE
+
+This module is distributed under the same terms as Perl itself.
+
+Copyright (C) 2002 S J Baker, Ambriel Consulting
+

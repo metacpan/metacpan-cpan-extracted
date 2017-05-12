@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::ToXML.
+
+$Log: Changes,v $
+Revision 0.02  2002/02/05 01:09:18  mneylon
+Slight fix in POD docs
+
+Revision 0.01  2002/02/03 17:11:44  mneylon
+Initial release to Perlmonks
+
+

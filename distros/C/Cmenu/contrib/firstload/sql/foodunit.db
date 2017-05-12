@@ -1,0 +1,8 @@
+DROP TABLE foodunit;
+CREATE TABLE foodunit (
+	unit	INT,
+	units	TEXT,
+	unitl 	TEXT,
+	metu	INT,
+	conv	FLOAT
+);

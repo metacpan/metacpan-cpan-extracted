@@ -1,0 +1,24 @@
+Catalyst::Plugin::Cache::HTTP 0.001000
+======================================
+
+HTTP/1.1 cache validators for Catalyst.
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+See META.yml
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Bernhard Graf <graf(a)cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

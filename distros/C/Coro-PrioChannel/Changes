@@ -1,0 +1,24 @@
+Revision history for Coro-PrioChannel
+
+0.005     2013-03-26
+        ! Some testers don't have sub-second timers (?), such as
+          perl 5.17.{[789],10}, or darwin (?), causing a failure in
+          t/06_reprio.t.  Workaround in the test, not the code.
+          If you are missing sub-second timers, this is likely your
+          perl, not this module nor AnyEvent.
+
+0.004     2013-03-23
+        + Add Coro::PrioChannel::Multi
+        + Queues now age items to prevent starvation
+
+0.003     2012-04-13
+        + Add optional minimum-priority-level to size. Need to figure it out
+          for get, too (blocking here is harder, as will be testing).
+
+0.002     2012-04-11
+        + Add github metadata
+        + Add some better documentation for put (hey, it's all relative)
+        + Add test for size method
+
+0.001     2012-04-10
+        + Initial revision based nearly completely on Coro::Channel.

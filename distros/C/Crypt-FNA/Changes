@@ -1,0 +1,72 @@
+Revision history for Crypt-FNA
+
+0.65    19/06/2013 04:20
+	new test
+
+0.64    18/06/2013 20:45
+	fixed crypt_fract method
+
+0.63    03/10/2012 17:49
+	fixed zoom (if != 1) on make_fract method
+
+0.62    30/10/2012 17:00
+	fixed abstract
+
+0.61    29/10/2012 16:05
+	fixed zoom factor on method make_fract
+	
+0.60    29/10/2012 15:05
+	fixed error on makefile.pl
+
+0.59    29/10/2012 11:32
+	rebuilt distribution module with module-starter
+
+0.58    26/10/2012 10:40
+	code optimization
+
+0.56    26/03/2012 08:13
+	Fixed little bug make_fract method
+
+0.54    15/08/2011 13:32
+	Added 'MAC' method (digest)
+
+0.48    16/05/2011 12:03
+	RAM usage optimization
+
+0.24    03/12/2010 17:01
+	Added 'salted' attribute
+	Added 'make_salt' - internal - method
+	Modified POD text
+	Added control on validation.pm (rev. 0.02) to verify attribute 'salted' is a boolean
+	Updated array of message error (code 21): salted initialization  error (only true | false)
+
+0.12    27/09/2010 13:30
+	Modified s/GD::SIMPLE/GD::Simple/ 
+
+0.10    26/07/2010 16:13
+	Added method 'decrypt_scalar'
+	Added POD information for 'decrypt_scalar' method
+
+0.06    15/04/2010 11:05
+	Added POD information for 'new' method of Crypt::FNA
+
+0.05    14/04/2010 11:05
+	Add more information to Crypt::FNA POD
+	Add more information to Crypt::FNA::Validation POD
+	Modified 'Changes' (last version on top)
+
+0.04    09/04/2010 12:55
+	Modified abstract in build.pl
+        Correct text of readme
+
+0.03    09/04/2010 12:55
+        Correct text of POD Crypt::FNA
+        Add POD to Crypt::FNA::Validation
+        Add Version to Crypt::FNA::Validation
+        Add t/01-add.t
+        
+0.02    09/04/2010 9:55
+        Correct text of POD
+        
+0.01    16/03/2010/23:26
+        First version, released on an unsuspecting world.

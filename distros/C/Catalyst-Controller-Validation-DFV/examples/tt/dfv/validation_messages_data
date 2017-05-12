@@ -1,0 +1,33 @@
+[%
+    SET error_message = {
+        # messages for missing fields
+        missing => {
+            password                    => 'You must provide a password',
+            username                    => 'You must provide a username',
+
+            moon_stick                  => 'I demand the MOON! On a STICK!',
+        },
+
+        # messages for invalid fields (failed constraints)
+        invalid => {
+            'american_phone'            => 'should be an American phone number',
+            'constraint_confirm_equal'  => 'values do not match',
+            'email'                     => 'should be an email address',
+            'passwords-do-not-match'    => 'the passwords do not match',
+            'username-not-unique'       => 'the requested username is already in use',
+
+            # reCAPTCHA messages (from: http://recaptcha.net/apidocs/captcha/)
+            'incorrect-captcha-sol'     => 'the CAPTCHA solution was incorrect',
+            'recaptcha-not-reachable'   => 'unable to contact the reCAPTCHA verify server',
+        },
+
+        # mappings from field names to something we'd like to show the user
+        name => {
+            email_address               => 'Email Address',
+            password                    => 'Password',
+            password_confirm            => 'Password Confirmation',
+            recaptcha                   => 'reCAPTCHA',
+            username                    => 'Username',
+        },
+    }
+%]

@@ -1,0 +1,49 @@
+{
+   "abstract" : "The great new Config::TOML!",
+   "author" : [
+      "Alex Kalderimis <alex.kalderimis@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-TOML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : 0,
+            "IO::All" : 0,
+            "List::Util" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Config::TOML" : {
+         "file" : "lib/Config/TOML.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/lgpl-license.php"
+      ]
+   },
+   "version" : "0.01"
+}

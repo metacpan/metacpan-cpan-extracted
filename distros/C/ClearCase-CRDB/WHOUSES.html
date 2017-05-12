@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>whouses - impact analysis in a clearmake build environment</title>
+<link rev="made" href="mailto:dsb@boyski.com" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#motto">MOTTO</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#selecting_derived_objects_to_analyze">SELECTING DERIVED OBJECTS TO ANALYZE</a></li>
+	<li><a href="#.audit_files">.AUDIT FILES</a></li>
+	<li><a href="#clearcase::crdb">ClearCase::CRDB</a></li>
+	<li><a href="#true_code_analysis_compared">TRUE CODE ANALYSIS COMPARED</a></li>
+	<ul>
+
+		<li><a href="#minuses">MINUSES</a></li>
+		<li><a href="#pluses">PLUSES</a></li>
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#status">STATUS</a></li>
+	<li><a href="#porting">PORTING</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>whouses - impact analysis in a clearmake build environment</p>
+<p>
+</p>
+<hr />
+<h1><a name="motto">MOTTO</a></h1>
+<p><em><strong>``You give me a clean CR, I'll give you a clean impact analysis.''</strong></em></p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>Run this script with the <code>-help</code> option for usage details. Here are
+some additional sample usages with explanations:</p>
+<pre>
+  whouses foobar.h</pre>
+<p>Shows all DOs that make use of any file matching /foobar.h/.</p>
+<pre>
+  whouses -recurse foobar.h</pre>
+<p>Same as above but follows the chain of derived files recursively.</p>
+<pre>
+  whouses -exact foobar.h</pre>
+<p>Shows all DOs that make use of the specified file. The <code>-exact</code> flag
+suppresses pattern matching and shows only DOs which reference the
+exact file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><strong>Whouses</strong> provides a limited form of ``impact analysis'' in a clearmake
+build environment. This is different from traditional impact analysis
+(see <strong>TRUE CODE ANALYSIS COMPARED</strong> below for details). In particular,
+it operates at the granularity of files rather than language elements.</p>
+<p>Whouses is best described by example. Imagine you have a VOB
+<em>/vobs_sw</em> in which you build the incredibly simple application <code>foo</code>
+from <code>foo.c</code>.  You have a Makefile which compiles <code>foo.c</code> to <code>foo.o</code>
+and then links it to produce <code>foo</code>. And let's further assume you've
+just done a build using clearmake.</p>
+<p>Thus, <code>foo</code> is a derived object (<em>DO</em>) which has a config record
+(<em>CR</em>) showing how it was made. Whouses analyzes that CR and prints
+the data in easy-to-read indented textual format.  For instance:</p>
+<pre>
+        % whouses -do foo foo.c
+        /vobs_sw/src/foo.c  =&gt;
+          /vobs_sw/src/foo.o</pre>
+<p>The <code>-do foo</code> points to the derived object from which to extract and
+analyze the CR; it will be implicit in the remaining examples.  The
+output indicates that <code>foo.o uses foo.c</code>, or in other words that
+<code>foo.c</code> is a <em>contributor</em> to <code>foo.o</code>. If we add the <code>-recurse</code> flag:</p>
+<pre>
+        % whouses -r foo.c
+        /vobs_sw/src/foo.c =&gt;
+          /vobs_sw/src/foo.o
+            /vobs_sw/src/foo</pre>
+<p>We see all files to which <code>foo.c</code> contributes, indented according to
+how many generations removed they are. If we now add <code>-terminals</code></p>
+<pre>
+        % whouses -r -t foo.c
+        /vobs_sw/src/foo.c =&gt;
+          /vobs_sw/src/foo</pre>
+<p>Intermediate targets such as <code>foo.o</code> are suppressed so we see only the
+``final'' targets descended from <code>foo.c</code>.</p>
+<p>We can also go in the other direction using <code>-backward</code>:</p>
+<pre>
+        % whouses -b -e foo
+        /vobs_sw/src/foo &lt;=
+          /vobs_sw/src/foo.o</pre>
+<p>Which shows <code>foo.o</code> as a progenitor of <code>foo</code>. Note that the arrow
+(<strong>&lt;=</strong>) is turned around to indicate <code>-backward</code> mode. We also
+introduced the <code>-exact</code> flag here. By default, arguments to whouses
+are treated as patterns, not file names, and since <code>foo</code> has no
+extension it would have matched <code>foo.c</code> and <code>foo.o</code> as well. Use of
+<code>-exact</code> suppresses pattern matching.</p>
+<p>Of course we can go backward recursively as well:</p>
+<pre>
+        % whouses -back -exact -recurse foo
+        /vobs_sw/src/foo &lt;=
+          /vobs_sw/src/foo.o
+              /vobs_sw/src/foo.c
+              /vobs_sw/src/foo.h
+              /vobs_sw/src/bar.h</pre>
+<p>And discover that <code>foo.h</code> and <code>bar.h</code> were also used.</p>
+<p>When used recursively in the forward direction, this script answers the
+question ``if I change file X, which derived files will need to be
+rebuilt''? This is the classic use, the one for which it was written.
+When used recursively in the backward direction it can depict the
+entire dependency tree in an easily readable format.</p>
+<p>Because extracting a recursive CR can be quite slow for large build
+systems, whouses provides ways of dumping the CR data to a file
+representation for speed. Use of <code>-save</code>:</p>
+<pre>
+        % whouses -do foo -save ...</pre>
+<p>will write out the data to <em>foo.crdb</em>. Subsequently, if <em>foo.crdb</em>
+exists it will be used unless a new the <code>-do</code> flag is used.  See also
+the <code>-db</code> and <code>-fmt</code> flags.</p>
+<p>The default save format is that of <strong>Data::Dumper</strong>. It was chosen
+because it results in a nicely indented, human-readable text format
+file.</p>
+<p>
+</p>
+<hr />
+<h1><a name="selecting_derived_objects_to_analyze">SELECTING DERIVED OBJECTS TO ANALYZE</a></h1>
+<p>If a <code>-do</code> flag is given, the CRs are taken from the specified derived
+object(s).  Multiple DOs may be specified with multiple <code>-do</code> flags
+or as a comma-separated list. Alternatively, if the <code>CRDB_DO</code>
+environment variable exists, its value is used as if specified with
+<code>-do</code>.</p>
+<p>If no DOs are specified directly, <code>whouses</code> will look for stored DO
+data in files specified with <code>-db</code> or the <code>CRDB_DB</code> EV. The format is
+the same as above.</p>
+<p>Failing that, <code>whouses</code> will search for files named <code>*.crdb</code> along a
+path specified with <code>-dir</code> or <code>CRDB_PATH</code>, defaulting to the current
+directory.</p>
+<p>
+</p>
+<hr />
+<h1><a name=".audit_files">.AUDIT FILES</a></h1>
+<p>As a special case, derived objects matching the Perl regular expression
+<code>/\.AUDIT/i</code> are ignored while traversing the recursive config spec.
+These are presumed to be <em>meta-DOs</em> by convention, which aren't part
+of the production build per se but rather pseudo-targets whose only
+purpose is to hold CRs referring back to all real deliverables. Thus
+if you construct your Makefile to create a meta-DO, you might want to
+name it <code>.AUDIT</code> or <code>.prog.AUDIT</code> or something.</p>
+<p>
+</p>
+<hr />
+<h1><a name="clearcase::crdb">ClearCase::CRDB</a></h1>
+<p>Most of the logic is actually in the <code>ClearCase::CRDB</code> module; the
+<code>whouses</code> program is just a wrapper which uses the module. It's done
+this way so ClearCase::CRDB can provide an API for other potential
+tools which need to do CR analysis.</p>
+<p>
+</p>
+<hr />
+<h1><a name="true_code_analysis_compared">TRUE CODE ANALYSIS COMPARED</a></h1>
+<p>Whouses is somewhat different from ``real'' impact analysis products.
+There are a number of such tools on the market, for example SNiFF+ from
+WindRiver.  Typically these work by parsing the source code into some
+database representation which they can then analyze. It's a powerful
+technique but entails some tradeoffs:</p>
+<p>
+</p>
+<h2><a name="minuses">MINUSES</a></h2>
+<ul>
+<li></li>
+A true code analysis tool must have knowledge of each programming
+language in use. I.e. to add support for Java, a Java parser must be
+added.
+<p></p>
+<li></li>
+A corollary of the above is that it requires lot of work by expert
+programmers. Thus the tools tend to be large, complex and expensive.
+Note: there is also <em>cscope</em> which is free, and maybe others. But as
+the name implies <em>cscope</em> is limited to C-like languages.
+<p></p>
+<li></li>
+Another corollary is that the tool must track each advance
+in each language, usually with significant lag time, and
+may not be bug-for-bug compatible with the compiler.
+<p></p>
+<li></li>
+Also, since analysis basically entails compiling the code, analysis of
+a large code base can take a long time, potentially as long or longer
+than actually building it.
+<p></p>
+<li></li>
+If some part of the application is written in a language the tool
+doesn't know (say Python or Visual Basic or Perl or an IDL), no
+analysis of that area can take place.
+<p></p></ul>
+<p>
+</p>
+<h2><a name="pluses">PLUSES</a></h2>
+<ul>
+<li></li>
+The analysis can be as granular and as language-knowledgeable as its
+developers can make it. If you change the signature of a C function, it
+can tell you how many uses of that function, in what files and on what
+lines, will need to change.
+<p></p>
+<li></li>
+A code analysis tool may be tied to a set of languages but by the same
+token it's NOT tied to a particular SCM or build system.
+<p></p></ul>
+<p>The minuses above are not design flaws but inherent tradeoffs.  For
+true code impact analysis you must buy one of these tools and accept
+the costs.</p>
+<p>Whouses doesn't attempt code analysis per se.  As noted above, true
+code analysis programs are tied to language but not to an SCM system.
+Whouses flips this around; it doesn't care about language but it only
+works with build systems that use clearmake within a ClearCase VOB.</p>
+<p>Whouses takes the <em>config records</em> generated by clearmake, analyzes
+them, and tells you which files depend on which other files according
+to the CRs. Both techniques have fuzziness of different kinds: code
+analysis predicts what the real compiler will do based on what the
+analysis compiler found; divergence is possible. Whouses predicts what
+the next build will do based on what the last build did.  If changes
+have taken place since, divergence is possible here too.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>David Boyce &lt;dsbperl AT boyski.com&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2000-2006 David Boyce. All rights reserved.  This Perl
+program is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="status">STATUS</a></h1>
+<p>This is currently ALPHA code and thus I reserve the right to change the
+UI incompatibly. At some point I'll bump the version suitably and
+remove this warning, which will constitute an (almost) ironclad promise
+to leave the interface alone.</p>
+<p>
+</p>
+<hr />
+<h1><a name="porting">PORTING</a></h1>
+<p>I've tried to write this in a platform independent style but it hasn't
+been heavily tested on Windows (actually it hasn't been <em>all</em> that
+heavily tested anywhere). It does pass <code>make test</code> on Windows and
+appears to work fine in limited testing.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1), ClearCase::CRDB(3), <code>cleartool man catcr</code></p>
+
+</body>
+
+</html>

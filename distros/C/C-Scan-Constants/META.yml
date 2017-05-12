@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               C-Scan-Constants
+version:            1.020
+abstract:           Slurp constants from specified C header files
+author:
+    - Philip Monsen <philip.monsen@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Flow:       0
+    File::Copy:       0
+    File::Path:       0
+    File::Temp:       0
+    List::MoreUtils:  0
+    Scalar::Util:     0
+resources:
+    bugtracker:  http://rt.cpan.org/Public/Dist/Display.html?Name=C-Scan-Constants
+    repository:  git://github.com/icerider70/c-scan-constants.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

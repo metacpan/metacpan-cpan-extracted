@@ -1,0 +1,72 @@
+# PODNAME: Config::Model::models::Sshd::MatchBlock
+# ABSTRACT:  Configuration class Sshd::MatchBlock
+=head1 NAME
+
+Config::Model::models::Sshd::MatchBlock - Configuration class Sshd::MatchBlock
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+Class to represent a Match block inside a sshd_config file. 
+
+It's made of a list of conditions to match and a list of 
+parameters to apply to the matched items.
+
+=head1 Elements
+
+=head2 Condition
+
+Specify the condition (User, Group, Host, Address) necessary for this Match block to be applied. I<< Optional. Type node of class L<Sshd::MatchCondition|Config::Model::models::Sshd::MatchCondition> .  >> 
+
+=head2 Settings
+
+Defines the sshd_config parameters that will override general settings when all defined User, Group, Host and Address patterns match.I<< Optional. Type node of class L<Sshd::MatchElement|Config::Model::models::Sshd::MatchElement> .  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Sshd::MatchCondition>
+
+=item *
+
+L<Config::Model::models::Sshd::MatchElement>
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Dominique Dumont
+
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2009-2011 Dominique Dumont
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item LGPL2
+
+
+=back
+
+=cut
+

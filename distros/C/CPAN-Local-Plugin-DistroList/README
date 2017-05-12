@@ -1,0 +1,83 @@
+NAME
+    CPAN::Local::Plugin::DistroList - Populate a mirror with a list of
+    distributions
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+    In "cpanlocal.ini":
+
+      ; Add distros from backan
+      [DistroList / Backpan]
+      list   = backpan.distrolist
+      prefix = http://backpan.perl.org/authors/id/
+      cache  = /home/user/backpan/cache
+
+      ; Add distros from filesystem
+      [DistroList / Local]
+      list     = local.distrolist
+      prefix   = /home/user/distros/
+      local    = 1
+      authorid = MYCOMPANY
+
+    In "backpan.distrolist":
+
+      A/AB/ABH/Apache-DBI-0.94.tar.gz
+      A/AB/ABIGAIL/Regexp-Common-1.30.tar.gz
+      A/AB/ABW/Class-Base-0.03.tar.gz
+      ...
+
+    In "local.distrolist":
+
+      My-Great-App-001.tar.gz
+      My-Great-App-002.tar.gz
+      ...
+
+    Then simply update the repo from the command line:
+
+      % lpan update
+
+DESCRIPTION
+    This plugin allows you to add distributions from a list of filenames or
+    uris. The list is read from a configuration file containing one
+    distribution name per line.
+
+IMPLEMENTS
+    CPAN::Local::Role::Gather
+
+ATTRIBUTES
+  list
+    Required. Path to the configuration file that contains the list of
+    distributions. The configuration file must contain absolute paths or
+    uris, unless "prefix" is specified.
+
+  prefix
+    Optional. String to prepend to each line in the configuration file. This
+    is commonly the base uri of a CPAN mirror or the path to a local folder
+    containing distributions. Note that the prefix is simply concatenated
+    with each line in the configuration file, so be careful not to omit the
+    trailing slash where needed.
+
+  cache
+    Optional. Directory where to download a remote distribution before
+    adding it to the mirror. If a distribtuion from the configuartion file
+    is already in the cache, it will not be downloaded again. Ignored when
+    "local" is used.
+
+  local
+    Optional. Instructs the plugin that the distributions live in the local
+    filesystem, so no attempt will be made to download or cache them.
+
+  authorid
+    Optional. Author id to use when injecting distributions from this list.
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Venda, Inc..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

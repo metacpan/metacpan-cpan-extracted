@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+use strict;
+use lib 'Cluster/Init/lib';
+use Cluster::Init;
+use Getopt::Std;
+
+my %opt;
+getopts("dhkvc:s:", \%opt) || usage();
+
+usage() if $opt{h};
+
+my %parms = (
+    'cltab' => $opt{c} || '/etc/cltab',
+    'socket'  => $opt{s} || '/var/run/clinit/clinit.s'
+	    );
+
+if ($opt{d})
+{
+  my $init = Cluster::Init->daemon(%parms);
+  exit;
+}
+
+my $init = Cluster::Init->client(%parms);
+
+if ($opt{k})
+{
+  $init->shutdown(); 
+  print $init->status if $opt{v};
+  exit;
+}
+
+unless ($#ARGV >= 0)
+{
+  $init->tell("::ALL::","::REREAD::");
+  print $init->status if $opt{v};
+  exit;
+}
+
+# spawn all apps for requested resource group and runlevel 
+my $runlevel=pop;
+my $resource_group=pop || `hostname`;
+chomp($resource_group);
+print $init->tell($resource_group,$runlevel)."\n";
+print $init->status if $opt{v};
+
+sub usage
+{
+  die "
+  usage: $0 [-h] [-c cltab] [-s udsocket] [[resource_group] runlevel]
+
+    -h	help
+    -d	start daemon
+    -k	kill daemon and all child processes
+    -c  config file (default /etc/cltab)
+    -s  socket path (default /var/run/clinit/clinit.s)
+
+  If resource_group is not given, it defaults to the output of 'hostname'.
+
+  If neither resource_group nor runlevel are given, reread /etc/cltab.
+  
+  \n";
+}
+

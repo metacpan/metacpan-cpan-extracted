@@ -1,0 +1,43 @@
+NAME
+    Catalyst::ActionRole::ExpiresHeader - Set default Expires header for
+    actions
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        package MyApp::Controller::Foo;
+        use Moose;
+        use namespace::autoclean;
+
+        BEGIN { extends 'Catalyst::Controller::ActionRole' }
+
+        __PACKAGE__->config(
+            action_roles => [qw( ExpiresHeader )],
+        );
+
+        sub expire_in_one_day : Local Expires('+1d') { ... }
+
+        sub already_expired : Local Expires('-1d') { ... }
+
+DESCRIPTION
+    Provides a ActionRole to set HTTP Expires header for actions, which will
+    be set unless Expires header was already set.
+
+    Argument syntax matches the "-expires" from
+    "CREATING_A_STANDARD_HTTP_HEADER:" in CGI.
+
+SEE ALSO
+    Take a look at Catalyst::ActionRole::NotCacheableHeaders to make your
+    action not cachable by default.
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

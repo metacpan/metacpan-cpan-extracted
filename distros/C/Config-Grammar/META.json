@@ -1,0 +1,52 @@
+{
+   "abstract" : "A grammar-based, user-friendly config parser",
+   "author" : [
+      "David Schweikert <david@schweikert.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Grammar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "base" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0",
+            "Test::Simple" : "0",
+            "lib" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/schweikert/Config-Grammar/issues"
+      },
+      "homepage" : "https://github.com/schweikert/Config-Grammar",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/schweikert/Config-Grammar.git",
+         "web" : "https://github.com/schweikert/Config-Grammar"
+      }
+   },
+   "version" : "1.12",
+   "x_serialization_backend" : "JSON::XS version 2.34"
+}
+

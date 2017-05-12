@@ -1,0 +1,15 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+	<title><tmpl_var name=title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link href="<tmpl_var name=css_url>" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<h1 align="center"><tmpl_var name=title></h1>
+	<ul>
+	<tmpl_loop name=li_loop>
+	<li><tmpl_var name=item></li>
+	</tmpl_loop>
+	</ul>
+</body>
+</html>

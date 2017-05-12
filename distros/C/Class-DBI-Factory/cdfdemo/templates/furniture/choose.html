@@ -1,0 +1,8 @@
+<p><b>Choose [% factory.title(moniker) %]</b><br>
+<select name="[% moniker %]">
+<option value=""[% ' selected' UNLESS this %]> </option>
+[% FOREACH x = factory.all(moniker) %]
+    <option value="[% x.id %]"[% ' selected' IF this.id == x.id %]> [% x.title %]</option>
+[% END %]
+</select>
+</p>

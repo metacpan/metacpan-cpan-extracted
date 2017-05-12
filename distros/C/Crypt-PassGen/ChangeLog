@@ -1,0 +1,45 @@
+2012-09-21  Tim Jenness  <tjenness@cpan.org>
+
+	* Release v0.06 to CPAN
+
+	* PassGen.pm: Ensure password is correct length (Vadim Pushtaev)
+
+2008-03-25  Tim Jenness  <tjenness@cpan.org>
+
+	* Release v0.05 to CPAN
+
+	* PassGen.pm (ingest): Fix typo in _scale_seconds_down [thanks to imacat]
+
+2005-11-30 Tim Jenness <tjenness@cpan.org>
+
+	* Fix typo in call to _scale_thirds_down() [thanks to vijay on
+	annocpan]
+
+2003-11-28  Tim Jenness  <tjenness@cpan.org>
+
+	* Release v0.04 to CPAN
+
+2002-11-13  Tim Jenness  <tjenness@cpan.org>
+
+	* PassGen.pm (_tot_to_index): Handle the case where no index
+	matches (ie the combination does not exist in the frequency file)
+
+2002-10-05  Tim Jenness  <tjenness@cpan.org>
+
+	* Release v0.03 to CPAN
+
+	* PassGen.pm: Construct default frequency file name using File::Spec
+
+	* Makefile.PL: Fix PREREQ_PM so that it works correctly with
+	CPAN.pm (undef version number is not supported) [thanks to Florian
+	Helmberger]
+
+2002-09-18  Tim Jenness  <tjenness@cpan.org>
+
+	* PassGen.pm: Synopsis now correct [thanks to Florian Helmberger]
+
+2001-04-09  Tim Jenness  <tjenness@cpan.org>
+
+	* Makefile.PL: Search in /usr/share  as well as /usr/ for default
+	dictionary.
+

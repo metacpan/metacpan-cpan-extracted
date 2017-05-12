@@ -1,0 +1,100 @@
+NAME
+    Class::Inheritance - get and set inheritance values for a class.
+
+SYNOPSIS
+      use Class::Inheritance;
+      my $ci = new Class::Inheritance;
+      $ci->format('type'=>'simple');
+
+        # Example class and method. Change to the class and method you want.
+      my $class = 'CGI';
+      my $method = 'param';
+
+      print $ci->source('class'=>$class, 'method'=>$method); 
+      print $ci->tree('class'=>$class); 
+      print $ci->sources('class'=>$class, 'method'=>$method); 
+      print $ci->tree_children('class'=>$class, 'method'=>$method,);
+      print $ci->subclasses('class'=>$class);
+      print $ci->source_all('method'=>$method);
+      print $ci->trees_all('method'=>$method);
+      print $ci->tree_children('class'=>$class, 'method'=>$method);
+
+        ### Do not use these methods. 
+      $ci->function_in_isa('class'=>$class, 'method'=>$method);
+      $ci->method_return_type(method'=>$method, list=>[]);
+
+DESCRIPTION
+      Class::Inheritance tries to get all the information you would ever 
+      need regarding inheritance and multiple inheritance for classes. 
+      The main focus of the module is to ask "From which class did this
+      method come from?".
+
+      NOTE: You MUST have the classes loaded in order for them to be 
+      searched. In the future, there will be options for it to scan all 
+      modules loaded on your system -- but it does not do it yet. 
+
+      The current state of Class::Inheritance is alpha-quality material. 
+      The code is going to be ripped apart and redone, but the basic
+      methods should remain. It most likely will take heavy use of 
+      Class::Inspector in the future. 
+
+      Setting values for classes is not implemented yet. 
+
+TERMS AND OPTIONS
+        Options common to most methods. 
+
+      1. "return_type" can have the values "", "list", or "string". 
+           Default "string".
+      2. "class" is the name of the class in question. Also, defaults
+         to "package" if defined. 
+      3. "package" contains the class you are looking for. Most of the 
+          time you do not need to specify this. Defaults to "class".  
+
+        Options for the object. 
+
+      1. "debug" will turn off and on the debug levels. 
+      2. "format" has the options of "" or "simple". "simple" returns
+         a string ready for printing. 
+
+METHODS
+  source
+       Returns the name of the class which this method came from. Only 
+       searches loaded classes.
+
+  tree
+      This returns the inheritance tree for a class. Only searches
+      loaded classes.
+
+      Returns all the classes in the inheritance tree of a classes has
+      this method defined. This does not include classes which inherited
+      the method. Only searches loaded classes.
+
+  tree_children
+      Returns the classes which inherit a method from a class. Only 
+      searches loaded classes. 
+
+  subclasses
+      Returns all the loaded subclasses for a class. 
+
+  source_all
+      Returns all the sources for a method from the loaded classes. 
+      This will search all loaded classes. Any class that has this
+      method defined (not inherited) should be in this list. 
+
+  trees_all
+      Returns all the trees of classes which contain a method. Only 
+      searches loaded classes. 
+
+AUTHOR
+            Mark Nielsen
+            articles@tcu-inc.com
+            http://tcu-inc.com/
+
+COPYRIGHT
+    Copyright (c) 2004 Mark Nielsen. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

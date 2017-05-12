@@ -1,0 +1,33 @@
+=head1 POD script modificator
+
+The POD generation should be able to append to the script it calls, also updating earlier POD to make things easier for me. Forgot to update paramorama POD for version 3.000004!
+
+=head1 1. post-3.0.0: HALF-DONE: Add hashes, simple enough syntax 
+
+	--hash.=name=value, or just --hash=name=value
+
+I think I prefer the former for consistency, --hash=name=value sets the whole hash to the single pair.
+Also, there will be hash-=name to delete an entry; perhaps hash+=name=value as alias to .= operator ... but then, would that prohibit other meaningful use of those?
+Hm, I don't define those for arrays ... but one could indeed define -= for removing elements (positive/negative number for pop/shift).
+
+=head1 3. post-3.0.0: consider supporting environment variables ...
+
+perhaps ... in the form PROGRAM_PARNAME
+
+=head1 4. post-3.0.0: Consider proper parameter groups
+
+buntstift has tex.* parameters ... looks like a group, but is none. Do I need extra structure?
+
+Perhaps all that's needed is in config files, mimicking INI-style grouping via
+
+	=prefix tex.
+
+(without or without dot ...)
+
+That would prepend "tex." on all the following parameter names. Config::Param::print_file() could get some smarts to detect common prefixes. And done you are with pseudo-groups.
+
+I could even add [tex.] as alias for that and, when avoiding here-document multiline strings and meta stuff, would have something that should parse as INI.
+
+=head1 8. post-3.0.0: $config{hidenonshort}
+
+consider providing a list of those instead ... or in addition, at least

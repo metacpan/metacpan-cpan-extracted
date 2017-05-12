@@ -1,0 +1,258 @@
+NAME
+    CGI::FileManager - Managing a directory structure on an HTTP server
+
+SYNOPSIS
+    Enable authenticated users to do full file management on a subdirectory
+    somewhere with a web server installed.
+
+    After installing the module you have to create a file with usernames and
+    passwords in it. For this we supply cfm-passwd.pl which should have been
+    installed in your PATH. Type:
+
+    > cfm-passwd.pl /home/user/mypwfile add someuser
+
+    It will ask for password and the home directory that the use is supposed
+    to be able to manage.
+
+    Then in nearby CGI script:
+
+     #!/usr/bin/perl -wT
+     use strict;
+ 
+     use CGI::FileManager;
+     my $fm = CGI::FileManager->new(
+                            PARAMS => {
+                                    AUTH => {
+                                            PASSWD_FILE => "/home/user/mypwfile",
+                                    }
+                            }
+                    );
+     $fm->run;
+
+    Now point your browser to the newly created CGI file and start managing
+    your files.
+
+WARNING
+     This is Software is in Alpha version. Its interface, both human and programatic
+     *will* change. If you are using it, please make sure you always read the Changes
+     section in the documentation.
+
+VERSION
+    Version 0.05
+
+DESCRIPTION
+    Enables one to do basic file management operations on a filesystem under
+    an HTTP server. The actions on the file system provide hooks that let
+    you implement custom behavior on each such event.
+
+    It can be used as a base class for a simple web application that mainly
+    manipulates files.
+
+Methods
+  cgiapp_init
+    Initialize application (standard CGI::Application)
+
+  setup
+    Standart CGI::Appication method to setup the list of all run modes and
+    the default run mode
+
+  cgiapp_prerun
+    Regular CGI::Application method
+
+  redirect
+    Just to easily redirect to the home page
+
+  load_tmpl
+    Change the default behaviour of CGI::Application by overriding this
+    method. By default we'll load the template from within our module.
+
+  message
+    Print an arbitrary message to the next page
+
+  login
+    Show login form
+
+  login_process
+    Processing the login information, checking authentication, configuring
+    the session object or giving error message.
+
+  authenticate
+    Called without parameter. Returns an objects that is capable to
+    authenticate a user.
+
+    By default it returns a CGI::FileManager::Auth object.
+
+    It is planned that this method will be overriden by the user to be able
+    to replace the authentication back-end. Currently the requirements from
+    the returned object is to have these methods:
+
+     $a->verify(username, password)   returns true/false
+     $a->home(username)               return the full path to the home directory of the given user
+
+    WARNING: this interface might change in the future, before we reach
+    version 1.00 Check the Changes.
+
+  logout
+    logout and mark the session accordingly.
+
+  change_dir
+    Changes the current directory and then lists the new current directory
+
+  list_dir
+    Listing the content of a directory
+
+  delete_file
+    Delete a file from the server
+
+  remove_directory
+    Remove a directory
+
+  unzip
+    unzip
+
+  rename_form
+    Rename file form
+
+  rename
+    Rename file
+
+  upload_file
+    Upload a file
+
+  create_directory
+    Create a directory
+
+  DEFAULT
+    To get the default behavior you can write the following code. The module
+    will use the built in templates to create the pages.
+
+     #!/usr/bin/perl -wT
+     use strict;
+ 
+     use CGI::FileManager;
+     my $fm = CGI::FileManager->new(
+                            PARAMS => {
+                                    AUTH => {
+                                            PASSWD_FILE => "/home/user/mypwfile",
+                                    }
+                            }
+                    );
+     $fm->run;
+
+    new(OPTIONS)
+
+  META-DATA
+    Theoretically we could manage some meta-data about each file in some
+    database that can be either outside our virtual file system or can be a
+    special file in each directory.
+
+  Limitations
+    The user running the web server has to have read/write access on the
+    relevant part of the file system in order to carry out all the
+    functions.
+
+USE CASES
+  Virtual web hosting with no ftp access for one user
+    A single user needs authentication and full access to one directory
+    tree. This does not work yet.
+
+     #!/usr/bin/perl -T
+ 
+     use CGI::FileManager;
+     my $fm = CGI::FileManager->new({
+                 ROOT => "/home/gabor/web/client1",
+                 AUTH => ["george", "WE#$%^DFRE"],   # the latter is the crypt-ed password we expect
+                 });
+     $fm->run;
+
+  Virtual web hosting with no ftp access for a number of users
+    A number of users need authentication and full access to one directory
+    tree per user.
+
+     #!/usr/bin/perl -T
+ 
+     use CGI::FileManager;
+     my $fm = CGI::FileManager->new(
+                            PARAMS => {
+                                    AUTH => {
+                                            PASSWD_FILE => "/home/user/mypwfile",
+                                    }
+                            }
+                    );
+     $fm->run;
+
+     The mypwfile file looks similar to an /etc/passwd file:
+     username:password:uid:gid:geco:homedir:shell
+
+     gid and shell are currently not used
+     homedir is the directory the user has rights for
+     password is encrypted by crypt
+     uid is just a unique number
+
+Changes
+  v0.01 2004 June 27
+     Initial release
+
+  v0.02_01
+     Move file/directory
+     Unzip file (.zip)
+
+  v0.02_02
+     Separate CGI::FileManager::Templates
+     add cfm-install.pl install script
+
+     Use CGI::Application::Plugin::Session
+     remove catching the warning of CA and require higher version of CA
+     add a test that test a particular warning
+     some subs were called as functions, now they are called as methods allowing better subclassing
+
+TODO
+     - install the module as regular CPAN module and add a script that will generate the templates
+       and hard-code their location in the script.
+ 
+     - Replace the Unix::ConfigFile with my own implementation
+
+     Test the module on Windows and find out what need to be done to pass the windows
+     tests ? Especially look at Unix::ConfigFile
+
+     Show most of the error messages on the directory listing page
+ 
+     Support for filenames with funny characters (eg. space)
+
+     Test all the functions, look for security issues !
+     Show the current directory  (the virtual path)
+     Separate footer/header
+     Enable external templates
+
+     Security issues: can I be sure that unzipping a file will open files only under the current directory ?
+     What should I do in case a file that comes from an unzip operation already exists ?
+
+     ZIP: currently the path to unzip is hard coded. It probably should be replaced by Archive::Zip
+
+     More fancy things:
+     Create file
+     Copy file/directory
+     Unzip file (tar/gz/zip)
+     Edit file (simple editor)
+
+     look at CGI::Explorer and check what is the relationsip to it ?
+
+Author
+    Gabor Szabo, "<gabor@pti.co.il>"
+
+Bugs
+    Please report any bugs or feature requests to
+    "bug-cgi-filemanager@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+Copyright & License
+    Copyright 2004 Gabor Szabo, All Rights Reserved.
+    <http://www.szabgab.com/>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+See also
+    CGI::Upload, WWW::FileManager, CGI::Uploader
+

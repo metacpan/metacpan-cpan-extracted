@@ -1,0 +1,24 @@
+<div id="status">
+<pre>factory id is '[% factory.id %]' and timestamp [% factory.timestamp %]</pre>
+
+<pre>
+config_class is <b>[% factory.config_class %]</b>
+config files read: <b>[% factory.config.files.join(' ') %]</b>
+config timestamp: <b>[% factory.config.timestamp %]</b>
+data classes: <b>[% factory.config.classes.join(' ') %]</b>
+list_class is <b>[% factory.list_class %]</b>
+dbh is <b>[% factory.dbh %]</b>
+tt is <b>[% factory.tt %]</b>
+template path: <b>[% factory.config.template_path.join(' ') %]</b>
+master template: <b>[% factory.config.master_template %]</b>
+</pre>
+
+<pre>
+id: <b>[% id %]</b>
+moniker: <b>[% moniker %]</b>
+thing: [% IF thing %]<b>[% thing.moniker %] [[% thing.id %]][% IF thing.title %]: [% thing.title %][% END %]</b>[% IF thing.is_ghost %] (ghost)[% END %][% END %]
+list: <b>[% list %]</b>
+view: <b>[% view %]</b>
+</pre>
+
+</div>

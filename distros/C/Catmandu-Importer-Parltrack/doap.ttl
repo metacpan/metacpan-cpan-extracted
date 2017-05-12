@@ -1,0 +1,66 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Catmandu-Importer-Parltrack/project>
+	a                    doap:Project;
+	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap-deps:runtime-requirement [ doap-deps:on "Catmandu::Sane 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Catmandu::Importer::getJSON 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo 1.000000"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard 0"^^doap-deps:CpanId ], [ doap-deps:on "URI::Template 0"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Test::Compile 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fixme 0"^^doap-deps:CpanId ], [ doap-deps:on "Test::Pod 1.00"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Catmandu-Importer-Parltrack>;
+	doap:category        [ rdfs:label "Big Data" ], [ rdfs:label "Content" ];
+	doap:created         "2014-06-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:download-page   <https://metacpan.org/release/Catmandu-Importer-Parltrack>;
+	doap:homepage        <https://metacpan.org/release/Catmandu-Importer-Parltrack>, <https://wiki.debian.org/DebianParl/VoightKampff>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:name            "Catmandu-Importer-Parltrack";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Catmandu-Importer-Parltrack/v_0-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://anonscm.debian.org/cgit/parl/Catmandu-Importer-Parltrack.git>;
+	];
+	doap:shortdesc       "import data from Parltrack into Catmandu".
+
+<http://purl.org/NET/cpan-uri/dist/Catmandu-Importer-Parltrack/v_0-001>
+	a                    doap:Version;
+	dc:identifier        "Catmandu-Importer-Parltrack-0.001"^^xsd:string;
+	dc:issued            "2014-10-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Iitial release, based on Catmandu::Wikidata.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/voss>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Catmandu-Importer-Parltrack-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:dr@jones.dk>;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/voss>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:voss@cpan.org>;
+	foaf:name            "Jakob Voﬂ";
+	foaf:nick            "VOSS";
+	foaf:page            <https://metacpan.org/author/VOSS>.
+

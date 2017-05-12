@@ -1,0 +1,66 @@
+=head1 NAME
+
+CGI::RSS - provides a CGI-like interface for making rss feeds
+
+=head1 SYNOPSIS
+
+    use strict;
+    use CGI::RSS;
+
+    # NOTE: RSS.pm does not export functions like CGI.pm. use OOP.
+
+    my $rss = new CGI::RSS;
+
+    print $rss->header;
+    print $rss->begin_rss(
+        title => "My Feed!",
+        link  => "http://localhost/directory",
+        desc  => "My feed is cool!");
+
+    while( my $h = $sth->fetchrow_hashref ) {
+        print $rss->item(
+            $rss->title       ( $h->{title} ),
+            $rss->link        ( $h->{link}  ),
+            $rss->guid        ( $h->{link}  ), # unique identifier, usually
+            $rss->description ( $h->{desc}  ), #   a permalink
+            $rss->date        ( $h->{date}  ), # does rfc822 date processing
+        );
+    }
+    print $rss->finish_rss;
+
+=head1 TAGS
+
+=head2 RSS TAGS
+
+The following tags work anywhere.  There is no enforcement for where they
+belong.  They're just tag functions.
+
+    rss channel item title link description language copyright
+    managingEditor webMaster pubDate lastBuildDate category
+    generator docs cloud ttl image rating textInput skipHours
+    skipDays link description author category comments enclosure
+    guid pubDate source date url
+
+=head1 TODO
+
+I just wanted to get this thing working for now, but I'm not proud of the
+module. In the future, I'd like to actually follow a standard.
+
+ 1. conform to standard(s) if possible
+ 2. deal with xmlns somehow
+
+=head1 AUTHOR
+
+Paul Miller C<< <jettero@cpan.org> >>
+
+I am using this software in my own projects...  If you find bugs, please please
+please let me know. :) Actually, let me know if you find it handy at all.  Half
+the fun of releasing this stuff is knowing that people use it.
+
+=head1 COPYRIGHT
+
+Copyright © 2011 Paul Miller — LGPL
+
+=head1 SEE ALSO
+
+L<CGI>

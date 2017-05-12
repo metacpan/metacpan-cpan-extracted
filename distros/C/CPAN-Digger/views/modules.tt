@@ -1,0 +1,18 @@
+[%
+   title=Modules
+   description= name
+%]
+[% INCLUDE incl/header.tt %]
+
+<p>
+When searching for the module [% module %] we found several places:
+</p>
+<ul>
+[% FOR m IN links %]
+  <li><a href="/dist/[% m.distro %]/lib/[% m.path].pm">[% m.module %]</a></li>
+[% END %]
+</ul>
+
+
+
+[% INCLUDE incl/footer.tt %]

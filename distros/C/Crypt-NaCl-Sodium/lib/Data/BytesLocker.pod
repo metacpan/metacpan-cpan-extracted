@@ -1,0 +1,314 @@
+# PODNAME: Data::BytesLocker
+# ABSTRACT: Guarded storage for sensitive data
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::BytesLocker - Guarded storage for sensitive data
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw(:utils);
+
+    # lock by default
+    $Data::BytesLocker::DEFAULT_LOCKED = 1;
+
+    # some sensitive data read from external sources, eg. database
+    my $password = ...;
+
+    my $password_locker = Data::BytesLocker->new($password, wipe => 1);
+
+    # $password now is overwritten with null bytes
+    $password =~ /^\0+$/ or die;
+
+    # as requested locker is locked
+    $password_locker->is_locked or die;
+
+    # dies with: "Unlock BytesLocker object before accessing the data"
+    print "password: ", $password_locker->bytes, "\n";
+
+    # unlock the data
+    $password_locker->unlock;
+
+    # as requested locker is unlocked
+    $password_locker->is_locked and die;
+
+    # prints the password using overloaded stringification
+    print "password: $password_locker\n";
+
+    # Crypt::NaCl::Sodium functions and methods return binary data locked in Data::BytesLocker objects
+    my $random_password = random_bytes( 32 );
+
+    # we wanted locked by default
+    $random_password->unlock;
+
+    # helper function to convert into hexadecimal string
+    print "random password: ", $random_password->to_hex, "\n";
+
+    # clone the data into new object
+    my $copy = $password_locker->clone;
+
+    # nonce increment
+    my $next_nonce = $nonce->increment;
+
+    # add number
+    my $next_nonce = $nonce->add( $step );
+
+    # check if the data contains zero bits only
+    $next_nonce->is_zero and print "back to square zero\n";
+
+    # always lock the data once done using it
+    $password_locker->lock;
+    $random_password->lock;
+
+    # wipe out the memory and destroy the object
+    undef $password_locker;
+    undef $random_password;
+    undef $copy;
+
+=head1 DESCRIPTION
+
+Heartbleed was a serious vulnerability in OpenSSL. The ability to read
+past the end of a buffer is a serious bug, but what
+made it even worse is the fact that secret data could be
+disclosed by doing so.
+
+In order to mitigate the impact of similar bugs, C<Data::BytesLocker> provides
+heap allocation functions for storing sensitive data.
+
+These are not general-purpose allocation functions. In particular, they
+are slower than regular scalars, and they
+require 3 or 4 extra pages of virtual memory (usually between 12-16kb extra
+memory will be used).
+
+The stored data is placed at the end of a page boundary,
+immediately followed by a guard page. As a result, accessing
+memory past the end of the region will immediately terminate the
+application.
+
+A canary is also placed right before the stored data.
+Modification of this canary are detected when trying to free
+the allocated region, and also cause the
+application to immediately terminate.
+
+An additional guard page is placed before this canary. In a
+Heartbleed-like scenario, this guard page is likely to be read
+before the actual data, and this access will cause the application
+to terminate instead of leaking sensitive data.
+
+The allocated region is filled with C<0xd0> bytes in order
+to help catch bugs due to initialized data.
+
+On operating systems supporting C<MAP_NOCORE> or C<MADV_DONTDUMP>,
+the memory allocated this way will also not be part of core dumps and can help
+avoid the data being swapped to disk.
+
+=head1 METHODS
+
+=head2 new
+
+    my $locker = Data::BytesLocker->new($data, wipe => 1 );
+
+Returns object that stores the input C<$data> in a protected memory location.
+
+If the optional parameter C<wipe> is given and is true, then the input C<$data>
+variable will be overwritten with null bytes.
+
+Returned C<$locker> object will contain the data that cannot be modified and if
+the object is locked it cannot be accessed as well.
+
+C<Data::BytesLocker> object when used in string context return the protected
+data.  See L</OVERLOADED OPERATIONS> for more details.
+
+=head2 clone
+
+    my $cloned = $locker->clone;
+
+Returns new data object which will contain the copied data from C<$locker>.
+
+=head2 lock
+
+    $locker->lock();
+
+When called makes the data stored inaccessible. It cannot be read or written,
+but the data are preserved.
+
+=head2 unlock
+
+    $locker->unlock();
+
+When called makes the data stored accessible for read access only.
+
+=head2 is_locked
+
+    if ( $locker->is_locked ) {
+        $locker->unlock;
+    }
+
+Returns true if the C<$locker> object is locked, false otherwise.
+
+=head2 length
+
+    my $data_length = $locker->length();
+
+Returns the length of protected bytes.
+
+=head2 to_hex
+
+    my $hexencoded = $locker->to_hex();
+
+Returns the protected data converted into a hexadecimal string.
+
+B<NOTE:> the C<$locker> object must be unlocked.
+
+Returns regular scalar.
+
+=head2 bytes
+
+    my $bytes = $locker->bytes();
+
+Returns the protected data as regular scalar.
+
+B<NOTE:> the C<$locker> object must be unlocked.
+
+=head2 is_zero
+
+    if ( $locker->is_zero ) {
+        print "data contains zero bits only\n";
+    }
+
+Returns true if the C<$locker> object contains zero bits only.
+Runs in constant-time for objects of the same length.
+
+=head2 memcmp
+
+    $locker->memcmp($bytes, $length ) or die "\$locker ne \$bytes for length: $length";
+
+Compares strings in constant-time. Returns true if they match, false otherwise.
+
+The argument C<$length> is optional if length of C<$bytes> is equal to the
+length of the data stored in C<$locker>. Otherwise it is required and cannot
+be greater then the length of the shorter of compared variables.
+
+=head2 compare
+
+    $nonce->compare( $number, $length ) == -1 and print "\$nonce < \$number for length: $length";
+
+A constant-time version of L</memcmp>, useful to compare nonces and counters
+in little-endian format, that plays well with L</increment>.
+
+Returns C<-1> if C<$nonce> is lower then C<$number>, C<0> if C<$nonce> and
+C<$number> are identical, or C<1> if C<$nonce> is greater then C<$number>.
+Both C<$nonce> and C<$number> are assumed to be numbers encoded in little-endian format.
+
+The argument C<$length> is optional if variables are of the same length. Otherwise it is
+required and cannot be greater then the length of the shorter of compared variables.
+
+=head2 increment
+
+    my $next_nonce = $nonce->increment();
+
+Increments an arbitrary long unsigned number. Method runs in constant-time
+for a given length of locked data and considers it to be encoded in
+little-endian format.
+
+This method is meant to be used to increment nonces and counters.
+
+Returns the incremented object.
+
+=head2 add
+
+    my $next_nonce = $nonce->add($number, $length);
+
+Method computes C<($nonce + $number) mod 2 ^ (8 * $length)> in constant time for
+a given length and returns the result of that computation.
+Both C<$nonce> and C<$number> are assumed to be numbers encoded in little-endian format.
+
+The argument C<$length> is optional if variables are of the same length. Otherwise it is
+required and cannot be greater then the length of the shorter of compared variables.
+
+This method is meant to be used to increment nonces and counters using specified
+step.
+
+=head1 OVERLOADED OPERATIONS
+
+Only operations listed below are supported.
+
+=head2 stringification
+
+    print "Password: $locker\n";
+
+Returns the protected data as regular scalar.
+
+=head2 stringwise equality
+
+    if ( $locker eq $expected ) {
+        print "matches\n";
+    }
+
+    if ( $locker ne $expected ) {
+        print "does not match\n";
+    }
+
+The C<eq> and C<ne> operations are overloaded and allow to compare the
+C<$locker> object with variable of equal length.
+
+=head2 boolean context
+
+    if ( $locker ) {
+        print "locker has some non-zero length data\n";
+    }
+
+    if ( ! $locker ) {
+        print "locker has some zero length data\n";
+    }
+
+The C<bool> and C<!> operations are overloaded and allow to check if the
+C<$locker> object contains the data at least one byte long.
+
+=head2 concatenation
+
+    my $kv = "password:". $locker;
+
+The concatenation operator C<.> is overloaded and allows to create a new
+C<Data::BytesLocker> object that is a result of joining the data together.
+
+=head2 repetition
+
+    my $tripled_data = $locker x 3;
+
+The repetition operator C<x> is overloaded and allow to create a new
+C<Data::BytesLocker> object that is a result of repeating the protected data
+specified number of times.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Crypt::NaCl::Sodium>
+
+=item * L<Securing memory allocations|http://doc.libsodium.org/helpers/memory_management.html>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

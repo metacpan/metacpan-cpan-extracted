@@ -1,0 +1,37 @@
+Source: courier-filter-perl
+Section: mail
+Priority: optional
+Maintainer: Julian Mehnle <julian@mehnle.net>
+Build-Depends-Indep: perl (>= 5.8), libmodule-build-perl
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.3
+
+Package: courier-filter-perl
+Architecture: all
+Depends: courier-mta, perl (>= 5.8), liberror-perl
+Recommends: libnet-rblclient-perl, libmail-spf-perl, libmime-tools-perl (>= 5.400), libio-stringy-perl (>= 2.110), libclamav-client-perl, libmail-spamassassin-perl, libarchive-zip-perl
+Suggests: libnet-address-ip-local-perl
+Description: purely Perl-based mail filter framework for the Courier MTA
+ Courier::Filter implements the Courier MTA's courierfilter interface as a
+ framework for mail filter modules.  Authors of filter modules can concentrate
+ on writing the actual filter logic without having to care about the usual
+ low-level details of the courierfilter interface.  Logging to various
+ facilities is also supported.
+ .
+ Courier::Filter allows multiple filter modules to be installed in stacked and
+ hierarchically grouped configurations.  Also, modules' polarity can be
+ reversed, so some modules can be used for explicitly accepting messages while
+ others are used in the traditional way for rejecting messages.
+ .
+ The following filter modules are included:
+   * BlankBody: matching of blank bodies (a stupid spammer symptom)
+   * DNSBL:     matching of calling MTA's IP address against DNS black-lists
+   * SPF:       authentication of sender addresses in inbound messages
+   * SPFout:    authentication of sender addresses in outbound messages
+   * Envelope:  matching of RFC 2821 message envelope fields
+   * Header:    matching of RFC 2822 message header fields
+   * FakeDate:  detection of implausible and malformed date header fields
+   * ClamAVd:   malware detection using the ClamAV scanner
+   * SpamAssassin:  spam detection using SpamAssassin
+   * Parts:     matching of MIME parts and ZIP archive contents
+   * SendCopy:  sending message copies to additional recipients

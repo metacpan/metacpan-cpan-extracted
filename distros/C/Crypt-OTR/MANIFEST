@@ -1,0 +1,19 @@
+Changes
+crypt-otr-callbacks.c
+crypt-otr-members.c
+crypt-otr-perl.c
+crypt-otr-private.c
+crypt-otr-utils.c
+crypt-otr.h
+lib/Crypt/OTR.pm
+lib/Crypt/OTR/PublicKey.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+OTR.inc
+OTR.xs
+ppport.h
+README
+t/Crypt-OTR.t
+typemap

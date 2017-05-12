@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 106
+name: fd6a
+registers:
+  AF: 24698
+  AF_: 0
+  BC: 57397
+  BC_: 0
+  DE: 23481
+  DE_: 0
+  HL: 56000
+  HL_: 0
+  I: 0
+  IX: 64516
+  IY: 46519
+  PC: 0
+  R: 0
+  SP: 0

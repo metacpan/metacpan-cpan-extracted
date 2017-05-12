@@ -1,0 +1,169 @@
+Change log for Chart::Gnuplot
+
+0.23
+    - CHG update copyright session of POD
+    - FIX testsuite for axis tics
+
+0.22
+    - NEW support "layer" option in drawing arbitrary lines, arrows, borders,
+          grid, and adding labels
+    - NEW support manually-specified range for tic location
+          (Thanks to Paul Evans)
+
+0.21
+    - FIX the persistance of label and arrow over plots in multiplot
+          (Thanks to Dave Lee)
+    - FIX repeatedly unset and set logscale in multiplot
+          (Thanks to Dave Lee)
+    - FIX the persistance of shape (circles, rectangles, ...) over plots in
+          multiplot
+
+0.20
+    - NEW support drawing arbitrary polygons
+    - NEW support alpha value in filling styles and objects for certain
+          terminals
+    - NEW chart object method "command" supports executing an array of commands
+    - NEW more test cases
+    - CHG automatically set "using" of the dataSet object in plotting histogram
+    - CHG code refactoring in Chart::Gnuplot::DataSet
+    - CHG make private method "_execute()" public
+    - CHG update POD
+    - FIX data processing of array of points in plotting 3D surface
+    - FIX data processing of plotting "hbars"
+
+0.19
+    - NEW support drawing arbitrary rectangles, ellipses and circles
+    - NEW Perlish setting of arrow head of arbitary arrows
+    - NEW support filling pattern in box-type styles
+    - NEW support setting color for the border of the box-type styles
+    - NEW support curve fitting (experimental)
+    - CHG check OS using /MSWin/ instead of "MSWin32" for safty
+    - FIX grid options syntax error if the options are not in hash form
+
+0.18
+    - Add try to guess the path of the gnuplot executable in Windows
+      (Bug ID: 82525)
+    - CHG improve POD
+    - CHG use qq() instead of "" in Gnuplot command line construction
+      (Bug ID: 82525)
+    - CHG use qq() instead of "" in convert command line construction
+    - FIX offset and font options of the time stamp
+
+0.17
+    - NEW control the display of arbitrary border of the graph
+    - FIX expression of range of numeric axis if time axis exists
+      (Bug ID: 69169)
+
+0.16
+    - Add support of creating animated gif
+    - Option to unset "(x|y)tics" and "border"
+      (Thanks to Adam Russell)
+    - Improve POD
+
+0.15
+    - Fix the problem that "orient" has no effect if "imagesize" is set
+    - Fix setting color of the label point
+
+0.14
+    - Support drawing arbitrary arrows
+    - Support importing data as "points" for "financebars" and "candlesticks"
+      charts
+    - Better support of the terminals other than the default (postscript)
+    - Change using ImageMagick instead of ps2pdf to generate PDF from PS
+    - Fix the problem that the location of the text labels cannot be in
+      date/time format
+
+0.13
+    - Improve error handling
+    - Add method to copy the chart and data set objects
+    - Add specific get-set methods for xdata, ydata, zdata, points, datafile
+      and func so that different data sources cannot co-exist in the same data
+      set object
+    - Keep the plot window from disappearing immediately for interactive
+      terminals
+      (Thanks to Alex White)
+    - More strict testsuite. Add more test cases
+
+0.12
+    - More understandable error messages
+    - Add an example in POD
+      (Thanks to WOLfgang Schricker)
+
+0.11
+    - Add new plotting styles "hbars" (horizontal bars) and "hlines"
+      (horizontal lines)
+    - Add frame to the example webpage
+
+0.10
+    - Support "every" and "index" features
+    - Support control of the tics on the z-axis
+    - Change the directory for the temporary files to the default of File::Temp
+    - Fix a bug that options do not reset to their default after plotting each
+      sub-chart in multiplot
+    - Fix a bug in plotting financial time series when the x-axis is in time
+      format
+    - Fix a bug in plotting error boxes when the input data set is in "points"
+      and the x-axis is in time format
+      (Thanks to Anthony Chan)
+    - Add license session to Makefile.PL
+    - Improve POD
+
+0.09
+    - Support the "using" feature of Gnuplot
+    - Force setting character encoding before setting terminal to avoid
+      potential problem
+    - Cleaner fix for the bug of the "command()" method
+
+0.08
+    - Fix a bug that plotting data does not work in MSWin
+      (Thanks to Anthony Tekatch)
+    - Fix a bug that would generate redundant code when the "command()" method
+      is called
+      (Thanks to Anthony Tekatch)
+    - Fix a typo in POD
+    - Improve testsuite
+
+0.07
+    - Support user-specified path of the convert program
+    - Support plotting parametric functions
+    - Fix a bug that range does not work if axis is date/time
+      (Thanks to Holyspell)
+
+0.06
+    - Support formatting legend
+    - Fix an error that causes some options of one chart affects other charts
+      in multiplot.
+    - Fix an error in image format conversion.
+    - Better support of MSWin
+
+0.05
+    - Fix a bug in timestamp option.
+      (Thanks to Lou King)
+    - Fix a typo in POD
+
+0.04
+    - Support adding time stamp
+    - Support adding arbitrary labels
+    - Create temporary file when the chart object is created
+
+0.03
+    - Support financebars and candlesticks plotting styles
+    - Support setting filling the boxes and candlesticks
+    - Support setting style of the borders
+    - Support plotting 3D graph from arrays of coordinates of data points
+    - Support adding 3D data set to multiplot chart
+    - Support setting of background color (experimental)
+    - Support setting of plot area background color (experimental)
+    - Plot in PS if the output file has no extension
+    - Fix a bug of checking array lengths in error-type style
+    - Update the POD
+
+0.02
+    - Fix a bug that makes converting output figure to PDF failed
+    - Fix a bug that makes printing certain error mesg failed
+    - Add checking whether xdata and ydata array lengths are the same
+    - Add more test cases
+    - Remove some redundant code
+
+0.01
+    Initial release

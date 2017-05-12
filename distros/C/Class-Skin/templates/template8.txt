@@ -1,0 +1,25 @@
+<HTML>
+  <HEAD>
+  <TITLE>Webiso</TITLE>
+  </HEAD>
+
+  <FRAMESET COLS="180,*" BORDER=1>
+    <FRAMESET ROWS="350,*" BORDER=1>	
+      <FRAME NAME="menu" 
+             SRC="$action?command=webiso_menu&extra_param=$extra_param&which_button=manual_structure_pushed" 
+             SCROLLING=NO 
+             MARGINHEIGHT=0 
+             MARGINWIDTH=0>
+      <FRAME NAME="messages"      
+             SRC="$action?command=dbot_show_empty" 
+             SCROLLING=AUTO
+             MARGINHEIGHT=0 
+             MARGINWIDTH=0>
+    </FRAMESET>              
+    <FRAME NAME="main" 
+           SRC="$action?command=dbot&extra_param=$extra_param" 
+           SCROLLING=AUTO 
+           MARGINHEIGHT=0 
+           MARGINWIDTH=0>
+  </FRAMESET>
+</HTML>

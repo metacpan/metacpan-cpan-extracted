@@ -1,0 +1,19 @@
+######################################
+# flush/delete the all firewall chains
+######################################
+
+iptables -t filter -F
+iptables -t filter -X
+
+iptables -t nat    -F
+iptables -t nat    -X
+
+iptables -t mangle -F
+iptables -t mangle -X
+
+######################################
+# delete all ipset sets
+######################################
+ipset destroy
+
+# vim: sw=2 ft=sh

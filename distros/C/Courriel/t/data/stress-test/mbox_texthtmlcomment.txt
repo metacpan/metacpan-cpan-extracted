@@ -1,0 +1,297 @@
+From mason-users-admin@lists.sourceforge.net  Thu Jan  5 17:58:15 2006
+Return-Path: <mason-users-admin@lists.sourceforge.net>
+Received: from lists-outbound.sourceforge.net (lists-outbound.sourceforge.net [66.35.250.225])
+        by smtp.mazrmail.com (8.12.11/8.12.11) with ESMTP id k05NwEYm004022
+        for <archive_mason-users_lists.sourceforge.net@mazrmail.com>; Thu, 5 Jan 2006 17:58:15 -0600
+Received: from sc8-sf-list1-b.sourceforge.net (sc8-sf-list1-b.sourceforge.net [10.3.1.7])
+        by sc8-sf-spam1.sourceforge.net (Postfix) with ESMTP
+        id 5278E8C3F2; Thu,  5 Jan 2006 15:58:12 -0800 (PST)
+Received: from sc8-sf-mx2-b.sourceforge.net ([10.3.1.92] helo=mail.sourceforge.net)
+        by sc8-sf-list1.sourceforge.net with esmtp (Exim 4.30)
+        id 1Euez5-0004Yl-EE
+        for mason-users@lists.sourceforge.net; Thu, 05 Jan 2006 15:57:31 -0800
+Received: from mail2.l-3com.com ([128.170.207.35])
+        by mail.sourceforge.net with esmtp (Exim 4.44)
+        id 1Euez5-00017D-4i
+        for mason-users@lists.sourceforge.net; Thu, 05 Jan 2006 15:57:31 -0800
+Received: from isDNS2.is.l-3com.com (isdns2.is.l-3com.com [148.104.4.19])
+        by mail2.L-3com.com (8.12.10+Sun/8.12.10) with ESMTP id k05NvMXZ005047;
+        Thu, 5 Jan 2006 18:57:22 -0500 (EST)
+Received: from gvlmailhub.gvl.l-3com.com (gvlmailhub.gvl.is.l-3com.com [138.254.134.153])
+        by isDNS2.is.l-3com.com (8.12.8/8.12.8) with ESMTP id k05NtnCE008570;
+        Thu, 5 Jan 2006 17:55:51 -0600
+Received: from gvlexch04.gvl.is.l-3com.com (gvlexch04.gvl.is.l-3com.com [138.254.134.124])
+        by gvlmailhub.gvl.l-3com.com (8.11.6/8.11.6) with ESMTP id k05NvFe13313;
+        Thu, 5 Jan 2006 17:57:15 -0600
+Received: by gvlexch04.gvl.is.l-3com.com with Internet Mail Service (5.5.2657.72)
+        id <W6NCVVSD>; Thu, 5 Jan 2006 17:57:15 -0600
+Message-ID: <49D1A43C2994F140A1CE90170420F2840A1EF8C7@gvlexch04.gvl.is.l-3com.com>
+From: "Sproul, SA Stacey @ IS" <Stacey.A.Sproul@L-3com.com>
+To: "'mason-users@lists.sourceforge.net'" <mason-users@lists.sourceforge.net>
+Cc: "Stone, T Teresa (7454) @ IS" <Teresa.Stone@L-3com.com>,
+        "Gibson, WB William @ IS" <William.B.Gibson@L-3com.com>,
+        "Shelton, SA Steve @ IS" <Steve.A.Shelton@L-3com.com>,
+        "'Paul Robertson'" <paul_j_robertson@raytheon.com>,
+        "Harwell, DK Dennis @ IS" <dennis.harwell@L-3com.com>
+MIME-Version: 1.0
+X-Mailer: Internet Mail Service (5.5.2657.72)
+Content-Type: multipart/alternative;
+        boundary="----_=_NextPart_001_01C61253.BCB38AFA"
+X-Spam-Score: 0.9 (/)
+X-Spam-Report: Spam Filtering performed by sourceforge.net.
+        See http://spamassassin.org/tag/ for more details.
+        Report problems to http://sf.net/tracker/?func=add&group_id=1&atid=200001
+        0.6 HOT_NASTY              BODY: Possible porn - Hot, Nasty, Wild, Young
+        0.0 HTML_MESSAGE           BODY: HTML included in message
+        0.3 HTML_10_20             BODY: Message is 10% to 20% HTML
+Subject: [Mason] Mason compile results in a zero size file
+Sender: mason-users-admin@lists.sourceforge.net
+Errors-To: mason-users-admin@lists.sourceforge.net
+X-BeenThere: mason-users@lists.sourceforge.net
+X-Mailman-Version: 2.0.9-sf.net
+Precedence: bulk
+List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/mason-users>,
+        <mailto:mason-users-request@lists.sourceforge.net?subject=unsubscribe>
+List-Id: Main user's list for Mason <mason-users.lists.sourceforge.net>
+List-Post: <mailto:mason-users@lists.sourceforge.net>
+List-Help: <mailto:mason-users-request@lists.sourceforge.net?subject=help>
+List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/mason-users>,
+        <mailto:mason-users-request@lists.sourceforge.net?subject=subscribe>
+List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=mason-users>
+X-Original-Date: Thu, 5 Jan 2006 17:57:08 -0600
+Date: Thu, 5 Jan 2006 17:57:08 -0600
+
+This message is in MIME format. Since your mail reader does not understand
+this format, some or all of this message may not be legible.
+
+------_=_NextPart_001_01C61253.BCB38AFA
+Content-Type: text/plain
+
+Thanks in advance for any input!!
+
+We inherited a website that uses Mason from another company.
+Included in it are template header and footer components.
+
+What we have found is that, if we modify a header or footer component (say
+we edit a component to change the email contact name from Joe Smith to Jane
+Doe) Mason attempts to recompile the component file, since it has been
+updated, and we end up with a zero size file that, when it interacts with
+the web server, displays the following HTTP Error:
+
+OK, The server encountered an internal error or misconfiguration and was
+unable to complete your request. Please contact the server administrator,
+root@localhost and inform them of the time the error occurred, and anything
+you might have done that may have caused the error. More information about
+this error may be available in the server error log.
+
+The server error log displays the following:
+
+[Thu Jan 5 17:31:34 2006] check_part.cgi: Variable "%labels" will not stay
+shared at /xxx/xxxx/cgi-bin/check_part.cgi line 182.
+[Thu Jan 5 17:31:34 2006] check_part.cgi: Variable "@values" will not stay
+shared at /xxx/xxx/cgi-bin/check_part.cgi line 199.
+[Thu Jan 5 17:31:34 2006] check_part.cgi: Subroutine initialize redefined at
+/xxx/xxx/cgi-bin/check_part.cgi line 181.
+[Thu Jan 05 17:31:34 2006] [error] 25722: ModPerl::PerlRun: Can't coerce
+GLOB to string in entersub at
+/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler.pm line 187.!!Stack:!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler.pm:187]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler/ToObject.pm:75]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler/ToObject.pm:115]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:318]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Request.pm:198]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Request.pm:166]!
+[/usr/lib/perl5/site_perl/5.8.0/Class/Container.pm:275]!
+[/usr/lib/perl5/site_perl/5.8.0/Class/Container.pm:353]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:222]!
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:216]!
+[/usr/lib/perl5/site_perl/RayStandardSubs.pm:65]!
+[/var/www/cgi-bin/check_part.cgi:175]!
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/RegistryCo
+oker.pm:184]!
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/RegistryCo
+oker.pm:154]!
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/PerlRun.pm
+:16]! [-e:0]!
+
+We are running:
+Red Hat Enterprise Linux 3ES
+Apache 2.0.46
+Mod Perl 1.99_09
+Mason 1.28
+
+Here is the entire list of perl modules we have installed on the server that
+were not included with the Red Hat Enterprise Linux 3 ES distribution, but
+most of which we needed to install in order to run Mason:
+
+Algorithm-Diff-1.1901
+Apache-AuthNetLDAP-0.29
+Apache-Test-1.26
+Archive-Tar-1.26
+Authen-SASL-2.09
+Bit-Vector-6.4
+Cache-Cache-1.04
+Carp-Clan-5.3
+CGI.pm-3.07
+Class-Container-0.12
+Class-Data-Inheritable-0.02
+Compress-Zlib-1.38
+Convert-ASN1-0.19
+Cwd-2.21
+Date-Calc-5.4
+Devel-StackTrace-1.11
+Digest-1.11
+Digest-SHA1-2.10
+Digest-SHA-5.31
+Error-0.15
+Exception-Class-1.21
+ExtUtils-AutoInstall-0.63
+ExtUtils-CBuilder-0.13
+ExtUtils-ParseXS-2.12
+ExtUtils-XSBuilder-0.27
+File-Spec-0.90
+IO-Socket-SSL-0.97
+IO-Zlib-1.04
+IPC-ShareLite-0.09
+Module-Build-0.2611
+Module-Signature-0.50
+Net_SSLeay.pm-1.25
+OLE-Storage_Lite-0.14
+Params-Validate-0.78
+PAR-Dist-0.07
+Parse-RecDescent-1.94
+perl-ldap-0.33
+Pod-Escapes-1.04
+Pod-Simple-3.02
+Scalar-List-Utils-1.17
+Sort-Versions-1.5
+Spreadsheet-ParseExcel-0.2603
+Test-Builder-Tester-1.01
+Test-Pod-1.20
+Text-Diff-0.35
+Tie-IxHash-1.21
+XML-NamespaceSupport-1.09
+XML-SAX-0.12
+And of course,
+HTML-Mason-1.28
+
+Thanks again for any input/help
+
+Stacey Sproul
+
+
+------_=_NextPart_001_01C61253.BCB38AFA
+Content-Type: text/html
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META HTTP-EQUIV=3D"Content-Type" CONTENT=3D"text/html; =
+charset=3DUS-ASCII">
+<TITLE>Message</TITLE>
+
+<META content=3D"MSHTML 6.00.2900.2769" name=3DGENERATOR></HEAD>
+<BODY><!-- Converted from text/plain format -->
+<P><FONT size=3D2>Thanks in advance for any input!!<BR><BR>We inherited =
+a website=20
+that uses Mason from another company.<BR>Included in it are template =
+header and=20
+footer components.<BR><BR>What we have found is that, if we modify a =
+header or=20
+footer component (say we edit a component to change the email contact =
+name from=20
+Joe Smith to Jane Doe) Mason attempts to recompile the component file, =
+since it=20
+has been updated, and we end up with a zero size file that, when it =
+interacts=20
+with the web server, displays the following HTTP Error:<BR><BR><EM>OK, =
+The=20
+server encountered an internal error or misconfiguration and was unable =
+to=20
+complete your request. Please contact the server administrator, =
+root@localhost=20
+and inform them of the time the error occurred, and anything you might =
+have done=20
+that may have caused the error. More information about this error may =
+be=20
+available in the server error log.<BR></EM><BR><STRONG>The server error =
+log=20
+displays the following:</STRONG><BR><BR>[Thu Jan 5 17:31:34 2006]=20
+check_part.cgi: Variable "%labels" will not stay shared at=20
+/xxx/xxxx/cgi-bin/check_part.cgi line 182.<BR>[Thu Jan 5 17:31:34 2006] =
+
+check_part.cgi: Variable "@values" will not stay shared at=20
+/xxx/xxx/cgi-bin/check_part.cgi line 199.<BR>[Thu Jan 5 17:31:34 2006]=20
+check_part.cgi: Subroutine initialize redefined at=20
+/xxx/xxx/cgi-bin/check_part.cgi line 181.<BR>[Thu Jan 05 17:31:34 2006] =
+[error]=20
+25722: ModPerl::PerlRun: Can't coerce GLOB to string in entersub at=20
+/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler.pm line =
+187.!!Stack:!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler.pm:187]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler/ToObject.pm:75]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Compiler/ToObject.pm:115]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:318]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Request.pm:198]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Request.pm:166]!=20
+[/usr/lib/perl5/site_perl/5.8.0/Class/Container.pm:275]!=20
+[/usr/lib/perl5/site_perl/5.8.0/Class/Container.pm:353]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:222]!=20
+[/usr/lib/perl5/site_perl/5.8.0/HTML/Mason/Interp.pm:216]!=20
+[/usr/lib/perl5/site_perl/RayStandardSubs.pm:65]!=20
+[/var/www/cgi-bin/check_part.cgi:175]!=20
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/Regist=
+ryCooker.pm:184]!=20
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/Regist=
+ryCooker.pm:154]!=20
+[/usr/lib/perl5/vendor_perl/5.8.0/i386-linux-thread-multi/ModPerl/PerlRu=
+n.pm:16]!=20
+[-e:0]!<BR><BR><STRONG>We are running:<BR></STRONG>Red Hat Enterprise =
+Linux=20
+3ES<BR>Apache 2.0.46<BR>Mod Perl 1.99_09<BR>Mason 1.28<BR><BR>Here is =
+the=20
+<STRONG>entire list of perl modules we have installed on the server =
+that were=20
+not included with the Red Hat Enterprise Linux 3 ES =
+distribution</STRONG>, but=20
+most of which we needed to install in order to run=20
+Mason:<BR><BR>Algorithm-Diff-1.1901<BR>Apache-AuthNetLDAP-0.29<BR>Apache=
+-Test-1.26<BR>Archive-Tar-1.26<BR>Authen-SASL-2.09<BR>Bit-Vector-6.4<BR>=
+Cache-Cache-1.04<BR>Carp-Clan-5.3<BR>CGI.pm-3.07<BR>Class-Container-0.12=
+<BR>Class-Data-Inheritable-0.02<BR>Compress-Zlib-1.38<BR>Convert-ASN1-0.=
+19<BR>Cwd-2.21<BR>Date-Calc-5.4<BR>Devel-StackTrace-1.11<BR>Digest-1.11<=
+BR>Digest-SHA1-2.10<BR>Digest-SHA-5.31<BR>Error-0.15<BR>Exception-Class-=
+1.21<BR>ExtUtils-AutoInstall-0.63<BR>ExtUtils-CBuilder-0.13<BR>ExtUtils-=
+ParseXS-2.12<BR>ExtUtils-XSBuilder-0.27<BR>File-Spec-0.90<BR>IO-Socket-S=
+SL-0.97<BR>IO-Zlib-1.04<BR>IPC-ShareLite-0.09<BR>Module-Build-0.2611<BR>=
+Module-Signature-0.50<BR>Net_SSLeay.pm-1.25<BR>OLE-Storage_Lite-0.14<BR>=
+Params-Validate-0.78<BR>PAR-Dist-0.07<BR>Parse-RecDescent-1.94<BR>perl-l=
+dap-0.33<BR>Pod-Escapes-1.04<BR>Pod-Simple-3.02<BR>Scalar-List-Utils-1.1=
+7<BR>Sort-Versions-1.5<BR>Spreadsheet-ParseExcel-0.2603<BR>Test-Builder-=
+Tester-1.01<BR>Test-Pod-1.20<BR>Text-Diff-0.35<BR>Tie-IxHash-1.21<BR>XML=
+-NamespaceSupport-1.09<BR>XML-SAX-0.12<BR>And of =
+course,<BR>HTML-Mason-1.28<BR><BR>Thanks again=20
+for any input/help<BR><BR>Stacey Sproul </FONT></P></BODY></HTML>
+
+------_=_NextPart_001_01C61253.BCB38AFA--
+
+
+-------------------------------------------------------
+This SF.net email is sponsored by: Splunk Inc. Do you grep through log files
+for problems?  Stop!  Download the new AJAX search engine that makes
+searching your log files as easy as surfing the  web.  DOWNLOAD SPLUNK!
+http://ads.osdn.com/?ad_id=7637&alloc_id=16865&op=click
+_______________________________________________
+Mason-users mailing list
+Mason-users@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/mason-users
+
+
+
+
+
+
+
+
+
+

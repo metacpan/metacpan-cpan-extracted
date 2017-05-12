@@ -1,0 +1,11 @@
+Changes
+lib/Config/Options.pm
+lib/Config/Options/Threaded.pm
+Makefile.PL
+MANIFEST
+README
+t/1-options.t
+t/2-pod.t
+t/3-pod-coverage.t
+t/4-threads.t
+META.yml                                 Module meta-data (added by MakeMaker)

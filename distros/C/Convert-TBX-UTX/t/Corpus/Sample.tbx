@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<TBX dialect="TBX-Min">
+    <header>
+        <id>TBX sample</id>
+        <description>A short sample file demonstrating TBX-Min</description>
+        <dateCreated>2013-11-12T00:00:00</dateCreated>
+        <languages source="de" target="en"/>
+        <creator>Klaus-Dirk Schmidt</creator>
+        <directionality>bidirectional</directionality>
+        <license>CC BY license can be freely copied and modified</license>
+    </header>
+    <body>
+        <entry id="C002">
+            <subjectField>biology</subjectField>
+            <langGroup xml:lang="de">
+                <termGroup>
+                    <term>Hund</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </termGroup>
+            </langGroup>
+            <langGroup xml:lang="en">
+                <termGroup>
+                    <term>dog</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <termStatus>preferred</termStatus>
+                    <customer>SAP</customer>
+                </termGroup>
+                <termGroup>
+                    <term>hound</term>
+                    <termStatus>notRecommended</termStatus>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>SAP</customer>
+                    <note>however bloodhound is used rather than blooddog</note>
+                </termGroup>
+            </langGroup>
+        </entry>
+        <entry id="c008">
+            <subjectField>biology</subjectField>
+            <langGroup xml:lang="de">
+                <termGroup>
+                    <term>Katze</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </termGroup>
+            </langGroup>
+            <langGroup xml:lang="en">
+                <termGroup>
+                    <term>cat</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>SAP</customer>
+                </termGroup>
+            </langGroup>
+        </entry>
+        <entry id="C007">
+            <subjectField>biology</subjectField>
+            <langGroup xml:lang="de">
+                <termGroup>
+                    <term>Maus</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                </termGroup>
+            </langGroup>
+            <langGroup xml:lang="en">
+                <termGroup>
+                    <term>mouse</term>
+                    <partOfSpeech>noun</partOfSpeech>
+                    <customer>PestGone</customer>
+                </termGroup>
+            </langGroup>
+        </entry>
+    </body>
+</TBX>

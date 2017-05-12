@@ -1,0 +1,27 @@
+This is Perl module Cache::Memcached::Indexable.
+
+INSTALLATION
+
+Cache::Memcached::Indexable installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Cache::Memcached::Indexable
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Cache::Memcached::Indexable documentation is available as in POD. So you can do:
+
+    % perldoc Cache::Memcached::Indexable
+
+to read the documentation online with your favorite pager.
+
+Koichi Taniguchi

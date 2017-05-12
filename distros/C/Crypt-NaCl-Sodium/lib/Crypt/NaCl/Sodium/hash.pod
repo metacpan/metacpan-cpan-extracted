@@ -1,0 +1,241 @@
+# PODNAME: Crypt::NaCl::Sodium::hash
+# ABSTRACT: SHA-2 hash functions (SHA-256, SHA-512)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::hash - SHA-2 hash functions (SHA-256, SHA-512)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_hash = Crypt::NaCl::Sodium->hash();
+
+    # list of files for which we are computing the checksums
+    my @files = ...;
+
+    ## SHA-256
+    ########
+
+    for my $file ( @files ) {
+        # file name checksum
+        my $filename_hash = $crypto_hash->sha256($file);
+
+        # using multi-part API
+        my $stream = $crypto_hash->sha256_init();
+
+        open(my $fh, $file) or die;
+        while ( sysread($fh, my $buf, 4096) ) {
+            # add the chunk of data
+            $stream->update( $buf );
+        }
+        close($fh);
+
+        # calculate the final checksum
+        my $checksum = $stream->final();
+    }
+
+    ## SHA-512
+    ########
+
+    for my $file ( @files ) {
+        # file name checksum
+        my $filename_hash = $crypto_hash->sha512($file);
+
+        # using multi-part API
+        my $stream = $crypto_hash->sha512_init();
+
+        open(my $fh, $file) or die;
+        while ( sysread($fh, my $buf, 4096) ) {
+            # add the chunk of data
+            $stream->update( $buf );
+        }
+        close($fh);
+
+        # calculate the final checksum
+        my $checksum = $stream->final();
+    }
+
+=head1 DESCRIPTION
+
+The I<SHA-256> and I<SHA-512> functions are provided for interoperability with
+other applications.
+
+These functions are not keyed and are thus deterministic. In
+addition, they are vulnerable to length extension attacks.
+
+A message can be hashed in a single pass, but a streaming API is
+also available to process a message as a sequence of
+multiple chunks.
+
+If you are looking for a generic hash function and not specifically
+I<SHA-2>, using L<Crypt::NaCl::Sodium::generichash> might be a
+better choice.
+
+=head1 METHODS
+
+=head2 sha256
+
+    my $hash256 = $crypto_hash->sha256($msg);
+
+Generates I<SHA-256> hash of the given C<$msg>.
+
+The length of the C<$sha256> equals L</SHA256_BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx256 = $crypto_hash->sha256_init();
+
+    $ctx256->update( $msgX );
+    $ctx256->update( $msgY )->update( $msgZ, ... );
+
+    my $mac256 = $ctx256->final();
+
+=head4 sha256_init
+
+    my $ctx256 = $crypto_hash->sha256_init();
+
+Creates a context for multi-part computation.
+
+Returns C<Crypt::NaCl::Sodium::hash::sha256stream> object which encapsulates
+the computation state of the I<SHA-256> algorithm.
+
+=head4 clone
+
+    while ( <> ) {
+        $ctx256->update( $_ );
+        print "Line: $.: ", $ctx256->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx> object, that contains the current computation
+state.
+
+=head4 update
+
+    $ctx256->update( $msgX, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx256> object itself.
+
+=head4 final
+
+    my $mac256 = $ctx256->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 sha512
+
+    my $hash512 = $crypto_hash->sha512($msg);
+
+Generates I<SHA-512> hash of the given C<$msg>.
+
+The length of the C<$sha512> equals L</SHA512_BYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx512 = $crypto_hash->sha512_init();
+
+    $ctx512->update( $msgX );
+    $ctx512->update( $msgY )->update( $msgZ, ... );
+
+    my $mac512 = $ctx512->final();
+
+=head4 sha512_init
+
+    my $ctx512 = $crypto_hash->sha512_init();
+
+Creates a context for multi-part computation.
+
+Returns C<Crypt::NaCl::Sodium::hash::sha512stream> object which encapsulates
+the computation state of the I<SHA-512> algorithm.
+
+=head4 clone
+
+    while ( <> ) {
+        $ctx512->update( $_ );
+        print "Line: $.: ", $ctx512->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx> object, that contains the current computation
+state.
+
+=head4 update
+
+    $ctx512->update( $msgX, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx512> object itself.
+
+=head4 final
+
+    my $mac512 = $ctx512->final();
+
+Computes the final MAC of the input data.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 SHA256_BYTES
+
+    my $sha256_length = $crypto_hash->SHA256_BYTES;
+
+Returns the length of I<SHA-256> hash.
+
+=head2 SHA512_BYTES
+
+    my $sha512_length = $crypto_hash->SHA512_BYTES;
+
+Returns the length of I<SHA-512> hash.
+
+=head1 SECURITY MODEL
+
+Although the existing attacks against I<SHA-2> are not yet practical, there are
+various attacks against its implementations. The
+recommended ways of message authentication are provided by
+L<Crypt::NaCl::Sodium::generichash> and L<Crypt::NaCl::Sodium::auth>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<SHA-2|https://en.wikipedia.org/wiki/SHA-2>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

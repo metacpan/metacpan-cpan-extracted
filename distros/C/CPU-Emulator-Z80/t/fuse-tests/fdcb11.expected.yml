@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  40203:
+    - 188
+name: fdcb11
+registers:
+  AF: 48296
+  AF_: 0
+  BC: 25020
+  BC_: 0
+  DE: 62968
+  DE_: 0
+  HL: 44836
+  HL_: 0
+  I: 0
+  IX: 16409
+  IY: 40080
+  PC: 4
+  R: 2
+  SP: 0

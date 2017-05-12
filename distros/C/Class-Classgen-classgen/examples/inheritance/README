@@ -1,0 +1,46 @@
+To implement inheritance do:
+
+1) generate a base-class from a suitable control-file
+2) generate a derived class from another control-file
+   put into the header section:
+
+	package Derived_Class;
+	use Base_Class;
+	@ISA=("Base_Class");
+
+4) edit the derived class; in the new() method of your derived class
+   you'll find right after the blessing
+
+	#$self->inherit_from($self->your_base::new());
+
+   remove the # and replace the term 'your_base' by the name of your
+   derived-class. copy and adapt this line if you inherit from several
+   base classes. make sure to put these in the @ISA as well. result:
+
+
+	$self->inherit_from($self->Base_Class::new());
+
+
+   this approach is unusual compared to what you can find in the perl
+   literature so far. it is necessary because the classes, which
+   classgen generates, incorporate instance variables $x,%x or @x.
+   so you have to make sure memory is allocated for them through the
+   call to new() of the base class. inherit_from() will take care,
+   that those variables will be accessible through the base classes
+   methods.
+
+WARNING:
+   classgen has not been designed to handle multiple inheritances
+   (though it works even then).
+
+   it is up to you to ensure that all variables will be unique.
+   classgen works fine for simple inheritance, which will suffice in
+   most cases.
+
+
+5) edit more specific functions to the derived class
+
+
+Enjoy.
+
+Michael Schlueter  	email: mschlue@cpan.org 

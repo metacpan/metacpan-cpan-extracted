@@ -1,0 +1,93 @@
+[% 
+    title = 'CPAN Statistics' ;
+    box_sites = 1
+
+    crumb1_name = 'CPAN Statistics' ;
+%]
+
+<h2>Content</h2>
+<ul class="contents">
+<li><a href="#numbers"    title="CPAN Numbers"        >CPAN Numbers</a></li>
+<li><a href="#milestones" title="CPAN Milestones"     >CPAN Milestones</a></li>
+<li><a href="#first"      title="What Was the First?" >What Was the First?</a></li>
+</ul>
+
+<h2 id="numbers">CPAN Numbers</h2>
+
+<h3>Authors</h3>
+<div class="boxer">
+<table summary="CPAN Numbers: Authors">
+<tr><th class="top w100">Count</th><th class="top">Notes</th></tr>
+<tr><td class="numbers">[% authors.total    %]</td><td>Total registered PAUSE accounts</td></tr>
+<tr><td class="numbers">[% authors.active   %]</td><td>Active Authors - have uploaded at least one distribution</td></tr>
+<tr><td class="numbers">[% authors.inactive %]</td><td>Inactive Authors - have uploaded no distributions</td></tr>
+</table>
+</div>
+
+<h3>Distributions</h3>
+<div class="boxer">
+<table summary="CPAN Numbers: Distributions">
+<tr><th class="top w100">Count</th><th class="top">Notes</th></tr>
+<tr><td class="numbers">[% distros.uploaded2 %]</td><td>Total Unique Distributions on CPAN &amp; BACKPAN</td></tr>
+<tr><td class="numbers">[% distros.uploaded1 %]</td><td>Total Unique Distributions on CPAN</td></tr>
+<tr><td class="numbers">[% distros.uploaded3 %]</td><td>Total Unique Distributions deleted from CPAN (i.e. on BACKPAN ONLY)</td></tr>
+<tr><th colspan="2"></th></tr>
+<tr><td class="numbers">[% distros.uploaded5 %]</td><td>Total Distribution Releases on CPAN &amp; BACKPAN</td></tr>
+<tr><td class="numbers">[% distros.uploaded4 %]</td><td>Total Distribution Releases on CPAN</td></tr>
+<tr><td class="numbers">[% distros.uploaded6 %]</td><td>Total Distribution Releases deleted from CPAN (i.e. on BACKPAN ONLY)</td></tr>
+</table>
+</div>
+
+<h3>Directory Sizes</h3>
+<div class="boxer">
+<table summary="CPAN Numbers: Directory Sizes">
+<tr><th class="top w100">Size</th><th class="top">Notes</th></tr>
+<tr><td class="numbers">[% sizes.cpan %]</td><td>Current size of CPAN</td></tr>
+<tr><td class="numbers">[% sizes.backpan %]</td><td>Current Size of BACKPAN</td></tr>
+</table>
+</div>
+
+<h2 id="milestones">CPAN Milestones</h2>
+<h3>Distributions</h3>
+<div class="boxer">
+<table summary="CPAN Milestones: Distributions">
+<tr><th class="top w100">Count</th><th class="top w200">Timestamp</th><th class="top w100">PAUSE</th><th class="top">Distribution-Version</th></tr>
+[% FOREACH item = distributions %]
+<tr><td class="numbers">[% item.counter %]</td><td class="timestamp1">[% item.date %]</td><td>[% item.name %]</td><td>[% item.dist %]-[% item.vers %]</td></tr>
+[% END %]
+</table>
+</div>
+
+<h3>Uploads</h3>
+<div class="boxer">
+<table summary="CPAN Milestones: Uploads">
+<tr><th class="top w100">Count</th><th class="top w200">Timestamp</th><th class="top w100">PAUSE</th><th class="top">Distribution-Version</th></tr>
+[% FOREACH item = uploads %]
+<tr><td class="numbers">[% item.counter %]</td><td class="timestamp1">[% item.date %]</td><td>[% item.name %]</td><td>[% item.dist %]-[% item.vers %]</td></tr>
+[% END %]
+</table>
+</div>
+
+<h3>Uploaders</h3>
+<div class="boxer">
+<table summary="CPAN Milestones: Uploaders">
+<tr><th class="top w100">Count</th><th class="top w200">Timestamp</th><th class="top w100">PAUSE</th><th class="top">Distribution-Version</th></tr>
+[% FOREACH item = uploaders %]
+<tr><td class="numbers">[% item.counter %]</td><td class="timestamp1">[% item.date %]</td><td>[% item.name %]</td><td>[% item.dist %]-[% item.vers %]</td></tr>
+[% END %]
+</table>
+</div>
+
+<h4 id="first">What Was the First?</h4>
+
+<p>Back in 1995 a few core Perl developers had started to write some code and wanted to release it to the world. There were a handful of repositiories, but Jarkko Hietaniemi had the idea to bring these together into a consistent set of distributions, perls and scripts across all repositories, providing a mirrored network of repositories. It took a while, but eventually it came together into what we now know as CPAN.</p>
+
+<p>Speaking to Andreas K&#246;nig, it transpires that PAUSE started sometime between 15th and 20th August 1995. Andreas collected together 35 distributions from several different servers, and the Master PAUSE server was live. On 21st June 1995 Tim Bunce <a href="http://groups.google.com/group/comp.lang.perl.announce/browse_thread/thread/da4a0737bb9c0d46#" title="The first The Perl 5 Module List">published The Perl 5 Module List</a>, which details these early modules, although includes those that were included within Perl core as well as addition distributions.</p>
+
+<p>As Andreas notes, "Unfortunately I have no archives that would fill the gap between perl 5alpha1 and the start of Pause. But there were these 35 modules and many more releases and there was no "first" that I could name. Perl 5alpha came with plenty of modules, they provided the critical mass to spur the community to add more and so they did -- instantly."</p>
+
+<p>Having said that, if you wanted to hang your hat on a "first" release, according to the BACKPAN/CPAN timestamps, the first that is recorded within the current repositories is 'Symdump-1.20.tar.gz', released by one ANDK, on 16 Aug 1995 @ 9:12:18am.</p>
+
+<p>For a more detailed history of Perl, please see the <a href="http://history.perl.org/PerlTimeline.html" title="Perl Timeline">Perl Timeline</a></p>
+
+<p>My thanks to Brian Cassidy for being the first to ask this, thus prompting me to write this addendum before anyone else thought to ask ;)</p>

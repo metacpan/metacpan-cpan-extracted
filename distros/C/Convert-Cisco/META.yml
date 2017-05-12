@@ -1,0 +1,24 @@
+---
+name: Convert-Cisco
+version: 0.06
+author:
+  - "Mark O'Connor <marko@cpan.org>"
+abstract: Module for converting Cisco billing records
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  DateTime: 0.3
+  Log::Log4perl: 1.04
+  Module::Build: 0.2801
+  Test::Unit: 0.25
+  XML::Writer: 0.601
+  YAML: 0.62
+provides:
+  Convert::Cisco:
+    file: lib/Convert/Cisco.pm
+    version: 0.06
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

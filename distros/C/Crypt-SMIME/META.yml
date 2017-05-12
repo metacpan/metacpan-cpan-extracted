@@ -1,0 +1,27 @@
+---
+abstract: 'S/MIME message signing, verification, encryption and decryption'
+author:
+  - 'Ymirlink <tl@tripletail.jp>'
+build_requires:
+  ExtUtils::PkgConfig: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::CChecker: '0'
+  ExtUtils::Constant: '0.23'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::PkgConfig: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-SMIME
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0'
+version: '0.19'

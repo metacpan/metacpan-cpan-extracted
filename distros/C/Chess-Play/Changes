@@ -1,0 +1,19 @@
+Revision history for Perl extension Chess::Play.
+
+0.01  Sun Apr 19 16:37:35 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Chess::Play
+
+0.02
+	- Modified License Information
+	- do_move() return the best move in coordinate notation
+
+0.03
+	- added a shuffle function to make the move choice less deterministic
+
+0.04
+	- bug fixed in castle code : a pawn promoted to rook was able casle :S
+	- Added print_board()
+	
+0.05
+	- Added support to FEN notation (import && export)

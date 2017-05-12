@@ -1,0 +1,32 @@
+{
+  "_class": "Lucy::Plan::Schema",
+  "analyzers": [
+    null,
+    {
+      "_class": "Lucy::Analysis::PolyAnalyzer",
+      "analyzers": [
+        {
+          "_class": "Lucy::Analysis::CaseFolder"
+        },
+        {
+          "_class": "Lucy::Analysis::RegexTokenizer",
+          "pattern": "\\w+(?:['\\x{2019}]\\w+)*"
+        },
+        {
+          "_class": "Lucy::Analysis::SnowballStemmer",
+          "language": "en"
+        }
+      ]
+    }
+  ],
+  "fields": {
+    "desc": {
+      "analyzer": "1",
+      "type": "fulltext"
+    },
+    "title": {
+      "analyzer": "1",
+      "type": "fulltext"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+0.01	2007-05-19
+	initial release
+
+0.011	2007-05-27
+	test-failure in Perl < 5.008 fixed: older versions of perl can't catch STDERR in an scalarref
+	pod-failure fixed: the method init() was not in toc in CPAN-html-pod
+	perl-requirement of version 5 set in makefile
+ 

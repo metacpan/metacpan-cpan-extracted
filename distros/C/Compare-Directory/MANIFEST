@@ -1,0 +1,25 @@
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Changes
+README
+lib/Compare/Directory.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+t/unit-test-01.t
+t/exp-1/CSV.csv
+t/exp-1/PDF.pdf
+t/exp-1/TXT.txt
+t/exp-1/XLS.xls
+t/exp-1/XML.xml
+t/got-1/CSV.csv
+t/got-1/PDF.pdf
+t/got-1/TXT.txt
+t/got-1/XLS.xls
+t/got-1/XML.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

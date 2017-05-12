@@ -1,0 +1,168 @@
+#include "xs/openssl.h"
+
+MODULE = Crypt::Keyczar		PACKAGE = Crypt::Keyczar::AesEngine
+
+
+Crypt::Keyczar::AesEngine
+new(class, key)
+	SV *class
+	SV *key
+	CODE:
+	{
+	    STRLEN l;
+	    unsigned char *k;
+	
+	    k = (unsigned char *)SvPV(key, l);
+	    PERL_UNUSED_VAR(class);
+	    Newz(0, RETVAL, 1, struct Crypt__Keyczar__AesEngine_class);
+	    RETVAL->context = EVP_CIPHER_CTX_new();
+	    Newz(0, RETVAL->key, l, unsigned char);
+	    Newz(0, RETVAL->iv, 16, unsigned char);
+
+	    memmove(RETVAL->key, k, l);
+	    RETVAL->key_length = l*8;
+	}
+	OUTPUT:
+	    RETVAL
+
+
+void
+DESTROY(self)
+	Crypt::Keyczar::AesEngine self
+	CODE:
+	{
+	    if (self->context != NULL) {
+	        EVP_CIPHER_CTX_free(self->context);
+	        self->context = NULL;
+	    }
+	    if (self->key != NULL) {
+	        Safefree(self->key);
+	        self->key = NULL;
+	    }
+	    if (self->iv != NULL) {
+	        Safefree(self->iv);
+	        self->iv = NULL;
+	    }
+	    Safefree(self);
+	}
+
+
+SV *
+init(self, ...)
+	Crypt::Keyczar::AesEngine self
+	CODE:
+	{
+	    SV *iv;
+
+	    if (items > 1) {
+	        iv = ST(1);
+	        memmove(self->iv, SvPVbyte_nolen(iv), 16);
+	    }
+	    else {
+	        if (RAND_bytes(self->iv, 16) != 1) {
+                    crypt__keyczar__util__croak_openssl();
+	            /* NOTREACHED */
+	        }	
+	    }
+
+	    if (self->iv != NULL) {
+	        RETVAL = newSVpv((char *)self->iv, 16);
+	    }
+	    else {
+	        RETVAL = newSVpv("", 0);
+	    }
+	}
+	OUTPUT:
+	    RETVAL
+
+
+SV *
+encrypt(self, data)
+	Crypt::Keyczar::AesEngine self
+	SV *data
+	CODE:
+	{
+	    STRLEN in_l;
+	    unsigned char *in, *out;
+	    int out_l, last_l;
+	    const EVP_CIPHER *type;
+
+	    if (self->key_length == 128) {
+	        type = EVP_aes_128_cbc();
+	    }
+	    else if (self->key_length == 192) {
+	        type = EVP_aes_192_cbc();
+	    }
+	    else if (self->key_length == 256) {
+	        type = EVP_aes_256_cbc();
+	    }
+	    else {
+	        croak("unsupported key length: %d", self->key_length);
+	    }
+
+	    EVP_EncryptInit_ex(self->context, type, NULL, self->key, self->iv);
+	    Newz(0, out, SvCUR(data) + EVP_CIPHER_CTX_block_size(self->context), unsigned char);
+	    in = (unsigned char *)SvPV(data, in_l);
+	    if (!EVP_EncryptUpdate(self->context, out, &out_l, in, in_l)) {
+	        RETVAL = NULL;
+	        Safefree(out);
+	        crypt__keyczar__util__croak_openssl(); 
+	        return;	
+	    }
+	    if (!EVP_EncryptFinal_ex(self->context, out + out_l, &last_l)) {
+	        RETVAL = NULL;
+	        Safefree(out);
+	        crypt__keyczar__util__croak_openssl(); 
+	        return;	
+	    }
+	    RETVAL = newSVpv((char *)out, out_l+last_l);
+	    Safefree(out);
+	}
+	OUTPUT:
+	    RETVAL
+
+
+SV *
+decrypt(self, data)
+	Crypt::Keyczar::AesEngine self
+	SV *data
+	CODE:
+	{
+	    STRLEN in_l;
+	    unsigned char *in, *out;
+	    int out_l, last_l;
+	    const EVP_CIPHER *type;
+
+	    if (self->key_length == 128) {
+	        type = EVP_aes_128_cbc();
+	    }
+	    else if (self->key_length == 192) {
+	        type = EVP_aes_192_cbc();
+	    }
+	    else if (self->key_length == 256) {
+	        type = EVP_aes_256_cbc();
+	    }
+	    else {
+	        croak("unsupported key length: %d", self->key_length);
+	    }
+	
+	    EVP_DecryptInit_ex(self->context, type, NULL, self->key, self->iv);
+	    in = (unsigned char *)SvPV(data, in_l);
+	    Newz(0, out, in_l, unsigned char);
+	    if (!EVP_DecryptUpdate(self->context, out, &out_l, in, in_l)) {
+	        RETVAL = NULL;
+	        Safefree(out);
+	        crypt__keyczar__util__croak_openssl(); 
+	        return;
+	    }
+	    if (!EVP_DecryptFinal_ex(self->context, out + out_l, &last_l)) {
+	        RETVAL = NULL;
+	        Safefree(out);
+	        crypt__keyczar__util__croak_openssl(); 
+	        return;	
+	    }
+	    RETVAL = newSVpv((char *)out, out_l+last_l);
+	    Safefree(out);
+	}
+	OUTPUT:
+	    RETVAL

@@ -1,0 +1,64 @@
+Revision history for Perl extension Catalyst::Plugin::FormValidator::Simple.
+
+0.15  Tue Jul  13 14:04:00
+    - fixed issue pertinent to https://rt.cpan.org/Ticket/Display.html?id=58363
+
+0.14  Fri Jun  4 22:00:00
+    - removed NEXT stuff
+
+0.13  Thu Sep  3 14:22:00 2009
+    - added message_decode_from option corresponding to
+      FormValidator::Simple set_message_decode_from option.
+      Thanks to Hu Hailin.
+
+0.12  Thu Nov  2 18:06:00 2006
+    - revert to ver 0.10.
+      When you use relative path on config-file,
+      it's better to write like follow example.
+
+      validator:
+        profiles: __path_to(profiles.yml)__
+        messages: __path_to(messages.yml)__
+
+      Thanks to TYPESTER and Hideo Kimura.
+
+0.11  Wed Nov  1 17:14:00 2006
+    - fixed to deal with messages file's path well.
+      you can set relative filepath in mod_perl environment.
+      Thanks to Hideo Kimura
+
+0.10  Mon May 15 00:00:00 2006
+    - bugfix: Now, it validates parameters correctly,
+      when they're set with $c->req->param on recent version of Catalyst.
+      (Thanks to luo.dongxiang)
+
+0.09  Fri Mar 3 00:00:00 2006
+    - fixed poor mistake, when passing option setting.
+      (Thanks to Roman Filippov)
+
+0.08  Mon Feb 27 00:00:00 2006
+    - Now, this doesn't use NEXT::ACTUAL.
+          That's make test-server not to work as expected on restarting.
+
+0.06  Mon Nov 18 00:00:00 2005
+    - change the version of prerequired FormValidator::Simple.
+      Now this module requires FormValidator::Simple Version 0.10 or over.
+      And added many document and tutorials.
+
+0.05  Mon Nov 14 08:54:00 2005
+    - fixed documentation
+      (Thanks to John Wang)
+
+0.04  Thu Oct 20 12:23:40 2005
+    - fixed bug: option setting wasn't passed to validator.
+
+0.03  Sat Oct  1 10:23:40 2005
+    - fixed documentation
+
+0.02  Fri Sep 30 10:23:40 2005
+    - cpan release version
+
+0.01  Tue Jul  5 10:23:40 2005
+    - original version; created by h2xs 1.23 with options
+        -X -A Catalyst::Plugin::FormValidator::Simple
+

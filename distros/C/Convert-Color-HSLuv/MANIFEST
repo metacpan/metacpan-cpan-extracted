@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/accessors.t
+t/Convert-Color-HSLuv.t
+t/perlcriticrc
+t/perlcritic.t
+t/snapshot-rev4.csv
+lib/Convert/Color/HSLuv.pm
+lib/Convert/Color/HPLuv.pm
+lib/Convert/Color/LCh.pm
+lib/Convert/Color/LUV.pm
+lib/Convert/Color/XYZ.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

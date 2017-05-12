@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Config/Layered.pm
+lib/Config/Layered/Source.pm
+lib/Config/Layered/Source/ConfigAny.pm
+lib/Config/Layered/Source/ENV.pm
+lib/Config/Layered/Source/Getopt.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00_load.t
+t/01_default.t
+t/02_getopts.t
+t/03_configany.t
+t/04_env.t
+t/etc/config.perl

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Convert/TAP/Archive.pm
+t/00_load.t
+t/01_archive2html.t
+t/data/01_test_archive.tar.gz

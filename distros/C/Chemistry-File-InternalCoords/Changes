@@ -1,0 +1,15 @@
+Revision history for Chemistry-File-InternalCoords
+
+0.03	2006-11-10
+	* corrected v0.02 release date in Changes
+	* added version numbers to prerequisites in PREREQ_PM in Makefile.PL
+	* fixed vi typo in META.yml
+
+0.02	2006-06-28
+	* Added prerequisites to PREREQ_PM
+	* add a 'skip_build' option to skip build_zmat() call
+	* some code clean up in write_string()
+
+0.01	2006-06-25
+	Initial release
+

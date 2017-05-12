@@ -1,0 +1,14 @@
+Changes
+lib/Catalyst/Plugin/LogWarnings.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Controller/Warnings.pm
+t/live_warnings.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

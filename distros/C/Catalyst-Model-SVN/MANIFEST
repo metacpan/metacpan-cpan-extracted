@@ -1,0 +1,25 @@
+Changes
+lib/Catalyst/Helper/Model/SVN.pm
+lib/Catalyst/Model/SVN.pm
+lib/Catalyst/Model/SVN/Item.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/basic.t
+t/catalyst_helpers_model_svn.t
+t/kwalitee.t
+t/lib/TestLib.pm
+t/localrepos.t
+t/localrepossubpath.t
+t/pod_coverage.t
+t/pod_spelling.t
+t/pod_syntax.t
+t/ra_new.t
+t/ra_path.t
+t/stress.t
+t/strict.t
+t/warnings.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

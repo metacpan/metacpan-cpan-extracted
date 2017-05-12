@@ -1,0 +1,11 @@
+Bencode_XS.xs
+Changes
+extras/bench_decode.pl
+extras/bench_encode.pl
+lib/Convert/Bencode_XS.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_tests.t
+t/leak.t

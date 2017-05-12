@@ -1,0 +1,91 @@
+Revision history for CohortExplorer
+
+0.01    2013-12-06
+
+        - Initial release
+
+0.02    2013-12-09
+
+        - Documentation corrections and minor code changes
+
+0.03    2013-12-15
+
+        - Fixed some broken links within the documentation and improved the command-line completion.
+          The application now allows the auto-completion of options and their values. For a given commmand 
+          all possible options can be seen by typing the command name followed by '--' and pressing the tab key. 
+          The user is also able to see all possible values the options can take by pressing the tab key after 
+          specifying the option name.
+
+0.04   2013-12-27
+       
+        - Improved platform independence by employing File::Spec.
+
+0.05   2014-01-11
+
+        - Minor code changes
+
+0.06   2014-01-13
+
+        - The application now throws an exception if the command history file does not exist. The application requires
+          the command history file to exist with RW enabled for CohortExplorer.
+
+0.07   2014-02-03
+
+        - Fixed bug related to supplying of duplicate arguments in search and compare commands
+
+        - Fixed inconsistency in the validation of variables present in arguments and condition option
+
+
+
+0.08   2014-02-07
+
+        - Fixed bug related to imposing sql conditions in the search command
+
+        - Added support for 'AND' operation in the find command
+
+0.09   2014-02-18
+
+        - Fixed inconsistency related to computing visit_max in longitudinal datasources (REDCap)
+
+        - Minor documentation changes
+
+0.10   2014-04-30
+
+        - Added support for SQL datasources (Opal version 2.0)
+
+        - Minor documentation changes  
+
+0.11   2014-07-10
+
+        - Bug fixed within 'find' command REDCap API
+  
+        - Added support for group permission in REDCap API. Now the users belonging to some group can only view records 
+          created by their group.
+          
+        - Improved syntax for imposing conditions in search and compare command. 
+
+        - Improved logging
+
+        - Documentation changes
+
+0.12   2014-07-11
+
+        - Documentation corrections 
+
+0.13   2014-07-20
+
+        - Fixed bug in REDCap datasource API:
+          variable_count in describe command does not show count of unique variables
+  
+        - Documentation corrections  
+
+0.14   2014-09-05
+        
+        - Support for OpenClinica is added (OpenClinica datasource API)
+
+        - Fixed bug in ordering of visits/events and variable de-identification in REDCap datasource API
+
+        - Multiple arms datasources in REDCap can now be queried by creating two separate configurations
+          (one for each arm) in datasource-config.properties
+          
+        - When running the search/compare commands the metadata can also be exported with the data

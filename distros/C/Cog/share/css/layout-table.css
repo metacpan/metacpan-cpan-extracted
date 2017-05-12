@@ -1,0 +1,39 @@
+html, body {
+    height: 100%;
+}
+
+table {
+    height: 100%;
+    width: 100%;
+}
+
+table, tbody, tr, td {
+    margin: 0;
+    padding: 0;
+}
+
+td {
+    margin: 5px;
+}
+
+tr.head {
+    height: 50px;
+}
+
+td.side {
+    width: 200px;
+}
+
+tr.foot {
+    height: 50px;
+}
+
+.column {
+    border-left: 4px solid #222;
+}
+
+textarea {
+    border: 1px solid red;
+    width: inherit;
+    height: 100%;
+}

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-Template/index.html">
+<title>CAM-Template</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-Template</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-Template-0.93-docs">v0.93</a>, 2005-09-20</p>
+
+
+
+<p>
+This module implements an easy to use search-and-replace API for
+substituting parameters into template files.  The Perl module it most
+closely resembles is HTML:<!-- -->:Template.  It's main advantages over that
+module are:
+</p>
+
+<p>
+ * it's template syntax is easily configured
+ * it implements the Clotho Advanced Media template syntax by default
+   (yeah big deal, but it's important to us)
+ * it is smaller and, subjectively, more readable
+</p>
+
+<p>
+It's main disadvantages under HTML:<!-- -->:Template are:
+</p>
+
+<p>
+ * it's caching and preparsing are less sophisticated
+ * the default template syntax is quirkier
+ * it's not as feature rich in syntax and configuration options
+</p>
+
+<p>
+If you are starting from scratch, you may prefer HTML:<!-- -->:Template.  But,
+if you already have a bunch of templates using a syntax that is not
+compatible with HTML:<!-- -->:Template, this can help.
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-Template-0.93.tgz">CAM-Template-0.93.tgz</a>
+          (<a href="perl/CAM-Template-0.93.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-Template-0.93.zip">CAM-Template-0.93.zip</a>
+          (<a href="perl/CAM-Template-0.93.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-Template-0.93-docs">CAM-Template-0.93-docs</a>
+          
+        </td>
+        <td valign="top">Tue Sep 20 14:25:28 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-Template-0.91.tgz">CAM-Template-0.91.tgz</a>
+          (<a href="perl/CAM-Template-0.91.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-Template-0.91.zip">CAM-Template-0.91.zip</a>
+          (<a href="perl/CAM-Template-0.91.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-Template-0.91-docs">CAM-Template-0.91-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr 22 21:42:11 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-Template-0.90.tgz">CAM-Template-0.90.tgz</a>
+          (<a href="gpl/CAM-Template-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-Template-0.90.zip">CAM-Template-0.90.zip</a>
+          (<a href="gpl/CAM-Template-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-Template-0.90.html">CAM-Template-0.90.html</a>
+          
+        </td>
+        <td valign="top">Fri Sep 12 16:48:50 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-Template-0.90.tgz">CAM-Template-0.90.tgz</a>
+          (<a href="clotho/CAM-Template-0.90.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-Template-0.90.zip">CAM-Template-0.90.zip</a>
+          (<a href="clotho/CAM-Template-0.90.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-Template-0.90.html">CAM-Template-0.90.html</a>
+          
+        </td>
+        <td valign="top">Fri Sep 12 16:48:50 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

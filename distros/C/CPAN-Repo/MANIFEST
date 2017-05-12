@@ -1,0 +1,11 @@
+Build.PL
+CHANGES.md
+features/index.feature
+features/support/env.rb
+lib/CPAN/Repo.pm
+lib/CPAN/Repo/Server.pm
+MANIFEST			This list of files
+scripts/cpan_repo
+t/00.t
+META.yml
+META.json

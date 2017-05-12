@@ -1,0 +1,8 @@
+single_node       foo bar baz
+
+repeating_node    foo bar
+repeating_node    baz etc
+repeating_node
+{
+    123           456
+}

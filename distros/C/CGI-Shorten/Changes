@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI::Shorten.
+
+0.01  Tue Sep  9 12:50:07 2003
+	- original version; created by h2xs 1.21 with options
+		-Xn CGI::Shorten
+
+0.02
+	- added eg/shorten.pl and eg/redirect.pl for you reference

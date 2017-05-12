@@ -1,0 +1,11 @@
+index.html
+ChangeLog
+Build.PL
+LICENSE
+MANIFEST
+Makefile.PL
+lib/CAM/SQLManager.pm
+test.pl
+CAM-SQL.dtd
+README
+META.yml

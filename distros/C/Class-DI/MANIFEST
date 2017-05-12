@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_di.t
+t/02_definition.t
+t/03_factory.t
+t/04_resource.t
+t/05_get_component.t
+lib/Class/DI.pm
+lib/Class/DI/Definition.pm
+lib/Class/DI/Factory.pm
+lib/Class/DI/Resource.pm
+lib/Class/DI/Resource/YAML.pm

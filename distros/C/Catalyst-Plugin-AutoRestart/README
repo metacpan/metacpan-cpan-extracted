@@ -1,0 +1,82 @@
+NAME
+    Catalyst::Plugin::AutoRestart - Catalyst plugin to restart server
+    processes when specified memory threshold is reached
+
+SYNOPSIS
+    use Catalyst qw/AutoRestart/;
+
+     __PACKAGE__->config->{Plugin::AutoRestart} = {
+            active => '1',
+            check_each => '20',
+            max_bits => 576716800,
+            min_handled_requests => '150',
+            size_field => 'size', # or any other field supported by
+                                  # Proc::ProcessTable::Process
+            restart => 'exit', # alternative is kill for a more graceful restart
+     }
+
+     <Plugin::AutoRestart>
+        active   1
+        check_each   20
+        max_bits  576716800
+        min_handled_requests   150
+        restart exit
+     </Plugin::AutoRestart>
+
+DESCRIPTION
+    Catalyst plugin to force the application to restart server processes
+    when they reach a configurable memory threshold. Memory checks are
+    performed every 'N' requests. This is intended as a band-aid to deal
+    with problems like memory leaks; it's here to buy you time to find and
+    solve the underlying issues.
+
+CONFIGURATION
+  active
+    This is used to turn the plugin on and off
+
+  check_each
+    This is the number of requests to wait between checks
+
+  min_handled_requests
+    Minimum application requests before process size check starts occurring.
+    This is to prevent your application processes from exiting immediately
+    in case your application is bigger than your max_bits limit.
+
+    The default is 500 requests
+
+  max_bits
+    This is the size virtual memory can grow to before triggering a restart
+
+    The default is 524288000 bits (500 mb)
+
+  size_field
+    Which size field to measure. Defaults to "size". Other values are
+    anything that Proc::ProcessTable::Process has an accessor for, which
+    depends on your OS. Most people will want "size" (virtual memory size)
+    or "rss" (resident set size)
+
+SEE ALSO
+    For trying to solve memory leaks see Devel::Leak::Object
+
+EXTENDED METHODS
+    The following methods are extended from the main Catalyst application
+    class.
+
+  setup
+    Create sane defaults
+
+  handle_request
+    Count each handled request and when a threshold is met, restart.
+
+  _debug_process_table
+    Send to the log the full running process table and return the size of
+    the process
+
+AUTHORS
+     John Napiorkowski <john.napiorkowski@takkle.com>
+     John Goulah       <jgoulah@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use v5.008;
+
+use Class::User::DBI::Roles;
+use Class::User::DBI::Privileges;
+use Class::User::DBI::Domains;
+use Class::User::DBI::RolePrivileges;
+use Class::User::DBI::UserDomains;
+use Class::User::DBI;
+
+use DBIx::Connector;
+
+use Data::Dumper;
+$Data::Dumper::Terse  = 1;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Sortkeys = 1;
+
+# SQLite database settings.
+my $dsn     = 'dbi:SQLite:dbname=:memory:';
+my $db_user = q{};
+my $db_pass = q{};
+
+# mysql database settings.
+# my $database = 'cudbi_test';
+# my $dsn      = "dbi:mysql:database=$database";
+# my $db_user  = 'tester';
+# my $db_pass  = 'testers_pass';
+
+my $conn = DBIx::Connector->new(
+    $dsn, $db_user, $db_pass,
+    {
+        RaiseError => 1,
+        AutoCommit => 1,
+    }
+);
+
+my @classes = qw(
+    Class::User::DBI::Roles
+    Class::User::DBI::Privileges
+    Class::User::DBI::Domains
+    Class::User::DBI::RolePrivileges
+    Class::User::DBI::UserDomains
+    Class::User::DBI
+);
+
+foreach my $class ( @classes ) {
+    $class->configure_db( $conn );
+}
+
+# Create some roles.
+
+my $r = Class::User::DBI::Roles->new( $conn );
+$r->add_roles( [ 'workers',     'Those who work'    ],
+               [ 'players',     'Those who play'    ],
+               [ 'principles',  'Those who care'    ],
+);
+
+# Create some privileges.
+
+my $p = Class::User::DBI::Privileges->new( $conn );
+$p->add_privileges( [ 'work',       'The right to work'       ],
+                    [ 'work_hard',  'The right to work hard'  ],
+                    [ 'play',       'The right to play'       ],
+                    [ 'worry',      'The right to worry'      ],
+                    [ 'administer', 'The right to administer' ],
+                    [ 'watch',      'The right to watch'      ],
+                    [ 'rest',       'The right to rest'       ],
+);
+
+# Assign some privileges to roles.
+
+my $wkrp = Class::User::DBI::RolePrivileges->new( $conn, 'workers'     );
+my $plrp = Class::User::DBI::RolePrivileges->new( $conn, 'players'     );
+my $prrp = Class::User::DBI::RolePrivileges->new( $conn, 'principles'  );
+$wkrp->add_privileges( 'work',  'work_hard'                        );
+$plrp->add_privileges( 'play',  'rest'                             );
+$prrp->add_privileges( 'worry', 'work_hard',  'play', 'administer' );
+
+# Create some domains.
+
+my $d = Class::User::DBI::Domains->new( $conn );
+$d->add_domains( [ 'east',  'The Eastern territories'  ],
+                 [ 'west',  'The Western territories'  ],
+                 [ 'north', 'The Northern territories' ],
+                 [ 'south', 'The Southern territories' ],
+);
+
+# Now add a user.
+my $user = Class::User::DBI->new( $conn, 'kahn' );
+
+$user->add_user( {
+    password => 'The rain in Spain falls mainly on the planes.',
+    ip_req   => 1,
+    username => 'Ghengis Kahn',
+    email    => 'wreker@havoc.net',
+    ips      => [ '192.168.0.1', '127.0.0.1' ],
+    role     => 'principles',
+    domains  => [ qw( east west north south ) ],
+} );
+
+
+print $user->userid, ": He's the real deal!\n"
+    if $user->validate(
+        'The rain in Spain falls mainly on the planes.', '192.168.0.1' );
+
+print "He rules the north.\n"
+    if $user->user_domains->has_domain( 'north' );
+    
+my @domains = $user->user_domains->fetch_domains;
+print "In fact he is feared @domains!\n";
+
+print "He's in charge of it all.\n" if $user->is_role( 'principles' );
+
+print "Nobody can stop him from playing.\n"
+    if $user->role_privileges->has_privilege( 'play' );
+
+print "He can't stand by and watch...."
+    if ! $user->role_privileges->has_privilege( 'watch' );
+
+print " He never sleeps!\n"
+    if ! $user->role_privileges->has_privilege( 'rest' );
+
+
+my $profile = $user->load_profile;
+print "He is $profile->{username}!\n";
+
+print "And here is everything you need to know about him:\n";
+print Dumper $profile;
+
+my $credentials = $user->get_credentials;
+print "And these are his secrets:\n";
+print Dumper $credentials;
+
+print "But eventually everyone kicks the bucket... " if $user->delete_user;
+
+print "Loses validity,\n"
+    if ! $user->validated;
+    
+print "And ceases to exist.\n"
+    if ! $user->exists_user;
+

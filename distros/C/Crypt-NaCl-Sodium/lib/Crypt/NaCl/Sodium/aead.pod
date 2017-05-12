@@ -1,0 +1,481 @@
+# PODNAME: Crypt::NaCl::Sodium::aead
+# ABSTRACT: Authenticated Encryption with Additional Data (ChaCha20/Poly1305 MAC, AES256-GCM)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::aead - Authenticated Encryption with Additional Data (ChaCha20/Poly1305 MAC, AES256-GCM)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_aead = Crypt::NaCl::Sodium->aead();
+
+    my ($key, $nonce, $additional_data, $decrypted_msg, $msg, $secret);
+
+    ## Alice
+    ########
+
+    # Alice generates secret key
+    $key = $crypto_aead->keygen();
+
+    # ... and shares it with Bob
+    send_to( Bob => { key => $key } );
+
+    # now Alice and Bob can start communicating
+
+    # then generates random nonce
+    $nonce = $crypto_aead->nonce();
+
+    send_to( Bob => { nonce => $nonce } );
+
+    # Alice's message to Bob
+    $msg = "Hi Bob!";
+
+    # unencrypted metadata
+    $additional_data = "greeting";
+
+    # Bob will need it to decrypt and verify secret message
+    send_to( Bob => { additional_data => $additional_data } );
+
+    # the secret will include the additional data
+    $secret = $crypto_aead->encrypt( $msg, $additional_data, $nonce, $key );
+
+    # message is ready for Bob
+    send_to( Bob => { secret => $secret } );
+
+    ## Bob
+    ########
+
+    # Bob receives the secret key from Alice
+    $key = receive_for( Bob => 'key' );
+
+    # and random nonce
+    $nonce = receive_for( Bob => 'nonce' );
+
+    # Bob is now ready to receive first message from Alice
+    # first the additional data
+    $additional_data = receive_for( Bob => 'additional_data' );
+
+    # then the secret itself
+    $secret = receive_for( Bob => 'secret' );
+
+    # he has now all information required to decrypt message
+    $decrypted_msg = $crypto_aead->decrypt( $secret, $additional_data, $nonce, $key );
+
+    # time to reply
+    $msg = "Hello Alice!";
+
+    # generates new nonce
+    $nonce = $crypto_aead->nonce();
+
+    # Bob replies with no additional data
+    $additional_data = "";
+
+    # let's encrypt now
+    $secret = $crypto_aead->encrypt( $msg, $additional_data, $nonce, $key );
+
+    # Alice needs all pieces to verify and decrypt Bob's message
+    send_to( Alice => { nonce => $nonce } );
+    send_to( Alice => { additional_data => $additional_data } );
+    send_to( Alice => { secret => $secret } );
+
+    ## Alice
+    ########
+
+    # Bob's data sent to Alice
+    $nonce           = receive_for( Alice => 'nonce' );
+    $additional_data = receive_for( Alice => 'additional_data' );
+    $secret          = receive_for( Alice => 'secret' );
+
+    # we have now all information required to decrypt message
+    $decrypted_msg = $crypto_aead->decrypt( $secret, $additional_data, $nonce, $key );
+
+    # NOTE: send_to() and receive_for() and user functions providing transport of
+    # messages
+
+=head1 DESCRIPTION
+
+Authenticated Encryption with Additional Data combines the secret-key encryption
+with a mechanism to include an optional, non-confidential (not-encrypted) data
+which can provide some protocol-specific metadata.
+
+The additional data is included when computing the MAC of the secret and the
+decryption will never be performed, even partially, before verification.
+
+The generated key must be distributed in secret.
+
+Nonce (number used once) does not have to be protected, but it is crucial that
+the same nonce has not been ever reused with the same key. The recommended way
+is to generate the initial nonce with first message and then increment it for
+each subsequent message using the same key - see L<Crypt::NaCl::Sodium/increment>.
+
+The default algorithm is C<ChaCha20> with C<Poly1305 MAC>.
+
+If C<Intel SSSE3> extensions, C<aesni> and C<pcmul> instructions are available
+the hardware-accelerated C<AES256-GCM> cipher can also be used.
+
+=head1 METHODS
+
+=head2 ChaCha20/Poly1305 MAC
+
+The nonce is 64 bits long,
+
+Methods that use C<IETF>-compatible extended nonce (96-bit) and a 32-bit
+counter are also available as L</ietf_nonce>, L</ietf_encrypt> and
+L</ietf_decrypt>.
+
+=head3 keygen
+
+    my $key = $crypto_aead->keygen();
+
+Helper method to generate a random key to be used by C<$crypto_aead>.
+
+The length of the C<$key> equals L</KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 nonce
+
+    my $nonce = $crypto_aead->nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_aead>.
+
+The length of the nonce equals L</NPUBBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_aead->nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 ietf_nonce
+
+    my $nonce_ietf = $crypto_aead->ietf_nonce();
+
+Same as above but generates C<IETF>-compatible extended nonce.
+
+The length of the nonce equals L</IETF_NPUBBYTES>.
+
+=head3 encrypt
+
+    my $secret = $crypto_aead->encrypt($msg, $additional_data, $nonce, $key);
+
+Encrypts the plaintext message using given C<$nonce> and C<$key>. Even when empty the
+C<$additional_data> will be used to compute the MAC of the secret message.
+
+The length of the C<$secret> is at most equal to the length of C<$msg> + L</ABYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 ietf_encrypt
+
+    my $secret = $crypto_aead->ietf_encrypt($msg, $additional_data, $nonce_ietf, $key);
+
+Same as above but uses C<IETF>-compatible extended nonce.
+
+=head3 decrypt
+
+    my $msg;
+    eval {
+        $msg = $crypto_aead->decrypt($secret, $additional_data, $nonce, $key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Verify and decrypt the secret message with C<$additional_data> using given C<$nonce> and C<$key>.
+
+Function croaks if the verification fails. Otherwise returns the decrypted message.
+
+The length of the C<$msg> is at most equal to the length of C<$secret> - L</ABYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 ietf_decrypt
+
+    my $msg;
+    eval {
+        $msg = $crypto_aead->ietf_decrypt($secret, $additional_data, $nonce_ietf, $key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Same as above but uses C<IETF>-compatible extended nonce.
+
+=head2 AES256-GCM
+
+When supported by the CPU, C<AES256-GCM> is the fastest C<AEAD> cipher available
+in this library.
+
+If portability is a concern, use default L</"ChaCha20/Poly1305 MAC"> cipher.
+
+=head3 aes256gcm_is_available
+
+    if ( $crypto_aead->aes256gcm_is_available ) {
+        print "Can use AES256-GCM!\n";
+    }
+
+Returns true if the current CPU supports C<AES256-GCM> implementation.
+
+=head3 aes256gcm_keygen
+
+    my $key = $crypto_aead->aes256gcm_keygen();
+
+Helper method to generate a random key to be used by C<$crypto_aead>.
+
+The length of the C<$key> equals L</AES256GCM_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head3 aes256gcm_beforenm
+
+    my $precal_key = $crypto_aead->aes256gcm_beforenm( $key );
+
+Applications that encrypt several messages using the same key can gain a little
+speed by expanding the AES key only once, via the precalculation interface.
+
+Returns C<Crypt::NaCl::Sodium::aead::aes256gcmstate> object which encapsulates
+the expanded key.
+
+B<NOTE:> the returned object provides following methods to allow securing the
+access to the expanded key:
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head4 lock
+
+    $precal_key->lock();
+
+When called makes the state inaccessible. It cannot be read or written,
+but the data are preserved.
+
+=head4 unlock
+
+    $precal_key->unlock();
+
+When called makes the state accessible for read access only.
+
+=head4 is_locked
+
+    if ( $precal_key->is_locked ) {
+        $precal_key->unlock;
+    }
+
+Returns true if the C<$precal_key> object is locked, false otherwise.
+
+=head3 aes256gcm_nonce
+
+    my $nonce = $crypto_aead->aes256gcm_nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_aead>.
+
+The length of the nonce equals L</AES256GCM_NPUBBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_aead->aes256gcm_nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head3 aes256gcm_encrypt
+
+    my $secret = $crypto_aead->aes256gcm_encrypt($msg, $additional_data, $nonce, $key);
+
+Encrypts the plaintext message using given C<$nonce> and C<$key>. Even when empty the
+C<$additional_data> will be used to compute the MAC of the secret message.
+
+The length of the C<$secret> is at most equal to the length of C<$msg> +
+L</AES256GCM_ABYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head4 aes256gcm_encrypt_afternm
+
+    my $secret = $crypto_aead->aes256gcm_encrypt_afternm($msg, $additional_data, $nonce,
+        $precal_key);
+
+Same as above but uses precalculated key (as returned by L</aes256gcm_beforenm>).
+
+=head3 aes256gcm_decrypt
+
+    my $msg;
+    eval {
+        $msg = $crypto_aead->aes256gcm_decrypt($secret, $additional_data, $nonce, $key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Verify and decrypt the secret message with C<$additional_data> using given C<$nonce> and C<$key>.
+
+Function croaks if the verification fails. Otherwise returns the decrypted message.
+
+The length of the C<$msg> is at most equal to the length of C<$secret> -
+L</AES256GCM_ABYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head4 aes256gcm_decrypt_afternm
+
+    my $msg;
+    eval {
+        $msg = $crypto_aead->aes256gcm_decrypt_afternm($secret, $additional_data, $nonce,
+            $precal_key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Same as above but uses precalculated key (as returned by L</aes256gcm_beforenm>).
+
+=head1 CONSTANTS
+
+=head2 NPUBBYTES
+
+    my $nonce_length = $crypto_aead->NPUBBYTES;
+
+Returns the length of nonce used by L</"ChaCha20/Poly1305 MAC"> methods.
+
+=head2 IETF_NPUBBYTES
+
+    my $nonce_length = $crypto_aead->IETF_NPUBBYTES;
+
+Returns the length of nonce used by C<IETF>-compatible L</"ChaCha20/Poly1305 MAC"> methods.
+
+=head2 AES256GCM_NPUBBYTES
+
+    my $nonce_length = $crypto_aead->AES256GCM_NPUBBYTES;
+
+Returns the length of nonce used by L</"AES256-GCM"> methods.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_aead->KEYBYTES;
+
+Returns the length of key used by L</"ChaCha20/Poly1305 MAC"> methods.
+
+=head2 AES256GCM_KEYBYTES
+
+    my $key_length = $crypto_aead->AES256GCM_KEYBYTES;
+
+Returns the length of key used by L</"AES256-GCM"> methods.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head2 ABYTES
+
+    my $additional_bytes = $crypto_aead->ABYTES;
+
+Returns the maximum of number of additional bytes added to encrypted messages
+used by L</"ChaCha20/Poly1305 MAC"> methods.
+
+=head2 AES256GCM_ABYTES
+
+    my $additional_bytes = $crypto_aead->AES256GCM_ABYTES;
+
+Returns the maximum of number of additional bytes added to encrypted messages
+used by L</"AES256-GCM"> methods.
+
+B<NOTE:> if C<AES256-GCM> is not available this method croaks.
+
+=head1 ALGORITHM DETAILS
+
+C<crypto_aead> for encryption by default uses C<ChaCha20> stream cipher and
+C<Poly1305 MAC> for authentication.
+
+Google has selected those algorithms as a replacement for RC4 in OpenSSL, and
+shortly afterwards it has been added to OpenSSH.
+
+The C<AES256-GCM> algorithm has been recommended by C<NIST> and is a part of the
+C<TLS 1.2> ciphers.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<ChaCha, a variant of Salsa20|http://cr.yp.to/chacha/chacha-20080128.pdf>
+
+=item * L<The Poly1305-AES message-authentication code|http://cr.yp.to/mac/poly1305-20050329.pdf>
+
+=item * L<ChaCha20 and Poly1305 based Cipher Suites for TLS|https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-04>
+
+=item * L<AES Galois Counter Mode (GCM) Cipher Suites for TLS|https://tools.ietf.org/html/rfc5288>
+
+=item * L<An Interface and Algorithms for Authenticated Encryption|https://tools.ietf.org/html/rfc5116>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

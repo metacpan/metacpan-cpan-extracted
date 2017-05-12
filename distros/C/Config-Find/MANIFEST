@@ -1,0 +1,33 @@
+Changes
+lib/Config/Find.pm
+lib/Config/Find/Any.pm
+lib/Config/Find/Unix.pm
+lib/Config/Find/Where.pm
+lib/Config/Find/Win2k.pm
+lib/Config/Find/Win2k3.pm
+lib/Config/Find/Win7.pm
+lib/Config/Find/Win95.pm
+lib/Config/Find/Win98.pm
+lib/Config/Find/WinAny.pm
+lib/Config/Find/WinCE.pm
+lib/Config/Find/WinME.pm
+lib/Config/Find/WinNT.pm
+lib/Config/Find/WinXP.pm
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/10find.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t
+t/data/.test1
+t/data/.test2
+t/data/.test3
+t/data/test1.cfg
+t/data/test2.cfg
+t/data/test3.cfg
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

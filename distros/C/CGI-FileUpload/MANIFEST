@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+cgi/cgi-fileupload-manager.pl
+cgi/cgi-upload.css
+cgi/cgi-fileupload.pl
+lib/CGI/FileUpload/Manager.pm
+lib/CGI/FileUpload.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

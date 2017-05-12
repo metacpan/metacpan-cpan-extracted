@@ -1,0 +1,29 @@
+Revision History for Catalyst-Model-RDF
+=======================================
+
+v0.03 2012-11-23
+----------------
+
+commit c73435d12349f6711c1aee27598f9ae281383622
+Author: Dorian Taylor <dorian.taylor.lists@gmail.com>
+
+    mistake in test plan
+
+commit 13fe364557c7fae86f9d1e62cce14c1870cdec3b
+Author: Dorian Taylor <dorian.taylor.lists@gmail.com>
+
+    adding static namespace map
+
+commit 1c70052d1c91970e54d346df4186e399f2cf651a
+Author: Dorian Taylor <dorian.taylor.lists@gmail.com>
+
+    Doc fixes
+
+commit 53f493d38f172cffc76944fb9754860d1eda3ba4
+Author: Dorian Taylor <dorian.taylor.lists@gmail.com>
+
+    Adding a 'store' parameter to the constructor
+
+===================================
+End of changes in the last 365 days
+===================================

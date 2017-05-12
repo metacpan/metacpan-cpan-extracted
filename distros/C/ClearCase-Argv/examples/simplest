@@ -1,0 +1,18 @@
+##########################################################################
+# This is the simplest OO use of ClearCase::Argv.
+# Or at least the simplest variant that I like and recommend.
+# See the './simple' script for many variants.
+# Try running this with combinations of -/dbg=1, -/ipc=1, and -/ctcmd=1
+# on the cmd line.
+##########################################################################
+
+use ClearCase::Argv;
+
+# Pre-parse the command line for flags in the style '-/flag'.
+# These translate into ClearCase::Argv settings.
+ClearCase::Argv->attropts;
+
+# Instantiate an object, give it a program to run, and run it.
+my $ct = ClearCase::Argv->new;
+$ct->prog('pwv');
+$ct->system;

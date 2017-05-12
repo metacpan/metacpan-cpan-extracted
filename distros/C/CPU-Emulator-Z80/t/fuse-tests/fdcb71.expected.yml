@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb71
+registers:
+  AF: 7004
+  AF_: 0
+  BC: 58287
+  BC_: 0
+  DE: 38101
+  DE_: 0
+  HL: 2454
+  HL_: 0
+  I: 0
+  IX: 51925
+  IY: 39322
+  PC: 4
+  R: 2
+  SP: 0

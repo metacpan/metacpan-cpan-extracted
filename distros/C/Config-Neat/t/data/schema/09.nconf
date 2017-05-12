@@ -1,0 +1,10 @@
+jobs
+{
+    {
+        name            job2
+    }
+
+    {
+        name            job1
+    }
+}

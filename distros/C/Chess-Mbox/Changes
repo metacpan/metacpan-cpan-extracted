@@ -1,0 +1,15 @@
+2002-02-21  Terrence Brannon  <metaperl@localhost>
+
+	* added post_op option to constructor so that an Chess game
+	written to disk can have post-processing (e.g. run a Crafty
+	analysis on it) done on it.
+
+	* added scripts/parsegames.pl which is the script I use to process
+	my games files. also added scripts/annotate.pl, which is uses
+
+Revision history for Perl extension Chess::Mbox.
+
+0.01  Mon Feb 11 02:36:04 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-A -X -n Chess::Mbox
+

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                CPANPLUS-Dist-Deb
+version:             0.12
+abstract:            CPANPLUS plugin to create debian packages on the fly
+license:             ~
+author:              
+    - Jos Boumans <kane[at]cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    CPANPLUS:                      0.81
+    CPANPLUS::Dist::Build:         0.03
+    IPC::Cmd:                      0.23
+    Locale::Maketext::Simple:      0
+    Module::Load::Conditional:     0.06
+    Module::Pluggable:             2.4
+    Object::Accessor:              0.02
+    Package::Constants:            0
+    Params::Check:                 0.23
+    Test::More:                    0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

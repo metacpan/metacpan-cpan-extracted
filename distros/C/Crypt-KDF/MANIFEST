@@ -1,0 +1,12 @@
+MANIFEST
+Makefile.PL
+README
+lib/Crypt/KDF/_base.pm
+lib/Crypt/KDF/BaseKDFGenerator.pm
+lib/Crypt/KDF/KDF1Generator.pm
+lib/Crypt/KDF/KDF2Generator.pm
+lib/Crypt/KDF/OpenSSLPBEGenerator.pm
+t/00use_kdf1.t  
+t/01use_kdf2.t  
+t/02use_osslkdf.t
+META.yml                                 Module meta-data (added by MakeMaker)

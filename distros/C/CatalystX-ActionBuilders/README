@@ -1,0 +1,106 @@
+NAME
+    CatalystX::ActionBuilders - A DSL for declaring controller paths
+
+VERSION
+    This document describes version 0.003 of CatalystX::ActionBuilders -
+    released April 25, 2014 as part of CatalystX-ActionBuilders.
+
+SYNOPSIS
+        package MyApp::Controller::Foo;
+
+        use Moose;
+        use namespace::autoclean;
+        use CatalystX::ActionBuilders;
+
+        extends 'Catalyst::Controller';
+
+        # aka: sub index : Path(q{}) Args(0) { ... }
+        index_action { ... do something indexy here ... };
+
+        public list
+            => args 1
+            => template 'other_list.tt2'
+            => sub {
+                my ($self, $c) = @_;
+
+                ... something listy here ...
+        };
+
+
+        private something
+
+DESCRIPTION
+    This package exports sugar that allows paths to be declared without
+    having to hew to any of the requirements of attributes. Note that this
+    is an _alternate_ way to declare paths; you can still use the standard
+    approach without fear or reprisal.
+
+    We provide common shortcuts to common "special" actions (index, default,
+    etc) as well as some helpers for commonly-used packages.
+
+BEWARE!
+    This is a pretty early version based off of 2-ish year old code, and
+    needs a goodly number of (any!) tests. YMMV, pull-requests welcome. Some
+    stuff may disappear, some stuff may appear, etc, etc.
+
+SPECIAL ACTIONS
+    These all take one argument, a coderef; e.g.
+
+        index_action { ... do something indexy ... };
+
+  index_action
+  default_action
+  begin_action
+  end_action
+  auto_action
+ACTIONS
+  public
+  private
+  global
+ACTION PARAMETERS
+    Probably not the best name for this.
+
+NAVIGATION/MENU PARAMETERS
+    We also include support for defining menu attributes that can be used by
+    Catalyst::Plugin::Navigation.
+
+BEGIN BLOCKS
+    It's good practice to wrap any "extends" in your controller classes --
+    essential if you're using the standard approach of method attributes to
+    define your routes.
+
+    If you're using this package exclusively to define actions, you do not
+    need to use a BEGIN block. Note I'm not recommending this, just stating
+    that it's possible -- and if something breaks, you get to keep all the
+    pieces :)
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   This package is largely inspired by (and steals parts of)
+        CatalystX::Routes.
+
+SOURCE
+    The development version is on github at
+    <http://https://github.com/RsrchBoy/catalystx-actionbuilders> and may be
+    cloned from
+    <git://https://github.com/RsrchBoy/catalystx-actionbuilders.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/catalystx-actionbuilders/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

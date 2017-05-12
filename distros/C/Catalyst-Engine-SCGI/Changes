@@ -1,0 +1,13 @@
+Revision history for Catalyst-Engine-SCGI
+
+0.03 29-04-2011
+        - Include Module::Install correctly RT#66961
+        - Fix documentation bug in the helper RT#47276
+        - Include repository URI in metadata
+
+0.02
+        Freshen package, minor bug fixes
+
+0.01
+        First version, released on an unsuspecting world.
+

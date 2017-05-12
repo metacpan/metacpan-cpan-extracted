@@ -1,0 +1,80 @@
+=encoding UTF-8
+
+=head1 NAME
+
+CLDR::Number::TODO - TODO for CLDR::Number
+
+=head1 VERSION
+
+This document describes CLDR::Number v0.19, built with Unicode CLDR v29.
+
+=head1 TODO
+
+=head2 Specification
+
+In descending order of priority.
+
+=over
+
+=item * algorithmic numbering systems (C<hant>, C<hebr>, C<roman>, etc.)
+I<L<#32|https://github.com/patch/cldr-number-pm5/issues/32>>
+
+=item * other numbering systems (C<native>, C<traditional>, C<finance>)
+I<L<#10|https://github.com/patch/cldr-number-pm5/issues/10>>
+
+=item * format lengths (C<full>, C<long>, C<medium>, C<short>, C<narrow>)
+I<L<#11|https://github.com/patch/cldr-number-pm5/issues/11>>
+
+=item * currency symbol lengths
+I<L<#12|https://github.com/patch/cldr-number-pm5/issues/12>>
+
+=item * currency unit patterns with currency display names
+I<L<#35|https://github.com/patch/cldr-number-pm5/issues/35>>
+
+=item * C<accounting> currency format in addition to default C<standard>
+I<L<#13|https://github.com/patch/cldr-number-pm5/issues/13>>
+
+=item * maximum integer digits
+I<L<#17|https://github.com/patch/cldr-number-pm5/issues/17>>
+
+=item * significant digits (and C<@> symbol in patterns)
+I<L<#18|https://github.com/patch/cldr-number-pm5/issues/18>>
+
+=item * scientific notation formatter (and C<E> symbol in patterns)
+I<L<#14|https://github.com/patch/cldr-number-pm5/issues/14>>
+
+=item * superscripting exponent format for scientific notation
+I<L<#15|https://github.com/patch/cldr-number-pm5/issues/15>>
+
+=item * number parsers
+I<L<#19|https://github.com/patch/cldr-number-pm5/issues/19>>
+
+=back
+
+=head2 Optimization
+
+=over
+
+=item * deprecate mutable locales (in progress)
+I<L<#38|https://github.com/patch/cldr-number-pm5/issues/38>>
+
+=item * locale subtag attributes for use without locale attribute parsing
+I<L<#4|https://github.com/patch/cldr-number-pm5/issues/4>>
+
+=item * passing prebuilt locales to formatters from CLDR::Number
+I<L<#5|https://github.com/patch/cldr-number-pm5/issues/5>>
+
+=item * parsed pattern caching
+I<L<#6|https://github.com/patch/cldr-number-pm5/issues/6>>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CLDR::Number::FAQ>
+
+=item * L<Issues for CLDR::Number on GitHub|https://github.com/patch/cldr-number-pm5/issues>
+
+=back

@@ -1,0 +1,99 @@
+TODO list for Perl module CPAN::Reporter
+
+#--------------------------------------------------------------------------#
+# Bugs
+#--------------------------------------------------------------------------#
+
+#--------------------------------------------------------------------------#
+# Features, etc
+#--------------------------------------------------------------------------#
+
+# NOW NOW NOW NOW NOW
+
+- Add support for CPAN::Reporter singleton for CPANPLUS refactoring
+
+- Look for .cpanreporter in a known place for Strawberry preconfig
+  (e.g. in @INC where CPAN/Reporter.pm is found?)
+
+# High priority
+
+- Add utility sub to invoke a test (for C::R::S and PoCo::C::R)
+
+- Add Oslo Accords environment variables
+
+- Add datestamps to history (ISO 8601: YYYY-MM-DD HH:MM:SS)
+    -   my @t=localtime; $t[4]++; $t[5]+=1900; 
+        my $iso = sprintf("%4d-%02d-%02d %02d:%02d:%02d", reverse @t[0..5]);
+
+- For failure in PL stage -- in report, show configure_requires and an error
+  message that other requirements aren't available if PL fails
+
+- change report truncation to take first 25K and last 25K (summary) (?!)
+
+- check for working signals regardless of platform and skip if not working --
+  maybe during *.PL (write a signaling file)
+
+# Medium priority 
+
+- search for recursive Makefile.PL only at depth 1
+
+- list installed versions of any modules in requires/recommends/etc
+
+- list path of requires/recommends/etc/
+
+- 'force_prompt' config to locally unset PERL_MM_USE_DEFAULT (Rezic)
+
+- add results back to CPAN::Distribution object
+
+- Create a discards file that shows missing prerequisites for each discarded
+  report.  Could be interesting data to find highly requested.  Or, perhaps
+  track *all* prerequisites for all files tested.  Very interesting data
+  I suspect.  Probably not something that should be on by default
+
+# Low priority
+
+- document Windows ErrorMode registry hack to stop segfault dialog
+
+- add earlier, successful phases to output in reverse order.  Probably have to
+  bump up the test-length cutoff, though, to deal with lengthy make output
+    - Test phase output
+    - make phase output
+    - PL phase output
+
+- refactor t/Helper.pm
+
+- switch from a single flat file for history. e.g.
+    - SDBM_File for history (key on subject line, with phase as value?
+      Or key on distro name/perl with result and phase as value? ) -- but
+      does it scale well?  (See MJD's article)
+    - Or use sorted file with Search::Dict(?) -- (prefer this option,
+      keeps search for non-existant line fast; insertion is a just a few
+      block writes and a rename.) If we do this, need to put distro name
+      first to make "have_tested()" easier to write
+    - Use filesystem to index -- one file per distname? hash with directories
+      to keep number of files/directory down?
+    - Or flat file per perl/archname/osver (usually constant)
+    - use File::ReadBackwards for searches on flat file
+
+- Add interactive config for editor?
+
+- Improve test coverage for utility subs and error handling
+
+- Check email addresses for validity (cf. Email::Valid, etc.)
+
+- Add other Config items like 'make' to report context
+
+- heuristics for missing library files --> discard report ??
+
+- figure out how to support color output from Test::Harness 3.0 -- probably
+  set an environment variable to get them to pass color strings to the pipe
+  and then strip color escape codes from the teed file.
+
+# Probably won't implement
+
+- add timeout to EU::MM prompts (RT#28034)
+
+- remove File::Temp as a build_requires dependency
+
+- send duplicate report if using "report" (?) or "force" (?)
+

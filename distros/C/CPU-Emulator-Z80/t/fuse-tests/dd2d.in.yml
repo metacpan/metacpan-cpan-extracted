@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 45
+name: dd2d
+registers:
+  AF: 14780
+  AF_: 0
+  BC: 45628
+  BC_: 0
+  DE: 28177
+  DE_: 0
+  HL: 23113
+  HL_: 0
+  I: 0
+  IX: 615
+  IY: 43779
+  PC: 0
+  R: 0
+  SP: 0

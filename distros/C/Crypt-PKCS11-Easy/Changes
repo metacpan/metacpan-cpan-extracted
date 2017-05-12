@@ -1,0 +1,33 @@
+Changelog for Crypt-PKCS11-Easy
+
+0.162150 2016-08-02T21:41:33Z
+ - [Closes #4] Support encryption - tested with RSA PKCS and OAEP (Ioan
+   Rogers)
+ - Fix dumping available mechanisms is hsm example script (Ioan Rogers)
+ - Use a static and much shorter Readme.md and add some status badges (Ioan
+   Rogers)
+ - Add perl 5.24 to travis builds and make softhsm2 available (Ioan Rogers)
+
+0.161790 2016-06-27T16:12:19Z
+ - Fix PSS param sLen (Ioan Rogers)
+ - SHA1 hash mech has a different naming format to the others SHAs (Ioan
+   Rogers)
+
+0.161750 2016-06-23T16:38:03Z
+ - Support PSS signing (Ioan Rogers)
+
+0.161530 2016-06-01T20:27:50Z
+ - Fix loop (Christopher Anthony)
+ - Add some more default pkcs11 module dirs (Ioan Rogers)
+
+0.161260 2016-05-05T15:19:28Z
+ - Re-enable UploadToCPAN (Ioan Rogers)
+
+0.161250 2016-05-04T21:33:16Z
+ - [Closes #2] Allow setting module_dirs (Ioan Rogers)
+ - [Closes #1] allow passing full module paths instead of relying on
+   automagic (Ioan Rogers)
+ - Improvements to test suite
+
+0.161160 2016-04-25T15:37:28Z
+ - First public release

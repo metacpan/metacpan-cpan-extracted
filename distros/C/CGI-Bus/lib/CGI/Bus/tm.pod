@@ -1,0 +1,767 @@
+=head1 NAME
+
+CGI::Bus::tm - database Transaction page Manager to view and edit data
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->tm->...see 'Transaction Sequence' below
+
+
+=head1 DESCRIPTION
+
+This module is database Transaction page Manager to view and edit data.
+
+There are a common C<TRANSACTION SEQUENCE> and 
+simplest programming interface using C<cmd>(-command) conditions and
+direct database calls along with C<cnd> and C<qparam> calls.
+Some common transaction commands for more usable programming interface
+are also implemented.
+
+Some slots are only predefined for children and not used within this module.
+Some slots may be extended in subclasses.
+
+See L<CGI::Bus::tmsql|CGI/Bus/tmsql> as an example of details and
+for more advanced SQL database applications development features.
+
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+
+=head1 TRANSACTION SEQUENCE
+
+Transaction sequence is a series of hooks dependent on
+current command C<cmd> and
+current generic (or general or global) command C<cmdg>.
+C<cmd>(-command) calls are used as conditions.
+In simplest programming interface this conditions should be programmed.
+In more usable programming interface (SQL generator) 
+this conditions are hidden inside 
+C<eval> or C<cmd>(C<-cmd>) call evaluating C<cmdCCC> methods, 
+but may be hooked with C<-cmdCCC> slots.
+
+A transaction sequence looks like something as:
+
+ my $s =CGI::Bus->new();
+ my $t =$s->tmsql;
+ my $d =$s->dbi;        #
+ eval {                 # inside $t->eval(?connect, sub{
+   if ($t->cmd(-chk)) { # check before insert, update, delete # $t->cmdchk
+   }
+   if ($t->cmd(-ins)) { # insert record
+       $d->execute('insert ...', @{$t->qparam([names])});
+   }
+   if ($t->cmd(-upd)) { # update record where cnd
+       $t->cnd(-upd, field=>flags,...);
+       $d->execute('update ...' .$t->cnd, @{$p->qparam([names])});       
+   }
+   if ($t->cmd(-del)) { # delete record where cnd
+       $t->cnd(-del, field=>flags,...);
+       $d->execute('delete ...' .$t->cnd);
+   }
+   if ($t->cmd(-sel)) { # select record fields to edit
+       $t->cnd(-sel, field=>flags,...);
+       $p->qparam($d->selectrow_hashref('...' .$t->cnd));      
+   }
+   if ($t->cmd(-crt)) { # create new record values            # $t->cmdcrt
+   }
+   if ($t->cmd(-qry)) { # list query condition                # $t->cmdqry
+   }                                                          
+   if ($t->cmd(-htm)) { # html page begin                     # $t->cmdhtm
+       print $t->htmlhid;
+       print $t->htmlbar;
+   }
+   if ($t->cmd(-frm)) { # html record form                    # $t->cmdfrm
+     # print html form
+   }
+   if ($t->cmd(-lst)) { # list records
+       $t->cnd(-lst, field=>flags,...);
+       $d->select...
+   }
+   if ($t->cmd(-end)) { # commit, inside $t->eval call
+       $d->commit
+   }
+ };
+ $t->print($t->htmlres);# result msg, inside $t->eval call
+}
+
+
+=head2 Transaction Sequence and Calls
+
+=over
+
+=item -chk
+
+Check or compute fields values before insert, update, delete operation - 
+C<cmdchk> call
+
+
+=item -ins
+
+Insert record into database
+
+
+=item -upd
+
+Update record in the database.
+Previous values parameters names have C<-pxpv> prefix.
+
+
+=item -del
+
+Delete record in the database.
+Previous values parameters names have C<-pxpv> prefix.
+
+
+=item -sel
+
+Select record fields into L<CGI|CGI> params to view or edit.
+Previous values parameters will be reseted.
+
+
+=item -crt
+
+Create new record fields values into L<CGI|CGI> params.
+Initiate to present new record form.
+C<cmdcrt> call.
+
+
+=item -qry
+
+List query condition values initiate as L<CGI|CGI> params -
+C<cmdqry> call
+
+
+=item -htm
+
+HTML page begin output - 
+print operations action bar
+and hidden HTML - 
+C<cmdhtm> call
+
+
+=item -frm
+
+Output HTML record form for query condition, view or edit - 
+C<cmdfrm> call
+
+
+=item -lst
+
+List records to user according to filter, view chosen, query condition given
+
+
+=item -end
+
+Commit database transaction, the last command,
+implemented inside C<eval> call along with C<htmlres> and rollback.
+
+
+=back
+
+
+
+=head1 SLOTS
+
+=over
+
+
+=item -acd
+
+Access control description hash ref. RESERVED
+
+
+=item -banner
+
+Banner to place above the toolbar. 
+May be sub{}(self) or HTML.
+See also <-logo>
+
+
+=item -cmd
+
+Current transaction command cached by C<cmd>
+
+
+=item -cmdc
+
+Current transaction command cached inside C<cnd> calls
+
+
+=item -cmdCCC
+
+Transacion command 'CCC' hook subroutine reference.
+Default operation is C<cmdCCC> call.
+Commands are described in C<TRANSACTION SEQUENCE> above.
+
+
+=item -cmde
+
+Current transaction command edit state flag cached by C<cmd> calls
+
+
+=item -cmdg
+
+Generic (general, global) 
+transaction command cached by C<cmd>, available via C<cmdg>.
+This is any C<-cmd> command exept form exchanges - 
+C<-frm>, C<-ins>, C<-upd> commands.
+
+
+=item -cnd
+
+Transaction condition string generated by C<cnd>
+
+
+=item -fields
+
+Form fields hash ref, converted from C<-form> by C<set>
+
+
+=item -filter
+
+Filter 'WHERE' clause for all SQL commands - string or sub{}.
+C<-fltsel>, C<-fltlst>, C<-fltedt> takes precedence. RESERVED
+
+
+=item -fltedt
+
+Filter 'WHERE' clause SQL 'UPDATE' and 'DELETE' commands - string or sub{}.
+RESERVED
+
+
+=item -fltlst
+
+Filter 'WHERE' clause SQL 'SELECT' command to list records - string or sub{}.
+RESERVED
+
+
+=item -fltsel
+
+Filter 'WHERE' clause SQL 'SELECT' commands to view record - string or sub{}.
+RESERVED
+
+
+=item -form
+
+Form data description array ref, extendable in subclasses.
+See L<CGI::Bus::tmsql|CGI/Bus/tmsql>
+for descriptions of field attributes used here:
+C<-fld>, C<-lbl>, C<-cmt>, C<-flg> ('k'ey and 'm'andatory), C<-col>
+C<-crt>, C<-frm>, C<-sav>, C<-ins>, C<-upd>, C<-del>
+
+
+=item -formtgf
+
+Form Target Frame. 
+Target frame to open form for create new or edit existed record.
+Undefined value means the same browser window as for list of records, 
+'_BLANK' opens new browser window
+
+
+=item -fsd
+
+File store description hash ref, RESERVED
+
+
+=item -ftext
+
+Full-text search expression template for use in query condition for C<-lists>,
+'$_' is placeholder. RESERVED
+
+
+=item -genXXX
+
+Generated database commands and clauses, RESERVED
+
+
+=item -htmlts
+
+=item -htmlte
+
+Starting and ending data (form or view) table HTML.
+Commonly used by default are '<table>' and '/<table>'.
+
+
+=item -keyfld
+
+Single key field name, RESERVED
+
+
+=item -lboxrnm
+
+Listbox rows number margin, RESERVED
+
+
+=item -lists
+
+Views data description hash ref, extendable in subclasses.
+See L<CGI::Bus::tmsql|CGI/Bus/tmsql>
+for descriptions of view attributes used here:
+C<-lbl>, C<-cmt>, C<-fields>, C<-key>, C<-orderby>
+
+
+=item -listrnm
+
+View rows number default margin.
+Margin of the number of the rows returned by C<-lst> operation
+
+
+=item -logo
+
+Logotype to place at the left of the toolbar. 
+May be image URL or HTML.
+See also C<-banner>, C<-tbarl>
+
+
+=item -opflg
+
+Operations allowed letters:
+'<' leftmost left navigation action bar from C<htmlbar>;
+'a'll:
+'c'reate/'i'nsert, 'e'dit/'u'pdate, 'd'elete,
+'s'elect (?), 'v'iew record,
+'l'ist, 'q'uery records;
+!'c'reate/'i'nsert, !'e'dit/'u'pdate, !'d'elete record,
+!'s'elect record button, !'v'iew record mode, !'q'uery condition
+
+
+
+=item -pxcb
+
+-pxcb => '_tcb_' - 
+Transaction command or button name prefix
+
+
+=item -pxqc 
+
+-pxqc  => '_tsw_' - 
+Special widget name prefix
+
+
+=item -pxpv
+
+-pxpv => '_tpv_' -
+Previous value parameter name prefix for C<-upd> and C<-del> operation
+
+
+=item -pxqc 
+
+-pxqc => '_tqc_' -
+Query condition parameter name prefix for save by C<-lst> operation
+
+
+=item -refresh
+
+Refresh frequency for all lists (views) of recods,
+used to generate <meta http-equiv="refresh" CONTENT=XX>
+
+
+=item -rowlst
+
+=item -rowsel
+
+=item -rowedt
+
+=item -rowsav
+
+=item -rowins
+
+=item -rowupd
+
+=item -rowdel
+
+Subs{} to allow or filter row operation given.
+Are used at a lower level, then C<-cmdCCC> subs{}.
+May be used for access control.
+C<-rowlst> is to be evaluated for each row in C<cmdlst> to filter rows to display.
+C<-rowedt> controls record edit appearance.
+C<-rowupd> and C<-rowdel> (and C<-rowsav> in this cases)
+are to evaluate when previous values
+of fields are fetched to C<-pxpv> parameters.
+Partially RESERVED.
+
+
+=item -rowsav1
+
+=item -rowsav2
+
+=item -rowsav1a
+
+=item -rowsav2a
+
+Like C<-rowsav>, but immediatelly before or 'a'fter database (SQL) command
+generation and execution.
+Actual field values to be used for or 'a'fter database command are 
+available as L<CGI|CGI> params.
+C<-rowsav1> is used for edited record only 
+(new value fieldnames not prefixed).
+C<-rowsav2> is used for each database command 
+(new value fieldnames may be prefixed).
+
+
+
+=item -rowsel1a
+
+=item -rowsel2a
+
+Like C<-rowsel>, but immediatelly 'a'fter database (SQL SELECT) command
+generation and execution.
+Field values are available as L<CGI|CGI> params, 
+both previous (C<-pxpv>) and pending.
+C<-rowsel1a> is used while editing record only 
+(when previous field values selected).
+C<-rowsel2a> is used for each record selection
+(previous or current field values selected).
+
+
+
+=item -tbarl
+
+Left toolbar HTML or HTML strings array ref for C<-htm> operation
+
+
+=item -tbarr
+
+Right toolbar HTML or HTML strings array ref for C<-htm> operation
+
+
+=item -vsd
+
+Version store description hash ref, RESERVED
+
+
+=item -width
+
+Width of data (form or view) table, in '&nbsp;' chars
+
+
+=back
+
+
+
+=head1 METHODS
+
+Common methods: 
+C<qparampv>, C<qparamsw>, C<qparampx>, C<htmlself>,
+C<cmd>, C<cmdg>, 
+C<htmlbar>, C<htmlhid>, C<htmlres>, C<htmlself>, 
+C<eval>, C<evaluate>
+
+Programming interface: 
+C<evaluate>, C<eval>, C<cmd>, C<cnd>
+
+Transaction commands implementations: 
+C<cmdchk>, C<cmdcrt>, C<cmdqry>, C<cmdhtm>, C<cmdfrm>, C<cmdhlp>
+
+
+=over
+
+
+=item cmd -> current command
+
+=item cmd (-command) -> is command matched?
+
+=item cmd (-cmd) -> execution of all commands required
+
+Current transaction command
+
+
+=item cmdchk () -> check before insert, update, delete
+
+Check fields (L<CGI|CGI> params) values before insert or update
+with C<-chk> subs{}.
+Calculate fields values with C<-frm>, C<-sav>, 
+C<-ins>, C<-upd>, C<-del> subs{} 
+before insert, update, delete
+
+
+=item cmdcrt () -> params with default values
+
+Create L<CGI|CGI> params with C<-crt> default values for new record
+
+
+=item cmdfe () -> form editing?
+
+Check if there is form editing operation.
+
+
+=item cmdfrm () -> HTML form fields printed
+
+Print HTML form fields for new, view or edit record
+
+
+=item cmdg -> current generic command
+
+=item cmdg (-command,...) -> is one of commands matched?
+
+Current generic (general, global) transaction command is any C<-cmd> command 
+exept form exchanges like C<-frm>, C<-ins>, C<-upd>.
+
+
+=item cmdhlp ()  -> Help screen HTML printed
+
+Print Help page HTML, constructed with C<-form> and C<-lists>
+descriptions
+
+
+=item cmdhtm ()  -> top form HTML printed
+
+Print HTML at the top of the list of records or form of record.
+By other words, print C<htmlbar> and C<htmlhid>.
+
+
+=item cmdqry () -> params with default values
+
+Create L<CGI|CGI> params with C<-qry> default values for query parameters form
+
+
+
+=item cnd -> current transaction command condition string
+
+=item cnd (?-cmd, param => format,...) -> condition string
+
+=item cnd (?-cmd, ?'+', ?'-and|or', ?'+and|or', ?'prefix.', param, ?'fieldname=', format,...) -> condition string
+
+Makes dbi transaction command condition string or returns current condition string.
+'-+and|or' prepends or appends 'and' or 'or' to condition string 
+generated if it is not empty.
+Field values may contain condition expression used for C<-lst> transaction.
+Field values are given from CGI C<param>s.
+Field formats may be 
+empty, quote ("'", '"'), sub, string template with '?' placeholder for value.
+
+
+=item eval (?dbi connect parameters, ?sub{}) -> DBI transaction
+
+Connect to the database, execute given sub{} in L<DBI|DBI> transaction,
+print C<htmlres>, commit or rollback on errors.
+Default procedure is C<cmd>('-cmd').
+See also C<evaluate>
+
+
+=item evaluate () -> operation requested by browser
+
+Full L<CGI::Bus::tm|CGI/Bus/tm> execution.
+Like C<eval>, but with starting HTTP, 
+starting and ending HTML page.
+Uses '-htpgstart' and '-htpfstart' from parent L<CGI::Bus|CGI/Bus>
+
+
+=item htmlbar (?opt) -> action bar HTML
+
+Generate action bar HTML string dependent on options or C<-opflg>,
+current transaction, C<-tbarl> , C<-tbarr>.
+
+
+=item htmlhid () -> hidden HTML
+
+Generate hidden HTML string.
+Hidden HTML contains saved parameters values like 
+previous values of fields.
+
+
+=item htmlres () -> transaction result HTML
+
+Generate transaction result HTML string - 
+empty or success or error message.
+
+
+=item htmlself (command, param=>val,...) -> self command hyperlink HTML
+
+=item htmlself (command, param=>val,..., {attributes})
+
+=item htmlself ({attributes}, command, param=>val,...)
+
+Generate self script command hyperlink HTML.
+See C<cmd> and C<TRANSACTION SEQUENCE> for commands.
+Attributes for 'A' HTML tag may be given as an array or hash ref.
+
+
+=item pxnme ( prefix => name ) -> prefixed name
+
+=item pxcb ( name ) -> command button name
+
+=item pxsw ( name ) -> special widget name
+
+=item pxpv ( name ) -> previous value name
+
+=item pxqc ( name ) -> query condition name
+
+Prefix field or param name given to construct special name.
+Prefixes are C<-pxcb>, C<-pxsw>, C<-pxpv>, C<-pxqc>.
+
+
+=item qlst () -> queried list name
+
+List (view) name queried or default
+
+
+=item qparampv (name,...) -> previous value of param
+
+C<qparam> call with C<-pxpv> prefixed param names.
+
+
+=item qparampx (prefix) -> [field names]
+
+=item qparampx (prefix,...) -> qparam prefixed
+
+Get params names with prefix given or
+C<qparam> call with prefixed param names.
+Empty prefix means non-prefixed names.
+
+
+=item qparamsw (name,...) -> special widget value
+
+C<qparam> call with C<-pxsw> prefixed param names.
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+
+=head2 23/08/2007
+
+New C<-banner>.
+
+
+=head2 16-17/11/2004
+
+New !'c'reate/'i'nsert, !'d'elete, !'e'dit/'u'pdate, !'q'uery C<-opflg> options.
+New C<cmdfe> method.
+Changed C<htmlbar> considering C<-vsd> option.
+
+
+=head2 03/11/2004
+
+New experimantal C<_tsw_LSO> / C<qloval> / C<qlourl> / C<qlowgh> / C<qlowgl> / C<qloparse>
+interface to implement options embedded into views.
+
+
+=head2 18-19/10/2004
+
+=item Changed:
+
+C<evaluate> executes now some L<CGI::Bus::upws|CGI/Bus/upws>
+'_run' commands as full-text 'SEARCH' or user 'SETUP'.
+
+C<qlst> may determine default view via '_' sign not only at the end of
+the view name, but at the end of the view label too.
+
+
+=head2 26/06/2003
+
+=item Changed:
+
+C<htmlbar> button set behaviour:
+'Login' button moved after 'Back' and will be always shown for guests;
+'Login' button small picture resized;
+'List' button in the record form replaced with 'Query' button 
+and excluded when record editing;
+'Edit' button will not be shown for guests.
+
+
+=head2 28/04/2003
+
+=item Fixed:
+
+C<cmdfrm> 'l'ist, 's'elect, '"'quoted only fields (C<-flg> =~/^["'ls]*$/)
+are not considered in form layout now
+
+
+=head2 17/04/2003
+
+=item Improved:
+
+C<cmdfrm> text area formatting improved with '&nbsp;' signs and '<code>' tags as needed.
+
+
+=head2 25/11/2002
+
+=item Fixed:
+
+C<cmdfrm> lost line breacks when displaying text areas with embedded URLs
+
+
+=head2 13/09/2002
+
+=item New:
+
+C<-logo> slot
+
+=item Changed:
+
+C<htmlbar> and C<cmdhlp> behaviour for '<' C<-opflg>.
+
+
+
+=head2 05/06/2002
+
+=item New:
+
+C<-refresh> view and common slots
+
+
+
+=head2 02/06/2002
+
+=item New:
+
+C<-htmlts>, C<-htmlte>, C<-width> common slots
+
+
+=head2 16/05/2002
+
+=item New:
+
+C<-rowsav1> and C<-rowsav2> events inside C<cmdsql>.
+
+
+=head2 07/05/2002
+
+=item Changed:
+
+ - textarea fields displays linebreaks when viewed
+ - 'Select' and 'Edit' command buttons appearance
+ - '!s'elect record button '-opflg' value
+
+
+=head2 05/04/2002 - 06/05/2002
+
+=item New:
+
+ - imagebuttons toolbar using -iurl slot;
+   uncomment at the beginning of the source to disable;
+   see issue in the source code
+
+
+
+=head2 19/01/2002 - 23/03/2002
+
+=item New:
+
+Implemented and Documented.
+
+
+=item ToDo:
+
+ - review & test & debug
+
+=item Questions:
+
+ - how to move 'qparampv' and 'qparamsw' methods up to the application object?
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

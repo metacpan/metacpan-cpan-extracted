@@ -1,0 +1,58 @@
+[% 
+    title = 'Distribution PASS List' ;
+    box_sites = 1 ;
+    name3 = '' ;
+    name2 = '' ;
+%]
+
+[% 
+    IF OS ;
+      name3 = 'Matrices By OS' ;
+      name2 = 'By OS' ;
+      link1 = '/osmatrix' ;
+    ELSE ; 
+      name3 = 'Matrices By Platform' ;
+      name2 = 'By Platform' ;
+      link1 = '/pmatrix' ;
+    END ;
+%]
+
+[% 
+    IF FULL ;
+      link1 = link1 _ '-full' ;
+      name2 = name2 _ ' - All Perls' ;
+    ELSE ; 
+      name2 = name2 _ ' - Official Perls' ;
+    END ;
+
+    IF MONTH ;
+      link1 = link1 _ '-month' ;
+      title = title _ ' (Last Month)' ;
+      name2 = name2 _ ' (Last Month)' ;
+    END ;
+
+    crumb3_name = name3 ;
+    crumb2_name = name2 ;
+    crumb2_href = link1 _ '.html' ;
+    crumb1_name = 'Distributions' ;
+
+    IF MONTH ;
+      crumb1_name = crumb1_name _ ' (Last Month)' ;
+    END ;
+%]
+
+<table summary="Platform Info">
+<tr><th class="top">PLATFORM:</th><td>[% vplatform %]</td></tr>
+<tr><th class="top">PERL:</th><td>[% vperl %]</td></tr>
+<tr><th class="top">COUNT:</th><td>[% count %]</td></tr>
+</table>
+
+<p>All the distributions listed below have had at least one PASS report
+submitted to the cpan-testers mailing list, for this instance of platform and
+perl.</p>
+
+<ul>
+[% FOREACH dist = dists.sort %]
+<li><a href="http://search.cpan.org/dist/[% dist %]" title="[% dist %] on search.cpan.org">[% dist %]</a></li>
+[% END %]
+</ul>

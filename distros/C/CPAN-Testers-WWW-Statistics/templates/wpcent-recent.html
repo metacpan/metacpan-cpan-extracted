@@ -1,0 +1,28 @@
+[% 
+    title = 'Recent Failure Percentage' ;
+    box_sites = 1
+
+    crumb1_name = 'Recent Failure Percentage' ;
+%]
+
+<h2>HIGHEST RECENT FAILURE COUNTS (as of <span class="timestamp1">[% RUNDATE2 %]</span>)</h2>
+<p>Order by Failure Count or Failure Percentage by clicking the appropriate column headings.</p>
+
+<table summary="HIGHEST RECENT FAILURE PERCENTAGES">
+<tr><th class="top">#</th><th class="top">DISTRIBUTION</th><th class="top">UPLOAD</th><th class="top"><a href="wdists-recent.html" title="HIGHEST RECENT FAILURE COUNTS">FAILS</a></th><th class="top">PASSES</th><th class="top">TOTAL</th><th class="top">PERCENTAGE</th></tr>
+[% FOREACH row = WORST %]
+<tr><td align="right">[% row.0 %]</td>
+    <td><a href="http://www.cpantesters.org/distro/[% row.7.substr(0,1) %]/[% row.7 %].html" title="reports for [% row.7 %]">[% row.2 %]</a></td>
+    <td>[% row.3 %]</td>
+    <td align="right">[% row.1 %]</td>
+    <td align="right">[% row.4 %]</td>
+    <td align="right">[% row.5 %]</td>
+    <td align="right">[% row.6 %]</td></tr>
+[% END %]
+</table>
+
+<p>Failure rates are based on the last submitted version of a distribution only.
+Failures are counted as reports posted as FAIL or UNKNOWN. Currently all reports are counted
+individually, so any duplicate reports that are for the same version of Perl on the same platform
+for the same distribution are NOT ignored. This may change in the future.</p>
+<p>All counts are recorded up until <span class="timestamp1">[% RUNDATE3 %]</span>.</p>

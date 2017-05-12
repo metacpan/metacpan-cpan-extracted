@@ -1,0 +1,14 @@
+<form title="Hello" header="head.tmpl" footer="foot.tmpl" post-event="say_hello">
+    <page name="Name">
+        <field id="wibble" type="text" validation="wibble">
+            <label>Type "wibble":</label>
+        </field>
+    </page>
+
+    <lexicon lang="en">
+        <entry>
+            <base>NOT_WIBBLE</base>
+            <trans>You didn't type wibble</trans>
+        </entry>
+    </lexicon>
+</form>

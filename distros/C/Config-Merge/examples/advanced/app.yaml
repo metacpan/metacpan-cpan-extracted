@@ -1,0 +1,14 @@
+# Global config file
+
+---
+root:          /srv/www/sites/example
+db:
+    host:       db.domain.com
+    username:   prod
+    password:   secret
+    
+cron: 
+    - job1
+    - job2
+    - job3
+    - job4

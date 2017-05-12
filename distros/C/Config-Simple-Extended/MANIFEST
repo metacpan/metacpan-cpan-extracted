@@ -1,0 +1,19 @@
+cpanfile
+cpanfile.snapshot
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Config/Simple/Extended.pm
+t/00-load.t
+t/10_inherit.t
+t/11_parse_url_for_cfg_path.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/simplified_inherit_again.ini
+t/simplified_inherit.ini
+t/simplified.ini
+
+META.json                                Module JSON meta-data (added by MakeMaker)

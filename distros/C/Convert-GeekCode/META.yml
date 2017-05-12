@@ -1,0 +1,29 @@
+---
+abstract: 'Convert and generate geek code sequences'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Convert::GeekCode
+name: Convert-GeekCode
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Text::Wrap: 0
+  YAML: 0
+  perl: 5.005
+resources:
+  homepage: https://github.com/audreyt/convert-geekcode/tree
+  repository: git://github.com/audreyt/convert-geekcode.git
+version: 0.63

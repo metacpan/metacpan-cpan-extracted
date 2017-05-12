@@ -1,0 +1,22 @@
+body
+{
+margin: 0;
+padding: 0;
+}
+
+.blue_center
+{
+	background-color: #60c0ff;
+	font-weight: bold;
+	text-align: center;
+}
+
+.green
+{
+color: green;
+}
+
+.red
+{
+color: red;
+}

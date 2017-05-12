@@ -1,0 +1,13 @@
+Revision history for Perl module Ceph::RadosGW::RadosGW
+
+0.4 Mon Dec 15 2014
+	- Pass arguments along to the gateway when $user->delete is called.
+
+0.3 Wed Dec 10 2014
+	- Added some Moose best practice details that had been overlooked.
+
+0.2 Tue Dec 02 2014
+	- Fix homepage in the metadata.
+	
+0.1 Tue Dec 02 2014
+	- Initial release.

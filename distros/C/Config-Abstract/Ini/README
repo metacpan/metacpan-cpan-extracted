@@ -1,0 +1,26 @@
+Config/Abstract/Ini version 0.14
+================================
+
+Config::Abstract::Ini is the implementation of Config::Abstract for
+.ini-style files. To make it compatible with other file formats, we
+support a few extensions to the  .ini format, most notably  nesting
+if sections by using double colons as delimiters in  section names.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Config::Abstract
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Eddie Olsson <ewt@avajadi.org>

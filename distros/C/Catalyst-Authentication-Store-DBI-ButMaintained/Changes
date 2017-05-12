@@ -1,0 +1,29 @@
+0.03 2014-11-17
+	- Fixed a minor bug. Think Moose Handles forces the Type to be isa Object
+
+0.02_03
+	- Added support for user schema
+	- Added convience 'get_config' method for accessing app config in Store
+
+0.02_02
+	- CPAN updated because of a fudge the MANIFEST on 02_01, removed from repo now
+
+0.02_01
+	- Moved into ::ButMaintained for control
+	- Full Moosification
+	- Added missing quote_identifiers
+	- Removed the redundant retreive code for user retrieval in from_session, now we call find_user here
+	- Made the user class subclassable á la DBIC
+	- Made the store work with composite keys by serializing the initial auth_info clause
+	- Added tests for roles t/20_session.t
+	- find_user will now fall back to auth_info, but maintains user_key if it is set in conf
+	- Added a ton of docs
+
+0.01 Sun Nov 23 04:18:03 CET 2008
+	- apply knf
+
+0.00_02 Tue Nov 18 22:47:24 CET 2008
+	- sync readme
+
+0.00_01 Tue Nov 18 22:15:54 CET 2008
+	- initial development release

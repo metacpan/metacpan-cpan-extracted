@@ -1,0 +1,69 @@
+Cog version 0.061
+=================
+
+Changes to packaging so that installation works correctly 
+under Linux. No functional changes here. 
+
+cog version 0.06
+================
+
+cog.pm, a module for cutting cogwheels from sheet metal. 
+
+At the moment we do horological cogs only using equations
+tightly based on British Standard for this type of wheel. 
+
+There are also some functions for cutting a Graham type 
+escapement (wheel and yoke). 
+
+This software is in a very early stage of development. 
+
+See the file cogtest.pl for example usage.
+
+This code has been developed under Windows 98SE. I have 
+not tested it under any other operating system, but 
+do not expect operating system dependencies. 
+
+
+EXAMPLES
+
+Some extended examples along with photographs of the 
+artifacts produced and the output from the cog.pm module
+can be viewed here: 
+
+http://www.jetmark.co.uk/cog/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  GD - If and only if you intend to view graphical output. 
+
+OPERATING SYSTEM
+
+This module has been developed under Windows 98 and  Perl 5.8
+I thought it would work under Linux, but when I tried it under Suse 10
+I found it doesnt. Its all to do with the packaging: line feed format, 
+lack of execute permissions on directories, and even wrong capitalisation
+on file names. I've sadly given up on this for the moment. I'll
+restate my original point: if you are able to get it installed under Linux, 
+you probably find it works. 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004,2005 Mark Winder
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

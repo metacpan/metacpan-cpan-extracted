@@ -1,0 +1,14 @@
+
+control:
+
+	actionsequence = ( editfiles.zshenv )
+
+editfiles:
+	zshenv::
+
+	{ /usr/local/src/cfengine/zshenv
+		LocateLineMatching "^##BEGIN OS"
+		IncrementPointer "1"
+		DeleteToLineMatching "^##END OS"
+		InsertLine "export ARCH=linux"
+	}

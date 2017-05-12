@@ -1,0 +1,397 @@
+NAME
+    Crypt::GPG - An Object Oriented Interface to GnuPG.
+
+VERSION
+     $Revision: 1.64 $
+     $Date: 2007/04/02 13:34:25 $
+
+SYNOPSIS
+      use Crypt::GPG;
+      my $gpg = new Crypt::GPG;
+
+      $gpg->gpgbin('/usr/bin/gpg');      # The GnuPG executable.
+      $gpg->secretkey('0x2B59D29E');     # Set ID of default secret key.
+      $gpg->passphrase('just testing');  # Set passphrase.
+
+      # Sign a message:
+
+      my $sign = $gpg->sign('testing again');
+
+      # Encrypt a message:
+
+      my @encrypted = $gpg->encrypt ('top secret', 'test@bar.com');
+
+      # Get message info:
+
+      my @recipients = $gpg->msginfo($encrypted);
+
+      # Decrypt a message.
+
+      my ($plaintext, $signature) = $gpg->verify($encrypted);
+
+      # Key generation:
+
+      $status = $gpg->keygen 
+        ('Test', 'test@foo.com', 'ELG-E', 2048, 0, 'test passphrase');
+      print while (<$status>); close $status;
+
+      # Key database manipulation:
+
+      $gpg->addkey($key, @ids);
+      @keys = $gpg->keydb(@ids);
+
+      # Key manipulation:
+
+      $key = $keys[0];
+ 
+      $gpg->delkey($key);
+      $gpg->disablekey($key);
+      $gpg->enablekey($key);
+      $gpg->keypass($key, $oldpassphrase, $newpassphrase);
+      $keystring = $gpg->export($key);
+
+DESCRIPTION
+    The Crypt::GPG module provides access to the functionality of the GnuPG
+    (www.gnupg.org) encryption tool through an object oriented interface.
+
+    It provides methods for encryption, decryption, signing, signature
+    verification, key generation, key certification, export and import.
+    Key-server access is on the todo list.
+
+    This release of the module may create compatibility issues with previous
+    versions. If you find any such problems, or any bugs or documentation
+    errors, please do report them to crypt-gpg at neomailbox.com.
+
+CONSTRUCTOR
+    new()
+      Creates and returns a new Crypt::GPG object.
+
+DATA METHODS
+    gpgbin($path)
+      Sets the GPGBIN instance variable which gives the path to the GnuPG
+      binary.
+
+    gpgopts($opts)
+      Sets the GPGOPTS instance variable which may be used to pass
+      additional options to the GnuPG binary. For proper functioning of this
+      module, it is advisable to always include '--lock-multiple' in the
+      GPGOPTS string.
+
+    delay($seconds)
+      Sets the DELAY instance variable. This is no longer necessary (nor
+      used) in the current version of the module, but remains so existing
+      scripts don't break.
+
+    secretkey($keyid)
+      Sets the SECRETKEY instance variable which may be a KeyID or a
+      username. This is the ID of the default key to use for signing.
+
+    passphrase($passphrase)
+      Sets the PASSPHRASE instance variable, required for signing and
+      decryption.
+
+    text($boolean)
+      Sets the TEXT instance variable. If set true, GnuPG will use
+      network-compatible line endings for proper cross-platform
+      compatibility and the plaintext will gain a newline at the end, if it
+      does not already have one.
+
+    armor($boolean)
+      Sets the ARMOR instance variable, controlling the ASCII armoring of
+      output. The default is to use ascii-armoring. The module has not been
+      tested with this option turned off, and most likely will not work if
+      you switch this off.
+
+    detach($boolean)
+      Sets the DETACH instance variable. If set true, the sign method will
+      produce detached signature certificates, else it won't. The default is
+      to produce detached signatures.
+
+    encryptsafe($boolean)
+      Sets the ENCRYPTSAFE instance variable. If set true, encryption will
+      fail if trying to encrypt to a key which is not trusted. This is the
+      default. Turn this off if you want to encrypt to untrusted keys.
+
+    version($versionstring)
+      Sets the VERSION instance variable which can be used to change the
+      Version: string on the GnuPG output to whatever you like.
+
+    comment($commentstring)
+      Sets the COMMENT instance variable which can be used to change the
+      Comment: string on the GnuPG output to whatever you like.
+
+    nofork($flag)
+      Sets the NOFORK instance variable which if set to a true value will
+      cause keygen() not to fork a separate process for key generation.
+
+    debug($boolean)
+      Sets the DEBUG instance variable which causes the raw output of
+      Crypt::GPG's interaction with the GnuPG binary to be dumped to STDOUT.
+      By default, debugging is off.
+
+OBJECT METHODS
+    sign(@message)
+      Signs @message with the secret key specified with secretkey() and
+      returns the result as a string.
+
+    decrypt(\@message, [\@signature])
+      This is just an alias for verify()
+
+    verify(\@message, [\@signature])
+      Decrypts and/or verifies the message in @message, optionally using the
+      detached signature in @signature, and returns a list whose first
+      element is plaintext message as a string. If the message was signed, a
+      Crypt::GPG::Signature object is returned as the second element of the
+      list.
+
+      The Crypt::GPG::Signature object can be queried with the following
+      methods:
+
+         $sig->validity();    # 'GOOD', 'BAD', or 'UNKNOWN'
+         $sig->keyid();       # ID of signing key
+         $sig->time();        # Time the signature was made
+         $sig->trusted();     # Signature trust level
+
+    msginfo(@ciphertext)
+      Returns a list of the recipient key IDs that @ciphertext is encrypted
+      to.
+
+    encrypt($plaintext, $keylist, [-sign] )
+      Encrypts $plaintext with the public keys of the recipients listed in
+      $keylist and returns the result in a string, or undef if there was an
+      error while processing. Returns undef if any of the keys are not
+      found.
+
+      Either $plaintext or $keylist may be specified as either an arrayref
+      or a simple scalar.
+
+      If $plaintext is a an arrayref, it will be join()ed without newlines.
+
+      If you want to encrypt to multiple recipients, you must use the
+      arrayref version of $keylist. A scalar $keylist works for only a
+      single key ID.
+
+      If the -sign option is provided, the message will be signed before
+      encryption. The secret key and passphrase must be set for signing to
+      work. They can be set with the secretkey() and passphrase() methods.
+
+    addkey($key, $pretend, @keyids)
+      Adds the keys given in $key to the user's key ring and returns a list
+      of Crypt::GPG::Key objects corresponding to the keys that were added.
+      $key may be a string or an array reference.
+
+      If $pretend is true, it pretends to add the key and creates the key
+      object, but doesn't actually perform the key addition.
+
+      Optionally, a list of key IDs may be specified. If a list of key IDs
+      is specified, only keys that match those IDs will be imported. The
+      rest will be ignored.
+
+    export($key)
+      Exports the key specified by the Crypt::GPG::Key object $key and
+      returns the result as a string.
+
+    keygen($name, $email, $keytype, $keysize, $expire, $passphrase)
+      Creates a new keypair with the parameters specified. The only
+      supported $keytype currently is 'ELG-E'. $keysize can be any of 1024,
+      2048, 3072 or 4096. Returns undef if there was an error, otherwise
+      returns a filehandle that reports the progress of the key generation
+      process similar to the way GnuPG does. The key generation is not
+      complete till you read an EOF from the returned filehandle.
+
+    certify($keyid, $local, @uids)
+      Certifies to the authenticity of UIDs of the key with ID $keyid. If
+      $local is true, the certification will be non-exportable. The @uids
+      parameter should contain the list of UIDs to certify (the first UID of
+      a key is 0).
+
+    keydb(@keyids)
+      Returns an array of Crypt::GPG::Key objects corresponding to the Key
+      IDs listed in @keyids. This method used to be called keyinfo and that
+      is still an alias to this method.
+
+    parsekeys(@keylist)
+      Parses a raw GnuPG formatted key listing in @keylist and returns an
+      array of Crypt::GPG::Key objects.
+
+    keypass($key, $oldpass, $newpass)
+      Change the passphrase for a key. Returns true if the passphrase change
+      succeeded, false if not, or undef if there was an error.
+
+    delkey($keyid)
+      Deletes the key specified by the Crypt::GPG::Key object $key from the
+      user's key ring. Returns undef if there was an error, or 1 if the key
+      was successfully deleted.
+
+    disablekey($keyid)
+      Disables the key specified by the Crypt::GPG::Key object $key.
+
+    enablekey($keyid)
+      Enables the key specified by the Crypt::GPG::Key object $key.
+
+Crypt::GPG::Signature
+        Documentation coming soon.
+
+Crypt::GPG::Key
+        Documentation coming soon.
+
+TODO
+    * Key server access.
+
+    * More complete key manipulation interface.
+
+    * Filehandle interface to handle large messages.
+
+BUGS
+    * Error checking needs work.
+
+    * Some key manipulation functions are missing.
+
+    * The method call interface is subject to change in future versions.
+
+    * The current implementation will probably eat up all your RAM if you
+      try to operate on huge messages. In future versions, this will be
+      addressed by reading from and returning filehandles, rather than using
+      in-core data.
+
+    * Methods may break if you don't use ASCII armoring.
+
+CHANGELOG
+      $Log: GPG.pm,v $
+
+      Revision 1.64 2014/09/18 12:21:25 ashish
+
+        - Applied Fix for RT 68339 (thanks to Todd Rinaldo)
+
+      Revision 1.63 2007/04/02 13:34:25 ashish
+
+        - Fixed a bug introduced by the changes in 1.62 wrt default signing key
+
+      Revision 1.62 2007/03/31 11:28:12 ashish
+
+        - Fixed debug()
+
+        - Fixed regex for signature line
+
+        - Non-forking version of keygen() (thanks to Greg Hill)
+
+        - Enabled use of default Key ID for signing
+
+        - Allow for GPG returning 8 or 16 bit KeyIDs (thanks to Roberto Jimenoca)
+
+        - Fixed tempfiles being left around after decrypt()
+
+        - Changed exit() to CORE::exit() (suggested by Jonathan R. Baker)
+
+      Revision 1.61 2006/12/21 12:36:28 ashish
+
+        - Skip tests if gpg not found.
+
+        - Use File::Spec to determine tmpdir. Suggested by Craig Manley.
+
+      Revision 1.59 2006/12/19 12:51:54 ashish
+
+        - Documentation fixes.
+
+        - Removed tests for obsolete 768 bit keys.
+
+        - Bugfixes.
+
+        - Tested with gpg 1.4.6.
+
+      Revision 1.57 2005/12/15 17:09:17 ashish
+
+        - Fixed bug in decrypt
+
+        - Fixed small key certification bugs.
+
+      Revision 1.50 2005/02/10 12:32:51 cvs
+
+       - Overhauled to use IPC::Run instead of Expect.
+
+       - Test suite split up into multiple scripts.
+
+      Revision 1.42 2002/12/11 03:33:19 cvs
+
+       - Fixed bug in certify() when trying to certify revoked a key.
+
+       - Applied dharris\x40drh.net's patch to allow for varying date formats
+         between gpg versions, and fix time parsing and the
+         Crypt::GPG::Signature autoloaded accessor functions.
+
+      Revision 1.40 2002/09/23 23:01:53 cvs
+
+       - Fixed a bug in keypass()
+
+       - Documentation fixes.
+
+      Revision 1.37 2002/09/21 02:37:49 cvs
+
+       - Fixed signing option in encrypt.
+
+      Revision 1.36 2002/09/21 00:03:29 cvs
+
+       - Added many tests and fixed a bunch of bugs.
+
+      Revision 1.34 2002/09/20 19:07:11 cvs
+
+       - Extensively modified formatting to make the code easier to
+         read. All lines are now < 80 chars.
+
+       - Removed all instances of invoking a shell.
+
+       - Misc. other stuff.
+
+      Revision 1.31 2002/09/20 16:38:45 cvs
+
+       - Cleaned up export and addkey. Fixed(?) addkey clobbering trustdb
+         problem (thanks to jrray\x40spacemeat.com for the patch). Added
+         support for signature verification on addkey pretend.
+
+       - No calls to POSIX::tmpnam remain (thanks to radek\x40karnet.pl and
+         jrray\x40spacemeat.com for suggesting File::Temp).
+
+      Revision 1.30 2002/09/20 15:25:47 cvs
+
+       - Fixed up tempfile handling and eliminated calls to the shell in
+         encrypt(), sign() and msginfo(). Passing all currently defined
+         tests. 
+
+       - Hopefully also fixed signing during encryption and verification of
+         detached signatures. Not tested this yet.
+
+      Revision 1.29 2002/09/20 11:19:02 cvs
+
+       - Removed hack to Version: string. Only the Comment: string in GPG
+         output is now modified by Crypt::GPG. (Thanks to
+         eisen\x40schlund.de for pointing out the bug here)
+
+       - Removed code that incorrectly replaced 'PGP MESSAGE' with 'PGP
+         SIGNATURE' on detached signatures. (Thanks to ddcc\x40mit.edu for
+         pointing this out).
+
+       - Fixed up addkey() to properly handle pretend mode and to
+         selectively import only requested key IDs from a key block.
+
+       - parsekeys() now also figures out which keyring a key belongs to.
+
+       - Added certify() method, to enable certifying keys.
+
+       - Added Crypt::GPG::Signature methods - validity(), keyid(), time()
+         and trusted().
+
+AUTHOR
+    Crypt::GPG is Copyright (c) 2000-2007 Ashish Gulhati <crypt-gpg at
+    neomailbox.com>. All Rights Reserved.
+
+ACKNOWLEDGEMENTS
+    Thanks to Barkha, for inspiration; to the GnuPG team; and to everyone
+    who writes free software.
+
+LICENSE
+    This code is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS REPORTS, PATCHES, FEATURE REQUESTS
+    Are very welcome. Email crypt-gpg at neomailbox.com.
+

@@ -1,0 +1,45 @@
+Revision history for Catmandu-BagIt
+
+0.12  2016-04-08 16:05:37 CEST
+        - Fixed bug in checking file names
+
+0.11  2016-01-20 15:44:40 CET
+        - Extra autocleaning
+        
+0.10  2016-01-14 16:05:00 CET
+        - Fixing auto cleanup of temporary files
+        
+0.09  2015-12-15 11:07:25 CET
+        - Adding locking support
+        
+0.08  2015-12-14 16:09:13 CET
+        - Create bags on a deep nested path
+        - Fixed file update bug
+
+0.07  2015-12-14 11:27:30 CET
+        - Adding fetch mirror support
+        - Fixing network related tests
+        
+0.06  2015-12-11 12:30:02 CET
+        - Adding travis
+	- Fixing File::Slurp bug
+
+0.05  2015-12-09 14:50:19 CET
+        - Creating a Catmandu::BagIt implementation of the BagIt spec
+        - Adding support for bag updates
+        - Adding correct handling of fetch files
+        
+0.04  2014-12-05 14:10:47 CET
+	- Adding required dependencies
+		
+0.03  2014-12-03 11:13:03 CET
+        - Removing Perl code from the example bags which confuses CPAN
+
+0.02  2014-12-03 10:58:47 CET
+	- Adding an example how to download data from OAI repos into BagIt
+		
+0.01  2014-12-03 10:02:20 CET
+        - Initial release
+        - Adding Catmandu::Importer skeleton
+        - Adding Catmandu::Exporter skeleton
+        - Adding support for reading and writing bagits

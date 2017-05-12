@@ -1,0 +1,15 @@
+abstract: A CogBase Implementation in Perl
+author: "Ingy d\xC3\xB6t Net, C<< <ingy at cpan.org> >>"
+build_requires: 
+  Test::Base: 0.50
+distribution_type: module
+generated_by: Module::Install version 0.61
+license: perl
+name: CogBase
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.6.1
+version: 0.10

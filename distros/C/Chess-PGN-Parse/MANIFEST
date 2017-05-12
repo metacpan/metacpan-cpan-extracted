@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+Parse.pm
+test.pl
+examples/kk_2001.pgn
+examples/kk_game4_test.pgn
+examples/test_1_PGN.pl
+examples/test_2_PGN.pl
+examples/test_3_PGN.pl
+examples/test_4_PGN.pl
+examples/test_5_PGN.pl
+examples/test_6_PGN.pl
+examples/test_non_standard.pl
+examples/test_recursion.pl
+examples/test_001.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

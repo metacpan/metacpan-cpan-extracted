@@ -1,0 +1,46 @@
+{
+   "abstract" : "Draw a variety of characters using the Pango",
+   "author" : [
+      "MASUDA Yuta <yuta.cpan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cv-Pango",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0,
+            "ExtUtils::ParseXS" : "2.22",
+            "ExtUtils::PkgConfig" : "1.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cv" : "0.26",
+            "ExtUtils::ParseXS" : "2.22",
+            "ExtUtils::PkgConfig" : "1.12",
+            "Pango" : "1.223"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.28"
+}

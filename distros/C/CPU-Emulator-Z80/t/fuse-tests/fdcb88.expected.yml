@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  50657:
+    - 212
+name: fdcb88
+registers:
+  AF: 32020
+  AF_: 0
+  BC: 54508
+  BC_: 0
+  DE: 7751
+  DE_: 0
+  HL: 30433
+  HL_: 0
+  I: 0
+  IX: 14449
+  IY: 50701
+  PC: 4
+  R: 2
+  SP: 0

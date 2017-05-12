@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Convert-BaseN
+version:             0.01
+abstract:            encoding and decoding of base{2,4,8,16,32,64} strings
+license:             ~
+author:              
+    - Dan Kogai <dankogai@dan.co.jp>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    MIME::Base64:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

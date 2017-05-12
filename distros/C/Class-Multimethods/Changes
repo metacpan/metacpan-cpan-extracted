@@ -1,0 +1,74 @@
+Revision history for Perl extension Class::Multimethods.
+
+0.01  Tue Oct 27 13:33:29 1998
+    - original version; created by h2xs 1.18
+
+1.00    Wed Feb 17 09:28:29 1999
+
+    - Now supports '#', '$', and '*' pseudo-types in parameter lists
+
+
+1.10    Fri Feb 19 11:55:37 1999
+
+    - Fixed a nasty bug in the import method (thanks Larry)
+
+    - Added constraints to indicate that the module
+      doesn't run on Perls earlier than 5.005
+
+    - Added &resolve_ambiguous to allow handlers to be
+      registered for multimethod calls which could be
+      equally well be disptched to two or more variants
+
+    - Added &resolve_no_match to allow handlers to be
+      registered for multimethod calls which cannot be
+      dispatched to any variant.
+
+    - Documented the syntactic vinegar needed to run under
+      'use strict'
+
+
+1.12    Tue Jul  6 17:09:04 1999
+
+    - Removed subroutine call in generated multimethod dispatcher,
+      made dispatch table a package var, and optimized most common cases.
+      Produced a 38% improvement in raw dispatch speed (around 22% 
+      faster dispatch in real applications).
+    
+    - Added &analyse subroutine to assist debugging
+
+    - Moved test.pl to t/multimethods.t
+      (thanks Lupe)
+
+    - Added superclass method (thanks Gareth)
+
+1.69    Sun Sep 12 07:29:06 1999
+
+    - Fixed absolute path snafu in MANIFEST (thanks Gareth and Michael)
+
+    - moved demos to demo subdirectory
+
+
+1.70    Sun Apr  9 12:43:55 2000
+
+    - moved .pod file to installable directory (/lib)
+
+    - Added TPC3 paper as tutorial.html (thanks Tom)
+
+
+
+1.071  Fri Nov 25 10:54:12 2016
+
+    - Added handler registration code to clean up installation
+      (thanks Robert)
+
+    - Changed demo shebang lines for Debian compatibility
+      (thanks Florian and Jay)
+
+
+
+1.701  Fri Nov 25 11:03:33 2016
+
+    - Fixed release number
+
+
+

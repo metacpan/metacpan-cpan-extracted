@@ -1,0 +1,9 @@
+$Id: Changes 25 2005-09-11 09:48:14Z kentaro $
+
+Revision history for Perl extension Class::AutoAccess::Deep.
+
+0.02  Sun Sep 11 2005
+    - fixed some errors on the documentation. I'm so clunky...(>_<)
+
+0.01  Sat Sep 10 2005
+    - original version

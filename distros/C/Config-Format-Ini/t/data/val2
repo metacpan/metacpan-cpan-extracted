@@ -1,0 +1,13 @@
+[chars]
+simple    =   an , apple
+quote1    =  "can't wouln't", more
+quote2    =  "can''t'"
+comma1    =  "Imperials, The", more
+space1    =  "Innocents, The "
+space2    =  " Duke ,  The  "
+comment1  =  "Caddilacs; The"
+comment2  =   Caddilacs; The 
+comment3  =  "Five Satins # The"
+
+# "', ; # \
+#comment3  =  Five Satins

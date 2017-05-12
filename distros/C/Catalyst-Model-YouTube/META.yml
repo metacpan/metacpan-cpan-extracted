@@ -1,0 +1,24 @@
+---
+name: Catalyst-Model-YouTube
+version: 0.12
+author:
+  - 'J. Shirley <jshirley@gmail.org>'
+abstract: Catalyst Model for the YouTube Web Services
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.00
+  Class::C3: 0.14
+  WebService::YouTube: 0
+provides:
+  Catalyst::Helper::Model::YouTube:
+    file: lib/Catalyst/Helper/Model/YouTube.pm
+    version: 0.01
+  Catalyst::Model::YouTube:
+    file: lib/Catalyst/Model/YouTube.pm
+    version: 0.12
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

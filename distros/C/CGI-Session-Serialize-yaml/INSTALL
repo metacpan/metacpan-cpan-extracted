@@ -1,0 +1,32 @@
+INSTALLATION
+============
+
+Using CPAN Interactive shell
+----------------------------
+
+    % perl -MCPAN -e shell
+    cpan> install CGI::Session::Serialize::yaml
+
+Using Makefile.PL
+--------------------
+
+    % perl Makefile.PL
+    % make
+    % make test
+    % make install
+
+If you don't have proper permissions to perform system-wide 
+installations you can install CGI::Session::Serialize::yaml to your private 
+PERL5LIB folder:
+
+    % perl Makefile.PL LIB=~/perllib
+    % make
+    % make test
+    % make install
+
+These commands install CGI::Session::Serialize::yaml to your ~/perllib folder.
+
+TESTING
+=======
+
+See the INSTALL document in the CGI::Session distro.

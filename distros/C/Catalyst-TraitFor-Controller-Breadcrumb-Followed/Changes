@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::TraitFor::Controller::Breadcrumb::Followed.
+
+0.01  Wed Jan  6 19:30:30 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Catalyst::TraitFor::Controller::Breadcrumb::Followed
+

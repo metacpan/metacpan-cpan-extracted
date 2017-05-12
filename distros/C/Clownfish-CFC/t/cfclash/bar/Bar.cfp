@@ -1,0 +1,7 @@
+{
+    "name": "Bar",
+    "version": "v1.0.0",
+    "prerequisites": {
+        "Foo": "v1.0.0"
+    }
+}

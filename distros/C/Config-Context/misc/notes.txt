@@ -1,0 +1,53 @@
+
+Developer's notes on the various Config modules that work (or might be
+made to work) with Conig::Context
+
+  - file inclusion
+    - Config::General: supported
+    - Config::Scoped:  supported
+    - Config::Natural: supported
+
+    - Config::YAML
+      - no inclusion mechanism
+
+    - XML::SAX
+      - use XInclude to include files and record their urls
+
+  - caching
+    - Config::General
+      - no built-in caching
+      - files() provided in 1.2.8
+
+    - Config::Scoped
+      - built-in caching
+      - can get at files via map { Cwd::abs_path($_) } $config_scoped->{'local'}{'includes'}
+      - write author about adding interface to $config_scoped->{'local'}{'includes'}
+
+    - XML::Simple
+      - built-in caching
+
+    - Config::Natural
+      - no built-in caching
+      - can't get list of files that have been read
+
+    - Config::YAML
+      - no built-in caching
+
+  - lower case names (not supported)
+    - Config::General - supported
+    - Config::Scoped  - supported
+    - XML::Simple     - not supported - driver would use _hash_with_lc_keys
+    - Config::Natural - not supported - driver would use _hash_with_lc_keys
+    - Config::YAML    - not supported - driver would use _hash_with_lc_keys
+
+  - Generated Hash Compatibility
+    - Config::Natural doesn't work (creates lists)
+
+ - Config::Natural - needed features
+   - lowercase names
+   - files and no recursion
+
+ - future:
+    -CacheRequestConfig => [qw/secure address port path path_info module/],
+
+

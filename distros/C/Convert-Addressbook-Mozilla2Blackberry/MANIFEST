@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Convert-Addressbook-Mozilla2Blackberry.t
+lib/Convert/Addressbook/Mozilla2Blackberry.pm
+META.yml                                 Module meta-data (added by MakeMaker)

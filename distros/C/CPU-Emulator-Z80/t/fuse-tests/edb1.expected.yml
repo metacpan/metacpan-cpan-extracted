@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: edb1
+registers:
+  AF: 62535
+  AF_: 0
+  BC: 4
+  BC_: 0
+  DE: 58592
+  DE_: 0
+  HL: 38953
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 8
+  SP: 0

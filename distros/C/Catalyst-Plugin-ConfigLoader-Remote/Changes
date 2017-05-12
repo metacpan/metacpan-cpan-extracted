@@ -1,0 +1,5 @@
+Revision history for Catalyst-Plugin-ConfigLoader-Remote
+
+0.01    2007-09-17
+        First version, very basic remote loading via File::Fetch
+

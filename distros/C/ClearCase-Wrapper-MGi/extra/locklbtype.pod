@@ -1,0 +1,81 @@
+=head1 NAME
+
+locklbtype -- lock (and unlock) label types
+
+Perl script intended to be used under suid to a account, itself
+authorized to connect to the local host via C<ssh>, as vob owner.
+
+=head1 SYNOPSYS
+
+locklbtype [--unlock | --nusers accounts] --vob <vob> --lbtype <lbtypes>
+ | --help
+
+The default function is to I<lock> the label types passed as argument.
+To unlock them instead, use C<--unlock>.
+Only one vob parameter is accepted, and it is mandatory.
+Multiple label types are possible, either with separate options or as one
+comma separated list.
+All the types must exist in the vob.
+For the I<locking> function, a C<--nusers> exception list is supported.
+
+=head1 SSH CONFIGURATION
+
+The account for which this script should be suid -enabled, should have a
+valid ssh configuration: a pair of private/public keys generated, for
+passwordless (challenge -based) authentication.
+
+Its public keys should be added into each of the intended vob owner accounts'
+C<~/.ssh/authorized_keys> files.
+
+The script connects to a host, where ssh is configured. If all hosts
+are so configured, one may obtain the local host name by invoking
+I<hostname>, instead of hardcoding one dedicated host.
+
+The host configuration may include adding the chosen account to the
+users.allow file.
+
+=head1 SUDO CONFIGURATION
+
+The I<user> account owning the script, installed suid-enabled, should
+be allowed in I</etc/sudoers> to run (cleartool) commands
+passwordlessly on behalf of all vob owner accounts. The following
+setting can serve as template:
+
+Runas_Alias VOBOWN = vobown1,vobown2
+%user ALL=(VOBOWN) NOPASSWD: ALL
+
+=head1 DETAILS
+
+The script sets its real uid to the value of its effective uid (owning the
+running process, and set via the suid bit).
+
+It then invokes, either (1) C<ssh> on I<myhost.mydomain> (but using
+its host name instead of C<0> or C<localhost>, in order to avoid
+recording different host keys under the same name), or (20 sudo, with
+the account of the vob owner, obtained from ClearCase.
+
+Unlock events are logged, with the id and name of the real user, to a
+dedicated log file under the crontab account home.
+Lock events contain a comment with the same identity information.
+
+This script itself is to be used from a copy in a unix directory, unless the
+vobs are mounted on all hosts with suid enabled.
+It is acknowledgedly a workaround for the lack of C<sudo>, which would
+provide a simpler, better, safer and more secure solution.
+
+Perl requires that any data obtained from the user or from a system call be
+thoroughly checked, and in fact re-created by any script run under an other
+id than the effective one (i.e. in practice, via suid).
+The script performs this by C<untainting> the data, via one of several
+functions specialized for certain kinds of data.
+
+Among other things, it unsets its C<PATH> environment variable. This it must
+however do before requiring C<ClearCase::Argv>, thus in a C<BEGIN> block.
+The reason is that C<ClearCase::Argv> sets the path to the C<cleartool>
+binary in different way for priviledged and for normal invocations: for the
+latter, it uses the environment; for the former, the standard installation
+path. It also uses the standard path when the environment is unset. Invocation
+under suid is detected by comparing the real and the effective uid, which
+misses the case when the real uid happens to be the same as the suid account.
+In this case, it is important that the C<PATH> is not wiped out between the
+initialization and the actual invocation.

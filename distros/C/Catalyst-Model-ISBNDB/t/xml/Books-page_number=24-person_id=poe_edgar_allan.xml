@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:54Z">
+<BookList total_results="252" page_size="10" page_number="24" shown_results="10">
+<BookData book_id="the_tell_tale_heart_and_other_writings" isbn="0613366964">
+<Title>The Tell-Tale Heart and Other Writings</Title>
+<TitleLong>The Tell-Tale Heart and Other Writings (Bantam Classics)</TitleLong>
+<AuthorsText>Edgar Allen Poe, </AuthorsText>
+<PublisherText publisher_id="rebound_by_sagebrush">Rebound by Sagebrush</PublisherText>
+<Details dewey_decimal="" physical_description_text="4.0&quot;x7.2&quot;x0.9&quot;; 0.6 lb" language="" edition_info="School &amp; Library Binding; 2001-10-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-07T05:20:01Z" price_time="2006-10-08T08:03:57Z" />
+<Summary>Suspense, fear and the supernatural provide the center for this tale by the master prose writer.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-01-07T10:42:11Z" currency_rate="1" price="10.01" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-09T02:35:28Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780613366960" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-09T02:35:28Z" currency_rate="1" price="14.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-09T02:35:28Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Tell-Tale Heart and Other Writings" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0613366964&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-06T07:20:21Z" currency_rate="1" price="18.4" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:30Z" currency_rate="1" price="12.69" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:30Z" currency_rate="1" price="14.2" />
+<Price store_isbn="" store_title="Tell-Tale Heart and Other Writings" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:30Z" currency_rate="1" price="14.2" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:30Z" currency_rate="1" price="14.1" />
+<Price store_isbn="" store_title="The Tell-Tale Heart and Other Writings (Bantam Classics)" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:43Z" currency_rate="1" price="14.25" />
+<Price store_isbn="" store_title="Tell-Tale Heart and Other Writings" store_url="http://isbndb.com/x/book/the_tell_tale_heart_and_other_writings/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T08:03:57Z" currency_rate="1" price="14.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_horror_anthologies">Amazon.com -- Horror -- Anthologies</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa1">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_general_classics">Amazon.com -- Literature &amp; Fiction -- General -- Classics</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_united_states">Amazon.com -- Literature &amp; Fiction -- Short Stories -- United States</Subject>
+<Subject subject_id="amazon_com_literature_fiction_short_stories_anthologies">Amazon.com -- Literature &amp; Fiction -- Short Stories -- Anthologies</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_p_poe_edgar_allan">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- 19th Century</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense" isbn="1894003055">
+<Title>The Tell-Tale Heart, Plus 3 other Tales of Mystery, Suspense</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, Conan Doyle, Alan King, Dorothy Davis, Arthur Conan Doyle, </AuthorsText>
+<PublisherText publisher_id="warwick">Warwick</PublisherText>
+<Details dewey_decimal="" physical_description_text="4.8&quot;x7.0&quot;x0.8&quot;; 0.3 lb" language="" edition_info="Audio Cassette; 1999-12-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-14T12:07:04Z" price_time="2006-10-08T08:04:04Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-07-22T14:30:20Z" currency_rate="1" price="18.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:31Z" currency_rate="1" price="14.52" />
+<Price store_isbn="" store_title="The Tell Tale Heart/Adventures of the Noble Bachelor/The Kitchen Table/Sight Unseen" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:32Z" currency_rate="1" price="18.51" />
+<Price store_isbn="" store_title="The Tell Tale Heart/Adventures of the Noble Bachelor/The Kitchen Table/Sight Unseen" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:32Z" currency_rate="1" price="18.51" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:34Z" currency_rate="1" price="14.98" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:34Z" currency_rate="1" price="18.99" />
+<Price store_isbn="" store_title="MYST THEATRE V01 TELL T" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:44Z" currency_rate="1" price="15.09" />
+<Price store_isbn="" store_title="Mystery Theatre: The Tell Tale Heart, Kitchen Table, Sight Unseen, Adventures of the Noble Bachelor" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30543580%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:15Z" currency_rate="1" price="17.09" />
+<Price store_isbn="" store_title="The Tell Tale Heart/Adventures of the Noble Bachelor/The Kitchen Table/Sight Unseen" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=1894003055&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:49Z" currency_rate="1" price="18.99" />
+<Price store_isbn="" store_title="The Tell-Tale Heart: Adventures of the Noble Bachelor, the Kitchen Table, Sight Unseen" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:57Z" currency_rate="1" price="14.24" />
+<Price store_isbn="" store_title="The Tell Tale Heart/Adventures of the Noble Bachelor/The Kitchen Table/Sight Unseen Product 722636" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.722636&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:58:24Z" currency_rate="1" price="17.85" />
+<Price store_isbn="" store_title="The Tell Tale Heart/Adventures of the Noble Bachelor/The Kitchen Table/Sight Unseen" store_url="http://isbndb.com/x/book/the_tell_tale_heart_plus_3_other_tales_of_mystery_suspense/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T08:04:04Z" currency_rate="1" price="18.99" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_formats_audiocassettes_mystery_thrillers_mystery">Amazon.com -- Formats -- Audiocassettes -- Mystery &amp; Thrillers -- Mystery</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_radio_shows">Amazon.com -- Formats -- Audiocassettes -- Radio Shows</Subject>
+<Subject subject_id="amazon_com_entertainment_radio_general_broadcasting">Amazon.com -- Entertainment -- Radio -- General Broadcasting</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+<Subject subject_id="amazon_com_literature_fiction_genre_fiction_historical">Amazon.com -- Literature &amp; Fiction -- Genre Fiction -- Historical</Subject>
+<Subject subject_id="amazon_com_mystery_thrillers_mystery_anthologies">Amazon.com -- Mystery &amp; Thrillers -- Mystery -- Anthologies</Subject>
+<Subject subject_id="amazon_com_mystery_thrillers_authors_a_z_d_doyle_arthur_cona">Amazon.com -- Mystery &amp; Thrillers -- Authors, A-Z -- ( D ) -- Doyle, Arthur Conan -- General</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_authors_a_z_d_doyle_arthur">Amazon.com -- Formats -- Audiocassettes -- Authors, A-Z -- ( D ) -- Doyle, Arthur Conan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_mystery_thrillers_au_aaaa1">Amazon.com -- Formats -- Audiocassettes -- Mystery &amp; Thrillers -- Authors, A-Z -- ( D ) -- Doyle, Sir Arthur Conan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_authors_a_z_p_poe_edgar_al">Amazon.com -- Formats -- Audiocassettes -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_formats_audiocassettes_general">Amazon.com -- Formats -- Audiocassettes -- General</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="conan_doyle">Conan Doyle</Person>
+<Person person_id="king_alan_j_c">King, Alan J. C.</Person>
+<Person person_id="davis_dorothy_salisbury">Davis, Dorothy Salisbury</Person>
+<Person person_id="doyle_arthur_conan">Doyle, Arthur Conan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_thousand_and_second_tale_of_scheherazade" isbn="0585052344">
+<Title>The thousand-and-second tale of Scheherazade</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:53Z" price_time="2006-10-08T08:04:07Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086030 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="scheherazade_legendary_character">Scheherazade (Legendary character)</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_thousand_and_second_tale_of_scheherazade-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_unabridged_edgar_allan_poe" isbn="0585329575">
+<Title>The unabridged Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="courage_books">Philadelphia, Pa. : Courage Books, 1997.</PublisherText>
+<Details dewey_decimal="" physical_description_text="1184 p. ; 23 cm." language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2003-11-11T16:06:28Z" price_time="2006-10-08T08:04:10Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 2001. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=33025 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="collected_works">Collected works</Subject>
+<Subject subject_id="literature_history_and_criticism_theory">Literature -- History and criticism -- Theory</Subject>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="North Carolina (Coastal) Database" last_update="2003-11-11T16:06:28Z" marc_url="http://isbndb.com/x/libdata/isbndb-122-the_unabridged_edgar_allan_poe-20031111.mrc" />
+<MARC library_name="North Carolina (Western) Database" last_update="2005-01-14T04:39:11Z" marc_url="http://isbndb.com/x/libdata/isbndb-297-the_unabridged_edgar_allan_poe-20050113.mrc" />
+<MARC library_name="Morehead State University (Morehead, KY)" last_update="2005-10-14T21:06:58Z" marc_url="http://isbndb.com/x/libdata/isbndb-75-the_unabridged_edgar_allan_poe-20051014.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_unabridged_edgar_allan_poe_a01" isbn="0762401788">
+<Title>The Unabridged Edgar Allan Poe</Title>
+<TitleLong>The Unabridged Edgar Allan Poe (Courage Unabridged Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="running_press_book_publishers">Running Press Book Publishers</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.7&quot;x8.8&quot;x3.0&quot;; 1178 pages; 3.2 lb" language="" edition_info="Leather Bound; 1997-09-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-03-08T02:52:19Z" price_time="2006-10-08T08:04:14Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780762401789" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-01-11T22:11:23Z" currency_rate="1" price="71.4" />
+<Price store_isbn="" store_title="The Unabridged Edgar Allan Poe (Courage Unabridged Classics)" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:34Z" currency_rate="1" price="48" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:49Z" currency_rate="1" price="14.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:57:04Z" currency_rate="1" price="14.99" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_unabridged_edgar_allan_poe_a02" isbn="0894712330">
+<Title>The Unabridged Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="running_pr">Running Pr</PublisherText>
+<Details dewey_decimal="" physical_description_text="1178 pages" language="" edition_info="Paperback; 1983-06-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-08-08T13:22:33Z" price_time="2006-10-08T08:04:17Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-08T13:22:40Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=40409178&amp;aid=isbndb" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-08-08T13:22:58Z" currency_rate="1" price="2.54" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="0.19" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:49Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:57:06Z" currency_rate="1" price="10" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unabridged_edgar_allan_poe_a02/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:57:06Z" currency_rate="1" price="14.21" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_unknown_poe" isbn="0872861104">
+<Title>The unknown Poe</Title>
+<TitleLong>The unknown Poe: an anthology of fugitive writings by Edgar Allan Poe, with appreciations by Charles Baudelaire, Stephane Mallarmé, Paul Valéry, J. K. Huysmans &amp; André Breton</TitleLong>
+<AuthorsText>edited by Raymond Foye</AuthorsText>
+<PublisherText publisher_id="city_lights_books">San Francisco, Calif. : City Lights Books, 1980.</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="x, 117 p. : ill. ; 20 cm." language="eng" edition_info="(pbk.)" dewey_decimal_normalized="818.309" lcc_number="PS2603" change_time="2004-10-24T21:22:24Z" price_time="2006-06-02T22:38:24Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-04-13T18:30:37Z" currency_rate="1" price="6.21" />
+<Price store_isbn="" store_title="The Unknown Poe" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-02T22:30:43Z" currency_rate="1" price="7.83" />
+<Price store_isbn="" store_title="The Unknown Poe" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:30:43Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="The Unknown Poe" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-02T22:30:44Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="The Unknown Poe" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:30:44Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="The Unknown Poe Product 253730" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.253730&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-02T22:30:46Z" currency_rate="1" price="8.41" />
+<Price store_isbn="" store_title="The Unknown Poe : An Anthology of Fugitive Writings" store_url="http://www.biblio.com/details.php?dcx=2535443&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:30:53Z" currency_rate="1" price="3.48" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780872861107" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:30:56Z" currency_rate="1" price="4.95" />
+<Price store_isbn="" store_title="Unknown Poe" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:31:06Z" currency_rate="1" price="2.49" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-02T22:31:13Z" currency_rate="1" price="5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-02T22:31:13Z" currency_rate="1" price="8.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_unknown_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-02T22:38:24Z" currency_rate="1" price="8.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_criticism_and_interpretation">Poe, Edgar Allan,1809-1849 -- Criticism and interpretation</Subject>
+<Subject subject_id="criticism_france">Criticism -- France</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Colorado, Boulder" last_update="2004-10-24T21:22:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-311-the_unknown_poe-20041024.mrc" />
+<MARC library_name="Memorial University of Newfoundland Search Form" last_update="2005-01-29T06:31:23Z" marc_url="http://isbndb.com/x/libdata/isbndb-173-the_unknown_poe-20050128.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-04-13T18:30:35Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-the_unknown_poe-20060413.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="foye_raymond">Foye, Raymond</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_valley_of_unrest" isbn="0585052387">
+<Title>The valley of unrest</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:26:08Z" price_time="2006-07-28T07:52:23Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086034 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="ghosts_poetry">Ghosts -- Poetry</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:26:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-the_valley_of_unrest-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_works_of_edgar_allan_poe" isbn="1592243495">
+<Title>The Works of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, Darrell Schweitzer, </AuthorsText>
+<PublisherText publisher_id="wildside_press">Wildside Press</PublisherText>
+<Details dewey_decimal="" physical_description_text="348 pages" language="" edition_info="Paperback; 2003-09-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-05-25T19:24:11Z" price_time="2005-11-03T23:54:15Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="19.95" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe, Vol. II" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="17.22" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe: Volume 2" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="17.22" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="15.26" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="15.57" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:11Z" currency_rate="1" price="14.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:12Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe, Vol. II" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2005-11-03T23:54:12Z" currency_rate="1" price="19.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-03T23:54:12Z" currency_rate="1" price="87.5" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe: Volume 2 : Edgar Allan Poe : ISBN 1592243495" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33932224%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-11-03T23:54:13Z" currency_rate="1" price="17.95" />
+<Price store_isbn="" store_title="The Works of Edgar Allan Poe: Volume 2" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-03T23:54:15Z" currency_rate="1" price="16.04" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="schweitzer_darrell">Schweitzer, Darrell</Person>
+</Authors>
+</BookData>
+<BookData book_id="the_works_of_edgar_allan_poe_a01" isbn="0836959930">
+<Title>The works of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>[Edited by Edmund Clarence Stedman and George Edward Woodberry</AuthorsText>
+<PublisherText publisher_id="books_for_libraries_press">Freeport, N.Y. : Books for Libraries Press, 1971]</PublisherText>
+<Details dewey_decimal="" physical_description_text="10 v. illus. 23 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2006-09-23T00:52:10Z" price_time="2006-10-04T12:16:24Z" />
+<Summary></Summary>
+<Notes>Reprint of 1894-95 ed. published by Stone &amp; Kimball, Chicago.
+
+V. 1-4. Tales of the grotesque and arabesque: 1. Romances of death. Old-world romance. 2. Tales of conscience, natural beauty and pseudo-science. 3. Tales of ratiocination and illusion. 4. Extravaganza and caprice.-- v.5. Tales of adventure and exploration: Narrative of Arthur Gordon Pym. The journal of Julius Rodman.--v.6-8. Literary criticism: 1. On poetry and the poets. 2. On novels, essays, and travels--marginalia. 3. The literati--minor contemporaries, etc.--v.9. Eureka and miscellantes.--v.10. Poems. Bibliography (p.278-809)</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T10:57:17Z" currency_rate="1" price="7" />
+<Price store_isbn="" store_title="Works of Edgar Allan Poe" store_url="http://isbndb.com/x/book/the_works_of_edgar_allan_poe_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T10:57:17Z" currency_rate="1" price="14.17" />
+</Prices>
+<Subjects>
+<Subject subject_id="poetry">Poetry</Subject>
+<Subject subject_id="american_literature_history_and_criticism">American literature -- History and criticism</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of California (MELVYL)" last_update="2006-09-23T00:52:10Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-the_works_of_edgar_allan_poe_a01-20060922.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="stedman_edmund_clarence">Stedman, Edmund Clarence</Person>
+<Person person_id="woodberry_george_edward">Woodberry, George Edward</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

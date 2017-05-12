@@ -1,0 +1,376 @@
+#!/usr/bin/perl -w
+
+use Gtk;
+use CORBA::ORBit idl => [ 'Tictactoe.idl' ];
+use strict;
+use vars '$ior_file';
+
+my $orb;
+my $root_poa;
+
+END {
+    defined $ior_file and unlink $ior_file;
+}
+
+$SIG{INT} = sub { die "Killed by Ctrl-c\n"; };
+
+package MyClient;
+
+use Error qw(:try);
+
+@MyClient::ISA = qw(POA_Tictactoe::Client);
+
+sub new {
+    my $class = shift;
+    my $opponent = shift;
+    my $self = bless {
+		      tag => undef,
+		      opponent => undef,
+		      reset_wait => 0,
+		      reset_ask => 0,
+		      turn => 0,
+		      win => 0
+		     };
+
+    for my $i (0..2) {
+	for my $j (0..2) {
+	    $self->{board}->[$i][$j] = 0;
+	}
+    }
+
+    $self->make_ui;
+
+    if (defined $opponent) {
+	my $id = $root_poa->activate_object ($self);
+	my $ref = $root_poa->id_to_reference ($id);
+	try {
+	    $self->{tag} = $opponent->connect ($ref);
+	} catch Tictactoe::AlreadyConnected with {
+	    die "Game is already in progress\n";
+	};
+	$self->{opponent} = $opponent;
+	$self->set_status;
+    }
+
+    $self;
+}
+
+sub check_tag {
+    my ($self,$tag) = @_;
+
+    if ($tag != $self->{tag}) {
+	print "Got request with bad tag: '$tag', should have been '$self->{tag}'\n";
+	
+	throw Tictactoe::BadTag;
+    }
+}
+
+sub put {
+    my ($self,$tag,$row,$column) = @_;
+
+    $self->check_tag ($tag);
+
+    if ($self->{turn} || ($self->{board}->[$row][$column] != 0)) {
+	throw Tictactoe::InvalidMove;
+    }
+
+    $self->update ($row, $column, 2);
+    $self->{turn} = 1;
+    $self->set_status;
+}
+
+sub connect {
+    my ($self, $opponent) = @_;
+    
+    if ($self->{opponent}) {
+	throw Tictactoe::AlreadyConnected;
+    }
+
+    $self->{opponent} = $opponent;
+    $self->{tag} = int(rand(2**31));	# badly "insecure" before 5.004
+
+    $self->start_over;
+    $self->set_status;
+
+    return $self->{tag};
+}
+
+sub disconnect {
+    my ($self, $tag) = @_;
+
+    $self->check_tag ($tag);
+
+    $self->{opponent} = undef;
+    $self->{tag} = undef;
+    $self->set_status;
+}
+
+sub request_reset {
+    my ($self, $tag) = @_;
+
+    $self->check_tag ($tag);
+
+    if ($self->{reset_ask}) {
+	return 0;
+    } else {
+	$self->{reset_ask} = 1;
+
+	my $dialog = new Gtk::Dialog;
+	my $label = new Gtk::Label "Start Over?";
+	$label->set_padding (20, 20);
+	$dialog->vbox->add ($label);
+	$label->show;
+
+	my $button;
+
+	$button = new Gtk::Button "Yes";
+	$dialog->action_area->add ($button);
+	$button->signal_connect ("clicked", \&reset_action, $self, $dialog, 1);
+	$button->show;
+
+	$button = new Gtk::Button "No";
+	$dialog->action_area->add ($button);
+	$button->signal_connect ("clicked", \&reset_action, $self, $dialog, 0);
+	$button->show;
+
+	$dialog->signal_connect ("destroy", \&reset_action, $self, $dialog, 0);
+	
+	$dialog->show;
+
+	return 1;
+    }
+}
+
+sub reset_action
+{
+    my ($w, $self, $dialog, $ok) = @_;
+
+    $self->{opponent}->reset($self->{tag}, $ok);
+    $self->{reset_ask} = 0;
+
+    if ($ok) {
+	$self->start_over;
+	$self->{turn} = 1;
+	$self->set_status;
+    }
+
+    $dialog->destroy;
+}
+
+sub reset {
+    my ($self, $tag, $ok) = @_;
+
+    $self->check_tag ($tag);
+
+    if ($self->{reset_wait}) {
+	if ($ok) {
+	    $self->start_over;
+	    $self->{turn} = 0;
+	    $self->set_status;
+	}
+	$self->{reset_wait} = 0;
+    }
+}
+
+sub start_over {
+    my $self = shift;
+
+    $self->{turn} = 1;
+    $self->{win} = 0;
+
+    for my $i (0..2) {
+	for my $j (0..2) {
+	    $self->update ($i, $j, 0);
+	}
+    }
+}
+
+my @rwins = ( [ 0, 0, 0 ], [ 1, 1, 1 ], [ 2, 2, 2 ],
+	      [ 0, 1, 2 ], [ 0, 1, 2 ], [ 0, 1, 2 ],
+	      [ 0, 1, 2 ], [ 0, 1, 2 ] );
+my @cwins = ( [ 0, 1, 2 ], [ 0, 1, 2 ], [ 0, 1, 2 ],
+	      [ 0, 0, 0 ], [ 1, 1, 1 ], [ 2, 2, 2 ],
+	      [ 0, 1, 2 ], [ 2, 1, 0 ] );
+
+sub check_win {
+    my $self = shift;
+
+    for (my $k = 0; $k <= $#rwins ; $k++) {
+	my $success = 1;
+
+	my $player = 0;
+
+	for (my $i = 0; $i < 3 ; $i++) {
+	    my $t = $self->{board}->[$rwins[$k][$i]][$cwins[$k][$i]];
+	    if (!$player) {
+		$player = $t;
+	    }
+	    if (!$player || ($player != $t)) {
+		$success = 0;
+		last;
+	    }
+	}
+
+	if ($success) {
+	    $self->{win} = $player;
+	    $self->set_status;
+	    last;
+	}
+    }
+}
+
+sub update {
+    my ($self, $i, $j, $val) = @_;
+
+    $self->{board}->[$i][$j] = $val;
+    $self->{squares}->[$i][$j]->set ($self->{pixmaps}->[$val], undef);
+
+    $self->check_win;
+}
+
+sub set_status {
+    my $self = shift;
+
+    my $status;
+    
+    if (!$self->{opponent}) {
+	$status = "Not connected";
+    } elsif ($self->{win}) {
+	$status = ($self->{win} == 1) ? "You won" : "Opponent won";
+    } else {
+	$status = $self->{turn} ? "Your turn" : "Opponent's turn"; 
+    }
+
+    $self->{statusbar}->pop($self->{context});
+    $self->{statusbar}->push($self->{context}, $status);
+}
+
+sub make_ui {
+    my $self = shift;
+    
+    my $window = new Gtk::Window 'toplevel';
+    $window->set_policy (0, 0, 0);
+    $window->realize;
+
+    my $vbox = new Gtk::VBox 0, 0;
+    $window->add ($vbox);
+    $vbox->show;
+
+    # Hack, create_from_xpm is broken and doesn't currently
+    # allow undef here.
+    my $trans = $window->style->white;
+
+    $self->{pixmaps}->[0] = 
+	Gtk::Gdk::Pixmap->create_from_xpm ($window->window, 
+					   $trans, "empty.xpm");
+    $self->{pixmaps}->[1] = 
+	Gtk::Gdk::Pixmap->create_from_xpm ($window->window, 
+					   $trans, "self.xpm");
+    $self->{pixmaps}->[2] = 
+	Gtk::Gdk::Pixmap->create_from_xpm ($window->window, 
+					   $trans, "opponent.xpm");
+
+    my $bbox = new Gtk::HButtonBox;
+    $vbox->add ($bbox);
+    $bbox->show;
+
+    my $button = new Gtk::Button "Start Over";
+    $bbox->add ($button);
+    $button->signal_connect ("clicked", 
+      sub {
+	  if ($self->{opponent}) {
+	      $self->{reset_wait} = 1;
+	      $self->{opponent}->request_reset ($self->{tag});
+	  }
+      });
+    
+    $button->show;
+
+    $button = new Gtk::Button "Quit";
+    $bbox->add ($button);
+    $button->show;
+
+    $button->signal_connect ("clicked", 
+      sub {
+	  if ($self->{opponent}) {
+	      $self->{opponent}->disconnect ($self->{tag});
+	  }
+
+	  $root_poa->deactivate_object ($root_poa->servant_to_id ($self));
+	  $orb->shutdown (0);
+      });
+
+    my $separator = new Gtk::HSeparator;
+    $vbox->add ($separator);
+    $separator->show;
+    
+    my $table = new Gtk::Table (5, 5, 1);
+    $vbox->add ($table);
+    $table->show;
+
+    for my $i (0..2) {
+	for my $j (0..2) {
+	    my $eventbox = new Gtk::EventBox;
+	    $eventbox->set_events ('button_press_mask');
+	    $table->attach ($eventbox, $i+1, $i+2, $j+1, $j+2,
+			    [], [], 0, 0);
+
+	    $eventbox->signal_connect ("button_press_event", 
+	      sub {
+		  if ($self->{turn} && !$self->{win} &&
+		      ($self->{board}->[$i][$j] == 0)) {
+		      $self->update ($i, $j, 1);
+		      $self->{opponent}->put ($self->{tag}, $i, $j);
+		      $self->{turn} = 0;
+		      $self->set_status;
+		  }
+	      });
+	    
+	    $eventbox->show;
+	    
+  	    $self->{squares}->[$i][$j] = new Gtk::Pixmap ($self->{pixmaps}->[0], undef);
+  	    $eventbox->add ($self->{squares}->[$i][$j]);
+  	    $self->{squares}->[$i][$j]->show;
+	}
+    }
+    
+      $self->{statusbar} = new Gtk::Statusbar;
+      $self->{context} = $self->{statusbar}->get_context_id("game");
+      $vbox->add ($self->{statusbar});
+      $self->{statusbar}->show;
+
+      $self->set_status;
+      $window->show;
+}
+
+package main;
+
+$orb = CORBA::ORB_init("orbit-local-orb");
+Gtk->init;
+
+$root_poa = $orb->resolve_initial_references("RootPOA");
+
+my $opponent;
+my $client;
+
+if (open (IOR, "<tictactoe.ref")) {
+    my $ior = <IOR>;
+    close IOR;
+    $opponent = $orb->string_to_object($ior);
+    $client = new MyClient ($opponent);
+} else {
+    $client = new MyClient;
+    my $id = $root_poa->activate_object ($client);
+    my $ior = $orb->object_to_string ($root_poa->id_to_reference ($id));
+
+    $ior_file = "tictactoe.ref";
+
+    open (OUT, ">$ior_file") || die "Cannot open file for ior: $!";
+    print OUT "$ior";
+    close OUT;
+}
+
+$root_poa->_get_the_POAManager->activate;
+
+$orb->run;
+

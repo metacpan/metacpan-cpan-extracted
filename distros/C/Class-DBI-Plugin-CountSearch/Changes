@@ -1,0 +1,39 @@
+------------------------------------------------------------------------
+r95 | tholbroo | 2004-05-19 10:09:57 -0700 (Wed, 19 May 2004) | 2 lines
+
+Version number change for new release to CPAN.
+
+------------------------------------------------------------------------
+r94 | tholbroo | 2004-05-19 10:08:41 -0700 (Wed, 19 May 2004) | 4 lines
+
+Simplified code using select_val() as per Tony Bowden's suggestion.
+Fixed test count.
+
+
+------------------------------------------------------------------------
+r92 | tholbroo | 2004-05-18 10:59:44 -0700 (Tue, 18 May 2004) | 2 lines
+
+Updated version number for CPAN release.
+
+------------------------------------------------------------------------
+r82 | tholbroo | 2004-04-26 13:50:36 -0700 (Mon, 26 Apr 2004) | 2 lines
+
+Added support for searching without search terms (which should return everything).  Submitted by James Tolley.
+
+------------------------------------------------------------------------
+r54 | tholbroo | 2004-04-14 13:35:07 -0700 (Wed, 14 Apr 2004) | 2 lines
+
+Changed version number in anticipation of branching a CPAN version.
+
+------------------------------------------------------------------------
+r49 | tholbroo | 2004-04-14 11:48:48 -0700 (Wed, 14 Apr 2004) | 2 lines
+
+Removed extraneous directory
+
+------------------------------------------------------------------------
+r48 | tholbroo | 2004-04-14 11:05:02 -0700 (Wed, 14 Apr 2004) | 3 lines
+
+First version, prepped for CPAN upload
+
+
+------------------------------------------------------------------------

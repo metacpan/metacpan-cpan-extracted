@@ -1,0 +1,88 @@
+{
+   "abstract" : "Configurable URIs for Catalyst",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-Plugin-SmartURI",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Exception" : "0",
+            "Catalyst::Request" : "0",
+            "Class::C3::Componentised" : "0",
+            "Class::Load" : "0",
+            "Moose" : "0",
+            "Scalar::Util" : "0",
+            "mro" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Action::REST" : "0",
+            "Catalyst::Controller" : "0",
+            "Catalyst::Test" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0",
+            "Time::HiRes" : "0",
+            "Time::Out" : "0",
+            "URI::SmartURI" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Catalyst-Plugin-SmartURI@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-SmartURI"
+      },
+      "homepage" : "http://metacpan.org/release/Catalyst-Plugin-SmartURI",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/catalyst-plugin-smarturi.git",
+         "web" : "http://github.com/rkitover/catalyst-plugin-smarturi"
+      }
+   },
+   "version" : "0.041",
+   "x_authority" : "cpan:RKITOVER"
+}
+

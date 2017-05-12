@@ -1,0 +1,14 @@
+2006-08-14  IKEBE Tomohiro  <ikebe@shebang.jp>
+
+	* added password41() to @EXPORT_OK list.
+	* support MySQL 4.1's PASSWORD() function.
+        * allow the string which contain Null characters. 
+        Apply the patch from Zefram.
+
+2004-02-24  IKEBE Tomohiro  <ikebe@shebang.jp>
+
+	* fixed array overrun problem.
+
+2003-04-24  IKEBE Tomohiro  <ikebe@shebang.jp>
+
+	* original version

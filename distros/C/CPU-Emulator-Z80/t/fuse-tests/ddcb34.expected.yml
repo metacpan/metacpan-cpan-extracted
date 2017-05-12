@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  43921:
+    - 223
+name: ddcb34
+registers:
+  AF: 52617
+  AF_: 0
+  BC: 17458
+  BC_: 0
+  DE: 8404
+  DE_: 0
+  HL: 57150
+  HL_: 0
+  I: 0
+  IX: 43848
+  IY: 51551
+  PC: 4
+  R: 2
+  SP: 0

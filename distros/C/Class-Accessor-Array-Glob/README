@@ -1,0 +1,51 @@
+SYNOPSIS
+
+    In lib/Your/Class.pm:
+
+     package Your::Class;
+     use Class::Accessor::Array::Glob {
+         accessors => {
+             foo => 0,
+             bar => 1,
+             baz => 2,
+         },
+         glob_attribute => 'baz',
+     };
+
+    In code that uses your class:
+
+     use Your::Class;
+    
+     my $obj = Your::Class->new;
+     $obj->foo(1);
+     $obj->bar(2);
+     $obj->baz([3,4,5]);
+
+    $obj is now:
+
+     bless([1, 2, 3, 4, 5], "Your::Class");
+
+DESCRIPTION
+
+    This module is a builder for array-backed classes. It is the same as
+    Class::Accessor::Array except that you can define your last (in term of
+    the index in array storage) attribute to be a "glob attribute", meaning
+    it is an array where its elements are stored as elements of the array
+    storage. There can be at most one glob attribute and it must be the
+    last.
+
+    Note that without a glob attribute, you can still store arrays or other
+    complex data in your attributes. It's just that with a glob attribute,
+    you can keep a single flat array backend, so the overall number of
+    arrays is minimized.
+
+    An example of application: tree node objects, where the first attribute
+    (array element) is the parent, then zero or more extra attributes, then
+    the last attribute is a globbing one storing zero or more children.
+    This is how Mojo::DOM stores its HTML tree node, for example.
+
+SEE ALSO
+
+    Other class builders for array-backed objects: Class::Accessor::Array,
+    Class::XSAccessor::Array, Class::ArrayObjects, Object::ArrayType::New.
+

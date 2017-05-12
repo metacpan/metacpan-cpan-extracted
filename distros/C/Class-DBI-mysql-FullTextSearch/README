@@ -1,0 +1,56 @@
+NAME
+    Class::DBI::mysql::FullTextSearch - Full Text Indexing for
+    Class::DBI::mysql
+
+SYNOPSIS
+      package Film;
+      use Class::DBI::mysql::FullTextSearch;
+
+      __PACKAGE__->full_text_search('mysearch' => [qw/title director/]);
+
+      package main;
+
+      use Film;
+
+      my @films = Film->mysearch('Godfather');
+      my @films = Film->mysearch('Godfather', { sort => 'title' });
+      my @films = Film->mysearch('Godfather', { nsort => 'year' });
+
+DESCRIPTION
+    This provides a convenient abstraction to DBIx::FullTextSearch for use
+    with Class::DBI::mysql. It sets up lots of default values for you,
+    handles all the updating of the index when you create, delete or edit
+    values, and provides a simple way for you to create your search method.
+
+METHODS
+  full_text_search
+      Class->full_text_search('search_method_name' => [qw/columns to index/]);
+
+    This creates your search method with the required name.
+
+    When calling the search method, if you wish to order the resulting
+    values you can supply a field by which we either 'sort' or
+    'n(umeric)sort' the results.
+
+    For details on the syntax of the other search arguments etc, see
+    DBIx::FullTextSearch.
+
+    Later versions will provide ways for you to override any of the
+    defaults, if anyone actually requests it!
+
+SEE ALSO
+    Class::DBI::mysql. Class::DBI. DBIx::FullTextSearch.
+
+AUTHOR
+    Tony Bowden and Marty Pauley
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-mysql-FullTextSearch@rt.cpan.org
+
+COPYRIGHT
+    Copyright (C) 2001-05 Kasei. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

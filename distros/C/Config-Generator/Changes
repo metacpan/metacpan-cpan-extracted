@@ -1,0 +1,26 @@
+Revision history for Config::Generator:
+
+1.0	The May 24 2016
+	* Config::Generator::XML: added support for elements with string body.
+
+0.9	Mon Nov 30 2015
+	* Config::Generator::File: make file write as atomic as possible.
+
+0.8	Tue Jun  3 2014
+	* Config::Generator::Config: Config::General now uses IncludeGlob=1.
+	* Config::Generator::Crontab: allow user name to contain dashes.
+	* Config::Generator::File: keep parent directories in manifest.
+
+0.7	Mon Apr 28 2014
+	* Config::Generator::Template: added ifdef() and ifndef() macros.
+	* Added an example of a wrapper script in the "eg" directory.
+
+0.6	Tue Apr  8 2014
+	* Config::Generator::Schema: added "duration" related constants.
+
+0.5	Wed Feb 19 2014
+	* The modules $VERSION variables now contain the package version.
+	* Fixed POD formatting.
+
+0.4	Tue Feb 18 2014
+	* First version released in CPAN.

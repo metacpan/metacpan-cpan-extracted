@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/ActionRole/PseudoCache.pm
+t/01-basic.t
+t/02-true.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TrueTestApp.pm
+t/lib/TrueTestApp/Controller/Root.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

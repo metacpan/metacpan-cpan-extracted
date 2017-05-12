@@ -1,0 +1,33 @@
+2005-04-22 23:09  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/SOAPApp/Std.pm: v1.03 Relicensing
+
+2004-03-17 14:05  chris
+
+	* lib/CAM/SOAPApp/Std.pm: Bug fix - bad interaction between
+	  reqwuesID and wrappers
+
+2004-03-17 08:30  chris
+
+	* lib/CAM/SOAPApp/Std.pm: v1.02 Add auto-detection of <request>
+	  wrapper tags and auto-rewrapping in a   <response> tag.
+
+2003-09-18 17:25  chris
+
+	* Build.PL, LICENSE, MANIFEST, Makefile.PL, README, Std.pm,
+	  index.html, test.pl, lib/CAM/SOAPApp/Std.pm: v1.01 Update for new
+	  build and license infrastructure
+
+2003-04-11 10:30  chris
+
+	* Makefile.PL: Fix version number of CAM::SOAPApp
+
+2003-04-11 10:24  chris
+
+	* MANIFEST, Makefile.PL, README, Std.pm, test.pl: Initial import
+
+2003-04-11 10:24  chris
+
+	* MANIFEST, Makefile.PL, README, Std.pm, test.pl: Initial revision
+

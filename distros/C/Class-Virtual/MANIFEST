@@ -1,0 +1,12 @@
+.travis.yml
+appveyor.yml
+Changes
+lib/Class/Virtual.pm
+lib/Class/Virtually/Abstract.pm
+Makefile.PL
+MANIFEST
+t/Abstract.t
+t/assert.t
+t/Virtual.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

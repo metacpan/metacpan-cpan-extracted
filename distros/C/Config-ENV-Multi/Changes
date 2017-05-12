@@ -1,0 +1,14 @@
+Revision history for Perl extension Config-ENV-Multi
+
+0.03 2015-08-24T05:42:22Z
+    - Fix behavior of three ( and more ) args
+    - https://github.com/hixi-hyi/p5-Config-ENV-Multi/pull/2
+
+0.02 2015-06-17T06:35:58Z
+    - add export (load)
+    - add cpanfile
+
+0.01 2015-06-15T05:36:07Z
+
+    - original version
+

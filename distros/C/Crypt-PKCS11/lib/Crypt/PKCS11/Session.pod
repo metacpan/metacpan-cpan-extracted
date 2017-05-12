@@ -1,0 +1,850 @@
+=encoding utf8
+
+=head1 NAME
+
+Crypt::PKCS11::Session - PKCS #11 session handler.
+
+=head1 SYNPOSIS
+
+  use Crypt::PKCS11;
+
+  # Create the main PKCS #11 object, load a PKCS #11 provider .so library and initialize the module
+  my $pkcs11 = Crypt::PKCS11->new;
+  $pkcs11->load(...);
+  $pkcs11->Initialize;
+
+  # Create a new session, log in, use the session, log out and close the session
+  my $session = $pkcs11->OpenSession(...);
+  $session->Login(...);
+  ...
+  $session->Logout;
+  $session->CloseSession;
+
+=head1 DESCRIPTION
+
+This module encapsulates the PKCS #11 session created with L<Crypt::PKCS11->OpenSession>
+and is used to manage the keys and encrypt/decrypt data using a HSM.
+
+=head1 RETURN VALUES AND ERROR HANDLING
+
+This is the general return value and error handling for all methods unless
+otherwise stated.
+
+On XS layer errors, when called from within these methods, all methods returns
+false (0/undef) and the XS layer error can be retrieved with C<$pkcs11-E<gt>errno>
+for the number and C<$pkcs11-E<gt>errstr> for the message.
+
+For errors from the methods themself, the method will confess (croak) with the
+error message.
+
+=head1 METHODS
+
+For more extensive documentation about the methods, data structures and types
+please see http://www.cryptsoft.com/pkcs11doc/v230/ .
+
+=over 4
+
+=item $session->InitPIN ([$pin = 1234 || '...'])
+
+Initializes the normal user's PIN.
+
+The argument is optional due to "protected authentication path", please see the
+PKCS #11 documentation for more information about that.
+
+=over 4
+
+=item $pin
+
+Optional argument that is the normal user's PIN, if given must contain a number
+or a non-empty string.
+
+=back
+
+=item $session->SetPIN ([$oldPin = 1234 || '...', $newPin = 1234 || '...'])
+
+Modifies the PIN of the user that is currently logged in, or the C<CKU_USER> PIN
+if the session is not logged in.
+
+The arguments are optional due to "protected authentication path", please see
+the PKCS #11 documentation for more information about that.
+
+=over 4
+
+=item $oldPin
+
+Optional argument that is the user's old PIN, if given must contain a number or
+a non-empty string.
+
+=item $newPin
+
+Optional argument that is the user's new PIN, if given must contain a number or
+a non-empty string.
+
+=back
+
+=item $session->CloseSession
+
+Close the session, any use of the object after closing the session will result
+in an error.
+
+=item < %hash || $hash_ref > = $session->GetSessionInfo
+
+Return information about the session as a hash, if called in list context, or as
+a hash reference, if called in scalar context.
+
+Fields in hash are as follows:
+
+=over 4
+
+=item slotID
+
+ID of the slot that interfaces with the token.
+
+=item state
+
+The state of the session.
+
+=item flags
+
+Bit flags that define the type of session.
+
+=item ulDeviceError
+
+An error code defined by the cryptographic device. Used for errors not covered by Cryptoki.
+
+=back
+
+=item $operationState = $session->GetOperationState
+
+Obtains a copy of the cryptographic operations state of a session, encoded as a
+string of bytes.
+
+=item $session->SetOperationState ($operationState, [$encryptionKey = undef, $authenticationKey = undef])
+
+Restores the cryptographic operations state of a session from a string of bytes
+obtained with C_GetOperationState.
+
+=over 4
+
+=item $operationState
+
+The saved state.
+
+=item $encryptionKey
+
+Optional argument with the key which will be used for an ongoing encryption or
+decryption operation in the restored session (or undef if no encryption or
+decryption key is needed, either because no such operation is ongoing in the
+stored session or because all the necessary key information is present in the
+saved state).
+
+=item $authenticationKey
+
+Optional argument with the key which will be used for an ongoing signature,
+MACing, or verification operation in the restored session (or undef if no such
+key is needed, either because no such operation is ongoing in the stored session
+or because all the necessary key information is present in the saved state).
+
+=back
+
+=item $session->Login ($userType, [$pin = undef])
+
+Logs a user into a token.
+
+=over 4
+
+=item $userType
+
+The user type.
+
+=item $pin
+
+Optional argument with the user's PIN.
+
+=back
+
+=item $session->Logout
+
+Logs a user out from a token.
+
+=item $object = $session->CreateObject ($template)
+
+Creates a new object, returns a L<Crypt::PKCS11::Object> when successful.
+
+=over 4
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the object's template.
+
+=back
+
+=item $newObject = $session->CopyObject ($object, $template)
+
+Copies an object, creating a new object for the copy. Returns a
+L<Crypt::PKCS11::Object> when successful.
+
+=over 4
+
+=item $object
+
+A L<Crypt::PKCS11::Object> with the object to copy.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the new object's template.
+
+=back
+
+=item $session->DestroyObject ($object)
+
+Destroys an object.
+
+=over 4
+
+=item $object
+
+A L<Crypt::PKCS11::Object> with the object to destroy.
+
+=back
+
+=item $size = $session->GetObjectSize ($object)
+
+Gets the size of an object in bytes.
+
+=over 4
+
+=item $object
+
+A L<Crypt::PKCS11::Object> with the object.
+
+=back
+
+=item < @array || ... > = $session->GetAttributeValue ($object, $template)
+
+Obtains the value of one or more attributes of an object. Returns a list of
+L<Crypt::PKCS11::Attribute> objects with the attributes retrieved, if called in
+list context, otherwise the normal return statuses are used and the retrieved
+attributes are contained with the template.
+
+=over 4
+
+=item $object
+
+A L<Crypt::PKCS11::Object> with the object.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the attributes to retrieve.
+
+=back
+
+=item $session->SetAttributeValue ($object, $template)
+
+Modifies the value of one or more attributes of an object.
+
+=over 4
+
+=item $object
+
+A L<Crypt::PKCS11::Object> with the object.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the attributes to modify.
+
+=back
+
+=item $session->FindObjectsInit ($template)
+
+Initializes a search for token and session objects that match a template.
+
+=over 4
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the template.
+
+=back
+
+=item < @array || $array_ref > = $session->FindObjects ($maxObjectCount)
+
+Start or continues a search for token and session objects that match a template.
+Returns a list of L<Crypt::PKCS11::Object> objects, if called in list context, or
+as an array reference, if called in scalar context.
+
+=over 4
+
+=item $maxObjectCount
+
+The maximum number of objects to be returned.
+
+=back
+
+=item $session->FindObjectsFinal
+
+Terminates a search for token and session objects.
+
+=item $session->EncryptInit ($mechanism, $key)
+
+Initializes an encryption operation.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the encryption mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the encryption key.
+
+=back
+
+=item $encryptedData = $session->Encrypt ($data)
+
+Encrypts single-part data. Returns the encrypted data on success.
+
+=over 4
+
+=item $data
+
+The data to encrypt.
+
+=back
+
+=item $encryptedPart = $session->EncryptUpdate ($part)
+
+Continues a multiple-part encryption operation, processing another data part.
+Returns the encrypted data part on success.
+
+=over 4
+
+=item $part
+
+The data part to encrypt.
+
+=back
+
+=item $lastEncryptedPart = $session->EncryptFinal
+
+Finishes a multiple-part encryption operation. Returns the last encrypted data
+part, if any.
+
+=item $session->DecryptInit ($mechanism, $key)
+
+Initializes a decryption operation.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the decryption mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the decryption key.
+
+=back
+
+=item $data = $session->Decrypt ($encryptedData)
+
+Decrypts encrypted data in a single part. Returns the decrypted data on success.
+
+=over 4
+
+=item $encryptedData
+
+The encrypted data to decrypt.
+
+=back
+
+=item $part = $session->DecryptUpdate ($encryptedPart)
+
+Continues a multiple-part decryption operation, processing another encrypted
+data part. Returns the decrypted data part on success.
+
+=over 4
+
+=item $encryptedPart
+
+The encrypted data part to decrypt.
+
+=back
+
+=item $lastPart = $session->DecryptFinal
+
+Finishes a multiple-part decryption operation. Returns the last recovered data
+part, if any.
+
+=item $session->DigestInit ($mechanism)
+
+Initializes a message-digesting operation.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the digesting mechanism.
+
+=back
+
+=item $digest = $session->Digest ($data)
+
+Digests data in a single part. Returns the message digest on success.
+
+=over 4
+
+=item $data
+
+The data to digest.
+
+=back
+
+=item $digest = $session->DigestUpdate ($part)
+
+Continues a multiple-part message-digesting operation, processing another data
+part. Returns the message digest part on success.
+
+=over 4
+
+=item $part
+
+The data part to digest.
+
+=back
+
+=item $session->DigestKey ($key)
+
+Continues a multiple-part message-digesting operation by digesting the value of
+a secret key.
+
+=over 4
+
+=item $key
+
+A L<Crypt::PKCS11::Object> with the secret key to be digested.
+
+=back
+
+=item $digest = $session->DigestFinal
+
+Finishes a multiple-part message-digesting operation, returning the message
+digest.
+
+=item $session->SignInit ($mechanism, $key)
+
+Initializes a signature operation, where the signature is an appendix to the
+data.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the signature mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the signature key.
+
+=back
+
+=item $signature = $session->Sign ($data)
+
+Signs data in a single part, where the signature is an appendix to the data.
+Returns the signature on success.
+
+=over 4
+
+=item $data
+
+The data to sign.
+
+=back
+
+=item $session->SignUpdate ($part)
+
+Continues a multiple-part signature operation, processing another data part.
+
+=over 4
+
+=item $part
+
+The data part to sign.
+
+=back
+
+=item $signature = $session->SignFinal
+
+Finishes a multiple-part signature operation, returning the signature.
+
+=item $session->SignRecoverInit ($mechanism, $key)
+
+Initializes a signature operation, where the data can be recovered from the
+signature.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the signature mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the signature key.
+
+=back
+
+=item $signature = $session->SignRecover ($data)
+
+Signs data in a single operation, where the data can be recovered from the
+signature. Returns the signature on success.
+
+=over 4
+
+=item $data
+
+The data to sign.
+
+=back
+
+=item $session->VerifyInit ($mechanism, $key)
+
+Initializes a verification operation, where the signature is an appendix to the
+data.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the verification mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the verification key.
+
+=back
+
+=item $session->Verify ($data, $signature)
+
+Verifies a signature in a single-part operation, where the signature is an
+appendix to the data.
+
+=over 4
+
+=item $data
+
+The data to verify.
+
+=item $signature
+
+The signature to verify.
+
+=back
+
+=item $session->VerifyUpdate ($part)
+
+Continues a multiple-part verification operation, processing another data part.
+
+=over 4
+
+=item $data
+
+The data part to verify.
+
+=back
+
+=item $session->VerifyFinal ($signature)
+
+Finishes a multiple-part verification operation, checking the signature.
+
+=over 4
+
+=item $signature
+
+The signature to verify.
+
+=back
+
+=item $session->VerifyRecoverInit ($mechanism, $key)
+
+Initializes a signature verification operation, where the data is recovered from
+the signature.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the verification mechanism.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> to use as the verification key.
+
+=back
+
+=item $data = $session->VerifyRecover ($signature)
+
+Verifies a signature in a single-part operation, where the data is recovered
+from the signature. Returns the data on success.
+
+=over 4
+
+=item $signature
+
+The signature to verify.
+
+=back
+
+=item $encryptedPart = $session->DigestEncryptUpdate ($part)
+
+Continues multiple-part digest and encryption operations, processing another
+data part. Returns the encrypted data part on success.
+
+=over 4
+
+=item $part
+
+The data part.
+
+=back
+
+=item $part = $session->DecryptDigestUpdate ($encryptedPart)
+
+Continues a multiple-part combined decryption and digest operation, processing
+another data part. Returns the data part on success.
+
+=over 4
+
+=item $encryptedPart
+
+The encrypted data part.
+
+=back
+
+=item $encryptedPart = $session->SignEncryptUpdate ($part)
+
+Continues a multiple-part combined signature and encryption operation,
+processing another data part. Returns the encrypted data part on success.
+
+=over 4
+
+=item $part
+
+The data part.
+
+=back
+
+=item $part = $session->DecryptVerifyUpdate ($encryptedPart)
+
+Continues a multiple-part combined decryption and verification operation,
+processing another data part. Returns the data part on success.
+
+=over 4
+
+=item $encryptedPart
+
+The encrypted data part.
+
+=back
+
+=item $key = $session->GenerateKey ($mechanism, $template)
+
+Generates a secret key or set of domain parameters, creating a new object.
+Returns a L<Crypt::PKCS11::Object> on success.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the generation mechanism.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the template for the new key or set of
+domain parameters.
+
+=back
+
+=item ($publicKey, $privateKey) = $session->GenerateKeyPair ($mechanism, $publicKeyTemplate, $privateKeyTemplate)
+
+Generates a public/private key pair, creating new key objects. Return both keys
+on success.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the generation mechanism.
+
+=item $publicKeyTemplate
+
+A L<Crypt::PKCS11::Attributes> containing the template for the public key.
+
+=item $privateKeyTemplate
+
+A L<Crypt::PKCS11::Attributes> containing the template for the private key.
+
+=back
+
+=item $wrappedKey = $session->WrapKey ($mechanism, $wrappingKey, $key)
+
+Wraps (i.e., encrypts) a private or secret key. Returns the wrapped key on
+success.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the wrapping mechanism.
+
+=item $wrappingKey
+
+A L<Crypt::PKCS11::Object> with the wrapping key.
+
+=item $key
+
+A L<Crypt::PKCS11::Object> with the key to be wrapped.
+
+=back
+
+=item $key = $session->UnwrapKey ($mechanism, $unwrappingKey, $wrappedKey, $template)
+
+Unwraps (i.e. decrypts) a wrapped key, creating a new private key or secret key
+object. Returns a L<Crypt::PKCS11::Object> on success.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the unwrapping mechanism.
+
+=item $unwrappingKey
+
+A L<Crypt::PKCS11::Object> with the unwrapping key.
+
+=item $wrappedKey
+
+The wrapped key.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the template for the new key.
+
+=back
+
+=item $key = $session->DeriveKey ($mechanism, $baseKey, $template)
+
+Derives a key from a base key, creating a new key object. Returns a
+L<Crypt::PKCS11::Object> on success.
+
+=over 4
+
+=item $mechanism
+
+A L<Crypt::PKCS11::CK_MECHANISM> with the derivation mechanism.
+
+=item $unwrappingKey
+
+A L<Crypt::PKCS11::Object> with the base key.
+
+=item $template
+
+A L<Crypt::PKCS11::Attributes> containing the template for the new key.
+
+=back
+
+=item $session->SeedRandom ($seed)
+
+Mixes additional seed material into the token's random number generator.
+
+=over 4
+
+=item $seed
+
+The seed material.
+
+=back
+
+=item $randomData = $session->GenerateRandom ($randomLen)
+
+Generates random or pseudo-random data. Returns the random or pseudo-random data
+on success.
+
+=over 4
+
+=item $randomLen
+
+The length in bytes of the random or pseudo-random data to be generated.
+
+=back
+
+=item $session->GetFunctionStatus
+
+Obtained the status of a function running in parallel with an application. Will
+always return the CKR from the C layer function.
+
+=item $session->CancelFunction
+
+Cancelled a function running in parallel with an application. Will always return
+the CKR from the C layer function.
+
+=item $errno = $session->errno
+
+Return the last error number, can be used after a method returns false.
+
+=item $errstr = $session->errstr
+
+Return the last error message, can be used after a method returns false.
+
+=back
+
+=head1 PRIVATE METHODS
+
+These are the private methods used within the module and should not be used
+elsewhere.
+
+=over 4
+
+=item $session = Crypt::PKCS11::Session->new ($pkcs11xs, $session)
+
+=back
+
+=head1 NOTE
+
+Derived from the RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki)
+
+=head1 AUTHOR
+
+Jerry Lundström <lundstrom.jerry@gmail.com>
+
+=head1 REPORTING BUGS
+
+Report bugs at https://github.com/dotse/p5-Crypt-PKCS11/issues .
+
+=head1 LICENSE
+
+  Copyright (c) 2015 Jerry Lundström <lundstrom.jerry@gmail.com>
+  Copyright (c) 2015 .SE (The Internet Infrastructure Foundation)
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

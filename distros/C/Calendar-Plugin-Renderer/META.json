@@ -1,0 +1,90 @@
+{
+   "abstract" : "Role to render calendar.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Calendar-Plugin-Renderer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "XML::SemanticDiff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.000000",
+            "Moo::Role" : "2.000000",
+            "SVG" : "2.64",
+            "Term::ANSIColor::Markup" : "0.06",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Calendar::Plugin::Renderer" : {
+         "file" : "lib/Calendar/Plugin/Renderer.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::SVG" : {
+         "file" : "lib/Calendar/Plugin/Renderer/SVG.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::SVG::Box" : {
+         "file" : "lib/Calendar/Plugin/Renderer/SVG/Box.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::SVG::Label" : {
+         "file" : "lib/Calendar/Plugin/Renderer/SVG/Label.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::SVG::Page" : {
+         "file" : "lib/Calendar/Plugin/Renderer/SVG/Page.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::SVG::Text" : {
+         "file" : "lib/Calendar/Plugin/Renderer/SVG/Text.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::Text" : {
+         "file" : "lib/Calendar/Plugin/Renderer/Text.pm",
+         "version" : "0.12"
+      },
+      "Calendar::Plugin::Renderer::Util" : {
+         "file" : "lib/Calendar/Plugin/Renderer/Util.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Calendar-Plugin-Renderer.git",
+         "web" : "https://github.com/manwar/Calendar-Plugin-Renderer"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

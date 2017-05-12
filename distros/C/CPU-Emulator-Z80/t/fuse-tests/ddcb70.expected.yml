@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb70
+registers:
+  AF: 63761
+  AF_: 0
+  BC: 2488
+  BC_: 0
+  DE: 17400
+  DE_: 0
+  HL: 10870
+  HL_: 0
+  I: 0
+  IX: 1068
+  IY: 32557
+  PC: 4
+  R: 2
+  SP: 0

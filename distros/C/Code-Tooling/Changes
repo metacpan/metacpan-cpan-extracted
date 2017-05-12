@@ -1,0 +1,6 @@
+Revision history for Perl extension Code::Tooling.
+
+0.01  Wed May 18 10:28:17 2016
+	- original version; created by h2xs 1.23 with options
+		-AX --name=Code::Tooling
+

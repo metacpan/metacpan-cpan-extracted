@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  8882:
+    - 156
+name: ddcb8d
+registers:
+  AF: 363
+  AF_: 0
+  BC: 22530
+  BC_: 0
+  DE: 42627
+  DE_: 0
+  HL: 9628
+  HL_: 0
+  I: 0
+  IX: 8934
+  IY: 13243
+  PC: 4
+  R: 2
+  SP: 0

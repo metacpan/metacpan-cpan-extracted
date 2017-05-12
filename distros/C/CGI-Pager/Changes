@@ -1,0 +1,21 @@
+Revision history for Perl extension CGI::Pager.
+
+0.01  Mon Jan 23 23:39:34 2006
+	- original version; created by h2xs 1.22 with options
+		-X -A -n CGI::Pager
+0.02  Mon Jan 24 07:58:00 2006
+	- Fixed a bug in page numbering
+        - Added 'last_pos_displayed' method.
+
+0.03  Mon Jan 24 2006
+	- Fixed another pagination bug.
+
+0.04  Wed Feb 1 2006
+	- Fixed a fatal bug in installer.
+
+1.00  Fri Oct 12 2007
+        - Added total_count method.
+
+1.01  Tue Jun 10 2014
+        - Fixed dependency info in the package. Converted to Dist::Zilla.
+

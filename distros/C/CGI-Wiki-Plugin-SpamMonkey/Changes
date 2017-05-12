@@ -1,0 +1,10 @@
+Revision history for Perl module CGI::Wiki::Plugin::SpamMonkey
+
+0.03 Mon Apr 17 2006
+    - Fix home directory problem with Win32 tests.
+    
+0.02 Sat Apr  1 2006
+    - is_spam API was wrong in initial release.
+
+0.01 Sat Apr  1 2006
+    - Initial version.

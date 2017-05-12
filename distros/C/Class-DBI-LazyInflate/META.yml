@@ -1,0 +1,15 @@
+---
+name: Class-DBI-LazyInflate
+version: 0.06
+author:
+  - Copyright (c) 2004-2005 Daisuke Maki E<lt>dmaki@cpan.orgE<gt>
+abstract: Defer Inflating Of Columns Until They Are Used
+license: perl
+requires:
+  Class::DBI: 0
+  Data::Lazy: 0
+provides:
+  Class::DBI::LazyInflate:
+    file: lib/Class/DBI/LazyInflate.pm
+    version: 0.06
+generated_by: Module::Build version 0.2611

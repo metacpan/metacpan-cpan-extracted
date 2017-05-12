@@ -1,0 +1,62 @@
+---
+abstract: "A small wrapper around the Chef 'knife' command line utility"
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chef-Knife-Cmd
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Chef::Knife::Cmd:
+    file: lib/Chef/Knife/Cmd.pm
+    version: '0.15'
+  Chef::Knife::Cmd::Client:
+    file: lib/Chef/Knife/Cmd/Client.pm
+  Chef::Knife::Cmd::DataBag:
+    file: lib/Chef/Knife/Cmd/DataBag.pm
+  Chef::Knife::Cmd::EC2:
+    file: lib/Chef/Knife/Cmd/EC2.pm
+  Chef::Knife::Cmd::EC2::Server:
+    file: lib/Chef/Knife/Cmd/EC2/Server.pm
+  Chef::Knife::Cmd::Node:
+    file: lib/Chef/Knife/Cmd/Node.pm
+  Chef::Knife::Cmd::Node::From:
+    file: lib/Chef/Knife/Cmd/Node/From.pm
+  Chef::Knife::Cmd::Node::RunList:
+    file: lib/Chef/Knife/Cmd/Node/RunList.pm
+  Chef::Knife::Cmd::Search:
+    file: lib/Chef/Knife/Cmd/Search.pm
+  Chef::Knife::Cmd::Vault:
+    file: lib/Chef/Knife/Cmd/Vault.pm
+requires:
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  Shell::Carapace: '0.18'
+  String::ShellQuote: '0'
+resources:
+  bugtracker: https://github.com/kablamo/p5-chef-knife-cmd/issues
+  homepage: https://github.com/kablamo/p5-chef-knife-cmd
+  repository: git://github.com/kablamo/p5-chef-knife-cmd.git
+version: '0.15'
+x_authority: cpan:KABLAMO
+x_contributors:
+  - 'Marc Soda <marc@duckduckgo.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Eric Johnson <github@iijo.org>'

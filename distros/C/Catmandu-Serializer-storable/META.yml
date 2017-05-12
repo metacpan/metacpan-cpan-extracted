@@ -1,0 +1,31 @@
+---
+abstract: 'A Catmandu::Serializer backend using Storable'
+author:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catmandu-Serializer-storable
+provides:
+  Catmandu::Serializer::storable:
+    file: lib/Catmandu/Serializer/storable.pm
+    version: 0.0102
+requires:
+  Catmandu: 0.8006
+  MIME::Base64: 0
+  Storable: 0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Serializer-storable/issues
+  homepage: https://github.com/LibreCat/Catmandu-Serializer-storable
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/LibreCat/Catmandu-Serializer-storable.git
+version: 0.0102

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CMS/Joomla.pm
+t/00-load.t
+t/01-parse15.t
+t/02-parse17.t
+t/03-missing.t
+t/configuration-1.5.php
+t/configuration-1.7.php
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

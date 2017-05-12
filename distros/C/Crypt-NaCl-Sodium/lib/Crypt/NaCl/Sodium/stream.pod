@@ -1,0 +1,692 @@
+# PODNAME: Crypt::NaCl::Sodium::stream
+# ABSTRACT: Stream ciphers (XSalsa20, ChaCha20, Salsa20, AES-128-CTR)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::stream - Stream ciphers (XSalsa20, ChaCha20, Salsa20, AES-128-CTR)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_stream = Crypt::NaCl::Sodium->stream();
+
+    my ($key, $nonce, $random_bytes, $secret, $decrypted_msg);
+
+    my $msg = "Secret message";
+
+    ## XSalsa20
+    ########
+
+    # generate secret key
+    $key = $crypto_stream->keygen();
+
+    # generate nonce
+    $nonce = $crypto_stream->nonce();
+
+    # generate 256 bytes from $nonce and $key
+    $random_bytes = $crypto_stream->bytes( 256, $nonce, $key );
+
+    # encrypt
+    $secret = $crypto_stream->xor($msg, $nonce, $key);
+
+    # decrypt
+    $decrypted_msg = $crypto_stream->xor($secret, $nonce, $key);
+
+    ## ChaCha20
+    ########
+
+    # generate secret key
+    $key = $crypto_stream->chacha20_keygen();
+
+    # generate nonce
+    $nonce = $crypto_stream->chacha20_nonce();
+
+    # generate 256 bytes from $nonce and $key
+    $random_bytes = $crypto_stream->chacha20_bytes( 256, $nonce, $key );
+
+    # encrypt
+    $secret = $crypto_stream->chacha20_xor($msg, $nonce, $key);
+
+    # decrypt
+    $decrypted_msg = $crypto_stream->chacha20_xor($secret, $nonce, $key);
+
+    ## Salsa20
+    ########
+
+    # generate secret key
+    $key = $crypto_stream->salsa20_keygen();
+
+    # generate nonce
+    $nonce = $crypto_stream->salsa20_nonce();
+
+    # generate 256 bytes from $nonce and $key
+    $random_bytes = $crypto_stream->salsa20_bytes( 256, $nonce, $key );
+
+    # encrypt
+    $secret = $crypto_stream->salsa20_xor($msg, $nonce, $key);
+
+    # decrypt
+    $decrypted_msg = $crypto_stream->salsa20_xor($secret, $nonce, $key);
+
+    ## AES-128-CTR
+    ########
+
+    # generate secret key
+    $key = $crypto_stream->aes128ctr_keygen();
+
+    # generate nonce
+    $nonce = $crypto_stream->aes128ctr_nonce();
+
+    # generate 256 bytes from $nonce and $key
+    $random_bytes = $crypto_stream->aes128ctr_bytes( 256, $nonce, $key );
+
+    # encrypt
+    $secret = $crypto_stream->aes128ctr_xor($msg, $nonce, $key);
+
+    # decrypt
+    $decrypted_msg = $crypto_stream->aes128ctr_xor($secret, $nonce, $key);
+
+=head1 DESCRIPTION
+
+The C<crypto_stream> provides I<XSalsa20>, I<ChaCha20>, I<Salsa20> and
+I<AES-128> stream ciphers which can be used to generate pseudo-random data
+from a key and nonce, or as building blocks for implementing custom
+constructions, but they are not alternatives to
+L<Crypt::NaCl::Sodium::secretbox>.
+
+Nonce (number used once) does not have to be protected, but it is crucial that
+the same nonce has not been ever reused with the same key.
+
+The generated key must be distributed in secret.
+
+The default stream cipher is I<XSalsa20>.
+
+=head1 METHODS
+
+=head2 XSalsa20
+
+I<XSalsa20> is a stream cipher based upon Salsa20 but with a much
+longer nonce: 192 bits instead of 64 bits.
+
+I<XSalsa20> uses a 256-bit key as well as the first 128 bits of
+the nonce in order to compute a subkey. This subkey, as well as
+the remaining 64 bits of the nonce, are the parameters of the I<Salsa20>
+function used to actually generate the stream.
+
+Like I<Salsa20>, I<XSalsa20> is immune to timing attacks and provides
+its own 64-bit block counter to avoid incrementing the
+nonce after each block.
+
+But with I<XSalsa20's> longer nonce, it is safe to generate nonces
+using L</nonce> for every message encrypted with
+the same key without having to worry about a collision.
+
+C<crypto_stream> exposes I<XSalsa20> with 20 rounds as the default algorithm.
+
+=head3 keygen
+
+    my $key = $crypto_stream->keygen();
+
+Helper method to generate a I<XSalsa20> random key to be used by C<$crypto_stream>.
+
+The length of the C<$key> equals L</KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 nonce
+
+    my $nonce = $crypto_stream->nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_stream>.
+
+The length of the nonce equals L</NONCEBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_stream->nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key. It is large enough that the randomly
+generated nonces have negligible risk of collision.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 bytes
+
+    # stream of random bytes
+    my $bytes = $crypto_stream->bytes($num_of_bytes, $nonce, $key);
+
+Generates unpredictable sequence of C<$num_of_bytes> bytes using given C<$nonce> and C<$key>.
+
+The length of the C<$bytes> equals the value of C<$num_of_bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 xor
+
+    # encryption
+    my $secret = $crypto_stream->xor($msg, $nonce, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->xor($secret, $nonce, $key);
+
+Encrypts/decrypts the message using given C<$nonce> and C<$key>.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 xor_ic
+
+    # encryption
+    my $secret = $crypto_stream->xor_ic($msg, $nonce, $ic, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->xor_ic($secret, $nonce, $ic, $key);
+
+C<xor_ic> is similar to L</xor> function and encrypts/decrypts
+the message using given C<$nonce> and C<$key>, but adds the ability to set the
+initial value of the block counter to a non-zero value, C<$ic>.
+
+This permits direct access to any block without having to compute the
+previous ones.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 ChaCha20
+
+I<ChaCha20> is a stream cipher developed by Daniel J. Bernstein that
+expands a 256-bit key into 2^64 randomly accessible
+streams, each containing 2^64 randomly accessible 64-byte (512
+bits) blocks. It is a variant of I<Salsa20> with better diffusion.
+
+I<ChaCha20> doesn't require any lookup tables and avoids the possibility of
+timing attacks.
+
+Internally, I<ChaCha20> works like a block cipher used in counter
+mode. It uses a dedicated 64-bit block counter to avoid
+incrementing the 64-bit nonce after each block.
+
+Methods that use C<IETF>-compatible extended nonce (96-bit) and a 32-bit
+counter are also available as L</chacha20_ietf_nonce>, L</chacha20_ietf_bytes>,
+L</chacha20_ietf_xor> and L</chacha20_ietf_xor_ic>.
+
+=head3 chacha20_keygen
+
+    my $key = $crypto_stream->chacha20_keygen();
+
+Helper method to generate a I<ChaCha20> random key to be used by C<$crypto_stream>.
+
+The length of the C<$key> equals L</CHACHA20_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+B<NOTE:> this method can be used to generate keys used in original version of
+C<ChaCha20> and the C<IETF>-compatible.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 chacha20_nonce
+
+    my $nonce = $crypto_stream->chacha20_nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_stream>.
+
+The length of the nonce equals L</CHACHA20_NONCEBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_stream->chacha20_nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key.
+
+Bacause the nonce is 64 bits long, in order to prevent nonce reuse,
+if a key is being reused, it is recommended to increment the
+previous nonce instead of generating a random nonce every time
+a new stream is required.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 chacha20_ietf_nonce
+
+    my $nonce_ietf = $crypto_stream->chacha20_ietf_nonce();
+
+Same as above but generates an C<IETF>-compatible extended nonce.
+
+The length of the nonce equals L</CHACHA20_IETF_NONCEBYTES>.
+
+=head3 chacha20_bytes
+
+    # stream of random bytes
+    my $bytes = $crypto_stream->chacha20_bytes($num_of_bytes, $nonce, $key);
+
+Generates unpredictable sequence of C<$num_of_bytes> bytes using given C<$nonce> and C<$key>.
+
+The length of the C<$bytes> equals the value of C<$num_of_bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 chacha20_ietf_bytes
+
+    # stream of random bytes
+    my $bytes = $crypto_stream->chacha20_ietf_bytes($num_of_bytes, $nonce_ietf, $key);
+
+Same as above but uses an C<IETF>-compatible extended nonce.
+
+=head3 chacha20_xor
+
+    # encryption
+    my $secret = $crypto_stream->chacha20_xor($msg, $nonce, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->chacha20_xor($secret, $nonce, $key);
+
+Encrypts/decrypts the message using given C<$nonce> and C<$key>.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 chacha20_ietf_xor
+
+    # encryption
+    my $secret = $crypto_stream->chacha20_ietf_xor($msg, $nonce_ietf, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->chacha20_ietf_xor($secret, $nonce_ietf, $key);
+
+Same as above but uses an C<IETF>-compatible extended nonce.
+
+=head3 chacha20_xor_ic
+
+    # encryption
+    my $secret = $crypto_stream->chacha20_xor_ic($msg, $nonce, $ic, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->chacha20_xor_ic($secret, $nonce, $ic, $key);
+
+C<chacha20_xor_ic> is similar to L</chacha20_xor> function and encrypts/decrypts the message using
+given C<$nonce> and C<$key>, but adds the ability to set the
+initial value of the block counter to a non-zero value, C<$ic>.
+
+This permits direct access to any block without having to compute the
+previous ones.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 chacha20_ietf_xor_ic
+
+    # encryption
+    my $secret = $crypto_stream->chacha20_ietf_xor_ic($msg, $nonce_ietf, $ic, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->chacha20_ietf_xor_ic($secret, $nonce_ietf, $ic, $key);
+
+Same as above but uses an C<IETF>-compatible extended nonce.
+
+=head2 Salsa20
+
+I<Salsa20> is a stream cipher developed by Daniel J. Bernstein that
+expands a 256-bit key into 2^64 randomly accessible
+streams, each containing 2^64 randomly accessible 64-byte (512
+bits) blocks.
+
+I<Salsa20> doesn't require any lookup tables and avoids the possibility of
+timing attacks.
+
+Internally, I<Salsa20> works like a block cipher used in counter
+mode. It uses a dedicated 64-bit block counter to avoid
+incrementing the nonce after each block.
+
+Although the best known attack against I<Salsa20/8> is not practical,
+the full-round (20 rounds) version provides a highest security margin
+while still being fast enough for most purposes.
+
+Faster, reduced-rounds versions of L</salsa20_bytes> and L</salsa20_xor> are also available.
+
+=head3 salsa20_keygen
+
+    my $key = $crypto_stream->salsa20_keygen();
+
+Helper method to generate a I<Salsa20> random key to be used by C<$crypto_stream>.
+
+The length of the C<$key> equals L</SALSA20_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 salsa20_nonce
+
+    my $nonce = $crypto_stream->salsa20_nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_stream>.
+
+The length of the nonce equals L</SALSA20_NONCEBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_stream->salsa20_nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 salsa20_bytes
+
+    # stream of random bytes
+    my $bytes = $crypto_stream->salsa20_bytes($num_of_bytes, $nonce, $key);
+
+Generates unpredictable sequence of C<$num_of_bytes> bytes using given C<$nonce> and C<$key>.
+
+The length of the C<$bytes> equals the value of C<$num_of_bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 salsa2012_bytes
+
+Salsa20 reduced to 12 rounds:
+
+    # stream of random bytes using Salsa20/12
+    my $bytes = $crypto_stream->salsa2012_bytes($num_of_bytes, $nonce, $key);
+
+See L</salsa20_bytes> for details.
+
+=head4 salsa208_bytes
+
+Salsa20 reduced to 8 rounds:
+
+    # stream of random bytes using Salsa20/8
+    my $bytes = $crypto_stream->salsa208_bytes($num_of_bytes, $nonce, $key);
+
+See L</salsa20_bytes> for details.
+
+=head3 salsa20_xor
+
+    # encryption
+    my $secret = $crypto_stream->salsa20_xor($msg, $nonce, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->salsa20_xor($secret, $nonce, $key);
+
+Encrypts/decrypts the message using given C<$nonce> and C<$key>.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head4 salsa2012_xor
+
+Salsa20 reduced to 12 rounds:
+
+    # encryption using Salsa20/12
+    my $secret = $crypto_stream->salsa2012_xor($msg, $nonce, $key);
+
+    # decryption using Salsa20/12
+    my $decrypted_msg = $crypto_stream->salsa2012_xor($secret, $nonce, $key);
+
+See L</salsa20_xor> for details.
+
+=head4 salsa208_xor
+
+Salsa20 reduced to 8 rounds:
+
+    # encryption using Salsa20/8
+    my $secret = $crypto_stream->salsa208_xor($msg, $nonce, $key);
+
+    # decryption using Salsa20/8
+    my $decrypted_msg = $crypto_stream->salsa208_xor($secret, $nonce, $key);
+
+See L</salsa20_xor> for details.
+
+=head3 salsa20_xor_ic
+
+    # encryption
+    my $secret = $crypto_stream->salsa20_xor_ic($msg, $nonce, $ic, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->salsa20_xor_ic($secret, $nonce, $ic, $key);
+
+C<salsa20_xor_ic> is similar to L</salsa20_xor> function and encrypts/decrypts
+the message using given C<$nonce> and C<$key>, but adds the ability to set the
+initial value of the block counter to a non-zero value, C<$ic>.
+
+This permits direct access to any block without having to compute the
+previous ones.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 AES-128-CTR
+
+C<crypto_stream> provides a software bitsliced implementation of I<AES-128> in
+counter mode written by Peter Schwabe and Emilia Käsper, which resists all
+cache timing attacks.
+
+Unless using AES is a requirement, you should consider
+L</XSalsa20> or L</ChaCha20> instead.
+
+=head3 aes128ctr_keygen
+
+    my $key = $crypto_stream->aes128ctr_keygen();
+
+Helper method to generate a I<AES-128-CTR> random key to be used by C<$crypto_stream>.
+
+The length of the C<$key> equals L</AES128CTR_KEYBYTES>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 aes128ctr_nonce
+
+    my $nonce = $crypto_stream->aes128ctr_nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_stream>.
+
+The length of the nonce equals L</AES128CTR_NONCEBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_stream->aes128ctr_nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same key.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the key to avoid accidental reuse on
+the next session. In connection-oriented protocols counter-based nonce could help
+rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 aes128ctr_bytes
+
+    # stream of random bytes
+    my $bytes = $crypto_stream->aes128ctr_bytes($num_of_bytes, $nonce, $key);
+
+Generates unpredictable sequence of C<$num_of_bytes> bytes using given C<$nonce> and C<$key>.
+
+The length of the C<$bytes> equals the value of C<$num_of_bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 aes128ctr_xor
+
+    # encryption
+    my $secret = $crypto_stream->aes128ctr_xor($msg, $nonce, $key);
+
+    # decryption
+    my $decrypted_msg = $crypto_stream->aes128ctr_xor($secret, $nonce, $key);
+
+Encrypts/decrypts the message using given C<$nonce> and C<$key>.
+
+The length of the C<$secret/$decrypted_msg> is equal to the length of
+C<$msg/$secret>.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 NONCEBYTES
+
+    my $nonce_length = $crypto_stream->NONCEBYTES;
+
+Returns the length of nonce used by L</XSalsa20> methods.
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_stream->KEYBYTES;
+
+Returns the length of key used by L</XSalsa20> methods.
+
+=head2 CHACHA20_NONCEBYTES
+
+    my $nonce_length = $crypto_stream->CHACHA20_NONCEBYTES;
+
+Returns the length of nonce used by L</ChaCha20> methods.
+
+=head2 CHACHA20_IETF_NONCEBYTES
+
+    my $nonce_length = $crypto_stream->CHACHA20_NONCEBYTES;
+
+Returns the length of nonce used by L</ChaCha20> methods.
+
+=head2 CHACHA20_KEYBYTES
+
+    my $key_length = $crypto_stream->CHACHA20_KEYBYTES;
+
+Returns the length of key used by L</ChaCha20> methods.
+
+=head2 SALSA20_NONCEBYTES
+
+    my $nonce_length = $crypto_stream->SALSA20_NONCEBYTES;
+
+Returns the length of nonce used by L</Salsa20> methods.
+
+=head2 SALSA20_KEYBYTES
+
+    my $key_length = $crypto_stream->SALSA20_KEYBYTES;
+
+Returns the length of key used by L</Salsa20> methods.
+
+=head2 AES128CTR_NONCEBYTES
+
+    my $nonce_length = $crypto_stream->AES128CTR_NONCEBYTES;
+
+Returns the length of nonce used by L</AES-128-CTR> methods.
+
+=head2 AES128CTR_KEYBYTES
+
+    my $key_length = $crypto_stream->AES128CTR_KEYBYTES;
+
+Returns the length of key used by L</AES-128-CTR> methods.
+
+=head1 SECURITY MODEL
+
+C<crypto_stream> stream ciphers, viewed as a functions of the nonce for a uniform
+random key, are designed to meet the standard notion of unpredictability.
+
+This means that an attacker cannot distinguish this function from a uniform
+random function. Consequently, if a series of messages is encrypted by
+C<*_xor()> methods with a different nonce for each message, the ciphertexts are
+indistinguishable from uniform random strings of the same length.
+
+C<crypto_stream> does not make any promises regarding the resistance to
+"related-key attacks". It is the caller's responsibility to use proper
+key-derivation functions.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Crypt::NaCl::Sodium::secretbox>
+
+=item * L<The security of the cipher block chaining message authentication code|http://cseweb.ucsd.edu/~mihir/papers/cbc.html>
+
+=item * L<Extending the Salsa20 nonce|http://cr.yp.to/snuffle/xsalsa-20110204.pdf>
+- the paper introducing XSalsa20
+
+=item * L<ChaCha, a variant of Salsa20|http://cr.yp.to/chacha/chacha-20080128.pdf>
+
+=item * L<ChaCha20 and Poly1305 for IETF Protocols|https://tools.ietf.org/html/rfc7539>
+
+=item * L<Faster and Timing-Attach Resistant AES-GCM|http://www.chesworkshop.org/ches2009/presentations/01_Session_1/CHES2009_ekasper.pdf>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

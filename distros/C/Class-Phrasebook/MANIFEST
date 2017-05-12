@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+Phrasebook.pm
+test.pl
+test.xml
+SQL/Changes
+SQL/MANIFEST
+SQL/Makefile.PL
+SQL/SQL.pm
+SQL/test.pl
+SQL/test.xml
+README
+TODO

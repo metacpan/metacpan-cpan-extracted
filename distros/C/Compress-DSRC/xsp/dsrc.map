@@ -1,0 +1,28 @@
+std::string*	T_STRINGPTR
+std::string	T_STRING
+dsrc::uint32	T_UV
+dsrc::uint64	T_UV
+
+INPUT
+
+T_STRING
+	$var = std::string(SvPV_nolen($arg))
+
+T_STRINGPTR
+	$var = new std::string(SvPV_nolen($arg))
+
+T_UV
+	 $var = ($type)SvUV($arg);
+	
+
+OUTPUT
+
+T_STRING
+	$arg = newSVpvn($var.c_str(), $var.length());
+
+T_STRINGPTR
+	$arg = newSVpvn($var->c_str(), $var->length());
+
+T_UV
+	sv_setuv_mg( $arg, (UV)$var );
+

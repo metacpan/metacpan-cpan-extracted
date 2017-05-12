@@ -1,0 +1,43 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::CBC;
+use MIME::Base64;
+
+sub get_input
+{
+    my ($message) = @_;
+    local $| = 1;
+    local *TTY;
+    open TTY,"/dev/tty";
+    my ($tkey1, $tkey2);
+    system "stty -echo </dev/tty";
+    do {
+        print STDERR "Enter $message: "; chomp($tkey1 = <TTY>);
+        print STDERR "\nRe-type $message: "; chomp($tkey2 = <TTY>);
+        print STDERR "\n";
+        print STDERR "\nThe two $message", "s don't match. ",
+            "Please try again.\n\n" unless $tkey1 eq $tkey2;
+    } until $tkey1 eq $tkey2;
+
+    system "stty echo </dev/tty";
+    close TTY;
+    return $tkey1;
+}
+
+my $key = &get_input("username");
+
+my $IV = pack "H32", "0123456789abcdef0123456789abcdef";
+my $cipher = Crypt::CBC->new({'key' => $key,
+                              'cipher' => 'TC18',
+                              'iv' => $IV,
+                              'regenerate_key' => 1,
+                              'padding' => 'standard',
+                              'prepend_iv' => 0
+                            });
+
+my $ciphertext = $cipher->encrypt($key);
+print "Your password is\n", encode_base64($ciphertext, ""), "\n";
+

@@ -1,0 +1,28 @@
+---
+abstract: 'escape continuations (returning higher up the stack)'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.27
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Continuation-Escape
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Scope::Upper: 0.06
+  perl: 5.8.0
+resources:
+  homepage: http://github.com/sartak/continuation-escape/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/continuation-escape.git
+version: 0.03

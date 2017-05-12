@@ -1,0 +1,31 @@
+Revision history for Catmandu-Inspire
+
+0.265  2014-08-11 10:57:24 CEST
+	- build process; cpanfile
+
+0.264  2014-07-28 09:31:56 CEST
+	- iterates over single records
+	- fix module removed; not needed
+	- tests
+	- pod
+
+0.263  2014-07-01 10:38:40 CEST
+	- compatible with new Moo version
+	- tests
+
+0.262  2014-05-06 07:52:39 CEST
+	- cpan, please index me
+
+0.261  2014-04-29 08:42:39 CEST
+	- test modified
+	- some cleanup
+
+0.26  2014-04-29 07:25:09 CEST
+	- use another XML parser, XML::LibXML::Simple
+
+v0.24  2014-01-27 14:38:56 CET
+	- more meta information
+
+v0.23  2013-12-18 17:13:59 CET
+	- Dist::Milla instead of Module::Build
+	- files cleanup

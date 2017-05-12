@@ -1,0 +1,7 @@
+Revision history for Perl extension Coro::DataPipe.
+
+0.02  Fri May 31
+    - fixed t/Coro-DataPipe.t to not use Data::Dump module
+    
+0.01  Tue May 28
+	- Coro::DataPipe::run implemented

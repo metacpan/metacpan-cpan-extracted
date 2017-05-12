@@ -1,0 +1,15 @@
+Revision history for CDR-Parser-SI3000
+
+0.03    2015-10-30 02:50
+        Parse loss records record
+        Fixed CLI parsing (uneven area code length)
+        Fixed typos
+        Thanks to Vladimir Melnikov for patch
+
+0.02    2014-01-31 00:15
+        Parse system reboot records
+        Require perl 5.10.0 to avoid failed tests
+
+0.01    2013-11-14/09:30
+        First version
+

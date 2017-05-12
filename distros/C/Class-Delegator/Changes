@@ -1,0 +1,52 @@
+Revision history for Perl extension Class::Delegator.
+
+0.09  2008-05-22T03:27:06
+      - Removed the spelling test from the distribution, since it can fail on
+        systems without a spell program or using a different locale.
+
+0.08  2008-05-15T03:36:19
+      - Fixed a Perl 5.5 test failure. I never should have been testing for
+        line number, anyway. The file name is enough.
+      - Added a spelling test. No more typos!
+
+0.07  2008-05-05T17:57:26
+      - Added the "configure_requires", and "recommends" parameters to
+        Build.PL.
+
+0.06  2006-01-02T18:28:48
+      - Fixed test failures on some platforms. It seems that how error line
+        numbers are determined can vary from Perl to Perl.
+
+0.05  2005-12-30T21:45:22
+      - Fixed a few more minor typos.
+      - Added #line comments to the generated delegation methods that point to
+        the context in which Class::Delegator was used. This makes debugging
+        easier, as any exceptions will have an appropriate file name and line
+        number rather than "at (eval 137) line 1". Patch from Sterling
+        Hanenkamp.
+      - Added meethod name information to the delegating methods, by assigning
+        the method name to *__ANON__.
+
+0.04  2005-11-02T03:04:23
+      - Minor documentation typo fix (cpan #12286).
+
+0.03  2005-04-13T18:22:10
+      - Added a word missing from an error message.
+      - Fixed a spelling error. Reported by Ramesh R.
+      - Fixed a warning in the tests.
+
+0.02  2005-01-29T20:36:34
+      - Added support for dispatching a single method call to multiple
+        attributes. The "as" parameter can be used to dispatch to different
+        methods in those multiple attributes. This brings things more in
+        line with how Class::Delegation works.
+      - Added a "Benchmarks" section to demonstrate the performance of
+        Class::Delegator vs. Class::Delegation and manually-generated
+        delegation methods.
+      - When specified as an array reference, the "as" parameter no longer
+        needs to contain the same number of items as the "send" parameter. But
+        it does need to be the same number of items as in the "to" parameter
+        when both "to" and "as" are array references.
+
+0.01  2005-01-28T00:02:09
+      - Initial public release.

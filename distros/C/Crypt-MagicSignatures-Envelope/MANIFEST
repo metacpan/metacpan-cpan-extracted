@@ -1,0 +1,14 @@
+lib/Crypt/MagicSignatures/Envelope.pm
+t/01-magicenvelope.t
+t/02-magicenvelope-2.t
+t/03-magicenvelope-3.t
+t/04-hjfreyer.t
+t/05-identica.t
+t/06-magicsig-spec.t
+t/07-minime.t
+Changes
+MANIFEST
+LICENSE
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

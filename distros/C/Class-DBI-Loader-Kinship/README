@@ -1,0 +1,46 @@
+NAME
+    Class::DBI::Loader::Kinship - Fixes to Class::DBI::Loader
+
+SYNOPSIS
+      use Class::DBI::Loader::Kinship;
+
+      my $l = new Class::DBI::Loader::Kinship  (
+                    dsn           =>  $ENV{ DBI_DSN  },
+                    user          =>  $ENV{ DBI_USER },
+                    password      =>  $ENV{ DBI_PASS },
+                    namespace     =>  'music',
+                    exclude       =>  '^pg_.*|sql_.*',
+      );
+
+      my @tables  = $l->tables;
+      my @classes = $l->classes;
+
+      print Dumper $l->kinships;
+      print Dumper $l->kinships('music::Cd');
+      print Dumper $l->kinships('music::Cd', 'has_a');
+      print Dumper $l->kinships('music::Cd', 'has_many');
+
+DESCRIPTION
+    A subclass of Class::DBI::Loader which introduces the 3rd argument to
+    has_many relations, adds support to schemas for Postgresql, and provides
+    a few additional fuctions. This package still dependends on its
+    subclass; and so far, I resisted to opt for cleaner code and fork my own
+    direction. The original Pg subclass is intentionally prevented from
+    loading so another can masquerade in its palace.
+
+  EXPORT
+    None by default.
+
+SEE ALSO
+    Class::DBI::Loader, Class::DBI::Loader::Pg.
+
+AUTHOR
+    Ioannis Tambouras, <ioannis@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Ioannis Tambouras
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,13 @@
+---
+version: 0.11
+date:    Mon Jul  3 11:56:25 PDT 2006
+changes:
+- Fix bug in SYNOPSIS
+- Change generated code
+- Add new tests
+
+---
+version: 0.10
+date:    Sun Jul  2 23:56:41 CDT 2006
+changes:
+- Maiden voyage

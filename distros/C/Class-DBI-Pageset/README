@@ -1,0 +1,140 @@
+NAME
+    Class::DBI::Pageset - A flexible pager utility for Class::DBI using
+    Data::Pageset
+
+SYNOPSIS
+      package CD;
+      use base qw(Class::DBI);
+      use Class::DBI::Pageset;        # just use it
+      __PACKAGE__->set_db(...);
+
+      # then, in client code!
+      package main;
+      use CD;
+      my $pager = CD->pager( {
+                entries_per_page => 20,
+                current_page     => 1,
+                pages_per_set    => 10,
+            } );
+      my @disks = $pager->retrieve_all;
+
+DESCRIPTION
+    "Class::DBI::Pageset" is a plugin for "Class::DBI" that integrates
+    "Data::Pageset" into "Class::DBI" with minimal fuss. This enables you to
+    search via "Class::DBI" and grouping results into pages and page sets.
+
+    This module is very similar to Tatsuhiko Miyagawa's very nice
+    "Class::DBI::Pager" module, but uses "Data::Pageset" (or any module that
+    inherits from "Data::Pageset", such as "Data::Pageset::Render") to
+    create the pager. "Data::Pageset" provides a more flexible pager, which
+    is better suited to searches that return many pages. This is not
+    necessarily very efficient (see "NOTE" below for more).
+
+EXAMPLE
+      # Controller: (MVC's C)
+      my $query    = CGI->new;
+      my $template = Template->new;
+
+      my $pager    = Film->pager({ 
+        entries_per_page => 20,
+        current_page     => $query->param('page') || 1,
+        pages_per_set    => 5, 
+      });
+      my $movies   = $pager->retrieve_all;
+      $template->process($input, {
+          movies => $movies,
+          pager  => $pager,
+      });
+
+      # View: (MVC's V)
+      Matched [% pager.total_entries %] items.
+
+      [% WHILE (movie = movies.next) %]
+      Title: [% movie.title | html %]
+      [% END %]
+
+      ### navigation like:   ... 5 [6] 7 8 9 ...
+      [% IF pager.previous_set %] 
+        <a href="display?page=[% pager.previous_set %]">...</a>
+      [% END %]
+      [% FOREACH num = [ pager.pages_in_set ] %]
+      [% IF num == pager.current_page %] [[% num %]]
+      [% ELSE %]<a href="display?page=[% num %]">[% num %]</a>[% END %]
+      [% END %]
+      [% IF pager.next_set %]
+        <a href="display?page=[% pager.next_set %]">...</a>
+      [% END %]
+
+    To use one of the modules that inherit from "Data::Pageset" (such as
+    "Data::Pageset::Render") just include the module name as part of the
+    "use" statement.
+
+        use Class::DBI::Pageset qw(Data::Pageset::Render);
+        ## Then in your code you can use
+        $pager->html( '<a href="index?page=%s">%a</a>' );
+
+METHODS
+    pager()
+            my $pager = Film->pager({ 
+                entries_per_page => 20,
+                current_page     => $query->param('page') || 1,
+                pages_per_set    => 5, 
+                mode             => 'slide',
+            });
+
+        This is the constructor for the pager. See "Data::Pageset" for more
+        on the parameters. The $pager object can then be used as a normal
+        "Class::DBI" object for searching.
+
+    total_entries()
+    entries_per_page()
+    current_page()
+    entries_on_this_page()
+    first_page()
+    last_page()
+    first()
+    last()
+    previous_page()
+    next_page()
+    pages_in_navigatio()
+    pages_per_set()
+    previous_set()
+    next_set()
+    pages_in_set()
+        See "Data::Pageset".
+
+NOTE
+    This modules internally retrieves itertors, then creates Data::Page
+    object for paging utility. Using SQL clauses LIMIT and/or OFFSET with
+    DBIx::Pager might be more memory efficient. As this module is geared to
+    searches that return many pages of results, it maybe more prone to
+    inefficiencies than "Class::DBI::Pager".
+
+    I had originally wanted to patch "Class::DBI::Pager" to use different
+    pagers, ie, "Data::Page", "Data::Pageset", or "Data::Pageset::Render",
+    but the constructors for "Data::Page" and "Data::Pageset" are
+    incompatible and jamming them together didn't seem like a good fix.
+
+SEE ALSO
+    "Class::DBI", "Data::Pageset"
+
+    Or for alternatives: "Class::DBI::Pager", "DBIx::Class",
+    "DBIx::Class::ResultSet::Data::Pageset"
+
+BUGS
+    Please report any bugs or suggestions at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-DBI-Pageset>
+
+AUTHOR
+    Mark Grimes <mgrimes@cpan.org>
+
+    Most of this code was shamelessly taken from the very nice
+    "Class::DBI::Pager" by Tatsuhiko Miyagawa <miyagawa@bulknews.net>.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by mgrimes
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

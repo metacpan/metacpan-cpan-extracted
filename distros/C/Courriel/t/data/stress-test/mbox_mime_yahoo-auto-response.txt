@@ -1,0 +1,88 @@
+From tomcat-user-return-112208-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Fri Oct 08 12:55:52 2004
+Return-Path: <tomcat-user-return-112208-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 59631 invoked from network); 8 Oct 2004 12:55:52 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur-2.apache.org with SMTP; 8 Oct 2004 12:55:52 -0000
+Received: (qmail 76191 invoked by uid 500); 8 Oct 2004 12:55:18 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 75989 invoked by uid 500); 8 Oct 2004 12:55:16 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 75967 invoked by uid 99); 8 Oct 2004 12:55:16 -0000
+X-ASF-Spam-Status: No, hits=2.2 required=10.0
+        tests=DNS_FROM_RFC_ABUSE,FORGED_YAHOO_RCVD,NO_REAL_NAME
+X-Spam-Check-By: apache.org
+Received-SPF: pass (hermes.apache.org: local policy)
+Received: from [66.163.174.143] (HELO mta115.mail.sc5.yahoo.com) (66.163.174.143)
+  by apache.org (qpsmtpd/0.28) with SMTP; Fri, 08 Oct 2004 05:55:15 -0700
+Date: Fri, 8 Oct 2004 05:55:13 -0700 (PDT)
+From: freetimeintomoney@yahoo.com
+Subject: Yahoo! Auto Response
+To: tomcat-user@jakarta.apache.org
+MIME-Version: 1.0
+Content-Type: text
+X-Virus-Checked: Checked
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+Hello Visitor,
+
+Thank you for your interest shown towards our work from HOME/CAFE
+(EARNING THROUGH INTERNET) opportunity.This is responce to your mail.
+PLZ visit our webpage for Details.
+
+http://freetime2money.cjb.net
+
+For more Details Call us at  0-9841243410 (between 7.00pm to 10.30 pm)
+
+--------------------
+
+
+Original Message:
+
+
+X-YahooFilteredBulk: 219.64.131.243
+X-Originating-IP: [219.64.131.243]
+Return-Path: <tomcat-user@jakarta.apache.org>
+Received: from 219.64.131.243  (EHLO yahoo.com) (219.64.131.243)
+  by mta115.mail.sc5.yahoo.com with SMTP; Fri, 08 Oct 2004 05:55:13 -0700
+From: tomcat-user@jakarta.apache.org
+To: freetimeintomoney@yahoo.com
+Subject: Re: Order
+Date: Fri, 8 Oct 2004 06:24:24 -0700
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0016----=_NextPart_000_0016"
+X-Priority: 3
+X-MSMail-Priority: Normal
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0016----=_NextPart_000_0016
+Content-Type: text/plain;
+        charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+
+Thank you for your request, your details are attached!
+
+++++ Attachment: No Virus found
+++++ Norman AntiVirus - www.norman.com
+
+
+------=_NextPart_000_0016----=_NextPart_000_0016
+Content-Type: application/octet-st
+_________________________________________________________
+DO YOU YAHOO!?
+Get your free @yahoo.com address at http://mail.yahoo.com
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

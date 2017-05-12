@@ -1,0 +1,28 @@
+DESCRIPTION
+
+    fish allows completion of option arguments to come from an external
+    command, e.g.:
+
+     % complete -c deluser -l user -d Username -a "(cat /etc/passwd|cut -d : -f 1)"
+
+    The command is supposed to return completion entries one in a separate
+    line. Description for each entry can be added, prefixed with a tab
+    character. The provided function format_completion() accept a
+    completion answer structure and format it for fish. Example:
+
+     format_completion(["a", "b", {word=>"c", description=>"Another letter"}])
+
+    will result in:
+
+     a
+     b
+     c       Another letter
+
+SEE ALSO
+
+    Complete
+
+    Complete::Bash
+
+    Fish manual.
+

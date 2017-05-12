@@ -1,0 +1,143 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c62455e2e96ead14c9d1de4b38ba432c374b4045 .git/COMMIT_EDITMSG
+SHA1 acbaef275e46a7f14c1ef456fff2c8bbe8c84724 .git/HEAD
+SHA1 b7fb54119ee089141f282733bbbefa489625fdf1 .git/config
+SHA1 6cac720d81346fff7a3c0e71e4526f56fb06d44a .git/description
+SHA1 66191780b4eee9988d48ef9aa8edfc48592c7064 .git/hooks/applypatch-msg
+SHA1 65690d5d38536bbe2a9eb45c152085082bd61f77 .git/hooks/commit-msg
+SHA1 4b679b9567b8b9cc7ec22c4bd4a5f37e9542275f .git/hooks/post-commit
+SHA1 19bb736c7d7171196dc31c5ab098516b1d56374a .git/hooks/post-receive
+SHA1 0dbfaf07552b6d7626a77e72a135e33f6857e745 .git/hooks/post-update
+SHA1 7c35f9a34986ed69f1622effa05ea9b2b4a6b9b4 .git/hooks/pre-applypatch
+SHA1 18249544683693ceab1811ce0e3a08bebc136534 .git/hooks/pre-commit
+SHA1 3a13ecfe08742c96cf0f2f1deb69a858ce5dcdac .git/hooks/pre-rebase
+SHA1 e0700f1acfb868914fb265dadbdee87e4920c729 .git/hooks/update
+SHA1 798978d305985811259e079740a3308e986bf893 .git/index
+SHA1 5e3d38e7f8fb75627adea1b5a35751ede67311a4 .git/info/exclude
+SHA1 0524057c4d0d98801f4742469c0d789a008e12f6 .git/logs/HEAD
+SHA1 aafd65dcd3da418d2369c8afbaf75afbdab0cb4c .git/logs/refs/heads/gh-pages
+SHA1 3a84302e5284015ae87e409159bc6b26b29ac9ee .git/logs/refs/heads/master
+SHA1 607e0a087ba536c26b1f17c2fa4cf71f4681994b .git/logs/refs/remotes/origin/gh-pages
+SHA1 05fa2e73405c842e1beccfd9eee4070ffcd7a448 .git/logs/refs/remotes/origin/master
+SHA1 b8392cc89e61aef73bb73b36041766f2de75a708 .git/objects/00/253305003bc1bb21c2d65de79c3eaceb583c2a
+SHA1 256af231790bc8f0d3c038631679d06c517195ad .git/objects/02/e1e2d9786af040d22aec26042916c92f568380
+SHA1 0e482a960592d6dddda4cced79fddbbec269bdac .git/objects/11/917b279ea3db197c281fb97cb7ccbebd7d26d0
+SHA1 0bbc2ccbb8b5e1dd59c0c642630d6691070efbeb .git/objects/16/e86468f8c64c3489dca04eb8a1005aeb0c1bbd
+SHA1 3616213df189cfc23289933327ae3db83cedd37b .git/objects/24/0d21884dded894d6c1e8a5ae0fe2c571161fcd
+SHA1 5ca18852b8217517fb177fdc4e8f421340688d61 .git/objects/24/8fc81bd8b3dae46bd23bf46bee47b799bf26d0
+SHA1 e5016825ca3fae7c6c7d57af1f719115c853ba1a .git/objects/2c/592319104b07b5963b72a695844267872f1577
+SHA1 95343f4c739fac45a76aa6f8232d1b9d551ded84 .git/objects/2c/dfcc45fa0ef6ec2095a910b2eb995cd055483d
+SHA1 0c692e89502dbb0c80ac0a7c6ccd8ccb3c1ec43c .git/objects/2d/7baea4c3ca6e64b362587b47e6717603cf5d84
+SHA1 fe8b48f8f9d8154da42264a630b75405c27f0d44 .git/objects/32/8dd9e992fa4fc4f3661e83944de21e8915caf5
+SHA1 544b0e21bc0da1c0fee26750c3c93a31cb3dc44f .git/objects/32/fbd427a5c0d3f01e1aa56b6db16294d3bcc389
+SHA1 c74fee1881cfd9488d5124d3b4301effc92092f5 .git/objects/3b/94f915737aba1f12a0f067fdba3726bfe02df5
+SHA1 c9b34487ec789c6f889ed2eca64fdac81919938f .git/objects/42/fe70c3ab7cf77e7e63251e10702aca38a234a8
+SHA1 60c403dce437b5a56ac02799faa921100ddb816e .git/objects/49/64fcebddca287c788fc4d410d93fe10e754055
+SHA1 99d03ec89c3f5acf31381ee1e556c495d5cc5a48 .git/objects/4d/fb8763875bc7635a4c962156265feb169a48fc
+SHA1 255a03d4e6c05f879179a29542aa731850066c8f .git/objects/54/1cbdf44fbbe3d56f86e1455b5d201807a333b8
+SHA1 7e39ece31dd43cfad7d2c7fa103476a6db92d840 .git/objects/5b/749fc1cd6b30aebfd8bf90c7a4a8e825410954
+SHA1 cc601f2694bf1ed289c70c42f6ce8dd321d2d2f3 .git/objects/60/ce607554d8a42d044a923fadb33cc43fee1de4
+SHA1 eb9631c67fb4b8c7d440fe3b403dbdf91132bd80 .git/objects/6d/5a86aab2d451b1d653602a94c857a93fc24a1d
+SHA1 7760465c673bc6bc6aa11d4959514b72a8345f7c .git/objects/72/c8ea2d2f30656605239edd209b9709167bf609
+SHA1 9354b748c64f25c99e948db669e9182a3c90e9e7 .git/objects/79/37131dcfcd5077a324fc2c6eb4d89050ba215c
+SHA1 40a1b462774eba3f66611c934adeee62c52661f2 .git/objects/7c/e5c0a4d736adf39bcaeaeaa0964898f2765524
+SHA1 e0f3424e171491707b4663de6d5e976d8b3a778e .git/objects/81/1ca9c47189185ed6a4a9863a47636166e1294e
+SHA1 f9e7324f3192e377c891cb5fc52797dd59b582a7 .git/objects/85/9c49174843587f7762da5138e18fc894d91787
+SHA1 c5906df554e6e5b09dd57924316544d991961f54 .git/objects/8f/7e658ba13fa31fbd29bb9184de51d567a7987a
+SHA1 20d9325277bc1935ce10c55682f4ef757b9d3330 .git/objects/97/db2772309afeb0fdef93b71a73e75c3109f160
+SHA1 e5120e4dc00a1ebb3635b618d750a9241787b8e5 .git/objects/9e/43294ac83e210e3cbacfc8fb3c5a2539b2bd2f
+SHA1 66635bc47cde571aaab7a622af93333ac5c38b6b .git/objects/a2/28d6e8b0fd3444447e99878a9335b30d811dfb
+SHA1 74296aa85d0d95b077b77b8a776e596c2098e6fb .git/objects/b2/ba9fdb428db5047ebe7b45c0eff1490dc496e1
+SHA1 4d28d5a2d7639da8dcf0c3562c953dc31255d24c .git/objects/b3/578ff979724110881a76f6f56aa194c3fe584e
+SHA1 7662893a26965362225bf0677532265c41f46380 .git/objects/b3/e54e8fb87690eb109f25f366537229e983aea4
+SHA1 eb6bf5d76b44c74fd5dfe340f141893bc8741665 .git/objects/bc/4ff543d510c9b1e1d5113a0e0049ff36b3e8e8
+SHA1 4e8011e19a79f0fc1b1eb31fd5288988dbfc7083 .git/objects/d6/ad5d5db58de849581bde8586beb32d46f10513
+SHA1 8d827570c1c80dc2d463f80531397095b0d3b798 .git/objects/d7/1aaee6663e73d5419fbdbb357e845979a1ab9c
+SHA1 2b3593f8c9cc33b362125f7614657dc3fd96c02a .git/objects/d8/3c027ec97b8ec8d44b7da5cee7c58b0b5fd3c0
+SHA1 69b529ae35e75b60a08ab251d5dcfb625a722991 .git/objects/f0/b472c18d2bb86c4efab39f3c746bbcf2064e36
+SHA1 14621fd3bf19285e2595c96f014ec9c2c470b1f9 .git/objects/f5/bd5eaa6fa5b6b165f962bd91276afca12f153e
+SHA1 f2a6ca6faba5e97c50be4fdb68bdef687873ef49 .git/objects/f6/fa85b0f83fd4a4ac01e019aa16e9574d0c9202
+SHA1 6b0d58ffe59539cd4f4d3d23f31e02aa43dd7d59 .git/objects/f7/bb6a21e8113bb7471b62e536b8a1826e93f691
+SHA1 6a4db00f1bf6333ed00abadc4eb30ce5770a4b43 .git/objects/pack/pack-acb2f699c75d052386c85e694b765e2df846530f.idx
+SHA1 db174c7691609f3357ed9c5492f83c19524d8d18 .git/objects/pack/pack-acb2f699c75d052386c85e694b765e2df846530f.keep
+SHA1 58d7fdc7f55e8ebcc2546002088884d0d5892c49 .git/objects/pack/pack-acb2f699c75d052386c85e694b765e2df846530f.pack
+SHA1 1b1f1595460e071e1254f56589cfa168c4437f6b .git/refs/heads/gh-pages
+SHA1 779e41adaccbe2d602ff88a78e9dc299eae31439 .git/refs/heads/master
+SHA1 d9427cda09aba1cdde5c69c2b13c905bddb0bc51 .git/refs/remotes/origin/HEAD
+SHA1 1b1f1595460e071e1254f56589cfa168c4437f6b .git/refs/remotes/origin/gh-pages
+SHA1 779e41adaccbe2d602ff88a78e9dc299eae31439 .git/refs/remotes/origin/master
+SHA1 779e41adaccbe2d602ff88a78e9dc299eae31439 .git/refs/tags/0.22
+SHA1 9be2487f76ce9cde4873ded37ddc9eed6a9a0751 .git/refs/tags/v0_20
+SHA1 b6741d480308cb6dc602c0e0768c4f16b7d94610 .git/refs/tags/v0_21
+SHA1 0a62df1226ba0ff2ab671b019f6146e66be32769 .gitignore
+SHA1 37287912e1d1f0ebd4507e9a4086018856d854c9 ChangeLog
+SHA1 c53557a77e848460f3a0a71cf6cb26f6784e6e51 ChangeLog.xml
+SHA1 86f637b47ac6a77078e28390d4d575300283fa18 MANIFEST
+SHA1 5082a3b5bf52ef7774f06c9984157729be1a44db META.yml
+SHA1 3ea4bf0c8c6fe27707bd7a7c4d38e9e94813b55f Makefile.PL
+SHA1 376db7f7da26cfa7512ce869689731a33d87cf21 README
+SHA1 085b98a14ae69751ff4d9113e4725185931faad2 README.textile
+SHA1 9b69288d758544300c30e055ed7afed1d9e4fa4b lib/Catalyst/Helper/Model/ISBNDB.pm
+SHA1 9f7de455cdaa2ad5780c3ee98ec7721a56b949df lib/Catalyst/Model/ISBNDB.pm
+SHA1 6c1a9e8e578b9674b5726b8018b5b01d335bf6f4 t/00_load.t
+SHA1 9f09733cd3cb1f3bd151637039e62fd4dcd8e844 t/01_pod.t
+SHA1 d495b5ef939096adae32c6f8705e76504a820c8d t/02_pod_coverage.t
+SHA1 84d4f71c70f1dd008cf1d280006c10037405fdfd t/03_meta.t
+SHA1 5bba71a1423280579ef47d22da2b01f3b599ce1f t/04_minimumversion.t
+SHA1 a37b65833b8bf151831eb2c98da9bb7665cb8689 t/05_critic.t
+SHA1 51c7be502c91c76e801255e4cc9a06db3a54006a t/10_basic.t
+SHA1 3651be6efde27a1911e628b126ba2ff5e1ae7abb t/DUMMY.pm
+SHA1 f46fa8a546971e389b622321c1baf44e2dd622fe t/xml/Authors-person_id=poe_edgar_allan.xml
+SHA1 b3b941de76391c526b5a29f7177bcf8ba19c9501 t/xml/Books-book_id=programming_web_services_with_perl.xml
+SHA1 b3b941de76391c526b5a29f7177bcf8ba19c9501 t/xml/Books-isbn=0596002068.xml
+SHA1 0d407d1f4dc6e0ceef43bae971f120aa9c3b8647 t/xml/Books-page_number=10-person_id=poe_edgar_allan.xml
+SHA1 38f07f915df7e4d76d39d593a15041cd3a21359f t/xml/Books-page_number=11-person_id=poe_edgar_allan.xml
+SHA1 8f7c09f432fc8a271263851fe9d25ab5d2008e74 t/xml/Books-page_number=12-person_id=poe_edgar_allan.xml
+SHA1 e68c03caeb05ca7dab8e75c65ddc41dea94e2724 t/xml/Books-page_number=13-person_id=poe_edgar_allan.xml
+SHA1 503dbfd2a81198202fe37f2c5dace994f04be2ef t/xml/Books-page_number=14-person_id=poe_edgar_allan.xml
+SHA1 497f3e10feaa5ee232149f673672961503b8642d t/xml/Books-page_number=15-person_id=poe_edgar_allan.xml
+SHA1 aaf834928da30f783cee74b4f1e618d8dbf132dd t/xml/Books-page_number=16-person_id=poe_edgar_allan.xml
+SHA1 0ed3f56dd12fe3ecc93872f638b2b0515f07d737 t/xml/Books-page_number=17-person_id=poe_edgar_allan.xml
+SHA1 df6f3aa06abcb88c2280592b54517dc02a023ba3 t/xml/Books-page_number=18-person_id=poe_edgar_allan.xml
+SHA1 5c9a072813f7dacd6c4273663c360bbd709c4463 t/xml/Books-page_number=19-person_id=poe_edgar_allan.xml
+SHA1 54d868b4af404332ec4dd83219e1d3bd941f573e t/xml/Books-page_number=2-person_id=poe_edgar_allan.xml
+SHA1 ad1297871c1fca89f6e26cbe7d26eacc04aeb1e6 t/xml/Books-page_number=20-person_id=poe_edgar_allan.xml
+SHA1 a5dd3f5a130ce736e789a52ddf61c685ad5fd1fc t/xml/Books-page_number=21-person_id=poe_edgar_allan.xml
+SHA1 881e7647f5845eef8d3e4f6b4b4e7595b34ebc80 t/xml/Books-page_number=22-person_id=poe_edgar_allan.xml
+SHA1 d488744dfa3ffa65cc2e19f0e6a089aa04a0de09 t/xml/Books-page_number=23-person_id=poe_edgar_allan.xml
+SHA1 122f84d33b2aa70cf40dc66c4acce0655e57c21f t/xml/Books-page_number=24-person_id=poe_edgar_allan.xml
+SHA1 61e65c93b5cc55123e3f2a60ed64668937b4049c t/xml/Books-page_number=25-person_id=poe_edgar_allan.xml
+SHA1 fd97600ab1399a3815439d95c518868bb7727540 t/xml/Books-page_number=26-person_id=poe_edgar_allan.xml
+SHA1 a82c3394aeb12a1b2e2d732dcc23acad6b3dd5df t/xml/Books-page_number=3-person_id=poe_edgar_allan.xml
+SHA1 9dd90d099cf43e2e7227edde38c12b2317757cb3 t/xml/Books-page_number=4-person_id=poe_edgar_allan.xml
+SHA1 a5f72cfbeff3a0c9def15b6ec4b0da619af503c1 t/xml/Books-page_number=5-person_id=poe_edgar_allan.xml
+SHA1 80501fe92c60fcff4669bdc26851d4338d6b0d05 t/xml/Books-page_number=6-person_id=poe_edgar_allan.xml
+SHA1 d4928d20a4fc7f82225ac9a0d35ba530803fb9b7 t/xml/Books-page_number=7-person_id=poe_edgar_allan.xml
+SHA1 81440a4dae640158d629f79794321bd6dde19b47 t/xml/Books-page_number=8-person_id=poe_edgar_allan.xml
+SHA1 c59ef0b6bf7a97d41527682952e47d675d18ad7c t/xml/Books-page_number=9-person_id=poe_edgar_allan.xml
+SHA1 4dd1daf4f97d24f649c6de3db490a5aa0aadd976 t/xml/Books-person_id=poe_edgar_allan.xml
+SHA1 f4c8029208f19859f287b109719efa1a5c70189e t/xml/Categories-category_id=science.xml
+SHA1 f6a59b98a34bac0bc4ca1c67c788fe2309eed381 t/xml/Publishers-publisher_id=oreilly.xml
+SHA1 05626c3f827f5f57998332c66b7e07a01f2d6fd3 t/xml/Subjects-subject_id=perl_computer_program_language.xml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkqKGOEACgkQ3Cp33jjp81X2JACfdQjIzw3l9sANwM9LYgulukcb
+94AAn12C9AZeLxoRIx6vDcC1VpNhc0Dc
+=Uv1w
+-----END PGP SIGNATURE-----

@@ -1,0 +1,43 @@
+CMD-Colors version 0.01
+=======================
+
+CMD::Colors - Generate Colorfull text on commandline
+
+This module provides functions for generating colorfull text on commandline with perl programs.  It can
+be used to make PERL "CMD" programs more interesting.
+
+*Cprint() function be used for all "print" calls.
+
+Techinal Details:: 
+This module uses "Linux" console escape and control sequences for generating colorfull
+text with background colors, It utilizes the "ECMA-48 SGR" sequenceof the SHELL to generate colored text.
+
+Example
+ use CMD::Colors;
+ Cprint('hello, This is RED text', 'red');
+
+Function Syntax
+Cprint("TEXT TO BE Printed", "ForegroundCOLORName", "BackgroundColorName", "TEXT Property"); 
+
+
+INSTALLATION
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Utsav Handa
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

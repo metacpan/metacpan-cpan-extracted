@@ -1,0 +1,30 @@
+---
+abstract: 'HTTP Proxy authentication'
+author:
+  - 'Marcus Ramberg <mramberg@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0
+  Test::MockObject: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Credential-HTTP-Proxy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Authentication::Credential::HTTP: 1.009
+  Catalyst::Plugin::Authentication: 0
+  Catalyst::Runtime: 0
+  LWP::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Authentication-Credential-HTTP-Proxy/1.000/trunk/
+version: 0.06

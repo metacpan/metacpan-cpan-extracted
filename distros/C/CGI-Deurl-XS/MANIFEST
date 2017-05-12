@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/CGI-Deurl-XS.t
+fallback/const-c.inc
+fallback/const-xs.inc
+XS.pm
+parser/Makefile.PL
+parser/parser.c
+parser/parser.h
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

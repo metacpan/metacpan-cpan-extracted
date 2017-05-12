@@ -1,0 +1,80 @@
+{
+   "abstract" : "Build Your Application Instance Programatically",
+   "author" : [
+      "Daisuke Maki C<< <daisuke@endeworks.jp> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-AppBuilder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.80024",
+            "Moose" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CatalystX::AppBuilder" : {
+         "file" : "lib/CatalystX/AppBuilder.pm",
+         "version" : "0.00011"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/colinnewell/CatalystX-AppBuilder/issues"
+      },
+      "homepage" : "https://github.com/colinnewell/CatalystX-AppBuilder",
+      "repository" : {
+         "url" : "git://github.com/colinnewell/CatalystX-AppBuilder.git",
+         "web" : "https://github.com/colinnewell/CatalystX-AppBuilder"
+      }
+   },
+   "version" : "0.00011",
+   "x_contributors" : [
+      "Colin Newell <colin.newell@gmail.com>",
+      "Colin Newell <colin@opusvl.com>",
+      "lestrrat <lestrrat+github@gmail.com>"
+   ]
+}

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution CSS-Selector-Parser,
+version 0.003:
+
+  parse CSS selectors to Perl data structures
+
+This software is copyright (c) 2011 by Hans Dieter Pearcey <hdp@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

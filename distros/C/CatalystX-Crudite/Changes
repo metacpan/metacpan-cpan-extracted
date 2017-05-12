@@ -1,0 +1,136 @@
+Revision history for Perl extension CatalystX-Crudite
+
+0.21  2014-01-16 17:55:14 CET
+    [Improvements]
+        - share/templates/crudite_config: Datatable columns whose title is the
+          empty string aren't searchable or sortable; use those for columns
+          with action buttons. You can have several of those; previously the
+          title had to be "Actions", which looks strange if you have several
+          such columns. And it's clear from the buttons in those columns that
+          they produce some sort of action.
+        - Also, datatable columns whose title is '*hidden' are hidden.
+
+0.20  2014-01-16 13:42:38 CET
+    [Improvements]
+        - In config_app(), the user can specify extra args for web libraries
+          such as specific versions.
+
+0.19  2013-08-04 19:09:39 CEST
+    [Improvements]
+        - Each table gets a uuid column that is automatically set on insert
+
+0.18  2013-08-04 13:38:40 CEST
+    [Improvements]
+        - Adapted for CatalystX::Resource 0.008001; require that version
+
+0.17  2013-08-04 11:41:34 CEST
+    [Improvements]
+        - specify encoding now that Catalyst::Plugin::Unicode::Encoding is core
+
+0.16 Sat May 18 12:08:57 2013 CEST
+    [Improvements]
+        - Give the user more freedom over his layout: The TT view doesn't
+          mandate wrapper.tt and the login form is rendered as a template as
+          well, so you need to provide your own login/login.tt
+
+0.15 Thu May  2 11:19:11 2013 CEST
+    [Improvements]
+        - Removed xt/ - this is taken care of by author-side perlcritic
+        - Removed client-side library; uses Web::Library now
+        - Added meta resources to Makefile.PL
+        - CatalystX::Crudite::View::TT: expose Web::Library to the templates as
+          'web_library'
+
+0.14 Mon Apr 22 14:58:36 2013 CEST
+    [New Features]
+        - CatalystX::Crudite::Form::Base gets is_create_mode() and
+          is_update_mode()
+        - added jQuery UI to the libaries maintained by CXC
+        - added Catalyst::ActionRole::RequireSameUser
+        - added CatalystX::Crudite::Util::Random
+
+0.13 Mon Apr 15 23:59:02 2013 CEST
+    [Bug Fixes]
+        - Adapt for CatalystX::Controller 0.006001
+
+0.12 Sat Mar 23 12:33:39 2013 CET
+    [Improvements]
+        - Submit button is now styled as a Bootstrap button
+
+0.11 Fri Feb 15 18:16:38 2013 CET
+    [New Features]
+        - added show_button() macro to template config
+
+    [Improvements]
+        - default resource controller trait also includes Show now
+
+0.10 Fri Feb 15 18:01:29 2013 CET
+    [Improvements]
+        - buttons that appear in datatables are now btn-mini to save space
+
+0.09 Fri Feb 15 14:09:43 2013 CET
+    [New Features]
+        - config_resource_controller() accepts a 'traits' arg, which
+          overrides the default traits.
+
+0.08 Thu Feb 14 17:52:37 2013 CET
+    [Improvements]
+        - ActionRole Code can now handle a list of coderefs;
+          ::Controller::Resource stashes the context for forms
+        - more robust deploy script in starter template
+        - updated JS libraries to: Bootstrap 2.3.0; jQuery 1.9.1 and DataTables
+          1.9.4
+
+0.07 Fri Jan 25 11:13:14 2013 CET
+    [New Features]
+        - added Form::Base->submit_button
+        - added share/starter/script/myapp_set_password.pl
+        - added (very basic) CatalystX::Crudite::Manual::Cookbook
+
+    [Improvements]
+        - documentation improvements
+
+0.06 Wed Jan 23 16:33:49 2013 CET
+    [New Features]
+        - added CatalystX::Crudite::Test
+
+    [Improvements]
+        - added a few lines of documentation
+        - added README.md
+
+    [Bug Fixes]
+        - install_shared_files(): handle dist names like 'Foo-Bar' or
+          'Foo::Bar' correctly
+        - the starter now uses the right required CXC version number in the
+          generated Makefile.PL
+
+0.05 Mon Jan 21 16:27:23 2013 CET
+    [New Features]
+        - added resource create script
+
+    [Improvements]
+        - starter classes refactored
+        - "make install" uninstalls existing share dir
+
+    [Bug Fixes]
+        - various bugfixes
+
+0.04 Sun Jan 20 14:53:44 2013 CET
+    [New Features]
+        - added project starter generator and templates
+
+    [Bug Fixes]
+        - various bugfixes
+
+0.03 Sat Jan 19 19:06:17 2013 CET
+    [Improvements]
+        - reorganized share/static
+        - merging configs is now more flexible
+
+0.02 Sat Jan 19 11:24:13 2013 CET
+    [Improvements]
+        - first working version
+
+0.01 Sat Jan 19 10:42:14 2013 CET
+    [New Features]
+        - original version

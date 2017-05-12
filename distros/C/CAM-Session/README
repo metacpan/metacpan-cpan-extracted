@@ -1,0 +1,51 @@
+CAM::Session - DBI and cookie CGI session state maintenance
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module implements CGI session state via a MySQL database.  If you
+are just starting out, we recomment CGI::Session instead of this
+module.
+
+The Perl modules that CAM::Session most closely resemble are
+CGI::Session and Apache::Session.  It's main advantages over those
+module are:
+
+ * Simplicity - there's almost nothing to configure
+ * Compatibility with CAM::App and CAM::UserApp
+
+It's disadvantages are:
+
+ * Flexibility of the datastore - CAM::Session supports only MySQL
+ * Some features, like distinguishing access time from creation time
+ * CGI::Session is very popular

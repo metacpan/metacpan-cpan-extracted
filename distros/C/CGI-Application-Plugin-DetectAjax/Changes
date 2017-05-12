@@ -1,0 +1,9 @@
+0.02 Don't depend on CGI::* modules. We check for the header ourselfs.
+
+0.03 Remove no longer needed dependencies from Build.PL
+
+0.04 Fixes a typo in POD.
+
+0.05 Remove unused dependencies on Test::MockObject, Test::MockObject::Extends and UNIVERSAL::require.
+
+0.06 Fixes a wrong module name in POD.

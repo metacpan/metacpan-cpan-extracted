@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               CGI-Application-Structured
+version:            0.007
+abstract:           A web application framework.
+author:
+    - Gordon Van Amburg (vanamburg@cpan.org)
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::Application:     4
+    CGI::Application::Dispatch:  0
+    CGI::Application::Plugin::AutoRunmode:  0
+    CGI::Application::Plugin::ConfigAuto:  0
+    CGI::Application::Plugin::DBH:  0
+    CGI::Application::Plugin::DBIC::Schema:  0
+    CGI::Application::Plugin::DebugScreen:  0
+    CGI::Application::Plugin::FillInForm:  0
+    CGI::Application::Plugin::Forward:  0
+    CGI::Application::Plugin::LogDispatch:  0
+    CGI::Application::Plugin::Redirect:  0
+    CGI::Application::Plugin::Session:  0
+    CGI::Application::Plugin::SuperForm:  0
+    CGI::Application::Plugin::TT:  0
+    CGI::Application::Plugin::ValidateRM:  0
+    CGI::Application::Server:  0
+    Test::Simple:         0.44
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

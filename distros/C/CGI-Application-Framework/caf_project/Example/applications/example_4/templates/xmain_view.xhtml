@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns:tal="http://purl.org/petal/1.0/">
+  <head>
+    <title>Web MVC Framework Example Application #4 -- Main View</title>
+  </head>
+
+  <body>
+    <h1>Web MVC Framework Example Application #4 -- Main View</h1>
+    <h2>Petal Version</h2>
+
+<pre>
+<span metal:use-macro="README-petal.txt">
+    README.txt
+</span>
+</pre>
+
+<p align="center">
+  <table border="5" bgcolor="#40c040">
+    <tr>
+      <td align="center" valign="middle">
+        <p>
+         <a href="#nowhere" tal:attributes="href SELF_HREF_LINK">
+<b>Click me to reload this page...</b>
+          </a>
+        </p>
+      </td>
+    </tr>
+  </table>
+</p>
+
+<p>
+The purpose of this example application is to demonstrate the use of the
+"CGIAPP/embed 'some_run_mode'" expression within Petal templates,
+which are used to display the content of one run mode within another run
+mode. Inspect this source .html file to see how "CGIAPP/embed
+'some_run_mode'" is used.
+</p>
+
+<p>
+<b>Number of times you have loaded this page:</b>
+<span tal:replace="load_count">load_count</span>
+</p>
+
+1.
+<hr />
+
+<span tal:replace="structure CGIAPP/embed 'outer_component'">outer component goes here</span>
+<hr />
+
+2.
+<hr />
+
+<span tal:replace="structure CGIAPP/embed 'outer_component'">outer component goes here</span>
+
+<hr />
+
+<p>
+<b>Number of times you have loaded this page:</b>
+<span tal:replace="load_count">load_count</span>
+</p>
+  </body>
+</html>
+
+
+

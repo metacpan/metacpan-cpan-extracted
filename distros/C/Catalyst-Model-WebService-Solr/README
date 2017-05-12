@@ -1,0 +1,50 @@
+NAME
+    Catalyst::Model::WebService::Solr - Use WebService::Solr in your
+    Catalyst application
+
+SYNOPSIS
+        package MyApp::Model::Solr;
+    
+        use Moose;
+        use namespace::autoclean;
+    
+        extends 'Catalyst::Model::WebService::Solr';
+    
+        __PACKAGE__->config(
+            server  => 'http://localhost:8080/solr/',
+            options => {
+                autocommit => 1,
+            }
+        );
+
+DESCRIPTION
+    This module helps you use remote indexes via WebService::Solr in your
+    Catalyst application.
+
+METHODS
+  solr( )
+    This is the WebService::Solr instance to which all methods are
+    delegated.
+
+        # delegates to solr->search behind the scenes
+        my $response = $c->model('Solr')->search( $q );
+
+SEE ALSO
+    *   Catalyst
+
+    *   WebService::Solr
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+CONTRIBUTORS
+    Matt S. Trout <mst@shadowcatsystems.co.uk>
+
+    Oleg Kostyuk <cub@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2008-2010 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

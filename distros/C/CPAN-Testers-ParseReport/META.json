@@ -1,0 +1,80 @@
+{
+   "abstract" : "parse reports to www.cpantesters.org from various sources",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2101, CPAN::Meta::Converter version 2.150009",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Testers-ParseReport",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Converter" : "2.110440",
+            "CPAN::Meta::YAML" : "0.018",
+            "Class::ISA" : "0",
+            "Compress::Zlib" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::Path" : "1.08",
+            "File::Spec" : "3.63",
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "Hash::Util" : "0",
+            "IO::Prompt" : "0.997003",
+            "JSON::PP" : "2.27300",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "MIME::QuotedPrint" : "3.07",
+            "Parse::CPAN::Meta" : "2.150009",
+            "Pod::Usage" : "1.33",
+            "Statistics::Regression" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Time::Local" : "1.11",
+            "perl" : "5.008",
+            "version" : "0.9916"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Testers::ParseReport" : {
+         "file" : "lib/CPAN/Testers/ParseReport.pm",
+         "version" : "v0.4.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://repo.or.cz/cpan-testers-parsereport.git"
+      }
+   },
+   "version" : "0.4.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,46 @@
+Convert-ASN1-asn1c version 0.04
+===============================
+
+This module let's you encode/decode BER encoded ASN.1 PDUs via the asn1c tools
+enber/unber. The key difference to the Convert::ASN1 module on CPAN is that it
+doesn't require (and can not make use of) the ASN.1 specification for the PDUs
+you want to de/encode.
+
+Please see the module documentation (perldoc Convert::ASN1::asn1c) for more
+information on how this module is used.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires the following perl modules available on CPAN:
+
+   Test::More
+   Carp
+   File::Slurp
+   IPC::Run
+   File::Which
+   FindBin
+   ExtUtils::MakeMaker
+
+This module uses the binaries "enber" and "unber" which are distributed with
+"Open Source ASN.1 Compiler" asn1c, available from http://lionet.info/asn1c/ or
+directly from your linux distro, i.e. apt-get install asn1c on debian. These
+executables have to be in your $PATH for this module to find them!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Timo Schneider
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

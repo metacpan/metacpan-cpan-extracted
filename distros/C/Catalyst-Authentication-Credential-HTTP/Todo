@@ -1,0 +1,7 @@
+. Split auth headers / do auth methods again, and make authenticate call each in turn.
+. Test 'algorithm' config / MD5-sess properly.
+. Full implementation of MD5-sess with remote authentication service.
+. Domain option should be able to be passed as config.
+. Support for NTLM auth?
+. Config verification / validation on construction.
+. Test all config parameters (esp username_field)

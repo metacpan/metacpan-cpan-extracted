@@ -1,0 +1,28 @@
+---
+name: CGI-Application-Plugin-Config-General
+version: 0.08
+author:
+  - 'Michael Graham <mgraham@cpan.org>'
+abstract: Add Config::General Support to CGI::Application
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Application: 0
+  Config::General::Match: 0
+  Scalar::Util: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  CGI::Application::Plugin::Config::General:
+    file: lib/CGI/Application/Plugin/Config/General.pm
+    version: 0.08
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+no_index:
+  directory:
+    - misc
+    - t

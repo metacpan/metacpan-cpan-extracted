@@ -1,0 +1,18 @@
+Config::Record - Simple configuration records
+---------------------------------------------
+
+Config::Record provides a module for loading configuration
+records. It supports scalar, array and hash parameters nested
+to an arbitrary depth.
+
+See the manual page for Config::Record for details and 
+example usage.
+
+Feedback, bug reports, patches
+------------------------------
+
+Please send patches in unified diff format to:
+
+	Daniel Berrange <dan@berrange.com>
+
+-- End

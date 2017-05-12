@@ -1,0 +1,8 @@
+Revision history for Catalyst-View-Vega
+
+0.02  2016-06-02 21:23:35 PDT
+    [Tests]
+        - Don't rely on Catalyst 5.90094's last_error method
+
+0.01  2016-05-31 17:08:05 PDT
+        - Initial release

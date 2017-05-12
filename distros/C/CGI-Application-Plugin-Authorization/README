@@ -1,0 +1,44 @@
+CGI::Application::Plugin::Authorization
+
+adds the ability to authorize users for specific tasks in your
+CGI::Application modules.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, if you do not have Module::Build but you do have 'make',
+you can used the included Makefile.PL and run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+CGI::Application
+Class::ISA
+UNIVERSAL::require
+
+
+BUILD DEPENDENCIES
+
+Test::More
+Test::Exception
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, SiteSuite
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

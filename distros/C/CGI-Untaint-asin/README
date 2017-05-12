@@ -1,0 +1,35 @@
+NAME
+    CGI::Untaint::asin - validate an Amazon ID
+
+SYNOPSIS
+      use CGI::Untaint;
+      my $handler = CGI::Untaint->new($q->Vars);
+
+      my $url = $handler->extract( -as_asin => 'id' );
+
+DESCRIPTION
+    This CGI::Untaint input handler verifies that it is dealing with a
+    plausible Amazon ID (asin). It does not (yet?) check that this is a
+    *real* asin, just that it looks like one.
+
+SEE ALSO
+    CGI::Untaint
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-CGI-Untaint-asin@rt.cpan.org
+
+COPYRIGHT
+      Copyright (C) 2004-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

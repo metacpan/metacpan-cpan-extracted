@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+t/basic.t
+t/pod.t
+Build.PL
+Makefile.PL
+lib/CGI/Application/Plugin/ErrorPage.pm
+META.yml

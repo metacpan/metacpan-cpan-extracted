@@ -1,0 +1,4 @@
+# dist,version,author,filename,released - epoch,released - YMD
+[% FOREACH row = rows %][% row.dist %],[% row.version %],[% row.author %],[% row.filename %],[% row.released %],[% row.datetime %]
+
+[% END %]

@@ -1,0 +1,4 @@
+This directory contains some minimal examples of how to use
+ClearCase::CtCmd. The func*.pl scripts show how to use the functional
+interface, oo*.pl are examples of the OO interface, and ccargv*.pl
+illustrates ways to indirect through ClearCase::Argv.

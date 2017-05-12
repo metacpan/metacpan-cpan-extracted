@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd8c
+registers:
+  AF: 14393
+  AF_: 0
+  BC: 17073
+  BC_: 0
+  DE: 24202
+  DE_: 0
+  HL: 2076
+  HL_: 0
+  I: 0
+  IX: 52056
+  IY: 15182
+  PC: 2
+  R: 2
+  SP: 0

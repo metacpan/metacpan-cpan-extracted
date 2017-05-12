@@ -1,0 +1,20 @@
+0.06
+        - Fix dependencies in Makefile.PL
+
+0.05
+        - Port to new session config key.
+        - Port to Moose.
+
+0.04
+        - Switch to Module::Install.
+        - Avoid test suite warnings with Catalyst 5.80
+
+0.03
+        - Fix tests to work with tightened up $c->model in 5.71
+        - Switch from NEXT to MRO::Compat for method redispatch
+
+0.02
+        - Internal API refactorings
+
+0.01
+        - Initial release

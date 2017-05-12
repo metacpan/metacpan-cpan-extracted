@@ -1,0 +1,62 @@
+Convert::IBM390 -- functions for manipulating mainframe data
+
+
+How to Install
+==============
+
+This distribution includes two versions of the code: Perl-only and
+Perl with XS and C.  Ordinarily, you will probably want to install the
+latter (with XS), since the functions are written in C and run quite
+a bit faster.  You, however, may prefer the Perl version -- if, for
+instance, you do not have access to the C compiler that was used to
+build Perl, or if you just prefer to have pure Perl code in your
+libraries.
+
+If you want the Perl/XS version, begin thus:
+	perl Makefile.PL
+If you want the Perl-only version, begin thus:
+	perl Makefile.PL noxs
+
+The complete shtick:
+
+	perl Makefile.PL [noxs]
+	make
+	make test
+	make install
+
+If your C compiler defaults to signed rather than unsigned char (many
+do), you may see some warnings about type mismatches, although I believe
+I have corrected all such problems.  Anyhow, the mismatches are
+harmless.  As long as the C code compiles correctly, the module should
+work.
+
+If you have to build the module a second (third, fourth, ...) time, run
+"make clean" before running the above commands.
+
+
+Debugging Option
+================
+
+This module should work on most platforms, but if you have trouble with
+it (during "make test", for instance), you can compile the Perl/XS
+version with a debugging flag.  This will produce a number of messages
+in stderr at run time.
+
+The Perl-only version ignores this flag, but you can run it with the
+standard Perl debugger (-d) if you wish.
+
+Note the following lines in Makefile.PL:
+      'DEFINE'	=> $p_define,
+  #    'DEFINE'	=> "$p_define -DDEBUG390",   # if debugging is desired
+
+To enable debugging, just comment out the first line (add a '#' to the
+front) and uncomment the second line (delete the first '#').  Then
+rebuild the module, starting with "make clean".  E-mail me if you need
+help interpreting the debugging output.
+
+Be sure to rebuild *WITHOUT* debugging before installing the module for
+general use.
+
+
+Geoffrey Rommel
+August 1999

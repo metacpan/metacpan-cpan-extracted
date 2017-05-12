@@ -1,0 +1,56 @@
+{
+   "abstract" : "create a minimal CPAN mirror from a list of modules you specify",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Mini-FromList",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Mini" : 0,
+            "Data::Dumper" : 0,
+            "File::Find::Rule" : 0,
+            "File::Spec::Functions" : 0,
+            "Getopt::Long" : 0,
+            "Pod::Usage" : 0,
+            "base" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sjn/CPAN-Mini-FromList.git",
+         "web" : "http://github.com/sjn/CPAN-Mini-FromList"
+      }
+   },
+   "version" : "0.05"
+}
+

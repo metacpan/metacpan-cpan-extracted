@@ -1,0 +1,11 @@
+Changes
+lib/Crypt/RC4/XS.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/00-crypt-rc4.t
+t/01-test-vector.t
+typemap
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,30 @@
+0.07 08 Jul 2010
+        - Adapt the plugin for Catalyst 5.8
+        - use MRO::Compat and adapt all calls
+        - Fix test suite
+        - The attributes for path and compiled changed in Cat 5.8 
+          in the base classes
+        - leftover keys in write_result_to_response where making all
+          requests die
+0.06 11 Mar 2009
+        - replaced 'parent' with 'base' for Catalyst::View::JSONRPC
+0.05  Sun Mar  1 16:40:00 2009
+        - "seperator" renamed to "separator"
+        - config object creation moved to setup instead of setup_engine
+          so now it reads config from the myapp.conf
+        - jsonrpc_client binary fixed
+
+0.04  Sun Mar  1 16:40:00 2009
+        - META.yaml fixed
+
+0.03  Sun Mar  1 16:30:00 2009
+        - 005_lisMethods.t test added
+        - system.listMethods request fixed
+        - code uploaded to google.code
+
+0.02  Fri Feb  14 06:30:00 2009
+        - Catalyst::View::JSONRPC now render JSON reponse insted of finalize
+
+0.01  Fri Feb  13 12:00:00 2009
+        - Initial release just copied from XMLRPC
+

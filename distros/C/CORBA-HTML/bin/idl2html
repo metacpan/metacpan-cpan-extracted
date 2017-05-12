@@ -1,0 +1,222 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use CORBA::IDL      2.60;
+use CORBA::HTML;
+# visitors
+use CORBA::IDL::RepositoryIdVisitor;
+
+our $global;
+unless (do 'index.lst') {
+    $global->{index_module} = {};
+    $global->{index_interface} = {};
+    $global->{index_value} = {};
+    $global->{index_entry} = {};
+}
+
+my $parser = CORBA::IDL::ParserFactory::create('3.0');
+$parser->getopts('fhi:o:s:t:vx');
+if ($parser->YYData->{opt_v}) {
+    print "CORBA::HTML $CORBA::HTML::VERSION\n";
+    print "CORBA::IDL $CORBA::IDL::VERSION\n";
+    print "IDL $CORBA::IDL::Parser::IDL_VERSION\n";
+    print "$0\n";
+    print "Perl $] on $^O\n";
+    exit;
+}
+if ($parser->YYData->{opt_h}) {
+    use Pod::Usage;
+    pod2usage(-verbose => 1);
+}
+
+my $cflags = '-D__idl2html';
+if ($CORBA::IDL::Parser::IDL_VERSION lt '3.0') {
+    $cflags .= ' -D_PRE_3_0_COMPILER_';
+}
+# preprocessor must preserve comments
+my $preprocessor;
+if ($^O eq 'MSWin32') {
+    $preprocessor = 'cpp -C ' . $cflags;
+#    $preprocessor = 'CL /E /C /nologo ' . $cflags;      # Microsoft VC
+}
+else {
+    $preprocessor = 'cpp -C ' . $cflags;
+}
+$parser->Configure(
+        'preprocessor'          => $preprocessor,
+        'verbose_error'         => 1,   # 0, 1
+        'verbose_warning'       => 1,   # 0, 1
+        'verbose_info'          => 1,   # 0, 1
+        'verbose_deprecated'    => 1,   # 0, 1 (concerns only version '2.4' and upper)
+#        'collision_allowed'     => 1,
+);
+$parser->Run(@ARGV);
+$parser->DisplayStatus();
+my $root = $parser->getRoot();
+if (defined $root) {
+    $root->visit(new CORBA::IDL::RepositoryIdVisitor($parser));
+    if ($parser->YYData->{opt_x}) {
+        $parser->Export();
+    }
+    $root->visit(new CORBA::HTML::IndexVisitor($parser));
+    $root->visit(new CORBA::HTML::HtmlVisitor($parser));
+}
+
+if (open my $PERSISTANCE, '>', 'index.lst') {
+    print $PERSISTANCE Data::Dumper->Dump([$global], [qw(global)]);
+    close $PERSISTANCE;
+}
+else {
+    warn "can't open index.lst.\n";
+}
+
+__END__
+
+=head1 NAME
+
+idl2html - Generates HTML documentation from IDL source files.
+
+=head1 SYNOPSIS
+
+idl2html [options] I<spec>.idl
+
+=head1 OPTIONS
+
+All options are forwarded to C preprocessor, except -f -h -i -o -s -t -v -x.
+
+With the GNU C Compatible Compiler Processor, useful options are :
+
+=over 8
+
+=item B<-D> I<name>
+
+=item B<-D> I<name>=I<definition>
+
+=item B<-I> I<directory>
+
+=item B<-I->
+
+=item B<-nostdinc>
+
+=back
+
+Specific options :
+
+=over 8
+
+=item B<-f>
+
+Enable the frameset mode.
+
+=item B<-h>
+
+Display help.
+
+=item B<-i> I<directory>
+
+Specify a path for import (only for version 3.0).
+
+=item B<-o> I<file>
+
+Specificy the outfile for HTML Help (default "htmlhelp").
+
+=item B<-s> I<style>
+
+Generate an external Cascading Style Sheet file.
+
+=item B<-t> I<title>
+
+Specificy the title of HTML Help.
+
+=item B<-v>
+
+Display version.
+
+=item B<-x>
+
+Enable export (only for version 3.0).
+
+=back
+
+=head1 DESCRIPTION
+
+B<idl2html> parses the declarations and doc comments in a IDL source file and
+formats these into a set of HTML pages.
+B<idl2html> generates some helper files for HTML Help compiler.
+
+B<idl2html> works like B<javadoc>.
+
+Within doc comments, B<idl2html> supports the use of special doc tags to
+augment the documentation. B<idl2html> also supports standard HTML within doc
+comments. This is useful for formatting text.
+
+B<idl2html> reformats and displays declaration for:
+
+=over 8
+
+=item Modules, interfaces and value types
+
+=item Operations (with parameters) and attributes
+
+=item Types (typedef, enum, struct, union with members)
+
+=item Exceptions (with members)
+
+=item Constants
+
+=item Pragma (ID, version as tag)
+
+=back
+
+=head2 Doc Comments
+
+IDL source files can include doc comments. Doc comments begin  with /** and
+indicate text to be included automatically in generated documentation.
+
+Doc comments immediately preceed the entity being documented.
+
+Single line comments beginning with /// are also included.
+
+=head2 Standard HTML
+
+You can embed standard HTML tags within a doc comment. However, don't use tags
+heading tags like E<lt>h1E<gt> or E<lt>hrE<gt>. B<idl2html> creates an entire
+structured document and these structural tags interfere with formatting of
+the generated document.
+
+=head2 idl2html Tags
+
+B<idl2html> parses special tags that are recognized when they are embedded
+within an IDL doc comment. These doc tags enable you to autogenerate a
+complete, well-formatted document from your source code. The tags start with
+an @.
+
+Tags must start at the beginning of a line.
+
+=head1 SPECIAL REQUIREMENTS
+
+B<idl2html> needs a B<cpp> executable or B<CL.EXE> for Microsoft Windows.
+
+CORBA Specifications, including IDL (Interface Definition Language)
+ are available on E<lt>http://www.omg.org/E<gt>.
+
+=head1 SEE ALSO
+
+cpp, javadoc
+
+=head1 COPYRIGHT
+
+(c) 2001-2007 Francois PERRAD, France. All rights reserved.
+
+This program and all CORBA::HTML modules are distributed
+under the terms of the Artistic Licence.
+
+=head1 AUTHOR
+
+Francois PERRAD, francois.perrad@gadz.org
+
+=cut
+

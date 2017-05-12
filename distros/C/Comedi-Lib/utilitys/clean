@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Part of Comedi::Lib
+#
+# Copyright (c) 2009 Manuel Gebele <forensixs@gmx.de>, Germany
+#
+make clean && rm Makefile.old

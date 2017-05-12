@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+    <meta name="generator" content="./benchmark.pl"/>
+    <title>Benchmark Results (Thu Nov 27 15:46:11 2003) by decrypted bytes</title>    
+	<style type="text/css">
+body {
+        font-family: Monospace;
+}
+td {
+	text-align: right;
+    padding-left: 1em;
+    padding-right: 3pt;
+}
+th {
+	text-align: left;
+    padding-left: 1em;
+    padding-right: 3pt;
+    background-color: #d0c4b6;
+}
+.name {
+	text-align: left;
+	background-color: #fffff2;
+}
+th.name {
+	text-align: left;
+    font-weight: bold;
+	background-color: #d0c4b6;
+}
+.other {
+	background-color: #fffff2;
+}
+.twofish {
+        background-color: #eee2d4;
+}
+.twofish_name {
+        text-align: left;
+        background-color: #eee2d4;
+}
+    </style>
+  </head>
+  <body>
+    <a name="top"><!-- --></a>
+    <h1>Benchmark Results (Thu Nov 27 15:46:11 2003)</h1>
+    <h2>Sorted by decrypted bytes, time per test: 2 s</h2>
+    <table border="1" summary="Benchmark">
+      <tbody>
+        <tr>
+          <th rowspan="2" colspan="2" class="name">
+	        <a href="benchmark.html">Module</a>
+          </th>
+          <th rowspan="2" class="name">
+            Language<super>[<a href="#lang">1</a>]</super>
+          </th>
+          <th rowspan="2">
+	        <a href="benchmark_by_blksize.html">Blocksize</a>
+          </th>
+          <th rowspan="2">
+	        <a href="benchmark_by_keysize.html">Keysize</a>
+          </th>
+          <th colspan="2">Keys/s<super>[<a href="#keys">2</a>]</super></th>
+          <th colspan="2">Encrypt</th>
+          <th colspan="2">Decrypt</th>
+        </tr>
+        <tr>
+          <th>
+            <a href="benchmark_by_ekeys.html">encrypt</a>
+          </th>
+          <th>
+            <a href="benchmark_by_dkeys.html">decrypt</a>
+          </th>
+          <th>
+            <a href="benchmark_by_ebytes.html">bytes/s</a>
+          </th>
+          <th>
+            <a href="benchmark_by_eblocks.html">blocks/s</a>
+          </th>
+          <th>
+            <a href="benchmark_by_dbytes.html">bytes/s</a>
+          </th>
+          <th>
+            <a href="benchmark_by_dblocks.html">blocks/s</a>
+          </th>
+        </tr>
+        <tr>
+            <td class="other">1</td>
+			<td class="name">NULL v1.02</td>
+            <td class="other">Perl</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">66059.45</td>
+			<td class="other">66030.88</td>
+			<td class="other">3283622.22</td>
+			<td class="other">205226.39</td>
+			<td class="other">3351598.17</td>
+			<td class="other">209474.89</td>
+        </tr>
+        <tr>
+            <td class="other">2</td>
+			<td class="name">Anubis v1.0.4</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">27700.00</td>
+			<td class="other">27807.39</td>
+			<td class="other">1565010.33</td>
+			<td class="other">97813.15</td>
+			<td class="other">1610372.95</td>
+			<td class="other">100648.31</td>
+        </tr>
+        <tr>
+            <td class="other">3</td>
+			<td class="name">Square v1.0.0</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">38004.00</td>
+			<td class="other">37488.13</td>
+			<td class="other">1526143.40</td>
+			<td class="other">95383.96</td>
+			<td class="other">1534710.90</td>
+			<td class="other">95919.43</td>
+        </tr>
+        <tr>
+            <td class="other">4</td>
+			<td class="name">Twofish2 v0.06</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">17767.73</td>
+			<td class="other">17607.00</td>
+			<td class="other">1587372.55</td>
+			<td class="other">99210.78</td>
+			<td class="other">1534710.90</td>
+			<td class="other">95919.43</td>
+        </tr>
+        <tr>
+            <td class="other">5</td>
+			<td class="name">Twofish2 v0.06</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">32</td>
+			<td class="other">13156.73</td>
+			<td class="other">13093.78</td>
+			<td class="other">1578961.54</td>
+			<td class="other">98685.10</td>
+			<td class="other">1529115.60</td>
+			<td class="other">95569.72</td>
+        </tr>
+        <tr>
+            <td class="other">6</td>
+			<td class="name">Twofish2 v0.06</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">24</td>
+			<td class="other">14444.83</td>
+			<td class="other">14554.50</td>
+			<td class="other">1602630.77</td>
+			<td class="other">100164.42</td>
+			<td class="other">1527464.15</td>
+			<td class="other">95466.51</td>
+        </tr>
+        <tr>
+            <td class="other">7</td>
+			<td class="name">Rijndael v0.04</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">11329.76</td>
+			<td class="other">11289.11</td>
+			<td class="other">1499185.19</td>
+			<td class="other">93699.07</td>
+			<td class="other">1479243.78</td>
+			<td class="other">92452.74</td>
+        </tr>
+        <tr>
+            <td class="other">8</td>
+			<td class="name">Rijndael v0.04</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">24</td>
+			<td class="other">9753.00</td>
+			<td class="other">9799.04</td>
+			<td class="other">1436611.76</td>
+			<td class="other">89788.24</td>
+			<td class="other">1436367.15</td>
+			<td class="other">89772.95</td>
+        </tr>
+        <tr>
+            <td class="other">9</td>
+			<td class="name">Rijndael v0.04</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">32</td>
+			<td class="other">8532.86</td>
+			<td class="other">8618.36</td>
+			<td class="other">1375909.86</td>
+			<td class="other">85994.37</td>
+			<td class="other">1375909.86</td>
+			<td class="other">85994.37</td>
+        </tr>
+        <tr>
+            <td class="other">10</td>
+			<td class="name">Rainbow v1.0.0</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">381.43</td>
+			<td class="other">380.73</td>
+			<td class="other">1316776.24</td>
+			<td class="other">82298.51</td>
+			<td class="other">1323307.69</td>
+			<td class="other">82706.73</td>
+        </tr>
+        <tr>
+            <td class="other">11</td>
+			<td class="name">Serpent v1.01</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">24</td>
+			<td class="other">14912.14</td>
+			<td class="other">14912.14</td>
+			<td class="other">1236409.95</td>
+			<td class="other">77275.62</td>
+			<td class="other">1292251.64</td>
+			<td class="other">80765.73</td>
+        </tr>
+        <tr>
+            <td class="other">12</td>
+			<td class="name">Serpent v1.01</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">32</td>
+			<td class="other">13220.29</td>
+			<td class="other">13220.29</td>
+			<td class="other">1251116.19</td>
+			<td class="other">78194.76</td>
+			<td class="other">1287921.57</td>
+			<td class="other">80495.10</td>
+        </tr>
+        <tr>
+            <td class="other">13</td>
+			<td class="name">Serpent v1.01</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">17225.48</td>
+			<td class="other">17143.06</td>
+			<td class="other">1245194.31</td>
+			<td class="other">77824.64</td>
+			<td class="other">1285011.76</td>
+			<td class="other">80313.24</td>
+        </tr>
+        <tr>
+            <td class="other">14</td>
+			<td class="name">Twofish v2.12</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">32</td>
+			<td class="other">7937.86</td>
+			<td class="other">7899.52</td>
+			<td class="other">1256560.00</td>
+			<td class="other">78535.00</td>
+			<td class="other">1233494.84</td>
+			<td class="other">77093.43</td>
+        </tr>
+        <tr>
+            <td class="other">15</td>
+			<td class="name">Twofish v2.12</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">24</td>
+			<td class="other">9130.37</td>
+			<td class="other">9098.05</td>
+			<td class="other">1236520.75</td>
+			<td class="other">77282.55</td>
+			<td class="other">1227738.32</td>
+			<td class="other">76733.64</td>
+        </tr>
+        <tr>
+            <td class="other">16</td>
+			<td class="name">Twofish v2.12</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">11120.39</td>
+			<td class="other">11013.46</td>
+			<td class="other">1245194.31</td>
+			<td class="other">77824.64</td>
+			<td class="other">1225912.20</td>
+			<td class="other">76619.51</td>
+        </tr>
+        <tr>
+            <td class="other">17</td>
+			<td class="name">Noekeon v1.0.2</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">32440.38</td>
+			<td class="other">32160.65</td>
+			<td class="other">1225912.20</td>
+			<td class="other">76619.51</td>
+			<td class="other">1208803.86</td>
+			<td class="other">75550.24</td>
+        </tr>
+        <tr>
+            <td class="other">18</td>
+			<td class="name">Loki97 v1.0.1</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">15827.75</td>
+			<td class="other">15677.73</td>
+			<td class="other">1176599.01</td>
+			<td class="other">73537.44</td>
+			<td class="other">1159464.08</td>
+			<td class="other">72466.50</td>
+        </tr>
+        <tr>
+            <td class="other">19</td>
+			<td class="name">CAST5 v0.03</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">5</td>
+			<td class="other">36367.44</td>
+			<td class="other">35882.21</td>
+			<td class="other">903921.18</td>
+			<td class="other">112990.15</td>
+			<td class="other">947030.19</td>
+			<td class="other">118378.77</td>
+        </tr>
+        <tr>
+            <td class="other">20</td>
+			<td class="name">CAST5 v0.03</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">36585.78</td>
+			<td class="other">36537.38</td>
+			<td class="other">912911.44</td>
+			<td class="other">114113.93</td>
+			<td class="other">942621.60</td>
+			<td class="other">117827.70</td>
+        </tr>
+        <tr>
+            <td class="other">21</td>
+			<td class="name">Khazad v1.0.3</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">36882.08</td>
+			<td class="other">37773.13</td>
+			<td class="other">819200.00</td>
+			<td class="other">102400.00</td>
+			<td class="other">912849.29</td>
+			<td class="other">114106.16</td>
+        </tr>
+        <tr>
+            <td class="other">22</td>
+			<td class="name">CAST5 v0.03</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">36585.78</td>
+			<td class="other">36536.92</td>
+			<td class="other">877967.46</td>
+			<td class="other">109745.93</td>
+			<td class="other">908392.08</td>
+			<td class="other">113549.01</td>
+        </tr>
+        <tr>
+            <td class="other">23</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">40</td>
+			<td class="other">1720.67</td>
+			<td class="other">1712.62</td>
+			<td class="other">873790.48</td>
+			<td class="other">109223.81</td>
+			<td class="other">886450.24</td>
+			<td class="other">110806.28</td>
+        </tr>
+        <tr>
+            <td class="other">24</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">32</td>
+			<td class="other">1715.96</td>
+			<td class="other">1715.98</td>
+			<td class="other">877967.46</td>
+			<td class="other">109745.93</td>
+			<td class="other">877971.29</td>
+			<td class="other">109746.41</td>
+        </tr>
+        <tr>
+            <td class="other">25</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">56</td>
+			<td class="other">1715.96</td>
+			<td class="other">1712.62</td>
+			<td class="other">882192.31</td>
+			<td class="other">110274.04</td>
+			<td class="other">877967.46</td>
+			<td class="other">109745.93</td>
+        </tr>
+        <tr>
+            <td class="other">26</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">48</td>
+			<td class="other">1715.96</td>
+			<td class="other">1715.96</td>
+			<td class="other">883861.03</td>
+			<td class="other">110482.63</td>
+			<td class="other">873786.67</td>
+			<td class="other">109223.33</td>
+        </tr>
+        <tr>
+            <td class="other">27</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">24</td>
+			<td class="other">1715.98</td>
+			<td class="other">1720.67</td>
+			<td class="other">875776.00</td>
+			<td class="other">109472.00</td>
+			<td class="other">873786.67</td>
+			<td class="other">109223.33</td>
+        </tr>
+        <tr>
+            <td class="other">28</td>
+			<td class="name">DES v2.03</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">25653.00</td>
+			<td class="other">25717.70</td>
+			<td class="other">893634.29</td>
+			<td class="other">111704.29</td>
+			<td class="other">865547.17</td>
+			<td class="other">108193.40</td>
+        </tr>
+        <tr>
+            <td class="other">29</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">1725.37</td>
+			<td class="other">1725.37</td>
+			<td class="other">875776.00</td>
+			<td class="other">109472.00</td>
+			<td class="other">865543.40</td>
+			<td class="other">108192.92</td>
+        </tr>
+        <tr>
+            <td class="other">30</td>
+			<td class="name">Blowfish v2.09</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">1720.66</td>
+			<td class="other">1715.96</td>
+			<td class="other">862833.50</td>
+			<td class="other">107854.19</td>
+			<td class="other">858980.00</td>
+			<td class="other">107372.50</td>
+        </tr>
+        <tr>
+            <td class="other">31</td>
+			<td class="name">Camellia v1.0.2</td>
+            <td class="other">C</td>
+			<td class="other">16</td>
+			<td class="other">16</td>
+			<td class="other">25044.55</td>
+			<td class="other">25154.90</td>
+			<td class="other">853425.12</td>
+			<td class="other">53339.07</td>
+			<td class="other">846121.74</td>
+			<td class="other">52882.61</td>
+        </tr>
+        <tr>
+            <td class="other">32</td>
+			<td class="name">IDEA v?</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">27970.73</td>
+			<td class="other">18438.21</td>
+			<td class="other">827073.08</td>
+			<td class="other">103384.13</td>
+			<td class="other">750252.43</td>
+			<td class="other">93781.55</td>
+        </tr>
+        <tr>
+            <td class="other">33</td>
+			<td class="name">Skipjack v1.0.2</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">10</td>
+			<td class="other">26352.45</td>
+			<td class="other">26352.45</td>
+			<td class="other">733116.00</td>
+			<td class="other">91639.50</td>
+			<td class="other">732334.98</td>
+			<td class="other">91541.87</td>
+        </tr>
+        <tr>
+            <td class="other">34</td>
+			<td class="name">Misty1 v1.1.3</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">35805.47</td>
+			<td class="other">35762.75</td>
+			<td class="other">658488.04</td>
+			<td class="other">82311.00</td>
+			<td class="other">664854.11</td>
+			<td class="other">83106.76</td>
+        </tr>
+        <tr>
+            <td class="other">35</td>
+			<td class="name">GOST v1.00</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">32</td>
+			<td class="other">23863.21</td>
+			<td class="other">23788.18</td>
+			<td class="other">643960.78</td>
+			<td class="other">80495.10</td>
+			<td class="other">643960.78</td>
+			<td class="other">80495.10</td>
+        </tr>
+        <tr>
+            <td class="other">36</td>
+			<td class="name">TEA v1.25</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">29512.75</td>
+			<td class="other">29394.74</td>
+			<td class="other">647133.00</td>
+			<td class="other">80891.63</td>
+			<td class="other">640746.41</td>
+			<td class="other">80093.30</td>
+        </tr>
+        <tr>
+            <td class="other">37</td>
+			<td class="name">Shark v1.0.1</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">21.76</td>
+			<td class="other">21.76</td>
+			<td class="other">746134.56</td>
+			<td class="other">93266.82</td>
+			<td class="other">400515.12</td>
+			<td class="other">50064.39</td>
+        </tr>
+        <tr>
+            <td class="other">38</td>
+			<td class="name">DES_EEE3 v0.01</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">24</td>
+			<td class="other">6400.00</td>
+			<td class="other">6369.19</td>
+			<td class="other">224438.36</td>
+			<td class="other">28054.79</td>
+			<td class="other">228190.65</td>
+			<td class="other">28523.83</td>
+        </tr>
+        <tr>
+            <td class="other">39</td>
+			<td class="name">DES_EDE3 v0.01</td>
+            <td class="other">C</td>
+			<td class="other">8</td>
+			<td class="other">24</td>
+			<td class="other">6364.93</td>
+			<td class="other">6369.67</td>
+			<td class="other">223761.95</td>
+			<td class="other">27970.24</td>
+			<td class="other">223765.85</td>
+			<td class="other">27970.73</td>
+        </tr>
+        <tr>
+            <td class="other">40</td>
+			<td class="name">CAST5_PP v1.02</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">5</td>
+			<td class="other">230.73</td>
+			<td class="other">224.64</td>
+			<td class="other">108184.91</td>
+			<td class="other">13523.11</td>
+			<td class="other">107680.75</td>
+			<td class="other">13460.09</td>
+        </tr>
+        <tr>
+            <td class="other">41</td>
+			<td class="name">CAST5_PP v1.02</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">223.83</td>
+			<td class="other">219.18</td>
+			<td class="other">103536.45</td>
+			<td class="other">12942.06</td>
+			<td class="other">104750.24</td>
+			<td class="other">13093.78</td>
+        </tr>
+        <tr>
+            <td class="other">42</td>
+			<td class="name">CAST5_PP v1.02</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">175.98</td>
+			<td class="other">171.77</td>
+			<td class="other">81900.95</td>
+			<td class="other">10237.62</td>
+			<td class="other">81128.30</td>
+			<td class="other">10141.04</td>
+        </tr>
+        <tr>
+            <td class="twofish">43</td>
+			<td class="twofish_name">Twofish_PP v0.16</td>
+            <td class="twofish">Perl</td>
+			<td class="twofish">16</td>
+			<td class="twofish">32</td>
+			<td class="twofish">218.81</td>
+			<td class="twofish">218.14</td>
+			<td class="twofish">73382.16</td>
+			<td class="twofish">4586.38</td>
+			<td class="twofish">71730.77</td>
+			<td class="twofish">4483.17</td>
+        </tr>
+        <tr>
+            <td class="twofish">44</td>
+			<td class="twofish_name">Twofish_PP v0.16</td>
+            <td class="twofish">Perl</td>
+			<td class="twofish">16</td>
+			<td class="twofish">16</td>
+			<td class="twofish">313.24</td>
+			<td class="twofish">313.55</td>
+			<td class="twofish">74085.31</td>
+			<td class="twofish">4630.33</td>
+			<td class="twofish">71706.42</td>
+			<td class="twofish">4481.65</td>
+        </tr>
+        <tr>
+            <td class="twofish">45</td>
+			<td class="twofish_name">Twofish_PP v0.16</td>
+            <td class="twofish">Perl</td>
+			<td class="twofish">16</td>
+			<td class="twofish">24</td>
+			<td class="twofish">263.51</td>
+			<td class="twofish">259.26</td>
+			<td class="twofish">72706.98</td>
+			<td class="twofish">4544.19</td>
+			<td class="twofish">70725.79</td>
+			<td class="twofish">4420.36</td>
+        </tr>
+        <tr>
+            <td class="other">46</td>
+			<td class="name">DES_PP v1.00</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">1649.77</td>
+			<td class="other">1657.41</td>
+			<td class="other">33933.65</td>
+			<td class="other">4241.71</td>
+			<td class="other">33755.66</td>
+			<td class="other">4219.46</td>
+        </tr>
+        <tr>
+            <td class="other">47</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">8</td>
+			<td class="other">4.43</td>
+			<td class="other">4.46</td>
+			<td class="other">14759.02</td>
+			<td class="other">1844.88</td>
+			<td class="other">14652.43</td>
+			<td class="other">1831.55</td>
+        </tr>
+        <tr>
+            <td class="other">48</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">48</td>
+			<td class="other">4.43</td>
+			<td class="other">4.43</td>
+			<td class="other">14736.45</td>
+			<td class="other">1842.06</td>
+			<td class="other">14616.43</td>
+			<td class="other">1827.05</td>
+        </tr>
+        <tr>
+            <td class="other">49</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">56</td>
+			<td class="other">4.43</td>
+			<td class="other">4.43</td>
+			<td class="other">14759.02</td>
+			<td class="other">1844.88</td>
+			<td class="other">14600.00</td>
+			<td class="other">1825.00</td>
+        </tr>
+        <tr>
+            <td class="other">50</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">40</td>
+			<td class="other">4.43</td>
+			<td class="other">4.43</td>
+			<td class="other">14698.56</td>
+			<td class="other">1837.32</td>
+			<td class="other">14600.00</td>
+			<td class="other">1825.00</td>
+        </tr>
+        <tr>
+            <td class="other">51</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">24</td>
+			<td class="other">4.43</td>
+			<td class="other">4.43</td>
+			<td class="other">14658.18</td>
+			<td class="other">1832.27</td>
+			<td class="other">14600.00</td>
+			<td class="other">1825.00</td>
+        </tr>
+        <tr>
+            <td class="other">52</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">16</td>
+			<td class="other">4.43</td>
+			<td class="other">4.43</td>
+			<td class="other">14796.08</td>
+			<td class="other">1849.51</td>
+			<td class="other">14600.00</td>
+			<td class="other">1825.00</td>
+        </tr>
+        <tr>
+            <td class="other">53</td>
+			<td class="name">Blowfish_PP v1.12</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">32</td>
+			<td class="other">4.41</td>
+			<td class="other">4.43</td>
+			<td class="other">14831.37</td>
+			<td class="other">1853.92</td>
+			<td class="other">14591.86</td>
+			<td class="other">1823.98</td>
+        </tr>
+        <tr>
+            <td class="other">54</td>
+			<td class="name">GOST_PP v1.10</td>
+            <td class="other">Perl</td>
+			<td class="other">8</td>
+			<td class="other">32</td>
+			<td class="other">541.40</td>
+			<td class="other">541.40</td>
+			<td class="other">10517.97</td>
+			<td class="other">1314.75</td>
+			<td class="other">10517.97</td>
+			<td class="other">1314.75</td>
+        </tr>
+        <tr>
+            <td class="other">55</td>
+			<td class="name">Rijndael_PP v0.04</td>
+            <td class="other">Perl</td>
+			<td class="other">16</td>
+			<td class="other">32</td>
+			<td class="other">69.63</td>
+			<td class="other">63.21</td>
+			<td class="other">1777.78</td>
+			<td class="other">111.11</td>
+			<td class="other">1536.95</td>
+			<td class="other">96.06</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr />
+<p>
+Remarks:<br />
+<dl>
+<dt><a name="lang">[1]</a></dt>
+<dd>Some modules, like Crypt::DES_EEE3 or Crypt::DES_EDE3 are actually
+pure Perl modules but are implemented as a wrapper around XS modules.
+These are still listed here as implemented in C.
+<a href="#top">back</a></dd>
+
+<dt><a name="keys">[2]</a></dt>
+<dd>One test cycle for key generation actually consists of a constructor
+call followed by one encryption resp. decryption operation, since a module
+may decide to postpone the key scheduling until the direction is fixed.
+The number is therefore an indicator for the encryption/decryption 
+performance for small chunks of data.
+<a href="#top">back</a></dd>
+</p>
+  </body>
+</html>

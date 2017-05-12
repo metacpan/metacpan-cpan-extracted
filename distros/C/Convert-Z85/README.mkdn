@@ -1,0 +1,57 @@
+# NAME
+
+Convert::Z85 - Encode and decode Z85 strings
+
+# SYNOPSIS
+
+    use Convert::Z85;
+
+    my $encoded = encode_z85($binarydata);
+    my $decoded = decode_z85($encoded);
+
+# DESCRIPTION
+
+An implementation of the _Z85_ encoding scheme (as described in
+[ZeroMQ spec 32](http://rfc.zeromq.org/spec:32)) for encoding binary data as
+plain text.
+
+Modelled on the [PyZMQ](http://zeromq.github.io/pyzmq/) implementation.
+
+This module uses [Exporter::Tiny](https://metacpan.org/pod/Exporter::Tiny) to export two functions by default:
+["encode\_z85"](#encode_z85) and ["decode\_z85"](#decode_z85).
+
+## encode\_z85
+
+    my $z85 = encode_z85($data);
+
+Takes binary data in 4-byte chunks and returns a Z85-encoded text string.
+
+Per the spec, padding is not performed automatically; the **pad** option can be
+specified to pad data with trailing zero bytes:
+
+    my $z85 = encode_z85($data, pad => 1);
+
+## decode\_z85
+
+    my $bin = decode_z85($encoded);
+
+Takes a Z85 text string and returns the original binary data.
+
+Dies (with a stack trace) if invalid data is encountered.
+
+Padding (see ["encode\_z85"](#encode_z85)) is not handled automatically; the **pad** option
+can be specified to remove trailing zero bytes:
+
+    my $bin = decode_z85($encoded, pad => 1);
+
+# SEE ALSO
+
+[Convert::Ascii85](https://metacpan.org/pod/Convert::Ascii85)
+
+[POEx::ZMQ](https://metacpan.org/pod/POEx::ZMQ)
+
+[ZMQ::FFI](https://metacpan.org/pod/ZMQ::FFI)
+
+# AUTHOR
+
+Jon Portnoy &lt;avenj@cobaltirc.org>

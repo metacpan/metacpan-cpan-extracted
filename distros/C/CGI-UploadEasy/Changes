@@ -1,0 +1,14 @@
+Version history for CGI::UploadEasy.
+
+v1.00 (February 1, 2009)
+    otherparam() changed to also return parameters whose values are
+    an empty string.
+
+    Some minor code fixes.
+
+v0.11 (April 2, 2005)
+    Fixed bug in the otherparam() method.
+
+v0.10 (Mar 31, 2005)
+    Initial release.
+

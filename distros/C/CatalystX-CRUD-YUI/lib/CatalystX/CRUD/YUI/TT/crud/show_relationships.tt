@@ -1,0 +1,15 @@
+[% PROCESS crud/filter_relationships.tt %]
+
+<div id="relTabs">
+[% FOREACH r IN RelsToShow;
+    r.livegrid.counter = loop.index;
+%]
+ <div class="hidden" title="[% r.thisLabel %]" id="[% r.tabLabel %]Tab" >
+  [% PROCESS crud/livegrid_related_js.tt %]  
+ </div><!-- end [% r.method %] Tab[% loop.index %] -->
+[% END;  # FOREACH r %]
+</div><!-- end relTabs -->
+
+[% # after all rels done so page size is calculated correctly
+   #INSERT 'crud/add_row_panel.tt';  # TODO livegrid
+%]

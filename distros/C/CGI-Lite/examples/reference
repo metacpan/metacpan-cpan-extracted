@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+# Simple example that performs the same function as the
+# print_data method.
+
+use strict;
+use warnings;
+use CGI::Lite;
+
+my $cgi = CGI::Lite->new;
+
+# The return value is stored in $data, which contains a
+# reference to the hash. In order to access an element, you 
+# have to dereference it:
+#
+#     $data->{readme}
+#     $$data{readme}
+#     %$data
+
+my $data = $cgi->parse_form_data;
+
+print "Content-type: text/plain", "\n\n";
+
+while (my ($key, $value) = each %$data) {
+    print "$key = $value\n";
+}
+
+exit;

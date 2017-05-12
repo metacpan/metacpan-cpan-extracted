@@ -1,0 +1,135 @@
+# NAME
+
+Catalyst::TraitFor::Model::DBIC::Schema::Result - PerRequest Result from Catalyst Request
+
+# SYNOPSIS
+
+In your configuration, set the trait:
+
+    MyApp->config(
+      'Model::Schema' => {
+        traits => ['Result'],
+        schema_class => 'MyApp::Schema',
+        connect_info => [ ... ],
+      },
+    );
+
+Now in your actions you can call the generated models, which get their ->find($id) from
+$c->request->args.
+
+    sub user :Local Args(1) {
+      my ($self, $c) = @_;
+      my $user = $c->model('Schema::User::Result');
+    }
+
+You can also control how the 'find' on the Resultset works via an action attribute
+('ResultModelFrom') or via arguments passed to the 'model' call.
+
+# DESCRIPTION
+
+Its a common case to get the result of a [DBIx::Class](https://metacpan.org/pod/DBIx::Class) '->find' based on the current
+[Catalyst](https://metacpan.org/pod/Catalyst) request (typically from the Args attribute).  This is an experimental trait
+to see if we can usefully encapsulate that common task in a way that is not easily broken.
+
+If you can't read the source code and figure out what is going on, might want to stay
+away for now!
+
+When you compose this trait into your MyApp::Model::Schema (subclass of
+[Catalyst::Model::DBIC::Schema](https://metacpan.org/pod/Catalyst::Model::DBIC::Schema)) it automatically creates a second PerRequest model
+for each ResultSource in your Schema.  This new Model is named by taking the name
+of the resultsource (for example 'Schema::User') and adding '::Result' to it (or
+in the example case 'Schema::User::Result').  When you request an instance of this
+model, it will automatically assume the first argument of the current action is intended
+to be the index by which the ->find locates your database row.  So basically the two
+following actions are the same in effect:
+
+With trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c) = @_;
+      my $user = $c->model('Schema::User::Result');
+    }
+
+Without trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c, $id) = @_;
+      my $user = $c->model('Schema::User')->find($id);
+    }
+
+I recommend that if you can use [Catalyst](https://metacpan.org/pod/Catalyst) 5.9009x+ that you use a type constraint
+to make sure the argument is the correct type (otherwise you risk generating a
+database error if the user tries to submit a string arg and the database is expecting
+an integer:
+
+    use Types::Standard 'Int';
+
+    sub user :Local Args(Int) {
+      my ($self, $c) = @_;
+      my $user = $c->model('Schema::User::Result');
+    }
+
+# SUBROUTINE ATTRIBUTES
+
+For the case when a result is complex (requires more than one argument) or you 
+want to use a key other then the PK, you may add a subroutine argument to describe
+the pattern:
+
+    sub user_with_attr :Local Args(1) ResultModelFrom(first_name=>$args[0]) {
+      my ($self, $c) = @_;
+    }
+
+This is experimental and may change as needed.  Basically this get converted
+to a hashref and submitted to ->find.
+
+# Passing arguments to ->model
+
+Lastly, you may passing arguments to find via the ->model call.  The following
+are examples
+
+With trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c) = @_;
+      my $user = $c->model('Schema::User::Result', $some_other_id);
+    }
+
+Without trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c, $id) = @_;
+      my $user = $c->model('Schema::User')->find($some_other_id);
+    }
+
+With trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c) = @_;
+      my $user = $c->model('Schema::User::Result', +{first_name=>'john'});
+    }
+
+Without trait:
+
+    sub user :Local Args(1) {
+      my ($self, $c, $id) = @_;
+      my $user = $c->model('Schema::User')->find({first_name=>'john'});
+    }
+
+If you choose to pass arguments this way, each call will 'reset' the current
+model (changing PerRequest into a Factory type).  This behavior is still
+subject to change).
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Model::DBIC::Schema](https://metacpan.org/pod/Catalyst::Model::DBIC::Schema).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

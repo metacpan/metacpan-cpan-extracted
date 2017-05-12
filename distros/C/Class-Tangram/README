@@ -1,0 +1,120 @@
+Class::Tangram version 1.57
+===========================
+
+Class::Tangram serves to provide a base class for objects well suited
+for storage into a Tangram SQL storage.
+
+In some ways, it is similar to Class::Contract or Class::MethodMaker -
+in that you define attributes for your class, and the module uses
+those definitions to create what are known as ``accessor'' methods -
+simply speaking, if you define class `Cheese' to have a `holes'
+attribute, then you will get two functions - `Cheese->get_holes()' and
+`Cheese->set_holes($x)'.  Also, there is a `Cheese->holes()' function
+that behaves like a get or a set, depending on how it is called.  DWIM
+is the motto.
+
+However, it allows finer-grained specification of the types of
+attributes than those other classes.  Currently the granularity is
+geared towards the assumption that you're using the SQL Tangram
+storage back-end - Tangram 2.
+
+It should be stressed that storing Class::Tangram objects in a Tangram
+storage, or ensuring that your classes in a Tangram storage are all
+derived from Class::Tangram is not required.
+
+This seperation is what makes Tangram what is known as ``orthogonal'',
+and why you can run Tangram 2 side by side with other mapping tools.
+
+If you want to know what the hell I'm rabbitting on about, first go to
+the Tangram web site at http://www.tangram-persistence.org/, and read
+the "Guided Tour" of Tangram.  It doesn't take long, and will vastly
+assist `Aha!' moments whilst reading the Class::Tangram manual page.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   su root -c "make install"
+
+DEPENDENCIES
+
+This module requires Set::Object 1.04 or higher.  You may also want to
+install Tangram 2.03 or later.  Realistically, you'll want the latest
+version of Tangram - 2.07 or later is recommended.
+
+Test::Simple 0.18 and Date::Manip 0.32 are also required to run the
+test suite.
+
+UPGRADING FROM 1.13
+
+The large change in the version number represents a substantial
+enhancement to the way `collection' attributes (ref, set, array, hash)
+are treated.  See `perldoc lib/Class/Tangram/Containers.pod` for more
+information.  If you only ever use the get_* methods for these types
+of attributes in scalar context, this will not affect you.
+
+Another important change is that `intermediate' classes are now
+inserted into the inheritance tree.  Writers of ambitious code should
+be careful not to call Class::Tangram::import_schema() until your
+inheritance tree has `settled down'.
+
+The contributed module Class::Tangram::Generator is now included.
+It's worth a look!
+
+In other news, support for Perl 5.005 has finally been neglected.
+
+UPGRADING FROM 1.11
+
+The biggest change is that previously, if you wanted to override what
+happens when you get or set an attribute, you should have defined
+set() and get() functions in your derived class.  Now, you are going
+to have to define methods called get_attribute() and/or
+set_attribute().  attribute() is a virtual method that calls
+get_attribute() or set_attribute() - depending on the number of
+arguments given - so don't override that unless you understand the
+consequences.
+
+The semantics for specifying an object's fields has changed slightly;
+instead of defining $YourClass::schema, you should define
+$YourClass::fields, which should contain what
+$YourClass::schema->{fields} used to contain.  The module still looks
+in the old location, so don't fret about changing your modules too
+much :-).
+
+UPGRADING FROM 1.09
+
+There is only a very minor source incompatible change, that would
+affect people who used tied values for their init_default attribute
+options.  ie, it should not affect anyone.  e-mail me if the new
+behaviour is not what you want!
+
+UPGRADING FROM 1.07
+
+There are no backwards-incompatibile changes in this release, unless
+you have another Tangram::Type that provides the tangram type
+"transient".
+
+UPGRADING FROM 1.06
+
+Most users should be able to install the new version without problems.
+
+However, there are a few small places where slight changes could
+affect your code.
+
+   1. If you have an attribute that is an array or a flat array, and
+      you evaluate it in list context, it now returns the contents of
+      the array rather than a reference to the array.  This is keeping
+      in line with the way Set::Object attributes work.
+
+   2. If you were using the bogus "time" or "timestamp" types, you
+      will need to switch to "rawtime", "rawdatetime" or "dmdatetime".
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 - 2005, Sam Vilain.  All Rights Reserved.  This
+module is free software. It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License
+

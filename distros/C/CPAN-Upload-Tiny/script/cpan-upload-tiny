@@ -1,0 +1,88 @@
+#! perl
+
+use strict;
+use warnings;
+
+use CPAN::Upload::Tiny;
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions('config=s' => \my $config_file, 'help:1' => \my $help, 'silent' => \my $silent);
+
+pod2usage(-exitval => 0, -verbose => $help) if $help;
+die "No files given to upload\n" if not @ARGV;
+
+my $uploader = CPAN::Upload::Tiny->new_from_config($config_file);
+for my $filename (@ARGV) {
+	$uploader->upload_file($filename);
+	print "Successfully uploaded $filename\n" if not $silent;
+}
+
+#PODNAME: cpan-upload-tiny
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-upload-tiny
+
+=head1 VERSION
+
+version 0.003
+
+=head1 USAGE
+
+  usage: cpan-upload-tiny [options] file-to-upload-1 [ file-to-upload-2 ... ]
+    --config              config file to use; defaults to ~/.pause
+    --help[=int]          display a help message
+    --silent              omit success message
+
+=head1 CONFIGURATION
+
+If you have a C<.pause> file in your home directory, it will be checked for a
+username and password.  It should look like this:
+
+ user EXAMPLE
+ password your-secret-password
+
+You can GnuPG-encrypt this file if you wish, but you must install
+L<Config::Identity> and configure your gpg-agent as L<Config::Identity>
+currently doesn't prompt for a password at decryption time:
+
+ # Follow the prompts, setting your key as the "recipient"
+ # Use ^D once you've finished typing out your authentication information
+ gpg -ea > $HOME/.pause
+ 
+ # OR, encrypt a file you already created:
+ gpg -ea $HOME/.pause && mv $HOME/.pause{.asc,}
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<CPAN::Upload::Tiny|CPAN::Upload::Tiny>
+
+This is used to implement cpan-upload-tiny
+
+=item * L<Config::Identity|Config::Identity>
+
+This is optionally used for secure storage of PAUSE credentials.
+
+=back
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

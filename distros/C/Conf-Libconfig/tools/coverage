@@ -1,0 +1,14 @@
+#!/bin/sh
+echo "Generates coverage in HTML format. Run from distribution base directory."
+if [ ! -e Makefile.PL ] ; then exit ; fi
+cover -delete
+perl Makefile.PL
+make distclean
+perl Makefile.PL
+HARNESS_PERL_SWITCHES=-MDevel::Cover make test \
+CCFLAGS=-O0\ -fprofile-arcs\ -ftest-coverage \
+OTHERLDFLAGS=-fprofile-arcs\ -ftest-coverage
+gcov Libconfig.xs
+gcov2perl Libconfig.xs.gcov
+cover
+rm -f Libconfig.c.gcov Libconfig.gcda Libconfig.gcno Libconfig.xs.gcov

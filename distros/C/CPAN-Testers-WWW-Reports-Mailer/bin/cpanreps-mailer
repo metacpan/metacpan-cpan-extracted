@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+use strict;
+$|++;
+
+my $VERSION = '0.06';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+cpanstats-mailer - script to mail authors links to reports of their modules
+
+=head1 SYNOPSIS
+
+  perl cpanstats-mailer --config=prefs.ini
+
+=head1 DESCRIPTION
+
+Collates report links for each author, based on the preferences set for each
+author, and mails them a single report. This script is expected to run daily
+and in tests produces only 40% of the previous mail volumes to authors.
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use lib qw(./lib ../lib);
+
+use CPAN::Testers::WWW::Reports::Mailer;
+
+# -------------------------------------
+# Program
+
+# default is debug mode on, thus no mails are sent, need to
+# force this to 0 to ensure mails do get sent correctly.
+
+my $mailer = CPAN::Testers::WWW::Reports::Mailer->new();
+
+$mailer->check_reports();
+$mailer->check_counts();
+
+__END__
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::Data::Generator>
+L<CPAN::Testers::WWW::Statistics>
+L<CPAN::WWW::Testers>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to the RT Queue (see below).
+
+Fixes are dependant upon their severity and my availablity. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Reports-Mailer
+
+=head1 AUTHOR
+
+Barbie, <barbie@missbarbell.co.uk> for
+Miss Barbell Productions, L<http://www.missbarbell.co.uk/>
+
+=head1 COPYRIGHT & LICENSE
+
+  Copyright (C) 2008-2009 Barbie for Miss Barbell Productions.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+
+=cut

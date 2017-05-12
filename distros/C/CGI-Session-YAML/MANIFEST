@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Session-YAML.t
+lib/CGI/Session/YAML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

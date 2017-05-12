@@ -1,0 +1,419 @@
+NAME
+    CGI::IDS - PerlIDS - Perl Website Intrusion Detection System (XSS, CSRF,
+    SQLI, LFI etc.)
+
+VERSION
+    Version 1.0217 - based on and tested against the filter tests of PHPIDS
+    https://phpids.org rev. 1409
+
+DESCRIPTION
+    PerlIDS (CGI::IDS) is a website intrusion detection system based on
+    PHPIDS https://phpids.org/ to detect possible attacks in website
+    requests, e.g. Cross-Site Scripting (XSS), Cross-Site Request Forgery
+    (CSRF), SQL Injections (SQLI) etc.
+
+    It parses any hashref for possible attacks, so it does not depend on
+    CGI.pm.
+
+    The intrusion detection is based on a set of converters that convert the
+    request according to common techniques that are used to hide attacks.
+    These converted strings are checked for attacks by running a filter set
+    of currently 68 regular expressions and a generic attack detector to
+    find obfuscated attacks. For easily keeping the filter set up-to-date,
+    PerlIDS is compatible to the original XML filter set of PHPIDS, which is
+    frequently updated.
+
+    Each matching regular expression has it's own impact value that
+    increases the tested string's total attack impact. Using these total
+    impacts, a threshold can be defined by the calling application to log
+    the suspicious requests to database and send out warnings via e-mail or
+    even SMS on high impacts that indicate critical attack activity. These
+    impacts can be summed per IP address, session or user to identify
+    attackers who are testing the website with small impact attacks over a
+    time.
+
+    You can improve the speed and the accurancy (reduce false positives) of
+    the IDS by specifying an XML whitelist file. This whitelist check can
+    also be processed separately by using CGI::IDS::Whitelist if you want to
+    pre-check the parameters on your application servers before you send
+    only the suspicious requests over to worker servers that do the complete
+    CGI::IDS check.
+
+    Download and install via CPAN:
+    http://search.cpan.org/dist/CGI-IDS/lib/CGI/IDS.pm
+
+    Report issues and contribute to PerlIDS on GitHub:
+    https://github.com/hinnerk-a/perlids
+
+SYNOPSIS
+     use CGI;
+     use CGI::IDS;
+
+     $cgi = new CGI;
+
+     # instantiate the IDS object;
+     # do not scan keys, values only; don't scan PHP code injection filters (IDs 58,59,60);
+     # whitelist the parameters as per given XML whitelist file;
+     # All arguments are optional, 'my $ids = new CGI::IDS();' is also working correctly,
+     # loading the entire shipped filter set and not scanning the keys.
+     # See new() for all possible arguments.
+     my $ids = new CGI::IDS(
+         whitelist_file  => '/home/hinnerk/ids/param_whitelist.xml',
+         disable_filters => [58,59,60],
+     );
+
+     # start detection
+     my %params = $cgi->Vars;
+     my $impact = $ids->detect_attacks( request => \%params );
+
+     if ($impact > 0) {
+         my_log( $ids->get_attacks() );
+     }
+     if ($impact > 30) {
+         my_warn_user();
+         my_email( $ids->get_attacks() );
+     }
+     if ($impact > 50) {
+         my_deactivate_user();
+         my_sms( $ids->get_attacks() );
+     }
+
+     # now with scanning the hash keys
+     $ids->set_scan_keys(scan_keys => 1);
+     $impact = $ids->detect_attacks( request => \%params );
+
+    See examples/demo.pl in CGI::IDS module package for a running demo.
+
+    You might want to build your own 'session impact counter' that increases
+    during multiple suspicious requests by one single user, session or IP
+    address.
+
+METHODS
+  new()
+    Constructor. Can optionally take a hash of settings. If *filters_file*
+    is not given, the shipped filter set will be loaded, *scan_keys*
+    defaults to 0.
+
+    The filter set and whitelist will stay loaded during the lifetime of the
+    object. You may call `detect_attacks()' multiple times, the attack array
+    (`get_attacks()') will be emptied at the start of each run of
+    `detect_attacks()'.
+
+    For example, the following is a valid constructor:
+
+     my $ids = new CGI::IDS(
+         filters_file    => '/home/hinnerk/ids/default_filter.xml',
+         whitelist_file  => '/home/hinnerk/ids/param_whitelist.xml',
+         scan_keys       => 0,
+         disable_filters => [58,59,60],
+     );
+
+    The Constructor dies (croaks) if no filter rule could be loaded.
+
+  detect_attacks()
+     DESCRIPTION
+       Parses a hashref (e.g. $query->Vars) for detection of possible attacks.
+       The attack array is emptied at the start of each run.
+     INPUT
+       +request   hashref to be parsed
+     OUTPUT
+       Impact if filter matched, 0 otherwise
+     SYNOPSIS
+       $ids->detect_attacks(request => $query->Vars);
+
+  set_scan_keys()
+     DESCRIPTION
+       Sets key scanning option
+     INPUT
+       +scan_keys   1 to scan keys, 0 to switch off scanning keys, defaults to 0
+     OUTPUT
+       none
+     SYNOPSIS
+       $ids->set_scan_keys(scan_keys => 1);
+
+  get_attacks()
+     DESCRIPTION
+       Get an key/value/impact array of all detected attacks.
+       The array is emptied at the start of each run of C<detect_attacks()>.
+     INPUT
+       none
+     OUTPUT
+       ARRAY (
+         key     => '',
+         value   => '',
+         impact  => n,
+         filters => (n, n, n, n, ...),
+         tags    => ('', '', '', '', ...),
+       )
+     SYNOPSIS
+       $ids->get_attacks();
+
+  get_rule_description()
+     DESCRIPTION
+       Returns the rule description for a given rule id. This can be used for logging purposes.
+     INPUT
+       HASH
+       + rule_id      id of rule
+     OUTPUT
+       SCALAR description
+     EXAMPLE
+       $ids->get_rule_description( rule_id => $rule_id );
+
+XML INPUT FILES
+  Filters
+    This module is compatible with the PHPIDS filter set. Please find the
+    latest (frequently updated) filter file from the PHPIDS Subversion
+    repository at
+    https://dev.itratos.de/projects/php-ids/repository/raw/trunk/lib/IDS/def
+    ault_filter.xml.
+
+    Example XML Code
+     <filters>
+         <filter>
+             <id>1</id>
+             <rule><![CDATA[(?:"+.*>)|(?:[^\w\s]\s*\/>)|(?:>")]]></rule>
+             <description>finds html breaking injections including whitespace attacks</description>
+             <tags>
+                 <tag>xss</tag>
+                 <tag>csrf</tag>
+             </tags>
+             <impact>4</impact>
+         </filter>
+         <filter>
+             <id>2</id>
+             <rule><![CDATA[(?:"+.*[<=]\s*"[^"]+")|(?:"\w+\s*=)|(?:>\w=\/)|(?:#.+\)["\s]*>)|(?:"\s*(?:src|style|on\w+)\s*=\s*")]]></rule>
+             <description>finds attribute breaking injections including whitespace attacks</description>
+             <tags>
+                 <tag>xss</tag>
+                 <tag>csrf</tag>
+             </tags>
+             <impact>4</impact>
+         </filter>
+     </filters>
+
+    Used XML Tags
+    * filters
+        The root tag.
+
+        * filter
+            Filter item.
+
+            * id
+                Filter ID for referring in log files etc.
+
+            * rule
+                The regular expression for detection of malicious code.
+                Case-insensitive; mode modifiers *i*, *m* and *s* in use.
+
+            * description
+                Description of what the filter finds.
+
+            * tags
+                Set of tags that describe the kind of attack.
+
+                * tag
+                    Currently used values are *xss*, *csrf*, *sqli*, *dt*,
+                    *id*, *lfi*, *rfe*, *spam*, *dos*.
+
+            * impact
+                Value of impact, defines the weight of the attack. Each
+                detection run adds the particular filter impacts to one
+                total impact sum.
+
+  Whitelist
+    Using a whitelist you can improve the speed and the accurancy (reduce
+    false positives) of the IDS. A whitelist defines which parameters do not
+    need to undergo the expensive scanning (if their values match given
+    rules and given conditions).
+
+    Example XML Code
+     <whitelist>
+         <param>
+             <key>scr_id</key>
+             <rule><![CDATA[(?:^[0-9]+\.[0-9a-f]+$)]]></rule>
+         </param>
+         <param>
+             <key>uid</key>
+         </param>
+         <param>
+             <key>json_value</key>
+             <encoding>json</encoding>
+         </param>
+         <param>
+             <key>login_password</key>
+             <conditions>
+                 <condition>
+                     <key>username</key>
+                     <rule><![CDATA[(?:^[a-z]+$)]]></rule>
+                </condition>
+                <condition>
+                    <key>send</key>
+                </condition>
+                <condition>
+                    <key>action</key>
+                    <rule><![CDATA[(?:^login$)]]></rule>
+                </condition>
+             </conditions>
+         </param>
+         <param>
+             <key>sender_id</key>
+             <rule><![CDATA[(?:[0-9]+\.[0-9a-f]+)]]></rule>
+             <conditions>
+                 <condition>
+                     <key>action</key>
+                     <rule><![CDATA[(?:^message$)]]></rule>
+                </condition>
+             </conditions>
+         </param>
+     </whitelist>
+
+    Used XML Tags
+    * whitelist
+        The root tag.
+
+        * param
+            Parameter item. Defines the query parameter to be whitelisted.
+
+            * key
+                Parameter key.
+
+            * rule
+                Regular expression to match. If the parameter value matches
+                this rule or the rule tag is not present, the IDS will not
+                run its filters on it. Case-sensitive; mode modifiers *m*
+                and *s* in use.
+
+            * encoding
+                Use value *json* if the parameter contains JSON encoded
+                data. IDS will test the decoded data, otherwise a false
+                positive would occur due to the 'suspicious' JSON encoding
+                characters.
+
+            * conditions
+                Set of conditions to be fulfilled. This is the parameter
+                environment in which the whitelisted parameter has to live
+                in. The parameter will only be skipped if all conditions
+                (and its own parameter rule) match.
+
+                In the example XML this means: *login_password* may only be
+                skipped of filtering if parameter *action* equals *login*,
+                parameter *send* is present and parameter *username*
+                contains only small letters.
+
+                * condition
+                    A condition to be fulfilled.
+
+                    * key
+                        Parameter key.
+
+                    * rule
+                        Regular expression to match. Missing `<rule>' means
+                        *key has to be present no matter what content (can
+                        even be empty)*.
+
+    Helper methods for building and improving whitelists
+     # check request
+     my $impact = $ids->detect_attacks( request => $request);
+
+     # print reasons and key/value pairs to a logfile for analysis of your application parameters.
+     print LOG "filtered_keys:\n"
+     foreach my $entry (@{$ids->{filtered_keys}}) {
+         print LOG "\t".$entry->{reason}."\t".$entry->{key}.' => '.$entry->{value}."\n";
+     }
+     print LOG "non_filtered_keys:\n"
+     foreach my $entry (@{$ids->{non_filtered_keys}}) {
+         print LOG "\t".$entry->{reason}."\t".$entry->{key}.' => '.$entry->{value}."\n";
+     }
+
+    `$entry->{reason}' returns following reasons for skipping and
+    non-skipping a value:
+
+    `$ids->{filtered_keys}'
+        * *key*: key not whitelisted
+            Filtered due to missing rule set for this key.
+
+        * *cond*: condition mismatch
+            Filtered due to mismatching conditions for this key.
+
+        * *rule*: rule mismatch
+            Filtered due to mismatching rule for this key.
+
+        * *enc*: value contains encoding
+            Filtered due to containing (JSON) encoding for this key.
+
+    `$ids->{non_filtered_keys}'
+        * *empty*: empty value
+            Not filtered due to empty value for this key.
+
+        * *harml*: harmless value
+            Not filtered due to harmless value string for this key.
+
+        * *key*: key generally whitelisted
+            Not filtered because the key has been generally whitelisted.
+
+        * *r&c*: rule & conditions matched
+            Not filtered due to matching rules and conditions for this key.
+
+BUGS
+    Please report any bugs or feature requests to `bug-cgi-ids at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-IDS. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CGI::IDS
+
+    You can also look for information at:
+
+    * GitHub
+        https://github.com/hinnerk-a/perlids
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-IDS
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-IDS
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-IDS
+
+    * Search CPAN
+        http://search.cpan.org/dist/CGI-IDS
+
+CREDITS
+    Thanks to:
+
+    * Mario Heiderich (https://phpids.org/)
+    * Christian Matthies (https://phpids.org/)
+    * Ingo Bax (http://www.epublica.de/)
+    * epublica GmbH (http://www.epublica.de/)
+    * XING AG (https://www.xing.com/) for making this work possible and
+    running PerlIDS under heavy load for a long time.
+AUTHOR
+    Hinnerk Altenburg, `<hinnerk at cpan.org>'
+
+SEE ALSO
+    https://phpids.org/
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2008-2014 Hinnerk Altenburg
+    (http://www.hinnerk-altenburg.de/)
+
+    This file is part of PerlIDS.
+
+    PerlIDS is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    PerlIDS is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with PerlIDS. If not, see <http://www.gnu.org/licenses/>.
+

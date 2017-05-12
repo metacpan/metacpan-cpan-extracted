@@ -1,0 +1,50 @@
+---
+abstract: 'add version component to uris'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Catalyst: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::Catalyst: '0'
+  lib: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-VersionedURI
+provides:
+  Catalyst::Controller::VersionedURI:
+    file: lib/Catalyst/Controller/VersionedURI.pm
+    version: v1.2.0
+  Catalyst::Plugin::VersionedURI:
+    file: lib/Catalyst/Plugin/VersionedURI.pm
+    version: v1.2.0
+requires:
+  Catalyst::Controller: '0'
+  Catalyst::DispatchType::Regex: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0'
+  URI::QueryParam: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Catalyst-Plugin-VersionedURI/issues
+  homepage: https://github.com/yanick/Catalyst-Plugin-VersionedURI
+  repository: https://github.com/yanick/Catalyst-Plugin-VersionedURI.git
+version: 1.2.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Mark Grimes <mgrimes@cpan.org>'

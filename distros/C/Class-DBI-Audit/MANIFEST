@@ -1,0 +1,12 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Class/DBI/Audit.pm
+t/00-load.t
+t/01-artist.t
+t/testlib/Artist.pm
+t/pod.t
+t/pod-coverage.t

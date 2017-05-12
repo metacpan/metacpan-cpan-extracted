@@ -1,0 +1,13 @@
+CGI::Session::FlexMySQL is a derivation from CGI::Session::MySQL which allows module users  to fully customize the MySQL connection including data tables and field names, as well as more precisely control when the database handle is disconnected.
+
+Example:
+
+           $session = new CGI::Session("driver:FlexMySQL", $sid, {
+              Handle => $dbh,
+              Table => 'custom_table',    # You can put your sessions in any table
+              KeyField => 'SessionID',    # Use any field for your session ids
+              DataField => 'SessionData', # Use any field for your session data 
+              AutoDisconnect => 0,        # So your $dbh stays open even after $session is gone
+           });
+
+

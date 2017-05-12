@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+# 4BMNsQx: w0rm written by Pip Stuart <Pip@CPAN.Org>
+#   derived from Dan Steele's <Mutated@GMail.Com> worm... w/ extra compression
+use Curses::Simp;$s=0;$g=1;$d=u;$t=.8;$c='#';$o=tie@t,Curses::Simp,flagsdlk,1;$h
+=$o->Hite;$w=$o->Widt;$t[1]=$c x$w;$t[$h-1]=$t[1];for(2..$h-2){$t[$_]=$c.' 'x($w
+-2).$c}push@b,int($h/2);push@a,int($w/2);while(!$q){if(!$f){do{$y=int(rand($h-8)
++4);$x=int(rand($w-8)+4);$f=1;$v=int rand(9)+1}while(substr($t[$y],$x,1)ne' ');
+substr$t[$y],$x,1,$v}$t[0]=' 'x37 .w0rm.' 'x24 ."Score:$s";if(substr($t[$b[-1]],
+$a[-1],1)eq$c){$q=1;$o->Mesg('wait',7,titl,"You Died!",flagprsk,0,"\nFinal Scor"
+."e:$s\n\n   Goodbye!")}elsif(substr($t[$b[-1]],$a[-1],1)=~/\d/){$f=0;$s+=$g=--
+$v;$s++}elsif(!$g){substr$t[shift@b],shift@a,1,' '}else{$g--;$t-=.005 if $t>.01
+}substr$t[$b[-1]],$a[-1],1,$c;$k=$o->GetK($t);$q=1 if$k=~/[qx]/;if($k=~/UP/||($k
+eq-1&& $d eq u)){$d=u;push@a,$a[-1];push@b,$b[-1]-1}elsif($k=~/N/||($k eq-1&& $d
+eq d)){$d=d;push@a,$a[-1];push@b,$b[-1]+1}elsif($k=~/FT/||($k eq-1&& $d eq l)){
+$d=l;push@a,$a[-1]-1;push@b,$b[-1]}elsif($k=~/HT/||($k eq-1&& $d eq r)){$d=r;
+push@a,$a[-1]+1;push@b,$b[-1]}}# Simp w0rm in <=12.3875 80-char lines of Perl =)

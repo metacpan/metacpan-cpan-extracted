@@ -1,0 +1,41 @@
+=head1 Config::Model::Approx - Approx graphical configuration editor
+
+This module provides a graphical configuration editor for
+the configuration file of 
+C<approx> (A package proxy cache for Debian. See 
+http://packages.qa.debian.org/a/approx.html) 
+(C</etc/approx/approx.conf>) .
+
+=head2 Main dependencies
+
+=over
+
+=item *
+
+L<Config::Model::TkUI>
+
+=item *
+
+L<Config::Model>
+
+=back
+
+=head2 usage
+
+Once this module is installed, you can run:
+
+  # cme edit approx
+
+If L<cme> fails to load your approx.conf, you can try 
+with -force option.
+
+=head2 Installation from git
+
+Make sure that L<Config::Model> and L<Dist::Zilla> are installed, then run:
+
+ dzil build
+
+If you want to install this software without packaging, you can also run:
+
+ dzil install
+

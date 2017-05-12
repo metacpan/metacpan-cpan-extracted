@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Config/Apt/Sources.pm
+lib/Config/Apt/SourceEntry.pm
+t/00-load.t
+t/sourceentry.t
+t/sources.t
+t/to_string.t
+t/comment.t
+t/warnings.t
+t/pod-coverage.t
+t/pod.t

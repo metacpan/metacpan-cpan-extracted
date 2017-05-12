@@ -1,0 +1,56 @@
+---
+abstract: 'Catmandu modules for working with OAI repositories'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Pod: '0'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-OAI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+optional_features:
+  xslt:
+    description: xslt
+    requires:
+      Catmandu::XML: '0.15'
+requires:
+  Catmandu: '1.0306'
+  HTTP::OAI: '4.03'
+  IO::Socket::SSL: '1.993'
+  IO::String: '0'
+  MODS::Record: '0.11'
+  Moo: '1.0'
+  URI: '0'
+  XML::Struct: '0.18'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-OAI/issues
+  homepage: https://github.com/LibreCat/Catmandu-OAI
+  repository: https://github.com/LibreCat/Catmandu-OAI.git
+version: '0.17'
+x_contributors:
+  - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Matthias Vandermaesen <matthias@colada.be>'
+  - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
+  - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

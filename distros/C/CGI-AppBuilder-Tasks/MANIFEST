@@ -1,0 +1,6 @@
+Tasks.pm
+test.pl
+Makefile.PL
+./t/AppBuilder::Tasks.t
+CGI-AppBuilder-Tasks-0.12.readme
+README

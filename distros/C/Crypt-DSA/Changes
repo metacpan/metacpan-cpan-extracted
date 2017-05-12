@@ -1,0 +1,82 @@
+Revision history for Perl extension Crypt-DSA
+
+1.17 2011.06.16
+	- Upgrade to Module::Install 1.01
+	- Added support for OpenSSL 1.0.0 dsaparam format change.
+	- Requires perl 5.6 now
+	- Fixes for 64-bit support
+
+1.16 2009.09.11
+	- Switching to production release
+	- Switching to non-development version
+
+0.15_01 2009.02.13
+	- Updated to Module::Install 0.91
+	- Added a consistent $VERSION across the entire distro
+	- Removed the optional dependency on Convert::PEM for more
+	  consistent downstream packaging (it was pointless to ask
+	  since most people don't know what it is anyways).
+	- Data::Buffer has almost perfect CPAN Testers PASS, so always
+	  install it (plus, SSH2 is common now).
+	- Added some missing dependencies to the Makefile.PL
+	- Removed the sign(1) and auto_install (which was dangerous)
+	- Removed all the magic repository tags that would change depending
+	  on who was maintaining it.
+	- Adding missing test_requires for Test.pm and Test::More (I'll
+	  migrate the remaining tests away from Test.pm next release)
+	- Merged the ToDo file into the POD
+
+0.14  2006.05.08
+	- Win32 fixes: use Data::Random as a fallback in make_random, better
+	  support for locating openssl. Thanks to CFRANKS for the patch.
+	- Makefile.PL update, to the latest Module::Install. Thanks to Adam
+	  Kennedy for the patch.
+
+0.13  2005.05.26
+	- Rewrote to use Math::BigInt instead of Math::Pari, including patches
+	  from Brad Fitzpatrick for a replacement for the isprime function
+	  (both using pure Perl and an external gp program).
+	- Added optional Content argument to Crypt::DSA::Key->new, to specify
+	  serialized Content to be deserialized.
+	- Added Signature serialization and deserialization of ASN.1-encoded
+	  structures.
+	- Added ability to do key generation using an external openssl binary.
+	  Thanks to Brad Fitzpatrick for the patch.
+	- Signature object now has better get/set acccessors.
+	- Use Module::Install instead of hand-coded Makefile.PL.
+
+0.12  2001.05.03
+	- Removed swap file from the distribution. :)
+
+0.11  2001.05.02
+	- Added Crypt::DSA::Key::SSH2, which reads SSH2-format DSA
+	  key files. These are a different format than those used
+	  by OpenSSH (that uses PEM-encoded files). Currently only
+	  reading SSH2 key files is supported, and the files must not
+	  be encrypted.
+	- Added size method to Crypt::DSA::Key. $key->size is number
+	  of bits in p.
+
+0.10  2001.04.22
+	- Added much better test suite: tests bigint utilities in Util,
+	  sign/verify, key generation (512, 768, 1024 bits), PEM
+	  encoding/decoding (if Convert::PEM is installed), FIPS 186-2
+	  example case.
+	- Added interface to Convert::PEM to read/write encrypted
+	  PEM files containing ASN.1-encoded DSA keys. Convert::PEM
+	  is optional; Makefile.PL will check for it and warn if it
+	  can't be found.
+	- Get/set accessors now take hex values and store their values
+	  internally as strings. Thanks to Crypt::RSA for the idea. :)
+
+0.03  2001.04.07
+	- abstracted signature object into Crypt::DSA::Signature object.
+
+0.02  2001.03.23
+	- split up code into separate modules (ie. KeyChain, Key, Util, etc.)
+	- switched from using GMP to Pari
+	- streamlined code
+	- added documentation
+
+0.01  2001.03.22
+	- original version; created by h2xs 1.19

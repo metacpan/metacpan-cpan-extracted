@@ -1,0 +1,668 @@
+NAME
+    Class::Agreement - add contracts to your Perl classes easily
+
+SYNOPSIS
+        package SomeClass;
+    
+        use Class::Agreement;
+    
+        # use base 'Class::Accessor' or 'Class::MethodMaker',
+        # or roll your own:
+        sub new { ... }
+
+        invariant {
+            my ($self) = @_;
+            $self->count > 0;
+        };
+    
+        precondition add_a_positive => sub {
+            my ( $self, $value ) = @_;
+            return ( $value >= 0 );
+        };
+        sub add_a_positive {
+            my ( $self, $value ) = @_;
+            ...
+        }
+    
+        sub choose_word {
+            my ( $self, $value ) = @_;
+            ...
+        }
+        postcondition choose_word => sub {
+            return ( result >= 0 );
+        };
+    
+        dependent increase_foo => sub {
+            my ( $self, $amount ) = @_;
+            my $old_foo = $self->foo;
+            return sub {
+              my ( $self, $amount ) = @_;
+              return ( $old_foo < $self->get_foo );
+            }
+        };
+        sub increase_foo {
+            my ( $self, $amount ) = @_;
+            $self->set_foo( $self->get_foo + $amount );
+        }
+
+DESCRIPTION
+    Class::Agreement is an implementation of behavioral contracts for Perl5.
+    This module allows you to easily add pre- and postconditions to new or
+    existing Perl classes.
+
+    This module provides contracts such as dependent contracts, contracts
+    for higher-order functions, and informative messages when things fail.
+    At the time of this writing, Class::Agreement is one of only two
+    contract implementations that blames contract-breaking components
+    correctly. (See: "Object-oriented Programming Languages Need
+    Well-founded Contracts" at
+    <http://citeseer.ist.psu.edu/findler01objectoriented.html>.)
+
+    Using Class::Agreement lets you specify proper input and output of your
+    functions or methods, thus strengthening your code and allowing you to
+    spot bugs earlier.
+
+  Comparison with Class::Contract
+    Class::Contract requires you to use its own object and accessor system,
+    which makes the addition of contracts to existing code difficult. In
+    contrast, it should be easy to implement contracts with Class::Agreement
+    no matter what object system ("Class::Accessor", Class::MethodMaker,
+    Spiffy, etc.) you use.
+
+    Class::Contract also clones objects every time you add a postcondition,
+    which can get pretty expensive. Class::Agreement doesn't clone --
+    alternatively, it provides you with dependent contracts so that you can
+    use closure to keep track of only the values you care about. (See
+    "Testing old values".)
+
+  Comparison with Eiffel
+    You could say that Class::Agreement gives you Perl equivalents of
+    Eiffel's "require", "ensures", "invariant" and (indirectly) "old"
+    keywords. For example, the following Eiffel method:
+
+        decrement is
+            require
+                item > 0
+            do
+                item := item - 1
+            ensure
+                item = old item - 1
+            end 
+
+    ...could be written in Perl as:
+
+        use Class::Contract;
+        ...
+    
+        precondition decrement => sub { shift()->item > 0 }
+
+        sub decrement {
+            my ( $self ) = @_;
+            $self->item( $self->item - 1 );
+        }
+
+        dependent decrement => sub {
+            my ( $self ) = @_;
+            my $old_item = $self->item;
+            return sub { $self->item == $old_item - 1 };
+        };
+
+EXPORT
+    The following functions are exported by default:
+
+    * "precondition", "postcondition", and "dependent", each of which have
+    two distinct calling syntaxes: one for functional programming and one
+    for object-oriented.
+    * "result", which should only be used within postconditions or functions
+    returned by dependent contracts.
+    * "invariant" and "specify_constructors", both of which are used only in
+    object-oriented programming.
+
+    All exported functions are described in the following section,
+    "FUNCTIONS".
+
+FUNCTIONS
+  precondition NAME, BLOCK
+    Specify that the method NAME must meet the precondition as specified in
+    BLOCK.
+
+    In BLOCK, the variable @_ will be the argument list of the method. (The
+    first item of @_ will be the class name or object, as usual.)
+
+    For example, to specify a precondition on a method to ensure that the
+    first argument given is greater than zero:
+
+        precondition foo => sub {
+            my ( $self, $value ) = @_;
+            return ( $value >= 0 );
+        };
+        sub foo {
+            my ( $self, $value ) = @_;
+            ...
+        }
+
+    With methods, if the precondition fails (returns false), preconditions
+    for the parent class will be checked. If the preconditions for both the
+    child's method and the parent's method fail, the input to the method
+    must have been invalid. If the precondition for the parent passes, the
+    hierarchy between the class and the parent class is incorrect because,
+    to fulfill the Liskov-Wing principal of substitutability, the subclass'
+    method should accept that the superclass' does, and optionally more.
+    Note that only the relationships between child and parent classes are
+    checked -- this module won't traverse the complete ancestry of a class.
+
+    You can use this keyword multiple times to declare multiple
+    preconditions on the given method.
+
+  precondition VARIABLE, BLOCK
+    Specify that, when called, the subroutine reference pointed to by the
+    lvalue VARIABLE must meet the precondition as specified in BLOCK.
+
+    In BLOCK, the variable @_ will be the argument list of the subroutine.
+
+    There are times when you will have a function or method that accepts
+    another function as an argument. Say that you have a function "g()" that
+    accepts another function, "f()", as its argument. However, the argument
+    given to "f()" must be greater than zero:
+
+        sub g {
+            my ($f) = @_;
+            precondition $f => sub { 
+                my ($value) = @_;
+                return ( $value >= 0 );
+            };
+            $f->(15); # will pass
+            $f->(-3); # will fail
+        }
+
+    If called in void context this function will modify VARIABLE to point to
+    a new subroutine reference with the precondition. If called in scalar
+    context, this function will return a new function with the attached
+    precondition.
+
+    You can use this keyword multiple times to declare multiple
+    preconditions on the given function.
+
+  postcondition NAME, BLOCK
+    Specify that the method NAME must meet the postcondition as specified in
+    BLOCK.
+
+    In BLOCK, the variable @_ will be the argument list of the method. The
+    function "result" may be used to retrieve the return values of the
+    method. If the method returns a list, calling "result" in array context
+    will return all of return values, and calling "result" in scalar context
+    will return only the first item of that list. If the method returns a
+    scalar, "result" called in scalar context will be that scalar, and
+    "result" in array context will return a list with one element.
+
+    For example, to specify a postcondition on a method to ensure that the
+    method returns a number less than zero, BLOCK would check the
+
+        sub foo {
+            my ( $self, $value ) = @_;
+            ...
+        }
+        postcondition foo => sub {
+            return ( result >= 0 );
+        };
+
+    With methods, postconditions for the parent class will be checked if
+    they exist. If the postcondition for the child's method fails, the blame
+    lies with the child method's implementation since it is not adhering to
+    its contract. If the postcondition for the child method passes, but the
+    postcondition for the parent's fails, the problem lies with the
+    hierarchy betweeen the classes. Note again that only the relationships
+    between child and parent classes are checked -- this module won't
+    traverse the complete ancestry of a class.
+
+    You can use this keyword multiple times to declare multiple
+    postconditions on the given method.
+
+  postcondition VARIABLE, BLOCK
+    Specify that, when called, the subroutine reference pointed to by the
+    lvalue VARIABLE must meet the postcondition as specified in BLOCK.
+
+    In BLOCK, the varable @_ and function "result" are available and may be
+    used in the same ways as described in the previous usage of
+    "postcondition".
+
+    Say that you have a function "g()" that accepts another function, "f()"
+    as its argument. "f()", however, must return a number that is divisible
+    by two. This can be expressed as:
+
+        sub g {
+            my ($f) = @_;
+            postcondition $f => sub {
+                return ! ( result % 2 );
+            };
+            ...
+        }
+
+    If called in void context this function will modify VARIABLE to point to
+    a new subroutine reference with the postcondition. If called in scalar
+    context, this function will return a new function with the attached
+    postcondition.
+
+    You can use this keyword multiple times to declare multiple
+    postconditions on the given function.
+
+  dependent NAME, BLOCK
+    Specify that the method NAME will use the subroutine reference returned
+    by BLOCK as a postcondition. If BLOCK returns undefined, no
+    postcondition will be added. In some cases, the postcondition returned
+    will *depend* on the input provided, hence these are referred to as
+    *dependent contracts*. However, since the arguments to the method are
+    given in the postcondition, dependent contracts will be used typically
+    to compare old and new values.
+
+    BLOCK is run at the same time as preconditions, thus the @_ variable
+    works in the same manner as in preconditions. However, the subroutine
+    reference that BLOCK returns will be invoked as a postcondition, thus it
+    may the "result" function in addition to @_.
+
+    You'll probably use these, along with closure, to check the old copies
+    of values. See the example in "Testing old values".
+
+    You can use this keyword multiple times to declare multiple dependent
+    contracts on the given method.
+
+  dependent VARIABLE, BLOCK
+    Specify that the subroutine reference pointed to by the lvalue VARIABLE
+    will use the subroutine reference returned by BLOCK as a postcondition.
+    If BLOCK returns undefined, no postcondition will be added.
+
+    Identical to the previous usage, BLOCK is run at the same time as
+    preconditions, thus the @_ variable works in the same manner as in
+    preconditions. However, the subroutine reference that BLOCK returns will
+    be invoked as a postcondition, thus it may the "result" function in
+    addition to @_.
+
+    Say that you have a function "g()" that accepts another function, "f()"
+    as its argument. You want to make sure that "f()", as a side effect,
+    adds to the global variable $count:
+
+        my $count = 0;
+        ...
+
+        sub g {
+            my ($f) = @_;
+            dependent $f => sub {
+                my $old_count = $count;
+                return sub { $count > $old_count };
+            };
+            ...
+        }
+
+    You can use this keyword multiple times to declare multiple dependent
+    contracts on the given function.
+
+  invariant BLOCK
+    BLOCK will be evaluated before and after every public method in the
+    current class. A *public method* is described as any subroutine in the
+    package whose name begins with a letter and is not composed entirely of
+    uppercase letters.
+
+    Invariants will not be evaluated for class methods. More specifically,
+    invariants will only be evaluated when the first argument to a
+    subroutine is a blessed reference. This would mean that invariants would
+    not be checked for constructors, but "Class::Agreement" provides another
+    function, "specify_constructors", which is used for this purpose. (See
+    the following section for details.)
+
+    Invariant BLOCKS are provided with only one argument: the current
+    object. An exception is if the method is a constructor, the only
+    argument to the BLOCK is the first return value of the method. (If your
+    constructors return an object as the first or only return value -- as
+    they normally do -- this means you're fine.)
+
+    Invariants are not checked when destructors are invoked. For an
+    explanation as to why, see "WHITEPAPER".
+
+    You can use this keyword multiple times to declare multiple invariant
+    contracts for the class.
+
+   Blame
+    Blaming violators of invariants is easy. If an invariant contract fails
+    following a method invocation, we assume that the check prior to the
+    invocation must have succeeded, so the implementation of the method is
+    at fault. If an invariant fails before the method runs, invariants must
+    have succeeded after the last method was called, so the object must have
+    been tampered with by an exogenous source. Eeek!
+
+   Example
+    For example, say that you have a class for Othello boards, which are
+    typically 8x8 grids. Othello begins with four pieces already placed on
+    the board and ends when the board is full or there are no remaining
+    moves. Thus, the board must always have between four and sixty-four
+    pieces, inclusive:
+
+        invariant sub {
+            my ( $self ) = @_;
+            return ( $self->pieces >= 4 and $self->pieces <= 64 );
+        };
+
+    If the invariant fails after a method is called, the method's
+    implementation is at fault. If the invariant fails before the method is
+    run, an outside source has tampered with the object.
+
+  specify_constructors LIST
+    As described above, invariants are checked on public methods when the
+    first argument is an object. Since constructors are typically class
+    methods (if not also object methods), "Class::Agreement" needs to know
+    which methods are constructors so that it can check invariants against
+    the constructors' return values instead of simply ignoring them.
+
+    By default, it is assumed that a method named "new" is the constructor.
+    You don't have to bother with this keyword if you don't specify any
+    invariants or if your only constructor is "new".
+
+    If your class has more constructors, you should specify all of them
+    (including "new") with "specify_constructors" so that invariants can be
+    checked properly:
+
+        package Othello::Board;
+        use Class::Agreement;
+
+        specify_constructors qw( new new_random );
+
+        invariant sub {
+            my ( $self ) = @_;
+            return ( $self->pieces >= 4 and $self->pieces <= 64 );
+        };
+
+        sub new {
+            ...
+            return bless [], shift;
+        }
+
+        sub new_random {
+            ...
+            return bless [], shift;
+        }
+
+    Any subclasses of "Othello::Board" would also have the invariants of the
+    methods "new()" and "new_random()" checked as constructors. You can
+    override the specified constructors of any class -- all subclasses will
+    use the settings specified by their parents.
+
+    If, for some reason, your class has no constructors, you can pass
+    "specify_constructors" an empty list:
+
+        specify_constructors ();
+
+REAL-LIFE EXAMPLES
+  Checking a method's input
+    Say that you have a board game that uses a graph of tiles. Every turn,
+    players draw a tile and, if it's placable, plop it into the graph. The
+    method "insert_tile()" of the "Graph" class should take a placable tile
+    as an argument, which we can express as a contract:
+
+        precondition insert_tile => sub {
+            my ( $self, $tile ) = @_;
+            return $self->verify_tile_fits( $tile );
+        };
+
+        sub insert_tile {
+            my ( $self, $tile ) = @_;
+            ...
+        }
+
+    Before the implementation of "insert_tile" is executed, the precondition
+    checks to ensure that $tile is placable in the graph as determined by
+    "verify_tile_fits()".
+
+  Checking a method's output
+    Using the "Graph" class from the previous example, say we have a method
+    "get_neighbors()" which, given an "x" and "y", will return all tiles
+    surrounding the tile at that position. If the tiles are square, any
+    given tile shouldn't have more than eight neighbors:
+
+        sub get_neighbors {
+            my ( $self, $x, $y ) = @_;
+            ...
+        }
+
+        postcondition get_neighbors => sub {
+            return ( (result) <= 8 );
+        };
+
+    The postcondition ensures that "get_neighbors()" returns no more than
+    eight items.
+
+  Testing old values
+    Dependent contracts occur when the postcondition *depends* on the input
+    given to the method. You can use dependent contracts to save old copies
+    of values through the use of closure.
+
+    Given the "Graph" class from previous examples, say that the tiles in
+    the graph are stored in a list. If insert tile has successfully added
+    the tile to the graph, the number of tiles in the graph should have
+    increased by one. Using the "dependent()" function, we return a closure
+    that will check exactly this:
+
+        dependent insert_tile => sub {
+            my ( $self, $tile ) = @_;
+            my $old_count = $self->num_tiles;
+            return sub {
+                my ( $self, $tile ) = @_;
+                return ( $self->num_tiles > $old_count );
+            };
+        };
+
+        sub insert_tile {
+            my ( $self, $tile ) = @_;
+            ...
+        }
+
+    Before the implementation of "insert_tile()" is run, the block given to
+    "dependent()" is run, which returns a closure. This closure is then run
+    after "insert_tile()" as if it were a precondition. (Thus, the closure
+    returned by the block may make use the "result" function as well as @_.)
+
+  Contracts on coderefs
+    This is where contracts get interesting. Say that you have a function
+    "g()" that takes a function "f()" as an argument and returns a number
+    greater than zero. However, "f()" has a contract, too: it must take a
+    natural number as the first argument and must return a single letter of
+    the alphabet. This can be represented as follows:
+
+        precondition g => sub {
+            # first argument of @_ is f()
+            precondition $_[0] => sub {
+                my ( $val ) = @_;
+                return ( $val =~ /^\d+$/ );
+            };
+            postcondition $_[0] => sub {
+                return ( result =~ /^[A-Z]$/i );
+            };
+        };
+
+        sub g {
+            my ($f) = @_;
+            ... # call $f somehow
+        }
+
+        postcondition g => sub {
+            return ( result > 0 );
+        };
+
+    Thus, when the function "f()" is used within "g()", the contracts set up
+    for "f()" in the precondition apply to it.
+
+FAQ
+  Aren't contracts just assertions I could write with something like "die unless" ?
+    The answer to this has been nicely worded by Jim Weirich in "Design by
+    Contract and Unit Testing" located at
+    <http://onestepback.org/index.cgi/Tech/Programming/DbcAndTesting.html>:
+
+    "Although Design by Contract and assertions are very closely related,
+    DbC is more than just slapping a few assertions into your code at
+    strategic locations. It is about identifying the contract under which
+    your code will execute and you expect all clients to adhere to. It is
+    about clearly defining responsibilities between client software and
+    supplier software.
+
+    "In short, Design by Contract starts by specifying the conditions under
+    which it is legal to call a method. It is the responsibility of the
+    client software to ensure these conditions (called preconditions) are
+    met.
+
+    "Given that the preconditions are met, the method in the supplier
+    software guarantees that certion other conditions will be true when the
+    method returns. These are called postcondition, and are the
+    responsibility of the supplier code in ensure."
+
+  Why not just use Carp::Assert?
+    Use Carp::Assert and Carp::Assert if you need to check *values*. If you
+    want to assert *behavior*, Class::Agreement does everything that
+    Carp::Assert can do for you and it determines which components are
+    faulty when something fails.
+
+    If you're looking for the sexiness of Carp::Assert::More, try using
+    Class::Agreement with something like Data::Validate:
+
+        use Class::Agreement;
+        use Data::Validate qw(:math :string);
+
+        precondition foo => sub { is_integer( $_[1] ) };
+        precondition bar => sub { is_greater_than( $_[1], 0 ) };
+        precondition baz => sub { is_alphanumeric( $_[1] ) };
+
+  How do I save an old copy of the object?
+    Hopefully you don't need to. Just save the variable (or variables) you
+    need to check in the postcondition by creating closures. See "Testing
+    old values" for an example of how to do this.
+
+  How do I disable contracts?
+    Before you ask this, determine why you want to do this. If your
+    contracts are slowing down your program, first try following these
+    guidelines:
+
+    * Don't clone.
+        Cloning in Perl is expensive. Hopefully you've read the above
+        examples on "Testing old values" and have realized that cloning an
+        object isn't necessary.
+
+    * Don't recreate the function in the contract.
+        If your contract is performing the exact same tasks or calculations
+        that are in the function itself, toss it. Only code the essentials
+        into the contracts, such as "this function returns a number greater
+        than twelve" or "the object was modified in this mannar."
+
+    * Don't do type-checking in the contracts.
+        You can if you want, but contracts are designed to be *declarations
+        of behavior*, not to enforce the types of data structures you're
+        passing around.
+
+    If you really want to disable this module, replace "use
+    Class::Agreement" with "use Class::Agreement::Dummy", which exports
+    identically-named functions that do nothing.
+
+  What do you mean, "There's a problem with the hierarchy?"
+    The Liskov-Wing principle states, "The objects of subtype ought to
+    behave the same as those of the supertype as far as anyone or any
+    program using the supertype objects can tell." (See: "Liskov Wing
+    Subtyping" at <http://c2.com/cgi/wiki?LiskovWingSubtyping>.) Say that
+    "ClassA" is a parent class of "ClassB", and both classes implement a
+    method "m()", and both implementations have pre- and postconditions.
+    According to Liskov-Wing, the valid input of "ClassA::m()" should be a
+    *subset* of the valid input of "ClassB::m()". Thus, if the precondition
+    for "ClassA::m()" fails but the precondition for "ClassB::m()" passes,
+    the class heiarchy fails the principle. Postconditions are the opposite:
+    the output of "ClassA::m()" should be a *superset* of the output of
+    "ClassB::m()". If the postcondition for "ClassA::m()" passes but the
+    postcondition for "ClassB::m()" fails, this violates the principle.
+
+  Can I modify the argument list?
+    If the argument list @_ is made up of simple scalars, no. However, if
+    the method or function is passed a reference of some sort. This is a Bad
+    Thing because your code should
+
+  How can I type less?
+    ...or more ugly? Use implicit returns and don't name your variables. For
+    example, the dependent contract in "Dependent Contracts" could be
+    written as follows:
+
+        dependent insert_tile => sub {
+            my $o = shift()->num_tiles;
+            sub { shift()->num_tiles > $o };
+        };
+
+    Other examples:
+
+        precondition sqrt => sub { shift() > 0 };
+
+        postcondition digits => sub { result =~ /^\d+$/ };
+
+        invariant sub { shift()->size > 4 };
+
+    Or, write your own generator to make things clean:
+
+        sub argument_is_divisible_by {
+            my $num = shift;
+            return sub { not $_[1] % $num };
+        }
+
+        precondition foo => argument_is_divisible_by(2);
+        precondition bar => argument_is_divisible_by(3);
+
+  What if I generate methods?
+    There's no problem as long as you build your subroutines before runtime,
+    probably by sticking the generation in a "BEGIN" block.
+
+    Here's a snippet from one of the included tests, t/generate-methods.t.
+    Three methods, "foo", "bar" and "baz", are created and given an
+    assertion that the argument passed to them must be greater than zero:
+
+        my $assertion = sub { $_[1] > 0 };
+        precondition foo => $assertion;
+        precondition bar => $assertion;
+        precondition baz => $assertion;
+
+        BEGIN {
+            no strict 'refs';
+            *{$_} = sub { }
+                for qw( foo bar baz );
+        }
+
+CAVEATS
+    * You can't add contracts for abstract methods. If you try to add a
+    contract to a method that isn't implemented in the given class or any of
+    its parents, Class::Agreement will croak. One must declare an empty
+    subroutine to get around this.
+    * The "wantarray" keyword will not properly report void context to any
+    methods with contracts.
+    * The "caller" keyword will return an extra stack frame.
+
+AUTHOR
+    Ian Langworth, "<ian@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-class-agreement@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Agreement>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Thanks to Prof. Matthias Felleisen who granted me a directed study to
+    pursue this project and guided me during its development.
+
+    Thanks to a number of other people who contributed to this module in
+    some way, including: Damian Conway, Simon Cozens, Dan "Lamech" Friedman,
+    Uri Guttman, Christian Hansen, Adrian Howard, David Landgren, Curtis
+    "Ovid" Poe, Ricardo SIGNES, Richard Soderburg, Jesse Vincent.
+
+SEE ALSO
+    Class::Contract, Hook::LexWrap, Carp::Assert, Carp::Assert::More,
+    Param::Util
+
+    <http://citeseer.ist.psu.edu/findler01objectoriented.html>,
+    <http://c2.com/cgi/wiki?LiskovWingSubtyping>
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Ian Langworth, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

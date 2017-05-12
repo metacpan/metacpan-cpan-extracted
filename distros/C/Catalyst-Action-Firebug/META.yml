@@ -1,0 +1,18 @@
+abstract: Catalyst action for embedding Firebug Lite tag
+author: Daisuke Murase <typester@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Action-Firebug
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Catalyst: 5.6
+  File::Spec: 0
+  MIME::Base64: 0
+  NEXT: 0
+version: 0.01

@@ -1,0 +1,813 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_create_help
+# ABSTRACT: Walks through an installation and tries to extract all options with informations into a database
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Archive::Zip qw/ :ERROR_CODES :CONSTANTS/;
+use HTML::TreeBuilder;
+use IO::HTML;
+use XML::LibXML;
+use Tie::File;
+use Term::ProgressBar;
+use DBI;
+#use utf8;
+use File::Find;
+use File::Basename;
+use File::Spec;
+use CAD::Firemen;
+use CAD::Firemen::Common qw(
+  getInstallationPath
+  getInstallationConfigCdb
+  :PRINTING
+  strip
+  sharedDir
+  dbConnect
+  buildStatistic
+);
+use CAD::Firemen::Load qw(loadCDB);
+use CAD::Firemen::ParseHelp::Wildfire5 qw(extractHelpWildfire5);
+use CAD::Firemen::ParseHelp::Creo3 qw(extractHelpCreo3);
+
+
+sub localeToLang {
+  my $locale = shift;
+  if(!defined($locale) || $locale eq ""){
+    return "";
+  }
+  my %languages = ("en_US" => "usascii", "de_DE" => "german");
+  if(exists($languages{$locale})){
+    return $languages{$locale};
+  }
+  return "";
+}
+
+our $locale = "en_US";
+our $zipUrl = "";
+our $tocUrl = "";
+sub findHelpUrls{
+  my $file = $File::Find::name;
+  my $regex = "(?:\|/)(?:pma|proe)_help_". substr($locale, 0, 2) .".zip\$";
+  if(($zipUrl eq "") && ($file =~ m/$regex/i)){
+    $zipUrl = $file;
+    testPassed("Found help archive (". $zipUrl .")");
+  }
+  elsif($tocUrl eq ""){
+    $regex = "toc/". $locale .".xml\$";
+    if($file =~ m/$regex/i){
+      $tocUrl = $file;
+      testPassed("Found help toc (". $tocUrl .")");
+    }
+    else{
+      my $language = localeToLang($locale);
+      if($language ne ""){
+        $regex = "(?:\|/)". $language ."/pma_sx.js\$";
+        if(($tocUrl eq "") && ($file =~ m/$regex/i)){
+          my ($name, $path, $suffix) = fileparse($file);
+          $tocUrl = File::Spec->canonpath( $path ."/../../");
+          testPassed("Found help in creo 3 format (". $tocUrl .")");
+          $zipUrl = "";
+        }
+      }
+    }
+  }
+}
+
+my $showVersion = 0;
+my $verbose = 0;
+my $outputFile = "";
+my $crossfire = 0;
+my $notepad = 0;
+my $dbh = undef;
+
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions(
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'output|o:s' => \$outputFile,
+  'locale|l:s' => \$locale,
+  'crossfire|c' => \$crossfire,
+  'notepad|n' => \$notepad
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+my $structUrl = shift;
+
+if(!defined($structUrl)){
+  $structUrl = getInstallationPath();
+}
+
+if(!defined($structUrl) || $structUrl eq ""){
+  pod2usage(2);
+}
+
+if($locale !~ m/[a-z]{2}_[A-Z]{2}/){
+  print "Please specify a valid locale like en_US\n";
+  help();
+  exit 1;
+}
+
+if($crossfire && $outputFile eq ""){
+  print "Please specify an output file with help of --output\n";
+  pod2usage(2);
+}
+
+if($notepad && !-d $outputFile){
+  print "Please specify an existend output directory with help of --output\n";
+  pod2usage(2);
+}
+
+# get most upper folder (root folder) of creo or proe
+my $rootUrl = $structUrl;
+$rootUrl =~ s/^(.+(?:creo|proe)[^(?:\\|\/)]+).{0,}/$1/gi;
+if(!-d $rootUrl){
+  print $rootUrl ."\n";
+  testFailed("Extract root Url");
+  exit 1;
+}
+
+my $cdbUrl = getInstallationConfigCdb($structUrl);
+my ($refOptions, $refErrors) = loadCDB($cdbUrl);
+my %cdbOptions = %{$refOptions};
+my %cdbErrors = %{$refErrors};
+if(scalar(keys(%cdbErrors))){
+  if($verbose > 0){
+    testFailed("Load CDB");
+  }
+  if($verbose > 1){
+    print "Errors while parsing ". $cdbUrl .":\n";
+    my @lines = sort { $a <=> $b } keys(%cdbErrors);
+    my $max = length($lines[scalar(@lines) - 1]);
+    foreach my $line (@lines){
+      printColored(sprintf("%". $max ."s", $line) .": ". $cdbErrors{$line} ."\n", "red");
+    }
+  }
+  exit 1;
+}
+
+# find files
+find(\&findHelpUrls, $rootUrl);
+if(!-e $tocUrl){
+  testFailed("Found help archive");
+  exit 1;
+}
+if(!-e $zipUrl && $verbose > 1){
+  print "Found help in extracted format\n";
+}
+
+# extract info for every option
+my %optionsInfo = ();
+my %optionsValue = ();
+my %optionsDefault = ();
+my %errors = ();
+if($zipUrl ne ""){
+    my ($optionsInfoRef, $optionsValueRef, $optionsDefaultRef, $errorsRef) = extractHelpWildfire5($tocUrl, "", \%cdbOptions, $verbose, $zipUrl);
+    %optionsInfo = %{$optionsInfoRef};
+    %optionsValue = %{$optionsValueRef};
+    %optionsDefault = %{$optionsDefaultRef};
+    %errors = %{$errorsRef};
+}
+else{
+    my ($optionsInfoRef, $optionsValueRef, $optionsDefaultRef, $errorsRef) = extractHelpCreo3($tocUrl, localeToLang($locale), \%cdbOptions, $verbose);
+    %optionsInfo = %{$optionsInfoRef};
+    %optionsValue = %{$optionsValueRef};
+    %optionsDefault = %{$optionsDefaultRef};
+    %errors = %{$errorsRef};
+}
+my $foundOptionsInHelp = scalar(keys(%optionsInfo));
+
+if(scalar(keys(%errors)) > 0){
+  print2ColsRightAligned("Collecting infos ", scalar(keys(%errors)) ." errors", "yellow");
+  if($verbose > 0){
+    my $max = maxLength(keys(%errors)) + 2;
+    foreach my $opt (sort(keys(%errors))){
+      print sprintf("%-". $max ."s", $opt .": ") . $errors{$opt} ."\n";
+    }
+  }
+}
+
+if($crossfire){
+  # create the output in format of crossfire
+  my $CROSS;
+  if(!open($CROSS, ">", $outputFile)){
+    testFailed("Creating crossfire help");
+    exit 1;
+  }
+
+  # insert header
+  if($structUrl =~ m/^.+((?:creo|proe)[^(?:\\|\/)]+).{0,}/i){
+    print $CROSS "#####################################\n";
+    print $CROSS "#\n";
+    print $CROSS "# For ". $1 ."; Created with CAD::Firemen-". $CAD::Firemen::VERSION ." on ". strftime("%Y-%m-%d", localtime()) ."\n";
+    print $CROSS "#\n";
+    print $CROSS "#####################################\n";
+  }
+
+  # insert all found options into the file
+  # we use cdbOptions here as base, to catch also those options, which we have not found at the documentation
+  my $max = scalar(keys(%cdbOptions));
+  my $progress = Term::ProgressBar->new({name => "Inserting data", count => $max});
+  $progress->minor(0);
+  my $i = 0;
+  foreach my $opt (sort(keys(%cdbOptions))){
+    # insert option
+    print $CROSS lc($opt) ."\n";
+
+    # insert values
+    my @keys = keys(%{$cdbOptions{$opt}});
+    if(scalar(@keys) < 1 || !$keys[0]){
+        next;
+    }
+    my $ref = $cdbOptions{$opt}->{$keys[0]};
+    if(!defined($ref)){
+      next;
+    }
+    my @values = ();
+    foreach my $value (keys(%{$ref})){
+      # insert default value hint
+      if(exists($optionsDefault{$opt}) && ($value eq $optionsDefault{$opt})){
+        $value .= " (default)";
+      }
+      push(@values, $value);
+    }
+    print $CROSS join(", ", @values) ."\n";
+
+    # description
+    if(exists($optionsInfo{$opt})){
+      print $CROSS $optionsInfo{$opt} ."\n"
+    }
+    # option finisher
+    print $CROSS "***\n";
+
+    $i++;
+    $progress->update($i);
+  }
+  if($i < $max){
+    $progress->update($max);
+  }
+  close($CROSS);
+}
+elsif($notepad){
+  # compute file name
+  my $file = "";
+  my $version = "";
+  if($structUrl =~ m/^.+((?:creo|proe)[^(?:\\|\/)]+).{0,}/i){
+    $version = $1;
+    $version =~ s/\s//g;
+    $version =~ s/\./_/g;
+  }
+  my $fileAPI = $outputFile ."/". $version .".xml";
+  my $fileUDL = $outputFile ."/". $version ."-udl.xml";
+
+  # creating the API auto complete file
+  # (Should be placed in plugins/API)
+  my $docAPI = XML::LibXML::Document->new("1.0", "UTF-8");
+   # creating the user defined language file
+  # (Must be imported at the UDL Dialog at View-> User defined languages)
+  my $docUDL = XML::LibXML::Document->new("1.0", "UTF-8");
+
+  # prepare docAPI
+  my $root = $docAPI->createElement("NotepadPlus");
+  $docAPI->setDocumentElement($root);
+  # insert header comment
+  my $elem = $docAPI->createComment("\@author Firemen\n \@version ". strftime("%Y%m%d", localtime()) ."\n");
+  $root->appendChild($elem);
+  my $autoc = $docAPI->createElement("AutoComplete");
+  $root->appendChild($autoc);
+  $autoc->setAttribute("language", $version);
+  $elem = $docAPI->createElement("Environment");
+  $autoc->appendChild($elem);
+  $elem->setAttribute("ignoreCase", "yes");
+  $elem->setAttribute("startFunc", " ");
+  $elem->setAttribute("stopFunc", "");
+
+
+  # prepare docUDL
+  $root = $docUDL->createElement("NotepadPlus");
+  $docUDL->setDocumentElement($root);
+  my $udl = $docUDL->createElement("UserLang");
+  $root->appendChild($udl);
+  $udl->setAttribute("name", $version);
+  my $versionNum = $version;
+  $versionNum =~ s/[^\d]//g;
+  $udl->setAttribute("ext", "proe". $versionNum);
+
+  my $settings = $docUDL->createElement("Settings");
+  $udl->appendChild($settings);
+  $elem = $docUDL->createElement("Global");
+  $settings->appendChild($elem);
+  $elem->setAttribute("caseIgnored", "yes");
+  $elem = $docUDL->createElement("TreatAsSymbol");
+  $settings->appendChild($elem);
+  $elem->setAttribute("comment", "no");
+  $elem->setAttribute("commentLine", "no");
+  $elem = $docUDL->createElement("Prefix");
+  $settings->appendChild($elem);
+  $elem->setAttribute("words1", "no");
+  $elem->setAttribute("words2", "no");
+  $elem->setAttribute("words3", "no");
+  $elem->setAttribute("words4", "no");
+  my $keywordLists = $docUDL->createElement("KeywordLists");
+  $udl->appendChild($keywordLists);
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Delimiters");
+  $elem->appendText("000000");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Folder+");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Folder-");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Operators");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Comment");
+  $elem->appendText("1 2 0!");
+  my $words1 = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($words1);
+  $words1->setAttribute("name", "Words1");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Words2");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Words3");
+  $elem = $docUDL->createElement("Keywords");
+  $keywordLists->appendChild($elem);
+  $elem->setAttribute("name", "Words4");
+  my $styles = $docUDL->createElement("Styles");
+  $udl->appendChild($styles);
+  my @wordStyles = (
+    {
+      "name" => "DEFAULT",
+      "styleID" => 11,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0,
+      "fontSize" => 10
+    },
+    {
+      "name" => "FOLDEROPEN",
+      "styleID" => 12,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "FOLDERCLOSE",
+      "styleID" => 13,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "KEYWORD1",
+      "styleID" => 5,
+      "fgColor" => "0000FF",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 1
+    },
+    {
+      "name" => "KEYWORD2",
+      "styleID" => 6,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "KEYWORD3",
+      "styleID" => 7,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "KEYWORD4",
+      "styleID" => 8,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "COMMENT",
+      "styleID" => 1,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "COMMENT LINE",
+      "styleID" => 2,
+      "fgColor" => "808040",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "NUMBER",
+      "styleID" => 4,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "OPERATOR",
+      "styleID" => 10,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "DELIMINER1",
+      "styleID" => 14,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "DELIMINER2",
+      "styleID" => 15,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    },
+    {
+      "name" => "DELIMINER3",
+      "styleID" => 16,
+      "fgColor" => "000000",
+      "bgColor" => "FFFFFF",
+      "fontName" => "",
+      "fontStyle" => 0
+    }
+  );
+  foreach my $refStyle (@wordStyles){
+    $elem = $docUDL->createElement("WordsStyle");
+    $styles->appendChild($elem);
+    foreach my $key (keys(%{$refStyle})){
+      $elem->setAttribute($key, $refStyle->{$key});
+    }
+  }
+
+  # insert all found options into the file
+  # we use cdbOptions here as base, to catch also those options, which we have not found at the documentation
+  my $max = scalar(keys(%cdbOptions));
+  my $progress = Term::ProgressBar->new({name => "Inserting data", count => $max});
+  $progress->minor(0);
+  my $i = 0;
+  my @words1Words = ();
+  foreach my $opt (sort(keys(%cdbOptions))){
+    # insert option
+    my $keyword = $docAPI->createElement("KeyWord");
+    $autoc->appendChild($keyword);
+    $keyword->setAttribute("name", lc($opt));
+    $keyword->setAttribute("func", "yes");
+
+    push(@words1Words, lc($opt));
+
+    my $description = "";
+    # description
+    if(exists($optionsInfo{$opt})){
+      $description = $optionsInfo{$opt};
+    }
+
+    # insert values
+    my @keys = keys(%{$cdbOptions{$opt}});
+    if(scalar(@keys) < 1 || !$keys[0]){
+        next;
+    }
+    my $ref = $cdbOptions{$opt}->{$keys[0]};
+    if(!defined($ref)){
+      next;
+    }
+    my @values = ();
+    foreach my $value (keys(%{$ref})){
+      # treat every value as an overload of the function, because only one value can be choosen
+      my $overload = $docAPI->createElement("Overload");
+      $keyword->appendChild($overload);
+      $overload->setAttribute("retVal", "void");
+      $overload->setAttribute("descr", $description);
+      $elem = $docAPI->createElement("Param");
+      $overload->appendChild($elem);
+      $elem->setAttribute("name", $value);
+    }
+
+    $i++;
+    $progress->update($i);
+  }
+  if($i < $max){
+    $progress->update($max);
+  }
+  $words1->appendText(join(" ", @words1Words));
+
+  if(!$docAPI->toFile($fileAPI, 1)){
+    testFailed("Creating notepad files");
+    exit 1;
+  }
+  if(!$docUDL->toFile($fileUDL, 1)){
+    testFailed("Creating notepad files");
+    exit 1;
+  }
+  if($verbose > 0){
+    print "Please copy ". $fileAPI ." into plugins\\APIs at the Notepad directory.\n";
+    print "Afterwards start Notepad go to View --> User defined languages, and import ". $fileUDL ."\n";
+    print "On next restart of Notepad, you can choose your proe version as a lanuage and\n";
+    print "you'll get syntex highlighting and auto completion\n";
+  }
+}
+else{
+  # creating the database
+  $dbh = dbConnect($structUrl, $verbose);
+  if(!$dbh){
+    testFailed("Creating database");
+    exit 1;
+  }
+  # quietly drop the table if it already existed
+  my $errorString = "";
+  my @tables = qw(options options_values options_has_values);
+  foreach my $table (@tables){
+    if(!defined($dbh->do("DROP TABLE IF EXISTS ". $table))){
+      $errorString = "Could not drop table ". $table;
+      last;
+    }
+  }
+  if($errorString ne ""){
+    testFailed("Creating database");
+    if($verbose > 0){
+      print $errorString ."\n";
+    }
+    exit 1;
+  }
+  # (re)create it
+  if(!defined($dbh->do("CREATE TABLE options (id INTEGER PRIMARY KEY, name VARCHAR(250), defaultValueId INTEGER, description TEXT)"))){
+    $errorString = "Could not create the database table options";
+  }
+  if(!defined($dbh->do("CREATE TABLE options_values (id INTEGER PRIMARY KEY, name VARCHAR(250))"))){
+    $errorString = "Could not create the database table options_values";
+  }
+  if(!defined($dbh->do("CREATE TABLE options_has_values (id INTEGER PRIMARY KEY, optionsId INTEGER, valuesId INTEGER)"))){
+    $errorString = "Could not create the database table options_has_values";
+  }
+  if($errorString ne ""){
+    testFailed("Creating database");
+    if($verbose > 0){
+      print $errorString ."\n";
+    }
+    exit 1;
+  }
+
+  # insert all found options into the database
+  # we use cdbOptions here as base, to catch also those options, which we have not found at the documentation
+  my $max = scalar(keys(%cdbOptions));
+  my $progress = Term::ProgressBar->new({name => "Inserting data", count => $max});
+  $progress->minor(0);
+  my $i = 0;
+  foreach my $opt (sort(keys(%cdbOptions))){
+    my $info = "";
+    if(exists($optionsInfo{$opt})){
+      $info = $optionsInfo{$opt};
+    }
+    $info = $dbh->quote($info);
+    $dbh->do("INSERT INTO options VALUES (NULL, '". $opt ."', NULL, ". $info .")");
+    my $ref = $dbh->selectall_arrayref("SELECT id FROM options WHERE name='$opt'");
+    if(!defined($ref) || scalar(@{$ref}) != 1){
+      $errorString = "Could not insert option ". $opt ." (Select failed)\nDescription: ". $info;
+      last;
+    }
+    my $optionId = $ref->[0]->[0];
+    if($optionId < 1){
+      $errorString = "Could not insert option ". $opt ." (Id < 1)";
+      last;
+    }
+    my @keys = keys(%{$cdbOptions{$opt}});
+    if(scalar(@keys) < 1 || !$keys[0]){
+      next;
+    }
+    $ref = $cdbOptions{$opt}->{$keys[0]};
+    if(!defined($ref)){
+      next;
+    }
+    foreach my $value (keys(%{$ref})){
+      # check if value already exists
+      $ref = $dbh->selectall_arrayref("SELECT id FROM options_values WHERE name='$value'");
+      my $valueId = 0;
+      if(defined($ref) && (scalar(@{$ref}) == 1)){
+        $valueId = $ref->[0]->[0];
+      }
+      else{
+        $dbh->do("INSERT INTO options_values VALUES (NULL, '$value')");
+        $ref = $dbh->selectall_arrayref("SELECT id FROM options_values WHERE name='$value'");
+        if(!defined($ref) || scalar(@{$ref}) != 1){
+          $errorString = "Could not insert value ". $value ." of option ". $opt;
+          last;
+        }
+        $valueId = $ref->[0]->[0];
+      }
+      if($valueId < 1){
+        $errorString = "Could not insert value ". $value ." of option ". $opt;
+        last;
+      }
+      # insert the relation and if default value insert defaultId
+      if(!defined($dbh->do("INSERT INTO options_has_values VALUES (NULL, '$optionId', '$valueId')"))){
+        $errorString = "Could not create relation between option ". $opt ." and value ". $value;
+        last;
+      }
+      if(exists($optionsDefault{$opt}) && ($value eq $optionsDefault{$opt})){
+        if(!defined($dbh->do("UPDATE options SET defaultValueId='$valueId' WHERE id='$optionId'"))){
+          $errorString = "Could not update option ". $opt ." to add default value ". $value;
+          last;
+        }
+      }
+    }
+    if($i % 10 == 0){
+      if(!$dbh->commit()){
+        $errorString = "Could not commit changes";
+        last;
+      }
+    }
+    $i++;
+    $progress->update($i);
+  }
+  # finish commit (if at last item $i % 10 is not 0)
+  $dbh->commit();
+  if($i < $max){
+    $progress->update($max);
+  }
+
+  if($errorString ne ""){
+    testFailed("Creating database");
+    if($verbose > 0){
+      print $errorString ."\n";
+    }
+    exit 1;
+  }
+}
+
+# print some statistics
+if($verbose > 0){
+  my $countOptions = scalar(keys(%cdbOptions));
+  # do not count all those options, which have -Fs as value
+  my $ignoredFs = 0;
+  # we use the first entry here, because in CDB file, all options should be
+  # only there one time
+  foreach my $opt (keys(%cdbOptions)){
+    my @keys = keys(%{$cdbOptions{$opt}});
+    if(scalar(@keys) > 0){
+        foreach my $value (keys(%{$cdbOptions{$opt}->{$keys[0]}})){
+          if($value eq "( -Fs )"){
+            $ignoredFs++;
+            last;
+          }
+        }
+    }
+  }
+  my $countOptionsDefaultValues = $countOptions - $ignoredFs;
+
+  print "\n\n";
+  print "Statistics:\n";
+
+  my %statistics = ();
+  $statistics{"Options in cdb"} = buildStatistic("Options in cdb", $countOptions, $countOptions);
+  $statistics{"Options in Help"} = buildStatistic("Options in Help", $foundOptionsInHelp, $countOptions);
+  $statistics{"Default values"} = buildStatistic("Default values", scalar(keys(%optionsDefault)), $countOptionsDefaultValues);
+  $statistics{"Descriptions"} = buildStatistic("Descriptions", scalar(keys(%optionsInfo)), $countOptions);
+
+  my $maxLen = maxLength(keys(%statistics)) + 2;
+  foreach my $stat (keys(%statistics)){
+    print sprintf("%-". $maxLen ."s", $stat) . $statistics{$stat} ."\n";
+  }
+  print "Ignored ". $ignoredFs ." Options with value -Fs to calculate percentage of Default values\n";
+}
+
+END {
+  if(defined($dbh) && ($dbh != 0) && !$dbh->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_create_help - Walks through an installation and tries to extract all options with informations into a database
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_create_help [options] [PATH_TO_INSTALLATION]
+
+Options:
+
+  --help             -?   Prints this help.
+  --version               Prints current version.
+  --verbose          -v   The verbose level. 0 - least output, 2 most output (Default: 0).
+  --output           -o   Optional filepath to store the created data.
+  --locale           -l   The locale which should be used (Default en_US).
+  --crossfire        -c   Store the output in the format of Crossfire. Set file with --output.
+  --notepad          -n   Create some Notepad++ help files. Set directory with --output.
+
+If no PATH_TO_INSTALLATION is given, it tries to figure out the correct path with help of $ENV{PATH}.
+
+Example:
+
+  fm_create_help
+
+=head1 DESCRIPTION
+
+This script parses a option database (cdb file) and afterwards, it tries
+to collect more information with help of the delivered html help. The collected
+data is stored in an SQLite Database afterwards. The structure is as shown below.
+
+                                                    |==========================|
+                                                    | options_has_values       |
+                                                    |==========================|
+  |==========================|                      | id INTEGER, PRIMARY KEY  |
+  | options                  |                      |--------------------------|
+  |==========================|          |---------->| optionsId INTEGER        |
+  | id INTEGER, PRIMARY KEY  | ---------|           |--------------------------|
+  |--------------------------|                |---->| valuesId INTEGER         |
+  | name VARCHAR(250)        |                |     |==========================|
+  |--------------------------|                |
+  | defaultValueId INTEGER   |<---------------|
+  |--------------------------|                |     |==========================|
+  | description TEXT         |                |     | options_values           |
+  |==========================|                |     |==========================|
+                                              ------| id INTEGER, PRIMARY KEY  |
+                                                    |--------------------------|
+                                                    | name VARCHAR(250)        |
+                                                    |==========================|
+
+It can also create help files for Crossfire (see option --crossfire) or a user
+defined language (udl) with auto completion for use with Notepad++ (--notepad).
+The last command creates to files. One file is the auto completion file, which
+should be copied into the plugins\APIs folder within your Notepad++ directory.
+The other file, with a name ending with -udl, is the definition of the udl. To
+import this file, start Notepad++ and choose Import in the udl dialog,
+which can be found within the View menu. After next restart of Notepad++, you can
+use the auto completion and syntax highlighting for your configuration files after
+choosing the new udl at the language menu.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

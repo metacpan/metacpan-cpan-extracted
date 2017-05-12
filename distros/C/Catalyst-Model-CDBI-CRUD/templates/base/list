@@ -1,0 +1,32 @@
+[% USE class = Class(class) %]
+[% action = c.request.action %]
+<table>
+    <tr>
+    [% primary = class.primary_column %]
+    [% FOR column = class.columns %]
+        [% NEXT IF column == primary %]
+        <th>[% column %]</th>
+    [% END %]
+        <th/>
+    </tr>
+    [% FOR object = class.retrieve_all %]
+        <tr>
+        [% FOR column = class.columns.list %]
+            [% NEXT IF column == primary %]
+            <td>[% object.$column %]</td>
+        [% END %]
+            <td>
+                <a href="[% base _ action _ '/view/' _ object.$primary %]">
+                    View
+                </a>
+                <a href="[% base _ action _ '/edit/' _ object.$primary %]">
+                    Edit
+                </a>
+                <a href="[% base _ action _ '/destroy/' _ object.$primary %]">
+                    Destroy
+                </a>
+            </td>
+        </tr>
+    [% END %]
+</table>
+<a href="[% base _ action _ '/add' %]">Add</a>

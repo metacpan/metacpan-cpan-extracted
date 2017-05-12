@@ -1,0 +1,55 @@
+CGI-CRUD version 1.06
+=====================
+
+This module provide a framework to create web forms for a front-end
+CRUD interface to a variety of data sources. It features
+auto-discovery of the data dictionary for an RDBMS source.
+
+With this framework, you can get a basic CRUD web interface up and
+running in minutes without coding. At the same, it allows a great
+deal of flexibility for customization by engineers (application
+functionality/business logic) and non-engineers (presentation and
+style) alike.
+
+For an implementation see Cruddy!
+http://www.thesmbexchange.com/cruddy/index.html
+
+CRUD now, code later.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Enurl
+  CGI::AutoForm
+  DBIx::IO
+  CGI::FastTemplate
+  DBI
+  
+  Optional:
+    If you plan to run this under plain ole' CGI then you'll need
+      CGI
+    
+    To take full advantage of debugging with mod_perl_debug.pl (see Cruddy!
+    referenced above)
+      Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2000-2012 Reed Sandberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

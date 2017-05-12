@@ -1,0 +1,156 @@
+
+
+NAME
+       CGI::FormBuilder::Source::YAML - Initialize FormBuilder from YAML file
+
+SYNOPSIS
+        use CGI::FormBuilder;
+
+        my $form = CGI::FormBuilder->new(
+           source  => {
+               source  => 'form.fb',
+               type    => 'YAML',
+           },
+        );
+
+        my $lname = $form->field('lname');  # like normal
+
+DESCRIPTION
+       This reads a YAML (YAML::Syck) file that contains FormBuilder config
+       options and returns a hash to be fed to CGI::FormBuilder->new().
+
+       Instead of the syntax read by CGI::FormBuilder::Source::File, it uses
+       YAML syntax as read by YAML::Syck.  That means you fully specify the
+       entire data structure.
+
+       LoadCode is enabled, so you can use YAML syntax for defining subrou-
+       tines.  This is convenient if you have a function that generates vali-
+       dation subrefs, for example, I have one that can check profanity using
+       Regexp::Common.
+
+        validate:
+           myfield:
+               javascript: /^[\s\S]{2,50}$/
+               perl: !!perl/code: >-
+                   {   My::Funk::fb_perl_validate({
+                           min         => 2,
+                           max         => 50,
+                           profanity   => 'check'
+                       })->(shift);
+                   }
+
+POST PROCESSING
+       There are two exceptions to "pure YAML syntax" where this module does
+       some post-processing of the result.
+
+       REFERENCES (ala CGI::FormBuilder::Source::File)
+
+       You can specify references as string values that start with \&, \$, \@,
+       or \% in the same way you can with CGI::FormBuilder::Source::File.  If
+       you have a full direct package reference, it will look there, otherwise
+       it will traverse up the caller stack and take the first it finds.
+
+       For example, say your code serves multiple sites, and a menu gets dif-
+       ferent options depending on the server name requested:
+
+        # in My::Funk:
+        our $food_options = {
+            www.meats.com   => [qw( beef    chicken horta   fish    )],
+            www.veggies.com => [qw( carrot  apple   quorn   radish  )],
+        };
+
+        # in source file:
+        options: \@{ $My::Funk::food_options->{ $ENV{SERVER_NAME} } }
+
+       EVAL STRINGS
+
+       You can specify an eval statement.  You could achieve the same example
+       a different way:
+
+        options: eval { $My::Funk::food_options->{ $ENV{SERVER_NAME} }; }
+
+       The cost either way is about the same -- the string is eval'd.
+
+EXAMPLE
+        method:     GET
+        header:     0
+        title:      test
+        name:       test
+        action:     /test
+        submit:     test it
+        linebreaks: 1
+
+        required:
+           - test1
+           - test2
+
+        fields:
+           - test1
+           - test2
+           - test3
+           - test4
+
+        fieldopts:
+           test1:
+               type:       text
+               size:       10
+               maxlength:  32
+
+           test2:
+               type:       text
+               size:       10
+               maxlength:  32
+
+           test3:
+               type:       radio
+               options:
+                   -
+                       - 1
+                       - Yes
+                   -
+                       - 0
+                       - No
+
+           test4:
+               options:    \@test4opts
+               sort:       \&Someother::Package::sortopts
+
+        validate:
+           test1:      /^\w{3,10}$/
+           test2:
+               javascript: EMAIL
+               perl:       eq 'test@test.foo'
+           test3:
+               - 0
+               - 1
+           test4:  \@test4opts
+
+       You get the idea.  A bit more whitespace, but it works in a standard-
+       ized way.
+
+METHODS
+       new()
+
+       Normally not used directly; it is called from CGI::FormBuilder.  Cre-
+       ates the "CGI::FormBuilder::Source::YAML" object.  Arguments from the
+       'source' hash passed to CGI::FormBuilder->new() will become defaults,
+       unless specified in the file.
+
+       parse($source)
+
+       Normally not used directly; it is called from CGI::FormBuilder.  Parses
+       the specified source file.  No fancy params -- just a single filename
+       is accepted.  If the file isn't acceptable to YAML::Syck, I suppose it
+       will die.
+
+SEE ALSO
+       CGI::FormBuilder, CGI::FormBuilder::Source
+
+AUTHOR
+       Copyright (c) 2006 Mark Hedges <hedges@ucsd.edu>. All rights reserved.
+
+LICENSE
+       This module is free software; you may copy it under terms of the Perl
+       license (GNU General Public License or Artistic License.)
+       http://www.opensource.org/licenses/index.html
+

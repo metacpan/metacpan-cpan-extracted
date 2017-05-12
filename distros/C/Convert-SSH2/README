@@ -1,0 +1,51 @@
+Convert-SSH2
+
+Version: 0.01
+
+This library converts an SSH2 style RSA public key to other representations like PKCS#1 which
+would be suitable for use with Crypt::RSA or other RSA library implementations.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Convert::SSH2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-SSH2
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Convert-SSH2
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Convert-SSH2
+
+    MetaCPAN
+        https://metacpan.org/dist/Convert-SSH2
+
+    Git Hub
+        https://github.com/mrallen1/Convert-SSH2
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Mark Allen
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

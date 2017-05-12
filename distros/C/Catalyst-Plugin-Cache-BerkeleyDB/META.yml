@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Catalyst-Plugin-Cache-BerkeleyDB
+version: 0.01
+author:
+  - David Kamholz <dkamholz@cpan.org>
+abstract: 
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

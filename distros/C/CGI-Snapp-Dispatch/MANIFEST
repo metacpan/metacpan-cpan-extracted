@@ -1,0 +1,27 @@
+Changelog.ini
+Changes
+lib/CGI/Snapp/Dispatch.pm
+lib/CGI/Snapp/Dispatch/Regexp.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/args.t
+t/args.txt
+t/lib/CGI/Snapp/App1.pm
+t/lib/CGI/Snapp/App2.pm
+t/lib/CGI/Snapp/Dispatch/PSGITest.pm
+t/lib/CGI/Snapp/Dispatch/RunScript.pm
+t/lib/CGI/Snapp/Dispatch/SubClass1.pm
+t/lib/CGI/Snapp/Dispatch/SubClass2.pm
+t/lib/CGI/Snapp/Dispatch/SubClass3.pm
+t/log.a.pl
+t/log.b.pl
+t/logs.t
+t/psgi.args.t
+t/psgi.regexp.t
+t/regexp.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

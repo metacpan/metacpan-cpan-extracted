@@ -1,0 +1,18 @@
+Revision history for Perl extension CGI::apacheSSI.
+
+0.96  Sun Jan 31 2016
+    - Removed the "use warnings" line.
+
+0.95  Sun Jan 31 2016
+    - Fixed some security and parsing problems with "include" calls.
+    - Fixed the fsize and flastmod functions.
+    - Removed ability to "include" from other sites, thereby also removing need for LWP::UserAgent
+    - "include virtual" and "include file" security fixes and functionality improvement
+    - flastmod, fsize functionality (similarity to Apache) improved
+    
+0.94  Sat Jan 30 2016
+    - Fixed the long-standing problems with the test vectors.
+
+0.93  Wed Jun 24 2014
+    - first release of CGI::apacheSSI a fork of CGI:SSI v0.92, aiming to emulate apache's SSI behavior.
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title><tmpl_var name=title></title>
+</head>
+<body>
+    <form action="<tmpl_var name=scriptname>" method=post>
+        <tmpl_var name=message>
+        <input type=text name=locale value="<tmpl_var name=locale>" />
+        <input type=hidden name=rm value=test />
+        <input type=submit />
+    </form>
+    
+    Hello: <b><tmpl_var name=hello></b><br />
+    Colour: <b><tmpl_var name=colour></b>
+</body>
+</html>

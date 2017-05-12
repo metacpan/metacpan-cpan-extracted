@@ -1,0 +1,25 @@
+---
+name: Config-Context
+version: 0.10
+author:
+  - Michael Graham <mag-perl@occamstoothbrush.com>
+abstract: 'Add C<< <Location> >> and C<< <LocationMatch> >> style context matching to hierarchical configfile formats such as Config::General, XML::Simple and Config::Scoped'
+license: perl
+requires:
+  Clone: 0
+  Config::General: 2.27
+  Hash::Merge: 0
+  Test::More: 0
+provides:
+  Config::Context:
+    file: lib/Config/Context.pm
+    version: 0.10
+  Config::Context::ConfigGeneral:
+    file: lib/Config/Context/ConfigGeneral.pm
+  Config::Context::ConfigScoped:
+    file: lib/Config/Context/ConfigScoped.pm
+  Config::Context::XMLSimple:
+    file: lib/Config/Context/XMLSimple.pm
+  XML::Filter::XInclude::RememberFiles:
+    file: lib/Config/Context/XMLSimple.pm
+generated_by: Module::Build version 0.2611

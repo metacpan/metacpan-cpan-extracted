@@ -1,0 +1,78 @@
+---
+abstract: 'Simple Deploy Tool A La Cinnamon'
+author:
+  - 'Daisuke Maki <daisuke@endeworks.jp>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.2, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Canella
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Canella:
+    file: lib/Canella.pm
+    version: 0.05
+  Canella::BlockGuard:
+    file: lib/Canella/BlockGuard.pm
+    version: 0
+  Canella::CLI:
+    file: lib/Canella/CLI.pm
+    version: 0
+  Canella::Context:
+    file: lib/Canella/Context.pm
+    version: 0
+  Canella::DSL:
+    file: lib/Canella/DSL.pm
+    version: 0
+  Canella::Exec::Local:
+    file: lib/Canella/Exec/Local.pm
+    version: 0
+  Canella::Exec::Remote:
+    file: lib/Canella/Exec/Remote.pm
+    version: 0
+  Canella::Log:
+    file: lib/Canella/Log.pm
+    version: 0
+  Canella::Role:
+    file: lib/Canella/Role.pm
+    version: 0
+  Canella::Task:
+    file: lib/Canella/Task.pm
+    version: 0
+  Canella::TaskRunner:
+    file: lib/Canella/TaskRunner.pm
+    version: 0
+requires:
+  AnyEvent: 0
+  Coro: 0
+  Guard: 0
+  Hash::MultiValue: 0
+  IPC::Run: 0
+  JSON: 0
+  Log::Minimal: 0
+  Moo: 0
+  Net::OpenSSH: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/lestrrat/p5-Canella/issues
+  homepage: https://github.com/lestrrat/p5-Canella
+  repository: git://github.com/lestrrat/p5-Canella.git
+version: 0.05
+x_contributors:
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

@@ -1,0 +1,45 @@
+#! /usr/bin/perl
+# -*- mode: cperl; -*-
+
+# Verify signature of a CSR
+# Usage: verify_csr [-l] file
+#        If file is not specified, reads from stdin
+#        -l use lax interpetation of Base64
+
+# Copyright (c) 2016 Timothe Litt
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+# Terms of the Perl programming language system itself
+#
+# a) the GNU General Public License as published by the Free
+#   Software Foundation; either version 1, or (at your option) any
+#   later version, or
+# b) the "Artistic License"
+#
+# See LICENSE for details.
+#
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+use strict;
+use warnings;
+
+use Crypt::PKCS10;
+use File::Slurp;
+use Getopt::Std;
+
+our $VERSION = '1.0';
+
+our( $opt_l );
+
+getopts( 'l' );
+
+my $in = read_file( @ARGV? $ARGV[0]: \*STDIN, binmode => ':raw' );
+
+Crypt::PKCS10->setAPIversion(1);
+my $csr = Crypt::PKCS10->new( $in, ($opt_l? (ignoreNonBase64 => 1): ()) ) or
+  die Crypt::PKCS10->error;
+
+print( "Signature is OK\n" );

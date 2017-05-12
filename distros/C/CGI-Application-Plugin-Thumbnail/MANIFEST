@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+lib/CGI/Application/Plugin/Thumbnail.pm
+lib/CGI/Application/Plugin/Thumbnail.pod
+t/.thumbnails/100x100/ayn_rand.jpg
+t/0.t
+t/1.t
+t/3_Image-Thumbnail-reqs.t
+t/PTest.pm
+t/Thumbs/200x200/ayn_rand.jpg
+t/ayn_rand.jpg
+t/thumbnails/100x100/ayn_rand.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+#README
+lib/Class/DBI/Sweet/Pie.pm
+lib/Class/DBI/Sweet/Pie/Nihongo.pod
+t/00-load.t
+t/01-aggregate.t
+t/02-join_aggregate.t
+t/lib/DBBase.pm
+t/lib/DBArtists.pm
+t/lib/DBCDs.pm
+t/lib/DBLabels.pm

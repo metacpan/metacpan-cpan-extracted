@@ -1,0 +1,17 @@
+^_build/
+^Build$
+\bCVS\b
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$
+^blib/
+^\.git/
+^Cache-\d
+pm_to_blib
+.cvsignore
+.swp$
+~$
+^\.gitignore$
+^MYMETA\.yml$
+^MYMETA\.json$
+^tags$

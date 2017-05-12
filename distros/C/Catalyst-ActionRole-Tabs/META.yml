@@ -1,0 +1,30 @@
+---
+abstract: 'Add tabs to Catalyst controller actions'
+author:
+  - 'Bernhard Graf <graf@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  URI: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-ActionRole-Tabs
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Controller::ActionRole: 0
+  Catalyst::Runtime: 0
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/augensalat/Catalyst-ActionRole-Tabs/tree/master
+version: 0.003000

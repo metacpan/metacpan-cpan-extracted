@@ -1,0 +1,206 @@
+Revision history for CPAN-Testers-WWW-Reports-Mailer
+====================================================
+
+0.37    2016-04-25
+        - Metabase reports are now stored as Sereal entries, not pure JSON, so
+          need to deserialize before sending individual reports.
+        - Data::FlexSerializer added as a prerequisite.
+
+0.36    2016-04-24
+        - added a fallback sponsors file, in case network fails.
+        - added missing SQL to tests.
+        - grammatical fixes to mailer template
+
+0.35    2015-12-31
+        - added missing pre-requisites.
+
+0.34    2015-12-29
+        - retrieve sponsors from iheart site.
+        - add random sponsor to emails.
+
+0.33    2014-09-24
+        - fixed license fields in META.json to be lists.
+        - added homepage to resources links.
+        - added documentation about the CPAN Testers Fund.
+
+0.32    2014-07-10
+        - updated notification text (thanks to Karen Etheridge and Christian
+          Walde).
+
+0.31    2014-05-12
+        - fixed distribution name in META.
+        - added LICENSE file.
+        - updated license links.
+        - more thorough META tests.
+
+0.30    2012-12-31
+        - fixed MANIFEST list.
+        - scaled down test data.
+
+0.29    2012-12-16
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - CHANGES => Changes
+        - change file dates changed to meet W3CDTF standards.
+        - reworked Makefile.PL for clarity.
+        - License updated to Artistic License v2.0.
+        - added minimum perl version (5.006).
+        - added missing prerequisites.
+        - added META.json.
+        - dropped SQLite support.
+        - move DB testing to Test::Database.
+        - added Test::Trap & help testing.
+        - reworked test suite.
+
+0.28    2011-10-13
+        - now only uses one database connection.
+
+0.27    2010-05-31
+        - added support for guid => nntpid lookups.
+        - added support for metabase reports.
+        - bugfixes from live.
+
+0.26    2010-01-14
+        - update CPAN Testers reports link in email template.
+
+0.25    2009-11-09
+        - fixed 31lastid.t to start with a blank sheet.
+
+0.24    2009-11-05
+        - POD documentation updates.
+        - moved tuples check to later in the process, as it is a big database
+          drain, when other checks could exclude the current report quickly.
+        - split debug flag into nomail and verbose flags.
+
+0.23    2009-11-05
+        - added auto reconnect if using a MySQL database.
+
+0.22    2009-11-01
+        - test fix due to MSWin32 delaying the file deletion process.
+        - amended logging test config to use local 01mailrc.txt
+
+0.21    2009-11-01
+        - bug fix when searching for tuples.
+
+0.20    2009-08-10
+        - added many more tests
+        - added more diagnostics in debug mode
+        - added the ability to check a report (automatical sets debug mode)
+
+0.19    2009-07-27
+        - temporary fix on live server made permanent (version.pm bug)
+        - fixed bad db reference
+
+0.18    2009-07-27
+        - fix for ALL grades.
+        - expanded test suite and samples considerably
+
+0.17    2009-06-06
+        - fixed email subject bug. Thanks to TONYC & RCAPUTO for spotting it.
+        - changed the way _get_lastid() works.
+        - added _set_lastid() to shortcut updating to the latest report
+        - non-daily mode SQL rewritten to speed up processing.
+        - added _get_earliest() to get a realistic start id, if a given mode
+          hasn't been set with a last id.
+
+0.16    2009-04-23
+        - added more tests
+        - added better reply-to handling
+        - more debugging output
+
+0.15    2009-04-04
+        - added support for monthly and named day weekly reports.
+        - added support for individual reports
+        - added more tests
+
+0.14    2009-01-29
+        - added author check in case lookup failed.
+        - fixed preferences bug for new authors.
+        - added more documentation.
+        - added more tests (43.9% coverage).
+        - added mode setting to define processing. Currently only daily summary
+          reports are available, but this will extend to weekly summary reports
+          and individual reports in time.
+        - options 'debug' and 'lastmail' now lower case in all configuration
+          variations.
+
+        - BACKWARDS INCOMPATIBILITY WARNING:
+
+          Due to the rework of the lastmail counter file, the old format will
+          cause errors in the new system. In order to port to the new format,
+          take the number currently stored and replace the zeroes in the
+          following string with it: daily=0,weekly=0,reports=0. Then save the
+          file.
+
+0.13    2009-01-19
+        - added more tests (now up to 43.4% coverage).
+        - enabled lastmail to be a configurable setting.
+
+0.12    2009-01-19
+        - moved to OO style of API.
+        - updated cpanreps-mailer (0.05) to use new OO API.
+        - added logging functionality.
+        - altered mail templates
+        - updated and added further count metrics.
+        - moved config example to examples/ and added example shell script.
+
+0.11    2009-01-18
+        - template website link fixes (thanks to JJ for spotting)
+        - added missing 'use version'.
+
+0.10    2008-12-17
+        - added missing README.
+        - fixed DBUtils method name calls.
+
+0.09    2008-12-15
+        - convert to use CPAN-Testers-Common-DBUtils
+        - minor debug output change to make life easier to ensure test runs
+          match.
+        - added protection for missing configuration.
+        - added debug command line switch to ensure debugging is ON!
+
+0.08    2008-12-14
+        - convert to use CPAN-Testers-Common-DBUtils.
+        - database references now CPANSTATS and CPANPREFS.
+        - fix to email templates now that preferences website is live.
+        - first release to CPAN.
+
+0.07    2008-11-19
+        - fix to ensure default preference entries always exist.
+        - fix broken SQL for incorrect table name :(
+        - additional POD for DBUtils.pm.
+
+0.06    2008-11-17
+        - fixed run time error where iterator call was bogus :(
+        - fixed preferences parsing to correctly set the new fields for ignored
+          and report.
+
+0.05    2008-11-16
+        - intergrated changes from the preferences site for ignoring
+          distributions and selecting the report type.
+        - fixed issues with get_author.
+        - altered Iterator to return a reference rather than the array or hash.
+
+0.04    2008-11-14
+        - fixed GetDefaultPrefs to use the INNER JOIN.
+        - allowed for exclusions in lists, as suggested by David Cantrell.
+        - moved DEBUG configuration to configuration file
+        - took out application configuration from MANIFEST and replaced it with
+          an example one, so as not to clobbered any settings from the real one
+          when installed.
+        - fixed InsertDistPrefs SQL string.
+
+0.03    2008-11-06
+        - port bulk of script code into Mailer module.
+
+0.02    2008-11-06
+        - prefs_distributions table extended to include distribution version,
+          platform, perl version and patches preferences.
+        - code added to cpanstats-mailer (v0.02) to include new preferences.
+        - redesigned tables so that login and activity are held in the author
+          table, and all distribution preferences are held in the distribution
+          table, where defaults are where distribution == '-'.
+        - redesigned new author insertions
+        - implemented a simple phrasebook lookup for SQL queries.
+
+0.01    2008-09-08
+        - initial release

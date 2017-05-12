@@ -1,0 +1,33 @@
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+table.test_results {
+	font-size: 85%;
+	border: 2px solid #bfbfbf;
+	border-collapse: collapse;
+	margin-top: 5px;
+	width: 100%;
+}
+
+table.test_results th {
+	text-align: left;
+	padding-right: 5px;
+	padding-bottom: 2px;
+	padding-top: 2px;
+}
+
+table.test_results a {
+	text-align: left;
+	padding-right: 5px;
+}
+
+table.test_results td {
+	text-align: left;
+	padding-right: 5px;
+	padding-bottom: 2px;
+}
+
+table.test_results thead {
+	background-color: #bfbfbf;
+}

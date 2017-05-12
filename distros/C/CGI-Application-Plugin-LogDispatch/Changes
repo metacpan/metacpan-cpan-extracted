@@ -1,0 +1,32 @@
+Revision history for Perl extension CGI::Application::Plugin::LogDispatch.
+
+1.02  Tue Mar  4 00:44:23 EST 2008
+
+    - Fix problem in test suite with newer versions of Test::More
+
+1.01  Tue Mar  2 00:38:22 EST 2008
+
+    - fixed typo bug in log_config which should have caught
+      you if you called log_config after the log object was
+      already created.  (reported by victor -at- taquiones.net)
+    - CAP::DevPopup support added by Graham TerMarsch
+      (cpan -at- howlingfrog.com)
+
+1.00  Sat Oct 29 11:55:42 EDT 2005
+
+    - Simplify the pod tests according to Test::Pod docs
+    - Add pod coverage tests
+    - Rename some internal subs with a leading underscore
+    - Change contact address
+
+0.03  Tue Jan 18 23:58:30 EST 2005
+
+    - added singleton support
+
+0.02  Thu Dec 16 11:14:56 EST 2004
+
+    - forgot to include CGI::Application as a dependancy
+
+0.01  Tue Nov  2 21:31:17 EST 2004
+
+    - original version

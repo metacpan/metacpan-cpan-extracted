@@ -1,0 +1,12 @@
+MANIFEST                        This File
+HISTORY                         Revision History
+README                          Readme File
+CGI_Lite.pm                     CGI_Lite Module
+Makefile.PL                     Makefile Generator
+examples/cookies		Example 1
+examples/file			Example 2
+examples/get_post		Example 3
+examples/post			Example 4
+examples/print			Example 5
+examples/reference		Example 6
+examples/upload			Example 7

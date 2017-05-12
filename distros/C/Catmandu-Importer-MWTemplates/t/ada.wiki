@@ -1,0 +1,77 @@
+[[Datei:Ada Lovelace.jpg|mini|Ada Lovelace 1836,<br /> Gemälde von [[Margaret Sarah Carpenter]] (1793–1872)]]
+
+'''Augusta Ada Byron King, Countess of Lovelace''', allgemein als '''Ada Lovelace''' bekannt (geborene ''Augusta Ada Byron''<ref>Stein 1985, S.&nbsp;17.</ref>; *&nbsp;[[10.&nbsp;Dezember]] [[1815]] in [[London]]; †&nbsp;[[27.&nbsp;November]] [[1852]] ebenda), war eine britische [[Mathematiker]]in. Für einen nie fertiggestellten mechanischen Computer, die [[Analytical Engine]], schrieb sie das erste Programm. Aus diesem Grund wird sie als – noch vor dem ersten männlichen Kollegen – erste [[Programmierer]]in der Welt betrachtet.<ref>John Fuegi; Jo Francis: [http://ieeexplore.ieee.org/xpl/freeabs_all.jsp?arnumber=1253887 ''Lovelace & Babbage and the creation of the 1843 'notes''']. ''Annals of the History of Computing''. 25, Nr.&nbsp;4, 2003, [[doi:10.1109/MAHC.2003.1253887]], S.&nbsp;16–26.</ref><ref>{{cite web | url = http://cs-www.cs.yale.edu/homes/tap/Files/ada-bio.html |title=Ada Byron, Lady Lovelace| work = Yale.edu | accessdate =2012-02-16}}</ref> Die Programmiersprache [[Ada (Programmiersprache)|Ada]]<ref>{{Literatur|Autor=Susan Hiep|Titel=Mönchengladbacher Frauenstraßennamen und ihre Geschichte|Verlag=Klartext Verlag|Ort=Essen|Monat=November|Jahr=2010|Auflage=1|Kapitel=Ehemals nach Frauen benannte Straßen oder nicht realisierte Benennungen|Seiten=72&nbsp;f.|ISBN=978-3-8375-0413-2}}</ref> und die [[Lovelace Medal]] wurden nach ihr benannt.
+
+== Leben ==
+[[Datei:Miniature_of_Ada_Byron.jpg|thumb|Ada im Alter von 4 Jahren]]
+[[Datei:Ada_Byron_aged_seventeen_(1832).jpg|thumb|Ada im Alter von 17 Jahren, 1832]]
+Augusta Ada Byron wurde am 10. Dezember 1815 als Tochter von [[Anne Isabella Noel-Byron, 11. Baroness Wentworth]] und [[George Gordon Byron|Lord Byron]] geboren;<ref>Stein 1985, S.&nbsp;14.</ref> er hatte drei Kinder von drei Frauen, nur Ada war ehelich geboren. Ihre Mutter zog aufgrund andauernder Auseinandersetzungen mit Lord Byron am 16. Januar 1816 gemeinsam mit der einen Monat alten Ada zu ihren Eltern nach [[Kirkby Mallory]].<ref>Turney 1972, S.&nbsp;35.</ref> Sie ließ ihren Mann durch eine ärztliche Untersuchung für geisteskrank erklären, sodass sie trotz der gesetzlichen Bestimmungen, die Vätern im Falle einer Trennung das alleinige Sorgerecht zusprachen, ihre Tochter mitnehmen konnte.<ref>Stein 1985, S.&nbsp;16.</ref> Am 21. April 1816 unterzeichnete Lord Byron eine Trennungsurkunde und verließ England wenige Tage danach.<ref>Turney 1972, S.&nbsp;36–38.</ref> Lord Byron hatte keine Beziehung zu seiner Tochter; er starb, als Ada neun Jahre alt war.<ref>Turney 1972, S.&nbsp;138.</ref> Adas mathematisch interessierte Mutter, die Geometrie und Astronomie studiert hatte, ermöglichte Ada eine naturwissenschaftliche Ausbildung, in deren Verlauf sie die Mathematikerin [[Mary Somerville]] und [[Charles Babbage]] kennenlernte, dessen Mitarbeiterin sie wurde.
+
+Mit 19 Jahren heiratete Ada Byron William King, 8. Baron King (1805–1893), der 1838 zum 1. Earl of Lovelace erhoben wurde. Auch er verfügte über eine mathematische Bildung und ließ sich, da Frauen zu dieser Zeit der Zutritt zu Bibliotheken untersagt war, Ada zuliebe in die [[Royal Society]] aufnehmen, wo er für sie Artikel abschrieb. Sie gebar drei Kinder in sehr kurzen Abständen, eine ihrer Töchter war [[Anne Blunt, 15. Baroness Wentworth]]. In ihrer Korrespondenz mit Mary Somerville schrieb sie, dass sie eine unglückliche Ehe führe, weil ihr neben [[Schwangerschaft]]en und [[Kinderbetreuung]] so wenig Zeit für ihr Studium der Mathematik und ihre zweite Leidenschaft, der Musik, bleibe. Um sich abzulenken, stürzte sie sich ins Gesellschaftsleben und hatte mehrere Affären. Mit großer Begeisterung wettete sie auf Pferde. Die letzten Jahre ihres Lebens, die sie auf Grund eines [[Zervixkarzinom]]s im Bett verbrachte, soll sie mit der Entwicklung eines mathematisch ausgefeilten „sicheren“ Wettsystems verbracht haben. Ada Lovelace starb im Alter von 36 Jahren.
+
+== Werk ==
+1843 übersetzte sie die durch den italienischen Mathematiker [[Federico Luigi Menabrea|Luigi Menabrea]] auf Französisch angefertigte Beschreibung von Babbages ''Analytical Engine'' ins Englische und fügte eigene Notizen und Überlegungen zum Bau dieser geplanten mechanischen Rechenmaschine hinzu. Babbages Maschine wurde zu seinen Lebzeiten niemals gebaut. Einerseits war die [[Feinmechanik]] noch nicht weit genug entwickelt, um die Maschinenteile in der nötigen Präzision herzustellen, andererseits stoppte das [[Britisches Parlament|britische Parlament]] die Finanzierung, nachdem Babbage seine Entwürfe allzu oft geändert hatte. Dessen ungeachtet legte Ada Lovelace einen schriftlichen Plan vor, wie man [[Bernoulli-Zahl]]en mit der Maschine berechnen könnte.<ref>Fara, Patricia: „Athene’s Owl: A History of Women in Science“ Wizard, 2005</ref> Dieser [[Algorithmus]] brachte ihr den Ruhm ein, das erste [[Computerprogramm]] geschrieben zu haben. Daher wurde später die [[Ada (Programmiersprache)|Programmiersprache Ada]] nach ihr benannt.
+
+== Aktivitäten mit Bezug auf Ada Lovelace ==
+* In Australien wurde die von Valerie Aurora und [[Mary Gardiner]] 2011 gegründete ''[[Ada Initiative]]'' nach Lovelace benannt, die sich für vermehrte weibliche Teilhabe im [[Open Source|Open-Source-Umfeld]] einsetzt.<ref name="AboutUs">{{cite web | author= | year=2011 | title=About Us | work=About Us | publisher=Ada Initiative | url=http://adainitiative.org/about-us/ | accessdate=2012-10-09}}</ref>
+* Das 1997 gegründete rheinland-pfälzische "Ada Lovelace-Projekt" fördert Mädchen und junge Frauen im MINT-Bereich (Mathematik, Informatik, Naturwissenschaften und Technik).<ref name="Ada Lovelace-Projekt">{{cite web | author= | year= | title=Ada Lovelace-Projekt | work= | publisher= | url=http://www.ada-lovelace.com/ | accessdate=2014-05-28}}</ref>
+* Jedes Jahr wird Mitte Oktober der ''Ada Lovelace Day'' ausgerufen, an dem Frauen und ihre Werke Wissenschaft, Technik, Ingenieurswissenschaften und Mathematik gefeiert werden.<ref>[http://findingada.com Website des ''Ada Lovelace Day'']</ref> 
+
+[[File:Ada Lovelace color.svg|thumb|right|Von einem Werk [[A. E. Chalon]]s inspiriertes Porträt für die [[Ada Initiative]], die Frauen in Open-Technology-Zusammenhängen unterstützt]]
+
+== Ada Lovelace in Kunst und Popkultur ==
+* In dem 2009 erschienenen Roman ''Die Frau, für die ich den Computer erfand'' von [[Friedrich Christian Delius]]<ref> [[Friedrich Christian Delius]]: ''Die Frau, für die ich den Computer erfand''.  Rowohlt, Berlin 2009, ISBN 978-3-87134-642-2.</ref> dient Ada Lovelace in der Phantasie dem Computerpionier [[Konrad Zuse]] als Muse und heimliche Geliebte.
+* Das Comic- bzw. Buchprojekt "The Thrilling Adventures of Lovelace and Babbage"<ref>[http://sydneypadua.com/2dgoggles/ Blog von Sydney Padua]</ref>
+* Der Film ''Leidenschaftliche Berechnung'' („Conceiving Ada“, USA 1997) von Lynn Hershman-Leeson (Regie) basiert auf Lovelaces Leben. Themen sind künstliches Leben, DNA, Geschichte und Erinnerung.<ref>{{IMDb Titel|tt0118882|Conceiving Ada}}</ref><ref>[http://www.edith-russ-haus.de/no_cache/veranstaltungen/veranstaltungen/archiv.html?tx_kdvzerhapplications_pi7[event]=126&tx_kdvzerhapplications_pi7[action]=eventshow&tx_kdvzerhapplications_pi7[controller]=event „Conceiving Ada” Filmpräsentation], zuletzt aufgerufen am 30. August 2014.</ref>
+* In Folge 5 der Serie "Halt and Catch Fire" (2014) steht Ada Lovelace Pate für den Namen eines neu entwickelten BIOS <ref>http://www.popularmechanics.com/technology/digital/fact-vs-fiction/halt-and-catch-fire-pc-pioneers-16942536</ref>.
+
+== Literatur ==
+* Sadie Plant: ''Nullen und Einsen. Digitale Frauen und die Kultur der neuen Technologien''. Berlin Verlag, Berlin 1998, ISBN 978-3-8270-0290-7.
+* [[Anita Siegfried]]: ''Die Schatten ferner Jahre. Roman''. Dörlemann Verlag, Zürich 2007, ISBN 978-3-908777-32-8.
+* Dorothy Stein: ''Ada. Die Braut der Wissenschaft''. Kulturverlag Kadmos, Berlin 1999, ISBN 3-931659-13-5.
+* Dorothy Stein: ''Ada: A Life and a Legacy.'' MIT Press, Cambridge, Mass. 1985, ISBN 0-262-19242-X.
+* Betty Alexander Toole: ''Ada, the Enchantress of Numbers. A Selection from the Letters of Lord Byron’s Daughter and Her Description of the First Computer''. Critical Connection, Mill Valley, Calif. 1998, ISBN 978-0-912647-09-8 (Biographie).
+* Catherine Turney: ''Byron’s Daughter.'' Charles Scribner’s Sons. New York 1972, ISBN 0-684-12753-9.
+* Benjamin Woolley: ''Byrons Tochter. Ada Lovelace – die Poetin der Mathematik''. Aufbau-Taschenbuch-Verlag, Berlin 2005, ISBN 3-7466-2123-2.
+* [[Ralf Bönt]]: ''Die Entdeckung des Lichts'', Dumont, Köln 2009, ISBN 978-3-8321-9517-5.
+*Eugene Kim, Betty Alexandra Toole: ''Ada and the first computer'', Scientific American, Mai 2000
+
+== Weblinks ==
+{{Commons}}
+* {{DNB-Portal|119232022}}
+* {{FemBio|http://www.fembio.org/biographie.php/frau/biographie/ada-lovelace-byron/}}
+* [http://www.fourmilab.ch/babbage/sketch.html ''Sketch of The Analytical Engine Invented by Charles Babbage''] von L. F. Menabrea of Turin, Officer of the Military Engineers
+* [http://www.frauen-informatik-geschichte.de/index.php?id=36 ''Ada King, Countess of Lovelace 1815–1852''] Biografie der Initiative ‚Frauen in der Geschichte der Informationstechnik‘
+* [http://www.frauen-informatik-geschichte.de/index.php?id=38 ''Ada Lovelace als Ikone der Informationstechnologie''] Initiative ‚Frauen in der Geschichte der Informationstechnik‘
+* [http://www.br.de/radio/bayern2/sendungen/radiowissen/augusta-ada-lovelace-102.html ''Die Zahlenzauberin – Das Leben der Augusta Ada Lovelace''] von Herrad Rhia; Imogen Stand, Bayern 2 radioWissen, 21. September 2012 (audio)
+* {{Internetquelle |url=http://www.zeit.de/2014/05/ada-lovelace-programmiererin |titel=Ada und der Algorithmus |autor=Anne Kunze |werk=[[Die_Zeit|Zeit Online]] |datum=2014-01-23 |zugriff=2014-02-09}}
+* [http://www.fh-luebeck.de/Inhalt/05_Presse_und_BesucherInnen_Ch051/90_Services/04_Posterausstellung/posterausstellung-de/Ada_Countess_of_Lovelace.pdf Posterausstellung Fachhochschule Lübeck Ada Lovelace]
+
+== Einzelnachweise ==
+<references />
+
+{{Normdaten|TYP=p|GND=119232022|LCCN=n/78/30997|NDL=01237915|VIAF=61632881}}
+
+{{SORTIERUNG:Lovelace, Ada}}
+[[Kategorie:Mathematiker (19. Jahrhundert)]]
+[[Kategorie:Informatiker]]
+[[Kategorie:Erfinder]]
+[[Kategorie:Computerpionier]]
+[[Kategorie:George Gordon Byron]]
+[[Kategorie:Charles Babbage]]
+[[Kategorie:Engländer]]
+[[Kategorie:Brite]]
+[[Kategorie:Geboren 1815]]
+[[Kategorie:Gestorben 1852]]
+[[Kategorie:Frau]]
+
+{{Personendaten
+|NAME=Lovelace, Ada
+|ALTERNATIVNAMEN=Byron, Ada Augusta; King, Ada; Lovelace, Augusta Ada King Byron Countess of (vollständiger Name)
+|KURZBESCHREIBUNG=britische Mathematikerin und Pionierin der Informatik
+|GEBURTSDATUM=10. Dezember 1815
+|GEBURTSORT=[[London]]
+|STERBEDATUM=27. November 1852
+|STERBEORT=[[London]]
+}}
+

@@ -1,0 +1,23 @@
+Revision history for Class-Std-Slots
+
+0.0.1  Wed Aug 16 16:22:14 2006
+       Initial release.
+
+0.0.2  Thu Aug 17 02:10:00 2006
+       Added has_slots.
+
+0.0.3  Sat Aug 19 16:52:44 2006
+       Added emit_signal and support for undeclared signals.
+       Allow multiple signal names to be passed as an array ref.
+
+0.0.4   2007-02-23
+        Added machine readable license.
+
+0.2     2007-11-07
+        Remove version.pm dependency.
+
+0.3     2008-03-07
+        Declared dependency on Class::Std.
+
+0.31    2009-05-29
+        Move to GitHub

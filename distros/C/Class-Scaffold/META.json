@@ -1,0 +1,298 @@
+{
+   "abstract" : "Large-scale OOP application support",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>",
+      "Florian Helmberger <fh@univie.ac.at>",
+      "Achim Adam <ac@univie.ac.at>",
+      "Mark Hofstetter <mh@univie.ac.at>",
+      "Heinz Ekker <ek@univie.ac.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102221, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Scaffold",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Complex" : 0,
+            "Class::Accessor::Constructor" : 0,
+            "Class::Accessor::FactoryTyped" : 0,
+            "Class::Factory::Enhanced" : 0,
+            "Class::Value" : 0,
+            "Cwd" : 0,
+            "Data::Comparable" : 0,
+            "Data::Inherited" : 0,
+            "Data::Miscellany" : 0,
+            "Data::Storage" : 0,
+            "Devel::Caller" : 0,
+            "Encode" : 0,
+            "Error" : 0,
+            "Error::Hierarchy" : 0,
+            "Error::Hierarchy::Container" : 0,
+            "Error::Hierarchy::Internal" : 0,
+            "Error::Hierarchy::Mixin" : 0,
+            "Error::Hierarchy::Test" : 0,
+            "Error::Hierarchy::Util" : 0,
+            "Exporter" : 0,
+            "File::Find" : 0,
+            "File::Spec::Functions" : 0,
+            "FindBin" : 0,
+            "Getopt::Inherited" : 0,
+            "Getopt::Long" : 0,
+            "IO::File" : 0,
+            "IO::Handle" : 0,
+            "List::Util" : 0,
+            "Property::Lookup" : 0,
+            "String::FlexMatch" : 0,
+            "Sys::Hostname" : 0,
+            "Test::Builder" : 0,
+            "Test::Class::GetoptControl" : 0,
+            "Test::CompanionClasses::Base" : 0,
+            "Test::CompanionClasses::Engine" : 0,
+            "Test::More" : 0,
+            "Time::HiRes" : 0,
+            "UNIVERSAL::require" : 0,
+            "YAML" : 0,
+            "YAML::Active" : 0,
+            "YAML::Active::Plugin::Array" : 0,
+            "YAML::Active::Plugin::Hash" : 0,
+            "YAML::Marshall" : 0,
+            "constant" : 0,
+            "overload" : 0,
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Scaffold" : {
+         "file" : "lib/Class/Scaffold.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Accessor" : {
+         "file" : "lib/Class/Scaffold/Accessor.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App" : {
+         "file" : "lib/Class/Scaffold/App.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App::CommandLine" : {
+         "file" : "lib/Class/Scaffold/App/CommandLine.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App::Test" : {
+         "file" : "lib/Class/Scaffold/App/Test.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App::Test::Class" : {
+         "file" : "lib/Class/Scaffold/App/Test/Class.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App::Test::Classes" : {
+         "file" : "lib/Class/Scaffold/App/Test/Classes.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::App::Test::YAMLDriven" : {
+         "file" : "lib/Class/Scaffold/App/Test/YAMLDriven.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Base" : {
+         "file" : "lib/Class/Scaffold/Base.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Base_TEST" : {
+         "file" : "lib/Class/Scaffold/Base_TEST.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::BusinessObject" : {
+         "file" : "lib/Class/Scaffold/BusinessObject.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::ConstantImporter" : {
+         "file" : "lib/Class/Scaffold/ConstantImporter.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Context" : {
+         "file" : "lib/Class/Scaffold/Context.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Delegate::Mixin" : {
+         "file" : "lib/Class/Scaffold/Delegate/Mixin.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Environment" : {
+         "file" : "lib/Class/Scaffold/Environment.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Environment_TEST" : {
+         "file" : "lib/Class/Scaffold/Environment_TEST.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception" : {
+         "file" : "lib/Class/Scaffold/Exception.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception::Business" : {
+         "file" : "lib/Class/Scaffold/Exception/Business.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception::Container" : {
+         "file" : "lib/Class/Scaffold/Exception/Container.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception::Loader" : {
+         "file" : "lib/Class/Scaffold/Exception/Loader.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception::NoSuchFactoryHandler" : {
+         "file" : "lib/Class/Scaffold/Exception/NoSuchFactoryHandler.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Exception::Util" : {
+         "file" : "lib/Class/Scaffold/Exception/Util.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Factory" : {
+         "file" : "lib/Class/Scaffold/Factory.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Factory::Type" : {
+         "file" : "lib/Class/Scaffold/Factory/Type.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::HierarchicalDirty" : {
+         "file" : "lib/Class/Scaffold/HierarchicalDirty.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Introspect" : {
+         "file" : "lib/Class/Scaffold/Introspect.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::LazyString" : {
+         "file" : "lib/Class/Scaffold/LazyString.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::LazyString::Code" : {
+         "file" : "lib/Class/Scaffold/LazyString.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Log" : {
+         "file" : "lib/Class/Scaffold/Log.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Log_TEST" : {
+         "file" : "lib/Class/Scaffold/Log_TEST.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Storable" : {
+         "file" : "lib/Class/Scaffold/Storable.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Storable_TEST" : {
+         "file" : "lib/Class/Scaffold/Storable_TEST.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Storable_TEST::x001" : {
+         "file" : "lib/Class/Scaffold/Storable_TEST.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Test" : {
+         "file" : "lib/Class/Scaffold/Test.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Test::Inherited" : {
+         "file" : "lib/Class/Scaffold/Test/Inherited.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Test::UtilLoader" : {
+         "file" : "lib/Class/Scaffold/Test/UtilLoader.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::Util" : {
+         "file" : "lib/Class/Scaffold/Util.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active" : {
+         "file" : "lib/Class/Scaffold/YAML/Active.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::Array" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/Array.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::Constant" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/Constant.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::Environment" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/Environment.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::Exception" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/Exception.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::ExceptionContainer" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/ExceptionContainer.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Active::Hash" : {
+         "file" : "lib/Class/Scaffold/YAML/Active/Hash.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Marshall" : {
+         "file" : "lib/Class/Scaffold/YAML/Marshall.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Marshall::Concat" : {
+         "file" : "lib/Class/Scaffold/YAML/Marshall/Concat.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Marshall::Constant" : {
+         "file" : "lib/Class/Scaffold/YAML/Marshall/Constant.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Marshall::ExceptionContainer" : {
+         "file" : "lib/Class/Scaffold/YAML/Marshall/ExceptionContainer.pm",
+         "version" : "1.102280"
+      },
+      "Class::Scaffold::YAML::Marshall::PID" : {
+         "file" : "lib/Class/Scaffold/YAML/Marshall/PID.pm",
+         "version" : "1.102280"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-class-scaffold at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Scaffold"
+      },
+      "homepage" : "http://search.cpan.org/dist/Class-Scaffold/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Class-Scaffold"
+      }
+   },
+   "version" : "1.102280"
+}
+

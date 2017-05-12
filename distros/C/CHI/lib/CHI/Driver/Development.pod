@@ -1,0 +1,313 @@
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CHI::Driver::Development - Manual for developing new CHI drivers
+
+=head1 VERSION
+
+version 0.60
+
+=head1 SYNOPSIS
+
+    package CHI::Driver::MyDriver;
+    use Moo;
+    use strict;
+    use warnings;
+
+    extends 'CHI::Driver';
+
+    has ...;
+
+    sub fetch {
+        my ( $self, $key ) = @_;
+
+    }
+
+    sub store {
+        my ( $self, $key, $data[, $expires_in] ) = @_;
+
+    }
+
+    sub remove {
+        my ( $self, $key ) = @_;
+
+    }
+
+    sub clear {
+        my ($self) = @_;
+
+    }
+
+    sub get_keys {
+        my ($self) = @_;
+
+    }
+
+    sub get_namespaces {
+        my ($self) = @_;
+
+    }
+
+=head1 DESCRIPTION
+
+This document describes how to implement a new CHI driver.
+
+The easiest way to start is to look at existing drivers, such as
+L<CHI::Driver::Memory|CHI::Driver::Memory> and
+L<CHI::Driver::FastMmap|CHI::Driver::FastMmap>.
+
+=head1 NAMING
+
+If you are going to publicly release your driver, call it
+'CHI::Driver::I<something>' so that users can create it with
+
+    CHI->new(driver => 'I<something>');
+
+If it's an internal driver, you can call it whatever you like and create it
+like
+
+    CHI->new(driver => '+My::Internal::CHI::Driver');
+
+=head1 MOO / MOOSE
+
+CHI driver classes must be L<Moo|Moo> or L<Moose|Moose> based to be fully
+functional, since we use Moose roles to implement various features. For
+backward compatibility, non-Moo/Moose drivers will still work at a basic level,
+but you will see an error if using any feature requiring a role.
+
+All drivers must directly or indirectly extend L<CHI::Driver|CHI::Driver>.
+
+=head1 NAMESPACE
+
+All cache handles have an assigned namespace that you can access with
+C<$self-E<gt>namespace>. You should use the namespace to partition your data
+store. That is, two cache objects with different namespaces should be able to
+access the same key without any collision.
+
+Examples:
+
+=over
+
+=item *
+
+The Memory driver uses a separate sub-hash inside its main memory hash for each
+namespace.
+
+=item *
+
+The File driver uses a separate top-level directory for each namespace.
+
+=item *
+
+The FastMmap driver uses a separate Cache::FastMmap file for each namespace.
+
+=back
+
+=head1 METHODS
+
+=head2 Required methods
+
+The following methods have no default implementation, and MUST be defined by
+your subclass:
+
+=over
+
+=item store ( $self, $key, $data[, $expires_in] )
+
+Associate I<$data> with I<$key> in the namespace, overwriting any existing
+entry.  Called by L</set>. I<$data> will contain any necessary metadata,
+including expiration options, so you can just store it as a single block.
+
+I<$expires_in> is optionally the number of seconds from now when the entry will
+expire. This will only be passed if L<CHI/expires_on_backend> is set. If your
+driver does not support expiration, or if you'd rather just let CHI manage
+expiration, you can ignore this.
+
+=item fetch ( $self, $key )
+
+Returns the data associated with I<$key> in the namespace. Called by L</get>.
+The main CHI::Driver superclass will take care of extracting out metadata like
+expiration options and determining if the value has expired.
+
+=item remove ( $self, $key )
+
+Remove the data associated with the I<$key> in the namespace.
+
+=item clear ( $self )
+
+Remove all data associated with the namespace. (Technically not required, but
+the default implementation, which iterates over all keys and calls L</remove>
+for each, is very inefficient).
+
+=back
+
+=head2 Overridable methods
+
+The following methods have a default implementation, but MAY be overridden by
+your subclass:
+
+=over
+
+=item BUILD ( $self, $options )
+
+Define the BUILD method if you want to process any options specific to your
+driver.  This is a standard Moo/Moose feature.
+
+=item fetch_multi_hashref ( $keys )
+
+Override this if you want to efficiently process multiple fetches. Return a
+hash reference from keys to fetched data. If a key is not available, it may be
+left out of the hash or paired with undef. The default method will iterate over
+I<$keys> and call fetch for each.
+
+This method is called by L<get_multi_arrayref> and L<get_multi_hashref>.
+
+=item store_multi ( $key_data, $options )
+
+Override this if you want to efficiently process multiple stores. I<$key_data>
+is a hash of keys and data that should be stored. The default will iterate over
+I<$key_data> and call store for each pair.
+
+This method is called by L<set_multi>.
+
+=back
+
+=head2 Optional methods
+
+The following methods have no default implementation, and MAY be defined by
+your subclass, but are not required for basic cache operations.
+
+=over
+
+=item get_keys ( $self )
+
+Return all keys in the namespace. It is acceptable to either include or omit
+expired keys.
+
+=item get_namespaces ( $self )
+
+Return namespaces associated with the cache. It is acceptable to either include
+or omit namespaces with no valid keys.
+
+=back
+
+=head1 DISCARD POLICIES
+
+You can create new discard policies for L<size aware|CHI/SIZE AWARENESS>
+caches, to choose items to discard when the cache gets full. For example, the
+Memory driver implements an LRU policy.
+
+To implement a discard policy I<foo>, define a subroutine
+I<discard_policy_foo>, which takes a driver object and returns a closure that
+returns one key each time it is called. The closure should maintain state so
+that each key is only returned once.
+
+For example, here's the Memory driver's LRU implementation. It utilizes a hash
+containing the last used time for each key.
+
+   sub discard_policy_lru {
+       my ($self) = @_;
+   
+       my $last_used_time = $self->{metadata_for_namespace}->{last_used_time};
+       my @keys_in_lru_order =
+         sort { $last_used_time->{$a} <=> $last_used_time->{$b} } $self->get_keys;
+       return sub {
+           shift(@keys_in_lru_order);
+       };
+   }
+
+You can set the default discard policy for your driver by overriding
+default_discard_policy; otherwise the default is 'arbitrary'.
+
+   sub default_discard_policy { 'lru' }
+
+=head1 TESTING
+
+CHI has a standard set of unit tests that should be used to ensure your driver
+is fully implementing the CHI API.
+
+To use CHI's tests (replacing I<MyDriver> with the name of your driver):
+
+=over
+
+=item *
+
+Install L<Test::Class> and add it to the build dependencies for your
+distribution.
+
+=item *
+
+Add a module called I<CHI::Driver::MyDriver::t::CHIDriverTests> to your
+distribution containing:
+
+    package CHI::Driver::MyDriver::t::CHIDriverTests;
+    use strict;
+    use warnings;
+    use CHI::Test;
+    use base qw(CHI::t::Driver);
+
+    sub testing_driver_class { 'CHI::Driver::MyDriver' }
+
+    sub new_cache_options {
+        my $self = shift;
+
+        return (
+            $self->SUPER::new_cache_options(),
+
+            # Any necessary CHI->new parameters for your test driver
+        );
+    }
+
+    1;
+
+=item *
+
+Add a test script called I<t/CHI-driver-tests.t> to your distribution
+containing:
+
+    #!perl -w
+    use strict;
+    use warnings;
+    use CHI::Driver::MyDriver::t::CHIDriverTests;
+    CHI::Driver::MyDriver::t::CHIDriverTests->runtests;
+
+=item *
+
+You may need to override other methods in
+I<CHI::Driver::MyDriver::t::CHIDriverTests>, e.g. to skip tests that do not
+apply to your driver. See CHI::t::Driver::Memory and CHI::t::Driver::File in
+this distribution for examples.
+
+=back
+
+=head2 Test cleanup
+
+You are responsible for cleaning up your datastore after tests are done. The
+easiest way to do this is to place your datastore wholly inside a temporary
+directory, or use a L<guard|Guard> to remove it at process end.
+
+For example, the L<File|CHI::Driver::File>, L<FastMmap|CHI::Driver::FastMmap>,
+and L<DBI|CHI::Driver::DBI> tests place all data inside a tempdir that is
+automatically cleaned up at process end.
+
+=head1 SEE ALSO
+
+L<CHI|CHI>
+
+=head1 AUTHOR
+
+Jonathan Swartz <swartz@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

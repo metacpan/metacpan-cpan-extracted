@@ -1,0 +1,52 @@
+Revision history for CGI-Application-Plugin-RunmodeDeclare
+
+0.10    2012-02-10  Rhesa Rozendaal <rhesa@cpan.org>
+        Added support for PHP style array params.
+
+0.09    2010-01-07  Rhesa Rozendaal <rhesa@cpan.org>
+        Added repository to META.yml. No code changes.
+
+0.08    2009-05-18  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix for multiline signatures
+
+0.07    2009-01-10  Rhesa Rozendaal <rhesa@cpan.org>
+        Added tests for picking up values for method args
+        from self->param or self->query->param
+
+0.06    2008-10-25  Rhesa Rozendaal <rhesa@cpan.org>
+        Fixed stupid regex bug in proto parsing.
+
+0.05    2008-10-25  Rhesa Rozendaal <rhesa@cpan.org>
+        * better default handling
+        * doc updates
+
+0.04    2008-10-25  Rhesa Rozendaal <rhesa@cpan.org>
+        * bumped prereq of Devel::Declare
+
+0.03_03 2008-10-24  Rhesa Rozendaal <rhesa@cpan.org>
+        * bugfix in _split
+
+0.03_02 2008-10-24  Rhesa Rozendaal <rhesa@cpan.org>
+        * bugfixes: prevent callback calling order from installing
+          the start/error mode from the parent class into child classes (Richard Jones)
+
+0.03_01 2008-10-23  Rhesa Rozendaal <rhesa@cpan.org>
+        * new feature: support code attributes
+        * simplified the signature parsing (see Method::Signatures::Simple)
+        * simplified the installer code by using Devel::Declare::MethodInstaller::Simple
+        * considered changing my name to Rhesa Simple ;-)
+
+0.03    2008-10-20  Rhesa Rozendaal <rhesa@cpan.org>
+        * new feature: change the default invocant name (Richard Jones)
+        * security fix: reversed the order in which we acquire values
+          for arguments: first method input, then $app->param, then
+          $query->param (Michael Peters and Mark Stosberg)
+        * bugfix: properly check uniqueness of startmode (RT #40174)
+
+0.02    2008-09-26  Rhesa Rozendaal <rhesa@cpan.org>
+        Fix test case. It relied on an unreleased version
+        of CGI::Application.
+
+0.01    2008-09-26
+        First version, released to solicit comments.
+

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-Classless-DBI
+version: 0.02
+author:
+  - Mark Tiefenbruck <mdash@cpan.org>
+abstract: provides a Classless object-oriented database interface
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

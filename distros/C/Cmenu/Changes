@@ -1,0 +1,55 @@
+#****************************************************************************
+# Cmenu.pm -- Perl Menu Support Facility 
+#
+# Last updated Time-stamp: <01/10/20 22:32:56 devel> 
+#
+#
+# Date:	Version 1.0 -- May, 1992 -- Original version 
+#       Version 1.1 -- Aug, 1992 -- Minor enhancements, bugfixes
+#       Version 1.2 -- Nov, 1992 -- Selection bugfix
+#       Version 1.3 -- Dec, 1992 -- "top" and "latch" functions added
+#       Version 1.4 -- Apr, 1993 -- "r=refresh" added to bottom line
+#       Version 2.0 -- Sep, 1993 -- Radio-button, Multiple-selection,
+#					shell-escape, new "hot-keys", and
+#					"menu_getstr" routine.
+#       Version 2.1 -- Oct, 1993 -- Bug fixes
+#       Version 2.2 -- Mar, 1994 -- Menu sub-titles
+#       Version 2.3 -- Jun, 1994 -- Bug fixes
+#       Version 3.0 -- Jan, 1995 -- Templates, lots of new options on
+#					many calls, Perl5 interfacing.
+#       Version 3.1 -- Mar, 1995 -- Bug fixes, new "menu_template_setexit"
+#					call, new menu_pref.
+#       Version 3.2 -- Jun, 1995 -- Bug fixes, template "required field"
+#					support, template Control-L refresh.
+#       Version 3.3 -- Feb, 1996 -- Bug fixes, help routines, templates
+#					from arrays ("menu_load_template_array")
+#       Version 4.0 -- Feb, 1997 -- Converted to "pm" module, highlighted
+#					selection cursor pref, Multiple-column
+#					menus pref, bug fixes
+#   Version 5.0 -- Jan, 2001 -- Complete re-write using Curses code and dialog
+#					'look and feel'. Simplified sub-calls and 
+#					colour support. Preferences stored in file.
+#	Version 5.1 -- Jan. 2001 -- Put check on edit field length to stop
+#					edit fields exceeding the window. Field
+#					layout looks marginally better
+#				    Corrected some fencepost errors in radio and
+#					checklist routines (oops). Watch out for these
+#					checklist routine only returns items checked
+#					does nothing with items which have been
+#					unchecked
+#	Version 5.2 -- Jan. 2001 -- Bug fix and test for Curses >1.03
+#					Curses 1.02 is reported to be incompatible
+#				    Added contrib with SQL demo
+#	Version 5.3 -- Feb. 2001 -- Replaced $kseq array with %kseq 
+#					aren't hashes cool
+#				    Fixed numeric field edit with better regex
+#	Version 1.0 -- Apr. 2001 -- Revised for CPAN conventions and minor bugs/typos
+#					
+#	Version 1.1 -- Oct. 2001 -- Several changes to configuration file processing
+#					full control of colour rendering
+#					better mono rendering
+#					added full set of terminal attributes
+#					explicit Lynx style motion - switchable
+#					hack25 to get an extra line on short displays (esp. mono)
+#					changed some rendering details (removed hard-codings)
+#					

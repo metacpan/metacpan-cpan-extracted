@@ -1,0 +1,15 @@
+Revision history for Perl extension Catalyst::Helper::Dojo.
+
+0.02000 2007-05-22
+
+        - Don't set default edition - HTML::Dojo has it's own default
+        - First non-dev release
+
+0.01_2 2007-05-11
+
+        - Changed distribution name to Catalyst-Helper-Dojo
+        - Removed Catalyst::Plugin::Dojo
+
+0.01_1  2006-05-15
+        - Initial CPAN release
+

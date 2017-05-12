@@ -1,0 +1,19 @@
+<h2>Change Password</h2>
+
+[% IF mailer.result == 1 %]
+<div class="box">
+    <p>An email has been sent to the email address you provided with a new
+    website password. As we only store encrypted passwords we have generated
+    a new password for you to login with.
+    <p>Note that once logged in, you can change your password to something
+    more memorable.
+</div>
+[% ELSE %]
+<div class="box">
+<p>Unfortunately we are unable process that user address. Please contact the
+<a href="mailto:[% administrator %]">administrator</a> with details of the user
+address you used and we will try and rectify the problem as soon as possible.
+We apologise for the inconvience.
+<p>Thank you for your patience.
+</div>
+[% END %]

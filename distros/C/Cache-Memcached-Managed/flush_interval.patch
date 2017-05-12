@@ -1,0 +1,66 @@
+--- memcached.c.1.1.12	2005-04-05 02:10:26.000000000 +0200
++++ memcached.c	2005-07-06 20:01:02.000000000 +0200
+@@ -619,8 +619,8 @@
+             if (it && (it->it_flags & ITEM_DELETED)) {
+                 it = 0;
+             }
+-            if (settings.oldest_live && it &&
+-                it->time <= settings.oldest_live) {
++            if (settings.oldest_live && settings.oldest_live <= now &&
++                it && it->time <= settings.oldest_live) {
+                 item_unlink(it);
+                 it = 0;
+             }
+@@ -707,8 +707,23 @@
+         return;
+     }
+ 
+-    if (strcmp(command, "flush_all") == 0) {
+-        settings.oldest_live = time(0);
++    if (strncmp(command, "flush_all", 9) == 0) {
++        time_t exptime = 0;
++        int res;
++
++        if (strcmp(command, "flush_all") == 0) {
++            settings.oldest_live = time(0);
++            out_string(c, "OK");
++            return;
++        }
++
++        res = sscanf(command, "%*s %ld", &exptime); 
++        if (res != 1) {
++            out_string(c, "ERROR");
++            return;
++        }
++
++        settings.oldest_live = realtime(exptime);
+         out_string(c, "OK");
+         return;
+     }
+--- doc/protocol.txt.1.1.12	2004-04-26 23:26:48.000000000 +0200
++++ doc/protocol.txt	2005-07-06 20:09:24.000000000 +0200
+@@ -359,16 +359,17 @@
+ Other commands
+ --------------
+ 
+-"flush_all" is a command with no arguments. It always succeeds,
+-and the server sends "OK\r\n" in response. Its effect is to immediately
+-invalidate all existing items: none of them will be returned in
+-response to a retrieval command (unless it's stored again under the
+-same key *after* flush_all has been executed). flush_all doesn't
++"flush_all" is a command with an optional numeric argument. It always
++succeeds, and the server sends "OK\r\n" in response. Its effect is to
++invalidate all existing items immediately (by default) or after the
++expiration specified.  After invalidation none of the items will be returned
++in response to a retrieval command (unless it's stored again under the
++same key *after* flush_all has invalidated the items). flush_all doesn't
+ actually free all the memory taken up by existing items; that will
+ happen gradually as new items are stored. The most precise definition
+ of what flush_all does is the following: it causes all items whose
+-update time is earlier than the time at which flush_all was executed
+-to be ignored for retrieval purposes.
++update time is earlier than the time at which flush_all was set to be
++executed to be ignored for retrieval purposes.
+ 
+ "version" is a command with no arguments:
+ 

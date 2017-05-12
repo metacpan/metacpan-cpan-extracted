@@ -1,0 +1,1 @@
+I received a param which value is [% CBF.cgi.param( 'foo' ) %]

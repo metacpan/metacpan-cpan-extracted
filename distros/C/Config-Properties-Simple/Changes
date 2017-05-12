@@ -1,0 +1,63 @@
+Revision history for Perl extension Config::Properties::Simple.
+
+0.14  Jun 30 2005
+	- corrected bug when validator sub inside hash used
+
+0.13  Jun 27 2005
+	- add support for reading/writing utf8 files
+
+0.12  Apr 15 2005
+	- docs for validation subs updated!
+
+0.11  Apr 15 2005
+	- typos on the docs corrected
+	- change log updated for 0.10!
+	- request Config::Properties 0.59 on Makefile.PL
+	- test passing Config::Properties objects for defaults.
+
+0.10  Apr 14 2005
+	- aliases support
+	- new tests for aliases
+	- accept any Config::Properties object for default
+	- optional > 1 makes file optional even when passed as 'file'
+	- new validate compatible with Config::Properties 0.59
+
+	INCOMPATIBILITY: validator subs handling has changed to allow
+	for modifing the keys
+	
+
+0.09  Oct 10 2003
+	- find now uses options stored from object creation as
+	  defaults, so $cfg->find() returns effectively the filename
+
+0.08  Sep 9 2003
+	- test suite added
+	- require => \@array was not working. Bug reported by Sastry
+	  Isukapalli
+
+0.07  Wed Apr 16 2003
+	- support for re in validate => \@array array
+	- validate => \@array handled properly
+	- support for required added.
+	- Makefile dependencies updated to working versions
+
+0.06  Mon Apr 14 2003
+	- mode => write equivalent to noread => 1
+	- support for property validation
+
+0.05  Thu Apr 10 2003
+	- default now accepts a HASH ref
+
+0.04  Wed Apr 9 2003
+	- 'file' defined causes 'optional' to be ignored now
+
+0.03  Wed Apr 9 2003
+	- support added for 'optional' keyword
+
+0.02  Tue Apr 8 2003
+	- updated dependecies in Makefile.PL
+
+0.01  Sun Mar 23 14:15:26 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Config::Properties::Simple
+

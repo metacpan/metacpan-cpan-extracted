@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use CGI;
+use CGI::Wiki::Kwiki;
+
+# See 'perldoc CGI::Wiki::Kwiki' to find out what options you can set here.
+# most of the things set here are the defaults.
+my %config = (
+
+    # the name of the home page node
+    home_node => "HomePage",
+    
+    # the email address of the wiki administrator
+    admin_email => 'admin@wiki.invalid',
+    
+    # the displayed name of your wiki
+    site_name => "Default CGI::Wiki::Kwiki site",
+
+    # the install script will have put templates here.
+    template_path => "./templates",
+
+    # use the default CGI::Wiki::Kwiki stylesheet
+    stylesheet_url => "./templates/style.css",
+
+    # the character set of your wiki. The default is 'iso-8859-1'
+    # for backwards compatibility reasons. I really suggest you
+    # use utf-8 if you can get away with it, though.
+    charset => 'utf-8',
+
+    # the options above are all optional. The options below
+    # are required..
+
+    # the install process will have set up a SQLite db in the
+    # current directory.
+    db_type => 'SQLite',
+    db_name => 'wikidb',
+
+    # The formatting modules people can use for the pages.
+    # If you want to have >1 module here, you will need
+    # CGI::Wiki::Formatter::Multiple installed.
+    formatters => {
+        default => [
+            'CGI::Wiki::Formatter::UseMod',
+            extended_links      => 1, # $FreeLinks
+            implicit_links      => 1, # $WikiLinks
+            force_ucfirst_nodes => 1, # $FreeUpper
+            use_headings        => 1, # $UseHeadings
+            allowed_tags        => [qw(b i)], # defaults to none
+            macros              => {},
+            node_prefix         => 'wiki.cgi?',
+            node_suffix         => '',
+            edit_prefix         => 'wiki.cgi?action=edit;id=',
+            edit_suffix         => '',
+            munge_urls          => 0,
+        ],          
+    },
+
+);
+
+
+# Probably don't need to touch below here.
+
+my %vars = CGI::Vars();
+
+eval {
+    CGI::Wiki::Kwiki->new(%config)->run(%vars);
+};
+
+if ($@) {
+    print "Content-type: text/plain\n\n";
+    print "There was a problem with CGI::Wiki::Kwiki:\n\n--\n";
+    print "$@";
+    print "\n--\n";
+    print STDERR $@;
+}

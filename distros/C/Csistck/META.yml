@@ -1,0 +1,38 @@
+---
+author:
+  - 'Anthony Johnson <aj@ohess.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Csistck
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Digest::MD5: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::stat: 0
+  Getopt::Long: 0
+  Linux::Distribution: 0.21
+  Scalar::Util: 0
+  Sys::Hostname::Long: 0
+  Template: 0
+  Term::ReadKey: 0
+  Test::Exception: 0
+  Text::Diff: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://github.com/agjohnson/csistck/issues
+  homepage: http://ohess.org/projects/csistck
+  repository: http://github.com/agjohnson/csistck.git
+version: 0.1003

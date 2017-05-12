@@ -1,0 +1,239 @@
+From users-return-148577-apmail-tomcat-users-archive=tomcat.apache.org@tomcat.apache.org Mon Jul 24 14:08:20 2006
+Return-Path: <users-return-148577-apmail-tomcat-users-archive=tomcat.apache.org@tomcat.apache.org>
+Delivered-To: apmail-tomcat-users-archive@www.apache.org
+Received: (qmail 55298 invoked from network); 24 Jul 2006 14:08:19 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur.apache.org with SMTP; 24 Jul 2006 14:08:19 -0000
+Received: (qmail 74251 invoked by uid 500); 24 Jul 2006 14:08:05 -0000
+Delivered-To: apmail-tomcat-users-archive@tomcat.apache.org
+Received: (qmail 74227 invoked by uid 500); 24 Jul 2006 14:08:05 -0000
+Mailing-List: contact users-help@tomcat.apache.org; run by ezmlm
+Precedence: bulk
+List-Help: <mailto:users-help@tomcat.apache.org>
+List-Unsubscribe: <mailto:users-unsubscribe@tomcat.apache.org>
+List-Post: <mailto:users@tomcat.apache.org>
+List-Id: <users.tomcat.apache.org>
+Reply-To: "Tomcat Users List" <users@tomcat.apache.org>
+Delivered-To: mailing list users@tomcat.apache.org
+Received: (qmail 74216 invoked by uid 99); 24 Jul 2006 14:08:05 -0000
+Received: from asf.osuosl.org (HELO asf.osuosl.org) (140.211.166.49)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Mon, 24 Jul 2006 07:08:05 -0700
+X-ASF-Spam-Status: No, hits=2.9 required=10.0
+        tests=FORGED_MUA_IMS,INVALID_MSGID
+X-Spam-Check-By: apache.org
+Received-SPF: pass (asf.osuosl.org: local policy)
+Received: from [155.91.38.1] (HELO uscttw1110.merck.com) (155.91.38.1)
+    by apache.org (qpsmtpd/0.29) with ESMTP; Mon, 24 Jul 2006 07:08:04 -0700
+Received: from 54.62.195.237 by uscttw1110.merck.com with ESMTP (SMTP
+ Relay); Mon, 24 Jul 2006 10:07:29 -0400
+X-Server-Uuid: 0D0C80A0-46FA-490C-AFC2-7618DC791584
+Received: from 54.62.195.245 by uscttw1101.merck.com with ESMTP (
+ Tumbleweed Email Firewall SMTP Relay (Email Firewall v6.1.1)); Mon, 24
+ Jul 2006 10:07:18 -0400
+X-Server-Uuid: 96433E61-BC67-4637-9B91-0C482EF10D46
+Received: by usrygw30.merck.com with Internet Mail Service (5.5.2658.27)
+ id <3RS9BDC8>; Mon, 24 Jul 2006 10:07:17 -0400
+Message-ID: 38687D1995FB2249B9DC84E2AE63285B
+From: "Cosio, Raul" <jose_raul_cosio@merck.com>
+To: "Tomcat Users List" <users@tomcat.apache.org>
+Subject: RE: out of memory error
+Date: Mon, 24 Jul 2006 10:07:05 -0400
+MS-TNEF-CorrelatoXr: <922874C78B5E2D4FA51B9A97A1A5637A2DF2C8@mxmxmx1100.merck.com>
+MIME-Version: 1.0
+X-Mailer: Internet Mail Service (5.5.2658.27)
+content-class: urn:content-classes:message
+x-mimeole: Produced By Microsoft Exchange V6.5
+x-originalarrivaltime: 24 Jul 2006 14:07:07.0945 (UTC)
+ FILETIME=[72FF2990:01C6AF2A]
+X-WSS-ID: 68DA0B9F2588846378-02-01
+X-WSS-ID: 68DA0B8726C10309059-05-01
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+X-Virus-Checked: Checked by ClamAV on apache.org
+X-Spam-Rating: minotaur.apache.org 1.6.2 0/1000/N
+
+This link may help...
+
+http://tomcat.apache.org/faq/memory.html
+
+
+-----Original Message-----
+From: Shinya Koizumi [mailto:skoizumi@basicengineering.ca]
+Sent: Jueves, 20 de Julio de 2006 07:10 p.m.
+To: Tomcat Users List
+Subject: Re: out of memory error
+
+
+One of solution for out of memory problem is to upgrade to Java 1.5
+
+SK
+
+----- Original Message -----
+From: "MW Janssen" <maarten@bedrijven.nl>
+To: "'Tomcat Users List'" <users@tomcat.apache.org>
+Sent: Wednesday, July 19, 2006 8:39 AM
+Subject: RE: out of memory error
+
+
+
+> i dont see a memory tab when i right click..
+>
+> -----Oorspronkelijk bericht-----
+> Van: Propes, Barry L [mailto:barry.l.propes@citigroup.com]
+> Verzonden: woensdag 19 juli 2006 17:32
+> Aan: Tomcat Users List
+> Onderwerp: RE: out of memory error
+>
+> possibly like I (incorrectly, because he was on UNIX) told a guy the other
+> day.
+>
+> Go to startup.bat, right click and change (under the Memory tab)
+properties
+> in the Initial Environment box from Auto to 4096 or higher.
+>
+> -----Original Message-----
+> From: MW Janssen [mailto:maarten@bedrijven.nl]
+> Sent: Wednesday, July 19, 2006 9:01 AM
+> To: 'Tomcat Users List'
+> Subject: RE: out of memory error
+>
+>
+> Guys,
+>
+> I am on a Windows NT platform so not Unix..solution?
+>
+> Maarten
+>
+> -----Oorspronkelijk bericht-----
+> Van: Leon Rosenberg [mailto:rosenberg.leon@googlemail.com]
+> Verzonden: woensdag 19 juli 2006 15:57
+> Aan: Tomcat Users List
+> Onderwerp: Re: out of memory error
+>
+> On 7/19/06, Jon Wingfield <jon.wingfield@mkodo.com> wrote:
+> > The process running tomcat can't (read isn't allowed by OS) to create
+> > any more threads:
+> >
+> > "java.lang.OutOfMemoryError: unable to create new native thread"
+> >
+> > If you are on unix you can up the number by tinkering with the ulimit
+> > command.
+>
+> but if you are on 2.4.x kernel, you're lost, since it can't create many
+> threads (max 500-600).
+>
+> leon
+>
+> >
+> > HTH,
+> >
+> > Jon
+> >
+> > MW Janssen wrote:
+> > > Hi,
+> > >
+> > > Can anyone explain and suggest a solution on error below:
+> > >
+> > > Jul 19, 2006 12:49:18 PM
+> > > org.apache.tomcat.util.threads.ThreadPool$ControlRunnable run
+> > > SEVERE: Caught exception (java.lang.OutOfMemoryError: unable to
+> > > create new native thread) executing HYPERLINK
+> > > "mailto:org.apache.tomcat.util.net.LeaderFollowerWorkerThread@b4a7c3
+> > > "org.apa che.tomcat.util.net.LeaderFollowerWorkerThread@b4a7c3,
+> > > terminating thread Jul 19, 2006 1:25:30 PM
+> > > org.apache.coyote.http11.Http11Protocol pause
+> > > INFO: Pausing Coyote HTTP/1.1 on http-80 Jul 19, 2006 1:25:31 PM
+> > > org.apache.catalina.core.StandardService stop
+> > > INFO: Stopping service Tomcat-Standalone Jul 19, 2006 1:25:32 PM
+> > > org.apache.catalina.core.ApplicationContext log
+> > > INFO: action: Finalizing this controller servlet Jul 19, 2006
+> > > 1:25:32 PM org.apache.catalina.core.StandardWrapper unload
+> > > INFO: Waiting for 3 instance(s) to be deallocated Jul 19, 2006
+> > > 1:25:33 PM org.apache.catalina.core.StandardWrapper unload
+> > > INFO: Waiting for 3 instance(s) to be deallocated Jul 19, 2006
+> > > 1:25:34 PM org.apache.catalina.core.StandardWrapper unload
+> > > INFO: Waiting for 3 instance(s) to be deallocated Jul 19, 2006
+> > > 1:25:34 PM org.apache.catalina.core.ApplicationContext log
+> > > INFO: action: Finalizing this controller servlet Jul 19, 2006
+> > > 1:25:34 PM org.apache.coyote.http11.Http11Protocol destroy
+> > > INFO: Stopping Coyote HTTP/1.1 on http-80
+> > >
+> > > Regards,
+> > >
+> > > Maarten Janssen
+> > >
+> > >
+> >
+> >
+> >
+> > ---------------------------------------------------------------------
+> > To start a new topic, e-mail: users@tomcat.apache.org To unsubscribe,
+> > e-mail: users-unsubscribe@tomcat.apache.org
+> > For additional commands, e-mail: users-help@tomcat.apache.org
+> >
+> >
+>
+> ---------------------------------------------------------------------
+> To start a new topic, e-mail: users@tomcat.apache.org To unsubscribe,
+> e-mail: users-unsubscribe@tomcat.apache.org
+> For additional commands, e-mail: users-help@tomcat.apache.org
+>
+> --
+> No virus found in this incoming message.
+> Checked by AVG Free Edition.
+> Version: 7.1.394 / Virus Database: 268.10.1/391 - Release Date: 18-7-2006
+>
+>
+> --
+> No virus found in this outgoing message.
+> Checked by AVG Free Edition.
+> Version: 7.1.394 / Virus Database: 268.10.1/391 - Release Date: 18-7-2006
+>
+>
+>
+> ---------------------------------------------------------------------
+> To start a new topic, e-mail: users@tomcat.apache.org
+> To unsubscribe, e-mail: users-unsubscribe@tomcat.apache.org
+> For additional commands, e-mail: users-help@tomcat.apache.org
+>
+>
+> ---------------------------------------------------------------------
+> To start a new topic, e-mail: users@tomcat.apache.org
+> To unsubscribe, e-mail: users-unsubscribe@tomcat.apache.org
+> For additional commands, e-mail: users-help@tomcat.apache.org
+>
+> --
+> No virus found in this incoming message.
+> Checked by AVG Free Edition.
+> Version: 7.1.394 / Virus Database: 268.10.1/391 - Release Date: 18-7-2006
+>
+>
+> --
+> No virus found in this outgoing message.
+> Checked by AVG Free Edition.
+> Version: 7.1.394 / Virus Database: 268.10.1/391 - Release Date: 18-7-2006
+>
+>
+>
+> ---------------------------------------------------------------------
+> To start a new topic, e-mail: users@tomcat.apache.org
+> To unsubscribe, e-mail: users-unsubscribe@tomcat.apache.org
+> For additional commands, e-mail: users-help@tomcat.apache.org
+>
+>
+>
+
+
+------------------------------------------------------------------------------
+Notice:  This e-mail message, together with any attachments, contains information of Merck & Co., Inc. (One Merck Drive, Whitehouse Station, New Jersey, USA 08889),
+ and/or its affiliates (which may be known outside the United States as Merck Frosst, Merck Sharp & Dohme or MSD and in Japan, as Banyu) that may be confidential, p
+roprietary copyrighted and/or legally privileged. It is intended solely for the use of the individual or entity named on this message.  If you are not the intended
+recipient, and have received this message in error, please notify us immediately by reply e-mail and then delete it from your system.
+------------------------------------------------------------------------------
+
+---------------------------------------------------------------------
+To start a new topic, e-mail: users@tomcat.apache.org
+To unsubscribe, e-mail: users-unsubscribe@tomcat.apache.org
+For additional commands, e-mail: users-help@tomcat.apache.org
+

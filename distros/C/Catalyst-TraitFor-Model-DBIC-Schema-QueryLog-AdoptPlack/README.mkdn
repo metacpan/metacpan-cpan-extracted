@@ -1,0 +1,56 @@
+# NAME
+
+Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack - Use a Plack Middleware QueryLog
+
+# SYNOPSIS
+
+    package MyApp::Web::Model::Schema;
+    use parent 'Catalyst::Model::DBIC::Schema';
+
+	__PACKAGE__->config({
+        schema_class => 'MyApp::Schema',
+        traits => ['QueryLog::AdoptPlack'],
+        ## .. rest of configuration
+	});
+
+# DESCRIPTION
+
+This is a trait for [Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) which adopts a [Plack](http://search.cpan.org/perldoc?Plack)
+created [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) and logs SQL for a given request cycle.  It is
+intended to be compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog)
+which you may already be using.
+
+It picks up the querylog from `$env->{'plack.middleware.dbic.querylog'}`
+or from  `$env->{'plack.middleware.debug.dbic.querylog'}`  which is generally
+provided by the [Plack](http://search.cpan.org/perldoc?Plack) middleware [Plack::Middleware::Debug::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::Debug::DBIC::QueryLog)
+In fact you will probably use these two modules together.  Please see the documentation
+in [Plack::Middleware::Debug::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::Debug::DBIC::QueryLog) for an example.
+
+PLEASE NOTE: Starting with the 0.04 version of [Plack::Middleware::Debug::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::Debug::DBIC::QueryLog)
+we will canonicalize on `$env->{'plack.middleware.dbic.querylog'}`.  For now
+both listed keys will work, but within a release or two the older key will warn and
+prompt you to upgrade your version of [Plack::Middleware::Debug::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::Debug::DBIC::QueryLog).
+Sorry for the trouble.
+
+# SEE ALSO
+
+[Plack::Middleware::Debug::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::Debug::DBIC::QueryLog),
+[Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog),
+[Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema),
+[Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug)
+
+# ACKNOWLEGEMENTS
+
+This code inspired from [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog)
+and the author owes a debt of gratitude for the original authors.
+
+# AUTHOR
+
+John Napiorkowski, `<jjnapiork@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

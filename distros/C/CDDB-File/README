@@ -1,0 +1,103 @@
+NAME
+    CDDB::File - Parse a CDDB/freedb data file
+
+SYNOPSIS
+      my $disc = CDDB::File->new("rock/f4109511");
+
+      print $disc->id, $disc->all_ids;
+      print $disc->artist, $disc->title;
+      print $disc->year, $disc->genre, $disc->extd;
+      print $disc->length, $disc->track_count;
+  
+      print $disc->revision, $disc->submitted_via, $disc->processed_by;
+
+      foreach my $track ($disc->tracks) {
+        print $track->number, $track->title, $track->artist;
+        print $track->length, $track->extd;
+      }
+
+DESCRIPTION
+    This module provides an interface for extracting data from CDDB-format
+    data files, as used by freedb.
+
+    It does not read data from your CD, or submit information to freedb.
+
+METHODS
+  new
+      my $disc = CDDB::File->new("rock/f4109511");
+
+    This will create a new object representing the data in the file name
+    specified.
+
+  id / all_ids
+      my $discid = $disc->id;
+      my @discid = $disc->all_ids;
+
+    Due to how freedb works, one CD may have several IDs associated with it.
+    'id' will return the first of these (not necessarily related to the
+    filename from which this was read), whilst 'all_ids' will return all of
+    them.
+
+  title / artist
+    The title and artist of this CD. For eponymous CDs these will be
+    identical, even if the data file leaves the artist field blank.
+
+  year
+    The (4-digit) year of release.
+
+  genre
+    The genre of this CD. This is the genre as stored in the data file
+    itself, which is not related to the 11 main freedb genres.
+
+  extd
+    The "extended data" for the CD. This is used for storing miscellaneous
+    information which has no better storage place, and can be of any length.
+
+  length
+    The run time of the CD in seconds.
+
+  track_count
+    The number of tracks on the CD.
+
+  revision
+    Each time information regarding the CD is updated this revision number
+    is incremented. This returns the revision number of this version.
+
+  processed_by / submitted_via
+    The software which submitted this information to freedb and which
+    processed it at the other end.
+
+  tracks
+      foreach my $track ($disc->tracks) {
+        print $track->number, $track->title, $track->artist;
+        print $track->length, $track->extd;
+      }
+
+    Returns a list of Track objects, each of which knows its number
+    (numering from 1), title, length (in seconds), offset, and may also have
+    extended track data.
+
+    Tracks may also contain an 'artist' field. If this is not set the artist
+    method will return the artist of the CD.
+
+SEE ALSO
+    http://www.freedb.org/
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-CDDB-File@rt.cpan.org
+
+COPYRIGHT
+      Copyright (C) 2001-2005 Tony Bowden. All rights reserved.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

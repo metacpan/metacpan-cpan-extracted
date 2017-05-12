@@ -1,0 +1,104 @@
+0.19 2017-04-08
+        - Added test from OStatus2 gem (used in Mastodon).
+        - Fixed random_nbit_prime overloading for GMP.
+
+0.18 2016-10-05
+        - Updated requirements for testing.
+        - Improved inheritance possibilities.
+
+0.17 2016-10-01
+        - Fixed cpantesters issue where random_nbit_prime
+          wasn't overwritten in key gen test.
+
+0.16 2016-09-18
+        - Fixed _b64url_to_hex to return undef earlier.
+        - Improved test coverage (with Math::Prime::Util):
+                 stmt   bran   cond    sub   time  total
+               ------ ------ ------ ------ ------ ------
+          From:  94.0   83.9   77.5  100.0  100.0   90.3
+          To:    98.3   93.6   87.5  100.0  100.0   96.2
+
+0.15 2016-09-15
+        - Updated for Kwalitee tests.
+        - Added Kwalitee test for release testing.
+        - Improved documentation regarding b64url handling,
+          and spec position.
+        - Improved error handling in constructor code.
+        - Removed dead code in constructor and attribute code.
+        - Added tests for error handling in constructor code.
+        - Improved test coverage (with Math::Prime::Util):
+                 stmt   bran   cond    sub   time  total
+               ------ ------ ------ ------ ------ ------
+          From:  91.8   59.5   50.0  100.0  100.0   77.4
+          To:    94.0   83.9   77.5  100.0  100.0   90.3
+        - DEPRECATED automatic key generation in new(),
+          to avoid accidential DOS.
+
+0.14 2015-09-21
+        - Warn on invalid construction parameters.
+
+0.13 2014-04-04
+        - Coherent Artistic License 2.0.
+
+0.12 2014-02-20
+        - Fix bug in documentation.
+
+0.11 2014-02-20
+        - Small code improvements.
+        - Change object to array.
+        - Support for 4096 bit keys.
+        - Overloading of "".
+
+0.10 2013-11-04
+        - Tests for key generation won't run if
+          they are expected to be extremely slow (Bug #89903).
+          (Thanks to Victor)
+        - Improved messages in test suite.
+
+0.09 2013-03-09
+        - No more entirely experimental.
+        - Small doc improvement.
+
+0.08 2013-03-01
+        - Stripped Math::Random::Secure dependency,
+          as Math::Prime::Util now uses (and needs)
+          Bytes::Random::Secure by default.
+        - Small changes after perlcritic check.
+        - Some Changes regarding Makefile.
+        - Make sure the right version of M:P:U is used.
+
+0.07 2013-02-20
+        - Corrected the dependency on Math::Prime::Util
+          to support irand.
+        - Recommend Math::Util::Prime::GMP for speed.
+        - Small code improvements.
+
+0.06 2013-02-14
+        - PATCH: Math::BigInt versions on OpenBSD.
+        - PATCH: Math::BigInt for base in i2osp for Win32.
+        - Small code improvements.
+          
+0.05 2013-02-07
+        - Small documentation improvements.
+        - Timing attacks are by nature unlikely
+          (for self-signing without public keys)
+          so secure compare is deleted again.
+
+0.04 2013-02-06
+        - Introduce a secure signature string
+          compare to prevent timing attacks.
+
+0.03 2013-02-05
+        - Small documentation improvements.
+        - Small speed improvements in signing.
+        - Fixed bug in &_emLen.
+
+0.02 2013-02-05
+        - Tiny speed improvements.
+        - Documentation tweaks.
+        - Make code slightly more secure
+          (do not accept nan for number values).
+
+0.01 2013-02-04
+        - Initial submission to GitHub.
+        - Initial submission to CPAN.

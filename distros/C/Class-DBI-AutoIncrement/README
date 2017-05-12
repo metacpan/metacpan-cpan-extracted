@@ -1,0 +1,33 @@
+Class::DBI::AutoIncrement version 0.01
+======================================
+
+Class::DBI::AutoIncrement emulates an auto-incrementing column
+in a table managed with Class::DBI, even for databases
+that do not support auto-incrementing sequences.
+
+See perldoc for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See module's perldoc
+
+

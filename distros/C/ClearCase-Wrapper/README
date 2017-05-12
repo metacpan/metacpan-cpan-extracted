@@ -1,0 +1,291 @@
+========================================================================
+			ClearCase::Wrapper
+========================================================================
+
+************************************************************************
+Note: this module is of use only to users of the ClearCase command-line
+interface tool 'cleartool', on Unix or Windows systems.
+************************************************************************
+
+DESCRIPTION/BACKGROUND
+----------------------
+
+This module has grown well beyond its initial design, which was
+inspired by three simple observations:
+
+   1. The configurability of cleartool, as represented by
+   ~/.clearcase_profile, is badly limited. The only thing it
+   can affect is the default comment behavior!
+
+   2. Triggers are useful but only apply to vob-object operations;
+   commands like mkview, catcs, etc are non-triggerable and must be
+   customized in a wrapper script.
+
+   2. Almost all command-line users of clearcase employ an alias for
+   cleartool (typically 'ct' or 'cl').
+
+Noting these all together made me think of writing a wrapper program
+which could be installed as 'ct' (or whatever) and could read its own
+config file to allow complete and general control of command-line
+defaults. Install the program, remove the alias, and life continues
+unchanged with no learning curve for users - but the sophisticated user
+now has better control over his/her environment and the administrator
+can now modify global policies and defaults.
+
+Deciding to write it in Perl was an easy choice.  I was originally
+planning to just extend the simple syntax described in the
+profile_ccase(1) man page, using something similar to ConfigReader.pm,
+until Andy Wardley (author of Text::MetaText) pointed out an old quote
+from Tom Christiansen. Tom said something to the effect that if a
+program is written in Perl there's no need to invent and parse a
+special language for its rc-files; just 'require' (aka include) them
+and let Perl do the parsing.  In other words, since perl has access to
+its own powerful parser, RE engine, etc. at runtime, why not use Perl
+itself as the configuration metalanguage? I took this advice
+gratefully.
+
+So it was decided to write a generic cleartool wrapper script in perl
+which would allow for site- and/or user-specific configurability.  I
+decided to implement it as a module in order to take advantage of the
+builtin support for AutoLoading.
+
+This turns out to be a surprisingly powerful mechanism for extending
+command-line ClearCase on Unix or Windows, because you can not only modify
+defaults but add your own new flags or even create pseudo-commands as
+well. Making these customizations is tougher than setting up a
+~/.clearcase_profile because you need to be somewhat knowledgeable
+about Perl, but it also removes an upper bound on what can be done.
+Once you set Perl loose on the command line you can do just about
+anything with it, as the supplied sample enhancements may demonstrate.
+
+ENHANCEMENTS
+--------------
+
+The interesting files in this distribution are cleartool.plx and
+Wrapper.pm.  The first is the actual cleartool wrapper program; it's
+short, generic, and should need no local modification.  Wrapper.pm
+provides some funky importing infrastructure above the __END__ token;
+again, this is boilerplate. All the interesting stuff - the ClearCase
+customizations - are made in the AutoLoader area below the __END__.
+
+It is not recommended that you modify either of these files for your
+own customizations. Rather, a provision is made for "overlay modules"
+which let you overlay your own semantics. A sample overlay module is
+provided in the ./examples directory along with its own README.
+
+In theory, as described above, ClearCase::Wrapper per se is just a
+framework for making your own enhancements. By that logic it should
+be delivered without any customizations. In other words, it should
+provide only mechanism and let you provide the policy.
+
+However, I think many of the enhancements I've made are of general
+interest and may be a primary reason for installing the module, so
+here's what I've done. The ones which are (a) widely applicable and (b)
+uncontroversial (e.g. don't change native CC defaults) are provided
+directly in ClearCase::Wrapper. The ones of perhaps less general
+use have been segregated into the overlay ClearCase::Wrapper::DSB,
+which is also available on CPAN. Those which are site-specific and/or
+modify CC defaults, or are controversial in any other way, are in a
+site-specific overlay which is not released.
+
+THEREFORE: to get the full scope of functionality, with all
+published enhancements, you should install BOTH ClearCase::Wrapper
+and ClearCase::Wrapper::DSB. At some point there may even be other
+overlays available on CPAN; check their docs before installing.
+Make your own customizations in ClearCase::Wrapper::YOURNAME or
+ClearCase::Wrapper::Site::YOURSITE, depending on whether the
+enhancements embody your or your organization's preferences.
+
+Note: older versions of ClearCase::Wrapper, prior to 1.00, had a
+different customization strategy involving a Site.pm file. This is
+obsolete. If you have a customized Site.pm it should continue to work,
+but it would be easy (and much cleaner) to convert it into an overlay
+module. The best way to do this is to copy your subroutines out of Site.pm
+into the sample overlay module ("MySite"). Rename as appropriate,
+test and install, and don't forget to take the obsolete Site.pm
+file out of your @INC area manually.
+
+See the POD for further discussion of how to add your own extensions.
+
+The wrapper script also looks for a file called ~/.clearcase_profile.pl
+(note same name ClearCase supports except with a .pl suffix) containing
+personal customizations. No sample of this is delivered; the syntax is
+pure Perl and the idea would be to modify @ARGV before the override
+subroutine and/or exec() ever see it. I've never found a need for this
+feature, though. See POD for details.
+
+
+TYPICAL USES / HIGHLIGHTS OF SUPPLIED FEATURES
+----------------------------------------------
+
+Not only can you modify the default behavior of any command as you like
+by adding flags to @ARGV, you can also define options that you've
+always wished for or even build new pseudo-commands on top of existing
+ones. Following are some examples of each of these as implemented in
+the sample enhancements.
+
+-> A number of cleartool commands don't support automated aggregation
+for some reason, so I added it.  Specifically, the provided code
+extends the common cleartool flags -dir/-rec/-all/-avobs to the
+checkin, checkout, unco, diff, lsprivate, and mkelem commands; thus you
+can checkin all checkouts under the current directory with "ct ci
+-rec", turn a tree of private files into elements with "ct mkelem -rec
+-ci", print out diffs of all current modifications in the view with "ct
+diff -all", etc. This is perhaps the most useful enhancement provided.
+
+-> As an example of building a new command, try out "ct edit". This is
+a simple pseudo-cmd which runs a checkout and then invokes your
+preferred editor on the checked-out file(s). Not rocket science but I
+use it many times a day and it saves a lot of keystrokes.
+
+-> An example of removing a minor irritation: one user complained
+that "cleartool unco" doesn't recognize and ignore comment flags
+such as -nc. This bothered him because if after running "ct co -nc
+<files>" he realized he'd made a mistake, he'd use ^co^unco^ (csh
+syntax for illustration only) to undo it, only to see cleartool
+fail on the unrecognized -nc. So the enhanced unco cmd accepts and
+ignores the standard comment flags.
+
+INSTALLING
+----------
+
+Installation consists of the usual sequence of commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Where the install step may need to be run with superuser privileges.
+Also, on Windows you'd want to use nmake or dmake instead of 'make'. To
+install a private testing version in your home directory, use:
+
+   perl Makefile.PL PREFIX=~
+
+which will cause "make install" to copy files into ~/lib/perl5/....
+Then set the environment variable to something like:
+
+   PERL5LIB=$HOME/lib/site_perl/5.6.1
+
+and cleartool.plx should find the local version for as long as that EV
+is in effect.
+
+Of course, to complete the installation you'll need to put the script
+somewhere on your path, symlink it to a short name such as 'ct', and
+remove the same-named shell alias if you have one.
+
+SELF-DOCUMENTATION
+------------------
+
+All the supplied code comes with embedded PODs.  Once the module is
+installed, these can be read via "ct man ct" for help on the wrapper
+itself and "ct man <cmd>" for documentation of specific customizations.
+
+DEPENDENCIES
+------------
+
+As shipped, this module depends on ClearCase::Argv which depends in
+turn on Argv. It has no inherent need for these modules but they're
+very well suited for writing portable enhancements. You need not use
+them in your own enhancements, though it's recommended you do. For
+performance reasons, the code is designed to load them only if and when
+they're used.
+
+FUNCTION NAME CONVENTIONS
+-------------------------
+
+sub mysub
+  'NORMAL' : 'op' which executes from command line, and help will work.
+
+sub _mysub
+  'HIDDEN' : 'op' which executes from command line, but no help as not
+      	   intended for the user.
+sub Mysub
+  'PUBLIC' : not an 'op', but expected to be shared with other extensions so
+      	    is exported to submodules
+sub _Mysub
+  'PRIVATE': not an 'op', and not expected to be shared with other extensions.
+
+sub MYSUB
+  'CONST'  : So don't do this, instead do this -> use constant MYSUB => ...
+
+Note: these rules apply also to the names of global variables defined
+in the overlay modules. So, use initial uppercases...
+
+DEBUGGING
+--------
+
+As the sample enhancements all use ClearCase::Argv, they can take
+advantage of its debugging infrastructure. In particular you can see
+all cleartool commands as executed by exporting ARGV_DBGLEVEL=1 or
+passing -/dbg=1 on the command line. See "perldoc ClearCase::Argv" and
+"perldoc Argv" for (lots of) details.
+
+The use of AutoSplit/AutoLoad makes debugging under the Perl debugger
+(-d option) somewhat cumbersome, especially when developing other
+modules than ClearCase::Wrapper itself. An alternative driver,
+cleartool.dbg, is provided to allow to place breakpoints to arbitrary
+positions in the code without having to first navigate to the right
+function. This driver loads all .al files at startup. One must however
+use the 'f' function of the debugger to select the right file, before
+creating the breakpoint (with the original line number). This function
+takes a regexp, which can be used here. Example:
+
+  DB<4> f autosplit.*rollout.al
+Choosing blib/lib/ClearCase/Wrapper/MGi.pm (autosplit into blib/lib/auto/ClearCase/Wrapper/MGi/rollout.al) matching `autosplit.*rollout.al':
+1 	2 	3 	4 	5 	6 	7 	8 	9 	10 	
+
+Note however that one needs to avoid certain ambiguities, e.g.:
+
+  DB<4> f autosplit.*/lock.al
+
+...not to catch 'unlock.al', or:
+
+  DB<4> f /MGi.pm$
+
+...to place breakpoints in non-autosplitted functions.
+
+Let's add that using cleartool.dbg will report errors and warnings (if
+used) on the whole module instead of only per autoloaded function.
+
+TESTED PLATFORMS
+----------------
+
+This module is in daily use on nearly all ClearCase platforms.  It
+should work without significant modification on any supported
+CC platform.
+
+Note that while the module itself works on Windows, the sample
+enhancements haven't all been well exercised there. Some have,
+some haven't.
+
+UPGRADING
+--------
+As with all autoloaded modules, each subroutine is "exploded" out
+into a separate file within the install area. One consequence of
+this is that when a new version removes or renames old subroutines,
+cruft may build up in the autoload area in the form of unused
+files.  This is generally harmless but you may prefer to keep
+things clean.
+
+In practice this simply means you should go into the site-lib
+area of your perl installation, look for a path like one of these:
+
+    <inst-prefix>/lib/site_perl/5.xx.yy/auto/ClearCase/Wrapper	(Unix)
+    <inst-prefix>\site\lib\auto\ClearCase\Wrapper		(Windows)
+
+and remove the 'Wrapper' subdirectory. It might be best to
+save it for a little while in case you have a customization that's
+not in source control, e.g.
+
+    % mv .../Wrapper /var/tmp
+
+And then install the new version. If you've already installed
+before reading this, don't worry. Just remove and reinstall
+as above.
+
+FEEDBACK
+--------
+
+Feel free to communicate bugs, suggestions, or (preferably) patches to
+me by email.

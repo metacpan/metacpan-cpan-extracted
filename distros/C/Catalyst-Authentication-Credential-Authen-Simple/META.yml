@@ -1,0 +1,25 @@
+---
+abstract: 'Verify credentials with the Authen::Simple framework'
+author:
+  - 'Jose Luis Martinez Torres <jlmartin@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::Simple: 0.44
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Credential-Authen-Simple
+requires:
+  Authen::Simple: 0
+  Catalyst::Plugin::Authentication: 0.1
+  Catalyst::Runtime: 5.7
+  parent: 0
+resources:
+  homepage: http://metacpan.org/release/Catalyst-Authentication-Credential-Authen-Simple/
+  repository: git://github.com/miquelruiz/Catalyst-Authentication-Credential-Authen-Simple.git
+version: 0.09

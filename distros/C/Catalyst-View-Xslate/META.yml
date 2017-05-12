@@ -1,0 +1,55 @@
+---
+abstract: 'Text::Xslate View Class'
+author:
+  - 'Copyright (c) 2010 Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  Devel::Cycle: '0'
+  ExtUtils::MakeMaker: '6.36'
+  PadWalker: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-Xslate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Catalyst::Helper::View::Xslate:
+    file: lib/Catalyst/Helper/View/Xslate.pm
+  Catalyst::View::Xslate:
+    file: lib/Catalyst/View/Xslate.pm
+    version: '0.00019'
+requires:
+  Catalyst: '5.8'
+  File::Find: '0'
+  Scalar::Util: '0'
+  Text::Xslate: '0.1045'
+resources:
+  bugtracker: https://github.com/lestrrat/Catalyst-View-Xslate/issues
+  homepage: https://github.com/lestrrat/Catalyst-View-Xslate
+  repository: git://github.com/lestrrat/Catalyst-View-Xslate.git
+version: '0.00019'
+x_contributors:
+  - 'hidek <hide@hide-k.net>'
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'hiratara <hiratara@cpan.org>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Torsten Raudssus <github@raudssus.de>'
+  - 'sunnavy <sunnavy@gmail.com>'
+  - 'Wallace Reis <wreis@123people.com>'
+  - 'Wallace Reis <wallace@reis.me>'
+  - 'John Napiorkowski <jjn1056@yahoo.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'

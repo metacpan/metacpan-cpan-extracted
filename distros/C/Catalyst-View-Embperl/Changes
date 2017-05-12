@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::View::Embperl.
+
+0.02  Wed Jun  7 13:58:22 2006
+        - debian package support
+
+0.01  Sat Mai 20 16:46:10 2006
+        - first release

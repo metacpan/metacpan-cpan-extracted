@@ -1,0 +1,109 @@
+{
+   "abstract" : "A framework for RESTful processing systems.",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Clustericious",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "share"
+      ],
+      "file" : [
+         "lib/Clustericious/Config/Plugin.pm",
+         "lib/Clustericious/Util.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "perl" : "5.010001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "0",
+            "EV" : "0",
+            "PerlX::Maybe::XS" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Rmap" : "0",
+            "DateTime::Format::DateParse" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "File::HomeDir" : "0.91",
+            "File::ReadBackwards" : "0",
+            "File::ShareDir" : "0",
+            "File::Which" : "0",
+            "Hash::Merge" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::MoreUtils" : "0",
+            "Log::Log4perl" : "0",
+            "Log::Log4perl::Appender::TAP" : "0.02",
+            "MojoX::Log::Log4perl" : "0",
+            "Mojolicious" : "7.31",
+            "Path::Class" : "0.26",
+            "PerlX::Maybe" : "0.003",
+            "Sub::Exporter" : "0",
+            "Sub::Identify" : "0.05",
+            "Term::Prompt" : "0",
+            "YAML::XS" : "0",
+            "autodie" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::chdir" : "0",
+            "PlugAuth::Lite" : "0",
+            "Test2::Suite" : "0.000060",
+            "Test::Clustericious::Cluster" : "0.35",
+            "Test::More" : "0.94",
+            "Test::Script" : "1.10",
+            "Test::Warn" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clustericious/Clustericious/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Clustericious",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clustericious/Clustericious.git",
+         "web" : "https://github.com/clustericious/Clustericious"
+      }
+   },
+   "version" : "1.24",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

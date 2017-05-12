@@ -1,0 +1,14 @@
+0.04 Thu 28 May 14:12:03 CEST 2015
+    - fix namespace issue
+
+0.03 Thu 28 May 10:59:13 CEST 2015
+    - allow for fallback user defined user look-up
+    - namespace change from Catalyst::Plugin::Authentication::Store::UserXML to Catalyst::Authentication::Store::UserXML
+
+0.02 Aug 25 15:01:58 CET 2014
+    - members folders support
+    - add set_password()
+    - set_status() + check status when validating password
+
+0.01 Oct 15 17:58:50 CET 2012
+    - initial release

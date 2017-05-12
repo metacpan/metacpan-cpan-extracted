@@ -1,0 +1,141 @@
+2.01 2016-06-24
+
+    - Version numbering now handled in dzil
+    - Example and internal code uses Moose conventions
+
+2.00 2016-06-01
+
+    - Silence MooseX::Attribute::Chained warnings with HTML::FormFu 2.0+.
+    - Packaging tweaks including adding travis CI support
+    - Updated version to 2.x to match other modules, requires HTML-FormFu v2.00
+
+1.00 2013-12-16
+
+    - Updated for HTML-FormFu v1.00
+    
+    - Only require MultiForm at runtime when needed
+
+0.09004 2012-09-11
+
+    - switch from MooseX::ChainedAccessors to MooseX::Attribute::Chained
+
+0.09003 2011-05-12
+
+     - depend on HTML::FormFu 0.09
+
+0.09002 2011-05-11
+
+    - fixes #67404 (Missing dependency on MooseX::ChainedAccessors)
+
+    - fixes #67571 (Minimum requirement for HTML::FormFu is 0.9002)
+      actually it just requires MooseX::ChainedAccessors
+
+    - hopefully fixes 539965f0-7b0f-11e0-b729-7181c0b02281
+
+0.09001 2011-05-10
+
+    - fixed problem with build_per_context_instance that caused errors
+      like http://paste.scsys.co.uk/102966
+
+0.09000 2011-03-29
+
+    - Fix mem leak
+    
+    - Resolve Moose extends/runtime bug RT #55780
+    
+    - fix RequestToken classes to work with new Moosified HTML-FormFu
+
+0.08002 2010-09-22
+
+    - Incompatible Change: removed all previously deprecated methods.
+
+0.06001 2009-12-10
+
+    - Test setting __uri_for(x)__ in a config file.
+
+0.06000 2009-11-25
+
+    - MultiForm actions now also always stash $multi->current_form
+      to $c->stash->{form}.
+      (key-name configurable via 'form_stash' config option).
+    
+    - New method suffixes such as "_FORM_VALID", "_FORM_SUBMITTED" to allow
+      blocks of code that will only be run under certain circumstances.
+
+0.05000 2009-07-06
+
+    - Fix RequestToken to be a hidden field.
+    
+    - Fix compatibility problem with moosified controllers.
+    
+    - use tests_recursive() so all tests are run correctly.
+
+0.04003 2009-04-20
+
+    - Fix missing prereqs
+
+0.04002 2009-04-20
+
+    - Switch to use MRO::Compat
+
+0.04001 2009-04-15
+
+    - New RequestToken feature to stop double-submissions of data.
+    
+    - Silence "Reference is already weak" warnings.
+    
+    - Add distribution description to pod (RT #41568)
+
+0.03007 2008-12-08
+
+    - Bump required version no. of HTML-FormFu to 0.03007
+
+0.03006 2008-12-03
+
+    - Deprecated config setting $config->{config_file_path}
+      use $config->{constructor}{config_file_path} instead.
+    
+    - Bumped HTML-FormFu prereq - need 0.03004 for load_config_filestem()
+      support.
+
+0.03004 2008-09-03
+
+    - 'config_file_ext' config setting has been removed.
+    
+    - Automatically search for form config files with any extension
+      supported by Config::Any.
+    
+    - Add __config()__ callback.
+    
+    - Support filestems (without extensions) in the FormConfig('file')
+      attribute syntax.
+    
+    - Forms returned by form() now have the query set with the Catalyst
+      request object.
+    
+    - Switched from ACCEPT_CONTEXT to using
+      Catalyst::Component::InstancePerContext - recommended by mst.
+    
+    - Changed config examples to Config::General, to match Catalyst's
+      core documentation.
+
+0.03000 2008-06-19
+
+	- Documented 'model_stash' option.
+	- New Multi* actions - not documented yet - need further testing.
+
+0.02000 2007-12-12
+
+	- Only set INCLUDE_PATH if it's not already set, and if 'root/formfu' 
+	  exists.
+	- Use of $form->render_class_args() changed to tt_args()
+	- Added support for expanding __path_to()__ in config callback
+
+0.01002 2007-09-12
+
+	- No longer use HTML::FormFu::Preload - tradeoff CPU for RAM
+	- Fix circular reference / memory leak
+
+0.01001	2007-08-22
+
+	- First CPAN release

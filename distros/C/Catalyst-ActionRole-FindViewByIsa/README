@@ -1,0 +1,35 @@
+NAME
+    Catalyst::ActionRole::FindViewByIsa - Select from the available
+    application views by type
+
+SYNOPSIS
+        package MyApp::Controller::Foo;
+        use Moose;
+
+        BEGIN { extends 'Catalyst::Controller::ActionRole'; }
+
+        sub foo : Local Does('FindViewByIsa') FindViewByIsa('Catalyst::View::TT') {
+            # Code here. If $c->stash->{current_view} is set, it will be left alone
+            #            after this method is run. Otherwise it will be set to
+            #            the first app view which @ISA Catalyst::View::TT
+        }
+
+DESCRIPTION
+    If you are trying to write a generic controller component which will be
+    reused within an application, you do not want to mandate the use of one
+    type of view, but if you're providing templates with your component,
+    then you need to be able to find a view of the appropriate type.
+
+    Therefore this action role will select a the view in the application
+    which matches the class of view that you want, no matter what it is
+    named locally within the application.
+
+AUTHOR
+    Tomas Doran (t0m), "<bobtfish@bobtfish.net>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Tomas Doran, some rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

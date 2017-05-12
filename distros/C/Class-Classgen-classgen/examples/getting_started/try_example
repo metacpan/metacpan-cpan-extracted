@@ -1,0 +1,26 @@
+# --- to generate the class Example.pm run
+#
+#	classgen example.txt Example.pm
+#
+#
+# --- to use instances of Example.pm do:
+
+#!/usr/bin/perl -w
+
+	use Example;
+	use strict;
+
+	my $ex1 = Example->new();
+	my $ex2 = Example->new();
+
+	# continue manipulating the instances $ex1 and $ex2 by using
+	# methods provided by Example.pm
+	
+
+	print "try perldoc Example.pm \n";
+
+# --- to try this just run the debugger: ---
+
+#	perl -d try_example
+
+# x $ex1   let you see the effect of this object.

@@ -1,0 +1,13 @@
+Revision history for Perl extension Class::DBI::Loader::Relationship.
+
+See
+http://cvs.simon-cozens.org/viewcvs.cgi/Class-DBI-Loader-Relationship/
+for full log
+
+1.1   Tue Jan  6 21:54:47 GMT 2004
+    - Make reverse relationship has_a, not has_many.
+
+0.01  Wed Dec 31 16:44:42 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Class::DBI::Loader::Relationship
+

@@ -1,0 +1,20 @@
+Revision history for Carp-Always-SyntaxHighlightSource
+
+0.03    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Devel::Confess to boost its 'lcpan related-mods
+	  Carp::Always' ranking.
+
+
+0.02    2013-03-21 (SHARYANTO)
+
+        - Add alias module Carp::Always::SHS.
+
+
+0.01    2013-03-21 (SHARYANTO)
+
+        - First release. Created this because I was somewhat inspired by
+          http://phperror.net/ . Yes, this module is less pretty; it needs some
+          xterm-256 themes.

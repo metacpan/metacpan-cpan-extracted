@@ -1,0 +1,11 @@
+# $Id$
+prefix=/base/path
+exec_prefix=/base/path
+libdir=${exec_prefix}/lib/foo
+includedir=${prefix}/include/foo-0
+
+Name: foo
+Description: Provides some testable flags for Config::AutoConf
+Version: 0.23
+Libs: -L${libdir} -lfoo
+Cflags: -I${includedir}

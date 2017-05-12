@@ -1,0 +1,50 @@
+Revision history for Config-Simple-Extended
+
+0.10    Fri Jan 11 00:09:39 EST 2013
+        Now uses ->param(), ->vars() and ->get_block() methods 
+        for overloading, rather than addressing internal data 
+        structure directly.  This is intended to make this 
+        module less fragile to changes in inherited Config::Simple.  
+        Now also uses File::PathInfo to provide an absolute path 
+        and interacts with config files using an absolute path.  
+        Also accepts a debug key on the interface, using that to be 
+        informative about what it is up to.
+
+0.09    Unknown
+
+0.08 	Thu Oct 23 01:45:25 EDT 2008
+	Updates t/10-inherit.t coreccting references to 
+	the ::Inherit module.
+
+0.07 	Tue Oct 21 01:49:46 EDT 2008
+	Restored missing test script from ::Inherit
+
+0.06	Fri Aug 8 03:19:32 EDT 2008
+	Reborn as Config::Simple::Extended
+	with new ->parse_url_for_config_path() method.
+	six additional working tests at:
+	t/11_parse_url_for_cfg_path.t
+
+0.05	Fri Aug 8 03:19:32 EDT 2008
+	Retiring Config::Simple::Inherit
+
+0.04 	Thu Jun 5 15:11:12 EDT 2008
+	Remove request that UNIVERSAL export VERSION
+	to address test reports of failure 
+	from CPAN testers.
+
+0.03	Wed Jun 4 21:16:35 EDT 2008
+	I've now integrated this with an application 
+	under development and added an EXAMPLES section 
+	to the perldoc documenting what I've learned 
+	about how to use the ->inherit() method.
+	Appears to be working just fine.
+
+0.02 	Wed Jun 4 04:39:15 EDT 2008
+	Add test config files to MANIFEST
+
+0.01    Wed Jun 4 03:21:30 EDT 2008 
+	->inherit() method seems to work
+	and has 13 working tests at t/10-inherit.t
+        First version, released on an unsuspecting world.
+

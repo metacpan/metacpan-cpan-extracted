@@ -1,0 +1,15 @@
+Revision history for perl module CSS::Scopifier
+
+0.04 2015-08-26
+    - Added CSS::Scopifier::Group
+
+0.03 2014-07-27
+    - Travis + Coveralls support
+    - Fixed bad files modes (files erroneously set with execute bit)
+
+0.02 2013-07-24
+    - Added Changes file, following the format in CPAN::Changes::Spec
+    - Added temp workaround for CSS::Tiny bug [rt.cpan.org #87261]
+
+0.01 2013-07-18
+    - Initial release

@@ -1,0 +1,9 @@
+=MRCtermTable
+A	workingLanguage	en
+A	sourceDesc	wood shop manual
+
+C005	subjectField	woodworking
+C005en1	term	chair
+C005en1	partOfSpeech	noun
+C005en2	term	seat
+C005en2	partOfSpeech	noun

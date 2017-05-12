@@ -1,0 +1,353 @@
+#!/opt/bin/perl
+
+# this is a relatively small web-server, using coroutines for connections.
+# play around with it but do not use it in production without checking it
+# works for you. ask myhttpd@plan9.de in case of problems, or if you are
+# interested in a newer version (more useless features).
+
+use Coro;
+use Coro::Semaphore;
+use Coro::Event;
+use Coro::Socket;
+
+no utf8;
+use bytes;
+
+# at least on my machine, this thingy serves files
+# quite a bit faster than apache, ;)
+# and quite a bit slower than thttpd :(
+
+$MAX_CONNECTS = 500;			# maximum simult. connects
+$REQ_TIMEOUT  =  60;			# request timeout
+$RES_TIMEOUT  = 180;			# response timeout
+$MAX_POOL     =  20;			# max. number of idle workers
+$DOCROOT      = "/usr/www/htdocs";	# document root
+$INDEXPROG    = "/usr/www/bin/dols";	# indexing program (nph-cgi script)
+$SERVER_HOST  = "0.0.0.0";		# host to bind on
+$SERVER_PORT  = 80;			# port to listen on
+
+my $port = new Coro::Socket
+        LocalAddr => $SERVER_HOST,
+        LocalPort => $SERVER_PORT,
+        ReuseAddr => 1,
+        Listen => 1,
+   or die "unable to start server";
+
+$SIG{PIPE} = 'IGNORE';
+   
+sub slog {
+   my $level = shift;
+   my $format = shift;
+   #printf "---: $format\n", @_;
+}
+
+my $connections = new Coro::Semaphore $MAX_CONNECTS;
+
+my @fh;
+
+# move the event main loop into a coroutine
+async { loop };
+
+slog 1, "accepting connections";
+while () {
+   $connections->down;
+   if (my $fh = $port->accept) {
+      #slog 3, "accepted @$connections ".scalar(@pool);
+      async_pool {
+         eval {
+            conn->new($fh)->handle;
+         };
+         close $fh;
+         slog 1, "$@" if $@ && !ref $@;
+         $connections->up;
+      };
+   }
+}
+
+package conn;
+
+use Socket;
+use HTTP::Date;
+
+sub new {
+   my $class = shift;
+   my $fh = shift;
+   my (undef, $iaddr) = unpack_sockaddr_in $fh->peername
+      or $self->err(500, "unable to get peername");
+   $self->{remote_address} = inet_ntoa $iaddr;
+   bless { fh => $fh }, $class;
+}
+
+sub slog {
+   main::slog(@_);
+}
+
+sub print_response {
+   my ($self, $code, $msg, $hdr, $content) = @_;
+   my $res = "HTTP/1.0 $code $msg\015\012";
+
+   $hdr->{Date} = time2str time; # slow? nah.
+
+   while (my ($h, $v) = each %$hdr) {
+      $res .= "$h: $v\015\012"
+   }
+   $res .= "\015\012$content" if defined $content;
+
+   print {$self->{fh}} $res;
+}
+
+sub err {
+   my $self = shift;
+   my ($code, $msg, $hdr, $content) = @_;
+
+   unless (defined $content) {
+      $content = "$code $msg";
+      $hdr->{"Content-Type"} = "text/plain";
+      $hdr->{"Content-Length"} = length $content;
+   }
+
+   $self->slog($msg) if $code;
+
+   $self->print_response($code, $msg, $hdr, $content);
+
+   die bless {}, err::;
+}
+
+sub handle {
+   my $self = shift;
+   my $fh = $self->{fh};
+
+   #while() {
+      $self->{h} = {};
+
+      # read request and parse first line
+      $fh->timeout($::REQ_TIMEOUT);
+      my $req = $fh->readline("\015\012\015\012");
+      $fh->timeout($::RES_TIMEOUT);
+
+      defined $req or
+         $self->err(408, "request timeout");
+
+      $req =~ /^(?:\015\012)?
+                (GET|HEAD) \040+
+                ([^\040]+) \040+
+                HTTP\/([0-9]+\.[0-9]+)
+                \015\012/gx
+         or $self->err(405, "method not allowed", { Allow => "GET,HEAD" });
+
+      $2 < 2
+         or $self->err(506, "http protocol version not supported");
+
+      $self->{method} = $1;
+      $self->{uri} = $2;
+
+      # parse headers
+      {
+         my (%hdr, $h, $v);
+
+         $hdr{lc $1} .= ",$2"
+            while $req =~ /\G
+                  ([^:\000-\040]+):
+                  [\011\040]*
+                  ((?: [^\015\012]+ | \015\012[\011\040] )*)
+                  \015\012
+               /gxc;
+
+         $req =~ /\G\015\012$/
+            or $self->err(400, "bad request");
+
+         $self->{h}{$h} = substr $v, 1
+            while ($h, $v) = each %hdr;
+      }
+
+      $self->{server_port} = $self->{h}{host} =~ s/:([0-9]+)$// ? $1 : 80;
+
+      $self->map_uri;
+      $self->respond;
+   #}
+}
+
+# uri => path mapping
+sub map_uri {
+   my $self = shift;
+   my $host = $self->{h}{host} || "default";
+   my $uri = $self->{uri};
+
+   $host =~ /[\/\\]/
+      and $self->err(400, "bad request");
+
+   # some massaging, also makes it more secure
+   $uri =~ s/%([0-9a-fA-F][0-9a-fA-F])/chr hex $1/ge;
+   $uri =~ s%//+%/%g;
+   $uri =~ s%/\.(?=/|$)%%g;
+   1 while $uri =~ s%/[^/]+/\.\.(?=/|$)%%;
+
+   $uri =~ m%^/?\.\.(?=/|$)%
+      and $self->err(400, "bad request");
+
+   $self->{name} = $uri;
+
+   # now do the path mapping
+   $self->{path} = "$::DOCROOT/$host$uri";
+}
+
+sub server_address {
+   my $self = shift;
+   my ($port, $iaddr) = unpack_sockaddr_in $self->{fh}->sockname
+      or $self->err(500, "unable to get socket name");
+   ((inet_ntoa $iaddr), $port);
+}
+
+sub server_host {
+   my $self = shift;
+   if (exists $self->{h}{host}) {
+      return $self->{h}{host};
+   } else {
+      return (($self->server_address)[0]);
+   }
+}
+
+sub server_hostport {
+   my $self = shift;
+   my ($host, $port);
+   if (exists $self->{h}{host}) {
+      ($host, $port) = ($self->{h}{host}, $self->{server_port});
+   } else {
+      ($host, $port) = $self->server_address;
+   }
+   $port = $port == 80 ? "" : ":$port";
+   $host.$port;
+}
+
+# no, this doesn't do cgi, but it's close enough
+# for the no-longer-used directory indexing script.
+sub _cgi {
+   my $self = shift;
+   my $path = shift;
+   my $fh;
+
+   # no two-way xxx supported
+   if (0 == fork) {
+      open STDOUT, ">&".fileno($self->{fh});
+      if (chdir $::DOCROOT) {
+         $ENV{SERVER_SOFTWARE} = "thttpd-myhttpd"; # we are thttpd-alike
+         $ENV{HTTP_HOST}       = $self->server_host;
+         $ENV{HTTP_PORT}       = $self->{server_host};
+         $ENV{SCRIPT_NAME}     = $self->{name};
+         exec $::INDEXPROG;
+      }
+      Coro::State::_exit(0);
+   } else {
+   }
+}
+
+sub respond {
+   my $self = shift;
+   my $path = $self->{path};
+
+   stat $path
+      or $self->err(404, "not found");
+
+   # idiotic netscape sends idiotic headers AGAIN
+   my $ims = $self->{h}{"if-modified-since"} =~ /^([^;]+)/
+             ? str2time $1 : 0;
+
+   if (-d _ && -r _) {
+      # directory
+      if ($path !~ /\/$/) {
+         # create a redirect to get the trailing "/"
+         my $host = $self->server_hostport;
+         $self->err(301, "moved permanently", { Location =>  "http://$host$self->{uri}/" });
+      } else {
+         $ims < (stat _)[9]
+            or $self->err(304, "not modified");
+
+         if ($self->{method} eq "GET") {
+            if (-r "$path/index.html") {
+               $self->{path} .= "/index.html";
+               $self->handle_file;
+            } else {
+               $self->handle_dir;
+            }
+         }
+      }
+   } elsif (-f _ && -r _) {
+      -x _ and $self->err(403, "forbidden");
+      $self->handle_file;
+   } else {
+      $self->err(404, "not found");
+   }
+}
+
+sub handle_dir {
+   my $self = shift;
+   $self->_cgi($::INDEXPROG);
+}
+
+sub handle_file {
+   my $self = shift;
+   my $length = -s _;
+   my $hdr = {
+      "Last-Modified"  => time2str ((stat _)[9]),
+   };
+
+   my @code = (200, "ok");
+   my ($l, $h);
+
+   if ($self->{h}{range} =~ /^bytes=(.*)$/i) {
+      for (split /,/, $1) {
+         if (/^-(\d+)$/) {
+            ($l, $h) = ($length - $1, $length - 1);
+         } elsif (/^(\d+)-(\d*)$/) {
+            ($l, $h) = ($1, ($2 ne "" || $2 >= $length) ? $2 : $length - 1);
+         } else {
+            ($l, $h) = (0, $length - 1);
+            goto ignore;
+         }
+         goto satisfiable if $l >= 0 && $l < $length && $h >= 0 && $h >= $l;
+      }
+      $hdr->{"Content-Range"} = "bytes */$length";
+      $self->err(416, "not satisfiable", $hdr);
+
+satisfiable:
+      $hdr->{"Content-Range"} = "bytes $l-$h/$length";
+      @code = (206, "partial content");
+      $length = $h - $l + 1;
+
+ignore:
+   } else {
+      ($l, $h) = (0, $length - 1);
+   }
+
+   if ($self->{path} =~ /\.html$/) {
+      $hdr->{"Content-Type"} = "text/html";
+   } else {
+      $hdr->{"Content-Type"} = "application/octet-stream";
+   }
+
+   $hdr->{"Content-Length"} = $length;
+
+   $self->print_response(@code, $hdr, "");
+
+   if ($self->{method} eq "GET") {
+      my ($fh, $buf);
+      open $fh, "<", $self->{path}
+         or die "$self->{path}: late open failure ($!)";
+
+      if ($l) {
+         sysseek $fh, $l, 0
+            or die "$self->{path}: cannot seek to $l ($!)";
+      }
+
+      $h -= $l - 1;
+
+      while ($h > 0) {
+         $h -= sysread $fh, $buf, $h > 4096 ? 4096 : $h;
+         print {$self->{fh}} $buf
+            or last;
+      }
+   }
+
+   close $fh;
+}
+

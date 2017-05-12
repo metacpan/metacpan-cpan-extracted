@@ -1,0 +1,43 @@
+NAME
+    Class::DBI::ViewLoader::Pg - Class::DBI::Viewloader implementation for
+    Postgresql.
+
+SYNOPSIS
+        use Class::DBI::ViewLoader;
+
+        $loader = Class::DBI::ViewLoader dsn => 'dbi:Pg:dbname=mydb';
+
+        # load views from mydb
+        @classes = $loader->load_views
+
+DESCRIPTION
+    This is the postgresql driver for Class::DBI::ViewLoader,
+
+METHODS
+  base_class
+    Returns 'Class::DBI::Pg'. This class will be used as the main base class
+    for all classes generated using this driver.
+
+  get_views
+        @views = $obj->get_views
+
+    Returns a list of the names of the views in the current database.
+
+  get_view_cols
+        @cols = $obj->get_view_cols($view)
+
+    Returns the columns contained in the given view.
+
+SEE ALSO
+    Class::DBI::ViewLoader, Class::DBI::Loader, Class::DBI,
+    <http://www.postgresql.org/>
+
+AUTHOR
+    Matt Lawrence <mattlaw@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 Matt Lawrence, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,17 @@
+This directory contains a more substantial example
+of the use of CORBA::MICO - an interface repostory
+browser.
+
+It requires the Gtk module for Perl and gtk+.
+
+To run it, run start-servers.sh in the parent
+directory, then in this directory, run:
+
+ perl -Mblib ./browser 
+
+The implementation and user interface here
+are far from complete.
+
+Owen Taylor
+28 Apr 1998
+

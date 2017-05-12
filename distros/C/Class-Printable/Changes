@@ -1,0 +1,10 @@
+Revision history for Perl extension Class-Printable.
+
+0.02 Thurs Dec 16 2004
+    - added 'fallback => 1' to overload so that 
+      perl wont try to look for other operators
+        - added tests to verify the fix
+
+0.01 Fri Oct  8 20:48:42 2004
+    - module created
+

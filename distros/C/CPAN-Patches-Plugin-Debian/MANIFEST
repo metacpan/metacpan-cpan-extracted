@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/CPAN/Patches/Plugin/Debian.pm
+lib/CPAN/Patches/Plugin/Debian/SPc.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+script/cpan-patches-update-from-debian
+sharedstate/cpan-patches/debian-set/.exists
+sharedstate/cpan-patches/pkg-perl-trunk/.exists
+t/00_compile.t
+t/distribution.t
+t/fixme.t
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t

@@ -1,0 +1,17 @@
+Revision history for CPAN-Testers-Common-Utils
+
+0.003     2015-04-16 23:04:25+02:00 Europe/Berlin
+
+    [Meta]
+
+    - Updated repo and bugtracker information
+
+0.002     2010-06-04 10:37:45 EST5EDT
+
+    - have guid_to_nntp return undef if GUID is not a converted NNTP GUID
+
+    - distribution now managed with Dist::Zilla
+
+0.001 Sun Jan 17 22:34:30 EST 2010
+
+    - Initial release

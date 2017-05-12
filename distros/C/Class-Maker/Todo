@@ -1,0 +1,455 @@
+todo
+{
+	reflector::reflect() should do recursion to the parents when retrieving
+
+	isa, can etc. when needed ("deep reflection").
+}
+
+todo
+{
+	class configure should have option 'explicit' for turning object hash
+
+	keys with 'Object::' on/off
+
+	configure =>
+	{
+		explicit => 0,
+	}
+}
+
+todo
+{
+	class attributes should be compatible with tangram object fields....
+
+		Tangram comes with built-in support for the following types:
+
+		* string, int, real: see the Tangram::Scalar manpage
+
+		* reference : see the Tangram::Ref manpage
+
+		* array : see the Tangram::Array manpage, the Tangram::IntrArray manpage
+
+		* Set::Object : see the Tangram::Set manpage, the Tangram::IntrSet
+		manpage
+}
+done
+{
+	implemented via Class::Maker::persistance
+}
+
+todo
+{
+	"Automatic & Intelligent" deploy of the Tangram::Schema in persist().
+
+	- Deploy on first-time usage OR when schema changes with careful handling
+	of loss old data deployed with the previous format.
+}
+done
+{
+	- first deploying worked, but nothing intelligent
+}
+
+todo
+{
+	Perldoc documentation for class.pm ctor.pm persistance.pm and reflector.pm
+}
+done
+{
+}
+
+todo
+{
+	Add gimmik to the 'new' constructor so arguments leading 'minus' are allowed, like "new( -attrib )".
+}
+done
+{
+	now all prefixed '-' or '+' signes are ignored for the keys like -attrib, --attrib, ...
+}
+
+todo
+{
+	import_isa function/config which automatically calls 'use' foreach isa class.
+}
+done
+{
+	skipped.
+}
+
+todo
+{
+	Class::Maker::persistance	schema()
+
+		- must produce real object names (with '::') as keys, and a '::' replaced by '_' version as
+		a "tablename" entry for tangram.
+
+		- this must be also valid for the ref => { name => 'My::Complex::Types' } attributes.
+
+		- these ref|array => { name => type } attribute objects have to be added to the schema tree classes, because
+		tangram must know even the schmema of just referenced classes.
+
+	See Web::Objects test.pl for trouble example.
+}
+done
+{
+	Done.
+
+	- The attribute ref|array class traversal is very inefficient, i think. Recursive use of schema() function could
+	be optimized so no double class parsing would occur.
+
+	TOSKIP: This is an internal Tangram problem, which is solved via Tangram::MetaStorage !
+}
+
+todo
+{
+	More intelligent deploy. Just looking for the "tangram" table is very idiotic when having multiple schema`s
+	to deploy.
+}
+done
+{
+}
+
+todo
+{
+	Use nametable aliases for new() etc instead of srefs.
+}
+done
+{
+}
+
+todo
+{
+		# this doesn't work yet - no idea why
+		#export the class function into the CORE::GLOBAL:: so it behaves like an internal routine
+
+	BEGIN
+	{
+		no strict 'refs';
+
+		*{ "CORE::GLOBAL::class" } = &class;
+	}
+}
+done
+{
+	According to Simon McCaughey <simonmcc@nortelnetworks.com.nospam>:
+	> My problem is in unit-testing modules, I want to stub out all external
+	> function calls, so for example I want the function time() to always return
+	> 991401617 (for example)
+	>
+	> So having read cookbook, and camel it seems the best way to redefine a
+	> function *globally* is to do :
+	>
+	> *CORE::GLOBAL::time = sub {
+	> return 991401617;
+	> }
+	>
+	> and this works.
+
+	...provided it happens at compile time.
+
+	> Is it possible to do this from inside a sub, as I cant seem to get that
+	> working??
+
+	There is no reason why this shouldn't be possible in a sub (though
+	I didn't try), but the same caveat applies:  The sub must be called
+	at compile time, for instance in a module you "use" or in a begin
+	block.  I believe you are asking if the overriding can be done at
+	run time, and the answer to that is no.  You can, however, replace
+	time() with a function whose behavior can change at runtime, like so:
+
+	BEGIN {
+	    my $true_time = 1;
+
+	    *CORE::GLOBAL::time = sub {
+	        return $true_time ? CORE::time : 1234567;
+	    };
+
+	    sub toggle_time { # ...or something more convenient
+	        $true_time = ! $true_time;
+	    }
+	}
+
+	Now time() will first behave normally, but after a call to toggle_time()
+	it will return 1234567 until toggle_time is called again, and so on.
+
+	Anno
+}
+
+todo
+{
+	- adding a "classes" function which returns all reflectable classes from the
+	symboltable (descending from a start-package of my choice)
+}
+done
+{
+	- added to Class::Maker::Reflection
+
+	- export: use Class::Maker qw(classes);
+
+	- see the ./classwalker.pl script in this dist
+}
+
+todo
+{
+	- classes should return an array of package id's instead of a hash. Then a user
+	might use reflect( package ) to retrieve the information.
+}
+done
+{
+}
+
+todo
+{
+	"Tangram schema creation"
+
+		array => [qw(one two three)]	become flat_array
+
+		array => { children => 'Human', ...    stay array !
+}
+done
+{
+	see persistance.pm
+}
+
+todo
+{
+	Fields.pm Line 114 ff.
+
+	# DANGER !!! WHAT HAPPENS WHEN $attributes was a hashref ??? see Line 114 above.
+
+	Fields.pm Line 132 ff.
+
+	# WE HAVE TO DELETE THIS METHOD FROM THE attribute/attr/public section.
+}
+done
+{
+	- both done
+	- now also correctly moving $args->{type} sections from public to private (not leaving
+	any empty fields).
+}
+
+todo
+{
+	private-bracket feature:
+
+	the brackets should include multiple attribute values,
+	like qw(one <two three four> five) , should make two, three,
+	four private.
+	This bracket-private feature should work only in public and
+	attributes fields.
+}
+done
+{
+	now <method> means private.
+}
+
+todo
+{
+	configure->{explicit},
+	configure->{private}->{prefix},
+
+	Shouldn't be changed on a per-object basis => Should make them global !
+}
+done
+{
+	done. $Class::Maker::explicit
+}
+
+todo
+{
+	Translators:
+	------------
+
+	The default new constructor is currently only accepting hash parameters:
+
+		Now: ->new( one => 1, two => 2 );
+
+		Future: ->new( 1, 2 );
+
+	Comment: the _preinit function takes a hashref of the arguments and this is a point where
+	translations of the arguments may happen.
+	Problem: How would we now how to assign the parameters to the accessors (especially the parent
+	accessors) ???
+
+	Is this confliciting with our current MI implementation ? ==> NO, because the array-params should
+	be converted to hash params.
+
+	Solution: I think there should be a parameter translation engine !
+
+	ie. ->new( 1, 2 ) should be translated to ->new( one => 1, two => 2 )
+
+	But how ?? => _preinit should be given an aref instead of an href !
+}
+done
+{
+	<<<<<<<<<<<<<<< ALL WAS NONSENSE: THERE WAS A VERY SIMPLE SOLUTION >>>>>>>>>>>>>>>>>>
+
+	Simply create 'another new' constructor which does all the argument translation and then
+	successivly call the real 'new' with the apropriate hash params:
+
+	SOLUTION #1
+
+	{
+		package Human::Role;
+
+		Class::Maker::class
+		{
+			public =>
+			{
+				string => [qw( name desc )],
+			},
+		};
+
+		sub anew
+		{
+			my $this = shift;
+
+			return $this->new( name => $_[0], desc => $_[1] );
+		}
+
+	}
+
+		my $role = Human::Role->anew( 'dba', 'Database Administrator' );
+
+		use Data::Dumper;
+
+		print Dumper reflect( 'Human::Role' );
+
+	SOLUTION #2
+
+	Override the class and create a constructor for the derived one which is simpler.
+
+		package Human::Role;
+
+		Class::Maker::class
+		{
+			public =>
+			{
+				string => [qw( name desc )],
+			},
+
+			default =>
+			{
+				name => 'Role Name',
+
+				desc => 'Role Descrition',
+			},
+		};
+
+		package Human::Role::Simple;
+
+		@ISA = qw(Human::Role);
+
+		sub new : method
+		{
+			my $this = shift;
+
+			return $this->SUPER::new( name => $_[0] );
+		}
+}
+
+todo
+{
+	Introduce std constructors:	like
+
+		my $obj = My::Object( one => 1, two => 2, three => 3 );
+
+	????? Should we ?????? Because that would pollute My:: namespace with an Object() function, which
+	could be to annoying.
+}
+
+todo
+{
+	reflect()
+
+	* deep reflection should make the 'isa' field containing pointer (hrefs) to the
+	classes.
+
+	* reflect() shouldn't return simple hrefs, better would be 'Class::Maker::Reflex' classes !
+
+	* isa => [qw( )] isnt in sync with @ISA. When @ISA (or isa) is modified after initation, the $reflex->{isa} will only
+	represent the state during object initiation.
+}
+done
+{
+	Works. Now a Class::Maker::Reflex object is returned (it is not created with Class::Maker):
+
+		->{parents} = href with all parent reflexes (->{isa} classes ) if $Class::Maker::Reflection::DEEP is true.
+
+		->{methods} = aref of ': method' functions of that package
+
+		->{def} = the original class definition (undef if not created with Class::Maker)
+
+		->{isa} = the actual @ISA value of the class package
+
+		->{name} = name of the reflected class
+}
+
+todo
+{
+	New syntax !
+
+	public =>
+	{
+		string => [qw( one <two three )],
+
+		int    => [qw( <five six> seven )],
+
+
+	should yeald to following private accessors: _two, _three, _five, _six !
+}
+done
+{
+	!! deprecated !! Because was to confusing <privat> fields in the public section.
+}
+
+todo
+{
+	Defaults and Getopts
+
+	Add a Getopt modus, so command line arguements can be easily mapped to attributes (See GetOpt::Attribute).
+
+	class Server
+	{
+		public =>
+		{
+			string => [qw( name ip )],
+
+			int => { secure => [ '123' ] },
+		},
+
+		default =>
+		{
+			ip => Getopt( ip=s ) || '127.0.0.1',
+
+			name => Getopt( name=s ) || 'localhost',
+
+			Loadable::startup => 1,
+		}
+	};
+
+	class Getoptable;
+
+	class Configer, { isa => [qw( Getoptable )] };
+
+	my $test = Configer->new();
+
+	$test->getopts( @ARGV );
+}
+
+todo Reflection
+{
+	attr|attributes|privat|private|public is chaotic !
+
+	=> We need clean guidelines which when used, and how they are reflected.
+}
+done
+{
+	1) Only public/private is allowed.
+	2) <method> is used to indicate private methds in public field.
+}
+
+todo 
+{
+	int the "default" section, check whether the "defaulted" memeber exists.
+}
+

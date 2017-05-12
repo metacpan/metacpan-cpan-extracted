@@ -1,0 +1,47 @@
+=head1 NAME
+
+Config::Strict::UserConstraints - Utility class to register user-defined profiles
+
+=head1 DESCRIPTION
+
+This class is used by L<Config::Strict> to register user-defined profiles from bare code blocks and to its type registry.
+
+=head1 PROFILE REGISTRATION
+
+=head2 $class->make_constraint($name,$sub,$message)
+
+A class method that wraps the 'constraint' method declaration used by Declare::Constraints::Simple to make a new profile. C<$message> is optional.
+
+=head1 SEE ALSO
+
+L<Declare::Constraints::Simple::Library::Base>, L<Config::Strict>
+
+=head1 AUTHOR
+
+Blake Willmarth
+
+bwillmarth at gmail.com
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-config-strict at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Config-Strict>.  I will be notified, and then you'll automatically be notified of progress on your bug as changes are made.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Blake Willmarth.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut

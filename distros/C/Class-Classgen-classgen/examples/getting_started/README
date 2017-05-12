@@ -1,0 +1,13 @@
+This directory contains a simple example to get started.
+To create the Example-object run
+
+	classgen example.txt Example.pm
+
+from your command line. Example.pm will be created. To try
+this class run try_example, best with the degugger:
+
+	perl -d try_example
+
+A more sophisticated example can be found at ../peanuts .
+
+Enjoy.

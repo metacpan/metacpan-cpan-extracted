@@ -1,0 +1,34 @@
+SYNOPSIS
+
+    In lib/Your/Class.pm:
+
+     package Your::Class;
+     use Class::MaybeXSAccessor {
+         accessors => [qw/foo bar/],
+     };
+
+    In code that uses your class:
+
+     use Your::Class;
+    
+     my $obj = Your::Class->new;
+     $obj->foo(1980);
+     $obj->bar(12);
+
+DESCRIPTION
+
+    EARLY, EXPERIMENTAL.
+
+    This module can be used to generate accessors/constructor. It will use
+    Class::XSAccessor if available, falling back to Class::Accessor. Note
+    that not all features from Class::Accessor nor Class::XSAccessor are
+    supported.
+
+SEE ALSO
+
+    Class::Accessor
+
+    Class::XSAccessor
+
+    Class::MaybeXSAccessor::Array
+

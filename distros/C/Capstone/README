@@ -1,0 +1,187 @@
+NAME
+    Capstone - Perl extension for capstone-engine
+
+SYNOPSIS
+      use Capstone ':all';
+
+      $cs = Capstone->new(CS_ARCH_X86, CS_MODE_64) || die "Can't init Capstone\n";
+      @insn = $cs->dis("\x4c\x8d\x25\xee\xa6\x20\x00\x90\xcd\x80", 0x040000a, 0);
+
+      foreach(@insn) {
+        printf "0x%.16x    %s %s\n", $_->{address}, $_->{mnemonic}, $_->{op_str};
+      }
+
+DESCRIPTION
+    This module is a Perl wrapper of the capstone-engine library.
+
+    Capstone is a disassembly framework with the target of becoming the
+    ultimate disasm engine for binary analysis and reversing in the security
+    community.
+
+    Created by Nguyen Anh Quynh, then developed and maintained by a small
+    community, Capstone offers some unparalleled features:
+
+    - Support multiple hardware architectures: ARM, ARM64 (ARMv8), Mips,
+    PPC, Sparc, SystemZ, XCore and X86 (including X86_64).
+
+    - Having clean/simple/lightweight/intuitive architecture-neutral API.
+
+    - Provide details on disassembled instruction (called
+    \u201cdecomposer\u201d by others).
+
+    - Provide semantics of the disassembled instruction, such as list of
+    implicit registers read & written.
+
+    - Implemented in pure C language, with lightweight wrappers for C++, C#,
+    Go, Java, Lua, NodeJS, Ocaml, Python, Ruby, Rust & Vala ready (available
+    in main code, or provided externally by the community).
+
+    - Native support for all popular platforms: Windows, Mac OSX, iOS,
+    Android, Linux, *BSD, Solaris, etc.
+
+    - Thread-safe by design.
+
+    - Special support for embedding into firmware or OS kernel.
+
+    - High performance & suitable for malware analysis (capable of handling
+    various X86 malware tricks).
+
+    - Distributed under the open source BSD license.
+
+    Further information is available at http://www.capstone-engine.org
+
+  METHODS
+    new(arch, mode)
+          $cs = Capstone->new(CS_ARCH_X86, CS_MODE_32);
+
+        Create a new capstone object. Take two arguments, the arch
+        (CS_ARCH_*) and the mode (CS_MODE_*). See cs_open() in
+        capstone-engine documentation
+
+    dis(code, address, num)
+          @ins = $cs->dis("\xcd\x80", 0x080480bc, 1);
+
+        Disassemble code, and return a list of disassembled instructions.
+
+        See cs_disasm() in capstone-engine documentation.
+
+          foreach(@ins) {
+            printf "%.16x  %-32s %s %s\n",
+                   $_->{address},
+                   hexlify($_->{bytes}),
+                   $_->{mnemonic},
+                   $_->{op_str};
+          }
+
+        An instruction is represented with a hash ref, with fields :
+
+        {address}
+            The address of the instruction
+
+        {mnemonic}
+            The mnemonic of the instruction
+
+        {op_str}
+            The operand string of the instruction
+
+        {bytes}
+            The raw bytes of the instruction
+
+        {regs_read}
+            If CS_OPT_DETAILS is set, it is a list of implicit registers
+            read.
+
+        {regs_write}
+            If CS_OPT_DETAILS is set, it is a list of implicit registers
+            modified.
+
+        {groups}
+            If CS_OPT_DETAILS is set, it is a list of group the instruction
+            belong to.
+
+    set_option(type, value)
+          $cs->set_option(CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
+
+        Change the disassembly behavior.
+
+        See cs_option() in capstone-engine documentation.
+
+  FUNCTIONS
+    version()
+          ($maj, $min) = Capstone::version();
+
+        Return a list of two scalars, the first is the major version, and
+        the second is the minor version
+
+        See cs_version() in capstone-engine documentation.
+
+    support(value)
+          print "CS_ARCH_ALL supported\n" if(Capstone::support(CS_ARCH_ALL));
+
+        Test if the library support an architecture. Use CS_ARCH_* constant
+        (see capstone documentation)
+
+        See cs_support() in capstone-engine documentation.
+
+  EXAMPLES
+      #!/usr/bin/perl
+
+      use ExtUtils::testlib;
+      use Capstone ':all';
+
+      use strict;
+      use warnings;
+
+      my $CODE = "\x4c\x8d\x25\xee\xa6\x20\x00\x90\x90\xcd\x80";
+      my $ADDRESS = 0x040000;
+
+      printf "Capstone version %d.%d\n", Capstone::version();
+      print "Support ARCH_ALL : " . Capstone::support(CS_ARCH_ALL) . "\n\n";
+
+      print "[+] Create disassembly engine\n";
+      my $cs = Capstone->new(CS_ARCH_X86, CS_MODE_64)
+          || die "[-] Can't create capstone object\n";
+
+      print "[+] Set AT&T syntax\n";
+      $cs->set_option(CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT)
+          || die "[-] Can't set CS_OPT_SYNTAX_ATT option\n";
+
+      print "[+] Disassemble some code\n\n";
+      my @insn = $cs->dis($CODE, $ADDRESS, 0);
+
+      foreach(@insn) {
+          printf "    0x%.16x  %-30s   %s %s\n",
+          $_->{address},
+          hexlify($_->{bytes}),
+          $_->{mnemonic},
+          $_->{op_str};
+      }
+
+      print "[+] " . scalar(@insn) . " instructions disassembled\n";
+
+
+      sub hexlify {
+          my $bytes = shift;
+
+          return join ' ', map { sprintf "%.2x", ord($_) } split //, $bytes;
+      }
+
+SEE ALSO
+    http://capstone-engine.org/
+
+    https://github.com/t00sh/perl-capstone
+
+AUTHOR
+    Tosh, <tosh@t0x0sh.org>
+
+CONTRIBUTORS
+    Vikas N Kumar <vikas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2015-2016 by Tosh
+
+    This library is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+

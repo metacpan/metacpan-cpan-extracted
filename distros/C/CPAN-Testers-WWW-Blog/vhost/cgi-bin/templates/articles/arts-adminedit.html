@@ -1,0 +1,29 @@
+[% 
+    IF article.data.articleid ; THEN ; editmode = 'Edit' ; ELSE ; editmode = 'Add' ; END ;
+    title = editmode _ ' Article' ;
+
+    crumb2_name = 'Article' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=arts-admin' ;
+    crumb1_name = editmode ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% data = article.data %]
+
+[% IF thanks %]<p>Article saved successfully.</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% IF errmess == 2 %]
+<p class="alert">Please note that the title must be unqiue.</p>
+[% END %]
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" id="EDIT" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="arts-save" />
+[% INCLUDE "articles/arts-adminblock.html" %]
+</form>
+
+[% INCLUDE "articles/arts-preview.html" %]

@@ -1,0 +1,118 @@
+=head1 NAME
+
+CGI::Bus::psp - Perl Script Processor CGI::Bus subobject
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->userauthopt;
+ $s->psp->evalf(filename);
+
+ Or directly in mixed CGI/HTML page:
+
+ #!perl -w
+ use vars qw($s);
+ $s =do("config.pl");
+ $s->userauthopt;
+ $s->psp->evalf($0)
+ __END__
+ <!DOCTYPE html
+ ....
+
+
+=head1 DESCRIPTION
+
+Why? - It is very simple.
+
+This module is a very simple and small 
+HTML/Perl Script Processor L<CGI::Bus|CGI/Bus> subobject.
+Formatted like ASP HTML file is converted to
+Perl subroutine and evaluated.
+HTML is converted to series of C<print> calls.
+E<lt>% perl expr %E<gt> tags are converted to C<print>(perl expr).
+E<lt>SCRIPT E<gt> tags are considered as Perl code.
+Script language attribute is observed.
+
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 SLOTS
+
+=over
+
+None
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+=item eval (?-opt, perl text, ? filename||[filename, base],...) -> HTML page printed
+
+Evaluate Perl text.
+'e' option is to produce embeddable HTML without headers.
+Evaluation context is 
+C<CGI::Bus::evalsub>(application object, options string, filename,...)
+
+
+
+=item evalf (?-opt, filename||[filename, base],...) -> HTML page printed
+
+Evaluate HTML/Perl script file.
+Uses C<parse> and C<eval>.
+
+
+
+=item parse (?-opt, html/perl text, ?filename||[filename, base],...) -> Perl text
+
+Parse HTML/Perl script file to Perl text.
+'e' option is to produce embeddable HTML without headers.
+
+
+
+
+=head1 VERSION
+
+=over
+
+=head2 02/04/2003
+
+=item New:
+
+[filename, base] filename syntax may now be used to generate '<base href...>' tag
+
+
+=head2 16/09/2002
+
+=item Changed:
+
+C<parse> omits text given before m/<(!DOCTYPE|html|head)/i,
+so mixed CGI/HTML page files may be parsed. 
+Synopsis changed to reflect this feature.
+
+
+
+=head2 15/10/2001 - 08/11/2001
+
+=item New:
+
+Implemented and Documented.
+
+
+=item ToDo:
+
+Perl code caching?
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

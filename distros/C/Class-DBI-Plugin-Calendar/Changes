@@ -1,0 +1,15 @@
+Revision history for Perl extension Class::DBI::Plugin::Calendar.
+
+0.18  Tue Jun 07 2010
+	- basic housekeeping
+
+0.16  Tue Jun 21 2005
+	- better testing
+
+0.14  Fri Jun 17
+	- first release candidate
+
+0.01  Fri Jun 10 19:34:57 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn Class::DBI::Plugin::Calendar
+

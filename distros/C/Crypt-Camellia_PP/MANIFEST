@@ -1,0 +1,11 @@
+Changes
+lib/Crypt/Camellia_PP.pm
+Makefile.PL
+MANIFEST
+README
+TODO
+t/00-basic.t
+t/01-CBC.t
+t/02-test-vectors-simple.t
+t/03-test-vectors-full.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+name: CGI-Session-Hidden
+version: 0.03
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+abstract: persistent session using hidden fields
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Session: 1.23
+  Module::Build: 0.2607
+  Test::More: 0.48
+  if: 0.03
+  perl: 5.6.0
+provides:
+  CGI::Session::Driver::hidden:
+    file: lib/CGI/Session/Driver/hidden.pm
+    version: 0.03
+  CGI::Session::Hidden:
+    file: lib/CGI/Session/Hidden.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,15 @@
+Revision history for Perl extension Catalyst::Authentication::Store::Crowd.
+
+0.04  Mon Oct  16 09:30:00 2012
+    - Fix "Can't use string ("info") as a HASH ref while "strict refs" take 2
+    - add new method to get info & test
+
+0.03  Mon Oct  15 16:00:00 2012
+	- Fix "Can't use string ("info") as a HASH ref while "strict refs"
+
+0.02  Fri Aug  20 13:45:00 2012
+	- Fix Deep recursion on subroutine "Catalyst::Authentication::User::id"
+
+0.01  Thu Jul  20 18:00:00 2012
+	- Initial release.
+

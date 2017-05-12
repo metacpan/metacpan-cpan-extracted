@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 491a57e1d615984fa6bf42fc3398baeb6cae4785 BUILD
+SHA1 3d7bf43f08bf22c9f26534c40fda78e22f7ab1cb Changes
+SHA1 f5935c8a793eb07eab8bb2101dd5a92bd2f2d54c Commitlog
+SHA1 e66197486df024f3e111ddfc73ee9e94d4b7270c LICENSE
+SHA1 b6349345c86320819575b3be6c1fce849802f723 MANIFEST
+SHA1 83784c35d0891293ade1ec9daa78a6ba8b76ef6d META.json
+SHA1 65ebe2299e220f7c087e5e0e3a534bfa426922c1 META.yml
+SHA1 3d0e370850716381811421383ac0fa14cf6ad721 Makefile.PL
+SHA1 944c353f7dba32f0e8023227dc803c2f480cb1b9 README
+SHA1 6dbca80b85d41c6090d12cf245e3cc21bd36f8fd README.md
+SHA1 49005f03a4f2722918502e5affb0df295aa8d891 dist.ini
+SHA1 ae4678cbdc4a2d120013eca3068d63824d6ff16b examples/dump_csr
+SHA1 ac1d56f70371e6e63fda6c225848570d30a04858 examples/verify_csr
+SHA1 70a0ac22536e2675d8f4f03b8763d9871a13ef37 lib/Crypt/PKCS10.pm
+SHA1 6e2a5ee6eecd4c852d0252eee7c827df8917485e makefile_test_ssl
+SHA1 fcc9f32c755475afa8c506f016f4b9b79aa0733b runbrew
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/0-signature.t
+SHA1 a5fc4089f50c0bd9d74f3572b32216538142a872 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 4459ecd44b2218b305162a0d847b7a3f144c4d46 t/02_base.t
+SHA1 a3b900b87238b624b904200896fbc84bbf5a8eeb t/03_ecc.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 ea5eecf542da23a1d891f9d3c44b4505184e4a82 t/csr1.cer
+SHA1 184e5e6610c3ae49ebdea9ceb005a86970b53fe5 t/csr1.pem
+SHA1 9b28200e52114797153adc6e210d959a9d96ee81 t/csr2.pem
+SHA1 dd47b315b638d6c7ce575e008fd5b30600f914f6 t/csr3.cer
+SHA1 60f5cacc67ad9b4cc0ab4fdb455a518f3d457ca9 t/csr4.pem
+SHA1 2a2a8c8e01d1232db2c14b92ca4305dcf824a140 t/csr5.pem
+SHA1 13b132880abe4e4716f81ef0e87aaa76c4442847 t/csr6.pem
+SHA1 d4aed7ef21f1c21c984731930c0c53943f66d054 t/csr7.pem
+SHA1 f3035152ac9a01471d4b6d7714767d65a30dda5e t/csr8.pem
+SHA1 eb871aed339971fb72f9d77d567f57707b75d027 weaver.ini
+SHA1 6f82661b9384cf56bd1ce45398b6122d3bee5a1a xt/01_Kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iQIVAwUBWGbKxLWTxzbeFddjAQLOEA/+NCMIAsq5gHemqVmuI96evPR4N1M4HZym
+Rl++hxP/yC8J13DBby5mdxaMXti5DYOgZdUmI0Nex9T6ORrV5+xFsT3ZVneExamZ
+Au5oAv0STCkcnAcq/0L5CAHchT0uhGG6ZMe8+avstjBZbV/ODAVj5SIx1mRUwR8S
+IOtOgHx43R1zvId2LCPkVXZ7XaVAFrztlhQOMcGXmd338aDGoUumggy5TT/oCkVI
+OJcwkxQl40R/1yj97cdqoBCDP+mc6e0Tj2hcVfLAKrTdeGy91grKPN1mJjvZZHSp
+gSmHmF1ylZxtP8oeP+Cxn1suKBMC13w1pujdC4984DoVc1JwXAuSwSwJEapYeQgZ
+00owxPE/ogcjg2Eu7WlfNa9T76qdYC35JPNC+Nk0gXZi7kJU4YSx0SSKJHEsn+QT
+PeJ8iXA4IgbH6c/KNk9ey4tuYahn8vpZajqWXmG5aG+tg5Zj8OCPO2WLAtuLqJCg
+pPVHr5TV+l6rSlEFFV9nExPvjeWaOGdATLR1aTnbVKTwGj8axrjo+Iksj27HZDpp
+uorfacoZYAO4TRxDU5/5iKmbRM1KdLsHTT6YM/ghu/QJl3K35bcO/J9gRNk/fzxt
+h4TAH4vsSNGBlj9ugbkcXyQ5sWKJJbSIwtOJdKSmH6bkfIz+te79IoJDxC1WOIrH
+Osurolwf7/w=
+=FrJx
+-----END PGP SIGNATURE-----

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 5a9301fec583b8ea049492af3ac01f82ea6236ac Build.PL
+SHA1 a9fe0afade64a8ca745265d5cbf547094cdb4a0b Changes
+SHA1 6eb1defe59a8635a13e3cd21c6118499608f4777 MANIFEST
+SHA1 348ae414b393ada33b9d4bdc497f6cc81096accc MANIFEST.SKIP
+SHA1 4fca7fa1cc092afe37b05833b1efef3efef42036 META.json
+SHA1 9b3ade6ccf873da4965cbdac53646d550d716d74 META.yml
+SHA1 8e45e0d09484bed53bf5439d8f824193e9978d25 README
+SHA1 c130dfac6f18817acb7b83ceebc7c3027c6a0f58 lib/Convert/YText.pm
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/00.signature.t
+SHA1 5ae298744e2e4ad6017eb2a3d3eddf581518e65e t/10.roundtrip.t
+SHA1 8b7dcb74ca21ee5cb21091661a1f29f266f1c8d0 t/20.keep-titles.t
+SHA1 4a8fd88551f22afc7be2e24ea7e7281e80fb6257 t/corpus.pl
+SHA1 18774b45a99afc597ce89b823d8f86b2f9cdab7d t/titles.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQGcBAEBCAAGBQJVzNkGAAoJEPIClx2kp54sByIL/2i35ggJaT+XWqUYkB6y0pcE
+/0f9sAagc0pXsbgY6BlKytDAaEVAysao7znrbBIs1MknSG95jqT69BZ8VHyw44qf
+N5W2RIcOt6mS0WFEDnkLbmLz9sM556PeMexGD+9wYcU060tlICqgxfeCwHXdiEzk
+vnxbvLqTqmQdII9nkaEHvI+VjBWL8Ym0dmN1Kx+3WKCPTB7rrkPav2OCBc4t2Djz
+0Kvg/bDJonS8RHJEhDVLFZP1hLhFWYyTTE2Rl+lTAWioQrGDG2T8e8fcst2ha656
+D9IE5Q37z9sSlFFc4v58uKRmTcHroUE4+TYc5hBbqGIBNrhf7cxLZNwQfygSkuB3
+sA5y/Vc3uyZiKbUVx7/1g3JApaWx966M1ZO8UYgnMFR1AkSwlaKZjyaOdTmJkGy7
+9BTjIpSWhoWyFt28ElNyOEzth1EhTbyu0yokx6qLNb18PRImNZSK8XXkD0YPV+PT
+reclUOPXHvCRU49EcZx0HSplyP+8Jgx28z4IPtr1Yg==
+=7IE2
+-----END PGP SIGNATURE-----

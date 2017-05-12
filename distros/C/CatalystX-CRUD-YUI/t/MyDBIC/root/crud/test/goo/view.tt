@@ -1,0 +1,8 @@
+[% 
+    fields      = {};
+    fields.readonly = {};
+    FOREACH f IN form.field_names;
+        fields.readonly.$f = 1;
+    END;
+    PROCESS crud/edit.tt  buttons = 0;
+%]

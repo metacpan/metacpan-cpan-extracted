@@ -1,0 +1,84 @@
+[% IF loggedin %]
+
+<h1>Menu</h1>
+<ul>
+[% FOREACH item = menus.2.data -%]
+    [% IF item.4 <= user.access -%]
+        <li><a href="[% item.3 %]" title="[% item.2 %] pages">[% item.2 %]</a></li>
+    [% END -%]
+[% END -%]
+</ul>
+<ul>
+<li><a href="http://stats.cpantesters.org/cpanmail.html" title="Find A Tester">Find A Tester</a></li>
+</ul>
+
+<h1>Profile</h1>
+<ul><li><a href="[% cgipath %]/pages.cgi?act=user-edit" title="Edit Your Profile">Edit Profile</a></li></ul>
+
+[% ELSE %]
+
+<h1>Search</h1>
+<form name="search" id="search" method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="diary-search" />
+<input type="text" id="data" name="data" size="12" value="Search For..." onfocus="if (this.value=='Search For...') this.value='';" />
+<label for="data" class="accessibility">Enter search term</label>
+<input class="button" type="submit" name="Submit" value="GO" />
+</form>
+
+<h1>Menu</h1>
+<ul>
+[% FOREACH item = menus.1.data -%]
+    [% IF item.4 <= user.access -%]
+        <li><a href="[% item.3 %]" title="[% item.2 %] pages">[% item.2 %]</a></li>
+    [% END -%]
+[% END -%]
+</ul>
+<ul>
+<li><a href="http://stats.cpantesters.org/cpanmail.html" title="Find A Tester">Find A Tester</a></li>
+</ul>
+
+[% IF latest.comments.0 %]
+<h1>Recent Comments</h1>
+<p>
+[% FOREACH item = latest.comments %]
+<em><strong>[% item.author %]</strong></em> in <a href="/diary/[% item.articleid %]" title="[% item.title %]">[% item.title %]</a><br />
+[% END %]
+</p>
+[% END %]
+
+[% IF events.shortlist.0 %]
+<h1>Events</h1>
+<ul>
+[% FOREACH item = events.shortlist %]<li><a href="/event/[% item.eventid %]" title="[% item.title %]">[% item.title %]</a> ([% item.eventdate %])</li>[% END %]
+</ul>
+[% END %]
+
+[% IF archive.diary %]
+<h1>Archives</h1>
+<p>
+[% FOREACH item = archive.diary %]
+<a href="/volume/[% item.volumeid %]" title="Read the archives from [% item.archdate %]">[% item.archdate %]</a> ([% item.counter %])<br />
+[% END %]
+</p>
+[% END %]
+
+[% IF cloud %]
+<h1>Tag Cloud</h1>
+[% cloud %]
+[% END %]
+
+<h1>Syndication</h1>
+<p>
+<img src="/images/icons/feed-icon-small.gif" alt="CPAN Testers Wiki RSS 2.0 Feed"  width="14" height="14" /> <a href="/rss/rss-2.0.xml"  title="RSS 2.0" >RSS 2.0</a><br />
+<img src="/images/icons/feed-icon-small.gif" alt="CPAN Testers Wiki Atom 1.0 Feed" width="14" height="14" /> <a href="/rss/atom-1.0.xml" title="Atom 1.0">Atom 1.0</a></p>
+
+<p>
+<a href="http://technorati.com/faves?sub=addfavbtn&amp;add=http://blog.cpantesters.org" title="Add the CPAN Testers Blog to your Technorati Favorites"><img src="/images/icons/technorati-fav-button.png" alt="Add the CPAN Testers Blog to your Technorati Favorites" width="145" height="25" /></a>
+</p>
+
+<div class="adverts">
+<h1>Our Sponsors</h1>
+<div id="iheart"></div>
+</div>
+
+[% END %]

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  41714:
+    - 41
+name: ddcba0
+registers:
+  AF: 3006
+  AF_: 0
+  BC: 10496
+  BC_: 0
+  DE: 34313
+  DE_: 0
+  HL: 21330
+  HL_: 0
+  I: 0
+  IX: 41712
+  IY: 55810
+  PC: 4
+  R: 2
+  SP: 0

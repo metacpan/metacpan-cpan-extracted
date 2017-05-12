@@ -1,0 +1,11 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/CGI/Untaint/set.pm
+t/00-load.t
+t/01.main.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,2 @@
+The Convert::Digits package provides a class with methods to convert
+digits of one Unicode supported script into another.  See the POD.

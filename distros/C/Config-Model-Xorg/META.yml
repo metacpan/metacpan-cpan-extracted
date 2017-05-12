@@ -1,0 +1,33 @@
+---
+abstract: 'Xorg configuration model for Config::Model'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Module::Build: '0.34'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Config::Model: '2.087'
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Model-Xorg
+recommends:
+  Config::Model::CursesUI: '0'
+  Config::Model::TkUI: '0'
+requires:
+  App::Cme: '0'
+  Config::Model: '2.070'
+  Exception::Class: '0'
+  Log::Log4perl: '1.11'
+  perl: '5.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Xorg
+  homepage: https://github.com/dod38fr/config-model/wiki
+  repository: git://github.com/dod38fr/config-model-xorg.git
+version: '1.113'
+x_serialization_backend: 'YAML::Tiny version 1.69'

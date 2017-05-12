@@ -1,0 +1,28 @@
+                    ========================================
+                       CGI::Session::Driver::redis
+                    ========================================
+
+CGI::Session::Driver::redis is CGI::Session driver for redis.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Session
+  Redis
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2014 Steve Kemp <steve@steve.org.uk>.  All rights reserved.
+
+This library is free software. You can modify and or distribute it under the same terms as Perl itself.
+

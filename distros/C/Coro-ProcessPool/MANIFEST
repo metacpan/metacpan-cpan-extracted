@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+
+lib/Coro/ProcessPool.pm
+lib/Coro/ProcessPool/Pipeline.pm
+lib/Coro/ProcessPool/Process.pm
+lib/Coro/ProcessPool/Worker.pm
+lib/Coro/ProcessPool/Util.pm
+
+t/00-Coro-ProcessPool-Util.t
+t/01-Coro-ProcessPool-Worker.t
+t/02-Coro-ProcessPool-Process.t
+t/03-Coro-ProcessPool.t
+t/04-Coro-ProcessPool-Pipeline.t
+t/TestTask.pm
+t/TestTaskNoNS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

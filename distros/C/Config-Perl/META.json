@@ -1,0 +1,68 @@
+{
+   "abstract" : "Perl extension for parsing configuration files written in a subset of Perl and (limited) undumping of data structures (via PPI, not eval)",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "PPI" : "0",
+            "perl" : "5.006000",
+            "warnings::register" : "0"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Config-Perl/issues"
+      },
+      "homepage" : "https://github.com/haukex/Config-Perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Config-Perl.git",
+         "web" : "https://github.com/haukex/Config-Perl"
+      }
+   },
+   "version" : "0.06"
+}

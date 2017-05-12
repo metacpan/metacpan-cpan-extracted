@@ -1,0 +1,170 @@
+NAME
+    Convert::BaseN - encoding and decoding of base{2,4,8,16,32,64} strings
+
+VERSION
+    $Id: README,v 0.1 2008/06/16 17:34:27 dankogai Exp dankogai $
+
+SYNOPSIS
+      use Convert::BaseN;
+      # by name
+      my $cb = Convert::BaseN->new('base64');
+      my $cb = Convert::BaseN->new( name => 'base64' );
+      # or base
+      my $cb = Convert::BaseN->new( base => 64 );
+      my $cb_url = Convert::BaseN->new(
+        base  => 64,
+        chars => '0-9A-Za-z\-_=' 
+      );
+      # encode and decode
+      $encoded = $cb->encode($data);
+      $decoded = $cb->decode($encoded);
+
+EXPORT
+    Nothing. Instead of that, this module builds *transcoder object* for you
+    and you use its "decode" and "encode" methods to get the job done.
+
+FUNCTIONS
+  new
+    Create the transcoder object.
+
+      # by name
+      my $cb = Convert::BaseN->new('base64');
+      my $cb = Convert::BaseN->new( name => 'base64' );
+      # or base
+      my $cb = Convert::BaseN->new( base => 64 );
+      my $cb_url = Convert::BaseN->new(
+        base  => 64,
+        chars => '0-9A-Za-z\-_=' 
+      );
+
+    You can pick the decoder by name or create your own by specifying base
+    and character map.
+
+    base
+      Must be 2, 4, 16, 32 or 64.
+
+    chars
+      Specifiles the character map. The format is the same as "tr".
+
+        # DNA is coded that way.
+        my $dna = Convert::BaseN->new( base => 4, chars => 'ACGT' );
+
+    padding
+    nopadding
+      Specifies if padding (adding '=' or other chars) is required when
+      encoding. default is yes.
+
+        # url-safe Base64
+        my $b64url = Convert::BaseN->new( 
+          base => 64, chars => '0-9A-Za-z\-_=', padding => 0;
+        );
+
+    name
+      When specified, the following pre-defined encodings will be used.
+
+      base2
+        base 2 encoding. "perl" is 01110000011001010111001001101100.
+
+      base4
+      DNA
+      RNA
+        base 4 encodings. "perl" is:
+
+          base4: 1300121113021230
+          DNA:   CTAACGCCCTAGCGTA
+          RNA:   GAUUGCGGGAUCGCAU
+
+        base 16 encoding. "perl" is "7065726c".
+
+      base32
+      base32hex
+        base 32 encoding mentioned in RFC4648. "perl" is:
+
+          base32:    OBSXE3A==
+          base32hex: E1IN4R0==
+
+      base64
+      base64_url
+      base64_imap
+      base64_ircu
+        base 64 encoding, as in MIME::Base64. They differ only in characters
+        to represent number 62 and 63 as follows.
+
+          base64:        +/
+          base64_url:    -_
+          base64_imap:   +,
+          base64_ircu:   []
+
+        for all predefined base 64 variants, "decode" accept ANY form of
+        those.
+
+  decode
+    Does decode
+
+      my $decoded = $cb->decode($data)
+
+  encode
+    Does encode.
+
+      # line folds every 76 octets, like MIME::Base64::encode
+      my $encoded = $cb->encode($data);
+      # no line folding (compatibile w/ MIME::Base64)
+      my $encoded = $cb->encode($data, "");
+      # line folding by CRLF, every 40 octets
+      my $encoded = $cb->encode($data, "\r\n", 40);
+
+SEE ALSO
+    RFC4648 <http://tools.ietf.org/html/rfc4648>
+
+    Wikipedia <http://en.wikipedia.org/wiki/Base64>
+
+    <http://www.centricorp.com/papers/base64.htm>
+
+    MIME::Base64
+
+    MIME::Base32
+
+    MIME::Base64::URLSafe
+
+AUTHOR
+    Dan Kogai, "<dankogai at dan.co.jp>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-convert-basen at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Convert-BaseN>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Convert::BaseN
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Convert-BaseN>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Convert-BaseN>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Convert-BaseN>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Convert-BaseN>
+
+ACKNOWLEDGEMENTS
+    N/A
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Dan Kogai, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

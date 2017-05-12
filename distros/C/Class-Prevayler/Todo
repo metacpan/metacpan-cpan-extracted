@@ -1,0 +1,7 @@
+TODO list for Perl module Class::Prevayler
+
+- thread-safety
+- atomic file-operations
+- ......
+
+

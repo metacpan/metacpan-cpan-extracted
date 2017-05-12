@@ -1,0 +1,380 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<base href="http://www.clotho.com/code/CAM-App/index.html">
+<title>CAM-App</title>
+<link href="/css/demo.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" src="/js/demo.js" type="text/javascript"></script>
+<style>
+p.desc, td.links, a {
+  line-height: 17pt;
+}
+thead tr td {
+  align: left;
+  font-weight: bold;
+  font-style: italic;
+}
+a {
+  font-weight: bold;
+  text-decoration: none;
+  aborder-bottom: 1px dotted white;
+}
+a:hover {
+  font-weight: bold;
+  text-decoration: underline;
+  atext-decoration: none;
+  aborder-bottom: 1px solid white;
+}
+</style>
+</head>
+<body>
+<div class="title">
+<img src="/images/clotho.gif" alt="Clotho Advanced Media, Inc." width="339" height="117" border="0">
+</div>
+
+<div class="body">
+
+<p class="title">CAM-App</p>
+
+<p class="subtitle">Last update: <a href="perl/CAM-App-1.07-docs">v1.07</a>, 2005-04-22</p>
+
+
+
+<p>
+This module implements a basic framework for building web database
+applications with the CAM libraries.  It is designed to be subclassed
+(see SUBCLASSING below) by your software to provide web functionality
+with low overhead.  It is intended for the usual Apache, Perl, MySQL,
+and Linux environment, but as little as possible is hardcoded for that
+idiom (or, when hardcoded, we try to make the pieces overrideable).
+</p>
+
+<p>
+External libraries referenced:
+  Required:
+    CGI
+    CAM:<!-- -->:Template
+  Optional: (NOTE! Some of these have not yet been released to CPAN)
+    CGI:<!-- -->:Compress:<!-- -->:Gzip
+    DBI
+    CAM:<!-- -->:Session
+    CAM:<!-- -->:SQLManager
+    CAM:<!-- -->:SQLObject
+    CAM:<!-- -->:EmailTemplate
+    CAM:<!-- -->:EmailTemplate:<!-- -->:SMTP
+    CAM:<!-- -->:Template:<!-- -->:Cache
+</p>
+
+<table cellspacing="0" cellpadding="2" border="1" width="100%">
+  <thead>
+    <tr>
+      <td>License</td>
+      <td>Files</td>
+      <td>Date</td>
+    </tr>
+  </thead>
+  <tbody>
+    
+      <tr>
+        <td valign="top"><a href="#perl">Perl</a></td>
+        <td valign="top">
+          <a href="perl/CAM-App-1.07.tgz">CAM-App-1.07.tgz</a>
+          (<a href="perl/CAM-App-1.07.tgz.md5">MD5</a>)
+          <br>
+          <a href="perl/CAM-App-1.07.zip">CAM-App-1.07.zip</a>
+          (<a href="perl/CAM-App-1.07.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="perl/CAM-App-1.07-docs">CAM-App-1.07-docs</a>
+          
+        </td>
+        <td valign="top">Fri Apr 22 22:47:57 2005</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.06.tgz">CAM-App-1.06.tgz</a>
+          (<a href="gpl/CAM-App-1.06.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.06.zip">CAM-App-1.06.zip</a>
+          (<a href="gpl/CAM-App-1.06.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.06-docs">CAM-App-1.06-docs</a>
+          
+        </td>
+        <td valign="top">Wed Nov 10 10:16:27 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.06.tgz">CAM-App-1.06.tgz</a>
+          (<a href="clotho/CAM-App-1.06.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.06.zip">CAM-App-1.06.zip</a>
+          (<a href="clotho/CAM-App-1.06.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.06-docs">CAM-App-1.06-docs</a>
+          
+        </td>
+        <td valign="top">Wed Nov 10 10:16:27 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.05.tgz">CAM-App-1.05.tgz</a>
+          (<a href="gpl/CAM-App-1.05.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.05.zip">CAM-App-1.05.zip</a>
+          (<a href="gpl/CAM-App-1.05.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.05-docs">CAM-App-1.05-docs</a>
+          
+        </td>
+        <td valign="top">Mon Sep 27 17:03:45 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.05.tgz">CAM-App-1.05.tgz</a>
+          (<a href="clotho/CAM-App-1.05.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.05.zip">CAM-App-1.05.zip</a>
+          (<a href="clotho/CAM-App-1.05.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.05-docs">CAM-App-1.05-docs</a>
+          
+        </td>
+        <td valign="top">Mon Sep 27 17:03:45 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.04.tgz">CAM-App-1.04.tgz</a>
+          (<a href="gpl/CAM-App-1.04.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.04.zip">CAM-App-1.04.zip</a>
+          (<a href="gpl/CAM-App-1.04.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.04-docs">CAM-App-1.04-docs</a>
+          
+        </td>
+        <td valign="top">Wed Sep  1 09:38:41 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.04.tgz">CAM-App-1.04.tgz</a>
+          (<a href="clotho/CAM-App-1.04.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.04.zip">CAM-App-1.04.zip</a>
+          (<a href="clotho/CAM-App-1.04.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.04-docs">CAM-App-1.04-docs</a>
+          
+        </td>
+        <td valign="top">Wed Sep  1 09:38:41 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.03.tgz">CAM-App-1.03.tgz</a>
+          (<a href="gpl/CAM-App-1.03.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.03.zip">CAM-App-1.03.zip</a>
+          (<a href="gpl/CAM-App-1.03.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.03-docs">CAM-App-1.03-docs</a>
+          
+        </td>
+        <td valign="top">Thu May 27 09:32:19 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.03.tgz">CAM-App-1.03.tgz</a>
+          (<a href="clotho/CAM-App-1.03.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.03.zip">CAM-App-1.03.zip</a>
+          (<a href="clotho/CAM-App-1.03.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.03-docs">CAM-App-1.03-docs</a>
+          
+        </td>
+        <td valign="top">Thu May 27 09:32:19 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.02.tgz">CAM-App-1.02.tgz</a>
+          (<a href="gpl/CAM-App-1.02.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.02.zip">CAM-App-1.02.zip</a>
+          (<a href="gpl/CAM-App-1.02.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.02-docs">CAM-App-1.02-docs</a>
+          
+        </td>
+        <td valign="top">Mon Jan 19 12:23:51 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.02.tgz">CAM-App-1.02.tgz</a>
+          (<a href="clotho/CAM-App-1.02.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.02.zip">CAM-App-1.02.zip</a>
+          (<a href="clotho/CAM-App-1.02.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.02-docs">CAM-App-1.02-docs</a>
+          
+        </td>
+        <td valign="top">Mon Jan 19 12:23:51 2004</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.01.tgz">CAM-App-1.01.tgz</a>
+          (<a href="gpl/CAM-App-1.01.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.01.zip">CAM-App-1.01.zip</a>
+          (<a href="gpl/CAM-App-1.01.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.01.html">CAM-App-1.01.html</a>
+          
+        </td>
+        <td valign="top">Wed Sep 17 16:23:13 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.01.tgz">CAM-App-1.01.tgz</a>
+          (<a href="clotho/CAM-App-1.01.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.01.zip">CAM-App-1.01.zip</a>
+          (<a href="clotho/CAM-App-1.01.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.01.html">CAM-App-1.01.html</a>
+          
+        </td>
+        <td valign="top">Wed Sep 17 16:23:13 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#gpl">GPL</a></td>
+        <td valign="top">
+          <a href="gpl/CAM-App-1.00.tgz">CAM-App-1.00.tgz</a>
+          (<a href="gpl/CAM-App-1.00.tgz.md5">MD5</a>)
+          <br>
+          <a href="gpl/CAM-App-1.00.zip">CAM-App-1.00.zip</a>
+          (<a href="gpl/CAM-App-1.00.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="gpl/CAM-App-1.00.html">CAM-App-1.00.html</a>
+          
+        </td>
+        <td valign="top">Fri Sep 12 16:51:16 2003</td>
+      </tr>
+    
+      <tr>
+        <td valign="top"><a href="#lic">Clotho</a></td>
+        <td valign="top">
+          <a href="clotho/CAM-App-1.00.tgz">CAM-App-1.00.tgz</a>
+          (<a href="clotho/CAM-App-1.00.tgz.md5">MD5</a>)
+          <br>
+          <a href="clotho/CAM-App-1.00.zip">CAM-App-1.00.zip</a>
+          (<a href="clotho/CAM-App-1.00.zip.md5">MD5</a>)
+          
+            <br>
+            <a href="clotho/CAM-App-1.00.html">CAM-App-1.00.html</a>
+          
+        </td>
+        <td valign="top">Fri Sep 12 16:51:16 2003</td>
+      </tr>
+    
+  </tbody>
+</table>
+
+
+
+
+<a name="perl"></a>
+<p class="license">
+
+  <p class="leader">Perl License</p>
+
+This software is released by Clotho Advanced Media, Inc. under the same
+terms as Perl itself.  That means that it is dual-licensed under the
+Artistic license and the GPL, and that you can redistribute it and/or
+modify it under the terms of either or both of those licenses.  
+
+  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/Perl">Clotho</a>
+
+  or view the LICENSE file directly.
+
+</p>
+
+
+<a name="gpl"></a>
+<p class="license">
+
+  <p class="leader">GPL License</p>
+
+  Releases of this software are available under the General
+  Public License, v2.  Copies of this license are available from
+
+  <a href="http://www.clotho.com/code/GPL">Clotho</a>
+
+  and
+
+  <a href="http://www.gnu.org/licenses/gpl.html">GNU</a>.
+
+</p>
+
+
+
+<a name="lic"></a>
+<p class="license">
+
+  <p class="leader">Clotho License</p>
+
+  Releases of this software are available under commercial
+  license directly from Clotho.  Please contact us at
+
+  <a href="mailto:info@clotho.com">info@clotho.com</a>
+
+  to purchase a license.
+
+</p>
+
+
+</div>
+</body>
+</html>
+

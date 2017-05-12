@@ -1,0 +1,94 @@
+Revision history for Perl extension CGI::Header::PSGI.
+
+0.62001  Jul 31st, 2013
+
+  - Requires CGI::Header 0.62 or higher
+  - Does not override #new anymore
+
+0.54001  May 20th, 2013
+
+  - Requires CGI::Header 0.54 or higher
+  - Overrides finalize() method of the superclass
+  - "0.54001" denotes CGI::Header::PSGI 0.54001 is compatible with
+    CGI::Header 0.54
+
+0.14  May 14th, 2013
+
+  - Requires CGI::Header 0.51 or higher
+  - CGI::Header::PSGI inherits from CGI::Header::Standalone
+
+0.13  Apr 22nd, 2013
+
+  - Requires CGI::Header 0.49 or higher
+
+0.12  Apr 13th, 2013
+
+  [BUG FIX]
+
+    - Rename "cookie" to "cookies" in _as_arrayref()
+
+0.11  Apr 12th, 2013
+
+  - Requires CGI::Header 0.47 or higher
+
+0.10  Apr 11th, 2013
+
+  - Rewrite entirely
+  - Requires CGI::Header 0.45 or higher
+  - Requires parent.pm
+
+0.05  Mar 17th, 2013
+
+  - A role CGI::Header::PSGI requires the nph() and server_software() methods
+    which are provided by both of CGI.pm and CGI::Simple.
+  - Update POD
+
+0.04  Mar 9th, 2013
+
+  - CGI::Header::PSGI requires CGI::Header 0.32 or higher
+
+0.03  Mar 4th, 2013
+
+  - CGI::Header::PSGI requires CGI::Header 0.30 or higher
+
+0.02  Feb 27th, 2013
+
+  - Fix t/11_psgi_redirect.t (thanks to CPAN testers)
+  - Tests require CGI-PSGI 0.15
+  - CGI::Header::PSGI requires Perl 5.8.9 or higher
+
+0.01  Feb 26th, 2013
+
+  Initial release of CGI-Header-PSGI as a separate distribution.
+  The CGI::Header::PSGI module used to be bundled with the
+  CGI-Header distribution.
+
+  [INCOMPATIBLE CHANGES]
+
+    Requires Role::Tiny. A role CGI::Header::PSGI requires
+    the following methods:
+
+      - charset
+      - cache
+      - no_cache (optional)
+      - self_url
+      - crlf
+
+    charset(), cache() and self_url() are provided by both of
+    CGI.pm and CGI::Simple. crlf() is provided by CGI::Simple.
+    If your query class inherits from CGI.pm, you have to implement
+    your crlf() method by yourself.
+
+    Using CGI.pm:
+
+      use parent 'CGI';
+      use Role::Tiny::With;
+      with 'CGI::Header::PSGI';
+
+      sub crlf { $CGI::CRLF }
+
+    Using CGI::Simple:
+
+      use parent 'CGI::Simple';
+      use Role::Tiny::With;
+      with 'CGI::Header::PSGI';

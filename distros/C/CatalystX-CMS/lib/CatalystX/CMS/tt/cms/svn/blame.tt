@@ -1,0 +1,19 @@
+[% # who to blame for each line of the file %]
+
+<table class="history">
+ [% FOREACH line = blame;
+     url = c.uri_for('/cms/history/diff', line.rev, pgobj.url);
+    %]
+ <tr onclick="parent.window.location='[% url %]'" [% IF loop.count % 2 %]class="alt"[% END %]>
+  <td>[% loop.count %]</td>
+  <td>[% UNLESS line.rev == oldest_rev %]
+      <a href="[% url %]">[% line.rev %]</a>
+      [% ELSE %]
+      [% line.rev %]
+      [% END %]
+  </td>
+  <td>[% line.who %]</td>
+  <td style="padding-left:1em"><pre class="diff">[% line.txt %]</pre></td>
+ </tr> 
+ [%+ END %]
+</table>

@@ -1,0 +1,18 @@
+<nav class="bar">
+  %= include 'client/conversation_list'
+% if ($full_page) {
+  % my $n_notifications = stash('n_notifications') || 0;
+  <div class="right">
+    <a href="sidebar://form.goto-anything" title="Goto anything" class="goto-anything btn-sidebar">
+      %= fa 'bars'
+    </a>
+    <a href="sidebar://div.notification-list" title="Show notifications" class="mention notifications btn-sidebar">
+      %= fa 'bell-o'
+      <b><%= $n_notifications > 999 ? '999+' : $n_notifications || '' %></b>
+    </a>
+    <a href="sidebar://form.sidebar" title="Conversation settings" class="sidebar btn-sidebar">
+      %= fa 'cog'
+    </a>
+  </div>
+% }
+</nav>

@@ -1,0 +1,15 @@
+0.05  2015-01-15
+    * skip HTTP-exception test if Catalyst version < 5.90062
+
+0.04  2015-01-02
+    * skip HTTP-exception test if Catalyst version < 5.90060
+
+0.03  2014-10-02
+    * add error cause to err msg in case of unknown err
+
+0.02  2014-09-09
+    * fix POD syntax
+    * do not require recent Catalyst version
+
+0.01  2014-09-02
+    * initial release

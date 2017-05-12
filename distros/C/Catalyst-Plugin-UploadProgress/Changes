@@ -1,0 +1,29 @@
+Revision history for Perl extension Catalyst::Plugin::UploadProgress
+
+0.06
+        - Fix to work with newer versions of Catalyst 5.90017
+          where logic is moved into the request class, by applying
+          a request class role.
+
+0.05   2010-01-12 00:22:05
+        - Convert to a Moose role
+        - Fixed POD coverage.
+
+0.04    2007-06-12 14:00:00
+        - Fixed issue where you could only run UploadProgress in apps at
+          the webserver root.
+        - Aborted uploads are now detected and the javascript will stop polling
+          for updates when this happens.
+        - Switched to Module::Install.
+
+0.03    2006-10-18 22:15:00
+        - Handle race condition where progress handler is
+          called before any upload data is received.
+        - Document engines that have been tested.
+
+0.02    2006-04-22 20:00:00
+        - Initial release.
+
+0.01
+        - Not released.
+

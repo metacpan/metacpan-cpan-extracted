@@ -1,0 +1,20 @@
+Catalyst::Authentication::Credential::Kerberos
+
+This module allows you to authenticate your users against a Kerberos server.
+
+INSTALLATION
+
+To install you can use the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Edmund von der Burg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

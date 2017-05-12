@@ -1,0 +1,50 @@
+TYPEMAP
+BIGNUM *		BIGNUM
+const BIGNUM *		BIGNUM
+ECDSA_SIG *		ECDSA_SIG
+const ECDSA_SIG *	ECDSA_SIG
+const ECDSA_METHOD *	ECDSA_METHOD
+BN_CTX *		T_PTRREF
+ECDSA_METHOD *		T_PTRREF
+const ECDSA_METHOD *	T_PTRREF
+EC_KEY * 		EC_KEY
+const EC_KEY * 		EC_KEY
+const unsigned char *	T_PV
+
+INPUT
+BIGNUM
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+ECDSA_METHOD
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+EC_KEY
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+ECDSA_SIG
+    if( ! SvROK( $arg ) ) { croak( \"argument is not an object\" ); }
+    $var = (${type}) SvIV( SvRV( $arg ) );
+
+# These output types create blessed mortal references to ECDSA pointers
+# which ensures that you can call class methods on them and the DESTROY gets
+# called when they go out of scope, for auto cleanup
+
+OUTPUT
+# We dont actually output BIGNUM so we dont need this conversion and can avoid
+# some dependency
+#BIGNUM
+#	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::Bignum",1))));
+
+ECDSA_METHOD
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::ECDSA::ECDSA_METHOD",1))));
+
+EC_KEY
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::EC::EC_KEY",1))));
+
+ECDSA_SIG
+	sv_setsv($arg, sv_2mortal(sv_bless(newRV_noinc( newSViv( (IV)$var ) ), gv_stashpv("Crypt::OpenSSL::ECDSA::ECDSA_SIG",1))));
+
+

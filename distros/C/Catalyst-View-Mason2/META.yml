@@ -1,0 +1,27 @@
+---
+abstract: 'Mason 2.x view class'
+author:
+  - 'Jonathan Swartz <swartz@pobox.com>'
+build_requires:
+  Catalyst::Action::RenderView: 0
+  Catalyst::Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Mason2
+no_index:
+  directory:
+    - t
+requires:
+  Catalyst: 5.50
+  Mason: 2.05
+  Scalar::Util: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-View-Mason2
+  repository: git://github.com/jonswar/perl-catalyst-view-mason2.git
+version: 0.03

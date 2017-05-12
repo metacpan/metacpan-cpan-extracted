@@ -1,0 +1,52 @@
+---
+abstract: 'Shortcut functions for L<Catalyst> controllers'
+author:
+  - "Robert \"phaylon\" Sedlacek <rs@474.at>"
+build_requires:
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Plugin::Session::Store::FastMmap: 0
+  Catalyst::Test: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  HTTP::Request: 0
+  Test::More: 0.62
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Imports
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  CatalystX::Imports:
+    file: lib/CatalystX/Imports.pm
+    version: 0.05
+  CatalystX::Imports::Context:
+    file: lib/CatalystX/Imports/Context.pm
+  CatalystX::Imports::Context::Config:
+    file: lib/CatalystX/Imports/Context/Config.pm
+  CatalystX::Imports::Context::Default:
+    file: lib/CatalystX/Imports/Context/Default.pm
+  CatalystX::Imports::Vars:
+    file: lib/CatalystX/Imports/Vars.pm
+requires:
+  Carp::Clan: 0
+  Catalyst::Runtime: 5.80002
+  Class::C3: 0.20
+  Class::MOP: 0
+  Data::Alias: 0.08
+  Filter::EOF: 0.02
+  List::MoreUtils: 0.19
+  Scalar::Util: 1.19
+  Sub::Name: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

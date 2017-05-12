@@ -1,0 +1,24 @@
+README for Class-DBI-MSAccess
+
+This is a simple subclass of Class::DBI which makes CDBI work correctly with
+Microsoft Access databases.  I've only tested this module when connecting to
+the Access database with DBD::ODBC.  MS Access 2000 or more recent is required
+(so that we can use "SELECT @@IDENTITY" to correctly locate the new value for
+AutoNumber primary key columns).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Michael Hendricks <michael@palmcluster.org>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,442 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+  <meta http-equiv="Content-Type"         content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Language"     content="en-gb" />
+  <meta http-equiv="Content-Style-Type"   content="text/css" />
+  <meta http-equiv="Content-Script-Type"  content="text/javascript" />
+
+  <title>CPAN Uploads : CPAN Testers Statistics</title>
+
+  <meta name="title"       content="CPAN Testers Statistics" />
+  <meta name="author"      content="Barbie" />
+  <meta name="language"    content="en" />
+  <meta name="keywords"    content="perl, cpan, test, testing, tester, testers, stat, statistics, reports, yacsmoke, smoke, smoker, black box, automated, automation" />
+  <meta name="description" content="Analysis of reports submitted by the CPAN Testers community, who automatically black box test submissions to Perl's CPAN code repository" />
+
+  <link rel="icon"          href="/favicon.ico" type="image/x-icon" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> 
+
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout-min.css" />
+  <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout-uploads.css" />
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/sorttable.js"></script>
+
+  <script type="text/javascript" src="http://www.google-analytics.com/urchin.js"></script>
+<script type="text/javascript">
+_uacct = "UA-1826389-9";
+urchinTracker();
+</script>
+
+<script type="text/javascript">
+function goThere(loc) {
+  window.location.href=loc;
+}
+</script>
+<!--
+  Site Layout, Design &amp; Development by Miss Barbell Productions
+  Original CSS/XHTML Template Design by Wolfgang.
+
+  Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+  Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+  Produced by LABYRINTH, a state of the art Website Management System
+  available from Miss Barbell Productions.
+  For more information contact Barbie <barbie@missbarbell.co.uk>
+
+  Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+<link rel="stylesheet" type="text/css" href="/css/epoch.min.css">
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="/js/epoch.min.js"></script>
+
+<script>
+
+var data1 = [
+  { label: 'Layer 4', values: [ {x: [% data.layer4.0.reldate %], y: [% data.layer4.0.num %]}, {x: [% data.layer4.1.reldate %], y: [% data.layer4.1.num %]} ] },
+  { label: 'Layer 3', values: [ {x: [% data.layer3.0.reldate %], y: [% data.layer3.0.num %]}, {x: [% data.layer3.1.reldate %], y: [% data.layer3.1.num %]} ] },
+  { label: 'Layer 2', values: [
+    [% comma = 0 %][% FOREACH item = data.layer2 %][% IF comma == 1 %], [% END %]{x: [% item.reldate %], y: [% item.num %]}[% comma = 1 %][% END %]
+  ] },
+  { label: 'Layer 1', values: [ 
+    [% comma = 0 %][% FOREACH item = data.layer1 %][% IF comma == 1 %], [% END %]{x: [% item.reldate %], y: [% item.num %]}[% comma = 1 %][% END %]
+  ] },
+];
+
+var data2 = [
+  { label: 'Layer 8', values: [ {x: [% data.layer8.0.reldate %], y: [% data.layer8.0.num %]}, {x: [% data.layer8.1.reldate %], y: [% data.layer8.1.num %]} ] },
+  { label: 'Layer 7', values: [ {x: [% data.layer7.0.reldate %], y: [% data.layer7.0.num %]}, {x: [% data.layer7.1.reldate %], y: [% data.layer7.1.num %]} ] },
+  { label: 'Layer 6', values: [
+    [% comma = 0 %][% FOREACH item = data.layer6 %][% IF comma == 1 %], [% END %]{x: [% item.reldate %], y: [% item.num %]}[% comma = 1 %][% END %]
+  ] },
+  { label: 'Layer 5', values: [ 
+    [% comma = 0 %][% FOREACH item = data.layer5 %][% IF comma == 1 %], [% END %]{x: [% item.reldate %], y: [% item.num %]}[% comma = 1 %][% END %]
+  ] },
+];
+
+</script>
+</head>
+
+<body>
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->      
+    <div class="header">
+      
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/" title="Home">CPAN Testers Statistics</a></h1>
+          <h3>stats.cpantesters.org</h3>
+          <h2><span class="timestamp1">August 1999</span> - <span class="timestamp1">September 2013</span></h2>
+        </div>
+      </div>
+
+        <!-- Navigation Level 0 -->
+        <div class="nav0">
+          <ul>
+          <li class="purple"  ><a href="http://blog.cpantesters.org"      title="CPAN Testers Blog"       >Blog</a></li>
+          <li class="orange"  ><a href="http://www.cpantesters.org"       title="CPAN Testers Reports"    >Reports</a></li>
+          <li class="violet"  ><a href="http://wiki.cpantesters.org"      title="CPAN Testers Wiki"       >Wiki</a></li>
+          <li class="blue"    ><a href="http://stats.cpantesters.org"     title="CPAN Testers Statistics" >Statistics</a></li>
+          <li class="yellow"  ><a href="http://pass.cpantesters.org"      title="CPAN Testers PASS Matrix">PASS Matrix</a></li>
+          <li class="green"   ><a href="http://prefs.cpantesters.org"     title="CPAN Testers Preferences">Preferences</a></li>
+          <li class="cornblue"><a href="http://metabase.cpantesters.org"  title="CPAN Testers Metabase"   >Metabase</a></li>
+          <li class="cyan"    ><a href="http://devel.cpantesters.org"     title="CPAN Testers Development">Development</a></li>
+          <li class="brown"   ><a href="http://deps.cpantesters.org"      title="CPAN Dependencies"       >CPAN Deps</a></li>
+          <li class="grey"    ><a href="http://matrix.cpantesters.org"    title="CPAN Testers Matrix"     >CPAN Matrix</a></li>
+          <li class="teal"    ><a href="http://analysis.cpantesters.org"  title="CPAN Testers Analysis"   >Analysis</a></li>
+          </ul>
+        </div>    </div>
+
+    <!-- B. MAIN -->
+    <div class="break">
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <div id="breadcrumbs">
+        <ul>
+          <li><a href="/" title="Home">Home</a></li>
+                              <li>30 Days of Uploads</li>
+        </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- For alternative headers END PASTE here -->
+
+    <!-- B. MAIN -->
+    <div class="main">
+      <div class="main-inner">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+        <h1>Testers Menu</h1>
+<ul>
+<li><a href="/index.html"         title="Home">Home</a></li>
+<li><a href="/graphs.html"        title="Testing Trends">Testing Trends</a></li>
+<li><a href="/testers.html"       title="Tester Leaderboard">Tester Leaderboard</a></li>
+<li><a href="/interest.html"      title="Interesting Stats">Interesting Stats</a></li>
+<li><a href="/perform.html"       title="Performance Stats">Performance Stats</a></li>
+</ul>
+<ul>
+<li><a href="/cpanmail.html"      title="Find A Tester">Find A Tester</a></li>
+<li><a href="/missing.html"       title="Missing In Action">Missing In Action</a></li>
+</ul>
+
+<h1>CPAN Menu</h1>
+<ul>
+<li><a href="/trends.html"        title="CPAN Trends">CPAN Trends</a></li>
+<li><a href="/leadercpan.html"    title="CPAN Leaderboards">CPAN Leaderboards</a></li>
+<li><a href="/statscpan.html"     title="Statistics of CPAN">Statistics of CPAN</a></li>
+<li><a href="/rates.html"         title="Submission Rates">Submission Rates</a></li>
+<li><a href="/uploads.html"       title="CPAN Uploads">CPAN Uploads</a></li>
+</ul>
+
+<h1>Monthly Stats</h1>
+<ul>
+<li><a href="/mreports.html"      title="Reports">Reports</a></li>
+<li><a href="/mtesters.html"      title="Testers">Testers</a></li>
+<li><a href="/mosname.html"       title="Operating Systems">Operating Systems</a></li>
+<li><a href="/mplatforms.html"    title="Platforms">Platforms</a></li>
+<li><a href="/mperls.html"        title="Perls">Perls</a></li>
+</ul>
+
+<h1>Matrices</h1>
+<h2>By OS</h2>
+<ul>
+<li><a href="/osmatrix-month.html"      title="By OS - Official Perls (Last Month)">Official Perls (<span class="timestamp1">08/13</span>)</a></li>
+<li><a href="/osmatrix.html"            title="By OS - Official Perls">Official Perls</a></li>
+<li><a href="/osmatrix-full-month.html" title="By OS - All Perls (Last Month)">All Perls (<span class="timestamp1">08/13</span>)</a></li>
+<li><a href="/osmatrix-full.html"       title="By OS - All Perls">All Perls</a></li>
+</ul>
+<h2>By Platform</h2>
+<ul>
+<li><a href="/pmatrix-month.html"       title="By Platform - Official Perls (Last Month)">Official Perls (<span class="timestamp1">08/13</span>)</a></li>
+<li><a href="/pmatrix.html"             title="By Platform - Official Perls">Official Perls</a></li>
+<li><a href="/pmatrix-full-month.html"  title="By Platform - All Perls (Last Month)">All Perls (<span class="timestamp1">08/13</span>)</a></li>
+<li><a href="/pmatrix-full.html"        title="By Platform - All Perls">All Perls</a></li>
+</ul>
+
+<h1>Failures</h1>
+<ul>
+<li><a href="/wdists.html"        title="Counts">Counts</a></li>
+<li><a href="/wpcent.html"        title="Percentage">Percentage</a></li>
+<li><a href="/wdists-recent.html" title="Recent Counts">Recent Counts</a></li>
+<li><a href="/wpcent-recent.html" title="Recent Percentage">Recent Percentage</a></li>
+</ul>
+<ul>
+<li><a href="/noreports/all.html" title="No Reports">No Reports</a></li>
+</ul>
+
+<h1>Our Sponsors</h1>
+<div id="iheart"></div>
+
+<h1>Perl Promotions</h1>
+<script type="text/javascript" src="http://adserver.szabgab.com/ads/direct_link_selflink.js?cnt=5&noself=1"></script>
+<p align="center">Ads provide by<br /> <a href="http://adserver.szabgab.com" title="The Perl Community AdServer">The Perl Community AdServer</a>        <br />
+        <br />
+        <br />
+        <h2>Albert Einstein:</h2>
+        <p><em>"A person who never made a mistake never tried anything new."</em></p>
+      </div>
+ 
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <div id="tooltip" class="update20110712">
+          <p><strong>Upgrade Notice</strong></p>
+          <p>The CPAN Testers Statistics site has been upgraded since you last accessed the site.
+          Please press the F5 key or CTRL-R to refresh your browser cache to use the latest javascript and CSS files.</p>
+        </div>
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">CPAN Uploads</h1>
+        <div class="column1-unit">
+
+          <p>Please note that all upload dates are based on UTC timestamps.</p>
+          <p>Current CPAN time is:
+          
+
+<script language="JavaScript">
+if (document.all||document.getElementById)
+  document.write('<span id="worldclock" style="font:bold 16px Arial;"></span><br />')
+
+zone=0;
+isitlocal=false;
+ampm='';
+
+function WorldClock(){
+  now=new Date();
+  ofst=now.getTimezoneOffset()/60;
+  secs=now.getSeconds();
+  sec=-1.57+Math.PI*secs/30;
+  mins=now.getMinutes();
+  min=-1.57+Math.PI*mins/30;
+  hr=(isitlocal)?now.getHours():(now.getHours() + parseInt(ofst)) + parseInt(zone);
+  hrs=-1.575+Math.PI*hr/6+Math.PI*parseInt(now.getMinutes())/360;
+  if (hr < 0) hr+=24;
+  if (hr > 23) hr-=24;
+
+  hr2 = hr;
+  if (hr2 == 0) hr2=12;
+  if (hr2<10) hr2="0"+hr2
+
+  var finaltime=hr2+':'+((mins < 10)?"0"+mins:mins)+':'+((secs < 10)?"0"+secs:secs)+' UTC';
+
+  if (document.all)
+    worldclock.innerHTML=finaltime
+  else if (document.getElementById)
+    document.getElementById("worldclock").innerHTML=finaltime
+  else if (document.layers){
+    document.worldclockns.document.worldclockns2.document.write(finaltime)
+    document.worldclockns.document.worldclockns2.document.close()
+  }
+
+  setTimeout('WorldClock()',1000);
+}
+
+window.onload=WorldClock
+//-->
+</script>
+
+<!--Place holder for NS4 only-->
+<ilayer id="worldclockns" width=100% height=35><layer id="worldclockns2" width=100% height=35 left=0 top=0 style="font:bold 16px Arial;"></layer></ilayer>
+          </p>
+
+          <h2>Content</h2>
+          <ul class="contents">
+          <li><a href="#today1"    title="Today's Uploads - Releases" >Today's Uploads - Releases</a></li>
+          <li><a href="#today2"    title="Today's Uploads - Authors" >Today's Uploads - Authors</a></li>
+          <li><a href="#today3"    title="Today's Top Submitters" >Today's Top Submitters</a></li>
+          <li><a href="#days"      title="Last 30 Days of Uploads" >Last 30 Days of Uploads</a></li>
+          <li><a href="#release10" title="Top 10 Release Days">Top 10 Release Days</a></li>
+          <li><a href="#author10"  title="Top 10 Author Days" >Top 10 Author Days</a></li>
+          <li><a href="#neodist"   title="Top 10 NeoCPANism Distribution Days">Top 10 NeoCPANism Distribution Days</a></li>
+          <li><a href="#neoauth"   title="Top 10 NeoCPANism Author Days" >Top 10 NeoCPANism Author Days</a></li>
+          </ul>
+
+          <h3 id="today1">Today's Uploads - Releases</h3>
+<div id="area" class="epoch category10" style="height: 200px; width:600px;"></div>
+<script>
+var areaChartInstance = $('#area').epoch({
+    type: 'line',
+    data: data1,
+    axes: ['left', 'right', 'bottom'],
+    ticks: { right: 10, bottom: 12, left: 10 }
+});
+</script>
+          <ul>
+          <li>Red line = so far today</li>
+          <li>Green line = predicted for today</li>
+          <li>Orange line = previous highest</li>
+          <li>Blue line = target line for CPAN Day</li>
+          </ul>
+
+          <h3 id="today2">Today's Uploads - Authors</h3>
+<div id="area2" class="epoch category10" style="height: 200px; width:600px;"></div>
+<script>
+var areaChartInstance = $('#area2').epoch({
+    type: 'line',
+    data: data2,
+    axes: ['left', 'right', 'bottom'],
+    ticks: { right: 10, bottom: 12, left: 10 }
+});
+</script>
+          <ul>
+          <li>Red line = so far today</li>
+          <li>Green line = predicted for today</li>
+          <li>Orange line = previous highest</li>
+          <li>Blue line = target line for CPAN Day</li>
+          </ul>
+
+
+          <h3 id="today3">Today's Top Submitters</h3>
+          [% IF submitters %]
+          <table class="matrix2" summary="Top Submitters">
+          <tr><th width="100px">Rank</th><th width="150px">Author</th><th>Number of Releases</th></tr>
+              [% FOREACH row = submitters %]
+              <tr><td>[% row.0 _ row.1 %]</td><td>[% row.2.name %]</td><td>[% row.2.score %]</td></tr>
+              [% END %]
+          </table>
+          [% END %]
+
+          <h3 id="days">Last 30 Days of Uploads</h3>
+          [% IF rows ; today = 1 %]
+          <table class="matrix2" summary="Uploads Info">
+          <tr><th>Date</th><th>Day</th><th>Number of Releases</th><th>Number of Authors</th></tr>
+              [% FOREACH row = rows %]
+              <tr class="[% IF today ; THEN ; 'today' ; ELSE ; row.day ; END %]"><td>[% row.reldate %]</td><td>[% row.day %]</td><td>[% row.num_dists %]</td><td>[% row.num_authors %]</td></tr>
+              [% today = 0 ; END %]
+          </table>
+          [% ELSE %]
+          <p>Sorry, there seems to be a problem at the moment, please try refreshing in a few minutes.</p>
+          [% END %]
+
+          <h3 id="release10">Top 10 Release Days</h3>
+          [% IF releases %]
+          <table class="matrix2" summary="Release Days">
+          <tr><th width="100px">Rank</th><th width="150px">Date</th><th>Number of Releases</th></tr>
+              [% FOREACH row = releases %]
+              <tr><td>[% row.0 _ row.1 %]</td><td>[% row.2.name %]</td><td>[% row.2.score %]</td></tr>
+              [% END %]
+          </table>
+          [% END %]
+
+          <h3 id="author10">Top 10 Author Days</h3>
+          [% IF authors %]
+          <table class="matrix2" summary="Author Days">
+          <tr><th width="100px">Rank</th><th width="150px">Date</th><th>Number of Author</th></tr>
+              [% FOREACH row = authors %]
+              <tr><td>[% row.0 _ row.1 %]</td><td>[% row.2.name %]</td><td>[% row.2.score %]</td></tr>
+              [% END %]
+          </table>
+          [% END %]
+
+          <h3 id="neodist">Top 10 NeoCPANism Distribution Days</h3>
+          [% IF neodist %]
+          <table class="matrix2" summary="Neo Distribution Days">
+          <tr><th width="100px">Rank</th><th width="150px">Date</th><th>Number of Releases</th></tr>
+              [% FOREACH row = neodist %]
+              <tr><td>[% row.0 _ row.1 %]</td><td>[% row.2.name %]</td><td>[% row.2.score %]</td></tr>
+              [% END %]
+          </table>
+          [% END %]
+
+          <h3 id="neoauth">Top 10 NeoCPANism Author Days</h3>
+          [% IF neoauth %]
+          <table class="matrix2" summary="Neo Author Days">
+          <tr><th width="100px">Rank</th><th width="150px">Date</th><th>Number of Releases</th></tr>
+              [% FOREACH row = neoauth %]
+              <tr><td>[% row.0 _ row.1 %]</td><td>[% row.2.name %]</td><td>[% row.2.score %]</td></tr>
+              [% END %]
+          </table>
+          [% END %]
+
+[% 
+    title = '30 Days of Uploads' ;
+    box_sites = 1
+
+    crumb1_name = '30 Days of Uploads' ;
+%]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+      <div class="blank"></div>
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    <div class="footer">
+
+		<p>
+	  The CPAN Testers server is supported and funded by <a href="http://birmingham.pm.org" title="Birmingham Perl Mongers">Birmingham Perl Mongers</a>.<br />
+    CPAN Testers Statistics site generated using <a href="http://search.cpan.org/dist/CPAN-Testers-WWW-Statistics" title="CPAN-Testers-WWW-Statistics">CPAN-Testers-WWW-Statistics-1.05</a>, 
+    on <span class="timestamp2">Fri, 27 Sep 2013 04:40:37 BST</span>.<br />
+    CPAN Tester data generated using <a href="http://search.cpan.org/dist/CPAN-Testers-Data-Generator" title="CPAN-Testers-Data-Generator">CPAN-Testers-Data-Generator</a>.<br />
+    All data and statistics are &#169; 1999-2013 CPAN Testers., and available under the Artistic License 2.0. Comments and design patches to barbie@cpan.org.
+    </p>
+    
+		<p>
+    The CPAN Testers Family: <br />
+      <a href="http://blog.cpantesters.org"     title="CPAN Testers Blog"       >Blog</a>         &#8226;
+      <a href="http://www.cpantesters.org"      title="CPAN Testers Reports"    >Reports</a>      &#8226;
+      <a href="http://wiki.cpantesters.org"     title="CPAN Testers Wiki"       >Wiki</a>         &#8226;
+      <a href="http://stats.cpantesters.org"    title="CPAN Testers Statistics" >Statistics</a>   &#8226;
+      <a href="http://pass.cpantesters.org"     title="CPAN Testers PASS Matrix">PASS Matrix</a>  &#8226;
+      <a href="http://prefs.cpantesters.org"    title="CPAN Testers Preferences">Preferences</a>  &#8226;
+      <a href="http://metabase.cpantesters.org" title="CPAN Testers Metabase"   >Metabase</a>     &#8226;
+      <a href="http://devel.cpantesters.org"    title="CPAN Testers Development">Development</a>  &#8226;
+      <a href="http://deps.cpantesters.org"     title="CPAN Dependencies"       >Dependencies</a> &#8226;
+      <a href="http://matrix.cpantesters.org"   title="CPAN Testers Matrix"     >Matrix</a>       &#8226;
+      <a href="http://analysis.cpantesters.org" title="CPAN Testers Analysis"   >Analysis</a>
+	  </p>
+    <p>
+    CPAN Testers, supporting the Perl programming language since 1999.
+    </p>
+
+</div>
+  </div> 
+
+  <p class="footnote"><a href="/terms.html" title="Terms &amp; Conditions">Terms &amp; Conditions</a></p>
+
+  <script type="text/javascript" src="/js/iheart.js"></script>
+
+</body>
+</html>

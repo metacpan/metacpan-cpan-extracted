@@ -1,0 +1,16 @@
+Revision history for Perl extension Catalyst::Helper::Controller::Scaffold.
+
+0.04  Wed Dec 21 13:45:00
+        - Fixed invalid form tags (frank at planet-interview.de)
+        - Spelling error in validation.
+        - Added auto-detection of short vs. long model package names.
+
+0.03  Mon Aug 29 17:15:00 2005
+        - cdbi knows it's primary.
+        - basic message passing for validation.
+
+0.02  Tue Jul 05 22:00:00 2005
+        - less code :)
+
+0.01  Wed Jun 22 22:00:00 2005
+        - first release

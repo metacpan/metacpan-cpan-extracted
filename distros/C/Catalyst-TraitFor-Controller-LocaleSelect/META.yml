@@ -1,0 +1,27 @@
+---
+abstract: 'Provides locale selection mechanism for controllers'
+author:
+  - 'Diego Kuperman, C<< <diego at freekeylabs.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Controller-LocaleSelect
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 5.80022
+  MooseX::MethodAttributes::Role: 0
+  namespace::autoclean: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.03

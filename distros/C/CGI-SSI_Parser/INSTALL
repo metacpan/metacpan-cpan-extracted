@@ -1,0 +1,13 @@
+
+To compile
+
+	perl Makefile.PL
+	make
+	make test
+
+and to install
+
+	make install
+
+Please report any bugs and/or missing/excess functionality to me.
+

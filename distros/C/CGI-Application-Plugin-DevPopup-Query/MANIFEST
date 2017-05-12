@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+Query.pm
+README
+t/t0.t
+t/t1.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,36 @@
+---
+abstract: 'CPANPLUS plugin to install packages that use Build.PL'
+author:
+  - 'Jos Boumans <kane[at]cpan.org>, Ken Williams <kwilliams@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPANPLUS-Dist-Build
+requires:
+  CPANPLUS: '0.84'
+  ExtUtils::Install: '1.42'
+  File::Spec: '0'
+  IPC::Cmd: '0.42'
+  Locale::Maketext::Simple: '0'
+  Module::Build: '0.32'
+  Module::Load: '0.16'
+  Module::Load::Conditional: '0.30'
+  Params::Check: '0.26'
+  Test::Harness: '3.16'
+  if: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/cpanplus-dist-build
+  repository: https://github.com/bingos/cpanplus-dist-build.git
+version: '0.86'
+x_serialization_backend: 'YAML::Tiny version 1.70'

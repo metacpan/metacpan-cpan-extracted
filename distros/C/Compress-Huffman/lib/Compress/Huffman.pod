@@ -1,0 +1,422 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Compress::Huffman - Huffman encode a symbol table
+
+=head1 SYNOPSIS
+
+    
+    # Turn an alphabet in the form of a hash from symbols to
+    # probabilities into a binary Huffman table.
+    
+    use Compress::Huffman;
+    my $cf = Compress::Huffman->new ();
+    my %symbols = (
+    a => 0.5,
+    b => 0.25,
+    c => 0.125,
+    d => 0.125,
+    );
+    $cf->symbols (\%symbols);
+    my $table = $cf->table ();
+    for my $k (keys %symbols) {
+        print "$k: <$table->{$k}> ";
+    }
+    print "\n";
+    
+    # Turn an alphabet in the form of a hash from symbols to weights
+    # into a tertiary Huffman table.
+    
+    $cf->symbols (\%symbols, size => 3, notprob => 1);
+    
+    my $table3 = $cf->table ();
+    for my $k (keys %symbols) {
+        print "$k: <$table3->{$k}> ";
+    }
+    print "\n";
+
+
+produces output
+
+    b: <11> c: <101> a: <0> d: <100> 
+    b: <1> c: <02> a: <2> d: <01> 
+
+
+=head1 VERSION
+
+This documents version 0.05 of Compress::Huffman corresponding to git
+commit a923820b287c44d900d2831266f925506d2fa5e8 released on Wed Sep 21 20:46:29 2016 +0900.
+
+=head1 DESCRIPTION
+
+Compress::Huffman converts a table of symbols and probabilities to a
+Huffman encoded form.
+
+=head1 METHODS
+
+=head2 new
+
+    my $cf = Compress::Huffman->new ();
+
+This returns a new object.
+
+=head2 symbols
+
+    $cf->symbols (\%symbols);
+
+This converts a table of symbols into a Huffman code. The keys of
+C<%symbols> are any set of symbols you want to encode. The values of
+C<%symbols> must be numeric (this is checked with
+L<Scalar::Util/looks_like_number>). Usually a Huffman code is used to
+compress a set of symbols associated with probability values, so
+usually the numerical values of C<%symbols> should sum to one. If the
+values of C<%symbols> do not sum to one, use the L</notprob> option.
+
+This method takes the following options, supplied as a hash after the
+initial hash reference:
+
+=over
+
+=item size
+
+    $cf->symbols (\%symbols, size => 3);
+
+This specifies the size of the output alphabet. Without any symbols
+specified, the default is binary output, in other words the default
+value for C<size> is two. For values of C<size> up to 10, the numerals
+0 to 9 are used to encode the output. If C<size> is greater than 10,
+specify an alphabet with the L</alphabet> option.
+
+=item notprob
+
+    my %symbols = (a => 1, b => 2, c => 3);
+    $cf->symbols (\%symbols, notprob => 1);
+
+This specifies that the values of C<%symbols> are not a probability
+distribution. The function then calculates the probabilities of each
+symbol by summing the values of C<%symbols> and dividing each value by
+the calculated sum. In either case, the values of C<%symbols> must be
+numeric.
+
+=item alphabet
+
+    $cf->symbols (\%symbols, alphabet => ['a', 'b', 'c']);
+
+The default behaviour of L</symbols> is to form a Huffman code using
+digits. The default Huffman code with L</size> equal to two (binary
+Huffman encoding) encodes C<%symbols> using a string consisting of 0's
+and 1's. For a different encoding, or if you set size to a value more
+than ten, specify the alphabet of symbols using C<< alphabet =>
+\@alphabet >>, where C<@alphabet> is the list of symbols you want to
+use.
+
+=item verbose
+
+    $cf->symbols (\%symbols, verbose => 1);
+
+Any true value turns on debugging messages.
+
+=back
+
+=head2 xl
+
+    my $expected_length = $cf->xl ();
+
+This returns the expected length of the Huffman encoding, which is the
+sum of the probability of each symbol multiplied by the length of the
+code associated with that symbol. Please see, for example, L</Elements
+of Information Theory> for details.
+
+=head2 encode_array
+
+    my $huffout = $cf->encode (\@string);
+
+Encode the string of symbols in C<@string> into a Huffman-encoded
+format C<$huffout>. The return value is an array reference.
+
+If C<@string> contains a symbol which is not in the symbol table, a
+warning is printed and the symbol is skipped over.
+
+=head2 encode
+
+    my $huffout = $cf->encode (\@string);
+
+Encode the symbols in C<@string> into a Huffman-encoded format
+C<$huffout>. The behaviour is identical to L</encode_array> except
+that the return value is a string.
+
+    
+    use utf8;
+    use Compress::Huffman;
+    my $ch = Compress::Huffman->new ();
+    my %symbols = (あ => 100, い => 200, う => 300, え => 400, お => 1000);
+    $ch->symbols (\%symbols, notprob => 1);
+    my $msg = $ch->encode ([qw/あ い う え お/]);
+    print "Huffman encoding is $msg\n";
+    my $recovered = $ch->decode ($msg);
+    print "Recovered @$recovered\n";
+    
+
+
+produces output
+
+    Huffman encoding is 01100111010001
+    Recovered あ い う え お
+
+
+=head2 decode
+
+    my $string = $cf->decode ($huffout);
+
+Decode the huffman-encoded C<$huffout> into symbols. The return value,
+C<$string> in the example, is an array reference containing the
+symbols supplied in C<symbols>. Please see L</encode> for an example.
+
+=head2 table
+
+    my $table = $cf->table ();
+
+The return value is a hash reference which is the symbol-to-Huffman
+code table within C<$cf>. This is not a copy, so it shouldn't be
+altered by the user.
+
+=head2 save
+
+    my $saved = $n->save ();
+
+Save the Huffman table in JSON format to C<$saved>.
+
+This was added in version 0.04.
+
+=head2 load
+
+    my $n = Compress::Huffman->new ();
+    $n->load ($saved);
+
+Load a Huffman table in JSON format from C<$saved>.
+
+This was added in version 0.04.
+
+=head1 ALGORITHM
+
+(This is copied from the documentation of L<Algorithm::Huffman>)
+
+Here is an example illustrating the algorithm. Given the characters
+and occurences
+
+    a(15) b(7) c(6) d(6) e(5),
+
+in the first step e and d are the rarest symbols, so we create this
+new heap and tree structure:
+
+    a(15) de(11) b(7) c(6)
+
+          de
+         /  \
+     "0"/    \"1"
+       d      e
+
+Now combine the next two rarest characters, b and c:
+
+    a(15) bc(13) de(11)
+
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+Now combine the next two rarest characters, bc and de.
+
+    a(15) bcde(24)
+
+                  bcde
+                /      \
+           "0"/          \"1"
+            /              \
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+The next step unifies all the steps:
+
+                               Huffman-Table
+                                  /    \
+                            "0"/          \"1"
+                           /                  \
+                       /                          \
+                  bcde                              a
+                /      \
+           "0"/          \"1"
+            /              \
+          de                bc
+         /  \              /  \
+     "0"/    \"1"      "0"/    \"1"
+       d      e          b      c
+
+
+Finally this encoding table is created from the labels on the
+branches:
+
+     a    1
+     b    010
+     c    011
+     d    000
+     e    001
+
+Huffman coding is ambiguous, and there is no rule defining what
+element in the tree is ordered to the left or right, so it's also
+possible to reverse the 0s and 1s to get:
+
+     a    0
+     b    100
+     c    101
+     d    110
+     e    111
+
+In the case of non-binary Huffman encodings, dummy elements may also
+have to be added to the tree.
+
+Please see L</References> for more information about Huffman
+encodings.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item Bad size $size for Huffman table, must be integer >= 2
+
+(Fatal) The user attempted to make a Huffman table which isn't
+possible.
+
+=item Use $o->symbols (\%t, alphabet => ['a', 'b',...]) for table sizes bigger than 10
+
+(Fatal) The user must supply an alphabet for the Huffman codes if size > 10
+
+=item Symbol table has no entries
+
+(Fatal) User supplied an empty hash reference in L</symbols>.
+
+=item Non-numerical value '$s->{$k}' for key '$k'
+
+(Fatal) User supplied a hash reference with a non-numerical value in
+L</symbols>.
+
+=item Input values don't sum to 1.0; use $o->symbols (\%s, notprob => 1) if not a probability distribution
+
+(Fatal) User supplied a non-probability distribution hash table to
+L</symbols>.
+
+=item Symbol 'X' is not in the symbol table
+
+(Warning) The user tried to encode a list of symbols with L</encode>
+which contained a symbol C<X> which was not in the symbol table.
+
+=item Input starting from XYZ was not Huffman encoded using this table
+
+(Warning) The user tried to decode a Huffman-encoded string with
+L</decode>, but it doesn't seem to have been encoded using the table
+associated with the object.
+
+=item Bad object
+
+(Fatal) A user-supplied object didn't contain the correct tables.
+
+=item Value N for symbol X is not a probability
+
+(Fatal) A user-supplied value for symbol X was either greater than 1
+or less than 0, and the user did not specify "notprob".
+
+=item Negative weight N for symbol X
+
+(Fatal) The weighting for symbol X was negative.
+
+=back
+
+=head1 BUGS
+
+The module is slow for large symbol tables. For example a hash with
+100,000 entries might take several minutes to finish building the
+table.
+
+Huffman encoding itself does not achieve any compression with, for
+example, two symbols A and B with probabilities 0.001 and 0.999.
+
+=head1 DEPENDENCIES
+
+L<JSON::Parse> and L<JSON::Create> are used by L</save> and L</load>
+for storing the Huffman table. The module also uses the core modules
+L<Carp>, L<Scalar::Util/looks_like_number> for detecting numbers, and
+L<POSIX/ceil> to calculate the size of tables needed in encoding.
+
+=head1 SEE ALSO
+
+=head2 CPAN modules
+
+=over
+
+=item L<Algorithm::Huffman>
+
+Perl extension that implements the Huffman algorithm
+
+Unfortunately this is 14 years old and L<seems to
+fail all its
+tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
+most platforms.
+
+=back
+
+=head2 Other software
+
+=over
+
+=item L<Rosetta code examples|http://rosettacode.org/wiki/Huffman_coding>
+
+This includes a Perl example.
+
+=back
+
+=head2 References
+
+=over
+
+=item Original article
+
+David A. Huffman, "A Method for the Construction of Minimum-Redundancy
+Codes", Proceedings of the Institute of Radio Engineers, volume 40,
+number 9, pages 1098-1102, September 1952.
+
+=item Elements of Information Theory
+
+I<Elements of Information Theory> by Thomas Cover and Joy Thomas,
+(either the first or second edition) details Huffman encoding.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2015-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

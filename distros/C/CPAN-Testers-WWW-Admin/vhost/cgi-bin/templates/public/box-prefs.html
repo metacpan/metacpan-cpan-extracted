@@ -1,0 +1,34 @@
+<h1>Preferences</h1>
+<h2>Grade:</h2>
+<select id="grade_pref" name="grade" onchange="check_grade(this)">
+<option value="0">All Reports</option>
+<option value="1">PASS ONLY</option>
+<option value="2">FAIL ONLY</option>
+<option value="3">NA ONLY</option>
+<option value="4">UNKNOWN ONLY</option>
+</select>
+
+<!--
+<h2>Patched Perl</h2>
+<select id="patches_pref" name="patches" onchange="check_patches(this)">
+<option value="0">Include Patches</option>
+<option value="1">Exclude Patches</option>
+<option value="2">Patches ONLY</option>
+</select>
+
+<h2>Perl Version</h2>
+<select id="perlver_pref" name="perlver" onchange="check_perlver(this)">
+<option value="ALL">ALL</option>
+[% FOREACH item = perlvers %]
+<option value="[% item %]">[% item %]</option>
+[% END %]
+</select>
+
+<h2>OS Name</h2>
+<select id="osname_pref" name="osname" onchange="check_osname(this)">
+<option value="ALL">ALL</option>
+[% FOREACH item = osnames.sort %]
+<option value="[% item %]">[% osnames.$item %]</option>
+[% END %]
+</select>
+-->

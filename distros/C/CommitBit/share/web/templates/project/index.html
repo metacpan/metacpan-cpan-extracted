@@ -1,0 +1,84 @@
+<%args>
+$project
+</%args>
+<%init>
+my $edit = Jifty->web->new_action(class =>'UpdateProject', record => $project);
+</%init>
+<&|/_elements/wrapper,title => $project->name &>
+<div class="yui-gc">
+    <div class="yui-u first">
+% if ($project->logo_url) {
+<img src="<%$project->logo_url%>" />
+% }
+<h1><%$project->name%></h1>
+<blockquote>
+    <%$project->description%>
+</blockquote>
+
+
+% if ($project->lists_url) {
+<h2>Mailing lists</h2>
+<%Jifty->web->link( url => $project->lists_url, label => $project->lists_url)%>
+% }
+
+
+% if ($project->wiki_url) {
+<h2>Wiki</h2>
+
+<%Jifty->web->link( url => $project->wiki_url, label => $project->wiki_url)%>
+% }
+
+% if ($project->bugtracker_url) {
+<h2>Bug tracking</h2>
+
+<%Jifty->web->link( url => $project->bugtracker_url, label => $project->bugtracker_url)%>
+% }
+
+<h2>Version control</h2>
+
+% if ($project->svnweb_url) {
+<h3>Repository browser</h3>
+<%Jifty->web->link( url => $project->svnweb_url, label => $project->svnweb_url)%>
+% }
+
+% if ($project->svn_url_anon) {
+<h3>Anonymous access</h3>
+<%Jifty->web->link( url => $project->svn_url_anon, label => $project->svn_url_anon)%>
+
+% }
+% if ($project->svn_url_auth) {
+<h3>Committer access</h3>
+<%Jifty->web->link( url => $project->svn_url_auth, label => $project->svn_url_auth)%>
+% }
+<h2>License</h2>
+<%$project->license%>
+</div>
+<div class="yui-u">
+<div id="people">
+    <h2>People</h2>
+
+% foreach my $type (sort keys %people) {
+
+<h3><%_(ucfirst($type))%></h3>
+<ul>
+% while (my $u = $people{$type}->next) {
+<li><%$u->name_and_email%></li>
+% }
+</ul>
+%}
+% if (Jifty->web->current_user->user_object) {
+% if ($project->is_project_admin(Jifty->web->current_user) || Jifty->web->current_user->user_object->admin) { 
+<% Jifty->web->link( label => _('Invite someone'), url => '/admin/project/'.$project->name.'/people')%>
+% }
+% }
+</div>
+</div>
+</div>
+</&>
+<%init>
+my %people = (
+ observers => $project->observers,
+ authors => $project->members,
+ administrators => $project->administrators
+);
+</%init>

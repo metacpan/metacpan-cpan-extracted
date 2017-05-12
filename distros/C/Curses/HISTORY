@@ -1,0 +1,320 @@
+The Curses Perl module was created by William Setzer (William_Setzer
+at ncsu.edu) in 1994.  William maintained it up until July 2001, when he
+stopped having time to do so.
+
+In September 2004, Bryan Henderson (bryanh@giraffe-data.com) took over
+maintainership of it, after confirming with William that he did not
+plan to continue.
+
+The module has always been distributed via CPAN.
+
+Curses itself is much older than the Perl implementation.  Curses was
+originally only a C programming library.
+
+New in 1.36 (Released August 14, 2016)
+
+  Fix the GNU Hurd thing from 1.35 by including the hints file in the
+  manifest.
+
+New in 1.35 (Released July 11, 2016)
+
+  Added hints file for GNU Hurd ($OSNAME == 'gnu').  From Pino Toscano.
+
+New in 1.34 (Released April 2, 2016)
+
+  Several bugs fixed in demo programs (which also function as the
+  documentation) for forms and menus and comments added explaining need to
+  keep Perl variables around to avoid invalid memory references.
+
+New in 1.33 (Released October 3, 2015)
+
+  Package contains META files.
+
+New in 1.32 (Released August 9, 2014)
+
+  Makefile.PL: if /usr/include/ncurses/ncurses.h exists, use Ncurses regardless
+  of what the $guess_cfg table says for the OS at hand.  This fixes the former
+  hybrid approach which didn't work for a Solaris 11 system that has both
+  Ncurses and BSD curses.
+
+  Typographical error in documentation fixed.
+
+New in 1.31 (Released April 26, 2014)
+
+  Fix compile failure with some Curses libraries, introduced in
+  1.29 - undefined KEY_CODE_YES.
+
+  Fix documentation: wide character functions exist back to Perl 5.6,
+  not 5.16.
+
+New in 1.30 (Released April 19, 2014)
+
+  Fix build failure: Use older substitutes if Perl is too old to have
+  the 'utf8_to_uvchr_buf' function they use; don't include the wide character
+  functions if Perl is even too old to have the substitutes.  Broken in 1.29.
+
+  Fix "constant not provided by your vendor" message when you refer to a
+  function that does not exist in the Curses module.
+
+  Minor fixes to documentation of new wide character functions.
+
+  Fix warning about extra argument to c_setmevent .
+
+  Fix documentation for "not defined in your Curses library" errors.
+  (broken in 1.28).
+
+  Fix demo programs' recognition of "not defined in your Curses library"
+  errors (broken in 1.28).
+
+New in 1.29 (Released April 6, 2014)
+
+  Add an alternate set of functions (getchar, ungetchar, getstring,
+  instring, addstring, insstring) providing a more Perl-like interface,
+  converting from and to Perl strings (instead of passing data to the C
+  library verbatim) and using wide character functions if available in the
+  underlying curses library.
+
+  Written by Edgar FuÅﬂ, Mathematisches Institut der Uni Bonn,
+  <ef@math.uni-bonn.de>
+
+New in 1.28 (Released January 27, 2010)
+
+  Disable Curses::Var::STORE.  It doesn't work (doesn't even compile) with
+  newer Ncurses (due to updates to make Ncurses reentrant).  One can
+  re-enable it by defining ALLOW_VARS_STORE in c-config.h.
+
+  Improve "not provided by your vendor" message.
+
+New in 1.27 (Released January 20, 2009)
+
+  Extraneous .i and .s files in 1.26 removed.  'make clean' cleans all
+  .i and .s too.
+
+  'gen' directory is replaced by gen.tar file, so CPAN doesn't index
+  the stuff in there.  That directory is stuff for developing the Curses
+  package, not stuff for users.
+
+New in 1.26 (Released January 3, 2009)
+
+  newterm() is available and putwin() and getwin() work in newer Perl (with
+  PerlIO).  We now use PerlIO_findFile().
+
+1.25 doesn't exist (The name got burned in a CPAN upload mistake).
+
+New in 1.24 (Released September 10, 2008)
+
+  Export KEY_RESIZE, KEY_EVENT.
+
+  For Netbsd, allow both Netbsd and BSD guesses via CURSES_LIBTYPE,
+  and default to Ncurses.  Used to guess only BSD.  From Ulrich Habel
+  rhaen@NetBSD.org .
+
+  Add guess capability for Dragonfly.  From Ulrich Habel
+  rhaen@NetBSD.org .
+
+New in 1.23 (Released March 9, 2008)
+
+  Fix crash of Makefile.PL on Windows.
+
+New in 1.22 (Released February 29, 2008)
+
+  Nothing.  Just a packaging fix.
+
+New in 1.21 (Released February 15, 2008)
+
+  Don't undefine 'bool' macro in c-darwin hints file.
+
+New in 1.20 (Released November 19, 2007)
+
+  Fix missing comment delimiter.
+
+New in 1.19 (Released November 18, 2007)
+
+  Make it work on 5.005 again, using ppport.h (Devel::PPPort).
+  From Slaven Rezic - slaven <at> rezic <dot> de .
+
+  Fix uninitialized value in Makefile.PL on a system without BSD Curses or
+  Ncurses in a common place.
+
+  Reverse change to chgat() in 1.16.  Make expected argument count 4.
+
+There was never a 1.18 release; problems with PAUSE prevent using that
+release number.
+
+New in 1.17 (Released October 14, 2007)
+
+  Fix bug - can't find c-config.h on a system with ncursesw.
+
+  Make cdemo work on Windows.
+
+  Don't undefine SP macro with Pdcurses.  (Otherwise it won't compile;
+  don't know why we used to undefine SP).
+
+  In Windows hints file, #include curses.h instead of pdcurses.h.  It
+  seems to be called curses.h these days.
+
+New in 1.16 (August 7, 2007)
+
+  Use Ncursesw (Ncurses with wide character functions) instead of
+  Ncurses if available.
+
+  Undefine "tab" macro, defined by Curses header file.  It interferes
+  with perl.h.
+
+  Fix demo.form to use L! instead of J in the pack template that generates
+  the new_form() argument.  Apparently, J is something from older Perl
+  and doesn't exist in current Perl.
+
+  Put some documentation of the library in comments in demo.form.
+
+  Use L! instead of I in the pack template in demo.menu.
+
+  Change SvPV(X,PL_na) to SvPV_nolen(X) to get with the times.
+
+  Change #!/usr/local/bin/perl to #! /usr/bin/perl .
+
+  Fix bug: chgat() requires an extra, meaningless, argument.  Fix changes
+  expected argument count from 4 to 3.
+
+New in 1.15 (October 8, 2006)
+
+  Add a simple load test 00-load.t.
+
+  Makefile.PL: use cdemo.obj instead of cdemo.o on Windows.
+
+  Makefile.PL: Guess ncurses/bsd based on what .h files exist.
+
+  Fix bug in Makefile.PL: doesn't use curses type in guess at c-config.h
+  (e.g. tries to use c-freebsd.h when it should use c-freebsd.bsd.h).
+
+  Change all sv_isa() to sv_derived_from() so you can use subclasses.
+  Thanks Leigh <leighbrown@hsbc.com>.
+
+  Rename default Darwin (Mac OS X) hints file (ca 2001) to c-darwin.old, and
+  the newer one ca 2004) to c-darwin.old so as to be the default.  We're
+  guessing that the newer one applies to more systems today.
+
+New in 1.14 (June 3, 2006)
+
+  Make demo.form work on 64 bit machine.
+
+  Add some narration to Makefile.PL to help with diagnosis.
+
+  Move undef of 'instr' from individual hint files to Curses.c and add
+  explanation.
+
+  Use perl -w instead of 'use warnings' in Makefile.PL so it works with
+  older Perl.
+
+New in 1.13 (October 10, 2005)
+
+  Fix so it builds on current Cygwin.
+
+  Some kind of build fix to get panels, forms, and menu functions to build.
+
+New in 1.12 (March 17, 2005)
+
+  Build bug fixed: panel, forms, menu libs not found in build.
+
+  Build bug fixed: Curses.pm treats version as number, so 1.10 == 1.1 .
+
+New in 1.11 (March 12, 2005)
+
+  Various cleanup and improved diagnostics in the build.
+
+New in 1.10 (March 11, 2005)
+
+  Build bug fixed: Makefile has undefined variable $libtyp.
+
+  Build bug fixed: Makefile computes wrong guess hint file name.
+
+New in 1.09 (March 6, 2005)
+
+  - Makefile.PL searches for curses header files instead of assuming
+    based on $OSNAME.
+
+  - Makefile.PL warns user to reconfigure environment when form.h is
+    in /usr/include rather than just add -I/usr/include to the compile
+    (this concerns the problem with the conflicting Perl form.h file).
+
+New in 1.08 (November 2004)
+
+  - perl.syms more verbose so you can diagnose failures.
+
+  - You can use environment variables instead of modifying Makefile.PL
+    to set your -I, -L, etc. options for the Curses libraries.
+
+  - c-linux.ncurses.h hints file includes ncurses.h, not curses.h.
+
+  - New c-darwin-thread-multi-2level.h hints file.
+
+New in 1.07 (September 2004)
+
+  - Call to Perl_sv_isa() changed to sv_isa() because the former doesn't
+    work on some systems (causes a build failure).
+
+New in 1.06 (July 2001)
+
+ o Now requires perl5.005 or better to run.  (You can probably run it
+   in perl5.002-perl5.004 by grabbing newCONSTSUB out of the IO
+   distribution on CPAN and editing all uses of "foreach my $var" in
+   my perl scripts.)
+
+ o Did lots of fiddling with the file generation in an effort to make
+   it more comprehensible.  In doing so, I moved around the way some
+   things were done and probably broke it on some systems with weird
+   compilers.  Please let me know.
+
+ o changed the "Curses->new()" function to be a bit less clever.
+
+ o Works with libmenu!  Many thanks to Yury Pshenichny <yura at zp.ua>
+   who did most of the actual work.
+
+   Update: Well, sort of works.  For some reason beyond my ken, it
+   doesn't work with Solaris (2.6) libmenu. (The items won't attach to
+   the menu.)  ncurses menu, both 1.9.9 and 5.2, seem to work fine.
+
+ o Works with libform too.  Ho hum.  ;)  This one does appear to
+   work with Solaris libform.
+
+ o Added the following ncurses extension functions:
+
+   use_default_colors()
+   assume_default_colors()
+   define_key()
+   keybound()
+   keyok()
+   resizeterm()
+
+   (Thanks to neild at misago.org, hans at kolej.mff.cuni.cz)
+
+ o Re-enabled the functions:
+
+   attr_get()
+   attr_off()
+   attr_on()
+   attr_set()
+
+ o Between the functions exposed and the functions listed in the
+   pod as not exposeded, those are all the ones I know about.
+   Got any more?  Let me know.
+
+ o Fixed 64 bit issue with getch() and possibly others, truncating
+   returns of `chtype' to 32 bits.  Note that this could possibly
+   break some OSes.  Please let me know.
+   (Thanks to Randall.G.Steiner at bankofamerica.com)
+
+ o Fixed bug where @ARGV was always being cleared, and so no arguments
+   ever got to MakeMaker.
+   (Thanks to bdlow at nortelnetworks.com)
+
+ o Added hints for Darwin/Mac OS X system.
+   (Thanks to sdietrich at emlab.com)
+
+ o Added note to NETBSD users at the bottom of this README.
+
+ o Added a security notice to the README and pod.
+   (Thanks to connor at ing.umu.se)
+
+ o Has anyone successfully used the mouse event stuff?
+

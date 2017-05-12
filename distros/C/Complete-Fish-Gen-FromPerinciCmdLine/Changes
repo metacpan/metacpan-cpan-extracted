@@ -1,0 +1,26 @@
+Revision history for Complete-Fish-Gen-FromPerinciCmdLine
+
+0.004   2016-10-28 (PERLANCAR)
+
+        - Return error response when received Perinci::CmdLine scripts with
+          subcommands.
+
+
+0.003   2016-10-27 (PERLANCAR)
+
+	- Add description from Rinci metadata.
+
+	- Add skip_detect option.
+
+
+0.002   2016-10-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq of Complete::Fish::Gen::FromGetoptLong to
+	  0.06.
+
+
+0.001   2016-10-21 (PERLANCAR)
+
+         - First release.

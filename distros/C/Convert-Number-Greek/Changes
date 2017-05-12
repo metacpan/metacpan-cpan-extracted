@@ -1,0 +1,14 @@
+Revision history for Convert::Number::Greek
+
+0.02a   18 November, 2009
+        Fixed the tests so they pass under  ‘make test’,  as  well  as
+        under ‘prove’.
+
+0.02    18 November, 2009
+      • The greek2num function has been added.
+      • Perl 5.8.0 has been added as a requirement in Makefile.PL. (It
+        never did work  in  5.6;  I  just  forgot  to  specify  that.)
+
+0.01    16 August, 2006
+        First version. Only the num2greek function is available.
+

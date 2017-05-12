@@ -1,0 +1,58 @@
+CookBookB - Dean's Extension-Building Cookbook, part B.
+
+These are the same examples you've seen posted to comp.lang.perl.misc in
+late '95 and early '96.  All of them are about letting Perl manipulate C
+structures or C++ objects.
+
+Struct1: A very simple example showing how Perl can create, manipulate, and
+	destroy a C structure.
+
+Opaque: Another simple example of letting Perl create, manipulate, and
+	destroy a C structure.  I think I named it Opaque because I was
+	trying to emphasize that the simplest way to do this is to allow the
+	C object to be opaque to Perl.
+
+ListOfStruct: An example of letting Perl manipulate a linked list of C
+	structures.
+
+ArrayOfStruct: An example of letting Perl manipulate an array of C
+	structures.
+
+CCsimple: A very simple example showing how Perl can create, manipulate,
+	and destroy a C++ object.
+
+Struct2: This is the Struct1 example using typemaps which convert the C
+	structure to and from a Perl array.  This is "the hard way"; Struct1
+	and Opaque are "the easy way".
+
+Struct3: This is the Struct1 example using typemaps which convert the C
+	structure to and from a Perl hash.  This is "the hard way"; Struct1
+	and Opaque are "the easy way".
+
+Mstruct: This shows C-like interfaces to some C functions which take
+	pointers to C structs.  I do not recommend using this non-Perl style.
+
+Most examples contain NOTES files which describe how they were created.
+
+Some of these examples rely on my perlobject.map typemap, which is included
+in the package and can also be found on CPAN in the same place you found
+this package.
+
+If you are going to do datatype conversions between C and Perl, which is
+what XS programming is all about, then you would be doing yourself a favor
+to install Devel::Peek and to learn how to use its Dump() function.  The
+DevelPeek.pod document in this package is a preliminary manpage/tutorial.
+
+For other examples of extension-building, covering a wider range of
+mini-topics, consult the CookBookA package, which is part A of this
+Extension-Building CookBook series.  CookBookA can be found on CPAN in the
+same place you found this CookBookB package.
+
+Dean Roehrich
+apr 30,96
+
+------------------
+apr 30,96 additions:
+ - Added Mstruct
+ - Added DevelPeek.pod
+ - Added notes about CookBookA

@@ -1,0 +1,28 @@
+Revision history for CatalystX-ExtJS-Direct
+
+2.1.5 - 2014-01-13
+  - handle hash randomization
+
+2.1.4 - 2011-03-20
+  -  error handling:
+     stringify only blessed objects, pass through perl objects
+
+2.1.2 - 2011-03-14
+  -  Fixed bug where objects in $c->error where not stringified
+     and caused the JSON module to die
+  -  When an exception happens the "status" field is now called
+     "status_code" and contains the http status code of the
+     failed request. This used to be named "status" which caused
+     problems with some versions of ExtJS which checked that field.
+  -  fixed warning when body of subrequest was undefined
+  -  fixed https://rt.cpan.org/Public/Bug/Display.html?id=66346
+
+2.1.1 - 2011-02-09
+  -  Tutorial fixes
+  -  use JSON instead of JSON::Any
+
+2.1.0 - 2011-02-05
+  -  CatalystX::ExtJS has been split in ::Direct and ::REST
+     There were no functional changes.
+     
+For older changes see the Changes file of CatalystX::ExtJS

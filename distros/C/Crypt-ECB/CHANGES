@@ -1,0 +1,74 @@
+v2.21, 23.09.2016
+	- no code changes to ECB.pm
+	- ecb.pl -l now prints module versions
+	- ignoring Serpent in test suite as it is broken on many platforms
+
+v2.20, 30.03.2016
+	- made passing a custom padding method possible without specifying a cipher before
+	- added verifying correct truncation of custom padding methods
+	- added verifying padded bytes when truncating (for standard and zeroes padding)
+	- added testing encrypt_hex and decrypt_hex function style
+	- added testing start-crypt-finish
+	- added testing usage of pre-existing cipher objects
+	- updated eg/ecb.pl to recognize cipher modules in the Crypt::OpenSSL namespace
+	- added option to eg/ecb.pl to print the Crypt::ECB version used
+	- changed license again, to GPL or Artistic
+
+v2.15, 14.03.2016
+	- removing caching with v2.00 made Crypt::ECB ignorant of key changes
+		within the same Crypt::ECB object. Fixed, changing the key now
+		forces a new cipher object to be created.
+	- added some notes on upgrading from versions before v2.00 to the README
+
+v2.10, 07.03.2016
+	- forgot another change in the v2.00 changelog...
+	- changed license from GPL to Artistic
+	- improved kwalitee:
+		- added license information to meta files
+		- removed test.pl
+	- added eg/ecb.pl (command line en- and decryption)
+	- added dummy cipher, so the test suite actually performs some tests
+		even if there are no block ciphers installed
+	- refactored test data from test scripts
+
+v2.05, 04.03.2016
+	- make Crypt:ECB work under perl-5.8.* again
+	- some changes actually made in v2.00 haven't been mentioned in the changelog
+	- add some more block ciphers to the test suite
+	- minor changes in test.pl
+	- minor documentation update
+
+v2.00, 19.02.2016
+	- ATTENTION, there are subtle changes in the API, see README for details
+		- removed caching; the feature did finally not seem to make much sense
+		- removed constants indicating the padding mode	(PADDING_AUTO, PADDING_NONE)
+		- removed errstring(), Crypt::CBC now dies when stumbling over errors
+	- better compatibility with current Crypt::CBC:
+		- allow passing options like Crypt::CBC does (new and old styles)
+		- allow passing an existing cipher object (RT ticket #112020)
+		- added padding styles, including custom padding
+			- adding 'null' padding fixes RT ticket #80456
+		- added methods for accessing keysize and blocksize of a cipher
+	- use Test::More (thanks to Xavier Guimard for providing a patch, RT ticket #82301)
+	- changed internal attribute names (foo -> _foo and Foo -> foo)
+	- much more internal code cleanup
+	- updated documentation
+
+v1.45, 16.07.2008
+	- fixed test.pl so it will not stumble over an already installed Crypt::CBC
+	- fixed bug in t/70-funcstyle.t which could in some cases let tests wrongly fail
+	- test scripts: changed indentation, updated list of known ciphers
+
+v1.40, 07.01.2005
+	- the '0' block problem still had survived in functions encrypt and decrypt... fixed
+	- some code cleanup
+	- changed versioning scheme to be more CPAN-like
+
+v1.3, 06.01.2005
+	- no code changes, just some minor documentation update
+
+v1.2, 06.01.2005
+	- fixed problems with blocks consisting of a '0'
+
+v1.1, 23.12.2000
+	- first release

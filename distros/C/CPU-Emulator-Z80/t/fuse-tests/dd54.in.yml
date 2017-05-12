@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 84
+name: dd54
+registers:
+  AF: 33654
+  AF_: 0
+  BC: 3347
+  BC_: 0
+  DE: 51047
+  DE_: 0
+  HL: 12569
+  HL_: 0
+  I: 0
+  IX: 19309
+  IY: 779
+  PC: 0
+  R: 0
+  SP: 0

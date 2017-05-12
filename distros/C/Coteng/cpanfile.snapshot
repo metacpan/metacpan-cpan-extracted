@@ -1,0 +1,597 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Algorithm-Diff-1.1902
+    pathname: T/TY/TYEMQ/Algorithm-Diff-1.1902.tar.gz
+    provides:
+      Algorithm::Diff 1.1902
+      Algorithm::Diff::_impl 1.1902
+      Algorithm::DiffOld 1.1
+    requirements:
+      ExtUtils::MakeMaker 0
+  Capture-Tiny-0.23
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.23.tar.gz
+    provides:
+      Capture::Tiny 0.23
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      strict 0
+      warnings 0
+  Class-Accessor-Lite-0.05
+    pathname: K/KA/KAZUHO/Class-Accessor-Lite-0.05.tar.gz
+    provides:
+      Class::Accessor::Lite 0.05
+    requirements:
+      ExtUtils::MakeMaker 6.42
+  Class-Accessor-Lite-Lazy-0.03
+    pathname: M/MO/MOTEMEN/Class-Accessor-Lite-Lazy-0.03.tar.gz
+    provides:
+      Class::Accessor::Lite::Lazy 0.03
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Carp 0
+      Class::Accessor::Lite 0.05
+      ExtUtils::CBuilder 0
+      ExtUtils::MakeMaker 6.59
+      Module::Build 0.38
+      Test::Fatal 0
+      Test::More 0.98
+      parent 0
+      perl 5.008001
+  Class-Data-Inheritable-0.08
+    pathname: T/TM/TMTM/Class-Data-Inheritable-0.08.tar.gz
+    provides:
+      Class::Data::Inheritable 0.08
+    requirements:
+      ExtUtils::MakeMaker 0
+  DBD-SQLite-1.40
+    pathname: I/IS/ISHIGAKI/DBD-SQLite-1.40.tar.gz
+    provides:
+      DBD::SQLite 1.40
+      DBD::SQLite::_WriteOnceHash 1.40
+      DBD::SQLite::db 1.40
+      DBD::SQLite::dr 1.40
+    requirements:
+      DBI 1.57
+      ExtUtils::MakeMaker 6.48
+      File::Spec 0.82
+      Test::Builder 0.86
+      Test::More 0.47
+      Tie::Hash 0
+      perl 5.006
+  DBI-1.630
+    pathname: T/TI/TIMB/DBI-1.630.tar.gz
+    provides:
+      Bundle::DBI 12.008696
+      DBD::DBM 0.08
+      DBD::DBM::Statement 0.08
+      DBD::DBM::Table 0.08
+      DBD::DBM::db 0.08
+      DBD::DBM::dr 0.08
+      DBD::DBM::st 0.08
+      DBD::ExampleP 12.014311
+      DBD::ExampleP::db 12.014311
+      DBD::ExampleP::dr 12.014311
+      DBD::ExampleP::st 12.014311
+      DBD::File 0.42
+      DBD::File::DataSource::File 0.42
+      DBD::File::DataSource::Stream 0.42
+      DBD::File::Statement 0.42
+      DBD::File::Table 0.42
+      DBD::File::TableSource::FileSystem 0.42
+      DBD::File::db 0.42
+      DBD::File::dr 0.42
+      DBD::File::st 0.42
+      DBD::Gofer 0.015327
+      DBD::Gofer::Policy::Base 0.010088
+      DBD::Gofer::Policy::classic 0.010088
+      DBD::Gofer::Policy::pedantic 0.010088
+      DBD::Gofer::Policy::rush 0.010088
+      DBD::Gofer::Transport::Base 0.014121
+      DBD::Gofer::Transport::corostream undef
+      DBD::Gofer::Transport::null 0.010088
+      DBD::Gofer::Transport::pipeone 0.010088
+      DBD::Gofer::Transport::stream 0.014599
+      DBD::Gofer::db 0.015327
+      DBD::Gofer::dr 0.015327
+      DBD::Gofer::st 0.015327
+      DBD::NullP 12.014715
+      DBD::NullP::db 12.014715
+      DBD::NullP::dr 12.014715
+      DBD::NullP::st 12.014715
+      DBD::Proxy 0.2004
+      DBD::Proxy::RPC::PlClient 0.2004
+      DBD::Proxy::db 0.2004
+      DBD::Proxy::dr 0.2004
+      DBD::Proxy::st 0.2004
+      DBD::Sponge 12.010003
+      DBD::Sponge::db 12.010003
+      DBD::Sponge::dr 12.010003
+      DBD::Sponge::st 12.010003
+      DBDI 12.015129
+      DBI 1.630
+      DBI::Const::GetInfo::ANSI 2.008697
+      DBI::Const::GetInfo::ODBC 2.011374
+      DBI::Const::GetInfoReturn 2.008697
+      DBI::Const::GetInfoType 2.008697
+      DBI::DBD 12.015129
+      DBI::DBD::Metadata 2.014214
+      DBI::DBD::SqlEngine 0.06
+      DBI::DBD::SqlEngine::DataSource 0.06
+      DBI::DBD::SqlEngine::Statement 0.06
+      DBI::DBD::SqlEngine::Table 0.06
+      DBI::DBD::SqlEngine::TableSource 0.06
+      DBI::DBD::SqlEngine::TieMeta 0.06
+      DBI::DBD::SqlEngine::TieTables 0.06
+      DBI::DBD::SqlEngine::db 0.06
+      DBI::DBD::SqlEngine::dr 0.06
+      DBI::DBD::SqlEngine::st 0.06
+      DBI::FAQ 1.014935
+      DBI::Gofer::Execute 0.014283
+      DBI::Gofer::Request 0.012537
+      DBI::Gofer::Response 0.011566
+      DBI::Gofer::Serializer::Base 0.009950
+      DBI::Gofer::Serializer::DataDumper 0.009950
+      DBI::Gofer::Serializer::Storable 0.015586
+      DBI::Gofer::Transport::Base 0.012537
+      DBI::Gofer::Transport::pipeone 0.012537
+      DBI::Gofer::Transport::stream 0.012537
+      DBI::Profile 2.015065
+      DBI::ProfileData 2.010008
+      DBI::ProfileDumper 2.015325
+      DBI::ProfileDumper::Apache 2.014121
+      DBI::ProfileSubs 0.009396
+      DBI::ProxyServer 0.3005
+      DBI::ProxyServer::db 0.3005
+      DBI::ProxyServer::dr 0.3005
+      DBI::ProxyServer::st 0.3005
+      DBI::SQL::Nano 1.015544
+      DBI::SQL::Nano::Statement_ 1.015544
+      DBI::SQL::Nano::Table_ 1.015544
+      DBI::Util::CacheMemory 0.010315
+      DBI::Util::_accessor 0.009479
+      DBI::common 1.630
+    requirements:
+      ExtUtils::MakeMaker 6.48
+      Test::Simple 0.90
+      perl 5.008
+  DBIx-Sunny-0.21
+    pathname: K/KA/KAZEBURO/DBIx-Sunny-0.21.tar.gz
+    provides:
+      DBIx::Sunny 0.21
+      DBIx::Sunny::Schema undef
+    requirements:
+      Capture::Tiny 0
+      Class::Accessor::Lite 0.05
+      Class::Data::Inheritable 0
+      DBD::SQLite 1.31
+      DBI 1.615
+      DBIx::TransactionManager 0
+      Data::Validator 0
+      Module::Build 0.38
+      Scalar::Util 0
+      Test::More 0.98
+      Test::Requires 0
+      Test::TCP 0
+      parent 0
+      perl 5.008005
+  DBIx-TransactionManager-1.12
+    pathname: N/NE/NEKOKAK/DBIx-TransactionManager-1.12.tar.gz
+    provides:
+      DBIx::TransactionManager 1.12
+      DBIx::TransactionManager::ScopeGuard 1.12
+    requirements:
+      DBI 0
+      ExtUtils::MakeMaker 6.36
+      Test::More 0.96
+      Try::Tiny 0
+  Data-Validator-1.04
+    pathname: G/GF/GFUJI/Data-Validator-1.04.tar.gz
+    provides:
+      Data::Validator 1.04
+      Data::Validator::Role::AllowExtra undef
+      Data::Validator::Role::Croak undef
+      Data::Validator::Role::Method undef
+      Data::Validator::Role::NoRestricted undef
+      Data::Validator::Role::NoThrow undef
+      Data::Validator::Role::Sequenced undef
+      Data::Validator::Role::StrictSequenced undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::CBuilder 0
+      ExtUtils::MakeMaker 6.59
+      Module::Build 0.38
+      Mouse 0.93
+      perl 5.008001
+  Devel-CheckCompiler-0.05
+    pathname: S/SY/SYOHEX/Devel-CheckCompiler-0.05.tar.gz
+    provides:
+      Devel::AssertC99 undef
+      Devel::CheckCompiler 0.05
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Exporter 0
+      ExtUtils::CBuilder 0
+      File::Temp 0
+      Module::Build 0.38
+      Test::More 0.98
+      Test::Requires 0
+      parent 0
+      perl 5.008001
+  Exporter-Lite-0.02
+    pathname: M/MS/MSCHWERN/Exporter-Lite-0.02.tar.gz
+    provides:
+      Dummy 0.5
+      Exporter::Lite 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0.34
+  ExtUtils-MakeMaker-6.84
+    pathname: B/BI/BINGOS/ExtUtils-MakeMaker-6.84.tar.gz
+    provides:
+      DynaLoader 6.84
+      ExtUtils::Command::MM 6.84
+      ExtUtils::Liblist 6.84
+      ExtUtils::Liblist::Kid 6.84
+      ExtUtils::MM 6.84
+      ExtUtils::MM_AIX 6.84
+      ExtUtils::MM_Any 6.84
+      ExtUtils::MM_BeOS 6.84
+      ExtUtils::MM_Cygwin 6.84
+      ExtUtils::MM_DOS 6.84
+      ExtUtils::MM_Darwin 6.84
+      ExtUtils::MM_MacOS 6.84
+      ExtUtils::MM_NW5 6.84
+      ExtUtils::MM_OS2 6.84
+      ExtUtils::MM_QNX 6.84
+      ExtUtils::MM_UWIN 6.84
+      ExtUtils::MM_Unix 6.84
+      ExtUtils::MM_VMS 6.84
+      ExtUtils::MM_VOS 6.84
+      ExtUtils::MM_Win32 6.84
+      ExtUtils::MM_Win95 6.84
+      ExtUtils::MY 6.84
+      ExtUtils::MakeMaker 6.84
+      ExtUtils::MakeMaker::Config 6.84
+      ExtUtils::MakeMaker::_version 6.84
+      ExtUtils::Mkbootstrap 6.84
+      ExtUtils::Mksymlists 6.84
+      ExtUtils::testlib 6.84
+      MM 6.84
+      MY 6.84
+      in 6.84
+    requirements:
+      Data::Dumper 0
+      DirHandle 0
+      File::Basename 0
+      File::Spec 0.8
+      Pod::Man 0
+      perl 5.006
+  ExtUtils-ParseXS-3.22
+    pathname: S/SM/SMUELLER/ExtUtils-ParseXS-3.22.tar.gz
+    provides:
+      ExtUtils::ParseXS 3.22
+      ExtUtils::ParseXS::Constants 3.22
+      ExtUtils::ParseXS::CountLines 3.22
+      ExtUtils::ParseXS::Eval 3.22
+      ExtUtils::ParseXS::Utilities 3.22
+      ExtUtils::Typemaps 3.22
+      ExtUtils::Typemaps::Cmd 3.22
+      ExtUtils::Typemaps::InputMap 3.22
+      ExtUtils::Typemaps::OutputMap 3.22
+      ExtUtils::Typemaps::Type 3.22
+    requirements:
+      Carp 0
+      Cwd 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::MakeMaker 6.46
+      File::Basename 0
+      File::Spec 0
+      Symbol 0
+      Test::More 0.47
+  File-Slurp-9999.19
+    pathname: U/UR/URI/File-Slurp-9999.19.tar.gz
+    provides:
+      File::Slurp 9999.19
+      FileSlurp_12 9999.13
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Fcntl 0
+      POSIX 0
+  Log-Minimal-0.17
+    pathname: K/KA/KAZEBURO/Log-Minimal-0.17.tar.gz
+    provides:
+      Log::Minimal 0.17
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0
+      Module::Build 0.38
+      Scalar::Util 0
+      Term::ANSIColor 0
+  Module-Build-0.4203
+    pathname: L/LE/LEONT/Module-Build-0.4203.tar.gz
+    provides:
+      Module::Build 0.4203
+      Module::Build::Base 0.4203
+      Module::Build::Compat 0.4203
+      Module::Build::Config 0.4203
+      Module::Build::Cookbook 0.4203
+      Module::Build::Dumper 0.4203
+      Module::Build::ModuleInfo 0.4203
+      Module::Build::Notes 0.4203
+      Module::Build::PPMMaker 0.4203
+      Module::Build::Platform::Default 0.4203
+      Module::Build::Platform::MacOS 0.4203
+      Module::Build::Platform::Unix 0.4203
+      Module::Build::Platform::VMS 0.4203
+      Module::Build::Platform::VOS 0.4203
+      Module::Build::Platform::Windows 0.4203
+      Module::Build::Platform::aix 0.4203
+      Module::Build::Platform::cygwin 0.4203
+      Module::Build::Platform::darwin 0.4203
+      Module::Build::Platform::os2 0.4203
+      Module::Build::PodParser 0.4203
+      Module::Build::Version 0.87
+      Module::Build::YAML 1.41
+      inc::latest 0.4203
+      inc::latest::private 0.4203
+    requirements:
+      CPAN::Meta 2.110420
+      CPAN::Meta::YAML 0.003
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      File::Temp 0.15
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Parse::CPAN::Meta 1.4401
+      Perl::OSType 1
+      Pod::Man 2.17
+      Test::Harness 3.16
+      Test::More 0.49
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-Build-XSUtil-0.05
+    pathname: H/HI/HIDEAKIO/Module-Build-XSUtil-0.05.tar.gz
+    provides:
+      Module::Build::XSUtil 0.05
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Devel::CheckCompiler 0.02
+      Devel::PPPort 3.19
+      Exporter 0
+      ExtUtils::CBuilder 0
+      File::Basename 0
+      File::Path 0
+      Module::Build 0.4005
+      XSLoader 0.02
+      parent 0
+      perl 5.008005
+  Mouse-2.1.0
+    pathname: G/GF/GFUJI/Mouse-2.1.0.tar.gz
+    provides:
+      Mouse 2.001000
+      Mouse::Exporter undef
+      Mouse::Meta::Attribute undef
+      Mouse::Meta::Class undef
+      Mouse::Meta::Method undef
+      Mouse::Meta::Method::Accessor undef
+      Mouse::Meta::Method::Constructor undef
+      Mouse::Meta::Method::Delegation undef
+      Mouse::Meta::Method::Destructor undef
+      Mouse::Meta::Module undef
+      Mouse::Meta::Role undef
+      Mouse::Meta::Role::Application undef
+      Mouse::Meta::Role::Composite undef
+      Mouse::Meta::Role::Method undef
+      Mouse::Meta::TypeConstraint undef
+      Mouse::Object undef
+      Mouse::PurePerl undef
+      Mouse::Role 2.001000
+      Mouse::Spec 2.001000
+      Mouse::TypeRegistry undef
+      Mouse::Util 2.001000
+      Mouse::Util::MetaRole undef
+      Mouse::Util::TypeConstraints undef
+      Squirrel undef
+      Squirrel::Role undef
+      Test::Mouse undef
+      ouse undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Devel::PPPort 3.19
+      ExtUtils::CBuilder 0
+      ExtUtils::ParseXS 3.22
+      Module::Build 0.38
+      Module::Build::XSUtil 0.05
+      Scalar::Util 1.14
+      XSLoader 0.02
+      perl v5.8.1
+  SQL-Maker-1.12
+    pathname: T/TO/TOKUHIROM/SQL-Maker-1.12.tar.gz
+    provides:
+      SQL::Maker 1.12
+      SQL::Maker::Condition undef
+      SQL::Maker::Plugin::InsertMulti undef
+      SQL::Maker::Plugin::InsertOnDuplicate undef
+      SQL::Maker::SQLType undef
+      SQL::Maker::Select undef
+      SQL::Maker::Select::Oracle undef
+      SQL::Maker::SelectSet undef
+      SQL::Maker::Util undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Class::Accessor::Lite 0.05
+      DBI 0
+      Module::Build 0.38
+      Module::Load 0
+      Scalar::Util 0
+      parent 0
+      perl 5.008001
+  SQL-NamedPlaceholder-0.03
+    pathname: S/SA/SATOH/SQL-NamedPlaceholder-0.03.tar.gz
+    provides:
+      SQL::NamedPlaceholder 0.03
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Carp 0
+      Exporter::Lite 0
+      ExtUtils::MakeMaker 6.36
+      Module::Build 0.38
+      Scalar::Util 0
+      Test::Name::FromLine 0
+  Scope-Container-0.04
+    pathname: K/KA/KAZEBURO/Scope-Container-0.04.tar.gz
+    provides:
+      Scope::Container 0.04
+    requirements:
+      ExtUtils::MakeMaker 6.42
+      Test::More 0.88
+      perl 5.008001
+  Scope-Container-DBI-0.09
+    pathname: K/KA/KAZEBURO/Scope-Container-DBI-0.09.tar.gz
+    provides:
+      Scope::Container::DBI 0.09
+    requirements:
+      DBD::SQLite 0
+      DBI 1.615
+      Data::Dumper 0
+      ExtUtils::MakeMaker 6.36
+      File::Temp 0
+      List::Util 0
+      Log::Minimal 0
+      Module::Load 0
+      Scope::Container 0.04
+      Test::More 0
+      Test::SharedFork 0
+      Try::Tiny 0.11
+  Test-Differences-0.61
+    pathname: O/OV/OVID/Test-Differences-0.61.tar.gz
+    provides:
+      Test::Differences 0.61
+    requirements:
+      Data::Dumper 2.126
+      Test::More 0
+      Text::Diff 0.35
+  Test-Fatal-0.013
+    pathname: R/RJ/RJBS/Test-Fatal-0.013.tar.gz
+    provides:
+      Test::Fatal 0.013
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-Name-FromLine-0.11
+    pathname: S/SA/SATOH/Test-Name-FromLine-0.11.tar.gz
+    provides:
+      Test::Name::FromLine 0.11
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::MakeMaker 6.36
+      File::Slurp 0
+      Filter::Util::Call 0
+      Module::Build 0.38
+      Test::Builder 0
+      Test::Differences 0
+      Test::Fatal 0
+      Test::More 0
+  Test-Requires-0.07
+    pathname: T/TO/TOKUHIROM/Test-Requires-0.07.tar.gz
+    provides:
+      Test::Requires 0.07
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::MakeMaker 6.59
+      Module::Build 0.38
+      Test::Builder::Module 0
+      Test::More 0.61
+      perl 5.008_001
+  Test-SharedFork-0.21
+    pathname: T/TO/TOKUHIROM/Test-SharedFork-0.21.tar.gz
+    provides:
+      Test::SharedFork 0.21
+      Test::SharedFork::Array undef
+      Test::SharedFork::Scalar undef
+      Test::SharedFork::Store undef
+    requirements:
+      App::Prove 0
+      ExtUtils::MakeMaker 6.59
+      Test::More 0.88
+      Test::Requires 0
+      Time::HiRes 0
+      perl 5.008
+  Test-TCP-2.02
+    pathname: T/TO/TOKUHIROM/Test-TCP-2.02.tar.gz
+    provides:
+      Net::EmptyPort undef
+      Test::TCP 2.02
+      Test::TCP::CheckPort undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::CBuilder 0
+      IO::Socket::INET 0
+      Module::Build 0.38
+      Test::More 0
+      Test::SharedFork 0.19
+      Time::HiRes 0
+      perl 5.008001
+  Text-Diff-1.41
+    pathname: O/OV/OVID/Text-Diff-1.41.tar.gz
+    provides:
+      Text::Diff 1.41
+      Text::Diff::Base 1.41
+      Text::Diff::Config 1.41
+      Text::Diff::Table 1.41
+    requirements:
+      Algorithm::Diff 1.19
+      Exporter 0
+      ExtUtils::MakeMaker 0
+  Try-Tiny-0.18
+    pathname: D/DO/DOY/Try-Tiny-0.18.tar.gz
+    provides:
+      Try::Tiny 0.18
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      base 0
+      constant 0
+      strict 0
+      warnings 0

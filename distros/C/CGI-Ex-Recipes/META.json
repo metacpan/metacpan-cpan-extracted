@@ -1,0 +1,46 @@
+{
+   "abstract" : "A usage example for CGI::Ex::App!",
+   "author" : [
+      "Красимир Беров <k.berov@gmail.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Ex-Recipes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Ex" : "2.18",
+            "DBD::SQLite" : 0,
+            "DBI" : 0,
+            "SQL::Abstract" : 0,
+            "Test::More" : 0,
+            "YAML" : "0.65"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08"
+}

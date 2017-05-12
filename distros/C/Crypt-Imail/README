@@ -1,0 +1,55 @@
+Crypt/Imail version 0.01
+========================
+
+Encrypt and Decrypt Imail passwords
+
+THE SCOOP
+
+search for "imail decrypt" on google and you 
+will find serveral articles dating back around
+1999 that discuss the insecurities of Imail's
+encryption scheme.  To date they have done
+nothing about it.
+
+This is a perl module that uses the information
+from those articles to provide functions that
+allow you to decrypt and encrypt Imail passwords.
+
+http://www.ipswitch.com/prodcuts/imail_server/
+
+NOTE
+
+I never reversed engineered Imail at any time and 
+simply wrote the specs for this program based on
+code found at insecure.com's archieved message
+board.  In fact I never run Imail, never recommended
+Imail to friends or loved ones and have no intention
+of providing Imail to any of my clients or collaegues.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+none.
+
+THANKS
+
+Thanks goes to Brian Gannon <brian@fearthepenguin.com>
+and to Insomni (http://www.insomni.net/) for their
+encouragement in writing this code.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Stephen D. Wells.  All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

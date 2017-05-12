@@ -1,0 +1,40 @@
+NAME
+    CPAN::IndexPod - Index the POD from an unpacked CPAN
+
+SYNOPSIS
+      my $i = CPAN::IndexPod->new;
+      $i->unpacked("/unpacked/cpan/); # use CPAN::Unpack
+      $i->kinosearch("/kino/");   # must be absolute path
+      $i->index;
+
+      # Then search with:
+      my @files = $i->search("vampire");
+
+DESCRIPTION
+    The Comprehensive Perl Archive Network (CPAN) is a very useful
+    collection of Perl code. It has a whole lot of module distributions.
+    CPAN::Unpack unpacks CPAN distributions. This module will analyse the
+    unpacked CPAN, index the Pod it contains, and allow you to search it.
+
+    Right now it allows simplistic searching of NAME, SYNOPSIS and
+    DESCRIPTION sections and returns a list of filenames.
+
+METHODS
+  new
+      my $i = CPAN::IndexPod->new;
+
+  index
+      $i->index;
+
+  search
+      my @files = $i->search("vampire");
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004-6, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

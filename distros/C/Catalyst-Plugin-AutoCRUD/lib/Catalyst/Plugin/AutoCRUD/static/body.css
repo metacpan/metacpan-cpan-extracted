@@ -1,0 +1,12 @@
+/*
+ * Style for the LFB application homepage and schema/source selector
+ *
+ */
+
+body {
+    font-family: "Bitstream Vera Sans", "Trebuchet MS",
+                  Verdana, Tahoma, Arial, helvetica,
+                  sans-serif;
+    background-color: #EEEEEE;
+}
+

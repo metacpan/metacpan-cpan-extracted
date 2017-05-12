@@ -1,0 +1,35 @@
+---
+abstract: 'Use the YAML module to tidy YAML documents with tidyall'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Code-TidyAll-Plugin-YAML
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Code::TidyAll::Plugin: '0'
+  Moo: '0'
+  YAML: '0'
+  strict: '0'
+resources:
+  bugtracker: http://github.com/oalders/Code-TidyAll-Plugin-YAML/issues
+  homepage: https://github.com/oalders/code-tidyall-plugin-yaml
+  repository: https://github.com/oalders/code-tidyall-plugin-yaml.git
+version: '0.000001'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'

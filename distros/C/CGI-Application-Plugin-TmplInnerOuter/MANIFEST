@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/CGI/Application/Plugin/TmplInnerOuter.pm
+lib/CGI/Application/Plugin/TmplInnerOuter.pod
+lib/CGI/Application/Plugin/TmplInnerOuter2.pm
+t/0.t
+t/1.t
+t/TestOne.pm
+META.yml                                 Module meta-data (added by MakeMaker)

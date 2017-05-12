@@ -1,0 +1,4 @@
+staff {
+  name = Ikari Gendo
+  role = Nerv director and commander
+}

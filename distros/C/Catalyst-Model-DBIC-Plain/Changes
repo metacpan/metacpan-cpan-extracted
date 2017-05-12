@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Model::DBIC::Plain.
+
+0.02  Mon Nov 21 10:08:00 CEST 2005
+	- subclass Catalyst::Model instead of Catalyst::Base
+
+0.01  Wed Aug 03 19:49:56 CEST 2005
+        - First release

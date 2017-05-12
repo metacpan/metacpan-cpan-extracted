@@ -1,0 +1,148 @@
+#!/usr/bin/perl -w
+use strict;
+use Getopt::Long;
+
+my ($dbtype, $dbname, $dbuser, $dbpass, $dbhost, $help, $preclear);
+GetOptions( "type=s"         => \$dbtype,
+	    "name=s"         => \$dbname,
+            "user=s"         => \$dbuser,
+            "pass=s"         => \$dbpass,
+            "host=s"         => \$dbhost,
+            "help"           => \$help,
+            "force-preclear" => \$preclear
+           );
+
+unless (defined($dbtype)) {
+    print "You must supply a database type with the --type option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+unless (defined($dbname)) {
+    print "You must supply a database name with the --name option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+if ($help) {
+    print "Help can be found by typing 'perldoc $0'\n";
+    exit 0;
+}
+
+my %setup_modules = ( postgres => "CGI::Wiki::Setup::Pg",
+		      mysql    => "CGI::Wiki::Setup::MySQL",
+		      sqlite  => "CGI::Wiki::Setup::SQLite"
+);
+
+unless ( defined($setup_modules{$dbtype}) ) {
+    print "dbtype must be one of 'postgres', 'mysql', and 'sqlite'\n";
+    print "further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+my $class = $setup_modules{$dbtype};
+eval "require $class";
+if ( $@ ) {
+    print "Couldn't 'use' $class: $@\n";
+    exit 1;
+}
+
+if ($preclear) {
+    no strict 'refs';
+    &{$class."::cleardb"}($dbname, $dbuser, $dbpass, $dbhost);
+}
+
+{
+    no strict 'refs';
+    &{$class."::setup"}($dbname, $dbuser, $dbpass, $dbhost);
+}
+
+=head1 NAME
+
+cgi-wiki-setupdb - Set up a database storage backend for CGI::Wiki.
+
+=head1 SYNOPSIS
+
+  # Set up or update the storage backend, leaving any existing data
+  # intact. Useful for upgrading from old versions of CGI::Wiki to
+  # newer ones with more backend features.
+
+  cgi-wiki-setupdb --type postgres
+		   --name mywiki \
+		   --user wiki  \
+		   --pass wiki \
+                   --host 'db.example.com'
+
+  # Clear out any existing data and set up a fresh backend from scratch.
+
+  cgi-wiki-setupdb --type postgres
+		   --name mywiki \
+		   --user wiki  \
+		   --pass wiki  \
+		   --force-preclear
+
+=head1 DESCRIPTION
+
+Takes three mandatory arguments:
+
+=over 4
+
+=item type
+
+The database type.  Should be one of 'postgres', 'mysql' and 'sqlite'.
+
+=item name
+
+The database name.
+
+=item user
+
+The user that connects to the database. It must have permission
+to create and drop tables in the database.
+
+=back
+
+two optional arguments:
+
+=over 4
+
+=item pass
+
+The user's database password.
+
+=item host
+
+The hostname of the machine the database server is running on (omit
+for local databases).
+
+=back
+
+and one optional flag:
+
+=over 4
+
+=item force-preclear
+
+By default, this script will leave any existing data alone.  To force
+that to be cleared out first, pass the C<--force-preclear> flag.
+
+=back
+
+=head1 AUTHOR
+
+Kake Pugh (kake@earth.li).
+
+=head1 COPYRIGHT
+
+     Copyright (C) 2002-2003 Kake Pugh.  All Rights Reserved.
+
+This code is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<CGI::Wiki>
+
+=cut
+
+1;

@@ -1,0 +1,96 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README.pod
+
+################################################################################
+### Base Perl API                                                            ###
+################################################################################
+lib/Couchbase.pm
+lib/Couchbase/Core.pm
+lib/Couchbase/Bucket.pm
+lib/Couchbase/Document.pm
+lib/Couchbase/HTTPDocument.pm
+lib/Couchbase/OpContext.pm
+lib/Couchbase/Constants.pm
+lib/Couchbase/_GlueConstants.pm
+lib/Couchbase/Settings.pm
+
+################################################################################
+### Misc                                                                     ###
+################################################################################
+lib/Couchbase/BucketConfig.pm
+
+################################################################################
+### Testing API                                                              ###
+################################################################################
+lib/Couchbase/MockServer.pm
+lib/Couchbase/Test/ClientSync.pm
+lib/Couchbase/Test/Common.pm
+lib/Couchbase/Test/Settings.pm
+lib/Couchbase/Test/Views.pm
+
+################################################################################
+### Views Perl API                                                           ###
+################################################################################
+lib/Couchbase/View/Handle.pm
+
+################################################################################
+### N1QL                                                                     ###
+################################################################################
+lib/Couchbase/N1QL/Handle.pm
+lib/Couchbase/N1QL/Params.pm
+
+################################################################################
+################################################################################
+### Common C Support                                                         ###
+################################################################################
+################################################################################
+xs/perl-couchbase.h
+xs/plcb-util.h
+xs/plcb-return.h
+xs/ppport.h
+xs/typemap
+
+xs/callbacks.c
+xs/convert.c
+xs/constants.c
+xs/opcontext.c
+
+################################################################################
+### Basic C Client Support                                                   ###
+################################################################################
+xs/args.c
+xs/operations.c
+xs/Couchbase.xs
+xs/BucketConfig.xs
+xs/plcb-args.h
+xs/async.c
+xs/IO.xs
+xs/N1QLParams.xs
+
+################################################################################
+### Views C Support                                                          ###
+################################################################################
+xs/query.c
+
+################################################################################
+### Examples                                                                 ###
+################################################################################
+eg/couch_demo.pl
+eg/memd_basic.pl
+eg/durability.pl
+eg/n1ql.pl
+eg/pillowfight.pl
+eg/sample.pl
+
+
+################################################################################
+### Test Skeleton                                                            ###
+################################################################################
+t/00-load.t
+t/01-main.t
+t/tmp/CouchbaseMock.jar
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

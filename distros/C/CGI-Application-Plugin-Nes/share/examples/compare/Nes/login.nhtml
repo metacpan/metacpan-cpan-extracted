@@ -1,0 +1,25 @@
+{: NES 1.0 none :}
+{: ~ ( ! * nes_session_ok )
+    <div id="caja">
+    <center>
+    Any user, password: 1234<br><br>
+    {: include ('{: * cfg_obj_top_dir :}/Nes/form/secure_login.nhtml',
+                "
+                  script_handler   => 'test_script_handler.pl',
+                  function_handler => 'test_function_handler',
+                  form_name        => 'test_form_login',
+                  form_action      => '',
+                "
+               )         
+    :}
+    </center>
+    </div>
+:}
+{: ~ ( * nes_session_ok ) 
+    <div id="caja">
+    <center>
+    The session for <b>{: * nes_session_user :}</b> is Ok<br>
+    <a href="?action=logout">logout</a>
+    </center>
+    </div>    
+:}

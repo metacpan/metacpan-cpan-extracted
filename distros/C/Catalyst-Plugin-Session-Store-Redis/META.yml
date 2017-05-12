@@ -1,0 +1,20 @@
+---
+abstract: 'Redis Session store for Catalyst'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Session-Store-Redis
+requires:
+  Redis: '0'
+resources:
+  repository: git://github.com/domm/Catalyst-Plugin-Session-Store-Redis.git
+version: '0.07'

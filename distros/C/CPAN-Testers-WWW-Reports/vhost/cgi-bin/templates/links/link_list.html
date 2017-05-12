@@ -1,0 +1,34 @@
+<h2>Suggested Cool Links</h2>
+
+[% catid = 0 %]
+[% FOREACH item = links %]
+    [% IF catid != item.catid %]
+        [% IF catid > 0 %]
+        </ul>
+        [% END %]
+        [% catid = item.catid %]
+        <h3>[% item.category %]</h3>
+        <ul>
+        [% catid = item.catid %]
+    [% END %]
+
+    [% IF item.title %]
+        <li><a href="[% item.href %]" title="link to [% item.title %]">[% item.title %]</a>
+    [% ELSE %]
+        <li><a href="[% item.href %]" title="link to [% item.href %]">[% item.href %]</a>
+    [% END %]
+
+    [% IF item.body %]
+        - [% item.body %]
+    [% END %]
+[% END %]
+
+[% IF catid > 0 %]
+</ul>
+[% END %]
+
+<hr />
+
+<p>If you have any appropriate link suggestions or want to report any broken links, please 
+contact <a href="mailto:barbie@cpan.org">Barbie</a>. Please note that any marketing
+link swap requests will be ignored.</p>

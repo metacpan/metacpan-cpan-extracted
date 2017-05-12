@@ -1,0 +1,32 @@
+Revision history for Perl extension Catalyst::Plugin::Email.
+
+0.09 - 2015-08-12
+        - final release, with modern tooling and deprecation flag in metadata
+
+0.08  2006-12-31 20:01:00
+	- Modernize documentation not to use subrequest.
+
+0.07  2006-12-18 16:08:00
+	- Revert change:
+          Make it croak if recipient is empty.
+
+0.06  2006-12-06 12:23:00 
+        - Added more extensive docs on config and usage.
+          (Carl Franks)
+	- Make it croak if recipient is empty.
+
+0.05  Thu Nov 17 22:00:00 2005
+        - Added docs on sending email using a TT template.
+          (Andy Grundman)
+
+0.04  Fri Apr 15 16:09:00 2005
+        - added pod tests.
+
+0.03  Wed Feb 02 18:00:00 2005
+        - bugfix
+
+0.02  Sun Jan 30 18:00:00 2005
+        - new api
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

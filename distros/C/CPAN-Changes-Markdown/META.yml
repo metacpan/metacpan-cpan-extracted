@@ -1,0 +1,83 @@
+---
+abstract: 'Format your Changes file ( or a section of it ) in Markdown'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  charnames: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Changes-Markdown
+provides:
+  CPAN::Changes::Markdown:
+    file: lib/CPAN/Changes/Markdown.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter:
+    file: lib/CPAN/Changes/Markdown/Filter.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Node::DelimitedText:
+    file: lib/CPAN/Changes/Markdown/Filter/Node/DelimitedText.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Node::PlainText:
+    file: lib/CPAN/Changes/Markdown/Filter/Node/PlainText.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::NodeUtil:
+    file: lib/CPAN/Changes/Markdown/Filter/NodeUtil.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Passthrough:
+    file: lib/CPAN/Changes/Markdown/Filter/Passthrough.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Rule::NumericsToCode:
+    file: lib/CPAN/Changes/Markdown/Filter/Rule/NumericsToCode.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Rule::PackageNamesToCode:
+    file: lib/CPAN/Changes/Markdown/Filter/Rule/PackageNamesToCode.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Rule::UnderscoredToCode:
+    file: lib/CPAN/Changes/Markdown/Filter/Rule/UnderscoredToCode.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::Rule::VersionsToCode:
+    file: lib/CPAN/Changes/Markdown/Filter/Rule/VersionsToCode.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Filter::RuleUtil:
+    file: lib/CPAN/Changes/Markdown/Filter/RuleUtil.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Role::Filter:
+    file: lib/CPAN/Changes/Markdown/Role/Filter.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Role::Filter::Node:
+    file: lib/CPAN/Changes/Markdown/Role/Filter/Node.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Role::Filter::Rule:
+    file: lib/CPAN/Changes/Markdown/Role/Filter/Rule.pm
+    version: '1.000002'
+  CPAN::Changes::Markdown::Role::Filter::Rule::PlainText:
+    file: lib/CPAN/Changes/Markdown/Role/Filter/Rule/PlainText.pm
+    version: '1.000002'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  CPAN::Changes: '0'
+  Carp: '0'
+  Moo: '1.000008'
+  Path::Tiny: '0'
+  Role::Tiny: '0'
+  Sub::Exporter::Progressive: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/CPAN-Changes-Markdown/issues
+  homepage: https://github.com/kentnl/CPAN-Changes-Markdown
+  repository: https://github.com/kentnl/CPAN-Changes-Markdown.git
+version: '1.000002'

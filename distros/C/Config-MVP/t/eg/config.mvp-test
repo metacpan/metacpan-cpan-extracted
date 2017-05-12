@@ -1,0 +1,18 @@
+[Foo::Bar]
+x = 1
+y = 2
+z = 3
+y = 4
+
+[Foo::Baz bz]
+single = 1
+multi  = 2
+multi  = 3
+
+[Foo::Metaboondle]
+
+[Foo::Quux]
+a = 1
+b = 2
+c = 3
+

@@ -1,0 +1,174 @@
+Revision history for perl module CHI::Cascade
+
+0.284 2014-07-20
+    - Fix bug with ttl, when one target with ttl's rule had dependencies which had other ttl'd rules
+    - few code optimizations
+    - update inc::Module::Install up to v1.10
+
+0.283 2014-06-17
+    - Now i set up minimal version of perl 5.10 because i use defined-or '//'
+      operator and some CPAN's tests are failed. I don't whant now to rewrite
+      module for old version because i don't love very old soft and love
+      an effective code, sorry ;-)
+
+0.282 2014-06-16
+    - some corrected t/test_04.pm
+      ( test fail report here - http://www.cpantesters.org/cpan/report/8b744d08-764a-11e3-8d2f-66cfdfbfc7aa )
+    - fix bug with 'valid_expires', the test was written for it
+    - Now value_expires can be coderef for dynamic 'value_expires'
+
+0.28 2013-10-24
+    - Removed MYMETA.* files from MANIFEST and added to exclude lists (.gitignore & MANIFEST.SKIP)
+      ( http://weblog.bulknews.net/post/44251476706/stop-shipping-mymeta-to-cpan )
+
+0.27 2013-09-01 Stable release - i use it in production ;-)
+    - Only fix Changes - reformated to CPAN::Changes::Spec
+
+0.261 2013-06-11
+    - Fix bug (not tested yet) - in rare cases there can infinite locks of
+      targets in status CASCADE_COMPUTING. Fixed but not tested by me.
+
+0.26 2012-12-14
+    - New conception of non-blocking run method - deferring
+    - The test 04_memcached_multi.t some fails in FreeBSD. May be this is
+      because 'sleep' works not as expected. I changed the 'sleep' to
+      'select($,$,$,$)'. May be it will improve this test at FreeBSD...
+    - Added CHI::Cascade::Rule::value_expires method for changing by recompute
+      code the expiration time of values & target markers
+    - Added test for value_expires - test_05.pm by 08_fast_mmap.t
+    - Fixed bugs - in tests *_fast_mmap.t if was ^C signal - files of FastMmap
+      driver were not deleted
+    - The new method CHI::Cascade::Value->state
+    - Added method CHI::Cascade::Value::state_as_str
+    - The test '07_fast_mmap.t' tests now deferring & states of values
+    - Fix few bug with target locking
+    - Fixed unproductive code piece of value with expiring
+    - Fixed unproductive code with target locking
+    - Changed some tests for testing the 'actual_term' option
+    - Added stats for operations 'run' & 'dependencies_lookup'
+    - Added bits of state CASCADE_ACTUAL_TERM & CASCADE_TTL_INVOLVED
+    - Added 'ttl' feature.
+    - CHI::Cascade->rule has now some new options: value_expires & ttl
+    - CHI::Cascade->run has now some new options: ttl & stash
+    - Memcached tests are skipped by default. They use a starting of memcached
+      and from cpanm they doesn't work. If you want to tests please use this
+      method:
+      $ perl Makefile.PL
+      $ FORCE_MEMCACHED_TESTS=1 make test && make install
+    - Added a stack info for targets for circled dependencies die (now it prints stack)
+    - Fixed bug with circled dependencies - now more accurate (no tests)
+    - Added new method 'stash' for getting a stash passed through 'run' method
+
+0.25001 2012-04-17
+    - Few fix - should improve tests
+
+0.25 2012-02-28
+    - Some improvements
+    - For backward compatibility with perl < 5.9 the operator '$a // $b' is
+      changed to long style as 'defined($a) ? $a : $b'. It should improve a
+      tests on old perl installations
+
+0.24_01 2012-02-24
+    - Added 'parent' module in requires for old perl installation (<=5.10.0)
+
+0.24 2012-02-24
+    - Fixed bug with tests with memcached
+
+0.23 2012-02-22
+    - Queues for non blocking running - to see test t/lib/test_04.pm
+       (no docs yet)
+    - Added test '07_fast_mmap.t' for queue-ing
+    - Fix some bugs
+    - Added bits for values (no docs yet) and not finished yet.
+
+0.22 2012-02-20
+    - Added the option 'target_chi' - target markers can be kept in other CHI
+       cache than data of targets. It's useful for l1_cache's caches of CHI
+
+0.21 2012-02-16
+    - A detection of circle dependencies is improved (not tested)
+
+0.20 2012-02-09
+    - Some optimization
+    - Few fixes of documentation
+    - Added option 'depends_catch' to rule as catcher callback for dependencies
+
+0.19 2012-01-25
+    - Fixed bug of die like "Can't call method "is_value" on an undefined value
+      at /usr/local/share/perl5/CHI/Cascade.pm line 190"
+
+0.18 2012-01-25
+    - Now if recompute function dies with exception of CHI::Cascade::Value type
+      (introduced in v.0.13) CHI::Cascade::run method will return old value of
+      target value from cache if exception's value is 'undef' and cache value
+      exists. Before the run method always returned a value of exception.
+    - Imroved the documentation for CHI::Cascade::rule/code
+    - Added the documentation of CHI::Cascade::Value
+
+0.17 2011-12-13
+    - Added a callback function in rule as 'recomputed'
+
+0.16 2011-12-13
+    - Changed API for coderef's subroutines in 'depends' of rules. Now first
+      parameter is reference to CHI::Cascade::Rule object and other are
+      'qr_params'
+    - CHI::Cascade::Rule object now has a method 'cascade' which returns a
+      CHI::Cascade instance for this rule. You can use it in 'depends'
+      subroutines
+
+0.15  2011-12-07
+    - Corrections if cascade rules have a 'depends' option as coderef. Backward
+      compatible. Now coderef can return arrayref of dependencies. Before it
+      could return only one dependence as plain text. No tests yet for this
+    - Tests are rewritten and optimised
+    - Added a FastMmap driver's tests
+    - Added tests when dependencies are coderef (t/lib/test_02.pm)
+
+0.14 2011-11-29
+    - Improved tests in accordance with reports version 0.13
+    - Fixed few misprints in Changes & TODO files
+
+0.13 2011-11-18
+    - Fix bug - sometimes generated warnging for trigger time (was undefined)
+    - Now a compute code can throw die with CHI::Cascade::Value object - this value
+      will be returned from run method but value will not be saved in cache as
+      computed value
+    - Improved a behavior with some buggy situations with cache (cache doesn't
+      save a value by some reasons for example)
+
+0.12 2011-11-14
+    - More stable version as i think ;-) Please use it
+    - Improved signal handling in tests (for memcached killing)
+    - Fixed bug - dependencies as sub {} didn't get a qr_params properly
+    - Fixed rule's bug
+
+0.11 2011-11-14
+    - Fixed bug (sometime dead locks were after target locking)
+    - Added 'busy_lock' option in contructor and to 'rule' method
+    - All 'set's in cache executed with expire as 'never' (excluding locking of
+      targets)
+
+0.1 2011-11-14
+    - Changed API of execution 'code' of rules
+    - Now you can use instances of CHI::Cascade::Rule in your target codes
+    - Now you can pass any parameters to target codes described in rules
+
+0.05 2011-11-12
+    - More improved the test t/03_memcached_multi.t
+    - Tests with memcached for root user are not started (passed)
+      Now they are started
+    - More ready distributive
+
+0.03 2011-11-11
+    - Fixed bugs in tests (for example not be stopped memcached)
+    - New test - multi-process reading/getting from memcached (with forks)
+    - Added documentation about constructor and methods.
+
+0.02 2011-11-11
+    - Added repo meta info of github.com repository
+    - few changes of Makefile.PL ('README' file is generated by auto)
+    - Added 'Changes' file ;-)
+    - Added TODO file
+
+0.01 2011-11-10
+    - First release

@@ -1,0 +1,40 @@
+Class-DBI-Plugin-AccessionSearch
+
+"Class::DBI::Plugin::AccessionSearch" is easliy add search attrs.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Class::DBI::Plugin::AccessionSearch
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Class-DBI-Plugin-AccessionSearch
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-DBI-Plugin-AccessionSearch
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Class-DBI-Plugin-AccessionSearch
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Class-DBI-Plugin-AccessionSearch
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Atsushi Kobayashi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

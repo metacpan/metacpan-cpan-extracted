@@ -1,0 +1,33 @@
+Chart/Plot/Annotated version 0.01
+=================================
+
+No system dependencies for this module, assuming you have its base
+class Chart::Plot installed and working. This will require you to have
+GD as well, so deal with that first.
+
+This module is pure Perl, so no XS headaches here either.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Chart::Plot        0.10
+  GD                 1.27
+  Class::MethodMaker 1.02
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Jeremy Kahn <kahn@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,14 @@
+lib/Command/Interactive/Interaction.pm
+lib/Command/Interactive.pm
+Makefile.PL
+MANIFEST
+README.md
+t/001.t
+t/basic.t
+t/interaction.t
+t/password.t
+t/pathological.t
+t/regex.t
+t/system_only.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

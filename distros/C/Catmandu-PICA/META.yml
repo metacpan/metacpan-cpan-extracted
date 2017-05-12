@@ -1,0 +1,39 @@
+---
+abstract: 'Catmandu modules for working with PICA+ data'
+author:
+  - 'Johann Rolschewski <rolschewski@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+conflicts:
+  Catmandu::SRU: '< 0.032'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-PICA
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+recommends:
+  Catmandu::SRU: '0.032'
+requires:
+  Catmandu: '0.9504'
+  PICA::Data: '0.30'
+resources:
+  bugtracker: https://github.com/gbv/Catmandu-PICA/issues
+  homepage: https://github.com/gbv/Catmandu-PICA
+  repository: https://github.com/gbv/Catmandu-PICA.git
+version: '0.19'
+x_contributors:
+  - 'E. Choroba <choroba@matfyz.cz>'
+  - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'Johann Rolschewski <jorol@cpan.org>'
+  - 'Julian Ladisch <julianladisch@users.noreply.github.com>'

@@ -1,0 +1,108 @@
+NAME
+    Catalyst::Plugin::SpecialAction::Trail - Support for the 'trail' special
+    action
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+      # enabling the 'trail' special action in a single controller:
+
+      package MyApp::Controller::Foo;
+
+      use Moose;
+      use namespace::autoclean;
+
+      extends 'Catalyst::Controller';
+
+      with 'Catalyst::TraitFor::Controller::SpecialAction::Trail';
+
+      sub trail : Private {
+        my ($self, $c, @args) = (shift, shift, @_);
+
+        ...
+      }
+
+      # globally enabling the 'trail' special action:
+
+      package MyApp;
+
+      use Moose;
+      use namespace::autoclean;
+
+      extends 'Catalyst';
+
+      __PACKAGE__->setup(qw/ SpecialAction::Trail /);
+
+      # now you can use 'trail' in any controller in your app
+
+DISCLAIMER
+    This is ALPHA SOFTWARE. Use at your own risk. Features may change.
+
+DESCRIPTION
+    This module introduces a new special action "trail" that unites the
+    features of "end" and "auto" special actions (see "Built-in special
+    actions" in Catalyst::Manual::Intro):
+
+    *   Like "end", the "trail" actions will be run at the end of the
+        request, after all URL-matching actions are called; but they are
+        called before any "end" is run.
+
+    *   Like "auto", multiple "trail" actions will be run in turn, starting
+        with the application class and going through to the most specific
+        controller class, and the processing chain stops if any of them
+        returns false (any remaining "trail" actions are skipped and the
+        control goes to "end" if there's any).
+
+METHODS
+  setup_component
+    Overridden (with an 'around' method modifier) from "setup_component" in
+    Catalyst. Applies the
+    Catalyst::TraitFor::Controller::SpecialAction::Trail role to the
+    "Catalyst::Controller" instance.
+
+SEE ALSO
+    Catalyst, Catalyst::Manual::Intro.
+
+AUTHOR
+    Norbert Buchmuller, "<norbi at nix.hu>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-specialaction-trail at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-SpecialA
+    ction-Trail>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Plugin::SpecialAction::Trail
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-SpecialAct
+        ion-Trail>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Plugin-SpecialAction-Trail>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Catalyst-Plugin-SpecialAction-Trail>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Plugin-SpecialAction-Trail/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2010 Norbert Buchmuller, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

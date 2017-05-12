@@ -1,0 +1,15 @@
+name: bar
+method: post
+javascript: 0
+
+fields:
+
+    bar_one:
+        label: Bar One
+        type:  text
+
+    bar_two:
+        label: Bar Two
+        type:  text
+
+submit: Save Bar

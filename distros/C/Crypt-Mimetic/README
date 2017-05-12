@@ -1,0 +1,87 @@
+-------------------------------------------------------------------------------
+Crypt::Mimetic Perl Module
+-------------------------------------------------------------------------------
+  Copyright (C) 2002 by Erich Roncarolo <erich-roncarolo@users.sourceforge.net>
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself (Artistic/GPL2).
+-------------------------------------------------------------------------------
+
+What is this
+------------
+
+  This module allows you to hide a file by encrypting it and then attaching
+  it to another file of your choice.  This mimetic file then looks and
+  behaves like a normal file, and can be stored, used or emailed without
+  attracting attention.
+
+  Although this could be considered a steganography program, it implements
+  a very very trivial steganography.
+  A lot of steganography programs use smarter methods, but they can hide
+  only few informations in big files.
+  I wrote this module because it can be used to hide big files behind
+  little ones; obviously a gif larger than 5MB could be souspicious, but
+  a doc or a pdf with the same size should not attract attention.
+
+
+New versions
+------------
+  
+  You can download new versions of this module at: 
+   http://www.cpan.org/
+  If you cannot find it, email me: erich-roncarolo@users.sourceforge.net
+  
+
+Requirements
+------------
+  _____________________________________
+  Perl5 - http://www.perl.com/CPAN/src/
+  
+  OK, you should know enough about it.
+
+  _______________________________________
+  Some Perl modules - http://www.cpan.org
+
+  Crypt::Mimetic needs following modules:
+   Term::ReadKey
+   File::Copy
+   File::Find
+   Error
+  (probably you already have them)
+
+  Mimetic supports some encryption algorithms:
+   None - no extra modules required
+   TEA - requires Crypt::Tea
+   CipherSaber - requires Crypt::ChiperSaber
+    
+
+Installation
+------------
+
+  You can install it in usually way:
+   # perl Makefile.PL
+   # make
+   # make test
+   # make install
+
+
+Made with...
+------------
+  ______
+  Cygwin
+
+  but I think that it should work on each OS with a normal Perl ditribution.
+
+  ____
+  Perl
+
+  I used Perl because it has a lot of encryption algorithms in pure Perl and
+  as C wrappers.
+
+
+To do
+-----
+  1. Add a lot of encryption algorithms.
+  2. Multiple files support.
+  3. Write some demos and examples.
+  4. Add API for comfortable user interfaces.

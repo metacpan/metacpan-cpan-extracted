@@ -1,0 +1,66 @@
+Revision history for Perl extension Crypt::Skip32.
+
+0.18  Fri Jan 29 00:40:34 PST 2010 
+       - Email address update
+
+0.15  Fri Jan 29 00:40:34 PST 2010 
+       - Documentation example fix. (Joe Edmonds <joe@elem.com>)
+
+0.14  Tue Jul 14 04:58:01 UTC 2009
+        - Croak instead of die. (gray <gray@cpan.org>)
+
+0.13 Tue Jul  7 23:37:20 PDT 2009
+        - Correct way of recommending Crypt::Skip32::XS
+
+0.12  Tue Jul  7 18:14:32 PDT 2009
+        - Improve CPANTS score by recommending Crypt::Skip32::XS
+
+0.11  Mon Dec 29 17:18:57 PST 2008
+        - Get unit test to pass if ::XS is installed
+
+0.10  Sun Nov 23 09:37:05 UTC 2008
+	- Use Crypt::Skip32::XS if installed (gray <gray@cpan.org>)
+
+0.09  Mon Dec 29 10:52:14 UTC 2008
+	- Add Test::NoWarnings in some unit tests.
+
+0.08  Tue May 27 06:37:51 PDT 2008
+	- Apparently cpants.perl.org does not like SIGNATURE in MANIFESTS.
+	- Add "suggests" for optional testing modules.
+
+0.07  Sat May 24 23:33:49 PDT 2008
+	- Converted from Makefile.PL to Build.PL (Module::Build)
+        - Created examples/ subdirectory with one example.
+        - Added LICENSE file.
+
+0.06  Sat May 24 18:16:00 PDT 2008
+	- Removed basic unit test dependency on Test::Exception
+	- Added unit test based on the unit test in the original C code.
+	- Tweak example in documentation.
+        - Specify required version of Crypt::CBC in unit test.
+
+0.05  Wed Sep 26 23:44:21 2007
+	- Added unit test using optional Crypt::CBC (not recommended).
+	- Added unit tests with optional Test::Pod, Test::Pod::Coverage,
+	  Test::Distribution
+	- Added SIGNATURE file with PGP signed SHA1 signatures of files.
+	- Documentation cleanup including bugfix in example code.
+	- Lowering required Perl to 5.8.0 to see if tests pass for a
+	  wider audience.
+	- Changed to my unobfuscated email address in case automated
+	  CPAN tools can use it.  I'll worry about spam on the
+	  receiving end.
+
+0.04  Wed Sep 26 04:46:50 2007
+	- Altered error messages to include package info.
+        - Additional documentation, more useful example, doc cleanup.
+
+0.03  Sun Sep 23 14:19:22 2007
+        - More unit tests, better length checking, cleaned up docs.
+
+0.02  Sun Sep 23 01:08:44 2007
+        - Added actual code, unit tests, documentation, etc.
+
+0.01  Sat Sep 22 13:58:10 2007
+        - original version; created by h2xs 1.23 with options
+          -XA -n Crypt::Skip32

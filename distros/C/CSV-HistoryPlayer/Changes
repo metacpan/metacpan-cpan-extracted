@@ -1,0 +1,8 @@
+0.02      2017-02-21 02:46:55+00:00 UTC
+  - Switch to dzil
+
+0.02 2015-02-15 binary.com <perl@binary.com>
+  - Add namespace::clean into dependencies
+
+0.01 2015-02-11 binary.com <perl@binary.com>
+ - Initial version.

@@ -1,0 +1,40 @@
+{
+   "abstract" : "Quotes strings suitably for rfc2822 local part",
+   "author" : [
+      "David Bremner <ddb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-YText",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Convert::YText" : {
+         "file" : "lib/Convert/YText.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://pivot.cs.unb.ca/git/?p=convert-ytext.git;a=summary"
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

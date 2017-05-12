@@ -1,0 +1,48 @@
+Revision history for CGI::Alternatives
+
+0.15 2016-10-13
+    - Fix typos (thanks to davorg)
+
+0.14 2015-10-16
+    - mention HTML::Tiny as an alternative to CGI.pm's HTML
+      generation functions (thanks to osfameron for the suggestion)
+
+0.13 2014-06-23
+    - add HTML::Zoom to recommended templating engines
+
+0.12 2014-10-14
+    - Add LEEJO to maintainer information
+    - coveralls and travis badges
+
+0.11 2014-08-12
+    - Fix typo
+
+0.10 2014-07-29
+    - Fix typo, add link to Task::Kensho
+
+0.09 2014-07-25
+    - Clarify HTML functions are show for comparison only
+
+0.08 2014-06-09
+    - Update MANIFEST and Changes
+
+0.07 2014-06-09
+    - Remove unnecessary Catalyst files from examples
+
+0.06 2014-06-09
+    - Add examples
+
+0.05 2014-06-09
+    - Correct some links
+
+0.04 2014-06-09
+    - Completed documentation on alternatives with examples
+
+0.03 2014-06-09
+    - Links to alternatives (thanks: craig.treptow@gmail.com)
+
+0.02 2014-05-28
+    - Correct this Changes file
+
+0.01 2014-05-28
+    - First release, let's make a start on this

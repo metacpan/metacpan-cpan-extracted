@@ -1,0 +1,46 @@
+NAME
+    Catalyst::ActionRole::NotCacheableHeaders - Set no cache headers for
+    actions
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        package MyApp::Controller::Foo;
+        use Moose;
+        use namespace::autoclean;
+
+        BEGIN { extends 'Catalyst::Controller::ActionRole' }
+
+        __PACKAGE__->config(
+            action_roles => [qw( NotCacheableHeaders )],
+        );
+
+        sub dont_cache_me : Local NotCacheable { ... }
+
+DESCRIPTION
+    Provides a ActionRole to set HTTP headers instructing proxies and
+    browsers to not cache the response.
+
+        Pragma: no-cache
+        Cache-Control: no-cache
+        Expires: Thu, 01 Jan 1970 00:00:00 GMT
+        Last-Modified: %current time%
+
+    Please note that if any of above headers were already set they will be
+    overwritten.
+
+SEE ALSO
+    Take a look at Catalyst::ActionRole::ExpiresHeader if you want to set
+    the "Expires" header only.
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

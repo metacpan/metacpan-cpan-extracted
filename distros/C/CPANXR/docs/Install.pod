@@ -1,0 +1,115 @@
+# $Id: Install.pod,v 1.2 2003/10/06 21:41:18 clajac Exp $
+
+=pod
+
+=head1 NAME
+
+CPAN Installation
+
+=head1 DESCRIPTION
+
+This documentation describes how to install CPANXR on a host.
+
+=head1 REQUIREMENTS
+
+To run CPANXR you'll need the following installed on your host
+
+ Database:
+   MySQL 3.23 or later (developed using 4.0.14-standard)
+
+ Apache:
+   Apache 1.3 or later (developed using 1.3.28)
+   mod_perl (developed using 1.27)
+
+ Perl:
+   Perl 5.6.0 or later
+
+ Perl modules:
+   DBI 1.37 (previous versions should work)
+   DBD::mysql 2.9002 (previous versions should work)
+   PPI 0.805
+   CGI
+   CGI::Carp
+   Class::Autouse 1.0
+   Class::Handle 0.4
+   File::Spec 0.82
+   File::Flat 0.9
+   File::Find::Rule 0.11
+   List::Util 1.11
+   Test::ClassAPI
+   Config::Tiny 1.1
+   Config::Simple 4.55
+   GraphViz 1.8
+   Data::Page 0.18
+   
+ Other software:
+   graphviz-1.10
+
+=head1 INSTALLATION
+
+These instructions assume your cwd is the unpacked CPANXR distribution.
+
+=head2 Installing Perl modules
+
+ % perl Makefile.PL
+ % make
+ % make test
+ % make install
+
+=head2 Configuring apache
+
+If you want to run CPANXR under a virtual host, add the following to your httpd.conf.
+
+ # Load the CPANXR Apache handler
+ PerlModule CPANXR::Apache
+ 
+ <VirtualHost *>
+  # Replace this with the actual hostname to use
+  ServerName cpanxr.mycompany.com
+
+  # Change this to where you'll install the HTML support files
+  DocumentRoot /var/www/cpanxr.mycompany.com
+
+  <Location /cpanxr>
+   PerlHandler CPANXR::Apache
+   SetHandler  perl-script
+  </Location>
+ </VirtualHost>
+
+=head2 Installing the HTML files
+
+ % cp -R setup/html /var/www/cpanxr.mycompany.com
+ % chmod -R 755 /var/www/cpanxr.mycompany.com
+ % chown nobody:nogroup /var/www/cpanxr.mycompany
+
+Change the path I</var/www/cpanxr.mycompany.com> to whatever you specified in your httpd.conf. Change nobody:nogroup to the user and group that apache is configured to runs as.
+
+=head2 Installing and configuring the config file
+
+ % cp setup/conf/cpanxr.conf /etc
+ 
+Now, open I</etc/cpanxr.conf> and change to configuration to match your host. If your Apache runs under chroot, it is probablly wise to put XrRoot under the DocumentRoot.
+
+=head2 Put some distributions in the XrRoot directory
+
+The following assumes you have downloaded some Acme- modules and unpacked them into /var/cpan/
+
+ % cp -R /var/cpan/Acme-* /var/cpanxr/dists/
+ % chmod -R 755 /var/cpanxr/dists/
+ % chown -R nobody:nogroup /var/cpanxr/dists
+
+=head2 Install the database
+
+ % mysql -uroot -p < setup/setup-mysql.sql
+
+Will create a database named B<cpanxr>.
+
+=head2 Run the indexer
+ 
+ % cpanxr index
+
+=head2 Test
+
+Fire up your favorite web-browser and enter the URL to CPANXR on your host.
+
+=cut

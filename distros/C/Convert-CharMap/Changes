@@ -1,0 +1,15 @@
+[Changes for 0.10 - 2007-10-14]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.
+
+* The YAML backend now interoperates with YAML::Syck, YAML::Tiny,
+  YAML::XS, as well as YAML.pm.
+
+* Modernized the build infrastructure with Module::Install.
+
+* Tidied up source code, test files, and this changelog.
+
+[Changes for 0.01 - 2003-01-26]
+
+* First CPAN release.

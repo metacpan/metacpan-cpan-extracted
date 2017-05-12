@@ -1,0 +1,72 @@
+$Id
+
+--------
+Abstract
+--------
+
+Crypt::Nettle provides a Perl interface to the libnettle cryptographic
+functions.
+
+------------
+Requirements
+------------
+
+Crypt::Nettle requires that libnettle is installed on your system. You
+can use your favourite package manager or download the latest version
+of Nettle:
+
+  http://www.lysator.liu.se/~nisse/nettle/
+
+------------------
+Basic Installation
+------------------
+
+Crypt::Nettle may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'install Crypt::Nettle'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme Crypt::Nettle
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install Crypt::Nettle
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/D/DK/DKG/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+
+----------------
+Acknowledgements
+----------------
+
+Crypt::Nettle started off using Crypt::GCrypt as a template.  Thanks
+very much to Alessandro Ranellucci for the guidance.  All mistakes are
+my own, of course.
+
+Thanks for reading!
+
+-- Daniel Kahn Gillmor
+
+

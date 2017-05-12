@@ -1,0 +1,58 @@
+Revision history for CPAN-Critic-Module-Abstract
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.05    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update renamed module SHARYANTO::Package::Util ->
+	  Package::MoreUtil.
+
+
+0.04     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+         - Rename CLI script.
+
+
+0.03     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.02     2012-08-09 (SHARYANTO)
+
+         - Catch redundant phrase 'Perl XS binding for' and 'Perl interface for'
+           [suggested by Ben Bullock].
+
+         - Rename function/command name (critique is the verb).
+
+         - Add policy: just_module_name.
+
+         - Adjust to Perinci::Sub::DepChecker 0.07.
+
+
+0.01     2012-07-17 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,72 @@
+NAME
+    CGI::AppBuilder::MapSpec - ETL map specifications module
+
+SYNOPSIS
+      use CGI::AppBuilder::MapSpec;
+
+      my $sec = CGI::AppBuilder:MapSpec->new();
+      my ($sta, $msg) = $sec->exe_sql($ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  run_ldspecs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    Return: $pr will contain the parameters adn output from running the
+    PL/SQL.
+
+  run_ldviews($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    Return: $pr will contain the parameters adn output from running the
+    PL/SQL.
+
+HISTORY
+    *   Version 0.10
+
+          This is the initial version ported from File::XLS2HTML test script on 11/17/2010.
+
+    *   Version 0.20
+
+          10/11/2011 (htu) - added run_ldviews 
+          11/21/2011 (htu) - added sql codes to insert a reord to sp_jobs table 
+                             in run_ldspecs and run_ldviews
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2009 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 667:
+        You forgot a '=back' before '=head1'
+

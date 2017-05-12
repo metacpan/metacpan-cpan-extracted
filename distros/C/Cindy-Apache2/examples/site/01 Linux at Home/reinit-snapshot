@@ -1,0 +1,24 @@
+#!/bin/sh
+# Dieses Skript wird nur beim Start im Runlevel 1
+# zwischen LVM und dem mounten der FS ausgef
+
+
+LOGVOL=home
+FULLVOL=/dev/volg1/$LOGVOL
+SNAP=$LOGVOL.old
+FULLSNAP=/dev/volg1/$SNAP
+COW=/dev/sdc1
+
+echo -n "LVM Snapshot $FULLSNAP wird entfernt."
+# Alten Snapshot droppen
+sync
+lvremove -f $FULLSNAP
+#lvrename $FULLSNAP $FULLSNAP.1
+
+sleep 5
+sync
+
+echo -n "LVM Snapshot $SNAP wird neu angelegt."
+# Snapshot neu anlegen
+lvcreate -l 19539 -c 512  -s -p r -n $SNAP $FULLVOL $COW
+

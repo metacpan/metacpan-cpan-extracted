@@ -1,0 +1,29 @@
+---
+abstract: 'Enhance Catalyst component injection'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst::Plugin::Session: '0.40'
+  Catalyst::Plugin::Session::State::Cookie: '0.17'
+  Catalyst::Test: '0'
+  HTTP::Request::Common: '0'
+  Scalar::Util: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-InjectionHelpers
+requires:
+  Catalyst: '5.90090'
+  Moose: '2.0602'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers/issues
+  homepage: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers
+  repository: https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers.git
+version: '0.009'

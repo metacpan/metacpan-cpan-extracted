@@ -1,0 +1,82 @@
+{
+   "abstract" : "Catalyst internationalisation (I18N) framework",
+   "author" : [
+      "Maroš Kollár"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-I18N",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Catalyst::Plugin::Session" : "0",
+            "Catalyst::Plugin::Session::State::Cookie" : "0",
+            "Catalyst::Plugin::Session::Store::File" : "0",
+            "Catalyst::View::TT" : "0",
+            "ExtUtils::MakeMaker" : "6.59",
+            "JSON" : "2.17",
+            "Template" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.80004",
+            "Clone" : "0",
+            "Data::Localize" : "0",
+            "Data::Localize::Format::Gettext" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::CLDR" : "0",
+            "DateTime::Locale" : "0.40",
+            "DateTime::TimeZone" : "0",
+            "HTTP::BrowserDetect" : "1.09",
+            "IP::Country" : "0",
+            "Locale::Geocode" : "0",
+            "Locale::Maketext" : "0",
+            "Locale::Maketext::Lexicon" : "0",
+            "Moose" : "0",
+            "MooseX::Types::DateTime" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Number::Format" : "0",
+            "POSIX" : "0",
+            "Path::Class" : "0",
+            "Unicode::Collate" : "0",
+            "namespace::autoclean" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/maros/CatalystX-I18N.git"
+      }
+   },
+   "version" : "1.13"
+}

@@ -1,0 +1,51 @@
+<body id="doc" class="yui-t1">
+<div id="hd">
+    <div id="headers">
+        <h1 class="title"><% _($title) %></h1>
+    </div>
+    <& sidebar &>
+</div>
+<div id="bd">
+    <div id="yui-main">
+        <div class="yui-b">
+            <% Jifty->web->render_messages %>
+            <% $m->content |n%>
+        </div>
+    </div>
+    <div class="yui-b">
+        <div id="navigation">
+        <& /_elements/menu, menu => Jifty->web->navigation &>
+        </div>
+    </div>
+</div>
+<div id="ft">
+    <p class="copyright">
+    Powered by <%Jifty->web->link( url => "/", label => _(Jifty->config->framework('ApplicationName')))%><br>
+    By <a href="http://bestpractical.com/">Best Practical Solutions</a>
+    </p>
+</div>
+
+  <div id="content">
+    <a name="content"></a>
+% if (Jifty->config->framework('AdminMode') ) {
+<div class="warning admin_mode">
+<%_('Alert')%>: <% Jifty->web->tangent( label => _('Administration mode is enabled.') , url => '/__jifty/admin/')%>
+</div>
+% }
+  <& /_elements/keybindings &>
+  </div>
+  <div id="jifty-wait-message" style="display: none"><%_('Loading...')%></div>
+% Jifty::Mason::Halo->render_component_tree() if (Jifty->config->framework('DevelMode') );
+</body>
+</html>
+% Jifty->handler->stash->{'in_body'} = 0;
+<%args>
+$title => ""
+</%args>
+<%init>
+# First we set up the header. 
+$m->comp( 'header', title => $title);
+# now that we've printed out the header, we're inside the body, so it's safe to print
+# halo markers.
+Jifty->handler->stash->{'in_body'} = 1;
+</%init>

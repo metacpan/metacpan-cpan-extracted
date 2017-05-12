@@ -1,0 +1,46 @@
+Revision history for Perl extension CGI::Application::Plugin::ConfigAuto
+
+1.33 March 1st, 2011
+    (no meaningful code changes)
+    [DOCUMENTATION]
+    Document the recommended use of "my" in the example config file.  (Zakarias Santanu)
+
+1.32 Thu Feb 25 23:28:15 EST 2010
+    (no code changes)
+    [TESTS] 
+    Attempted test fix to address: Global symbol "%CFG" requires explicit package name
+
+1.31 Mon Jul 20 15:27:42 EDT 2009
+   [DOCUMENTATION]
+   - Fix a couple of broken documentation links (Lyle Hopkins)
+
+1.30 Sat Feb 18 23:35:44 EST 2006
+
+   - comply with CGI::Application::Config::Standard 1.0. (Mark Stosberg)
+
+1.20 Sat Jul 23 18:37:14 EST 2005
+
+    - Update recommended usage syntax.
+
+1.10
+    - Make death messages more useful by 'croaking' instead of die'ing
+    - Docs clarified (Dan Horne)
+    - die if no valid configuration is found. (William McKee)
+    - Explicit file format can now be provided for files.
+
+1.00
+    - First release on CPAN.
+    - Documentation patch (William McKee)
+
+0.21 Mon Sep  6 18:03:23 EST 2004
+    - Added missing t/basic_config.pl to distribution (William McKee)
+
+0.20 Mon Sep  6 16:24:23 EST 2004
+    - Add support for return config info as a hashref (William McKee)
+
+0.10 Mon Sep  6 12:11:08 EST 2004
+    - added cfg_file(), a simpler syntax for providing config file names.
+
+0.02 Sun Sep  5 18:47:48 EST 2004
+	- initial release
+

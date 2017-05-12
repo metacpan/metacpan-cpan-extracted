@@ -1,0 +1,130 @@
+# NAME
+
+Catalyst::Plugin::RedirectTo - Easier redirects to action objects or private paths.
+
+# SYNOPSIS
+
+Use the plugin in your application class:
+
+    package MyApp;
+    use Catalyst 'RedirectTo';
+
+    MyApp->setup;
+
+Then you can use it in your controllers:
+
+    package MyApp::Controller::Example;
+
+    use base 'Catalyst::Controller';
+
+    sub does_redirect_to :Local {
+      my ($self, $c) = @_;
+      $c->redirect_to( $self->action_for('target'), [100] );
+    }
+
+    sub does_redirect_to_action :Local {
+      my ($self, $c) = @_;
+      $c->redirect_to_action( 'example/target', [100] );
+    }
+
+    sub target :Local Args(1) {
+      my ($self, $c, $id) = @_;
+      $c->response->content_type('text/plain');
+      $c->response->body("This is the target action for $id");
+    }
+
+# DESCRIPTION
+
+Currently if you want to setup a redirect in [Catalyst](https://metacpan.org/pod/Catalyst) to an existing action the
+proper form is somewhat verbose:
+
+    $c->response->redirect(
+      $c->uri_for(
+        $c->controller(...)->action_for(...), \@args, \%q
+      )
+    );
+
+Which is verbose enough that i probably encourages people to do the wrong thing
+and use a hard coded link path in the redirect request.  This might later bite
+you if you need to change your controllers and URL hierarchy.
+
+Also, for historical reasons the default redirect code is 302, which is considered
+a temporary redirect, rather than 303 which is a better default for the common use
+case of a form POST that generates a new resource.  Which means to do the right
+thing you really need:
+
+    $c->response->redirect(
+      $c->uri_for(
+        $c->controller(...)->action_for(...), \@args, \%q
+      ),
+      303
+    );
+
+This plugin seeks to relieve some of the effort involved in doing the right thing.
+It does this by creating a context method which encapulates the redirect response
+setup (and sets a 303 by default, since that is the common case today) with a call
+to 'uri\_for' (or 'uri\_for\_action').  So instead of the above you can just do:
+
+    $c->redirect_to($c->controller(...)->action_for(...), \@args, \%q);
+
+or even:
+
+    $c->redirect_to_action('controller/action', \@args, \%q);
+
+Which hopefully is a good encapsulation of 'the right thing to do'!
+
+**NOTE:** Please be aware that setting up a redirect does not automatically detach or
+complete the action.  You still should either return the redirect or call 'detach'
+if you want to stop action processing.
+
+# METHODS
+
+This plugin adds the following methods to your context
+
+## redirect\_to ($action\_obj, \\@args, \\%query, \\$code)
+
+Example:
+
+    $c->redirect_to( $action_obj, \@args, \%query, \$code);
+
+Is shorthand for:
+
+    $c->response->redirect(
+      $c->uri_for( $action_obj, \@args, \%query), $code);
+
+$code will default to 303 (not 302 as does $c->res->redirect) as this is commonly
+supported in modern browsers, so unless you have a specific need for an alternative
+response code, you should be able to just leave it off.
+
+For example:
+
+    $c->redirect_to($self->action_for($action_name), \@args);
+
+Basically all the arguments to this method will be sent to ->uri\_for, unless the
+last argument is a scalar ref, in which case it will be used to set the HTTP status
+code.  $code must be '3xx' (a valid current or future redirect status).
+
+Does not detach or return the current action (just like the existing method)!
+
+**NOTE:** Please notice that if you want to set a status code other than 303, that
+code must be added to the argument list as a scalar ref.  This is needed to
+distinguish from an argument that gets passed to 'uri\_for'.
+
+## redirect\_to\_action
+
+Same as 'redirect\_to' but submits the arguments to 'uri\_for\_action' instead.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Response](https://metacpan.org/pod/Catalyst::Response)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

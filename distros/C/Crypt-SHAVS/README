@@ -1,0 +1,33 @@
+Crypt-SHAVS version 0.02
+========================
+
+Crypt::SHAVS automates the checking of any SHA implementation by comparing
+its behavior against the detailed test vectors of NIST's SHA Validation
+System (SHAVS).  The capability extends to the testing of upcoming SHA-3
+implementations as well, assuming the continued use of SHAVS by NIST.
+
+See the "scripts" directory for programs that automate the checking of
+various CPAN SHA implementations.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Mark Shelor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

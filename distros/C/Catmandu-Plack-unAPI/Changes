@@ -1,0 +1,7 @@
+Revision history for Catmandu-Plack-unAPI
+
+0.11  2014-10-06 14:04:19 CEST
+    - support unAPI from a Catmandu::Store
+
+0.10  2014-10-06 12:38:36 CEST
+    - Initial release

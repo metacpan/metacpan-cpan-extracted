@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Metrics.pm
+lib/Parser.pm
+lib/Graph.pm
+lib/TaggedChart.pm
+bin/cvs_activity
+bin/cvs_energy
+bin/cvs_tklog
+bin/cvs_wxlog
+bin/cvs_current
+bin/cvs_revbytag
+bin/cgi_cvs_evolq
+bin/cgi_cvs_evolr
+README
+test.pl
+t/pod.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

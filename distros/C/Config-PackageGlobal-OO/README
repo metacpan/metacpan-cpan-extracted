@@ -1,0 +1,55 @@
+NAME
+    Config::PackageGlobal::OO - A generic configuration object for modules
+    with package global configuration
+
+SYNOPSIS
+            use Hash::Merge;
+            use Config::PackageGlobal::OO;
+
+            my $o = Config::PackageGlobal::OO->new( "Hash::Merge", qw/merge/ );
+
+            $o->behavior( RIGHT_PRECEDENT );
+
+            my $rv = $o->merge( $hash, $other );
+
+            Hash::Merge::set_behavior(); # this is returned to it's previous value
+
+DESCRIPTION
+    Modules with a package-global configuration tend to be tricky to use
+    uninvasively.
+
+    Typically you see code like:
+
+            sub mydump {
+                    my ( $self, @values ) = @_;
+
+                    local $Data::Dumper::SomeVar = $my_setting;
+                    Data::Dumper::Dumper( @values );
+            }
+
+    Now, Data::Dumper specifically has an OO interface precisely to solve
+    this problem, but some modules, like Hash::Merge do not.
+
+    This module provides a generic wrapper object for modules that need this
+    kind of fudging in a safe an easy way.
+
+METHODS
+    new $package, @functions
+        This method returns an object that wraps around $package, and
+        provides action methods that wrap around every element in
+        @functions.
+
+    AUTOLOAD
+        Calls to the wrapper methods will invoke the action.
+
+        Calls to any other method will set a value that will be set before
+        every action, and rolled back after every action.
+
+AUTHOR
+    Yuval Kogman <nothingmuch@woobling.org>
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2006 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

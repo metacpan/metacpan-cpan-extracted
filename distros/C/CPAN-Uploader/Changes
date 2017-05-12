@@ -1,0 +1,100 @@
+Revision history for CPAN-Uploader
+
+0.103013  2016-09-06 19:18:12-04:00 America/New_York
+        - the cpan-uploader program now skips directories, while the
+          upload_file method throws an exception on non-files; thanks to
+          Vincent Pit for reporting the weird behavior when trying to upload a
+          directory
+
+0.103012  2015-12-31 21:41:09-05:00 America/New_York
+        - don't chomp undef (Graham Knop)
+
+0.103011  2015-10-05 21:45:26-04:00 America/New_York
+        - document the availability of Config::Identity-based encrypted config
+
+0.103010  2015-08-10 22:23:25-04:00 America/New_York
+        - add --md5 option to print md5sum of uploaded files (Vincent Pit)
+
+0.103009  2015-05-27 13:56:16-04:00 America/New_York
+        - Do (minor) validation on the user in the config file (Mark Fowler)
+
+0.103008  2015-02-08 22:09:59-05:00 America/New_York
+        - fix documentation link to cpan-upload/CONFIGURATION (Kent Fredric)
+        - you can now "cpan-upload http://some.cool/file.tgz" (Barbie)
+        - add --ignore-errors for cpan-upload (perlancar)
+
+0.103007  2014-04-04 22:02:22-04:00 America/New_York
+        - added "-c" option to cpan-uploader to specify an alternate config
+
+0.103006  2013-12-13 08:18:36 America/New_York
+          update bugtracker and repo metadata
+
+0.103005  2013-07-01 19:01:17 America/New_York
+          Use Config::Identity to permit GPG-encrypting on-disk credentials
+          (thanks, Mike Doherty)
+
+0.103004  2013-03-12 15:51:43 America/New_York
+          like 0.103003, but a production release
+
+0.103003  2013-01-30 21:22:12 America/New_York
+          use https by default (thanks, Mike Doherty)
+
+0.103002  2012-12-24 22:00:44 America/New_York
+          cpan-uploader now can take a list of filenames to upload (Thanks,
+          Gabor Szabo!)
+
+0.103001  2012-03-26 08:32:44 America/New_York
+          Small fixes about upload_uri usage (Getty)
+
+0.103000  2011-04-07 22:05:13 America/New_York
+          allow an alternate upload_uri via constructor arg or env var
+
+0.102150  2010-08-03 18:34:27 America/New_York
+          allow automatic use of proxy from environment
+
+0.101670  2010-06-16 07:44:32 America/New_York
+          only print HTTP headers, not body
+
+0.101550  2010-06-04 00:00:50 America/New_York
+          minor tweak to the user-agent string sent
+
+0.101260  2010-05-06 22:48:37 America/New_York
+          move config file reading into CPAN::Uploader and out of the bin
+          better error message if no username is provided
+          no longer fails if ~/.pauserc is missing
+          eliminate spurious warnings
+
+0.100760  2010-03-17 12:14:52 America/New_York
+          fix internal log_debug to not try logging $self (thanks, Chris
+          Prather)
+
+0.100750  2010-03-16 09:29:19 America/New_York
+          prompt for password if using -u to specify a user not in config file
+
+0.100660  2010-03-07 10:49:55 America/New_York
+          make the log and log_debug methods public
+
+0.093390  2009-12-05 20:59:51 America/New_York
+          include docs on cpan-uploader command
+
+0.093330  2009-11-29 17:47:16 America/New_York
+          prompt for password if none is in config (patch from David Caldwell)
+          re-release to include a META.yml for cpandeps
+
+0.091270  2009-05-07
+          refactor internals, improve options handling, --dry-run (sungo)
+
+0.005     2008-11-09
+          handle but ignore -verbose to work with Module::Install
+
+0.004     2008-10-24
+          add URI prereq
+
+0.003     2008-06-08
+          make cpan-upload install
+
+0.002     2008-06-06
+          refactored code further, added upload script (not installed)
+
+0.001     2008-06-06
+          first release

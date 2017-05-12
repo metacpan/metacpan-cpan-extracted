@@ -1,0 +1,109 @@
+Revision history for CLI::Framework
+
+0.01    2009-06-18
+
+        Initial release.
+
+0.02    2009-06-18
+
+        Documentation corrections.
+
+0.03    2009-09-20
+
+        * Corrected broken dependencies (Exception::Class)
+
+        * Documentation improvements
+            + refined existing documentation
+            + added Tutorial
+
+        * Concept of "session" replaced with the "cache" (which can hold data shared
+          between separate components of a CLIF application)
+
+        * Now supporting custom error handling capability (new handle_exception() hook)
+
+        * Built-in command CLI::Framework::Command::Menu improved for better
+          formatting
+
+        * New features
+            + inline declaration of CLIF subclasses (both Application and
+              Command classes) is now supported (one file can contain everything)
+            + new built-in command CLI::Framework::Command::Alias
+
+        ***
+        *** ATTENTION: interface has changed! Most noteworthy changes follow...
+        ***
+
+        * REPLACED  CLI::Framework::Application::is_valid_command()
+          WITH      is_valid_command_pkg()
+          AND       is_valid_command_name()
+        * REMOVED   CLI::Framework::Application::command_search_path()
+          (no longer needed with the new command registration strategy)
+        * CHANGED   CLI::Framework::Application::get_registered_command_names()
+          TO        registered_command_names()
+        * REMOVED   CLI::Framework::Command::get_registered_command_names()
+        * CHANGED   CLI::Framework::Command::get_registered_command()
+          TO        registered_command_object()
+        * CHANGED   CLI::Framework::Command::get_registered_subcommand()
+          TO        registered_subcommand_object()
+        * REMOVED   CLI::Framework::Command::register_command()
+        * ADDED     CLI::Framework::Command::package_is_registered()
+        * CHANGED   CLI::Framework::Application::is_interactive()
+          TO        get_interactivity_mode()
+        * CHANGED   CLI::Framework::Command::Meta::app() changed
+          TO        get_app()
+        * REPLACED  CLI::Framework::Application::valid_commands()
+          WITH      CLI::Framework::Application::command_map()
+                    (a hash mapping command names to package names)
+
+        * CLI::Framework::Application::run() now accepts param 'initialize'
+
+0.04    2010-03-31
+
+        * Fixed inconsistency in exception handling (http://cpanforum.com/posts/12419)
+
+        * Fixed failing tests (some test scripts depended on DBI and DBD::SQLite,
+          which are not (and should not be) dependencies of the distribution)
+
+        * Added CLI::Framework package to satisfy CPAN's requirements for
+          finding the ABSTRACT for a distribution
+            + ***NOTE***: CLIF Application classes can now inherit from
+              CLI::Framework instead of CLI::Framework::Application (both work
+              equivalently)
+
+        * documentation updates
+            + link corrections, better explanation of some concepts
+            + moved general framework documentation from
+              CLI::Framework::Application POD to CLI::Framework POD
+            + added class diagram
+
+        ***
+        *** ATTENTION: one (minor) interface change:
+        ***
+        * in CLI::Framework::Exceptions, changed throw_app_args_exception() to
+          throw_invalid_cmd_exception()
+
+0.05    2011-03-10
+
+        * RT #56882: Fixed to use autohistory if the system's local ReadLine
+                     supports it.
+
+        * RT #56885: EOF now treated like a quit signal
+
+        *** ATTENTION: updates that affect the interface...
+
+        * RT #56887: The order of the commands shown in the built-in interactive
+                     menu is now determined by the order the commands are
+                     declared in command_map.
+
+                     The Application hook method "command_map" should now
+                     return a (hash-worthy) list, not a HASH ref.
+                     
+                     To upgrade a CLIF app to be compatible with this release,
+                     change the definition of command_map() to return a list
+                     (see documentation for CLI::Framework::Application::command_map)
+                     and remember to change calls to that method if necessary.
+
+                     Also see the new CLIF Application method, command_map_hashref().
+
+        * New method CLI::Framework::Application::command_map_hashref()
+          returns a HASH ref constructed from the command_map() list.

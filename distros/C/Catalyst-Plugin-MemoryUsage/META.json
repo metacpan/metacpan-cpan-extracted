@@ -1,0 +1,83 @@
+{
+   "abstract" : "Profile memory usage of requests",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Plugin-MemoryUsage",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CheckOS" : "0",
+            "List::Util" : "0",
+            "MRO::Compat" : "0",
+            "Memory::Usage" : "0",
+            "Moose::Role" : "0",
+            "Number::Bytes::Human" : "0",
+            "Text::SimpleTable" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Controller" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "Test::WWW::Mechanize::Catalyst" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Catalyst::Plugin::MemoryUsage" : {
+         "file" : "lib/Catalyst/Plugin/MemoryUsage.pm",
+         "version" : "v0.4.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-catalyst-plugin-memoryusage at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-MemoryUsage"
+      },
+      "homepage" : "http://search.cpan.org/dist/Catalyst-Plugin-MemoryUsage/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Catalyst-Plugin-MemoryUsage.git",
+         "web" : "https://github.com/yanick/Catalyst-Plugin-MemoryUsage"
+      }
+   },
+   "version" : "0.4.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK"
+}
+

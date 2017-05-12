@@ -1,0 +1,29 @@
+Revision history for Carp-Parse
+
+1.0.7   11/15/2012
+        Requring Perl 5.10, because I use the // operator.
+		
+1.0.6   10/24/2012
+        Things blow up if it can't find the line number; added a default of ''.
+
+1.0.5   10/24/2012
+        Fixed an uninitialized value error when the line number is not available.
+
+1.0.4   10/10/2012
+        Fixed dependency list.
+		Cleanup of build issues when moving to github.
+
+1.0.3   09/26/2012
+        Moved code to github.
+		Changed license to GPL_3.
+
+1.0.2   03/07/2012
+        Fixed quote parsing for older versions of Carp.
+        Added better handling of misquoted argument strings.
+        Added test cases.
+
+1.0.1   02/28/2012
+        Upgraded Module::Build for consistency with co-author.
+
+1.0.0   02/28/2012
+        First public release.

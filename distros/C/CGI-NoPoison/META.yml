@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-NoPoison
+version:      3.11
+version_from: lib/CGI/NoPoison.pm
+installdirs:  site
+requires:
+    CGI:                           3.1
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

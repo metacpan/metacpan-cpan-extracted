@@ -1,0 +1,208 @@
+Newsgroups: comp.lang.perl.misc
+Subject: Re: HELP: use XS for C -> Perl or only for Perl -> C ??
+Summary: 
+Expires: 
+References: <4f54rn$57d@utrhcs.cs.utwente.nl>
+Sender: 
+Followup-To: 
+Distribution: world
+Organization: Cray Research, Inc.
+Keywords: 
+Cc: 
+
+In article <4f54rn$57d@utrhcs.cs.utwente.nl>,
+Arnoud R. Zwemmer <zwemmer@cs.utwente.nl> wrote:
+>I read lots of manual pages about linking C and Perl code, but I don't
+>quite get everyting:
+
+>2. What to do with complex datatypes:
+>   In C, I have a list of structures. I want my Perl function to return
+>   values, place these in the list of structures I have and return a
+>   pointer to this list to the calling C function.
+>
+>   I don't know how to do that:
+>     - should the Perl function return a reference to a hash containing
+>       all information that needs to be set in the list of structures?
+
+You can do that.  I don't generally do a whole-sale Perl-to-C or C-to-Perl
+conversion of a datatype unless I have to.  I usually prefer to allow it to
+be opaque on the Perl side, then call to the C side to get and set values in
+that datatype.
+
+
+>I'm really at a loss here, I hope someone can tell me more about this. Lots
+>of info can be found on passing integers and character strings between Perl
+>and C and I have no problem with that, but I don't know what to do with
+>complex datastructures.
+
+We do need a cookbook.  I have a collection of examples that I tweak to
+answer questions like these, but it'll take a while until I can get all of
+them out to CPAN.  Unfortunately, few of them are documented as well as the
+following example (if you count this article as its documentation).
+
+Here's an example of manipulating a list of C structures from Perl.  The C
+structures are treated like Perl objects, and the objects' class is given a
+constructor/destructor so Perl can malloc/free the structs.  The class also
+contains methods/functions which let Perl set values in a struct and which
+let Perl link up and traverse a list of these structs.
+
+Here is the C struct.  We'll need a typemap for the PAIR type--I'll include
+that later.
+
+	struct PAIR {
+		double time;
+		double rate;
+		struct PAIR *next;
+	};
+	typedef struct PAIR PAIR;
+
+Here are the functions which let Perl malloc/free a PAIR.
+
+	PAIR *
+	new(CLASS)
+		char *CLASS
+	    CODE:
+		RETVAL = (PAIR *)safemalloc(sizeof(PAIR));
+		RETVAL->time = 0.0;
+		RETVAL->rate = 0.0;
+		RETVAL->next = NULL;
+	    OUTPUT:
+		RETVAL
+
+	void
+	DESTROY(self)
+		PAIR *self
+	    CODE:
+		safefree(self);
+
+Here are functions that let Perl build a list of PAIRs and fill the values
+in an individual PAIR struct.
+
+
+	void
+	push(self,pair)
+		PAIR *self
+		PAIR *pair
+	    CODE:
+		self->next = pair;
+
+	void
+	fill(self,t,r)
+		PAIR *self
+		double t;
+		double r;
+	    CODE:
+		self->time = t;
+		self->rate = r;
+
+Here's some Perl code that will use those functions:
+
+	use CookBookB::ListOfStruct;
+	$a = CookBookB::ListOfStruct->new;
+	$b = CookBookB::ListOfStruct->new;
+
+	$a->fill( 1.2, 1.3 );
+	$b->fill( 1.4, 1.5 );
+	$a->push($b);
+	$a->foo;
+
+That last function, &foo, is an XSUB that will print out the PAIR list.
+
+You'll need a typemap for the PAIR type.  The general idea is that the
+object is opaque on the Perl side, so Perl just needs to carry a C
+pointer--it doesn't actually need to know what a PAIR is.  I like to use my
+O_OBJECT (opaque object) typemap for this:
+
+	TYPEMAP
+
+	PAIR *	O_OBJECT
+
+	OUTPUT
+
+	# The Perl object is blessed into 'CLASS', which should be a
+	# char* having the name of the package for the blessing.
+	O_OBJECT
+		sv_setref_pv( $arg, CLASS, (void*)$var );
+
+	INPUT
+
+	O_OBJECT
+		if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+			$var = ($type)SvIV((SV*)SvRV( $arg ));
+		else{
+			warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+			XSRETURN_UNDEF;
+		}
+
+This same O_OBJECT typemap can be used for pretty much anything.  I even use
+it for C++ classes (and you'll find it in the C++ section of the latest
+perlxs manpage).
+
+Now the caveat.  With a linked list like this you have to be careful that
+you don't free something on the C side while the Perl side still thinks it's
+active.  I suppose the proper way to have this handled is for the push()
+XSUB to increment the Perl refcount of the 'pair' argument, and then for the
+DESTROY XSUB to decrement the Perl refcount of 'self->next' if 'self->next'
+is non-NULL.  This means 'self->next' should probably be an SV* rather than
+a PAIR*.  Decrementing that refcount will cause a domino effect as Perl
+starts calling destructors for each of the structures in the list.
+
+To address the caveat change the C struct to use a Perl object, an SV*, for
+its 'next' pointer:
+
+	struct PAIR {
+		double time;
+		double rate;
+		SV *sv_next;
+	};
+	typedef struct PAIR PAIR;
+
+Change the constructor (just update it because we changed 'next' to
+'sv_next'--the name was changed so we have a visual reminder that 'next' is
+an SV* rather than a C pointer to another PAIR*).  The destructor is changed
+to release the refcount of any other object that 'self' may be holding a
+reference to:
+
+	PAIR *
+	new(CLASS)
+		char *CLASS
+	    CODE:
+		RETVAL = (PAIR *)safemalloc(sizeof(PAIR));
+		RETVAL->time = 0.0;
+		RETVAL->rate = 0.0;
+		RETVAL->sv_next = NULL;
+	    OUTPUT:
+		RETVAL
+
+	void
+	DESTROY(self)
+		PAIR *self
+	    CODE:
+		printf("freeing PAIR(%g,%g)\n", self->time, self->rate );
+		if( self->sv_next != NULL ){
+			/* release our reference to the object in self->sv_next */
+			SvREFCNT_dec( self->sv_next );
+		}
+		safefree(self);
+
+The push() XSUB should be updated.  The 'self' object will be holding a
+reference to another PAIR* now, so that PAIR's refcount should be
+incremented to reflect this.
+
+	void
+	push(self,sv_pair)
+		PAIR *self
+		SV *sv_pair
+	    CODE:
+		self->sv_next = SvRV( sv_pair );
+		/* tell 'self->sv_next' that we have a reference to it */
+		SvREFCNT_inc( self->sv_next );
+
+The typemap doesn't change.  The fill() XSUB doesn't change.  The foo() XSUB
+has a significant change: it must now deal with an sv_next and know how to
+dereference it down to a PAIR*.
+
+The full working example is included here.
+
+Dean
+roehrich@cray.com

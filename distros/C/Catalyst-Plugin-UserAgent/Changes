@@ -1,0 +1,7 @@
+Revision history for Perl module Catalyst::Plugin::UserAgent
+
+0.01    2006-07-05 14:48    Andrew Sterling Hanenkamp
+
+    * Initial release of Catalyst::Plugin::UserAgent
+    * original version; created by ExtUtils::ModuleMaker 0.47
+

@@ -1,0 +1,28 @@
+        <div id="addListPanel">
+         <div class="hd"></div>
+         <div class="bd"></div>
+        </div>
+        
+        <script type="text/javascript">
+        /* <![CDATA[ */
+        
+        // create a overlay panel that uses the div
+        YAHOO.crud.addRowMatrix = new YAHOO.widget.ResizePanel(
+                'addListPanel', 
+                { 
+        // modal will deactivate the rest of the page while panel is active
+        // but page size calculation is broken under FF for OSX (at least)
+        // since so much of the page
+        // is loaded dynamically.
+                    //modal: true,
+                    width: "750px",
+                    fixedcenter: true, 
+                    constraintoviewport: true, 
+                    visible: false
+                    
+                } );
+                
+        YAHOO.crud.addRowMatrix.render();
+                         
+        /* ]]> */
+        </script>

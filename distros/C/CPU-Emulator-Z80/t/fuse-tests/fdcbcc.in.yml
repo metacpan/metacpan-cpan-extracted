@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 45
+    - 204
+  5414:
+    - 78
+name: fdcbcc
+registers:
+  AF: 3919
+  AF_: 0
+  BC: 609
+  BC_: 0
+  DE: 8624
+  DE_: 0
+  HL: 8343
+  HL_: 0
+  I: 0
+  IX: 22365
+  IY: 5369
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,70 @@
+Revision history for Config-Context
+
+0.10    2005-Nov-06
+        - there are no changes to the Config::Context itself in this
+          release.  The only changes are to the test suite.
+        - this version should pass all its tests under Cygwin and native Windows
+        - fixed test failures when running the distribution on a remote
+          filesystem where the timestamp of created files cannot be
+          changed to the current time
+        - fixed problem in one of the tests that loaded a writable
+          Config::Scoped file under windows
+        - fixed warnings about test XML files not having explicit
+          character encodings (in newer versions of SAX::Parser::PurePerl)
+        - fixed a test error in includes.t that made it fail on
+          case-insensitive filesystems
+        - fixed test failures on some platforms where Cwd::abs_path
+          fails on a non-existent file
+        - fixed some bugs in file-caching.t
+           - in test "Modify before (short) statconfig: Caching ON: objects identical"
+             - wrong configs were being compared
+             - cleared the config cache before test
+        - fixed warning in includes.t when tests are run without Config::General installed
+        - changed misc/prove_without_modules.pl to misc/prove_prereqs.pl
+        - changed t/skip_lib to t/prereq_scenarios
+
+
+
+0.09    2005-Aug-12
+        - fixed a bug in the tests for testing module prerequisites
+        - it is now possible to run the test suite while simulating the
+          absense of specific config modules.  To run the test suite
+          multiple times (each with a different selection of absent
+          modules), run:
+
+             $ perl misc/prove_without_modules.pl t/*.t
+
+          To customize this process, see the instructions at the top of
+          misc/prove_without_modules.pl
+
+0.08    2005-May-??
+        - documentation fixes
+
+0.07    2005-May-06
+        - improved error messages when one or more of a driver's
+          prerequisite modules are missing
+
+0.06    2005-May-04
+        - Minor documentation fixes
+        - config option to new:
+          - removed the requirement to specify a driver
+          - added test case
+        - added 'files' method
+        - changed Config::General feature detection
+        - suppress warnings that appear under "perl -w" but not under
+          "use warnings" (for removing warnings during test suite)
+        - changed 'lower_case_names' in Config::Context::XMLSimple from
+          an error to a warning
+        - fixed XMLSimple driver so that system fails gracefully when
+          XML modules are not installed
+        - fixed tests to detect all prereqs of driver, instead of just
+          a single module (this was done mostly for XML::Simple which
+          depends on three modules)
+
+0.05    2005-Apr-24
+        - First internal version, based on Config::General::Match 0.04
+        - added Config::Scoped support
+        - added caching features from CGI::Application::Plugin::Config::General
+        - added XML::Simple support
+        - modified test suite to support multiple drivers
+

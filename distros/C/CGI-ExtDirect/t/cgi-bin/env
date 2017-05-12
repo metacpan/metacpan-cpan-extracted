@@ -1,0 +1,22 @@
+#!/bin/sh
+
+$PERL -x 3<&0 <<'END_OF_SCRIPT'
+#!perl
+
+use CGI::ExtDirect;
+
+use RPC::ExtDirect::Test::Pkg::Env;
+
+# 2 argument open() is here for older Perls
+open STDIN, '<&3' or die "Can't reopen STDIN";
+
+my %headers = ();
+
+my $exd = CGI::ExtDirect->new( debug => 1 );
+
+print $exd->route(%headers);
+
+exit 0;
+
+END_OF_SCRIPT
+

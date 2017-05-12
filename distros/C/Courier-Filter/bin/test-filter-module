@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+
+#
+# A tester for Courier::Filter modules.
+#
+# (C) 2003-2006 Julian Mehnle <julian@mehnle.net>
+# $Id: test-filter-module 210 2008-03-21 19:30:31Z julian $
+#
+##############################################################################
+
+=head1 NAME
+
+test-filter-module - A tester for Courier::Filter modules
+
+=head1 VERSION
+
+0.18
+
+=head1 SYNOPSIS
+
+B<test-filter-module> I<module> [I<options>] I<message> [+I<control> ...] [...]
+
+=head1 DESCRIPTION
+
+This is a tester for B<Courier::Filter> modules.  It sets up the specified
+Courier::Filter::Module::I<module> filter module, using any supplied
+I<options>, and then queries the filter module for consideration of the given
+I<message> file and zero or more I<control> files.  More than one
+message/control files tuple may also be specified, in which case the filter
+module is applied to each message and its respective control file(s).  Filter
+module options must be specified in the format -I<option>=I<expr>, where
+I<expr> may be any valid Perl expression.
+
+=head1 EXAMPLES
+
+=over
+
+=item B<test-filter-module> DNSBL -zones='["bl.foo.org", "bl.bar.org"]'
+test.rfc2822 +test.control
+
+Applies the Courier::Filter::Module::DNSBL filter module to the
+F<test.rfc2822>/F<test.control> message/control file tuple (taking the sending
+machine's IP address from the control file), using the blacklist DNS zones
+C<bl.foo.org> and C<bl.bar.org>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Courier::Filter::Overview>, L<Courier::Filter>
+
+For AVAILABILITY, SUPPORT, and LICENSE information, see
+L<Courier::Filter::Overview>.
+
+=head1 AUTHOR
+
+Julian Mehnle <julian@mehnle.net>
+
+=cut
+
+use warnings;
+use strict;
+
+use lib '/usr/share/courier-filter-perl/perl5';
+
+use IO::Handle;
+
+use Courier::Message;
+
+# Declarations:
+##############################################################################
+
+use constant TRUE   => (0 == 0);
+use constant FALSE  => not TRUE;
+
+use constant MODULE_NAME_PREFIX => 'Courier::Filter::Module::';
+
+# Implementation:
+##############################################################################
+
+if (@ARGV < 2 or $ARGV[0] =~ /^(?:-h|--help)$/) {
+    my $script_name;
+    ($script_name = $0) =~ s/^.*\///;
+    STDERR->print(
+        "Usage:\n" .
+        "    $script_name MODULE [OPTIONS] MESSAGE [+CONTROL ...] [...]\n" .
+        "\n" .
+        "Applies the " . MODULE_NAME_PREFIX . "MODULE filter module to the specified\n" .
+        "MESSAGE file and any CONTROL files (if specified).  Multiple MESSAGE files can\n" .
+        "be specified, and each one may be followed by any number of CONTROL files, each\n" .
+        "prefixed by a '+' character.\n" .
+        "Optionally, OPTIONS in the format -<option>=<expr> can be given to the MODULE\n" .
+        "constructor, where <expr> may be any valid Perl expression.\n" .
+        "\n" .
+        "Example:\n" .
+        "    $script_name \\\n" .
+        "        DNSBL -zones='[qw(bl.foo.org bl.bar.org)]' \\\n" .
+        "        test.rfc2822 +test.control\n" .
+        "\n"
+    );
+    exit(64); # EX_USAGE
+}
+
+my $module_name = shift();
+
+my %options;
+$options{$1} = eval($2), shift()
+    while $ARGV[0] =~ /^-(.*?)=(.*)/;
+
+my @messages;
+
+while (@ARGV) {
+    my $file_name = shift();
+    if ($file_name !~ /^\+(.*)/) {
+        # Message file:
+        my $message = Courier::Message->new(
+            file_name => $file_name
+        );
+        push(@messages, $message);
+    }
+    else {
+        # Control file, belonging to the previous message file:
+        STDERR->print("Orphan control file specified.  List a message file first.\n"), exit(64) # EX_USAGE
+            if not @messages;
+        push(
+            @{ $messages[$#messages]->{control_file_names} },
+            $1
+        );
+    }
+}
+
+my $class = MODULE_NAME_PREFIX . $module_name;
+
+eval("use $class;");
+if ($@) {
+    STDERR->print("Unable to load filter module $module_name ($class).\n");
+    exit(1);
+}
+
+my $module = $class->new(
+    %options,
+    testing => TRUE # Enable testing mode, so no real-life/persistent things are done.
+);
+
+foreach my $message (@messages) {
+    my ($result, $code) = $module->consider($message);
+    
+    if ($result) {
+        $code ||= 550;
+    }
+    else {
+        $result = 'Ok';
+        $code ||= 200;
+    }
+    
+    my @lines = split(/\n/, $result);
+    my $last_line = pop(@lines);
+    print($message->file_name . ": $code-$_\n") foreach @lines;
+    print($message->file_name . ": $code $last_line\n");
+}

@@ -1,0 +1,123 @@
+NAME
+    Class::CompoundMethods - Create methods from components
+
+VERSION
+    0.03
+
+SYNOPSIS
+      package Object;
+      use Class::CompoundMethods 'append_method';
+
+      # This installs both versioning_hook and auditing_hook into the
+      # method Object::pre_insert.
+      append_method( pre_insert => "versioning_hook" );
+      append_method( pre_insert => "auditing_hook" );
+
+DESCRIPTION
+    This allows you to install more than one method into a single method
+    name. I created this so I could install both versioning and auditing
+    hooks into another module's object space. So instead of creating a
+    single larger method which incorporates the functionality of both hooks
+    I created "append_method()"/"insert_method()" to install a wrapper
+    method as needed.
+
+    If only one method is ever installed into a space, it is installed
+    directly with no wrapper. Once there are two or more components, a hook
+    method is installed which will call each component in order.
+
+PUBLIC METHODS
+    append_method( $method_name, $method )
+         append_method( $method_name, $method );
+
+        This function takes two parameters - a method name and the method to
+        install.
+
+        $method_name may be fully qualified. If not, Class::CompoundMethods
+        looks for your method in your current package.
+
+         append_method( 'Object::something', ... );
+         append_method( 'something', ... );
+
+        $method may be either a code reference or a method name. It may be
+        fully qualified.
+
+         append_method( ..., sub { ... } );
+         append_method( ..., \ &some_hook );
+         append_method( ..., 'Object::some_hook' );
+         append_method( ..., 'some_hook' );
+
+    prepend_method( $method_name, $method )
+         prepend_method( $method_name, $method );
+
+        This function takes two parameters - a method name and the method to
+        install.
+
+        $method_name may be fully qualified. If not, Class::CompoundMethods
+        looks for your method in your current package.
+
+         prepend_method( 'Object::something', ... );
+         prepend_method( 'something', ... );
+
+        $method may be either a code reference or a method name. It may be
+        fully qualified.
+
+         prepend_method( ..., sub { ... } );
+         prepend_method( ..., \ &some_hook );
+         prepend_method( ..., 'Object::some_hook' );
+         prepend_method( ..., 'some_hook' );
+
+  EXAMPLES
+    Example 1
+         use Class::CompoundMethods qw(append_method);
+
+         # This installs both versioning_hook and auditing_hook into the
+         # method Object::pre_insert.
+         append_method( 'Object::something' => \ &versioning_hook );
+
+         package Object;
+         prepend_method( 'something' => \ &auditing_hook );
+
+    Example 2
+         package GreenPartyDB::Database;
+         use Class::CompoundMethods qw(append_method);
+
+         my @versioned_tables = ( ... );
+         my @audited_tables = ( ... );
+ 
+         for my $table ( @versioned_tables ) {
+            my $package = __PACKAGE__ . "::" . $table;
+            append_method( $package . "::pre_insert", \ &versioning_hook );
+            append_method( $package . "::pre_update", \ &versioning_hook );
+            append_method( $package . "::pre_delete", \ &versioning_hook );
+         }
+
+         for my $table ( @audited_tables ) {
+            my $package = __PACKAGE__ . "::" . $table;
+            append_method( $package . "::pre_insert", \ &auditing_hook );
+            append_method( $package . "::pre_update", \ &auditing_hook );
+            append_method( $package . "::pre_delete", \ &auditing_hook );
+         }
+
+  EXPORT
+    This class optionally exports the "append_method" and "prepend_method"
+    functions. It also uses the ':all' tag.
+
+     use Class::CompoundMethods qw( append_method );
+
+     use Class::CompoundMethods qw( :all );
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2005 Joshua ben Jore All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    Joshua ben Jore <jjore@cpan.org>
+
+SEE ALSO
+    RFC Class::AppendMethods
+    <http://www.perlmonks.org/index.pl?node_id=252199>
+
+    Installing chained methods
+    <http://www.perlmonks.org/index.pl?node_id=251908>
+

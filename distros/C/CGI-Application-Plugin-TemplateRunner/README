@@ -1,0 +1,34 @@
+CGI/Application/Plugin/TemplateRunner version 0.04
+================================================
+
+This module is a plugin for L<CGI::Application>
+that provides a runmode to automatically get
+the name of an HTML::Template from the path_info 
+string, load the template, fill it with data from an
+associated Perl data file and display the template.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Application
+  HTML::Template
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Thilo Planz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

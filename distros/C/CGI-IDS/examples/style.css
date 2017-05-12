@@ -1,0 +1,42 @@
+body {
+    font-family:        Verdana, Arial, sans-serif;
+    font-size:          12px;
+    margin:             20px;
+    padding:            0px;
+}
+
+textarea {
+    width:              100%;
+}
+
+table {
+    border:             1px solid black;
+    border-collapse:    collapse;
+    width:              100%;
+}
+table td {
+    vertical-align:     top;
+    border-bottom:      1px solid black;
+    padding:            2px;
+}
+td.title {
+    width:              11em;
+}
+pre {
+    margin:             0px;
+    padding:            0px;
+}
+p {
+    padding:            2px;
+}
+em {
+    background-color:   #EEEEEE;
+}
+.positive {
+    color:              #FFFFFF;
+    background-color:   #00AA00;
+}
+.negative {
+    color:              #FFFFFF;
+    background-color:   #AA0000;
+}

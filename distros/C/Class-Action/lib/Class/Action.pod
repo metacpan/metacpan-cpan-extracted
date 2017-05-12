@@ -1,0 +1,348 @@
+=head1 NAME
+
+Class::Action - Basic command pattern obj undo/rollback actions
+
+=head1 VERSION
+
+This document describes Class::Action version 0.4
+
+=head1 SYNOPSIS
+
+    use Class::Action;
+    
+    my $act = Class::Action->new();
+    $act->set_steps(...);
+    $act->execute() || die "Failed to do the thing but we did try to rollback: " . $act->get_errstr();
+        
+    my $action = Class::Action->new({
+        'auto_rollback' => 0,
+    });
+    
+    $action->append_steps_from_class('MyProj::Action::Thing');
+    
+    if (!$action->execute()) {
+        warn "Oops we failed to do the thing!";
+        # examine what happened in execute here if you like (via $action->get_execution_state and/or $action->get_errstr)
+        
+        if ($action->rollback()) {
+            print "We were able to undo the thing we had done.";
+        }
+        else {
+            warn "We were NOT able to fully undo the thing we had done.";
+            # examine what happened in rollback here if you like  (via $action->get_execution_state and/or $action->get_errstr)
+        }
+    }
+    
+    $action->reset();
+
+=head1 DESCRIPTION
+
+This module allows you to define a class that acts as a basic command pattern object that can be executed and subsequently undone.
+
+This is helpful for encapsulating complex tasks into a single entity.
+
+=head1 INTERFACE 
+
+=head2 Object setup related methods
+
+Note: all step stack modifying methods return an array of the stack after it has been modified. It can return nothing is stack is empty or there was a problem.
+
+=over 4
+
+=item new
+
+Create an action object. It can take a hashref as an argument that describes how the object should be built.
+
+The hash can have the following keys:
+
+=over 4
+
+=item 'auto_rollback'
+
+Boolean of whether to do auto rollback or not. Default is true.
+
+=item 'enable_cwd'
+
+Boolean of whether to call set_starting_cwd() at the beginning of execute()ing our step stack. Default is false.
+
+=item 'global_data'
+
+A hashref that is passed around between steps for aggregate behavior.
+
+=item 'step_stack'
+
+An array ref containing the L<Class::Action::Step> items that make up this action.
+
+'set_steps_from_class' overrides this data.
+
+=item 'set_steps_from_class'
+
+A L<Class::Action::Step> compatible class name or an array ref containg that class name followed by arguments to pass to the class's get_class_action_steps() method.
+
+=back
+
+=item set_steps
+
+Sets the object's 'step_stack' to the passed array or array ref containing the L<Class::Action::Step> items that make up this action.
+
+=item set_steps_from_class
+
+Sets the object's 'step_stack' to the given L<Class::Action::Step> compatible class's get_class_action_steps() value.
+
+Additional arguments are passed throught to get_class_action_steps().
+
+=item append_steps
+
+Same as set_steps() except it appends to any existing steps.
+
+=item append_steps_from_class
+
+Same as set_steps_from_class() except it appends to any existing steps.
+
+=item prepend_steps
+
+Same as set_steps() except it prepends to any existing steps.
+
+=item prepend_steps_from_class
+
+Same as set_steps_from_class() except it prepends to any existing steps.
+
+=item clone
+
+Get an identical but independent object in a fresh state.
+
+=item get_auto_rollback
+
+Returns the boolean on/off state of auto rollback mode.
+
+=item set_auto_rollback
+
+Sets the boolean on/off state of auto rollback mode.
+
+=item get_enable_cwd
+
+Returns the boolean on/off state of CWD mode.
+
+=item set_enable_cwd
+
+Sets the boolean on/off state of CWD mode.
+
+=back
+
+=head2 Action related methods
+
+=over 4
+
+=item execute
+
+Execute the steps in the stack that makes up the given action.
+
+Any arguments you pass are passed to each step in the stack.
+
+Returns true if all steps were successfully executed. Returns false if not all steps were successfully executed.
+
+=item rollback
+
+Rollback a failed execute().
+
+In auto rollback mode it is called with the same arguments as execute().
+
+Returns true if all steps were successfully rolled back. Returns false if not all steps were successfully rolled back. 
+
+It also returns false if you call it before execute() or after a successful execute().
+
+=item undo
+
+Undo a successful execute().
+
+Returns true if all steps were successfully undone. Returns false if not all steps were successfully undone. 
+
+It also returns false if you call it before execute() or after a failed execute().
+
+=item reset
+
+Reset the internal state of the object, inclduing all of the boolean items below.
+
+=item get_errstr
+
+Gets the last error, if any.
+
+=item get_starting_cwd
+
+Get the directory the script was in when it started running the steps.
+
+This is only set if get_enable_cwd() is true (i.e. you called get_enable_cwd(1) or passed 'enable_cwd' => 1 to new()).
+
+=item get_execution_state
+
+Returns an array ref which is a copy of the current state of the action.
+
+Each item is a hashref describing a step that was executed, rolled back, or undone.
+
+That hash has the following keys:
+
+=over 4
+
+=item 'errstr'
+
+The error, if any, as set by the current step.
+
+=item 'type'
+
+The type of context the step was run in: 'execute', 'rollback', or 'undo'.
+
+=item 'step'
+
+The step object's state() or name space if it's state method returns nothing.
+
+=item 'ns'
+
+The step object's namespace.
+
+=item 'status'
+
+This will be 1 if it was successful, undef() if it failed but we are trying it again, and 0 if it failed and we will are not trying it again.
+
+=back
+
+=item execute_called
+
+Boolean of whether execute() has been called yet or not.
+
+=item execute_failed
+
+Boolean of whether the last execute() call failed or not.
+
+=item rollback_called
+
+Boolean of whether rollback() has been called yet or not.
+
+=item rollback_failed
+
+Boolean of whether the last rollback() call failed or not.
+
+=item undo_called
+
+Boolean of whether undo() has been called yet or not.
+
+=item undo_failed
+
+Boolean of whether the last undo() call failed or not.
+
+=back
+
+=head2 Execute/Rollback related methods (mostly internal)
+
+=over 4
+
+=item get_steps
+
+Returns the array of the current steps.
+
+=item get_current_step
+
+Returns the index of step it is currently on.
+
+undef() means it has not started yet. An empty string means it has completed.
+
+=item is_at_end
+
+A boolean of whether the stack has been completed.
+
+=item is_at_start
+
+A boolean of whether the stack is at the beginning or not.
+
+=item next_step
+
+The index of the next step that will run. returns false (non-numeric) when there are no more steps after the current one.
+
+=item prev_step
+
+The index of the previous step that was run. returns false (non-numeric) when there was no step before the current one.
+
+=item set_errstr
+
+Sets the object's "last error".
+
+=item set_starting_cwd
+
+Brings in Cwd.pm if needed and stores Cwd::cwd() in the object.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< CLASS does not implement get_class_action_steps() >>
+
+The class name passed to set_steps_from_class(), append_steps_from_class(), or prepend_steps_from_class() does not have a get_class_action_steps() method.
+
+In this case of set_steps_from_class() the step stack will be empty. 
+
+In the case of append_steps_from_class() and prepend_steps_from_class() the step step is not modified.
+
+=item C<< This action has no steps. >>
+
+You've called a method (e.g. execute()) that operates on steps and there are no steps setup in the action object.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Class::Action requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+None.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-class-action@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 SEE ALSO
+
+L<Class::Action::Step>
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2009, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

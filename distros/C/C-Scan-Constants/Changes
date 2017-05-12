@@ -1,0 +1,106 @@
+Revision history for Perl extension C::Scan::Constants.
+
+1.020
+    - Moved author-only tests to conventional xt/author dir, with renames
+    - Changed kwalitee test slightly to force a plan always
+
+1.019
+    - Fixed Win32 test bug related to lack of cppstdin (use $Config{cc} -E)
+    - Made tests cross-platform
+    - Made POD coverage test optional
+    - Removed Makefile.PL prereqs related to POD checking
+    - Updated $VERSION to best practice style
+    - Updated #define in enums.h for consistency with other .h files
+    - Updated Makefile.PL to have no path sep issues, and to bail gracefully (exit 0 before Makefile is created) if gcc is not found.
+    - Updated Makefile.PL to reference bug tracking page and repo page
+
+1.018
+    - Fixed t/07-kwalitee.t to not have a typo in the skip directive.
+    - Fixed Constants.pm to use File::Spec->tmpdir() instead of pegging
+      the temp dir as /tmp (which breaks on Windows).  Thanks to Tobias Leich
+      for suggesting that easy fix.
+    - Added a test to t/03-extract.t to assure that we don't exclude
+      constants ending in _H[_]? -- along with fixes in Constants.pm.
+      Thanks to Lee Pumphret for pointing out the bug leading to this fix.
+    - Fixed Makefile.PL to be more robust at cleanup time on Windows.
+
+1.017
+    - Added pod-coverage and kwalitee tests (to improve kwalitee)
+    - Added ABSTRACT to Makefile.PL (to improve kwalitee)
+    - Change license to "perl" instead of "Perl" to conform
+      to list of valid licenses per Module::Build manpage (to improve kwalitee)
+    - Updated README to make copyright disclaimer less restrictive.
+
+1.016
+    - Thanks to cpan-testers reports from Solaris platforms
+      I discovered and fixed a bug in the way we handle STDERR.
+      Tests in test file 03 should now pass on Solaris too.
+
+1.015
+    - Corrected broken #endif in t/include/defines.h
+    - Added #ifdef __cplusplus logic in both test .h files
+    - Beefed up check in extract_constants_from() so we issue a warning
+      if we failed to find constants in an input .h file -- this should
+      help isolate failing test cases on some platforms
+    - Added Test::Pod test to improve Kwalitee
+    - Added support for LICENSE in Makefile.PL in improve Kwalitee
+
+1.014
+    - Strengthened test for built-in ModPerl::CScan -- if too old,
+      we force an upgrade to bundled version.
+    - Updated enums.h to have a different #ifndef header/trailer -- apparently
+      on some systems _ENUMS_H_ is already defined.
+    - Updated defines.h the same way, just in case.
+
+1.013
+    - Fixed special case of test 02 so it passes wherever blueprint
+      is installed.
+
+1.012
+    - Added Data::Flow to satisfy ModPerl::CScan prereqs.
+    - Fixed copying of bundled ModPerl::CScan in Makefile.pl -- "cp -a"
+      is not supported on many platforms, so using File::Copy::copy()
+      in conjuntion with Perl builtin mkdir() instead.
+    - Correct Pod syntax error (unbalanced =back on line 663).
+
+1.011
+    - Added contrib dir to MANIFEST
+
+1.010
+    - Adjusted suggested code snippet to have correct XS loading code
+
+1.009
+    - Adjusted documentation to properly represent version number
+
+1.008
+    - added ModPerl::CScan to this distro to avoid having to have
+      the full mod_perl distro installed ahead of time
+    - genericized and beefed up tests, including adding bundled .h files
+    - updated author contact info throughout
+    - insulated code from blueprint
+
+0.04 - 1.007
+    - arranged for constants to be forward-declared so they always
+      behave as constants, instead of as barewords in some circumstances.
+    - changed version to be tied to revision of .pm file.  This is
+      not entirely precise but generally hits the mark.  If the
+      version needs bumping at a later time due to a change somewhere
+      else I'll figure out a workaround then.
+    - migrated to ModPerl::CScan from C::Scan due to the fact that
+      the latter fails on many .h files, whereas the former does not
+    - fixed up constants to be properly mortalized
+
+
+0.03
+    - removed Readonly-related cruft since it's no longer used
+    - added special Blueprint (proprietary build system software)
+      tag to fix build-time non-warnings marked incorrectly as WARN
+
+0.02
+    - changed name to C::Scan::Constants (from original Foo::Constant)
+    - extracted pertinent parts from Foo::Constant into callable functions
+    - added tests for everything that is easy to test
+
+0.01  Thu Jun  2 11:23:42 2005
+	- original version; created by h2xs 1.23 with options
+		-n Foo::Constant

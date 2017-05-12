@@ -1,0 +1,13 @@
+<br />
+View action [% action.name %]:<br />
+
+<table>
+<tr><th>ID</th><th>Name</th><th></th><th></th></tr>
+  <tr>
+  <td>[% action.id %]</td>
+  <td>[% action.name %]</td>
+  <td><a href="[% c.uri_for('/admin/action/') %][% action.id %]/edit">Edit</a></td>
+  <td><a href="[% c.uri_for('/admin/action/') %][% action.id %]/del">Delete</a></td>
+  </tr>
+</table>
+<br />

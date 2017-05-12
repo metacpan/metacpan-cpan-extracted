@@ -1,0 +1,62 @@
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="plain_txt"; filename="test0.txt"
+Content-Length: 186
+Content-Type: text/plain
+
+This is a test of a plain text document.
+It has several lines of text,
+and can be used to test how the EOL characters
+are handled by CGI::Lite.
+It is not intended for any other purpose.
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="html_txt"; filename="test0.html"
+Content-Length: 212
+Content-Type: text/html
+
+<h1>This is a test of an HTML document</h1>
+<p>
+It has several lines of text,
+and can be used to test how the EOL characters
+are handled by CGI::Lite.
+</p>
+<p><b>It is not intended for any other purpose.</b></p>
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="plain_win_txt"; filename="test1.txt"
+Content-Length: 191
+Content-Type: text/plain
+
+This is a test of a plain text document.
+It has several lines of text,
+and can be used to test how the EOL characters
+are handled by CGI::Lite.
+It is not intended for any other purpose.
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="html_win_txt"; filename="test1.html"
+Content-Length: 219
+Content-Type: text/html
+
+<h1>This is a test of an HTML document</h1>
+<p>
+It has several lines of text,
+and can be used to test how the EOL characters
+are handled by CGI::Lite.
+</p>
+<p><b>It is not intended for any other purpose.</b></p>
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="html_notype"; filename="notype.html"
+Content-Length: 212
+
+<h1>This is a test of an HTML document</h1>
+<p>
+It has several lines of text,
+and can be used to test how the EOL characters
+are handled by CGI::Lite.
+</p>
+<p><b>It is not intended for any other purpose.</b></p>
+
+--`!"$%^&*()-+[]{}'@.?~#|aaa--
+

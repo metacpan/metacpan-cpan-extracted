@@ -1,0 +1,75 @@
+Revision history for Perl extension Catalyst::Plugin::Session::State::URI
+
+0.15   2010-09-23
+        - Read from $req->query_parameters rather than $req->parameters
+          in prepare_path to avoid race condition with POST requests with body
+
+0.14    2010-07-19
+        - Fix behaviour when debug is turned on by wrapping prepare_path
+          rather than prepare_action (RT#56753).
+        - Fix warning about test plugin inheriting from Catalyst::Component.
+        - Fix for loading the session ID with a cookie for some actions
+          and Session::State::URI for others (RT#57620)
+
+0.13    2009-10-16
+        - Port to new session config key.
+        - Port to Moose.
+
+0.12    2009-10-06
+        - Make tests not warn with latest version of Catalyst.
+        - Prefer session configuration to be in the 'Plugin::Session'
+          config key, but provide backwards compatibility for the
+          deprecated 'session' key.
+
+0.11    2009-07-25
+        - When rewriting URIs, avoid doubled slashes. While this is
+          mostly a cosmetic problem, if you issue a redirect with a
+          URI like "//-/...", some browsers (or Firefox 3.0, at least)
+          may get very confused. (Dave Rolsky)
+
+0.10    2009-07-11
+        - Separate rewrite config item into rewrite_body and
+          rewrite_redirect. The old config setting will still
+          work. (Dave Rolsky)
+        - Shut up warnings from test code with newer Catalyst-Runtime.
+          (Dave Rolsky)
+
+0.09    2009-03-26
+        - Avoid bug in URI::Find causing test fails (RT#44593)
+        - Remove use of NEXT missed last time from the test suite.
+
+0.08    2009-02-08
+        - Switch from NEXT to MRO::Compat (t0m)
+        - Switch to Module::Install
+        - pod fixes (RT #23749)
+
+0.07    2006-10-13
+        - Fix dependencies (URI::Find was in the Build.PL, but M::B is being
+          phased out so the makefile wasn't regenerated)
+        - Fix tests due to changed behavior in Test::MockObject
+
+0.06    2006-09-04
+        - reintroduce URI::Find based rewriting for non HTML bodies
+        - more robust storage of session id in $c, using the api
+        - rewriting of Location headers during redirects
+        - various refactorings
+
+0.05    2006-08-01
+        - DWIM behavior when using both State::Cookie and State::URI together,
+          through App->config->{session}{no_rewrite_if_cookie}.
+        - Add App->config->{session}{rewrite_types} = [qw/.../] support.
+
+0.04    2006-07-31
+        - rerelase with proper version dependencies
+
+0.03    2006-07-29 19:07
+        - Update to new session state plugin api (get_session_id)
+
+0.02    2006-01-20 17:30
+        - Rewriting is optional (gphat)
+        - Support relative uri rewriting
+        - Support parameter style rewriting
+        - Filter mime types of binary and text
+
+0.01    2005-11-14 12:41:00
+        - Initial release.

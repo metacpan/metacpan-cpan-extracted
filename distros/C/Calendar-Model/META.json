@@ -1,0 +1,52 @@
+{
+   "abstract" : "Simple class modelling Calendars",
+   "author" : [
+      "Aaron Trevena <teejay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Calendar-Model",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Calendar::List" : "0.26",
+            "Date::Holidays" : "0.15",
+            "DateTime" : "0",
+            "I18N::Langinfo" : "0",
+            "Moose" : "2",
+            "MooseX::Role::Pluggable" : "0.02",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/hashbangperl/perl-calendar-model"
+      }
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,15 @@
+---
+name: Catalyst-Plugin-SuperForm
+version: 0.01
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+abstract: Create sticky HTML forms
+license: perl
+requires:
+  Catalyst: 5.2
+  HTML::SuperForm: 1.04
+provides:
+  Catalyst::Plugin::SuperForm:
+    file: lib/Catalyst/Plugin/SuperForm.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

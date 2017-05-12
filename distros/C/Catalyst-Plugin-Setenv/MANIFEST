@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/Setenv.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-live.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/TestApp.pm

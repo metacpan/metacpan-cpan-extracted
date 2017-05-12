@@ -1,0 +1,10 @@
+Revision history for Perl extension CAD::ProEngineer.
+
+0.01  Tue Mar 25 09:48:01 2003
+	- original version; created by h2xs 1.21 with options
+		-n CAD::ProEngineer
+
+0.02  Mon Aug 25 09:46:14 EDT 2003
+	- updated licensing information
+	- revised Makefile.PL defines and linker options
+

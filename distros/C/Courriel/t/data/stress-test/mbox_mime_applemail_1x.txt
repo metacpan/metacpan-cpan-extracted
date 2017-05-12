@@ -1,0 +1,183 @@
+From catalyst-dev-bounces@lists.scsys.co.uk  Tue Oct 30 00:15:44 2007
+Return-Path: <catalyst-dev-bounces@lists.scsys.co.uk>
+X-Original-To: archive@grokbase.com
+Delivered-To: archive@grokbase.com
+Received: from de007061.idaq.com (HELO jules.scsys.co.uk) (217.168.146.69)
+    by s69759.xenosight.com (qpsmtpd/0.32) with ESMTP; Tue, 30 Oct 2007 00:15:43 -0500
+Received: from localhost ([127.0.0.1] helo=jules.scsys.co.uk)
+	by jules.scsys.co.uk with esmtp (Exim 4.60)
+	(envelope-from <catalyst-dev-bounces@lists.scsys.co.uk>)
+	id 1ImjMh-0003dX-9E; Tue, 30 Oct 2007 05:10:11 +0000
+Received: from dopple.ion0.com ([69.65.110.16] helo=dave.ion0.com)
+	by jules.scsys.co.uk with esmtp (Exim 4.60)
+	(envelope-from <jayk@ion0.com>) id 1ImjMe-0003dP-Nq
+	for catalyst-dev@lists.scsys.co.uk; Tue, 30 Oct 2007 05:10:09 +0000
+Received: from dave.ion0.com (localhost [127.0.0.1])
+	by dave.ion0.com (8.13.8/8.12.9) with ESMTP id l9U4pdfW051676
+	for <catalyst-dev@lists.scsys.co.uk>;
+	Tue, 30 Oct 2007 00:51:44 -0400 (EDT) (envelope-from jayk@ion0.com)
+Received: (from root@localhost)
+	by dave.ion0.com (8.13.8/8.12.9/Submit) id l9U4pdo0051673
+	for catalyst-dev@lists.scsys.co.uk;
+	Tue, 30 Oct 2007 00:51:39 -0400 (EDT)
+Message-ID: <4C53584B-E166-4D4C-B9F9-F8A3F5A0A529@ion0.com>
+From: Jay K <jayk@ion0.com>
+To: Development of the elegant MVC web framework
+	<catalyst-dev@lists.scsys.co.uk>
+In-Reply-To: <756703690710291513y1737c124le6aa0a471aec2fc3@mail.gmail.com>
+MIME-Version: 1.0 (Apple Message framework v912)
+Subject: Re: [Catalyst-dev] Advent 2007
+Date: Mon, 29 Oct 2007 23:10:02 -0600
+References: <756703690710261112s35c77e57n88a96caa88854fd1@mail.gmail.com>
+	<472248D4.8030302@jrock.us>
+	<756703690710291513y1737c124le6aa0a471aec2fc3@mail.gmail.com>
+X-Mailer: Apple Mail (2.912)
+X-Mesmtpd-Mailerfrom: Jay K <jayk@ion0.com>
+X-BeenThere: catalyst-dev@lists.scsys.co.uk
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: Development of the elegant MVC web framework
+	<catalyst-dev@lists.scsys.co.uk>
+List-Id: Development of the elegant MVC web framework
+	<catalyst-dev.lists.scsys.co.uk>
+List-Unsubscribe: <http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev>,
+	<mailto:catalyst-dev-request@lists.scsys.co.uk?subject=unsubscribe>
+List-Archive: <http://lists.scsys.co.uk/pipermail/catalyst-dev>
+List-Post: <mailto:catalyst-dev@lists.scsys.co.uk>
+List-Help: <mailto:catalyst-dev-request@lists.scsys.co.uk?subject=help>
+List-Subscribe: <http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev>,
+	<mailto:catalyst-dev-request@lists.scsys.co.uk?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0845696419=="
+Mime-version: 1.0
+Errors-To: catalyst-dev-bounces@lists.scsys.co.uk
+
+
+--===============0845696419==
+Content-Type: multipart/alternative; boundary=Apple-Mail-8-665438218
+
+
+--Apple-Mail-8-665438218
+Content-Type: text/plain;
+	charset=US-ASCII;
+	format=flowed;
+	delsp=yes
+Content-Transfer-Encoding: 7bit
+
+I'll do one or two.
+
+ideas:
+
+intro to auth
+
+using auth realms
+
+anyone interested in a simple 'interacting with external caches' thing
+- like making your app cache friendly?
+
+Jay
+
+On Oct 29, 2007, at 4:13 PM, J. Shirley wrote:
+
+> Here's a list, we can shuffle days around as necessary.
+>
+>
+> Day 1 - Catalyst Application Design, jrockway
+> Day 2 - Catalyst Base Classes - ???
+> Day 3 - REST Redux, Using RESTful services and YUI; jshirley
+> Day 4 - Catalyst Configuration
+> Day 5 - $c->uri_for fun and profit - purge
+> Day 6 -
+> Day 7
+> Day 8
+> Day 9
+> Day 10
+> Day 11
+> Day 12
+> Day 13
+> Day 14
+> Day 15
+> Day 16
+> Day 17
+> Day 18
+> Day 19
+> Day 20
+> Day 21
+> Day 22
+> Day 23
+> Day 24 - This Year in Catalyst - kd
+>
+> _______________________________________________
+> Catalyst-dev mailing list
+> Catalyst-dev@lists.scsys.co.uk
+> http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
+
+---
+"Those who can make you believe absurdities can make you commit
+atrocities." --Voltaire
+
+
+
+--Apple-Mail-8-665438218
+Content-Type: text/html;
+	charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+<html><body style=3D"word-wrap: break-word; -webkit-nbsp-mode: space; =
+-webkit-line-break: after-white-space; ">I'll do one or two. =
+&nbsp;<div><br class=3D"webkit-block-placeholder"></div><div>ideas: =
+&nbsp;</div><div><br class=3D"webkit-block-placeholder"></div><div>intro =
+to auth</div><div><br class=3D"webkit-block-placeholder"></div><div>using =
+class=3D"webkit-block-placeholder"></div><div>anyone interested in a =
+simple 'interacting with external caches' thing - like making your app =
+cache friendly?<br><div><div><br =
+class=3D"webkit-block-placeholder"></div><div>Jay</div><div><br =
+class=3D"webkit-block-placeholder"></div><div>On Oct 29, 2007, at 4:13 =
+PM, J. Shirley wrote:</div><br =
+class=3D"Apple-interchange-newline"><blockquote type=3D"cite">Here's a =
+list, we can shuffle days around as necessary.<br><br><br>Day 1 - =
+Catalyst Application Design, jrockway<br>Day 2 - Catalyst Base Classes - =
+???<br>Day 3 - REST Redux, Using RESTful services and YUI; jshirley<br> =
+Day 4 - Catalyst Configuration<br> Day 5 - $c-&gt;uri_for fun and profit =
+- purge<br> Day 6 - <br>Day 7<br>Day 8<br> Day 9<br>Day 10<br>Day 11<br> =
+Day 12<br> Day 13<br>Day 14<br> Day 15<br> Day 16<br> Day 17<br> Day =
+18<br> Day 19<br>Day 20 <br>Day 21<br>Day 22<br>Day 23<br>Day 24 - This =
+Year in Catalyst - kd<br><br><a href=3D"http://www.toeat.com" =
+target=3D"_blank" onclick=3D"return =
+top.js.OpenExtLink(window,event,this)"></a> =
+_______________________________________________<br>Catalyst-dev mailing =
+list<br><a =
+href=3D"mailto:Catalyst-dev@lists.scsys.co.uk">Catalyst-dev@lists.scsys.co=
+..uk</a><br><a =
+href=3D"http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev">ht=
+tp://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev</a><br></bloc=
+kquote></div><br><div> <span class=3D"Apple-style-span" =
+style=3D"border-collapse: separate; border-spacing: 0px 0px; color: =
+rgb(0, 0, 0); font-family: Helvetica; font-size: 12px; font-style: =
+normal; font-variant: normal; font-weight: normal; letter-spacing: =
+normal; line-height: normal; text-align: auto; =
+-khtml-text-decorations-in-effect: none; text-indent: 0px; =
+-apple-text-size-adjust: auto; text-transform: none; orphans: 2; =
+white-space: normal; widows: 2; word-spacing: 0px; "><div =
+style=3D"word-wrap: break-word; -khtml-nbsp-mode: space; =
+-khtml-line-break: after-white-space; "><div>---</div><div>"Those who =
+can make you believe absurdities can make you commit atrocities." =
+--Voltaire</div><br class=3D"Apple-interchange-newline"></div></span> =
+</div><br></div></body></html>=
+
+--Apple-Mail-8-665438218--
+
+
+--===============0845696419==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Catalyst-dev mailing list
+Catalyst-dev@lists.scsys.co.uk
+http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst-dev
+
+
+--===============0845696419==--
+

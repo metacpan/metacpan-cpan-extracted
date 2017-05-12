@@ -1,0 +1,37 @@
+Release Name: 0.08 
+=======================
+ * Kwalitee improvments
+
+Release Name: 0.07 
+=======================
+ * Fixed module name in POD
+
+Release Name: 0.06 
+=======================
+ * deepmerge will no longer allow an undefined value to replace a defined one.
+
+Release Name: 0.05 
+=======================
+ * Bug fix with perl version require in test
+
+Release Name: 0.04 Dec-07-2007
+=======================
+ * Bug fix with deepmerge recursion check 
+
+Release Name: 0.03 Dec-05-2007
+=======================
+ * Added tests to MANIFEST!
+ * Added some sanity to deepmerge to prevent infinite recursion.
+
+Release Name: 0.02  Dec-03-2007 
+=======================
+ * Added serialize, deserialize, and tofile_perl routines
+ * Revized POD
+ * Added tests 
+ * Added requirement: Data::Dumper
+
+Release Name: 0.01  Dec-01-2007 
+=======================
+ * Initial Release
+ * Really basic routines to dress up a hash 
+

@@ -1,0 +1,12 @@
+Revision history for Crypt-OTP26
+
+0.03    2009-03-14
+        Removed spurious reference to Test::Exception which was causing test failures
+        Moved repo to git
+
+0.02    2006-07-05
+        Reinserted 01_word.t which had escaped the 0.01 bundle
+
+0.01    2006-07-04
+        First version
+

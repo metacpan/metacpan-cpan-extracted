@@ -1,0 +1,71 @@
+Revision history for Class-CGI
+
+0.20   2006-05-07
+       - Changed _add_error() to add_error() and documented it.
+       - Bug fix:  errors are now properly HTML escaped.  Users may override
+         the escaping via the new error_encoding() method.
+       - Created mailing list and added a link to it in the docs.
+       - Documented the term "virtual parameter".
+       - Overrode CGI::Simple::new() to centralize initialization.
+       - Added required() and is_required() methods.
+       - Added add_missing() and is_missing_required() methods.
+       - Handlers now have a base class (Class::CGI::Handler) with extensive
+         support for required and virtual parameters.
+       - Made the "ALPHA" designation much more prominent.  Folks need to know
+         that this is a work in progress which their production code should
+         not rely on.
+
+0.14   2006-04-25
+       - Fixed an 'uninitialized' warning in args().
+       - Fixed reference to "Congif" (sic) in POD.  Thanks to Darren Myer for
+         the catch (http://rt.cpan.org//Ticket/Display.html?id=18890).
+       - Removed dependency on Module::Load::Conditional due to security
+         concern.  Thanks to Darren Myer for the solution.  
+         See http://rt.cpan.org/Ticket/Display.html?id=18892 for more details.
+
+0.13   2006-04-22
+       - Minor doc fixes.
+       - Added the "args" method.
+
+0.12   2006-04-20
+       - No code changes.  Fixed some documentation errors and expanded some
+         explanations.
+
+0.11   2006-04-19
+       - API change.  errors() now returns a hash instead of an arrayref.
+         The keys are the param() names.  This was necessary because pushing
+         errors onto a stack could make it very difficult to figure out which
+         param() call generated the error.
+
+0.10   2006-04-16
+       - Add better error handling for the param() method.  At this point,
+         Class::CGI is essentially feature complete, though enhancements to
+         various features may come at some point in the future.
+
+0.04   2006-04-11
+       - Do not load Config::Std unless needed.
+       - handlers() method without arguments now returns the currently used
+         handlers.
+       - Tremendously improved test coverage.  Devel::Cover lists one branch
+         as untested (and I can't figure out why).
+       - Minor documentation clarifications.
+       - Updated the manifest to include the tests :/
+
+0.03   2006-04-08
+       - Now passes the parameter name is the second argument to the handler
+         constructor.  Thanks to Aristotle for pointing out how useful that
+         would be.
+       - Handlers can now be defined in a config file rather than being
+         continuously redefined in the code.
+
+0.02   2006-04-07
+       - Added 'raw_param' method which allows the user to fetch the actual
+         value of a parameter and ignore handlers defined for it.
+       - Handlers now accept the Class::CGI object instead of the value of the
+         corresponding parameter.  This makes them far more flexible (when
+         will I learn that I should default to passing objects instead of
+         scalars?)
+
+0.01   2006-04-07 
+       - First version, released on an unsuspecting world.
+

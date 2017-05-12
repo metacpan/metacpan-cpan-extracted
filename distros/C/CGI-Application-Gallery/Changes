@@ -1,0 +1,49 @@
+2008-11-06 13:12  cvs
+
+	* lib/CGI/Application/Gallery.pod: moved doc to own pod file
+
+2008-11-06 13:11  cvs
+
+	* MANIFEST, lib/CGI/Application/Gallery.pm: made some changes to
+	  default layout, it's nicer
+
+2007-08-27 09:13  cvs
+
+	* MANIFEST, x_installwebfiles.PL, cgi-bin/gallery.cgi,
+	  lib/CGI/Application/Gallery.pm: changes
+
+2007-05-04 20:47  cvs
+
+	* lib/CGI/Application/Gallery.pm: great
+
+2007-04-30 09:10  cvs
+
+	* MANIFEST: changes
+
+2007-04-28 18:43  cvs
+
+	* Makefile.PL, cgi-bin/browse.html, cgi-bin/view.html,
+	  lib/CGI/Application/Gallery.pm, t/0.t: working nice
+
+2007-04-28 15:24  cvs
+
+	* MANIFEST, Makefile.PL, x_installwebfiles.PL, cgi-bin/browse.html,
+	  cgi-bin/gallery.cgi, cgi-bin/view.html,
+	  lib/CGI/Application/Gallery.pm, public_html/gallery/1.jpg,
+	  public_html/gallery/10.jpg, public_html/gallery/2.jpg,
+	  public_html/gallery/3.jpg, public_html/gallery/4.jpg,
+	  public_html/gallery/5.jpg, public_html/gallery/6.jpg,
+	  public_html/gallery/7.jpg, public_html/gallery/8.jpg,
+	  public_html/gallery/9.jpg, t/0.t: Initial revision
+
+2007-04-28 15:24  cvs
+
+	* MANIFEST, Makefile.PL, x_installwebfiles.PL, cgi-bin/browse.html,
+	  cgi-bin/gallery.cgi, cgi-bin/view.html,
+	  lib/CGI/Application/Gallery.pm, public_html/gallery/1.jpg,
+	  public_html/gallery/10.jpg, public_html/gallery/2.jpg,
+	  public_html/gallery/3.jpg, public_html/gallery/4.jpg,
+	  public_html/gallery/5.jpg, public_html/gallery/6.jpg,
+	  public_html/gallery/7.jpg, public_html/gallery/8.jpg,
+	  public_html/gallery/9.jpg, t/0.t: init
+

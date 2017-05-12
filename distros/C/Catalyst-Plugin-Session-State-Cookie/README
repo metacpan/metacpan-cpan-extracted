@@ -1,0 +1,139 @@
+NAME
+    Catalyst::Plugin::Session::State::Cookie - Maintain session IDs using
+    cookies.
+
+SYNOPSIS
+        use Catalyst qw/Session Session::State::Cookie Session::Store::Foo/;
+
+DESCRIPTION
+    In order for Catalyst::Plugin::Session to work the session ID needs to
+    be stored on the client, and the session data needs to be stored on the
+    server.
+
+    This plugin stores the session ID on the client using the cookie
+    mechanism.
+
+METHODS
+    make_session_cookie
+        Returns a hash reference with the default values for new cookies.
+
+    update_session_cookie $hash_ref
+        Sets the cookie based on "cookie_name" in the response object.
+
+    calc_expiry
+    calculate_session_cookie_expires
+    cookie_is_rejecting
+    delete_session_id
+    extend_session_id
+    get_session_cookie
+    get_session_id
+    set_session_id
+
+EXTENDED METHODS
+    prepare_cookies
+        Will restore if an appropriate cookie is found.
+
+    finalize_cookies
+        Will set a cookie called "session" if it doesn't exist or if its
+        value is not the current session id.
+
+    setup_session
+        Will set the "cookie_name" parameter to its default value if it
+        isn't set.
+
+CONFIGURATION
+    cookie_name
+        The name of the cookie to store (defaults to
+        "Catalyst::Utils::apprefix($c) . '_session'").
+
+    cookie_domain
+        The name of the domain to store in the cookie (defaults to current
+        host)
+
+    cookie_expires
+        Number of seconds from now you want to elapse before cookie will
+        expire. Set to 0 to create a session cookie, ie one which will die
+        when the user's browser is shut down.
+
+    cookie_secure
+        If this attribute set to 0 the cookie will not have the secure flag.
+
+        If this attribute set to 1 (or true for backward compatibility) -
+        the cookie send by the server to the client will got the secure flag
+        that tells the browser to send this cookies back to the server only
+        via HTTPS.
+
+        If this attribute set to 2 then the cookie will got the secure flag
+        only if the request that caused cookie generation was sent over
+        https (this option is not good if you are mixing https and http in
+        you application).
+
+        Default vaule is 0.
+
+    cookie_httponly
+        If this attribute set to 0, the cookie will not have HTTPOnly flag.
+
+        If this attribute set to 1, the cookie will got HTTPOnly flag that
+        should prevent client side Javascript accessing the cookie value -
+        this makes some sort of session hijacking attacks significantly
+        harder. Unfortunately not all browsers support this flag (MSIE 6
+        SP1+, Firefox 3.0.0.6+, Opera 9.5+); if a browser is not aware of
+        HTTPOnly the flag will be ignored.
+
+        Default value is 1.
+
+        Note1: Many peole are confused by the name "HTTPOnly" - it does not
+        mean that this cookie works only over HTTP and not over HTTPS.
+
+        Note2: This paramater requires Catalyst::Runtime 5.80005 otherwise
+        is skipped.
+
+    cookie_path
+        The path of the request url where cookie should be baked.
+
+    For example, you could stick this in MyApp.pm:
+
+      __PACKAGE__->config( 'Plugin::Session' => {
+         cookie_domain  => '.mydomain.com',
+      });
+
+CAVEATS
+    Sessions have to be created before the first write to be saved. For
+    example:
+
+            sub action : Local {
+                    my ( $self, $c ) = @_;
+                    $c->res->write("foo");
+                    $c->session( ... );
+                    ...
+            }
+
+    Will cause a session ID to not be set, because by the time a session is
+    actually created the headers have already been sent to the client.
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::Session.
+
+AUTHORS
+    Yuval Kogman <nothingmuch@woobling.org>
+
+CONTRIBUTORS
+    This module is derived from Catalyst::Plugin::Session::FastMmap code,
+    and has been heavily modified since.
+
+      Andrew Ford
+      Andy Grundman
+      Christian Hansen
+      Marcus Ramberg
+      Jonathan Rockway E<lt>jrockway@cpan.orgE<gt>
+      Sebastian Riedel
+      Florian Ragwitz
+
+COPYRIGHT
+    Copyright (c) 2005 - 2009 the Catalyst::Plugin::Session::State::Cookie
+    "AUTHORS" and "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

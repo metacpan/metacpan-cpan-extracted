@@ -1,0 +1,14 @@
+# comment
+
+
+[cars]
+
+
+reno = yello  #fafa #a
+reno = red    #fafa ;a  ###
+reno = ;
+reno = white  #fafa 
+bmw  = white ; fafa
+fiat = blue , green # comment  
+ford = blue , green ; comment  
+mini = #

@@ -1,0 +1,16 @@
+---
+name: CAM-EmailTemplate
+version: 0.92
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Template-based email message sender
+license: perl
+requires:
+  CAM::Template: 0.90
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::EmailTemplate:
+    file: lib/CAM/EmailTemplate.pm
+    version: 0.92
+generated_by: Module::Build version 0.2609

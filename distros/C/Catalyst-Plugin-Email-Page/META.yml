@@ -1,0 +1,19 @@
+---
+name: Catalyst::Plugin::Email::Page
+version: 0.22
+author:
+  - Gavin Henry  C<< <ghenry@suretecsystems.com> >>
+abstract: Email your Catalyst page
+license: perl
+requires:
+  Catalyst: 5.61
+  Catalyst::Request: 0
+  Readonly: 0
+build_requires:
+  Test::Distribution: 0
+  Test::More: 0.42
+provides:
+  Catalyst::Plugin::Email::Page:
+    file: lib/Catalyst/Plugin/Email/Page.pm
+    version: 0.22
+generated_by: Module::Build version 0.2611

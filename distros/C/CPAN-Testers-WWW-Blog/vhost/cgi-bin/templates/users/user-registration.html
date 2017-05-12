@@ -1,0 +1,71 @@
+[% 
+    title = 'Registration' ;
+
+    crumb1_name = 'Registration' ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+
+<p>Fields marked * are mandatory fields and must be completed.</p>
+<p>Please use the following rules to create your new password:</p>
+
+<ul>
+<li>Passwords should be [% minpasslen %] - [% maxpasslen %] characters in length.</li>
+<li>Use more than one type from the upper case, lower case, numeral and symbol character types, e.g. 'Myword', 'smallword2' and 'L!TTLE' would all be fine.</li>
+<li>Use at least 3 unique characters, i.e 'Eeeeee' is not allowed.</li>
+<li>No whitespace characters allowed.</li>
+</ul>
+
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+[% ELSE %]
+<p class="alert">[% errmess %]</p>
+[% END %]
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name="act" value="user-regsave" />
+<input type="hidden" name="userid" value="0" />
+
+<table width="100%" summary="User Registration Form">
+<tr><td width="90">Email *</td>
+    <td width="10" class="alert">[% data.email_err %]</td>
+    <td colspan="3"><input type="text" name="email" value="[% data.email %]" size="40" /><br />
+        Your email address will NOT be publically visible or passed to any third party.
+        It is required as part of your login.</td>
+</tr>
+<tr><td>Password *</td>
+    <td class="alert">[% data.effect_err %]</td>
+    <td colspan="3"><input type="password" name="effect" value='' size="40" /></td>
+</tr>
+
+<tr><td>Display Name *</td>
+    <td class="alert">[% data.realname_err %]</td>
+    <td colspan="3"><input type="text" name="realname" value="[% data.realname %]" size="40" /></td>
+</tr>
+<tr><td>About Me</td>
+    <td class="alert">[% data.aboutme_err %]</td>
+    <td colspan="3"><textarea name="aboutme" rows="10" cols="45">[% data.aboutme %]</textarea></td>
+</tr>
+<tr><td>Web Page</td>
+    <td class="alert">[% data.url_err %]</td>
+    <td colspan="3"><input type="text" name="url" value="[% data.url %]" size="50" /></td></tr>
+
+<tr><td>Avatar</td>
+    <td class="alert">[% data.image_err %]</td>
+    <td colspan="3"><input type="file" name="image" />
+        <img src="[% webpath %]/[% data.link %]" alt="[% data.tag %]" />
+        <input type="hidden" name="imageid" value="[% data.imageid %]" />
+        <p>Please note that all avatar images are reduced in size to fit within a 100 x 100 pixel box.
+        Any illegal or inappropriate images will be removed, and may result in the removal of your
+        account and any further access to the wiki.  </td>
+</tr>
+<tr><td></td>
+    <td></td>
+    <td><input type="submit" name="submit" value="REGISTER" /></td>
+</tr>
+</table>
+
+</form>

@@ -1,0 +1,20 @@
+<HR />
+<table width="100%">
+<tr>
+<td align=left>
+<font size="-2">
+[% pages.Problems %] <A HREF="mailto:[% maintainer_email %]">[% maintainer %]</A>.</font>
+</td><td align=right>
+<font size="-2">[% pages.Questions %]</font>
+<a href="[% faq %]"><font size="-1">FAQ</font></a>.
+</td></tr>
+<tr>
+<td align=left>
+</td><td align=right>
+<font size="-2">Enable installations using </font>
+<a href="http://cpan.uwinnipeg.ca/par/webstart.html"><font size="-2">PAR::WebStart</font></a>.
+</td></tr>
+</table>
+</body>
+</html>
+

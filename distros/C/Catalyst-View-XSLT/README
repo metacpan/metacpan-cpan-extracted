@@ -1,0 +1,145 @@
+NAME
+    Catalyst::View::XSLT - XSLT View Class
+
+SYNOPSIS
+        # use the helper to create your view
+        myapp_create.pl view XSLT XSLT
+
+        # configure in lib/MyApp/View/XSLT.pm (can be done from a config file too)
+        package MyApp::View::XSLT;
+
+        use base 'Catalyst::View::XSLT';
+
+        __PACKAGE__->config(
+            # paths to the directories with templates
+            INCLUDE_PATH => [
+              MyApp->path_to( 'root', 'xslt' ),
+              MyApp->path_to( 'templates', 'xsl' ),
+            ],
+
+            # default template extension to use
+            # when you don't provide template name
+            TEMPLATE_EXTENSION => '.xsl',
+
+            # use this for debug purposes
+            # it will dump the the final (merged) config
+            DUMP_CONFIG => 1,
+
+            # XML::LibXSLT specific configuration 
+            LibXSLT => {
+                register_function => [
+                  {
+                    uri    => 'urn:catalyst',
+                    name   => 'add',
+                    subref => sub { return $_[0] + $_[1] },
+                  },
+                  {
+                    uri    => 'urn:foo',
+                    name   => 'Hello',
+                    subref => sub { return 'Hello, Catalyst\'s user.' },
+                  },
+                ],
+            },
+        );
+
+        # don't need nothing more
+
+        1;
+
+        # in your controller(s) :
+        sub someAction : Local {
+
+            # 'template' could be string or path to file
+            # see 'xml' for more info about string version 
+
+            # path to the template could be absolute
+            $c->stash->{template} = $c->config->{home} . 'root/some.xsl';
+
+            # or relative
+            $c->stash->{template} = 'some.xsl'; # this file will be searched in include paths
+
+            # or if you didn't provide any template name 
+            # then the last chance is 'someAction.xsl' ($c->action . $config->{TEMPLATE_EXTENSION})
+
+            # 'xml' could be string
+            $c->stash->{xml} =<<XML;
+    <root>
+      <level1>data</level>
+    </root>
+    XML
+            # or a relative path which will se searched in include paths
+            # $c->stash->{xml} = 'my.xml';
+
+            # or an absolute path 
+            # $c->stash->{xml} = '/some/where/around.xml';
+
+            # add more subrefs (these will predefine config ones if they overlap)
+            $c->stash->{additional_register_function} = [
+              {
+                uri => 'urn:catalyst',
+                name => 'doIt',
+                subref => sub { return $obj->method(@_) },
+              }
+            ];
+
+            # everything else in the stash will be used for parameters (<xsl:param name="param1" />)
+            $c->stash->{param1} = 'Param1 value';'
+            $c->stash->{param2} = 'Param2 value';
+        }
+
+        # Meanwhile, maybe in an 'end' action
+
+        $c->forward('MyApp::View::XSLT');
+
+        # to use your registered functions in some.xsl:
+        <xsl:stylesheet 
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+          xmlns:catalyst="urn:catalyst"
+          xmlns:foo="urn:foo"
+          version="1.0">
+          ...
+          <xsl:value-of select="catalyst:add(4, 5)" />
+          <xsl:value-of select="foo:Hello()" />
+          <xsl:value-of select="catalyst:doIt($param1, 3)" />
+          ...
+        </xsl:stylesheet>
+
+DESCRIPTION
+    This is a "XSLT" view class for Catalyst. Your application should
+    defined a view class which is a subclass of this module. The easiest way
+    to achieve this is using the myapp_create.pl script (where myapp should
+    be replaced with whatever your application is called). This script is
+    created as part of the Catalyst setup.
+
+METHODS
+    new The constructor for the XSLT view. Reads the application config.
+
+    render
+        Renders the template specified via $template. The template
+        parameters are set to %$args if $args is a hashref, or "$c->stash"
+        otherwise.
+
+        Templates are accepted as strings, filehandles or objects of the
+        corresponding view types (XML::LibXML::Document for example).
+
+    process
+        Renders the template specified in "$c->stash->{template}" or
+        "$c->action". Calls "render" to perform actual rendering. Template
+        params are set up from the contents of "$c->stash". Output is stored
+        in "$c->response->body".
+
+NOTE
+    This version works only with XML::LibXSLT.
+
+SEE ALSO
+    Catalyst, Catalyst::Base, XML::LibXSLT
+
+AUTHORS
+    Martin Grigorov, <mcgregory {at} e-card {dot} bg>
+
+    Simon Bertrang, <simon.bertrang@puzzworks.com>
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

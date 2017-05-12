@@ -1,0 +1,25 @@
+Config-YAML
+
+This is a wrapper around the YAML module to enable simple reading and
+writing of YAML-formatted configuration files. It supports multiple
+input files and integration with Getopt::Long to handle all your
+configuration needs.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 Shawn Boyette
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

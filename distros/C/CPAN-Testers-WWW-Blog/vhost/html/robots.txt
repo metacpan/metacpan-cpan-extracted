@@ -1,0 +1,15 @@
+User-agent: Googlebot
+Crawl-delay: 600
+Disallow: /private/
+
+User-agent: msnbot
+Crawl-delay: 600
+Disallow: /private/
+
+User-agent: DotBot
+Crawl-delay: 600
+Disallow: /private/
+
+User-agent: *
+Crawl-delay: 600
+Disallow: /private/

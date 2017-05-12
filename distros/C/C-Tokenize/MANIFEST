@@ -1,0 +1,16 @@
+Changes
+examples/c2html.pl
+examples/cvar.pl
+examples/includes.pl
+examples/synopsis-comment.pl
+examples/synopsis-cpp.pl
+lib/C/Tokenize.pm
+lib/C/Tokenize.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/C-Tokenize.t
+t/cvar-re.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

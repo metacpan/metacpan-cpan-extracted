@@ -1,0 +1,22 @@
+CGI-Application-NetNewsIface
+
+This CGI-Application-based web application provides a publicly-accessible,
+read-only interface to an NNTP server (such as Usenet or nntp.perl.org).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or use CPAN or CPANPLUS to install it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Shlomi Fish
+
+This program is released under the following license: MIT X11.
+

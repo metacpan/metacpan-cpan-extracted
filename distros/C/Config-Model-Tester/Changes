@@ -1,0 +1,139 @@
+2.060 2017-03-05
+
+  Improvements:
+  * add file_mode parameter to test permission (mode) of
+    written files
+
+2.059 2017-02-12
+
+  Improvements:
+    * allow to reuse test data. Use data_from parameter to re-use test
+      data from another test case
+    * mention that file list is sorted when comparing files written by
+      first and second test instance
+    * add load2 parameter to load configuration data in
+      the second test instance.
+
+  Bug fix
+    * recreate model object for each application test (i.e. a new model
+      object is created for each *-test-conf.pl file)
+
+  Other:
+    * dist.ini: update © year
+
+2.058 2016-12-05
+
+  Minor bug fix:
+  * prevent undef warning seen in smoke and travis tests
+
+2.057 2016-09-03
+
+  Bug fix for Perl 5.24 and Debian perl 5.22.2-4:
+  * load test file even if @INC does not contain '.'
+
+2.056 2016-09-01
+
+  Improvements:
+    * added an option to check config tree content
+      before calling apply_fix
+    * Changed syntax of dump check parameters (old syntax is
+      still accepted)
+
+2.055 2016-05-26
+
+  Minor bug fixes:
+  * removed debug print
+  * avoid undef warning
+
+2.054 2016-04-17
+
+  Improvements:
+    * improved Tester documentation
+    * inform user when a global var is missing in test setup
+    * fix file check when setup param is used
+    * handle dir specification containing ~/
+
+2.053 2016-03-28
+
+  New features:
+    * pass application when creating instance
+    * use config_dir specified in app info file
+
+  Improvements:
+    * Report error with model specification
+    * Improved doc
+
+2.052 2015-10-17
+
+  * New features:
+    * subtest filter parameter is now a regexp.
+      I.e you can filter tests like this:
+        prove t/model_test.t :: x stuff '^foo$'
+    * you can run update test with no_warnings and quiet param
+    * global no_warnings param also apply to load and dump
+  * Misc:
+    * bug tracker is now on github
+
+2.051 2015-05-20
+
+  * New features:
+    + Added has_key and has_not_key parameters to check hash
+      element content
+
+2.050 2015-03-29
+
+   * Bug fix:
+     * fix check_data function
+
+2.049 2015-03-28
+
+    * New features:
+      * check argument also accept a regexp ( i.e. a qr// )
+      + added option to run 'update' test
+      * Allow to start test without config file (from scratch)
+
+    * changed dependency:
+      * replaced Path::Class with Path::Tiny
+
+    * Internal changes:
+      * refactored most of the logic in separate functions
+
+2.048 2014-06-04
+
+    * C::M::Tester: added load_check2 parameter
+
+2.047 2013-10-06
+
+	* Updated Pod documents and added link to examples
+	* Updated dependency list
+
+2.046 2013-09-20
+
+    * depends on Path::Class >= 0.29
+
+2.045 2013-09-15
+
+    * Fix broken tests on Windows (mixup between / and \ )
+
+2.044 2013-09-07
+
+    * accept array ref for file_contents* tests
+    * fix spurious creation of '0' dir
+
+2.043 2013-08-23
+
+  * fix file_content* tests (bad path computation)
+
+2.042 2013-08-14
+
+  * fix file created/removed comparison
+  * added require perl5.10
+
+2.041 2013-08-12
+
+  * rewrote using Path::Class. Added setup parameter
+
+2.041_01 2013-08-11
+
+  * Initial release. This module was moved from Config-Model 
+    distribution.

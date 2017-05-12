@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+use strict;
+use Dancer;
+use CPAN::Repo::Server;
+$CPAN::Repo::Server::REPO_ROOT = $ARGV[0] || $ENV{'PWD'};
+set public => $CPAN::Repo::Server::REPO_ROOT;
+set port => ($ARGV[1] || 3000);
+dance;
+
+__END__
+
+=head1 NAME
+
+cpan_repo
+
+=head1 SYNOPSIS
+
+runs cpan repo server
+
+    cpan_repo <repo_root> [<port>]
+
+
+B<repo_root> - path to cpan repo root dir 
+
+B<port> - port server binds to, default value is I<3000>
+
+
+
+
+
+

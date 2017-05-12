@@ -1,0 +1,43 @@
+Convert::Number::Greek, version 0.02
+
+This module converts between Arabic and Greek numerals.
+
+CHANGES IN VERSION 0.02
+
+Support for parsing Greek numbers has been added.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module:
+
+    [sudo] perl -MCPAN -e "install Convert::Number::Greek"
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires Perl 5.8.0 or later. Apart from that, it has no dependencies  except  for  Exporter  and  POSIX--both  part  of  the
+standard Perl distribution.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command:
+
+    perldoc Convert::Number::Greek
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

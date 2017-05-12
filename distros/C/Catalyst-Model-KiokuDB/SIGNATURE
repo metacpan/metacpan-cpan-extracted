@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7dca6295f1bb36b740a5bfa03b2bb132a361c8a5 .gitignore
+SHA1 5225fcf4fe8fce65ef6534fba039dbfbd63ec447 Changes
+SHA1 9afb489d3e373be31298d84c891b98ac4bbe8c25 MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 6ceca7c5e3d549197e55a57f5dc62ad452ee2c3e META.yml
+SHA1 aab73ce0bd75ff5a0af301f1b32dfc51052bb2c5 Makefile.PL
+SHA1 22b7cc8aa164b3b79d9ea41b9d63777825512450 lib/Catalyst/Authentication/Store/Model/KiokuDB.pm
+SHA1 41ff56ae4a6b3fbe37293c1b2c049b0e5fe4d3a6 lib/Catalyst/Authentication/Store/Model/KiokuDB/UserWrapper.pm
+SHA1 90bc698abeb9a24086ac6ec0a3f3c1cf2b662e9d lib/Catalyst/Model/KiokuDB.pm
+SHA1 2096ed2229e0ab56ec2dcea215be5e6835fcdadb t/basic.t
+SHA1 6bae3f39a197660841e9d6a939cd277ac08da8d9 t/lib/Catalyst/Model/KiokuDB/Test.pm
+SHA1 4b7cfe48c5e73460a022c7c2c01e26e0387476f8 t/lib/Catalyst/Model/KiokuDB/Test/Controller/Root.pm
+SHA1 121dbe83f4f473cf3af7124a5cf8cd8087438f2c t/lib/Catalyst/Model/KiokuDB/Test/Model/KiokuDB.pm
+SHA1 15c238b206d61ee86094b4159ce335725aa25f8d t/lib/Catalyst/Model/KiokuDB/Test/User.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkxel4IACgkQdC8qQo5jWl7jTQCfUslnwfM8gGAFF4RK8DIsRMGO
+KT8AmQGGgcULedKzUe0KKlnRv8sNdUFh
+=axYA
+-----END PGP SIGNATURE-----

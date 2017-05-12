@@ -1,0 +1,15 @@
+Build.PL
+Changes
+examples/nonblockpoll-ex0.pl
+examples/nonblockpoll-ex1.pl
+examples/nonblockpoll-ex2.pl
+examples/nonblockpoll-ex3.pl
+examples/nonblockpoll-ex4.pl
+examples/usingthreads-ex1.pl
+lib/Control/CLI.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/control-cli.t

@@ -1,0 +1,59 @@
+---
+name: CAD-Drawing
+version: 0.26
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: 'Methods to create, load, and save vector graphics'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Calc: 0.25
+  Compress::Zlib: 1.41
+  Image::Magick: 6
+  Math::Geometry::Planar: 1.14
+  Math::MatrixReal: 1.9
+  Math::Vec: 0.03
+  Stream::FileInputStream: 0
+  Test::More: 0
+provides:
+  CAD::Drawing:
+    file: lib/CAD/Drawing.pm
+    version: 0.26
+  CAD::Drawing::Calculate:
+    file: lib/CAD/Drawing/Calculate.pm
+    version: 0.12
+  CAD::Drawing::Calculate::Finite:
+    file: lib/CAD/Drawing/Calculate/Finite.pm
+    version: 0.06
+  CAD::Drawing::Defined:
+    file: lib/CAD/Drawing/Defined.pm
+    version: 0.62
+  CAD::Drawing::IO:
+    file: lib/CAD/Drawing/IO.pm
+    version: 0.26
+  CAD::Drawing::IO::Circ:
+    file: lib/CAD/Drawing/IO/Circ.pm
+    version: 0.03
+  CAD::Drawing::IO::Compressed:
+    file: lib/CAD/Drawing/IO/Compressed.pm
+    version: 0.02
+  CAD::Drawing::IO::FlatYAML:
+    file: lib/CAD/Drawing/IO/FlatYAML.pm
+    version: 0.01
+  CAD::Drawing::IO::Split:
+    file: lib/CAD/Drawing/IO/Split.pm
+    version: 0.02
+  CAD::Drawing::Manipulate:
+    file: lib/CAD/Drawing/Manipulate.pm
+    version: 0.12
+  CAD::Drawing::Manipulate::Graphics:
+    file: lib/CAD/Drawing/Manipulate/Graphics.pm
+    version: 0.02
+  CAD::Drawing::Manipulate::Transform:
+    file: lib/CAD/Drawing/Manipulate/Transform.pm
+    version: 0.02
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

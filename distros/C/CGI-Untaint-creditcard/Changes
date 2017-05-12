@@ -1,0 +1,9 @@
+Revision history 
+
+1.00  Tue Sep 20 21:16:03 UTC 2005
+	- Use Business::CreditCard::Object, and set it back into value()
+
+0.01  August 22, 2001
+	- Created this
+
+

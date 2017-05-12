@@ -1,0 +1,12 @@
+Build.PL
+CHANGES
+lib/Config/File.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/config
+t/pod.t
+t/pod_coverage.t
+t/test.t

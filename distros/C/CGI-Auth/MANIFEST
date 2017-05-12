@@ -1,0 +1,14 @@
+Auth.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+extra/AuthCfg.pm
+extra/authman.pl
+extra/login.html
+extra/README
+t/1.t
+t/check.pl
+t/login.pl
+t/auth/user.dat
+t/auth/sess/README

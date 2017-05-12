@@ -1,0 +1,124 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/**
+ * Immutable buffer holding arbitrary bytes.
+ */
+
+public final class Clownfish::Blob inherits Clownfish::Obj {
+
+    const char *buf;
+    size_t      size;
+    bool        owns_buf;
+
+    /** Return a new Blob which holds a copy of the passed-in bytes.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert incremented Blob*
+    new(const void *bytes, size_t size);
+
+    /** Initialize a Blob which holds a copy of the passed-in bytes.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert Blob*
+    init(Blob *self, const void *bytes, size_t size);
+
+    /** Return a new Blob which assumes ownership of the passed-in bytes.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert incremented Blob*
+    new_steal(void *bytes, size_t size);
+
+    /** Initialize a Blob which assumes ownership of the passed-in bytes.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert Blob*
+    init_steal(Blob *self, void *bytes, size_t size);
+
+    /** Return a new Blob which wraps an external buffer.  The buffer must
+     * stay unchanged for the lifetime of the Blob.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert incremented Blob*
+    new_wrap(const void *bytes, size_t size);
+
+    /** Initialize a Blob which wraps an external buffer.  The buffer must
+     * stay unchanged for the lifetime of the Blob.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public inert Blob*
+    init_wrap(Blob *self, const void *bytes, size_t size);
+
+    void*
+    To_Host(Blob *self, void *vcache);
+
+    /** Return the number of bytes held by the Blob.
+     */
+    public size_t
+    Get_Size(Blob *self);
+
+    /** Accessor for raw internal buffer.
+     */
+    public const char*
+    Get_Buf(Blob *self);
+
+    /** Equality test.
+     *
+     * @return true if `other` is a Blob and has the same content as `self`.
+     */
+    public bool
+    Equals(Blob *self, Obj *other);
+
+    /** Test whether the Blob matches the passed-in bytes.
+     *
+     * @param bytes Pointer to an array of bytes.
+     * @param size Size of the array in bytes.
+     */
+    public bool
+    Equals_Bytes(Blob *self, const void *bytes, size_t size);
+
+    /** Indicate whether one Blob is less than, equal to, or greater than
+     * another.  The byte contents of the Blobs are compared
+     * lexicographically.  Throws an exception if `other` is not a Blob.
+     *
+     * @return 0 if the Blobs are equal, a negative number if `self` is less
+     * than `other`, and a positive number if `self` is greater than `other`.
+     */
+    public int32_t
+    Compare_To(Blob *self, Obj *other);
+
+    public incremented Blob*
+    Clone(Blob *self);
+
+    public void
+    Destroy(Blob *self);
+}
+
+

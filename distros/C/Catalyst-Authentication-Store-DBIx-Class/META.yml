@@ -1,0 +1,43 @@
+---
+abstract: 'A storage class for Catalyst Authentication using DBIx::Class'
+author:
+  - 'Jason Kuri (jayk@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Store-DBIx-Class
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Catalyst::Authentication::Realm::SimpleDB:
+    file: lib/Catalyst/Authentication/Realm/SimpleDB.pm
+  Catalyst::Authentication::Store::DBIx::Class:
+    file: lib/Catalyst/Authentication/Store/DBIx/Class.pm
+    version: 0.1506
+  Catalyst::Authentication::Store::DBIx::Class::User:
+    file: lib/Catalyst/Authentication/Store/DBIx/Class/User.pm
+requires:
+  Catalyst::Model::DBIC::Schema: 0.18
+  Catalyst::Plugin::Authentication: 0.10008
+  Catalyst::Runtime: 5.8
+  DBIx::Class: 0.08
+  List::MoreUtils: 0
+  Moose: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/catagits/Catalyst-Authentication-Store-DBIx-Class.git
+version: 0.1506

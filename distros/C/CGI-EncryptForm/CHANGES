@@ -1,0 +1,41 @@
+Revision history for CGI::EncryptForm
+
+1.02 1999-10-25
+
+  - NOTICE: CGI scripts written for versions prior to 1.02 are incompatible
+            with this release. See below.
+
+  - Changed the way we flag an error. Instead of returning -1 we now return
+    undef. The reason being CGI scripts that have the -w switch turned on
+    would produce a warning saying the lvalue of the test condition
+    $result == -1 isnt numeric, when there was no error.
+    Thanks to Howard Lowndes for bringing this to my attention.
+
+  - Prefixed all error messages return by error() with the method's name
+    where the error occured and a unique number within [] to
+    cross reference the number against the operation.
+    e.g. decrypt [1] Encrypted string is inconsistent.
+
+  - Modified _random_key method to ensure the random key is not persistent
+    when run under mod_perl or CGI::SpeedyCGI.
+
+  - Changed the way we autoescape the encrypted string. Instead of URL
+    escaping the string, we now use our own character set where by an array
+    reference contains from 0 to 255 elements, and each element is 2 characters.
+    The elements in the array represent the translation $array->[ord($char)].
+    The method charset() is provided to allow you to define your own character
+    set. If no character set is defined, the default character set will apply,
+    which is suitable for storing the encrypted result in form fields,
+    URL's and cookies.  The autoescape method/paramater is now known as
+    usecharset.
+
+1.01 1999-10-20
+
+  - Removed dependancy on Math::TrulyRandom because of portability issues.
+    Replaced random number generator with perl's builtin rand(). Given
+    the purpose of this module, I believe rand() will surfice.
+    If you disagree make me understand why and I will look into it further.
+
+1.00 1999-10-18
+
+  - First Release

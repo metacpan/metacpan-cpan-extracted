@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:                Color-TupleEncode
+version:             0.11
+abstract:            Encode a tuple (vector) into a color - useful for
+license:             perl
+author:              
+    - Martin Krzywinski <martin.krzywinski@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Config::General:               0
+    Cwd:                           0
+    File::Basename:                0
+    FindBin:                       0
+    Getopt::Long:                  0
+    Graphics::ColorObject:         0
+    Math::Round:                   0
+    Math::VecStat:                 0
+    parent:                        0
+    Pod::Usage:                    0
+    Readonly:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd /home/ron/perl.modules/CGI-Application-Util-Diff
+
+cp -r /var/www/assets/css/cgi/application/util       htdocs/assets/css/cgi/application/
+cp -r /var/www/assets/templates/cgi/application/util htdocs/assets/templates/cgi/application/
+cp    /var/www/local/util.diff                       htdocs/local
+cp    /usr/lib/cgi-bin/util.diff.cgi                 httpd/cgi-bin

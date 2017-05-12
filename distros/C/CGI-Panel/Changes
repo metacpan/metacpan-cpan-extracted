@@ -1,0 +1,23 @@
+Revision history for Perl extension CGI::Panel.
+
+0.01  Wed Sep 04 16:15:37 2002
+	- original version; created by ExtUtils::ModuleMaker 0.204
+0.90  Sat Sep 07
+        - first release on cpan
+0.91  Mon Sep 09
+        - corrected dependency specification and doc fixes
+0.92  Thu Sep 26
+        - corrected inheritance problem and added parent and state methods
+0.93  Fri Oct 11
+        - Added demo app and couple of bug fixes
+0.94  Fri Nov 01
+        - Fixed bug (not working if just a main panel) and a few typos
+0.95  Fri Nov 15
+	- Combined CGI::Panel and CGI::Panel::MainPanel to make module
+          easier to use
+0.96  Sat Nov 16
+        - Fixed docs and put full example in synopsis
+0.97  
+
+
+

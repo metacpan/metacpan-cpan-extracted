@@ -1,0 +1,13 @@
+#--------------------------------------------------------------------------#
+README for find-ls
+#--------------------------------------------------------------------------#
+
+- generated from 'find . -ls > find-ls'
+    - any leading ./ stripped
+    - dates converted to YYYYMMDD.dddddd timestamp if needed
+
+- timestamps for modules adjusted so that alphabetically earlier 
+  Author/DistName-version strings have a later timestamp (as they will
+  be tested first)
+
+- resulting file to be compresses with gzip 

@@ -1,0 +1,6 @@
+Revision history for Config-YAML
+
+1.42.0  2010-12-03
+
+        * Initial release. Quick port of Config::YAML code to use YAML::Tiny.
+

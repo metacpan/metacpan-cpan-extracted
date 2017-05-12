@@ -1,0 +1,69 @@
+[% static = catalyst.uri_for('/static') %]
+[% CLEAR -%]
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <title>[% title %]</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <link rel="stylesheet" type="text/css" href="[% static %]/js/yui/build/reset/reset-min.css" />
+    <link rel="stylesheet" type="text/css" href="[% static %]/js/yui/build/base/base-min.css" />
+    <link rel="stylesheet" type="text/css" href="[% static %]/js/yui/build/fonts/fonts-min.css" />
+    <link rel="stylesheet" type="text/css" href="[% static %]/js/yui/build/datatable/assets/skins/sam/datatable.css" />
+    <script type="text/javascript" src="[% static %]/js/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+    <script type="text/javascript" src="[% static %]/js/yui/build/element/element-beta-min.js"></script>
+
+    <script type="text/javascript" src="[% static %]/js/yui/build/json/json-min.js"></script>
+
+    <script type="text/javascript" src="[% static %]/js/yui/build/datasource/datasource-beta-min.js"></script>
+    <script type="text/javascript" src="[% static %]/js/yui/build/datatable/datatable-beta-min.js"></script>
+
+    <script type="text/javascript" src="[% static %]/js/yui/build/uploader/uploader-experimental-min.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="[% static %]/js/yui/build/logger/assets/skins/sam/logger.css"> 
+    <script type="text/javascript" src="[% static %]/js/yui/build/logger/logger-min.js"></script>
+    <script type="text/javascript">
+    function prependChild(parent, node) { if (parent.firstChild) { parent.insertBefore(node, parent.firstChild); } else { parent.appendChild(node); } }
+	function handleUploads(event) {
+        var data = eval("(" + event.data + ")");
+        var uploads = data.json.uploads;
+        for (var ii = 0; ii < uploads.length; ii++) {
+            var upload = uploads[ii];
+            var img = document.createElement("img");
+            img.src = upload.uri;
+            prependChild(document.getElementById('response'), img);
+        }
+	}
+    </script>
+
+</head>
+
+<body class="yui-skin-sam">
+
+    <div style="border-bottom: 1px solid #aaa; margin: 0; padding: 0.5em; height: 20px; width: 100%; background: url(/static/images/stripe.png);">
+    <b>
+        <a href="[% catalyst.uri_for("advanced") %]">Advanced</a> |
+        <a href="[% catalyst.uri_for("simple") %]">Simple</a> |
+        <a href="http://developer.yahoo.com/yui/uploader/">YUI Uploader</a>
+    <b>
+    </div>
+    <div style="padding: 1em;">
+
+    <h1>[% title %]</h1>
+
+    <div id="uploaderPlaceHolder" style="width:400px;height:210px">Unable to load Flash content. The YUI File Uploader Control requires Flash Player 9.0.45 or higher. You can download the latest version of Flash Player from the <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.</p></div>
+    <input id="browseBtn" name="browse" value="Browse" onclick="browse()" type="button" />
+    <input id="uploadBtn" name="upload" value="Upload" onclick="upload()" type="button" />
+
+[% content %]
+
+    <div id="response"></div>
+
+    </div>
+    </div>
+
+</body>
+</html>

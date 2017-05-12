@@ -1,0 +1,266 @@
+=head1 NAME
+
+CGI::Bus::upws - User Personal WorkSpace
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->upws->evaluate;
+
+=head1 DESCRIPTION
+
+
+This module is a user personal work space.
+There are two subsystems: workspace and 'u'sers 's'ites.
+Users sites facility is not very scalable, 
+it is for a small sites with a few publishers of the pages.
+
+Uses L<CGI::Bus::uauth|CGI/Bus/uauth>, L<CGI::Bus::udata|CGI/Bus/udata>.
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+=head1 SLOTS
+
+Common HTTP and HTML settings should be in L<CGI::Bus|CGI/Bus> parent object.
+
+=over
+
+=item -index
+
+URL of the Index HTML page or reference to URLs list (see C<-urls>), optional
+
+
+=item -indexes
+
+Reference to URLs list like C<-index>, to place on the navigation pane
+below C<-index> and above C<-usurl> and C<-urlst>
+
+
+=item -logo
+
+HTML logo or URL of logo image to place at the top of the navigation pane,
+just before the name of the user.
+Default is '/icons/portal.gif' on Apache
+and 'web.gif' on IIS.
+
+
+=item -search
+
+Search system URL or sub{}; optional
+
+
+=item -searchms
+
+Search hook 
+sub(self, Query object, Util object, [pathSearch,...], [[pathBegin, pathReplace],...]){} 
+to be called before Microsoft Index Server Query object 'CreateRecordset'
+method called.
+Required when using Microsoft Index Server.
+Attention: Results of Microsoft Index Server calls are impersonated
+and dependent on filesystem ACLs and effective user account.
+
+If both C<-search> and C<-searchms> defined, 
+C<-search> should contain URL of search script and
+C<-searchms> will be used to produce search.
+This behaviour is useful with impersonated search script like
+
+ $ENV{QUERY_STRING}='_run=SEARCH'
+                   .($ENV{QUERY_STRING} ? '&' .$ENV{QUERY_STRING} : '');
+ chdir('..');
+ do('upws.cgi'); # impersonated when called
+
+
+
+=item -urls
+
+URLs array ref or sub{} to place at the end of the 
+navigation pane.
+Each URL should be HTML or 'label|URL' string.
+URLs lists may be assigned for users and groups of
+users individually. This parameter is the most common list.
+
+
+=item -urlst
+
+Like C<-urls>, but to place above user's URLs and C<-urls>.
+
+
+=item -usfirst
+
+Sub{} to determine users sites to be sorted first and 
+to be placed above others
+See below C<-uspath>, C<-usudir>, C<-uspdir>, C<-uspfile>, C<-usurl>, C<scrusites>
+
+
+=item -uspath
+
+Users sites base path, directory with users publish HTML pages.
+Default is calculated when only C<-usurl> is defined.
+See below C<-usudir>, C<-uspdir>, C<-uspfile>, C<-usurl>, C<scrusites>
+
+
+=item -uspdir
+
+Users sites publish dirs inside C<-usudir>, 
+subdirectories of user's directory where should be pages to publish.
+Default ['pub',''].
+See also C<-uspath>, C<scrusites>
+
+
+=item -uspfile
+
+Users sites publish files inside C<-uspdir>,
+filenames to be published as main pages.
+Default 
+['index.url','index.html','index.htm','default.url','default.html','default.htm'].
+See also C<-uspath>, C<scrusites>
+
+
+=item -uspurf
+
+Users sites publish filesystem URL,
+used to open user's directory for the current user
+for publishing.
+Default C<-uspurl>
+
+
+=item -uspurl
+
+Users sites publish URL,
+used to open user's directory for the current user
+for publishing.
+Default C<-usurl>
+
+
+=item -usudir
+
+Users sites users dirs,
+subdirectories with the deepest publish dirs and files.
+Above this subdirectories may be group subdirectories
+with publish files.
+Default ['users','home',''].
+See also C<-uspath>, C<scrusites>
+
+
+=item -usurl
+
+Users sites base URL.
+Adds reference to users pages if defined.
+See also C<-uspath>, C<scrusites>
+
+
+=back
+
+=head1 METHODS
+
+The most commonly used is C<evaluate>.
+
+
+=over
+
+
+=item evaluate () -> requested HTML screen
+
+Dispatcher of the 'scr...' calls below.
+See source code for commands used.
+
+
+=item scrtop () -> top HTML screen
+
+Generates top HTML page, which is a frameset of
+left (navigation) pane and right (content) pane.
+
+
+=item scrleft () -> navigation pane HTML screen
+
+Generates navigation pane HTML page, the left part of the screen.
+
+
+=item scrright () -> content pane HTML screen
+
+Generates content pane HTML page, the right part of the screen.
+
+
+=item scrsetup () -> user settings HTML screen
+
+Generates user settings HTML page, interacts with used when editing and saving.
+See source code for setup fields names and descriptions.
+
+
+=item scrusites () -> users sites HTML screen
+
+Users sites map HTML page, based on
+C<-uspath> and C<-usurl>.
+Data collected within C<-uspath> directory structure 
+are cached inside temporary directory.
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+=head2 20/10/2002
+
+=item New:
+
+C<-search>, C<-searchms> slots. 
+Problem: Microsoft Index Server calls should be impersonalisated
+to obtain rightly ACL checked results.
+
+
+=head2 12/09/2002
+
+=item Changed:
+
+C<scrleft> discards duplicate rows to display.
+'label|URL|_target|URL' syntax added to deal with a complex pages.
+Logotype (C<-logo>) enclosed within URL filling the current browser window 
+with C<scrleft>.
+
+
+
+=head2 21/08/2002
+
+=item New:
+
+'USITES' CGI param for C<scrusites> identifier or number
+- to use multiple sets of users home pages, empty parameter
+means default page set
+
+
+
+
+=head2 28/02/2002
+
+=item New:
+
+Using icons.
+C<-logo> may be URL of logo image.
+
+
+
+=head2 01/01/2002 - 27/02/2002
+
+=item New:
+
+Implemented and Documented
+
+
+=item ToDo:
+
+Review
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

@@ -1,0 +1,72 @@
+			    Config::Maker
+			    =============
+
+=head1 About
+
+Config::Maker is perl program, that generates text files from templates and
+configuration values. It is useful to keep all configuration in one place and
+configure many different services from that. I wrote it and use it for
+generating firewall configuration, DNS zone file and dhcp server config for
+a small network.
+
+The idea is a combination of Embperl and XSLT, except it's not that
+heavyweight. The template is copied to the output, while substituting
+directives with respective values from the configuration. The values are
+refered with paths, that are similar to XPath, but a bit less featurefull.
+
+=head1 Instalation
+
+This module uses Module::Build infrastructure for building. To build it, unpack
+the source tarball, enter the directory and type:
+
+    perl Build.PL
+    ./Build
+    ./Build install
+
+For various options available, please refer to the L<Module::Build(3pm)> documentation.
+
+A Makefile.PL is provided for backwards compatibility. To use it, unpack the
+source tarball, enter the directory and type:
+
+    perl Makefile.PL
+    make
+    make install
+
+For various option available, please refer to the L<ExtUtils::MakeMaker(3pm)> documentation.
+
+The later method (and both methods in newer versions) is understood by the CPAN
+shell (see L<cpan(1)>). You can use that to install.
+
+=head1 Using
+
+The program is normaly invoked via the C<configit> script. It takes
+a metaconfig as an argument, which governs all the generation. In the
+metaconfig, a list of configuration sources (files) is given and for each
+a list of templates that should be instantiated (also files) are given. Result
+of expanding a template can be saved to a file, piped to a command, or possibly
+both. If an error is encountered anywhere during the processing, the results
+are not installed so the previous configuration is not broken. For details
+refer to L<configit(1)>.
+
+There is one additional auxiliary script, C<run-and-save>. It is useful if you
+generate a script, that shall be run on another machine. Just install the
+C<run-and-save> script on the target machine and specify C<ssh I<machine>
+run-and-save --act I<target-script-name>> as a C<command> for given template.
+This script installs your script as I<target-script-name> and executes it.
+Don't forget to end your template with C<#COMMIT> to indicate that whole script
+was transfered. The C<run-and-save> script can also take the name from first
+line of input.
+
+=head1 Author
+
+Jan Hudec bulb@ucw.cz
+
+=head1 Copyright And License
+
+Copyright 2004 Jan Hudec. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+# arch-tag: 623443ed-6268-4da9-b89c-8e679a997071

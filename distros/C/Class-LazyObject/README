@@ -1,0 +1,52 @@
+Class::LazyObject - Deferred object construction
+
+DESCRIPTION
+    Class::LazyObject allows you to create lazy objects. A lazy object holds
+    the place of another object, (Called the "inflated object"). The lazy
+    object turns into the inflated object ("inflates") only after a method
+    is called on the lazy object. After that, any variables holding the lazy
+    object will hold the inflated object.
+
+    In other words, you can treat a lazy object just like the object it's
+    holding the place of, and it won't turn into a real object until
+    necessary. This also means that the real object won't be constructed
+    until necessary.
+
+    A lazy object takes up less memory than most other objects (it's even
+    smaller than a blessed empty hash). Constructing a lazy object is also
+    likely to be computationally cheaper than constructing an inflated
+    object (especially if a database is involved).
+
+    A lazy object can hold a scalar (called the "ID") that is passed to the
+    constructor for the inflated object.
+
+    For more module documentation, see the module's POD. Do a
+    'perldoc Class::LazyObject'
+
+Class::LazyObject VS. Object::Realize::Later
+    Chances are, if you have a problem that needs to be solved, there's a
+    CPAN module that already solves it. Class::LazyObject was conceived and
+    implemented before I knew about Object::Realize::Later. See the POD for
+    more information.
+
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+    If you are on a windows box you should use 'nmake' rather than 'make'.
+
+
+PREREQUISITES
+    All of these are available from the CPAN.
+    
+    Module            Version (minimum)
+    ------            -----------------
+    Carp::Clan        (5.0 ) 
+    Class::Data::TIN  (0.02)
+    Class::ISA        (any )   
+    Test::More        (0.47)  Used only during 'make test'
+    Test::Exception   (0.15)  Used only during 'make test'

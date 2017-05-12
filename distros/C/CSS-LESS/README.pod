@@ -1,0 +1,159 @@
+=head1 NAME
+
+CSS::LESS - Compile LESS stylesheet files (.less) using lessc
+
+=head1 SYNOPSIS
+
+  use CSS::LESS;
+  # Compile a single LESS stylesheet
+  my $less = CSS::LESS->new();
+  my $css = $less->compile('a:link { color: lighten('#000000', 10%); }');
+  print $css."\n";
+
+  # Compile a LESS stylesheets with using @include syntax of LESS.
+  $less = CSS::LESS->new( include_paths => ['/foo/include/'] );
+  $css = $less->compile('@import (less) 'bar.less'; div { width: 100px; }');
+  print $css."\n";
+
+This module has released as an alpha version.
+
+=head1 REQUIREMENTS
+
+=head2 lessc
+
+It must installed, because this module is wrapper of "lessc".
+
+You can install "lessc" using "npm" (Node.js Package Manager).
+
+  $ npm install -g less
+  $ lessc -v
+  lessc x.x.x (LESS Compiler) [JavaScript]
+
+=head1 INSTALLATION (from GitHub)
+
+  $ git clone git://github.com/mugifly/p5-CSS-LESS.git
+  $ cpanm ./p5-CSS-LESS
+
+=head1 METHODS
+
+=head2 new ( [%params] )
+
+Create an instance of CSS::LESS.
+
+=head3 %params : 
+
+=over 4
+
+=item C<include_paths>
+
+Path of include .less files. 
+
+This paths will be used for the @include syntax of .less stylesheet.
+
+Use case of example:
+
+  # File-A of LESS stylesheet
+  # This file will be set as content when calling a 'compile' method.
+  @include (less) 'foo.less';
+  ~~~~
+
+  # File-B of LESS stylesheet
+  # This file was already saved to: /var/www/include/foo.less
+  div {
+    width: (100+200)px;
+  }
+  ~~~~
+
+  # Example of script
+  my less = CSS::LESS->new( include_paths => [ '/var/www/include/' ] )
+  my $css = $less->compile( File-A ); # Let compile the File-A.
+  print $css."\n"; # It includes the File-B, and will be compiled.
+
+=item C<compress>
+
+Compress a compiled style-sheet. It means removing some whitespaces using lessc. (default: 0)
+
+Avaiable value: 1 or 0. This item is same as parameter of lessc. 
+
+=item C<strict_imports>
+
+Force evaluation of imports. (default: 0)
+
+Avaiable value: 1 or 0. This item is same as parameter of lessc.
+
+=item C<relative_urls>
+
+Re-write relative urls to the base LESS stylesheet. (default: undef)
+
+Avaiable value: 1 or 0. This item is same as parameter of lessc.
+
+=item C<rootpath>
+
+Set rootpath for url rewriting in relative imports and urls. (default: undef)
+
+This item is same as parameter of lessc.
+
+=item C<line_numbers>
+
+Outputs filename and line numbers. (default: undef)
+
+Avalable value: 'comments', 'mediaquery', 'both', undef.
+
+This item is same as parameter of lessc.
+
+=item C<lessc_path>
+
+Path of LESS compiler (default: 'lessc' on the PATH.)
+
+=item C<dry_run>
+
+Dry-run mode for debug. (default: 0)
+
+=item C<dont_die>
+
+When an errors accrued, don't die. (default: 0)
+
+=item C<tmp_path>
+
+Path of save for temporally files. (default: '/tmp/'' or other temporally directory.)
+
+=back
+
+=head2 compile ( $content [, %params] )
+
+Parse a LESS (.less) stylesheet, and compile to CSS (.css) stylesheet.
+
+In addition, If you would prefer to compile from a file, firstly, 
+please read a file with using the "File::Slurp" module or open method as simply.
+Then, parse it with this 'compile' method.
+
+=head3 $content
+
+Content of LESS (.less) stylesheet.
+
+=head3 %params
+
+This item is optional. You can use parameters same as %params of new(...) method.
+
+=head2 is_lessc_installed ( )
+
+Check for lessc has installed.
+
+=head2 last_error ()
+
+Get a message of last error. (This method is useful only if 'dont_die' parameter is set when initialized an instance.)
+
+=head1 SEE ALSO
+
+L<https://github.com/mugifly/p5-CSS-LESS> - Develop on GitHub. Your feedback is highly appreciated.
+
+L<CSS::LESSp> - LESS-parser by native perl implementation.
+
+L<CSS::Sass>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Masanori Ohgita (http://ohgita.info/).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

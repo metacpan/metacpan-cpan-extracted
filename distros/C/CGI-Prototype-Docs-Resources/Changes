@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Prototype::Docs::Resources.
+
+0.01  Sun Apr 10 01:32:47 2005
+	- original version; created by h2xs 1.23 with options
+		-b5.6.1 -A -X -n CGI::Prototype::Docs::Resources
+

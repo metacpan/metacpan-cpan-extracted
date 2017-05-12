@@ -1,0 +1,91 @@
+# --8<--8<--8<--8<--
+#
+# Copyright (C) 2006 Smithsonian Astrophysical Observatory
+#
+# This file is part of CIAO-Lib-Param
+#
+# CIAO-Lib-Param is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# CIAO-Lib-Param is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the 
+#       Free Software Foundation, Inc. 
+#       51 Franklin Street, Fifth Floor
+#       Boston, MA  02110-1301, USA
+#
+# -->8-->8-->8-->8--
+
+=head1 NAME
+
+CIAO::Lib::Param::Match - handle a list of matched parameters
+
+=head1 SYNOPSIS
+
+  use CIAO::Lib::Param;
+
+  $pf = CIAO::Lib::Param->new( $filename );
+  $pmatch = $pf->match( $template );
+
+  printf "number of matched parameters: %d\n", $pmatch->length;
+  while( my $pname = $pmatch->next ) { print "$pname\n" };
+
+  # do it all over again
+  $pmatch->rewind;
+
+=head1 DESCRIPTION
+
+These routines manipulate the CIAO::Lib::Param::Match object returned
+by the CIAO::Lib::Param B<match()> method.
+
+
+=head2 Methods
+
+=over
+
+=item length
+
+   $len = $pmatch->length;
+
+returns the number of matched parameters.
+
+=item next
+
+   $pname = $pmatch->next;
+
+returns the name of the next parameter in the list.  It returns
+B<undef> if at the end of the list.
+
+
+=item rewind
+
+   $pmatch->rewind;
+
+Reset the list so that the next call to B<next()> will return the
+first element of the list.
+
+
+=back
+
+=head1 SEE ALSO
+
+CIAO::Lib::Param.
+
+=head1 AUTHOR
+
+Diab Jerius, E<lt>djerius@cpanE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by the Smithsonian Astrophysical Observatory
+
+This code is released under the GNU General Public License.  You may
+find a copy at <http://www.fsf.org/copyleft/gpl.html>.
+
+=cut

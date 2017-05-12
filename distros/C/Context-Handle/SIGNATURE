@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.52.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7f8203c66c0b544f6cdd550bf6096595b23ecdc2 Build.PL
+SHA1 032ff4e1c688a1247ea32fe4226ee923894583e1 MANIFEST
+SHA1 f2d5fbbc2f5ae676d30258b4b82d819a22638259 META.yml
+SHA1 616815ba32c083a1686ad7d1c0a9ed627f5d6c81 Makefile.PL
+SHA1 44ce9462113c90756c090e202fcba4f529d8eaef README
+SHA1 fae42fd2e3c7b6cd6c1603ac585417d3b36c5b95 lib/Context/Handle.pm
+SHA1 101b221329033113732dc6febee3712181020d61 lib/Context/Handle/RV/Bool.pm
+SHA1 09ac6dfe4b30f08d36b0313b55a5c3e088e44d8a lib/Context/Handle/RV/List.pm
+SHA1 5c4976e68cf136cc018bdf8713eaf1dd32df93d8 lib/Context/Handle/RV/RefArray.pm
+SHA1 d7c45ea279aa7f959872b8dd63a2e35f616cac1a lib/Context/Handle/RV/RefCode.pm
+SHA1 29e2224b46826865c4000ec0932340a97f2ebe1a lib/Context/Handle/RV/RefHash.pm
+SHA1 4653f0af2e3d43e2521e7112a91f9d9c572fd365 lib/Context/Handle/RV/RefObject.pm
+SHA1 fee250a3461630e1d42182fa84620b5b4e2e410a lib/Context/Handle/RV/RefScalar.pm
+SHA1 58975f5965b3ea11ad8b0097ea3e597ee5d932f3 lib/Context/Handle/RV/Scalar.pm
+SHA1 5868072f464de41116adb8cfcca420adf4c45941 lib/Context/Handle/RV/Void.pm
+SHA1 445f09b9a1e3ae9b8fafe75b17fe0649e304ced6 t/01_basic.t
+SHA1 65a0827db77d5cb698fe28053ea1292ec6708425 t/02_advanced.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (Darwin)
+
+iD8DBQFEKqyXVCwRwOvSdBgRAnISAJ92FTA7I70jqxNsOYp0biGSfDIbuACeI8X/
+JJWpLhSCQ+WiUtr+DGYwKxM=
+=nnvY
+-----END PGP SIGNATURE-----

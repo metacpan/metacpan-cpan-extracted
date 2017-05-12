@@ -1,0 +1,31 @@
+<h2>[% IF data.linkid %]Edit[% ELSE %]Add[% END %] Category</h2>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="link-csave" />
+<input type="hidden" name="catid" value="[% data.catid %]" />
+
+<div class="boxer">
+[% IF thanks %]<p>Category saved successfully.[% END %]
+[% IF errmess %]
+[% IF errmess == 1 %]
+<p class="alert">There are invalid or missing fields, as noted by the <span class="red">&empty;</span> symbol.
+[% ELSE %]
+<p class="alert">[% errmess %]
+[% END %]
+[% END %]
+</div>
+
+<div class="boxer">
+<table class="blocker">
+<tr><th width="150">Category Name *</th>
+    <td class="red">[% data.category_err %]</td>
+    <td><input type="text" name="category" size="32" value="[% data.category %]" /></td></tr>
+<tr><th>Order No.</th>
+    <td class="red">[% date.orderno_err %]</td>
+    <td><input type="text" name="orderno" size="3" value="[% data.orderno %]" /></td></tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value="Save Category" />
+
+</form>

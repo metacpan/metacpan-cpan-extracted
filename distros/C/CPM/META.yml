@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               CPM
+version:            1.51
+abstract:           Complete module to work with MyPrinterCloud System
+author:
+    - Juan Jose 'Peco' San Martin <peco@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Socket:           0
+    LWP::UserAgent:       0
+    Net::Address::IP::Local:  0
+    Net::Ping:            0
+    Net::SMTP_auth:       0
+    Net::SNMP:            0
+    Test::More:           0
+    XML::Simple:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,139 @@
+{
+   "abstract" : "A minimalistic deploy tool",
+   "author" : [
+      "=over 4"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cinnamon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd::Guard" : "0",
+            "Directory::Scratch" : "0",
+            "Test::Class" : "0",
+            "Test::Fatal" : "0",
+            "Test::Mock::Guard" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Class::Load" : "0",
+            "Coro" : "0",
+            "Getopt::Long" : "0",
+            "Hash::MultiValue" : "0",
+            "IPC::Run" : "0",
+            "Log::Dispatch" : "0",
+            "Moo" : "0",
+            "Net::OpenSSH" : "0",
+            "POSIX" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "YAML" : "0",
+            "parent" : "0",
+            "perl" : "5.014002"
+         }
+      }
+   },
+   "provides" : {
+      "Cinnamon" : {
+         "file" : "lib/Cinnamon.pm",
+         "version" : "0.28"
+      },
+      "Cinnamon::CLI" : {
+         "file" : "lib/Cinnamon/CLI.pm"
+      },
+      "Cinnamon::Config::Loader" : {
+         "file" : "lib/Cinnamon/Config/Loader.pm"
+      },
+      "Cinnamon::Context" : {
+         "file" : "lib/Cinnamon/Context.pm"
+      },
+      "Cinnamon::DSL" : {
+         "file" : "lib/Cinnamon/DSL.pm"
+      },
+      "Cinnamon::HandleManager" : {
+         "file" : "lib/Cinnamon/HandleManager.pm"
+      },
+      "Cinnamon::Local" : {
+         "file" : "lib/Cinnamon/Local.pm"
+      },
+      "Cinnamon::Logger" : {
+         "file" : "lib/Cinnamon/Logger.pm"
+      },
+      "Cinnamon::Remote" : {
+         "file" : "lib/Cinnamon/Remote.pm"
+      },
+      "Cinnamon::Role" : {
+         "file" : "lib/Cinnamon/Role.pm"
+      },
+      "Cinnamon::Runner" : {
+         "file" : "lib/Cinnamon/Runner.pm"
+      },
+      "Cinnamon::Task" : {
+         "file" : "lib/Cinnamon/Task.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentaro/cinnamon/issues"
+      },
+      "homepage" : "https://github.com/kentaro/cinnamon",
+      "repository" : {
+         "url" : "git://github.com/kentaro/cinnamon.git",
+         "web" : "https://github.com/kentaro/cinnamon"
+      }
+   },
+   "version" : "0.28",
+   "x_contributors" : [
+      "wakabatan <wakabatan@localhost.localdomain>",
+      "hatyuki <hatyuki29@gmail.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "hayajo <hayajo@cpan.org>",
+      "Kentaro Kuribayashi <kentarok@gmail.com>",
+      "TERAOKA Yoshinori <yteraoka@me.com>",
+      "mechairoi <ttsujikawa@gmail.com>",
+      "punytan <punytan@gmail.com>",
+      "nqounet <mail@nqou.net>",
+      "shibayu36 <shibayu36@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

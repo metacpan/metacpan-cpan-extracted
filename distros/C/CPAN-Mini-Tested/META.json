@@ -1,0 +1,72 @@
+{
+    "name": "CPAN-Mini-Tested",
+    "version": "0.23",
+    "abstract": "Create a CPAN mirror using modules with passing test reports",
+    "author": [
+      "Barbie <barbie@cpan.org>",
+      "Robert Rothenberg <rrwo at cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "cpan",
+        "archive",
+        "cpantesters"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "base": "0",
+                "CPAN::Mini": "0.32",
+                "Cache::Simple::TimedExpiry": "0.22",
+                "DBD::SQLite": "1",
+                "DBI": "0",
+                "File::Basename": "0",
+                "File::Spec::Functions": "0",
+                "LWP::Simple": "0",
+                "Regexp::Assemble": "0.06"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "CPAN::Mini::Tested": {
+            "file": "lib/CPAN/Mini/Tested.pm",
+            "version": "0.23"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Mini-Tested" },
+        "repository": {
+            "url": "git://github.com/barbie/cpan-mini-tested.git",
+            "web": "http://github.com/barbie/cpan-mini-tested",
+            "type": "git"
+        }
+    }
+}

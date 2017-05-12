@@ -1,0 +1,6 @@
+DROP TABLE addcat;
+CREATE TABLE addcat (
+	addcat		INT,
+	addctype	INT,
+	addcname	TEXT
+);

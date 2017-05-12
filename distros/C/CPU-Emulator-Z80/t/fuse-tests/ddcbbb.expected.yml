@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  48416:
+    - 73
+name: ddcbbb
+registers:
+  AF: 51171
+  AF_: 0
+  BC: 58526
+  BC_: 0
+  DE: 40521
+  DE_: 0
+  HL: 2023
+  HL_: 0
+  I: 0
+  IX: 48433
+  IY: 40287
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,22 @@
+---
+abstract: 'Interface to the CommonMark C library'
+author:
+  - 'Nick Wellnhofer <wellnhofer@aevum.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CommonMark
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/nwellnhof/perl-commonmark/issues
+  repository: https://github.com/nwellnhof/perl-commonmark.git
+version: '0.240100'

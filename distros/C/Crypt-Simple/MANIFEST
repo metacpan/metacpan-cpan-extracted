@@ -1,0 +1,10 @@
+MANIFEST			This list of files
+Makefile.PL
+README
+Simple.pm
+t/complex.t
+t/file.t
+t/multi.t
+t/passfile.t
+t/passphrase.t
+t/single.t

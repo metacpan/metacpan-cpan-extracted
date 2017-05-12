@@ -1,0 +1,10 @@
+# Local overrides for machine 'dev2'
+---
+db:
+    password:   EASY
+    
+cron: 
+    '!':
+       '+':
+           1 : JOB1NEW
+           5 : JOB5NEW

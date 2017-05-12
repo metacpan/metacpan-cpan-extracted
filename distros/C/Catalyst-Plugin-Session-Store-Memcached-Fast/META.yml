@@ -1,0 +1,21 @@
+---
+name: Catalyst-Plugin-Session-Store-Memcached-Fast
+version: 0.02
+author:
+  - 'Denis Arapov, C<bwizard@blackwizard.pp.ru>'
+abstract: Memcached session storage backend.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Cache::Memcached::Fast: 0
+  Catalyst::Plugin::Session: 0.01
+  Catalyst::Runtime: 5.7
+provides:
+  Catalyst::Plugin::Session::Store::Memcached::Fast:
+    file: lib/Catalyst/Plugin/Session/Store/Memcached/Fast.pm
+    version: 0.02
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

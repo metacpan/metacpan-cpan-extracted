@@ -1,0 +1,78 @@
+note Cache::FileCache uses sha1, so it's ok to use MD5
+	(remember we're just using it on the key, not the value, so
+	 we'll usually be giving it on the order of 100 bytes)
+
+conclusion: just use MD5. it's fast enough and widely 
+available/installed.
+
+MD5:     1.405/1.397/1.396
+newhash: 0.923/0.920/0.925
+
+#MD5 is much faster than SHA1 (at least in perl)
+#MD4 is marginally faster than MD5 (but less available)
+
+#Pearson, JHash, Elf, DJB, FNV all show promise but don't outperform newhash 
+
+#testing done on Athlon-XP downclocked to 1000MHz
+
+#general notes:
+#OO is faster
+#using addfile instead of add is MUCH faster!
+
+time perl -e 'use Digest::MD5 qw(md5 md5_hex md5_base64); for my $i 
+(0..100) { open(FH, "foobar"); my $digest = md5(join ("", <FH>)); 
+close(FH); } '
+MD5:      4.806/4.731/4.752
+MD4:      4.625/4.647/4.620
+SHA1:     14.195/14.158/14.185
+SHA2:     N/A
+JHash:    4.266/4.277/4.333
+Adler32:  N/A
+Haval:    N/A
+Elf:      3.519/3.500/3.443
+Whirlpool:N/A
+MD2:      (est. 55.14)
+DJB:      3.500/3.523/3.509
+Tiger:    6.941/6.887/6.940
+Nilsimsa: segfault
+Pearson:  4.375/4.435/4.405
+FNV:      3.447/3.493/3.498
+
+time perl -e 'use Digest::MD5 qw(md5 md5_hex md5_base64); for my $i 
+(0..100) { open(FH, "foobar"); my $ctx = Digest::MD5->new; 
+$ctx->add(<FH>); my $digest = $ctx->digest; close(FH); } '
+MD5:      4.161/4.342/4.165
+MD4:      4.081/4.039/4.050
+SHA1:     13.656/13.545/13.585
+SHA2:     7.770/7.741/7.734
+JHash:    N/A
+Adler32:  (est. 271.6)
+Haval:    4.966/4.929/4.933
+Elf:      N/A
+Whirlpool:22.611/22.549/23.077
+MD2:      (est. 54.55)
+DJB:      N/A
+Tiger:    N/A
+Nilsimsa: N/A
+Pearson:  N/A
+FNV:      N/A
+
+time perl -e 'use Digest::MD5 qw(md5 md5_hex md5_base64); for my $i 
+(0..100) { open(FH, "foobar"); my $ctx = Digest::MD5->new; 
+$ctx->addfile(FH); my $digest = $ctx->digest; close(FH); } '
+MD5:      1.658/1.660/1.657
+MD4:      1.561/1.591/1.602
+SHA1:     11.115/11.164/11.199
+SHA2:     error
+JHash:    N/A
+Adler32:  not tested (expected very slow)
+Haval:    error
+Elf:      N/A
+Whirlpool:error
+MD2:      (est. 52.03)
+DJB:      N/A
+Tiger:    N/A
+Nilsimsa: N/A
+Pearson:  N/A
+FNV:      N/A
+

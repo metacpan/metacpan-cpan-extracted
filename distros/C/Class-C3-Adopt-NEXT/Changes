@@ -1,0 +1,62 @@
+Revision history for Class-C3-Adopt-NEXT
+
+0.14    2015-06-04 00:58:24Z
+  * Switch from using List::MoreUtils to List::Util.
+
+0.13    2010-05-07 20:49:46Z
+  * Stop shipping some author tests, so users stupid enough to run them won't
+    spam me with fail reports.
+
+0.12    2009-06-08 12:16:34Z
+  * Update copyright notice.
+  * A couple of pod whitespace changes.
+
+0.11    2009-05-19 17:34:17Z
+  * Change wording of warning to be more clear.
+
+0.10    2009-05-12 11:23:52Z
+  * Depend on Test::Exception 0.27 to avoid breaking tests on older versions
+    (Closes: RT#45986).
+
+0.09    2009-04-28 22:14:58Z
+  * Rewrite a chunk of the documentation to be more clear, and also to beter
+    cater for our primary audience (people being linked from Catalyst).
+    Based on feeback from kiffin.
+
+0.08    2009-04-22 03:19:48Z
+  * Add additional example for doc for converting from NEXT, to help out
+    lazy people who only read the verbatim sections (abraxxa).
+
+0.07    2009-02-19 00:44:43Z
+  * Add ability to disable warnings for an entire set of modules using a
+    regex.
+  * Change warnings to use the caller instead of the class name of the
+    instance so that warnings are reported on the class which actually
+    uses NEXT, not the class which inherits from it.
+
+0.06    2008-12-24 23:15:14Z
+  * Update documentation.
+
+0.05    2008-12-20 15:04:48Z
+  * Upgrade Module::Install::ExtraTests to 0.006. This makes things work on
+    Win32 again (closes RT#41817).
+  * Update warning to be more eloquent.
+  * Document warnings.
+  * Implement a -no_warn import switch to turn of warnings locally.
+
+0.04    2008-12-07 00:11:59Z
+  * Install our hacked version of NEXT::AUTOLOAD into NEXT::ACTUAL::AUTOLOAD
+    too. This makes us work with NEXT 0.61, which doesn't do all of its magic
+    in NEXT::AUTOLOAD anymore (closes RT#41467).
+
+0.03    2008-12-05 21:53:48Z
+  * Make the tests work with the error message produced by the pure-perl
+    Class::C3 (RT#41460).
+  * Use MRO::Compat instead of Class::C3 directly.
+
+0.02    2008-12-02 14:41:39Z
+  * Depend on Test::Exception.
+  * Fix some test fails on perls with different c3 diagnostics.
+
+0.01    2008-12-01 18:54:51Z
+  * Initial release.

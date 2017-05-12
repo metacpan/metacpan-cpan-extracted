@@ -1,0 +1,219 @@
+#!/usr/local/bin/perl -w
+
+use Test::More tests => 40;
+
+END { ok $loaded; }
+use CGI ( ':standard', '-no_debug', '*h3', 'start_table' );
+$loaded = 1;
+ok 1;
+
+BEGIN {
+    $| = 1;
+    if ( $] > 5.006 ) {
+
+        # no utf8
+        require utf8;    # we contain Latin-1
+        utf8->unimport;
+    }
+}
+
+######################### End of black magic.
+
+my $CRLF = "\015\012";
+if ( $^O eq 'VMS' ) {
+    $CRLF = "\n";        # via web server carriage is inserted automatically
+}
+if ( ord("\t") != 9 ) {    # EBCDIC?
+    $CRLF = "\r\n";
+}
+
+# util
+sub test {
+    local ($^W) = 0;
+    my ( undef, $true, $msg ) = @_;
+    ok $true => $msg;
+}
+
+# all the automatic tags
+is h1(), '<h1 />', "single tag";
+
+is h1('fred'), '<h1>fred</h1>', "open/close tag";
+
+is h1( 'fred', 'agnes', 'maura' ), '<h1>fred agnes maura</h1>',
+  "open/close tag multiple";
+
+is h1( { -align => 'CENTER' }, 'fred' ), '<h1 align="CENTER">fred</h1>',
+  "open/close tag with attribute";
+
+is h1( { -align => undef }, 'fred' ), '<h1 align>fred</h1>',
+  "open/close tag with orphan attribute";
+
+is h1( { -align => 'CENTER' }, [ 'fred', 'agnes' ] ),
+  '<h1 align="CENTER">fred</h1> <h1 align="CENTER">agnes</h1>',
+  "distributive tag with attribute";
+
+{
+    local $" = '-';
+
+    is h1( 'fred', 'agnes', 'maura' ), '<h1>fred-agnes-maura</h1>',
+      "open/close tag \$\" interpolation";
+
+}
+
+is header(), "Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}",
+  "header()";
+
+is header( -type => 'image/gif', -charset => '' ), "Content-Type: image/gif${CRLF}${CRLF}",
+  "header()";
+
+is header( -type => 'image/gif', -status => '500 Sucks' ),
+  "Status: 500 Sucks${CRLF}Content-Type: image/gif${CRLF}${CRLF}", "header()";
+ 
+# return to normal 
+charset( 'ISO-8859-1' );
+
+like header( -nph => 1 ),
+  qr!HTTP/1.0 200 OK${CRLF}Server: cmdline${CRLF}Date:.+${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!,
+  "header()";
+
+is start_html(), <<END, "start_html()";
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+END
+
+is start_html(
+    -Title  => 'The world of foo' ,
+    -Script => [ {-src=> 'foo.js', -charset=>'utf-8'} ],
+    ), <<END, "start_html()";
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>The world of foo</title>
+<script charset="utf-8" src="foo.js" type="text/javascript"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+END
+
+for my $v (qw/ 2.0 3.2 4.0 4.01 /) {
+    local $CGI::XHTML = 1;
+    is
+      start_html( -dtd => "-//IETF//DTD HTML $v//FR", -lang => 'fr' ),
+      <<"END", 'start_html()';
+<!DOCTYPE html
+	PUBLIC "-//IETF//DTD HTML $v//FR">
+<html lang="fr"><head><title>Untitled Document</title>
+</head>
+<body>
+END
+}
+
+is
+  start_html( -dtd => "-//IETF//DTD HTML 9.99//FR", -lang => 'fr' ),
+  <<"END", 'start_html()';
+<!DOCTYPE html
+	PUBLIC "-//IETF//DTD HTML 9.99//FR">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+END
+
+my $cookie =
+  cookie( -name => 'fred', -value => [ 'chocolate', 'chip' ], -path => '/' );
+
+is $cookie, 'fred=chocolate&chip; path=/', "cookie()";
+
+my $h = header( -Cookie => $cookie );
+
+like $h,
+  qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Date:.*${CRLF}Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-cookie)";
+
+$h = header( '-set-cookie' => $cookie );
+like $h,
+  qr!^Set-[Cc]ookie: fred=chocolate&chip\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-set-cookie)";
+
+my $cookie2 =
+  cookie( -name => 'ginger', -value => 'snap' , -path => '/' );
+is $cookie2, 'ginger=snap; path=/', "cookie2()";
+
+$h = header( -cookie => [ $cookie, $cookie2 ] );
+like $h,
+  qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Set-Cookie: ginger=snap\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-cookie=>[cookies])";
+
+$h = header( '-set-cookie' => [ $cookie, $cookie2 ] );
+like $h,
+  qr!^Set-Cookie: fred=chocolate&chip\; path=/${CRLF}Set-Cookie: ginger=snap\; path=/${CRLF}(Date:.*${CRLF})?Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}!s,
+  "header(-set-cookie=>[cookies])";
+
+$h = redirect('http://elsewhere.org/');
+like $h,
+  qr!Status: 302 Found${CRLF}Location: http://elsewhere.org/!s,
+  "redirect";
+
+$h = redirect(-url=>'http://elsewhere.org/', -cookie=>[$cookie,$cookie2]);
+like $h,
+  qr!Status: 302 Found${CRLF}Set-[Cc]ookie: \Q$cookie\E${CRLF}Set-[Cc]ookie: \Q$cookie2\E${CRLF}(Date:.*${CRLF})?Location: http://elsewhere.org/!s,
+  "redirect with cookies";
+
+$h = redirect(-url=>'http://elsewhere.org/', '-set-cookie'=>[$cookie,$cookie2]);
+like $h,
+  qr!Status: 302 Found${CRLF}Set-[Cc]ookie: \Q$cookie\E${CRLF}Set-[Cc]ookie: \Q$cookie2\E${CRLF}(Date:.*${CRLF})?Location: http://elsewhere.org/!s,
+  "redirect with set-cookies";
+
+is start_h3, '<h3>';
+
+is end_h3, '</h3>';
+
+is start_table( { -border => undef } ), '<table border>';
+
+charset('utf-8');
+
+my $old_encode = $CGI::ENCODE_ENTITIES;
+$CGI::ENCODE_ENTITIES = '<';
+
+isnt h1( escapeHTML("this is <not> \x8bright\x9b") ),
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
+
+undef( $CGI::ENCODE_ENTITIES );
+
+is h1( escapeHTML("this is <not> \x8bright\x9b") ),
+  '<h1>this is &lt;not&gt; &#139;right&#155;</h1>';
+
+
+$CGI::ENCODE_ENTITIES = $old_encode;
+
+is i( p('hello there') ), '<i><p>hello there</p></i>';
+
+my $q = CGI->new;
+is $q->h1('hi'), '<h1>hi</h1>';
+
+$q->autoEscape(1);
+
+is $q->p( { title => "hello world&egrave;" }, 'hello &aacute;' ),
+  '<p title="hello world&amp;egrave;">hello &aacute;</p>';
+
+$q->autoEscape(0);
+
+is $q->p( { title => "hello world&egrave;" }, 'hello &aacute;' ),
+  '<p title="hello world&egrave;">hello &aacute;</p>';
+
+is p( { title => "hello world&egrave;" }, 'hello &aacute;' ),
+  '<p title="hello world&amp;egrave;">hello &aacute;</p>';
+
+is header( -type => 'image/gif', -charset => 'UTF-8' ),
+  "Content-Type: image/gif; charset=UTF-8${CRLF}${CRLF}", "header()";

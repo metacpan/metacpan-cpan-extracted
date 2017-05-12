@@ -1,0 +1,37 @@
+[%
+
+    title = 'Browse by Date' ;
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    ELSE ; crumb2_name = 'Tester' ; END ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Date' ;
+
+%]
+
+<p>Click on a date below to list the reports submitted by you for that day.</p>
+
+<!--
+[% FOREACH y = data.dates.nsort.reverse %]
+  <h2>[% y %]</h2>
+  [% FOREACH m = data.dates.$y.months.sort.reverse %]
+    <h3>[% data.dates.$y.months.$m.month %]/[% m %]</h3>
+    [% first = 1 %]
+    [% FOREACH d = data.dates.$y.months.$m.days.sort %]
+      [% IF first == 0 %]|[% END %][% first = 0 %]
+      <a href="[% cgipath %]/pages.cgi?act=tester-reports&amp;y=[% y %]&amp;m=[% m %]&amp;d=[% d %]">[% d %]</a>
+    [% END %]
+  [% END %]
+[% END %]
+-->
+
+[% FOREACH y = data.dates %]
+  <h2>[% y.year %]</h2>
+  [% FOREACH m = y.months %]
+    <h3>[% m.month %]</h3>
+    [% first = 1 %]
+    [% FOREACH d = m.days %]
+      [% IF first == 0 %]|[% END %][% first = 0 %]
+      <a href="[% cgipath %]/pages.cgi?act=tester-reports&amp;y=[% y.year %]&amp;m=[% m.mon %]&amp;d=[% d %]">[% d %]</a>
+    [% END %]
+  [% END %]
+[% END %]

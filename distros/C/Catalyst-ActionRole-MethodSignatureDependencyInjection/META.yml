@@ -1,0 +1,25 @@
+---
+abstract: 'experimental method signature dependency injection'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  warnings::illegalproto: '0.001003'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-ActionRole-MethodSignatureDependencyInjection
+requires:
+  Carp: '1.36'
+  Catalyst: '5.90060'
+  Moose::Role: '2.0602'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-ActionRole-MethodSignatureDependencyInjection/issues
+  homepage: https://github.com/jjn1056/Catalyst-ActionRole-MethodSignatureDependencyInjection
+  repository: https://github.com/jjn1056/Catalyst-ActionRole-MethodSignatureDependencyInjection.git
+version: '0.0200'

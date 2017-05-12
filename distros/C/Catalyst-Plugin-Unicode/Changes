@@ -1,0 +1,40 @@
+Revision history for Perl extension Catalyst::Plugin::Unicode
+
+0.93 Wed Mar 17 22:35:00 GMT 2010
+        - Make the documentation be phrased much more strongly
+          about how this is not the preferred unicode module.
+
+0.92 Sun Oct  4 18:30:00 GMT 2009
+        - Add documentation note that you probably want to use
+          Catalyst::Plugin::Unicode::Encoding
+
+0.91 Sat Apr 18 23:47:00 GMT 2009
+        - Fix manifest failure
+
+0.9  Sat Apr 18 11:47:00 GMT 2009
+        - Makefile.PL: build_requires => test_requires (RT #37960)
+        - Switch to MRO::Compat
+
+0.8  Tue Sep 25 12:31:02 CDT 2007
+        - fix META.yml again :)
+
+0.7  Wed Sep 12 23:58:37 CDT 2007
+        - add ok.pm to prereqs
+
+0.6  Wed Sep 12 04:08:29 CDT 2007
+        - Properly encode bodies that aren't text/* (like XML)
+
+0.5  Tue Jul 18 18:21:00 2007
+        -  Messed up META.yml
+
+0.4  Tue Jul 18 18:21:00 2007
+	    - Fix release fuckup
+
+0.3  Tue Jun 5 16:35:00 2007
+        - Change to Module::Install
+
+0.2  Sat Apr 30 23:08:00 2005
+        - Only encode body if it is utf8.
+
+0.1  Tue Apr 23 01:00:00 2005
+        - original version.

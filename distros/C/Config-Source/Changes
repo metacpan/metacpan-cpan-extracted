@@ -1,0 +1,31 @@
+Revision history for Config-Source
+
+0.08	2014-07-03
+		fixed typo in Build.PL (thanks to Slaven Rezić for the report)
+
+0.07	2014-06-05
+		add test to control the version string
+		removed Smartmatch dependency and add List::MoreUtils dependency
+		fix "keys on reference is experimental" for perl 5.20 (thanks to Slaven Rezić for the report)
+
+0.06	2013-05-21
+		fix emitting the SmartMatch Warning in Perl >= 5.18
+		(disabling the warning)
+		removed Hash order dependency in t/CloneTest.pm
+		
+0.05	2013-02-02
+		fix bug, died if you want to get a undef value
+
+0.04	2013-01-22
+		_load_source( scalarref ) doesn't croak on parsing error
+
+0.03	2013-01-17
+		push minperl from 5.12.0 to 5.14.0
+		add repository to Build.pl and Config-Source.pm
+
+0.02	2013-01-15
+		add cleanup for tests 01-general and 20-other-Config-General
+
+0.01	2013-01-14
+		First version, released on an unsuspecting world.
+

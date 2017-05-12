@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/Comparable.pm
+t/10_Class_Comparable_test.t
+t/pod.t
+t/pod_coverage.t

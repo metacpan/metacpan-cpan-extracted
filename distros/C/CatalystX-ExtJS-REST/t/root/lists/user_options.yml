@@ -1,0 +1,7 @@
+---
+elements:
+  - name: ending
+    constraints:
+      - type: Range
+        min: 2
+        max: 3

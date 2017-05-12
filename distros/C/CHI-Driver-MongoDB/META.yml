@@ -1,0 +1,25 @@
+---
+abstract: 'MongoDB driver for CHI'
+author:
+  - 'Heiko Jansen <hjansen@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CHI-Driver-MongoDB
+requires:
+  CHI: '0.60'
+  MongoDB: v1.4.5
+  Moo: '2.000000'
+  Time::Moment: '0.19'
+  Try::Tiny: '0'
+  URI::Escape::XS: '0'
+resources:
+  repository: https://github.com/heikojansen/chi-driver-mongodb.git
+version: '0.0001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

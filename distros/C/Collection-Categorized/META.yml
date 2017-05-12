@@ -1,0 +1,21 @@
+--- 
+abstract: categorize and organize a collection of data
+author: Jonathan Rockway C<< jrockway AT cpan.org >>
+build_requires: 
+  Test::More: 0
+  ok: 0
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: Perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Collection-Categorized
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Accessor: 0
+  Sub::AliasedUnderscore: 0
+version: 0.01

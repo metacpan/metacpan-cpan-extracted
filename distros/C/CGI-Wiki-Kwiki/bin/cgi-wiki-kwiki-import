@@ -1,0 +1,247 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+cgi-wiki-kwiki-import
+
+=head1 DESCRIPTION
+
+Import utility that will take a CGI::Kwiki store and import it into a CGI::Wiki
+wiki.
+
+    cgi-wiki-kwiki-import --host <host> --type <type> --name <name>
+                          --user <user> --pass <pass> --kwiki <kwiki source>
+                          --rcs-path <path to rcs binaries> --charset <charset>
+
+
+
+=head1 NOTES AND PROBLEMS
+
+If you use RCS for your kwiki back end, it assumes you have all your RCS
+programs in /usr/bin - you may have to edit import.pl to correct this if they
+are somewhere else.
+
+The charset directive determins what character set the pages are imported into
+your database with - the default is 'utf-8', as this is what Kwiki uses. Make
+sure that your wiki.cgi script agrees with this setting.
+
+There is a potential problem with the import - depending on your underlying
+filesystem, CGI::Kwiki may be case-sensitive - you can have a node 'node' and a
+node 'NODE' and they will be different. CGI::Wiki does not do this, and so all
+the data for both of those nodes will be written as different versions of the
+'node' node. This is almost certainly not what you want. The only thing you can
+really do about this is make sure you don't have duplicate nodes in the Kwiki
+database - merge and delete the duplicates from the /database folder in your
+kwiki. The import script will flag duplicates if it sees them.
+
+=cut
+
+use strict;
+use warnings;
+
+no warnings 'redefine';
+use CGI::Wiki;
+use Getopt::Long;
+use Time::Piece;
+use CGI::Wiki::Store::Database;
+use CGI::Wiki::Formatter::Kwiki;
+use CGI::Wiki;
+use Encode qw( decode_utf8 );
+
+# This is a nasty hack to make the modified time of the revisions accurate.
+my $fudge_time = 0;
+sub CGI::Wiki::Store::Database::_get_timestamp {
+    my $self = shift;
+    my $time = localtime($fudge_time);
+    return $time->strftime($CGI::Wiki::Store::Database::timestamp_fmt);
+}
+
+
+my ($dbtype, $dbname, $dbuser, $dbpass, $dbhost, $help, $path, $rcs_path, $charset);
+GetOptions( "type=s"   => \$dbtype,
+            "name=s"   => \$dbname,
+            "user=s"   => \$dbuser,
+            "pass=s"   => \$dbpass,
+            "host=s"   => \$dbhost,
+            "help"     => \$help,
+            "kwiki=s"  => \$path,
+            "charset=s" => \$charset,
+            "rcs-path=s" =>\$rcs_path,
+           );
+
+unless (defined($dbtype)) {
+    print "You must supply a database type with the --type option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+unless (defined($dbname)) {
+    print "You must supply a database name with the --name option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+unless (defined($path)) {
+    print "You must supply a kwiki data folder with the --kwiki option.\n";
+    print "Further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+if ($help) {
+    print "Help can be found by typing 'perldoc $0'\n";
+    exit 0;
+}
+
+my %store_modules = (
+    postgres => "CGI::Wiki::Store::Pg",
+    mysql    => "CGI::Wiki::Store::MySQL",
+    sqlite  => "CGI::Wiki::Store::SQLite"
+);
+
+unless ( defined($store_modules{$dbtype}) ) {
+    print "type must be one of 'postgres', 'mysql', and 'sqlite'\n";
+    print "further help can be found by typing 'perldoc $0'\n";
+    exit 1;
+}
+
+my $class = $store_modules{$dbtype};
+eval "require $class";
+if ( $@ ) {
+    print "Couldn't 'use' $class: $@\n";
+    exit 1;
+}
+my $store = $class->new(
+    dbname => $dbname,
+    dbpass => $dbpass,
+    dbuser => $dbuser,
+    dbhost => $dbhost,
+    charset => $charset,
+) or die "Could not create store\n";
+
+my $formatter = CGI::Wiki::Formatter::Kwiki->new();
+
+my $wiki = CGI::Wiki->new(
+    store=>$store,
+    formatter=>$formatter,
+    charset => $charset || "utf-8",
+);
+
+
+$path =~ s!/+$!!;
+unless (-d $path) {
+    die "I can't find the folder $path.\n";
+
+} elsif (!-d $path."/database") {
+    die "I can't find the database $path/database.\n";
+
+} elsif (!-d $path."/metabase") {
+    die "I can't find the metabase $path/metabase\n";
+}
+
+my $rcs;
+if (-d "$path/metabase/rcs") {
+    eval {
+        require Rcs;
+    };
+    if ($@) {
+        print "The Kwiki store uses RCS, but I can't find the perl RCS module\n";
+        print "Use CPAN to install it ('cpan Rcs'), and try again.\n";
+        exit 0;
+    }
+    $rcs = Rcs->new;
+    $rcs->bindir($rcs_path || '/usr/bin');
+    $rcs->quiet(1);
+    $rcs->rcsdir("$path/metabase/rcs");
+    $rcs->workdir("/tmp");
+}
+
+opendir(DIR, $path."/database") or die "Can't open database: $!\n";
+my @database = sort(grep { !/^\./ and -f $path."/database/".$_ } readdir(DIR));
+closedir(DIR);
+
+my %seen;
+for my $node (@database) {
+  eval {
+    print "Importing $node\n";
+
+    if ($seen{lc($node)}++) {
+        print "******** WARNING ********\n";
+        print "Duplicate node '$node' found (differs only by case)\n";
+        print "See README file for details\n\n";
+        print "*************************\n\n";
+    }
+    
+
+    my $meta;
+    open FILE, "$path/metabase/metadata/$node"
+        or die "Can't open metabase node for $node: $!\n";
+    while (<FILE>) {
+        chomp;
+        s/\s+$//;
+        my ($var, $val) = split(/\s*:\s*/, $_, 2);
+        $meta->{$var} = $val;
+    }
+    close FILE;
+    
+    if ($rcs) {
+        $rcs->file($node);
+        for (reverse($rcs->revisions)) {
+            print " Rcs revision $_\n";
+            $rcs->co("-r$_");
+            my $data;
+            {   local $/ = undef;
+                open FILE, "/tmp/$node"
+                    or die "Can't open temp checkout file for $node: $!\n";
+                $data = <FILE>;
+                close FILE;
+            }
+
+            $fudge_time = $rcs->revdate($_);
+            # We just want to pass the current checksum.
+            my %data = $wiki->retrieve_node($node);
+
+            # note that the formatter metadata doesn't really do anything yet. But
+            # hopefully it will.
+            $wiki->write_node( $node, $data, $data{checksum},
+            { # metadata
+                formatter => 'Kwiki',
+            }
+            ) or warn "Failed to write node\n";
+
+        }
+
+
+    } else {
+        local $/ = undef;
+        open FILE, "$path/database/$node"
+            or die "Can't open database node for $node: $!\n";
+        # Kwikis are in UTF8
+        binmode FILE, ":utf8";
+        my $data = <FILE>;
+        close FILE;
+        
+        # We just want to pass the current checksum.
+        my %data = $wiki->retrieve_node($node);
+
+        $fudge_time = Time::Piece->strptime(
+            $meta->{edit_time},
+            "%a %b %d %T %Y");
+        # Thu Oct 13 04:54:34 1994
+
+        # note that the formatter metadata doesn't really do anything yet. But
+        # hopefully it will.
+        $wiki->write_node(
+            $node,
+            $data,
+            $data{checksum},
+            {  formatter => 'Kwiki', }
+        ) or warn "Failed to write node\n";
+    }
+  };
+  if ($@) {
+    warn "FATAL ERROR IMPORTING NODE $node: $@\n";
+    warn "Trying to continue..\n";
+  }
+}
+print "Done.\n";
+

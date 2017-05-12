@@ -1,0 +1,23 @@
+Revision history for Catalyst-Model-CacheFunky-Loader
+
+0.06    2008-04-06/17:23
+        - using spelling
+
+0.05    2008-04-06/12:09
+        - fix type
+        - using Module::Install
+
+0.04    2007-06-16/00:20:00
+        - update POD
+
+0.03    2007-06-15/22:32:00
+        - add Cache::Funky as pre required.
+        - update POD
+
+0.02    2007-06-12/16:00:00
+        - update POD
+        - support mmr_args config setting for Module::Recursive::Require.
+
+0.01    2007-06-12/00:00:34
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,9 @@
+Revision history for Catalyst-Plugin-Session-PSGI
+
+0.0.2     2013-02-28 14:59:51 Europe/London
+ - apply _psgi_env() patch (RT#83685) [KOKI]
+
+0.0.1     2011-09-16 14:33:28 Europe/London
+ - initial release
+ - use PSGI/Plack environment for session data
+ - document obvious areas of concern

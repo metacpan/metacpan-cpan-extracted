@@ -1,0 +1,57 @@
+---
+abstract: 'Yet another line editing library '
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Caroline
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Caroline:
+    file: lib/Caroline.pm
+    version: '0.22'
+  Caroline::State:
+    file: lib/Caroline.pm
+  Term::ReadLine::Caroline:
+    file: lib/Term/ReadLine/Caroline.pm
+recommends:
+  Term::ReadLine: '0'
+requires:
+  Class::Accessor::Lite: '0.05'
+  IO::Handle: '0'
+  POSIX: '0'
+  Storable: '0'
+  Term::Encoding: '0'
+  Term::ReadKey: '2.3'
+  Text::VisualWidth::PP: '0.03'
+  Unicode::EastAsianWidth::Detect: '0.03'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Caroline/issues
+  homepage: https://github.com/tokuhirom/Caroline
+  repository: git://github.com/tokuhirom/Caroline.git
+version: '0.22'
+x_contributors:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+  - 'moznion <moznion@gmail.com>'
+  - 'Hiroaki Yoshida <yoshidaster@gmail.com>'
+  - 'Yasuhiro Matsumoto <mattn.jp@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

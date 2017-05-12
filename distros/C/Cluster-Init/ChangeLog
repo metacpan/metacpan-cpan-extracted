@@ -1,0 +1,219 @@
+2003-08-10 01:12  stevegt
+
+	* lib/Cluster/Init.pm, lib/Cluster/Init/Group.pm,
+	lib/Cluster/Init/Util.pm, t/0232stop.t, t/50multigrp.t: fix perl
+	5.8 bug
+
+2003-07-25 19:41  stevegt
+
+	* lib/Cluster/: Init.pm, Init/DB.pm, Init/Daemon.pm, Init/Util.pm:
+	add signal handling to HA monitor()
+
+2003-04-14 01:14  stevegt
+
+	* lib/Cluster/: Init.pm, Init/Conf.pm: docs done
+
+2003-04-08 14:39  stevegt
+
+	* Makefile.PL, clinit, lib/Cluster/Init.pm,
+	lib/Cluster/Init/Conf.pm, lib/Cluster/Init/Daemon.pm, t/0232stop.t:
+	checkpoint
+
+2003-04-04 23:47  stevegt
+
+	* Makefile.PL, TODO, lib/Cluster/Init.pm,
+	lib/Cluster/Init/Daemon.pm, t/0232stop.t, t/20wait.t,
+	t/cltab.master, t/utils.pl: clean up misc intermittent test
+	failures; refresh clstat every 30-45 secs even when no groups are
+	updated, to provide OpenMosix::HA heartbeat
+
+2003-04-04 12:20  stevegt
+
+	* MANIFEST, clinit, lib/Cluster/Init.pm, t/50multigrp.t,
+	t/60multichar.t, t/clinittab.master, t/clinittab.override,
+	t/cltab.master, t/utils.pl: rename clinit* to cl*
+
+2003-04-04 11:26  stevegt
+
+	* dfa/Daemon.dot, lib/Cluster/Init.pm, lib/Cluster/Init/Conf.pm,
+	lib/Cluster/Init/Daemon.pm, lib/Cluster/Init/Group.pm,
+	lib/Cluster/Init/Status.pm, t/0230group.t, t/0231level.t,
+	t/0232stop.t, t/0233passfail.t, t/0234halt.t, t/03_config.t,
+	t/08daemon.t, t/10_tell.t, t/11_status.t, t/12blank.t, t/20wait.t,
+	t/25long.t, t/30once.t, t/40respawn.t, t/45init0.t, t/47reread.t,
+	t/48off.t, t/50multigrp.t, t/60multichar.t, t/70clinit.t,
+	t/80test.t, t/clinittab.master, t/clinittab.override,
+	t/cltab.master, t/cltab.override, t/utils.pl, t/xrcize: rename
+	clinit* to cl*
+
+2003-04-04 11:00  stevegt
+
+	* TODO, lib/Cluster/Init/Process.pm, t/clinittab.master,
+	t/cltab.master: intermittent failure test 10 in 60multichar.t ,
+	remove need for comma in single-valued multichar runlevel
+
+2003-04-01 19:45  stevegt
+
+	* MANIFEST, lib/Cluster/Init.pm: update MANIFEST
+
+2003-04-01 15:49  stevegt
+
+	* TODO, clinit, dfa/Process.dot, lib/Cluster/Init.pm,
+	lib/Cluster/Init/Conf.pm, lib/Cluster/Init/Group.pm,
+	lib/Cluster/Init/Process.pm, lib/Cluster/Init/Status.pm,
+	lib/Cluster/Init/Util.pm, t/021process.t, t/0232stop.t,
+	t/40respawn.t, t/utils.pl, t/xrcize: pretty well done, works with
+	OpenMosix::Init, fixed intermittent PASS/FAIL failure
+
+2003-03-17 15:39  stevegt
+
+	* TODO, lib/Cluster/Init.pm: fix pod syntax
+
+2003-03-17 15:29  stevegt
+
+	* lib/Cluster/Init.pm: Convert from IS::Init version numbering.
+
+2003-03-17 15:26  stevegt
+
+	* MANIFEST, TODO, clinit, dfa/Daemon.dot, dfa/Process.dot,
+	lib/Cluster/Init.pm, lib/Cluster/Init/Conf.pm,
+	lib/Cluster/Init/DB.pm, lib/Cluster/Init/Daemon.pm,
+	lib/Cluster/Init/Group.pm, lib/Cluster/Init/Process.pm,
+	lib/Cluster/Init/Status.pm, lib/Cluster/Init/Util.pm,
+	t/021process.t, t/0230group.t, t/0231level.t, t/0232stop.t,
+	t/0233passfail.t, t/0234halt.t, t/03_config.t, t/08daemon.t,
+	t/10_tell.t, t/11_status.t, t/12blank.t, t/20wait.t, t/25long.t,
+	t/30once.t, t/40respawn.t, t/45init0.t, t/47reread.t, t/48off.t,
+	t/50multigrp.t, t/60multichar.t, t/70clinit.t, t/80test.t,
+	t/90override.t, t/clinittab.master, t/cltab.master, t/utils.pl: All
+	222 tests pass!  Some outstanding items -- see TODO.
+
+2003-03-14 19:16  stevegt
+
+	* MANIFEST, TODO, lib/Cluster/Init.pm, lib/Cluster/Init/Conf.pm,
+	lib/Cluster/Init/Daemon.pm, lib/Cluster/Init/Group.pm,
+	t/08daemon.t: about to convert t/023* to using Conf instead of
+	scratch newdb
+
+2003-03-07 17:59  stevegt
+
+	* dfa/Daemon.dot, dfa/Group.dot, dfa/Process.dot, dfa/dot2dfa,
+	lib/Cluster/Init/DB.pm, lib/Cluster/Init/Daemon.pm,
+	lib/Cluster/Init/Group.pm, lib/Cluster/Init/Kernel.pm,
+	lib/Cluster/Init/Process.pm, lib/Cluster/Init/Util.pm, t/01db.t,
+	t/021process.t, t/0230group.t, t/0231level.t, t/0232stop.t,
+	t/0233passfail.t, t/0234halt.t, t/02_config.t, t/03_config.t,
+	t/utils.pl: restarted work from process layer up -- working much
+	better now, tests working through 02*
+
+2003-02-23 11:37  stevegt
+
+	* MANIFEST: yanked 'gen'
+
+2003-02-23 11:36  stevegt
+
+	* MANIFEST, dfa/Daemon.dot, dfa/dot2dfa, lib/Cluster/Init.pm,
+	lib/Cluster/Init/DB.pm, lib/Cluster/Init/Daemon.pm,
+	lib/Cluster/Init/Process.pm, lib/Cluster/Init/Util.pm, t/01db.t,
+	t/02_config.t: checkpoint -- turned DB.pm into an OO db, started
+	getting tests working again after Event installation
+
+2003-02-19 16:15  stevegt
+
+	* MANIFEST, Makefile.PL, README, clinit, gen, dfa/Daemon.dot,
+	dfa/Group.dot, dfa/Makefile, dfa/Process.dot, lib/Cluster/Init.pm,
+	lib/Cluster/Init/DB.pm, lib/Cluster/Init/Daemon.pm,
+	lib/Cluster/Init/Group.pm, lib/Cluster/Init/Process.pm,
+	lib/Cluster/Init/Util.pm, t/01_ini.t, t/01db.t, t/02_config.t,
+	t/08daemon.t, t/10_tell.t, t/11_status.t, t/12blank.t, t/20wait.t,
+	t/25long.t, t/30once.t, t/40respawn.t, t/45init0.t, t/47reread.t,
+	t/48off.t, t/50multigrp.t, t/60multichar.t, t/70clinit.t,
+	t/80test.t, t/90override.t, t/utils.pl: convert from IS::Init
+
+2003-02-19 15:30  stevegt
+
+	* dfa/dot2dfa, lib/Cluster/Init.pm, lib/Cluster/Init/DB.pm,
+	lib/Cluster/Init/Daemon.pm, lib/Cluster/Init/Group.pm,
+	lib/Cluster/Init/Util.pm, dfa/Daemon.dot, dfa/Group.dot,
+	dfa/Process.dot, lib/Cluster/Init/Process.pm, t/ldt-client:
+	checkpoint
+
+2003-02-13 22:58  stevegt
+
+	* dfa/Makefile, dfa/dot2dfa, lib/Cluster/Init.pm,
+	lib/Cluster/Init/DB.pm, lib/Cluster/Init/Daemon.pm,
+	lib/Cluster/Init/Group.pm, lib/Cluster/Init/Util.pm: checkpoint
+	before dumping numeric dfa constants
+
+2003-01-30 23:26  stevegt
+
+	* lib/Cluster/Init.pm, t/01db.t, t/02_config.t, t/08daemon.t,
+	t/10_tell.t, t/11_status.t, t/12blank.t, t/20wait.t, t/25long.t,
+	t/30once.t, t/40respawn.t, t/45init0.t, t/47reread.t, t/48off.t,
+	t/50multigrp.t, t/60multichar.t, t/70clinit.t, t/80test.t,
+	t/90override.t: checkpoint -- non-working version, about to break
+	up into modules and install DFA state machines
+
+2003-01-27 23:33  stevegt
+
+	* lib/Cluster/Init.pm, t/01db.t, t/02_config.t, t/08daemon.t,
+	t/10_tell.t, t/11_status.t, t/12blank.t, t/20wait.t, t/25long.t,
+	t/30once.t, t/40respawn.t, t/45init0.t, t/47reread.t, t/48off.t,
+	t/50multigrp.t, t/60multichar.t, t/70clinit.t, t/80test.t,
+	t/90override.t: checkpoint -- about to rip out split level stuff
+
+2003-01-23 20:53  stevegt
+
+	* lib/Cluster/Init.pm, t/01db.t: checkpoint -- added db package,
+	reworking _config()
+
+2003-01-23 13:55  stevegt
+
+	* t/: 11_status.t, 12blank.t, 80test.t, 90override.t, blank,
+	clinittab.override, cltab.override: checkpoint -- missed adding
+	these earlier
+
+2003-01-23 13:54  stevegt
+
+	* MANIFEST, lib/Cluster/Init.pm, t/20wait.t: checkpoint --
+	installing Event
+
+2003-01-20 13:11  stevegt
+
+	* lib/Cluster/Init.pm, t/20wait.t, t/clinittab.master,
+	t/cltab.master: about to rework SIGCHLD handling, add an event
+	queue, crit/noncrit code path marking
+
+2003-01-18 23:27  stevegt
+
+	* lib/Cluster/Init.pm, t/clinittab.master, t/cltab.master: add test
+	mode
+
+2003-01-18 22:41  stevegt
+
+	* lib/Cluster/Init.pm, t/20wait.t, t/40respawn.t, t/50multigrp.t,
+	t/clinittab.master, t/cltab.master: add status file output
+
+2001-09-21 12:07  stevegt
+
+	* lib/Cluster/Init.pm: port to AIX
+
+2001-09-21 11:25  stevegt
+
+	* t/70clinit.t: fix timing problem on startup
+
+2001-09-21 11:21  stevegt
+
+	* MANIFEST, clinit, lib/Cluster/Init.pm, t/02_config.t,
+	t/08daemon.t, t/70clinit.t: add -k, -c, -s flags to isinit, add
+	test cases for it
+
+2001-09-21 10:42  stevegt
+
+	* LICENSE, MANIFEST, Makefile.PL, README, clinit, gen,
+	lib/Cluster/Init.pm, t/01_ini.t, t/02_config.t, t/08daemon.t,
+	t/10_tell.t, t/20wait.t, t/25long.t, t/30once.t, t/40respawn.t,
+	t/45init0.t, t/47reread.t, t/48off.t, t/50multigrp.t,
+	t/60multichar.t, t/clinittab.master, t/cltab.master, t/utils.pl:
+	first version, working great, all 90 regression tests pass
+

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Create PDF files from Catalyst using Template Toolkit templates",
+   "author" : [
+      "Ferruccio Zamuner <nonsolosoft@diff.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-PDF-API2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0",
+            "Test::WWW::Mechanize::Catalyst" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::View::TT" : "0",
+            "File::chdir" : "0",
+            "PDF::API2" : "0",
+            "Template::Plugin::Procedural" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

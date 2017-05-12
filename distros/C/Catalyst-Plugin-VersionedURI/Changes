@@ -1,0 +1,31 @@
+Revision history for Catalyst::Plugin::VersionedURI
+
+1.2.0 2016-05-25
+  [ ENHANCEMENTS ]
+    - Only utilize public methods when interacting with URI (GH#2, Mark
+      Grimes)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 27 insertions(+), 18 deletions(-)
+
+1.1.2 2015-11-29
+  - Now use 'Catalyst::DispatchType::Regex' explicitly to placate the
+    deprecation notice.
+  - Use Path::Tiny instead of Path::Class.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 35 insertions(+), 13 deletions(-)
+
+1.1.1 2011-08-29
+  - 'uri' now defaults to '/static'
+
+1.1.0 2011-02-07
+  - the version token can now be generated from the mtime of the file.
+    (thanks to mvgrimes for the patch)
+
+1.0.0 2011-01-03
+  - By default, add the versioned element to the query instead than the
+    path. (thanks to Alexander Hartmaier for pointing that out)
+
+0.1.0 2011-01-02
+  - Initial release.

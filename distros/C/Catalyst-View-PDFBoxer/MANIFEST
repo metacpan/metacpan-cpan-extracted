@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Catalyst/View/PDFBoxer.pm
+t/01use.t
+t/02request.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/View/PDFBoxer.pm
+t/lib/TestApp/root/test.tt
+weaver.ini

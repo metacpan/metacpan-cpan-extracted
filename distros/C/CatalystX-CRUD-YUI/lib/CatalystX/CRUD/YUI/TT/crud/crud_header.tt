@@ -1,0 +1,25 @@
+ <!-- local js -->
+  <script type="text/javascript">
+    /* <![CDATA[ */
+        // must come before crud.js is loaded
+        OK2LOG = [% c.debug ? '1' : '0' %];
+    /* ]]> */
+  </script>
+
+  <script type="text/javascript" src="[% static_url %]/js/crud.js"></script>
+  <script type="text/javascript" src="[% static_url %]/js/json.js"></script>
+  
+<!-- CRUD style -->
+  <link rel="stylesheet" type="text/css" media="all" href="[% static_url %]/css/crud.css" />
+
+  <style type="text/css"><!-- livegrid button icons -->
+    .add, {
+        background-image:url([% static_url %]/icons/add.gif) !important;
+    }
+    .add-button, .plus-button {
+        background-image:url([% static_url %]/icons/add.gif) !important;
+    }
+    .remove {
+        background-image:url([% static_url %]/icons/delete.gif) !important;
+    }
+  </style>

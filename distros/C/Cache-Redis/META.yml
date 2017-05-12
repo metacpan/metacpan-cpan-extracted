@@ -1,0 +1,48 @@
+---
+abstract: 'Redis client specialized for cache'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::RedisServer: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cache-Redis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cache::Redis:
+    file: lib/Cache/Redis.pm
+    version: '0.13'
+recommends:
+  Data::MessagePack: '0.36'
+  JSON::XS: '0'
+  Redis::Fast: '0'
+requires:
+  Module::Load: '0'
+  Redis: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-Cache-Redis/issues
+  homepage: https://github.com/Songmu/p5-Cache-Redis
+  repository: git://github.com/Songmu/p5-Cache-Redis.git
+version: '0.13'
+x_contributors:
+  - 'soh335 <sugarbabe335@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'David Farrell <davidnmfarrell@gmail.com>'

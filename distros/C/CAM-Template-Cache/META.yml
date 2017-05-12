@@ -1,0 +1,17 @@
+---
+name: CAM-Template-Cache
+version: 0.91
+author:
+  - Clotho Advanced Media Inc., I<cpan@clotho.com>
+abstract: Template files with database storage
+license: perl
+requires:
+  CAM::Template: 0.90
+  DBI: 1.00
+build_requires:
+  Test::More: 0.01
+provides:
+  CAM::Template::Cache:
+    file: lib/CAM/Template/Cache.pm
+    version: 0.91
+generated_by: Module::Build version 0.2609

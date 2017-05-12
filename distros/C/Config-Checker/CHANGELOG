@@ -1,0 +1,22 @@
+
+Some more missing dependencies.
+https://rt.cpan.org/Ticket/Display.html?id=50595
+
+Allow the prototype to be passed as an object.
+https://rt.cpan.org/Ticket/Display.html?id=53356
+
+= 2010/06/28	0.42
+
+https://rt.cpan.org/Ticket/Display.html?id=50595
+Note dependency on File::Slurp & Module::Load.
+
+= 2009/09/02	0.41
+
+Minor documentation changes.
+Fix some regression tests.
+
+= 2009/07/24	0.4
+
+Changed YAML::ConfigFile to Config::YAMLMacros to avoid
+a name conflict on CPAN.
+

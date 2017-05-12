@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+eg/addressbook/book.pl
+eg/addressbook/BonusTypes.pm
+eg/addressbook/form.css
+eg/wiki/lib/Page.pm
+lib/Continuity/Widget.pm
+lib/Continuity/Meta/Attribute/FormField.pm
+lib/Continuity/Coro/Moose.pm
+lib/Continuity/Coro/Continuation.pm
+README
+META.yml                                 Module meta-data (added by MakeMaker)

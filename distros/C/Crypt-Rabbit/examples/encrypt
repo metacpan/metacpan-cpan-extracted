@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl
+
+# Usage:
+#    encrypt input.txt > output.enc
+#    encrypt output.enc > file.dec
+#
+# input.txt should be the same as file.dec
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::Rabbit;
+
+my $key = pack "H32", "00112233445566778899aabbccddeeff";
+my $cipher = new Crypt::Rabbit $key;
+
+chomp $ARGV[0];
+open INFILE, $ARGV[0];
+
+while (read(INFILE, my $buffer, 4096)) {
+    print $cipher->encrypt($buffer);
+}
+
+close INFILE;
+

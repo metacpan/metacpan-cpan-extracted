@@ -1,0 +1,104 @@
+/* config.h.in.  Generated automatically from configure.in by autoheader 2.13.  */
+
+/* Define to `unsigned' if <sys/types.h> doesn't define.  */
+#undef size_t
+
+/* Define if you have the ANSI C header files.  */
+#undef STDC_HEADERS
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#undef TIME_WITH_SYS_TIME
+
+/*
+ * If your system is kinda special
+ */
+#undef SYSTEM_DOS
+#undef SYSTEM_QUICKWIN
+#undef SYSTEM_WINDLL
+#undef SYSTEM_OS2
+
+/*
+ * If your system has stdin/stdout/stderr
+ */
+#undef HAVE_STDIO
+
+/*
+ * how to declare functions that are exported from the UU library
+ */
+#undef UUEXPORT
+
+/*
+ * how to declare functions that are exported from the fptools library
+ */
+#undef TOOLEXPORT
+
+/*
+ * define if your compiler supports function prototypes
+ */
+#undef PROTOTYPES
+
+/*
+ * define if your system has chmod(2)
+ */
+#undef HAVE_CHMOD
+
+/*
+ * define if your system has umask(2)
+ */
+#undef HAVE_UMASK
+
+/*
+ * define if your system has mkstemp
+ */
+#undef HAVE_MKSTEMP
+
+/*
+ * Replacement functions.
+ * #define strerror _FP_strerror
+ * #define tempnam  _FP_tempnam
+ * if you don't have these functions
+ */
+#undef strerror
+#undef tempnam
+
+/* Define if you have the fgetc_unlocked function.  */
+#undef HAVE_FGETC_UNLOCKED
+
+/* Define if you have the gettimeofday function.  */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define if you have the strcasecmp function.  */
+#undef HAVE_STRCASECMP
+
+/* Define if you have the strcasestr function.  */
+#undef HAVE_STRCASESTR
+
+/* Define if you have the strncasecmp function.  */
+#undef HAVE_STRNCASECMP
+
+/* Define if you have the <errno.h> header file.  */
+#undef HAVE_ERRNO_H
+
+/* Define if you have the <fcntl.h> header file.  */
+#undef HAVE_FCNTL_H
+
+/* Define if you have the <io.h> header file.  */
+#undef HAVE_IO_H
+
+/* Define if you have the <malloc.h> header file.  */
+#undef HAVE_MALLOC_H
+
+/* Define if you have the <memory.h> header file.  */
+#undef HAVE_MEMORY_H
+
+/* Define if you have the <stdarg.h> header file.  */
+#undef HAVE_STDARG_H
+
+/* Define if you have the <sys/time.h> header file.  */
+#undef HAVE_SYS_TIME_H
+
+/* Define if you have the <unistd.h> header file.  */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the <varargs.h> header file.  */
+#undef HAVE_VARARGS_H

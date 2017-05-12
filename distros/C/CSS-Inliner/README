@@ -1,0 +1,174 @@
+NAME
+    CSS::Inliner - Library for converting CSS <style> blocks to inline
+    styles.
+
+SYNOPSIS
+    use CSS::Inliner;
+
+    my $inliner = new CSS::Inliner();
+
+    $inliner->read_file({ filename => 'myfile.html' });
+
+    print $inliner->inlinify();
+
+DESCRIPTION
+    Library for converting CSS style blocks into inline styles in an HTML
+    document. Specifically this is intended for the ease of generating HTML
+    emails. This is useful as even in 2015 Gmail and Hotmail don't support
+    top level <style> declarations.
+
+METHODS
+  new
+    Instantiates the Inliner object. Sets up class variables that are used
+    during file parsing/processing. Possible options are:
+
+    html_tree - (optional) Pass in a fresh unparsed instance of
+    HTML::Treebuilder
+
+    NOTE: Any passed references to HTML::TreeBuilder will be substantially
+    altered by passing it in here...
+
+    strip_attrs - (optional) Remove all "id" and "class" attributes during
+    inlining
+
+    leave_style - (optional) Leave style/link tags alone within <head>
+    during inlining
+
+    relaxed - (optional) Relaxed HTML parsing which will attempt to
+    interpret non-HTML4 documents.
+
+    NOTE: This argument is not compatible with passing an html_tree.
+
+    agent - (optional) Pass in a string containing a preferred user-agent,
+    overrides the internal default provided by the module for handling
+    remote documents
+
+  fetch_file
+    Fetches a remote HTML file that supposedly contains both HTML and a
+    style declaration, properly tags the data with the proper charset as
+    provided by the remote webserver (if any). Subsequently calls the read
+    method automatically.
+
+    This method expands all relative urls, as well as fully expands the
+    stylesheet reference within the document.
+
+    This method requires you to pass in a params hash that contains a url
+    argument for the requested document. For example:
+
+    $self->fetch_file({ url => 'http://www.example.com' });
+
+    Note that you can specify a user-agent to override the default
+    user-agent of 'Mozilla/4.0' within the constructor. Doing so may avoid
+    certain issues with agent filtering related to quirky webserver configs.
+
+    Input Parameters: url - the desired url for a remote asset presumably
+    containing both html and css charset - (optional) programmer specified
+    charset for the pass url
+
+  read_file
+    Opens and reads an HTML file that supposedly contains both HTML and a
+    style declaration, properly tags the data with the proper charset if
+    specified. It subsequently calls the read() method automatically.
+
+    This method requires you to pass in a params hash that contains a
+    filename argument. For example:
+
+    $self->read_file({ filename => 'myfile.html' });
+
+    Additionally you can specify the character encoding within the file, for
+    example:
+
+    $self->read_file({ filename => 'myfile.html', charset => 'utf8' });
+
+    Input Parameters: filename - name of local file presumably containing
+    both html and css charset - (optional) programmer specified charset of
+    the passed file
+
+  read
+    Reads passed html data and parses it. The intermediate data is stored in
+    class variables.
+
+    The <style> block is ripped out of the html here, and stored separately.
+    Class/ID/Names used in the markup are left alone.
+
+    This method requires you to pass in a params hash that contains scalar
+    html data. For example:
+
+    $self->read({ html => $html });
+
+    NOTE: You are required to pass a properly encoded perl reference to the
+    html data. This method does *not* do the dirty work of encoding the html
+    as utf8 - do that before calling this method.
+
+    Input Parameters: html - scalar presumably containing both html and css
+    charset - (optional) scalar representing the original charset of the
+    passed html
+
+  detect_charset
+    Detect the charset of the passed content.
+
+    The algorithm present here is roughly based off of the HTML5 W3C working
+    group document, which lays out a recommendation for determining the
+    character set of a received document, which can be seen here under the
+    "determining the character encoding" section:
+    http://www.w3.org/TR/html5/syntax.html
+
+    NOTE: In the event that no charset can be identified the library will
+    handle the content as a mix of UTF-8/CP-1252/8859-1/ASCII by attempting
+    to use the Encoding::FixLatin module, as this combination is relatively
+    common in the wild. Finally, if Encoding::FixLatin is unavailable the
+    content will be treated as ASCII.
+
+    Input Parameters: content - scalar presumably containing both html and
+    css charset - (optional) programmer specified charset for the passed
+    content ctcharset - (optional) content-type specified charset for
+    content retrieved via a url
+
+  decode_characters
+    Implement the character decoding algorithm for HTML as outlined by the
+    various working groups
+
+    Basically apply best practices for determining the applied character
+    encoding and properly decode it
+
+    It is expected that this method will be called before any calls to
+    read()
+
+    Input Parameters: content - scalar presumably containing both html and
+    css charset - known charset for the passed content
+
+  inlinify
+    Processes the html data that was entered through either 'read' or
+    'read_file', returns a scalar that contains a composite chunk of html
+    that has inline styles instead of a top level <style> declaration.
+
+  query
+    Given a particular selector return back the applicable styles
+
+  specificity
+    Given a particular selector return back the associated selectivity
+
+  content_warnings
+    Return back any warnings thrown while inlining a given block of content.
+
+    Note: content warnings are initialized at inlining time, not at read
+    time. In order to receive back content feedback you must perform
+    inlinify first
+
+Sponsor
+    This code has been developed under sponsorship of MailerMailer LLC,
+    http://www.mailermailer.com/
+
+AUTHOR
+     Kevin Kamel <kamelkev@mailermailer.com>
+
+CONTRIBUTORS
+     Dave Gray <cpan@doesntsuck.com>
+     Vivek Khera <vivek@khera.org>
+     Michael Peters <wonko@cpan.org>
+     Chelsea Rio <chelseario@gmail.com>
+
+LICENSE
+    This module is Copyright 2015 Khera Communications, Inc. It is licensed
+    under the same terms as Perl itself.
+

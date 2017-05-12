@@ -1,0 +1,10 @@
+
+2006/02/16
+	When CGI::Out and CGI::Wrap are both used, they'll say
+	were they were used from so that a nice error can be given.
+2001/12/14
+	Added a $mailto variable to CGI::Out & CGI::Wrap to
+	specify where mail bombs should be sent
+2000/01/13
+	Make the out buffer accessable.
+

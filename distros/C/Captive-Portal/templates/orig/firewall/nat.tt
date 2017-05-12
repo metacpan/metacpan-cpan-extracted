@@ -1,0 +1,18 @@
+#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+# nat chains handle the rules for a http based captive portal
+#-----------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+
+# pass all incoming traffic, capture/redirect only outgoing traffic
+iptables -t nat -I PREROUTING ! -i [%- capture_if -%] -j ACCEPT
+
+# shortcut marked traffic, don't capture/redirect already marked packets
+iptables -t nat -A PREROUTING -m mark --mark 1 -j ACCEPT
+
+# redirect outbound non-auth web traffic to redirect chain
+iptables -t nat -A PREROUTING -s [%- capture_net -%] ! -d [%- capture_net -%] \
+  -p tcp -m multiport --dports [%- capture_ports.join(',') -%] \
+  -j  REDIRECT --to-port [%- redirect_port -%]
+
+# vim: sw=2 ft=sh

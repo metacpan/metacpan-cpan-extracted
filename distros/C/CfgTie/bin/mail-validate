@@ -1,0 +1,183 @@
+#!/usr/bin/perl -Tw
+
+=head1 NAME
+
+mail-validate -- A CfgTie example that checks /var/spool/mail for errors
+
+=head1 SYNOPSIS
+
+	mail-validate
+
+=head1 DESCRIPTION
+
+This is an example of how CfgTie might be used.  It just checks out the mail
+spool (/var/spool/mail) and makes some recommendations.
+
+=head1 FILES
+
+F</var/spool/mail>
+
+=head1 Author
+
+Randall Maas (L<randym@acm.org>)
+
+=cut
+
+my $Spool='/var/spool/mail';
+
+
+my $Verbose=0xff;
+#Verboseness is controlled at the bit level:
+# 0x01 (bit 0): Whether or not to print the phase we are entering
+# 0x02 (bit 1): Whether or not to print "looks okay" messages
+# 0x04 (bit 2): Whether or not to print "looks bad" messages
+# 0x08 (bit 3): Whether or not to print why things look bad
+# 0x10 (bit 4): Whether or not to print suggestions
+# 0x20 (bit 5): Whether or not to explain suggestions
+
+#Our various error and status messages
+my $Msgs =
+  {
+    phase1 => "Phase 1: Checking mail spool area permissions\n",
+    phase2 => "Phase 2: Scanning the file names of the mail spool area\n",
+    phase3 => "Phase 3: Checking the files ownership, permissions, and type\n",
+    okay1  => "Looks okay\n",
+    mailodd=> "Mail spool folder has unusual permisions\n",
+    allwrite=>"The whole world can write to it\n",
+    stickymissing=>
+	"The sticky bit is not set: this should be set to make sure".
+	" only the owners of\n..the files can delete them\n",
+    spoolrec =>"Recommend using chmod'ing to permissions of 1775\n",
+    spoolwhy =>"This will allow everyone to read and write the proper files\n".
+     "..The general public won't be allowed to do any writing.\n".
+     "..The extra 1 on the front will help ensure only the owner the files ".
+     "can delete\n..them.\n",
+    nouser=> "Mailbox exists for '\\1', but there is no such user\n",
+    badgroup=> "Mailbox '\\1' has the wrong group owner.\n",
+    badowner=> "Mailbox '\\1' has the wrong owner.\n",
+    badperms=> "Mailbox '\\1' has the wrong permissions.\n",
+    groupshould=>"Belongs to group '\\1'.  Should be owned by 'mail'\n",
+    usershould =>"Belongs to user '\\1'.  Should be owned by '\\2'\n",
+    cantread   =>"The user isn't allowed to read his mail\n",
+    cantdelete =>"The user isn't allowed to delete his mail\n",
+  };
+
+
+# All of the modules we use:
+use CfgTie::TieUser;
+use CfgTie::TieGroup;
+
+# Set up the hooks to the users and groups:
+my (%Users, %Groups,%GIds,%UIds);
+tie %Users, 'CfgTie::TieUser';
+tie %Groups,'CfgTie::TieGroup';
+tie %GIds,'CfgTie::TieGroup_id';
+tie %UIds,'CfgTie::TieUser_id';
+
+# Check out the folder itself
+my @S=stat $Spool;
+
+if ($Verbose & 0x1) {print $Msgs->{phase1};}
+if (($S[2] & 0xfff) != 0x3fd)
+  {
+     #The permissions for the mail spool are unusual
+     if ($Verbose & 0x4) {print ".",$Msgs->{mailodd};}
+
+     if ($Verbose & 0x8)
+       {
+          #Describe the situation to the user
+          if ($S[2] & 2)      {print "..",$Msgs->{allwrite};}
+          if (!($S[2]&0x200)) {print "..",$Msgs->{stickymissing};}
+       }
+
+     #Make a recommendation
+     if ($Verbose & 0x10) {print ".",$Msgs->{spoolrec};}
+
+     #Explain the recommendation
+     if ($Verbose & 0x20) {print ".",$Msgs->{spoolwhy};}
+  }
+ elsif ($Verbose & 0x2) {print ".",$Msgs->{okay1};}
+
+
+if ($Verbose & 0x1) {print "\n",$Msgs->{phase2};}
+
+my $D;
+opendir D, $Spool;
+my ($S,$P,@Files)=readdir D;
+closedir D;
+
+foreach my $I (@Files)
+{
+   if (exists $Users{$I}) {next;}
+
+   #These is a mail folder for a none existent user: is someone hiding files
+   #here?
+   if ($Verbose & 0x4)
+     {
+        my $A = $Msgs->{nouser};
+        $A =~ s/\\1/$I/g;
+        print ".$A";
+     }
+}
+
+if ($Verbose & 0x1) {print "\n",$Msgs->{phase3};}
+
+my $GID = $Groups{'mail'}->{id};
+foreach $I (@Files)
+{
+   @S = stat($Spool.'/'.$I);
+   if ($GID != $S[5])
+     {
+        #The group owner is wrong.
+        if ($Verbose & 0x8)
+          {
+             my $A = $Msgs->{badgroup};
+             $A=~s/\\1/$I/g;
+             print ".$A";
+          }
+        if ($Verbose & 0x10)
+          {
+             my $A = $Msgs->{groupshould};
+             my $B = $GIds{$S[5]}->{'name'};
+             $A=~s/\\1/$B/g;
+             print "..$A";
+          }
+     }
+   if ($Users{$I}->{id} != $S[4])
+     {
+        #The owner is wrong.
+        if ($Verbose & 0x8)
+          {
+             my $A = $Msgs->{badowner};
+             $A=~s/\\1/$1/g;
+             print ".$A";
+          }
+        if ($Verbose & 0x10)
+          {
+             my $A = $Msgs->{usershould};
+             my $B = $UIds{$S[4]}->{'name'};
+             $A=~s/\\1/$B/g;
+             $A=~s/\\2/$I/g;
+             print "..$A";
+          }
+     }
+   if (($S[2]&0xfff) !=0x1b0)
+     {
+        if ($Verbose & 0x8)
+          {
+             my $A = $Msgs->{badperms};
+             $A=~s/\\1/$I/g;
+             print ".$A";
+          }
+        if (!($S[2]&0x100)) {print "..",$Msgs->{cantread};}
+        if (!($S[2]&0x080)) {print "..",$Msgs->{cantdelete};}
+        if (($S[2]&0x030)!=0x30)
+          {print "..The mail daemon isn't allowed to deliver mail to the user\n";}
+        if (($S[2]&0x06))
+          {print "..The general public can see or modify the users mail\n";}
+        if (($S[2]&0x49))
+          {print "..The file is marked executable.  No one should be allowed to execute it: otherwise anyone could email scripts or other badness.\n";}
+
+        print ".The permissions should be 660\n"; 
+     }
+}

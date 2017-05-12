@@ -1,0 +1,34 @@
+CGI::Session::Serialize::yaml Change Log
+
+4.26  Wed Feb 10 13:52:41 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+4.25  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+4.24 - Sunday, November 2, 2008
+	* FIX: Remove t/sessiondata/ before creating distro, since it is shipped as non-writable,
+	  which means testers can't create files in that dir, which means they - and I - get failure
+	  reports. Thanx to Andreas J. Koenig for reporting the problem.
+	  That'll teach me to run tests!
+
+4.23 - Thursday, October 30, 2008
+	* FIX: Requote the module names in Build.PL and Makefile.PL to keep earlier Perls happy
+
+4.22 - Tuesday, July 22, 2008
+	* FIX:      Patch Build.PL and Makefile.PL to list all dependencies,
+	  			and to specify a version of CGI::Session after this code was split out,
+				so installing this module will trigger installation of a version of
+				CGI::Session without it (this module). See RT#40056.
+				Reported, with suggested patch, by Ryan Higgins
+    * INTERNAL: Rename Changes to Changes.txt to match my other modules
+    * INTERNAL: Add Changelog.ini
+
+4.21 - Thursday, March 13, 2008
+
+    * NEW: Create separate distro for this module by cutting it out of CGI::Session V 4.21.
+           The requirement is for CGI::Session V 4.20 to be pre-installed so that you can
+           install this module on top of CGI::Session without needing to upgrade to V 4.21.
+           Of course there is no point in that, since V 4.20 already includes this module's
+           code, but it allows you to reassure yourself that this distro does install ok

@@ -1,0 +1,256 @@
+##################### Official Melody perltidyrc file #####################
+#####   HOW TO USE: After installing perltidy, cd to your Melody root
+#####   directory. To run on a single file, creating a backup at FILE.bak:
+#####
+#####           perltidy PATH/TO/FILE
+#####
+#####   You can use shell glob characters to run on multiple files:
+#####
+#####       perltidy PATH/TO/DIR/*.p[lm]
+#####
+#####   You can also use the 'find' command to run recusively:
+#####
+#####       find plugins/MyPlugin -name '*\.pm' -exec perltidy {} \;
+#####
+#####   To ensure that you are always using this configuration file, you can
+#####   set the PERLTIDY environment variable or use the -pro command-line
+#####   option. Please see the perltidy man page for further details.
+#####
+#####   For full details about the rules in this perltidyrc please see
+#####    http://bit.ly/perltidystyles
+###########################################################################
+
+###
+###     PERL BEST PRACTICES
+###     We start off with these which equate to the following
+###         -l=78 -i=4 -ci=4 -st -se -vt=2 -cti=0 -pt=1 
+###         -bt=1 -sbt=1 -bbt=1 -nsfs -nol
+###         -wbb="% + - * / x != == >= <= = ̃ ! ̃ < > | & = **= 
+###               += *= &= <<= &&= -= /=### |= >>= ||= //= .= %= ˆ= x="
+--perl-best-practices
+
+#####
+#####   I/O control
+#####
+
+# Since this file is most often used on the entire code base,
+# we disable writing processed input to standard output
+--no-standard-output
+
+# Same as above. Will create file.ERR
+--no-standard-error-output
+
+# We use version control and can reset changes easily, so just rewrite the
+# file instead of creating a backup (.bak) for each file
+--backup-and-modify-in-place
+
+-backup-file-extension=tdybak
+
+# Causes warnings to be treated like errors (think 'use strict')
+--warning-output
+
+#####
+#####   FORMATTING OPTIONS - Basic options
+#####
+
+# Normal indent level is 4 spaces (default)
+--indent-columns=4
+
+# Convert all line endings to UNIX-style line endings
+--output-line-ending=unix
+
+#####
+#####   FORMATTING OPTIONS - Code Indentation Control
+#####
+
+# When a statement is continued on next line, indent at 50% (default)
+--continuation-indentation=2
+
+# With multi-line array assignments, try to indent values to start paren
+--line-up-parentheses
+
+# Closing tokens (braces/brackets/parens) in a multi-line block or statement
+# should be aligned with the start of the statement, not the opening token
+--closing-token-indentation=0
+
+# When a comment or quoted string exceeds the line length, do not outdent
+--no-outdent-long-lines
+
+#####
+#####   FORMATTING OPTIONS - Whitespace Control
+#####
+
+--nospace-for-semicolon     # for loop semicolons do not get preceding space
+
+#####
+#####   FORMATTING OPTIONS - Comment controls
+#####
+
+# If there is no leading space on the line, then the comment will
+# not be indented, and otherwise it may be.
+# This allows you to comment out a section of code in the first
+# column without having those comments indented.
+--indent-spaced-block-comments
+
+# Align side comments which occur on subsequent lines from the statement
+# --nohanging-side-comments               # troublesome for commented out code
+--hanging-side-comments
+
+# Add a closing side comments for code blocks that are 20 lines or longer
+--closing-side-comments
+--closing-side-comment-interval=20
+# --closing-side-comment-list-string="sub : BEGIN END"
+
+
+# Non-indented ## comments get no additional indentation or vertical spacing
+# This is the default
+--static-block-comments
+
+#####
+#####   FORMATTING OPTIONS - Skipping Selected Sections of Code
+#####
+
+# To instruct perltidy to leave a section of code alone, wrap it with comment
+# markers like '#<<<' and '#>>>'. This is the default. For example:
+#
+#       #<<<  do not let perltidy touch this
+#          my @list = (1,
+#                      1, 1,
+#                      1, 2, 1,
+#                      1, 3, 3, 1,
+#                      1, 4, 6, 4, 1,);
+#       #>>>
+--format-skipping
+
+#####
+#####   FORMATTING OPTIONS - Line Break Control
+#####
+
+# Put else/elsif on the line following the closing brace for preceding block
+#     ....
+# }
+# else {  # This is default
+#     ....
+# }
+#
+--nocuddled-else
+
+# The next two determine vertical spacing after opening tokens and before closing tokens
+#   %romanNumerals = (
+#                      one   => 'I',
+#                      two   => 'II',
+#                      three => 'III',
+#                      four  => 'IV',
+#   );
+--vertical-tightness=0
+--vertical-tightness-closing=0
+
+# Compresses vertical space of opening tokens, much like
+# a regular code block with opening brace on the right
+--stack-opening-tokens
+
+# Break before all operators
+# --want-break-before="% + - * / x != == >= <= =~ < > | & **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
+--break-before-all-operators
+
+# The default is to honor old breakpoints, we don't want that...
+# -no-break-at-old-logical-breakpoints
+# -no-break-at-old-ternary-breakpoints
+# -no-break-at-old-keyword-breakpoints
+--ignore-old-breakpoints
+
+#####
+#####   FORMATTING OPTIONS - Blank Line Control
+#####
+
+--maximum-consecutive-blank-lines=2     # default is 1
+# -blanks-before-blocks
+# -blanks-before-comments
+# -blanks-before-subs
+# -keep-old-blank-lines=1
+# -long-block-line-count=8
+
+#####
+#####   FORMATTING OPTIONS - Other Controls
+#####
+
+# --tee-pod
+# The command -tp or --tee-pod will write all pod documentation (but not comments).
+
+# Thanks to Damian Conway for his must-have book Perl Best Practices
+# and to the Mojo team (http://github.com/kraih/mojo/) for an excellent
+# start on this .perltidyrc
+
+
+#### Default command line options: #####
+# -add-newlines
+# -add-semicolons
+# -add-whitespace
+# -blanks-before-blocks
+# -blanks-before-comments
+# -blanks-before-subs
+# -block-brace-tightness=0
+# -block-brace-vertical-tightness=0
+# -brace-tightness=1
+# -brace-vertical-tightness-closing=0
+# -brace-vertical-tightness=0
+# -break-at-old-logical-breakpoints
+# -break-at-old-ternary-breakpoints
+# -break-at-old-keyword-breakpoints
+# -comma-arrow-breakpoints=1
+# -nocheck-syntax
+# -closing-side-comment-interval=6
+# -closing-side-comment-maximum-text=20
+# -closing-side-comment-else-flag=0
+# -closing-side-comments-balanced
+# -closing-paren-indentation=0
+# -closing-brace-indentation=0
+# -closing-square-bracket-indentation=0
+# -continuation-indentation=2
+# -delete-old-newlines
+# -delete-semicolons
+# -fuzzy-line-length
+# -hanging-side-comments
+# -indent-block-comments
+# -indent-columns=4
+# -keep-old-blank-lines=1
+# -long-block-line-count=8
+# -look-for-autoloader
+# -look-for-selfloader
+# -maximum-consecutive-blank-lines=1
+# -maximum-fields-per-table=0
+# -maximum-line-length=80
+# -minimum-space-to-comment=4
+# -nobrace-left-and-indent
+# -nocuddled-else
+# -nodelete-old-whitespace
+# -nohtml
+# -nologfile
+# -noquiet
+# -noshow-options
+# -nostatic-side-comments
+# -notabs
+# -nowarning-output
+# -outdent-labels
+# -outdent-long-quotes
+# -outdent-long-comments
+# -paren-tightness=1
+# -paren-vertical-tightness-closing=0
+# -paren-vertical-tightness=0
+# -pass-version-line
+# -recombine
+# -valign
+# -short-concatenation-item-length=8
+# -space-for-semicolon
+# -square-bracket-tightness=1
+# -square-bracket-vertical-tightness-closing=0
+# -square-bracket-vertical-tightness=0
+# -static-block-comments
+# -trim-qw
+# -format=tidy
+# -backup-file-extension=bak
+# -format-skipping
+# -pod2html
+# -html-table-of-contents
+# -html-entities
+# -perl-syntax-check-flags=-c -T

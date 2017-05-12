@@ -1,0 +1,50 @@
+[% WRAPPER 'view/de/layout.tt' %]
+
+<div class="span-8">
+
+ <h4>Zugang zum Netzwerk erlaubt</h4>
+
+ [% IF msg_type == 'info' %]
+ <p class="info">[% msg_text %]</p>
+ [% END %]
+
+ [% IF msg_type == 'error' %]
+ <p class="error">[% msg_text %]</p>
+ [% END %]
+
+ <p class="info">Bitte melden Sie sich nach Abschluss der Arbeiten ab!</p>
+
+ <form action="" method="post" accept-charset="UTF-8">
+  <fieldset>
+   <label for="logout">Benutzer: [% username %]</label>
+   <br />
+   <br />
+   <input type="submit" value="Abmelden" id="logout" name="logout" />
+  </fieldset>
+ </form>
+
+ <h4>Probleme und Fragen</h4>
+ <div class="box">
+  <p>Wenden Sie sich bei Problemen und Fragen bitte an den Helpdesk:</p>
+  <ul>
+   <li>Sprechzeiten: Mo-Fr 8:00-18:00 Uhr</li>
+   <li>Telefon: +49 (0)xxx/yy-zzzzz</li>
+  </ul>
+ </div>
+</div>
+
+<div class="prepend-1 span-15 last">
+
+ <h4>Willkommen am Funknetz</h4>
+  <p class="box">Der Netzzugang wird nach einigen Minuten Inaktivität Ihres Endgeräts
+  automatisch deaktiviert.
+  Bitte melden Sie sich trotzdem nach Abschluss der Arbeiten ab!
+  Dies verhindert, dass andere Benutzer ihren Account für den Netzzugang missbrauchen können.
+  Um sich später abmelden zu können, setzen Sie am besten ein Lesezeichen auf diese
+  Seite.</p>
+</div>
+
+[% END %]
+[% STOP %]
+
+vim: sw=1 ft=html

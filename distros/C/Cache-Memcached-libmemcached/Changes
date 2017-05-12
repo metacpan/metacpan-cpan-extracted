@@ -1,0 +1,157 @@
+Changes
+=======
+
+0.04001 - 3rd Sept 2013
+  - Require Memcached::libmemcached 1.001701
+  - Fixed incr and decr methods to return undef on failure.
+
+0.03001 - 29 Oct 2010
+  - Require Memcached::libmemcached 0.4405
+  - Documented available libmemcached behaviours.
+  - All libmemcached behaviours can now be set via new({ behaviour_... => ... })!
+  - Optimized namespace support via libmemcached 'prefix key' mechanism.
+  - Fixed methods like incr() and decr() that didn't apply the namespace.
+  - Added namespace() method for Cache::Memcached::Fast compatibility.
+  - Added support for Cache::Memcached::Fast style hashref server specification.
+  - Added support for server weights.
+  - Added $keys parameter to stats()
+  - Removed malloc, sizes, and self from default stats() $keys.
+  - Added server_versions() method for Cache::Memcached::Fast compatibility.
+  - Added the documented enable_compress() method for Cache::Memcached compatibility.
+  - Removed undocumented version() method.
+  - Assorted documentation additions and cleanups.
+
+0.02011 - 27 May 2011 - ** NOTE DUPLICATE VERSION **
+  - Fix usage of foreach qw() which emits warnings under perl 5.14 (rt #68487)
+  ** This version has only these changes over 0.02010 **
+
+0.02011 - 26 Oct 2010
+  - Many more libmemcached behaviours are now accessible.
+  - stats() now returns many more items in the totals hash
+  - Fixed compression, thanks to Ask Bjørn Hansen, RT#46985
+  - Require Memcached::libmemcached 0.4402
+
+0.02010 - 07 Sep 2009
+  - overhaul tests
+  - require Memcached::libmemcached 0.3102
+
+0.02009 - 03 Jul 2008
+  - Correct get_multi() interaction with namespaces (Faylan Lim)
+
+0.02008 - 03 Jul 2008
+  - Offsets passed to decr() and incr() weren't properly handled.
+    Pointed out by Taro Funaki
+
+0.02007 - 27 May 2008
+  - Arrayref arguments for get/set/add/et al have been properly
+    implemented. Now you can use master keys. Yey!
+  - fix incr()/decr() to respect namespace
+  - Respect PERL_LIBMEMCACHED_OPTIMIZE
+  - Require Memcached::libmemcached 0.2101 (now consistent hashing
+    should work properly!)
+
+0.02006 - 09 May 2008
+  - Namespace support was ot properly working. fixed.
+
+0.02005 - 18 Apr 2008
+  - Explicitly require version of Test::More
+  - Treat expiration time / time as a special case and don't proxy undef
+    to memcached_* method calls.
+
+0.02004 - 17 Apr 2008
+  - Require Memcached::libmemcached 0.1902
+  - Explcitly weaken reference to self in the callbacks
+
+0.02003 - 13 Apr 2008
+  - Add stats() method
+  - Require Memcached::libmemcached 0.1901
+
+0.02002 - 30 Mar 2008
+  - Auto-generate accessors.
+  - Add docs and tests for hashing_algorithm and distribution_method.
+    They can also be specified in the constructor.
+  - Add more docs that deals with libmemcached-specific features
+
+0.02001 - 27 Mar 2008
+  - Require bytes pragma, just in case it wasn't loaded elsewhere.
+    Should clear rt #34460
+
+0.02000 - 04 Mar 2008
+  - Use Memcached::libmemcached 0.1701
+  - Subclass Memcached::libmemcached instead of containing it
+  - Fix problem where detecting host:port wasn't properly working
+  - Update benchmarks
+
+0.01000 - 29 Jan 2008
+  - Use Memcached::libmemcached as the underlying library, instead of
+    hooking directly to the C library.
+  - (get|set)_compress_enabled has been renamed to (get|set)_compress_enable
+  - stats() and cas() are currently disabled.
+  - add behavior_set() / behavior_get()
+
+0.00007 - Never released?
+  - Added prepend(), append()
+  - Added first cut support for CAS
+    * cas()
+    * gets()
+    * get_cas()
+    * get_cas_multi()
+  - Implement accessors:
+    * set_support_cas
+  - Use code references instead of code invocation via sub names.
+  - Tweak tests for more coverage
+
+0.00006 - 19 Jan 2008
+  - Makefile.PL now uses Devel::CheckLib
+  - Fix replace(), which was doing set() underneath instead of a real replace
+  - Fix t/03_compress.t which wasn't respecting MEMCACHED_SERVER
+  - Update benchmark to run more set() tests, and to report version
+    number for each modules being used.
+
+0.00005 - 17 Jan 2008
+  - Fix typo in POD.
+  - Implement stats() -- it's a half-baked implementation. Please
+    send patches!
+  - Implement disconnect_all()
+  - Implement some methods that allows you to tweak libmemcached
+    behavior (NOTE: API may not be permanent!)
+    * set_no_block() / is_no_block()
+    * set_distribution_method() / get_distribution_method()
+    * set_hashing_algorithm() / get_hashing_algorithm()
+
+0.00004 - 13 Jan 2008
+  - No code change.
+  - Note in POD what the differences between other memcached clients are.
+    rt #32277
+  - Update tools/benchmark.pl to include the following:
+    * comparisons between get() for small scalar, complex data structures,
+      and compressed data
+    * comparisons between set() for small scalar, complex data structures,
+      and compressed data
+
+0.00003 - 13 Jan 2008
+  - Revert back to go without using backend proxy.
+  - Fix segmentation fault when using get_multi() without debugging enabled.
+  - Implement set() as a pure C function.
+  - Implement add().
+  - Implement replace().
+  - Implement flush_all().
+  - Implement accessors:
+    * set_compress_threshold
+    * get_compress_threshold
+    * set_compress_enabled
+    * get_compress_enabled
+    * set_compress_savings
+    * get_compress_savings
+    * compress_enabled
+  - Fix behavior of set_servers() to actually replace the server list.
+  - Add tools/benchmark.pl to compare against vanilla Cache::Memcached.
+
+0.00002 - 13 Jan 2008
+  - Implement get_multi(), delete(), incr(), decr()
+  - Implement connecting to memcached via unix socket.
+  - Add ::Constants package.
+
+0.00001 - 11 Jan 2008
+  - Initial release.
+  - Only supportes get()/set()

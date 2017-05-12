@@ -1,0 +1,10 @@
+Revision history for Perl extension Cache-Keys-DSL
+
+0.02 2015-10-29T04:27:55Z
+
+    - Fixed bug that import for Exporter
+
+0.01 2015-10-29T03:52:27Z
+
+    - original version
+

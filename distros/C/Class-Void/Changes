@@ -1,0 +1,25 @@
+Revision history for Perl extension Data::Void.
+
+0.01  Mon Jul 09 11:02:00 2001
+	- Initial Version, my first upload to CPAN
+	
+0.02  Mon Jul 09 16:40:00 2001
+	- fixed some warnings, by not retungs undef but
+	  the empty string on stringification
+	- there is now a blessed package global which will
+	  be returned on calls to new, thus saving a lot of memory
+	  in large data structures.
+	  
+0.03  Mon Jul 17 11:24:00 2001
+	- added special behavior for can
+	- fixed some typos in the docs
+	- added exceptions to the docs
+	- fixed private sub &$new to work with inheritance
+
+0.04   Tue Sep 24 11:24:00 2002
+	- added tests
+	- corrected packaging
+	
+	
+0.05   Wed Nov 27 11:24:00 2002
+	- something went horribly wrong on CPAN

@@ -1,0 +1,132 @@
+Revision history for Perl extension Config::Inetd.
+
+0.31  2011-08-16  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.30_03  2011-08-14  <schubiger@cpan.org>
+
+ - Enclose literal code in documentation in angle brackets.
+
+0.30_02  2011-08-11  <schubiger@cpan.org>
+
+ - Undo printing to filehandle returned by tmpnam() as it breaks
+   tests on Windows.
+
+ - Deprecate direct access to tied configuration file in favor
+   of the accessor method config() which supersedes it.
+
+ - Document config() and the deprecation of its predecessor.
+
+ - Change the tests to use the config() method.
+
+0.30_01  2011-05-22  <schubiger@cpan.org>
+
+ - Test that enable() and disable() alter the configuration file;
+   once done, ensure that the status of the service has changed.
+
+ - Use whitespace for the regexes in enable() and disable();
+   moreover, make them more strict where possible.
+
+ - Separate assignment of invocant from method arguments.
+
+ - Minor indentation changes.
+
+ - Rename the caveat documentation section.
+
+ - Update broken license link.
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Remove the testing diagnostic.
+
+ - Print to filehandle returned by tmpnam().
+
+0.30 Sun Oct  5 13:48:13 CEST 2008
+
+ - Fixed an error related to unlocking within DESTROY by make it
+   release the tied configuration without an explicit unlock.
+
+ - Use the "boolean" pragma for true/false values.
+
+ - Validation of arguments is now handled by Params::Validate.
+
+ - Minor code and documentation improvements.
+
+0.29 Fri Feb  1 17:47:47 CET 2008
+
+ - Some more documentation reformatting.
+
+0.28 Fri Feb  1 16:07:41 CET 2008
+
+ - Clarified and reformatted documentation.
+
+0.27 Sat Nov 10 22:04:05 CET 2007
+
+ - Fixed permissions for 't/data/inetd.conf' by inlining
+   the data and copying it to a temporary file while testing.
+
+ - Undo the bailing out within 'methods.t'.
+
+0.26 Fri Nov  9 22:47:46 CET 2007
+
+ - Bail out within 'methods.t' when no system-wide
+   configuration (i.e. 'inetd.conf') is being found.
+
+0.25 Sun Mar 19 22:49:56 CET 2006
+
+ - Added INSTALL containing install instructions.
+
+0.23 Wed Mar 15 22:51:54 CET 2006
+
+ - Added func.t to the test suite. Checks against a local
+   copy of inetd.conf whether $inetd->dump_enabled() & $inetd->
+   dump_disabled() return the expected amount of services.
+   Furthermore, evaluates whether $inetd->disable() & $inetd->
+   enable() trigger the according changes correctly; the state
+   of $inetd->is_enabled() is checked against an enabled service.
+   All services are checked via a custom regular expression to
+   ensure that instance data access functions.
+
+0.22 Wed Mar 15 16:51:11 CET 2006
+
+ - Lines read in from inetd.conf preserve their newlines as
+   specified via the Tie::File option autochomp.
+
+ - Inetd.pm (formerly known as Entity.pm) is warnings-free
+   (previously emitted warnings while splitting the service/protocol
+   from the inetd.conf and for 1 inner reference that existed
+   for the tied Tie::File object).
+
+ - Suitable Build.PL added.
+
+0.21 2005/02/23
+
+ - Namespace changed from previously Net::Inetd to Config::Inetd
+   as proposed by others.
+
+0.11 2004/01/28
+
+ - Deadlock in flock() abandoned.
+
+0.09 2004/01/27
+
+ - Some inefficiency cleaned up.
+
+0.07 2004/01/25
+
+ - inetd.conf is locked.
+
+0.03 2004/01/21
+
+ - bin/inetd.pl added.
+
+0.02 2004/01/20
+
+ - Methods for dumping enabled/disabled services.
+
+0.01 2004/01/19
+
+ - Initial version.

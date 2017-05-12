@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 162
+    - 127
+  52747:
+    - 71
+name: fdcb7f
+registers:
+  AF: 6919
+  AF_: 0
+  BC: 40643
+  BC_: 0
+  DE: 5310
+  DE_: 0
+  HL: 24254
+  HL_: 0
+  I: 0
+  IX: 4472
+  IY: 52841
+  PC: 0
+  R: 0
+  SP: 0

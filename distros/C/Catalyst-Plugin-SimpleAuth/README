@@ -1,0 +1,80 @@
+NAME
+    Catalyst::Plugin::SimpleAuth - Simple authentication for Catalyst
+
+SYNOPSIS
+      # in your Catalyst application:
+      use Catalyst qw(SimpleAuth);
+      
+  __PACKAGE__->config(
+          simpleauth => { class => 'Users' },
+      );
+      
+  # in your sign up code
+      
+  unless( $c->sign_up(
+                {   username => $email,
+                    password => $password,
+                }
+            ) ) {
+            # sign up failed, user exists
+      }
+      my $user = $c->user;
+      ...
+
+      # in your sign in code
+      
+  my $user = $c->user; 
+      if ($c->sign_in(
+              {   username => $email,
+                  password => $password,
+              }
+          )
+          )
+      {
+          my $user = $c->user;
+          ...
+      } else {
+          # sign in failed
+      }
+
+      # in your sign out code
+
+      $c->sign_out;
+
+DESCRIPTION
+    This module is a replacement module for Catalyst::Authentication::*
+    which does one thing and does it well. This module assumes that you have
+    a model for the users you wish to authenticate - this will typically be
+    a DBIx::Class module.
+
+    You set the name of the model to authenticate in the configuration as
+    above. 'sign_up' creates the instance for you. 'sign_in' signs a person
+    in, 'sign_out' signs a person out. You can access the user object either
+    as $c->user in the code or as the 'user' variable in the stash.
+
+    This module saves SHA1 digests of the passwords instead of the password.
+
+    The model will generally have a database structure along the lines of:
+
+      CREATE TABLE `users` (
+        `username` text NOT NULL,
+        `password` char(40) NOT NULL,
+        `first_name` text,
+        `last_name` text
+      );
+
+    Note that the password will be 40 characters long.
+
+    This module requires either Catalyst::Plugin::Session or
+    Catalyst::Plugin::CookiedSession.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+COPYRIGHT
+    Copyright (C) 2008-9, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

@@ -1,0 +1,98 @@
+From tomcat-user-return-86155-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Tue Dec 09 15:15:47 2003
+Return-Path: <tomcat-user-return-86155-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 95305 invoked from network); 9 Dec 2003 15:15:46 -0000
+Received: from daedalus.apache.org (HELO mail.apache.org) (208.185.179.12)
+  by minotaur-2.apache.org with SMTP; 9 Dec 2003 15:15:46 -0000
+Received: (qmail 34899 invoked by uid 500); 9 Dec 2003 15:15:21 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 34830 invoked by uid 500); 9 Dec 2003 15:15:20 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 34817 invoked from network); 9 Dec 2003 15:15:20 -0000
+Received: from unknown (HELO mc.sc1.ummail.com) (66.187.250.16)
+  by daedalus.apache.org with SMTP; 9 Dec 2003 15:15:20 -0000
+Received: from MARCG-EVS.SC1.UMMAIL.COM (marcg-cn2.sc1.ummail.com
+        [66.187.248.17:25]) by mc.sc1.ummail.com with ESMTP id
+        A1209-1015-765300; Tue, 9 Dec 2003 15:15:13 GMT
+X-PROVIDER-INFO: Contact abuse@unitedmessaging.com for abuse/spam/UBE
+        complaints
+X-MimeOLE: Produced By Microsoft Exchange V6.0.6249.0
+Content-Class: urn:content-classes:message
+Subject: RE: How to get username
+Date: Tue, 9 Dec 2003 09:10:52 -0600
+Message-ID: <AB3C10C46F698F42B3836BAD91CC0C3F53E4EC@MARCG-EVS.marcgroup.mail>
+Thread-Topic: How to get username
+Thread-Index: AcO+ZIJqJ8YYARb4QjqCuhi4DDOVwgAApJ7g
+From: "Wilson, Allen" <Allen.Wilson@marcresearch.com>
+To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="<<001-3fd5e707-6553>>"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+--<<001-3fd5e707-6553>>
+Content-type: text/plain
+Content-transfer-encoding: 8bit
+
+You can use rundata.getUser().getUserName();
+
+This will return user's login name
+
+Allen
+
+-----Original Message-----
+From: Chaikin, Yaakov Y (US SSA)
+[mailto:yaakov.y.chaikin@baesystems.com]
+Sent: Tuesday, December 09, 2003 8:56 AM
+To: tomcat-user@jakarta.apache.org
+Subject: How to get username
+
+
+Hi,
+
+Does anyone know how to get back the username once the person logged in
+with declarative security?
+
+Thanks.
+
+Yaakov Chaikin
+Software Engineer
+BAE SYSTEMS
+301-838-6899 (phone)
+301-838-6802 (fax)
+yaakov.y.chaikin@baesystems.com
+
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+
+
+--<<001-3fd5e707-6553>>
+Content-type: text/plain
+Content-transfer-encoding: 8bit
+
+This message may contain proprietary or confidential company information.
+Any unauthorized use or disclosure is prohibited.
+
+
+
+--<<001-3fd5e707-6553>>
+Content-Type: text/plain; charset=us-ascii
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+--<<001-3fd5e707-6553>>--
+

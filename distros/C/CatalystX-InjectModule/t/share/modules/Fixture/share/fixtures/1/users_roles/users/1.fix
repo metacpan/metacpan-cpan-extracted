@@ -1,0 +1,11 @@
+$HASH1 = {
+           active   => 1,
+           created  => '2014-06-20T22:14:20',
+           email    => 'dab@localhost',
+           id       => 1,
+           name     => 'dab',
+           password => '$2a$14$yMXylyEx6RL6wvVW27b.TuyCSTIoqO5aQc13vmxzwiUz90bZWhql6',
+           tzone    => 'Europe/Paris',
+           username => 'admin',
+           website  => undef
+         };

@@ -1,0 +1,126 @@
+NAME
+    Catalyst::TraitFor::Controller::DoesExtPaging - Paginate
+    DBIx::Class::ResultSets for ExtJS consumption
+
+VERSION
+    version 1.000001
+
+SYNOPSIS
+      package MyApp::Controller;
+
+      use Moose;
+      BEGIN { extends 'Catalyst::Controller' }
+
+      # a single with would be better, but we can't do that
+      # see: http://rt.cpan.org/Public/Bug/Display.html?id=46347
+      with 'Catalyst::TraitFor::Controller::DBIC::DoesPaging';
+      with 'Catalyst::TraitFor::Controller::DoesExtPaging';
+
+      sub people :Local {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs);
+         # ...
+      }
+
+      sub people_lite :Local {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs, sub {
+            my $person = shift;
+            return {
+               first_name => $person->first_name,
+               last_name => $person->last_name,
+            }
+         });
+         # ...
+      }
+
+      # this will call the 'foo' method on each person and put the returned
+      # value into the datastructure
+      sub people_more_different :Local {
+         # ...
+         my $json = $self->ext_paginate($paginated_rs, 'foo');
+         # ...
+      }
+
+      sub programmers_do_it_by_hand :Local {
+         # ...
+         my $data = [qw{foo bar baz}];
+         my $total = 10;
+         my $json = $self->ext_parcel($data, $total);
+         # ...
+      }
+
+      # defaults total to amount of items passed in
+      sub some_programmers_do_it_by_hand_partially :Local {
+         # ...
+         my $data = [qw{foo bar baz}];
+         my $json = $self->ext_parcel($data);
+         # ...
+      }
+
+DESCRIPTION
+    This module is mostly for sending DBIx::Class paginated data to ExtJS
+    based javascript code.
+
+METHODS
+  ext_paginate
+      my $resultset = $self->model('DB::Foo');
+      my $results   = $self->paginate($resultset);
+      my $json      = $self->ext_paginate($resultset);
+      my $json_str  = to_json($json);
+
+   Description
+    Returns a structure like the following from the ResultSet:
+
+      {
+         data  => \@results,
+         total => $count_before_pagination
+      }
+
+   Valid arguments are:
+      rs      - paginated ResultSet to get the data from
+      coderef - any valid scalar that can be called on the result object
+
+  ext_parcel
+      my $items    = [qw{foo bar baz}];
+      my $total    = 7;
+      my $json     = $self->ext_parcel($data, $total);
+      my $json_str = to_json($json);
+
+   Description
+    Returns a structure like the following:
+
+      {
+         data  => [@{$items}],
+         total => $total || scalar @{$items}
+      }
+
+   Valid arguments are:
+      list  - a list of anything you want to be in the data structure
+      total - whatever you want to say the total is.  Defaults to size of
+              the list passed in.
+
+CONFIG VARIABLES
+    root
+      Sets the name of the root for the data structure. Defaults to data.
+
+    total_property
+      Sets the name for the total property for the data structure. Defaults
+      to total.
+
+SEE ALSO
+    Catalyst::Controller::Role::DBIC::DoesPaging.
+
+THANKS
+    Thanks to Micro Technology Services, Inc. for sponsoring initial
+    development of this module.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

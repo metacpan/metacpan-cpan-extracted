@@ -1,0 +1,24 @@
+NAME
+
+    Catmandu::EuropePMC - A bundle of Catmandu modules for working with
+    data from EuropePMC
+
+STATUS
+
+MODULES
+
+      * Catmandu::Importer::EuropePMC
+
+      * Catmandu::Fix::epmc_dbLinks
+
+AUTHOR
+
+    Vitali Peil
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Vitali Peil.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

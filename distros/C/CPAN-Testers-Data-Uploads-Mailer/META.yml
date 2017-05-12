@@ -1,0 +1,50 @@
+--- #YAML:1.0
+name:                   CPAN-Testers-Data-Uploads-Mailer
+version:                0.06
+abstract:               Verify CPAN uploads and mails reports
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                artistic_2
+distribution_type:      module
+installdirs:            site
+
+requires:
+  perl:                   5.006
+  Email::Simple:          0
+  File::Basename:         0
+  File::Path:             0
+  File::Slurp:            0
+  Getopt::ArgvFile:       0
+  Getopt::Long:           0
+  IO::File:               0
+  Template:               0
+  Time::Piece:            0
+recommends:
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  Test::More:             0.70
+  Test::Trap:             0
+
+provides:
+  CPAN::Testers::Data::Uploads::Mailer:
+    file:     lib/CPAN/Testers/Data/Uploads/Mailer.pm
+    version:  0.06
+
+no_index:
+  directory:
+    - t
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  homepage:   http://devel.cpantesters.org
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Uploads-Mailer
+  repository: http://github.com/barbie/cpan-testers-data-uploads-mailer
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

@@ -1,0 +1,68 @@
+Changes for Perl extension CPANDB-Generator
+
+0.19 Sat 29 Aug 2009
+	- Removed Acme:: from the Heavy 100, which should make the
+	  graph actually useful.
+
+0.18 Fri 28 Aug 2009
+	- Fixing a database column thinko
+
+0.17 Fri 28 Aug 2009
+	- Updating to Algorithm::Dependency::Source::DBI 1.06
+	- Strip out Task:: from the Heavy 100
+
+0.16 Wed  8 Jul 2009
+	- Updating to ORDB::CPANMeta::Generator 0.10
+
+0.14 Tue  7 Jul 2009
+	- Integrating the CPAN Ratings database
+
+0.13 Mon  6 Jul 2009
+	- Pass prefer_bin to the META.yml generator when not on Win32
+	- Better minicpan file: URL normalisation (cross platform now)
+
+0.12 Mon  6 Jul 2009
+	- The CPAN index database is now generated from the same
+	  minicpan as the META.yml data is drawn from (which should
+	  syncronise the index data to the META data).
+
+0.11 Mon  6 Jul 2009
+	- Added an option to generate our own CPANMeta database
+
+0.10 Mon  6 Jul 2009
+	- Typo correction
+
+0.09 Mon  6 Jul 2009
+	- Added support for an explicit publish => undef to allow for
+	  doing generation runs for immediate use, not producing a
+	  publishable file set.
+
+0.08 Fri  3 Jul 2009
+	- Added support for weight and volatility
+
+0.07 Thu  2 Jul 2009
+	- Removing a few superfluous indexes
+	- Run ANALYZE whenever we build indexes to make it easier
+	  for plan optimizer to do it's job.
+
+0.06 Wed  1 Jul 2009
+	- Better tracing
+
+0.05 Wed  1 Jul 2009
+	- Fixing a bug in the test count
+
+0.04 Wed  1 Jul 2009
+	- Integrating dependency information
+	- Adding indexes
+	- Adding trace support
+	- Adding control of the location of the intermediate SQLite database
+
+0.03 Wed  3 Jun 2009
+	- Added missing install_script entry
+
+0.02 Wed  3 Jun 2009
+	- Added Xtract::Publish functionality
+	- Started to integrate ORDB::CPANMeta
+
+0.01 Thu 14 May 2009
+	- Creating initial implementation

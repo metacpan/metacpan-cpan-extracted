@@ -1,0 +1,51 @@
+{
+   "abstract" : "config loader like Catalyst::Plugin::ConfigLoader",
+   "author" : [
+      "hirafoo <hirafoo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Divide",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config::General" : 0,
+            "Config::Tiny" : 0,
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::Exception" : 0,
+            "Test::More" : "0.98",
+            "Test::Synopsis" : 0,
+            "XML::NamespaceSupport" : 0,
+            "XML::Simple" : 0,
+            "YAML" : 0,
+            "YAML::Syck" : "0.7"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : 0,
+            "File::Spec" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.036"
+}

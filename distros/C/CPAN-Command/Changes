@@ -1,0 +1,7 @@
+Revision history for Perl extension CPAN-Command
+
+1.100840  2010-03-25 20:51:23 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.01  2009-09-11T08:33:49Z (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

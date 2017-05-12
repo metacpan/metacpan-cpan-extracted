@@ -1,0 +1,47 @@
+foo
+{
+    foo_inner
+    {
+        :label1
+        {
+            key1    value1
+        }
+
+        {
+            key2    value2
+        }
+
+        :label3
+        {
+            key3    value3
+        }
+    }
+}
+
+foo2
+{
+    foo_inner
+    {
+        :label1
+        {
+            key1    value1 replacement
+        }
+
+        {
+            key2    value2
+        }
+
+        :label3
+        {
+            key3    value3 replacement
+        }
+
+        {
+            key4    value4
+        }
+
+        {
+            key5    value5
+        }
+    }
+}

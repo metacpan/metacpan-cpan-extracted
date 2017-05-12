@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl -w
+use strict;
+use lib '..'; ## for testing from this Examples directory
+use CircuitLayout;
+$\="\n";
+my @xys=(0,0, 10,0, 10,10, 0,10);
+my $boundary = new CircuitLayout::Boundary(-xy=>\@xys);
+print 'boundary coords=',$boundary -> printableCoords;
+my $c = new CircuitLayout::Coord(-resolution=>0.05,-x=>3,-y=>5.679);
+print 'coord c=',$c -> printableCoords;
+print "is c inside? ... ",$boundary -> inside(-coord=>$c);
+print "is (4,6) inside ? ... ",$boundary -> inside(-coord=>[4,6]);
+print "is (0,0) inside ? ... ",$boundary -> inside(-coord=>[0,0]);
+print "is (90,-4.40) inside ? ... ",$boundary -> inside(-coord=>[90,-4.40]);
+print "is (9,-4.40) inside ? ... ",$boundary -> inside(-coord=>[9,-4.40]);
+

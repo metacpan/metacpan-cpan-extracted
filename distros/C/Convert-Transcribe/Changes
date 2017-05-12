@@ -1,0 +1,9 @@
+Revision history for Perl extension Convert::Transcribe.
+
+0.02  4 April 2003
+        - first working and documented version
+
+0.01  Tue Oct 22 21:10:46 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -n Convert::Transcribe -b 5.5.0
+

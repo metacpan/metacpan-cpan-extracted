@@ -1,0 +1,6 @@
+Revision history for Perl extension Class::SingletonMethod.
+
+0.01  Thu Jan  1 15:34:22 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Class::SingletonMethod
+

@@ -1,0 +1,67 @@
+Revision history for Perl module Catalyst::Model::SVN
+
+0.13 Fri Oct 10 00:35:00 2008
+   - Fix META.yml to conform to current spec (removing from SVN dist).
+   - Test suite compatibility with SVN 1.5 (RT#39918) - unsure if this is
+     enough to work in production, but it looks hopeful.
+
+0.12 Mon May 26 09:55:13 2008
+   - Build module with ShipIt
+   - Fix bug causing freeze when no config was supplied + test.
+   - Add extra debugging when $ENV{DEBUG_TEST} is set.
+
+0.11 Sat Dec 29 21:27:51 2007
+   - Fix getting the config from outside the class (i.e. config from an    
+     external config file now works). No tests yet, but seems to work.
+
+0.10 Sat Dec 8 01:18:05 2007
+   - Fix a nasty bug causing SVN::Ra to throw an exception in some versions (i.e. on my Debian box)
+
+0.09 Fri Dec 7 11:48:27 2007
+    - Fix crash when calling ls for a directory with a trailing / in the path 
+      requested which occurs when your SVn server is over HTTP and below the 
+      root directory.
+
+0.08 Thu Dec 6 18:35:57 2007
+    - Make _repos_path collapse URLs with multiple // in them. Tests for this.
+    - Stop warnings being fatal in the Makefile, this breaks me on some perls.
+    - Add propget as a method on Model::SVN, as well as on ::Items. Tests for this.
+    - Test / fix content regex I thought was dodgy.
+
+0.07 Sun Dec 2 18:41:02 200?
+    - Fix test failures from CPANTS (due to us not requiring Catalyst::Devel)
+    - Test a root which isn't at /, fix bugs in path resolution attaining to same ;)
+    - Fix META.yml authors
+
+0.06 Wed Nov 28 01:19:22 2007
+    - Re-written to not leak connections or RAM. SVN::Client removed. Almost complete re-write 'under the hood'.
+    - Test suite which tests the module for real + stress test added
+    - Removed (non working) realpath method on Catalyst::Model::SVN::Item
+    - Added a (horrifically inefficient) propget method to 
+      Catalyst::Model::SVN::Item
+    - Cleaned up path handling in cat and ls methods to conform. You can now 
+      supply either a path from the repository root, or an entire URI, to both 
+      methods.
+    - Path and uri methods now return canonical URIs/paths always (e.g. /f1 
+      not //f1 or svn://host/path rather than svn://host//path)
+    - Move Catalyst::Model::SVN::Item class into it's own file.
+    - Added a test for kwalitee
+
+0.05 Sun Jun 18 16:41:25 2006
+    - Added missing use DateTime statement (RT#19882)
+
+0.04 Mon Nov 21 22:05:13 2005
+    - Tweaked SYNOPSIS pod
+    - Added pod notes about copy->original path resolution
+
+0.03 Sat Nov 19 19:22:03 2005
+    - Added t/catalyst_helpers_model_svn.t tests
+    - Fixed various typos
+
+0.02 Fri Nov 17 22:53:18 2005
+    - Fixed not found errors when trying to read contents or logs of copies
+      Big hats off to Gerard Gerritsen for pointing me in the right direction.
+    - Added pod_spelling.t
+
+0.01 Tue Nov 01 19:05:04 2005
+    - Initial release

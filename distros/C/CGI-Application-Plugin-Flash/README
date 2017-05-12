@@ -1,0 +1,45 @@
+CGI-Application-Plugin-Flash
+
+This CGI::Application plugin wraps the CGI::Session::Flash module to
+implement a Flash object.  A flash is session data with a specific life cycle.
+When you put something into the flash it stays then until the end of the next
+request.  This allows you to use it for storing messages that can be accessed
+after a redirect, but then are automatically cleaned up.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Application::Plugin::Flash
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-Flash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Application-Plugin-Flash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Application-Plugin-Flash
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Application-Plugin-Flash
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Bradley C Bailey
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

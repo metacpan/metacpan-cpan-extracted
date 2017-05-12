@@ -1,0 +1,24 @@
+---
+abstract: 'Object oriented simple interface to fork()'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Capture::Tiny: '0.31'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Child
+requires:
+  Exporter: '5.57'
+  POSIX: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://github.com/exodist/Child/issues
+  repository: http://github.com/exodist/Child
+version: '0.013'

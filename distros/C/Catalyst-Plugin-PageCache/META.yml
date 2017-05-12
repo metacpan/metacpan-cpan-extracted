@@ -1,0 +1,32 @@
+---
+abstract: 'Cache the output of entire pages'
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+build_requires:
+  Cache::Cache: 1.04
+  Cache::FileCache: 0
+  Catalyst::Plugin::Cache: 0.10
+  ExtUtils::MakeMaker: 6.42
+  File::Path: 2.07
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-PageCache
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 0
+  Digest::SHA1: 0
+  MRO::Compat: 0.10
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Plugin-PageCache/
+version: 0.32

@@ -1,0 +1,47 @@
+---
+abstract: 'A module to implement some of AutoConf macros in pure perl.'
+author:
+  - 'Alberto Simoes <ambs@cpan.org>'
+  - 'Jens Rehsack <rehsack@cpan.org'
+build_requires:
+  ExtUtils::CBuilder: '0.23'
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-AutoConf
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  ExtUtils::CBuilder: '0.280220'
+  File::Slurp::Tiny: '0'
+  Scalar::Util: '1.18'
+requires:
+  Capture::Tiny: '0'
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Text::ParseWords: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#toolchain
+  MailingList: "mailto:cpan-workers@perl.org'"
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Config-AutoConf
+  homepage: https://metacpan.org/release/Config-AutoConf
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com:ambs/Config-AutoConf.git
+version: '0.314'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

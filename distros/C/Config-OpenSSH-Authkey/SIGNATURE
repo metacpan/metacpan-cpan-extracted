@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5af545c218bf29dd2f3c9202e292c2116254d035 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 736952fc9b9e893f8c8d6a94021ea6d11985d448 MANIFEST
+SHA1 8e3b6755719c631d442e198878ac2021d8e24ead META.json
+SHA1 83cfe57dc7c572a813dd344165484180e914dfd4 META.yml
+SHA1 b620df7583dd617876089e51ca437989b36f5752 Makefile.PL
+SHA1 25dfdf5d6e23d354a8269d70c3b9152176ac27fa README
+SHA1 976dc73b4a011ff1b9f6a490233497c12281ac47 eg/authkey-merge
+SHA1 9af4c6fbb25f2f80111ffdeec828e718bfe2fd6c eg/ssh1-authkey-audit
+SHA1 9d9903a43b8599d0880f0987ce92ef1c38dc3a14 lib/Config/OpenSSH/Authkey.pm
+SHA1 a31f363c0ac2d957100db480386bf87851604028 lib/Config/OpenSSH/Authkey/Entry.pm
+SHA1 5cda3e28ab9f9e79302d0955823d8b039d846134 lib/Config/OpenSSH/Authkey/Entry/Options.pm
+SHA1 392f66cdd6f9dcf63545863af8c96045e30c0295 t/020-entry.t
+SHA1 ce0f42c4c41dfff408f7c30617befaed430bd73e t/040-authkey.t
+SHA1 b926aee7ef3dc6dbbeb1b1207a1cc82ce15493ea t/042-options.t
+SHA1 09afb982e3e791d91d200919437976ffa70cad5a t/authorized_keys
+SHA1 191b9f21ce475030cfc0be2c28dd47f9a6129072 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU0DpMAAoJEDTEVWqwTuCUi3EIAJg8W9QcAgMyh988YhILlAc3
+5hRoxYQ4xLOthoOXrDLwLjBIol/NSDfHW+weum03QHA6afPe5gwAMXi7gRPMu/zr
+7fWJtYeR+dF3ZE9ooHVa9SF+wRV3OBS6aLw6MUtdk3jr/uVq2jd/93XU+7EFYc5I
+KpjfrbymMD1yZbyPw58AJH5wUr60DTiPkzMaXERRu+6aymrMoN7wqNLE/RWrdf4L
+7JM7HdRoEEZAV4H5CZY6XIleB+0XMq6TxDBOilSGb0OUqdH/cgFI7r4oT0vBGal+
+eCiAy4tk0ocNu8WMpqWdhfYn+ej5HYN4qMP6awkEiMwCGz2Kbhkt8p3mmbzl3/k=
+=XqlQ
+-----END PGP SIGNATURE-----

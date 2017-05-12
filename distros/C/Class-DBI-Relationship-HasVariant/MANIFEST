@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+
+lib/Class/DBI/Relationship/HasVariant.pm
+
+t/00_load.t
+t/pod-coverage.t
+t/pod.t
+
+t/lib/Test/CDBI/Variant.pm
+t/albumattr.t
+t/boolean.t
+t/perl-critic.t
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

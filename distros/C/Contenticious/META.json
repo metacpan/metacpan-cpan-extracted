@@ -1,0 +1,61 @@
+{
+   "abstract" : "build web sites from markdown files",
+   "author" : [
+      "Mirko Westermeier <mail@memowe.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Contenticious",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.08",
+            "File::Basename" : "2.76",
+            "File::Copy::Recursive" : "0.38",
+            "File::Path" : "2.04",
+            "FindBin" : "1.49",
+            "List::Util" : "1.19",
+            "Mojolicious" : "7.0",
+            "Mojolicious::Plugin::RelativeUrlFor" : "0.052",
+            "Mojolicious::Plugin::Subdispatch" : "0.04",
+            "Text::Markdown" : "1.000031",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/memowe/contenticious/issues"
+      },
+      "homepage" : "http://memowe.github.com/contenticious/",
+      "repository" : {
+         "url" : "http://github.com/memowe/contenticious"
+      }
+   },
+   "version" : "0.391",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

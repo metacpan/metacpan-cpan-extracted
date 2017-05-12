@@ -1,0 +1,17 @@
+sub buttonSHFileCallback  { 
+	local $userSelectedFile = $top->getSaveFile(
+		-defaultextension => ".sh",
+		-filetypes	=> 
+			[
+				['Shell Program', '.sh'],
+				['All Files', '*']
+			],
+		-initialdir	=>	$tables{$selectedTable}{"InitDir"},
+		-initialfile	=>	$tables{$selectedTable}{"SHFile"},
+		-title		=> 	"Name the shell script to load $selectedTable"
+	); 
+	if ($userSelectedFile) {
+		$SHFILE = &dosify( $userSelectedFile );
+	}
+}
+

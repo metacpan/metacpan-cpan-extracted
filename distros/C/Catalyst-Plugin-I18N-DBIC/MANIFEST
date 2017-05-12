@@ -1,0 +1,7 @@
+DBIC.pm
+MANIFEST
+Makefile.PL
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+META.yml

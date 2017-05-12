@@ -1,0 +1,263 @@
+</R>Purpose<!R>
+The matrix widget allows a programmer to create and use a complex matrix. The
+matrix allows the user to enter in information in each cell and have all of the 
+information returned.
+
+</R>Construction Options<!R>
+A matrix widget is defined using the following syntax. The variable
+</B>$matrixObject<!B> contains the reference to the matrix object.
+<C></B>$matrixObject = new Cdk::Matrix ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Rowtitles   Required            Array Ref  The row titles.
+Coltitles   Required            Array Ref  The column titles.
+Colwidths   Required            Array Ref  The column widths.
+Coltypes    Required            Array Ref  The display types of the columns. (see display help for more information)
+Vrows       Required            Scalar     The number of rows seen on the screen.
+Vcols       Required            Scalar     The number of columns seen on the screen.
+Rowspace    1                   Scalar     The amount of space between the rows.
+Colspace    1                   Scalar     The amount of space between the columns.
+Filler      .                   Scalar     The default cell fill character.
+Fillattr    Normal              Scalar     The attribute of the default fill character.
+Dominant    None                Scalar     The dominant row. This applies to when colors are applied to rows and columns. If there is a conflict, one takes precedence over the other.
+Xpos        Center              Scalar     This is the position of the window on the X axis.
+Ypos        Center              Scalar     This is the position of the window on the Y axis.
+Boxcell     True                Scalar     This states that the individual cells are to be boxed.
+Boxmatrix   False               Scalar     This states that the whole matrix is to be boxed.
+Shadow      False               Scalar     This Boolean states whether the dialog box will have a shadow on the box.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The 
+following example demonstrates how to activate a matrix widget.
+<C></B>$listReference = $matrixObject->activate ();
+
+The variable </B>$listReference<!B> contains a reference to a list of lists 
+which contains the information within the matrix.
+
+</B>inject<!B>
+This function injects a single character into the widget. The following
+examples demonstrates how to call the inject method.
+<C></B>$matrixObject->inject ( options );
+
+The options are defined in the following table.
+</U>Option      Default Value       Type       Purpose<!U>
+Shadow      Required             Scalar     The character to inject into the widget.
+
+If you are injecting a special character into the widget, then you can
+use a pre-defined value to represent the key.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+</B>set<!B>
+Sets or resets certain attributes or features of the widget. The following
+example demonstrates how to call the set method.
+<C></B>$matrixObject->set ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Values      Required            Array Ref  This is a reference to an array of new values to be stored in the matrix.
+
+</B>bind<!B>
+The bind method binds keys to events. The binding is specific to the individual
+objects. The following example demonstrates how to call the bind method.
+<C></B>$matrixObject->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Key         Required            Scalar     This is the character to bind the event to.
+Function    Required            Scalar     This is the name of the callback function.
+
+</B>preProcess<!B>
+The </B>preProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+preProcess method.
+<C></B>$matrixObject->preProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a pre-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$matrixObject->preProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+If the pre-process function returns a value of 0 the key hit will
+not be injected into the widget. This allows the programmer to
+selectively pick which characters will or will not get injected
+into the widget.
+
+The </B>postProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+postProcess method.
+<C></B>$matrixObject->postProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a post-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$matrixObject->postProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+<C></B>$matrixObject->draw ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Box         True                Scalar     Draws the window with a box around it.
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+<C></B>$matrixObject->erase ();
+
+</B>raise<!B>
+The raise method raises the widget to the top of the screen. This means if there
+were any widgets obscuring part of the view, raising the object would bring the
+complete object into view. The following example demonstrates how to call the 
+raise method.
+<C></B>$matrixObject->raise();
+
+</B>lower<!B>
+The lower method lowers the object so it doesn't obscure the view of any other 
+objects. The following example demonstrates how to call the lower method.
+<C></B>$matrixObject->lower();
+
+</B>register<!B>
+The register method registers the object to the default screen. This does </R>NOT<!R>
+have to be called since the objects are registered automatically. This method
+should be called if the </B>unregister<!B> method was called. The following
+example demonstrates how to call the register method.
+<C></B>$matrixObject->register();
+
+</B>unregister<!B>
+The unregister method should be called when a widget, which is part of the
+default screen, needs to be taken away temporarily. This does not delete or free
+the object, it just unmaps it from any future screen refreshes. The object can
+be registered by calling the </B>register<!B> method. The following example
+demonstrates how to call the unregister method.
+<C></B>$matrixObject->unregister();
+
+</B>getwin<!B>
+This method returns a pointer to the window of the object. Not much use for this
+yet. It will be useful in the future when the drawing methods are added. The
+following example demonstrates how to call the getwin method.
+<C></B>$matrixObject->getwin();
+
+</R>Default Key Bindings<!R>
+</U>Key               Action<!U>
+Backspace         Deletes the last character in the current cell.
+Delete            Deletes the last character in the current cell.
+Right Arrow       Moves the to the next cell on the right.
+Return            Moves the to the next cell on the right.
+Left Arrow        Moves the to the next cell on the left.
+Up Arrow          Moves the to the next cell one row up.
+Down Arrow        Moves the to the next cell one row down.
+Next Page         Moves to the next screen of cells.
+CTRL-F            Moves to the next screen of cells.
+Prev Page         Moves to the previous screen of cells.
+CTRL-B            Moves to the previous screen of cells.
+CTRL-G            Jumps to a specific cell.
+CTRL-P            Pastes the contents of the paste buffer in the current cell.
+CTRL-T            Copies the contents of the current cell in the paste buffer.
+CTRL-E            Erases the complete cell.
+CTRL-K            Cuts the contents of the current cell and stores it in the paste buffer.
+CTRL-R            Refreshes the screen.
+Tab               Moves the to the next cell on the right.
+Escape            Exits the 
+
+</R>Tips & Tricks<!R>
+<B=*>You can have more than one column of row titles by setting certain
+     columns to ViewOnly. This makes it appear like there are actually 2
+     matrices in one.
+
+</R>Physical Restrictions<!R>
+</U>Restriction                    Value<!U>
+Maximum Number of Rows         1000
+Maximum Number of Columns      1000
+
+</R>Example Use Of The Widget<!R>
+<F=../examples/matrix>
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995
+<C>Document Revised: March,    1996

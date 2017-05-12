@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::Authent.
+
+0.1  <date unknown>
+
+0.2  <date unknown>
+
+0.2.1 January 15, 1999
+ a bugfix
+
+0.2.1 July 26, 1999
+ renamed from Authent to CGI::Authent
+

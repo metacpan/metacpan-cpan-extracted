@@ -1,0 +1,56 @@
+# PODNAME: Config::Model::models::Systemd::Service
+# ABSTRACT:  Configuration class Systemd::Service
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::Systemd::Service - Configuration class Systemd::Service
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+=head1 Elements
+
+=head2 disable - disable configuration file supplied by the vendor
+
+When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to
+/dev/null with the same filename as the vendor configuration file.
+See L<systemd-system.conf> for details. I<< Optional. Type boolean. upstream_default: '0'.  >> 
+
+=head2 Unit
+
+I<< Optional. Type warped_node of class L<Systemd::Section::Unit|Config::Model::models::Systemd::Section::Unit> .  >> 
+
+=head2 Install
+
+I<< Optional. Type warped_node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  >> 
+
+=head2 Service
+
+I<< Optional. Type warped_node of class L<Systemd::Section::Service|Config::Model::models::Systemd::Section::Service> .  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Install>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Service>
+
+=item *
+
+L<Config::Model::models::Systemd::Section::Unit>
+
+=back
+
+=cut
+

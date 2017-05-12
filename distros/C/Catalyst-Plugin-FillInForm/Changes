@@ -1,0 +1,44 @@
+Revision history for Perl extension Catalyst::Plugin::FillInForm.
+
+0.12  2009-07-11 13:40:31
+        - Stop relying on index : Global being dispatched to on / in
+          the tests. Catalyst-Runtime >= 5.80006 doesn't support it
+          anymore.
+
+0.11  2009-06-30 22:55:53
+        - Port from NEXT to MRO::Compat.
+        - Suppress warning in Catalyst 5.80 caused by assigning undef
+          to the body
+
+0.10  2008-12-31 17:08:00
+        - Suppress potential HTML::FillInForm warning (jhannah)
+
+0.09  2008-04-29 11:48:00
+        - PREREQS typo
+
+0.08  2008-04-12 13:16:00
+        - Updated to Module::Install;
+        - Added build_requires RenderView
+
+0.07  2008-04-11 21:49:00
+        - Changed all references of output -> body.
+        - Added tests & docs (jhannah)
+
+0.06  2005-06-11 00:42:00
+        - docs heavily rewritten
+
+0.05  2005-05-26 14:43:00
+        - $c->fillform now takes an optional hashref
+
+0.04  2005-04-18 23:00:00
+        - fixed some renaming issues
+
+0.03  2005-04-15 16:12:00
+        - Added pod tests
+        - Extended documentation.
+
+0.02  2005-02-03 02:00:00 
+        - $c->stash->{error} support
+
+0.01  2005-01-28 22:00:00 
+        - first release

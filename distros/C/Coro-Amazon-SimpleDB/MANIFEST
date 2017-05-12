@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Coro/Amazon/SimpleDB.pm
+t/00-load.t
+t/02-live.t
+META.yml                                 Module meta-data (added by MakeMaker)

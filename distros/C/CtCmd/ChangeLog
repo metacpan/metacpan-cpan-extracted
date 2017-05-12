@@ -1,0 +1,62 @@
+##########################################################################
+#                                                                        #
+# (C) Copyright IBM Corporation 2002, 2013 All rights reserved.          #
+#                                                                        #
+# This program and the accompanying materials are made available under   #
+# the terms of the Common Public License v1.0 which accompanies this     #
+# distribution, and is also available at http://www.opensource.org       #
+# Contributors:                                                          #
+#                                                                        #
+# William Spurlin - Creation and updates                                 #
+#                                                                        #
+# Max Vohlken - Defect fixes                                             #
+#                                                                        #
+##########################################################################
+
+1.11  Updated Makefile.PL to add /opt/rational/common/shlib to the library
+      search path. This is needed to find the SSL libraries. Updated 
+      Makefile.PL to force a 32-bit compile on Linux and AIX just in case 
+      the default is to create a 64-bit binary. Updated Makefile.PL to 
+      exit if the perl being used isn't 32-bit. Updated Makefile.PL to 
+      change $Config{lib_ext} on the fly from .a to .so on AIX.
+1.10  Fix for a crash in free() on unix systems using Perl 5.8.6 and later.
+      Updated Makefile.PL to deal with new ClearCase library dependencies that 
+      were added in ClearCase releases 7.1.2.9 and 8.0.0.5.
+1.09  Added a version() subroutine to CtCmd that produces output similar to
+      cleartool -verall. This insures that all of the ClearCase core libraries
+      will be dynamically loaded when CtCmd is dynamically loaded. Fixed 
+      handling of the temporary directory setting in the CC.pm module on 
+      Windows. Fixes to the mkfolder and mkstream tests in t1_createArch.t.
+      Also this version is included by default in the 8.0 release of 
+      ClearCase.
+1.08  Added support for AIX 6.x
+      This change affects building CtCmd on AIX platforms only.  Changes to
+      IBM Rational ClearCase versions 7.0.x and 7.1.x require updating the
+      LDDLFLAGS so that CtCmd can be built using /usr/bin/perl on AIX 6.x
+1.07  Improved Makefile construction on RHEL5 platform.
+      This change affects building CtCmd on RHEL platforms only.  An update
+      to /usr/bin/perl requires a change in order to support both RHEL4 and
+      RHEL5.  Note that this update also removes -latriatirpc from the 
+      library list; MCK is not being updated any more and users can still use 
+      CtCmd 1.06 or edit Makefile.PL to restore it.
+1.06  Due to changes in release 7 (Baltic) librpcsoc.so is no longer used.
+      This change affects only Solaris implementations of CtCmd as 
+      librpcsoc.so was only used for Solaris.  This means that release 7
+      does not need the aux_zuba.c and the SolarisInterposer code.  Because
+      we need backward compatibility that code needs to stay in
+      for now.  When releases before release 7 are no longer supported, that
+      code and all references to it may be removed.
+1.04  Corrected compile warnings generated from aux_zuba.c and proc_table.h.
+      License upgraded to CPL v1.0.  On Windows, CtCmd.dll links to ClearCase 
+      dlls via symbol names instead of ordinal. So a patch of Clearcase
+      will not necessarily require a rebuild of CtCmd. On Solaris, modified 
+      aux_zuba.c to fix db_server:RPC failure introduced in ClearCase 2003.06 
+      patch 12/13. Some clean up for HP-UX (HP-UX 10.20 no longer supported). 
+1.03  Add vob.conf. Expand supported platforms to include Solaris
+      2.9, Windows 5.1, HP-UX 11.11.  Modify signal behavior for
+      ClearCase > 5.0. Added class method cmdstat() to return error
+      status in scalar context.  
+1.02  Modify ld in  SolarisInterposer.  Expand Windows $os test. 
+      Add sections to README.  Add ChangeLog.
+1.01  Fixed outfunc,errfunc.
+1.00  Initial release to CPAN.

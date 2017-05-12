@@ -1,0 +1,22 @@
+<div class=path>
+<B>[% pages.categories %]</B>
+</div>
+[% class = 's' %]
+<div class=box>
+<table width="99%">
+[% USE table(results, rows=3) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END -%]
+<td><a href="[% home %]/chapter/[% item.chap_link %]"> 
+<b>[% item.chap_desc %]</b></a> 
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>
+</div>

@@ -1,0 +1,315 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Curses::UI::POE;
+
+use Curses;
+use Net::POP3;
+use Mail::Header;
+use Mail::Address;
+
+my $cui        = new Curses::UI::POE ( -clear_on_exit => 1 );
+my $pop3       = undef;
+my $connection = undef;
+
+# We do not want STDERR to clutter our screen.
+open STDERR, ">/dev/null";
+
+# ----------------------------------------------------------------------
+# setup(): Setup the connection
+# ----------------------------------------------------------------------
+
+sub check_connection($;)
+{
+	my $buttons = shift;
+	my $conwin  = $buttons->parent;
+	my $cui     = $conwin->root;
+
+	foreach my $key ('username','password','host','port') 
+	{
+		my $obj = $conwin->getobj($key);
+		my $value = $obj->get;
+		$connection->{$key} = $value;
+		# TODO: focus back to entry does not seem to
+		# move the cursor with it.
+		if ($value =~ /^\s*$/) {
+			$cui->error("Missing value for $key field");
+			$obj->focus;
+			return;
+		}
+	}
+
+	return 1;
+}
+
+sub setup_connection()
+{
+	my $conwin = $cui->add(
+		'connection_window', 'Window',
+		-border => 1,
+		-ipad => 2,
+		-height => 15,
+		-width => 60,
+		-centered => 1,
+		-title => "POP3 connection",
+	);	 
+
+	$conwin->add(
+		'host_label', 'Label',	
+		-x => 0, -y => 0, -width => 13,
+		-textalignment => 'right',
+		-text => 'POP3 host :',
+	);
+
+	$conwin->add(
+		'host', 'TextEntry',
+		-x => 14, -y => 0,
+		-text => 'pop',
+	);
+
+	$conwin->add(
+		'port_label', 'Label',	
+		-x => 0, -y => 2, -width => 13,
+		-textalignment => 'right',
+		-text => 'POP3 port :',
+	);
+
+	$conwin->add(
+		'port', 'TextEntry',
+		-x => 14, -y => 2,
+		-regexp => '/^\d*$/',	
+		-text => '110',
+	);
+
+	$conwin->add(
+		'username_label', 'Label',	
+		-x => 0, -y => 4, -width => 13,
+		-textalignment => 'right',
+		-text => 'Username :',
+	);
+
+	$conwin->add(
+		'username', 'TextEntry',
+		-x => 14, -y => 4,
+		-text => getpwuid($>),
+	);
+
+	$conwin->add(
+		'password_label', 'Label',	
+		-x => 0, -y => 6, -width => 13,
+		-textalignment => 'right',
+		-text => 'Password :',
+	);
+
+	$conwin->add(
+		'password', 'TextEntry',
+		-x => 14, -y => 6,
+		-password => '*',
+		-text => '',
+	)->focus;
+
+	my $buttons = $conwin->add(
+		'buttons', 'Buttonbox',
+		-x => 14, -y => 8,
+		-buttons => [
+		    { -label => '< Connect >',
+		      -onpress => sub {
+		          my $this = shift;
+		          if (check_connection($this)) {
+			      if (pop3_connect()) {
+			          $this->parent->loose_focus;
+			      }
+			  }
+		      },
+		    },
+		    { -label => '< Quit >',
+		      -onpress => sub {exit} },
+		],
+	);
+
+	$conwin->modalfocus;
+	$cui->delete('connection_window')
+}
+
+# ----------------------------------------------------------------------
+# pop3_connect(): Connect to the POP3 server and exit if it fails
+# ----------------------------------------------------------------------
+
+sub pop3_connect()
+{
+	$cui->progress(
+		-message => "Connecting to the POP3 server...",
+		-max => 4,
+		-pos => 1,
+	);
+
+	my $error = 0;
+
+	$pop3 = Net::POP3->new(
+		$connection->{host},
+		Port => $connection->{port},
+		Timeout => 0,
+	);
+
+	if (not $pop3) {
+		$error++;
+		$cui->error("Could not connect to "
+		           ."$connection->{host}:$connection->{port}");
+	}
+
+	$cui->setprogress(2, "Sending username...");
+	if (not $error and not defined $pop3->user($connection->{username})) {
+		$error++;
+		my $err = $pop3->message(); chomp $err;
+		$cui->error("Sending USER failed:\n$err");
+	}
+	
+	$cui->setprogress(3, "Sending password...");
+	if (not $error and not defined $pop3->pass($connection->{password})) {
+		$error++;
+		my $err = $pop3->message(); chomp $err;
+		$cui->error("Sending PASS failed:\n$err");
+	}
+
+	if (not $error) {
+		$cui->setprogress(4, "Connection successful!");
+		sleep 1;
+	}
+
+	$cui->noprogress;
+
+	return !$error;
+}
+
+# ----------------------------------------------------------------------
+# The inbox screen
+# ----------------------------------------------------------------------
+
+sub build_inbox()
+{
+	my $list = $pop3->list();
+	my @ids = sort {$a<=>$b} keys %$list;
+
+	my $msg = "Retrieving headers";
+	$cui->progress(
+		-max => scalar(@ids),
+		-message => $msg,
+	);
+
+	my @values = ();
+	my %labels = ();
+	my $progress_pos = 0;
+	foreach my $n (@ids)
+	{
+		my $lines = $pop3->top($n, 0);
+		my $header = new Mail::Header($lines);
+
+		# Add value
+		push @values, $n;
+
+		# Add label
+		my $subject = $header->get('Subject');
+		my $from    = $header->get('From');
+	 	my $addr = new Mail::Address($from);	
+		my $name = substr($addr->name, 0, 15);
+		$labels{$n} = sprintf("%4d", $n)
+			    . " | "
+			    . sprintf("%15s", $name)
+			    . " | "
+                            . $header->get('Subject');
+	
+		$cui->setprogress(
+			++$progress_pos,
+			$msg . ": message $progress_pos of " . scalar(@ids)
+		);
+	}
+	$cui->noprogress;
+
+	my $listwin = $cui->add('list_window', 'Window');
+	my $ml = $listwin->add(
+		'message_list', 'Listbox',
+		-values => \@values,
+		-labels => \%labels,
+		-vscrollbar => 1,
+		-border => 1,
+		-ipad   => 1,
+		-title  => '<ENTER> view message <CTR+Q> Quit from program',
+	);
+	
+	$ml->set_binding(sub{exit(0)}, "\cC", "\cQ");
+	$ml->set_routine('option-select', \&view_message);
+}
+
+# ----------------------------------------------------------------------
+# view_message(): callback routine for the inbox list
+# ----------------------------------------------------------------------
+
+sub view_message()
+{
+	my $this = shift;	
+
+	# Get the selected message id.
+	$this->{-selected} = $this->{-ypos};
+	my $id = $this->get;
+	$this->{-selected} = undef;
+	
+	# Retrieve the message from the POP3 server.
+	$cui->status("Retrieving message $id from the POP3 server...");
+	my $lines = $pop3->get($id);		
+	unless (ref $lines)
+	{
+		# Maybe the connection went away. Reconnect and try again.
+		$pop3->close;
+		unless (pop3_connect()) 
+		{
+			$cui->error("Fatal error: Could not reconnect\n"
+			          . "to the POP3 server.");
+	 		exit(1);
+		}
+		$lines = $pop3->get($id);		
+	}
+	unless (ref $lines)
+	{
+		$cui->error("Failed to retrieve message $id\n"
+		           ."from the POP3 server.\n"
+                           ."Even after reconnecting");
+		exit_program();
+	}
+	$cui->nostatus;
+
+	# Create the viewer window.
+	my $viewwin = $cui->add('view_window', 'Window');
+	my $tv = $viewwin->add(
+		'textviewer', 'TextViewer',
+		-text => join("", @$lines),
+		-vscrollbar => 1,
+		-wrapping => 1,
+		-border => 1,
+		-ipad   => 1,
+		-title  => '<ENTER> return to inbox <CTRL+Q>: Quit from program',
+	);
+
+	$viewwin->set_binding(sub{ shift()->loose_focus }, KEY_ENTER());
+	$viewwin->set_binding(sub{exit(0)}, "\cC", "\cQ");
+	$viewwin->modalfocus;
+	$cui->delete('view_window');
+	$cui->draw;
+}
+
+# ----------------------------------------------------------------------
+# Clean exit
+# ----------------------------------------------------------------------
+
+END { $pop3->quit if defined $pop3 }
+
+# ----------------------------------------------------------------------
+# The main program
+# ----------------------------------------------------------------------
+
+setup_connection();
+build_inbox();
+MainLoop;
+

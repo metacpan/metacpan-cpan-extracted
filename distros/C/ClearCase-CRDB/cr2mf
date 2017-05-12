@@ -1,0 +1,236 @@
+#!/opt/rational/clearcase/bin/Perl
+
+use ClearCase::CRDB;
+
+use Cwd 'abs_path';
+use File::Basename;
+use File::Spec;
+use Getopt::Long;
+
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+
+use strict;
+
+my $prog = basename($0, qw(.pl));
+
+my $bar = '#' x 68;
+
+sub usage {
+    my $msg = shift;
+    my $rc = (defined($msg) && !$msg) ? 0 : 2;
+    if ($rc) {
+	select STDERR;
+	print "$prog: Error: $msg\n\n" if $msg;
+    }
+    print <<EOF;
+Usage: $prog [flags] pattern ...
+Flags:
+   -check
+   -cr|cache <s>
+   -do <s>
+   -db <s>
+   -dir <s>
+   -fmt <s>
+   -macros
+   -recurse
+   -save
+   -verbose
+   -help		Print this message and exit
+Note:
+    All flags may be abbreviated to their shortest unique name.
+Examples:
+    $prog -do - -db 0220.cc.crdb <0220.cc.dos >0220.cc.mf
+    $prog -db 0220.cc.crdb >0220.cc.mf
+EOF
+    exit $rc;
+}
+
+# Make a new CRDB object and initialize it from @ARGV.
+my $crdb = ClearCase::CRDB->new(@ARGV);
+
+my %opt;
+GetOptions(\%opt, qw(dir=s help macros recurse verbose));
+usage() if $opt{help};
+
+sub note {
+    print STDERR "$prog: @_\n" if $opt{verbose};
+}
+
+my @targets = @ARGV ? @ARGV : sort $crdb->targets;
+
+# Determine the set of versioned elements.
+my %elems = map { $_ => 1 } $crdb->versioned_elements;
+
+############################################################################
+# From here on we're printing out a makefile.
+############################################################################
+
+print ".PHONY: all promote clean\n\n";
+
+print ".SUFFIXES:\n\n";
+
+print "$bar\n\n";
+
+print "export PATH	:= \$(PATH):/opt/rational/clearcase/bin\n\n";
+
+print "$bar\n\n";
+
+print <<'EOF';
+
+CT		:= cleartool
+VIEW_SCRUBBER	:= /opt/rational/clearcase/etc/view_scrubber
+EOP		:= :
+
+EOF
+
+print "$bar\n\n";
+
+print "##:LOCALIZATIONS:##\n";
+
+print "\n$bar\n\n";
+
+my @terminals = sort $crdb->terminals;
+print "all:\t    ", shift @terminals;
+print " \\\n\t    $_" for @terminals;
+print qq(\n\techo "All derived objects inherit from this one" > TOP.AUDIT\n\n);
+
+print "$bar\n\n";
+
+for my $tgt (@targets) {
+    my $iwd = $crdb->iwd($tgt);
+
+    # Sibling targets are separated with a "+" in the makefile.
+    # This is an undocumented (?) feature which tells clearmake
+    # to treat them as a "target group", meaning that one invocation
+    # of the build script will generate all siblings.
+    my @siblings = sort $crdb->siblings($tgt);
+    unshift(@siblings, $tgt);
+    for my $i (0 .. $#siblings) {
+	my $line = $siblings[$i];
+	print $line;
+	print " + \\\n" if $i < $#siblings;
+    }
+    print ":";
+
+    # Get the list of prereqs for this target. List all members of
+    # sibling groups.
+    my @needs = sort $crdb->needs($tgt);
+    for my $need (@needs) {
+	# Don't list elements because clearmake can infer those prereqs.
+	next if $elems{$need};
+	print " \\\n\t    $need";
+    }
+    print "\n";
+
+#######################################################################
+####################### RATIONAL HACKERY! #############################
+#######################################################################
+    my @pfx;
+    if (@siblings > 1) {
+	push(@pfx, qq(echo "Building: @siblings"));
+	push(@pfx, qq(rm -f @siblings));
+	my $dir = dirname($siblings[0]);
+	push(@pfx, qq(mkdir -p $dir));
+    } else {
+	push(@pfx, qq(echo "Building: \$@"));
+	push(@pfx, qq(if [ -f \$@ ]; then rm -f \$@; else mkdir -p \$(\@D); fi));
+    }
+    push(@pfx, qq(cd $iwd));
+    push(@pfx, q($(EOP)));
+
+    for my $line (@pfx) {
+	print "\t$line && \\\n";
+    }
+
+    # Remove certain prefix cmds (echo, rm) that imake puts at the
+    # beginning of build scripts so we can replace them with our own.
+    my @script;
+    my $meat = 0;
+    for ($crdb->script($tgt)) {
+	# If an echo line is redirected to a file ("echo > foo"), it's meat.
+	if (!$meat && !m%\s>%) {
+	    next if 
+		m%^\@echo "?(?:building|linking|compiling|making|Making|converting)\s%;
+	    next if 
+		m%(?:^(?:rm -rf|if \[\s+-)|/bin/true)%;
+	    next if
+		m%^rm -f% || m%(?:_hdr_\w+\.h|y\.tab\.|lex\.yy\.|\.tmp$)%;
+	}
+
+	$meat = 1;
+	push(@script, $_);
+    }
+#######################################################################
+####################### END OF RATIONAL HACKERY #######################
+#######################################################################
+
+    # Never throw away lines in this loop!!
+    for my $i (0 .. $#script) {
+	my $line = $script[$i];
+
+	# Some sloppy build script lines end with an unneeded semicolon.
+	$line =~ s%;$%%;
+
+	# Replace multiple space chars with a single space. Makefiles
+	# are particularly prone to this because of constructs like
+	# '$(CC) $(DBGFLAG) -c ...' when DBGFLAG is empty.
+	$line =~ s%[ ]{2,}% %g;
+
+	# A literal $ is recorded in the CR as "$" so it needs to be
+	# doubled up before being fed back into clearmake.
+	$line =~ s%\$%\$\$%g;
+
+	# Simplify "/foo/../bar" to "/bar".
+	$line =~ s%/\w+/\.\./%/%g;
+
+	# Remove duplicated -I and -L flags.
+	if ($line !~ m%findlib\.sh%) {
+	    my %seen = ();
+	    $line = join(' ',
+		grep { !$seen{$_}++ } split(m%(\s+-[IL]\S+)%, $line));
+	}
+
+	print "\t", $line;
+	print " && \\" if $i < $#script;
+	print "\n";
+    }
+    print "\n";
+}
+
+print "$bar\n\n";
+
+print "promote:";
+print "\n\t", q($(CT) lsp -do | | $(VIEW_SCRUBBER) -p), "\n";
+print "\n";
+
+print "clean:";
+print "\n\t", q($(CT) lsp -do |\\);
+print "\n\t", q(perl -e "print for sort {\\$$b cmp \\$$a} <>" |\\);
+print "\n\t", q(perl -nle "unlink || rmdir");
+print "\n\t", q($(CT) lsp |\\);
+print "\n\t", q(perl -e "print for sort {\\$$b cmp \\$$a} <>" |\\);
+print "\n\t", q(perl -nle "rmdir");
+print "\n";
+
+if ($opt{macros}) {
+    print "\n$bar\n\n";
+
+    my %macros;
+
+    # Harvest all the variables used during the build.
+    for my $tgt (@targets) {
+	if (my $ovars = $crdb->vars($tgt)) {
+	    for my $var (keys %{$ovars}) {
+		my $nkey = join('=', $var, $ovars->{$var});
+		$macros{$nkey}++;
+	    }
+	}
+    }
+
+    if (keys %macros) {
+	print "\n## The following macros were used during the build:\n";
+	for (sort keys %macros) {
+	    print "## [$macros{$_}] $_\n";
+	}
+    }
+}

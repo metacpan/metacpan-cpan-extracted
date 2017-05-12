@@ -1,0 +1,36 @@
+Crypt::Blowfish_PP
+==================
+
+Blowfish is a published algorithm written by Bruce Schneier
+(http://www.counterpane.com/). Unlike IDEA or DES etc. there are no patent
+implications in using this algorithm.
+
+It uses anywhere between a 64 bit and a 448 bit key. The transform itself is
+fast and operates on a 64 bit block, and most of the calculation time is in
+initialising the context with the key data.
+
+The _PP name comes from the fact that this implementation is Pure Perl, and
+will not have any compatibility problems.
+
+I have not included any sort of multiblock structure in this implementation
+(I might do in future), so to be useful you will probably need something
+like Crypt::CBC. (v1.01 fixes the compatibility issues with Crypt::CBC)
+
+This passes the test vectors on http://www.counterpane.com/vectors.txt
+
+To install, untar the module
+
+do the standard:
+$ perl Makefile.PL
+$ make
+$ make test
+# make install
+
+This implementation is entirely object oriented, and entirely written in Perl.
+The perl form is (c) copyright Matthew Byng-Maddick <mbm@colondot.net> 2000,
+and the actual structure and static data are copyright Bruce Schneier.
+
+PLEASE NOTE UPDATED EMAIL ADDRESS: mbm@colondot.net, as the other may stop
+working at some point soon.
+
+The licensing is GPL or Artistic at your preference, as with Perl itself.

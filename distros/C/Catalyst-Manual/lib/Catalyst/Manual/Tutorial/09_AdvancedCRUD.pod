@@ -1,0 +1,105 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial::09_AdvancedCRUD - Catalyst Tutorial - Chapter 9: Advanced CRUD
+
+
+=head1 OVERVIEW
+
+This is B<Chapter 9 of 10> for the Catalyst tutorial.
+
+L<Tutorial Overview|Catalyst::Manual::Tutorial>
+
+=over 4
+
+=item 1
+
+L<Introduction|Catalyst::Manual::Tutorial::01_Intro>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
+
+=item 3
+
+L<More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
+
+=item 4
+
+L<Basic CRUD|Catalyst::Manual::Tutorial::04_BasicCRUD>
+
+=item 5
+
+L<Authentication|Catalyst::Manual::Tutorial::05_Authentication>
+
+=item 6
+
+L<Authorization|Catalyst::Manual::Tutorial::06_Authorization>
+
+=item 7
+
+L<Debugging|Catalyst::Manual::Tutorial::07_Debugging>
+
+=item 8
+
+L<Testing|Catalyst::Manual::Tutorial::08_Testing>
+
+=item 9
+
+B<09_Advanced CRUD>
+
+=item 10
+
+L<Appendices|Catalyst::Manual::Tutorial::10_Appendices>
+
+=back
+
+
+=head1 DESCRIPTION
+
+This chapter of the tutorial explores more advanced functionality for
+Create, Read, Update, and Delete (CRUD) than we saw in
+L<Chapter 4|Catalyst::Manual::Tutorial::04_BasicCRUD>.  In particular,
+it looks at a number of techniques that can be useful for the Update
+portion of CRUD, such as automated form generation, validation of
+user-entered data, and automated transfer of data between forms and
+model objects.
+
+In keeping with the Catalyst (and Perl) spirit of flexibility, there are
+many different ways to approach advanced CRUD operations in a Catalyst
+environment.  Therefore, this section of the tutorial allows you to pick
+from one of several modules that cover different form management
+tools.  Select one or more options from the list below.
+
+=head1 ADVANCED CRUD OPTIONS
+
+=over 4
+
+=item *
+
+L<FormFu|Catalyst::Manual::Tutorial::09_AdvancedCRUD::09_FormFu>
+
+=item *
+
+L<FormHandler|Catalyst::Manual::Tutorial::09_AdvancedCRUD::09_FormHandler>
+
+=item *
+
+L<FormBuilder|Catalyst::Manual::Tutorial::09_AdvancedCRUD::09_FormBuilder>
+
+=back
+
+B<NOTE:> Please contact the author if you would like to assist with
+writing a new module.
+
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Feel free to contact the author for any errors or suggestions, but the
+best way to report issues is via the CPAN RT Bug system at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
+
+Copyright 2006-2011, Kennedy Clark, under the
+Creative Commons Attribution Share-Alike License Version 3.0
+(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).

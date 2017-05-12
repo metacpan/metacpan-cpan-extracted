@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+TNEF.pm
+t/test.t
+t/tnef.doc
+META.yml                                 Module meta-data (added by MakeMaker)

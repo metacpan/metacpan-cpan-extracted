@@ -1,0 +1,35 @@
+NAME
+    Catalyst::Controller::DBIC::Transaction - Encloses actions into
+    transactions
+
+SYNOPSIS
+      use base qw(Catalyst::Controller::DBIC::Transaction);
+      sub foo :DBICTransaction('DB::Schema') {
+         do $something or die $!;
+      }
+
+DESCRIPTION
+    This module enables the use of automatic transaction support into
+    Catalyst Actions, it will associate a given action with the appropriate
+    action class and save the DBIx::Class::Schema class name for later use.
+
+    The action will be executed inside a txn_do, and a die inside that
+    method will cause the transaction to be rolled back, as documented in
+    DBIx::Class::Schema.
+
+    This method will not, on the other hand, handle that exception, since
+    txn_do will rethrow it. This means that this handling is not much
+    intrusive in the action processing flow.
+
+AUTHORS
+    Daniel Ruoso <daniel@ruoso.com>
+
+BUG REPORTS
+    Please submit all bugs regarding
+    "Catalyst::Controller::DBIC::Transaction" to
+    "bug-catalyst-controller-dbic-transaction@rt.cpan.org"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension CCCP::SQLiteWrap.
+
+0.01  Mon May 31 18:17:56 2010
+	- original version; created by h2xs 1.23 with options
+		-AX CCCP::SQLiteWrap
+

@@ -1,0 +1,133 @@
+NAME
+
+    Catalyst::Action::REST - Automated REST Method Dispatching
+
+SYNOPSIS
+
+        sub foo :Local :ActionClass('REST') {
+          ... do setup for HTTP method specific handlers ...
+        }
+    
+        sub foo_GET {
+          ... do something for GET requests ...
+        }
+    
+        # alternatively use an Action
+        sub foo_PUT : Action {
+          ... do something for PUT requests ...
+        }
+
+DESCRIPTION
+
+    This Action handles doing automatic method dispatching for REST
+    requests. It takes a normal Catalyst action, and changes the dispatch
+    to append an underscore and method name. First it will try dispatching
+    to an action with the generated name, and failing that it will try to
+    dispatch to a regular method.
+
+    For example, in the synopsis above, calling GET on "/foo" would result
+    in the foo_GET method being dispatched.
+
+    If a method is requested that is not implemented, this action will
+    return a status 405 (Method Not Found). It will populate the "Allow"
+    header with the list of implemented request methods. You can override
+    this behavior by implementing a custom 405 handler like so:
+
+       sub foo_not_implemented {
+          ... handle not implemented methods ...
+       }
+
+    If you do not provide an _OPTIONS subroutine, we will automatically
+    respond with a 200 OK. The "Allow" header will be populated with the
+    list of implemented request methods. If you do not provide an _HEAD
+    either, we will auto dispatch to the _GET one in case it exists.
+
+    It is likely that you really want to look at
+    Catalyst::Controller::REST, which brings this class together with
+    automatic Serialization of requests and responses.
+
+    When you use this module, it adds the Catalyst::TraitFor::Request::REST
+    role to your request class.
+
+METHODS
+
+    dispatch
+
+      This method overrides the default dispatch mechanism to the
+      re-dispatching mechanism described above.
+
+SEE ALSO
+
+    You likely want to look at Catalyst::Controller::REST, which implements
+    a sensible set of defaults for a controller doing REST.
+
+    This class automatically adds the Catalyst::TraitFor::Request::REST
+    role to your request class. If you're writing a web application which
+    provides RESTful responses and still needs to accommodate web browsers,
+    you may prefer to use Catalyst::TraitFor::Request::REST::ForBrowsers
+    instead.
+
+    Catalyst::Action::Serialize, Catalyst::Action::Deserialize
+
+TROUBLESHOOTING
+
+    Q: I'm getting a "415 Unsupported Media Type" error. What gives?!
+
+      A: Most likely, you haven't set Content-type equal to
+      "application/json", or one of the accepted return formats. You can do
+      this by setting it in your query accepted return formats. You can do
+      this by setting it in your query string thusly:
+      ?content-type=application%2Fjson (where %2F == / uri escaped).
+
+      NOTE Apache will refuse %2F unless configured otherwise. Make sure
+      AllowEncodedSlashes On is in your httpd.conf file in order for this
+      to run smoothly.
+
+AUTHOR
+
+    Adam Jacob <adam@stalecoffee.org>, with lots of help from mst and
+    jrockway
+
+    Marchex, Inc. paid me while I developed this module.
+    (http://www.marchex.com)
+
+CONTRIBUTORS
+
+    Tomas Doran (t0m) <bobtfish@bobtfish.net>
+
+    John Goulah
+
+    Christopher Laco
+
+    Daisuke Maki <daisuke@endeworks.jp>
+
+    Hans Dieter Pearcey
+
+    Brian Phillips <bphillips@cpan.org>
+
+    Dave Rolsky <autarch@urth.org>
+
+    Luke Saunders
+
+    Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
+    J. Shirley <jshirley@gmail.com>
+
+    Gavin Henry <ghenry@surevoip.co.uk>
+
+    Gerv http://www.gerv.net/
+
+    Colin Newell <colin@opusvl.com>
+
+    Wallace Reis <wreis@cpan.org>
+
+    André Walker (andrewalker) <andre@cpan.org>
+
+COPYRIGHT
+
+    Copyright (c) 2006-2015 the above named AUTHOR and CONTRIBUTORS
+
+LICENSE
+
+    You may distribute this code under the same terms as Perl itself.
+

@@ -1,0 +1,7 @@
+perl Makefile.PL && make all test && sudo make install
+# or, if you aren't rootish:
+# perl Makefile.PL PREFIX=~/local && make all test install
+
+# If you're missing any dependencies, "perl Makefile.PL" will let you know
+# (hopefully).  Just use "cpan" to install them, and you should be ready to
+# go.

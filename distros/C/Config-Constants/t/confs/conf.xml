@@ -1,0 +1,9 @@
+<config>
+    <module name='Foo::Bar'>
+          <constant name='BAZ' value='the coolest module ever' />
+    </module>
+    <module name='Bar::Baz'>
+        <constant name='FOO' value='42' />
+        <constant name='BAR' value='Foo and Baz' />        
+    </module>
+</config>

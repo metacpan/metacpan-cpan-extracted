@@ -1,0 +1,14 @@
+ABOUT
+
+Config::Neat is a suite of Perl modules that implement parsing/rendering
+human-readable configuration files with inheritance and schema validation.
+
+INSTALLATION
+
+    perl Build.PL
+    ./Build test
+    ./Build install
+
+SEE ALSO
+
+https://github.com/iafan/Config-Neat

@@ -1,0 +1,21 @@
+Revision history for Perl extension Catalyst-View-HTML-Zoom
+
+
+0.003       3 Mar, 2011
+            - Reduced dependencies a bit
+            - Let you specify a Zoom class in the stash or render arguments
+            - Let you call ->render with a scalar reference for inlined template
+              rendering and let you pass args to ->render
+            - Additional configuration options for setting content-type
+            - Improved control over where your templates are stored
+            - Let you use the Catalyst Configuration to pass arguments to your
+              delegated view classes.
+            - Refactored to clarify method functionalty
+            - Additional test cases and documentation for above
+            - let you pass a stash key 'zoom_do' that is a coderef to process 
+              the zoom template
+            - Debug logging
+
+0.002002    24 Mar 2010
+            - First Release 
+

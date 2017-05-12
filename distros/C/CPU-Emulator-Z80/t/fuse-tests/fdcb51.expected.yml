@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb51
+registers:
+  AF: 36725
+  AF_: 0
+  BC: 16587
+  BC_: 0
+  DE: 38211
+  DE_: 0
+  HL: 39738
+  HL_: 0
+  I: 0
+  IX: 6466
+  IY: 13461
+  PC: 4
+  R: 2
+  SP: 0

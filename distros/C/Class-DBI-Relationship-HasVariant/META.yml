@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Class-DBI-Relationship-HasVariant
+version:             0.020
+abstract:            columns with varying types
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Class::DBI:                    0.96
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Ricardo Signes <rjbs@cpan.org>

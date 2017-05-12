@@ -1,0 +1,17 @@
+Revision history for Perl extension CGI::Lazy::ModPerl.
+
+0.04 	-fixed warnings to remove warnings about uninitialized variables and redefined subroutines
+
+0.03	-fixed distribution, got sick of seeing the release numbers
+
+0.02-r3 -fixed pod formatting
+
+0.02-r2 -partial upload cpan.  oops
+
+0.02  Sat Aug  2 19:29:56 2008
+	-split off from CGI::Lazy itself
+
+
+
+
+

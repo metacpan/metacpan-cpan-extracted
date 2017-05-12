@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-Plugin-MessageStack,
+version 0.03:
+
+  A Catalyst plugin for gracefully handling messaging (and more) that follows the Post/Redirect/Get pattern.
+
+This software is copyright (c) 2012 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,38 @@
+Mon Oct 18 10:59:00 EST 2004    Jason Purdy <Jason@Purdy.INFO>
+
+	Fixed the 'make test' problem - it was a permissions thing
+	where the cgi files had to be executable.  Go figure. ;)
+
+	I also updated the POD documentation AUTHORS section to
+	have folks bug me.
+
+Wed Oct 15 11:44:00 EST 2004	Jason Purdy <Jason@Purdy.INFO>
+
+	Updated README file to let folks know I'm the new maintainer of
+	this module.  Other than that, nothing else has been changed.
+
+Wed May 30 23:16:46 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Fixed HISTORY section.
+
+	Random cleanup in named argument docs, to add the "=>" where it
+	should be.
+
+	Removed DFEATURE call from stringify hooks in the Exception
+	hierarchy.  With Carp::Datum turned on with argument listing,
+	that would cause an infinite recursion.
+
+	Added sub-section on creation routine in the CGI::MxScreen::Screen
+	manpage.
+
+	Minor README reformatting.
+
+	Forgot to list all t/ in MANIFEST.
+
+Sun Apr 22 19:31:07 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+	Version 0.1.0.
+	First public alpha release.
+

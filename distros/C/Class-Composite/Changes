@@ -1,0 +1,8 @@
+Revision history for Perl extension Class::Composite.
+
+0.02  Tue Dec  3 12:24:39 2002
+	- Allow undef to be added in collection
+	- more warnings
+
+0.01  23 Jul 2002
+  - Original version

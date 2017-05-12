@@ -1,0 +1,7 @@
+Revision history for Perl extension CHI::Driver::MemcachedFast
+
+0.02 Sat Nov  1 13:40:00 2008
+	* changed implementation by CHI interface change
+
+0.01 Sat Nov  1 02:58:59 2008
+	* original version

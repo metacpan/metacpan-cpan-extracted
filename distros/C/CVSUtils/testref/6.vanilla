@@ -1,0 +1,16 @@
+2002-10-26 12:04  martyn
+
+	* 0/: bar, foo: Random Message
+
+2002-10-26 11:56  martyn
+
+	* 2/0/bar: [no log message]
+
+2002-10-26 11:54  martyn
+
+	* 0/foo, 1/foo: Initial revision
+
+2002-10-26 11:54  martyn
+
+	* 0/foo, 1/foo: Test dir for cvs2cl
+

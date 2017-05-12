@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+lib/Catalyst/Model/REST.pm
+t/boilerplate.t
+t/pod.t
+t/rest.t

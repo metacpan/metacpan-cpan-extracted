@@ -1,0 +1,14 @@
+INSTALL
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+changes.txt
+lib/Config/Ant.pm
+t/data/file1.conf
+t/data/file2.conf
+t/read.t
+t/write.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

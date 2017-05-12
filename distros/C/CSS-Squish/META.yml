@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               CSS-Squish
+version:            0.10
+abstract:           Compact many CSS files into one big file
+author:
+    - Thomas Sibley <trs@bestpractical.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::LongString:  0
+requires:
+    File::Spec:    0
+    perl:          5.008
+    Scalar::Util:  0
+    URI:           0
+    URI::file:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,305 @@
+=head1 NAME
+
+CGI::Bus::uauth - default or base user authentication class
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->ugroups;         # get groups current user belongs to
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->set(-login => '/cgi-bin/login-screen.cgi');
+ $s->uauth;           # go to login screen
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->set(-login => undef);
+ $s->uauth->authscr   # login script under web server authentication
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->uauth->loginscr; # ... with authentication by application
+
+
+=head1 DESCRIPTION
+
+This is default or base user authentication class.
+It provides C<user>, C<ugroups>, C<uglist>, C<auth> methods
+for L<CGI::Bus|CGI/Bus> 'user' and 'group' methods, which are
+wrappers to C<CGI::Bus::uauth>.
+It contains platform specific methods and may be overwritten 
+in L<CGI::Bus|CGI/Bus> with '-import'.
+It implements a three user authentication methods:
+
+Web server user authentication on Win32 IIS or Apache with 'NTLM' module.
+Win32 operation use 
+Windows 2000 ADSI via L<Win32::OLE|Win32/OLE> module
+or 'findgrp.exe' Windows NT Resource Kit utility
+or L<Win32API::Net|Win32API/Net> module.
+
+Apache user authentication with 'AuthUserFile' and 'AuthGroupFile'.
+Apache itself may use 'uagroup' buffer file produced from Windows 2000 ADSI within C<dpath>.
+
+User authentication by application (with C<loginscr> or C<auth>/C<authscr>), 
+where user data are stored within
+L<CGI::Bus::udata|CGI/Bus/udata> or its replacement.
+
+
+Cookie operation (C<auth>, C<loginscr>, C<signchk>, C<signset>, C<logout>) 
+use L<Digest|Digest> modules, default is 'MD5'.
+
+
+Microsoft IIS deimpersonation requires L<Win32::API|Win32/API> for 'RevertToSelf' call.
+
+
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+
+
+=head1 SLOTS
+
+=over
+
+
+=item -AuthUserFile
+
+Pointer to Apache's 'AuthUserFile'
+
+
+=item -AuthGroupFile
+
+Pointer to Apache's 'AuthGroupFile'
+
+
+=item -digest
+
+L<Digest|Digest> submodule to use with C<signchk> and C<signset>.
+Default used is 'MD5'
+
+
+=item -login
+
+Login screen URL. Used by C<auth>
+
+
+=item -udata
+
+If true, user authentication by application will be supposed
+with L<CGI::Bus::udata|CGI/Bus/udata> component for
+C<ugroups> and C<uglist> calls
+
+
+=back
+
+=head1 METHODS
+
+
+=over
+
+
+=item auth (?[types], ?redirect URL) 
+
+User authentication request or login operation.
+Redirect to C<-login> and exit may be used for authentication.
+Login screen should set $ENV{REMOTE_USER} (by web server or itself)
+and call C<auth>; C<signset>(?redirect) will be called inside.
+This operation is for optional web server authentication.
+It is not needed when web server authentication is set for scripts.
+C<loginscr> may be used for user authentication by application.
+
+
+=item authscr ( ? auth args )
+
+User authentication screen for login scripts under web server authentication.
+Contains L<CGI::Bus|CGI/Bus> C<userauth> call, which calls C<auth>.
+Not authenticated users will be authenticated and redirected back.
+Authenticated users will get authentication information page with URL
+to return back.
+This method is created partially due to possible browser redirection problems.
+
+
+=item authurl -> login script call URL
+
+=item authurl ( return to URL )
+
+=item authurl ( login script URL, return to URL )
+
+Form and return URL to call login script.
+Default login script URL is C<-login>.
+If there is no login script URL, empty string will be returned.
+If login script URL ends with '/' sign, it is treated as 
+authenticated location, and current script name will to be appended.
+Default return URL is current script's URL.
+C<auth> call can redirect to login script,
+but C<authurl> may be used to place URL to lead user to 
+login script directly and decrease browser redirections.
+
+
+=item loginscr ( ?'-lri' ) -> redirect
+
+Login screen operation for user authentication by application.
+Options: 'l'ogin, 'r'egister user function, user 'i'nfo function,
+default '-lri'.
+Use C<auth> instead of C<loginscr> for web server authentication with cookie.
+See issue about authentication by application.
+
+
+=item logout (?redirect) -> exit
+
+Clear user authentication cookie and redirect to
+URL given or $ENV{HTTP_REFERER}
+
+
+=item signchk () -> success
+
+Check authentication cookie.
+Dies on corrupted.
+Returns empty if no cookie.
+Uses L<Digest|Digest>
+
+
+=item signget () -> [cookie data]
+
+Get authentication cookie data, undef if not exists.
+May be used to detect authentication cookie existence
+
+
+=item signset (?redirect) -> redirect
+
+Set authentication cookie, redirect, exit
+Uses $ENV{REMOTE_USER} and $ENV{REMOTE_ADDR} for cookie data.
+Uses L<Digest|Digest>
+
+
+=item uglist (?-ug) -> [user and groups list]
+
+=item uglist (?-ug<>, {}) -> {name=>label,...}
+
+List (array ref) of user and group names.
+Options are: 'u'sers only, 'g'roups only, '<>' force comment notation, 
+default is '-ug'.
+Form with hash ref may be used to get names and labels of them.
+Labels begin with user name, comma, and blank sign.
+
+
+=item ugroups (?user name) -> [groups of user] 
+
+Groups array ref user belongs to.
+Default is current user.
+
+
+=item usdomain () -> User names Server's Domain name
+
+User names Server's Domain name - Windows NT or DNS domain name.
+See also C<userver>.
+
+
+=item user () -> user name
+
+Current user name.
+Result of web server or script authentication: 
+$ENV{REMOTE_USER} ||$ENV{AUTH_USER}... ||C<signchk>
+
+
+=item userver () -> User names Server name
+
+User names Server name - Windows NT or DNS host name.
+See also C<usdomain>.
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+
+=head2 19/11/2004
+
+C<ugroups> extended with new 'user name' parameter.
+
+
+=head2 03/11/2004
+
+C<ugroups> fixed to return [C<guest>] instead of empty list.
+
+
+=head2 14/09/2004
+
+Evolution to Windows ADSI using L<Win32::OLE|Win32/OLE>,
+other Windows interfaces used at last only.
+
+C<-adsi> slot ignored and removed.
+
+L<Win32::OLE|Win32/OLE>->Option("Warn"=>0) used anywere.
+
+ADSI data buffered in L<CGI::Bus|CGI/Bus>::dpath
+for faster access and Apache usage.
+
+
+=head2 05/06/2004
+
+New: Deimpersonation for Microsoft IIS
+using 'RevertToSelf' via L<Win32::API|Win32/API>.
+Tried when finished with '/' sign C<-login> URL.
+
+
+=head2 13/06/2002
+
+=item Changed
+
+C<ugroups> on Win32 returns global group names prefixed with 
+domain name for users from foreign domains.
+
+
+=head2 16/05/2002
+
+=item Changed
+
+Filtered rows with space chars only 'findgrp.exe' may return.
+
+
+=head2 28/04/2002
+
+=item New:
+
+C<-adsi> switch, attempting to use a Windows 2000 ADSI, see issues in the source code
+
+
+
+=head2 15/10/2001 - 23/03/2002
+
+=item New:
+
+Implemented and Documented
+
+
+=item ToDo:
+
+ ? AuthDBMUserFile('user'=>), AuthDBMGroupFile('user'=>'groups')
+ ? AuthDBUserFile, AuthDBGroupFile
+
+=item Issues:
+
+ - All platform and authentication method specifics could not
+   be implemented in a one module. Another authentication support
+   modules may be needed.
+ - Application (password, not web server) authentication interferes
+   with web server access control to a files. So, if application
+   publishes files via URLs, this URLs should operate via scripts,
+   or only web server authentication should be used.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

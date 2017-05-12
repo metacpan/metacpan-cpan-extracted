@@ -1,0 +1,18 @@
+inc
+{
+    @inherit    23.nconf#foo
+}
+
+inc2
+{
+    etc         pwd
+    inc3
+    {
+        abc     def
+    }
+}
+
+foo_2
+{
+    @inherit    .#inc2/inc3
+}

@@ -1,0 +1,84 @@
+{
+   "abstract" : "Cache::Memcached::Fast with sanitizing keys and fork-safe",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-Memcached-Fast-Safe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Memcached::Fast" : "0.23",
+            "Digest::SHA" : "0",
+            "POSIX::AtFork" : "0.02",
+            "URI::Escape::XS" : "0.09",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Proc::Guard" : "0",
+            "Test::More" : "0",
+            "Test::Skip::UnlessExistsExecutable" : "0",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Cache::Memcached::Fast::Safe" : {
+         "file" : "lib/Cache/Memcached/Fast/Safe.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Cache-Memcached-Fast-Safe/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Cache-Memcached-Fast-Safe",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Cache-Memcached-Fast-Safe.git",
+         "web" : "https://github.com/kazeburo/Cache-Memcached-Fast-Safe"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Jiro Nishiguchi <jiro@cpan.org>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

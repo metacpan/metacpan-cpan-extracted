@@ -1,0 +1,18 @@
+Changes
+fcrypt/fcrypt.c
+fcrypt/fcrypt.h
+fcrypt/Makefile.PL
+lib/Crypt/UnixCrypt_XS.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+t/compare_forever.t
+t/Crypt-UnixCrypt_XS.t
+t/extvec.t
+t/pieces.t
+t/tradvec.t
+t/utf8.t
+UnixCrypt_XS.xs
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,67 @@
+{
+   "abstract" : "manage flow of control in Continuation-Passing Style",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::Identity" : "0",
+            "Test::More" : "0",
+            "Test::Refcount" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Sub::Name" : "0"
+         },
+         "requires" : {
+            "Future" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CPS" : {
+         "file" : "lib/CPS.pm",
+         "version" : "0.18"
+      },
+      "CPS::Functional" : {
+         "file" : "lib/CPS/Functional.pm",
+         "version" : "0.18"
+      },
+      "CPS::Future" : {
+         "file" : "lib/CPS/Future.pm",
+         "version" : "0.18"
+      },
+      "CPS::Governor" : {
+         "file" : "lib/CPS/Governor.pm",
+         "version" : "0.18"
+      },
+      "CPS::Governor::Deferred" : {
+         "file" : "lib/CPS/Governor/Deferred.pm",
+         "version" : "0.18"
+      },
+      "CPS::Governor::Simple" : {
+         "file" : "lib/CPS/Governor/Simple.pm",
+         "version" : "0.18"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.18"
+}

@@ -1,0 +1,243 @@
+Revision history for Perl extension CGI::Application::Dispatch.
+
+3.12 September 10th, 2012
+    [BUG FIXES]
+    - Further fix diagnostic message in some cases when exceptions are thrown.  (Michael Lackhoff)
+
+3.11 September 10th, 2012
+    (No code changes) 
+
+    [INTERNALS]
+    -  Fixed test for rethrowing HTTP::Exception objects (Graham TerMarsch)
+
+3.10 September 2nd, 2012
+    [NEW FEATURES]
+    - CGI::Application::Dispatch::PSGI now allows exceptions thrown as HTTP::Exception objects
+      to bubble up in some cases. See the new documentation section on "Exception Handling"
+      for details. (Mark Stosberg, Graham TerMarsch, RT#79022)  
+
+    [BUG FIXES]
+    - When auto_rest was enabled and no run mode was found, a 404 could have been returned
+      instead of defaulting to start mode. We now correctly default to the start_mode().
+      (James Q.L., Ron Savage, Mark Stosberg)
+
+    [DOCUMENTATION]
+    - Docs have been expanded to explain how /foo/:rm? resolves, and interaction
+      with start_mode() when no run mode is found. (Mark Stosberg)
+
+    [INTERNALS]
+    - Fix diagnostic message in some cases when exceptions are thrown (Michael Lackhoff)
+    - Added test coverage for auto_rest to CGI::Application::Dispatch::PSGI (Mark Stosberg) 
+    - POD formatting fix in Dispatch.pm
+    - Fix Perl 5.14 compatibility warning (chorny, RENEEB@cpan.org, SILASMONK@cpan.org)  
+
+3.07 September 9th, 2011
+    Fix t/cgi.t test failures caused by Try::Tiny refactor in 3.05 (Yoshihiro Sasaki)
+
+3.06 September 9th, 2011
+    Typo fix in "use" statement, introduced in 3.05 (Nicholas Bamber) 
+
+3.05 September 5th, 2011
+    Removed Exception::Class::TryCatch with the already required Try::Tiny thereby eliminating 
+    one dependency. (Timothy Appnel) 
+
+3.04 June 29th, 2011
+    No code changes.
+
+    [DOCUMENTATION]
+    - spelling fixes (Nicholas Bamber)
+
+3.03 June 25th, 2011
+    No code changes.
+
+    [INTERNALS]
+    - further dependency refinement and a typo fix. (Nicholas Bamber)
+
+3.02 June 24th, 2011
+    No code changes.
+
+    [INTERNALS]
+    - further refined dependency definitions. (Nicholas Bamber)
+
+3.01 Jun 23, 2011
+    No code changes.
+
+    [INTERNALS]
+    - Fixed Build.PL issue that was causing tests to fail in a lot of environments. (Brad Oaks) 
+    - cleaned up MANIFEST
+
+3.00 Jun 16, 2011
+    [FEATURES] 
+    - PSGI support is improved. CGI::Application::Dispatch is now been
+      rewritten and is included in this distribution. It is no longer a
+      wrapper around the older dispatcher, but is completely PSGI-native.
+      Performance should be improved a bit as well. 
+     
+    [THINGS THAT MIGHT BREAK YOUR CODE]
+    As part of the significant update to PSGI support, you'll need to update a
+    couple lines of code in your "dispatch.cgi" script if you were using an
+    older version of CGI::Application::Dispatch::PSGI. See the section on
+    "Backwards Compatibility" in that documentation.
+
+    [INTERNALS]
+    - CGI::Application 4.5 is now required for the newer native PSGI support.
+
+    - Exceptions in CGI::Application::Dispatch::PSGI are now handled with
+      HTTP::Exception.  This in turn depends on HTTP::Status, which is
+      currently in a distribution which depends on HTML::Parser, which depends
+      having a C-compiler available. I don't consider this ideal, as I'd like
+      to be able to support the easy installation of a pure-Perl
+      CGI::Application stack. This could possibly be addressed in the future by
+      removing the false dependency on a C-compiler from HTTP::Status, or we
+      could return to use Exception::Class directly for exception handling.
+
+      The except format of the default thrown exceptions may change in the
+      future.
+
+2.18 Sep 9, 2010
+    - Update Build.PL to require a newer version of "version", to address
+      a rare installation problem. (RT#56283) Thanks to Jim Brandt and others.
+
+2.17 Dec 30, 2009
+
+    - Update examples to use FindBin::Real instead of FindBin, since FindBin is not 
+      fully mod_perl compatible. (Mark Stosberg)
+    - Fix typo in POD (Alexander Becker) 
+
+2.16 Mar 23, 2009
+    - Fix: "$app->run() error handler breaks exception objects." RT#43340 (dekimsey)
+    - Documentation improvements (Dave Baker, thinc)
+    - remove "Makefile.PL", which appears to related to some test failures. Build.PL
+      seems to work reliably. If removing Makefile.PL is a problem for you, maybe you have
+      a better solution to RT#39793: https://rt.cpan.org/Ticket/Display.html?id=39793
+      (Mark Stosberg)
+
+2.15 Dec 4, 2008
+    - Logging improvement: Quit duplicating $ENV{REQUEST_URI} for Not Found requests (Mark Stosberg)
+    - Logging improvement: Remove stray "'" character (Mark Stosberg)
+
+2.14 Nov 2, 2008
+    - New feature: $ENV{PATH_INFO} is now abstracted through dispatch_path(). (RT#34069, Bradley Bailey) 
+    - Attempted fix for "Couldn't open t/TEST.PL" error, RT#39793. Add comments to that ticket
+      if you still have "make test" problems with Apache::Test. (Puneet Kishor, Kevin, Mark Stosberg) 
+      http://rt.cpan.org/Public/Bug/Display.html?id=39793
+
+2.13 Sep 16, 2008
+    - Fixing various install issues by having a dumber Makefile.PL and Build.PL
+      (#37859, Thanks to lkundrak)
+
+2.12 Jan 03, 2007
+    - Creating our own Makefile.PL instead of relying on create_makefile_pl
+    - Fixed test problems with GET() not being exported by implicitly by some
+      versions of Apache::Test
+    - Fixed RT #32037 and clarifying some documentation
+
+2.11 Oct 11, 2007
+    - Fixed RT #30135 by using "slash" and "backslash" properly [Ricardo Signes and Michael Peters]
+    - Fixed RT #30134 [Ricardo Signes and Michael Peters]
+    - Fixed RT #28979 [GTERMARS]
+    - Fixed RT #25298 [cpan@punch.net and Michael Peters]
+    - Fixed RT #25297 [cpan@punch.net and Michael Peters]
+    - Fixing cpan install problem with autogenerated Makefile.PL
+    - Fixing failing test when IO::Scalar is not installed
+
+2.10 Jan 15, 2007
+    - Added REST support with 'auto_rest', 'auto_rest_lc' and '[METHOD]' support in dispatch rules [Michael Peters]
+    - Added wildcard matching token to dispatch rules [Shawn Sorichetti]
+    - Removed url caching [Michael Peters, Timothy Appnel]
+    - Documentation fixes in examples [dsteinbrunner, ZACKSE and Stew Heckenberg]
+
+2.03 Sep 29, 2006
+    - When running a cached URL, we were mistakenly using the '$r' object
+      from the cached request instead of the newly given one under mod_perl.
+
+2.02 Aug 16, 2006
+    - args_to_new were not merging PARAMS properly [Michael Peters]
+
+2.01
+    - Improved docs for CGI::Application::Dispatch::Regexp, including
+      a typo fix in the Synopsis. [Mark Stosberg]
+    - Fixed bug in mod_perl 2 where status/error codes were sent to the browser
+      after the content [Michael Peters]
+
+2.00 Jul 3rd, 2006
+
+    - Some errors in run() execution were being silently ignored [Michael Peters]
+    - POD correction [Ron Savage]
+    - When the PATH_INFO can't be parsed, a proper 404 is returned instead of
+      an internal server error. [Mark Stosberg]
+    - Fix error page printing. [Mark Stosberg] 
+    - Added experimental CGI::Application::Dispatch::Regexp to distribution
+
+2.00_05
+    - Fully working on mod_perl 2
+    - Using Exception::Class internally to handle exceptions instead of passing around return codes
+    - Added 'not_found' option to dispatch()
+    - Added more flexible error handling [Viacheslav Sheveliov]
+    - Improve mod_rewrite examples [Mark Stosberg]
+    - removed now unused variables [Viacheslav Sheveliov]
+    - speed up some of the rule-to-regex processing [Viacheslav Sheveliov]
+
+2.00_04
+    - handler() now sends a 404 if the run mode can't be found either
+    - some environments don't set the PATH_INFO if it's blank, so handle that better
+    - added _get_cache() and _set_cache() protected methods to further help subclassing [Viacheslav Sheveliov, Michael Peters]
+    - now passing same args passed from dispatch() into dispatch_args() [Viacheslav Sheveliov, Michael Peters)  ]
+    - Added built-in 404 page if no application is found to dispatch to. [Mark Stosberg]
+
+2.00_03
+    - Added cache of REQUEST_URI -> dispatch mapping [Mark Stosberg, Michael Peters]
+    - fixed local args_to_new overrides [Mark Stosberg]
+    - added support for debug flag to dispatch() [Mark Stosberg]
+
+2.00_02
+    - Added optional-variable tokens to dispatch tables
+    - added more docs and examples for dispatch tables
+
+2.00_01
+    - Initial rewrite of new API and new dispatch table
+
+1.04 (Jun. 27, 2005)
+    - Small changes to correspond to official mod_perl 2.0 release
+        and API change (see http://perl.apache.org/docs/2.0/rename.html)
+
+1.03 (Mar. 4, 2005)
+    - 100% test coverage
+
+1.02 (Jan. 20, 2005)
+    - Added mod_perl 2 support
+    - Added TABLE dispatch option
+    - fixed bug with a PATH_INFO value of '/'
+    - fixed bug where DEFAULT doesn't have an initial '/'
+    - fixed testing issues when Apache::TestMB is not installed [Cees Hek]
+    - fixed security whole with reqard to untainting module names [Cees Hek]
+    - minor documentation improvements
+
+1.01 (Jan. 8, 2005)
+    - moved dependancy on perl 5.8.x to 5.6.x since method attributes were include
+    - added Apache::Test as a build dependancy
+
+1.0 (Jan. 6, 2005)
+    - fixed bug which prevented overriding of certain methods
+    - upped required perl version to 5.8.0 because of method attributes
+    
+0.04
+    - added CGIAPP_DISPATCH_DEFAULT option to specify default PATH_INFO value
+    - added CGIAPP_DISPATCH_PATH which gets passed to new()'s PARAMS for use
+        by the application module
+    - any parameters passed into dispatch() are then passed into the 
+        application's new()
+    - added Apache::Test tests to the test suite
+
+0.03 (Oct. 29, 2004)
+    - missing files from MANIFEST
+    - minor optimizations
+
+0.02 (Oct. 19, 2004)
+    - find and fix document mistakes
+    - add aliases to options (PREFIX and RM) for dispatch()
+    - improved test
+    - mention security concern with not using PREFIX 
+
+0.01 (Sep. 12, 2004)
+    - First version

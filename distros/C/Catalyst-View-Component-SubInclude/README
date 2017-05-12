@@ -1,0 +1,118 @@
+NAME
+    Catalyst::View::Component::SubInclude - Use subincludes in your Catalyst
+    views
+
+VERSION
+    Version 0.10
+
+SYNOPSIS
+      package MyApp::View::TT;
+      use Moose;
+
+      extends 'Catalyst::View::TT';
+      with 'Catalyst::View::Component::SubInclude';
+
+      __PACKAGE__->config( subinclude_plugin => 'SubRequest' );
+
+    Then, somewhere in your templates:
+
+      [% subinclude('/my/widget') %]
+      [% subinclude_using('SubRequest', '/page/footer') %]
+
+DESCRIPTION
+    "Catalyst::View::Component::SubInclude" allows you to include content in
+    your templates (or, more generally, somewhere in your view's "render"
+    processing) which comes from another action in your application. It's
+    implemented as a Moose::Role, so using Moose in your view is required.
+
+    Simply put, it's a way to include the output of a Catalyst sub-request
+    somewhere in your page.
+
+    It's built in an extensible way so that you're free to use sub-requests,
+    Varnish ESI (<http://www.catalystframework.org/calendar/2008/17>) or any
+    other sub-include plugin you might want to implement.
+
+STASH FUNCTIONS
+    This component does its magic by exporting a "subinclude" coderef entry
+    to the stash. This way, it's easily accessible by the templates (which
+    is the most common use-case).
+
+  "subinclude( $path, @args )"
+    This will render and return the body of the included resource (as
+    specified by $path) using the default subinclude plugin.
+
+  "subinclude_using( $plugin, $path, @args )"
+    This will render and return the body of the included resource (as
+    specified by $path) using the specified subinclude plugin.
+
+    The "subinclude" function above is implemented basically as a shortcut
+    which calls this function using the default plugin as the first
+    parameter.
+
+SUBINCLUDE PLUGINS
+    The module comes with two subinclude plugins: SubRequest, Visit and ESI.
+
+    By default, the "SubRequest" plugin will be used. This can be changed in
+    the view's configuration options (either in the config file or in the
+    view module itself).
+
+    Configuration file example:
+
+      <View::TT>
+          subinclude_plugin   ESI
+      </View::TT>
+
+  "set_subinclude_plugin( $plugin )"
+    This method changes the current active subinclude plugin in runtime. It
+    expects the plugin suffix (e.g. "ESI" or "SubRequest") or a
+    fully-qualified class name in the
+    "Catalyst::View::Component::SubInclude" namespace.
+
+  Writing plugins
+    If writing your own plugin, keep in kind plugins are required to
+    implement a class method "generate_subinclude" with the following
+    signature:
+
+      sub generate_subinclude {
+          my ($class, $c, @args) = @_;
+      }
+
+    The default plugin is stored in the "subinclude_plugin" which can be
+    changed in runtime. It expects a fully qualified class name.
+
+SEE ALSO
+    Catalyst::Plugin::SubRequest, Moose::Role, Moose,
+    <http://www.catalystframework.org/calendar/2008/17>
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-view-component-subinclude at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-View-Component-
+    SubInclude>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+AUTHOR
+    Nilson Santos Figueiredo Junior, "<nilsonsfj at cpan.org>"
+
+CONTRIBUTORS
+    Tomas Doran (t0m) "<bobtfish@bobtfish.net".
+
+    Vladimir Timofeev, "<vovkasm at gmail.com>".
+
+    Wallace Reis (wreis) "<wreis@cpan.org>".
+
+SPONSORSHIP
+    Development sponsored by Ionzero LLC <http://www.ionzero.com/>.
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2010 Nilson Santos Figueiredo Junior and the above
+    contributors.
+
+    Copyright (C) 2009 Nilson Santos Figueiredo Junior.
+
+    Copyright (C) 2009 Ionzero LLC.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

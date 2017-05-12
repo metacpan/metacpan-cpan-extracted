@@ -1,0 +1,20 @@
+COPYING
+Changelog
+Nettle.xs
+inc/Devel/CheckLib.pm
+lib/Crypt/Nettle.pm
+lib/Crypt/Nettle/Hash.pm
+lib/Crypt/Nettle/Cipher.pm
+lib/Crypt/Nettle/Yarrow.pm
+lib/Crypt/Nettle/RSA.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01-hash.t
+t/02-hmac.t
+t/03-cipher.t
+t/04-yarrow.t
+t/05-rsa.t
+typemap

@@ -1,0 +1,37 @@
+% my $nick = stash('nick') || '';
+% my $network = stash('network') || '';
+% my $target = stash('target') || 'any';
+% my $sidebar = stash('sidebar') || 'chat';
+<!DOCTYPE html>
+<html>
+  <head>
+  % if($full_page) {
+    %= include 'partials/head', minimal_ui => 1
+  % } else {
+    <title><%= $organization_name %> - <%= title %></title>
+  % }
+  </head>
+  <body class="chat" data-want-desktop-notifications="<%= session('desktop_notifications') // 1 %>" data-socket-url="<%= url_for('socket')->to_abs %>">
+    %= include 'partials/nav'
+    %= include 'partials/desktop-notifications-question'
+
+    %= form_for 'connection.control', { name => $network }, method => 'post', class => "sidebar sidebar-right", begin
+      <ul>
+        %= include "sidebar/$sidebar"
+      </ul>
+    % end
+
+    %= include "sidebar/goto_anything"
+
+    <div class="messages">
+      %= content
+    </div>
+
+    %= form_for 'connection.control', { name => $network }, method => 'post', class => 'input', begin
+      %= hidden_field cmd => 'irc';
+      %= text_field 'irc_cmd', placeholder => "Connecting to backend...", autocomplete => 'off', class => 'disabled', disabled => 'disabled'
+    % end
+
+    %= include 'sidebar/notification_list' if stash 'notification_list'
+  </body>
+</html>

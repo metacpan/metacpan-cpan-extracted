@@ -1,0 +1,96 @@
+Revision history for Perl extension Collection.
+0.58 08 Apr 2013
+    - fix crc32(undef) ( ::CrcColl)
+
+0.57 03 Mar 2013
+    - pretty JSON (::CrcCall)
+    - handle bunary for fetch_ids (::CrcCall)
+
+0.56 13 Dec 2012
+    - fix dencode json for utf8
+    - fix tests
+    - delete caching for Index
+
+0.55 09 Oct 2012
+    - add file storage
+
+0.54 01 Aug 2012
+    - add Collection::Index for storing indexes in separate MySQL tables 
+    - add on_store,on_delete, on_create handlers (Collection)
+    - add json serialization for fields
+     
+0.53 24 Jul 2012
+    - fix empty 'where'
+0.52 03 Jul 2012
+    - add PostgreSQL fix ( Collection::AutoSQL::__flow_sql__)
+    
+0.51 19 Jun 2012
+    - add experimental Collection::CrcColl
+
+0.50 28 Aug 2011
+    - AutoSQLnotUnique: delete caching (differrent keys in recs for save)
+    - AutoSQLnotUnique: fix invoke class method _delete
+
+0.49 14 Aug 2011
+    - apply types for keys (Collection::AutoSQLnotUnique)
+    - allow strip dublicates for key (uniq flag for list_ids)
+    - use _flow method for stream sql results (AutoSQL)
+
+0.48 9 May 2011
+    - flow sql queryes
+    - support for premastered SQL queries (AutoSQL::list_ids)
+
+0.47 9 Nov 2010
+    -add desc param to  AutoSQL::list_ids
+
+0.46 17 Oct 2010
+    -add Flow support for AutoSQL
+
+0.45
+    - fix Memcached create()
+    - improve Mirror
+    - fix fetch() in Utl::Mirror
+    - fix delete() in Memcached
+    - handle objects in mirror
+    - fix return results for delete ( Utl::Mirror, Memcached, Mem)
+0.44
+    - support bind_values in execute (SQL collection)
+0.43
+    - add terms ( < > = ) in fetch params
+    - simplification fetch code and api for _fetch, _delete methods
+0.42
+    - add expand_rules for support type of fields at Collection::AutoSQL
+    - add Collection::Storable for store data in files
+0.41
+    -fix deps;
+0.40
+    -fix docs;
+    -fix dependes
+0.39
+    -fix Collection::AutoSQLnotUnique
+0.38 
+    - fix api add docs
+0.37
+    - add Memcached class
+    - add  class for mirror collections
+0.36 
+    - fix Collection/AutoSQL prepare_where for id ==0
+0.35
+    - return undef if empty  for _prepare_where
+0.34  
+        - fix 0 for test on defined 
+	- add expressions (<> ) to key names
+0.33  
+        - add LazyLoad support
+        - add UnionHash
+
+0.32  22/01/2007
+       - AutoSQL::fetch_object - support query
+
+0.30  23/12/2006
+        - fix pods
+
+0.01  Wed Dec 21 03:22:55 2005
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter Objects::Collection
+

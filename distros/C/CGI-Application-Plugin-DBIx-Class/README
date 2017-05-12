@@ -1,0 +1,254 @@
+NAME
+    CGI::Application::Plugin::DBIx::Class - Access a DBIx::Class Schema from
+    a CGI::Application
+
+VERSION
+    version 1.000101
+
+SYNOPSIS
+     use CGI::Application::Plugin::DBIx::Class ':all';
+
+     sub cgiapp_init  {
+         my $self = shift;
+
+         $self->dbic_config({
+            schema => 'MyApp::Schema',
+            connect_info => {
+               dsn => $data_source,
+               user => $username,
+               password => $password,
+            },
+         });
+     }
+
+     sub person {
+        my $self   = shift;
+        my $id     = $self->query->param('id');
+        my $person = $self->schema->resultset('People')->find($id);
+        # ...
+     }
+
+     sub people {
+        my $self   = shift;
+        my $people = $self->page_and_sort(
+            $self->simple_search(
+               $self->schema->resultset('People')
+            )
+        );
+        # ...
+     }
+
+DESCRIPTION
+    This module helps you to map various DBIx::Class features to CGI
+    parameters. For the most part that means it will help you search, sort,
+    and paginate with a minimum of effort and thought.
+
+METHODS
+  dbic_config
+     $self->dbic_config({
+       schema => MyApp::Schema->connect(@connection_data),
+       connect_info => { ... },
+     });
+
+    You must run this method in setup or cgiapp_init to setup your schema.
+
+    Valid arguments are:
+
+     schema - Required, Name of DBIC Schema
+     connect_info - Optional, these arguments are what are passed to connect, if
+       this isn't passed and a C<dbh> method exists, that will be used
+     ignored_params - Optional, Params to ignore when doing a simple search or sort,
+        defaults to
+     [qw{limit start sort dir _dc rm xaction}]
+
+     page_size - Optional, amount of results per page, defaults to 25
+
+  page_and_sort
+     my $resultset = $self->schema->resultset('Foo');
+     my $result = $self->page_and_sort($resultset);
+
+    This is a helper method that will first sort (with "simple_sort") your
+    data and then paginate it. Returns a resultset.
+
+  paginate
+     my $resultset = $self->schema->resultset('Foo');
+     my $result = $self->paginate($resultset);
+
+    Paginates the passed in resultset based on the following CGI parameters:
+
+     start - first row to display
+     limit - amount of rows per page
+
+    Returns a resultset.
+
+  schema
+     my $schema = $self->schema;
+
+    This is just a basic accessor method for your schema
+
+  search
+     my $resultset   = $self->schema->resultset('Foo');
+     my $searched_rs = $self->search($resultset);
+
+    Calls the controller_search method on the passed in resultset with all
+    of the CGI parameters. I like to have this look something like the
+    following:
+
+     # Base search dispatcher, defined in MyApp::Schema::ResultSet
+     sub _build_search {
+        my $self           = shift;
+        my $dispatch_table = shift;
+        my $q              = shift;
+
+        my %search = ();
+        my %meta   = ();
+
+        foreach ( keys %{$q} ) {
+           if ( my $fn = $dispatch_table->{$_} and $q->{$_} ) {
+              my ( $tmp_search, $tmp_meta ) = $fn->( $q->{$_} );
+              %search = ( %search, %{$tmp_search} );
+              %meta   = ( %meta,   %{$tmp_meta} );
+           }
+        }
+
+        return $self->search(\%search, \%meta);
+     }
+
+     # search method in specific resultset
+     sub controller_search {
+        my $self   = shift;
+        my $params = shift;
+        return $self->_build_search({
+              status => sub {
+                 return { 'repair_order_status' => shift }, {};
+              },
+              part_id => sub {
+                 return {
+                    'lineitems.part_id' => { -like => q{%}.shift( @_ ).q{%} }
+                 }, { join => 'lineitems' };
+              },
+              serial => sub {
+                 return {
+                    'lineitems.serial' => { -like => q{%}.shift( @_ ).q{%} }
+                 }, { join => 'lineitems' };
+              },
+              id => sub {
+                 return { 'id' => shift }, {};
+              },
+              customer_id => sub {
+                 return { 'customer_id' => shift }, {};
+              },
+              repair_order_id => sub {
+                 return {
+                    'repair_order_id' => { -like => q{%}.shift( @_ ).q{%} }
+                 }, {};
+              },
+           },$params
+        );
+     }
+
+  sort
+     my $resultset = $self->schema->resultset('Foo');
+     my $result = $self->sort($resultset);
+
+    Exactly the same as search, except calls controller_sort. Here is how I
+    use it:
+
+     # Base sort dispatcher, defined in MyApp::Schema::ResultSet
+     sub _build_sort {
+        my $self = shift;
+        my $dispatch_table = shift;
+        my $default = shift;
+        my $q = shift;
+
+        my %search = ();
+        my %meta   = ();
+
+        my $direction = $q->{dir};
+        my $sort      = $q->{sort};
+
+        if ( my $fn = $dispatch_table->{$sort} ) {
+           my ( $tmp_search, $tmp_meta ) = $fn->( $direction );
+           %search = ( %search, %{$tmp_search} );
+           %meta   = ( %meta,   %{$tmp_meta} );
+        } elsif ( $sort && $direction ) {
+           my ( $tmp_search, $tmp_meta ) = $default->( $sort, $direction );
+           %search = ( %search, %{$tmp_search} );
+           %meta   = ( %meta,   %{$tmp_meta} );
+        }
+
+        return $self->search(\%search, \%meta);
+     }
+
+     # sort method in specific resultset
+     sub controller_sort {
+        my $self = shift;
+        my $params = shift;
+        return $self->_build_sort({
+             first_name => sub {
+                my $direction = shift;
+                return {}, {
+                   order_by => { "-$direction" => [qw{last_name first_name}] },
+                };
+             },
+           }, sub {
+          my $param = shift;
+          my $direction = shift;
+          return {}, {
+             order_by => { "-$direction" => $param },
+          };
+           },$params
+        );
+     }
+
+  simple_deletion
+     $self->simple_deletion({ rs => 'Foo' });
+
+    Deletes from the passed in resultset based on the following CGI
+    parameter:
+
+     to_delete - values of the ids of items to delete
+
+    Valid arguments are:
+
+     rs - resultset loaded into schema
+
+    Note that this method uses the $rs->delete method, as opposed to
+    $rs->delete_all
+
+  simple_search
+     my $searched_rs = $self->simple_search({ rs => 'Foo' });
+
+    This method just searches on all of the CGI parameters that are not in
+    the "ignored_params" with a like "%$value%". If there are multiple
+    values it will make the search an "or" between the different values.
+
+    Valid arguments are:
+
+     rs - source loaded into schema
+
+  simple_sort
+     my $resultset = $self->schema->resultset('Foo');
+     my $sorted_rs = $self->simple_sort($resultset);
+
+    Sorts the passed in resultset based on the following CGI parameters:
+
+     sort - field to sort by, defaults to primarky key
+     dir  - direction to sort
+
+SEE ALSO
+    CGI::Application::Plugin::DBH
+
+CREDITS
+    Thanks to Micro Technology Services, Inc. for funding the initial
+    development of this module.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

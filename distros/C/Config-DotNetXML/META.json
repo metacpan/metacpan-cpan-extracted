@@ -1,0 +1,50 @@
+{
+   "abstract" : "Use .Net XML COnfig files.",
+   "author" : [
+      "Jonathan Stowe (jns@gellyfish.co.uk)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-DotNetXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0.33",
+            "XML::XPath" : "1.13"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jonathanstowe/Config-DotNetXML.git",
+         "web" : "https://github.com/jonathanstowe/Config-DotNetXML"
+      }
+   },
+   "version" : "1.6",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

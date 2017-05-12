@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb76
+registers:
+  AF: 29557
+  AF_: 0
+  BC: 51967
+  BC_: 0
+  DE: 56704
+  DE_: 0
+  HL: 51437
+  HL_: 0
+  I: 0
+  IX: 32313
+  IY: 26147
+  PC: 4
+  R: 2
+  SP: 0

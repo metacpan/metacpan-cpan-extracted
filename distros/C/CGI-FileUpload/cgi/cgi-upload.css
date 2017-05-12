@@ -1,0 +1,35 @@
+
+
+a { color: #A62423; text-decoration: none; font-weight: bold }
+a:active { color: #A62423; text-decoration: none }
+a:link { color: #A62423; text-decoration: none }
+a:visited { color: #A62423;text-decoration: none }
+a:hover { color: #A62423; text-decoration: underline; font-weight: bold }
+
+
+body {background-color: white}
+.small { font-family: Verdana, Arial, Geneva, sans-serif; color: #A62423; font-size: 9px }
+.small a:hover { color: #A62423; text-decoration: underline}
+
+input {
+  padding: 2px;
+  color: #A62423;
+  background-color: #FFFFFF;
+  border-style : solid;
+  border-width : 1px;
+  border-color : #A62423;
+}
+
+input[disabled] {
+  background-color: #AAAAAA;
+}
+
+.submitButtons {
+  color: #FFFFFF; 
+  width: 45px; 
+  height: 22px;
+  font-size: 10px;
+  background-color:#A62423
+}
+
+ 

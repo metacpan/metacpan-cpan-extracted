@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Model::CDBI::CRUD.
+
+0.04  2005-10-13 14:28:00
+	- Added deprecation warning to the POD.
+	- Use match, not action.
+0.03  2005-08-10 16:15:00
+	- process would not fetch primary keys that evals to false.
+0.02  2005-04-15 15:54:00 
+        - Updated examples for Catalyst 5
+        - Added Template::Plugin::Class to dependencies
+        - Added POD docs, made sure they passed.
+        
+0.01  2005-01-28 22:00:00
+        - first release

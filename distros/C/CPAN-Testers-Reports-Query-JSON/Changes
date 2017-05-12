@@ -1,0 +1,16 @@
+0.04 - Thu 11 Feb 2010 07:34:58 GMT
+    - Yes, modules used by Tests are needed in the Makefile.PL
+    - CPANTesters rock (for picking up stuff like this)
+
+0.03 - Tue  9 Feb 2010 07:41:22 GMT
+    - add namespace::autoclean to dependencies!
+
+0.02 - Mon  8 Feb 2010 20:22:28 GMT
+    - add namespace::autoclean
+    - make immutable
+    - distribution is required - obviously!
+    - cleanup _build_current_version()
+    - cleanup pod, add some for Set.pm as well
+
+0.01 - Sun  7 Feb 2010 21:00:30 GMT
+	- Initial release

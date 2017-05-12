@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 166
+    - 209
+  4184:
+    - 44
+name: ddcbd1
+registers:
+  AF: 49336
+  AF_: 0
+  BC: 14106
+  BC_: 0
+  DE: 25714
+  DE_: 0
+  HL: 55597
+  HL_: 0
+  I: 0
+  IX: 4274
+  IY: 12404
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,45 @@
+---
+abstract: 'a generic connection to a hierarchical-structured data set'
+author:
+  - 'Scott Hardin <mrscotty@cpan.org>'
+build_requires:
+  Config::Std: 0
+  Config::Versioned: 0
+  DBD::SQLite: 0
+  DBI: 0
+  ExtUtils::MakeMaker: 6.59
+  Net::SSL: 0
+  Template: 0
+  Test::More: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Connector
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Config::Std: 0
+  Config::Versioned: '0.5'
+  DBI: 0
+  Net::LDAP: 0
+  Net::SSL: 0
+  Proc::SafeExec: 0
+  Template: 0
+  Text::CSV_XS: 0
+  YAML: 0
+requires:
+  Log::Log4perl: 0
+  Moose: 0
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.22'

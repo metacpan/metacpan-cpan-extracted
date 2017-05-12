@@ -1,0 +1,136 @@
+Changes for the CPAN Testers Preferences website
+================================================
+
+0.20    2015-02-16
+        - fixed pre-requisites.
+
+0.19    2015-02-10
+        - final fix for PAUSE authentication.
+        - upgrade to Labyrinth-5.24.
+        - upgrade to Labyrinth-Plugin-Core-5.19.
+        - added Admin site links.
+
+0.18    2014-09-22
+        - fixed license fields in META.json to be lists.
+        - added documentation about the CPAN Testers Fund.
+
+0.17	2014-07-11
+        - removed obsolete files.
+        - remove NONE from templates.
+
+0.16	2014-07-07
+        - abstracted out Labyrinth-Plugin-CPAN.
+
+0.15	2014-07-05
+        - renamed to CPAN-Testers-WWW-Preferences.
+        - documentation fixes.
+
+0.14	2014-07-05
+        - first release to CPAN.
+        - renamed tables.
+        - upgrade to Labyrinth-5.20.
+        - upgrade to Labyrinth-Plugin-Core-5.14.
+        - upgrade to Labyrinth-DIUtils-ImageMagick-5.04.
+
+0.13	2011-08-18
+        - user lists now hide special users (Guest), restrict access to users
+          of the same or higher access, and prevent priveledged users from
+          being deleted.
+        - user acls fixed to correctly list folders and access.
+        - folder list driven by database, added FolderName function.
+        - update to admin templates to make them consistent across sites.
+        - revised banner logo image by Jon 'JJ' Allen.
+
+0.12	2010-10-03
+        - upgrade to Labyrinth v5.00 (CORE only)
+        - added links to Metabase and Labyrinth.
+        - repositioned site boxes to avoid text and logo clashing.
+        - activated SetHits.
+        - update CSS for lists.
+        - reworded templates to make it clearer how to disable notifications.
+        - new perl_version table incorporated to speed up perl version lookups.
+
+0.11	2010-01-19
+        - moved dist version lookup away from 'cpanstats' table.
+        - removed obsolete methods from Preferences.pm.
+        - removed obsolete queries from phrasebook.ini.
+        - removed use of DBX to connect to additional SQLite DBs as all are
+          MySQL now.
+        - OS names loaded from DB not config.
+
+0.10	2010-01-14
+        - added Analysis to site family lists.
+        - added quote.html
+
+0.09	2009-07-30
+        - added missing user-forgot action.
+        - removed word 'Notification' from author menu.
+        - author distribution list now only list dist on CPAN.
+        - s/\s.*// filtering on Perl Version pattern matching.
+        - OS names dropdown now display names not codes
+        - smaller font on footer
+        - removed references to uploads database.
+
+0.08	2009-05-17
+        - reskinned with new layout design
+        - fixed profile editing and creating a new user.
+
+0.07	2009-04-24
+        - added support for Weekly & Monthly Summary reports, as well as
+          individual reports.
+        - fixed name change when "unimpostering".
+
+0.06	2009-01-26
+        - as spotted by Chris Williams:
+          - fixed text in user-login.html to reference PAUSEID not email.
+          - relaxed the password pass through validation to allow unusual 
+            characters in passwords.
+          - removed the need for referencing Parse::BACKPAN::Packages and 
+            Parse::CPAN::Distributions due to the new 'uploads' database.
+        - removed adverts from the footer (SSL has a problem with it)
+        - imporved text in user-login.
+
+0.05	2008-11-16
+        - as suggested by David Golden:
+          - disable distribution filters if the distribution has been disabled.
+          - disable default filters if all reports are disabled.
+          - use javascript to toggle filters between disable/enable for above.
+          - changed saved messages to alerts to be more prominent.
+          - fixed notes and keys on distribution list page
+          - disabled distributions now greyed out on list page
+          - summary table now uses "author defaults" or "reports disabled" to
+            avoid blank columns, and inform the user better.
+          - labeled first column "X", for the ignore/disable column.
+        - removed notion of "NONE", implemented an "ignore" flag and set the
+          report type to correctly identify the report requested. This is so
+          re-enabling a disabled distribution can recall the previous values.
+          A by-product of this is now the author can select to not receive any
+          reports by default, but select specific distributions to receieve
+          reports for.
+
+0.04	2008-11-14
+        - amended tooltip CSS to try and avoid the limitations of browser 
+          rendering.
+        - as suggested by David Golden:
+          - used a summary table on the distributions list page.
+          - emphasised the customisation ability of distributions.
+          - renamed navigation options
+        - added ability to select which distributions to apply to which
+          notifications. Only Daily Summary at the moment, but allows for
+          future expansion.
+
+0.03	2008-11-14
+        - fixes made following review of apache error log entries.
+        - as suggested by Andreas Koenig:
+          - added short circuit for blank login.
+          - removed external javascript for login page.
+        - as suggested by David Cantrell:
+          - added tooltips to preference settings pages.
+          - added checkboxes to ignore distros on distribution list pages.
+          - added ability to exclude selections in some filters.
+
+0.02	2008-11-11
+        - fixes made following review of apache error log entries.
+
+0.01	2008-11-09
+        - First released version, based on Labyrinth v4.15

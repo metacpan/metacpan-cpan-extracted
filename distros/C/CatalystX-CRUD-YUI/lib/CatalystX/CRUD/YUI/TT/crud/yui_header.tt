@@ -1,0 +1,109 @@
+[%- 
+    DEFAULT Y = {
+        url     => YUIBaseURL,
+        version => YUIVersion,
+        css     => [],
+        js      => [],
+    };
+    Y.css.push('build/reset-fonts-grids/reset-fonts-grids');
+    Y.css.push('build/assets/skins/sam/skin');
+    Y.css.push('build/autocomplete/assets/skins/sam/autocomplete');
+    #Y.css.push('build/resize/assets/skins/sam/resize');
+    #Y.css.push('build/button/assets/skins/sam/button');
+    #Y.css.push('build/treeview/assets/skins/sam/treeview');
+    #Y.css.push('build/tabview/assets/skins/sam/tabview');
+    Y.css.push('build/calendar/assets/skins/sam/calendar');
+    Y.css.push('build/editor/assets/skins/sam/editor');
+    
+    Y.js.push('build/utilities/utilities');
+    Y.js.push('build/datasource/datasource-min');
+    Y.js.push('build/autocomplete/autocomplete-min');
+    Y.js.push('build/container/container-min');
+    Y.js.push('build/menu/menu-min');        
+    #Y.js.push('build/button/button-min');
+    Y.js.push('build/calendar/calendar-min');
+    #Y.js.push('build/paginator/paginator-min');
+    #Y.js.push('build/datatable/datatable-min');
+    Y.js.push('build/history/history-min');
+    Y.js.push('build/json/json-min');
+    #Y.js.push('build/resize/resize-min');
+    #Y.js.push('build/layout/layout-min');
+    #Y.js.push('build/tabview/tabview-min');
+    #Y.js.push('build/treeview/treeview-min');
+    Y.js.push('build/editor/editor-min');
+    
+  IF (!ExtJS.defined);
+    SET ExtJS = {
+        url     => ExtBaseURL,
+        version => ExtVersion,
+        css     => [],
+        js      => [],
+    };
+    
+    ExtJS.js.push('adapter/ext/ext-base');
+    ExtJS.js.push('ext-all');
+
+    # column filters do not work well with m2m so
+    # they are disabled by default
+    IF USE_LIVEGRID_FILTERS;
+    ExtJS.js.push('source/widgets/menu/DateMenu');
+    ExtJS.js.push('examples/grid-filtering/menu/EditableItem');
+    ExtJS.js.push('examples/grid-filtering/menu/RangeMenu');
+
+    ExtJS.js.push('examples/grid-filtering/grid/GridFilters');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/Filter');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/StringFilter');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/DateFilter');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/ListFilter');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/NumericFilter');
+    ExtJS.js.push('examples/grid-filtering/grid/filter/BooleanFilter');
+    END;
+    
+    ExtJS.css.push('resources/css/ext-all');
+    ExtJS.css.push('resources/css/xtheme-gray');
+  END;
+  
+  IF (!LiveGrid.defined);
+    SET LiveGrid = {
+        url     => LGBaseURL,
+        version => LGVersion,
+        css     => [],
+        js      => [],
+    };
+    
+    LiveGrid.css.push('resources/css/ext-ux-livegrid');
+    LiveGrid.js.push('livegrid-all');
+  END;
+    
+-%]
+[%- BLOCK css_file -%]
+  <link rel="stylesheet" type="text/css" href="[% url %]/[% version %]/[% css %].css" />
+[%- END -%]
+[%- BLOCK js_file -%]
+  <script type="text/javascript" src="[% url %]/[% version %]/[% js %].js"></script>
+[%- END -%]
+[%- FOREACH css IN Y.css.unique -%]
+    [% PROCESS css_file url = Y.url version = Y.version %]
+[% END -%]
+[%- FOREACH js IN Y.js.unique -%]
+    [% PROCESS js_file url = Y.url version = Y.version %]
+[% END -%]
+[%- FOREACH css IN ExtJS.css.unique -%]
+    [% PROCESS css_file url = ExtJS.url version = ExtJS.version %]
+[% END -%]
+[%- FOREACH js IN ExtJS.js.unique -%]
+    [% PROCESS js_file url = ExtJS.url version = ExtJS.version %]
+[% END -%]  
+[%- FOREACH css IN LiveGrid.css.unique -%]
+    [% PROCESS css_file url = LiveGrid.url version = LiveGrid.version %]
+[% END -%]
+[%- FOREACH js IN LiveGrid.js.unique -%]
+    [% PROCESS js_file url = LiveGrid.url version = LiveGrid.version %]
+[% END -%]
+[% IF USE_LIVEGRID_FILTERS %]
+<script type="text/javascript">
+/* <![CDATA[ */
+    USE_LIVEGRID_FILTERS = 1;
+/* ]]> */
+</script>
+[% END %]

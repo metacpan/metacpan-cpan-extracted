@@ -1,0 +1,14 @@
+Changes
+examples/crazyhash.pl
+examples/rot13.pl
+examples/trombone.pl
+lib/Convert/Moji.pm
+lib/Convert/Moji.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Convert-Moji.t
+t/make-regex.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

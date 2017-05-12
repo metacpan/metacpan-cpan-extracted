@@ -1,0 +1,16 @@
+0.07 2015-04-09
+  * Fix construction failure caused by perl 5.18 hash randomization.
+  * Remove use of deprecated Class::MOP::load_class
+
+0.01_02 2008-02-20
+  * Fix a bug where we would blow away a Scope::Guard if we had more than
+    one model instance in an app.
+
+0.01_01 2008-01-30
+  * First dev release to CPAN.
+
+0.003_01 2008-01-25
+  * Resync with new MenuGrinder API.
+
+0.002_01 2008-01-17
+  * First internal release.

@@ -1,0 +1,53 @@
+<div id="content">
+<div style="width:100%;text-align:center">
+    <span class="login_error">[% error %]</span>
+    <form class="login_form" name="[% form_name %]" method="post" 
+    action="[% script_name %][% path_info %]">
+    <fieldset>
+    <legend>Please login</legend>
+    <input type="hidden" name="[% key_redirect %]" value="[% relative_url %]">
+    <input type="hidden" name="[% key_payload %]" value="">
+    <input type="hidden" name="[% key_time %]" value="">
+    <input type="hidden" name="[% key_expires_min %]" value="">
+    <div class="form_row">
+        <input id="[% key_user %]"  name="[% key_user %]" type="text" class="input_text right"  value="" />
+        <label for="[% key_user %]">[% text_user %]</label>
+    </div>
+<div class="form_row clear">
+      <input name="[% key_pass %]" id="[% key_pass %]"
+      type="password" class="input_text right"  value="" />
+      <label for="[% key_pass %]">[% text_pass %]</label>
+</div>
+<div class="form_row clear">
+        <div class="right" style="width:60%"><input type="checkbox" id="[% key_save %]" 
+        name="[% key_save %]"  class="input_checkbox left" value="1" /></div>
+        <label for="[% key_save %]">[% text_save %]</label>
+</div>
+<div class="form_row clear"><input type="submit" value="Login" class="button right" /></div>
+    </fieldset>
+    </form>
+    </div>
+<hr />
+    [%~ IF ! use_plaintext %]
+    <script src="[% md5_js_path %]"></script>
+    <script>
+    if (document.md5_hex) document.[% form_name %].onsubmit = function () {
+      var f = document.[% form_name %];
+      var u = f.[% key_user %].value;
+      var p = f.[% key_pass %].value;
+      var t = f.[% key_time %].value;
+      var s = f.[% key_save %] && f.[% key_save %].checked ? -1 : f.[% key_expires_min %].value;
+      var l = f.[% key_payload %].value;
+      var r = f.[% key_redirect %].value;
+
+      var str = u+'/'+t+'/'+s+'/'+l;
+      var sum = document.md5_hex(str +'/' + document.md5_hex(p));
+      var loc = f.action + '?[% key_user %]='+escape(str +'/'+ sum)+'&[% key_redirect %]='+escape(r);
+
+      location.href = loc;
+      return false;
+    }
+    </script>
+    [% END ~%]
+
+</div>

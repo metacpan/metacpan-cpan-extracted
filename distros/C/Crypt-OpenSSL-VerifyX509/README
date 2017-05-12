@@ -1,0 +1,11 @@
+Crypt::OpenSSL::VerifyX509 - simple verify-cert module, in XS.
+
+This module provides certificate verification, along the lines of
+"openssl verify". While Crypt::OpenSSL::CA can do this, and is
+fully-featured, it uses Inline::C, which can present deployment
+problems.
+
+Major dependency:
+ * Crypt::OpenSSL::X509
+
+

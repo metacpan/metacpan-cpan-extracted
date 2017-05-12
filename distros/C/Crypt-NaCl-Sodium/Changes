@@ -1,0 +1,58 @@
+Revision history for Perl extension Crypt::NaCl::Sodium.
+
+1.0.8.0 2015-12-27 21:45:43
+    - Use Alien::Sodium v1.0.8.0
+
+1.0.7.0 2015-12-24 02:44:37
+    - New methods added to Data::BytesLocker: is_zero(), increment(), add(), clone().
+    - Helper methods memcmp(), compare() added to Data::BytesLocker
+    - Require Alien::Sodium v1.0.7.0 (to enable new features)
+    - DEPRECATED: increment() function - use Data::BytesLocker's increment method
+
+1.0.6.1 2015-11-25 23:48:38
+    - Fix chacha20_ietf_xor_ic on 32bit platforms
+
+1.0.6.0 2015-11-22 22:57:54
+    - Verify if AES256-GCM is available and die in related methods if not.
+    - increment() accepts variable list of arguments.
+    - cleanup documentation.
+
+0.09   2015-11-10 02:15:01
+    - Data::BytesLocker bytes() method added.
+    - box, secretbox and aead verify the minimum length of ciphertext.
+    - Require Alien::Sodium v1.0.6.0 (to enable new features)
+    - Added following compare and increment utility functions.
+    - IETF-compatible version of ChaCha20 stream cipher
+    - Added support for AES256-GCM.
+
+0.08   2015-07-17 00:15:13
+    - Require Alien::Sodium v1.0.3.1
+
+0.07   2015-07-13 22:37:05
+    - Allow to specify library and include directory paths
+  if pre-installed libsodium is to be used [gh#1]
+    - Minor documentation changes
+
+0.06   2015-05-20 22:37:45
+    - Build changes to locate libsodium.a if pkg-config fails
+    - Fix tests failure on OpenBSD which comes with Math::BigInt v1.89_01
+    - Fix warning on older perls that warned on ref as lvalue in substr
+
+0.05   2015-05-19 22:37:36
+    - Statically linked libsodium.a
+
+0.04   2015-05-18 00:31:37
+    - BSDs do not come with mempcpy
+    - Fix some compiler warnings
+
+0.03   2015-05-12 22:26:26
+    - Add Alien::Sodium to configure requirements
+    - Correct label for crypto_scalarmult->base
+
+0.02   2015-05-12 01:33:29
+    - Add provides for indexing .pod files
+    - Minor documentation fixes
+
+0.01   2015-05-12 00:43:48
+    - Initial version.
+

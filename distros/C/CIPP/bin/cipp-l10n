@@ -1,0 +1,733 @@
+#!/usr/dim/bin/perl
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use File::Find;
+use File::Basename;
+use File::Path;
+use File::Copy;
+use File::Spec;
+use Data::Dumper;
+use Cwd;
+
+my $verbose = 0;
+
+main: {
+    my $man       = 0;
+    my $help      = 0;
+    my $directory = undef;
+    my $output    = undef;
+    my $newspirit = 0;
+    my $xgettext  = 0;
+    my $updatepo  = 0;
+    my $msgfmt    = 0;
+    my $all       = 0;
+    my $genconf   = 0;
+
+    GetOptions(
+        'help|?'        => \$help,
+        'man'           => \$man,
+        'genconf|c'     => \$genconf,
+        'xgettext|x'    => \$xgettext,
+        'updatepo|u'    => \$updatepo,
+        'install|i'     => \$msgfmt,
+        'all|a'         => \$all,
+        'output|o=s'    => \$output,
+        'directory|d=s' => \$directory,
+        'verbose|v'     => \$verbose,
+        'newspirit|n'   => \$newspirit,
+    ) or pod2usage(2);
+
+    $xgettext = $updatepo = $msgfmt = $genconf = 1 if $all;
+
+    pod2usage(-verbose => 2) if $man;
+    pod2usage(1) if $help || $xgettext + $updatepo + $msgfmt + $genconf == 0;
+
+    if ( $newspirit ) {
+        #-- new.spirit mode
+        pod2usage(1) if @ARGV || !$directory || $output;
+
+        #-- Given directory is new.spirit project root directory        
+        my ($ns_root, $scan_dir)  = determine_ns_root($directory);
+
+        #-- change into ns-root directory, to get relative paths
+        chdir($ns_root);
+
+        if ( $scan_dir ne 'src' ) {
+            #-- we're in a subdirectory. determine next 
+            #-- text-domain directory
+            $scan_dir = determine_po_dir_of($scan_dir);
+        }
+
+        my $l10n_conf;
+
+        #-- xgettext?
+        if ( $xgettext || $genconf ) {
+            my @files;
+            my %l10n_conf; # src_po_dir => { domain => "...", lang => [ "de", ... ] }
+            $l10n_conf = \%l10n_conf;
+            scan_directory($scan_dir, \@files, $l10n_conf);
+            check_l10n_conf($l10n_conf);
+            write_l10n_conf($l10n_conf, "$ns_root/prod/l10n/domains.conf")
+                if $genconf && $scan_dir eq 'src';
+            if ( $xgettext ) {
+                assign_files_to_domains(\@files, $l10n_conf);
+                write_pot_for_all_domains($l10n_conf, $ns_root);
+            }
+        }
+        
+        #-- updatepo?
+        if ( $updatepo ) {
+            $l10n_conf ||= read_l10n_conf($ns_root);
+            update_po_for_all_domains($l10n_conf, $ns_root);
+        }
+        
+        #-- msgfmt?
+        if ( $msgfmt ) {
+            $l10n_conf ||= read_l10n_conf($ns_root);
+            msgfmt_for_all_domains($l10n_conf, $ns_root);
+        }
+        
+    }
+    else {
+        #-- xgettext?
+        if ( $xgettext ) {
+            my @files = @ARGV;
+            scan_directory($directory, \@files) if $directory;
+            my $messages = get_messages(\@files, $directory);
+            save_po_file($messages, $output);
+        }
+    }
+}
+
+sub determine_ns_root {
+    my ($start_dir) = @_;
+    
+    $start_dir = File::Spec->rel2abs($start_dir);
+    
+    my $last_dir;
+    my $dir = $start_dir;
+
+    while ( 1 ) {
+        if ( -f "$dir/src/configuration.cipp-base-config" ) {
+            $start_dir = File::Spec->abs2rel($start_dir, $dir);
+            $start_dir = "src" unless $last_dir;
+            return ($dir, $start_dir);
+        }
+        $dir = dirname($dir);
+        last if $last_dir eq $dir;
+        $last_dir = $dir;
+    }
+    
+    die "Directory '$start_dir' doesn't belong to a new.spirit project directory";
+}
+
+sub determine_po_dir_of {
+    my ($start_dir) = @_;
+    
+    my $last_dir;
+    my $dir = $start_dir;
+
+    while ( 1 ) {
+        if ( -f "$dir/po/domain.text-domain" ) {
+            return $dir;
+        }
+        $dir = dirname($dir);
+        last if $last_dir eq $dir;
+        $last_dir = $dir;
+    }
+    
+    die "Directory '$start_dir' doesn't belong to a text domain";
+}
+
+sub scan_directory {
+    my ($directory, $files_lref, $l10n_conf) = @_;
+
+    my %dirs_seen;
+    my $current_dir;
+    find sub {
+        $current_dir = $File::Find::dir;
+        my $rel_file = "$current_dir/$_";
+        $rel_file =~ s!^/!!;
+
+        if ( $_ eq 'CVS' ) {
+            $File::Find::prune = 1;
+            return;
+        }
+        if ( $verbose && !$dirs_seen{$current_dir} ) {
+            print STDERR "Scanning directory $current_dir...\n";
+            $dirs_seen{$current_dir} = 1;
+        }
+        if ( $l10n_conf ) {
+            if ( /\.text-domain$/ ) {
+                my $base = dirname($current_dir);
+                $base = '' if $base eq '.';
+                my ($domain, $lang_team_email, $msg_id_bug_email)
+                    = read_text_domain_file($_);
+                chomp $domain;
+                die "Error: subtree $base has multiple domain definitions"
+                   if exists $l10n_conf->{$base} &&
+                      exists $l10n_conf->{$base}->{domain};
+                $l10n_conf->{$base}->{domain} = $domain;
+                $l10n_conf->{$base}->{lang_team_email} = $lang_team_email;
+                $l10n_conf->{$base}->{msg_id_bug_email} = $msg_id_bug_email;
+                $l10n_conf->{$base}->{po_dir} = basename($current_dir);
+                $verbose && print STDERR "Found text domain: $domain\n";
+            }
+            elsif ( /-([^-]+)\.po$/ ) {
+                my $base = dirname($current_dir);
+                $base = '' if $base eq '.';
+                my $lang = $1;
+                push @{$l10n_conf->{$base}->{lang}}, $lang;
+                $verbose && print STDERR "Found language: $lang\n";
+            }
+        }
+        return unless m{\.(?:cipp|cipp-module|cipp-inc)$};
+        push @{$files_lref}, $rel_file;
+    }, $directory;
+    
+    1;    
+}
+    
+sub get_messages {
+    my ($files_lref, $base_dir) = @_;
+    
+    my %messages;
+    #-- %messages = (
+    #--   "message" => [ "path:line", "path:line", ... ],
+    #-- )
+
+    my $parser = CIPP::xGetText->new(
+        object_type  => 'cipp',
+        program_name => "dummy",
+        project      => "dummy",
+    );
+
+    $parser->set_messages_href(\%messages);
+
+    foreach my $file ( @{$files_lref} ) {
+        my $full_file = "$base_dir/$file";
+        $full_file =~ s!^/!!;
+        $verbose && print STDERR "Reading file $full_file... ";
+        open (my $fh, $full_file) or die "can't read $full_file";
+        $parser->set_in_fh($fh);
+        $parser->set_in_filename($full_file);
+        $parser->parse;
+        close $fh;
+        $verbose && print STDERR "done\n";
+    }
+
+    return \%messages;
+}
+
+sub read_text_domain_file {
+    my ($file) = @_;
+    open (my $fh, $file) or die "can't read $file";
+    my @values;
+    while ( <$fh> ) {
+        chomp;
+        push @values, $_;
+    }
+    return @values;
+}
+
+sub scan_file {
+    my ($file, $messages_href) = @_;
+
+    $verbose && print STDERR "Reading file $file... ";
+
+    open (my $fh, $file) or die "can't read $file";
+
+    my $parser = CIPP::xGetText->new(
+        object_type  => 'cipp',
+        program_name => $file,
+        project      => "dummy",
+    );
+
+    $parser->set_in_fh($fh);
+    $parser->set_messages_href($messages_href);
+    $parser->parse();
+    
+    close $fh;
+
+    $verbose && print STDERR "done\n";
+    
+    1;
+}
+
+sub save_po_file {
+    my ($messages_href, $filename, $domain_conf) = @_;
+
+    $domain_conf ||= {};
+
+    $verbose && print STDERR "Saving po file $filename... ";
+
+    my $fh = \*STDOUT;
+
+    if ( $filename ) {
+        open ($fh, ">", $filename)
+            or die "can't write '$filename'";
+    }
+
+    binmode $fh, ":utf8";
+
+    my $domain           = $domain_conf->{domain}
+                           || "PACKAGE";
+
+    my $lang_team_email  = $domain_conf->{lang_team_email}
+                           || "LANGUAGE TEAM <EMAIL\@ADDRESS>";
+
+    my $msg_id_bug_email = $domain_conf->{msg_id_bug_email}
+                           || "BUGS <EMAIL\@ADDRESS>";
+
+    print $fh <<__EOH;
+#. Generated with cipp-l10n - Copyright (C) dimedis GmbH
+msgid ""
+msgstr ""
+"Project-Id-Version: $domain\\n"
+"POT-Creation-Date: (null)\\n"
+"PO-Revision-Date: (null)\\n"
+"Last-Translator: TRANSLATOR NAME <EMAIL\@ADDRESS>\\n"
+"Language-Team: $lang_team_email\\n"
+"Report-Msgid-Bugs-To: $msg_id_bug_email\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+
+__EOH
+
+    foreach my $message ( sort {
+                            $messages_href->{$a}->[0] cmp
+                            $messages_href->{$b}->[0]
+                          } keys %{$messages_href} ) {
+        my $entries = $messages_href->{$message};
+        foreach my $entry ( @{$entries} ) {
+            print $fh qq[#: $entry\n];
+        }
+
+        if (  $message =~ m!\{.*\}! ) {
+            print $fh qq[#, perl-brace-format\n];
+        }
+
+        if ( $message =~ /\n/ ) {
+            print $fh qq[msgid ""\n];
+            $message =~ s/^/"/gm;
+            $message =~ s/\n/"\n/gm;
+            $message .= qq["\n] if $message !~ /\n$/;
+            print $fh $message;
+        }
+        else {
+            print $fh qq[msgid "$message"\n];
+        }
+        print $fh qq[msgstr ""\n\n];
+    }
+
+    if ( $filename ) {
+        close $fh;
+    }
+
+    $verbose && print STDERR "done\n";
+
+    1;
+}
+
+sub check_l10n_conf {
+    my ($conf) = @_;
+    
+    foreach my $base ( keys %{$conf} ) {
+        if ( ! exists $conf->{$base}->{lang} ) {
+            print Dumper($conf);
+            die "Error: subtree '$base' has no language files";
+        }
+        if ( ! exists $conf->{$base}->{domain} ) {
+            print Dumper($conf);
+            die "Error: subtree '$base' has no text domain definition";
+        }
+    }
+    
+    1;
+}
+
+sub create_dir_for {
+    my ($file) = @_;
+
+    my $dir = dirname($file);
+    
+    if ( ! -d $dir ) {
+        mkpath ([$dir], 0, 0775) or die "can't mkpath $dir";
+    }
+
+    1;
+}
+
+sub write_l10n_conf {
+    my ($conf, $file) = @_;
+    
+    $verbose && print STDERR "Writing config file '$file'... ";
+    
+    create_dir_for($file);
+    
+    open (my $fh, ">", $file) or die "can't write $file";
+    my $dd = Data::Dumper->new([$conf], ["l10n"]);
+    $dd->Sortkeys(1);
+    $dd->Indent(1);
+    my $dump = $dd->Dump;
+    $dump =~ s/^.*?\{/{/;
+    print $fh $dump;
+    close $fh;
+    
+    $verbose && print STDERR "Done\n";
+    
+    1;
+}
+
+sub read_l10n_conf {
+    my ($ns_root_dir) = @_;
+    
+    my $file = "$ns_root_dir/prod/l10n/domains.conf";
+
+    $verbose && print STDERR "Reading config file '$file'... ";
+    
+    die "File '$file' doesn't exist or isn't readable"
+        unless -f $file && -r $file;
+    
+    my $data = do $file;
+    
+    $verbose && print STDERR "Done\n";
+    
+    return $data;
+}
+
+sub assign_files_to_domains {
+    my ($files, $conf) = @_;
+    
+    my @files = sort @{$files};
+
+    $verbose && print STDERR "Number of files ".@files."\n";
+    
+    foreach my $base ( sort { length($b) <=> length($a) } keys %{$conf} ) {
+        my $domain = $conf->{$base}->{domain};
+        $verbose && print STDERR "Assigning files in '$base/' to domain '$domain'...\n";
+        my $base_qm = quotemeta $base;
+        my $base_regex = qr[^$base_qm];
+        my $i = 0;
+        my $start_idx = -1;
+        my $stop_idx  = @{$files};
+        foreach my $file ( @files ) {
+            if ( $file =~ $base_regex ) {
+                $start_idx = $i if $start_idx == -1;
+            }
+            else {
+                if ( $start_idx != -1 ) {
+                    $stop_idx = $i;
+                    last;
+                }
+            }
+            ++$i;
+        }
+        if ( $start_idx == -1 ) {
+            die "No matching files for '$base'";
+        }
+        my @matched_files = splice(@files, $start_idx, $stop_idx-$start_idx);
+        $conf->{$base}->{files} = \@matched_files;
+    }
+    
+}
+
+sub write_pot_for_all_domains {
+    my ($conf, $ns_root_dir) = @_;
+    
+    foreach my $base ( sort { length($b) <=> length($a) } keys %{$conf} ) {
+        my $domain_conf = $conf->{$base};
+        my $domain   = $domain_conf->{domain};
+        my $messages = get_messages($conf->{$base}->{files}, "");
+        my $pot_file = "$ns_root_dir/tmp/l10n/$domain.pot";
+        create_dir_for($pot_file);
+        save_po_file($messages, $pot_file, $domain_conf);
+    }
+    
+    1;
+}
+
+sub update_po_for_all_domains {
+    my ($conf, $ns_root_dir) = @_;
+    
+    my $ns_prod_dir = "$ns_root_dir/prod";
+    my $ns_tmp_dir  = "$ns_root_dir/tmp";
+
+    foreach my $base ( keys %{$conf} ) {
+        my $dom_conf = $conf->{$base};
+        my $domain   = $dom_conf->{domain};
+        my $domain_file = $domain;
+        $domain_file =~ s/\./-/g;
+        foreach my $lang ( @{$dom_conf->{lang}} ) {
+            my $po_file  = "$ns_root_dir/$base/$dom_conf->{po_dir}/$domain_file-$lang.po";
+            my $pot_file = "$ns_tmp_dir/l10n/$domain.pot";
+            if ( ! -e $po_file || 0 == -s $po_file ) {
+                $verbose && print STDERR "Copying .pot file '$pot_file' to '$po_file'... ";
+                copy($pot_file, $po_file) or die "can't copy '$pot_file' to '$po_file'";
+                $verbose && print STDERR "Done\n";
+            }
+            else {
+                $verbose && print STDERR "Updating .po file '$po_file'... ";
+                my $cmd =
+                    "msgmerge -o $po_file.tmp $po_file $pot_file && ".
+                    "mv $po_file.tmp $po_file && echo SUCCESS";
+                run($cmd);
+                $verbose && print STDERR "Done\n";
+            }
+        }
+    }
+    
+    1;
+}
+
+sub msgfmt_for_all_domains {
+    my ($conf, $ns_root_dir) = @_;
+    
+    my $ns_prod_dir = "$ns_root_dir/prod";
+    my $ns_tmp_dir  = "$ns_root_dir/tmp";
+
+    foreach my $base ( keys %{$conf} ) {
+        my $dom_conf = $conf->{$base};
+        my $domain   = $dom_conf->{domain};
+        my $domain_file = $domain;
+        $domain_file =~ s/\./-/g;
+        foreach my $lang ( @{$dom_conf->{lang}} ) {
+            my $mo_file  = "$ns_prod_dir/l10n/$lang/LC_MESSAGES/$domain.mo";
+            my $po_file  = "$ns_root_dir/$base/$dom_conf->{po_dir}/$domain_file-$lang.po";
+            my $cmd = "msgfmt --statistics -c -o $mo_file $po_file && echo SUCCESS";
+            create_dir_for($mo_file);
+            $verbose && print STDERR "Installing .mo file '$mo_file'...\n";
+            run($cmd, 1);
+        }
+    }
+    
+    1;
+}
+
+sub run {
+    my ($cmd, $show_output) = @_;
+    my $output = qx[($cmd) 2>&1];
+    if ( $output !~ /SUCCESS/ ) {
+        $verbose && print STDERR "ERROR!\n";
+        print STDERR
+            "Error executing this command:\n$cmd\n".
+            "Output was:\n$output\n";
+        exit 1;
+    }
+    elsif ( $verbose && $show_output ) {
+        $output =~ s/SUCCESS\n$//;
+        print STDERR $output;
+    }
+    1;
+}
+
+package CIPP::xGetText;
+
+use base qw/CIPP::Compile::Parser/;
+
+sub get_messages_href           { shift->{messages_href}                }
+sub set_messages_href           { shift->{messages_href}        = $_[1] }
+
+sub cmd_l {
+    my $self = shift;
+
+    my $RC = $self->RC_BLOCK_TAG;
+
+    if ( $self->get_current_tag_closed ) {
+	my $buffer_sref = $self->close_output_buffer;
+        $self->pop_context;
+
+        my $message = ${$buffer_sref};
+        $message =~ s/^\s+//gm;
+        $message =~ s/\s*$/ /gm;
+        $message =~ s/\s+$//s;
+        $message =~ s/"/\\"/g;
+        $message =~ s/\s+/ /gs;
+    
+        my $file    = $self->get_in_filename;
+        my $line_no = $self->get_current_tag_line_nr;
+
+        push @{$self->get_messages_href->{$message}}, "$file:$line_no";
+
+	return $RC;
+    }
+
+    $self->open_output_buffer;
+
+    $self->push_context('var_noquote');
+
+    return $RC;
+}
+
+sub get_normalized_object_name {
+    return $_[0];
+}
+
+sub process_text {
+    my $self = shift;
+    my ($text) = @_;
+    $self->write ($$text) if $self->get_out_fh;
+    1;
+}
+
+sub generate_debugging_code {
+}
+
+__END__
+
+=head1 NAME
+
+cipp-l10n - do various l10n tasks with CIPP source files
+
+=head1 SYNOPSIS
+
+cipp-l10n [COMMAND OPTIONS] [OPTIONS] [INPUTFILE]...
+
+=head1 OPTIONS
+
+=head2 COMMAND OPTIONS
+
+These options control the main operation mode of the program.
+Currently most of them are valid only in new.spirit mode and
+it's allowed to combined them. Only --xgettext doesn't require
+new.spirit mode.
+
+=over 4
+
+=item B<--xgettext | -x>
+
+Extract gettext messages from source files. Valid options are
+-o and -d. More input files may be given at the command line.
+
+=item B<--genconf | -c>
+
+Creates CIPP textdomain config file. Valid only with --newspirit.
+
+=item B<--updatepo | -u>
+
+Update a .po file merging new messages from a .pot file into it.
+Valid only with --newspirit.
+ 
+=item B<--install | -i>
+
+Compile a binary .mo file from a .po file. Valid options are -o.
+Valid only with --newspirit.
+
+=item B<--all | -a>
+
+Execute all commands listed above in a row: --genconf --xgettext
+--updatepo --install. Valid only with --newspirit.
+
+=back
+
+=head2 ADDITIONAL OPTIONS
+
+=over 4
+
+=item B<--newspirit | -n>
+
+new.spirit mode. It's assumed that the directory passed with -d
+is a subdirectory of a new.spirit project root folder or the
+root folder itself.
+
+With --genconf all directories in the new.spirit project are
+scanned for textdomain definitions and .-po files. A summary
+of this information is stored in the project's
+ROOT/prod/l10n/domains.conf file.
+
+In --xgettext all source files are scanned for text messages
+and the corrsponding .pot files are saved as ROOT/tmp/l10n/DOMAIN.pot.
+
+If the -d directory is a new.spirit project subdirectory, --xgettext
+will extract messages only from the textdomain this subdirectory
+belongs to. As well --genconf is disabled automatically (if set),
+because generating a config file with a subset of the project's
+domains wouldn't make sende.
+
+In --updatepo mode all po files are merged with the .pot files
+generated during a prior --xgettext run.
+
+In --msgfmt mode all .po files are compiled to .mo format and
+installed as ROOT/prod/l10n/LANG/LC_MESSAGES/DOMAIN.mo.
+
+=item B<--output | -o> filename
+
+Write output to the specified file. Invalid in --newspirit mode.
+
+=item B<--directory | -d> directory
+
+Search for CIPP source files in this directory. Only valid with
+--xgettext or --newspirit.
+
+=item B<--verbose | -v>
+
+Print progress information to STDERR.
+
+=item B<--help>
+
+Print a brief help message.
+
+=item B<--man>
+
+Show the full manpage.
+
+=back
+
+=head1 DESCRIPTION
+
+cipp-xgettext extracts gettext strings from CIPP sources
+and generates a corresponding .po file for them.
+
+=head1 EXAMPLES
+
+This section shows some typical examples of cipp-l10n usage:
+
+=head2 Extract all messages from a new.spirit project
+
+This command extracts all messages from a new.spirit project
+and generates a .pot file for each textdomain. Additionally
+the prod/l10n/domains.conf file is created:
+
+  % cd some/newspirit/project/root
+  % cipp-l10n -v -n -d . --xgettext --genconf
+
+=head2 Just update .po files in a new.spirit subdirectory
+
+This command updates all .po files for the textdomain of
+the custom/ subdirectory in a new.spirit project:
+
+  % cd some/newspirit/project/root
+  % cd src/custom
+  % cipp-l10n -v -n -d . --updatepo
+
+This presumes that a domains.conf file exists already, otherwise
+you would have to do a --geconf run first.
+
+=head2 Install all .mo files in a new.spirit project
+
+This command runs msgfmt for all textdomains resp .po files
+in a new.spirit directory and installs the resulting .mo files
+in the prod/l10n/ directory:
+
+  % cd some/newspirit/project/root
+  % cipp-l10n -v -n -d . --install
+
+=head2 Do all tasks above in one run
+
+This executes all tasks: message extraction / .pot file generation,
+domains.conf generation, .po updating and .mo installation:
+
+  % cd some/newspirit/project/root
+  % cipp-l10n -v -n -d . --all
+
+=head2 Simply extract messages of a CIPP source tree
+
+This command is for non new.spirit projects and just extracts
+messages from CIPP sources and generates a corresponding .pot file:
+
+  % cipp-l10n -v -d some/cipp/src --xgettext --output some.pot
+
+=cut

@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::MVC.
+
+0.01  Thu Feb 13 10:00:18 2003
+	- original version; created by h2xs 1.21 with options
+		-n Class::MVC -X
+
+0.01.03
+	* Using Class::Observable for Class::Model (instead of Class::Listener)
+	

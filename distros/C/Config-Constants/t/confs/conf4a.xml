@@ -1,0 +1,5 @@
+<config>
+    <module name='Bar::Baz'>
+        <constant name='FOO' value='42' />
+    </module>
+</config>

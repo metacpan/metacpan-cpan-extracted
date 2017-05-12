@@ -1,0 +1,19 @@
+
+# Files in Class::Loader bundle. 
+
+MANIFEST
+ARTISTIC
+Changes
+
+Makefile.PL
+
+lib/Class/Loader.pm
+lib/Class/LoaderTest.pm
+
+t/01-require.t
+t/02-map.t
+t/03-args.t
+
+# $Id: MANIFEST,v 1.4 2001/05/02 02:57:01 vipul Exp $ 
+
+META.yml                                 Module meta-data (added by MakeMaker)

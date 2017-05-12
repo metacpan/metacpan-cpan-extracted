@@ -1,0 +1,15 @@
+Revision history for Class-Data-Reloadable
+
+CHANGES
+
+version     date         changes
+----------------------------------------
+0.04        20 Apr 2005  - added a Makefile.PL (reported by ceverett)
+0.03        19 Nov 2004  - removed unnecessary $DEBUG = 0
+0.02        19 Nov 2004  - minor pod updates
+                         - changed $ClassData from 'my' to 'our'
+                         - added $DEBUG global
+
+0.01        12 Nov 2004  Initial release
+
+

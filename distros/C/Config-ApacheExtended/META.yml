@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-ApacheExtended
+version:      1.16
+version_from: VERSION
+installdirs:  site
+requires:
+    Carp:                          0
+    File::Spec::Functions:         1.1
+    IO::File:                      1.07
+    Parse::RecDescent:             1.94
+    Scalar::Util:                  1.07
+    Test::More:                    0.44
+    Text::Balanced:                1.89
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.20

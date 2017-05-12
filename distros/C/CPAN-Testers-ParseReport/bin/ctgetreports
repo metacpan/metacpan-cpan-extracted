@@ -1,0 +1,465 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ctgetreports - Quickly fetch cpantesters results with all reports
+
+=head1 SYNOPSIS
+
+  ctgetreports [options] distroname
+  ctgetreports [options] --report number ...
+  ctgetreports [options] --reportfiles path ...
+  ctgetreports -h
+
+=head1 OPTIONS
+
+A distroname is unversioned, e.g. C<IPC-Run>. For versioned names as
+in C<IPC-Run-0.80> see --vdistro.
+
+=over 2
+
+=cut
+
+my $optpod = <<'=back';
+
+=item B<--cachedir=s>
+
+Directory to keep mirrored data in. Defaults to C<$HOME/var/cpantesters>.
+
+=item B<--ctdb=s>
+
+If you have your own copy of the cpan testers I<cpanstats> database
+you can use this to set the path to the database. Must not be used
+together with C<--cturl>. Requires
+C<CPAN::WWW::Testers::Generator::Database> and C<CPAN::DistnameInfo>
+installed.
+
+=item B<--cturl=s>
+
+Base URL of the cpantesters website. Defaults to
+C<http://static.cpantesters.org/show>.
+
+=item B<--dumpfile=s>
+
+If dumpvars are specified, dump them into this file. Defaults to "ctgetreports.out".
+
+=item B<--dumpvars=s>
+
+Dump all queryable variables matching the regular expression given as
+argument at the end of the loop for a distro.
+
+=item B<--filtercb=s>
+
+A callback that is called at the end of parse_report(). It allows to
+manipulate the result, e.g. change the resulting values or add
+calculated values. The callback function gets a record (hashref) as
+the only argument. The return value is ignored. The callback is pure
+perl code without any surrounding sub declaration.
+
+Compared to the C<--ycb> callback described below C<--filtercb> is
+considered easier to use.
+
+The following example excludes reports by the user C<jack.blacksmoke>
+from regression testing:
+
+  ctgetreport --q --solve --filtercb '
+    my $rec = shift;
+    $rec->{"meta:ok"}="FILTERED" if $rec->{"meta:from"} =~ /jack.blacksmoke/;
+    ' String-RewritePrefix-0.005
+
+=item B<--help|h>
+
+Prints a brief message and exists.
+
+=item B<--interactive|i>
+
+After every parsed report asks if you want to see it in a pager.
+
+=item B<--local>
+
+Do not mirror, use a local *.yaml file. Dies if the YAML file
+is missing, skips missing report files.
+
+=item B<--minfail=i>
+
+Same thing as --minpass but for fail reports.
+
+Default value is the value of --minpass; if this is missing, no
+default applies.
+
+=item B<--minpass=i>
+
+If --sample is set, then it could happen that randomness strikes
+unluckily and the sample ends without a pass report. For the --solve
+option this would then have the consequence that it cannot succeed. By
+setting a minpass, the sample size is iteratively increased by small
+steps until the number of passes is equal to this option or higher.
+
+No default.
+
+If --sample is not set, --minpass and --minfail are ignored.
+
+=item B<--pager=s>
+
+Pager (needed when -i is given). Defaults to C<less>.
+
+=item B<--parse-common-errors|pce>
+
+While the C<<--q qr:...> syntax ultimately offers free parsing it is
+cumbersome to use. The C<--parse-common-errors> option is a
+placeholder for a variety of frequent errors to watch. Currently it
+stands for the following additional options:
+
+  -q qr:(Failed test\s+\S+.*)
+  -q qr:(Failed to load .*)
+  -q qr:(Can't load .*)
+  -q qr:((?i:.*could.?n.t find.*))
+  -q qr:(Can't locate object method .+)
+  -q qr:(Can't locate \S+pm)
+  -q qr:(Please\s+install\s+\S+)
+  -q qr:(You tried to run a test without a plan.*)
+  -q qr:(.*Server didn't start.*)
+  -q qr:(You planned.*)
+
+This list is subject to change in future releases.
+
+=item B<--prefer-local-reports|plr>
+
+Boolean. If true, we skip downloading of reports from cpantesters when
+the file that is designated to be the local target of the mirror
+command already exists. This is highly recommended since it has been
+observed (2011-11) that cpantesters is not sending Last-Modified
+headers for reports and does not send a 304 on requests with an
+If-Modified-Since header. But even when the HTTP handling becomes more
+efficient at cpantesters main site, this parameter should lower the
+burden on them and reduce the latency on the mirror side considerably.
+
+=item B<--q=s@>
+
+Query, may be repeated.
+
+Example: C<--q mod:Clone --q meta:writer>
+
+=item B<--quiet!>
+
+Do not output the usual query lines per parsed report. Quiet
+overrules verbose.
+
+=item B<--raw!>
+
+Boolean which, if set, causes the full (HTML) report to be
+concatenated to STDOUT after every status line.
+
+=item B<--report=s@>
+
+Avert going through a cpan testers index, go straight to the report
+with this number.
+
+Example: C<--report 1238673>
+
+If report is set and dumpvars is not set, dumpvars will be set to a
+dot (meaning that all variables shall be dumped into dumpfile).
+
+=item B<--reportfiles=s@{1,}>
+
+Specify file names for local report files. One to many files may be given.
+
+Example: C<--reportfiles pass.Foo-Bar-0.01.i386-linux.123456789.12345.rpt fail.Foo-Bar-0.01.i386-linux.123456788.12344.rpt>
+
+=item B<--sample=i>
+
+Limit the number of reports to be analyzed. If the total number of
+reports is lower than or equal to the value specifed here then the
+option is ignored and all available reports will be used. Only if the
+total number of reports is larger than specified then the number of
+reports will be sampled randomly to the demanded sample size. Useful
+to limit the computing power needed for a result.
+
+See also --minpass and --minfail.
+
+=item B<--solve!>
+
+Calls the solve function which tries to identify the best contenders
+for a blame using Statistics::Regression. Currently only limited to
+single variables and with simple heuristics. Implies C<--dumpvars=.>
+unless the caller sets dumpvars himself.
+
+The function prints at the moment to STDOUT the top 3 (set with
+C<--solvetop>) candidates according to R^2 with their regression
+analysis.
+
+A few words of advise: do not take the results as a prove ever. Take
+them just as a hint where you can most probably prove a causal
+relationship. And keep in mind that causal relationships can be the
+other direction as well.
+
+If you want to extend on that approach, I recommend you study the
+ctgetreports.out file where you find all the data you'd need and feed
+your assumptions to Statistics::Regression.
+
+=item B<--solvetop=i>
+
+The number of top candidates from the C<--solve> regression analysis
+to display.
+
+=item B<--transport=s>
+
+Specifies transport to get the reports. Defaults to C<http_cpantesters>.
+
+C<http_cpantesters> uses LWP::UserAgent at static.cpantesters.org.
+
+C<http_cpantesters_gzip> also uses LWP::UserAgent at
+static.cpantesters.org but compresses the fetched result after fetching
+and decompresses cached results before mirroring. This option
+requires that C<Compress::Zlib> is installed.
+
+=item B<--vdistro=s>
+
+Versioned distro, e.g.
+
+  IPC-Run-0.80
+
+or
+
+  Moose-2.1103-TRIAL
+
+This is the way to target a version different from the most recent
+one.
+
+In the case that the command line argument already contains an easy to
+recognize version as in C<IPC-Run-0.80>, that argument is split and
+
+  ctgetreports Foo-Bar-3.14
+
+is equivalent to
+
+  ctgetreports --vdistro=Foo-Bar-3.14 Foo-Bar
+
+Note, that there may be distributions on CPAN where the trivial
+splitting implemented in ctgetreports does not work.
+
+=item B<--verbose|v+>
+
+Feedback during download.
+
+=item B<--ycb=s>
+
+Only used during --solve. Provides perl code to be used as a callback
+from the regression to determine the B<Y> of the regression equation.
+The callback function gets a record (hashref) as the only argument and
+must return a value or undefined. If it returns undefined, the record
+is skipped, otherwise this record is processed with the returned
+value. The callback is pure perl code without any surrounding sub
+declaration.
+
+The following example analyses diagnostic output from Acme-Study-Perl:
+
+  ctgetreports --q qr:"#(.*native big math float/int.*)" --solve \
+    --ycb 'my $rec = shift;
+           my $nbfi = $rec->{"qr:#(.*native big math float/int.*)"};
+          return undef unless defined $nbfi;
+          my $VAR1 = eval($nbfi);
+          return $VAR1->{">"}' Acme-Study-Perl
+
+=back
+
+=head1 DESCRIPTION
+
+The intent is to get at both the summary at cpantesters and the
+individual reports and parse the reports and collect the data for
+further inspection.
+
+We always only fetch the reports for the most recent (optionally
+picked) release. Target root directory is C<$HOME/var/cpantesters>
+(can be overridden with the --cachedir option).
+
+The C<--q> parameter can be repeated. It takes one argument which
+stands for a query. This query must consist of two parts, a qualifier
+and the query itself. Qualifiers are one of the following
+
+  conf       parameters from the output of 'perl -V'
+             e.g.: conf:usethreads, conf:cc
+  mod        for installed modules, either from prerequisites or from the toolchain
+             e.g.: mod:Test::Simple, mod:Imager
+  env        environment variables
+             e.g.: env:TERM
+  meta       all other parameters
+             e.g.: meta:perl, meta:from, meta:date, meta:writer
+  qr         boolean set if the appended regexp matches the report
+             e.g.: qr:'division by zero'
+
+The conf parameters specify a word used by the C<Config> module.
+
+The mod parameters consist of a package name.
+
+The meta parameters are the following: C<perl> for the perl version,
+C<from> for the sender of the report, C<date> for the date in the mail
+header, C<writer> for the module that produced the report,
+C<output_from> for the line that is reported to have produced the output.
+
+
+=head2 Examples
+
+This gets all recent reports for Object-Relation and outputs the
+version number of the prerequisite Clone:
+
+  $0 --q mod:Clone Object-Relation
+
+Collects reports about Clone and reports the default set of metadata:
+
+  $0 Clone
+
+Collect reports for Devel-Events and report the version number of
+Moose in thses reports and sort by success/failure. If Moose broke
+Devel-Events is becomes pretty obvious:
+
+  $0 --q mod:Moose Devel-Events |sort
+
+Which tool was used to write how many reports, sorted by frequency:
+
+  $0 --q meta:writer Template-Timer | sed -e 's/.*meta:writer//' | sort | uniq -c | sort -n
+
+Who was in the From field of the mails whose report writer was not determined:
+
+  $0 --q meta:writer --q meta:from Template-Timer | grep 'UNDEF'
+
+At the time of this writing this collected the results of
+IPC-Run-0.80_91 which was not really the latest release. In this case
+manual investigations were necessary to find out that 0.80 was the
+most recent:
+
+  $0 IPC-Run
+
+Pick the specific release IPC-Run-0.80:
+
+  $0 IPC-Run-0.80
+
+The following displays in its own column if the report contains the
+regexp C<division by zero>:
+
+  $0 --q qr:"division by zero" CPAN-Testers-ParseReport-0.0.7
+
+The following is a simple job to refresh all HTML pages we already
+have and fetch new reports referenced there too:
+
+  perl -le '
+  for my $dirent (glob "$ENV{HOME}/var/cpantesters/cpantesters-show/*.html"){
+    my($distro) = $dirent =~ m|/([^/]+)\.html$| or next;
+    print $distro;
+    my $system = "ctgetreports --verbose --verbose $distro";
+    0 == system $system or die;
+  }'
+
+=cut
+
+use strict;
+use warnings;
+
+use CPAN::Testers::ParseReport;
+use Getopt::Long;
+use Hash::Util qw(lock_keys);
+use Pod::Usage qw(pod2usage);
+
+our %Opt;
+my @opt = $optpod =~ /B<--(\S+)>/g;
+for (@opt) {
+    $_ .= "!" unless /[+!=]/;
+}
+lock_keys %Opt, map { /([^=!\|]+)/ } @opt;
+
+GetOptions(\%Opt,
+           @opt,
+          ) or pod2usage(2);
+
+if ($Opt{help}) {
+    pod2usage(0);
+}
+
+if ($Opt{report} || $Opt{reportfiles}) {
+    if (@ARGV) {
+        pod2usage(2);
+    }
+} else {
+    if (1 != @ARGV) {
+        pod2usage(2);
+    }
+}
+
+if ($Opt{interactive}) {
+    eval { require IO::Prompt; 1; } or
+        die "Option '--interactive' requires IO::Prompt installed";
+}
+
+if ($Opt{solve}) {
+    eval { require Statistics::Regression };
+    if ($@) {
+        die "Statistics::Regression required for solved option: $@";
+    }
+}
+if ($Opt{report} || $Opt{reportfiles}) {
+    $Opt{dumpvars} ||= ".";
+}
+if ($Opt{dumpvars}) {
+    eval { require YAML::Syck };
+    if ($@) {
+        die "YAML::Syck required for dumpvars option: $@";
+    }
+}
+
+if ($Opt{"parse-common-errors"}) {
+    $Opt{q} ||= [];
+    my($para) = grep {/^\s+-q qr:/} split /\n\n/, $optpod;
+    for my $line (split /\n/, $para) {
+        my($qr) = $line =~ /-q (qr:.*)/;
+        push @{$Opt{q}}, $qr;
+    }
+}
+if (defined $Opt{minpass}) {
+    if (! defined $Opt{minfail}) {
+        $Opt{minfail} = $Opt{minpass};
+    }
+}
+
+$|=1;
+if ($Opt{report} || $Opt{reportfiles}) {
+    my $dumpvars = {};
+    if ($Opt{solve}) {
+        $Opt{dumpvars} = "." unless defined $Opt{dumpvars};
+    }
+ REPORT: for my $key (qw(report reportfiles)) {
+	my $reports = $Opt{$key};
+	if ($reports && @$reports) {
+	    for my $report (@$reports) {
+		my $extract;
+		if ($key eq 'report') {
+		    $extract = eval { CPAN::Testers::ParseReport::parse_single_report({id => $report},$dumpvars,%Opt) };
+		} else {
+		    $extract = eval { CPAN::Testers::ParseReport::parse_report($report,$dumpvars,%Opt) };
+		}
+		if ($@) {
+		    if (ref $@) {
+			warn "Warning: error while parsing '$report': $@->{text}";
+		    } else {
+			warn "Alert: error while parsing '$report': $@";
+		    }
+		}
+		last REPORT if $CPAN::Testers::ParseReport::Signal;
+	    }
+	}
+    }
+    if ($Opt{solve}) {
+        CPAN::Testers::ParseReport::solve($dumpvars,%Opt);
+    } else {
+	my $dumpfile = $Opt{dumpfile} || "ctgetreports.out";
+	YAML::Syck::DumpFile($dumpfile,$dumpvars);
+    }
+} else {
+    $ARGV[0] =~ s|.+/||;
+    CPAN::Testers::ParseReport::parse_distro($ARGV[0],%Opt);
+}
+
+__END__
+
+# Local Variables:
+# mode: cperl
+# End:

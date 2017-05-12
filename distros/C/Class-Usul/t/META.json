@@ -1,0 +1,192 @@
+{
+   "abstract" : "A base class providing config, locking, logging, and l10n",
+   "author" : [
+      "Peter Flanigan, C<< <pjfl@cpan.org> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Usul",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0.22",
+            "Module::Build" : "0.4004",
+            "Test::Deep" : "0.108",
+            "Test::Requires" : "0.06",
+            "version" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IPC::Run" : "0.89",
+            "Proc::ProcessTable" : "0.42"
+         },
+         "requires" : {
+            "Class::Inspector" : "1.28",
+            "Class::Null" : "2.101420",
+            "Crypt::CBC" : "2.30",
+            "Crypt::Twofish2" : "1.02",
+            "Data::Printer" : "0.35",
+            "Data::Record" : "0.02",
+            "Date::Format" : "2.24",
+            "DateTime::Format::Epoch" : "0.13",
+            "Exporter::Tiny" : "0.026",
+            "File::DataClass" : "v0.41.0",
+            "File::Gettext" : "v0.23.0",
+            "File::HomeDir" : "0.93",
+            "Getopt::Long::Descriptive" : "0.093",
+            "IO::Interactive" : "v0.0.6",
+            "IPC::SRLock" : "v0.22.0",
+            "JSON::MaybeXS" : "1.001000",
+            "Log::Handler" : "0.63",
+            "Module::Runtime" : "0.014",
+            "Moo" : "1.004002",
+            "MooX::ClassStash" : "0.005",
+            "Pod::Eventual" : "0.093330",
+            "Regexp::Common" : "2010010201",
+            "Sub::Install" : "0.925",
+            "Term::ReadKey" : "2.30",
+            "Text::Autoformat" : "1.669002",
+            "Time::Zone" : "2.24",
+            "Try::Tiny" : "0.18",
+            "Type::Tiny" : "0.046",
+            "Unexpected" : "v0.23.0",
+            "namespace::clean" : "0.25",
+            "namespace::sweep" : "0.006",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Usul" : {
+         "file" : "lib/Class/Usul.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Config" : {
+         "file" : "lib/Class/Usul/Config.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Config::Programs" : {
+         "file" : "lib/Class/Usul/Config/Programs.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Constants" : {
+         "file" : "lib/Class/Usul/Constants.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Crypt" : {
+         "file" : "lib/Class/Usul/Crypt.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Crypt::Util" : {
+         "file" : "lib/Class/Usul/Crypt/Util.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Exception" : {
+         "file" : "lib/Class/Usul/Exception.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::File" : {
+         "file" : "lib/Class/Usul/File.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Functions" : {
+         "file" : "lib/Class/Usul/Functions.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::IPC" : {
+         "file" : "lib/Class/Usul/IPC.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::L10N" : {
+         "file" : "lib/Class/Usul/L10N.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Lock" : {
+         "file" : "lib/Class/Usul/Lock.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Log" : {
+         "file" : "lib/Class/Usul/Log.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Options" : {
+         "file" : "lib/Class/Usul/Options.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Programs" : {
+         "file" : "lib/Class/Usul/Programs.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Response::IPC" : {
+         "file" : "lib/Class/Usul/Response/IPC.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Response::Table" : {
+         "file" : "lib/Class/Usul/Response/Table.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Schema" : {
+         "file" : "lib/Class/Usul/Schema.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Time" : {
+         "file" : "lib/Class/Usul/Time.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::TraitFor::ConnectInfo" : {
+         "file" : "lib/Class/Usul/TraitFor/ConnectInfo.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::TraitFor::MetaData" : {
+         "file" : "lib/Class/Usul/TraitFor/MetaData.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::TraitFor::Prompting" : {
+         "file" : "lib/Class/Usul/TraitFor/Prompting.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::TraitFor::UntaintedGetopts" : {
+         "file" : "lib/Class/Usul/TraitFor/UntaintedGetopts.pm",
+         "version" : "v0.45.3"
+      },
+      "Class::Usul::Types" : {
+         "file" : "lib/Class/Usul/Types.pm",
+         "version" : "v0.45.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Class-Usul@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Usul"
+      },
+      "homepage" : "https://metacpan.org/author/PJFL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.45.3"
+}
+

@@ -1,0 +1,23 @@
+0.16 Sat Aug 16 10:55:59 PDT 2014
+ - Meta 0.0.2
+
+0.15 Fri Aug 15 15:44:25 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.14 Tue Aug  5 09:23:38 PDT 2014
+ - Add badges to doc
+
+0.13 Sun Aug  3 21:25:09 PDT 2014
+ - Remove (c) from Copyright
+
+0.12 Sat Jul 26 19:36:46 PDT 2014
+ - Convert to Zilla::Dist
+
+0.11 Sun Jan 16 11:29:36 EST 2011
+ - More tests (actually 32 tests now!!!)
+ - Small refactoring
+
+0.10 Sun Jan 16 11:29:36 EST 2011
+ - First release
+

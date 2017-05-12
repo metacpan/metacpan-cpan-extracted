@@ -1,0 +1,51 @@
+--- #YAML:1.0
+name:                CPAN-Testers-WWW-Statistics-Excel
+version:             0.06
+abstract:            Scripts to create the Excel files for the cpanstats website
+author:
+  - Barbie <barbie@cpan.org>
+
+license:             artistic_2
+distribution_type:   module
+installdirs:         site
+
+requires:
+  perl:                             5.006
+  Class::Accessor::Fast:            0
+  File::Basename:                   0
+  File::Path:                       0
+  Getopt::ArgvFile:                 0
+  Getopt::Long:                     0
+  HTML::Entities:                   0
+  HTML::TokeParser:                 0
+  IO::File:                         0
+  Spreadsheet::WriteExcel:          0
+recommends:
+  Test::CPAN::Meta:                 0
+  Test::CPAN::Meta::JSON:           0
+  Test::Pod:                        1.00
+  Test::Pod::Coverage:              0.08
+build_requires:
+  File::Slurp:                      0
+  Test::More:                       0.70
+
+provides:
+  CPAN::Testers::WWW::Statistics::Excel:
+    file:     lib/CPAN/Testers/WWW/Statistics/Excel.pm
+    version:  0.06
+
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  homepage:   http://stats.cpantesters.org
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-WWW-Statistics-Excel
+  repository: http://github.com/barbie/cpan-testers-www-statistics-excel
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

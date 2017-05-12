@@ -1,0 +1,130 @@
+NAME
+    Catalyst::Plugin::Authentication::Credential::TypeKey - TypeKey
+    Authentication for Catalyst.
+
+SYNOPSIS
+        use Catalyst qw/Authentication::Credential::TypeKey/;
+
+        MyApp->config->{authentication}{typekey} = {
+            token => 'xxxxxxxxxxxxxxxxxxxx',
+        };
+
+        sub foo : Local {
+                    my ( $self, $c ) = @_;
+
+                    if ( $c->authenticate_typekey ) {
+
+                    # you can also specify the params manually: $c->authenticate_typekey(
+                    #       name => $name,
+                    #       email => $email,
+                    #       ...
+                    #)
+
+                            # successful autentication
+
+                            $c->user; # this is set
+                    }
+            }
+
+            sub auto : Private {
+                    my ( $self, $c ) = @_;
+
+                    $c->authenticate_typekey; # uses $c->req
+
+                    return 1;
+            }
+
+DESCRIPTION
+    This module integrates Authen::TypeKey with
+    Catalyst::Plugin::Authentication.
+
+METHODS
+   authenticate_typekey $user_object, %parameters
+   authenticate_typekey %parameters
+   authenticate_typekey { ... parameters ... }
+   authenticate_typekey
+    This method performs the actual authentication. It's pretty complicated.
+
+    Any configuration field (this plugin's configuration, e.g. "user_class",
+    as well as any Authen::TypeKey configuration fields, e.g. "token", etc)
+    can be in %parameters. This will clone the configured typekey object if
+    needed and set the fields locally for this call only.
+
+    All other fields are assumed to be typekey credentials.
+
+    If a user object is provided it will be asked for it's typekey
+    credentials and then authenticated against the server keys.
+
+    If there are no typekey credentials in the paramters or the user object,
+    the credentials will be taken from "$c->request".
+
+    If a user object exists and is authenticated correctly it will be marked
+    as authenticated. If no such object exists but "auth_store" is provided
+    (or configured) then it will attempt to retrieve a user from that store
+    using the "name" typekey credential field. If no "auth_store" is
+    configured or a user was not found in that store "user_class" is used to
+    create a temporary user using the parameters as fields.
+
+   last_typekey_object
+    The last typekey object used for authentication. This is useful if you
+    use overrides or need to check errors.
+
+   last_typekey_error
+    This is "$c->last_typekey_object->errstr"
+
+   EXTENDED METHODS
+   setup
+    Fills the config with defaults.
+
+CONFIGURATION
+    "<$c-"config->{autentication}{typekey}>> is a hash with these fields
+    (all can be left out):
+
+    typekey_object
+        If this field does not exist an Authen::TypeKey object will be
+        created based on the other param and put here.
+
+    expires
+    key_url
+    token
+    version
+        See Authen::TypeKey for all of these. If they aren't specified
+        Authen::TypeKey's defaults will be used.
+
+    key_cache
+        Also see Authen::TypeKey.
+
+        Defaults to "regkeys.txt" under "class2tempdir" in Catalyst::Utils.
+
+    auth_store
+        A store (or store name) to retrieve the user from.
+
+        When a user is successfully authenticated it will call this:
+
+                $store->get_user( $name, $parameters, $result_of_verify );
+
+        Where $parameters is a the hash reference passed to "verify" in
+        Authen::TypeKey, and $result_of_verify is the value returned by
+        "verify" in Authen::TypeKey.
+
+        "default_auth_store" will NOT be used automatically, you need to set
+        this parameter to "default" for that to happen. This is because most
+        TypeKey usage is not store-oriented.
+
+    user_class
+        If "auth_store" or the default store returns nothing from get_user,
+        this class will be used to instantiate an object by calling "new" on
+        the class with the return value from "verify" in Authen::TypeKey.
+
+SEE ALSO
+    Authen::TypeKey, Catalyst, Catalyst::Plugin::Authentication.
+
+AUTHOR
+    Christian Hansen
+
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

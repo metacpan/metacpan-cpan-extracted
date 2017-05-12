@@ -1,0 +1,17 @@
+Cache::Weak
+
+Perl object cache based on weak references
+
+INSTALLATION
+
+To install this module type the following:
+
+	$ perl Build.PL
+	$ perl ./Build
+	$ perl ./Build test
+	$ sudo perl ./Build install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2008, Eugen Sobchenko <ejs@cpan.org>
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,75 @@
+NAME
+    CatalystX::Plugin::Blurb - (alpha software) handle transient messages
+    and UI elements.
+
+VERSION
+    0.03
+
+NOTICE
+    This is not something I'd encourage you to use yet. I am releasing it to
+    the CPAN so it can be available for building another package. This is
+    half done. It was written well over a year ago and barely used or
+    touched since. It might be a mistake. It might be abandoned. If you try
+    it though, have fun.
+
+SYNOPSIS
+     use Catalyst qw(
+                     Unicode
+                     Session
+                     +CatalystX::Plugin::Blurb
+                     );
+
+DESCRIPTION
+    blurb
+    flash_blurb
+        Blurbs are normally only kept for a single response. If you set
+        "flash_blurb" to true the blurbs will be kept for the next request
+        via flash.
+
+    * finalize
+        Puts the blurbs into flash for the next request if "flash_blurb" has
+        been set.
+
+CONFIGURATION AND ENVIRONMENT
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-blurb@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+TODO
+    Flash blurb interface is wrong. They should be just like blurbs, not a
+    switch. They should also have an expiration baked in.
+
+AUTHOR
+    Ashley Pond V "<ashley@cpan.org>".
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2009, Ashley Pond V.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    Because this software is licensed free of charge, there is no warranty
+    for the software, to the extent permitted by applicable law. Except when
+    otherwise stated in writing the copyright holders and/or other parties
+    provide the software "as is" without warranty of any kind, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the software is with
+    you. Should the software prove defective, you assume the cost of all
+    necessary servicing, repair, or correction.
+
+    In no event unless required by applicable law or agreed to in writing
+    will any copyright holder, or any other party who may modify and/or
+    redistribute the software as permitted by the above licence, be liable
+    to you for damages, including any general, special, incidental, or
+    consequential damages arising out of the use or inability to use the
+    software (including but not limited to loss of data or data being
+    rendered inaccurate or losses sustained by you or third parties or a
+    failure of the software to operate with any other software), even if
+    such holder or other party has been advised of the possibility of such
+    damages.
+

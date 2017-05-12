@@ -1,0 +1,71 @@
+{
+   "abstract" : "Verify, Cache and Optimise CGI Output",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Buffer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Test::Most" : "0",
+            "Test::TempDir::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Info" : "0.51",
+            "CSS::Packer" : "0",
+            "Carp" : "0",
+            "Compress::Zlib" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "File::Spec" : "0",
+            "HTML::Lint" : "0",
+            "HTML::Packer" : "1",
+            "HTTP::Date" : "0",
+            "HTTP::Status" : "0",
+            "IO::Compress::Brotli" : "0",
+            "IO::String" : "0",
+            "JavaScript::Packer" : "2",
+            "Storable" : "0",
+            "Time::localtime" : "0",
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CGI-Buffer@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/CGI-Buffer.git",
+         "web" : "https://github.com/nigelhorne/CGI-Buffer"
+      }
+   },
+   "version" : "0.79",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

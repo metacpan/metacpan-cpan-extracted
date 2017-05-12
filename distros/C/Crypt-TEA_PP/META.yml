@@ -1,0 +1,22 @@
+---
+abstract: 'Pure Perl Implementation of the Tiny Encryption Algorithm'
+author:
+  - 'Kars Wang <jahiy@cpan.org>'
+build_requires:
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-TEA_PP
+requires:
+  Carp: '1.3301'
+  List::Util: '1.38'
+  Scalar::Util::Numeric: '0.40'
+  perl: '5.010'
+version: '0.0308'

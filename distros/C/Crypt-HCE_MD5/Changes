@@ -1,0 +1,24 @@
+Revision history for Perl extension Crypt::HCE_MD5.
+
+0.01  Wed Oct 14 16:23:57 1998
+	- original version; created by h2xs 1.18
+
+0.02 implementation
+
+0.03 moved examples to their own directory
+
+0.05 fixed description man bug (had an extra space)
+     added check for MIME::Base64
+
+0.40 updated to use Digest::MD5 by Gisle Aas
+
+0.45 fixed chaining key bug, thanks to Jake Angerman for
+     pointing out the weakness
+
+0.60 fixed bug in encoding to not allow mime to put in it's own
+     returns.  Client.pm and Server.pm where updated to reflect
+     this changes, thanks to Trance for the bug report
+
+0.65 removed syslog from test.pl
+0.70 removed the other syslog from test.pl
+0.75 fixed deprecated defined usage

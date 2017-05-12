@@ -1,0 +1,60 @@
+{{{}
+{   "abstract" : "unknown",}
+{   "author" : [}
+{      "unknown"}
+{   ],}
+{   "dynamic_config" : 1,}
+{   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",}
+{   "license" : [}
+{      "unknown"}
+{   ],}
+{   "meta-spec" : {{}
+{      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",}
+{      "version" : "2"}
+{   }},}
+{   "name" : "CPU-Z80-Assembler",}
+{   "no_index" : {{}
+{      "directory" : [}
+{         "t",}
+{         "inc"}
+{      ]}
+{   }},}
+{   "prereqs" : {{}
+{      "build" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "configure" : {{}
+{         "requires" : {{}
+{            "ExtUtils::MakeMaker" : "0"}
+{         }}}
+{      }},}
+{      "runtime" : {{}
+{         "requires" : {{}
+{            "Asm::Preproc" : "1",}
+{            "Asm::Z80::Table" : "0.02",}
+{            "Class::Struct" : "0",}
+{            "Data::Dump" : "1.08",}
+{            "File::Slurp" : "9999.13",}
+{            "File::Spec" : "0",}
+{            "Iterator::Array::Jagged" : "0.05",}
+{            "Iterator::Simple::Lookahead" : "0.04",}
+{            "Regexp::Trie" : "0.02",}
+{            "Test::More" : "0.96",}
+{            "Text::Tabs" : "2006.1117",}
+{            "perl" : "5.01"}
+{         }}}
+{      }}}
+{   }},}
+{   "release_status" : "stable",}
+{   "resources" : {{}
+{      "repository" : {{}
+{         "type" : "git",}
+{         "url" : "git://github.com/pauloscustodio/perl-CPU-Z80-Assembler.git",}
+{         "web" : "https://github.com/pauloscustodio/perl-CPU-Z80-Assembler"}
+{      }}}
+{   }},}
+{   "version" : "2.15",}
+{   "x_serialization_backend" : "JSON::PP version 2.27300"}
+{}}}

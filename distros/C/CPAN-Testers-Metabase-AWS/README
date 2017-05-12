@@ -1,0 +1,120 @@
+NAME
+    CPAN::Testers::Metabase::AWS - Metabase backend on Amazon Web Services
+
+VERSION
+    version 1.999002
+
+SYNOPSIS
+  Direct usage
+       use CPAN::Testers::Metabase::AWS;
+ 
+       my $mb = CPAN::Testers::Metabase::AWS->new( 
+         bucket    => 'myS3bucket',
+         namespace => 'prod' 
+       );
+ 
+       $mb->public_librarian->search( %search spec );
+       ...
+
+  Metabase::Web config
+       ---
+       Model::Metabase:
+         class: CPAN::Testers::Metabase::AWS
+           args:
+             bucket: myS3bucket
+             namespace: prod
+
+DESCRIPTION
+    This class instantiates a Metabase backend on the S3 and SimpleDB Amazon
+    Web Services (AWS). It uses Net::Amazon::Config to provide user
+    credentials and the Metabase::Gateway Role to provide actual
+    functionality. As such, it is mostly glue to get the right credentials
+    to setup AWS clients and provide them with standard resource names.
+
+    For example, given the "bucket" "example" and the "namespace" "alpha",
+    the following resource names would be used:
+
+       Public S3: http://example.s3.amazonaws.com/metabase/alpha/public/*
+       Public SDB domain: example.metabase.alpha.public
+ 
+       Private S3: http://example.s3.amazonaws.com/metabase/alpha/private/*
+       Private SDB domain: example.metabase.alpha.private
+
+USAGE
+  new
+       my $mb = CPAN::Testers::Metabase::AWS->new( 
+         bucket    => 'myS3bucket',
+         namespace     => 'prod', 
+         profile_name  => 'cpantesters',
+       );
+
+    Arguments for "new":
+
+    *   "bucket" -- required -- the Amazon S3 bucket name to hold both
+        public and private fact content. Bucket names must be unique across
+        all of AWS. The bucket name is also used as part of the SimpleDB
+        namespace for consistency.
+
+    *   "namespace" -- required -- a short phrase that uniquely identifies
+        this metabase. E.g. "dev", "test" or "prod". It is used to specify
+        specific locations within the S3 bucket and to uniquely identify a
+        SimpleDB domain for indexing.
+
+    *   "amazon_config" -- optional -- a Net::Amazon::Config object
+        containing Amazon Web Service credentials. If not provided, one will
+        be created using the default location for the config file.
+
+    *   "profile_name" -- optional -- the name of a profile for use with
+        Net::Amazon::Config. If not provided, it defaults to 'cpantesters'.
+
+  access_key_id
+    Returns the AWS Access Key ID.
+
+  secret_access_key
+    Returns the AWS Secret Access Key
+
+  Metabase::Gateway Role
+    This class does the Metabase::Gateway role, including the following
+    methods:
+
+    *   "handle_submission"
+
+    *   "handle_registration"
+
+    *   "enqueue"
+
+    see Metabase::Gateway for more.
+
+SEE ALSO
+    *   CPAN::Testers::Metabase
+
+    *   Metabase::Gateway
+
+    *   Metabase::Web
+
+    *   Net::Amazon::Config
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Metabase-
+    AWS>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/cpan-testers-metabase-aws>
+
+      git clone https://github.com/dagolden/cpan-testers-metabase-aws.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

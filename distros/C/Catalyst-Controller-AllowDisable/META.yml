@@ -1,0 +1,28 @@
+---
+abstract: DEPRECATED.
+author:
+  - 'Tomohiro Teranishi <tomohiro.teranishi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-AllowDisable
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst::Runtime: 5.7
+  MRO::Compat: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.coderepos.org/share/lang/perl/Catalyst-Controller-AllowDisable/trunk
+version: 0.08

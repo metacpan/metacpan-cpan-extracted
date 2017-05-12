@@ -1,0 +1,25 @@
+---
+abstract: 'Controller that serves files from a directory'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: '5.90060'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Controller-Public
+requires:
+  Catalyst: '5.90060'
+  Catalyst::ActionRole::Public: '0.008'
+  Moose: '2.1403'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-Controller-Public/issues
+  homepage: https://github.com/jjn1056/Catalyst-Controller-Public
+  repository: https://github.com/jjn1056/Catalyst-Controller-Public.git
+version: '0.003'

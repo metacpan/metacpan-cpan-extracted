@@ -1,0 +1,6 @@
+Enter your name:
+[% WRAPPER form %]
+first name: [% self.CGI.textfield('first') %]
+last name: [% self.CGI.textfield('last') %]
+[% self.CGI.submit %]
+[% END %]

@@ -1,0 +1,111 @@
+0.02 2014-10-02
+    * simple version numbers
+    * test db now in-memory sqlite
+
+0.010001 2014-01-24
+    * stable release of earlier dev releases
+
+0.009_002 2014-01-21
+    * fix typo in required version of DBIx::Class
+
+0.009_001 2014-01-21
+    * refactored tests
+    * remove Catalyst::ActionRole::MatchRequestMethod in favour
+      of new Catalyst core module Catalyst::ActionRole::HTTPMethods
+
+0.008001 2013-04-02
+    * stable release of earlier dev releases
+
+0.007_003 2013-04-22
+    * ATTENTION: this change breaks stuff!!!
+      CatalystX::Resource::TraitFor::Controller::List does no longer stash an
+      array reference under $self->resources_key because that is not actually
+      needed. If you want to access a list of all resources simply
+      use the resultset available in
+      $c->stash->{ $self->resultset_key } # Perl code
+      OR
+      [% $self->resultset_key %] #  Template Tookit
+
+      Update HowTo:
+        1) remove any occurence of 'resources_key'
+        2) update 'resultset_key'. (e.g.: 'artist_rs' to 'artists')
+        3) replace 'artists' with 'artists.all' in your templates
+
+0.007_002 2013-04-17
+    * add prefetch feature
+
+0.007_001 2013-04-08
+    * change in trait Sortable::move_to()
+      instead of passing the new position as Args(1) it has to be passed as
+      request parameter.
+    * Removed DEPRECATION warning if stash key 'form_attrs' is used.
+      'form_attrs' is not merged into attributes used for $form->new() anymore.
+      Use 'form_attrs_new' instead.
+
+0.006001 2013-04-02
+    * stable release of earlier dev releases
+
+0.005_002 2013-03-26
+    * update version of required module SQL::Translator
+
+0.005_001 2013-03-20
+    * deprecated use of catalyst stash key 'form_attrs' which was passed to
+      $form->new. Use stash keys 'form_attrs_new' and 'form_attrs_process'
+      instead.
+
+0.004002 2013-01-31
+    * make form_class attr 'rw' to enable  runtime change of the form_class
+    * remove perl 5.10 dependency
+    * The 'posted' flag also works to prevent validation from being performed
+      if there are extra params in the params hash and it is not a 'POST' request.
+
+0.004001 2012-12-11
+    * stable release of earlier dev releases
+
+0.003_003 2012-12-09
+    * new redirect_mode 'show_parent_list' redirects to list of parent
+
+0.003_002 2012-12-09
+    * change config 'identifier_columns' to 'identifier_candidates'
+      now you can use accessor on your $row in addition to columns
+      (also, if fallback $row->resource_key is used as identifier, add value of id column if available)
+
+0.003_001 2012-10-24
+    * redirect to referer after move operations
+      (redirect to '/' if referer header is missing)
+    * depend on perl 5.10.0 because of defined-or operator '//'
+
+0.002004 2012-08-22
+    * fixed redirect for move_next/move_previous actions
+
+0.002003 2012-07-25
+    * config option for identifier column of resource
+
+0.002002 2012-07-25
+    * fixed typo in config
+
+0.002001 2012-07-25
+    * use tempdir for session data of TestApp and cleanup afterwards
+
+0.002000 2012-07-23
+    * fixed tests
+    * first stable release
+
+0.001_006 2012-07-22
+    * customizable error_path.
+
+0.001_005 2012-01-07
+    * added trait MergeUploadParams and test
+
+0.001_004 2011-12-22
+    * Controller::Resource extends from C::C::ActionRole
+    * actions must match method enforced with C::AR::MatchRequestMethod
+
+0.001_003 2011-12-13
+    * add missing dependencies
+
+0.001_002 2011-12-12
+    * add missing dependencies
+
+0.001_001 2011-12-12
+    * initial release

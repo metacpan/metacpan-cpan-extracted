@@ -1,0 +1,81 @@
+Revision history for Perl module CSS::SpriteMaker
+
+1.01    Sat Aug 13 17:59:10 CEST 2016
+        * Speed up sprite generation (no need for color maps!)
+        * Add enable_colormap option
+
+0.15    Thu Sep 18 12:51:17 CEST 2014
+        * Make compose_sprite() consistent under Perl 5.18 hash key ordering (thanks Alex!)
+
+0.14    Fri May 30 02:12:07 CEST 2014
+        * Allow user to add arbitrary padding around sprite images
+
+0.13    Thu May 15 15:15:04 CEST 2014
+        * Fix bugs in print_fake_css
+        * Allow renaming of pathnames in print_fake_css
+        * Fix POD
+
+0.12    Thu May 15 11:07:46 CEST 2014
+        * Avoid error in load test for certain other versions of ImageMagick
+
+0.11    Thu May 15 10:57:27 CEST 2014
+        * Avoid error in load test for certain versions of ImageMagick
+
+0.10    Wed May 14 22:57:32 CEST 2014
+        * generate fake CSS stylesheets
+        * added rounding in get_layout_ascii_string (to have more precise layouts)
+
+0.09    Wed May 14 00:54:56 CEST 2014
+        * move author tests in xt/
+        * add css_class_prefix option
+        * improve POD
+
+0.08    Tue Apr 15 17:07:53 CEST 2014
+        * partial source padding feature: specify remove_source_padding => 1 in
+          in CSS::Spritemaker::compose_sprite parts to remove padding from
+          certain parts of the combines sprite only.
+        * new method to display layout in ascii format (see
+          CSS::SpriteMaker::Layout)
+
+0.07    2013-09-15 18:44:14 BST
+        * allow custom target image filename in CSS stylesheet generation
+        * allow override of the generated CSS class name (e.g., add a prefix)
+        * remove '+' characters during CSS class generation
+        * allow parts of combined layout to be hidden in CSS
+        * nicer html preview of CSS image sprites
+        * allow composite layouts without glue layout
+
+0.06    2013-08-19 22:36:00 BST
+        * fix POD
+
+0.05    2013-08-19 07:44:25 BST
+        * allow composite layouts (layouts of layouts!)
+        * fix bug in Packed Layout by porting packing algorithm
+          from python glue
+
+0.04    2013-08-17 02:01:39 BST
+        * updated distribution metadata and version numbers
+
+0.03    2013-08-17 00:53:30 BST
+        * FixedDimension layout algorithm
+        * test FixedDimension layout algorithm
+        * pluggable layouts can now accept parameters
+
+0.02    2013-06-30 14:40:08 BST
+        * improved CSS class names generation
+        * improved POD
+
+0.01    2013-06-26 19:18:08 BST
+        * first release!
+        * make CSS image sprite
+        * make HTML sample page
+        * make CSS Stylesheet
+        * binpacking algorithm for layout
+        * directory-based layout algorithm
+        * format conversion
+        * border removal
+        * tests
+
+0.00    2013-05-23 22:02:09 BST
+        * initial commit
+

@@ -1,0 +1,13 @@
+^smerge
+\.bak$
+^Makefile$
+\.swp$
+\.tar\.gz$
+^blib/
+^pm_to_blib$
+~$
+^util\.o$
+^XS\.bs$
+^XS\.c$
+^XS\.o$
+

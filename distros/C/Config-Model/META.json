@@ -1,0 +1,102 @@
+{
+   "abstract" : "Create tools to validate, migrate and edit configuration files",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Model",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Fuse" : "0",
+            "Term::ReadLine" : "0",
+            "Text::Levenshtein::Damerau" : "0",
+            "YAML" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Assert::More" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "Fcntl" : "0",
+            "File::Copy" : "0",
+            "File::HomeDir" : "0",
+            "File::Path" : "0",
+            "Hash::Merge" : "0.12",
+            "IO::File" : "0",
+            "JSON" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Log::Log4perl" : "1.11",
+            "Mouse" : "0",
+            "Mouse::Role" : "0",
+            "Mouse::Util" : "0",
+            "Mouse::Util::TypeConstraints" : "0",
+            "MouseX::NativeTraits" : "0",
+            "MouseX::StrictConstructor" : "0",
+            "POSIX" : "0",
+            "Parse::RecDescent" : "v1.90.0",
+            "Path::Tiny" : "0.070",
+            "Pod::POM" : "0",
+            "Pod::Simple" : "3.23",
+            "Pod::Text" : "0",
+            "Regexp::Common" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Text::Diff" : "0",
+            "Text::Levenshtein::Damerau" : "0",
+            "Text::Wrap" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Model::Tester" : "2.059",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::File::Contents" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0.11"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/config-model/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/config-model.git",
+         "web" : "http://github.com/dod38fr/config-model"
+      }
+   },
+   "version" : "2.101",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

@@ -1,0 +1,64 @@
+Changes for Crypt::PBKDF2
+
+Version 0.161520: 2016-05-31
+  * Require an up-to-date Types::Standard to prevent errors about ConsumerOf
+    and Enum not being found on installation. There is no need to upgrade if
+    Crypt::PBKDF2 is already working for you.
+
+Version 0.160410: 2016-02-10
+  * Release 0.160010-TRIAL as stable.
+
+Version 0.160010-TRIAL: 2015-12-31
+  * Use Moo instead of Moose. This reduces our dependencies significantly,
+    and also speeds up startup by a little bit. Runtime performance should
+    be unaffected.
+
+Version 0.150900: 2015-03-31
+  * Fix RT#102447 (PBKDF2_hex removes certain bytes from the end of hash).
+
+Version 0.142390: 2014-08-27
+  * Add HMACSHA3 hasher.
+  * Add an option to limit password length to prevent algorithmic
+    complexity attacks. Thanks Gabor Szabo for reporting.
+
+Version 0.140890: 2014-03-30
+  * Remove use of Method::Signatures::Simple. Devel::Declare was causing
+    problems for some users, and it's really not needed for such a simple
+    module.
+
+Version 0.133330: 2013-11-29
+  * Replace Class::MOP::load_class with Module::Runtime for compatibility
+    with latest Moose
+
+Version 0.131750: 2013-06-24
+  * Fix decoding 'crypt'-style hashes with options (CPAN RT#84130)
+
+Version 0.121930: 2012-07-10
+  * Correct a typo that breaks deserialization of hashes with algorithm
+    options.
+
+Version 0.112020: 2011-07-21
+  * SEMI-INCOMPATIBLE CHANGE: Add a new, LDAP-like, output format for
+    'generate'. This format is now the default output format. If you want
+    to generate the same output as version 0.110461, or that can be read by
+    previous versions, see the documentation for the "encoding" attribute.
+
+Version 0.110461: 2011-02-15
+  * Fix bug related to instantiation of "hasher".
+
+Version 0.110460: 2011-02-14
+  * Miscellaneous documentation improvements.
+  * Optional arguments to "generate" and "validate" have been removed. The
+    mandatory arguments remain the same. If you want to override options,
+    clone the object instead.
+  * MooseX::MethodSignatures replaced with Method::Signatures::Simple, which
+    should improve speed noticeably.
+
+Version 0.101170: 2010-04-26
+  * Updated SEE ALSO section.
+  * Repository in META.
+  * Added Changes file.
+
+Version 0.101160: 2010-04-26
+  * Initial release to CPAN.
+  * HMACSHA1, HMACSHA2, and DigestHMAC hashers included.

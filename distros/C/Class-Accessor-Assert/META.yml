@@ -1,0 +1,26 @@
+---
+abstract: 'Accessors which type-check'
+author:
+  - 'Steffen Mueller <accessor-module at steffen-mueller dot net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Accessor-Assert
+provides:
+  Class::Accessor::Assert:
+    file: lib/Class/Accessor/Assert.pm
+    version: 1.41
+recommends:
+  Test::Pod: 1.0
+requires:
+  Class::Accessor: 0.25
+  Class::Data::Inheritable: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.41

@@ -1,0 +1,11 @@
+Revision history for Catalyst-TraitFor-Request-Params-Hashed
+
+0.03    2010-02-09 00:30:24
+        Fix: repository path in Makefile.PL was incorrect
+
+0.02    2009-12-05 20:18:22
+        Switch to Assembla.com repository
+
+0.01    2009-12-04 14:07:48
+        First version, released on an unsuspecting world :)
+

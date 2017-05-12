@@ -1,0 +1,211 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/74684>, <http://purl.org/NET/cpan-uri/rt/ticket/74685>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 1.000000"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Crypt-XkcdPassword>;
+	doap:created         "2012-02-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Crypt-XkcdPassword>;
+	doap:homepage        <https://metacpan.org/release/Crypt-XkcdPassword>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Crypt-XkcdPassword";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-009>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-crypt-xkcdpassword>;
+	];
+	doap:shortdesc       "see http://xkcd.com/936/";
+	rdfs:seeAlso         <http://xkcd.com/936/>.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-02-02"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2012-02-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Packaging;
+			rdfs:label "Forgot to run mo-inline in 0.001, creating an undeclared dependency on Mo. Have switched to Moo now anyway, and declared that as a dependency."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2012-03-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide a $filter parameter to make_password."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/74684>, <http://purl.org/NET/cpan-uri/rt/ticket/74685>;
+		], [
+			a doap-changeset:Addition, doap-changeset:Documentation;
+			rdfs:label "Crypt::XkcdPassword::Examples"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require Perl 5.10.1 (Unicode in 5.10.0 is too broken)."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2012-07-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "EN::Roget word list."@en;
+		], [ rdfs:label "Switch from Moo to Any::Moose."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2013-05-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Any::Moose -> Moo + Types::Standard; smartmatch -> match::smart; Class::Load -> Module::Runtime."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Crypt-XkcdPassword-0.006"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Crypt-XkcdPassword-0.007"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "General tidying.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support for Perl 5.8.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Don't depend on Role::Commons.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle `passphrase` command-line tool.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Crypt-XkcdPassword-0.008"^^xsd:string;
+	dc:issued            "2014-09-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Fix issue tracker metadata so that 'NOBODY' doesn't show up in CREDITS file for reporting some bugs.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Crypt-XkcdPassword-0.009"^^xsd:string;
+	dc:issued            "2014-09-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Crypt::XkcdPassword::Words::sys";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/mstrout>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "A bunch of refactoring common stuff into Crypt::XkcdPassword::Words, which is a role that must now be consumed by word list classes.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "The `words` attribute is now a blessed object, not a class name.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "The `passphrase` tool can now generate more than one phrase per invocation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Crypt-XkcdPassword-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/NEILB>
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:NEILB@cpan.org>.
+
+<http://purl.org/NET/cpan-uri/person/mstrout>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:mstrout@cpan.org>;
+	foaf:name            "Matt S Trout";
+	foaf:nick            "MSTROUT";
+	foaf:page            <https://metacpan.org/author/MSTROUT>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster".
+
+<http://purl.org/NET/cpan-uri/rt/ticket/74684>
+	a                    doap-bugs:Issue;
+	rdfs:label           "invalid words in the wordlist";
+	dc:created           "2012-02-04T23:45:32Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/NEILB>;
+	doap-bugs:id         "74684";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=74684>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/74685>
+	a                    doap-bugs:Issue;
+	rdfs:label           "don't include swear words, or provide an option to decide";
+	dc:created           "2012-02-04T23:47:34Z"^^xsd:dateTime;
+	dc:reporter          <http://purl.org/NET/cpan-uri/person/NEILB>;
+	doap-bugs:id         "74685";
+	doap-bugs:page       <https://rt.cpan.org/Public/Bug/Display.html?id=74685>;
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/rejected>.
+

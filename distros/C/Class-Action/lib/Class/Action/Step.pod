@@ -1,0 +1,310 @@
+=head1 NAME
+
+Class::Action::Step - Base class for use by Class::Action "step" objects
+
+=head1 VERSION
+
+This document describes Class::Action::Step version 0.4
+
+=head1 SYNOPSIS
+
+    package MyAction;
+        
+    require Class::Action::Step;
+    @MyAction::ISA = qw(Class::Action::Step);
+
+    sub get_class_action_steps {
+        my ($class, @args) = @_; 
+        return [MyAction::Foo->new(@args), MyAction::Bar->new(@args)];
+    }
+   
+    package MyAction::Foo;
+    @MyAction::Foo::ISA = qw(MyAction);
+   
+    sub new { ... 
+   
+    package MyAction::Bar;
+    @MyAction::Bar::ISA = qw(MyAction);
+   
+    sub new { ... 
+   
+   
+    1;
+
+Then in your script:
+
+    use Class::Action;
+    my $action = Class::Action->new();
+    $action->set_steps_from_class('MyAction');
+    $action->execute("3.14159") or die $action->get_errstr();
+    $action->execute("1.61803") or die $action->get_errstr();
+ 
+Instead you could use the 'get_action_object()' method that you could define or inherit from Class::Action::Step.
+
+Then your script would look like this:
+
+    use MyAction;
+    my $action = MyAction->get_action_object();
+    $action->execute("3.14159") or die $action->get_errstr();
+    $action->execute("1.61803") or die $action->get_errstr();
+
+=head1 DESCRIPTION
+
+This module contains definitions for all the necessary methods a "step" class needs. The intent is to be used as base class so that all neccessary methods exist.
+
+=head1 INTERFACE 
+
+=head2 'step_stack' method get_class_action_steps()
+
+This method needs defined in Your::Class::Here in order to be passed to $action->set_steps_from_class('Your::Class::Here')
+
+It should return an array or array reference of objects, namespaces that are Class::Action::Step compatible, and/or array refs as described below.
+
+   $action->set_steps_from_class('Your::Class::Here');
+
+essentially calls: 
+
+   Your::Class::Here->get_class_action_steps()
+   
+Additional arguments are passed through:
+
+   $action->set_steps_from_class('Your::Class::Here',1,2,3);
+
+essentially calls: 
+
+   Your::Class::Here->get_class_action_steps(1,2,3)
+
+If it returns a namespace then that namespace's new() is called when it is run in execute(), rollback(), and undo().
+
+Step::NS->new() is called with the arguments passed to execute(), rollback(), and undo()
+
+If it returns an array ref then the first argument is treated as the name space and the rest of the list is the arguments to it's new() method. The arguments passed to execute(), rollback(), and undo() are passed as an array ref in the last argument to new().
+
+    sub get_class_action_steps {
+        my ($this_class, @args_to_from_class_method) = @_;
+        
+        return [
+            Class::A->new(\%a_args), # object is used every time
+            'Class::B',              # Class::B->new(@step_args) every time
+            ['Class::C',1,2,3],      # Class::C->new(1,2,3,\@step_args) every time
+        ];
+    }
+
+=head2 Class::Action::Step compatible
+
+The following methods are used in Class::Action->execute(), Class::Action->rollback(), and Class::Action->undo() and therefore need defined in your "step" classes.
+
+=head2 Mandatory methods
+
+These have to be defined in your "step" class. If they are not then it will carp and return nothing.
+
+=over 4
+
+=item new()
+
+This should return an object that represents this "step".
+
+=item clone_obj()
+
+Takes no arguments, should return an identical but independent object in a fresh state.
+
+=item state()
+
+Takes no arguments, should return string or data structure reference representing the "state" (e.g. any important messages and status that you might want to examine after reset_obj_state() has wiped the object clean).
+
+=item reset_obj_state()
+
+Takes no arguments, resets the internal state of the object, called in void context.
+
+=item execute()
+
+The first argument (after the object itself of course) is a hash reference of "global" data that each "step" object can modify in order to aggregate data, report, back and communicate between each other.
+
+The remaining arguments are the arguments passed to the main Class::Action object's execute() method.
+
+It should return true if it was successful, false otherwise.
+
+    sub execute {
+        my ($step_obj, $global_data_hr, @args_to_execute) = @_;
+        
+        $global_data_hr->{'foo'} = _find_foo($args_to_execute[1]);
+        
+        return 1 if $global_data_hr->{'foo'} eq 'bar';
+        
+        $step_obj->{'last_errstr'} = 'foo did not equal bar';
+        return;
+    }
+
+=back
+
+=head2 Optional Methods
+
+=over 4
+
+=item retry_execute()
+
+This method is called when the step's execute() fails. It is intended as a way to try and address why it failed and then return a boolean of if the step's execute() should be tried again.
+
+The first argument (after the object itself of course) is a hash reference of "global" data that each "step" object can modify in order to aggregate data, report, back and communicate between each other.
+
+The rest of the arguments are what were passed to execute().
+
+=item clean_failed_execute()
+
+This method is called when the step's execute() fails and we will not  be retrying it again. It is intended as a way to try and address why it failed. It is called in void context.
+
+The first argument (after the object itself of course) is a hash reference of "global" data that each "step" object can modify in order to aggregate data, report, back and communicate between each other.
+
+The rest of the arguments are what were passed to execute().
+
+=item undo()
+
+This is equivalent to $step_obj->execute() except that it should undo what execute() does. Return true to continue the undo stack, false to stop.
+
+=item retry_undo()
+
+This is equivalent to $step_obj->retry_execute() except that it's return value indicates whether we should try to run the $step_obj->undo() that failed again.
+
+=item clean_failed_undo()
+
+This is equivalent to $step_obj->clean_failed_execute() except that it relate's to the entire rollback/undo process instead of execute process.
+
+=item exec_stack_runtime_handler()
+
+Sometimes you don't want to wait until an action has completed in order to call Class::Action->get_execution_state() and examine the result stack.
+
+If you'd rather examine each item as it is added (e.g. report progress to the UI in real time, alert admins ASAP, etc.) to the final result stack as returned by Class::Action->get_execution_state() you could define this method in your Step class.
+
+It's arguments are the step object and the hashref of info as described in Class::Action->get_execution_state() POD.
+
+It is called in void context.
+
+=back
+
+=head2 Convenience methods
+
+=over 4
+
+=item get_action_object()
+
+This basic convienience method will bring in Class::Action if needed, create a basic Class::Action object (no args to new), then pass though your args ultimately to to the class's get_class_action_steps().
+
+If this is too simplistic for your needs feel free to not use it.
+
+=item setup_class_execute_and_get_class_action_steps()
+
+This convienience method assists in the setup of multiple step classes.
+
+Assuming 'MyClass' ISA Class::Action::Step, has defined it's own basic methods (i.e. at least all of the mandatory ones except execute()) you can then use this method to build the class structure you need with the different execute()'s (and optionally undo()'s) you need.
+
+    package MyClass;
+    
+    @MyClass::ISA = qw(Class::Action::Step);
+    
+    ...
+    
+    sub get_class_action_steps {
+        ...        
+        return [
+            ...
+            __PACKAGE__->setup_class_execute_and_get_class_action_steps(
+                [A => sub {...}],
+                [B => sub {...}],
+                [C => sub {...}],    
+            )
+            ...
+        ];
+    }
+    
+    ...
+
+This will setup MyClass::A, MyClass::B, and MyClass::C's @ISA and defines their execute() with the given code ref.
+
+It returns an array of full name spaces appropriate for get_class_action_steps().
+
+A second coderef will be used as the class's undo() method:
+
+    sub get_class_action_steps {
+        ...        
+        return [
+            ...
+            __PACKAGE__->setup_class_execute_and_get_class_action_steps(
+                [A => sub {...}, sub { ... undo ... }],
+                [B => sub {...}],
+                [C => sub {...}, sub { ... undo ... }],    
+            )
+            ...
+        ];
+    }
+
+This will setup MyClass::A, MyClass::B, and MyClass::C's @ISA and defines their execute() with the given code ref.
+
+In addition MyClass::A and MyClass::C will have their undo()s defined
+
+If this is too simplistic for your needs feel free to not use it.
+
+=back 
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<< CLASS does not implement METHOD() >>
+
+Your CLASS needs to define the METHOD() method.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Class::Action::Step requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+None.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-class-action@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2009, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

@@ -1,0 +1,11 @@
+[% 
+    title = 'Admin Index' ;
+
+    crumb1_name = 'Index' ;
+%]
+
+<p>
+[% IF page.comments %]<a href="[% cgipath %]/pages.cgi?act=diary-clist">Approval required on [% page.comments %] comment[% IF page.comments > 1 ; THEN ; 's' ; END %].</a>
+[% ELSE %]No comments have been submitted for approval.
+[% END %]
+</p>

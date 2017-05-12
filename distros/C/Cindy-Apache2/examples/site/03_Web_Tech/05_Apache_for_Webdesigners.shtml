@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html 
+  i18n:domain="Apache_Webdesign"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n" 
+>
+<head>
+  <script src="eventLogger.js" language="javascript"></script>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title i18n:translate="">Apache for Webdesigners</title>
+</head>
+
+<body>
+<h1 i18n:translate="">Apache for Webdesigners</h1>
+<span style="font-style: italic;" i18n:translate="">.htaccess for HTMLers</span>
+
+<p i18n:translate="">The
+apache webserver highly end user configurable. This is done on the
+directory level with <span style="font-weight: bold;" i18n:name="htaccess">.htaccess</span> files.</p>
+
+<h2 i18n:translate="">How do I do this?</h2>
+<h3 i18n:translate="">Default Images</h3>
+
+<p i18n:translate="">If in a directory an
+image is not found a default image shall be delivered. This is done by
+configuring the default image as an error document in .htaccess.
+</p>
+
+<pre><font color="#a52a2a"><b>&lt;Files</b></font><font color="#ff00ff"> "*.jpg"</font><font color="#a52a2a"><b>&gt;</b></font><br /><font color="#008b8b">ErrorDocument</font> 404 <span i18n:translate="">/path/needed/</span>dflt.jpg<br /><font color="#a52a2a"><b>&lt;/Files&gt;</b></font>
+</pre>
+
+<p i18n:translate="">The purpose of the Files
+container is to deliver the default image only for JPEGs. The
+browser would be correct to be confused if he would get this default
+image while requesting a GIF. </p>
+
+<p i18n:translate="">The
+method above has the disadvantage of writing 404s to the logfiles. If
+this is not desirable, mod_rewrite needs to take care of this before
+the 404 happens.
+</p>
+
+<pre><font color="#008b8b">RewriteEngine</font> <font color="#ff00ff">On</font><br /><font color="#008b8b">RewriteCond</font> %{REQUEST_FILENAME} !-f<br /><font color="#008b8b">RewriteRule</font> ^.*\.jpg$ dflt.jpg [L]<br /></pre>
+
+<h3 i18n:translate="">Marking Documents as Gone</h3>
+
+<p i18n:translate="">If a document has been removed you will find
+that search engine bots and the searchers that follow them keep
+requesting those documents for months (in case you read your logs). If
+you want the document to be removed from the
+search engines indexes it makes sense to replace the usual 404 (Not
+Found) with a 410 (Gone).</p>
+
+<pre><font color="#008b8b">RedirectMatch</font> <font color="#ff00ff">gone</font> ^/webalbum.*<br /><br /></pre>
+
+<p i18n:translate="">This is admittedly a bit unexpected for a directive 
+named RedirectMatch. Note that the third parameter has been omitted.</p>
+
+</body>
+</html>
+

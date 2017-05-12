@@ -1,0 +1,5 @@
+0.011 2017-01-15 17:19:00+0000
+  -Permit array of markers in Scattergeo
+0.010 2017-01-08 20:00:00+0000
+  -Add Changes file
+  -Extract trace examples to separate files

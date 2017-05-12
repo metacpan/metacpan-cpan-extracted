@@ -1,0 +1,82 @@
+Revision history for CLI-Dispatch
+
+0.21 2016/06/25
+  - Resolved #115600: Avoid to destroy some data of
+    a CLI::Dispatch::Command's child class (Yohei Yoshimuta++)
+
+0.20 2016/02/17
+  - fixed an option spec error under perl 5.8.1
+
+0.19 2014/03/31
+  - ::Help died if . was in the PATH (DJERIUS++)
+
+0.18 2014/03/29
+  - switched to Path::Tiny internally
+
+0.17 2013/02/05
+  - subcommand ("script.pl cmd subcmd args...") support, thanks to
+    Diab Jerius
+
+0.16 2012/11/06
+  - ::Command->new now accepts a hash of options so that
+    you can write ->new(%opts)->run(@args) .
+
+0.15 2012/08/01
+  - Log::Dump is not loaded when you provide your own "log" method.
+
+0.14 2011/11/05
+  - finer log control with --debug and --logfilter options
+
+0.13 2011/06/01
+  - use the first brief description found in the INC
+
+0.12 2010/12/19
+  - production release; no code changes
+
+0.11_03 2010/12/18
+  - encoding tweak for help
+
+0.11_02 2010/10/02
+  - make sure classes are unloaded after their availability are
+    confirmed (except those that are loaded before the check)
+
+0.11_01 2010/10/02
+  - use more Try::Tiny
+
+0.10 2010/09/29
+  - no code changes
+  - added Try::Tiny dependency, hoping to catch test errors correctly
+
+0.09 2010/09/23
+  - added run_directly method, which would be handy if you prefer
+    writing a set of independent scripts to writing one dispatcher
+    script.
+
+0.08 2010/08/09
+  - now CLI::Dispatch can accept multiple namespaces in which it
+    looks for subcommands.
+  - noted an example to provide a subcommand aliases.
+
+0.07 2010/04/17
+  - added a usage method
+
+0.06 2010/04/02
+  - support inline packages to pack everything in a script file
+
+0.05 2009/07/15
+  - Now you can add a "check" method to a command to see if it is
+    really available for a user (if the command dies there due to
+    the lack of recommended modules etc, the dying message will be
+    shown in the commands list). (rjbs++)
+
+0.04 2009/07/10
+  - should always parse .pod file if it exists (tokuhirom++)
+
+0.03 2009/05/16
+  - better error handling (not to show pod with an unexpected error)
+
+0.02 2008/11/17
+  - explicitly camelize the first argument for 'Help' command
+
+0.01 2008/11/17
+  - initial release

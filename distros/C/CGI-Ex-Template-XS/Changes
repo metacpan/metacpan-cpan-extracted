@@ -1,0 +1,29 @@
+Revision history for Perl extension CGI::Ex::Template::XS.
+
+0.06
+      Jun 14 2007
+        - Correct dependency in Makefile.PL
+
+0.05
+      Jun 12 2007
+        - Deprecate the module in favor of using Template::Alloy::XS
+        - Module still works - but is now a subclass of Template::Alloy::XS.
+
+0.04
+        - Allow for LOWER_CASE_VAR_FALLBACK for HTML::Template functionality
+
+0.03  May 17 2007
+        - Updates to keep internals in sync with CGI::Ex::Template 2.13
+        - Added support for VMETHOD_FUNCTIONS configuration.
+        - Allow for turning of name_is_private by unsetting CGI::Ex::Template::QR_PRIVATE
+
+0.02  May 08 2007
+        - Updates to keep internals in sync with CGI::Ex::Template 2.11
+
+0.01  Apr 27 2007
+        - Initial release on CPAN - in sync with CGI::Ex::Template 2.10
+
+0.00  Jul 27 2006
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 --name CGI::Ex::Template::XS
+

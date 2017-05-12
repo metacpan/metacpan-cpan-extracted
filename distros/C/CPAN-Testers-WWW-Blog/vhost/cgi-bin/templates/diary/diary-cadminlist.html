@@ -1,0 +1,79 @@
+[% 
+    title = 'Comment List' ;
+
+    crumb3_name = 'Diary' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=diary-admin' ;
+    crumb2_name = 'Comments' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=diary-clist' ;
+    crumb1_name = 'List' ;
+%]
+
+<div class="boxer">
+<table class="blocker3">
+<tr><td valign="top">
+
+  <p>The comments below require approval</p>
+  <form id="SEARCH" name="SEARCH" method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" id="act" name="act" value="diary-clist" />
+    <input type="hidden" id="mark" name="mark" value="" />
+    <input type="hidden" id="commentid" name="commentid" value="" />
+
+    Page: <input type="text" id="start" name="start" value="[% page.start %]" size="5" />
+    Entries per Page: <select id="limit" name="limit">
+    <option value="10"  [% IF page.limit == 10                %]selected="selected"[% END %]>10</option>
+    <option value="20"  [% IF page.limit == 20 || !page.limit %]selected="selected"[% END %]>20</option>
+    <option value="50"  [% IF page.limit == 50                %]selected="selected"[% END %]>50</option>
+    <option value="100" [% IF page.limit == 100               %]selected="selected"[% END %]>100</option>
+    </select>
+    <input type="submit" value="GO" />
+  </form>
+
+  <p>
+  [% IF page.this > 1 %]<a href="javascript:newpage(1);">first</a>[% ELSE %]first[% END %] ..
+  [% IF page.this > 1 %]<a href="javascript:newpage([% page.prev %]);">prev</a>[% ELSE %]prev[% END %] ..
+  this ..
+  [% IF page.this < page.last %]<a href="javascript:newpage([% page.next %]);">next</a>[% ELSE %]next[% END %] ..
+  [% IF page.this < page.last %]<a href="javascript:newpage([% page.last %]);">last</a>[% ELSE %]last[% END %] ([% page.comments %])
+  </p>
+
+  <form method="post" action="[% cgipath %]/pages.cgi">
+  <input type="hidden" name="act"     value="diary-clist" />
+  <input type="hidden" name="start"   value="[% page.start %]" />
+  <input type="hidden" name="limit"   value="[% page.limit %]" />
+  <input type="text"   name="pattern" value="" size="32" />
+  <input type="submit" value="Block Matching Posts" />
+  </form>
+
+</td><td align="right" valign="top">
+
+  [% IF offenders %]
+  <h3>Worst Offenders</h3>
+  <table class="blocker2">
+  [% FOREACH item = offenders %]
+  <tr><td>[% item.ipaddr %]</td><td>[% item.count %]</td></tr>
+  [% END %]
+  </table>
+  [% END %]
+
+</td></tr>
+</table>
+</div>
+
+[% IF comments.0 %]
+[% FOREACH item = comments %]
+    <h4>[% item.title %][% IF item.subject %]: [% item.subject %]</h4>[% END %]
+    [% item.body %]
+    <p class="small">Posted by [% item.author %] on [% item.postdate %] ([% item.ipaddr %])
+    <br />
+
+      <a href="[% cgipath %]/pages.cgi?act=diary-cmark&amp;mark=block&amp;commentid=[% item.commentid %]">Block</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cmark&amp;mark=allow&amp;commentid=[% item.commentid %]">Allow</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cedit&amp;commentid=[% item.commentid %]">Edit</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cpromote&amp;commentid=[% item.commentid %]">Approve</a>
+    | <a href="[% cgipath %]/pages.cgi?act=diary-cdelete&amp;commentid=[% item.commentid %]">Delete</a></p>
+    <hr />
+[% END %]
+[% ELSE %]
+<p>No Comments</p>
+<hr />
+[% END %]

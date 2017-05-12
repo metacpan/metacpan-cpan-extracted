@@ -1,0 +1,77 @@
+=head2 *** network ***
+
+The following variables can be set in this section:
+
+=over
+
+=item B<dns>
+
+address of the dns server
+
+Example: dns = 10.12.33.2
+
+=back
+
+The following sections are valid on level 1:
+
+=over
+
+=item B<+/\d+\.\d+\.\d+\.\d+/>
+
+Ip Adress
+
+The following variables can be set in this section:
+
+=over
+
+=item B<dns>
+
+address of the dns server
+
+Example: dns = 10.12.33.3
+
+=item B<netmask>
+
+Netmask
+
+Example: netmask = 255.255.255.0
+
+=item B<gateway>
+
+Default Gateway address in IP notation
+
+Example: gateway = 10.12.33.1
+
+=back
+
+=back
+
+=head2 *** hosts ***
+
+Details about the hosts
+
+Description of all the Hosts
+
+=over
+
+=item column 0
+
+Ethernet Address
+
+Example: 2:3:3:a:fb:cc:12:2
+
+=item column 1
+
+IP Address
+
+Example: 10.1.43.32
+
+=item column 2
+
+Unspecific Content
+
+=back
+
+=head2 *** text ***
+
+Unspecified Text content

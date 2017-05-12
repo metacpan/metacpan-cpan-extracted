@@ -1,0 +1,18 @@
+---
+name: Class-DBI-DFV
+version: 0.02
+author:
+  - Edmund von der Burg <evdb@ecclestoad.co.uk>
+abstract: check that your data is valid using DFV
+license: perl
+requires:
+  Class::DBI: 3.0.1
+  DBD::SQLite: 0
+  Data::Dumper: 0
+  Data::FormValidator: 4.02
+  Test::More: 0
+provides:
+  Class::DBI::DFV:
+    file: lib/Class/DBI/DFV.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

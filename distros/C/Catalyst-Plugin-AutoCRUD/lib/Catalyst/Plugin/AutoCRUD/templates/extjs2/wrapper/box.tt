@@ -1,0 +1,72 @@
+<div id="cpac_outer" class="cpac_box">
+    <noscript>
+        <div id="cpac_warning">
+            <h3>Javascript disabled ?</h3>
+            <br />
+            <p>It seems your web browser has not started the Javascript components which are required to view this site.</p>
+            <br />
+            <p>If you have Javascript disabled, please enable it and reload this page.</p>
+            <p>Otherwise, there could be a problem on the web server, so please contact this site's administrator.</p>
+        </div>
+    </noscript>
+
+    <div id="cpac_header">
+        [% IF cpac.g.title %]
+        <div class="cpac_top">
+            <div class="cpac_left">
+                [% IF cpac.g.site == 'default' %]
+                    <a href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('no_db') ) %]">Home</a> &gt;
+                    <a href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('no_table'), [cpac_db] ) %]">
+                        [% cpac.c.$cpac_db.display_name %]</a> &gt;
+                [% ELSE %]
+                    <a href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('no_schema'), [cpac.g.site] ) %]">Home</a> &gt;
+                    <a href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('no_source'), [cpac.g.site,cpac_db] ) %]">
+                        [% cpac.c.$cpac_db.display_name %]</a> &gt;
+                [% END %]
+                [% IF cpac.c.$cpac_db.t.keys.size == 1 %]
+                    [% cpac.c.$cpac_db.t.$cpac_table.display_name %]
+                [% ELSE %]
+                    <select id="cpac_picker" onchange="window.location = document.getElementById(this.id).value">
+                      [% FOREACH tpath IN cpac.c.$cpac_db.t.keys.sort %]
+                        [% NEXT IF cpac.c.$cpac_db.t.$tpath.hidden == 'yes' %]
+                        [% IF cpac.g.site == 'default' %]
+                            <option value="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('table'), [cpac_db], tpath ) %]"
+                        [% ELSE %]
+                            <option value="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('source'), [cpac.g.site,cpac_db], tpath ) %]"
+                        [% END %]
+                                [% ' selected="selected"' IF tpath == cpac_table %]>
+                                [% cpac.c.$cpac_db.t.$tpath.display_name %]</option>
+                      [% END %]
+                    </select>
+                [% END %]
+            </div>
+            <div class="cpac_right">
+              [% IF cpac.g.site == 'default' %]
+                <a id="cpac_browse_link" href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('table'),
+                                                        [cpac_db], cpac_table, 'browse', cpac.g.filter_params ) %]"
+              [% ELSE %]
+                <a id="cpac_browse_link" href="[% c.uri_for( c.controller('AutoCRUD::Root').action_for('source'),
+                                                        [cpac.g.site,cpac_db], cpac_table, 'browse', cpac.g.filter_params ) %]"
+              [% END %]
+                    title="Skinny (non-JS) Browser">
+                    <img src="[% c.uri_for( c.controller('AutoCRUD::Static').action_for('cpacstatic'), "application_view_detail.png" ) %]"
+                        alt="Skinny (non-JS) Browser" />
+                </a>
+            </div>
+        </div>
+
+        [% ELSE %]
+            [% content %]
+        [% END %]
+    </div>
+    
+    <div id="cpac_content">
+        [% IF cpac.g.title %]
+            [% content %]
+        [% END %]
+    </div>
+    
+    <div id="cpac_footer">
+        Powered by [% cpac.g.version %]
+    </div>
+</div> <!-- box -->

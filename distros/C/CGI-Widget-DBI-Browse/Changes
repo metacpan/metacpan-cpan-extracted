@@ -1,0 +1,128 @@
+=head1 NAME
+
+Changes - CGI::Widget::DBI::Browse change logfile
+
+=head1 CHANGES
+
+all changes without author attribution are by Adi Fairbank
+
+=over 3
+
+=item 0.17 - Dec 8, 2014
+
+call translate() method from Search module v0.31 on user-visible English strings, to support internationalization
+
+add a span around "Show all items in this category" so it can be replaced (via CSS) with something else
+
+add empty div so content can be added (via CSS content:) at the top of browse results for any level in category tree
+
+more unicode fixes: decode utf8 chars in link_for_category_column() and when -cache_categories enabled
+
+=item 0.16 - Feb 11, 2014
+
+add utf8 escaping to support browsing datasets with non-english-language characters
+
+add exception handling to prevent circular reference memory leak if an error occurs in display of results
+
+update for refactoring in CGI::Widget::DBI::Search version 0.30
+
+bugfix: auto-skip to results code was breaking the case of a single browse result on the final page of category choices
+
+HTML escape the id of the <a/> tag of each category browse choice
+
+=item 0.15 - Mar 14, 2013
+
+minor performance improvement by eliminating unnecessary calls to HTML-generation methods
+
+bugfix in unicode handling: use uri_escape_utf8() on all query string values in URIs used for navigation
+
+change id attribute of category navigation href: was just "categoryNavLink", now "categoryNavLink-[CATEGORY]"
+where [CATEGORY] is the category value where the user would navigate to if the href is followed
+
+minor change in behavior of -auto_skip_to_results: enable auto-skip for any category with just a
+single member, instead of only no members (sub-category value NULL) or single empty string member,
+since the whole point of this module is to make browsing datasets in a browser *easy*
+
+=item 0.14 - Jun 27, 2010
+
+add new -exclude_vars_from_breadcrumbs option to exclude some -href_extra_vars params
+from breadcrumb links
+
+refactor add_breadcrumbs_to_header() to make individual breadcrumbs available to calling object
+
+minor change to behavior of parent_category_column() and ancestor_category_columns() methods:
+when auto_skip_in_effect, return the parent or ancestors *before* auto-skip, instead of after
+
+improve link_for_category_column() method to support list of params to exclude from generated
+href, even when preseent in -href_extra_vars (useful for removing a search string param)
+
+add -href_extra_vars from search widget to query string for all browse navigation links:
+category browse, breadcrumb, skip-to-results, and link returned by link_for_category_column() method
+
+minor API changes:
+- new method auto_skip_to_results() which runs just the auto-skip code; also sets
+  'auto_skip_in_effect' object variable when auto-skip is triggered
+- new method build_results() which performs the search and calls auto_skip_to_results(),
+  in case external classes want to build results before calling display_results
+
+=item 0.13 - Oct 26, 2009
+
+document public methods, in preparation for first CPAN release
+
+add link_for_category_column() method to generate a link back to a certain place
+in the browse tree based on current result row data
+
+make auto-skip feature work with both no category rows, or a single category value
+of empty string: ''
+
+add -post_auto_skip_callback to allow a callback routine to run to update state of
+widget if in auto-skip mode
+
+add new -auto_skip_to_results option for auto showing results when we reach a category
+which has no members
+
+reformat display of skipToResultsLink to show on same line as breadcrumbs
+
+add support for a pre-existing search widget object in object construction
+
+set -form_extra_vars for _browse_skip_to_results_ so browsing will work embedded in forms
+
+fix for when used with -sql_search_columns / -sql_join_for_dataset options of
+CGI::Widget::DBI::Search, and new test case
+
+new method category_title() which returns a context-specific title which can be displayed
+to the user to denote where in the browse tree they currently are
+
+add hidden form fields to html output so category navigation state will be preserved
+across form (POST) submits
+
+fix bug when a column in -sql_retrieve_columns has a table alias (e.g. i.sub_category)
+
+add -category_sql_retrieve_columns and -category_column_closures options, for extra
+flexibility when rendering categories in browse mode (internal nodes in the browse tree)
+
+reverse order of columns returned by ancestor_category_columns()- now returned in same
+order as listed in -category_columns
+
+=item 0.12
+
+add automatic category caching functionality with -cache_categories option,
+for faster rendering of internal nodes in the browse tree
+
+refactoring to split component functionality into concise methods, for better reuse.
+new methods: configure_search_for_category_browse(), add_breadcrumbs_to_header()
+
+new methods parent_category_column(), and ancestor_category_columns() based on
+current position in browse tree
+
+=item 0.11
+
+add is_browsing() method to API to determine whether widget is browsing or showing results
+
+=item 0.10
+
+initial release
+
+=back
+
+=cut

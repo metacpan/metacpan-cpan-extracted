@@ -1,0 +1,266 @@
+NAME
+    Cache::Memcached::Turnstile - Thundering Herd Protection for Memcached
+    Clients
+
+SYNOPSIS
+      use Cache::Memcached::Turnstile qw(:all);
+  
+      my $memd_client = Cache::Memcached::Fast->new(...);
+  
+      my $value = cache_get_or_compute(
+        $memd_client,
+        key          => "foo", # key to fetch
+        expiration   => 60,    # [s] expiration to set if need to compute the value
+        compute_cb   => sub { ... expensive computation... return $result },
+        compute_time => 1,
+        wait         => 0.1,
+      );
+  
+      my $value_hash = multi_cache_get_or_compute(
+        $memd_client,
+        key          => [["foo", 60], ["bar", 120]], # key/expiration pairs
+        compute_cb   => sub {
+          my ($memd_client, $args, $keys_ary) = @_;
+          ... expensive computation...
+          return \@values;
+        },
+        compute_time => 1, # approx computation time per key (see below)
+      );
+
+DESCRIPTION
+    This is a prototype of a Thundering-Herd prevention algorithm for
+    memcached. As most such systems, it doesn't play entirely nicely with
+    incompatible modes of access to the same keys, but that's not so much
+    surprise, one would hope. Access to different keys in the same memcached
+    instance through different means is perfectly safe and compatible.
+
+    The logic in this module should be compatible with any Memcached client
+    library that has the same API as the Cache::Memcached::Fast module at
+    least for the following methods: "get", "set", "add", "gets", "cas". It
+    has only been tested with the aforementioned client library.
+
+  The Problem Statement
+    The algorithm described and implemented here attempts to provide means
+    of dealing with two kinds of situations. Most similar systems appear to
+    be targeted at the first and more common situation only:
+
+    1 A hot cached value expires. Between the point in time when it expired
+      and the time when the first user has recomputed the value and
+      successfully filled the cache, all users of the cache will, in a naive
+      cache client implementation, attempt to recalculate the value to store
+      in the cache. This can bring down back-end systems that are not
+      designed to handle the load of all front-ends that rely on the
+      cache[1].
+
+    2 A normal web environment has rather friendly, randomized access
+      patterns. But if your cache has a number of near-synchronized clients
+      that all attempt to access a new cache key in unison (such as when a
+      second or a minute roll around), then some of the mechanisms that can
+      help in situation 1 break down.
+
+  The Solution
+    A very effective approach to deal with most causes of situation 1) is
+    described in [2]. In a nutshell, it's a trade-off in that we accept that
+    for a small amount of time, we will serve data from a stale cache. This
+    small amount of time is the minimum of either: the time it takes for a
+    single process to regenerate a fresh cache value, or a configured safety
+    threshold. This has the effect that when a cache entry has expired, the
+    first to request the cache entry will start reprocessing, and all
+    subsequent accesses (until the reprocessing is done) will use the old,
+    slightly outdated cached data. This is a perfectly valid strategy in
+    many use cases and where extreme accuracy of the cached values is
+    required, it's usually possible to address that either by active
+    invalidation (deleting from memcached) or by simply setting a more
+    stringent expire time.
+
+    That approach does not handle situation 2), in which many clients
+    attempt to access a cache entry that didn't previously exist. To my
+    knowledge, there is no generic solution for handling that situation. It
+    will always require application specific knowledge to handle. For this
+    situation, there is a configurable back-off time, or a custom hook
+    interface to intercept such cases and handle them with custom logic.
+
+  The Algorithm
+    Situation 1 from above is handled by always storing a tuple in the cache
+    that includes the real, user-supplied expiration time of the cached
+    value. The expiration time that is set on the cache entry is the sum of
+    the user-supplied expiration time and an upper-bound estimate of the
+    time it takes to recalculate the cached value.
+
+    On retrieval of the cache entry (tuple), the client checks whether the
+    real, user-supplied expiration time has passed and if so, it will
+    recalculate the value. Before doing so, it attempts to obtain a lock on
+    the cache entry to prevent others from concurrently also recalculating
+    the same cache entry.
+
+    The locking is implemented by setting a flag on the tuple structure in
+    the cache that indicates that the value is already being reprocessed.
+    This can be done race-condition free by using the "add", "gets", and
+    "cas" commands supplied by Memcached. With the command that sets the
+    being-reprocessed flag on a tuple, the client always sets an expiration
+    time of the upper-bound of the expected calculation time, thus
+    protecting against indefinitely invalidating the cache when a
+    re-calculation fails, slows, or locks up.
+
+    On retrieval of a cache entry that is being reprocessed, other clients
+    than the one doing the reprocessing will continue to return the old
+    cached value. The time this stale value is in use is bounded by the
+    reprocessing time set as expiration above.
+
+    There are a number of conditions under which there is no such stale
+    value to use, however, including the first-use of the cache entry and a
+    cache entry that is used rarely enough to expire altogether before a
+    client finds it to be outdated. The pathological variant is one in which
+    a large number of clients concurrently request a cache value that is not
+    available at all (stale or not). In this situation, the remedy is
+    application dependent. By default, all clients but one wait for up to
+    the upper-bound on the time it takes to calculate the cached value. This
+    may result in a slow-down, but no Thundering Herd effect on back-end
+    systems. If a complete failure to provide the cached value is
+    preferrable to a slow-down, then that can be achieved by providing a
+    corresponding custom callback, see below.
+
+  Footnotes
+    [1]
+      I am of the firm (and learned) opinion that when you're in such a
+      situation, your cache is no longer strictly a cache and memcached is
+      no longer the appropriate technology to use.
+
+    [2]
+      See <https://github.com/ericflo/django-newcache> and
+      <https://bitbucket.org/zzzeek/dogpile.cache/> for examples of prior
+      art.
+
+API DOCUMENTATION
+  Exports
+    Optionally exports the "cache_get_or_compute" and
+    "multi_cache_get_or_compute" functions which are the main API of the
+    module. Also recognizes the standard "Exporter" semantics, including the
+    ":all" tag.
+
+  "cache_get_or_compute"
+    This function is the single-key implementation of the Thundering Herd
+    protection. "cache_get_or_compute" will attempt to fetch or compute the
+    cached value for the given key, and will try really hard to avoid more
+    than one user recomputing the cached value at any given time.
+
+    The first argument to "cache_get_or_compute" needs to be a Memcached
+    client object, typically a "Cache::Memcached::Fast" object. It's
+    followed by named parameters. The "key" parameter is required and
+    indicates the Memcached key to retrieve and/or store. The "compute_cb"
+    parameter needs to be a function reference that will, on cache miss,
+    compute the value to store in the cache and return it. It is invoked as
+    "$callback->($memd_client, $parameter_hashref)" where $parameter_hashref
+    is a hash reference of all other parameters provided to the
+    "cache_get_or_compute" call.
+
+    The "compute_time" parameter (in integer seconds) indicates a high
+    estimate of the time it might take to compute the value on cache miss.
+    You can generally be a tad generous on this. It defaults to 2 seconds.
+
+    The "expiration" parameter indicates the desired expiration time for the
+    computed value. It defaults to 0, which is unbounded retention. That is
+    not usually a good idea, so make sure to provide a better value. The
+    unit is seconds from "now" or, if more than 30 days, it's considered a
+    Unix epoch (Memcached rules, not ours).
+
+    Finally, the "wait" parameter can either be a function reference, a
+    number (may be fractional, in unit of seconds), or it may be omitted
+    altogether. If omitted, "wait" will be set to the "compute_time"
+    parameter if one was explicitly provided. Otherwise, it defaults to 0.1
+    seconds to avoid blocking clients too long.
+
+    If "wait" is a number (or it was set to a number as per the
+    aforementioned defaults), and if the running process has a cache miss,
+    but there is another process already updating the cached value, then we
+    will wait for "wait" number of seconds and retry to fetch (once).
+
+    If "wait" is a function reference, then that function will be called
+    under the conditions we'd otherwise wait & retry. The function is
+    invoked as "$wait->($memd_client, $parameter_hashref)". Its return value
+    is directly returned from "cache_get_or_compute", so if you want logic
+    similar to the *wait, then retry* logic that is the default, then you
+    could use a callback like the following:
+
+      wait => sub {
+        my ($memd_client, $args) = @_;
+        # ... custom logic here ...
+        # Retry. But don't go into infinite loop, thus the empty callback:
+        return cache_get_or_compute($memd_client, %$args, "wait" => sub {return()});
+      }
+
+  "multi_cache_get_or_compute"
+    This function is the multi-key implementation of the Thundering Herd
+    protection, that is, it attempts to minimize the number of client-server
+    roundtrips as much as it can and reaches for Memcached's batch interface
+    throughout.
+
+    "multi_cache_get_or_compute" will attempt to fetch or compute the cached
+    value for the each of the keys, and will try really hard to avoid more
+    than one user recomputing any given cached value at any given time. Most
+    of the interface mimicks that of the single-key version as much as
+    possible, but there are some important differences highlighted below. As
+
+    "keys" needs to be a reference to an array containing array references
+    of key/expiration pairs. "compute_cb" receives an extra, third,
+    parameter as compared to the single-key implementation: A references to
+    an array containing the keys for which values need to be computed. (This
+    list of keys is possibly only a subset of the original set of keys.) The
+    callback needs to return a reference to an array of values which
+    correspond to the computed values for each input key in turn.
+
+    The "wait" parameter works fundamentally the same as in the single-key
+    function, but the callback variant also receives a third parameter: The
+    list of keys whose values weren't available from the cache and couldn't
+    be locked for computation. The callback is expected to return a hash
+    reference of keys and values. This is different from the "compute_cb"
+    interface to allow for easy calling back into
+    "multi_cache_get_or_compute" for retries (see the "wait" example for the
+    single-key implementation above).
+
+    As with the single-key variant, "compute_time" is the additional
+    cached-value life time for a single value, so should at least be an
+    upper bound (or slightly more) on the computation-time for a single key.
+    Alas, there is a trade-off here: Since the implementation seeks to limit
+    the number of roundtrips as much as possible, it will pass all
+    keys-to-be-computed to one run of the "compute_cb". This means that the
+    computation time can add up to be significantly more than the single-key
+    "compute_time" value, so the "compute_time" parameter may have to be
+    adjusted upwards depending on the situation and relative cost. Failing
+    to do so will result in seeing more hard cache misses on concurrent use
+    as well as an increase in the number of cache entries being recomputed
+    multiple times in parallel, which this module aims to avoid in the first
+    place.
+
+    In other words, the rule of thumb for the multi-key interface is: Be
+    somewhat generous on the "compute_time" setting and provide a separate
+    and appropriate "wait" time or implementation.
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Thundering_herd_problem>
+
+    Cache::Memcached::Fast
+
+    <https://github.com/ericflo/django-newcache> and
+    <https://bitbucket.org/zzzeek/dogpile.cache/> for examples of prior art.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+    Rafaël Garcia-Suarez, <rgs@consttype.org<gt>
+
+ACKNOWLEDGMENT
+    This module was originally developed for Booking.com. With approval from
+    Booking.com, this module was generalized and put on CPAN, for which the
+    authors would like to express their gratitude.
+
+COPYRIGHT AND LICENSE
+     (C) 2013 Steffen Mueller. All rights reserved.
+ 
+     This code is available under the same license as Perl version
+     5.8.1 or higher.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

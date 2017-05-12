@@ -1,0 +1,32 @@
+Revision history for Perl extension Convert::Bencode_XS.
+
+0.06  Sun Nov 12 18:49:00 AEST 2006
+    - use sv_catpvn instead of sv_catpvf for string values
+        (works with binary data blobs) as reported by many.
+
+0.05  Thu Jun  8 14:33:21 JST 2006
+    - function bdecode totally rewritten in C by Andrew Danforth with
+      clear performance increase
+    
+0.04  Tue Nov 15 14:47:00 JST 2005
+    - small changes in Bencode_XS.xs helps compiling under MSVSC
+        (thanx to Nilson Santos Figueiredo Junior nilsonsfj@cpan.org)
+
+0.03  Mon Nov  3 18:15:38 CET 2003
+    - we use qsort instead of sortsv 
+        (apparent speedup and should compile on 5.6)
+    - now we sort hash keys comparing them the rawest way possible
+        we consider no UTFness or locale
+    - using SVt_PVAV and SVt_PVHV instead of 10 and 11
+    - other minor adjustments
+    
+0.02  Thu Oct 30 17:33:13 CET 2003
+    - fixed warning in bencode()
+    - added META.yml
+    - removed a repeated "our" in bench_decode.pl
+    - other minor adjustments
+
+0.01  Wed Oct 22 18:26:52 2003
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.0 Convert::Bencode_XS
+

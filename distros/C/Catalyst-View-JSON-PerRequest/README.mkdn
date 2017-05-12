@@ -1,0 +1,151 @@
+# NAME
+
+Catalyst::View::JSON::PerRequest - JSON View that owns its data 
+
+# SYNOPSIS
+
+    MyApp->inject_components(
+      'View::JSON' => { from_component => 'Catalyst::View::JSON::PerRequest' }
+    );
+
+    # In a controller...
+
+    sub root :Chained(/) CaptureArgs(0) {
+      my ($self, $c) = @_;
+      $c->view('JSON')->data->set(z=>1);
+    }
+
+    sub midpoint :Chained(root) CaptureArgs(0) {
+      my ($self, $c) = @_;
+      $c->view('JSON')->data->set(y=>1);
+    }
+
+    sub endpoint :Chained(midpoint) Args(0) {
+      my ($self, $c) = @_;
+      $c->view('JSON')->send_created({
+        a => 1,
+        b => 2,
+        c => 3,
+      });
+    }
+
+# DESCRIPTION
+
+This is a [Catalyst::View](https://metacpan.org/pod/Catalyst::View) that produces JSON response from a given model.
+It differs from some of the more classic JSON producing views (such as
+[Catalyst::View::JSON](https://metacpan.org/pod/Catalyst::View::JSON) in that is is a per request view (one view for each
+request) and it defines a 'data' method to hold information to use to produce
+a view.
+
+It also generates some local response helpers.  You may or may not find this
+approach leads to cleaner code.
+
+# METHODS
+
+This view defines the following methods
+
+## data (?$model)
+
+Used to set the view data model, and/or to called methods on it (for example
+to set attributes that will later be used in the JSON response.).
+
+The default is an injected model based on [Catalyst::Model::JSON::ViewData](https://metacpan.org/pod/Catalyst::Model::JSON::ViewData)
+which you should review for basic usage.  I recommend setting it to a custom
+model that better encapsulates your view data.  You may use any model in your
+[Catalyst](https://metacpan.org/pod/Catalyst) application as long as it does the method "TO\_JSON".
+
+You may only set the view data model once.  If you don't set it and just call
+methods on it, the default view model is automatically used.
+
+## send
+
+    $view->send($status, @headers, \%data||$object);
+    $view->send($status, \%data||$object);
+    $view->send(\%data||$object);
+    $view->send($status);
+    $view->send($status, @headers);
+
+Used to send a response.  Calling this method will setup an http status, finalize
+headers and set a body response for the JSON.  Content type will be set to
+'application/json' automatically (you don't need to set this in a header).
+
+## Method '->send' Helpers
+
+We map status codes from [HTTP::Status](https://metacpan.org/pod/HTTP::Status) into methods to make sending common
+request types more simple and more descriptive.  The following are the same:
+
+    $view->send(200, @args);
+    $view->send_ok(@args);
+
+See [HTTP::Status](https://metacpan.org/pod/HTTP::Status) for a full list of all the status code helpers.
+
+# ATTRIBUTES
+
+This View defines the following attributes that can be set during configuration
+
+## callback\_param
+
+Optional.  If set, we use this to get a method name for JSONP from the query parameters.
+
+For example if 'callback\_param' is 'callback' and the request is:
+
+    localhost/foo/bar?callback=mymethod
+
+Then the JSON response will be wrapped in a function call similar to:
+
+    mymethod({
+      'foo': 'bar',
+      'baz': 'bin});
+
+Which is a common technique for overcoming some cross-domain restrictions of
+XMLHttpRequest.
+
+There are some restrictions to the value of the callback method, for security.
+For more see: [http://ajaxian.com/archives/jsonp-json-with-padding](http://ajaxian.com/archives/jsonp-json-with-padding)
+
+## default\_view\_model
+
+The [Catalyst](https://metacpan.org/pod/Catalyst) model that is the default model for your JSON return.  The
+default is set to a local instance of [Catalyst::Model::JSON::ViewData](https://metacpan.org/pod/Catalyst::Model::JSON::ViewData)
+
+## json\_class
+
+The class used to perform JSON encoding.  Default is [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
+
+## json\_init\_args
+
+Arguments used to initialize the ["json\_class"](#json_class).  Defaults to:
+
+    our %JSON_INIT_ARGS = (
+      utf8 => 1,
+      convert_blessed => 1);
+
+# UTF-8 NOTES
+
+Generally a view should not do any encoding since the core [Catalyst](https://metacpan.org/pod/Catalyst)
+framework handles all this for you.  However, historically the popular
+Catalyst JSON views and related ecosystem (such as [Catalyst::Action::REST](https://metacpan.org/pod/Catalyst::Action::REST))
+have done UTF8 encoding and as a result for compatibility core Catalyst code
+will assume a response content type of 'application/json' is already UTF8 
+encoded.  So even though this is a new module, we will continue to maintain this
+historical situation for compatibility reasons.  As a result the UTF8 encoding
+flags will be enabled and expect the contents of $c->res->body to be encoded
+as expected.  If you set your own JSON class for encoding, or set your own
+initialization arguments, please keep in mind this expectation.
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::View](https://metacpan.org/pod/Catalyst::View), [Catalyst::View::JSON](https://metacpan.org/pod/Catalyst::View::JSON),
+[CatalystX::InjectComponent](https://metacpan.org/pod/CatalystX::InjectComponent), [Catalyst::Component::InstancePerContext](https://metacpan.org/pod/Catalyst::Component::InstancePerContext),
+[JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

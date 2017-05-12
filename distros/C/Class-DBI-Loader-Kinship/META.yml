@@ -1,0 +1,29 @@
+---
+name: Class-DBI-Loader-Kinship
+version: 0.03
+author:
+  - 'Ioannis Tambouras <ioannis@cpan.org>'
+abstract: Fixes to Class::DBI::Loader
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::DBI::Loader: 0
+  Class::DBI::Pg: 0
+  perl: 5.006
+recommends:
+  Test::Pod: 1.20
+  Test::Pod::Coverage: 1.06
+provides:
+  Class::DBI::Loader::Generic:
+    file: lib/Class/DBI/Loader/Kinship.pm
+  Class::DBI::Loader::Kinship:
+    file: lib/Class/DBI/Loader/Kinship.pm
+    version: 0.03
+  Class::DBI::Loader::Pg:
+    file: lib/Class/DBI/Loader/k_Pg.pm
+    version: 0.30
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

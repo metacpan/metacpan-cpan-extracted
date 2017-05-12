@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html ; charset=iso-8859-1">
+  <title>Informations DSLIP</title>
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+</head>
+<body>
+  Voici la liste compl&egrave;te des options DSLIP&nbsp;: 
+  <dl>
+    
+    <dt class="l1">D - Stade de d&eacute;veloppement (Note&nbsp;: * PAS DE CALENDRIER D&Eacute;TERMIN&Eacute; *)</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>i</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Id&eacute;e, &agrave; d&eacute;battre ou simplement plac&eacute;e l&agrave; pour l'instant</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>En d&eacute;veloppement, version pr&eacute;-alpha (pas encore distribu&eacute;)</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Version alpha</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Version b&ecirc;ta</td>
+        </tr>
+      
+        <tr>
+          <td>R</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Distribu&eacute;</td>
+        </tr>
+      
+        <tr>
+          <td>M</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Stable (pas de d&eacute;finition pr&eacute;cise)</td>
+        </tr>
+      
+        <tr>
+          <td>S</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Standard, fourni avec Perl 5</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">S - Niveau de support</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>m</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Liste de diffusion</td>
+        </tr>
+      
+        <tr>
+          <td>d</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>D&eacute;veloppeur</td>
+        </tr>
+      
+        <tr>
+          <td>u</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Forum Usenet comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Inconnu, essayez comp.lang.perl.modules</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Abandonn&eacute;, le module a &eacute;t&eacute; abandonn&eacute; par son auteur</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">L - Langage utilis&eacute;</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl uniquement, pas besoin de compilateur, a priori ind&eacute;pendant de plate-forme</td>
+        </tr>
+      
+        <tr>
+          <td>c</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C et Perl, un compilateur C est n&eacute;cessaire</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Hybride, &eacute;crit en Perl avec du code C optionnel, pas besoin de compilateur</td>
+        </tr>
+      
+        <tr>
+          <td>+</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>C++ et Perl, un compilateur C++ est n&eacute;cessaire</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Perl et un langage autre que C ou C++</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">I - Style d'interface</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>f</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Fonctions simples, sans utilisation de r&eacute;f&eacute;rence</td>
+        </tr>
+      
+        <tr>
+          <td>h</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Interface hybride, orient&eacute;e objet et proc&eacute;durale</td>
+        </tr>
+      
+        <tr>
+          <td>n</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Aucune interface (hein ?)</td>
+        </tr>
+      
+        <tr>
+          <td>r</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Utilisation sporadique de r&eacute;f&eacute;rences non b&eacute;nies ou de r&eacute;f&eacute;rences li&eacute;es ("ties")</td>
+        </tr>
+      
+        <tr>
+          <td>O</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Orient&eacute; objet, avec des r&eacute;f&eacute;rences b&eacute;nies et/ou de l'h&eacute;ritage</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+    <dt class="l1">P - Licence d'utilisation</dt>
+    <dd>
+      <table>
+      
+        <tr>
+          <td>p</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Licence Perl : l'utilisateur peut choisir entre les licences GPL et artistique</td>
+        </tr>
+      
+        <tr>
+          <td>g</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>GPL : Licence GPL ("GNU General Public License")</td>
+        </tr>
+      
+        <tr>
+          <td>l</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>LGPL : Licence LGPL ("GNU Lesser General Public License") (pr&eacute;c&eacute;demment nomm&eacute;e "GNU Library General Public License")</td>
+        </tr>
+      
+        <tr>
+          <td>b</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>BSD : Licence BSD</td>
+        </tr>
+      
+        <tr>
+          <td>a</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Licence artistique uniquement</td>
+        </tr>
+      
+        <tr>
+          <td>o</td>
+          <td>&nbsp;-&nbsp;</td>
+          <td>Autre (mais la distribution est autoris&eacute;e sans restriction)</td>
+        </tr>
+      
+      </table>
+    </dd>
+    
+  </dl>
+  <p><b>AVIS DE NON-RESPONSABILIT&Eacute;&nbsp;:</b> Ce qui est indiqu&eacute; dans le champ
+   "Licence d'utilisation" ne l'est qu'&agrave; titre indicatif et n'a aucune
+   valeur juridique. Pour obtenir des informations pr&eacute;cises sur un module et ses
+   fichiers, veuillez-vous reporter &agrave; la distribution du module ou contactez
+   directement son auteur. Merci d'informer la liste <a
+   href="mailto:modules@perl.org">modules@perl.org</a> si vous rencontrez des erreurs
+   dans le contenu du champ "Licence d'utilisation". 
+</p>
+  <hr>
+</body>
+</html>
+

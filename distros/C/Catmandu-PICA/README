@@ -1,0 +1,44 @@
+NAME
+
+    Catmandu::PICA - Catmandu modules for working with PICA+ data
+
+DESCRIPTION
+
+    Catmandu::PICA provides methods to work with PICA data within the
+    Catmandu framework.
+
+    See PICA::Data for more information about PICA data format and record
+    structure.
+
+    See Catmandu::Introduction and http://librecat.org/ for an introduction
+    into Catmandu.
+
+CATMANDU MODULES
+
+      * Catmandu::Importer::PICA
+
+      * Catmandu::Exporter::PICA
+
+      * Catmandu::Importer::SRU::Parser::picaxml
+
+      * Catmandu::Fix::pica_map
+
+CONTRIBUTORS
+
+    Johann Rolschewski, <jorol@cpan.org>
+
+    Jakob Voß <voss@gbv.de>
+
+COPYRIGHT
+
+    Copyright 2014- Johann Rolschewski and Jakob Voss
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    PICA::Data, Catmandu
+

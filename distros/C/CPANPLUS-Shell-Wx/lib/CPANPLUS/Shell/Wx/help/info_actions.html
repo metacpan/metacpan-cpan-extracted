@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>wxCPAN :: Information Pane :: Actions Tab</title>
+</head>
+<body>
+<h1>Actions Tab</h1>
+<img src="images/info_actions.png"/>
+<p>The Actions tab is where you can find all the actions which you can do to a module. This pane has the following fields:</p>
+<ul>
+    <li><a href="#version">Version List</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#uninstall">Uninstall</a></li>
+    <li><a href="#check">Check For Other Versions</a></li>
+    <li><a href="#disable">Disable Dependency Check</a></li>
+    <li><a href="#force">Force</a></li>
+    <li><a href="#order">Install Order</a>
+        <ol>
+            <li><a href="#fetch">Fetch</a></li>
+            <li><a href="#extract">Extract</a></li>
+            <li><a href="#prepare">Prepare</a></li>
+            <li><a href="#build">Build</a></li>
+            <li><a href="#test">Test</a></li>
+        </ol>
+    </li>
+    <li><a href="#extended">Get Extended Info</a></li>
+</ul>
+
+<h2 id="version">Version List</h2>
+<p>This is a list of all versions available on CPAN. You may want to check the <a href="info_report.html">Report Tab</a> to make sure the version you want to install is compatible with your system. Click on the &quot;<a href="">Check For Other Versions</a>&quot; text to populate this list.</p>
+
+<h2 id="install">Install</h2>
+<p>Install the selected version, or the most up-to-date version (if no version is selected) of a module.</p>
+
+<h2 id="uninstall">Uninstall</h2>
+<p>Uninstall the selected module.</p>
+
+<h2 id="check">Check For Other Versions</h2>
+<p>Clicking on this text retrieves the versions available from CPAN, and populates the version list. The version information is not automatically retrieved when you select an item, because it may take some time to get the necessary inforamtion.</p>
+
+<h2 id="disable">Disable Dependency Check</h2>
+<p>Check this to disable dependency checking, if you want to force a module to install with no dependecies.</p>
+
+<h2>Install Order</h2>
+<p>The buttons after this text are used to directly invoke part of the installation process on a module. They are listed in the order they are called during the installation process, when clicking on Install.</p>
+
+<h3 id="fetch">Fetch</h3>
+<p>Download the module to disk.</p>
+
+<h3 id="extract">Extract</h3>
+<p>Extracts the module from its archive.</p>
+
+<h3 id="prepare">Prepare</h3>
+<p>Prepares the module for installation.</p>
+
+<h3 id="build">Build</h3>
+<p>Builds the module from source.</p>
+
+<h3 id="test">Test</h3>
+<p>Tests the module.</p>
+
+<h2 id="extended">Get Extended Info</h2>
+<p>This button retrieves and populates all the information in all the other tabs in the Information Panel. As this may take quite a while, intercting with those tabs individually is recommended.</p>
+
+</body>
+</html>

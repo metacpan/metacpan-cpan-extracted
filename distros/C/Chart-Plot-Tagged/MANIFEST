@@ -1,0 +1,8 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Chart-Plot-Tagged.t
+lib/Chart/Plot/Tagged.pm
+META.yml                                 Module meta-data (added by MakeMaker)

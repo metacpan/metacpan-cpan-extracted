@@ -1,0 +1,17 @@
+---
+name: CGI-Application-Plugin-Forward
+version: 1.06
+author:
+  - Michael Graham <mag-perl@occamstoothbrush.com>
+abstract: Pass control from one run mode to another
+license: perl
+requires:
+  CGI::Application: 0
+  Test::More: 0
+recommends:
+  CGI::Application::Plugin::AutoRunmode: 0.09
+provides:
+  CGI::Application::Plugin::Forward:
+    file: lib/CGI/Application/Plugin/Forward.pm
+    version: 1.06
+generated_by: Module::Build version 0.2611

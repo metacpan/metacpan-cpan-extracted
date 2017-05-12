@@ -1,0 +1,10 @@
+TODO
+----
+
+provide additional arguments to is_a to cause specified methods to be inheritable
+
+use sub attributes to declare methods in superclass as inheritable via is_a.
+
+write proper tests using DBI::MockObject
+
+

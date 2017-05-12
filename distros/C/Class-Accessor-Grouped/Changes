@@ -1,0 +1,171 @@
+Revision history for Class::Accessor::Grouped.
+
+0.10012 2014-10-05 21:22 (UTC)
+    - Fix tests tickling deficient threads on perl 5.10.0
+
+0.10011 2014-09-26 11:24 (UTC)
+    - Soft-depend on newer (bugfixed and *simpler*) Class::XSAccessor 1.19
+    - More robust threading tests
+
+0.10010 2013-04-24 02:58 (UTC)
+    - Fix bug with identically-named 'simple' accessors in different
+      classes set to access *differently named fields* getting their
+      field access mixed up
+    - Fix subtle pessimization when having identically-named accessors
+      in different classes leads to 'simple' implementations not being
+      replaced by Class::XSAccessor where appropriate
+
+0.10009 2012-11-15 18:51 (UTC)
+    - Stop leaking extra methods into the inheritance chain - there
+      are plenty already
+
+0.10008 2012-11-15 09:48 (UTC)
+    - Allow disabling of accessor name checking introduced in 0.10007
+    - Pass tests if Class::XSAccessor is available but Sub::Name isn't
+
+0.10007 2012-11-08 11:54 (UTC)
+    - Disable tests on perls where Class::XSAccessor emits broken
+      error messages (RT#74883, RT#80519)
+    - Drop minimum perl to 5.6 (from 5.6.2)
+    - Switch all module loading to Module::Runtime and lose
+      dependency on Class::Inspector
+    - Fix stupid mistake causing double-require of Sub::Name when
+      Class::XSAccessor is not available (RT#80657)
+    - Simplify superclass traversal done by the 'inherited' group type
+    - Fix incorrect quoting of unusual hash keys (fieldnames)
+    - Depend on newer bugfixed Class::XSAccessor 1.15
+    - Improve text of ro/wo violation exceptions
+    - Sanity-check accessor names for well-formedness
+      (qr/[A-Z_a-z][0-9A-Z_a-z]*/)
+
+0.10006 2011-12-30 03:52 (UTC)
+    - Silence warnings resulting from incomplete can() overrides
+      hiding get/set_simple methods
+
+0.10005 2011-12-26 12:43 (UTC)
+    - Depend on newer bugfixed Class::XSAccessor
+    - Repack with correct metadata (RT#73100)
+
+0.10004 2011-11-28 21:20 (UTC)
+    - No longer leak internal __CAG* methods into the inheritable
+      namespace
+
+0.10003 2011-05-03 00:15 (UTC)
+    - Only require MRO::Compat for older perls
+    - Add SYNOPSIS
+    - Add examples for methods that get used most often
+
+0.10002 Sun Dec 19 05:23:44 2010
+    - Fix grave bug of XS-enabled simple accessors clobbering an
+      existing 'around' overlay installed in the same method slot
+    - Require bugfixed XSAccessor, remove Win32 caveat
+
+0.10001 Sun Dec 12 03:17:05 2010
+    - Fix an ActiveState Win32 incompatibility
+    - Fix spurious method re-invocation warnings after Class::Unload
+
+0.10000 Sat Nov 27 17:51:04 2010
+    - Fix perl 5.6 failures
+    - Add test-time deferred coderef reinvocation checks
+    - Another minor (8%) speedup
+
+0.09009 Fri Nov 26 01:31:56 2010
+    - Major cleanup and optimization of code (evaled coderef sharing)
+    - Module can now operate in PurePerl environments with 100%
+      compatibility (including proper naming of generated coderefs)
+
+0.09008 Sun Oct 11 07:41:56 2010
+    - Put back a private undocumented method that the DBIC-CDBI compat
+      layer relies on :(
+    - Fix corner case segfaults with C::XSA and old 5.8 perls
+
+0.09007 Sat Oct  9 10:22:56 2010 (DELETED)
+    - Fix corner case when get/set_simple overrides are circumvented
+      iff Class::XSAccessor is present
+
+0.09006 Fri Sep 10 23:55:00 2010
+    - Fix bugs in ro/wo accessor generation when XSAccessor is
+      being used
+    - Better Class::XSAccessor usage control - introducing
+      $ENV{CAG_USE_XS} and $Class::Accessor::Grouped::USE_XS
+
+0.09005 Wed Sep  1 04:00:00 2010
+    - Again, remove Class::XSAccessor for Win32 sine it still breaks
+
+0.09004 Wed Aug 11 04:23:15 2010
+    - Changed the way Class::XSAccessor is invoked if available
+      (recommended by C::XSA author)
+    - Modified internal cache names to avoid real accessor clashes
+    - Some micro-optimizations for get_inherited
+    - Fixed field names with a single quote in them (patch from Jason Plum)
+
+0.09003 Fri Apr 23 23:00:19 2010
+    - use Class::XSAccessor if available for 'simple' accessors, except on
+      MSWin32, with documentation
+
+0.09002 Tue Oct 20 23:16:28 2009
+    - removing Class::XSAccessor usage for now
+
+0.09001 Thu Oct  1 21:48:06 2009
+    - remove optional dep from Makefile.PL
+
+0.09000 Sun Aug 23 20:08:09 2009
+    - release
+
+0.08999_01 Tue July 7 22:06:21 2009
+    - Make _mk_group_accessors name the closures installed for Moose compat
+    - Use Class::XSAccessor if available RT#45577 (Andy Grundman)
+
+0.08003 Sat Mar 21 9:27:24 2009
+    - Fixed set_inherited under C3::Componentised: RT#43702, RIBASUSHI
+
+0.08002 Mon Nov 17 20:27:22 2008
+    - Removed unnecessary code in get_simple: RT#40992, BUCHMULLER Norbert
+
+0.08001 Wed Jan 09 19:35:34 2008
+    - Fixed Makefile.PL tests setting that was killing older installs
+
+0.08000 Tue Jan 08 18:22:47 2008
+    - Bumped version for release. No changes oherwise.
+
+0.07009_01 Fri Dec 28 18:08::00 2007
+    - Tweak code for pure speed while fixing performance issue when assigning @_
+    under Perl 5.10.0
+
+0.07000
+    - Altered get_inherited to return undef rather than () when no value
+        set for Class::Data::(Inheritable|Accessor) compatiblity
+    - Fixed spelling test error
+    - Added WriteAll/DIST/PREOP for README
+
+0.06000 Fri May 11 22:00:26 2007
+    - get_super_paths now uses mro::get_linear_isa to DTRT under C3
+
+0.05002 Fri May 11 20:46:16 2007
+    - killed Class::Inspector->installed warnings
+
+0.05001 Thur May 10 20:55:11 2007
+    - set_component_class now only dies if the specified class is a
+        installed/installable class and fails to load it.
+
+0.05000 Tue May 08 19:42:33 2007
+    - Added get/set_component_class
+
+0 04000 Sat May 05 21:17:23 2007
+    - Converted to Module::Install
+    - Added culterific tests/TEST_AUTHOR
+    - Converted to distro friendly version number
+
+0.03  2006-11-07 21:33::35
+    - big speedup for get_inherited
+    - get_inherited now checks the current class first before calculating
+        super_path
+    - get_inherited now caches super_path results
+
+0.02  2006-06-26 19:23:13
+    - Added return statement to end of get_inherited
+    - Fixed pod NAME
+
+0.01  2006-06-26 17:38:23
+    - initial release
+

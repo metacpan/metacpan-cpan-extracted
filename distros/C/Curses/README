@@ -1,0 +1,131 @@
+                           The Curses Perl Module
+
+
+============================================================
+COPYRIGHT AND LICENSE INFORMATION IS AT THE END OF THIS FILE
+============================================================
+
+This is a dynamic loadable curses module for perl.  You can get this
+package at any CPAN archive.
+
+Please see the INSTALL document for how to install it on your system,
+the Curses pod (located at the end of "Curses.pm") for known
+incompatibilities with other Perl programs, and the end of this
+document for known compile or install problems.
+
+RECENT CHANGES
+--------------
+
+The change history is in the file HISTORY.
+ 
+
+BINARY DISTRIBUTIONS
+--------------------
+
+There is a binary package for Cygwin at
+
+  ftp://sunsite.dk/projects/cygwinports/release/perl/perl-Curses
+
+The maintainer of this CPAN source package doesn't know of any others,
+but if you do, let him know and he will add them here.
+
+
+DEMO PROGRAMS
+-------------
+
+The "demo" program is for demonstration purposes only.  If it
+references a function your version of curses doesn't have, wrap it in
+an "eval" and try again.  Same goes double for the "gdc" program.
+You can type "make cdemo" to make a C language version of the demo.
+If you get the same results via "demo" and "cdemo", but they don't
+look right, then it's a bug in your libcurses, not in Curses.
+
+
+MAINTENANCE
+-----------
+
+Bryan Henderson maintains the Perl Curses module.  Bryan doesn't actually
+know much about it, and is functioning mainly as a coordinator.  Go ahead
+and report bugs to and ask technical questions of Bryan, but don't hold
+your breath.  If you should have a fix or enhancement, though, Bryan will
+incorporate it into the package promptly.
+
+Email Bryan at bryanh@giraffe-data.com.  Do not use the CPAN bug
+database to report a bug.  It's more work for both parties and Bryan
+doesn't know a bug has been opened except when he occasionally goes to
+look.
+
+
+*** SECURITY NOTICE ***
+
+It has always been the case with the curses functions, but please note
+that the following functions:
+
+    getstr()   (and optional wgetstr(), mvgetstr(), and mvwgetstr())
+    inchstr()  (and optional winchstr(), mvinchstr(), and mvwinchstr())
+    instr()    (and optional winstr(), mvinstr(), and mvwinstr())
+
+are subject to buffer overflow attack.  This is because you pass in
+the buffer to be filled in, which has to be of finite length, but
+there is no way to stop a bad guy from typing.
+
+In order to avoid this problem, use the alternate functions:
+
+   getnstr()
+   inchnstr()
+   innstr()
+
+which take an extra "size of buffer" argument or the wide-character-aware
+getstring() and instring() versions.
+
+
+Known Problems
+--------------
+NCurses
+   getch() and getstr() don't work right under very old versions of
+   ncurses (around v1.8.5).
+
+   panel_hidden() test is reversed in v1.9.9g.
+
+   Actually, there are several problems in v1.9.9g.
+
+NETBSD
+
+   William reported as of 2001: I continue to get conflicting reports
+   about the correct number of arguments for longname() and
+   touchline(), controlled via the file `hints/c-netbsd.h'.  Before
+   compiling, you may want to look them up yourself, confirm them, and
+   then editing `hints/c-netbsd.h'.
+
+Solaris 2.6
+
+   The menu stuff doesn't appear to work.  I have no idea why.
+
+
+
+COPYRIGHT AND LICENSE INFORMATION
+---------------------------------
+
+	 Copyright (c) 1994-2000  William Setzer
+                   All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as perl, specifically:
+
+        a) the GNU General Public License as published by the Free
+        Software Foundation; either version 1, or (at your option) any
+        later version, or
+
+        b) the "Artistic License" which comes with this Kit.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details. 
+
+    You should have received a copy of the Artistic License with this
+    Kit, in the file named "Artistic".  If not, I'll be glad to provide one.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.

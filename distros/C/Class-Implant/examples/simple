@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use Class::Inspector;
+use lib qw(lib);
+
+
+package Foo::Bar;
+sub foo { "foo" }
+sub bar { "bar" }
+
+
+package Less::More;
+sub less { "less" }
+sub more { "more" }
+
+
+package Hello;
+use Class::Implant;
+use Data::Dumper;
+implant qw(Less::More Foo::Bar), { inherit => 1, exclude => [qw(import)] };
+sub isa { @ISA }
+
+
+package main;
+for (qw(foo bar less more)) {
+  eval qq{ print Hello::$_, "\n" };
+}
+print Hello::isa(), "\n";
+
+

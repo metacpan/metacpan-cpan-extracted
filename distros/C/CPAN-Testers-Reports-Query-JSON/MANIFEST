@@ -1,0 +1,10 @@
+Changes
+lib/CPAN/Testers/Reports/Query/JSON.pm
+lib/CPAN/Testers/Reports/Query/JSON/Set.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/CTRQJTester.pm
+t/data-pageset.json
+t/report.t
+META.yml                                 Module meta-data (added by MakeMaker)

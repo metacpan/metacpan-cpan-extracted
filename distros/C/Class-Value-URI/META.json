@@ -1,0 +1,80 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Class-Value-URI/",
+      "repository" : "http://github.com/hanekomu/Class-Value-URI",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Value-URI"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100840",
+   "name" : "Class-Value-URI",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Class::Value::URI" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI.pm"
+      },
+      "Class::Value::URI::ftp_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/ftp_TEST.pm"
+      },
+      "Class::Value::URI::fax_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/fax_TEST.pm"
+      },
+      "Class::Value::URI::fax" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/fax.pm"
+      },
+      "Class::Value::URI::file" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/file.pm"
+      },
+      "Class::Value::URI::http" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/http.pm"
+      },
+      "Class::Value::URI::ftp" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/ftp.pm"
+      },
+      "Class::Value::URI::file_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/file_TEST.pm"
+      },
+      "Class::Value::URI::http_TEST" : {
+         "version" : "1.100840",
+         "file" : "lib/Class/Value/URI/http_TEST.pm"
+      }
+   },
+   "requires" : {
+      "Class::Accessor::Complex" : "0",
+      "Class::Value::Test" : "0",
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "Data::Semantic::URI::TestData::file" : "0",
+      "Data::Semantic::URI::TestData::ftp" : "0",
+      "Carp" : "0",
+      "Test::More" : "0.88",
+      "perl" : "5.008",
+      "Data::Semantic::URI::TestData::fax" : "0",
+      "File::Find" : "0",
+      "Class::Value::SemanticAdapter" : "0",
+      "Test::CompanionClasses" : "0",
+      "File::Temp" : "0",
+      "Data::Semantic::URI::TestData::http" : "0"
+   },
+   "abstract" : "Value class for URIs",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

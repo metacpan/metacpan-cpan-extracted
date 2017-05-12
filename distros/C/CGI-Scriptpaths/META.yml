@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Scriptpaths
+version:      1.03
+version_from: lib/CGI/Scriptpaths.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Cwd:                           0
+    Cwd::Ext:                      1.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

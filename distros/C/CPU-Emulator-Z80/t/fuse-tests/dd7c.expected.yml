@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd7c
+registers:
+  AF: 35928
+  AF_: 0
+  BC: 30469
+  BC_: 0
+  DE: 44178
+  DE_: 0
+  HL: 42657
+  HL_: 0
+  I: 0
+  IX: 36062
+  IY: 29959
+  PC: 2
+  R: 2
+  SP: 0

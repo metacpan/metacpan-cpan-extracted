@@ -1,0 +1,41 @@
+---
+abstract: 'shim for Apache::AuthTkt'
+author:
+  - 'Peter Karman, C<< <karman at cpan dot org> >>'
+build_requires:
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Plugin::Session::Store::Dummy: 0
+  Catalyst::Plugin::Static::Simple: 0
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Cookies: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-AuthTkt
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Apache::AuthTkt: 0.08
+  Catalyst: 5.7014
+  Catalyst::Plugin::Authentication: 0.10007
+  Config::General: 0
+  Data::Dump: 0
+  Moose: 0
+  perl: 5.8.9
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Authentication-AuthTkt
+  homepage: https://github.com/karpet/catalyst-authentication-authtkt
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/karpet/catalyst-authentication-authtkt
+version: 0.15

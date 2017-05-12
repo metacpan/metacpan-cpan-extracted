@@ -1,0 +1,264 @@
+Revision history for Perl module Class::InsideOut
+
+1.14      2017-04-02 13:52:18-04:00 America/New_York
+
+    Fixed:
+
+    - Passes tests when '.' is not in @INC.
+
+1.13      2013-04-25 13:59:42 America/New_York
+
+    Added:
+    
+    - allow set_hook and get_hook to be blessed or overloaded objects
+
+1.12      2013-04-24 21:02:39 America/New_York
+
+    Docs:
+    - Typos fixed
+
+    Other:
+    - Issue tracker is now GitHub
+
+1.11      2013-01-23 21:33:13 America/New_York
+
+    Bug fixes:
+    - fixed tests for recent, XS-only Scalar::Util
+
+    Other:
+    - converted distribution management to Dist::Zilla
+
+1.10 Mon Aug 24 20:44:46 EDT 2009
+
+    Bug fixes:
+    - changed method of calling Exporter::import() to avoid confusing DProf
+    - fixed detection of missing 'weaken' function in newer Scalar::Util
+      (fixes test t/15_no_weaken_fallback.t) (RT#47623)
+
+    Other: 
+    - cleanup: eliminate test warning from bogus superclass in a test class
+    - docs: Noted that set_hooks aren't called by new() (RT#48106)
+
+1.09 Fri Jan  4 18:42:41 EST 2008
+
+    - bugfix: allow use of upper or mixed case property accessors 
+      (David Schmitt)
+
+    - testfix: tests will now pass on Perl 5.005 -- though 5.005 is not
+      recommended due to the lack of weak references
+    
+    - pod: added a note about using "our" instead of "my" for properties 
+
+    - critic: various cleanups to about Perl::Critic level 5
+    
+    - moved author tests to xt directory for CPANTS compatibility
+
+1.08 Thu Aug 23 07:12:33 EDT 2007
+    
+    - STORABLE_attach warns instead of dying if it can't provide a singleton
+      back to Storable, leaving Storable to croak instead; on 5.6.2 (and 
+      possibly older Perls), this change works around Storable dying during
+      cleanup if STORABLE_attach dies inside an eval()
+    
+    - thread tests skip on perl < 5.8.5 due to unexplained thread failures;
+      perl585delta alludes to thread fixes when weak references are in use
+      and this may be related
+    
+    - removed "use warnings" from singleton test files for back compatibility
+    
+    - moved pod/coverage tests to t_extra/ and stopped depending on an
+      environment variable to allow them to run
+    
+    - changed to the Apache License, version 2.0; (it's clearer, relicensable,
+      and is explicit about contributions)
+    
+1.07 Fri Aug 10 07:41:00 EDT 2007
+    
+    - fixes for using ":storable" with older versions of Exporter
+      that required tags to come first. Now we just strip it during import.
+
+1.06 Mon Feb 12 19:34:59 EST 2007
+    
+    - all tests involving Storable now skip if Storable isn't installed
+      (instead of only a few) (David Cantrell)
+    
+1.05 Sun Feb 11 16:29:16 EST 2007
+    
+    - fixed optional new method with hash reference (RT#24839)
+
+1.04 Thu Jan 18 21:47:19 EST 2007
+    
+    - added 'readonly' accessor-creator
+
+1.0301 Wed Nov 15 06:08:47 EST 2006
+    
+    - removing email address for bug reports to (hopefully)
+      cut down on RT ticket spam
+
+1.03 Wed Oct 11 10:55:28 EDT 2006
+    
+    - thread tests skip if thread creation fails
+    
+    - added an examples directory with a reference to some of the objects
+      used in testing 
+
+1.02 Tue Aug 15 09:26:11 EDT 2006
+    
+    - fixed duplicate property name checking (RT#20997)
+
+1.01 Thu Jul 27 12:30:54 EDT 2006
+    
+    - register() now handles standard cases with "sufficiently advanced
+      technology" and does the right thing
+ 
+    - optional simple "new" constructor added
+    
+    - changed "foreign" inheritance to "black-box" inheritance in Pod
+
+1.00 Fri May 12 21:25:34 EDT 2006
+    
+    - removed Data::Dump::Streamer support attempts until RT#19060 can
+      be addressed
+      
+0.90_02 Thu May  4 00:56:04 EDT 2006
+    
+    - fixed up META.yml and a pod typo
+
+0.90_01 Wed May  3 20:47:34 EDT 2006
+
+    - *API CHANGE* renamed serialization hooks to FREEZE and THAW
+    
+    - added support for STORABLE_attach for singletons
+    
+    - improved test coverage
+    
+    - refactored some of the test classes
+    
+    - refactored STORABLE_* code
+    
+    - refactored documentation
+    
+    - added draft (non-working) support for serialization with
+      Data::Dump::Streamer
+
+0.14 Thu Mar 16 23:07:22 EST 2006
+
+    - Fixed test bug where thread test wouldn't properly skip for Win32 Perl
+      5.6 (with ithreads enabled for pseudofork but no threads.pm)
+    
+    - Improved handling of "die" in set_hook and get_hook callbacks
+
+0.13 Fri Mar 10 10:32:08 EST 2006
+
+    - Test for Scalar::Util::weaken fallback had a bug that would fail on
+      Perl versions prior to 5.6.  Fixed to be fully backwards compatible. 
+    
+0.12 Wed Mar  8 21:58:58 EST 2006
+    
+    - Added workaround for unavailable Scalar::Util::weaken; gives warning
+      about not running thread-safe; added missing weaken skips to thread/fork
+      test files
+
+    - property/public/private arguments are now validated.  Property names must
+      be identifiers; Property options must be given as hash references;
+      Duplicate property names are not permitted. 
+
+    - options argument checked for proper format; option values are checked
+      for validity
+
+    - register argument checked for blessed reference
+
+    - added optional pod/pod_coverage tests (skipped by default)
+
+0.11 Sat Jan 28 11:09:50 EST 2006
+
+    - tweaked Build.PL; dropped Test::More dependency to 0.45 to help pass
+      ActiveState automated tests (0.45 first to offer thread safety and in the
+      5.008 core); fixed copy/paste error for cleanup
+
+    - documentation cleanup; fixed links; restructured Pod for options;
+      softened alpha warnings as we get closer to a stable API
+
+0.10 Fri Jan 27 01:41:38 EST 2006
+
+    - added "set_hook" and "get_hook" option for custom accessor/mutator
+      manipulations
+
+    - added ":all" and ":std" tags
+
+    - cleaned up or reorganized documentation in places; revised synopsis
+      to be shorter
+
+0.09 Fri Jan 20 14:55:14 EST 2006
+
+    - added basic accessor generation as an option for property declarations;
+      added aliases "public" and "private" as shortcuts to property options
+
+    - added per-class default options for properties
+
+    - added support for user-written freeze and thaw hooks
+
+    - documentation updates: typo safety requires strict (Steven Lembark);
+      caching refaddr() to minimize overhead; new features documented
+
+0.08 Wed Jan 18 10:50:13 EST 2006
+
+    - BACKWARDS INCOMPATIBLE CHANGE: property definitions now require a
+      label in addition to the property hash
+
+    - Class::ISA results are now cached when first used; also minor
+      optimization of reftype switching in STORABLE_* methods (Adam Kennedy)
+
+    - foreign inheritance test now checks for IO::File or skips
+
+    - documentation cleanup and trailing whitespace removal (Ron Savage)
+
+0.07 Mon Jan  9 09:48:46 EST 2006
+
+    - Storable support tested with references, grouped references and circular
+      references; references external to the freeze are cloned
+
+    - documentation cleanup
+
+0.06 Sun Jan  8 23:07:22 EST 2006
+
+    - DESTROY cleans up all Class::InsideOut properties in the @ISA tree;
+      updated documentation on object destruction for clarity; fixes
+      diamond-pattern inheritance memory leaks without requiring a DEMOLISH
+      method
+
+    - added first-draft support of serialization with Storable for objects
+      based on scalars, arrays and hashes; tested on data values only; not
+      yet tested on values with references or objects, particularly circular
+      reference chains
+
+    - CLONE no longer exported; all refaddr index cleanup handled globally in
+      Class::InsideOut::CLONE rather than in class-specific methods
+
+0.05 Fri Jan  6 09:07:07 EST 2006
+
+    - added caveats on usage and current limitations
+
+    - more documentation tweaks
+
+0.04 Thu Jan  5 21:44:30 EST 2006
+
+    - major documentation update
+
+0.03 Thu Jan  5 18:41:05 EST 2006
+
+    - thread test no longer dies if threads are not configured
+
+    - added DEMOLISH support for custom destruction actions
+
+    - added id() as optional alias for refaddr
+
+    - documentation tweaks
+
+0.02 Thu Jan  5 00:51:01 EST 2006
+
+    - basic property and object registration with automatic CLONE and DESTROY
+
+0.01 Wed Jan  4 12:06:51 EST 2006
+
+    - placeholder

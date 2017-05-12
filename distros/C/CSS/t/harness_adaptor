@@ -1,0 +1,20 @@
+use Test::Simple tests => 2;
+
+use CSS;
+
+my $css = CSS->new({'adaptor' => $adaptor_name});
+$css->read_file("t/css_tiny");
+
+eval "\$output = $css->output";
+ok(!@!, "adaptor returned ok");
+
+$output = $css->output;
+ok($output eq $expected_output, "adaptor output ok");
+
+if ($output ne $expected_output){
+	$output =~ s/\n/\\n/g;
+	$output =~ s/\t/\\t/g;
+	print "output was $output";
+}
+
+1;

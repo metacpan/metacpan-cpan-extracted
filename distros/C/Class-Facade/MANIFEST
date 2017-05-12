@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+README
+lib/Class/Facade.pm
+test.pl

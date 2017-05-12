@@ -1,0 +1,31 @@
+---
+abstract: 'Find the distributions recently uploaded to CPAN'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Recent-Uploads
+requires:
+  Carp: '0'
+  File::Spec: '0'
+  File::Spec::Unix: '0'
+  LWP::UserAgent: '5.835'
+  URI: '1.56'
+  YAML::Syck: '1.15'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/cpan-recent-uploads
+  repository: https://github.com/bingos/cpan-recent-uploads.git
+version: '0.10'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+# $Id: demo-notebook,v 1.1 2004/10/22 16:37:30 mthies2s Exp $
+
+use strict;
+use File::Temp qw( :POSIX );
+use lib "../lib";
+
+#   make KEY_BTAB (shift-tab) working in XTerm
+#   and also at the same time enable colors
+#$ENV{TERM} = "xterm-vt220" if ($ENV{TERM} eq 'xterm');
+
+my $debug = 0;
+if (@ARGV and $ARGV[0] eq '-d') {
+    $debug = 1;
+} else {
+    # We do not want STDERR to clutter our screen.
+    my $fh = tmpfile();
+    open STDERR, ">&fh";
+}
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Curses::UI;
+
+# Create the root object and main window.
+my $cui = new Curses::UI ( 
+    -clear_on_exit => 1, 
+    -debug => $debug,
+);
+$cui->set_binding( sub { exit(0); } , "\cQ");
+
+my $main = $cui->add(
+    undef, 'Window',
+    -title => 'Main Window',
+);
+$main->add(
+    undef, 'Label',
+    -y     => $main->height - 1,
+    -width => $main->width,
+    -text  => '<PageUp> / <PageDown> cycles through pages; <Ctrl>-Q exits',
+    -textalignment => 'middle',
+    -bold  => 1,
+);
+
+
+# Create notebook and a couple of pages.
+my $notebook = $main->add(
+    undef, 'Notebook',
+    -height => $main->height - 1,
+);
+my @quotes = (
+    "Forsan et haec olim meminisse iuvabit.\n(And perhaps someday it will be pleasant to remember these things.)\n\n                         - Vergil",
+    "Yankee, n: In Europe, an American.\nIn the Northern States of our Union, a New Englander.\nIn the Southern States the word is unknown. (See DAMYANK.)\n\n                 - Ambrose Bierce, \"The Devil's Dictionary\" 1911",
+    "I must not fear. Fear is the mind-killer. Fear is the little-death that\nbrings total obliteration. I will face my fear. I will permit it to pass\nover me and through me. And when it has gone past I will turn the inner\neye to see its path. Where the fear has gone there will be nothing.\nOnly I will remain.\n\n                         - Frank Herbert, \"Dune\", 1965",
+    "El amor es un camino que de repente aparece\ny de tanto caminarlo se te pierde.\n\n         - Victor Jara, \"El Amor es un Camino\"",
+    "Who knows for what we live, and struggle, and die? ...\nWise men write many books, in words too hard to understand.\nBut this, the purpose of our lives, the end of all our struggle,\nis beyond all human wisdom.\n\n                         - Alan Paton, \"Cry, The Beloved Country\", 1948",
+);
+my @pages;
+for (my $i = 1; $i <= 5; ++$i) {
+    $pages[$i] = $notebook->add_page("Page $i");
+    $pages[$i]->add(
+        undef, 'TextViewer',
+        -x    => 1,
+        -y    => 5,
+        -text => $quotes[$i-1],
+    );
+}
+$notebook->focus;
+
+# Let user play.
+$cui->mainloop;

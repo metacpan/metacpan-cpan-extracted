@@ -1,0 +1,8 @@
+Revision history for CPS-Governor-IOAsync
+
+0.02    CHANGES:
+         * Declare "requires IO::Async::Loop" to hopefully give it a concrete
+           module to depend on
+
+0.01    First version, released on an unsuspecting world.
+

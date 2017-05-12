@@ -1,0 +1,44 @@
+---
+abstract: 'PSGI engine for Catalyst'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+  Test::Requires: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Engine-PSGI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catalyst::Action::RenderView: '0'
+  Catalyst::Runtime: '5.80007'
+  Filter::Util::Call: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/miyagawa/Catalyst-Engine-PSGI/issues
+  homepage: https://github.com/miyagawa/Catalyst-Engine-PSGI
+  repository: https://github.com/miyagawa/Catalyst-Engine-PSGI.git
+version: '0.14'
+x_contributors:
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'chromatic <chromatic@wgz.org>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Tomas Doran <bobtfish@bobtfish.net>'

@@ -1,0 +1,220 @@
+0.32    2017-01-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid test failures [CT, RT#119861].
+
+
+0.31    2017-01-13 (PERLANCAR)
+
+	- Implement IOD 0.9.11 !none encoding and implicit !path encoding.
+
+
+0.30    2017-01-05 (PERLANCAR)
+
+        - Replace the use of File::HomeDir with copied routine from
+          PERLANCAR::File::HomeDir to reduce deps. Now we don't depend on any
+          non-core modules.
+
+
+0.29    2017-01-04 (PERLANCAR)
+
+	- Replace JSON with Cpanel::JSON::XS (recommends) + JSON::PP
+	  (requires, fallback), to reduce deps.
+
+
+0.28    2016-10-07 (PERLANCAR)
+
+	- For now, skip the whole t/encoding_path.t on Windows, because
+	  File::HomeDir->users_home() is not implemented on Windows.
+
+
+0.27    2016-10-07 (PERLANCAR)
+
+        - Derp, forgot to replace usage of getpwuid() in lib/, only in t/.
+
+        - Replace PERLANCAR::File::HomeDir with File::HomeDir for now, as
+          PERLANCAR::File::HomeDir currently cannot return other user's home
+          directory.
+
+
+0.26    2016-10-07 (PERLANCAR)
+
+        - Replace getpwuid() with checking USERNAME/USER and
+          PERLANCAR::File::HomeDir, to make it work on Windows [GH#1].
+
+
+0.25    2016-09-25 (PERLANCAR)
+
+	- Revert from using JSON::MaybeXS to JSON because JSON::MaybeXS is
+	  currently not depakable (hard dependency to XS module
+	  Cpanel::JSON::XS).
+
+
+0.24    2016-03-11 (PERLANCAR)
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.23    2016-03-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update Synopsis.
+
+
+0.22    2016-02-24 (PERLANCAR)
+
+	- Implement encodings !path & !paths (new in IOD 0.9.10).
+
+
+0.21    2016-02-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove use of inchworm operator [RT#111786].
+
+
+0.20    2016-01-23 (PERLANCAR)
+
+	- Reader: accept an optional $callback in second argument that will
+	  be called during various stages.
+
+	- Remove bench scripts (see Bencher-Scenario-IODParsing now).
+
+
+0.19    2015-09-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak abstract: mention INI.
+
+
+0.18    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.17    2015-06-07 (PERLANCAR)
+
+	- Patch to account for Windows/filesystem with volume [RT#104982]
+	  (thanks kmx).
+
+	- Make sure bench scripts uses dev (lib/) version.
+
+
+0.16    2015-05-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [opt] Reduce startup overhead by avoiding Carp & experimental.
+
+
+0.15    2015-03-27 (PERLANCAR)
+
+	- No functional changes.
+
+        - Adjust to IOD::Examples 0.15 which now puts shared files in tarball.
+
+
+0.14    2015-03-20 (PERLANCAR)
+
+        - [Bugfix] Revert an optimization introduced during 0.13 which caused a
+          section line containing equal sign (e.g. [profile=foo]) to be parsed
+          as a key line. This affected Perinci::CmdLine since its config profile
+          feature uses that particular syntax. [CT]
+
+
+0.13    2015-03-19 (PERLANCAR)
+
+	- Extract t/01-basics.t to module Test::Config::IOD::Common so it's
+	  reusable by Config::IOD.
+
+
+0.12    2015-03-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Typo: Why do I keep typing ignore_unknown_encoding
+	  instead of ignore_unknown_directive???.
+
+
+0.11    2015-03-19 (PERLANCAR)
+
+	- Add option: ignore_unknown_directive.
+
+
+0.10    2015-03-18 (PERLANCAR)
+
+	- [Refactoring] Rename variable.
+
+	- Avoid file from older version: encoding-expr.iod [CT].
+
+	- Add attribute: allow_duplicate_key.
+
+
+0.09    2015-03-13 (PERLANCAR)
+
+        - [Internal] Refactor value decoding to a separate method
+          _parse_raw_value() so it's usable by Config::IOD. Improve comment
+          parsing a bit.
+
+
+0.08    2015-03-12 (PERLANCAR)
+
+	- [Internal] Refactor some functionality out to a base class
+          Config::IOD::Base so it's usable by Config::IOD. Rename
+          Config::IOD::Reader::Expr -> Config::IOD::Expr.
+
+        - [Bug fixes] Fix a couple of bugs in initializing internal state
+          variables.
+
+
+0.07    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.06    2014-09-12 (PERLANCAR)
+
+	- Bugfix: handling of comment character inside string/array/object
+	  using quoting/bracket/brace.
+
+
+0.05     2014-08-29 (PERLANCAR)
+
+         - Add experimental support for !expr encoding. Only a limited subset is
+           supported, but it should already be adequate for common cases.
+
+
+0.04     2014-08-28 (PERLANCAR)
+
+         - Add options: enable_bracket, enable_brace.
+
+         - Update specification to IOD 0.9.6 (parse implicit JSON array &
+           object).
+
+
+0.03     2014-08-26 (PERLANCAR)
+
+         - [Bugfix] Canonicalize encoding shorthand 'j' and 'h' (to 'json' and
+           'hex', respectively) before testing against
+           {allow,disallow}_encodings.
+
+
+0.02     2014-08-18 (SHARYANTO)
+
+         - No functional changes.
+
+         - Add tests for the attributes.
+
+
+0.01     2014-08-17 (SHARYANTO) - Dirgahayu 69!
+
+         - First release.

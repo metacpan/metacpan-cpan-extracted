@@ -1,0 +1,86 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/** Base class for all objects.
+ */
+
+public abstract class Clownfish::Obj {
+
+    Class *klass;
+
+    /** Abstract initializer.
+     */
+    public inert Obj*
+    init(Obj* self);
+
+    /** Return a host-language object wrapper for this object.
+     */
+    void*
+    To_Host(Obj *self, void *vcache);
+
+    /** Return a clone of the object.
+     */
+    public abstract incremented Obj*
+    Clone(Obj *self);
+
+    /** Indicate whether two objects are the same.  By default, compares the
+     * memory address.
+     *
+     * @param other Another Obj.
+     */
+    public bool
+    Equals(Obj *self, Obj *other);
+
+    /** Indicate whether one object is less than, equal to, or greater than
+     * another.
+     *
+     * @param other Another Obj.
+     * @return 0 if the objects are equal, a negative number if
+     * `self` is less than `other`, and a positive
+     * number if `self` is greater than `other`.
+     */
+    public abstract int32_t
+    Compare_To(Obj *self, Obj *other);
+
+    /** Generic destructor.  Frees the struct itself but not any complex
+     * member elements.
+     */
+    public void
+    Destroy(Obj *self);
+
+    /** Return the object's Class.
+     */
+    public inert Class*
+    get_class(Obj *self);
+
+    /** Return the name of the class that the object belongs to.
+     */
+    public inert String*
+    get_class_name(Obj *self);
+
+    /** Indicate whether the object is a descendent of `ancestor`.
+     */
+    public inert bool
+    is_a(nullable Obj *self, nullable Class *ancestor);
+
+    /** Generic stringification: "ClassName@hex_mem_address".
+     */
+    public incremented String*
+    To_String(Obj *self);
+}
+

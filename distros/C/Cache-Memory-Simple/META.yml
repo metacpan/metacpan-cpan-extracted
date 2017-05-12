@@ -1,0 +1,46 @@
+---
+abstract: 'Yet another on memory cache'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: 0.98
+  Test::Time: 0.04
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-Memory-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cache::Memory::Simple:
+    file: lib/Cache/Memory/Simple.pm
+    version: 1.03
+  Cache::Memory::Simple::Scalar:
+    file: lib/Cache/Memory/Simple/Scalar.pm
+requires:
+  Time::HiRes: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/Cache-Memory-Simple/issues
+  homepage: https://github.com/tokuhirom/Cache-Memory-Simple
+  repository: git://github.com/tokuhirom/Cache-Memory-Simple.git
+version: 1.03
+x_contributors:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

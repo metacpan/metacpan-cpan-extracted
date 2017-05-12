@@ -1,0 +1,79 @@
+NAME
+    Catalyst::View::ContentNegotiation::XHTML - Adjusts the response
+    Content-Type header to application/xhtml+xml if the browser accepts it.
+
+SYNOPSIS
+        package Catalyst::View::TT;
+
+        use Moose;
+        use namespace::clean -except => 'meta';
+
+        extends qw/Catalyst::View::TT/;
+        with qw/Catalyst::View::ContentNegotiation::XHTML/;
+
+        1;
+
+DESCRIPTION
+    This is a simple Role which sets the response "Content-Type" to be
+    "application/xhtml+xml" if the users browser sends an "Accept" header
+    indicating that it is willing to process that MIME type.
+
+    Changing the "Content-Type" to "application/xhtml+xml" causes browsers
+    to interpret the page as XML, meaning that your markup must be well
+    formed.
+
+CAVEATS
+    This is useful when you're developing your application, as you know that
+    all pages you view are parsed as XML, so any errors caused by your
+    markup not being well-formed will show up at once.
+
+    Whilst this module is has been tested against most popular browsers
+    including Internet Explorer, it may cause unexpected results on browsers
+    which do not properly support the "application/xhtml+xml" MIME type.
+
+METHOD MODIFIERS
+  after process
+    Changes the response "Content-Type" if appropriate (from the requests
+    "Accept" header).
+
+METHODS
+  pragmatic_accept
+    Some browsers (such as Internet Explorer) have a nasty way of sending
+    Accept */* and this claiming to support XHTML just as well as HTML.
+    Saving to a file on disk or opening with another application does count
+    as accepting, but it really should have a lower q value then text/html.
+    This sub takes a pragmatic approach and corrects this mistake by
+    modifying the Accept header before passing it to content negotiation.
+
+ATTRIBUTES
+  variants
+    Returns an array ref of 3 part arrays, comprising name, priority, output
+    mime-type, which is used for the content negotiation algorithm.
+
+PRIVATE METHODS
+  _build_variants
+    Returns the default variant attribute contents.
+
+SEE ALSO
+    Catalyst::View::TT::XHTML - Trivial Catalyst TT view using this role.
+    <http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html> - Content
+    negotiation RFC.
+
+BUGS
+    Should be split into a base ContentNegotiation role which is consumed by
+    ContentNegotiation::XHTML.
+
+AUTHOR
+    Maintainer and contributor of various features - David Dorward "<david@dorward.me.uk>"
+
+    Original author - Tomas Doran (t0m) "<bobtfish@bobtfish.net>"
+
+CONTRIBUTORS
+
+    Florian Ragwitz (rafl) "<rafl@debian.org>" - Conversion into a Moose
+    Role, which is what the module should have been originally.
+
+COPYRIGHT
+    This module itself is copyright (c) 2008 Tomas Doran and is licensed
+    under the same terms as Perl itself.
+

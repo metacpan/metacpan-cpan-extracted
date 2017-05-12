@@ -1,0 +1,40 @@
+			BiIndex README
+
+A BiIndex is a data structure which records relations between values.  Pairs
+of values can be stored together in the BiIndex.  Later, all of the values
+which have been stored with a particular value can be retrieved.  This can be
+done for either of the values which were stored together, though the BiIndex
+remembers which was the first and which the second value.
+
+This software is Alpha (subject to interface change - see below).  I
+will accept bug reports mailed to me.  Please put BiIndex in the
+subject (Michael De La Rue <miked@ed.ac.uk>).  Reports with fixes
+(diff -ur by preference) will get fixed, but please explain what you
+are fixing and give an example.  Problems without fixes will have to
+wait till I have time.
+
+Please note: I'm not sure about the name.  I've had things like
+suggested like
+
+	String::BiIndex - doesn't seem right becuase it's for any
+			values? I use it for URLs others maybe number?
+
+and
+
+	Search::BiIndex - maybe?  it isn't for general searching..
+
+I'll probably change to the latter unless someone gives me a better
+suggestion or reason to choose something different.
+
+I'm not sure about the reference counting that is built in.  I think
+maybe it causes needless inefficiency and a slightly difficult
+interface (maybe returning references to arrays from the search
+instead of associative arrays).  Perhaps two implementations are
+called for?
+
+The module is distributed under the same terms as perl.
+
+If you use this stuff for something interesting a note would be nice.  Code
+contributions to the perl or free software community would be even nicer.
+
+	Michael De La Rue

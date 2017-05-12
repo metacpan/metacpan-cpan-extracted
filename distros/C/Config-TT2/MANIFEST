@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Config/TT2.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-new.t
+t/02-basics.t
+t/03-global.t
+t/04-constants.t
+t/05-meta.t
+t/06-def-vmethod.t
+t/07-include-path.t
+t/cfg/one
+t/cfg/three
+t/cfg/two
+t/pod-coverage.t
+t/pod.t

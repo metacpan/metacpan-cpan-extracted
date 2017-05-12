@@ -1,0 +1,12 @@
+QuickForm.pm
+CHANGES
+MANIFEST
+Makefile.PL
+README
+eg/example1
+eg/example2
+eg/example3
+eg/example4
+eg/example5
+eg/example6
+t/quickform.t

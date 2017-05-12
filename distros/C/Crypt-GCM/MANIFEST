@@ -1,0 +1,13 @@
+Changes
+GCM.xs
+lib/Crypt/GCM.pm
+Makefile.PL
+MANIFEST
+META.yml
+ppport.h
+README
+t/00-load.t
+t/01-api.t
+t/03-encrypt.t
+t/04-decrypt.t
+typemap

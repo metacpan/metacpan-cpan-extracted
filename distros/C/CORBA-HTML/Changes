@@ -1,0 +1,54 @@
+Revision history for Perl extension CORBA::HTML.
+
+2.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+2.42  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+2.41  Mon Jun  7 08:30:00 2004
+	- better support of 'import'
+
+2.40  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+
+2.21  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+
+2.20  Thu Feb 19 18:30:00 2004
+	- compatible with CORBA::IDL 2.20
+	- idl2html.pl : add option -h (display help)
+	- idl2html.pl : add option -v (display version)
+
+2.02
+	- missing space in value
+
+2.01
+	- missing link base interface in derived interface
+
+2.00  Mon Jan 13 12:30:00 2003
+	- support CORBA IDL 3.0
+	- refactoring
+
+1.04  Tue Sep 17 08:30:00 2002
+	- add -f option : frame mode generation
+
+1.03  Tue May 21 09:30:00 2002
+	- bug when reopen a module
+
+1.02  Tue May 14 08:30:00 2002
+	- Add \n for <PRE>
+
+1.01  Mon Mar 04 12:30:00 2002
+
+1.0   Mon Jan 20 20:00:00 2002
+	- Add special tags (@version, @author)
+	- Add hyperlink to e-mail, www and IDL symbol
+
+0.90  Fri Dec 14 15:30:00 2001
+	- first version
+
+0.01  Mon Nov 19 11:34:22 2001
+	- original version; created by h2xs 1.19
+

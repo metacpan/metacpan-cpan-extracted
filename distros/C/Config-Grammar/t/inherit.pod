@@ -1,0 +1,101 @@
+The following variables can be set in this section:
+
+=over
+
+=item B<a>
+
+The 'A' variable
+
+Default value: a = 5
+
+=item B<b>
+
+The 'B' variable
+
+Default value: b = 6
+
+=item B<c>
+
+The 'C' variable
+
+=item B<d>
+
+The 'D' variable
+
+Default value: d = 11
+
+=back
+
+=head2 *** top ***
+
+This section is I<recursive>: it can contain subsection(s) with the same syntax.
+
+The following variables can be set in this section:
+
+=over
+
+=item B<a>
+
+The 'A' variable
+
+This variable I<inherits> its value from the parent section if nothing is specified here.
+
+Default value: a = 7
+
+=item B<b>
+
+The 'B' variable
+
+This variable I<inherits> its value from the parent section if nothing is specified here.
+
+Default value: b = 8
+
+=item B<c>
+
+The 'C' variable
+
+Default value: c = 9
+
+=item B<d>
+
+The 'D' variable
+
+=back
+
+The following sections are valid on level 1:
+
+=over
+
+=item B<+bottom>
+
+The following variables can be set in this section:
+
+=over
+
+=item B<a>
+
+The 'A' variable
+
+=item B<b>
+
+The 'B' variable
+
+This variable I<inherits> its value from the parent section if nothing is specified here.
+
+Default value: b = 8
+
+=item B<c>
+
+The 'C' variable
+
+Default value: c = 9
+
+=item B<d>
+
+The 'D' variable
+
+This variable I<inherits> its value from the parent section if nothing is specified here.
+
+=back
+
+=back

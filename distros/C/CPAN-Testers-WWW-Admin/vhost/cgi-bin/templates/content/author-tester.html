@@ -1,0 +1,67 @@
+[%
+
+    display = data.tester.name ;
+    IF data.tester.pause ;
+        display = display _ ' (' _ data.tester.pause _ ')' ;
+    END ;
+
+    title = 'Browse by Tester: ' _ display;
+    crumb4_name = 'Author' ;
+    crumb4_href = '/' ;
+    crumb3_name = 'Browse by Tester' ;
+    crumb3_href = '/author/testers' ;
+    crumb2_name = data.letter ;
+    crumb2_href = '/author/testers/' _ data.letter ;
+    crumb1_name = display ;
+
+    box_prefs = 1 ;
+    javascript = 1 ;
+
+%]
+
+[% INCLUDE "content/moreinfo.html" %]
+
+<p>Select the reports you wish to delete from the list below. 
+Click on the report ID to view more information about that report. 
+Click the column headings to sort in ascending or descending order.</p>
+
+<div class="prevnext">
+<div class="prev">[% IF pager.prev %]<a href="/author/tester/[% data.tester.testerid %]/prev/[% pager.prev %]">&lt;&lt; Previous</a>[% ELSE %]&lt;&lt; Previous[% END %]</div>
+<div class="next">[% IF pager.next %]<a href="/author/tester/[% data.tester.testerid %]/next/[% pager.next %]">Next &gt;&gt;</a>[% ELSE %]Next &gt;&gt;[% END %]</div>
+</div>
+
+[% IF data.reports %]
+<form name="reports" action="[% cgipath %]/pages.cgi" method="post">
+<input type="hidden" name="act" value="tester-mark" />
+
+<table id="reports" class="sortable">
+<tr><th><input type="checkbox" name="top" onclick="togglecheckboxes(this)" /></th>
+	<th><span class="sortheader">Grade</span></th>
+	<th><span class="sortheader">Distribution-Version</span></th>
+	<th><span class="sortheader">Perl</span></th>
+	<th><span class="sortheader">OS</span></th>
+	<th><span class="sortheader">Date</span></th>
+</tr>
+[% FOREACH r = data.reports %]
+<tr class="g[% r.state | upper %]relunp">
+  <td><input type="checkbox" name="DELETE" value="[% r.id %]" class="cb[% r.state | upper %]relunp" /></td>
+	<td class="[% r.state | upper %]"><span class="reportlink" onclick="more_info('[% r.guid %]','[% r.state | upper %]','[% r.dist %]','[% r.version %]','[% r.perl %]','[% r.osname %]','[% r.profile.display || r.tester | html %]','[% user.author %]','[% r.fulldate %]');">[% r.state | upper %]</span></td>
+	<td><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% r.dist %]">[% r.dist %]</a>-[% r.version %]</td>
+	<td>[% r.perl %]</td>
+	<td>[% r.osname %]</td>
+	<td>[% r.showdate %]</td>
+</tr>
+[% END %]
+</table>
+
+<div class="prevnext">
+<div class="prev">[% IF pager.prev %]<a href="/author/tester/[data.tester.testerid]/prev/[% pager.prev %]">&lt;&lt; Previous</a>[% ELSE %]&lt;&lt; Previous[% END %]</div>
+<div class="next">[% IF pager.next %]<a href="/author/tester/[data.tester.testerid]/next/[% pager.next %]">Next &gt;&gt;</a>[% ELSE %]Next &gt;&gt;[% END %]</div>
+</div>
+
+<p class="smalltext clear"><input type="button" value='Mark Reports' /></p>
+</form>
+
+[% ELSE %]
+<p>Sorry, no reports found for that tester.</p>
+[% END %]

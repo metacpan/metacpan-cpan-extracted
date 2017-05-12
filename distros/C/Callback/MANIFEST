@@ -1,0 +1,11 @@
+Callback.pm
+Callback.pod
+Makefile.PL
+MANIFEST
+CHANGELOG
+README
+t/callback.t
+t/error.t
+t/obj.t
+t/store.t
+META.yml                                 Module meta-data (added by MakeMaker)

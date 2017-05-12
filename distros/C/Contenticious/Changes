@@ -1,0 +1,98 @@
+Revision history for perl module Contenticious
+
+0.391   2017-01-31
+
+    - keep up with changes in Mojo::Home (@kiwiroy)
+
+0.39    2016-09-29
+
+    - fix file/directory handling in the presence of spaces
+
+0.38    2016-07-21
+
+    - fix Mojolicious 7.0 compatibility
+
+0.35    2015-02-23
+
+    - updated prerequisites
+
+0.333   2013-11-28
+
+    - changed DOM tests to use attr instead of the deprecated attrs (M. 4.20)
+
+0.332   2012-12-11
+
+    - forgot to add the latest M::P::RelativeUrlFor changes to deps - sorry!
+
+0.331   2012-12-09
+
+    - added a dummy base url for M::P::Subdispatch to correctly generate
+      relative urls
+
+0.33    2012-10-31
+
+    - disabled RelativeUrlFor's replace_url_for and switched to manual
+      IMPORTANT: maybe you have to replace url_for with rel_url_for in
+                 your existing inflated templates!
+
+0.328   2012-09-13
+
+    - temporarily disabled the (not so important) mount test
+      because FindBin dies in Mojo::Server
+
+0.327   2012-09-11
+
+    - replaced Mojo::Command by Mojolicious::Command (Joel Berger)
+
+0.326   2012-08-30
+
+    - removed MOJO_APP usage
+
+0.325   2012-04-29
+
+    - removed a small incompatibility in content.html.ep (%== instead of b)
+
+0.324   2012-03-27
+
+    - increased Mojolicious version because of a small inflate command bug
+
+0.323   2012-03-27
+
+    - updated Mojolicious::Renderer->default_template_class
+      and Mojolicious::Static->root calls
+    - added hypnotoad configuration documentation
+
+0.322   2012-03-08
+
+    - a better Makefile.PM with MIN_PERL_VERSION and META informations
+
+0.321   2012-03-06
+
+    - fixed a bug in t/06_script.t (tinita, stephan48)
+      cpantesters reports should be much "greener" now
+
+0.32    2012-03-05
+
+    - updated README (Contenticious is on CPAN now)
+    - added morbo support
+
+0.311   2012-03-03
+
+    - changed nothing important, just needed to bump the version number
+      to be able to upload tarball to CPAN (my fault)
+
+0.31    2012-02-22
+
+    - fixed windows compatibility for the script test (stephan48)
+
+0.3     2012-02-21
+
+    - really installable app with a standalone contenticious script
+
+0.2     2012-01-12
+
+    - rewrite with Makefile.pm and everything
+
+0.1     2010-01-15
+
+    - first version

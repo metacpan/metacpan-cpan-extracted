@@ -1,0 +1,31 @@
+---
+abstract: "Color schemes from Cynthis Brewer's ColorBrewer L<http://colorbrewer2.org/>"
+author:
+  - 'Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Color-Brewer
+requires:
+  ExtUtils::Typemaps: '1.02'
+  File::ShareDir: '0'
+  JSON: '0'
+  Params::Validate: '0'
+  Path::Tiny: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pablrod/p5-Color-Brewer/issues
+  homepage: https://github.com/pablrod/p5-Color-Brewer
+  repository: https://github.com/pablrod/p5-Color-Brewer.git
+version: '0.001'

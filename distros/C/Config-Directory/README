@@ -1,0 +1,51 @@
+Config/Directory - version 0.04
+===============================
+
+INTRO
+
+Config::Directory provides an object-oriented interface to configuration 
+data stored as multiple small files in one or more config directories.
+Using individual files for config items greatly simplifies update 
+interfaces and scriptability, while using multiple directories allows
+distinctions between distribution and local configuration settings, for
+example.
+
+Basic usage:
+
+  $c = Config::Directory->new('/usr/local/myapp/conf');
+
+or:
+
+  $c = Config::Directory->new([ '/usr/local/myapp/conf', "$HOME/.myapp" ]);
+
+Each file becomes an entry in the blessed hashref $c, with the filename as
+the key and the file contents as the value.
+
+There are various optional arguments to modify the default behaviour - see
+the perldocs for the details.
+
+This version supports write access to config files, using a set() method:
+
+  $c->set($name, $value)
+
+which writes $value to the file called $name. If more than one config
+directory is used, set() always used the last one in the list for writes.
+A get() method is provided for consistency, equivalent to the direct
+hash access.
+
+
+INSTALLATION
+
+The usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+File::Basename, File::Spec.
+
+

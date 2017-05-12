@@ -1,0 +1,13 @@
+Revision history for Cogwheel
+
+0.03   2008-10-03
+	   - Removed Build.PL from the package so builds on 5.10 are happy
+
+0.02   2008-09-28
+	   - Updated uuid attributes so they are compatible with later versions of Moose accessors
+	   - Updated basic_sprocket test case so that it calls parent new
+	   - Updated Cogwheel::Server pod so method names show
+
+0.01   2008-01-28
+       Initial release.
+

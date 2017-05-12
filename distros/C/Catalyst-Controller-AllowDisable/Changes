@@ -1,0 +1,27 @@
+Revision history for CatalystX-Controller-AllowDisable
+
+0.08    2009-09-20T18:01:12+09:00
+        - this module is deprecated.
+
+0.07    2009-05-10T18:56
+        - added require modules to Makefile.PL
+
+0.06    2009-05-07T13:59
+        - added repository URL
+
+0.05    2009-05-07/13:46
+        - split tests to xt/
+
+0.04    2009-05-05/17:06
+        - fixed #45531: Broken by Catalyst::Runtime 5.80
+
+0.03    2008-04-06/18:20
+        - add spelling.t
+
+0.02    2008-04-05/11:43
+        - fix type
+        - using Module::Install
+
+0.01    2007-11-20/22:44
+        First version, released on an unsuspecting world.
+

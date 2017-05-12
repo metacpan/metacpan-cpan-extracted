@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Config-Options
+version:             0.08
+abstract:            module to provide a configuration hash with option to read from file.
+license:             perl
+author:              
+    - Edward Allen (ealleniii _at_ cpan _dot_ org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Data::Dumper:                  2
+    Scalar::Util:                  0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,15 @@
+--- XTEA_PP.orig.pm	2015-04-13 15:09:56.000000000 +0200
++++ XTEA_PP.pm	2016-03-04 10:20:15.487604900 +0100
+@@ -30,10 +30,10 @@
+ my $ELEMENTS_IN_BLOCK = $BLOCK_SIZE / 4;
+ 
+ 
+-use constant keysize => $KEY_SIZE;
++sub keysize { $KEY_SIZE }
+ 
+ 
+-use constant blocksize => $BLOCK_SIZE;
++sub blocksize { $BLOCK_SIZE }
+ 
+ 
+ sub new {

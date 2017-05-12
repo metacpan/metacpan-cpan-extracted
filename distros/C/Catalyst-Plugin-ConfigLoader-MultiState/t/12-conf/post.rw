@@ -1,0 +1,6 @@
+$var3 = 33;
+rewrite('rw3', 33);
+
+rewrite('/twice/inner/rw4', 43);
+
+$post_rwt2 = p('/rwt2');

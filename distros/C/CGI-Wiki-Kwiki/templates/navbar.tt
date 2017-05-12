@@ -1,0 +1,35 @@
+[%# The main navigation bar at the top of every page.
+    Included from header.tt.
+-%]
+
+<div class="navbar">
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?node=RecentChanges">Recent Changes</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?action=preferences">Preferences</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?action=random">Random Page</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?node=WantedPages">Wanted Pages</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?action=index">All Pages</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% cgi_url %]?action=create">Create Page</a>
+  </div>
+  <div class="navbar_item">
+    <a href="[% home_link %]">[% home_name %]</a>
+  </div>
+
+  <div class="navbar_search_form">
+   <form method="GET" action="[% cgi_url %]">
+     <input type="text" name="search" />
+     <input class="navbar_search_button" type="submit" title="search" name="Search" value="Search" />
+   </form>
+  </div>
+
+</div>

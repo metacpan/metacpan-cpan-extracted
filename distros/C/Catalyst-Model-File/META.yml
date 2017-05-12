@@ -1,0 +1,35 @@
+---
+abstract: 'File based storage model for Catalyst.'
+author:
+  - 'Ash Berlin, C<ash@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-File
+no_index:
+  directory:
+    - inc
+    - t
+    - t/lib
+requires:
+  Catalyst: 5.80
+  Catalyst::Component::InstancePerContext: 0
+  MRO::Compat: 0
+  Moose: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  namespace::autoclean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ashb/Catalyst-Model-File.git
+version: 0.10

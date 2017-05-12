@@ -1,0 +1,28 @@
+[% 
+    title = TITLE ;
+    box_sites = 1
+
+    crumb2_name = 'Testing Trends' ;
+    crumb2_href = '/graphs.html' ;
+    crumb1_name = title ;
+%]
+
+<h2>Contents</h2>
+<ul class="contents">
+[% FOREACH item = RANGES.reverse %]
+<li><a href="#r[% item %]" title="[% TITLE %]: [% item.substr(0,4) %] - [% item.substr(7,4) %]">[% item.substr(0,4) %] - [% item.substr(7,4) %]</a></li>
+[% END %]
+</ul>
+
+<h2>Graphs</h2>
+[% FOREACH item = RANGES.reverse %]
+<h3>[% item.substr(0,4) %] - [% item.substr(7,4) %]</h3>
+<p><img id="r[% item %]" src="/stats/[% PREFIX %]-[% item %].png" alt="[% title %] - [% item.substr(0,4) %] to [% item.substr(7,4) %]" /></p>
+[% END %]
+
+<h2>Raw Data</h2>
+<p>The raw data file is available here:</p>
+<ul>
+<li><a href="/stats/[% PREFIX %].txt" title="Raw Data">[% title %]</a></li>
+</ul>
+<p>Graphs generated using the <a href="http://code.google.com/apis/chart/" title="Google Chart API">Google Chart API</a>.</p>

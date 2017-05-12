@@ -1,0 +1,27 @@
+Revision history for Perl extension Class::PINT.
+
+0.05   Mon Aug 08 2005
+       - fixed deep recursion bug when inheriting primary key from superclass
+       - added inheritance of relationships (except is_a)
+       - fix to accidental stringification in creator method
+       - now accepts and uses value for superclass pk in create
+       - now requires Class::DBI::AbstractSearch
+
+0.04  
+       - more improvements to pod
+
+0.03  Wed Sep 27 16:30:15 2004
+       - added fix to pod from scott mcwhirter
+       - fixed Makefile.PL to no longer require perl 5.8
+
+0.02  Wed Sep 27 13:30:29 2004
+       - added patch from James O'Sullivan to handle update and accessors
+       - Aaron Trevena tinkered and fixed methods method to support user-named and ucfirst accessors/mutators
+       - added patch from James O'Sullivan to fix searching
+       - fixed inheritable data problem
+
+0.01  Tue Aug  3 22:13:17 2004
+	- original version; created by h2xs 1.23 with options
+		-X Class::PINT
+        - original written by Richard Hundt
+

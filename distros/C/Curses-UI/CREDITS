@@ -1,0 +1,69 @@
+This file mentions persons that contributed to Curses::UI:
+
+Credits:
+=======
+
+Robert De Leo	: for contributing Dirbrowser and other valuable 
+		  input
+
+Vlad Tepes	: for contributing the norwegian translation and
+		  other valuable input
+
+Maurice Makaay	: for designing and writing Curses::UI
+
+Ralf S. Engelschall : for sending valuable patches and giving good
+		      input.
+
+Luke Closs	: patch maniac
+
+George Theall   : Notebook Widget
+
+Marcus Theisen  : First maintainer of Curses::UI
+
+Russ Allbery    : for many patches and fixes
+
+
+Original Credits:
+=================
+As the original code is by Maurice Makaay, these are his credits:
+
+Esther Bronk   : (my girl) For being so patient while I was harassing 
+                 her about the beauty of curses based user interfaces 
+	         and for providing me the initial idea for Curses::UI 
+	         (so basically it was her own fault :-).
+
+InterNLnet     : (my employer) For the enthusiasm and support that I got
+                 from my colleagues and for sponsoring this project
+	         (I got to play hooky :-) See: http://www.internl.net/
+
+William Setzer : Author of the Perl5 Curses extension, the module on 
+                 which Curses::UI is built.
+
+Nick Slussar   : For criticizing my software and for bringing 
+                 up new ideas.
+
+Marcus Thiesen : For taking over the development of Curses::UI
+
+Raul Dias      : For putting effort into Curses::UI and submitting
+		 multiple patches.
+
+Language Credits:
+===============
+
+Nick Slussar		: Russian translation
+
+Valentina Portolan	: Italian translation
+
+Andrzej Kukula		: Polish translation
+
+Albrecht Kleine		: German translation
+
+Sebastian Desreux	: French translation
+
+Raul Dias		: Portuguese translation
+
+Vlad Tepes		: Norwegian translation
+
+Marek Grac		: Slovak translation
+
+Takatoshi Kitano        : Japanese translation

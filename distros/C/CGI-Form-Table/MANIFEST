@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/Form/Table.pm
+lib/CGI/Form/Table/Reader.pm
+t/00-load.t
+t/invalid.t
+t/pod-coverage.t
+t/pod.t
+t/make_table.t
+t/read_table.t
+t/perl-critic.t
+LICENSE
+META.yml                                 Module meta-data (added by MakeMaker)

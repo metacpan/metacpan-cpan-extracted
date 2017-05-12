@@ -1,0 +1,65 @@
+NAME
+
+Config::Interactive
+
+VERSION
+
+ 0.04
+ 
+ 
+DECRIPTION
+
+Provides a convenient way for loading   config values from a given file and
+returns it as a hash structure, allows interpolation for the   perl scalars ( $xxxx ${xxx} )
+and inside of XML fragments as well.
+Also, it can run interactive session with user, use predefined prompts, use validation patterns
+and store back into the file, preserving the original order of the comments and definitions.
+Motivation behind this module was inspired by Config::General module which was missing required
+functionality ( preservation of the comments order and positioining, prompts and validation for 
+command line based UI ). This module is extremely useful as CLI frontend to your application.
+  
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Interactive
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config::Interactive
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config::Interactive
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config::Interactive
+
+    Search CPAN
+        http://search.cpan.org/dist/Config::Interactive
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008,  Fermi Reasearch Alliance (FRA)  
+
+You should have received a copy of the Fermitools license
+with this software.  If not, see <http://fermitools.fnal.gov/about/terms.html>
+
+
+AUTHOR
+
+Maxim Grigoriev, <maxim |AT| fnal.gov>
+

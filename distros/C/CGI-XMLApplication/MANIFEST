@@ -1,0 +1,23 @@
+XMLApplication.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+t/01basic.t
+examples/example1.pm
+examples/example1.pl
+examples/example2.pm
+examples/example2.pl
+examples/example3.pm
+examples/example3.pl
+examples/ex2_form.xsl
+examples/ex2_finish.xsl
+examples/example4.pm
+examples/example4.pl
+examples/minimal.pl
+examples/minimalapp.pm
+examples/minimal.xsl
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

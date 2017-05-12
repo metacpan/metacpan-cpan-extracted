@@ -1,0 +1,36 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Template Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the template object.
+my $template = new Cdk::Template ('Label' => 'Type in a date:',
+					'Plate' => '## ## ####',
+					'Overlay' => 'DD-MM-YYYY');
+
+# Activate the widget.
+my $date = $template->activate();
+
+# Get the mixed date back.
+my $mixedDate = $template->mix();
+
+# Check the results.
+if (!defined $date)
+{
+   popupLabel (["<C>Escape hit. No information to return."]);
+}
+else
+{
+   popupLabel (["<C>With Overlay Mixing   : $mixedDate",
+		"<C>Without Overlay Mixing: $date"]);
+}
+
+# Exit Cdk.
+Cdk::end();

@@ -1,0 +1,14 @@
+Revision history for Catmandu-Store-Lucy
+
+0.0103  2017-03-27 14:22:09 CEST
+    - Remove unneeded SRU sortkeys functionality
+
+0.0102  2017-02-23 09:46:55 CET
+    - Moving to Dist::Milla
+    - Adding missing dependencies
+
+0.0101 2013-06-24
+    - import Carp
+
+0.01 2012-10-17
+    - initial release

@@ -1,0 +1,7 @@
+lib/CGI/Session/Driver/flexmysql.pm
+t/1.t
+Makefile.PL
+README
+INSTALL
+Changes
+MANIFEST

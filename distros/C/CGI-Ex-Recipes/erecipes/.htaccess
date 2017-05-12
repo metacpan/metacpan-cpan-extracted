@@ -1,0 +1,11 @@
+Options +ExecCGI 
+AddHandler cgi-script .cgi
+<IfModule mod_perl.c>
+    # mod_perl mode
+    <Files "*.pl">
+        SetHandler  perl-script
+        PerlOptions +ParseHeaders
+        PerlResponseHandler ModPerl::Registry
+        Options +ExecCGI
+    </Files>
+</IfModule>

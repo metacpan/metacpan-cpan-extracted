@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Catalyst-Helper-Dojo
+version:             0.02000
+abstract:            Helper to generate Dojo JavaScript / AJAX library
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    File::Spec:                    0
+    HTML::Dojo:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Carl Franks <cfranks@cpan.org>

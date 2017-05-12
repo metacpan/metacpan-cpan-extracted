@@ -1,0 +1,59 @@
+DESCRIPTION
+
+FAQ
+
+ Why is fuzzy matching slow?
+
+    Example:
+
+     use Benchmark qw(timethis);
+     use Complete::Util qw(complete_array_elem);
+    
+     # turn off the other non-exact matching methods
+     $Complete::Common::OPT_CI = 0;
+     $Complete::Common::OPT_WORD_MODE = 0;
+     $Complete::Common::OPT_CHAR_MODE = 0;
+    
+     my @ary = ("aaa".."zzy"); # 17575 elems
+     timethis(20, sub { complete_array_elem(array=>\@ary, word=>"zzz") });
+
+    results in:
+
+     timethis 20:  7 wallclock secs ( 6.82 usr +  0.00 sys =  6.82 CPU) @  2.93/s (n=20)
+
+    Answer: fuzzy matching is slower than exact matching due to having to
+    calculate Levenshtein distance. But if you find fuzzy matching too slow
+    using the default pure-perl implementation, you might want to install
+    Text::Levenshtein::Flexible (an optional prereq) to speed up fuzzy
+    matching. After Text::Levenshtein::Flexible is installed:
+
+     timethis 20:  1 wallclock secs ( 1.04 usr +  0.00 sys =  1.04 CPU) @ 19.23/s (n=20)
+
+ENVIRONMENT
+
+ COMPLETE_UTIL_TRACE => bool
+
+    If set to true, will display more log statements for debugging.
+
+ COMPLETE_UTIL_LEVENSHTEIN => str ('pp'|'xs'|'flexible')
+
+    Can be used to force which Levenshtein distance implementation to use.
+    pp means the included PP implementation, which is the slowest (1-2
+    orders of magnitude slower than XS implementations), xs which means
+    Text::Levenshtein::XS, or flexible which means
+    Text::Levenshtein::Flexible (performs best).
+
+    If this is not set, the default is to use Text::Levenshtein::Flexible
+    when it's available, then fallback to the included PP implementation.
+
+SEE ALSO
+
+    Complete
+
+    If you want to do bash tab completion with Perl, take a look at
+    Complete::Bash or Getopt::Long::Complete or Perinci::CmdLine.
+
+    Other Complete::* modules.
+
+    Bencher::Scenarios::CompleteUtil
+

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+Mbox.pm
+chess-games.mbox
+scripts/annotate.pl
+scripts/parsegames.pl
+test.pl

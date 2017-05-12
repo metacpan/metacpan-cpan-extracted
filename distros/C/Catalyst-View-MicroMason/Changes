@@ -1,0 +1,18 @@
+Revision history for Perl extension Catalyst::View::MicroMason
+0.05  Sat Aug 18 18:38:29 CDT 2007
+        - use View::Templated API
+
+0.04_01 Sat Oct  7 07:16:55 CDT 2006
+        - Works more like C::V::TT now, with process/render
+        - Accepts config properly (via a config file)
+        - Added a simple test
+
+0.03  Tue Jul 12 20:16:31 2005
+        - Fixed the typo in the Build.PL 'requires' parameter
+        - Added CompileCache Mixin to the View generated with the Helper
+
+0.02  Sat Jul 09 18:43:14 2005
+        - $c, $name and $base are globals now
+
+0.01  Jul Fri 08 12:00:00 2005
+        - original version.

@@ -1,0 +1,127 @@
+SYNOPSIS
+
+        package MyApp;
+    
+        use Catalyst;
+        with 'CatalystX::DebugFilter';
+    
+        __PACKAGE__->config(
+            'CatalystX::DebugFilter' => {
+    
+                # filter all "Cookie" headers as well as "password" and "SECRET" parameters
+                Request => { headers => 'Cookie', params => [ 'password', qr/SECRET/ ] },
+    
+                # filter all Set-Cookie values in the response
+                Response => { headers => 'Set-Cookie' },
+    
+                Stash => [
+                    sub {
+                        my ( $key, $value ) = @_;
+                        my $type = ref($value);
+    
+                        # ignore any non-ref values
+                        return undef if !$type;
+    
+                        if ( $type->isa('DBIx::Class::ResultSet') ) {    # dump ResultSet objects as SQL
+                            return $value->as_query;
+                        } elsif ( $type->isa('DBIx::Class::Result') ) {    # dump Result objects as simple HASH
+                            return { $value->get_columns };
+                        } else {                                           # ignore these
+                            return undef;
+                        }
+                    },
+                ],
+                Session => [
+                    'secret_session_key'
+                ],
+            }
+        );
+
+DESCRIPTION
+
+    This module provides a Moose role that will filter certain elements of
+    a request/response/stash/session before they are logged to the debug
+    logs (or the error screen).
+
+METHODS
+
+ dump_these
+
+    This role uses an "around" method modifier on the "dump_these" in
+    Catalyst method and modifies the elements returned according to the
+    configuration provided by the user as demonstrated in the SYNOPSIS
+    section.
+
+FILTER CONFIGURATION
+
+    There are few different types of filters that can be defined:
+
+      * Exact Match
+
+      The parameter/header/stash key is compared against a literal string.
+      If it matches, the value is replaced with [FILTERED]
+
+      * Regular Expression
+
+      The parameter/header/stash key is compared against a regular
+      expression. If it matches, the value is replaced with [FILTERED]
+
+      * Callback
+
+      The parameter/header/stash key and value are passed to a callback
+      function. If the function returns a defined value, that value is used
+      instead of the original value.
+
+    This module supports filtering a few different types of data
+    (naturally, these could all be combined into a single config call):
+
+      * Request Parameters
+
+          __PACKAGE__->config( 'CatalystX::DebugFilter' => { Request => { params => $filters } } );
+
+      * Request Headers
+
+      Useful with CatalystX::Debug::RequestHeaders:
+
+          __PACKAGE__->config( 'CatalystX::DebugFilter' => { Request => { headers => $filters } } );
+
+      * Response Headers
+
+      Useful with CatalystX::Debug::ResponseHeaders:
+
+          __PACKAGE__->config( 'CatalystX::DebugFilter' => { Response => { headers => $filters } } );
+
+      * Stash Data
+
+          __PACKAGE__->config( 'CatalystX::DebugFilter' => { Stash => $filters } );
+
+    In each of the above examples, $filters can be one of a few things:
+
+      * A non-ref scalar, implying an exact match
+
+      * A Regexp reference, implying an regular expression match
+
+      * A CODE reference, implying a callback matching function
+
+      * An ARRAY reference of any of the above
+
+CAVEATS
+
+    This module will not magically remove all references to a specific
+    piece of data unless filters are explicitly defined for each place this
+    data is stored. For instance, you may define a request parameter filter
+    to prevent passwords from being logged to the debug logs but if you
+    create an object that contains that password and store it in the stash,
+    the password value may still appear on the error screen.
+
+    Also, the stash and session are only filtered at the top level. If you
+    would like to filter more extensively, you can use a filter callback to
+    traverse the hash, modifying whatever data you like (a shallow copy is
+    made before passing the value to the callback).
+
+SEE ALSO
+
+      * CatalystX::Debug::RequestHeaders
+
+      * CatalystX::Debug::ResponseHeaders
+

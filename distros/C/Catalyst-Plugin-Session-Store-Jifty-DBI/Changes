@@ -1,0 +1,12 @@
+Revision history for Catalyst-Plugin-Session-Store-Jifty-DBI
+
+0.03 2009/10/18
+  - bumped up the version requirement of Catalyst::Plugin::Session
+    to 0.27 due to its recent internal change. See C::P::Session
+    for details.
+
+0.02 2009/04/28
+  - switched from NEXT to MRO::Compat
+
+0.01 2008/05/05
+  - initial release

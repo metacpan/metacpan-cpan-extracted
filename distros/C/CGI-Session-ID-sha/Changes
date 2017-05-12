@@ -1,0 +1,13 @@
+Revision history for Perl extension CGI::Session::ID::sha.
+
+1.01 - Sun Nov  3 23:12:54 2008
+	* INTERNAL: Fixed t/CGI-Session-ID-sha.t. I left a bad version of this file
+	            in the package. This package should now be able to be installed
+	            via CPAN.
+	            
+    * DOCS:     Fixed error in sha512 documentation. I mistyped the number
+                of characters in the SQL statement. This should be CHAR(128) not
+                CHAR(126).
+
+1.00 - Sun Nov  2 17:42:51 2008
+    * INITIAL RELEASE

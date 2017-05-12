@@ -1,0 +1,21 @@
+foo
+{
+    foo_inner
+    {
+        {
+            bar     baz
+        }
+    }
+}
+
+foo2
+{
+    @inherit    .#foo
+
+    +foo_inner
+    {
+        {
+            bar2    baz2
+        }
+    }
+}

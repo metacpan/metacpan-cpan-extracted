@@ -1,0 +1,11 @@
+# CHECKSUMS file written on Mon Jan 28 13:21:04 2008 GMT by CPAN::Checksums (v1.064)
+$cksum = {
+  'Bogus-OSUnsupported-0.01.tar.gz' => {
+    'md5' => '1e054a7da63e22a7b5acb98baaa47eb3',
+    'md5-ungz' => '8cf33a880347adb0376b7ab6b5a16dff',
+    'mtime' => '2008-01-27',
+    'sha256' => '0dc430f0deded63d47b141e7161e2d0b73fbd6509a03fa97614c8dff79246b21',
+    'sha256-ungz' => 'b019dfb9f90e91cad36e16c281a9cd63fb0e5fbbb7c21065ca67add4de782bd6',
+    'size' => 1004
+  }
+};

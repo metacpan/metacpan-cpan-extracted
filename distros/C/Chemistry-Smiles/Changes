@@ -1,0 +1,12 @@
+Revision history for Perl extension Chemistry::Smiles.
+
+0.13  Fri Feb 27 2004
+        - No changes in the code. Added deprecation notice.
+
+0.11  Mon Nov 3 2003
+        - Now the default atom and bond handlers call new_atom and new_bond
+            instead of creating the atom and bond themselves.
+        - Fixed a POD error.
+
+0.10  Fri Sep 6 2003
+	- first release

@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Catmandu/Importer/PubMed.pm
+lib/Catmandu/PubMed.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-post-load.t
+Makefile.PL
+LICENSE
+META.yml
+META.json

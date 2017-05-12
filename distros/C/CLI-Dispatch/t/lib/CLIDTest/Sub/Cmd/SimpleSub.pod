@@ -1,0 +1,7 @@
+=head1 NAME
+
+CLIDTest::Sub::Cmd::SimpleSub - alternative text for simple subcommand
+
+=head1 DESCRIPTION
+
+simple manual

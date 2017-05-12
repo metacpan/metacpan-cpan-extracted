@@ -1,0 +1,253 @@
+NAME
+    CSS::SpriteBuilder - CSS sprite builder.
+
+SYNOPSIS
+        use CSS::SpriteBuilder
+
+        my $builder = CSS::SpriteBuilder->new( [%args] );
+        $builder->build(
+            sprites => [{
+                file   => 'sample_sprite_%d.png',
+                images => [
+                    { file => 'small/Add.png', [ %options ] },
+                ],
+                [ %options ],
+            }],
+        );
+
+        $build->write_css('sprite.css');
+
+        Or
+
+        $builder->build(config => 'config.xml');
+
+        $build->write_css('sprite.css');
+
+DESCRIPTION
+    This module generate CSS sprites with one of these modules:
+    Image::Magick or GD.
+
+    It has many useful settings and can be used for sites with complex
+    structure.
+
+METHODS
+  new(<%args>)
+    my $builder = CSS::SpriteBuilder->new(<%args>);
+
+    Create instance.
+
+    Valid arguments are:
+
+    *   source_dir [ = undef ]
+
+        Specify custom location for source images.
+
+    *   output_dir [ = undef ]
+
+        Specify custom location for generated images.
+
+    *   image_quality 0..100 [ = 90 ]
+
+        Specify image quality for generated images (for JPEG only).
+
+    *   max_image_size [ = 65536 ]
+
+        Specify max size of images that will be used to generate a sprite.
+
+    *   max_image_width [ = 2000 ]
+
+        Specify max width of images that will be used to generate a sprite.
+
+    *   max_image_height [ = 2000 ]
+
+        Specify max height of images that will be used to generate a sprite.
+
+    *   max_sprite_width [ = 2000 ]
+
+        Specify max width of sprite. When sprite has no free space, than
+        creates a new sprite with addition of a suffix to the sprite name.
+        Opera 9.0 and below have a bug which affects CSS background offsets
+        less than -2042px. All values less than this are treated as -2042px
+        exactly.
+
+    *   max_sprite_height [ = 2000 ]
+
+        Specify max height of sprite.
+
+    *   margin [ = 0 ]
+
+        Add margin to each image.
+
+    *   transparent_color [ = undef ]
+
+        Set transparent color for image, for example: 'white', 'black', ....
+
+    *   is_background [ = 0 ]
+
+        If is_background flag is '0' will be generated CSS rule such as:
+        'width:XXXpx;height:YYYpx;'.
+
+    *   layout [ = 'packed' ]
+
+        Specify layout algorithm (horizontal, vertical or packed).
+
+    *   css_selector_prefix [ = '.spr-' ]
+
+        Specify CSS selector prefix. For example, for an image
+        "img/icon/arrow.gif" will be generated selector such as
+        ".spr-img-icon-arrow".
+
+    *   css_url_prefix [ = '' ]
+
+        Specify prefix for CSS url. For example: background-image:
+        url('css_url_prefixsample_sprite.png')
+
+    *   is_add_timestamp [ = 1 ]
+
+        If parameter set to '1' than timestamp will be added for CSS url.
+        For example: background-image: url('sample_sprite.png?12345678')
+
+  build(<%args>)
+    Build sprites.
+
+        $builder->build(<%args>);
+
+    This method returning structure like:
+
+        {
+            'sample_sprite_1.png' => [
+                {
+                    'y' => 0,
+                    'width' => 32,
+                    'selector' => '.spr-small-add',
+                    'is_background' => 0,
+                    'x' => 0,
+                    'height' => 32,
+                    'image' => 'small/Add.png',
+                    'repeat' => 'no'
+                },
+                ...
+            ],
+            ...
+        }
+
+    Valid arguments are:
+
+    *   sprites
+
+        Specify sprite list.
+
+            $builder->build(
+                sprites => [
+                    {
+                        file               => 'horizontal_%d.png',
+                        layout             => 'horizontal',
+                        max_sprite_width   => 1000,
+                        ...
+                        images => [
+                            { file => 'small/*.png', is_repeat => 1, ... },
+                            { file => 'small/*.gif' },
+                            { file => 'small/a.jpg', is_background => 1 },
+                        ],
+                    },
+                    {
+                        file                => 'sprite_%d.png',
+                        max_sprite_width    => 1000,
+                        css_selector_prefix => '#spr-',
+                        ...
+                        images => [
+                            { file => 'small/Add.png', is_repeat => 1, ... },
+                        ],
+                    },
+                ],
+            );
+
+    *   config
+
+        Specify XML config filename (it requires XML::LibXML module).
+
+            $builder->build(config => 'config.xml');
+
+        Example of config.xml:
+
+            <root>
+                <global_opts>
+                    <max_image_size>20000</max_image_size>
+                    <layout>packed</layout>
+                    <css_selector_prefix>.spr-</css_selector_prefix>
+                    <css_url_prefix>/sprite/</css_url_prefix>
+                </global_opts>
+
+                <sprites>
+                    <sprite file="sprite_%d.png">
+                        <image file="small/Add.png"/>
+                        <image file="small/Box.png"/>
+                        <image file="medium/CD.png"/>
+                    </sprite>
+                    <sprite file="sprite_x_%d.png" layout="vertical">
+                        <image file="small/Brick.png" is_repeat="1"/>
+                        <image file="small/Bin_Empty.png"/>
+                        <image file="medium/Close.png"/>
+                    </sprite>
+                    <sprite file="sprite_y_%d.png" layout="horizontal">
+                        <image file="small/Pattern.png" is_repeat="1"/>
+                        <image file="small/Address_Book.png"/>
+                        <image file="medium/Chat.png"/>
+                    </sprite>
+                </sprites>
+            </root>
+
+  write_css([<filename|fh>])
+    Write CSS to file. When filename parameter is not specified than this
+    method returning a string.
+
+        $builder->write_css('sprite.css');
+
+  write_xml([<filename|fh>])
+    Write CSS sprites info structure into XML format (it requires
+    XML::LibXML module). When filename parameter is not specified than this
+    method returning a string.
+
+        $builder->write_xml('sprite.xml');
+
+    Example of sprite.xml:
+
+        <root>
+            <sprite src="sample_sprite.png">
+                <image y="0" width="32" selector=".spr-small-add" is_background="0" x="0" height="32" repeat="no" image="small/Add.png"/>
+            </sprite>
+        </root>
+
+  write_html([<filename|fh>])
+    Write HTML sample page. When filename parameter is not specified than
+    this method returning a string.
+
+  get_sprites_info()
+    This method returning structure like:
+
+        {
+            'sample_sprite.png' => [
+                {
+                    'y' => 0,
+                    'width' => 32,
+                    'selector' => '.spr-small-add',
+                    'is_background' => 0,
+                    'x' => 0,
+                    'height' => 32,
+                    'image' => 'small/Add.png',
+                    'repeat' => 'no'
+                },
+                ...
+            ],
+            ...
+        }
+
+AUTHOR
+        Yuriy Ustushenko, <yoreek@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 Yuriy Ustushenko
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

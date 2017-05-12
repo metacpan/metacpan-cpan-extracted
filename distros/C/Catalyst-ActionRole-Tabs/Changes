@@ -1,0 +1,11 @@
+Revision history for Catalyst-ActionRole-Tabs
+
+0.003000  2009-10-26
+  - Performance improvments: Don't use can_visit() if avoidable.
+
+0.002000  2009-10-25
+  - Don't copy request parameters to tab links automatically.
+
+0.001000  2009-09-26
+  - First version, released on an unsuspecting world.
+

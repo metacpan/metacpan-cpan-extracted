@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+use strict;
+$|++;
+
+my $VERSION = '0.10';
+
+#----------------------------------------------------------------------------
+
+=head1 NAME
+
+cpanstats-update - script to update entries in the cpanstats database.
+
+=head1 SYNOPSIS
+
+  perl cpanstats-update                 \
+     --config=<file>                    \
+     --database=<dbcode>                \
+     [-i=0] [--file=<file>]
+
+=head1 DESCRIPTION
+
+Using a nominated cpanstats database, this program will search for records
+matching the given id on the command line, or the list provided in a named file.
+If the named file is correctly formatted, the nominated columns will also be
+updated.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --config
+
+Configuration file contain database access details.
+
+=item --database
+
+Specify the database to use, CPANSTATS or LITESTATS
+
+=item -i | --id
+
+Display the record matching the given NNTP id.
+
+=item --file
+
+The named file will be used to retrieve a list of NNTP ids, and if correctly
+formatted will update columns for the nominated id.
+
+To display records for a list of ids, the file should look like:
+
+  1
+  2
+  3
+  4
+
+To update columns for given ids, the file should look like:
+
+  1,state='pass'
+  2,state='pass',dist='MyDist'
+
+Note that the second entry will update multiple columns
+
+=back
+
+=cut
+
+# -------------------------------------
+# Library Modules
+
+use Config::IniFiles;
+use CPAN::Testers::Common::DBUtils;
+use Getopt::ArgvFile default=>1;
+use Getopt::Long;
+use IO::File;
+
+# -------------------------------------
+# Variables
+
+my (%options,@rows);
+
+# -------------------------------------
+# Program
+
+##### INITIALISE #####
+
+init_options();
+
+##### MAIN #####
+
+print "#id,guid,state,postdate,tester,dist,version,platform,perl\n";
+my @list = get_list();
+push @list, {id=>$options{id}}    if($options{id});
+
+for my $item (@list) {
+    @rows = $options{DB}->get_query('array',"SELECT * FROM cpanstats WHERE id=$item->{id}");
+    unless(@rows) {
+        $options{DB}->do_query("INSERT INTO cpanstats (id) VALUES ($item->{id})");
+    }
+    if($item->{set}) {
+        $options{DB}->do_query("UPDATE cpanstats SET $item->{set} WHERE id=$item->{id}");
+    }
+
+    @rows = $options{DB}->get_query('array',"SELECT * FROM cpanstats WHERE id=$item->{id}");
+    print join(",",@$_)."\n"   for(@rows);
+}
+
+@rows = $options{DB}->get_query('array',"SELECT max(id) FROM cpanstats");
+print "\n#MAX ID=$rows[0][0]\n" if(@rows);
+
+# -------------------------------------
+# Subroutines
+
+=item get_list
+
+Returns the list of NNTP ids from the named file.
+
+=cut
+
+sub get_list {
+    my @list;
+    my $file = $options{file} || return ();
+    die "file [$file] not found"        unless(-f $file);
+
+    my $fh = IO::File->new($file)       or die "Cannot open file [$file]: $!";
+    while(<$fh>) {
+        next    if(/^\s*$/);    # ignore empty lines
+        chomp;
+        my ($id,$str) = (m/^(\d+)(?:,(.*))?/);
+        $str =~ s/fulldate/date/        if($options{driver} =~ /sqlite/i);
+        push @list, {id=>$id,set=>$str} if($id);
+    }
+    $fh->close;
+
+    return @list;
+}
+
+=item init_options
+
+Determine command line options and initialise any defaults.
+
+=cut
+
+sub init_options {
+    GetOptions( \%options,
+        'config=s',
+        'database=s',
+        'id|i=i',
+        'file=s',
+        'help|h',
+        'version|v'
+    );
+
+    help(1) if($options{help});
+    help(0) if($options{version});
+
+    help(1,"Must specify the configuration file")               unless(   $options{config});
+    help(1,"Configuration file [$options{config}] not found")   unless(-f $options{config});
+
+    help(1,"Must specify the database code (CPANSTATS or LITESTATS)")
+        unless($options{database} && $options{database} =~ /^CPANSTATS|LITESTATS$/);
+
+    # load configuration
+    my $cfg = Config::IniFiles->new( -file => $options{config} );
+
+    # configure databases
+    my $db = $options{database};
+    die "No configuration for $db database\n"   unless($cfg->SectionExists($db));
+    my %opts = map {$_ => $cfg->val($db,$_);} qw(driver database dbfile dbhost dbport dbuser dbpass);
+    $options{DB} = CPAN::Testers::Common::DBUtils->new(%opts);
+    die "Cannot configure $db database\n" unless($options{DB});
+
+    $options{driver} = $opts{driver};
+}
+
+sub help {
+    my ($full,$mess) = @_;
+
+    print "\n$mess\n\n" if($mess);
+
+    if($full) {
+        print <<HERE;
+
+Usage: $0
+     --config=<file>                - configuration file
+     --database=<dbcode>            - CPANSTATS or LITESTATS
+
+    [--id=<num>]                    - refresh this id
+    [--file=<file>]                 - refresh these ids (1 per line)
+
+    [--help|-h]                     - this screen
+    [--Version|-v]                  - program version
+
+HERE
+
+    }
+
+    print "$0 v$VERSION\n";
+    exit(0);
+}
+
+__END__
+
+=back
+
+=head1 BUGS, PATCHES & FIXES
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties, that is not explained within the POD
+documentation, please send bug reports and patches to the RT Queue (see below).
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT Queue -
+http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Data-Generator
+
+=head1 SEE ALSO
+
+L<CPAN::Testers::WWW::Reports>,
+L<CPAN::Testers::WWW::Statistics>
+
+F<http://www.cpantesters.org/>,
+F<http://stats.cpantesters.org/>,
+F<http://wiki.cpantesters.org/>
+
+=head1 AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+=head1 COPYRIGHT AND LICENSE
+
+  Copyright (C) 2005-2012 Barbie for Miss Barbell Productions.
+
+  This module is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.
+
+=cut
+

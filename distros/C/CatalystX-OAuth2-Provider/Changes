@@ -1,0 +1,3 @@
+0.0003 - Fix missing dependencies
+0.0004 - Fix another missing dep CatalystX::Component::Traits in Makefile.PL
+0.0005 - Add test_requires 'Catalyst::Action::RenderView' in Makefile.PL. Aka, just another fix for dependency hell.

@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Helper::Model::Bitcoin.
+
+0.01  Sun Nov  7 21:34:22 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n Catalyst::Helper::Model::Bitcoin
+

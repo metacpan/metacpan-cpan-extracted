@@ -1,0 +1,26 @@
+---
+abstract: 'Comment::Block - Makes Block Comments Possible'
+author:
+  - 'Madison Koenig'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131490'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Comment-Block
+no_index: {}
+requires:
+  Filter::Util::Call: 0
+  strict: 0
+  warnings: 0
+version: 0.01

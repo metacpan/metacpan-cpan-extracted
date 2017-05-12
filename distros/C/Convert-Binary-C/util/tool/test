@@ -1,0 +1,10 @@
+#!/bin/sh
+
+DIFF=`perl check_alloc.pl <test.in | diff test.out -`
+
+if [[ $DIFF = "" ]]; then
+  echo "test passed"
+else
+  echo "FAILED:"
+  echo "\"$DIFF\""
+fi

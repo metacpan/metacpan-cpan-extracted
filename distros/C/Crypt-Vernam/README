@@ -1,0 +1,37 @@
+Crypt-Vernam version 0.03
+=========================
+
+The Crypt::Vernam module allows you to do a simple but robust
+encryption/decryption, with the algorithm of Gilbert Sandford, Vernam.
+This kind of encryption is truly unbreakable as long the key is
+maintained a secret.
+
+The Vernam cipher is a stream cipher where the original/plain data is 
+shifted (mod26) or XORed (mod2) with a pseudo-random stream of data of
+the same length to generated the encrypted data.
+When the stream of data used as key is truly random and used only 
+once, it is called a one-time pad. A widely used implementation of the
+Vernam cipher is RC4.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Manuel Gebele.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,23 @@
+CHANGELOG
+lib/Class/Mock/Generic/InterfaceTester.pm
+lib/Class/Mockable.pm
+Makefile.PL
+README
+t/class-mockable.t
+t/lib/SomePackage.pm
+t/pod-coverage.t
+t/pod.t
+MANIFEST
+t/class-mock-generic-interfacetester.t
+GPL2.txt
+ARTISTIC.txt
+t/coverage.sh
+t/lib/ParentPackage.pm
+lib/Class/Mock/Method/InterfaceTester.pm
+t/test-classes/CMMITTests.pm
+t/lib/CMMITTestClass.pm
+t/lib/CMMITTestClass/Subclass.pm
+t/lib/CMTests/TestClass.pm
+t/test-class.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

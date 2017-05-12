@@ -1,0 +1,54 @@
+Chart::GRACE
+-----------
+
+This module provides a perl/PDL interface to the XMGR plotting package. 
+Can be used to plot PDLs or Perl arrays.
+
+A simple function interface is provided that is based on the
+more complete object-oriented interface.
+
+
+Requirements
+------------
+
+This module is written entirely in perl (no XS) but does require that
+the PDL::Options module is installed. This is available as part of the
+PDL distribution (http://pdl.perl.org) or separately in the PDL
+directory on CPAN (e.g. in my author directory).
+
+In addition to this module, the XMGRACE plotting tool is also required.
+This can be downloaded from the GRACE web page. The GRACE home
+page is at http://plasma-gate.weizmann.ac.il/Grace/ .
+
+This module also requires a version of perl containing the IO::Pipe
+and IO::File modules (tested with 5.00404). The named
+pipe facility also requires that the POSIX::mkfifo command is supported
+If POSIX::mkfifo is not available then the named pipe option will not
+be available (and the npipe.t test will fail).
+
+
+Building and installation
+-------------------------
+
+This package uses the standard CPAN installation system:
+Unpack the distribution, change to the module directory and
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+The first command will fail if PDL::Options is not available.
+The test script will launch XMGRACE and send some data to it. Each
+test (one using simple pipes the other using named pipes) will launch
+an XMGRACE process -- this process must be exited before the further
+tests will start.
+
+Full documentation can be found in the GRACE.pm file using POD.
+
+Author and Copyright notice
+---------------------------
+
+Copyright (C) Tim Jenness 1998,1999,2001 (t.jenness@jach.hawaii.edu).  All
+rights reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.

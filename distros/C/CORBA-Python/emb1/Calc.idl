@@ -1,0 +1,17 @@
+
+interface Calc
+{
+
+	exception DivisionByZero { /* no member */ };
+
+	long Add(in long val1, in long val2);
+
+	long Sub(in long val1, in long val2);
+
+	long Mul(in long val1, in long val2);
+
+	long Div(in long val1, in long val2) raises (DivisionByZero);
+
+};
+
+

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+    <zs:version>1.1</zs:version>
+    <zs:numberOfRecords>2</zs:numberOfRecords>
+    <zs:records>
+        <zs:record>
+            <zs:recordSchema>dc</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/"> 
+                    <dc:title>Sample Title</dc:title>
+                    <dc:contributor>Alice</dc:contributor>
+                    <dc:contributor>Bob</dc:contributor>
+                    <dc:date xmlns:srw_dc="info:srw/schema/1/dc-schema">2013</dc:date>
+                </oai_dc:dc>
+            </zs:recordData>
+            <zs:recordPosition>1</zs:recordPosition>
+        </zs:record>
+        <zs:record>
+            <zs:recordSchema>dc</zs:recordSchema>
+            <zs:recordPacking>xml</zs:recordPacking>
+            <zs:recordData>
+                <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/"> 
+                    <dc:title>Another Title</dc:title>
+                </oai_dc:dc>
+            </zs:recordData>
+            <zs:recordPosition>2</zs:recordPosition>
+        </zs:record>
+    </zs:records>
+</zs:searchRetrieveResponse>

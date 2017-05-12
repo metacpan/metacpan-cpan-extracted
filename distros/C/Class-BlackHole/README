@@ -1,0 +1,131 @@
+README for Class::BlackHole
+                                        Time-stamp: "2000-05-13 19:35:25 MDT"
+
+NAME
+     Class::BlackHole - base class to treat unhandled method
+     calls as no-ops
+
+SYNOPSIS
+       use Class::BlackHole;
+
+       # set up a class X, to inherit from Class::BlackHole
+       @X::ISA = qw(Class::BlackHole);
+       # put a method in it
+       sub X::zaz { 123123; }
+
+       print "Zaz is <", X->zaz, ">\n";
+       print "Flork is <", X->flork, ">\n";
+       print "can zaz : <", X->can('zaz'), ">\n";
+       print "can flork : <", X->can('flork'), ">\n";
+
+       The above code prints:
+        Zaz is <123123>
+        Flork is <>
+        can zaz : <CODE(0x392c7d4)>
+        can flork : <>
+
+DESCRIPTION
+     Normally, if you try to call a method that there's no
+     handler for, you get an error:
+
+       Can't locate object method "flork" via package "X".
+
+     But for classes that inherit from Class::BlackHole,
+     unhandled methods become just no-operations.
+
+CAVEATS
+     Be sure to have Class::BlackHole be the absolute last item
+     in your class's ISA list.
+
+     This class will almost definitely not work right as part of
+     any ISA tree that has multiple inheritance.
+
+IMPLEMENTATION
+     Class::BlackHole just traps everything with an AUTOLOAD sub
+     that is a no-operation.
+
+     HOWEVER, what makes Class::Blackhole different than merely:
+
+       @Class::BlackHole::ISA = ();
+       sub Class::BlackHole::AUTOLOAD { }
+
+     is that this would (unhappily) trap calls to the helpful
+     methods in UNIVERSAL, like can, VERSION, and isa.
+
+     Class::BlackHole aliases those methods (or better said, all
+     subs in package UNIVERSAL) into its own package, so that
+     they'll be accessible instead of being caught by the
+     AUTOLOAD.
+
+FUNCTIONS AND METHODS
+     This module provides no functions or methods.
+
+     It exports no symbols into the calling package or anywhere
+     else.
+
+DISCLAIMER
+     This program is distributed in the hope that it will be
+     useful, but without any warranty; without even the implied
+     warranty of merchantability or fitness for a particular
+     purpose.
+
+     But let me know if it gives you any problems, OK?
+
+COPYRIGHT
+     Copyright 1999, 2000, Sean M. Burke sburke@cpan.org, all
+     rights reserved.  This program is free software; you can
+     redistribute it and/or modify it under the same terms as
+     Perl itself.
+
+AUTHOR
+     Sean M. Burke sburke@cpan.org
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Class::BlackHole doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Class::BlackHole, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Class::BlackHole in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in BlackHole.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Class directory in your
+MacPerl site_lib or lib directory, and move BlackHole.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Class::BlackHole should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Class::BlackHole is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

@@ -1,0 +1,42 @@
+NAME
+    Catalyst::Plugin::SuperForm - Create sticky HTML forms
+
+SYNOPSIS
+        use Catalyst qw[SuperForm];
+
+        print $c->superform->text( 
+            name => 'test'
+        );
+
+        print $c->superform->select(
+            name   => 'select',
+            labels => {
+                'DE' => 'Germany',
+                'SE' => 'Sweden',
+                'US' => 'United States'
+            }
+        );
+
+        # Alias
+        print $c->sform->text( name => 'test' );
+
+DESCRIPTION
+    Create sticky forms with "HTML::SuperForm".
+
+METHODS
+    sform
+        alias to superform
+
+    superform
+        Returns a instance of "HTML::SuperForm".
+
+SEE ALSO
+    HTML::SuperForm, Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

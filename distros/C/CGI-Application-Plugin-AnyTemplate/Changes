@@ -1,0 +1,308 @@
+Revision history for CGI-Application-Plugin-AnyTemplate
+
+0.18    Oct 18, 2009
+        - Can now use Clone::PP if Clone is not installed.
+          Thanks to Bianka Martinovic (RT #37999).  Note that there
+          doesn't appear to be a way to indicate to Module::Build that
+          the module can use either Clone or Clone::PP - that it
+          requires one (but not both) of them.  So for now, Clone is
+          still listed as a prerequisite.
+
+        - updated Template::Toolkit driver docs to indicate how to use 
+          different encodings.  Thanks to Shmuel Fomberg (RT #34791).
+        
+        - removed spurious call to $template->error on Petal templates.
+          Thanks to William McKee (RT #20221).
+
+        - Component handler now weakens reference to containing_template,
+          in an attempt to avoid crazy memory usage.  Thanks to Dan Horne
+          (RT #18157).
+          
+        - Changes of interest to module maintainers only:
+          - t/prereqs-scenarios is now included in the distribution.  
+            
+            This is how I simulate the absense of specific modules when 
+            running the test suite.  For instance, the user may have 
+            HTML::Template::Expr installed, but not HTML::Template::Pluggable.
+            Or they may have Clone::PP installed, but not Clone.
+
+            To test the various prerequisite scenarios, use the included 
+            prove-prereqs.pl script:
+
+              ./misc/prove-prereqs.pl t/prereq_scenarios -Ilib t/
+
+            This runs the test suite several times.  Each time it simulates
+            a different set of unavailable modules.
+
+            Adapted from the Perl Hacks book.
+            
+          - fixed the makedocs script to work with more recent pod2html
+          
+          - changed noindex to no_index in META.yml
+
+0.17    Nov 07, 2005
+        - fixed storage of TT objects so that objects with different
+          named configs don't trample each other (discovered by RA Jones)
+
+0.16    Nov 03, 2005
+        - fixed fill() so that when it is called without parameters, it
+          does not set the filename to undef.
+        - changed skip_libs to prereq_scenarios (and removed the scenarios
+          from the distribution)
+        - added new scenario for old CAP::Forward
+
+0.15    Oct 03, 2005
+        - include fix to work with old version of CAP::Forward that
+          doesn't always install its hooks properly.
+
+0.14    Sep 25, 2005
+        - added template_filename_generator
+        - minor doc fix
+
+0.13    Sep 14, 2005
+        - fixd bug where clear_params didn't work (Wojciech Pietron)
+        - fixed typos in docs regarding include_paths and
+          add_include_paths (Wojciech Pietron)
+        - minor doc fix
+
+0.12    Sep 13, 2005
+        - added return_references option, defaulting to true.
+        - changed load_tmpl to always return a string, rather than a
+          reference
+        - added documentation indicating that output returns a reference
+          by default
+
+0.11    Sep 08, 2005
+        - fixed a bug fill/process when called with a single non-hashref
+          argument.  The following used to be broken; now they DWIM:
+
+               $self->template->fill('filename');
+               $self->template->fill(\$template);
+
+        - fixed a bug in template_post_process that has been there since
+          the beginning.  The callback was being called as:
+
+              template_post_process($self, \$output)  # wrong!
+
+          But it was documented as:
+
+              template_post_process($self, $template, \$output)  # right!
+
+          It's been fixed to match the documentation.
+
+0.10    Aug 17, 2005
+        - This is a major new release with a lot of new features and
+          some incompatible API changes.
+
+          The new features are:
+
+            * new driver (HTMLTemplatePluggable) has support for
+              HTML::Template::Pluggable and HTML::Template::Plugin::Dot
+
+            * AnyTemplate can now optionally provide a load_tmpl method
+              like the one built into CGI::Application, so that old code
+              can get the benefit of AnyTemplate.
+
+            * added support for the load_tmpl hook
+
+            * test suite should be less fragile for users who don't have
+              all of the templating modules installed
+
+          The incompatibilities are:
+
+            * associate_query off by default
+            * associate_query now deprecated
+            * CAP::Forward now required
+            * default template names determined from $self->current_runmode, not
+              from the name of the calling sub
+            * template_pre_process and template_post_process now need to be
+              explicitly registered with $self->add_callback()
+            * tmpl_path is respected
+
+        - for more info on these changes see the changelog below for the developer
+          versions released since 0.08
+
+0.10_06 Aug 17, 2005 [**DEVELOPER RELEASE**] [unreleased]
+        - added an explit test to see if HTML::Template::Plugin::Dot works
+
+0.10_05 Aug 13, 2005 [**DEVELOPER RELEASE**]
+        - fixed a bug in the tests for testing module prerequisites
+        - it is now possible to run the test suite while simulating the
+          absense of specific templating modules.  To run the test suite
+          multiple times (each with a different selection of absent
+          modules), run:
+
+             $ perl misc/prove_without_modules.pl t/*.t
+
+          To customize this process, see the instructions at the top of
+          misc/prove_without_modules.pl
+
+0.10_04 Aug 13, 2005 [**DEVELOPER RELEASE**]
+        - new driver HTMLTemplatePluggable has support for
+          HTML::Template::Pluggable and HTML::Template::Plugin::Dot
+          (thanks to Mark Stosberg for starting the driver)
+
+0.10_03 July 27, 2005 [**DEVELOPER RELEASE**]
+        - moved 'forward' to its own module: CGI::Application::Plugin::Forward
+        - changed instances of 'use base' to use... and @ISA to be kinder to old Perls
+        - made hook-based tests skip if installed CGI::Application
+          doesn't support hooks
+
+0.10_02 July 25, 2005 [**DEVELOPER RELEASE**]
+        - wrapped usage of CGI::Application's callback system in
+
+            if ($webapp->can('call_hook')) { ... }
+
+          ...or equivalent, so CGI::Application 4.x is not required.
+
+0.10_01 July 25, 2005 [**DEVELOPER RELEASE**]
+        - this version has several API changes that are not backwards compatible:
+
+          - template names used to be automatically determined from the name
+            of the calling subroutine:
+
+                sub my_runmode {
+                    my $self = shift;
+                    $self->other_method;
+                }
+                sub other_method {
+                    my $self = shift;
+                    $self->template->fill;  # loads 'other_method.html'
+                }
+
+            There were two problems with this method:
+               1. Not every subroutine or method is a run mode
+               2. Under debuggers, the name of the calling subroutine is
+                  often not available, so code that uses automatic
+                  template names can't be run under a debugger.
+
+            So now AnyTemplate has been changed to get the template name
+            from $self->get_current_runmode:
+
+                sub my_runmode {
+                    my $self = shift;
+                    $self->other_method;
+                }
+                sub other_method {
+                    my $self = shift;
+                    $self->template->fill;  # loads 'my_runmode.html'
+                }
+
+            If you want to pass control to another runmode and you want
+            $self->get_current_runmode to be updated, then you use the
+            new 'forward' method:
+
+                sub my_runmode {
+                    my $self = shift;
+                    return $self->forward('other_runmode');
+                }
+                sub other_runmode {
+                    my $self = shift;
+                    $self->template->fill;  # loads 'other_runmode.html'
+                }
+
+
+          - template_pre_process and template_post_process are no longer
+            called automatically.  Instead you must register them as
+            hooks.
+
+            $self->add_callback('template_pre_process', \&template_pre_process);
+            $self->add_callback('template_post_process', \&template_post_process);
+
+          - associate_query and emulate_associate_query have now been
+            disabled by default. Having this feature enabled by default
+            was a potential XSS (Cross Site Scripting) security risk.
+            The use of this feature is now deprecated.  The feature
+            will be removed in the future
+
+
+        - other changes:
+          - added option to override load_tmpl.  It is enabled by:
+
+              use CGI::Application::Plugin::AnyTemplate qw(load_tmpl);
+
+            When this feature is enabled, you can do the following:
+
+                $self->load_tmpl('somefile.txt',
+                    path => '/path/to/templates',
+                    %other_options
+                );
+
+            And this is translated into:
+
+                $self->template->load('somefile.txt',
+                    add_include_path => '/path/to/templates',
+                    HTMLTemplate     => \%other_options,
+                    auto_add_template_extension => 0,
+                );
+
+          - added support for the load_tmpl hook, compatible with the
+            one built into CGI::Application
+
+          - $self->tmpl_path is now merged into 'include_path'
+
+          - documentation for authors of plugins and re-usable applications
+
+          - documentation for why the automatic extension mechanism is there
+
+          - re-numbered some test scripts
+
+
+0.08    July 20, 2005
+        - fixed bug where keys of configuration hashref were clobbered,
+          so if you used the same config repeatedly (e.g. under
+          mod_perl), onlyt the first call would work.
+          (thanks to R.A. Jones)
+
+0.07    July 10, 2005
+        - templates can also be created from strings via fill:
+             return $self->template->fill(\$some_text, \%params);
+
+0.06    July 10, 2005
+        - allowed templates to be created from strings (works in all
+          drivers except Petal):
+
+             $self->template->load(string => \$some_text);
+             $self->template->load(\$some_text);
+
+
+0.05    Jun 15, 2005
+        - changed embedded components from 'dispatch' to 'embed' to
+          avoid confusion with CGI::Application::Dispatch
+
+          This is an incompatible API change, which hopefully won't
+          actually affect anybody since I don't think there are any
+          users of AnyTemplate yet.
+
+          The default syntax has changed from:
+              CGIAPP_dispatch, CGIAPP.dispatch, CGIAPP/dispatch, etc.
+          to:
+              CGIAPP_embed, CGIAPP.embed, CGIAPP/embed, etc.
+
+          The old syntax still works to embed components in TT and
+          Petal (but is undocumented). Users of HTML::Template and
+          HTML::Template::Expr can return to the old syntax by setting
+          embed_tag_name to 'cgiapp_dispatch'
+
+          Related API changes:
+          - CAP:AnyTemplate::Dispatcher has been renamed to
+            CAP:AnyTemplate::ComponentHandler
+
+          - the dispatcher_class option has been renamed to
+            component_handler class
+
+          - the dispatch_tag_name driver config key has been renamed to
+            embed_tag_name
+
+
+0.04    May 19, 2005
+        - fixed Pod links and other minor doc issues
+
+0.03    May 19, 2005
+        - Fixed one More POD NAME error
+
+0.02    May 19, 2005
+        - Fixed NAME sections in driver POD
+
+0.01    May 18, 2005
+        - Initial Release

@@ -1,0 +1,157 @@
+2005/01/29 - (0.58)
+             Skip binmode step on older perls - this distro will now work
+             on pre-5.8 again.
+             Added documentation and --help option to cgi-wiki-kwiki-install.
+
+2005/01/27 - (0.57)
+             Small update to fix test failures when old version of
+             CGI::Wiki::Formatter::Multiple is installed (Bob Walker).
+
+2004/09/02 - (0.56)
+             Added code to the installer script. Changed the Build.PL to
+             copy the templates into the perl5 lib path. Added a new
+             copy of wiki.cgi into the 'bin' directory. The installer
+             script copies the templates and the cgi script into the current
+             directory, and creates an empty sqlite database. This should
+             leave you with a working CGI::Wiki::Kwiki install.
+             
+             Added comments to most of the templates to explain their
+             function. Added a stylesheet, installed along with the
+             templates.
+             
+             Fixed bug where the prefs page died if the site had a ' in
+             the name. This will invalidate most existing preferences
+             cookies.
+             
+             Changed search to use CGI::Wiki::Search::DB, as it's simpler
+             and doesn't spew weird cleanup errors.
+             
+             Added character set support, this requires a seperate patch
+             to CGI::Wiki to allow the store to support charsets. Made
+             the default charset of a new site utf-8.
+
+2004/08/26 - (0.55)
+             Fixed "Wanted Pages" that was broken by the 0.54 update -
+             thanks to Martin Frost for bug report.
+
+2004/08/12 - (0.54)
+             Display home node if asked for nonexistent node.
+
+2004/07/23 - (0.53)
+             Fixed bug - formatter name wasn't getting stored for single-
+             formatter wikis.  Fixed other bug - HTML wasn't getting
+             escaped in comments when listing all versions of a node.
+
+             ******************* NOTE TO UPGRADERS ************************
+             **  If you are upgrading from a version earlier than 0.52,  **
+             **  please make sure that you install the updated templates **
+             **  found in the templates/ directory of the tarball.       **
+             **    Added:   create_page.tt                               **
+             **    Changed: navbar.tt                                    **
+             **************************************************************
+
+2004/07/08 - (0.52)
+             We now require CGI::Wiki::Plugin::Diff 0.07 (bugfix version).
+             Added "Create Page" link to navbar (requested by Dave Cantrell).
+
+             ******************* NOTE TO UPGRADERS ************************
+             **  If you are upgrading from a version earlier than 0.51,  **
+             **  please make sure that you install the updated templates **
+             **  found in the templates/ directory of the tarball.       **
+             **    Added:   show_all_nodes.tt                            **
+             **    Changed: footer.tt                                    **
+             **             navbar.tt                                    **
+             **             site_index.tt                                **
+             **************************************************************
+
+2004/06/12 - (0.51) Template tweaks to add more stylesheet hooks.
+             Added 'show_all_nodes' action to dump out contents of all nodes
+             (requested by Bob Walker); access it via link on 'All Pages'.
+
+             ******************* NOTE TO UPGRADERS ************************
+             **  If you are upgrading from a version earlier than 0.50,  **
+             **  please make sure that you install the updated templates **
+             **  found in the templates/ directory of the tarball.       **
+             **    Changed: recent_changes.tt                            **
+             **************************************************************
+
+2004/06/10 - (0.50) Improved RecentChanges.
+
+2004/06/02 - (0.49) Documentation tweaks, added a default template_path
+             of './templates'.  New 'prefs_expire' option to let you decide
+             when preferences cookie will expire.
+
+             ******************* NOTE TO UPGRADERS ************************
+             **  If you are upgrading from a version earlier than 0.48,  **
+             **  please make sure that you install the updated templates **
+             **  found in the templates/ directory of the tarball.       **
+             **    Added:   preferences.tt                               **
+             **    Changed: navbar.tt                                    **
+             **************************************************************
+
+2004/01/06 - (0.48) Moved the button-press munging out of the CGI and into
+             the module, where it belongs.  Improved calling syntax of
+             ->process_template.  Added preferences facility for saving
+             username.
+
+2003/12/22 - (0.47) After committing an edit we now redirect to the edited
+             page rather than just calling the display method in order that
+             the URL our browser is pointing at is correct and complete.
+
+             ******************* NOTE TO UPGRADERS ************************
+             **  If you are upgrading from a version earlier than 0.45,  **
+             **  please make sure that you install the new difference.tt **
+             **  template.  It can be found in the templates/ directory  **
+             **  of the tarball.                                         **
+             **************************************************************
+
+2003/12/10 - (0.46) Fixup Build.PL - we don't *really* depend on CGI::Kwiki
+             Loads more docs (thanks Schuyler for the prod).  Few fixes to
+             the diff thing.
+
+.......... - (0.45) (not released) Ivor Williams' patches to make diffs work.
+             CGI::Wiki::Plugin::Diff is now a prerequisite.
+
+2003/11/24 - (0.44) Added ability to specify hostname of database server,
+             requested by Jody Belka.  db_user no longer required for
+             SQLite backend.
+
+2003/10/10 - (0.43) Fixed test skipping in t/04_multiple_formatter_options.t
+             - thanks to Josts Smokehouse for finding the failure.
+             Added footer.tt with a little credit in, plus the version.
+             Lots of template tweaks to use footer.tt and take advantage of
+             not_editable flag.  Couple more stylesheet hooks.
+
+2003/10/03 - (0.42) Fixed edit link for nonexistent nodes.  Made "all pages"
+             output be in alphabetical order.  Added some stylesheet hooks
+             to the template.  Removed the "revert to this version" link
+             from the node.tt template.  Made the content box on the edit
+             form be a more sensible size.
+
+2003/09/25 - (0.41) Fix for test failures - we skip the ones that require
+             CGI::Wiki::Formatter::Multiple if it's not installed (ta Jost).
+
+2003/09/23 - (0.4) Added multiple formatter support.
+
+                         **** INCOMPATIBLE CHANGE ****
+
+             The way that you tell the module which formatters to use has
+             changed.  Please read the documentation in lib/CGI/Wiki/Kwiki.pm
+             before upgrading, as you will need to change any existing
+             wiki.cgi scripts.
+
+2003/09/22 - (0.31) Tidied up the tests - IO::Stringy no longer needed.
+             (0.32) Fixed small bug previously masked by unnecessary
+             'use CGI qw( :standard )' line in CGI::Wiki, removed in 0.48.
+
+2003/08/28 - (0.3) Added username/comment support.  Added a start at tests.
+             Added support for the 'userstats' action.
+
+2003/07/18 - (0.2) Added search, using Search::InvertedIndex
+             (0.21) ..and added the new template to the MANIFEST. Oops.
+
+2003/07/13 - (0.1) Cleaned up some docs, added ability to revert to a previous
+             page version. Bumped to 0.1 because I'm in a good mood.
+
+2003/07/12 - Initial release
+

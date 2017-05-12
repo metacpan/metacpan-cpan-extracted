@@ -1,0 +1,13 @@
+
+In this toolkit are the modules:
+
+	Convert::BinHex		(in ./lib)
+
+And the sample programs:
+
+	binhex.pl		(in ./bin)
+	debinhex.pl		(in ./bin)
+
+Knock yourself out.
+
+

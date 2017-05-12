@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+
+[% body = PROCESS $content %]
+
+  <title>[% iname | html %]</title>
+
+    <meta http-equiv="Content-Type"     content="text/html; charset=ISO-8859-1" />
+    <meta http-equiv="Content-Language" content="en-gb" />
+    <meta name="Generator"              content="Labyrinth" />
+    <meta name="keywords"               content="perl,cpan,testing,testers" />
+    <meta name="description"            content="The administration site for CPAN Testers reports" />
+    <meta name="copyright"              content="Copyright (C) 2007-2013 CPAN Testers" />
+
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_setup.css" />
+    <link rel="stylesheet" type="text/css" media="screen,projection,print" href="/css/layout2_text.css" />
+
+<!--
+    Site Layout, Design &amp; Development by Miss Barbell Productions
+    Original CSS/XHTML Template Design by Wolfgang.
+
+    Valid XHTML 1.0 - http://validator.w3.org/check?uri=referer
+    Powered by LAMP (Linux, Apache, MySQL &amp; Perl) technologies.
+    Produced by LABYRINTH, a state of the art Website Management System
+    available from Miss Barbell Productions.
+    For more information contact Barbie <barbie@missbarbell.co.uk>
+
+    Smoke Box image copyright (c) Tyson Ibele 2004 (http://www.tysonibele.com/Main/gallery.htm)
+-->
+
+</head>
+
+<body>
+
+  <!-- Main Page Container -->
+  <div class="page-container">
+
+    <!-- For alternative headers START PASTE here -->
+
+    <!-- A. HEADER -->      
+    <div class="header">
+      
+      <!-- A.1 HEADER TOP -->
+      <div class="header-middle">
+
+        <!-- Sitelogo and sitename -->
+        <div class="sitename">
+          <h1><a href="/">[% iname %]</a></h1>
+          <h3>admin.cpantesters.org</h3>
+          <h2>[% IF user.fakename ; THEN ; user.fakename _ ': ' ; ELSIF user.name ; THEN ; user.name _ ': ' ; END %][% title %]</h2>
+        </div>
+      </div>
+
+        [% INCLUDE "public/box-sites.html" %]
+
+      <!-- A.4 HEADER BREADCRUMBS -->
+
+      <!-- Breadcrumbs -->
+      <div class="header-breadcrumbs">
+        <ul>
+          [% IF crumb4_name %]<li><a href="[% crumb4_href %]">[% crumb4_name %]</a></li>[% END %]
+          [% IF crumb3_name %]<li><a href="[% crumb3_href %]">[% crumb3_name %]</a></li>[% END %]
+          [% IF crumb2_name %]<li><a href="[% crumb2_href %]">[% crumb2_name %]</a></li>[% END %]
+          <li>[% crumb1_name %]</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- B. MAIN -->
+    <div class="main">
+
+      <!-- B.1 MAIN NAVIGATION -->
+      <div class="main-navigation">
+
+        <!-- Navigation Level 3 -->
+        <div class="round-border-topright"></div>
+
+        [% INCLUDE "public/navigation.html" %]
+        [% IF box_prefs ; THEN ; INCLUDE "public/box-prefs.html"   ; END %]
+        [% INCLUDE "public/quote.html" %]
+
+      </div>
+
+      <!-- B.1 MAIN CONTENT -->
+      <div class="main-content">
+
+        <!-- Pagetitle -->
+        <h1 class="pagetitle">[% title %]</h1>
+        <div class="column1-unit">
+
+          [% body %]
+
+        </div>
+        <hr class="clear-contentunit" />
+
+      </div>
+    </div>
+      
+    <!-- C. FOOTER AREA -->      
+    [% INCLUDE "public/footer.html" %]
+
+  </div> 
+
+[% INCLUDE "public/analytics.html" %]
+
+</body>
+</html>
+
+[% IF javascript %]
+	<script type="text/javascript" src="/js/prototype.js"></script>
+	<script type="text/javascript" src="/js/cpanadmin.js"></script>
+	<script type="text/javascript" src="/js/email_handler.js"></script>
+  <script type="text/javascript" src="/js/sorttable.js"></script>
+  <script type="text/javascript" src="/js/fixedmenu.js"></script>
+[% END -%]

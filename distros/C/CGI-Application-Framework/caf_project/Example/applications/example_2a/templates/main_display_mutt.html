@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>CGI::Application::Framework Example Application #2a ("Mutt") -- Main Page</title>
+	<link rel="stylesheet" href="<!-- TMPL_VAR NAME="url_examples_css" -->" type="text/css" />
+</head>
+  <body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+
+	<div id="nav">
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_1">One</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_2a">Two</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_3">Three</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_4">Four</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_5">Five</a></span>
+	</div>
+
+    <h1>CGI::Application::Framework Example Application #2a ("Mutt") -- Main Page</h1>
+    <h2>HTML::Template version</h2>
+
+<pre>
+<!-- TMPL_VAR NAME="README.txt" -->
+</pre>
+
+<h2>Building links that Maintain session</h2>
+
+<a href="<!-- TMPL_VAR NAME="SELF_HREF_LINK" -->">
+<b>Reload Page</b>
+</a>
+
+<p><font size=1><b>The 'href' link value is:</b>
+<!-- TMPL_VAR NAME="SELF_HREF_LINK" -->
+</font>
+</p>
+
+<p>
+<a href="<!-- TMPL_VAR NAME="JEFF_HREF_LINK" -->">
+<b>Click me to jump to the other page while maintaining the same session...</b>
+</a>
+</p>
+
+<p>
+<font size=1><b>The 'href' link value is:</b>
+<!-- TMPL_VAR NAME="JEFF_HREF_LINK" -->
+</font>
+</p>
+
+<p>
+<b>Number of times you have loaded this page:</b>
+<!-- TMPL_VAR NAME="load_count_just_here" -->
+</p>
+
+<p>
+<b>Number of times you have loaded any page with this session:</b>
+<!-- TMPL_VAR NAME="load_count_for_session" -->
+</p>
+
+  </body>
+</html>

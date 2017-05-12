@@ -1,0 +1,131 @@
+From catalyst-bounces@lists.rawmode.org  Mon Nov 21 06:43:32 2005
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by s69759.xenosight.com (8.12.11/8.12.11) with ESMTP id jALChVmM024617
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Mon, 21 Nov 2005 06:43:31 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EeAss-0008Bk-JT; Mon, 21 Nov 2005 13:34:58 +0100
+Received: from sa2.bezeqint.net ([192.115.104.16])
+        by rawmode.org with esmtp (Exim 4.52) id 1EeAsn-000665-IG
+        for catalyst@lists.rawmode.org; Mon, 21 Nov 2005 13:34:55 +0100
+Received: from localhost (unknown [127.0.0.1])
+        by sa2.bezeqint.net (Bezeq International SMTP out Mail Server) with
+        ESMTP id 9C21C33CF5
+        for <catalyst@lists.rawmode.org>; Mon, 21 Nov 2005 14:40:22 +0200 (IST)
+Received: from sa2.bezeqint.net ([127.0.0.1])
+        by localhost (sa2 [127.0.0.1]) (amavisd-new, port 10024) with ESMTP
+        id 01868-05 for <catalyst@lists.rawmode.org>;
+        Mon, 21 Nov 2005 14:40:19 +0200 (IST)
+Received: from pasta.woobling.org (unknown [82.81.247.180])
+        by sa2.bezeqint.net (Bezeq International SMTP out Mail Server) with
+        ESMTP
+        for <catalyst@lists.rawmode.org>; Mon, 21 Nov 2005 14:40:19 +0200 (IST)
+Received: by pasta.woobling.org (Postfix, from userid 501)
+        id 23B626C45; Mon, 21 Nov 2005 14:39:54 +0200 (IST)
+Date: Mon, 21 Nov 2005 14:39:53 +0200
+From: Yuval Kogman <nothingmuch@woobling.org>
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+Subject: Re: [Catalyst] Beer Rewards
+Message-ID: <20051121123953.GY8114@woobling.org>
+References: <20051121121554.GX8114@woobling.org>
+        <6.1.1.1.0.20051121132320.04b69738@127.0.0.1>
+        <20051121122801.GX4916@herlpacker.co.uk>
+Mime-Version: 1.0
+In-Reply-To: <20051121122801.GX4916@herlpacker.co.uk>
+X-HelloFBI-1: Allah Chemicals Weapons Mass Destruction Terror Anthrax
+X-HelloFBI-2: Taliban Iraq Jihad America Terrorism Communist Bomb
+X-OpenPGP-Key: http://nothingmuch.woobling.org/gpg-key-0xEBD27418.asc
+X-OpenPGP-Key-Fingerprint: C56E 126B C277 6DB7 237C 4A7C 542C 11C0 EBD2 7418
+X-Habeas-SWE-1: winter into spring
+X-Habeas-SWE-2: brightly anticipated
+X-Habeas-SWE-3: like Habeas SWE (tm)
+X-Habeas-SWE-4: Copyright 2002 Habeas (tm)
+X-Habeas-SWE-5: Sender Warranted Email (SWE) (tm). The sender of this
+X-Habeas-SWE-6: email in exchange for a license for this Habeas
+X-Habeas-SWE-7: warrant mark warrants that this is a Habeas Compliant
+X-Habeas-SWE-8: Message (HCM) and not spam. Please report use of this
+X-Habeas-SWE-9: mark in spam to <http://www.habeas.com/report/>.
+User-Agent: mutt-ng 1.5.9i (Linux)
+X-Virus-Scanned: amavisd-new at bezeqint.net
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============1726565169=="
+Mime-version: 1.0
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Status: O
+X-Status:
+X-Keywords:
+X-UID: 49
+
+
+--===============1726565169==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="tYlHSoJ8Aop8eNG2"
+Content-Disposition: inline
+
+
+--tYlHSoJ8Aop8eNG2
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 21, 2005 at 12:28:01 +0000, Chisel Wright wrote:
+> On Mon, Nov 21, 2005 at 01:25:25PM +0100, Johan Lindstr=F6m wrote:
+> > At 13:15 2005-11-21, Yuval Kogman wrote:
+> > >http://dev.catalyst.perl.org/wiki/BeerRewards
+> >=20
+> > I bet one beer (a Lappinkulta) that Catalyst::Easy is going to get more=
+=20
+> > takers if described right there in the Wiki.
+>=20
+> Yeah, I scanned through the list and immediately dismissed
+> Catalyst::Easy because I didn't see why I needed to head off to IRC for
+> the details.
+
+Fixed... Thanks for pressuring me, otherwise I would have left it at
+that =3D)
+
+--=20
+ ()  Yuval Kogman <nothingmuch@woobling.org> 0xEBD27418  perl hacker &
+ /\  kung foo master: /me spreads pj3Ar using 0wnage: neeyah!!!!!!!!!!!
+
+
+--tYlHSoJ8Aop8eNG2
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDgcAZVCwRwOvSdBgRAqK/AJ0cVEEzun9rt4AOURPazUflp9IwGACdETnE
+cqmuTsHkmW1oJL2EAzk+vRQ=
+=4ymK
+-----END PGP SIGNATURE-----
+
+--tYlHSoJ8Aop8eNG2--
+
+
+--===============1726565169==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst
+
+--===============1726565169==--

@@ -1,0 +1,15 @@
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/watch
+lib/Coro/Twiggy.pm
+Makefile.PL
+MANIFEST
+README
+t/01-use.t
+t/02-requests.t
+META.yml                                 Module meta-data (added by MakeMaker)

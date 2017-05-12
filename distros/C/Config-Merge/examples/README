@@ -1,0 +1,46 @@
+Examples for Config::Merge
+===========================
+
+There are four examples of the usage of Config::Merge:
+
+1) 'oo.pl' and 'func.pl' illustrate the two ways of using Config::Merge
+   They dump the config data corresponding to the path you type in.
+
+   To run them, try this:
+
+      perl oo.pl
+      perl oo.pl app.images
+      perl oo.pl app.html_filter.BanAllBut
+      perl oo.pl app.html_filter.BanAllBut.2
+
+      OR
+
+      perl func.pl
+      perl func.pl app.images
+      perl func.pl app.html_filter.BanAllBut
+      perl func.pl app.html_filter.BanAllBut.2
+
+   You need to have YAML::Syck or YAML installed to use these examples
+
+2) 'browser.pl' allows you to compare the data between a production environment
+   and a development environment.  The only difference between the data is
+   the 'local.yaml' file in 'config_dev/local.yaml'
+
+   To try it, type:
+       perl browser.pl
+    OR perl browser.pl debug
+
+   Then enter the path to the data you want (eg 'app.images.path')
+   or you can just press Enter to start.
+
+   You need to have Term::ReadLine and YAML::Syck or YAML installed to use
+   this example
+
+
+3) 'advanced.pl' illustrates how to define your own methods for is_local()
+   and load_as(). It shows the same config data for the production server
+   and for the machines 'dev1' and 'dev2'
+
+       perl advanced.pl
+    OR perl advanced.pl debug
+

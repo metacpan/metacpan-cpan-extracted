@@ -1,0 +1,17 @@
+/* comment */
+# comment
+test1       foo1
+test2       foo  bar
+test3       `foo  bar`
+test4       `/* foo */`
+test5       `\/`
+test6       `\``
+test7       \`
+test8       `\/x`
+test9       http:\/\/foo\.bar\.com\/baz\/
+test10      foo/* test */bar
+test11      `foo/* test */bar`
+test12      \\/\\/\\/
+
+test_multi  foo bar
+test_multi  baz etc

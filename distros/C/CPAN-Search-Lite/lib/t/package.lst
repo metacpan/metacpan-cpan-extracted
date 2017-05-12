@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORYSUMMARY>
+<SOFTPKG NAME="Archive-Tar" VERSION="1,30,0,0">
+	<TITLE>Archive-Tar</TITLE>
+	<ABSTRACT>Manipulates TAR archives</ABSTRACT>
+	<AUTHOR>Jos Boumans (kane@cpan.org)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+		<DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="Archive-Tar-1.30-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+    <DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+    <DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="Archive-Tar-1.30-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>
+<SOFTPKG NAME="libnet" VERSION="1,19,0,0">
+	<TITLE>libnet</TITLE>
+	<ABSTRACT>Collection of Network protocol modules</ABSTRACT>
+	<AUTHOR>Graham Barr (gbarr@pobox.com)</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="libnet-1.19-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="libnet-1.19-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>
+<SOFTPKG NAME="libwww-perl" VERSION="5,805,0,0">
+	<TITLE>libwww-perl</TITLE>
+	<ABSTRACT>The World-Wide Web library for Perl</ABSTRACT>
+	<AUTHOR>Gisle Aas (gisle@aas.no)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="Digest-MD5" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="HTML-Parser" VERSION="3,33,0,0" />
+		<DEPENDENCY NAME="MIME-Base64" VERSION="2,1,0,0" />
+		<DEPENDENCY NAME="URI" VERSION="1,10,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="libwww-perl-5.805-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="Digest-MD5" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="HTML-Parser" VERSION="3,33,0,0" />
+		<DEPENDENCY NAME="MIME-Base64" VERSION="2,1,0,0" />
+		<DEPENDENCY NAME="URI" VERSION="1,10,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="libwww-perl-5.805-PPM58.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>
+<SOFTPKG NAME="XML-Parser" VERSION="2,34,0,0">
+	<TITLE>XML-Parser</TITLE>
+	<ABSTRACT>A perl module for parsing XML documents</ABSTRACT>
+	<AUTHOR>Matt Sergeant (matt@sergeant.org)</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="XML-Parser-2.34-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="XML-Parser-2.34-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>
+</REPOSITORYSUMMARY>

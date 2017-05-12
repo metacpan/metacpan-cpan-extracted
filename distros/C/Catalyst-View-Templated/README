@@ -1,0 +1,12 @@
+Nobody reads this anymore, so see:
+
+   perldoc Catalyst::View::Templated 
+
+for details.  To install, try:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Enjoy.

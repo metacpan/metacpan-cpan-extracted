@@ -1,0 +1,2 @@
+<%args> $hearts </%args>\
+<p>This heart literal ♥</p><p>This is heart var <% $hearts %></p>

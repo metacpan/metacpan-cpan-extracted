@@ -1,0 +1,38 @@
+Changes
+examples/build_html.pl
+examples/config.xml
+examples/icons/medium/Calender.png
+examples/icons/medium/CD.png
+examples/icons/medium/Chat.png
+examples/icons/medium/Close.png
+examples/icons/medium/Folder_Open.png
+examples/icons/medium/Forward.png
+examples/icons/medium/Help.png
+examples/icons/medium/Home.png
+examples/icons/small/Add.png
+examples/icons/small/Address_Book.png
+examples/icons/small/Bin_Empty.png
+examples/icons/small/Bin_Full.png
+examples/icons/small/Box.png
+examples/icons/small/Brick.png
+examples/icons/small/Pattern.png
+lib/CSS/SpriteBuilder.pm
+lib/CSS/SpriteBuilder/Constants.pm
+lib/CSS/SpriteBuilder/ImageDriver/Auto.pm
+lib/CSS/SpriteBuilder/ImageDriver/Common.pm
+lib/CSS/SpriteBuilder/ImageDriver/Fake.pm
+lib/CSS/SpriteBuilder/ImageDriver/GD.pm
+lib/CSS/SpriteBuilder/ImageDriver/ImageMagick.pm
+lib/CSS/SpriteBuilder/Sprite.pm
+lib/CSS/SpriteBuilder/SpriteItem.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-build.t
+t/02-css-rules.t
+t/03-write-css.t
+t/04-write-xml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

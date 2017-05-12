@@ -1,0 +1,29 @@
+eva {
+  unit = 00
+  type = Prototype Unit
+}
+
+eva {
+  unit = 01
+  type = Test Unit
+}
+
+eva {
+  unit = 02
+  type = First Unit of Production Serie 1
+}
+
+eva {
+  unit = 03
+  type = Second Unit of Production Serie 1
+}
+
+eva {
+  unit = 04
+  type = Third Unit of Production Serie 1
+}
+
+eva {
+  unit = 05
+  type = First Unit of Production Serie 2
+}

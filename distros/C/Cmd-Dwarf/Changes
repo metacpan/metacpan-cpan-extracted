@@ -1,0 +1,158 @@
+Revision history for Perl extension dwarf
+
+1.42 2017-03-29T04:41:29Z
+
+    - fix tests of validator for Plack 1.0040 or higher
+    - fix usage synopsis
+    - fix a bug of Model::SQLBuilder
+    - improve Model::Email
+    - support http_only flag of cookie in HTTP::Session
+    - update URL of Dwarf::Module::SocialMedia::Twitter
+    - impl BLANK_TO_NULL filter for Dwarf::Validator
+
+1.41 2016-10-25T05:55:10Z
+
+    - impl autoflush-validation-error param
+    - impl Dwarf::Util::safe_decode_json
+    - add BIGINT and BIGUINT to Dwarf::Validator
+    - integrate Data::Validator
+    - integrate autobox
+    - fix CORS plugin
+    - modify JSON plugin
+    - modify SQLBuilder
+    - modify Text::CSV_XS
+    - modify Dwarf::load_plugins method
+    - fix a bug for Linux
+
+1.31 2016-01-20T06:39:00Z
+
+    - fix a bug for Linux
+    - add yen formatter for Text::Xslate
+    - fix a bug of Email::Valid with UTF-8 String
+    - modify Dwarf::load_plugin method
+    - support PSGI Streaming
+
+
+1.30 2015-09-17T08:16:49Z
+
+    - fix FILE_EXT validation constraint
+    - add a param to redirect method to specify custom status code
+
+1.29 2015-08-28T08:57:12Z
+
+    - fix a problem that dist_dir will die when this module hasn't installed yet. (kuriyama++)
+
+1.28 2015-08-26T13:26:46Z
+
+    - add carton support
+    - use Data::DPath instead of Data::Path as default
+    - add BASE64_TYPE constraint
+    - fix JSON constraint bug
+    - fix META.json
+    - fix other tiny bugs
+
+1.27 2015-07-30T06:47:39Z
+
+    - add share_dir option (bin/dwarf)
+    - use Test::PostgreSQL (01_basic/02_db.t)
+    - modify output on Ping API
+    - impl App::Model::Email
+    - add new DSLs (env, unauthorized)
+
+1.26 2015-07-21
+    - display proctitle
+
+1.25 2015-06-17
+    - impl CORS Plugin
+    - fix a bug on Build.pl
+    - modify SQL files
+
+1.24 2015-05-11
+    - update bootstap to version 3
+    - add favicon and apple-touch-icons
+    - add headers method in Dwarf::Module::DSL
+    - fix typo on App::Controller::ApiBase
+
+1.23 2015-02-02
+    - add more tests
+    - add Model::Hash
+    - add model method in Dwarf
+    - shoot few bugs on Dwarf::Plugin::Text::CSV_XS
+
+1.22 2015-01-06
+    - impl Dwarf::Plugin::Text::CSV_XS
+
+1.21 2014-12-25
+    - update documents
+    - impl a validation filter ENCODE_UTF8
+    - add new plugin Devel::StackTrace
+    - use Devel::StackTrace plugin when server error occurred
+    - fix a few bugs
+
+1.20 2014-12-24
+    - security fix for JSON API
+    - re-impl FormValidatr
+    - support DELETE method on App::Test
+    - fix a few bugs
+
+1.19 2014-11-26
+    - use Dwarf::Request as request object
+    - use Dwarf::Response as response object
+    - support array type on validation (such as name[])
+
+1.18 2014-11-06
+    - update run.cgi for SpeedyCGI
+    - move a directory of sql into app directory
+
+1.17 2014-07-09
+    - impl base_row_class option on App::DB::Schema::Dumper
+
+1.16 2014-06-09
+    - Add three Utils (DateTime/Geo/Password)
+
+1.15 2014-06-04
+    - SCALAR is no longer available on Dwarf::Validator
+    - Add new feature "ARRAY" on Dwarf::Validator
+    - Add unauthorized method on Dwarf
+    - fix a few bugs
+
+1.14 2014-05-02
+    - shoot a bug on Dwarf::Validator
+
+1.13 2014-04-17
+    - don't add new line with debug method on Dwarf::Plugin::Log::Dispath
+
+1.12 2014-04-16
+    - change default Content-Type on APIBase if URL is end with xml
+
+1.11 2014-04-16
+	- impl some FILTERs for Dwarf::Validator
+
+1.10 2014-04-14
+	- Impl Dwarf::Session::Store::DBI
+
+1.09 2013-11-28
+    - Add new plugin Dwarf::Plugin::AnyEvent::Redis
+    - Change URL of Twitter OAuth from authorize to authenticate
+    - Modify error handling of Dwarf::Module::SocialMedia::Twitter
+    - Modify error handling of Dwarf::Module::SocialMedia::Facebook
+    - Fix bugs of Dwarf::Plugin::HTTP::Session
+
+1.08 2013-11-22
+    - Fix bugs of Dwarf::Plugin::HTTP::Session
+
+1.07 2013-11-21
+    - remove/add some validation constraints
+
+1.06  2013-11-21
+    - Rename S2Factory::* to Dwarf::*
+    - Modify Dwarf::Module::SocialMedia::*
+
+1.05  2013-11-20
+    - update updated_at column when Teng::Row::update() called
+
+1.04  2013-11-19
+    - Add a plugin for Log::Dispatch::Rotate
+
+1.03_02
+    - original version

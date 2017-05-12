@@ -1,0 +1,7 @@
+Revision history for Perl extension Color::Mix.
+
+0.02  Mon Dec 07 12:19:00 2009
+	- Added Test::Warn as a dependency in Makefile.PL
+0.01  Mon Nov 30 14:27:04 2009
+	- original version of Color::Mix. L.Dalton;
+

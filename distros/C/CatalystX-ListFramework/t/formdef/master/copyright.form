@@ -1,0 +1,15 @@
+{
+ title  => 'Copyrights',
+ model  => 'TestModel::Copyright',
+ uses   => {
+           },
+
+ columns => {
+             OBJECT   => {primary_key => 'id'},
+             cpid     => {field=>'id', heading => 'ID'},
+             cpholder => {field=>'rights_owner', heading => 'Owner'},
+             cpyear   => {field=>'copyright_year', heading => 'Year'},
+            },
+ searches => {
+             },
+}

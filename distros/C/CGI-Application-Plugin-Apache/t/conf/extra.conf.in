@@ -1,0 +1,10 @@
+<Location /mp>
+    SetHandler  perl-script
+    PerlHandler ApachePlugin::MP
+</Location>
+
+<Location /cgi_compat>
+    SetHandler  perl-script
+    PerlSetVar CAPA_CGI_Compat On
+    PerlHandler ApachePlugin::CGI_compat
+</Location>

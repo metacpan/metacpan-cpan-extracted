@@ -1,0 +1,28 @@
+---
+abstract: 'helps you to make something around computer vision.'
+author:
+  - 'MASUDA Yuta <yuta.cpan@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::Exception: 0.310
+  Test::Number::Delta: 1.030
+configure_requires:
+  ExtUtils::MM_Cygwin: 6.620
+  ExtUtils::ParseXS: 2.220
+  ExtUtils::PkgConfig: 1.120
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cv
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::MM_Cygwin: 6.620
+  ExtUtils::ParseXS: 2.220
+  ExtUtils::PkgConfig: 1.120
+version: 0.29

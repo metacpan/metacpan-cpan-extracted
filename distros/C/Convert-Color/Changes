@@ -1,0 +1,68 @@
+Revision history for Convert-Color
+
+0.11    2014/06/01 21:07:03
+        [BUGFIXES]
+         * Unit-test floating-point numbers with approx delta tests; use
+           Test::Number::Delta (RT94761)
+
+0.10    2013/12/30 01:07:36
+        [CHANGES]
+         * Resolve a cornercase ambiguity between CORE::hex() and sub hex
+           which affects unclean code reloading on 5.16 (RT91722)
+
+0.09    CHANGES:
+         * Add ->chroma method to HSV and HSL spaces
+         * Add distance metrics in HSV and HSL spaces
+         * Allow palette spaces to perform custom closest-match in any color
+           space by using its distance metric
+
+0.08    CHANGES:
+         * Fix VGA colours so the indices agree with VT100/ANSI colour
+           numbering
+         * Don't rely on rgb8:255,255,255 as X11 being called 'white' during
+           testing
+         * Added an example script for generating gradients
+
+0.07    CHANGES:
+         * Add warnings in 'deprecated' category for AUTOLOAD and COLOR_SPACE
+           behaviours
+
+        BUGFIXES:
+         * Declare dependency on List::UtilsBy
+
+0.06    CHANGES:
+         * Introduced ->register_color_space and ->register_palette
+           declarations
+         * Announce AUTOLOAD behaviour as deprecated
+         * Provide automatic "best match" palette searches on registered
+           palette spaces
+
+0.05    CHANGES:
+         * Documentation fixes
+         * Various small updates to keep CPANTS happy
+
+0.04    CHANGES:
+         * Distance metrics in RGB{,8,16} color spaces
+         * Remember name/index of X11 and VGA colors
+
+0.03    CHANGES:
+         * Alpha-blending in RGB{,8,16} color spaces
+
+        BUGFIXES:
+         * More candidate paths to find X11's rgb.txt
+
+0.02    ADDITIONS:
+         * Support CMY and CMYK color spaces
+
+        CHANGES:
+         * Neater and more internal implementation of space->space conversions
+         * ->rgb8 / ->rgb16 are no longer methods on Convert::Color, but instead
+           on the specific ::RGB8 / ::RGB16 subclasses
+         * Added ->hsl etc.. component list accessors for other color spaces
+
+        BUGFIXES:
+         * Cache plugin list and space-to-class mapping to avoid @INC search
+           overhead in Module::Pluggable each time a new object is constructed
+
+0.01    First version, released on an unsuspecting world.
+

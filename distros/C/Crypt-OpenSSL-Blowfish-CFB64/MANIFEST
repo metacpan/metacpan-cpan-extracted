@@ -1,0 +1,13 @@
+CFB64.xs
+Changes
+lib/Crypt/OpenSSL/Blowfish/CFB64.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+ppport.h
+README
+t/Crypt-OpenSSL-Blowfish-CFB64.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

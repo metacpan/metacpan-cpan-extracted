@@ -1,0 +1,4 @@
+[% # generic error page %]
+<div class="error">
+ [% error.join("<br/>") %]
+</div>

@@ -1,0 +1,39 @@
+#to be used in conjunction with Cache::Static
+
+eval {	require Cache::Static;
+	require Cache::Static::XML_Comma_Util;
+}; if($@) {
+	XML::Comma::Log->warn("disabling cache_static.macro, Cache::Static not found");
+} else {
+	my $ROOT = $Cache::Static::ROOT;
+	my @stores = $self->elements('store');
+
+	$self->add_method( '_scache_enabled', sub { return 1; } );
+
+	foreach my $store (@stores) {
+		$store->add_hook ( 'post_store_hook',
+			sub {
+				my $doc = shift;
+				my $doc_key = my $store_spec = $doc->doc_key();
+				$store_spec =~ s/\|[^\|]*$//;
+
+				Cache::Static::_write_spec_timestamp("XML::Comma|Doc|$doc_key");
+				Cache::Static::_write_spec_timestamp("XML::Comma|Store|$store_spec");
+			}
+		);
+
+		$store->add_hook ( 'erase_hook',
+			sub {
+				my $doc = shift;
+				my $doc_key = my $store_spec = $doc->doc_key();
+				$store_spec =~ s/\|[^\|]*$//;
+
+				Cache::Static::_unlink_spec_timestamp("XML::Comma|Doc|$doc_key");
+				Cache::Static::_write_spec_timestamp("XML::Comma|Store|$store_spec");
+			}
+		);
+	}
+}
+
+1;
+

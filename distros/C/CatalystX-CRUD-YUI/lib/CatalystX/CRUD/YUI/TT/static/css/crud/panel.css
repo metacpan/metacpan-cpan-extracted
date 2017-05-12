@@ -1,0 +1,116 @@
+/* Resize Panel CSS */
+
+.yui-panel-container .yui-resizepanel .bd {
+
+    overflow: auto;
+    background-color: #fff;
+
+}
+
+/*
+    PLEASE NOTE: It is necessary to toggle the "overflow" property 
+    of the body element between "hidden" and "auto" in order to 
+    prevent the scrollbars from remaining visible after the the 
+    ResizePanel is hidden.  For more information on this issue, 
+    read the comments in the "container-core.css" file.
+*/
+
+.yui-panel-container.hide-scrollbars .yui-resizepanel .bd {
+
+    overflow: hidden;
+
+}
+
+.yui-panel-container.show-scrollbars .yui-resizepanel .bd {
+
+    overflow: auto;
+
+}		
+
+
+/*
+    PLEASE NOTE: It is necessary to set the "overflow" property of
+    the underlay element to "visible" in order for the 
+    scrollbars on the body of a ResizePanel instance to be 
+    visible.  By default the "overflow" property of the underlay 
+    element is set to "auto" when a Panel is made visible on
+    Gecko for Mac OS X to prevent scrollbars from poking through
+    it on that browser + platform combintation.  For more 
+    information on this issue, read the comments in the 
+    "container-core.css" file.
+*/
+
+.yui-panel-container.show-scrollbars .underlay {
+
+    overflow: visible;
+
+}
+
+.yui-resizepanel .resizehandle { 
+
+     position: absolute; 
+     width: 10px; 
+     height: 10px; 
+     right: 0;
+     bottom: 0; 
+     margin: 0; 
+     padding: 0; 
+     z-index: 1; 
+     background: url(http://developer.yahoo.com/yui/examples/container/assets/img/corner_resize.gif) left bottom no-repeat;
+     cursor: se-resize;
+
+}
+
+#panel_msg, .message {
+    font-weight: bold;
+    color: green;
+}
+
+
+/* popup panels */
+#addListPanel.yui-panel .hd,
+#links_panel_container .hd,
+#daily_schedule_panel .hd
+{
+    background: #7a0019;
+    text-align:center;
+    border: 1px solid #ffdd77;
+    color: #fff;
+    font-size: 110%;
+}
+
+#addListPanel .bd,
+#links_panel_container .bd,
+#daily_schedule_panel .bd
+{
+    border: 1px solid #7a0019;
+}
+
+
+/* undo crud effects */
+#panel_autocomplete label
+{
+    font-weight:normal;
+    text-align:left;
+    width: auto;
+    padding-right: 0;
+    float:none;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: inline;
+
+}
+
+#panel_autocomplete input
+{
+    font-weight:normal;
+    text-align:left;
+    width: auto;
+    padding-right: 0;
+    float:none;
+    margin-top: 0;
+    margin-bottom: 0;
+    display: inline;
+}
+
+

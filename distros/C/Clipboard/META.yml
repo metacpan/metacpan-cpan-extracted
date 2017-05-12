@@ -1,0 +1,20 @@
+---
+abstract: 'Cliboard - Copy and Paste with any OS'
+author:
+  - 'Ryan King <rking@panoptic.com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Clipboard
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.13

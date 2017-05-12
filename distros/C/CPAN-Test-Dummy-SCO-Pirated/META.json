@@ -1,0 +1,52 @@
+{
+   "abstract" : "package to test the SCO clone",
+   "author" : [
+      "Gabor Szabo <szabgab@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Test-Dummy-SCO-Pirated",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://perlmaven.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/szabgab/CPAN-Test-Dummy-SCO.git",
+         "web" : "http://github.com/szabgab/CPAN-Test-Dummy-SCO",
+         "x_license" : "http://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "1.04"
+}

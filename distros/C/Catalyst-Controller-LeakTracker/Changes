@@ -1,0 +1,28 @@
+0.08
+    - Fix bug #68134: link to Plugin::LeakTracker 
+    - Minor doc fix for CAVEATS section
+0.07
+    - Switch to Module::Install
+    - Add CONTRIBUTORS section
+
+0.06
+    - Sorting for requests and leaks (wreis)
+    - Mini-Tutorial (mateu)
+
+0.05
+    - switch from YAML::Syck to YAML::XS and add a missing dep (rbo &
+      nothingmuch)
+
+0.04
+    - use Chained dispatch type for compatibility
+
+0.03
+    - Update for more recent dependencies
+    - Actual test suite
+
+0.02
+    - use Template::Declare::Anon for the templates
+    - some doc fixes
+
+0.01
+    - Initial release

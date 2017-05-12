@@ -1,0 +1,13 @@
+NAME
+    CGI::Wiki::Plugin::Locator::UK - A CGI::Wiki plugin to manage UK
+    location data.
+
+DESCRIPTION
+    Access to and calculations using British National Grid location metadata
+    supplied to a CGI::Wiki wiki when writing a node. (For converting
+    between British National Grid co-ordinates and latitude/longitude, you
+    may wish to look at Geography::NationalGrid.)
+
+    Note: This is *read-only* access. If you want to write to a node's
+    metadata, you need to do it using the "write_node" method of CGI::Wiki.
+

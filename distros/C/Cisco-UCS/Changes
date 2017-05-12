@@ -1,0 +1,36 @@
+Revision history for Cisco-UCS
+
+0.51	Wed 25 Nov 2016 <ltp@cpan.org>
+	- Added support for extended attributes to resolve RT #114646.
+
+0.50	Mon 30 Nov 2015 <ltp@cpan.org>
+	- Use different versioning scheme because some package managers were found to
+	  misorder versions using a single decimal value.
+	- Changed Makefile.PL back to ExtUtils::MakMaker from inc::Module::Install.
+
+0.4	Thu 26 Nov 2015 <ltp@cpan.org>
+	- Release 0.04 - fixed VERSION in all modules.
+
+0.37	Wed 25 Nov 2015 <ltp@cpan.org>
+	- Updated _backup() sub for changes with later versions of UCSM.
+	- Added Cisco::UCS::Interconnect::Stats.
+	- Code and documentation tidy up.
+
+0.33	Fri May 17 2013 <ltp@cpan.org>
+	- Added Cisco::UCS::Blade::PowerBudget
+	- Added Cisco::UCS::Chassis::Stats
+	- Updated Cisco::UCS::Blade to add new method for retreiving power budget stats.
+	- Updated Cisco::UCS::Chassis to add new method for retreiving environmental stats..
+
+0.32	Wed May 15 2013 <ltp@cpan.org>
+	- Added Cisco::UCS::Blade::CPU
+	- Added Cisco::UCS::Common::PowerStats
+	- Added Cisco::UCS::Common::EnvironmentalStats
+	- Updated Cisco::UCS::Blade - new methods for retrieving CPU and power stats.
+
+0.31	Wed May 1 2013 <ltp@cpan.org>
+	- Added let method to Cisco::UCS::Blade
+
+0.30	Fri 4 2012 <ltp@cpan.org>
+	-Fixed bug in _get_child_objects in UCS.pm that prevented correct handling
+	of single child entities.

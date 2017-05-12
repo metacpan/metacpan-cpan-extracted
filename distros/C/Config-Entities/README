@@ -1,0 +1,182 @@
+NAME
+
+    Config::Entities - An multi-level overridable perl based configuration
+    module
+
+VERSION
+
+    version 1.06
+
+SYNOPSIS
+
+        use Config::Entities;
+    
+        # Assuming this directory structure:
+        #
+        # /project/config/entities
+        # |_______________________/a
+        # |_________________________/b.pm
+        # | { e => 'f' }
+        # |
+        # |_______________________/c.pm
+        # | { g => 'h' }
+        # |
+        # |_______________________/c
+        # |_________________________/d.pm
+        # | { i => 'j' };
+        my $entities = Config::Entities->new( '/project/config/entities' );
+        my $abe = $entities->{a}{b}{e};    # 'f'
+        my $ab = $entities->{a}{b};        # '{e=>'f'}
+        my $ab_e = $ab->{e};               # 'f'
+        my $cg = $entities->{c}{g};        # 'h'
+        my $cd = $entities->{c}{d};        # {i=>'j'}
+        my $cdi = $entities->{c}{d}{i};    # 'j'
+        my $c = $entities->{c};            # {g=>'h',d=>{i=>'j'}}
+    
+        # Entities can be constructed with a set of properties to be used by configs.
+        # Assuming this directory structure:
+        #
+        # /project/config/entities
+        # |_______________________/a.pm
+        # | { 
+        # |     file => $properties{base_folder}
+        # |         . '/sub/folder/file.txt'
+        # | }
+        my $entities = Config::Entities->new( '/project/config/entities',
+            { properties => { base_folder => '/project' } } );
+        my $file = $entities->{a}{file}; # /project/sub/folder/file.txt
+    
+        # You can also supply multiple entities folders
+        # Assuming this directory structure:
+        #
+        # /project/config
+        # |______________/entities
+        # |_______________________/a.pm
+        # | { b => 'c' } 
+        # |
+        # |______________/more_entities
+        # |____________________________/d.pm
+        # | { e => $properties{f} } 
+        my $entities = Config::Entities->new( 
+            '/project/config/entities',
+            '/project/config/more_entities',
+            { properties => {f => 'g'} } );     # { b => 'c', e => 'g' }
+        
+        # You can also specify a properties file  
+        # Assuming this directory structure:
+        #
+        # /project/config
+        # |______________/entities
+        # |_______________________/a.pm
+        # | { b => $properties{e} } 
+        # |
+        # |______________/properties.pl
+        # | { e => 'f' } 
+        my $entities = Config::Entities->new( 
+            '/project/config/entities',
+            { properties_file => '/project/config/properties.pl } );
+        my $ab = $entities->{a}{b}; # 'f'
+        
+        # Assuming:
+        #
+        # {
+        #     a => {
+        #         b => {
+        #             c => 'd',
+        #             e => 'f'
+        #         },
+        #         g => 'h'
+        #     }       
+        # }
+        #
+        # You can use dotted notation to refer to entities using get_entity
+        my $ab = $entities->get_entity( 'a.b' );    # {c=>'d',e=>'f'}
+        # You can fill a hash with many values at once using fill
+        my $ab_abc_abe = $entities->fill( 'a.b', 
+            {c=>undef, e=>undef} );                 # {c=>'d',e=>'f'}
+        # Perhaps the most useful approach is filling a hash from a coordinate
+        # or its parents
+        my $ab_abc_abe_ag = $entities->fill( 'a.b',
+            {c=>undef, e=>undef, g=>undef}, 
+            ancestry => 1 );                        # {c=>'d',e=>'f',g=>'h'}
+
+DESCRIPTION
+
+    In essense, this module will recurse a directory structure, running do
+    FILE for each entry and merging its results into the Entities object
+    which can be treated as a hash. Given that it runs do FILE, each config
+    node is a fully capable perl script.
+
+CONSTRUCTORS
+
+ new( $entities_root_dir [, $entities_root_dir, ...] \%options )
+
+    Recurses into each $entities_root_dir loading its contents into the
+    entities map. The filesystem structure will be propagated to the map,
+    each sub folder representing a sub hash. If both Xxx.pm and a folder
+    Xxx are found, the Xxx.pm will be loaded first then the recursion will
+    enter Xxx and merge its results over the top of what is already in the
+    map. If properties are provided via properties or properties_file, they
+    can be accessed using %properties in the individual config files. The
+    currently available options are:
+
+    entity
+
+      A hashref containing configuration. Will be overriden by the contents
+      of any $entities_root_dir's that are passed in.
+
+    properties
+
+      Properties to be loaded into %properties. Will override any
+      properties with the same name loaded by properties_file.
+
+    properties_file
+
+      A file or array reference of files that will be loaded into
+      %properties using do FILE
+
+METHODS
+
+ as_hashref
+
+    Will return a hashref representation of the current entities. It will
+    be a deep copy so changes to the hash will not affect the entities
+    object.
+
+ fill( $coordinate, $hashref, [%options] )
+
+    Will iterate through the keys of $hashref setting the associated value
+    to the value found at the same key in the entity matching $coordinate.
+    If the supplied $hashref has a key whose value is
+    'Config::Entities::entity' and the key is not found in the entity at
+    $coordinate the value in $hashref will be set to the entity itself. The
+    currently available options are:
+
+    ancestry
+
+      If true, the search will continue up the ancestry until it finds a
+      match.
+
+ get_entity( $coordinate, [%options] )
+
+    A simple dotted notation for indexing into the map. For example,
+    $entities-get_entity( 'a.b.c' )> is equivalent to $entities-{a}{b}{c}.
+    The currently available options are:
+
+    ancestry
+
+      If true, a list will be returned where the first element is the
+      matching entity, and each successive entity is its parent, all the
+      way up to $self.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,187 @@
+From catalyst-bounces@lists.rawmode.org  Mon Nov 21 14:01:28 2005
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by s69759.xenosight.com (8.12.11/8.12.11) with ESMTP id jALK1RER026667
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Mon, 21 Nov 2005 14:01:28 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EeHik-0000Bn-4k; Mon, 21 Nov 2005 20:52:58 +0100
+Received: from sa9.bezeqint.net ([192.115.104.23])
+        by rawmode.org with esmtp (Exim 4.52) id 1EeHif-0002ti-91
+        for catalyst@lists.rawmode.org; Mon, 21 Nov 2005 20:52:54 +0100
+Received: from localhost (unknown [127.0.0.1])
+        by sa9.bezeqint.net (Bezeq International SMTP out Mail Server) with
+        ESMTP id C2AEE33FB4
+        for <catalyst@lists.rawmode.org>; Mon, 21 Nov 2005 21:57:12 +0200 (IST)
+Received: from sa9.bezeqint.net ([127.0.0.1])
+        by localhost (sa9 [127.0.0.1]) (amavisd-new, port 10024) with ESMTP
+        id 24478-10 for <catalyst@lists.rawmode.org>;
+        Mon, 21 Nov 2005 21:57:10 +0200 (IST)
+Received: from pasta.woobling.org (unknown [82.81.247.180])
+        by sa9.bezeqint.net (Bezeq International SMTP out Mail Server) with
+        ESMTP
+        for <catalyst@lists.rawmode.org>; Mon, 21 Nov 2005 21:57:02 +0200 (IST)
+Received: by pasta.woobling.org (Postfix, from userid 501)
+        id BAAD76B89; Mon, 21 Nov 2005 21:57:54 +0200 (IST)
+Date: Mon, 21 Nov 2005 21:57:54 +0200
+From: Yuval Kogman <nothingmuch@woobling.org>
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+Subject: Re: [Catalyst] Beer Rewards
+Message-ID: <20051121195754.GZ8114@woobling.org>
+References: <20051121121554.GX8114@woobling.org>
+        <22a4faec0511210744g19404204n976919c775a8f60e@mail.gmail.com>
+Mime-Version: 1.0
+In-Reply-To: <22a4faec0511210744g19404204n976919c775a8f60e@mail.gmail.com>
+X-HelloFBI-1: Allah Chemicals Weapons Mass Destruction Terror Anthrax
+X-HelloFBI-2: Taliban Iraq Jihad America Terrorism Communist Bomb
+X-OpenPGP-Key: http://nothingmuch.woobling.org/gpg-key-0xEBD27418.asc
+X-OpenPGP-Key-Fingerprint: C56E 126B C277 6DB7 237C 4A7C 542C 11C0 EBD2 7418
+X-Habeas-SWE-1: winter into spring
+X-Habeas-SWE-2: brightly anticipated
+X-Habeas-SWE-3: like Habeas SWE (tm)
+X-Habeas-SWE-4: Copyright 2002 Habeas (tm)
+X-Habeas-SWE-5: Sender Warranted Email (SWE) (tm). The sender of this
+X-Habeas-SWE-6: email in exchange for a license for this Habeas
+X-Habeas-SWE-7: warrant mark warrants that this is a Habeas Compliant
+X-Habeas-SWE-8: Message (HCM) and not spam. Please report use of this
+X-Habeas-SWE-9: mark in spam to <http://www.habeas.com/report/>.
+User-Agent: mutt-ng 1.5.9i (Linux)
+X-Virus-Scanned: amavisd-new at bezeqint.net
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0745418690=="
+Mime-version: 1.0
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Status: O
+X-Status:
+X-Keywords:
+X-UID: 72
+
+
+--===============0745418690==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="+1d8mk/W7pQzMfc7"
+Content-Disposition: inline
+
+
+--+1d8mk/W7pQzMfc7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 21, 2005 at 07:44:01 -0800, John Wang wrote:
+> When will the ACL plugin be available?
+
+It's in the subversion repository - if you want I can make a
+release, but I'm hesitant - there hasn't been enough use (i needed
+it, but don't anymore - my project was cancelled).
+
+--=20
+ ()  Yuval Kogman <nothingmuch@woobling.org> 0xEBD27418  perl hacker &
+ /\  kung foo master: MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM: neeyah!
+
+
+--+1d8mk/W7pQzMfc7
+Content-Type: application/pgp-signature
+Content-Disposition: inline
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFDgibCVCwRwOvSdBgRAjXiAKC36PlkfCRzpvksQRNdb9LK9B/WXACghdfw
+O/rX34OnZZEBrHXJQY6LIDU=
+=1lVq
+-----END PGP SIGNATURE-----
+
+--+1d8mk/W7pQzMfc7--
+
+
+--===============0745418690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst
+
+--===============0745418690==--
+
+From catalyst-bounces@lists.rawmode.org  Mon Nov 21 14:36:09 2005
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by s69759.xenosight.com (8.12.11/8.12.11) with ESMTP id jALKa8LT026794
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Mon, 21 Nov 2005 14:36:09 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EeIGI-0004S8-Hh; Mon, 21 Nov 2005 21:27:38 +0100
+Received: from saturnus.mwdesign.se ([195.196.29.163])
+        by rawmode.org with smtp (Exim 4.52) id 1EeIGD-0001Iv-E3
+        for catalyst@lists.rawmode.org; Mon, 21 Nov 2005 21:27:34 +0100
+Received: (qmail 23956 invoked from network); 21 Nov 2005 20:33:04 -0000
+Received: from unknown (HELO linjoh1.DarSerMan.com)
+        (johanl@darserman.com@81.226.97.152)
+        by 0 with SMTP; 21 Nov 2005 20:33:04 -0000
+Message-Id: <6.1.1.1.0.20051121213043.061b3c50@127.0.0.1>
+X-Sender: johanl@darserman.com@mail.melmac.se
+X-Mailer: QUALCOMM Windows Eudora Version 6.1.1.1
+Date: Mon, 21 Nov 2005 21:32:33 +0100
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+From: Johan Lindström <johanl@DarSerMan.com>
+Subject: Re: [Catalyst] Context sensitive template locations
+In-Reply-To: <20051121184306.GD10477@central.redice.net>
+References: <6.1.1.1.0.20051121002017.02bee360@127.0.0.1>
+        <33643.84.143.57.123.1132534017.squirrel@mail.dunkelheit.at>
+        <6.1.1.1.0.20051121183126.06153598@127.0.0.1>
+        <20051121184306.GD10477@central.redice.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"; format=flowed
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Status: O
+X-Status:
+X-Keywords:
+X-UID: 73
+
+At 19:43 2005-11-21, Matt S Trout wrote:
+>Yuck. Just pass an arrayref as the INCLUDE_PATH to the TT view config and
+>then have requests set that ...
+
+Aahh! Of course, now I remember reading something about that in the TT
+archives.
+
+Much better.
+
+
+/J
+
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst

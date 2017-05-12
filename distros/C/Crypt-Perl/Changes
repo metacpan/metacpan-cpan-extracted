@@ -1,0 +1,74 @@
+Revision history for Perl module Crypt::Perl
+
+0.01 Tue Dec 13 2016
+- original release
+
+0.02 Sat Dec 17 2016
+- Add sign_jwa() and verify_jwa() ECDSA methods
+- Add JWK-getter and JWK thumbprint methods
+- Fix generation of secp521r1 keys
+- Replace overload-dependent math for BigInt with explicit function calls
+- Fix parsing of RSA PKCS8 keys
+- Fix ASN.1 template error messages
+- Add typed exceptions for ASN.1 errors
+- Update a bit of documentation
+
+0.021 Mon Dec 19 2016
+- Fix minimum version in Makefile.PL so that CPAN will run tests
+
+0.022 Mon Dec 19 2016
+- Fix MANIFEST to include all of the intended files
+
+0.03 Tue Dec 20 2016
+- Add JWK parsing
+- Add a generic parse_key() method
+
+0.031 Tue Dec 20 2016
+- Remove use of Math::BigInt::FastCalc, pending bug fixes
+
+0.032 Wed Dec 21 2016
+- Put correct Symbol::Get version in Makefile.PL
+- Remove test dependency on JSON.pm
+- Use File::Which instead of “which” binary (Win32 compatibility)
+
+0.033 Fri Dec 23 2016
+- Accommodate missing from_bytes()/as_bytes() in GMP/Pari
+- Make exception class print with object’s stringification
+- Accept ASN1 find() errors that don’t have an error message.
+
+0.1
+- PKCS #10 CSR generation (RSA or ECDSA)
+- Small optimizations to RSA generation and associated POD
+- ASN1 prepare() errors now include the template’s first 32 bytes
+
+0.11 Sat Dec 31 2017
+- Fix MANIFEST to include new files meant for 0.1 release … grr, CPAN
+
+0.12 Mon Jan 02 2017
+- Fix generation of 224-bit ECDSA keys
+- Fix PKCS10 tests to permit spaces around “=” in OpenSSL parse
+- Add tests for generation of all ECDSA curves
+
+0.13 Tue Jan 03 2017
+- Make CSRs with explicit curve parameters rather than named curves
+- Proper fix for ECDSA key generation (224-bit and 521-bit)
+- Reduce tests’ dependency on OpenSSL
+- Include seed in explicit ECDSA parameters
+- Fix CSRs challengePassword test to accommodate OpenSSL versions
+  that hide the challengePassword
+
+0.14 Tue Jan 03 2017
+- Make CSRs with named curves again (CAs don’t like explicit parameters.)
+
+0.15 Tue Jan 03 2017
+- Fix tests for Perl <5.14
+
+0.16 Mon Feb 06 2017
+- Add logic for compressed, uncompressed, and hybrid curve points
+- Improve documentation concerning ECDSA key formats
+- Fix (?) handling of “seed” values
+- Optimizations to the ECC math
+
+0.17
+- All exceptions that originate in Crypt::Perl are now Crypt::Perl::X instances.
+- BUG FIX: Make RSA key generation typecast to Crypt::Perl::BigInt.

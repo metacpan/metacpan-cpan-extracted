@@ -1,0 +1,62 @@
+[% PROCESS mirror_list %]
+[%
+  langs = { de => 'Deutsch',
+            en => 'English',
+            es => 'Espa&ntilde;ol',
+            fr => 'Fran&ccedil;ais',
+            it => 'Italiano',
+            pt => 'Portugu&ecirc;s',
+          }
+%]
+<div class=path><b>[% pages.mirror %]</b></div>
+[% pages.mirror1 %]
+[% host = mirror || download %]
+<a href="[% host %]">
+[% host %]</a>. 
+[% pages.default %] <a href="[% download %]">[% download %]</a>
+[% pages.mirror2 %]<p />
+<form action="[% home %][% path %]" method="post">
+[% IF save -%]
+[% FOREACH key = save.keys -%]
+<input type="hidden" name="[% key %]" value="[% save.$key %]">
+[% END -%]
+[% END -%]
+<b>1. [% pages.public %]</b><br />
+<select name="host">
+<option value="">[% pages.none %]</option>
+[% FOREACH item = mirror_list -%]
+[% FOREACH protocol = ['http', 'ftp'] -%]
+[% IF item.$protocol %]
+<option value="[% item.$protocol %]">[% item.location %]
+ [[% protocol %]://[% item.host %]]</option>
+[% END -%]
+[% END -%]
+[% END -%]
+</select><p />
+<b>[% pages.alt %]</b><p /><b>2. [% pages.custom %]</b> 
+(eg http://my.site/CPAN/)<br />
+<input type=text name="url" value="" size=80>
+<p /><hr /><p>
+[% IF webstart %]
+<input name="webstart" value="1" type="checkbox" checked>
+[% ELSE -%]
+<input name="webstart" value="1" type="checkbox">
+[% END -%]
+[% pages.webstart %]
+<a 
+href="http://cpan.uwinnipeg.ca/htdocs/faqs/webstart.html">PAR::WebStart</a>.
+</p><hr /><p>
+[% pages.Language %]: <select name="lang">
+<option value="">Web browser setting</option>
+[% FOREACH choice = ['de', 'en', 'es', 'fr', 'it', 'pt'] %]
+[% IF choice == lang %]
+ <option value="[% choice %]" selected="selected">[% langs.$choice %]</option>
+[% ELSE %]
+ <option value="[% choice %]">[% langs.$choice %]</option>
+[% END -%]
+[% END -%]
+</select>
+</p><hr />
+<input type="hidden" name="submit" value="1">
+<input type="submit" value="Submit">
+</form>

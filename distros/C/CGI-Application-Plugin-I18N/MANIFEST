@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/CGI/Application/Plugin/I18N.pm
+lib/CGI/Application/Plugin/I18N/Guide.pod
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+sample/potest/potest.pm
+sample/potest/potest.cgi
+sample/potest/test.html
+sample/potest/I18N/de.mo
+sample/potest/I18N/de.po
+META.yml                                 Module meta-data (added by MakeMaker)

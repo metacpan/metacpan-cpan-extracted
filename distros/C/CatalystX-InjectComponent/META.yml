@@ -1,0 +1,21 @@
+---
+abstract: 'Inject components into your Catalyst application'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-InjectComponent
+requires:
+  Catalyst::Runtime: 5.8
+  Class::Inspector: 0
+  Devel::InnerPackage: 0
+  parent: 0
+version: 0.025

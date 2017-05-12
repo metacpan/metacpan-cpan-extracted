@@ -1,0 +1,41 @@
+NAME
+    Catalyst::Plugin::PluginLoader - Load Catalyst Plugins from Config
+
+SYNOPSIS
+      <Plugin::PluginLoader>
+          plugins Session
+          plugins Session::Store::FastMmap
+          plugins Session::State::Cookie
+      </Plugin::PluginLoader>
+
+      use Catalyst qw/ConfigLoader PluginLoader/;
+
+DESCRIPTION
+    Allows you to load Catalyst plugins from your app config file.
+
+    Plugin order is the same as if you put the plugins after PluginLoader in
+    the "use Catalyst" line.
+
+    Roles will be loaded as well, however "around 'setup'" will not work
+    yet.
+
+    This is a COLOSSAL HACK, use at your own risk.
+
+    Please report bugs at <http://rt.cpan.org/>.
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::ConfigLoader,
+    Catalyst::Manual::ExtendingCatalyst
+
+TODO
+    Better tests.
+
+AUTHOR
+    Ash Berlin, "ash at cpan.org"
+
+    Rafael Kitover, "rkitover at cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

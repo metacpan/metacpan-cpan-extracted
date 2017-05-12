@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Class/Meta/Declare.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-constants.t
+t/20-build-class.t
+t/30-semi-affordance.t
+t/40-affordance.t
+t/50-create.t
+t/60-constructors.t
+t/70-bare.t
+t/80-options.t
+t/90-types.t
+t/pod-coverage.t
+t/pod.t

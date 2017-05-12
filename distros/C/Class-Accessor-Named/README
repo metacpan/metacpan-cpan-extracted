@@ -1,0 +1,68 @@
+Class::Accessor::Named(U3s)er Contributed Perl DocumentatCiloanss::Accessor::Named(3)
+
+
+
+NNAAMMEE
+       Class::Accessor::Named - Better profiling output for Class::Accessor
+
+SSYYNNOOPPSSIISS
+           perl -MClass::Accessor::Named your_script.pl
+
+DDEESSCCRRIIPPTTIIOONN
+       Class::Accessor is a great way to automate the tedious task of generat-
+       ing accessors and mutators. One small drawback is that due to the
+       details of the implemenetation, you only get one "__ANON__" entry in
+       profiling output.  That entry contains all your accessors, which can be
+       a real pain if you're attempting to figure out _w_h_i_c_h of your accessors
+       is being called six billion times.  This module is a development aid
+       which uses Hook::LexWrap and Sub::Name to talk your accessors into
+       identifying themselves. While it shouldn't add much additional runtime
+       overhead (as it acts only Class::Accessor's generator functions), it
+       has not been designed for production deployment,
+
+DDEEPPEENNDDEENNCCIIEESS
+       This module depends on Class::Accessor, UNIVERSAL::require,
+       Hook::LexWrap and Sub::Name
+
+IINNCCOOMMPPAATTIIBBIILLIITTIIEESS
+       None reported.
+
+BBUUGGSS AANNDD LLIIMMIITTAATTIIOONNSS
+       Please report any bugs or feature requests to "bug-class-acces-
+       sor-named@rt.cpan.org", or through the web interface at
+       <http://rt.cpan.org>.
+
+AAUUTTHHOORR
+       Jesse Vincent  "<jesse@bestpractical.com>"
+
+LLIICCEENNCCEE AANNDD CCOOPPYYRRIIGGHHTT
+       Copyright (c) 2006, Best Practical Solutions, LLC.  All rights
+       reserved.
+
+       This module is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself. See perlartistic.
+
+DDIISSCCLLAAIIMMEERR OOFF WWAARRRRAANNTTYY
+       BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+       FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+       WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+       PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+       EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+       WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+       ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+       YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+       NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+       IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+       WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+       REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+       TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CON-
+       SEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFT-
+       WARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+       INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF
+       THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER
+       OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+
+
+perl v5.8.7                       2006-06-25         Class::Accessor::Named(3)

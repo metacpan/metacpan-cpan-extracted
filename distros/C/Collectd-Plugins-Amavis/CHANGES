@@ -1,0 +1,27 @@
+==================================================
+Changes from 2014-10-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2015-10-27 09:08:53 +0000
+------------------------------------------
+
+  Change: 19fc6d65f146aa7fb3613aaf9135403e1911c0a0
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-10-27 10:07:51 +0000
+
+    replace special characters in counter names 
+
+------------------------------------------
+version 1.000 at 2015-10-26 18:54:14 +0000
+------------------------------------------
+
+  Change: 30bcc91e6ee2f9b3337da5aded15497b5a831b01
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-10-26 19:54:14 +0000
+
+    initial checkin 
+
+================
+End of releases.
+================

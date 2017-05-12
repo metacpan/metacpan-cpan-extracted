@@ -1,0 +1,154 @@
+Revision history for Carmel
+
+v0.1.34  2016-09-25 15:24:53 PDT
+        - Use cpan.metacpan.org as a default fast/backpan mirror
+        - Fix SiteINC to run nested carmel exec #28
+
+v0.1.33  2016-05-25 22:39:03 PDT
+        - Same as v0.1.32
+
+v0.1.32  2016-05-24 10:37:10 PDT
+        - Allow falling back to backpan when restoring from snapshot
+
+v0.1.31  2016-05-24 01:37:11 PDT
+        - Experimental support for mirror in cpanfile
+        - Support restoring exact snapshot versions via mirror-index for Menlo
+
+v0.1.30  2016-05-23 13:32:48 PDT
+        - Store configure/build requirements in snapshot as well for a compatibility with Carton
+
+v0.1.29  2016-05-22 13:02:57 PDT
+        - Fixes various corner cases to preserve snapshot versions
+        - Added a workaround with optimistic snapshot upgrade in case submodules have
+          non-changing versions across distribution updates
+        - Make sure build cache (~/.carmel/perl-<ver>-<arch>/perl5) is blown away
+        - Implemented experimental carmel update command
+
+v0.1.28  2016-05-21 22:51:49 PDT
+        - Fix bugs locating modules with undef versions in snapshot
+
+v0.1.27  2016-05-21 22:31:27 PDT
+        - Support loading versions from cpanfile.snapshot
+
+v0.1.26  2016-05-05 10:52:46 PDT
+        - Add PERL_FILE_TEMP_CLEANUP environment variable to keep build files (#21)
+        - Support HOMEPATH in addition to HOME (#25)
+        - Experimental support for saving cpanfile.snapshot
+
+v0.1.25  2015-09-02 08:15:07 CEST
+        - Make this a non-dev release
+
+v0.1.24  2015-09-02 08:04:13 CEST
+        - Remove snapshot support for now
+        - Rename carmel install <module> to carmel inject
+        - Locate cpanfile in upper directory a la Carton
+        
+v0.1.23  2015-08-13 14:02:08 PDT
+        - Use the new dev version of Menlo CLI instead of cpanm
+
+v0.1.22  2015-04-27 10:04:19 PDT
+        - Added experimental carmel binstubs command
+        - The minimum perl version requirement is now 5.12 because of the INC ordering
+        - Stop installing "Guard" INC since runtime Module::CoreList is a bad idea. Instead,
+          replace site_perl INC entry with a dumbed down version that only allows loading
+          Carmel::Preload and its dependencies. This is like lib::core::only.
+
+v0.1.21  2015-04-25 11:25:53 PDT
+        - Fixed a bug where carmel exec fails to install the guard hook when there's no PERL5LIB
+        - Added more helpful error message when you try to load Carmel::Preload outside carmel exec
+
+v0.1.20  2015-04-25 10:21:01 PDT
+        - Added Carmel::Setup to configure Carmel within a perl script
+        - Removed Carmel::Runtime->require_all in favor of new Carmel::Preload
+        - Documentation
+        - Refactored Carmel::Runtime and split them into Runner/Setup/Preload
+
+v0.1.19  2015-04-25 06:22:59 PDT
+        - Display which dependencies are being installed in `carmel install`
+        - Added an experimental `carton package` command
+
+v0.1.18  2015-04-24 14:23:25 PDT
+        - Silence ExtUtils::Install output in carmel rollout
+
+v0.1.17  2015-04-24 12:52:07 PDT
+        - add back inc entries so that some XS modules can load its objects
+        - carmel exec unknowncommand will give you the error message
+        - `carmel exec` after `carmel rollout` will use the modules from ./local
+
+v0.1.16  2015-04-23 16:54:27 PDT
+        - Better error message when there's a conflicting version requirement in cpanfile and
+          META prereqs in dependencies
+        - Change the output of carmel env slightly
+
+v0.1.15  2015-04-23 11:02:35 PDT
+        - Fix a bug in artifact search where a package with same versions do not return newer
+          dists correctly. Also simplified the logic behind that search.
+        - Allow utilities like prove to add INC correctly via its `-l` options in carmel exec
+
+v0.1.14  2015-04-22 21:21:23 PDT
+        - Fix a bug failing to load artifact when exact version is specified in cpanfile
+        - Use -Mlib=... to load the bootstrap module
+
+v0.1.13  2015-04-22 19:25:53 PDT
+        - Implemented experimental carmel rollout command to install artifacts into ./local
+
+v0.1.12  2015-04-22 16:42:10 PDT
+        - Implemented Carmel::Runtime->require_all
+        - Save and restore cpanfile prereqs in Runtime
+
+v0.1.11  2015-04-22 12:03:03 PDT
+        - Big performance optimization in carmel exec, about 20 times less overhead
+        - Do not use PERL5LIB env var anymore, rather use PERL5OPT and bootstrap .pm file
+        - Fix a bug where -h/-v is swallowed in carton exec
+        - -v will make cpanm installation a bit verbose too
+
+v0.1.10  2015-04-21 15:04:06 PDT
+        - Fixed a bug in 0.1.9 on sorting versions
+        - use fatscript version of cpanm so that 'cpanm' in $PATH won't be used ala Carton (#7)
+
+v0.1.9  2015-04-21 14:24:36 PDT
+        - added -h and -v|--verbose for debugging
+        - Internal refactoring and (de-)optimizations on artifact loading
+
+v0.1.8  2015-04-20 21:40:06 PDT
+        - Change the default base to ~/.carmel/5.20.2-{arch} rather than ~/.perl-carmel/5.020002-{arch}
+
+v0.1.7  2015-04-20 14:44:20 CEST
+        - Fix dependencies count display when 'perl' is in cpanfile
+        - Fix the ordering of %ENV in exec when PATH/PERL5LIB is already set (#4)
+
+v0.1.6  2015-04-20 01:55:23 CEST
+        - up dependency on Carton
+        - Fixed an issue with exact v-strings in requirements
+
+v0.1.5  2015-04-19 16:07:40 CEST
+        - `carmel install` now only installs missing requirements
+        - internal refactorings
+        - add `carmel show` command
+        - add help and version subcommand
+        - requires newer cpanm that supports better cpanfile requirement support
+
+v0.1.4  2015-04-18 19:52:12 CEST
+        - Fixed an issue with Devel::Carmel where Module::Runtime requires the module
+        - Pass requirements as a dumped cpanfile to cpanm for more accurate requirements
+        - Merge carton .snapshot if it's there
+        - Display all required modules after carmel install
+        - Set -q option in internal invocation of cpanm, just like Carton
+        - When finding artifacts, honor the requirements built out of cpanfile and snapshot
+
+v0.1.3  2015-04-18 12:12:49 CEST
+        - Better display in carmel install to show already built modules
+        - Big performance optimization in carton list/tree/exec
+        - require newer cpanminus (marcus++)
+        - skip Carton's cpanfile.snapshot support for now (marcus++)
+
+v0.1.2  2015-04-17 23:25:24 CEST
+        - fix possible infinite loop in many commands
+        - implement tree command
+
+v0.1.1  2015-04-17 22:45:55 CEST
+        - include archname in build artifacts directory
+        - remove unused modules
+
+v0.1.0  2015-04-17 19:59:52 CEST
+        - Initial release

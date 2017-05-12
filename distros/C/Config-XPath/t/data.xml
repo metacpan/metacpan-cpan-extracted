@@ -1,0 +1,22 @@
+<data>
+ <!-- This comment is required by the test script -->
+ <aaa str="hello">
+  <bbb>Content</bbb>
+ </aaa>
+ <ccc>
+  <dd name="one" value="1">
+   <i ord="first" />
+  </dd>
+  <dd name="two" value="2">
+   <i ord="second"/>
+  </dd>
+ </ccc>
+ <eee>
+  <ff name="one">1</ff>
+  <ff name="two">2</ff>
+ </eee>
+ <ggg><hh/></ggg>
+ <empty></empty>
+ <jj o="1" first="1" />
+ <jj o="2" />
+</data>

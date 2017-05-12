@@ -1,0 +1,26 @@
+---
+abstract: 'A Perl implementation of the reCAPTCHA API'
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+  - 'Sunny Patel (maintainer) <sunnypatel4141@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Captcha-reCAPTCHA
+no_index:
+  directory:
+    - t
+    - inc
+    - t/lib
+requires:
+  HTML::Tiny: 0.904
+  LWP::UserAgent: 0
+  Test::More: 0
+version: 0.99

@@ -1,0 +1,23 @@
+Crypt::Elijah - A Perl5 encryption module 
+=========================================
+
+This module provides a simple API for symmetric data encryption using the 
+Elijah stream cipher. This cipher uses a 128-bit key and operates on 
+arbitrary length data. 
+
+To install, the regular...
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Then for usage information...
+
+    perldoc Crypt::Elijah
+
+This module does not depend on other CPAN modules.
+
+You can get help from the author, Michael Bombardieri <bombardierix@gmail.com>. 
+Your comments, suggestions and patches are always welcome. Have fun!
+

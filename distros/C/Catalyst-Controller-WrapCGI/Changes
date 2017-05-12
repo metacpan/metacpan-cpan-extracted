@@ -1,0 +1,143 @@
+Revision history for Catalyst-Controller-WrapCGI
+
+0.038 2015-12-09 08:51:51
+    - set CGI test dep to 3.31, lower versions fail file upload test on
+      smokers
+
+0.037 2015-12-02 14:04:56
+    - seek body fh back to 0 for the next guy down the chain as well
+
+0.036 2015-11-30 16:28:22
+    - seek body fh back to 0 in wrap_cgi (RT#106569)
+    - fix warnings in tests
+    - convert to dzil
+    - update copyrights and links
+
+0.035  2012-06-14 16:53:52
+    - fix test failures with Catalyst-Runtime-5.90012 (rbuels)
+
+0.034  2011-08-31 22:29:23
+    - fixed t/wrap-cgi.t test for Catalyst 5.9+ (rbuels)
+
+0.033  2011-05-24 13:44:33
+    - re-release with unix line ends
+
+0.032  2011-05-22 09:19:36
+    - now works on Win32
+
+0.031  2011-05-20 23:28:23
+    - fix CGIBin.pm bug hardcoding 'root' as the site root
+
+0.030  2010-08-06 16:08:10
+    - rethrow non-scalar exceptions as-is
+    - minor doc fix
+
+0.029  2010-06-05 21:12:47
+    - update tests for new HTTP::Request::AsCGI
+
+0.028  2010-04-07 17:51:38
+    - added cgi_chain_root and cgi_file_pattern options for CGIBin
+
+0.027  2010-02-19 04:34:50
+    - fix tests for Perl < 5.8.9
+    - fix for HTTP::Request::AsCGI 1.2
+
+0.026  2010-01-03 11:37:15
+    - convert to CGI::Compile
+    - check exit status of non-Perl CGIs
+
+0.025  2009-12-26 16:43:50
+    - fix %SIG localization in CGIBin
+
+0.024  2009-12-22 01:13:01
+    - revert passing args to coderefs (some CGIs might implicitly shift off
+     @ARGV .)
+
+0.023  2009-12-22 00:41:10
+    - some code stole from CGI::Compile (until we can dep on it)
+        - correct line numbers for CGIs
+        - CGI::initialize_globals() called
+        - better CGI path to action name mapping
+    - coderefs are passed ($controller, $context)
+
+0.022  2009-12-06 05:18:08
+    - handle scripts that override $SIG{__DIE__} and $SIG{__WARN__}
+
+0.021  2009-12-04 21:05:14
+    - better is_perl_cgi determination that also allows using MyApp->foo
+      methods
+
+0.020  2009-06-30 22:59:56
+    - fix AUTHOR pod sections
+
+0.019  2009-06-04 23:06:39
+    - fix a "make test" problem with +x not preserved on test.sh
+
+0.018  2009-06-01 20:04:41
+    - remove forward example from synopsis in CGIBin, as that confuses people
+
+0.017  2009-05-30 09:56:43
+    - skip test that depends on unreleased runtime
+
+0.016  2009-05-26 22:35:09
+    - fallback to $c->req->remote_user for $ENV{REMOTE_USER}
+    - fix POD
+
+0.0037  2009-05-06 20:07:00
+    - pass captures in SCRIPT_NAME (caelum)
+
+0.0036  2009-05-05 19:45:20
+    - fix deps (caelum)
+
+0.0035  2009-05-03 04:33:27
+    - add a note about nph cgis not working (caelum)
+
+0.0034  2009-04-30 16:38:00
+    - remove all CGI specific env vars by default (caelum)
+
+0.0033  2009-04-29 03:29:34
+    - fix for multiple file uploads (hdp)
+    - file uploads support (caelum)
+    - test for file uploads (hdp)
+
+0.0032  2009-04-27 18:43:25
+    - fix deps, does not work in cat 5.7 (caelum)
+
+0.0031  2009-04-27 16:00:07
+    - revert PATH_INFO tests to unescaped URIs (caelum)
+
+0.0030  2009-04-27 05:17:17
+    - configurable cgi_dir (caelum)
+    - support for PATH_INFO and SCRIPT_NAME (caelum)
+    - FILEPATH_INFO (iffy implementation) (caelum)
+
+0.0029  2009-04-26 20:54:28
+    - Allow more control over public paths to CGIBin actions (hdp)
+    - Override exit() in CGIBin-wrapped Perl cgis to avoid terminating the
+      Catalyst process (hdp)
+    - Set (temporarily) $0 to the filename of the Perl cgi being executed (hdp)
+    - cgi_root_path accessor, convert to Moose (caelum)
+    - slight rewrite of docs and a test for __DATA__ (caelum)
+
+0.0028  2009-04-24 04:40:39
+    - Add support for __DATA__ sections in cgis for C::CGIBin (caelum)
+
+0.0027  2009-04-03 14:55:34
+    - Add 'kill_env' and default to killing 'MOD_PERL' from environment (hdp)
+
+0.0026  2009-02-02
+    - Stop storing generated files in SVN and add svn:ignore.
+    - Remove taint from tests as this breaks in a local::lib environment
+      as PERL5LIB is stripped.
+
+0.0025  2009-01-09 14:59:20
+    - Tell Static::Simple to ignore root/cgi-bin for C::C::CGIBin (caelum)
+
+0.0024  2008-11-19 16:00:54
+    - Fixed for Catalyst 5.8 (caelum)
+
+0.002  2008-07-02 23:02:20
+    - First release.
+
+0.001  2008-06-28 15:28:46
+    - First complete dist.

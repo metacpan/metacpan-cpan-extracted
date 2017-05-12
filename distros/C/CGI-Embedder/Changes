@@ -1,0 +1,16 @@
+Revision history for Perl extension CGI::Embedder.
+
+1.00  Tue Nov 6 16:43:01 2001
+	- original version; created by h2xs 1.21 with options
+	  -A -X -n CGI::Embedder -v 1.00
+
+1.01  Thu Sep 26 0:40 2003
+	- use strict
+	- corrected <?=("a")."b"?> case
+
+1.20  Thu 1 Jan	18:30:00 2004
+    - Published to CPAN.
+
+1.21  Tue 6 Jan 21:40:00 2004
+    - Now "no strict" mode is default for all the templates (compatibility reason).
+    		

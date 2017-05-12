@@ -1,0 +1,9 @@
+Revision history for Perl extension Catalyst::View::REST::XML.
+
+0.02  Mon Jun 06 2011
+        - DEPRECATION NOTICE:
+          Depcreated in favor of Catalyst::Action::REST
+        - Inherit from Catalyst::View rather than the deprecated Catalyst::Base
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

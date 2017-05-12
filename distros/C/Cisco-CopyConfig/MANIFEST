@@ -1,0 +1,8 @@
+Changes
+CopyConfig.pm
+MANIFEST
+META.yml
+Makefile.PL
+README
+t
+t/base.t

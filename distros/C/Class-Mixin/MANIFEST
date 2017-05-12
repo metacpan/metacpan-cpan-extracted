@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Class/Mixin.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+t/mixin-to.t
+t/mixin-from.t
+t/destroy-to.t
+t/destroy-from.t
+t/errors.t
+t/import.t
+META.yml                                 Module meta-data (added by MakeMaker)

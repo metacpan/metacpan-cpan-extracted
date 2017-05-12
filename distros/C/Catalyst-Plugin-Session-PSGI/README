@@ -1,0 +1,97 @@
+NAME
+    Catalyst::Plugin::Session::PSGI - minimal configuration access to
+    PSGI/Plack session (EXPERIMENTAL)
+
+VERSION
+    version 0.0.2
+
+SYNOPSIS
+    When running under PSG/Plack with Session middeware enabled you can use
+    the PSGI session as follows:
+
+        use Catalyst qw/
+            Session
+            Session::State::PSGI
+            Session::Store::PSGI
+        /;
+
+  _psgi_env
+    Fetches the psgi env globally from the request env
+
+EXPERIMENTAL
+    This distribution should be considered experimental. Although
+    functional, it may break in currently undiscovered use cases.
+
+SUMMARY
+    If you are running your Catalyst application in a Plack/PSGI environment
+    and using Plack::Middleware::Session you might want to consider using
+    the session information in the PSGI environment.
+
+    The Catalyst::Plugin::Session::State::PSGI and
+    Catalyst::Plugin::Session::Store::PSGI modules access the
+    *psgix.session.options* and *psgix.session* data to provide the Catalyst
+    session.
+
+AREAS OF CONCERN
+    As this is an early, experimental release I thought it only fair to
+    share the glaring areas of concern:
+
+    session expiry
+        I currently believe that it should be the responsibility of the
+        Plack middleware to expire and clear session data. As far as
+        possible this functionality is unimplemented and unsupported in this
+        distribution.
+
+    session expiry value initialisation
+        There was a problem with the session expiry value being unset in the
+        Catalyst related code. This led to sessions always being
+        deleted/expired and never working properly.
+
+        There are a couple of dubious areas to resolve this.
+
+            sub get_session_data {
+                # ...
+
+                # TODO: work out correct place to initialise this
+                $psgi_env->{'psgix.session.expires'}
+                    ||= $c->get_session_expires;
+
+                # ...
+            }
+
+        is almost certainly the wrong time and place to be initialising this
+        value, but it works and I'm open to clue-sticks and patches.
+
+            sub get_session_expires {
+                my $c = shift;
+                my $expires = $c->_session_plugin_config->{expires} || 0;
+                return time() + $expires;
+            }
+
+        worries me because I have no idea where the value for
+        "$c->_session_plugin_config->{expires}" is being initialised. I'm
+        concerned that this may become 0 when you least expect it and start
+        expiring all sessions.
+
+    (lack of) test coverage
+        Other than basic sanity tests provided by Dist::Zilla this
+        distribution has no tests!
+
+        I haven't found the time to mock up a plack-catalyst test suite to
+        ensure the session is doing the right thing. Once again I'm open to
+        clue-sticks and patches.
+
+SEE ALSO
+    Catalyst, Catalyst::Plugin::Session, Plack::Middleware::Session,
+    Catalyst::Plugin::Session::State::PSGI,
+    Catalyst::Plugin::Session::Store::PSGI
+
+AUTHOR
+    Chisel <chisel@chizography.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chisel Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

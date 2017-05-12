@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Class-Singleton
+version:             1.5
+abstract:            Base class for creating singleton objects
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Wardley <abw@wardley.org>

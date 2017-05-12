@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Template.t
+lib/CGI/Template.pm

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Contize.t
+lib/Contize.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+eg/webGuess.pl
+

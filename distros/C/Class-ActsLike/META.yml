@@ -1,0 +1,16 @@
+---
+name: Class-ActsLike
+version: 1.00
+author:
+  - chromatic <chromatic@wgz.org>
+abstract: Perl extension for identifying class behavior similarities
+license: perl
+requires:
+  Class::Roles: ''
+build_requires:
+  Test::Simple: 0.60
+provides:
+  Class::ActsLike:
+    file: lib/Class/ActsLike.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

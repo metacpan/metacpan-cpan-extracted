@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/CGI/Application/Plugin/Redirect.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01_basic.t
+t/98_pod.t
+t/99_pod_coverage.t
+Makefile.PL

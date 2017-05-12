@@ -1,0 +1,21 @@
+Testing this module automatically is rather hard and a lot of data not supplied
+by this module is necessary for it. Therefore, this module only comes with a
+very basic test that needs to be run manually.
+
+To do that, you will need to register an application on
+http://www.facebook.com/developers/ and retrieve your application id and secret.
+
+In addition, you will need to create an account at http://www.facebook.com/ to
+authenticate with.
+
+Once you have that, spin up the test application included in this distribution
+using:
+
+  $ cd t
+  $ FACEBOOK_APPLICATION_ID=foo FACEBOOK_APPLICATION_SECRET=bar plackup -I../lib -Ilib testapp.psgi
+
+Then point your browser at http://localhost:5000/auth
+
+You should be redirected to a site at Facebook, asking you to confirm. Once
+you've done that, you should be redirected back to http://localhost:5000/auth
+and see 'success'.

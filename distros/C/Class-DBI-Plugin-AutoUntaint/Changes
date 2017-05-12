@@ -1,0 +1,22 @@
+Revision history for Class-DBI-Plugin-AutoUntaint
+
+0.1     Wed 16 Nov 2005 21:25
+        - added text and int types
+
+0.04    Fri   6 May 2005 17:00
+        - added some entries to %TypesMap (thanks Will Hawes)
+        - skip untainting timestamp columns by default
+        - updated POD 
+
+0.03    Thur 28 Apr 2005 15:20
+        - now using CDBI::Plugin::Type to determine column types 
+            (thanks Will Hawes)
+
+0.02    Wed  27 Apr 2005 22:00 
+        - more docs
+        - removed hackery to handle Maypole not dying on cue, because 
+            in fact it does
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

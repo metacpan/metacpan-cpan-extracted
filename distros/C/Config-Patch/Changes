@@ -1,0 +1,41 @@
+######################################################################
+Revision history for Perl extension Config::Patch
+
+0.09  2010/05/09
+    (ms) Complete rewrite with new API, while providing backwards
+         compatibility with legacy API.
+
+0.08  2007/10/03
+    (ms) Added insert() patch by Steve McNeill. 
+
+0.07  2006/12/26
+    (ms) Comment character can be specified now, but defaults to '#'.
+
+0.06  2006/11/30
+    (ms) Fixed bug with keys containing '-'
+
+0.05  2006/03/31
+    (ms) Applied patch by Greg Olszewski adding prepend()
+
+0.04  2006/02/01
+    (ms) Added flock support to lock the config file while it's 
+         being edited.
+
+0.03  2005/07/16
+    (ms) Disallowing patching twice with the same key
+    (ms) fixed replace() problem with two matches on the same line
+    (ms) prevent replace() matches in patched sections
+    (ms) Added slurp/blurt utility functions
+    (ms) seek back one in append() to check "\n"
+
+0.02  2005/07/16
+    (ms) Corrected docs
+    (ms) Added replace() and comment_out()
+
+0.01  2005/07/15
+    (ms) Where it all began.
+
+TODO: 
+* don't use base64, just encode unprintable chars
+* length()/UTF8?
+* "\n" on win32?

@@ -1,0 +1,4 @@
+TYPEMAP
+Memcache *	T_PTROBJ
+MemcacheReq *	T_PTROBJ
+MemcacheRes *	T_PTROBJ

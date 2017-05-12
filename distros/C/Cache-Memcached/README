@@ -1,0 +1,14 @@
+This is the Perl API for memcached, a distributed memory cache daemon.
+See the documentation within the module for details on its use.
+
+Information on the big picture is available at:
+
+      http://www.danga.com/memcached/
+
+Feel free to join the mailing list and ask any questions.
+
+-- 
+Brad Fitzpatrick
+brad@danga.com
+
+

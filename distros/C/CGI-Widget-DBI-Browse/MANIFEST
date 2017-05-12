@@ -1,0 +1,8 @@
+AGPL
+Changes
+MANIFEST
+Makefile.PL
+README
+t/01browse.t
+lib/CGI/Widget/DBI/TEST/Browse.pm
+lib/CGI/Widget/DBI/Browse.pm

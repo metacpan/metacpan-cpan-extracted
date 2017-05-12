@@ -1,0 +1,36 @@
+---
+abstract: 'Manage and minify .css and .js assets in a Catalyst application'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Catalyst::Test: 0
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  HTML::Declare: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Assets
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  CSS::Minifier::XS: 0.03
+  JavaScript::Minifier::XS: 0.03
+requires:
+  CSS::Minifier: 0
+  Catalyst: 0
+  Class::Accessor::Fast: 0
+  File::Assets: 0.061
+  JavaScript::Minifier: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.036

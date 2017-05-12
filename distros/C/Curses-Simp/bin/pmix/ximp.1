@@ -1,0 +1,39 @@
+.TH XIMP 1
+.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
+.\" other parms are allowed: see man(7), man(1)
+.SH NAME
+ximp \- /dev/mixer manipulation utility.
+.SH SYNOPSIS
+.B ximp
+.I "\-[hgspflrov]"
+.SH "DESCRIPTION"
+This manual page documents briefly the
+.BR ximp
+program.
+This manual page was written for the Debian GNU/Linux distribution.
+.PP
+.B ximp
+lets you view && update mixer settings.  You can specify a mixer 
+device name as the first parameter to query its settings or follow
+that with values to update it.
+.SH OPTIONS
+.TP
+.B \-h
+Show help text with version information, detailed description,
+&& examples.
+.TP
+.B \-all
+query All channels with extra information with formatting.
+.TP
+.B \-q
+Query all channels without formatting (like aumix).
+.TP
+.B \-v
+query Vol channel.
+.SH AUTHOR
+This manual page was written by Pip Stuart <Pip@CPAN.Org>,
+for the Debian GNU/Linux system (but may be used by others).
+.br
+.B ximp
+was written by Pip Stuart. Pip's e-mail address is
+<Pip@CPAN.Org>.

@@ -1,0 +1,39 @@
+Perl Module CVSUtils:
+
+    Tools for talking to CVS.
+
+Description:
+
+Modules & Classes:
+
+    *None*
+
+Executables:
+
+    cvs2cl - produce ChangeLog(s) from `cvs log` output
+
+Required Perl Version:
+
+    5_005.03
+
+Required Packages:
+
+    *None*
+
+Required Executables:
+
+    *None*
+
+Package Maintainer: 
+
+    Martyn J. Pearce fluffy@cpan.org
+
+Copyright: 
+
+    Copyright (c) 1999 Karl Fogel, (c) 2001,2002 Martyn J. Pearce.  This
+    program is free software; you can redistribute it and/or modify it under
+    the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2, or (at your option) any later
+    version.
+
+23rd July, 2002

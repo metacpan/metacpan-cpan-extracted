@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+XPath.pm
+t/00load.t
+t/01simple.t
+t/02html.t
+t/02html.html
+t/Simple.pm
+

@@ -1,0 +1,82 @@
+Revision history for Perl extension Prima::CodeManager.
+
+
+
+###############################################################################
+
+0.05  Sun Jan 14 07:22:30 2013
+--------------------------------
+
+1. Deleted false comment (pod) from CodeManager.pm
+
+###############################################################################
+
+0.04  Sun Jan 13 19:33:30 2013
+--------------------------------
+
+1. Added a new cathegory projects group. Now in menu the projects can
+be collected in groups
+
+2. Added calling program "meld" to compare the first and the second files
+in the notebook.
+
+3. Now a source file in a notebook can be closed be double right mouse click on the file's tab.
+
+
+###############################################################################
+
+0.02  Tue Nov 22 17:29:30 2011
+--------------------------------
+
+1. added package "package Prima::CodeManager::CodeManager"
+with version number for better versions managing.
+
+Now is possible:
+
+use package Prima::CodeManager::CodeManager 0.019
+
+The problem rised because I wanted to put all the modules inside the directory
+.../Prima/CodeManager, even the package Prima::CodeManager.
+
+2. Now on $project_color variable is randomly generated from the array @warpColors
+
+3. menuBackColor is synchronized with project_color.
+
+4. changed the order in menu: the Project.
+
+5. added colors (synchronized with the project one) to frames and some other minor
+changes in a look.
+
+6. Added to popup show window the option (Full) Delete and the old one changed into Backup.
+Added modal feature to this popup. Also added Copy feature.
+
+7. Added saving modified files during closing whole program
+
+8. Added independent encoding for each project
+
+9. Some order changes.
+
+10. changed the width of edit area and file formating changes.
+
+11. Replace the way of files displaying; instead just those
+which have the extension from the list, the regular expression
+instead:
+the old form:
+extensions	= seal|ini
+new form:
+extensions	= my\w*\.seal$|ini
+
+12. Added the same (#11) - regular expression base mechanism - to
+filter directories that have to be displayed.
+
+13. Added the possibility to exclude directories and files from displaying;
+options:
+
+dir_exclude = \.svn$
+ext_exclude =
+
+###############################################################################
+
+0.01  Sun Nov  6 21:59:30 2011
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Prima::CodeManager

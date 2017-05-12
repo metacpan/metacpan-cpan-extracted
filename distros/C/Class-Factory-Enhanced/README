@@ -1,0 +1,72 @@
+NAME
+    Class::Factory::Enhanced - More functionality for Class::Factory
+
+VERSION
+    version 1.101420
+
+SYNOPSIS
+        package My::Factory;
+        use base 'Class::Factory::Enhanced';
+
+        package Some::Class;
+        My::Factory->add_factory_type(
+            person_name    => 'Person::Name',
+            person_address => 'Person::Address'
+        );
+
+DESCRIPTION
+    This class subclasses Class::Factory and adds some functionality.
+
+METHODS
+  add_factory_type
+    Like "Class::Factory"'s "add_factory_type()", but this one can add
+    several mappings at once. See the Synopsis for an example.
+
+  register_factory_type
+    Like "Class::Factory"'s "register_factory_type()", but this one can add
+    several mappings at once.
+
+  make_object_for_type
+        $factory->make_object_for_type('person_name',
+            last_name  => 'Shindou',
+            first_name => 'Hikaru',
+        );
+
+    An alternative constructor that gets the class to be constructed from
+    the factory, then calls "new()" on that class.
+
+    Takes as arguments the object type to be constructed and a list of
+    arguments to be passed to the constructor ("new()") of the newly
+    constructed object.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Factory-Enhanced
+    >.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Class-Factory-Enhanced/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Class-Factory-Enhanced/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

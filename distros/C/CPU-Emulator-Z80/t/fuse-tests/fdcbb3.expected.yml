@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbb3
+registers:
+  AF: 39941
+  AF_: 0
+  BC: 3986
+  BC_: 0
+  DE: 48439
+  DE_: 0
+  HL: 21821
+  HL_: 0
+  I: 0
+  IX: 51038
+  IY: 20946
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,104 @@
+#!/usr/bin/env perl
+
+use v5.10;
+
+use strict;
+use warnings;
+
+use Courriel::Builder;
+use Email::Sender::Simple qw( sendmail );
+use Email::Sender::Transport::SMTP;
+
+my $from    = 'you@yourdomain.com';
+my $to      = 'person@youaremailing.com';
+my $subject = 'Example Perl Email';
+
+# We will create an email with both a plain text and HTML body. If the
+# recipient has an HTML-capable email reader, they'll see that version.
+my $plain = <<'EOF';
+Hi, You
+
+How are you? I'm doing *great*!
+EOF
+
+my $html = <<'EOF';
+<html>
+  <head></head>
+  <body>
+    <p>
+      Hi, You,
+    </p>
+    <p>
+       How are you? I'm doing <strong>great</strong>!
+    </p>
+  </body>
+</html>
+EOF
+
+my $email = build_email(
+    from($from),
+    to($to),
+    subject($subject),
+    plain_body($plain),
+    html_body($html),
+);
+
+# Sendgrid login credentials
+my $username = 'yourlogin@sendgrid.net';
+my $password = "yourpassword";
+
+my $transport = Email::Sender::Transport::SMTP->new(
+    host          => 'smtp.sendgrid.net',
+    port          => 587,
+    sasl_username => $username,
+    sasl_password => $password,
+    helo          => 'yourdomain.com',
+);
+
+sendmail( $email, { transport => $transport } );
+
+__END__
+
+=head1 INSTALLING MODULES
+
+The Courriel and Email::Sender libraries can be installed from CPAN using any
+cpan client. For example, using cpanminus
+(https://metacpan.org/module/App::cpanminus) you would run the following shell
+command:
+
+  cpanm Courriel Email::Sender
+
+=head1 SMTP VERSUS A LOCAL MAIL SERVER
+
+If you really want to ensure that emails get delivered, you need
+to handle the (rare) case where Sendgrid is unavailable and queue the email
+for retrying.
+
+We could try to implement that in this code, but that would get complicated
+fast, and soon we'd have reimplemented an entire mail server. A better
+solution is to configure a local mail server running locally to deliver email
+using Sendgrid. See http://sendgrid.com/docs/Integrate/Mail_Servers/index.html
+for more details on how to do this. The mail server will queue the email if
+Sendgrid is unavailable and try to send it again later.
+
+If you're using a local mail server, you don't need to use
+Email::Sender::Transport::SMTP at all. You can just use the C<sendmail()>
+subroutine in its default mode:
+
+  sendmail($email);
+
+This looks for a sendmail binary program in the path and invokes it to send
+the email. On Unix systems, this binary should always do the right thing if
+you've installed a local mail server.
+
+=head1 AUTHOR
+
+David Rolsky <autarch@urth.org>
+
+=head1 LICENSE
+
+To the extent possible under law, David Rolsky has waived all copyright and
+related or neighboring rights to this example. This work is published from:
+United States.
+
+See http://creativecommons.org/publicdomain/zero/1.0/ for details.

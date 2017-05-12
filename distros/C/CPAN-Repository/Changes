@@ -1,0 +1,275 @@
+==================================================
+Changes from 1742-02-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2015-12-05 04:05:28 +0000
+------------------------------------------
+
+  Change: 98a84303921abb9841d179c88499cfa826ad8a68
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2015-12-04 23:03:20 +0000
+
+    Ensure CPAN::Repository always has a $VERSION 
+
+------------------------------------------
+version 0.009 at 2015-04-23 00:56:50 +0000
+------------------------------------------
+
+  Change: c7a1864d46c47229c975ff210eabd251343addc4
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2015-04-22 20:56:50 +0000
+
+    Commit dzil's changes to Travis config. 
+
+  Change: 0fa21891269de0e609692d0ce3635a09f5f9b116
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2015-04-22 20:56:50 +0000
+
+    Ensure that only one permission is written for each line. 
+
+  Change: 985ebce92a2bf33b6d8507ff3fab32c3f5465dec
+  Author: Olaf Alders <olaf@wundersolutions.com>
+  Date : 2015-04-22 20:55:19 +0000
+
+    Merge pull request #1 from ivanwills/master
+
+    Fixed "self" refernces to be "repo" to match reset of the
+    documentation 
+
+  Change: 8a62b1a824847d5c302b967e801c06f4f2e7c096
+  Author: Ivan Wills <ivan.wills@gmail.com>
+  Date : 2014-12-25 18:55:31 +0000
+
+    Fixed "self" refernces to be "repo" to match reset of the
+    documentation 
+
+  Change: 58a2180ad00e4ec4a2e31c984fdc0ea2e7b045d8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 23:24:14 +0000
+
+    New .travis.yml 
+
+  Change: fda31b41a17077c982067030d278dcfe8db1e1f6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-25 01:22:22 +0000
+
+    Committed updated travis.yml 
+
+  Change: 8816481cf18293611f73bd3e0c3752b8402a2c96
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-04-25 01:21:22 +0000
+
+    Added travis.yml 
+
+------------------------------------------
+version 0.008 at 2013-02-19 04:09:09 +0000
+------------------------------------------
+
+  Change: 751bb68a9cc2167f37f9e7ba3e122732cbcfec34
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-19 05:09:09 +0000
+
+    Added possibility for custom author path, tuned tests a bit 
+
+  Change: 826b2b1016705a4dd35664ed2d38e1378d4b3377
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-09 17:22:08 +0000
+
+    A bit more handles on CPAN::Repository, a bit more informational
+    functions 
+
+  Change: d0fd8a4a28dfc85f2c5d00d7e07484a49bc49ff9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-09 17:09:21 +0000
+
+    Hups, missed generation a bit ;) 
+
+  Change: 817fc4ca199e2ed86904a541aea4d3f25f1fdc42
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-09 17:06:57 +0000
+
+    Added 06perms.txt 
+
+  Change: 638fbb234a31dbad87c44dd518b05edbffedf9de
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-09 16:29:41 +0000
+
+    Added sorted output to 02packages file 
+
+------------------------------------------
+version 0.007 at 2012-01-26 00:33:00 +0000
+------------------------------------------
+
+  Change: 40882f1e46e8a07633387632621ef6958b9989d6
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-26 01:33:00 +0000
+
+    v0.007 
+
+  Change: 07f6d26a55d513de7cc6a3fa0201086e3885905a
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-26 01:31:50 +0000
+
+    Damn it, remove debugging before release! 
+
+------------------------------------------
+version 0.006 at 2012-01-26 00:23:36 +0000
+------------------------------------------
+
+  Change: fc73dd923155974b0ecbaaa1a392805de467dbf1
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-26 01:23:36 +0000
+
+    v0.006
+
+    Fixed handling of undef versions in generation of packages 
+
+  Change: 4a55e90e39dee509b9dfc520f187b77a575fa46e
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-26 01:07:32 +0000
+
+    Fixed handling of undef versions in generation of packages 
+
+------------------------------------------
+version 0.005 at 2012-01-19 17:27:21 +0000
+------------------------------------------
+
+  Change: 6805f253673872c2c33d7e7a61049401b5cca191
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-19 18:27:21 +0000
+
+    v0.005
+
+    Return pathname in repo on add_author_distribution 
+
+  Change: 686c92891b684192140ed705ceb8748600bf87b6
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-19 18:25:58 +0000
+
+    Return pathname in repo on add_author_distribution 
+
+------------------------------------------
+version 0.004 at 2012-01-18 00:01:32 +0000
+------------------------------------------
+
+  Change: 282f22ce49f2842a23a144cef129d58d16aa463c
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-18 01:01:32 +0000
+
+    v0.004
+
+    Fixed documentation, added generation of 02STAMP 
+
+  Change: 2fcd4dea3741769ccd95fe5c423340bc1d0566f1
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-18 01:00:34 +0000
+
+    Added timestamp feature, added more pod (thats always good) 
+
+  Change: 222fb80936d073994ae6c0cba3a9a1b0ed509183
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:17:02 +0000
+
+    Fixed typo in SYNOPSIS and a stupid 1; at the end of pod 
+
+------------------------------------------
+version 0.003 at 2012-01-17 03:12:15 +0000
+------------------------------------------
+
+  Change: 20f044868e11d112bc06a9e6112e239f3b438831
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:12:15 +0000
+
+    v0.003
+
+    Arghl... another requirement fix 
+
+  Change: 31a77af4edb34f830ec8be8c68b637f186a56bfa
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:11:09 +0000
+
+    And again forgot Changes... arghl^2 
+
+  Change: f6dd17fb84ba3d3b2531e46dbbf73f56513da665
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:10:49 +0000
+
+    Arghl.. another requirement fix... 
+
+------------------------------------------
+version 0.002 at 2012-01-17 03:10:38 +0000
+------------------------------------------
+
+  Change: d9fcfd51a0ff36f5aa5a98c663f6a4718b0af712
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:10:38 +0000
+
+    v0.002
+
+    Fixed requirements 
+
+  Change: 175d5a7e480fb0b1b18d8ba6679e725a3654407d
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 04:08:55 +0000
+
+    Updated changes file 
+
+  Change: 2a3ca1d5ffd28f0f67b87ffdb53957c604c8670d
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 03:52:46 +0000
+
+    Fixing requirements 
+
+------------------------------------------
+version 0.001 at 2012-01-17 02:51:54 +0000
+------------------------------------------
+
+  Change: 133b7ed23dba68b6ff2244c31a344131645a6224
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 03:51:54 +0000
+
+    v0.001
+
+    First working version 
+
+  Change: 409bfa2da2cf92ae4c40091908f80c848446642f
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 03:48:20 +0000
+
+    Avoid a Moo problem 
+
+  Change: 7a8ae7b59f831360bd04086e858ca3532581a29b
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 03:15:25 +0000
+
+    added modules function to CPAN::Repository 
+
+  Change: 25dac06b010a618281df78cfb9fc736229590c97
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 02:49:12 +0000
+
+    Fixed reference to old distribution name, added other modules to load
+    test 
+
+  Change: b8c0a8be2e3be695c7b1e087ee91a89bc27c84fc
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 02:45:56 +0000
+
+    Hups, Data::Dumper probably unrequired ;) 
+
+  Change: 7a3562d96831d9eead9c7ddd188b25de62a34af5
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-17 02:45:06 +0000
+
+    First working version 
+
+  Change: a154fad7f10a8c08ae06ae6daa0d101f0955058b
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2012-01-16 01:38:42 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,31 @@
+Revision history for Catalyst-Plugin-ConfigLoader-Environment
+0.07       05 June 2010
+        - removed useless use of grep in void context
+        - using shipit for dist management
+
+0.06       25 February 2010
+        - official release
+
+0.06_01    24 February 2010
+        - Removed NEXT
+        - using MRO::Compat
+        - updated 01-live.t to reflect such
+        - Added self to contributors
+
+0.05    6 March 2008
+        - Allow top-level ::-params (Model__Foo, not just Model__Foo_bar)
+        - Allow JSON for all values (not just Model__Foo_bar)
+        - Use $c->config() instead of tweaking config directly (get merge_hashes for free)
+
+0.04    14 January 2008
+        - YAML is causing weird errors; killing it in favor of 
+          making JSON::Any mandatory
+
+0.03    12 January 2008
+        - Fix some problems the CPAN testers uncovered
+
+0.02    12 January 2008
+        - Add YAML/JSON support from mugwump
+
+0.01    9 December 2006
+        - First version, released on an unsuspecting world.

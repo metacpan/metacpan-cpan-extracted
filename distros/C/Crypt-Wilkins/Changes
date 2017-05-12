@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::Wilkins.
+
+0.01  Wed May 26 18:35:34 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Crypt::Wilkins
+

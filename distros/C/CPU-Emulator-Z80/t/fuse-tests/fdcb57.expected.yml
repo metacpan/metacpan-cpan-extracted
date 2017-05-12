@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb57
+registers:
+  AF: 14129
+  AF_: 0
+  BC: 47068
+  BC_: 0
+  DE: 48668
+  DE_: 0
+  HL: 14570
+  HL_: 0
+  I: 0
+  IX: 24194
+  IY: 41915
+  PC: 4
+  R: 2
+  SP: 0

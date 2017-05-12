@@ -1,0 +1,12 @@
+Revision history for CSS-LESS
+
+0.0.3  Fri Sep 20 16:30:00 2013 JST
+	* [Fix] Test on lessc not installed environment and error prosessing. (I'm very sorry.)
+
+0.0.2  Wed Sep 18 16:40:00 2013 JST
+	* [Add] A parameter is available when using compile() method.
+	* [Add] lessc parameters: "compress", "strict_imports", "rootpath", "relative_urls", "line_numbers".
+
+0.0.1  Wed Sep 18 12:25:00 2013 JST
+       Initial release.
+

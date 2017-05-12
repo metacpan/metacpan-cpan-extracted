@@ -1,0 +1,52 @@
+{
+   "abstract" : "Command Line Interface I/O over either Telnet or SSH (IPv4 & IPv6) or Serial port",
+   "author" : [
+      "Ludovico Stevens <lstevens@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Control-CLI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Interactive" : "0",
+            "Net::Telnet" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "IO::Handle" : "0",
+            "IO::Socket::INET" : "0",
+            "Term::ReadKey" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Control::CLI" : {
+         "file" : "lib/Control/CLI.pm",
+         "version" : "2.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.03"
+}

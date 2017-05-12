@@ -1,0 +1,23 @@
+---
+abstract: 'indexed colors used by mIRC'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Convert::Color::RGB: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-Color-mIRC
+provides:
+  Convert::Color::mIRC:
+    file: lib/Convert/Color/mIRC.pm
+    version: '0.01'
+requires:
+  Convert::Color::RGB8: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>menu_show($title,$message,$style)</TITLE>
+<META NAME="description" CONTENT="menu_show($title,$message,$style)">
+<META NAME="keywords" CONTENT="Cmenu">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Cmenu.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node6.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html227"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html223"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html217"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html225"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html228"
+  HREF="node16.html">Internal Functions</A>
+<B> Up:</B> <A NAME="tex2html224"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html218"
+  HREF="node14.html">menu_popup</A>
+ &nbsp <B>  <A NAME="tex2html226"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00058000000000000000">
+menu_show($title,$message,$style)</A>
+</H2> 
+This provides for splash screens to be shown to the user either reporting difficulties, errors, providing help or asking for confirmation of responses. The routine draws a full window covering the normal menu space (not the backdrop). It accepts three parameters;
+<DL>
+<DT><STRONG>$title</STRONG></DT>
+<DD>Gives the window a title included in the border
+</DD>
+<DT><STRONG>$message</STRONG></DT>
+<DD>provides the actual text message. If this can be fitted onto a single line, it will be centred in the screen. If the text exceeds a single line width, it will be passed through <B>Text::Wrap</B> for formating. <B>Text::Wrap</B> breaks lines at word-boundaries (spaces) and also acknowledges <B>n</B> as a forced new-line character. All lines are left-justified and ragged on the right.
+</DD>
+<DT><STRONG>$style</STRONG></DT>
+<DD>using different colours, a different meaning can be associated with splash screens. Also a simple button bar will be drawn for each type so that users can confirm or reject options as required. Responses from menu_show will be either ``YES'' or ``NO''
+<DL>
+<DT><STRONG>``HELP''</STRONG></DT>
+<DD>uses the help colour scheme (brown on grey); also automatically provides a single button.
+</DD>
+<DT><STRONG>``WARN''</STRONG></DT>
+<DD>uses the warning colour scheme as used by the popup screens (defaults to yellow on green). User definable button bar available (see button_set).
+</DD>
+<DT><STRONG>``ERROR''</STRONG></DT>
+<DD>uses the error colour scheme (white on red) with an active button bar.
+</DD>
+</DL>
+Splash screen are exited by pressing any normal key. Usually function keys are rejected.
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html227"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html223"
+  HREF="node6.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html217"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html225"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html228"
+  HREF="node16.html">Internal Functions</A>
+<B> Up:</B> <A NAME="tex2html224"
+  HREF="node6.html">Function Reference</A>
+<B> Previous:</B> <A NAME="tex2html218"
+  HREF="node14.html">menu_popup</A>
+ &nbsp <B>  <A NAME="tex2html226"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Andy Ferguson (AFC)
+2001-10-20
+</ADDRESS>
+</BODY>
+</HTML>

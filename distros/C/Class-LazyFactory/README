@@ -1,0 +1,36 @@
+Class-LazyFactory
+=================
+
+Class::LazyFactory is a base class for factory classes. Concrete classes
+are lazy loaded, i.e. dynamically require()d, and instances of the
+concrete classes are constructed. 
+
+By using a factory method design pattern, one can provide a consistent
+interface for constructing a family of classes, without knowing the actual
+concrete classes in advance.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp
+    Class::Inspector
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Dexter Tad-y
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,7 @@
+Revision history for Catalyst::TraitFor::Request::DecodedParams
+
+0.02    14 Jan 2011
+    - Move utf8 test to author mode
+
+0.01    13 Jan 2011
+    - First release

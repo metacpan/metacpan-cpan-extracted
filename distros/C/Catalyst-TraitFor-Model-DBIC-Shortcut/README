@@ -1,0 +1,95 @@
+NAME
+    Catalyst::TraitFor::Model::DBIC::Shortcut - shortcuts support for DBIC
+    models
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        #
+        # application class
+        #
+        package TestApp;
+
+        use Moose;
+        use namespace::autoclean;
+        use Catalyst qw/ ......... /;
+        extends 'Catalyst';
+        with 'Catalyst::TraitFor::Model::DBIC::Shortcut';
+
+
+        #
+        # controller class
+        #
+        package TestApp::Controller::Test;
+
+        .........
+            # these two calss are the same
+            my $s = $c->model('DB')->schema;
+            my $s = $c->db_schema;
+        .........
+            # these two calss are the same
+            my $rs = $c->model('DB::Actor');
+            my $rs = $c->db_actor_rs;
+        .........
+
+DESCRIPTION
+    If you got tired of writting "$c->model('DB::Actor')" each time, or if
+    you use auto-completion intensively, you could look at this trait. Just
+    use this role in your application class, and you'll have shortcuts
+    auto-created for all DBIx::Class-based models:
+
+    - schema
+        for all schema classes, based on Catalyst::Model::DBIC::Schema,
+        you'll get method with name "lowercase class name" + "_schema", with
+        all "::" converted to underscore ("_"):
+
+            $c->model('DB')->schema         ==>     $c->db_schema
+            $c->model('DBIC')->schema       ==>     $c->dbic_schema
+            $c->model('DBIC::DB1')->schema  ==>     $c->dbic_db1_schema
+
+    - resultset
+        for all resultset classes, based on DBIx::Class, you'll get method
+        with name "lowercase class name" + "_rs", with all "::" converted to
+        underscore ("_"):
+
+            $c->model('DB::Actor')          ==>     $c->db_actor_rs
+            $c->model('DB::Track')          ==>     $c->db_track_rs
+            $c->model('DBIC::DB1::Actor')   ==>     $c->dbic_db1_actor_rs
+
+SEE ALSO
+    Catalyst, DBIx::Class, Moose
+
+SUPPORT
+    *   Report bugs or feature requests
+
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-TraitFor-Mo
+        del-DBIC-Shortcut>
+
+        <http://www.assembla.com/spaces/Catalyst-TraitFor-Model-DBIC-Shortcu
+        t/tickets>
+
+    *   Git repository
+
+        git clone
+        git://git.assembla.com/Catalyst-TraitFor-Model-DBIC-Shortcut.git
+
+AUTHOR
+    Oleg Kostyuk, "<cub#cpan.org>"
+
+    Based on ideas from from Pedro Melo and Oleg Pronin
+
+    <http://lists.scsys.co.uk/pipermail/dbix-class/2010-January/008794.html>
+
+    <http://lists.scsys.co.uk/pipermail/dbix-class/2010-February/008903.html
+    >
+
+COPYRIGHT & LICENSE
+    Copyright by Oleg Kostyuk.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,75 @@
+Revision history for Perl module CPAN::ReleaseHistory
+
+0.15 2016-07-17 NEILB
+    - Fixed a bug: if you used --neo and --user together,
+      it would report the first release of a dist you did as a neocpanism,
+      even if someone else had already released it. RJBS++ for the PR.
+
+0.14 2016-07-13 NEILB
+    - Added -neo option to cpan-dist-counts, prompted by
+      a question from RJBS.
+
+0.13 2016-07-13 NEILB
+    - Added cpan-dist-counts script, prompted by a tweet from PJF.
+
+0.12 2015-02-07 NEILB
+    - Added pod for the two sub-classes. MANWAR++
+
+0.11 2014-08-18
+    - Added a date() method to CPAN::ReleaseHistory::Release, as in so
+      many of the scripts I write, that's what I want to get from the
+      timestamp.
+
+0.10 2014-05-20
+    - Switched to using the index file on the CPAN Testers BackPAN;
+      this is generated hourly, and is already in the format we work
+      with, which has greatly simplified this module. Thanks to BARBIE
+      for his help in getting this in place.
+    - Added a live test in xt/
+
+0.09 2014-05-07
+    - Now use MooX::Role::CachedURL to do the getting and caching of the file,
+      since that now has transparent handling of gzip'd files.
+    - Switched to using one of BARBIE's BackPAN indexes, because they're
+      updated daily, and it's a format I can use directly.
+
+0.08 2014-02-22
+    - cpan-heavyweights: if you asked for the top N users, and the search
+      returned fewer than N users, you would get a load of warnings about
+      unefined values.
+
+0.07 2014-02-22
+    - Added --distprefix (-d) option to cpan-release-counts
+      and cpan-heavyweights. Thanks to Kent Fredric for this.
+
+0.06 2014-02-21
+    - Added --monthly option to cpan-release-counts
+      Based on idea and patch from Kent Fredric.
+    - Added -year YYYY option to cpan-release-counts
+
+0.05 2014-02-20
+    - cpan-release-counts was barfing if user had no releases
+      RT#93183 from Martin Evans.
+    - Added cpan-heavyweights script, which shows the top releasers,
+      either of all-time, or optionally for a specific year.
+
+0.04 2014-02-20
+    - Added cpan-release-counts script for generating text graphs
+      of release history, either of a user or across all users.
+    - The tests were using // which requires 5.010. Changed that and
+      made dependent on 5.006.
+
+0.03 2014-02-19
+    - Added a well_formed option to the release iterator.
+      If true, then the iterator only returns releases where the distname
+      and author id could be determined by CPAN::DistnameInfo
+
+0.02 2014-02-06
+    - Changed the sort order of local cache, so it's sorted on
+      distname and then by release time.
+    - Noted in the doc that you may discover anomalies in
+      CPAN's release history.
+
+0.01 2014-02-05
+    - First release to CPAN
+

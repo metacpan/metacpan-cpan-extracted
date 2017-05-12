@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/CPAN/Test/Dummy/MultiPkgVer/NoMETA.pm
+t/basic.t
+t/release-pod-syntax.t

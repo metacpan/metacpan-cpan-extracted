@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# ->resume is not exactly cheap (it saves/restores a LOT
+# of global variables), but shouldn't be slow. just to show
+# how fast it is, this little proggie compares a normal subroutine
+# call with two calls of transfer in a loop.
+
+use Coro;
+use Benchmark;
+
+sub a($) { }
+
+$a = bless {}, main::;
+
+sub b {
+   my ($self) = shift;
+   $self->{b} = shift if @_;
+   $self->{b};
+}
+
+$b = async {
+   # do a little unrolling...
+   while() {
+      cede; cede; cede; cede; cede;
+      cede; cede; cede; cede; cede;
+   }
+};
+
+cede;
+
+*transfer = \&Coro::State::transfer;
+
+sub doit0 {
+   while() {
+      # some unrolling here as well..
+      transfer($c0, $main); transfer($c0, $main);
+      transfer($c0, $main); transfer($c0, $main);
+      transfer($c0, $main); transfer($c0, $main);
+      transfer($c0, $main); transfer($c0, $main);
+   }
+}
+
+sub doit1 {
+   while() {
+      # some unrolling here as well..
+      transfer($c1, $main); transfer($c1, $main);
+      transfer($c1, $main); transfer($c1, $main);
+      transfer($c1, $main); transfer($c1, $main);
+      transfer($c1, $main); transfer($c1, $main);
+   }
+}
+
+$c0 = new Coro::State sub {
+   doit0(1,2,3,4,5,6,7,8,9);
+};
+
+$c1 = new Coro::State sub {
+   doit1(1,2,3,4,5,6,7,8,9);
+};
+
+#$c0->save (0);
+#$c1->save (-1);
+
+#Coro::State::enable_times 1;
+#use Coro::Debug; Coro::Debug::command "ps";#d#
+#(async {
+   $main = $Coro::current;
+
+   transfer($main, $c0);
+   transfer($main, $c1);
+
+   timethese 5000000, {
+      function  => 'a(5); a(6)',
+      method    => '$a->b(5); $a->b(6)',
+      cede      => 'cede',
+      transfer0 => 'transfer($main, $c0)',
+      transfer1 => 'transfer($main, $c1)',
+   };
+#})->join;
+#use Coro::Debug; Coro::Debug::command "ps";#d#
+
+

@@ -1,0 +1,60 @@
+{
+   "abstract" : "write message handling apps with Catalyst.",
+   "author" : [
+      "Chris Andrews C<< <chris@nodnol.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.02, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Engine-Stomp",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::ActiveMQ" : "0.00003",
+            "Catalyst::Plugin::ConfigLoader" : 0,
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Engine::Embeddable" : "v0.0.1",
+            "Catalyst::Runtime" : "5.80004",
+            "Data::Serializer" : "0.49",
+            "Moose" : 0,
+            "MooseX::Types" : 0,
+            "MooseX::Workers" : "0.05",
+            "Net::Stomp" : "0.34",
+            "YAML" : 0,
+            "YAML::XS" : "0.32",
+            "namespace::autoclean" : "0.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/pmooney/catalyst-engine-stomp.git"
+      }
+   },
+   "version" : "0.16.99"
+}

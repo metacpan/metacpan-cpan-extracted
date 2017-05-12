@@ -1,0 +1,46 @@
+--- #YAML:1.0
+name:                     CPAN-Testers-Fact-PlatformInfo
+version:                  1.03
+abstract:                 Platform information on which a CPAN Testers smoker is running
+author:
+  - Barbie (BARBIE) <barbie@cpan.org>
+  - Brian McCauley (NOBULL) <nobull67@gmail.com>
+  - Colin Newell (NEWELLC) http://colinnewell.wordpress.com/
+  - Jon 'JJ' Allen (JONALLEN) <jj@jonallen.info>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Carp:                   0
+  Metabase::Fact::Hash:   0.016
+recommends:
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  IO::File:               0
+  Test::More:             0.70
+
+provides:
+  CPAN::Testers::Fact::PlatformInfo:
+    file:     lib/CPAN/Testers/Fact/PlatformInfo.pm
+    version:  1.03
+
+no_index:
+  directory:
+    - t
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Fact-PlatformInfo
+  repository: http://github.com/barbie/cpan-testers-fact-platforminfo
+  homepage:   http://devel.cpantesters.org
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

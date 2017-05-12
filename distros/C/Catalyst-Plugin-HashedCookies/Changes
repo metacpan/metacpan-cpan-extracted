@@ -1,0 +1,67 @@
+1.131710  2013-06-20 23:51:43 Europe/London
+
+  * Fix for bug in tests when there is more than one plugin loaded
+
+1.123540  2012-12-19 05:57:07 Europe/London
+
+  * Update test libraries for compatibility with Catalyst 5.81+
+
+1.110231  2011-01-23 10:27:44 Europe/London
+
+  * Do not skip finalize_cookies in 5xx situation (Nigel M., rt.cpan #64855)
+
+1.110230  2011-01-23 10:23:22 Europe/London
+
+  * Convert to Dist::Zilla
+
+1.05    Sun Apr 19 15:30:00 GMT 2009
+        - Fix test suite to no longer use deprecated Catalyst::Base
+        - Tested under Catalyst 5.80
+
+1.04    Mon Dec 29 22:28:00 GMT 2008
+        - Proper fix for Catamoose, actually use request_class properly
+
+1.03    Sat Dec 27 09:23:00 GMT 2008
+        - Fix for Catamoose
+
+1.02    Fri Dec 26 21:36:00 GMT 2008
+        - Fix for my misuse of HTTP::Headers::Util in tests
+
+1.01    Sat Nov 08 14:47:00 GMT 2008
+        - switch to Module::Install and tidy dist
+        - added examples
+
+1.00    Fri Mar 21 11:47:00 GMT 2008
+        - Switch from CGI::Cookie to CGI::Simple::Cookie to follow Catalyst
+        - Bump version to 1.00, it's been in production for long enough :)
+
+0.05    Tue May  2 13:03:32 BST 2006
+        - Added a test for the new _hashedcookies_* check code
+
+0.04    Tue May  2 10:38:05 BST 2006
+        - Silly typo in POD, but was worth correcting to avoid confusion
+
+0.03    Sun Apr 30 20:59:06 BST 2006
+        - Refactored _hashedcookies_* check code because it was very broken
+        - Test support App scrubbed in favour of smarter, simpler alternative
+        - Tests restructured and rewritten to favour new Catalyst version 5.6x
+        - Moved POD to the bottom of HashedCookies.pm
+        - Updated License and Copyright
+
+0.02    Mon Aug 22 16:28:31 BST 2005
+        - Lots of tweaks to the POD; a few bugs and a few clarifications.
+        - Small fixup to config parameter checking code.
+        - Ran the source through perltidy.
+        - Refactored the implementation of my Catalyst::Request extensions, so
+          that (hopefully) cpan2rpm and the PAUSE indexer don't think I'm
+          working on that module.
+        - setup() now die()s rather than croak()s.
+        - finalize_cookies() now sets $c->error rather than die()ing.
+        - Changed dependencies to omit those in Perl core
+        - Added 133 tests.
+          "Code has bugs. Tests are code. Ergo tests have bugs."
+          Please report any broken tests via rt.cpan.org
+
+0.01    Sat Aug 20 17:14:23 BST 2005
+        - First version, released on an unsuspecting world.
+

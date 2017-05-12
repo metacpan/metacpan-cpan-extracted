@@ -1,0 +1,52 @@
+NAME
+    Catalyst::Plugin::Authentication::Basic::Remote - (DEPRECATED) Basic
+    authentication via remote host.
+
+SYNOPSIS
+      use Catalyst;
+      MyApp->setup(qw/Authentication::Basic::Remote Session::FastMmap/);
+
+      MyApp->config(
+          authentication => {
+              auth_url => 'http://example.com/',
+          
+              # Use Template when unauthorized. (option)
+              view_tt  => 'MyApp::V::TT',
+              template => '401.tt',
+
+              # text in Authentication dialog (default="Require Authorization")
+              auth_name => 'Require Authorization',
+          },
+      );
+
+DEPRECATION NOTICE
+    This module has been deprecated. The use of a new Authentication style
+    is recommended.
+
+    See Catalyst::Plugin::Authetnication for detail.
+
+DESCRIPTION
+    Catalyst authentication plugin that use remote host's Basic
+    authentication.
+
+    It is only first time that plugin request to remote host for
+    authentication. After that, user infomation keeps in sessions.
+
+METHODS
+    prepare
+    dispatch
+    login
+    logout
+
+SEE ALSO
+    Catalyst
+
+AUTHOR
+    Daisuke Murase, <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Daisuke Murase
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

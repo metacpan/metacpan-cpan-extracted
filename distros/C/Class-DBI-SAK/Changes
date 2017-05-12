@@ -1,0 +1,12 @@
+1.1
+  - Initial code.
+
+1.2
+  - Added mixin requirement.
+  - Details default behaviour.
+
+1.3
+  - Forgot to update, stupid Casey.
+
+1.4
+  - Removed Class::DBI::Join support.

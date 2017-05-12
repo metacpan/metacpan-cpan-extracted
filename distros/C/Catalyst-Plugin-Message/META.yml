@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Catalyst-Plugin-Message
+version: 0.03
+author:
+  - Chunzi <chunzi@cpan.org>
+abstract: The great new Catalyst::Plugin::Message!
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

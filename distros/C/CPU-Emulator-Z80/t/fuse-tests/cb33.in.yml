@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 51
+  911:
+    - 186
+name: cb33
+registers:
+  AF: 54528
+  AF_: 0
+  BC: 38688
+  BC_: 0
+  DE: 30276
+  DE_: 0
+  HL: 911
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

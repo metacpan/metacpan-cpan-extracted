@@ -1,0 +1,24 @@
+Revision history for Perl extension Class::ArrayObjects.
+
+1.03 
+	- added POD and POD coverage tests
+	- Standardised distro. Using lib for source, using tree for module structure
+
+1.00 - 1.01
+	- cleanup for 1.00
+	- patch by Slaven Rezic so that "extend" will look into @ISA
+	  in case the class isn't specified.
+
+0.04  Sat Apr 21 22:34:20 2001
+	- many many documentation updates
+	- first public release
+
+0.03  02/04/2001
+	- feature upgrade in view of release
+
+0.02  28/01/2001
+	- a few enhancements and uses (production tests)
+
+0.01  12/12/2000
+	- initial hack
+

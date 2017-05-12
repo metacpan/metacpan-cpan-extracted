@@ -1,0 +1,30 @@
+CGI-Carp-DebugScreen version
+============================
+
+CGI::Carp::DebugScreen provides decent debug/error screens for Web
+applications via CGI::Carp's set_message() function. You don't need
+to care $SIG{__DIE__} anymore. Just die or croak to get the right 
+thing. You can customize those screens as well.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2006 by Kenichi Ishigaki
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

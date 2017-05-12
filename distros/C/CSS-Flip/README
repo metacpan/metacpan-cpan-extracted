@@ -1,0 +1,19 @@
+CSS-Flip Package.
+
+Copyright (C) 2013 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>.
+
+This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.
+
+                                   ***
+
+One main module is contained.  For more details read following POD
+documentation:
+
+    CSS::Janus - Converts a left-to-right Cascading Style Sheet (CSS) into a right-to-left one
+
+For more details about the utility program cssflip, run:
+
+    cssflip --help
+
+$$

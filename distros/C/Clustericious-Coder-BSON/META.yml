@@ -1,0 +1,27 @@
+---
+abstract: 'BSON encoder for AutodataHandler'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::Clustericious::Cluster: '0'
+  Test::More: '0.94'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clustericious-Coder-BSON
+requires:
+  BSON: '0'
+  Clustericious: '1.12'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/clustericious/Clustericious-Coder-BSON/issues
+  homepage: http://perl.wdlabs.com/Clustericious-Coder-BSON
+  repository: git://github.com/clustericious/Clustericious-Coder-BSON.git
+version: '0.01'

@@ -1,0 +1,10 @@
+Revision history for Perl module Crypt::SimpleGPG
+
+0.1 Mon Aug 30 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.2 Wed Sep 1 2010
+    - updated dependencies in makefile
+
+0.3 Fri Sep 3 2010
+    - updated dependencies to require gpg

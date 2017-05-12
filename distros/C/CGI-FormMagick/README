@@ -1,0 +1,24 @@
+FormMagick 0.3.1
+Copyright (c) 2000-2001 Kirrily Robert <skud@cpan.org>
+Copyright (c) 2000-2002 Mitel Networks Corporation
+This software is distributed under the same licenses as Perl itself;
+see the file COPYING for details.
+
+For installation instructions, read the file INSTALL.
+
+More detailed documentation can be found in the doc/ directory or in
+the POD ("plain old documentation") embedded in the Perl modules.  To
+read these, type:
+
+	perldoc CGI::FormMagick
+	perldoc CGI::FormMagick::L10N
+	perldoc CGI::FormMagick::Validator
+	perldoc CGI::FormMagick::FAQ
+
+This software is in the "beta" phase of development.  This means that
+the module is mostly stable but may change slightly in later releases.
+You have been warned.
+
+The FormMagick development site (CVS, bug tracker, etc) can be found 
+at http://sourceforge.net/projects/formmagick/
+

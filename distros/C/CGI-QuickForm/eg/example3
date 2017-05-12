@@ -1,0 +1,703 @@
+#!/usr/bin/perl -w
+
+# $Id: linux-help,v 1.22 2000/04/23 14:04:36 root Exp root $
+
+# Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+# WARNING - linux-help is provided as an example of QuickForm use, (although
+# I now use it instead of dwww), and it may not be secure. 
+
+# NOTE - linux-help has hard-coded paths for a Debian Linux system - your
+# paths may/will differ. See "CHANGE THESE FOR YOUR LOCAL SYSTEM" for the
+# paths that you will need to change. linux-help itself should be placed in
+# your cgi-bin directory and made executable.
+
+# linux-help has only ever been run as root on a local system - multi-user use
+# is not supported (since I do no record locking), in other words it's only for
+# a single person to use. This program also uses the undocumented colour()
+# function from QuickForm. (This is one of CGI::QuickForm's example programs.)
+
+# TODO Configure option, e.g. to add/del paths to/from $Data{"$PREFIX PATH"}
+#      so that hard-coding is not necessary
+# TODO Cache page searches, i.e. cache lists of links?
+# TODO Keyword searching
+
+use strict ;
+
+use CGI qw( :standard :html3 ) ;
+use CGI::QuickForm qw( show_form colour ) ;
+use DB_File ; 
+use Fcntl ; # For DB_File constants.
+use File::Find ;
+use HTML::Entities ;
+use Storable qw( freeze thaw ) ;
+use URI::Escape ;
+
+use vars qw( $VERSION ) ; $VERSION = '1.061' ;
+
+use vars qw( $URL $PREDEFINED_PAGES ) ;
+
+################### CHANGE THESE FOR YOUR LOCAL SYSTEM ##############
+
+# This is the db file where linux-help stores its configuration info - it must
+# be rw by linux-help running as a CGI script.
+my $DB_FILE   = '/root/web/db/linux-help.db' ;
+# Change these to reflect your local situation; multiple paths are supported
+# separated by colons in the usual way.
+my $PATH_DOC  = "/usr/doc" ;
+my $PATH_INFO = "/usr/info" ;
+my $PATH_MAN  = "/usr/man:/usr/X11R6/man" ;
+my $PATH_POD  = "/usr/doc/perl5:/usr/doc:/usr/lib/perl5:/root/lib" ;
+# This must be rw by this script.
+my $TMP       = '/tmp' ;
+
+
+################### END OF LOCAL CHANGES ############################
+
+$| = 1 ; # Autoflush.
+
+my $TITLE        = 'Linux Help' ;
+my $SEARCH       = 'Search' ;
+my $NEW_SEARCH   = 'New Search' ;
+my $NEW_TERM     = 'New Term' ;
+my $PREV_TERM    = 'Prev Term' ;
+my $PREV_PAGE    = 'Prev Page' ;
+my $NEW_KEYWORD  = 'New Keyword' ;
+my $SEARCH_PAGES = 'Search Pages' ;
+my $SEARCH_FOR   = 'Search/Show' ;
+my $IGNORE_CASE  = 'Ignore Case' ;
+my $DEL_PAGE     = 'Del Page' ;
+my $DEL_PAGES    = 'Del Pages' ;
+my $DEL_TERM     = 'Del Term' ;
+my $DEL_TERMS    = 'Del Terms' ;
+my $PREFIX       = "\x01" ;
+my $SEARCH_TERMS = "\x01 SEARCH_TERMS" ;
+my $SHOWN        = "\x01 SHOWN" ;
+
+my %Data ;
+my %Show ;
+my %SearchTerm ; # key is the term, value is the number of times used
+my @Term ;       # Array of terms to be matched
+my $CaseSensitive = '(?i)' ;
+my %Found ;
+
+&initialise ;
+
+if( query_string() =~ /file=([^&]+)/o ) {
+    &show_file( $1 ) ;
+}
+elsif( query_string() =~ /term=([^&]+)/o ) {
+    my $term = $1 ;
+    query_string() =~ /type=([^&]+)/o ;
+    my $pagetype = $1 ;
+    param( $SEARCH_PAGES, ( $pagetype ) ) ;
+    param( $IGNORE_CASE, 'X' ) ;
+    &show_matches( $term ) ;
+}
+else {
+
+    my $footer = $PREDEFINED_PAGES ; 
+    #$footer .= hr . &show_config ;
+    my @pages  = sort @{ thaw( $Data{"$PREFIX PAGETYPE"} ) } ;
+    my $font   = "font-family:Helvetica;" ;
+    my $weight = "font-weight:900;" ;
+
+    show_form(
+            -TITLE  => $TITLE,
+            -HEADER => header() . start_html( $TITLE ) . h2( $TITLE ),
+            -FOOTER => $footer,
+            -ACCEPT => \&on_valid_form,
+            -STYLE_FIELDNAME  => qq{style="${font}${weight}"},
+            -STYLE_FIELDVALUE => qq{style="$font"},
+            -STYLE_BUTTONS    => qq{style="${font}${weight}text-align:center;"},
+            -FIELDS => [
+                {
+                    -LABEL      => $PREV_PAGE,
+                    -TYPE       => 'scrolling_list',
+                    '-values'   => [ sort { lc $a cmp lc $b } keys %Show ],
+                    -size       => 1,
+                },
+                {
+                    -LABEL      => $PREV_TERM,
+                    -TYPE       => 'scrolling_list',
+                    '-values'   => [ sort { $SearchTerm{$b} <=> $SearchTerm{$a} } 
+                                     keys %SearchTerm ], 
+                    -size       => 1,
+                },
+                { 
+                    -LABEL      => $NEW_TERM, 
+                    -size       => 24,
+                },
+                {
+                    -LABEL      => $IGNORE_CASE,
+                    -TYPE       => 'checkbox',
+                    -value      => 'X',
+                    -checked    => 'checked',
+                    -label      => '',
+                },
+                { 
+                    -LABEL      => $SEARCH_PAGES,
+                    -TYPE       => 'checkbox_group',
+                    '-values'   => \@pages,
+                    -default    => \@pages,
+                },
+                {
+                    -LABEL      => $SEARCH_FOR,
+                    -TYPE       => 'radio_group',
+                    '-values'   => [ $PREV_PAGE, $PREV_TERM, $NEW_TERM, $NEW_KEYWORD ],
+                },
+            ],
+            -BUTTONS => [ 
+                { -name => $SEARCH_FOR },
+                { -name => $DEL_PAGE },
+                { -name => $DEL_PAGES },
+                { -name => $DEL_TERM }, 
+                { -name => $DEL_TERMS }, 
+                { -name => 'Clear', -DEFAULTS => 1 }, 
+                ],
+            # If eventually we want to offer configuration we'll add the options
+            # as fields and add a Configure button.
+        ) ;
+}
+
+&clean_and_quit ;
+
+sub show_file {
+    my $file = uri_unescape( shift ) ;
+    my( $type, $compress ) = $file =~ /\.([^.]+)(?:\.(gz|z|zip|Z))?$/o ;
+      ( $type, $compress ) = ( 'txt', $type ) if $type =~ /^(?:gz|z|zip|Z)$/o ;
+    $type = 'man'                             if $type =~ /^\d[a-z]{0,2}$/o ;
+
+    # Remember for next time.
+    unless( $Show{ &file_to_name( $file ) } ) {
+        $Show{ &file_to_name( $file ) } = $file ;
+        $Data{$SHOWN}                   = freeze( \%Show ) ;
+    }
+
+    $compress ||= '' ;
+
+    my $TIMEOUT = 30 ;
+    my @lines ;
+    local $_ ;
+
+    if( $type !~ /man/o ) { 
+        if( $compress ) {
+            @lines = `zcat $file` ;    
+        }
+        else {
+            @lines = `cat $file` ;    
+        }
+    }
+
+    print header ;
+
+    CASE : {
+        if( $type =~ /html?/o ) {
+            # Should never get here!
+            print @lines ;
+            last CASE ;
+        }
+        if( $type =~ /te?xt/o ) {
+            print
+                start_html( $file ),
+                h3( colour( 'BLUE', $file ) ),
+                ;
+            &new_search ;
+            print "<pre>" ;
+            foreach( @lines ) {
+                print encode_entities( $_ ) ;
+            }
+            print "</pre>" ;
+            &new_search ;
+            print end_html ;
+            last CASE ;
+        }
+#        if( $type =~ /pod|pm/o ) { #/
+#            # Doesn't work except from the command line.
+#            if( $compress ) {
+#                print `zcat $file | pod2html --norecurse` ;
+#            }
+#            else {
+#                print `pod2html --norecurse --infile $file` ;
+#            }
+#            last CASE ;
+#        }
+        if( $type =~ /man/o ) {
+            print
+                start_html( $file ),
+                h3( colour( 'BLUE', $file ) ), 
+                ;
+            &new_search ;
+            print "<pre>" ;
+            my $temp = $file ;
+            $temp =~ s,.+/,,o ;
+            $temp = "$TMP/$temp.cache" ;
+            &full_system( "man -l $file > $temp" ) ;
+            my $i = 0 ;
+            sleep 1 while not -e $temp and $i++ < $TIMEOUT ;
+            if( -e $temp ) {
+                @lines = `cat $temp` ;
+                foreach( @lines ) {
+                    s/.\cH//g ;
+                    print encode_entities( $_ ) ;
+                }
+                unlink $temp if $Data{"$PREFIX DEL_CACHE"} ;
+            }
+            else {
+                print "Timed out after $i seconds" ;
+            }
+            print "</pre>" ;
+            &new_search ;
+            print end_html ;
+            last CASE ;
+        }
+        if( $type =~ /info/o ) {
+            print
+                start_html( $file ),
+                h3( colour( 'BLUE', $file ) ),
+                ;
+            &new_search ;
+            print "<pre>" ;
+            print `info --file $file` ;
+            print "</pre>" ;
+            &new_search ;
+            print end_html ;
+            last CASE ;
+        }
+        DEFAULT : {
+            print
+                start_html( $TITLE ),
+                h3( colour( 'BLUE', $TITLE ) ), 
+                ;
+            &new_search ;
+            print
+                p( colour( 'RED', "BUG: File <br />$file<br />of type " .
+                                  "$type $compress should be converted" ) ),
+                "<pre>", 
+                ;
+            foreach( @lines ) {
+                print encode_entities( $_ ) ;
+            }
+            print "</pre>" ;
+            &new_search ;
+            print end_html ;
+        }
+    }
+}
+
+# Copied from Programming Perl 2nd Ed (Blue Camel).
+sub full_system {
+
+    my $rc     = 0xFFFF & system @_ ;
+    my $result = '' ;
+
+    if( $rc == 0 ) {
+        $result = "ran with normal exit\n" ;
+    }
+    elsif( $rc == 0xFF00 ) {
+        $result = "command failed: $!\n" ;
+    }
+    elsif( $rc > 0x80 ) {
+        $rc >>= 8 ;
+        $result = "ran with non-zero exit status $rc\n" ;
+    }
+    else {
+        $result = "ran with " ;
+        if( $rc &   0x80 ) {
+            $rc &= ~0x80 ;
+            $result .= "core dump from " ;
+        }
+        $result .= "signal $rc\n" ;
+    }
+#    print qq{<font color="RED">$result</font>} if $result ;
+    ( $rc != 0 ) ;
+}
+
+sub on_valid_form {
+
+    if( param( $DEL_PAGE ) and param( $PREV_PAGE ) ) {
+        delete $Show{ param( $PREV_PAGE ) } ;
+        $Data{$SHOWN} = freeze( \%Show ) ;
+        &show_del( 'Page', param( $PREV_PAGE ) ) ;
+    }
+    elsif( param( $DEL_PAGES ) and param( $PREV_PAGE ) ) {
+        %Show         = () ;
+        $Data{$SHOWN} = freeze( \%Show ) ;
+        &show_del( 'All Pages', '' ) ;
+    }
+    elsif( param( $DEL_TERM ) and param( $PREV_TERM ) ) {
+        delete $SearchTerm{ param( $PREV_TERM) } ;
+        $Data{$SEARCH_TERMS} = freeze( \%SearchTerm ) ;
+        &show_del( 'Term', param( $PREV_TERM ) ) ;
+    }
+    elsif( param( $DEL_TERMS ) and param( $PREV_TERM ) ) {
+        %SearchTerm          = () ;
+        $Data{$SEARCH_TERMS} = freeze( \%SearchTerm ) ;
+        &show_del( 'All Terms', '' ) ;
+    }
+    elsif( param( $SEARCH_FOR ) eq $NEW_KEYWORD ) {
+        print 
+            header,
+            start_html( $TITLE ),
+            h2( $TITLE ),
+            h3( colour( 'RED', "Find Keyword not implemented yet." ) ),
+            ;
+        
+        &new_search ;
+
+        print end_html ;
+    }
+    else {
+        my $term ;
+        my $find = param( $SEARCH_FOR ) ;
+        if( $term = param( $NEW_TERM ) ) {
+            # Look for a new term if given.
+            &show_matches( $term ) ; 
+        }
+        elsif( $term = param( $PREV_TERM ) and $find ne $PREV_PAGE ) {
+            # Look for an existing term unless we're looking for a previous page.
+            &show_matches( $term ) ; 
+        }
+        elsif( param( $PREV_PAGE ) ) {
+            &show_file( $Show{ param( $PREV_PAGE ) } ) ;
+        }
+        else {
+            print 
+                header,
+                start_html( $TITLE ),
+                h2( $TITLE ),
+                h3( colour( 'RED', "Invalid search/show" ) ),
+                p( "Did you choose a $PREV_TERM without checking the $PREV_TERM " .
+                   "check box?" ),
+                ;
+            
+            &new_search ;
+
+            print end_html ;
+         }
+    }
+}
+
+sub show_del {
+    my( $type, $value ) = @_ ;
+
+    print 
+        header,
+        start_html( $TITLE ),
+        h2( $TITLE ),
+        h3( qq{Deleted $type <font color="BLUE">$value</font>} ),
+        ;
+    
+    &new_search ;
+
+    print end_html ;
+}
+
+sub show_matches {
+    my $term = shift ;
+
+    @Term = split ' ', $term ;
+
+    local $_ ;
+
+    &reduce_terms if scalar keys %SearchTerm > $Data{"$PREFIX MAX_TERMS"} ;
+    $SearchTerm{$term}++ if $term !~ /^\d[a-z]*\.?$/o ;
+    # Always freeze as early as possible in case the user interrupts.
+    $Data{$SEARCH_TERMS} = freeze( \%SearchTerm ) ;
+
+    print 
+        header,
+        start_html( $TITLE ),
+        h2( $TITLE ),
+        h3( "Files matching ", join " or ", 
+            map { qq{<font color="BLUE">$_</font>} } @Term ),
+        ;
+
+    &new_search ;
+
+    my @path = () ;
+    my %path = %{ thaw( $Data{"$PREFIX PATH"} ) } ;
+    foreach my $pagetype ( param( $SEARCH_PAGES ) ) {
+       push @path, split /:/, $path{$pagetype} ;
+    }
+
+    $CaseSensitive = '' unless param( $IGNORE_CASE ) eq 'X' ;
+    %Found = () ;
+    find( \&wanted, @path ) ; 
+    print "<ol>" ;
+    foreach my $file ( sort by_filename keys %Found ) {
+        my $name = &file_to_name( $file ) ;
+        if( $file =~ /\.html?$/o ) {
+            print qq{<li><a href="file://$file">$name</a></li>} ;
+        }
+        else {
+            print qq{<li><a href="$URL?file=$file">$name</a></li>} ;
+        }
+    }
+    printf "</ol>" ;
+
+    &new_search ;
+
+    print end_html ;
+}
+
+sub wanted {
+    if( -f ) {
+        foreach my $term ( @Term ) {
+            $Found{$File::Find::name}++ if /$CaseSensitive\Q$term/ ; 
+        }
+    }
+}
+
+sub by_filename {
+    my $filea = lc &file_to_name( $a ) ;
+    my $fileb = lc &file_to_name( $b ) ;
+
+    $filea cmp $fileb ;
+}
+
+sub file_to_name {
+    my $name = shift ;
+
+    if( $name =~ m,/usr/lib/perl5/(.+\.p(?:m|od))$,o ) {
+        $name = $1 ;
+    }
+    elsif( $name =~ m,/usr/doc/(.+)$,o ) {
+        $name = $1 ;
+    }
+    else {
+        $name =~ m,([^/]+)$, ;
+        $name = $1 ;
+    }
+
+    $name ;
+}
+
+# No need now that the user can manually delete - but will do for convenience.
+sub reduce_terms {
+
+    my $max = $Data{"$PREFIX MAX_TERMS"} ;
+    my $min = 1 ;
+    while( scalar keys %SearchTerm > $max ) {
+        foreach my $term ( %SearchTerm ) {
+            delete $SearchTerm{$term} 
+            if exists $SearchTerm{$term} and $SearchTerm{$term} <= $min ;
+        }
+        $min++ ;
+    }
+}
+
+sub new_search {
+
+    print 
+        start_form,
+        defaults( $NEW_SEARCH ),
+        end_form,
+        ;
+}
+
+sub fail_form {
+
+    my $err = shift ;
+
+    print 
+        header,
+        start_html( $TITLE ),
+        h3( colour( "RED",  "$TITLE Failed" ) ),
+        p(  colour( "GREEN", $err ) ),
+        start_form,
+        defaults( $NEW_SEARCH ),
+        end_form,
+        end_html,
+        ;
+
+    &clean_and_quit ;
+}
+
+sub clean_and_quit {
+
+    eval {
+        untie %Data or 
+        die "Failed to save to linux-help.db: $!\n" ;
+    } ;
+    &fail_form( $@ ) if $@ ;
+
+    exit ;
+}
+
+sub initialise {
+
+    my( $FALSE, $TRUE ) = ( 0, 1 ) ;
+
+    eval {
+        tie %Data, 'DB_File', $DB_FILE, O_RDWR | O_CREAT, 0600, $DB_BTREE or 
+        die "Failed to open $DB_FILE: $!\n" ;
+    } ;
+    &fail_form( $@ ) if $@ ;
+
+    if( not exists $Data{"$PREFIX INITIALISED"} ) {
+
+        $Data{"$PREFIX INITIALISED"} = $TRUE ;
+
+        $Data{"$PREFIX DEL_CACHE"}   = $TRUE ;
+
+        $Data{"$PREFIX MAX_TERMS"}   = 16 ;
+
+        $Data{"$PREFIX PATH"} = freeze( {
+                                    doc  => $PATH_DOC,
+                                    info => $PATH_INFO,
+                                    man  => $PATH_MAN,
+                                    pod  => $PATH_POD,
+                                    } ) ;
+
+        $Data{"$PREFIX PAGETYPE"} = 
+            freeze( [ keys %{ thaw( $Data{"$PREFIX PATH"} ) } ] ) ;
+    }
+
+    %SearchTerm = %{ thaw( $Data{$SEARCH_TERMS} ) } 
+    if exists $Data{$SEARCH_TERMS} ;
+
+    %Show = %{ thaw( $Data{$SHOWN} ) } if exists $Data{$SHOWN} ;
+}
+
+sub show_config {
+
+    local $_ = <<__EOT__ ;
+<table border="1" cellspacing="0"><tr><td colspan="2" align="center">
+<b>Configuration</b></td></tr>
+__EOT__
+
+    # Paths.
+    $_ .= qq{<tr><td colspan="2"><b>Paths:</b></td></tr>} ;
+    my %path = %{ thaw( $Data{"$PREFIX PATH"} ) } ;
+    foreach my $key ( sort keys %path ) {
+        my $path = join ", ", split /:/, $path{$key} ;
+        $_ .= qq{<tr><td>$key </td><td>$path</td></tr>} ;
+    }
+
+    $_ .= qq{<tr><td><i>database</i> </td><td>$DB_FILE</td></tr>} ;
+
+    $_ .= qq{<tr><td><i><b>Program:</b></i> </td><td>$URL</td></tr>} ;
+
+    $_ .= qq{<tr><td><i><b>Del cache:</b></i> </td><td>$Data{"$PREFIX DEL_CACHE"}} .
+          qq{</td></tr>} ;
+
+    $_ .= qq{<tr><td><i><b>Max Terms:</b></i> } .
+          qq{</td><td>$Data{"$PREFIX MAX_TERMS"}</td></tr>} ;
+
+    my $pagetype = join ", ", sort @{ thaw( $Data{"$PREFIX PAGETYPE"} ) } ;
+    $_ .= qq{<tr><td><i><b>Page types:</b></i> </td><td>$pagetype</td></tr>} ;
+
+    $_ .= "</table>" ;
+}
+
+BEGIN {
+
+    $URL = url() ;
+
+    $PREDEFINED_PAGES = <<__EOT__ ;
+<a href="$URL?type=info\&term=.info">Info pages</a>&nbsp;&nbsp;
+<a href="$URL?type=doc\&term=.">/usr/doc</a>&nbsp;&nbsp;
+<a href="$URL?type=doc\&term=HOWTO">HOWTO</a>&nbsp;&nbsp;
+<p>
+<a href="$URL?type=man\&term=1.">
+man 1\&nbsp;\&nbsp;\&nbsp;Executable programs or shell commands</a><br />
+<a href="$URL?type=man\&term=1d.">
+man 1db\&nbsp;DB</a><br />
+<a href="$URL?type=man\&term=1p.">
+man 1p\&nbsp;\&nbsp;Perl Functions</a><br />
+<a href="$URL?type=man\&term=1x.">
+man 1x\&nbsp;\&nbsp;X Executable programs or shell commands</a><br />
+<a href="$URL?type=man\&term=2.">
+man 2\&nbsp;\&nbsp;\&nbsp;System calls</a> (functions provided by the kernel)<br />
+<a href="$URL?type=man\&term=3.">
+man 3\&nbsp;\&nbsp;\&nbsp;Library calls</a> (functions within system libraries)<br />
+<a href="$URL?type=man\&term=3paper">
+man 3paper\&nbsp;Paper related</a><br />
+<a href="$URL?type=man\&term=3pm.">
+man 3pm\&nbsp;Perl Modules</a><br />
+<a href="$URL?type=man\&term=4.">
+man 4\&nbsp;\&nbsp;\&nbsp;Special files</a> (usually found in /dev)<br />
+<a href="$URL?type=man\&term=5.">
+man 5\&nbsp;\&nbsp;\&nbsp;File formats and conventions</a> eg /etc/passwd<br />
+<a href="$URL?type=man\&term=5vga.">
+man 5vga\&nbsp;VGA File formats and conventions</a><br />
+<a href="$URL?type=man\&term=5x.">
+man 5x\&nbsp;\&nbsp;X File formats and conventions</a><br />
+<a href="$URL?type=man\&term=6.">
+man 6\&nbsp;\&nbsp;\&nbsp;Games</a><br />
+<a href="$URL?type=man\&term=7.">
+man 7\&nbsp;\&nbsp;\&nbsp;Macro packages and conventions</a> eg man(7), groff(7)<br />
+<a href="$URL?type=man\&term=7vga.">
+man 7vga\&nbsp;VGA Macro packages and conventions</a><br />
+<a href="$URL?type=man\&term=8.">
+man 8\&nbsp;\&nbsp;\&nbsp;System administration commands</a> (usually only for root)<br />
+<a href="$URL?type=man\&term=9.">
+man 9\&nbsp;\&nbsp;\&nbsp;Kernel routines</a><br />
+<hr />
+__EOT__
+
+}
+
+__END__
+
+=head1 NAME
+
+linux-help - CGI program for looking up help text, e.g. man and info pages on localhost
+
+=head1 DESCRIPTION
+
+A single source for looking up help via a browser on linux systems. 
+
+It will search for and render man pages, info pages and perl pod pages, as
+well as any html pages you want. It is slower than systems like dwww because
+it doesn't cache and searches dynamically - but you never have to update
+anything or pre-index because of this dynamism.
+
+(Note that if you enter a New Term you don't have to change Search/Show to New
+Term - linux-help will figure it out.)
+
+You will need to place linux-help in your cgi-bin directory and change the
+\$DB_FILE file to a path and filename of your choice. Non-Debian users will
+have to change the paths stored in the \$PATH_* variables. See the beginning
+of the code for these.
+
+=head1 README
+
+CGI program for looking up help text, e.g. man, info and pod pages on localhost.
+It is slower than systems like dwww because
+it doesn't cache and searches dynamically - but you never have to update
+anything or pre-index because of this dynamism.
+
+=head1 PREREQUISITES
+
+C<strict>
+C<CGI>
+C<CGI::QuickForm>
+C<DB_File> 
+C<Fcntl>
+C<File::Find>
+C<HTML::Entities>
+C<Storable>
+C<URI::Escape>
+
+=head1 COREQUISITES
+
+=head1 COPYRIGHT
+
+Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+May be used/distributed under the GPL.
+Email <summer@perlpress.com> with 'linux-help' in the subject line.
+
+=head1 OSNAMES
+
+Linux
+
+=head1 SCRIPT CATEGORIES
+
+CGI
+Web
+
+=cut
+

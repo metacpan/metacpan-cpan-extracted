@@ -1,0 +1,7 @@
+This is CircuitLayout, a module for working with 
+circuit layout items like boundaries, rectangles,
+texts, and structure references (srefs).
+
+Send feedback/suggestions to
+Schumack@cpan.org
+

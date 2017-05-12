@@ -1,0 +1,75 @@
+DESCRIPTION
+
+    This module provides routines related to tab completion in bash shell.
+
+ About programmable completion in bash
+
+    Bash allows completion to come from various sources. The simplest is
+    from a list of words (-W):
+
+     % complete -W "one two three four" somecmd
+     % somecmd t<Tab>
+     two  three
+
+    Another source is from a bash function (-F). The function will receive
+    input in two variables: COMP_WORDS (array, command-line chopped into
+    words) and COMP_CWORD (integer, index to the array of words indicating
+    the cursor position). It must set an array variable COMPREPLY that
+    contains the list of possible completion:
+
+     % _foo()
+     {
+       local cur
+       COMPREPLY=()
+       cur=${COMP_WORDS[COMP_CWORD]}
+       COMPREPLY=($( compgen -W '--help --verbose --version' -- $cur ) )
+     }
+     % complete -F _foo foo
+     % foo <Tab>
+     --help  --verbose  --version
+
+    And yet another source is an external command (-C) including, from a
+    Perl script. The command receives two environment variables: COMP_LINE
+    (string, raw command-line) and COMP_POINT (integer, cursor location).
+    Program must split COMP_LINE into words, find the word to be completed,
+    complete that, and return the list of words one per-line to STDOUT. An
+    example:
+
+     % cat foo-complete
+     #!/usr/bin/perl
+     use Complete::Bash qw(parse_cmdline format_completion);
+     use Complete::Util qw(complete_array_elem);
+     my ($words, $cword) = @{ parse_cmdline() };
+     my $res = complete_array_elem(array=>[qw/--help --verbose --version/], word=>$words->[$cword]);
+     print format_completion($res);
+    
+     % complete -C foo-complete foo
+     % foo --v<Tab>
+     --verbose --version
+
+ About the routines in this module
+
+    First of all, parse_cmdline() is the function to parse raw command-line
+    (such as what you get from bash in COMP_LINE environment variable) into
+    words. This makes it easy for the other functions to generate
+    completion answer. See the documentation for that function for more
+    details.
+
+    format_completion() is what you use to format completion answer
+    structure for bash.
+
+SEE ALSO
+
+    Complete, the convention that this module follows.
+
+    Some higher-level modules that use this module (so you don't have to
+    use this module directly): Getopt::Long::Complete (via
+    Complete::Getopt::Long), Getopt::Long::Subcommand, Perinci::CmdLine
+    (via Perinci::Sub::Complete).
+
+    Other modules related to bash shell tab completion: Bash::Completion,
+    Getopt::Complete, Term::Bash::Completion::Generator.
+
+    Programmable Completion section in Bash manual:
+    https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion.html
+

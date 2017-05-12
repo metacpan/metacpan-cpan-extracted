@@ -1,0 +1,88 @@
+# NAME
+
+Cwd::utf8 - Fully UTF-8 aware Cwd
+
+# VERSION
+
+version 0.010
+
+# SYNOPSIS
+
+    # Using the utf-8 versions of cwd, getcwd, fastcwd, fastgetcwd
+    use Cwd::utf8;
+    my $dir = getcwd;
+
+    # Using the utf-8 versions of abs_path
+    use Cwd::utf8 qw(abs_path);
+    my $abs_path = abs_path($file);
+
+    # Exporting no functions
+    use Cwd::utf8 qw(:none); # NOT "use Cwd::utf8 qw();"!
+    my $real_path = Cwd::real_path($file);
+
+# DESCRIPTION
+
+While the original [Cwd](https://metacpan.org/pod/Cwd) functions are capable of handling UTF-8
+quite well, they expects and return all data as bytes, not as
+characters.
+
+This module replaces all the [Cwd](https://metacpan.org/pod/Cwd) functions with fully UTF-8 aware
+versions, both expecting and returning characters.
+
+**Note:** Replacement of functions is not done on DOS, Windows, and OS/2
+as these systems do not have full UTF-8 file system support.
+
+## Behaviour
+
+The module behaves as a pragma so you can use both `use
+Cwd::utf8` and `no Cwd::utf8` to turn utf-8 support on
+or off.
+
+By default, cwd(), getcwd(), fastcwd(), and fastgetcwd() (and, on
+Win32, getdcwd()) are exported (as with the original [Cwd](https://metacpan.org/pod/Cwd)). If you
+want to prevent this, use `use Cwd::utf8 qw(:none)`. (As all the
+magic happens in the module's import function, you can not simply use
+`use Cwd::utf8 qw()`)
+
+# ATTRIBUTES
+
+## $Cwd::utf8::UTF8\_CHECK
+
+By default `Cwd:::utf8` marks decoding errors as fatal (default value
+for this setting is `Encode::FB_CROAK`). If you want, you can change this by
+setting `Cwd::utf8::UTF8_CHECK`. The value `Encode::FB_WARN` reports
+the encoding errors as warnings, and `Encode::FB_DEFAULT` will completely
+ignore them. Please see [Encode](https://metacpan.org/pod/Encode) for details. Note: `Encode::LEAVE_SRC` is
+_always_ enforced.
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker
+[website](https://github.com/HayoBaan/Cwd-utf8/issues).
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# COMPATIBILITY
+
+The filesystems of Dos, Windows, and OS/2 do not (fully) support
+UTF-8. The [Cwd](https://metacpan.org/pod/Cwd) function will therefore not be replaced on these
+systems.
+
+# SEE ALSO
+
+- [Cwd](https://metacpan.org/pod/Cwd) -- The original module
+- [File::Find::utf8](https://metacpan.org/pod/File::Find::utf8) -- Fully utf-8 aware versions of the [File::Find](https://metacpan.org/pod/File::Find) functions.
+- [utf8::all](https://metacpan.org/pod/utf8::all) -- Turn on utf-8, all of it. This was also the module I first added the utf-8 aware versions of [Cwd](https://metacpan.org/pod/Cwd) and [File::Find](https://metacpan.org/pod/File::Find) to before moving them to their own package.
+
+# AUTHOR
+
+Hayo Baan <info@hayobaan.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Hayo Baan.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,10 @@
+Revision history for Class-Dot-Model
+
+0.1.2  Tue Sep 11 12:08:43 2007
+   - Install a sighandler that walks through all modules that imports
+      us + inherits from DBIx::Class and then disconnects them.
+
+
+0.1.1  Sun Sep  9 02:22:58 2007
+       Initial release.
+

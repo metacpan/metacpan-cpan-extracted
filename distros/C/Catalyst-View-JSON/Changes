@@ -1,0 +1,150 @@
+Revision history for Perl extension Catalyst::View::JSON
+
+0.36  Wed Nov 25  12:00:00 CT 2015
+        - POD updates, improved warning messages, strictness (andyjack++)
+        - Make the default BOM added for safari optional. Possible breaking
+          change, please file issues if this causes trouble.
+        - New render method to let you just get a JSON encoded version of
+          some data (Added to make compatible with the unofficial Catalyst
+          View API that has a render method).
+        -
+
+0.35  Wed Jan 07  12:00:00 CT 2014
+        - Specify a version of JSON::MaybXS in the Makefile to close a test
+          failure (test case requires version '1.003000' so we made that the
+          required version).
+
+0.34  Mon Jan 05  12:00:00 CT 2014
+        - switched from JSON::Any to JSON::MaybeXS (json_driver option no
+          longer supported)
+        - Updated some documenation to note that in 2015 perhaps some of the
+          given advice is no longer relevent.
+        - Added a new configuration option 'json_encoder_args' which lets you
+          pass arguments to JSON::MaybeXS.  Useful for when you want to have
+          more control on how your JSON serializer works.
+
+0.33  Tue Apr 12 12:20:22 PDT 2011
+        - Fixed local_request monkey patching to support Catalyst >= 5.89
+
+0.32  Tue Jan  4 10:03:05 PST 2011
+        - remove Opera special casing (omega)
+
+0.31  Wed Sep 15 15:14:33 PDT 2010
+        - Chrome doesn't like UTF-8 BOM (Larry Leszczynski)
+
+0.30  Tue Apr 13 01:14:07 CEST 2010
+        - Fix test application to call $c->forward('View::JSON') rather than
+          (the incorrect) $c->forward('MyApp::View::JSON')
+        - Fix documentation to match the above change
+        - Turn off the regex fallback behavior in the test applications on
+          newer Catalyst versions to ensure tests are correctly forwarding.
+        - Move actions out of the test application classes into controller
+          classes to avoid deprecation warnings on newer Catalyst releases.
+        - 0.29 had unintended commits accidentally pulled from ap/master. Reverted
+
+0.28  Wed Mar 10 11:19:35 JST 2010
+        - No code changes. Fixed packaging, added YAML dep for testing
+
+0.27  Tue Feb 23 18:09:02 PST 2010
+        - Added repository info to META.yml to satisfy people
+
+0.26  Mon Aug 24 16:11:37 PDT 2009
+        - Work around not to expose Catalyst specific stash variables (Chris Prather)
+
+0.25  Sat Apr 18 19:09:46 CST 2009
+        - Use MRO::Compat instead of NEXT. (Florian Ragwitz)
+
+0.24  Mon Mar  3 01:42:30 PST 2008
+        - removed t/02_ut8.t since it doesn't do anything useful
+
+0.23  Fri Feb 22 14:35:28 PST 2008
+        - Implemented and documented how to override JSON encoder in
+          your view class by implementing encode_json() method.
+
+0.22  Wed Jan  9 14:29:20 PST 2008
+        - Updated the test to work with JSON 2.x and now unbundle JSON.pm in inc/
+          (Thanks to Daniel Westermann-Clark)
+
+0.21  Thu Oct 18 13:53:47 PDT 2007
+        - Update JSON::Any dependency to 1.11
+          (Thanks to typester and perigrin)
+
+0.20  Wed Aug 29 03:23:27 PDT 2007
+        - Fixed POD config 'V::JSON' to 'View::JSON'
+          (Thanks to Matt S Trout)
+
+0.19  Fri Aug  3 15:32:04 PDT 2007
+        - Store JSON::Any object into json_dumper to prevent other
+          modules to change JSON::Any backend like WWW::Facebook::API does.
+          (Thanks to J.Shirley)
+
+0.18  Mon Apr 30 21:08:06 PDT 2007
+        - Make 'JSON' as a default driver to make it backward compatible
+          (Thanks to Andy Hobbs)
+
+0.17  Wed Apr 25 16:04:44 PDT 2007
+        - Switch to Module::Install
+        - include JSON.pm in inc/ for testing.
+          (Thanks to Matt S Trout)
+
+0.16  Tue Apr 17 20:11:38 PDT 2007
+        - Added JSON::Any dependency
+
+0.15  Fri Apr 13 19:25:04 PDT 2007
+        - Switch to use JSON::Any to abstract JSON drivers imlementations
+          (Thanks to Florian Ragwitz for the patch)
+
+0.14  Wed Dec 20 17:20:26 PST 2006
+        - Oops, no_x_json_header in 0.13 was broken
+
+0.13  Wed Dec 20 17:12:32 PST 2006
+        - Added UTF-8 BOM if the User-Agent is Safari and encoding is utf-8 (Jun Kuriyama)
+        - Added 'no_x_json_header' option to disable auto-setting X-JSON for Prototype.js
+          (Jun Kuriyama)
+        - Documented json_driver config
+
+0.12  Thu Oct 26 17:37:58 JST 2006
+        - Support X-JSON for Prototype.js (John Wang)
+        - Updated interoperability doc (John Wang)
+
+0.11  Mon Jul 31 16:21:14 JST 2006
+        - Fix validator so 'json_driver' should just work (Thanks to typester)
+
+0.10  Sun Jul 30 23:46:43 JST 2006
+        - Updated document (Thanks to John Wang)
+        - Switch Content-Type to application/json the standard other than Opera
+        - Mention Encode::UCS::JavaScript in POD
+
+0.09  Thu Apr 20 22:16:19 JST 2006
+        - Added Helper class (Thanks to Komatsu)
+
+0.08  Tue Jan 10 13:31:39 UTC 2006
+        - Added Opera hack (Content-Type: applcation/x-javascript)
+          (Thanks to kazeburo)
+
+0.07  Tue Jan 10 13:00:19 UTC 2006
+        - Now able to use JSON::Syck as a converter by passing
+          json_driver as 'JSON::Syck'
+
+0.06  Tue Jan 10 09:04:34 UTC 2006
+        - Oops, 0.05 was broken. Fixed encode() problem and added test
+          cases for them.
+
+0.05  Tue Jan 10 08:51:02 UTC 2006
+        - Added encoding option (default utf-8) to tackle with Safari
+          multibytes problem. Content-Type is now text/javascript (no +json)
+          (Thanks to kazeburo)
+
+0.04  Sun Jan  8 17:06:56 UTC 2006
+        - Added scalar support to expose_hash and updated the
+          document.
+
+0.03  Sun Jan  8 16:36:36 UTC 2006
+        - Added sanitization of callback function names to avoid XSS
+          thingy.
+
+0.02  Wed Jan  4 10:41:28 UTC 2006
+        - Include the tests file on distribution
+
+0.01  Wed Jan  4 09:27:33 2006
+	- original version

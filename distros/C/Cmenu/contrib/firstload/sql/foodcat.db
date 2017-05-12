@@ -1,0 +1,5 @@
+DROP TABLE foodcat;
+CREATE TABLE foodcat (
+	foodcat	INT NOT NULL,
+	cat	TEXT
+);

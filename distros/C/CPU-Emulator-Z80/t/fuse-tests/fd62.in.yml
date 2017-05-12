@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 98
+name: fd62
+registers:
+  AF: 36971
+  AF_: 0
+  BC: 62766
+  BC_: 0
+  DE: 62424
+  DE_: 0
+  HL: 7820
+  HL_: 0
+  I: 0
+  IX: 56762
+  IY: 39426
+  PC: 0
+  R: 0
+  SP: 0

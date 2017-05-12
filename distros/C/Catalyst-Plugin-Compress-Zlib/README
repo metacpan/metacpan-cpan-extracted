@@ -1,0 +1,25 @@
+NAME
+    Catalyst::Plugin::Compress::Zlib - DEPRECATED Zlib Compression for
+    Catalyst
+
+SYNOPSIS
+        use Catalyst qw[Compress::Zlib];
+        # NOTE - DEPRECATED, supported for legacy applications,
+        #        but use Catalyst::Plugin::Compress in new code.
+
+DESCRIPTION
+    DEPRECATED - supported for legacy applications, but
+    useCatalyst::Plugin::Compress in new code.
+
+    Compress response if client supports it.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

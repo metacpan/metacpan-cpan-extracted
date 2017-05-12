@@ -1,0 +1,18 @@
+<h2>Updates</h2>
+
+<div class="admin">
+<table>
+<tr>
+    <th>Type</th>
+    <th>Page No.</th>
+    <th>Updated</th>
+</tr>
+[% FOREACH record = records %]
+<tr>
+    <td>[% record.area %]</td>
+    <td>[% record.pageid %]</td>
+    <td>[% record.updated %]</td>
+</tr>
+[% END %]
+</table>
+</div>

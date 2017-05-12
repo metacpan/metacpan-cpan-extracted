@@ -1,0 +1,81 @@
+
+              =================================================
+                          -=* Convert::Ethiopic *=-
+                Tools for working with Ethiopic text in Perl
+                           -----------------------
+
+
+
+README file for Convert-Ethiopic distribution:
+
+	This package was originally developed as an interface to the LibEth
+	programming library for Ethiopic text and information processing.  The 
+	Ethiopic module is not a comprehensive interface to the LibEth library but
+	the minimum to support the "LiveGeez" module which is an implementation of
+	the LiveGe'ez Remote Processing Protocol.
+
+	The modules Ethiopic::Cstocs and Ethiopic::Time are intended primarily as
+	services to the LiveGe'ez module and as such expect a LiveGeez::Request
+	object as an argument (though can work with any object containing the
+	expected hash keys and values).
+
+	In future versions of the Ethiopic::Cstocs module should apply the same
+	type of interface as used in the Cz::Cstocs module from the Cstool package
+	which the Ethiopic::Convert package is loosely based on.
+
+
+	Module Ethiopic::System:
+
+		Creates an Ethiopic "system" object that holds conversion settings.
+
+	Module Ethiopic::Cstocs:
+
+		Implements an object for various character set code conversions.
+		Character set systems are specified by a canonical name specified
+		in the LiveGe'ez Remote Processing Protocol.  Optional secondary
+		conversion give the number of conversion possibilities at more
+		than 68x9x2.
+
+	Module Ethiopic::Time:
+
+		Implements an object for various calendar services.  The most
+		useful methods are EthiopicToGregorian, GregorianToEthiopic, and
+		isEthiopianHoliday.
+
+	Program edate.pl:
+
+		Gives you the current date and time with Ethiopic formatting
+		in the languages Amharic and Tigrigna.  Has oodles of options
+		that can be combined together.  See -? you will need an Ethiopic
+		font and a terminal supporting UTF8.
+
+	Program enumber.pl:
+
+		Converts numbers from English to Ethiopic from standard input.
+
+	Program estring.pl:
+
+		Converts strings between Ethiopic encoding systems.   Will
+		emulate the "cstocs" and "g2" utilities more closely in the future.
+
+	[ NOTE the .pl demo files require the LiveGeez modules and must be hand
+	  installed for the time being. ]
+
+Installation:
+    LibEth is required:  http://libeth.netpedia.net
+
+	Download the tar.gz, unpack it, change to the Convert-Ethiopic-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+Available:
+	ftp://ftp.abyssiniacybergateway.net/pub/users/abyssini/perl-unicode/ and from your
+	favorite CPAN site in the authors/id/D/DY/DYACOB/ directory.
+	
+Copyright: (c) 1999 Daniel Yacob, yacob@ethiopiaonline.net. All rights
+	reserved. This library is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.

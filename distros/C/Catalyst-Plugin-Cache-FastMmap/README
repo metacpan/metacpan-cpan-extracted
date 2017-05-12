@@ -1,0 +1,38 @@
+NAME
+    Catalyst::Plugin::Cache::FastMmap - Mmap cache
+
+SYNOPSIS
+        use Catalyst qw[Cache::FastMmap];
+
+        MyApp->config->{cache}->{storage} = '/tmp/cache';
+        MyApp->config->{cache}->{expires} = 3600;
+
+        my $data;
+
+        unless ( $data = $c->cache->get('data') ) {
+            $data = MyApp::Model::Data->retrieve('data');
+            $c->cache->set( 'data', $data );
+        }
+
+        $c->response->body($data);
+
+DESCRIPTION
+    This package is part of the Catalyst Cache family. It allows integration
+    of Cache::FastMmap and Catalyst
+
+    This module extends the Catalyst application class with a "mmap" cache.
+
+METHODS
+    cache
+        Returns an instance of "Cache::FastMmap"
+
+SEE ALSO
+    Cache::FastMmap, Catalyst.
+
+AUTHOR
+    Christian Hansen, "ch@ngmedia.com" Sebastian Riedel "sri@oook.de"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

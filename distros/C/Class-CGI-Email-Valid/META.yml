@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-CGI-Email-Valid
+version: 0.01
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: "Validate email from forms"
+license: perl
+generated_by: Module::Build version 0.2704, without YAML.pm

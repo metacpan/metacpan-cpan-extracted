@@ -1,0 +1,9 @@
+Make sure and set the parameters for 
+
+my $sendmail_command    = '/usr/lib/sendmail -t -oi';
+my $tmp_dir             = '/tmp';
+my $intervals           = '5d,30d,60d';
+my $TO                  = 'license@my_eamil.com';
+
+
+in Notice.pm

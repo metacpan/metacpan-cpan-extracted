@@ -1,0 +1,44 @@
+# ssh global comment
+
+
+Host *
+#   ForwardAgent no
+#   ForwardX11 no
+    Port 1022
+#   Protocol 2,1
+#   Cipher 3des
+    Ciphers aes192-cbc,aes128-cbc
+#   PermitLocalCommand no
+    SendEnv LANG LC_*
+    HashKnownHosts yes
+    GSSAPIAuthentication yes
+    GSSAPIDelegateCredentials no
+
+# foo bar big
+# comment
+Host foo.*,*.bar
+    # for and bar have X11
+    ForwardX11 yes
+    SendEnv FOO BAR
+
+Host *.gre.hp.com
+ForwardX11           yes
+User                 tester
+
+Host picosgw
+ForwardAgent         yes
+HostName             sshgw.truc.bidule
+IdentityFile         ~/.ssh/%r
+LocalForward         20022         10.3.244.4:22
+# IPv6 example
+LocalForward         all.com/22080       2001:0db8:85a3:0000:0000:8a2e:0370:7334/80
+User                 k0013
+
+Host picos
+ForwardX11           yes
+HostName             localhost
+Port                 20022
+User                 ocad
+ControlPersist       YES
+
+

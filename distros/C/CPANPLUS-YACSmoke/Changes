@@ -1,0 +1,195 @@
+==================================================
+Changes from 2012-04-09 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.02 at 2017-04-08 19:52:06 +0000
+-----------------------------------------
+
+  Change: ce1fd64767a6026a1bb59696215e1a90a1a84d21
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-04-08 20:52:06 +0000
+
+    Switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 1.00 at 2017-02-21 20:35:17 +0000
+-----------------------------------------
+
+  Change: 690b04169cb632a1c74829078fd9f9b982676ceb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-21 20:35:17 +0000
+
+    Handle perls without dot in @INC 
+
+-----------------------------------------
+version 0.98 at 2016-04-23 10:41:18 +0000
+-----------------------------------------
+
+  Change: 7d6b5389da8f93209f8c4bc563ac41252dbd8166
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-04-23 11:41:18 +0000
+
+    Also report CFLAGS and LDFLAGS env vars 
+
+-----------------------------------------
+version 0.96 at 2016-04-23 10:27:17 +0000
+-----------------------------------------
+
+  Change: 070befdd74d6239e378255e87bf3ff358bcc2c96
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-04-23 11:27:17 +0000
+
+    Also report all Test::Harness environment variables if set 
+
+  Change: c8e2cf47af496681fa4bbc358db9209854dd2b09
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-08-26 19:17:53 +0000
+
+    Silence warnings from recent File::Path 
+
+-----------------------------------------
+version 0.94 at 2015-05-24 14:41:02 +0000
+-----------------------------------------
+
+  Change: ea25cab23ed81e8dabc6707fb0e35204e536f4e1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-05-24 15:41:02 +0000
+
+    Tests can now be run in parallel 
+
+-----------------------------------------
+version 0.92 at 2015-03-29 15:43:34 +0000
+-----------------------------------------
+
+  Change: 6790191fe2fc4e65b4cc4da46326b5328f42b060
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-29 16:43:34 +0000
+
+    Don't report if we can't resolve a prereq to an indexed version 
+
+-----------------------------------------
+version 0.90 at 2013-07-30 19:03:21 +0000
+-----------------------------------------
+
+  Change: f48989bb4e1162a80f642672c329ae63c579027b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-30 20:03:21 +0000
+
+    Added exclusions by author ID 
+
+-----------------------------------------
+version 0.88 at 2013-06-14 12:48:58 +0000
+-----------------------------------------
+
+  Change: 5f4f6431e88d3831b67703200e936fbcb72ab151
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-06-14 13:48:58 +0000
+
+    Fix POD errors in CPANPLUS::YACSmoke::IniFiles 
+
+  Change: e675f647817384029a5f47411edc1f6ab00cdaf4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-06-14 13:45:25 +0000
+
+    Add NONINTERACTIVE_TESTING to CPANPLUS::YACSmoke
+
+    As per the Lancaster Consensus:
+
+    'The Lancaster Consensus from this year's QA hackathon has updated
+    the desired semantics:
+    http://www.dagolden.com/index.php/2098/the-annotated-lancaster-consen
+    sus/
+
+    Specifically, AUTOMATED_TESTING is now intended to distinguish only
+    between things running for "smoke testing" versus things running as
+    part of module installation (or other, manually testing). It no
+    longer means "without recourse to a human operator" as it did after
+    the Oslo Consensus. That aspect is now covered by the new
+    "NONINTERACTIVE_TESTING" environment variable.' -xdg 
+
+-----------------------------------------
+version 0.86 at 2013-03-09 12:27:19 +0000
+-----------------------------------------
+
+  Change: 61a88908bda0396825cfe79899cd4061f9c972fe
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-03-09 12:27:19 +0000
+
+    Fix the pod errors in ReAssemble 
+
+  Change: fb87c5a2bb2bd8b90365c53e2ad45c570aaf1cec
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-03-09 12:21:37 +0000
+
+    Skip the pod tests when running under CPAN smokers 
+
+-----------------------------------------
+version 0.84 at 2012-07-18 17:37:39 +0000
+-----------------------------------------
+
+  Change: 830f89a2a1039a2815d421c41ca310cc29b303d6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-07-18 18:37:39 +0000
+
+    Ensure that skiptest => 1 isn't unintentionally propagated to
+    prereqs.
+
+    This will fix an observed edge-case that can never be reproduced in a
+    lab environment. 
+
+-----------------------------------------
+version 0.82 at 2012-06-21 23:33:55 +0000
+-----------------------------------------
+
+  Change: 670df9e5bcddf2f3ad1fec008da2bacde8697b70
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-06-22 00:33:55 +0000
+
+    Fix NA test for 'new' blead 
+
+  Change: 5daf3f1ddb8d1a18f9e5bc237e566353f73ab8cb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-06-21 23:46:43 +0000
+
+    Fix encodings in POD 
+
+-----------------------------------------
+version 0.80 at 2012-04-26 21:20:35 +0000
+-----------------------------------------
+
+  Change: 8d758069cda704e150e3d8dccac2ddbc2d347b53
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-04-26 22:20:35 +0000
+
+    Also report whether RELEASE_TESTING is set or not 
+
+-----------------------------------------
+version 0.78 at 2012-04-11 20:57:09 +0000
+-----------------------------------------
+
+  Change: e5fd3d02e47171dec252bfd700467c3a1b3c4dd4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-04-11 21:57:09 +0000
+
+    Adjust the NA test dist to specify an older core module 
+
+-----------------------------------------
+version 0.76 at 2012-04-10 21:48:46 +0000
+-----------------------------------------
+
+  Change: 7fc7d95f209c507aab07f991f39c0ec4bafb1355
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-04-10 22:48:46 +0000
+
+    Rework the NA detail tests dist to test for a different NA condition 
+
+  Change: 6b8f34b5dfb70d9709abee516f3c347b0004709f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-04-10 22:24:17 +0000
+
+    Don't allow unknown prereqs 
+
+=================================================
+Plus 22 releases after 2012-04-09 00:00:00 +0000.
+=================================================

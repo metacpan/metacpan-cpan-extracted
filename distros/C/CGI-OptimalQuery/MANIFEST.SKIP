@@ -1,0 +1,10 @@
+^demo\/db
+\.bak$
+\.old$
+^blib
+^\.git
+\.tar\.gz$
+^unittestsetup\.sh$
+^pm_to_blib
+^CGI-OptimalQuery-
+^Makefile$

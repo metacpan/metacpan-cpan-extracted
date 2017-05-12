@@ -1,0 +1,61 @@
+NAME
+    Catalyst::Plugin::UserAgent - Add a singleton LWP::UserAgent to the
+    context
+
+SYNOPSIS
+      use Catalyst qw/ UserAgent /;
+
+      __PACKAGE__->config(
+          name => 'MyApp',
+          lwp_user_agent => {
+              agent      => 'MyApp/1.0',
+              cookie_jar => {},
+          },
+      );
+
+      sub foo : Local {
+          my ($self, $c) = @_;
+
+          my $content = $c->user_agent->get('http://example.com/')->content;
+
+          $c->stash->{template} = 'show_example.com.tt2';
+          $c->stash->{content} = $content;
+      }
+
+DESCRIPTION
+    Just creates a single LWP::UserAgent available to the context. This
+    object is created on-demand.
+
+    If you wish to pass any startup options to the constructor. Place those
+    into the configuration under the key: "lwp_user_agent":
+
+      __PACKAGE__->config(
+          name => 'MyApp',
+          lwp_user_agent => {
+              agent      => 'MyApp/1.0',
+              cookie_jar => {},
+          },
+      );
+
+    To get the user agent instance, use the "user_agent" method of the
+    Catalyst context:
+
+      my $ua = $c->user_agent;
+
+SEE ALSO
+    LWP::UserAgent
+
+AUTHOR
+    Andrew Sterling Hanenkamp, <hanenkamp@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2006 Andrew Sterling Hanenkamp <hanenkamp@cpan.org>. All
+    Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

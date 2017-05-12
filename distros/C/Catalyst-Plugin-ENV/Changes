@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::Plugin::ENV
+
+0.01  Thu Nov 25 11:59:54 2008
+	- original version; created by h2xs 1.23 with options
+		-A Catalyst::Plugin::ENV
+

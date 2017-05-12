@@ -1,0 +1,36 @@
+CGI-Authen-Simple version 1.0
+==============================
+
+CGI::Authen::Simple provides an easy OO interface to create form-based,
+cookie-based, session-less (simple) authentication for web applications.
+It relies on the presence of a database, and currently is only known to
+work with MySQL. It may work with other databases depending on the hashing
+functions they provide.
+
+Some data is transmitted across the wire in plain-text each page submission
+(via cookies), so for increased security it is recommended that your application
+run on an SSL-secured web server.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI
+  CGI::Cookie
+  Template
+  DBI
+
+COPYRIGHT AND LICENSE
+
+This module is released under the same license as Perl itself.
+
+Copyright (C) 2004 Shane Allen <opiate@gmail.com>

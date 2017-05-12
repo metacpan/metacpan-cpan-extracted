@@ -1,0 +1,80 @@
+0.22 -- Mon, 12 Mar 2012 13:42:19 +0100
+- only pod tweaks
+
+0.21 -- Sat, 04 Feb 2012 17:54:24 +0100
+- minor doc tweaks, minor pod typos
+
+0.20 -- Fri, 03 Feb 2012 21:10:36 +0100
+- cpantesters reported problems since R::RD 1.967003
+- took the chance to rewrite without precompiled grammar and patched P::RD
+
+0.13 -- Thu Dec  3 10:46:09 MET 2009
+- POD now written by a native speaker, thanks Steven!
+- only documentation changes
+
+0.12_03 -- Wed Dec  2 11:24:07 MET 2009
+- still wrestling with make dist
+
+0.12_02 -- Tue Dec  1 12:00:34 MET 2009
+- fix wrong MANIFEST and dist
+
+0.12_01 -- Fri Nov 27 14:50:53 MET 2009
+- only documentation changes
+- POD now written by a native speaker, thanks Steven!
+
+0.12 -- Mi 9. Apr 22:48:49 CEST 2008
+- version upgrade from developer to working release
+
+0.11_03 -- Mi 9. Apr 01:10:56 CEST 2008
+- fix version in precompiled grammar
+
+0.11_02 -- Mi 9. Apr 00:52:04 CEST 2008
+- grml, Makefile.PL missing in dist, wrong MANIFEST.SKIP
+
+0.11_01 -- Di 8. Apr 18:38:43 CEST 2008
+- fix version requirement for Parse::RecDescent
+- fix meta-character in macro expansion
+- no interface changes 
+
+0.11 -- Sun Aug  8 23:35:23 CEST 2004
+- collapsed localization statements in the grammar file where possible
+- some minor interface changes 
+- some minor pod changes
+- added test for parsing perl datastructures
+
+0.10 -- Thu Aug  5 09:52:48 CEST 2004
+- precompile dependencies revisited, no new features
+
+0.09 -- Thu Aug  4 14:19:55 CEST 2004
+- again Makefile.PL munging and version information in
+  precompiled package, no new features, just distribution fiddling
+
+0.08 -- Wed Aug  4 11:57:07 CEST 2004
+- new P::RD->Precompile patch in order to stuff a VERSION
+  into the precompiled package.
+- new P::RD->Precompile patch in order to stuff some
+  POD into the precompiled package.
+
+0.07 -- Tue Aug  3 21:30:50 CEST 2004
+- new() must be called with a Class name and not with a ref.
+  See Merlyn's fight againt this
+
+0.06 -- Tue Aug  3 20:38:57 CEST 2004
+- arrgh, typo in SYNOPSYS.
+- Version synchronize with Precomp.pm
+- import override for Parse::RecDescent
+
+0.05 -- Mon Aug  2 17:09:56 CEST 2004
+allow lowercase conversion for parameters and declarations 
+
+0.04 -- Mon Aug  2 12:58:11 CEST 2004
+test problem's with tar and patched P::RD on Win32 solved
+
+0.03 -- Sun Aug  1 21:32:34 CEST 2004
+Macro's expand now in eval blocks unconditionally
+
+0.02 -- Sun Aug  1 15:23:27 CEST 2004
+solved problems with permissions and file paths on Win32
+
+0.01 -- Sat Jul 31 22:40:16 CEST 2004
+Initial release uploaded to CPAN

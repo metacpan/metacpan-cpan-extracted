@@ -1,0 +1,16 @@
+% my $class = shift;
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Spec;
+use File::Basename 'dirname';
+
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
+use <%= $class %>::Client;
+use Clustericious::Client::Command;
+
+Clustericious::Client::Command->run(<%= $class %>::Client->new, @ARGV);
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension XML::CGI.
+0.01  Sat Oct 17 13:14:46 1998
+	- original version; created by h2xs 1.18
+
+0.02  Mon Oct 19
+        - Major contribution by David Black <dblack@candle.superlink.net>
+          which gets rid of local context crud, allows user to specify 
+          the root element in XML::CGI::toXML, and all-around improvements. 
+
+0.1  Sun Jan 10 03:49:36 EST 1999
+        - Updated routine to encode characters in x80-xFF range to Unicode.
+          Also added encoding for complete set of pre-declared entities.

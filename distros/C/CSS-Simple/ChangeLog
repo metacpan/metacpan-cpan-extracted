@@ -1,0 +1,41 @@
+2698	2010-09-01	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Initial release to world.
+
+2874	2010-10-27	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Widen "acceptable" selectors, there were hacks that used certain characters we weren't allowing,
+	  we now skip such selectors and don't store them at all          
+	* In the event a selector is given twice, merge back the properties instead of overwriting them
+	* In the event a compound rule was given we break it into the component selectors
+	* Add forgotten method for "get all selectors"
+	* Empty selectors are no longer outputted during write operations
+	* Updated module, created more sophisticated directory structured
+	* Updated tests
+	* Update documentation
+
+3044	2011-03-10	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Add new flag to constructor (suppress_error) to disable fatal errors, instead allowing warns
+	* Replace croaks with dies
+	* Add test to make sure suppress_error flag works
+
+3211	2011-05-16	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Add getter/setter autogenerator code
+	* Rework private methods to suit error reporting better
+	* Rewrite fatal errors flag (previously suppress_error) to instead work as the inverse
+	* Rename suppress_error to warn_as_error to better describe it's current functionality
+	* Update tests to test updated flag properly
+	* Update documentation
+
+3220	2015-07-10	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Fix SYNOPSIS block as suggested by Kate Yoak <kate@yoak.com>
+	* Add new flag to constructor (browser_specific_properties) to allow inclusion of such properties
+	  as per patch provided by David Arnaud <arnaud.david@adestra.com>
+	* Fix issue with unclosed file handle as suggested by Mohammad Anwar <manwar@cpan.org>
+
+3223	2016-07-26	Kevin Kamel <kamelkev@mailermailer.com>
+
+	* Apply keys on references test fix provided by Alexandr Ciornii <alexchorny@gmail.com>

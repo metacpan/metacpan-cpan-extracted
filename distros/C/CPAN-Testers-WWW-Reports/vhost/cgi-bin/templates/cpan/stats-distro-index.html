@@ -1,0 +1,20 @@
+[% 
+    title = "Browse distribution by letter " _ letter ;
+
+    crumb2_name = 'Distributions' ;
+    crumb2_href = '/' ;
+    crumb1_name = letter ;
+%]
+
+<p>Below are the CPAN distributions that start with the letter 
+[% letter %] for which we have test reports:</p>
+<table class="col3">
+[% inx = 0 %]
+[% FOREACH item = list.sort %]
+[% IF inx % 1 == 0 %]<tr>[% END %]
+<td><a href="/stats/distro/[% item.substr(0,1) %]/[% item %].html">[% item %]</a></td>
+[% inx = inx + 1 %]
+[% IF inx % 1 == 0 %]</tr>[% END %]
+[% END %]
+[% IF inx % 1 > 0 %]</tr>[% END %]
+</table>

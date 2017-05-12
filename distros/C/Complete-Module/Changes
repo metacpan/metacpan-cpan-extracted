@@ -1,0 +1,173 @@
+Revision history for Complete-Module
+
+0.24    2015-12-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove old 'use' statement [CT].
+
+
+0.23    2015-11-29 (PERLANCAR)
+
+	- Updates to Complete::Common 0.21.
+
+        - [Removed] For more consistent user experience, remove per-function
+	  options ci/fuzzy/map_case/exp_im_path/dig_leaf, users are now
+	  encouraged to set these behaviors globally via Complete::Common.
+
+
+0.22    2015-10-08 (PERLANCAR)
+
+	- Add prefix shortcuts: dz (for Dist/Zilla/) and pw (for
+	  Pod/Weaver/).
+
+	- [Bugfix] Fix typo in Rinci metadata.
+
+
+0.21    2015-09-23 (PERLANCAR)
+
+	- Add default shortcut prefix: df (DateTime/Format/).
+
+
+0.20    2015-09-17 (PERLANCAR)
+
+	- Add fuzzy matching.
+
+
+0.19    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.18    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.17    2015-03-13 (PERLANCAR)
+
+	- Add shortcut prefixes: pwr (Pod::Weaver::Role) & dzr
+	  (Dist::Zilla::Role).
+
+
+0.16    2015-03-03 (PERLANCAR)
+
+	- Add option: path_sep.
+
+
+0.15    2015-01-13 (PERLANCAR)
+
+	- Add option: dig_leaf.
+
+	- Adjust to Complete 0.11 & Complete::Path 0.12.
+
+
+0.14    2015-01-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Reupload to PAUSE to see if this time it gets indexed.
+
+
+0.13    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] forgot to avoid emptying @INC in a couple of places.
+
+
+0.12    2014-12-28 (PERLANCAR)
+
+	- Return hash form of completion answer so path-like completing
+	  works.
+
+
+0.11    2014-12-28 (PERLANCAR)
+
+        - No functional changes.
+
+        - Minor fixes.
+
+
+0.10    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust tests, don't empty @INC but instead use a unique prefix
+	  because emptying @INC will fail on some systems [CT, NANIS].
+
+
+0.09    2014-12-28 (PERLANCAR)
+
+        - Incorporate all the convenience features from App::PMUtils's
+          completion routine to this module (i.e. autoselect path separator,
+          shortcut prefixes), so all other modules that might need it can use us
+          instead of having to depend on App::PMUtils.
+
+        - Add setting: $OPT_SHORTCUT_PREFIXES.
+
+        [INCOMPATIBLE CHANGES]
+
+        - (Due to importing App::PMUtils' features) default path separator is
+          now '/', unless word has '::' or '.' in it.
+
+
+0.08    2014-12-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Load B module during testing before emptying @INC, as it's
+	  required by new Test::Simple (1.301002+) [CT].
+
+
+0.07    2014-12-25 (PERLANCAR)
+
+        - No functional changes.
+
+        - Fix typo in test.
+
+
+0.06    2014-12-25 (PERLANCAR) - ♪ so this is xmas
+
+	- Use Complete::Path to avoid code duplication and gain features like
+          expand intermediate path (exp_im_path option) and map case (map_case
+          option).
+
+        [REMOVED FEATURES]
+
+        - Remove argument 'separator'. I think this is a misfeature, Perl
+          package names should always be separated by '::'. Convenience features
+          will be put in App::PMUtils.
+
+
+0.05    2014-12-24 (PERLANCAR)
+
+	- Follow convention of Complete 0.06.
+
+
+0.04     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - Add option: ns_prefix.
+
+
+0.03     2014-06-25 (SHARYANTO)
+
+         - Add option: ci (case-insensitive).
+
+
+0.02     2014-06-24 (SHARYANTO)
+
+         - Fix a couple of bugs, add more tests.
+
+
+0.01     2014-06-22 (SHARYANTO)
+
+         - First release.

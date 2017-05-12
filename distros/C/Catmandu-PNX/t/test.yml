@@ -1,0 +1,20 @@
+---
+control:
+  sourcerecordid: 004400000
+  sourcesystem: ILS
+display:
+  title: "Inventaris van het archief vanHugo de Vries"
+  subject:
+      - Plantkunde
+      - Erfelijkheid
+  lds02: ok
+links:
+  openurlfulltext: "$$Topenurlfull_journal"
+search:
+  general:
+    - Faber and Faber
+    - "UBM: P 45-3159"
+    - "UBM: P 69-326"
+---
+deleted: 1
+...

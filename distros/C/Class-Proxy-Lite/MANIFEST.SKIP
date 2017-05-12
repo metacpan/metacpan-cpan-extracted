@@ -1,0 +1,11 @@
+^Class-Proxy-Lite-
+\.DS_Store$
+\.podge
+\.bak$
+^Build$
+^Makefile$
+^_build/
+^blib/
+^CVS$
+^\.nkpr
+^_darcs

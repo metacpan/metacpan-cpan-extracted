@@ -1,0 +1,23 @@
+# Filename:	config.in
+#
+# written by Paul Marquess <pmqs@cpan.org>
+# last modified 12th October 2009
+# version 1.000
+# 
+# 
+# This file is used to control which zlib library will be used by
+# Compress::Raw::Lzma
+# 
+# See to the sections below in the README file for details of how to
+# use this file.
+#
+#    Controlling the version of liblzma used by Compress::Raw::Lzma
+#
+
+INCLUDE         = /usr/local/include
+LIB             = /usr/local/lib
+
+#INCLUDE         = ./libraries/5.2.1/include
+#LIB             = ./libraries/5.2.1/lib
+
+# end of file config.in

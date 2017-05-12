@@ -1,0 +1,10 @@
+Build
+_build
+blib
+*.html
+ChangeLog
+MANIFEST
+META.yml
+Makefile.PL
+Makefile
+pm_to_blib

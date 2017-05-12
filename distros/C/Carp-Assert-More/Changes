@@ -1,0 +1,76 @@
+Revision history for Perl extension Carp::Assert::More.
+
+1.14    Wed Oct 31 11:37:04 CDT 2012
+        [ENHANCEMENTS]
+        Added assert_undefined() for Ben Hengst.
+
+        Added assert_unlike().
+
+        [FIXES]
+        assert_nonblank() wasn't using the correct message.  Thanks to
+        Leland Johnson.
+
+        assert_nonempty() wouldn't work on blessed arrays and refs.
+        Now it will.
+
+1.12    Oct 14 2005
+        [ENHANCEMENTS]
+        * Added assert_nonnegative() and assert_nonnegative_integer().
+        * Added assert_lacks().  Thanks to Bob Diss.
+
+1.10    Wed Feb 16 12:52:16 CST 2005
+        [FIXES]
+        * Fixed assert_positive_integer() to not pass "14.".
+
+1.08    Wed Nov 24 11:44:34 CST 2004
+        [ENHANCEMENTS]
+        * Added assert_is() and assert_isnt()
+        * Organized the functions into logical groupings.
+
+        [INTERNALS]
+        * Now requires Test::Exception.
+        * Added t/pod.t and t/pod-coverage.t
+
+
+1.06    Sat Oct 30 23:50:45 CDT 2004
+        * No functionality changes.  Just added a Copyright notice to
+          so we can put it in Debian.
+
+1.04    Mon Oct 18 10:21:37 CDT 2004
+        [ENHANCEMENTS]
+        * assert_isa() is now aware of subclasses.
+
+        [FIXES]
+        * $names weren't getting passed to sub-assertions.  Now they are.
+
+        [DOCUMENTATION]
+        * Documentation fix.
+
+        This is the "all thanks to Allard Hoeve" release.
+
+1.02    Tue Oct  5 17:31:56 CDT 2004
+        [ENHANCEMENTS]
+        * Added assert_hashref() and assert_listref().  Thanks to Dan
+          Friedman.
+
+1.00    Wed Sep 22 10:14:28 CDT 2004
+        * First real official version.  I'm not sure what's different
+          between this and 0.04.
+
+        * Added a bunch of new assert_* functions.  Thanks David
+          Storrs and Pete Krawczyk.
+
+0.04    August 21, 2002
+        - Added assert_integer
+        - Added assert_nonzero
+        - Added assert_nonzero_integer
+        - Added assert_exists
+
+0.03    August 15, 2002
+        - Added assert_fail
+
+0.02    August 8, 2002
+        - Added assert_nonblank and assert_nonref
+
+0.01    August 8, 2002
+        - Original version, stolen from Carp::Assert

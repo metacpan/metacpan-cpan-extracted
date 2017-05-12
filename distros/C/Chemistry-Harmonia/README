@@ -1,0 +1,46 @@
+Chemistry-Harmonia version 0.11
+===============================
+
+The module provides the necessary subroutines to solve some puzzles of the
+general inorganic chemistry. The methods implemented in this module, are all
+oriented to known rules and laws of general chemistry.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you have root on a Unix system it is enough to run this command:
+
+   cpan Chemistry::Harmonia
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Chemistry::File::Formula
+Algorithm::Combinatorics
+Math::BigInt
+Math::BigRat
+Math::Assistant
+String::CRC::Cksum
+Test::More
+Test::LongString
+Test::Pod
+Data::Dumper
+Carp
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2013 by Alessandro Gorohovski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

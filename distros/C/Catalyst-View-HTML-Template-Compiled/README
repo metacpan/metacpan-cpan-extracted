@@ -1,0 +1,101 @@
+NAME
+    Catalyst::View::HTML::Template::Compiled - HTML::Template::Compiled View
+    Class
+
+SYNOPSIS
+        # use the helper
+        script/myapp_create.pl view HTML::Template::Compiled HTML::Template::Compiled
+
+        # lib/MyApp/View/HTML/Template.pm
+        package MyApp::View::HTML::Template::Compiled;
+
+        use base 'Catalyst::View::HTML::Template::Compiled';
+
+        __PACKAGE__->config(
+            use_default_path => 0, # defaults to 1
+
+            # any HTML::Template::Compiled configurations items go here
+            # see HTML::Template::Compiled documentation for more details
+        );
+
+        1;
+
+        # Meanwhile, maybe in an 'end' action
+        $c->forward('MyApp::View::HTML::Template::Compiled');
+
+DESCRIPTION
+    This is the " HTML::Template::Compiled " view class. Your subclass
+    should inherit from this class.
+
+METHODS
+    new Internally used by "Catalyst". Used to configure some internal
+        stuff.
+
+    process
+        Renders the template specified in * $c-*stash->{template} >, *
+        $c-*request->match >, * $c-*config->{template}->{filename} > or *
+        __PACKAGE__-*config->{filename} >.
+
+        Template params are set up from the contents of * $c-*stash >,
+        augmented with " base " set to * $c-*req->base >, * name * to *
+        $c-*config->{name} > and * c * to * $c *. Output is stored in *
+        $c-*response->body >.
+
+    prepare_process
+        Pretty much the first thing called by * process *. Only used for
+        sub-classing. Return a i<true>-value if everything is okay,
+        otherwise * process * will fail.
+
+    finalize_process
+        Will be called right before * process * finishes. Only used for
+        sub-classing. Whatever it returns, * process * will return.
+
+    prepare_htc
+        Creates the " HTML::Template::Compiled " object. On success, returns
+        the filename to be rendered; undef otherwise.
+
+    htc Accessor to the "HTML::Template::Compiled" object. May returns undef
+        then the object has not yet been created or creating has failed.
+
+    prepare_render
+        First thing before " render " is called. Assigns the parameters like
+        the ones from the stash.
+
+    render
+        This is where the rendering magic happens. Returns the rendered
+        output on success, or undef otherwise.
+
+    template
+        Tries to find the right template to render. Returns its filename or
+        undef. Actually only used internally.
+
+    path
+        Returns a array ref with paths used to find the templates in.
+
+    config
+        "use_default_path": if set, will include *$c->config->{root}* and
+        *$c->config->{root} . '/base'* to look for the template. *Defaults
+        to 1*.
+
+        This also allows your view subclass to pass additional settings to
+        the "HTML::Template::Compiled" config hash.
+
+    config_names
+        A list of names that are used to locate configuration parameters for
+        the view inside " $c-"config >.
+
+    catalyst
+        Normally all methods are called with the * $c * as the first
+        parameter. Just to insure that you have it as a method it case you
+        need it. :) Will be initializes by " new ".
+
+SEE ALSO
+    HTML::Template::Compiled, Catalyst, Catalyst::Base.
+
+AUTHOR
+    Sascha Kiefer, "esskar@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,54 @@
+Revision history for Crypt-URandom
+
+0.36 - Mon Jun 01 21:37:26 2011
+       Fixing bug that caused errors when requesting urandom before and after forking
+
+0.35 - Thu May 14 06:07:03 2011
+       Corrected Manifest - RT#101208
+       Removed Build.PL - RT#104406
+
+0.34 - Sun Mar 10 20:18:43 2011
+       Removed t/pod-coverage.t
+
+0.33 - Sat Mar 09 15:29:41 2011
+       Added @CARP_NOT
+
+0.32 - Sat Mar 09 15:15:37 2011
+       Reformatting
+
+0.31 - Fri Mar 01 17:56:58 2011
+       More test case fixes
+
+0.30 - Mon Feb 25 07:55:00 2011
+       Fixed test cases
+
+0.29 - Thu Feb 14 06:40:41 2011
+       Added binmode call to the open for /dev/urandom
+       Optimised /dev/urandom access to only open a filehandle once and only reopen after read errors
+
+0.28  Wed Apr 20 06:45:41 2011
+       Dropped extra 0 in version number
+       Now passes perlcritic -1
+
+0.0.27  Wed Apr 20 06:45:41 2011
+       Included t/export.t in MANIFEST
+       Formatting changes
+       Changed module name from Crypt::Random::NonBlocking to Crypt::URandom
+
+0.0.25  Mon Apr 18 18:55:30 2011
+       Removed t/perlcritic.t due to other Perl::Critic policies being testing on cpan.org
+       Changed the interface to be Crypt::Random::NonBlocking::urandom();
+       Allowed urandom to be exported
+
+0.0.23  Mon Apr 18 07:56:17 2011
+       Added t/rand.t to actually test the module
+
+0.0.21  Mon Apr 18 07:00:17 2011
+       Removed dependency Readonly entirely as it is a non-core module
+
+0.0.19  Sun Apr 17 20:42:17 2011
+       Added dependency Readonly to fix RT Ticket 67532 filed by YSAWANT
+
+0.0.11  Sun Apr 17 10:45:13 2011
+       Initial release.
+

@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CGI/FormBuilder/Config/Simple.pm
+t/00-load.t
+t/10-formbuilder.t
+# t/pod-coverage.t
+t/pod.t
+t/conf.d/cgi_fb_config_simple.ini
+t/My/Module/Test.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<!-- This is a test settings file. -->
+<!-- @(#) $Id: test.xml 520 2005-02-21 12:27:29Z dom $ -->
+<settings>
+  <section name="settings">
+    <item name="foo">
+      bar, ${Ivor}
+    </item>
+    <item name="baz">
+      quux
+    </item>
+    <item name="Ivor">
+      The Engine
+    </item>
+    <item name="combined">
+      ${foo} ${baz} ${very_undefined}
+    </item>
+  </section>
+
+  <section name="other stuff">
+    <item name="this">
+      ignored
+    </item>
+    <item name="lonely">
+      in here
+    </item>
+  </section>
+</settings>
+<!-- vim: set ai et sw=2: -->

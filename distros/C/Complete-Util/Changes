@@ -1,0 +1,427 @@
+Revision history for Complete-Util
+
+0.58    2016-12-10 (PERLANCAR)
+
+	- [doc] Add package description.
+
+	- Fix Rinci metadata: uniq is a bool.
+
+
+0.57    2016-10-30 (PERLANCAR)
+
+	- Add modify_answer().
+
+	- Add more logging (entering & leaving complete_array_elem()).
+
+
+0.56    2016-10-28 (PERLANCAR)
+
+	- complete_comma_sep(): Add 'remaining' option for more flexible
+	  customization of what to offer for the next element.
+
+
+0.55    2016-10-26 (PERLANCAR)
+
+	- complete_array_elem: Tweak Rinci metadata for CLI.
+
+
+0.54    2016-10-22 (PERLANCAR)
+
+	- [dist][bugfix] Text::Levenshtein::XS accidentally added as
+	  RuntimeRequires prereq.
+
+
+0.53    2016-10-18 (PERLANCAR)
+
+        - No need to fallback to another XS (Text::Levenshtein::XS)
+          implementation, just try Text::Levenshtein::Flexible then fallback to
+          our PP implementation.
+
+
+0.52    2016-10-14 (PERLANCAR)
+
+	- [doc] Add FAQ item about speeding up fuzzy matching.
+
+	- [Bugfix] Remember levenshtein implementation properly.
+
+
+0.51    2016-10-14 (PERLANCAR)
+
+	- Use Text::Levenshtein::Flexible first (because it can give a
+	  speed boost by specifying maximum distance), then fallback to
+	  Text::Levenshtein::XS, then to our PP implementation.
+
+
+0.50    2016-10-07 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild to remove extraneous dependencies.
+
+
+0.49    2016-09-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update example (there is no longer ci option for
+	  complete_file() or complete_module()).
+
+
+0.48    2016-08-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix Rinci metadata.
+
+
+0.47    2016-08-24 (PERLANCAR)
+
+	- Add complete_comma_sep().
+
+
+0.46    2016-04-05 (PERLANCAR)
+
+        - [Bugfix] complete_array_elem(): When there is replace_map, @arrayn was
+	  longer than the original array because we appended to it replace_map
+	  entries. We now use a copy of original array (@array) to make @array
+	  and @arrayn of the same length again.
+
+	- Add logging statement (enabled only when COMPLETE_UTIL_TRACE=1).
+
+
+0.45    2016-01-05 (PERLANCAR)
+
+	- [doc] Mention Bencher::Scenarios::CompleteUtil.
+
+	- Observe COMPLETE_UTIL_LEVENSHTEIN to allow forcing which
+	  levenshtein edit distance implementation to use (pp/xs).
+
+
+0.44    2016-01-05 (PERLANCAR)
+
+        - Update to Complete::Common 0.22 (OPT_CHAR_MODE).
+
+        - complete_array_elem(): Implement char-mode matching (done when normal
+          prefix matching and word-mode matching fails to return any results,
+          before fuzzy matching).
+
+
+0.43    2016-01-05 (PERLANCAR)
+
+        - complete_array_elem(): Add replace_map option.
+
+        - [Bugfix] complete_array_elem(): the exclude option now honors
+          OPT_MAP_CASE.
+
+
+0.42    2015-12-17 (PERLANCAR)
+
+	- [experimental][ux] In word mode completion, try matching word
+	  like 'ca-c' with strings like 'CamelCaseWord' by internally
+	  converting the string into 'Camel-Case-Word' first, this is
+	  convenient when matching e.g. perl module names.
+
+
+0.41    2015-11-29 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21.
+
+	- [Removed] For more consistent user experience, remove options
+	  ci/word_mode/fuzzy/map_case, users are now encouraged to set behavior
+	  globally via Complete::Common.
+
+
+0.40    2015-11-29 (PERLANCAR)
+
+	- Tweak word-mode matching: allow searching non-first word using
+	  '-foo' like in Emacs.
+
+
+0.39    2015-11-28 (PERLANCAR)
+
+        - Add word-mode matching, like in Emacs.
+
+
+0.38    2015-09-18 (PERLANCAR)
+
+	- Use Text::Levenshtein::XS if available, for faster fuzzy
+	  matching.
+
+
+0.37    2015-09-17 (PERLANCAR)
+
+        - [Removed] Remove alias complete_array() which has been deprecated
+          since 0.12.
+
+        - Add map_case option for complete_array_elem() & complete_hash_key().
+
+        - Add fuzzy option for complete_hash_key().
+
+
+0.36    2015-09-16 (PERLANCAR)
+
+	- [Removed] Split complete_file, complete_env, complete_program to
+	  their own dists, for better modularity and avoid circular
+	  dependencies.
+
+
+0.35    2015-09-12 (PERLANCAR)
+
+	- Add fuzzy matching to complete_array_elem().
+
+
+0.34    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.33    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.32    2015-08-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid using experimental (+Carp) to shave off a few milliseconds
+	  of startup time.
+
+
+0.31    2015-06-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Previous guess about $^O not being properly localized was
+	  incorrect, the test failures on Windows were caused by path
+	  containing /:/ (thanks kmx).
+
+
+0.30    2015-06-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Skip test when we cannot set $^O temporarily (just my guess)
+	  [RT#104981].
+
+
+0.29    2015-04-25 (PERLANCAR)
+
+	- combine_answers(): Re-sort final words to be more deterministic &
+	  testable.
+
+
+0.28    2015-04-25 (PERLANCAR)
+
+	- combine_answers(): Interpret 'final' metadata in completion
+	  answer.
+
+
+0.27    2015-04-02 (PERLANCAR)
+
+	- complete_file(): Add convenience shortcut for filter:
+	  file_regex_filter.
+
+
+0.26    2015-03-30 (PERLANCAR)
+
+	- Handle combining static in combine_answers().
+
+
+0.25    2015-03-18 (PERLANCAR)
+
+        - Add options to complete_file(): starting_path, handle_tilde,
+          allow_dot. These options can be used to limit/restrict file searching,
+          so it cannot go outside a certain path.
+
+
+0.24    2015-03-04 (PERLANCAR)
+
+	- Follow Complete 0.12 (escmode renamed to esc_mode).
+
+
+0.23    2015-03-03 (PERLANCAR)
+
+	- Add option 'exclude' to complete_array_elem().
+
+
+0.22    2015-01-13 (PERLANCAR)
+
+        - Adjust to Complete 0.11, Complete::Path 0.12.
+
+        - Add option: dig_leaf.
+
+
+0.21    2014-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Rinci metadata (prepare for use by App-CompleteCLIs, make
+	  it consistent that word is argument at pos=0.
+
+
+0.20    2014-12-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add tests for map_case and exp_im_path.
+
+
+0.19    2014-12-25 (PERLANCAR) - ♪ the magic of christmas day
+
+	- Extracted most functionality of complete_file() to Complete-Path, to
+          make the code reusable for other modules e.g. Complete-Module and
+          Complete-Riap.
+
+
+0.18    2014-12-24 (PERLANCAR)
+
+	- Follow convention of Complete 0.06.
+
+
+0.17    2014-12-21 (PERLANCAR)
+
+	- Add function: combine_answers().
+
+	- Delay loading File::Glob.
+
+
+0.16    2014-12-18 (PERLANCAR)
+
+        - Fix t\complete_program.t failure on Windows (thanks NANIS).
+
+
+0.15    2014-12-09 (PERLANCAR)
+
+	- Add functions: hashify_answer, arrayify_answer.
+
+
+0.14    2014-12-05 (PERLANCAR)
+
+        - complete_file(): Add option 'ci', can handle '~/blah' and '~foo/blah'
+          (but not ~foo [yet?] which requires completing username instead of
+          files).
+
+
+0.13    2014-07-13 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - complete_file(): Replace 'file' and 'dir' options with the more
+          generic 'filter'.
+
+
+0.12    2014-07-02 (SHARYANTO)
+
+        - This release is a re-organization of Complete::Util into Complete::*
+          modules family.
+
+        [REMOVED FEATURES]
+
+        - Move bash specific functions to Complete::Bash. This includes:
+          mimic_shell_dir_completion(), format_shell_completion(),
+          break_cmdline_into_words(). Complete::Util now only contains generic
+          complete_*() functions.
+
+        - Move developer notes to Complete.
+
+        [INCOMPATIBLE CHANGES]
+
+        - complete_array() is renamed to complete_array_elem() (but old name is
+          still provided, with no documentation mentioning it, for current
+          module users; the old name will be removed someday in the future).
+
+        - complete_file() no longer does mimic_shell_dir_completion(). You'll
+          have to do it yourself (but, format_completion() from Complete::Bash
+          will do it for you).
+
+
+0.11    2014-06-29 (SHARYANTO)
+
+        - Add optional param 'sep' in mimic_shell_completion(), used in
+          format_shell_completion().
+
+
+0.10    2014-06-29 (SHARYANTO)
+
+        [INCOMPATIBLE]
+
+        - Change interface of mimic_shell_dir_completion() and
+          break_cmdline_into_words() to accept positional arguments. This makes
+          it more consistent: all complete_* accept hash/named args, while the
+          rest positional.
+
+        - Apply mimic_shell_dir_completion() logic in format_shell_completion()
+          when given hint is_path=>1.
+
+        [ENHANCEMENTS]
+
+        - Add intro docs to make it clearer how to use this module.
+
+
+0.09    2014-06-27 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Fix format_shell_completion().
+
+
+0.08    2014-06-27 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change interface of format_shell_completion() (accept positional args
+          to make it shorter).
+
+
+0.07    2014-06-26 (SHARYANTO)
+
+        - No longer uses bash to break cmdline into words. This solves some
+          issues like $var no longer being substituted by bash (allowing env
+          completion to work), unclosed quotes work, etc.
+
+        - Add developer's notes.
+
+        - Add format_shell_completion().
+
+
+0.06    2014-06-26 (SHARYANTO)
+
+        - complete_program(): add 'ci' option, handle Windows where PATH is
+          split by /;/ and not /:/.
+
+
+0.05    2014-06-25 (SHARYANTO)
+
+        - Rename dist from SHARYANTO-Complete-Util to Complete-Util.
+
+
+0.04    2014-06-23 (SHARYANTO)
+
+        - Add function: mimic_shell_dir_completion().
+
+
+0.03    2014-05-05 (SHARYANTO)
+
+        - No functional changes.
+
+        - [test] Skip case sensitive test on Windows [CT].
+
+
+0.02    2013-11-04 (SHARYANTO)
+
+        - Rename parse_{bash,shell}_cmdline().
+
+
+0.01    2013-11-03 (SHARYANTO)
+
+        - First release. Split from Perinci-BashComplete because the routines
+          are general and not tied to Perinci/Rinci.

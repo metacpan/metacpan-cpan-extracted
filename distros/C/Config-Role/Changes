@@ -1,0 +1,13 @@
+Revision history for Config-Role
+
+0.1.1     2012-05-11 10:35:32 Europe/Oslo
+        - Fixed path separator test error on Win32
+        - Added Config::Tiny to test prereqs
+
+0.1.0     2011-10-19 20:38:59 Europe/Oslo
+        - Improved documentation
+        - Added config_dir attribute
+        - Method/attribute config_filename in consuming class is now optional
+
+0.0.1     2011-10-17 20:28:36 Europe/Oslo
+        - Initial version

@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use strict;
+use CPAN::Dependency;
+
+my $cpandep = new CPAN::Dependency;
+$cpandep->load_deps_tree(file => 'deps.yml');
+$cpandep->calculate_score;
+$cpandep->save_deps_tree(file => 'deps.yml');
+
+my %score = $cpandep->score_by_dists;
+print "Top 10 modules\n--------------\n";
+my @dists = sort { $score{$b} <=> $score{$a} } keys %score;
+for my $dist (@dists[0..9]) {
+    printf "%5d %s\n", $score{$dist}, $dist;
+}
+

@@ -1,0 +1,11 @@
+Revision history for Catalyst::View::Chart::Strip
+
+0.05    Mon May 22 04:01:27 UTC 2006
+        - trivial meta-improvements, no change
+          for users intended
+
+0.04    Sat Feb 18 19:13:23 UTC 2006
+        - pod_to_ignore fixes
+
+0.03    Fri Feb 10 19:53:34 UTC 2006
+        - First public release

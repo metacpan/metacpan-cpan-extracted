@@ -1,0 +1,27 @@
+---
+abstract: 'Catalyst helper function for translating jqGrid search parameters'
+author:
+  - 'Scott R. Keszler <keszler@srkconsulting.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Controller-jQuery-jqGrid-Search
+provides:
+  Catalyst::TraitFor::Controller::jQuery::jqGrid::Search:
+    file: lib/Catalyst/TraitFor/Controller/jQuery/jqGrid/Search.pm
+    version: 0.02
+requires:
+  JSON: 0
+  Moose::Role: 0
+  perl: 5.008008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://app.srkconsulting.com/repos/jqGridSearch/
+version: 0.02

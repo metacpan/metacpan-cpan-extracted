@@ -1,0 +1,9 @@
+Revision history for Perl extension Convert::DUDE.
+
+0.02  Sat Jul 28 04:18:38 JST 2001
+	- Now Convert::DUDE handles Unicode strings as UTF8.
+	  Requires Unicode::String.
+
+0.01  Thu Jul 19 18:17:35 2001
+	- original version; created by h2xs 1.19
+

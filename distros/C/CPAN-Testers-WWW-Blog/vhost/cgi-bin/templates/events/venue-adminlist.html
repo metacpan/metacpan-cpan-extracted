@@ -1,0 +1,36 @@
+[% 
+    title = 'Venue Admin' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Venue' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=venue-admin' ;
+    crumb1_name = 'List' ;
+%]
+
+[% IF thanks_message %]<p>[% thanks_message %][% END %]
+<p>Click on a venue name amend details or click the add or delete options.
+<p><a href="[% cgipath %]/pages.cgi?act=venue-add">add a new venue</a>
+
+<div class="boxer">
+<table class="blocker" summary="Venue List">
+<tr>
+    <th>Venue</th>
+    <th>Link</th>
+    <th>Address</th>
+    <th>Map Link</th>
+    <th>Info</th>
+    <th>Actions</th>
+</tr>
+[% FOREACH item = data %]
+<tr>
+    <td><a href="[% cgipath %]/pages.cgi?act=venue-edit&amp;venueid=[% item.venueid %]">[% IF item.venue %][% item.venue %][% ELSE %]No Title[% END %]</a></td>
+    <td>[% IF item.venuelink %]YES[% ELSE %]NO[% END %]</td>
+    <td>[% IF item.address %]YES[% ELSE %]NO[% END %]</td>
+    <td>[% IF item.addresslink %]YES[% ELSE %]NO[% END %]</td>
+    <td>[% IF item.info %]YES[% ELSE %]NO[% END %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=venue-delete&amp;venueid=[% item.venueid %]"><img src="[% webpath %]/images/icons/icon_delete.gif" alt="delete" height="15" /></a></td>
+</tr>
+[% END %]
+</table>
+</div>

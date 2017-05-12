@@ -1,0 +1,26 @@
+---
+abstract: 'A curses based OO user interface framework'
+author:
+  - 'Shawn Boyette C<< <mdxi@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Curses-UI
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Curses: 0
+  Term::ReadKey: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.9609

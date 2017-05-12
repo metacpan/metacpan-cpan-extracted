@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Application::Pluggable.
+
+0.03  Mar 22 2006
+        - change interface. (Thanks to kazeburo)
+
+0.02  Mon Mar 20 2006
+        - add module's option import.
+
+0.01  Wed Dec 21 13:51:42 2005
+        - Initial release

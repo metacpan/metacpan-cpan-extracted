@@ -1,0 +1,41 @@
+Class::XPath 1.4
+
+This module adds XPath-style matching to your object trees. This means
+that you can find nodes using an XPath-esque query with "match()" from
+anywhere in the tree. Also, the "xpath()" method returns a unqique path
+to a given node which can be used as an identifier.
+
+NOTE: This module is not yet a complete XPath implementation. Over
+time I expect the subset of XPath supported to grow. See the SYNTAX
+documentation in the module POD for details on the current level of
+support.
+
+CHANGES
+
+  - Added ':' as an allowed character in names for nodes and
+    attributes.  (Timothy Appnel)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.6.0.  This module also requires these other
+modules and libraries:
+
+   Test::More
+   Carp
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Sam Tregar
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.

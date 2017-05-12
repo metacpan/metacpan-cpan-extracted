@@ -1,0 +1,2282 @@
+NAME
+    `Crypt::HSXKPasswd' - A secure memorable password generator inspired by
+    Steve Gibson's Passord Haystacks (https://www.grc.com/haystack.htm), and
+    the famous XKCD password cartoon (https://xkcd.com/936/).
+
+VERSION
+    This documentation refers to `Crypt::HSXKPasswd' version 3.6.
+
+SYNOPSIS
+        use Crypt::HSXKPasswd;
+
+        #
+        # Functional Interface - a shortcut for generating single passwords
+        #
+    
+        # generate a single password using the default word source, configuration,
+        # and random number generator
+        my $password = hsxkpasswd();
+    
+        # the above call is simply a shortcut for the following
+        my $password = Crypt::HSXKPasswd->new()->password();
+    
+        # this function passes all arguments on to Crypt::HSXKPasswd->new()
+        # so all the same customisations can be specified, e.g. specifying a
+        # config preset:
+        my $password = hsxkpasswd(preset => 'XKCD');
+    
+        #
+        # Object Oriented Interface - recommended for generating multiple passwords
+        #
+    
+        # create a new instance with the default dictionary, config, and random
+        # number generator
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new();
+    
+        # generate a single password
+        my $password = $hsxkpasswd_instance->password();
+    
+        # generate multiple passwords
+        my @passwords = $hsxkpasswd_instance->passwords(10);
+
+DESCRIPTION
+    A secure memorable password generator inspired by the wonderful XKCD
+    webcomic at http://www.xkcd.com/ and Steve Gibson's Password Haystacks
+    page at https://www.grc.com/haystack.htm. This is the Perl module that
+    powers https://www.xkpasswd.net.
+
+  PHILOSOPHY
+    More and more of the things we do on our computer require passwords, and
+    at the same time it seems we hear about organisations or sites losing
+    user database on every day that ends in a *y*. If we re-use our
+    passwords we expose ourself to an ever greater risk, but we need more
+    passwords than we can possibly remember or invent. Coming up with one
+    good password is easy, but coming up with one good password a week is a
+    lot harder, let alone one a day!
+
+    Obviously we need some technological help. We need our computers to help
+    us generate robust password and store them securely. There are many
+    great password managers out there to help us securely store and sync our
+    passwords, including commercial offerings and open-source projects. Many
+    of these managers also offer to generate random passwords for us,
+    usually in the form of a random string of meaningless letters numbers
+    and symbols. These kinds of nonsense passwords are certainly secure, but
+    they are often impractical.
+
+    Regardless of how good your chosen password manager is, there will
+    always be times when you need to type in your passwords, and that's when
+    random gibberish passwords become a real pain point. As annoying as it
+    is to have to glance over and back at a small cellphone screen to
+    manually type a gibberish password into a computer, that's nothing
+    compared to the annoyance of trying to communicate such a password to a
+    family member, friend, colleague or customer over the phone.
+
+    Surely it would be better to have passwords that are still truly random
+    in the way humans can't be, but are also human-friendly in the way
+    random gibberish never will be? This is the problem this module aims to
+    solve.
+
+    Rather than randomly choosing many letters, digits, and symbols from a
+    fairly small alphabet of possible characters, this library chooses a
+    small number of words from a large *alphabet* of possible words as the
+    basis for passwords. Words are easy to remember, easy to read from a
+    screen, easy to type, and easy to communicate over the telephone.
+
+    This module uses words to make up the bulk of the passwords it
+    generates, but it also adds carefully placed symbols and digits to add
+    security without making the passwords difficult to remember, read, type,
+    and speak.
+
+    In shot, this module is for people who prefer passwords that look like
+    this:
+
+        !15.play.MAJOR.fresh.FLAT.23!
+
+    to passwords that look like this:
+
+        eB8.GJXa@TuM
+    
+  PASSWORD GENERATION ALGORITHM
+    This module always uses a simple five-step algorithm to generate
+    passwords, but each step can be customised, and many steps can be
+    skipped completely.
+
+    It's important to understand the algorithm before trying to create your
+    own custom configurations for this module.
+
+    The algorithm is broken in to the following steps:
+
+    1   Pick random words from the dictionary.
+
+    2   Apply transformations to the words.
+
+    3   Create pseudo-words made up for randomly chosen digits and add them
+        as the first and last words.
+
+    4   Insert a copy of the same symbol between each of the words and
+        pseudo-words. This symbol is referred to as the *separator
+        character*.
+
+    5   Pad the password with multiple instances of the same symbol front
+        and/or back. This symbol is referred to as the *padding character*.
+
+    You can visualise this process as follows:
+
+        correct horse batter staple
+        correct HORSE battery staple
+        25 correct HORSE battery staple 83
+        25*correct*HORSE*battery*staple*83
+        ++25*correct*HORSE*battery*staple*83++
+    
+    Each of these steps can be customised in the following ways:
+
+    1   The number of words to be used, and the minimum and maximum lengths
+        of the words can be configured.
+
+    2   The case of the words can be modified in a number of ways, including
+        randomly choosing the case for each word.
+
+        It is also possible to specify so-called *133t-style* character
+        substitutions, e.g. replacing all occurrences of the letter `e' with
+        the digit `3', or all occurrences of the letter `s' with the symbol
+        `$'.
+
+    3   The number of digits to add as pseudo words to the front and back of
+        the password can be configured. A length of zero can be specified
+        for both to generate passwords without any randomly chosen digits.
+
+    4   The separator character can be specified directly, or it can be
+        randomly chosen from a list of symbols. It is also possible to
+        specify that no separator should be used.
+
+    5   The padding character can also be specified directly, or remotely
+        chosen from a list of possible symbols. Padding can also be disabled
+        completely. If padding is to be used it can be applied in two modes
+        - fixed, and adaptive.
+
+        With fixed padding a specified number of copies of the separator
+        character are added to the front and back of the password. The fixed
+        padding does not have to be symmetric.
+
+        With adaptive padding the required number of copies of the separator
+        character are added to the back of the password until it reaches a
+        specified length.
+
+  THE MATHS
+    Before examining the password strength of passwords generated with this
+    module we need to lay out the relatively simple maths underlying it all.
+
+    Maths Primer
+    A coin could be used as a very simple password generator. Each character
+    in the password would be the result of a single coin toss. If the coin
+    lands heads up, we add a `H' to our password, if it lands tails up, we
+    add a `T'.
+
+    If you made a one-letter password in this way there would only be two
+    possibilities, `H', or `T', or two permutations. If you made a
+    two-letter password in this way there would be four possible
+    combinations, or permutations, `HH', `HT', `TH', and `TT'. If you made a
+    three-character password in this way there would be 16 permutations, a
+    five character one would have 32 permutations, and so forth.
+
+    So, for a coin toss, which has two possible values for each character,
+    the formula for the number of permutations `P' for a given length of
+    password `L' is:
+
+        P = 2^L
+
+    Or, two to the power of the length of the password.
+
+    If we now swapped our coin for a dice, we would go from two possible
+    values per letter, to six possible values per letter. For one dice roll
+    there would be six permutations, for two there would be 36, for three
+    there would be 108 and so on.
+
+    This means that for a dice, the number of permutations can be calculated
+    with the formula:
+
+        P = 6^L
+
+    When talking about passwords, the set of possible symbols used for each
+    character in the password is referred to as the password's *alphabet*.
+    So, for the coin toss the alphabet was just `H' and `T', and for the
+    dice it was `1', `2', `3', `4', `5', and `6'. The actual characters used
+    in the alphabet make no difference to the strength of the password, all
+    that matters is the size of the alphabet, which we'll call `A'.
+
+    As you can probably infer from the two examples above, the formula for
+    the number of possible permutations `P' for a password of length `L'
+    created from an alphabet of size `A' is:
+
+        P = A^L
+
+    In the real world our passwords are generally made up of a mix of
+    letters, digits, and symbols. If we use mixed case that gives us 52
+    letters alone, then add in the ten digits from `0' to `9' and we're
+    already up to 62 possible characters before we even start on the array
+    of symbols and punctuation characters on our keyboards. It's generally
+    accepted that if you include symbols and punctuation, there are 95
+    characters available for use in randomly generated passwords. Hence, in
+    the real-world, the value for `A' is assumed to be 95. When you start
+    raising a number as big as 95 to even low powers the number of
+    permutations quickly rises.
+
+    A two character password with alphabet of 95 has 9025 permutations,
+    increasing the length to three characters brings that up to 857,375, and
+    so on. These numbers very quickly become too big to handle. For just an
+    8 character password we are talking about 6,634,204,312,890,625
+    permutations, which is a number so big most people couldn't say it (what
+    do you call something a thousand times bigger than a trillion?).
+
+    Because the numbers get so astronomically big so quickly, computer
+    scientists use bits of entropy to measure password strength rather than
+    the number of permutations. The formula to turn permutations into bits
+    of entropy `E' is very simple:
+
+        E = Log(2)P
+
+    In other words, the entropy is the log to base two of the permutations.
+    For our eight character example that equates to about 52 bits.
+
+    There are two approaches to increasing the number of permutations, and
+    hence the entropy, you can choose more characters, or, you can make the
+    alphabet you are choosing from bigger.
+
+    The Entropy of HSXKPasswd Passwords
+    Exactly how much entropy does a password need? That's the subject of
+    much debate, and the answer ultimately depends on the value of the
+    assets being protected by the password.
+
+    Two common recommendations you hear are 8 characters containing a mix of
+    upper and lower case letters, digits, and symbols, or 12 characters with
+    the same composition. These evaluation to approximately 52 bits of
+    entropy and 78 bits of entropy respectively.
+
+    When evaluating the entropy of passwords generated by this module, it
+    has to be done from two points of view for the answer to be meaningful.
+    Firstly, a best-case scenario - the attacker has absolutely no knowledge
+    of how the password was generated, and hence must mount a brute-force
+    attack. Then, secondly from the point of view of an attacker with full
+    knowledge of how the password was generated. Not just the knowledge that
+    this module was used, but a copy of the dictionary file used, and, a
+    copy of the configuration settings used.
+
+    For the purpose of this documentation, the entropy in the first
+    scenario, the brute force attack, will be referred to as the blind
+    entropy, and the entropy in the second scenario the seen entropy.
+
+    The blind entropy is solely determined by the configuration settings,
+    the seen entropy depends on both the settings and the dictionary file
+    used.
+
+    Calculating the bind entropy `Eb' is quite straightforward, we just need
+    to know the size of the alphabet resulting from the configuration `A',
+    and the minimum length of passwords generated with the configuration
+    `L', and plug those values into this formula:
+
+        Eb = Log(2)(A^L)
+
+    Calculating `A' simply involves determining whether or not the
+    configuration results in a mix of letter cases (26 or 52 characters),
+    the inclusion of at least one symbol (if any one is present, assume the
+    industry standard of a 33 character search space), and the inclusion of
+    at least one digit (10 character). This will result in a value between
+    26 and 95.
+
+    Calculating `L' is also straightforward. The one minor complication is
+    that some configurations result in a variable length password. In this
+    case, assume the shortest possible length the configuration could
+    produce.
+
+    The example password from the PHILOSOPHY section
+    (`!15.play.MAJOR.fresh.FLAT.23!') was generated using the preset
+    `WEB32'. This preset uses four words of between four and five letters
+    long, with the case of each word randomly set to all lower or all upper
+    as the basis for the password, it then chooses two pairs of random
+    digits as extra words to go front and back, before separating each word
+    with a copy of a randomly chosen symbol, and padding the front and back
+    of the password with a copy of a different randomly chosen symbol. This
+    results in passwords that contain a mix of cases, digits, and symbols,
+    and are between 27 and 31 characters long. If we add these values into
+    the formula we find that the blind entropy for passwords created with
+    this preset is:
+
+        Eb = Log(2)(95^27) = 163 bits
+
+    This is spectacularly secure! And, this is the most likely kind of
+    attack for a password to face. However, to have confidence in the
+    password we must also now calculate the entropy when the attacker knows
+    everything about how the password was generated.
+
+    We will calculate the entropy resulting from the same `WEB32' config
+    being used to generate a password using the sample library file that
+    ships with the module.
+
+    The number of permutations the attacker needs to check is purely the
+    product of possibly results for each random choice made during the
+    assembly of the password.
+
+    Lets start with the words that will form the core of the password. The
+    configuration chooses four words of between four and five letters long
+    from the dictionary, and then randomises their case, effectively making
+    it a choice from twice as many words (each word in each case).
+
+    The sample dictionary file contains 698 words of the configured length,
+    which doubles to 1396. Choosing four words from that very large alphabet
+    gives a starting point of `1396^4', or 3,797,883,801,856 permutations.
+
+    Next we need to calculate the permutations for the separator character.
+    The configuration specifies just nine permitted characters, and we
+    choose just one, so that equates to 9 permutations.
+
+    Similarly, the padding character on the end is chosen from 13 permitted
+    symbols giving 13 more permutations.
+
+    Finally, there are four randomly chosen digits, giving `10^4', or 10,000
+    permutations.
+
+    The total number of permutations is the product of all these
+    permutations:
+
+        Pseen = 3,797,883,801,856 * 9 * 13 * 10,000 = 2.77x10^17
+    
+    Finally, we convert this to entropy by taking the base 2 log:
+
+        Eseen = Log(2)2.77x10^17 = ~57bits
+    
+    What this means is that most probably, passwords generated with this
+    preset using the sample dictionary file are spectacularly more secure
+    than even 12 randomly chosen characters, and, that in the very unlikely
+    event that an attackers knows absolutely everything about how the
+    password was generated, it is still significantly more secure than 8
+    randomly chosen characters.
+
+    Because the exact strength of the passwords produced by this module
+    depend on the configuration and dictionary file used, the constructor
+    does the above math when creating an HSXKPasswd object, and throws a
+    warning if either the blind entropy falls below 78bits, or the seen
+    entropy falls below 52 bits.
+
+SUBROUTINES/METHODS
+  MODULE CONFIGURATION
+    It is possible to tweak the module's behaviour in certain areas by
+    updating the values contained within a set of module configuration keys.
+    The values associated with these keys can be accessed and updated via
+    the class function `module_config()'.
+
+        # get the current debug status
+        my $debug_status = Crypt::HSXKPasswd->module_config('DEBUG');
+    
+        # configure the module to suppress all entropy warnings
+        Crypt::HSXKPasswd->module_config('ENTROPY_WARNINGS', 'NONE');
+
+    The following module configuration keys exist within the module:
+
+    *   `DEBUG' - A True/False value denoting whether or not the module
+        should print debug messages. The default is not to print debug
+        messages.
+
+        For more details see the DIAGNOSTICS section of this document.
+
+    *   `LOG_ERRORS' - A True/False value denoting whether or not errors
+        should be logged. The default is not to log.
+
+        For more details see the DIAGNOSTICS section of this document.
+
+    *   `LOG_STREAM' - the stream to which debug messages should be printed
+        if debugging is enabled, and log messages should be printed when
+        error logging is enabled. The default is to print to `STDERR'.
+
+        For more details see the DIAGNOSTICS section of this document.
+
+    *   `ENTROPY_MIN_BLIND' - the minimum allowable entropy against brute
+        force attacks in bits. The default is 78 bits.
+
+        For more details see the ENTROPY CHECKING section of this document.
+
+    *   `ENTROPY_MIN_SEEN' - the minimum allowable entropy against an
+        attacker with full knowledge. The default is 52 bits.
+
+        For more details see the ENTROPY CHECKING section of this document.
+
+    *   `ENTROPY_WARNINGS' - control the emission of entropy warnings. The
+        value must be one of `ALL', `BLIND', or `NONE'. The default value is
+        `ALL'.
+
+        For more details see the ENTROPY CHECKING section of this document.
+
+  CUSTOM DATA TYPES
+    This module uses a custom type library created with `Type::Library' for
+    data validation. It is important to know this for two reasons - firstly,
+    these custom types are mentioned in many error messages, and secondly
+    these custom types are available for developers to use in their own
+    code, either when utilising `Crypt::HSXKPasswd', or writing custom word
+    sources by extending `Crypt::HSXKPasswd::Dictionary', or when writing
+    custom random number generators by extending `Crypt::HSXKPasswd::RNG'.
+
+    Defined Types
+    *   `NonEmptyString' - a string containing at least one character.
+
+    *   `PositiveInteger' - a whole number greater than or equal to zero.
+
+    *   `NonZeroPositiveInteger' - a whole number greater than zero.
+
+    *   `TrueFalse' - a reasonable boolean value, specifically, `undef', and
+        empty string, or 0 to indicate false, and a 1 to indicate true.
+
+    *   `PerlPackageName' - string representing a valid Perl package name
+        like `Crypt::HSXKPasswd::Dictionary::NL'.
+
+    *   `Letter' - a string containing a single letter. Because this module
+        is Unicode-aware, it should be noted that a letter is defined as a
+        single Unicode grapheme with the Unicode property `Letter'. What
+        this means is that accented letters like `é' are considered valid,
+        as are ligatures like `æ'.
+
+    *   `Symbol' - a string containing a single non-letter character.
+        Because this module is Unicode-aware, should be noted that a
+        non-letter character is defined as a single Unicode grapheme that
+        does not have the Unicode property `Letter'. What this means is that
+        neither letters, accented characters, nor ligatures can be used as
+        symbols, but just about every other Unicode character can, including
+        punctuation symbols, mathematical symbols, and even emoji!
+
+    *   `Word' - a string containing only letters (as defined by the type
+        `Letter'), and at least four long.
+
+    *   `SymbolAlphabet' - a symbol alphabet is a reference to an array that
+        contains at least two distinct symbols (as defined by the type
+        `Symbol'), and no values that are not symbols.
+
+    *   `WordLength' - a valid value when specifying the length of a word,
+        specifically, a whole number greater than or equal to four.
+
+    *   `ConfigKeyDefinition' - a valid configuration key definition. A
+        reference to a hash mapping `required' to a true/false value,
+        `expects' to a non-empty string, and `type' to a `Type::Tiny'
+        object.
+
+    *   `ConfigKeyName' - a valid configuration key name, see the
+        CONFIGURATION section of this document for a description of each
+        configuration key supported by this module. You can get a list of
+        valid configuration key names programatically by calling the
+        function `Crypt::HSXKPasswd-'defined_config_keys()>.
+
+    *   `ConfigKeyAssignment' - a mapping between a valid configuration key
+        name and a valid value for that configuration key.
+
+    *   `ConfigOverride' - a reference to hash containing one or more
+        configuration key assignments as defined by the type
+        `ConfigKeyAssignment'.
+
+    *   `Config' - a reference to a hash that contains a complete and valid
+        set of mappings between configuration key names and values. For a
+        config to be considered valid it must contain only valid valid
+        configuration key assignments as defined by the type
+        `ConfigKeyAssignment', must contain a configuration key assignment
+        for each required configuration key and all interdependencies
+        between the specified configuration key assignments must be
+        fulfilled.
+
+        See the CONFIG section of this document for a detailed description
+        of each of the defined configuration keys and their various
+        interdependencies.
+
+    *   `PresetDefinition' - a valid preset definition. A reference to a
+        hash mapping `description' to a non-empty string, and `config' to a
+        valid Config.
+
+    *   `PresetName' - a valid preset name, see the PRESETS section of this
+        document for a description of each preset supported by this module.
+        You can get a list of valid preset names programatically by calling
+        the function `Crypt::HSXKPasswd-'defined_presets()>.
+
+    Using the Custom Types
+    The library of custom types is defined in the package
+    `Crypt::HSXKPasswd::Types', and it is a standard `Type::Library' type
+    library containing `Type::Tiny' type definitions.
+
+    Useful Links:
+
+    *   The documentation for `Type::Tiny' -
+        http://search.cpan.org/perldoc?Type%3A%3ATiny
+
+    *   The documentation for `Type::Library' -
+        http://search.cpan.org/perldoc?Type%3A%3ALibrary
+
+    To use the bare type definitions listed above, import the module as
+    follows:
+
+        use Crypt::HSXKPasswd::Types qw( :types );
+    
+    Each type listed above will now be imported, and become available as a
+    bare word. The `Type::Tiny' documentation provides a full list of
+    available functions, but the examples below illustrate some of the more
+    useful ones:
+
+        $is_valid = Letter->check('e'); # $is_valid = 1
+        $is_valid = Letter->check('-'); # $is_valid = undef
+        $err_msg = Letter->validate('e'); # $err_msg = undef
+        $err_msg = Letter->validate('-'); # $err_msg = "'-' is not a Letter ...
+                        # ... (must be a string containing exactly one letter)"
+
+    `Type::Library' automatically creates an `is_TypeName' function for each
+    type defined in the library. These are not imported by default. To
+    import them add the export tag `:is' to the `use' line. I would
+    recommend the following `use' line:
+
+        use Crypt::HSXKPasswd::Types qw( :types :is );
+    
+    You can now do things like the following:
+
+        $is_valid = is_Letter('e'); # $is_valid = 1
+        $is_valid = is_Letter('-'); # $is_valid = undef
+    
+    Each of the types listed above also contains a custom function using
+    `Type::Tiny''s new, and still officially experimental, `my_methods'
+    feature. The custom function is called `my_english', and can be used to
+    return an English description of the values considered valid by the
+    type, e.g.:
+
+        print Letter->my_english(); # prints: a string containing exactly one letter
+    
+    As well as the named types listed above, there are also anonymous types
+    defined for each supported configuration key. These can be accessed
+    using the function `Crypt::HSXKPasswd-'config_key_definitions()>.
+
+    If declaring your own `Type::Tiny' types, you may also find the public
+    subroutine `Crypt::HSXKPasswd::Types::var_to_string()' useful - it will
+    turn anything passed as a scalar into a meaningful string, truncating
+    any resulting strings longer than 72 characters in nice way. All the
+    custom error messages in all the types defined in
+    `Crypt::HSXKPasswd::Types' make use of this subroutine.
+
+  CONFIGURATION
+    The module builds passwords using the following process.
+
+    First, a set of words are randomly chosen from the word source. Then,
+    two pseudo-words made of one or more digits may added before and/or
+    after the words from. Next, a separator character may be placed between
+    all the words (including the groups of digits), and one or more
+    occurrences of a padding symbol may be added front and/or back.
+
+    You can envisage the process as follows:
+
+        correct HORSE BATTERY staple
+        34 correct HORSE BATTERY staple 56
+        34-correct-HORSE-BATTERY-staple-56
+        !!34-correct-HORSE-BATTERY-staple-56!!
+    
+    Many aspects of this password generation process are configurable. You
+    can control the length and number of words chosen, and what, if any,
+    case transformations should be applied to those words, and how accented
+    characters should be treated. How many, if any, digits should be added
+    front and back. What symbol, if any, should be used as a separator. And
+    finally how the password should be padded, if at all, and with what
+    symbol. Passwords can be padded to a given length, or by a given number
+    of symbols front and back.
+
+    The symbols used as the separator and for padding can be explicitly
+    specified, or the they can be randomly chosen from a given alphabet of
+    possible symbols. Both symbols can be randomly chosen from the same
+    alphabet, or from two separately specified alphabets.
+
+    Every instance of an HSXKPasswd password generator stores its
+    configuration as a set of name-value pairs, referred to as
+    *configuration keys* throughout this documentation.
+
+    Configurations can be specified either as a complete set of
+    configuration keys with values that together form a valid configuration,
+    as a named preset, or, as a named preset accompanied by a list of one or
+    more configuration keys with new values to override those specified by
+    the preset.
+
+    The module contains a preset called `DEFAULT', and this preset is used
+    if no configuration is specified. The function `default_config()' will
+    return a copy of this configuration as a reference to a hashtable.
+
+    For more details on how to specify configurations, see the documentation
+    for the constructor (the function `new()') below.
+
+    Password Generator Configuration Keys
+    Below is a list of all the configuration keys that can be used to
+    customise the password generation algorithm. Each configuration key is
+    accompanied by a description of what aspect of the algorithm they
+    control, and any validation rules that apply to the key.
+
+    Note that some keys are always required, and that there are dependencies
+    between keys. For examples, if you specify that the separator symbol
+    should be chosen at random, you must also specify an alphabet from which
+    the symbol should be randomly chosen.
+
+    *   `allow_accents' (optional) - if not specified, or if a falsy value
+        is specified, accents will be removed from letters in the generated
+        passwords. E.g. `é' becomes `e'. If a truthy value is specified,
+        accents will be preserved, and appear in the generated passwords.
+
+    *   `case_transform' (required) - the transformations, if any, that
+        should be applied to the words that appear in the generated
+        passwords. The value specified must be one of the following:
+
+        *   `ALTERNATE' - each alternate word will be converted to all upper
+            case and all lower case. The case of the first word is chosen at
+            random.
+
+        *   `CAPITALISE' - the first letter in every word will be converted
+            to upper case, all other letters will be converted to lower
+            case.
+
+        *   `INVERT' - the first letter in every word will be converted to
+            lower case, all other letters will be converted to upper case.
+
+        *   `LOWER' - all letters in all the words will be converted to
+            lower case. Use of this option is strongly discouraged for
+            security reasons.
+
+        *   `NONE' - the case of the letters that make up the words will not
+            be altered from how they were specified in the original word
+            source.
+
+        *   `RANDOM' - each word will be randomly converted to all upper
+            case or all lower case.
+
+        *   `UPPER' - all letters in all the words will be converted to
+            upper case. Use of this option is strongly discouraged for
+            security reasons.
+
+        The function `default_config()' returns a value of `CAPITALISE' for
+        this key.
+
+    *   `character_substitutions' (optional) - a reference to a hashtable
+        containing containing zero or more character substitutions to be
+        applied to the randomly chosen words when generating passwords. The
+        keys in the hashtable must be single letters. The substitutions can
+        contain multiple characters. Specifying one or more substitutions
+        with a length greater than one could lead to passwords being longer
+        than expected, and to entropy calculations being under estimated.
+        The module will issue a warning when such a config is loaded.
+
+    *   `num_words' (required) - the number of words to randomly choose from
+        the word source as the basis for the generated passwords.
+
+        The function `default_config()' returns a value of `3' for this key.
+
+    *   `pad_to_length' (conditionally required) - the length generated
+        passwords must be padded to when using adaptive padding, i.e. when
+        `padding_type' is set to `ADAPTIVE'). The value must be an integer
+        greater than or equal to 12. Lengths of less than 12 are not
+        permitted for security reasons.
+
+    *   `padding_alphabet' (optional) - this key is ignored unless the
+        configuration specifies that the padding character should be
+        randomly chosen, i.e. unless `padding_character' is set to `RANDOM'.
+
+        When the padding character is set to be randomly chosen, the module
+        will check for the presence of this key. If it is specified, the
+        padding character will be randomly chosen from the set of symbols
+        defined by this key. If this key is not set, the module will use the
+        set of symbols specified by the key `symbol_alphabet'. If neither
+        this key nor `symbol_alphabet' are specified, then the configuration
+        will be considered invalid.
+
+        If specified, this key must be a reference to an array of
+        single-character strings.
+
+    *   `padding_character' (conditionally required) - this key is unless
+        the key `padding_type' is set to `NONE'. It specifies the padding
+        symbol to be used when generating passwords.
+
+        If specified, they key's value must be a single character string, or
+        one of the following special values:
+
+        *   `RANDOM' - the character should be randomly chosen from the set
+            of characters specified by the key `padding_alphabet' or
+            `symbol_alphabet'. If specified, `padding_alphabet' takes
+            precedence over `symbol_alphabet'. If this value is specified
+            for `padding_character', and neither `padding_alphabet' nor
+            `symbol_alphabet' are specified, the configuration will be
+            considered invalid.
+
+        *   `SEPARATOR' - pad the password with the same symbol that is used
+            to separate the words. The key `padding_character' cannot be set
+            to `SEPARATOR' when the key `separator_character' is set to
+            `NONE'.
+
+        The function `default_config' return the value `RANDOM' for this
+        key.
+
+    *   `padding_characters_before' & `padding_characters_after'
+        (conditionally required) - both of these keys are required if the
+        key `padding_type' is set to `FIXED'.
+
+        These keys specify the number of padding symbols that should be
+        added to the front and back of the password.
+
+        Both keys require that the specified value be an integer greater
+        than or equal to zero.
+
+        The function `default_config()' returns a value of `2' for both of
+        these keys.
+
+    *   `padding_digits_before' & `padding_digits_after' (required) - the
+        number of random digits to include before and after the randomly
+        chosen words when generating passwords.
+
+        Both keys require that the specified value be an integer greater
+        than or equal to zero.
+
+        The function `default_config()' returns a value of `2' for both of
+        these keys.
+
+    *   `padding_type' (required) - the way in which padding symbols should
+        be added when generating passwords.
+
+        Only the following values are valid for this key:
+
+        *   `NONE' - do not add any padding symbols when generating
+            passwords.
+
+        *   `FIXED' - add an exactly specified number of copies of the
+            padding symbol to the front and back of generated passwords.
+
+            When they key `padding_type' is set to `FIXED', the three keys
+            `padding_character', `padding_characters_before' &
+            `padding_characters_after' become required.
+
+        *   `ADAPTIVE' - add no copies of the padding symbol will be added
+            to the front of the generated passwords, and copies of the
+            padding character will be added to the end of the generated
+            passwords until the total length of the password is equal to the
+            value specified for the key `pad_to_length'.
+
+            Note that If the password is longer than the value specified by
+            the key `pad_to_length' before any copies of the padding symbol
+            are added, the password will be truncated to the length
+            specified by the key `pad_to_length'.
+
+            When they key `padding_type' is set to `ADAPTIVE', the three
+            keys `padding_character', `padding_characters_before' &
+            `padding_characters_after' become required.
+
+        The function `default_config()' returns a value of `FIXED' for this
+        key.
+
+    *   `separator_alphabet' (optional) - this key is ignored unless the
+        configuration specifies that the separator character should be
+        randomly chosen, i.e. unless `separator_character' is set to
+        `RANDOM'.
+
+        When the separator character is set to be randomly chosen, the
+        module will check for the presence of this key. If it is specified,
+        the separator character will be randomly chosen from the set of
+        symbols defined by this key. If this key is not set, the module will
+        use the set of symbols specified by the key `symbol_alphabet'. If
+        neither this key nor `symbol_alphabet' are specified, then the
+        configuration will be considered invalid.
+
+        If specified, this key must be a reference to an array of
+        single-character strings.
+
+    *   `separator_character' (required) - the symbol to use to separate the
+        words when generating passwords.
+
+        The value specified for this key must be a single-character string,
+        or one of the following special values:
+
+        *   `NONE' - no separator character will be used. I.e. the words,
+            and the groups of digits before and after the words, if any,
+            will be directly joined together.
+
+            `RANDOM' - a single character will be randomly chosen from the
+            list of symbols specified by one of the keys
+            `separator_alphabet' or `symbol_alphabet'. If both keys are set,
+            `separator_alphabet' takes precedence.
+
+        The function `default_config()' returns a value of `RANDOM' for this
+        key.
+
+    *   `symbol_alphabet' (optional) - this key specifies a default alphabet
+        of symbols that can be used when either or both the separator
+        character and the padding character are set to be chosen at random.
+        I.e. when either or both of the keys `separator_character' and
+        `padding_character' are set to `RANDOM'.
+
+        Note that the keys `separator_alphabet' and `padding_alphabet' take
+        precedence over this key if specified.
+
+        The value specified for this key must be a reference to an array of
+        single-character strings.
+
+        The function `default_config()' returns a value of `['!', '@', '$',
+        '%', '^', '&', '*', '-', '_', '+', '=', ':', '|', '~', '?', '/',
+        '.', ';']' for this key.
+
+    *   `word_length_min' & `word_length_max' (required) - the minimum and
+        maximum length of the words that will form the basis of the
+        generated passwords.
+
+        The values specified for both keys must be integers greater than
+        three, and the value specified for `word_length_max' must be greater
+        than or equal to the value specified for `word_length_min'.
+
+        The function `default_config()' returns values of `4' and `8' for
+        these keys.
+
+  PRESETS
+    Below is a list of all the presets defined by this module.
+
+    This information can be accessed programatically using the functions
+    `defined_presets()', `presets_to_string()', `preset_description()', and
+    `preset_config()'.
+
+    *   `APPLEID' - a preset respecting the many prerequisites Apple places
+        on Apple ID passwords. Apple's official password policy cam be found
+        at the following URL: http://support.apple.com/kb/ht4232. Note that
+        Apple's knowledge base article omits to mention that passwords can't
+        be longer than 32 characters. This preset is also configured to use
+        only characters that are easy to type on the standard iOS keyboard,
+        i.e. those appearing on the letters keyboard (`ABC') or the numbers
+        keyboard `.?123', and not those on the harder to reach symbols
+        keyboard `#+='.
+
+        Sample Password:
+
+            -25,favor,MANY,BEAR,53-
+    
+        Preset Definition:
+
+            {
+                padding_alphabet => [qw{- : . ! ? @ &}],
+                separator_alphabet => [qw{- : . @}, q{,}, q{ }],
+                word_length_min => 4,
+                word_length_max => 7,
+                num_words => 3,
+                separator_character => 'RANDOM',
+                padding_digits_before => 2,
+                padding_digits_after => 2,
+                padding_type => 'FIXED',
+                padding_character => 'RANDOM',
+                padding_characters_before => 1,
+                padding_characters_after => 1,
+                case_transform => 'RANDOM',
+                allow_accents => 0,
+            }
+
+    *   `DEFAULT' - the default configuration.
+
+        Sample Password:
+
+            ~~12:settle:SUCCEED:summer:48~~
+    
+        Preset Definition:
+
+            {
+                symbol_alphabet => [qw{! @ $ % ^ & * - _ + = : | ~ ? / . ;}],
+                word_length_min => 4,
+                word_length_max => 8,
+                num_words => 3,
+                separator_character => 'RANDOM',
+                padding_digits_before => 2,
+                padding_digits_after => 2,
+                padding_type => 'FIXED',
+                padding_character => 'RANDOM',
+                padding_characters_before => 2,
+                padding_characters_after => 2,
+                case_transform => 'ALTERNATE',
+                allow_accents => 0,
+            }
+
+    *   `NTLM' - a preset for 14 character NTMLv1 (NTLM Version 1)
+        passwords. ONLY USE THIS PRESET IF YOU MUST! The 14 character limit
+        does not allow for sufficient entropy in scenarios where the
+        attacker knows the dictionary and config used to generate the
+        password. Use of this preset will generate a low entropy warning.
+
+        Sample Password:
+
+            0=mAYAN=sCART@
+    
+        Preset Definition:
+
+            {
+                padding_alphabet => [qw{! @ $ % ^ & * + = : | ~ ?}],
+                separator_alphabet => [qw{- + = . * _ | ~}, q{,}],
+                word_length_min => 5,
+                word_length_max => 5,
+                num_words => 2,
+                separator_character => 'RANDOM',
+                padding_digits_before => 1,
+                padding_digits_after => 0,
+                padding_type => 'FIXED',
+                padding_character => 'RANDOM',
+                padding_characters_before => 0,
+                padding_characters_after => 1,
+                case_transform => 'INVERT',
+                allow_accents => 0,
+            }
+
+    *   `SECURITYQ' - a preset for creating fake answers to security
+        questions. This preset generates long nonsense sentences ending in
+        `.' `!' or `?'.
+
+        Sample 'Password':
+
+            Wales outside full month minutes gentle?
+    
+        Preset Definition:
+
+            {
+                word_length_min => 4,
+                word_length_max => 8,
+                num_words => 6,
+                separator_character => q{ },
+                padding_digits_before => 0,
+                padding_digits_after => 0,
+                padding_type => 'FIXED',
+                padding_character => 'RANDOM',
+                padding_alphabet => [qw{. ! ?}],
+                padding_characters_before => 0,
+                padding_characters_after => 1,
+                case_transform => 'NONE',
+                allow_accents => 0,
+            }
+
+    *   `WEB16' - a preset for websites that don't allow passwords to be
+        longer than 16 characters. ONLY USE THIS PRESET IF YOU MUST! The 14
+        character limit does not allow for sufficient entropy in scenarios
+        where the attacker knows the dictionary and config used to generate
+        the password. Use of this preset will generate a low entropy
+        warning.
+
+        Sample Password:
+
+            tube+NICE+iron+02
+    
+        Preset Definition:
+
+            {
+                symbol_alphabet => [qw{! @ $ % ^ & * - _ + = : | ~ ? / . ;}],
+                word_length_min => 4,
+                word_length_max => 4,
+                num_words => 3,
+                separator_character => 'RANDOM',
+                padding_digits_before => 0,
+                padding_digits_after => 2,
+                padding_type => 'NONE',
+                case_transform => 'RANDOM',
+                allow_accents => 0,
+            }
+    
+    *   `WEB32' - a preset for websites that don't allow passwords to be
+        longer than 32 characters.
+
+        Sample Password:
+
+            +93-took-CASE-money-AHEAD-31+
+    
+        Preset Definition:
+
+            {
+                padding_alphabet => [qw{! @ $ % ^ & * + = : | ~ ?}],
+                separator_alphabet => [qw{- + = . * _ | ~}, q{,}],
+                word_length_min => 4,
+                word_length_max => 5,
+                num_words => 4,
+                separator_character => 'RANDOM',
+                padding_digits_before => 2,
+                padding_digits_after => 2,
+                padding_type => 'FIXED',
+                padding_character => 'RANDOM',
+                padding_characters_before => 1,
+                padding_characters_after => 1,
+                case_transform => 'ALTERNATE',
+                allow_accents => 0,
+            }
+
+    *   `WIFI' - a preset for generating 63 character long WPA2 keys (most
+        routers allow 64 characters, but some only allow 63, hence the
+        somewhat unexpected length).
+
+        Sample Password:
+
+            2736_ITSELF_PARTIAL_QUICKLY_SCOTLAND_wild_people_7441!!!!!!!!!!
+    
+        Preset Definition:
+
+            {
+                padding_alphabet => [qw{! @ $ % ^ & * + = : | ~ ?}],
+                separator_alphabet => [qw{- + = . * _ | ~}, q{,}],
+                word_length_min => 4,
+                word_length_max => 8,
+                num_words => 6,
+                separator_character => 'RANDOM',
+                padding_digits_before => 4,
+                padding_digits_after => 4,
+                padding_type => 'ADAPTIVE',
+                padding_character => 'RANDOM',
+                pad_to_length => 63,
+                case_transform => 'RANDOM',
+                allow_accents => 0,
+            }
+
+    *   `XKCD' - a preset inspired by the original XKCD comic
+        (http://xkcd.com/936/), but with some alterations to provide
+        sufficient entropy to avoid low entropy warnings.
+
+        Sample Password:
+
+            quiet-children-OCTOBER-today-HOPE
+    
+        Preset Definition:
+
+            {
+                word_length_min => 4,
+                word_length_max => 8,
+                num_words => 5,
+                separator_character => q{-},
+                padding_digits_before => 0,
+                padding_digits_after => 0,
+                padding_type => 'NONE',
+                case_transform => 'RANDOM',
+                allow_accents => 0,
+            }
+
+  FUNCTIONAL INTERFACE
+    Although the package was primarily designed to be used in an
+    object-oriented way, there is a functional interface too. The functional
+    interface initialises an object internally and then uses that object to
+    generate a single password. If you only need one password, this is no
+    less efficient than the object-oriented interface, however, if you are
+    generating multiple passwords it is much less efficient.
+
+    There is only a single function exported by the module:
+
+    hsxkpasswd()
+        my $password = hsxkpasswd();
+    
+    This function call is equivalent to the following Object-Oriented code:
+
+        my $password =  Crypt::HSXKPasswd->new()->password();
+    
+    This function passes all arguments it receives through to the
+    constructor, so all arguments that are valid in `new()' are valid here.
+
+    This function Croaks if there is a problem generating the password.
+
+    Note that it is inefficient to use this function to generate multiple
+    passwords because the dictionary will be re-loaded, and the entropy
+    stats re-calculated each time the function is called.
+
+  CONSTRUCTOR
+        # create a new instance with the default dictionary, config, and random
+        # number generator
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new();
+    
+        # the constructor takes optional named arguments, these can be used to
+        # customise the word source, config, and random number source.
+    
+        # create an instance that uses the UNIX words file as the word source
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(
+            dictionary => Crypt::HSXKPasswd::Dictionary::System->new()
+        );
+    
+        # create an instance that uses an array reference as the word source
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(dictionary_list => $array_ref);
+    
+        # create an instance that uses a dictionary file as the word source
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(
+            dictionary_file => 'sample_dict_EN.txt'
+        );
+    
+        # the class Crypt::HSXKPasswd::Dictionary::Basic can be used to aggregate
+        # multiple array refs and/or dictionary files into a single word source
+        my $dictionary = Crypt::HSXKPasswd::Dictionary::Basic->new();
+        $dictionary->add_words('dict1.txt');
+        $dictionary->add_words('dict2.txt');
+        $dictionary->add_words($array_ref);
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(dictionary => $dictionary);
+    
+        # create an instance from the preset 'XKCD'
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(preset => 'XKCD');
+    
+        # create an instance based on the preset 'XKCD' with one customisation
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(
+            preset => 'XKCD',
+            preset_override => {separator_character => q{ }}
+        );
+    
+        # create an instance from a config based on a preset
+        # but with many alterations
+        my $config = Crypt::HSXKPasswd->preset_config('XKCD');
+        $config->{separator_character} = q{ };
+        $config->{case_transform} = 'INVERT';
+        $config->{padding_type} = "FIXED";
+        $config->{padding_characters_before} = 1;
+        $config->{padding_characters_after} = 1;
+        $config->{padding_character} = '*';
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(config => $config);
+    
+        # create an instance from an entirely custom configuration
+        my $config = {
+            padding_alphabet => [qw{! @ $ % ^ & * + = : ~ ?}],
+            separator_alphabet => [qw{- + = . _ | ~}],
+            word_length_min => 6,
+            word_length_max => 6,
+            num_words => 3,
+            separator_character => 'RANDOM',
+            padding_digits_before => 2,
+            padding_digits_after => 2,
+            padding_type => 'FIXED',
+            padding_character => 'RANDOM',
+            padding_characters_before => 2,
+            padding_characters_after => 2,
+            case_transform => 'CAPITALISE',
+        }
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(config => $config);
+    
+        # create an instance from an entire custom config passed as a JSON string
+        # a convenient way to use configs generated using the web interface at
+        # https://xkpasswd.net
+        my $config = <<'END_CONF';
+        {
+         "num_words": 4,
+         "word_length_min": 4,
+         "word_length_max": 8,
+         "case_transform": "RANDOM",
+         "separator_character": " ",
+         "padding_digits_before": 0,
+         "padding_digits_after": 0,
+         "padding_type": "NONE",
+        }
+        END_CONF
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(config_json => $config);
+    
+        # create an instance which uses /dev/urandom as the RNG
+        # (only possible on Linux/Unix only systems)
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(
+            rng => Crypt::HSXKPasswd::RNG::DevUrandom->new();
+        );
+    
+        # create an instance which uses Random.Org as the random number generator
+        # NOTE - this should be used sparingly, and only by the paranoid. If you
+        # abuse this RNG your IP will get blacklisted on Random.Org. You must pass
+        # a valid email address to the constructor for
+        # Crypt::HSXKPasswd::RNG::RandomDorOrg because Random.Org's usage
+        # guidelines request that all invocations to their API contain a contact
+        # email in the useragent header, and this module honours that request.
+        my $hsxkpasswd_instance = Crypt::HSXKPasswd->new(
+            rng => Crypt::HSXKPasswd::RNG::RandomDorOrg->new('your.email@addre.ss');
+        );
+
+    The constructor must be called via the package name.
+
+    If called with no arguments the constructor will use an instance of
+    `Crypt::HSXKPasswd::Dictionary::EN' as the word source, the preset
+    `DEFAULT', and an instance of the class `Crypt::HSXKPasswd::RNG::Basic'
+    to generate random numbers.
+
+    The function accepts named arguments to allow for custom specification
+    of the word source, config, and random number source.
+
+    Specifying Custom Word Sources
+    Three named arguments can be used to specify a word source, but only one
+    should be specified at a time. If multiple are specified, the one with
+    the highest priority will be used, and the rest ignored. The variables
+    are listed below in descending order of priority:
+
+    *   `dictionary' - an instance of a class that extends
+        `Crypt::HSXKPasswd::Dictionary'.
+
+    *   `dictionary_list' - a reference to an array containing words as
+        scalars.
+
+    *   `dictionary_file' - the path to a dictionary file. Dictionary files
+        should contain one word per. Lines starting with a # symbol will be
+        ignored. It is assumed files will be UTF-8 encoded. If not, a second
+        named argument, `dictionary_file_encoding', can be used to specify
+        another encoding.
+
+    Specifying Custom Password Generator Configurations
+    Two primary named arguments can be used to specify the config the
+    instance should use to generate passwords. Only one should be specified
+    at a time. If multiple are specified, the one with the highest priority
+    will be used, and the rest ignored. The variables are listed below in
+    descending order of priority:
+
+    *   `config' - a valid config hashref.
+
+    *   `config_json' - a JSON string representing a valid config hashref.
+
+        This named argument provides a convenient way to use configs
+        generated using the web interface at https://xkpasswd.net/. The
+        Save/Load tab in that interface saves and loads configs in JSON
+        format.
+
+    *   `preset' - a valid preset name. If this variable is used, then any
+        desired config overrides can be passed as a hashref using the
+        variable `preset_overrides'.
+
+    Specifying Custom Random Number Generators
+    A custom RNG can be specified using the named argument `rng'. The passed
+    value must be an instance of a class that extends
+    `Crypt::HSXKPasswd::RNG' and overrides the function `random_numbers()'.
+
+  INSTANCE METHODS
+    NOTE - all instance methods must be invoked on a Crypt::HSXKPasswd
+    object or they will croak.
+
+    ->config()
+        my $config = $hsxkpasswd_instance->config(); # getter
+        $hsxkpasswd_instance->config($config_hashref); # setter
+        $hsxkpasswd_instance->config($config_json_string); # setter
+
+    When called with no arguments the function returns a clone of the
+    instance's config hashref.
+
+    When called with a single argument the function sets the config of the
+    instance to a clone of the passed config. If present, the argument must
+    be either a hashref containing valid config keys and values, or a JSON
+    string representing a hashref containing valid config keys and values.
+
+    The function will croak if an invalid config is passed.
+
+    ->config_as_json()
+        my $config_json_string = $hsxkpasswd_instance->config_as_json();
+    
+    This function returns the content of the instance's loaded config
+    hashref as a JSON string.
+
+    The output from this function can be loaded into the web interface at
+    https://xkpasswd.net (using the load/save tab).
+
+    ->config_as_string()
+        my $config_string = $hsxkpasswd_instance->config_as_string();
+    
+    This function returns the content of the instance's loaded config
+    hashref as a scalar string.
+
+    ->dictionary()
+        my $dictionary_clone = $hsxkpasswd_instance->dictionary();
+        $hsxkpasswd_instance->dictionary($dictionary_instance);
+        $hsxkpasswd_instance->dictionary($array_ref);
+        $hsxkpasswd_instance->dictionary('sample_dict_EN.txt');
+        $hsxkpasswd_instance->dictionary('sample_dict_EN.txt', 'Latin1');
+    
+    When called with no arguments this function returns a clone of the
+    currently loaded dictionary which will be an instance of a class that
+    extends `Crypt::HSXKPasswd::Dictionary'.
+
+    To load a new dictionary into an instance, call this function with
+    arguments. The first argument argument can be an instance of a class
+    that extends `Crypt::HSXKPasswd::Dictionary', a reference to an array of
+    words, or the path to a dictionary file. If either an array reference or
+    a file path are passed, they will be used to instantiate an instance of
+    the class `Crypt::HSXKPasswd::Dictionary::Basic', and that new instance
+    will then be loaded into the object. If a file path is passed, it will
+    be assumed to be UTF-8 encoded. If not, an optional second argument can
+    be passed to specify the file's encoding.
+
+    ->password()
+        my $password = $hsxkpasswd_instance->password();
+    
+    This function generates a random password based on the instance's loaded
+    config and returns it as a scalar. The function takes no arguments.
+
+    The function croaks if there is an error generating the password. The
+    most likely cause of and error is the random number generation,
+    particularly if the loaded random generation function relies on a cloud
+    service or a non-standard library.
+
+    ->passwords()
+        my @passwords = $hsxkpasswd_instance->passwords(10);
+    
+    This function generates a number of passwords and returns them all as an
+    array.
+
+    The function uses `password()' to generate the passwords, and hence will
+    croak if there is an error generating any of the requested passwords.
+
+    ->passwords_json()
+        my $json_string = $hsxkpasswd_instance->passwords_json(10);
+    
+    This function generates a number of passwords and returns them and the
+    instance's entropy stats as a JSON string representing a hashref
+    containing an array of passwords indexed by `passwords', and a hashref
+    of entropy stats indexed by `stats'. The stats hashref itself is indexed
+    by: `password_entropy_blind', `password_permutations_blind',
+    `password_entropy_blind_min', `password_entropy_blind_max',
+    `password_permutations_blind_max', `password_entropy_seen' &
+    `password_permutations_seen'.
+
+    The function uses `passwords()' to generate the passwords, and hence
+    will croak if there is an error generating any of the requested
+    passwords.
+
+    ->rng()
+        my $rng_instance = $hsxkpasswd_instance->rng();
+        $hsxkpasswd_instance->rng($rng_instance);
+    
+    When called with no arguments this function returns currently loaded
+    Random Number Generator (RNG) which will be an instance of a class that
+    extends `Crypt::HSXKPasswd::RNG'.
+
+    To load a new RNG into an instance, call this function with a single
+    argument, an instance of a class that extends `Crypt::HSXKPasswd::RNG'.
+
+    ->stats()
+        my %stats = $hsxkpasswd_instance->stats();
+    
+    This function generates a hash containing stats about the instance
+    indexed by the following keys:
+
+    *   `dictionary_contains_accents' - 1 if the filtered word list contains
+        accented letters, 0 otherwise.
+
+    *   `dictionary_filter_length_min' & `dictionary_filter_length_max' -
+        the minimum and maximum word lengths allowed by the dictionary
+        filter (defined by config keys `word_length_min' and
+        `word_length_max')
+
+    *   `dictionary_source' - the source of the word list loaded into the
+        instance.
+
+    *   `dictionary_words_filtered' - the number of words loaded from the
+        dictionary file that meet the criteria defined by the loaded config.
+
+    *   `dictionary_words_percent_available' - the percentage of the words
+        in the dictionary file that are available for use with the loaded
+        config.
+
+    *   `dictionary_words_total' - the total number of words loaded from the
+        dictionary file.
+
+    *   `password_entropy_blind_min' - the entropy (in bits) of the shortest
+        password the loaded config can generate from the point of view of a
+        brute-force attacker.
+
+    *   `password_entropy_blind_max' - the entropy (in bits) of the longest
+        password the loaded config can generate from the point of view of a
+        brute-force attacker.
+
+    *   `password_entropy_blind' - the entropy (in bits) of the average
+        length of passwords the loaded config can generate from the point of
+        view of a brute-force attacker.
+
+    *   `password_entropy_seen' - the entropy (in bits) of passwords
+        generated by the instance assuming the dictionary and config are
+        known to the attacker.
+
+    *   `password_length_min' - the minimum length of passwords generated by
+        the loaded config.
+
+    *   `password_length_max' - the maximum length of passwords generated by
+        the loaded config.
+
+    *   `password_permutations_blind_min' - the number of permutations a
+        brute-force attacker would have to try to be sure of cracking the
+        shortest possible passwords generated by this instance. Because this
+        number can be very big, it's returned as a `Math::BigInt' object.
+
+    *   `password_permutations_blind_max' - the number of permutations a
+        brute-force attacker would have to try to be sure of cracking the
+        longest possible passwords generated by this instance. Because this
+        number can be very big, it's returned as a `Math::BigInt' object.
+
+    *   `password_permutations_blind' - the number of permutations a
+        brute-force attacker would have to try to be sure of cracking an
+        average length password generated by this instance. Because this
+        number can be very big, it's returned as a `Math::BigInt' object.
+
+    *   `password_permutations_seen' - the number of permutations an
+        attacker with a copy of the dictionary and config would need to try
+        to be sure of cracking a password generated by this instance.
+        Because this number can be very big, it's returned as a
+        `Math::BigInt' object.
+
+    *   `passwords_generated' - the number of passwords this instance has
+        generated.
+
+    *   `password_random_numbers_required' - the number of random numbers
+        needed to generate a single password using the loaded config.
+
+    *   `randomnumbers_cached' - the number of random numbers currently
+        cached within the instance.
+
+    *   `randomnumbers_cache_increment' - the number of random numbers
+        generated at once to replenish the cache when it's empty.
+
+    *   `randomnumbers_source' - the class used by the instance to generate
+        random numbers.
+
+    ->status()
+        print $hsxkpasswd_instance->status();
+    
+    Generates a string detailing the internal status of the instance. Below
+    is a sample status string:
+
+        *DICTIONARY*
+        Source: Crypt::HSXKPasswd::Dictionary::EN
+        # words: 1425
+        # words of valid length: 1194 (84%)
+    
+        *CONFIG*
+        case_transform: 'ALTERNATE'
+        num_words: '3'
+        padding_character: 'RANDOM'
+        padding_characters_after: '2'
+        padding_characters_before: '2'
+        padding_digits_after: '2'
+        padding_digits_before: '2'
+        padding_type: 'FIXED'
+        separator_alphabet: ['!', '$', '%', '&', '*', '+', '-', '.', '/', ':', ';', '=', '?', '@', '^', '_', '|', '~']
+        separator_character: 'RANDOM'
+        symbol_alphabet: ['!', '$', '%', '&', '*', '+', '-', '.', '/', ':', ';', '=', '?', '@', '^', '_', '|', '~']
+        word_length_max: '8'
+        word_length_min: '4'
+    
+        *RANDOM NUMBER CACHE*
+        Random Number Generator: Crypt::HSXKPasswd::RNG::Basic
+        # in cache: 0
+    
+        *PASSWORD STATISTICS*
+        Password length: between 24 & 36
+        Permutations (brute-force): between 2.91x10^47 & 1.57x10^71 (average 2.14x10^59)
+        Permutations (given dictionary & config): 5.51x10^15
+        Entropy (Brute-Force): between 157bits and 236bits (average 197bits)
+        Entropy (given dictionary & config): 52bits
+        # Random Numbers needed per-password: 9
+        Passwords Generated: 0
+
+    ->update_config()
+        $hsxkpasswd_instance->update_config({separator_character => '+'});
+    
+    The function updates the config within an HSXKPasswd instance. A hashref
+    with the config options to be changed must be passed. The function
+    returns a reference to the instance to enable function chaining. The
+    function will croak if the updated config would be invalid in some way.
+    Note that if this happens the running config will not have been altered
+    in any way.
+
+  CLASS METHODS
+    NOTE - All class methods must be invoked via the package name, or they
+    will croak.
+
+    clone_config()
+        my $clone = Crypt::HSXKPasswd->clone_config($config);
+    
+    This function must be passed a valid config hashref as the first
+    argument or it will croak. The function returns a hashref.
+
+    config_key_definition()
+        my %key_definition = Crypt::HSXKPasswd->config_key_definition($key_name);
+    
+    A function to return the definition for a config key. The definition is
+    returned as a hash indexed by the following keys:
+
+    *   `required' - 1 if the key is a required key, and 0 otherwise.
+
+    *   `type' - a `Type::Tiny' object representing the valid data type for
+        the key.
+
+    *   `expects' - an English description of valid values for the key.
+
+    config_key_definitions()
+        my %key_definitions = Crypt::HSXKPasswd->config_key_definitions();
+    
+    A function to return definitions for all defined config keys as a hash
+    indexed by config key names. Each definition is represented as a hash
+    with the same keys as the hashes returned by the function
+    `config_key_definition()'.
+
+    config_stats()
+        my %stats = Crypt::HSXKPasswd->config_stats($config);
+        my %stats = Crypt::HSXKPasswd->config_stats(
+            $config,
+            suppress_warnings => 1,
+        );
+    
+    This function requires one argument, a valid config hashref. It returns
+    a hash of statistics about a given configuration. The hash is indexed by
+    the following:
+
+    *   `length_min' - the minimum length a password generated with the
+        given config could be.
+
+    *   `length_max' - the maximum length a password generated with the
+        given config could be. (see caveat below)
+
+    *   `random_numbers_required' - the amount of random numbers needed to
+        generate a password using the given config.
+
+    There is one scenario in which the calculated maximum length will not be
+    reliably accurate, and that's when a character substitution with a
+    length greater than 1 is specified, and `padding_type' is not set to
+    `ADAPTIVE'. If the config passed contains such a character substitution,
+    the length will be calculated ignoring the possibility that one or more
+    extra characters could be introduced depending on how many, if any, of
+    the long substitutions get triggered by the randomly chosen words. If
+    this happens the function will also carp with a warning. Such warnings
+    can be suppressed by passing an optional named argument
+    `suppress_warnings' with the value `1'.
+
+    config_to_json()
+        my $config_json_string = Crypt::HSXKPasswd->config_to_json($config);
+    
+    This function returns a JSON representation of the passed config hashref
+    as a scalar string.
+
+    The function must be passed a valid config hashref or it will croak.
+
+    config_to_string()
+        my $config_string = Crypt::HSXKPasswd->config_to_string($config);
+    
+    This function returns the content of the passed config hashref as a
+    scalar string. The function must be passed a valid config hashref or it
+    will croak.
+
+    default_config()
+        my $config = Crypt::HSXKPasswd->default_config();
+
+    This function returns a hashref containing a config with default values.
+
+    This function can optionally be called with a single argument, a hashref
+    containing keys with values to override the defaults with.
+
+        my $config = Crypt::HSXKPasswd->default_config({num_words => 3});
+    
+    When overrides are present, the function will carp if an invalid key or
+    value is passed, and croak if the resulting merged config is invalid.
+
+    This function is a shortcut for `preset_config()', and the two examples
+    above are equivalent to the following:
+
+        my $config = Crypt::HSXKPasswd->preset_config('DEFAULT');
+        my $config = Crypt::HSXKPasswd->preset_config('DEFAULT', {num_words => 3});
+
+    defined_config_keys()
+        my @config_key_names = Crypt::HSXKPasswd->defined_config_keys();
+    
+    This function returns the list of valid config key names as an array of
+    strings.
+
+    defined_presets()
+        my @preset_names = Crypt::HSXKPasswd->defined_presets();
+    
+    This function returns the list of defined preset names as an array of
+    strings.
+
+    distil_to_config_keys()
+        my $dist_hashref = Crypt::HSXKPasswd->distil_to_config_keys($hashref);
+    
+    This function takes a hashref as an argument, and returns a deep clone
+    of that hashref containing only valid config keys with valid values.
+
+    By default the function silently drops keys that are not valid config
+    keys, but issues a warning when dropping a key that is a valid config
+    key, but contains an invalid value. The function can also issue warnings
+    when dropping keys that are not valid config keys.
+
+    The warnings can be controlled with a pair of optional named arguments
+    that can be added as a second argument:
+
+        # suppress all warnings
+        my $dist_hashref = Crypt::HSXKPasswd->distil_to_config_keys(
+            $hashref,
+            suppress_warnings => 1,
+        );
+    
+        # emit warnings when dropping invalidly named keys
+        my $dist_hashref = Crypt::HSXKPasswd->distil_to_config_keys(
+            $hashref,
+            warn_invalid_key_names => 1,
+        );
+
+    distil_to_symbol_alphabet()
+        my @unique_syms = Crypt::HSXKPasswd->distil_to_symbol_alphabet($arrayref);
+        my @unique_syms = Crypt::HSXKPasswd->distil_to_symbol_alphabet(
+            $arrayref,
+            warn => 1,
+        );
+    
+    This function takes reference to an array of strings and returns a new
+    array containing all the valid symbols from the referenced array. The
+    valid symbols are de-duplicated before being returned.
+
+    By default the function silently skips over strings that are not valid
+    symbols. The function can be made issue warnings each time a string is
+    skipped by passing a named argument `warn' with a value of `1' (`0' can
+    also be passed to explicitly disable warnings).
+
+    distil_to_words()
+        my @valid_unique_words = Crypt::HSXKPasswd->distil_to_words($arrayref);
+        my @valid_unique_words = Crypt::HSXKPasswd->distil_to_words(
+            $arrayref,
+            warn => 1,
+        );
+    
+    This function takes reference to an array of strings and returns a new
+    array containing all the valid words from the referenced array. The
+    valid words are de-duplicated before being returned.
+
+    By default the function silently skips over strings that are not valid
+    words. The function can be made issue warnings each time a string is
+    skipped by passing a named argument `warn' with a value of `1' (`0' can
+    also be passed to explicitly disable warnings).
+
+    is_valid_config()
+        # determine the validity
+        my $is_ok = Crypt::HSXKPasswd->is_valid_config($config);
+    
+        # assert the validity - will croak if the config is invalid
+        Crypt::HSXKPasswd->is_valid_config($config, croak => 1);
+    
+    This function must be passed a hashref to test as the first argument.
+    The function returns 1 if the passed config is valid, and 0 otherwise.
+
+    Optionally, a named argument `croak' can also be passed to control
+    whether or not the function should croak if the config is invalid. The
+    value of this named argument should be `1' or `0'.
+
+    When calling the function with `croak' set to `1', the message thrown by
+    croak will explain why the config is invalid.
+
+        use English qw( -no_match_vars );
+        eval{
+            Crypt::HSXKPasswd->is_valid_config($config, croak => 1);
+        }or do{
+            print "ERROR - config is invalid because: $EVAL_ERROR\n";
+        }
+    
+    module_config()
+        my $debug_val = Crypt::HSXKPasswd->module_config('DEBUG'); # getter
+        Crypt::HSXKPasswd->module_config('DEBUG', 1); # setter
+    
+    This function is used to access or alter the value of one of the module
+    configuration settings. The first function must always be a valid module
+    configuration key name. If no second argument is provided, the value
+    stored in the module configuration key will not be updated. To update
+    the stored value, pass a new value as a second argument. Regardless of
+    whether or not a second argument is passed, the value stored in the
+    module configuration key is always returned.
+
+    The function will croak if called with an invalid module configuration
+    key name, or passed an invalid new value.
+
+    For a list of the module configuration keys, see the MODULE
+    CONFIGURATION section of this document.
+
+    preset_config()
+        my $config = Crypt::HSXKPasswd->preset_config('XKCD');
+    
+    This function returns the config hashref for a given preset. See above
+    for the list of available presets.
+
+    The first argument this function accepts is the name of the desired
+    preset as a scalar. If an invalid name is passed, the function will
+    carp. If no preset is passed the preset `DEFAULT' is assumed.
+
+    This function can optionally accept a second argument, a hashref
+    containing keys with values to override the defaults with.
+
+        my $config = Crypt::HSXKPasswd->preset_config(
+            'XKCD',
+            {case_transform => 'INVERT'}
+        );
+    
+    When overrides are present, the function will carp if an invalid key or
+    value is passed, and croak if the resulting merged config is invalid.
+
+    preset_definition()
+        my %preset_def = Crypt::HSXKPasswd->preset_definition('XKCD');
+    
+    This function returns a hash defining a preset. The hash contains an
+    English description of the preset indexed be `description' and a config
+    hashref indexed by `config'.
+
+    The function expects to be called with one argument, a valid preset
+    name, but it can be called without arguments, in which case it will
+    return the definition for the preset c<DEFAULT>.
+
+    You can see all the defined presets in the PRESETS section of this
+    document, and you can get a list of valid preset names programatically
+    with the function `defined_presets()'.
+
+    preset_definitions()
+        my %preset_defs = Crypt::HSXKPasswd->preset_definitions();
+    
+    This function returns a hash of all defined presets indexed by preset
+    name. Each preset definition is a hash as returned by
+    `preset_definition()'.
+
+    This function does not take any arguments.
+
+    presets_json()
+        my $json_string = Crypt::HSXKPasswd->presets_json();
+    
+    This function returns a JSON string representing all the defined
+    configs, including their descriptions.
+
+    The returned JSON string represents a hashref indexed by three keys:
+    `defined_keys' contains an array of preset identifiers, `presets'
+    contains the preset configs indexed by reset identifier, and
+    `preset_descriptions' contains a hashref of descriptions indexed by
+    preset identifiers.
+
+    preset_description()
+        my $description = Crypt::HSXKPasswd->preset_description('XKCD');
+    
+    This function returns the description for a given preset. See above for
+    the list of available presets.
+
+    The first argument this function accepts is the name of the desired
+    preset as a scalar. If an invalid name is passed, the function will
+    carp. If no preset is passed the preset `DEFAULT' is assumed.
+
+    presets_to_string()
+        print Crypt::HSXKPasswd->presets_to_string();
+    
+    This function returns a string containing a description of each defined
+    preset and the configs associated with the presets.
+
+  COMMANDLINE INTERFACE
+    The module ships with a commandline interface to this library, simply
+    called `hsxkpasswd'.
+
+    This interface allows for the generation of multiple passwords at a
+    time, the use of presets and preset overrides, the use of custom
+    password generator configurations, the use of custom word sources, and
+    the use of custom random number generators.
+
+    Both preset overrides and password generator configurations must be
+    specified in JSON format.
+
+    Examples
+    Generate a single password using all the default settings:
+
+        hsxkpasswd
+    
+    Generate five passwords using the default settings:
+
+        hsxkpasswd 5
+    
+    Generate five passwords using the `XKCD' preset:
+
+        hsxkpasswd -p XKCD 5
+    
+    Generate five passwords using the `XKCD' preset with an overridden
+    password generator configuration key:
+
+        hsxkpasswd -p XKCD -o '{"separator_character" : "*"}' 5
+
+    Generate five passwords using a custom password generator configuration
+    stored in a text file in JSON format:
+
+        hsxkpasswd -c my_config.json
+    
+    Further Reading
+    The examples above are just a sample of what the command can do, for
+    complete documentation, run the command with the -h flag:
+
+        hsxkpasswd -h
+    
+    If you are new to JSON, you may find the following links useful:
+
+    *   JSON on Wikipedia - http://en.wikipedia.org/wiki/JSON
+
+    *   A free online JSON validator -
+        http://jsonformatter.curiousconcept.com
+
+    *   A JSON tutorial from W3Schools - http://www.w3schools.com/json/
+
+  ENTROPY CHECKING
+    For security reasons, this module's default behaviour is to warn (using
+    `carp()') when ever the loaded combination of word source and
+    configuration would result in low-entropy passwords. When the
+    constructor is invoked, or when an instance's the word source or config
+    are altered (using `dictionary()' or `config()'), the entropy is
+    re-calculated and re-checked against the defined minima.
+
+    Entropy is calculated and checked for two scenarios. Firstly, for the
+    best-case scenario, when an attacker has no prior knowledge about the
+    password, and must resort to a brute-force attack. And secondly, for the
+    worst-case scenario, when the attacker is assumed to know that this
+    module was used to generate the password, and, that the attacker has a
+    copy of the word source and config settings used to generate the
+    password.
+
+    Entropy checking is controlled via three module configuration variables
+    (which can be accessed and updated using the function
+    `module_config()'):
+
+    *   `ENTROPY_MIN_BLIND' - the minimum acceptable entropy in bits for a
+        brute-force attack. The default value is 78bits, the equivalent to a
+        12 character password consisting of mixed-case letters, digits, and
+        symbols.
+
+    *   `ENTROPY_MIN_SEEN' - the minimum acceptable entropy in bits for a
+        worst-case scenario (where the word source and config are known).
+        The default value is 52bits, equivalent to an 8 character password
+        consisting of mixed-case letters, digits, and symbols.
+
+    *   `ENTROPY_WARNINGS' - this variable can be used to control the
+        emission of entropy warnings. The following values are valid:
+
+        *   `ALL' - all entropy warnings are emitted. This is the default
+            value.
+
+        *   `BLIND' - only warnings for the best-case scenario are emitted.
+            I.e. warnings for the worst-case scenario (attacker has full
+            knowledge) are suppressed.
+
+        *   `NONE' - all entropy warnings are suppressed.
+
+    Caveats
+    The entropy calculations make some assumptions which may in some cases
+    lead to the results being inaccurate. In general, an attempt has been
+    made to always round down, meaning that in reality the entropy of the
+    produced passwords may be higher than the values calculated by the
+    package.
+
+    When calculating the entropy for brute force attacks on configurations
+    that can result in variable length passwords, the shortest possible
+    password is assumed.
+
+    When calculating the entropy for brute force attacks on configurations
+    that contain at least one symbol, it is assumed that an attacker would
+    have to brute-force-check 33 symbols. This is the same value used by
+    Steve Gibson's *Password Haystacks* calculator
+    (https://www.grc.com/haystack.htm).
+
+    When calculating the entropy for worst-case attacks on configurations
+    that contain symbol substitutions where the replacement is more than 1
+    character long the possible extra length is ignored.
+
+  WORD SOURCES (DICTIONARIES)
+    The abstract class `Crypt::HSXKPasswd::Dictionary' acts as a base class
+    for sources of words for use by this module. Word sources should extend
+    this base class and implement the function `word_list()', which should
+    return an array of words.
+
+    In order to produce secure passwords it's important to use a word source
+    that contains a large selection of words with a good mix of different
+    lengths of words.
+
+    The module ships with a number of pre-defined word sources:
+
+    `Crypt::HSXKPasswd::Dictionary::DE'
+    A German word list based on the GPL-licensed German dictionary for
+    WinEdit by Juergen Vierheilig.
+
+    Note: This module is licensed under the GPL, not the BSD license used
+    for the majority of this project.
+
+    `Crypt::HSXKPasswd::Dictionary::EN'
+    A default word list consisting of English words and place names.
+
+    `Crypt::HSXKPasswd::Dictionary::ES'
+    A Spanish word list based on the BSD-licensed Spanish dictionary for
+    WinEdit by Juan L. Varona from the Universidad de La Rioja.
+
+    `Crypt::HSXKPasswd::Dictionary::FR'
+    A French word list based on the GPL-licensed French dictionary for
+    WinEdit.
+
+    Note: This module is licensed under GPL V2, not the BSD license used for
+    the majority of this project.
+
+    `Crypt::HSXKPasswd::Dictionary::IT'
+    An Italian word list based on the free-for-non-commerical-use Italian
+    dictionary for WinEdit by Karl Koeller.
+
+    Note: This module is licensed under GPL V2, not the BSD license used for
+    the majority of this project.
+
+    `Crypt::HSXKPasswd::Dictionary::NL'
+    A Dutch/Flemish word list based on the GPL-licensed Dutch dictionary for
+    WinEdit.
+
+    Note: This module is licensed under GPL V2, not the BSD license used for
+    the majority of this project.
+
+    `Crypt::HSXKPasswd::Dictionary::PT'
+    A Portuguese word list based on the GPL-licensed Portuguese dictionary
+    for WinEdit compiled by Bernhard Enders (building on work by Raimundo
+    Santos Moura & Ricardo Ueda Karpischek).
+
+    Note: This module is licensed under GPL V2.1, not the BSD license used
+    for the majority of this project.
+
+    `Crypt::HSXKPasswd::Dictionary::System'
+    This class tries to find and use a Unix words file on the system.
+
+    The constructor croaks if no system words file can be found.
+
+    Usage
+        my $word_source = Crypt::HSXKPasswd::Dictionary::System->new();
+
+    `Crypt::HSXKPasswd::Dictionary::Basic'
+    This class can be initialised from a words file, or from an array ref
+    containing words.
+
+    Usage
+        my $word_source = Crypt::HSXKPasswd::Dictionary::Basic->new('file_path');
+        my $word_source = Crypt::HSXKPasswd::Dictionary::Basic->new(
+            'file_path',
+            'Latin1'
+        );
+        my $word_source = Crypt::HSXKPasswd::Dictionary::Basic->new($array_ref);
+
+    The rules for the formatting of dictionary files are simple. Dictionary
+    files must contain one word per line. Words shorter than four letters
+    will be ignored, as will all lines starting with the # symbol. Files are
+    assumed to be UTF-8 encoded, but an optional second argument can be
+    passed specifying a different file encoding.
+
+    This format is the same as that of the standard Unix Words file, usually
+    found at `/usr/share/dict/words' on Unix and Linux operating systems
+    (including OS X).
+
+  RANDOM NUMBER SOURCES
+    In order to minimise the number of non-standard modules this module
+    requires, the default source of randomness is Perl's built-in `rand()'
+    function. This provides a reasonable level of randomness, and should
+    suffice for most users, however, some users will prefer to make use of
+    one of the many advanced randomisation modules in CPAN, or, reach out to
+    a web service like http://random.org for their random numbers. To
+    facilitate both of these options, this module uses a cache of
+    randomness, and provides an abstract Random Number Generator (RNG) class
+    that can be extended.
+
+    The module can use an instance of any class that extends
+    `Crypt::HSXKPasswd::RNG' as it's source of randomness. Custom RNG
+    classes must implement the method `random_numbers()' which will be
+    invoked on an instance of the class and passed one argument, the number
+    of random numbers required to generate a single password. The function
+    must return an array of random numbers between 0 and 1. The number of
+    random numbers returned is entirely up to the module to decide. The
+    number required for a single password is passed purely as a guide. The
+    function must always return at least one random number.
+
+    The module ships with five standard RNGs (described below).
+
+    By default, the module will try to use one of the following four RNGs,
+    listed from most to least preferred, depending on what is available on
+    the system:
+
+    1   `Crypt::HSXKPasswd::RNG::Math_Random_Secure' (only available if
+        `Math::Random::Secure' is installed on the system).
+
+    2   `Crypt::HSXKPasswd::RNG::Data_Entropy' (only available if
+        `Data::Entropy::Algorithms' is installed on the system).
+
+    3   `Crypt::HSXKPasswd::RNG::DevUrandom' (only available on Linux/Unix
+        systems with a `/dev/urandom').
+
+    4   `Crypt::HSXKPasswd::RNG::Basic' (available on all systems because it
+        uses Perl's built-in `rand()' function).
+
+    If the constructor is called without specifying an RNG, and if the only
+    available RNG is `Crypt::HSXKPasswd::RNG::Basic', a warning will be
+    thrown suggesting installing `Math::Random::Secure' or
+    `Data::Entropy::Algorithms'.
+
+    The module also ships with a fifth RNG,
+    `Crypt::HSXKPasswd::RNG::RandomDotOrg', but this one must be explicitly
+    used, the constructor will never used it by default. As its name
+    suggests, this class uses http://Random.Org/'s HTTP API to generate
+    random numbers.
+
+    To explicitly use any particular RNG, create an instance of it, and
+    either pass that instance to the constructor with the named argument
+    `rng', or, set the RNG after instantiating the object using the `rng()'
+    function.
+
+    Crypt::HSXKPasswd::RNG::Math_Random_Secure
+        my $rng = Crypt::HSXKPasswd::RNG::Math_Random_Secure->new();
+
+    This is the preferred RNG because it is both fast and secure, but, it
+    requires the non-standard module `Math::Random::Secure'
+    (http://search.cpan.org/perldoc?Math%3A%3ARandom%3A%3ASecure) be
+    installed.
+
+    Crypt::HSXKPasswd::RNG::Data_Entropy
+        my $rng = Crypt::HSXKPasswd::RNG::Data_Entropy->new();
+
+    This RNG is secure, but it is quite slow (about six times slower than
+    `Crypt::HSXKPasswd::RNG::Math_Random_Secure'), and it requires the
+    non-standard module `Data::Entropy::Algorithms'
+    (http://search.cpan.org/perldoc?Data%3A%3AEntropy%3A%3AAlgorithms) be
+    installed.
+
+    Crypt::HSXKPasswd::RNG::DevUrandom
+        my $rng = Crypt::HSXKPasswd::RNG::DevUrandom->new();
+    
+    This RNG is secure and relatively fast (faster than
+    `Crypt::HSXKPasswd::RNG::Data_Entropy' but slower than
+    `Crypt::HSXKPasswd::RNG::Math_Random_Secure'), but is only available on
+    Linux/Unix systems with a `/dev/urandom' special file.
+
+    Crypt::HSXKPasswd::RNG::Basic
+        my $rng = Crypt::HSXKPasswd::RNG::Basic->new();
+    
+    This RNG uses Perl's built-in `rand()' function as its source of
+    randomness, and this is sub-optimal. The Perl docs warn that `rand()' is
+    not a particularly good source of random numbers, and advises against
+    its use for cryptography.
+
+    This RNG provides a base-line, and should only be used if none of the
+    better RNGs are available. While it is sub-optimal, it will still
+    generate passwords with sufficient entropy in most situations.
+    Ultimately, even using this imperfect RNG, this module will still
+    produce passwords that are much better than those produced by the human
+    imagination!
+
+    Crypt::HSXKPasswd::RNG::RandomDotOrg
+        my $rng = Crypt::HSXKPasswd::RNG::RandomDotOrg->new('my.address@my.dom');
+        my $rng = Crypt::HSXKPasswd::RNG::RandomDotOrg->new('my.address@my.dom',
+            timeout => 180,
+            num_passwords => 3,
+        );
+
+    This RNG serves as a usable example of an RNG that queries a web
+    service. As its name suggests, this class uses http://Random.Org/'s HTTP
+    API to generate random numbers.
+
+    In order to comply with Random.Org's client guidelines
+    (https://www.random.org/clients/), this module requires that a valid
+    email address be passed as the first argument.
+
+    The client guidelines also request that clients use long timeouts, and
+    batch their requests. They prefer to be asked for more number less
+    frequently than less numbers more frequently. For this reason the
+    class's default behaviour is to use a timeout of 180 seconds, and to
+    request enough random numbers to generate three passwords at a time.
+
+    These defaults can be overridden by passing named arguments to the
+    constructor after the email address. The following named arguments are
+    supported:
+
+    *   `timeout' - the timeout to use when making HTTP requests to
+        Random.Org in seconds (the default is 180).
+
+    *   `num_passwords' - the number of password generations to fetch random
+        numbers for per request from Random.org. This value is in effect a
+        multiplier for the value passed to the `random_numbers()' function
+        by `Crypt::HSXKPasswd'.
+
+        `num_absolute' - the absolute number of random numbers to fetch per
+        request to Random.Org. This argument takes precedence over
+        `num_passwords'.
+
+    `num_passwords' and `num_absolute' should not be used together, but if
+    they are, `num_absolute' use used, and `num_passwords' is ignored.
+
+    This class requires a number of modules not used by any other classes
+    under `Crypt::HSXKPasswd', and not listed in that module's requirements.
+    If all of the following modules are not installed, the constructor will
+    croak:
+
+    *   `Email::Valid'
+
+    *   `LWP::UserAgent'
+
+    *   `Mozilla::CA'
+
+    *   `URI'
+
+DIAGNOSTICS
+    By default this module does all of it's error notification via the
+    functions `carp()', `croak()', and `confess()' from the `Carp' module.
+    Optionally, all error messages can also be printed to a stream. To
+    enable the printing of messages, set the `LOG_ERRORS' module
+    configuration variable to `1'. All error messages will then be printed
+    to the stream defined by the module configuration variable `LOG_STREAM',
+    which is set to `STDERR' by default.
+
+    Ordinarily this module produces very little output. To enable more
+    verbose output the module configuration variable `DEBUG' can be set to
+    `1'. Debug message are printed to the stream specified by the module
+    variable `LOG_STREAM'.
+
+    This module produces output at three severity levels:
+
+    *   `DEBUG' - this output is completely suppressed unless the module
+        configuration variable `DEBUG' is set to `1'. All debug messages are
+        printed to the stream defined in the module configuration variable
+        `LOG_STREAM' (regardless of the the value of the module
+        configuration variable `LOG_ERRORS').
+
+    *   `WARNING' - warning messages are always thrown with `carp()', and
+        also printed to the stream specified by the module configuration
+        variable `LOG_STREAM' if the module configuration variable
+        `LOG_ERRORS' is set to `1'.
+
+    *   `ERROR' - error messages are usually thrown with `croak()', but will
+        be thrown with `confess()' if the module configuration variable
+        `DEBUG' is set to `1'. If the module configuration variable
+        `LOG_ERRORS' is set to `1' errors are also printed to the stream
+        defined by the module configuration variable `LOG_STREAM', including
+        a stack trace if the module configuration variable `DEBUG' is set to
+        `1' and the module `Devel::StackTrace' is installed.
+
+    The value stored in a module configuration variable can be accessed and
+    updated using the function `module_config()'.
+
+CONFIGURATION AND ENVIRONMENT
+    This module does not currently support configuration files, nor does it
+    currently interact with the environment. It may do so in future
+    versions.
+
+DEPENDENCIES
+    This module requires the following Perl modules:
+
+    *   `Carp' - http://search.cpan.org/perldoc?Carp
+
+    *   `Clone' - http://search.cpan.org/perldoc?Clone
+
+    *   `DateTime' - http://search.cpan.org/perldoc?DateTime
+
+    *   `English' - http://search.cpan.org/perldoc?English
+
+    *   `Fatal' - http://search.cpan.org/perldoc?Fatal
+
+    *   `File::HomeDir' - http://search.cpan.org/perldoc?File%3A%3AHomeDir
+
+    *   `Getopt::Long' - http://search.cpan.org/perldoc?Getopt%3A%3ALong
+
+    *   `JSON' - http://search.cpan.org/perldoc?JSON
+
+    *   `List::MoreUtils' -
+        http://search.cpan.org/perldoc?List%3A%3AMoreUtils
+
+    *   `Math::BigInt' - http://search.cpan.org/perldoc?Math%3A%3ABigInt
+
+    *   `Math::Round' - http://search.cpan.org/perldoc?Math%3A%3ARound
+
+    *   `Module::Load' - http://search.cpan.org/perldoc?Module%3A%3ALoad
+
+    *   `Pod::Usage' - http://search.cpan.org/perldoc?Pod%3A%3AUsage
+
+    *   `Readonly' - http://search.cpan.org/perldoc?Readonly
+
+    *   `Scalar::Util' - http://search.cpan.org/perldoc?Scalar%3A%3AUtil
+
+    *   `strict' - http://search.cpan.org/perldoc?strict
+
+    *   `Text::Unidecode' -
+        http://search.cpan.org/perldoc?Text%3A%3AUnidecode
+
+    *   `Type::Library' - http://search.cpan.org/perldoc?Type%3A%3ALibrary
+
+    *   `Type::Params' - http://search.cpan.org/perldoc?Type%3A%3AParams
+
+    *   `Type::Tiny' - http://search.cpan.org/perldoc?Type%3A%3ATiny
+
+    *   `Types::Standard' -
+        http://search.cpan.org/perldoc?Types%3A%3AStandard
+
+    *   `warnings' - http://search.cpan.org/perldoc?warnings
+
+    The module can also optionally use the following Perl modules:
+
+    *   `Data::Entropy::Algorithms' -
+        http://search.cpan.org/perldoc?Data%3A%3AEntropy%3A%3AAlgorithms
+
+        Used by the RNG class `Crypt::HSXKPasswd::RNG::Data_Entropy'.
+
+    *   `Devel::StackTrace' -
+        http://search.cpan.org/perldoc?Devel%3A%3AStackTrace
+
+        Used for printing stack traces with error messages if
+        `$XKPasswd::DEBUG' and `$XKPasswd::LOG_ERRORS' both evaluate to
+        true. If the module is not installed the stack traces will be
+        omitted from the log messages.
+
+    *   `Email::Valid' - http://search.cpan.org/perldoc?Email%3A%3AValid
+
+        Used by the Random.Org RNG class
+        `Crypt::HSXKPasswd::RNG::RandomDotOrg'.
+
+    *   `LWP::UserAgent' - http://search.cpan.org/perldoc?LWP%3A%3AUserAgent
+
+        Used by the Random.Org RNG class
+        `Crypt::HSXKPasswd::RNG::RandomDotOrg'.
+
+    *   `Math::Random::Secure' -
+        http://search.cpan.org/perldoc?Math%3A%3ARandom%3A%3ASecure
+
+        Used by the RNG class `Crypt::HSXKPasswd::RNG::Math_Random_Secure'.
+
+    *   `Mozilla::CA' - http://search.cpan.org/perldoc?Mozilla%3A%3ACA
+
+        Indirectly required by the Random.Org RNG class
+        `Crypt::HSXKPasswd::RNG::RandomDotOrg' because without it
+        `LWP::UserAgent' can't use HTTPS, and the Random.Org API uses HTTPS.
+
+    *   `URI' - http://search.cpan.org/perldoc?URI
+
+        Used by the Random.Org RNG class
+        `Crypt::HSXKPasswd::RNG::RandomDotOrg'.
+
+INCOMPATIBILITIES
+    This module has no known incompatibilities.
+
+BUGS AND LIMITATIONS
+    There are no known bugs in this module.
+
+    Please report any bugs you may find on the module's GitHub page:
+    https://github.com/bbusschots/xkpasswd.pm.
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2014-15, Bart Busschots T/A Bartificer Web Solutions All
+    rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    1.  Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2.  Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    The following components of this package are covered by the more
+    restrictive GPL V2 license https://www.gnu.org/licenses/gpl-2.0.html:
+
+    *   The `share/sample_dict_DE.txt' text file.
+
+    *   The `Crypt::HSXKPasswd::Dictionary::DE' Perl module.
+
+    *   The `share/sample_dict_FR.txt' text file.
+
+    *   The `Crypt::HSXKPasswd::Dictionary::FR' Perl module.
+
+    *   The `share/sample_dict_IT.txt' text file.
+
+    *   The `Crypt::HSXKPasswd::Dictionary::IT' Perl module.
+
+    *   The `share/sample_dict_NL.txt' text file.
+
+    *   The `Crypt::HSXKPasswd::Dictionary::NL' Perl module.
+
+    *   The `share/sample_dict_PT.txt' text file.
+
+    *   The `Crypt::HSXKPasswd::Dictionary::PT' Perl module.
+
+AUTHOR
+    Bart Busschots (mailto:bart@bartificer.net)
+

@@ -1,0 +1,90 @@
+Content-type: text/html
+
+<html>
+<head>
+<title>TEST</title>
+<link href="fbstyle.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // fullname: standard text, hidden, password, or textarea box
+    var fullname = form.elements['fullname'].value;
+    if (fullname == null || fullname === "") {
+        alertstr += '- Invalid entry for the "Full Name" field\n';
+        invalid++;
+        invalid_fields.push('fullname');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+</head>
+<body>
+<h3>TEST</h3>
+<noscript><span class="fb_invalid">Please enable Javascript or use a newer browser.</span></noscript>
+<p>1 error(s) were encountered with your submission. Please correct the fields <span class="fb_invalid">highlighted</span> below.</p>
+<form action="TEST" class="fb_form" method="post" onsubmit="return validate(this);">
+<div class="fb_state"><input id="_submitted" name="_submitted" type="hidden" value="1" /></div>
+<table class="fb">
+<tr>
+  <td class="fb_label"><span class="fb_required">Full Name</span></td>
+  <td class="fb_field"><input class="fb_input" id="fullname" name="fullname" type="text" /></td>
+</tr>
+<tr>
+  <td class="fb_label">Sex</td>
+  <td class="fb_field"><table class="fb_columns">
+  <tr>
+    <td><input class="fb_radio" id="gender_M" name="gender" type="radio" value="M" /></td>
+    <td><label class="fb_option" for="gender_M">M</label></td>
+  </tr>
+  <tr>
+    <td><input class="fb_radio" id="gender_F" name="gender" type="radio" value="F" /></td>
+    <td><label class="fb_option" for="gender_F">F</label></td>
+  </tr>
+  </table> <span class="fb_comment">It's one or the other</span></td>
+</tr>
+<tr>
+  <td class="fb_label"><span class="fb_invalid">Favy Colour</span></td>
+  <td class="fb_field"><select class="fb_select" id="fav_color" name="fav_color">
+  <option value="">-select-</option>
+  <option value="Red">Red</option>
+  <option value="Green">Green</option>
+  <option value="Blue">Blue</option>
+  <option value="Orange">Orange</option>
+  <option value="Yellow">Yellow</option>
+  <option value="Purple">Purple</option>
+  </select> <span class="fb_message">Select an option from this list</span> <span class="fb_comment">Choose just one, even if you have more than one</span></td>
+</tr>
+<tr>
+  <td class="fb_label">Things you love</td>
+  <td class="fb_field"><table class="fb_columns">
+  <tr>
+    <td><input class="fb_checkbox" id="lover_Sex" name="lover" type="checkbox" value="Sex" /></td>
+    <td><label class="fb_option" for="lover_Sex">Sex</label></td>
+  </tr>
+  <tr>
+    <td><input class="fb_checkbox" id="lover_Drugs" name="lover" type="checkbox" value="Drugs" /></td>
+    <td><label class="fb_option" for="lover_Drugs">Drugs</label></td>
+  </tr>
+  <tr>
+    <td><input class="fb_checkbox" id="lover_Rock_Roll" name="lover" type="checkbox" value="Rock+Roll" /></td>
+    <td><label class="fb_option" for="lover_Rock_Roll">Rock+Roll</label></td>
+  </tr>
+  </table></td>
+</tr>
+<tr>
+  <td class="fb_submit" colspan="2"><input class="fb_button" id="_reset" name="_reset" type="reset" value="Showme" /><input class="fb_button" id="_submit" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Update" /><input class="fb_button" id="_submit_2" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Delete" /></td>
+</tr>
+</table>
+</form>
+</body>
+</html>

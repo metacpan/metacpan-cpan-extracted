@@ -1,0 +1,88 @@
+SYNOPSIS
+
+     use Config::IOD::Reader;
+     my $reader = Config::IOD::Reader->new(
+         # list of known attributes, with their default values
+         # default_section     => 'GLOBAL',
+         # enable_encoding     => 1,
+         # enable_quoting      => 1,
+         # enable_backet       => 1,
+         # enable_brace        => 1,
+         # allow_encodings     => undef, # or ['base64','json',...]
+         # disallow_encodings  => undef, # or ['base64','json',...]
+         # allow_directives    => undef, # or ['include','merge',...]
+         # disallow_directives => undef, # or ['include','merge',...]
+         # allow_bang_only     => 1,
+         # enable_expr         => 0,
+         # allow_duplicate_key => 1,
+         # ignore_unknown_directive => 0,
+     );
+     my $config_hash = $reader->read_file('config.iod');
+
+DESCRIPTION
+
+    This module reads IOD configuration files (IOD is an INI-like format
+    with more precise specification, some extra features, and 99%
+    compatible with typical INI format). It is a minimalist alternative to
+    the more fully-featured Config::IOD. It cannot write IOD files and is
+    optimized for low startup overhead.
+
+EXPRESSION
+
+    # INSERT_BLOCK: lib/Config/IOD/Base.pm expression
+
+ATTRIBUTES
+
+    # INSERT_BLOCK: lib/Config/IOD/Base.pm attributes
+
+METHODS
+
+ new(%attrs) => obj
+
+ $reader->read_file($filename[ , $callback ]) => hash
+
+    Read IOD configuration from a file. Die on errors.
+
+    See read_string for more information on $callback argument.
+
+ $reader->read_string($str[ , $callback ]) => hash
+
+    Read IOD configuration from a string. Die on errors.
+
+    $callback is an optional coderef argument that will be called during
+    various stages. It can be useful if you want more information
+    (especially ordering). It will be called with hash argument %args
+
+      * Found a directive line
+
+      Arguments passed: event (str, has the value of 'directive'), linum
+      (int, line number, starts from 1), line (str, raw line), directive
+      (str, directive name), cur_section (str, current section name), args
+      (array, directive arguments).
+
+      * Found a comment line
+
+      Arguments passed: event (str, 'comment'), linum, line, cur_section.
+
+      * Found a section line
+
+      Arguments passed: event (str, 'section'), linum, line, cur_section,
+      section (str, section name).
+
+      * Found a key line
+
+      Arguments passed: event (str, 'section'), linum, line, cur_section,
+      key (str, key name), val (any, value name, already decoded if
+      encoded), raw_val (str, raw value).
+
+    TODO: callback when there is merging.
+
+SEE ALSO
+
+    IOD - specification
+
+    Config::IOD - round-trip parser for reading as well as writing IOD
+    documents
+
+    IOD::Examples - sample documents
+

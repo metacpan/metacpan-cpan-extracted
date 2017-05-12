@@ -1,0 +1,9 @@
+---
+name: Basic Test 1
+scalar: foo
+array:
+    - foo
+    - bar
+    - baz
+hash:
+    foo: bar

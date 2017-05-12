@@ -1,0 +1,18 @@
+Revision history for Catalyst-Plugin-CDBI-Transaction
+
+0.03    12 Oct 2005
+        Bug fix: Depending on how many CDBI classes were returned by
+        $c->components, not all localizations of AutoCommit were being
+        restored after the coderef executed, thus effectively failing to
+        commit the entire transaction.
+        Added a test Catalyst application for actual tests of the plugin.
+        Small correction to the create() method in the SYNOPSIS section of the
+        documentation.
+0.02    14 Sep 2005
+        Bug fix.  Class::DBI model components don't always stringify to their
+        class names.  Used ref() to ensure we always get the CDBI class name
+        before attempting to zero its AutoCommit.
+
+0.01    22 Jun 2005
+        First version, released on a (mostly) unsuspecting world.
+

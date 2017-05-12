@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::OpenSSL::Blowfish::CFB64.
+
+0.01  Fri Mar 16 15:19:24 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::OpenSSL::Blowfish::CFB64
+

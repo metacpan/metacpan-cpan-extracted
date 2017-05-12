@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 63e70ed0429a982ddc3d1c52dd1117fde27fa043 AUTHOR_PLEDGE
+SHA1 ca2faaebb78471783e4d0c3c2cc3cbbf278964aa CONTRIBUTORS
+SHA1 bb7117652277fc05b321ddb85b0b5854c4b380a7 Changes
+SHA1 50e5bf8e8f3b70082780677b526011a6b000243c INSTALL
+SHA1 07ecfd17dea4597853e604be99039f63a11a49b7 LICENSE
+SHA1 2306aabcd5419594459decdd0162bb457de13a6d MANIFEST
+SHA1 ee02bb20cef568cfc75214bcaef8f139d7dac9db META.json
+SHA1 1eb00e717575cc4935cacb8623b213a345db83ca META.yml
+SHA1 2e23c29cd4ef452bd949ed1968686ebeb8889465 Makefile.PL
+SHA1 2db298886c2be41e0b7ad71ef9e8bfadc400554a README
+SHA1 9a87bbb286cda29d6d700f2d897cc4a6231da16c README.mkdn
+SHA1 1185debc7c2e6f25bff228638f40748c5516a430 cpanfile
+SHA1 0054047e459b633d53018b0d3071f9a61acd0833 doap.xml
+SHA1 cfa1c5765601b3d908dc914f67d7506d697756cf lib/Catalyst/Controller/VersionedURI.pm
+SHA1 0ec27e63e20b4b092a8b72540e074e7314cb86b6 lib/Catalyst/Plugin/VersionedURI.pm
+SHA1 3da73d6dea608883ad5c4d89331006ac777df042 t/00-compile.t
+SHA1 62379f7c8b2ecff498295ac194f98fc37fdbe282 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 3e140cfd0ffc670a2c2d6b9fdd190a789ed30cf5 t/basic.t
+SHA1 eccecd5dac8c99bc6325596d0061accdc71f2bd0 t/in_path.t
+SHA1 29322b464803b97221a34cbc05a839badfd03619 t/lib/BasicApp.pm
+SHA1 06443f31047d1d23d51d041a0a59cdc6bf6b55b7 t/lib/BasicApp/Controller/Root.pm
+SHA1 0494119c85faa2b2629aa8bfed8091f097b94212 t/lib/MTimeApp.pm
+SHA1 6156747daf12301f8949ee23f890af7547d18775 t/lib/MTimeApp/Controller/Root.pm
+SHA1 4e1243bd22c66e76c2ba9eddc1f91394e57f9f83 t/lib/MTimeApp/root/foo/something
+SHA1 a8e6fa18a74f5da45d9dfb070557ba4a84c3a70a t/lib/ParamApp.pm
+SHA1 999a8edb794b3a4e8acf066c892a6dd29726d00a t/lib/ParamApp/Controller/Root.pm
+SHA1 f5002edcde8c5779419e9536c1e8734d3c5fd16d t/lib/TestApp.pm
+SHA1 026cbb4a1208cc1c8db3a65f0cb2166dee0d85d7 t/lib/TestApp/Controller/Root.pm
+SHA1 498ac5410036150d9daeb47b585e375baaa379c0 t/mtime.t
+SHA1 b95d109961ccd284635aa69faeae54acb8a57bec t/param.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAldGLdUACgkQ34Hwf+GwC4xkuACgrnSO0qSsm0JMyJjqIYDf2pxx
+RjkAniLj4r7IkByfhDdqv4Kn3FkqkDzc
+=HOwM
+-----END PGP SIGNATURE-----

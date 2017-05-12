@@ -1,0 +1,39 @@
+---
+abstract: 'Pure-Perl implementation of scaling LZW'
+author:
+  - 'Meredith Howard <mhoward@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Compress-LZW
+provides:
+  Compress::LZW:
+    file: lib/Compress/LZW.pm
+    version: '0.04'
+  Compress::LZW::Compressor:
+    file: lib/Compress/LZW/Compressor.pm
+    version: '0.04'
+  Compress::LZW::Decompressor:
+    file: lib/Compress/LZW/Decompressor.pm
+    version: '0.04'
+requires:
+  Exporter: '0'
+  Moo: '1.001000'
+  Types::Standard: '0'
+  base: '0'
+  bytes: '0'
+  namespace::clean: '0'
+  perl: v5.10.0
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/merrilymeredith/p5-Compress-LZW/issues
+  homepage: https://metacpan.org/release/Compress-LZW
+  repository: git://github.com/merrilymeredith/p5-Compress-LZW.git
+version: '0.04'

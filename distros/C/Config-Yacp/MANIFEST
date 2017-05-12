@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/02getset.t
+t/03add.t
+t/04delete.t
+t/05save.t
+t/06pod.t
+t/config.ini
+t/config2.ini
+lib/Config/Yacp.pm
+META.yml

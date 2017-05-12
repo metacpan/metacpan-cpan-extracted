@@ -1,0 +1,107 @@
+#!perl
+use strict;
+use CPAN::Mirror::Tiny::CLI;
+exit CPAN::Mirror::Tiny::CLI->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+cpan-mirror-tiny - CPAN::Mirror::Tiny command line interface
+
+=head1 SYNOPSIS
+
+  $ cpan-mirror-tiny inject    [option] url1 url2 ...
+  $ cpan-mirror-tiny gen-index [option]
+  $ cpan-mirror-tiny cat-index [option]
+  $ cpan-mirror-tiny list      [option]
+  $ cpan-mirror-tiny server    [option]
+
+=head1 OPTIONS
+
+  -h, --help      show help
+  -v, --version   show version
+  -a, --author    specify author, default: VENDOR
+  -b, --base      base directory,
+                  default: $ENV{PERL_CPAN_MIRROR_TINY_BASE} or ./darkpan
+
+=head1 EXAMPLES
+
+  $ cpan-mirror-tiny inject cpan:Plack
+  $ cpan-mirror-tiny inject cpan:Plack@1.0039
+  $ cpan-mirror-tiny inject --author YOU http://exmpale.com/Module-0.01.tar.gz
+  $ cpan-mirror-tiny inject --author YOU git://github.com/you/Module.git@develop
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/Module-0.01.tar.gz
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/dir
+
+=head1 DESCRIPTION
+
+This is a command line interface for L<CPAN::Mirror::Tiny>.
+You can easily create your darkpan with this script.
+
+=head2 TYPICAL USAGE
+
+Let's create your darkpan in C<./darkpan> directory.
+
+First inject distributions into your darkpan with C<inject> command:
+
+  # from github, with optional ref (revision/tag/branch)
+  $ cpan-mirror-tiny inject --author SKAJI git://github.com/skaji/cpm.git
+  $ cpan-mirror-tiny inject --author SKAJI https://github.com/skaji/cpm@0.118
+
+  # from cpan, with optional version (author is automatically guessed)
+  $ cpan-mirror-tiny inject cpan:Plack
+  $ cpan-mirror-tiny inject cpan:Dist::Zilla@5.046
+
+  # from http server
+  $ cpan-mirror-tiny inject --author YOU http://example.com/path/to/Your-Module-0.01.tar.gz
+
+  # from local file/directory
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/Module-0.01.tar.gz
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/dir
+
+Second, create the index file I<02packages.details.txt.gz> by C<gen-index> command:
+
+  $ cpan-mirror-tiny gen-index
+
+Check your darkpan with C<list> command:
+
+  $ cpan-mirror-tiny list
+
+Now your darkpan has your own distributions. Let's install distributions with
+CPAN client L<cpm>:
+
+  $ cpm install --resover 02packages,file://$PWD/darkpan --resover metadb Your::Module
+
+=head2 HTTP SERVER
+
+If you want to use your darkpan in other hosts, run a http server first:
+
+  [host1]$ cpan-mirror-tiny server
+  HTTP::Server::PSGI: Accepting connections at http://0:5000/
+
+Then
+
+  [host2]$ cpm install --resover 02packages,http://host1:5000 --resover metadb Your::Module
+
+Moreover you can inject/upload your modules against C<http://host1:5000/upload>:
+
+=over 4
+
+=item inject git repositories
+
+  [host2]$ curl --data-urlencode 'module=git://github.com/skaji/Carl.git' \
+                --data-urlencode 'author=SKAJI' http://host1:5000/upload
+
+=item upload tarballs with L<cpan-upload|https://metacpan.org/pod/distribution/CPAN-Uploader/bin/cpan-upload>
+
+  [host2]$ export CPAN_UPLOADER_UPLOAD_URI=http://host1:5000/upload
+  [host2]$ cpan-upload --user SKAJI --password dummy /path/to/local/Module-0.01.tar.gz
+
+=back
+
+Note that C<cpan-mirror-tiny server> accepts the same options as C<plackup> such as C<--port>, C<--server>:
+
+  [host1]$ cpan-mirror-tiny server --server Starman --port 8888
+
+=cut

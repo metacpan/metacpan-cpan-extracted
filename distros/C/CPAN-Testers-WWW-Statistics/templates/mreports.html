@@ -1,0 +1,16 @@
+[% 
+    title = 'Reports' ;
+    box_sites = 1
+
+    crumb1_name = 'Monthly Report Stats' ;
+%]
+
+<h2>Uploads &amp; Reports By YEAR/MONTH (latest first)</h2>
+<div class="boxer">
+<table summary="Uploads &amp; Reports By YEAR/MONTH">
+<tr><th class="top">DATE</th><th class="top">UPLOADS</th><th class="top">REPORTS</th><th class="top">PASS</th><th class="top">FAIL</th><th class="top">NA</th><th class="top">UNKNOWN</th></tr>
+[% FOREACH row = STATS %]
+<tr>[% FOREACH col = row %]<td nowrap="nowrap">[% col %]</td>[% END %]</tr>
+[% END %]
+</table>
+</div>

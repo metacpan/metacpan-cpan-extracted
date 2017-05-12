@@ -1,0 +1,12 @@
+[%# search result matrix %]
+[%
+    # this template called by crud/search.tt if there
+    # are any search results to display
+%]
+
+<div id="results">
+ <div class="livegrid">
+ [% PROCESS crud/livegrid_js.tt %]
+ </div>
+</div>
+

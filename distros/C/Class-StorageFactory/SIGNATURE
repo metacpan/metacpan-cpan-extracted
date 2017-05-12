@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 eebe14c714516506fd2d8cac26bcc9d66cc5880e Build.PL
+SHA1 a21bd6d143c741e5646423160c11093f3e8c1d41 MANIFEST
+SHA1 5d40239e25d12683ab8ebb599f9a608da6b3d501 MANIFEST.SKIP
+SHA1 70ecb07aaac95a365486641cc775810fd66deb1a META.yml
+SHA1 a745e55b114339d698c06a111676cbbdff2850e0 README
+SHA1 7cdfb6bac9ba288b427dc3c0d75f66b13b2f22d6 lib/Class/StorageFactory.pm
+SHA1 1e5bcea5a40a7aa679cc8cb9ddccd183b32532d2 lib/Class/StorageFactory/YAML.pm
+SHA1 f35a25f9883738be60f36b3ec2d0aeae9e2a9608 t/0-signature.t
+SHA1 36066203467ff6baf61ee55c467031ea870fd9c1 t/base.t
+SHA1 f607f5b042dcbe5a4d33b5f852db492bd48c1ee9 t/lib/Astronaut.pm
+SHA1 b39d0e326d663df127375476f46c0ac109e167f0 t/lib/TestBase.pm
+SHA1 1cddd20c941307891af98d5a91ddad9e8c4fe20e t/lib/TestYAML.pm
+SHA1 0dcbeed09f44789415a9fab11855d7a0cef3a6a8 t/pod.t
+SHA1 0cb803817d4d604520be183f2e623f2a2819d732 t/pod_coverage.t
+SHA1 013b2b1fde3ff8603337644eca93a91a29d2ac1a t/yaml.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFCYG30Bd8Wn1wI6cQRAvC9AJ47Y5owituFNBVqPxJQli2oWTcCwwCdFCWf
+UhcUoZ2HMuWCawuMgO6k270=
+=gYDC
+-----END PGP SIGNATURE-----

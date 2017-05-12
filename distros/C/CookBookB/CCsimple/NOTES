@@ -1,0 +1,32 @@
+To: zoran@cs.cmu.edu
+Subject: Re: dynamic loading of C++ into perl
+
+> I've recently looked at your CCsimple example, but it seems to me
+> that there are no provisions for dynamically loading the c++
+> library.  i know that static initialization methods of a c++
+> library can cause headaches, but i was wondering whether the
+> mechanism for dynamic perl module built from the c++ library is
+> possible under the current state of xsub spec?
+
+You need a special Perl binary.  The perlmain.c module must be compiled with
+a C++ compiler, then you can use that binary for dyanmic loading of C and
+C++ extensions.
+
+The easiest way to do this is with h2xs; build an empty C++ extension that
+is static-linked.  Change to some work area, outside the Perl source tree:
+
+	$ h2xs -AXPn CPLUS
+	$ cd CPLUS
+	< Make sure that both LD and CC point to the C++ compiler.
+	< My C++ compiler is called "CC".
+	$ perl5 Makefile.PL LINKTYPE=static CC=CC LD=CC
+	$ make
+	$ make perl
+	< Clean up the empty extension.
+	$ make realclean
+	< You are left with a 'perl' binary.
+
+You now have a 'perl' binary that can do dynamic loading of C and C++
+extensions.  You can replace your regular Perl binary with this one.
+
+Dean

@@ -1,0 +1,279 @@
+Revision history for Perl extension Config::Crontab.
+
+Release 1.45
+----------------------------
+commit eef68c773f42d73b5670a7c894b2f67914c83c95
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Thu Apr 20 10:24:09 2017 -0600
+
+    use relative path in require (RT#120863)
+
+Release 1.44
+----------------------------
+commit a81b708e1b5b023b6fc70ec7b68ce4cfcd1d5628
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Mar 20 14:24:08 2017 -0600
+
+    skip crontab writes unless explicitly asked for
+
+Release 1.43
+----------------------------
+commit 2fedca514e2826bae41960295af20dc718db3256
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Mon Feb 27 10:42:51 2017 -0700
+
+    fix lexical scope error introduced in PR#2; tests
+
+Release 1.42
+----------------------------
+commit 337927a0840a7d3572b31c9c31c2911463e6bbc4
+Author: Felipe Gasper <felipe@felipegasper.com>
+Date:   Fri Jan 6 15:39:46 2017 -0500
+
+    Use lexical filehandles rather than barewords (https://github.com/FGasper)
+
+Release 1.41
+----------------------------
+commit 5ab21cf7b653915d792e76935606bf24462a11fb
+Author: Scott Wiersdorf <scott@perlcode.org>
+Date:   Thu May 26 19:00:26 2016 -0600
+
+    RT #114744
+
+Release 1.40
+----------------------------
+revision 1.8
+date: 2014/01/09 04:50:04;  author: scott;  state: Exp;  lines: +5 -4
+- fix for multiple datetime wildcards
+
+Release 1.33
+----------------------------
+revision 1.7
+date: 2011/04/11 22:55:03;  author: scott;  state: Exp;  lines: +8 -3
+- check for SunOS crontab (RT#32658)
+
+Release 1.32
+----------------------------
+revision 1.6
+date: 2011/04/11 22:39:19;  author: scott;  state: Exp;  lines: +2 -2
+- add t/setup.pl to MANIFEST
+
+Release 1.31
+----------------------------
+revision 1.5
+date: 2011/04/11 22:29:11;  author: scott;  state: Exp;  lines: +10 -7
+- minor formatting changes
+- tests updated to Test::More
+- checks for crontab(1) in tests (RT#59578)
+- fewer stupid tests
+
+Release 1.30
+----------------------------
+revision 1.4
+date: 2008/10/27 16:31:46;  author: scott;  state: Exp;  lines: +58 -19
+- version 1.30
+- modernize (no more 'use vars')
+- support for SuSE-specific 'no syslog' extension
+
+Release 1.21
+----------------------------
+revision 1.3
+date: 2007/07/18 19:55:59;  author: scott;  state: Exp;  lines: +40 -3
+- note about debian linux's 'crontab' command
+
+Release 1.20
+----------------------------
+revision 1.2 (new CVS repository)
+date: 2006/04/18 22:08:38;  author: scott;  state: Exp;  lines: +53 -3
+- fix write('') to unset file()
+- add remove_tab() method to remove the crontab
+
+Release 1.10
+----------------------------
+revision 1.37
+date: 2005/06/10 22:14:50;  author: scottw;  state: Exp;  lines: +132 -14
+- support for reading other users' crontabs (as root)
+
+Release 1.06
+----------------------------
+revision 1.36
+date: 2005/05/04 21:24:03;  author: scottw;  state: Exp;  lines: +162 -13
+- pretty printing in system mode tests
+- select_blocks tests
+----------------------------
+revision 1.35
+date: 2005/04/29 18:28:11;  author: scottw;  state: Exp;  lines: +13 -3
+- pass through the -system parameter
+----------------------------
+revision 1.34
+date: 2005/04/28 04:16:53;  author: scottw;  state: Exp;  lines: +63 -28
+- support for system crontab
+
+Release 1.05
+----------------------------
+revision 1.33
+date: 2005/04/27 17:49:31;  author: scottw;  state: Exp;  lines: +54 -6
+- additional documentation for Event syntax
+----------------------------
+revision 1.32
+date: 2005/04/27 16:42:24;  author: scottw;  state: Exp;  lines: +52 -17
+- add system-style parsing information and 'user' method
+
+Release 1.04
+----------------------------
+revision 1.31
+date: 2004/09/27 17:52:01;  author: scottw;  state: Exp;  lines: +4 -3
+- return if no object selecte
+
+Release 1.03
+----------------------------
+revision 1.30
+date: 2003/09/11 15:22:04;  author: scottw;  state: Exp;  lines: +5 -5
+- fix delete => remove typos
+
+Release 1.02
+----------------------------
+revision 1.29
+date: 2003/07/11 20:53:07;  author: scottw;  state: Exp;  lines: +159 -69
+- additional documentation, minor fixes
+- tests with pipe files
+
+Release 1.01 - First public release
+----------------------------
+revision 1.28
+date: 2003/05/22 13:59:42;  author: scottw;  state: Exp;  lines: +29 -15
+- sysv notes
+- version increment
+- constructor notes
+----------------------------
+revision 1.27
+date: 2003/05/21 22:22:31;  author: scottw;  state: Exp;  lines: +4 -5
+- fix bug with setting '*/2'-style datetime elements via 'datetime' method
+----------------------------
+revision 1.26
+date: 2003/05/20 22:10:19;  author: scottw;  state: Exp;  lines: +46 -1
+- add 'replace' method to container class
+- add tests for 'replace'
+- work on cgi demo script
+----------------------------
+revision 1.25
+date: 2003/05/20 00:11:01;  author: scottw;  state: Exp;  lines: +1 -2
+- whitespace change to module
+- add new example cgi program
+----------------------------
+revision 1.24
+date: 2003/05/18 04:19:22;  author: scottw;  state: Exp;  lines: +277 -120
+- safe 'write' method for replacing existing (or making new) crontabs
+- activate/deactivate entire blocks with 'active' method
+- documentation
+----------------------------
+revision 1.23
+date: 2003/05/16 23:37:01;  author: scottw;  state: Exp;  lines: +3 -3
+- fix missing C<> blocks around command-line examples
+----------------------------
+revision 1.22
+date: 2003/05/16 23:34:59;  author: scottw;  state: Exp;  lines: +1024 -677
+- change 'parse' to 'read' in Config::Crontab
+- disallow non-block objects in Config::Crontab internals
+- much documentation
+- new crashme tests
+- working on a small tutorial
+----------------------------
+revision 1.21
+date: 2003/05/16 04:48:53;  author: scottw;  state: Exp;  lines: +13 -1
+- auto-parse if '-file' is passed to constructor
+----------------------------
+revision 1.20
+date: 2003/05/15 21:02:48;  author: scottw;  state: Exp;  lines: +249 -132
+- refactor Block->select and Crontab->select
+- fix parsing
+- documentation & test improvements
+----------------------------
+revision 1.19
+date: 2003/05/15 14:47:09;  author: scottw;  state: Exp;  lines: +25 -8
+- tests for write method
+----------------------------
+revision 1.18
+date: 2003/05/15 13:09:22;  author: scottw;  state: Exp;  lines: +2 -2
+- doc change
+----------------------------
+revision 1.17
+date: 2003/05/15 05:14:51;  author: scottw;  state: Exp;  lines: +4 -4
+- fix some things 5.00503 didn't like (symbolic refs w/o parens, ==
+  with undef)
+
+Release 1.00
+----------------------------
+revision 1.16
+date: 2003/05/14 22:35:25;  author: scottw;  state: Exp;  lines: +103 -49
+- first complete version
+- working on SYOPSIS documentation section and a corresponding test suite
+----------------------------
+revision 1.15
+date: 2003/05/12 23:41:13;  author: scottw;  state: Exp;  lines: +279 -155
+- created Container superclass for Crontab and Block classes
+- working on 'select' method and 'block' method
+- need to test up, down, first, last, etc (Container methods)
+----------------------------
+revision 1.14
+date: 2003/05/11 03:56:16;  author: scottw;  state: Exp;  lines: +78 -57
+- implemented up, down, first, last for Block class
+- removed 'more' method, renamed 'less' to 'remove'
+- need to fixup documentation for some of these changes (marked FIXME)
+----------------------------
+revision 1.13
+date: 2003/05/10 05:44:00;  author: scottw;  state: Exp;  lines: +55 -15
+- fix some 5.00503 bugs under strict
+- tidy up some initialization (use methods instead of data members)
+- "move" methods documented
+----------------------------
+revision 1.12
+date: 2003/05/09 23:13:23;  author: scottw;  state: Exp;  lines: +513 -143
+- Block class fully documented; working on "move" methods/tests for
+  block class
+----------------------------
+revision 1.11
+date: 2003/05/08 23:44:07;  author: scottw;  state: Exp;  lines: +363 -22
+- documentation for Event, Env, and Comment classes complete
+- adding code for block manipulation
+----------------------------
+revision 1.10
+date: 2003/05/08 04:25:03;  author: scottw;  state: Exp;  lines: +143 -8
+- Event object documented
+----------------------------
+revision 1.9
+date: 2003/05/07 22:32:10;  author: scottw;  state: Exp;  lines: +288 -3
+- documentation fuller
+----------------------------
+revision 1.8
+date: 2003/05/07 15:39:46;  author: scottw;  state: Exp;  lines: +1 -1
+- fix 'odd number of hash args' error for 5.00503
+----------------------------
+revision 1.7
+date: 2003/05/07 15:33:25;  author: scottw;  state: Exp;  lines: +103 -53
+- consistent event handling
+----------------------------
+revision 1.6
+date: 2003/05/05 21:51:29;  author: scottw;  state: Exp;  lines: +235 -294
+- mostly functional
+----------------------------
+revision 1.5
+date: 2003/05/02 22:09:28;  author: scottw;  state: Exp;  lines: +40 -0
+- changing how crontab files are parsed (data handed off to
+  constructors which will either fail or succeed).
+----------------------------
+revision 1.4
+date: 2003/04/24 04:16:27;  author: scottw;  state: Exp;  lines: +11 -7
+- moderate progress
+----------------------------
+revision 1.3
+date: 2003/04/23 22:23:25;  author: scottw;  state: Exp;  lines: +214 -53
+- more progress; working comment, environment, and most of event subclasses
+----------------------------
+revision 1.2
+date: 2003/04/23 04:48:23;  author: scottw;  state: Exp;  lines: +140 -18
+- work done in 'parse' method
+----------------------------
+revision 1.1
+date: 2003/04/22 19:29:32;  author: scottw;  state: Exp;
+- initial checkin of crontab parser/writer

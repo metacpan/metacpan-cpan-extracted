@@ -1,0 +1,661 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::Changes - History of Class::MakeMethods
+
+=head1 SYNOPSIS
+
+Revision history for Class::MakeMethods.
+
+=head1 CHANGES
+
+=head2 Version 1.010
+
+=over 4
+
+=item 2004/09/06
+
+Moved get_declarations() and associated documentation from Standard module to superclass.
+
+=item 2004/09/03
+
+Developed test.pl test harness with recursive file search to fix Windows "command line too long" errors.
+
+=item 2004/09/01
+
+Moved Template::TextBuilder and Template::DiskCache into Utility:: namespace.
+
+Added support for defaults with -- and -param to Standard get_declarations().
+
+=item 2004/08/12
+
+Began testing and integrating tied-value patches from Dominique Dumont.
+
+=item 2004/04/27
+
+Added method types to Evaled::Hash.
+
+=item 2004/04/23
+
+Added skeleton of a new Evaled::Hash class.
+
+=back
+
+=head2 Version 1.009
+
+=over 4
+
+=item 2003/09/25
+
+Added Emulator::mcoder and compatibility tests.
+
+Released to CPAN as Class-MakeMethods-1.009.tar.gz.
+
+=item 2003/09/22
+
+Added support for lvalue methods to Template and Template::Generic. Added a few tests to demonstrate they're working. Added an example to Docs::Examples.
+
+Added Emulator::accessors and compatibility tests.
+
+Minor documentation improvements.
+
+=back
+
+=head2 Version 1.008
+
+=over 4
+
+=item 2003/09/05
+
+Adjusted layout of test directories in another attempt to solve a MakeMaker/shell-glob issue on Windows that was preventing make test from running correctly. 
+
+Removed Template::PseudoHash, since this package never really worked, as pointed out by a question from Mike Castle. Management of array-based objects can be handled by any of the existing ::Array subclasses, and support for pseudo-hashes would not provide any useful new capabilities.
+
+Added support for "Template::Universal:forward_methods -delegate" and "Template::Generic:object --soft_delegate" based on a suggestion from Peter Chen. Extended behavior of Template -subs handling to make it easy to add such functionality in the future.
+
+Released to CPAN as Class-MakeMethods-1.008.tar.gz.
+
+=item 2003/09/02
+
+Adjusted DESTROY behavior of Template::InsideOut and cleaned up documentation.
+
+=back
+
+=head2 Version 1.007
+
+=over 4
+
+=item 2003/09/01
+
+Made Template definitions automatically import their class's generic
+definitions, if present. This eliminates the need for Generic
+subclasses to explicitly redeclare every method it inherits, and
+should obviate the "missing declaration" problems referenced below.
+
+Updated the names of several Template subclasses, with stubs at
+the old names for backwards compatibility: Flyweight becomes
+InsideOut, Static becomes Global, and Struct becomes Array.
+
+Added Template::Inheritable and basic tests for it.
+
+Eliminated use of legacy Test.pm from remaining tests, except for
+MethodMaker emulation.
+
+Rearranged test directories in an effort to avoid a reported bug
+with the test path of t/*/*.t under Windows.
+
+Released to CPAN as Class-MakeMethods-1.007.tar.gz.
+
+=item 2003/08/27
+
+Added section to Class::MakeMethods/EXTENDING documentation based
+on question from Terrence Brannon.
+
+=item 2003/02/07
+
+Fixed missing declaration of Template::Hash:instance, reported via RT.
+
+=back
+
+=head2 Version 1.006
+
+=over 4
+
+=item 2003/01/26
+
+Additional documentation touch-ups. Moved miscellaneous POD files into the Docs directory.
+
+Added new test scripts from Class-MethodMaker-1.08, although we
+don't yet pass them. In particular, I need to add support for the
+new method types added in 1.04: tie_scalar, tie_list, object_tie_list,
+object_tie_hash
+
+Also need to compare against the changes included in Class-MethodMaker-1.09 and 1.10, which don't seem to include any new test code, but do include functionality changes.
+
+=item 2002/12/12
+
+Re-integrated Template and Emulator packages; the separate distribution
+turned out to be a hastle rather than a convenience. However, in
+order to keep test scripts for each subsystem separate, I'm now
+using a Makefile.PL attribute to specify a two-level deep directory
+tree of test scripts; I hope this doesn't break on Windows...
+
+Fixed possible "use of undefined as a reference" problem in
+Standard::*::array method generators, reported by Jared Rhine.
+
+Tried to improve documentation, based on feedback from Jared Rhine.
+Expunged ReadMe.pod. Extracted method catalogs into Catalog.pod.
+Moved examples to new Example.pod, although that underlines how
+few examples there are.
+
+=back
+
+
+=head2 Version 1.005
+
+=over 4
+
+=item 2002/06/06
+
+Added Autoload interface.
+
+Modifed Attribute interface to add "inheritable" default logic for
+Maker class parameter. (Suggested by Malcolm Cook.)
+
+Fixed typo in documentation for Standard::Universal. (Spotted by
+Malcolm Cook.)
+
+=back
+
+
+=head2 Version 1.004
+
+=over 4
+
+=item 2002/03/23
+
+Released to CPAN as Class-MakeMethods-1.004.tar.gz.
+
+=item 2002/03/16
+
+Allow double-colons between package name and method generator name.
+
+=item 2002/02/19
+
+Fixed related use of undef in Standard::*:hash methods.
+
+=item 2002/02/14
+
+Adjusted Standard::*:hash methods to avoid assuming that the hashref
+already exists.
+
+=item 2002/02/07
+
+Added missing *_reset => clear to Template number --counter interface.
+
+=item 2002/02/02
+
+Adjusted error message in Utility::ArraySplicer
+
+=item 2002/01/26
+
+Applied small documentation corrections suggested by Adam Spiers.
+
+Added Standard::Universal:alias.
+
+=back
+
+=head2 Version 1.003
+
+=over 4
+
+=item 2002/01/24
+
+Folded "Getting Started Guide" POD into main module documentation.
+
+Renamed Utility::TakeName to Emulator.
+
+Split Template and Emulator packages into their own distributions.
+
+B<Please Note:> This means that to fully upgrade you must retrieve
+all three of these files:
+
+  Class-MakeMethods-1.003.tar.gz 
+  Class-MakeMethods-Template-1.003.tar.gz 
+  Class-MakeMethods-Emulator-1.003.tar.gz 
+
+Of course, if you're not using the Template or Emulator classes,
+there's no need to download them...
+
+
+=item 2002/01/21
+
+Started bumping sub-version numbers and not using sub-sub-versions,
+to shorten distribution names and more closely match standard
+practice.
+
+Added Composite::Inheritable:hook and matching test. Added
+Composite->CurrentResults method to easily access, update composite
+method results.
+
+=back
+
+=head2 Version 1.000.*
+
+=over 4
+
+=item v1.000.16 - 2002/01/21
+
+Released to CPAN as v1.000.016.
+
+=item v1.000.16 - 2002/01/20
+
+Adjusted the hash and array methods in the Standard::* and Composite::*
+packages to properly accept a set-contents call with a single
+reference argument, and to return contents rather than ref in list
+context.
+
+=item v1.000.16 - 2002/01/14
+
+Fixed a subtle bug in a test script inherited from Class::MethodMaker:
+4_Template_hash_hash_array.t and 7_MethodMaker_hash_of_lists.t both
+relied on "keys %hash" returning the keys in a particular order,
+which *almost* always worked, but caused failures on one or more
+Perl version/platform combinations.
+
+
+=item v1.000.15 - 2002/01/14
+
+Released to CPAN as v1.000.015.
+
+=item v1.000.15 - 2002/01/12
+
+Renamed Basic::Static to Basic::Global for consistency with Standard
+and Composite. Hopefully, there aren't many users of this module
+yet; please accept my apologies if this breaks your code.
+
+Eliminated "local @_ = ...", which appears to cause a scoping
+problem on Perl 5.6. Thanks to Adam Spiers for a thorough bug
+report. (See http://www.perlmonks.org/index.pl?node_id=138370 for
+details.)
+
+Extended Template::Generic to support "array --get_set_ref" method
+style requested by Adam Spiers.
+
+Various documentation tweaks, including feedback from Adam Spiers:
+Adjusted documentation to downplay Basic::* modules as a starting
+point, in favor of Standard::* ones. Trimmed out some duplicated
+documentation in favor of more "See LE<lt>...E<gt>" links. Adjusted
+documentation of *::Inheritable packages in an attempt to clarify
+the way in which the inheritance tree is searched for a value.
+
+Factored out common code from Standard::Inheritable and
+Composite::Inheritable to new module, Utility::Inheritable. Factored
+out common code from Standard::Hash and Standard::Array to new
+module, Utility::ArraySplicer. Factored out common code from
+Template::Universal to new module, Utility::Ref. Renamed
+Emulator::TakeName to Utility::TakeName (this is internal use only,
+so there should be no public impact).
+
+
+=item v1.000.15 - 2001/12/01
+
+Adjusted Template::Universal's code for _CALL_METHODS_FROM_HASH_,
+to ensure that method/arg pairs are called in order they were passed
+in.
+
+=item v1.000.15 - 2001/07/04, 2001/07/19
+
+Minor additions to documentation of various method types.
+
+
+=item v1.000.14 - 2001/07/01
+
+Released as v1.000.014.
+
+
+=item v1.000.14 - 2001/06/25, 2001/06/29, 2001/07/01
+
+Removed Makefile rule from Makefile.PL to avoid warnings when used
+with recent versions of ExtUtils::MakeMaker, which also define a
+similar rule. (Based on bug report from Ron Savage.)
+
+Fixed test failure for machines with P5.6 but no Attribute::Handlers.
+(Reported by Ron Savage, Jay Lawrence.)
+
+Added Template::Flyweight:string_index. (But still needs test
+script.)
+
+Added Standard::Universal. (But still needs test scripts.)
+
+Minor touch-ups to ReadMe and Guide documentation.
+
+
+=item v1.000.13 - 2001/05/16, 2001/05/18, 2001/05/20, 2001/06/02, 2001/06/22, 2001/06/24
+
+To date, this module has been circulated under several provisional
+names: it was originally floated as a possible version-2 rewrite
+of Class::MethodMaker, then renamed to Class::Methods when it forked
+from that project, and then briefly to Class::MethodGenerator.
+(Note that it can be surprisingly difficult to comply with both of
+these L<perlmodlib> guidelines: "To be portable each component of
+a module name should be limited   to 11 characters. [...] Always
+try to use two or more whole words.") In the end, I selected
+Class::MakeMethods, as it is two whole words, and is reminiscent
+of Class::MethodMaker without being confusing (I hope!), and I
+believe this issue is now settled.
+
+Standardized syntax for global options; renamed -implementation to
+-MakerClass and -target_class to -TargetClass. Moved $TargetClass
+and other context information into %CONTEXT with _context accessor.
+Added ForceInstall.
+
+Completed re-simplification of build directories; we're back to a
+single Makefile, which avoids a warning in P5.6.0.
+
+Added Attribute interface for use with P5.6 and later, based on
+Attribute::Handlers.
+
+Renamed "Simple" subclasses to "Basic". Added documentation and
+initial tests.
+
+Added Standard subclasses with parameter parsing and more powerful
+accessors.
+
+Modified Emulator::Struct to use Standard::* methods. Found struct
+test from P5.7, and added auto_init functionality to match.
+
+Added Composite::* subclasses. 
+
+Added Emulator::AccessorFast.
+
+Added Class::MakeMethods::Guide with introduction and examples.
+
+Continued clean-up effort on Template documentation. Renamed Template
+"attributes" to "method parameters" to avoid confusion with Perl
+attributes. Retitled Template naming rules from "templates" to
+"interfaces".
+
+Changed initialization code expressions of Template::Class in hopes
+of P5.6.1 compatibility. (Problem reported by M Schwern.)
+
+Added 'Template::Generic:new --and_then_init' based on feedback
+from Jay Lawrence.
+
+=back
+
+=head2 Early 1.000 versions
+
+=over 4
+
+=item v1.000.12 - 2001/05/14
+
+Renamed module to Class::MethodGenerator, although naming questions
+remain.
+
+Moved Template subclasses into Template::* namespace. Simplified
+build directory and makefile structure.
+
+Changed initialization code expressions of Template::PackageVar,
+ClassVar for P5.6.0 compatibility. (Reported by M Schwern.)
+
+
+=item v1.000.11 - 2001/05/07, 2001/05/12
+
+Eliminated Bundle file. Moved general documentation to cm_base.
+
+Renamed Class::Methods::Base to Class::Methods::Generator.
+
+Extracted code for Template declarations to new Class::Methods::Template
+module. Extracted disk-caching to new Template::DiskCache module.
+Moved TextBuilder into the Template:: tree.
+
+Moved _namespace_capture code to new package
+Class::Methods::Emulator::TakeName.
+
+Added Simple::Hash subclass.
+
+
+=item v1.000.10 - 2001/04/26, 2001/05/02, 2001/05/04
+
+Moved _namespace_capture and _namespace_release to Class::Methods::Base.
+
+Additional doc tweakage. Moved ReadMe documentation to
+Bundle::ClassMethods. Merged Extending documentation into Base.
+
+Removed spurious uses of -default => 'default' in templates.
+
+Added new ClassInherit subclass and Emulator::Inheritable.
+
+Expunged Index subclass in favor of boolean_index and string_index
+types on Generic.
+
+Moved Struct:builtin_isa type to new package, StructBuiltin.
+
+Refactored code templating function as Class::Methods::Base::TextBuilder.
+
+
+=item v1.000.9 - 2001/03/24
+
+Reversed sense of - and --, as it was in 1.000.1.
+
+Separated source files into separate directories with distinct
+Makefiles and test hierarchies. This should clarify the boundaries
+between the core method-generation code, the common constructor/accessor
+methods, and the various emulator and experimental packages.
+
+
+=item v1.000.8 - 2001/01/19
+
+Following receipt of a suggestion to fork from the maintainer of
+Class::MethodMaker, renamed packge from Class::MethodMaker v2.0 to
+Class::Methods v1.000.
+
+Adjusted documentation to reflect fork, although additional cleanup
+is still needed.
+
+Moved backward compatibility to Emulator::MethodMaker subclass.
+
+Added Generic -compatibility array index_* and hash_of_arrays *_last
+and *_set methods to match changes in Class::MethodMaker v1.02.
+Added Emulator::MethodMaker support for the '-static' flag. The
+emulator now completely satisfies the enclosed test suites, from
+Class::MethodMaker v0.92 and v1.02.
+
+
+=item v1.000.7 - 2001/01/05, 2001/01/06, 2001/01/07
+
+Moved core code and internal code to Internals.pm. MethodMaker.pm
+now contains only some require statements and the general user
+guide documentation.
+
+Moved ReadMe.pod, Changes.pod, and ToDo.pod into MethodMaker
+directory. Separated Catalog.pod, Extending.pod, RelatedModules.pod.
+
+Included version 1 docs as Class::Methods::OriginalDocs; minor
+revisions for clarity.
+
+Renamed Package subclass to PackageVar, Class to ClassVar.
+
+Added Emulation::Struct subclass.
+
+Added support for shifting targets with make( -target_class =>
+Package, ... ).
+
+Extended ClassName subclass to handle requiring, rather than creating
+subclases.
+
+
+=item v1.000.6 - 2000/12/29, 2001/01/02, 2001/01/04
+
+Restored -sugar import option for compatibility with earlier
+versions.
+
+Added plural names to "Generic:hash -compatibility" to support
+v0.92 usage.
+
+Replaced use of substr(..., 0, 1) with ... =~ s/^-// for P5.004
+compatibility; problem found by Scott Godin.
+
+Copy @_ before splicing and pushing on to it for P5.004 compatibility.
+
+Expunged duplicate lines from Generic.pm's array_of_objects; found
+by Ron Savage.
+
+Renamed Hash.pm's delete and exists behaviors to avoid possible
+run-time import conflict with Generic.pm's behaviors; failure
+reported by Ron Savage.
+
+Added _STATIC_ATTR_{return_value_undefined} attributes to Generic
+string and number to allow overrides of this functionality.
+
+Minor doc touchups and expanded examples section.
+
+
+=item v1.000.5 - 2000/11/28, 2000/12/16, 2000/12/28
+
+Added Universal -warn_calls modifier.
+
+Folded various pod files together into main module's inline
+documentation.  Updated catalog of existing implementations in
+documentation.  Added pointers to some tutorials and books which
+discuss Class::Methods.
+
+Standardized naming of test scripts.
+
+Can now specify default template name, via -default=>"foo".
+
+
+=item v1.000.4 - 2000/11/22
+
+Separated string, number, and boolean from the Generic scalar
+methods.
+
+Provide _disk_cache to shortcut the lengthy _interpret_text_builder
+process.
+
+Fixes to ClassName implementation.
+
+Change to forward methods to provide better error messages when
+object is empty.
+
+
+=item v1.000.3 - 2000/11/03
+
+Rearranged documentation into separate files in the pod/ directory.
+
+Collapsed find_target_class and make functionality into import;
+moved support for the old functions to the Compatibility module.
+
+Adjusted tests to generally use standard syntax, and not Compatibility
+hooks.
+
+
+=item v1.000.2.1 - 2000/10/23
+
+Moved commonly-accessible information to Universal.
+
+Added block{...} replacement for enhanced behavior templating.
+
+Added modifier mechanism to support -private and -protected.
+
+May need to be able to specify import ordering so that modifiers
+are applied in the right order. This hasn't bit me yet, but it's
+there. Darn.
+
+
+=item v1.000.2 - 2000/10/22
+
+Completed generalization of Generic methods from Static and Hash.
+Rewrote ClassVar and PackageVar to use Generic framework.
+
+Attribute expansion can now substitute values besides name, using
+*{attr}.
+
+Added _diagnostics function and documentation of all failure
+messages.
+
+Added SEE ALSO section to documentation, brief review of Class::*
+on CPAN.  Stumbled across Damian Conway's very nice Class::Contract
+module.
+
+Added Scalar and Flyweight implementations.
+
+
+=item v1.000.1.1 - 2000/10/21
+
+Rolled back change from yesterday; can still pick templates like
+'-java'.  Allow attributes to be specified as '--foo'=>'bar' or
+'--'=>{foo=>'bar'}
+
+Automated caching for meta-method definition hashes.
+
+Generalized several Static and Hash interfaces into Generic templates.
+Added Static:array and Static:code support.
+
+Allow global -import to set default sources for templates, exprs,
+behaviors.
+
+
+=item v1.000.1 - 2000/10/19
+
+Support inheritance of templates between meta-methods with -import.
+
+Made "template" an attribute, rather than a special state variable.
+
+Allow any attribute to be specified as -foo=>'bar'.  Changed
+selection of standard templates from '-java' to '--java'.
+
+Initial support for string-eval behaviors and code_exprs, and
+Generic.pm
+
+
+=item v1.000.0 - 2000/10/14, 2000/10/15
+
+Completed initial pass of full rewrite.
+
+Assorted cleanup of syntax and documentation.
+
+Moved Hash, Static, and Index implementations into separate packages.
+
+
+=item v0.9.3 - 2000/09/30
+
+Refactored subclass_name and class_registry.
+
+Folded in some misc improvements from Class::MethodMaker 1.0.
+
+
+=item v0.97x - 2000/08/04 to 2000/08/13
+
+Forked from Class::MethodMaker 0.96. Substantial rewrite started
+
+Created build_meta_method and refactored many methods to use it.
+
+Added new_hash, hash_init, new_from_prototype.
+
+Extended arg format. Added -template=>behavior_name. Added support
+for array-of-names arguments.
+
+Performance tuning. Additional refactoring to support AutoSplit
+functionality.
+
+Also folded in some older changes and additions from Evolution's
+internal collection of MethodMaker subclasses:
+
+=back
+
+=head2 Class::MethodMaker::Extensions
+
+Change notes from unreleased collection of extensions to Class::MethodMaker that were later folded into Class::MakeMethods:
+
+  2000/01/12 Added set_foo, clear_foo to class_var hashes.
+  1999/07/27 Added subclass_name.
+  1999/04/15 Changed class_var to use symbol table lookups, not eval "".
+  1999/04/05 Changed determine_once to check again if undefined.
+  1999/03/25 Added singleton method.
+  1998/09/18 Finished integration of class_registry handlers.
+  1998/07/31 Added class_var and classnames handlers.
+  1998/06/12 Added lookup handlers.
+  1998/05/09 Created no_op and determine_once method groups.
+
+=cut

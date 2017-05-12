@@ -1,0 +1,105 @@
+From tomcat-user-return-59522-qmlist-jakarta-archive-tomcat-user=nagoya.apache.org@jakarta.apache.org Fri Apr 04 17:02:50 2003
+Return-Path: <tomcat-user-return-59522-qmlist-jakarta-archive-tomcat-user=nagoya.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@apache.org
+Received: (qmail 51412 invoked from network); 4 Apr 2003 17:02:49 -0000
+Received: from exchange.sun.com (192.18.33.10)
+  by daedalus.apache.org with SMTP; 4 Apr 2003 17:02:49 -0000
+Received: (qmail 781 invoked by uid 97); 4 Apr 2003 17:04:42 -0000
+Delivered-To: qmlist-jakarta-archive-tomcat-user@nagoya.betaversion.org
+Received: (qmail 774 invoked from network); 4 Apr 2003 17:04:42 -0000
+Received: from daedalus.apache.org (HELO apache.org) (208.185.179.12)
+  by nagoya.betaversion.org with SMTP; 4 Apr 2003 17:04:42 -0000
+Received: (qmail 46538 invoked by uid 500); 4 Apr 2003 17:01:19 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 46473 invoked from network); 4 Apr 2003 17:01:18 -0000
+Received: from oldtfw04.pearsontc.com (HELO oldtms704.pearsontc.com) (12.29.228.5)
+  by daedalus.apache.org with SMTP; 4 Apr 2003 17:01:18 -0000
+Received: from oldtms031.prenhall.com (localhost [127.0.0.1])
+ by oldtms704.pearsontc.com (iPlanet Messaging Server 5.1 (built May  7 2001))
+ with ESMTP id <0HCT00BC5WARD8@oldtms704.pearsontc.com> for
+ tomcat-user@jakarta.apache.org; Fri, 04 Apr 2003 11:54:27 -0500 (EST)
+Received: by OLDTMS031 with Internet Mail Service (5.5.2654.89)
+        id <H85P75YM>; Fri, 04 Apr 2003 12:03:01 -0500
+Content-return: allowed
+Date: Fri, 04 Apr 2003 12:02:47 -0500
+From: "O'Neill, John" <John.O'Neill@ScottForesman.com>
+Subject: RE: Tomcat Heap creep
+To: 'Tomcat Users List' <tomcat-user@jakarta.apache.org>
+Message-id: <691974AB8807D21196F200600842F7570A7E7C2B@oldtms009.schuster.com>
+MIME-version: 1.0
+X-Mailer: Internet Mail Service (5.5.2654.89)
+Content-type: text/plain; charset=iso-8859-1
+Content-transfer-encoding: 7BIT
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+
+I am on Solaris 8 and have scripted a netstat -an | grep 8009 | grep -c
+ESTABLISHED.  Weighing total grep -c 8009 vs grep 8009 | grep -c ESTABLISHED
+I'm getting numbers like 847 vs 542.  I'm assuming that ESTABLISHED should
+not rise above maxConnections + acceptCount.  Most of the other connections
+are in the SYN_SENT state.
+
+Any other tools outside of third party profilers?
+
+- John
+
+Howdy,
+
+>When I netstat on the Tomcat connections, after a heavy load on the
+server
+>and the server is crawling, I get very large number of established
+>connections, well above the number on my connector's maxProcessors and
+>acceptCount.  How and why does this happen?
+
+First of all, don't mistake dead sockets for established connections.
+What is the socket state as reported by netstat?  What's your OS by the
+way?
+
+>If I suspect that my application has a memory leak (I've turned up -Xms
+-
+>Xms up to 1024), how can I narrow down where it is at?  Is there a way
+to >get stats on the servlets and jsps?
+
+With a profiler, e.g. OptimizeIt or JProbe, good logging, and code
+inspections.  OptimizeIt will attach to tomcat 4.x out of the box.
+
+Yoav Shapira
+Millennium ChemInformatics
+
+
+
+This e-mail, including any attachments, is a confidential business
+communication, and may contain information that is confidential, proprietary
+and/or privileged.  This e-mail is intended only for the individual(s) to
+whom it is addressed, and may not be saved, copied, printed, disclosed or
+used by anyone else.  If you are not the(an) intended recipient, please
+immediately delete this e-mail from your computer system and notify the
+sender.  Thank you.
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org
+
+
+****************************************************************************
+This email may contain confidential material.
+If you were not an intended recipient,
+please notify the sender and delete all copies.
+We may monitor email to and from our network.
+
+****************************************************************************
+
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

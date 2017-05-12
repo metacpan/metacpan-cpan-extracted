@@ -1,0 +1,6 @@
+Revision history for Perl extension Crypt::Imail.
+
+0.01  Fri Oct 17 17:35:32 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Crypt::Imail
+

@@ -1,0 +1,7 @@
+=head1 NAME
+
+CLIDTest::More::Simple - alternative text for simple command
+
+=head1 DESCRIPTION
+
+simple manual

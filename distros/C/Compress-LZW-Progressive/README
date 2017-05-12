@@ -1,0 +1,80 @@
+NAME
+    Compress::LZW::Progressive - Progressive LZW-like compression
+
+SYNOPSIS
+      use Compress::LZW::Progressive;
+
+      my $codec = Compress::LZW::Progressive->new();
+
+      my $compressed = $codec->compress($data);
+
+DESCRIPTION
+    This module implements a progressive LZW-like compression technique. The
+    progressive nature means that, in general, the more times you call
+    $codec->compress(), the more efficient the codec will get (more highly
+    compressed the data will be).
+
+CUSTOM LZW
+    The codec is LZW-like because it has the following differences with
+    Compress::LZW:
+
+    - Compressor can request the decompressor to delete a certain number of
+    least frequently used codes - Stream will have a end_segment codeword at
+    the end of a segment - Number of bits used is predefined, and cannot
+    change.
+
+USAGE
+  new (...)
+        Creates a new codec for compressing and/or decompressing
+
+        * bits => $num_bits (default 16)
+            Number of bits to use in dictionary entries. Generally this will
+            be between 12-16. The greater the number of bits, the more
+            dictionary entries can be held (2^^$num_bits entries), and
+            therefore the larger memory requirements necessary on
+            compression and decompression. Additionally, the more bits used,
+            the easier it is for the decompressor to decompress.
+
+        * debug => $boolean (default 0)
+            If true, will print debug information to STDOUT.
+
+  reset ($which)
+        Reset the state of the compressor/decompressor. If $which is either
+        'compress' or 'decompress', it'll only reset that part. Otherwise,
+        it'll reset both.
+
+  compress ($str)
+  decompress ($str)
+        Compress or decompress the string given and return the
+        (de)compressed data.
+
+  stats ($show_phrases)
+        Prints efficiency statistics: how compressed the data is, how many
+        code words used, how many Kb the dictionary is occupying in memory.
+        If $show_phrases is true, it'll also spit out phrase length
+        statistics in the dictionary.
+
+TO DO
+    For more efficiency, the codec should support outputting codes over less
+    than two bytes. For example, a 12 bit compressed segment would be better
+    expressed using 1.5 bytes per code, since you're not going to be using 4
+    bits of each output code using "pack 'S*'".
+
+KNOWN BUGS
+    The LZW algorithim implemented here is not compatible with any other LZW
+    implementation. It is a slight varient from that implemented in
+    Compress::LZW, but don't expect it to work with any other LZW compressed
+    data.
+
+COPYRIGHT
+    Copyright (c) 2006 Eric Waters and XMission LLC
+    (http://www.xmission.com/). All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Eric Waters <ewaters@uarc.com>
+

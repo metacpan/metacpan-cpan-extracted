@@ -1,0 +1,24 @@
+0.05     2012-04-26
+
+- Fixed test failures with Catalyst::Plugin::Session 0.35. Reported by Andreas
+  Koenig. RT #76811.
+
+
+0.04     2009-12-08
+
+- Added missing build prereqs, Test::Exception.
+
+
+0.03     2009-10-16
+
+- Fixes to work with the new config session key, Plugin::Session.
+
+
+0.02     2009-07-27
+
+- Added a prereq on Catalyst::Plugin::Session.
+
+
+0.01     2009-07-26
+
+- First version, released on an unsuspecting world.

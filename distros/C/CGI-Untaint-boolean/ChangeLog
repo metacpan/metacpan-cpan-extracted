@@ -1,0 +1,20 @@
+Version 1.01, Sat Jul  9 20:31:19 UTC 2005
+	- clarified the return value in the documentation (Dave Baker)
+
+Version 1.00, Fri Jul  8 07:08:44 UTC 2005
+	- added patch from Simon Wilcox to clarify return value of value()
+	- tested coverage
+	- made traditional Makefile.PL
+	- added POD tests
+	- signed distribution
+	- bumped up version number
+
+Version 0.12, Wed Jul  7 04:39:49 UTC 2004
+	- added Makefile.PL for ExtUtils::MakeMaker compatibility
+	- skip some tests without Test::CGI::Untaint installed
+
+Version 0.11, Sat Jun 26 22:25:55 UTC 2004 
+	- added explanation of the value in the documentation (thanks, Tony!)
+
+Version 0.10, Sat Jun 26 22:16:46 UTC 2004
+	- initial release

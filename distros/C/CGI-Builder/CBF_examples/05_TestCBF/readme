@@ -1,0 +1,25 @@
+The test is really little and it is my FIRST TEST with this library: I
+discovered it just some days ago!! If you note errors, send me.
+
+It's composed of just six templates used with Magic and filled with some
+variables , a counter in the session and two forms, one of which tested
+with DFVCheck.
+
+To install, extract in your cgi-bin dir, be sure you have apache
+executing .pl files, and set the path in test.pl to the directory in
+which is Test.pm library.
+
+Then point your browser to http://localhost/cgi-bin/Test/test.pl?p=Main
+All the executed procedure will be logged in /tmp/test.log (tail -f
+/tmp/test.log to view it).
+
+Just a problem: I tried to check the correctness of the email input in
+'Form2' using DFVCheck, but it doesn't work.
+If someone knows why, I'm here.
+
+If you want to send me some feedback, please use the CBF mailing list.
+
+Massimiliano Ciancio
+
+
+2004-06-02

@@ -1,0 +1,62 @@
+Revision history for perl module Catalyst::Controller::SimpleCAS
+
+1.001 2017-04-05
+    - Use :raw mode on file handles - PR #6 (NERDVANA)
+
+1.000 2016-06-01
+    - First "official" production release (i.e. can be used beyond RapidApp)
+    - More complete documentation (VANSTYN)
+    - Added Catalyst::Plugin::SimpleCAS interface (VANSTYN)
+    - Add new sugar methods 'fetch', 'fetch_fh' and 'add' (VANSTYN)
+    - Fix Store::File backend on Win32 Strawberry perl - PR #5 (NRDVANA)
+
+0.9982 2015-11-29
+    - Minor bugfix (missing use Path::Class) - apparent leftover regression
+      from DBIC store enhancement/refactoring ~ v0.996 (VANSTYN)
+    - Added Contributors section to dist.ini (VANSTYN)
+
+0.9981 2015-08-29
+    - Bypassed broken dep CSS::Simple with a temp/hack local copy. See 
+      git commit log and RT#105857 for more details (VANSTYN)
+
+0.998 2015-06-03
+    - Added DBIC Store class (for real this time) - PR #4 (GETTY)
+    - Prevent failed get_resource calls from blowing up the entire
+      request/parse (Download as MHT functions) (VANSTYN)
+    - Misc warnings cleanup/fixes, but not all, there are still warnings
+      produced from Email::Simple::Header not solved (VANSTYN)
+    - Requure latest versions of Email::* modules (VANSTYN)
+
+0.997 2015-05-20
+    - REVERT BACK TO v0.995, v0.996 IS BROKEN
+
+0.996 2015-05-20
+    - Added DBIC Store class - PR #2 (GETTY)
+    - Misc refactoring (GETTY)
+
+0.995 2015-05-08
+    - Switch to Chained controller actions - PR #1 (GETTY)
+
+0.994 2015-02-06
+    - Fixed broken code within TextTranscode
+    - Load from mhtml now aggressively tries to figure out *real* encoding
+      for the MIME part/wrapper. It is now able to properly decode files
+      saved by Word 2010 which actually use 'UTF-16LE' and should also be
+      able to handle other scenarios too
+    - Support for mount_url prefix (only applies to RapidApp)
+
+0.993 2015-01-28
+    - Fixed broken content_size method
+
+0.992 2015-01-19
+    - Added support for forwarding to a view for JSON rendering, 
+      and this now defaults to the view 'RapidApp::JSON' if present
+    - Misc logic/code cleanup
+    - Switched from JSON::DWIW back to normal JSON
+
+0.991 2014-08-20
+    - Freed up rouge RapidApp include/dep
+    - Misc Travis/dist tweaks
+
+0.990 2014-08-06
+    - Initial CPAN release, ported mostly "as-is" from RapidApp

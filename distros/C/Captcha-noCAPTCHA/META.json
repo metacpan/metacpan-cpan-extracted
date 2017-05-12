@@ -1,0 +1,63 @@
+{
+   "abstract" : "Simple implementation of Google's noCAPTCHA reCAPTCHA for perl",
+   "author" : [
+      "Chuck Larson"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captcha-noCAPTCHA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "1.56",
+            "JSON::PP" : "0",
+            "Net::SSLeay" : "1.49",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Captcha::noCAPTCHA" : {
+         "file" : "lib/Captcha/noCAPTCHA.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clarson/Captcha-noCAPTCHA/issues"
+      },
+      "homepage" : "https://github.com/clarson/Captcha-noCAPTCHA",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/clarson/Captcha-noCAPTCHA.git",
+         "web" : "https://github.com/clarson/Captcha-noCAPTCHA"
+      }
+   },
+   "version" : "0.15"
+}
+

@@ -1,0 +1,40 @@
+Revision history for Perl extension Cikl
+
+0.5.1 2014-03-25T22:00:50Z
+    - Fixed missing dependencies
+
+    - Moved rules/feeds out to cikl/cikl-feeds
+
+0.5.0 2014-03-25T16:00:04Z
+    - Stripped out all the server-side code, given that we are shifting focus
+    to using Logstash as the 'backend'. 
+
+    - Spint RabbitMQ out to its own perl module to reduce dependencies of the
+    core library.
+
+0.4.1 2014-03-05T17:47:15Z
+
+    - Ugh, use better versioning. 
+
+0.04 2014-03-03T20:02:05Z
+
+    - Remove test-rules to reduce dist size.    
+
+0.03 2014-03-03T19:16:36Z
+
+    - Try pushing our stuff up to CPAN
+
+0.02 2014-03-03T17:28:32Z
+
+    - Clean up dependencies
+      - Set minimum version of perl to 5.014
+      - Stop using MouseX::NativeTraits - we really don't benefit.
+      - Remove lots of unused stuff.
+
+    - Require Cikl::DataTypes::* explicitly (was seeing dependency issues on 
+      travis)
+
+0.01 2014-02-27T20:01:29Z
+
+    - original version
+

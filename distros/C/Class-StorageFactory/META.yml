@@ -1,0 +1,21 @@
+---
+name: Class-StorageFactory
+version: 1.0
+author: ~
+abstract: base class for factories to store and fetch objects
+license: perl
+requires:
+  YAML: 0.35
+build_requires:
+  Test::Class: ''
+  Test::Exception: ''
+  Test::Pod: ''
+  Test::Pod::Coverage: ''
+  Test::Simple: 0.47
+provides:
+  Class::StorageFactory:
+    file: lib/Class/StorageFactory.pm
+    version: 1.0
+  Class::StorageFactory::YAML:
+    file: lib/Class/StorageFactory/YAML.pm
+generated_by: Module::Build version 0.2608

@@ -1,0 +1,12 @@
+Changes
+lib/Catalyst/Helper/Model/Xapian.pm
+lib/Catalyst/Model/Xapian.pm
+lib/Catalyst/Model/Xapian/Result.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+sample-indexer.pl
+t/01use.t
+t/02pod.t
+t/03podcoverage.t

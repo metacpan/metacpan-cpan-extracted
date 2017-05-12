@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+
+package Bench::Base;
+
+sub new { 
+    my($class) = shift;
+    bless { test => 23 }, $class;
+}
+
+package Bench::Direct;
+use base qw(Bench::Base);
+
+package Bench::Normal;
+use Class::Accessor "moose-like";
+has test => (is => "rw");
+
+package Bench::Fast;
+use Class::Accessor::Fast "moose-like";
+has test => (is => "rw");
+
+package Bench::Faster;
+use Class::Accessor::Faster "antlers";
+has test => (is => "rw");
+
+package Bench::Moose;
+use Moose;
+has test => (is => "rw");
+
+package Bench::Mouse;
+use Mouse;
+has test => (is => "rw");
+
+package main;
+use strict;
+use Benchmark 'cmpthese';
+
+my $tmp;
+my $direct = Bench::Direct->new({ test => 23 });
+my %accessor = ( Direct => sub { $tmp = $direct->{test}; } );
+my %mutator = ( Direct => sub { $direct->{test} = 42; } );
+for my $p (qw/Normal Fast Faster Moose Mouse/) {
+    my $o = "Bench::$p"->new({ test => 23 });
+    $accessor{$p} = sub { $tmp = $o->test; };
+    $mutator{$p}  = sub { $o->test(42); };
+}
+
+print "accessors:\n";
+cmpthese( -10, \%accessor );
+print "\n";
+print "mutators:\n";
+cmpthese( -10, \%mutator );
+

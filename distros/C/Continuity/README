@@ -1,0 +1,289 @@
+NAME
+    Continuity - Abstract away statelessness of HTTP, for stateful Web
+    applications
+
+SYNOPSIS
+      #!/usr/bin/perl
+
+      use strict;
+      use Continuity;
+
+      my $server = new Continuity;
+      $server->loop;
+
+      sub main {
+        my $request = shift;
+        $request->print("Your name: <form><input type=text name=name></form>");
+        $request->next; # this waits for the form to be submitted!
+        my $name = $request->param('name');
+        $request->print("Hello $name!");
+      }
+
+DESCRIPTION
+    Continuity is a library to simplify web applications. Each session is
+    written and runs as a persistant application, and is able to request
+    additional input at any time without exiting. This is significantly
+    different from the traditional CGI model of web applications in which a
+    program is restarted for each new request.
+
+    The program is passed a $request variable which holds the request
+    (including any form data) sent from the browser. In concept, this is a
+    lot like a $cgi object from CGI.pm with one very very significant
+    difference. At any point in the code you can call $request->next. Your
+    program will then suspend, waiting for the next request in the session.
+    Since the program doesn't actually halt, all state is preserved,
+    including lexicals -- getting input from the browser is then similar to
+    doing "$line = <>" in a command-line application.
+
+GETTING STARTED
+    The first thing to make a note of is that your application is a
+    continuously running program, basically a self contained webserver. This
+    is quite unlike a CGI.pm based application, which is re-started for each
+    new request from a client browser. Once you step away from your CGI.pm
+    experience this is actually more natural (IMO), more like writing an
+    interactive desktop or command-line program.
+
+    Here's a simple example:
+
+      #!/usr/bin/perl
+
+      use strict;
+      use Continuity;
+
+      my $server = new Continuity;
+      $server->loop;
+
+      sub main {
+        my $request = shift;
+        while(1) {
+          $request->print("Hello, world!");
+          $request->next;
+          $request->print("Hello again!");
+        }
+      }
+
+    First, check out the small demo applications in the eg/ directory of the
+    distribution. Sample code there ranges from simple counters to more
+    complex multi-user ajax applications. All of the basic uses and some of
+    the advanced uses of Continuity are covered there.
+
+    Here is an brief explanation of what you will find in a typical
+    application.
+
+    Declare all your globals, then declare and create your server.
+    Parameters to the server will determine how sessions are tracked, what
+    ports it listens on, what will be served as static content, and things
+    of that nature. You are literally initializing a web server that will
+    serve your application to client browsers. Then call the "loop" method
+    of the server, which will get the server listening for incoming requests
+    and starting new sessions (this never exits).
+
+      use Continuity;
+      my $server = Continuity->new( port => 8080 );
+      $server->loop;
+
+    Continuity must have a starting point when starting new sessions for
+    your application. The default is "\&::main" (a sub named "main" in the
+    default global scope), which is passed the $request handle. See the
+    Continuity::Request documentation for details on the methods available
+    from the $request object beyond this introduction.
+
+      sub main {
+        my $request = shift;
+        # ...
+      }
+
+    Outputting to the client (that is, sending text to the browser) is done
+    by calling the "$request->print(...)" method, rather than the plain
+    "print" used in CGI.pm applications.
+
+      $request->print("Hello, guvne'<br>");
+      $request->print("'ow ya been?");
+
+    HTTP query parameters (both GET and POST) are also gotten through the
+    $request handle, by calling "$p = $request->param('x')", just like in
+    CGI.pm.
+
+      # If they go to http://webapp/?x=7
+      my $input = $request->param('x');
+      # now $input is 7
+
+    Once you have output your HTML, call "$request->next" to wait for the
+    next response from the client browser. While waiting other sessions will
+    handle other requests, allowing the single process to handle many
+    simultaneous sessions.
+
+      $request->print("Name: <form><input type=text name=n></form>");
+      $request->next;                   # <-- this is where we suspend execution
+      my $name = $request->param('n');  # <-- start here once they submit
+
+    Anything declared lexically (using my) inside of "main" is private to
+    the session, and anything you make global is available to all sessions.
+    When "main" returns the session is terminated, so that another request
+    from the same client will get a new session. Only one continuation is
+    ever executing at a given time, so there is no immediate need to worry
+    about locking shared global variables when modifying them.
+
+ADVANCED USAGE
+    Merely using the above code can completely change the way you think
+    about web application infrastructure. But why stop there? Here are a few
+    more things to ponder.
+
+  Coro::Event
+    Since Continuity is based on Coro, we also get to use Coro::Event. This
+    means that you can set timers to wake a continuation up after a while,
+    or you can have inner-continuation signaling by watch-events on shared
+    variables.
+
+  Multiple sessions per-user
+    For AJAX applications, we've found it handy to give each user multiple
+    sessions. In the chat-ajax-push demo each user gets a session for
+    sending messages, and a session for receiving them. The receiving
+    session uses a long-running request (aka COMET) and watches the globally
+    shared chat message log. When a new message is put into the log, it
+    pushes to all of the ajax listeners.
+
+  Lexical storage and callback links
+    Don't forget about those pretty little lexicals you have at your
+    disposal. Taking a hint from the Seaside folks, instead of regular links
+    you could have callbacks that trigger a anonymous subs. Your code could
+    look like:
+
+      use Continuity;
+      use strict;
+      my @callbacks;
+      my $callback_count;
+      Continuity->new->loop;
+      sub gen_link {
+        my ($text, $code) = @_;
+        $callbacks[$callback_count++] = $code;
+        return qq{<a href="?cb=$callback_count">$text</a>};
+      }
+      sub process_links {
+        my $request = shift;
+        my $cb = $request->param('cb');
+        if(exists $callbacks[$cb]) {
+          $callbacks[$cb]->($request);
+          delete $callbacks[$cb];
+        }
+      }
+      sub main {
+        my $request = shift;
+        my $x;
+        my $link1 = gen_link('This is a link to stuff' => sub { $x = 7  });
+        my $link2 = gen_link('This is another link'    => sub { $x = 42 });
+        $request->print($link1, $link2);
+        $request->next;
+        process_links($request);
+        $request->print("\$x is now: $x");
+      }
+
+  Scaling
+    To scale a Continuity-based application beyond a single process you need
+    to investigate the keywords "session affinity". The Seaside folks have a
+    few articles on various experiments they've done for scaling, see the
+    wiki for links and ideas. Note, however, that premature optimization is
+    evil. We shouldn't even be talking about this.
+
+EXTENDING AND CUSTOMIZING
+    This library is designed to be extensible but have good defaults. There
+    are two important components which you can extend or replace.
+
+    The Adapter, such as the default Continuity::Adapt::HttpDaemon, actually
+    makes the HTTP connections with the client web broswer. If you want to
+    use FastCGI or even a non-HTTP protocol, then you will use or create an
+    Adapter.
+
+    The Mapper, such as the default Continuity::Mapper, identifies incoming
+    requests from The Adapter and maps them to instances of your program. In
+    other words, Mappers keep track of sessions, figuring out which requests
+    belong to which session. The default mapper can identify sessions based
+    on any combination of cookie, ip address, and URL path. Override The
+    Mapper to create alternative session identification and management.
+
+METHODS
+    The main instance of a continuity server really only has two methods,
+    "new" and "loop". These are used at the top of your program to do setup
+    and start the server. Please look at Continuity::Request for
+    documentation on the $request object that is passed to each session in
+    your application.
+
+  $server = Continuity->new(...)
+    The "Continuity" object wires together an Adapter and a mapper. Creating
+    the "Continuity" object gives you the defaults wired together, or if
+    user-supplied instances are provided, it wires those together.
+
+    Arguments:
+
+    *   "callback" -- coderef of the main application to run persistantly
+        for each unique visitor -- defaults to "\&::main"
+
+    *   "adapter" -- defaults to an instance of
+        "Continuity::Adapt::HttpDaemon"
+
+    *   "mapper" -- defaults to an instance of "Continuity::Mapper"
+
+    *   "docroot" -- defaults to "."
+
+    *   "staticp" -- defaults to "sub { $_[0]->url =~
+        m/\.(jpg|jpeg|gif|png|css|ico|js)$/ }", used to indicate whether any
+        request is for static content
+
+    *   "debug_level" -- Set level of debugging. 0 for nothing, 1 for
+        warnings and system messages, 2 for request status info. Default is
+        1
+
+    *   "debug_callback" -- Callback for debug messages. Default is print.
+
+    Arguments passed to the default adapter:
+
+    *   "port" -- the port on which to listen
+
+    *   "no_content_type" -- defaults to 0, set to 1 to disable the
+        "Content-Type: text/html" header and similar headers
+
+    Arguments passed to the default mapper:
+
+    *   "cookie_session" -- set to name of cookie or undef for no cookies
+        (defaults to 'cid')
+
+    *   "query_session" -- set to the name of a query variable for session
+        tracking (defaults to undef)
+
+    *   "assign_session_id" -- coderef of routine to custom generate session
+        id numbers (defaults to a simple random string generator)
+
+    *   "cookie_life" -- lifespan of the cookie, as in CGI::set_cookie
+        (defaults to "+2d")
+
+    *   "ip_session" -- set to true to enable ip-addresses for session
+        tracking (defaults to false)
+
+    *   "path_session" -- set to true to use URL path for session tracking
+        (defaults to false)
+
+    *   "implicit_first_next" -- set to false to get an empty first request
+        to the main callback (defaults to true)
+
+  $server->loop()
+    Calls Coro::Event::loop and sets up session reaping. This never returns!
+
+SEE ALSO
+    See the Wiki for development information, more waxing philosophic, and
+    links to similar technologies such as <http://seaside.st/>.
+
+    Website/Wiki: <http://continuity.tlt42.org/>
+
+    Continuity::Request, Continuity::RequestCallbacks, Continuity::Mapper,
+    Continuity::Adapt::HttpDaemon, Coro
+
+AUTHOR
+      Brock Wilcox <awwaiid@thelackthereof.org> - http://thelackthereof.org/
+      Scott Walters <scott@slowass.net> - http://slowass.net/
+      Special thanks to Marc Lehmann for creating (and maintaining) Coro
+
+COPYRIGHT
+      Copyright (c) 2004-2008 Brock Wilcox <awwaiid@thelackthereof.org>. All
+      rights reserved.  This program is free software; you can redistribute it
+      and/or modify it under the same terms as Perl itself.
+

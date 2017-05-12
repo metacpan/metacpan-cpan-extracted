@@ -1,0 +1,23 @@
+05/23/2016 v.2.001	Disallow the 'global' section name.
+			For config files, key names should always be case insenstive
+
+05/23/2016 v.1.9	Remove mistakenly added MYMETA files from manifest
+
+05/09/2016 v.1.8	Command line argument keys are now case sensitive
+
+04/30/2016 v.1.7	Fixed macro bug which resulted in the wrong substitution when using multiple
+			macros from the same section on a single line
+
+04/27/2016 v.1.6	More documentation improvements
+
+04/25/2016 v.1.5	Documentation improvements
+			Improvements to examples/test.pl
+
+04/24/2016 v.1.4	Fixed line splitting regexp to just use split()
+
+04/19/2016 v.1.3	Removed debugging string on the CLI argument parser
+			Removed cruft
+			Fixed issue which preventing all internal variables from being
+			successfully parsed.
+
+04/15/2016 v.1.2	Initial public release

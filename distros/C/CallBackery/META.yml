@@ -1,0 +1,34 @@
+---
+abstract: 'CallBackery is a Mojolicious+Qoodoo Framework for building Web Applications'
+author:
+  - 'Tobias Oetiker <tobi@oetiker.ch>'
+build_requires:
+  CPAN::Uploader: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CallBackery
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - example
+    - setup
+    - lib/Mojolicious/Command/generate/callbackery_app
+requires:
+  Config::Grammar: '1.12'
+  Locale::PO: '0.27'
+  Mojolicious: '7.26'
+  Mojolicious::Plugin::Qooxdoo: '0.905'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/oetiker/callbackery/issues
+  license: http://opensource.org/licenses/GPL-3.0
+  repository: https://github.com/oetiker/callbackery
+version: v0.10.6

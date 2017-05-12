@@ -1,0 +1,42 @@
+Cdk Perl5 Extension,
+Mike Glover, Copyright 1995, 1996
+------------------------------------------------------------------------------
+This file lists all the files provided as an example of the Perl5 Cdk
+extension.
+
+examples Directory	Description
+------------------------------------------------------------------------------
+alphalist		Demonstrates the alphalist widget.
+buttonbox		Demonstrates the buttonbox widget.
+bind			Demonstrates how to use the bind function.
+calendar		Demonstrates the calendar widget.
+dialog			Demonstrates the dialog widget.
+entry			Demonstrates the entry widget.
+fselect			Demonstrates the file selector widget.
+graph			Demonstrates the graph widget.
+histogram		Demonstrates the histogram widget.
+itemlist		Demonstrates the itemlist widget.
+label			Demonstrates the label widget.
+marquee			Demonstrates the marquee widget.
+matrix			Demonstrates the matrix widget.
+mentry			Demonstrates the mentry widget.
+menu			Demonstrates the menu widget.
+postProcess		Demonstrates how to use the post-process capabilities.
+preProcess		Demonstrates how to use the pre-process capabilities.
+radio			Demonstrates the radio widget.
+scale			Demonstrates the scale widget.
+scroll			Demonstrates the scroll widget.
+selection		Demonstrates the selection widget.
+slider			Demonstrates the slider widget.
+swindow			Demonstrates the scrolling window widget.
+template		Demonstrates the template widget.
+viewer			Demonstrates the viewer widget.
+
+demos Directory		Description
+------------------------------------------------------------------------------
+async			Demonstrates how to manipulate defined widgets
+			asynchronously.
+perlbug			Rips off Larry's utils/perlbug program.
+pkgInfo			Basic Solaris package install/remove program.
+pwdInfo			Basic password file browser.
+rolodex			Comprehensive personal rolodex.

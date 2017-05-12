@@ -1,0 +1,12 @@
+Revision history for Perl extension Crypt::Fernet.
+
+0.02  Web Aug 20 01:33:59 2014
+	- update LICENSE
+	- update test cases
+	- update dependencies
+	- update readme
+
+0.01  Mon Aug 18 01:47:56 2014
+	- original version; created by h2xs 1.23 with options
+		-AX Crypt::Fernet
+

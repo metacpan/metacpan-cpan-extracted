@@ -1,0 +1,49 @@
+Revision history for Class-NonOO
+
+v0.4.1    2016-01-12 17:21:19+00:00 Europe/London
+  [Documentation]
+  - Update copyright year to 2016.
+
+  [Bug Fixes]
+  - Fix tests to work with older versions of Moo.
+
+v0.4.0    2016-01-12 15:20:54+00:00 Europe/London
+  [Documentation]
+  - Added SEE ALSO section for similar modules.
+
+  - Minor rewording of the description.
+
+  [Enhancements]
+  - Default export options come from the export variables, if they are
+    defined.
+
+  [Bug Fixes]
+  - Duplicate symbols are not added to @EXPORT_OK.
+
+v0.3.0    2015-01-12 19:15:42+00:00 Europe/London
+  [Documentation]
+  - Added old module name to Changes.
+
+  - Fixed typo in POD.
+
+  [Incompatible Changes]
+  - Bumped minimum Perl to v5.10.1.
+
+  [Enhancements]
+  - Added support for @EXPORT_OK and %EXPORT_TAGS.
+
+  - Added namespace segregation.
+
+  [Other Changes]
+  - Minor code reorganization.
+
+v0.2.0    2015-01-11 14:46:24+00:00 Europe/London
+  [Incompatible Changes]
+  - Renamed module to Class::NonOO, since it does not actually require
+    Moo.
+
+  [Bug Fixes]
+  - Fixed bad code in the tests.
+
+v0.1.0    2015-01-11 01:07:06+00:00 Europe/London
+  - Initial version of MooX::NonOO.

@@ -1,0 +1,54 @@
+Revision history for Catmandu-EuropePMC
+
+0.17  2015-08-31 09:01:20 CEST
+    - remove unused deps
+
+0.16  2015-08-31 08:25:05 CEST
+    - test slightly modified
+
+0.15  2014-09-25 07:40:50 CEST
+    - uses Catmandu::Importer::XML
+    - iteration over single items
+    - raw xml option
+
+0.14  2014-06-27 14:01:39 CEST
+	- renamed accessor format to fmt
+
+0.13  2014-05-06 08:24:25 CEST
+	- cpan, please index me
+
+0.12  2014-04-29 11:40:51 CEST
+	- removed dependency XML::Simple and LWP::UserAgent
+
+0.11  2014-03-05 15:25:38 CET
+	- tests improved
+
+v0.10  2014-01-13 07:44:19 CET
+	- typo
+
+v0.08  2014-01-07 15:56:49 CET
+	- better error handling, Try::Tiny
+
+v0.07  2013-12-19 10:04:28 CET
+	- pod
+
+v0.06  2013-12-18 16:37:50 CET
+	- default option added
+	- tests extended
+
+0.05  2013-12-18 14:58:20 CET
+	- again tests
+
+v0.04  2013-12-18 14:40:00
+	- still testing
+
+v0.03  2013-12-18 14:30:00
+	- testing
+
+v0.02  2013-12-18 14:15:00
+	- documentation
+
+v0.01  2013-12-18 13:55:00
+	- simple test
+	- Importer + fix methods
+        - Initial release

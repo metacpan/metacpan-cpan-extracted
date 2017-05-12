@@ -1,0 +1,120 @@
+Changes for the CPAN Testers Blog website
+=========================================
+
+1.13    2015-12-31
+        - added CSS green ribbon promotion.
+
+1.12    2015-10-11
+        - updates from live
+        - upgrade to Labyrinth-Plugin-CPAN-3.55.
+        - added CPAN Testers Sponsor adverts.
+        - added 1 <3 CPAN Testers framed ribbon.
+
+1.11    2015-09-15
+        - upgrade to Labyrinth-5.32.
+        - upgrade to Labyrinth-Plugin-Core-5.19.
+
+1.10    2015-02-09
+        - upgrade to Labyrinth-5.24.
+        - removed Perl promotions links.
+        - added Admin site links.
+
+1.09    2014-09-21
+        - fixed license fields in META.json to be lists.
+        - added documentation about the CPAN Testers Fund.
+
+1.08    2014-05-23
+        - upgrade to Labyrinth-5.21.
+        - upgrade to Labyrinth-Plugin-Core-5.15.
+        - upgrade to Labyrinth-Plugin-Articles-Diary 1.05.
+        - upgrade to Labyrinth-Plugin-Event 1.04.
+        - fixed distribution name in META.
+        - added LICENSE file.
+        - added nofollow link attributes to iheart.js.
+        - upgraded comment management.
+        - extend allowable CMS HTML tags.
+
+1.07    2014-02-16
+        - removed unused files.
+        - template cleanups.
+        - upgrade to Labyrinth-5.20.
+        - upgrade to Labyrinth-Plugin-Core-5.14.
+        - updated sumhits script.
+
+1.06    2013-03-24
+        - optimised static images.
+        - minimised CSS.
+        - added robots.txt.
+        - change to JSON for iheart 
+        - split posted by and on onto 2 different lines
+        - upgrade to Labyrinth 5.15.
+        - added block.grango.org to Block/Allow IPs
+
+1.05    2013-01-06
+        - change file dates changed to meet W3CDTF standards.
+        - added iheart styles.
+
+1.04    2012-04-22
+        - fixed META.json test.
+
+1.03    2012-04-22
+        - fixed publish status when saving edited comments.
+        - upgrade to Labyrinth 5.12.
+        - removed social media bar due to dubious practices.
+        - added CPAN Testers Sponsors.
+        - added README.
+        - added minimum perl version (5.006).
+        - fixed test pre-requisites.
+        - reworked Makefile.PL for clarity.
+
+1.02    2011-08-18
+        - upgrade to Labyrinth 5.09.
+        - upgrade to Labyrinth-Plugin-Core 5.09.
+        - added titlemaps and pathmaps to settings.ini.
+        - WAI WCAG v2.0 compliance updates.
+        - update layout to include an update notification.
+        - added a new social media bar
+        - fixed images and css incorrectly pasted from wiki distro
+        - revised banner logo image by Jon 'JJ' Allen.
+
+1.01    2011-06-20
+        - updates to improve presentation.
+        - included a Terms & Conidtions page to meet EU Cookie Directive.
+        - updates to diary and user templates for images.
+        - updates to templates for usability compliance.
+        - fixes for Posted lookups.
+        - upgrade to Labyrinth 5.08.
+        - upgrade to Labyrinth-Plugin-Core 5.08.
+
+1.00    2011-04-20
+        - upgrade to Labyrinth 5.04.
+        - upgrade to Labyrinth-Plugin-Core 5.06.
+        - upgrade to Labyrinth-Plugin-Articles-Diary 1.00.
+        - upgrade to Labyrinth-Plugin-Event 1.00.
+        - packaged for CPAN release.
+
+0.06    2010-11-20
+        - user lists now hide special users (Guest), restrict access to users
+          of the same or higher access, and prevent priveledged users from
+          being deleted.
+        - user acls fixed to correctly list folders and access.
+        - folder list driven by database, added FolderName function.
+        - update to admin templates to make them consistent across sites.
+
+0.05    2010-09-29
+        - repositioned site boxes to avoid text and logo clashing.
+
+0.04    2010-09-16
+        - added links to Metabase and Labyrinth.
+        - upgraded to Labyrinth v5.00.
+
+0.03    2010-01-14
+        - added quote.html
+        - added Analysis to site family lists.
+
+0.02    2009-07-04
+        - added TinyMCE support to comments for public users.
+        - fixed bug in saving comments for admin users.
+
+0.01    2009-05-17
+        - First released version, based on Labyrinth v4.16

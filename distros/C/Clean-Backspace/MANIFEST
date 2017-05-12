@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Clean-Backspace.t
+lib/Clean/Backspace.pm
+META.yml                                 Module meta-data (added by MakeMaker)

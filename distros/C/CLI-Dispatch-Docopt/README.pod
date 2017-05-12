@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<CLI::Dispatch::Docopt>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/CLI-Dispatch-Docopt"><img src="https://secure.travis-ci.org/bayashi/CLI-Dispatch-Docopt.png"/></a> <a href="https://coveralls.io/r/bayashi/CLI-Dispatch-Docopt"><img src="https://coveralls.io/repos/bayashi/CLI-Dispatch-Docopt/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+CLI::Dispatch::Docopt installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan CLI::Dispatch::Docopt
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+CLI::Dispatch::Docopt documentation is available as in POD. So you can do:
+
+    % perldoc CLI::Dispatch::Docopt
+
+
+=head1 REPOSITORY
+
+CLI::Dispatch::Docopt is hosted on github
+L<http://github.com/bayashi/CLI-Dispatch-Docopt>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

@@ -1,0 +1,20 @@
+Revision history for Perl extension Catalyst::Plugin::DBIC::Schema::Profiler.
+
+0.06 2010-02-19 21:22
+    - Fix test fail when Catalyst::Plugin::Session::Store::DBIC is not installed.
+
+0.05 2010-02-13 21:54
+    - Fix RT #53355 ( thanks Matthias )
+      https://rt.cpan.org/Ticket/Display.html?id=53355
+
+0.04 2007-01-24 15:04
+    - Activate Only in -Debug mode 
+
+0.03  2007-01-02 00:01
+    - Fix typo in the POD.
+
+0.02  2007-01-01 23:10
+    - Add 'Catalyst-Model-DBIC-Schema' to PREREQ_PM.
+
+0.01  2006-12-26 20:34
+    - initial version

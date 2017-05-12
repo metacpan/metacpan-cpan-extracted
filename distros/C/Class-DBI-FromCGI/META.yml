@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Class-DBI-FromCGI
+version:      1.00
+version_from: lib/Class/DBI/FromCGI.pm
+installdirs:  site
+requires:
+    CGI::Untaint:                  0.8
+    Class::DBI:                    0.91
+    Test::More:                    0.17
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

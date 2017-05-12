@@ -1,0 +1,55 @@
+<?xml version='1.0'?>
+
+<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/">
+<version>1.1</version>
+<numberOfRecords>4</numberOfRecords>
+<records>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData>
+<record type="Bibliographic">
+  <leader>00785nas a2200277 c 4500</leader>
+  <controlfield tag="001">987874829</controlfield>
+  <datafield ind1="1" ind2="0" tag="245">
+    <subfield code="a">Code4Lib journal</subfield>
+    <subfield code="h">Elektronische Ressource</subfield>
+    <subfield code="b">C4LJ</subfield>
+  </datafield>
+</record>
+</recordData><recordPosition>1</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData>
+<record type="Bibliographic" xmlns:slim="http://www.loc.gov/MARC21/slim">
+  <leader>00785nas a2200277 c 4500</leader>
+  <controlfield tag="001">987874829</controlfield>
+  <datafield ind1="1" ind2="0" tag="245">
+    <subfield code="a">Code4Lib journal</subfield>
+    <subfield code="h">Elektronische Ressource</subfield>
+    <subfield code="b">C4LJ</subfield>
+  </datafield>
+</record>
+</recordData><recordPosition>2</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData>
+<slim:record type="Bibliographic" xmlns:slim="http://www.loc.gov/MARC21/slim">
+  <slim:leader>00785nas a2200277 c 4500</slim:leader>
+  <slim:controlfield tag="001">987874829</slim:controlfield>
+  <slim:datafield ind1="1" ind2="0" tag="245">
+    <slim:subfield code="a">Code4Lib journal</slim:subfield>
+    <slim:subfield code="h">Elektronische Ressource</slim:subfield>
+    <slim:subfield code="b">C4LJ</slim:subfield>
+  </slim:datafield>
+</slim:record>
+</recordData><recordPosition>3</recordPosition></record>
+<record><recordSchema>info:srw/schema/1/marcxml-v1.1</recordSchema><recordPacking>xml</recordPacking><recordData>
+<marc:record type="Bibliographic" xmlns:marc="http://www.loc.gov/MARC21/slim">
+  <marc:leader>00785nas a2200277 c 4500</marc:leader>
+  <marc:controlfield tag="001">987874829</marc:controlfield>
+  <marc:datafield ind1="1" ind2="0" tag="245">
+    <marc:subfield code="a">Code4Lib journal</marc:subfield>
+    <marc:subfield code="h">Elektronische Ressource</marc:subfield>
+    <marc:subfield code="b">C4LJ</marc:subfield>
+  </marc:datafield>
+</marc:record>
+</recordData><recordPosition>4</recordPosition></record>
+</records>
+
+<extraResponseData></extraResponseData> 
+<echoedSearchRetrieveRequest><version>1.1</version><query>code4lib</query><startRecord>1</startRecord><maximumRecords>10</maximumRecords><recordSchema>marcxml</recordSchema><xQuery><searchClause xmlns="http://www.loc.gov/zing/cql/xcql/"><index>srw.ServerChoice</index><relation><value>scr</value></relation><term>code4lib</term></searchClause></xQuery></echoedSearchRetrieveRequest>
+</searchRetrieveResponse>

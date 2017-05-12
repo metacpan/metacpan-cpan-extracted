@@ -1,0 +1,78 @@
+# PODNAME: Config::Model::models::Ssh::PortForward
+# ABSTRACT:  Configuration class Ssh::PortForward
+=head1 NAME
+
+Config::Model::models::Ssh::PortForward - Configuration class Ssh::PortForward
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+Configuration class that represents the parameters required
+to specify port forwarding in a ssh configuration.
+
+=head1 Elements
+
+=head2 ipv6
+
+Specify if the forward is specified iwth IPv6 or IPv4. I<< Optional. Type boolean.  >> 
+
+=head2 bind_address - bind address to listen to
+
+Specify the address that the port will listen to. By default, only connections coming from localhost (127.0.0.1) will be forwarded.
+
+By default, the local port is bound in accordance with the GatewayPorts setting. However, an explicit bind_address may be used to bind the connection to a specific address.
+
+The bind_address of 'localhost' indicates that the listening port be bound for local use only, while an empty address or '*' indicates that the port should be available from all interfaces.I<< Optional. Type uniline.  >> 
+
+=head2 port
+
+Listening port. Connection made to this port will be forwarded to the other side of the tunnel.I<< Mandatory. Type uniline.  >> 
+
+=head2 host - host name or address
+
+I<< Mandatory. Type uniline.  >> 
+
+=head2 hostport - destination port
+
+Port number to connect the tunnel to.I<< Mandatory. Type uniline.  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=back
+
+=head1 AUTHOR
+
+=over
+
+=item Dominique Dumont
+
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2009-2011 Dominique Dumont
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item LGPL2
+
+
+=back
+
+=cut
+

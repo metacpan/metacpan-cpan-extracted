@@ -1,0 +1,16 @@
+To: "[% name %]" <[% email %]>
+From: CPAN Testers Webmaster <webmaster@cpantesters.org>
+Subject: CPAN Testers Reports Admin - Marked Reports
+
+Dear [% name %],
+
+This email is being sent to you, as an author has marked a report submitted to the CPAN Testers by this email address. Please login or open an account to The CPAN Testers Reports Admin website to see what reports have been marked. 
+
+If you have never logged into the Reports Admin website before, this site allows authors and testers to agree to remove reports that may have been sent in error, or contain reports that are not correctly representative of the testing required.
+
+Please click the following link to access the site:
+
+http://admin.cpantesters.org
+
+Regards,
+The CPAN Testers Administration Team

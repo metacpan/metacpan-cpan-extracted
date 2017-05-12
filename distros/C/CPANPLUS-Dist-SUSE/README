@@ -1,0 +1,57 @@
+CPANPLUS-Dist-SUSE
+
+This is a simple module which inherits from CPANPLUS::Dist::RPM that
+allows for creating RPM packages under SUSE. In particular, this
+RPM spec file has been tested in SLES 11.
+
+It also honors Module::Build if Build.PL is in the distribution.
+
+Simple way of creating and installing a module is:
+
+ cpan2dist --verbose --format CPANPLUS::Dist::SUSE --buildprereq --dist-opts="--replacefiles=" --install Module::Builder
+
+"--replacefiles=" can be used when you want to install with rpm option 
+"--replacefiles"
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CPANPLUS::Dist::SUSE
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPANPLUS-Dist-SUSE
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CPANPLUS-Dist-SUSE
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CPANPLUS-Dist-SUSE
+
+    Search CPAN
+        http://search.cpan.org/dist/CPANPLUS-Dist-SUSE/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Qindel Formacion y Servicios, SL
+Copyright (C) 2011 Matthias Weckbecker, <matthias@weckbecker.name>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+MDLMol.pm
+META.yml			Module meta-data (added by MakeMaker)
+README
+SDF.pm
+t/1.sdf
+t/mdlmol.t
+t/pattern.t
+t/pod.t
+t/rw.sdf
+t/sdf.t
+t/mol/bromobenzene.mol
+t/mol/C5H5Cl2I.mol
+t/mol/chg_rad.mol
+t/mol/fluoroethylene.mol
+t/mol/N2F2.mol
+t/pat/bromobenzene.mol
+t/pat/query.mol
+

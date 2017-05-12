@@ -1,0 +1,42 @@
+Changelog for Crypt-MCrypt
+
+0.07 2013-09-12T09:17:50
+ - Adding README to distribution. modified gitignore [Shantanu]
+
+0.06 2013-09-12T09:16:04
+ - v0.06
+   
+    - Merge branch 'master' of github.com:shantanubhadoria/Crypt-MCrypt
+      [Shantanu]
+    - Bump Changes [Shantanu Bhadoria]
+    - Bump Changes [Shantanu Bhadoria] [Shantanu]
+ - Merge branch 'master' of github.com:shantanubhadoria/Crypt-MCrypt
+   [Shantanu]
+ - Bump Changes [Shantanu Bhadoria]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.05 2013-09-08T09:04:36
+ - Fixed XS syntax bugs [Shantanu Bhadoria]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.04 2013-07-11T00:48:40
+ - Added Changes [Shantanu Bhadoria]
+ - Added DES ECB Test [Shantanu Bhadoria]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.03 2013-07-09T15:38:54
+ - v0.03
+   
+	   - 2013-07-09 23:38:26 Asia/Singapore [Shantanu Bhadoria]
+ - Added README and .gitignore [Shantanu Bhadoria]
+
+0.02 2013-07-09T15:31:31
+ - Added README and .gitignore [Shantanu Bhadoria]
+ - Modified and REMOVED Default OUR $VERSION line to generate using
+   Dist::Zilla, Added Test [Shantanu Bhadoria]
+ - Adding XS Files
+   triple des cbc decryption test [Shantanu Bhadoria]
+
+0.01 2013-07-09T09:36:15
+ - First Interation of the Crypt::MCrypt Module [Shantanu Bhadoria]
+

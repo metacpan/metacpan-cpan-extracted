@@ -1,0 +1,19 @@
+README for Class::ExtraAttributes
+
+This module makes it possible to transparently add attributes to an existing
+class (usually a subclass of a standard class) without interfering with the
+functionality of that class.  This functionality is based on the OOB class
+which allows attributes to be added to any Perl data-structure.
+
+Version:
+ 0.02
+
+Required Modules:
+ OOB (0.08)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

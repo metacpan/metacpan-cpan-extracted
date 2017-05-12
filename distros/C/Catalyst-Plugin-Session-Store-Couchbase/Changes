@@ -1,0 +1,14 @@
+Revision history for Catalyst-Plugin-Session-Store-Couchbase
+
+0.94    2013-06-24
+        c->session_expires is unix time to expire;  expiry should be a duration.
+
+0.93    2013-03-14
+        Increase timeout to six seconds (from default of 2.5)
+
+0.92    2013-02-21
+        Add missing dependencies to Makefile
+
+0.91    2013-02-20
+        Initial open-source version released to CPAN
+

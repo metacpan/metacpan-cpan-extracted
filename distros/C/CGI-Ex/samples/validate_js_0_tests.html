@@ -1,0 +1,519 @@
+<html>
+<head>
+<title>CGI/Ex/validate.js tests</title>
+<script src="../lib/CGI/Ex/validate.js"></script>
+</style>
+</head>
+<body>
+<h1>CGI/Ex/validate.js tests</h1>
+<div style="background:#eee">
+Test Form
+<form name=the_form>
+<input type=text     size=3 name=text1>
+<input type=text     size=3 name=text2>
+<input type=text     size=3 name=text3>
+<input type=text     size=3 name=text3>
+<input type=password size=3 name=password1>
+<input type=hidden   name=hidden1>
+<select name=select1><option>foo</option></select>
+<select name=select2><option value="foo">foo</option></select>
+<select name=select3><option value="foo">foo</option><option value="bar">bar</option></select>
+<select name=select4 multiple=multiple><option value="foo">foo</option><option value="bar">bar</option></select>
+<textarea name=textarea1 rows=1 cols=3></textarea>
+<input type=checkbox name=checkbox1 value=1>
+<input type=checkbox name=checkbox2 value=1><input type=checkbox name=checkbox2 value=2>
+<input type=radio name=radio1 value=1>
+<input type=radio name=radio2 value=1><input type=radio name=radio2 value=2>
+</form>
+</div>
+<div id="output"></div>
+</body>
+<script>
+var ok_i = 0;
+var nok  = 0;
+function ok (is_ok, str) {
+  if (! is_ok) nok++;
+  str = ""+ (is_ok ? "ok" : "not ok") +" "+ (++ok_i) +" - "+ str;
+  str = "<span style=color:"+(is_ok ? "green" : "red")+">"+ str +"</span><br>\n";
+  var el = document.getElementById("output")
+  el.innerHTML = str + el.innerHTML;
+}
+
+function validate (vars, vals) {
+  var f = document.the_form;
+  f.text1.value     = typeof(vars.text1    ) != 'undefined' ? vars.text1     : '';
+  f.text2.value     = typeof(vars.text2    ) != 'undefined' ? vars.text2     : '';
+  f.textarea1.value = typeof(vars.textarea1) != 'undefined' ? vars.textarea1 : '';
+  f.password1.value = typeof(vars.password1) != 'undefined' ? vars.password1 : '';
+
+  for (var j = 0; j < f.checkbox2.length; j++)
+     f.checkbox2[j].checked = false;
+  if (vars.checkbox2)
+    for (var i = 0; i < vars.checkbox2.length; i++)
+      for (var j = 0; j < f.checkbox2.length; j++)
+        if (vars.checkbox2[i] == f.checkbox2[j].value) f.checkbox2[j].checked = true;
+
+  var err_obj = v_validate(f, vals);
+  if (err_obj) return err_obj.as_hash();
+  return false;
+}
+
+function run_tests () {
+  var begin = new Date();
+  begin = begin.getTime();
+
+  ok(document.validate, "Found document.validate function");
+  ok(v_get_form_value, "Found v_get_form_value function ");
+
+  var form = document.the_form;
+  ok(form, "Got the form");
+
+  // required
+  var e = validate({}, {text1:{required:1}});
+  ok(e, "Got required error");
+  ok(e.text1_error == "The field text1 is required.", "Got the right required error");
+
+  e = validate({text1:1}, {text1:{required:1}});
+  ok(! e, "Got no required error");
+
+  // validate_if
+
+  e = validate({}, {text1:{required:1, validate_if:'text2'}});
+  ok(! e, "Got no error on validate_if");
+  e = validate({text2:1}, {text1:{required:1, validate_if:'text2'}});
+  ok(e, "Got validate_if error");
+  ok(e.text1_error == "The field text1 is required.", "Got the right required error");
+
+  var v = {text1:{required:1, validate_if:'text2 was_valid'}, text2:{validate_if:'text3'}};
+  e = validate({}, v);
+  ok(! e, "Got no error on validate_if with was_valid");
+  e = validate({text2:1}, v);
+  ok(! e, "Got no error on validate_if with was_valid with non-validated data");
+  e = validate({text3:1}, v);
+  ok(! e, "Got no error on validate_if with was_valid with validated - bad data");
+  e = validate({text2:1, text3:1}, v);
+  ok(! e, "Got error on validate_if with was_valid with validated - good data");
+  e = validate({text1:1, text2:1, text3:1}, v);
+  ok(! e, "No error on validate_if with was_valid with validated - good data");
+
+  v = {text1:{required:1, validate_if:'text2 had_error'}, text2:{required:1}};
+  e = validate({}, v);
+  ok(e, "Got error on validate_if with had_error");
+  e = validate({text2:1}, v);
+  ok(! e, "No error on validate_if with had_error and bad_data");
+  e = validate({text1:1}, v);
+  ok(e && ! e.text1_error, "No error on validate_if with had_error and good data");
+
+  // required_if
+  e = validate({}, {text1:{required_if:'text2'}});
+  ok(! e, "No required_if error");
+  e = validate({text2:1}, {text1:{required_if:'text2'}});
+  ok(e, "Required_if error");
+  ok(e.text1_error == "The field text1 is required.", "Got the right required error");
+
+  // max_values
+  e = validate({checkbox2:[1,2]}, {checkbox2:{required:1}});
+  ok(e, "Got max_values error "+e.checkbox2_error);
+  ok(e.checkbox2_error == "The field checkbox2 had more than 1 value.", "Got the right max_values error");
+  e = validate({checkbox2:[1]}, {checkbox2:{max_values:2}});
+  ok(! e, "No max_values error");
+  e = validate({checkbox2:[1,2]}, {checkbox2:{max_values:2}});
+  ok(! e, "No max_values error");
+
+  // min_values
+  e = validate({checkbox2:[1]}, {checkbox2:{min_values:2}});
+  ok(e, "Got min_values error");
+  ok(e.checkbox2_error == "The field checkbox2 had less than 2 values.", "Got the right min_values error");
+  e = validate({checkbox2:[1,2]}, {checkbox2:{min_values:2, max_values:10}});
+  ok(! e, "No min_values error");
+
+  // enum
+  v = {text1:{'enum':[1, 2, 3]}};
+  e = validate({}, v);
+  ok(e, "Got enum error");
+  ok(e.text1_error == "The field text1 is not in the given list.", "Got the right enum error");
+  e = validate({text1:1}, v);
+  ok(! e, "No enum error");
+
+  v = {text1:{'enum':[1, 2, 3],match:'m/3/'}};
+  e = validate({text1:1}, v);
+  ok(e, 'enum');
+  ok(e.text1_error == "The field text1 contains invalid characters.", 'enum shortcircuit');
+
+  e = validate({text1:4}, v);
+  ok(e, 'enum');
+  ok(e.text1_error == "The field text1 is not in the given list.", 'enum shortcircuit2');
+
+  v = {text2:{'enum':"1 || 2||3"}};
+  e = validate({text2:1}, v);
+  ok(! e, "No enum error");
+  e = validate({text2:4}, v);
+  ok(e, "Got enum error");
+
+  // equals
+  v = {text1:{equals:'text2'}};
+  e = validate({}, v);
+  ok(! e, 'No equals error');
+
+  e = validate({text1:1}, v);
+  ok(e, "Got an equals error");
+  ok(e.text1_error == "The field text1 did not equal the field text2.", "Got the right equals error");
+  e = validate({text1:1, text2:2}, v);
+  ok(e, "Got equals error");
+  e = validate({text1:1, text2:1}, v);
+  ok(! e, "No equals error");
+  v = {text1:{equals:'"text2"'}};
+  e = validate({text1:1, text2:1}, v);
+  ok(e, "Got equals error");
+  e = validate({text1:'text2', text2:1}, v);
+  ok(! e, "No equals error");
+
+  //min_len
+  v = {text1:{min_len:1}};
+  e = validate({}, v);
+  ok(e, "Got min_len error");
+  ok(e.text1_error == "The field text1 was less than 1 character.", "Got the right min_len error");
+  v = {text1:{min_len:10}};
+  e = validate({}, v);
+  ok(e, "Got min_len error");
+  ok(e.text1_error == "The field text1 was less than 10 characters.", "Got the right min_len error");
+  e = validate({text1:"123456789"}, v);
+  ok(e, "Got a min_len error");
+  e = validate({text1:"1234567890"}, v);
+  ok(! e, "No min_len error");
+
+  // max_len
+  v = {text1:{max_len:10}};
+  e = validate({}, v);
+  ok(! e, "No max_len error");
+  e = validate({text1:""}, v);
+  ok(! e, "No max_len error");
+  e = validate({text1:"1234567890"}, v);
+  ok(! e, "No max_len error");
+  e = validate({text1:"12345678901"}, v);
+  ok(e, "Got a max_len error");
+  ok(e.text1_error == "The field text1 was more than 10 characters.", "Got the right max_len error");
+  v = {text1:{max_len:1}};
+  e = validate({text1:"12345678901"}, v);
+  ok(e, "Got a max_len error");
+  ok(e.text1_error == "The field text1 was more than 1 character.", "Got the right max_len error");
+
+  // match
+  v = {text1:{match:'m/^\\w+$/'}};
+  e = validate({text1:"abc"}, v);
+  ok(! e, "No match error");
+  e = validate({text1:"abc."}, v);
+  ok(e, "Got a match error");
+  ok(e.text1_error == "The field text1 contains invalid characters.", "Got the right match error");
+
+  v = {text1:{match_2:'m/^\\w+$/',match_2_error:'Bad'}};
+  e = validate({text1:"abc"}, v);
+  ok(! e, "No match error");
+  e = validate({text1:"abc."}, v);
+  ok(e, "Got a match error");
+  ok(e.text1_error == "Bad", "Got the right match error");
+
+  v = {text1:{match:['m/^\\w+$/', 'm/^[a-z]+$/']}};
+  e = validate({text1:"abc"}, v);
+  ok(! e, "No match error with multiple");
+  e = validate({text1:"abc1"}, v);
+  ok(e, "Got a match error with multiple");
+
+  v = {text1:{match:'m/^\\w+$/ || m/^[a-z]+$/'}};
+  e = validate({text1:"abc"}, v);
+  ok(! e, "No match error with multiple match string");
+  e = validate({text1:"abc1"}, v);
+  ok(e, "Got a match error with multiple match string");
+
+  v = {text1:{match:'! m/^\\w+$/'}};
+  e = validate({text1:"abc"}, v);
+  ok(e, "Got a match error with not match string");
+  e = validate({text1:"abc."}, v);
+  ok(! e, "No match error with not match string");
+
+  v = {text1:{match:'m/^\\w+$/'}};
+  e = validate({}, v);
+  ok(e, "Got an error with non-existing field");
+  v = {text1:{match:'! m/^\w+$/'}};
+  e = validate({}, v);
+  ok(! e, "No match error with non-existing field and not match string");
+
+  // compare
+  v = {text1:{compare:'> 0'}};
+  e = validate({}, v);
+  ok(e, "Got an error");
+  ok(e.text1_error == "The field text1 did not fit comparison.", "Got the right compare error");
+  v = {text1:{compare:'== 0'}};
+  e = validate({}, v);
+  ok(! e, "No compare error == 0");
+  v = {text1:{compare:'== 1'}};
+  e = validate({}, v);
+  ok(e, "Got compare error == 1");
+  v = {text1:{compare:'< 0'}};
+  e = validate({}, v);
+  ok(e, "Got compare error < 0");
+  v = {text1:{compare:'> 10'}};
+  e = validate({text1:11}, v);
+  ok(! e, "No compare error > 10");
+  e = validate({text1:10}, v);
+  ok(e, "Got compare error > 10");
+  v = {text1:{compare:'== 10'}};
+  e = validate({text1:11}, v);
+  ok(e, "Got compare error == 10");
+  e = validate({text1:10}, v);
+  ok(! e, "No compare error == 10");
+  v = {text1:{compare:'< 10'}};
+  e = validate({text1:9}, v);
+  ok(! e, "No compare error < 10");
+  e = validate({text1:10}, v);
+  ok(e, "Got compare error < 10");
+  v = {text1:{compare:'>= 10'}};
+  e = validate({text1:10}, v);
+  ok(! e, "No compare error >= 10");
+  e = validate({text1:9}, v);
+  ok(e, "Got compare error >= 10");
+  v = {text1:{compare:'!= 10'}};
+  e = validate({text1:10}, v);
+  ok(e, "Got compare error >= 10");
+  e = validate({text1:9}, v);
+  ok(! e, "No compare error >= 10");
+  v = {text1:{compare:'<= 10'}};
+  e = validate({text1:11}, v);
+  ok(e, "Got compare error <= 10");
+  e = validate({text1:10}, v);
+  ok(! e, "No compare error <= 10");
+  v = {text1:{compare:'gt ""'}};
+  e = validate({}, v);
+  ok(e, "Got compare error gt ''");
+  v = {text1:{compare:'eq ""'}};
+  e = validate({}, v);
+  ok(! e, "No compare error eq ''");
+  v = {text1:{compare:'lt ""'}};
+  e = validate({}, v);
+  ok(e, "Got compare error lt ''");
+  v = {text1:{compare:'gt "c"'}};
+  e = validate({text1:'d'}, v);
+  ok(! e, "No compare error gt 'c'");
+  e = validate({text1:'c'}, v);
+  ok(e, "Got compare error gt 'c'");
+  v = {text1:{compare:'eq c'}};
+  e = validate({text1:'d'}, v);
+  ok(e, "Got compare error eq c");
+  e = validate({text1:'c'}, v);
+  ok(! e, "No compare error lt c");
+  v = {text1:{compare:'lt c'}};
+  e = validate({text1:'b'}, v);
+  ok(! e, "No compare error lt c");
+  e = validate({text1:'c'}, v);
+  ok(e, "Got compare error lt c");
+  v = {text1:{compare:'ge c'}};
+  e = validate({text1:'c'}, v);
+  ok(! e, "No compare error ge c");
+  e = validate({text1:'b'}, v);
+  ok(e, "Got compare error ge c");
+  v = {text1:{compare:'ne c'}};
+  e = validate({text1:'c'}, v);
+  ok(e, "Got compare error ne c");
+  e = validate({text1:'b'}, v);
+  ok(! e, "No compare error ne c");
+  v = {text1:{compare:'le c'}};
+  e = validate({text1:'d'}, v);
+  ok(e, "Got compare error le c");
+  e = validate({text1:'c'}, v);
+  ok(! e, "No compare error le c");
+
+  // custom_js
+  v = {text1:{custom_js:" value ? true : false "}};
+  e = validate({}, v);
+  ok(e, "Got a custom_js error for eval type");
+  ok(e.text1_error == "The field text1 did not match custom_js check.", "Got the right custom_js error for eval type");
+  e = validate({text1:"str"}, v);
+  ok(! e, "No custom_js error for eval type");
+  v = {text1:{custom_js:function (args) { return args.value ? true : false }}};
+  e = validate({}, v);
+  ok(e, "Got a custom_js error for function type");
+  ok(e.text1_error == "The field text1 did not match custom_js check.", "Got the right custom_js error for function type");
+  e = validate({text1:"str"}, v);
+  ok(! e, "No custom_js error for function type");
+
+  e = validate({text1: "str"}, {text1: {custom_js:"throw 'Always fail ('+value+')'"}});
+  ok(e, 'Got an error');
+  ok(e.text1_error == "Always fail (str)", "Passed along the message from throw");
+  e = validate({text1: "str2"}, {text1: {custom_js:function (args) { throw "Always fail2 ("+args.value+")" }}});
+  ok(e, 'Got an error');
+  ok(e.text1_error == "Always fail2 (str2)", "Passed along the message from throw");
+
+
+
+  // type checks
+  v = {text1: {type: 'ip', match: 'm/^203\./'}};
+  e = validate({text1: '209.108.25'}, v);
+  ok(e, 'type ip - with short circuit');
+  ok(e.text1_error == 'The field text1 did not match type ip.', 'type ip - was: '+e.text1_error); // make sure they short circuit
+  e = validate({text1: '209.108.25.111'}, v);
+  ok(e, 'type ip - but had match error');
+  ok(e.text1_error == 'The field text1 contains invalid characters.', 'type ip');
+  e = validate({text1: '203.108.25.111'}, v);
+  ok(! e, 'type ip');
+
+  v = {text1:{type:'email'}};
+  e = validate({text1:'foo.bar.com'}, v)
+  ok(e, "Got an email error");
+  ok(e.text1_error == "The field text1 did not match type email.", "Got the right type email error");
+  e = validate({text1:'f oo@bar.com'}, v)
+  ok(e, "Got an email error");
+  ok(e.text1_error == "The field text1 did not match type email.", "Got the right type email error");
+  e = validate({text1:'foo@bar.com'}, v)
+  ok(!e, "No email error");
+  e = validate({text1:'+foo@bar.com'}, v)
+  ok(!e, "No email error");
+  e = validate({text1:'+bar.com'}, {text1:{type:'domain'}});
+  ok(e, "Got a domain error");
+  e = validate({text1:'foo-.bar.com'}, {text1:{type:'domain'}});
+  ok(e, "Got a domain error");
+  e = validate({text1:'foo..bar.com'}, {text1:{type:'domain'}});
+  ok(e, "Got a domain error");
+  e = validate({text1:'.foo.bar.com'}, {text1:{type:'domain'}});
+  ok(e, "Got a domain error");
+  e = validate({text1:'foo.bar.com'}, {text1:{type:'domain'}});
+  ok(!e, "No domain error");
+  e = validate({text1:'http://bar.com/'}, {text1:{type:'url'}});
+  ok(!e, "No url error");
+  e = validate({text1:'https://bar.com/foo.html'}, {text1:{type:'url'}});
+  ok(!e, "No url error");
+  e = validate({text1:'http://bar.com.:8080/'}, {text1:{type:'url'}});
+  ok(!e, "No url error");
+  e = validate({text1:'http://bar.com/fo sdf'}, {text1:{type:'url'}});
+  ok(e, "Got url error");
+  e = validate({text1:'234234234'}, {text1:{type:'cc'}});
+  ok(e, "Got cc error");
+  e = validate({text1:'4242-4242-4242-4242'}, {text1:{type:'cc'}});
+  ok(!e, "No cc error");
+  e = validate({text1:'4242 4242 4242 4242'}, {text1:{type:'cc'}});
+  ok(!e, "No cc error");
+  e = validate({text1:'4241-4242-4242-4242'}, {text1:{type:'cc'}});
+  ok(e, "Got cc error");
+  e = validate({text1:'4241-4242-4242'}, {text1:{type:'cc'}});
+  ok(e, "Got cc error");
+  for (var $_ in {"0":1, "2":1, "23":1, "-0":1, "-2":1, "-23":1, "0.0":1, ".1":1, "0.1":1, "0.10":1, "1.0":1, "1.01":1})
+    ok(!validate({text1: $_}, {text1: {type: 'num'}}),  "Type num "+$_)
+  for (var $_ in {"0":1, "2":1, "23":1, "-0":1, "-2":1, "-23":1, "2147483647":1, "-2147483648":1})
+    ok(!validate({text1: $_}, {text1: {type: 'int'}}),  "Type int "+$_);
+  for (var $_ in {"0":1, "2":1, "23":1, "4294967295":1})
+    ok(!validate({text1: $_}, {text1: {type: 'uint'}}), "Type uint "+$_);
+  for (var $_ in {"0a":1, "a2":1, "-0a":1, "0..0":1, "00":1, "001":1, "1.":1})
+    ok(validate({text1: $_},  {text1: {type: 'num'}}),  "Type num invalid "+$_);
+  for (var $_ in {"1.1":1, "0.1":1, "0.0":1, "-1.1":1, "0a":1, "a2":1, "a":1, "00":1, "001":1, "2147483648":1, "-2147483649":1})
+    ok(validate({text1: $_},  {text1: {type: 'int'}}),  "Type int invalid "+$_);
+  for (var $_ in {"-1":1, "-0":1, "1.1":1, "0.1":1, "0.0":1, "-1.1":1, "0a":1, "a2":1, "a":1, "00":1, "001":1, "4294967296":1})
+    ok(validate({text1: $_},  {text1: {type: 'uint'}}), "Type uint invalid "+$_);
+
+  // min_in_set checks
+  v = {text1:{min_in_set:'2 of text1 text2 password1', max_values:5}};
+  e = validate({text1:1}, v);
+  ok(e, "Had a min_in_set error");
+  ok(e.text1_error == "Not enough fields were chosen from the set (2 of text1, text2, password1)", "Got the right error");
+  e = validate({text1:1, text2:1}, v);
+  ok(! e, "No min_in_set error");
+  e = validate({text1:1, text2:0}, v);
+  ok(! e, "No min_in_set error");
+
+  // max_in_set checks
+  v = {text1:{max_in_set:'2 of text1 text2 password1'}};
+  e = validate({text1:1}, v);
+  ok(! e, "No max_in_set error");
+  e = validate({text1:1, text2:1}, v);
+  ok(! e, "No max_in_set error");
+  e = validate({text1:1, text2:1, password1:1}, v);
+  ok(e, "Got a max_in_set error");
+
+  // validate_if revisited (but negated - uses max_in_set)
+  v = {text1:{required:1, validate_if:'! text2'}};
+  e = validate({}, v);
+  ok(e, "Got an error because validate_if failed");
+  e = validate({text2:1}, v);
+  ok(! e, "Didn't run required because of validate_if");
+
+  // default value
+  v = {text1:{required:1, 'default':'hmmmm'}};
+  e = validate({}, v);
+  ok(! e, "Didn't get an error because default value was found");
+  ok(document.the_form.text1.value == "hmmmm", "Default value got set in form");
+
+  // do_not_trim / case / replace
+  e = validate({text1:" hey "}, {text1:{required:1}});
+  ok(! e, "No error - just trimmed");
+  ok(document.the_form.text1.value == "hey", "Got right trimmed value ("+document.the_form.text1.value+")");
+  e = validate({text1:"hey\n"}, {text1:{required:1}});
+  ok(! e, "No error - just trimmed");
+  ok(document.the_form.text1.value == "hey", "Got right trimmed value ("+document.the_form.text1.value+")");
+  e = validate({text1:" "}, {text1:{required:1}});
+  ok(e, "Got a required error because chars where trimmed");
+  e = validate({text1:" "}, {text1:{required:1,do_not_trim:1}});
+  ok(! e, "No error because we didn't trim");
+  e = validate({textarea1:"hey\n"}, {textarea1:{required:1,do_not_trim:1}});
+  ok(! e, "No error - just trimmed");
+  ok(document.the_form.textarea1.value.match(/hey\r?\n/), "Got right trimmed value ("+document.the_form.textarea1.value+")");
+  e = validate({textarea1:"\they\n"}, {textarea1:{required:1,do_not_trim:1,trim_control_chars:1}});
+  ok(! e, "No error - just trimmed");
+  ok(document.the_form.textarea1.value == " hey", "Got right trimmed value ("+document.the_form.textarea1.value+")");
+  e = validate({textarea1:"hey"}, {textarea1:{to_upper_case:1}});
+  ok(! e, "No error - just upper cased");
+  ok(document.the_form.textarea1.value == "HEY", "Got right uppercase value");
+  e = validate({textarea1:"HEY"}, {textarea1:{to_lower_case:1}});
+  ok(! e, "No error - just lower cased");
+  ok(document.the_form.textarea1.value == "hey", "Got right lowercase value");
+
+  e = validate({textarea1:"wow"}, {textarea1:{replace:"s/w/W/g", replace2:"s/O/0/i"}});
+  ok(! e, "No error - just replaced");
+  ok(document.the_form.textarea1.value == "W0W", "Got right value ("+document.the_form.textarea1.value+")");
+
+  // match field names
+  e = validate({text1: " hey "}, {'m/^text1$/':{required:1}});
+  ok(! e, "complexname - no error");
+
+  e = validate({text1: ""}, {'m/^text1$/':{required:1}});
+  ok(e, "complexname - had error");
+
+  e = validate({text1: ""}, {'m/^(tex)t1$/':{required:1, validate_if:'$1t2'}});
+  ok(!e, "validate_ifstr - no error");
+
+  e = validate({text1: "", text2: 1}, {'m/^(tex)t1$/':{required:1, validate_if:'$1t2'}});
+  ok(e, "validate_ifstr - had error");
+
+  e = validate({text1: ""}, {'m/^(tex)t1$/':{required:1, validate_if:{field:'$1t2',required:1}}});
+  ok(!e, "validate_if - no error");
+
+  e = validate({text1: "", text2: 1}, {'m/^(tex)t1$/':{required:1, validate_if:{field:'$1t2',required:1}}});
+  ok(e, "validate_if - had error");
+
+  e = validate({text1: ""}, {'m/^(tex)t1$/':{required:1, validate_if:'$1t2 was_valid'}});
+  ok(!e, "was valid - no error");
+
+  e = validate({text1: "", text2: 1}, {'m/^(tex)t1$/':{required:1, validate_if:'$1t2 was_valid'}, text2:{required:1}, 'group order':['text2']});
+  ok(e, "was valid - had error");
+
+  e = validate({text1: "foo", text2: "bar"}, {'m/^(tex)t1$/':{equals:'$1t2'}});
+  ok(e, "equals - had error");
+
+  e = validate({text1: "foo", text2: "foo"}, {'m/^(tex)t1$/':{equals:'$1t2'}});
+  ok(!e, "equals - no error");
+
+  //alert(_form_value(form.text2));
+  //form.text2[0].value = "text1";
+  //form.text2[1].value = "text2";
+  //ok(1, "We can set and get values for duplicate named items");
+
+  var end = new Date();
+  end = end.getTime();
+  var sec = (end - begin)/1000;
+
+  var str = nok ? "<span style=color:red>Failed tests: "+nok+"</span><br>\n" : "<span style=color:green>All tests passed</span><br>\n";
+  str += "(Seconds: "+sec+")<br>\n";
+  var el = document.getElementById("output")
+  el.innerHTML = str + el.innerHTML;
+}
+
+window.onload = run_tests;
+</script>
+</html>

@@ -1,0 +1,12 @@
+Changes
+lib/CDDB/Fake.pm
+script/ls2nocddb
+Makefile.PL
+MANIFEST
+README
+CHANGES
+t/basic1.t
+t/basic2.t
+t/cddb1.t
+t/cddb2.t
+META.yml                                Module meta-data (added by MakeMaker)

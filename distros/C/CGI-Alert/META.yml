@@ -1,0 +1,24 @@
+---
+abstract: 'report CGI script errors to maintainer'
+author:
+  - 'Eduardo Santiago <esm@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Alert
+provides:
+  CGI::Alert:
+    file: lib/CGI/Alert.pm
+    version: 2.09
+requires:
+  Test::Differences: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.09

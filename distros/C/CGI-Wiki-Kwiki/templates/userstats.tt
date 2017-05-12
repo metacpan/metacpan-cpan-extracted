@@ -1,0 +1,33 @@
+[%# When you click on the name of a user in the RecentChanges node, you'll
+    get a list of everything that user has done, displayed on _this_
+    page.
+-%]
+
+[%- INCLUDE header.tt node_name = "User Stats for $username" %]
+
+<h1>[% site_name %] - User Stats for [% username %]</h1>
+
+[% content %]
+
+<h2>
+  Last
+  [% IF nodes.size == 1 %]
+    node
+  [% ELSE %]
+    [% nodes.size %] nodes
+  [% END %]
+  edited by [% username %]
+</h2>
+
+<ul>
+[% FOREACH node = nodes %]
+  <li>[% node.last_modified %]
+      <a href="[% node.url %]">[% node.name %]</a>
+      [% IF node.comment %]
+        <b>[[% node.comment %]]</b>
+      [% END %]
+  </li>
+[% END %]
+</ul>
+
+[% INCLUDE footer.tt %]

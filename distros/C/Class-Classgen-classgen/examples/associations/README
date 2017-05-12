@@ -1,0 +1,8 @@
+On associations
+===============
+
+/one_to_one  gives a simple demo for a one-to-one association.
+/one_to_many gives a simple demo on a one-to-many association.
+
+
+Michael Schlueter  	email: mschlue@cpan.org 

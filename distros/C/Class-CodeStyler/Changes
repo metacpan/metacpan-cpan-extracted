@@ -1,0 +1,63 @@
+Revision history for Perl extension Class::CodeStyler.
+
+0.27 Tue May 1 18:30:00 2007
+	- Changed exists() -- possible mem leak in stl::algorithm functions.
+
+0.26 Thu March 29 18:30:00 2007
+	- fix prerequisite 'use' error for Class::STL;:Containers on some platforms.
+
+0.25 Wed February 21 19:12:21 2007
+	- in append_text() default arg to '' if undefined.
+
+0.24 Wed February 14 19:12:21 2007
+	- added pod functions begin(), end(), etc
+
+0.23 Fri February 9 21:19:51 2007
+	- added pod program type
+
+0.22 Thu February 8 23:39:54 2007
+	- bugfix in add() when called with non-ref arg
+
+0.21 Tue February 6 19:39:54 2007
+	- back() will ignore unmatched over()
+	- close_block will ignore unmatched open_block()
+
+0.20 Thu January 18 18:09:30 2007
+	- Public release
+
+0.18 Tue December 19 19:29:38 2006
+	- Error if undefined object in add() arg list.
+
+0.17 Fri December 15 19:29:38 2006
+	- anchor_set() and anchor_return() functions.
+
+0.16 Thu December 14 21:19:58 2006
+	- the add() function will now copy segments elements of type derived from
+		Class::CodeStyler::Program::Abstract.
+	- removed the packages and inline nodes.
+
+0.15 Wed November 14 23:21:12 2006
+	- using updated stl 0.33 requires explicit name exports.
+
+0.14 Mon July 24 21:26:43 2006
+	- run() function -- waits for child to complete.
+
+0.13 Wed July 19 20:56:43 2006
+	- code() functions -- accept '0' as text argument.
+
+0.12 Thu Jun 29 22:01:22 2006
+	- print_bookmarks option.
+
+0.08 Wed May 17 22:21:34 2006
+	- raw() function -- print code without indent and newline formatting.
+
+0.07 Mon May 15 20:02:22 2006
+	- use stl version 0.26.
+
+0.06 Mon May 8 20:02:22 2006
+	- use stl version 0.21.
+
+0.01  Fri Apr 28 09:10:06 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Class::CodeStyler
+

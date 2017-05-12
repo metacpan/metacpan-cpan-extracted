@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 196
+    - 172
+  42145:
+    - 68
+name: ddcbac
+registers:
+  AF: 44850
+  AF_: 0
+  BC: 36008
+  BC_: 0
+  DE: 25944
+  DE_: 0
+  HL: 1753
+  HL_: 0
+  I: 0
+  IX: 42205
+  IY: 52511
+  PC: 0
+  R: 0
+  SP: 0

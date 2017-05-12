@@ -1,0 +1,11 @@
+<%init>
+$foo = 123;
+@bar = qw/moo kooh/;
+</%init>
+
+<& /globals &>
+
+{
+  foo => <% $foo %>,
+  bar => [<% join (q/, /, @bar) %>],
+}

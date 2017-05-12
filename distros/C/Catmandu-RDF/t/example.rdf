@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="http://example.org">
+    <rdf:type rdf:resource="http://www.w3.org/2000/01/rdf-schema#Resource"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org">
+    <ns0:foo xmlns:ns0="http://example.org/" xml:lang="en">bär</ns0:foo>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org">
+    <ns0:title xmlns:ns0="http://purl.org/dc/elements/1.1/">BÄR</ns0:title>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org">
+    <ns0:extent xmlns:ns0="http://purl.org/dc/elements/1.1/" rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">42</ns0:extent>
+  </rdf:Description>
+</rdf:RDF>

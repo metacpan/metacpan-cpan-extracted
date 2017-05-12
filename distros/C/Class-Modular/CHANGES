@@ -1,0 +1,17 @@
+v0.4 - Saturday, January 22, 2005 13:31:54 PST
+ * Add is_loaded function
+ * Improve documentation
+ * load now checks the subclasses @METHODS and @SUB_MODULE if there
+   isn't a _methods or _init method, respectively.
+ * Add documentation and tests for the above
+ * Add isa function
+
+v0.3 - Tuesday, October 19, 2004 19:28:22 PDT
+ * Fix debian directory to actually build this package properly
+ * Add Safe support and allow Storable to use Deparse to handle CODE references in clones
+ * Rearange function order so that the documentation is in a sane order in Class::Modular
+ * Add USE_SAFE variable to control whether Safe is used
+ * Improve documentation
+ * Fixes to tests
+
+[:DARK MISTS OF TIME:]

@@ -1,0 +1,14 @@
+CHANGES file for CPAN::IndexPod
+
+0.25 Thu Sep 18 16:55:48 BST 2008
+  - change back from Module::Build to ExtUtils::MakeMaker
+  - add machine- and human-readble license
+
+0.24 Sat Sep 30 19:42:10 BST 2006
+  - move the underlying search engine to KinoSearch
+  - add POD test and POD coverage test
+  - fix tyops in pod 
+
+0.22 Fri Jul  2 15:14:41 IST 2004
+  - first release
+

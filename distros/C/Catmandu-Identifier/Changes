@@ -1,0 +1,21 @@
+Revision history for Catmandu-Identifier
+
+0.06  2015-12-22 07:47:20 CET
+    - update dependency of Business::ISBN (@briandfoy)
+
+0.05  2015-12-15 12:31:47 CET
+    - bump version
+
+0.04  2015-09-02 08:35:06 CEST
+    - new fixes orcid_bio, orcid_find, orcid_profile, orcid_works
+    - new conditions is_valid_orcid is_live_orcid
+
+0.03  2015-08-06 13:06:14 CEST
+    - new fixes is_uri, is_http_uri, is_https_uri, is_web_uri, is_live_web_uri, is_archived_web_uri
+    - new fixes memento_find, uuid
+
+0.02  2015-07-14 15:06:46 CEST
+    - new fixes is_valid_isbn, is_valid_issn as condition (thanks @phochste)
+
+0.01  2015-07-06 22:36:34 CEST
+    - Initial release

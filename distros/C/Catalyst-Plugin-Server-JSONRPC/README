@@ -1,0 +1,313 @@
+NAME
+    Catalyst::Plugin::Server::JSONRPC -- Catalyst JSONRPC Server Plugin
+
+SYNOPSIS
+        package MyApp;
+        use Catalyst qw/Server Server::JSONRPC/;
+
+        package MyApp::Controller::Example;
+        use base 'Catalyst::Controller';
+
+        sub echo : JSONRPC {                     # available as: example.echo
+            my ( $self, $c, @args ) = @_;
+            $c->stash->{jsonrpc} = join ', ', @args;
+        }
+
+        sub ping : JSONRPCPath('/ping') {        # available as: ping
+            my ( $self, $c ) = @_;
+            $c->stash->{jsonrpc} = 'Pong';
+        }
+
+        sub world : JSONRPCRegex(/hello/) {      # available as: *hello*
+            my ($self, $c) = @_;
+            $c->stash->{jsonrpc} = 'World';
+        }
+
+        sub echo : JSONRPCLocal {                # available as: example.echo
+            my ( $self, $c, @args ) = @_;
+            $c->stash->{jsonrpc} = join ', ', @args;
+        }
+
+        sub ping : JSONRPCGlobal {               # available as: ping
+            my ( $self, $c ) = @_;
+            $c->stash->{jsonrpc} = 'Pong';
+        }
+
+DESCRIPTION
+    JSONRPC Plugin for Catalyst which we tried to make compatible with the
+    way Catalyst works with URLS. Main features are:
+
+    *   Split JSONRPC methodNames by STRING to find out Controller.
+
+    *   Single entrypoint for JSONRPC calls, like http://host.tld/rpc
+
+    *   DispatchTypes (attributes) which work much the same as Catalyst
+        attrs
+
+    *   JSONRPC Parameter handling transparent to Catalyst parameter
+        handling
+
+HOW IT WORKS
+    The default behaviour will handle JSONRPC Requests sent to "/rpc" by
+    creating an OBJECT containing JSONRPC specific parameters in
+    "$c->req->jsonrpc".
+
+    Directly after, it will find out the Path of the Action to dispatch to,
+    by splitting methodName by ".":
+
+      methodName: hello.world
+      path      : /hello/world
+
+    From this point, it will dispatch to '/hello/world' when it exists, like
+    Catalyst Urls would do. What means: you will be able to set Regexes,
+    Paths etc on subroutines to define the endpoint.
+
+    We discuss these custom JSONRPC attributes below.
+
+    When the request is dispatched, we will return $c->stash->{jsonrpc} to
+    the jsonrpc client, or, when it is not available, it will return
+    $c->stash to the client. There is also a way of defining $c->stash keys
+    to be send back to the client.
+
+ATTRIBUTES
+    You can mark any method in your Catalyst application as being available
+    remotely by using one of the following attributes, which can be added to
+    any existing attributes, except Private. Remember that one of the
+    mentioned attributes below are automatically also Privates...
+
+    JSONRPC
+        Make this method accessible via JSONRPC, the same way as Local does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "hello.world":
+
+          package Catalyst::Controller::Hello
+          sub world : JSONRPC {}
+
+    JSONRPCLocal
+        Identical version of attribute "JSONRPC"
+
+    JSONRPCGlobal
+        Make this method accessible via JSONRPC, the same way as GLOBAL does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "ping":
+
+          package Catalyst::Controller::Hello
+          sub ping : JSONRPCGlobal {}
+
+    JSONRPCPath('/say/hello')
+        Make this method accessible via JSONRPC, the same way as Path does
+        when using catalyst by URL.
+
+        The following example will be accessible by method "say.hello":
+
+          package Catalyst::Controller::Hello
+          sub hello : JSONRPCPath('/say/hello') {}
+
+    JSONRPCRegex('foo')
+        Make this method accessible via JSONRPC, the same way as Regex does
+        when using catalyst by URL.
+
+        The following example will be accessible by example methods:
+        "a.foo.method" "wedoofoohere" "foo.getaround"
+
+          package Catalyst::Controller::Hello
+          sub hello : JSONRPCPath('foo') {}
+
+ACCESSORS
+    Once you've used the plugin, you'll have an $c->request->jsonrpc
+    accessor which will return an "Catalyst::Plugin::Server::JSONRPC"
+    object.
+
+    You can query this object as follows:
+
+    $c->req->jsonrpc->is_jsonrpc_request
+        Boolean indicating whether the current request has been initiated
+        via JSONRPC
+
+    $c->req->jsonrpc->config
+        Returns a "Catalyst::Plugin::Server::JSONRPC::Config" object. See
+        the "CONFIGURATION" below on how to use and configure it.
+
+    $c->req->jsonrpc->body
+        The body of the original JSONRPC call
+
+    $c->req->jsonrpc->method
+        The name of the original method called via JSONRPC
+
+    $c->req->jsonrpc->args
+        A list of parameters supplied by the JSONRPC call
+
+    $c->req->jsonrpc->result_as_string
+        The JSON body that will be sent back to the JSONRPC client
+
+    $c->req->jsonrpc->error
+        Allows you to set jsonrpc fault code and message
+
+Server Accessors
+    The following accessors are always available, whether you're in a
+    jsonrpc specific request or not
+
+    $c->server->jsonrpc->list_methods
+        Returns a HASHREF containing the available jsonrpc methods in
+        Catalyst as a key, and the "Catalyst::Action" object as a value.
+
+CATALYST REQUEST
+    To make things transparent, we try to put JSONRPC params into the
+    Request object of Catalyst. But first we will explain something about
+    the JSONRPC specifications.
+
+    A full draft of these specifications can be found on:
+    "http://www.jsonrpc.com/spec"
+
+    In short, a jsonrpc-request consists of a methodName, like a subroutine
+    name, and a list of parameters. This list of parameters may contain
+    strings (STRING), arrays (LIST) and structs (HASH). Off course, these
+    can be nested.
+
+    $c->req->arguments
+        We will put the list of arguments into $c->req->arguments, thisway
+        you can fetch this list within your dispatched-to-subroutine:
+
+          sub echo : JSONRPC {
+              my ($self, $c, @args) = @_;
+              $c->log->debug($arg[0]);              # Prints first JSONRPC parameter
+                                                    # to debug log
+          }
+
+    $c->req->parameters
+        Because JSONRPC parameters are a LIST, we can't just fill
+        $c->req->paremeters. To keep things transparent, we made an extra
+        config option what tells the JSONRPC server we can assume the
+        following conditions on all JSONRPC requests: - There is only one
+        JSONRPC parameter - This JSONRPC parameter is a struct (HASH)
+
+        We will put this STRUCT as key-value pairs into $c->req->parameters.
+
+    $c->req->params
+        Alias of $c->req->parameters
+
+    $c->req->param
+        Alias of $c->req->parameters
+
+INTERNAL JSONRPC FUNCTIONS
+    The following system functions are available to the public.,
+
+    system.listMethods
+        returns a list of available RPC methods.
+
+DEFINING RETURN VALUES
+    The JSON-RPC response must contain a single parameter, which may contain
+    an array (LIST), struct (HASH) or a string (STRING). To define the
+    return values in your subroutine, you can alter $c->stash in three
+    different ways.
+
+  Defining $c->stash->{jsonrpc}
+    When defining $c->stash->{jsonrpc}, the JSONRPC server will return these
+    values to the client.
+
+  When there is no $c->stash->{jsonrpc}
+    When there is no "$c->stash->{jsonrpc}" set, it will return the complete
+    "$c->stash"
+
+CONFIGURATION
+    The JSONRPC Plugin accepts the following configuration options, which
+    can be set in the standard Catalyst way (See "perldoc Catalyst" for
+    details):
+
+        Your::App->config( jsonrpc => { key => value } );
+
+    You can look up any of the config parameters this package uses at
+    runtime by calling:
+
+        $c->server->jsonrpc->config->KEY
+
+    path
+        This specifies the entry point for your jsonrpc server; all requests
+        are dispatched from there. This is the url any JSONRCP client should
+        post to. You can change this to any "Regex" wish.
+
+        The default is: "qr!^(/?)rpc(/|$)!i", which matches on a top-level
+        path begining with "rpc" preceeded or followed by an optional "/",
+        like this:
+
+            http://your-host.tld/rpc
+
+    prefix
+        This specifies the prefix of the forward url.
+
+        For example, with a prefix of "rpc", and a method "foo", the forward
+        path would be come "/rpc/foo".
+
+        The default is '' (empty).
+
+    separator
+        This is a STRING used to split your method on, allowing you to use a
+        hierarchy in your method calls.
+
+        For example, with a separator of "." the method call "demo.echo"
+        would be forwarded to "/demo/echo". To make "demo_echo" forward to
+        the same path, you would change the separator to "_",
+
+        The default is ".", splitting methods on a single "."
+
+    convert_params
+        Make the arguments in "$c->req->jsonrpc->params" available as
+        "$c->req->params".
+
+        Defaults to true.
+
+    show_errors
+        Make system errors in "$c->error" public to the rpc-caller in a
+        JSON-RPC faultString. When show_errors is false, and your catalyst
+        app generates a fault, it will return an JSON-RPC fault containing
+        error number 500 and error string: "Internal Server Error".
+
+        Defaults to false.
+
+DIAGNOSTICS
+    Invalid JSONRPC request: No such method
+        There is no corresponding method in your application that can be
+        forwarded to.
+
+    Invalid JSONRPC request %s
+        There was an error parsing the JSONRPC request
+
+    Invalid JSONRPC request: Unknown error
+        An unexpected error occurred
+
+TODO
+    Make error messages configurable/filterable
+        Right now, whatever ends up on $c->error gets returned to the
+        client. It would be nice to have a way to filter/massage these
+        messages before they are sent back to the client.
+
+    Make stash filterable before returning
+        Just like the error messages, it would be nice to be able to filter
+        the stash before returning so you can filter out keys you don't want
+        to return to the client, or just return a certain list of keys. This
+        all to make transparent use of JSONRPC and web easier.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Request, Catalyst::Response,
+    JSON::RPC::Common,
+
+ACKNOWLEDGEMENTS
+    For the original implementation of this module:
+
+    Marcus Ramberg "mramberg@cpan.org" Christian Hansen Yoshinori Sano Jos
+    Boumans (kane@cpan.org) Michiel Ootjers (michiel@cpan.org)
+
+AUTHORS
+    Sergey Nosenko (darknos@cpan.org)
+
+    http://code.google.com/p/catalyst-server-jsonrpc
+
+BUG REPORTS
+    Please submit all bugs regarding "Catalyst::Plugin::Server::JSONRPC" to
+    http://code.google.com/p/catalyst-server-jsonrpc/issues/entry
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.

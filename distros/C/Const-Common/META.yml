@@ -1,0 +1,41 @@
+---
+abstract: 'Yet another constant definition module'
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Const-Common
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Const::Common:
+    file: lib/Const/Common.pm
+    version: 0.01
+requires:
+  Data::Lock: 0
+  Exporter: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Songmu/p5-Const-Common/issues
+  homepage: https://github.com/Songmu/p5-Const-Common
+  repository: git://github.com/Songmu/p5-Const-Common.git
+version: 0.01
+x_authority: cpan:SONGMU

@@ -1,0 +1,23 @@
+Revision history for Perl extension Crypt-Password-StretchedHash
+
+0.05 2013-06-28T11:08:06Z
+
+    - use Exporter
+    - Fixed pod
+
+0.04 2013-06-28T04:47:04Z
+
+    - Added parent.pm to require modules #3
+
+0.03 2013-06-24T13:28:27Z
+
+    - Fixed pattern match with hash information
+
+0.02 2013-06-24T06:29:11Z
+
+    - Added HashInfo class and crypt/verify methods and removed OBJECT validation by Params::Validate
+
+0.01 2013-06-19T04:28:57Z
+
+    - original version
+

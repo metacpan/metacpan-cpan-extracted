@@ -1,0 +1,55 @@
+{
+   "abstract" : "IPFilter.dat parser",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Conversion, Software version 7.0",
+   "keywords" : [
+      "BitTorrent",
+      "eMule",
+      "IP",
+      "Filter",
+      "IPFilter.dat"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-IPFilter",
+   "provides" : {
+      "Config::IPFilter" : {
+         "file" : "lib/Config/IPFilter.pm",
+         "version" : "1.00"
+      },
+      "Config::IPFilter::Rule" : {
+         "file" : "lib/Config/IPFilter/Rule.pm",
+         "version" : "1.00"
+      },
+      "Config::IPFilter::Types" : {
+         "file" : "lib/Config/IPFilter/Types.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "sanko@cpan.org",
+         "web" : "http://github.com/sanko/config-ipfilter/issues"
+      },
+      "homepage" : "http://sankorobinson.com/config-ipfilter/",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sanko/config-ipfilter.git",
+         "web" : "http://github.com/sanko/config-ipfilter/tree/"
+      },
+      "x_ChangeLog" : "http://github.com/sanko/config-ipfilter/commits/"
+   },
+   "version" : "1.00"
+}

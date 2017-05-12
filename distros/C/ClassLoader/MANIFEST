@@ -1,0 +1,15 @@
+Build.PL                        Build-Skript
+lib/ClassLoader.pm              Klasse
+INSTALL                         Installationsanleitung
+MANIFEST                        This list of files
+README.pod                      Dokumentation
+slides/classloader.pdf          Präsentation
+slides/classloader.tex
+slides/classloader_wiki.txt
+slides/README
+t/ClassLoader.t                 Unit-Test
+t/ClassLoader/MyClass1.pm       Test Hilfsklasse 1
+t/ClassLoader/MyClass2.pm       Test Hilfsklasse 2
+    
+META.yml
+META.json

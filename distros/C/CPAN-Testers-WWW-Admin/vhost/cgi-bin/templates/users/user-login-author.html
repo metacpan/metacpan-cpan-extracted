@@ -1,0 +1,39 @@
+[% 
+
+    title = 'Author Login' ;
+    crumb2_name = 'Home' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Author Login' ;
+
+%]
+
+[% IF errmess == 1 %]
+<p>I'm sorry but that login was not recognised. Please try again, ensuring you 
+enter the correct email address and password. Thank you.
+[% ELSE %]<p>[% errmess %]</p>
+[% END %]
+
+<p>If you are an author, please login using your standard PAUSE credentials.
+You will then be able to browse your distributions and mark the appropriate
+reports, which you believe to have been made in error.</p>
+
+<p>In the interests of security, your PAUSE credentials will be used to 
+dynamically verify you are an author by PAUSE directly. Once successfully 
+verified, your PAUSE ID only is then held for the duration of the current
+session, and deleted when the current session times out.<p>
+
+<p>Please note that for those authors who are testers as well as authors, 
+you will need to register separately as a tester to mark/verify the reports you
+have sent as a tester. You should also register every email address you have
+sent reports from.</p>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name='act' value='author-login' />
+
+    <table>
+    <tr><td>PAUSE</td>		<td><input type="text"		name="pause" /></td></tr>
+     <tr><td>Password</td>	<td><input type="password"	name="eject" /></td></tr>
+     <tr><td></td>			<td><input type="submit"	name="submit" value='LOGIN' /></td></tr>
+     </table>
+</form>
+

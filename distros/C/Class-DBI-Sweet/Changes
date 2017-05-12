@@ -1,0 +1,56 @@
+Revision history for Perl extension Class::DBI::Sweet
+
+0.11 Mon Jul 25 2011
+    - fix out of scope 'skip_alls' in tests [ishigaki]
+
+0.10 Mon Aug 03 20:20:18 PST 2009
+    - SQL::Abstract 1.55 compatibility, Damyan Ivanov
+
+0.09 Sun Dec 23 23:51:36 PST 2007
+    - fix spelling error which resulted in broken POD link, Jonas B. Nielsen
+    - check for Cache::MemoryCache and skip tests if not present, Rhesa Rozendaal
+    - fix 'bizzare copy of HASH in leave' issue, David Morgan, Randal Schwartz
+
+    - mutiple trigger registration in one add_trigger() call is deprecated,
+      update test 11 to reflect that, Bill Moseley <moseley@hank.org>
+
+    - indent subroutines and perltidy for easy reading
+    - new maintainer Fred Moyer <fred@redhotpenguin.com>
+
+0.08  Tue Dec 14 12:13:00 2005
+	- I mean, v3.0.12 ;-)
+	- Also, /ge
+
+0.07  Mon Dec 12 10:37:00 2005
+        - Updated to work properly with Class::DBI v3.1.2
+
+0.06
+        - Moved UUID check to only die if user has selected uuid as their
+          sequence
+
+        - Provide a way to use named custom SQL fragments and which
+          bits of SQL are replaced in the "%s" substitutions.  Useful
+          for aggregate and GROUP BY queries.  New "attributes" added:
+
+            sql_method : select the sql fragment used for COUNT(*)/SELECT
+            statement_order : define which sql chunks and order are used
+                in the "%s" substitution string.
+
+0.05  
+        - No longer require Data::UUID/Win32API::GUID in Build.PL.
+        - Multi-step joins added for search
+
+0.04  Wed Jul  6 04:10:00 2005
+        - Test fixes (Andrew Taylor)
+        - Bugfix to prefetch (Chia-liang Kao)
+
+0.03  Fri Jul  1 09:31:00 2005
+        - Fixed test suite.
+
+0.02  Wed Jun 29 15:00:00 2005
+        - Added prefetch, join on search and resultset cache. Lots of toys!
+        - added alias pager to page
+        - added some syntactic sugar ;)
+
+0.01  Sun May 29 01:00:00 2005
+        - original version.

@@ -1,0 +1,42 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  AnyEvent::HTTP: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chouette
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::Task: '0.804'
+  Callback::Frame: '0'
+  EV: '0'
+  Feersum: '0'
+  JSON::XS: '0'
+  Log::Defer: '0'
+  Log::Defer::Viz: '0'
+  Log::File::Rolling: '0'
+  Plack: '0'
+  Plack::Request::WithEncoding: '0'
+  Regexp::Assemble: '0'
+  Session::Token: '0'
+  YAML: '0'
+  common::sense: '0'
+resources:
+  bugtracker: https://github.com/hoytech/Chouette/issues
+  repository: git://github.com/hoytech/Chouette.git
+version: '0.102'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

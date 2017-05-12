@@ -1,0 +1,161 @@
+Revision history for Crypt-LE
+
+0.23    25 April 2017
+        - IDN (internationalized domain name) support has been added to the client. Note: the library itself was supporting
+          this from the beginning, as long as you pass domain names in "punycode" form. Now the client application will
+          encode such names into "punycode" for you if needed.
+        - Domain verification process now uses domains in the specified order rather than sorted.
+        - Domain verification is also supported by the client directly (no need to specify --handle-with).
+        - If there is a challenge result flagged as 'valid' for the domain, it will be re-used.
+        - Max amount of retries for waiting in 'pending' state can now be set (by default 300, resulting in 10 min wait time).
+
+0.22    18 April 2017
+        - Client will now postpone fetching the resource directory (so you can generate CSRs and keys completely offline).
+        - Win32 and Win64 binaries are to be available with releases (at https://github.com/do-know/Crypt-LE/releases).
+        - Minor documentation changes.
+
+0.21    17 April 2017
+        - Multi-webroot support added (for multiple domains on the same certificate having different webroots).
+        - Renew expiration date check should now also work with old libraries not reporting certificate depth.
+        - Domains method should now return loaded domains in the same order as provided rather than sorted.
+        - Help output from the client is narrowed down to fit small screens like Windows console better.
+        - Minor documentation changes.
+
+0.20    01 April 2017
+        - CSRs can now be generated on Windows.
+        - ECC is now supported (as long as you have Net:SSLeay version 1.75 or better).
+        - Keys are now generated using Net::SSLeay, Crypt::OpenSSL::RSA is only used for utility purposes and might be removed later.
+        - Main le.pl script accepts a new parameter 'curve' for EC keys, you can use 'default' as a value for 'prime256v1'.
+        - Mail le.pl script accepts a new parameter 'issue-code' to set specified exit code on certificate issuance/renewal.
+        - Main le.pl script will exit with code 255 on error, 0 otherwise.
+        - Dropped non-portable Crypt::OpenSSL::PKCS10 dependency.
+        - Removed Crypt:::PKCS10 dependency.
+
+0.19    16 October 2016
+        - Legacy option (--legacy) is now supported (for AWS services, old Apache versions, some Control Panels and specific
+          devices). In this mode domain keys are generated with 2048 bits instead of 4096 and certificate file only contains
+          the domain certificate, the issuer's one is saved separately.
+        - Certificate revocation should now work for the certificate files containing the full chain - the first certificate
+          in the file will be used.
+        - Improved client error messaging (for the account key and CSR parameters handling).
+        - Minor changes for the upcoming ECC support.
+        - Minor documentation fixes.
+
+0.18    21 August 2016
+        - Loading keys, CSR and certificate is now possible from variables. Passing the string to "load_account_key",
+          "load_csr", "load_csr_key" or "revoke_certificate" functions works as before and treated as a filename.
+          The scalar reference though will be treated as an actual content of the key, CSR or certificate.
+          That allows such data to be stored in a database for example, but used with the Crypt::LE library.
+        - The case of the blacklisted domains (those are similar to well-known brands for example) is handled better
+          and the client will stop early with producing appropriate messages, before even attempting to request any
+          challenges.
+        - Additional check for domain names, both entered as a parameter and loaded from CSR, is implemented.
+          This should cover the cases of attempting to use unsupported by LE entity types (such as URI, IP, email)
+          and attempts to request wildcard certificates (also not supported by LE at the moment).
+        - Registration ID for the key is now accessible directly with "registration_id" call and reported by the client.
+
+0.17    14 May 2016
+        - Additional functions set_domains/verified_domains have been added to work with domain names and to make it possible 
+          to run the verification process before loading/generating a CSR.
+        - The failed_domains method has been modified and now returns the list of domains failed the verification on any of 
+          the request/accept/verify steps if called with a true value as a parameter. Otherwise the list of domains failed 
+          the process on the most recently called request/accept/verify step gets returned (as usual).
+        - Online resource to generate RSA keys and Certificate Signing Requests is referenced and to be available soon at
+          https://get.zerossl.com/ (should help with CSR on Win32/Win64).
+
+0.16    14 May 2016
+        - Configuration changes to allow building PPM for pure Win23/Win64 environments.
+
+0.15    01 April 2016
+        - While generating a new CSR you can now use your existing key (if the file named in csr-key exists). Previously 
+          generating a CSR would have also created a new key with it.
+        - Even though tokens from LE should be technically safe (base64url), in case something gets changed by accident or 
+          gets broken, they will be checked for matching the expected alphabet as per RFC 4648 section 5 (you don't want 
+          something like / to sneak in).
+        - Version typo fix.
+
+0.14    28 March 2016
+        - LICENSE file has been added.
+        - Minimum Perl version is now explicitly specified.
+        - A bit of tidying up.
+
+0.13    28 March 2016
+        - Simplified a few blocks of code in the client.
+        - Moved pod in the client out of the way.
+        - Added Markdown version of README.
+
+0.12    27 March 2016
+        - Library now supports 'logger' parameter to log debug messages via external logger (otherwise printed to STDOUT).
+        - Client logging is now done via Log::Log4perl and supports --log-config parameter, so you can configure logging
+          to your liking (example of a configuration file is given in help).
+        - Client WILL NOT ask for domain verification now if previous verification results are still valid - that should
+          allow renewals to be done without re-verification for about a year. Note: that makes --verified parameter obsolete.
+        - Client now allows email to be used for registration.
+        - Client is largely rewritten and the new home for the project is referenced (https://ZeroSSL.com)
+        - On domain verification failure the error message is available now to callbacks under the 'error' key of results.
+        - Crypt::LE::Complete::Simple can now use the logger passed to it by the client.
+        - Crypt::LE::Complete::Simple is now also given a list of domains the certificate is issued for.
+        - Crypt::LE::Challenge::Simple can now use the logger passed to it by the client (or other application).
+        - Crypt::LE::Challenge::Simple now has DNS verification example added.
+        - Client now supports basic DNS verification by using the following parameters in a command line:
+
+          --handle-as dns --handle-with Crypt::LE::Challenge::Simple
+
+0.11    21 March 2016
+        - Added an option for conditional renew (--renew XX, where XX is the number of days left until expiration) to le.pl client.
+          Expiration can be checked either locally (by reading an existing certificate file) or remotely (by connecting to the website
+          using that certificate).
+        - Added an option to unlink challenge files automatically (--unlink) to le.client. Note: it only works in combination with 
+          existing --path option, which automatically places the challenge files into the target directory.
+
+0.10    16 March 2016
+        - Minor documentation changes.
+        - Text in Crypt::LE::Challenge::Simple handler brought in line with le.pl.
+
+0.09    15 March 2016
+        - Client (and the library of course) now also supports optional callback for verification,
+          so you can clean up challenge files or react in some way depending on the verification process outcome.
+        - Minor documentation fixes.
+
+0.08    15 March 2016
+        - Added MIME::Base64 version dependency to make it work in a specific NetBSD environment.
+        - Client le.pl will not require 'crt' parameter in generate-only mode any more.
+        - Brushed up documentation.
+
+0.07    14 March 2016
+        - Certificate revocation now handles "already revoked" status better.
+        - Both 'handle-params' and 'complete-params' can now take JSON document with parameters either directly or by reading it from file.
+          So it should be now even easier to create 'handle' and 'complete' plugins and pass parameters to those without changing anything
+          in the client itself.
+
+0.06    14 March 2016
+        - Added certificate revocation to both the library (Crypt::LE) and the client (le.pl).
+        - Improved documentation and le.pl usage help.
+        - Added HTTP::Tiny dependencies for NetBSD/OpenBSD boxes, which don't have IO::Socket::SSL and Net::SSLeay
+          installed by default.
+
+0.05    13 March 2016
+        Client: In addition to be able to use external challenge handlers, le.pl can now also use completion handlers. Example:
+
+        le.pl ... --complete-with Crypt::LE::Complete::Simple --complete-params '{"key1": 1, "key2": 2, "key3": "something"}'
+
+        The module handling process completion should have a 'complete' method defined, to which both the completion data
+        (including the domain and issuer's certificate, certificate file name and key file name) and the parameters given
+        with '--complete-params' will be passed.
+
+0.04    13 March 2016
+        Library: accept_challenge() now takes optional parameters, which can be then passed to a callback.
+        Client: le.pl now supports passing parameters to external challenge handling modules. Example:
+
+        le.pl ... --handle-with Crypt::LE::Challenge::Simple --handle-params '{"key1": 1, "key2": 2, "key3": "something"}'
+
+0.03    13 March 2016
+        Client (le.pl) now supports "handle-with" and "handle-as" parameters, so external 
+        challenge handling modules (such as Crypt::LE::Challenge::Simple) can be easily used.
+
+0.02    12 March 2016
+        Minor documentation fix.
+
+0.01    12 March 2016
+        Initial version.
+

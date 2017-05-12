@@ -1,0 +1,12 @@
+Revision history for Perl extension Crypt::Vernam.
+
+0.03  Set Dec 20 12:31:00 2008
+        - Overhauled the README file
+
+0.02  Wed Dec 17 12:10:00 2008
+        - Overhauled the source code
+
+0.01  Sat Dec 13 11:28:55 2008
+	- original version; created by h2xs 1.23 with options
+		-XAn Crypt::Vernam
+

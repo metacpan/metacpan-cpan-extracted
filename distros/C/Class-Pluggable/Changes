@@ -1,0 +1,10 @@
+Revision history for Perl extension Class::Pluggable.
+
+0.02  Sun Jun 25 22:56:00 2006
+	- added addHook, runHook, deleteHook method to Class::Pluggable.
+
+
+0.01  Sat Jun 24 18:31:35 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Class::Pluggable
+

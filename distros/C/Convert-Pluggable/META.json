@@ -1,0 +1,54 @@
+{
+   "abstract" : "convert between various units of measurement",
+   "author" : [
+      "bradley andersen <bradley@pvnp.us>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Convert-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "Math::Round" : "0",
+            "Switch" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Float" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Math::Round" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Switch" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0322"
+}

@@ -1,0 +1,26 @@
+$Id: README 25 2005-09-11 09:48:14Z kentaro $
+
+Class-AutoAccess-Deep version 0.02
+==================================
+
+DESCRIPTION
+
+Class::AutoAccess::Deep is the base class for automated accessors implementation.
+You can access deep inside the object fields to call the method named joining the object
+field name with '->' operator.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Kentaro Kuribayashi, <kentaro@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

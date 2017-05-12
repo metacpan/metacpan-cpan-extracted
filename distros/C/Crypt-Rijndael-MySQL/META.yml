@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Crypt-Rijndael-MySQL
+version:            0.02
+abstract:           MySQL compatible Rijndael (AES) encryption module
+author:
+    - Ivan Fomichev <ifomichev@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Crypt::Rijndael:  1.09
+    Test::More:       0.94
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

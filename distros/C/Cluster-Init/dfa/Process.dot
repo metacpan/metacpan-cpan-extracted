@@ -1,0 +1,106 @@
+digraph "Cluster::Init::DFA::Process"
+{
+
+  size="7.5,10";
+  //rankdir=LR;
+  ratio=fill;
+
+  // _ANY_ -> _ANY_ [label="update/ckent"];
+  _ANY_ -> _ANY_ [label="start/"];
+  _ANY_ -> _ANY_ [label="stop/"];
+  // _ANY_ -> _ANY_ [label="restart/"];
+  _ANY_ -> _ANY_ [label="chld/ckpid"];
+
+  //async: start stop 
+  configured -> setup [label="start/ckmode"];
+  // configured -> retired [label="retire/destruct"];
+
+  // sequencing -> setup [label="ready/ckmode"];
+  // sequencing -> sequencing [label="idle/ckseq"];
+  // sequencing -> configured [label="stop/"];
+  // sequencing -> retired [label="retire/destruct"];
+
+  setup -> runfg [label="wait/xeq"];
+  setup -> runtest [label="test/xeq"];
+  setup -> runbg [label="respawn/xeq"];
+  setup -> runbg [label="once/xeq"];
+  setup -> configured [label="stop/"];
+  setup -> configured [label="off/"];
+  // setup -> retired [label="retire/destruct"];
+
+  //async: start stop chld exited
+
+  runfg -> running [label="started/"];
+  runfg -> done [label="exited/ckmode"];
+  runfg -> configured [label="execfailed/error"];
+  runfg -> stopping [label="stop/"];
+  // runfg -> restarting [label="restart/"];
+  // runfg -> retiring [label="retire/"];
+
+  runtest -> runtest [label="started/"];
+  runtest -> testing [label="exited/ckrc"];
+  runtest -> configured [label="execfailed/error"];
+  runtest -> stopping [label="stop/"];
+
+  runbg -> done [label="started/"];
+  runbg -> done [label="exited/ckmode"];
+  runbg -> configured [label="execfailed/error"];
+  runbg -> stopping [label="stop/"];
+  // runbg -> restarting [label="restart/"];
+  // runbg -> retiring [label="retire/"];
+
+  running -> done [label="exited/ckmode"];
+  running -> stopping [label="stop/"];
+  // running -> restarting [label="restart/"];
+  // running -> retiring [label="retire/"];
+
+  done -> done [label="exited/ckmode"];
+  done -> done [label="wait/"];
+  // done -> testing [label="test/ckrc"];
+  done -> pausing [label="respawn/ckfreq"];
+  done -> done [label="once/"];
+  done -> stopping [label="stop/"];
+  done -> stopping [label="off/"];
+  // done -> restarting [label="restart/"];
+  // done -> retiring [label="retire/"];
+
+  pausing -> runbg [label="continue/xeq"];
+  pausing -> pausing [label="too_rapid/"];
+  pausing -> stopping [label="stop/"];
+
+  stopping -> stopping [label="timeout/ckpid"];
+  stopping -> stopping [label="procrunning/killproc"];
+  stopping -> configured [label="exited/"];
+
+  // restarting -> restarting [label="idle/ckpid"];
+  // restarting -> restarting [label="procrunning/"];
+  // restarting -> restarting [label="restart/"];
+  // restarting -> stopping [label="stop/"];
+  // restarting -> setup [label="procstopped/ckseq"];
+  // restarting -> setup [label="exited/ckseq"];
+  // restarting -> retiring [label="retire/"];
+
+  // retiring -> retiring [label="idle/ckpid"];
+  // retiring -> retiring [label="procrunning/"];
+  // retiring -> retired [label="procstopped/destruct"];
+  // retiring -> retired [label="exited/destruct"];
+  // retiring -> retiring [label="retire/"];
+
+  //async: start stop 
+  testing -> pass [label="rc_zero/"];
+  testing -> fail [label="rc_nonzero/"];
+  testing -> configured [label="stop/"];
+  // testing -> restarting [label="restart/"];
+  // testing -> retired [label="retire/destruct"];
+
+  pass -> setup [label="start/ckmode"];
+  pass -> configured [label="stop/"];
+  // pass -> restarting [label="restart/"];
+  // pass -> retired [label="retire/destruct"];
+
+  fail -> setup [label="start/ckmode"];
+  fail -> configured [label="stop/"];
+  // fail -> restarting [label="restart/"];
+  // fail -> retired [label="retire/destruct"];
+
+}

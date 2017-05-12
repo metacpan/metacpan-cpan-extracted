@@ -1,0 +1,45 @@
+Revision history for Carp-Proxy
+
+0.14    02 Mar 2015
+        The format produced by pod2usage() has changed, causing tests to
+        fail.  Tests now employ a regex that accepts either form.  Small
+        additions to the documentation.
+
+0.13    04 Jan 2015
+        decipher_child_error() now accepts an optional argument.  More
+        wordsmithing.
+
+0.12    07 Nov 2014
+        _build_proxy_name() was being ignored in sub classes.  Minor
+        wordsmithing in the POD.
+
+0.11    31 Oct 2014
+        Windows platforms now skip the portion of 30-attr-context.t that
+        used 'open -|' forking during testing.
+
+0.10    29 Oct 2014
+        Perl dependency moved from 5.14.0 to 5.10.0.  Also tweaked the
+        t/30-attr-context.t test in hopes of picking up a few more
+        Windows platforms.
+
+0.09    25 Oct 2014
+        Fixes for more Windows tests.  We now use the 'open -|' emulation
+        suggested in perldoc perlfork.
+
+0.08    Oct 23 2014
+        Attempts to rectify test failures on Windows
+
+0.07    Oct 21 2014
+        POD had extraneous =for html tags
+
+0.06    Oct 21 2014
+        Tests were failing on windows for what I assume were whitespace
+        issues.  In addition, I was missing three test dependencies in
+        Makefile.PL
+
+0.05    Oct 18 2014
+        I neglected to specify dependencies in Makefile.PL
+
+0.04    Oct 15 2014
+        First version released to CPAN
+

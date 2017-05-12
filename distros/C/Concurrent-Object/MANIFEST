@@ -1,0 +1,30 @@
+
+# Files in Concurrent::Object bundle. 
+
+MANIFEST
+ARTISTIC
+TODO
+Changes
+
+Makefile.PL
+
+lib/Concurrent/Object.pm
+lib/Concurrent/Errorhandler.pm
+lib/Concurrent/Debug.pm
+lib/Concurrent/Object/Forked.pm
+lib/Concurrent/Object/Proxy.pm
+lib/Concurrent/Object/Data/DefferedRV.pm
+lib/Concurrent/Channel/LinkedPipes.pm
+lib/Concurrent/Data/Serializer.pm
+
+t/01-LinkedPipes.t
+t/02-Serializer.t
+t/03-LinkedPipesPerl.t
+t/03-LinkedPipesPerlPackage.t
+t/04-ProxySetScalar.t
+t/04-ProxyURI.t
+t/05-COURI.t
+t/06-CO_RV_URI.t
+
+# $Id: MANIFEST,v 1.2 2001/06/10 15:04:13 vipul Exp $
+

@@ -1,0 +1,10 @@
+Revision history for Config-INI-Reader-Multiline
+
+1.001 2016-08-07 BOOK
+    - Replaced obsolete dzil plugin ReportVersions::Tiny by Test::ReportPrereqs
+    - Replaced t/01use.t test script by the Test::Compile dzil plugin
+    - Rewrote the Changes file according to CPAN::Changes::Spec
+    - Typo fixes
+
+1.000 2015-04-01 BOOK
+    - First version, based on a helper module developed for Act-Voyager

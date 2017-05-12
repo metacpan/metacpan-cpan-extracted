@@ -1,0 +1,75 @@
+---
+abstract: 'Generate Perl class hierarchies'
+author:
+  - unknown
+build_requires:
+  Text::Soundex: '0'
+  Text::Tabs: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Generate
+provides:
+  Class::Generate:
+    file: lib/Class/Generate.pm
+    version: '1.15'
+  Class::Generate::Array:
+    file: lib/Class/Generate.pm
+  Class::Generate::Array_Class:
+    file: lib/Class/Generate.pm
+  Class::Generate::Array_Member:
+    file: lib/Class/Generate.pm
+  Class::Generate::Class:
+    file: lib/Class/Generate.pm
+  Class::Generate::Class_Holder:
+    file: lib/Class/Generate.pm
+  Class::Generate::Class_Method:
+    file: lib/Class/Generate.pm
+  Class::Generate::Code_Checker:
+    file: lib/Class/Generate.pm
+  Class::Generate::Constructor:
+    file: lib/Class/Generate.pm
+  Class::Generate::Hash:
+    file: lib/Class/Generate.pm
+  Class::Generate::Hash_Class:
+    file: lib/Class/Generate.pm
+  Class::Generate::Hash_Member:
+    file: lib/Class/Generate.pm
+  Class::Generate::Key_Value:
+    file: lib/Class/Generate.pm
+  Class::Generate::List_Member:
+    file: lib/Class/Generate.pm
+  Class::Generate::Member:
+    file: lib/Class/Generate.pm
+  Class::Generate::Member_Names:
+    file: lib/Class/Generate.pm
+  Class::Generate::Method:
+    file: lib/Class/Generate.pm
+  Class::Generate::Mix:
+    file: lib/Class/Generate.pm
+  Class::Generate::Own:
+    file: lib/Class/Generate.pm
+  Class::Generate::Param_Style:
+    file: lib/Class/Generate.pm
+  Class::Generate::Positional:
+    file: lib/Class/Generate.pm
+  Class::Generate::Scalar_Member:
+    file: lib/Class/Generate.pm
+  Class::Generate::Support:
+    file: lib/Class/Generate.pm
+requires:
+  Carp: '0'
+  Symbol: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/shlomif/perl-Class-Generate
+version: '1.15'

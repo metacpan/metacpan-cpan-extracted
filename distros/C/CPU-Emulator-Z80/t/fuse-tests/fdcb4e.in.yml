@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 32
+    - 78
+  57832:
+    - 170
+name: fdcb4e
+registers:
+  AF: 12491
+  AF_: 0
+  BC: 22054
+  BC_: 0
+  DE: 21180
+  DE_: 0
+  HL: 21763
+  HL_: 0
+  I: 0
+  IX: 12347
+  IY: 57800
+  PC: 0
+  R: 0
+  SP: 0

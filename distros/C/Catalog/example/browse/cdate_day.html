@@ -1,0 +1,45 @@
+<html>
+<body bgcolor=#ffffff>
+<!-- start years -->
+<center>
+  [ <a href=_SCRIPT_?name=urldate&context=cbrowse>Show all years</a> | 
+  <a href=_YEARLINK_&template=year>Monthes of _YEARFORMATED_</a> |
+
+  <!-- start months -->
+    <!-- params format => '%M %Y' -->
+  <a href=_MONTHLINK_&template=month>Days of _MONTHFORMATED_</a> ]
+
+    <!-- start days -->
+      <!-- params format => '%W, %d %M %Y' -->
+<h3>URL catalog _DAYFORMATED_</h3>
+<title>URL catalog _DAYFORMATED_</title>
+</center>
+    <!-- end days -->
+
+  <!-- end months -->
+
+<!-- end years -->
+
+<!-- start records -->
+<dl>
+<!-- start entry -->
+<dt><a href='_URL-QUOTED_'>_COMMENT_</a>
+<dd>
+<a href='_URL-QUOTED_'>_URL_</a>
+<dd>
+<i><font size=-1>Created _CREATED_</font></i><br>
+<p>
+<!-- end entry -->
+</dl>
+
+<!-- start pager -->
+<center>
+Number of pages _MAXPAGES_
+<p>
+_PAGES_
+</center>
+<!-- end pager -->
+
+<!-- end records -->
+
+</html>

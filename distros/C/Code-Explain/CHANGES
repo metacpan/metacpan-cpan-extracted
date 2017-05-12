@@ -1,0 +1,13 @@
+
+0.02 2011.02.27
+
+    Added more cases that can be explained
+    Added new method to explain each PPI token
+    Removed the unused Moose
+
+    API Change: Eliminated the reuse of the object for multiple strings
+    Command line tool now requires --explain
+
+0.01 2011.02.24
+
+    First version released

@@ -1,0 +1,42 @@
+---
+abstract: 'Catalyst Plugin for File::RotateLogs'
+author:
+  - 'masakyst <masakyst.public@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-File-RotateLogs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Catalyst::Plugin::File::RotateLogs:
+    file: lib/Catalyst/Plugin/File/RotateLogs.pm
+    version: '0.05'
+  Catalyst::Plugin::File::RotateLogs::Backend:
+    file: lib/Catalyst/Plugin/File/RotateLogs.pm
+requires:
+  Catalyst::Runtime: '5.90000'
+  File::RotateLogs: '0.07'
+  perl: 5.010_001
+resources:
+  bugtracker: https://github.com/masakyst/Catalyst-Plugin-File-RotateLogs/issues
+  homepage: https://github.com/masakyst/Catalyst-Plugin-File-RotateLogs
+  repository: git://github.com/masakyst/Catalyst-Plugin-File-RotateLogs.git
+version: '0.05'
+x_contributors:
+  - 'masakyst <masakyst.mobile@gmail.com>'

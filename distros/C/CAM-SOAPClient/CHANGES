@@ -1,0 +1,29 @@
+Revision history for Perl module CAM::SOAPClient
+
+1.17  7 Apr 2006
+      [ENHANCEMENTS]
+      - Added getLastFault() method
+      [INTERNALS]
+      - Comply with Perl::Critic 0.15 standards      
+
+1.16  21 Feb 2006
+      [FIXES]
+      - Missed one of the SOAP::Lite 0.66 API changes
+        Credit Don (aka ketone)
+
+1.15  17 Feb 2006
+      [FIXES]
+      - Accommodate SOAP::Lite 0.66 API changes
+      [INTERNALS]
+      - Comply with Perl::Critic 0.14 standards
+
+1.14  20 Dec 2005
+      [ENHANCEMENTS]
+      - Added getLastFaultCode method
+      [FIXES]
+      - When client fails to send message, a new Fault is constructed
+      - On server error, a new Fault is constructed
+        Previously, a server error looked like an empty success
+
+1.13  22 Apr 2005
+      First public release

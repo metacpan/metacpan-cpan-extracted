@@ -1,0 +1,182 @@
+/*
+ * based on: 
+ * Gnome05
+ * Jason Murray Cole
+ * July 2006
+ */
+
+* {
+    border: none;
+    font-size: 1em;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #FFF;
+    font-family: arial,"bitstream vera sans",sans-serif;
+    font-size: 0.7em;
+    text-align: center;
+    /*background-image:url(img/photo-0024.png);
+    background-repeat:no-repeat;
+    background-position:120% 350px;
+    background-attachment: fixed;*/
+}
+#container
+{
+  margin: 0 auto;
+  text-align: left;
+  width: 80em;
+  background-repeat:no-repeat;
+  background-position:0 0;
+  padding-top:15px;
+
+ }
+
+#menu {
+    color: #cde;
+    float: left;
+    width: 9em;
+}
+
+#content {
+    border-left: 1px solid #cde;
+    margin-left: 10em;
+    padding: 1em;
+}
+
+h1,h2,h3,h4,h5 {
+    color: #abc;
+    letter-spacing: 0.2em;
+    line-height: 2em;
+    font-weight: 900;
+    text-align: left;
+}
+
+h1 {
+    border-bottom: 1px solid #cde;
+    font-size: 1.5em;
+}
+
+h2 {font-size: 1.3em;}
+
+h3 {font-size: 1.2em;}
+
+h4 {font-size: 1.1em;}
+
+h4 {font-size: 1em;}
+
+h6 {
+    border-top: 1px solid #cde;
+    color: #abc;
+    font-weight: 100;
+    text-align: center;
+}
+
+ul,li {list-style: square inside;}
+
+ul.recipes {
+    margin-left: 1.5em;
+    padding-left: 0px;
+}
+
+
+li.recipes {
+    border-bottom: 1px solid #cde;
+    border-right:  1px solid #cde;
+    display:block;
+    
+}
+
+li.recipes:hover {
+    background: #cde;
+}
+
+a.edit, a.delete, a.add {
+    border-left: 1px solid  #cde;
+    border-top: 1px solid  #cde;
+    padding-right: 0.5em;
+    padding-left:  0.5em;
+}
+
+a.add {color:green}
+
+a.delete {color:red }
+
+p {
+    text-align: justify;
+    text-indent: 1em;
+    font-size:1.5em;
+}
+
+a {
+    color: #039;
+    text-decoration: none;
+}
+
+a:hover {text-decoration: underline;}
+
+.left {float: left;}
+
+.right {float: right;}
+
+.clear {clear: both;}
+
+#content p {
+    font-size:1.3em;
+    text-align:left;
+    margin-bottom:1em;
+}
+
+pre {
+    text-align:left;
+    padding-left:3em;
+    font-size:1.5em;
+}
+
+.form_row {
+    text-align:left;
+    margin-bottom:0.8em;
+}
+
+form {
+    width:98%; 
+}
+#theform
+label {font-size:1.2em}
+
+input, textarea, select {
+    font-size:1.3em;
+    font-family:Tahoma,sans-serif
+}
+
+.input_text, .input_textarea, .input_select, .input_checkbox {
+    border: 1px solid #cde;
+    width:80%;
+}
+
+.input_checkbox {width:20px;}
+
+.input_textarea { height:8em;}
+
+fieldset {
+    border:1px solid #eee;
+    padding:0.5em;
+    background-color:GhostWhite;
+    
+    /*
+    GhostWhite===#F8F8FF
+    FloralWhite===#FFFAF0
+    LavenderBlush===#FFF0F5
+    Lavender===#E6E6FA*/
+}
+
+.button, .submit {border:1px solid #779;background:#eee}
+
+legend {padding:0.5em;}
+
+.login_error {color:red;font-weight:bolder}
+
+.login_form fieldset legend {font-size:0.8em}
+
+.code {font-family:monospace;}

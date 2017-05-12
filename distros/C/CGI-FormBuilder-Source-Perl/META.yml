@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                CGI-FormBuilder-Source-Perl
+version:             0.01
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    CGI::FormBuilder:              0
+    File::Slurp:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

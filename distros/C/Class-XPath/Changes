@@ -1,0 +1,22 @@
+Revision history for Perl extension Class::XPath.
+
+1.4   Sun Feb 29 17:58:02 EST 2004
+  - Added ':' as an allowed character in names for nodes and
+    attributes.  (Timothy Appnel)
+
+1.3   Thu Nov 13 12:00:00 2003
+  - Added support for matching child content. (ex. /Books[title="Foo"])
+    (Mark Addison)
+
+1.2   Tue Aug 19 12:00:00 2003
+  - Added attribute selectors (/page/@title) (Tim Peoples)
+  - Added self matcher (./page) (Tim Peoples)
+
+1.1   Mon May 05 12:00:00 2003
+  - Added attibute matchers (page[@number>1], page[@header="Title Page"])
+  - Added parent target (../child[1])
+  - Fixed a bug in the way named methods were handled
+
+1.0   Sat Mar 29 12:00:00 2003
+  - First release.
+

@@ -1,0 +1,168 @@
+=head1 NAME
+
+CGI::Application::Plugin::I18N::Guide - Understanding and using I18N and L10N
+
+=head1 BACKGROUND
+
+I'm writing this guide for people who find themselves in the position I did.
+You code Perl CGI scripts, you want to make your scripts more open to other
+countries, and thus other languages. How is this done? Well after much research
+this is best done properly, do B<not> be tempted to have a big list or variables
+or a large hash that you replace based on the users language. This B<will>
+quickly break and do nothing more than to annoy people including yourself.
+
+Have a read through this guide. If you are completely new to
+Internationalization then you'll find this guide and it's resources useful even
+if you aren't using CGI::Application.
+
+=head1 WHERE TO START?
+
+Internationalization of your application or I18N for short, means making your
+application language packable. So that Localization (L10N) can be done for the
+end user. Depending on the language your are localizing to, these language
+packs can become complicated. If you are unfamiliar with the structures of
+other languages you'll probably be surprised (as I was) as to just how much
+things can differ, not just in alphabet and sentence structure, but culture,
+what's exceptable, varying degrees of quantifiers, not to mention currency
+formats!
+
+I don't want to re-write all the stuff that's been covered before. So before
+you continue on this guide, catch up your reading on the following resources.
+B<Note: I recommend reading pretty much everything, this isn't the easiest
+subject to get your head around. Trying to skip ahead may well mean having to
+re-read it all again later>
+
+=head2 Things to read
+
+This is the order I recommend:-
+
+We'll start with what's pretty mcuh the current standard for localization:
+Gettext, I'd only read to section 1.5, but feel free to read more if you are so
+inclined.
+L<http://www.gnu.org/software/gettext/manual/gettext.html#Introduction>
+
+This'll cover some of the issues and ideas with the differences between
+languages and some ways around them.
+L<Locale::Maketext::TPJ13>
+
+These two links will help you understand language tags.
+L<http://www.i18nguy.com/unicode/language-identifiers.html>
+L<I18N::LangTags>
+
+UTF-8, you need to understand what this is and why it's used.
+L<http://en.wikipedia.org/wiki/UTF-8>
+
+You also need to understand the difference between UTF-8 and Perl's internal
+format.
+L<Encode>
+
+It's well worth reading Audreys guide.
+L<http://search.cpan.org/src/AUTRIJUS/Locale-Maketext-Lexicon-0.50/docs/webl10n.html>
+
+Basics bits like yes/no, etc, are provided by:-
+L<I18N::Langinfo>
+
+Getting deeping into the nitty gritty.
+L<Locale::Maketext::Lexicon>
+L<Locale::Maketext::Simple>
+
+And finally:-
+L<Locate::Maketext>
+
+Now you should have all the background info you need to understand how the
+L<CGI::Application::Plugin::I18N> module works.
+
+=head2 Other useful resources
+
+The I18N Catalyst plugin as a Manual page that is full of useful links:-
+L<Catalyst::Plugin::I18N::Manual>
+
+=head1 Creating .po and .mo files
+
+The .po files are the editable language packs. The .mo files are compiled
+versions that are a bit faster to use.
+
+I've found a good little app for creating .po and .mo files:-
+L<http://www.poedit.org>
+It's cross platform and gives you a nice GUI to work from. Of course you can
+always edit the .po files direct and generate the .mo files yourself.
+
+=head2 Getting the sample files
+
+This module includes some sample files in the folder sample/poedit. It's a tiny
+CGI::Application script designed to get you used to using and editing .po files.
+You'll need to copy this folder to your webservers public folder. It's safe to
+do this by FTP is you are stuck on shared hosting. Or you can test locally,
+just copy the folder to your public_html, httpdocs, wwwroot, etc. Depending on
+your servers configuration you might have to put this in the cgi-bin. For the
+sake of simplicity the rest of this guide refers to this folder as /tmp/potest.
+
+=head2 Using Poedit
+
+Download and install Poedit. When you open for the first time it'll ask for
+your name and email, don't worry this is just for stamping the .po files with
+your details.
+
+Click the I<File> menu, then I<Preferences> and select the I<Parsers> tab.
+You'll see that there is a Perl parser, select this and then click the I<Edit>
+button.
+
+You'll see that the list of file extensions only has I<*.pl>, extend this so
+that is contains I<*.pl;*.pm;*.cgi> and any other extensions you use for your
+applications Perl files. Click I<OK> and I<OK> again.
+
+Now we are ready to create our first catalog. Click I<File-E<gt>New catalog>.
+The details I entered:-
+Project name: Demo
+Team: po testers
+Team email: not@now.com
+Language: English
+Country: United States
+Charset: UTF-8
+Source code charset: UTF-8
+
+Then select the I<Paths> tab, click the little square graphic for I<new item>
+then input the path to your script files, I've done /tmp/potest
+
+Then select the I<Keywords> tab and add I<localtext> the same way you added the
+path.
+
+Click I<OK> to finish, a dialog will ask you where to save your .po file. I
+selected /tmp/potest/I18N/en-us.po.
+
+You should get a window titled I<Update summary> appear with a list of 4 new
+strings. Click I<OK>.
+
+If we added another localtext field to the potest example then all we need do
+is click on the globe icon at the top and it'd parse the files again for new
+strings.
+
+For this example, click on the I<Colour> string, in the box at the bottom type
+I<Color>. Now click the save icon. The .mo compiled version of this file is
+generated automatically on each save.
+
+=head2 Testing your demo .po file
+
+Ok, now we are ready to test out your .po file and see it in action. Use your
+browser to open the script potest.cgi.
+
+I'm testing locally on my Vista IIS7. So /tmp/potest for me is actually
+c:\inetpub\wwwroot\cgi-bin\potest, I'll be opening
+http://localhost/cgi-bin/potest/potest.cgi in my browser.
+
+You'll get a very basic HTML form asking for a locale, and showing small bits
+of localized text (I do plan on an advanced version at some point). Enter in
+I<en-us> and hit submit. You'll see all that has changed is I<Colour: Colour>.
+
+Finally I wont have Americans moaning about how they can't spell colour or
+cheque properly :P
+
+If you enter in de then you'll get a german example that I've created as an
+example of a more complete language pack (although my German is minimal, I used
+babelfish to translate parts so it probably isn't structured correctly).
+
+=head1 Quantifiers
+
+I haven't used these yet... Stay tuned :)
+
+=cut

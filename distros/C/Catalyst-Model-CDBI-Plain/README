@@ -1,0 +1,43 @@
+NAME
+       Catalyst::Model::CDBI::Plain - A Plain base class for Class::DBI models
+
+SYNOPSIS
+               # set up your CDBI classes within Catalyst: base class
+               package Music::Model::DBI;
+               use base 'Catalyst::Model::CDBI::Plain';
+               __PACKAGE__->connection('dbi:mysql:dbname', 'user', 'pw');
+
+               # One class, inherits from base, sets up relationships
+               package Music::Model::Artist;
+               use base 'Music::Model::DBI';
+               __PACKAGE__->table('artist');
+               __PACKAGE__->columns(All => qw/artistid name/);
+               __PACKAGE__->has_many(cds => 'Music::Model::CD');
+
+               # etc.
+
+               # OR
+
+               # use existing CDBI classes within Catalyst:
+               package MyApp::Model::Artist; # a Catalyst class
+               use base qw[Catalyst::Model::CDBI::Plain Some::Other::Artist];
+               1; # That's it--Some::Other::Artist is in Catalyst now
+
+               # OR
+
+               package MyApp::Model::Library;
+               use base qw[MyApp::Model::DBI Class::DBI::mysql]; # add MySQL-spe
+cific methods
+               __PACKAGE__->set_up_table('library'); # from CDBI::mysql
+
+DESCRIPTION
+       "Catalyst::Model::CDBI::Plain" is a Model class for Catalyst to be used
+       with user-specified Class::DBI classes. It does not automatically set
+       anything up or create relationships; this is left to the user. This
+       module can be used with existing "Class::DBI" classes, so that they can
+       be used with Catalyst, or as a way of writing CDBI Model classes within
+       Catalyst.
+
+AUTHOR
+       Jesse Sheidlower "<jester@panix.com>"
+       Christian Hansen "<ch@ngmedia.com>"

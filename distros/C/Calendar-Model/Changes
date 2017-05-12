@@ -1,0 +1,18 @@
+Revision history for Calendar-Model
+0.04	02/03/2013
+	Made pod tests author only
+        Added wordpress widget style example
+
+0.03    21/02/2013
+	Added some details in POD SYNOPSIS
+	Added new get_day method to Model::Calendar
+	Added test for new method
+	Added examples
+
+0.02    20/01/2013
+	Fixed schoolboy error in working out weeks/rows
+	Added methods for last day in calendar and day as DateTime
+
+0.01    18/01/2013
+        First version, released on an unsuspecting world.
+

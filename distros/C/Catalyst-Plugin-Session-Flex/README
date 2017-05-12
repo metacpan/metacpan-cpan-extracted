@@ -1,0 +1,34 @@
+NAME
+    Catalyst::Plugin::Session::Flex - Apache::Session::Flex sessions for Catalyst
+
+SYNOPSIS
+        use Catalyst 'Session::Flex';
+
+        $c->session->{foo} = 'bar';
+        print $c->sessionid;
+
+DESCRIPTION
+  EXTENDED METHODS
+   finalize
+   prepare_action
+   setup
+  METHODS
+   session
+   uri
+    Extends an uri with session id if needed.
+
+        my $uri = $c->uri('http://localhost/foo');
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Rusty Conover, "rconover@infogears.com"
+
+    Based on code by:
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

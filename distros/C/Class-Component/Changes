@@ -1,0 +1,74 @@
+Revision history for Perl extension Class::Component
+
+0.17    2008-05-12T17:57:22+09:00
+        - add Component::Moosenize
+
+0.16    2008-04-21T22:05:30+09:00
+        - Attribute::Method can use alias method name
+        - Attribute::Hook default hook name is method name if undefined Hook Arg 
+        - t/15_aliaspluginmethod.t test bug fix
+
+0.15    2008-04-09T16:31:49+09:00
+        - add Component::AutoloadPlugin by tokuhirom++
+        - add 17_duplication_load_plugins.t test
+
+0.14    2008-04-04T15:47:55+09:00
+        - add attribute name space resolver (class_component_load_attribute_resolver) tokuhirom++
+        - add support anonymous method and code reference to register_method
+
+0.13    2008-04-03T17:43:39+09:00
+        - change method name is_class_component_plugin_attribute_detect_cache to class_component_plugin_attribute_detect_cache_enable
+          this method is added in version 0.12
+
+0.12    2008-04-03T16:53:37+09:00
+        - speed optimized
+        - Component::Autocall::SingletonMethod memory leak fixed
+        - class_component_(?:config|components|plugins|methods|hooks) methods enchant setter
+
+0.11    2008-04-02T18:12:55+09:00
+        - changed to extend attribute option like Attribute::Handlers
+        - updated to POD
+
+0.10    2007-12-25T11:41:32+09:00
+        - removed to duplicate config hash keys
+
+0.09    2007-12-18T21:07:56+09:00
+        - do not 101_plaggerize_simple.t test if YAML is not installed.
+
+0.08    2007-12-09T14:23:01+09:00
+        - fixed to do not work test 101_plaggerize_simple.t by Perl 5.6
+        - fixed to Carp is not loaded in Plaggerize
+
+0.07    2007-12-06T17:03:46+09:00
+        - add Class::Component::Component::Plaggerize
+        - add class_component_clear_isa_list method
+        - plugin config support for load_config method
+        - put context data to Class::Component::Plugin::init
+
+0.06    2007-09-05T21:36:57+09:00
+        - Attribute was able to be enhanced in the name space of the user class. 
+
+0.05    2007-06-11T22:16:42+09:00
+        - fixed to bug where AUTOLOAD doesn't move normally when object is overload
+
+0.04    2007-06-08T19:29:44+09:00
+        - add components DisableDynamicPlugin, Autocall::InjectMethod
+        - change component name, Autocall -> Autocall::Autoload, SingletonMethod -> Autocall::SingletonMethod
+        - change interface name load_component_resolver -> class_component_load_component_resolver
+        - change interface name load_plugin_resolver -> class_component_load_plugin_resolver
+        - change resolve package rule to locad_components and load_plugins
+        - add config loader in import method
+
+        - Class::Component caching isa lists
+        - Class::Component::Plugin caching attr methods
+
+0.03    2007-05-10T15:14:42+09:00
+        - change reference args to array args to call methods
+          > $obj->call('plugin method name' => $args) to $obj->call('plugin method name' => @args)
+
+0.02    2007-05-10T06:01:53+09:00
+        - fixed to dupe pod namespace Class::Component
+        - using Scalar::Util::refaddr to get reference address by Component::SingletonMethod
+
+0.01    2007-05-08T20:16:32+09:00
+        - original version

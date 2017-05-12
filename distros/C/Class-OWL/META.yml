@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Class-OWL
+version:             0.0.6
+abstract:            Generate perl classes from OWL schema
+license:             ~
+author:              
+    - Chris Prather <cpan@prather.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::MOP:                    0
+    Data::Dumper:                  0
+    LWP::Simple:                   0
+    RDF::Helper:                   0
+    Test::More:                    0
+    version:                       0
+    XML::CommonNS:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

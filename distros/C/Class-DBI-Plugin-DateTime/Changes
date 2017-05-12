@@ -1,0 +1,23 @@
+Changes
+=======
+
+0.05 20 Feb 2009
+  - Fix Makefile.PL so that neither MySQL nor PostgreSQL specific
+    modules are required. 
+
+0.04 28 Jan 2006
+  - Allow explicit specification of implementation to use via
+    Class::DBI::Plugin::DateTime qw(Pg);
+  - Pg implementation of has_interval() has_duration() wasn't working. Fixed.
+
+0.03 25 Nov 2005
+  - Add Class::DBI::Plugin::DateTime to auto-select the implementation class
+  - use Module::Pluggable
+
+0.02 17 Nov 2005
+  - No code change
+  - Minor fix on MySQL.pm docs
+  - Properly set abstract on Build.PL
+
+0.01 17 Nov 2005
+  - Initial CPAN release

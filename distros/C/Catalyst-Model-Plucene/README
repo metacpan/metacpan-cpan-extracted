@@ -1,0 +1,37 @@
+NAME
+    Catalyst::Model::Plucene - Plucene Model Class
+
+SYNOPSIS
+        # lib/MyApp/Model/Plucene.pm
+        package MyApp::Model::Plucene;
+
+        use base 'Catalyst::Model::Plucene';
+
+        __PACKAGE__->config( path => '/tmp/myindex' );
+
+        1;
+
+        my $plucene = $c->comp('MyApp::Model::Plucene');
+
+        $plucene->add(
+            $id1 => { $field => $term1 },
+            $id2 => { $field => $term2 },
+        );
+
+        my @results = $plucene->search($search_string);
+
+        $plucene->optimize;
+
+DESCRIPTION
+    This is the "Plucene" model class.
+
+SEE ALSO
+    Catalyst, Plucene::Simple
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

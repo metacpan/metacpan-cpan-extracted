@@ -1,0 +1,38 @@
+# This file documents the revision history for Perl extension Catalyst::View::JSON::PerRequest
+
+0.009 - 2016-06-10
+  - Fix for how ViewModels set data when using the shortcut
+    syntax to avoid namespace collision.
+    
+0.008 - 2016-03-14
+  - Pod fixes and fixes buggy test case (moltar++)
+  
+0.007 - 2015-11-16
+  - Fixed another problem with submitting headers.
+
+0.006 - 2015-11-13
+  - Fixed issue when an HTP header value is an object.
+
+0.005 - 2015-10-19
+  - New Feature: You can now set an application or context error
+    handler to provide a valid response when the data provided to
+    the JSON encoder cannot be encoded.
+
+0.004 - 2015-09-29
+  - Bugfix for older Perl version compatibility
+
+0.003 - 2015-09-25
+  - Fixed incorrect $VERSION in last release
+
+0.002 - 2015-09-24
+  - Shorten the response helpers and new helpers to make the common
+    patten of detaching on response easier.
+  - change 'send' to 'response' since I think its less deceptive ('send'
+    didn't actually send anything it just set the response.)  This is a
+    breaking change if you used the send method (change to response or
+    use a helper).
+  - added a 'process' method to be more compatible with current practice
+    so this can work with the 'RenderView' action class, for example.
+
+0.001 - 2015-09-20
+  - First Release 

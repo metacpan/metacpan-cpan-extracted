@@ -1,0 +1,28 @@
+Revision history for Carp-Parse-Redact
+
+v1.1.5  10/10/2012
+        Fixed dependencies.
+		Cleanup of build issues.
+
+v1.1.4  09/28/2012
+        * Improved indentation for better readability (Thanks, G$!)
+		* Include referenced LICENSE file I forgot to git add.
+
+v1.1.3  09/26/2012
+        * Moved to github
+        * Upgraded license to GPL_3
+
+v1.1.2  09/17/2012
+        * Fixed issue with trying to redact undefined arguments.
+
+v1.1.1  05/30/2012
+        * Fixed formatting for function calls with only one argument.
+
+v1.1.0  03/30/2012
+        * Added feature to redact using regexes.
+
+v1.0.1  02/28/2012
+        * Syncing up CPAN::Meta::Converter versions with coauthor.
+
+v1.0.0  02/28/2012
+        * First public release.

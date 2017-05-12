@@ -1,0 +1,37 @@
+Revision history for Perl extension Crypt::CipherSaber.
+
+1.00 Tue Jul 12 23:45:00 UTC 2005
+	- migrated to Build.PL
+	- added POD, POD coverage, and signature tests
+	- generated traditional Makefile.PL
+	- bumped up version number
+	- ported tests to Test::Simple
+	- bumped up test coverage
+	- updated README
+
+0.61  Sat May 25 17:31:52 UTC 2002
+	- avoid uninitialized value warnings in fh_crypt() 
+
+	  Thu May 10          2001
+	- fixed _gen_iv() to generate 255 characters (thanks to John Wiersba)
+
+      Sun Apr 29          2001
+	- added license/copyright information to the pod in the module itself
+
+0.60  Sat Apr  7          2001
+	- some internal cleanup
+	- added some comments
+	- added documentation for fh_crypt()
+
+      Thu Apr  5          2001
+	- made _gen_iv() work with Perl 5.004 (again Sympa)
+	- added fh_crypt()
+	- added _do_crypt() to help with fh_crypt()
+	- made crypt() use _do_crypt()
+	- added t/bigfile.t and t/fh_encrypt.t
+
+0.51  Wed Apr  4          2001		UNRELEASED VERSION
+	- made decrypt() work with Perl 5.004 (for Sympa project)
+
+0.50  Fri Dec  1 17:02:02 2000
+	- original version; created by h2xs 1.19

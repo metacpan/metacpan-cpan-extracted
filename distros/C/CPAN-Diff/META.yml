@@ -1,0 +1,49 @@
+---
+abstract: 'Compare local Perl packages/versions with a CPAN'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Diff
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  CPAN::Diff:
+    file: lib/CPAN/Diff.pm
+    version: '0.02'
+  CPAN::Diff::Module:
+    file: lib/CPAN/Diff/Module.pm
+requires:
+  Config: '0'
+  ExtUtils::Installed: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0'
+  Module::Extract::Namespaces: '0'
+  Module::Metadata: '0'
+  Moo: '0'
+  Parse::CPAN::Packages::Fast: '0'
+  perl: '5.008001'
+  version: '0'
+resources:
+  bugtracker: https://github.com/kablamo/CPAN-Diff/issues
+  homepage: https://github.com/kablamo/CPAN-Diff
+  repository: git://github.com/kablamo/CPAN-Diff.git
+version: '0.02'
+x_authority: cpan:KABLAMO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

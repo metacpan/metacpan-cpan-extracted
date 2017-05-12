@@ -1,0 +1,23 @@
+#------------------------------------------------------------------------------
+
+severity = 1
+verbose  = %f: %m at line %l.  %e.  (Severity: %s)\n %p near '%r'\n
+
+# PPI doesn't like the ::2:: ... + 2x TODO for the future...
+exclude = Modules::RequireFilenameMatchesPackage
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+
+[-Miscellanea::RequireRcsKeywords]
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidy.conf
+
+

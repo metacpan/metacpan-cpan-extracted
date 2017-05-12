@@ -1,0 +1,42 @@
+Revision history for CGI-Application-Plugin-Config-General
+
+0.08    2009-10-25
+        - fixed test that broke due to change introduced into CGI.pm 
+          version 3.11.  (RT #19758).
+
+        - Changes of interest to module maintainers only:
+          - switched to using MANIFEST.SKIP
+          - fixed the makedocs script to work with more recent pod2html
+          - source repo now on github: http://github.com/mgraham/CAP-Config-General
+
+0.07    2005-07-30
+        - added pointer to CGI::Application::Plugin::Config::Context,
+          which supercedes this module
+        - minor documentation fixes
+
+0.06    2005-03-15 (unreleased)
+        - added some docs regarding the file caching system
+        - improved performance of the caching system by switching
+          from File::Spec->rel2abs() to Cwd::abs_path()
+          (seems the former uses Cwd::cwd which spawns /bin/pwd)
+
+0.05    2005-03-08
+        - fixed the strategy used to determine the module name - now you
+          can initialize the config object method in a superclass of the
+          web application, but App and AppMatch will still correctly
+          match on the package name of the actual web application.
+
+0.04    2005-01-30
+        - fixed some documentation errors
+
+0.03    2005-01-29
+        - added missing prerequisites
+
+0.02    2005-01-29
+        - added some more tests to increase coverage
+        - Changed to Module::Build
+        - first CPAN release
+
+0.01    2005-01-27
+        - First version
+

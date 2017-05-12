@@ -1,0 +1,2 @@
+% my $p = shift;
+<%= "$p->{fullName} <$p->{email}>" %>

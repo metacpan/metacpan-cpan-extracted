@@ -1,0 +1,83 @@
+$Header: /cvsroot/Catalog/Catalog/README,v 1.10 1999/09/07 14:48:03 loic Exp $
+
+What is it ?
+------------
+Catalog is a perl program that allows to create, maintain and display
+Yahoo! like directories. The user interface is 100% HTML. It requires a
+MySQL database to run.
+
+The general idea behind the design of Catalog is that creating a catalog
+is mainly a matter of organizing objects in a structured tree. For
+Catalog the objects are records in a table of the SQL database. 
+The structured tree is a set of tree nodes and relations between these
+nodes. The maintainer of the catalog is in charge of building the tree
+and placing objects in this tree.
+
+Here is a short list of the functions provided by Catalog:
+
+* Display structured trees of resources.
+* Display chronologically ordered resources and associated calendar.
+* Display alphabetical indexes of resources.
+* Allow full text search in the resources and the category names.
+* Powerful HTML based administration of catalogs.
+* On-Line editing of resource records.
+* Handle an arbitrary number of catalogs.
+* High performances using mod_perl and Apache.
+* Easy customization of the user view using HTML template files.
+* It is possible to define more than one view of the same catalog.
+* Load and unload a thematic catalog in XML.
+* Create an HTML dump of a structured tree to publish a static 
+  version.
+* Complete documentation including a guide and a reference manual.
+* Ready to use example.
+
+Where is the documentation ?
+----------------------------
+
+If you have installed Catalog, it is on your local machine 
+(see the Where is it installed section below). If you didn't
+install Catalog, you can take a look at http://www.senga.org/.
+
+How to install it ?
+-------------------
+See the INSTALL file for installation instructions.
+
+Where is it installed ?
+-----------------------
+
+The main program is a file named Catalog that is installed in the
+cgi-bin directory of the HTTP server running on your local machine.
+
+The HTML documentation starts with a file named catalog_toc.html in the
+HTML tree of the HTTP server running on your local machine (the path
+you specified with the HTMLDIR variable when installing Catalog).
+
+
+Where can I download it ?
+-------------------------
+The Catalog home page is http://www.senga.org/download.html
+
+Contributors
+------------
+
+See http://www.senga.org/contribute.html for contribution guidelines.
+
+Tim Bunce <Tim.Bunce@ig.co.uk>
+ Fixed many bugs, contributed ideas, implemented *_fill in templates and
+ compressed dmoz handling.
+
+Gilles Polart <g.polart@atrid.fr>
+ Provides invaluable feedback on dmoz data loading.
+
+Weston J. Bustraan <weston@infinityteldata.net>
+ Is the author of the PHP3 display functions.
+
+Graham Barr <gbarr@pobox.com>
+ Root page configuration, vertical tables, bug fixes and enhancements.
+
+Author
+------
+
+Loic Dachary
+loic@senga.org
+http://www.senga.org/

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README.pod
+t/CCCP-LiveMX.t
+lib/CCCP/LiveMX.pm

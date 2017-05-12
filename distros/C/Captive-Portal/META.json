@@ -1,0 +1,91 @@
+{
+   "abstract" : "Perl based solution for controlled network access",
+   "author" : [
+      "Karl Gaissmaier <gaissmai (at) cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captive-Portal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::Simple::RADIUS" : 0,
+            "HTTP::Server::Simple::CGI" : 0,
+            "HTTP::Server::Simple::Static" : 0,
+            "Test::WWW::Mechanize::CGI" : 0
+         },
+         "requires" : {
+            "Authen::Simple" : 0,
+            "CGI::Cookie" : 0,
+            "CGI::Fast" : 0,
+            "JSON" : 0,
+            "Log::Dispatch::Syslog" : 0,
+            "Log::Log4perl" : 0,
+            "Role::Basic" : 0,
+            "Scalar::Util" : 0,
+            "Spawn::Safe" : 0,
+            "Template" : 0,
+            "Time::HiRes" : 0,
+            "Try::Tiny" : 0,
+            "parent" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Captive::Portal" : {
+         "file" : "lib/Captive/Portal.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::LockHandle" : {
+         "file" : "lib/Captive/Portal/LockHandle.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::AuthenSimple" : {
+         "file" : "lib/Captive/Portal/Role/AuthenSimple.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::Config" : {
+         "file" : "lib/Captive/Portal/Role/Config.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::Firewall" : {
+         "file" : "lib/Captive/Portal/Role/Firewall.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::I18N" : {
+         "file" : "lib/Captive/Portal/Role/I18N.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::Session" : {
+         "file" : "lib/Captive/Portal/Role/Session.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::Role::Utils" : {
+         "file" : "lib/Captive/Portal/Role/Utils.pm",
+         "version" : "4.10"
+      },
+      "Captive::Portal::TestServer" : {
+         "file" : "lib/Captive/Portal/TestServer.pm",
+         "version" : "4.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "4.10"
+}

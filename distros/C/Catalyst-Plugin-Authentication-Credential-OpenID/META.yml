@@ -1,0 +1,17 @@
+abstract: OpenID credential for Catalyst::Auth framework
+author: Six Apart, Ltd. <cpan@sixapart.com>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Catalyst-Plugin-Authentication-Credential-OpenID
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  LWPx::ParanoidAgent: 0
+  Net::OpenID::Consumer: 0
+  UNIVERSAL::require: 0
+version: 0.03

@@ -1,0 +1,9 @@
+name: MyLib
+
+CatalystX::InjectModule:
+  debug: 0
+  path:
+    - t/share/modules
+  inject:
+    - MyLib
+  persistent_dir: t/var/

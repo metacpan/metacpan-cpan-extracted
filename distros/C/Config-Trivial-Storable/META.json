@@ -1,0 +1,54 @@
+{
+   "abstract" : "Very simple tool for reading and writing",
+   "author" : [
+      "Adam Trickett, E<lt>atrickett@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Trivial-Storable",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Capture" : "0",
+            "Module::Build" : "0.40",
+            "Pod::Coverage" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Trivial" : "0.70",
+            "Storable" : "2.24",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Trivial::Storable" : {
+         "file" : "lib/Config/Trivial/Storable.pm",
+         "version" : "0.32"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-3.0.txt"
+      ]
+   },
+   "version" : "0.32"
+}

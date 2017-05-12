@@ -1,0 +1,30 @@
+NAME
+    CPAN::WWW::Top100::Generator - Create or update the website for
+    http://ali.as/top100
+
+DESCRIPTION
+    This module is used to generate the website content for the CPAN Top 100
+    website.
+
+    This module (for now) has no moving parts...
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-WWW-Top100-Generato
+    r>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2009 - 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,78 @@
+---
+name: Courier-Filter
+version: v0.200
+author:
+  - 'Julian Mehnle <julian@mehnle.net>'
+abstract: Purely Perl-based mail filter framework for the Courier MTA
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Error: 0
+  perl: 5.008
+build_requires:
+  Module::Build: 0
+recommends:
+  Archive::Zip: 0
+  ClamAV::Client: 0
+  DateTime: 0
+  DateTime::Format::Mail: 0
+  IO::InnerFile: 2.110
+  MIME::Tools: 5.400
+  Mail::SPF: 0
+  Mail::SpamAssassin: 0
+  Net::Address::IP::Local: 0
+  Net::RBLClient: 0
+provides:
+  Courier::Config:
+    file: lib/Courier/Config.pm
+  Courier::Error:
+    file: lib/Courier/Error.pm
+  Courier::Filter:
+    file: lib/Courier/Filter.pm
+    version: v0.200
+  Courier::Filter::Logger:
+    file: lib/Courier/Filter/Logger.pm
+  Courier::Filter::Logger::File:
+    file: lib/Courier/Filter/Logger/File.pm
+  Courier::Filter::Logger::IOHandle:
+    file: lib/Courier/Filter/Logger/IOHandle.pm
+  Courier::Filter::Logger::Syslog:
+    file: lib/Courier/Filter/Logger/Syslog.pm
+  Courier::Filter::Module:
+    file: lib/Courier/Filter/Module.pm
+  Courier::Filter::Module::BlankBody:
+    file: lib/Courier/Filter/Module/BlankBody.pm
+  Courier::Filter::Module::ClamAVd:
+    file: lib/Courier/Filter/Module/ClamAVd.pm
+  Courier::Filter::Module::DNSBL:
+    file: lib/Courier/Filter/Module/DNSBL.pm
+  Courier::Filter::Module::Envelope:
+    file: lib/Courier/Filter/Module/Envelope.pm
+  Courier::Filter::Module::FakeDate:
+    file: lib/Courier/Filter/Module/FakeDate.pm
+  Courier::Filter::Module::Header:
+    file: lib/Courier/Filter/Module/Header.pm
+  Courier::Filter::Module::MIMEParts:
+    file: lib/Courier/Filter/Module/MIMEParts.pm
+  Courier::Filter::Module::Parts:
+    file: lib/Courier/Filter/Module/Parts.pm
+  Courier::Filter::Module::SPF:
+    file: lib/Courier/Filter/Module/SPF.pm
+  Courier::Filter::Module::SPFout:
+    file: lib/Courier/Filter/Module/SPFout.pm
+  Courier::Filter::Module::SendCopy:
+    file: lib/Courier/Filter/Module/SendCopy.pm
+  Courier::Filter::Module::SpamAssassin:
+    file: lib/Courier/Filter/Module/SpamAssassin.pm
+  Courier::Filter::Util:
+    file: lib/Courier/Filter/Util.pm
+  Courier::Message:
+    file: lib/Courier/Message.pm
+    version: v0.200
+  MIME::Words::Better:
+    file: lib/Courier/Message.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

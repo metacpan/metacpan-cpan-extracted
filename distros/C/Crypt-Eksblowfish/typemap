@@ -1,0 +1,30 @@
+TYPEMAP
+Crypt::Eksblowfish::Subkeyed	T_PTROBJ
+Crypt::Eksblowfish	T_PTROBJ
+Crypt::Eksblowfish::Blowfish	T_PTROBJ
+Crypt::Eksblowfish::Uklblowfish	T_PTROBJ
+BF_block	T_BF_BLOCK
+
+INPUT
+T_BF_BLOCK
+	{
+		STRLEN bfb_len;
+		U8 *bfb_octets;
+		bool bfb_tofree;
+		sv_to_octets(&bfb_octets, &bfb_len, &bfb_tofree, $arg);
+		if(bfb_len != 8) {
+			if(bfb_tofree) Safefree(bfb_octets);
+			croak(\"block must be exactly eight octets long\");
+		}
+		$var = import_block(bfb_octets);
+		if(bfb_tofree) Safefree(bfb_octets);
+	}
+
+OUTPUT
+T_BF_BLOCK
+	{
+		U8 bfb_octets[8];
+		export_block($var, (unsigned char *)bfb_octets);
+		sv_setpvn($arg, (char*)bfb_octets, 8);
+		SvUTF8_off($arg);
+	}

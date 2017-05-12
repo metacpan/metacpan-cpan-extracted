@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+####################
+# LOAD CORE MODULES
+####################
+use strict;
+use warnings FATAL => 'all';
+
+# Autoflush ON
+local $| = 1;
+
+####################
+# LOAD DIST MODULES
+####################
+use CASCM::CLI;
+
+####################
+# RUN
+####################
+my $cli = CASCM::CLI->new();
+$cli->run(@ARGV);
+exit $cli->exitval();
+
+####################

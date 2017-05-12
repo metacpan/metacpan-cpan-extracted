@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CatalystX/Profile.pm
+lib/CatalystX/Profile/Controller/ControlProfiling.pm
+t/01basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

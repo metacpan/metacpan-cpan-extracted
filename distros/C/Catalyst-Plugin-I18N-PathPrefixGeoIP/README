@@ -1,0 +1,311 @@
+NAME
+    Catalyst::Plugin::I18N::PathPrefixGeoIP - A drop in for
+    atalyst::Plugin::I18N::PathPrefix that uses GeoIP
+
+SYNOPSIS
+      # in MyApp.pm
+      use Catalyst qw/
+        I18N I18N::PathPrefixGeoIP
+      /;
+      __PACKAGE__->config('Plugin::I18N::PathPrefixGeoIP' => {
+        valid_languages => [qw/en de fr/],
+        fallback_language => 'en',
+        language_independent_paths => qr{
+            ^( votes/ | captcha/numeric/ )
+        }x,
+        geoip_db => 'data/GeoLiteCity.dat',
+      });
+      __PACKAGE__->setup;
+
+      # now the language is selected based on requests paths:
+      #
+      # http://www.example.com/en/foo/bar -> sets $c->language to 'en',
+      #                                      dispatcher sees /foo/bar
+      #
+      # http://www.example.com/de/foo/bar -> sets $c->language to 'de',
+      #                                      dispatcher sees /foo/bar
+      #
+      # http://www.example.com/fr/foo/bar -> sets $c->language to 'fr',
+      #                                      dispatcher sees /foo/bar
+  
+
+      # http://www.example.com/foo/bar    -> used GeoIP to sets $c->language
+      #                                      If GeoIp dos not fain a mach it fails
+      #                                      over to use language from
+      #                                      Accept-Language header,
+      #                                      dispatcher sees /foo/bar
+      #
+      # or if redirect_to_language_url == 1:
+      #
+      # http://www.example.com/foo/bar    -> redirect to http://www.example.com/xx/foo/bar
+      #                                      where xx is language from Accept-Language header
+
+      # in a controller
+      sub language_switch : Private
+      {
+        # the template will display the language switch
+        $c->stash('language_switch' => $c->language_switch_options);
+      }
+
+DESCRIPTION
+    This module allows you to put the language selector as a prefix to the
+    path part of the request URI without requiring any modifications to the
+    controllers (like restructuring all the controllers to chain from a
+    common base controller).
+
+    (Internally it strips the language code from "$c->req->path" and appends
+    it to "$c->req->base" so that the invariant "$c->req->uri eq
+    $c->req->base . $c->req->path" still remains valid, but the dispatcher
+    does not see the language code - it uses "$c->req->path" only.)
+
+    Throughout this document 'language code' means ISO 639-1 2-letter
+    language codes, case insensitively (eg. 'en', 'de', 'it', 'EN'), just
+    like I18N::LangTags supports them.
+
+    Note: You have to load Catalyst::Plugin::I18N if you load this plugin.
+
+    Note: HTTP already have a standard way (ie. Accept-Language header) to
+    allow the user specify the language (s)he prefers the page to be
+    delivered in. Unfortunately users often don't set it properly, but more
+    importantly Googlebot does not really support it (but requires that you
+    always serve documents of the same language on the same URI). So if you
+    want a SEO-optimized multi-lingual site, you have to have different
+    (sub)domains for the different languages, or resort to putting the
+    language selector into the URL.
+
+CONFIGURATION
+    You can use these configuration options under the
+    'Plugin::I18N::PathPrefixGeoIP' key:
+
+  valid_languages
+      valid_languages => \@language_codes
+
+    The language codes that are accepted as path prefix.
+
+  fallback_language
+      fallback_language => $language_code
+
+    The fallback language code used if the URL contains no language prefix
+    and Catalyst::Plugin::I18N cannot auto-detect the preferred language
+    from the "Accept-Language" header or none of the detected languages are
+    found in "valid_languages".
+
+  language_independent_paths
+      language_independent_paths => $regex
+
+    If the URI path is matched by $regex, do not add language prefix and
+    ignore if there's one (and pretend as if the URI did not contain any
+    language prefix, ie. rewrite "$c->req->uri", "$c->req->base" and
+    "$c->req->path" to remove the prefix from them).
+
+    Use a regex that matches all your paths that return language independent
+    information.
+
+    If you don't set this config option or you set it to an undefined value,
+    no paths will be handled as language independent ones.
+
+  redirect_to_language_url
+      redirect_to_language_url => 1
+
+    Redirect users to url with language prefix.
+
+    Without redirect_to_language_url users may access your site using bout
+    urls with a language selector and without. This may be bad for search
+    engine optimization because search engines will have a hard time
+    determine the original source for documents. Setting
+    redirect_to_language_url will redirect users to a url with language
+    prefix.
+
+  debug
+      debug => $boolean
+
+    If set to a true value, "prepare_path_prefix" logs its actions (using
+    "$c->log->debug(...)").
+
+METHODS
+  setup_finalize
+    Overridden (wrapped with an an "after" modifier) from "setup_finalize"
+    in Catalyst.
+
+    Sets up the package configuration.
+
+  prepare_path
+    Overridden (wrapped with an an "after" modifier) from "prepare_path" in
+    Catalyst.
+
+    Calls "$c->prepare_path_prefix" after the original method.
+
+  prepare_path_prefix
+      $c->prepare_path_prefix()
+
+    Returns: N/A
+
+    If "$c->req->path" is matched by the "language_independent_paths"
+    configuration option then calls "$c->set_languages_from_language_prefix"
+    with the value of the "fallback_language" configuration option and
+    returns.
+
+    Otherwise, if "$c->req->path" starts with a language code listed in the
+    "valid_languages" configuration option, then splits language prefix from
+    "$c->req->path" then appends it to "$c->req->base" and calls
+    "$c->set_languages_from_language_prefix" with this language prefix.
+
+    Otherwise, it tries to select an appropriate language code:
+
+    *   It picks the first language code "$c->languages" that is also
+        present in the "valid_languages" configuration option.
+
+    *   If no such language code, uses the value of the "fallback_language"
+        configuration option.
+
+    Then appends this language code to "$c->req->base" and the path part of
+    "$c->req->uri", finally calls "$c->set_languages_from_language_prefix"
+    with that language code.
+
+  set_languages_from_language_prefix
+      $c->set_languages_from_language_prefix($language_code)
+
+    Returns: N/A
+
+    Sets "$c->languages" to $language_code.
+
+    Called from both "prepare_path_prefix" and "switch_language" (ie. always
+    called when "$c->languages" is set by this module).
+
+    You can wrap this method (using eg. the "after" in Moose method
+    modifier) so you can store the language code into the stash if you like:
+
+      after set_languages_from_language_prefix => sub {
+        my $c = shift;
+
+        $c->stash('language' => $c->language);
+      };
+
+  uri_for_in_language
+      $c->uri_for_in_language($language_code => @uri_for_args)
+
+    Returns: $uri_object
+
+    The same as "uri_for" in Catalyst but returns the URI with the
+    $language_code path prefix (independently of what the current language
+    is).
+
+    Internally this method temporarily sets the paths in "$c->req", calls
+    "uri_for" in Catalyst then resets the paths. Ineffective, but you
+    usually call it very infrequently.
+
+    Note: You should not call this method to generate language-independent
+    paths, as it will generate invalid URLs currently (ie. the language
+    independent path prefixed with the language prefix).
+
+    Note: This module intentionally does not override "uri_for" in Catalyst
+    but provides this method instead: "uri_for" in Catalyst is usually
+    called many times per request, and most of the cases you want it to use
+    the current language; not overriding it can be a significant performance
+    saving. YMMV.
+
+  switch_language
+      $c->switch_language($language_code)
+
+    Returns: N/A
+
+    Changes "$c->req->base" to end with $language_code and calls
+    "$c->set_languages_from_language_prefix" with $language_code.
+
+    Useful if you want to switch the language later in the request
+    processing (eg. from a request parameter, from the session or from the
+    user object).
+
+  language_switch_options
+      $c->language_switch_options()
+
+    Returns: "{ $language_code => { name => $language_name, uri => $uri },
+    ... }"
+
+    Returns a data structure that contains all the necessary data (language
+    code, name, URL of the same page) for displaying a language switch
+    widget on the page.
+
+    The data structure is a hashref with one key for each valid language
+    code (see the "valid_languages" config option) (in all-lowercase format)
+    and the value is a hashref that contains the following key-value pairs:
+
+    name
+        The localized (translated) name of the language. (The actual msgid
+        used in "$c->loc()" is the English name of the language, returned by
+        "name" in I18N::LangTags::List.)
+
+    url The URL of the equivalent of the current page in that language (ie.
+        the language prefix replaced).
+
+    You can find an example TT2 HTML template for the language switch
+    included in the distribution.
+
+  valid_languages
+      $c->valid_languages
+
+    Returns: Array of valid language codes
+
+    "valid_languages" returns the language codes you configured in the
+    valid_languages configuration.
+
+    Useful if you want to go through all valid languages. For example to
+    make a sitemap.
+
+SEE ALSO
+    Catalyst::Plugin::I18N::PathPrefix, Catalyst::Plugin::I18N,
+    Catalyst::TraitFor::Request::PerLanguageDomains
+
+AUTHOR
+    PathPrefix: Norbert Buchmuller, "<norbi at nix.hu"> PathPrefixGeoIP:
+    Runar Buvik: "<runarb at gmail.com"> =head1 TODO
+
+    make "uri_for_in_language" work on language-independent URIs
+    support locales instead of language codes
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-i18n-pathprefix at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-I18N-Pat
+    hPrefixGeoIP>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Plugin::I18N::PathPrefixGeoIP
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-I18N-PathP
+        refixGeoIP>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Catalyst-Plugin-I18N-PathPrefixGeoIP>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Catalyst-Plugin-I18N-PathPrefixGeoIP>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Catalyst-Plugin-I18N-PathPrefixGeoIP/>
+
+ACKNOWLEDGEMENTS
+    Thanks for Larry Leszczynski for the idea of appending the language
+    prefix to "$c->req->base" after it's split off of "$c->req->path"
+    (<http://dev.catalystframework.org/wiki/wikicookbook/urlpathprefixing>).
+
+    Thanks for Tomas (t0m) Doran <bobtfish@bobtfish.net> for the code
+    reviews, improvement ideas and mentoring in general.
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Norbert Buchmuller, Runar Buvik, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

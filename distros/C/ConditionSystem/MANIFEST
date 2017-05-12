@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/ConditionSystem.pm
+t/basic.t
+t/log.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

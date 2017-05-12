@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Data::Dumper;
+use Config::Abstract::Ini;
+my $settingsfile = 'Ini/test.ini';
+my $newsettingsfile = 'Ini/test2.ini';
+#print("--------------------------------------------- Instantiating -----\n");
+my $abstract = Config::Abstract::Ini->new($settingsfile);
+#my $diffabstract = Config::Abstract::Ini->new($newsettingsfile);
+#print("--------------------------------------------------- Diffing -----\n");
+#my $diff = $abstract->diff($diffabstract);
+#print("-------------------------------------------- Diff structure -----\n$diff\n");
+print("Getting //book//chapter1//title from abstract\n");
+my $v = $abstract->get('//book//chapter1//title');
+print("//book//chapter1//title: $v\n");
+$v = $abstract->set('//book//chapter1//title','Not very original, is it?');
+print("Altered //book//chapter1//title: $v\n");

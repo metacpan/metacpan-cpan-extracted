@@ -1,0 +1,46 @@
+Revision history for Perl extension CSS::Squish.
+
+0.08  Mon Apr 20 2009
+    
+    * module doesn't work on perl 5.6.x and older
+    * update docs
+
+0.07  Fri Nov 9 2007
+    
+    * add back _resolve_file which has been deprecated, to make the module
+      backward compatible for users of that method
+
+0.06  Tue Nov 4 2007
+
+    * INCOMPATIBLE CHANGE
+
+      Multiple roots are treated in a different way, read more in the doc.
+
+    * Make things more extendable
+
+    * Docs updates
+
+    * The follwoing bugs are fixed:
+
+      Only direct @import loops (i.e. where a file imports itself) are checked
+      and skipped.  It's easy enough to get this module in a loop.  Don't do it.
+
+      As of now, server-relative URLs (instead of file-relative URLs) will not work
+      correctly.
+
+0.05  Tue Jul 4 2006
+
+    * INCOMPATIBLE CHANGE
+
+      CSS::Squish now searches the user-specified roots _before_ searching
+      relative to the importing file.  This seems to make more sense in
+      general and allows overriding the default behaviour more easily.
+
+      For users not using the multiple roots functionality, behaviour has
+      not changed.
+
+0.02  Wed Jun 7 2006
+
+    * Fixed POD and added another bug note
+
+0.01  Wed Jun 7 2006

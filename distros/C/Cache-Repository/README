@@ -1,0 +1,40 @@
+Cache::Repository - a framework for handling repositories of files
+          Darin McBride
+
+Copyright 2005 Darin McBride
+
+QUICK START:
+
+    Finish reading this README.  Install by doing:
+        perl Build.PL
+        ./Build.PL
+        ./Build.PL test
+        ./Build.PL install
+
+    At this point, the source tree is no longer needed - you can delete
+    it if you wish.
+
+DESCRIPTION:
+
+    The purpose of this framework is to provide a way to handle a
+    repository of files.  In general, unlike simple data, files can be
+    too large to fit in available memory, or, more often, too large to
+    fit in a reasonable amount of memory.  For example, a repository of
+    CD images would be too large to keep in shared memory, or even a
+    repository of images, CAD files, etc.  Even for smaller files, such
+    as perl code, if you are dealing with them as files, and not as
+    data, there may be no reason to load them into a scalar in memory
+    to work with.
+
+    Further, files are often grouped together in some manner that they
+    will stay together in.  For example, an image and its thumbnail
+    will usually be kept together - they either are both required or
+    neither.  Or an ISO image and its .md5 file.
+
+    These are both ways that separate this framework from its nearest
+    look-alike: Cache::Cache.  With Cache::Cache, each file would be
+    treated as data - loaded into memory.  There is no grouping of this
+    "data" since it is geared towards caching actual perlish data, and
+    you can just cache arrays or hashes to keep your data together.
+
+

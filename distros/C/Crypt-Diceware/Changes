@@ -1,0 +1,43 @@
+Revision history for Crypt-Diceware
+
+0.005     2014-07-15 12:57:24-04:00 America/New_York
+
+    [ADDED]
+
+    - Custom entropy source may be used
+
+    [CHANGED]
+
+    - Default entropy source is now seeded with Crypt::URandom
+      instead of the Data::Entropy default using rand()
+
+0.004     2014-07-14 23:27:43-04:00 America/New_York
+
+    [ADDED]
+
+    - Custom word files may be used
+
+    [CHANGED]
+
+    - Modernized distribution meta files
+
+0.003     2013-05-16 17:59:58 America/New_York
+
+    [CHANGED]
+
+    - In scalar context, returns words joined by space
+
+    [FIXED]
+
+    - Removed words with a slash
+
+0.002     2013-01-08 22:54:21 America/New_York
+
+    [DOCUMENTED]
+
+    - Added link to Neil Bower's comparison of CPAN password generators
+
+0.001     2013-01-08 21:43:47 America/New_York
+
+    - First release
+

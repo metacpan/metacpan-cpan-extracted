@@ -1,0 +1,3 @@
+The Class::Privacy Perl module implements object data privacy:
+only the class itself can look inside its objects.
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Dependency Injection via method signatures'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  Catalyst: '5.9009'
+  Catalyst::ActionRole::MethodSignatureDependencyInjection: '0.020'
+  Moose: '2.0602'
+  MooseX::MethodAttributes: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-ActionSignatures
+requires:
+  B::Hooks::Parser: '0.16'
+  Carp: '1.36'
+  Catalyst::ActionRole::MethodSignatureDependencyInjection: '0.020'
+  Moose::Role: '2.0602'
+  signatures: '0.13'
+resources:
+  bugtracker: https://github.com/jjn1056/Catalyst-ActionSignatures/issues
+  homepage: https://github.com/jjn1056/Catalyst-ActionSignatures
+  repository: https://github.com/jjn1056/Catalyst-ActionSignatures.git
+version: '0.010'

@@ -1,0 +1,15 @@
+Revision history for Catalyst::Model::S3
+
+0.03	2007-03-28
+		Minor updates for PAUSE:
+			* Test app package declaration hack
+			* Fixed missing examples files in MANIFEST
+
+0.02	2007-03-28:
+		Tidied up distribution:
+			* Improved documentation
+			* Tidied up testing
+			* Fixed dependencies in Makefile.pl
+
+0.01    2007-03-07:
+		Initial release.

@@ -1,0 +1,1778 @@
+=head1 NAME
+
+CGI::Bus - Web and DBI Application object
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->print->htpfstart;       # start http, page, form
+
+ $s->cgi->...                # -> CGI object
+ $s->dbi->...                # -> DBI object
+ $s->tmsql->...              # -> SQL database interface object
+ ........
+ $s->print->htpfend          # end form and page
+
+
+
+=head1 DESCRIPTION
+
+A web database with record versioning, 
+access control at the record level, 
+and file attachments 
+was needed for me, 
+see examples and L<CGI::Bus::tmsql|CGI/Bus/tmsql>...
+Modular structure and some codes implemented due to
+infrastructural needs.
+
+This module is to provide based on L<CGI|CGI> module core application object
+to load, contain and manage any other used by application objects,
+methods and data.
+Several slots and methods may be useful predefined and added also.
+Several automatic subobject classes may be useful provided.
+Perhaps, this looks something like C<Jellybean> or C<PAS>, 
+but is not so complex or so right.
+
+Currently implemented and tested on Win32 Apache and IIS.
+
+
+=head2 SUBOBJECTS
+
+L<CGI::Bus::Base|CGI/Bus/Base> is base class for automatic subobjects.
+
+L<CGI::Bus::file|CGI/Bus/file> is a file object encapsulating 
+L<IO::File|IO/File> object.
+
+L<CGI::Bus::fut|CGI/Bus/fut> is a file and directory utils library.
+
+L<CGI::Bus::psp|CGI/Bus/psp> is a very simple and little 
+HTML/Perl script processor, 
+like something as 
+L<Apache::ASP|Apache/ASP>,
+L<HTML::Embperl|HTML/Embperl>, L<HTML::HTPL|HTML/HTPL>,
+L<HTML::Mason|HTML/Mason>.
+
+L<CGI::Bus::smtp|CGI/Bus/smtp> is a simple SMTP sender,
+based on L<Net::SMTP|Net/SMTP>.
+
+L<CGI::Bus::tm|CGI/Bus/tm> is a database Transaction page Manager 
+to view and edit data, the base and simplest case of 
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> below.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> is an SQL database user interface 
+to view and edit data,
+page transaction manager,
+another than L<DBIx::HTMLView|DBIx/HTMLView>, C<eXtropia> or C<MOT>.
+
+L<CGI::Bus::uauth|CGI/Bus/uauth> is default or base user authentication class,
+provides C<user>, C<ugroups>, C<uglist> methods.
+It translates web server authentication and uses platform specific methods.
+
+L<CGI::Bus::udata|CGI/Bus/udata> is a user data store.
+
+L<CGI::Bus::upws|CGI/Bus/upws> is a user personal work space.
+
+L<CGI::Bus::wg|CGI/Bus/wg> is a collection of HTML widgets.
+
+
+
+=head2 SOLUTIONS
+
+See C<AUTOLOAD>, C<reset>, C<print>, L<CGI::Bus::Base|CGI/Bus/Base>
+
+
+
+=head1 CLASSIFICATION
+
+=over
+
+=item Creation and Setup 
+
+C<new>, C<set>, C<-import>, C<-reimport>
+
+
+=item Internals
+
+C<AUTOLOAD>, C<launch>, C<-classes>, C<-cache>, C<$CGI::Bus::SELF>,
+C<reset>, C<-reset>, C<-endh>, C<DESTROY>, 
+C<-debug>, C<microtest>
+
+
+=item Subobjects and Features Embedded
+
+C<cgi>, C<-cgi>, C<fcgicount>, C<request>, C<dbi>, C<-dbi>, C<oscmd>
+
+
+=item Error and Message processing
+
+C<die>, C<warn>, C<problem>, C<-problem>, 
+C<pushmsg>, C<pushlog>, C<-pushlog>
+
+
+
+=item Language
+
+C<lngname>, C<-lngname>, C<lngload>, C<lng>
+
+
+=item Locations
+
+C<qpath>, C<-qpath>, C<qurl>, C<-qurl>,
+C<spath>, C<-spath>, C<surl>, C<-surl>,
+C<bpath>, C<-bpath>, C<burl>, C<-burl>,
+C<dpath>, C<-dpath>,
+C<tpath>, C<-tpath>,
+C<ppath>, C<-ppath>, C<purl>, C<-purl>,
+C<fpath>, C<-fpath>, C<furf>, C<-furf>, C<furl>, C<-furl>,
+C<hpath>, C<-hpath>, C<hurf>, C<-hurf>, C<hurl>, C<-hurl>,
+C<urfcnd>, C<-urfcnd>,
+C<-iurl>
+
+
+
+=item Utils
+
+C<strtime>, C<timestr>, C<timeadd>,
+C<cptran>, C<ishtml>,
+C<dumpout>, C<dumpin>,
+C<orarg>
+
+
+=item HTML Generation
+
+C<httpheader>, C<-httpheader>, 
+C<htmlstart>, C<-htmlstart>, 
+C<htpgstart>, C<-htpnstart>, C<-htpgstart>, C<-htpfstart>, C<-htpgtop>, 
+C<htpgend>, C<-htpgbot>,
+C<htpfstart>, C<htpfend>,
+C<htmlescape>, C<urlescape>, C<dbquote>, C<dblikesc>,
+C<htmlddlb>, C<htmltextarea>, C<htmltextfield>, C<htmlfsdir>
+
+
+=item Parameters Handling
+
+C<qparam>, C<param>, C<qparamh>, C<qrun>
+
+
+=item User Name
+
+C<userauth>, C<userauthopt>, C<-login>,
+C<user>, C<useron>, 
+C<-user>, C<-usercnv>, C<-unmsadd>, C<usercn>, C<usersn>, C<unames>, 
+C<uguest>, C<uadmin>, C<-uadmins>, 
+C<usdomain>, C<-usdomain>, C<userver>, C<-userver>, 
+C<ugroups>, C<-ugroups>, C<-ugrpcnv>, C<-ugrpadd>, C<ugnames>, 
+C<uglist>, C<-uglist>, C<-udflt>, C<-unflt>, C<-ugflt>,
+C<unamesun>
+
+
+=back
+
+
+
+=head1 SLOTS
+
+Are available via C<set> 
+and several explicitly refered here methods.
+
+=over
+
+=item $CGI::Bus::SELF
+
+Package variable, pointer to current C<CGI::Bus> object.
+local $SELF is set within some methods for use by external objects or
+methods.
+See also C<evalsub>
+
+
+=item -bpath
+
+=item -burl
+
+Binary path, URL
+Default is path of script running.
+Cached and used by C<bpath>, C<burl>.
+See also C<Locations>.
+
+
+=item -cache
+
+Data cache hash ref for stable methods results 
+to speed up by skipping some code evaluations.
+
+
+=item -cgi
+
+L<CGI|CGI> predefined object, created in C<initialize>
+
+
+=item -classes
+
+Classes to autocreate Objects: {-key=>class,...}. 
+See also C<-import>, C<-reimport>, C<-reset>.
+
+
+=item -dbi
+
+L<DBI|DBI> predefined object
+
+
+=item -debug
+
+Debug Mode: add
+1 - verbose operation messages at the bottom of HTML pages with "display: none" style, 
+2 - verbose operation messages at the bottom of HTML pages, 
+3 - some debug values as HTML comment,
+4 - debug values at the bottom of HTML pages,
+5 - results of some methods calls.
+
+
+=item -dpath
+
+Data path.
+Default is C<tpath>.
+Cached and used by C<dpath>.
+See also C<Locations>.
+
+
+=item -endh
+
+Delayed commands hash ref, executed in C<reset>, cleaned after execution.
+
+
+=item -fcgicount
+
+Counter of L<CGI::Fast|CGI/Fast> loops.
+Used inside C<fcgicount>.
+
+
+=item -fcgimax
+
+Margin of L<CGI::Fast|CGI/Fast> loops.
+And FastCGI enable flag also.
+Used inside C<fcgicount>.
+
+
+=item -fpath
+
+=item -furf
+
+=item -furl
+
+File store path, filesystem URL, URL.
+Default is C<ppath>, C<fpath>, C<purl>.
+Cached and used by C<fpath>, C<furf>, C<furl>
+See also C<Locations>.
+
+
+=item -hpath
+
+=item -hurf
+
+=item -hurl
+
+Homes store path, filesystem URL, URL.
+Default is C<ppath>, C<hpath>, C<purl>.
+Cached and used by C<hpath>, C<hurf>, C<hurl>
+See also C<Locations>.
+
+
+=item -htmlstart
+
+HTML start hash ref, for C<htmlstart>
+
+
+=item -htpfstart
+
+Form pages HTML start hash ref, for C<htmlstart>
+in L<CGI::Bus::tmsql|CGI/Bus/tmsql> and etc,
+see also C<-htpgstart>, C<-htpnstart>
+
+
+=item -htpgbot
+
+HTML page end HTML string, for C<htpgend>
+
+
+=item -htpgstart
+
+Pages (views, lists) HTML start hash ref, for C<htmlstart> 
+in L<CGI::Bus::tmsql|CGI/Bus/tmsql> and etc,
+see also C<-htpfstart>, C<-htpnstart>
+
+
+=item -htpgtop
+
+HTML page begin HTML string, for C<htpgstart>
+
+
+=item -htpnstart
+
+Navigator panes HTML start hash ref, for C<htmlstart> 
+in L<CGI::Bus::upws|CGI/Bus/upws>,
+see also C<-htpgstart>, C<-htpfstart>
+
+
+=item -httpheader
+
+HTTP header hash ref, for C<httpheader>
+
+
+=item -iurl
+
+Apache images URL to use instead of text only behaviour.
+Default is undef, standard is '/icons'.
+
+
+=item -import
+
+ -import => {'use...'=>{-method=>call,...},...}
+
+ -import => {'use...'=>[method,...],...}
+
+ -import => {-key=>class}
+
+Add Classes or Methods and Packages. This slot does not exists,
+it is used only as C<set> parameter to fill other slots or C<-classes> slot.
+
+
+=item -lngname
+
+Name and charset of the language to use. See C<lngname>
+
+
+=item -login
+
+Login screen URL. 
+Used by C<userauth> and L<CGI::Bus::uauth|CGI/Bus/uauth>.
+If login URL ends with '/' sign, it is treated as 
+authenticated location, current script name will be appended.
+
+
+=item -ppath
+
+=item -purl
+
+Publish path, URL.
+Default is $ENV{DOCUMENT_ROOT} ||$ENV{PATH_TRANSLATED} ||'.'; C<surl>.
+Cached and used by C<ppath>, C<purl>.
+See also C<Locations>.
+
+
+=item -pushlog
+
+Log file name to push messages to
+
+
+=item -qpath
+
+=item -qurl
+
+Query (script) Path, URL.
+Cached and used by C<qpath>, C<qurl>.
+See also C<Locations>.
+
+
+=item -reimport
+
+ -reimport => {-key=>class,...}
+
+ -reimport => [-key,...]
+
+ -reimport => -key
+
+Add Classes or slots to reset when reusing application object. 
+This slot does not exists,
+it is used only as C<set> parameter to fill C<-reset> or C<-classes> slots.
+See also C<-import>, C<-reset>, C<new>.
+
+
+=item -reset
+
+ -reset => {-slot => 1,...}
+
+slots to destroy when reusing application object.
+See also C<-import>, C<-reimport>, C<new>.
+
+
+=item -spath
+
+=item -surl
+
+Site path, URL
+Cached and used by C<spath>, C<surl>.
+See also C<Locations>.
+
+
+=item -tpath
+
+Temporary files path.
+Default is based on L<CGI|CGI> $TempFile::TMPDIRECTORY ||$ENV{TMP} ||$ENV{TEMP}.
+Cached and used by C<tpath>.
+See also C<Locations>.
+
+
+=item -uadmins
+
+List (array ref) of administrators or
+sub{} to check current user as administrator.
+Used by C<uadmin>
+
+
+=item -udflt
+
+User domains filter optional sub{} to be evaluated against each domain name in $_.
+Considered in L<CGI::Bus::uauth|CGI/Bus/uauth> windows specific codes.
+See also C<-unflt>, C<-ugflt>.
+
+
+=item -ugflt
+
+User groups filter optional sub{} to be evaluated against each group name in $_.
+Considered in C<ugroups> and C<uglist> default code.
+See also C<-unflt>.
+
+
+=item -uglist
+
+Users and groups list optional sub{}.
+C<uglist> method evaluates this sub or uses it's own code.
+
+
+=item -ugroups
+
+User groups list optional sub{}.
+C<ugroups> method evaluates this sub or uses it's own code.
+
+
+=item -ugrpadd
+
+Additional user groups names array or hash ref or research sub{},
+used by C<ugroups>.
+Example:
+
+ $g->set(-ugrpadd=>sub{['Everyone','Guests']})
+
+
+=item -ugrpcnv
+
+User groups names conversion optional sub{}
+to convert or filter user and group names 
+to be returned by C<ugroups>, C<uglist>.
+Example:
+
+ $g->set(-ugrpcnv=>sub{$_[0]->usersn})
+
+
+=item -unflt
+
+User names filter optional sub{} to be evaluated against each name in $_.
+Considered in C<uglist> default code.
+See also C<-ugflt>.
+
+
+=item -unmsadd
+
+Additional user names research sub{},
+used by C<unames>.
+Example:
+
+ $g->set(-unmsadd=>sub{$_[0]->usercn})
+
+
+=item -urfcnd
+
+Filesystem URLs (file://) condition sub{}.
+Condition to use '-urf's instead of '-url's.
+See also C<urfcnd>
+
+
+=item -usdomain
+
+User names Server's Domain name optional evaluation sub{}.
+C<usdomain> method evaluates this sub or returns 
+value from L<CGI::Bus::uauth|CGI/Bus/uauth>.
+See also C<-userver>, C<userver>
+
+
+=item -user
+
+User name get optional sub{}.
+C<user> method evaluates this sub or returns user name got from web server.
+
+
+=item -userver
+
+User names Server name optional evaluation sub{}.
+C<userver> method evaluates this sub or returns 
+value from L<CGI::Bus::uauth|CGI/Bus/uauth>.
+See also C<-usdomain>, C<usdomain>
+
+
+=item -userauth
+
+User authentication optional sub{} or 
+reference to list of authentication options.
+C<userauth> evaluates this sub or calls L<CGI::Bus::uauth|CGI/Bus/uauth>->'auth'
+if there is no current user.
+Authentication options will be passed to L<CGI::Bus::uauth|CGI/Bus/uauth>->'auth'.
+
+
+=item -usercnv
+
+User name conversion optional sub{}
+to convert or filter user names 
+to be returned by C<user>.
+Example:
+
+ $g->set(-usercnv=>sub{lc($_[0]->usercn)});
+
+
+
+=item -w32IISdpsn
+
+Deimpersonation place for Microsoft IIS authenticated user session, 
+see also C<userauth>().
+
+	0 - never
+	1 - when required, i.e. for file store operation
+	2 - always and early
+
+
+=back
+
+
+
+=head1 METHDOS
+
+=over
+
+
+=item AUTOLOAD
+
+Loads subobject or method requested in order:
+subobject or method defined via C<set>(C<-import>),
+L<CGI|CGI> module method,
+automatic C<CGI::Bus> subobject.
+Sets new object slot 'CGI::Bus' to application object.
+See also C<Creation and Setup>, C<Internals>
+
+
+=item bpath -> binary path
+
+=item bpath (subpath) -> binary subdirectory path
+
+Binary path cached in C<-bpath> with given subpath added.
+See also C<Locations>.
+
+
+=item burl -> binary URL
+
+=item burl (subpath) -> binary subdirectory URL
+
+=item burl (subpath, param => value,...) -> binary subdirectory URL
+
+Binary URL cached in C<-burl> with given subpath and parameters added.
+See also C<Locations>.
+
+
+=item cgi () -> C<CGI> object
+
+C<CGI> predefined object stored in C<-cgi>
+
+
+=item cptran (fromCP, toCP, strings) -> translated
+
+Translates strings from codepage fromCP to codepage toCP,
+returns translated string or list of strings. 
+Codepages may be 'oem', '866','ansi', '1251','koi' prone of koi8,
+'8859-5' prone of ISO 8859-5.
+
+
+=item dbi (constructor args) -> new C<DBI> object
+
+=item dbi -> current C<DBI> object
+
+Create new or return current C<DBI> object stored in C<-dbi>
+
+
+=item dblikesc (text) -> escaped
+
+Escapes text to use inside SQL LIKE 'text' ESCAPE '\' expression.
+See also C<htmlescape>, C<urlescape>, C<dbquote>.
+
+
+=item dbquote (text) -> quoted
+
+Quotes text to use inside SQL.
+See also C<htmlescape>, C<urlescape>, C<dblikesc>.
+
+
+=item DESTROY
+
+Destructor, uses C<reset> for almost all application object.
+See also C<Creation and Setup>, C<Internals>
+
+
+=item die (?message) -> died
+
+Error Stop, like CORE::die.
+Message with "\n" signs is considered to be for user,
+without "\n" is treated as software error and implemented via 
+'confess' or 'croak'.
+See also C<Error and Message processing>, L<CGI::Carp|CGI/Carp>
+
+
+=item dpath -> data path
+
+=item dpath (subpath) -> data subdirectory path
+
+Data path cached in C<-dpath> with given subpath added.
+See also C<Locations>.
+
+
+=item dumpin ( data string ) -> data ref
+
+=item dumpout ( data ref ) -> data string
+
+Stringify and destringify data structure with
+L<Data::Dumper|Data/Dumper> and L<Safe|Safe>
+
+
+=item evalsub (sub, arguments) -> result
+
+Evals sub given with local $CGI::Bus::SELF set to application object.
+
+
+=item CGI::Bus::fcgicount (-fcgimax=>number, constructor args) -> success self
+
+=item fcgicount (self, -fcgimax=>number, constructor args) -> success self
+
+=item fcgicount -> success self
+
+Interface for L<CGI::Fast|CGI/Fast>.
+Uses C<-fcgicount>, C<-fcgimax>.
+May be used in constructs like:
+
+ while ($s =CGI::Bus::fcgicount($s,-fcgimax=>...)) {};
+ while (1) {$s =CGI::Bus::new($s,-fcgimax=>...); ...; last until $s->fcgicount};
+
+
+
+=item fpath ( ?subpath ) -> File store path
+
+=item furf  ( ?subpath, ?args ) -> File store file URL
+
+=item furl  ( ?subpath, ?args ) -> File store URL
+
+Location of file store 
+cached in C<-fpath>, C<-furf>, C<-furl> 
+with given subpath added.
+Default is C<ppath>, C<fpath>, C<purl>.
+See also C<Locations>.
+
+
+=item hpath ( ?subpath ) -> Home store path
+
+=item hurf  ( ?subpath, ?args ) -> Home store file URL
+
+=item hurl  ( ?subpath, ?args ) -> Home store URL
+
+Location of home store 
+cached in C<-hpath>, C<-hurf>, C<-hurl> 
+with given subpath added.
+Default is C<ppath>, C<hpath>, C<purl>.
+See also C<Locations>.
+
+
+
+=item htmlddlb (false, name, data, field name,...) -> HTML drop-down list box
+
+=item htmlddlb (widget | false, name, data, [field name => label],...)
+
+Generate input helper drop-down list box HTML.
+Optional 'widget' parameter (html, '$_' placeholder, any other string or empty value),
+is used only to be placed after some javascript may be generated.
+Name is used as the common part of names of the HTML widgets - submits, 
+scrolling_list, buttons, which names are generated by appending '_' sign
+and suffix.
+Data may be array ref with list of values,
+hash ref with internal and external values, 
+sub{} to produce above.
+Other arguments are field names to fill with values.
+Field names with leading "\t" corresponds to multivalue fields,
+leading "\tmsab\t" hints to try Microsoft Address Book before if possible.
+Implemented in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+
+=item htmlescape (text) -> escaped
+
+C<CGI::escapeHTML> call.
+See also C<urlescape>, C<dbquote>, C<dblikesc>.
+
+
+=item htmlescapetext (text) -> escaped 
+
+Alike C<htmlescape>, but with
+text area formatting improved with '&nbsp;' signs and '<code>' tags as needed;
+'<br />' and '<a href=' tags; 
+URLs; 
+relative URLs marked with 'host://' and 'url://' protocols.
+
+
+=item htmlfsdir ( name, edit?, allow edit?, files path, URL, ?filesystemURL, ?rows, ?cols )
+
+Generate filesystem directory editor HTML.
+This may be IE HTML IFRAME tag pointed to filesystem,
+URLs, or filefield for upload files and checkboxes to delete.
+Name is used as the common part of names of the HTML widgets.
+Implemented in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+
+=item htmlstart (?parameters) -> start html string
+
+Start HTML string using C<CGI::start_html>(?parameters) call.
+Default parameters are given from C<-htmlstart> slot.
+
+
+=item htmltextarea (-name=>...,-arows=>min, -hrefs=>1,...) -> textarea HTML
+
+Like C<CGI::textarea> call, but with additional attributes:
+-arows=>min autosizes widget to it's content.
+-hrefs=>1 searches HTML hyperlinks in content and displays them.
+Implemented in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+
+=item htmltextfield (-name=>..., -asize=>min) -> text field HTML
+
+Like C<CGI::textfield> call, but with additional attributes:
+-asize=>min autosizes widget to it's content.
+Implemented in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+
+=item htpfend -> end form and page HTML
+
+End HTML form and page string using C<htpgend>.
+
+
+=item htpfstart (?httpheader, ?htmlstart) -> start page and form HTML
+
+Start HTML page and form string using C<htmlstart>, C<-htpfstart>.
+
+
+=item htpgend () -> end page HTML
+
+End HTML page string using C<-htpgbot> and
+C<CGI>->C<end_html> call.
+
+
+=item htpgstart (?httpheader, ?htmlstart) -> start page HTML
+
+Start HTML page string using C<httpheader>, C<htmlstart>, 
+C<-htpgstart>, C<-htpgtop>
+
+
+=item httpheader (?parameters) -> HTTP header string
+
+HTTP header string using C<CGI::header>(?parameters).
+Default parameters are given from C<-httpheader> slot.
+
+
+=item ishtml ( text ) -> is text HTML formatted?
+
+Detect HTML format of text: beginning
+with '<' and one of well-known HTML tags.
+
+
+=item launch (class => constructor args) -> object
+
+=item launch -> class(constructor args) -> object
+
+Creates object unbinded to C<CGI::Bus> object.
+Uses C<AUTOLOAD> like principles, but does not attaches 
+object created to C<CGI::Bus> object.
+
+
+=item lng (msg) -> language message variants array ref
+
+=item lng (number, msg) -> language message
+
+Message text in current language.
+0 - short message, label.
+1 - long message, comment or description.
+
+
+=item lngload (class, ?language) -> language base hash ref
+
+Loads and returns language base hash ref for class given.
+
+
+=item lngname () -> language name with charset
+
+=item lngname (language to set)
+
+Returns current language name with charset.
+Default is $ENV{HTTP_ACCEPT_LANGUAGE} and $ENV{HTTP_ACCEPT_CHARSET}.
+
+
+=item microtest
+
+Prints some diagnostics, used in debug mode.
+
+
+=item new ( -slot=>value...) -> new application object
+
+=item new (?reuse,...)...
+
+Create new or reuse existed application object.
+See also C<Creation and Setup>, C<Internals>
+
+
+=item orarg (sub, arg,...) -> succeeded arg
+
+=item orarg (function string, arg,...) -> succeeded arg
+
+Evaluates sub or function given with local $_ set to each arg
+until success. Returns successful arg. 
+Example: orarg('-d','c:/home','c:/users') returns first
+existed directory.
+
+
+=item oscmd (?'-hi', command, args) -> success
+
+Execute given OS command with output interception.
+Command and output will be stored with C<pushmsg> if 'h'ide option is not set.
+Non zero return code will produce C<die> if 'i'gnore option is not set.
+The last argument may be sub{} to print to STDIN of the command.
+
+
+=item param (args) -> L<CGI|CGI> subobject C<param> call
+
+L<CGI|CGI> subobject C<param> call, optimising C<AUTOLOAD>ing.
+See also C<qparam>
+
+
+=item ppath -> publish path
+
+=item ppath (subpath) -> publish subdirectory path
+
+Publish path cached in C<-ppath> with given subpath added.
+See also C<Locations>.
+
+
+=item print -> print object
+
+=item print (?args to print) -> print object
+
+Prints arguments, returns object, 
+that autoloads self or L<CGI|CGI> method, 
+prints result of it,
+returns itself.
+This is useful to shorten notation and some output control.
+Example: $u->print->h1('some header')->h2('some header') 
+will print 'h1' and 'h2' tags given.
+See also: C<AUTOLOAD>, C<cgi>
+
+
+=item problem (?message) -> problem set
+
+Set problem flag or message C<-problem>.
+See also C<Error and Message processing>
+
+
+=item purl -> publish URL
+
+=item purl (subpath) -> publish subdirectory URL
+
+=item purl (subpath, param => value,...) -> publish subdirectory URL
+
+Publish URL cached in C<-purl> with given subpath and parameters added.
+See also C<Locations>.
+
+
+=item pushlog ( messages )
+
+Push messages strings to C<-pushlog> file
+
+
+=item pushmsg -> messages []
+
+=item pushmsg (messages) -> messages []
+
+Retrieve and store messages strings.
+Accumulate messages to display.
+
+
+=item qparam  ([parameters names]) -> [parameters values]
+
+=item qparam  ([names]=>[values]) -> [values]
+
+=item qparam  ({name=>value,...}) -> {name=>value,...}
+
+=item qparam  (?CGI param args) -> CGI param call
+
+=item qparamh ([names]) -> {name=>value,...}
+
+C<CGI::param> call extended
+
+
+=item qpath -> query (script) path
+
+=item qpath (subpath) -> query (script) subdirectory path
+
+Query (script running) path including script name
+cached in C<-qpath> with given subpath added.
+See also C<Locations>.
+
+
+=item qrun () -> run parameter value
+
+Query to run: 
+C<CGI::param>('_run') ||C<CGI::param>('') ||C<CGI::param>('run')
+
+
+=item qurl -> query (script) URL
+
+=item qurl (subpath) -> query (script) subdirectory URL
+
+=item qurl (subpath, param => value,...) -> query (script) subdirectory URL
+
+Query (script running) URL including script name
+cached in C<-qurl> with given subpath and parameters added.
+See also C<Locations>.
+
+
+=item request () -> web server request object
+
+Predefined web server request object - 
+something like C<cgi> or Apache->request.
+
+
+=item reset
+
+=item reset ({-slot=>1,...})
+
+Reset application object, i.e. when reusing - 
+release subobjects to be reinitiated.
+Calls destructors of objects to be released,
+deletes 'CGI::Bus' slots of this objects.
+See also C<Creation and Setup>, C<Internals>
+
+
+
+=item set (-slot) -> value
+
+=item set (-slot=>value,...) -> application object
+
+Retrieve or set application object slots.
+See also C<Creation and Setup>
+
+
+=item spath -> site path
+
+=item spath (subpath) -> site subdirectory path
+
+Site path cached in C<-spath> with given subpath added.
+See also C<Locations>.
+
+
+=item strtime ( ?mask, ?@time ) -> string
+
+=item strtime ( ?mask, ?time seconds ) -> string
+
+Convert given date-time array into string using mask or format given.
+Mask constructions are 'yyyy', 'yy', 'mm', 'dd', 'hh', 'mm' or 'MM', 'ss',
+or L<POSIX|POSIX> C<strftime> format.
+Default mask is 'yyyy-mm-dd hh:mm:ss'.
+Default time is C<localtime>(C<time>).
+
+
+=item surl -> site URL
+
+=item surl (subpath) -> site subdirectory URL
+
+=item surl (subpath, param => value,...) -> site subdirectory URL
+
+Site URL cached in C<-purl> with given subpath and parameters added.
+See also C<Locations>.
+
+
+=item timeadd (time seconds, years, ?months, ?days, ?hours, ?minutes ,?seconds) -> time seconds
+
+Add values given to time given.
+
+
+=item timestr ( ?mask, time string ) -> time seconds
+
+Convert time string by mask to compatible with C<time> number of seconds.
+See C<strtime> for mask constructions and default mask.
+
+
+=item tpath -> temporary files path
+
+=item tpath (subpath) -> temporary subdirectory path
+
+Temporary files path cached in C<-tpath> with given subpath added.
+See also C<Locations>.
+
+
+=item uadmin () -> administrator?
+
+=item uadmin ( user or group name ) -> administrator?
+
+=item uadmin ( [] ) -> [ managed users ]
+
+Is current user an administrator (checked against C<-uadmins>) or 
+an administrator of user or group given 
+(checked against L<CGI::Bus::udata|CGI/Bus/udata>)?
+What names are managed by current user?
+
+
+=item uglist ( ?'-ug' ) -> [users and groups list]
+
+=item uglist ( ?'-ug<>', {}, ?label width ) -> {name => label,...}
+
+List all users and groups.
+Options are 'u'sers, 'g'roups, '<>' force comment notation,
+default are '-ug'.
+See also C<-uglist>
+
+
+=item ugnames () -> [user and group names]
+
+Names and groups of current user, including
+C<unames> and C<ugroups>
+
+
+=item ugroups (?user name) -> [user groups]
+
+Groups current user belongs to. Default is current user.
+See also C<-ugroups>.
+
+
+=item uguest (?user name) -> guest?
+
+Is current user or user name given a guest or authenticated?
+
+
+=item unames () -> [user names]
+
+Names of current user, including
+C<user>, C<usercn>, lowercase of this names.
+See also C<ugnames>.
+
+
+=item unamesun (user names list) -> [unique names]
+
+Convert user names list to contain only unique names.
+Remove redundant lowercases and common names as possible.
+
+
+=item urfcnd () -> use URFs?
+
+Condition to use filesystem URLs (file://) instead of HTTP URLs (http://).
+This depends on browser type (see source code) and C<-urfcnd>.
+
+
+=item urlescape (text) -> escaped
+
+C<CGI::escape> call.
+See also C<htmlescape>, C<dbquote>, C<dblikesc>.
+
+
+=item usdomain () -> User names Server's Domain name
+
+=item usdomain (set name)
+
+User names Server's Domain name - Windows NT or DNS domain name
+that may be included in C<user> result as a part.
+See also C<-usdomain>, L<CGI::Bus::uauth|CGI/Bus/uauth>.
+
+
+=item user () -> user name
+
+=item user (?user name) -> user name set
+
+User name of the current user.
+See also C<-user>.
+
+
+=item userauth (?redirect) -> user name
+
+Authenticate current user if guest.
+There are three authentication methods:
+by web server, via C<-login> script back redirecting;
+by application, using C<-login> screen back redirecting;
+by web server, redirecting to C<-login> directory.
+First two methods uses signature cookies.
+Last method on Microsoft IIS requests 'RevertToSelf' deimpersonation
+using L<Win32::API|Win32/API> and requires low process insulation.
+
+See also C<-userauth>, C<-w32IISdpsn>, L<CGI::Bus::uauth|CGI/Bus/uauth>.
+
+
+
+=item userauthopt () -> user name
+
+Authenticate current user if guest and required
+by '_auth' or '_login' L<CGI|CGI> param.
+Otherwise avoid '_*(login|auth|a|ntlm)'
+IIS impersonated script subURL with redirection if not 'RevertToSelf.
+Uses C<userauth>.
+
+
+=item usercn (?username) -> user name common part
+
+Common name of user, without domain part
+
+
+=item userds (?username) -> user name as directory structure
+
+User name as directory structure
+
+
+=item userfn (?username) -> user name as filename
+
+User name as filename
+
+
+=item useron () -> user original name
+
+Original name of the current user, C<user> value before C<-usercnv>
+
+
+=item usersn (?username) -> user shorten name
+
+User shorten name, 
+with C<usdomain> value removed if present.
+
+
+=item userver () -> User names Server name
+
+=item userver (set name)
+
+User names Server name - Windows NT or DNS host name.
+See also C<-userver>, L<CGI::Bus::uauth|CGI/Bus/uauth>.
+
+
+=item warn (?message) -> warning
+
+Warning message, like CORE::warn.
+Message with "\n" signs is considered to be for user,
+without "\n" is treated as software warn and implemented via 
+'cluck' or 'carp'.
+See also C<Error and Message processing>, L<CGI::Carp|CGI/Carp>
+
+
+=back
+
+
+
+
+
+=head1 VERSION
+
+=over
+
+
+=head2 07/09/2007
+
+Version 0.62, improvement release.
+
+
+=head2 23/08/2007
+
+New L<CGI::Bus::tm -banner|CGI/Bus/tm>.
+
+Corrected 'xcopy' command call under PerlEx.
+
+
+=head2 29/06/2007
+
+Version 0.61, improvement release.
+
+
+=head2 26/06/2007
+
+Corrections for Active Perl/PerlIS 5.8 and L<CGI|CGI> 3.20:
+'use CGI qw(-nph -no_xhtml)'; '$CGI::Q =$s->{-cgi}';
+new C<url> fixing L<CGI::url|CGI>.
+
+
+=head2 12/06/2007
+
+Fixed for newer L<CGI|CGI> peculiarities: 'use CGI qw(-no_xhtml)', C<CGI>->C<br>, C<print>->C<br>.
+
+
+=head2 23/01/2007
+
+Fixed L<CGI::Bus::tmsql|CGI/Bus/tmsql>::fsacl considering 'cacls' for invalid user names.
+
+
+=head2 21/03/2006
+
+Changed C<htmlddlb>, the first parameter, input widget, became positional, but may be empty.
+
+
+=head2 20/03/2006
+
+Changed C<htmlddlb>, leading "\tmsab\t" hints to try Microsoft Address Book before if possible.
+
+
+
+=head2 14/01/2006
+
+New C<-w32IISdpsn> slot.
+
+
+=head2 26/12/2005
+
+New C<-ugrpadd> slot.
+
+
+=head2 25/11/2005
+
+Version 0.60, improvement release.
+
+
+=head2 22/11/2005
+
+New C<dbquote> and C<dblikesc> methods.
+
+
+=head2 29/08/2005
+
+Improved styles/classes in L<CGI::Bus|CGI/Bus> and L<CGI::Bus::tm|CGI/Bus/tm>.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> QBF expressions extended with 'rlike', 'regexp', 'similar to' operators.
+
+
+=head2 12/08/2005
+
+L<CGI::Bus|CGI/Bus> supplied with default C<-style> for C<-htmlstart>;
+L<CGI::Bus::upws|CGI/Bus/upws> screens corrected using style names.
+
+
+=head2 03/08/2005
+
+L<CGI::Bus::tm|CGI/Bus/tm>,
+L<CGI::Bus::tmsql|CGI/Bus/tmsql>,
+L<CGI::Bus::upws|CGI/Bus/upws>,
+L<CGI::Bus::wg|CGI/Bus/wg>:
+'font size=-1' replaced with 'style="font-size: smaller;"',
+class names somewere added
+to improve CSS behaviour.
+
+
+=head2 15/03/2005
+
+Version 0.59, improvement release.
+
+
+=head2 19/01/2005
+
+C<tpath> usage replaced with C<dpath>
+in L<CGI::Bus::udata|CGI/Bus/udata> and L<CGI::Bus::upws|CGI/Bus/upws>;
+C<-tpath> is not used directly inside L<CGI::Bus|CGI/Bus> now,
+but only as C<-dpath> default value 
+and for L<CGI|CGI> $TempFile::TMPDIRECTORY.
+
+
+=head2 10/01/2005
+
+Some corrections in L<CGI::Bus::wg|CGI/Bus/wg> 'ddlb' 
+and L<CGI::Bus::tm|CGI/Bus/tm> behaviours.
+
+
+=head2 26/11/2004
+
+L<CGI::Bus::wg|CGI/Bus/wg> 'ddlb' 
+and L<CGI::Bus::tmsql|CGI/Bus/tmsql> 'htmlddlb'
+changed - optional 'field' parameter added.
+
+
+=head2 22/11/2004
+
+L<CGI::Bus::wg|CGI/Bus/wg> changed - 'ddlb'
+gives default value from the first field, 
+'ddlb' double clicking invokes the first field filling.
+
+
+=head2 19/11/2004
+
+C<ugroups> extended with new 'user name' parameter.
+
+
+=head2 16-17/11/2004
+
+Additional L<CGI::Bus::tm|CGI/Bus/tm> '-opflg' options.
+New L<CGI::Bus::tm|CGI/Bus/tm> 'cmdfe' method.
+New L<CGI::Bus::tmsql|CGI/Bus/tmsql> '-rowsel1a', '-rowsel2a', '-rowsel3a' slots.
+HTML style names changed, style usage extended in L<CGI::Bus::tm|CGI/Bus/tm>, 
+L<CGI::Bus::tmsql|CGI/Bus/tmsql>,
+L<CGI::Bus::upws|CGI/Bus/upws>.
+
+
+=head2 05/11/2004
+
+New L<CGI::Bus::tmsql|CGI/Bus/tmsql> 'f'etch flag in '-flg' for 'cmdlst'.
+
+
+=head2 03/11/2004
+
+L<CGI::Bus::tm|CGI/Bus/tm> changed implementing experimental '_tsw_LSO'
+interface for options embedded into views.
+
+L<CGI::Bus::uauth|CGI/Bus/uauth> fixed
+to return ['guest'] instead of empty list from 'ugroups'.
+
+L<CGI::Bus::lngbase|CGI/Bus/lngbase> strings corrected.
+
+
+=head2 25/10/2004
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> 'cmdlst' changed to
+bind database columns to hash ref available from '-rowlst' and '-clst'.
+
+
+=head2 18-19/10/2004
+
+L<CGI::Bus::tm|CGI/Bus/tm> 'evaluate' changed to execute
+some L<CGI::Bus::upws|CGI/Bus/upws>
+'_run' commands as full-text 'SEARCH' or user 'SETUP'.
+
+L<CGI::Bus::tm|CGI/Bus/tm> 'qlst' changed to determine 
+default view via '_' sign not only at the end of
+the view name, but at the end of the view label too.
+
+
+
+=head2 12/10/2004
+
+New L<CGI::Bus::tmsql|CGI/Bus/tmsql> C<-listurm> slots
+
+
+=head2 11/10/2004
+
+L<locale|locale> used for sorting in some places.
+
+
+
+=head2 10/10/2004
+
+Version 0.58, improvement release.
+
+
+
+=head2 09/10/2004
+
+C<-udflt> slot added.
+
+
+=head2 27/09/2004
+
+'<>' C<uglist> option added.
+
+
+=head2 21/09/2004
+
+C<-unflt> and C<-ugflt> slots added.
+
+
+=head2 14/09/2004
+
+L<Win32::OLE|Win32/OLE>->Option("Warn"=>0) used anywere
+(in L<CGI::Bus::wg|CGI/Bus/wg>, L<CGI::Bus::upws|CGI/Bus/upws>, L<CGI::Bus::uauth|CGI/Bus/uauth>).
+
+C<-endh> slote developed for L<CGI::Bus::uauth|CGI/Bus/uauth> ADSI data buffering.
+
+L<CGI::Bus::uauth|CGI/Bus/uauth> evoluted to buffer ADSI data inside C<dpath>
+for faster access and Apache usage.
+
+
+=head2 30/08/2004
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> - C<-swrite> does not grant read right,
+C<-sread> should be used instead.
+Changes in 'acltest' (C<-swrite> excluded for '-lst','-sel') 
+and 'fsacl' (filesystem - excluded when read, '.htaccess' - excluded).
+
+
+=head2 26-28/08/2004
+
+L<CGI::Bus::uauth|CGI/Bus/uauth>
+- migration to base on Windows ADSI,
+other Windows intarfaces (and 'findgrp.exe') used at last,
+C<-adsi> slot ignored.
+
+C<-debug> levels shifted, 
+new level '1' produces debug output with "display: none" style,
+operation rezult should be clicked to access.
+This is useful to view SQL.
+
+
+=head2 23-25/08/2004
+
+L<CGI::Bus::tm|CGI/Bus/tm>
+- record ID added to some command button URLs if available.
+
+L<CGI::Bus::tm|CGI/Bus/tm>
+- some record view/edit form corrections.
+
+L<CGI::Bus::tm|CGI/Bus/tm>
+- C<-pxqc> fields commented out as unused in transaction sequences.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql>
+- switch to view mode after insert/update/delete when versioning.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> and L<CGI::Bus::tm|CGI/Bus/tm>
+- '-cmdCCC' view description slots implemented.
+
+L<CGI::Bus::smtp|CGI/Bus/smtp>
+- C<addrtr> method added.
+
+
+
+=head2 19/08/2004
+
+'DHTML Edit Control for IE5' replaced with 'MSHTML Edit Control for IE5.5'
+in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+L<CGI::Bus::tm|CGI/Bus/tm> and L<CGI::Bus::tmsql|CGI/Bus/tmsql> little corrections.
+
+
+=head2 24/06/2004
+
+C<unames> code rewritten, 
+lowercases removed (C<-usercnv> may be used), 
+C<-unmsadd> slot added.
+
+'DHTML Edit Control for IE5' experimentally used in L<CGI::Bus::wg|CGI/Bus/wg>.
+
+
+=head2 09/06/2004
+
+Version 0.57, improvement release.
+
+
+=head2 27/05/2004 - 05/06/2004
+
+HTML classes added to support CSS.
+
+Inline HTML styles changed to be compatible with Mozilla.
+
+'Back' button behaviour changed - 'window.history.back()' follows 'window.history.go(-x)', 
+this is useful for opened in new windows links.
+
+Perl warnings will be shown at the bottom of the screen in debug modes.
+
+C<usercn> removed from C<ugnames>.
+
+L<CGI::Bus::uauth|CGI/Bus/uauth> changed: 
+Microsoft IIS deimpersination code added 
+using 'RevertToSelf' via L<Win32::API|Win32/API>.
+Tried when finished with '/' sign C<-login> URL.
+See cource code comments.
+
+L<CGI::Bus::wg|CGI/Bus/wg> changed:
+added user interface to close opened file attachments on Windows server.
+
+
+=head2 07/07/2003
+
+Version 0.56 released
+
+
+=head2 25/06/2003
+
+L<CGI::Bus::tm|CGI/Bus/tm> changed: 'htmlbar' button set behaviour.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> changed: new '-listrnm' view description slot
+used in 'cmdlst' alike common '-listrnm' slot
+
+
+=head2 21/05/2003
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> fixed:
+Excluded 'order by', 'group by', 'limit' clauses from
+gant (timeline) chart minimum and maximum margins SQL 'select' command
+to escape fields to be defined in 'select' list.
+
+'gwo' application example changed:
+added 'List Obj Hier' view and 'subject_q' virtual field.
+
+
+
+=head2 29-28/04/2003
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> new '-wherepar' view description slot
+
+L<CGI::Bus::tm|CGI/Bus/tm> C<cmdfrm> fixed:
+'l'ist, 's'elect, '"'quoted only fields (C<-flg> =~/^["'ls]*$/)
+are not considered in form layout now
+
+
+
+=head2 26-25/04/2003
+
+L<CGI::Bus|CGI/Bus>, L<CGI::Bus::wg|CGI/Bus/wg>, L<CGI::Bus::tmsql|CGI/Bus/tmsql> changed:
+special URL protocol 'url://' added, translated as relative to script URL.
+Special URL protocols new aliaces: 
+host:// or urlh://, url:// or urlr://, fsurl:// or urlf://
+
+
+
+=head2 24/04/2003
+
+Version 0.55 released
+
+
+=head2 17/04/2003
+
+C<htmlescapetext>() method introduced, 'gwo' and 'notes' examples changed.
+
+L<CGI::Bus::tm|CGI/Bus/tm> 
+'cmdfrm' text area formatting improved with '&nbsp;' signs and '<code>' tags as needed.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> 
+'acltest' - fixed record read delegation via '-readsub':
+it processes further only array refs from 'acl' now, 
+false values will be ignored in loop, true - returned.
+'gwo' and 'notes' examples changed.
+
+
+=head2 07/04-31/03/2003
+
+C<microtest>, C<microenv> increased using L<getlogin()|perlfunc> or L<Win32::LoginName()|Win32>.
+
+
+L<CGI::Bus|CGI/Bus>, L<CGI::Bus::upws::search|CGI/Bus/upws> changed: '_*(login|auth|a|ntlm|search|guest)' special IIS subURLs introduced:
+
+/cgi-bin/cgi-bus - may be common unimpersonated URL under IUSR_xxx user, and moreover
+
+/cgi-bin/login/cgi-bus - common impersonated virtual URL of /cgi-bin/cgi-bus,
+
+/cgi-bin/search/cgi-bus - common guest access unimpersonated virtual URL of /cgi-bin/cgi-bus under IUSR_xxx_1 user
+
+
+C<userauthopt> changed:
+avoiding '_*(login|auth|a|ntlm|search|guest)' IIS impersonated script subURL 
+with authentication or redirection as needed.
+
+
+L<CGI::Bus::psp|CGI/Bus/psp> modified:
+[filename, base] filename syntax may now be used to generate '<base href...>' tag
+
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> modified:
+new '-htaccess' subslot of '-acd'
+
+
+=head2 25/11/2002
+
+L<CGI::Bus::tm|CGI/Bus/tm> fixed: 
+C<cmdfrm> lost line breacks when displaying text areas with embedded URLs
+
+
+=head2 18-19/11/2002
+
+L<CGI::Bus::wg|CGI/Bus/wg> changed: 'fsdir' displays now filesystem URLs 
+only in edit mode. Files URLs supplied with '_blank' option.
+
+
+=head2 17/11/2002
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> changed: new 'thead' and 'tbody' HTML tags in C<cmdlst>.
+
+
+=head2 08/11/2002
+
+gwo.cgi changed: 'otime' field SQL formula changed from '..., gwo.utime)' to
+'..., COALESCE(gwo.etime, gwo.utime)'.
+
+gwo.cgi new: 'All News', 'Our News', 'Pers News' views.
+
+
+=head2 31/10/2002
+
+L<CGI::Bus::wg|CGI/Bus/wg> changed:
+C<textarea>: special URL protocols may be used and translated in the text: 
+'host://'  -> '/'.
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> changed:
+C<-inp> C<Field Description>: 'htmltextarea' URLs display behaviour 
+is extended with special URL protocol 'fsurl://' to be translated 
+to C<fsurl> value.
+
+
+=head2 20/10/2002
+
+L<CGI::Bus::upws|CGI/Bus/upws> new:
+C<-search>, C<-searchms> slots. 
+Problem: Microsoft Index Server calls should be impersonalisated
+to obtain rightly ACL checked results.
+
+
+
+
+=head2 14/10/2002
+
+Version 0.54 released
+
+
+=head2 21/08/2002 - 31/08/2002 - 12-13/09/2002 - 16/09/2002
+
+L<CGI::Bus::psp|CGI/Bus/psp> changed:
+C<parse> omits text given before m/<(!DOCTYPE|html|head)/i,
+so mixed CGI/HTML page files may be parsed. 
+Synopsis changed to reflect this feature.
+
+
+L<CGI::Bus::tm|CGI/Bus/tm> new:
+C<-logo> slot
+
+L<CGI::Bus::tm|CGI/Bus/tm> changed:
+C<htmlbar> and C<cmdhlp> behaviour for '<' C<-opflg>.
+
+
+L<CGI::Bus::upws|CGI/Bus/upws> changed: 
+C<scrleft> discards duplicate rows to display.
+'label|URL|_target|URL' syntax added to deal with a complex pages.
+Logotype (C<-logo>) enclosed within URL filling the current browser window 
+with C<scrleft>.
+
+L<CGI::Bus::upws|CGI/Bus/upws> new: 
+'USITES' CGI param for C<scrusites> identifier or number
+- to use multiple sets of users home pages, empty parameter
+means default page set
+
+
+L<CGI::Bus::tmsql|CGI/Bus/tmsql> changed:
+
+C<cmdlst> - fixed parsing of query condition parameters with 
+leading '<>=' operators
+
+C<acltest> - field may contain several user names delimited with commas with 
+spaces allowed. Regular expression is used instead of 'eq' comparison.
+
+C<aclsel> - sub{}, m/^\$_(regexp|rlike)$/i, m/.*\$_.*/ 
+special parameters introduced 
+for the field name followed
+
+
+
+
+=head2 19/05/2002 - 01-06/06/2002 - 13/06/2002 - 19/06/2002
+
+=item Changed
+
+ - gwo.cgi - fields 'subject_v' and 'alist_v' used in all views,
+   perconal views filters changed
+ - uauth.pm - 'ugroups' on Win32 returns global group names prefixed 
+   with domain name for users from foreign domains. '-ugrpcnv' 
+   should be commented out. 'gwo.cgi' and 'notes.cgi' default group 
+   detection condition changed
+ - gwo.cgi - fields 'subject_v', 'plist_v', 'alist_v' added to use 
+   in views, timeline view changed using this fields
+ - timeline view supplied with predefined date margin columns from 
+   '-gant1' and '-gant2', so 'gwo.cgi' changed
+
+=item New
+
+ - IE6 with IIS problem detected - on 'post' requests browser brings 
+   IIS to authentication/impersonalisation of the script to be not 
+   impersonalisated, but placed in the same directory as requiring web 
+   server authentication 'uauth.cgi'
+ - tm.pm, tmsql.pm: '-refresh' view and common slots
+ - tm.pm, tmsql.pm: '-htmlts', '-htmlte', '-width' common slots; 
+   '-width' field slot
+ - cache-control http header mentioned in 'config.pl'
+ - form tag generation with '-acceptcharset' attribute given from 
+   '-httpheader'
+ - notes.cgi - 'mailto' field added
+ - install-db.pl script to install or upgrade applications database
+ - tmsql.pm: '-width' view attribute
+ - tmsql.pm: 'explain select...' 'pushmsg' when listing data
+
+
+=head2 07/05/2002 - 18/05/2002
+
+
+=item New
+
+ - tmsql.pm: '-htmlts', '-htmlte', '-gant1', '-gant2', '-htmlg1' 
+   view slots.
+ - tmsql.pm: '-rowsav1' and '-rowsav2' events.
+
+
+=item Changed
+
+ - gwo.cgi - timeline chart view using '-gant1' and '-gant2' 
+   view slots.
+ - gwo.cgi - mailsend code improved using '-rowsav1' event.
+ - uauth.pm - filtered rows with space chars only 'findgrp.exe' 
+   may return.
+ - tm.pm - textarea fields displays linebreaks when viewed
+ - tm.pm - 'Select' command turns to view mode from edit mode, 
+           'Edit' command removed from edit mode; 
+           '!s'elect command button '-opflg' flag
+ - Bus.pm - '-debug=>3' recurse loop corrected
+
+=item Issue on tm.pm record 'Select' and 'Edit' command buttons
+
+'Select' command may to be removed, 
+'Edit' command may to be restricted to appear when record viewing only.
+'Select' may be replaced with 'refresh' browser action when record viewing.
+'Select' may be useful to reject changes, but it is not very required.
+'Select' may be useful to select record when it's key is available, so some flag
+in '-opflg' should be used to turn it on or off.
+'Edit' command when editing loses changes and may be useful only to preview HTML
+entered by user. 'Edit' may be also associated with 'Select' when record editing.
+
+
+
+=head2 05/04/2002 - 06/05/2002
+
+=item New & Changed
+
+ - tmsql.pm - MySQL 'LIMIT rows' clause generation
+ - uauth.pm - attempting to use a Windows2000 ADSI, 
+   see issues in the source code
+ - uauth.pm, wg.pm - case insensitive sorting
+ - notes.cgi - update for indexes
+ - gwo.cgi   - update for indexes, may be not useful
+ - Bus.pm -debug slot levels
+ - Bus.pm -iurl  slot added
+ - upws.pm  - using icons based on -iurl slot value
+ - all printed HTML tags and attributes are lowercase as from 
+   CGI module
+ - tm.pm - image toolbar using -iurl slot, uncomment at the 
+   beginning of the source to disable
+
+
+
+=head2 15/10/2001 - 23/03/2002
+
+Implemented and Documented.
+
+=item ToDo
+
+  -  -dpath, -ppath, -purl default values review
+  -  username SSL value review
+  -  naming review
+  -  review & test & debug
+
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut
+
+

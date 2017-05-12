@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Controller::FlashRemoting
+
+0.02 2008-08-08T13:23:05+09:00
+     - support error response
+
+0.01 2008-07-23T15:21:15+09:00
+     - original version

@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+#+##############################################################################
+#                                                                              #
+# File: xyzcg                                                                  #
+#                                                                              #
+# Description: XYZ Configuration Generator                                     #
+#                                                                              #
+#-##############################################################################
+
+# $Id: xyzcg,v 1.2 2014/04/14 10:38:16 c0ns Exp $
+
+#
+# used modules
+#
+
+use strict;
+use warnings qw(FATAL all);
+use FindBin qw();
+use No::Worries::Dir qw(dir_parent);
+
+#
+# simple-minded yacg wrapper
+#
+
+exec("yacg", "--home", dir_parent($FindBin::RealBin), @ARGV);
+die("command not found: yacg\n");
+
+__END__
+
+=head1 NAME
+
+xyzcg - XYZ Configuration Generator
+
+=head1 SYNOPSIS
+
+B<xyzcg> [I<OPTIONS>] I<PATH>
+
+B<xyzcg> B<--help>|B<--manual>|B<--version>
+
+=head1 DESCRIPTION
+
+B<xyzcg> reads the given high-level configuration file, carefully validates it
+and generates ready-to-use XYZ related (configuration) files.
+
+B<xyzcg> is simply a wrapper around B<yacg> pointing to the relevant
+L<Config-Generator> modules and templates.
+
+=head1 SEE ALSO
+
+L<yacg>, L<Config-Generator>.
+
+=head1 AUTHOR
+
+Lionel Cons L<http://cern.ch/lionel.cons>
+
+Copyright (C) CERN 2014

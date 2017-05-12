@@ -1,0 +1,166 @@
+0.24    24 May 2012
+        Removed forced die from Makefile.PL if memcached is not available.
+        All relevant tests will be skipped, allowing installs on machines
+        where memcached itself is not installed.  Your Mileage May Vary.
+        RT #52678
+
+        Added clarification about using version as floating points, and that
+        it is better to use it as a string. RT #29224
+
+        Fixed problem with expiration just specified as number of seconds.
+        Added tests for expiration specification, just to be sure.  RT #49913
+
+0.23    24 May 2012
+        Fixed thinko reported by James M.  Added tests to test for thinko.
+        Also fixed specifying a blessed object as data / directory source,
+        although this may well break with non-hashref based implemenations.
+        But it didn't work before anyway, so it at least now matches the
+        documentation.  RT #77389.
+
+        Ensured it runs with 5.16.0, threaded and unthreaded.
+
+0.22    22 April 2012
+        Some more spelling fixes.  Added license information + adapted copyright
+        message to reflect that I've taken it back in maintenance in my own
+        time again. RT #75346
+
+0.21    31 March 2012
+        Added spelling fixes as suggested by Nicholas Bamber, as suggested
+        by Gregor Herrmann. RT #69648
+        
+        Finally released to CPAN, thanks to the impetus given by the QA
+        Hackathon 2012 in Paris.
+
+        24 May 2008
+        Shielded some code from using Cache::Memcached specific internal
+        methods, which do not appear to exist in Cache::Memcached::Fast.
+        This at least let the test-suite complete, albeit with errors if
+        the Cache::Memcached::Fast class is being used.  This probably will
+        need some more work and some direct interaction with the developers
+        of Cache::Memcached::Fast.  Testing with a class other than
+        Cache::Memcached can be accomplished by setting the environment
+        variable CACHE_MEMCACHE to the intended class, e.g.
+
+          $ CACHE_MEMCACHED=Cache::Memcached::Fast make test
+
+0.20    19 May 2008
+        Added preliminary "memcached_class" parameter to "new", to allow other
+        implementations of Cache::Memcached (such as Cache::Memcached::Fast)
+        to be used.
+
+0.19    8 October 2007
+        Argh, 0.18 broke on 5.005 because of new style open().  Now rephrased        
+        to old-style open() using globs.
+
+0.18    7 October 2007
+        Changed Makefile.PL to quit before attempting to install to kill all
+        cpan-tester messages where Cache::Memcached::Managed is being tested
+        without "memcached" being available and executable.  No changes made
+        to the code.
+
+0.17    3 October 2007
+        Methods "add", "decr", "incr", "replace" and "set" now accept a third
+        unnamed parameter for expiration.  Suggested by John Goulah.
+
+        Fixed test-suite: most problems occurred because "localhost"
+        apparently doesn't resolve on most systems anymore, so it couldn't
+        find a port to work on.  Now using 127.0.0.1.
+
+        Several other problems occurred because of additional statistics in
+        newer versions of memcached.  Marked tests as TODO for now.
+
+        Apparently the handling of dead servers has been improved, so the
+        fetch on a dead servers wasn't failing, which was failing the test
+        and subsequent statistics tests.  Also marked tests as TODO for now.
+
+        Added "Incompatibility with Cache module" section to CAVEATS.
+
+0.16    2 February 2007
+        Updated the test-suite to support version 1.2.1 of memcached.  Brought
+        code of test-suite up to PBP standards (code itself will follow in a
+        later version).
+
+        Load testing is no longer skipped on OS X, as the latest libevent
+        / memcached combo seems to compile and install cleanly with all
+        necessary workarounds installed automagically.  Instead a warning
+        is displayed.
+
+        Changed documentation of "flush_all" to point out that the
+        "flush_interval.patch" is no longer necessary when using memcached
+        1.2.1.
+
+0.15    11 June 2006
+        Cache::Memcached changed some of its internals with version 1.16.
+        This version now supports both versions before and after.  Spotted
+        by islue.
+
+0.14    19 October 2005
+        Update VERSION file (forgotten to do that in 0.13)
+        Added fix for missing Kwalitee point for not using 'strict'
+
+0.13    23 August 2005
+        Added support for Cache::Memcached::Managed::Multi, to allow accessing
+        multiple managed servers at the same time.
+
+0.12    18 July 2005
+        Added "inactive" parameter to "new".  Added
+        Cache::Memcached::Managed::Inactive module for the "inactive"
+        functionality.  This allows you to make your code in such a way that
+        it doesn't make a difference whether or not there is an actual
+        memcached server available.
+
+0.11    8 July 2005
+        Fixed problem in "group" and "get_multi" when using a non-standard
+        delimiter.  Spotted by Torbjørn Køhle
+
+0.10    6 July 2005
+        Changed return value of "flush_all" to boolean rather than number
+        of servers flushed.  Added support for "flush_interval".  Added
+        file "flush_interval.patch" to distribution to add time flush_all
+        support to memcached itself.
+
+0.09    5 July 2005
+        Further refined the fork checking / dead server logic: connection
+        attempts are now made again after 20..30 seconds, instead of never
+        in the current process.
+
+        Fixed problem that would cause an empty list to be returned in case
+        of failure in list context: this affected "set", "add", "replace",
+        "incr" and "decr".  A false value is now returned regardless of
+        context.
+
+        4 July 2005
+        Completely reworked the fork checking logic.  Child processes of
+        parent processes that have been disconnected, now attempt to
+        reconnect.
+
+0.08    4 July 2005
+        Fixed many documentation problems.  Added default data server
+        functionality to "new".  Added "W" to allow expirations to be
+        specified by week.
+
+0.07    3 July 2005
+        Fixed problem with return value of "start".  Optimized "stats".
+        Added stress test related to groups, which unfortunately seems to
+        fail on Tiger (with its crippled libevent support).
+
+0.06    1 July 2005
+        Fixed problems with relative keys and version support.
+
+0.05    30 June 2005
+        Added initial tests for checking behaviour after fork().
+
+0.04    29 June 2005
+        Added methods "start", "stop" and "version".  Removed starting /
+        stopping logic from testlib.  Adapted test-suite to account for these
+        new methods.  Basic testing should now cover all methods (albeit not
+        with all parameter combinations yet.
+
+0.03    28 June 2005
+        Tweaks and fixes and more tests.
+
+0.02    27 June 2005
+        Tweaks and fixes and a much more expanded test-suite.
+
+0.01    26 June 2005
+        First public version of Cache::Memcached::Managed.

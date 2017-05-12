@@ -1,0 +1,67 @@
+NAME
+    Class::Accessor::Children - Automated child-class/accessor generation
+
+SYNOPSIS
+    BEFORE (WITHOUT THIS)
+
+        package MyClass::Foo;
+        use base qw( Class:Accessor );
+        __PACKAGE__->mk_ro_accessors(qw( jacob michael joshua ethan ));
+
+        package MyClass::Bar;
+        use base qw( Class:Accessor );
+        __PACKAGE__->mk_ro_accessors(qw( emily emma madison isabella ));
+
+        package MyClass::Baz;
+        use base qw( Class:Accessor );
+        __PACKAGE__->mk_ro_accessors(qw( haruka haruto miyu yuto ));
+
+    AFTER (WITH THIS)
+
+        package MyClass;
+        use base qw( Class::Accessor::Children );
+        __PACKAGE__->mk_child_ro_accessors(
+            Foo => [qw( jacob michael joshua ethan )],
+            Bar => [qw( emily emma madison isabella )],
+            Baz => [qw( haruka haruto miyu yuto )],
+        );
+
+DESCRIPTION
+    This module automagically generates child classes which have
+    accessor/mutator methods.
+
+    This module inherits "Class::Accessor" to make accessors.
+
+METHODS
+    This module provides the following methods in addition to all methods
+    provided by "Class::Accessor".
+
+  mk_child_accessors
+        MyClass->mk_child_accessors( Foo => \@fields, ... );
+
+    This generates a child class named "MyClass::Foo" which have
+    accessor/mutator methods each named in "\@fields".
+
+  mk_child_ro_accessors
+        MyClass->mk_child_ro_accessors( Bar => \@fields, ... );
+
+    This generates a child class named "MyClass::Bar" which have read-only
+    accessors (ie. true accessors).
+
+  mk_child_wo_accessors
+        MyClass->mk_child_wo_accessors( Baz => \@fields, ... );
+
+    This generates a child class named "MyClass::Baz" which have write-only
+    accessor (ie. mutators).
+
+SEE ALSO
+    Class::Accessor
+
+AUTHOR
+    Yusuke Kawasaki <http://www.kawa.net/>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007 Yusuke Kawasaki. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+

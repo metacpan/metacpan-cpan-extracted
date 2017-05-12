@@ -1,0 +1,37 @@
+Revision history for Perl extension Catalyst::Plugin::Authorization::Roles
+
+0.09   2011-04-29
+        - Fix documentation to point at the tutorial, rather than
+          old advent article.
+        - Link to Catalyst::ActionRole::ACL
+        - Tidy up examples to show the new authentication system
+        - fix check_* to always return scalar values,
+          even in list context (RT#66812)
+
+0.08    2009-11-19
+        - repackaged with a new version of Module::Install
+
+0.07    2008-08-21
+        - repackaged
+
+0.06    2008-08-20
+        - support renamed Catalyst::Authentication::* modules
+        - removed dependency on Test::MockObject
+
+0.05    2006-10-13
+        - fix tests due to a change in Test::MockObject
+        - add support for check_any style role checks.
+
+0.04    2006-03-26 10:36:00 IST
+        - Add dependency on UNIVERSAL::isa
+
+0.03    2005-12-04 22:02:20
+        - Pass-through and accessor style role checks separated
+        - this check does $user->supports(qw/roles self_check/)
+
+0.02    2005-12-03 18:00:00
+        - Pass-through wanted roles to storage layer.
+        - Added debug messages for role granted and denied.
+
+0.01    2005-11-27 02:21:00
+        - Initial release.

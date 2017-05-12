@@ -1,0 +1,267 @@
+NAME
+    CGI::AppBuilder::TaskDisps - Display tasks
+
+SYNOPSIS
+      use CGI::AppBuilder::TaskDisps;
+
+      my $sec = CGI::AppBuilder::TaskDisps->new();
+      my ($sta, $msg) = $sec->exe_sql($ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+  check_chkids($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History:
+
+  check_droptabs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History:
+
+  test_dbl($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History:
+
+  disp_archive($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_hids($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_tabs($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+    History: mm/dd/yyyy (developer) - description
+
+      03/28/2011 (htu) - added $exc_vars
+      03/29/2011 (htu) - added $obj_vars
+
+  disp_rpts($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_client($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_project($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_study($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_job($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_hjob($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_htmlrpt($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  build_links($q,$pr,$ar)
+    Input variables:
+
+      $pr   - array ref containing id and name 
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+  disp_links($q,$ar)
+    Input variables:
+
+      $q    - CGI class
+      $ar   - array ref containing the following variables:
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+    Return: None
+
+HISTORY
+    *   Version 0.10
+
+        This version extracted from jp2.pl on 09/08/2010.
+
+    *   Version 0.20
+
+          09/08/2010 (htu): 
+            1. start this PM
+          01/05/2012 (htu): added disp_htmlrpt
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::AppBuilder, File::Xcopy,
+    CGI::AppBuilder::Message
+
+AUTHOR
+    Copyright (c) 2009 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 1615:
+        You forgot a '=back' before '=head1'
+

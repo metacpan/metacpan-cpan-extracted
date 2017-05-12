@@ -1,0 +1,27 @@
+Calendar::Simple
+----------------
+
+This is a very simple module that models a calendar month.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.P
+   ./Build
+   ./Build test
+   ./Build install
+
+Note: The older "perl Makefile.PL; make; make test; make install" sequence
+will also work.
+
+DEPENDENCIES
+
+This module has no external dependencies.
+
+COPYRIGHT AND LICENCE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Copyright (C) 2002-2010 Magnum Solutions Ltd., All rights reserved.

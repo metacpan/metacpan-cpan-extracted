@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TODO
+examples/testclass.pm
+examples/indexbuilder.pl
+examples/testsearch.pl
+examples/testobj.pl
+t/Class-Indexed.t
+lib/Class/Indexed.pm
+lib/Class/Indexed/Words.pm
+META.yml                                 Module meta-data (added by MakeMaker)

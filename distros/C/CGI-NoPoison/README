@@ -1,0 +1,82 @@
+NAME
+    CGI::NoPoison - No Poison Null Byte in CGI->Vars
+
+SYNOPSIS
+            use CGI;
+            use CGI::NoPoison
+
+            my $m = CGI->new();
+            $m->param(
+                    -name=>'amplifier',
+                    -value=>['nine', 'ten', 'up to eleven'],
+            );
+            my %h = $m->Vars();
+            # look ma, no splitting on poison null-bytes ( '\0' )!
+            print "$_ => ", join ", ", @{$h{$_}} for keys %h;
+   
+            print "This one goes ", ($m->param('amplifier'))[2];
+
+DESCRIPTION
+    Simplicity itself. Instead of using a null-byte to separate multi-valued
+    fields why not just use what CGI.pm already uses to store the values
+    internally?
+
+    "What's that?", you ask? Why, it's an anonymous array, of course, like
+    anyone sensible would use. cgi-lib.pl may have been fine years and years
+    ago, but this now-archaic throwback no longer needs us to bow to its
+    demands. (is anyone still actually using it? yikes.)
+
+    This does, however change how you parse CGI->Vars() (as an anon-array,
+    not a "\0"-packed string) and also how you set params.
+
+    NOW you can properly test for inserted null-bytes in a secure
+    environment WHILE taking advantage of the convenience of the Vars()
+    function.
+
+USAGE
+    Include the 'use CGI::NoPoison' only after you've already done 'use CGI'
+    so that it can replace the AUTOLOAD routines with these replacement
+    functions instead.
+
+    (By the way, the CGI.pm internal functions that we replace are:
+    CGI::SplitParam, CGI::STORE, and CGI::FETCH, not that you'd actually
+    ever use these directly :)
+
+    Then, all you have to do is remember that anywhere you would have
+    previously used "\0" to split on, or to string-pack, just take an array
+    reference, or use an anonymous array instead. See the CGI module
+    documentation for details.
+
+BUGS
+    None so far. :)
+
+    Well, this may actually be a pretty wonky way of replacing those
+    functions in CGI.pm, but hey, it worked here. YMMV. :D
+
+SUPPORT
+    Yer on yer own with this one. Hopefully Lincoln Stein will get around to
+    adding this as a -nopoison pragma to CGI.pm at some point.
+
+AUTHOR
+            Scott R. Godin
+            CPAN ID: SGODIN
+            Laughing Dragon Services
+            nospam@webdragon.net
+            http://www.webdragon.net/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    <http://groups-beta.google.com/group/perl.beginners.cgi/msg/7fcdb6b34769
+    15de?hl=en> ( or message-id
+    <20050209020155.15512.qmail@lists.develooper.com> )
+
+    Google around for "poison null byte"
+
+    CGI, perlref
+

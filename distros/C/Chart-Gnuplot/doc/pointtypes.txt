@@ -1,0 +1,25 @@
+        List of known point type names:
+  dot
+  plus
+  cross
+  star
+  dot-square
+  dot-circle
+  dot-triangle
+  dot-diamond
+  dot-pentagon
+  fill-square
+  fill-circle
+  fill-triangle
+  fill-diamond
+  fill-pentagon
+  square
+  circle
+  triangle
+  diamond
+  pentagon
+  opaque-square
+  opaque-circle
+  opaque-triangle
+  opaque-diamond
+  opaque-pentagon

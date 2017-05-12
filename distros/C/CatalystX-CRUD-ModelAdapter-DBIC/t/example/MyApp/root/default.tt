@@ -1,0 +1,9 @@
+<ul>
+
+<li><a href="[% c.uri_for('/song/list') %]">Song list</a></li>
+
+<li><a href="[% c.uri_for('/album/list') %]">Album list</a></li>
+
+</ul>
+
+

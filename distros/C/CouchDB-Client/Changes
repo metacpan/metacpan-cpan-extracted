@@ -1,0 +1,40 @@
+0.09 - 2010-08-06
+=================
+Applied patch from Colin Bradford (via evdb's patch submission on github) 
+which correctly sets the content type header for bulk operations in CouchDB 1.0 
+(issue #59685)
+
+Applied patch from Marty Pauley that allows database and document ids to contain
+a / (issue #60076)
+
+0.08 - 2010-05-16
+=================
+Applied patch from Jon Allen to fix json encoding bug on numeric values
+in CouchDB::Client::DB.
+
+0.07 - 2010-05-05
+=================
+Applied patch from Jon Allen to fix json encoding bug in fixViewArgs 
+in CouchDB::Client::DB.
+
+http://github.com/jonallen/couchdb-client/commit/91172ac735c34d4d974788615227088d56db4812
+
+Added tests for fixViewArgs.
+
+0.06 - 2010-03-21
+=================
+Added Changes file
+
+Added deleteAttachment method to CouchDB::Client::Doc
+
+Added replicate method to CouchDB::Client::DB
+
+
+0.05 - 2010-02-15
+=================
+Maverick takes over maintenance from Robin, who no longer has time to devote to
+this module.
+
+Fixed issues #48407 and #49759 - API change between version 0.8 and 0.9 of CouchDB
+
+CouchDB::Client::DB->listDocIdRevs works correctly against CouchDB version 0.10

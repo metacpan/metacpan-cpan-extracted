@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  43452:
+    - 241
+name: cbf6
+registers:
+  AF: 31488
+  AF_: 0
+  BC: 49879
+  BC_: 0
+  DE: 17554
+  DE_: 0
+  HL: 43452
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,6 @@
+Revision history for Perl extension Convert::Cyr.
+
+0.01  Mon Oct 15 19:30:03 2001
+	- original version; created by h2xs 1.21 with options
+		-O -n Convert::Cyr
+

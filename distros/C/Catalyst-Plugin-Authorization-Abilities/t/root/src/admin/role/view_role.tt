@@ -1,0 +1,12 @@
+<h1 class="caps">View role [% role.role %]</h1>
+
+<table>
+<tr><th>ID</th><th>Role</th><th></th><th></th></tr>
+  <tr>
+  <td>[% role.id %]</td>
+  <td>[% role.role %]</td>
+  <td><a href="[% c.uri_for('/admin/role/') %][% role.id %]/edit">Edit</a></td>
+  <td><a href="[% c.uri_for('/admin/role/') %][% role.id %]/del">Delete</a></td>
+  </tr>
+</table>
+<br />

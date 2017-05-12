@@ -1,0 +1,7 @@
+Artistic
+Changes
+MANIFEST
+Makefile.PL
+README
+Regex.pm
+t/main.t

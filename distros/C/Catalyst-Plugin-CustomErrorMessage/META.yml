@@ -1,0 +1,28 @@
+---
+abstract: "Catalyst plugin to have more \"cute\" error message."
+author:
+  - 'Jozef Kutej <jozef@kutej.net>'
+build_requires:
+  Carp::Clan: 0
+  Class::Accessor::Fast: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-CustomErrorMessage
+provides:
+  Catalyst::Plugin::CustomErrorMessage:
+    file: lib/Catalyst/Plugin/CustomErrorMessage.pm
+    version: 0.06
+requires:
+  Class::Data::Inheritable: 0
+  HTML::Entities: 0
+  MRO::Compat: 0
+  URI::Escape: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

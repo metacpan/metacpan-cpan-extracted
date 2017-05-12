@@ -1,0 +1,14 @@
+Curses::UI installation:
+========================
+
+Curses::UI depends on the Curses and Term::ReadKey packages. The
+installer will volunteer to take care of this for you via the CPAN,
+but you may wish to handle it through your package manager.
+
+Installation is the usual:
+
+> perl Makefile.PL
+> make
+> make test
+> # Optionally, "./example/demo-widgets" for an interactive test
+> sudo make install

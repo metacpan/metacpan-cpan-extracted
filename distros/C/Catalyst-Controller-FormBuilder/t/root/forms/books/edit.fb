@@ -1,0 +1,26 @@
+name: books_edit
+method: post
+fields:
+    title:
+        label: Book Title
+        type:  text
+        size:  40
+        required: 1
+    author:
+        label: Author's Name
+        type:  text
+        size:  80
+        required: 1
+    isbn:
+        label: ISBN#
+        type:  text
+        size:  20
+        validate: /^(\d{10}|\d{13})$/
+        required: 1
+    desc:
+        label: Description
+        type:  textarea
+        cols:  80
+        rows:  5
+
+submit: Save New Book

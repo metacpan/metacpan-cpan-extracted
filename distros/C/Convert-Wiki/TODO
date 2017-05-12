@@ -1,0 +1,17 @@
+
+TODO List for Convert::Wiki:
+
+* better txt input filtering (definition lists, tables etc)
+* add table support (for tab-delimited txt tables)
+* improve testsuite with even more examples
+* interlinking will turn the same phrase in subsequent paragraphs
+  into links. This could be toned down, either by distances (at least
+  1000 bytes beteen links?) or not before next headline.
+  Likewise, a phrase shouldn't be linked in two consequtive list items.
+* interlinking phrases that match other subphrases has problems like:
+ 
+     Foo|foobar
+     bar
+ 
+  will turn "foobar" into "[[Foo|foobar]]" and then this into
+  "[[Foo|foo[[bar]]]]" - ugh.

@@ -1,0 +1,32 @@
+ Class-DBI-Plugin-FastDelete
+=============================
+
+"Class::DBI::Plugin::FastDelete" Add to Class::DBI for more fast delete method.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - Class::DBI
+ - SQL::Abstract
+
+SEE ALSO
+
+ - Class::DBI
+ - SQL::Abstract
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

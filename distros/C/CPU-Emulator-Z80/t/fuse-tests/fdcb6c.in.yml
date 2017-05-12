@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 13
+    - 108
+  34503:
+    - 37
+name: fdcb6c
+registers:
+  AF: 5195
+  AF_: 0
+  BC: 15090
+  BC_: 0
+  DE: 36736
+  DE_: 0
+  HL: 31717
+  HL_: 0
+  I: 0
+  IX: 50041
+  IY: 34490
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,80 @@
+CPAN-Mini-Inject-Server
+
+This module is a simple Restish webservice that makes the basic functionality
+and interface of mcpani (of the CPAN::Mini::Inject package) available from
+accross a network allowing for remote management of a cpan mirror.
+
+The original envisaged use for this module was for a continuous integration
+platform with distributed build nodes to be able to commit its build artifacts
+back to a common CPAN repository so that subsequent builds of other modules
+could use source the new version of the software.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+After the libraries are installed the service must be set up on some form of web
+server.
+
+You can use a test server (set up in cmis_test_server.pl)
+
+    use CGI::Application::Dispatch::Server;
+    my $server = CGI::Application::Dispatch::Server->new(
+        class => 'CPAN::Mini::Inject::Server::Dispatch',
+        port => '9000'
+    );
+
+    $server->run;
+
+Or plain CGI can be used
+
+    #!/usr/bin/perl
+    use FindBin '$Bin';
+    use lib "$Bin/../../rel/path/to/my/perllib";
+    use CPAN::Mini::Inject::Server::Dispatch
+    CPAN::Mini::Inject::Server::Dispatch->dispatch();
+
+Or preferably Apache and mod_perl
+
+    <location /app>
+        SetHandler perl-script
+        PerlHandler CPAN::Mini::Inject::Server::Dispatch
+    </location>
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CPAN::Mini::Inject::Server
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CPAN-Mini-Inject-Server
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CPAN-Mini-Inject-Server
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CPAN-Mini-Inject-Server
+
+    Search CPAN
+        http://search.cpan.org/dist/CPAN-Mini-Inject-Server/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Christopher Mckay
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

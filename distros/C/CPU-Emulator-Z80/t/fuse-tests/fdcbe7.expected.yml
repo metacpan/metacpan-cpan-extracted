@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  46504:
+    - 182
+name: fdcbe7
+registers:
+  AF: 46629
+  AF_: 0
+  BC: 54249
+  BC_: 0
+  DE: 54454
+  DE_: 0
+  HL: 43568
+  HL_: 0
+  I: 0
+  IX: 35005
+  IY: 46487
+  PC: 4
+  R: 2
+  SP: 0

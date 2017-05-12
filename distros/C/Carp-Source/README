@@ -1,0 +1,105 @@
+NAME
+    Carp::Source - Warn of errors with stack backtrace and source context
+
+VERSION
+    version 1.101420
+
+SYNOPSIS
+        use Carp::Source 'source_cluck';
+        source_cluck 'some error';
+        source_cluck 'some error',
+            lines => 5, number => 0, color => 'yellow on_blue';
+
+DESCRIPTION
+    This module exports one function, "source_cluck()", which prints stack
+    traces with source code extracts to make it obvious what has been called
+    from where.
+
+    It does not work for one-liners because there is no file from which to
+    load source code.
+
+FUNCTIONS
+  source_cluck
+        source_cluck 'some error';
+        source_cluck 'some error',
+            lines => 5, number => 0, color => 'yellow on_blue';
+
+    Like Carp's "cluck()", but it also displays the source code context of
+    all call frames, with three lines before and after each call being
+    shown, and the call being highlighted.
+
+    It takes as arguments a string (the error message) and a hash of
+    options. The following options are recognized:
+
+    "lines"
+        Number of lines to display before and after the line reported in the
+        stack trace. Defaults to 3.
+
+    "number"
+        Boolean value to indicate whether line numbers should be printed at
+        the beginning of the context source code lines. Defaults to yes.
+
+    "color"
+        The color in which to print the source code line reported in the
+        stack trace. It has to be a string that Term::ANSIColor understands.
+        Defaults to "black on_yellow".
+
+    This is just a quick hack - not all of "Carp"'s or even just "cluck()"'s
+    features are present. The code borrows heavily from "Carp".
+
+  caller_info
+    FIXME
+
+  format_arg
+    FIXME
+
+  format_line
+    FIXME
+
+  get_context
+    FIXME
+
+  get_subname
+    FIXME
+
+  longmess_heavy
+    FIXME
+
+  ret_backtrace
+    FIXME
+
+  source_cluck
+    FIXME
+
+  str_len_trim
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Source>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Carp-Source/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Carp-Source/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

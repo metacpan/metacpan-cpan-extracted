@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb95
+registers:
+  AF: 13182
+  AF_: 0
+  BC: 25511
+  BC_: 0
+  DE: 10520
+  DE_: 0
+  HL: 60907
+  HL_: 0
+  I: 0
+  IX: 45356
+  IY: 59254
+  PC: 4
+  R: 2
+  SP: 0

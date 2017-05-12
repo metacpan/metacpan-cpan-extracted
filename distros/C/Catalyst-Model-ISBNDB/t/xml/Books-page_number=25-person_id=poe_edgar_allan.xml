@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:55Z">
+<BookList total_results="252" page_size="10" page_number="25" shown_results="10">
+<BookData book_id="thirty_two_stories" isbn="0872204987">
+<Title>Thirty-two stories</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited, with introductions and notes by Stuart Levine and Susan F. Levine</AuthorsText>
+<PublisherText publisher_id="hackett_pub_co">Indianapolis, Ind. : Hackett Pub. Co., c2000.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xii, 385 p. : ill., maps ; 23 cm." language="eng" edition_info="(pbk. : alk. paper)" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2003-11-24T08:22:56Z" price_time="2006-10-08T08:04:20Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. [379]-385).</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-11-01T03:06:56Z" currency_rate="1" price="12" />
+<Price store_isbn="" store_title="Thirty-Two Stories" store_url="54522203&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:13:09Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:13:12Z" currency_rate="1" price="25" />
+<Price store_isbn="" store_title="Thirty-Two Stories" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:13:13Z" currency_rate="1" price="12.95" />
+<Price store_isbn="" store_title="Thirty-Two Stories (Poe) (Hackett Publishing Co.)" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:45:31Z" currency_rate="1" price="5.7" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:33Z" currency_rate="1" price="3.9" />
+<Price store_isbn="" store_title="Thirty-Two Stories" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="13.51" />
+<Price store_isbn="" store_title="Thirty-Two Stories, By Poe" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="5.1" />
+<Price store_isbn="" store_title="Thirty-Two Stories (Poe) (Hackett Publishing Co.)" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:36Z" currency_rate="1" price="12.95" />
+<Price store_isbn="" store_title="Thirty-Two Stories (Poe) (Hackett Publishing Co.)" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:36Z" currency_rate="1" price="8.47" />
+<Price store_isbn="" store_title="Thirty-Two Stories (Poe) (Hackett Publishing Co.)" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:54Z" currency_rate="1" price="2.49" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:57:08Z" currency_rate="1" price="12.17" />
+<Price store_isbn="" store_title="Thirty-Two Stories Product 1419089" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1419089&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:58:32Z" currency_rate="1" price="12.43" />
+</Prices>
+<Subjects>
+<Subject subject_id="detective_and_mystery_stories_american">Detective and mystery stories, American</Subject>
+<Subject subject_id="fantasy_fiction_american">Fantasy fiction, American</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2003-11-24T08:22:56Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-thirty_two_stories-20031124.mrc" />
+<MARC library_name="State University of New York at Binghamton" last_update="2004-07-11T13:37:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-315-thirty_two_stories-20040711.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="thirty_two_stories_a01" isbn="0872204995">
+<Title>Thirty-two stories</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited, with introductions and notes by Stuart Levine and Susan F. Levine</AuthorsText>
+<PublisherText publisher_id="hackett_pub_co">Indianapolis, Ind. : Hackett Pub. Co., c2000.</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="xii, 385 p. : ill., maps ; 23 cm." language="eng" edition_info="(cloth : alk. paper)" dewey_decimal_normalized="813.3" lcc_number="PS2612" change_time="2003-11-24T08:22:57Z" price_time="2006-10-08T08:04:23Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. [379]-385).</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Thirty-Two Stories" store_url="http://isbndb.com/x/book/thirty_two_stories_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="25.68" />
+<Price store_isbn="" store_title="Thirty-Two Stories" store_url="http://isbndb.com/x/book/thirty_two_stories_a01/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:35Z" currency_rate="1" price="61.66" />
+<Price store_isbn="" store_title="Thirty-Two Stories (Poe) (Hackett Publishing Co.)" store_url="http://isbndb.com/x/book/thirty_two_stories_a01/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:36Z" currency_rate="1" price="37.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories_a01/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:54Z" currency_rate="1" price="20.85" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/thirty_two_stories_a01/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:57:10Z" currency_rate="1" price="35.67" />
+<Price store_isbn="" store_title="32 Stories Product 1326716" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1326716&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:58:34Z" currency_rate="1" price="35.67" />
+</Prices>
+<Subjects>
+<Subject subject_id="detective_and_mystery_stories_american">Detective and mystery stories, American</Subject>
+<Subject subject_id="fantasy_fiction_american">Fantasy fiction, American</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2003-11-24T08:22:57Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-thirty_two_stories_a01-20031124.mrc" />
+<MARC library_name="State University of New York at Binghamton" last_update="2004-07-11T13:37:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-315-thirty_two_stories_a01-20040711.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="three_sundays_in_a_week" isbn="0585052352">
+<Title>Three Sundays in a week</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:55Z" price_time="2006-10-08T08:04:27Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086031 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:55Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-three_sundays_in_a_week-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="ulalume" isbn="0585052360">
+<Title>Ulalume</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2626" change_time="2004-07-26T00:25:59Z" price_time="2006-10-08T08:04:30Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086032 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="haunted_places_poetry">Haunted places -- Poetry</Subject>
+<Subject subject_id="ghosts_poetry">Ghosts -- Poetry</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:59Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-ulalume-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="visions_of_poe" isbn="0394574273">
+<Title>Visions of Poe</Title>
+<TitleLong>Visions of Poe: a selection of Edgar Allan Poe's stories and poems</TitleLong>
+<AuthorsText>with photographs and introduction by Simon Marsden</AuthorsText>
+<PublisherText publisher_id="knopf">New York : Knopf : 1988.</PublisherText>
+<Details dewey_decimal="" physical_description_text="128 p. : ill. ; 27 x 29 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-05-05T12:09:43Z" price_time="2006-10-08T08:04:34Z" />
+<Summary>A selection of tales and poems, visually interpreted with photographs by Simon Marsden, capturing the world as Poe envisaged it.</Summary>
+<Notes>"First published in Great Britain by Webb &amp; Bower (Publishers) Ltd., Exeter, Devon"--T.p. verso.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-02-17T19:21:09Z" currency_rate="1" price="33.29" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780394574271" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-04-10T21:29:55Z" currency_rate="1" price="5.15" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:36Z" currency_rate="1" price="49.9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:36Z" currency_rate="1" price="6.94" />
+<Price store_isbn="" store_title="Visions of Poe: A Selection of Edgar Allan Poe's Stories and Poems, With Photographs and an Introduction" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:52:37Z" currency_rate="1" price="49.95" />
+<Price store_isbn="" store_title="Visions Of Poe" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:37Z" currency_rate="1" price="6.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/visions_of_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:55Z" currency_rate="1" price="6.99" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Arizona State University" last_update="2005-05-05T12:09:43Z" marc_url="http://isbndb.com/x/libdata/isbndb-31-visions_of_poe-20050505.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-02-17T19:21:07Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-visions_of_poe-20060217.mrc" />
+<MARC library_name="University of California (MELVYL)" last_update="2006-04-10T21:29:53Z" marc_url="http://isbndb.com/x/libdata/isbndb-40-visions_of_poe-20060410.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="marsden_simon">Marsden, Simon</Person>
+</Authors>
+</BookData>
+<BookData book_id="von_kempelen_and_his_discovery" isbn="0585052395">
+<Title>Von Kempelen and his discovery</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:26:10Z" price_time="2006-10-08T08:04:37Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,1999.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086035 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:26:10Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-von_kempelen_and_his_discovery-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="white_heron_and_other_american_stories" isbn="0582430496">
+<Title>White Heron and Other American Stories</Title>
+<TitleLong>White Heron and Other American Stories (Penguin Readers, Level 2)</TitleLong>
+<AuthorsText>Sarah Orne Jewett, Kate Chopin, O. Henry, Mark Twain, Edgar Allen Poe, Mary Gladwin, Andy Hopkins, Jocelyn Potter, Jewell, </AuthorsText>
+<PublisherText publisher_id="pearson_esl">Pearson ESL</PublisherText>
+<Details dewey_decimal="" physical_description_text="5.0&quot;x0.2&quot;x7.8&quot;; 41 pages; 0.2 lb" language="" edition_info="Paperback; 2000-03-28" dewey_decimal_normalized="" lcc_number="" change_time="2005-02-02T17:52:31Z" price_time="2006-10-08T04:27:02Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="A White Heron and Other American Stories - Jewett *NEW" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-17T11:30:07Z" currency_rate="1" price="8.93" />
+<Price store_isbn="" store_title="A WHITE HERON AND OTHER AMERICAN SHORT STORIES LEVEL 2" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="6.92" />
+<Price store_isbn="" store_title="White Heron and Other American Stories (Penguin Readers, Level 2)" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="3" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="13.95" />
+<Price store_isbn="" store_title="White Heron and Other American Stories, Level 2, Penguin Readers" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="7.84" />
+<Price store_isbn="" store_title="White Heron and Other American Stories (Penguin Readers, Level 2)" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="9" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="7.85" />
+<Price store_isbn="" store_title="White Heron and Other American Stories, Level 2, Penguin Readers" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="7.84" />
+<Price store_isbn="" store_title="White Heron and Other American Stories, Level 2, Penguin Readers" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="8.46" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T04:27:00Z" currency_rate="1" price="8.33" />
+<Price store_isbn="" store_title="A White Heron and Other American Stories" store_url="http://isbndb.com/x/book/white_heron_and_other_american_stories/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T04:27:01Z" currency_rate="1" price="9.54" />
+<Price store_isbn="" store_title="A White Heron and Other American Stories" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33781939%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T04:27:01Z" currency_rate="1" price="8.58" />
+<Price store_isbn="" store_title="A White Heron and Other American Stories Product 1966934" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1966934&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T04:27:02Z" currency_rate="1" price="8.15" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaab9">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Chopin, Kate</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa4">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Twain, Mark</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_c_chopin_kate">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( C ) -- Chopin, Kate</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_h_henry_o">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( H ) -- Henry, O</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_p_poe_edgar_allan">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( P ) -- Poe, Edgar Allan</Subject>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaaa5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- 19th Century</Subject>
+<Subject subject_id="amazon_com_childrens_books_authors_illustrators_a_z_t_twain_">Amazon.com -- Children's Books -- Authors &amp; Illustrators, A-Z -- ( T ) -- Twain, Mark</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_t_twain_mark_gener">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( T ) -- Twain, Mark -- General</Subject>
+<Subject subject_id="amazon_com_literature_fiction_authors_a_z_t_twain_mark_paper">Amazon.com -- Literature &amp; Fiction -- Authors, A-Z -- ( T ) -- Twain, Mark -- Paperback</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="jewett_sarah_orne">Jewett, Sarah Orne</Person>
+<Person person_id="chopin_kate">Chopin, Kate</Person>
+<Person person_id="twain_mark">Twain, Mark</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="gladwin_mary">Gladwin, Mary</Person>
+<Person person_id="hopkins_andy">Hopkins, Andy</Person>
+<Person person_id="potter_jocelyn">Potter, Jocelyn</Person>
+</Authors>
+</BookData>
+<BookData book_id="who_murdered_mary_rogers" isbn="0139583068">
+<Title>Who murdered Mary Rogers?</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="prentice_hall_a01">Englewood Cliffs, N.J., Prentice-Hall [1971]</PublisherText>
+<Details dewey_decimal="" physical_description_text="vii, 271 p. maps, ports. 24 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="HV6524" change_time="2004-07-24T17:04:31Z" price_time="2006-07-18T05:49:22Z" />
+<Summary></Summary>
+<Notes>Bibliography: p. 263-264.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/who_murdered_mary_rogers/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-18T05:43:38Z" currency_rate="1" price="2.94" />
+<Price store_isbn="" store_title="Who Murdered Mary Rogers" store_url="http://isbndb.com/x/book/who_murdered_mary_rogers/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-18T05:43:38Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Who Murdered Mary Rogers" store_url="http://isbndb.com/x/book/who_murdered_mary_rogers/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-18T05:43:39Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Who Murdered Mary Rogers" store_url="http://www.biblio.com/details.php?dcx=88532928&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-18T05:43:41Z" currency_rate="1" price="2.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="rogers_mary_1820_1841">Rogers, Mary,1820-1841</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--Stevens Point" last_update="2004-07-24T17:04:31Z" marc_url="http://isbndb.com/x/libdata/isbndb-155-who_murdered_mary_rogers-20040724.mrc" />
+<MARC library_name="University of Louisiana at Monroe" last_update="2004-11-29T20:31:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-126-who_murdered_mary_rogers-20041129.mrc" />
+<MARC library_name="Western Washington University" last_update="2005-02-13T05:35:02Z" marc_url="http://isbndb.com/x/libdata/isbndb-44-who_murdered_mary_rogers-20050212.mrc" />
+<MARC library_name="University of Wisconsin--Madison" last_update="2006-07-18T05:43:37Z" marc_url="http://isbndb.com/x/libdata/isbndb-94-who_murdered_mary_rogers-20060717.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="paul_raymond">Paul, Raymond</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="why_the_little_frenchman_wears_his_hand_in_a_sling" isbn="0585065985">
+<Title>Why the little Frenchman wears his hand in a sling</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2003-11-26T17:26:43Z" price_time="2006-06-25T19:05:59Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086159 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:43Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-why_the_little_frenchman_wears_his_hand_in_a_sling-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:12:22Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-why_the_little_frenchman_wears_his_hand_in_a_sling-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:30:14Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-why_the_little_frenchman_wears_his_hand_in_a_sling-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:35:52Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-why_the_little_frenchman_wears_his_hand_in_a_sling-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:52:19Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-why_the_little_frenchman_wears_his_hand_in_a_sling-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-why_the_little_frenchman_wears_his_hand_in_a_sling-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="writings_in_the_broadway_journal" isbn="0877522340">
+<Title>Writings in the Broadway journal</Title>
+<TitleLong>Writings in the Broadway journal: nonfictional prose</TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with introduction by Burton R. Pollin</AuthorsText>
+<PublisherText publisher_id="gordian_press">New York : Gordian Press, 1986.</PublisherText>
+<Details dewey_decimal="818/.309" physical_description_text="2 v. : ill., ports. ; 24 cm." language="eng" edition_info="(pt. 2) :$35.00" dewey_decimal_normalized="818.309" lcc_number="PS2619" change_time="2004-11-08T03:03:40Z" price_time="2006-03-22T20:39:06Z" />
+<Summary></Summary>
+<Notes>Includes index.
+
+pt. 1. The text -- pt. 2. The annotations.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Writings in the Broadway Journal: Nonfictional Prose (Part 2)" store_url="http://isbndb.com/x/book/writings_in_the_broadway_journal/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-22T20:37:42Z" currency_rate="1" price="50" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_notebooks_sketchbooks_etc">Poe, Edgar Allan,1809-1849 -- Notebooks, sketchbooks, etc</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Library of Congress" last_update="2004-11-08T03:03:40Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-writings_in_the_broadway_journal-20041107.mrc" />
+<MARC library_name="University of Denver" last_update="2005-01-14T22:24:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-266-writings_in_the_broadway_journal-20050114.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="pollin_burton_ralph">Pollin, Burton Ralph</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

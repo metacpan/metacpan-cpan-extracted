@@ -1,0 +1,7 @@
+default:
+  dsn:     'dbi:Pg:dbname=${.dbname};host=${.host};port=${.port}'
+  host:    'localhost'
+  port:    '1234'
+  dbname:  'stat'
+  options: { var: myapp.db.default_options }
+

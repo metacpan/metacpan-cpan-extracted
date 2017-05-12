@@ -1,0 +1,207 @@
+CORBA::MICO-0.6.0
+=================
+
+Perl Interface to MICO (Mico Is COrba) version 0.6.0
+
+
+Status
+======
+
+Basic client and server functionality is currently working.
+Quite a few things are left to be done. A few of them are:
+
+ - wchar and wstring types
+
+None of these are particularly hard to do given what works
+now - they just haven't been done yet.
+
+
+Documentation
+=============
+
+General information about a mapping of CORBA onto Perl is in
+the available in the file 'MICO/mapping.pod' while specifics
+about MICO are in 'MICO.pm'. Information about the internals
+of the module is in 'MICO/internals.pod' These POD documents
+can be viewed on the screen using the 'perldoc' program:
+
+  perldoc MICO/mapping.pod
+
+or converted to a variety of formats, for example:
+
+  pod2html MICO/mapping.pod > MICO/mapping.html
+
+They will also be installed as manual pages.
+
+The file MICO/internals.ps is a diagram that may be useful
+for figuring out MICO/internals.pod.
+
+
+Installation
+============
+
+To compile and run this package, you'll need to have MICO v2.2.7
+or better installed. Information about MICO is availaible from:
+
+   http://diamant-atm.vsb.cs.uni-frankfurt.de/~mico/
+
+IMPORTANT NOTE:
+
+ mico-2.2.7 has a bug in the handling of extraction
+ from Anys. To get CORBA::MICO to work with mico-2.2.7 you
+ must apply the patch mico-2.2.7-checker.patch
+ included in this distribution.
+
+You'll also need Graham Barr's Error module - available
+from CPAN in the directory:
+
+   http://www.perl.com/CPAN/authors/id/GBARR/
+
+And a reasonable recent version of Perl. (This has been
+tested with perl5.004_04, and perl5.005_03. 
+perl5.005_02 had a problem where uncaught exceptions
+didn't get properly stringified.)
+
+For the demo programs you'll may want the Data::Dumper
+module from CPAN:
+
+   http://www.perl.com/CPAN/modules/by-module/Data
+
+
+Once you have MICO installed, to build this package,
+simply type:
+
+  perl Makefile.PL
+  make
+
+The package then can be installed by executing the command:
+
+  make install
+
+
+
+Trying it Out
+=============
+
+To start the interface repository, load in the Account.idl
+interface file, and create an appropriate .micorc, run
+the script
+
+  ./start-servers.sh
+
+Run the Perl server program in the background:
+
+  perl -Mblib server &
+
+And then run the client program:
+
+  perl -Mblib client
+
+You should see output that looks something like:
+
+----------
+Using /usr/home/owen/tmp/CORBA-MICO-0.4.8/blib
+Balance is +500.00
+Favorite color is taupe
+Lottery numbers are 21 63 83 96
+Nickname is Dopey
+  /****\  
+ ;      ; 
+ [ O  O ] 
+ l   \  l 
+  ; -- ;  
+   ;;;;   
+Favorite color is now chartreuse
+As an any: favorite color is now chartreuse
+As an any: nickname is now Grumpy
+2 * 1,000,000,000,0000 pennies = 20000000000000 pennies
+Withdrawing $100,000
+Oops. I don't have that much money
+    (I need +99500.00 more)
+created counter!
+1 2 3 4 5 6 7 8 9 10
+destroyed counter!
+created counter!
+Successful completion
+----------
+
+
+Trying the GTK Demo
+===================
+
+To use this demo you must have GTK installed on your system
+and the Kenneth Albanowski's Gtk module for perl (version 0.5 or
+later). Both are available from ftp://ftp.gimp.org/pub/gtk
+
+Then, start up the servers with 
+
+ ./start-servers.sh
+
+and run two copies of the 'tictactoe' program
+
+ perl -Mblib tictactoe &
+ perl -Mblib tictactoe &
+
+Trying the micod example
+------------------------
+
+[ This demo is not currently working with the new POA-ized
+  code ]
+
+Warning: I had major problems trying to get this to work using
+egcs-1.0.2 and mico-2.0.5. The micod daemon core-dumped
+until I recompiled it as static. This seems to have gone away
+with mico-2.0.6.
+
+  ./start-servers.sh
+  perl -Mblib client-activate
+
+The client will automatically start up the server (as registered
+in 'start-servers.sh'). Halfway through the server process,
+it writes its state to disk and exits. Then is automatically
+restarted, and restored from disk by micod.
+
+--------------
+Balance is +250.00
+Favorite color is taupe
+Lottery numbers are 21 63 83 96
+Nickname is Dopey
+Closing server...
+Trying to reactivate...
+Favorite color is now chartreuse
+As an any: favorite color is now chartreuse
+As an any: nickname is now Grumpy
+Withdrawing $100,000
+Oops. I don't have that much money
+    (I need +99750.00 more)
+1 2 3 4 5 6 7 8 9 10
+Successful completion
+---------------
+
+
+Trying the shlib example
+------------------------
+
+  cd shlib
+  ./hello
+
+Note on the start-servers.sh
+============================
+
+In actual operation, you probably wouldn't want to keep killing
+and restarting the servers (ird and micod) as this script does.
+But doing so when testing things out makes it a lot easier
+to make sure that the current test isn't being affected by
+previous test failures.
+
+=================
+
+License
+-------
+
+This work is Copyright Owen Taylor, 1998-1999, and licensed
+under the terms of the GNU Library General Public License (LGPL)
+See the included file LICENSE-LGPL for details.
+
+The contents of the file constsub.c are from the Perl distribution
+and licensed accordingly.

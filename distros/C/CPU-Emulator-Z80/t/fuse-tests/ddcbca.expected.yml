@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcbca
+registers:
+  AF: 57259
+  AF_: 0
+  BC: 41009
+  BC_: 0
+  DE: 32376
+  DE_: 0
+  HL: 44346
+  HL_: 0
+  I: 0
+  IX: 43143
+  IY: 29492
+  PC: 4
+  R: 2
+  SP: 0

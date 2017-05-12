@@ -1,0 +1,12 @@
+WML.pm
+Changes
+MANIFEST
+README
+COPYING
+Makefile.PL
+t/01_basic.t
+t/02_html_to_wml.t
+t/03_wml_to_wmlc.t
+t/04_autoloaded.t
+t/test.html
+t/test.wml

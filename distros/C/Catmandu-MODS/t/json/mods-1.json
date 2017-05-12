@@ -1,0 +1,191 @@
+{
+   "modsCollection" : {
+      "mods" : [
+         {
+            "accessCondition" : [
+               {
+                  "_body" : "Personal, noncommercial use of this item is permitted in the United States of America. Please see http://digital.library.upenn.edu/women/ for other rights and restrictions that may apply to this resource.\n"
+               }
+            ],
+            "physicalDescription" : [
+               {
+                  "internetMediaType" : [
+                     {
+                        "_body" : "text/html"
+                     }
+                  ],
+                  "digitalOrigin" : [
+                     {
+                        "_body" : "reformatted digital"
+                     }
+                  ]
+               }
+            ],
+            "typeOfResource" : [
+               {
+                  "_body" : "text"
+               }
+            ],
+            "language" : [
+               {
+                  "languageTerm" : [
+                     {
+                        "_body" : "eng",
+                        "authority" : "iso639-2b"
+                     },
+                     {
+                        "type" : "text",
+                        "_body" : "English"
+                     }
+                  ]
+               }
+            ],
+            "location" : [
+               {
+                  "url" : [
+                     {
+                        "usage" : "primary display",
+                        "access" : "object in context",
+                        "_body" : " http://digital.library.upenn.edu/women/alleman/gettysburg/gettysburg.html\n"
+                     }
+                  ]
+               }
+            ],
+            "version" : "3.3",
+            "subject" : [
+               {
+                  "topic" : [
+                     {
+                        "_body" : "Gettysburg, Battle of, Gettysburg, Pa., 1863"
+                     }
+                  ],
+                  "authority" : "lcsh"
+               },
+               {
+                  "topic" : [
+                     {
+                        "_body" : "Gettysburg (Pa.) -- History -- Civil War, 1861-1865"
+                     }
+                  ],
+                  "authority" : "lcsh"
+               },
+               {
+                  "topic" : [
+                     {
+                        "_body" : "United States -- History -- Civil War, 1861-1865 -- Campaigns"
+                     }
+                  ],
+                  "authority" : "lcsh"
+               }
+            ],
+            "name" : [
+               {
+                  "namePart" : [
+                     {
+                        "_body" : "Alleman, Tillie Pierce [1848-1914]"
+                     }
+                  ],
+                  "role" : [
+                     {
+                        "roleTerm" : [
+                           {
+                              "type" : "code",
+                              "_body" : "aut",
+                              "authority" : "marcrelator"
+                           },
+                           {
+                              "type" : "text",
+                              "_body" : "Author",
+                              "authority" : "marcrelator"
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ],
+            "recordInfo" : [
+               {
+                  "recordContentSource" : [
+                     {
+                        "_body" : "University of Pennsylvania Digital Library"
+                     }
+                  ],
+                  "languageOfCataloging" : [
+                     {
+                        "languageTerm" : [
+                           {
+                              "type" : "code",
+                              "_body" : "eng",
+                              "authority" : "iso639-2b"
+                           }
+                        ]
+                     }
+                  ],
+                  "recordOrigin" : [
+                     {
+                        "_body" : "MODS auto-converted from a simple Online Books Page metadata record. For details, see http://onlinebooks.library.upenn.edu/mods.html"
+                     }
+                  ]
+               }
+            ],
+            "titleInfo" : [
+               {
+                  "title" : [
+                     {
+                        "_body" : "At Gettysburg, or, What a Girl Saw and Heard of the Battle: A True Narrative"
+                     }
+                  ]
+               }
+            ],
+            "relatedItem" : [
+               {
+                  "titleInfo" : [
+                     {
+                        "title" : [
+                           {
+                              "_body" : "A Celebration of Women Writers: Americana"
+                           }
+                        ],
+                        "type" : "uniform",
+                        "authority" : "dlfaqcoll"
+                     }
+                  ],
+                  "type" : "host"
+               }
+            ],
+            "classification" : [
+               {
+                  "_body" : "E475.53 .A42",
+                  "authority" : "lcc"
+               }
+            ],
+            "originInfo" : [
+               {
+                  "place" : [
+                     {
+                        "placeTerm" : [
+                           {
+                              "type" : "text",
+                              "_body" : "New York"
+                           }
+                        ]
+                     }
+                  ],
+                  "publisher" : [
+                     {
+                        "_body" : "W. Lake Borland"
+                     }
+                  ],
+                  "dateIssued" : [
+                     {
+                        "keyDate" : "yes",
+                        "_body" : "1889",
+                        "encoding" : "w3cdtf"
+                     }
+                  ]
+               }
+            ]
+         }
+      ]
+   }
+}

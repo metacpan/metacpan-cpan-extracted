@@ -1,0 +1,30 @@
+---
+name: Crypt-PerfectPaperPasswords
+version: 0.06
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Steve Gibson's Perfect Paper Passwords
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-PerfectPaperPasswords
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Crypt--PerfectPaperPasswords.git
+requires:
+  Crypt::Rijndael: 0
+  Digest::SHA256: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  Test::More: 0
+  Time::HiRes: 0
+provides:
+  App::PerlPPP:
+    file: lib/App/PerlPPP.pm
+    version: 0.06
+  Crypt::PerfectPaperPasswords:
+    file: lib/Crypt/PerfectPaperPasswords.pm
+    version: 0.06
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

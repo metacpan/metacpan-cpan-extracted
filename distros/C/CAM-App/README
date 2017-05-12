@@ -1,0 +1,121 @@
+CAM::App - Web database application framework
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at cpan@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This module implements a basic framework for building web database
+applications with the CAM libraries.  It is designed to be subclassed
+(see SUBCLASSING below) by your software to provide web functionality
+with low overhead.  It is intended for the usual Apache, Perl, MySQL,
+and Linux environment, but as little as possible is hardcoded for that
+idiom (or, when hardcoded, we try to make the pieces overrideable).
+
+External libraries referenced:
+  Required:
+    CGI
+    CAM::Template
+  Optional: (NOTE! Some of these have not yet been released to CPAN)
+    CGI::Compress::Gzip
+    DBI
+    CAM::Session
+    CAM::SQLManager
+    CAM::SQLObject
+    CAM::EmailTemplate
+    CAM::EmailTemplate::SMTP
+    CAM::Template::Cache
+
+
+COMPARISON
+
+The Perl module CAM::App most closely resembles is CGI::Application. It's
+main advantages over that module are:
+
+ * Simplifies DBI connections
+ * Prefills templates
+ * Integrated with a session manager (CAM::Session)
+ * Centralized error handling
+ * Simple email sending (via CAM::EmailTemplate)
+ * Integrates a very simple configuration mechanism
+ * Can auto-compress output HTML
+
+It's main disadvantages vs. CGI::Application are:
+
+ * Doesn't autodetect or support run modes, except via subclassing.
+ * Doesn't support HTML::Template
+ * Run modes are not necessarily centralized
+
+And features which may or may not be advantages:
+
+ * Can behave as a helper instead of a harness
+ * Uses CAM::Template instead of HTML::Template
+ * Caller sets up explicitly scripted run modes instead of
+   CGI::Application's run modes.  (if you think this is an advantage,
+   then CGI::Application really was never an option for you, was it?)
+
+In general, CGI::Application is great for highly-structured web
+applications that are easily broken into use modes.  CAM::App is good
+for apps that are much more free form, and just need a little help
+with organization.
+
+
+
+SUBCLASSING
+
+There are a few important steps for you to use this library.
+
+1) Although it's not strictly necessary, we HIGHLY recommend starting
+with a subclass.  This can be as simple as creating a trivial file
+like this in, for example, "MyApp.pm":
+
+   package MyApp;
+   use CAM::App;
+   our @ISA = qw(CAM::App);
+   1;
+
+2) Create a configuration file.  We recommend starting with the
+SampleConfig.pm, but you can quite easily build your own from scratch.
+
+   cp example/SampleConfig.pm MyConfig.pm
+   edit MyConfig.pm
+
+3) Set up your CGI script to use MyApp and MyConfig.  It should
+contain lines something like this.
+
+   use lib qw(.); # or where ever you stored the new .pm file
+   use MyApp;
+   use MyConfig;
+   
+   my $app = MyApp->new(config => MyConfig->new());
+   $app->authenticate() or $app->error("Login failed");
+   my $cgi = $app->getCGI();
+   ...

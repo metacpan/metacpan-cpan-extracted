@@ -1,0 +1,3 @@
+use CGI::SpeedyCGI;
+CGI::SpeedyCGI->setopt('timeout', 1);
+print $$;

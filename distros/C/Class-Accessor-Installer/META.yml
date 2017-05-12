@@ -1,0 +1,34 @@
+---
+abstract: 'Install an accessor subroutine'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+  - 'Florian Helmberger <florian@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Accessor-Installer
+provides:
+  Class::Accessor::Installer:
+    file: lib/Class/Accessor/Installer.pm
+    version: 1.100880
+requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Sub::Name: 0
+  Test::More: 0.88
+  UNIVERSAL::require: 0
+  parent: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Installer
+  homepage: http://search.cpan.org/dist/Class-Accessor-Installer/
+  repository: http://github.com/hanekomu/Class-Accessor-Installer
+version: 1.100880

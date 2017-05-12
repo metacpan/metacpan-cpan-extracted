@@ -1,0 +1,45 @@
+<h1>Menu</h1>
+
+<ul>
+<li><a href="/">Home</a></li>
+</ul>
+
+[% IF loggedin %]
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=user-logout">Logout</a></li>
+[% IF realm == 'admin' %]
+<li><a href="[% cgipath %]/pages.cgi?act=user-edit">Change Profile</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-pass">Change Password</a></li>
+[% END %]
+</ul>
+
+<ul>
+<li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+</ul>
+
+[% IF realm == 'author' || (realm == 'admin' && user.author) %]
+<h1>Author Preferences</h1>
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=author-default">Default Filters</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=author-distros">Distribution Filters</a></li>
+[% IF realm == 'admin' && user.author %]
+<li><a href="[% cgipath %]/pages.cgi?act=author-clear">Unimpersonate Author : [% user.author | upper | html %]</a></li>
+[% END %]
+</ul>
+
+[% ELSIF realm == 'admin' %]
+<h1>Admin Actions</h1>
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=author-admin">Impersonate an Author</a></li>
+<li><a href="[% cgipath %]/pages.cgi?act=user-admin">Admin Profiles</a></li>
+</ul>
+[% END %]
+
+[% ELSE %]
+<ul>
+<li><a href="[% cgipath %]/pages.cgi?act=user-login" rel="nofollow">Login</a></li>
+</ul>
+<ul>
+<li><a href='http://stats.cpantesters.org/cpanmail.html'>Find A Tester</a></li>
+</ul>
+[% END %]

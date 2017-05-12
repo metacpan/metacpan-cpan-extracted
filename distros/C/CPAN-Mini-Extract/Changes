@@ -1,0 +1,83 @@
+Revision history for Perl extension CPAN-Mini-Extract
+
+1.23 Tue 30 Oct 2012
+	- Updating to Module::Install::DSL 1.06
+
+1.22 Wed 1 Feb 2012
+	- Updating to Module::Install::DSL 1.04
+	- Updating author tests
+	- Moving from ->trace to ->log as the former is broken
+
+1.21 Wed 23 Mar 2011
+	- Updating to Module::Install::DSL 1.00
+	- Updating author tests
+	- Removed the use of base
+
+1.20 Mon 30 Jun 2008
+	- Refactoring and reducing the number of stat calls needed
+
+1.19 Mon  5 May 2008
+	- Include .tgz in the files to be extracted (RSAVAGE)
+
+1.18 Mon  5 May 2008
+	- Upgrade CPAN::Mini dependency to get reliable offline mode.
+	- Massive speed improvements from BOTH the faster piplined
+	  HTTP fetch AND hugely faster decompression. 200-300% faster!
+
+1.17 Tue 15 May 2007
+	- Integrating LWP::Online to auto-detect the internet
+        - When in offline mode, provide a fake remote param to
+          CPAN::Mini to trick it into not checking for the remote
+          URI, and thus failsely failing.
+
+1.16 Mon 14 May 2007
+	- Don't pre-filter for only Perl files
+
+1.15 Mon 14 May 2007
+	- Fixing a typo in the handling of extract_filter
+	- Upgrading to Module::Install 0.67
+
+0.13 Sun Nov 13 2005
+	- Fixed a bug when cleaning up removed files from extract dir
+
+0.12 Fri Nov 11 2005
+	- Fixed a typo bug
+
+0.11 Fri Nov 11 2005
+	- Added better testing
+	- Add better use of Archive::Tar
+	- Seperated out the actual extraction mechanics so it can more
+	  easily be upgraded to Archive::Extract later
+
+0.10 Wed Oct 12 2005
+	- Converted from CPAN::Processor to CPAN::Mini::Extract.
+	- Stripped out the PPI::Processor code.
+	- This module is now considered EXPERIMENTAL again.
+
+0.08 Tue Jan 11 2005
+	- Adding the update_mirror option to disable CPAN synchronisation
+	- Updated copyright date
+
+0.07 Mon Jan 10 2005
+	- Fixing some small bugs in the Archive::Tar report
+	- Added a report for "Build.PL but no Makefile.PL in tarball"
+	  (Requested by Randal Schwartz)
+	- Adding some additional trace messages
+
+0.06 Mon Jan 10 2005
+	- Removed a useless setting of $self->{limit_processor}
+	- Updated the version dependency to match changes to PPI::Processor
+	- Fixed several bugs in the Archive::Tar extraction code
+
+0.05 Mon Jan 10 2005
+	- Added support for Archive::Tar warning reports
+
+0.04 Sun Jan  9 2005
+	- Added the force_processor option
+
+0.02 Thu Dec 30 2004
+	- Upgraded version dependency to 5.006
+	- Cleaned up and added code to handle tarballs errors better
+
+0.01 Tue Dec 28 2004
+	- Created the initial version of the module

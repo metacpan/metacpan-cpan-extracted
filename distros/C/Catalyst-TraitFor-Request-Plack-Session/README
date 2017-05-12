@@ -1,0 +1,65 @@
+NAME
+    Catalyst::TraitFor::Request::Plack::Session - Easily access the current
+    request's Plack session
+
+VERSION
+    This document describes version 0.001 of
+    Catalyst::TraitFor::Request::Plack::Session - released June 03, 2012 as
+    part of Catalyst-TraitFor-Request-Plack-Session.
+
+SYNOPSIS
+        # in your app class
+        use CatalystX::RoleApplicator;
+        __PACKAGE__->apply_request_class_roles(qw/
+            Catalyst::TraitFor::Request::Plack::Session
+        /);
+
+        # then, off in an action/view/whatever somewhere...
+        my $ps = $ctx->req->plack_session;
+
+DESCRIPTION
+    This is a tiny little Catalyst::Request class trait that allows easy,
+    lazy access to the Plack session, on demand.
+
+    Note that for this to make any sense at all, you need to be using
+    Plack::Middleware::Session.
+
+ATTRIBUTES
+  plack_session
+    A place to stash the session, if we've created it.
+
+METHODS
+  plack_session
+    Returns the Plack::Session object for this request. If necessary the
+    session object will be constructed.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Plack::Middleware::Session
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/catalyst-traitfor-request-plack-session> and
+    may be cloned from
+    <git://github.com/RsrchBoy/catalyst-traitfor-request-plack-session.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/catalyst-traitfor-request-plack-session/issu
+    es
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

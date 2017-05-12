@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Crypt/CipherSaber.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/CS2.t
+t/base.t
+t/bigfile.t
+t/both_long.t
+t/create.t
+t/encrypt.t
+t/fh_encrypt.t
+t/smiles.cs1
+t/smiles.png
+META.json

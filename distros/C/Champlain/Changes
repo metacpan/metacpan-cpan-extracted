@@ -1,0 +1,62 @@
+Revision history for Champlain
+
+0.12 Sun May  9 17:26:58 CEST 2010
+	API coverage for libchamplain 0.5.1.
+	Includes Memphis support (local rendering).
+
+
+0.11 Sat Jan  9 10:48:45 CET 2010
+	API coverage for libchamplain 0.4.3.
+
+
+0.10 Tue Nov  3 06:31:52 CET 2009
+	Build update: add Champliain to write_boot ignore.
+	Minor documentation update.
+	Advertise Gtk2::Champlain.
+
+
+0.09 Sat Oct 17 19:41:46 CEST 2009
+	Full API coverage for libchamplain 0.4.1.
+	Update the OpenStreetMap license (fixes unit tests).
+
+
+0.08 Wed Sep 23 19:06:04 CEST 2009
+	Full API coverage for libchamplain 0.4.
+
+
+0.07 Wed Sep 16 19:18:20 CEST 2009
+	Port to libchamplain 0.4 and clutter 1.0.
+	Dual license: LGPL 2.1 and Artistic License 2.0.
+
+
+0.06 Sat Aug  8 09:32:26 CEST 2009
+	Full coverage for libchamplain 0.3.5 (the last release to use clutter 0.8).
+	Updated the example flickr.pl.
+	Fixed a timeout in the unit tests.
+	Unit tests for all methods except for the cache API.
+
+
+0.05 Sat Jun 27 23:05:56 CEST 2009
+	New example: flickr.pl
+
+
+0.04 Mon Jun 15 23:48:13 CEST 2009
+	Bindings for libchamplain 0.3.3.
+	More complete unit tests coverage.
+	New examples: capitals.pl, image.pl, animated-marker.pl and polygons.pl.
+	Champlain::MapSourceFactory and the factory's constructor accept arguments.
+
+
+0.03 Sun Mar 22 22:32:44 CET 2009
+	Fixed the binding of champlain_view_embed_get_view().
+	Added support for Champlain::ZoomLevel.
+	Added unit tests.
+
+
+0.02 Tue Mar 17 09:18:08 CET 2009
+	Cleanup in the project.
+	Added champlain_view_embed_get_view().
+
+
+0.01 Sat Mar 14 10:33:12 CET 2009
+	First version, released on an unsuspecting world.

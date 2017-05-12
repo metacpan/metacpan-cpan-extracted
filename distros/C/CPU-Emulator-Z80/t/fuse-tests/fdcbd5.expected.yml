@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  34384:
+    - 156
+name: fdcbd5
+registers:
+  AF: 5129
+  AF_: 0
+  BC: 25909
+  BC_: 0
+  DE: 50033
+  DE_: 0
+  HL: 43932
+  HL_: 0
+  I: 0
+  IX: 11792
+  IY: 34312
+  PC: 4
+  R: 2
+  SP: 0

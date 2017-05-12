@@ -1,0 +1,37 @@
+---
+abstract: 'Decide whether to allow a client to run this script'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  CGI::Info: '0'
+  CGI::Lingua: '0.15'
+  File::Spec: '0'
+  IPC::System::Simple: '0'
+  Test::Carp: '0'
+  Test::CleanNamespaces: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-ACL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Net::CIDR: '0'
+  namespace::clean: '0'
+  perl: '5.006002'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-ACL
+  repository: git://github.com/nigelhorne/CGI-ACL.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Chess::Rep::Coverage::Imager;
+
+# Chess::PGN::EPD expects db/ to be in the current working directory,
+# so we get to do these gymnastics:
+BEGIN {
+    use Module::InstalledVersion;
+    my $module = Module::InstalledVersion->new('Chess::PGN::EPD');
+    symlink "$module->{dir}/Chess/PGN/db", 'db';
+    require Chess::PGN::Parse;
+    require Chess::PGN::EPD;
+    Chess::PGN::EPD->import('epdlist');
+}
+END {
+    unlink 'db' or warn "Could not remove the db symlink: $!"
+}
+
+# Get the PGN file from the command-line.
+my $pgn = -e $ARGV[0] ? shift : die "Usage: perl $0 some.pgn\n";
+
+# Read_in the PGN.
+$pgn = Chess::PGN::Parse->new($pgn);
+$pgn->read_game;
+
+# Create the game filename prefix.
+(my $name = $pgn->date) =~ s/[?.]//g;
+$name = join('-', $pgn->white, 'vs', $pgn->black, $name);
+$name =~ s/\s/_/g;
+
+# Extract the game moves.
+$pgn->parse_game;
+my @moves = epdlist(@{$pgn->moves});
+my $n = length @moves; # Used for printf field width.
+
+# Image each ply.
+my $cover = Chess::Rep::Coverage::Imager->new;
+
+# Initialize the move number.
+my $i = 0;
+warn sprintf("Move %0*d: %s\n", $n, $i, Chess::Rep::FEN_STANDARD);
+# Write the file for the starting ply.
+my $filename = sprintf("%s-%0*d", $name, $n, $i);
+warn 'File: ', $cover->write($filename, 'png'), "\n";
+
+# Loop over each move in FEN format.
+for my $move (@moves) {
+    # Set the move FEN.
+    $cover->set_from_fen($move);
+    # Recalculate the coverage status.
+    $cover->coverage;
+    # Re-render the board.
+    $cover->board();
+
+    # Increment the move number.
+    $i++;
+    warn sprintf("Move %0*d: %s\n", $n, $i, $move);
+    # Write the file for the current ply.
+    $filename = sprintf("%s-%0*d", $name, $n, $i);
+    warn 'File: ', $cover->write($filename, 'png'), "\n";
+}
+
+__END__
+Make an animated GIF from the PGN moves with ImageMagick:
+convert -delay 10 -loop 1 Garry_Kasparov-vs-Veselin_Topalov-1999-*.png immortal.gif

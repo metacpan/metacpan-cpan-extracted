@@ -1,0 +1,65 @@
+NAME
+
+    Config::Any::Properties - Config::Any loader for Java-style property
+    files
+
+VERSION
+
+    0.001001
+
+    Released on Friday, 26 December 2014.
+
+SYNOPSIS
+
+     use Config::Any;
+    
+     my $config = Config::Any->load_files({
+         files       => \@files,
+         use_ext     => 1,
+     });
+
+DESCRIPTION
+
+    Loads Config::Properties property files.
+
+METHODS
+
+ extensions
+
+    Return an array of valid extensions (properties, props).
+
+ load
+
+    Attempts to load $file as a Config::Properties file.
+
+ requires_any_of
+
+    Specifies that this module requires Config::Properties in order to
+    work.
+
+SEE ALSO
+
+      * Config::Properties
+
+      * Log::Any
+
+      * ".properties" on Wikipedia
+      <http://en.wikipedia.org/wiki/.properties>
+
+      * Official Oracle java.util.Properties API
+      <http://docs.oracle.com/javase/1.5.0/docs/api/java/util/Properties.ht
+      ml>
+
+AUTHORS
+
+      * Peter Hallam <pragmatic@cpan.org>
+
+      * Сергей Романов <sromanov-dev@yandex.ru>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright © 2012-2014 Peter Hallam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

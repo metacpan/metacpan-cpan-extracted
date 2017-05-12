@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use CPAN::Diff;
+use Getopt::Long;
+
+my %options = (mirror => 'http://cpan.org');
+Getopt::Long::Configure("bundling");
+Getopt::Long::GetOptions(
+    'h|help'                  => \$options{help},
+    'v|verbose'               => \$options{verbose},
+    'm|mirror=s'              => \$options{mirror},
+    'exclude-core'            => \$options{exclude_core},
+    'l|local-lib=s'           => \$options{local_lib},
+    'L|local-lib-contained=s' => 
+      sub { $options{local_lib} = $_[1]; $options{self_contained} = 1; },
+) or usage();
+
+usage() if $options{help};
+usage() unless $ARGV[0];
+
+main();
+
+sub main {
+    my $diff = CPAN::Diff->new(%options);
+    my $verbose = $options{verbose};
+
+    print_stuff($diff->extra_modules, $verbose) if $ARGV[0] eq 'extra';
+    print_more( $diff->newer_modules, $verbose) if $ARGV[0] eq 'newer';
+    print_more( $diff->older_modules, $verbose) if $ARGV[0] eq 'older';
+}
+ 
+sub print_stuff {
+    my ($modules, $verbose) = @_;
+    if ($verbose) {
+        printf "%-45s %15s %-20s\n",
+            $_->name,
+            $_->local_version,
+            $_->cpan_dist->pathname,
+                for @$modules;
+    }
+    else {
+        print $_->name . "\n" for @$modules;
+    }
+}
+
+sub print_more {
+    my ($modules, $verbose) = @_;
+    if ($verbose) {
+        printf "%-45s %15s %15s %-20s\n",
+            $_->name,
+            $_->local_version,
+            $_->cpan_version,
+            $_->cpan_dist->pathname
+                for @$modules;
+    }
+    else {
+        print $_->name . "\n" for @$modules;
+    }
+}
+
+sub usage {
+    print <<EOF;
+usage: cpan-diff [<options>] <report-type>
+
+Compare local Perl modules/versions to modules on the CPAN or on a CPAN mirror.
+Useful for discovering how a system differs from a company darkpan like Pinto
+or OrePAN2.
+
+Report types
+  extra   Local modules which are not on the CPAN.
+  newer   Local modules newer than corresponding CPAN modules.
+  older   Local modules older than corresponding CPAN modules.
+          (same as cpan-outdated ^)
+
+Options
+  -m, --mirror               A CPAN mirror (a file or a darkpan like pinto or orepan2).
+                             Defaults to http://cpan.org
+  -l, --local-lib            Diff this set of modules. Same as cpanm.
+  -L, --local-lib-contained  Diff this set of modules. Same as cpanm.
+  -v, --verbose              Also print version numbers.
+  -h, --help                 Print this message
+
+EOF
+    exit 1;
+}
+
+1;
+
+=head1 NAME
+
+cpan-diff - Compare local Perl modules with those available on a CPAN
+
+=head1 SYNOPSIS
+
+    # Usage
+    $ cpan-diff --help
+
+    # Find local modules which are older than whats available in the CPAN
+    $ cpan-diff older
+    Acme::LookOfDisapproval
+    Acme::What
+
+    $ cpan-diff older --verbose
+    Acme::LookOfDisapproval        0.005   0.006 ETHER/Acme-LookOfDisapproval-0.006
+    Acme::What                     0.004   0.005 T/TO/TOBYINK/Acme-What-0.005.tar.gz
+
+    # Find local modules which are older than the ones in your company darkpan.
+    $ cpan-diff older --verbose --mirror https://darkpan.yourcompany.cm
+    Acme::LookOfDisapproval        0.005   0.006 ETHER/Acme-LookOfDisapproval-0.006
+    Acme::What                     0.004   0.005 T/TO/TOBYINK/Acme-What-0.005.tar.gz
+
+    # Find local modules which are newer than the ones in your darkpan.  
+    $ cpan-diff newer --mirror https://darkpan.yourcompany.com
+
+    # Find local modules which are 'extra' -- ie don't exist in your darkpan.
+    $ cpan-diff extra --mirror https://darkpan.yourcompany.com
+
+=head1 DESCRIPTION
+
+Compare local Perl modules/versions to modules on the CPAN or on a CPAN mirror.
+Useful for discovering how a system differs from a company darkpan like Pinto
+or OrePAN2.
+
+=head1 LICENSE
+
+Copyright (C) Eric Johnson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Eric Johnson E<lt>eric.git@iijo.orgE<gt>
+
+=cut

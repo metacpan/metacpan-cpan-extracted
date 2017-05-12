@@ -1,0 +1,63 @@
+Crypt::Lite version 0.82.0x
+===========================
+
+Crypt::Lite does NOT strong encryption. Take a closer look on AES or Blowfish for strong encryption.
+
+Sometimes it's necessary to protect some certain data against plain reading or you intend to send information through the Internet. Another reason might be to assure users cannot modify their previously entered data in a follow-up step of a long Web transaction where you don't want to deal with server-side session data. The goal of Crypt::Lite was to have a pretty simple way to encrypt and decrypt data without the need to install and compile huge packages with lots of dependencies.
+
+Crypt::Lite has the property that it typically returns an empty string on a wrong passphrase instead of a partially decrpyted string. It generates every time a different encrypted hash when you re-encrypt the same data with the same secret string. In normal cases of XOR encryption, what Crypt::Lite is based on, double or tripple encryption does NOT increase the security. Because of the nature of Crypt::Lite I state (because of the shifting concept) double encryption *does* increase the challenge to decrypt it. Nevertheless I *don't* recommend it because at least it creates very large strings ;-) What I really suggest is to use good passphrases not shorter than 6 characters, or better 16 characters length to encrypt. A randomly generated passphrase that is used only once of the same length as the plain text will be the most secure encryption with Crypt::Lite.
+
+In general, decryption works also on hashes that have been encrypted on a foreign host (try this with an unpatched IDEA installation ;-).
+
+Since last time has grown a harshly thread about XOR encryption I suggest to take a look from time to time on this URL to get the latest news and documentation on
+
+http://www.infocopter.com/perl/modules/crypt-lite.html
+
+There is also a Blog for any issues regarding this module:
+
+http://infocopter.blogspot.com/2006/09/cryptlite.html
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   su
+   make install
+
+
+RPMs of Crypt::Lite are available on
+
+http://dag.wieers.com/packages/perl-Crypt-Lite/
+http://rpm.pbone.net/?stat=3&search=perl-Crypt-Lite&srodzaj=3
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+MD5
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2006 by Reto Schaer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+Feel free to use it for commercial purposes or just for pleasure. 
+You may change the code for your needs if you like. Redistribution 
+and use in source and binary forms, with or without modification, 
+are permitted.
+
+I ask you to leave the link to the related documentation anywhere 
+at the the top of the module in case of redistribution my code.
+
+SEE ALSO
+
+http://www.infocopter.com/perl/licencing.html
+

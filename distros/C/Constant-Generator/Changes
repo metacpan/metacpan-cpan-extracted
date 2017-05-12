@@ -1,0 +1,22 @@
+Revision history for Perl extension Constant::Generator.
+
+1.013  Fri Apr  7 05:42:40 2017
+	- fix bug in package name decoration
+
+1.012  Fri Mar 31 18:22:49 2017
+	- now working in perl 5.6.1+
+	- new overlap test
+
+1.011  Sat Dec 29 09:26:38 2014
+	- fix typos
+	- require version reduced to 5.012005
+
+
+1.01   Sat Nov 22 03:07:22 2014
+	- new option int0
+	- require version reduced to 5.012005
+
+1.00   Sat Nov  8 12:27:36 2014
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Constant::Generator
+

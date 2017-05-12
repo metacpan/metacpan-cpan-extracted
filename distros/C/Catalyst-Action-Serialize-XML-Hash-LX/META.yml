@@ -1,0 +1,35 @@
+---
+abstract: 'XML::Hash::LX serializer for Catalyst'
+author:
+  - 'Mons Anderson <mons@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  lib::abs: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Action-Serialize-XML-Hash-LX
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Catalyst::Action::Deserialize::XML::Hash::LX:
+    file: lib/Catalyst/Action/Deserialize/XML/Hash/LX.pm
+    version: 0.06
+  Catalyst::Action::Serialize::XML::Hash::LX:
+    file: lib/Catalyst/Action/Serialize/XML/Hash/LX.pm
+    version: 0.06
+requires:
+  Catalyst::Action: 0
+  XML::Hash::LX: 0.06
+  perl: 5.6.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

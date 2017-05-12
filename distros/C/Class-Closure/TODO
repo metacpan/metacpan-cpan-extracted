@@ -1,0 +1,15 @@
+To be done / Ideas:
+
+Alias $_ to the invocant on method call.
+
+Make a default constructor the maps argument names to members.
+
+Deal with SUPER:: / NEXT:: syntax.
+
+Metaclass.
+
+Make the base of the object delegate to the real objects.
+
+Benchmark everything.
+
+Reflection Interface.

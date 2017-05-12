@@ -1,0 +1,25 @@
+ChangeLog
+lib/C/TCC.pm
+LICENSE
+Makefile.PL
+MANIFEST
+ppport.h
+README
+ex/hello.pl
+t/001_tcc_new.t
+t/006_tcc_add_include_path.t
+t/007_tcc_add_sysinclude_path.t
+t/008_tcc_define_symbol.t
+t/009_tcc_undefine_symbol.t
+t/010_tcc_add_file.t.t
+t/011_tcc_compile_string.t
+t/012_tcc_set_output_type.t
+t/016_tcc_output_file.t
+t/017_tcc_run.t
+t/pod.t
+t/pod-coverage.t
+t/hello.c
+t/hello.h
+TCC.xs
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

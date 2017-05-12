@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/CAD/Drawing/IO/DWGI.pm
+lib/CAD/Drawing/IO/DWGI/functions.c
+README
+t/00-load.t
+t/01-pod-coverage.t
+t/02-pod.t
+t/03-prereq.t
+t/04-methods.t
+META.yml                                 Module meta-data (added by MakeMaker)

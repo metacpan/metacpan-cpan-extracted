@@ -1,0 +1,103 @@
+Changelog for Catmandu-PICA
+
+0.19  2016-02-19 09:14:13 CET
+ - Requires PICA::Data version 0.30
+ - Add new PICA+ XML format variant (PPXML)
+
+0.18  2016-02-16 15:11:39 CET
+ - Add new binary PICA format
+
+0.17  2015-11-18 18:14:56 CET
+ - Require Catmandu version '0.9504' by E. Choroba;
+ - Remove outdated Makefile.PL 
+ - Add .mailmap
+
+0.16  2015-09-30 15:53:27 CEST
+ - travis infrastructure change
+ - Fix pica_each single execution bug
+ - ISSUE-31: drop PerlIO layer for XML importer
+ - ISSUE-26: Add feature pluck
+ - Deleted Perl 5.10 from travis.yml
+ - ISSUE-25: Add pica_each and pica_match fixes
+
+0.15  2014-09-19 12:08:39 CEST
+ - remove PICA::Data as independent module
+ - migrated to Dist::Milla 
+
+0.14 2014-09-18T13:24:08
+ - refactoring with PICA::Path
+
+0.13 2014-09-16T12:12:25
+ - refactored (Jakob Voss)
+
+0.12 2014-09-16T10:50:18
+ - more PICA access methods (Jakob Voss)
+ - lower requirement of XML::LibXML (Jakob Voss)
+
+0.11 2014-09-12T11:46:22
+ - new function pica_values (Jakob Voss)
+ - move parse_pica_path to PICA::Data (Jakob Voss)
+ - fix parsing empty subfields (Jakob Voss)
+ - test with Perl 5.20 (Jakob Voss)
+
+0.10 2014-09-11T13:03:24
+ - new function parse_pica_path (Jakob Voss)
+ - bugfix for pica_map to check for occurrence (Johann Rolschewski)
+
+0.09 2014-05-23T09:46:00
+ - release 0.09 (Jakob Voss)
+ - Transforming Fix functions the new syntax. Require Catmandu 0.9 (Johann
+   Rolschewski)
+
+0.08 2014-04-04T07:38:42
+ - new release (Jakob Voss)
+ - bugfix for pica_map to handle subfield code 0 (Johann Rolschewski)
+
+0.07 2014-03-27T21:13:23
+ - documentation (Jakob Voss)
+ - XML parser should ignore PerlIO layers (Jakob Voss)
+ - show build status of master and devel branch (Jakob Voss)
+
+0.06 2014-03-26T17:12:53
+ - new version (Jakob Voss)
+ - documentation (Jakob Voss)
+ - don't try to interprete long string as filename (Jakob Voss)
+ - don't depend on Catmandu::SRU (Jakob Voss)
+ - added ABSTRACT and VERSION to POD (Johann Rolschewski)
+ - correction of SYNOPSIS in POD (Johann Rolschewski)
+ - added SRU importer (Johann Rolschewski)
+ - deleted constant LEADER_LENGTH; added more flexible check for leader
+   (Johann Rolschewski)
+
+0.05 2014-01-16T10:44:57
+ - new release (Jakob Voss)
+ - fixed test failure in 00-load.t (closes issue #5) (Jakob Voss)
+ - tests for Exporter and different PICA formats (Johann Rolschewski)
+
+0.04 2013-09-24T10:09:46
+ - use xml as default import and export type (Jakob Voss)
+ - added Plain PICA parser (Jakob Voss)
+ - removed regex modifier (Johann Rolschewski)
+ - Simplify internal PICA format (Johann Rolschewski)
+ - implemented draft of PICA XML writer (Jakob Voss)
+ - implemented basic PICA exporter (no XML yet) (Jakob Voss)
+ - first draft of PICA writer (Jakob Voss)
+ - deleted leader from some records (Johann Rolschewski)
+ - added check for leader (Johann Rolschewski)
+ - Renamed modules (Jakob Voss)
+
+0.03 2013-09-15T18:23:02
+ - release version 0.03 (Jakob Voss)
+ - added some test data and more tests (Johann Rolschewski)
+ - added PICA+ parser (Johann Rolschewski)
+
+0.02 2013-09-15T15:02:55
+ - added email address to AUTHOR (Johann Rolschewski)
+ - migrated to Dist::Zilla (Jakob Voss)
+ - nice to have (Jakob Voss)
+ - allow given/when in Perl >= 5.18 (Jakob Voss)
+ - delete Makefile.old (Johann Rolschewski)
+
+0.01 2013-06-04T16:01:00
+ - First version. BETA now than later. (Johann Rolschewski)
+

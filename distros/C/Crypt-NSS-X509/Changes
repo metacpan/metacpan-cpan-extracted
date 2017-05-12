@@ -1,0 +1,2 @@
+0.05
+ - Make notBefore and notAfter locale independent. This fixes a lot of test failures and makes them universally parseable.

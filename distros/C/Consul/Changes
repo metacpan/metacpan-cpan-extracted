@@ -1,0 +1,78 @@
+0.020     2016-12-20 20:59:28+11:00 Australia/Melbourne
+- Support hash-to-object coercion in check_register and
+  service_register.
+- Added support for service_id, status, and
+  deregister_critical_service_after to Consul::Check.
+- Added Consul::Check::HTTP, Consul::Check::TCP, and
+  Consul::Check::Docker.
+- Fixed the port argument and added the address argument in
+  Consul::Service.
+
+0.019     2016-10-21 19:15:29+11:00 Australia/Melbourne
+- Add a token argument which is used to set the X-Consul-Token
+  HTTP header.
+- Implement the ACL API.
+
+0.018     2016-09-23 13:47:43+10:00 Australia/Melbourne
+- Fixup error_cb test to work even when there is an existing
+  Consul agent listening on port 8500.
+- Update for Test-Consul 0.005 (Consul 0.6.1 through 0.7.0+)
+
+0.017     2016-09-22 23:24:53+10:00 Australia/Melbourne
+- Add support for enableTagOverride attribute on services
+- Add support for ServiceAddress attribute on catalog entries
+
+0.016     2016-02-19 08:54:46+11:00 Australia/Melbourne
+- Error callback for individual endpoint methods
+- Update for Test-Consul 0.003 (Consul 0.6.3)
+
+0.015     2015-12-08 16:59:19+11:00 Australia/Melbourne
+- Fix session/info on nonexistent session (Consul 0.6.0)
+
+0.014     2015-12-07 17:05:57+11:00 Australia/Melbourne
+- Implement Sessions API
+
+0.013     2015-11-25 21:20:44+11:00 Australia/Melbourne
+- Never call the endpoint callback after calling the error callback
+
+0.012     2015-11-25 20:02:06+11:00 Australia/Melbourne
+- API change: Switch request_cb to take and return a parameter object
+- API change: Include original args with request, and request with response
+
+0.011     2015-11-24 08:55:35+11:00 Australia/Melbourne
+ - API change: Rename req_cb to request_cb
+ - Separate error_cb attr for async modules to avoid croak
+
+0.010     2015-11-23 20:13:16+11:00 Australia/Melbourne
+ - Add KV get_all endpoint method, for recursive get
+
+0.009     2015-11-19 22:17:32+11:00 Australia/Melbourne
+ - Don't use defined-or, gets things working on Perl 5.8
+
+0.008     2015-11-18 12:58:37+11:00 Australia/Melbourne
+ - Fix _http builder, get it passing tests again
+ - Silence warning during croak when call fails without content
+
+0.007     2015-11-18 08:51:27+11:00 Australia/Melbourne
+ - API change: Add timeout option, remove http option
+
+0.006     2015-11-16 09:34:58+11:00 Australia/Melbourne
+ - API change: Return undef when KV key not found
+ - API change: Return server meta from "blocking" endpoints
+ - Make Event::fire properly async
+
+0.005     2015-11-13 21:21:52+11:00 Australia/Melbourne
+ - Support for async calls
+
+0.004     2015-11-07 15:03:25+11:00 Australia/Melbourne
+ - Fix accessor defaults (Moo requires them to be coderefs)
+ - Don't use defined-or, gets things working on Perl 5.8
+
+0.003     2015-11-06 16:36:14+11:00 Australia/Melbourne
+ - Don't require feature(state), might get things working in Perl < 5.10
+
+0.002     2015-11-05 23:08:14+11:00 Australia/Melbourne
+ - Skip tests if Test::Consul can't start a consul instance
+
+0.001     2015-11-05 12:56:16+11:00 Australia/Melbourne
+ - First release

@@ -1,0 +1,15 @@
+* Better docs
+* More tests
+* More flexibility about where to get the Tangram schema / db connection from.
+* Ability to connect if needed..
+* Test session saves / restores.
+* Mock testing.
+* Custom lookups / filters
+* Test autoload
+* Test stringification
+* Test user_results_filter
+* Test returning text list of roles.
+* Make it throw a hard error (rather than a warning) if you try to search
+  the user by an unknown field. 
+* Test lookup_roles dealing with both a list and an array ref correctly.
+

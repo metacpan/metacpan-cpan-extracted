@@ -1,0 +1,66 @@
+Revision history for Catalyst-Plugin-Spark-Form
+
+0.01000002 2012-11-29T18:58:09Z
+ - distribution maintenance release, no user visible changes.
+
+ [Dependencies::New  / test requires]
+ - File::Find
+ - File::Temp
+ - Test::More 0.98
+
+ [Dependencies::New / build requires]
+ - Module::Build 0.4003
+
+ [Dependencies::New / configure requires]
+ - Module::Build 0.4003
+
+ [Dependencies::New / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+ [Dependencies::New / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::New / runtime requires]
+ - Moose::Role
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Documentation]
+ - update LICENSE indentation
+ - update LICENSE address
+ - update copyright year
+
+ [Internals]
+ - Add an $AUTHORITY value to all namespaces.
+ - Change $VERSION declaration syntax.
+
+ [Packaging]
+ - include .perltidyrc
+ - remove EUMM
+ - migrate author tests to xt/
+ - Using DZIL4 instead of DZIL1
+ - replace guts of dist.ini with bundle.
+ - Bugtracker/Sources now point to perl-spark project.
+
+ [Tests::Author::New]
+ - xt/author/critic.t
+
+ [Tests::New]
+ - t/000-report-versions-tiny.t
+
+ [Tests::Release::New]
+ - xt/release/cpan-changes.t
+ - xt/release/distmeta.t
+ - xt/release/eol.t
+ - xt/release/kwalitee.t
+ - xt/release/minimum-version.t
+
+0.01000001 2009-11-01T19:02:23Z
+ - First version.
+

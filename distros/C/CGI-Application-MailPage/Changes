@@ -1,0 +1,48 @@
+Revision history for Perl extension CGI::Application::MailPage.
+
+1.7 (May 14, 2010)
+    - Fixed problem with our $VERSION (RT #57477 && RT #41697) - gary@sitesuite.com.au
+
+1.6 (Oct 31, 2005)
+    - Fixed vulnerability where newlines could be embedded in subject, 
+        name, etc and used to create a completely custom message for spammers.
+        Validation is now performed by Data::FormValidator and can be customized
+        by 'validation_profile'.
+        # NOTE - the older 'alert' parameter is still passed into the form template
+        # as the first error message encountered on the form. This exists for backwards
+        # compatability but should be considered deprecated.
+    - Added 'max_emails_per_request' and 'max_emails_per_hour' to avoid
+        being used as a spam relay.
+    - Added original requestor's IP address to the outgoing email headers
+        to avoid being seen as the sender if the message is hijacked for spam
+1.5 (Oct  3, 2005)
+    - Fixed vulnerability in the translation of page param into
+        file name. Allowed someone to maliciously put '../../', etc
+        into the file name and retrieve arbitrary documents from the
+        file system if remote_fetch was not enabled.
+1.4 (Oct 19, 2004)
+    - Fixed bug with regard to 'acceptable_domains' if 'page' has
+        a port number.
+1.3 (Oct 11, 2004)
+    - Added 'acceptable_domains' param to restrict the domain
+        of the page to mail (protection against spam)
+    - Added 'remote_fetch' param to allow sending pages that
+        aren't on local filesystem
+    - Added 'extra_tmpl_params' param to further customize the
+        processing of the templates.
+    - Added 'format_options' tmpl_var that is available to the
+        'form_template' to use instead of 'format_selector' if you
+        want more control.
+    - All templates now have 'die_on_bad_params' = 0 so that you aren't
+        required to have all tmpl_params/tmpl_loops present in your templates
+1.2 (Sep 9, 2004)
+    - Build fix
+1.1 (Sep 9, 2004)
+    - MailPage.pm now uses C::A's load_tmpl instead of calling H::T::new directly
+    - templates were updated to use XHTML
+    - regression tests now use Test::More
+    - now support port numbers in 'page' parameter
+    - M. Peters is now co-maintainer
+1.0
+    - First version.
+

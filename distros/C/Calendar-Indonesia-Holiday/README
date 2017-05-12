@@ -1,0 +1,99 @@
+SYNOPSIS
+
+     use Calendar::Indonesia::Holiday qw(
+         list_id_holidays
+         enum_id_workdays
+         count_id_workdays
+     );
+    
+     # list Indonesian holidays for the year 2011, without the joint leave days
+     # ("cuti bersama"), show only the dates
+    
+     my $res = list_id_holidays(year => 2011, is_joint_leave=>0);
+     # sample result
+     [200, "OK", [
+       '2011-01-01',
+       '2011-02-03',
+       '2011-02-16',
+       '2011-03-05',
+       '2011-04-22',
+       '2011-05-17',
+       '2011-06-02',
+       '2011-06-29',
+       '2011-08-17',
+       '2011-08-31',
+       '2011-09-01',
+       '2011-11-07',
+       '2011-11-27',
+       '2011-12-25',
+     ]];
+    
+     # list religious Indonesian holidays, show full details
+     my $res = list_id_holidays(year => 2011,
+                                "tags.has" => ['religious'], detail=>1);
+    
+     # sample result
+     [200, "OK", [
+       {date        => '2011-02-16',
+        day         => 16,
+        month       => 2,
+        year        => 2011,
+        ind_name    => 'Maulid Nabi Muhammad',
+        eng_name    => 'Mawlid',
+        eng_aliases => ['Mawlid An-Nabi'],
+        ind_aliases => ['Maulud'],
+        is_holiday  => 1,
+        tags        => [qw/religious religion=islam calendar=lunar/],
+       },
+       ...
+     ]];
+    
+     # check whether 2011-02-16 is a holiday
+     my $res = list_id_holidays(date => '2011-02-16');
+     print "2011-02-16 is a holiday\n" if @{$res->[2]};
+    
+     # enumerate working days for a certain period
+     my $res = enum_id_workdays(year=>2011, month=>7);
+    
+     # idem, but returns a number instead. year/month defaults to current
+     # year/month.
+     my $res = count_id_workdays();
+
+DESCRIPTION
+
+    This module provides functions to list Indonesian holidays.
+
+    There is a command-line script interface for this module:
+    list-id-holidays.
+
+FAQ
+
+ What is "joint leave"?
+
+    Workers are normally granted 12 days of paid leave per year. They are
+    free to spend it on whichever days they want. The joint leave ("cuti
+    bersama") is a government program of recent years (since 2002) to
+    recommend that some of these leave days be spent together nationally on
+    certain days, especially during Lebaran (Eid Ul-Fitr). It is not
+    mandated, but many do follow it anyway, e.g. government civil workers,
+    banks, etc. I am marking joint leave days with is_joint_leave=1 and
+    is_holiday=0, while the holidays themselves with is_holiday=1, so you
+    can differentiate/select both/either one.
+
+ Holidays before 2002?
+
+    Will be provided if there is demand and data source.
+
+ Holidays after (current year)+1?
+
+    Some religious holidays, especially Vesakha, are not determined yet.
+    Joint leave days are also usually decreed by the government in May/June
+    of the preceding year.
+
+SEE ALSO
+
+    This API will also be available on GudangAPI, http://gudangapi.com/
+
+    Aside from national holidays, some provinces declare their own (e.g.
+    governor election day for East Java province, etc).
+

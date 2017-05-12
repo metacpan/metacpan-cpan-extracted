@@ -1,0 +1,42 @@
+{
+   "abstract" : "report CGI script errors to maintainer",
+   "author" : [
+      "Eduardo Santiago <esm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Alert",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Differences" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Alert" : {
+         "file" : "lib/CGI/Alert.pm",
+         "version" : "2.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.09"
+}

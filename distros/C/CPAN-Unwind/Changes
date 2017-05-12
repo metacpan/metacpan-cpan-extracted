@@ -1,0 +1,32 @@
+######################################################################
+Revision history for Perl extension CPAN::Unwind
+
+0.06  (2011/05/01)
+      (ms) Using LWP::UserAgent instead of LWP::Simple
+
+0.05  (2007/07/30)
+      (ms) Fixed test suite bug reported by Andreas König. Ignoring 
+           'perl' as a prereq.
+
+0.04  (2006/09/21)
+      (ms) Added Algorithm::Dependency::Ordered as a dependency, fixing
+           rt #21603, reported by Andreas König.
+
+0.03  (2005/03/26)
+      (ms) Added cpan-download
+      (ms) made CPAN::Config optional
+      (ms) Cache optional
+      (ms) Leave core modules out by default, core_include param set to true
+           (-c switch in cpan-unwind) gets them back in.
+      (ms) cpan-unwind supports multiple arguments
+
+0.02  2005/03/15
+      (ms) Changed all references to the misspelled 'dependend' to 
+           'dependent'. Please note that this also affects the API 
+           (->dependent_versions()). Thanks to Adam Kennedy 
+           <adamk@cpan.org>.
+      (ms) Added cpan-unwind script in eg, installed in bin.
+      (ms) Added module dependencies in Makefile.PL
+
+0.01  2005/03/13
+      (ms) Where it all began.

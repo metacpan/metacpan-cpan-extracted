@@ -1,0 +1,43 @@
+###################
+# CONFIG::XMLPERL #
+###################
+
+Config::XMLPerl - Configuration files based in XML, where Perl data codes as XML values are enabled.
+
+###############
+# DESCRIPTION #
+###############
+
+This module enable the use of normal XML files as configuration files, but also
+enable Perl data codes as definition of values.
+
+The XML also don't need to be well formatted, soo you can write by hand a wild XML file and use it normally.
+
+
+See POD for more...
+
+################
+# INSTALLATION #
+################
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+##########
+# AUTHOR #
+##########
+
+Graciliano M. P. <gm@virtuasites.com.br>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+############# 
+# COPYRIGHT #
+#############
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

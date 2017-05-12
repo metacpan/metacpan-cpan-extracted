@@ -1,0 +1,23 @@
+---
+name: Clarion
+version: 1.02
+author:
+  - 'Stas Ukolov <ukoloff@cpan.org>'
+  - 'Ilya Chelpanov <ilya@macro.ru>, http://i72.narod.ru or http://i72.by.ru'
+abstract: Perl module for reading CLARION 2.1 data files
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  FileHandle: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Clarion:
+    file: lib/Clarion.pm
+    version: 1.02
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

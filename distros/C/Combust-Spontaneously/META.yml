@@ -1,0 +1,44 @@
+---
+name: Combust-Spontaneously
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: combust standalone server class
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Combust-Spontaneously
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Combust-Spontaneously/trunk
+build_requires:
+  Module::Build: 0.34
+  Test::More: 0
+requires:
+  Class::Accessor::Classy: v0.9.1
+  Config::Simple: 0
+  Digest::MD5: 0
+  Digest::SHA1: 0
+  Exception::Class: 0
+  Getopt::AsDocumented: 0
+  HTML::Entities: 0
+  HTTP::Server::Simple::Er: 0
+  LWP::MediaTypes: 0
+  Pod::Simple: 0
+  Pod::Simple::HTML: 0
+  Template: 0
+  Template::Document: 0
+  Template::Parser: 0
+  Template::Stash: 0
+  URI::Escape: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Combust::Request::Spontaneously:
+    file: lib/Combust/Spontaneously.pm
+  Combust::Spontaneously:
+    file: lib/Combust/Spontaneously.pm
+    version: v0.0.1
+generated_by: Module::Build version 1000
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

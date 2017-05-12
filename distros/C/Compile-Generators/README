@@ -1,0 +1,77 @@
+NAME
+    Compile::Generators - Python-like generator subroutines for Perl
+
+SYNOPSIS
+        use Compile::Generators;
+
+        sub gen_range :generator {
+            my ($min, $max) = @_;
+            my $num = $min;
+            my $incr;
+
+            while (not defined $max or $num < $max) {
+                $incr = shift || 1;
+                yield $num;
+                $num += $incr;
+            }
+        }
+
+        my $range = gen_range(50, 100);
+        my $i = gen_range(1);
+
+        while (my $num = $range->($i->())) {
+            print "\$num => $num\n";
+        }
+
+    When run, this prints:
+
+        $num => 50
+        $num => 51
+        $num => 53
+        $num => 56
+        $num => 60
+        $num => 65
+        $num => 71
+        $num => 78
+        $num => 86
+        $num => 95
+
+DESCRIPTION
+    Compile::Generators lets you define subroutines that return their code
+    as a generator. You can then call the generator over and over until it
+    returns an empty list. The generator can yield (return) a value and then
+    when you call it again it resumes right after the yield.
+
+USAGE
+    Any subroutine marked with the a ":generator" attribute will have its
+    code wrapped into a closure and returned by the subroutine. Any yield
+    statements will be replace with code to return/resume at that point.
+
+    Any code before the first blank line in the sub will not be a part of
+    the closure but will be executed when the sub is actually called. This
+    means that any variables that are defined before the blank line will be
+    *closed* by the generator sub.
+
+    This module uses Module::Compile to compile the generators. Look inside
+    the ".pmc" to see what is really happening.
+
+    Since this module uses "goto" statements, you cannot "yield" inside a
+    "for" loop. Perl does not allow this. However you *can* use "while"
+    statements.
+
+    Currently a "yield" statement needs to be a simple statement on it's own
+    line, since this gets parsed and replaced by a return/goto-label.
+
+    See the tests for examples.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2006. Ingy döt Net. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

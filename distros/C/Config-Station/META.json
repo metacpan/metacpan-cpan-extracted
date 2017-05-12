@@ -1,0 +1,56 @@
+{
+   "abstract" : "Load configs from files and the environment",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Config-Station",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::All" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Config-Station/issues"
+      },
+      "homepage" : "https://github.com/frioux/Config-Station",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Config-Station.git",
+         "web" : "https://github.com/frioux/Config-Station"
+      }
+   },
+   "version" : "0.002001"
+}
+

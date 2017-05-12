@@ -1,0 +1,361 @@
+{
+   "files" : [
+      {
+         "measurements" : {
+            "RootDocument" : [
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 1,
+                  "lines" : 6,
+                  "sdepth" : 0,
+                  "size" : 46
+               }
+            ]
+         },
+         "path" : "data/shelltest/basic_collect/Empty.pm"
+      },
+      {
+         "measurements" : {
+            "RootDocument" : [
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 1,
+                  "lines" : 6,
+                  "sdepth" : 0,
+                  "size" : 48
+               }
+            ]
+         },
+         "path" : "data/shelltest/basic_collect/Ignored.pm"
+      },
+      {
+         "measurements" : {
+            "Block" : [
+               {
+                  "ccomp" : 1,
+                  "col" : 10,
+                  "line" : 6,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               }
+            ],
+            "RootDocument" : [
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 1,
+                  "lines" : 10,
+                  "sdepth" : 0,
+                  "size" : 73
+               }
+            ],
+            "Sub" : [
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 6,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 24
+               }
+            ]
+         },
+         "path" : "data/shelltest/basic_collect/OneSub.pm"
+      },
+      {
+         "measurements" : {
+            "Block" : [
+               {
+                  "ccomp" : 9,
+                  "col" : 22,
+                  "line" : 6,
+                  "lines" : 20,
+                  "sdepth" : 2,
+                  "size" : 234
+               },
+               {
+                  "ccomp" : 8,
+                  "col" : 12,
+                  "line" : 7,
+                  "lines" : 17,
+                  "sdepth" : 4,
+                  "size" : 207
+               },
+               {
+                  "ccomp" : 7,
+                  "col" : 12,
+                  "line" : 8,
+                  "lines" : 15,
+                  "sdepth" : 6,
+                  "size" : 188
+               },
+               {
+                  "ccomp" : 6,
+                  "col" : 12,
+                  "line" : 9,
+                  "lines" : 13,
+                  "sdepth" : 8,
+                  "size" : 169
+               },
+               {
+                  "ccomp" : 5,
+                  "col" : 12,
+                  "line" : 10,
+                  "lines" : 11,
+                  "sdepth" : 10,
+                  "size" : 150
+               },
+               {
+                  "ccomp" : 4,
+                  "col" : 16,
+                  "line" : 11,
+                  "lines" : 9,
+                  "sdepth" : 12,
+                  "size" : 127
+               },
+               {
+                  "ccomp" : 3,
+                  "col" : 20,
+                  "line" : 12,
+                  "lines" : 7,
+                  "sdepth" : 14,
+                  "size" : 100
+               },
+               {
+                  "ccomp" : 2,
+                  "col" : 24,
+                  "line" : 13,
+                  "lines" : 5,
+                  "sdepth" : 16,
+                  "size" : 69
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 28,
+                  "line" : 14,
+                  "lines" : 3,
+                  "sdepth" : 18,
+                  "size" : 34
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 27,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 31,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 35,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 39,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 43,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 47,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 51,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 55,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 59,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 63,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 13,
+                  "line" : 67,
+                  "lines" : 3,
+                  "sdepth" : 2,
+                  "size" : 15
+               }
+            ],
+            "RootDocument" : [
+               {
+                  "ccomp" : 9,
+                  "col" : 1,
+                  "line" : 1,
+                  "lines" : 71,
+                  "sdepth" : 0,
+                  "size" : 625
+               }
+            ],
+            "Sub" : [
+               {
+                  "ccomp" : 9,
+                  "col" : 1,
+                  "line" : 6,
+                  "lines" : 20,
+                  "sdepth" : 1,
+                  "size" : 255
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 27,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 31,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 35,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 39,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 43,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 47,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 51,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 55,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 59,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 63,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               },
+               {
+                  "ccomp" : 1,
+                  "col" : 1,
+                  "line" : 67,
+                  "lines" : 3,
+                  "sdepth" : 1,
+                  "size" : 27
+               }
+            ]
+         },
+         "path" : "data/shelltest/basic_collect/SomeSubs.pm"
+      }
+   ],
+   "ignored_files" : [],
+   "metrics" : [
+      "ccomp",
+      "col",
+      "deviation",
+      "line",
+      "lines",
+      "path",
+      "sdepth",
+      "size"
+   ],
+   "targets" : [
+      "Block",
+      "RootDocument",
+      "Sub",
+      "nop"
+   ]
+}

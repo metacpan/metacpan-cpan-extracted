@@ -1,0 +1,72 @@
+[%
+    passmatrix = 1
+    link = '<a href="http://search.cpan.org/dist/' _ builder.distribution _ '">' _ builder.distribution _ "</a>"
+
+    htmltitle = 'CPAN PASS Matrix for distribution ' _ builder.distribution
+    title = 'CPAN PASS Matrix for distribution ' _ link
+
+    crumb3_name = 'Distributions' ;
+    crumb3_href = '/' ;
+    crumb2_name = builder.letter ;
+    crumb2_href = '/distro/' _ crumb2_name ;
+    crumb1_name = builder.distribution ;
+%]
+
+<p>See also: <a href="index.html">All stats</a>, <a href="http://www.cpantesters.org/distro/[% builder.letter %]/[% builder.distribution %].html">Reports for [% builder.distribution %]</a>.</p>
+
+<h2>PASS Summary - Versions</h2>
+
+<p>The following table lists the most recent version of [% builder.distribution %] to 
+have had at least one PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+
+<div class="container">
+<table class="test_results">
+<tr><th><img src="/images/headings/perlversion.png" alt="Perl Version" /></th>
+[% FOREACH os IN builder.stats_oses %]
+<th><img src="/images/headings/[% os | lower %].png" alt="[% os %]" /></th>
+[% END %]
+</tr>
+[% FOREACH perl IN builder.stats_perl %]
+[% IF perl != '0' %]
+<tr>
+<td><small>[% perl %]</small></td>
+[% FOREACH os IN builder.stats_oses %]
+[% IF builder.stats.$perl.$os.version %]<td class="PASS"><small>[% builder.stats.$perl.$os.version %]</small></td>[% ELSE %]<td></td>[% END %]
+[% END %]
+</tr>
+[% END %]
+[% END %]
+</table>
+</div>
+
+<h2>PASS Summary - Counts</h2>
+
+<p>This summary highlights the number PASS reports submitted per operating system and Perl version. 
+Please note that the summary table is based on all versions of this distribution,
+not just the current one.</p>
+
+<div class="container">
+<table class="test_stats">
+<thead>
+  <tr><th><img src="/images/headings/perlversion.png" alt="Perl Version" /></th>
+  [% FOREACH os IN builder.stats_oses %]
+  <th><img src="/images/headings/[% os | lower %].png" alt="[% stats_code.$os %]" /></th>
+  [% END %]
+  </tr>
+</thead>
+<tbody id="stats_data">
+  [% FOREACH perl IN builder.stats_perl %]
+  [% IF perl != '0' %]
+    <tr>
+    <td><small>[% perl %]</small></td>
+    [% FOREACH os IN builder.stats_oses %]
+    [% IF builder.stats.$perl.$os.count %]<td class="PASS"><small>[% builder.stats.$perl.$os.count %]</small></td>[% ELSE %]<td></td>[% END %]
+    [% END %]
+    </tr>
+  [% END %]
+  [% END %]
+</tbody>
+</table>
+</div>

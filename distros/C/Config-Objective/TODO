@@ -1,0 +1,21 @@
+- replace include_dir with include_path (multiple directories) ???
+
+- have $conf->objname return object reference instead of calling get() method?
+
+- split up test.conf into multiple, smaller config files
+  (add tests for expected failures, too)
+
+- add some sort of global token replacement facility?
+  (i.e., want to be able to do ``%include "platform/%{platform}.conf"'')
+
+- Config::Objective::Hash problems:
+  - replace 'value_optional' and 'value_type' options with a reference
+    to a subroutine to perform input validation?
+
+- architecture:
+  - make data types work recursively?
+  - allow method arguments to be the result of another method call? Example:
+      motd->gsub("%h", hostname->get());
+  - allow usage of methods to access nested data.  Example:
+      hash->find('key')->list_delete('foo');
+

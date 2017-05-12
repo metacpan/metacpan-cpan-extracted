@@ -1,0 +1,30 @@
+NAME
+    Catalyst::View::REST::YAML - YAML View Class
+
+SYNOPSIS
+        # lib/MyApp/View/REST.pm
+        package MyApp::View::REST;
+
+        use base 'Catalyst::View::REST::YAML';
+
+        1;
+
+        $c->forward('MyApp::View::REST');
+
+DESCRIPTION
+    This is the "YAML" view class.
+
+  OVERLOADED METHODS
+   process
+    Serializes $c->stash to $c->response->output.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,186 @@
+NAME
+    CGI::Pure - Common Gateway Interface Class.
+
+SYNOPSIS
+     use CGI::Pure;
+     my $cgi = CGI::Pure->new(%parameters);
+     $cgi->append_param('par', 'value');
+     my @par_value = $cgi->param('par');
+     $cgi->delete_param('par');
+     $cgi->delete_all_params;
+     my $query_string = $cgi->query_string;
+     $cgi->upload('filename', '~/filename');
+     my $mime = $cgi->upload_info('filename', 'mime');
+     my $query_data = $cgi->query_data;
+
+METHODS
+    "new(%parameters)"
+             Constructor
+
+            *       "disable_upload"
+
+                     Disables file upload.
+                     Default value is 1.
+
+            *       "init"
+
+                     Initialization variable.
+                     May be:
+                     - CGI::Pure object.
+                     - Hash with params.
+                     - Query string.
+                     Default is undef.
+
+            *       "par_sep"
+
+                     Parameter separator.
+                     Default value is '&'.
+                     Possible values are '&' or ';'.
+
+            *       "post_max"
+
+                     Maximal post length.
+                     -1 means no limit.
+                     Default value is 102400kB
+
+            *       "save_query_data"
+
+                     Flag, that means saving query data.
+                     When is enable, is possible use query_data method.
+                     Default value is 0.
+
+            *       "utf8"
+
+                     Flag, that means utf8 CGI parameters handling.
+                     Default is 1.
+
+    "append_param($param, [@values])"
+             Append param value.
+             Returns all values for param.
+
+    "clone($class)"
+             Clone class to my class.
+
+    "delete_param($param)"
+             Delete param.
+             Returns undef, when param doesn't exist.
+             Returns 1, when param was deleted.
+
+    "delete_all_params()"
+             Delete all params.
+
+    "param([$param], [@values])"
+             Returns or sets parameters in CGI.
+             params() returns all parameters name.
+             params('param') returns parameter 'param' value.
+             params('param', 'val1', 'val2') sets parameter 'param' to 'val1' and 'val2'
+             values.
+
+    "query_data()"
+             Gets query data from server.
+             There is possible only for enabled 'save_data' flag.
+
+    "query_string()"
+             Returns actual query string.
+
+    "upload($filename, [$write_to])"
+             Upload file from tmp.
+             upload() returns array of uploaded filenames.
+             upload($filename) returns handler to uploaded filename.
+             upload($filename, $write_to) uploads temporary '$filename' file to
+             '$write_to' file.
+
+    "upload_info($filename, [$info])"
+             Returns informations from uploaded files.
+             upload_info() returns array of uploaded files.
+             upload_info('filename') returns size of uploaded 'filename' file.
+             upload_info('filename', 'mime') returns mime type of uploaded 'filename' file.
+
+ERRORS
+     new():
+             400 Malformed multipart, no terminating boundary.
+             400 No boundary supplied for multipart/form-data.
+             405 Not Allowed - File uploads are disabled.
+             413 Request entity too large: %s bytes on STDIN exceeds post_max !
+             500 Bad read! wanted %s, got %s.
+             500 IO::File can\'t create new temp_file.
+             500 IO::File is not available %s.
+             Bad parameter separator '%s'.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     upload():
+             Cannot close file '%s': %s.
+             Cannot write file '%s': %s.
+             File uploads only work if you specify enctype="multipart/form-data" in your form.
+             No filehandle for '%s'. Are uploads enabled (disable_upload = 0)? Is post_max big enough?
+             No filename submitted for upload to '$writefile'.
+
+     upload_info():
+             File uploads only work if you specify enctype="multipart/form-data" in your form.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use CGI::Pure;
+
+     # Object.
+     my $query_string = 'par1=val1;par1=val2;par2=value';
+     my $cgi = CGI::Pure->new(
+             'init' => $query_string,
+     );
+     foreach my $param_key ($cgi->param) {
+             print "Param '$param_key': ".join(' ', $cgi->param($param_key))."\n";
+     }
+
+     # Output:
+     # Param 'par1': val1 val2
+     # Param 'par2': value
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use CGI::Pure;
+
+     # Object.
+     my $cgi = CGI::Pure->new;
+     $cgi->param('par1', 'val1', 'val2');
+     $cgi->param('par2', 'val3');
+     $cgi->append_param('par2', 'val4');
+
+     foreach my $param_key ($cgi->param) {
+             print "Param '$param_key': ".join(' ', $cgi->param($param_key))."\n";
+     }
+
+     # Output:
+     # Param 'par2': val3 val4
+     # Param 'par1': val1 val2
+
+DEPENDENCIES
+    Class::Utils, CGI::Deurl::XS, Error::Pure, URI::Escape.
+
+SEE ALSO
+    CGI::Pure::Fast
+        Fast Common Gateway Interface Class for CGI::Pure.
+
+    CGI::Pure::Save
+        Common Gateway Interface Class for loading/saving object in file.
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2004-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

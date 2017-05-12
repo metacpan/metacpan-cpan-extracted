@@ -1,0 +1,102 @@
+{
+   "abstract" : "Catmandu modules for working with MARC data",
+   "author" : [
+      "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-MARC",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catmandu" : "1.0201",
+            "JSON::XS" : "2.3",
+            "List::Util" : "0",
+            "MARC::File::MARCMaker" : "0.05",
+            "MARC::File::MiJ" : "0.04",
+            "MARC::File::XML" : "v1.0.3",
+            "MARC::Lint" : "0",
+            "MARC::Parser::RAW" : "0",
+            "MARC::Record" : "v2.0.6",
+            "MARC::Spec" : "v0.1.4",
+            "Memoize" : "0",
+            "Moo" : "1.0",
+            "MooX::Singleton" : "0",
+            "YAML::XS" : "0.34",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Simple::HTML" : "3.23",
+            "Test::Deep" : "0",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0",
+            "Test::Simple" : "1.001003",
+            "Test::Warnings" : "0",
+            "XML::XPath" : "1.13"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-MARC/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-MARC",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-MARC.git",
+         "web" : "https://github.com/LibreCat/Catmandu-MARC"
+      }
+   },
+   "version" : "1.10",
+   "x_contributors" : [
+      "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
+      "Carsten Klee <cKlee@users.noreply.github.com>",
+      "Chris Cormack <chrisc@catalyst.net.nz>",
+      "Jakob Voss <voss@gbv.de>",
+      "Johann Rolschewski <jorol@cpan.org>",
+      "Johann Rolschewski <rolschewski@gmail.com>",
+      "Nicolas Franck <nicolas.franck@ugent.be>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>",
+      "Robin Sheat <robin@catalyst.net.nz>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

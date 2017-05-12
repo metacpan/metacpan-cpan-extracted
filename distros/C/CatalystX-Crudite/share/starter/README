@@ -1,0 +1,32 @@
+# Installation
+
+    $ cpanm --install CatalystX-Crudite-*.tar.gz
+    $ cpanm --installdeps .
+
+# Testing
+
+To test the application in a browser, run
+
+    $ ./script/<% dist_file %>_server.pl
+
+To enable debug panels, use:
+
+    $ PLACK_DEBUG=1 ./script/<% dist_file %>_server.pl
+
+To run automated tests, use
+
+    $ prove -l
+
+To run tests from subdirectories of t/, you need to tell prove to
+recurse. For example, the following .proverc does that:
+
+    $ cat ~/.proverc
+    --color
+    --merge
+    --timer
+    --recurse
+
+To test in parallel, which is possible thanks for DBICx::TestDatabase, use:
+
+    forkprove -MMoose -MCatalyst -MDBIx::Class -j8 -lr t
+

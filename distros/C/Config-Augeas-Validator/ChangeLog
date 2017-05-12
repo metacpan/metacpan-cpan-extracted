@@ -1,0 +1,50 @@
+2012-01-19  Raphaël Pinson <raphink@cpan.org> v1.300
+
+	* Allow multiple rulesdirs.
+
+2011-10-11  Raphaël Pinson <raphink@cpan.org> v1.200
+
+	* Remove rules parameter, add level=ignore;
+	* Add span to detect line numbers in files;
+	* Cleanup code with constants;
+	* Analyze the whole system if no files are given;
+	* Add tags system.
+
+2011-09-13  Raphaël Pinson v1.110
+
+	* Add SVN hook examples.
+
+2011-09-12  Raphaël Pinson v1.100
+
+	* Colored output;
+	* Add warn_code, default to 2.
+
+2011-09-08  Raphaël Pinson v1.000
+
+	* Add verbose, debug and quiet modes;
+	* Add recursivity;
+	* Add nofail mode;
+	* Add generic excludes;
+	* Improve error management;
+	* Instantiate Augeas only once;
+	* Make default system-wide rulesdir.
+
+2011-09-05  Raphaël Pinson v0.103
+
+	* Fix return code in augeas-validator in rulesdir mode;
+	* Remove obsolete call to Config::IniFiles;
+	* Fix doc;
+	* Add all examples to MANIFEST;
+	* Check that lens was properly loaded.
+
+2011-09-05  Raphaël Pinson v0.102
+
+	* Fix unit tests
+
+2011-09-05  Raphaël Pinson v0.101
+
+	* First release
+
+2011-04-08  Raphaël Pinson v00.1
+
+	* Original version.

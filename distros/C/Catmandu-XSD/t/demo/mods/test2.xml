@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.loc.gov/mods/v3"
+    xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-6.xsd"
+    version="3.6">
+
+<identifier type="hdl">http://hdl.handle.net/1854/LU-2001771</identifier>
+<identifier type="isbn">9786161200855</identifier>
+
+<titleInfo lang="und">
+    <title>Seaweeds of Mu Ko Tha Lae Thai (SE Thailand): methodologies and field guide to the dominant species</title>
+</titleInfo>
+
+<language>
+    <languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+</language>
+<accessCondition lang="eng" type="useAndReproduction">I have transferred the copyright for this publication to the publisher</accessCondition>
+
+
+<genre authority="ugent">book</genre>
+
+<classification authority="ugent-classification">B1</classification>
+<classification authority="ugent-publication-status">published</classification>
+<classification authority="ugent-publication-credit">ugent</classification>
+
+
+<name type="personal" authority="ugent">
+    <namePart type="given">Eric</namePart>
+    <namePart type="family">Coppejans</namePart>
+    <displayForm>Eric Coppejans</displayForm>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">aut</roleTerm>
+        <roleTerm type="text" lang="eng">author</roleTerm>
+    </role>
+    <nameIdentifier type="ugent">801000232150</nameIdentifier></name>
+
+<name type="personal">
+    <namePart type="given">Anchana</namePart>
+    <namePart type="family">Prathep</namePart>
+    <displayForm>Anchana Prathep</displayForm>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">aut</roleTerm>
+        <roleTerm type="text" lang="eng">author</roleTerm>
+    </role></name>
+
+<name type="personal" authority="ugent">
+    <namePart type="given">Frédérik</namePart>
+    <namePart type="family">Leliaert</namePart>
+    <displayForm>Frédérik Leliaert</displayForm>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">aut</roleTerm>
+        <roleTerm type="text" lang="eng">author</roleTerm>
+    </role>
+    <nameIdentifier type="ugent">001992372724</nameIdentifier>
+    <nameIdentifier type="ugent">801001131321</nameIdentifier></name>
+
+<name type="personal">
+    <namePart type="given">Khanjanapaj</namePart>
+    <namePart type="family">Lewmanomont </namePart>
+    <displayForm>Khanjanapaj Lewmanomont</displayForm>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">aut</roleTerm>
+        <roleTerm type="text" lang="eng">author</roleTerm>
+    </role></name>
+
+<name type="personal" authority="ugent">
+    <namePart type="given">Olivier</namePart>
+    <namePart type="family">De Clerck</namePart>
+    <displayForm>Olivier De Clerck</displayForm>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">aut</roleTerm>
+        <roleTerm type="text" lang="eng">author</roleTerm>
+    </role>
+    <nameIdentifier type="ugent">801000975010</nameIdentifier>
+    <nameIdentifier type="orcid" typeURI="http://orcid.org/">0000-0002-3699-8402</nameIdentifier></name>
+<name type="corporate">
+    <displayForm lang="eng">Department of Biology</displayForm>
+    <nameIdentifier type="ugent">WE11</nameIdentifier>
+    <role>
+        <roleTerm authority="marcrelator" authorityURI="http://id.loc.gov/vocabulary/relators" type="code">sht</roleTerm>
+        <roleTerm type="text" lang="eng">department</roleTerm>
+    </role>
+</name>
+
+
+
+
+
+<originInfo eventType="publication">
+    <place>
+        <placeTerm>Bangkok, Thailand</placeTerm>
+    </place>
+    <publisher>Biodiversity Research and Training Program (BRT)</publisher>
+    <dateIssued encoding="w3cdtf">2010</dateIssued>
+</originInfo>
+
+    <physicalDescription>
+        <extent>274 p.</extent>
+    </physicalDescription>
+
+    <relatedItem type="series">
+        <titleInfo>
+            <title>BRT Book Series, Area-Based</title>
+        </titleInfo>
+        <part>
+            <detail type="volume">
+                <number>11</number>
+            </detail>
+        </part>
+    </relatedItem>
+
+<subject>
+    <occupation lang="eng">Biology and Life Sciences</occupation>
+</subject>
+
+<location>
+    <url displayLabel="pre-proof_Coppejans_Thailand_fieldguide.pdf" access="raw object">http://localhost:5000/publication/2001771/file/2001778</url>
+    <holdingExternal>
+        <dcterms:simpledc xmlns:dcterms="http://purl.org/dc/elements/1.1/">
+            <dcterms:accessRights>restricted</dcterms:accessRights>
+            <dcterms:valid>2012-02-28 16:30:40</dcterms:valid>
+            <dcterms:format>application/pdf</dcterms:format>
+            <dcterms:coverage>fullText</dcterms:coverage>
+            <dcterms:type>http://purl.org/dc/dcmitype/Text</dcterms:type>
+            <dcterms:extent>9999491</dcterms:extent>
+            <dcterms:title>pre-proof_Coppejans_Thailand_fieldguide.pdf</dcterms:title>
+        </dcterms:simpledc>
+    </holdingExternal>
+</location>
+
+<note type="preferred citation" lang="eng">Coppejans, Eric, Anchana Prathep, Frédérik Leliaert, Khanjanapaj Lewmanomont , and Olivier De Clerck. 2010. Seaweeds of Mu Ko Tha Lae Thai (SE Thailand): Methodologies and Field Guide to the Dominant Species. BRT Book Series, Area-Based. Vol. 11. Bangkok, Thailand: Biodiversity Research and Training Program (BRT).</note>
+
+<recordInfo lang="eng">
+    <recordContentSource>Ghent University Library</recordContentSource>
+    <recordIdentifier>pug01:2001771</recordIdentifier>
+    <recordCreationDate encoding="w3cdtf">2012-01-24T14:54:12Z</recordCreationDate>
+    <recordChangeDate encoding="w3cdtf">2012-02-28T16:30:40Z</recordChangeDate>
+    <languageOfCataloging>
+        <languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+    </languageOfCataloging>
+    <recordOrigin>Record created by  and validated by UGent on 2012-02-28T16:30:40Z</recordOrigin>
+    <recordInfoNote>Last reviewed by </recordInfoNote>
+</recordInfo>
+
+</mods>

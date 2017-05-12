@@ -1,0 +1,55 @@
+---
+abstract: 'Very simple CGI web framework'
+author:
+  - 'MacGyveR <dumb@cpan.org>'
+build_requires:
+  HTTP::Daemon: 0
+  HTTP::Response: 0
+  HTTP::Status: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Mungo
+provides:
+  CGI::Mungo:
+    file: lib/CGI/Mungo.pm
+    version: 1.9
+  CGI::Mungo::Base:
+    file: lib/CGI/Mungo/Base.pm
+  CGI::Mungo::Log:
+    file: lib/CGI/Mungo/Log.pm
+  CGI::Mungo::Request:
+    file: lib/CGI/Mungo/Request.pm
+  CGI::Mungo::Response:
+    file: lib/CGI/Mungo/Response.pm
+  CGI::Mungo::Response::Base:
+    file: lib/CGI/Mungo/Response/Base.pm
+  CGI::Mungo::Response::NotModified:
+    file: lib/CGI/Mungo/Response/NotModified.pm
+  CGI::Mungo::Response::Raw:
+    file: lib/CGI/Mungo/Response/Raw.pm
+  CGI::Mungo::Response::TemplateToolkit:
+    file: lib/CGI/Mungo/Response/TemplateToolkit.pm
+  CGI::Mungo::Session:
+    file: lib/CGI/Mungo/Session.pm
+  CGI::Mungo::Utils:
+    file: lib/CGI/Mungo/Utils.pm
+requires:
+  CGI: 0
+  CGI::Simple::Cookie: 0
+  Carp: 0
+  Class::Load: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Spec: 0
+  HTTP::Response: 0
+  Template: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.9

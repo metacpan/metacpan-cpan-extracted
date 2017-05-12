@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl -wT
+#########
+# Author:        rmp
+# Maintainer:    $Author: zerojinx $
+# Created:       2007-03-28
+# Last Modified: $Date: 2015-09-21 10:19:13 +0100 (Mon, 21 Sep 2015) $
+# Id:            $Id: application 470 2015-09-21 09:19:13Z zerojinx $
+# Source:        $Source: /cvsroot/clearpress/clearpress/cgi-bin/application,v $
+# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/cgi-bin/application $
+#
+use strict;
+use warnings;
+use ClearPress::controller;
+
+our $VERSION = q[468];
+
+main();
+0;
+
+sub main {
+  my $util = ClearPress::util->new();
+  ClearPress::controller->handler($util);
+}

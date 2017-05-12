@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+ <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>[% c.config.name || 'CatalystX::CRUD::YUI Application' %]</title>
+  <link rel="shortcut icon" href="[% static_url %]/favicon.ico" type="image/x-icon" />
+  [% PROCESS crud/yui_header.tt         %]
+  [% PROCESS crud/crud_header.tt        %]
+  [% PROCESS crud/page_head_maker.tt    %]
+  <script type="text/javascript">
+    [% INCLUDE crud/yui_menu.tt %]
+  </script>
+ </head>
+ <body class="yui-skin-sam"><!-- YUI requires this class -->
+  <!-- yui history feature requires these -->
+  <input id="yui_history_field" type="hidden" />
+  <iframe id="yui_history_iframe" 
+    src="[% static_url %]/empty.txt"></iframe>
+
+  <div id="crud-header">
+ [%
+    # default is to just load menu files from disk each time
+    # could also read it at start time via tt_config.tt, 
+    # but then could not make menu changes to a running app.
+    PROCESS crud/schema_menu.tt;
+    PROCESS crud/menu.tt;
+ %]
+  </div>
+  

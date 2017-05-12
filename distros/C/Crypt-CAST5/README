@@ -1,0 +1,34 @@
+Crypt::CAST5 version 0.05
+=========================
+
+This module implements the CAST5 block cipher using compiled C code for
+increased speed. See RFC 2114.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   cpansign -v
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Module::Signature is needed to verify the signature
+  Test::More is needed to run the tests
+  Crypt::CBC is useful, but not required
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002-2006 Bob Mathews
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd2a
+registers:
+  AF: 15670
+  AF_: 0
+  BC: 45646
+  BC_: 0
+  DE: 48572
+  DE_: 0
+  HL: 51790
+  HL_: 0
+  I: 0
+  IX: 12469
+  IY: 59342
+  PC: 4
+  R: 2
+  SP: 0

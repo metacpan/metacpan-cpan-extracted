@@ -1,0 +1,77 @@
+Revision history for Const::Exporter
+
+v0.2.4  2015-01-08
+        - No functional changes.
+
+        [Documentation]
+        - Bumped copyright year.
+
+        [Incompatabilities]
+        - Bumped minimum Perl version to v5.10.1.
+
+        [Other Changes]
+        - Removed version from version, to workaround the issue where
+          Carton thinks v0.9909 < v0.77 (which is the version included
+          w/Perl v5.10.1 anyway).
+
+v0.2.3  2014-08-16
+        [Other Changes]
+        - MANIFEST.SKIP updated to ignore .travis.yml.
+
+        - Fixed license in Makefile.PL to make CPANTS happy.
+
+v0.2.2  2014-06-24
+        [Documentation]
+         - Added testing requirements to README.
+
+        [Other Changes]
+        - Test::Warnings is only used if the RELEASE_TESTING variable
+          is set.
+
+v0.2.1  2014-06-04
+        [Documentation]
+         - Corrected typos in POD.
+
+         - Added requirements to README.
+
+         - Reformatted Changes.
+
+v0.2.0   2014-05-29
+         [Bug Fixes]
+         - Bug Fix: scalar constants can have blessed values.
+
+         [Documentation]
+         - Fixed typos in POD and Changes file.
+
+	 - Fixed formatting of Changes file.
+
+	 - Cleaned up details from README using Pod::Readme.
+
+         [Other Changes]
+         - Updated MANIFEST.SKIP.
+
+         - Perltidied source code.
+
+	 - Added QA tests to the git repo.
+
+         - Removed unnecessary dependency from Makefile.PL.
+
+v0.1.2   2014-02-24
+
+         - Import dies if given the tag "all", since it's reserved.
+
+         - Various documentation improvements.
+
+         - Code cleanup.
+
+v0.1.1   2014-02-23
+
+         - Added missing Changes and MANIFEST.SKIP files.
+
+         - Added additional modules to SEE ALSO section.
+
+         - Updated README.
+
+v0.1.0   2014-02-23
+
+         - First public release of Const::Exporter.

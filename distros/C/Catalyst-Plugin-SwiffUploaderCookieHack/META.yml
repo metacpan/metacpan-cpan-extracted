@@ -1,0 +1,32 @@
+---
+abstract: 'Hack to get session restored when'
+author:
+  - 'Todd Wade <waveright@gmail.com>'
+build_requires:
+  CGI::Simple::Cookie: 0
+  Catalyst::Plugin::Session::State::Cookie: 0.17
+  Catalyst::Plugin::Session::Store::File: 0.18
+  Catalyst::Runtime: 5.80015
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+  Test::WWW::Mechanize::Catalyst: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.94'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-SwiffUploaderCookieHack
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:trwww/Catalyst-Plugin-SwiffUploaderCookieHack.git
+version: 0.01

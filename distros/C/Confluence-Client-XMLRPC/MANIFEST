@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+examples/det_group_mbrship.pl
+examples/upload_files.pl
+examples/upload_users.pl
+lib/Confluence/Client/XMLRPC.pm
+t/00-load.t
+t/release-pod-syntax.t

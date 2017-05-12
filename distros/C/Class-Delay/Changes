@@ -1,0 +1,6 @@
+0.02	Wednesday 22nd October, 2003
+	Fixed a test failure - now the triggering method will also return the
+	nominated value also.
+
+0.01	Tuesday 21st October, 2003
+	Initial CPAN release

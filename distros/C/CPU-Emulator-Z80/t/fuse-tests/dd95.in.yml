@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 149
+name: dd95
+registers:
+  AF: 10528
+  AF_: 0
+  BC: 22955
+  BC_: 0
+  DE: 17036
+  DE_: 0
+  HL: 14996
+  HL_: 0
+  I: 0
+  IX: 17661
+  IY: 62019
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,18 @@
+Revision history for Perl extension CGI::HTMLError.
+
+1.00  Slight tweak in the regex for finding the line number
+      First CPAN release
+
+0.05  Regex for finding line number debugged; sometimes
+      the last digit was missed.
+
+0.04  Check for undefined $SIG{__DIE__} handler added
+
+0.03  Documentation update
+
+0.02  Small bug-fixes
+
+0.01  Sun Oct 20 16:45:28 2002
+	- original version; created by h2xs 1.21 with options
+		-X -v0.01 -nCGI::HTMLError
+

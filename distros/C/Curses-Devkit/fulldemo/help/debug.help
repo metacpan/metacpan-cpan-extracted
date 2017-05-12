@@ -1,0 +1,26 @@
+The Cdk Perl5 extension has a somewhat powerful diagnostics element 
+associated with it. It really needs it because of the behavior of Cdk. Cdk
+was written using curses; and one of the behaviors set when using Cdk is 
+that </R>noecho<!R> is turned on. This means that whenever a character is printed
+to the screen using </R>print<!R> or </R>printf<!R> they won't show up. This means another
+method of diagnostics must be provided.
+
+</U>Cdk::Diag Module:<!U>
+   The Cdk::Diag module currently only has one method: Log. It writes to the
+log file if diagnostics has been turned on. If diagnostics has been turned
+on, the performance of the Cdk Perl script will take a severe performance 
+hit, depending on how many diagnostics are turned on.
+
+</U>Turning on the Diagnostics:<!U>
+   To turn the diagnostics on, there is an environment variable called 
+</R>CDKDIAG<!R> which needs to be set. This currently only really supports one 
+value: </B>ALL<!B>. There is work being done right now so diagnostics can be turned
+on by method name, class name, required values only, default values only, 
+methods called....
+
+</U>Diagnostic File:<!U>
+   The default diagnostic filename is </R>cdkdiag.log<!R> but can be changed by
+setting the environment variable </R>CDKLOGFILE<!R>.
+
+<C><#HL(70)>
+<C>Document Created: June, 1995

@@ -1,0 +1,44 @@
+---
+abstract: 'Create a multilingual web page'
+author:
+  - 'Nigel Horne <njh@bandsman.co.uk>'
+build_requires:
+  IPC::System::Simple: '0'
+  Test::Compile: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::Requires: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Lingua
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::Info: '0.6'
+  Class::Autouse: '0'
+  Class::Load: '0'
+  DBD::SQLite: '0'
+  Data::Validate::IP: '0'
+  HTTP::BrowserDetect: '0'
+  I18N::AcceptLanguage: '0'
+  I18N::LangTags::Detect: '1.04'
+  Locale::Language: '0'
+  Locale::Object::Country: '0'
+  Net::Subnet: '0'
+  Net::Whois::IANA: '0'
+  Net::Whois::IP: '0'
+  Sys::Syslog: '0'
+  perl: '5.006002'
+resources:
+  repository: git://github.com/nigelhorne/CGI-Lingua.git
+version: '0.58'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

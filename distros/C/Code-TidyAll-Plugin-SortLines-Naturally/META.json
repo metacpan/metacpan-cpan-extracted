@@ -1,0 +1,83 @@
+{
+   "abstract" : "Sort lines of a file using Unicode::Collate::Locale",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Code-TidyAll-Plugin-SortLines-Naturally",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll::Plugin" : "0",
+            "Moo" : "0",
+            "Unicode::Collate::Locale" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Code::TidyAll" : "0",
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "open" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/Code-TidyAll-Plugin-SortLines-Naturally/issues"
+      },
+      "homepage" : "https://github.com/oalders/code-tidyall-plugin-sortlines-naturally",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/code-tidyall-plugin-sortlines-naturally.git",
+         "web" : "https://github.com/oalders/code-tidyall-plugin-sortlines-naturally"
+      }
+   },
+   "version" : "0.000003",
+   "x_contributors" : [
+      "Gregory Oschwald <goschwald@maxmind.com>",
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ]
+}
+

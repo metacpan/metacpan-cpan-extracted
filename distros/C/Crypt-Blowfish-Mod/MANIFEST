@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+Mod.pm
+Mod.xs
+README
+blowfish.h
+dist.ini
+t/Mod.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

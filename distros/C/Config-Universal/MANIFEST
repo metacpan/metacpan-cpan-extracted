@@ -1,0 +1,18 @@
+MANIFEST
+README
+Makefile.PL
+lib/Config/Universal.pm
+samples/sample1.conf
+samples/sample2.conf
+samples/sample3-a.conf
+samples/sample1-simple.pl
+samples/sample2-array.pl
+samples/sample3-b.conf
+samples/sample3-multiple.pl
+samples/sample4-a.conf
+samples/sample4-b.conf
+samples/sample4-include.pl
+samples/sample5-hierarchical.pl
+samples/sample5.conf
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,82 @@
+
+=pod
+
+Sometimes you are fetching static content like images, JavaScript code and CSS files from a
+different server that your L<Catalyst> application is running on, let's say a CDN
+(content delivery network).
+For development, this often should not be the case because your local files may differ from
+the files on your CDN.  Changing the URIs to the static content everytime you upload a new
+version of your application is not a solution and leads to mistakes.
+
+Entering L<CatalystX::UriForStatic>:
+
+=head2 CatalystX::UriForStatic takes care of your static host name
+
+L<CatalystX::UriForStatic> either creates a local or production URI to your static files
+depending on your configuration!  If your differences are that simple so you just can switch
+the host names, L<CatalystX::UriForStatic> is for you.
+
+=head2 Example
+
+=head3 Production environment
+
+Let's pretend this is your L<Catalyst> application while C<sysenv> controls whether your
+application is a development or production instance and C<static_host> defines the
+host name of your static files for production environment:
+
+    package MyApp;
+    use Moose;
+    use namespace::autoclean;
+    
+    extends 'Catalyst';
+    with 'CatalystX::UriForStatic';
+    
+    __PACKAGE__->config(
+        static_host => 'http://static.example.net',
+        sysenv      => 'production',
+        ...
+    );
+
+In your templates where you point to your images etc. change the URIs to:
+
+  <% $c->uri_for_static('/static/foo.png') %>
+
+(Note this is Mason syntax.)
+
+On your production environment like the one above this will return C<http://static.example.net/static/foo.png>.
+
+=head3 Development or local environment
+
+Leave everything as it and add a new config file C<myapp_local.yaml> (See L<Catalyst::Plugin::ConfigLoader>) with
+the following configuration line:
+
+  sysenv  local
+
+Now, calling L<CatalystX::UriForStatic/uri_for_static> will return something like
+C<http://localhost/static/foo.png> or whatever your local host name is.
+
+=head2 Not perfect in either way
+
+There are plenty of different ways of your specific CDN implementation like not having the same paths for both
+systems.  While adding a folder name to the C<static_host> configuration is not an issue, removing one from
+the local path is.  Suggestions are very welcome, as well as patches and so on.
+
+=head2 Installation
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=head2 License and Copyright
+
+Copyright (C) 2011 Matthias Dietrich
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

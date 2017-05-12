@@ -1,0 +1,57 @@
+{
+   "abstract" : "Smooth over incompatible changes in Carp 1.25",
+   "author" : [
+      "Michael G Schwern <schwern@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Carp-Fix-1_25",
+   "no_index" : {
+      "package" : [
+         "Carp::Fix::1_25::Fixed"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Carp::Fix::1_25" : {
+         "file" : "lib/Carp/Fix/1_25.pm",
+         "version" : "1.000001"
+      },
+      "Carp::Fix::1_25::Fixed" : {
+         "file" : "lib/Carp/Fix/1_25.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/schwern/Carp-Fix-1_25/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/schwern/Carp-Fix-1_25/tree/master"
+      }
+   },
+   "version" : "1.000001"
+}

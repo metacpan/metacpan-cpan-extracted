@@ -1,0 +1,32 @@
+The ClearPrompt module provides a wrapper around the clearprompt
+ClearCase utility. It provides the following conveniences:
+
+=> It handles Unix/NT quoting and pathing issues automatically.
+
+=> It takes over the task of defining, creating, reading, and unlinking
+temp files for those clearprompt modes which leave their output in a
+file.
+
+=> It supports use of clearprompt to fire off asynchronous dialog boxes.
+
+=> It allows error messages to be automatically caught and directed to
+dialog boxes when operating in GUI mode.
+
+=> It optionally handles "trigger series" prompting.
+
+=> It adds a directory chooser, which clearprompt per se is utterly
+unable to do. This one simply uses opendir/readdir/closedir and the
+clearprompt list chooser; it's kind of clunky but better than nothing
+if you need to choose directories.
+
+Most of the documentation for this module is in the standard POD
+format so see the .pm file for further reading.  However, as with
+many modules, the simplest introduction is to just download it and run
+the installation through the "make test" step.  Once you've done
+this, assuming it works ok, you'll have a pretty clear high-level
+overview idea of what it does and the documentation can just fill in
+gaps. And at that point if you decide to use it you're a simple "make
+install" away; if not, just remove the directory.
+
+As the POD also notes, you can crib some usage examples from the test
+script.

@@ -1,0 +1,14 @@
+---
+name: CAM-Template
+version: 0.93
+author:
+  - 'Clotho Advanced Media, Inc. I<cpan@clotho.com>'
+abstract: Clotho-style search/replace HTML templates
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  CAM::Template:
+    file: lib/CAM/Template.pm
+    version: 0.93
+generated_by: Module::Build version 0.2611

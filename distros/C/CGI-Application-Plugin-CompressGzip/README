@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution CGI-Application-Plugin-CompressGzip, version
+1.02:
+
+  Add gzip compression to CGI::Application
+
+This software is copyright (c) 2010 by Rhesa Rozendaal.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

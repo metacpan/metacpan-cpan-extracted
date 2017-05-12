@@ -1,0 +1,46 @@
+---
+abstract: 'The PBKDF2 password hash algorithm'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires:
+  Encode: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-PBKDF2
+no_index:
+  directory:
+    - t
+requires:
+  Carp: '0'
+  Digest: '1.16'
+  Digest::HMAC: '1.01'
+  Digest::SHA: '0'
+  Digest::SHA3: '0.22'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Moo: '2'
+  Moo::Role: '2'
+  Scalar::Util: '0'
+  Try::Tiny: '0.04'
+  Type::Tiny: '0'
+  Types::Standard: '1.000005'
+  namespace::autoclean: '0'
+  strictures: '2'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-PBKDF2
+  homepage: http://metacpan.org/release/Crypt-PBKDF2
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/Crypt-PBKDF2.git
+version: '0.161520'
+x_authority: cpan:ARODLAND

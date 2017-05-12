@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_compile.t
+t/01_factory.t
+t/lib/MyService/Base.pm
+t/lib/MyService/Member.pm
+t/lib/MyService/Member/Basic.pm
+t/lib/MyService/Member/Free.pm
+t/lib/MyService/Member/VIP.pm
+lib/Class/DBI/Plugin/Factory.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,45 @@
+# This file documents the revision history for Perl extension Catalyst::Model::Formhandler.
+
+0.009 - 2016 08-31
+  - Fixed incorrect dependency name
+  - Generate meta.json
+
+0.008 - 2016 27-19
+  - When creating the form, be sure to grab configuration since this
+    is a per request model and that allows for configuration that might
+    be context dependent.
+
+0.007 - 2015-11-12
+  - Better error message if the injected model has a syntax error.
+  - fixed schema_model_name
+
+0.006 - 2015-05-18
+  - Tweaked the test cases a bit and added a missing test dependency
+
+0.005 - 2015-05-08
+  - Removed debugging output code mistakeningly left in.
+
+0.004 - 2015-05-03
+  - Fixed a bug when calling the same form over and over causes the form
+    to reprocess params even if you don't ask for any.
+  - Injection new form model ::IsValid that returns the form only if its valid
+    and undef otherwise.
+
+0.003 - 2015-05-03
+  - Tweaks to how set set and guess a target action for a form if you do not
+    provide one.
+  - ALlows you to set an action attribute "FormModelTarget($form_model)" in an
+    action in the current controller to set that as the form target action.  This
+    is considered experimental.
+
+0.002 - 2015-05-03
+  - When calling the model for the second and more times after creating it,
+    pass any args (if any) to ->process.
+  - When calling for the model you may now use a single first positioned argument
+    to set the item or item_id, to cover a common use case.
+  - Allow you to control if we use Request->body_data or Request->body_parameters
+    when accessing POSTed data.
+  - Allow you to disable form auto process of request body globally.
+
+0.001 - 2015-04-22
+  - First Release 

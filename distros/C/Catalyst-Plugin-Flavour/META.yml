@@ -1,0 +1,23 @@
+---
+name: Catalyst-Plugin-Flavour
+version: 0.03
+author:
+  - 'Daisuke Murase E<lt>typester@cpan.orgE<gt>'
+abstract: Catalyst plugin for request flavours.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.50
+provides:
+  Catalyst::Plugin::Flavour:
+    file: lib/Catalyst/Plugin/Flavour.pm
+    version: 0.03
+  Catalyst::Plugin::Flavour::Data:
+    file: lib/Catalyst/Plugin/Flavour/Data.pm
+  Catalyst::Request:
+    file: lib/Catalyst/Plugin/Flavour.pm
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,28 @@
+changes from 0.04 to 0.05
+=========================
+
+  * authenticate method was not passing authinfo params on to Authen::CAS::Client 
+    meaning that gateway and renew would not work properly.
+
+changes from 0.03 to 0.04
+=========================
+
+  * fixing a bug where the uri lookup would send the cas ticket back to your sso authority
+    which resulted in being unable to auth properly
+
+changes from 0.02 to 0.03
+=========================
+
+  * making service uri lookup work with actions that have captures/arguments
+
+changes from 0.01 to 0.02
+=========================
+
+  * removed end action in test framework to avoid loading of RenderView action
+
+changes from 0.00 to 0.01
+=========================
+
+  * the call to $realm->find_user() wasn't including $c
+
+  * minor fix with the ordering of the sections in the documentation

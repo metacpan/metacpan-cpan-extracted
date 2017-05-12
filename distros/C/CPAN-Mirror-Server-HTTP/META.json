@@ -1,0 +1,54 @@
+{
+   "abstract" : "Simple HTTP server for serving a CPAN mirror",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Mirror-Server-HTTP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "3.12",
+            "Getopt::Long" : "2.35",
+            "HTML::Tiny" : "1.05",
+            "HTTP::Daemon" : "5.827",
+            "HTTP::Response" : "0",
+            "HTTP::Status" : "0",
+            "MIME::Base64" : "3.07",
+            "Number::Bytes::Human" : "0.07",
+            "Pod::Usage" : "1.33",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/cpan-mirror-server-http",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/cpan-mirror-server-http.git",
+         "web" : "https://github.com/bingos/cpan-mirror-server-http"
+      }
+   },
+   "version" : "0.04"
+}
+

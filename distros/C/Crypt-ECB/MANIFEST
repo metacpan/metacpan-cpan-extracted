@@ -1,0 +1,28 @@
+ARTISTIC
+CHANGES
+ECB.pm
+eg/ecb.pl
+GPLv1
+Makefile.PL
+MANIFEST			This list of files
+patches/XTEA-0.0107.patch
+patches/XTEA_PP-0.0106.patch
+README
+README.XTEA
+t/10-options.t
+t/15-sanity.t
+t/20-encryption.t
+t/25-decryption.t
+t/30-start-crypt-finish.t
+t/35-keychange.t
+t/40-padding.t
+t/45-padding-custom.t
+t/50-padding-fullblock.t
+t/60-substrings+nulls.t
+t/80-preexisting.t
+t/85-preexisting-xtea.t
+t/90-funcstyle.t
+t/Crypt/Dummy.pm
+t/Testdata.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

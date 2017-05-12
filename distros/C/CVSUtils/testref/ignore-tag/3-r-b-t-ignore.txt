@@ -1,0 +1,34 @@
+2000-07-20 10:39  sreinst
+
+	* Alib/a.h (1.2), Blib/b.h (1.2), Clib/c.h (1.2), common/a.h (1.1,
+	MyTagBlic0, MyTagCLIB5, myTag4,
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_,
+	mytag3a, mytag3, mytag2a, mytag2, mytag,
+	My_Manual_Tag_20_43_00_27_07_2000_a,
+	My_Manual_Tag_20_43_00_27_07_2000,
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion,
+	Clib1, Blib1, Alib1, App1), common/b.h (1.1, MyTagBlic0,
+	MyTagCLIB5, myTag4,
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_,
+	mytag3a, mytag3, mytag2a, mytag2, mytag,
+	My_Manual_Tag_20_43_00_27_07_2000_a,
+	My_Manual_Tag_20_43_00_27_07_2000,
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion,
+	Clib1, Blib1, Alib1, App1), common/c.h (1.1, MyTagBlic0,
+	MyTagCLIB5, myTag4,
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_,
+	mytag3a, mytag3, mytag2a, mytag2, mytag,
+	My_Manual_Tag_20_43_00_27_07_2000_a,
+	My_Manual_Tag_20_43_00_27_07_2000,
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion,
+	Clib1, Blib1, Alib1, App1): Created a new "common" directory and
+	moved all the .h files to that directory.
+
+2000-07-18 06:40  sreinst
+
+	* Alib/Alib.dsp (1.1), Alib/a.c (1.1), Alib/a.h (1.1),
+	Alib/Alib.dsw (1.1), App/App.dsp (1.1), App/App.dsw (1.1),
+	App/app.c (1.1), Blib/Blib.dsp (1.1), Blib/Blib.dsw (1.1), Blib/b.c
+	(1.1), Blib/b.h (1.1), Clib/c.c (1.1), Clib/Clib.dsp (1.1),
+	Clib/Clib.dsw (1.1), Clib/c.h (1.1): Initial revision
+

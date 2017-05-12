@@ -1,0 +1,12 @@
+Note:
+-----
+Including the file "ext-ux-livegrid.css" is mandatory, otherwise the view will
+not be rendered properly.
+
+Author:
+-------
+Thorsten Suckow-Homberg <ts@siteartwork.de>
+
+Project Home:
+-------------
+http://www.siteartwork.de/livegrid

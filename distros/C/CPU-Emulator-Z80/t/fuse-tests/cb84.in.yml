@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 132
+  54976:
+    - 114
+name: cb84
+registers:
+  AF: 52736
+  AF_: 0
+  BC: 57548
+  BC_: 0
+  DE: 54021
+  DE_: 0
+  HL: 54976
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

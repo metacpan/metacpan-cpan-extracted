@@ -1,0 +1,17 @@
+2003/01/11
+
+Fixed Makefile.PL to correctly quote hash key 'File::Spec'
+
+2003/07/07
+
+Modified method 'invoke' to not check for availability of method.
+Instead, just make attempt to call method and let client handle exceptions.
+Also, modified API to better handling invocation of methods.  Now just past
+as first parameter method name and list of arguments which will be handed
+of to invoked method.
+
+NOTE : Only class methods should really be called this way as there is no way
+to call the method based on an object.  Invoke is made available as a convenience
+method and is not really necessary as once the class is loaded it should be
+trivial to just handle calling methods of this class directly.
+

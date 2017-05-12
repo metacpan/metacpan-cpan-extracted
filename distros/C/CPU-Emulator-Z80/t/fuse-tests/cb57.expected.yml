@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb57
+registers:
+  AF: 26160
+  AF_: 0
+  BC: 44850
+  BC_: 0
+  DE: 21290
+  DE_: 0
+  HL: 55888
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

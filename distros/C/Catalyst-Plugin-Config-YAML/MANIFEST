@@ -1,0 +1,12 @@
+Changes
+lib/Catalyst/Plugin/Config/YAML.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Catalyst-Plugin-Config-YAML.t
+t/components.t
+t/config.yml
+t/config2.yml
+t/Foo/C/Bar.pm
+t/multifiles.t

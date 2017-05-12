@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 85739b4718a98226122afb503e4b6aedc52b8dcd Changes
+SHA1 6f4d6dd9592d039a9f3d6c0d97d08ec1a84d9afc INSTALL
+SHA1 8b646c25bac537d8bc5e9d7af2fc5c2018b7f304 LICENSE
+SHA1 9dcaa66d14d4b9e16fa3b677b52ac9746c45f835 MANIFEST
+SHA1 51d68d0c6adea3b2bab48f8ce3ebfd191be38b87 MANIFEST.SKIP
+SHA1 63a06d6b9a75afb7add315a0ce22adff6183d771 META.yml
+SHA1 540fa58c202327bb97f3093bf60182bcc5eb8556 Makefile.PL
+SHA1 7530d1eeb593107b67d26d1950b737113155c7ab README
+SHA1 20c73697e1713638140c719d8eaa19a275ed43a5 inc/Module/AutoInstall.pm
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 ca13d9875e1249f6e84f7070be8152c34837955e inc/Module/Install/AutoInstall.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b501b0df59a5cd235cca473889f82c3d3429f39e inc/Module/Install/Include.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 a77b735cfea756971ff3bb1182be552a0a7a77a0 lib/Class/Rebless.pm
+SHA1 fbfb8f448a21e7f98bd16567e9a2961aa8fbaf35 t/01-simple.t
+SHA1 5edae44e1affde073216b1a4794622f7a41c31d2 t/boilerplate.t
+SHA1 6474d0d48688227a97313ca21115f98546a3d96b t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 2ed3f06c9bc5c594190f0080f2b75b1949f24b99 t/use.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk40V6AACgkQcNs4LFsgNuOK/QCgr62cYwA2y7kxzyMz6oGsVFIc
+gTwAoOfZqYq78flLhUIbrYYdJg0ieAW5
+=rgLu
+-----END PGP SIGNATURE-----

@@ -1,0 +1,23 @@
+CPANPLUS::Shell::Curses is a graphical user interface bases
+on Curses::UI to the newly developed CPANPLUS package.
+
+It makes it more comfortable to access the CPAN but
+it is still possible to access the shell through a terminal
+connection.
+
+Features:
+	- List of all CPAN packages
+	- Searching as in the default shell
+	- Upgrading/Uninstalling packages
+	- Nice and fency Curses interface
+	- almost as many keybindings as emacs (TM) :-)
+
+Copyright (c) 2003 Marcus Thiesen (marcus@cpan.org). 
+All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty. It may be used, redistributed and/or modified
+under the same terms as perl itself.
+
+
+

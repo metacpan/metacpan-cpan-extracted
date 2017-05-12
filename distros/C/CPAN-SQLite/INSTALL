@@ -1,0 +1,21 @@
+This package requires the following Perl modules:
+  File::Spec
+  Archive::Tar
+  IO::Zlib
+  CPAN::DistnameInfo
+  DBD::SQLite
+  File::HomeDir
+
+Installation follows the standard
+   perl Makefile.PL
+   $MAKE
+   $MAKE test
+   $MAKE install
+or, if Module::Build is available,
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+See the README file for a quick overview of the useage.
+

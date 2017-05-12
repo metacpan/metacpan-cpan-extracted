@@ -1,0 +1,99 @@
+Revision history for Perl extension Catalyst::Plugin::CRUD.
+
+0.21 Wed Oct 3 4:18:00 2007
+    - special version for OSC2007 Tokyo/Fall
+    - Catalyst::Controller::CRUD calls MyApp::C::Some->get_model if can get_model
+
+0.20 Sat Sep 21 16:31:00 2007
+    - added pager support at Catalyst::Conroller::CRUD::DBIC
+        - ref) MyApp/root/template/xxxx/list.tt
+
+            search result (total [% c.stash.xxxx.pager.total %] entries):
+            [% FOREACH page = [1 .. c.stash.xxxx.pager.pages] %]
+              [% IF page == c.stash.xxxx.pager.current %]
+              [% page %]
+              [% ELSE %]
+              <a href="/xxxx/list?page=[% page %]">[% page %]</a>
+              [% END %]
+            [% END %]
+
+0.19 Tue Jun 5 03:27:00 2007
+    - wrote tutorials
+        - http://d.hatena.ne.jp/Bayside/20070511/p1
+        - http://d.hatena.ne.jp/Bayside/20070512/p1
+        - http://d.hatena.ne.jp/Bayside/20070513/p1
+        - http://d.hatena.ne.jp/Bayside/20070514/p1
+    - when deleting, use Widget::Dialog (you can get from JSAN)
+    - changed Catalyst::Controller::CRUD::CDBI::model_to_hashref to Class::DBI::toHashRef
+        - ref) my $hash = $c->model('CDBI::Foo')->retrieve(1)->toHashRef;
+    - changed Catalyst::Controller::CRUD::DBIC::model_to_hashref to DBIx::Class::toHashRef
+        - ref) my $hash = $c->model('DBIC::Foo')->find(1)->toHashRef;
+
+0.18 Tue May 8 12:32:00 2007
+	- refactoring at Catalyst::Helper::Model::CRUD
+	    - changed trigger name
+	        - create_before -> create_check
+	        - update_before -> update_check
+	        - delete_before -> delete_check
+	- refactoring at Catalyst::Controller::CRUD
+	    - changed stash name
+	        - c.stash.create.message -> c.stash.create.error
+	        - c.stash.update.message -> c.stash.update.error
+
+0.17 Mon May 7 22:14:00 2007
+    - fixed spelling mistake at Catalyst::Conroller::CRUD::DBIC
+      (Thanks to woremacx)
+
+0.16 Wed Mar 5 22:13:00 2007
+	- refactoring at Catalyst::Helper::Model::CRUD
+	- refactoring at Catalyst::Plugin::CRUD
+    	- deleted Catalyst::Plugin::CRUD::CDBI
+    	- deleted Catalyst::Plugin::CRUD::DBIC
+    	- added Catalyst::Conroller::CRUD
+    	- added Catalyst::Conroller::CRUD::CDBI
+    	- added Catalyst::Conroller::CRUD::DBIC
+	- fixed dupricated 'DELETE' in MyApp/lib/MyApp/I18N/*.po
+
+0.15 Wed Apr 12 03:16:00 2007
+	- refactoring at Catalyst::Helper::Model::CRUD
+	- change .html to .tt
+
+0.14 Sat Mar 10 02:25:00 2007
+	- refactoring at Catalyst::Helper::Model::CRUD
+
+0.13 Fri Aug 29 06:28:00 2006
+	- refactoring at Catalyst::Helper::Model::CRUD
+
+0.12 Fri Aug 25 10:38:00 2006
+	- changed resource file at Catalyst::Helper::Model::CRUD
+	- changed resource file at sample application
+
+0.11 Fri Aug 25 07:49:00 2006
+	- added CSS at Catalyst::Helper::Model::CRUD
+
+0.10 Fri Aug 16 03:00:00 2006
+	- bug fix
+
+0.09 Fri Aug 16 02:00:00 2006
+	- changed method name: config -> setting
+	- I18N skelton code changed at Catalyst::Helper::Model::CRUD
+
+0.08  Fri Aug 15 01:02:00 2006
+	- added I18N code
+
+0.07  Fri Aug 04 03:07:00 2006
+	- refactoring
+
+0.06  Mon May 22 10:15:00 2006
+	- added header.html and footer.html at Catalyst::Helper::Model::CRUD
+
+0.04  Fri May 19 23:36:00 2006
+	- added scaffold helper
+
+0.02  Fri May 19 16:42:00 2006
+	- added many error check codes
+
+0.01  Fri May 12 19:48:00 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::Plugin::CRUD
+

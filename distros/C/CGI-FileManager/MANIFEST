@@ -1,0 +1,34 @@
+Build.PL
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+
+bin/cfm-passwd.pl
+bin/cfm-install.pl
+
+lib/CGI/FileManager.pm
+lib/CGI/FileManager/Auth.pm
+lib/CGI/FileManager/Templates.pm
+
+t/00.load.t
+t/002-authentication.t
+t/003-main.t
+t/004-upload.t
+
+xt/90-pod.t
+xt/91-pod-coverage.t
+xt/99-critic.t
+xt/pod_checker.t
+
+t/lib/CGI/FileManager/Test.pm
+
+
+# for testing only
+dir/data.txt
+dir/subdir/somefile.txt
+
+# these files are used as input files that we will upload 
+local/1.txt
+

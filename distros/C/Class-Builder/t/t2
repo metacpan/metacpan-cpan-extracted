@@ -1,0 +1,35 @@
+#!perl -w
+
+use strict;
+use warnings;
+use lib 'lib';
+use Carp;
+
+use Benchmark;
+use Test::More tests=>5;
+
+  package MusicCD;
+  use Class::Builder {
+    trackList => {
+        arrayref => [qw(track1 silent noise)],
+      },
+  };
+
+  1;
+
+  package main;
+  my $mcd = new MusicCD;
+  my $i = 0;
+  foreach my $tract ($mcd->trackList){ $i++; }
+  ok ($i == $mcd->trackList_count, 'count travel');
+  my $arrayref = $mcd->trackList;
+  # use this to get the count
+  my $count = $mcd->trackList_count;
+  ok ($count == scalar @$arrayref, 'count ref');
+  $mcd->trackList_push('newTrack');
+  ok ($mcd->trackList_pop eq 'newTrack', 'pop, push');
+
+  $mcd->trackList_unshift('firstTrack');
+  # firstTract
+  ok ($mcd->trackList_shift() eq 'firstTrack', 'shift, unshift');
+  ok ($mcd->trackList_splice(1, 1) eq 'silent', 'splice');

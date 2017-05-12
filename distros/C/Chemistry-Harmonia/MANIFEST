@@ -1,0 +1,16 @@
+Changes
+lib/Chemistry/Harmonia.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-oxidation_state.t
+t/02-good_formula.t
+t/03-parse_chem_mix.t
+t/04-prepare_mix.t
+t/05-class_cir_brutto.t
+t/06-ttc_reaction.t
+t/07-stoichiometry.t
+t/08-brutto_formula.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

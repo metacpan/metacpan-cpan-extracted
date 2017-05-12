@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	
+	<title>[% meta.title _ ' - ' IF meta.title %][% c.config.site_name OR 'ShinySite' %]</title>
+	
+	<meta name="description" content="[% head.meta_description | html %]" />
+	<meta name="keywords"    content="[% head.meta_keywords    | html %]" />
+	<meta name="author"      content="[% head.meta_author      | html %]" />
+	
+	<link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/main.css') %]" />
+	
+	[%- IF controller == 'Blog' %]
+	<link type="application/atom+xml" href="[% c.uri_for( '/static/rss/atom.xml' ) %]" rel="alternate" title="Recent blog posts" />
+	[%- END %]
+</head>
+
+<!--[if lt IE 7 ]><body class="ie6"><![endif]-->
+<!--[if IE 7    ]><body class="ie7"><![endif]-->
+<!--[if IE 8    ]><body class="ie8"><![endif]-->
+<!--[if IE 9    ]><body class="ie9"><![endif]-->
+<!--[if (gt IE 9|!(IE)) ]><!--><body><!--<![endif]-->
+
+<div id="container">
+	
+	[%- IF error_msg  %]<div class="error" >[% error_msg  %]</div>[% END %]
+	[%- IF status_msg %]<div class="status">[% status_msg %]</div>[% END %]
+	
+	<h1>
+		[% meta.title || 'ShinySite' %]
+	</h1>
+	
+	[%- content %]
+	
+	<p class="right">
+		<a href="http://validator.w3.org/check?uri=referer"><img src="/static/images/valid-xhtml10-blue.png" alt="Valid XHTML 1.0" /></a> 
+		<a href="http://jigsaw.w3.org/css-validator/check/referer"><img src="/static/images/valid-css-blue.png" alt="Valid CSS" /></a>
+		<a href="http://feedvalidator.org/check"><img src="/static/images/valid-atom.png" alt="Valid Atom" /></a>
+	</p>
+	
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,22 @@
+---
+name: Catalyst-View-HTML-Template
+version: 0.03
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+abstract: HTML::Template View Class
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Catalyst: 5.7
+  HTML::Template: 0
+provides:
+  Catalyst::Helper::View::HTML::Template:
+    file: lib/Catalyst/Helper/View/HTML/Template.pm
+  Catalyst::View::HTML::Template:
+    file: lib/Catalyst/View/HTML/Template.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

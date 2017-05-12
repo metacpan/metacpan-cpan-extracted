@@ -1,0 +1,38 @@
+---
+abstract: "A set of tools designed to extract data from CRAC's SAM files and to provide annotations."
+author:
+  - 'Nicolas PHILIPPE <nphilippe.research@gmail.com>'
+  - 'Jérôme AUDOUX <jaudoux@cpan.org>'
+  - 'Sacha BEAUMEUNIER <sacha.beaumeunier@gmail.com>'
+build_requires:
+  Data::Dumper: '0'
+  File::Temp: '0.23'
+  Inline::Files: '0.68'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CracTools
+requires:
+  App::Cmd::Setup: '0'
+  Carp: '0'
+  Config::FileManager: '1.6'
+  Config::Simple: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::HomeDir: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Parallel::ForkManager: v0.7.6
+  Set::IntervalTree: '0.10'
+  constant: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.25'

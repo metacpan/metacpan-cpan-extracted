@@ -1,0 +1,18 @@
+#!perl -w
+
+# Display the element type hierachy for the current vob
+
+use warnings;
+use ClearCase::Argv;
+
+my $ct = new ClearCase::Argv({autochomp=>1,ipc=>1});
+for ($ct->lstype([qw(-s -kind eltype)])->qx) {
+  my ($s) = grep s/^\s+supertype: (.*)$/$1/, $ct->des("eltype:$_")->qx;
+  push @{$h{$s?$s:q()}} ,$_;
+}
+sub disp {
+  my ($t,$i) = @_;
+  printf "%${i}s%s\n", '', $t if $t;
+  disp($_,$i+2) for @{$h{$t}};
+}
+disp('', -2);

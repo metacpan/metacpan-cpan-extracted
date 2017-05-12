@@ -1,0 +1,86 @@
+CGI::Debug  v1.00   -   module for debugging CGI programs.
+
+
+CHANGES since 0.07
+
+   Tested with perl v5.7.0
+
+   New email address of autor
+
+
+
+DESCRIPTION
+
+It's goal is to catch ALL errors and display them, along with useful
+data like form data, cookies, etc. You should never see the "Internal
+Server Error" message.
+
+The module will not change the behaviour of your cgi program.  As long
+as your program works, you will not notice the modules presence. The
+only ting you will have to do is "use CGI::Debug". Then your program
+works, you can just remove the line.
+
+It's highly configurable. Choose what functions to use.
+
+ Report
+ o  warnings
+ o  runtime errors
+ o  compilation errors
+ o  faulty HTTP headers
+ o  Form data
+ o  Cookies
+ o  Enviroment
+ o  Elapsed time in subseconds
+
+ Report
+ o  to Browser
+ o  to error log
+ o  to file
+ o  as mail to owner and/or others
+
+ Report
+ o  if warnings occured
+ o  if program died
+ o  always
+
+
+Configure with cookies, or enviroment variables, or on the use
+line.
+
+
+EXAMPLES
+
+Only report errors:
+    use CGI::Debug( report => 'errors' );
+
+Do not bother about warnings:
+    use CGI::Debug( on => 'fatals' );
+
+Allways show complete debugging info:
+    use CGI::Debug( report => 'everything', on => 'anything' );
+
+Send debug data as mail to file owner:
+    use CGI::Debug( to => 'mail' );
+
+
+REQUIRES
+
+ o  CGI
+ o  perl 5.004_05
+
+
+TODO
+
+ o Clean up and generalize configuration
+
+ o Test it on non *nix platforms
+
+ o Implement HTML_compliance controls (using HTML::validate)
+
+ o Implement function for debugging in a separate window
+
+
+AUTHOR
+
+  Jonas Liljegren <jonas@paranormal.se>
+

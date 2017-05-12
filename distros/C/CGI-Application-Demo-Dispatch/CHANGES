@@ -1,0 +1,30 @@
+Revision history for Perl extension CGI::Application::Demo::Dispatch.
+
+1.05  Fri Mar 11 13:22:00 2011
+	- Fix typo in docs and code for FCGI::ProcManager. new({processes => 2}) should have been new({n_processes => 2}).
+	- Real pre-req version #s in Build.PL and Makefile.PL, instead of using 0.
+	- Move FCGI script from htdocs/local/dispatch to httpd/cgi-bin/cgi/application/demo/dispatch/dispatch.fcgi.
+	- Move CGI script from httpd/cgi-bin/dispatch.cgi to httpd/cgi-bin/cgi/application/demo/dispatch/dispatch.cgi.
+	- Add Plack script httpd/cgi-bin/cgi/application/demo/dispatch/dispatch.psgi.
+	- Reformat Build.PL and Makefile.PL.
+	- Change the code so the Menu option responds the same way the Organization and Person options respond.
+
+1.04  Tue Feb 15 16:31:00 2011
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.03  Sun Feb 21 12:54:25 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+
+1.02  Wed Feb 10 13:52:34 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.01  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.00  Fri Jun 12 18:40:00 2009
+	- Original version

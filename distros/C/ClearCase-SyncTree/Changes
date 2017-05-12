@@ -1,0 +1,282 @@
+Revision history for Perl extension ClearCase::SyncTree.
+
+0.01 Sat Jan  8 12:20:26 2000
+	- original version; created by h2xs 1.19
+
+0.05 Tue Jul 18 13:18:33 EDT 2000
+	- First public release.
+	- Includes 'synctree' script
+
+0.06 Fri Jul 28 20:51:10 EDT 2000
+	- Added POD.
+	- Fixed a bug in 'synctree' script.
+	- Ported synctree script to Win32.
+	- Added ->eltypemap method.
+
+0.10 Mon Jul 31 18:05:43 EDT 2000
+	- Added support for symlinks. The code is designed to work
+	  even on platforms that don't natively support symlinks
+	  such as Windows (but is not yet tested there).
+
+0.11 Tue Aug  1 10:24:48 EDT 2000
+	- Fixed a bug in symlink code.
+	- "synctree -subtract" becomes "synctree -rm".
+	- Added synctree -ctime flag.
+
+0.12 Thu Aug  3 22:51:07 EDT 2000
+	- Reworked some of the flags in 'synctree' to be more
+	  compatible with Paul Smith's citree script. Replaced
+	  -ok with -y (sense toggled), replaced -preview with -n.
+
+0.13 Mon Aug  7 16:38:14 EDT 2000
+	- Bugfix involving misplaced -ptime flag, caused by
+	  overenthusiastic cleanup.
+
+0.15 Thu Oct 12 11:47:06 EDT 2000
+	- Fixed a Windows/clearprompt quoting error reported
+	  by James Anderson.
+
+0.16 Mon Oct 23 22:33:12 EDT 2000
+	- Fix bugs reported by Rowena Sandoval (MSWIN drive letters and \)
+	- Added cmp_func method as supplied by Greg Kurz.
+
+0.17 Tue Oct 24 22:13:45 EDT 2000
+	- Added -map and -nprotect flags to synctree script.
+
+0.18 Wed Nov  1 21:44:31 EST 2000
+	- Fixed a pretty bad bug causing a failure to remove view-private
+	  files it didn't create.
+
+0.19 Sun Nov 12 21:04:17 EST 2000
+	- Removed undocumented constructor param for setting comparator.
+	  (use ->cmp_func instead).
+	- Fixed a recently-introduced bug breaking -rm/name.
+	- Added a ->reuse method to SyncTree and -reuse flag to synctree.
+	  (tested exactly once on one file).
+
+0.20 Tue Feb 27 14:44:25 EST 2001
+	- Fixed bug in synctree: clearprompt result must be >>8.
+
+0.21 Fri Jun 29 19:32:28 EDT 2001
+	- A few fixes donated from fmr.com.
+
+0.23 Tue Sep  4 10:48:58 EDT 2001
+	= Test Env: Solaris 8/Win2K SP2/Perl 5.6/CC 4.2
+	+ Summary: previous versions had some pretty serious bugs
+	  on Windows especially. These are fixed and it appears
+	  to work pretty robustly on UNIX and Windows.
+	- Fixes to support M:\view\... paths on *&^&%^#$ Windows
+	- Added --Version flag to synctree.
+	- Fix bug reported by Paul Faulstich of llbean.com.
+	- Removed requirement for 'dbase' dir to exist a priori.
+	- Only look for subtractions if requested (for performance).
+	- Add support for subtraction preview.
+	- Added -follow feature for alignment with clearfsimport.
+	- Some peformance enhancements by combining repetitive
+	  cleartool commands into one.
+	- No longer requires a set view on UNIX as long as the
+	  dest dir is in a view context.
+	- Added a -quiet flag to synctree (requires Argv 1.00).
+	- Improved -force to return an exit status.
+	- Fixed synctree to return nonzero if any checkin fails.
+	- Bugfix: transport non-resolving (dangling) symlinks correctly.
+	- Require Argv 1.00 or above (related bugfixes there).
+
+0.24 Fri Sep 14 14:05:40 EDT 2001
+	- Fixed an obscure bug involving -reuse and -cr together.
+	- Some improvements to -map/-flist and docs thereof
+	- Added -lbmods flag to synctree.
+
+0.25 Tue Sep 18 09:34:34 EDT 2001
+	- Added -stop option to synctree.
+
+0.26 Mon Sep 24 19:37:20 EDT 2001
+	- Bugfix for "-sbase=/" case.
+	- Fixed so that parent dirs have same comments as files.
+
+0.27 Mon Oct 22 22:35:07 EDT 2001
+	- POD work.
+	- Added an optimization; when comparing src-vs-dest files,
+	  compare sizes before invoking File::Compare::cmp(). This
+	  is not only faster, it stops ClearCase from having to
+	  construct cleartext for every file just to compare it.
+
+0.29 Thu Dec 13 15:27:23 EST 2001
+	- SEMANTIC CHANGE: the -yes flag is now less powerful; it does
+	  not suppress the checkin prompt. As of this version you must
+	  use -yes and -ci together to suppress all prompts.
+
+0.30 Tue Jul 22 10:33:12 EDT 2003
+	- Fixed contact data.
+
+0.31 Wed Nov  5 08:55:00 EST 2003
+	- Made two fixes provided by Christopher Drexler of Siemens.
+	- Made other fixes provided by James Anderson of Tyco Electronics.
+	- The ->protect() method of SyncTree.pm (and thus the behavior
+	  of the synctree script without -nprotect) on Windows now forces
+	  executable files (*.exe, *.dll, etc.) to be executable.
+
+0.32 Mon Nov 10 18:00:10 EST 2003	(NOT RELEASED)
+	- Fixed a bug when specifying the dest base as "." on Windows.
+
+0.33 Tue Dec  9 13:17:55 EST 2003	(NOT RELEASED)
+	- Bugfix: refuse to proceed if checkouts are sitting in the dest
+	  area.
+	- A certain (small) amount of code cleanup.
+
+0.34 Thu Jan  8 10:47:59 EST 2004	(NOT RELEASED)
+	- Make -Narrow RE case insensitive on Windows.
+	- Fixes to -reuse feature.
+	- Added -ignore_co and -overwrite_co flags to synctree.
+	- ********************NOTE**********************
+	  ***THIS VERSION MAKES AN INCOMPATIBLE CHANGE***
+	  ********************NOTE**********************
+	  The ->analyze method used to check that the dest area was
+	  "safe" before proceeding. This logic has now been moved out
+	  to a separate ->dstcheck method.  The synctree script has
+	  been fixed to make the extra method call; you only need
+	  to worry if you have your own tool built directly on the
+	  ClearCase::SyncTree API.  If so, simply add a call to
+	  ->dstcheck prior to ->analyze.
+
+0.35 Wed Jan 21 15:30:21 EST 2004
+	- Cleaned up and documented the 0.32-0.34 work for release.
+
+0.36 Tue Feb 10 14:44:31 EST 2004
+	- Made Windows-specific mvfsdrive() method more robust.
+
+0.37 Fri Jun 11 14:56:36 EDT 2004
+	- Fixed bug involving bad exit statuses reported by Leo Sager.
+
+0.38 Sat Jun 19 13:37:31 EDT 2004
+	- Fixed bug with explicit -flist option on Windows involving
+	  incorrect canonification of paths (/-vs-\). Fix supplied
+	  by David Darby.
+
+0.39 Thu Aug  4 07:21:25 EDT 2005
+	- Applied Windows bugfix supplied by "Hans" via rt.cpan.org.
+
+0.40 Tue Sep 25 11:33:20 EDT 2007
+	- Spelling/formatting fixes contributed by Marc Girod.
+	- Fixes for case-sensitivity issues on Windows contributed
+	  by James Anderson.
+
+0.41 Thu Sep 27 16:48:13 EDT 2007
+	- Previous fix was a little wrong on Windows.
+
+0.42 Sun Sep 30 10:45:54 IST 2007
+	- Added support for ##:BranchOff: root contributed by Marc Girod.
+
+0.43 Thu Oct  4 18:44:28 IST 2007
+	- Fixed 2 minor bugs in BranchOff support: checking out from
+	  /main/0, and after a chtype of the main branch to some other
+	  brtype.
+
+0.44 Wed Oct 10 11:20:43 IST 2007
+	- Set synctree to ctcmd or ipc mode if installed.
+	  Bug fix to BranchOff support: test of branch type constraint
+	  on Windows.
+
+0.45 Thu Oct 11 09:26:17 IST 2007
+	- Support for -rellinks option.
+
+0.46 Mon Nov  5 12:18:29 GMT 2007
+	- checkcs: support running not within a view, e.g. on Windows
+
+0.47 Tue Nov 20 11:17:41 EST 2007
+	- Only minor cosmetic changes from previous.
+
+0.48 Mon Nov 19 17:41:09 GMT 2007
+	- Preliminary test suite
+	- Quiet 'seed merging' of new branches, with contributors removal.
+
+0.49 Sun Mar 16 12:05:12 GMT 2008
+	- Fixed: ipc mode not properly set when CtCmd not found.
+
+0.50 Thu Mar 20 11:34:29 GMT 2008
+	- Made synctree accessible to make test.
+
+0.51 Fri Mar 21 11:00:42 GMT 2008
+	- chdir unconditionally in unix and cleartool
+	- skipped the package name from ARGV in runtest
+
+0.52 Wed Mar 26 09:22:26 GMT 2008
+	- return or exit depending on call context in synctree
+	- mkview with -gpa to force local storage (global might not work)
+	- internal _chdir hides the difference introduced with the ipc mode
+	- internal ct shares the ST_CT object as much as possible
+
+0.54 Mon Dec  6 18:57:55 GMTST 2010
+	- Using Argv 1.34 - removed _chdir
+	- reuse: branch names ending in numbers
+	- reuse: symlinks or dirs with same name in lsvtree of directory
+	- vreuse option
+	- completing the processing if checkouts left (required fix to _lsco)
+	- removed the Modulino structure set in 0.50 (test strategy reverted)
+	- cygwin support
+	- clone simplified to support ipc reference counting
+	- indentation fixes in the pod parts
+	- prepend sbase to the arguments if not accessible (test first)
+	- reverted test.pl to 0.47
+	- support for incremental label families: apply fixed, move floating
+	- uncommented a change by Uwe Nagler, to import empty directories
+	- chomp control, especially in fork mode
+	- fix for args relative to current dir (bug report by Achim Bursian)
+	- do not remove empty directories
+	- reuse also attempts to reuse 'implicit dirs'
+	- snapview check the path to the vob root, in case dbase didn't exist
+	- process whole paths brought in while reusing directory elements
+	- file/symlink clashes handled
+	- clone preserves the value of autofail
+
+0.55 Thu Dec  9 14:37:57 GMTST 2010
+        - fix to autofail cloning, especially in _lsprivate
+
+0.56 Thu Dec 23 22:51:40 GMTST 2010
+        - removed spurious cleartool errors, mostly under Windows/Cygwin
+	- fixed various internal bugs: readcclink was altering its call context
+	- absdst doesn't use Cwd::abs_path: behaves differently on UNIX and Cygwin
+	- use of ClearCase::Argv::clone disturbs the ipc reference count
+	- fixed bug in reusemkdir, which resulted in wrong removals
+	- skip attempting to remove entries below removed dirs, or the same twice
+	- checkin in reverse sort order, to cope with 'not selected by view'
+	- removed from subtract list any symlink already renamed
+	- restored less verbosity: no mklabel events
+
+0.57 Fri Apr 15 15:16:02 GMTDT 2011
+        - apply even equivalent fixed labels with -rep, to allow for replay
+	- if label existed, check labeled versions first
+	- skip unchanged labeled versions from recursive labeling
+	- symlinks in srcbase on Windows/Cygwin, if srcbase in a vob
+	- import and remove dangling links
+	- skip symlink to directory in file reuse
+	- check in from source: do not attempt to check in again
+	- cleanup if branchoff root, remove orphaned branches at uncheckout
+	- file in source, dangling link in dest (maybe second to same): mkelem
+	- fail instead of die in a few more cases (cleanup)
+	- fixes to reusemkdir: reuse is per element, and private dirs may be skipped
+	- skip symlinks to directories in resurrected directories
+	- fix a bug with mkpath syntax resulting in creating 511 and 0 directories
+	- fix to reuse of empty directories
+	- fix in pruning of versions in vtree
+	- arguments given with relative paths must point under srcbase
+	- remove symlinks to directories under dstbase, which could fool synctree
+
+0.58 Sat Oct  1 00:25:57 EDT 2011
+        - branchco optimization: avoid lsvtree if possible
+	- subtract: new implementation--remove only the top of directory trees
+	- rmdirlinks: remove entries from the remove list after removing them
+	- remove directories on the way of symlinks
+	- symlink replaced with file, while keeping the original target
+
+0.59 Sun Dec 11 22:11:05 GMTST 2011
+	- reuse failed for the root of dstbase
+	- reuse failed for intermediate dirs, missing from a restored version
+	- silence spurious error messages in _lsco, testing private directories
+	- subtract: elements with no selected version, and checkouts in other views
+	- From James Anderson: in mvfsdrive, always open the Win rgy in read-only mode
+
+0.60 Sun Jul  8 18:26:40 IST 2012
+        - fixed one spurious warning: sort (...) interpreted as function
+	- subtract: added a test to fix a minor internal bug
+	- NOTE: all work from 0.48 to here courtesy of Marc Girod.

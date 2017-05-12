@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta content= "HTML Tidy for Linux/x86 (vers 1st March 2003), see www.w3.org" name="generator">
+<title>Add a Photo of a Friend</title>
+</head>
+<body>
+<h1>Add a Photo of a Friend</h1>
+
+<form action="photos.cgi" enctype="multipart/form-data" method="post">
+	<input type="hidden" name="rm" value="add_process">
+	Friend Name: <input type="text" name= "full_name"> <!-- tmpl_var err_full_name -->
+	<br>
+	Image: <input type="file" name="photo"> <!-- tmpl_var err_photo -->
+ <input type="submit">
+</form>
+</body>
+<!-- arch-tag: 1c1d9634-8b41-4b5e-9a16-9cb22401dfe2 -->
+</html>

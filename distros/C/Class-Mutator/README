@@ -1,0 +1,123 @@
+NAME
+    Class::Mutator - Run-time Dynamic Multiple Inheritance
+
+SYNOPSIS
+      package Frog;
+      use Class::Mutator qw( -isasubclass );
+      sub new { ... }
+      sub eat_flies { ... }
+
+      package Prince;
+      sub be_charming { ... }
+
+      my $froggie = Frog->new;
+      $froggie->mutate('Prince');
+
+      # Now the froggie has been reblessed into a "Frog Prince"
+      # class and can take advantage of methods in both classes.
+      $froggie->eat_flies;
+      $froggie->be_charming;
+
+DESCRIPTION
+    Class::Mutator adds the power of "dynamic polymorphism" to Perl objects.
+
+    Any object that inherits Class::Mutator principally gains two new
+    methods, mutate and unmutate that allows them to add methods to
+    themselves at runtime from other packages. The most recently mutated
+    packages take precedence when methods with the same name are defined in
+    more than one package.
+
+    This module is similar to Sex.pm, which Michael Schwern was working on
+    around the same time, only a little bit more predictable. It came about
+    while I was doing some training at the BBC and someone asked how you
+    could do this easily; after discussion with my fellow London.pm'ers, in
+    particular Piers Cawley, this module came about.
+
+    More recently Matthew Simon Cavalletto sent me a version with everything
+    I had been meaning to do on the module a little after I uploaded version
+    0.03 which only had more substantial tests. So major kudos to Matthew.
+
+USE
+    To enable a class of objects to mutate, make it a subclass of
+    Class::Mutator.
+
+      package MyBaseClass;
+      use Class::Mutator;
+      push @ISA, 'Class::Mutator';
+      ...
+      MyBaseClass->new()->mutate( ... );
+
+    As a shortcut, you may pass the "-isasubclass" flag in your use
+    statement, which will produce the same result.
+
+      package MyBaseClass;
+      use Class::Mutator '-isasubclass';
+      ...
+      MyBaseClass->new()->mutate( ... );
+
+    Finally, if you need to retroactively add mutation capabilities to an
+    existing class, you can do so using the same syntax, with the target
+    class passeds as a parameter.
+
+      package main;
+      use MyBaseClass;
+      use Class::Mutator '-isasubclass' => 'MyBaseClass';
+      MyBaseClass->new()->mutate( ... );
+
+    You can also import the specific methods and functions described below
+    and call them directly.
+
+      package main;
+      use MyBaseClass;
+      use Class::Mutator 'mutate';
+      mutate( MyBaseClass->new(), ... );
+
+METHODS
+    These methods provide the module's public object-oriented interface.
+
+  mutate
+      $object->mutate( @packages );
+
+    Adds a mutation.
+
+  unmutate
+      $object->unmutate( @packages );
+
+    Remove mutation abilities via a package
+
+FUNCTIONS
+    These functions are used internally to support the methods described
+    above.
+
+  apply_mutation
+      $reblessed_object = apply_mutation( $object, $op, @packages );
+
+    Builds a new package list, based on the current package for a given
+    object, the operator (either "+" or "-"), and the packages to be added
+    or removed.
+
+  get_mutation_list
+      @packages = get_mutation_list($object_or_class);
+
+    Returns the list of classes a mutated object is based on. If the object
+    is not a mutant, its normal class name will be returned.
+
+  build_mutation_package
+      $new_class_name = build_mutation_package(@packages);
+
+    Builds the new mutation package. Returns the name of the new class.
+
+  modify_mutation_list
+      @packages = modify_mutation_list($object_or_class, $op, @packages);
+
+    Builds a new package list based on the current packages list and the
+    operation and package (the operation is upon) handed to this method.
+
+AUTHORS
+    Greg McCarroll Mail : greg@mccarroll.demon.co.uk Jabber :
+    greg@jabber.mccarroll.org.uk Homepage :
+    http://www.mccarroll.org.uk/~gem/
+
+    Matthew Simon Cavalletto Mail : simonm@cavalletto.org, Homepage :
+    http://www.evoscript.org/
+

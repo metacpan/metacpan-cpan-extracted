@@ -1,0 +1,63 @@
+{
+   "abstract" : "Dummy package that has version range in prereqs",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-Deps-VersionRange",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.025"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Try::Tiny" : ">= 0.12, != 0.14",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange.git",
+         "web" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-Deps-VersionRange"
+      }
+   },
+   "version" : "0.01"
+}
+

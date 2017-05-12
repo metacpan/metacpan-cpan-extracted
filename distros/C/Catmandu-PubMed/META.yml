@@ -1,0 +1,33 @@
+---
+abstract: 'Catmandu module for working with PubMed data'
+author:
+  - 'Wouter Willaert <wouterw@inuits.eu>'
+build_requires:
+  Software::License: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catmandu-PubMed
+provides:
+  Catmandu::Importer::PubMed:
+    file: lib/Catmandu/Importer/PubMed.pm
+    version: 0
+  Catmandu::PubMed:
+    file: lib/Catmandu/PubMed.pm
+    version: 0.01
+requires:
+  Catmandu: 0.0302
+  Furl: 0.41
+  Moo: 1.000003
+  XML::LibXML::Simple: 0.91
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

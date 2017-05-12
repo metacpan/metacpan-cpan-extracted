@@ -1,0 +1,166 @@
+﻿CopyTree-VendorProof version 0.0012
+==============================================
+
+This module provides a generic interface to implement a copy method between [a local computer and a remote file system] or [a remote file system and itself] or [local computer to local computer]. 
+
+The supported (very basic) copy functionalities mimics the unix cp -rf command - copies SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
+
+This module is written for file copies to and from a remote file system that cannot be mounted; for example, the Microsoft Sharepoint web service (as of 2011).  To use the methods in this module, you must provide objects that act as connectors to the remote file system and / or the local file system (More details about the methods required in these connector modules below).  For example, if you want to copy locally a file to a dir (I don't know why you would want to use this module for that, unless you're on a very silly OS that doesn't handle copy well), you must provide an extra object that provides basic methods for local file copying.  I have written one for local, named CopyTree::VendorProof::LocalFileOp.  
+
+If you would like to copy between local to remote, you must also provide the connector object for the remote.  I have written one for sharepoint, called SharePoint::SOAPHandler.  
+
+If you would like to copy to and from a variety of remote and local file systems, you must include connecter objects for these systems, and all of which will use this module as a base class.  In other words, this module is quite useless by itself, yet other modules like SharePoint::SOAPHandler and CopyTree::VendorProof::LocalFileOp depends on it.  In all likeliness, you have to use these 3 modules in your script to complete a copy operation - the two connectors to provide basic copy / ls methods, and this module to provide the cp -rf functionality.
+
+The primary use of this module is on a linux / unix system that needs to interact with a remote system.  This module is not tested on Macs.
+
+Currently, you need to install Authen::NTLM version 1.09 or greater for this module to work.  With my v1.09 tweak to Authen::NTLM on CPAN, this module should just work.  If you actually use Authen::NTLM directly for some reason, remember to set
+
+ntlmv2('sp');
+
+prior to using SharePoint::SOAPHandler.  You did remember to export ntlmv2, no?
+
+use Authen::NTLM qw(ntlmv2);
+
+The methods provided in this module (base class) include:
+	new
+	reset
+	src
+	dst
+	cp
+	copy_meth_deci
+	ls_tree
+	ls_tree_fdret
+	path
+	fdls_ret
+	
+	Of the aforementioned methods, new, path, and reset are the only methods that do not require additional connector objects to function, although path has the sole function of providing a base class to connector objects.
+
+The methods required in the connector objects include:
+	new
+	fdls				
+	is_fd
+	read_info_memory
+	write_from_memory
+	copy_local_files
+	cust_mkdir
+	cust_rmdir
+	cust_rmfile
+
+How to write connector methods ($_[0] holds the class / instance itself, arguments mentioned below are in $_[1] and onwards):
+
+	new:	Takes no arguments, but blesses an anonymous hash into the data connection object and returns it
+
+	fdls:  Pass in $lsoption, $path	
+		Where $lsoption is 'd', 'f', 'fdarrayrefs', or '', 
+		and $path is the path of the directory to be listed.	
+		The lsoption is passed to the SUPER class fdls_ret, and is not handled at this level.
+		The $startpath should be standardized to start in a certain 'root' directory; for
+      example, in SharePoint::SOAPHandler, it must start with "Shared Documents", and in 
+		Livelink::DAV, it must start with a dir right under the webdav root folder.
+
+		Required action:
+		You must put all the files found in $path in @files, and all the dirs in @dirs, then
+		return $self->SUPER::fdls_ret ($lsoption, \@files, \@dirs).
+
+	   For example, if you have a tree structure:
+	
+	      /home/
+	      /home/john
+	      /home/john/notes.txt
+	      /home/john/punch.mov
+	      /home/john/picutres
+	      /home/john/pictures/1.jpg
+	
+	   and your $startdir is /home/john, and your $lsoption is 'f':
+	   You will create
+	      @files, which is ("/home/john/notes.txt", "/home/john/punch.mov")
+	      @dirs, which consist of ("/home/john/pictures")
+	   And, the last line of your method (subroutine) will be
+	      return $self->SUPER::fdls_ret($lsoption, \@files, \@dirs);
+
+	is_fd: Pass in $query
+		Where $query is the file or dir in question to do a file test.
+		Required action:
+		For the specific $query, the return must be 'f' for file, 'd' for directory, 'pd' for
+		a non existing file / dir that has a valid parent, and 0 for everything else.
+
+	   This code will vary by connector modules; most connectors have file test 
+		facilities to return 'f' or 'd', but most connectors we have to create
+		something for the 'pd' test.  For connectors that can't tell 'f' or 'd' directly,
+		we have to be creative and do a dir listing of the $path or do a dir listing
+		of the $path's parent to guss what $path is.
+
+
+	read_into_memory: Pass in $sourcepath
+		Where $sourcepath is the file to read.
+		Required action:
+		The return must be a reference to a scalar, which holds the contents of the file
+		in bin mode.
+	
+	write_from_memory: Pass in $bincontentref, $dest
+		Where $bincontentref is a reference to a scalar, which holds the content of a file 
+		in bin mode, and $dest is the file name to write the content to.
+		Required action: 
+		The method will write the content of the file onto the file system, using the $dest
+		specified.
+		No return is necessary.
+
+	copy_local_files: Pass in $source, $dest
+		Where $source is the $source path of a file, and $dest is a destination path on 
+		the same file system.  
+		Required Action:
+		This method is written such that purely remote operations
+		do not require an intermediate step of holding each file in memory. 
+		The $source file is copied and saved to the file name specified by 
+		$dest.
+		Does not proceed if destination already exists (prevents 
+		accidental overwrite).
+		No return is necessary.
+	
+	cust_mkdir: Pass in $path
+		Where $path is the dir name to be created.
+		Required action:
+		Create the dir as specified by $path.
+		No return is necessary.
+
+	cust_rmdir: Pass in $path
+		Where $path is the dir name to be removed.	
+		Required action:
+   	Removes the dir as specified by $path.  If items / files / other dirs exists under $path,
+		recursively remove them.  
+		No return is necessary.
+
+	cust_rmfile: Pass in $filepath
+		Where $filepath is the path of the file
+		Required action
+		removes the file as specified by path.  warns / carps if $filepath is not a file
+		No return is necessary.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2011 by dbmolester
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

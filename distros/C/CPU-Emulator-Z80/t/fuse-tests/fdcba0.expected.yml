@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  55043:
+    - 196
+name: fdcba0
+registers:
+  AF: 36043
+  AF_: 0
+  BC: 50263
+  BC_: 0
+  DE: 48153
+  DE_: 0
+  HL: 58691
+  HL_: 0
+  I: 0
+  IX: 35933
+  IY: 54925
+  PC: 4
+  R: 2
+  SP: 0

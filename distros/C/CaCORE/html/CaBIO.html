@@ -1,0 +1,3651 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::CaBIO</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#agent">Agent</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_agent">ATTRIBUTES of Agent</a></li>
+		<li><a href="#associations_of_agent">ASSOCIATIONS of Agent</a></li>
+	</ul>
+
+	<li><a href="#anomaly">Anomaly</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_anomaly">ATTRIBUTES of Anomaly</a></li>
+		<li><a href="#associations_of_anomaly">ASSOCIATIONS of Anomaly</a></li>
+	</ul>
+
+	<li><a href="#chromosome">Chromosome</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_chromosome">ATTRIBUTES of Chromosome</a></li>
+		<li><a href="#associations_of_chromosome">ASSOCIATIONS of Chromosome</a></li>
+	</ul>
+
+	<li><a href="#clinicaltrialprotocol">ClinicalTrialProtocol</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_clinicaltrialprotocol">ATTRIBUTES of ClinicalTrialProtocol</a></li>
+		<li><a href="#associations_of_clinicaltrialprotocol">ASSOCIATIONS of ClinicalTrialProtocol</a></li>
+	</ul>
+
+	<li><a href="#clone">Clone</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_clone">ATTRIBUTES of Clone</a></li>
+		<li><a href="#associations_of_clone">ASSOCIATIONS of Clone</a></li>
+	</ul>
+
+	<li><a href="#clonerelativelocation">CloneRelativeLocation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_clonerelativelocation">ATTRIBUTES of CloneRelativeLocation</a></li>
+		<li><a href="#associations_of_clonerelativelocation">ASSOCIATIONS of CloneRelativeLocation</a></li>
+	</ul>
+
+	<li><a href="#cytoband">Cytoband</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_cytoband">ATTRIBUTES of Cytoband</a></li>
+		<li><a href="#associations_of_cytoband">ASSOCIATIONS of Cytoband</a></li>
+	</ul>
+
+	<li><a href="#cytogeneticlocation">CytogeneticLocation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_cytogeneticlocation">ATTRIBUTES of CytogeneticLocation</a></li>
+		<li><a href="#associations_of_cytogeneticlocation">ASSOCIATIONS of CytogeneticLocation</a></li>
+	</ul>
+
+	<li><a href="#diseaseontology">DiseaseOntology</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_diseaseontology">ATTRIBUTES of DiseaseOntology</a></li>
+		<li><a href="#associations_of_diseaseontology">ASSOCIATIONS of DiseaseOntology</a></li>
+	</ul>
+
+	<li><a href="#diseaseontologyrelationship">DiseaseOntologyRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_diseaseontologyrelationship">ATTRIBUTES of DiseaseOntologyRelationship</a></li>
+		<li><a href="#associations_of_diseaseontologyrelationship">ASSOCIATIONS of DiseaseOntologyRelationship</a></li>
+	</ul>
+
+	<li><a href="#gene">Gene</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_gene">ATTRIBUTES of Gene</a></li>
+		<li><a href="#associations_of_gene">ASSOCIATIONS of Gene</a></li>
+	</ul>
+
+	<li><a href="#genealias">GeneAlias</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_genealias">ATTRIBUTES of GeneAlias</a></li>
+		<li><a href="#associations_of_genealias">ASSOCIATIONS of GeneAlias</a></li>
+	</ul>
+
+	<li><a href="#geneontology">GeneOntology</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_geneontology">ATTRIBUTES of GeneOntology</a></li>
+		<li><a href="#associations_of_geneontology">ASSOCIATIONS of GeneOntology</a></li>
+	</ul>
+
+	<li><a href="#geneontologyrelationship">GeneOntologyRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_geneontologyrelationship">ATTRIBUTES of GeneOntologyRelationship</a></li>
+		<li><a href="#associations_of_geneontologyrelationship">ASSOCIATIONS of GeneOntologyRelationship</a></li>
+	</ul>
+
+	<li><a href="#generelativelocation">GeneRelativeLocation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_generelativelocation">ATTRIBUTES of GeneRelativeLocation</a></li>
+		<li><a href="#associations_of_generelativelocation">ASSOCIATIONS of GeneRelativeLocation</a></li>
+	</ul>
+
+	<li><a href="#genericarray">GenericArray</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_genericarray">ATTRIBUTES of GenericArray</a></li>
+		<li><a href="#associations_of_genericarray">ASSOCIATIONS of GenericArray</a></li>
+	</ul>
+
+	<li><a href="#genericreporter">GenericReporter</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_genericreporter">ATTRIBUTES of GenericReporter</a></li>
+		<li><a href="#associations_of_genericreporter">ASSOCIATIONS of GenericReporter</a></li>
+	</ul>
+
+	<li><a href="#histopathology">Histopathology</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_histopathology">ATTRIBUTES of Histopathology</a></li>
+		<li><a href="#associations_of_histopathology">ASSOCIATIONS of Histopathology</a></li>
+	</ul>
+
+	<li><a href="#homologousassociation">HomologousAssociation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_homologousassociation">ATTRIBUTES of HomologousAssociation</a></li>
+		<li><a href="#associations_of_homologousassociation">ASSOCIATIONS of HomologousAssociation</a></li>
+	</ul>
+
+	<li><a href="#library">Library</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_library">ATTRIBUTES of Library</a></li>
+		<li><a href="#associations_of_library">ASSOCIATIONS of Library</a></li>
+	</ul>
+
+	<li><a href="#location">Location</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_location">ATTRIBUTES of Location</a></li>
+		<li><a href="#associations_of_location">ASSOCIATIONS of Location</a></li>
+	</ul>
+
+	<li><a href="#nucleicacidsequence">NucleicAcidSequence</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_nucleicacidsequence">ATTRIBUTES of NucleicAcidSequence</a></li>
+		<li><a href="#associations_of_nucleicacidsequence">ASSOCIATIONS of NucleicAcidSequence</a></li>
+	</ul>
+
+	<li><a href="#organontology">OrganOntology</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_organontology">ATTRIBUTES of OrganOntology</a></li>
+		<li><a href="#associations_of_organontology">ASSOCIATIONS of OrganOntology</a></li>
+	</ul>
+
+	<li><a href="#organontologyrelationship">OrganOntologyRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_organontologyrelationship">ATTRIBUTES of OrganOntologyRelationship</a></li>
+		<li><a href="#associations_of_organontologyrelationship">ASSOCIATIONS of OrganOntologyRelationship</a></li>
+	</ul>
+
+	<li><a href="#pathway">Pathway</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_pathway">ATTRIBUTES of Pathway</a></li>
+		<li><a href="#associations_of_pathway">ASSOCIATIONS of Pathway</a></li>
+	</ul>
+
+	<li><a href="#physicallocation">PhysicalLocation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_physicallocation">ATTRIBUTES of PhysicalLocation</a></li>
+		<li><a href="#associations_of_physicallocation">ASSOCIATIONS of PhysicalLocation</a></li>
+	</ul>
+
+	<li><a href="#populationfrequency">PopulationFrequency</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_populationfrequency">ATTRIBUTES of PopulationFrequency</a></li>
+		<li><a href="#associations_of_populationfrequency">ASSOCIATIONS of PopulationFrequency</a></li>
+	</ul>
+
+	<li><a href="#protein">Protein</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_protein">ATTRIBUTES of Protein</a></li>
+		<li><a href="#associations_of_protein">ASSOCIATIONS of Protein</a></li>
+	</ul>
+
+	<li><a href="#proteinalias">ProteinAlias</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_proteinalias">ATTRIBUTES of ProteinAlias</a></li>
+		<li><a href="#associations_of_proteinalias">ASSOCIATIONS of ProteinAlias</a></li>
+	</ul>
+
+	<li><a href="#proteinsequence">ProteinSequence</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_proteinsequence">ATTRIBUTES of ProteinSequence</a></li>
+		<li><a href="#associations_of_proteinsequence">ASSOCIATIONS of ProteinSequence</a></li>
+	</ul>
+
+	<li><a href="#protocol">Protocol</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_protocol">ATTRIBUTES of Protocol</a></li>
+		<li><a href="#associations_of_protocol">ASSOCIATIONS of Protocol</a></li>
+	</ul>
+
+	<li><a href="#protocolassociation">ProtocolAssociation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_protocolassociation">ATTRIBUTES of ProtocolAssociation</a></li>
+		<li><a href="#associations_of_protocolassociation">ASSOCIATIONS of ProtocolAssociation</a></li>
+	</ul>
+
+	<li><a href="#snp">SNP</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_snp">ATTRIBUTES of SNP</a></li>
+		<li><a href="#associations_of_snp">ASSOCIATIONS of SNP</a></li>
+	</ul>
+
+	<li><a href="#target">Target</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_target">ATTRIBUTES of Target</a></li>
+		<li><a href="#associations_of_target">ASSOCIATIONS of Target</a></li>
+	</ul>
+
+	<li><a href="#taxon">Taxon</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_taxon">ATTRIBUTES of Taxon</a></li>
+		<li><a href="#associations_of_taxon">ASSOCIATIONS of Taxon</a></li>
+	</ul>
+
+	<li><a href="#tissue">Tissue</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_tissue">ATTRIBUTES of Tissue</a></li>
+		<li><a href="#associations_of_tissue">ASSOCIATIONS of Tissue</a></li>
+	</ul>
+
+	<li><a href="#vocabulary">Vocabulary</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_vocabulary">ATTRIBUTES of Vocabulary</a></li>
+		<li><a href="#associations_of_vocabulary">ASSOCIATIONS of Vocabulary</a></li>
+	</ul>
+
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="agent">Agent</a></h1>
+<p>CaCORE::CaBIO::Agent - Perl extension for Agent.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Agent is a Perl object representation of the
+CaCORE Agent object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_agent">ATTRIBUTES of Agent</a></h2>
+<p>The following are all the attributes of the Agent object and their data types:</p>
+<dl>
+<dt><strong><a name="item_evsid">EVSId</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_nscnumber">NSCNumber</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_bigid">bigid</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_comment">comment</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_iscmapagent">isCMAPAgent</a></strong>
+
+<dd>
+<p>data type: <code>boolean</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_name">name</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_source">source</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_agent">ASSOCIATIONS of Agent</a></h2>
+<p>The following are all the objects that are associated with the Agent:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fclinicaltrialprotocol_3a">Instance of <a href="#clinicaltrialprotocol">ClinicalTrialProtocol</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getClinicalTrialProtocolCollection</code> to get a collection of associated ClinicalTrialProtocol.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftarget_3a">Instance of <a href="#target">Target</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTargetCollection</code> to get a collection of associated Target.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="anomaly">Anomaly</a></h1>
+<p>CaCORE::CaBIO::Anomaly - Perl extension for Anomaly.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Anomaly is a Perl object representation of the
+CaCORE Anomaly object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_anomaly">ATTRIBUTES of Anomaly</a></h2>
+<p>The following are all the attributes of the Anomaly object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_description">description</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_anomaly">ASSOCIATIONS of Anomaly</a></h2>
+<p>The following are all the objects that are associated with the Anomaly:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fhistopathology_3a">Collection of <a href="#histopathology">Histopathology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getHistopathology</code> to get the associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2forganontology_3a">Instance of <a href="#organontology">OrganOntology</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getOrganOntologyCollection</code> to get a collection of associated OrganOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fvocabulary_3a">Instance of <a href="#vocabulary">Vocabulary</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getVocabularyCollection</code> to get a collection of associated Vocabulary.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="chromosome">Chromosome</a></h1>
+<p>CaCORE::CaBIO::Chromosome - Perl extension for Chromosome.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Chromosome is a Perl object representation of the
+CaCORE Chromosome object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_chromosome">ATTRIBUTES of Chromosome</a></h2>
+<p>The following are all the attributes of the Chromosome object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_number">number</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_chromosome">ASSOCIATIONS of Chromosome</a></h2>
+<p>The following are all the objects that are associated with the Chromosome:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fgene_3a">Instance of <a href="#gene">Gene</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2flocation_3a">Instance of <a href="#location">Location</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getLocationCollection</code> to get a collection of associated Location.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftaxon_3a">Collection of <a href="#taxon">Taxon</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTaxon</code> to get the associated Taxon.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="clinicaltrialprotocol">ClinicalTrialProtocol</a></h1>
+<p>CaCORE::CaBIO::ClinicalTrialProtocol - Perl extension for ClinicalTrialProtocol.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::ClinicalTrialProtocol is a Perl object representation of the
+CaCORE ClinicalTrialProtocol object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_clinicaltrialprotocol">ATTRIBUTES of ClinicalTrialProtocol</a></h2>
+<p>The following are all the attributes of the ClinicalTrialProtocol object and their data types:</p>
+<dl>
+<dt><strong><a name="item_nihadmincode">NIHAdminCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_pdqidentifier">PDQIdentifier</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_piname">PIName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_currentstatus">currentStatus</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_currentstatusdate">currentStatusDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_documentnumber">documentNumber</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_leadorganizationid">leadOrganizationId</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_leadorganizationname">leadOrganizationName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_participationtype">participationType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_phase">phase</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_title">title</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_treatmentflag">treatmentFlag</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_clinicaltrialprotocol">ASSOCIATIONS of ClinicalTrialProtocol</a></h2>
+<p>The following are all the objects that are associated with the ClinicalTrialProtocol:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fagent_3a">Instance of <a href="#agent">Agent</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAgentCollection</code> to get a collection of associated Agent.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdiseaseontology_3a">Instance of <a href="#diseaseontology">DiseaseOntology</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDiseaseOntologyCollection</code> to get a collection of associated DiseaseOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fhistopathology_3a">Instance of <a href="#histopathology">Histopathology</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fprotocolassociation_3a">Instance of <a href="#protocolassociation">ProtocolAssociation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getProtocolAssociationCollection</code> to get a collection of associated ProtocolAssociation.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="clone">Clone</a></h1>
+<p>CaCORE::CaBIO::Clone - Perl extension for Clone.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Clone is a Perl object representation of the
+CaCORE Clone object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_clone">ATTRIBUTES of Clone</a></h2>
+<p>The following are all the attributes of the Clone object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_insertsize">insertSize</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_type">type</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_clone">ASSOCIATIONS of Clone</a></h2>
+<p>The following are all the objects that are associated with the Clone:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fclonerelativelocation_3a">Instance of <a href="#clonerelativelocation">CloneRelativeLocation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getCloneRelativeLocationCollection</code> to get a collection of associated CloneRelativeLocation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2flibrary_3a">Collection of <a href="#library">Library</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getLibrary</code> to get the associated Library.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fnucleicacidsequence_3a">Instance of <a href="#nucleicacidsequence">NucleicAcidSequence</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getNucleicAcidSequenceCollection</code> to get a collection of associated NucleicAcidSequence.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftaxon_3a">Instance of <a href="#taxon">Taxon</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTaxonCollection</code> to get a collection of associated Taxon.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="clonerelativelocation">CloneRelativeLocation</a></h1>
+<p>CaCORE::CaBIO::CloneRelativeLocation - Perl extension for CloneRelativeLocation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::CloneRelativeLocation is a Perl object representation of the
+CaCORE CloneRelativeLocation object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_clonerelativelocation">ATTRIBUTES of CloneRelativeLocation</a></h2>
+<p>The following are all the attributes of the CloneRelativeLocation object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_clonerelativelocation">ASSOCIATIONS of CloneRelativeLocation</a></h2>
+<p>The following are all the objects that are associated with the CloneRelativeLocation:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fclone_3a">Collection of <a href="#clone">Clone</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClone</code> to get the associated Clone.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fnucleicacidsequence_3a">Collection of <a href="#nucleicacidsequence">NucleicAcidSequence</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getNucleicAcidSequence</code> to get the associated NucleicAcidSequence.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="cytoband">Cytoband</a></h1>
+<p>CaCORE::CaBIO::Cytoband - Perl extension for Cytoband.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Cytoband is a Perl object representation of the
+CaCORE Cytoband object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_cytoband">ATTRIBUTES of Cytoband</a></h2>
+<p>The following are all the attributes of the Cytoband object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_cytoband">ASSOCIATIONS of Cytoband</a></h2>
+<p>The following are all the objects that are associated with the Cytoband:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fphysicallocation_3a">Collection of <a href="#physicallocation">PhysicalLocation</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getPhysicalLocation</code> to get the associated PhysicalLocation.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="cytogeneticlocation">CytogeneticLocation</a></h1>
+<p>CaCORE::CaBIO::CytogeneticLocation - Perl extension for CytogeneticLocation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::CytogeneticLocation is a Perl object representation of the
+CaCORE CytogeneticLocation object.</p>
+<p>CytogeneticLocation extends from domain object <a href="#location">Location</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_cytogeneticlocation">ATTRIBUTES of CytogeneticLocation</a></h2>
+<p>The following are all the attributes of the CytogeneticLocation object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_endcytobandlocid">endCytobandLocId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_startcytobandlocid">startCytobandLocId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_cytogeneticlocation">ASSOCIATIONS of CytogeneticLocation</a></h2>
+<p>The following are all the objects that are associated with the CytogeneticLocation:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fendcytoband_3a">Collection of <a href="#endcytoband">EndCytoband</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getEndCytoband</code> to get the associated EndCytoband.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fstartcytoband_3a">Collection of <a href="#startcytoband">StartCytoband</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getStartCytoband</code> to get the associated StartCytoband.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="diseaseontology">DiseaseOntology</a></h1>
+<p>CaCORE::CaBIO::DiseaseOntology - Perl extension for DiseaseOntology.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::DiseaseOntology is a Perl object representation of the
+CaCORE DiseaseOntology object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_diseaseontology">ATTRIBUTES of DiseaseOntology</a></h2>
+<p>The following are all the attributes of the DiseaseOntology object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_diseaseontology">ASSOCIATIONS of DiseaseOntology</a></h2>
+<p>The following are all the objects that are associated with the DiseaseOntology:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchilddiseaseontologyrelationship_3a">Instance of <a href="#childdiseaseontologyrelationship">ChildDiseaseOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildDiseaseOntologyRelationshipCollection</code> to get a collection of associated ChildDiseaseOntologyRelationship.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#clinicaltrialprotocol">ClinicalTrialProtocol</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getClinicalTrialProtocolCollection</code> to get a collection of associated ClinicalTrialProtocol.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#histopathology">Histopathology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentdiseaseontologyrelationship_3">Instance of <a href="#parentdiseaseontologyrelationship">ParentDiseaseOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentDiseaseOntologyRelationshipCollection</code> to get a collection of associated ParentDiseaseOntologyRelationship.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="diseaseontologyrelationship">DiseaseOntologyRelationship</a></h1>
+<p>CaCORE::CaBIO::DiseaseOntologyRelationship - Perl extension for DiseaseOntologyRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::DiseaseOntologyRelationship is a Perl object representation of the
+CaCORE DiseaseOntologyRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_diseaseontologyrelationship">ATTRIBUTES of DiseaseOntologyRelationship</a></h2>
+<p>The following are all the attributes of the DiseaseOntologyRelationship object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_diseaseontologyrelationship">ASSOCIATIONS of DiseaseOntologyRelationship</a></h2>
+<p>The following are all the objects that are associated with the DiseaseOntologyRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchilddiseaseontology_3a">Collection of <a href="#childdiseaseontology">ChildDiseaseOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildDiseaseOntology</code> to get the associated ChildDiseaseOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentdiseaseontology_3a">Collection of <a href="#parentdiseaseontology">ParentDiseaseOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentDiseaseOntology</code> to get the associated ParentDiseaseOntology.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="gene">Gene</a></h1>
+<p>CaCORE::CaBIO::Gene - Perl extension for Gene.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Gene is a Perl object representation of the
+CaCORE Gene object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_gene">ATTRIBUTES of Gene</a></h2>
+<p>The following are all the attributes of the Gene object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_clusterid">clusterId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_fullname">fullName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_symbol">symbol</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_gene">ASSOCIATIONS of Gene</a></h2>
+<p>The following are all the objects that are associated with the Gene:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchromosome_3a">Collection of <a href="#chromosome">Chromosome</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChromosome</code> to get the associated Chromosome.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdatabasecrossreference_3a">Instance of <a href="#databasecrossreference">DatabaseCrossReference</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDatabaseCrossReferenceCollection</code> to get a collection of associated DatabaseCrossReference.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fgenealias_3a">Instance of <a href="#genealias">GeneAlias</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneAliasCollection</code> to get a collection of associated GeneAlias.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fgeneontology_3a">Instance of <a href="#geneontology">GeneOntology</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneOntologyCollection</code> to get a collection of associated GeneOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fgenerelativelocation_3a">Instance of <a href="#generelativelocation">GeneRelativeLocation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneRelativeLocationCollection</code> to get a collection of associated GeneRelativeLocation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fgenericreporter_3a">Instance of <a href="#genericreporter">GenericReporter</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGenericReporterCollection</code> to get a collection of associated GenericReporter.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#histopathology">Histopathology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fhomologousassociation_3a">Instance of <a href="#homologousassociation">HomologousAssociation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getHomologousAssociationCollection</code> to get a collection of associated HomologousAssociation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2flibrary_3a">Instance of <a href="#library">Library</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getLibraryCollection</code> to get a collection of associated Library.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#location">Location</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLocationCollection</code> to get a collection of associated Location.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#nucleicacidsequence">NucleicAcidSequence</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getNucleicAcidSequenceCollection</code> to get a collection of associated NucleicAcidSequence.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#organontology">OrganOntology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getOrganOntologyCollection</code> to get a collection of associated OrganOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fpathway_3a">Instance of <a href="#pathway">Pathway</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPathwayCollection</code> to get a collection of associated Pathway.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fprotein_3a">Instance of <a href="#protein">Protein</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getProteinCollection</code> to get a collection of associated Protein.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#target">Target</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getTargetCollection</code> to get a collection of associated Target.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#taxon">Taxon</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTaxon</code> to get the associated Taxon.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="genealias">GeneAlias</a></h1>
+<p>CaCORE::CaBIO::GeneAlias - Perl extension for GeneAlias.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GeneAlias is a Perl object representation of the
+CaCORE GeneAlias object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_genealias">ATTRIBUTES of GeneAlias</a></h2>
+<p>The following are all the attributes of the GeneAlias object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_genealias">ASSOCIATIONS of GeneAlias</a></h2>
+<p>The following are all the objects that are associated with the GeneAlias:</p>
+<dl>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="geneontology">GeneOntology</a></h1>
+<p>CaCORE::CaBIO::GeneOntology - Perl extension for GeneOntology.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GeneOntology is a Perl object representation of the
+CaCORE GeneOntology object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_geneontology">ATTRIBUTES of GeneOntology</a></h2>
+<p>The following are all the attributes of the GeneOntology object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_geneontology">ASSOCIATIONS of GeneOntology</a></h2>
+<p>The following are all the objects that are associated with the GeneOntology:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchildgeneontologyrelationship_3a">Instance of <a href="#childgeneontologyrelationship">ChildGeneOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildGeneOntologyRelationshipCollection</code> to get a collection of associated ChildGeneOntologyRelationship.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentgeneontologyrelationship_3a">Instance of <a href="#parentgeneontologyrelationship">ParentGeneOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentGeneOntologyRelationshipCollection</code> to get a collection of associated ParentGeneOntologyRelationship.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="geneontologyrelationship">GeneOntologyRelationship</a></h1>
+<p>CaCORE::CaBIO::GeneOntologyRelationship - Perl extension for GeneOntologyRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GeneOntologyRelationship is a Perl object representation of the
+CaCORE GeneOntologyRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_geneontologyrelationship">ATTRIBUTES of GeneOntologyRelationship</a></h2>
+<p>The following are all the attributes of the GeneOntologyRelationship object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_relationshiptype">relationshipType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_geneontologyrelationship">ASSOCIATIONS of GeneOntologyRelationship</a></h2>
+<p>The following are all the objects that are associated with the GeneOntologyRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchildgeneontology_3a">Collection of <a href="#childgeneontology">ChildGeneOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildGeneOntology</code> to get the associated ChildGeneOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentgeneontology_3a">Collection of <a href="#parentgeneontology">ParentGeneOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentGeneOntology</code> to get the associated ParentGeneOntology.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="generelativelocation">GeneRelativeLocation</a></h1>
+<p>CaCORE::CaBIO::GeneRelativeLocation - Perl extension for GeneRelativeLocation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GeneRelativeLocation is a Perl object representation of the
+CaCORE GeneRelativeLocation object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_generelativelocation">ATTRIBUTES of GeneRelativeLocation</a></h2>
+<p>The following are all the attributes of the GeneRelativeLocation object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_generelativelocation">ASSOCIATIONS of GeneRelativeLocation</a></h2>
+<p>The following are all the objects that are associated with the GeneRelativeLocation:</p>
+<p>
+</p>
+<hr />
+<h1><a name="genericarray">GenericArray</a></h1>
+<p>CaCORE::CaBIO::GenericArray - Perl extension for GenericArray.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GenericArray is a Perl object representation of the
+CaCORE GenericArray object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_genericarray">ATTRIBUTES of GenericArray</a></h2>
+<p>The following are all the attributes of the GenericArray object and their data types:</p>
+<dl>
+<dt><strong><a name="item_arrayname">arrayName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_platform">platform</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_genericarray">ASSOCIATIONS of GenericArray</a></h2>
+<p>The following are all the objects that are associated with the GenericArray:</p>
+<dl>
+<dt><strong>Instance of <a href="#genericreporter">GenericReporter</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGenericReporterCollection</code> to get a collection of associated GenericReporter.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="genericreporter">GenericReporter</a></h1>
+<p>CaCORE::CaBIO::GenericReporter - Perl extension for GenericReporter.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::GenericReporter is a Perl object representation of the
+CaCORE GenericReporter object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_genericreporter">ATTRIBUTES of GenericReporter</a></h2>
+<p>The following are all the attributes of the GenericReporter object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_genericreporter">ASSOCIATIONS of GenericReporter</a></h2>
+<p>The following are all the objects that are associated with the GenericReporter:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fgene_3a">Collection of <a href="#gene">Gene</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getGene</code> to get the associated Gene.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fgenericarray_3a">Instance of <a href="#genericarray">GenericArray</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getGenericArrayCollection</code> to get a collection of associated GenericArray.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="histopathology">Histopathology</a></h1>
+<p>CaCORE::CaBIO::Histopathology - Perl extension for Histopathology.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Histopathology is a Perl object representation of the
+CaCORE Histopathology object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_histopathology">ATTRIBUTES of Histopathology</a></h2>
+<p>The following are all the attributes of the Histopathology object and their data types:</p>
+<dl>
+<dt><strong><a name="item_ageofonset">ageOfOnset</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_comments">comments</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_grossdescription">grossDescription</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_microscopicdescription">microscopicDescription</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_relationaloperation">relationalOperation</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_survivalinfo">survivalInfo</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_tumorincidencerate">tumorIncidenceRate</a></strong>
+
+<dd>
+<p>data type: <code>float</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_histopathology">ASSOCIATIONS of Histopathology</a></h2>
+<p>The following are all the objects that are associated with the Histopathology:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fanomaly_3a">Instance of <a href="#anomaly">Anomaly</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAnomalyCollection</code> to get a collection of associated Anomaly.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#clinicaltrialprotocol">ClinicalTrialProtocol</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getClinicalTrialProtocolCollection</code> to get a collection of associated ClinicalTrialProtocol.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fdiseaseontology_3a">Collection of <a href="#diseaseontology">DiseaseOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDiseaseOntology</code> to get the associated DiseaseOntology.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#library">Library</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLibraryCollection</code> to get a collection of associated Library.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fmetastasis_3a">Instance of <a href="#metastasis">Metastasis</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getMetastasisCollection</code> to get a collection of associated Metastasis.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2forganontology_3a">Collection of <a href="#organontology">OrganOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOrganOntology</code> to get the associated OrganOntology.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="homologousassociation">HomologousAssociation</a></h1>
+<p>CaCORE::CaBIO::HomologousAssociation - Perl extension for HomologousAssociation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::HomologousAssociation is a Perl object representation of the
+CaCORE HomologousAssociation object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_homologousassociation">ATTRIBUTES of HomologousAssociation</a></h2>
+<p>The following are all the attributes of the HomologousAssociation object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_homologousid">homologousId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_similaritypercentage">similarityPercentage</a></strong>
+
+<dd>
+<p>data type: <code>float</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_homologousassociation">ASSOCIATIONS of HomologousAssociation</a></h2>
+<p>The following are all the objects that are associated with the HomologousAssociation:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fhomologousgene_3a">Collection of <a href="#homologousgene">HomologousGene</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getHomologousGene</code> to get the associated HomologousGene.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="library">Library</a></h1>
+<p>CaCORE::CaBIO::Library - Perl extension for Library.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Library is a Perl object representation of the
+CaCORE Library object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_library">ATTRIBUTES of Library</a></h2>
+<p>The following are all the attributes of the Library object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_cloneproducer">cloneProducer</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_clonevector">cloneVector</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_clonevectortype">cloneVectorType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_clonestodate">clonesToDate</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_creationdate">creationDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_keyword">keyword</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_labhost">labHost</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_rsite1">rsite1</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_rsite2">rsite2</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sequencestodate">sequencesToDate</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_unigeneid">uniGeneId</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_library">ASSOCIATIONS of Library</a></h2>
+<p>The following are all the objects that are associated with the Library:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fclone_3a">Instance of <a href="#clone">Clone</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getCloneCollection</code> to get a collection of associated Clone.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#histopathology">Histopathology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fprotocol_3a">Collection of <a href="#protocol">Protocol</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProtocol</code> to get the associated Protocol.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftissue_3a">Collection of <a href="#tissue">Tissue</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTissue</code> to get the associated Tissue.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="location">Location</a></h1>
+<p>CaCORE::CaBIO::Location - Perl extension for Location.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Location is a Perl object representation of the
+CaCORE Location object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_location">ATTRIBUTES of Location</a></h2>
+<p>The following are all the attributes of the Location object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_location">ASSOCIATIONS of Location</a></h2>
+<p>The following are all the objects that are associated with the Location:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fsnp_3a">Collection of <a href="#snp">SNP</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSNP</code> to get the associated SNP.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#chromosome">Chromosome</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChromosome</code> to get the associated Chromosome.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getGene</code> to get the associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#nucleicacidsequence">NucleicAcidSequence</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getNucleicAcidSequence</code> to get the associated NucleicAcidSequence.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="nucleicacidsequence">NucleicAcidSequence</a></h1>
+<p>CaCORE::CaBIO::NucleicAcidSequence - Perl extension for NucleicAcidSequence.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::NucleicAcidSequence is a Perl object representation of the
+CaCORE NucleicAcidSequence object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_nucleicacidsequence">ATTRIBUTES of NucleicAcidSequence</a></h2>
+<p>The following are all the attributes of the NucleicAcidSequence object and their data types:</p>
+<dl>
+<dt><strong><a name="item_accessionnumber">accessionNumber</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_accessionnumberversion">accessionNumberVersion</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_length">length</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_value">value</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_nucleicacidsequence">ASSOCIATIONS of NucleicAcidSequence</a></h2>
+<p>The following are all the objects that are associated with the NucleicAcidSequence:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fclonerelativelocation_3a">Collection of <a href="#clonerelativelocation">CloneRelativeLocation</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getCloneRelativeLocation</code> to get the associated CloneRelativeLocation.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#databasecrossreference">DatabaseCrossReference</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDatabaseCrossReferenceCollection</code> to get a collection of associated DatabaseCrossReference.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#location">Location</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLocationCollection</code> to get a collection of associated Location.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="organontology">OrganOntology</a></h1>
+<p>CaCORE::CaBIO::OrganOntology - Perl extension for OrganOntology.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::OrganOntology is a Perl object representation of the
+CaCORE OrganOntology object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_organontology">ATTRIBUTES of OrganOntology</a></h2>
+<p>The following are all the attributes of the OrganOntology object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_organontology">ASSOCIATIONS of OrganOntology</a></h2>
+<p>The following are all the objects that are associated with the OrganOntology:</p>
+<dl>
+<dt><strong>Instance of <a href="#anomaly">Anomaly</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAnomalyCollection</code> to get a collection of associated Anomaly.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fchildorganontologyrelationship_3a">Instance of <a href="#childorganontologyrelationship">ChildOrganOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildOrganOntologyRelationshipCollection</code> to get a collection of associated ChildOrganOntologyRelationship.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#histopathology">Histopathology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentorganontologyrelationship_3a">Instance of <a href="#parentorganontologyrelationship">ParentOrganOntologyRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentOrganOntologyRelationshipCollection</code> to get a collection of associated ParentOrganOntologyRelationship.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="organontologyrelationship">OrganOntologyRelationship</a></h1>
+<p>CaCORE::CaBIO::OrganOntologyRelationship - Perl extension for OrganOntologyRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::OrganOntologyRelationship is a Perl object representation of the
+CaCORE OrganOntologyRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_organontologyrelationship">ATTRIBUTES of OrganOntologyRelationship</a></h2>
+<p>The following are all the attributes of the OrganOntologyRelationship object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_organontologyrelationship">ASSOCIATIONS of OrganOntologyRelationship</a></h2>
+<p>The following are all the objects that are associated with the OrganOntologyRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchildorganontology_3a">Collection of <a href="#childorganontology">ChildOrganOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildOrganOntology</code> to get the associated ChildOrganOntology.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentorganontology_3a">Collection of <a href="#parentorganontology">ParentOrganOntology</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentOrganOntology</code> to get the associated ParentOrganOntology.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="pathway">Pathway</a></h1>
+<p>CaCORE::CaBIO::Pathway - Perl extension for Pathway.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Pathway is a Perl object representation of the
+CaCORE Pathway object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_pathway">ATTRIBUTES of Pathway</a></h2>
+<p>The following are all the attributes of the Pathway object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_diagram">diagram</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_displayvalue">displayValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_pathway">ASSOCIATIONS of Pathway</a></h2>
+<p>The following are all the objects that are associated with the Pathway:</p>
+<dl>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#histopathology">Histopathology</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getHistopathologyCollection</code> to get a collection of associated Histopathology.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#taxon">Taxon</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTaxon</code> to get the associated Taxon.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="physicallocation">PhysicalLocation</a></h1>
+<p>CaCORE::CaBIO::PhysicalLocation - Perl extension for PhysicalLocation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::PhysicalLocation is a Perl object representation of the
+CaCORE PhysicalLocation object.</p>
+<p>PhysicalLocation extends from domain object <a href="#location">Location</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_physicallocation">ATTRIBUTES of PhysicalLocation</a></h2>
+<p>The following are all the attributes of the PhysicalLocation object and their data types:</p>
+<dl>
+<dt><strong><a name="item_chromosomalendposition">chromosomalEndPosition</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_chromosomalstartposition">chromosomalStartPosition</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_physicallocation">ASSOCIATIONS of PhysicalLocation</a></h2>
+<p>The following are all the objects that are associated with the PhysicalLocation:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fcytoband_3a">Instance of <a href="#cytoband">Cytoband</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getCytobandCollection</code> to get a collection of associated Cytoband.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="populationfrequency">PopulationFrequency</a></h1>
+<p>CaCORE::CaBIO::PopulationFrequency - Perl extension for PopulationFrequency.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::PopulationFrequency is a Perl object representation of the
+CaCORE PopulationFrequency object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_populationfrequency">ATTRIBUTES of PopulationFrequency</a></h2>
+<p>The following are all the attributes of the PopulationFrequency object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_ethnicity">ethnicity</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_majorallele">majorAllele</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_majorfrequency">majorFrequency</a></strong>
+
+<dd>
+<p>data type: <code>double</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_minorallele">minorAllele</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_minorfrequency">minorFrequency</a></strong>
+
+<dd>
+<p>data type: <code>double</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_populationfrequency">ASSOCIATIONS of PopulationFrequency</a></h2>
+<p>The following are all the objects that are associated with the PopulationFrequency:</p>
+<dl>
+<dt><strong>Collection of <a href="#snp">SNP</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSNP</code> to get the associated SNP.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="protein">Protein</a></h1>
+<p>CaCORE::CaBIO::Protein - Perl extension for Protein.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Protein is a Perl object representation of the
+CaCORE Protein object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_protein">ATTRIBUTES of Protein</a></h2>
+<p>The following are all the attributes of the Protein object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_copyrightstatement">copyrightStatement</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_primaryaccession">primaryAccession</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_uniprotcode">uniProtCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_protein">ASSOCIATIONS of Protein</a></h2>
+<p>The following are all the objects that are associated with the Protein:</p>
+<dl>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fkeywords_3a">Instance of <a href="#keywords">Keywords</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getKeywordsCollection</code> to get a collection of associated Keywords.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fproteinalias_3a">Instance of <a href="#proteinalias">ProteinAlias</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getProteinAliasCollection</code> to get a collection of associated ProteinAlias.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fproteinsequence_3a">Collection of <a href="#proteinsequence">ProteinSequence</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProteinSequence</code> to get the associated ProteinSequence.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsecondaryaccession_3a">Instance of <a href="#secondaryaccession">SecondaryAccession</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSecondaryAccessionCollection</code> to get a collection of associated SecondaryAccession.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#taxon">Taxon</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getTaxonCollection</code> to get a collection of associated Taxon.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="proteinalias">ProteinAlias</a></h1>
+<p>CaCORE::CaBIO::ProteinAlias - Perl extension for ProteinAlias.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::ProteinAlias is a Perl object representation of the
+CaCORE ProteinAlias object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_proteinalias">ATTRIBUTES of ProteinAlias</a></h2>
+<p>The following are all the attributes of the ProteinAlias object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_proteinalias">ASSOCIATIONS of ProteinAlias</a></h2>
+<p>The following are all the objects that are associated with the ProteinAlias:</p>
+<dl>
+<dt><strong>Instance of <a href="#protein">Protein</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getProteinCollection</code> to get a collection of associated Protein.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="proteinsequence">ProteinSequence</a></h1>
+<p>CaCORE::CaBIO::ProteinSequence - Perl extension for ProteinSequence.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::ProteinSequence is a Perl object representation of the
+CaCORE ProteinSequence object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_proteinsequence">ATTRIBUTES of ProteinSequence</a></h2>
+<p>The following are all the attributes of the ProteinSequence object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_checksum">checkSum</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>length</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_molecularweightindaltons">molecularWeightInDaltons</a></strong>
+
+<dd>
+<p>data type: <code>double</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_proteinsequence">ASSOCIATIONS of ProteinSequence</a></h2>
+<p>The following are all the objects that are associated with the ProteinSequence:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fprotein_3a">Collection of <a href="#protein">Protein</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProtein</code> to get the associated Protein.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="protocol">Protocol</a></h1>
+<p>CaCORE::CaBIO::Protocol - Perl extension for Protocol.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Protocol is a Perl object representation of the
+CaCORE Protocol object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_protocol">ATTRIBUTES of Protocol</a></h2>
+<p>The following are all the attributes of the Protocol object and their data types:</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_protocol">ASSOCIATIONS of Protocol</a></h2>
+<p>The following are all the objects that are associated with the Protocol:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#library">Library</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLibraryCollection</code> to get a collection of associated Library.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftissue_3a">Instance of <a href="#tissue">Tissue</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTissueCollection</code> to get a collection of associated Tissue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="protocolassociation">ProtocolAssociation</a></h1>
+<p>CaCORE::CaBIO::ProtocolAssociation - Perl extension for ProtocolAssociation.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::ProtocolAssociation is a Perl object representation of the
+CaCORE ProtocolAssociation object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_protocolassociation">ATTRIBUTES of ProtocolAssociation</a></h2>
+<p>The following are all the attributes of the ProtocolAssociation object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_ctepname">CTEPNAME</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_imtcode">IMTCODE</a></strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_diseasecategory">diseaseCategory</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_diseasesubcategory">diseaseSubCategory</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_protocolassociation">ASSOCIATIONS of ProtocolAssociation</a></h2>
+<p>The following are all the objects that are associated with the ProtocolAssociation:
+
+</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fclinicaltrialprotocol_3a">Collection of <a href="#clinicaltrialprotocol">ClinicalTrialProtocol</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClinicalTrialProtocol</code> to get the associated ClinicalTrialProtocol.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#diseaseontology">DiseaseOntology</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDiseaseOntology</code> to get the associated DiseaseOntology.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="snp">SNP</a></h1>
+<p>CaCORE::CaBIO::SNP - Perl extension for SNP.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::SNP is a Perl object representation of the
+CaCORE SNP object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_snp">ATTRIBUTES of SNP</a></h2>
+<p>The following are all the attributes of the SNP object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_dbsnpid">DBSNPID</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_allelea">alleleA</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_alleleb">alleleB</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_validationstatus">validationStatus</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_snp">ASSOCIATIONS of SNP</a></h2>
+<p>The following are all the objects that are associated with the SNP:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#databasecrossreference">DatabaseCrossReference</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDatabaseCrossReferenceCollection</code> to get a collection of associated DatabaseCrossReference.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#generelativelocation">GeneRelativeLocation</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneRelativeLocationCollection</code> to get a collection of associated GeneRelativeLocation.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#location">Location</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLocationCollection</code> to get a collection of associated Location.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fpopulationfrequency_3a">Instance of <a href="#populationfrequency">PopulationFrequency</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPopulationFrequencyCollection</code> to get a collection of associated PopulationFrequency.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="target">Target</a></h1>
+<p>CaCORE::CaBIO::Target - Perl extension for Target.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Target is a Perl object representation of the
+CaCORE Target object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_target">ATTRIBUTES of Target</a></h2>
+<p>The following are all the attributes of the Target object and their data types:
+
+</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_target">ASSOCIATIONS of Target</a></h2>
+<p>The following are all the objects that are associated with the Target:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#agent">Agent</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAgentCollection</code> to get a collection of associated Agent.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#anomaly">Anomaly</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAnomalyCollection</code> to get a collection of associated Anomaly.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="taxon">Taxon</a></h1>
+<p>CaCORE::CaBIO::Taxon - Perl extension for Taxon.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Taxon is a Perl object representation of the
+CaCORE Taxon object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_taxon">ATTRIBUTES of Taxon</a></h2>
+<p>The following are all the attributes of the Taxon object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_abbreviation">abbreviation</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_commonname">commonName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_ethnicitystrain">ethnicityStrain</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_scientificname">scientificName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_taxon">ASSOCIATIONS of Taxon</a></h2>
+<p>The following are all the objects that are associated with the Taxon:
+
+</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchromosome_3a">Instance of <a href="#chromosome">Chromosome</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChromosomeCollection</code> to get a collection of associated Chromosome.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#clone">Clone</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getCloneCollection</code> to get a collection of associated Clone.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#gene">Gene</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getGeneCollection</code> to get a collection of associated Gene.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#pathway">Pathway</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getPathwayCollection</code> to get a collection of associated Pathway.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#protein">Protein</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getProteinCollection</code> to get a collection of associated Protein.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#tissue">Tissue</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getTissueCollection</code> to get a collection of associated Tissue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="tissue">Tissue</a></h1>
+<p>CaCORE::CaBIO::Tissue - Perl extension for Tissue.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Tissue is a Perl object representation of the
+CaCORE Tissue object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_tissue">ATTRIBUTES of Tissue</a></h2>
+<p>The following are all the attributes of the Tissue object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_cellline">cellLine</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_celltype">cellType</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_developmentalstage">developmentalStage</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_histology">histology</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_organ">organ</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_sex">sex</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_supplier">supplier</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_tissue">ASSOCIATIONS of Tissue</a></h2>
+<p>The following are all the objects that are associated with the Tissue:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#library">Library</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getLibraryCollection</code> to get a collection of associated Library.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#protocol">Protocol</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProtocol</code> to get the associated Protocol.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#taxon">Taxon</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTaxon</code> to get the associated Taxon.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="vocabulary">Vocabulary</a></h1>
+<p>CaCORE::CaBIO::Vocabulary - Perl extension for Vocabulary.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaBIO::Vocabulary is a Perl object representation of the
+CaCORE Vocabulary object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_vocabulary">ATTRIBUTES of Vocabulary</a></h2>
+<p>The following are all the attributes of the Vocabulary object and their data types:
+
+</p>
+<dl>
+<dt><strong>bigid</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_coreterm">coreTerm</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_generalterm">generalTerm</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_vocabulary">ASSOCIATIONS of Vocabulary</a></h2>
+<p>The following are all the objects that are associated with the Vocabulary:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#anomaly">Anomaly</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAnomalyCollection</code> to get a collection of associated Anomaly.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>The CaCORE Software License, Version 1.0
+
+</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.
+
+</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.
+
+</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.
+
+</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.
+
+</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

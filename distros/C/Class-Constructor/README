@@ -1,0 +1,81 @@
+
+Class::Constructor
+------------------
+This is Class::Constructor, a package that simplifies the creation
+of object constructors in your own modules.
+
+It is meant to work alongside Class::Accessor.  Use Class::Accessor to
+automate the creation of your object accessor methods, and
+Class::Constructor to automate the creation of your object constructor
+methods.
+
+Instead of writing:
+
+    sub new {
+        my $proto = shift;
+        my $class = ref $proto || $proto;
+        my $self = {};
+        bless $self, $class;
+
+        my %args = @_;
+        foreach my $attr ('first_attribute', 'second_attribute') {
+            $self->$attr($args{$attr});
+        }
+
+        $self->_init();
+
+        return $self;
+    }
+
+You can just write:
+
+    CLASS->mk_constructor(
+        Auto_Init      => [ 'first_attribute', 'second_attribute' ],
+    );
+
+(There are other features as well for creating more sophisticated
+constructors.  See the docs for details.)
+
+The syntax is loosely based on Class::Accessor, by Michael G. Schwern.
+
+Prerequisites
+-------------
+* Perl 5.005 or higher
+
+
+Installing
+----------
+On Unix systems install Class::Constructor as you would any other
+perl module:
+
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    $ make install
+
+To read the docs, type:
+
+    perldoc Class::Constructor
+
+On systems without make (e.g. Windows), first copy Constructor.pm
+into your local library directory (e.g. C:\PERL\lib\site\Class).
+
+To read the docs, run them through the pod2html program:
+
+    perl -S pod2html.pl Constructor.pm > Constructor.html
+
+And then open the html files in your web browser.
+
+Homepage
+--------
+
+    http://www.occamstoothbrush.com/perl/
+
+Author
+------
+Michael Graham <mag-perl@occamstoothbrush.com>
+
+Copyright (C) 2001 Michael Graham.  All rights reserved.
+This program is free software.  You can use, modify
+and distribute it under the same terms as Perl itself.
+

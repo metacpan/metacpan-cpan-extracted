@@ -1,0 +1,20 @@
+MANIFEST
+README
+CHANGES
+Makefile.PL
+SMIME.pm
+SMIME.xs
+test.pl
+typemap
+perlobject.map
+t/ca.crt
+t/ca.key
+t/MailForSend.txt
+t/README
+t/recipient.crt
+t/recipient.csr
+t/recipient.key
+t/sender.crt
+t/sender.csr
+t/sender.key
+META.yml                                 Module meta-data (added by MakeMaker)

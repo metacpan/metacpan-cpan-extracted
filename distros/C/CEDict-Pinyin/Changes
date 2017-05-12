@@ -1,0 +1,21 @@
+0.02004   2010-03-01
+          - Now you don't have to pass in an array reference to isPinyin.
+          - Modified the test case 01test.t.
+          - Changed the synopsis documentation.
+
+0.02003   2009-04-25
+          - More POD documentation formatting problems.
+
+0.02002   2009-04-25
+          - Fixed version in Makefile.PL
+
+0.02001   2009-04-25
+          - Fixed some typos in the documentation.
+
+0.02000   2008-07-11
+          - Added "diacritic" for rendering Pinyin text with
+          diacritic marks instead of numbers to represent
+          tone marks.
+
+          - Fixed a bug in the "buildRegex" method that would
+          generate the wrong pattern in some cases

@@ -1,0 +1,99 @@
+- Perl signal handling is currently unsafe for multi-threaded servers.
+
+- It would be very nice to have alternate methods of loading
+  up interface information that don't rely on a running
+  interface repository. The two interesting variants of this
+  are:
+
+   1) Loading directly from IDL files
+   2) A "compiler" that writes the interface information into
+      module files.
+
+  1) is difficult to do, simply because the omniORB IDL compiler is
+  too slow. libIDL from ORBit is fast enough to make this practical,
+  but with omniORB's IDL compiler, the overhead is most likely
+  prohibitive.  Plus, omniidl is licensed under the GPL, and
+  CORBA::omniORB is LGPL.
+
+  There are a couple of different ways of doing 2). The first
+  one is to define a set of Perl interfaces that essentially
+  parallel the write interfaces for the Interface repository.
+  The generate .pm files would simply use these files to
+  initialize the local type structures. (In fact, these
+  interfaces could simply _be_ the IR write interfaces, if
+  we wanted to link in the omniIFR code.)
+
+  The second way would be to dump the InterfaceDescription
+  information out in raw form into the __DATA__ of a .pm.
+  An easy way of doing this might be to reuse omniORB's 
+  codecs, and thus pickle a CORBA::Any into its CDR
+  form.
+
+- Careful audit for reference counting leaks.  (Overnight test runs
+  and valgrind tests have been done, but more wouldn't hurt.  It is
+  suspected that some of the char * returns in omniORB.xs are leaking
+  strings.)
+
+- croak() doesn't unwind the C++ stack, so _var's can leak.
+  There are now trampoline exception classes provided for wrapping code
+  that calls croak() or pomni_throw(); see the CATCH_POMNI_TRAMPOLINE macro
+  in pomni.h.
+
+- We probably need to surround _every_ call into omniORB with
+  a trap for CORBA::SystemException.  The CATCH_POMNI_SYSTEMEXCEPTION
+  macro in pomni.h is provided for doing this.
+
+- Blocking calls into omniORB need to unlock the Perl entry lock
+  using POmniPerlEntryUnlocker.  (Currently most of the important
+  cases are covered.)
+
+- Cache results in a hash table when looking up descriptions on the
+  server side to avoid tons of strcmp calls.
+
+- Set up Typecode constants for loaded interfaces/modules.
+
+- Fill in member functions for TypeCode
+
+- When loading interfaces, we make too many calls to the
+  interface repository.
+
+- Globally remove all the (char *) casts when passing const
+  char *'s into Perl functions and do something better.
+
+- The conversion functions in exttypes.cc are pretty cheesy.
+  They should use C library functions when available. (In particular
+  for LongDouble, where the last bit tends to be wrong)
+
+- Optimize CORBA::omniORB::Fixed.
+
+- Write hooks for Perl's standard Storable module
+
+- A test suite.  Some tests from <http://corba-cost.sourceforge.net/>:
+
+  echo: basic - basic
+  echo: basic - derived
+  echo: basic - multi
+  echo: derived - basic
+  echo: derived - derived
+  echo: derived - multi
+  echo: multi - basic
+  echo: multi - derived
+  echo: multi - multi
+  echo: untyped - basic
+  multiEcho_tie
+  nullecho
+  refp
+  seqEcho
+  tstexcept
+  attrEcho
+  attrObjRef
+  concurrent
+  inheritance_test
+  pseudo_tests
+  seq long
+  seq objref
+  seq string
+  seq struct
+  string
+  seq tests
+  sysexceptions

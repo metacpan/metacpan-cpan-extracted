@@ -1,0 +1,50 @@
+---
+abstract: 'Speedier interface to HTML::FormFu for Catalyst'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Controller: 0
+  Catalyst::Engine::HTTP: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Restarter: 0
+  Catalyst::Runtime: 5.80
+  Catalyst::Test: 0
+  Catalyst::View::TT: 0
+  DBIx::Class::Candy: 0
+  DBIx::Class::Schema: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  HTML::FormFu::Model::DBIC: 0.09000
+  Path::Class: 0
+  Pod::Usage: 0
+  Test::More: 0
+  Test::Most: 0
+  parent: 0
+  rlib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Model-FormFu
+no_index:
+  directory:
+    - benchmark
+requires:
+  Catalyst::Component::InstancePerContext: 0
+  Catalyst::Model: 0
+  HTML::FormFu: 0
+  Moose: 0
+  Scalar::Util: 0
+  namespace::clean: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Model-FormFu
+  homepage: http://github.com/pshangov/catalyst-model-formfu/tree
+  repository: git://github.com/pshangov/catalyst-model-formfu.git
+version: 0.004

@@ -1,0 +1,68 @@
+Version 1.15 - 29th May 2006
+    + Changed to use Module::Build.
+
+    + Added use of Safe module to prevent code injection
+      through the evaluation of the Colloquy data files.
+
+    + Changed unit tests to use Test::Deep instead of
+      Test::Assertions
+
+Version 1.14 - 6th February 2006
+    + Modified Makefile.PL to be aware of automated testing
+      environment variable and default to no to send usage
+      information.
+
+Version 1.13 - 12th January 2006
+    + Fixed POD so that it actually passes the
+      Test::Pod::Coverage unit tests, and fixed
+      the unit test so that it actually tests the
+      POD coverage since it wasn't before.
+
+Version 1.12 - 12th January 2006
+    + Tweaked unit test for 1.4 data to ensure
+      that permissions are safe to begin with, and
+      then force an insecurity to test the security
+      trap.
+
+Version 1.11 - 7th January 2006
+    + Added Test::Pod and Test::Pod::Coverage unit
+      tests to make more compliant with CPANTS.
+
+Version 1.10 - 30th December 2005
+    + Changed license to Apache 2.0
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Version 1.9 - 29th December 2005
+    + Added Changes file.
+
+    + Added GPL license header comment to various files.
+
+    + Modified Makefile.PL to send anonymous information to
+      http://perlgirl.org.uk/lib/usage.cgi if the user
+      agrees. This is so I can track which of my modules
+      are most heavily used and on what platforms, so I can
+      concentrate on maintaning the most popular ones in
+      my limited spare time.
+
+Version 1.6 - 13th December 2005
+    + Changed code to only read in files and ignore
+      directories.
+
+Version 1.5 - 8th December 2005
+    + Changed POD.
+
+Version 1.4 - 28th November 2005
+    + Added condition to catch known invalid user data files
+      in colloquy when only the "return {" line is written
+      because of case sensitive cruft in the colloquy code.
+
+Version 1.3 - 12th November 2005
+    + Fixed typo.
+
+Version 1.2 - 12th November 2005
+    + Updated the code to include carping and to actually
+      do the permissions checking ;-)
+
+Version 1.1 - 12th November 2005
+    + Adding initial release.
+

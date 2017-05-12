@@ -1,0 +1,68 @@
+=for html
+<p>
+<a href="https://travis-ci.org/nwellnhof/perl-commonmark?branch=master"><img src="https://travis-ci.org/nwellnhof/perl-commonmark.svg?branch=master"></a>
+<a href="https://coveralls.io/r/nwellnhof/perl-commonmark?branch=master"><img src="https://coveralls.io/repos/nwellnhof/perl-commonmark/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="http://badge.fury.io/pl/CommonMark"><img src="https://badge.fury.io/pl/CommonMark.svg" alt="CPAN version"></a>
+</p>
+
+=head1 Perl bindings for the CommonMark C library
+
+This module is a wrapper around I<libcmark>, the official CommonMark C
+library.
+
+=head2 Installation of libcmark
+
+Please note that the I<libcmark> API isn't stable yet. This version of the
+Perl bindings is targeted at I<libcmark>
+L<version 0.24.1|https://github.com/jgm/cmark/releases/tag/0.24.1>.
+It's known to work with all releases between 0.21.0 and 0.24.1, but there's
+no guarantee that it can be compiled with later versions. Also note that
+upgrading libcmark may require recompilation of the Perl module.
+
+    curl -LJO https://github.com/jgm/cmark/archive/0.24.1.tar.gz
+    tar xzf cmark-0.24.1.tar.gz
+    cd cmark-0.24.1
+    make [INSTALL_PREFIX=/prefix]
+    make test
+    make install
+
+See the I<libcmark> README for details.
+
+=head2 Installation from a CPAN tarball
+
+If I<libcmark> is in a standard location:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Otherwise:
+
+    perl Makefile.PL \
+        INC="-I/prefix/include" \
+        LIBS="-L/prefix/lib -lcmark"
+    make
+    make test
+    make install
+
+See the documentation of I<ExtUtils::MakeMaker> for additional options.
+The I<PERL_MM_OPT> environment variable is especially useful.
+
+    export PERL_MM_OPT='INC="-I..." LIBS="-L... -lcmark"'
+
+=head2 Build from a repository checkout 
+
+You need I<Dist::Zilla> with the external plugin I<MakeMaker::Awesome>.
+Then you can build and test with I<dzil>:
+
+    dzil test
+    dzil build
+
+=head2 Copyright
+
+This software is copyright (C) by Nick Wellnhofer.
+ 
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

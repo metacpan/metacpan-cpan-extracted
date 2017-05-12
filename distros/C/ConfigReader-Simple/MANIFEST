@@ -1,0 +1,38 @@
+Changes
+eg/config.desc
+eg/config_creator.pl
+eg/example.pl
+examples/README
+INSTALL.SKIP
+lib/ConfigReader/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/_save.t
+t/add_config_file.t
+t/clone.config
+t/clone.t
+t/eof.config
+t/example.config
+t/exists.t
+t/get.t
+t/global.config
+t/load.t
+t/new_multiple.t
+t/new_string.t
+t/parse.t
+t/parse_line.t
+t/parse_string.t
+t/pod.t
+t/pod_coverage.t
+t/remove.t
+t/save.t
+t/set.t
+t/test_manifest
+t/unparseable.config
+t/validate_keys.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,43 @@
+---
+abstract: "A generalised API version of David Golden's visitcpan"
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.86
+  Test::NoWarnings: 0.084
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CPAN::Mini::Visit
+name: CPAN-Mini-Visit
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Extract: 0.32
+  Archive::Tar: 1.52
+  CPAN::Mini: 0.576
+  File::Find::Rule: 0.27
+  File::Spec: 0.80
+  File::Temp: 0.21
+  File::chmod: 0.31
+  File::pushd: 1.00
+  Locale::Maketext: 1.19
+  Object::Tiny: 1.06
+  Params::Util: 1.00
+  perl: 5.8.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/CPAN-Mini-Visit
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/CPAN-Mini-Visit
+version: 1.15

@@ -1,0 +1,26 @@
+$Id: README 1111 2006-02-22 00:39:49Z ykerherve $
+
+This is Catalyst::Plugin::MortalForward, an implementation of a forward which
+throws exceptions.
+
+PREREQUISITES
+
+    * Catalyst
+
+INSTALLATION
+
+Catalyst::Plugin::MortalForward installation is straightforward. If your
+CPAN shell is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Catalyst::Plugin::MortalForward'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Build.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Six Apart / cpan@sixapart.com

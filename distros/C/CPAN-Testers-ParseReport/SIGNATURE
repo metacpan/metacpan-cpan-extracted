@@ -1,0 +1,193 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ebaf9660bff10171b456b545ef87541c2f746ce5 Changes
+SHA1 0d99c7a8359fbe3663326c484e4f097ec8a77b69 MANIFEST
+SHA1 9affe93993fbf2ef31f3c3f450fdbc6812ab6d03 MANIFEST.SKIP
+SHA1 221f3b3ee4d830c66b87a53146ef1115b4dd3745 META.json
+SHA1 8c5ef3a8a79ecc305b14426e98415a0e8e2fd69f META.yml
+SHA1 e9ccf74d1b7ba302438decfa008207a75e9f3c8c Makefile.PL
+SHA1 af348ab0f2fa69ad7dd041744d3fc4c1674acf88 README
+SHA1 75e051bd856dd73b1ac2ca54d910d4f00dc49fbe TODO
+SHA1 8b53bdb4632531b3598bfcafd87a3de4537e13fe bin/conf2conf.pl
+SHA1 717993aae86e6d7d2fe6edfe13efaabe517a3dde bin/ctgetreports
+SHA1 ba9b408017070abf10118cff7b92a5f0ee5aec08 bin/ctsolvereports
+SHA1 6931044a81cb49340a6a77cf51763cdf86a275b0 lib/CPAN/Testers/ParseReport.pm
+SHA1 214ea606d3bf7bbdc14af4afa8c8bee51a33d8d2 t/00-load.t
+SHA1 2c653e503aee9e78f775d237b36756aa38bc92e4 t/01-metayaml.t
+SHA1 563f378233bd3fca1636b206fb1002d31536edc5 t/ctgetreports.t
+SHA1 8eca35b6718a7a24ed5df6c01ad20d34908404df t/ctgr-live.t
+SHA1 865602362ea5d413242733d1e5e6e19c899837e9 t/nytprof.t
+SHA1 2dd80143fcb6f0e7515448406fd8eb842db15238 t/parse_long_report.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 dc81efbf47d931f84070d06f36eec909b25fbd03 t/run.t
+SHA1 6e8b2fe0cad12186b8dc95a5b86c95cdadc6e038 t/var/cpantesters-show/Scriptalicious.headers
+SHA1 9e675fa2caf5b4e9827bafbb907be85584774a0b t/var/cpantesters-show/Scriptalicious.json
+SHA1 9e47e39c6cd99a8bb33acb700a57d3ea5a4b8477 t/var/cpantesters-show/Scriptalicious.yaml
+SHA1 f407d57907031d1064d45937b7e81db4dc686ea7 t/var/fake/Module-Versions-Report
+SHA1 b8a370a14b3d606ddf74abcf829a428822e73d25 t/var/nntp-testers/1423910
+SHA1 74be1b7fa3054f5381b962eca0bafe934b78fb3f t/var/nntp-testers/1423911
+SHA1 4c4932b624d1e45b725f68690b1bbe27e3e0faca t/var/nntp-testers/1423912
+SHA1 d441860904a437569f127d332b8426bba4358c60 t/var/nntp-testers/1423914
+SHA1 304c281f6460c06a6d8b3c36954b47cfb20f50ac t/var/nntp-testers/1423917
+SHA1 73179563f8bc21bc89985434b2b1c7097b94c930 t/var/nntp-testers/1423919
+SHA1 0adb4b8265774e86e35c13a0d7b507741d7d148a t/var/nntp-testers/1423923
+SHA1 57329acc4585432d7b20985b13a9b00dcb5aea66 t/var/nntp-testers/1423925
+SHA1 939a3a234a9ef85c4af14ee3a81ce2196f63e1df t/var/nntp-testers/1423927
+SHA1 53d6eda52668eabb40c986ce03a7ce934bd44a6c t/var/nntp-testers/1423928
+SHA1 151e2c0f61bc1ae9a3491dd08eb1e87602a637dd t/var/nntp-testers/1424694
+SHA1 835cdf888e67fd43a1b52f3f4ee1f2e1bfbc6da8 t/var/nntp-testers/1424997
+SHA1 ad62d7ebed46c21ab2d650ad6fd1adc361a84f70 t/var/nntp-testers/1425023
+SHA1 8ee0a4bb53816883c4f4b8845d0ff4ac9f932677 t/var/nntp-testers/1425097
+SHA1 e0a757c4fc8638ab239e4761badf20f2ad131d02 t/var/nntp-testers/1425113
+SHA1 da85de267a05b390f2768891188178ad324d8f94 t/var/nntp-testers/1425116
+SHA1 d44e457651ec86276ac893e3bc2dedcae9368fa8 t/var/nntp-testers/1425119
+SHA1 570b9f8c7c1f3fe4ea3a14e269fc5c99a81749f8 t/var/nntp-testers/1425125
+SHA1 5935581435a53737f1269d772f6d2a036469754c t/var/nntp-testers/1425127
+SHA1 a865cc2658780e2402ec9d4c3e703857de0fefeb t/var/nntp-testers/1425129
+SHA1 8f2076850cd4960aa32912bff9d1677efcf2c9f0 t/var/nntp-testers/1425132
+SHA1 3d7b4f7a66b8ca2a2fe9002d208d1cacf24c7b44 t/var/nntp-testers/1425770
+SHA1 4184f881be54be8f473eb355f151e0890ea7d5a0 t/var/nntp-testers/1426481
+SHA1 b4af2c167c492f12512601454d4655d10723ac7a t/var/nntp-testers/1426833
+SHA1 a140ebc73c181f5e07760a07a4372e5910296c9d t/var/nntp-testers/1426834
+SHA1 31ec095191755be969f558c863e0a6b6a097de56 t/var/nntp-testers/1427341
+SHA1 d0175371092eb4bb19d68fd24f445d7b1fe45fdb t/var/nntp-testers/1427455
+SHA1 645fc267676e8558a61d4365a9165f5b52b28750 t/var/nntp-testers/1427462
+SHA1 d8b1be742a7a801d89bf0991e58b90abf6a5808d t/var/nntp-testers/1427741
+SHA1 4c05f9f046f132627e3aee7b09b53aae18a6af5c t/var/nntp-testers/1427750
+SHA1 5d9a10c54bda561bb12dea7ae815859576fbf332 t/var/nntp-testers/1427801
+SHA1 2782300eb12e46584441a5d960329d63b4180674 t/var/nntp-testers/1428287
+SHA1 8e1227730731897c32e8a69b24d692e8fb2fb21b t/var/nntp-testers/1431202
+SHA1 017fca42324e40a2d0c86b883785417058c66151 t/var/nntp-testers/1431561
+SHA1 dc33902b088c52b2530e0931c4407063412d0ef6 t/var/nntp-testers/1431945
+SHA1 ff4b9f0cf0331d1bfb63dff2064d3470fe58ee74 t/var/nntp-testers/1433311
+SHA1 5ce8a26b915419875d5aada29a6b85058785f4a1 t/var/nntp-testers/1433375
+SHA1 5cd00c16e5163aefa05893e5759c2661efd3d256 t/var/nntp-testers/1437272
+SHA1 9d72577edd37659b4207bbdb4a22075cf2716ed7 t/var/nntp-testers/1451287
+SHA1 8f9907bf293645c3b947f02b17469c555361d3f8 t/var/nntp-testers/1455329
+SHA1 efd1f71daee08bae267ffeb2a5bef7a985012200 t/var/nntp-testers/1462318
+SHA1 359971fc3af945a983aef608d3ab22a6e42098bf t/var/nntp-testers/1463345
+SHA1 4bb0254da3e53a4d4522f14756a7837e2c4355e4 t/var/nntp-testers/1467394
+SHA1 0b1eca8ce0cd117acf9e67dc522c4439c5f77751 t/var/nntp-testers/1478381
+SHA1 e4626ff567e6e49003e8b5e6377e0640dfcfe484 t/var/nntp-testers/1487124
+SHA1 31c300ec010faae041630f8a9363f72aa57ac000 t/var/nntp-testers/1491366
+SHA1 4832269ccf9e7cdc45fe86828cea7fc440f278b7 t/var/nntp-testers/1495127
+SHA1 8b1e2b5176131c37552ac3d0966162a1efde5ee4 t/var/nntp-testers/1509437
+SHA1 427845dde2af9b972f19a2eb701536cec691a180 t/var/nntp-testers/1514267
+SHA1 33995698a5bdac8d86bcbcbc192a3c6a8b7d2173 t/var/nntp-testers/1523406
+SHA1 5a7e02caf660349d6f60451d7369cbf081d1a8df t/var/nntp-testers/1531637
+SHA1 0573ca61e229d60f8c89723ae665e2a75a58c96d t/var/nntp-testers/1533902
+SHA1 c4662ca964770bb16f23cbc4ff0d7c82cb0c9606 t/var/nntp-testers/1539822
+SHA1 1a0bfd3db8648e016f1b78287cc225c6636af211 t/var/nntp-testers/1542309
+SHA1 c1470afddede8782692c0e50303ca93d18d5061c t/var/nntp-testers/1545673
+SHA1 c743a0af8265c5d2e64646a2c6052cce82c92bcf t/var/nntp-testers/1556882
+SHA1 0291ae671d6f1cda2dddf5a52cb50ae64f0827ed t/var/nntp-testers/1562447
+SHA1 d0e06a7b895f2fdc902c73e6a9e1e88dea39abb0 t/var/nntp-testers/1568304
+SHA1 8ebfbcc4a1ba4eea504c235e42fee8e701c15ec4 t/var/nntp-testers/1572984
+SHA1 56b080b950adc4452405aa6f15b6213bc0c8c946 t/var/nntp-testers/1581994
+SHA1 a09ca7b2b5dc2cfe49bba004bd398feacab4e1ee t/var/nntp-testers/1605990
+SHA1 9bfc26ccedcaba7940fc925079e3be4b021be5ec t/var/nntp-testers/1607915
+SHA1 0a0036ec977834ebb53fadc7265baf16422c6a9b t/var/nntp-testers/1634201
+SHA1 11362a2fb6841d39a6898747932f528e3eca0707 t/var/nntp-testers/1639785
+SHA1 a2c85c7d129b2c3a34085a27e4ea67df78295985 t/var/nntp-testers/1666660
+SHA1 272fbfd73c98a956169ec3b926e048f364612cd8 t/var/nntp-testers/1678737
+SHA1 1438cd6741c2d91b90bdec07f273e6df2ee37641 t/var/nntp-testers/16833358.gz
+SHA1 5dfb7c1dee03f3d971b89b7542147a2693928061 t/var/nntp-testers/1692130
+SHA1 13a935c6cd19a3adcecd0436854ddb1f65d3dff4 t/var/nntp-testers/1698371
+SHA1 41f8fbdd7dab19eca3d3f9472d5a318d7ae68173 t/var/nntp-testers/1703708
+SHA1 8a19fcc2164982eea4e73628286bf2bdbdf6aa09 t/var/nntp-testers/1705692
+SHA1 1f5ffe84c822728fbd61db86216049a122bc203b t/var/nntp-testers/1711521
+SHA1 492a06251bd0400141ec512446140b8ecf7490f5 t/var/nntp-testers/1720807
+SHA1 2f0cbf8328a4a76ca7d61fa495d3919bd456194d t/var/nntp-testers/1727416
+SHA1 abf7ad9f7e7ec7e2414896e038c58c7884a358aa t/var/nntp-testers/1727422
+SHA1 6e2fdb0ac728d8239ff6c7229a050bd240544303 t/var/nntp-testers/1765002
+SHA1 6b951da5bc23c848a0ecb4a11c02d7c764dd918f t/var/nntp-testers/1772433
+SHA1 462522160ad83e902bab1c38f5ba4ae80d5449a6 t/var/nntp-testers/1785897
+SHA1 28a6a254176a96fc21d9ede6a606f6754168316e t/var/nntp-testers/1797053
+SHA1 47ef6a94e1315cd7b37a2eafc77fd95475701f0a t/var/nntp-testers/1808597
+SHA1 3133d0857d4827e3220c659a6c1fd86c1b67a62f t/var/nntp-testers/1817513
+SHA1 8604ae4d5d72f20568c7309a6b1ab3b09018c725 t/var/nntp-testers/1832312
+SHA1 6d71a64f3a96659a22e751a7a977f94b095803ab t/var/nntp-testers/18548512.gz
+SHA1 bf1d8e32f086e21bd72875095523554cd1f0ee3a t/var/nntp-testers/1858862
+SHA1 3abd90bbabf83125953c88626c35a27e1cca26da t/var/nntp-testers/1874870
+SHA1 dac144567e8cf9086ba8d5e6555260db9a606241 t/var/nntp-testers/1886196
+SHA1 d872d73ef6173a2abdbb7d51644745a14336c75f t/var/nntp-testers/18981290
+SHA1 882b54a7448c7249854a744f930d438821319692 t/var/nntp-testers/1898917
+SHA1 d53d4798c2078fca8d733dcacb65dc5c0247dd17 t/var/nntp-testers/1915394
+SHA1 13267ce13731b1fb62e046eba4858d83322f94e8 t/var/nntp-testers/1931471
+SHA1 fe8e0aadec3b07698690fe80d17de3df463a8b93 t/var/nntp-testers/1947592
+SHA1 739a792a0a736e07bf66bae297ed916747fc59df t/var/nntp-testers/1963410
+SHA1 ffb4e26c15d271abcca7fb1d3233420ff6f8ed7c t/var/nntp-testers/1971376
+SHA1 5e0c9f2f458907c40ad7f8661b7273868799951f t/var/nntp-testers/2023712
+SHA1 e035141d7e855dbce88407cbd83ab7110c0a7b95 t/var/nntp-testers/2044631
+SHA1 27bdad806b8a2bca5a60d6b3349aa56e778f99da t/var/nntp-testers/2050880
+SHA1 d211005209776c8b7b76f3b7b83bd87e12461e39 t/var/nntp-testers/2063153
+SHA1 e9e876c1841836cc049e10785c6ba2aa9d7919a6 t/var/nntp-testers/2077848
+SHA1 ba6673b501cca55d863302e4ce318364103db662 t/var/nntp-testers/2090563
+SHA1 e82680b83db8cae706a24ab6f54c709440834e25 t/var/nntp-testers/2106255
+SHA1 db92e41d90854c41491f6649c382b4d99298b3bb t/var/nntp-testers/2110470
+SHA1 2ceebb3f1bf0ba084bff2ef7928fa56003e11c73 t/var/nntp-testers/2119277
+SHA1 22425ddd2c2c540a4d05cd6cf13795e424fb4ea1 t/var/nntp-testers/2129076
+SHA1 0045e4920e149337bbc0252ff331466fe61551ff t/var/nntp-testers/2140571
+SHA1 bd8f9430111a9973278dc15d2398b08056363611 t/var/nntp-testers/2150060
+SHA1 2497afdc5bc88354ebf45c62339a10ed32a9ba5f t/var/nntp-testers/2154281
+SHA1 ff3d5af70117b35f5d28669d2cf7145f06f080d2 t/var/nntp-testers/2155575
+SHA1 0263ad78bbed15acca832b84b80e47a96faf4cbd t/var/nntp-testers/2156376
+SHA1 184d5a045199a6d0a0b996d1430622a23a044b56 t/var/nntp-testers/2166758
+SHA1 0299bcd748b15e317b989c9f8d3e7e70deb9127b t/var/nntp-testers/2171124
+SHA1 734878346480fc3405935d2daf61d17ad3501e11 t/var/nntp-testers/2176263
+SHA1 9fd5066765e5ddfda1b1b0dd9e585227b728878b t/var/nntp-testers/2179355
+SHA1 b8972f22c326ff7477468eb9a51397a8da53de26 t/var/nntp-testers/2191340
+SHA1 73f1dcc74c80fa22940b553870043ec0ce0951bf t/var/nntp-testers/2207034
+SHA1 fa6bfd6e579f4f817489f22b7a9248a36281821b t/var/nntp-testers/2214718
+SHA1 b67f5061c909d5c4305eb5c59db75cec3e32b89b t/var/nntp-testers/2219962
+SHA1 e4571f806223cfef8a0313ea35be8af565b076db t/var/nntp-testers/2222583
+SHA1 1eb78db56aa7209006071e7e55b0e045222ecf79 t/var/nntp-testers/2239643
+SHA1 6c53ddc0e8aa66aca032b0c656dcbab4b0d49577 t/var/nntp-testers/2246311
+SHA1 543960764d187693f920f9e787d527ac08de62f3 t/var/nntp-testers/2258285
+SHA1 c01bef6706bf584bae10ae3243cad9e9b9da9c8f t/var/nntp-testers/2317687
+SHA1 f8fcbf9e346a87ee33ec4a3e40cf150fe0db14fb t/var/nntp-testers/2321729
+SHA1 6158fb40cfab2a1db1b8cdf932244f7545e45446 t/var/nntp-testers/2326212
+SHA1 ea2ac62a0a7fd6d933beff92b8361bf254d37e15 t/var/nntp-testers/2326644
+SHA1 5e13c4ea294ffb4e7f807f4744fb0062d78889dc t/var/nntp-testers/2329587
+SHA1 8880bb37182ec5306a68c9cc2ddbd29927e8d6aa t/var/nntp-testers/2346471
+SHA1 e4d0badcba81f7e386a41a417ca0b0911e60cc8d t/var/nntp-testers/2356931
+SHA1 20aaabcf3d96b80469125bf77529cc0677b4300d t/var/nntp-testers/2361096
+SHA1 c5cf3cda642bd248004b817139eb500f8ce08ae8 t/var/nntp-testers/2389376
+SHA1 a45e7db9758079bfd252e743a992e6eed31ce7ca t/var/nntp-testers/2400137
+SHA1 bbedd40f6695ed8dd3dd5bbc720f3ad464f94cbb t/var/nntp-testers/2410530
+SHA1 09055b1b08d2d44f9eb2c4cfa04120885e206bb9 t/var/nntp-testers/2427559
+SHA1 4e42211a6d8c4028ec8e931beedcf628906ee8db t/var/nntp-testers/2433487
+SHA1 bca79881082455f75cdb98decea6eb9af0d081a3 t/var/nntp-testers/34604012
+SHA1 1db0c4f2b885c64396192cd8c9bed63cbd31543a t/var/nntp-testers/3521214
+SHA1 b0c4ec59aadb689945b7d7d4c9a7f645b7be0883 t/var/nntp-testers/3851138
+SHA1 f8e5ae5095f985078ed4be18940d7f6839127690 t/var/nntp-testers/40637320.gz
+SHA1 ee33d0ee07bfec061bcdb18862b9b9c159020de1 t/var/nntp-testers/5012315
+SHA1 6d39436183ac6a5344f01c18b6649b993c5c3db3 t/var/nntp-testers/5698506
+SHA1 d7c2fa935d5da3adda8d77534f8bf68402c1f9f7 t/var/nntp-testers/5834678
+SHA1 7a2eb17df606cb9a7f820d880433d41460d8d9dd t/var/nntp-testers/5928865
+SHA1 42c53dbcf0d6aab493823455113467258fdb39c1 t/var/nntp-testers/6115651.gz
+SHA1 7a6197f367308f16ede8ce587f241bb45cb1c05c t/var/nntp-testers/6422067
+SHA1 6bad95bc04c7bc66dd908a59f96ecf69535997c7 t/var/nntp-testers/6525411
+SHA1 25d73b8cf20feb02cfdbfb9f1a408dc4fac3cbcb t/var/nntp-testers/8327429
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlezcooACgkQ7IA58KMXwV2vNwCg0JTETqmxDvqegq7CdtOQOGAJ
+I1UAoO3vz2VJblE1oZu5Vd40xFa01Ysf
+=6Nb9
+-----END PGP SIGNATURE-----

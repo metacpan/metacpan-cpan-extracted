@@ -1,0 +1,65 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Store::File.
+
+0.18  09 Oct 2009
+    - Port to new session confic key.
+
+0.17  10 May 2009
+    - Add dependency on recent -Session to fix moose issues
+
+0.16  24 Apr 2009
+    - 0.14 was mistakenly released as 0.15
+
+0.15  24 Apr 2009
+    - Create temp directory from class name, not stringified instance.
+      This stops you losing all your sessions when your app restarts. (xinming)
+
+0.14  18 Apr 2009
+    - switch to MRO Compat
+    - defer creation of cache store until first time it is needed.
+      This should allow the plugin to work "out of the box" under mod_perl.
+      See https://rt.cpan.org/Ticket/Display.html?id=27505
+
+0.13  16 Jan 2008
+    - remove Class::Accessor prereq
+    - further dist cleanups
+
+0.12  09 Jan 2008
+    - merge 0.10 from CPAN to version in Cat repos and release
+      the result. No feature/fixes, just packaging and src sanity.
+
+0.11  09 Jan 2008
+    - fix Class::C3 compat - karman
+
+0.10  07 Nov 2006
+    - Example added
+
+0.09  Fri Jul 21 19:37:34 2006
+    - Renamed Build.pl to Build.PL
+
+0.08  Fri Jul 21 10:30:49 2006
+    - switched to Module::Build
+
+0.07  Sun Jan  2 13:06:19 2006
+    - CPAN said: Couldn't copy file 'Catalyst-Plugin-Session-Store-File-0.06.tar.gz' to
+      '/home/ftp/incoming/Catalyst-Plugin-Session-Store-File-0.06.tar.gz':
+      Permission denied
+
+0.06  Sun Jan  1 13:11:19 2006
+    - remove expiry in store due to flexibility issues
+
+0.05  Thu Nov 23 01:36:00 2005
+    - expire_time defaults to 3600 now
+
+0.04  Thu Nov 18 20:00:00 2005
+    - more tests added
+
+0.03  Thu Nov 15 23:03:30 2005
+    - implemented "relative" option
+
+0.02  Thu Nov 15 00:03:30 2005
+    - change of dokumentation and prereq's
+
+0.01  Thu Nov  3 23:12:16 2005
+    - original version; created by h2xs 1.23 with options
+        -XA -n Catalyst::Plugin::Session::Store::File
+

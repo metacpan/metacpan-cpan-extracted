@@ -1,0 +1,237 @@
+Revision history for Perl extension CPANPLUS::Dist::Build.
+
+0.82 Thu Feb 16 12:29:37 GMT 2017
+
+  - Set env var PERL_USE_UNSAFE_INC if required
+    [rt.cpan.org #120227]
+
+0.80 Sun Jun  5 13:43:55 BST 2016
+  - Include test_requires when falling back to older mechanism
+    for determining prereqs
+
+0.78 Wed Jun 11 18:06:59 BST 2014
+  - Shield tests from PERL_INSTALL_QUIET env var
+
+0.76 Wed Jan  8 08:46:22 GMT 2014
+  - Don't send test reports during prepare() phase
+
+0.74 Tue Aug  6 20:53:04 BST 2013
+  - Remove Module::Pluggable prereq
+
+0.72 Sun Jul 21 16:21:40 BST 2013
+  - Actually resolve the issue where Build.PL doesn't
+    generate a Build script. Regression since 0.68
+
+0.70 Fri Jan 25 15:58:27 GMT 2013
+  - Add deprecation usage to warn if modules are loaded
+    from corelib. CPANPLUS::Dist::Build will be leaving
+    core with v5.20.0 and will still be available on
+    CPAN.
+
+0.68 Wed Dec  5 00:17:04 GMT 2012
+  - Revert change to wrapper command-line
+
+0.66 Tue Dec  4 23:05:53 GMT 2012
+  - Resolve an issue where Build.PL doesn't generate a
+    Build script
+
+0.64 Sat Oct 20 23:21:36 BST 2012
+  - Update Module::Install, no functional changes.
+
+0.62 Mon Feb 13 22:15:57 GMT 2012
+  - Test reporting enhancements
+
+0.60 Thu Oct 27 20:54:22 BST 2011
+  - Eliminate the need to use 'perlwrapper' at all by using
+    an equivalent one-liner.
+
+0.58 Sun Sep  4 20:42:48 BST 2011
+  - Added local::lib type behaviour detection to disable use of 'sudo'
+
+0.56 Tue Apr 19 14:51:07 BST 2011
+  - Display failing tests only once to terminal.
+
+0.54 Mon Feb 28 11:52:04 GMT 2011
+  - Only skip 'perl' as a prereq when CPANPLUS version is
+    less than 0.9102
+
+0.52 Fri Jan  7 22:23:03 GMT 2011
+  - Apply blead patch from Peter Acklam
+
+0.50 Thu Oct 28 23:02:19 BST 2010
+  - We clear the relevant env vars that effect Module::Build
+    during the 'install' test. local::lib and cpanm set these.
+
+0.48 Sun Sep  5 15:14:17 BST 2010
+  - Explicitly set the location of cpanp-run-perl when under PERL_CORE
+    in t/inc/conf.pl
+  - Make sure we find cpanp-run-perl in ../../utils when PERL_CORE
+  - Correct spelling in POD, pointed out by H.Merijn Brand
+
+0.46 Sat Jan 23 07:52:19 GMT 2010
+  - actually make the prereq resolving fallback to _build/ querying
+    if the 'prereq_data' action fails. *facepalm*
+
+0.44 Wed Nov 18 12:37:03 GMT 2009
+  - Make the prereq resolving fallback to _build/ querying 
+    if the 'prereq_data' action fails. Spotted by Johan Vromans.
+
+0.41_01 Thu Nov  5 14:07:48 GMT 2009
+  - Added MYMETA support
+
+0.40 Mon Sep  7 14:15:03 BST 2009
+  - Change the location of the CPANPLUS bin directory when
+    running under core (bingos)
+
+0.38 Mon Aug 24 13:59:11 BST 2009
+  - Cosmetic change to the test output message so it
+    matches CPANPLUS::Dist::MM (bingos)
+
+0.36 Sat Jul  4 14:51:42 BST 2009
+  - Make install() honour the buildflags directive, 
+    absence spotted by Matt Trout
+
+0.35_03 Tue Jun 30 22:48:57 BST 2009
+  - Switch to IPC::Cmd->can_capture_buffer wherever we 
+    need to rely on what is captured ( VMS and MSWin32 
+    currently ).
+  - Make sure to use perlwrapper for Build.PL on VMS
+
+0.35_02 Sat Jun 27 09:35:55 BST 2009
+  - Don't use the perlwrapper on VMS, (Craig Berry)
+  - Skip env test on VMS
+
+0.35_01 Wed Jun 24 09:57:28 BST 2009
+  - Fix to _find_prereqs() for VMS when running prereq_data
+    Build target, reported by Craig Berry.
+
+0.34 Sat Jun 13 09:50:24 BST 2009
+  - Fixed the 02packages.details.txt.gz file in our fake CPAN
+      CPANPLUS-0.87_01 now checks this file for sanity. Ours
+      was not sane >:) Spotted by the ever vigilant Vincent Pit.
+
+0.32 Mon Jun  1 21:43:52 BST 2009
+  - Removed generation of .output files
+  - Fixed the setting of PERL5_CPANPLUS_IS_EXECUTING env var in 
+    prepare. Spotted by Matt Trout
+  - Added 'perlwrapper' to all perl calls. Spotted by Matt Trout.
+
+0.30 Mon May 18 16:23:14 BST 2009
+  - [RT #46176] Skip XS tests when perl compiled without dynamic
+    loading. Reported by Andy Dougherty
+
+0.28 Fri May  8 10:58:42 BST 2009
+  - Add the CPANPLUS bin/ dir to $ENV{PATH} if we are running
+    under PERL_CORE. This fixes warnings during 'make test' in
+    the core. No need for other users to upgrade.
+
+0.26 Thu May  7 16:40:26 BST 2009
+  - Integrated the t/inc/conf.pl and dummy-CPAN/ structure from
+    CPANPLUS into the testsuite. This resolves the issue where 
+    CPAN indexes were fetched and built during the tests. 
+    Spotted by Steve Hay, fixed with help from Jos Boumans.
+
+0.24 Mon Apr 27 16:55:37 BST 2009
+  - Removed CPANPLUS::inc from the code as CPANPLUS-0.86 does not 
+    include this now.
+
+0.22 Tue Apr 14 11:01:12 BST 2009
+  - Fix the installdirs in Makefile.PL
+
+0.20 Tue Apr  7 17:01:47 BST 2009
+
+  - Made MI::Respository only necessary on the author-side
+    we should be installable on 5.6.* now. No other changes
+    so no need to update in core.
+    
+0.18 Mon Mar 30 10:03:21 BST 2009
+
+  - Amendments for the new save_state in dev CPANPLUS.
+  - Added M::I::Repository functionality to Makefile.PL
+
+0.16 Thu Mar 19 22:24:06 GMT 2009
+
+  - Applied patch from Vincent Pit [RT #44426] 
+    'buildflags of the form "--option value" aren't honoured'
+
+0.14 Tue Mar 10 22:56:24 GMT 2009
+
+  - Bump versions for a stable release
+
+0.13_02 Mon Mar  9 13:36:15 GMT 2009
+
+  - Resolved some issues on MSWin32 due to capturing of STDOUT/STDERR
+
+0.13_01 Sun Mar  8 13:32:01 GMT 2009
+
+  - Ported the 'configure_requires' functionality from CP::D::MM 
+
+0.12 Mon Mar  2 13:33:47 GMT 2009
+
+  - Fixed the version number in ::Constants
+
+0.10 Mon Mar  2 07:36:41 GMT 2009
+
+  - Added 'installdirs' directive to Makefile.PL to resolve
+    [rt #43739] (bingos)
+  - Only a version change no need to update core.
+
+0.08 Sat Feb 28 07:53:52 GMT 2009
+
+  - bumped Module::Build prerequisite to 0.32 (dagolden)
+  - refactored documentation to reflect changes to code (bingos)
+  - removed all refs to Module::Build object (bingos)
+  - added LICENSE file (bingos)
+  - added documentation to ::Constants (bingos)
+  - added POD and POD coverage tests (bingos)
+
+0.06_05 Wed Feb 25 22:24:50 GMT 2009
+
+ - Brought the test fixes into line with blead [rt #42670]
+ - suppress [ERROR] messages in tests (dagolden)
+
+0.06_04 Wed Feb 18 16:50:08 GMT 2009
+
+ - bumped CPANPLUS prerequisite to 0.84 (bingos)
+ - bumped all required versions, added Test::Harness 3.15 (bingos)
+ - Fixed warnings in tests and added diag() to ignore the [ERROR] (bingos)
+
+0.06_03	Mon Feb  9 16:31:10 GMT 2009
+
+ - process separation for Build.PL, Build, test and install actions, 
+   using IPC::Cmd (bingos)
+ - If M::B is version 0.31_03 or greater use 'Build prereq_data' to
+   work out prereqs, otherwise fallback on poking around in _build/
+   like CPAN.pm does. (bingos)
+ - Resolved issues with test reports for FAILs being misgraded as UKNOWN. (bingos)
+
+0.06_02 - 
+
+ - Fixed some issues with test output not appearing in CPAN Tester
+   reports. [Chris Williams]
+
+0.06 - Fri May  4 14:11:36 2007
+
+ - Make test suite compatible with the perl core. No functional
+   changes in this release; users need not upgrade.
+
+0.05 - Sun Mar 11 16:58:13 2007
+
+ - Set $ENV{PERL5_CPANPLUS_IS_EXECUTING} to the full path of the
+   Build.PL file when running Module::Build->new_from_context.
+   Requested by Adam Kennedy <cpan@ali.as>.
+
+0.04  Wed Aug 16 22:00:18 CDT 2006
+
+ - Address RT #13926: build_requires not included in prerequisites
+
+ - Address RT #14240 Why does it say "Params::Check" in the README 
+   Description?
+
+ - Address RT #13937 Won't install without force because newer 
+   version installed (from CPANPLUS 0.055?)
+
+ - Update dependency versions in Makefile.PL
+  
+ - We were sending cpantesters 'pass' reports whenever --force was in
+   effect, which is probably not the right thing to do. [Jos Boumans]

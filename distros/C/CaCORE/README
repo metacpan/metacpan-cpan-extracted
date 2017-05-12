@@ -1,0 +1,88 @@
+			Perl module: CaCORE
+
+========= DEPENDENCIES =========================================================
+
+You need the following modules (all available at CPAN):
+
+- Perl 5.6.0 or higher
+- XML::DOM
+- LWP::UserAgent (It's part of libwww-perl. If you don't have it, some test
+		  cases may fail and you can't read files from URLs.)
+
+========= INSTALLATION =========================================================
+
+To configure this module, cd to the directory that contains this README file
+and type the following.
+
+	perl Makefile.PL
+
+Alternatively, if you plan to install CaCORE somewhere other than
+your system's perl library directory. You can type something like this:
+
+	perl Makefile.PL PREFIX=/home/me/perl INSTALLDIRS=perl
+
+Then to build you run make.
+
+	make
+
+You can then test the module by typing:
+
+	make test
+
+If you have write access to the perl library directories, you may then
+install by typing:
+
+	make install
+
+============= CaCORE =========================================================
+
+This is a Perl application programming interface to caCORE hosted vocabulary, metadata,
+and biomedical data.
+
+============= Author =========================================================
+
+Shan Jiang <jiangs@mail.nih.gov>
+
+============= COPYRIGHT AND LICENSE ============================================
+
+The CaCORE Software License, Version 1.0
+
+Copyright 2001-2006 SAIC. This software was developed in conjunction with the
+National Cancer Institute, and so to the extent government employees are co-authors,
+any rights in such works shall be subject to Title 17 of the United States Code,
+section 105. Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list
+   of conditions and the disclaimer of Article 5, below. Redistributions in binary 
+   form must reproduce the above copyright notice, this list of conditions and the
+   disclaimer of Article 5 in the documentation and/or other materials provided with
+   the distribution.
+   
+2. The end-user documentation included with the redistribution, if any, must include
+   the following acknowledgment: "This product includes software developed by SAIC and
+   the National Cancer Institute." If no such end-user documentation is to be included,
+   this acknowledgment shall appear in the software itself, wherever such third-party
+   acknowledgments normally appear.
+   
+3. The names "The National Cancer Institute", "NCI" and "SAIC" must not be used to
+   endorse or promote products derived from this software. This license does not
+   authorize the licensee to use any trademarks owned by either NCI or SAIC.
+   
+4. This license does not authorize or prohibit the incorporation of this software into
+   any third party proprietary programs. Licensee is expressly made responsible for
+   obtaining any permission required to incorporate this software into third party
+   proprietary programs and for informing licensee's end-users of their obligation
+   to secure any required permissions before incorporating this software into third
+   party proprietary software programs.
+   
+5. THIS SOFTWARE IS PROVIDED "AS IS," AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND
+   FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL
+   CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT,
+   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+   TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+   BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+   ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+

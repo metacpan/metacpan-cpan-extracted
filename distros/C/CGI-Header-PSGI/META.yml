@@ -1,0 +1,35 @@
+---
+abstract: 'Generate PSGI-compatible response header arrayref'
+author:
+  - 'Ryo Anazawa (anazawa@cpan.org)'
+build_requires:
+  CGI::PSGI: 0.15
+  ExtUtils::MakeMaker: 6.59
+  Test::MockTime: 0
+  Test::More: 0.98
+  Test::Pod: 1.45
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CGI::Header::PSGI
+name: CGI-Header-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  CGI::Header: 0.62
+  Carp: 1.10
+  parent: 0
+  perl: 5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/anazawa/p5-CGI-Header-PSGI
+version: 0.62001

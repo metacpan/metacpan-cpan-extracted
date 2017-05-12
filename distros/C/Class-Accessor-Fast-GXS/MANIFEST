@@ -1,0 +1,24 @@
+example/bench.pl
+example/inc/Module/Install.pm
+example/inc/Module/Install/Base.pm
+example/inc/Module/Install/Can.pm
+example/inc/Module/Install/Fetch.pm
+example/inc/Module/Install/Makefile.pm
+example/inc/Module/Install/Metadata.pm
+example/inc/Module/Install/Win32.pm
+example/inc/Module/Install/WriteAll.pm
+example/lib/My/CAFGXS.pm
+example/Makefile.PL
+example/README
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Class/Accessor/Fast/GXS.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml

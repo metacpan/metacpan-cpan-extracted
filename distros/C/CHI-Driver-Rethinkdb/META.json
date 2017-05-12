@@ -1,0 +1,56 @@
+{
+   "abstract" : "Rethinkdb driver for CHI",
+   "author" : [
+      "Dan Burke <dburke@addictmud.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CHI-Driver-Rethinkdb",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI::Driver" : "0",
+            "CHI::Test" : "0",
+            "CHI::t::Driver" : "0",
+            "Carp" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Rethinkdb" : "0",
+            "Rethinkdb::IO" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dwburke/perl-CHI-Driver-Rethinkdb",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dwburke/perl-CHI-Driver-Rethinkdb.git",
+         "web" : "https://github.com/dwburke/perl-CHI-Driver-Rethinkdb"
+      }
+   },
+   "version" : "0.1.2"
+}
+

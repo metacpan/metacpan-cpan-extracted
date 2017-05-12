@@ -1,0 +1,31 @@
+Revision history for Perl extension Catalyst::View::TT::Alloy.
+
+0.00007  2015-03-30
+        - Adjustments to dist.ini, thanks to E. Choroba via GitHub
+
+0.00006  2015-02-24
+        - Nothing from CPANTS. So releasing as proper version.
+
+0.00005_01  2015-02-21
+        - It's my birthday
+        - use parent instead
+        - Adjust stated dependencies
+        - Developer release
+
+0.00005  2015-02-16
+        - Changes to use Dist::Zilla for releases
+        - Fixed error handling to work with Log::Dispatch,
+            and behave like Catalyst::View::TT.
+
+0.00004  2015-02-14
+        - Changes to use Dist::Zilla for releases
+
+0.00003  2010-05-18
+        - Got rid of NEXT
+        - Fixed warnings in test suite
+
+0.00002  2007-10-15
+        - Fixed pod indexing error with Catalyst-Helper-View-TT-Alloy
+
+0.00001  2007-09-21
+        - First release

@@ -1,0 +1,6 @@
+MapDisps.pm
+test.pl
+Makefile.PL
+./t/AppBuilder::MapDisps.t
+CGI-AppBuilder-MapDisps-0.12.readme
+README

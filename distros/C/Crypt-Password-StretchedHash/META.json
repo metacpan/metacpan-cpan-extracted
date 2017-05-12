@@ -1,0 +1,80 @@
+{
+   "abstract" : "simple library for password hashing and stretching",
+   "author" : [
+      "Ryo Ito <ritou.06@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-Password-StretchedHash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "MIME::Base64" : "0",
+            "Params::Validate" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Digest::SHA3" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::Password::StretchedHash" : {
+         "file" : "lib/Crypt/Password/StretchedHash.pm",
+         "version" : "0.05"
+      },
+      "Crypt::Password::StretchedHash::HashInfo" : {
+         "file" : "lib/Crypt/Password/StretchedHash/HashInfo.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ritou/p5-Crypt-Password-StretchedHash/issues"
+      },
+      "homepage" : "https://github.com/ritou/p5-Crypt-Password-StretchedHash",
+      "repository" : {
+         "url" : "https://github.com/ritou/p5-Crypt-Password-StretchedHash.git",
+         "web" : "https://github.com/ritou/p5-Crypt-Password-StretchedHash"
+      }
+   },
+   "version" : "0.05"
+}

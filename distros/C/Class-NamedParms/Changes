@@ -1,0 +1,18 @@
+
+ 1.00 1999.06.16 - Initial release.
+
+ 1.01 1999.06.17 - Bug fix to 'clear' method. Added 'make test' support.
+
+ 1.02 1999.06.18 - Performance tweak to 'get' method.
+
+ 1.03 1999.06.21 - Minor docs tweaks. Removal of 'use attrs' for portability
+
+ 1.04 1999.10.08 - Bug fix to 'all_parms' method 
+
+ 1.05 2005.09.19 - Added GPL_License.txt, Artistic_License.txt, LICENSE,
+                   Changes, Build.PL. Added pod build tests.
+                   Split documentation into .pod file. Extended build
+                   tests to 100% code coverage. Refactored code to make
+                   it more inheritance friendly. Updated documentation.
+
+ 1.06 2005.09.20 - Fixed bad pod coverage build test.

@@ -1,0 +1,10 @@
+<div id="content">
+    <h2>About:</h2>
+    [%# DUMP Menu.list_items(0) %]
+    [%# DUMP app.categories     %]
+    [%# DUMP app.recipes        %]
+    [% success %]
+    [% menu.recipes_map( id ) %]
+    
+
+</div>

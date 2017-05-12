@@ -1,0 +1,177 @@
+NAME
+    Catalyst::Model::Adaptor - use a plain class as a Catalyst model
+
+SYNOPSIS
+    Given a good old perl class like:
+
+        package NotMyApp::SomeClass;
+        use Moose; # to provide "new"
+        sub method { 'yay' }
+
+    Wrap it with a Catalyst model:
+
+        package MyApp::Model::SomeClass;
+        use base 'Catalyst::Model::Adaptor';
+        __PACKAGE__->config( class => 'NotMyApp::SomeClass' );
+
+    Then you can use "NotMyApp::SomeClass" from your Catalyst app:
+
+        sub action :Whatever {
+            my ($self, $c) = @_;
+            my $someclass = $c->model('SomeClass');
+            $someclass->method; # yay
+        }
+
+    Note that "NotMyApp::SomeClass" is instantiated at application startup
+    time. If you want the adapted class to be created for call to
+    "$c->model", see Catalyst::Model::Factory instead. If you want the
+    adapted class to be created once per request, see
+    Catalyst::Model::Factory::PerRequest.
+
+DESCRIPTION
+    The idea is that you don't want your Catalyst model to be anything other
+    than a line or two of glue. Using this module ensures that your Model
+    classes are separate from your application and therefore are
+    well-abstracted, reusable, and easily testable.
+
+    Right now there are too many modules on CPAN that are Catalyst-specific.
+    Most of the models would be better written as a class that handles most
+    of the functionality with just a bit of glue to make it work nicely with
+    Catalyst. This module aims to make integrating your class with Catalyst
+    trivial, so you won't have to do any extra work to make your model
+    generic.
+
+    For a good example of a Model that takes the right design approach, take
+    a look at Catalyst::Model::DBIC::Schema. All it does is glues an
+    existing DBIx::Class::Schema to Catalyst. It provides a bit of sugar,
+    but no actual functionality. Everything important happens in the
+    "DBIx::Class::Schema" object.
+
+    The end result of that is that you can use your app's DBIC schema
+    without ever thinking about Catalyst. This is a Good Thing.
+
+    Catalyst is glue, not a way of life!
+
+CONFIGURATION
+    Subclasses of this model accept the following configuration keys, which
+    can be hard-coded like:
+
+       package MyApp::Model::SomeClass;
+       use base 'Catalyst::Model::Adaptor';
+       __PACKAGE__->config( class => 'NotMyApp::SomeClass' );
+
+    Or be specified as application config:
+
+       package MyApp;
+       MyApp->config->{'Model::SomeClass'} = { class => 'NotMyApp::SomeClass' };
+
+    Or in your ConfigLoader-loaded config file:
+
+       ---
+       Model::SomeClass:
+         class: NotMyApp::SomeClass
+         args:
+           foo: ...
+           bar: ...
+
+    This is exactly like every other Catalyst component, so you should
+    already know this.
+
+    Anyway, here are the options:
+
+  class
+    This is the name of the class you're adapting to Catalyst. It MUST be
+    specified.
+
+    Your application will die horribly if it can't require this package.
+
+  constructor
+    This is the name of the class method in "class" that will create an
+    instance of the class. It defaults to "new".
+
+    Your application will die horribly if it can't call this method.
+
+  args
+    This is a hashref of arguments to pass to the constructor of "class". It
+    is optional, of course. If you omit it, nothing is passed to the
+    constructor (as opposed to "{}", an empty hashref).
+
+METHODS
+    There are no methods that you call directly. When you call "$c->model"
+    on a model that subclasses this, you'll get back an instance of the
+    class being adapted, not this model.
+
+    These methods are called by Catalyst:
+
+  COMPONENT
+    Setup this component.
+
+CUSTOMIZING THE PROCESS
+    By default, the instance of your adapted class is instantiated like
+    this:
+
+        my $args = $self->prepare_arguments($app); # $app sometimes called $c
+        $adapted_class->$constructor($self->mangle_arguments($args));
+
+    Since a static hashref of arguments may not be what $class needs, you
+    can override the following methods to change what $args is.
+
+    NOTE: If you need to pass some args at instance time, you can do
+    something like:
+
+        my $model = $c->model('MyFoo', { foo => 'myfoo' });
+
+    or
+
+        my $model = $c->model('MyFoo', foo => 'myfoo');
+
+  prepare_arguments
+    This method is passed the entire configuration for the class and the
+    Catalyst application, and returns the hashref of arguments to be passed
+    to the constructor. If you need to get dynamic data out of your
+    application to pass to the consturctor, do it here.
+
+    By default, this method returns the "args" configuration key.
+
+    Example:
+
+        sub prepare_arguments {
+            my ($self, $app) = @_; # $app sometimes written as $c
+            return { foobar => $app->config->{foobar}, baz => $self->{baz} };
+        }
+
+  mangle_arguments
+    This method is passed the hashref from "prepare_arguments", mangles them
+    into a form that your constructor will like, and returns the mangled
+    form. If your constuctor wants a list instead of a hashref, this is your
+    opportunity to do the conversion.
+
+    Example:
+
+        sub mangle_arguments {
+            my ($self, $args) = @_;
+            return %$args; # now the args are a plain list
+        }
+
+    If you need to do more than this, you might as well just write the whole
+    class yourself. This module is designed to make the common case work
+    with 1 line of code. For special needs, it's easier to just write the
+    model yourself.
+
+SEE ALSO
+    If you need a new instance returned each time "$c->model" is called, use
+    Catalyst::Model::Factory instead.
+
+    If you need to have exactly one instance created per request, use
+    Catalyst::Model::Factory::PerRequest instead.
+
+AUTHOR
+    Jonathan Rockway "<jrockway@cpan.org>"
+
+CONTRIBUTORS
+    Wallace Reis "<wreis@cpan.org>"
+
+LICENSE
+    This module is Copyright (c) 2007 Jonathan Rockway. You may use, modify,
+    and redistribute it under the same terms as Perl itself.
+

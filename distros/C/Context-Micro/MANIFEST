@@ -1,0 +1,15 @@
+.proverc
+.travis.yml
+Changes
+ignore.txt
+lib/Context/Micro.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.pod
+t/00-load.t
+t/01-new.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

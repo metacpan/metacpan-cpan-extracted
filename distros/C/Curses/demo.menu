@@ -1,0 +1,152 @@
+#! /usr/bin/perl
+##
+##  This code contributed by Yury Pshenichny <yura@zp.ua>
+##  based on demo.panel by Chris Leach <leachcj@bp.com>
+##  and pretty much redone by me
+
+use strict;
+use warnings;
+use English;
+use ExtUtils::testlib;
+use Curses;
+
+sub fatal {
+    clrtobot(0, 0);
+    addstr(0, 0, "@_\n");
+    refresh();
+    sleep 2;
+    die("Fatal error.");
+}
+
+
+
+eval { new_menu() };
+if ($@ =~ m{not defined in your Curses library}) {
+    print STDERR "Curses was not compiled with menu function.\n";
+    exit 1;
+}
+
+my $itemListR = [
+    [ "AAA" => "A descr" ],
+    [ "BBB" => "B descr" ],
+    [ "CCC" => "C descr" ],
+    [ "DDD" => "D descr" ],
+    [ "EEE" => "E descr" ],
+    [ "FFF" => "F descr" ],
+    [ "GGG" => "G descr" ],
+    [ "HHH" => "H descr (This item has a very long descr) "]
+];
+
+initscr;
+noecho;
+
+my @cItemRList;
+
+foreach my $itemR (@$itemListR) {
+    my $cItemR = new_item($itemR->[0], $itemR->[1]);
+
+    if (${$cItemR} eq '') {
+        fatal("new_item($itemR->[0], $itemR->[1]) failed")
+    }
+    push @cItemRList, $cItemR;
+}
+
+
+# Believe it or not, we have to pass to new_menu() a string whose
+# representation in memory is a C array of pointers to C item objects.  Don't
+# try to understand it; just copy this magic pack code.
+
+my @cItemList;
+
+foreach my $cItemR (@cItemRList) {
+    push(@cItemList, ${$cItemR});
+}
+
+push @cItemList, 0;
+
+my $itemListMenuArg = pack('L!*', @cItemList);
+
+my $menuR = new_menu($itemListMenuArg);
+if (${$menuR} eq '') {
+    fatal("new_menu failed")
+}
+
+# Don't under any circumstance destroy $itemListMenuArg while the menu object
+# still exists, since the C menu object actually points to the memory that
+# backs $itemListMenuArg.
+
+# And don't destroy @cItemList or @cItemRList either while the menu object
+# still exists, because they are backed by memory that the C menu object
+# references as well.
+
+my $rows;
+my $cols;
+
+set_menu_mark($menuR, '->');
+set_menu_format($menuR, 3, 1);
+scale_menu($menuR, $rows, $cols);
+
+my $mwinR = newwin($rows + 2, $cols + 2, 8, 15);
+my $msubR = derwin($mwinR, $rows, $cols, 1, 1);
+
+set_menu_win($menuR, $mwinR);
+set_menu_sub($menuR, $msubR);
+
+box($mwinR, 0, 0);
+keypad($mwinR, 1);
+
+post_menu($menuR);
+
+addstr(0, 0, "Use KEY_UP/KEY_DOWN/KEY_PPAGE/KEY_NPAGE to navigate");
+addstr(1, 0, "Press 'ENTER' to select item, or 'F1' to exit");
+refresh();
+
+my $ci;
+
+while(1) {
+    my $ch = getch($mwinR);
+    if ($ch eq KEY_UP) {
+	menu_driver($menuR, REQ_UP_ITEM);
+    }
+    elsif ($ch eq KEY_DOWN) {
+	menu_driver($menuR, REQ_DOWN_ITEM);
+    }
+    elsif ($ch eq KEY_PPAGE) {
+	menu_driver($menuR, REQ_SCR_UPAGE);
+    }
+    elsif ($ch eq KEY_NPAGE) {
+	menu_driver($menuR, REQ_SCR_DPAGE);
+    }
+    elsif ($ch eq KEY_F(1)) {
+	last;
+    }
+    elsif ($ch eq "\r" or $ch eq "\n") {
+	$ci = current_item($menuR);
+	last;
+    }
+    elsif ($ch =~ /^\S$/) {
+	menu_driver($menuR, $ch);
+    }
+    else {
+	beep();
+    }
+}
+
+if ($ci) {
+    addstr(0, 0, "You selected " . item_name($ci) . "\n");
+}
+else {
+    addstr(0, 0, "You didn't select anything\n");
+}
+clrtoeol(1,0);
+refresh();
+sleep 2;
+
+unpost_menu($menuR);
+delwin($mwinR);
+free_menu($menuR);
+map { free_item($_) } @cItemRList;
+endwin();
+
+exit 0;
+

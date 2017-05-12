@@ -1,0 +1,34 @@
+% title ucfirst($form) || "Convos";
+% my $redis_version = $self->app->config->{redis_version} || 0;
+<div class="landing-page">
+  <header class="row">
+    <h1>
+      <span class="logo">Convos</span>
+      <small>for <%= $organization_name %></small>
+    </h1>
+  </header>
+% if($redis_version and $redis_version < 2.6) {
+  <div class="row question">
+    The Redis server is too old. Version <b>2.6.x</b> or newer is required,
+    but we detected version <b><%= $redis_version %></b>.
+  </div>
+% }
+<!--[if IE]>
+  <div class="row question">
+    Convos does not work in Internet Explorer. It works best in the following browsers:
+    (in order)
+    <ol>
+      <li><%= link_to 'Google Chrome', 'http://www.google.com/chrome' %></li>
+      <li><%= link_to 'Mozilla Firefox', 'http://getfirefox.com' %></li>
+      <li><%= link_to 'Opera', 'http://opera.com' %></li>
+      <li>Or any webkit based browser, such as Safari.</li>
+    </ol>
+  </div>
+<![endif]-->
+  %= include "user/$form"
+  <div class="row footer">
+    <hr>
+    &copy; <%= link_to "Nordaaker", "http://nordaaker.com"%>
+    - <%= link_to "About", "http://convos.by" %>
+  </div>
+</div>

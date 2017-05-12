@@ -1,0 +1,9 @@
+WARNING:
+
+The format of colour settings in the config file have changed. If you have
+cmenurc files installed, check them before running with the new module.
+
+Nothing disasterous will happen - just your specified colours will cease to 
+be applied
+
+Andy

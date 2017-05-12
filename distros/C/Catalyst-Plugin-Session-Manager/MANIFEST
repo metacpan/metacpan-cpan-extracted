@@ -1,0 +1,15 @@
+Changes
+lib/Catalyst/Plugin/Session/Manager.pm
+lib/Catalyst/Plugin/Session/Manager/Client.pm
+lib/Catalyst/Plugin/Session/Manager/Client/Cookie.pm
+lib/Catalyst/Plugin/Session/Manager/Client/Rewrite.pm
+lib/Catalyst/Plugin/Session/Manager/Client/StickyQuery.pm
+lib/Catalyst/Plugin/Session/Manager/Storage.pm
+lib/Catalyst/Plugin/Session/Manager/Storage/CDBI.pm
+lib/Catalyst/Plugin/Session/Manager/Storage/FastMmap.pm
+lib/Catalyst/Plugin/Session/Manager/Storage/File.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00_compile.t

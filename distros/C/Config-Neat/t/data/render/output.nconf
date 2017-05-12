@@ -1,0 +1,43 @@
+word                              Hello
+string_with_spaces                Hello, world!
+simple_array                      1 `2 3` `4 5` 6 7
+wrappable_string                  Vestibulum ullamcorper leo quam, vel adipiscing tellus.
+                                  Phasellus placerat dolor sit amet lorem mattis dictum.
+                                  Vestibulum luctus malesuada risus, et porttitor lectus
+                                  lobortis et.
+wrappable_array                   `this particular array item will not wrap since it contains spaces and thus is enclosed in backticks`
+                                  Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt
+                                  Uu Vv Ww Xx Yy Zz
+
+subsection_1
+{
+    etc                           foo bar
+    pwd                           foo `foo bar` ba\`\`z \`
+}
+
+subsection_2
+{
+    true_parameter                1
+    false_parameter               NO
+
+    subtree
+    {
+        empty_string              ``
+        array_of_empty_strings    `` `` ``
+    }
+}
+
+array_of_hashes
+{
+    {
+        param1                    value1
+    }
+
+    {
+        param2                    value2
+    }
+
+    {
+        param3                    value3
+    }
+}

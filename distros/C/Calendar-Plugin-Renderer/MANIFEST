@@ -1,0 +1,32 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Calendar/Plugin/Renderer.pm
+lib/Calendar/Plugin/Renderer/Util.pm
+lib/Calendar/Plugin/Renderer/Text.pm
+lib/Calendar/Plugin/Renderer/SVG.pm
+lib/Calendar/Plugin/Renderer/SVG/Page.pm
+lib/Calendar/Plugin/Renderer/SVG/Text.pm
+lib/Calendar/Plugin/Renderer/SVG/Box.pm
+lib/Calendar/Plugin/Renderer/SVG/Label.pm
+t/00-load.t
+t/calendar-plugin-renderer.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+t/bahai.xml
+t/gregorian.xml
+t/hijri.xml
+t/persian.xml
+t/saka.xml
+t/fake-bahai.xml
+t/fake-gregorian.xml
+t/fake-hijri.xml
+t/fake-persian.xml
+t/fake-saka.xml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "\"Jeff Ober\" <\"jeffober@gmail.com\">"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Coro-ProcessPool",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Const::Fast" : "0",
+            "Coro" : "0",
+            "Data::UUID" : "0",
+            "Devel::StackTrace" : "0",
+            "Guard" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "Sereal" : "0",
+            "Storable" : "2.05",
+            "String::Escape" : "0",
+            "Sub::Override" : "0",
+            "Types::Standard" : "1.0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/jsober/Coro-ProcessPool"
+      }
+   },
+   "version" : "0.26"
+}

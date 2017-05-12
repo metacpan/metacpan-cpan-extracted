@@ -1,0 +1,246 @@
+# PODNAME: Class::InsideOut::Manual::Advanced
+# ABSTRACT: guide to advanced usage
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Class::InsideOut::Manual::Advanced - guide to advanced usage
+
+=head1 VERSION
+
+version 1.14
+
+=head1 DESCRIPTION
+
+This manual provides further documentation for advanced usage of
+Class::InsideOut.
+
+=head2 Customizing accessors
+
+C<<< Class::InsideOut >>> supports custom subroutine hooks to modify the behavior of
+accessors.  Hooks are passed as property options: C<<< set_hook >>> and C<<< get_hook >>>.
+
+The C<<< set_hook >>> is called when the accessor is called with an argument.
+The hook subroutine receives the entire argument list.  Just before the hook is
+called, C<<< $_ >>> is locally aliased to the first argument for convenience.  When
+the C<<< set_hook >>> returns, the property is set equal to C<<< $_ >>>.  This feature is
+useful for on-the-fly modification of the value that will be stored.
+
+  public initials => my %initials, {
+     set_hook => sub { $_ = uc $_ }
+  };
+ 
+  public tags => my %tags, {
+     set_hook => sub { $_ = [ @_ ] } # stores arguments in a reference
+  };
+
+If the C<<< set_hook >>> dies, the error is caught and rethrown with a preamble that
+includes the name of the accessor.  The error should end with a newline to
+prevent C<<< die >>> from adding 'at ... filename line N'.  The correct
+location will be added when the error is rethrown with C<<< croak >>>:
+
+  public height  => my %height, {
+     set_hook => sub { /^\d+$/ or die "must be a positive integer" }
+  };
+ 
+  # dies with "height() must be a positive integer at ..."
+  $person->height(3.5); 
+
+I<Note that the return value of the C<<< set_hook >>> function is ignored.>  This
+simplifies syntax in the case where C<<< die >>> is used to validate input.
+
+The C<<< get_hook >>> is called when the accessor is called without an
+argument.  Just before the hook is called, C<<< $_ >>> is set equal to the property
+value of the object for convenience. The hook is called in the same context
+(i.e. list versus scalar) as the accessor.  I<The return value of the hook is
+passed through as the return value of the accessor.>  
+
+  public tags => my %tags, {
+     set_hook => sub { $_ = [ @_ ] }, # stores arguments in a reference
+     get_hook => sub { @$_ }          # return property as a list
+  };
+
+Because C<<< $_ >>> is a copy, not an alias, of the property value, it
+can be modified directly, if necessary, without affecting the underlying
+property.
+
+As with C<<< set_hook >>>, the C<<< get_hook >>> can die to indicate an error condition and
+errors are handled similarly.  This could be used as a way to implement a
+protected property:
+
+  sub _protected { 
+     die "is protected\n" unless caller(2)->isa(__PACKAGE__)
+  }
+ 
+  public hidden => my %hidden, {
+     get_hook => \&_protected,
+     set_hook => \&_protected,
+  }
+
+Accessor hooks can be set as a global default with the C<<< options >>> function,
+though they may still be overridden with options passed to specific properties.
+
+=head2 Black-box inheritance
+
+Because inside-out objects built with C<<< Class::InsideOut >>> can use any type of
+reference for the object, inside-out objects can be built from other objects.
+This is useful to extend a superclass without needing to know whether it is
+based on hashes, array, or other types of blessed references.
+
+  use base 'IO::File';
+ 
+  sub new {
+    my ($class, $filename) = @_;
+ 
+    my $self = IO::File->new( $filename );
+ 
+    register( $self, $class );
+  }
+
+In the example above, C<<< IO::File >>> is a superclass.  The object is an
+C<<< IO::File >>> object, re-blessed into the inside-out class.  The resulting
+object can be used directly anywhere an C<<< IO::File >>> object would be,
+without interfering with any of its own inside-out functionality.
+
+Classes using black-box inheritance should consider providing a C<<< DEMOLISH >>>
+function that calls the black-box class destructor explicitly.
+
+=head2 Serialization
+
+C<<< Class::InsideOut >>> automatically imports C<<< STORABLE_freeze >>> and C<<< STORABLE_thaw >>>
+methods to provide serialization support with L<Storable>.Due to limitations of
+C<<< Storable >>>, this serialization will only work for objects based on scalars,
+arrays or hashes.
+
+References to objects within the object being frozen will result in clones
+upon thawing unless the other references are included in the same freeze
+operation.  (See C<<< Storable >>> for details.)
+
+   # assume $alice and $bob are objects
+   $alice->friends( $bob );
+   $bob->friends( $alice );
+ 
+   $alice2 = Storable::dclone( $alice );
+ 
+   # $bob was cloned, too, thanks to the reference
+   die if $alice2->has_friend( $bob ); # doesn't die
+ 
+   # get alice2's friend
+   ($bob2) = $alice2->friends();
+ 
+   # preserved relationship between bob2 and alice2
+   die unless $bob2->has_friend( $alice2 ); # doesn't die
+
+C<<< Class::InsideOut >>> also allows customizing freeze and thaw hooks.  When an
+object is frozen, if its class or any superclass provides a
+C<<< FREEZE >>> method, they are each called with the object as an
+argument I<prior> to the rest of the freezing process.  This allows for
+custom preparation for freezing, such as writing a cache to disk, closing
+network connections, or disconnecting database handles.
+
+Likewise, when a serialized object is thawed, if its class or any
+superclass provides a C<<< THAW >>> method, they are each called
+I<after> the object has been thawed with the thawed object as an argument.
+
+C<<< Class::InsideOut >>> also supports serialization of singleton objects for recent
+versions of C<<< Storable >>> (2.14 or later) that support C<<< STORABLE_attach >>>.  Users
+must signal that C<<< STORABLE_attach >>> should be used instead of C<<< STORABLE_thaw >>> by
+adding C<<< :singleton >>> to their import line as follows:
+
+   use Class::InsideOut qw( :std :singleton );
+
+When attaching, the singleton object will be recreated in one of two ways:
+
+1. If the singleton class contains an C<<< ATTACH >>> method, it will be called with
+three arguments: the class name, a flag for whether this is part of a dclone,
+and a data structure representing the object:
+
+     $data = {
+         class => ref $obj,              # class name
+         type => $type,                  # object reference type
+         contents => $contents,          # object reference contents
+         properties => \%property_vals,  # HoH of classes and properties
+     }
+
+C<<< contents >>> is a reference of the same type as C<<< type >>>.  C<<< properties >>> is a
+multi-level hash, with the names of the class and any superclasses as top-level
+keys and property labels as second-level keys.  This data may be used to
+reconstruct or reattach to the singleton.  The C<<< ATTACH >>> method should return
+the singleton.
+
+2. If no C<<< ATTACH >>> routine is found, but the class has or inherits a C<<< new >>>
+method, then C<<< new >>> will be called with no arguments and the result will be
+returned as the singleton.
+
+=head2 Thread-safety
+
+Because C<<< Class::InsideOut >>> uses memory addresses as indices to object
+properties, special handling is necessary for use with threads.  When a new
+thread is created, the Perl interpreter is cloned, and all objects in the new
+thread will have new memory addresses.  Starting with Perl 5.8, if a C<<< CLONE >>>
+function exists in a package, it will be called when a thread is created to
+provide custom responses to thread cloning.  (See L<perlmod> for details.)
+To avoid bugs in the implementation of threading, Perl 5.8.5 or later is
+strongly recommended.
+
+C<<< Class::InsideOut >>> itself has a C<<< CLONE >>> function that automatically fixes up
+properties in a new thread to reflect the new memory addresses for all classes
+created with C<<< Class::InsideOut >>>.  C<<< register >>> must be called on all newly
+constructed inside-out objects to register them for use in
+C<<< Class::InsideOut::CLONE >>>.
+
+Users are strongly encouraged not to define their own C<<< CLONE >>> functions as
+they may interfere with the operation of C<<< Class::InsideOut::CLONE >>> and leave
+objects in an undefined state.  Future versions may support a user-defined
+CLONE hook, depending on demand.
+
+B<Limitations:> 
+
+C<<< fork >>> on Perl for Win32 is emulated using threads since Perl
+5.6. (See L<perlfork>.)  As Perl 5.6 did not support C<<< CLONE >>>, inside-out objects
+that use memory addresses (e.g. C<<< Class::InsideOut >>>) are not fork-safe for Win32
+on Perl 5.6.  Win32 Perl 5.8 C<<< fork >>> is supported.
+
+The technique for thread-safety requires creating weak references using
+C<<< Scalar::Util::weaken() >>>, which is implemented in XS.  If the XS-version of
+L<Scalar::Util> is not installed or if run on an older version of Perl without
+support for weak references, C<<< Class::InsideOut >>> will issue a warning and
+continue without thread-safety.  Also, objects will leak memory unless manually
+deregistered with a private function:
+
+  # destroying an object when weaken() isn't availalbe
+  Class::InsideOut::_deregister( $obj );
+  undef $obj;
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Class::InsideOut>
+
+=item *
+
+L<Class::InsideOut::Manual::About>
+
+=back
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2006 by David A. Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

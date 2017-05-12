@@ -1,0 +1,108 @@
+This is the output from class-std.pl run on a IBM Thinkpad T42 equipped with 
+a 1.7GHz Pentium Mobile (Dothan).
+The machine has 1 GB of memory, which was more than sufficient for running 
+the benchmark.
+The Benchmark was run from inside Eclipse from a Gnome desktop.
+OS was Ubuntu 7.10 (Gutsy Gibbon).
+
+Class-Std-Fast is SVN revision 195 (trunk).
+
+Summary of my perl5 (revision 5 version 8 subversion 8) configuration:
+  Platform:
+    osname=linux, osvers=2.6.15.7, archname=i486-linux-gnu-thread-multi
+    uname='linux palmer 2.6.15.7 #1 smp thu sep 7 19:42:20 utc 2006 i686 gnulinux '
+    config_args='-Dusethreads -Duselargefiles -Dccflags=-DDEBIAN -Dcccdlflags=-fPIC -Darchname=i486-linux-gnu -Dprefix=/usr -Dprivlib=/usr/share/perl/5.8 -Darchlib=/usr/lib/perl/5.8 -Dvendorprefix=/usr -Dvendorlib=/usr/share/perl5 -Dvendorarch=/usr/lib/perl5 -Dsiteprefix=/usr/local -Dsitelib=/usr/local/share/perl/5.8.8 -Dsitearch=/usr/local/lib/perl/5.8.8 -Dman1dir=/usr/share/man/man1 -Dman3dir=/usr/share/man/man3 -Dsiteman1dir=/usr/local/man/man1 -Dsiteman3dir=/usr/local/man/man3 -Dman1ext=1 -Dman3ext=3perl -Dpager=/usr/bin/sensible-pager -Uafs -Ud_csh -Uusesfio -Uusenm -Duseshrplib -Dlibperl=libperl.so.5.8.8 -Dd_dosuid -des'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=define
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='4.1.3 20070831 (prerelease) (Ubuntu 4.1.2-16ubuntu1)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lgdbm -lgdbm_compat -ldb -ldl -lm -lpthread -lc -lcrypt
+    perllibs=-ldl -lm -lpthread -lc -lcrypt
+    libc=/lib/libc-2.6.1.so, so=so, useshrplib=true, libperl=libperl.so.5.8.8
+    gnulibc_version='2.6.1'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -L/usr/local/lib'
+
+
+Characteristics of this binary (from libperl): 
+  Compile-time options: MULTIPLICITY PERL_IMPLICIT_CONTEXT
+                        PERL_MALLOC_WRAP THREADS_HAVE_PIDS USE_ITHREADS
+                        USE_LARGE_FILES USE_PERLIO USE_REENTRANT_API
+  Built under linux
+  Compiled at Sep 29 2007 05:57:38
+  @INC:
+    /etc/perl
+    /usr/local/lib/perl/5.8.8
+    /usr/local/share/perl/5.8.8
+    /usr/lib/perl5
+    /usr/share/perl5
+    /usr/lib/perl/5.8
+    /usr/share/perl/5.8
+    /usr/local/lib/site_perl
+    .
+
+
+Info:
+Each test creates an object an stacks two objects into it (two levels)
+
+MyBenchTestFastCache (50000 iterations - first run)
+timethis 50000:  1 wallclock secs ( 0.91 usr +  0.02 sys =  0.93 CPU) @ 53763.44/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  2 wallclock secs ( 1.58 usr +  0.01 sys =  1.59 CPU) @  0.63/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTestFastCache (50000 iterations - second run)
+timethis 50000:  0 wallclock secs ( 0.45 usr +  0.00 sys =  0.45 CPU) @ 111111.11/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  2 wallclock secs ( 1.54 usr +  0.01 sys =  1.55 CPU) @  0.65/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTestFastBasic (50000 iterations - first run)
+timethis 50000:  1 wallclock secs ( 0.57 usr +  0.01 sys =  0.58 CPU) @ 86206.90/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  1 wallclock secs ( 1.39 usr +  0.00 sys =  1.39 CPU) @  0.72/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTestFastBasic (50000 iterations - second run)
+timethis 50000:  1 wallclock secs ( 0.55 usr +  0.00 sys =  0.55 CPU) @ 90909.09/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  1 wallclock secs ( 1.38 usr +  0.01 sys =  1.39 CPU) @  0.72/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTestFast (50000 iterations - first run)
+timethis 50000: 14 wallclock secs (13.10 usr +  0.08 sys = 13.18 CPU) @ 3793.63/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  1 wallclock secs ( 1.51 usr +  0.03 sys =  1.54 CPU) @  0.65/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTestFast (50000 iterations - second run)
+timethis 50000: 14 wallclock secs (12.93 usr +  0.08 sys = 13.01 CPU) @ 3843.20/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  1 wallclock secs ( 1.52 usr +  0.00 sys =  1.52 CPU) @  0.66/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTest (50000 iterations - first run)
+timethis 50000: 14 wallclock secs (13.48 usr +  0.08 sys = 13.56 CPU) @ 3687.32/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  2 wallclock secs ( 1.71 usr +  0.02 sys =  1.73 CPU) @  0.58/s (n=1)
+            (warning: too few iterations for a reliable count)
+
+MyBenchTest (50000 iterations - second run)
+timethis 50000: 14 wallclock secs (13.27 usr +  0.09 sys = 13.36 CPU) @ 3742.51/s (n=50000)
+Cleanup: Destroying 150000 objects
+timethis 1:  2 wallclock secs ( 1.71 usr +  0.02 sys =  1.73 CPU) @  0.58/s (n=1)
+            (warning: too few iterations for a reliable count)

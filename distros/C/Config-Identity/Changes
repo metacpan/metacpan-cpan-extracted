@@ -1,0 +1,35 @@
+Revision history for Config-Identity
+
+0.0019    2016-11-19 22:55:59-05:00 America/New_York
+    - DAGOLDEN joined as maintainer
+    - Attemped test bug fix for rt.cpan.org#112569 (fails with newer gpg)
+    - SYNOPSIS fixed
+    - Added a generic "load_check" method to Config::Identity for simple
+      use cases that don't really need subclassing
+    - Replaces a die() call with croak() for consistency
+
+0.0018 Saturday March 01 13:40:31 PST 2014:
+    - Be more sane with how we interact with gpg
+ 
+0.0017 Saturday March 01 11:12:09 PST 2014:
+    - Use IPC::Run instead of IPC::Open3
+
+0.0016 Wednesday June 16 23:26:25 PDT 2010:
+    - Added CI_PAUSE_STUB/CI_GITHUB_STUB override
+
+0.0015 Tuesday June 08 15:57:29 PDT 2010:
+    - Added username/user aliasing to the PAUSE format (and loader)
+
+0.0014 Wednesday June 02 20:23:51 PDT 2010:
+    - Changed load_best to try_best and added a stricter load_best
+
+0.0013 2010-06-12:
+    - Surpress secmem warning during testing
+    - Added documentation about CI_{GPG/CI_GPG_ARGUMENTS}
+    - Put in information about using gpg-agent
+    
+0.0012 Tuesday May 11 23:59:01 PDT 2010:
+    - Updated documentation
+
+0.0010 Tuesday May 11 18:32:09 PDT 2010:
+    - Initial release

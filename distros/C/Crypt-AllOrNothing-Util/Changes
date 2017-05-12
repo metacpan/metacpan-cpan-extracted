@@ -1,0 +1,23 @@
+Revision history for Crypt-AllOrNothing-Util
+
+0.09	8/21/07 20:16
+		Change function newKey to randomValue.  Breaks backwards compatibility.
+
+0.08	8/20/07 20:52
+		Fix formatting in POD and change one last mention to Crypt::AON::Util
+
+0.07	8/20/07 19:19
+		Change namespace to Crypt::AllOrNothing::Util
+
+0.06	8/16/07 07:50
+		Add Crypt-AON-Util.t to MANIFEST
+
+0.05	8/15/07 20:05
+		Really added requires statements for correct building off CPAN
+
+0.04	8/15/07 08:25
+		Added requires statements for correct building off CPAN
+
+0.03    8/15/07 01:49
+		Changed to Crypt::AON::Util
+		Cleaned up a bit

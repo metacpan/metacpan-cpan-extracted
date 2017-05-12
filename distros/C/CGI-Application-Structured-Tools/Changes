@@ -1,0 +1,51 @@
+Revision history for Perl module CGI::Application::Structured::Tools
+0.015 Sun Feb 12 15:47:02 EST 2012
+  -  Update meta.yml and Changes for changes in 0.014
+0.014 Sun Feb 12 15:47:02 EST 2012w
+  - Update Starter.pm to handle changes in Module::Starter::Plugin behviour
+0.013 Sun Mar 27 22:14:41 EDT 2011
+  - include debug.sh in MANIFEST so it is distributed
+  - missed a replacement of "perl" to Probe::Perl->find_perl_interpreter() last time.  all should be covered now.
+  - make all scripts executable (755) so interpreter doesn't need to be called on CLI.
+  - add test for existence of generated debug.sh
+
+0.012 Sun Mar 27 11:47:54 EDT 2011
+  this version generates bash script to start CAS witn debug screen plugin.  requires CAS 0.006, which itself requires Plugin::DebugScreen
+
+0.010 Sun Mar 27 01:13:11 EDT 2011
+  replaced use of '$^X' with Probe::Perl to find interpreter to use in system call in t/001_load.t  it was suggested to use $^X in place of 'perl' for the purpose.  while that solution worked on my ubuntu boxes, it started failing in cpantesters (can't find Module::Install ...).  Probe::Perl was also suggested. Local testing is fine, so moving to cpantesters
+
+0.010 Sun Mar 27 01:13:11 EDT 2011
+  replaced use of '$^X' with Probe::Perl to find interpreter to use in system call in t/001_load.t  it was suggested to use $^X in place of 'perl' for the purpose.  while that solution worked on my ubuntu boxes, it started failing in cpantesters (can't find Module::Install ...).  Probe::Perl was also suggested. Local testing is fine, so moving to cpantesters
+
+0.009
+  fixed regression in t/001_load.t which used 'perl' in place of $^X in system call.
+
+0.009
+  fixed regression in t/001_load.t which used 'perl' in place of $^X in system call.
+0.008 Sat Mar 26 13:42:00 EDT 2011
+  fix bug in generation of schema name in application main cgi app module.
+    * moved schema name into config file 
+    * fixed bug (typo) in template variable name for schema name
+  removed experimental FCGI support
+  default config file location to 'config/config.pl' and remove need to export filename
+0.007 Tue Sep 28 19:13:18 EDT 2010
+  add support for FastCGI project template generation.
+
+0.006 Sat Sep 26 12:32:15 EDT 2009
+   bug fix for subcontroller generation script for multi level main packages
+
+0.005 Thu Sep 24 12:25:00 EDT 2009
+    corrected template variable name in configuration of DB in main module template.
+
+0.004 Thu Sep 24 11:40:04 EDT 2009
+      fixed bug in CGI::Application::Structured::Tools::Starter->create_mainmodule: was failing to create proper path for multi leveled main package hierarchy in file system.
+
+0.003 Sat Sep 19 18:00:06 EDT 2009
+   include use statement for Module::Starter in cas-starter.pl which is causing
+   test failures on some platforms.
+
+0.001 Fri Sep 18 14:58:43 EDT 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

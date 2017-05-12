@@ -1,0 +1,72 @@
+From tomcat-user-return-63480-qmlist-jakarta-archive-tomcat-user=nagoya.apache.org@jakarta.apache.org Fri May 09 12:47:48 2003
+Return-Path: <tomcat-user-return-63480-qmlist-jakarta-archive-tomcat-user=nagoya.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@apache.org
+Received: (qmail 18378 invoked from network); 9 May 2003 12:47:47 -0000
+Received: from exchange.sun.com (192.18.33.10)
+  by daedalus.apache.org with SMTP; 9 May 2003 12:47:47 -0000
+Received: (qmail 26268 invoked by uid 97); 9 May 2003 12:49:50 -0000
+Delivered-To: qmlist-jakarta-archive-tomcat-user@nagoya.betaversion.org
+Received: (qmail 26261 invoked from network); 9 May 2003 12:49:50 -0000
+Received: from daedalus.apache.org (HELO apache.org) (208.185.179.12)
+  by nagoya.betaversion.org with SMTP; 9 May 2003 12:49:50 -0000
+Received: (qmail 16710 invoked by uid 500); 9 May 2003 12:47:29 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 16678 invoked from network); 9 May 2003 12:47:29 -0000
+Received: from oldtfw04.pearsontc.com (HELO oldtms704.pearsontc.com) (12.29.228.5)
+  by daedalus.apache.org with SMTP; 9 May 2003 12:47:29 -0000
+Received: from oldtms031.prenhall.com (localhost [127.0.0.1])
+ by oldtms704.pearsontc.com (iPlanet Messaging Server 5.1 (built May  7 2001))
+ with ESMTP id <0HEM00EJ6E5BRS@oldtms704.pearsontc.com> for
+ tomcat-user@jakarta.apache.org; Fri, 09 May 2003 08:46:23 -0400 (EDT)
+Received: by OLDTMS031 with Internet Mail Service (5.5.2654.89)
+        id <K1Y66T8X>; Fri, 09 May 2003 08:48:26 -0400
+Content-return: allowed
+Date: Fri, 09 May 2003 08:48:08 -0400
+From: "O'Neill, John" <John.O'Neill@ScottForesman.com>
+Subject: Tomcat server limits
+To: "'tomcat-user@jakarta.apache.org'" <tomcat-user@jakarta.apache.org>
+Message-id: <691974AB8807D21196F200600842F7570A7E7D51@oldtms009.schuster.com>
+MIME-version: 1.0
+X-Mailer: Internet Mail Service (5.5.2654.89)
+Content-type: text/plain; charset=iso-8859-1
+Content-transfer-encoding: 7BIT
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+
+I have an Apache, mod_jk and tomcat configuration.  At a certain threshold,
+I begin to see a flood of EST and some SYNC_SENT tcp connections for the
+apache, tomcat and oracle ports (no SNYC_SENT for oracle port).
+
+Questions:
+1)  How do I know when I will need to load balance?
+2)  What are the normal and extreme settings people are using for
+maxProcessors on tomcat and MaxClients for Apache?
+3)  Has anyone needed to tune the Solaris tcp parameters to increase their
+efficiency for their apps?
+
+Thanks,
+John
+
+
+
+****************************************************************************
+This email may contain confidential material.
+If you were not an intended recipient,
+please notify the sender and delete all copies.
+We may monitor email to and from our network.
+
+****************************************************************************
+
+
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

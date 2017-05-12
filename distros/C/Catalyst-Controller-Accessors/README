@@ -1,0 +1,93 @@
+NAME
+    Catalyst::Controller::Accessors - Accessors for a namespaced stash
+
+VERSION
+    version 0.003003
+
+SYNOPSIS
+     package MyApp::Controller::Users::Roles;
+
+     use Moose;
+     use Catalyst::Controller::Accessors;
+
+     use namespace::autoclean;
+
+     BEGIN { extends 'Catalyst::Controller' };
+
+     cat_has user => (
+       is => 'ro',
+       namespace => 'MyApp::Controller::Users',
+     );
+
+     cat_has thing => ( is => 'rw' );
+
+     use Check::ISA;
+     cat_has resultset => (
+        is => 'rw',
+        isa => sub {
+          die 'resultset needs to be a DBIx::Class::ResultSet, but you passed "$_[0]"'
+             unless obj($_[0], 'DBIx::Class::ResultSet')
+        }
+     );
+
+     # slot lets us use a different underlying field
+     cat_has other_user => (
+       is => 'ro',
+       namespace => 'MyApp::Controller::Users',
+       slot => 'user',
+     );
+
+     sub load_rs {
+       my ($self, $c) = @_;
+
+       $self->resultset($c,
+          $self->user($c)->roles
+       );
+     }
+
+     sub load_thing {
+       my ($self, $c, $id) = @_;
+
+       $self->thing($c,
+          $self->resultset($c)->find($id)
+       );
+     }
+
+     sub get_user {
+       my ($self, $c) = @_;
+
+       $c->response->body($self->thing($c)->name);
+     }
+
+DESCRIPTION
+    The overall idea for this module is to allow more sensible access to the
+    stash. It merely namespaces the stash based on the name of the
+    controller adding the accessor or the specified namespace. It's prime
+    purpose is for chaining.
+
+IMPORTED SUBROUTINES
+  cat_has
+    Options:
+
+    *
+     "is" - required, must be either "ro" or "rw"
+
+    *
+     "namespace" - defaults to current controller
+
+    *
+     "slot" - defaults to accessor name
+
+    *
+     "isa" - Moo style validation coderef. For a set of predefined
+     validators check out MooX::Types::MooseLike::Base.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

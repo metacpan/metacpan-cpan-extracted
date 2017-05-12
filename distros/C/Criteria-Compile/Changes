@@ -1,0 +1,33 @@
+CHANGE LOG
+----------------------------
+[Version 0.4]
+
+Module now ready for dev release.
+
+- Added unit tests for the standard functionality (none yet for custom functionality)
+- POD updated
+- General code / dist cleanup 
+
+
+
+[Version 0.2]
+
+Module now functional. OOH-RAH!
+
+- Added Makefile and CPAN META files
+- Added MANIFEST file
+- Added short readme from excepts of POD
+- Fixed Build.PL syntax error preventing build
+
+- Completed support for newer criteria API
+- Added access mode implementation / API
+- Added smart-handling of subroutine-by-name and subroutine-by-ref handler directives
+- Added smart match 'matches' criteria support
+- Added initial project POD documentation
+- Fixed issue with accidental regression causing lost localiation of $_ in handlers and causing only first run to succeed
+- Removed remnants of old clear mode of the compile method
+
+- Experimental sub flattening ready for test with the follow caveats:
+	- the optimisation is heavy at initialisation
+	- slows down criteria compilation by almost 1 second
+	- improves speed of repeated evaluation of criteria by reducing calls during criteria exec by 40%

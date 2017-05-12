@@ -1,0 +1,944 @@
+-------------------------
+Version 0.78 (2016-02-14)
+-------------------------
+
+* added Clang support to ccconfig
+
+* fix cpan #109978: improve wording/grammar in POD; thanks to
+  gregor herrmann for providing a patch
+
+* fix cpan #95716: Add support for #warn/#warning; thanks to
+  Jon DuSaint for providing an initial patch
+
+* update module metadata
+
+-------------------------
+Version 0.77 (2015-07-22)
+-------------------------
+
+* ensure consistent order of enums when generating code; this was
+  a real bug and caused the configuration part of C::B::C to report
+  wrong (even invalid) configurations back to the user when built
+  using a recent version of Perl that randomises hash keys
+
+* fix cpan #85264: the POD test was reporting a missing =back tag
+  in one of the support modules; the ultimate fix was to ensure only
+  the provided modules were POD checked
+
+* fix cpan #83167: an artificially low refcnt for immortal variables
+  introduced recently for debug Perl builds was causing the refcnt
+  tests to fail for SvNULLs; thanks to Reini Urban for his patch;
+  also thanks to Nicholas Clark for pointing me to the Perl commit
+
+* fix cpan #78165: spelling errors in the documentation; thanks to
+  gregor herrmann for providing a patch
+
+* fix deprecated use of unescaped braces in regex
+
+* fix some gcc and Perl warnings
+
+* switch from SnapshotCM to git repo: github.com/mhx/Convert-Binary-C/
+
+-------------------------
+Version 0.76 (2011-04-11)
+-------------------------
+
+* it looks like I've found the source of the test failures reported
+  in cpan #56369; this version is an attempt to fix the problem, but
+  without fully understanding it -- if a windows guru can explain to
+  me why setjmp() deadlocks if the jmp_buf structure was allocated
+  through Perl's API (New, Newz, etc), I'd really appreciate it
+
+-------------------------
+Version 0.75 (2011-04-10)
+-------------------------
+
+* fix cpan #63381 / perl #79854: make sure warnings cause a cache
+  file not to be used (thanks to Andreas König for reporting this)
+
+* fix bug in unpack where the code would attempt to create an array
+  with negative size when running out of input data
+
+* make sure elf.PL reads/writes in binary mode (thanks to רחלי מרל
+  for finding this problem)
+
+-------------------------
+Version 0.74 (2009-04-18)
+-------------------------
+
+* fix sourcification of flexible array members (triggered by cpan
+  #45105; thanks to Alexander Ost for being persistent in his
+  attempt to convince me that there's a bug in sourcify)
+
+-------------------------
+Version 0.73 (2009-03-16)
+-------------------------
+
+* fix META.yml generation with newer versions of ExtUtils::MakeMaker
+
+* work around an include path handling bug present in some versions
+  of Test::Harness
+
+-------------------------
+Version 0.72 (2009-03-15)
+-------------------------
+
+* fix cpan #43119: patch to allow Convert::Binary::C to build
+  with GCC 4.4.x (thanks to Alex Lancaster for providing a patch)
+
+-------------------------
+Version 0.71 (2008-04-15)
+-------------------------
+
+* added new 'StdCVersion' and 'HostedC' options for configuring
+  the predefined macros of the preprocessor
+
+* fix debugging build with development version of Perl
+
+-------------------------
+Version 0.70 (2007-12-24)
+-------------------------
+
+-- released without changes --
+
+----------------------------
+Version 0.69_01 (2007-12-08)
+----------------------------
+
+* fix UV generation on platforms where NVs don't preserve
+  UVs (e.g. amd64) and perl doesn't know about UVs (<5.6.0)
+
+* make the test suite more noisy when something goes wrong
+
+-------------------------
+Version 0.69 (2007-12-06)
+-------------------------
+
+* fix: unpack would return garbage when an unpack hook
+  causes the perl stack to be reallocated
+
+* make ccconfig handle blanks in paths correctly
+
+* slightly improve ELF parser example
+
+* fix debug format strings
+
+-------------------------
+Version 0.68 (2007-06-25)
+-------------------------
+
+* allow #pragma pack(0) to reset to default alignment,
+  just like #pragma pack
+
+* add checks for invalid #pragma pack() arguments
+
+-------------------------
+Version 0.67 (2006-12-29)
+-------------------------
+
+* bleeding edge perl versions don't have SVt_PVBM anymore,
+  which broke compilation of cbc/util.c
+
+-------------------------
+Version 0.66 (2006-11-02)
+-------------------------
+
+* fix a bug in the parser that accidentially allowed
+  qualified enum specifiers as unnamed compound members
+
+* update test suite for better coverage of recent
+  compiler features and bitfields
+
+-------------------------
+Version 0.65 (2006-08-27)
+-------------------------
+
+* fix compilation issues with perls configured with
+  threads and debugging; these issues were caused by
+  a buggy implementation of the assert() macro in the
+  5.8 series of perl
+
+* fix compilation issues with HP compiler on itanium
+  systems
+
+* fix: hooks for the same type were not re-entrant
+  (i.e. you could not pack/unpack the same type
+  within a hook registered for that type)
+
+* fix: passing sparse hashes or arrays to pack() in
+  combination with pack hooks was causing an assertion
+
+* fix an integer promotion bug in the preprocessor
+
+* add better support for C99-style array declarator
+
+* fix enumerator handling: it was impossible to reuse
+  the name of an enumerator as an identifer
+
+* ccconfig fix: macros defined to the empty string
+  were not properly detected
+
+----------------------------
+Version 0.64_02 (2006-03-24)
+----------------------------
+
+* struct members are now treated more Cish than before
+
+* added experimental Dimension tag
+
+* cleaned up some internals
+
+----------------------------
+Version 0.64_01 (2006-02-27)
+----------------------------
+
+* added new methods to interface with the preprocessor:
+
+  o the 'defined' method tests if a macro is defined
+
+  o the 'macro_names' method returns a list of all
+    defined macro names
+
+  o the 'macro' method returns macro definitions
+
+* added 'Defines' option for 'sourcify' method; with
+  this option turned on, macro definition are also
+  sourcified
+
+* the speed of the 'sourcify' method has been greatly
+  improved
+
+* add a new pod coverage test
+
+* fix a pod2usage call in elf.pl example
+
+* improve warning when trying to pack references into
+  format tagged types
+
+* make the module and some basic tests compatible with
+  perl 5.004
+
+* the native() function/method now also supports the
+  'UnsignedChars' and 'UnsignedBitfields' properties
+
+* the 'threads' feature is deprecated and will be removed
+  in a future relase
+
+-------------------------
+Version 0.64 (2006-01-16)
+-------------------------
+
+* fix version handling in *.pm files
+
+* don't index bin/elf.PL
+
+* upgrade ppport.h
+
+----------------------------
+Version 0.63_01 (2006-01-09)
+----------------------------
+
+* fix: using the Format tag on bitfield members now throws
+  an exception
+
+* added experimental ByteOrder tag
+
+* added ELF parser example
+
+* improve internals
+
+  o better encapsulation of the pack/unpack code
+
+  o avoid unnecessary computations
+
+  o thanks to the cachegrind tool (http://valgrind.org), some
+    expressions in the lexer code of the ucpp preprocessor
+    could be optimized, making the preprocessor more than
+    10% faster on x86 platforms; this means that parsing
+    should be about 7% faster now
+
+* improve test coverage
+
+-------------------------
+Version 0.63 (2005-12-29)
+-------------------------
+
+* fix a problem with the test suite when run in a directory
+  that contains whitespace characters
+
+* (hopefully) fix the no_index problem in the META.yml by
+  replacing "dir" with "directory"
+
+-------------------------
+Version 0.62 (2005-12-01)
+-------------------------
+
+* fixed a bug in unpack() that would cause an error when
+  repeatedly passing a substr() as the data argument; this
+  is not a critical bug, because there's no silent failure
+
+-------------------------
+Version 0.61 (2005-10-27)
+-------------------------
+
+* fix Makefile.PL / META.yml
+
+-------------------------
+Version 0.60 (2005-10-26)
+-------------------------
+
+* fixed: the byte order setting was not correctly handed
+  to the bitfield layouter when using configure() before
+  using parse(); since that's what C::B::C::Cached does,
+  C::B::C::Cached could be using the wrong byte order for
+  bitfields
+
+* the deprecated methods add_hooks(), delete_hooks() and
+  delete_all_hooks() have been removed
+
+* silence some warnings with newer gcc versions
+
+* start moving test suite to use Test::More
+
+* bundle Test, Test::More and Test::Harness for older
+  perl versions
+
+* extend compatibility down to perl 5.005
+
+-------------------------
+Version 0.59 (2005-06-13)
+-------------------------
+
+* fixed: dying hooks no longer leak memory
+
+* added new 'UnsignedBitfields' option
+
+* removed 'Bitfields are unsupported' warning
+
+* documented bitfield support
+
+* the usual cleanups and corrections
+
+----------------------------
+Version 0.58_01 (2005-05-23)
+----------------------------
+
+* bitfields are now supported; since bitfield implementations
+  differ from compiler to compiler (sometimes significantly),
+  the bitfield layouting engine can be exchanged at runtime;
+  bitfield support is, however, still considered experimental
+
+* the memory used by internal data structures as well
+  as the number of malloc/free calls has been reduced
+  by about 15 percent; besides saving memory, this also
+  makes parsing and cloning a bit faster
+
+* the whole pack()/unpack() engine was re-doing the work
+  that has previously been done by the compound layouter;
+  this redundancy has been removed, making the code more
+  readable (and a little bit faster)
+
+* the compound layouter implementation has been separated
+  and can now be exchanged at runtime (which is currently
+  unused as there's only one implementation)
+
+* the bison parser is now making use of the %destructor
+  feature introduced recently; this makes the parser code
+  a lot easier to read and maintain, and makes the parser
+  a bit faster; you need at least bison-2.0a to regenerate
+  the files
+
+* when packing 'string' numbers, the 0b... syntax is now
+  supported for binary numbers
+
+* ccconfig's interface and internals have been updated
+
+* ccconfig now has a lot more options that hopefully allow
+  you to test compilers with strange commandline interface
+
+* ccconfig is now more robust against compiler failures
+
+* lots of minor tweaks and fixes
+
+-------------------------
+Version 0.58 (2005-02-21)
+-------------------------
+
+* there's now a mailing list; see the documentation or
+  README for details
+
+* new tag() method provides a generic way of tagging
+  properties such as hooks to types
+
+* the hooks methods are deprecated and will be removed
+  in a future release (new interface is provided through
+  tag() / untag())
+
+* completely restructured the XS/C internals, since C.xs
+  was getting way too large; the code should be a lot
+  more modular and organized now
+
+* make the preprocessor handle (read: ignore) any #ident
+  directives (problem spotted by Ronnie Kelly)
+
+* use faster preprocessor tokenizer routine
+
+* ccconfig: add --output-file and --output-format options
+
+* fix invalid read bug when redefining a macro with trailing
+  whitespace (spotted by valgrind)
+
+* make sure pack() returns null-terminated strings; not doing
+  so can confuse the regex engine
+
+* strip redundant warnings from enum/compound/typedef methods
+
+* fix deep recursion in llex() that causes bus error on hpux
+  (this should fix the activestate test failures)
+
+* make util / ucpp use Perl's memory allocation functions
+  (this should fix problems with -Dusethreads and -Dusemymalloc)
+
+* as usual, more tests and more docs
+
+-------------------------
+Version 0.57 (2004-11-23)
+-------------------------
+
+* allow empty initializers (spotted by Mike Lamb)
+
+* add CharSize option to support architectures where
+  chars are larger than 8 bits (spotted by Esa Östring)
+
+-------------------------
+Version 0.56 (2004-09-19)
+-------------------------
+
+* allow empty member declaration lists
+
+* minor doc fixes
+
+-------------------------
+Version 0.55 (2004-08-22)
+-------------------------
+
+* new native() function to query native properties
+
+* feature() and native() can now also be called as methods
+
+* allow setting Alignment and CompoundAlignment to zero to
+  request native alignment and compound alignment
+
+* prefix compile-time defaults with CBC_ and document them
+
+* upgrade ppport.h
+
+* minor cleanups
+
+-------------------------
+Version 0.54 (2004-07-01)
+-------------------------
+
+* improved hooks features
+
+* changed handling of autogenerated files that has been
+  causing trouble with crappy archiving tools
+
+* minor bugfixes
+
+-------------------------
+Version 0.53 (2004-05-25)
+-------------------------
+
+* fixed a bug that messed up the return values when using
+  unpack in list context together with OrderMembers => 1
+
+-------------------------
+Version 0.52 (2004-05-24)
+-------------------------
+
+* added new CompoundAlignment option
+
+* added new behaviour for unpack method in list context
+
+* simplify inheriting from Convert::Binary::C
+
+* fixed a bug in the initializer method that caused
+  wrong initialization strings for unnamed unions
+
+* fixed a systematic bug that caused sourcify to return
+  invalid C code in a few special cases
+
+-------------------------
+Version 0.51 (2004-03-23)
+-------------------------
+
+* added method chaining for add_hooks, delete_hooks and
+  delete_all_hooks
+
+* fixed some bugs when using substr() with pack and unpack
+
+* documentation fixes and updates
+
+-------------------------
+Version 0.50 (2004-03-22)
+-------------------------
+
+* added support for flexible array members and incomplete
+  types
+
+* added support for registering pack/unpack hooks to allow
+  user-defined packing/unpacking
+
+* ucpp is now reentrant, thus there's no more locking of
+  parse/parse_file
+
+* fixed a memory leak when using OrderMembers => 1
+
+* improved ccconfig's detection of ability to compile
+  object/executable files
+
+* lots of minor bugfixes and code cleanups
+
+-------------------------
+Version 0.49 (2003-11-24)
+-------------------------
+
+* fixed build problem on multi-threaded 5.6.x perls by
+  removing irrelevant code from ppport.h
+
+* changed error reporting: preprocessor errors are no
+  longer only warnings
+  (this fixes an issue with Convert::Binary::C::Cached
+  creating an empty cache file if none of the #include'd
+  files could be found)
+
+* fixed some error/warnings reporting problems with
+  Convert::Binary::C::Cached
+
+* minor cleanups
+
+-------------------------
+Version 0.48 (2003-11-03)
+-------------------------
+
+* added new 'OrderMembers' option: this option allows you
+  to tie all hashes returned by the unpack method to either
+  Tie::Hash::Indexed or Tie::IxHash, thus preserving the
+  order of compound members when e.g. dumping the hashes or
+  iterating through their keys/values
+
+* slightly improved performance for pack method
+
+* added META.yml
+
+* lots of code cleanups
+
+* small bugfixes
+
+-------------------------
+Version 0.47 (2003-09-11)
+-------------------------
+
+* enhanced behaviour of def() method
+
+* added new pod test
+
+* fixed some buglets
+
+-------------------------
+Version 0.46 (2003-09-09)
+-------------------------
+
+* fixed bug #3753 "packing a struct/member/field causes a
+  bus error"
+
+* added new warnings when packing/unpacking zero-sized types
+
+* updated the docs with links to http://rt.cpan.org and
+  http://cpanratings.perl.org
+
+-------------------------
+Version 0.45 (2003-08-18)
+-------------------------
+
+* fixed/improved sourcify output for #pragma pack
+
+* added Context option for sourcify method
+
+-------------------------
+Version 0.44 (2003-08-17)
+-------------------------
+
+* fixed behaviour of typeof method for bitfields
+
+* dependencies method now returns plain list of files when
+  called in list context
+
+* doc fixes
+
+-------------------------
+Version 0.43 (2003-07-24)
+-------------------------
+
+* fixed: undef values returned by unpack were not writable
+  and caused problems with almost all versions of perl
+
+* fixed: sizeof() could return garbage when used on array
+  types
+
+* fixed bogus warning generated by pack when explicitly
+  passing 'undef'
+
+* improved warning messages generated by pack
+
+* added error when using offsetof on bitfields
+
+* added new initializer method
+
+* the offset argument to the member method is now optional;
+  without the offset argument, a list of all possible
+  members is returned
+
+* code cleanups
+
+-------------------------
+Version 0.42 (2003-06-23)
+-------------------------
+
+* added new 'ieeefp' feature
+
+* new floating point conversion code to support both IEEE
+  and non-IEEE sytems
+
+  o on machines using the IEEE format to store floating
+    point numbers, you can pack/unpack arbitrary byteorder
+    floating point values for all supported native sizes
+
+  o on machines not using the IEEE format, packing and
+    unpacking of floating point values is restricted to
+    the types natively available
+
+* floating point conversion checks and warnings have been
+  improved
+
+* added floating point format detection to ccconfig
+
+* some code cleanups
+
+-------------------------
+Version 0.41 (2003-06-10)
+-------------------------
+
+* added support for gcc's asm syntax
+
+* some cleanups
+
+-------------------------
+Version 0.40 (2003-04-20)
+-------------------------
+
+* same as 0.13, just to make CPAN(?:PLUS|-indexer)? happy
+
+-------------------------
+Version 0.13 (2003-04-20)
+-------------------------
+
+* changed behaviour of member method in list context
+
+  o doesn't return the member's type any longer
+
+  o returns all matching members instead, if multiple
+    members match the given offset
+
+  o this change is NOT backward compatible
+
+  o to get the old behaviour, turn
+
+      ($member, $typeof) = $c->member( $type, $offset );
+
+    into
+
+      $member = $c->member( $type, $offset );
+      $typeof = $c->typeof( $type.$member );
+
+* fixed lots of memory leaks resulting from using sv_dec()
+  where SvREFCNT_dec() should have been used instead
+
+* fixed memory leak when object construction fails
+
+* fixed sourcify for enums in special cases
+
+* fixed segfault in debugging mode
+
+* removed lots of limitations and fixed lots of bugs when
+  dealing with member expressions
+
+* changed module/ccconfig versioning; now
+
+    $Convert::Binary::C::VERSION
+    $Convert::Binary::C::Cached::VERSION
+
+  as well as the version of ccconfig are all set to the
+  version of the distribution to avoid confusion
+
+* added new typeof method
+
+* added dwimmy handling of offset suffixes
+
+* added basic type support for many methods
+
+* allowed basic types to be used without parsing any code
+
+* allowed enum/struct/union prefixes for enum, compound,
+  struct and union methods
+
+* improved performance when using a threaded perl binary
+  by about 20%; performance is now only 5% worse than
+  with a non-threaded binary
+
+* added new "understanding types" section to documentation
+
+* fixed some inconsistencies in documentation
+
+* added some new warnings
+
+* added lots of new tests, some based on coverage analysis
+  using gcov
+
+* fixed some tests that could fail due to random binary
+  input when (un)packing floating point values
+
+* used ppport.h for compatibility
+
+* added check for unsupported perl binary configuration
+  with usemymalloc=y _and_ threads
+
+* lots of code cleanups
+
+-------------------------
+Version 0.12 (2003-03-18)
+-------------------------
+
+* fixed some bugs in ccconfig
+
+* fixed dealing with cache file corruption
+
+* minor fixes in documentation
+
+* use Devel::Tokenizer::C for tokenizer generation
+
+-------------------------
+Version 0.11 (2003-02-27)
+-------------------------
+
+* fixed problem with recursive data structures in sourcify
+
+* minor cleanups
+
+-------------------------
+Version 0.10 (2003-01-23)
+-------------------------
+
+* added --version for ccconfig
+
+* cleaned up and fixed format strings
+
+* updated README
+
+-------------------------
+Version 0.09 (2003-01-20)
+-------------------------
+
+* fixed problems with va_list on Linux-PPC that caused some
+  tests to segfault
+
+* updated preprocessor output detection in ccconfig for
+  "smart" preprocessors
+
+* minor fixes and cleanups
+
+* minor documentation updates
+
+-------------------------
+Version 0.08 (2003-01-15)
+-------------------------
+
+* added ccconfig --nodelete option
+
+* added context info for structs/unions/enums
+
+* removed 'c99' feature
+
+* documentation updates and fixes
+
+-------------------------
+Version 0.07 (2003-01-09)
+-------------------------
+
+* fixed packing/unpacking for #pragma pack
+
+* complete rewrite of member() algorithm
+
+* added 'KeywordMap' option to add keywords directly to the parser
+
+* added new behaviour for EnumSize => -1
+
+* extended ranges of some integer options
+
+* integrated new version of ucpp
+
+* added 'ccconfig' script
+
+* example scripts are now generated
+
+* added and improved tests
+
+* documentation updates
+
+* lots of other tiny tweaks
+
+* deprecated 'c99' feature, will be removed in 0.08
+
+-------------------------
+Version 0.06 (2002-12-13)
+-------------------------
+
+* removed options 'HasVOID' and 'HasC99Keywords'
+
+* added 'DisabledKeywords' option, which replaces both 'HasVOID' and
+  'HasC99Keywords', and allows to disable a lot of other keywords, too:
+
+    HasVOID => 0         -->  DisabledKeywords => ['void']
+    HasC99Keywords => 0  -->  DisabledKeywords => [qw(inline restrict)]
+
+* updated parser to ignore type definitions within code blocks
+
+* fixed an access violation when cleaning up the preprocessor
+
+* removed warning when using sourcify method
+
+* added some more tests
+
+* added examples directory and some example scripts
+
+* added more examples to documentation
+
+* documentation fixes/updates
+
+-------------------------
+Version 0.05 (2002-11-28)
+-------------------------
+
+* fixed a bug that suppressed the error message
+  when the cache file could not be created, and
+  added a test for it
+
+-------------------------
+Version 0.04 (2002-11-27)
+-------------------------
+
+* support for 64-bit data types on all platforms
+
+* additional data types
+
+  o long long
+
+  o long double
+
+* new methods
+
+  o clean -- cleaning an object
+
+  o clone -- cloning an object
+
+  o depencencies -- retrieve an object's dependencies
+
+  o sourcify -- emit an object's parsed data as C source
+
+* changed method behaviour
+
+  o configure
+
+    - The 'HashSize' option has been removed. I didn't like
+      it anyway, and since the hash tables are now growing
+      automatically, it's completely useless.
+
+  o def
+
+    - Instead of undef, 0 and 1, the def method will now return
+      undef, '' (the empty string) or the kind of the type you
+      passed as an argument, e.g. 'typedef' or 'union'.
+
+* added method behaviour
+
+  o configure
+
+    - Calls to configure (and other configuration methods) can
+      be chained together when they're 'set' method calls.
+
+  o parse, parse_file
+
+    - All method calls that have no return value will return a
+      reference to their object, so method chaining is possible.
+
+  o pack, unpack, sizeof, offsetof, member
+
+    - These methods now can all operate on compound members, i.e.
+      you could say $obj->sizeof( 'type.foo.x' ).
+
+  o member
+
+    - The member method now can optionally return the type of the
+      requested member.
+
+* new Convert::Binary::C::Cached module
+
+  o cached Convert::Binary::C objects
+
+  o identical interface
+
+  o can speed up parsing by up to 10 - 20 times
+
+* increased speed for packing and unpacking arrays
+
+* increased portability
+
+* added new and improved existing tests
+
+* some bug fixes and a lot of code cleanups
+
+* upgraded to bison 1.75
+
+-------------------------
+Version 0.03 (2002-09-25)
+-------------------------
+
+* fixed default sizes for floats and double in object constructor
+
+* fixed some 64-bit architecture issues
+
+* fixed bug in bison parser
+
+* fixed problems with some tests
+
+* added support for dec_osf platform
+
+-------------------------
+Version 0.02 (2002-08-31)
+-------------------------
+
+* decreased the complex test file, which speeds up the complex test
+  and decreases the size of the distribution file
+
+* decreased the number of threads in the threads test
+
+* added copyright notice to the README file
+
+* minor corrections/cleanups
+
+-------------------------
+Version 0.01 (2002-08-30)
+-------------------------
+
+* initial release

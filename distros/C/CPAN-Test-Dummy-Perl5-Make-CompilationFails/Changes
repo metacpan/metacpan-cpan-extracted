@@ -1,0 +1,4 @@
+0.02 - Name change to CPAN::Test::Dummy::Perl5::Make::CompilationFails and
+       remove Test::Broken from CPAN. (Thanks Slaven Rezic.)
+
+0.01 - first release (as Test::Broken)

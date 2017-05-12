@@ -1,0 +1,19 @@
+<% dist_file %>.db
+MYMETA.json
+MYMETA.yml
+MANIFEST.old
+^Makefile$
+^blib
+^pm_to_blib$
+^MakeMaker-\d
+cover_db
+t/000_standard__*
+Debian_CPANTS.txt
+nytprof.out
+~$
+\.git
+\.swp$
+\.tar$
+\.tar\.gz$
+^core$
+.travis.yml

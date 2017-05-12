@@ -1,0 +1,6 @@
+MANIFEST
+README
+Makefile.PL
+Blinker.pm
+example-server.pl
+META.yml                                 Module meta-data (added by MakeMaker)

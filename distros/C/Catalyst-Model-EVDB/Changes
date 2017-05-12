@@ -1,0 +1,32 @@
+Revision history for Perl extension Catalyst::Model::EVDB.
+
+0.08  Sat Mar 18 17:43:05 EST 2006
+        - Allow direct specification of username and password in login
+          method
+        - Add documentation for login method
+        - Reorganize tests
+
+0.07  Thu Mar 16 01:05:36 EST 2006
+        - Add login method
+
+0.06  Fri Mar  3 23:43:33 EST 2006
+        - Minor documentation cleanup
+
+0.05  Mon Feb 27 22:47:56 EST 2006
+        - Add Helper documentation
+        - Instruct POD parsers to ignore helper __DATA__ sections
+          (Gavin Henry)
+
+0.04  Wed Feb  1 17:45:18 EST 2006
+        - Set component configuration in new method
+        - Change error accessor method to errstr to match EVDB::API
+
+0.03  Wed Dec 28 02:33:50 EST 2005
+        - Require Catalyst 5.5 (for Catalyst::Model)
+        - Add basic test of model class
+
+0.02  Sun Oct 30 21:44:45 EST 2005
+        - Fix module description
+
+0.01  Tue Oct 22 17:24:32 EDT 2005
+        - Initial revision

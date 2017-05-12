@@ -1,0 +1,24 @@
+---
+abstract: 'collectd plugin for sending collectd metrics to syslog'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Collectd-Plugins-WriteSyslogGraphite
+requires:
+  Collectd: 0
+  Sys::Syslog: 0
+  strict: 0
+  threads::shared: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Collectd-Plugins-WriteSyslogGraphite
+  repository: https://github.com/benningm/Collectd-Plugins-WriteSyslogGraphite
+version: 1.002

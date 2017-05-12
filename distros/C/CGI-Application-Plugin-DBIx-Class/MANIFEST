@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CGI/Application/Plugin/DBIx/Class.pm
+t/01-basic.t
+t/lib/CAPDBICTest/CGIApp.pm
+t/lib/CAPDBICTest/Schema.pm
+t/lib/CAPDBICTest/Schema/Result/Stations.pm
+t/lib/CAPDBICTest/Schema/ResultSet/Stations.pm
+t/release-pod-syntax.t

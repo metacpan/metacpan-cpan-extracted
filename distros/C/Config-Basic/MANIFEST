@@ -1,0 +1,11 @@
+Build.PL
+lib/Config/Basic.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+test.pl
+test.cfg
+test1.cfg
+test1.pl
+

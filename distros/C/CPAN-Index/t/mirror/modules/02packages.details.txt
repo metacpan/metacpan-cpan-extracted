@@ -1,0 +1,18 @@
+File:         02packages.details.txt
+URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+Description:  Package names found in directory $CPAN/authors/id/
+Columns:      package name, version, path
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   Id: mldistwatch 479 2004-01-04 13:29:05Z k 
+Line-Count:   23609
+Last-Updated: Fri, 13 Feb 2004 13:50:21 GMT
+
+Acme::Colour                       1.00  L/LB/LBROCARD/Acme-Colour-1.00.tar.gz
+Acme::Colour::Old                  1.00  L/LB/LBROCARD/Acme-Colour-0.95.tar.gz
+Acme::ComeFrom                     0.07  A/AU/AUTRIJUS/Acme-ComeFrom-0.07.tar.gz
+Acme::Comment                      1.02  K/KA/KANE/Acme-Comment-1.02.tar.gz
+Acme::CramCode                     0.01  X/XE/XERN/Acme-CramCode-0.01.tar.gz
+Acme::Currency                     0.01  S/SM/SMUELLER/Acme-Currency-0.01.tar.gz
+accessors                          0.02  S/SP/SPURKIS/accessors-0.02.tar.gz
+accessors::chained                undef  S/SP/SPURKIS/accessors-0.02.tar.gz
+accessors::classic                undef  S/SP/SPURKIS/accessors-0.02.tar.gz

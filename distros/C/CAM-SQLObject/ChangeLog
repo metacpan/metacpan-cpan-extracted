@@ -1,0 +1,265 @@
+2005-04-22 22:36  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/SQLObject.pm: v1.01 Relicensing Documentation
+
+2004-06-01 17:00  chris
+
+	* lib/CAM/SQLObject.pm: Minor code cleanup
+
+2003-09-16 17:10  chris
+
+	* index.html: Fix doc typo
+
+2003-09-16 17:08  chris
+
+	* Build.PL, LICENSE, MANIFEST, Makefile.PL, README, SQLObject.pm,
+	  index.html, test.pl, lib/CAM/SQLObject.pm: v1.00 Add Table_...
+	  field name translation to get, set and render auto-functions
+	  i.e. $obj->getTable_ID() translates into
+	  $obj->get($obj->tableName()."_ID") Update to use new build and
+	  license infrastructure
+
+2003-08-28 15:08  chris
+
+	* MANIFEST, Makefile.PL, SQLObject.pm: v0.84 Add benchmarking
+	  statistics to retrieveByKey().  This requires a small change made
+	  to CAM::SQLManager v0.84
+
+2003-08-26 14:30  chris
+
+	* SQLObject.pm: v0.83 Improve instance usage of the retrieve()
+	  method so that instance fields are consulted.  Class usage
+	  unchanged.
+
+2003-08-13 16:13  tasc
+
+	* SQLObject.pm: v0.82 Correct the documentation to say that query()
+	  does NOT fill fields in the object.  Change fill() to take
+	  optional arguments like query().  The fill() method now returns
+	  the SQL results rather than a literal "1".
+
+2003-07-29 11:14  chris
+
+	* SQLObject.pm, test.pl: Add setDBH() method, and communication
+	  with CAM::SQLManager
+
+2003-05-05 15:37  chris
+
+	* Makefile.PL, SQLObject.pm: v0.80 (synched up with CAM::SQLManager
+	  v0.80) * Added getMgr() method to consolidate instantiation of
+	  CAM::SQLManager objects * Added some undef checking to get() and
+	  set() * Added support for CAM::SQLManager tableName() and
+	  fieldName() to the   default methods of the same name here.
+
+2003-05-02 11:44  chris
+
+	* SQLObject.pm: v0.55 Allow set() to take multiple key-value pairs
+
+2003-03-19 14:38  chris
+
+	* SQLObject.pm: fix a minor debugging function
+
+2003-03-11 09:26  chris
+
+	* Makefile.PL: Add Test::More to the prereq list
+
+2003-03-10 23:56  chris
+
+	* SQLObject.pm, test.pl: Extention and touch ups to performance
+	  improvements
+
+2003-03-10 17:05  chris
+
+	* SQLObject.pm, test.pl: v0.54 Performance enhancements and tests
+
+2003-03-07 11:44  chris
+
+	* Makefile.PL, SQLObject.pm: Make query() instance method take
+	  additional parameters as overrides to the instance's properties.
+
+2003-03-07 11:14  chris
+
+	* SQLObject.pm: Minor doc fix
+
+2003-02-12 14:45  tasc
+
+	* SQLObject.pm: Another of the same as before
+
+2003-02-12 14:41  tasc
+
+	* SQLObject.pm: Bug fix: make retrieve() return an empty array
+	  instead of undef if wantarray
+
+2003-02-05 15:03  chris
+
+	* SQLObject.pm: Make query() work as a class method as well as an
+	  instance method.
+
+2003-01-21 13:43  chris
+
+	* SQLObject.pm: v0.51 Move the retrieve functions around Add some
+	  wantarray handling to the retrieve() method.
+
+2003-01-17 11:55  chris
+
+	* SQLObject.pm: v0.50
+
+2003-01-17 11:51  chris
+
+	* Makefile.PL, SQLObject.pm: 0.50 Overhaul of recommendations for
+	  subclassing:	- don't override new()	- added many override
+	  methods Add default sqlcmd files Add ability to select from
+	  multiple sqlcmd files (via that update   CAM::SQLManager v0.66)
+	  Documentation updates
+
+2003-01-13 13:35  chris
+
+	* SQLObject.pm: Fix dumb typo
+
+2003-01-13 13:34  chris
+
+	* SQLObject.pm: v0.45 update documentation add overrideable
+	  sqlcmd() method
+
+2002-12-10 16:01  chris
+
+	* SQLObject.pm: v0.44 Added retrieve<queryname>() autoload function
+	  Added retrieveByKey() function
+
+2002-10-30 11:56  tasc
+
+	* SQLObject.pm: Add debugging functions
+
+2002-10-30 09:34  chris
+
+	* SQLObject.pm: v0.34 * Let update() insert() and delete() take an
+	  optional query argument * Add another newkey algorithm,
+	  "maxcountertable"
+
+2002-10-25 09:13  tasc
+
+	* SQLObject.pm: Document that last change
+
+2002-10-25 09:07  tasc
+
+	* SQLObject.pm: Make newkey() accept optional arguments (v0.42)
+
+2002-10-24 13:34  chris
+
+	* SQLObject.pm: Minor change to insert() - call set_key() instead
+	  of doing it ourself.	v0.41
+
+2002-10-23 11:22  chris
+
+	* Makefile.PL, SQLObject.pm: Change all mentions of "getmgr" to
+	  "getMgr".  This version requires CAM::SQLManager v0.61
+
+2002-09-26 13:55  chris
+
+	* SQLObject.pm: Make sure render() doesn't return undef
+
+2002-09-26 11:53  chris
+
+	* SQLObject.pm: Version 0.37.  Add set_key() method.  Fix
+	  documentation for newkey().
+
+2002-09-24 11:36  chris
+
+	* SQLObject.pm: Error message for no tablename in fieldNames()
+
+2002-09-24 11:32  chris
+
+	* SQLObject.pm: Bump to version 0.36 Added fieldNames() method
+
+2002-09-20 17:36  chris
+
+	* SQLObject.pm: Tweak _lastBinds debug function
+
+2002-09-19 14:46  chris
+
+	* SQLObject.pm: Add _lastBinds method
+
+2002-09-19 14:41  chris
+
+	* SQLObject.pm: Add debugging _laststatement method
+
+2002-09-18 14:37  tasc
+
+	* SQLObject.pm: Use eval to call all constructed member functions
+	  instead of interpolated function names.
+
+2002-09-18 14:14  chris
+
+	* SQLObject.pm: Fix typo -- wrong variable name in render
+
+2002-09-18 12:25  chris
+
+	* SQLObject.pm: fix example code
+
+2002-09-18 12:22  chris
+
+	* SQLObject.pm: Add render functions
+
+2002-09-16 12:29  chris
+
+	* SQLObject.pm: added some documentation
+
+2002-09-16 12:23  chris
+
+	* SQLObject.pm: bump version
+
+2002-09-16 12:23  chris
+
+	* SQLObject.pm: Add simple query method
+
+2002-09-04 16:06  tasc
+
+	* SQLObject.pm: Bug: turn off strict for function name creation
+
+2002-09-04 16:02  tasc
+
+	* SQLObject.pm: Add get_key wrapper method, bumped version
+
+2002-06-10 16:37  tasc
+
+	* SQLObject.pm: Follow changes made to the CAM::SQLManager API for
+	  class methods.  Bumped version
+
+2002-05-23 14:39  tasc
+
+	* SQLObject.pm: Features: * broke out set and get functions * added
+	  fill function * tweaked AUTOLOAD
+
+2002-05-21 15:11  chris
+
+	* SQLObject.pm: bump version
+
+2002-05-21 15:10  chris
+
+	* SQLObject.pm: Add newkey function
+
+2002-05-21 11:04  chris
+
+	* Changes, MANIFEST: Move the revision record from Changes to
+	  ChangeLog
+
+2002-05-21 11:02  chris
+
+	* SQLObject.pm: Updated documentation, a couple of minor tweaks,
+	  one bugfix
+
+2002-05-10 16:44  chris
+
+	* SQLObject.pm: bump version number
+
+2002-05-10 16:37  chris
+
+	* Changes, MANIFEST, Makefile.PL, SQLObject.pm, test.pl: Initial
+	  revision
+
+2002-05-10 16:37  chris
+
+	* Changes, MANIFEST, Makefile.PL, SQLObject.pm, test.pl: initial
+	  import
+

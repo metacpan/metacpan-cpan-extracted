@@ -1,0 +1,121 @@
+NAME
+    Chart::Math::Axis - Implements an algorithm to find good values for
+    chart axis
+
+SYNOPSIS
+      # Create a new Axis
+      my $axis = Chart::Math::Axis->new;
+      
+  # Provide is some data to calculate on
+      $axis->add_data( @dataset );
+      
+  # Get the values for the axis
+      print "Top of axis: "     . $axis->top           . "\n";
+      print "Bottom of axis: "  . $axis->bottom        . "\n";
+      print "Tick interval: "   . $axis->interval_size . "\n";
+      print "Number of ticks: " . $axis->ticks         . "\n";
+      
+  # Apply the axis directly to a GD::Graph.
+      $axis->apply_to( $graph );
+
+DESCRIPTION
+    Chart::Math::Axis implements in a generic way an algorithm for finding a
+    set of ideal values for an axis. That is, for any given set of data,
+    what should the top and bottom of the axis scale be, and what should the
+    interval between the ticks be.
+
+    The terms "top" and "bottom" are used throughout this module, as it's
+    primary use is for determining the Y axis. For calculating the X axis,
+    you should think of 'top' as 'right', and 'bottom' as 'left'.
+
+METHODS
+  new
+      my $null = Chart::Math::Axis->new;
+      my $full = Chart::Math::Axis->new( @dataset );
+
+    The "new" method creates a new "Chart::Math::Axis" object. Any arguments
+    passed to the constructor are used as dataset values. Whenever the
+    object has some values on which to work, it will calculate the axis. If
+    the object is created with no values, most methods will return undef.
+
+  max
+    Returns the maximum value in the dataset.
+
+  min
+    Returns the minimum value in the dataset.
+
+  top
+    The "top" method returns the value that should be the top of the axis.
+
+  bottom
+    The "bottom" method returns the value that should be the bottom of the
+    axis.
+
+  maximum_intervals
+    Although Chart::Math::Axis can work out scale and intervals, it doesn't
+    know how many pixels you might need, how big labels etc are, so it can
+    determine the tick density you are going to need. The
+    "maximum_intervals" method returns the current value for the maximum
+    number of ticks the object is allowed to have.
+
+    To change this value, see the "set_maximum_intervals" method. The
+    default for the maximum number of intervals is 10.
+
+  interval_size
+    The "interval_size" method returns the interval size in dataset terms.
+
+  ticks
+    The "ticks" method returns the number of intervals that the
+    top/bottom/size values will result in.
+
+  add_data
+      $self->add_data( @dataset );
+
+    The "add_data" method allows you to provide data that the object should
+    be aware of when calculating the axis. In fact, you can add additional
+    data at any time, and the axis will be updated as needed.
+
+  set_maximum_intervals
+      $self->set_maximum_intervals( $intervals );
+
+    The "set_maximum_intervals" method takes an argument and uses it as the
+    maximum number of ticks the axis is allowed to have.
+
+  include_zero
+    If you have a dataset something like ( 10, 11, 12 ) the bottom of the
+    axis will probably be somewhere around 9 or 8. That is, it won't show
+    the zero axis. If you want to force the axis to include zero, use this
+    method to do so.
+
+  apply_to
+      $self->apply_to( $gd_graph_object )
+
+    The "apply_to" method is intended to provide a series of shortcuts for
+    automatically applying an axis to a graph of a know type. At the
+    present, this will change only the Y axis of a GD::Graph object. This
+    method is considered experimental. If in doubt, extract and set the
+    graph values yourself.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Chart-Math-Axis>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    GD::Graph, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2002 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

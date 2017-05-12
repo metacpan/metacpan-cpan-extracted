@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  54002:
+    - 1
+name: ddcb8e
+registers:
+  AF: 62708
+  AF_: 0
+  BC: 62376
+  BC_: 0
+  DE: 10307
+  DE_: 0
+  HL: 33483
+  HL_: 0
+  I: 0
+  IX: 53992
+  IY: 54119
+  PC: 4
+  R: 2
+  SP: 0

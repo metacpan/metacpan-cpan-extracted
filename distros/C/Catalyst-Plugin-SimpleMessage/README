@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-Plugin-SimpleMessage,
+version 0.0.2:
+
+  Handle passing multiple types of messages between screens of a web application using session or stash.
+
+This software is copyright (c) 2014 by Geovanny Junio.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

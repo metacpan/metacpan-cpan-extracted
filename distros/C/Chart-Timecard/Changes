@@ -1,0 +1,7 @@
+Revision history for Perl extension Chart::Timecard
+
+0.02
+- fix dependency declaration.
+
+0.01    Thu Jun 18 19:54:29 2009
+        - original version

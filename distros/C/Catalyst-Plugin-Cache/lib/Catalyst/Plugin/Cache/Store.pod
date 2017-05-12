@@ -1,0 +1,44 @@
+=pod
+
+=head1 NAME
+
+Catalyst::Plugin::Cache::Store - how to write a Cache store plugin.
+
+=head1 SYNOPSIS
+
+    package Catalyst::Plugin::Cache::Store::Frobnicator;
+
+    sub setup_frobnicator_cache_backend {
+        my ( $app, $name, $config ) = @_;
+
+        ....
+        
+        $app->register_cache_backend( $name => $cache_object );
+    }
+
+=head1 DESCRIPTION
+
+In order to write a cache store plugin, all you need is to implement a method
+following the naming convention:
+
+    setup_<<lower case store name>>_cache_backend {
+
+    }
+
+For example C<setup_fastmmap_cache_backend> for
+L<Catalyst::Plugin::Cache::Store::FastMmap>.
+
+and call C<register_cache_backend> from within that.
+
+The method will get the backend name and configuration as it's first and second
+arguments.
+
+All invokation of the setup methods will be automatic, based on the
+configuration. However, the plugin must be loaded by the user.
+
+Note that store plugins are only necessary if some configuration defaults that
+are catalyst specific need to be provided.
+
+For most cases simply using a cache class instead of a plugin is sufficient.
+
+=cut

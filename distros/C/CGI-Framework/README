@@ -1,0 +1,16 @@
+$Header: /cvsroot/CGI::Framework/README,v 1.1.1.1 2003/04/24 18:24:26 mina Exp $
+
+CGI::Framework.pm > README
+
+For full documentation, install this module then run:
+perldoc CGI::Framework
+
+
+INSTALLATION INSTRUCTIONS:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

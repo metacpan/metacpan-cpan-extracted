@@ -1,0 +1,36 @@
+[% INCLUDE "header.tt" %]
+[% PROCESS "view_macros.tt" %]
+
+<div id="title">View [% crud.moniker %]</div>
+
+<form>
+<fieldset>
+    <legend>[% crud.moniker | html %] '[% item | html %]'</legend>
+
+    [% form_view_item(item); %]
+
+    <span class="item_local_action">
+    <a href="[% c.uri_for_controller('edit', item.id) %]">Edit</a> | <a href="[% c.uri_for_controller('delete', item.id) %]">Delete</a>
+    </span>
+
+</fieldset></form>
+
+
+[% IF item.id != 1; #Hard coded to "In Shelf" %]
+    <div id="title">Books borrowed by [% item.name | html %]</div>
+
+    <ul>
+    [% FOR book IN item.books %]
+        <li><a href="/book/view/[% book.id %]">[% book.title | html %]</a>
+        - [% book.borrowed | html %]
+        - <form class="button_form" action="/book/do_return/[% book.id %]"><input type="submit" value="&nbsp;Return book&nbsp;"></form>
+    [% END %]
+    </ul>
+[% END %]
+
+
+<a href="[% c.uri_for_controller('add') %]">Add</a>
+<a href="[% c.uri_for_controller('list') %]">List</a>
+
+[% INCLUDE "footer.tt" %]
+

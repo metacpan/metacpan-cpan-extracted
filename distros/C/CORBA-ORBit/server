@@ -1,0 +1,185 @@
+#!/usr/bin/perl -w
+
+use CORBA::ORBit idl => [ qw(Account.idl) ];
+
+my @servers;
+
+my $poa;
+my $current;
+
+package PlainCounter;
+
+sub new {
+    my $class = shift;
+
+    my $count = 0;
+    return bless \$count, $class;
+}
+
+sub next {
+    my $self = shift;
+    return (++$$self);
+}
+
+sub destroy {
+    my $self = shift;
+    $poa->deactivate_object ($poa->servant_to_id ($self));
+}
+
+package MyCounter;
+
+@MyCounter::ISA = qw(PlainCounter POA_Account::AcctCounter);
+
+package MyAccount;
+
+@MyAccount::ISA = qw(POA_Account::Account);
+
+use Error qw(:try);
+
+sub new {
+    my ($class) = @_;
+    my $self = bless {}, $class;
+
+    $self->{current_balance} = 0;
+    $self->{prefs} = {
+		      favorite_color => 'burgundy',
+		      lottery_numbers => [ 1, 2, 3, 4],
+		      nickname => 'Sneezy'
+		     };
+    $self->{appearance} = [ map { [ (0..9) ] } 0..5 ];
+
+    $self;
+}
+
+sub set_pref {
+    my $self = shift;
+    my ($d, $v) = @{shift()};
+
+    if ($d eq "pt_color") {
+	$self->{prefs}->{favorite_color} = $v;
+    } elsif ($d eq "pt_lotnum") {
+	$self->{prefs}->{lottery_numbers} = $v;
+    } elsif ($d eq "pt_nickname") {
+	$self->{prefs}->{nickname} = $v;
+    }
+}
+
+sub get_pref {
+    my ($self, $d) = @_;
+
+    if ($d eq "pt_color") {
+	return [$d, $self->{prefs}->{favorite_color}];
+    } elsif ($d eq "pt_lotnum") {
+	return [$d, $self->{prefs}->{lottery_numbers}];
+    } elsif ($d eq "pt_nickname") {
+	return [$d, $self->{prefs}->{nickname}];
+    }
+}
+
+sub get_pref_any {
+    my ($self,$d) = @_;
+
+    if ($d eq "pt_color") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Account/Account/Color:1.0'),
+			       $self->{prefs}->{favorite_color});
+    } elsif ($d eq "pt_lotnum") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Account/Account/numbers:1.0'),
+			       $self->{prefs}->{lottery_numbers});
+    } elsif ($d eq "pt_nickname") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:CORBA/String:1.0'),
+			       $self->{prefs}->{nickname});
+    }
+}
+
+sub deposit {
+    my ($self,$amount) = @_;
+    $self->{current_balance} += $amount;
+}
+
+sub withdraw {
+    my ($self,$amount) = @_;
+
+    if ($amount > $self->{current_balance}) {
+	throw Account::Account::InsufficientFunds
+	    overdraft => $amount - $self->{current_balance};
+	
+    } else {
+	$self->{current_balance} -= $amount;
+    }
+}
+
+sub balance {
+    $_[0]->{current_balance};
+};
+
+sub counter {
+    $servant = new MyCounter;
+    my $id = $poa->activate_object ($servant);
+    return $poa->id_to_reference ($id);
+#    $poa->create_reference("IDL:Account/AcctCounter:1.0");
+}
+
+sub add {
+    my ($self, $a, $b) = @_;
+    $a+$b;
+}
+
+# Possible alternative mapping
+#
+#sub prefs {
+#    ($self, $val) = @_;
+#    defined $val || return $self->{prefs};
+#    $self->{prefs} = $val;
+#}
+
+sub _set_appearance {
+    my ($self,$a) = @_;
+    $self->{appearance} = $a;
+}
+
+sub _get_appearance {
+    $_[0]->{appearance};
+}
+
+sub _get_prefs {
+    $_[0]->{prefs};
+}
+
+sub _set_prefs {
+    my ($self,$p) = @_;
+    $self->{prefs} = $p;
+}
+
+package main;
+
+use Error qw(:try);
+
+$orb = CORBA::ORB_init("orbit-local-orb");
+$poa = $orb->resolve_initial_references("RootPOA");
+
+# Create the main server object
+
+$servant = new MyAccount;
+push @servers, $servant;
+
+$id = $poa->activate_object ($servant);
+$ref = $orb->object_to_string ($poa->id_to_reference ($id));
+
+# The following causes a segmentation fault within ORBit, which
+# is incorrect. It should throw a InvalidPolicy exception, I think.
+# $servant = $poa->servant_to_reference ($servant);
+# $ref = $orb->object_to_string ($servant);
+
+open (OUT, ">account.ref");
+print OUT $ref;
+close OUT;
+
+# Activate our POA
+
+$poa->_get_the_POAManager->activate;
+
+print "The daily maximum is: ", Account::DAILY_MAX, "\n";
+
+$orb->run ();
+
+exit (0);			# Never reached

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>CGI::Application::Framework</title>
+	<link rel="stylesheet" href="<!-- TMPL_VAR NAME="url_examples_css" -->" type="text/css" />
+</head>
+
+<body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+	<div id="nav">
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_1">One</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_2a">Two</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_3">Three</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_4">Four</a></span>
+		<span class="link"><a href="<!-- TMPL_VAR NAME="url_app_cgi" -->/Example/example_5">Five</a></span>
+	</div>
+
+	<div id="main">
+		<h1>Build a Navbar</h1>
+		Build a navbar that doesn't require logging in for each click, using session maintaining links from the last example.
+	</div>
+
+	<div id="dynamicnav">
+		<span class="link"><a href='<!-- TMPL_VAR NAME="EXAMPLE_1" -->'>One</a></span>
+		<span class="link"><a href='<!-- TMPL_VAR NAME="EXAMPLE_2" -->'>Two</a></span>
+		<span class="link"><a href='<!-- TMPL_VAR NAME="EXAMPLE_3" -->'>Three</a></span>
+		<span class="link"><a href='<!-- TMPL_VAR NAME="EXAMPLE_4" -->'>Four</a></span>
+		<span class="link"><a href='<!-- TMPL_VAR NAME="EXAMPLE_5" -->'>Five</a></span>
+	</div>
+
+	<p>
+		In the next example, we will turn that navbar into an include that can be reused by any page.
+	</p>
+</body>
+
+</html>

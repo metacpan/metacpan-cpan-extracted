@@ -1,0 +1,51 @@
+Revision history for Catalyst::Log::Log4perl
+
+1.06 Thu Jun 21 07:50:00 BST 2012
+  - Stop wrongly bundling Test::More without Test::Builder. RT#77939
+
+1.05 Tue Oct 27 19:08:00 BST 2011
+  - DEPRECATED in favor of Log::Log4perl::Catalyst
+
+1.04 Sun Oct 18 19:00:00 BST 2009
+  - Fixup copyright info
+  - Add tests using Test::Log4perl contributed by Sebastian Willert
+  - Correct dependency on Log4Perl (RT#41622)
+  - Remove unused dependency (RT#27361)
+
+1.03 Sat Mar 21 20:52:20 GMT 2009
+  - Fix to work correctly with Log::Dispatch::Email::MailSend, which
+    is recommended in the documentation (Sebastian Willert)
+
+1.02 Tue Mar 10 12:56:06 GMT 2009
+  - Remove dependency on parent.pm from the new tests.
+
+1.01 Sun Mar  8 23:07:08 GMT 2009
+  - Fix test suite to work correctly with Catalyst 5.8 (omega)
+
+1.00 Wed May 30 11:31:58 PDT 2007
+  - Added _dump support. (Thanks, jshirley)
+  - Bumped to 1.00, as there don't seem to be any outstanding bugs, and
+    the experimental stuff likely will remain that way.
+
+0.51 Sat Mar 10 11:27:39 PST 2007
+  - Put in a dependency for Log::Log4perl.  (thanks, lbr!) That was dumb!
+
+0.50 Fri Mar  9 11:50:49 PST 2007
+  - Added support for more Log::Log4perl cspecs.  Sebastian Willert provided
+    the code for this, and it was graciously tested by jshirley.  It's use
+    should still be considered experimental, as it requires mucking about
+    with the internals of Log::Log4perl.
+
+0.4	Mon Jul  3 14:41:01 PDT 2006
+  - Fixed a documentation typo (thanks, ghenry!)
+
+0.3     Sat Apr  8 11:08:36 PDT 2006
+  - Added support for init_and_watch, from Stephen Steneker
+
+0.2   	2006-02-10 00:55:10 +0100
+  - Resync with Catalyst::Log, by supporting abort(1)
+  - Refactor to closures
+  - added autoflush option to new() to disable abort-support
+
+0.01    Wed Sep 21 16:25:37 PDT 2005
+  - Initial Release

@@ -1,0 +1,369 @@
+=head1 NAME
+
+Convert::IBM390 -- functions for manipulating mainframe data
+
+=head1 SYNOPSIS
+
+  use Convert::IBM390 qw(...those desired... or :all);
+
+  set_codepage('CP00037');  # equivalent to "use Convert::IBM390::CP00037;"
+
+  $eb  = asc2eb($string);
+  $asc = eb2asc($string);
+  $asc = eb2ascp($string);
+
+  $ebrecord = packeb($template, LIST...);
+  @fields = unpackeb($template, $ebcdic_record);
+  @lines = hexdump($string [,startaddr [,charset]]);
+
+=head1 DESCRIPTION
+
+B<Convert::IBM390> supplies various functions that you may find useful
+when working with IBM System/3[679]0 data.  No functions are exported
+automatically; you must ask for the ones you want.  "use ... qw(:all)"
+exports all functions.
+
+By the way, this module is called "IBM390" because it will deal with
+data from any mainframe operating system.  Nothing about it is
+specific to z/OS, or z/VM, z/VSE, i5/OS, z/TPF....
+
+When transmitting EBCDIC data to your Perl environment via FTP, be
+sure to use the "binary" option. This will leave the data unconverted
+so that the module recognizes it. By default, FTP will translate
+the data to ASCII; this will convert the character fields
+correctly but garble other formats, such as packed-decimal and binary.
+
+=head1 FUNCTIONS
+
+=over 2
+
+=item B<asc2eb> STRING
+
+Converts a character string from ASCII to EBCDIC.  The table translates
+ISO8859-1 to IBM-1047.  For more information, see the
+C/C++ Programming Guide under L<"REFERENCES">.
+
+=item B<eb2asc> STRING
+
+Converts a character string from EBCDIC to ASCII.  EBCDIC character
+strings ordinarily come from files transferred from mainframes
+via the binary option of FTP.  The table translates IBM-1047 to
+ISO8859-1 (see above).
+
+=item B<eb2ascp> STRING
+
+Like eb2asc, but the output will contain only printable ASCII
+characters.
+
+=item B<packeb> TEMPLATE LIST
+
+This function is much like Perl's built-in "pack".  It takes a list
+of values and packs it into an EBCDIC record (structure).  If
+called in list context, it will return a list of one element.
+The TEMPLATE is patterned after Perl's pack template but allows fewer
+options.  The following characters are allowed in the template:
+
+  c  (1)  Character string without translation, padded with nulls
+  C  (1)  Character string without translation, padded with native
+          spaces
+  e  (1)  ASCII string to be translated into EBCDIC, padded with nulls
+  E  (1)  ASCII string to be translated into EBCDIC, padded with EBCDIC
+          spaces
+  h  (1)  A hexadecimal string, high nibble always first
+  i  (2)  Signed integer (S/390 fullword)
+  p  (1)  Packed-decimal field (default length = 8)
+  P  (1)  Packed-decimal field with F signs for positive numbers
+          (sometimes called "unsigned") (default length = 8)
+  s  (2)  Signed short integer (S/390 halfword)
+  S  (2)  Unsigned short integer (2 bytes)
+  x  (2)  A null byte
+  z  (1)  Zoned-decimal field (default length = 8)
+  Z  (1)  Unsigned zoned-decimal field (default length = 8)
+  @       Null-fill to absolute offset
+
+ (1) May be followed by a number giving the length of the output field;
+     or, for hexadecimal, the number of nibbles in the input.
+ (2) May be followed by a number giving the repeat count.
+
+Each character may be followed by a number giving either the length
+of the field or a repeat count, as shown above.  Types 'i', 's', and
+'S' will gobble the specified number of items from the list; if '*' is
+given as the length, all the remaining items will be gobbled.  All
+other types will gobble only one item; you will usually want to give
+a length for the output field.  The following defaults apply:
+
+  Conversion                No length given   '*' given
+  Character string [cCeE]   1                 Same length as input
+  Hex string [hH]           2                 Same length as input
+  Decimal [pz]              8                 8
+
+The number must immediately follow the character, but whitespace may
+appear between field specifiers.
+
+The length for packed (p) or zoned (z) fields may include a number
+of decimal places,
+which is added after the byte count and a '.'.  For instance, "p3.2"
+indicates a 3-byte (5-digit) packed field with 2 implied decimal
+places; if the corresponding list element is 24.68, the result will
+be x'02468C'.
+Likewise, "z7.2" indicates a 7-byte (7-digit) zoned field with 2
+implied decimal places; if the input is -35.79, the result will be
+'000357R' in EBCDIC.
+The number of implied decimals may be greater than the number of digits,
+but such a specification will usually cause you to lose part of your
+value; e.g., packing .589 with "p3.6" would yield x'89000c'.
+If the input is not a valid Perl number, the results are unpredictable
+(since they depend on internal Perl code), but most likely the output
+field will contain zero.
+
+'p' will produce packed fields with the preferred sign characters:
+C for positive, D for negative. 'P' will produce F for positive
+(sometimes called "unsigned") and D for negative.
+
+Signed zoned output (z) will always have an overpunch in the last byte
+for the sign. In other words, the top nibble will be 'C' for positive
+or 'D' for negative; e.g., x'C1' (EBCDIC 'A') for +1 or x'D3'
+(EBCDIC 'L') for -3.
+In unsigned zoned output (Z), positive values will have no overpunch;
+i.e., the top nibble will always be 'F'. Thus, +1 will be the character
+'1' (x'F1'). Negative values will have a 'D' overpunch.
+
+The ASCII-to-EBCDIC translation used by [Ee] is the same as in
+asc2eb().
+
+Either 'h' or 'H' may be used to request hexadecimal conversion.  This
+conversion is exactly the same as in the Perl pack function, except
+that the high nibble must always come first in the input.
+
+The maximum length of a packed field is 16 bytes; of a zoned field, 32
+bytes.  All other fields may have a maximum specifier (length or repeat
+count) of 32767.  The maximum length of the output structure is 36KB.
+These maxima are enforced.
+
+See L</unpackeb> for the correspondence between template characters
+and Cobol pictures.
+
+=item B<unpackeb> TEMPLATE RECORD
+
+This function is much like Perl's built-in "unpack".  It takes an
+EBCDIC record (structure) and unpacks it into a list of values.  If
+called in scalar context, it will return only the first unpacked value.
+The TEMPLATE is patterned after Perl's unpack template but allows fewer
+options.  The following characters are allowed in the template:
+
+  c or C (1)   Character string without translation
+  e      (1)   EBCDIC string to be translated into ASCII; preserve
+               trailing nulls and spaces
+  E      (1)   EBCDIC string to be translated into ASCII; strip
+               trailing nulls and spaces
+  i      (2)   Signed integer (S/390 fullword)
+  I      (2)   Unsigned integer (4 bytes)
+  p      (1)   Packed-decimal field
+  s      (2)   Signed short integer (S/390 halfword)
+  S      (2)   Unsigned short integer (2 bytes)
+  v      (2)   EBCDIC varchar string
+  V      (1)   EBCDIC varchar string in fixed-length field
+  x      (1)   Ignore these bytes
+  z or Z (1)   Zoned-decimal field (signed or unsigned)
+  @            Move to an absolute position in the input record
+
+ (1) May be followed by a number giving the length of the field.
+ (2) May be followed by a number giving the repeat count.
+
+Each character may be followed by a number giving either the length
+of the field or a repeat count, as shown above, or by '*', which means
+to use however many items are left in the string.  The number must
+immediately follow the character, but whitespace may appear between
+field specifiers.
+
+The length for packed (p) or zoned (z) fields may include a number
+of decimal places,
+which is added after the byte count and a '.'.  For instance, "p3.2"
+indicates a 3-byte (5-digit) packed field with 2 implied decimal
+places; if this field contains x'02468C', the result will be 24.68.
+Likewise, "z7.2" indicates a 7-byte (7-digit) zoned field with 2
+implied decimal places; if this field contains '000357R' (in EBCDIC),
+the result will be -35.79.
+The number of implied decimals may be greater than the number of digits;
+e.g., unpacking the packed field above with "p3.6" would yield 0.002468.
+Zoned input fields may, but need not, have an overpunch sign in the
+last byte.
+If the field is not a valid packed or zoned field, the resulting
+element of the list will be undefined.
+
+Varchar (v) fields are assumed to consist of a signed halfword (16-bit)
+integer followed by EBCDIC characters.  If the number appearing in the
+initial halfword is N, the following N bytes are translated from EBCDIC
+to ASCII and returned as one string.  This format is used, for
+instance, by DB2/MVS.  A repeat count may be specified; e.g., "v2" does
+not mean a length of 2 bytes, but that there are two such fields in
+succession.  If the length is found to be less than 0, the resulting
+element of the list will be undefined.
+
+Varchar (V) fields are similar except that the variable data is stored in
+a fixed-length field.  The fixed-length field is large enough to contain
+a halfword and the maximum possible varchar value; for instance, a
+varchar(200) field will occupy 202 bytes.  The length given in your
+format string should be the maximum length of the field exclusive of the
+halfword; for instance, 'V200' for the field just described.  The
+halfword length in the data determines the length of the resulting string.
+For instance, a 3-character string in a 200-byte field will come out as
+3 characters, not 200.
+
+The EBCDIC-to-ASCII translation used by [EeVv] is the same as in
+eb2asc().
+
+The maximum length of a packed field is 16 bytes; of a zoned field, 32
+bytes.  All other fields may have a maximum specifier (length or repeat
+count) of 32767.  These maxima are enforced.
+
+In most cases, you should use 'i' rather than 'I' when unpacking
+fullword integers.  Unsigned long integers are not handled cleanly by
+all systems.
+
+A simplified correspondence between template characters and Cobol
+pictures follows.
+
+  c,e,E  PIC X
+  i      S9(9) COMP, COMP-4, BINARY, or COMP-5
+  I      9(9) COMP, COMP-4, BINARY, or COMP-5
+  p      S9(d)V9(s) COMP-3; number of bytes is typically (d+s+1)/2
+  s      S9(4) COMP, COMP-4, BINARY, or COMP-5
+  z      S9(x) DISPLAY; number of bytes = number of digits
+  Z      9(x) DISPLAY; number of bytes = number of digits
+
+=item B<hexdump> STRING [STARTADDR [CHARSET]]
+
+Generates a hexadecimal dump of STRING.  The dump is similar to a
+SYSABEND dump in z/OS: each line contains an address, 32 bytes of data
+in hexadecimal, and the same data in printable form.  This function
+returns a list of lines, each of which is terminated with a newline.
+This allows them to be printed immediately; for instance, you can say
+"print hexdump($crud);".
+
+The second and third arguments are optional.  The second specifies
+a starting address for the dump (default = 0); the third specifies
+the character set to use for the printable data at the end of each
+line ("ascii" or "ebcdic", in upper or lower case; default = ascii).
+
+=item B<set_codepage> CODEPAGE
+
+Sets the ASCII/EBCDIC translation to CODEPAGE.  This is equivalent to
+
+  use Convert::IBM390::CODEPAGE;
+
+but is more convenient if you're switching between multiple codepages,
+or if the codepage is determined at runtime.
+
+=item B<set_translation> A2E [E2A [E2AP]]
+
+Sets the ASCII/EBCDIC translation tables.  Each table must be either
+256 characters, or 512 hexadecimal digits with optional whitespace.
+
+If the mapping is 1-to-1 (each ASCII byte maps to a unique EBCDIC
+byte), you can specify just one of A2E and E2A (either one, passing
+C<undef> for the other), and set_translation will automatically
+compute the reverse mapping.  If the mapping is not 1-to-1, you must
+supply both A2E and E2A.  (If you're only converting in one direction,
+you could pass a bogus table like S<C<' ' x 256>>).
+
+E2AP is normally generated automatically from E2A, but you can supply
+it if you want a different set of "printable" characters.
+
+=item B<version>
+
+Returns a string identifying the version of this module.  This
+function is not exported; it must be called as
+C<Convert::IBM390::version>.
+
+=back
+
+=head1 CODEPAGES
+
+The following EBCDIC code pages are available. CP01047 is the
+default.
+
+  CP00037: USA, Canada, Australia, New Zealand, Netherlands, Brazil, Portugal
+  CP00273: Austria, Germany
+  CP00275: Brazil
+  CP00277: Denmark, Norway
+  CP00278: Finland, Sweden
+  CP00280: Italy
+  CP00281: Japanese English
+  CP00282: Portuguese
+  CP00284: Spanish
+  CP00285: United Kingdom
+  CP00297: France
+  CP00500: Latin-1
+  CP00871: Iceland
+  CP01047: Latin-1 
+  CP01140: USA/Canada (Euro)
+  CP01141: Germany (Euro)
+  CP01142: Denmark/Norway (Euro)
+  CP01143: Finland/Sweden (Euro)
+  CP01144: Italy (Euro)
+  CP01145: Latin America/Spain (Euro)
+  CP01146: United Kingdom (Euro)
+  CP01147: France (Euro)
+  CP01148: International (Euro)
+  CP01149: Icelandic (Euro)
+
+=head1 SMF TIMESTAMPS
+
+Support for SMF timestamps has been removed from this version.
+If you need to read an SMF timestamp, it can be unpacked with the
+template 'ip4'. The first field is the time of day in hundredths
+of seconds since midnight (e.g. 3258000 for 9:03 a.m.); the second
+is the Julian day in cyyddd form (e.g. 103227 for 2003-08-15).
+Likewise, the time of day and date, converted to the above forms,
+may be packed into an EBCDIC record with the same template, 'ip4'.
+Be aware that the time zone on the SMF server may not be the same
+as in your Perl program.
+
+=head1 A COBOL EXAMPLE
+
+Suppose you have a mainframe record described thus in Cobol:
+
+ 01  ACPDB-RECORD.
+     03  ACPDB-FIRST-DATE-TRANS.
+         05  ACPDB-FD-TRANS-CN   PIC XX.
+         05  ACPDB-FD-TRANS-YR   PIC XX.
+         05  ACPDB-FD-TRANS-MO   PIC XX.
+         05  ACPDB-FD-TRANS-DA   PIC XX.
+     03  ACPDB-LAST-DATE-TRANS.
+         05  ACPDB-LD-TRANS-CN   PIC XX.
+         05  ACPDB-LD-TRANS-YR   PIC XX.
+         05  ACPDB-LD-TRANS-MO   PIC XX.
+         05  ACPDB-LD-TRANS-DA   PIC XX.
+     03  ACPDB-TOTAL-ITEMS       PIC S9(9)       COMP.
+     03  ACPDB-TOTAL-NO-TRANS    PIC S9(5)       COMP-3.
+     03  ACPDB-TOTAL-DOLLARS-1   PIC S9(7)V99    COMP-3.
+     03  ACPDB-PREV-YR-DOLLARS   PIC S9(7)V99    COMP-3.
+     03  ACPDB-RETURNED-ITEMS    PIC S9(4)       COMP.
+     03  ACPDB-DOLL-CD-PREV-BASE PIC XX.
+
+You would unpack the record like this:
+
+  @fields = unpackeb('e8 e8 i p3.0 p5.2 p5.2 s e2', $inrecord)
+
+=head1 REFERENCES
+
+IBM z/Architecture Principles of Operation, SA22-7832.
+
+IBM ESA/390 Principles of Operation, SA22-7201.
+
+z/OS XL C/C++ Programming Guide, SC09-4765, sec. 8.6.4 (code set
+converters).
+
+z/OS MVS System Management Facilities (SMF), SA22-7630,
+s.v. "Standard SMF Record Header".
+
+=head1 AUTHOR
+
+Convert::IBM390 was written by Geoffrey Rommel
+E<lt>GROMMEL@cpan.orgE<gt>
+in January 1999.
+Special thanks to Chris Madsen for the expansion to use additional
+code pages. See Changes for other acknowledgments.
+
+=cut

@@ -1,0 +1,6 @@
+Revision history for Perl extension Cron::RunJob.
+
+0.01  Wed Nov 21 13:57:25 2012
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Cron::RunJob
+

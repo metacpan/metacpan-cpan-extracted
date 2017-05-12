@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+
+package clipseqtools::plot;
+$clipseqtools::plot::VERSION = '0.1.7';
+
+##############################################
+# Import external libraries
+use Modern::Perl;
+
+
+##############################################
+# Import CLIPSeqTools
+use CLIPSeqTools::PlotApp;
+
+
+##############################################
+# Run the application
+CLIPSeqTools::PlotApp->new_with_command->run();

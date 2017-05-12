@@ -1,0 +1,74 @@
+Revision history for Perl extension CGI::Untaint.
+
+1.26  Tue Sep 20 22:13:21 UTC 2005
+        - allow 'printable' strings to be empty [Michael Reece]
+
+1.25  December 27 2004
+        - add test to make sure that false values which don't pass the
+          regex test are handled correctly [Mark Fowler]
+
+1.24  December 27 2004
+        - Correctly handle false values [reported by Mark Fowler]
+
+1.23  December 27 2004
+        - fix INCLUDE_PATH bugs: it's a prefix, not a physical path on
+          disk
+
+1.22  December 27 2004
+        - store raw data in sub-hash, rather than direct in object
+        - clean out lots of obsolete code
+
+1.21  December 27 2004
+        - document the error() method [Mark Fowler]
+        - allow 'printable' to include tabs [Dana Hudes]
+
+1.20  December 27 2004
+        - remove an 'our' for 5.005 compatability [Drew Taylor]
+
+1.1   August 26 2003
+        - don't clobber people's 'value' key
+
+1.0   August 6 2003
+        - handle case where $q->Vars is empty
+
+0.9   February 5, 2003
+        - handle Apache::Table better when we have no config hash
+          (thanks to domm)
+        - better portability
+        - reference Test::CGI::Untaint
+
+0.83  January 27, 2002
+        - cope with UNIVERSAL::require API change
+
+0.82  December 16, 2001
+        - add reference to CGI::Untaint::isbn
+
+0.81  December 8, 2001
+        - add 'hex' pattern
+        - fix spelling of parameter in error message
+
+0.8   November 28, 2001
+        - make tests work with latest Test::More
+
+0.09  November 10, 2001
+        - list available handlers from CPAN
+
+0.08  November 9, 2001
+        - empty values always extract OK
+
+0.07  October 5, 2001
+        - value is now settable in the validation routine
+        - untainting now works properly
+
+0.05  August 23, 2001
+        - added the ability to specify an INCLUDE_PATH
+        - fixed bug in (undocumented) credit_card handler
+        - added 'printable'
+
+0.02  August 22, 2001
+        - added 'postcode'
+
+0.01  June 2001
+        - original version
+
+

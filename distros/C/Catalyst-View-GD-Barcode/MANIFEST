@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-View-GD-Barcode.t
+lib/Catalyst/View/GD/Barcode.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,139 @@
+// Test Replies
+
+// Chatbot-Alpha 2.0 - Mid-sentence redirections.
++ redirect test
+- If you said hello I would've said: {@hello} But if you said whats up I'd say: {@whats up}
+
+// Test formalization and uppercasing with odd characters involved.
++ test formal odd
+- {formal}This... is a test/of using odd\characters with formal.{/formal}
+
++ test sentence odd
+- {sentence}This=/\is a test--of using odd@characters in sentence.{/sentence}
+
+// Redirect test with <star1>.
++ i say *
+- Indeed you do say. {@<star1>}
+
+// Chatbot-Alpha 1.7 - A reply with continuation...
++ tell me a poem
+- Little Miss Muffet,\n
+  ^ sat on her tuffet,\n
+  ^ in a nonchalant sort of way.\n\n
+  ^ With her forcefield around her,\n
+  ^ the spider, the bounder\n
+  ^ is not in the picture today.
+
+// Chatbot-Alpha 1.7 - Check syntax errors on deep recursion.
++ one
+@ two
+
++ two
+@ one
+
+// A standard reply to "hello", with multiple responses.
++ hello
+- Hello there!
+- What's up?
+- This is random, eh?
+
+// A "that" test.
++ i hate you
+- You're really mean... =(
+
++ sorry
+% youre really mean
+- Don't worry--it's okay. :-)
+
+// A test of having two of the same trigger in different topics.
++ sorry
+- Why are you sorry?
+
+// A simple one-reply response to "what's up"
++ whats up
+- Not much, you?
+
+// A test using <star1>
++ say *
+- Um.... "<star1>"
+
+// This reply is referred to below.
++ identify yourself
+- I am Alpha.
+
+// Refers the asker back to the reply above.
++ who are you
+@ identify yourself
+
+// Wildcard Tests
++ my name is *
+- Nice to meet you <star1>.
++ i am * years old
+- Many people are <star1>.
+
+// Conditionals Tests
++ am i your master
+* master=1::Yes, you are my master.
+- No, you are not my master.
+
++ is my name bob
+* name=bob::Yes, that's your name.
+- No your name is not Bob.
+
+// Perl Evaluation Test
++ what is 2 plus 2
+# $reply = "2 + 2 = 4";
+
+// A Conversation Holder: Knock Knock!
++ knock knock
+- Who's there?
+& <msg> who?
+& Ha! <msg>! That's a good one!
+
+// A Conversation Holder: Rambling!
++ are you crazy
+- I was crazy once.
+& They locked me away...
+& In a room with padded walls.
+& There were rats there...
+& Did I mention I was crazy once?
+
+// Regexp Trigger Tests
+~ i (would have|would\'ve) done it
+- Do you really think you <star1> done it?
+
+~ i am (\d) years old
+- A lot of people are <star1> years old.
+
+~ i am ([^0-9]) years old
+- You're a "word" years old?
+
+// Random tests.
++ random test one
+- This {random}reply trigger command  {/random} has a random noun.
+
++ random test two
+- Fortune Cookie: {random}You will be rich and famous.|You will 
+^ go to the moon.|You will suffer an agonizing death.{/random}
+
+// Topic Test
++ you suck
+- And you're very rude. Apologize now!{topic=apology}
+
+// 1.71 Test - Single wildcards should sort LAST, so this could be
+// used as a "I can't reply to that" reply.
++ *
+- Hm, I'm going to have to think about that one for a minute.
+- I'm sorry, but I can't answer that!
+- I really don't know what to say to that one...
+
+> topic apology
+
+	+ *
+	- No, apologize for being so rude to me.
+
+	// Set {topic=random} to return to the default topic.
+	+ sorry
+	- See, that wasn't too hard. I'll forgive you.{topic=random}
+
+< topic

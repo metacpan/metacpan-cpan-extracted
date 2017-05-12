@@ -1,0 +1,10 @@
+[% UNLESS no_wrapper;
+    PROCESS crud/header.tt;
+    PROCESS crud/submenu.tt;
+    PROCESS crud/crud_menu.tt;
+    PROCESS crud/body.tt;
+    PROCESS crud/footer.tt;
+   ELSE;
+    content;
+   END;
+%]

@@ -1,0 +1,15 @@
+Building:
+
+$ sudo perl Build.PL
+
+If you have the Module::Build::Debian package installed, you can execute
+
+$ sudo perl Build debian
+
+to generate a .deb file of this perl package.
+
+Otherwise, you can execute
+
+$ sudo perl Build install
+
+to install the module and man files onto the local system.

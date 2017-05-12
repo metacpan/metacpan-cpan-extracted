@@ -1,0 +1,49 @@
+0.12 -- Fri Mar 11 17:36:55 CST 2011
+
+  * Grok dist names ending with something numeric containing underscores [Florian Ragwitz]
+
+0.11 -- Tue Dec 14 08:52:15 CST 2010
+
+  * Remove potential -withoutworldwriteables suffix [Vincent Pit]
+
+0.10 -- Sat Mar 27 15:04:54 CDT 2010
+
+  * Support -TRAIL in distribution version to indicate developer release
+
+0.09 -- Thu Dec 3 18:29:49 CST 2009
+
+  * Normalize dist() for CGI.pm [Michael G. Schwern]
+
+0.08 -- Wed May  6 09:21:47 CDT 2009
+
+  * make a better guess at the meaning of Dist-Name-undef.tar.gz
+  * add tests for the .tar.bz2 feature added in 0.07
+
+0.07 -- Mon Jun 30 09:27:04 CDT 2008
+
+  * Added support for .tar.bz2 archive extension
+
+0.06  --  Mon Sep 20 14:28:32 BST 2004
+
+  * Added support for CPAN id containing a numerical digit (IBMTORDB2)
+
+0.05  --  Wed Jul 14 20:26:26 BST 2004
+
+  * Added pathname attribute and method to return path passed to constructor
+
+2003-12-02 Graham Barr <gbarr@pobox.com>
+
+  * Release 0.04
+  * Added the archive extension, Thanks Thomas Klausner
+
+2003-10-23 Graham Barr <gbarr@pobox.com>
+
+  * Release 0.03
+  * Fixed a bug extracting 2 character cpan ids from the path
+
+2003-10-15 Graham Barr <gbarr@pobox.com>
+
+  * Release 0.02
+  * Fix so the V3_1_1 of Unicode-Collate-Standard-V3_1_1-0.1.tar.gz is not treated
+    as part of the version
+  * Changed API to be OO based

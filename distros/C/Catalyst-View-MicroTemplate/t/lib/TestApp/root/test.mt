@@ -1,0 +1,1 @@
+<? my ($c, $args) = @_ ?><?= $args->{message} ?>

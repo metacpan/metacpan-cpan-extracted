@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Catalyst/Authentication/Credential/Flickr.pm
+t/001_basic.t
+t/002_pod.t
+t/003_pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

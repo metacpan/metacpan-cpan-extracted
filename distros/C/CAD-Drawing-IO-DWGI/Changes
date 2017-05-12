@@ -1,0 +1,4 @@
+0.08 First public release
+0.09 Fixed error reading image size
+0.10 Added Ellipse read
+0.12 Fixed "not a double" errors

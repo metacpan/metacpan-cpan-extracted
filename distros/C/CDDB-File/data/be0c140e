@@ -1,0 +1,59 @@
+# xmcd CD database file
+# Copyright (C) 1995-1998 Ti Kan
+#
+# Track frame offsets:
+#	150
+#	15030
+#	34935
+#	50752
+#	66790
+#	84827
+#	106260
+#	124360
+#	141017
+#	154050
+#	168782
+#	187235
+#	200825
+#	218000
+#
+# Disc length: 3094 seconds
+#
+# Revision: 6
+# Processed by: cddbd v1.4b42PL1 Copyright (c) Steve Scherf et al.
+# Submitted via: audiograbber 1.80
+#
+DISCID=af10420e,be0c140e
+DTITLE=Various / Clueless Soundtrack
+DYEAR=
+DGENRE=Rock
+TTITLE0=The Muffs / Kids In America
+TTITLE1=Cracker / Shake Some Action
+TTITLE2=Counting Crows / The Ghost In You
+TTITLE3=Here (Squirmel Mix)
+TTITLE4=World Party / All The Young Dudes
+TTITLE5=Radiohead / Fake Plastic Trees (Acoustic Version)
+TTITLE6=Lightning Seeds / Change
+TTITLE7=Smoking Popes / Need You Around
+TTITLE8=Beastie Boys / Mullet Head
+TTITLE9=Mighty Mighty Bosstones / Where'd You Go
+TTITLE10=Coolio / Rollin' With My Homies
+TTITLE11=Supergrass / Alright
+TTITLE12=Velocity Girl / My Forgotton Favorite
+TTITLE13=Jill Sobule / Supermodel
+EXTD=\n YEAR: 1995 ID3G:  17
+EXTT0=
+EXTT1=
+EXTT2=
+EXTT3=
+EXTT4=
+EXTT5=
+EXTT6=
+EXTT7=
+EXTT8=
+EXTT9=
+EXTT10=
+EXTT11=
+EXTT12=
+EXTT13=
+PLAYORDER=

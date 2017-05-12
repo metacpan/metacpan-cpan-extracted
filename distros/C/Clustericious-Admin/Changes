@@ -1,0 +1,131 @@
+Revision history for Clustericious-Admin
+
+1.09      2017-03-14 10:59:11 -0400
+  - Fix Test2 / Test::Exit order bug
+
+1.08      2016-04-11 14:02:57 -0400
+  - Migrated back to Module::Build.
+  - --clad_server_command, --clad_fat_server_command and --clad_fat
+    options to Build.PL can override the default values for the
+    corresponding configuration items.
+
+1.07      2016-01-31 12:08:35 -0500
+  - As promised, older configuration keys aliases and clusters has been removed
+  - Default output with no arguments is less verbose.
+    To get the full help text, run clad --help or perldoc clad.
+
+1.06      2015-12-16 15:13:04 -0500
+  - Allow hostname as single host cluster.
+  - Added --list option
+
+1.05      2015-12-03 13:38:41 -0500
+  - Added the --summary option
+  - Added the --log, --log-dir and --purge options
+  - Colorize failure and stderr (colors are configurable via fail_color and
+    err_color configuration items)
+
+1.04      2015-11-29 12:57:14 -0500
+  - If STDIN is not a tty, then it will be read and
+    passed onto the server.
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+1.03      2015-11-27 09:41:40 -0500
+  - Added the --dir option
+    (requires server 1.02)
+  - Use Data::Dumper as fallback instead of JSON::PP.
+    Thus in theory should work with a core Perl 5.6.x 
+    server side.
+
+1.02      2015-11-25 17:55:03 -0500
+  - Internal performance tweaks
+
+1.01      2015-11-25 21:42:53 +0000
+  - Added the --file option
+    (requires server 1.01)
+  - Added script configuration item
+
+1.00      2015-11-17 04:57:07 -0500
+  - Minor documentation fixes, otherwise identical to
+    the 0.99_05 release.
+
+0.99_05   2015-11-16 20:52:07 -0500
+  - Second release candidate for 1.00
+  - Added --fat option (and fat config option) for
+    hosts that don't already have App-clad installed
+  - Relaxed requirement for server code (using --fat)
+    to Perl 5.8 and JSON::PP.
+  - Added --max option.
+
+0.99_04   2015-11-16 06:57:26 -0500
+  - Consider this to be a release candidate for 1.00
+  - Stop argument parsing at first non-option,
+    non recognized option, so arguments can be passed
+    to remote end without -- (this fixes an issue
+    mostly relevent since 0.99_01, which was a trial
+    release anyway).
+
+0.99_03   2015-11-16 04:27:10 -0500
+  - Deprecate "clusters" in the configuration file
+    in favor of "cluster".  "clusters" will be removed
+    on or after January 31, 2016.
+  - Restored the now deprecated (instead of removed)
+    Clustericious::Admin interface.  Along with the
+    other deprecations I plan on removing it on or
+    after January 31, 2016.
+  - MSWin32 is officially not supported.  It may be in
+    a future revision.
+
+0.99_02   2015-11-14 01:38:10 -0500
+  - Added ssh_extra configuration useful for
+    appending to ssh_options
+  - Deprecate "aliases" in the configuration file
+    in favor of "alias".  "aliases" will be removed
+    on or after January 31, 2016.
+  - Added some server side verification of payload.
+
+0.99_01   2015-11-13 22:04:58 -0500
+  - Complete rewrite from scratch.  List
+    of (probably not exhaustive) changes
+    to follow.
+  - No support for macros.  These seem to have been
+    documented in Clustericious::Admin, but
+    not actually implemented.
+  - Use of single argument or list version of
+    system on the server side.  See EXAMPLES 
+    for details.
+  - Environment variables are more accurately passed
+    to the server side when you are using shell
+    logic operators (||, &&, etc) pipes ( | ).
+  - Clustericious::Admin is no longer a public interface
+    to clad.  It wasn't ever really inteded to be so,
+    but it did include some documentation.  A public
+    interface may be added here later.
+  - Clustericious::Admin is an empty package included
+    for dependency compatibility only.  The machinery
+    for the app has been moved into App::clad.
+  - App::clad and the clad executable is used on both
+    the client AND the server.  This makes it more
+    reliable, but does require that it be installed on
+    both hosts, where before it only needed to be
+    on the client.
+  - This implementation uses AnyEvent::Open3::Simple and
+    is object oriented to make the code easier to maintain.
+
+0.25      2014-12-20 05:43:02 America/New_York
+  - cpantesters do not report on older Perls
+
+0.24      2014-08-19 16:17:41 America/New_York
+  - migrate to Dist::Zilla
+  - better documentation coverage
+  - do not use ansi color if standard out is not a terminal
+
+0.23      2013-08-19 07:36:09 America/New_York
+  - increment version number this time
+
+0.22      2013-08-19 07:34:14 America/New_York
+  - minor documentation tweaks
+
+0.21      2012-11-05 12:29:52 America/New_York
+  - first public release
+

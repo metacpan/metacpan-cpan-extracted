@@ -1,0 +1,71 @@
+Config/Vars version 0.01
+========================
+
+Config::Vars makes it easier to declare and initialize configuration
+variables in a central perl module.  Without Config::Vars, you have to
+list each variable name three times in order for it to be usable from
+every module in your program.  You have to list it on a "use vars" or
+"our" declaration, you have to add it to @EXPORT or @EXPORT_OK, and
+you have to initalize the variable.
+
+With Config::Vars, instead of:
+
+    use strict;
+    package MyVars;
+    use Exporter;
+    use vars qw(@ISA @EXPORT_OK $foo @bar %fred);
+    @ISA = qw(Exporter);
+    @EXPORT_OK = qw($foo @bar %fred);
+
+    $foo  = 42;
+    @bar  = (1, 2, 3, 4, 5);
+    %fred = map {$_=>1} @bar;
+
+You can do:
+
+    use strict;
+    package MyVars;
+    use Config::Vars;
+
+    var $foo  = 7;
+    var @bar  = (1, 2, 3, 4, 5);
+    var %fred = map {$_=>1} @bar;
+
+@ISA, "use Exporter", @EXPORT_OK, and "use vars" are all taken care of
+for you.  Note that your module must still end with a true value.
+
+
+DEVELOPMENT STATE
+
+Config::Vars is a brand new module.  It has a decent test suite, but
+it hasn't been used much in the Real World yet.  Thus it should be
+considered "beta" software.  If six months pass without any bugs being
+reported, or any features being added, I'll bump the version to 1.0.
+
+
+INSTALLATION
+
+To install this module, do the standard Perl module four-step:
+
+   perl Makefile.PL    or    perl Makefile.pl LIB='my/install/path'
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  Exporter
+  Filter::Simple
+
+
+COPYRIGHT AND LICENCE
+
+Eric J. Roode, roode@cpan.org
+
+Copyright (c) 2003 by Eric J. Roode. All Rights Reserved.  This module
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

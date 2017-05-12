@@ -1,0 +1,23 @@
+---
+name: MyApp
+
+# Database Model
+#Model::DBIC:
+#  schema_class: Schema::Abilities
+#  connect_info:
+#    - dbi:mysql:database=test;host=localhost
+#    - root
+#    - root
+
+Model::DBIC:
+  schema_class: Schema::Abilities
+  connect_info:
+    - dbi:SQLite:t/db/test.db
+
+default_model: DBIC
+
+
+Authorization::Abilities:
+  debug: 1
+  model: Model::DBIC
+

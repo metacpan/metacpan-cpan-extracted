@@ -1,0 +1,66 @@
+[% static = catalyst.uri_for('/static') %]
+[% title = "YUI Uploader: Simple Example" %]
+[% CLEAR -%]
+[% WRAPPER upload_frame.tt.html %]
+<script type="text/javascript">
+	this.myLogReader = new YAHOO.widget.LogReader();
+	
+	YAHOO.widget.Uploader.SWFURL = "[% static %]/js/yui/build/uploader/assets/uploader.swf";
+	var uploader = new YAHOO.widget.Uploader( "uploaderPlaceHolder" );
+	uploader.addListener('fileSelect',onFileSelect)
+	uploader.addListener('uploadStart',onUploadStart);
+	uploader.addListener('uploadProgress',onUploadProgress);
+	uploader.addListener('uploadCancel',onUploadCancel);
+	uploader.addListener('uploadComplete',onUploadComplete);
+	uploader.addListener('uploadCompleteData',onUploadResponse);
+	uploader.addListener('uploadError', onUploadError);
+
+	var fileList;
+	
+	function browse() {
+		uploader.clearFileList();
+		uploader.browse(true, [{description:"Images", extensions:"*.jpg"}]);
+		YAHOO.log("Started browsing for images");
+	}
+	
+	function upload() {
+        if (fileList != null) {
+            for(var i in fileList) {
+		        uploader.upload(i, '[% catalyst.uri_for('/upload') %]');
+            }
+        }	
+	}
+	
+	function onFileSelect(event) {
+		fileList = event.fileList;
+		YAHOO.log("Files selected");
+		YAHOO.log(event);
+	}
+	
+	function onUploadStart(event) {
+		YAHOO.log(event);
+	}
+	
+	function onUploadProgress(event) {
+		YAHOO.log(event);
+	}
+	
+	function onUploadComplete(event) {
+		YAHOO.log(event);
+	}
+	
+	function onUploadError(event) {
+		YAHOO.log(event, "error");
+	}
+	
+	function onUploadCancel(event) {
+		YAHOO.log(event);
+	}
+	
+	function onUploadResponse(event) {
+		YAHOO.log(event);
+        handleUploads(event);
+	}
+
+</script>
+[% END %]

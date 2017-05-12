@@ -1,0 +1,45 @@
+Revision history for Config::Multi
+
+
+0.12    2013-03-10T00:11:30+09:00
+        - avoided a worning of using uninitialized value.
+          thanks Siraiwa san for patch!
+
+0.11    2009-10-09T12:36:39+09:00
+        - fixed 08-unicode-option-with-yaml-syck.t.
+          is_supported_yaml_syck() returned false, if not supported YAML::Syck.
+
+0.10    2009-10-05T18:02:00+09:00
+        - remove Data::Visitor::Encode code and using Unicode::RecursiveDowngrade instead 
+          because I do not want to have Any::Moose dependancy.
+
+0.09    2009-09-20T17:44:52+09:00
+        - fixed bug, not die if $YAML::Syck::ImplicitUnicode is true.
+
+0.08    2008-12-15/14:34
+        - not using Config::Any::YAML->is_supported for test.
+
+0.07    2008-12-13/14:27
+        - no more dependecies YAML and YAML::Syck.
+
+0.06    2008-11-07/15:03
+        - bug fix. add YAML at requires list of Makefile.PL
+
+0.05    2008-09-11/21:00
+        - add unicode option. unicode => 1.
+        - fix bug. remove hard coded extension 'yml' , use $extension valiable instead.
+
+0.04    2008-05-18/19:20
+        - add Config::Any arguments. use_ext => 1.
+
+0.03    2008-05-17/23:07
+        - fix 00-load.t
+        - bug fix. 02-overwrite.t will pass all test now.
+
+0.02    2008-05-17/21:53
+        - remove use FindBin::libs;
+        - fix POD indent
+
+0.01    2008-05-17/01:17
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,145 @@
+NAME
+    Module::Starter::Plugin::Attanium - template based module starter for
+    Attainium apps.
+
+SYNOPSIS
+        use Module::Starter qw(
+            Module::Starter::Simple
+            Module::Starter::Plugin::Template
+            Module::Starter::Plugin::Attanium
+        );
+
+        Module::Starter->create_distro(%args);
+
+ABSTRACT
+    The prefered method for using this module is via the
+    attainium-starter.pl script.
+
+VERSION
+    Version 0.002
+
+DESCRIPTION
+    This is a plugin for Module::Starter that builds a skeleton Attainium
+    module with all the extra files needed to package it for CPAN. It also
+    generates - an Attanium controller base class for your modules - a
+    customized CGI::Application::Dispatch subclass - a preconfigured
+    development config file - a server.pl that runs out of the box - helper
+    scripts to generate Controller modules subclasses - a helper script to
+    generate DBIx::Class schema and result classes.
+
+    This module is inspired Module::Starter::Plugin::CGIApp by Jaldhar H.
+    Vyas .
+
+METHODS
+  new ( %args )
+    This method calls the "new" supermethod from
+    Module::Starter::Plugin::Template and then initializes the template
+    store and renderer. (See "templates" and "renderer" below.)
+
+  create_distro ( %args )
+    This method works as advertised in Module::Starter.
+
+  create_t( @modules )
+    This method creates a bunch of *.t files. *@modules* is a list of all
+    modules in the distribution.
+
+  render( $template, \%options )
+    This method is subclassed from Module::Starter::Plugin::Template.
+
+    It is given an HTML::Template and options and returns the resulting
+    document.
+
+    Data in the "Module::Starter" object which represents a reference to an
+    array @foo is transformed into an array of hashes with one key called
+    $foo_item in order to make it usable in an HTML::Template "TMPL_LOOP".
+    For example:
+
+        $data = ['a'. 'b', 'c'];
+
+    would become:
+
+        $data = [
+            { data_item => 'a' },
+            { data_item => 'b' },
+            { data_item => 'c' },
+        ];
+
+    so that in the template you could say:
+
+        <tmpl_loop data>
+            <tmpl_var data_item>
+        </tmpl_loop>
+
+  renderer ()
+    This method is subclassed from Module::Starter::Plugin::Template but
+    doesn't do anything as the actual template is created by "render" in
+    this implementation.
+
+  templates ()
+    This method is subclassed from Module::Starter::Plugin::Template.
+
+    It reads in the template files and populates the object's templates
+    attribute. The module template directory is found by checking the
+    "MODULE_TEMPLATE_DIR" environment variable and then the config option
+    "template_dir".
+
+  create_MANIFEST_SKIP()
+    This method creates a "MANIFEST.SKIP" file in the distribution's
+    directory so that unneeded files can be skipped from inclusion in the
+    distribution.
+
+  create_perlcriticrc ()
+    This method creates a "perlcriticrc" in the distribution's test
+    directory so that the behavior of "perl-critic.t" can be modified.
+
+  create_server_pl ()
+    This method creates "server.pl" in the distribution's root directory.
+
+  create_server_pl ()
+    This method creates "config-test.pl" in the distribution's root/config
+    directory.
+
+  create_create_pl ()
+    This method creates "create_controller.pl" in the distribution's
+    app/script directory.
+
+  create_tmpl ()
+    This method takes all the template files ending in .tmpl (representing
+    HTML::Template's and installs them into a directory under the distro
+    tree. For instance if the distro was called "Foo-Bar", the templates
+    would be installed in "Foo-Bar/templates".
+
+    Note the files will just be copied over not rendered.
+
+  create_submodule ()
+    Implements a default "Home" subclass of the main module. This module
+    will be auto configured as the default module in the Dispatch subclass.
+
+  create_dbic_pl ()
+    This method creates "create_dbic_schema.pl" in the distribution's
+    root/script/ directory.
+
+  create_dispatch ()
+    Implements a CGI::Application::Dispatch subclass for this app in the lib
+    directory under the main modules directory.
+
+BUGS
+    Please report any bugs or feature requests to through the web interface
+    at <http://rt.cpan.org>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+AUTHOR
+    Gordon Van Amburg, <vanamburg at cpan.org>
+
+ACKNOWLEDGEMENT
+    This module borrows heavily from <Module::Starter::Plugin::CGIApp> by
+    Jaldhar H. Vyas, <jaldhar at braincells.com>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    attanium-starter, Attainium, Titanium, CGI::Application,
+    Module::Starter::Plugin::CGIApp
+

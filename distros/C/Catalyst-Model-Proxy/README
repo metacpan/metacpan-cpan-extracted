@@ -1,0 +1,87 @@
+Catalyst::Model::Proxy(U3s)er Contributed Perl DocumentatCiaotnalyst::Model::Proxy(3)
+
+
+
+[1mNAME[0m
+       Catalyst::Model::Proxy - Proxy Model Class
+
+[1mSYNOPSIS[0m
+         # a sample use with C<Catalyst::Model::DBI::SQL::Library>
+
+         # lib/MyApp/Model/DBI/SQL/Library/MyDB.pm
+         package MyApp::Model::DBI::SQL::Library::MyDB;
+
+         use base 'Catalyst::Model::DBI::SQL::Library';
+
+         __PACKAGE__->config(
+           dsn           => 'dbi:Pg:dbname=myapp',
+           password      => '',
+           user          => 'postgres',
+           options       => { AutoCommit => 1 },
+         );
+
+         1;
+
+         # lib/MyApp/Model/Other.pm
+         package MyApp::Model::Other;
+
+         use base 'Catalyst::Model::Proxy';
+
+         __PACKAGE__->config(
+           target_class => 'DBI::SQL::Library::MyDB',
+           subroutines => [ qw ( dbh load ) ]
+         );
+
+         # get access to shared resources via proxy mechanism
+         sub something {
+           my $self = shift;
+           my $sql = $self->load('something.sql'); #located under root/sql
+           my $query = $sql->retr ( 'query' );
+           my $dbh = $self->dbh;
+           # ... do some stuff with $dbh
+           $dbh->do ( $query );
+         }
+
+         # back in the controller
+
+         # lib/MyApp/Controller/Other.pm
+         package MyApp::Controller::Other;
+
+         use base 'Catalyst::Controller';
+
+         my $model = $c->model('Other');
+         $model->something;
+
+[1mDESCRIPTION[0m
+       This is the Catalyst Model Class called "Catalyst::Model::Proxy" that
+       implements Proxy Design Pattern. It enables you to make calls to target
+       classes/subroutines via proxy mechanism. This means reduced memory
+       footprint because any operations performed on the proxies are forwarded
+       to the original complex ( target_class ) object. The target class model
+       is also cached for increased performance. For more information on the
+       proxy design pattern please refer yourself to:
+       http://en.wikipedia.org/wiki/Proxy_design_pattern
+
+[1mMETHODS[0m
+       new Initializes DBI connection
+
+[1mSEE ALSO[0m
+       Catalyst
+
+[1mAUTHOR[0m
+       Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+
+[1mCOPYRIGHT[0m
+       This program is free software, you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+[1mPOD ERRORS[0m
+       Hey! [1mThe above document had some coding errors, which are explained[0m
+       [1mbelow:[0m
+
+       Around line 106:
+           You forgot a '=back' before '=head1'
+
+
+
+perl v5.14.2                      2013-03-15         Catalyst::Model::Proxy(3)

@@ -1,0 +1,46 @@
+1.0.8 2007-11-17
+
+    Fix version in META.yml... I guess deleting file doesn't work.
+
+1.0.7 2007-11-17
+
+    Fix [rt.cpan.org #30559]
+    - no longer uses Test::Exception.
+
+    [bugfix]
+    - no longer tests specific html content
+        since this does not work with all versions of FB.
+        Will develop an html parser to verify elements.
+
+1.0.6 2006-11-?  
+
+    [released]
+    - umm
+
+1.0.5 2006-11-8
+
+    [bugfix]
+    - oops, the pattern was not quite right for ref assignments
+    
+    [feature]
+    - added support for eval { } as a value
+
+1.0.4 2006-11-7
+
+    [bugfix]
+    - oops, forgot the ref type for direct package ref assignments
+
+1.0.3 2006-11-2
+
+    [bugfix]
+    - scope for LoadPerl flag needed to be in parse subroutine
+
+1.0.2 2006-11-2
+
+    [feature]
+    - added support for references ala CGI::FormBuilder::Source::File
+
+0.01 Wed Nov  1 12:48:32 PST 2006
+    
+    [INITIAL RELEASE]
+    - First release

@@ -1,0 +1,28 @@
+This file documents the revision history for Catalyst::Controller::Validation::DFV;
+
+0.0.8     2012-12-10 22:37:44 Europe/London
+ - Don't list ourself as a prereq (RT#81741)
+
+0.0.7     2012-01-30 15:22:31 Europe/London
+ - convert to Dist::Zilla
+
+0.0.6   Tue May  5 08:25:24 BST 2009
+    - added "version" to list of dependencies; should fix a couple of failing
+      tests on cpantesters
+    - added Mechanize based tests
+    - reworked t/lib to work with Catalyst 5.8
+
+0.0.5   Mon Mar 16 08:06:19 GMT 2009
+    - added requirements to try to get off the starting block with cpantesters
+
+0.0.4   Mon Mar  9 09:04:37 GMT 2009
+    - removed "use Data::Dump" which I foolishly left floating around
+
+0.0.3   Sun Mar  8 11:34:30 GMT 2009 
+    - remove Build.PL (Module::Install no longer supports Build.PL)
+
+0.0.2
+    - Initial module release
+
+0.0.1
+    - private experimentation

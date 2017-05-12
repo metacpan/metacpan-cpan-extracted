@@ -1,0 +1,38 @@
+---
+abstract: 'Redis driver for CHI with proper expiration of namespace keys'
+author:
+  - 'Arnold Tan Casis <atancasis@cpan.org>'
+build_requires:
+  Test::Class: '0'
+  Test::Mock::Redis: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CHI-Driver-Redis-SortedSet
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CHI: '0.36'
+  CHI::Driver::Redis: '0'
+  Moo: '0'
+  Redis: '1.901'
+  URI: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/atancasis/CHI-Driver-Redis-SortedSet/issues
+  homepage: https://github.com/atancasis/CHI-Driver-Redis-SortedSet
+  repository: https://github.com/atancasis/CHI-Driver-Redis-SortedSet.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

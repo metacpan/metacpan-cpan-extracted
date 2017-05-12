@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 181
+  19386:
+    - 112
+name: cbb5
+registers:
+  AF: 39680
+  AF_: 0
+  BC: 55417
+  BC_: 0
+  DE: 11977
+  DE_: 0
+  HL: 19386
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

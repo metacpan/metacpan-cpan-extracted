@@ -1,0 +1,31 @@
+2004-06-18 15:07  james
+
+    v0.12 released to CPAN
+
+    Add support for generating ACLs that have the 'established' option
+    set
+
+    Add reset method to clear out all the values of the ACL object for
+    re-use
+
+2004-05-27 11:20  james
+
+    v0.11 released to CPAN
+
+	Integrate patch from nicolasgeorgel@yahoo.fr to support port range
+	syntax and port numbers in reverse (higher first) order.
+
+	Add example using multiple addrs / ports
+
+	Re-gen t/05_examples.t from .pm
+
+	Add a new test to t/04_acls.t
+
+	Indent example addresses to prevent them from running together in the
+	HTML version of the documentation.
+
+2004-01-28 19:18  james
+
+	v0.10 released to CPAN
+
+	Finish port of acl.pl to Cisco::ACL

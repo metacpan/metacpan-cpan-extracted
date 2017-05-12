@@ -1,0 +1,11 @@
+lib/Config/Terse.pm
+COPYING
+Makefile.PL
+README.md
+MANIFEST
+t/try.result.txt
+t/try.cfg
+t/try.pl
+README
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

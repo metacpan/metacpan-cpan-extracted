@@ -1,0 +1,149 @@
+NAME
+    Class::RDF - Perl extension for mapping objects to RDF and back
+
+SYNOPSIS
+      use Class::RDF;
+
+      Class::RDF->set_db( "dbi:mysql:rdf", "user", "pass" );
+
+      Class::RDF->define(
+          rdf => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+          rdfs => "http://www.w3.org/2000/01/rdf-schema#",
+          foaf => "http://xmlns.com/foaf/0.1/",
+      );
+      # define xml namespace aliases, export some as perl namespaces.
+        
+      Class::RDF::NS->export( 'rdf', 'rdfs', 'foaf' );
+
+      my @objects = Class::RDF->parse( xml => $some_rdf_xml );
+      # eat RDF from the world
+      @objects = Class::RDF->parse( uri => $a_uri_pointing_to_some_rdf_xml );
+
+      my $obj = Class::RDF::Object->new( $new_uri );
+      $obj->rdf::type( foaf->Person );
+      $obj->foaf::name( "Larry Wall" );
+      # build our own RDF objects
+
+      my @people = Class::RDF::Object->search( rdf->type => foaf->Person );
+      for my $person (@people) {
+          print $person->foaf::OnlineAccount->foaf::nick, "\n";
+      }
+
+      my $rdf_xml = Class::RDF->serialize( @people );
+
+DESCRIPTION
+      Class::RDF is a perl object layer over an RDF triplestore. 
+      It is based on Class::DBI, the perl object / RDBMS package.
+      Thus it works with mysql, postgresql, sqlite etc.
+      Look in the sql/ directory distributed with this module for database schemas.
+
+      It provides an 'rdf-y' shortcut syntax for addressing object properties.
+      It also contains a triples-matching RDF API.
+                        
+  Class::RDF
+  METHODS
+   define
+            Class::RDF->define('foaf','http://xmlns.com/foaf/0.1/');
+
+    Define an alias for an XML namespace. This needs to be done once per
+    program, and is probably accompanied by a
+    Class::RDF::NS->export('short_name').
+
+    This should be superseded by a loaded RDF model of namespaces and
+    aliases which comes with the distribution and lives in the database.
+
+   parse
+            my @objects = Class::RDF->parse( xml => $some_xml );
+            my @objects = Class::RDF->parse( uri => $uri_of_some_xml );
+
+    Parses the xml either passed in as a string or available at a URI,
+    directly into the triplestore and returns the objects represented by the
+    graph.
+
+   serialise
+            my $xml = Class::RDF->serialise( @objects );
+        
+    Take a number of Class::RDF::Object objects, and serialise them as
+    RDF/XML.
+
+  Class::RDF::Object
+    Class::RDF::Object is the base class for RDF perl objects. It is
+    designed to be subclassed:
+
+            package Person; use base 'Class::RDF::Object';
+
+    Create a Class::RDF::Object derived object, then RDF predicate - object
+    pairs can be set on it with a perlish syntax.
+
+    RDF resources - that is http:// , mailto: etc URIs, are automatically
+    turned into Class::RDF::Objects when they are requested. To observe them
+    as URIs they have to be referenced as $object->uri->value. RDF literals
+    - ordinary strings - appear as regular properties.
+
+            my $person = Person->new({foaf->mbox => 'mailto:zool@frot.org',
+                                      foaf->nick => 'zool'});
+            print $person->uri->value;
+            print $person->foaf::nick;
+            print $person->foaf::mbox->uri->value;
+
+  METHODS
+   new ( [uri], [{ properties}], [context],[ baseuri] )
+            my $obj = Class::RDF::Object->new({ rdf->type => foaf->Person, 
+                                                foaf->nick => 'zool'});
+            # creates a stored object with blank node uri
+
+            my $obj = Class::RDF::Object->new($uri);
+            # creates (or retrieves) a stored object with a uri
+
+            my $obj = Class::RDF::Object->new($uri,$context_uri);
+            # creates (or retrieves) a stored object with a uri with a context
+
+   search ( predicate => object )
+            my @found = $object->search( rdf->type => foaf->Person );
+            my $found = $object->search( foaf->mbox );
+
+    Search for objects with predicate - object matching pairs. Can also
+    supply a predicate without a corresponding object.
+
+   uri
+            my $uri = $object->uri;
+            print $uri->value;
+
+    Returns the uri of the object.
+
+  Class::RDF::Statement
+    Class::RDF also provides the equivalent of a triples-matching API to the
+    RDF store.
+
+            my @statements = Class::RDF::Statement->search(subject => $uri);
+            my @statements = Class::RDF::Statement->search(predicate => foaf->nick,
+                                                           object => 'zool');
+            my @statements = Class::RDF::Statement->search(context => $uri);
+
+            my @triples = map {$_->triples} @statements;
+            # three Class::RDF::Node objects
+
+  Class::RDF::Node
+            my $node = Class::RDF::Node->new($uri); # create or retrieve
+            my $exists = Class::RDF::Node->find($uri);
+
+SEE ALSO
+      Class::DBI(3pm), RDF::Simple(3pm)
+
+      http://space.frot.org/grout.html - an RDF aggregator built on Class::RDF
+
+TODO/BUGS
+      lots! 
+
+AUTHORS
+    Schuyler D. Erle <schuyler@nocat.net>
+
+    jo walsh <jo@frot.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2004 by Schuyler Erle & Jo Walsh
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

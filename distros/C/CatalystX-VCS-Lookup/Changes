@@ -1,0 +1,20 @@
+Revision history for CatalystX-VCS-Lookup
+
+0.06    2016-03-28
+        More verbose diagnostic message into svn test
+
+0.05    2016-03-26
+        Add diagnostic message into svn test
+
+0.04    2016-03-23
+        Case insensitive svn version parsing
+
+0.03    2016-03-22
+        Support pre 1.7 svn working copy format
+
+0.02    2016-03-21
+        Update to the latest svn working copy format
+
+0.01    2012-06-14
+        First version, released on an unsuspecting world.
+

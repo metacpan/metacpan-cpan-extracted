@@ -1,0 +1,39 @@
+----------------------------
+revision 1.997  locked by: corliss;
+date: 2002/11/14 18:22:59;  author: corliss;  state: Exp;  lines: +124 -6
+--Added window management array and functions
+--POD updates
+--Form windows are now set to syncok
+--Subforms now return focus to parent form after last widget
+----------------------------
+revision 1.996  locked by: corliss;
+date: 2002/11/04 01:01:46;  author: corliss;  state: Exp;  lines: +293 -105
+--Added subform support
+--Reworked slightly for new Curses::Widgets internals
+--Removed touchwin calls
+--Added ALTFBASE for loading subforms from different namespace
+All form descendents:
+--Adjusted internal geometry calculations to reflect new API behaviour
+----------------------------
+revision 1.995	locked by: corliss;
+date: 2002/10/22 18:21:36;  author: corliss;
+--Added support for alternate namespace searching for widgets
+--Added form autocenter support for non-derived forms
+--Added DONTSWITCH directive to keep focus on the same widget
+--Now passing default colours to all the widgets that don't explicitly
+  declare thier colours
+--Fixed bug in DERIVED forms usage
+--Added shift+tab support in execute method
+--Updated all dialogs to use Forms autocentering mode
+--Updated dialog to use Curses::Widgets::Label instead of writing
+  text on its own
+--Pod updates
+----------------------------
+revision 1.993
+date: 2002/10/16 07:10:00;  author: corliss;
+--Synchronising rev with Curses::Widgets
+----------------------------
+revision 1.1
+date: 2002/10/16 07:07:49;  author: corliss;
+Initial revision
+=============================================================================

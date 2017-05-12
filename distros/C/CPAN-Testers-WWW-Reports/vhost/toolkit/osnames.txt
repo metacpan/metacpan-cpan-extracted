@@ -1,0 +1,30 @@
+,unknown
+osname,undetermined
+aix,AIX
+bsdos,BSD/OS
+cygwin,Windows (Cygwin)
+darwin,Mac OS X
+dec_osf,Tru64
+dragonfly,Dragonfly BSD
+freebsd,FreeBSD
+gnu,GNU Hurd
+haiku,Haiku
+hpux,HP-UX
+irix,IRIX
+linux,GNU/Linux
+macos,Mac OS classic
+midnightbsd,MidnightBSD
+mirbsd,MirOS BSD
+mswin32,Windows (Win32)
+netbsd,NetBSD
+openbsd,OpenBSD
+os2,OS/2
+os390,OS390/zOS
+sco,SCO
+vms,VMS
+solaris,SunOS/Solaris
+beos,BeOS
+interix,Interix
+gnukfreebsd,Debian GNU/kFreeBSD
+nto,QNX Neutrino
+

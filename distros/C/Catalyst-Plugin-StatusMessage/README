@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Catalyst-Plugin-StatusMessage,
+version 1.002000:
+
+  Handle passing of status (success and error)
+messages between screens of a web application.
+
+This software is copyright (c) 2011 by Kennedy Clark.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

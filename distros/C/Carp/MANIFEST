@@ -1,0 +1,22 @@
+Changes
+lib/Carp.pm
+lib/Carp/Heavy.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/arg_regexp.t
+t/arg_string.t
+t/baduni.t
+t/baduni_warnings.t
+t/Carp.t
+t/Carp_overload.t
+t/errno.t
+t/heavy.t
+t/heavy_mismatch.t
+t/stash_deletion.t
+t/swash.t
+t/vivify_gv.t
+t/vivify_stash.t
+t/with_warnings.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

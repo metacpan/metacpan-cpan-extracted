@@ -1,0 +1,13 @@
+It's possible to use ClearCase's Context Menu Editor on Windows to
+add menu entries for Windows Explorer and/or ClearCase Explorer.  The
+most useful example I know of is adding a "Recursive Add to Source
+Control" right below the standard "Add to Source Control" entry.  This
+is simply a shortcut to the "mkelem -recurse" feature implemented in
+ClearCase::Wrapper. See WinRecMkelem.gif and WinRecMkelem.reg for more
+details. If you're familiar with Context Menu Editor these (especially
+the picture) should be pretty much self-explanatory.
+
+Don't apply the WinRecMkelem.reg directly, though. I don't know whether
+that works. It's just there for reference. You should be able to
+generate similar entries for your site easily using the Context Menu
+Editor as shown by the .gif picture.

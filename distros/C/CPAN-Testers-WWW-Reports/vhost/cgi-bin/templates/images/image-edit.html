@@ -1,0 +1,32 @@
+<h2>Image Edit</h2>
+<p>Fields marked '*' are mandatory fields and must be completed.
+
+<form method="post" action="[% cgipath %]/pages.cgi" enctype="multipart/form-data">
+<input type="hidden" name='act' value='imgs-save' />
+<input type="hidden" name='imageid' value="[% IF newimage %]0[% ELSE %][% data.imageid %][% END %]" />
+
+<div class="boxer">
+<table class="blocker">
+        <tr><td valign="top" width="150">Image *</td>
+            <td width="10">[% data.err_image %]</td>
+            <td><input type="file" name="image" />
+            <img src="[% webpath %]/[% data.link %]" border="0" alt="[% data.tag %]" />
+            <input type="hidden" name='imageid' value='[% data.imageid %]' /></td>
+        </tr>
+        <tr><td valign="top">Tag</td>
+            <td>[% data.err_tag %]</td>
+            <td><input type="text" name="tag" value="[% data.tag %]" /></td>
+        </tr>
+        <tr><td valign="top">Type *</td>
+            <td>[% data.err_stock %]</td>
+            <td>[% ddstock %]</td>
+            </tr>
+        <tr><td valign="top">Move File</td>
+            <td>[% data.err_path %]</td>
+            <td>[% pathselect %]</td>
+        </tr>
+</table>
+</div>
+
+<p align="center"><input type="submit" value='Submit' />
+</form>

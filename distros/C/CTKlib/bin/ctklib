@@ -1,0 +1,173 @@
+#!/usr/bin/perl -w
+use strict; # $Id: ctklib 191 2017-04-28 18:29:58Z minus $
+
+=head1 NAME
+
+ctklib - CTKlib project helper
+
+=head1 VERSION
+
+Version 1.18
+
+=head1 SYNOPSIS
+
+    ctklib [-d] [-t regular|tiny|module] [PROJECTNAME]
+    ctklib [-di]
+
+    ctklib-tiny [PROJECTNAME]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d, --debug>
+
+Enable debug mode
+
+=item B<-h, --help>
+
+Help page
+
+=item B<-i, --interactive, --shell>
+
+Interactive (shell) mode without creation of project
+
+=item B<-t TYPE, --type=TYPE>
+
+Select output's type your project. Supported types: "regular", "tiny" and "module".
+For tiny projects please use follow command:
+
+    ctklib-tiny [PROJECTNAME]
+
+=item B<-v, --ver, --version>
+
+Version of CTK module
+
+=back
+
+=head1 DESCRIPTION
+
+Creating PROJECTNAME project with CTK
+
+=head1 AUTHOR
+
+Sergey Lepenkov (Serz Minus) L<http://www.serzik.com> E<lt>minus@mail333.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998-2017 D&D Corporation. All Rights Reserved
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms and 
+conditions as Perl itself.
+
+This program is distributed under the GNU LGPL v3 (GNU Lesser General Public License version 3).
+
+See C<LICENSE> file
+
+=cut
+
+use constant {
+    PROJECTNAME => 'foo',
+    TYPES       => [qw/module regular tiny/],
+};
+use Getopt::Long;
+use Pod::Usage;
+use Term::ReadLine ();
+use Text::ParseWords qw(shellwords);
+
+# Packages
+use CTK;
+use CTKx;
+use CTK::Helper;
+
+BEGIN {
+    sub start { local $| = 1; print CTK::CTKCP @_ ? @_ : '' }
+    sub finish { say(@_) }
+    sub _{my $s=shift||'';my $l=length $s;$s.($l<70?('.'x(70-$l)):'').' '}
+    sub _error { printf(STDERR "%s\n", $_) for grep {defined} @_; exit(1) }
+}
+
+# Режимы команд
+Getopt::Long::Configure ("bundling");
+GetOptions(\%OPT, 
+    "help|usage|h|u|man|?", # Помощь
+    "version|ver|v",        # Текущая версия CTK
+    "debug|d",              # Отладка
+    "type|t=s",             # Regular | Tiny | Module
+    "interactive|shell|i",  # Interactive
+) || pod2usage(-exitval => 1, -verbose => 0, -output => \*STDERR);
+pod2usage(-exitval => 0, -verbose => 2) if $OPT{help};
+
+if ($OPT{version}) {
+    say "CTKlib Version: ", CTK->VERSION;
+    exit 0;
+}
+
+# Arguments
+my $projectname   = @ARGV ? shift @ARGV : ''; # имя проекта
+
+#########################
+### START
+#########################
+my $c = new CTK( syspaths => 1 );
+my $ctkx = CTKx->instance( c => $c );
+if ($OPT{interactive}) {
+    $ENV{TERM} = "dumb" if CTK::WIN;
+    my $term = new Term::ReadLine('CTKlib');
+    while ( defined ($_ = $term->readline("CTKlib> ")) ) { last if /^\s*(quit|exit)$/i;
+        my @w = shellwords($_);
+        if (@w) {
+            $term->addhistory($_);
+            my $command = shift @w;
+            if ($command =~ /^(help|man|\?)/i) {
+                say "USAGE:\n\t<command>";
+                say "\t... any Perl command ...";
+                say;
+                say "\thelp:\t\tHelp page";
+                say "\texit:\t\tExit";
+            } else {
+                my $res = eval(defined($_) ? $_ : "");
+                warn $@ if $@;
+            }
+            say;
+        }
+    }
+    goto FINISH;
+}
+
+# Type define
+my $type = $OPT{type} || '';
+if ($type) {
+    pod2usage(-exitval => 1, -verbose => 0) unless grep {$_ eq $type} @{(TYPES)};
+} else {
+    $type = $c->cli_select("Please select type of the project:",TYPES,1);
+}
+_error("Invalid project's type") unless $type && grep {$_ eq $type} @{(TYPES)};
+
+$projectname =~ s/[^a-z0-9_\-]//ig;
+unless ($projectname) {
+    goto FINISH if $c->cli_prompt("Are you sure you want to create a new $type project?:", "yes") =~ /^n/i;
+    $projectname = $c->cli_prompt("Please enter name of Your project in unix style:", PROJECTNAME);
+}
+_error("Invalid project's name!") if $projectname =~ /[^a-z0-9_\-]/i;
+_error("Invalid project's name. Name must not be begun with a number!") if $projectname =~ /^\d/;
+
+my $h = new CTK::Helper (
+        -type           => $type,
+        -projectname    => $projectname,
+    );
+
+start _ "Creating $type project \"$projectname\"...";
+my $hstat = $h->build();
+finish $hstat ? "OK" : "ERROR";
+
+debug "The project \"$projectname\" was successfully created." if $hstat;
+
+#########################
+### FINISH
+#########################
+FINISH: exit(0);
+1;
+__END__

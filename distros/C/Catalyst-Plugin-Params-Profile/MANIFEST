@@ -1,0 +1,11 @@
+Changes
+lib/Catalyst/Plugin/Params/Profile.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/001_use.t
+t/002_live.t
+t/inc/local_request.pl
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Functions.pm
+META.yml                                 Module meta-data (added by MakeMaker)

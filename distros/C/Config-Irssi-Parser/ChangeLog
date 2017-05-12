@@ -1,0 +1,14 @@
+2004-09-19  Dylan Hardison <dylanwh@tampabay.rr.com>
+
+	* mylib/Module/Build/Yapp.pm: call yapp with the -s option now, thus
+	Parse::Yapp::Driver is no longer required.
+	* Build.PL: list Test::More as a dependency now,
+	and increment the version number.	
+	* lib/Config/Irssi/Lexer.pm: Radically changed the design of the lexer.
+	Now it's a closure returned from the exported function mklexer()
+	in the new module, Config::Irssi::Lexer. Errors can now have line numbers
+	on them.
+	* lib/Config/Irssi/Parser.yp: Using the new lexer.
+	* TODO: Added TODO file. :)
+	* ChangeLog: Added this file, too.
+	* t/lex.t: Added rudimentry tests for the lexer.

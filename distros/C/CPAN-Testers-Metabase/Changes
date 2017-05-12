@@ -1,0 +1,16 @@
+Revision history for CPAN-Testers-Metabase
+
+1.999002  2012-05-18 10:39:55 America/New_York
+
+    - CPAN::Testers::Metabase::AWS split out into a separate
+      distribution
+
+1.999001  2010-04-23 15:40:49 EST5EDT
+
+    - ensure S3 prefix has a trailing slash
+
+    - enable S3 retry with exponential backoff
+
+1.999 Wed Mar  3 11:31:48 2010
+
+    - initial release to CPAN

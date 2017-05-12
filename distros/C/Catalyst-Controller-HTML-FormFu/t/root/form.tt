@@ -1,0 +1,6 @@
+<html>
+<body>
+[% form %]
+<p>[% message.join(', ') %]</p>
+</body>
+</html>

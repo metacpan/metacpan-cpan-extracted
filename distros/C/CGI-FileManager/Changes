@@ -1,0 +1,21 @@
+Revision history for CGI-FileManager
+
+0.06 - 2008 04 08
+    move authore tests to xt/ and include the perl critic test script
+
+0.05 -
+    Remove Unix::PasswdFile from prerequisites as it is included in
+        Unix::ConfigFile anyway
+    Some cleanup using Perl::Critic and CPANTS
+
+
+0.04 - 2006 06 02
+
+    Compared to 0.03 not much changed,
+    test_pod_coverage added
+    several generated files were removed from the SVN repository
+    the SVN repository was made public
+ 
+0.01 - 
+    First version, released on an unsuspecting world.
+

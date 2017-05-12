@@ -1,0 +1,1 @@
+Cog.prototype.config = [% json %];

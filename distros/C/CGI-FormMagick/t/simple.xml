@@ -1,0 +1,40 @@
+<form title="FormMagick demo application" post-event="submit_order">
+  <page name="Personal">
+    <title>Personal details</title>
+    <field id="firstname" type="text" validation="nonblank">
+      <label>first name</label>
+      <description>description here</description>
+    </field>
+  </page>
+  <page name="More">
+    <title>More details</title>
+    <field id="lastname" type="text" validation="nonblank">
+      <label>last name</label>
+    </field>
+  </page>
+  <page name="More again">
+    <title>Yet more details</title>
+    <field id="long" type="text" validation="minlength(5)">
+      <label>long string</label>
+    </field>
+    <field id="short" type="text" validation="maxlength(5)">
+      <label>short string</label>
+    </field>
+  </page>
+
+    <lexicon lang="fr">
+        <entry>
+            <base>FOO</base>
+            <trans>le foo</trans>
+        </entry>
+        <entry>
+            <base>BAR</base>
+            <trans>le bar</trans>
+        </entry>
+        <entry>
+            <base>BAZ</base>
+            <trans>le baz</trans>
+        </entry>
+    </lexicon>
+
+</form>

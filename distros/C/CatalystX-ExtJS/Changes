@@ -1,0 +1,124 @@
+Revision history for CatalystX-ExtJS
+
+2.1.3  2011-06-20
+  - fixed prereqs
+
+2.1.2  2011-02-09
+  - more prereqs
+  - tutorial fix
+
+2.1.1  2011-02-06
+  - Fixed prereqs to include example and tutorial prereqs
+
+2.1.0  2011-02-05
+  - CatalystX::ExtJS has been split up in CatalystX::ExtJS::Direct and
+    CatalystX::ExtJS::REST. Installing this module will pull in both of
+    them, so nothing changes for you. The benefit is that you can use
+    CatalystX::ExtJS::Direct without installing CatalystX::ExtJS and
+    the prereqs for CatalystX::ExtJS::REST, which include DBIx::Class 
+    and HTML::FormFu.
+    
+2.0.0  2011-01-31
+  - pass 'object' or 'list' to the default_rs_method as second parameter
+  - limit of rows to fetch is now 100, set limit => 0 to disable
+  - order_by specifies the default column to sort (e.g. { -desc => 'updated_on' })
+  - silenced test warnings
+  - forms can now be defined in the class itself (forms => { default => , get => , list => })
+  - added tests and documentation
+  - bump prereq versions
+  - fixed Ext.Direct create with only one attribute
+  - don't ship extjs, using CDN for examples and tutorial instead
+  - using ExtJS 3.3.1 in examples and tutorial
+  - catch exceptions in Controller::REST and send a 400 bad_request status to the browser
+    including a message and success: false
+  - Ext.Direct will send an exception if the response status of the subrequest is >= 400
+    The response includes the status of the subrequest as well as $c->error or the body
+  - status_not_found also includes success => 0 in it's response
+  - request trait application moved to Deserializer action class
+  - added namespace option to /api/src
+
+1.124000 2010-12-13
+  - object_GET allowed to override certain fields
+  - fixed object_DELETE which was calling status_not_found incorrectly
+
+1.123000 2010-11-29
+  - API controllers in the API namespace lose the "API" prefix
+  - Fixed naming for actions in deep controller namespaces
+
+1.122000 2010-09-27
+  - Fixed location algorithm for config files
+  - Adjusted file upload via Direct
+
+1.121000 2010-08-18
+  - Fixed file uploads via the Ext.Direct API
+
+1.120000 2010-08-17
+  - Fixed #60070 (ExtJS 3.2.1 compatibility)
+  - Fixed #60396 (Ext.Direct error handling)
+  - Require JavaScript::Dumper (fixes bogus prereq problem)
+  
+  - The default root property is now "data". If you have set no_list_metadata then it will 
+    remain the old value of "rows"
+  - Also you can set root_property
+
+1.110000 2010-08-16
+  - Fixed form_base_file to work with deep-hierarchy controllers
+
+1.101700 2010-06-19
+  - Fixed prereq
+
+1.101670 2010-06-16
+  - Fixed content-type for Direct API
+  - Fixed prereq
+
+1.101570 2010-06-06
+  - Fixed bogus bug where C::View::JSON prepends the BOM when agent = Safari
+  - Fixed meta to not include example/tutorial libs
+  - Fixed #57373 (Global configuration doesn't work as documented)
+
+1.101560 2010-06-05
+  - Ext.Direct support
+  - Ext.Direct API Controller
+  - REST uses now path_to to find form files instead of hard-coded path
+  - added example (run 'perl -Ilib example/script/myapp_server.pl')
+  - added tutorial
+  - added tutorial app (run 'perl -Ilib tutorial/script/myapp_server.pl')
+  - caching is disabled in debug mode
+  - improved performance (using Moose attributes and config file caching)
+  - caching is disabled in debug mode
+  - ditch Subrequest in favor of visit()
+  - works with latest C::R::REST
+  - Got rid of C::R::REST dispatcher in ::REST class
+  - SELECT ... FOR UPDATE for update & delete
+  - use transactions
+
+0.11 2010-01-03
+  - Order by me.* (fixes ambiguous errors)
+
+0.10 2009-12-08
+  - Silence debug messages
+  - fixed failing test on win32 (#500002, thanks kmx)
+
+0.09 2009-09-17
+  - removed hack to ignore empty file and password fields
+    this can now be achieved via ignore_if_empty in formfu
+  - the object is now stashed after creating it
+    you can access it via $c->stash->{object}
+  - the form object is now on the stash and can easily be
+    manipulated
+
+0.08 2009-09-12
+  - introduced parameter validation in list context
+
+0.07 2009-09-10
+  - yet another missing prereq
+
+0.06 2009-09-07
+  - yet another missing prereq
+
+0.02 - 0.05
+  - fixed versioning problems
+  - added new prereqs
+
+0.01 2009-08-27
+  - first official cpan release

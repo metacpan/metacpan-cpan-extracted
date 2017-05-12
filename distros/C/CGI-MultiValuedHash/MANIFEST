@@ -1,0 +1,7 @@
+ChangeLog
+lib/CGI/MultiValuedHash.pm
+Makefile.PL
+MANIFEST
+ReadMe
+t/CGI-MultiValuedHash.t
+META.yml                                 Module meta-data (added by MakeMaker)

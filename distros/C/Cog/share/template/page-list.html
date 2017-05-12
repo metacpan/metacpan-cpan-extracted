@@ -1,0 +1,21 @@
+<div class="page-list">
+<h1>[% title %]</h1>
+<hr />
+<table>
+<tr>
+<th class="id">Id</th>
+<th class="duration">When</th>
+<th class="name">What</th>
+<th class="user">Who</th>
+<th class="size">Size</th>
+</tr>
+[% FOR page = pages %]
+<tr>
+<td class="id"><tt><b>[% page.id %]</b>0[% page.rev %]</tt></td>
+<td class="duration"><tt>[% page.duration %] ago</tt></td>
+<td class="name"><a href="/page/[% page.id %]">[% page.title %]</a></td>
+<td class="user">[% page.user %]</td>
+<td class="size">[% page.size %]</td>
+</tr>
+[% END %]
+</table>

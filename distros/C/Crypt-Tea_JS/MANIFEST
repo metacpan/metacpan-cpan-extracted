@@ -1,0 +1,12 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+test.pl
+Tea_JS.pm
+Tea_JS.xs
+Tea_JS.js
+META.yml
+bin/tea
+examples/old_tea_demo.cgi
+examples/tea_demo.cgi

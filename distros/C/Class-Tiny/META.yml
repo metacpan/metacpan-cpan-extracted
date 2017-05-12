@@ -1,0 +1,57 @@
+---
+abstract: 'Minimalist class construction'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+  base: '0'
+  lib: '0'
+  perl: '5.006'
+  subs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150009'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Class::Tiny:
+    file: lib/Class/Tiny.pm
+    version: '1.006'
+  Class::Tiny::Object:
+    file: lib/Class/Tiny.pm
+    version: '1.006'
+requires:
+  Carp: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Class-Tiny/issues
+  homepage: https://github.com/dagolden/Class-Tiny
+  repository: https://github.com/dagolden/Class-Tiny.git
+version: '1.006'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'Gelu Lupas <gelu@devnull.ro>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Toby Inkster <tobyink@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

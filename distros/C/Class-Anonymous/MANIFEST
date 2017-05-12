@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+cpanfile
+ex/ro_hash.pl
+lib/Class/Anonymous.pm
+lib/Class/Anonymous/Instance.pm
+lib/Class/Anonymous/Utils.pm
+t/build.t
+t/not_found.t
+t/synopsis.t
+t/utils.t

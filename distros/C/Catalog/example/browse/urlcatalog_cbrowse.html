@@ -1,0 +1,50 @@
+<body bgcolor=#ffffff>
+<title>_CATEGORY_</title>
+
+<center>
+<b>Category</b> _PATH_
+<p>
+<form action=_SCRIPT_ method=POST>
+<input type=hidden name=name value=_NAME_>
+<input type=hidden name=context value=csearch>
+<input type=hidden name=style value=urlcatalog>
+<input type=hidden name=mode value=_CONTEXT_>
+<input type=text size=40 name=text value='_TEXT-QUOTED_'>
+<input type=submit value='search'><br>
+</form>
+</center>
+
+
+<!-- start categories -->
+<center>
+<table>
+<!-- params 'style' => 'table', 'columns' => 2 -->
+<!-- start row --> 
+<tr>
+<!-- start entry -->
+<td> <b><a href='_URL_'>_NAME_</a></b> (_COUNT_) </td>
+<!-- end entry -->
+</tr>
+<!-- end row --> 
+</table>
+</center>
+<!-- end categories -->
+
+<dl>
+<!-- start entry -->
+<dt><a href='_URL-QUOTED_'>_COMMENT_</a>
+<dd>
+<a href='_URL-QUOTED_'>_URL_</a>
+<dd>
+<i><font size=-1>Created _CREATED_</font></i><br>
+<p>
+<!-- end entry -->
+</dl>
+
+<center>
+<!-- start pager -->
+Number of pages _MAXPAGES_
+<p>
+_PAGES_
+<!-- end pager -->
+</center>

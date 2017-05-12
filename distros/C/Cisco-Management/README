@@ -1,0 +1,42 @@
+Cisco-Management
+================
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+IMPORTANT NOTE
+
+This module is deprecated - please use Cisco::SNMP.
+
+IPv6 VERSUS IPv4 ONLY
+
+As of version 0.06, Cisco::Management supports IPv6 on systems with IPv6 
+configured but requires Socket version 1.94 or greater.  This may cause 
+issues on Perl versions less than 5.14, where the default Socket module 
+is of a lesser version.  The requirement stems from the use of the 
+getaddrinfo() and getnameinfo() functions not available on older 
+versions of Socket.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Socket (requires 1.94 for IPv6)
+    Net::IPv6Addr (required for IPv6 support in ProxyPing)
+  Sys::Hostname
+  Net::SNMP
+  Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Michael Vincent (www.VinsWorld.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

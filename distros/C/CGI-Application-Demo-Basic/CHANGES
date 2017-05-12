@@ -1,0 +1,56 @@
+Revision history for Perl extension CGI::Application::Demo::Basic.
+
+1.06  Sun Feb 21 12:54:22 2010
+	- Change namespace from CGI::Application::Demo to
+		CGI::Application::Demo::Basic, to force files to be
+		installed separately from other modules called
+		CGI::Application::Demo::(Ajax, Dispatch).
+	- Re-write and/or re-design the docs.
+	- Document much more clearly what needs to be patched by the end user.
+	- Move CSS and HTML templates into htdocs/assets/..., and
+		simplify their names.
+	- Move the CGI scripts into cgi-bin/ca.demo.basic, and
+		simplify their names.
+	- Use DBIx::Admin::CreateTable rather than copying some of its code.
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+	- Change default database driver to SQLite.
+	- Change path to Perl to /usr/bin/perl. Thanx for Larry for bug report #45751.
+	- Change path to config files and templates to /var/www/.
+	- Remove scripts/bu-demo from the distro.
+	- Eliminate references to $ENV.
+	- Write a new module to handle reading config files.
+	- Move the config files into lib/CGI/Application/Demo/Basic/Util, so they
+		can be installed with the *.pm files, and so Config::Tiny
+		can find them easily. Change config file handing to match.
+
+1.05  Wed Feb 10 13:52:32 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+	- Clean up POD.
+
+1.04  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.03  Sun Jan 14 11:13:00 2007
+	- Fix Build.PL and Makefile.PL to refer to FindBin::Real rather than FindBin
+	- Fix faulty datesatmps in this file, and generate Changelog.ini
+
+1.02  Mon Nov 28 14:58:00 2005
+	- Add One.pm, Two.pm, Three.pm, Four.pm and Five.pm, with corresponding
+		config and template files, and instance scripts. These module are
+		graduated in complexity, and help probe a programming environment.
+	- Document those modules. Documentation is in Demo.pm; the above modules do not
+		have their own documentation
+	- Split out into a separate document the notes on the indirectly required
+		modules
+	- Extend the testing environment to include Oracle 10gR1.
+		This included writing CGI::Session::Driver::oracle
+
+1.01  Fri Nov 11 09:19:00 2005
+	- Change some option values in the shipped config file
+
+1.00  Tue Nov 01 15:00:00 2005
+	- Original version

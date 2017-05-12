@@ -1,0 +1,45 @@
+{
+   "abstract" : "Plugin that adds file streaming support to CGI::Application",
+   "author" : [
+      "Jason Purdy <Jason@Purdy.INFO>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-Plugin-Stream",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "3.21",
+            "File::Basename" : "1",
+            "File::MMagic" : "0",
+            "FileHandle" : "1.22",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::Plugin::Stream" : {
+         "file" : "lib/CGI/Application/Plugin/Stream.pm",
+         "version" : "2.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.12"
+}

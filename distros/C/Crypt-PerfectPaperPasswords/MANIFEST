@@ -1,0 +1,14 @@
+bin/pppp
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/App/PerlPPP.pm
+lib/Crypt/PerfectPaperPasswords.pm
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/app.t
+t/conformance.t
+t/pod-coverage.t
+t/pod.t

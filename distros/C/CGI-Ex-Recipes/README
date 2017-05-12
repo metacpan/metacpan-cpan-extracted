@@ -1,0 +1,43 @@
+CGI-Ex-Recipes - A usage example for CGI::Ex::App!
+
+This small but relatively complete application was inspired by the examples 
+given by Paul in his documentation. I decided to go further and experiment with 
+the recomendations and features which the framework provides. 
+You are encouraged to play with it and use it as a starting point  for far more 
+complex and customized applications.
+
+INSTALLATION
+
+The modules and scripts here are actually the example application. 
+They can be just copied and pasted manually in an appropriate viewable by 
+the server directory.
+
+The other way is to use the install.pl script.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc CGI::Ex::Recipes
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Ex-Recipes
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Ex-Recipes
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/CGI-Ex-Recipes
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/CGI-Ex-Recipes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Красимир Беров
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

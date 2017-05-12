@@ -1,0 +1,81 @@
+NAME
+    Catalyst::ActionRole::PseudoCache - Super simple caching for Catalyst
+    actions
+
+VERSION
+    version 1.000003
+
+SYNOPSIS
+     package MyApp::Controller::Root;
+
+     use Moose;
+     BEGIN { extends 'Catalyst::Controller::ActionRole' };
+
+     # used with Catalyst::Plugin::Cache
+     sub cache_js :Local Does(PseudoCache) PCTrueCache(1) {
+       my ($self, $c) = @_;
+       # Long running action to be cached
+     }
+
+     # used with Catalyst::Plugin::Cache and the optional key attr
+     sub cache_with_key :Local Does(PseudoCache) PCTrueCache(1) PCKey('rememberme'){
+       my ($self, $c) = @_;
+       # Long running action to be cached
+     }
+
+DESCRIPTION
+    This module was originally made to take the output of
+    Catalyst::View::JavaScript::Minifier::XS and store it in a file so that
+    after the server booted we would not need to generate it again and could
+    let the static web server serve up the static file. Obviously it can be
+    used for much more than javascript, but it's mostly made with large,
+    purely javascript sites in mind. It does not cache the output of the
+    action when the server is run in development mode.
+
+ATTRIBUTES
+  PCTrueCache
+    Setting PCTrueCache will use Catalyst::Plugin::Cache and allow a real
+    cache backend to do the work. After version 2 of this module this will
+    no longer need to be set and the old mode of this plugin will be removed
+    entirely.
+
+  PCKey
+    PCKey is an optional way of providing a different key for the cache
+    backend. The default key is "Controller::Name/action".
+
+    The two attributes below are DEPRECATED and provided for back compat
+    only. They might disappear in the future. Using "PCTrueCache" and
+    Catalyst::Plugin::Cache is highly recommended.
+
+  PCUrl
+    Required when not using "PCTrueCache".
+
+    After the action runs once it will redirect to $PCUrl.
+
+  PCPath
+    When the action gets run the first time it will write it's output to
+    $PCPath.
+
+    Defaults to "$c->path_to('root') . $PCUrl"
+
+    So using the example given above for the "all_js" action, the path will
+    be
+
+     $MyAppLocation/root/static/js/all.js
+
+THANKS
+    Thanks to Geoffrey Darling for writing all the code for the modern true
+    cache mode
+
+SEE ALSO
+    Catalyst::Plugin::Cache
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

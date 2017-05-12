@@ -1,0 +1,24 @@
+Revision history for Convert-Cisco
+
+0.01    2007-01-04
+        First version, released on an unsuspecting world.
+
+0.02    2007-01-05
+        Updated the perldoc. Warn users that the XML format is
+        subject to change.
+
+0.03    2007-01-06
+        XML format has changed to make it more generic
+        Refactored the to_xml method allowing it to function when Call
+        records are not properly configured.
+
+0.04    2007-01-07
+        Minor changes to XML format. Added the ability to format datetime
+        fields in the output XML
+
+0.05    2007-01-16
+	Now converts compound timepoint fields containing milliseconds
+
+0.06	2007-02-09
+	Updated Build.PL file with module dependencies.
+	Replaced YAML::Syck with YAML module. Problems with Linux installation.

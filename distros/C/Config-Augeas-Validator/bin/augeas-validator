@@ -1,0 +1,179 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#    Copyright (c) 2011 Raphaël Pinson.
+#
+#    This library is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU Lesser Public License as
+#    published by the Free Software Foundation; either version 2.1 of
+#    the License, or (at your option) any later version.
+#
+#    Config-Model is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    Lesser Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser Public License
+#    along with Config-Model; if not, write to the Free Software
+#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+#    02110-1301 USA
+
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Config::Augeas::Validator;
+
+
+################
+# Parse options
+################
+
+my $conffile;
+my $rulesdir = "/etc/augeas-validator/rules.d";
+my $verbose = 0;
+my $debug = 0;
+my $quiet = 0;
+my $recurse = 0;
+my $exclude = '';
+my $nofail = 0;
+my $tags = [];
+my $man = 0;
+my $help = 0;
+
+my $opts = GetOptions(
+   'help|?'     => \$help,
+   'man'        => \$man,
+   "verbose"    => \$verbose,
+   "debug"      => \$debug,
+   "quiet"      => \$quiet,
+   "conf=s"     => \$conffile,
+   "rulesdir=s" => \$rulesdir,
+   "recursive"  => \$recurse,
+   "tag=s@"     => \$tags,
+   "exclude=s"  => \$exclude,
+   "nofail"     => \$nofail,
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+
+my @files = @ARGV;
+
+my $validator;
+
+if ($conffile) {
+   $validator = Config::Augeas::Validator->new(conf => $conffile,
+                                               recurse => $recurse,
+                                               exclude => $exclude,
+                                               nofail  => $nofail,
+                                               tags    => $tags,
+                                               verbose => $verbose,
+                                               debug   => $debug,
+                                               quiet   => $quiet);
+   $validator->play(@files);
+   exit $validator->{err};
+} else {
+   $validator = Config::Augeas::Validator->new(rulesdir => $rulesdir,
+                                               recurse => $recurse,
+                                               exclude => $exclude,
+                                               nofail  => $nofail,
+                                               tags    => $tags,
+                                               verbose => $verbose,
+                                               debug   => $debug,
+                                               quiet   => $quiet);
+   $validator->play(@files);
+   exit $validator->{err};
+}
+
+
+__END__
+
+=head1 NAME
+
+   augeas-validator - A generic configuration validator
+
+=head1 SYNOPSIS
+
+   augeas-validator [options] [file ...]
+
+    Options:
+      -help brief help message
+      -man full documentation
+      -verbose be verbose
+      -rulesdir <rules directory> specify a directory of rules to use
+      -conf <conffile> specify which configuration file to use
+      -recursive recursively analyze the given directories
+      -nofail do not stop when errors are found
+      -tag pass a tag to filter executed rules
+      -exclude <pattern> exclude files by pattern
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-man>
+
+Prints the manual page and exits.
+
+=item B<-verbose>
+
+Print verbose information.
+
+=item B<-rulesdir rulesdir>
+
+Specify the rules directory to use.
+
+=item B<-conf conffile>
+
+Specify a configuration file to use. When this option is specified, the rules
+directory is bypassed, and only the given configuration file is used.
+Patterns and excludes are ignored.
+
+=item B<-recursive>
+
+Analyze the given directories recursively and test each file found.
+
+=item B<-nofail>
+
+Do not stop when errors are found on a file.
+
+=item B<-tag>
+
+Pass a tag to filter executed rules. This option can be passed multiple times.
+
+=item B<-exclude pattern>
+
+A Perl regex pattern to exclude files.
+
+=back
+
+=head1 DESCRIPTION
+
+B<Augeas-validator> is a generic configuration validator based on B<Augeas>.
+It takes a configuration file (by default F<augeas-validator.ini>)
+which contains a set of rules for a given B<Augeas> lens and applies them to the given files.
+
+=head1 CONFIGURATION
+
+See the L<Config::Augeas::Validator> manual.
+
+
+=head1 SEE ALSO
+
+L<Config::Augeas>
+
+=head1 FILES
+
+F<augeas-validator.ini>
+    The default configuration file for B<Augeas-validator>.
+
+=cut
+
+
+

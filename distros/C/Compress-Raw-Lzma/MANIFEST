@@ -1,0 +1,25 @@
+Changes
+config.in
+fallback/constants.h
+fallback/constants.xs
+lib/Compress/Raw/Lzma.pm
+Lzma.xs
+Makefile.PL
+MANIFEST
+ppport.h
+private/MakeUtil.pm
+README
+t/001version.t
+t/02filters.t	
+t/09limitoutput.t
+t/01llzma-generic.t  
+t/050interop-xz.t	
+t/19nonpv.t	
+t/99pod.t
+t/compress/CompTestUtils.pm
+t/Test/Builder.pm
+t/Test/More.pm
+t/Test/Simple.pm
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+^blib/
+^pm_to_blib$
+^cover_db/
+^Makefile\.old$
+^Makefile$
+^Build$
+^_build/
+^MANIFEST\.
+^.*\.tar\.gz$
+\..*\.swp$
+^\.git/
+^\.gitignore$

@@ -1,0 +1,9 @@
+Revision history for Perl extension Compass::Points.
+
+0.02  Sat Jun 21 15:45:32 CEST 2014
+	- let it work on older perls (RT#95699)
+	- add licence, repository and bugtracker links
+
+0.01  Sun May  4 17:11:00 CEST 2014
+	- beginning of the project and first code
+

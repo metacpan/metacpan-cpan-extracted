@@ -1,0 +1,10 @@
+Revision history for Perl extension Coro::Generator.
+
+0.02 2009.04.16
+  - Fix synopsis
+  - Add some more tests
+
+0.01  Wed Apr 16 12:14:46 2008
+	- original version; created by h2xs 1.23 with options
+		-X -n Coro::Generator
+

@@ -1,0 +1,22 @@
+---
+abstract: 'parser for binary CDR files (*.ama) produced by Iskratel SI3000 MSCN telephony product'
+author:
+  - 'Sergey Leschenko <sergle.ua@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CDR-Parser-SI3000
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 0
+version: 0.03

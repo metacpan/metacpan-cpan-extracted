@@ -1,0 +1,43 @@
+Revision history for Perl extension Class-Accessor-FactoryTyped
+
+1.100970  2010-04-07 16:42:26 Europe/Vienna
+    - pod fix to mention Sub::Documentation
+    - added missing '=>' (it still compiled...)
+
+1.100880  2010-03-29 19:58:20 Europe/Vienna
+    - added t/03_array.t
+    - use parent instead of use base
+    - use Class::Accessor::Installer->document_accessor()
+
+1.100830  2010-03-24 11:03:26 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.05  Fri 2010.02.05 22:10:05 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - check for defined() instead of ref()
+
+0.04  Wed 2009.11.04 23:35:04 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - check whether what we want to check against UNIVERSAL::isa() is actually
+       defined - in real-world scenarios, this saves most of the calls
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.03  Thu, 29 May 2008 12:01:23 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - .shipit: now uses ApplyYAMLChangeLogVersion
+     - started writing generated documentation
+     - updated t/perlcriticrc
+     - factory typed attribute accessor now also accepts subclasses of the
+       expected class
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.02  Wed, 24 Oct 2007 11:41:27 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - now uses Class::Accessor::Installer
+
+0.01  Sun, 21 Oct 2007 20:05:00 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

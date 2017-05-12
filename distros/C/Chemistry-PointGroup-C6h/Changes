@@ -1,0 +1,6 @@
+Revision history for Perl extension Chemistry::PointGroup::C6h.
+
+0.01  Sun Feb 19 12:08:27 2006
+	- original version; created by h2xs 1.22 with options
+		-AX -n Chemistry::PointGroup::C6h
+

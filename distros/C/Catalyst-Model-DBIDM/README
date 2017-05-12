@@ -1,0 +1,152 @@
+NAME
+    Catalyst::Model::DBIDM - DBIx::DataModel model class
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    1   Create the DBIx::DataModel schema in MyApp/Schema.pm:
+
+            package MyApp::Schema;
+            use DBIx::DataModel;
+
+            DBIx::DataModel->Schema('MyApp::DM');
+
+            MyApp::DM->Table(qw/ MyApp::DM::Employee   employee   emp_id /);
+            MyApp::DM->Table(qw/ MyApp::DM::Department department dpt_id /);
+            ...
+
+        Notice that the DBIx::DataModel is MyApp:DM, not MyApp::Model::DM.
+        It is usable as a standalone schema, without the need for Catalyst.
+        In fact, it does not even need to be in the MyApp namespace.
+
+    2   To expose it to Catalyst as a model, create a DBIDM in
+        MyApp/Model/DBIDM.pm:
+
+            package MyApp::Model::DM;
+            use base Catalyst::Model::DBIDM;
+
+            use MyApp::Schema; # to create the classes MyApp::DM
+
+            __PACKAGE__->config(
+                schema_class => 'MyApp::DM',
+                connect_info => [
+                    'dbi:...',
+                    'username',
+                    'password',
+                    { RaiseError => 1 },
+                ],
+            );
+
+    Now you have a working model, bound to your DBIx::DataModel schema, that
+    can be accessed the Catalyst way, using $c->model().
+
+        my $employee = $c->model('DM::Employee')->fetch(1);
+
+    "$c->model('DM')" merely returns the string "MyApp::DM", i.e., the name
+    of the DBIx::DataModel schema, but it also ensures that it is connected
+    to the database, as configured in the "connect_info" configuration
+    entry.
+
+    "$c->model('DM::Employee')" (or any other table declared in
+    MyApp::Schema) does the same (returns the string "MyApp::DM::Employee",
+    and connects to the database if need be).
+
+DESCRIPTION
+METHODS
+    new Constructor. It creates "ACCEPT_CONTEXT" for the "MyApp::Model::DM"
+        class and for pseudo-classes for each of its tables
+        ("MyApp::Model::DM::Employee", "MyApp::Model::DM::Department", etc.)
+
+        This allows the Catalyst application to invoke
+        "$c->model('DM::Employee')" prior to calling "$c->model('DM')" and
+        still have it initialised properly.
+
+        The "ACCEPT_CONTEXT" methods invoke the connect_if_not() method
+        before returning the Schema class name or the Table class name:
+
+            $c->model('DM');            # "MyApp::DM"
+            $c->model('DM::Employee');  # "MyApp::DM::Employee"
+
+        The pseudo-classes names is elaborated as follow:
+
+        1    Take the class name as returned by the Schema's tables() method
+             ("MyApp::DM::Employee").
+
+        2    Remove the Schema class name ("MyApp::DM::"), if possible,
+             which leaves "Employee".
+
+        3    Prepend with the Model class name ("MyApp::Model::DM::"),
+             resulting in "MyApp::Model::DM::Employee", which can be called
+             with "$c->model('DM::Employee')".
+
+        The Table class names need not be in the same namespace as the
+        Schema class: if the substitution at step 2 fails, the Model class
+        name is prepended to the full Table class name.
+
+            # In MyApp::Schema
+            DBIx::DataModel->Schema('MyApp::DM');
+            MyApp::Model->Table(qw/ Employee employee emp_id /);
+
+            # In MyApp::Model::DM
+            use base qw/ Catalyst::Model::DM /;
+            __PACKAGE__->config(
+                schema_class => 'MyApp::DM',
+                ...
+            );
+
+            # In some controller code
+            $c->model('DM::Employee')->fetch(1);   # Employee->fetch(1);
+
+    connect_if_not
+        Initialises the Schema (i.e., connects to the database), if not
+        already done. This method returns immediately if the Schema class
+        already has a dbh() (See DBIx::DataModel). If not, it creates a
+        database handler by invoking "DBI->connect" with the "connect_info"
+        parameters from the configuration.
+
+        This method receives $c and the Schema class name as arguments.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Helper::Model::DBIDM
+
+AUTHOR
+    Cedric Bouvier, "<cbouvi at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-catalyst-model-dbidm
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Model-DBIDM>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Catalyst::Model::DBIDM
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Catalyst-Model-DBIDM>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Catalyst-Model-DBIDM>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Model-DBIDM>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Catalyst-Model-DBIDM>
+
+ACKNOWLEDGEMENTS
+    Praises go to Laurent Dami for writing DBIx::DataModel, and to Brandon L
+    Black, for writing Catalyst::Model::DBIC::Schema, a great source of
+    inspiration.
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Cedric Bouvier, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,29 @@
+<view-master id='mainwrapper'
+    title=\'title:content'
+    css=\'@link'
+    meta=\'@meta'
+    body=\'body:content'>
+  <html>
+    <head>
+      <title>Things To Do</title>
+      <link href="/static/summary.css" rel="stylesheet"/>
+      <link href="/static/core.css" rel="stylesheet"/>
+    </head>
+    <body>
+      <view-form id="newtodo" fif='$.form.fif' errors='$.form.errors'>
+        <view-input id='item'
+            label="Todo"
+            name="item"
+            type="text" />
+        <view-input id='item2'
+            label="Todo"
+            name="item"
+            type="text" />
+      </view-form>
+      <ol id='todos'>
+        <li>What To Do?</li>
+      </ol>
+      <view-footer copydate='$.copywrite' />
+    </body>
+  </html>
+</view-master>

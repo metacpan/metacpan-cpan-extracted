@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Class-DBI-SQL-Transformer-Quotify
+version:             0.02
+abstract:            Quote column and table names in Class::DBI-generated SQL
+license:             ~
+author:              
+    - David Westbrook <dwestbrook@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::DBI:                    3.0.8
+    DBD::Mock:                     0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

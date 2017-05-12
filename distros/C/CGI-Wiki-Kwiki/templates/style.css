@@ -1,0 +1,107 @@
+/****************************************************/
+/* Sample CGI::Wiki::Kwiki CSS file
+   This file lists all the CSS classes in use in the
+   templates, and what they're used for. */
+/****************************************************/
+
+body {
+  color:              #000000;
+  background-color:   #ffffff;
+  font-family: "gill sans","trebuchet ms", tahoma, verdana, geneva, arial, helvetica, sans-serif;;
+  margin: 0px;
+  padding: 0px;
+}
+
+/****************************************************/
+/* header tags */
+/****************************************************/
+
+/* the navbar at the top of the page */
+.navbar {
+  font-size: 90%;
+  display: block;
+  margin: 0px;
+  padding: 10px;
+  border-bottom: 1px solid black;
+  text-align: right;
+  background-color: #dddddd;
+}
+
+.navbar form {
+  display: inline;
+}
+
+/* an item in the navbar */
+.navbar_item {
+  display: inline;
+  padding: 6px;
+}
+
+/* the 'search' box in the navbar */
+.navbar_search_form {
+  display: inline;
+}
+
+/* the 'search' button in the navbar */
+.navbar_search_button {
+  display: inline;
+}
+
+
+/****************************************************/
+/* content tags */
+/****************************************************/
+
+/* the main page contents (all except the navbar) are wrapped in this div */
+.content {
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+/* all the page headings are h1s */
+h1 {
+  margin-left: -50px;
+}
+
+
+/* The warning for the edit_conflict page */
+.warning_text {
+}
+
+/* from node_history - the show_current_revision link */
+.menu {
+}
+
+/* from show_all_nodes, each displayed node is in this class of div */
+.node {
+}
+
+
+/****************************************************/
+/* footer tags */
+/****************************************************/
+
+/* actions for this page, displayed in the footer */
+.page_actions {
+  font-size: 90%;
+  display: block;
+  margin: 0px;
+  padding: 10px;
+  text-align: right;
+}
+
+/* an item in the page_actions list at the bottom of the page */
+.page_actions_item {
+  display: inline;
+  padding: 6px;
+}
+
+/* credits for the wiki, used from the footer */
+.credits {
+  font-size: 80%;
+  text-align: right;
+  border-top: 1px solid black;
+  background-color: #dddddd;
+  padding-bottom: 15px;
+}
+

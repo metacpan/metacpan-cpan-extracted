@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 88
+name: ed58
+registers:
+  AF: 51694
+  AF_: 0
+  BC: 16529
+  BC_: 0
+  DE: 40518
+  DE_: 0
+  HL: 34618
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

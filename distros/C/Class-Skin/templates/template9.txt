@@ -1,0 +1,10 @@
+$bla
+$(bla)
+$bla_$bla
+$(bla)_$bla
+$(bla)_$(bla)
+$
+$$
+$$$bla
+($bla)
+$(bla there)

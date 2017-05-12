@@ -1,0 +1,4 @@
+[% FOREACH concert = concerts %]
+    <a href="[% c.uri_for(c.controller('Resource::Concert').action_for('show'), [ artist.id, concert.id ]) %]">[% concert.location %]</a>
+    <br/>
+[% END %]

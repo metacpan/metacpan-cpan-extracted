@@ -1,0 +1,158 @@
+NAME
+    CGI::AppBuilder - CGI Application Builder
+
+SYNOPSIS
+      use CGI::AppBuilder::Apps;
+
+      my $cg = CGI::AppBuilder::Apps->new('ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my $ar = $cg->get_inputs;
+
+DESCRIPTION
+    There are already many application builders out there. Why you need
+    another one? Well, if you are already familiar with CGI::Builder or
+    CGI::Application, this one will provide some useful methods to you to
+    read your configuration file and pre-process your templates. Please read
+    on.
+
+   new (ifn => 'file.cfg', opt => 'hvS:')
+    Input variables:
+
+      $ifn  - input/initial file name. 
+      $opt  - options for Getopt::Std
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $ca = new CGI::AppBuilder::Apps;      # or
+       my $ca = CGI::AppBuilder::Apps->new;     # or
+       my $ca = CGI::AppBuilder::Apps->new(ifn=>'file.cfg',opt=>'hvS:'); # or
+       my $ca = CGI::AppBuilder::Apps->new('ifn', 'file.cfg','opt','hvS:');
+
+    Return: new empty or initialized CGI::AppBuilder::Apps object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      $self->{ifn} = ""
+      $self->{opt} = 'hvS:';
+
+   start_app ($prg,$arg,$nhh)
+    Input variables:
+
+      $prg  - program name 
+      $arg  - array ref for arguments - %ARGV
+      $nhh  - no html header pre-printed 
+              0 - HTML header will be set when it is possible
+              1 - no HTML header is set in any circumstance
+
+    Variables used or routines called:
+
+      build_html_header     - build HTML header array
+      echo_msg              - echo messages
+      start_log             - start and write message log
+      get_inputs            - read input file and/or CGI form inputs
+
+    How to use:
+
+       my ($q, $ar, $ar_log) = $self->start_app($0,\@ARGV);
+
+    Return: ($q,$ar,$ar_log) where
+
+      $q - a CGI object
+      $ar - hash ref containing parameters from input file and/or 
+            CGI form inputs and the following elements:
+        ifn - initial file name
+        opt - command input options
+        cfg - configuration array
+        html_header - HTML header parameters (hash ref)
+        msg - contain message hash
+      $ar_log - hash ref containing log information
+
+    This method performs the following tasks:
+
+      1) initial a CGI object
+      2) read initial file if specified or search for a default file
+         and save the file name to $ar->{ifn}. The default file is your 
+         program name with .ini extension. For instance, if your CGI program
+         name is 'myapp.pl', it will look for a file named 'myapp.ini'. 
+      3) define message level. Default to level 1. 
+      4) start HTML header and body using I<page_title> and I<page_style>
+         if they are defined.
+      5) parse CGI form inputs and combine them with parameters defined
+         in initial file
+      6) read configuration file ($prg.cfgi, for instance 'myapp.cfg') if it 
+         exists and save the array to $ar->{cfg}
+      7) prepare log record if writing log is enabled
+
+    It checks the parameters read from initial file for page_title,
+    page_style, page_author, page_meta, top_nav, bottom_nav, and js_src.
+
+   end_app ($q, $ar, $ar_log, $nhh)
+    Input variables:
+
+      $q    - CGI object 
+      $ar   - array ref for parameters 
+      $ar_log - hash ref for log record
+      $nhh  - no html header pre-printed 
+              1 - no HTML is printed in any circumstance
+              0 - HTML header will be printed when it is possible
+
+    Variables used or routines called:
+
+      echo_msg - echo messages
+      end_log - start and write message log
+      set_param - get a parameter from hash array
+
+    How to use:
+
+       my ($q, $ar, $ar_log) = $self->start_app($0,\@ARGV);
+       $self->end_app($q, $ar, $ar_log);
+
+    Return: none
+
+    This method performs the following tasks:
+
+      1) ends HTML document 
+      2) writes log records to log files 
+      3) close database connection if it finds DB handler in {dbh}
+
+HISTORY
+    *   Version 0.10
+
+        This version is to extract out the app methods from CGI::Getopt
+        class. It was too much for CGI::Getopt to include the start_app,
+        end_app, build_html_header, and disp_form methods.
+
+          0.11 Rewrote start_app method so that content-type can be changed.
+          0.12 Moved disp_form to CGI::AppBuilder::Form,
+               moved build_html_header to CGI::AppBuilder::Header, and 
+               imported all the methods in sub-classes into this class.
+
+    *   Version 1.0001
+
+        The start_app and end_app were extracted out of CGI::AppBuilder
+        class and formed this sub class.
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 ~ 2015 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 309:
+        You forgot a '=back' before '=head1'
+

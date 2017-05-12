@@ -1,0 +1,76 @@
+CGI::Auth version 2.4.4
+=======================
+
+CGI::Auth provides password authentication for web-based applications.  
+It uses server-based session files that are referred to by a parameter 
+in all links and forms inside the scripts guarded by CGI::Auth.
+
+CGI::Auth is written in pure Perl, so it should be portable across 
+operating systems.  It was originally designed on Windows NT, and has 
+also been used extensively (and successfully) on Linux.
+
+Upon installation, the documentation can be viewed by issuing the 
+command 'perldoc CGI::Auth', or by running perldoc directly on the 
+Auth.pm file.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Also, take a look in the extra directory for sample files to help you
+get started.
+
+NOTE: If the make doesn't work for you for some reason, all you really 
+need to do is copy Auth.pm to a folder named 'CGI' in one of your Perl 
+include directories.
+
+DEPENDENCIES
+
+CGI.pm version 2.0.  
+
+    It will probably work with any version, since I don't use a lot of 
+    CGI.pm's functionality, but I developed it with 2.7 and didn't want 
+    to go too far back.  It's probably best to use the latest version 
+    of CGI.pm anyway.
+
+ * OR * 
+
+CGI::Simple
+
+    This is a simpler alternative to CGI.pm.  It is smaller and faster, 
+    but includes all the basic CGI functionality.  What it doesn't 
+    include is the HTML shortcuts, and these are not needed by 
+    CGI::Auth.
+
+    However, CGI::Simple is newer than CGI.pm and hasn't been tested 
+    as thoroughly.  It will probably work just fine, but you might find 
+    a bug or two.
+
+NOTE ON SECURITY
+
+Any hidden fields such as passwords are sent over the network in clear 
+text, so anyone with low-level access to the network (such as an ISP 
+owner or a lucky/skilled hacker) could read the passwords and gain 
+access to your application.  CGI::Auth has no control over this since 
+it is currently a server-side-only solution.
+
+If your application must be fully secured, an encryption layer such as 
+HTTPS should be used to encrypt the session so that passwords cannot be 
+snooped by unauthorized individuals.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001, 2002, 2003 C. Chad Wallace.
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

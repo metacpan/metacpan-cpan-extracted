@@ -1,0 +1,25 @@
+Build.PL
+Changelog.ini
+CHANGES
+htdocs/assets/css/cgi/application/util/util.css
+htdocs/assets/templates/cgi/application/util/diff/form.js
+htdocs/assets/templates/cgi/application/util/diff/form.tmpl
+htdocs/assets/templates/cgi/application/util/diff/web.page.tmpl
+htdocs/local/util.diff
+httpd/cgi-bin/util.diff.cgi
+httpd/conf/httpd.conf
+lib/CGI/Application/Util/.htutil.logger.conf
+lib/CGI/Application/Util/Diff.pm
+lib/CGI/Application/Util/Diff/.htutil.diff.actions.conf
+lib/CGI/Application/Util/Diff/.htutil.diff.conf
+lib/CGI/Application/Util/Diff/Actions.pm
+lib/CGI/Application/Util/Diff/Config.pm
+lib/CGI/Application/Util/Logger.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/pack
+scripts/test.field.hash.pl
+t/pod.t
+t/test.t

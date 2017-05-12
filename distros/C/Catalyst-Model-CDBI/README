@@ -1,0 +1,41 @@
+NAME
+    Catalyst::Model::CDBI - CDBI Model Class
+
+SYNOPSIS
+        # use the helper
+        create model CDBI CDBI dsn user password
+
+        # lib/MyApp/Model/CDBI.pm
+        package MyApp::Model::CDBI;
+
+        use base 'Catalyst::Model::CDBI';
+
+        __PACKAGE__->config(
+            dsn           => 'dbi:Pg:dbname=myapp',
+            password      => '',
+            user          => 'postgres',
+            options       => { AutoCommit => 1 },
+            relationships => 1
+        );
+
+        1;
+
+        # As object method
+        $c->comp('MyApp::Model::CDBI::Table')->search(...);
+
+        # As class method
+        MyApp::Model::CDBI::Table->search(...);
+
+DESCRIPTION
+    This is the "Class::DBI", "Class::DBI::Loader" model class.
+
+SEE ALSO
+    Catalyst, Class::DBI
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

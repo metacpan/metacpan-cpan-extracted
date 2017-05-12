@@ -1,0 +1,51 @@
+Color-Spectrum-Multi
+
+A very simple wrapper around Color::Spectrum, to make fading between more than
+two colours simple and pleasant.
+
+See Color::Spectrum's documentation - the only difference using
+Color::Spectrum::Multi is that you can supply as many colours as you wish.
+
+For instance, you could fade from red, through yellow, to green:
+
+my $spectrum = Color::Spectrum::Multi->new;
+my @colors = $spectrum->generate(15, '#FF0000', '#FFEE00', '#00FF00');
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Color::Spectrum::Multi
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Color-Spectrum-Multi
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Color-Spectrum-Multi
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Color-Spectrum-Multi
+
+    Search CPAN
+        http://search.cpan.org/dist/Color-Spectrum-Multi/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 David Precious
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

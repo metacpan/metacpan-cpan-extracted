@@ -1,0 +1,56 @@
+0.26 Wed Jul 29 11:22:35 CEST 2015
+  * unshift feature lib instead of shift
+
+0.25 Tue Mar  4 10:24:17 CET 2014
+  * Class::MOP::load_class is deprecated in Moose 2.1100
+
+0.24 Mon Nov 19 19:57:19 CET 2012
+  * BUG: path_to was not returning Path::Class object
+
+0.23 Thu Aug 23 16:12:53 CEST 2012
+  * BUG: path_to original fixed
+
+0.22 Tue Aug 21 16:26:33 CEST 2012
+  * BUG: path_to fixed
+
+0.21 Mon Nov 21 18:00:12 CET 2011
+  * NEW: now you can disable a feature from the DISABLED variable
+
+0.20 Wed Aug 11 10:15:36 CEST 2010
+  * fixed backend_class and feature_class config options (rbuels)
+
+0.18 Sat Apr 24 10:26:06 CEST 2010
+  * More dependencies for failing tests
+
+0.17 Sat Apr 17 18:27:15 CEST 2010
+  * Removed useless Class::Inspector dependency
+
+0.16 Sat Apr  3 01:43:03 CEST 2010
+  * Added Plugin::ConfigLoader requirement
+
+0.15  Thu Apr 1 19:03:01 CET 2010
+  * Now requires Catalyst 5.80015
+  * Also requires Static::Simple, just in case
+  * Changed Static::Simple to consume the original plugin as a role. 
+  * No more 'parent' dependencies
+
+0.14  Sat Nov 14 11:06:34 CET 2009
+  * Fixed broken tests
+
+0.13  Mon, 05 Oct 2009 10:00:43 +0100
+  * New: path_to files in features
+
+0.12  Fri, 25 Sep 2009 08:00:43 +0100
+  * New: skip features by putting # in front of directories.
+
+0.11  Sat, 19 Sep 2009 10:42:43 +0100
+  * Fixed: feature with no version now has topmost priority.
+  * Separated tests by type.
+  * Tests now check if plugins or views are available.
+
+0.1011 Thu, 07 Sep 2009 10:45:04 +0100
+  * Fix some test errors.
+
+0.10  Thu, 06 Jun 2009 06:45:11 +0100
+  * Initial release.
+

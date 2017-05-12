@@ -1,0 +1,399 @@
+NAME
+    Callback::Frame - Preserve error handlers and "local" variables across
+    callbacks
+
+SYNOPSIS
+        use Callback::Frame;
+
+        my $callback;
+
+        frame_try {
+          $callback = fub {
+                        die "some error";
+                      };
+        } frame_catch {
+           my $stack_trace = shift;
+           print $stack_trace;
+           ## Also, $@ is set to "some error at ..."
+        };
+
+        $callback->();
+
+    This will print something like:
+
+        some error at tp.pl line 7.
+        ----- Callback::Frame stack-trace -----
+        synopsis.pl:8 - ANONYMOUS FRAME
+        synopsis.pl:13 - ANONYMOUS FRAME
+
+BACKGROUND
+    When programming with callbacks in perl, you create anonymous functions
+    with "sub { ... }". These functions are especially useful because when
+    they are called they will preserve their surrounding lexical
+    environment.
+
+    In other words, the following bit of code
+
+        my $callback;
+        {
+          my $var = 123;
+          $callback = sub { $var };
+        }
+        print $callback->();
+
+    will print 123 even though $var is no longer in scope when the callback
+    is invoked.
+
+    Sometimes people call these anonymous functions that reference variables
+    in their surrounding lexical scope "closures". Whatever you call them,
+    they are essential for convenient and efficient asynchronous
+    programming.
+
+    For many applications we really like straightforward callback style. The
+    goal of Callback::Frame is to simplify the management of dynamic
+    environments (defined below) while leaving callback style alone.
+
+DESCRIPTION
+    The problem that this module solves is that although closures preserve
+    their lexical environment, they don't preserve error handlers or "local"
+    variables.
+
+    Consider the following piece of broken code:
+
+        use AnyEvent;
+
+        eval {
+          $watcher = AE::timer 0.1, 0,
+            sub {
+              die "some error";
+            };
+        };
+
+        ## broken!
+        if ($@) {
+          print STDERR "Oops: $@";
+        }
+
+        AE::cv->recv;
+
+    The intent behind the "eval" above is obviously to catch any exceptions
+    thrown by the callback. However, this will not work because the "eval"
+    will only be in effect while installing the callback in the event loop,
+    not while running the callback. When the event loop calls the callback,
+    it will probably wrap its own "eval" around the callback and you will
+    see something like this:
+
+        EV: error in callback (ignoring): some error at broken.pl line 6.
+
+    (The above applies to EV which is a well-designed event loop. Other
+    event loops may fail more catastrophically.)
+
+    The root of the problem is that the dynamic environment has not been
+    preserved. In this case it is the dynamic exception handlers that we
+    would like to preserve. In some other cases we would like to preserve
+    dynamically scoped (aka "local") variables (see below).
+
+    By the way, "lexical" and "dynamic" are the lisp terms. When it applies
+    to variables, perl confusingly calls dynamic scoping "local" scoping,
+    even though the scope is temporal, not local.
+
+    Here is how we could fix the code above using Callback::Frame:
+
+        use AnyEvent;
+        use Callback::Frame;
+
+        frame_try {
+          $watcher = AE::timer 0.1, 0, fub {
+                                         die "some error";
+                                       };
+        } frame_catch {
+          print STDERR "Oops: $@";
+        };
+
+        AE::cv->recv;
+
+    Now we see the desired error message:
+
+        Oops: some error at fixed.pl line 8.
+
+    We created two frames to accomplish this: A root frame with "frame_try"
+    which contains the exception handler, and a nested frame with "fub" to
+    use as a callback. Unlike "fub", "frame_try" immediately executes its
+    frame. Because the nested callback frame is created while the root frame
+    is executing, the callback will preserve the dynamic environment
+    (including the exception handler) of the root frame.
+
+USAGE
+    This module exports the following subs: "frame", "fub", "frame_try",
+    "frame_catch", "frame_local", and "frame_void".
+
+    "frame" is the general interface. The other subs are just syntactic
+    sugar around "frame". "frame" requires at least a "code" argument which
+    should be a coderef (a function or a closure). It will return another
+    coderef that "wraps" the coderef you passed in. When this wrapped codref
+    is run, it will reinstate the dynamic environment that was present when
+    the frame was created, and then run the coderef that you passed in as
+    "code".
+
+    "frame" also accepts "catch", "local", "existing_frame", and "name"
+    parameters which are described below.
+
+    "fub" simplifies the conversion of existing callback code into
+    Callback::Frame enabled code. For example, given the following AnyEvent
+    statement:
+
+        $watcher = AE::io $sock, 0, sub { do_stuff() };
+
+    In order for the callback to have its dynamic environment maintained,
+    you just need to change it to this:
+
+        $watcher = AE::io $sock, 0, fub { do_stuff() };
+
+    IMPORTANT NOTE: All callbacks that may be invoked outside the dynamic
+    environment of the current frame should be created with "frame" or "fub"
+    so that the dynamic environment will be correctly re-applied when the
+    callback is invoked.
+
+    The "frame_try" and "frame_catch" subs are equivalent to a call to
+    "frame" with "code" and "catch" parameters. However, unlike with
+    "frame", the frame is executed immediately.
+
+    "frame_void" takes a single callback argument. This can be useful if you
+    wish to kick off an unassociated asynchronous action while handling. If
+    the action is run in void context, there is no way for it to throw an
+    exception that will affect your request, or to access its local
+    variables. Note that you probably should install a separate
+    "frame_catch" in case the unassociated operation throws exceptions.
+
+    Libraries that wrap callbacks in frames can use the
+    "Callback::Frame::is_frame()" function to determine if a given callback
+    is already wrapped in a frame. It returns true if the callback is
+    wrapped in a frame and is therefore suitable for use with
+    "existing_frame". Sometimes libraries like to automatically wrap a
+    callback in a frame unless it already is one:
+
+        if (!Callback::Frame::is_frame($callback)) {
+          $callback = frame(code => $callback);
+        }
+
+    If you wish to run a coderef inside an existing frame's dynamic
+    environment, when creating a frame you can pass in an existing frame as
+    the "existing_frame" parameter. When this frame is executed, the "code"
+    of the frame will be run inside "existing_frame"'s dynamic environment.
+    This is useful for throwing exceptions from within some given callback's
+    environment (timeouts for example):
+
+        frame(existing_frame => $callback, code => sub {
+          die "request timed out";
+        })->();
+
+    "existing_frame" is also useful for extracting/setting a callback's
+    local variables.
+
+    Although you should never need to, the internal frame stack can be
+    accessed at $Callback::Frame::top_of_stack. When this variable is
+    defined, a frame is currently being executed.
+
+NESTING AND STACK-TRACES
+    Callback::Frame tries to make adding error handling support to an
+    existing asynchronous application as easy as possible by not forcing you
+    to pass extra parameters around. It should also make life easier because
+    as a side effect of adding error checking it also can be made to produce
+    detailed and useful "stack traces" that track the callback history of
+    some connection or transaction.
+
+    Frames can be nested. When an exception is raised, the most deeply
+    nested "catch" handler is invoked. If this handler itself throws an
+    error, the next most deeply nested handler is invoked with the new
+    exception but the original stack trace. If the last "catch" handler
+    re-throws the error, the error will be thrown in whatever dynamic
+    environment was in place when the callback was called, usually the event
+    loop's top-level handler (probably not what you want).
+
+    When a "catch" handler is called, not only is $@ set, but also a
+    stack-trace string is passed in as the first argument. All frames will
+    be listed in this stack-trace, starting with the most deeply nested
+    frame.
+
+    If you want you can use simple frame names like "accepted" but if you
+    are recording error messages in a log you might find it useful to name
+    your frames things like "accepted connection from $ip:$port at $time"
+    and "connecting to $host (timeout = $timeout seconds)".
+
+    All frames you omit the name from will be shown as "ANONYMOUS FRAME" in
+    stack-traces.
+
+    Since multiple frames can be created within the same parent frame and
+    therefore multiple child frames can be active at once, frames aren't
+    necessarily arranged in terms of a stack. Really, the frame "stack" is
+    more of a tree data structure (known in lisp as a "spaghetti stack").
+    This occurs most often when two asynchronous request frames are started
+    up concurrently while the same frame is in effect. At this point the
+    "stack" has essentially branched. If you are ever surprised by an
+    exception handler being called twice, this is probably what is
+    happening.
+
+"LOCAL" VARIABLES
+    In the same way that using "frame_catch" or the "catch" parameter to
+    "frame" preserves the dynamic environment of error handlers, the
+    "frame_local" function or "local" parameter to "frame" can be used to
+    preserve the dynamic environment of local variables. Of course, the
+    scope of these bindings is not actually local in the physical sense of
+    the word, only in the perl sense.
+
+    Technically, perl's "local" maintains the dynamic environment of
+    bindings. The distinction between variables and bindings is subtle but
+    important. See, when a lexical binding is created, it is there "forever"
+    -- or at least until it is no longer reachable by your program according
+    to the rules of lexical scoping. Therefore, bindings are statically
+    mapped to lexical variables and it is redundant to distinguish between
+    the two.
+
+    However, with dynamic variables the same variable accessed in the same
+    part of your code can refer to different bindings at different times.
+    That's why they are called "dynamic" and lexical variables are sometimes
+    called "static".
+
+    Because any code in any file, function, or package can access a dynamic
+    variable, they are the opposite of local. They are global. However, the
+    bindings are only global for a little while at a time. After a while
+    they go out of scope and then they are no longer visible at all. Or
+    sometimes they will get "shadowed" by some other binding and will come
+    back again later. Because when they are accessed determines which
+    binding is referenced, dynamic variables are actually temporally scoped,
+    not locally scoped (perl nomenclature notwithstanding).
+
+    To make all this concrete, consider how the binding containing 2 is lost
+    forever in this bit of code:
+
+        our $foo = 1;
+        my $cb;
+
+        {
+          local $foo;
+          $foo = 2;
+          $cb = sub {
+            return $foo;
+          };
+        }
+
+        say $foo;     # 1
+        say $cb->();  # 1  <- not 2!
+        say $foo;     # 1
+
+    Here's a way to "fix" that using Callback::Frame:
+
+        our $foo = 1;
+        my $cb;
+
+        frame_local __PACKAGE__.'::foo', sub {
+          $foo = 2;
+          $cb = fub {
+            return $foo;
+          };
+        };
+
+        say $foo;     # 1
+        say $cb->();  # 2  <- hooray!
+        say $foo;     # 1
+
+    Don't be fooled into thinking that this is a lexical binding though.
+    While the callback $cb is executing, all parts of the program will see
+    the binding containing 2:
+
+        our $foo = 1;
+        my $cb;
+
+        sub global_foo_getter {
+          return $foo;
+        }
+
+        frame_local __PACKAGE__.'::foo', sub {
+          $foo = 2;
+          $cb = fub {
+            return global_foo_getter();
+          };
+        };
+
+        say $foo;     # 1
+        say $cb->();  # 2  <- still 2
+        say $foo;     # 1
+
+    You can install multiple local variables in the same frame with the
+    "frame" interface:
+
+        frame(local => __PACKAGE__.'::foo',
+              local => 'main::bar',
+              code => { })->();
+
+    Note that if you have both "catch" and "local" elements in a frame, in
+    the event of an error the local bindings will not be present inside the
+    "catch" handler (use a nested frame if you need this).
+
+    Variable names must be fully package qualified. The best way to do this
+    for variables in your current package is to use the ugly "__PACKAGE__"
+    technique.
+
+    Objects stored in local bindings managed by Callback::Frame will not be
+    destroyed until all references to the frame-wrapped callback that
+    contains the binding are destroyed, along with all references to any
+    deeper frames.
+
+SEE ALSO
+    The Callback::Frame github repo
+    <https://github.com/hoytech/Callback-Frame>
+
+    AnyEvent::Task uses Callback::Frame and its docs have more discussion on
+    exception handling in async apps.
+
+    This module's "catch" syntax is of course modeled after "normal
+    language" style exception handling as implemented by Try::Tiny and
+    similar.
+
+    This module depends on Guard to maintain the
+    $Callback::Frame::active_frames datastructure and to ensure that "local"
+    binding updates aren't lost even when exceptions or other non-local
+    returns occur.
+
+    AnyEvent::Debug provides an interactive debugger for AnyEvent
+    applications and uses some of the same techniques that Callback::Frame
+    does. AnyEvent::Callback and AnyEvent::CallbackStack sort of solve the
+    dynamic error handler problem. Unlike these modules, Callback::Frame is
+    not related at all to AnyEvent, except that it happens to be useful in
+    AnyEvent libraries and applications (among other things).
+
+    Promises and Future are similar modules but they solve a slightly
+    different problem. In the area of exception handling they require a more
+    drastic restructuring of your async code because you need to pass
+    "promise/future" objects around to maintain context. Callback::Frame is
+    context-less (or rather the context is implicit in the dynamic state).
+    That said, both of these modules should be compatible with
+    Callback::Frame.
+
+    Miscellaneous other modules: IO::Lambda::Backtrace,
+    POE::Filter::ErrorProof
+
+    Python Tornado's StackContext
+    <http://www.tornadoweb.org/en/branch2.3/stack_context.html> and
+    "async_callback"
+
+    Let Over Lambda, Chapter 2
+    <http://letoverlambda.com/index.cl/guest/chap2.html>
+
+    UNWIND-PROTECT vs. Continuations
+    <http://www.nhplace.com/kent/PFAQ/unwind-protect-vs-continuations-origin
+    al.html>
+
+BUGS
+    For now, "local" bindings can only be created in the scalar namespace.
+    Also, none of the other nifty things that local can do (like localising
+    a hash table value) are supported yet.
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2012-2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

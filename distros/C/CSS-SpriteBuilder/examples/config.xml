@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+
+<global_opts>
+<!--
+    <image_quality>90</image_quality>
+    <max_image_size>65536</max_image_size>
+    <max_image_width>1536</max_image_width>
+    <max_image_height>1024</max_image_height>
+    <max_sprite_width>1536</max_sprite_width>
+    <max_sprite_height>1024</max_sprite_height>
+    <margin>0</margin>
+    <transparent_color></transparent_color>
+    <is_background>0</is_background>
+    <layout>packed</layout>
+    <css_selector_prefix>.spr-</css_selector_prefix>
+    <css_url_prefix>/sprite/</css_url_prefix>
+    <is_add_timestamp>1</is_add_timestamp>
+-->
+</global_opts>
+
+<sprites>
+    <sprite file="sprite.png">
+        <image file="small/Add.png"/>
+        <image file="small/Box.png"/>
+        <image file="medium/CD.png"/>
+    </sprite>
+    <sprite file="sprite_x.png" layout="vertical">
+        <image file="small/Brick.png" is_repeat="1"/>
+        <image file="small/Bin_Empty.png"/>
+        <image file="medium/Close.png"/>
+    </sprite>
+    <sprite file="sprite_y.png" layout="horizontal">
+        <image file="small/Pattern.png" is_repeat="1"/>
+        <image file="small/Address_Book.png"/>
+        <image file="medium/Chat.png"/>
+    </sprite>
+</sprites>
+
+</root>

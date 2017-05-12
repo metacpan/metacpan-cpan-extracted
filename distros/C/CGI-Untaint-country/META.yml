@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name: CGI-Untaint-country
+version: 0.2
+author:
+  - David Baird <cpan@riverside-cms.co.uk>
+abstract: validate a country code or name
+license: perl
+requires:
+  CGI::Untaint: 0
+  Locale::Country: 0
+  Test::CGI::Untaint: 0
+  Test::More: 0
+provides:
+  CGI::Untaint::country:
+    file: lib/CGI/Untaint/country.pm
+    version: 0.2
+  CGI::Untaint::countrycode:
+    file: lib/CGI/Untaint/countrycode.pm
+  CGI::Untaint::countrycode3:
+    file: lib/CGI/Untaint/countrycode3.pm
+  CGI::Untaint::countryname:
+    file: lib/CGI/Untaint/countryname.pm
+  CGI::Untaint::countrynumber:
+    file: lib/CGI/Untaint/countrynumber.pm
+  CGI::Untaint::to_countrycode:
+    file: lib/CGI/Untaint/to_countrycode.pm
+  CGI::Untaint::to_countrycode3:
+    file: lib/CGI/Untaint/to_countrycode3.pm
+  CGI::Untaint::to_countrynumber:
+    file: lib/CGI/Untaint/to_countrynumber.pm
+generated_by: Module::Build version 0.2609

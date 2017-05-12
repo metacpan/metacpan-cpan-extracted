@@ -1,0 +1,221 @@
+# PODNAME: Crypt::NaCl::Sodium::generichash
+# ABSTRACT: Generic hashing (Blake2b)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::generichash - Generic hashing (Blake2b)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_generichash = Crypt::NaCl::Sodium->generichash();
+
+    # generate secret key
+    my $key = $crypto_generichash->keygen();
+
+    # list of files for which we are computing the checksums
+    my @files = ...;
+
+    for my $file ( @files ) {
+        # file name checksum
+        my $filename_hash = $crypto_generichash->mac($file, key => $key, bytes => 32 );
+
+        # using multi-part API
+        my $stream = $crypto_generichash->init( key => $key, bytes => 64 );
+
+        open(my $fh, $file) or die;
+        while ( sysread($fh, my $buf, 4096) ) {
+            # add the chunk of data
+            $stream->update( $buf );
+        }
+        close($fh);
+
+        # calculate the final checksum
+        my $checksum = $stream->final();
+    }
+
+=head1 DESCRIPTION
+
+Compute a fixed-length fingerprint for an arbitrary long message.
+C<crypto_generichash> supports multi-part API and the use of keys of variable length.
+
+A message will always have the same fingerprint for a given key, but different keys
+used to hash the same message are very likely to produce distinct fingerprints.
+
+If the key is used it should remain secret.
+
+The C<crypto_generichash> provides better and faster alternative to other hashing
+functions like C<MD5> and C<SHA-1/2/3>.
+
+=head1 METHODS
+
+=head2 keygen
+
+    my $key = $crypto_generichash->keygen( $keybytes );
+
+Helper method to generate a random key to be used by C<$crypto_generichash>.
+
+The value of the C<$keybytes> argument can by any value between
+L</KEYBYTES_MIN> (included) and L</KEYBYTES_MAX> (included).
+
+The default value of C<$keybytes> is L</KEYBYTES>.
+
+The length of the C<$key> equals the value of C<$keybytes>.
+
+B<NOTE:> keep the key confidential.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 mac
+
+    my $mac = $crypto_generichash->mac( $msg, key => $key, bytes => $bytes );
+
+Computes the MAC of the C<$msg> using (optional) C<$key>. The value of optional
+C<$bytes> argument specifies the length of the computed C<$mac>.
+
+The value of the C<$bytes> argument can by any value between
+L</BYTES_MIN> (included) and L</BYTES_MAX> (included).
+
+The default value of C<$bytes> is L</BYTES>.
+
+The length of the C<$mac> equals the value of C<$bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 Multi-part API
+
+Multi-part computation is also supported.
+
+    my $ctx = $crypto_generichash->init( key => $key, bytes => $bytes );
+
+    $ctx->update( $msgX );
+    $ctx->update( $msgY )->update( $msgZ, ... );
+
+    my $mac = $ctx->final( bytes => $bytes );
+
+=head2 init
+
+    my $ctx = $crypto_generichash->mac( key => $key, bytes => $bytes );
+
+Creates a context for multi-part computation using (optional) C<$key>. The value of optional
+C<$bytes> argument specifies the length of the final hash.
+
+The value of the C<$bytes> argument can by any value between
+L</BYTES_MIN> (included) and L</BYTES_MAX> (included).
+
+The default value of C<$bytes> is L</BYTES>.
+
+Returns C<Crypt::NaCl::Sodium::generichash::stream> object which encapsulates
+the computation state of the algorithm.
+
+=head2 clone
+
+    while ( <> ) {
+        $ctx->update( $_ );
+        print "Line: $.: ", $ctx->clone->final->to_hex, "\n";
+    }
+
+Returns a copy of C<$ctx> object, that contains the current computation
+state.
+
+=head2 update
+
+    $ctx->update( $msg, ... );
+
+Appends its arguments to the message for which the MAC is being calculated.
+
+Returns the C<$ctx> object itself.
+
+=head2 final
+
+    my $mac = $ctx->final( bytes => $bytes );
+
+Computes the final MAC of the input data. The value of optional
+C<$bytes> argument specifies the output length of the final output.
+
+The value of the C<$bytes> argument can by any value between
+L</BYTES_MIN> (included) and L</BYTES_MAX> (included).
+
+The default value of C<$bytes> equals to the value of C<$bytes> of the L</init>
+parameter.
+
+Returns L<Data::BytesLocker> object.
+
+=head1 CONSTANTS
+
+=head2 KEYBYTES
+
+    my $key_length = $crypto_generichash->KEYBYTES;
+
+Returns the default length of key.
+
+=head2 KEYBYTES_MIN
+
+    my $key_min_length = $crypto_generichash->KEYBYTES_MIN;
+
+Returns the minimum length of key.
+
+=head2 KEYBYTES_MAX
+
+    my $key_max_length = $crypto_generichash->KEYBYTES_MAX;
+
+Returns the maximum length of key.
+
+=head2 BYTES
+
+    my $mac_length = $crypto_generichash->BYTES;
+
+Returns the default length of MAC.
+
+=head2 BYTES_MIN
+
+    my $mac_min_length = $crypto_generichash->BYTES_MIN;
+
+Returns the minimum length of MAC.
+
+=head2 BYTES_MAX
+
+    my $mac_max_length = $crypto_generichash->BYTES_MAX;
+
+Returns the maximum length of MAC.
+
+=head1 SECURITY MODEL
+
+C<crypto_generichash> uses I<Blake2b> hash function which is an improved version of
+I<SHA-3> finalist I<BLAKE>. Like I<SHA-3>, I<Blake2b> offers highest security, yet is fast as
+I<MD5> on 64-bit platforms and requires 33% less RAM then I<SHA-2> or I<SHA-3>
+on low-end systems. The core algorithm of I<Blake2b> is derived from I<ChaCha> stream cipher.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<BLAKE2 - fast secure hashing|https://blake2.net/>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

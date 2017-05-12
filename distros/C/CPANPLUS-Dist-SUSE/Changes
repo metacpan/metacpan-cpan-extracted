@@ -1,0 +1,10 @@
+Revision history for CPANPLUS-Dist-SUSE
+
+0.02    19/2/2011
+        Enhanced SUSE.pm to make it more SUSEish in 
+        order to achieve a better build rate
+
+0.01    15/3/2010
+        First version, copy of CPANPLUS::Dist::Fedora
+	
+

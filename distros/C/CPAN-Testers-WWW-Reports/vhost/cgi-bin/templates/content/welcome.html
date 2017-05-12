@@ -1,0 +1,90 @@
+[% 
+    title = "Index" ;
+    box_help  = 1 ;
+
+    crumb1_name = 'Index' ;
+%]
+
+<p>Find CPAN testers reports for all the modules on CPAN. See also <a href="/recent.html">recent reports</a>.</p>
+
+[% IF ! static %]
+<h2>CPAN Testers Builder - Current Status</h2>
+<table>
+[% IF status.total %]
+<tr><th>Status</th><td [% 
+	IF    status.count > 25000 ; THEN ; 'class="FAIL"'    ;
+	ELSIF status.count > 15000 ; THEN ; 'class="UNKNOWN"' ;
+	ELSE                              ; 'class="PASS"'    ;
+	END
+%]>[%
+	IF    status.count > 25000 ; THEN ; 'OVERLOADED'  ;
+	ELSIF status.count > 20000 ; THEN ; 'STRUGGLING'  ;
+	ELSIF status.count > 15000 ; THEN ; 'STRAINING'   ;
+	ELSIF status.count > 10000 ; THEN ; 'MANAGEABLE'  ;
+	ELSIF status.count > 5000  ; THEN ; 'GOOD'        ;
+	ELSE                              ; 'EXCELLENT'   ;
+	END
+%]</td></tr>
+<tr><th>Most recent report</th><td>[% report.date %] ([% report.id %])</td></tr>
+<tr><th>Time of oldest page request</th><td>[% status.created %]</td></tr>
+<tr><th>Total page requests</th><td>[% status.total %]</td></tr>
+<tr><th>Total unique page requests</th><td>[% status.count %]</td></tr>
+[% ELSE %]
+<tr><th>Status</th><td class="PASS">EXCELLENT</td></tr>
+<tr><th>Most recent report</th><td>[% report.date %] ([% report.id %])</td></tr>
+<tr><th>Time of oldest page request</th><td>no requests found</td></tr>
+<tr><th>Total page requests</th><td>no requests found</td></tr>
+<tr><th>Total unique page requests</th><td>no requests found</td></tr>
+[% END %]
+</table>
+[% END %]
+
+<h2>Distributions</h2>
+<p>Search distributions by first character:</p>
+<p>
+[% FOREACH letter = ['A' .. 'Z'] %]
+<a href="/distro/[% letter %]">[% letter %]</a>
+[% END %]
+</p>
+
+<h2>Authors</h2>
+<p>Search authors by first character:</p>
+<p>
+[% FOREACH letter = ['A' .. 'Z'] %]
+<a href="/author/[% letter %]">[% letter %]</a>
+[% END %]
+</p>
+
+<p>Alternatively, refine your view to just 
+<a href="http://pass.cpantesters.org/">PASS reports by Perl version and
+operating system</a>.</p>
+
+[% IF ! static %]
+<h2>Javascript</h2>
+<p>This site requires your browser to have Javascript enabled. Due to
+the high volume of reports, in order to more easily manage the 
+display listings, Javascript is used to filter the reports displayed.</p>
+[% END %]
+
+<h2>Become a tester</h2>
+
+<p>Whether you have a common platform or a very unusual one, you can help by 
+testing modules you install and submitting reports. There are plenty of module
+authors who could use test reports and helpful feedback on their modules and 
+distributions. </p>
+
+<p>If you'd like to get involved, please take a look at the 
+<a href="http://wiki.cpantesters.org">CPAN Testers Wiki</a>, where you can 
+learn how to install and configure one of the recommended smoke tools.</p>
+
+<p>For further help and advice, please subscribe to the 
+<a href="http://lists.cpan.org/showlist.cgi?name=cpan-testers-discuss">the 
+CPAN Testers discussion mailing list</a>.</p>
+
+<h2>The reports data</h2>
+
+<p>The entire database that this website uses is available at 
+<a href="http://devel.cpantesters.org/cpanstats.db.gz">cpanstats.db.gz</a>
+as an <a href="http://search.cpan.org/dist/DBD-SQLite/">SQLite</a> database. 
+See the <a href="http://devel.cpantesters.org">Development</a> 
+website to get a full list of the available file formats and sizes</p>

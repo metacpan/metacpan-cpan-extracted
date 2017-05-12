@@ -1,0 +1,38 @@
+Revision history for perl module Catalyst::Controller::AutoAssets
+
+0.40 2017-02-02
+    - 'include' param now supports ScalarRef vals for direct content (VANSTYN)
+    - Split out inject logic to new ->_inject_single_asset_controller (VANSTYN)
+
+0.33 2015-08-27
+    - Now uses CSS::Scopifier::Group for scopify (VANSTYN) 
+
+0.32 2015-05-08
+    - Switch to Chained controller actions - PR #5 (GETTY)
+
+0.31 2015-02-12
+    - Image/Icon asset types now include *.svg files (PR #4)
+
+0.30 2014-12-09
+    - Optional handling for $c->mount_url (RapidApp-only feature)
+
+0.29 2014-06-17
+    - More fixes for Win32 compatibility
+
+0.28 2014-06-06
+    - Changed locking code to be cross-platform (flock) and more
+      robust by using a scoped lock object
+
+0.27 2014-05-26
+    - Fixed bug in detecting changes to directory asset subfiles
+
+0.26 2014-05-13
+    - Log messages now suppressed in the same manner as Static::Simple
+
+0.25 2014-04-23
+    - Built asset messages now only log in debug mode
+
+0.24 2013-07-24
+    - Added Changes file, following the format in CPAN::Changes::Spec
+    - CSS::Scopifier/CSS::Tiny errors now fatal
+    - Requires CSS::Scopifier 0.02

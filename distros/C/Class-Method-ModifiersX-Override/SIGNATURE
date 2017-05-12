@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79019549e00302beef7ee51007762cb0c17e8739 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 adc336d4fc5f32e36634a457270eec52ceb41c7c Changes
+SHA1 1df0f284f5d1407d3d0258ab5e67a9eec482afd2 INSTALL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 9ebf75c759c3f63486e96f0d20b8fff43d4c29bc MANIFEST
+SHA1 f0fe0cfb1299f8c692ed85c97d5c324efc679117 META.json
+SHA1 333758bb8e46c845b7d3106499081be89acd6e01 META.yml
+SHA1 7782e3b690eae62f29364565042ef57cdb2a5b21 Makefile.PL
+SHA1 ceafc6968f17d48211afdf2e865a3799823857f5 README
+SHA1 184182a2dba29f1251312cd933b4aa168e30b1de dist.ini
+SHA1 cde250507736f27cd39ef81023f9039abd15a400 doap.ttl
+SHA1 6e9ab0bb7c974b8d13f3d447a4db873c0a5eb370 lib/Class/Method/ModifiersX/Override.pm
+SHA1 23e04a7314750748feb68a1fb54adfb287f180de lib/MooX/Override.pm
+SHA1 b7547d4523039368963c8a3d220f3caa1ca6ddbb lib/Role/TinyX/Override.pm
+SHA1 b967f7f613cfa246a105b020ded65a4722fee175 t/01basic.t
+SHA1 aa93b6a50febc5296b4a28b94d3e06f9419ecc82 t/02works.t
+SHA1 64554dd737fb6a3df57ee1461ed4fadc59fcf211 t/03twice.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAliZz9EACgkQzr+BKGoqfTnQ5QCdGIbBwd4CL1wDIjKQQM0YTnmN
+mOAAn3ckPINFBPYXoQx+QnZJ2kQb/1Q2
+=bCK4
+-----END PGP SIGNATURE-----

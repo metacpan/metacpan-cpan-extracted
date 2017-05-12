@@ -1,0 +1,10 @@
+[pWiki] will handle the following file types :
+
+| extension | formatting rule |
+| .html | hyper_text |
+| .text | preformatted_text |
+| .wiki | wiki_formatted_text |
+| .xml | xslt_formatted_text |
+| .pod | pod2html_formatted_text |
+
+Not all file type are enabled at every virtual host.

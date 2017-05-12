@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 79
+    - 126
+  53055:
+    - 242
+name: ddcb7e
+registers:
+  AF: 39461
+  AF_: 0
+  BC: 12142
+  BC_: 0
+  DE: 3341
+  DE_: 0
+  HL: 43071
+  HL_: 0
+  I: 0
+  IX: 52976
+  IY: 35861
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,269 @@
+Revision history for Complete-Bash
+
+0.31    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.30    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Moving spec prereq from DevelopRecommends to
+	  DevelopSuggests with _SPEC:: prefix.
+
+
+0.29    2016-12-25 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to remove extraneous dependencies.
+
+
+0.28    2016-09-27 (PERLANCAR)
+
+        - [Bugfix] Fix join_wordbreak_words() [GH#3]. Thanks Mary Ehlers.
+
+
+0.27    2016-02-03 (PERLANCAR)
+
+	- Add join_wordbreak_words().
+
+
+0.26    2016-02-02 (PERLANCAR)
+
+        - [Incompatible change] Split the rest of the word-breaking characters
+          like bash.
+
+        - [Removed] Move parse_options() to Complete-Bash-History because it's
+          not generic enough to be in Complete::Bash.
+
+
+0.25    2016-01-21 (PERLANCAR)
+
+	- [Bugfix] Off-by-one error was still present when current word is not
+          the last word.
+
+        - Add utility routine: point().
+
+
+0.24    2015-12-30 (PERLANCAR)
+
+	- [Bugfix] Fix off-by-one error when truncate_current_word=1.
+
+
+0.23    2015-12-30 (PERLANCAR)
+
+	- To prevent unnecessary breakages, make the previous change
+	  (truncating current word) into a non-default behavior, activated
+	  by passing truncate_current_word=>1 option to parse_cmdline().
+
+
+0.22    2015-12-30 (PERLANCAR)
+
+	- [ux][experimental] Truncate current word to the position of
+	  cursor, so completing something like (^ marks the position of
+	  cursor) --vers^oo is regarded as --vers instead of --versoo, thus
+	  more convenient.
+
+
+0.21    2015-09-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.20    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.19    2015-04-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Skip tests on platforms that do not implement getpwuid [CT].
+
+
+0.18    2015-03-31 (PERLANCAR)
+
+        - [Internal] Reimplement parse_cmdline() using regex instead of C-like
+          char-by-char parsing.
+
+        - [Removed feature] Remove option/parameter 'preserve_quotes' and
+          'word_breaks' because they are never used in my applications/other
+          libraries (and they complicate the new regex-based parsing
+          implementation). Extra word-breaking character used is always '=' and
+          that is now the behavior.
+
+        - [ux] Variable syntaxes in word in parse_cmdline() (like
+          '$HOME/foo.txt') are now substituted with variable values from
+          environment variables, except for the current word. Similarly, tildes
+          like '~/todo.txt' is now replaced with user home directory except for
+          the current word. This makes completing a command like this works:
+          'list-org-todos ~/organizer/todo.org --has-tags <tab>' (the
+          applications now see the tildes already expanded so they do not have
+          to parse it themselves).
+
+
+0.17    2015-03-04 (PERLANCAR)
+
+	- Change escmode to esc_mode (Complete 0.12), but old key is still
+	  supported (though undocumented).
+
+
+0.16    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.15    2014-12-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid PAUSE false positive misinterpreting 'package name' as
+	  statement (well, PAUSE is rather liberal with the regex, isn't
+	  it?).
+
+
+0.14    2014-12-29 (PERLANCAR)
+
+        - Add workaround for annoyance when completing word that contains ':'
+          (like Perl package/module names) in bash, due ':' being a
+          word-breaking character in bash.
+
+
+0.13    2014-11-30 (PERLANCAR)
+
+        - Add function: parse_options().
+
+
+0.12    2014-11-28 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Comply to Complete 0.04, change 'completion' key in hash-form
+          completion answer structure to 'words', and accept each word as
+          hashref (to allow for things like fish shell which can have a
+          'description' instead of just 'word' for each entry).
+
+
+0.11    2014-07-26 (SHARYANTO)
+
+        - [tweak] format_completion(): Don't escape '~'.
+
+
+0.10    2014-07-25 (SHARYANTO)
+
+        - No functional changes.
+
+        - Add documentation about new parse_cmdline() not stripping first word,
+          and thus some client code will need to shift @$words + $cword--.
+
+
+0.09    2014-07-25 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change algorithm to mimic bash more closely. Remove
+          break_cmdline_into_words() and merge the code into parse_cmdline().
+          Now does not strip first word, because bash also does not in
+          COMP_WORDS. Now 'cmd foo ^ bar' works (becomes ['cmd', 'foo', '',
+          'bar']. In short, parse_cmdline() should [be able to] produce the
+          equivalent of bash's COMP_WORDS and COMP_CWORD.
+
+        - parse_cmdline(): Add option to preserve quotes, like bash. For
+          example, 'cmd "foo bar"' becomes ['cmd', '"foo bar"']. Although this
+          is not enabled by default.
+
+
+0.08    2014-07-23 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - break_cmdline_into_words() now injects word-breaking characters into
+          the words array, to follow bash more closely. For example,
+          break_cmdline_into_words('--foo 1 --bar=2', ':=') now results in
+          [qw/--foo 1 --bar = 2/].
+
+
+0.07    2014-07-22 (SHARYANTO)
+
+        - No functional changes.
+
+        - Rebuild to fix rendering examples.
+
+
+0.06    2014-07-19 (SHARYANTO)
+
+        [REMOVED FEATURES]
+
+        - Remove mimic_dir_completion(). Functionality is now moved into
+          format_completion().
+
+        [INCOMPATIBLE CHANGES]
+
+        - format_completion(): remove 'is_path' key (setting 'path_sep'
+          automatically enables path mode), rename 'type' to 'escmode' (rename
+          escape mode 'env' to 'shellvar', add 'default' and 'none' modes).
+
+        [ENHANCEMENTS]
+
+        - format_completion(): Recognize key 'as' to return completion as array.
+          Useful for using under Term::ReadLine (e.g. in App::riap).
+
+        [DOCUMENTATION]
+
+        - Explain more about path mode.
+
+
+0.05    2014-07-18 (SHARYANTO)
+
+        - No functional changes.
+
+        - Update Rinci metadata, rebuild POD.
+
+
+0.04    2014-07-18 (SHARYANTO)
+
+        - Add examples for parse_cmdline().
+
+        [INCOMPATIBLE CHANGES]
+
+        - Return 2-element arrayref instead of 2-element list (in general, I
+          want to avoid returning list for better interop with Rinci).
+
+
+0.03    2014-07-18 (SHARYANTO)
+
+        - Forgot to add 'word_breaks' argument to parse_cmdline().
+
+
+0.02    2014-07-17 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Add error message if COMP_LINE is not set.
+
+        - Add argument 'word_breaks' to allow breaking at other characters, like
+          bash's COMP_WORDBREAKS.
+
+
+0.01    2014-07-02 (SHARYANTO)
+
+        - First release, extracted from Complete-Util. format_completion() is
+          from Complete::Util's format_shell_completion() but can also accept
+          array instead of hash. parse_cmdline() is from Complete::Util's
+          parse_shell_cmdline() but with a different return value.

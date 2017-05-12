@@ -1,0 +1,35 @@
+Revision history for CPAN-Testers
+=================================
+
+0.07    2015-03-21
+        - fixed duplicate key 'build_requires' RT#102876 (thanks Andreas).
+
+0.06    2014-09-06
+        - fixed license fields in META.json to be lists.
+        - extended test suite.
+
+0.05    2014-04-11
+        - documentation updates.
+        - added LICENSE file.
+        - added git repo links.
+
+0.04    2012-09-26
+        - change file dates changed to meet W3CDTF standards.
+        - reworked Makefile.PL for clarity.
+        - reworked META.yml
+        - added META.json
+        - reworked and added to the test suite
+        - more presentations
+        - added CPAN-Testers-Eco-System.jpg example image.
+
+0.03    2010-11-08
+        - Text updated to include the Metabase and various CT2.0 changes. 
+        - Diagram updated to correctly reflect the flow from test to website.
+        - Extended list of websites and mailing lists. 
+        - Fixed website URLs.
+
+0.02    2007-08-12T16:00:00 EDT
+        - Incorporating documentation changes per Barbie and David Golden
+
+0.01    2007-08-12T06:00:00 EDT
+        - Namespace placeholder for the CPAN Testers

@@ -1,0 +1,539 @@
+From perl5-porters@perl.org  Thu Apr 25 13:56:41 2002
+Received: (qmail 304 invoked by uid 76); 25 Apr 2002 13:57:08 -0000
+Received: from smtpzilla2.xs4all.nl (HELO smtpzilla2.xs4all.nl) (194.109.127.138)
+   by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 13:57:08 2002 -0000
+Received: from procura.nl (procura.xs4all.nl [213.84.163.145])
+        by smtpzilla2.xs4all.nl (8.12.0/8.12.0) with SMTP id g3PDuwfj033337;
+        Thu, 25 Apr 2002 15:56:59 +0200 (CEST)
+Received: from PC09 ([192.0.1.19]) by procura.nl
+           with SMTP (Mailtraq/2.0.0.1258) id PRCRAF9794C0;
+           Thu, 25 Apr 2002 15:56:41 +0200
+Date: Thu, 25 Apr 2002 15:56:41 +0200
+To: Jarkko Hietaniemi <jhi@iki.fi>
+Subject: Recent smokes for Solaris, irix and linux
+Cc: Perl 5 Porters <perl5-porters@perl.org>
+Message-ID: <20020425155447.CC0D.H.M.BRAND@hccnet.nl>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------_3CC80AA7CC47028B0158_MULTIPART_MIXED_"
+Content-Transfer-Encoding: 7bit
+From: h.m.brand@hccnet.nl ("H.Merijn Brand")
+X-Hops: 1
+X-Mailer: Becky! ver. 2.05 (beta1)
+Delivered-To: mailing list perl5-porters@perl.org
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Newsgroups: perl.perl5.porters
+Path: nntp.perl.org
+Return-Path: <h.m.brand@hccnet.nl>
+Xref: nntp.perl.org perl.perl5.porters:57783
+X-JNN-List-Post: <mailto:perl5-porters@perl.org>
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl5.porters:57783
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Here are three very recent smokes from the other Merijn, for those that do not
+follow the smoke list
+
+And one from a rater fresh smoker named krokodile :)
+
+--
+H.Merijn Brand        Amsterdam Perl Mongers (http://amsterdam.pm.org/)
+using perl-5.6.1, 5.7.3 & 631 on HP-UX 10.20 & 11.00, AIX 4.2, AIX 4.3,
+  WinNT 4, Win2K pro & WinCE 2.11.  Smoking perl CORE: smokers@perl.org
+http://archives.develooper.com/daily-build@perl.org/   perl-qa@perl.org
+send smoke reports to: smokers-reports@perl.org, QA: http://qa.perl.org
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 16126 solaris 2.5.1
+
+From daily-build-reports-return-646-h.m.brand=hccnet.nl@perl.org  Thu Apr 25 14: 38:53 2002
+Return-Path: <daily-build-reports-return-646-h.m.brand=hccnet.nl@perl.org>
+Received: from onion.perl.org by deliver.hccnet.nl via onion.valueclick.com [209.85.157.220] with SMTP for <h.m.brand@hccnet.nl> id OAA24060 (8.8.8/1.13); Thu, 25 A
+pr 2002 14:38:52 +0200 (MET DST)
+Received: (qmail 55222 invoked by uid 1005); 25 Apr 2002 12:38:51 -0000
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:daily-build-reports@perl.org>
+List-Help: <mailto:daily-build-reports-help@perl.org>
+List-Unsubscribe: <mailto:daily-build-reports-unsubscribe@perl.org>
+List-Subscribe: <mailto:daily-build-reports-subscribe@perl.org>
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 55207 invoked by uid 1005); 25 Apr 2002 12:38:50 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 55203 invoked by uid 76); 25 Apr 2002 12:38:50 -0000
+Received: from hqvsbh2.ms.com (HELO hqvsbh2.ms.com) (205.228.12.104) by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 12:38:50 2002 -0000
+Received: from hqvsbh2.ms.com (localhost [127.0.0.1]) by localhost.ms.com (Postfix) with SMTP id A0C45DA1D for <smokers-reports@perl.org>; Thu, 25 Apr 2002 08:38:48
+ -0400 (EDT)
+Received: from cwsmh1.ms.com (unknown [138.20.13.27]) by hqvsbh2.ms.com (internal Postfix) with ESMTP id 402F4DA53 for <smokers-reports@perl.org>; Thu, 25 Apr 2002
+08:38:48 -0400 (EDT)
+Received: from cwit315.morgan.com (cwit315.morgan.com [172.16.200.156]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id NAA13454 for <smokers-reports@perl.org
+>; Thu, 25 Apr 2002 13:38:47 +0100 (BST)
+Received: (merijnb@localhost) by cwit315.morgan.com (8.8.5/sendmail.cf.client v1.05) id NAA11573 for smokers-reports@perl.org; Thu, 25 Apr 2002 13:38:47 +0100 (BST)
+Resent-Message-Id: <200204251238.NAA11573@cwit315.morgan.com>
+Received: from sasmh1.morgan.com (sasmh1.morgan.com [144.14.19.186]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id NAA19239 for <merijnb@cwsmh1>; Thu, 25 Ap
+r 2002 13:06:21 +0100 (BST)
+Received: (from root@localhost) by sasmh1.morgan.com (8.8.5/hub+ldap v2.4) with X.500 id IAA08373 for merijnb@cwsmh1.ms.com; Thu, 25 Apr 2002 08:06:21 -0400 (EDT)
+Received: from sascs1.morgan.com (sascs1.morgan.com [144.14.154.174]) by sasmh1.morgan.com (8.8.5/hub+ldap v2.4) with ESMTP id IAA08369 for <merijn.broeren@morganst
+anley.com>; Thu, 25 Apr 2002 08:06:20 -0400 (EDT)
+Received: (merijnb@localhost) by sascs1.morgan.com (8.8.5/sendmail.cf.client v1.05) id IAA06170; Thu, 25 Apr 2002 08:06:20 -0400 (EDT)
+Date: Thu, 25 Apr 2002 08:06:20 -0400 (EDT)
+Message-Id: <200204251206.IAA06170@sascs1.morgan.com>
+To: merijn.broeren@morganstanley.com
+From: Merijn.Broeren@morganstanley.com
+Subject: Smoke 16126 solaris 2.5.1
+Resent-From: merijnb@ms.com
+Resent-Date: Thu, 25 Apr 2002 13:38:47 +0100
+Resent-To: Smoke Reports <smokers-reports@perl.org>
+X-UIDL: ecd8aaf4b06682176507df25e76d02c9
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 16126 on solaris - 2.5.1
+uname -a = [SunOS 5.5.1 Generic_103640-34 sun4u sparc SUNW,Ultra-Enterprise]
+          v1.11      using cc version
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+F F F F -Dafsroot="/ms" -Uuseperlio
+F F F F -Dafsroot="/ms" -Duseperlio
+F F F F -Dafsroot="/ms" -Duseperlio -Duse64bitint
+c c c c -Dafsroot="/ms" -Duseperlio -Duse64bitall
+F F F F -Dafsroot="/ms" -Duseperlio -Duselongdouble
+F F F F -Dafsroot="/ms" -Duseperlio -Dusemorebits
+c c c c -Dafsroot="/ms" -Duseperlio -Duse64bitall -Duselongdouble
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+c c c c -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+c c c c -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall -Duselongdouble
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Failures:
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Uuseperlio
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Uuseperlio
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio
+    lib/locale..........................FAILED at test 99
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Duse64bitint
+    ext/Encode/t/fallback...............FAILED at test 14
+    lib/locale..........................FAILED at test 99
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio -Duselongdouble
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Duselongdouble
+    lib/locale..........................FAILED at test 99
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio -Dusemorebits
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Dusemorebits
+    ext/Encode/t/fallback...............FAILED at test 14
+    lib/locale..........................FAILED at test 99
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio
+    lib/locale..........................FAILED at test 99
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+    ext/Encode/t/fallback...............FAILED at test 14
+    lib/locale..........................FAILED at test 99
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+    lib/locale..........................FAILED at test 99
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+    ext/Encode/t/fallback...............FAILED at test 14
+    lib/locale..........................FAILED at test 99
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 16126 solaris 2.7
+
+From daily-build-reports-return-647-h.m.brand=hccnet.nl@perl.org  Thu Apr 25 14: 39:03 2002
+Return-Path: <daily-build-reports-return-647-h.m.brand=hccnet.nl@perl.org>
+Received: from onion.perl.org by deliver.hccnet.nl via onion.valueclick.com [209.85.157.220] with SMTP for <h.m.brand@hccnet.nl> id OAA24188 (8.8.8/1.13); Thu, 25 A
+pr 2002 14:39:02 +0200 (MET DST)
+Received: (qmail 55287 invoked by uid 1005); 25 Apr 2002 12:39:01 -0000
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:daily-build-reports@perl.org>
+List-Help: <mailto:daily-build-reports-help@perl.org>
+List-Unsubscribe: <mailto:daily-build-reports-unsubscribe@perl.org>
+List-Subscribe: <mailto:daily-build-reports-subscribe@perl.org>
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 55261 invoked by uid 1005); 25 Apr 2002 12:39:01 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 55241 invoked by uid 76); 25 Apr 2002 12:38:54 -0000
+Received: from hqvsbh1-x0.ms.com (HELO hqvsbh1.ms.com) (205.228.12.101) by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 12:38:54 2002 -0000
+Received: from hqvsbh1.ms.com (localhost [127.0.0.1]) by localhost.ms.com (Postfix) with SMTP id 460BA2084E for <smokers-reports@perl.org>; Thu, 25 Apr 2002 08:38:5
+2 -0400 (EDT)
+Received: from cwsmh1.ms.com (unknown [138.20.13.27]) by hqvsbh1.ms.com (internal Postfix) with ESMTP id DBAF02021E for <smokers-reports@perl.org>; Thu, 25 Apr 2002
+ 08:38:51 -0400 (EDT)
+Received: from cwit315.morgan.com (cwit315.morgan.com [172.16.200.156]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id NAA13500 for <smokers-reports@perl.org
+>; Thu, 25 Apr 2002 13:38:51 +0100 (BST)
+Received: (merijnb@localhost) by cwit315.morgan.com (8.8.5/sendmail.cf.client v1.05) id NAA11577 for smokers-reports@perl.org; Thu, 25 Apr 2002 13:38:51 +0100 (BST)
+Resent-Message-Id: <200204251238.NAA11577@cwit315.morgan.com>
+Received: from sasmh3.ms.com (sasmh3.morgan.com [144.14.193.98]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id HAA02084 for <merijnb@cwsmh1>; Thu, 25 Apr 20
+02 07:18:15 +0100 (BST)
+Received: (from root@localhost) by sasmh3.ms.com (8.8.5/imap+ldap v2.4) with X.500 id CAA21310 for merijnb@cwsmh1.ms.com; Thu, 25 Apr 2002 02:18:15 -0400 (EDT)
+Received: from sascs5.morgan.com (sascs5.morgan.com [144.14.193.96]) by sasmh3.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id CAA21304 for <merijn.broeren@morganstanle
+y.com>; Thu, 25 Apr 2002 02:18:15 -0400 (EDT)
+Received: (merijnb@localhost) by sascs5.morgan.com (8.8.5/sendmail.cf.client v1.05) id CAA15649; Thu, 25 Apr 2002 02:18:15 -0400 (EDT)
+Date: Thu, 25 Apr 2002 02:18:15 -0400 (EDT)
+Message-Id: <200204250618.CAA15649@sascs5.morgan.com>
+To: merijn.broeren@morganstanley.com
+From: Merijn.Broeren@morganstanley.com
+Subject: Smoke 16126 solaris 2.7
+Resent-From: merijnb@ms.com
+Resent-Date: Thu, 25 Apr 2002 13:38:51 +0100
+Resent-To: Smoke Reports <smokers-reports@perl.org>
+X-UIDL: 0a105644122baf8007296c91b9cb9c9b
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 16126 on solaris - 2.7
+uname -a = [SunOS 5.7 Generic_106541-14 sun4u sparc SUNW,Ultra-Enterprise]
+          v1.11      using cc version
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+O O O O -Dafsroot="/ms" -Uuseperlio
+O O O O -Dafsroot="/ms" -Duseperlio
+F F F F -Dafsroot="/ms" -Duseperlio -Duse64bitint
+c c c c -Dafsroot="/ms" -Duseperlio -Duse64bitall
+O O O O -Dafsroot="/ms" -Duseperlio -Duselongdouble
+F F F F -Dafsroot="/ms" -Duseperlio -Dusemorebits
+c c c c -Dafsroot="/ms" -Duseperlio -Duse64bitall -Duselongdouble
+O O O F -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+O O O O -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+c c c c -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall
+O O O O -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+F F F F -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+c c c c -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall -Duselongdouble
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Failures:
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -Dafsroot="/ms" -Duseperlio -Dusemorebits
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Dusemorebits
+    ext/Encode/t/fallback...............FAILED at test 14
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+solaris      perlio           -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+    ext/threads/t/thread................FAILED at test 14
+/ext/threads/t/thread....Test output counter mismatch [test 15]LED test 14
+
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+solaris      stdio/perlio     -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+solaris      stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+    ext/Encode/t/fallback...............FAILED at test 14
+/ext/Encode/t/fallback....dubiousD. FAILED test 14
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 16126 irix 6.5
+
+From daily-build-reports-return-648-h.m.brand=hccnet.nl@perl.org  Thu Apr 25 14: 39:03 2002
+Return-Path: <daily-build-reports-return-648-h.m.brand=hccnet.nl@perl.org>
+Received: from onion.perl.org by deliver.hccnet.nl via onion.valueclick.com [209.85.157.220] with SMTP for <h.m.brand@hccnet.nl> id OAA24189 (8.8.8/1.13); Thu, 25 A
+pr 2002 14:39:02 +0200 (MET DST)
+Received: (qmail 55309 invoked by uid 1005); 25 Apr 2002 12:39:01 -0000
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:daily-build-reports@perl.org>
+List-Help: <mailto:daily-build-reports-help@perl.org>
+List-Unsubscribe: <mailto:daily-build-reports-unsubscribe@perl.org>
+List-Subscribe: <mailto:daily-build-reports-subscribe@perl.org>
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 55264 invoked by uid 1005); 25 Apr 2002 12:39:01 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 55248 invoked by uid 76); 25 Apr 2002 12:38:57 -0000
+Received: from hqvsbh1-x0.ms.com (HELO hqvsbh1.ms.com) (205.228.12.101) by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 12:38:57 2002 -0000
+Received: from hqvsbh1.ms.com (localhost [127.0.0.1]) by localhost.ms.com (Postfix) with SMTP id 0718E215AF for <smokers-reports@perl.org>; Thu, 25 Apr 2002 08:38:5
+6 -0400 (EDT)
+Received: from cwsmh1.ms.com (unknown [138.20.13.27]) by hqvsbh1.ms.com (internal Postfix) with ESMTP id 9A39821638 for <smokers-reports@perl.org>; Thu, 25 Apr 2002
+ 08:38:55 -0400 (EDT)
+Received: from cwit315.morgan.com (cwit315.morgan.com [172.16.200.156]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id NAA13556 for <smokers-reports@perl.org
+>; Thu, 25 Apr 2002 13:38:55 +0100 (BST)
+Received: (merijnb@localhost) by cwit315.morgan.com (8.8.5/sendmail.cf.client v1.05) id NAA11581 for smokers-reports@perl.org; Thu, 25 Apr 2002 13:38:55 +0100 (BST)
+Resent-Message-Id: <200204251238.NAA11581@cwit315.morgan.com>
+Received: from hqfid1.morgan.com (hqfid1.morgan.com [144.14.36.134]) by cwsmh1.ms.com (8.8.5/imap+ldap v2.4) with ESMTP id EAA21137 for <merijnb@cwsmh1>; Thu, 25 Ap
+r 2002 04:57:18 +0100 (BST)
+Received: (from root@localhost) by hqfid1.morgan.com (8.8.5/hub+ldap v2.4) with X.500 id XAA02728 for merijnb@cwsmh1.ms.com; Wed, 24 Apr 2002 23:57:17 -0400 (EDT)
+Received: from sgytje.morgan.com (sgytje.morgan.com [144.14.166.199]) by hqfid1.morgan.com (8.8.5/hub+ldap v2.4) with ESMTP id XAA02724 for <merijn.broeren@morganst
+anley.com>; Wed, 24 Apr 2002 23:57:17 -0400 (EDT)
+Received: (merijnb@localhost) by sgytje.morgan.com (8.8.5/sendmail.cf.client v1.05) id DAA327978; Thu, 25 Apr 2002 03:57:16 GMT
+Date: Thu, 25 Apr 2002 03:57:16 GMT
+Message-Id: <200204250357.DAA327978@sgytje.morgan.com>
+To: merijn.broeren@morganstanley.com
+From: Merijn.Broeren@morganstanley.com
+Subject: Smoke 16126 irix 6.5
+Resent-From: merijnb@ms.com
+Resent-Date: Thu, 25 Apr 2002 13:38:55 +0100
+Resent-To: Smoke Reports <smokers-reports@perl.org>
+X-UIDL: fa02c97d296fcd83ac2a749f96cc5922
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 16126 on irix - 6.5
+uname -a = [IRIX64 6.5 04131233 IP27]
+          v1.11      using cc -n32 -mips4 version
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+O O O O -Dafsroot="/ms" -Uuseperlio
+O O O O -Dafsroot="/ms" -Duseperlio
+O O O O -Dafsroot="/ms" -Duseperlio -Duse64bitint
+t t t t -Dafsroot="/ms" -Duseperlio -Duse64bitall
+F F F F -Dafsroot="/ms" -Duseperlio -Duselongdouble
+F F F F -Dafsroot="/ms" -Duseperlio -Dusemorebits
+t t F - -Dafsroot="/ms" -Duseperlio -Duse64bitall -Duselongdouble
+- - - - -Dafsroot="/ms" -Dusethreads -Duseithreads -Uuseperlio
+- - - - -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio
+- - - - -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitint
+t t t t -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall
+- - - - -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duselongdouble
+- - - - -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Dusemorebits
+- - t t -Dafsroot="/ms" -Dusethreads -Duseithreads -Duseperlio -Duse64bitall -Duselongdouble
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Failures:
+
+irix         stdio/perlio     -Dafsroot="/ms" -Duseperlio -Duselongdouble
+irix         stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Duselongdouble
+irix         stdio/perlio     -Dafsroot="/ms" -Duseperlio -Dusemorebits
+irix         stdio/perlio     -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Dusemorebits
+    t/op/sprintf........................FAILED at test 129
+
+irix         stdio            -DDEBUGGING -Dafsroot="/ms" -Duseperlio -Duse64bitall -Duselongdouble
+    t/op/sprintf........................FAILED at test 129
+    ext/Storable/t/canonical............FAILED at test 0
+    lib/ExtUtils/t/basic................FAILED at test 9
+    lib/Memoize/t/tie_storable..........FAILED at test 0
+    lib/warnings........................FAILED at test 261
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_
+Content-Type: message/rfc822
+Content-Description: Smoke 16127 linux 2.4.18 /home/kroepke/devel/smoke/perl-current
+
+From daily-build-reports-return-643-h.m.brand=hccnet.nl@perl.org  Wed Apr 24 22: 01:58 2002
+Return-Path: <daily-build-reports-return-643-h.m.brand=hccnet.nl@perl.org>
+Received: from onion.perl.org by deliver.hccnet.nl via onion.valueclick.com [209.85.157.220] with SMTP for <h.m.brand@hccnet.nl> id WAA13619 (8.8.8/1.13); Wed, 24 A
+pr 2002 22:01:57 +0200 (MET DST)
+Received: (qmail 89874 invoked by uid 1005); 24 Apr 2002 20:01:51 -0000
+Mailing-List: contact daily-build-reports-help@perl.org; run by ezmlm
+Precedence: bulk
+List-Post: <mailto:daily-build-reports@perl.org>
+List-Help: <mailto:daily-build-reports-help@perl.org>
+List-Unsubscribe: <mailto:daily-build-reports-unsubscribe@perl.org>
+List-Subscribe: <mailto:daily-build-reports-subscribe@perl.org>
+Delivered-To: mailing list daily-build-reports@perl.org
+Received: (qmail 89838 invoked by uid 1005); 24 Apr 2002 20:01:48 -0000
+Delivered-To: perlmail-smokers-reports@perl.org
+Received: (qmail 89834 invoked by uid 76); 24 Apr 2002 20:01:48 -0000
+Received: from go-out.mobile.de (HELO krokodil.mobile.intern) (212.12.52.41) by onion.perl.org (qpsmtpd/0.07) with SMTP; Wed Apr 24 20:01:48 2002 -0000
+Received: from kroepke by krokodil.mobile.intern with local (Exim 3.35 #1 (Debian)) id 170SyN-0001I1-00 for <smokers-reports@perl.org>; Wed, 24 Apr 2002 22:02:39 +0
+200
+To: smokers-reports@perl.org
+From: ...@krokodil.mobile.intern
+Subject: Smoke 16127 linux 2.4.18 /home/kroepke/devel/smoke/perl-current
+Message-Id: <E170SyN-0001I1-00@krokodil.mobile.intern>
+Sender: Kay Roepke <k.roepke@mobile.de>
+Date: Wed, 24 Apr 2002 22:02:39 +0200
+X-UIDL: 31d07ec69c1db315df73e732ed7976d2
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Automated smoke report for patch 16127 on linux - 2.4.18
+          v1.12      using gcc-3.0 version 3.0.4
+O = OK
+F = Failure(s), extended report at the bottom
+? = still running or test results not (yet) available
+Build failures during:       - = unknown
+    c = Configure, m = make, t = make test-prep
+
+         Configuration
+-------  --------------------------------------------------------------------
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Uuseperlio
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio
+F F F F -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bitint
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duselongdouble
+F F F F -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemorebits
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Uuseperlio
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio
+F F F F -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bitint
+O O O O -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duselongdouble
+F F F F -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemorebits
+| | | +- PERLIO = perlio -DDEBUGGING
+| | +--- PERLIO = stdio  -DDEBUGGING
+| +----- PERLIO = perlio
++------- PERLIO = stdio
+
+Failures:
+
+linux        stdio/perlio     -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bitint
+linux        stdio/perlio     -DDEBUGGING -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bitint
+linux        stdio/perlio     -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemorebits
+linux        stdio/perlio     -DDEBUGGING -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemorebits
+linux        stdio/perlio     -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bitint
+linux        stdio/perlio     -DDEBUGGING -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Duse64bit
+int
+linux        stdio/perlio     -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemorebits
+linux        stdio/perlio     -DDEBUGGING -Dcc='gcc-3.0' -Dcpp='cpp-3.0' -Dusethreads -Duseithreads -Dperladmin="kroepke@dolphin-services.de" -Duseperlio -Dusemoreb
+its
+    t/op/int............................FAILED at test 6
+/t/op/int....FAILED test 6
+
+--------_3CC80AA7CC47028B0158_MULTIPART_MIXED_--
+
+From perl5-porters@perl.org  Thu Apr 25 14:01:14 2002
+Received: (qmail 6717 invoked by uid 76); 25 Apr 2002 14:01:56 -0000
+Received: from mailgw5.gedas.de (HELO mailgw5.gedas.de) (139.1.44.13)
+   by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 14:01:56 2002 -0000
+Received: from mailgw5.gedas.de (localhost [127.0.0.1])
+        by mailgw5.gedas.de (8.9.3+Sun/8.9.3) with ESMTP id QAA29173
+        for <perl5-porters@perl.org>; Thu, 25 Apr 2002 16:01:23 +0200 (MET DST)
+Received: from blnsem05.de.gedas.vwg (blnsem05.gedas.de [139.1.84.49])
+        by mailgw5.gedas.de (8.9.3+Sun/8.9.3) with ESMTP id QAA29169
+        for <perl5-porters@perl.org>; Thu, 25 Apr 2002 16:01:23 +0200 (MET DST)
+Received: by blnsem05.de.gedas.vwg with Internet Mail Service (5.5.2653.19)
+        id <H4ADHV2D>; Thu, 25 Apr 2002 16:01:23 +0200
+Message-ID: <C9A98F2128EDD411B0920008C7B337A13DCC76@hamsem01.de.gedas.vwg>
+To: "'perl5-porters@perl.org'" <perl5-porters@perl.org>
+Subject: [PATCH] pp_ctl.c:pp_require
+Date: Thu, 25 Apr 2002 16:01:14 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="iso-8859-1"
+From: Philip.Newton@datenrevision.de ("Newton, Philip")
+X-Mailer: Internet Mail Service (5.5.2653.19)
+Delivered-To: mailing list perl5-porters@perl.org
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Newsgroups: perl.perl5.porters
+Path: nntp.perl.org
+Return-Path: <Philip.Newton@datenrevision.de>
+Xref: nntp.perl.org perl.perl5.porters:57784
+X-JNN-List-Post: <mailto:perl5-porters@perl.org>
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl5.porters:57784
+
+I found the error message caused when you specify, say 'require 5.6;', to be
+a little strange. Presumable the "did you mean" line was added later, but
+the spot where it was added is not the best IMO. Hence the enclosed patch.
+
+--- pp_ctl.c.orig       Sun Apr  7 16:20:55 2002
++++ pp_ctl.c    Thu Apr 25 13:59:54 2002
+@@ -2945,9 +2945,9 @@
+
+                /* help out with the "use 5.6" confusion */
+                if (sver == 0 && (rev > 5 || (rev == 5 && ver >= 100))) {
+-                   DIE(aTHX_ "Perl v%"UVuf".%"UVuf".%"UVuf" required--"
+-                       "this is only v%d.%d.%d, stopped"
+-                       " (did you mean v%"UVuf".%03"UVuf"?)",
++                   DIE(aTHX_ "Perl v%"UVuf".%"UVuf".%"UVuf" required"
++                       " (did you mean v%"UVuf".%03"UVuf"?)--"
++                       "this is only v%d.%d.%d, stopped",
+                        rev, ver, sver, PERL_REVISION, PERL_VERSION,
+                        PERL_SUBVERSION, rev, ver/100);
+                }
+End of patch.
+
+Cheers,
+--
+Philip Newton                  Philip.Newton@datenrevision.de
+datenrevision GmbH & Co. OHG      http://www.datenrevision.de
+a gedas company                         TEL +49-40-797 007-37
+Cuxhavener Str. 36, D-21149 Hamburg     FAX +49-40-797 007-10
+
+From perl5-porters@perl.org  Thu Apr 25 04:21:33 2002
+Received: (qmail 67476 invoked by uid 76); 25 Apr 2002 15:19:40 -0000
+Received: from [216.191.234.126] (HELO nssg.mitel.com) (216.191.234.126)
+   by onion.perl.org (qpsmtpd/0.07) with SMTP; Thu Apr 25 15:19:40 2002 -0000
+Received: (qmail 13211 invoked by uid 404); 25 Apr 2002 15:19:10 -0000
+Received: from schwern@pobox.com by tripe.nssg.mitel.com with qmail-scanner; 25/04/2002 11:19:09
+Received: from allspice-core.nssg.mitel.com (10.33.16.12, claiming to be "e-smith.com")
+        by tripe with SMTP id smtpdZdE8Zi; Thu, 25 Apr 2002 11:18:59 EDT
+Received: (qmail 23342 invoked by uid 8); 25 Apr 2002 15:18:58 -0000
+Received: from blackforestcake.nssg.mitel.com (10.33.15.125, claiming to be "hse-montreal-ppp106142.qc.sympatico.ca")
+        by allspice.nssg.mitel.com with SMTP id smtpdxikfDW; Thu, 25 Apr 2002 11:18:50 EDT
+Received: by hse-montreal-ppp106142.qc.sympatico.ca (Postfix, from userid 1000)
+        id 1E79083A1; Thu, 25 Apr 2002 00:21:33 -0400 (EDT)
+Date: Thu, 25 Apr 2002 00:21:33 -0400
+To: perl5-porters@perl.org
+Subject: unused attribute in Devel::DProf
+Message-ID: <20020425042132.GA26859@blackrider>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.3.28i
+From: schwern@pobox.com (Michael G Schwern)
+Delivered-To: mailing list perl5-porters@perl.org
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Newsgroups: perl.perl5.porters
+Path: nntp.perl.org
+Return-Path: <schwern@pobox.com>
+Xref: nntp.perl.org perl.perl5.porters:57788
+X-JNN-List-Post: <mailto:perl5-porters@perl.org>
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl5.porters:57788
+
+Just saw this go by:
+
+cc -c   -D_REENTRANT -D_GNU_SOURCE -DDEBUGGING -fno-strict-aliasing -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -g   -DVERSION=\"20000000.00_01\
+" -DXS_VERSION=\"20000000.00_01\" -fpic "-I../../.."  -DPERLDBf_NONAME=0x40 -DPERLDBf_GOTO=0x80 -DG_NODEBUG=32 -DPL_NEEDED DProf.c
+DProf.xs:97: warning: `unused' attribute ignored
+Running Mkbootstrap for Devel::DProf ()
+
+which is coming from:
+
+#ifdef PERL_IMPLICIT_CONTEXT
+#  define register
+    pTHX;
+#  undef register
+#endif
+
+
+--
+
+Michael G. Schwern   <schwern@pobox.com>    http://www.pobox.com/~schwern/
+Perl Quality Assurance      <perl-qa@perl.org>         Kwalitee Is Job One
+We have cornered the market on senselessness and have profited.

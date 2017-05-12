@@ -1,0 +1,25 @@
+0.1 - 15-06-2014
+	- Initial release.
+
+0.2 - 15-06-2014
+	- Added significantly more POD documentation.
+	- Added test-cases.
+
+0.3 - 16-06-2014
+	- Allow the caller to see hits via the `count` method.
+	- Fixed POD errors.
+	- Avoid overwriting configuration values that aren't specified.
+
+0.4 - 16-06-2014
+	- Fixed missing return statement, rendering the redirect broken.
+
+0.5 - 04-08-2014
+	- Minor POD formatting fixups.
+	- Ran POD through spell-checker.
+	- Default the Redis-key prefix to the Application class to avoid
+  	  collisions if you're running multiple applications on one host.
+        - Updated META.yml to specify build/run dependencies.
+
+0.6 - 05-08-2014
+	- Added explicit licences to the Makefile.PL and git mirror.
+	- Added minimum perl-version.

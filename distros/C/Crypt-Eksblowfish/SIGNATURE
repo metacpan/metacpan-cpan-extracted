@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1056e548e8fc802cf9e547d3a1ac86708c90f132 .cvsignore
+SHA1 e655960831df6355f525b51095559d95045da7b2 Build.PL
+SHA1 55c49c1b1043d82dd7784a8cdb0b2ee08d5068b4 Changes
+SHA1 7aed7cddf47ea2ad0d3f355851344a231d1f8c01 MANIFEST
+SHA1 7e2d0343f5cc744c28e988bbcde680b5a419afb4 META.json
+SHA1 7cf6de35cd0ee6241aa0a1b4a18df50859703f68 META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 5cfbb041c39258e6515e4df053f0e0e697cbd9bb README
+SHA1 1008eae74fc0ed04ffe262cf934bbe7ef3b56c18 lib/Crypt/.cvsignore
+SHA1 816c7b280b5756b9e4a91b53542218d90ae7bc4a lib/Crypt/Eksblowfish.pm
+SHA1 30385869643dbf1ae13cca68d242bbb26e507f7b lib/Crypt/Eksblowfish.xs
+SHA1 1e472a5263e35591c63e4924a1cd89782d6b24ce lib/Crypt/Eksblowfish/Bcrypt.pm
+SHA1 42896ef4a196e01a58b27bd7e0fc6b00bbe3218f lib/Crypt/Eksblowfish/Blowfish.pm
+SHA1 e5dc5f1779ab8852a9132d38d07ee047d9d68ef7 lib/Crypt/Eksblowfish/Family.pm
+SHA1 8ce83e9805152c826e23e00f0221728c68642948 lib/Crypt/Eksblowfish/Subkeyed.pm
+SHA1 37ea8bbe887befa6b2682fa88bf15a2dea6252b6 lib/Crypt/Eksblowfish/Uklblowfish.pm
+SHA1 fc61296b16be35687dfe8dc25868927ecbda5186 t/base64.t
+SHA1 2982289d98db3f0328f31e3a5e1ad49d3344fbff t/bcrypt.t
+SHA1 965c1c785b1e5c3ce0fa0d54cd65af72813e396d t/bcrypt_hash.t
+SHA1 85e1ac18310b6a0fa01b5d78dd4ead89c765fbf0 t/blowfish.t
+SHA1 a23c99f053c821c932513c8c9ef97da4cec4df28 t/eksblowfish.t
+SHA1 23077a7069fcb22dee7a8bde5f7de29bfa86e839 t/family.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 e609e4d8ea71964f400a8db6e3a02e9792c73677 t/subkey.t
+SHA1 e761a97727f8bf7238e5d8553f78575f8cc6d364 t/uklblowfish.t
+SHA1 7b673ca24bf62de6e7550aa7b19ed92e96dc0a78 t/utf8.t
+SHA1 7ad478ba2f46a8291fd098976ea1cebc39db5971 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk24d8IACgkQOV9mt2VyAVFYHQCdEsi0g7BAoO0rXXz93sZL2qfy
+Vo4AnjrlDqWl1g4QL40L+7tM/aPHe7sY
+=mEj6
+-----END PGP SIGNATURE-----

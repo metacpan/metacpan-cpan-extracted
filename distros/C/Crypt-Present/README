@@ -1,0 +1,47 @@
+Crypt-Present version 0.01
+==========================
+
+Present is a ultra lightweight block encryption and can use key sizes
+of 80 or 128 bit (10 or 16 byte key). It is developed for use in RFID
+hardware with minimum numer of cricuits.
+
+See for Algorithm authors:
+ PRESENT: An Ultra-Lightweight Block Cipher
+  A. Bogdanov1, L.R. Knudsen2 , G. Leander1 , C. Paar1, A. Poschmann1,
+     M.J.B. Robshaw3 , Y. Seurin3 , and C. Vikkelsoe2
+  1 Horst-Görtz-Institute for IT-Security, Ruhr-University Bochum, Germany
+  2 Technical University Denmark, DK-2800 Kgs. Lyngby, Denmark
+  3 France Telecom R&D, Issy les Moulineaux, France
+
+  leander@rub.de, {abogdanov,cpaar,poschmann}@crypto.rub.de
+                   lars@ramkilde.com, chv@mat.dtu.dk
+           {matt.robshaw,yannick.seurin}@orange-ftgroup.com
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  none
+
+COPYRIGHT AND LICENCE
+
+Copyright of this Perl implementation.
+All Rights reserved.
+
+Copyright (C) 2012 by Eduard Gode
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

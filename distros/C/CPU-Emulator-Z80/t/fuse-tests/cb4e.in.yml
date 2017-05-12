@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 78
+  44451:
+    - 91
+name: cb4e
+registers:
+  AF: 9728
+  AF_: 0
+  BC: 37383
+  BC_: 0
+  DE: 17818
+  DE_: 0
+  HL: 44451
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,55 @@
+[%
+    title = 'Merge Testers' ;
+
+    IF realm == 'admin' && !user.fakename ; THEN ; crumb2_name = 'Admin' ;
+    ELSE ; crumb2_name = 'Tester' ; END ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Merge Testers' ;
+
+    javascript = 1 ;
+%]
+
+[% INCLUDE "content/edit-tester.html" %]
+
+<p>Click on a distribution below to list the reports submitted for that distribution.</p>
+
+<form id="listform" method="POST" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-merge" />
+
+[% IF primary || secondary %]
+<table>
+<tr><th>Name</th><th>PAUSE</th><th>Status</th><th>Action</th></tr>
+[% FOREACH r = primary -%]
+<tr><td>[% r.name %]</td><td>[% r.pause %]</td><td class="PASS">Primary</td><td><button type="submit" value="[% r.testerid %]" name="remp">Remove</button><input type="hidden" name="PRIMARY" value="[% r.testerid %]"></td></tr>
+[% END -%]
+[% FOREACH r = secondary -%]
+<tr><td>[% r.name %]</td><td>[% r.pause %]</td><td class="NA">Secondary</td><td><button type="submit" value="[% r.testerid %]" name="rems">Remove</button><input type="hidden" name="SECONDARY" value="[% r.testerid %]"></td></tr>
+[% END -%]
+</table>
+
+[% IF primary && secondary %]
+<button type="submit" value="merge" name="merge">Merge Profiles</button><br /><br />
+[% END -%]
+
+[% END %]
+
+<p>Search by Name, PAUSE or Email: <input type="text" name="name" value="[% search %]" /> <input type="submit" value='GO!' /></p>
+
+[% IF results %]
+<table class="sortable">
+<tr>
+	<th><span class="sortheader">Name</span></th>
+	<th><span class="sortheader">PAUSE</span></th>
+  <th>Action</th>
+</tr>
+[% FOREACH r = results -%]
+<tr><td>[% r.name %]</td><td>[% r.pause %]</td>
+    <td><button type="submit" value="[% r.testerid %]" name="primary">Primary</button>
+        <button type="submit" value="[% r.testerid %]" name="secondary">Secondary</button>
+        <a href="javascript:void(0);" onclick="edit_tester([% r.testerid %],'[% r.name %]','[% r.pause %]')">Edit</a>
+    </td></tr>
+[% END -%]
+</table>
+[% END %]
+
+</form>

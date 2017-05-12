@@ -1,0 +1,31 @@
+Revision history for CGI-Application-Plugin-ValidateQuery
+
+1.0.4 December 31 2009
+    -Add validation support for app parameters
+
+1.0.3 October 21 2009
+    -Bugfixes for multivalued parameters from matt@summersault.com
+
+1.0.1 July 01 2009
+    -Doc update (from markstos)
+
+1.0 June 29 2009
+    -Renamed ignore_rest_p to extra_fields_optional and turned off by default
+    -Allowed global config'ing of extra_fields_optional
+    -added :types flag for more precise importing
+    -improved documentation
+
+0.99_4 June 26 2009
+    -Added query masking feature (ignore_rest_p flag)
+    -Now exporting Params::Validate types with :all tag
+    -General documentation updates, clean up
+
+0.99_3 June 8 2009
+    -Bugfix
+
+0.99_2  June 5 2009
+        No code changes, just removed some files accidentally added to dist
+
+0.99_1  June 4 2009
+        First version, developer release. 'Stable' and tested by author.
+

@@ -1,0 +1,22 @@
+0.06   26-01-11 10:38:00
+    Remove last reference to NEXT:: (caelum/agladish)
+
+0.05   08-05-09 15:12:26
+    Change from NEXT to MRO::Compat. Remove unneeded Class::Accessor::Fast
+    base classes (Chisel Wright)
+
+0.04
+    Memory Leak Fix - Matt S Trout
+
+0.03
+    Documentation: TT example used field.tag instead of field.field.
+    Documentation: clarify config should be in Controller not Application.
+    Documentation: modifying $form->field must happen before $form->validate.
+    Added source_type config option to define alternative source adapter class.
+    Instantiate CGI::FormBuilder::Source::File and call parse method directly.
+    Reset CGI::FormBuilder object after ACTION in case of $c->forward overwrites it.
+
+0.02   17-12-06 14:24:30
+    First working version
+    Add HTML::Template and Mason support
+    Rewrote Plugin::FormBuilder as Controller::FormBuilder base class

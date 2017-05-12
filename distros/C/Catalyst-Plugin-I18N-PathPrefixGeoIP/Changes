@@ -1,0 +1,35 @@
+Revision history for Catalyst-Plugin-LanguagePrefix
+
+0.10    2016-01-06 - 16_08:10 Runar Buvik
+    - Added missing file from cpan build.
+
+0.08	2015-10-13 19:15:00+0100 - Runar Buvik
+	- Support for redirecting users to url with language prefix if the language prefix is missing.
+
+0.07	2011-12-07 17:37:00+0100
+	- Removed requirement for the 'language' method.
+
+0.06	2011-12-06 18:27:00+0100
+	- Removed disclaimer about alpha quality.
+
+0.05	2011-11-26 12:30:00+0100
+	- Fixed a warning (RT 71568) that i couldn't reproduce, though.
+
+0.04	2011-05-05 23:49:00+0200
+	- Cleanup, refactoring, optimization.
+	- Added test for RT 67926. (The bug itself got fixed in the meantime.)
+
+0.03	2010-09-30 15:19:00+0200
+	- Fixed a bug: used to unnecessarily set $c->req->path to the wrong
+	  value when auto-detecting the language.
+	- Added a test for the request to '/'.
+	- "language_independent_paths" is not mandatory any more.
+	- Fixed how the valid language codes cache is stored.
+	- The "fallback_language" config option is now made lc in
+	  setup_finalize().
+
+0.02    2010-06-01 13:37:00+0200
+        - Removed non-ASCII chars from POD.
+
+0.01    2010-02-19 01:33:00+0100
+        - First version. We will see where it goes.

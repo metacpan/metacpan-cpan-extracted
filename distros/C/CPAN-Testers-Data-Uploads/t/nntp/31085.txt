@@ -1,0 +1,52 @@
+Newsgroups: perl.cpan.uploads
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.uploads:31085
+Return-Path: <root@pause.perl.org>
+Mailing-List: contact cpan-uploads-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-uploads@perl.org
+Received: (qmail 15318 invoked from network); 10 Sep 2009 18:19:34 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 10 Sep 2009 18:19:34 -0000
+Received: (qmail 10768 invoked by uid 225); 10 Sep 2009 18:19:34 -0000
+Delivered-To: cpan-uploads@perl.org
+Received: (qmail 10757 invoked by alias); 10 Sep 2009 18:19:32 -0000
+X-Spam-Status: No, hits=0.0 required=8.0
+	tests=
+X-Spam-Check-By: la.mx.develooper.com
+Received: from pause.fiz-chemie.de (HELO pause.perl.org) (195.149.117.110)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Thu, 10 Sep 2009 11:19:26 -0700
+Received: from pause.perl.org (localhost.localdomain [127.0.0.1])
+	by pause.perl.org (8.13.8/8.13.8/Debian-3) with ESMTP id n8AIJLHE005177;
+	Thu, 10 Sep 2009 20:19:21 +0200
+Received: (from root@localhost)
+	by pause.perl.org (8.13.8/8.13.8/Submit) id n8AIJLke005176;
+	Thu, 10 Sep 2009 20:19:21 +0200
+Date: Thu, 10 Sep 2009 20:19:21 +0200
+Message-ID: <200909101819.n8AIJLke005176@pause.perl.org>
+MIME-Version: 1.0
+Subject: CPAN Upload: I/IS/ISHIGAKI/Acme-CPANAuthors-Japanese-0.090911.tar.gz
+Content-Type: Text/Plain; Charset=UTF-8
+Reply-To: cpan-uploads@perl.org
+To: cpan-testers@perl.org, cpan-uploads@perl.org
+Content-Transfer-Encoding: 8bit
+Approved: news@nntp.perl.org
+From: upload@pause.perl.org (PAUSE)
+
+The uploaded file
+
+    Acme-CPANAuthors-Japanese-0.090911.tar.gz
+
+has entered CPAN as
+
+  file: $CPAN/authors/id/I/IS/ISHIGAKI/Acme-CPANAuthors-Japanese-0.090911.tar.gz
+  size: 6008 bytes
+   md5: e31be5ef5d1be9a38ddbb33f1a0e1abc
+
+No action is required on your part
+Request entered by: ISHIGAKI (Kenichi Ishigaki)
+Request entered on: Thu, 10 Sep 2009 18:18:41 GMT
+Request completed:  Thu, 10 Sep 2009 18:19:21 GMT
+
+Thanks,
+-- 
+paused, v1047

@@ -1,0 +1,705 @@
+NAME
+    CGI::Application::Plugin::Config::General - Add Config::General Support
+    to CGI::Application
+
+VERSION
+    Version 0.08
+
+NOTE
+    This module is obsolete and has now been superceded by
+    CGI::Application::Plugin::Config::Context.
+
+SYNOPSIS
+  Simple Access to Configuration
+    In your CGI::Application-based module:
+
+        use base 'CGI::Application';
+        use CGI::Application::Plugin::Config::General;
+
+        sub cgiapp_init {
+            my $self = shift;
+
+            # Set config file and other options
+            $self->conf->init(
+                -ConfigFile => 'app.conf',
+            );
+        }
+
+        sub my_run_mode {
+            my $self = shift;
+
+            # get entire configuration
+            my %conf = $self->conf->getall;
+
+            # get entire configuration (as a reference)
+            my $conf = $self->conf->getall;
+
+            # get single config parameter
+            my $value = $self->conf->param('some_value');
+
+            # get underlying Config::General::Match object
+            my $obj = $self->conf->obj;
+        }
+
+  Configuration Based on URL or Module
+    You can match a configuration section to the request URL, or to the
+    module name. For instance, given the following configuration file:
+
+        admin_area    = 0
+
+        <AppMatch ^MyApp::Admin>
+            admin_area = 1
+            title      = Admin Area
+        </AppMatch>
+
+        <Location /cgi-bin/feedback.cgi>
+            title      = Feedback Form
+        </Location>
+
+    The configuration will depend on how the script is called:
+
+        # URL:      /cgi-bin/feedback.cgi?rm=add
+        # Module:   MyApp::Feedback
+
+        print $self->conf->param('admin_area');  # 0
+        print $self->conf->param('title');       # 'Feedback Form'
+
+        # URL:      /cgi-bin/admin/users.cgi
+        # Module:   MyApp::Admin::Users
+
+        print $self->conf->param('admin_area');  # 1
+        print $self->conf->param('title');       # 'Admin Area'
+
+  Matching Configuration based on a Virtual Host
+    This module can also pick a configuration section based on the current
+    virtual-host:
+
+        # httpd.conf
+        <VirtualHost _default_:8080>
+            SetEnv SITE_NAME REDSITE
+        </VirtualHost>
+
+        # in app.conf
+        <Site BLUESITE>
+            background = blue
+            foreground = white
+        </Site>
+
+        <Site REDSITE>
+            background = red
+            foreground = pink
+        </Site>
+
+        <Site GREENSITE>
+            background = darkgreen
+            foreground = lightgreen
+        </Site>
+
+DESCRIPTION
+    This module allows you to easily access configuration data stored in
+    Config::General (i.e. Apache-style) config files.
+
+    You can also automatically match configuration sections to the request
+    URL, or to the module name. This is similar to how Apache dynamically
+    selects a configuration by matching the request URL to e.g. "<Location>"
+    and "<LocationMatch>" sections.
+
+    You can also select configuration sections based on Virtual Host or by a
+    variable you set in an ".htaccess" file. This allows you to share a
+    single application between many virtual hosts, each with its own unique
+    configuration. This could be useful, for instance, in providing multiple
+    themes for a single application.
+
+  Simple access to Configuration
+    This module provides a "conf" method to your CGI::Application object.
+    First, you initialize the configuration system (typically in your
+    "cgiapp_init" method):
+
+        $self->conf->init(
+            -ConfigFile => 'app.conf',
+        );
+
+    The configuration file is parsed at this point and is available from
+    this point on.
+
+    Then, within your run-modes you can retrieve configuration data:
+
+        # get entire configuration
+        my %conf = $self->conf->getall;
+        my $value = $conf{'some_value'};
+
+        # get entire configuration (as a reference)
+        my $conf = $self->conf->getall;
+        my $value = $conf->{'some_value'};
+
+        # get single config parameter
+        my $value = $self->conf->param('some_value');
+
+  Multiple named Configurations
+    You can use more than one configuration by providing a name to the
+    "conf" method:
+
+        $self->conf('database')->init(
+            -ConfigFile => 'app.conf',
+        );
+        $self->conf('application')->init(
+            -ConfigFile => 'app.conf',
+        );
+
+        ...
+
+        my %db_config  = $self->conf('database')->getall;
+        my %app_config = $self->conf('application')->getall;
+
+  Configuration based on URL or Module
+    Within your configuration file, you can provide different configurations
+    depending on the current URL, or on the package name of your
+    application.
+
+    <Site>
+        Matches against the "SITE_NAME" environment variable, using an
+        *exact* match.
+
+            # httpd.conf
+            <VirtualHost _default_:8080>
+                SetEnv SITE_NAME REDSITE
+            </VirtualHost>
+
+            # in app.conf
+            <Site BLUESITE>
+                background = blue
+                foreground = white
+            </Site>
+
+            <Site REDSITE>
+                background = red
+                foreground = pink
+            </Site>
+
+            <Site GREENSITE>
+                background = darkgreen
+                foreground = lightgreen
+            </Site>
+
+        You can use name your sections something other than "<Site>", and
+        you can use a different environment variable than "SITE_NAME". See
+        "Notes on Site Matching", below.
+
+    <App>
+        Matches the Package name of your application module, for instance:
+
+            <App ABC_Books::Admin>
+                ...
+            </App>
+
+        The match is performed hierachically, like a filesystem path, except
+        using "::" as a delimiter, instead of "/". The match is tied to the
+        beginning of the package name, just like absolute paths. For
+        instance, given the section:
+
+            <App Site::Admin>
+                ...
+            </App>
+
+        the packages "Site::Admin" and "Site::Admin::Users" would match, but
+        the packages "My::Site::Admin" and "Site::Administrative" would not.
+
+    <AppMatch>
+        Matches the package name of your application module, using a regular
+        expression. The expression is not tied to the start of the string.
+        For instance, given the section:
+
+            <AppMatch Site::Admin>
+                ...
+            </AppMatch>
+
+        The following packages would all match: "Site::Admin",
+        "Site::Admin::Users", "My::Site::Admin", "MySite::Admin",
+        "Site::Administrative".
+
+    <Location>
+        Matches hierarchically against the request URI, including the path
+        and the "PATH_INFO" components, but *excluding* the scheme, host,
+        port and query string.
+
+        So, for instance with the following URL:
+
+            http://bookstore.example.com/cgi-bin/category.cgi/fiction/?rm=list
+
+        The Location would be:
+
+            /cgi-bin/category.cgi/fiction/
+
+        Internally, the location is obtained by calling the "url" method of
+        the query object (which is usually either a CGI or CGI::Simple
+        object):
+
+            $path = $webapp->query->url('-absolute' => 1, '-path_info' => 1);
+
+    <LocationMatch>
+        Matches against the request URI, using a regular expression.
+
+  Section Merge Order
+    The sections are matched in the following order:
+
+        Site:         <Site>
+        Package Name: <App>      and <AppMatch>
+        URL:          <Location> and <LocationMatch>
+
+    When there is more than one matching section at the same level of
+    priority (e.g. two "<Location>" sections, or both an "<App>" and an
+    "<AppMatch>" section), then the sections are merged in the order of
+    shortest match first.
+
+    Values in sections matched later override the values in sections matched
+    earlier.
+
+    The idea is that the longer matches are more specific and should have
+    priority, and that URIs are more specific than Module names.
+
+  Section Nesting
+    The sections can be nested inside each other. For instance:
+
+        <Site BOOKSHOP>
+            <Location /admin>
+                admin_books = 1
+            </Location>
+        </Site>
+
+        <Location /admin>
+            <Site RECORDSHOP>
+                admin_records = 1
+            </Site>
+        </Location>
+
+        <App Bookshop::>
+            <App Admin::>
+            </App>
+        </App>
+
+    By default, the sections can be nested up to two levels deep. You can
+    change this by setting the -NestingDepth parameter to init.
+
+  Merging Configuration Values into your Template
+    You can easily pass values from your configuration files directly to
+    your templates. This allows you to associate HTML titles with URLs, or
+    keep text like copyright notices in your config file instead of your
+    templates:
+
+        copyright_notice    =  Copyright (C) 1492 Christopher Columbus
+
+        <Location /about>
+            title = "Manifest Destiny, Inc. -  About Us"
+        </Location>
+
+        <Location /contact>
+            title = "Manifest Destiny, Inc. - Contact Us"
+        </Location>
+
+    If you use HTML::Template, you use the associate method when you load
+    the template:
+
+        $self->load_template(
+            'template.tmpl',
+            'associate' => $self->conf,
+        );
+
+    If you use Template::Toolkit (via the CGI::Application::Plugin::TT
+    module), you can accomplish the same thing by providing a custom
+    tt_pre_process method:
+
+        sub tt_pre_process {
+            my $self            = shift;
+            my $template        = shift;
+            my $template_params = shift;
+
+            my $config = $self->conf->getall
+            foreach (keys %$config) {
+                unless (exists $template_params->{$_}) {
+                    $template_params->{$_} = $config->{$_};
+                }
+            }
+        }
+
+    *NOTE: If you plan to merge data directly from your config files to
+    your* *templates, you should consider keeping your database passwords
+    and other* *sensitive data in a separate configuration file, in order to
+    avoid* *accidentally leaking these data into your web pages.*
+
+METHODS
+  init
+    Initializes the plugin. The only required parameter is a config file:
+
+        $self->conf->init(
+            -ConfigFile => 'app.conf',
+        );
+
+    The other paramters are described below:
+
+    -ConfigFile
+        The path to the configuration file to be parsed.
+
+    -Options
+        Any additional Config::General::Match options. See the documentation
+        to Config::General and Config::General::Match for more details.
+
+    -CacheConfigFiles
+        Whether or not to cache configuration files. Enabled, by default.
+        This option is only really useful in a persistent environment such
+        as "mod_perl". See "Config File Caching" under "ADVANCED USAGE",
+        below.
+
+    -StatConfig
+        If config file caching is enabled, this option controls how often
+        the config files are checked to see if they have changed. The
+        default is 60 seconds. This option is only really useful in a
+        persistent environment such as "mod_perl". See "Config File Caching"
+        under "ADVANCED USAGE", below.
+
+    -SiteSectionName
+        Change the name of the "<Site>" section to something else. For
+        instance, to use sections named "<VirtualHost>", use:
+
+            -SiteSectionName => 'VirtualHost'
+
+    -SiteVar
+        Change the name of the "SITE_NAME" environment variable used to
+        match against "<Site>" sections. For instance To change this name to
+        "HTTP_HOST", use:
+
+            -SiteVar => 'HTTP_HOST',
+
+    -NestingDepth
+        The number of levels deep that sections can be nested. The default
+        is two levels deep.
+
+        See "Section Nesting", above.
+
+    You can initialize the plugin from within your instance CGI script:
+
+        my $app = WebApp->new();
+        $app->conf->init(-ConfigFile => '../../config/app.conf');
+        $app->run();
+
+    Or you can do so from within your "cgiapp_init" method within the
+    application:
+
+        sub cgiapp_init {
+            my $self = shift;
+            $self->conf->init(
+                -ConfigFile => "$ENV{DOCUMENT_ROOT}/../config/app.conf"
+            );
+        }
+
+  getall
+    Gets the entire configuration as a hash or hashref:
+
+        my %config = $self->conf->getall;  # as hash
+        my $config = $self->conf->getall;  # as hashref
+
+    Note that the following two method calls will return different results:
+
+        my %config = $self->conf->getall;       # parsed config
+        my %config = $self->conf->obj->getall;  # raw config
+
+    In the first case, the matching based on URI, Module, etc. has already
+    been performed. In the second case, you get the raw config with all of
+    the "<Location>", "<App>", etc. sections intact.
+
+  param
+    Allows you to retrieve individual values from the configuration.
+
+    It behvaves like the "param" method in other classes, such as CGI,
+    CGI::Application and HTML::Template:
+
+        $value      = $self->conf->param('some_key');
+        @all_keys   = $self->conf->param();
+
+  obj
+    Provides access to the underlying Config::General::Match object.
+
+    You can access the raw unparsed configuration data by calling
+
+        my $config = $self->conf->obj->getall;  # raw config
+
+    See the note under getall, above.
+
+    In future versions of this module, certain caching strategies may
+    prevent you from accessing the underlying Config::General::Match object
+    in certain situations.
+
+  get_current_config ($name)
+    This is a class method which returns the current configuration object.
+
+        my $conf = CGI::Application::Plugin::Config::General->get_current_config;
+        print $conf->{'title'};
+
+        my %db_conf = CGI::Application::Plugin::Config::General->get_current_config('db');
+        print $db_conf{'username'};
+
+    This method is most useful in situations where you don't have access to
+    the CGI::Application object, such within a Class::DBI class. See "Access
+    to Configuration information from another Class" for an example.
+
+    Note that get_current_config returns the configuration hash (or hashref)
+    directly, and does not give you access to the object itself. It is the
+    equivalent of calling "$self->conf->getall".
+
+ADVANCED USAGE
+  Usage in a Persistent Environment such as mod_perl
+    The following sections describe some notes about running this module
+    under mod_perl:
+
+   Config File Caching
+    By default each config file is read only once when the conf object is
+    first initialized. Thereafter, on each init, the cached config is used.
+
+    This means that in a persistent environment like mod_perl, the config
+    file is parsed on the first request, but not on subsequent requests.
+
+    If enough time has passed (sixty seconds by default) the config file is
+    checked to see if it has changed. If it has changed, then the file is
+    reread.
+
+    If you are using Config::General version 2.28 or greater, then you can
+    safely use the "include" feature of Config::General and all included
+    files will be checked for changes along with the main file.
+
+    To disable caching of config files pass a false value to the
+    -CacheConfigFiles parameter to init, e.g:
+
+        $self->conf->init(
+            -ConfigFile           => 'app.conf',
+            -CacheConfigFiles     => 0,
+        );
+
+    To change how often config files are checked for changes, change the
+    value of the -StatConfig paramter to init, e.g.:
+
+        $self->conf->init(
+            -ConfigFile => 'app.conf',
+            -StatConfig => 1, # check the config file every second
+        );
+
+    Internally the configuration cache is implemented by a hash, keyed by
+    the absolute path of the configuration file. This means that if you have
+    two web applications that use the same configuration file, they will use
+    the same cache.
+
+    This would only matter if you wanted to use different "Config::General"
+    or "Config::General::Match" options for different applications running
+    in the same process that use the same config file.
+
+   PerlSetVar instead of SetEnv
+    For a (slight) performance improvement, you can use "PerlSetVar" instead
+    of "SetEnv" within a "<VirtualHost>":
+
+        # httpd.conf
+        <VirtualHost _default_:8080>
+            PerlSetVar SITE_NAME REDSITE
+        </VirtualHost>
+
+  Notes on Site Matching
+   Renaming "<Site>" or "SITE_NAME"
+    Normally, the environment variable "SITE_NAME" is matched to "<Site>"
+    section.
+
+    You can change these with the -SiteSectionName and -SiteVar parameters
+    to init:
+
+        $self->conf->init(
+            -ConfigFile           => 'app.conf',
+            -SiteSectionName      => 'Host',
+            -SiteVar              => 'MY_HOST',
+        );
+
+    This will match the environment variable "MY_HOST" to the "<Host>"
+    section.
+
+   Setting "SITE_NAME" from an ".htaccess" file or the CGI script
+    Since "SITE_NAME" is just an environment variable, you can set it
+    anywhere you can set environment variables. For instance in an
+    ".htaccess" file:
+
+        # .htaccess
+        SetEnv SITE_NAME bookshop
+
+    Or even the calling CGI script:
+
+        #!/usr/bin/perl
+
+        use MySite::WebApp;
+
+        $ENV{'SITE_NAME'} = 'recordshop';
+        my $app = MySite::WebApp->new();
+        $app->run();
+
+  Access to Configuration information from another Class
+    You can also get at the current configuration settings from a completely
+    unrelated Perl module. This can be useful for instance if you need to
+    configure a set of Class::DBI classes, and you want them to be able to
+    pick up their configuration on their own. For instance:
+
+        # app.conf
+
+        <database>
+            connect_string = dbi:Pg:dbname=example
+            username       = test
+            password       = test
+
+            <options>
+                RaiseError = 1
+                AutoCommit = 1
+            </options>
+        </database>
+
+
+        # In your Class::DBI subclass
+        package My::Class::DBI::Base;
+        use base 'Class::DBI';
+
+        sub db_Main {
+
+            my $conf = CGI::Application::Plugin::Config::General->get_current_config;
+
+            my $dsn  = $conf->{'database'}{'connect_string'};
+            my $user = $conf->{'database'}{'username'};
+            my $pass = $conf->{'database'}{'password'};
+            my $opts = $conf->{'database'}{'options'};
+
+            return DBI->connect_cached($dsn, $user, $pass, $opts);
+        }
+
+    For this example to work, you need to make sure you call
+    "$self->conf->init" before you access the database through any of your
+    Class::DBI objects.
+
+    Note that get_current_config returns the configuration hash (or hashref)
+    directly, and does not give you access to the object itself. It is the
+    equivalent of calling "$self->conf->getall".
+
+  Changing Parsing Behaviour Using Custom -MatchSections
+    Internally, this module uses Config::General and Config::General::Match
+    to parse its config files. If you want to change the parsing behaviour,
+    you can pass your own -MatchSections list to init. For instance, if you
+    want to allow only sections named "<URL>", with no nesting, and have
+    these matched exactly to the complete request path, you could do the
+    following:
+
+        # app.conf
+
+        admin_area = 0
+        user_area  = 0
+
+        <URL /cgi-bin/admin.cgi>
+            admin_area = 1
+        </URL>
+
+        <URL /cgi-bin/user.cgi>
+            user_area = 1
+        </URL>
+
+
+        # in your cgiapp_init:
+        $self->conf->init(
+            -ConfigFile        => 'app.conf',
+            -NestingDepth      => 1,
+            -Options           => {
+                -MatchSections => [
+                    {
+                        -Name          => 'URL',
+                        -MatchType     => 'exact',
+                        -MergePriority => 0,
+                        -SectionType   => 'path',
+                    },
+                ]
+            }
+        );
+
+    For reference, here is the default -MatchSections:
+
+        -MatchSections => [
+            {
+                -Name          => 'Site', # overridden by -SiteSectionName
+                -MatchType     => 'exact',
+                -MergePriority => 0,
+                -SectionType   => 'env',
+            },
+            {
+                -Name          => 'AppMatch',
+                -MatchType     => 'regex',
+                -SectionType   => 'module',
+                -MergePriority => 1,
+            },
+            {
+                -Name              => 'App',
+                -MatchType         => 'path',
+                -PathPathSeparator => '::',
+                -SectionType       => 'module',
+                -MergePriority     => 1,
+            },
+            {
+                -Name          => 'LocationMatch',
+                -MatchType     => 'regex',
+                -SectionType   => 'path',
+                -MergePriority => 3,
+            },
+            {
+                -Name          => 'Location',
+                -MatchType     => 'path',
+                -SectionType   => 'path',
+                -MergePriority => 3,
+            },
+        ],
+
+    For each section, the -SectionType param indicates what runtime variable
+    the section will be matched against. Here are the allowed values
+
+        env:     matched to the environment variable SITE_NAME (overridden by -SiteNameVar)
+        module:  name of the Perl Module handling this request (e.g. MyApp::Users)
+        path:    path of the request, including path_info (e.g. /cgi-bin/myapp/users.cgi/some/path)
+
+    You can use the above -SectionType values in your own custom
+    -MatchSections.
+
+    For more information on the syntax of -MatchSections, see the docs for
+    Config::General::Match.
+
+AUTHOR
+    Michael Graham, "<mgraham@cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-cgi-application-plugin-config-general@rt.cpan.org", or through the
+    web interface at <http://rt.cpan.org>. I will be notified, and then
+    you'll automatically be notified of progress on your bug as I make
+    changes.
+
+ACKNOWLEDGEMENTS
+    This module would not be possible without Thomas Linden's excellent
+    Config::General module.
+
+    Thanks to the excellent examples provided by the other CGI::Application
+    plugin authors: Mark Stosberg, Michael Peters, Cees Hek and others.
+
+SOURCE
+    The source code repository for this module can be found at
+    http://github.com/mgraham/CAP-Config-General
+
+SEE ALSO
+        CGI::Application
+        Config::General
+        Config::General::Match
+        CGI::Application::Plugin::Config::Simple
+        CGI::Application::Plugin::ConfigAuto
+
+        CGI::Application::Plugin::TT
+        Template::Toolkit
+        HTML::Template
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Michael Graham, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

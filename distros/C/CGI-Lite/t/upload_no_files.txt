@@ -1,0 +1,17 @@
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+Content-Type: application/octet-stream
+
+bar
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+Content-Type: application/octet-stream
+
+baz
+--`!"$%^&*()-+[]{}'@.?~#|aaa
+Content-Disposition: form-data; name="foolots"
+Content-Type: application/octet-stream
+
+quux
+--`!"$%^&*()-+[]{}'@.?~#|aaa--
+

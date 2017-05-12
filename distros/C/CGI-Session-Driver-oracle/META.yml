@@ -1,0 +1,26 @@
+---
+abstract: 'A CGI::Session driver for Oracle'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Session-Driver-oracle
+provides:
+  CGI::Session::Driver::oracle:
+    file: lib/CGI/Session/Driver/oracle.pm
+    version: 1.05
+requires:
+  CGI::Session::Driver::DBI: 4.21
+  Carp: 0
+  DBI: 1.609
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.05

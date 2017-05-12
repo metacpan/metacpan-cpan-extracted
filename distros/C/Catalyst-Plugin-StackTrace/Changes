@@ -1,0 +1,50 @@
+Revision history for Perl extension Catalyst::Plugin::StackTrace
+
+0.12    2012-07-12 15:13:00 BST
+        - Convert from Class::Accessor::Fast to Moose (dakkar)
+
+0.11    2009-10-18 18:30:00 BST
+        - Fixup copyright info
+
+0.10    2009-04-20 13:50:00
+        - Switch to MRO::Compat
+
+0.09    2008-09-03 12:00:00
+        - Filter out unwanted stack frames and attributes in the
+          $SIG{__DIE__} handler instead of finalize_error().
+        - Avoid stringifying refs in the trace, since we now throw them
+          away immediately.
+
+0.08    2008-04-04 16:30:00
+        - Allow enabling functionality by config variable
+
+0.07    2008-02-01 13:00:00
+        - actually, the $@ reset is fairly general - need to die($error)
+          no matter what.
+
+0.06    2006-07-25 11:52:15
+        - fixed bug where $@ would get reset for exception objects
+        - changed stylesheets to match Catalyst 5.7000
+
+0.05    2006-07-13 16:34:11
+        - fixed bug where an exception in the $SIG{__DIE__} handler would cause
+          the original exception to be lost
+        - increased contrast on error line (Christopher H. Laco)
+        - added reverse option (Christopher H. Laco)
+
+0.04    2006-03-26 22:30:00
+        - Properly handle the case where finalize_error is called but there
+          is no stacktrace.  This happens if the user manually sets $c->error.
+
+0.03    2006-03-16 23:40:00
+        - Made the stack trace fill the entire width.
+        - Added respect_overload option for Devel::StackTrace (Stephen
+          Steneker)
+
+0.02    2006-01-01 14:00:00
+        - Changed _stacktrace from class data to accessor.
+        - Fixed test 4 in 04trace to handle different error messages
+          from different Perl versions.
+
+0.01    2005-12-30 23:20:00
+        - initial release

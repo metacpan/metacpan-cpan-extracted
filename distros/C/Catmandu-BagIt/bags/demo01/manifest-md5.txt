@@ -1,0 +1,1 @@
+c8accb44741272d63f6e0d72f34b0fde  data/Catmandu-0.9204.tar.gz

@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     % perl -MCarp::Patch::Config=MaxArgNums,20 -d:Confess ...
+
+DESCRIPTION
+
+    This is not so much a "patch" for Carp, but just a convenient way to
+    set some Carp package variables from the command-line. Currently can
+    set these variables: MaxArgLen, MaxArgNums.
+
+append:SEE ALSO
+
+    Devel::Confess
+

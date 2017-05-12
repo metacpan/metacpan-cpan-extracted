@@ -1,0 +1,22 @@
+Revision history for Perl extension Class::Gomor.
+
+1.03 Tue Jan 13 19:21:45 CET 2015
+   - update: copyright notice
+   - update: Kwalitee
+
+1.02 Sat May 23 15:44:40 CEST 2009
+   - bugfix: a warning when used with perl 5.10
+   - new: test kwalitee
+   - update: copyright notice
+
+1.01 Mon Nov 20 18:40:40 CET 2006
+   - Class::Gomor::Hash:  new: cgDumper()
+   - Class::Gomor::Array: new: cgDumper()
+   - Class::Gomor: cgClone() and cgFullClone() documented
+   - examples: my-class.pl
+   - test: Test::Pod, Test::Pod::Coverage
+
+1.00 Mon May  1 15:32:04 CEST 2006
+   - first public release
+   - old Class::Gomor::Hash is now obsolete
+

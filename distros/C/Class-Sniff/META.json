@@ -1,0 +1,58 @@
+{
+   "abstract" : "Look for class composition code smells",
+   "author" : [
+      "Curtis \"Ovid\" Poe <ovid@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Sniff",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0.2"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Concise" : "0.66",
+            "Devel::Symdump" : "2.08",
+            "Digest::MD5" : "2.36",
+            "File::Find::Rule" : "0.3",
+            "Graph::Easy" : "0.64",
+            "List::MoreUtils" : "0.22",
+            "Sub::Identify" : "0.03",
+            "Text::SimpleTable" : "0.05",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Sniff" : {
+         "file" : "lib/Class/Sniff.pm",
+         "version" : "0.10"
+      },
+      "Class::Sniff::App" : {
+         "file" : "lib/Class/Sniff/App.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.10"
+}

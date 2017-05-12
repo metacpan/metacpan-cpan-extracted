@@ -1,0 +1,3 @@
+Payload-Oxum: 92877.1
+Bagging-Date: 2014-10-03
+Bag-Size: 90.8 KB

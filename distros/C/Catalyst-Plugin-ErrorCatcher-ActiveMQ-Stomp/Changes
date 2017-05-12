@@ -1,0 +1,11 @@
+Revision history for Catalyst-Plugin-ErrorCatcher-ActiveMQ-Stomp
+
+0.1.5 Wed Nov 23 23:35:50 GMT 2011
+    Fix versioning
+
+0.1.4 Wed Nov 23 23:01:28 GMT 2011
+    Updated to build using dzil and fixed the random versioning
+
+0.1.0 Tue Feb 16 11:57:20 GMT 2010
+    First version, released on an unsuspecting world.
+

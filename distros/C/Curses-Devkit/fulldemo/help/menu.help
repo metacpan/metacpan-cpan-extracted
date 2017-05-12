@@ -1,0 +1,201 @@
+</R>Purpose<!R>
+The menu widget allows the programmer to create a pull-down menu widget. 
+Complete with sub-menu items.
+
+</R>Construction Options<!R>
+A menu widget is defined using the following syntax. The variable
+</B>$menuObject<!B> contains a reference to the menu object.
+<C></B>$menuObject = new Cdk::Menu ( options );
+ 
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Menulist    Required            Array Ref  This is the menu title list.
+Menuloc     Required            Array Ref  This is the menu title location list.
+Tattrib     Reverse             Scalar     This is the attribute of the currently highlighted menu title.
+SubTattrib  Reverse             Scalar     This is the attribute of the currently highlighted menu item.
+
+</R>Available Methods<!R>
+</B>activate<!B>
+Activation of an object means to make the object available for use. The 
+following example demonstrates how to activate a menu widget.
+<C></B>$returnValue = $menuObject->activate ();
+
+The variable </B>$returnValue<!B> is an integer value which represents the
+selected item. The calculation of this value is determined as follows:
+(100 * Current Title ) + Current Subtitle
+
+To extract the correct menu item from this value use the following formula:
+$menuList = int ( $returnValue / 100 );
+$menuItem = ($returnValue % 100 );
+
+You can then dereference the string value from the array using the above two
+calculations.
+
+</B>inject<!B>
+This function injects a single character into the widget. The following
+examples demonstrates how to call the inject method.
+<C></B>$menuObject->inject ( options );
+
+The options are defined in the following table.
+</U>Option      Default Value       Type       Purpose<!U>
+Shadow      Required             Scalar     The character to inject into the widget.
+
+If you are injecting a special character into the widget, then you can
+use a pre-defined value to represent the key.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+</B>bind<!B>
+The bind method binds keys to events. The binding is specific to the individual
+objects. The following example demonstrates how to call the bind method.
+<C></B>$menuObject->bind ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Key         Required            Scalar     This is the character to bind the 
+                                           event to.
+Function    Required            Scalar     This is the name of the callback 
+                                           function.
+
+</B>preProcess<!B>
+The </B>preProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+preProcess method.
+<C></B>$menuObject->preProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a pre-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$menuObject->preProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+
+If the pre-process function returns a value of 0 the key hit will
+not be injected into the widget. This allows the programmer to
+selectively pick which characters will or will not get injected
+into the widget.
+
+The </B>postProcess<!B> function sets a process to be run before the key entered
+is processed. If this function returns a value of 0, then the key injected
+into the widget will not be processed; otherwise the character will be
+processed as normal.  The following example demonstrates how to call the
+postProcess method.
+<C></B>$menuObject->postProcess ( options );
+
+The options are defined in the following table.
+
+</U>Option      Default Value       Type       Purpose<!U>
+Function    Required            Scalar     This is the name of the
+                                           callback function.
+
+To create a post-process callback the following code segment demonstrates
+how to do it properly.
+
+<C></B>$menuObject->postProcess ('Function' => sub { callback (@_); });
+
+Notice that the array </B>@_<!B> is passed into the function called
+</B>callback<!B>. This is done because when the callback process is 
+called the key which was pressed is passed into the perl subroutine.
+Since we nest the call-back function inside an anonymous subroutine,
+we need to pass the array </B>@_<!B> to the call-back function. If
+the key given to the call-back function is a non alphanumeric key
+then a predefined value will be given to the function. The following
+table describes the values passed into the function.
+
+<C><#UL><#HL(11)><#TT><#HL(14)><#UR>
+<C><#VL></U>Key         <#VL>Key Value      <!U><#VL>
+<C><#VL>Left Arrow  <#VL>KEY_LEFT       <#VL>
+<C><#VL>Right Arrow <#VL>KEY_RIGHT      <#VL>
+<C><#VL>Up Arrow    <#VL>KEY_UP         <#VL>
+<C><#VL>Down Arrow  <#VL>KEY_DOWN       <#VL>
+<C><#VL>Delete      <#VL>KEY_DELETE     <#VL>
+<C><#VL>Backspace   <#VL>KEY_BACKSPACE  <#VL>
+<C><#VL>Page Up     <#VL>KEY_PPAGE      <#VL>
+<C><#VL>Page Down   <#VL>KEY_NPAGE      <#VL>
+<C><#VL>Home        <#VL>KEY_HOME       <#VL>
+<C><#VL>End         <#VL>KEY_END        <#VL>
+<C><#VL>Escape      <#VL>KEY_ESC        <#VL>
+<C><#LL><#HL(11)><#BT><#HL(14)><#LR>
+</B>draw<!B>
+This method draws the object on the screen. The following example demonstrates
+how to call the draw method.
+<C></B>$menuObject->draw ();
+
+</B>erase<!B>
+This method removes the object from the screen. This does </B/U>NOT<!B!U> 
+destroy the object. The following example demonstrates how to call the erase 
+method.
+<C></B>$menuObject->erase ();
+
+</R>Default Key Bindings<!R>
+</U>Key               Action<!U>
+Left Arrow        Moves to the menu list on the left.
+Right Arrow       Moves to the menu list on the right.
+Up Arrow          Moves the cursor up one menu item.
+Down Arrow        Moves the cursor up one menu item.
+Space             Moves the cursor up down menu item.
+Return            Selects the current menu item.
+Tab               Moves to the menu list on the right.
+Escape            Exits the widget and returns undef.
+CTRL-R            Refreshes the screen.
+
+</R>Tips & Tricks<!R>
+None.
+
+</R>Physical Restrictions<!R>
+</U>Restriction                    Value<!U>
+Max number of menu items.      30
+Max number of sub-menu items.  98
+
+</R>Example Use Of The Widget<!R>
+<F=../examples/menu>
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995
+<C>Document Revised: March,    1996
+<C>Document Revised: June,     1996

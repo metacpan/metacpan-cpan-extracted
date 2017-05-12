@@ -1,0 +1,27 @@
+Revision history for Perl extension Canary::Stability
+
+2012  Sun Sep 25 01:45:56 CEST 2016
+	- another year where the UNFCCC had to adjust their predictions
+          in the worse direction.
+	- do not print the big intro blob in yellow.
+
+2011  Sun Mar 13 04:41:48 CET 2016
+	- the year the terrorists won and the free world sacrificed the free.
+        - added more explanatory blurb, based on ideas by Kent Fredric.
+	- colour wasn't reset in time to catch further Makefile.PL
+          output in some cases.
+
+2006  Tue Jan 31 01:00:00 UTC 2006
+	- the year when things were in good shape still.
+	- the compatibility version test for 5.22 was wrong and errornously
+          takes 5.20.1+ as unsupported.
+	- fix urls.
+
+2001  Tue Jul  3 02:18:41 CEST 2001
+	- the year where perl was still accomodating enough to inspire module
+          authors to do cool stuff, as opposed to abusing policy to stifle
+          criticism.
+
+1996  Wed Jun  5 09:34:41 GFT 1996
+	- ariane 5 destructed due to a software compatibility problem.
+

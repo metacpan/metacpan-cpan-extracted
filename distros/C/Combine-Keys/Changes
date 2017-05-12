@@ -1,0 +1,10 @@
+Revision history for Combine-Keys
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03    26/03/2017
+        - %s/av_tindex/av_top_index/gc 
+
+0.04    26/03/2017
+        - %s/av_top_index/av_len/gc

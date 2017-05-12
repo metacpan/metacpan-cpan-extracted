@@ -1,0 +1,38 @@
+---
+abstract: 'The great new Catalyst::Plugin::ErrorCatcher::ActiveMQ::Stomp!'
+author:
+  - 'Jason Tang <tang.jason.ch@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-ErrorCatcher-ActiveMQ-Stomp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::ErrorCatcher: 0.0.7
+  Data::Dump: 0
+  Data::Serializer: 0
+  DateTime: 0
+  Fcntl: 0
+  File::Slurp: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+  Net::Stomp: 0
+  Path::Class: 0
+  Path::Class::File: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001000

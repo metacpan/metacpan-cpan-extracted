@@ -1,0 +1,182 @@
+# NAME
+
+CPAN::Source - CPAN source list data aggregator.
+
+# DESCRIPTION
+
+[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) fetch, parse, aggregate all CPAN source list for you.
+
+Currently CPAN::Source supports 4 files from CPAN mirror. (00whois.xml,
+contains cpan author information, 01mailrc.txt contains author emails, 
+02packages.details.txt contains package information, 03modlist contains distribution status)
+
+[CPAN::Source](http://search.cpan.org/perldoc?CPAN::Source) aggregate those data, and information can be easily retrieved.
+
+The distribution info is from [CPAN::DistnameInfo](http://search.cpan.org/perldoc?CPAN::DistnameInfo).
+
+# SYNOPSIS
+
+    my $source = CPAN::Source->new(  
+        cache_path => '.cache',
+        cache_expiry => '7 days',
+        mirror => 'http://cpan.nctu.edu.tw',
+        source_mirror => 'http://cpansearch.perl.org'
+    );
+
+    $source->prepare;   # use LWP::UserAgent to fetch all source list files ...
+
+    # 00whois.xml
+    # 01mailrc
+    # 02packages.details.txt
+    # 03modlist
+
+    $source->dists;  # all dist information
+    $source->authors;  # all author information
+
+    for my $dist ( @{ $source->dists } ) {
+
+    }
+
+    for my $author ( @{ $source->authors ) {
+
+    }
+
+    for my $package ( @{ $source->packages } ) {
+
+    }
+
+    $source->packages;      # parsed package data from 02packages.details.txt.gz
+    $source->modlist;       # parsed package data from 03modlist.data.gz
+    $source->mailrc;        # parsed mailrc data  from 01mailrc.txt.gz
+
+
+
+    my $dist = $source->dist('Moose');
+    my $distname = $dist->name;
+    my $distvname = $dist->version_name;
+    my $version = $dist->version;  # attributes from CPAN::DistnameInfo
+    my $meta_data = $dist->fetch_meta();
+
+    $meta_data->{abstract};
+    $meta_data->{version};
+    $meta_data->{resources}->{bugtracker};
+    $meta_data->{resources}->{repository};
+
+    my $readme = $dist->fetch_readme;
+    my $changes = $dist->fetch_changes;
+
+
+
+    my $pkg = $source->package( 'Moose' );
+    my $pm_content = $pkg->fetch_pm();
+
+
+
+    my $mirror_server_timestamp = $source->stamp;  # DateTime object
+
+# ACCESSORS
+
+- authors
+
+Which is a hashref, contains:
+
+    {
+        {pauseId} => { ... }
+    }
+
+- package\_data
+
+Which is a hashref, contains:
+
+    { 
+        meta => { 
+            File => ...
+            URL => ...
+            Description => ...
+            Line-Count => ...
+            Last-Updated => ...
+        },
+        packages => { 
+            'Foo::Bar' => {
+                package   => 'Foo::Bar',
+                version   =>  0.01 ,
+                path      =>  tar path,
+                dist      =>  dist name
+            }
+            ....
+        }
+    }
+
+# METHODS
+
+## new( OPTIONS )
+
+
+
+## prepare\_authors
+
+## prepare\_mailrc
+
+## prepare\_modlist
+
+Download 03modlist.data.gz and parse it.
+
+## prepare\_package\_data
+
+Download 02packages.details.gz and parse it.
+
+## module\_source\_path
+
+Return full-qualified source path. built from source mirror, the default source mirror is [http://cpansearch.perl.org](http://cpansearch.perl.org).
+
+## mirrors 
+
+Return mirror info from mirror site. (07mirrors.json)
+
+## fetch\_whois
+
+## fetch\_mailrc
+
+## fetch\_package\_data
+
+## fetch\_modlist\_data
+
+## fetch\_mirrors
+
+## fetch\_module\_rss
+
+Return modules rss, from {Mirror}/modules/01modules.mtime.rss
+
+## fetch\_recent( $period )
+
+Fetch recent updated modules,
+
+    my $list = $source->fetch_recent( '1d' );
+    my $list = $source->fetch_recent( '1M' );
+
+## dist( $name )
+
+return [CPAN::Source::Dist](http://search.cpan.org/perldoc?CPAN::Source::Dist) object.
+
+## http\_get
+
+Use [LWP::UserAgent](http://search.cpan.org/perldoc?LWP::UserAgent) to fetch content.
+
+## new\_dist
+
+Convert [CPAN::DistnameInfo](http://search.cpan.org/perldoc?CPAN::DistnameInfo) into [CPAN::Source::Dist](http://search.cpan.org/perldoc?CPAN::Source::Dist).
+
+## purge\_cache 
+
+Purge cache.
+
+# AUTHOR
+
+Yo-An Lin <cornelius.howl {at} gmail.com>
+
+# SEE ALSO
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

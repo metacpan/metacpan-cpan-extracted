@@ -1,0 +1,10 @@
+TYPEMAP
+
+SECStatus                   T_IV
+PRInt32                     T_IV
+PRBool                      T_IV
+Net::NSS::SSL               T_PTROBJ
+Crypt::NSS::Certificate     T_PTROBJ
+Crypt::NSS::PrivateKey      T_PTROBJ
+Crypt::NSS::PublicKey       T_PTROBJ
+Crypt::NSS::PKCS11::Slot    T_PTROBJ

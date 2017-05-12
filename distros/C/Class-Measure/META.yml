@@ -1,0 +1,21 @@
+---
+abstract: 'Create, compare, and convert units of measurement.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: 0.82
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Measure
+requires:
+  Sub::Exporter: 0.982
+resources:
+  bugtracker: https://github.com/bluefeet/Class-Measure/issues
+  repository: git://github.com/bluefeet/Class-Measure.git
+version: 0.05

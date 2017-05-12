@@ -1,0 +1,153 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Term::ANSIColor ':constants';
+use Code::DRY;
+
+local $Term::ANSIColor::AUTORESET = 1;
+
+GetOptions(
+    'minimum=i' => \( my $minimum = 5 ),
+    'dir=s'     => \( my $dir     = 'lib' ),
+    'ignore=s@' => \my @ignore,
+    'terse'     => \( my $terse   = 0 ),
+) or die "Bad options";
+my $IGNORE = join '|' => @ignore;
+
+if ($IGNORE eq '') {
+	# ignore blocks consisting only of comments and whitespace
+	$IGNORE = '/\A(?:^\s*(?:\#.*)?$)*\z/';
+}
+
+Code::DRY::set_reporter(
+    sub {
+        my ( $minlength, $units, $rDups ) = @_;
+
+        # show dupes
+        my $copies               = scalar @{$rDups} - 1;
+        my $myamountlines        = $rDups->[0]->[3] - $rDups->[0]->[2] + 1;
+        my $myamountbytesclipped = $rDups->[0]->[5] - $rDups->[0]->[4] + 1;
+        my $myamountbytes        = $rDups->[0]->[7] - $rDups->[0]->[6] + 1;
+        my $lengthstring
+            = $units eq 'bytes'
+            ? "$myamountbytes (>= $minlength $units) and $myamountlines complete lines"
+            : "$myamountlines (>= $minlength $units) and $myamountbytesclipped bytes reduced to complete lines";
+        print BOLD RED
+            "$copies duplicate(s) found with a length of $lengthstring:\n";
+
+        my $cnt = 1;
+        for my $dup ( @{$rDups} ) {
+            print
+                "$cnt.  File: $dup->[0] in lines $dup->[2]..$dup->[3] (bytes ",
+                $dup->[4] - $dup->[1], "..", $dup->[5] - $dup->[1], ")\n";
+            ++$cnt;
+        }
+        if ($terse) {
+            return;
+        }
+        $cnt = 1;
+        for my $dup ( @{$rDups} ) {
+            print "$cnt. =================\n";
+
+            my $offsetLineEnd;
+            if ( $units eq 'bytes' ) {
+
+                # begin at start of line
+                my $linenumber      = Code::DRY::offset2line( $dup->[6] );
+                my $fileindex       = Code::DRY::offset2fileindex( $dup->[6] );
+                my $file_lineoffset = $Code::DRY::file_lineoffsets[$fileindex];
+                my $offsetLineBegin
+                    = $linenumber <= 1
+                    ? $dup->[1]
+                    : $dup->[1] + $file_lineoffset->[ $linenumber - 2 ] + 1;
+                $offsetLineEnd
+                    = $dup->[1]
+                    + $file_lineoffset->[ $dup->[3]
+                    + ( $dup->[5] == $dup->[7] ? 0 : 1 ) ];
+                print RED Code::DRY::get_concatenated_text( $offsetLineBegin,
+                    $dup->[6] - $offsetLineBegin );
+            }
+            print YELLOW Code::DRY::get_concatenated_text( $dup->[4],
+                $dup->[5] - $dup->[4] + 1 );
+            if ( $units eq 'bytes' ) {
+                print RED Code::DRY::get_concatenated_text( $dup->[7] + 1,
+                    $offsetLineEnd - $dup->[7] );
+            }
+
+            # end at end of line
+            ++$cnt;
+	    # avoids duplicates of output also :-)
+	    last;
+        }
+        print RESET "\n=================\n";
+    }
+);
+
+Code::DRY::scan_directories( $minimum, $IGNORE, '\.pm$|\.pl$|\.t$',
+    '\.swp$|~$|\.bak$', $dir );
+
+__END__
+
+CP_reporter - CopyandPaste_reporter, a scanner for verbatim text copies in files
+
+=head1 SYNOPSIS
+
+CP_reporter [options] path1 path2 ...
+
+=head1 DESCRIPTION
+
+CP_reporter reads the specified files and analyses the content for
+repeated substrings as they might occur when copying and pasting code.
+
+When a duplication is found, the position and range is reported for 
+each copy found and the duplicated content is printed once.
+
+The findings are sorted by length in bytes.
+
+The arguments are paths which can be directory paths
+or file paths or glob expressions.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--minimum> AMOUNT (default is set to 5 lines)
+
+Sets the minimum extent a duplication should have to be reported.
+Two units are supported: positive numbers indicate 'lines' while
+negative numbers specify 'bytes'.
+
+=item B<--dir> DIR (default is set to 'lib')
+
+Specifies the directory that is scanned recursively for files.
+
+=item B<--ignore> PATTERN (no default, may be given multiple times)
+
+Suppress the report of all duplications that match the ignore filter.
+
+For example /\A(^#.+$)+\z/ would suppress a duplication 
+when all lines of it begin with a comment.
+
+=item B<--terse>
+
+Suppress the output of the content of a duplication. Only positions 
+of duplications are printed out.
+
+=back
+
+=head1 BUGS & LIMITATIONS
+
+No rc file yet.
+
+Limited to 8-bit characters yet.
+
+No text preprocessing yet ( e.g. whitespace shrinking or comments elimination)
+
+No real parsing of Perl code yet.
+
+=head1 ACKNOWLEDGEMENTS
+
+This program was inspired a bit by Ovids find_duplicate_code.pl
+

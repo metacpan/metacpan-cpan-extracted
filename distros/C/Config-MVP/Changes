@@ -1,0 +1,135 @@
+Revision history for Config-MVP
+
+2.200010  2015-03-17 07:43:04-04:00 America/New_York
+        - copypaste code!  apply section_name fix from Section to WithBundles
+          (thanks, Karen Etheridge)
+
+2.200009  2015-03-07 17:18:10-05:00 America/New_York
+        - module-loading exceptions now include a section_name attribute for
+          the name of the section being assembled
+
+2.200008  2014-07-02 19:24:59-04:00 America/New_York
+        - fix a busted link
+        - be more consistent in exception-throwing on missing packages
+        - fix a dumb test that failed in a git checkout
+
+2.200007  2014-01-29 21:04:25-05:00 America/New_York
+        - throw an exception when a bundle reports an impossible situation,
+          like { value => [] }; https://github.com/rjbs/Config-MVP/issues/5
+
+2.200006  2013-09-17 08:58:53 Asia/Tokyo
+        - fix repository data
+
+2.200005  2013-09-17 08:56:36 Asia/Tokyo
+        - removed use of deprecated Class::MOP::load_class (thanks, Karen
+          Etheridge)
+
+2.200004  2013-08-27 12:09:19 America/New_York
+        - pass the arguments to missing_plugin in the right order
+
+2.200003  2013-01-30 21:35:34 America/New_York
+        - doc fixes (Thanks, George Hartzell!)
+
+2.200002  2012-03-15 21:16:16 America/New_York
+        - documentation fixes (Thanks, Gregor Herrmann of Debian!)
+
+        - depend on at least version 0.17 of Class::Load, to work around a bug
+          with perl5.8.8 and Module::Runtime 0.012. (Karen Etheridge)
+
+2.200001  2011-02-11 11:13:20 America/New_York
+        - when throwing "package not installed", add a "package" attribute to
+          Error
+
+2.200000  2011-02-08 11:05:12 America/New_York
+        - add Config::MVP::Error for common exceptions
+
+        - allow class loading and class-not-found handling to be subclassed
+          (thanks, Kent Fredric!)
+
+2.101650  2010-06-14 20:22:42 America/New_York
+        - require Moose 0.91 for native trait support
+
+2.101540  2010-06-03 00:28:57 America/New_York
+        - improve if_none to return from the proper scope (i.e., now it works)
+
+2.101480  2010-05-28 22:59:18 America/New_York
+        - add an if_none callback to Reader::Finder; for now, private
+
+2.101460  2010-05-26 22:29:43 America/New_York
+          [BREAKS BACKWARD COMPATIBILITY]
+
+        - I apologize for breaking backcompat twice in a week.  I do not
+          expect this to happen again.  -- rjbs
+
+        - Config::MVP::Reader is now a base class rather than a role.
+          This significantly simplifies the use of Config::MVP readers
+          and makes things easier to document.
+
+1.101451  2010-05-25 22:38:06 America/New_York
+        - always finalize sections added by bundles
+
+1.101450  2010-05-25 18:13:19 America/New_York
+          [BREAKS BACKWARD COMPATIBILITY]
+
+        - The Reader interface has been substantially overhauled.
+
+        - Readers no longer have persistent Assembler, but now must be handed
+          one (or will generate one as needed)
+
+        - the arguments for Reader->read_config have changed
+
+        - classes implementing Reader are required to provide a
+          read_into_assembler method, now
+
+        - Reader::Findable has been broken into Findable and
+          Findable::ByExtension
+
+0.101410  2010-05-21 22:09:48 America/New_York
+          Sections, Sequences, and Assemblers  can now be finalized
+
+          the Assembler finalizes things as appropriate
+
+          Sections can refer to their containing Sequence
+
+          Sequences can refer to their constructing Assembler
+
+          bundles now can (and should) provide payload as an arrayref
+
+          Assembler->begin_section can be given a reference to a package name
+          to skip rewriting
+
+          the replace_bundle_with_contents method is used by
+          Assembler::WithBundles to convert bundle sections into contents
+
+0.100780  2010-03-19 22:16:16 America/New_York
+          the alias attr on Section is now lazy so that mvp_aliases is called
+
+0.093350  2009-12-01 06:58:48 America/New_York
+          added Config::MVP::Reader::Hash for use by adapter writers
+
+0.093330  2009-11-29 17:40:08 America/New_York
+          rebuild to include META.yml for sake of cpandeps scanner
+
+0.093120  2009-11-08
+          add missing prereq
+
+0.093000  2009-10-27
+          bundles for Assembler::WithBundles can now be nested
+
+0.092990  2009-10-26
+          add Config::MVP::Reader and associated packages, from Dist::Zilla
+
+0.092360  2009-08-24
+          add "begin_section" and "end_section" methods, mostly for wrapping
+          with extra behavior in subclasses
+
+0.092211  2009-08-09
+          much more documentation yet again
+
+0.092210  2009-08-09
+          package interrogation (for mvp_* settings) is now done in Section
+            initialization; this means you don't need to use the Assembler to
+            benefit from this feature
+
+          much more documentation
+

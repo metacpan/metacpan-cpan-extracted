@@ -1,0 +1,26 @@
+Changes
+lib/Call/From.pm
+LICENSE
+maint/gen_deps.pl
+maint/lib/KENTNL/Prereqr.pm
+maint/Makefile.PL.include
+maint/perlcritic.rc.gen.pl
+maint/provided.pl
+Makefile.PL
+MANIFEST			This list of files
+perlcritic.rc
+t/00-compile.t
+t/_call_from.t
+t/_to_caller.t
+t/_to_fun.t
+t/call_function_from.t
+t/call_method_from.t
+xt/author/critic.t
+xt/author/eol.t
+xt/author/pod-coverage.t
+xt/author/pod-syntax.t
+xt/release/cpan-changes.t
+xt/release/kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 82
+    - 74
+  59437:
+    - 218
+name: fdcb4a
+registers:
+  AF: 12771
+  AF_: 0
+  BC: 26848
+  BC_: 0
+  DE: 65071
+  DE_: 0
+  HL: 41668
+  HL_: 0
+  I: 0
+  IX: 44182
+  IY: 59355
+  PC: 0
+  R: 0
+  SP: 0

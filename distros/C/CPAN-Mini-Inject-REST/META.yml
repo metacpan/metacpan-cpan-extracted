@@ -1,0 +1,40 @@
+---
+abstract: 'Remote API for CPAN::Mini::Inject'
+author:
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Mini-Inject-REST
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Extract: 0
+  CPAN::Mini::Inject: 0
+  Catalyst::Action::RenderView: 0
+  Catalyst::Action::Serialize::JSON: 0
+  Catalyst::Controller::REST: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Runtime: 5.80030
+  Config::General: 0
+  File::Find::Rule: 0
+  JSON: 0
+  List::MoreUtils: 0
+  Moose: 0
+  Parse::CPAN::Meta: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

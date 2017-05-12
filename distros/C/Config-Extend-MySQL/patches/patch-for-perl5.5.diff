@@ -1,0 +1,33 @@
+--- lib/Config/Extend/MySQL.pm	2008-09-07 02:00:31.000000000 +0200
++++ lib/Config/Extend/MySQL.pm	2008-09-07 02:04:17.000000000 +0200
+@@ -1,8 +1,8 @@
+ package Config::Extend::MySQL;
+-use 5.006;   # ask me if you *really* want a version that works on 5.5
+ use strict;
+ use warnings;
+ use Carp;
++use FileHandle;
+ use File::Basename          qw(dirname);
+ use File::Spec::Functions   qw(catfile rel2abs);
+ use File::Read;
+@@ -128,8 +128,10 @@
+         $fh = IO::String->new(\$content);
+     }
+     else {
++      eval q{
+         open($fh, "<", \$content)
+             or croak "fatal: Can't read in-memory buffer: $!";
++      }
+     }
+ 
+     # create the object using the given Config:: module
+@@ -194,7 +196,8 @@
+                      { __read_config($1 || "file", rel2abs($2, $base_dir)) }xgme;
+     }
+     elsif ($what eq "dir") {
+-        opendir(my $dirh, $path) or return "";
++        my $dirh = new FileHandle;
++        opendir($dirh, $path) or return "";
+ 
+         while (my $file = readdir($dirh)) {
+             # skip invisible files and directories we shouldn't 

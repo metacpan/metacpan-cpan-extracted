@@ -1,0 +1,16 @@
+Changes fpr Catalyst::Model::Files
+
+0.10 - 2011/12/06
+  - Unbork tests (thanks richardc)
+
+0.09 - 2011/12/06
+  - Port to being a proper Moose class, making proper attributes
+    and removing constructor. (bobtfish)
+
+0.08 - 2009/07/02
+  Use next::method for method re-dispatch instead of NEXT
+  Fix Win32 test failures by forcing stringifies to Unix output format
+
+0.07 - 2008/12/17
++ Make the return from list stringify relative to cwd, but make operations 
+  (open, stat, etc.) work on the actual file

@@ -1,0 +1,10 @@
+        List of known line type names:
+  solid
+  longdash
+  dash
+  dot
+  dot-longdash
+  dot-dash
+  2dash
+  2dot-dash
+  4dash

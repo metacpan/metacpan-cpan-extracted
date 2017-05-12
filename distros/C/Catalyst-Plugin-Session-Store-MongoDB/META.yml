@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Catalyst-Plugin-Session-Store-MongoDB
+version:            0.03
+abstract:           MongoDB Session store for Catalyst
+author:
+    - Stefan Völkel (bd@bc-bd.org)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    String::Random:  0
+    Test::More:      0
+requires:
+    Catalyst::Plugin::Session:  0.27
+    Data::Dumper:         0
+    MongoDB:              0
+    Moose:                0
+    String::Random:       0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

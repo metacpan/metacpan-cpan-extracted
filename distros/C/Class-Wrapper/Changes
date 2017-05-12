@@ -1,0 +1,22 @@
+Revision history for Perl extension Class::Wrapper.
+
+0.01  Mon Dec 30 09:37:06 2002
+	- original version; created by h2xs 1.22 with options
+		-XAn Class::Wrapper
+
+0.20  Mon Dec 30 13:38:00 2002
+    - AUTOLOAD method can
+        - autogenerate accessor methods
+        - autogenerate methods that dispatches method calls to component object
+
+0.21  Sat Jan 04 00:39:00 2003
+    - Made the following changes:
+      - Replaced switch statement with foreach
+      - Removed use Switch
+      - Removed use 5.008 statement
+      Module is now compatible with Perl 5.6
+
+0.22  Sat Jan 04 19:32:00 2003
+      - Removed use 5.008 statement from
+        Makefile.PL. It kept the installation
+	from being Perl 5.6 compatible.

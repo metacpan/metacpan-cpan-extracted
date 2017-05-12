@@ -1,0 +1,37 @@
+---
+abstract: 'a publicly-accessible read-only interface'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.37'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Application-NetNewsIface
+provides:
+  CGI::Application::NetNewsIface:
+    file: lib/CGI/Application/NetNewsIface.pm
+    version: '0.0203'
+  CGI::Application::NetNewsIface::Cache::DBI:
+    file: lib/CGI/Application/NetNewsIface/Cache/DBI.pm
+requires:
+  CGI::Application: '0'
+  CGI::Application::Plugin::TT: '0'
+  Class::Accessor: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Net::NNTP: '0'
+  Test::More: '0'
+  XML::RSS: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://bitbucket.org/shlomif/perl-cgi-application-netnewsiface/
+version: '0.0203'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

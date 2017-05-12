@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb44
+registers:
+  AF: 43312
+  AF_: 0
+  BC: 26868
+  BC_: 0
+  DE: 40868
+  DE_: 0
+  HL: 32614
+  HL_: 0
+  I: 0
+  IX: 521
+  IY: 62707
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,12 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/Class/ErrorHandler.pm
+minil.toml
+t/00-compile.t
+t/01-errors.t
+META.yml
+MANIFEST

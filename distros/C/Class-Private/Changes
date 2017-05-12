@@ -1,0 +1,19 @@
+Revision history for Class-Private
+
+0.05    2010-07-07
+        Stylistic updates and simplifications
+
+0.04    2010-03-24
+        Fixed dependencies
+
+0.03    2010-03-22
+        Changed the separator from '/' to '::'.
+        Fixed a portability issue on Win32.
+        Changed from DynaLoader to XSLoader
+
+0.02    2009-03-26
+        Documentation updates.
+
+0.01    2009-03-23
+        First version, released on an unsuspecting world.
+

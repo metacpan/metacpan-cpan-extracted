@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.t
+t/crash.cgi
+lib/CGI/Carp/Fatals.pm
+META.yml                                 Module meta-data (added by MakeMaker)

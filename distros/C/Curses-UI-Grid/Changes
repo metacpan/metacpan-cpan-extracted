@@ -1,0 +1,18 @@
+Revision history for Perl extension Curses::UI::Grid.
+
+0.15  Mon May 09 2008
+	- Pod tests added
+
+0.13  Mon May 05 2008
+	- Refactoring stage 1
+        - layout bug fix
+	
+0.11  Sun Dec 25 2005
+	- Added mouse support :
+	   - Addes the following methods:
+	        - y2row
+	  	- x2cell 
+		- mouse_button1               
+
+0.10  Sun May 2005
+	-  Initial import to CPAN.

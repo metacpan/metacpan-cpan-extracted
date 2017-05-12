@@ -1,0 +1,20 @@
+Crypt::Nettle (0.2) upstream;
+
+  * Brown Paper Bag release -- META.yaml was cargo-culted over from
+    Crypt::GCrypt; hopefully that metadata mismatch doesn't screw anyone
+    up.
+
+ -- Daniel Kahn Gillmor <dkg@fifthhorseman.net>  Thu, 17 Mar 2011 21:30:17 -0400
+
+Crypt::Nettle (0.1) upstream;
+
+  * initial version:
+   - Crypt::Nettle::Hash
+   - Crypt::Nettle::Cipher
+   - Crypt::Nettle::Yarrow
+   - Crypt::Nettle::RSA
+
+  * Available via git at:
+    git://lair.fifthhorseman.net/~dkg/libcrypt-nettle-perl
+
+ -- Daniel Kahn Gillmor <dkg@fifthhorseman.net>  Thu, 17 Mar 2011 20:19:18 -0400

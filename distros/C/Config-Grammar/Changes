@@ -1,0 +1,95 @@
+Revision history for Perl extension Config::Grammar.
+
+UNRELEASED
+    
+     * Fixes 'Name "Config::Grammar::File" used only once' (patch by Salvatore Bonaccorso)
+     * Fix spelling error in manpage (patch by Salvatore Bonaccorso)
+     * Use Dist::Zilla to prepare the Perl distribution for CPAN
+
+2016-02-08
+     
+     * Released 1.11
+     * Allow specification of file encoding (Fritz Zaucker)
+
+2007-09-25
+
+     * Released 1.10
+     * Split module in Config::Grammar and Config::Grammar::Dynamic, where only
+       Config::Grammar::Dynamic can process _dyn, _dyndoc and _recursive
+       directives
+     * Move documentation-generating code to Config::Grammar::Document
+
+2007-08-29
+
+     * Released 1.03
+     * fix example in POD (Fritz Zaucker)
+
+2005-08-15
+
+     * Released 1.02
+     * Fixed bug with @defines (the substituted text was sometimes modified
+       erroneously, reported by Niko Tyni and Tobias Oetiker)
+
+2005-03-09
+
+     * Released 1.01
+     * License: same as Perl
+     * Obfuscate the email of the authors to make life a little bit harder for spammers
+
+2005-03-08
+
+     * Released 1.00
+     * Renamed from ISG::ParseConfig to Config::Grammar for publication
+       on CPAN
+
+2005-02-21
+
+     * Implemented _dyndoc, _varlist and _sub for sections (Niko Tyni) 
+
+2005-01-10
+
+     * Implemented _dyn, _default, _recursive, and _inherited (Niko Tyni) 
+
+2004-08-17
+
+     * Allow special input files like "program|"
+
+2004-02-09
+
+     * Added _example propperty for pod and template generation
+
+2002-10-10
+
+     * More verbatim _text sections
+
+2002-08-28
+
+     * Added maketmpl methode
+
+2002-03-12
+
+     * Implemented @define, make makepod return a string and not an array
+
+2002-01-28
+
+     * Fixed quote parsing in tables
+
+2002-01-09
+
+     * Added Documentation to the _text section documentation
+
+2001-10-20
+
+     * Improved Rendering of _doc information
+
+2001-09-19
+
+     * Added _sub error parsing and _doc self documentation
+
+2001-09-04
+
+     * Remove space before comments, more strict variable definition
+
+2001-05-11
+
+     * Initial Version for policy 0.3

@@ -1,0 +1,16 @@
+0.04 2010-01-14T00:40:00+09:00
+	 * Fix tests
+
+0.03 2008-01-11T23:40:00+09:00
+	 * Fix package to install currectly.
+
+0.02 2008-01-10T17:41:59+09:00
+	 * Fix config filename to same as pit in ruby.
+	 * Avoid violating global switch (ImplicitTyping, SingleQuote) of YAML::Syck.
+	 * Fix 'ppit set' for interoperability.
+	 * Export pit_set pit_switch.
+	 * Add $Config::Pit::verbose flag.
+
+0.01 2008-01-09T19:19:31+09:00
+	First release.
+

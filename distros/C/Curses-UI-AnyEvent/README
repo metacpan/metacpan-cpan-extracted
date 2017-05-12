@@ -1,0 +1,99 @@
+NAME
+    Curses::UI::AnyEvent - Sub-class of Curses::UI for AnyEvent
+
+SYNOPSIS
+        use strict;
+
+        use Curses::UI::AnyEvent;
+
+        my $cui = Curses::UI::AnyEvent->new(-color_support => 1);
+
+        $cui->set_binding(sub { exit }, "\cC");
+        $cui->set_binding(sub { $cui->mainloopExit() }, "q");
+   
+        my $win = $cui->add('win', 'Window',
+                            -border => 1,
+                            -bfg  => 'red',
+                           );
+
+
+        my $textviewer = $win->add('mytextviewer', 'TextViewer',
+                                   -text => '',
+                                  );
+
+        my $watcher = AE::timer 1, 1, sub {
+            $textviewer->{-text} = localtime() . "\n" . $textviewer->{-text};
+            $textviewer->draw;
+        };
+
+        $textviewer->focus();
+
+        $cui->mainloop();
+
+DESCRIPTION
+    Very simple integration with Curses::UI and AnyEvent. Just create a
+    "Curses::UI::AnyEvent" object instead of a "Curses::UI" one and use it
+    as normal.
+
+    You'll probably want to install some AnyEvent watchers before you call
+    "mainloop()". Alternatively, if you want to setup the async handlers
+    without blocking, you can use the "startAsync" method:
+
+        $cui->startAsync();
+
+        ## add some other handlers...
+
+        AE::cv->recv; ## block here instead
+
+    Most things work, including mouse support.
+
+DIALOGS
+    Curses::UI unfortunately implements a separate event loop in order to
+    handle modal dialogs. This conflicts with our AnyEvent loop so it needed
+    to be stubbed out by replacing the internal "tempdialog" method.
+    Informational dialogs work normally, except they return immediately
+    instead of waiting for the dialog to be dismissed:
+
+        $cui->dialog("Some information: blah blah blah");
+        ## ^^ Returns immediately, not when dialog dismissed!
+
+    If you wish to perform some action after the dialog is dismissed, or in
+    the case of query dialogs you wish to access the value, there is a new
+    "-cb" parameter that accepts a callback:
+
+        $cui->question(-question => "What is your name?",
+                       -cb => sub {
+                                  my $name = shift;
+                                  ## ...
+                              });
+
+    Note that while a dialog is active, all keypresses are routed to that
+    dialog instead of the main screen. However, since the main event loop is
+    still active, it can still be processing externally triggered or timed
+    events.
+
+BUGS
+    There are still a few places that call `do_one_event()` in a loop
+    instead of using the AnyEvent loop so they will busy-loop until
+    dismissed by the user and no background events will be processed. The
+    cases I know about are search windows and fatal error screens. I may
+    stub these out similarly to dialogs if I need them (patches welcome).
+
+SEE ALSO
+    Curses-UI-AnyEvent github repo
+    <https://github.com/hoytech/Curses-UI-AnyEvent>
+
+    Curses::UI
+
+    AnyEvent
+
+    Curses::UI::POE
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2016 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

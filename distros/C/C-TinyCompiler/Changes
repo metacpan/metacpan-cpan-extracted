@@ -1,0 +1,65 @@
+Put changes under the appropriate header. Headers can include API CHANGES, 
+DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
+OTHER. Entries should be in chronological order, i.e. oldest at the top
+
+0.05  Wed, Aug 5, 2015
+
+  [BUGS]
+  
+  * Fixed Callable's broken handling of void argument lists.
+  
+  * Boolean precedent was not being handled correctly. Since Perl always
+    returns the last evaluated statement, this wasn't actually a problem.
+    However, if any new code was added, it would be, so Perl 5.20 started to
+    warn. That broke tests. Precedence is fixed and everything works again.
+
+0.04  Mon, Sep 1, 2013
+
+  [DEPENDENCIES] 
+  
+  * Added Alien::TinyCC at the specific version v0.05
+  
+  [OTHER]
+  
+  * Removed silly author tests.
+  
+  * Added git commit hook to check for updates to the Changes file. Hopefully
+    this document will be more accurate moving forward. :-)
+  
+  * Added support for Travis CI.
+
+0.03  Mon, Aug 26, 2013
+
+  [DEPENDENCIES] 
+  
+  * Added Alien::TinyCC at the specific version v0.03
+  
+  * For testing, we now depend on Test::Exception and Test::Warn.
+  
+  [BUG FIXES]
+  
+  * Differentiated between compiler warnings and errors. Still doesn't handle
+    multiple warnings properly, though.
+  
+  [OTHER]
+  
+  * Build.PL indicates the proper repository and bug tracker, and indicates that
+    README.pod should not be indexed. Hopefully that solves the issue of the
+    REAMDE being shown instead of the module's documentation on MetaCPAN.
+
+0.02  Tue, Aug 20, 2013
+
+  [DEPENDENCIES]
+  
+  * C::TinyCompiler now depends on Alien::TinyCC
+
+0.01  Sun, Aug 18, 2013
+
+  Initial release!
+  
+  C::TinyCompiler::Perl remains untested, along with its brethren, apart from
+  ::Perl::Croak, which is tested and used by other packages.
+  
+  C::TinyCompiler::Callable works!
+  
+  C::TinyCompiler::StretchyBufer works!

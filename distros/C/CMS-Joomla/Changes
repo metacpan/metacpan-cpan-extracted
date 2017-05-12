@@ -1,0 +1,40 @@
+Revision history for CMS::Joomla
+
+0.04	2011-09-13
+
+	* Added support and tests for Joomla! 1.7 configuration file
+	format.
+
+
+0.03    2008-12-27
+
+	* Removed display of "php: not found" error messages when
+	probing for PHP command line binary. (It does not matter any 
+	way as the configuration file is parsed internally in case the 
+	command line binary is not available).
+
+	* Catch the proper return status when executing PHP command
+	line binary. Previously we did not notice missing configuration
+	files.
+
+	* Added a test for checking proper detection of missing
+	Joomla! configuration file.
+
+
+0.02    2008-11-14
+
+	* Improved internal configuration.php parsing.
+
+	* Added dbprefix method.
+
+	* Implemented a test for parsing default Joomla! configuration.php.
+
+	* Added EXAMPLES section to manual.
+
+	* Added LICENSE to Makefile.PL.
+
+
+0.01    2008-11-13
+
+	* Initial release.
+

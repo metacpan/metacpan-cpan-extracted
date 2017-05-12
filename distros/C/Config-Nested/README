@@ -1,0 +1,79 @@
+Config::Nested VERSION 2.0 - read nested block configuration files.
+
+DESCRIPTION
+Config::Nested - read nested block configuration files.
+
+COPYRIGHT
+Copyright (c) 1998-2007 Anthony Fletcher. All rights reserved.
+These modules are free software; you can redistribute them and/or modify
+them under the same terms as Perl itself.
+
+This code is supplied as-is - use at your own risk.
+
+PREREQUISITES
+Perl5
+Exporter
+
+HOW TO BUILD AND INSTALL
+perl Makefile.PL
+make
+make test
+make install
+
+TODO
+Nothing planned.
+
+SUGGESTIONS
+Send suggestions, bugs, etc. to Anthony+perl@bifb.org.
+
+EXAMPLE CONFIGUARATION FILE
+
+The following data would produce 2 location configuration hashes and 6
+animal configuration hashes. Note that variables (e.g. owner) and
+booleans (e.g. alive) are scoped to their enclosing block.
+
+location home {
+	animal fish 
+	{
+		name Fred
+		sex male
+		colour yellow
+		happy
+		alive
+	}
+
+	{
+		owner  Gladys
+
+		animal rat
+		{
+			name Bob
+			!alive
+		}
+		animal bird
+		{
+			name Clyde
+			sex female
+			colour yellow
+			alive
+		}
+	}
+}
+
+location work
+{
+	animal horse
+	{
+		name "A Horse"
+	}
+}
+
+animal dog
+{
+	name Rover
+
+	animal flea
+	{
+	}
+}
+

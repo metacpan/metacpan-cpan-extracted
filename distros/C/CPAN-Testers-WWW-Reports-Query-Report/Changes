@@ -1,0 +1,27 @@
+Revision history for CPAN-Testers-WWW-Reports-Query-Report
+==========================================================
+
+0.05    2016-04-24
+        - added a content() method to aid debugging. Returns the text response
+          sent by the server.
+        - check network using api.cpantesters.org.
+
+0.04    2014-09-27
+        - fixed license fields in META.json to be lists.
+        - added homepage to META resources.
+        - added documentation about the CPAN Testers Fund.
+        - extended META testing.
+        - fixed lead module name in Makefile.PL.
+        - add error if no report found.
+        - more query tests.
+
+0.03    2014-04-22
+        - return more informative error messages.
+        - network may be responsive, but server may be busy.
+        - fixed distribution name in META.
+
+0.02    2014-04-01
+        - fixed skip test count in 10query.t.
+
+0.01    2014-03-30
+        - First release.

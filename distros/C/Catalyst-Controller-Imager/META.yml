@@ -1,0 +1,26 @@
+---
+abstract: 'generate scaled or mangled images'
+author:
+  - 'Wolfgang Kinkeldei <wolfgang@kinkeldei.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-Imager
+requires:
+  Catalyst::Runtime: 5.80
+  Image::Info: 1.31
+  Imager: 0.86
+  Imager::File::GIF: 0.82
+  Imager::File::JPEG: 0.82
+  Imager::File::PNG: 0.82
+  MIME::Types: 2.04
+  Moose: 2.0
+  Path::Class: 0.16
+  Pod::Coverage::TrustPod: 0
+version: 0.06

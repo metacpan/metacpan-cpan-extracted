@@ -1,0 +1,71 @@
+=pod
+
+=head1 Caffeinated Markup Language
+
+Please see the main page at 
+L<http://necrophonic.github.io/text-caffeinatedmarkup> as well as the
+wiki at
+L<https://github.com/necrophonic/text-caffeinatedmarkup/wiki>
+for details for the language and usage guides.
+
+=head2 What is it?
+
+The I<Caffeinated Markup Language> is an attempt to create a simple yet rich markup language.
+It is inspired by the best bits of other markup (and markdown) languages and builds on
+them with more features whilst not sacrificing source doc readability and ease of use.
+
+The idea is to be able to markup a document simply and quickly without polluting with
+too much markup furniture or needing to embed foreign markup to acheive good layout.
+
+
+=head2 Is this production ready?
+
+The current version is beta so not recommended for production use.
+
+
+=head2 What output formats are supported?
+
+Currently the only formatter is L<Text::CaffeinatedMarkup::HTMLFormatter> but feel
+free to write your own.
+
+
+=head2 How do I write a new output formatter?
+
+Currently the only parser is the L<Text::CaffeinatedMarkup::PullParser> which provides
+a sequential tokenized stream from the input file. Check out the existing HTML parser
+(L<Text::CaffeinatedMarkup::HTMLFormatter>) for an example.
+
+At some point I'll get around to writing a proper guide. More than likely once the 
+push parser and non blocking features have been fully implemented.
+
+
+=head2 Where can I find out more?
+
+Check out:
+
+=over 2
+
+=item * L<Github repo|http://github.com/necrophonic/text-caffeinatedmarkup>
+
+=item * L<Github wiki|http://github.com/necrophonic/text-caffeinatedmarkup/wiki>
+
+=back
+
+
+=head2 How about performance?
+
+The current CML is an early build but performance is being factored in. There are no
+specific metrics yet but there will be and I'll be striving to get the performance
+as fast as possible. See L</"Is there an XS version?">
+
+
+=head2 Is there an XS version?
+
+Not yet, but it's on the roadmap.
+
+
+=head1 Author
+
+J Gregory <jgregory@cpan.org>
+
+=cut

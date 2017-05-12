@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+# this crap is an asynchronous finger client. it's rather idiotic ;)
+
+use Coro;
+use Coro::Socket;
+use Coro::Event;
+use AnyEvent;
+
+my $quit = AnyEvent->condvar;
+
+# this gets started everytime a user enters a finger command
+sub finger {
+   my $user = shift;
+   my $host = shift;
+
+   my $fh = new Coro::Socket PeerHost => $host, PeerPort => "finger"
+      or die "$user\@$host: $!";
+
+   print $fh "$user\n";
+
+   print "$user\@$host: $_" while <$fh>;
+   print "$user\@$host: done\n";
+}
+
+# display the time or garble the display, YMMV.
+async {
+   my $w = Coro::Event->timer (interval => 0.001, hard => 1);
+   use Time::HiRes qw(time);
+   while () {
+      $w->next;
+      print "\e7\e[C\e[C\e[C\e[C\e[C\e[C\e[C\e[C   <time ", time, ">   \e8";
+   };
+};
+
+my $stdin = new_from_fh Coro::Handle \*STDIN;
+
+$SIG{PIPE} = 'IGNORE';
+
+$| = 1;
+while() {
+   print "cmd (finger|quit)> "; my $cmd = <$stdin>; chomp $cmd;
+   if ($cmd eq "finger") {
+      print "user> "; my $user = <$stdin>; chomp $user;
+      print "host> "; my $host = <$stdin>; chomp $host;
+      async { finger $user, $host };
+   } elsif ($cmd eq "quit") {
+      last;
+   } else {
+      print "unknown command '$cmd', either 'finger' or 'quit'\n";
+   }
+}
+

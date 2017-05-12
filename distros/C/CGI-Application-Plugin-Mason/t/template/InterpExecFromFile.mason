@@ -1,0 +1,12 @@
+<%args>
+$param
+</%args>
+<html>
+<head>
+<title>InterpExecFromFile</title>
+</head>
+
+<body>
+param : <% $param %>
+</body>
+</html>

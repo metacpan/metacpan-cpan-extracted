@@ -1,0 +1,24 @@
+Revision history for Config-MVP-Writer-INI
+
+0.004     2015-06-04T23:25:30Z
+
+  - Remove unused dependency on List::AllUtils/List::MoreUtils. (@ether++)
+
+0.003     2013-03-22T04:30:04Z
+
+  - Don't leave a trailing space on a line where a config value is blank
+  - Try harder to match the name to the package moniker to avoid duplicates.
+  - Add 'strip_bundle_prefix' option to always remove the "@Foo/" part of
+    the section name (default true).  This cuts down on the noise when the
+    name is actually different from the package moniker.
+
+0.002     2013-03-04T00:45:53Z
+
+  - Document and test the 'spacing' and 'rewrite_package' options
+  - Be more lenient in how sections are specified
+  - Bug fixes
+  - More tests
+
+0.001     2013-03-02T23:00:07Z
+
+  - Initial release

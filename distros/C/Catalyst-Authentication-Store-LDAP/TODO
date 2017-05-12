@@ -1,0 +1,10 @@
+* Cache - this hits the directory a lot during full Auth/Authz usage.  
+
+* Recipes - We could handle some default recipes in the documentation for
+             different usage patterns.
+
+* Tests - We don't do any but the most cursory of tests
+
+(13:22:23) jayk: karpet: yah. the ability to define the user class to use 
+in config would make the module much more flexible.  
+able to customize without so much hacking around. 

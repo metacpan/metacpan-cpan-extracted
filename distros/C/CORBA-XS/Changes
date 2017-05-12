@@ -1,0 +1,69 @@
+Revision history for Perl extension CORBA::XS.
+
+0.63  Sat May 12 01:30:00 2012
+	- fix RT#76826
+
+0.62  Wed Jul 16 18:30:00 2008
+	- add Vi & Emacs macros
+
+0.61  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+
+0.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+0.54  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+0.53  Tue Jul 19 18:30:00 2005
+	- new enum (CORBA::C)
+
+0.52  Sat May 21 12:30:00 2005
+	- c_cdr.pm : bug client free sequence
+	- use CORBA::C::skel
+
+0.51  Mon Jun  7 08:30:00 2004
+	- some bugs
+
+0.50  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+	- automatic merge of skel_*.c
+
+0.40  Tue Mar 16 12:30:00 2004
+	- creation of CORBA::Perl
+
+0.31  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+
+0.30  Thu Feb 19 18:30:00 2004
+	- compatible  with CORBA::IDL 2.20
+	- idl2xs_c.pl : add option -h (display help)
+	- idl2xs_c.pl : add option -v (display version)
+
+0.22
+	- c_cdr.pm : buf ALLOC sequence parameter out (side client)
+
+0.21  Fri Aug 01 18:30:00 2003
+	- new pointer for array (*p -> &p[0]) in c_cdr.pm
+	- fix for Sequence in pl_name.pm & pl_cdr.pm
+
+0.20  Mon Jan 13 12:30:00 2003
+	- support CORBA IDL 3.0
+	- refactoring
+
+0.12  Tue Sep 17 08:30:00 2002
+	- add -J option
+
+0.11  Tue May 21 09:30:00 2002
+	- fix bug in test.pl
+	- complete implementation
+	- add 2 examples
+
+0.10  Tue May 14 08:30:00 2002
+	- first release
+
+0.01  Fri May  3 16:02:11 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n CORBA::XS
+

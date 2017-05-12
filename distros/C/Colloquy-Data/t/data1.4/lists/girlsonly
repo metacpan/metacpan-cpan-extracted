@@ -1,0 +1,10 @@
+return {
+  description = "Just for girls.",
+  created = "Wed Nov  9 15:21:57 2005",
+  members = { "neech", "zoe", "jen", "becky", "sarah", "heathers", "botbot", "neonkandi", },
+  listname = "GirlsOnly",
+  masters = { },
+  owner = "jen",
+  flags = "PL",
+  used = 1132857821,
+}

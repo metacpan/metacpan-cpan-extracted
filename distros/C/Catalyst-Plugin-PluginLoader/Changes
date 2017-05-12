@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst::Plugin::PluginLoader
+
+0.04  2009-05-26 23:23:47
+    - change to Class::MOP::Class::class_precedence_list which is probably
+      even better
+
+0.03  2009-05-22 13:00:13
+    - change method dispatcher to mro::get_linear_isa which is more correct
+
+0.02  2009-05-17 21:44:05
+    - some initial role support
+
+0.01  2009-05-12 12:30:33
+    - first release

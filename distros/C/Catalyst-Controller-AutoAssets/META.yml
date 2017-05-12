@@ -1,0 +1,48 @@
+---
+abstract: 'Automatic asset serving via sha1-based URLs'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Test: 0
+  FindBin: 0
+  Test::More: 0
+  lib: 0
+  parent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-AutoAssets
+requires:
+  CSS::Scopifier: 0.04
+  CSS::Scopifier::Group: 0
+  Carp: 0
+  Catalyst::Controller: 0
+  Catalyst::Utils: 0
+  CatalystX::InjectComponent: 0
+  Cwd: 0
+  Data::Dumper::Concise: 0
+  Digest::SHA1: 0
+  Fcntl: 0
+  File::stat: 0
+  MIME::Types: 0
+  Module::Runtime: 0
+  Moose: 0
+  Moose::Role: 0
+  Path::Class: 0.32
+  Storable: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  IRC: irc://irc.perl.org/#rapidapp
+  bugtracker: https://github.com/vanstyn/Catalyst-Controller-AutoAssets/issues
+  repository: https://github.com/vanstyn/Catalyst-Controller-AutoAssets.git
+version: 0.40

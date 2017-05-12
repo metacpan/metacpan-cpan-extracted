@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_Crypt-IDA.t
+t/10_Crypt-IDA-ShareFile.t
+lib/Crypt/IDA.pm
+lib/Crypt/IDA/ShareFile.pm
+bin/rabin-combine.pl
+bin/rabin-split.pl
+bin/SplitCombine.pl
+bin/SplitCombine.xml
+
+META.yml                                 Module meta-data (added by MakeMaker)

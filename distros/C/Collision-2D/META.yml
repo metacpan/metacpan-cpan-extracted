@@ -1,0 +1,40 @@
+---
+abstract: 'Continuous 2d collision detection'
+author:
+  - 'Zach Morgan <zpmorgan@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Collision-2D
+provides:
+  Collision::2D:
+    file: lib/Collision/2D.pm
+    version: 0.07
+  Collision::2D::Collision:
+    file: lib/Collision/2D/Collision.pm
+  Collision::2D::Entity:
+    file: lib/Collision/2D/Entity.pm
+  Collision::2D::Entity::Circle:
+    file: lib/Collision/2D/Entity/Circle.pm
+  Collision::2D::Entity::Grid:
+    file: lib/Collision/2D/Entity/Grid.pm
+  Collision::2D::Entity::Point:
+    file: lib/Collision/2D/Entity/Point.pm
+  Collision::2D::Entity::Rect:
+    file: lib/Collision/2D/Entity/Rect.pm
+requires:
+  Carp: 0
+  List::AllUtils: 0
+  POSIX: 0
+  Set::Object: 0
+  Test::More: 0
+  Test::Number::Delta: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

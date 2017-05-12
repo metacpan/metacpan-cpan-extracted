@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-ParseDistribution
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  Archive::Zip: '0'
+  Devel::CheckOS: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Parallel::ForkManager: '1.03'
+  Test::More: '0.88'
+  YAML: '0.6'
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-CPAN-ParseDistribution/issues
+  repository: https://github.com/DrHyde/perl-modules-CPAN-ParseDistribution
+version: '1.54'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

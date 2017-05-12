@@ -1,0 +1,25 @@
+Revision history for Catalyst-Plugin-EnableMiddleware
+
+0.006   06 April 2012
+        - reverse order that middleware is applied so that it
+          act as Plack::Builder (could be breaking change, FYI)
+
+0.005   06 April 2012
+        - fixed missing changelog
+        - adding debug output of loaded middleware
+        - don't try to installing middleware if theres none
+        - display loaded middlware if in debug mode
+
+0.004   06 April 2012
+        - fixed incorrect abstract in dist.ini
+
+0.003   06 April 2012
+        - Fixed another documentation goof
+        - Added more docs
+        - Fixed incorrect version in module
+
+0.002   06 April 2012
+        - Fixed 'to much cut and paste' in the docs
+
+0.001   05 April 2012
+        - initial release with all features complete

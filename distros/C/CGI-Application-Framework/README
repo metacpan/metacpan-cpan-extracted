@@ -1,0 +1,40 @@
+
+This document describes the procedure for the installing the
+CGI::Application::Framework (CAF), a fully-featured web application
+development platform built on CGI::Application.
+
+The INSTALL.txt document tells you how to install the CAF.
+
+The other documentation is in POD format:
+
+    CGI::Application::Framework - general docs
+    Examples.pod                - guide to the Example apps
+
+
+You can read these documents online in HTML format by visiting:
+
+    http://search.cpan.org/dist/CGI-Application-Framework/lib/CGI/Application/Framework.pm
+
+The docs are also available onlin at the CAF web site:
+
+    http://www.cafweb.org/
+
+CGI::Application::Framework was originally developed by Richard Dice under the 
+name CGI::Application::MVCFramework and under the generous auspices of LPI, the
+Linux Professional Institute (http://www.lpi.org/).  Many thanks to G. Matthew Rice
+and Rick Delaney at LPI for their support and encouragement througout the whole
+project, technical and otherwise.
+
+Since then, the package has been massively reworked by Michael Graham, and renamed
+to CGI::Application::Framework.
+
+After several months of post-YAPC::NA 2005 burn-out (Richard and Michael were/are
+two of the key organizers of the Toronto.pm conference production team) we finally
+got our collective butts in gear and got the package finally ready for
+"alpha quality general release" to CPAN.  Share - and enjoy!
+
+Copyright - Richard Dice, rdice-at-pobox.com
+=========
+
+License - you may use this package freely and distribute it under the same terms as
+=======   Perl itself. (I.e. Artistic License and/or GNU GPL.)

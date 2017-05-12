@@ -1,0 +1,12 @@
+// File: CORBA_CustomMarshal.idl
+// CORBA 3.0, Chapter 5
+// depends on CORBA_Stream.idl
+
+#ifdef _PRE_3_0_COMPILER_
+#pragma prefix "omg.org/CORBA"
+#endif
+
+	abstract valuetype CustomMarshal {
+		void marshal   (in DataOutputStream os);
+		void unmarshal (in DataInputStream  is);
+	};

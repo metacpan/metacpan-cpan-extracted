@@ -1,0 +1,32 @@
+Class::Hash version 1.01
+========================
+
+Sometimes its convenient to see a hash presented as an object with methods.
+This module implements a "inside-out" hash that may be accessed via name
+accessors or by method operations, depending upon how the instance is
+configured.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.8.0. Technically, it may work with slightly
+earlier versions (no earlier than 5.7.1), but I haven't tested it with
+anything else.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Andrew Sterling Hanenkamp
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

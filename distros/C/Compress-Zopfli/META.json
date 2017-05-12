@@ -1,0 +1,64 @@
+{
+   "abstract" : "Interface to Google Zopfli Compression Algorithm",
+   "author" : [
+      "Marcel Greter <compress-zopfli@ocbnet.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Compress-Zopfli",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.09",
+            "ExtUtils::MakeMaker" : "6.52",
+            "Getopt::Long" : "0.01",
+            "IO::Uncompress::Gunzip" : "0",
+            "IO::Uncompress::Inflate" : "0",
+            "IO::Uncompress::RawInflate" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CppGuess" : "0.09",
+            "ExtUtils::MakeMaker" : "6.52",
+            "Getopt::Long" : "0.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.01",
+            "Getopt::Long" : "0.01",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mgreter/perl-zopfli/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Compress-Zopfli",
+      "license" : [
+         "http://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mgreter/perl-zopfli"
+      }
+   },
+   "version" : "v0.0.1"
+}

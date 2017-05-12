@@ -1,0 +1,1 @@
+[% search.as_json(1) %]

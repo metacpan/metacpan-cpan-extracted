@@ -1,0 +1,78 @@
+0.9660: Wed Jun 17 2015
+   - maybe make t/05_test_cgi-fast.t stop failing
+
+0.9659: Tue Apr 28 2015
+   - still a bunch of cpan tester problems, particularly with the (somewhat
+     pointless) CGI::Fast test
+
+0.9658: Mon Apr 27 2015
+   - https://rt.cpan.org/Public/Bug/Display.html?id=103981
+   - additionally, the new CPAN version cannot be (easily) hacked upon to
+     produce non HTML tags. So I made a pseudo-CGI.pm argument parser.
+     I'm assuming it's not nearly as good, but I don't think there's any
+     users of this module either.
+
+0.9657: Mon Feb 25 2013
+   - added a charset (utf8) to the cgi response
+
+0.9655: Thu Nov 24 2011
+   - more import/export issues — this time while using CGI::Fast
+     https://rt.cpan.org/Ticket/Display.html?id=72662
+
+0.9654: Fri Nov 18 2011
+   - I cleaned up the compile-time/import-time code into one cute
+     little block of pure evil.  This has a side effect of fixing
+     a problem (bug?) where not calling import breaks the whole
+     module.
+
+0.9653: Thu Nov 17 2011
+   - really minor fix so one can call (eg) CGI::RSS::start_rss()
+     as a non-method.  Requested by Austin Seraphin
+
+0.9652: Fri Oct 28 2011
+   - %Z only works in the states, doesn't validate anywhere else
+
+0.9651: Wed Oct 26 2011
+   - minor change re: date formats, they're not configurable
+   - fixed silly loading of CGI tags, import() vs header()
+
+0.9600: Sat Apr 25 14:08:43 EDT 2009
+   - added a begin block to set the timezone to UTC when Date::Manip can't
+     otherwise figure it out.
+
+0.9501: Mon Apr  6 17:17:51 EDT 2009
+   - doc bugs
+
+0.95: Mon Apr  6 11:06:15 EDT 2009
+   - split the pod to a separate file
+   - my rss does not validate...
+   - added Date::Manip RFC822 date reformatting
+   - taught CGI::RSS to preserve case on tags (involved
+     deparse... blech)
+   - fixed a bug in finish_rss
+   - apparently, to validate, an RSS channel needs a
+     description...
+
+0.92: Thu Mar 26 12:00:54 EDT 2009
+   - messed up the META.yml
+
+0.91: Thu Mar 26 08:52:39 EDT 2009
+   - ditching the lgpl2 gz file for the new meta
+   - added chrony's meta.yml stuff
+
+0.9: Thu Aug  7 15:53:52 EDT 2008
+   - ditched version.pm
+
+0.7.3: Tue May 27 12:03:32 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+0.7.2: Mon May 26 15:44:02 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+0.7.1: Sat May 24 09:31:16 EDT 2008
+   - using version.pm as suggested by Andreas Koenig

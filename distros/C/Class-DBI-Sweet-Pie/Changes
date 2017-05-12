@@ -1,0 +1,8 @@
+Revision history for Class-DBI-Sweet-Pie
+
+0.04    2006-04-20
+        - support DISTINCT column
+
+0.03    2006-04-13
+        - First release.
+

@@ -1,0 +1,56 @@
+Revision history for CatalystX-InjectModule
+
+0.12 2016-07-09
+     - pass mi to uninstall to pass some tests
+     - use travis
+     - update dependencies end pod
+
+0.11 2016-05-21
+     - update dependencies to pass some tests and use travis
+
+0.10 2016-01-19
+     - save the installation information in files
+     - debug attribut
+     - load module and use install method if exist
+     - add role CatalystX-InjectModule-Fixtures
+     - fix a bug on the uniqueness of the returned modules
+
+0.09 2015-12-04
+     - use Catalyst::Utils::inject_component
+     - use Catalyst::Utils::merge_hash to merge modules config
+     - add template paths to all view
+
+0.08 2015-11-12
+     - use Template and Static modules
+     - update pod
+
+0.07 2015-09-27
+     - add tests
+     - load only ^config.yml$
+     - add pod in french
+     - use Setup module
+
+0.06 2015-09-20
+     - change the module name
+     - simplifie and replace some methods
+     - add @INC in search modules path ( path: __INC__ )
+     - merge module's config.yml with catalyst config
+
+0.05 2015-09-20
+      - test access to /login when CatalystX::SimpleLogin is injected
+      - loading modules in finaluze_config
+      - die if module is not found
+
+0.04  2015-09-09
+      - inject catalyst plugins
+
+0.03  2015-09-09
+      - inject components in application
+
+0.02  2015-09-09
+      - dependencies are resolved by the Dependency::Resolver Module
+      - Add lib module to INC
+      - add debug
+
+0.01  2015-08-11
+      - initiale release

@@ -1,0 +1,17 @@
+Revision history for Call-Haskell
+
+v0.2.1  2015-09-18 13:25:18 BST
+        - Localised Data::Dumper settings
+        - Added instructions for manual testing to README.md
+v0.2.0  2015-03-10 15:52:21 GMT
+        - Builder now correctly detects objects to be put in the FFI library
+        - Builder now automatically detects Haskell packages for linking
+
+v0.1.1  2015-02-19 10:06:24 GMT
+        - Changed name of types module from Types to Functional::Types
+
+v0.1.0  2015-02-18 09:17:57 GMT
+        - This release works for most untyped cases as well as with the type system.
+
+v0.0.1  2015-02-09 14:34:36 GMT
+        - Initial release

@@ -1,0 +1,31 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Enzyme
+version:      0.11
+version_from: lib/Catalyst/Enzyme.pm
+installdirs:  site
+requires:
+    Catalyst:                      0
+    Catalyst::Helper::Model::CDBI: 0
+    Catalyst::Model::CDBI:         0.1
+    Catalyst::Plugin::DefaultEnd:  0
+    Catalyst::Plugin::FormValidator: 0
+    Catalyst::View::TT::ControllerLocal: 0
+    Class::DBI:                    0.96
+    Class::DBI::AsForm:            2.42
+    Class::DBI::FromForm:          0.03
+    Class::DBI::Pager:             0
+    Class::DBI::Plugin::Type:      0.02
+    Class::DBI::SQLite:            0.09
+    Data::FormValidator:           4.02
+    DBI::Shell:                    0
+    File::Slurp:                   0
+    HTML::Element:                 0
+    List::Util:                    0
+    Path::Class:                   0
+    Test::More:                    0
+    URI:                           0
+    URI::QueryParam:               0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

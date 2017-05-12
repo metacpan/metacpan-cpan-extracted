@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Application-Plugin-Stash.t
+lib/CGI/Application/Plugin/Stash.pm
+META.yml                                 Module meta-data (added by MakeMaker)

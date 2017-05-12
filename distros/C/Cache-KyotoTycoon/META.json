@@ -1,0 +1,99 @@
+{
+   "abstract" : "KyotoTycoon client library",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cache-KyotoTycoon",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Furl" : "1.00",
+            "Furl::HTTP" : "0",
+            "MIME::Base64" : "0",
+            "MIME::QuotedPrint" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Test::TCP" : "1.17"
+         }
+      }
+   },
+   "provides" : {
+      "Cache::KyotoTycoon" : {
+         "file" : "lib/Cache/KyotoTycoon.pm",
+         "version" : "0.16"
+      },
+      "Cache::KyotoTycoon::Cursor" : {
+         "file" : "lib/Cache/KyotoTycoon/Cursor.pm"
+      },
+      "TSVRPC::Client" : {
+         "file" : "lib/TSVRPC/Client.pm",
+         "version" : "0.16"
+      },
+      "TSVRPC::Parser" : {
+         "file" : "lib/TSVRPC/Parser.pm"
+      },
+      "TSVRPC::Util" : {
+         "file" : "lib/TSVRPC/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Cache-KyotoTycoon/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Cache-KyotoTycoon",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Cache-KyotoTycoon.git",
+         "web" : "https://github.com/tokuhirom/Cache-KyotoTycoon"
+      }
+   },
+   "version" : "0.16",
+   "x_contributors" : [
+      "Tobias Kirschstein <lev@ideegeo.com>",
+      "ktat <ktat.is@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

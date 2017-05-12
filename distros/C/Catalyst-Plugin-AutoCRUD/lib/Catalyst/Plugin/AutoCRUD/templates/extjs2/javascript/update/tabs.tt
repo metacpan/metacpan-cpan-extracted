@@ -1,0 +1,137 @@
+    // we use the metadata loaded into the stash to create window tabs
+    // each tab is one table
+    // all tabs are in the same "form" wrt ajax submission
+
+    // most of the messing about is to get the right form field types
+    // also readonly, validation
+
+    [% SET tab_order = [ '' ] %]
+    [% FOREACH col IN cpac.tc.cols %]
+      [% NEXT UNLESS cpac.tm.f.$col.extra('rel_type') == 'belongs_to' %]
+      [% tab_order.push( col ) %]
+    [% END %]
+
+    var tabs = [
+      [% FOREACH orig_col IN tab_order %]
+        [% SET tbl = cpac.tm.f.$orig_col.extra('ref_table') || cpac_table %]
+        [% SET conf = cpac.c.$cpac_db.t.$tbl %]
+        [% SET meta = cpac.m.t.$tbl %]
+
+        [% NEXT IF conf.create_allowed == 'no' OR conf.update_allowed == 'no' %]
+        [% ',' IF orig_col != '' %]{
+            [% IF orig_col == '' %]
+              title: '[% conf.display_name %]'
+            [% ELSE %]
+              title: 'New [% cpac.tm.f.$orig_col.extra('display_name') %]'
+              ,xtype: 'fieldset'
+              ,checkboxToggle: true
+              ,checkboxName: 'checkbox.[% orig_col %]'
+              ,collapsed: true
+            [% END %]
+
+            ,items: [
+              [% SET count = 1 %]
+              [% FOREACH field IN conf.cols %]
+              [% NEXT IF meta.f.$field.extra('is_reverse') OR meta.f.$field.extra('masked_by') %]
+              [% NEXT IF orig_col != '' AND meta.f.$field.extra('is_proxy') %]
+                [% ',' IF count > 1 %]{
+                  [% IF orig_col == '' %]
+                    [% IF count == 1 %]
+                    name: 'cpac__id'
+                    ,id: 'cpac__id'
+                    ,xtype: 'hidden'
+                    },{
+                    [% END %]
+                    name: '[% field | replace('\'', '\\\'') %]'
+                    ,id: '[% field | replace('\'', '\\\'') %]'
+                  [% ELSE %]
+                    name: '[% orig_col %].[% field | replace('\'', '\\\'') %]'
+                    ,id: '[% orig_col %].[% field | replace('\'', '\\\'') %]'
+                  [% END %]
+
+                  [%= SET count = count + 1 %]
+                  [% IF meta.f.$field.is_auto_increment %]
+                    ,xtype: 'hidden'
+                  }[% NEXT %]
+                  [% END -%]
+
+                  ,fieldLabel: '[% conf.headings.$field %]'
+                  ,anchor: '-20'
+                  ,autoHeight: true
+                  
+                  [%= IF meta.f.$field.default_value.defined %]
+                    ,value: '[% meta.f.$field.default_value | replace('\'', '\\\'') %]'
+                  [% END %]
+
+                  [%= IF NOT meta.f.$field.is_nullable
+                        AND (NOT meta.f.$field.default_value.defined OR meta.f.$field.default_value) %]
+                    ,allowBlank: false
+                  [% END %]
+
+                  [%= IF meta.f.$field.is_foreign_key %]
+                    ,xtype: 'combo'
+                    ,displayField: 'stringified'
+                    ,valueField: 'dbid'
+                    [% IF orig_col == '' %]
+                    ,hiddenName: 'combobox.[% field | replace('\'', '\\\'') %]'
+                    [% ELSE %]
+                    ,hiddenName: 'combobox.[% orig_col %].[% field | replace('\'', '\\\'') %]'
+                    [% END %]
+                    ,loadingText: 'Searching...'
+                    ,forceSelection: true
+                    ,selectOnFocus: true
+                    ,typeAhead: false
+                    ,pageSize: 5
+                    ,triggerAction: 'all'
+                    ,store: new Ext.data.JsonStore ({
+                        url: '[% c.uri_for(
+                            c.controller('AutoCRUD::DisplayEngine::ExtJS2').action_for('list_stringified'),
+                            [cpac.g.site,cpac_db,tbl]
+                        ) %]'
+                        ,root: 'rows'
+                        ,totalProperty: 'total'
+                        ,fields: [ 'dbid', 'stringified' ]
+                        ,listeners: {
+                            beforeload: function(store, options) {
+                                var start = options.params.start;
+                                var limit = options.params.limit;
+                                options.params.page = Math.floor(start / limit) + 1;
+                                options.params.fkname = '[% field %]';
+                                return true;
+                            }
+                        }
+                    })
+                    // allow clearing of value
+                    ,listeners: {
+                        blur : function() {
+                            if (this.allowBlank && this.getRawValue() === '') {
+                                this.clearValue();
+                            }
+                        }
+                    }
+                  [% ELSE %]
+                    [% SET localxtype = meta.f.$field.extra('extjs_xtype') OR "textarea" %]
+                    ,xtype: '[% localxtype %]'
+
+                    [%= SWITCH localxtype %]
+                    [% CASE 'timefield' %]
+                    ,format: 'H:i:s'
+                    [% CASE 'datefield' %]
+                    ,format: 'Y-m-d'
+                    [% CASE 'xdatetime' %]
+                    ,otherToNow: false
+                    ,dateFormat: 'Y-m-d'
+                    ,timeFormat: 'H:i:s'
+                    [% CASE 'textarea' %]
+                    ,grow: true
+                    ,growMin: 0
+                    ,growMax: 200
+                    ,autoHeight: true
+                    [% END %]
+                  [% END %]
+                }
+              [% END %]
+            ]
+        }
+      [% END %]
+    ];

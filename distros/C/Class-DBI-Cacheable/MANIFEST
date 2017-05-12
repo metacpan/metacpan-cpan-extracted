@@ -1,0 +1,8 @@
+Makefile.PL
+Changes
+lib/Class/DBI/Cacheable.pm
+lib/Class/DBI/ObjectCache.pm
+README
+t/01basic.t
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

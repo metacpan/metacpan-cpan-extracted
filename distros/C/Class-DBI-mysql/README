@@ -1,0 +1,125 @@
+NAME
+    Class::DBI::mysql - Extensions to Class::DBI for MySQL
+
+SYNOPSIS
+      package Film;
+      use base 'Class::DBI::mysql';
+      __PACKAGE__->set_db('Main', 'dbi:mysql:dbname', 'user', 'password');
+      __PACKAGE__->set_up_table("film");
+
+      __PACKAGE__->autoinflate(dates => 'Time::Piece');
+
+      # Somewhere else ...
+
+      my $type = $class->column_type('column_name');
+      my @allowed = $class->enum_vals('column_name');
+
+      my $tonights_viewing  = Film->retrieve_random;
+
+DESCRIPTION
+    This is an extension to Class::DBI, containing several functions and
+    optimisations for the MySQL database. Instead of setting Class::DBI as
+    your base class, use this instead.
+
+METHODS
+  set_up_table
+            __PACKAGE__->set_up_table("table_name");
+
+    Traditionally, to use Class::DBI, you have to set up the columns:
+
+            __PACKAGE__->columns(All => qw/list of columns/);
+            __PACKAGE__->columns(Primary => 'column_name');
+
+    Whilst this allows for more flexibility if you're going to arrange your
+    columns into a variety of groupings, sometimes you just want to create
+    the 'all columns' list. Well, this information is really simple to
+    extract from MySQL itself, so why not just use that?
+
+    This call will extract the list of all the columns, and the primary key
+    and set them up for you. It will die horribly if the table contains no
+    primary key, or has a composite primary key.
+
+  autoinflate
+      __PACKAGE__->autoinflate(column_type => 'Inflation::Class');
+
+      __PACKAGE__->autoinflate(timestamp => 'Time::Piece');
+      __PACKAGE__->autoinflate(dates => 'Time::Piece');
+
+    This will automatically set up has_a() relationships for all columns of
+    the specified type to the given class.
+
+    We currently assume that all classess passed will be able to inflate and
+    deflate without needing extra has_a arguments, with the example of
+    Time::Piece objects, which we deal with using Time::Piece::mysql (which
+    you'll have to have installed!).
+
+    The special type 'dates' will autoinflate all columns of type date,
+    datetime or timestamp.
+
+  create_table
+            $class->create_table(q{
+                    name    VARCHAR(40)     NOT NULL PRIMARY KEY,
+                    rank    VARCHAR(20)     NOT NULL DEFAULT 'Private',
+                    serial  INTEGER         NOT NULL
+            });
+
+    This creates the table for the class, with the given schema. If the
+    table already exists we do nothing.
+
+    A typical use would be:
+
+            Music::CD->table('cd');
+            Music::CD->create_table(q{
+              cdid   MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+              artist MEDIUMINT UNSIGNED NOT NULL,
+                    title  VARCHAR(255),
+                    year   YEAR,
+                    INDEX (artist),
+                    INDEX (title)
+            });
+            Music::CD->set_up_table;
+
+  drop_table
+            $class->drop_table;
+
+    Drops the table for this class, if it exists.
+
+  column_type
+            my $type = $class->column_type('column_name');
+
+    This returns the 'type' of this table (VARCHAR(20), BIGINT, etc.)
+
+  enum_vals
+            my @allowed = $class->enum_vals('column_name');
+
+    This returns a list of the allowable values for an ENUM column.
+
+  retrieve_random
+            my $film = Film->retrieve_random;
+
+    This will select a random row from the database, and return you the
+    relevant object.
+
+    (MySQL 3.23 and higher only, at this point)
+
+SEE ALSO
+    Class::DBI. MySQL (http://www.mysql.com/)
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-mysql@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify it under
+      the terms of the GNU General Public License; either version 2 of the License,
+      or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful, but WITHOUT
+      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+      FOR A PARTICULAR PURPOSE.
+

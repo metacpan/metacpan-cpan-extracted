@@ -1,0 +1,12 @@
+Revision history for Perl extension CGI::Session.
+
+0.01  Wed Jun  6 12:01:17 2001
+	- original version; created by h2xs 1.19
+
+0.9c  Thu 14 22:20:00 2002
+        - something alpha and almost releasable
+        - NetLDAP and LDAP authenticators work
+        - NetLDAP authorizor has not been rigorously tested
+        - There is no LDAP authorizor
+         
+

@@ -1,0 +1,82 @@
+NAME
+    Carp::Assert - executable comments
+
+SYNOPSIS
+        # Assertions are on.
+        use Carp::Assert;
+
+        $next_sunrise_time = sunrise();
+
+        # Assert that the sun must rise in the next 24 hours.
+        assert(($next_sunrise_time - time) < 24*60*60) if DEBUG;
+
+        # Assertions are off.
+        no Carp::Assert;
+
+        $next_pres = divine_next_president();
+
+        # Assert that if you predict Dan Quayle will be the next president
+        # your crystal ball might need some polishing.  However, since
+        # assertions are off, IT COULD HAPPEN!
+        shouldnt($next_pres, 'Dan Quayle') if DEBUG;
+
+DESCRIPTION
+        "We are ready for any unforseen event that may or may not 
+        occur."
+            - Dan Quayle
+
+    Carp::Assert is intended for a purpose like the ANSI C library assert.h.
+    If you're already familiar with assert.h, then you can probably skip
+    this and go straight to the FUNCTIONS section.
+
+    Assertions are the explict expressions of your assumptions about the
+    reality your program is expected to deal with, and a declaration of
+    those which it is not. They are used to prevent your program from
+    blissfully processing garbage inputs (garbage in, garbage out becomes
+    garbage in, error out) and to tell you when you've produced garbage
+    output. (If I was going to be a cynic about Perl and the user nature,
+    I'd say there are no user inputs but garbage, and Perl produces nothing
+    but...)
+
+    An assertion is used to prevent the impossible from being asked of your
+    code, or at least tell you when it does. For example:
+
+        # Take the square root of a number.
+        sub my_sqrt {
+            my($num) = shift;
+
+            # the square root of a negative number is imaginary.
+            assert($num >= 0);
+
+            return sqrt $num;
+        }
+
+    The assertion will warn you if a negative number was handed to your
+    subroutine, a reality the routine has no intention of dealing with.
+
+AUTHOR
+        Michael G Schwern <schwern@pobox.com>
+
+WHAT IS THIS?
+
+This is Carp::Assert, a perl module.  Please see the README that comes with
+this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+WHAT MODULES DO I NEED?
+
+    Carp

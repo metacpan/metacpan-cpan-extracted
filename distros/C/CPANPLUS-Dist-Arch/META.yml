@@ -1,0 +1,43 @@
+---
+abstract: 'CPANPLUS backend for building ArchLinux pacman packages'
+author:
+  - 'John D Jones III <jnbek@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPANPLUS-Dist-Arch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  CPANPLUS: '0'
+  Carp: '0'
+  Cwd: '0'
+  Digest::MD5: '0'
+  DynaLoader: '0'
+  File::Copy: '0'
+  File::Path: 2.06_05
+  File::Spec::Functions: '0'
+  File::stat: '0'
+  Getopt::Long: '0'
+  IO::Zlib: '0'
+  IPC::Cmd: '0'
+  Module::CoreList: '0'
+  POSIX: '0'
+  Pod::Select: '0'
+  Pod::Usage: '0'
+  Term::ANSIColor: '0'
+  Text::Wrap: '0'
+  version: '0'
+resources:
+  repository: https://github.com/jnbek/perl-cpanplus-dist-arch
+version: '1.32'

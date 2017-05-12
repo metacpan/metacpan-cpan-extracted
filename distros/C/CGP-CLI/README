@@ -1,0 +1,14 @@
+The CLI.pm Perl module is the main component for CommuniGate Pro scripting.
+It contains the package CGP::CLI and includes the routines to connect to
+the CommuniGate Pro server over the network, to send CommuniGate Pro CLI
+commands and to convert command parameters from the Perl internal format into
+the CommuniGate Pro CLI format, and to convert command results back into the
+Perl internal format.
+
+You should use the new CGP::CLI command to establish an authenticated
+connection with the CommuniGate Pro server and to create an interface
+object. Then you send commands to the server by calling various interface
+object methods.
+
+See also: http://www.communigate.com/CGPerl/
+

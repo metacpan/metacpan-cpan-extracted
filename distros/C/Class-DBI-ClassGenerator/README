@@ -1,0 +1,11 @@
+Given a database and a directory, this module (and its accompanying script)
+will create stub Class::DBI sub-class modules.  It differs from
+Class::DBI::AutoLoader in that it spits out code instead of just magickally
+instantiating classes.
+
+To install, do the usual dance:
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ sudo make install

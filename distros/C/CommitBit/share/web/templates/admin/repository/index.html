@@ -1,0 +1,25 @@
+<%args>
+$repository
+</%args>
+<%init>
+my $update= Jifty->web->new_action(class => 'UpdateRepository', record => $repository);
+
+
+</%init>
+<&|/_elements/wrapper,title => $repository->name &>
+<h1><%$repository->name%></h1>
+<%Jifty->web->form->start()%>
+% foreach my $arg ($update->argument_names) {
+<%$update->form_field($arg)%>
+% }
+<%Jifty->web->form->submit()%>
+<%Jifty->web->form->end()%>
+
+<%
+Jifty->web->link(
+    label => 'Projects',
+    url   => '/admin/repository/' . $repository->name . '/projects'
+    )
+
+%>
+</&>

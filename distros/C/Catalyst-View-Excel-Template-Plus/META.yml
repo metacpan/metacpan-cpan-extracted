@@ -1,0 +1,30 @@
+---
+abstract: 'A Catalyst View for Excel::Template::Plus'
+author:
+  - 'Stevan Little E<lt>stevan@cpan.orgE<gt>'
+build_requires:
+  Test::Exception: '0.21'
+  Test::More: '0.62'
+  parent: '0'
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-Excel-Template-Plus
+provides:
+  Catalyst::Helper::View::Excel::Template::Plus:
+    file: lib/Catalyst/Helper/View/Excel/Template/Plus.pm
+  Catalyst::View::Excel::Template::Plus:
+    file: lib/Catalyst/View/Excel/Template/Plus.pm
+    version: '0.04'
+requires:
+  Catalyst::Runtime: '0'
+  Excel::Template::Plus: '0.05'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/stevan/catalyst-view-excel-template-plus/
+version: '0.04'

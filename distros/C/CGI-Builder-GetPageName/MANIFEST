@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+README
+MANIFEST
+lib/CGI/Builder/GetPageName.pm
+t/00-compile.t
+t/01-pod-coverage.t
+t/02-cgi-builder-getpagename.t
+

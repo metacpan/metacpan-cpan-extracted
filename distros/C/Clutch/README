@@ -1,0 +1,39 @@
+This is Perl module Clutch.
+
+INSTALLATION
+
+Type the following command:
+
+    $ curl -L http://cpanmin.us | perl - Clutch
+
+Or install cpanm and then run the following command to install
+Clutch:
+
+    $ cpanm Clutch
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf Clutch-$version.tar.gz
+    $ cd Clutch-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+Clutch documentation is available as in POD. So you can do:
+
+    $ perldoc Clutch
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2011, Atsushi Kobayashi. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

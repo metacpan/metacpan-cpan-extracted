@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+# simple example of using configSection
+
+use strict;
+use warnings;
+
+use Config::DotNetXML Section => 'FooSection';
+
+our %appSettings;
+
+print $appSettings{Foo},"\n";

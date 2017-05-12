@@ -1,0 +1,248 @@
+Revision history for Perl extension CGI::Simple.
+
+0.01  Thu Nov  1 12:21:48 2001
+    - original version; created by h2xs 1.21 with options
+        -X CGI::Simple
+
+0.02 Fri Dec 21 2001
+    - added cgi_error() if upload called but CONTENT_TYPE not multipart/form-data
+    - changed inernal storage names of globals by droping $
+    - added mod_perl notes re Selfloader and __DATA__ token
+    - as per suggestions from Curtis Poe
+
+0.03 Fri Apr 12 2002
+    - modifed test so skipping fork() test is noted as such
+    - allow '0' as a valid param name
+    - renamed concur.t to concur.test so that it does not rub by default
+    - added speed tests comparing CGI.pm to CGI::Simple in  the file
+      cgi-simple_vs_cgi-pm.html in the root dir
+
+0.04 Sat Apr 12 2002
+    - test bug on Solaris reported by robc@stamps.stortek.com and fixed
+
+0.05 Wed Nov 6 2002
+    - nasty upload bug reported (with solution) by Brandon Black fixed. Perl would
+      hang if upload terminated by browser before completion
+    - also odity with IO::file fixed (Brandon Black once again)
+
+0.06 Fri Nov 8 2002
+    - finally found someone with a solaris box to work out reason for
+      unexpected test failures. Thanks to John D. Robinson and Jeroen Latour
+      Details available at: http://www.perlmonks.org/index.pl?node_id=211401
+    - Removed another new bug relating to test scripts rather than core code
+      thanks to the combined effors of Perlmonks tommyw, grinder, Jaap, vek,
+      erasei, jlongino and strider_corinth
+0.07 Sat Aug 2 2003
+    - i admit to abject slackness, but anyway finally allocated a few hours
+      to apply a number of bug fixes which are (in no particular order)
+    - mod_perl compliant, patched by Mathew Albright
+        - still need to comment out use Selfloader and __DATA__ token
+        - still thinking about other solutions to this
+    - Blessed globs now possible in the constructor thanks to chromatic
+    - Unicode error  0xfe |  ($c >> 30) -> 0xfc | ($c >>30 ) fixed thanks to
+      Thomas L. Shinnick
+    - s/$value ||= 0/$value = defined $value ? $value : ''/ in raw_fetch() method
+      in Cookie.pm to allow value 0.
+    - Added missing $VERSION to Util.pm
+    - Added P3P support as suggested by Marc Bauer (parallels CGI.pm)
+        - updated header() and redirect() methods in Simple.pm
+0.071 Sat Aug 2 2003
+    - Oops, changed $VERSION to 0.007 not 0.07 so have to change to 0.071 to
+      upload again. ;-)
+    - no significant changes since 0.07 (aka 0.007) ;-)
+0.072 Tue Sept 9 2003
+    - Patched issue with large POSTs where data may not be on STDIN for single
+      read call. Bug exists in CGI.pm as well. Thanks to Jason Luther
+    - Added tests for slow post behaviour
+0.075 Tue June 1 2004
+    - Meant to upload 0.73 and 0.074 but just never got around to it
+    - Fixed upload hang bug in certain circumstances
+    - Added upload_fieldnames() method by request
+    - Added support for $fh = upload('field_name') but this has the issue
+      of what to do if 'field_name' is duplicated. You can only ever get one
+      fh from this method unlike the favoured approach using param() to get
+      the filename(s) which will let you get to all the files.
+    - José Micó deserves plaudits as does PodMaster.
+0.076
+    - Went missing in action.
+0.077 Tue 23 Nov 2004
+    - Bugfix patches.
+    - José Micó supplied patch that relates to character set allowed in headers.
+      TAB and high ascii chars are definitivelly allowed in headers, and not
+      accepting them prevents the upload of files with filenames like "España.txt".
+    - José Micó also notes that some versions of IE send extra boundaries in
+      POSTed data before real ones. New patch should be fix this IE issue.
+    - Lars Thegler supplied some patches.
+        - head2/head3 pod changed to head1/head2 for the benefit of some older
+          tools that exepect this.
+        - Resolved issue with manpages not being installed on FREEBSD via Makefile
+          hack
+    - Steve Purkis supplied a patch for a serious POST_MAX bug. A small modification
+      to control flow was used instead but this was a serious bug. If you are reading
+      this you are probably upgrading which is good.
+
+0.078 2007-01-09
+    - Maintenance release by Andy Armstrong <andy@hexten.net>
+    - Rewrote tests to use Test::More
+    - Implemented mod_perl 2 support
+
+0.080 2007-03-30
+    - Fixed problem parsing query args containing '='. Thanks to Ewan
+      Edwards for the patch.
+      
+0.081 2007-05-20
+    - Fix for sysread under mod_perl. Thanks to Joshua N Pritikin for
+      the patch.
+
+0.082 2007-05-22
+    - Added REST support. Thanks to Mike Barry for the patch.
+
+0.83  2007-05-22
+    - Big version jump to move version past badly formatted version in
+      Cookie, Util.
+
+1.0  2007-05-24
+   - Another big version jump. I think we're about ready for 1.0.
+   - Fixed skip count under Win32 in t/40.request.t [27257]. Thanks to
+     ISHIGAKI for the patch.
+
+1.1  2007-07-13
+   - Added support for Set-Cookie as per CGI.pm patch 15065. Thanks to
+     Patrick M. Jordan for the suggestion.
+
+1.1.1   2007-07-31
+      - Removed nasty global trap of __DIE__ in CGI::Standard. Thanks to
+        Jeremy Morton for reporting it.
+
+1.1.2   2007-07-31
+      - Fixed module names in POD for CGI::Simple::Cookie,
+        CGI::Simple::Util [#27597]. Thanks to BRICAS for reporting it.
+
+1.103   2007-07-31
+      - Version number chaos continues. One tends to forget that there
+        is a strange universe in which 1.1 > 1.1.2.
+
+1.104   2008-05-13
+      - Switched from sysread to read. Fixes #35844: sysread used in
+        CGI::Simple blocks on re-directed STDIO reads. Thanks to
+        Damjan Pelemis.
+
+1.105   2008-05-16
+      - Fixed skip count in t/040.request.t. Fixes #35945. Thanks
+        to snaury.
+
+1.106   2008-09-14
+      - Added missing Apache2 modules. Refs #39146 and #38931. Thanks
+        to RSAVAGE.
+      - Applied BEROV's patch for UTF-8 form data handling. Refs #12481.
+        Thanks to BEROV.
+
+1.107   2009-03-07
+      - CGI::Simple::Cookie, fixed bug when cookie had both leading and
+        trailing white space (RT#34314, Ron Savage and Mark Stosberg)
+      - Accept a comma as well as semi-colon as a cookie separator. This
+        is consistent with CGI.pm as well as RFC 2965, which states: "A
+        server SHOULD also accept comma (,) as the separator between cookie-
+        values for future compatibility." (Mark Stosberg)
+      - Support cookies which have an equals sign in the value. Ported
+        from CGI.pm (Mark Stosberg)
+      - Support cookies in which one of multiple values is empty. Ported
+        from CGI.pm (Mark Stosberg)
+      - Fixed bug when calling unescapeHTML on HTML that wasn't
+        properly escaped in the first place. Thanks to M-Uchino and
+        Mark Stosberg.
+      - Removed bogus dependency on version.pm.
+      - Add heuristic to upload to handle the case where no boundary is
+        specified in CONTENT_TYPE. See #14838.
+
+1.108   2009-03-13
+      - Remove bogus references to Selfloader in documenation. No
+        functional changes.
+
+1.109   2009-04-16
+      - Added support for HttpOnly to CGI::Simple::Cookie. Thanks to
+        Scott Thomson for the patch.
+
+1.110   2009-05-24
+      - Added missing test to manifest / distro.
+      - Added a test to ensure the manifest is consistent.
+      - Migrated to git.
+
+1.111   2009-05-28
+      - Implemented Michael Nachbaur fixes for multipart form data
+        handling.
+
+1.112   2009-05-31
+      - (thanks bingos) added missing IO::Scalar dependency.
+
+1.113   2010-12-27
+      - (thanks to Yamada Masahiro) randomise multipart boundary string
+        (security).
+
+      - Numerous changes from Mark Stosberg:
+
+        Port max-age support from CGI.pm, to improve compatibility and
+        RFC-compliance
+
+        Correct header comment in cookie.t
+        
+        It claims that is a simple copy/paste/modify from CGI.pm's test
+        by the same name, but this has not been true for some time--
+        CGI::Simple added
+
+        httponly tests that CGI.pm lacks, for example.
+
+        Sync cookie references with CGI.pm: add reference to the
+        newer RFC 2695
+
+        "Interface to browse cookies" looks like it was typo for
+        "browser". HTTP is more precise.
+
+        Fix awkward "CGI::Simple.pm" language. It looks like it probably
+        originated from the CGI.pm form. "CGI::Simple" is used instead.
+
+        Best Practice: eliminate indirect object notation from new(),
+        parse() and fetch() calls
+
+        Security: Fix handling of embedded malicious newlines in header
+          values This is a direct port of the same security fix that
+
+        Security: use a random MIME boundary by default in
+          multipart_init(). This is a direct port of the same issue
+          which was addressed in CGI.pm, preventing some kinds of
+          potential header injection attacks.
+
+        Port from CGI.pm: Fix multi-line header parsing.
+          This fix is covered by the tests in t/header.t added in
+          the previous patch. If you run those tests without this
+          patch, you'll see how the headers would be malformed
+          without this fix.
+
+        Port CRLF injection prevention from CGI.pm
+
+        Optimize Vars(): Don't build %hash if we aren't going to use it.
+
+        Micro-optimization to Vars(): Don't call "tie" unless we need to.
+
+      - Numerous changes from K. Berov:
+
+        Added "+" to the mime character class.
+
+        Added tests for C<$mime = $q->upload_info( $filename, 'mime' );>
+
+        Fixed wrong match for mimetypes. Example: matched only
+        'application/vnd' instead of 'application/vnd.ms-excel'.
+
+        Added "\." to the mime character class
+
+1.114
+      - Drop support for Perls older than 5.6.1.
+
+1.115 2014.10.19
+      - Replace indirect calling of constructor both in code an documentation
+        with direct calling.
+        Write  CGI::Simle->new   instead of    new CGI::Simple
+      -    add tests to make sure the order of value is kept as they were passed in the QUERY_STRING
+      - new co-maintainer (SZABGAB(
+
+

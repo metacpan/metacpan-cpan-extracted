@@ -1,0 +1,37 @@
+---
+abstract: 'get information about CPAN releases'
+author:
+  - 'Patrick Hochstenbach'
+build_requires:
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.038'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Importer-CPAN
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.90'
+  MetaCPAN::API::Tiny: '1.131730'
+  Moo: '1.0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Importer-CPAN/issues
+  homepage: https://github.com/LibreCat/Catmandu-Importer-CPAN
+  repository: https://github.com/LibreCat/Catmandu-Importer-CPAN.git
+version: '0.03'
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

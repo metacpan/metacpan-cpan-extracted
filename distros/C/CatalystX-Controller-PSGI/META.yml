@@ -1,0 +1,35 @@
+---
+abstract: 'use a PSGI app in a Catalyst Controller'
+author:
+  - 'Mark Ellis <markellis@cpan.org>'
+build_requires:
+  Catalyst::Test: 0
+  ExtUtils::MakeMaker: 6.36
+  FindBin: 0
+  Plack::App::File: 0
+  Plack::Response: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: CatalystX::Controller::PSGI
+name: CatalystX-Controller-PSGI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.90050
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/markwellis/catalystx-controller-psgi/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/markwellis/catalystx-controller-psgi.git
+version: 0.001002

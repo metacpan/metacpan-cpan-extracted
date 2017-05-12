@@ -1,0 +1,77 @@
+{
+   "abstract" : "create models / views at load time",
+   "author" : [
+      "Tomas Doran (t0m) <bobtfish@bobtfish.net>",
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-ComponentsFromConfig",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Model" : "0",
+            "Catalyst::View" : "0",
+            "CatalystX::InjectComponent" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Traits::Pluggable" : "0.10",
+            "MooseX::Types::Common::String" : "0",
+            "MooseX::Types::LoadableClass" : "0",
+            "MooseX::Types::Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "Catalyst::Plugin::ConfigLoader" : "0",
+            "Catalyst::Runtime" : "5.80",
+            "Config::General" : "0",
+            "Path::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dakkar/CatalystX-ComponentsFromConfig.git",
+         "web" : "https://github.com/dakkar/CatalystX-ComponentsFromConfig"
+      }
+   },
+   "version" : "1.006"
+}
+

@@ -1,0 +1,30 @@
+Class::Core Changelog
+
+0.04 ( 4-23-13 )
+  - Updated Makefile and dependencies to depend on the latest version of XML::Bare ( 0.48 ), rather than an old version
+  - Inclusion of hash2xml function into Class::Core temporarily - will likely shift to be in XML::Bare.
+  - Correct _funcspec to actually refer just to the function specification, not the hash of all function specifications.
+  - Don't die on callback check failures; just return 0. This may need to be revised at a later point. Point here is that the whole application shouldn't die if one permission check fails.
+  - Pass raw class specs along, not just the parsed spec, so that additional data can be stored in the specs
+  - Fix _hasfunc function
+  - Can now pass a single variable to a class::core function, so that functions with a single parameter do not need to name that parameter ( yet to have a way to set type restrictions on that though ).
+  - Spec xml file is now fetched from wherever the pm file was loaded, rather than being forced to be an exact path from the current workign directory.
+  - Able to register a function to be called when a function is done running, not just before it is run ( calldone )
+0.03 ( 2-15-13 )
+  - Remove leftover junk from definitions about XML::Bare from the top of Core.pm
+  - Detect and die when functions are called without properly using named parameters
+  - Add the ability to have a callback for any function call on a class ( docs TODO )
+  - Add a func _hasfunc to easily determine if a class has a function ( docs TODO )
+  - Moved function pointers into a _map array to prevent function name collisions
+  - Added a _duplicate function for objects to create clones of objects ( docs TODO )
+  - Added some basic functions to provide tie in to App::Core such as getmod ( docs TODO )
+  - Added the following extra functions to the INNER class: set, getres, getarr ( docs TODO )
+  - Added a 'create' function to allow Class::Core to be extended to allow for object instances ( docs TODO )
+  - Specified version # in code now, since there is a dependency from App::Core
+  - Default now to reading specs from an xml file in same directory as modules ( docs TODO )
+  - Export 'new' function directly, rather than running through a pointless stub
+  - Update copyright notice to current year
+0.02 ( 2-11-13 )
+  - Remove unacceptable reference to employer. ( had thought there was need to mention to due some changes being contributed on work time, but have been told it is unacceptable; from here on out project is solely a personal project and core copyright notice is changing )
+0.01 ( 11-15-12 )
+  - First release

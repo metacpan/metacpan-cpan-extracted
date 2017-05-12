@@ -1,0 +1,211 @@
+=head1 NAME
+
+CommonMark - Interface to the CommonMark C library
+
+=head1 SYNOPSIS
+
+    use CommonMark;
+
+    my $doc = CommonMark->parse(
+        file  => $file,
+        smart => 1,
+    );
+
+    my $html = CommonMark->markdown_to_html($markdown);
+    my $doc  = CommonMark->parse_file($file);
+    my $doc  = CommonMark->parse_document($markdown);
+    my $doc  = CommonMark->create_document;
+
+=head1 DESCRIPTION
+
+This module is a wrapper around the official CommonMark C library
+I<libcmark>. It closely follows the original API.
+
+The main module provides some entry points to parse documents. The bulk of
+features is available through L<CommonMark::Node> objects of which the
+parse tree is made. L<CommonMark::Iterator> is a useful class to walk
+through the nodes in a tree. L<CommonMark::Parser> provides a push parser
+interface.
+
+=head2 markdown_to_html
+
+    my $html = CommonMark->markdown_to_html( $markdown, [$options] );
+
+Converts a Markdown string to HTML. C<$options> is a bit field
+containing the parser and render options. It defaults to zero
+(C<OPT_DEFAULT>).
+
+Equivalent to
+
+    my $html = CommonMark->parse_document($markdown)->render_html;
+
+=head2 parse
+
+    my $doc = CommonMark->parse(
+        string        => $string,
+        normalize     => $bool,    # Optional
+        smart         => $bool,    # Optional
+        validate_utf8 => $bool,    # Optional
+    );
+
+    my $doc = CommonMark->parse(
+        file          => $handle,
+        normalize     => $bool,    # Optional
+        smart         => $bool,    # Optional
+        validate_utf8 => $bool,    # Optional
+    );
+
+Convenience function to parse documents. Exactly one of the C<string> or
+C<file> options must be provided. When given a string, calls
+L</parse_document>. When given a file, calls L</parse_file>. C<normalize>,
+C<smart>, and C<validate_utf8> enable the respective
+L<parser options|/"Parser options">.
+
+Returns the L<CommonMark::Node> of the root document.
+
+=head2 parse_document
+
+    my $doc = CommonMark->parse_document( $markdown, [$options] )
+
+Parses a CommonMark document from a string returning the L<CommonMark::Node>
+of the document root. C<$options> is a bit field containing the parser
+options. It defaults to zero (C<OPT_DEFAULT>).
+
+=head2 parse_file
+
+    my $doc = CommonMark->parse_file( $file, [$options] );
+
+Parses a CommonMark document from a file handle returning the
+L<CommonMark::Node> of the document root. C<$options> is a bit field
+containing the parser options. It defaults to zero (C<OPT_DEFAULT>).
+
+=head2 Parser options
+
+The parser options are a bit field created by ORing the following constants:
+
+    CommonMark::OPT_DEFAULT => 0
+    CommonMark::OPT_NORMALIZE
+    CommonMark::OPT_VALIDATE_UTF8
+    CommonMark::OPT_SMART
+
+Parser options can be imported from L<CommonMark> with tag C<opt>.
+
+    use CommonMark qw(:opt);
+
+C<OPT_NORMALIZE> makes sure that adjacent text nodes are merged in the parse
+tree.
+
+C<OPT_SMART> enables the "smart quote" features which turns vertical into
+typographic quotation marks, double and triple hyphens into en and em dashes,
+and triple periods into ellipses.
+
+C<OPT_VALIDATE_UTF8> turns on UTF-8 validation. Normally, this isn't
+necessary because Perl should always provide proper UTF-8. The option may
+be used if you don't trust the safety of Perl's internal UTF-8 handling.
+
+=head2 Node creation
+
+    my $document = CommonMark->create_document(
+        children => \@children,
+    );
+    my $header = CommonMark->create_heading(
+        level    => $level,
+        children => \@children,
+        text     => $literal,
+    );
+    my $paragraph = CommonMark->create_paragraph(
+        children => \@children,
+        text     => $literal,
+    );
+    my $block_quote = CommonMark->create_block_quote(
+        children => \@children,
+    );
+    my $list = CommonMark->create_list(
+        type     => $type,
+        delim    => $delim,
+        start    => $start,
+        tight    => $tight,
+        children => \@children,
+    );
+    my $item = CommonMark->create_item(
+        children => \@children,
+    );
+    my $code_block = CommonMark->create_code_block(
+        fence_info => $fence_info,
+        literal    => $literal,
+    );
+    my $html = CommonMark->create_html_block(
+        literal => $html,
+    );
+    my $custom_block = CommonMark->create_custom_block(
+        on_enter => $raw_prefix,
+        on_exit  => $raw_suffix,
+        children => \@children,
+        text     => $literal,
+    );
+    my $thematic_break = CommonMark->create_thematic_break;
+    my $text = CommonMark->create_text(
+        literal => $literal,
+    );
+    my $code = CommonMark->create_code(
+        literal => $literal,
+    );
+    my $html_inline = CommonMark->create_html_inline(
+        literal => $literal,
+    );
+    my $emph = CommonMark->create_emph(
+        children => \@children,
+        text     => $literal,
+    );
+    my $strong = CommonMark->create_strong(
+        children => \@children,
+        text     => $literal,
+    );
+    my $url = CommonMark->create_url(
+        url      => $url,
+        title    => $title,
+        children => \@children,
+        text     => $literal,
+    );
+    my $image = CommonMark->create_image(
+        url      => $url,
+        title    => $title,
+        children => \@children,
+        text     => $literal,
+    );
+    my $custom_inline = CommonMark->create_custom_inline(
+        on_enter => $raw_prefix,
+        on_exit  => $raw_suffix,
+        children => \@children,
+        text     => $literal,
+    );
+    my $softbreak = CommonMark->create_softbreak;
+    my $linebreak = CommonMark->create_linebreak;
+
+These convenience functions can be used to create nodes, set properties,
+and add children in a single operation. All parameters are optional.
+
+The C<children> parameter expects an arrayref of nodes to be added as
+children. The special C<text> parameter adds a single text child with
+literal C<$literal>. It can't be used together with C<children>. All other
+parameters correspond to a node property.
+
+=head2 libcmark version information
+
+    my $version = CommonMark->version;
+    my $string  = CommonMark->version_string;
+    my $version = CommonMark->compile_time_version;
+    my $string  = CommonMark->compile_time_version_string;
+
+Return the version number or version string of libcmark, either the
+library version linked against at run time or compile time.
+
+=head1 COPYRIGHT
+
+This software is copyright (C) by Nick Wellnhofer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

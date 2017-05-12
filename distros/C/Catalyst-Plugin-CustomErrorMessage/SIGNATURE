@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1333c39593e8c966b8d9500a3ea14938d597a99a Build.PL
+SHA1 0b8ff9eaea44af586118961920df013c4c4b6748 Changes
+SHA1 10b96b8e8b56b0fb54f1701507b6c3c9baee8fc6 MANIFEST
+SHA1 cfca6be59b10b8605b9c40b0bd36f7d25de4eec8 META.yml
+SHA1 8a0f1f9505bbab904a5078c5d5fc2d62cb8a5b11 Makefile.PL
+SHA1 7de54986af9d60c2212b49b396dc461c11d433cc README
+SHA1 b88b595507dba8f09158cd619b3e4c1bc2651004 lib/Catalyst/Plugin/CustomErrorMessage.pm
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/00-distribution.t
+SHA1 24ccea4f5d8ae7d1750ce295b72e9bd10fa781e0 t/01-Catalyst-Plugin-CustomErrorMessage.t
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkyIxvwACgkQC0OgUPgL2SekqACfcScCFxPgf4gGuPxP4znWfR+w
+KvoAnj2lh4Ctz6W4J5CIevBfLKOAHkCJ
+=6JvD
+-----END PGP SIGNATURE-----

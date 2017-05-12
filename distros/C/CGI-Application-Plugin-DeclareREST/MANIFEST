@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CGI/Application/Plugin/DeclareREST.pm
+t/00-load.t
+t/10-routes.t
+t/author-critic.t

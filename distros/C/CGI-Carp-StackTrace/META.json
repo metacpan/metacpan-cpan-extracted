@@ -1,0 +1,67 @@
+{
+   "abstract" : "install a L<Devel::StackTrace::AsHTML> error screen for your CGI app",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Carp-StackTrace",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Carp" : "0",
+            "Devel::StackTrace::AsHTML" : "0",
+            "Devel::StackTrace::WithLexicals" : "0",
+            "HTML::Entities" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CGI-Carp-StackTrace@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Carp-StackTrace"
+      },
+      "homepage" : "http://metacpan.org/release/CGI-Carp-StackTrace",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/cgi-carp-stacktrace.git",
+         "web" : "http://github.com/rkitover/cgi-carp-stacktrace"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:RKITOVER"
+}
+

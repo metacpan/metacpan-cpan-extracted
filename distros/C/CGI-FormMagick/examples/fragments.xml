@@ -1,0 +1,19 @@
+<form title="Hello" header="head.tmpl" footer="foot.tmpl" post-event="say_hello">
+    <page name="Name">
+        <title>I'm the FormMagickian.</title>
+        <field id="name" type="text" validation="nonblank">
+            <label>Your name?</label>
+        </field>
+        <html>
+            <![cdata[
+            <p>
+            <font color="ff0000">THIS IS A FRAGMENT</font>
+            </p>
+            ]]>
+        </html>
+        <field id="howmany" type="text" validation="nonblank">
+            <label>How many repeats?</label>
+        </field>
+        <subroutine src="subroutine()" />
+    </page>
+</form>

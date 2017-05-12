@@ -1,0 +1,11 @@
+08-08-2012 (0.0.3)
+    * Changed from use base to use parent for support in older systems.
+
+08-07-2012 (0.0.2)
+    * Made Config::Layered::Source a base class for Sources.
+    * Added Config::Layered::Source::ENV for environmental configuration
+    * Added documentation for each Source.
+    * Fixed random bugs
+
+08-02-2012 (0.0.1)
+    * Inital Release To CPAN

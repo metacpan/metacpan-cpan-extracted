@@ -1,0 +1,224 @@
+Revision history for perl module CPAN::Changes
+
+0.400002 - 2015-06-21
+  - revert whitespace changes that were inadvertantly included in previous
+    release.
+  - escape curly brackets in test to avoid warning in perl 5.22
+
+0.400001 - 2015-05-23
+  - accept either UTF-8 or ISO-8859-1 files and decode them
+  - only treat bracketed text if it is on its own line with no other brackets
+  - bump version.pm prereq to make sure it works properly
+  - Let long tokens (like URLs) overflow rather than splitting them into
+    multiple likes
+  - Don't wrap on non-breaking spaces
+  - Clean up packaging
+  - Return undef for dates or notes that don't exist
+  - Quote meta chars to fix a problem that clobbered dates 
+    with timezones due to the '+' char (GH #20)
+
+0.30 2014-07-26
+
+  - Fix for subclassing CPAN::Changes::Group (GH #23)
+
+0.29 2014-07-23
+
+  - Groups are now objects (CPAN::Changes::Group). Backwards
+    compatibility from hashes should be preserved (GH #22)
+
+0.28 2014-06-10
+
+  - Add "SEE ALSO" links to similar modules (RT #94636)
+
+  - Use perl 5.8-compatible regex
+
+0.27 2013-12-13
+
+  [ Spec Changes ]
+
+  - Bump version to 0.04
+
+  - Allow non-"word" characters between a Version and a Date
+
+0.26 2013-11-21
+
+  - Fix reference issues when adding a release (RT #90605)
+
+0.25 2013-10-08
+
+  - Move Text::Wrap usage to proper module (Michal Spacek)
+
+  - Typo fix (Karen Etheridge)
+
+0.24 2013-10-07
+
+  - Fix Dist::Zilla date parsing. Now puts timezone data in 
+    note section (Github #17)
+
+0.23 2013-08-14
+
+  [ Spec Changes ]
+
+  - Bump version to 0.03
+
+  - Allow the "T" marker in W3CDTF to be omitted
+
+  [ Code Changes ]
+
+  - Be more strict about what we consider to be a Dist::Zilla-style date
+    to avoid false positive matches
+
+  - Update W3CDTF parsing to make the "T" marker optional (RT #87499)
+
+  - Fix extra whitespace for empty values after version (RT #87524)
+
+0.22 2013-07-30
+
+  - Sync module versions (RT #87455)
+
+0.21 2013-07-30
+
+  [ Spec Changes ]
+
+  - Bump version to 0.02
+
+  - Added "unknown/dev" release date options (RT #67705)
+
+  - Added optional release note (RT #69321)
+
+  - Added another preamble example
+
+  - Added a note about line length
+
+  [ Code Changes ]
+
+  - Require Test::More 0.96 (RT #84994)
+
+  - Added --check and --help flags to tidy_changelog script (Gabor Szabo)
+
+  - Properly parse multi-line preamble
+
+  - Test::CPAN::Changes now warns about parsed dates not in spec-compliant form
+
+  - Handle unknown/dev release dates and release note from new spec
+
+0.20 2013-05-01
+
+  - 'delete_empty_groups' shouldn't erronously delete default group 
+    (Yanick Champoux)
+
+  - Add tidy_changelog utility script (Yanick Champoux)
+
+  - Minor pod fix
+
+0.19 2012-04-30
+
+  - Test::CPAN::Changes now accepts version entries ending in '-TRIAL' (RT
+    #76882, Karen Etheridge)
+
+  - releases() in CPAN::Changes also accepts entries ending in '-TRIAL'
+
+0.18 2011-10-18
+
+  - Expand changes_file_ok() to accept arguments so that a specific version
+    may be checked (Ricardo Signes)
+
+  - Add $VERSION to Test::CPAN::Changes so it plays nice with the toolchain
+    e.g Module::Install::AuthorRequres (Dan Brook)
+
+0.17 2011-04-21
+
+  - Eliminate extra whitespace when release date is not defined (RT #67441)
+
+  - Require version.pm 0.79, which introduced the $LAX regexp (RT #67613)
+
+  - Add the option to sort groups (Yanick Champoux)
+
+0.16 2011-04-12
+
+  - Expose W3CDTF regex variable
+
+  - Allow whitespace in some dates
+
+  - Extract out valid W3CDTF portions from dates
+
+  - Requires perl 5.10
+
+0.15 2011-04-11
+
+  - Handle more date/time formats during parsing
+
+0.14 2011-04-11
+
+  - Add delete_empty_groups() to Changes.pm and Release.pm (Yanick Champoux) 
+
+0.13 2011-04-04
+
+  - Use version.pm's LAX regex for finding versions.
+
+0.12 2011-04-04
+
+  - Sort releases() by version first for greater consistency
+
+0.11 2011-03-31
+
+  - Parse the default Dist-Zilla date format (e.g. 2010-12-28 00:15:12 
+    Europe/London)
+
+0.10 2011-03-29
+
+  - Be more strict about date validation in Test::CPAN::Changes
+
+0.09 2011-03-29
+
+  - Be more lenient when parsing dates. Timestamps (e.g. 
+    Tue Mar 29 08:32:16 2011) are now parsed and converted to W3CDTF. (Fixes 
+    RT #66862)
+
+0.08 2011-03-14
+
+  - Handle inconsistent indentation between releases
+
+  - Be more strict about parsing rules for grouping lines
+
+0.07 2011-03-03
+
+  - Wrap version parsing in eval()
+
+0.06 2011-02-15
+
+  - Add proper version sorting via version.pm
+
+  - Update dist manifest to include tests missing from previous releases
+
+0.05 2011-02-13
+
+  - Attempt to squash warnings for undefined dates and add rudimentary
+    version sorting when dates are equal
+
+  - Add support for a "next version" token (Yanick Champoux)
+
+  - Proper definition of whitespace between version and date
+    (Fixes RT #65678)
+
+0.04 2011-02-10
+
+  - Remove done_testing() from a test.
+
+0.03 2011-02-10
+
+  - Allow more than one space between the version and the date. The spec
+    allowed for this, but the parser did not. (Dave Rolsky)
+
+  - Handle the case where there is no space before the change marker
+    correctly. (Dave Rolsky)
+
+0.02 2011-02-08
+
+ - Make tests compatible with Test::More that ships with perl 5.10.0
+   (Fixes RT #65543)
+
+0.01 2011-02-02
+
+ - Initial release
+

@@ -1,0 +1,32 @@
+CyberSource version 0.01
+========================
+
+CyberSource is one of the leading E-Commerce service providers.
+This library implements a generic routine to send requests
+to the CyberSource and obtain results using ICS2 API library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ICS2 is a proprietary API to CyberSource E-Commerce services.
+It should be properly obtained from www.cybersource.com
+when creating CyberSource merchan account.
+
+COPYRIGHT AND LICENCE
+
+Module is supplied without any support. Please use it on your own risk.
+Author will not accept any responsibilty for gains or loses due to the
+use of this module.
+
+Copyright (C) 2003 Pavel Smirnov <huge@ax.ru>
+

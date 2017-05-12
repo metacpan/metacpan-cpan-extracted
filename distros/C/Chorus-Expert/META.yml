@@ -1,0 +1,26 @@
+---
+abstract: 'A simple skeleton of application using one or more Chorus::Engine objects (inference engines)                   working together on a common task.'
+author:
+  - 'Christophe Ivorra <ch.ivorra@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chorus-Expert
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources: {}
+version: '1.03'
+x_contributors:
+  - 'Christophe Ivorra <civ@maelink.com>'
+

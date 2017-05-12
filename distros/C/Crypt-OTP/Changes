@@ -1,0 +1,10 @@
+Revision history for Perl extension Crypt::OTP.
+
+2.00 - 04-Sep-2002
+        Added OO interface and license information.
+
+1.03 - 29-Jun-2001
+        Maintenance release. Minor changes.
+
+1.02 - 07-Jul-2000
+        First public release.

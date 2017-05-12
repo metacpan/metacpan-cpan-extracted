@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Catalyst/Continuation.pm
+lib/Catalyst/Plugin/Continuation.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04_diff_req.t
+t/05_login_example.t
+t/lib/ContTestApp.pm
+t/lib/ContTestApp/Controller/Foo.pm
+t/lib/ContTestApp/Controller/NeedsLogin.pm
+SIGNATURE    Added here by Module::Build

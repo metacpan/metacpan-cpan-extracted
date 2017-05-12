@@ -1,0 +1,192 @@
+@chapter A broad overview of CfgTie
+
+CfgTie is a set of PERL modules, each working with the configuration tables of
+some subsystem.    For our purposes, configuration will basically be defined
+loosely as:
+@itemize @bullet
+@item Settings in various files, or databases
+@item Probably establish some bounds for your system
+@item Describe an arrangement of modules and subsystems
+@item May describe how things currently are.
+@end itemize
+ 
+@c API Standards
+@c Attributes
+@c Implementation
+
+@heading Standards in the API
+@c Traps
+@c Common Object methods
+@c
+
+Most of the configuration elements have been developed to work as both Perl
+ties (almost always hashes or associative arrays), and as Perl objects.  In
+the more complex cases, the associative arrays often refer to other associatve
+arrays.  Otherwise the stored values are list references.
+
+To make these work as a normal variable you need only:
+
+@itemize @bullet
+@item reference the desired module:
+@code{require cfgthingy;}
+@code{my %Table;}
+
+@item Then, tie it a variable that you want to use:
+@code{tie %Table, 'cfgthingy', param1, param2, ...}
+
+@end itemize
+
+@subheading Traps
+Traps on changes in the variables are not currently implemented in this
+module.   The Perl module @code{Tie::Watch} seems to provide the proper
+functionality for this.
+
+@subheading Common object methods
+There as some standard methods typically (but not always) available to
+associative arrays:
+
+@code{HTML();} or @code{$Table->HTML('MyHTMLClass');}  This return a
+string formatted in HTML.  If an HTML class is specified, it will be embedded
+in the HTML.  This is useful for style sheets.
+
+@code{stat();} This works like a normal @code{stat}, returning information
+about the last time the table (e.g. file) was accessed, modified, etc.
+
+@heading Attributes
+The flags used in all of the variable control procedures are composed of
+three sections, based upon what they control
+
+@table @asis
+@item Scope
+This controls the scope of the variable setting.  The scope, from the
+narrowest to the widest scope: @emph{Session}, @emph{Application},
+@emph{User}, @emph{Group}, @emph{Global}.  That is, a variable set in the
+@emph{user} scope, say, will only affect applications run by that user.
+Currently all of the configuration modules are effectively global.
+
+@item Inheritance
+This controls whether or not a child process would inherit the variable.
+
+@item Precedence
+This controls whether an operation should affect an already existing variable.
+@end table
+
+@subheading Scope attributes
+The current scopes are mutually exclusive, and defined as follows, from the
+narrowest to the widest scope:
+
+@table @dfn
+@item session
+This sets the variable for this session only.
+
+@item application
+This sets the variable for executions of this application only.
+
+@item user
+This sets the variable for use by this user (and any applications that may
+run by said user) only.  If a user is not specified or otherwise implied, the
+effective user id is used to determine the user name.
+
+@item group
+This sets the variable for use by this group (and any applications that may
+run by an users in said group) only.  The effective group id is used to
+determine the user name.
+
+@item global
+This sets the variable for use in general by any user or any applications.
+
+@end table
+
+@heading Implementation
+
+@subheading CfgTie uses external utilities
+Wherever possible, CfgTie employs utility programs to interact with the
+low-level configuration data.  This was choosen for several reasons:
+
+@itemize @bullet
+@item The issues of locking, timing, state, security and communication with the
+services can be very specific.  It is better to use a utility that correctly
+addresses this, than reinvent an incorrect one.
+
+@item Many of the utilities can be used with @code{chroot} and other powerful
+tools limit their scope for security reasons.
+
+@item The utilities are usually well designed and offer well thought-out
+functionality that take advantage of the underlying affordances.  We take
+advantage of this too.
+
+@item The utilities are written by sharp, dedicated people who will fix the
+bugs with their systems.  CfgTie is meant to work on a broad range of
+platforms: identifying and correctly bugs in low level implementations is
+difficult, and hard to do. 
+
+@item The utilities of offer some degree of independence from the underlying
+system.  This lets the system developers choose the appropriate implementation,
+while letting CfgTie work across a variety of implementations.
+
+@end itemize
+
+@emph{In conclusion:} By using utilities that were designed with a strong
+understanding of these makes CfgTie development faster, more secure (since we
+are less likely to make mistakes in implementation those low-level things), and
+more portable.
+
+@subheading Overhead: where the slow stuff is
+The start-up (e.g. @code{BEGIN}, @code{tie}), run-time, and shutdown
+(e.g. @code{END}) phases all have different costs.  Many of the modules try to
+balance light costs with keeping in sync with the rest of the system.
+Wherever possible, the design has been to allow inclusion of the module for
+minimal functionality (e.g. @code{stat}) with a low overhead.
+
+This often includes delaying scanning the tables and files until the first
+action on the tie.  That is scanning is typically not done when a variable is
+tied, but when the tied variable is used with @code{FETCH}, @code{FIRSTKEY},
+@code{EXISTS}, @code{STORE}, @code{DELETE}, etc.
+
+Rewriting a file includes generating a subroutine to do the work; this is
+usually delayed to the @code{END} phase.  
+
+Some modules (e.g. @code{CfgTie::TieGroup}, @code{CfgTie::TieUser},
+@code{CfgTie::TieRCService}, etc.) employ an external utility program to make
+the system changes.  These programs are run either at the @code{END} phase, or
+at the time of the change, which ever minimizes the number of program calls and
+can be done early.
+
+@c @item noinherit
+@c This prohibits the variable setting from being inherited by child processes.
+@c If the flag is not set, the child processes will inherit the value (unless
+@c it
+@c is overridden).
+
+@subheading A quick note on the associative arrays versus indexed arrays
+
+[Kernighan 98] note that:@footnote{[Kernighan 98] Kernighan, Brian; Van Wyk,
+Christopher. @cite{Timing Trials, or, the Trials of Timing: Experiments with
+scripting and User-Interface Languages}
+@url{http://www.cs.bell-labs.com/cm/cs/who/bwk/interps/pap/html}}
+
+@quotation
+``using Perl associative arrays where indexed arrays would server can increase
+runtimes dramatically.''
+@end quotation
+
+CfgTie does use arrays for just this reason.  But associative arrays are used
+extensive for:
+@itemize @bullet
+@item When there is a large amount of partly structured information, but the
+particular elements can't be neccessarily be known ahead of time or atleast
+guaranteed to be present.
+
+@item When some keys of the hash may not be supported on all machines; a
+conventional array couldn't keep the same structure portably.
+
+@item When some elements are controlled or implemented by different modules.  
+
+@item When a very similar tie is implemented as an associative array.
+For example, @code{CfgTie::TieUser} (@pxref{CfgTie-TieUser}) is implemented
+as an associative array for all of the previous reasons.  However,
+@code{CfgTie::TieGroup} (@pxref{CfgTie-TieGroup}) doesn't have those issues.
+It was implemented as an associative array to mirror @code{CfgTie::TieUser}
+(@pxref{CfgTie-TieUser}) to keep them similar.
+
+@end itemize

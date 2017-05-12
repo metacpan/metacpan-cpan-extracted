@@ -1,0 +1,166 @@
+NAME
+
+    Catalyst::View::Thumbnail - Catalyst view to resize images for
+    thumbnails
+
+SYNOPSIS
+
+    Create a thumbnail view:
+
+     script/myapp_create view Thumbnail Thumbnail
+
+    Then in your controller:
+
+     sub thumbnail :Local :Args(1) {
+        my ($self, $c, $image_id) = @_;
+        
+        my $image_obj = $c->model('MyApp::Images')->find({id=>$image_id})
+          or $c->detach('/default');
+        
+        $c->stash->{x}     = 100;    # Create a 100px square thumbnail
+        $c->stash->{y}     = 100;
+        $c->stash->{image} = $image_obj->data;
+        
+        $c->forward('View::Thumbnail');
+     }
+
+DESCRIPTION
+
+    Catalyst::View::Thumbnail resizes images to produce thumbnails, with
+    options to set the desired x or y dimensions (or both), and specify a
+    zoom level and scaling type.
+
+ Options
+
+    The view is controlled by setting the following values in the stash:
+
+    image
+
+      Contains the raw data for the full-size source image.
+
+      This is a mandatory option.
+
+    x
+
+      The width (in pixels) of the thumbnail.
+
+      This is optional, but at least one of the x or y parameters must be
+      set.
+
+    y
+
+      The height (in pixels) of the thumbnail.
+
+      This is optional, but at least one of the x or y parameters must be
+      set.
+
+    zoom
+
+      Zoom level, expressed as a number between 1 and 100.
+
+      If the zoom option is given, the thumbnail will be 'zoomed-in' by the
+      appropriate amount, e.g. a zoom level of 80 will create a thumbnail
+      using the middle 80% of the source image.
+
+      This parameter is optional, if omitted then a zoom level of 100 will
+      be used, i.e. create thumbnails using 100% of the source image.
+
+    scaling
+
+      Scaling type, can be either 'fit' or 'fill'.
+
+      If both the x and y parameters are set, the aspect ratio (x/y) of the
+      thumbnail image may not match the aspect ratio of the source image.
+
+      To prevent the thumbnail from looking 'stretched', there is a choice
+      of two scaling options:
+
+      fit
+
+	Fits the thumbnail within the specified x and y dimensions,
+	preserving all of the source image.
+
+	Note that by using this scaling method, the generated thumbnails
+	may be smaller than the the specified x and y dimensions.
+
+      fill
+
+	Fills the thumbnail to the exact x and y dimensions as specified,
+	cropping the source image as necessary.
+
+      This parameter is optional, and will default to 'fill' if omitted.
+
+    image_type
+
+      Mime type for the output image. This is normally the same as the
+      input image. If you set this the Imager library will produce an image
+      of that format. This is useful when you want to convert something
+      like a tiff to a jpeg. Note that the conversions can be strange so
+      this may not be a good idea for all images. See the Imager
+      documentation for more details.
+
+ Image formats
+
+    The generated thumbnails will always be produced in the same format
+    (PNG, JPG, etc) as the source image.
+
+    Catalyst::View::Thumbnail uses the Imager module to crop and resize
+    images, so will accept any image format supported by Imager.
+
+    Please see the Imager documentation for more details and installation
+    notes.
+
+SEE ALSO
+
+    Catalyst::View::Thumbnail tutorial (with examples):
+    http://perl.jonallen.info/writing/articles/creating-thumbnails-with-cat
+    alyst
+
+AUTHOR
+
+    Jon Allen (JJ), <jj@jonallen.info>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-catalyst-view-thumbnail at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-View-Thumbnail.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    Commercial support, customisation, and training for this module is
+    available from Penny's Arcade Limited - contact info@pennysarcade.co.uk
+    for details.
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-View-Thumbnail
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Catalyst-View-Thumbnail
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Catalyst-View-Thumbnail
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Catalyst-View-Thumbnail/
+
+COPYRIGHT & LICENSE
+
+    Copyright (C) 2009 Jon Allen (JJ).
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl 5.10.0. For more details, see the full
+    text of the licenses in the directory LICENSES.
+
+    This module is distributed in the hope that it will be useful, but it
+    is provided "as is" and without any express or implied warranties.
+

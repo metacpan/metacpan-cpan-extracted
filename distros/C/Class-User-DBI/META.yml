@@ -1,0 +1,49 @@
+---
+abstract: 'A User class: Login credentials, roles, privileges, domains.'
+author:
+  - 'David Oswald <davido [@at] cpan [d.o.t] org>'
+build_requires:
+  DBD::SQLite: 0
+  DBIx::Connector: 0
+  List::MoreUtils: 0
+  Test::Exception: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-User-DBI
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Class::User::DBI:
+    file: lib/Class/User/DBI.pm
+    version: 0.10
+  Class::User::DBI::Domains:
+    file: lib/Class/User/DBI/Domains.pm
+    version: 0.10
+  Class::User::DBI::Privileges:
+    file: lib/Class/User/DBI/Privileges.pm
+    version: 0.10
+  Class::User::DBI::RolePrivileges:
+    file: lib/Class/User/DBI/RolePrivileges.pm
+    version: 0.10
+  Class::User::DBI::Roles:
+    file: lib/Class/User/DBI/Roles.pm
+    version: 0.10
+  Class::User::DBI::Userdomains:
+    file: lib/Class/User/DBI/UserDomains.pm
+    version: 0.10
+requires:
+  Authen::Passphrase::SaltedSHA512: 0.06
+  DBIx::Connector: 0
+  List::MoreUtils: 0
+  perl: 5.008000
+resources: {}
+version: 0.10

@@ -1,0 +1,1 @@
+Disallow set_2foo.  Perl doesn't like $obj->2foo.

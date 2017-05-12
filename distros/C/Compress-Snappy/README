@@ -1,0 +1,29 @@
+Compress-Snappy
+===============
+
+This module provides a Perl interface to Google's Snappy (de)compressor.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::More
+    XSLoader
+
+A C compiler is required to build this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2015 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

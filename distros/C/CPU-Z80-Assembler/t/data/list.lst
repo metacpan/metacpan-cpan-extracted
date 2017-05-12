@@ -1,0 +1,9 @@
+0x0000: ; comment                              | 
+0x0000: macro M1 {                             | 
+0x0000:         inc hl                         | 
+0x0000:         dec de                         | 
+0x0000: }                                      | 
+0x0000:         org 0x100                      | 
+0x0100:         M1                             | 23 1B 
+0x0102:         ld a,1 : ld b,2 : call 0x2 ... | 3E 01 06 02 CD 00 02 CD 34 12 
+0x010C:         M1                             | 23 1B 

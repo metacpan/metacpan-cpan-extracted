@@ -1,0 +1,48 @@
+############################################################
+##                                                        ##
+##       Configuration file for the perl script           ##
+##         notify_expiring_members.pl                     ##
+##       which sends Membership expiration reminders      ##
+##       to Members of a Drupal website created and       ##
+##       managed by the Membership Entity modules         ##
+##                                                        ##
+##       Make a copy of this file and rename it to        ##
+##         notify_expiring_members.config                 ##
+##       and set your config options in order to use      ##
+##       this program.  For more information and help     ##
+##       see notify_expiring_members.README               ##
+##                                                        ##
+############################################################
+
+[database]
+
+database = my_database
+host     = my_hostname
+port     = 
+user     = my_database_user
+password = my_database_password
+
+
+[organization] 
+ 
+short_name = MAW
+long_name  = My Awesome Website
+website    = http://www.my_site.org
+
+
+[email]
+
+sender    = my_email@my_site.org
+signature = My Name, more text
+copy_to   = other_email@my_site.org, foo@bar.com
+
+
+[notifications]
+
+31 = initial.notification
+7  = initial.notification
+1  = final.notification
+
+[program]
+debug = 0
+

@@ -1,0 +1,33 @@
+Revision history for Catalyst-Plugin-Session-Store-Redis
+
+0.07    2016-09-06T19:12:46
+    - new maintainer: domm
+    - some doc changes
+
+
+0.06    2016-09-05T13:36:48
+    - add reconnect param (domm)
+
+
+0.05    December 20th, 2009
+    - Remove connection setup from setup_session method so that connections
+      are created later.  This allow pre-fork setups to create connections 
+      after the fork. (Thanks Richard Soderberg)
+
+0.04    December 12th, 2009
+    - Update POD wrt expiry
+
+0.03    December 12th, 2009
+    - Fix POD description
+    - Fix logging typo (said 'Getting key' when it meant 'Setting key')
+    - Use Redis' EXPIRE command to build in session expiration so we can
+      ignore it. As such, delete_expired_sessions is now a null-op.
+    - Unify connection code that was previously duplicated in setup_session
+    - Test against Redis 1.02 and 1.1.91-beta
+
+0.02
+    Keep up with changes in Catalyst-Plugin-Session
+
+0.01
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,86 @@
+NAME
+    THIS MODULE IS UNSUPPORTED! YOU CAN ADOPT IT IF YOU LIKE IT! WRITE TO
+    modules@perl.org IF YOU WANT TO MAINTAIN IT.
+
+    CGI::Application::Plugin::Authentication::Driver::CDBI - Class::DBI
+    Authentication Driver
+
+VERSION
+    Version 0.03
+
+    THIS MODULE IS UNSUPPORTED! YOU CAN ADOPT IT IF YOU LIKE IT! WRITE TO
+    modules@perl.org IF YOU WANT TO MAINTAIN IT.
+
+SYNOPSIS
+      use base qw(CGI::Application);
+      use CGI::Application::Plugin::Authentication;
+
+      __PACKAGE__->authen->config(
+        DRIVER => [ 'CDBI',
+          CLASS   => 'My::CDBI::Users',
+          FIELD_METHODS => [qw(user MD5:passphrase)]
+        ],
+        CREDENTIALS => [qw(auth_username auth_password)],
+      );
+
+DESCRIPTION
+    This Authentication driver uses the Class::DBI module to allow you to
+    authenticate against any Class::DBI class.
+
+PARAMETERS
+    The Class::DBI authentication driver accepts the following required
+    parameters.
+
+  CLASS (required)
+    Specifies the Class::DBI class to use for authentication. This class
+    must be loaded prior to use.
+
+  FIELD_METHODS (required)
+    FIELD_METHODS is an arrayref of the methods in the Class::DBI class
+    specified by CLASS to be used during authentication. The order of these
+    methods needs to match the order of the CREDENTIALS. For example, if
+    CREDENTIALS is set to:
+
+      CREDENTIALS => [qw(auth_user auth_domain auth_password)]
+
+    Then FIELD_METHODS must be set to:
+
+      FIELD_METHODS => [qw(userid domain password)]
+
+    FIELD_METHODS supports filters as specified by
+    CGI::Application::Plugin::Authentication::Driver
+
+METHODS
+  verify_credentials
+    This method will test the provided credentials against the values found
+    in the database, according to the Driver configuration.
+
+SEE ALSO
+    CGI::Application::Plugin::Authentication::Driver,
+    CGI::Application::Plugin::Authentication, perl(1)
+
+AUTHOR
+    Shawn Sorichetti, "<ssoriche@coloredblocks.net>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-cgi-application-plugin-authentication-driver-cdbi@rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Application-Plugin-A
+    uthentication-Driver-CDBI>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    Special thanks to Cees Hek for writing
+    CGI::Application::Plugin::Authentication and his assistance in writing
+    this module.
+
+COPYRIGHT & LICENSE
+    THIS MODULE IS UNSUPPORTED! YOU CAN ADOPT IT IF YOU LIKE IT! WRITE TO
+    modules@perl.org IF YOU WANT TO MAINTAIN IT.
+
+    Copyright 2005 Shawn Sorichetti, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

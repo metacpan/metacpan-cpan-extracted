@@ -1,0 +1,9 @@
+CORBA/IOP/IOR.pm
+CORBA/IOP/TaggedProfile.pm
+CORBA/IOP/Util.pm
+MANIFEST
+Makefile
+Makefile.PL
+README
+examples/decodeIOR.pl
+examples/mungeIOR.pl

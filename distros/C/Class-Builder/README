@@ -1,0 +1,11 @@
+If you have 'Module::Build' installed, run:
+  SHELL> perl Build.PL [installpath=...]
+  SHELL> perl Build install
+
+This works under both Win32 and Unix-like platforms.
+
+The traditional MakeMaker approach is also available, though:
+  SHELL> perl Makefile.PL [PREFIX=...]
+  SHELL> make
+  SHELL> make install
+    

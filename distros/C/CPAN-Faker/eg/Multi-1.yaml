@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Multi-Relevant
+abstract: there will be two indexed dists
+version: 1.00
+provides:
+  Multi::Relevant::Sane:
+    version: 1.00
+    file: lib/Multi/Relevant/Sane.pm
+  Multi::Relevant::Dropped:
+    version: 1.00
+    file: lib/Multi/Relevant/Dropped.pm
+  Multi::Relevant::Stale:
+    version: 1.00
+    file: lib/Multi/Relevant/Stale.pm

@@ -1,0 +1,11 @@
+Präsentationssoftware installieren:
+
+  # apt-get install wiki2beamer
+
+Präsentation erzeugen:
+
+  $ make
+
+Präsentation zeigen:
+
+  $ evince classloader.pdf

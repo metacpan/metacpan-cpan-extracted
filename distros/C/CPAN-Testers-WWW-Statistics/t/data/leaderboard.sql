@@ -1,0 +1,15 @@
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','solaris','Jost Krieger (JOST)','3022','26','4093');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','linux','Serguei Trouchelle (STRO)','8193','538','1742');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','linux','Andreas J. K&ouml;nig (ANDK)','59181','469','3814');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','linux','Yi Ma Mao (IMACAT)','75','325','3827');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','freebsd','Slaven Rezi&#x0107; (SREZIC)','4996','8','3974');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','','Jost Krieger (JOST)','1','26','4093');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','solaris','Jost Krieger (JOST)','9087','26','4093');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','linux','Serguei Trouchelle (STRO)','11906','538','1742');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','linux','Andreas J. K&ouml;nig (ANDK)','44835','469','3814');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','linux','Yi Ma Mao (IMACAT)','14','325','3827');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','mswin32','Serguei Trouchelle (STRO)','1336','538','1742');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','mswin32','Slaven Rezi&#x0107; (SREZIC)','155','8','3974');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','mswin32','Serguei Trouchelle (STRO)','783','538','2633');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('THISMONTH','linux','Slaven Rezi&#x0107; (SREZIC)','11','8','3974');
+INSERT INTO leaderboard (postdate,osname,tester,score,testerid,addressid) VALUES ('LASTMONTH','freebsd','Slaven Rezi&#x0107; (SREZIC)','2445','8','3974');

@@ -1,0 +1,14 @@
+debian/
+~$
+\.ptkdb$
+\.old$
+dist.ini
+libconfig
+_build
+\.orig$
+^MYMETA.yml$
+blib
+wr_root
+wr_test
+demo/lib
+demo/etc

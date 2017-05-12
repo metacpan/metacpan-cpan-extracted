@@ -1,0 +1,9 @@
+See examples/ for an example External Process.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+

@@ -1,0 +1,11 @@
+Revision history for Catmandu-Atom
+
+0.04  2014-12-22 15:37:40 CET
+    - Adding required JSON package in testing
+    
+0.03  2014-10-21 09:37:07 CEST
+	- Changing to milla
+	- More pod
+	
+0.02	2013-06-12
+	- Initital release

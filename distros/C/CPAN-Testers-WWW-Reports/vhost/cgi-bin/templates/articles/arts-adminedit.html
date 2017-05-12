@@ -1,0 +1,28 @@
+[% 
+    title = 'Page Edit'
+
+    crumb2_name = 'Pages' ;
+    crumb2_href = cgipath _ '/pages.cgi?act=arts-admin'
+    crumb1_name = 'Edit' ;
+%]
+
+[% INCLUDE "public/tinymce.html" %]
+
+[% data = article.data %]
+
+[% IF thanks %]<p>Page saved successfully.[% END %]
+<p>Fields marked * are mandatory fields and must be completed.
+
+[% IF errmess %]
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.
+[% IF errmess == 2 %]
+<p class="alert">Please note that the title must be unqiue.
+[% END %]
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi" id="EDIT" name="EDIT" enctype="multipart/form-data">
+<input type="hidden" name="act" value="arts-save" />
+[% INCLUDE "articles/arts-adminblock.html" %]
+</form>
+
+[% INCLUDE "articles/arts-preview.html" %]

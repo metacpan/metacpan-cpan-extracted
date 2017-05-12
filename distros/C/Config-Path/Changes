@@ -1,0 +1,46 @@
+Revision history for Config-Path
+
+0.13 Oct 19 2012
+   * Convert to dzil
+
+0.12    Tue Oct 9, 2012
+   * Fix for empty YAML file merging (harlan barnes)
+   * Fix for calling fetch with no path (harlan barnes)
+
+0.11    Mon Jan 31, 2011
+    * Remove extra "empty" check that was causing problems when trying to
+      return a hashref from fetch.
+
+0.10    Sat Dec 30, 2010
+    * Fixing tests to not die when XML::Simple is not present for real
+
+0.09    Sat Dec 25, 2010
+    * Fixing tests to not die when XML::Simple is not present
+
+0.08    Wed Dec 22, 2010
+    * Default conversion option "convert_empty_to_undef",
+      specifically for XML config for empty nodes return
+      undef, rather than {}
+
+0.07    Wed Dec 22, 2010
+    * Strip leading slashes on paths given to fetch()
+
+0.06    Thu Dec 16, 2010
+    * Handle arrays (path/to/0/thing)
+    * Don't barf if we're given an unreachable item
+
+0.05    Fri Oct 22, 2010
+    * POD fixes
+
+0.04    Wed Oct 10, 2010
+    * Add support for directory slurping of config files w/directory attribute
+
+0.03    Sat Jul 10, 2010
+    * Add test_requires YAML::XS (Thanks CPAN Testers!)
+
+0.02    Tue Jul 6, 2010
+    * Add overrid
+
+0.01    Fri Jul 2, 2010
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,4 @@
+# recursive inclusion test
+
+%include increc2;
+

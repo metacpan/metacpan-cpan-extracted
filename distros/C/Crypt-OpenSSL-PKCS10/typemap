@@ -1,0 +1,14 @@
+TYPEMAP
+BIGNUM*      T_PTR
+pkcs10Data*     O_OBJECT
+Crypt__OpenSSL__RSA*     O_OBJECT 
+
+INPUT
+O_OBJECT
+    if (!(SvROK($arg) && sv_derived_from($arg, PACKAGE_NAME)))
+    {
+        croak(\"argument is not a ${type} object\");
+    }
+    $var = (${type}) SvIV(SvRV($arg));
+
+OUTPUT

@@ -1,0 +1,90 @@
+Change Log for Config::Record
+=============================
+
+v1.1.2 (on 11-12-2007)
+----------------------
+
+This is a minor feature enhancement release with no backwards
+compatability breakage
+
+ * Added support for including files via @include() tag
+ * Added support for keys containing characters outside a-Z0-9,
+   by quoting the keys
+ * Remove non-portable Makefile testing cruft
+
+v1.1.1 (on 04-06-2006)
+----------------------
+
+This is a minor cleanup release with no backwards compatability
+breakage
+
+ * Fixed POD comments
+ * Added tests for POD comments & coverage
+ * Allow a filename to be passed into save/load methods 
+ * Make RPM specfile install into vendor dirs, rather than site
+
+v1.1.0 (on 09-03-2005)
+----------------------
+
+This is a new major release since it breaks backwards
+compatability with 1.0.x series for compound keys.
+
+ * Allow keys in config files to contain periods.
+ * Change syntax for retrieving nested values from being
+   period separated to be slash separated. eg, instead of
+   $cfg->get("foo.bar"), use $cfg->get("foo/bar");
+ * Add support for selecting specific elements in an array
+   with $cfg->get("foo/[0]");
+ * Add support for creating a view on a subset of the
+   configuration record
+ * Increased test coverage to hit 83% of statements, 64% of
+   branches, 76% of conditionals, and 100% of subroutines.
+
+v1.0.5 (on 10-10-2004)
+----------------------
+
+ * Fixed dumb mistake which would cause processing of
+   configuration file to stop when encountering a blank
+   line.
+
+v1.0.4 (on 26-09-2004)
+----------------------
+
+ * Allow comments at the end of lines following a quoted
+   string, an open/close bracket, an open/close brace
+ * Allow long lines to be split with \ to break lines
+ * Allow multi-line strings to be input using <<EOF
+
+v1.0.3 (on 14-05-2004)
+----------------------
+
+ * When slurping filehandles only change $/ locally
+ * Add 'save' method to write a config file back to disk
+ * Add 'set' method for changing a config value
+ * Add 'get' method to replace 'param' and print deprecation
+   warning for all use of 'param' when 'use warnings' is in
+   effect (no warnings 'Config::Record' to disable this).
+
+v1.0.2 (on 05-04-2004)
+----------------------
+
+ * Fix stupid mistake of missing 'use IO::File' in Config::Record,
+   not caught by test suite.
+ * Make RPMs builds portable across Debian & Red Hat by forcing
+   man(3) install dir to always be $siteprefix/share/man/man3.
+
+v1.0.1 (on 01-04-2004)
+----------------------
+
+ * Fix building of RPMs
+ * Remove dependancy on IO::File::Cached & File::Path::Localize in 
+   favour of letting application developer use these when required.
+ * Split POD out into separate file, since MakeMaker (un)helpfully
+   skips any file matching /(config|setup).*\.pm/ :-(
+
+v1.0.0: (12-02-2004)
+--------------------
+
+ * Initial release.
+  
+-- End

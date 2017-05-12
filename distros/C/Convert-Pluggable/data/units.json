@@ -1,0 +1,1589 @@
+[
+    {
+        "aliases": [
+            "tonne",
+            "t",
+            "mt",
+            "te",
+            "metric tons",
+            "tonnes",
+            "ts",
+            "mts",
+            "tes"
+        ],
+        "unit": "metric ton",
+        "factor": "1",
+        "type": "mass"
+    },
+    {
+        "factor": "35274",
+        "type": "mass",
+        "aliases": [
+            "oz",
+            "ounces",
+            "ozs"
+        ],
+        "unit": "ounce"
+    },
+    {
+        "type": "mass",
+        "factor": "2204.62",
+        "unit": "pound",
+        "aliases": [
+            "lb",
+            "lbm",
+            "pound mass",
+            "pounds",
+            "lbs",
+            "lbms",
+            "pounds mass"
+        ]
+    },
+    {
+        "factor": "157.473",
+        "type": "mass",
+        "aliases": [
+            "st",
+            "stones",
+            "sts"
+        ],
+        "unit": "stone"
+    },
+    {
+        "aliases": [
+            "weight ton",
+            "imperial ton",
+            "long tons",
+            "weight tons",
+            "imperial tons"
+        ],
+        "unit": "long ton",
+        "factor": "0.984207",
+        "type": "mass"
+    },
+    {
+        "factor": 1000000000000,
+        "type": "mass",
+        "aliases": [
+            "mcg",
+            "micrograms",
+            "mcgs"
+        ],
+        "unit": "microgram"
+    },
+    {
+        "type": "mass",
+        "factor": 1000,
+        "unit": "kilogram",
+        "aliases": [
+            "kg",
+            "kilo",
+            "kilogramme",
+            "kilograms",
+            "kgs",
+            "kilos",
+            "kilogrammes"
+        ]
+    },
+    {
+        "type": "mass",
+        "factor": 1000000,
+        "unit": "gram",
+        "aliases": [
+            "g",
+            "gm",
+            "gramme",
+            "grams",
+            "gs",
+            "gms",
+            "grammes"
+        ]
+    },
+    {
+        "aliases": [
+            "mg",
+            "milligrams",
+            "mgs"
+        ],
+        "unit": "milligram",
+        "factor": 1000000000,
+        "type": "mass"
+    },
+    {
+        "aliases": [
+            "short ton",
+            "short tons",
+            "tons"
+        ],
+        "unit": "ton",
+        "factor": "1.10231",
+        "type": "mass"
+    },
+    {
+        "unit": "meter",
+        "aliases": [
+            "meters",
+            "metre",
+            "metres",
+            "m"
+        ],
+        "type": "length",
+        "factor": "1"
+    },
+    {
+        "unit": "kilometer",
+        "aliases": [
+            "kilometers",
+            "kilometre",
+            "kilometres",
+            "km",
+            "kms",
+            "klick",
+            "klicks"
+        ],
+        "type": "length",
+        "factor": "0.001"
+    },
+    {
+        "aliases": [
+            "centimeters",
+            "centimetre",
+            "centimetres",
+            "cm",
+            "cms"
+        ],
+        "unit": "centimeter",
+        "factor": "100",
+        "type": "length"
+    },
+    {
+        "type": "length",
+        "factor": "1000",
+        "unit": "millimeter",
+        "aliases": [
+            "millimeters",
+            "millimetre",
+            "millimetres",
+            "mm",
+            "mms"
+        ]
+    },
+    {
+        "type": "length",
+        "factor": 0.000621371192237334,
+        "unit": "mile",
+        "aliases": [
+            "miles",
+            "statute mile",
+            "statute miles",
+            "land mile",
+            "land miles",
+            "mi"
+        ]
+    },
+    {
+        "type": "length",
+        "factor": "1.0936133",
+        "unit": "yard",
+        "aliases": [
+            "yards",
+            "yd",
+            "yds",
+            "yrds"
+        ]
+    },
+    {
+        "factor": "3.28084",
+        "type": "length",
+        "aliases": [
+            "feet",
+            "ft",
+            "international foot",
+            "international feet",
+            "survey foot",
+            "survey feet"
+        ],
+        "unit": "foot"
+    },
+    {
+        "unit": "inch",
+        "aliases": [
+            "inches",
+            "in",
+            "ins"
+        ],
+        "type": "length",
+        "factor": "39.3701"
+    },
+    {
+        "aliases": [
+            "nautical miles",
+            "n",
+            "ns",
+            "nm",
+            "nms",
+            "nmi",
+            "nmis"
+        ],
+        "unit": "nautical mile",
+        "factor": "0.000539957",
+        "type": "length"
+    },
+    {
+        "aliases": [
+            "furlongs"
+        ],
+        "unit": "furlong",
+        "factor": 0.00497096953789867,
+        "type": "length"
+    },
+    {
+        "type": "length",
+        "factor": 0.0497096953789867,
+        "unit": "chain",
+        "aliases": [
+            "gunter's chains",
+            "chains"
+        ]
+    },
+    {
+        "type": "length",
+        "factor": 4.97096953789867,
+        "unit": "link",
+        "aliases": [
+            "gunter's links",
+            "links"
+        ]
+    },
+    {
+        "factor": 0.198838781515947,
+        "type": "length",
+        "aliases": [
+            "rods"
+        ],
+        "unit": "rod"
+    },
+    {
+        "type": "length",
+        "factor": 0.539611824837685,
+        "unit": "fathom",
+        "aliases": [
+            "fathoms",
+            "ftm",
+            "ftms"
+        ]
+    },
+    {
+        "type": "length",
+        "factor": 0.000207123730745778,
+        "unit": "league",
+        "aliases": [
+            "leagues"
+        ]
+    },
+    {
+        "aliases": [
+            "cables"
+        ],
+        "unit": "cable",
+        "factor": 0.00539611824837685,
+        "type": "length"
+    },
+    {
+        "factor": 1.05700083402462e-16,
+        "type": "length",
+        "aliases": [
+            "light years",
+            "ly",
+            "lys"
+        ],
+        "unit": "light year"
+    },
+    {
+        "type": "length",
+        "factor": 3.24077923047971e-17,
+        "unit": "parsec",
+        "aliases": [
+            "parsecs",
+            "pc",
+            "pcs"
+        ]
+    },
+    {
+        "type": "length",
+        "factor": 6.68458712226845e-12,
+        "unit": "astronomical unit",
+        "aliases": [
+            "astronomical units",
+            "au",
+            "aus"
+        ]
+    },
+    {
+        "aliases": [
+            "hectares",
+            "ha"
+        ],
+        "unit": "hectare",
+        "factor": 1,
+        "type": "area"
+    },
+    {
+        "unit": "acre",
+        "aliases": [
+            "acres"
+        ],
+        "type": "area",
+        "factor": 2.4710439
+    },
+    {
+        "factor": 10000,
+        "type": "area",
+        "aliases": [
+            "square meters",
+            "metre^2",
+            "meter^2",
+            "metres^2",
+            "meters^2",
+            "square metre",
+            "square metres",
+            "m^2",
+            "m"
+        ],
+        "unit": "square meter"
+    },
+    {
+        "factor": 0.01,
+        "type": "area",
+        "aliases": [
+            "square kilometers",
+            "square kilometre",
+            "square kilometres",
+            "km^2",
+            "km"
+        ],
+        "unit": "square kilometer"
+    },
+    {
+        "aliases": [
+            "square centimeters",
+            "square centimetre",
+            "square centimetres",
+            "cm^2",
+            "cm"
+        ],
+        "unit": "square centimeter",
+        "factor": 100000000,
+        "type": "area"
+    },
+    {
+        "factor": 10000000000,
+        "type": "area",
+        "aliases": [
+            "square millimeters",
+            "square millimetre",
+            "square millimetres",
+            "mm^2",
+            "mm"
+        ],
+        "unit": "square millimeter"
+    },
+    {
+        "unit": "square mile",
+        "aliases": [
+            "square miles",
+            "square statute mile",
+            "square statute miles",
+            "square land mile",
+            "square land miles",
+            "miles^2",
+            "miles",
+            "sq mi"
+        ],
+        "type": "area",
+        "factor": 0.00386102160083284
+    },
+    {
+        "aliases": [
+            "square yards",
+            "yard^2",
+            "yard",
+            "yards",
+            "yards^2",
+            "yd^2",
+            "yd",
+            "yrd^2",
+            "yrd"
+        ],
+        "unit": "square yard",
+        "factor": 11959.9,
+        "type": "area"
+    },
+    {
+        "unit": "square foot",
+        "aliases": [
+            "square feet",
+            "feet^2",
+            "feet",
+            "foot^2",
+            "foot",
+            "ft",
+            "ft^2"
+        ],
+        "type": "area",
+        "factor": 107639.1
+    },
+    {
+        "unit": "square inch",
+        "aliases": [
+            "square inches",
+            "inch^2",
+            "inches^2",
+            "squinch",
+            "in^2",
+            "in"
+        ],
+        "type": "area",
+        "factor": 15500031
+    },
+    {
+        "unit": "tsubo",
+        "aliases": [
+            "tsubos"
+        ],
+        "type": "area",
+        "factor": 3024.9863876
+    },
+    {
+        "factor": 1,
+        "type": "volume",
+        "aliases": [
+            "liter",
+            "litres",
+            "liters",
+            "l",
+            "litter",
+            "litters"
+        ],
+        "unit": "litre"
+    },
+    {
+        "aliases": [
+            "milliliter",
+            "millilitres",
+            "milliliters",
+            "ml"
+        ],
+        "unit": "millilitre",
+        "factor": 1000,
+        "type": "volume"
+    },
+    {
+        "aliases": [
+            "metre^3",
+            "meter^3",
+            "metres^3",
+            "meters^3",
+            "m^3",
+            "m"
+        ],
+        "unit": "cubic metre",
+        "factor": 0.001,
+        "type": "volume"
+    },
+    {
+        "factor": 1000,
+        "type": "volume",
+        "aliases": [
+            "centimetre^3",
+            "centimeter^3",
+            "centimetres^3",
+            "centimeters^3",
+            "cm^3",
+            "cm"
+        ],
+        "unit": "cubic centimetre"
+    },
+    {
+        "type": "volume",
+        "factor": 1000000,
+        "unit": "cubic millimetre",
+        "aliases": [
+            "millimetre^3",
+            "millimeter^3",
+            "millimetres^3",
+            "millimeters^3",
+            "mm^3",
+            "mm"
+        ]
+    },
+    {
+        "factor": 2.11337641886519,
+        "type": "volume",
+        "aliases": [
+            "liquid pints",
+            "us pints",
+            "us liquid pint",
+            "us liquid pints"
+        ],
+        "unit": "liquid pint"
+    },
+    {
+        "aliases": [
+            "dry pints"
+        ],
+        "unit": "dry pint",
+        "factor": 1.81616596853771,
+        "type": "volume"
+    },
+    {
+        "unit": "imperial pint",
+        "aliases": [
+            "pints",
+            "pint",
+            "imperial pints",
+            "uk pint",
+            "british pint",
+            "pts"
+        ],
+        "type": "volume",
+        "factor": 1.7597539863927
+    },
+    {
+        "factor": 0.219969248299088,
+        "type": "volume",
+        "aliases": [
+            "imperial gallon",
+            "uk gallon",
+            "british gallon",
+            "british gallons",
+            "uk gallons"
+        ],
+        "unit": "imperial gallon"
+    },
+    {
+        "factor": 0.264172052358148,
+        "type": "volume",
+        "aliases": [
+            "fluid gallon",
+            "us fluid gallon",
+            "fluid gallons",
+            "us gallons",
+            "gallon",
+            "gallons"
+        ],
+        "unit": "us gallon"
+    },
+    {
+        "unit": "quart",
+        "aliases": [
+            "liquid quart",
+            "us quart",
+            "us quarts",
+            "quarts",
+            "liquid quarts"
+        ],
+        "type": "volume",
+        "factor": 1.05668820943259
+    },
+    {
+        "factor": 7.03901594557081,
+        "type": "volume",
+        "aliases": [
+            "imperial quarts",
+            "british quarts",
+            "british quart"
+        ],
+        "unit": "imperial quart"
+    },
+    {
+        "unit": "imperial fluid ounce",
+        "aliases": [
+            "imperial fluid ounces",
+            "imperial fl oz",
+            "imperial fluid oz"
+        ],
+        "type": "volume",
+        "factor": 28.1560637822832
+    },
+    {
+        "unit": "us fluid ounce",
+        "aliases": [
+            "us fluid ounces",
+            "us fl oz",
+            "fl oz",
+            "fl. oz",
+            "fluid oz"
+        ],
+        "type": "volume",
+        "factor": 33.814022701843
+    },
+    {
+        "factor": 4.2267528,
+        "type": "volume",
+        "aliases": [
+            "us cups",
+            "cups",
+            "cup"
+        ],
+        "unit": "us cup"
+    },
+    {
+        "type": "volume",
+        "factor": 4,
+        "unit": "metric cup",
+        "aliases": [
+            "metric cups"
+        ]
+    },
+    {
+        "aliases": [
+            "days",
+            "dy",
+            "dys",
+            "d"
+        ],
+        "unit": "day",
+        "factor": "1",
+        "type": "duration"
+    },
+    {
+        "unit": "second",
+        "aliases": [
+            "seconds",
+            "sec",
+            "s"
+        ],
+        "type": "duration",
+        "factor": "86400"
+    },
+    {
+        "factor": "86400000",
+        "type": "duration",
+        "aliases": [
+            "milliseconds",
+            "millisec",
+            "millisecs",
+            "ms"
+        ],
+        "unit": "millisecond"
+    },
+    {
+        "aliases": [
+            "microseconds",
+            "microsec",
+            "microsecs",
+            "us"
+        ],
+        "unit": "microsecond",
+        "factor": "86400000000",
+        "type": "duration"
+    },
+    {
+        "type": "duration",
+        "factor": "86400000000000",
+        "unit": "nanosecond",
+        "aliases": [
+            "nanoseconds",
+            "nanosec",
+            "nanosecs",
+            "ns"
+        ]
+    },
+    {
+        "unit": "minute",
+        "aliases": [
+            "minutes",
+            "min",
+            "mins"
+        ],
+        "type": "duration",
+        "factor": "1440"
+    },
+    {
+        "unit": "hour",
+        "aliases": [
+            "hours",
+            "hr",
+            "hrs",
+            "h"
+        ],
+        "type": "duration",
+        "factor": "24"
+    },
+    {
+        "aliases": [
+            "weeks",
+            "wks",
+            "wk"
+        ],
+        "unit": "week",
+        "factor": 0.142857142857143,
+        "type": "duration"
+    },
+    {
+        "unit": "fortnight",
+        "aliases": [],
+        "type": "duration",
+        "factor": 0.0714285714285714
+    },
+    {
+        "type": "duration",
+        "factor": 0.0328767123287671,
+        "unit": "month",
+        "aliases": [
+            "months",
+            "mons",
+            "mns",
+            "mn"
+        ]
+    },
+    {
+        "unit": "year",
+        "aliases": [
+            "years",
+            "yr",
+            "yrs"
+        ],
+        "type": "duration",
+        "factor": 0.00273972602739726
+    },
+    {
+        "type": "duration",
+        "factor": 0.00273224043715847,
+        "unit": "leap year",
+        "aliases": [
+            "leap years",
+            "leapyear",
+            "leapyr",
+            "leapyrs"
+        ]
+    },
+    {
+        "factor": 1,
+        "type": "pressure",
+        "aliases": [
+            "pascals",
+            "pa",
+            "pas"
+        ],
+        "unit": "pascal"
+    },
+    {
+        "type": "pressure",
+        "factor": 0.001,
+        "unit": "kilopascal",
+        "aliases": [
+            "kilopascals",
+            "kpa",
+            "kpas"
+        ]
+    },
+    {
+        "type": "pressure",
+        "factor": 0.000001,
+        "unit": "megapascal",
+        "aliases": [
+            "megapascals",
+            "megapa",
+            "megapas"
+        ]
+    },
+    {
+        "unit": "gigapascal",
+        "aliases": [
+            "gigapascals",
+            "gpa",
+            "gpas"
+        ],
+        "type": "pressure",
+        "factor": 1e-9
+    },
+    {
+        "unit": "bar",
+        "aliases": [
+            "bars",
+            "pa",
+            "pas"
+        ],
+        "type": "pressure",
+        "factor": 0.00001
+    },
+    {
+        "type": "pressure",
+        "factor": 0.00000986923266716013,
+        "unit": "atmosphere",
+        "aliases": [
+            "atmospheres",
+            "atm",
+            "atms"
+        ]
+    },
+    {
+        "type": "pressure",
+        "factor": 0.000145036839357197,
+        "unit": "pounds per square inch",
+        "aliases": [
+            "psis",
+            "psi",
+            "lbs/inch^2",
+            "p.s.i.",
+            "p.s.i"
+        ]
+    },
+    {
+        "type": "energy",
+        "factor": 1,
+        "unit": "joule",
+        "aliases": [
+            "joules",
+            "j",
+            "js"
+        ]
+    },
+    {
+        "aliases": [
+            "watt second",
+            "watt seconds",
+            "ws"
+        ],
+        "unit": "watt-second",
+        "factor": 1,
+        "type": "energy"
+    },
+    {
+        "aliases": [
+            "watt hour",
+            "watt hours",
+            "wh"
+        ],
+        "unit": "watt-hour",
+        "factor": 0.000277777777777778,
+        "type": "energy"
+    },
+    {
+        "type": "energy",
+        "factor": 2.77777777777778e-7,
+        "unit": "kilowatt-hour",
+        "aliases": [
+            "kilowatt hour",
+            "kilowatt hours",
+            "kwh"
+        ]
+    },
+    {
+        "unit": "erg",
+        "aliases": [
+            "ergon",
+            "ergs",
+            "ergons"
+        ],
+        "type": "energy",
+        "factor": 1e-7
+    },
+    {
+        "factor": 6241509600000000000,
+        "type": "energy",
+        "aliases": [
+            "electronvolt",
+            "electron volts",
+            "ev",
+            "evs"
+        ],
+        "unit": "electron volt"
+    },
+    {
+        "type": "energy",
+        "factor": 0.239005736137667,
+        "unit": "thermochemical gram calorie",
+        "aliases": [
+            "small calories",
+            "thermochemical gram calories",
+            "chemical calorie",
+            "chemical calories"
+        ]
+    },
+    {
+        "unit": "large calorie",
+        "aliases": [
+            "large calories",
+            "food calorie",
+            "food calories",
+            "kcals",
+            "kcal"
+        ],
+        "type": "energy",
+        "factor": 0.000239005736137667
+    },
+    {
+        "unit": "british thermal unit",
+        "aliases": [
+            "british thermal units",
+            "btu",
+            "btus"
+        ],
+        "type": "energy",
+        "factor": 0.000948316737790422
+    },
+    {
+        "type": "energy",
+        "factor": 2.39005736137667e-10,
+        "unit": "ton of TNT",
+        "aliases": [
+            "tnt equivilent",
+            "tonnes of tnt",
+            "tnt",
+            "tons of tnt"
+        ]
+    },
+    {
+        "type": "power",
+        "factor": 1,
+        "unit": "watt",
+        "aliases": [
+            "watts",
+            "w"
+        ]
+    },
+    {
+        "aliases": [
+            "kilowatts",
+            "kw"
+        ],
+        "unit": "kilowatt",
+        "factor": 0.001,
+        "type": "power"
+    },
+    {
+        "aliases": [
+            "megawatts",
+            "mw"
+        ],
+        "unit": "megawatt",
+        "factor": 0.000001,
+        "type": "power"
+    },
+    {
+        "aliases": [
+            "gigawatts",
+            "jiggawatts",
+            "gw"
+        ],
+        "unit": "gigawatt",
+        "factor": 1e-9,
+        "type": "power"
+    },
+    {
+        "unit": "terawatt",
+        "aliases": [
+            "terawatts",
+            "tw"
+        ],
+        "type": "power",
+        "factor": 1e-12
+    },
+    {
+        "unit": "petawatt",
+        "aliases": [
+            "petawatts",
+            "pw"
+        ],
+        "type": "power",
+        "factor": 1e-15
+    },
+    {
+        "type": "power",
+        "factor": 1000,
+        "unit": "milliwatt",
+        "aliases": [
+            "milliwatts"
+        ]
+    },
+    {
+        "unit": "microwatt",
+        "aliases": [
+            "microwatts"
+        ],
+        "type": "power",
+        "factor": 1000000
+    },
+    {
+        "aliases": [
+            "nanowatts",
+            "nw"
+        ],
+        "unit": "nanowatt",
+        "factor": 1000000000,
+        "type": "power"
+    },
+    {
+        "factor": 1000000000000,
+        "type": "power",
+        "aliases": [
+            "picowatts",
+            "pw"
+        ],
+        "unit": "picowatt"
+    },
+    {
+        "type": "power",
+        "factor": 0.0013596216173039,
+        "unit": "metric horsepower",
+        "aliases": [
+            "metric horsepowers",
+            "mhp",
+            "hp",
+            "ps",
+            "cv",
+            "hk",
+            "ks",
+            "ch"
+        ]
+    },
+    {
+        "factor": 0.00134102208959503,
+        "type": "power",
+        "aliases": [
+            "mechnical horsepower",
+            "horsepower",
+            "hp",
+            "hp",
+            "bhp"
+        ],
+        "unit": "horsepower"
+    },
+    {
+        "unit": "electical horsepower",
+        "aliases": [
+            "electical horsepowers",
+            "hp",
+            "hp"
+        ],
+        "type": "power",
+        "factor": 0.00134048257372654
+    },
+    {
+        "aliases": [
+            "degrees",
+            "deg",
+            "degs"
+        ],
+        "unit": "degree",
+        "factor": 1,
+        "type": "angle"
+    },
+    {
+        "unit": "radian",
+        "aliases": [
+            "radians",
+            "rad",
+            "rads"
+        ],
+        "type": "angle",
+        "factor": 0.0174532925199433
+    },
+    {
+        "aliases": [
+            "gradians",
+            "grad",
+            "grads",
+            "gon",
+            "gons",
+            "grade",
+            "grades"
+        ],
+        "unit": "gradian",
+        "factor": 1.11111111111111,
+        "type": "angle"
+    },
+    {
+        "factor": 0.0111111111111111,
+        "type": "angle",
+        "aliases": [
+            "quadrants",
+            "quads",
+            "quad"
+        ],
+        "unit": "quadrant"
+    },
+    {
+        "type": "angle",
+        "factor": 0.00555555555555556,
+        "unit": "semi-circle",
+        "aliases": [
+            "semi circle",
+            "semicircle",
+            "semi circles",
+            "semicircles",
+            "semi-circles"
+        ]
+    },
+    {
+        "aliases": [
+            "revolutions",
+            "circle",
+            "circles",
+            "revs"
+        ],
+        "unit": "revolution",
+        "factor": 0.00277777777777778,
+        "type": "angle"
+    },
+    {
+        "factor": 1,
+        "type": "force",
+        "aliases": [
+            "newtons",
+            "n"
+        ],
+        "unit": "newton"
+    },
+    {
+        "factor": 0.001,
+        "type": "force",
+        "aliases": [
+            "kilonewtons",
+            "kn"
+        ],
+        "unit": "kilonewton"
+    },
+    {
+        "type": "force",
+        "factor": 0.000001,
+        "unit": "meganewton",
+        "aliases": [
+            "meganewtons",
+            "mn"
+        ]
+    },
+    {
+        "aliases": [
+            "giganewtons",
+            "gn"
+        ],
+        "unit": "giganewton",
+        "factor": 1e-9,
+        "type": "force"
+    },
+    {
+        "aliases": [
+            "dynes"
+        ],
+        "unit": "dyne",
+        "factor": 0.00001,
+        "type": "force"
+    },
+    {
+        "type": "force",
+        "factor": 0.01,
+        "unit": "kilodyne",
+        "aliases": [
+            "kilodynes"
+        ]
+    },
+    {
+        "aliases": [
+            "megadynes"
+        ],
+        "unit": "megadyne",
+        "factor": 10,
+        "type": "force"
+    },
+    {
+        "aliases": [
+            "lbs force",
+            "pounds force"
+        ],
+        "unit": "pounds force",
+        "factor": 0.224808943099711,
+        "type": "force"
+    },
+    {
+        "unit": "poundal",
+        "aliases": [
+            "poundals",
+            "pdl"
+        ],
+        "type": "force",
+        "factor": 7.23301385120989
+    },
+    {
+        "factor": 1,
+        "type": "temperature",
+        "can_be_negative": 1,
+        "aliases": [
+            "f"
+        ],
+        "unit": "fahrenheit"
+    },
+    {
+        "aliases": [
+            "c"
+        ],
+        "unit": "celsius",
+        "factor": 1,
+        "type": "temperature",
+        "can_be_negative": 1
+    },
+    {
+        "unit": "kelvin",
+        "aliases": [
+            "k"
+        ],
+        "type": "temperature",
+        "factor": 1
+    },
+    {
+        "factor": 1,
+        "type": "temperature",
+        "aliases": [
+            "r"
+        ],
+        "unit": "rankine"
+    },
+    {
+        "can_be_negative": 1,
+        "factor": 1,
+        "type": "temperature",
+        "aliases": [
+            "re"
+        ],
+        "unit": "reaumur"
+    },
+    {
+        "factor": 1,
+        "type": "digital",
+        "aliases": [
+            "bits"
+        ],
+        "unit": "bit"
+    },
+    {
+        "type": "digital",
+        "factor": 0.001,
+        "unit": "kilobit",
+        "aliases": [
+            "kbit",
+            "kbits",
+            "kilobits"
+        ]
+    },
+    {
+        "aliases": [
+            "mbit",
+            "mbits",
+            "megabits"
+        ],
+        "unit": "megabit",
+        "factor": 0.000001,
+        "type": "digital"
+    },
+    {
+        "type": "digital",
+        "factor": 1e-9,
+        "unit": "gigabit",
+        "aliases": [
+            "gbit",
+            "gigabits",
+            "gbits"
+        ]
+    },
+    {
+        "unit": "terabit",
+        "aliases": [
+            "tbit",
+            "tbits",
+            "terabits"
+        ],
+        "type": "digital",
+        "factor": 1e-12
+    },
+    {
+        "unit": "petabit",
+        "aliases": [
+            "pbit",
+            "pbits",
+            "petabits"
+        ],
+        "type": "digital",
+        "factor": 1e-15
+    },
+    {
+        "aliases": [
+            "ebit",
+            "ebits",
+            "exabits"
+        ],
+        "unit": "exabit",
+        "factor": 1e-18,
+        "type": "digital"
+    },
+    {
+        "type": "digital",
+        "factor": 1e-21,
+        "unit": "zettabit",
+        "aliases": [
+            "zbit",
+            "zbits",
+            "zettabits"
+        ]
+    },
+    {
+        "unit": "yottabit",
+        "aliases": [
+            "ybit",
+            "ybits",
+            "yottabits"
+        ],
+        "type": "digital",
+        "factor": 1e-24
+    },
+    {
+        "type": "digital",
+        "factor": 0.0009765625,
+        "unit": "kibibit",
+        "aliases": [
+            "kibit",
+            "kibits",
+            "kibibits"
+        ]
+    },
+    {
+        "factor": 9.5367431640625e-7,
+        "type": "digital",
+        "aliases": [
+            "mibit",
+            "mibits",
+            "mebibits"
+        ],
+        "unit": "mebibit"
+    },
+    {
+        "factor": 9.31322574615479e-10,
+        "type": "digital",
+        "aliases": [
+            "gibit",
+            "gibits",
+            "gibibits"
+        ],
+        "unit": "gibibit"
+    },
+    {
+        "factor": 9.09494701772928e-13,
+        "type": "digital",
+        "aliases": [
+            "tibit",
+            "tibits",
+            "tebibits"
+        ],
+        "unit": "tebibit"
+    },
+    {
+        "type": "digital",
+        "factor": 8.88178419700125e-16,
+        "unit": "pebibit",
+        "aliases": [
+            "pibit",
+            "pibits",
+            "pebibits"
+        ]
+    },
+    {
+        "type": "digital",
+        "factor": 8.67361737988404e-19,
+        "unit": "exbibit",
+        "aliases": [
+            "eibit",
+            "eibits",
+            "exbibits"
+        ]
+    },
+    {
+        "aliases": [
+            "zibit",
+            "zibits",
+            "zebibits"
+        ],
+        "unit": "zebibit",
+        "factor": 8.470329472543e-22,
+        "type": "digital"
+    },
+    {
+        "factor": 8.27180612553028e-25,
+        "type": "digital",
+        "aliases": [
+            "yibit",
+            "yibits",
+            "yobibits"
+        ],
+        "unit": "yobibit"
+    },
+    {
+        "unit": "byte",
+        "aliases": [
+            "bytes"
+        ],
+        "type": "digital",
+        "factor": 0.125
+    },
+    {
+        "type": "digital",
+        "factor": 0.000125,
+        "unit": "kilobyte",
+        "aliases": [
+            "kb",
+            "kbs",
+            "kilobytes"
+        ]
+    },
+    {
+        "type": "digital",
+        "factor": 1.25e-7,
+        "unit": "megabyte",
+        "aliases": [
+            "mb",
+            "mbs",
+            "megabytes"
+        ]
+    },
+    {
+        "aliases": [
+            "gb",
+            "gbs",
+            "gigabytes"
+        ],
+        "unit": "gigabyte",
+        "factor": 1.25e-10,
+        "type": "digital"
+    },
+    {
+        "type": "digital",
+        "factor": 1.25e-13,
+        "unit": "terabyte",
+        "aliases": [
+            "tb",
+            "tbs",
+            "terabytes"
+        ]
+    },
+    {
+        "type": "digital",
+        "factor": 1.25e-16,
+        "unit": "petabyte",
+        "aliases": [
+            "pb",
+            "pbs",
+            "petabytes"
+        ]
+    },
+    {
+        "aliases": [
+            "eb",
+            "ebs",
+            "exabytes"
+        ],
+        "unit": "exabyte",
+        "factor": 1.25e-19,
+        "type": "digital"
+    },
+    {
+        "unit": "zettabyte",
+        "aliases": [
+            "zb",
+            "zbs",
+            "zettabytes"
+        ],
+        "type": "digital",
+        "factor": 1.25e-22
+    },
+    {
+        "factor": 1.25e-25,
+        "type": "digital",
+        "aliases": [
+            "yb",
+            "ybs",
+            "yottabytes"
+        ],
+        "unit": "yottabyte"
+    },
+    {
+        "factor": 0.0001220703125,
+        "type": "digital",
+        "aliases": [
+            "kib",
+            "kibs",
+            "kibibytes"
+        ],
+        "unit": "kibibyte"
+    },
+    {
+        "type": "digital",
+        "factor": 1.19209289550781e-7,
+        "unit": "mebibyte",
+        "aliases": [
+            "mib",
+            "mibs",
+            "mebibytes"
+        ]
+    },
+    {
+        "unit": "gibibyte",
+        "aliases": [
+            "gib",
+            "gibs",
+            "gibibytes"
+        ],
+        "type": "digital",
+        "factor": 1.16415321826935e-10
+    },
+    {
+        "factor": 1.13686837721616e-13,
+        "type": "digital",
+        "aliases": [
+            "tib",
+            "tibs",
+            "tebibytes"
+        ],
+        "unit": "tebibyte"
+    },
+    {
+        "factor": 1.11022302462516e-16,
+        "type": "digital",
+        "aliases": [
+            "pib",
+            "pibs",
+            "pebibytes"
+        ],
+        "unit": "pebibyte"
+    },
+    {
+        "aliases": [
+            "eib",
+            "eibs",
+            "exbibytes"
+        ],
+        "unit": "exbibyte",
+        "factor": 1.0842021724855e-19,
+        "type": "digital"
+    },
+    {
+        "factor": 1.05879118406788e-22,
+        "type": "digital",
+        "aliases": [
+            "zib",
+            "zibs",
+            "zebibytes"
+        ],
+        "unit": "zebibyte"
+    },
+    {
+        "factor": 1.03397576569129e-25,
+        "type": "digital",
+        "aliases": [
+            "yib",
+            "yibs",
+            "yobibytes"
+        ],
+        "unit": "yobibyte"
+    }
+]

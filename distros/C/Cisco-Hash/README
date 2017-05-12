@@ -1,0 +1,36 @@
+Cisco::Hash 0.02
+
+This Module decrypts all kind of Cisco encrypted hashes also referred
+to as type 7 passwords. Further you can encrypt any given string into
+a encrypted hash that will be accepted by any Cisco device as an
+encrypted type 7 password.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5.6.0.  This module also requires these other
+modules and libraries:
+
+   Carp
+   
+THIS SOFTWARE IS NEITHER INTENDED FOR MALICIOUS USE NOR FOR THE USE IN
+ANY OTHER ILLEGAL PURPOSES.
+
+Credits for original code and description hobbit@avian.org, 
+SPHiXe, .mudge et al. and for John Bashinski <jbash@CISCO.COM> for
+Cisco IOS password encryption facts.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Lord Infernale
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

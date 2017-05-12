@@ -1,0 +1,119 @@
+<html>
+<style>
+.error {
+  color: red;
+  font-size: 75%;
+}
+</style>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script src="./yaml_load.js"></script>
+<script src="./validate.js"></script>
+<script>
+if (! document.yaml_load) {
+  document.writeln('<span style="color:red"><h1>Missing document.yaml_load</h1>Path to ../lib/CGI/Ex/yaml_load.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.yaml_load</h1></span>');
+}
+
+if (! document.validate) {
+  document.writeln('<span style="color:red"><h1>Missing document.validate</h1>Path to ../lib/CGI/Ex/validate.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.validate</h1></span>');
+}
+
+</script>
+
+
+<form name=a validation="
+general no_confirm: 1
+general no_alert: 1
+general as_array_prefix: ' -- '
+">
+<table>
+<tr>
+  <td valign=top>Username:</td>
+  <td>
+    <input type=text size=20 name=username validation="
+ name: Username
+ required: 1
+ min_len: 3
+ max_len: 30
+ match: 'm/^\w/'
+ match_error: '$name may contain only letters and numbers'
+"><br>
+    <span id=username_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Password:</td>
+  <td>
+    <input type=password size=20 name=password validation=" &pa
+ name: Password
+ required: 1
+ min_len: 6
+ max_len: 30
+ match: [m/\d/, 'm/[a-z]/']
+ match_error: '$name must contain both a letter and a number.'
+"><br>
+    <span id=password_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Password:</td>
+  <td>
+    <input type=password size=20 name=password2 validation="{name: Verify password, validate_if: *pa,  equals: password, equals_name: password}"><br>
+    <span id=password2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Email:</td>
+  <td>
+    <input type=text size=40 name=email validation="&em
+name: Email
+required: 1
+min_len: 6
+max_len: 100
+"><br>
+    <span id=email_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Email:</td>
+  <td>
+    <input type=text size=40 name=email2 validation="
+name: Verify email
+validate_if: *em
+equals: email
+equals_name: email
+clear_on_error: 1
+"><br>
+    <span id=email2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Random Association:</td>
+  <td>
+    <input type=text size=40 name=random validation="
+name: random
+default: bull sun orange
+"><br> (type anything - will fill in default if none)<br>
+    <span id=email2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td colspan=2 align=right>
+    <input type=submit>
+  </td>
+</tr>
+</table>
+</form>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+if (document.check_form) document.check_form('a');
+</script>
+
+</html>

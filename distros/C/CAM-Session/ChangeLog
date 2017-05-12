@@ -1,0 +1,92 @@
+2005-04-26 12:47  chris
+
+	* Build.PL, Makefile.PL, lib/CAM/Session.pm: v1.03 Add DBD::mysql
+	  to the build requirements (for testing)
+
+2005-04-22 22:44  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/Session.pm: v1.02 Relicensing
+
+2003-09-16 17:29  chris
+
+	* Build.PL, COPYRIGHT, LICENSE, MANIFEST, Makefile.PL, README,
+	  Session.pm, index.html, test.pl, lib/CAM/Session.pm: v1.01 Update
+	  for new build and license infrastructure Add top-level
+	  documentation
+
+2003-09-03 16:22  chris
+
+	* Makefile.PL, Session.pm, test.pl: v1.00 Added smart autosave to
+	  session Simplified new ID computation Added a lot of new tests
+
+2003-08-18 10:35  chris
+
+	* Session.pm: Set the session key to be an SQL primary key
+
+2003-03-13 16:37  chris
+
+	* Session.pm: Minor code cleanup
+
+2003-03-13 11:38  chris
+
+	* COPYRIGHT, Makefile.PL, README, Session.pm, test.pl: v0.35 Update
+	  docs, add copious tests (now depends on Test::More)
+
+2003-03-09 10:12  chris
+
+	* Session.pm: v0.34 -- minor updates * change file globals to
+	  package globals (my to our) * doc fixes
+
+2003-03-06 16:55  chris
+
+	* Session.pm: v0.33 Minor update: add indexing to create() function
+
+2002-12-13 15:17  chris
+
+	* Session.pm: Fix the return of getAll in the scalar case
+
+2002-10-31 09:57  chris
+
+	* Session.pm: Add getAll() function
+
+2002-06-10 16:41  chris
+
+	* Session.pm: Comment cleanup
+
+2002-06-10 13:24  tasc
+
+	* Session.pm: Add delete, clear methods Change class methods to
+	  require package Fix problem in _explode
+
+2002-06-10 11:19  tasc
+
+	* Session.pm: Bump minor version
+
+2002-06-10 11:18  tasc
+
+	* Session.pm: Restructured cookie output routines Let set() take
+	  multiple key,value pairs Bump version
+
+2002-06-07 15:27  chris
+
+	* Session.pm: Documentation typo and (copy-n-paste)o fixing
+
+2002-06-07 14:10  chris
+
+	* Makefile.PL, Session.pm: Initial testing revealed a ton of bugs
+
+2002-06-07 13:30  chris
+
+	* Makefile: Oops, imported a superfluous file
+
+2002-06-07 13:29  chris
+
+	* MANIFEST, Makefile, Makefile.PL, Session.pm, test.pl: Initial
+	  revision
+
+2002-06-07 13:29  chris
+
+	* MANIFEST, Makefile, Makefile.PL, Session.pm, test.pl: initial
+	  import
+

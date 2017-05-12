@@ -1,0 +1,40 @@
+---
+abstract: "It's new $module"
+author:
+  - 'Mike Ryan <falter@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.12.0, CPAN::Meta::Converter version 2.133380'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cikl-Redis
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Cikl::Redis:
+    file: lib/Cikl/Redis.pm
+    version: 0.01
+requires:
+  Cikl: v0.5.0
+  Mouse: 0
+  Redis: 1.972
+  perl: 5.014
+resources:
+  homepage: https://github.com/cikl/p5-Cikl-Redis
+  repository: git://github.com/cikl/p5-Cikl-Redis.git
+version: 0.01

@@ -1,0 +1,29 @@
+---
+abstract: 'Thundering Herd Protection for Memcached Clients'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-Memcached-Turnstile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: 0
+  Constant::FromGlobal: 0
+  Data::Dumper: 0
+  Exporter: 0
+  POSIX: 0
+  Test::More: 0.88
+  Time::HiRes: 0
+  constant: 0
+version: 0.01

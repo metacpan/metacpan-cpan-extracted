@@ -1,0 +1,24 @@
+Revision history for Perl extension Config::Magic.
+0.801  Sep 9, 2005
+        Fixed a problem with the new stricter variable names so that it will work with Apache style.
+0.80   Sep 9, 2005
+        Made it run faster using precompiling and fixed some bugs.  Made variable names a little stricter to remove some ambiguity.
+	Made comments part of "skip" instead of their own section.  Added C style comments.
+0.76   Dec 8, 2004
+	Workaround for buggy regular expression results from Perl 5.8.4, introduced ordering capability
+0.751  Dec 6, 2004
+       Removed debugging information.
+0.75  
+       Moved some things around to deal with a bug in the parent module.
+0.74  Thu July 1
+       Added missing dependency in the Makefile.PL file.
+0.73  Thu June 24
+       Allow backslashed quotes. Fixed a problem in the comments
+0.72  Tue Jun 22
+       Fixed a few problems with the POD documentation
+0.7   Tue Jun 22
+        - Added XML, documentation, made it run, etc.
+0.01  Thu Jun 17 19:41:12 2004
+	- original version; created by h2xs 1.23 with options
+		-XA -n Config::Magic
+

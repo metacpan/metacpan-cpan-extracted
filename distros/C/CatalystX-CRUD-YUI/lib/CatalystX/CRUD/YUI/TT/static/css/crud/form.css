@@ -1,0 +1,88 @@
+form.crud {
+    margin: 0;
+}
+
+form.crud fieldset,
+div.crud
+{
+    padding: 2px;
+    background-color: #f5f5f5;
+    border:1px solid #aaa;
+}
+
+
+form.crud legend  {
+    padding: 0.2em 0.5em;
+    background-color: #fff;
+    border:1px solid #aaa;
+    text-align:right;
+    font-weight:bold;
+    padding:5px;
+}
+
+form.crud div.boolean_group,
+form.crud div.boolean_group input,
+form.crud div.boolean_group label
+{
+    clear:both;
+    float:none;
+    border:none;
+    width:auto;
+    display:inline;
+}
+
+form.crud div.boolean_group input,
+form.crud div.boolean_group label
+{
+    font-weight:normal;
+    padding-left: .5em;
+    padding-right: 1em;
+    margin: 0;
+}
+
+
+form.crud input[type=text],
+form.crud input[type=password],
+form.crud textarea
+{
+    font-family: Monaco, 'Andale Mono', fixed, monospace;
+    padding: 1px;
+}
+
+/* buttons that look like links */
+form.inline {
+    display:inline;
+    margin: 0;
+    padding:0;
+}
+
+/* disable buttons */
+.disabled, .disabled:hover {
+    color: #222;
+    border: 1px solid #000;
+    background-color: #eee;
+    cursor: none;
+}
+
+table.crud th.crud,
+table.crud td.crud
+{
+    padding: 4px;
+}
+
+table.crud th.crud {
+    font-weight: bold;
+    text-align: right;
+}
+
+form.crud div.description {
+    background-color: #fff;
+    border:1px solid #aaa;
+    margin: 1em 1em 0.5em 1em;
+    padding: 0.5em 0.75em 0.5em 0.75em;
+    /* width: 50%; */
+}
+
+form.crud div.description strong {
+    font-weight: bold;
+}

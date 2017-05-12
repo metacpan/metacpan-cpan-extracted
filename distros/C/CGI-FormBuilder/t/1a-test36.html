@@ -1,0 +1,42 @@
+<form action="TEST" method="get">
+<div><input id="_submitted" name="_submitted" type="hidden" value="1" /></div>
+<input id="hid1" name="hid1" type="hidden" value="Val1b" />
+<input id="hid2" name="hid2" type="hidden" value="Val2" />
+<table>
+<tr valign="top">
+  <td>Name</td>
+  <td><input id="name" name="name" type="hidden" value="Pete Peteson" />Pete Peteson</td>
+</tr>
+<tr valign="top">
+  <td>Color</td>
+  <td><table>
+  <tr>
+    <td><input id="color_read" name="color" type="radio" value="read" /></td>
+    <td><label for="color_read">read</label></td>
+  </tr>
+  <tr>
+    <td><input checked="checked" id="color_blew" name="color" type="radio" value="blew" /></td>
+    <td><label for="color_blew">blew</label></td>
+  </tr>
+  <tr>
+    <td><input id="color_yell" name="color" type="radio" value="yell" /></td>
+    <td><label for="color_yell">yell</label></td>
+  </tr>
+  </table></td>
+</tr>
+<tr valign="top">
+  <td>Tummy</td>
+  <td><select id="Tummy" multiple="multiple" name="Tummy">
+  <option value="sm">sm</option>
+  <option value="med">med</option>
+  <option selected="selected" value="lg">lg</option>
+  <option value="xl">xl</option>
+  <option selected="selected" value="xxl">xxl</option>
+  <option value="xxxl">xxxl</option>
+  </select></td>
+</tr>
+<tr valign="top">
+  <td align="center" colspan="2"><input id="_submit" name="_submit" type="submit" value="Submit" /></td>
+</tr>
+</table>
+</form>

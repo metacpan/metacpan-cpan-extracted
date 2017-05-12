@@ -1,0 +1,35 @@
+---
+abstract: 'Perl interface for the certificate handling parts of the NSS api.'
+author:
+  - 'Johanna Amann, <johanna@icir.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+configure_requires:
+  Alien::NSS: 0.05
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: mozilla
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-NSS-X509
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Alien::NSS: 0.05
+  Encode: 2.4
+  Exporter: 5.6
+  MIME::Base64: 3.13
+  autodie: 2.1
+  perl: 5.10.1
+resources:
+  bugtracker: https://github.com/0xxon/perl-nss/issues
+  homepage: https://github.com/0xxon/perl-nss
+  license: http://opensource.org/licenses/mozilla1.1.php
+  repository: git://github.com/0xxon/perl-nss.git
+version: '0.05'

@@ -1,0 +1,13 @@
+Sat Nov 14 09:19:19 CET 2009
+  * New methods in the api
+  * Fixed error messages
+  * More docs and tests
+
+Thu, 12 Nov 2009 10:00:00 +0100
+  * Fixed test errors on Linux
+
+Tue, 10 Nov 2009 08:34:10 +0100
+  * Fixed dependencies
+
+Mon, 09 Nov 2009 23:34:04 +0100
+  * Initial Release

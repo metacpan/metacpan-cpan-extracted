@@ -1,0 +1,8 @@
+1.00    2001-05-13  (By Abhijit Menon-Sen <ams@wiw.org>
+
+    * Complete rewrite to use XS (this version is backwards-compatible
+      with 0.41).
+
+0.41    1998-12     (By Vipul Ved Prakash)
+
+    * Stable release.

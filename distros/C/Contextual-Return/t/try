@@ -1,0 +1,8 @@
+use Contextual::Return;
+
+sub foo {
+    return FAIL { 'failed' };
+}
+
+
+print 1+foo;

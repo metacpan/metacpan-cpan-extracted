@@ -1,0 +1,138 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Data::Dumper;
+use CORBA::omniORB ids => [ 'IDL:omg.org/CORBA:1.0' => undef ];
+
+my $orb = CORBA::ORB_init("omniORB4");
+
+my $fidtc = CORBA::TypeCode->new('IDL:omg.org/CORBA/InterfaceDef/FullInterfaceDescription:1.0');
+
+my $ir = $orb->resolve_initial_references("InterfaceRepository");
+$ir = CORBA::Repository->_narrow($ir);
+if(CORBA::is_nil($ir)) {
+    die "Can't connect to InterfaceRepository service\n";
+}
+
+print 'my $orb = CORBA::ORB_init("omniORB4");', "\n\n";
+
+foreach my $id (@ARGV) {
+    my $contained
+	= $ir->lookup_id($id) || die "Can't find $id in repository\n";
+
+    &dump_contained($contained);
+}
+
+print "1;\n";
+
+exit 0;
+
+sub dump_contained {
+    my ($contained) = @_;
+
+    my $kind = $contained->_get_def_kind();
+    if($kind eq 'dk_Module') {
+	&dump_container($contained);
+    }
+    elsif($kind eq 'dk_Interface') {
+	&dump_container($contained);
+
+	my $name = $contained->_get_absolute_name();
+	$name =~ s/^:://;
+	print "\$orb->_define_interface('$name', ";
+	my $desc = $contained->describe_interface();
+	my $cdr = $orb->cdr_encode($desc, $fidtc);
+	print "pack('H*', '", unpack('H*', $cdr), "'));\n";
+    }
+    elsif($kind eq 'dk_Exception') {
+	my $name = $contained->_get_absolute_name();
+	$name =~ s/^:://;
+	print "\$orb->_define_exception('$name', '";
+	print $contained->_get_id();
+	print "');\n";
+    }
+    elsif($kind eq 'dk_Constant') {
+	my $name = $contained->_get_absolute_name();
+	$name =~ s/^:://;
+
+	my $value = $contained->_get_value()->value();
+	
+	print "sub $name {\n";
+	print "  my ";
+	print Data::Dumper->Dump([$value], ['retval']);
+	print "  return \$retval;\n";
+	print "}\n";
+    }
+    else {
+	print "# $kind\n";
+    }
+}
+
+sub dump_container {
+    my ($container) = @_;
+
+    my $constants = $container->contents('dk_Constant', 1);
+    foreach my $constant (@$constants) {
+	&dump_contained($constant);
+    }
+
+    my $exceptions = $container->contents('dk_Exception', 1);
+    foreach my $exception (@$exceptions) {
+	&dump_contained($exception);
+    }
+
+    my $interfaces = $container->contents('dk_Interface', 1);
+    foreach my $interface (@$interfaces) {
+	&dump_contained($interface);
+    }
+}
+
+__END__
+=head1 NAME
+
+ir2pm - Extract CORBA Interface Repository information as a Perl module
+
+=head1 SYNOPSIS
+
+B<ir2pm> [I<repository-id> ...]
+
+=head1 DESCRIPTION
+
+The ir2pm program extracts portions of a CORBA interface repository
+(IR) and writes out the information needed to define CORBA::omniORB
+Perl stubs and skeletons for constants, interfaces, and exceptions
+without referencing the IR at runtime.
+
+Before running ir2pm, IDL definitions related to interface
+repositories must be present in the interface repository.  These
+definition can normally be found in the F<ir.idl> file in the omniORB
+IDL sources.
+
+The output of ir2pm can be loaded as a Perl module.  The effect of
+loading such a module is the same as pre-loading the interface
+definitions via the arguments to C<use CORBA:::omniORB>.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item * Can't connect to InterfaceRepository service
+
+Indicates that there is no InterfaceRepository initial reference defined
+in the omniORB configuration.
+
+=item * Can't find $id in repository
+
+The given repository identifier does not indicate an interface
+definition stored in the repository.
+
+=back
+
+=head1 AUTHOR
+
+Peter S. Housel, <F<housel@acm.org>>.
+
+=head1 COPYRIGHT
+
+Copyright 2006-2007 Mindspeed Technologies.
+Licensed under the terms of the GNU LGPL.

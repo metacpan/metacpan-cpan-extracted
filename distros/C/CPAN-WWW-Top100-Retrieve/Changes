@@ -1,0 +1,11 @@
+Revision history for CPAN-WWW-Top100-Retrieve
+
+1.001 2014-11-06T17:54:44Z UTC
+ - Converted to Dist::Zilla for the release process!
+
+ [STATISTICS]
+ - code churn: 14 files changed, 466 insertions(+), 603 deletions(-)
+
+0.01 0000-00-00T00:00:00Z UTC
+ - initial release
+

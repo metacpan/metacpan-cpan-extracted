@@ -1,0 +1,48 @@
+Class::Accessor::Ref - Access members by reference
+
+The typical Perl OOP module uses a blessed hash to store an object, with
+hash keys representing intance members. Using these members directly can
+be dangerous, because:
+
+1. if you have a typo in the member name, all you get is (at best) a
+   warning and a member with the wrong name is autovivified;
+
+2. from an OOP point of view, accessing members directly breaks the class
+   encapsulation, if done outside the class implementation.
+
+There exist several good modules on CPAN that solve these problems;
+I like Class::Accessor the best. But none of these modules provide a
+way to take a reference to a member variable, a common enough desire,
+for example if you're using an API that expects in/out parameters. In
+fact, most of the accessor modules don't let you do simple stuff like
+modifying a member (in a safe way) without a temporary variable. Here's
+a typical Class::Accessor example:
+
+    my $tmp = $obj->member;
+	$tmp =~ s/some/substitution/;
+	$obj->member($tmp);
+
+
+Class::Accessor::Ref helps with all these issues. It is a subclass
+of Class::Accessor, and setting it up can be as simple as a global
+s/Class::Accessor/$&::Ref/g in your code. In addition to the regular
+accessors provided by Class::Accessor, you also get the generic reference
+getter get_ref, which can be used thus:
+
+    ${ $obj->get_ref('member') } =~ s/some/substitution/;
+
+And also, for each member foo, you get a reference accessor _ref_foo:
+
+    ${ $obj->_ref_member } =~ s/some/substitution/;
+
+It is up to you to choose which you prefer. In either case, if you have a
+typo in the member name, you will get an exception thrown.
+
+Of course, this also works with APIs expecting in/out parameters, so
+you can call
+
+    Some::API::scale_rectangle($factor,
+                               $obj->_ref_minx, $obj->_ref_miny,
+                               $obj->_ref_maxx, $obj->_ref_maxy);
+
+See the POD documentation for more details.

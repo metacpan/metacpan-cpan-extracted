@@ -1,0 +1,61 @@
+{
+   "abstract" : "Support for creating standard \"inside-out\" classes",
+   "author" : [
+      "Damian Conway <DCONWAY@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "keywords" : [
+      "OOP",
+      "class",
+      "object"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Std",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Std" : {
+         "file" : "lib/Class/Std.pm",
+         "version" : "0.013"
+      },
+      "Class::Std::SCR" : {
+         "file" : "lib/Class/Std.pm",
+         "version" : "0.013"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/chorny/Class-Std"
+      }
+   },
+   "version" : "0.013"
+}

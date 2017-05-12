@@ -1,0 +1,8 @@
+# This file documents the revision history for Perl extension Catalyst-ComponentRole-PathFrom
+
+0.002 - 2015-05-31
+  - Change the way I form paths in test cases to hopefully solve
+    pointless test fails when testing on windows (sorry).
+
+0.001 - 2015-05-20
+  - First Release 

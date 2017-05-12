@@ -1,0 +1,24 @@
+---
+abstract: 'Use Form::Processor with Catalyst'
+author:
+  - 'Bill Moseley <mods@hank.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Form-Processor
+requires:
+  Class::Load: 0.20
+  HTML::FillInForm: 0
+  Module::Find: 0
+  Moose::Role: 0
+  Scalar::Util: 0
+version: 1.140270

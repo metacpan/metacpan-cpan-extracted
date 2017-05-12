@@ -1,0 +1,48 @@
+---
+abstract: 'Read and write Apache Commons Configuration style Properties'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  File::Temp: '0.14'
+  Test::Deep: '0'
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - java
+  - properties
+  - apache
+  - common
+  - config
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Properties-Commons
+no_index:
+  directory:
+    - .author
+    - t
+provides:
+  Config::Properties::Commons:
+    file: lib/Config/Properties/Commons.pm
+    version: v1.0.1
+requires:
+  Encode: '2.12'
+  File::Basename: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Params::Validate: '1.03'
+  String::Util: '0'
+  Text::Wrap: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/mithun/perl-config-properties-commons/issues
+  homepage: https://github.com/mithun/perl-config-properties-commons
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-config-properties-commons.git
+version: v1.0.1

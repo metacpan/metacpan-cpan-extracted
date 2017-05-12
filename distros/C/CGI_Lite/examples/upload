@@ -1,0 +1,105 @@
+#!/usr/local/bin/perl5
+
+# Simple example that displays the data associated with
+# the "readme" file field in a multiform/form-data request.
+
+use CGI_Lite;
+
+$cgi = new CGI_Lite;
+
+# Die if the directory is invalid (i.e doesn't exist, can't
+# read or write to it, or is not a directory).
+
+$cgi->set_directory ("/tmp") || die "Directory doesn't exist.\n";
+
+# Set the platform. "Unix" is the default. The method accepts 
+# platforms in a case insensitive manner, so you can pass 
+# "UNIX", "Unix", "unix", etc.
+
+$cgi->set_platform ("Unix");
+
+# Set the buffer size to 1024 bytes (1K). This is the default.
+
+$cgi->set_buffer_size (1024);
+
+# Let's change the way uploaded files are named!
+
+$cgi->filter_filename (\&my_way);
+
+# Tell the module to return filehandles.
+
+$cgi->set_file_type ('handle');
+
+# We want CGI_Lite to perform EOL conversion for all files that have the
+# following MIME types:
+#
+#     application/mac-binhex40
+#     application/binhex-40
+#
+# so, we use the add_mime_type method. In addition, we don't want 
+# files of MIME type: text/html to be converted. I'm sure you wouldn't
+# want to do that in real life :-)
+
+$cgi->add_mime_type ('application/mac-binhex40');
+$cgi->add_mime_type ('application/binhex-40');
+$cgi->remove_mime_type ('text/html');
+
+# Let's go ahead and parse the data!
+
+$data = $cgi->parse_form_data;
+
+print "Content-type: text/plain", "\n\n";
+
+if ($cgi->is_error) {
+    $error_message = $cgi->get_error_message;
+
+    print <<End_of_Error;
+
+Oops! An error occurred while uploading the file. Please go back
+and try to upload the file again. In the meanwhile, you may
+want to report the following error to the Webmaster:
+
+$error_message
+
+Sorry, and thanks for being patient!
+
+End_of_Error
+
+} else {
+
+    # Dereferences the variable to get a filehandle. Then,
+    # iterates through the file, displaying each line to STDOUT.
+    #
+    # NOTE: $readme also contains the name of the file.
+
+    $readme = $data->{readme};
+
+    print <<End_of_Header;
+
+Thanks for uploading the file: $readme to our server. Just
+in case you're interested, here are the contents of your uploaded
+file:
+
+End_of_Header
+
+    while (<$readme>) {
+        print;
+    }
+
+    # Make sure to close the file!
+
+    $cgi->close_all_files;
+}
+
+exit (0);
+
+sub my_way
+{
+    my $file = shift;
+
+    $file =~ tr/A-Z/a-z/;                # Upper to lowercase
+    $file =~ s/(?:%20)+/_/g;             # One or more spaces to "_"
+    $file =~ s/%[\da-fA-F]{2}//g;        # Remove all %xx
+
+    return ($file);
+}

@@ -1,0 +1,15 @@
+[% PROCESS "header.tt" title => "Pick Domain" %]
+
+(Your ip is [% remote_addr %]) (The time is [% time %])
+
+<form name=[% form_name %] action=[% script_name %] method=post>
+
+<label>Pick a domain:</label>
+<input type=text name=domain>
+<input type=submit value="Check"><br>
+<span class=error id=domain_error>[% domain_error %]</span>
+
+</form>
+[% js_validation %]
+
+[% PROCESS "footer.tt" %]

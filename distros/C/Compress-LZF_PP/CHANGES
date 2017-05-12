@@ -1,0 +1,7 @@
+Revision history for Perl module Compress::LZF_PP:
+
+0.33 Wed Sep 10 20:47:56 BST 2008
+     - add machine- and human-readable license
+
+0.32 Tue Sep  2 16:43:44 BST 2008
+     - initial release

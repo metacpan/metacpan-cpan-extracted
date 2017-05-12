@@ -1,0 +1,148 @@
+Revision history for Calendar-List
+==================================
+
+0.28    2014-10-05
+        - fixed maxcount setting when options and end date are both used.
+          (RT#99247, thanks to Slaven Rezić).
+
+0.27    2014-10-01
+        - fixed license fields in META.json to be lists.
+        - extended META and functional test suites.
+        - compare_dates and encode_date undefined logic reworked.
+        - reformat_date day/month/year validation must be numeric.
+        - fixed DDEXT and dotw bugs.
+        - simplified logic for holidays and exclusions.
+        - SELECTED now switched to XHTML format of selected="selected".
+        - added support for excluding full months.
+        - added tests for list function coverage.
+
+0.26    2012-11-18
+        - change file dates changed to meet W3CDTF standards.
+        - test file updates.
+
+0.25    2012-04-29
+	    - added minimum perl version (5.006).
+	    - META tests no longer require specific versions.
+	    - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+
+0.24    2012-04-15
+	    - removed debugging lines.
+
+0.23    2012-04-15
+        - update META.yml to prevent TestData.pm from being indexed.
+        - License updated to Artistic License v2.0.
+        - removed Artistic file.
+        - added META.json and test script.
+
+0.22    2009-18-18
+        - added more tests
+        - updated documentation.
+        - Due to previous rewrite, all versions of DateTime are now supported.
+
+0.21    2008-06-02
+        - updated META.yml to correctly include DateTime optional prerequisite.
+        - added dubious TestData to META.yml to see how PAUSE and CPANTS 
+          respond. This is dubious because TestData.pm is provided in the 
+          distribution under the ./t directory, and listed as no_index, which
+          CPANTS ignores and says there is a prerequisite missing!
+
+0.20    2008-03-28
+        - purely a cosmetic release to render the Makefile.PL time issues, that
+          have generated bogus FAIL reports in previous releases, null
+          and void.
+
+0.19    2008-03-19
+        - removed 5.006 dependency
+        - major refactorying effort
+        - removed month_list, dotw3, month_days, diff_dates (Functions.pm)
+        - added compare_dates (Functions.pm)
+        - reinstated DateTime support
+        - reworked lots of tests
+        - added AUTOMATED_TESTING checks to packaging tests.
+
+0.18    2007-03-02
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE.
+        - Added META.yml test script.
+        - Added LICENSE and Artistic files.
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - POD/README updates
+        - Devel::Cover - 90.6%
+
+0.17    2005-11-18
+        - added support for excluding holidays (suggested by Julio Gruskin)
+
+0.16    2005-03-03
+        - Fixed some inaccurate tests.
+        - Updated POD
+        - both modules now share the same VERSION
+        - fixed option count bug
+
+0.15    2005-03-01
+        - POD fix (william--knowmad.com via rt)
+
+0.14    2005-01-07
+        - fixed 13timelocal.t epoch test bug
+        - upgraded pod tests
+
+0.13    2004-04-22
+        - Upgrade 91podcover.t to use Test::Pod::Coverage
+
+0.12    2004-04-22
+        - All Time::Local dates based from 12 midday
+
+0.11    2004-04-19
+        - Test::More added as a prerequisites for PPMs
+        - Fixed Abstract in Makefile.PL
+
+0.10    2003-12-16
+        - Fixed the VERSION test if DateTime not loaded
+
+0.09    2003-11-10
+        - Added Time::Piece for the EPOCH date format
+        - Added more tests
+
+0.08    2003-11-07
+        - delta_days changed after DateTime 0.16 :(
+        - Quick fix to ensure we don't use DateTime after version 0.16.
+          This will change in the future, but I don't currently have
+          the time to write a work around.
+
+0.07    2003-10-08T13:04:18Z
+        - POD updates
+        - META.yml added to distribution
+
+0.06    2003-08-07T11:31:38Z
+        - Another fix to cope with Time::Local dotw problems
+        - Fixed POD links
+        - More Date Formats
+        - change tests to use is_deeply
+
+0.05    2003-07-31T21:21:14Z
+        - more Date Formats
+        - use Tie::IxHash to preserve order of internal hash
+
+0.04    2003-06-10T22:31:21Z
+        - Fixed the loading module test in new test files
+        - Fix for Time::Local test due to faults on windows
+        - Switched to timegm, as we're not interested in Daylight Saving
+        - SELECTED bug fix
+
+0.03    2003-06-09T13:47:31Z
+        - Time::Local fix for +/- duration.
+        - more tests added.
+
+0.02    2003-06-08T20:27:31Z
+        - '-opt' style dropped in favour of 'opt'
+        - 'make dist' used to create the distribution
+        - fixed DateTime::compare bug in tests
+          thanks to Richard Clamp for the above suggestions
+        - changed to 'delta_days' to get a true diff date with DateTime
+        - reworked Functions code to provide undef on error
+        - reworked Time::Local tests to check for undef on error
+
+0.01    2003-04-30T16:50:06Z
+        - original version; created by h2xs 1.21 with options
+          -c -n Calendar::List
+

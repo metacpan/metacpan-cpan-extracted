@@ -1,0 +1,16 @@
+CHANGES file for Catalyst::Plugin::CookiedSession:
+
+0.35 Wed Aug 19 11:43:10 BST 2009
+  - add ability to change the cookie name
+
+0.34 Wed Sep 10 20:41:10 BST 2008
+  - added machine- and human-readable license 
+
+0.33 Thu Apr 17 18:48:37 BST 2008
+  - remove debugging statements unless under debug mode
+
+0.32 Thu Feb 14 07:22:36 GMT 2008
+  - use JSON::XS::VersionOneAndTwo
+
+0.31 Wed Feb 13 14:38:53 GMT 2008
+  - first release

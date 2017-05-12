@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>FAIL Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/05.html">Postings from May 2008</a>
+
+<h2>FAIL Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release</h2>
+
+
+
+
+
+
+
+
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>srezic</b><br/>
+<div class="h_name">Date:</div> May 10, 2008 01:43<br/>
+<div class="h_name">Subject:</div> FAIL Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.8.8, created by CPAN-Reporter-1.13. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /usr/local/bin/perl5.8.8t &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....ok
+t/02-script..........ok
+t/03-yaml............ok
+t/04-fork............
+#   Failed test '-in4 =&gt; 'FILENAME''
+#   in t/04-fork.t at line 72.
+#                   'loopback.pl: saw 0 line(s) on input'
+#     doesn't match '(?-xism:Burp)'
+
+#   Failed test 'run -out4 =&gt; 'FILENAME''
+#   in t/04-fork.t at line 80.
+#                   ''
+#     doesn't match '(?-xism::.*easy!)'
+04-fork.t: ERROR: Command `/usr/local/bin/perl5.8.8t -Mlib=lib t/loopback.pl -o 4 -i 5' exited with error code 1
+program output:
+04-fork.t: ERROR: tried to setup on FD 5, but got 13(spec: &lt; CODE(0x83907c4))
+# Looks like you planned 17 tests but only ran 15.
+# Looks like you failed 2 tests of 15 run.
+dubious
+	Test returned status 2 (wstat 512, 0x200)
+DIED. FAILED tests 13, 15-17
+	Failed 4/17 tests, 76.47% okay
+t/05-prompt..........ok
+t/06-anydump.........ok
+t/07-tsay............ok
+t/08-unit............ok
+t/09-noyaml..........ok
+Failed Test Stat Wstat Total Fail  List of Failed
+-------------------------------------------------------------------------------
+t/04-fork.t    2   512    17    6  13 15-17
+Failed 1/9 test scripts. 4/60 subtests failed.
+Files=9, Tests=60, 5368 wallclock secs ( 2.34 cusr +  1.78 csys =  4.12 CPU)
+Failed 1/9 test programs. 4/60 subtests failed.
+*** Error code 35
+
+Stop in /var/tmp/CPAN-build/Scriptalicious-1.15-hmYqTg.
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.62
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    PATH = /usr/local/bin:/usr/X11R6/bin:/usr/X11/bin:/usr/perl5.8.0/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/pilot/bin:/home/cpansand/bin/freebsd6.1:/home/cpansand/bin/sh:/home/cpansand/bin:/usr/X386/bin:/usr/games:/home/cpansand/devel:/home/e/eserte/work/srezic-misc/scripts:/home/e/eserte/devel:/usr/home/e/eserte/work/srezic-misc/scripts
+    PERL5LIB = /usr/local/src/CPAN/build/Data-NDS-1.03-qmoD87/blib/arch:/usr/local/src/CPAN/build/Data-NDS-1.03-qmoD87/blib/lib:/usr/local/src/CPAN/build/Algorithm-Permute-0.12-s0h775/blib/arch:/usr/local/src/CPAN/build/Algorithm-Permute-0.12-s0h775/blib/lib:/usr/local/src/CPAN/build/List-Parseable-1.04-1bXHjO/blib/arch:/usr/local/src/CPAN/build/List-Parseable-1.04-1bXHjO/blib/lib:/usr/local/src/CPAN/build/Math-SigFigs-1.08-tzaN9x/blib/arch:/usr/local/src/CPAN/build/Math-SigFigs-1.08-tzaN9x/blib/lib:/usr/local/src/CPAN/build/Number-Ops-1.03-HAAMb5/blib/arch:/usr/local/src/CPAN/build/Number-Ops-1.03-HAAMb5/blib/lib:/usr/local/src/CPAN/build/Set-Files-1.04-zErvjI/blib/arch:/usr/local/src/CPAN/build/Set-Files-1.04-zErvjI/blib/lib:/usr/local/src/CPAN/build/Template-Plugin-ListOps-1.04-mSWyUk/blib/arch:/usr/local/src/CPAN/build/Template-Plugin-ListOps-1.04-mSWyUk/blib/lib:/usr/local/src/CPAN/build/Sort-DataTypes-2.03-K8udrk/blib/arch:/usr/local/src/CPAN/build/Sort-DataTypes-2.03-K8udrk/blib/lib:/usr/local/src/CPAN/build/Date-Manip-5.54-Af2Vby/blib/arch:/usr/local/src/CPAN/build/Date-Manip-5.54-Af2Vby/blib/lib:/usr/local/src/CPAN/build/Template-Toolkit-2.19-ihc4sD/blib/arch:/usr/local/src/CPAN/build/Template-Toolkit-2.19-ihc4sD/blib/lib:/usr/local/src/CPAN/build/AppConfig-1.66-itOjdk/blib/arch:/usr/local/src/CPAN/build/AppConfig-1.66-itOjdk/blib/lib:/usr/local/src/CPAN/build/Term-TUI-1.23-hUjxXz/blib/arch:/usr/local/src/CPAN/build/Term-TUI-1.23-hUjxXz/blib/lib:/usr/local/src/CPAN/build/App-FQStat-5.4-0w1FW8/blib/arch:/usr/local/src/CPAN/build/App-FQStat-5.4-0w1FW8/blib/lib:/usr/local/src/CPAN/build/String-ShellQuote-1.03-vLAgHy/blib/arch:/usr/local/src/CPAN/build/String-ShellQuote-1.03-vLAgHy/blib/lib:/usr/local/src/CPAN/build/Term-ANSIScreen-1.42-5f2dpW/blib/arch:/usr/local/src/CPAN/build/Term-ANSIScreen-1.42-5f2dpW/blib/lib:/usr/local/src/CPAN/build/YAML-Tiny-1.31-LMRdLL/blib/arch:/usr/local/src/CPAN/build/YAML-Tiny-1.31-LMRdLL/blib/lib:/usr/local/src/CPAN/build/Term-CallEditor-0.11-uOuESN/blib/arch:/usr/loc!
+ al/src/C
+PAN/build/Term-CallEditor-0.11-uOuESN/blib/lib:/usr/local/src/CPAN/build/HTML-WikiConverter-DokuWikiFCK-0.21-dSsh6N/blib/arch:/usr/local/src/CPAN/build/HTML-WikiConverter-DokuWikiFCK-0.21-dSsh6N/blib/lib:/usr/local/src/CPAN/build/HTML-WikiConverter-DokuWiki-0.53-jmQ40j/blib/arch:/usr/local/src/CPAN/build/HTML-WikiConverter-DokuWiki-0.53-jmQ40j/blib/lib:/usr/local/src/CPAN/build/HTML-WikiConverter-0.61-5Rn5rQ/blib/arch:/usr/local/src/CPAN/build/HTML-WikiConverter-0.61-5Rn5rQ/blib/lib:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-iAGwh7/blib/arch:/usr/local/src/CPAN/build/Class-Data-Inheritable-0.08-iAGwh7/blib/lib:/usr/local/src/CPAN/build/Params-Validate-0.91-cfKcNn/blib/arch:/usr/local/src/CPAN/build/Params-Validate-0.91-cfKcNn/blib/lib:/usr/local/src/CPAN/build/HTML-Tree-3.23-3S2jZO/blib/arch:/usr/local/src/CPAN/build/HTML-Tree-3.23-3S2jZO/blib/lib:/usr/local/src/CPAN/build/CSS-1.08-9gz8e3/blib/arch:/usr/local/src/CPAN/build/CSS-1.08-9gz8e3/blib/lib:/usr/local/src/CPAN/build/Parse-RecDescent-1.94-WwwsYo/blib/arch:/usr/local/src/CPAN/build/Parse-RecDescent-1.94-WwwsYo/blib/lib:/usr/local/src/CPAN/build/Games-Sudoku-General-0.008-1QurLN/blib/arch:/usr/local/src/CPAN/build/Games-Sudoku-General-0.008-1QurLN/blib/lib:/usr/local/src/CPAN/build/Module-Pluggable-3.8-6vLKf4/blib/arch:/usr/local/src/CPAN/build/Module-Pluggable-3.8-6vLKf4/blib/lib:/usr/local/src/CPAN/build/WWW-VenusEnvy-1.10-sJLTph/blib/arch:/usr/local/src/CPAN/build/WWW-VenusEnvy-1.10-sJLTph/blib/lib:/usr/local/src/CPAN/build/libwww-perl-5.812-xYJ7Wu/blib/arch:/usr/local/src/CPAN/build/libwww-perl-5.812-xYJ7Wu/blib/lib:/usr/local/src/CPAN/build/Compress-Zlib-2.010-Iuvz8f/blib/arch:/usr/local/src/CPAN/build/Compress-Zlib-2.010-Iuvz8f/blib/lib:/usr/local/src/CPAN/build/IO-Compress-Zlib-2.010-6Nerva/blib/arch:/usr/local/src/CPAN/build/IO-Compress-Zlib-2.010-6Nerva/blib/lib:/usr/local/src/CPAN/build/IO-Compress-Base-2.010-GgpI2k/blib/arch:/usr/local/src/CPAN/build/IO-Compress-Base-2.010-GgpI2k/blib/lib:/usr/local/src/CPAN/build/Compress-Raw-!
+ Zlib-2.0
+10-WPsQCU/blib/arch:/usr/local/src/CPAN/build/Compress-Raw-Zlib-2.010-WPsQCU/blib/lib:/usr/local/src/CPAN/build/URI-1.36-PFHnvp/blib/arch:/usr/local/src/CPAN/build/URI-1.36-PFHnvp/blib/lib:/usr/local/src/CPAN/build/Test-Pod-1.26-xsooRE/blib/arch:/usr/local/src/CPAN/build/Test-Pod-1.26-xsooRE/blib/lib:/usr/local/src/CPAN/build/Pod-Simple-3.05-JPkVUb/blib/arch:/usr/local/src/CPAN/build/Pod-Simple-3.05-JPkVUb/blib/lib:/usr/local/src/CPAN/build/Pod-Escapes-1.04-vd8hpX/blib/arch:/usr/local/src/CPAN/build/Pod-Escapes-1.04-vd8hpX/blib/lib:/usr/local/src/CPAN/build/Test-Pod-Coverage-1.08-VfiY4v/blib/arch:/usr/local/src/CPAN/build/Test-Pod-Coverage-1.08-VfiY4v/blib/lib:/usr/local/src/CPAN/build/Pod-Coverage-0.19-4Y0haC/blib/arch:/usr/local/src/CPAN/build/Pod-Coverage-0.19-4Y0haC/blib/lib:/usr/local/src/CPAN/build/Devel-Symdump-2.08-r7jUqL/blib/arch:/usr/local/src/CPAN/build/Devel-Symdump-2.08-r7jUqL/blib/lib:/usr/local/src/CPAN/build/OLE-Storage_Lite-0.17-LuCH4D/blib/arch:/usr/local/src/CPAN/build/OLE-Storage_Lite-0.17-LuCH4D/blib/lib:/usr/local/src/CPAN/build/HTML-Split-0.02-ttO6pR/blib/arch:/usr/local/src/CPAN/build/HTML-Split-0.02-ttO6pR/blib/lib:/usr/local/src/CPAN/build/HTML-Parser-3.56-1fCmCh/blib/arch:/usr/local/src/CPAN/build/HTML-Parser-3.56-1fCmCh/blib/lib:/usr/local/src/CPAN/build/HTML-Tagset-3.20-sYOOWk/blib/arch:/usr/local/src/CPAN/build/HTML-Tagset-3.20-sYOOWk/blib/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 1525
+    PERL5_CPAN_IS_RUNNING = 1525
+    PERL5_CPAN_IS_RUNNING_IN_RECURSION = 1510,1525
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_HTML_DISPLAY_CLASS = HTML::Display::Mozilla
+    SHELL = /usr/local/bin/zsh
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /usr/local/bin/perl5.8.8t
+    $UID/$EUID = 1023 / 1023
+    $GID = 1023 1023 1023
+    $EGID = 1023 1023 1023
+
+Perl module toolchain versions installed:
+
+    Module              Have   
+    ------------------- -------
+    CPAN                1.92_61
+    Cwd                 3.25   
+    ExtUtils::CBuilder  n/a    
+    ExtUtils::Command   1.13   
+    ExtUtils::Install   1.41   
+    ExtUtils::MakeMaker 6.36   
+    ExtUtils::Manifest  1.51   
+    ExtUtils::ParseXS   n/a    
+    File::Spec          3.25   
+    Module::Build       0.2808 
+    Module::Signature   n/a    
+    Test::Harness       2.64   
+    Test::More          0.62   
+    YAML                0.66   
+    YAML::Syck          0.99   
+    version             n/a    
+
+
+--
+
+Summary of my perl5 (revision 5 version 8 subversion 8) configuration:
+  Platform:
+    osname=freebsd, osvers=6.1-release, archname=i386-freebsd-thread-multi
+    uname='freebsd biokovo.herceg.de 6.1-release freebsd 6.1-release #0: sun may 7 04:32:43 utc 2006 root@opus.cse.buffalo.edu:usrobjusrsrcsysgeneric i386 '
+    config_args='-D usethreads=define -Dprefix=/usr/perl5.8.8t -D cc=ccache cc -Dgccansipedantic -Duse64bit -de -D hintfile=myfreebsd'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=define
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=y, bincompat5005=undef
+  Compiler:
+    cc='ccache cc', ccflags ='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include',
+    optimize='-O2 -mtune=athlon64 -pipe',
+    cppflags='-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing -pipe -Wdeclaration-after-statement -I/usr/local/include'
+    ccversion='', gccversion='3.4.4 [FreeBSD] 20050518', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='ccache cc', ldflags ='-pthread -Wl,-E  -L/usr/local/lib'
+    libpth=/usr/lib /usr/local/lib
+    libs=-lm -lcrypt -lutil -lc_r
+    perllibs=-lm -lcrypt -lutil -lc_r
+    libc=, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-DPIC -fpic', lddlflags='-shared  -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+<ul>
+
+
+  
+  
+    <li><b>
+      FAIL Scriptalicious-1.15 i386-freebsd-thread-multi 6.1-release</b>
+      by srezic</li> 
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

@@ -1,0 +1,30 @@
+Cache-Memcached-XS version 0.01
+===============================
+
+Cache::Memcached::XS is a memcached client using libmemcache. It uses
+a lot less CPU than the original pure-perl client.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libmemcache
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jacques Caron & Oxado SARL
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+#
+# Bootstrapping module for Courier::Filter,
+# the purely Perl-based filter framework for the Courier MTA.
+#
+# (C) 2003-2006 Julian Mehnle <julian@mehnle.net>
+# $Id: courier-filter-perl 205 2006-07-13 00:03:58Z julian $
+#
+##############################################################################
+
+=head1 NAME
+
+courier-filter-perl - A Courier::Filter-based filter for the Courier MTA
+
+=head1 VERSION
+
+0.18
+
+=head1 SYNOPSIS
+
+B<filterctl> [ B<start> | B<stop> ] [ B<courier-filter-perl> ]
+
+=head1 DESCRIPTION
+
+The B<courier-filter-perl> executable is a global mail filter for the Courier
+MTA and acts as glue between Courier's B<courierfilter> interface and the
+B<Courier::Filter> module framework.
+
+For an architectural and administrative overview of the B<Courier::Filter>
+framework, see L<Courier::Filter::Overview>.
+
+=head1 FILES
+
+=over
+
+=item F</etc/courier/filters/courier-filter-perl.conf>
+
+This is the configuration file for C<courier-filter-perl> and Courier::Filter.
+See L<Courier::Filter::Overview> for its format.
+
+=back
+
+=head1 SEE ALSO
+
+L<Courier::Filter::Overview>, L<Courier::Filter>
+
+For AVAILABILITY, SUPPORT, and LICENSE information, see
+L<Courier::Filter::Overview>.
+
+=head1 AUTHOR
+
+Julian Mehnle <julian@mehnle.net>
+
+=cut
+
+use warnings;
+use strict;
+
+use lib '/usr/share/courier-filter-perl/perl5';
+
+use Courier::Config;
+use Courier::Filter;
+
+use constant TRUE   => (0 == 0);
+use constant FALSE  => not TRUE;
+
+our $options;
+my $config_file_name = Courier::Config::COURIER_FILTER_CONF;
+require $config_file_name;
+
+my $filter = Courier::Filter->new(%$options);
+exit($filter->run() || 0);
+
+# vim:tw=79

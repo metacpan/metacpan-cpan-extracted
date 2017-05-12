@@ -1,0 +1,14 @@
+This is the original planned improvements to Chart::PNGgraph.  Given the
+move away from PNGgraph to GD::Graph, none of these will be implemented
+in PNGgraph.  Feel free to petition Martien to include them in GD::Graph.
+
+  -- Steve Bonds
+
+Add TrueType support to all font operations.
+Increase the number of examples in the POD documentation
+Add legend support to pie graphs. (Idea from Greg Stewart)
+Fix bar chart problem aligning zero axis when all values are 
+    zero. (Lew Teck Kheng)
+Add custom color support to PNGgraph::colors (Rhys from prizegolf)
+Create a way to allow one to query the GD coordinates of an area on 
+    the chart.  [Probably going to be a major overhaul.]  (abbott)

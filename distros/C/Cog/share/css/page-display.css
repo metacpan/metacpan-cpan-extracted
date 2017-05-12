@@ -1,0 +1,48 @@
+h1.page-title {
+    color: blue;
+    text-align: center;
+}
+
+.content li p {
+    margin: 0;
+}
+
+/* Tag List */
+ul.tag-list {
+    display: inline;
+}
+
+ul.tag-list li {
+    display: inline;
+    list-style: none;
+}
+
+ul.tag-list li:before {
+    content: "\00BB\0020";
+}
+
+/* URL List */
+ul.url-list {
+    margin: 0;
+}
+
+/* Page Navigation */
+ul.page-navigation {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+ul.page-navigation li {
+    background-color: brown;
+    color: white;
+    display: inline;
+    list-style: none;
+    margin-right: 10px;
+    padding: 0 10px;
+}
+
+ul.page-navigation a, ul.page-navigation a:visited {
+    color: white;
+}
+

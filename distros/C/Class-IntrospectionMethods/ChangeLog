@@ -1,0 +1,13 @@
+2004-12-13  Dominique Dumont  <domi@komarr.grenoble.hp.com> v1.003
+
+	* Catalog.pm (help): Return an empty string if no help was defined
+	by user.
+
+2004-12-08  Dominique Dumont  <domi@komarr.grenoble.hp.com> v1.002
+
+	* IntrospectionMethods.pm (set_legacy_methods): bug fixes in
+	legacy methods
+
+	* Catalog.pm: added some help for legacy application
+	(slot): accept several catalog names instead of one.
+

@@ -1,0 +1,33 @@
+Revision history for Perl extension Class::Skin.
+
+0.05  Wed Feb 19 12:55:54 CET 2003
+	- Could not identify correctly absolute paths in cygwin. Now 
+	  it can.
+	- The -ll flag was changed to -lfl (for using flex). 
+
+0.04  Mon Jan 20 11:11:18 CET 2003
+	- Fixed another Segmentation fault. In tree_walker.c line 79, 
+	  it was not checking for the right number of node children. 
+	  This made that template12.txt test failed (so any if-elsif 
+	  without else afterward, failed).
+
+0.03  Sun Dec 15 22:29:21 CET 2002
+	- Fixed a Segmentation fault. I cannot believe it actually
+	  worked without this fix. But it did. The bug was that I forgot
+	  to write the "return" statement in root_tnode that is in
+	  libskin/skin.y. 
+	  Maybe with the older version of gcc it compiles anyway with
+	  the return, when it was omitted? Anyway, this is fixed. 
+	  For the record, I ran in the past, and ran also today, after
+	  the fix valgrind and found no errors but some leaks. I
+	  cannot deal with those leaks as long as perl itself suffer
+	  from them. Anyway, it looks now stable. But be careful.
+
+0.02  Wed Sep 25 20:58:29 CEST 2002
+	- Added prerequisite module Log::LogLite.
+	- Added the function is_absolute_path that was missing.
+
+0.01  Thu Jul 25 10:13:35 2002
+	- original version; created by h2xs 1.21 with options
+		-O -n Class::Skin ./Class/Skin/libskin/skin.h
+

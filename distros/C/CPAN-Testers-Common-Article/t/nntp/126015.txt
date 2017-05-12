@@ -1,0 +1,64 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Return-Path: <Jost.Krieger+perl@rub.de>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 67805 invoked by uid 76); 8 Mar 2004 09:25:53 -0000
+Received: from qmailr@one.develooper.com (HELO ran-out.mx.develooper.com) (64.81.84.115)
+  by onion.perl.org (qpsmtpd/0.27-dev) with SMTP; Mon, 08 Mar 2004 01:25:53 -0800
+Received: (qmail 15837 invoked by uid 225); 8 Mar 2004 09:25:51 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 15832 invoked by uid 507); 8 Mar 2004 09:25:51 -0000
+X-Spam-Status: No, hits=-1.6 required=7.0
+        tests=CARRIAGE_RETURNS,NO_REAL_NAME,PERLBUG_CONF,SPAM_PHRASE_00_01
+X-Spam-Check-By: one.develooper.com
+Received: from sunu991.rz.ruhr-uni-bochum.de (HELO mi.ruhr-uni-bochum.de) (134.147.128.177)
+  by one.develooper.com (qpsmtpd/0.27.0) with ESMTP; Mon, 08 Mar 2004 01:25:20 -0800
+Date: Mon,  8 Mar 2004 10:25:20 +0100
+Subject: PASS AI-Perceptron-1.0 sun4-solaris-thread-multi 2.8
+To: cpan-testers@perl.org
+X-Reported-Via: Test::Reporter 1.20, via CPANPLUS 0.049
+Approved: news@nntp.perl.org
+From: Jost.Krieger+perl@rub.de (Jost Krieger+Perl)
+Message-ID: <perl.cpan.testers-126015@nntp.perl.org>
+
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+Please cc any replies to cpan-testers@perl.org to keep other
+test volunteers informed and to prevent any duplicate effort.
+
+
+--
+
+Summary of my perl5 (revision 5.0 version 8 subversion 3) configuration:
+  Platform:
+    osname=solaris, osvers=2.8, archname=sun4-solaris-thread-multi
+    uname='sunos sunu991 5.8 generic_108528-14 sun4u sparc sunw,ultra-5_10 solaris '
+    config_args=''
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=define
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='gcc', ccflags ='-D_REENTRANT -fno-strict-aliasing -I/usr/local/test/include -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O',
+    cppflags='-D_REENTRANT -fno-strict-aliasing -I/usr/local/test/include -I/usr/local/include'
+    ccversion='', gccversion='3.3.2', gccosandvers='solaris2.8'
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=4321
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=16
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=8, prototype=define
+  Linker and Libraries:
+    ld='gcc', ldflags ='-L/usr/local/test/lib -L/usr/local/lib '
+    libpth=/usr/local/test/lib /usr/local/lib /usr/lib /usr/ccs/lib
+    libs=-lsocket -lnsl -lgdbm -ldb -ldl -lm -lpthread -lc
+    perllibs=-lsocket -lnsl -ldl -lm -lpthread -lc
+    libc=/lib/libc.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version=''
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags=' '
+    cccdlflags='-fPIC', lddlflags='-G -L/usr/local/test/lib -L/usr/local/lib'
+

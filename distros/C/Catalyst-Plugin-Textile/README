@@ -1,0 +1,27 @@
+NAME
+    Catalyst::Plugin::Textile - Textile for Catalyst
+
+SYNOPSIS
+        # include it in plugin list
+        use Catalyst qw/Textile/;
+
+        my $html = $c->textile->process($text);
+
+DESCRIPTION
+    Persistent Textile processor for Catalyst.
+
+  METHODS
+   $c->textile;
+    Returns a ready to use Text::Textile object.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Test, Catalyst::Request, Catalyst::Response,
+    Catalyst::Helper, Text::Textile
+
+AUTHOR
+    Sebastian Riedel, "sri@oook.de"
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

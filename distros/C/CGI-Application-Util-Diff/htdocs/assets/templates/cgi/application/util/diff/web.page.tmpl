@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+
+<title>Diff 2 directories or files, or run other commands</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="/assets/css/cgi/application/util/util.css" />
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/button/assets/skins/sam/button.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/datatable/assets/skins/sam/datatable.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/menu/assets/skins/sam/menu.css">
+
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/element/element-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/container/container_core-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/menu/menu-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/button/button-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/json/json-min.js"></script>
+
+<script type="text/javascript">
+<tmpl_var name=head_js>
+
+function init()
+{ 
+<tmpl_var name=head_init>
+
+var oSubmitButton = new YAHOO.widget.Button({type: "submit", id: "diff-button", label: "Diff", container: "diff.button"});
+
+}
+YAHOO.util.Event.onDOMReady(init);
+</script>
+
+</head>
+
+<body class="yui-skin-sam">
+
+<h3 class="blue_center">Diff 2 directories or files, or run other commands</h3>
+
+<table align="center">
+<tr><td><tmpl_var name="content"></td></tr>
+</table>
+
+</body>
+
+</html>

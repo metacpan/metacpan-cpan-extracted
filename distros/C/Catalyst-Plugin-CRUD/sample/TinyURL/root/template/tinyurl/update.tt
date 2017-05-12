@@ -1,0 +1,24 @@
+[% INCLUDE template/header.tt -%]
+<h1>TinyURL [% c.loc('Edit') %]</h1>
+
+[% IF c.stash.update.error -%]
+<p><font color="red">[% c.stash.update.error %]</font></p>
+[% END -%]
+<form name="tinyurl" method="post" action="/tinyurl/update">
+<table border="1">
+  <tr>
+    <td>ID</td><td><input type="text" name="id" size="25" value="[% c.stash.tinyurl.id %]"></td>
+  </tr>
+  <tr>
+    <td>削除フラグ</td><td><input type="text" name="disable" size="25" value="[% c.stash.tinyurl.disable %]"></td>
+  </tr>
+  <tr>
+    <td>URL</td><td><input type="text" name="long_url" size="25" value="[% c.stash.tinyurl.long_url %]"></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><input type="submit" name="btn_update" value="[% c.loc('Update') %]"></td>
+  </tr>
+</table>
+</form>
+[% INCLUDE template/footer.tt -%]
+

@@ -1,0 +1,8 @@
+Revision history for Catalyst-Plugin-PickComponents
+
+0.02    2009.02.09
+        replace NEXT by MRO::Compat
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

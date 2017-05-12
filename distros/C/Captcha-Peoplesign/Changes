@@ -1,0 +1,15 @@
+Revision history for Perl extension Captcha::Peoplesign.
+
+0.00005
+    - fix documentation errors & typos
+    - brought LWP version requirement to 5.829 (for folks who use
+      ActiveState Perl)
+
+0.00004
+    - fix copyrights
+
+0.00003
+    - fix typos
+
+0.00002  Sat Jan 29 2011
+    - original version

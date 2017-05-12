@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Helper-Graphics
+version:      0.1
+version_from: lib/Catalyst/Helper/Graphics.pm
+installdirs:  site
+requires:
+    Catalyst:                      5.00
+    File::Spec:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

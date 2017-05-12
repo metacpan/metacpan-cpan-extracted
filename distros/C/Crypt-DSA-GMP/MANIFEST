@@ -1,0 +1,34 @@
+Changes
+lib/Crypt/DSA/GMP.pm
+lib/Crypt/DSA/GMP/Key.pm
+lib/Crypt/DSA/GMP/Key/PEM.pm
+lib/Crypt/DSA/GMP/Key/SSH2.pm
+lib/Crypt/DSA/GMP/KeyChain.pm
+lib/Crypt/DSA/GMP/Signature.pm
+lib/Crypt/DSA/GMP/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+TODO
+t/01-load.t
+t/02-util.t
+t/10-sign.t
+t/11-keygen.t
+t/20-fips.t
+t/21-fips-186-4.t
+t/30-pem.t
+t/31-openid.t
+t/32-pem-large.t
+t/33-ssh2.t
+t/40-interop-openssl.t
+t/41-interop-cryptdsa.t
+t/42-interop-cryptx.t
+t/90-release-perlcritic.t
+t/91-release-pod-syntax.t
+t/92-release-pod-coverage.t
+t/93-release-kwalitee.t
+t/94-release-manifest.t
+t/95-release-spelling.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

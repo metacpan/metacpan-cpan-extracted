@@ -1,0 +1,42 @@
+==================================================
+Changes from 2012-02-12 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.10 at 2017-02-10 14:53:44 +0000
+-----------------------------------------
+
+  Change: 5c1d14cd76fec0f39d2e47578c9626c4c7009455
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-10 14:53:44 +0000
+
+    Release 0.10 
+
+  Change: 20d702df2cc35035446de93de230fbc11ff30144
+  Author: brian greenfield <0briang0@gmail.com>
+  Date : 2017-02-10 12:15:30 +0000
+
+    Update URL of default mirror in documentation (#1)
+
+    Change the documented default CPAN mirror from
+    ftp://ftp.funet.fi/pub/CPAN/ to http://www.cpan.org/. 
+
+-----------------------------------------
+version 0.08 at 2014-05-19 12:57:28 +0000
+-----------------------------------------
+
+  Change: e9dd91a3d0bd9caca9053062ae1a3f23b058b8b5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-19 13:57:28 +0000
+
+    Ignore Perl6 modules that have been uploaded 
+
+  Change: 698fe72f04cc56417a4e0ddca84b28c61c220dd7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-07-04 12:10:02 +0000
+
+    Added a 'proper' test. 
+
+================================================
+Plus 3 releases after 2012-02-12 00:00:00 +0000.
+================================================

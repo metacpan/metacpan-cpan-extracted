@@ -1,0 +1,6 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+META.yml
+Schedule.pm
+t/01.t

@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl
+
+use Getopt::Long;
+use File::Basename;
+
+use constant MSWIN => $^O =~ /MSWin32|Windows_NT/i ? 1 : 0;
+
+use strict;
+
+my $prog = basename($0, qw(.pl));
+
+sub usage {
+    my $msg = shift;
+    my $rc = (defined($msg) && !$msg) ? 0 : 2;
+    if ($rc) {
+	select STDERR;
+	print "$prog: Error: $msg\n\n" if $msg;
+    }
+    print <<EOF;
+Usage: $prog [flags] pattern ...
+Flags:
+   -help		Print this message and exit
+Note:
+    All flags may be abbreviated to their shortest unique name.
+Examples:
+    $prog ...
+    $prog ...
+EOF
+    exit $rc;
+}
+
+my %opt;
+GetOptions(\%opt, qw(dbg help do=s));
+usage() if $opt{help} || !$opt{do} || !@ARGV;
+
+my $clearaudit = '/usr/atria/bin/clearaudit';
+$clearaudit = 'clearaudit' if ! -x $clearaudit;
+
+local $ENV{CLEARAUDIT_SHELL} = $^X;
+my $do = $opt{do};
+my $ecmd = qq(open(TOP, q(>$do)) || die "Error: $do: \$!\\n";) .
+    qq(for (<>) { print TOP; chomp; open(DO, \$_) || warn "Warning: \$_: \$!\\n";) .
+    qq(sysread DO, \$junk, 1; close DO; }; close TOP);
+my $cmd = qq($clearaudit -e '$ecmd');
+$cmd = "set -x; $cmd" if $opt{dbg} && !MSWIN;
+open(AUDIT, "| $cmd") || exit(2);
+for (@ARGV) {
+    print AUDIT $_, "\n";
+    print STDERR $_, "\n" if $opt{dbg};
+}
+close(AUDIT) || die($! ?
+		    "$prog: Error: closing clearaudit pipe: $!" :
+		    "$prog: Error: exit code @{[$?>>8]} from clearaudit");

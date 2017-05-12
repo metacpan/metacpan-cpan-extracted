@@ -1,0 +1,3 @@
+* Implement threading.
+    - cache the article meta-data in a local database of some sort (DBI,
+    Berkeley DB, etc.)

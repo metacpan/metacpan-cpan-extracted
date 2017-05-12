@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 35
+name: fd23
+registers:
+  AF: 27122
+  AF_: 0
+  BC: 49619
+  BC_: 0
+  DE: 3951
+  DE_: 0
+  HL: 8553
+  HL_: 0
+  I: 0
+  IX: 58270
+  IY: 9733
+  PC: 0
+  R: 0
+  SP: 0

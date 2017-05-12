@@ -1,0 +1,19 @@
+[%
+   title="CPAN Digger query"
+   description=""
+%]
+[% INCLUDE incl/header.tt %]
+
+[% IF not_found %]
+Nothing found for the term "[% q %]".
+[% END %]
+
+[% FOREACH doc IN results %]
+<div class="result_entry">
+   <a href="/dist/[% doc.name %]">[% doc.name %]</a><br>
+   [% doc.meta.abstract %]<br>
+</div>
+[% END %]
+
+[% INCLUDE incl/footer.tt %]
+

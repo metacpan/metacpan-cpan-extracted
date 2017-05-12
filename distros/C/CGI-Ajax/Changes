@@ -1,0 +1,498 @@
+Revision history for Perl module CGI::Perljax
+
+0.707 (154) | Jan Franczak | 2008-10-07
+
+ Fixed an issue in the declaration of the javascript cache variable as a
+ local variable in the exported methods.  This was causing NO_CACHE to
+ never generate the pjxrand in the query string.
+
+ Changed the code so that cache is set as a global javascript variable.
+
+ Thanks to Shivanandham Karunanithi for identifying this.
+
+0.706 (153) | Shibi Ns | 2008-09-04
+
+ Wrongly coded one line of code for the fix 0.705
+
+ Changed this:
+
+ #    return '' if  $cgi->isa('header') || $cgi->isa('header_type') ;
+
+ To this:
+
+ #    return '' if  $cgi->isa('CGI') || $cgi->isa('CGI::Application') ;
+
+0.705 (152) | Shibi Ns | 2008-08-26
+
+ Changed function call from "can" to "isa" in order this to work with new 
+ version of CGI 3.37. CGI 3.37 has overloaded the function "can" which causes
+ some of the functions to fail.
+
+0.703 (150) | Jan Franczak | 2008-08-20
+     
+ Added support for CACHE() which allows default behaviour of disabling page
+ cache.
+
+ Added fname() support to allow the names of exported functions to be
+ specified.
+
+ Added skip_header support to prevent two headers being produced for
+ applications producing their own headers.
+
+ Two new test scripts.
+
+0.701 (141) | bpederse | 2007-01-30
+
+ added short docs about:
+
+ onclick=jsfunc([{args:42}],['resultdiv'])
+ as an alternative to:
+ onclick=jsfunc(['args__42'],['resultdiv'])
+
+ added fix for split 
+
+ made changes from Peter Gordon for CGI::Application
+ and added 3 of his test scripts which are 1:1 mappings
+ of our test cases.
+
+ added changes to getval by Kyraha
+
+ always show error regardless of debug level if
+ $@ is filled after eval {}
+
+---- OLDER UPDATES BELOW ---
+
+.26 Fri Aug 26 08:07:24 2005
+  original version; created by ExtUtils::ModuleMaker 0.36
+
+.27
+  removed Perljax.pm
+
+
+.28 2005-09-07 10:14:54 Wed, 07 Sep 2005
+  the user can now send in static parameters on the function call:
+  the fnargs has been renamed to 'args'
+  the user can use a parameter as :
+  onclick=(['args__1234','div'],['result'])
+  which will form the url  &args=1234&args=valueindiv
+  can also rename parameters via:
+  onclick=(['parname__'+getVal('div')],['result'])
+  which will for the url:   &parname=valueindiv
+  this is useful for sending to outside scripts which may not use 'args'
+    as the cgi parameter name.
+  renamed getElem to getVal
+
+
+
+.32 2005-09-08 14:49:29 Thu, 08 Sep 2005
+  the url will now be appended to
+  so if get parameters are on the initial url, they can be used in the
+  registered ajax function
+  Lot's of documentation and some code restructures.
+  Set CPAN version to 0.32
+
+
+.37 2005-09-12 10:41:13 Mon, 12 Sep 2005
+  changed perldoc some.
+  Added newline/space compresson to show_common_js().
+  Fixed anonymous javascript functions to have semicolons after
+  definition.
+  Added JSDEBUG triggered compression of user-exported javascript
+  wrapper functions.  If JSBEDUG is on, the don't compress, otherwise
+  compress
+  Incremented CPAN version to 0.37
+
+.43 2005-09-22 09:00:09 Thu, 22 Sep 2005
+  Fixed missing space in a javascript warning message when an HTML
+  element id wasn't defined.
+  Fixed bug in js code to support 'textarea' fields as well as 'test'
+  can now use POST variables!! no url limit
+  can take POST variables, previous addition was still broken.
+  updated POST methods in javascript
+  incremented version string to .43 - POD touchups
+  added new example showing multiple returns to a page
+    (pjx_manyret.pl, in scripts/ dir)
+
+.46 2005-09-28 14:10:08 -0700 Wed, 28 Sep 2005
+  Added a new example script to show using select boxes, which change
+  the value of other select boxes based on what was selected.
+
+.47 2005-09-28 16:49:31 -0700 Wed, 28 Sep 2005
+  added support for multiple select boxes after bug report from
+  aztecpawn on sourceforge.net.  Now the common javascript will return
+  an array of values if there was a multiple selection in a select box
+
+.49 2005-09-29 08:36:37 -0700 Thu, 29 Sep 2005
+  Fixed broken fnsplit so it wouldn't split strings.  Restructured
+  javascript code for spaces and indents.  Need to give Brent my
+  vimrc to prevent real tab chars from coming through.  Removed
+  all tab chars and replaced with spaces.  Made lots of changes
+  to pjx_combo.pl to better document and organize the html layout.
+
+.52 2005-10-05 11:14:27 -0700 Wed, 05 Oct 2005
+
+  Complete rewrite of POD documentation and expansion of documentation.
+  Added heretofore undocumented capability of sending POST instead of
+  the default GET.
+
+.55 2005-10-07 09:33:28 -0700 Fri, 07 Oct 2005
+
+  Can now chain functions; ajax[] array holds pjx objects, so pjx
+  objects don't keep overwriting themselves.
+  Cleaned up javascript custom function code.
+
+.56 2005-10-07 10:35:33 -0700 Fri, 07 Oct 2005
+
+  Changed debugging output for javascript to show multiple URLs is
+  there are chained commands.
+  Fixed a bug introduced in .55 that broke IE browsers - IE doesn't
+  support onload, so switched back to onreadystatechange.
+
+.57 2005-10-10 09:24:37 -0700 Mon, 10 Oct 2005
+
+  Added radio to scripts directory;
+  Added ability to handle radios;
+  Fixed ghr so it only checks once on page load and returns a closure
+    of the correct xmlhttp/activeX request object
+  Changed name of 'radio.pl' to 'pjx_radio.pl'
+  Version to .58
+
+.59 2005-10-10 09:35:49 -0700 Mon, 10 Oct 2005
+
+  Version incremented to .59.  Modified Changes and MANIFEST.  Modified
+    output of pjx_radio.pl.
+  fix docs in pjx_radio
+  Fixed bug reported by anonymous on SF about encodeURIComponent
+  encoding '='.  Problem was parens were mislocated.
+
+.591
+    fixed .59 bug that didn't fix the encodeURIComponent bug
+
+.60 2005-10-17 12:45:31 -0700 Mon, 17 Oct 2005
+  Fixed problem with javascript in make_function() where sep variable
+  was getting overwritten if the processed url contained a '?'.
+  Thanks to pavfed98 for identifying this - reported via rt.cpan.org.
+
+  Added scripts/pjx_url.pl and scripts/convert_degrees.pl to scripts.
+  These were needed to properly test the make_function handling of
+  outside URLs (related to above bug).
+
+  Added support to pass in additional information to build_html()
+  function that gets sent directly to the cgi objects header() call.
+  This allows for custom HTML header information to get sent to the
+  pages generated in the CGI::Ajax system.  Thanks to Jesper Dalberg
+  for suggesting this.
+
+  Modifiedcorrected docs.
+
+  Updated to version 0.60
+
+.64 2005-10-27 09:45 -0700 Thu, 27 Oct 2005
+  Fixed cross-site scripting vulnerability identified in the <=0.60
+  versions.  All users of CGI::Ajax should upgrade asap!  If a browser
+  submits a request for a CGI::Ajax page that contains a function that
+  doesn't exist, a status 400 Bad Request is returned.  Additionally,
+  STDERR gets some output about this event with a "SECURITY" tag, just
+  in case.  Thanks to krusch for catching this!
+
+  Changed how CGI extra header parameters are passed into the CGI
+  object.  Now all parameters destined to CGI->header() are added as a
+  hashref to the CGI::Ajax->build_html() method, like this for example
+
+  $pjx->build_html( $cgi, \&Show_HTML, {-charset=>'UTF-8'} );
+
+  Any pre-0.64 CGI::Ajax script that passed in extra header
+  information to the CGI object will be updating.
+
+  Modified/corrected docs to explain the above change.
+
+  Fixed up javascript code to make all loop variables local.  Thanks
+  to Mingyi Lui.
+
+.641 2005-10-27 12:54 -0700 Thu, 27 Oct 2005
+  Pod documentations fixups.
+
+  Changed fnsplit to better support multiple selects (thanks Mingyi
+  Lui)
+
+------------------------------------------------------------------------
+.65 2005-10-27 12:55 -0700 Thu, 27 Oct 2005
+
+  pod typo corrections
+
+  changed javascript fnsplit to better support multiple-selects styles
+
+  add pjx_callback.pl to demonstrate the use of a callback function.
+  this required a fix in the Ajax.pm code 
+
+  Fixed up synopsis example POD.
+
+.651 2005-11-02 07:32 -0800 Wed, 02 Nov 2005
+
+  added support for hidden fields.
+
+.652 2005-11-03 13:41 -0800 
+
+  fixed type in javascript for handling hidden fields!
+
+  updated version and Changes to reflect .652 release
+
+.653 | bcthomas | 2005-11-14 18:42:42
+
+  moved some debugging code around so perl can handle the jdebug
+  state.  Thanks beanz!
+
+  Added a script (pjx_nobuild.pl) to demonstrate not using
+  build_html() but to instead handle the various stages of 
+  the async communication manually.
+
+  Fixed up POD
+
+.654 | bcthomas | 2005-11-15 10:38:55
+
+  Added fix for redundant js if test back in.  Thanks again beanz
+
+  Updated MANIFEST to show new no build_html() script and incremented
+  version to 0.654
+
+0.66 | bcthomas | 2005-11-29 10:22
+  
+  POD cleanup/corrections
+
+  Added support for other CGI handlers/decoders (like CGI::Simple,
+  CGI::Lite, CGI::Minimal, although we can't really test them since we
+  are running mod_perl2 only here.
+
+  Fixed typo in pjx_url.pl/convert_degrees.pl that was reversing the
+  sign on the kelvin degree conversion (thanks Wolfgang Baron!)
+
+  Switched home page URL to www.perljax.us
+
+  Updated version to 0.66
+
+0.662 | bcthomas | 2005-12-01 12:15
+  
+  POD cleanup/corrections
+
+  Added a example script to show proper way to use a javascript
+  function to split arguments returned from a perl-exported function.
+  scripts/pjx_splitargs.pl
+
+  Updated version to 0.662
+
+0.67 | bcthomas | 2005-12-01 16:29
+
+  reversed quick fix for javascript handling return values from perl
+  functions added in 0.662.
+
+  now multiple returns to a callback function are handled as
+  arguments[0], arguments[1], etc. uses an eval in the javascript
+  code, the way it was described in the POD, but wasn't coded.
+
+  changed splitargs.pl: added value="" to <input>'s getting the
+  return values from the function call to stop weird javascript
+  warning
+
+  Updated to 0.67
+
+0.68 | bcthomas | 2005-12-09 11:51:25
+
+	changed splitargs.pl
+
+	added value="" to <input>'s getting the return values from the
+	function call to stop weird javascript warning
+
+	Fixed docs in Ajax.pm to reflect the old way of dealing with arguments
+	array in javascript, after brent's fix of this code.  Updated changes,
+	and MANIFEST.
+
+	Added ability to prevent caching (though firefox doesn't seem to cache
+	anyway).  The keyword is 'NO_CACHE'.
+
+	Added to example scripts pjx_NO_CACHE_callee.pl and
+	pjx_NO_CACHE_caller.pl, to demonstrate how no caching works.
+
+	Fixed IE bug where __pjx____pjx__ doesn't return "" as the second split. 
+
+	Took a suggestion by 'qbxk' from the perljax.us forums and changed
+	the javascript code so only the function names remain the same. 
+	Also rearranged code for javascript jsdebug() so it cuts down the
+	amout of code.  Moved getting the script name to Perl code.
+	OVerall, these changes result in less repetition in the javascript
+	functions.  The URL length only includes the script name if it is
+	calling itself.
+
+	POD cleanup and additions.  Added extra level to JSDEBUG to uncompress
+	ALL generated javascript.  Changed around some js varable names to be
+	more understandable.
+
+	Corrected several of the demo scripts to not use the original method
+	of setting the div id to return results to...
+
+	onkeyup=myfunc(['in1'],'out1')
+	
+	should be..
+
+	onkeyup=myfunc(['in1'],['out1'])
+
+	(thanks Jerrod)
+
+	Modified Changes and MANIFEST.  Changed comments in Todo and README.
+	Update version to 0.68
+
+0.681 | bpederse | 2005-12-12 15:22:32
+
+  fixed the $script regular expression to work on windows;
+
+0.682 | bcthomas | 2006-01-09 09:41
+
+	switched from encodeURIComponent to encodeURI
+
+	fixed getVal to have better error checking, plus more inuitive code.
+	also, use can now use name= (but getVal still looks for id= first)
+	to send in the html element name. all code changes in javascript
+	getVal();  This fix should alleviate mistakes where your HTML
+	elements don't have an "id" defined, but do have a "name" defined.
+
+	Rewrote docs in several areas.  Removed gratuitous acks in javascript
+	code.
+
+	Added documentation about returning multiple arguments from perl to a
+	javascript function.
+
+0.683 | bpederse | 2006-01-20 13:27:43
+
+  Add scripts to show the use of JSON objects.
+	Fixed radio and multiple-select (slight error);
+	Cleaned up fnsplit.
+
+	version to 0.683
+
+0.684 | bpederse | 2006-01-28
+
+	added pjx_loading.pl script.
+
+	added function formDump() which returns an array of all form element
+	names/ids in the page and sends them to the function:
+
+	onclick=jsFunc(formDump(),['out'])
+
+	add pjx_formDump.pl to the scripts directory documneting use.
+	also changed getVal so that if you send in a function, it will
+	return the result of the function, not hte function itself.
+
+	also added $() and an alias to getVal() to follow prototype.js
+	but, might be a bad idea since even in the HERE delimiters '>>'
+	you have to escape the '$'..
+
+0.69 (105) | bcthomas | 2006-02-16
+
+	fixed typo in pjx_chained.pl
+	Updated MANIFEST/Changes for release 0.684
+
+  Added support for spans
+
+  Added callback methods in javascript: pjx.prototype.pjxInitialized
+  and pjx.prototype.pjxCompleted These methods are called before
+  and after, respectively, any xmlhttp request.  It was much
+  more responsive this way rather than providing a hook into each
+  readyState, especially since there is not uniform support for
+  the various readyStates in the common browsers.
+
+  Changed the pjx_loading.pl script to use the above callbacks, and
+  documented it.
+
+  Switched from prototype to javascript object notation.  This is
+  cosmetic, and only changes the way the code looks, not the way it
+  functions.
+
+  Added the ability to change the encoding that CGI::Ajax uses on input
+  elements.  The default is encodeURIComponent, but this can be set to
+  encode, etc., like so...
+
+  $pjx->js_encode_function('escape'); 
+
+  ...where 'escape' can be any of ('escape','encodeURI','encodeURIComponent')
+  or a programmer-defined javascript function.
+
+  altered MANIFEST to add two new scripts
+    scripts/pjx_change_encoding.pl
+    scripts/pjx_change_headers.pl
+
+  Rearranged Class::Accessor initialization.
+
+
+  Fixed select problem mentioned on forums, and changed pjx_formDump.pl as a
+  test for that fix.
+
+  updated to 0.69
+
+0.691 (113) | bpederse | 2006-02-19
+
+	fixed decode-ing
+	if encoding is 'encode*' , decoding is decode*
+	if encoding is escape, decoding is unescape
+
+
+
+0.692 (116) | bpederse | 2006-03-08
+
+	Wrapped a rogue debugging comment in an appropriate debugging check.
+
+	changed pjx_nobuild to use 'pjxdebugrequest' instead of old
+	'__pjxrequest'
+
+	version to 0.692
+
+0.693 (118) | bpederse | 2006-03-16
+
+  - javascript is now inserted at beggining of header, not before
+  - the eval in the javascript is gone. replaced by apply.
+  - using that apply "this" in a callback will now refer to the
+     javascript object. so this.url will give the url of the AJAX request.
+
+0.694 (119) | bcthomas | 2006-03-18
+
+	Added pjx_dynselect.pl to scripts in the dist.  This example
+	demonstrates the same thing as the pjx_combo.pl example, but it uses a
+	simple database to get values, instead of the calling script (as in
+	pjx_combo.pl).
+
+	fixed all the additional scripts that were missing '<form>' tags.
+
+	fixed pjx_combo.pl
+
+	for IE compatibility, all options must have a value, for example
+	here are the wrong way and the right way for IE...
+
+	NO:  <option> value </option>
+
+	YES: <option value='something'> displayed text </option>
+
+	fixed checkboxes - added a check script for them. 
+
+	updated some indentation in examples
+
+
+0.697 (134) | bpederse | 2006-07-15
+
+	two new demo scripts
+
+	can now get input from anything with .innerHTML (pjx_from_span.pl as
+	test case).
+
+	Changed the default encode function to 'escape' instead of
+	'encodeURIComponent'.  Hopefully this will alleviate many of the
+	problems users are reporting with browser functionality.
+
+
+	fixed problem with head/body with arguments (also improved regexp
+	speed)
+
+	add the ability to send in arguments via javascript objects instead of
+	using args__123, now can use {'args':123, 'args':'bcd','test':'the
+	value'}
+
+	fixed selects. see notes in previous checkin.
+
+	added $ENV{SCRIPT_FILENAME}

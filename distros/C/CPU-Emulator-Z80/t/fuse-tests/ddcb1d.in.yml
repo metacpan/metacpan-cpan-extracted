@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 58
+    - 29
+  23453:
+    - 243
+name: ddcb1d
+registers:
+  AF: 30373
+  AF_: 0
+  BC: 12878
+  BC_: 0
+  DE: 58945
+  DE_: 0
+  HL: 22777
+  HL_: 0
+  I: 0
+  IX: 23395
+  IY: 57739
+  PC: 0
+  R: 0
+  SP: 0

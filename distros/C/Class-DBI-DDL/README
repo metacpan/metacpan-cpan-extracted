@@ -1,0 +1,57 @@
+Class::DBI::DDL
+===============
+
+This package is an extension to Class::DBI that gives it the ability to create
+or drop the table automatically.
+
+Installation
+------------
+
+This uses the typical Module::Build formula:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Testing
+-------
+
+The tests will be skipped unless you set things up so that they run. (That is,
+I don't want to see a bunch of FAIL reports on CPAN because not everyone has
+PostgreSQL, MySQL, and the SQLite modules installed and a test database setup.)
+
+It will not run the PostgreSQL or MySQL tests without being told to. It will run
+the SQLite tests if it can find the modules to do so. (The reasoning is that if
+I just try to connect to some database that you might actually have setup, I
+could crap all over your setup and I don't want to do that unless you ask for
+it.) So, if you want testing, you need to set at least the following environment
+variables:
+
+CLASS_DBI_DDL_PG=1
+CLASS_DBI_DDL_MYSQL=1
+
+PostgreSQL
+~~~~~~~~~~
+
+In addition, you can set additional variables to specify how to run the test.
+Here are the other variables and the values picked if you don't set any:
+
+CLASS_DBI_DDL_PG_DATABASE=dbi:Pg:dbname=testdb
+CLASS_DBI_DDL_PG_USERNAME=testuser
+CLASS_DBI_DDL_PG_PASSWORD=testpass
+
+MySQL
+~~~~~
+
+In addition, you can set additional variables to specify how to run the test.
+Here are the other variables and the values picked if you don't set any:
+
+CLASS_DBI_DDL_MYSQL_DATABASE=dbi:mysql:testdb
+CLASS_DBI_DDL_MYSQL_USERNAME=testuser
+CLASS_DBI_DDL_MYSQL_PASSWORD=testpass
+
+SQLite
+~~~~~~
+
+The database will always be "dbi:SQLite:testdb".

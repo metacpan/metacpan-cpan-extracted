@@ -1,0 +1,17 @@
+0.5 - Thu Sept 14 11:56:00 EST 2006
+
+	Fixes for changing IDENTITY columns where IDENTITY_INSERT is not set (Thai Nguyen)
+	Allow for CaseSensitive columns (in case your DB is DesignedByJavaDeverlopers)
+	Tables with multiple column primary keys work again
+
+0.4 - Sun May 7 15:06:00 EST 2006
+
+	Added support for TEXT columns, fixed minor warnings when table has no IDENTITY columns
+
+0.31 - Wed Oct 20 09:34:57 PDT 2004
+
+	Minor update to include finish();
+
+0.3  - Wed Oct 20 09:20:29 PDT 2004
+
+	Patch from Michael Wojcikiewicz to add identity column support.

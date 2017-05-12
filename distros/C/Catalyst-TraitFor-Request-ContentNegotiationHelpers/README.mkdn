@@ -1,0 +1,169 @@
+# NAME
+
+Catalyst::TraitFor::Request::ContentNegotiationHelpers - assistance with content negotiation
+
+# SYNOPSIS
+
+For [Catalyst](https://metacpan.org/pod/Catalyst) v5.90090+
+
+    package MyApp;
+
+    use Catalyst;
+
+    MyApp->request_class_traits(['Catalyst::TraitFor::Request::ContentNegotiationHelpers']);
+    MyApp->setup;
+
+For [Catalyst](https://metacpan.org/pod/Catalyst) older than v5.90090
+
+    package MyApp;
+
+    use Catalyst;
+    use CatalystX::RoleApplicator;
+
+    MyApp->apply_request_class_roles('Catalyst::TraitFor::Request::ContentNegotiationHelpers');
+    MyApp->setup;
+
+In a controller:
+
+    package MyApp::Controller::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    sub myaction :Local {
+      my ($self, $c) = @_;
+      my $best_media_type = $c->req->choose_media_type('application/json', 'text/html');
+    }
+
+    sub choose :Local {
+      my ($self, $c) = @_;
+      my $body = $c->req->on_best_media_type(
+        'no_match' => sub { 'none' },
+        'text/html' => sub { 'html' },
+        'application/json' => sub { 'json' });
+
+      $c->res->body($body);
+    }
+
+# DESCRIPTION
+
+When using [Catalyst](https://metacpan.org/pod/Catalyst) and developing web APIs it can be desirable to examine
+the state of HTTP Headers of the request to make decisions about what to do,
+for example what format to return (HTML, XML, JSON, other).  This role can
+be applied to your [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request) to add some useful helper methods for
+the more common types of server side content negotiation.
+
+Most of the real work is done by [HTTP::Headers::ActionPack::ContentNegotiation](https://metacpan.org/pod/HTTP::Headers::ActionPack::ContentNegotiation),
+this role just seeks to make it easier to use those features.
+
+# ATTRIBUTES
+
+This role defines the following attributes.
+
+## content\_negotiator
+
+This is a 'bare' attribute with no direct accessors.  It expose a few methods to
+assist in content negotation.
+
+# METHODS
+
+This role defines the following methods:
+
+## choose\_media\_type (@array\_of\_types)
+
+Given an array of possible media types ('application/json', 'text/html', etc.)
+return the one that is the best match for the current request (by looking at the
+current request ACCEPT header, parsing it and comparing).
+
+## accepts\_media\_type ($type)
+
+Given a string type that is a media type (text/html, application/json) returns true
+if that type is acceptable to the requesting client.
+
+## on\_best\_media\_type (%callbacks)
+
+Given a hash where the keys are media types and the values are coderefs, execute
+and return the value of the coderef whose key is the best match for that media type
+(based on the result of ["choose\_media\_type"](#choose_media_type).  For example:
+
+    my $body = $c->req->on_best_media_type(
+      'no_match' => sub { 'none' },
+      'text/html' => sub { 'html' },
+      'application/json' => sub { 'json' });
+
+    $c->res->body($body);
+
+The coderef will receive the current request object as its single argument.
+
+If there are no matches, execute the coderef associated with a 'no\_match' key
+or return undef if no such key exists.
+
+## choose\_language (@array\_of\_langauges)
+
+Given an array of possible media types ('en-US', 'es', etc.)
+return the one that is the best match for the current request.
+
+## accepts\_language ($type)
+
+Given a string type that is a language string returns true
+if that is acceptable to the requesting client.
+
+## on\_best\_language (%callbacks)
+
+Works like ["on\_best\_media\_type"](#on_best_media_type) but matches language.
+
+## choose\_charset (@array\_of\_character\_sets)
+
+Given an array of possible media types ("UTF-8", "US-ASCII", etc.)
+return the one that is the best match for the current request.
+
+## accepts\_charset ($type)
+
+Given a string type that is a charset string returns true
+if that is acceptable to the requesting client.
+
+## on\_best\_charset (%callbacks)
+
+Works like ["on\_best\_media\_type"](#on_best_media_type) but matches charset.
+
+## choose\_encoding (@array\_of\_encodings)
+
+Given an array of possible encodings ("gzip", "identity", etc.)
+return the one that is the best match for the current request.
+
+## accepts\_encoding ($type)
+
+Given a string type that is an encoding string returns true
+if that is acceptable to the requesting client.
+
+## on\_best\_encoding (%callbacks)
+
+Works like ["on\_best\_media\_type"](#on_best_media_type) but matches encoding.
+
+## raw\_choose\_media\_type
+
+## raw\_choose\_language
+
+## raw\_choose\_charset
+
+## raw\_choose\_encoding
+
+These are methods that map directly to the underlying [HTTP::Headers::ActionPack::ContentNegotiation](https://metacpan.org/pod/HTTP::Headers::ActionPack::ContentNegotiation)
+object.  The are basicallty the same functionality except they require two arguments
+(an additional one to support the HTTP header string).  You generally won't need them unless
+you need to compare am HTTP header that is not one that is part of the current request.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::Request](https://metacpan.org/pod/Catalyst::Request), [HTTP::Headers::ActionPack::ContentNegotiation](https://metacpan.org/pod/HTTP::Headers::ActionPack::ContentNegotiation)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

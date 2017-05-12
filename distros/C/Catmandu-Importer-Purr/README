@@ -1,0 +1,27 @@
+NAME
+    Catmandu::Importer::Purr - Perl Utility for Recent Releases
+
+SYNOPSIS
+     use Catmandu::Importer::Purr;
+
+     my $importer = Catmandu::Importer::Purr->new(prefix => 'Catmandu');
+ 
+     $importer->each(sub {
+            my $module = shift;
+            print $module->{id} , "\n";
+            print $module->{date} , "\n";
+            print $module->{distribution} , "\n";
+            print $module->{version} , "\n";
+            print $module->{abstract} , "\n";
+     });
+ 
+     # or
+
+     $ catmandu convert Purr
+
+AUTHORS
+     Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>
+
+SEE ALSO
+    Catmandu, Catmandu::Importer
+

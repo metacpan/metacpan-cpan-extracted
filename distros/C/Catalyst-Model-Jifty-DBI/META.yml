@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Catalyst-Model-Jifty-DBI
+version:            0.06
+abstract:           Jifty::DBI Model Class with some magic on top
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Catalyst::Runtime:    0
+    Class::Accessor::Fast:  0
+    Data::Dump:           0
+    DBD::SQLite:          1.25
+    File::Basename:       0
+    File::Spec:           0
+    Jifty::DBI:           0.47
+    Module::Find:         0
+    MRO::Compat:          0
+    Test::UseAllModules:  0.09
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

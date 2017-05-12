@@ -1,0 +1,10 @@
+Revision history for Catalyst-Plugin-Session-Store-CHI
+
+0.02    2014-02-12
+
+        - Fixed missing File.pm in distribution.
+
+0.01    2014-02-12
+
+        - First version, released on an unsuspecting world.
+

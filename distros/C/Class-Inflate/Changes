@@ -1,0 +1,33 @@
+Revision history for Perl extension Class::Inflate.
+
+0.07  Mon Feb 11 16:30:55 2008
+	- join fetched records that formerly were forgotten
+	  (depending on which order the queries were run)
+	- changed Build.PL to not die when DBI is not installed
+	  (thank you David Golden and Andreas J. Koenig)
+
+0.06  Fri Feb  8 13:20:10 2008
+	- wrote logic for joining through a central table
+	  (when tables know how to join to the central table, but the
+	  central table is unaware of how to join to them)
+
+0.05  Fri Nov 10 15:35:44 2006
+	- run postinflate hooks after inflation of whole object
+	- pass $dbh to postinflate
+
+0.04  Thu Jul 27 16:40:23 2006
+	- search for multiple join paths when a single join may not be sufficient
+	  (not all fields in primary key are participating in join)
+
+0.03  Mon Jan 30 16:31:49 2006
+	- set up default deflation
+
+0.02  Fri Nov  4 11:22:04 2005
+	- searches harder for a way to join tables
+	- added a way to specify default values to filter by
+	- added a postinflate hook
+
+0.01  Fri May 13 08:36:56 2005
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.6.0 -n Class::Inflate
+

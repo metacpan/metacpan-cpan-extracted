@@ -1,0 +1,28 @@
+<head>
+  <title><tmpl_var form-title></title>
+  <tmpl_var form-jshead>
+</head>
+<body>
+
+  <div id="form">
+  <tmpl_var form-start>
+    <tmpl_loop fields>
+      <div class="label">
+       <tmpl_var NAME=label>
+      </div>
+      <div class="field">
+       <tmpl_var NAME=field>
+      </div>
+    </tmpl_loop>
+
+    <div id="submit"><tmpl_var form-submit></div>
+    <div id="reset"><tmpl_var form-reset></div>
+    <div id="state">
+      <tmpl_var form-statetags>
+      <tmpl_var form-keepextras>
+    </div>
+
+  <tmpl_var form-end>
+  </div>
+</body>
+</html>

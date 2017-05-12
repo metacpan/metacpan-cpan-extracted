@@ -1,0 +1,18 @@
+NAME
+    CPAN::Test::Dummy::MultiPkgVer - CPAN Test Dummy that has multiple
+    packages in one file with different versions
+
+DESCRIPTION
+    CPAN::Test::Dummy::MultiPkgVer is a test dummy distribution to test
+    MetaCPAN query with multiple versions in one .pm file.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2013- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

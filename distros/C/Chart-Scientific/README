@@ -1,0 +1,44 @@
+Chart-Scientific version 0.16
+==============================
+
+Chart::Scientific is a simple PDL-based plotter.  2-D plots can be easily
+made from data in an array or PDL, or from a file containing columns of data.
+The columns can be delimited with any character(s) or regular expression.
+
+There are many plotting options:
+
+Graph axes can be logged (non-finite data, i.e. negative data that is logged,
+will be ignored, with a warning), error bars can be plotted, the axes can be
+displayed, residuals can be plotted, font, line thickness, character size, plot
+point style, and colors can all be adjusted, line or point plotting, or both,
+can be supressed.  Labels can be written on either axis, and the x and y ranges
+can be specified.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+    PDL
+    PDL::NiceSlice;
+    PDL::Graphics::PGPLOT;
+    Tie::IxHash;
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Kester Allen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

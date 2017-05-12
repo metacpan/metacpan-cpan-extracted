@@ -1,0 +1,82 @@
+{
+   "abstract" : "Catmandu tools to communicate with DBI based interfaces",
+   "author" : [
+      "Nicolas Franck"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catmandu-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "1.0",
+            "DBI" : "1.630",
+            "Moo" : "1.000003",
+            "namespace::clean" : "0.24",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-DBI/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-DBI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-DBI.git",
+         "web" : "https://github.com/LibreCat/Catmandu-DBI"
+      }
+   },
+   "version" : "0.0511",
+   "x_contributors" : [
+      "Jakob Voss <jakob@nichtich.de>",
+      "Nicolas Franck <nicolas.franck@ugent.be>",
+      "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "njfranck <njfranck@ca20c521.ugent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "vpeil <vitali.peil@uni-bielefeld.de>"
+   ]
+}
+

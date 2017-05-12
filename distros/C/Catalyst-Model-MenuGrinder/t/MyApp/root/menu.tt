@@ -1,0 +1,33 @@
+<html>
+<head>
+<title>Page Title</title>
+<style type="text/css">
+  li a {
+    text-decoration: none;
+    color: #f00;
+  }
+
+  li.active > a {
+    color: #0f0;
+  }
+</style>
+</head>
+<body>
+<p>
+This next thing is the menu, even though there's no CSS to make it look menu-y!
+</p>
+[% BLOCK menuitem %]
+  <ul [%- IF menu.class %]class="[% menu.class %]"[% END %]>
+  [% FOREACH item = menu.item %]
+  <li [% IF item.active %]class="active"[% END %]>
+    <a href="[% item.target %]">[% item.label %]</a>
+    [% IF item.item %]
+    [% PROCESS menuitem
+      menu = item
+    %]
+    [% END %]
+  </li>
+  [% END %]
+  </ul>
+[% END %]
+[% PROCESS menuitem %]

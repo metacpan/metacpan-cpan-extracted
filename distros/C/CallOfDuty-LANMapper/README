@@ -1,0 +1,43 @@
+CallOfDuty-LANMapper
+
+This module lets you detect call of duty servers on your lan and retrieve server information once they have been detected. Currently only Call of Duty 4 is supported.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CallOfDuty::LANMapper
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CallOfDuty-LANMapper
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CallOfDuty-LANMapper
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CallOfDuty-LANMapper
+
+    Search CPAN
+        http://search.cpan.org/dist/CallOfDuty-LANMapper
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Peter Sinnott
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

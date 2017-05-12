@@ -1,0 +1,36 @@
+---
+abstract: 'Filtering various things out of CPAN::Meta::Prereqs'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  CPAN::Meta::Prereqs: '0'
+  Test::More: '0.89'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Meta-Prereqs-Filter
+provides:
+  CPAN::Meta::Prereqs::Filter:
+    file: lib/CPAN/Meta/Prereqs/Filter.pm
+    version: '0.004'
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  Module::CoreList: '5.021002'
+  Module::Metadata: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-Prereqs-Filter
+  repository: git://github.com/Leont/cpan-meta-prereqs-filter.git
+version: '0.004'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'

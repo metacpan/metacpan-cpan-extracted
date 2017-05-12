@@ -1,0 +1,323 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>synctree - Normalize a tree of flat files with a tree of ClearCase elements</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#file_mapping">FILE MAPPING</a></li>
+	<li><a href="#comparisons">COMPARISONS</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#debugging">DEBUGGING</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>synctree - Normalize a tree of flat files with a tree of ClearCase elements</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  synctree -sbase /tmp/newcode -dbase /vobs_tps/xxx</pre>
+<p>Take all files located under /tmp/newcode, remove the leading
+&quot;/tmp/newcode&quot; from each of their pathnames, and place the remaining
+relative paths under &quot;/vobs_tps/xxx&quot; as versioned elements, leaving
+them checked out.</p>
+<pre>
+  synctree -cr -yes -ci -sbase /vobs/hpux/bin -dbase /vobs_rel/hpux/bin</pre>
+<p>Sync all files under &quot;/vobs_rel/hpux/bin&quot; with those in
+&quot;/vobs/hpux/bin&quot;, making sure to preserve their CR's. Suppress
+interactive prompting and check in all work when done.</p>
+<pre>
+  synctree -sb /A/B -db /X/Y -map /A/B/foo /X/Y/bar /A/B/here /X/Y/there</pre>
+<p>Take 'foo' from directory /A/B and check it in as 'bar' in /X/Y.
+Similarly, create an element /X/Y/there with the contents of /A/B/here.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Synctree brings a VOB area into alignment with a specified set of files
+from a source area. It's analogous in various ways to <em>clearfsimport</em>,
+<em>citree</em>, and <em>clearexport/clearimport</em>; see the COMPARISONS section
+below.  Synctree is useful if you have a ClearCase tree that must be
+kept in sync with a CVS tree during a transition period, or for
+overlaying releases of third-party products upon previous ones, or
+exporting deliverable DO's from a nightly build to a release VOB while
+preserving config records (CR's) and labels, or similar.</p>
+<p>The default operation is to mkelem all files which exist in
+<em>&lt;src&gt;</em> but not in <em>&lt;dest&gt;</em>, modify any files which
+exist in both but differ, but <strong>not</strong> to remove files which are present
+in <em>&lt;dest&gt;</em> and not in <em>&lt;src&gt;</em>.  Adding the
+<em>-rmname</em> flag will cause this removal to happen as well and thus make
+the <em>&lt;src&gt;</em> and <em>&lt;dest&gt;</em> areas identical.</p>
+<p>Synctree need not run in a view context itself but the directory named
+by the <em>-dbase</em> flag must provide a view context. The branching
+behavior of any checkouts performed will be governed by that view's
+config spec.  The <em>-dbase</em> directory need not exist, as long as it
+lies under a mounted VOB tag and in a view context. In other words,
+synctree can auto-create the destination directory tree.</p>
+<p>The list of source files to operate on may be provided with the
+<em>-flist</em> option or it may come from <code>@ARGV</code>. Any directories
+encountered on the command line will be traversed recursively. If no
+source-file-list is provided, the directory specified with <em>-sbase</em> is
+used as the default.</p>
+<p>File paths may be given as relative or absolute. Destination paths are
+determined as follows: all source filenames are first turned into
+absolute paths if necessary, then the source preface given with the
+<em>-sbase</em> parameter is removed and replaced with the value of <em>-dbase</em>
+to produce the destination pathname (but see FILE MAPPING below).</p>
+<p>ClearCase symbolic links are supported, even on Windows.  Note that,
+unless you use the <em>-rellinks</em> flag, the text of the link is
+transported <strong>verbatim</strong> from source area to dest area; thus relative
+symlinks may no longer resolve in the destination area.</p>
+<p>Consider using the <em>-n</em> flag the first time you use this on a valued
+VOB, even though nothing irreversible (<em>rmelem</em>, <em>rmbranch</em>,
+<em>rmver</em>, <em>rmtype</em>, etc.) is <strong>ever</strong> done by synctree.  And by the
+same token use <em>-yes</em> and <em>-ci</em> with care.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<p>Not all options are described here, only those requiring elaboration
+beyond the <code>-help</code> summary. Run <code>synctree -help</code> for a full option
+summary.</p>
+<ul>
+<li><strong><a name="force_stop" class="item"><em>-force, -stop</em></a></strong>
+
+<p>By default, upon encountering a ClearCase error synctree will attempt
+to return to the initial state by undoing all checkouts etc. The
+<em>-stop</em> flag will cause it to exit immediately leaving the partial
+state intact while <em>-force</em> will cause it to blunder onward, ignoring
+errors. However, even with <em>-force</em> a nonzero status is returned if
+errors are encountered.</p>
+</li>
+<li><strong><a name="ignore_co_overwrite_co" class="item"><em>-ignore_co, -overwrite_co</em></a></strong>
+
+<p>By default, synctree refuses to run if any view-private files exist
+under the destination base. This includes checkouts, which are a
+special form of view private file. The <em>-ignore_co</em> flag allows
+synctree to continue in this situation. As the flag name implies it
+will <strong>ignore</strong> these checkouts; i.e. differences in the source base
+will <em>not</em> overwrite the checked-out file in the destination.  The
+<em>-overwrite_co</em> flag also allows synctree to proceed in the presence
+of existing checkouts but causes them to be overwritten by the source
+version.</p>
+</li>
+<li><strong><a name="no_yes_ci" class="item"><em>-no, -yes, -ci</em></a></strong>
+
+<p>The <em>-no</em> flag causes synctree to report what it would do and exit
+without making any changes, <em>-yes</em> suppresses all prompts except for
+the <code>check in changes?</code> prompt, and <em>-ci</em> suppresses that one. The
+default behavior is to prompt before making changes. To suppress all
+prompting you must use both <em>-yes</em> and <em>-ci</em>.</p>
+</li>
+<li><strong><a name="label_lbmods" class="item"><em>-label, -lbmods</em></a></strong>
+
+<p>The <em>-label</em> option let you specify a label to be applied before
+finishing. By default it will label recursively from the <em>-dbase</em> area
+down, as well as all parent directories upward to the vob root.  But if
+the <em>-lbmods</em> flag is used as well, only modified elements will be
+labeled.</p>
+</li>
+<li><strong><a name="reuse" class="item"><em>-reuse</em></a></strong>
+
+<p>If element X is created in synctree run #1, rmname'd in run #2, and 
+created again in run #3, you may end up with multiple elements with
+the same name. This situation is known as an <em>evil twin</em>. The
+<em>-reuse</em> flag can avoid this; before making a new element it
+searches the directory's version tree looking for a prior element
+of the same name. If found, it will link the old element back into
+the current version of the directory, then (if the contents differ)
+check it out and replace the contents with those of the source
+file.</p>
+<p>This flag can avoid evil twins and save storage space but will run a
+little slower due to the extra analysis. Also, there's no guarantee the
+prior element of the same name is in fact logically related to the new
+one. They could conceivably even be of different element types.</p>
+<p><em>The <strong>-reuse</strong> feature is not well tested and should still be considered
+<strong>experimental</strong>.</em></p>
+</li>
+<li><strong><a name="vreuse" class="item"><em>-vreuse</em></a></strong>
+
+<p>If two alternative releases of the same tree are imported in alternation,
+new versions are created at every step, as the result of even imports is
+systematically hidden by odd ones.</p>
+<p>This flag will check for suitable versions of the elements in their
+version tree, and apply there the label provided with the <em>-label</em>
+option. This will considerably slow down the processing, but will avoid
+data duplication.</p>
+<p>Consider forcing the ipc mode of <em>ClearCase::Argv</em>, with <em>-/ipc=1</em>, and
+using the BranchOff feature, both of which are relevant to this kind of
+situation.</p>
+</li>
+<li><strong><a name="narrow" class="item"><em>-Narrow</em></a></strong>
+
+<p>The <em>-Narrow</em> flag allows a regular expression to limit the files
+from the source list which are compared with the destination base.
+I.e. if you want to transport all the <code>*.java</code> files from a
+dir tree without the class files you can use</p>
+<pre>
+    synctree -N '\.java\$' ...</pre>
+<p>Note that the argument is a Perl regular expression, not a file glob.
+Any legal Perl RE may be used. Also, multiple <em>-Narrow</em> flags may be
+used; thus, to collect <code>*.class</code> and <code>*.properties</code> files you may use
+either of:</p>
+<pre>
+    synctree -N '\.class\$' -N '\.properties\$' ...
+    synctree -N '\.(class|properties)\$' ...</pre>
+<p>Also, the <em>-Narrow</em> flag is considered only for file lists derived
+internally by synctree. If you provide your own file list using
+<em>-flist</em>, filtering it is your own responsibility.</p>
+<p>This RE is automatically made case-insensitive on Windows.</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="file_mapping">FILE MAPPING</a></h1>
+<p>Synctree has lots of support for remapping filenames. The options can
+be pretty confusing and thus deserve special treatment here.</p>
+<p>Filename mapping is enabled with the <strong>-map</strong> flag.  Without <em>-map</em>, a
+list of files provided on the command line is interpreted as a set of
+<em>from</em> files; their <em>to</em> paths are derived via <em>s/^sbase/dbase/</em> and
+thus the file basenames cannot change.  In the presence of <em>-map</em> the
+arguments are instead interpreted as a hash alternating <strong>from</strong> and
+<strong>to</strong> names.  Thus</p>
+<pre>
+  synctree -sb /etc -db /vobs_st/etc /etc/passwd /etc/group</pre>
+<p>would make two files under /vobs_st/etc called passwd and group, whereas</p>
+<pre>
+  synctree -sb /etc -db /vobs_st/etc -map /etc/passwd /vobs_st/etc/foo</pre>
+<p>would create one file (/vobs_st/etc/foo) which is a copy of /etc/passwd.
+Alternatively the mapping may be specified with a literal <strong>=&gt;</strong>:</p>
+<pre>
+  synctree -sb /etc -db /vobs_st/etc -map '/etc/passwd =&gt; /vobs_st/etc/foo' ...</pre>
+<p>but note that this must be quoted against shell expansion. The
+<em>=&gt;</em> style is also allowed in files specified via <strong>-flist</strong>,
+thus:</p>
+<pre>
+  synctree -sb /etc -db /vobs_st/etc -flist - &lt;&lt; EOF
+  /etc/passwd =&gt; /vobs_st/etc/foo
+  /etc/group  =&gt; /vobs_st/etc/bar
+  EOF</pre>
+<p>
+</p>
+<hr />
+<h1><a name="comparisons">COMPARISONS</a></h1>
+<p>Synctree is comparable to <em>citree</em> and <em>clearfsimport</em>. It is
+similar to citree but has more options and runs on both Windows
+(including Cygwin) and UNIX. It has the following advantages over
+clearfsimport:</p>
+<ul>
+<li>
+<p>Synctree works with all ClearCase versions whereas clearfsimport is
+first supported in CC 4.2.</p>
+</li>
+<li>
+<p>Synctree is capable of preserving CR's during <code>MVFS-&gt;MVFS</code> transfers
+whereas clearfsimport always treats the source area as flat files.</p>
+</li>
+<li>
+<p>Synctree has support for mapping filenames in transit and a <em>-Narrow</em>
+option for limiting the set of files to transfer.</p>
+</li>
+<li>
+<p>Synctree is built on a documented API (<strong>ClearCase::SyncTree</strong>) which is
+available for custom tool development in Perl, whereas clearfsimport is
+a command-line interface only.</p>
+</li>
+<li>
+<p>Synctree has support for <em>element reuse</em>. I.e. if an element is
+added in one pass and removed (rmnamed) in a subsequent pass, and if a
+third pass would make another element of the same name, synctree can
+optionally (<em>-reuse</em>) make a link to the existing file instead of
+creating a new element which might be considered an &quot;evil twin&quot;.</p>
+</li>
+<li>
+<p>Synctree has support for <em>version reuse</em>. In conjunction with
+labeling the results, importing a new version may be skipped by
+labeling instead an existing suitable one, even if not currently
+selected.</p>
+</li>
+</ul>
+<p>However, unless you need one of the above features the supported,
+integrated solution (<strong>clearfsimport</strong>) is generally preferable. And of
+course some of these features <em>may</em> eventually be supported by
+clearfsimport; check current documentation.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<ul>
+<li>
+<p>Subtraction of symlinks is currently unimplemented. This could be made
+to work, it's just a corner case I haven't gotten to.</p>
+</li>
+<li>
+<p>SyncTree does not transport empty directories, and added/removed
+directories aren't shown explicitly in the list of operations to be
+performed. This is a structural artifact. It could presumably be
+fixed by adding an extra phase which looks for empty dirs.</p>
+</li>
+<li>
+<p>I have not tested SyncTree in snapshot views and would not expect it to
+work there without modifications.</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="debugging">DEBUGGING</a></h1>
+<p>The special flag <em>-/dbg=1</em> will cause all underlying cleartool
+commands to be printed as they are run (this is actually a feature of
+the Argv module on which <em>synctree</em> is built). Please run in this mode
+and include all output when reporting problems.</p>
+<p>Note also the <em>-/ipc=1</em> flag, which uses a common background
+cleartool process, for improved performance.
+In this mode, cleartool commands are prefixed with <code>=&amp;gt;</code> instead of
+the default <code>+</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>David Boyce &lt;dsbperl AT boyski.com&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2000-2010 David Boyce. All rights reserved.  This Perl
+program is free software; you may redistribute and/or modify it under
+the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><code>perl(1)</code>, &quot;perldoc ClearCase::SyncTree&quot;</p>
+
+</body>
+
+</html>

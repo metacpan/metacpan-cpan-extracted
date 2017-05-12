@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  19927:
+    - 202
+name: fdcbfe
+registers:
+  AF: 46287
+  AF_: 0
+  BC: 22073
+  BC_: 0
+  DE: 26491
+  DE_: 0
+  HL: 3234
+  HL_: 0
+  I: 0
+  IX: 56773
+  IY: 20047
+  PC: 4
+  R: 2
+  SP: 0

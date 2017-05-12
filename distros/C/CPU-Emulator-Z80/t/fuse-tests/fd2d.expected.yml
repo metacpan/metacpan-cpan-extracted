@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd2d
+registers:
+  AF: 12811
+  AF_: 0
+  BC: 63370
+  BC_: 0
+  DE: 47366
+  DE_: 0
+  HL: 12752
+  HL_: 0
+  I: 0
+  IX: 50986
+  IY: 59675
+  PC: 2
+  R: 2
+  SP: 0

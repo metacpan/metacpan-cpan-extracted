@@ -1,0 +1,5 @@
+---
+elements:
+    - type: Text
+      name: today
+      value: __dynamic(today)__

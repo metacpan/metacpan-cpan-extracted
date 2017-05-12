@@ -1,0 +1,39 @@
+NAME
+    Catalyst::TraitFor::Controller::RenderView - Alternative to
+    Catalyst::Action::RenderView using method modifiers.
+
+SYNOPSIS
+        package MyApp::Controller::Root;
+        use Moose;
+        use namespace::autoclean;
+
+        BEGIN { extends 'Catalyst::Controller' }
+        with 'Catalyst::TraitFor::Controller::RenderView;
+
+DESCRIPTION
+    This is an experimental alternative to Catalyst::Action::RenderView.
+
+METHODS
+  end
+    Provided if not present, wrapped to run the same checks as
+    Catalyst::Action::RenderView after end action.
+
+BUGS
+    The code is a horrible hack, as it delegates all the work to
+    Catalyst::Action::RenderView.
+
+    How end method attributes will compose onto other classes which already
+    have an end method is unknown (they shouldn't..)
+
+    How renaming the supplied 'end' method will work is untested at the
+    moment.
+
+AUTHOR
+    Tomas Doran (t0m) "bobtfish@bobtfish.net".
+
+COPYRIGHT & LICENSE
+    Copyright 2009 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

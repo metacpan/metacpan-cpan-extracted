@@ -1,0 +1,5 @@
+@inherit    ../inc/03.nconf
++foo {
+    foo1    baz1
+    foo2    baz2
+}

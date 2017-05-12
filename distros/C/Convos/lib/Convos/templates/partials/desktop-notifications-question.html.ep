@@ -1,0 +1,5 @@
+<div class="notification question">
+  Do you want desktop notifications when someone sends you a message?
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/tab-notifier" class="button yes" target="_blank">Yes</a>
+  <a href="#!no" class="button confirm no">No</a>
+</div>

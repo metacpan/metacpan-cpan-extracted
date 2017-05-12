@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb74
+registers:
+  AF: 26649
+  AF_: 0
+  BC: 14530
+  BC_: 0
+  DE: 3748
+  DE_: 0
+  HL: 2085
+  HL_: 0
+  I: 0
+  IX: 53845
+  IY: 24138
+  PC: 4
+  R: 2
+  SP: 0

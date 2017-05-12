@@ -1,0 +1,1730 @@
+2010/02/01 00:01:46 Updating CPAN entries
+2010/02/01 00:26:39 ... index update [BLUEFEET,0.05,1264976581,GIS-Distance-Fast,1]
+2010/02/01 00:31:22 ... index insert [GPHAT,0.01,1264979234,Template-Plugin-Time-Duration,1]
+2010/02/01 00:33:16 ... index update [JINGRAM,0.06,1264976681,Data-Maker,1]
+2010/02/01 00:33:17 ... index update [JINGRAM,0.07,1264977576,Data-Maker,1]
+2010/02/01 00:33:17 ... index update [JINGRAM,0.08,1264978909,Data-Maker,1]
+2010/02/01 00:34:15 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 00:34:40 ... index update [ADAMK,1.40,1264977335,ORLite,1]
+2010/02/01 00:34:42 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 00:34:53 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 00:36:10 ... index update [MARNANEL,0.60,1264976768,Lingua-EN-Alphabet-Shaw,1]
+2010/02/01 00:36:41 ... index update [MIYAGAWA,0.1008,1264976305,Tatsumaki,1]
+2010/02/01 00:37:27 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 00:38:17 Updating BACKPAN entries
+2010/02/01 00:38:18 Updating NNTP entries
+2010/02/01 00:38:20 .. from 39797 to 39805
+2010/02/01 00:38:20 ... [39798] subject=CPAN Upload: M/MI/MIYAGAWA/Tatsumaki-0.1008.tar.gz
+2010/02/01 00:38:20 ... index update [MIYAGAWA,0.1008,1264976280,Tatsumaki,1]
+2010/02/01 00:38:21 ... [39799] subject=CPAN Upload: B/BL/BLUEFEET/GIS-Distance-Fast-0.05.tar.gz
+2010/02/01 00:38:21 ... index update [BLUEFEET,0.05,1264976580,GIS-Distance-Fast,1]
+2010/02/01 00:38:21 ... [39800] subject=CPAN Upload: J/JI/JINGRAM/Data-Maker-0.06.tar.gz
+2010/02/01 00:38:21 ... index update [JINGRAM,0.06,1264976640,Data-Maker,1]
+2010/02/01 00:38:22 ... [39801] subject=CPAN Upload: M/MA/MARNANEL/Lingua-EN-Alphabet-Shaw-0.60.tar.gz
+2010/02/01 00:38:22 ... index update [MARNANEL,0.60,1264976760,Lingua-EN-Alphabet-Shaw,1]
+2010/02/01 00:38:22 ... [39802] subject=CPAN Upload: A/AD/ADAMK/ORLite-1.40.tar.gz
+2010/02/01 00:38:22 ... index update [ADAMK,1.40,1264977300,ORLite,1]
+2010/02/01 00:38:22 ... [39803] subject=CPAN Upload: J/JI/JINGRAM/Data-Maker-0.07.tar.gz
+2010/02/01 00:38:22 ... index update [JINGRAM,0.07,1264977540,Data-Maker,1]
+2010/02/01 00:38:23 ... [39804] subject=CPAN Upload: J/JI/JINGRAM/Data-Maker-0.08.tar.gz
+2010/02/01 00:38:23 ... index update [JINGRAM,0.08,1264978860,Data-Maker,1]
+2010/02/01 00:38:23 ... [39805] subject=CPAN Upload: G/GP/GPHAT/Template-Plugin-Time-Duration-0.01.tar.gz
+2010/02/01 01:01:31 Updating CPAN entries
+2010/02/01 01:33:34 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 01:35:05 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 01:35:09 START
+2010/02/01 01:35:12 Reindexing distros FAST
+2010/02/01 01:35:46 .. dist = Object-Quick
+2010/02/01 01:35:48 .. dist = Object-Quick
+2010/02/01 01:35:48 .. dist = Catalyst-View-Email
+2010/02/01 01:35:49 .. dist = Getopt-Flex
+2010/02/01 01:35:49 .. dist = Object-Quick
+2010/02/01 01:35:49 .. dist = Marpa
+2010/02/01 01:35:49 .. dist = Search-Query
+2010/02/01 01:35:50 .. dist = POE-Component-IRC-Plugin-Hailo
+2010/02/01 01:35:50 .. dist = GIS-Distance
+2010/02/01 01:35:50 .. dist = Plack
+2010/02/01 01:35:51 .. dist = DateTime-Event-Predict
+2010/02/01 01:35:51 .. dist = GIS-Distance
+2010/02/01 01:35:51 .. dist = GIS-Distance-Fast
+2010/02/01 01:35:51 .. dist = Plack-Middleware-Session
+2010/02/01 01:35:51 .. dist = Data-Maker
+2010/02/01 01:35:51 .. dist = Data-Maker
+2010/02/01 01:35:51 .. dist = POE-Component-Client-HTTP
+2010/02/01 01:35:51 .. dist = Mouse
+2010/02/01 01:35:51 .. dist = Net-Whois-SIDN
+2010/02/01 01:35:51 .. dist = Object-Simple
+2010/02/01 01:35:51 .. dist = Validator-Custom
+2010/02/01 01:35:51 .. dist = Catalyst-Helper-AuthDBIC
+2010/02/01 01:35:51 .. dist = UUID-Tiny
+2010/02/01 01:35:51 .. dist = Perl6-Pod
+2010/02/01 01:35:51 .. dist = SDL
+2010/02/01 01:35:52 .. dist = Search-Tools
+2010/02/01 01:35:52 .. dist = Acme
+2010/02/01 01:35:52 .. dist = Term-Terminfo
+2010/02/01 01:35:52 .. dist = Catalyst-Plugin-ErrorCatcher
+2010/02/01 01:35:52 .. dist = CSS-Selector-Parser
+2010/02/01 01:35:52 .. dist = Data-Maker
+2010/02/01 01:35:52 .. dist = Snapback2
+2010/02/01 01:35:52 .. dist = Number-Nary
+2010/02/01 01:35:52 .. dist = Pod-Weaver
+2010/02/01 01:35:52 .. dist = Dist-Zilla-PluginBundle-RJBS
+2010/02/01 01:35:52 .. dist = Number-Nary
+2010/02/01 01:35:52 .. dist = Number-Nary
+2010/02/01 01:35:52 .. dist = Net-Whois-Parser
+2010/02/01 01:35:52 .. dist = HTML-Tested
+2010/02/01 01:35:52 .. dist = Net-Google-PicasaWeb
+2010/02/01 01:35:53 .. dist = Tatsumaki
+2010/02/01 01:35:53 .. dist = GIS-Distance-Fast
+2010/02/01 01:35:53 .. dist = Data-Maker
+2010/02/01 01:35:53 .. dist = Lingua-EN-Alphabet-Shaw
+2010/02/01 01:35:53 .. dist = ORLite
+2010/02/01 01:35:53 .. dist = Data-Maker
+2010/02/01 01:35:53 .. dist = Data-Maker
+2010/02/01 01:35:53 Reindexing distros FAST done
+2010/02/01 01:35:53 STOP
+2010/02/01 01:36:01 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 01:40:00 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 01:40:04 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 01:40:44 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 01:41:01 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 01:43:33 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 01:50:00 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 02:06:01 Updating BACKPAN entries
+2010/02/01 02:06:02 Updating NNTP entries
+2010/02/01 02:06:04 .. from 39805 to 39809
+2010/02/01 02:06:04 ... [39806] subject=CPAN Upload: S/SM/SMAN/App-Cinema-1.16.tar.gz
+2010/02/01 02:06:04 ... index update [SMAN,1.16,1264983840,App-Cinema,1]
+2010/02/01 02:06:05 ... [39807] subject=CPAN Upload: G/GU/GUGOD/Markapl-0.08.tar.gz
+2010/02/01 02:06:06 ... index update [GUGOD,0.08,1264984200,Markapl,1]
+2010/02/01 02:06:06 ... [39808] subject=CPAN Upload: G/GE/GENE/Chess-Rep-Coverage-0.05_01.tar.gz
+2010/02/01 02:06:07 ... index update [GENE,0.05_01,1264985100,Chess-Rep-Coverage,1]
+2010/02/01 02:06:08 ... [39809] subject=CPAN Upload: G/GW/GWILLIAMS/RDF-Trine-0.116.tar.gz
+2010/02/01 02:06:08 ... index update [GWILLIAMS,0.116,1264985400,RDF-Trine,1]
+2010/02/01 03:02:29 Updating CPAN entries
+2010/02/01 03:50:13 ... index update [DYLAN,0.06,1264986272,Term-ANSIColor-Print,1]
+2010/02/01 03:50:40 ... index update [DOUGDUDE,0.002,1264986974,Test-Override-UserAgent,1]
+2010/02/01 03:54:06 ... index update [BILLH,0.15,1264987769,Authen-Users,1]
+2010/02/01 03:58:42 ... index update [SMAN,1.16,1264983876,App-Cinema,1]
+2010/02/01 04:02:45 ... index update [GENE,0.05_01,1264985138,Chess-Rep-Coverage,1]
+2010/02/01 04:03:16 ... index update [GUGOD,0.08,1264984236,Markapl,1]
+2010/02/01 04:03:20 ... index update [GWILLIAMS,0.116,1264985403,RDF-Trine,1]
+2010/02/01 04:08:52 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 04:22:37 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 04:24:23 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 04:30:48 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 04:31:49 Updating BACKPAN entries
+2010/02/01 04:31:58 Updating NNTP entries
+2010/02/01 04:32:04 .. from 39809 to 39815
+2010/02/01 04:32:05 ... [39810] subject=CPAN Upload: D/DY/DYLAN/Term-ANSIColor-Print-0.06.tar.gz
+2010/02/01 04:32:06 ... index update [DYLAN,0.06,1264986240,Term-ANSIColor-Print,1]
+2010/02/01 04:32:06 ... [39811] subject=CPAN Upload: D/DO/DOUGDUDE/Test-Override-UserAgent-0.002.tar.gz
+2010/02/01 04:32:06 ... index update [DOUGDUDE,0.002,1264986960,Test-Override-UserAgent,1]
+2010/02/01 04:32:07 ... [39812] subject=CPAN Upload: B/BI/BILLH/Authen-Users-0.15.tar.gz
+2010/02/01 04:32:07 ... index update [BILLH,0.15,1264987740,Authen-Users,1]
+2010/02/01 04:32:08 ... [39813] subject=CPAN Upload: P/PR/PRAVEEN/Text-CSV-Basic-1.00.tar.gz
+2010/02/01 04:32:10 ... index insert [PRAVEEN,1.00,1264991340,Text-CSV-Basic,1]
+2010/02/01 04:32:10 ... [39814] subject=CPAN Upload: P/PR/PRAVEEN/Text-CSV-Basic-1.01.tar.gz
+2010/02/01 04:32:10 ... index update [PRAVEEN,1.01,1264992360,Text-CSV-Basic,1]
+2010/02/01 04:32:10 ... [39815] subject=CPAN Upload: P/PR/PRAVEEN/Text-CSV-Basic-1.02.tar.gz
+2010/02/01 04:32:10 ... index update [PRAVEEN,1.02,1264993260,Text-CSV-Basic,1]
+2010/02/01 05:01:36 Updating CPAN entries
+2010/02/01 05:34:53 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 05:37:52 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 05:39:18 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 05:44:06 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 05:44:09 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 05:44:42 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 05:44:54 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 05:48:53 ... index update [PRAVEEN,1.02,1264993261,Text-CSV-Basic,1]
+2010/02/01 05:48:54 ... index update [PRAVEEN,1.00,1264991358,Text-CSV-Basic,1]
+2010/02/01 05:48:54 ... index update [PRAVEEN,1.01,1264992383,Text-CSV-Basic,1]
+2010/02/01 05:49:13 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 05:54:39 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 06:05:40 Updating BACKPAN entries
+2010/02/01 06:05:43 Updating NNTP entries
+2010/02/01 06:05:46 .. from 39815 to 39817
+2010/02/01 06:05:46 ... [39816] subject=CPAN Upload: P/PR/PRAVEEN/Text-CSV-Basic-1.03.tar.gz
+2010/02/01 06:05:47 ... index update [PRAVEEN,1.03,1264997520,Text-CSV-Basic,1]
+2010/02/01 06:05:48 ... [39817] subject=CPAN Upload: J/JO/JOHND/ASP4-1.007.tar.gz
+2010/02/01 06:05:48 ... index update [JOHND,1.007,1264999080,ASP4,1]
+2010/02/01 07:01:25 Updating CPAN entries
+2010/02/01 07:50:59 ... index update [PRAVEEN,1.03,1264997553,Text-CSV-Basic,1]
+2010/02/01 07:55:53 ... index update [JOHND,1.007,1264999100,ASP4,1]
+2010/02/01 07:57:48 ... index update [TROTSKEY,0.20,1265001837,Acme-Mahjong-Rule-CC,1]
+2010/02/01 07:58:04 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 07:59:07 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 07:59:35 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 08:04:19 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 08:05:57 Updating BACKPAN entries
+2010/02/01 08:06:04 Updating NNTP entries
+2010/02/01 08:06:06 .. from 39817 to 39819
+2010/02/01 08:06:06 ... [39818] subject=CPAN Upload: T/TR/TROTSKEY/Acme-Mahjong-Rule-CC-0.20.tar.gz
+2010/02/01 08:06:06 ... index update [TROTSKEY,0.20,1265001780,Acme-Mahjong-Rule-CC,1]
+2010/02/01 08:06:07 ... [39819] subject=CPAN Upload: C/CA/CASIANO/Parse-Eyapp-1.155.tar.gz
+2010/02/01 08:06:07 ... index update [CASIANO,1.155,1265007600,Parse-Eyapp,1]
+2010/02/01 09:01:18 Updating CPAN entries
+2010/02/01 09:16:58 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 09:18:53 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 09:20:20 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 09:23:33 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 09:23:39 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 09:24:00 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 09:24:11 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 09:27:04 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 09:29:15 ... index update [CASIANO,1.155,1265007623,Parse-Eyapp,1]
+2010/02/01 09:31:58 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 09:36:13 ... index update [KARMAN,0.37,1265008071,SWISH-Prog,1]
+2010/02/01 09:36:14 ... index insert [KARMAN,0.01,1265007972,Search-OpenSearch-Engine-KSx,1]
+2010/02/01 09:36:14 ... index insert [KARMAN,0.01,1265008163,Search-OpenSearch-Engine-SWISH,1]
+2010/02/01 09:36:14 ... index update [KARMAN,0.06,1265007984,SWISH-Prog-KSx,1]
+2010/02/01 09:36:14 ... index insert [KARMAN,0.01,1265007881,Search-OpenSearch,1]
+2010/02/01 09:41:30 Updating BACKPAN entries
+2010/02/01 09:41:32 Updating NNTP entries
+2010/02/01 09:41:33 .. from 39819 to 39825
+2010/02/01 09:41:34 ... [39820] subject=CPAN Upload: K/KA/KARMAN/Search-OpenSearch-0.01.tar.gz
+2010/02/01 09:41:34 ... [39821] subject=CPAN Upload: K/KA/KARMAN/Search-OpenSearch-Engine-KSx-0.01.tar.gz
+2010/02/01 09:41:35 ... [39822] subject=CPAN Upload: K/KA/KARMAN/SWISH-Prog-KSx-0.06.tar.gz
+2010/02/01 09:41:36 ... index update [KARMAN,0.06,1265007960,SWISH-Prog-KSx,1]
+2010/02/01 09:41:36 ... [39823] subject=CPAN Upload: K/KA/KARMAN/SWISH-Prog-0.37.tar.gz
+2010/02/01 09:41:36 ... index update [KARMAN,0.37,1265008020,SWISH-Prog,1]
+2010/02/01 09:41:36 ... [39824] subject=CPAN Upload: K/KA/KARMAN/Search-OpenSearch-Engine-SWISH-0.01.tar.gz
+2010/02/01 09:41:37 ... [39825] subject=CPAN Upload: P/PL/PLU/Gearman-Driver-0.01018.tar.gz
+2010/02/01 09:41:37 ... index update [PLU,0.01018,1265012640,Gearman-Driver,1]
+2010/02/01 10:01:27 Updating CPAN entries
+2010/02/01 10:44:29 ... index update [PLU,0.01018,1265012656,Gearman-Driver,1]
+2010/02/01 10:44:34 ... index update [CORNELIUS,2010.03216,1265015522,Vimana,1]
+2010/02/01 10:44:34 ... index update [CORNELIUS,2010.03217,1265015502,VIM-Packager,1]
+2010/02/01 10:44:34 ... index update [CORNELIUS,2010.03218,1265015958,VIM-Packager,1]
+2010/02/01 10:47:01 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 10:47:13 ... index update [AWNCORP,1.69,1265015853,DBIx-Simple-Batch,1]
+2010/02/01 10:47:39 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 10:47:51 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 10:49:05 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 10:49:11 Updating BACKPAN entries
+2010/02/01 10:49:11 Updating NNTP entries
+2010/02/01 10:49:13 .. from 39825 to 39830
+2010/02/01 10:49:13 ... [39826] subject=CPAN Upload: C/CO/CORNELIUS/VIM-Packager-2010.03217.tar.gz
+2010/02/01 10:49:13 ... index update [CORNELIUS,2010.03217,1265015460,VIM-Packager,1]
+2010/02/01 10:49:13 ... [39827] subject=CPAN Upload: C/CO/CORNELIUS/Vimana-2010.03216.tar.gz
+2010/02/01 10:49:13 ... index update [CORNELIUS,2010.03216,1265015520,Vimana,1]
+2010/02/01 10:49:14 ... [39828] subject=CPAN Upload: A/AW/AWNCORP/DBIx-Simple-Batch-1.69.tar.gz
+2010/02/01 10:49:14 ... index update [AWNCORP,1.69,1265015820,DBIx-Simple-Batch,1]
+2010/02/01 10:49:14 ... [39829] subject=CPAN Upload: C/CO/CORNELIUS/VIM-Packager-2010.03218.tar.gz
+2010/02/01 10:49:14 ... index update [CORNELIUS,2010.03218,1265015940,VIM-Packager,1]
+2010/02/01 10:49:15 ... [39830] subject=CPAN Upload: D/DA/DAMS/Curses-Toolkit-0.100320.tar.gz
+2010/02/01 10:49:15 ... index update [DAMS,0.100320,1265016060,Curses-Toolkit,1]
+2010/02/01 11:01:24 Updating CPAN entries
+2010/02/01 11:40:51 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 11:42:58 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 11:43:08 ... index update [DAMS,0.100320,1265016070,Curses-Toolkit,1]
+2010/02/01 11:44:16 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 11:48:22 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 11:48:25 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 11:48:54 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 11:49:09 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 11:52:35 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 11:57:58 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 12:05:53 ... index update [RKITOVER,0.05000,1265017244,DBIx-Class-Schema-Loader,1]
+2010/02/01 12:08:00 Updating BACKPAN entries
+2010/02/01 12:08:02 Updating NNTP entries
+2010/02/01 12:08:04 .. from 39830 to 39835
+2010/02/01 12:08:04 ... [39831] subject=CPAN Upload: R/RK/RKITOVER/DBIx-Class-Schema-Loader-0.05000.tar.gz
+2010/02/01 12:08:04 ... index update [RKITOVER,0.05000,1265017200,DBIx-Class-Schema-Loader,1]
+2010/02/01 12:08:05 ... [39832] subject=CPAN Upload: L/LB/LBROCARD/Net-Cassandra-0.35.tar.gz
+2010/02/01 12:08:05 ... index update [LBROCARD,0.35,1265019480,Net-Cassandra,1]
+2010/02/01 12:08:05 ... [39833] subject=CPAN Upload: Z/ZI/ZIBRI/Net-SMS-Cellsynt-0.2.tar.gz
+2010/02/01 12:08:06 ... index insert [ZIBRI,0.2,1265019660,Net-SMS-Cellsynt,1]
+2010/02/01 12:08:06 ... [39834] subject=CPAN Upload: P/PL/PLAVEN/Padre-0.56.tar.gz
+2010/02/01 12:08:06 ... index update [PLAVEN,0.56,1265019720,Padre,1]
+2010/02/01 12:08:06 ... [39835] subject=CPAN Upload: M/MA/MARKOV/Net-FTP-Robust-0.08.tar.gz
+2010/02/01 12:08:07 ... index update [MARKOV,0.08,1265020860,Net-FTP-Robust,1]
+2010/02/01 13:01:23 Updating CPAN entries
+2010/02/01 13:42:24 ... index update [LBROCARD,0.35,1265019498,Net-Cassandra,1]
+2010/02/01 13:46:45 ... index insert [VLYON,0.01,1265024827,DBIx-DBO,1]
+2010/02/01 13:51:11 ... index update [ZIBRI,0.2,1265019669,Net-SMS-Cellsynt,1]
+2010/02/01 13:51:55 ... index update [PLAVEN,0.56,1265019765,Padre,1]
+2010/02/01 13:54:53 ... index update [CLIFFORDJ,0.03,1265026232,Date-Holidays-EnglandWales,1]
+2010/02/01 13:55:15 ... index update [CORNELIUS,2010.03218,1265023101,Vimana,1]
+2010/02/01 13:59:54 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 14:00:56 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 14:01:23 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 14:03:32 ... index update [MARKOV,0.08,1265020907,Net-FTP-Robust,1]
+2010/02/01 14:06:40 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 14:08:32 Updating BACKPAN entries
+2010/02/01 14:08:33 Updating NNTP entries
+2010/02/01 14:08:35 .. from 39835 to 39840
+2010/02/01 14:08:35 ... [39836] subject=CPAN Upload: C/CO/CORNELIUS/Vimana-2010.03218.tar.gz
+2010/02/01 14:08:35 ... index update [CORNELIUS,2010.03218,1265023080,Vimana,1]
+2010/02/01 14:08:35 ... [39837] subject=CPAN Upload: V/VL/VLYON/DBIx-DBO-0.01.tar.gz
+2010/02/01 14:08:36 ... [39838] subject=CPAN Upload: C/CL/CLIFFORDJ/Date-Holidays-EnglandWales-0.03.tar.gz
+2010/02/01 14:08:36 ... index update [CLIFFORDJ,0.03,1265026200,Date-Holidays-EnglandWales,1]
+2010/02/01 14:08:36 ... [39839] subject=CPAN Upload: D/DR/DRBEAN/Grades-0.08.tar.gz
+2010/02/01 14:08:36 ... index update [DRBEAN,0.08,1265026440,Grades,1]
+2010/02/01 14:08:37 ... [39840] subject=CPAN Upload: C/CL/CLIFFORDJ/Date-Holidays-EnglandWales-0.04.tar.gz
+2010/02/01 14:08:37 ... index update [CLIFFORDJ,0.04,1265027100,Date-Holidays-EnglandWales,1]
+2010/02/01 15:01:28 Updating CPAN entries
+2010/02/01 15:41:51 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 15:42:17 ... index update [DRBEAN,0.08,1265026494,Grades,1]
+2010/02/01 15:44:04 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 15:46:15 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 15:52:05 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 15:52:08 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 15:52:51 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 15:53:10 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 15:55:55 ... index insert [PIXIE,0.01,1265031054,PixieLdap,1]
+2010/02/01 15:56:11 ... index update [PLU,0.01019,1265030648,Gearman-Driver,1]
+2010/02/01 15:57:02 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 15:57:05 ... index update [GAVINC,0.35,1265029493,HTML-Tabulate,1]
+2010/02/01 15:59:18 ... index update [CLIFFORDJ,0.04,1265027125,Date-Holidays-EnglandWales,1]
+2010/02/01 15:59:20 ... index update [CDENT,1.2,1265034030,Purple,1]
+2010/02/01 16:02:45 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 16:04:13 ... index update [TDEITRICH,0.12,1265034227,Device-Jtag-USB-FTCJTAG,1]
+2010/02/01 16:15:34 Updating BACKPAN entries
+2010/02/01 16:15:38 Updating NNTP entries
+2010/02/01 16:15:40 .. from 39840 to 39848
+2010/02/01 16:15:40 ... [39841] subject=CPAN Upload: G/GA/GAVINC/HTML-Tabulate-0.35.tar.gz
+2010/02/01 16:15:40 ... index update [GAVINC,0.35,1265029440,HTML-Tabulate,1]
+2010/02/01 16:15:41 ... [39842] subject=CPAN Upload: P/PL/PLU/Gearman-Driver-0.01019.tar.gz
+2010/02/01 16:15:41 ... index update [PLU,0.01019,1265030640,Gearman-Driver,1]
+2010/02/01 16:15:41 ... [39843] subject=CPAN Upload: P/PI/PIXIE/PixieLdap-0.01.tar.gz
+2010/02/01 16:15:41 ... [39844] subject=CPAN Upload: C/CD/CDENT/Purple/Purple-1.2.tar.gz
+2010/02/01 16:15:41 ... index update [CDENT,1.2,1265034000,Purple,1]
+2010/02/01 16:15:42 ... [39845] subject=CPAN Upload: T/TD/TDEITRICH/Device-Jtag-USB-FTCJTAG-0.12.tar.gz
+2010/02/01 16:15:42 ... index update [TDEITRICH,0.12,1265034180,Device-Jtag-USB-FTCJTAG,1]
+2010/02/01 16:15:42 ... [39846] subject=CPAN Upload: T/TD/TDEITRICH/Device-Jtag-USB-FTCJTAG-0.12b.tar.gz
+2010/02/01 16:15:42 ... index update [TDEITRICH,0.12b,1265034540,Device-Jtag-USB-FTCJTAG,1]
+2010/02/01 16:15:43 ... [39847] subject=CPAN Upload: J/JG/JGOULAH/Net-Akamai-0.13.tar.gz
+2010/02/01 16:15:43 ... index update [JGOULAH,0.13,1265035440,Net-Akamai,1]
+2010/02/01 16:15:43 ... [39848] subject=CPAN Upload: C/CL/CLIFFORDJ/Date-Holidays-EnglandWales-0.05.tar.gz
+2010/02/01 16:15:43 ... index update [CLIFFORDJ,0.05,1265035800,Date-Holidays-EnglandWales,1]
+2010/02/01 17:01:46 Updating CPAN entries
+2010/02/01 17:44:30 ... index update [SCAIN,0.12,1265037531,DBIx-DBStag,1]
+2010/02/01 17:44:31 ... index update [SCAIN,0.11,1265037052,DBIx-DBStag,1]
+2010/02/01 17:47:35 ... index insert [PRAVEEN,1.00,1265039171,Text-CSV-Field,1]
+2010/02/01 17:50:25 ... index update [CLIFFORDJ,0.05,1265035801,Date-Holidays-EnglandWales,1]
+2010/02/01 17:53:29 ... index update [JGOULAH,0.13,1265035436,Net-Akamai,1]
+2010/02/01 17:55:13 ... index update [TDEITRICH,0.12b,1265034562,Device-Jtag-USB-FTCJTAG,1]
+2010/02/01 17:55:41 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 17:56:45 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 17:57:14 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 18:02:06 ... index update [RKITOVER,0.39,1265037143,Catalyst-Model-DBIC-Schema,1]
+2010/02/01 18:02:15 ... index insert [RPKELLY,0.61,1265037854,File-Find-Declare,1]
+2010/02/01 18:02:16 ... index update [RPKELLY,1.02,1265038737,Getopt-Flex,1]
+2010/02/01 18:03:00 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 18:04:42 Updating BACKPAN entries
+2010/02/01 18:04:44 Updating NNTP entries
+2010/02/01 18:04:46 .. from 39848 to 39860
+2010/02/01 18:04:47 ... [39849] subject=CPAN Upload: S/SC/SCAIN/DBIx-DBStag-0.11.tar.gz
+2010/02/01 18:04:47 ... index update [SCAIN,0.11,1265037000,DBIx-DBStag,1]
+2010/02/01 18:04:47 ... [39850] subject=CPAN Upload: R/RK/RKITOVER/Catalyst-Model-DBIC-Schema-0.39.tar.gz
+2010/02/01 18:04:48 ... index update [RKITOVER,0.39,1265037120,Catalyst-Model-DBIC-Schema,1]
+2010/02/01 18:04:48 ... [39851] subject=CPAN Upload: P/PY/PYTHIAN/DBD-Oracle-1.24.tar
+2010/02/01 18:04:48 ... [39852] subject=CPAN Upload: S/SC/SCAIN/DBIx-DBStag-0.12.tar.gz
+2010/02/01 18:04:48 ... index update [SCAIN,0.12,1265037480,DBIx-DBStag,1]
+2010/02/01 18:04:49 ... [39853] subject=CPAN Upload: R/RP/RPKELLY/File-Find-Declare-0.61.tar.gz
+2010/02/01 18:04:49 ... [39854] subject=CPAN Upload: R/RP/RPKELLY/Getopt-Flex-1.02.tar.gz
+2010/02/01 18:04:50 ... index update [RPKELLY,1.02,1265038740,Getopt-Flex,1]
+2010/02/01 18:04:50 ... [39855] subject=CPAN Upload: P/PR/PRAVEEN/Text-CSV-Field-1.00.tar.gz
+2010/02/01 18:04:51 ... [39856] subject=CPAN Upload: V/VL/VLYON/DBIx-DBO-0.01_01.tar.gz
+2010/02/01 18:04:51 ... index update [VLYON,0.01_01,1265040480,DBIx-DBO,1]
+2010/02/01 18:04:51 ... [39857] subject=CPAN Upload: L/LI/LIMAONE/String-LCSS_XS-1.0_10.tar.gz
+2010/02/01 18:04:51 ... index update [LIMAONE,1.0_10,1265040900,String-LCSS_XS,1]
+2010/02/01 18:04:52 ... [39858] subject=CPAN Upload: M/MA/MAVERICK/Apache-Voodoo-3.0000.tar.gz
+2010/02/01 18:04:52 ... index update [MAVERICK,3.0000,1265042040,Apache-Voodoo,1]
+2010/02/01 18:04:53 ... [39859] subject=CPAN Upload: S/SR/SREZIC/Algorithm-GooglePolylineEncoding-0.02.tar.gz
+2010/02/01 18:04:53 ... index update [SREZIC,0.02,1265042220,Algorithm-GooglePolylineEncoding,1]
+2010/02/01 18:04:54 ... [39860] subject=CPAN Upload: M/MA/MARCEL/Class-Scaffold-0.15.tar.gz
+2010/02/01 18:04:54 ... index update [MARCEL,0.15,1265042880,Class-Scaffold,1]
+2010/02/01 19:01:11 Updating CPAN entries
+2010/02/01 19:01:21 ... index update [LIMAONE,1.0_10,1265040900,String-LCSS_XS,1]
+2010/02/01 19:01:21 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 19:01:24 ... index update [DCANTRELL,1.2102,1265044407,Data-Compare,1]
+2010/02/01 19:01:24 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 19:01:26 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 19:01:28 ... index update [VLYON,0.01_01,1265040488,DBIx-DBO,1]
+2010/02/01 19:01:31 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 19:01:31 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 19:01:32 ... index update [SREZIC,0.02,1265042261,Algorithm-GooglePolylineEncoding,1]
+2010/02/01 19:01:32 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 19:01:32 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 19:01:39 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 19:01:47 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 19:01:58 ... index update [MAVERICK,3.0000,1265042057,Apache-Voodoo,1]
+2010/02/01 19:01:59 ... index update [MARCEL,0.15,1265042908,Class-Scaffold,1]
+2010/02/01 19:02:06 Updating BACKPAN entries
+2010/02/01 19:02:06 Updating NNTP entries
+2010/02/01 19:02:07 .. from 39860 to 39861
+2010/02/01 19:02:08 ... [39861] subject=CPAN Upload: D/DC/DCANTRELL/Data-Compare-1.2102.tar.gz
+2010/02/01 19:02:08 ... index update [DCANTRELL,1.2102,1265044380,Data-Compare,1]
+2010/02/01 20:01:34 Updating CPAN entries
+2010/02/01 20:35:58 ... index update [EVO,1.00,1265048989,Benchmark-Forking,1]
+2010/02/01 20:40:14 ... index update [GSHANK,0.30,1265050778,HTML-FormHandler,1]
+2010/02/01 20:40:15 ... index update [GSHANK,0.08,1265050798,HTML-FormHandler-Model-DBIC,1]
+2010/02/01 20:43:28 ... index insert [TOBYINK,0.01,1265049858,HTTP-LRDD,1]
+2010/02/01 20:44:28 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 20:45:12 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 20:45:34 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 20:47:52 ... index update [MSTROUT,0.29,1265050125,Catalyst-Plugin-Static-Simple,1]
+2010/02/01 20:48:01 ... index insert [MICHAEL,0.01,1265050214,Bot-NotSoBasicBot,1]
+2010/02/01 20:49:24 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 20:50:40 Updating BACKPAN entries
+2010/02/01 20:50:41 Updating NNTP entries
+2010/02/01 20:50:42 .. from 39861 to 39869
+2010/02/01 20:50:43 ... [39862] subject=CPAN Upload: E/EV/EVO/Benchmark-Forking-1.00.tar.gz
+2010/02/01 20:50:43 ... index update [EVO,1.00,1265048940,Benchmark-Forking,1]
+2010/02/01 20:50:43 ... [39863] subject=CPAN Upload: T/TO/TOBYINK/HTTP-LRDD-0.01.tar.gz
+2010/02/01 20:50:44 ... [39864] subject=CPAN Upload: M/MS/MSTROUT/Catalyst-Plugin-Static-Simple-0.29.tar.gz
+2010/02/01 20:50:44 ... index update [MSTROUT,0.29,1265050080,Catalyst-Plugin-Static-Simple,1]
+2010/02/01 20:50:45 ... [39865] subject=CPAN Upload: M/MI/MICHAEL/Bot-NotSoBasicBot-0.01.tar.gz
+2010/02/01 20:50:45 ... [39866] subject=CPAN Upload: G/GS/GSHANK/HTML-FormHandler-0.30.tar.gz
+2010/02/01 20:50:45 ... index update [GSHANK,0.30,1265050740,HTML-FormHandler,1]
+2010/02/01 20:50:46 ... [39867] subject=CPAN Upload: G/GS/GSHANK/HTML-FormHandler-Model-DBIC-0.08.tar.gz
+2010/02/01 20:50:46 ... index update [GSHANK,0.08,1265050800,HTML-FormHandler-Model-DBIC,1]
+2010/02/01 20:50:46 ... [39868] subject=CPAN Upload: V/VI/VINSWORLD/Cisco-Management-0.01.tar.gz
+2010/02/01 20:50:46 ... index insert [VINSWORLD,0.01,1265052060,Cisco-Management,1]
+2010/02/01 20:50:47 ... [39869] subject=CPAN Upload: V/VI/VINSWORLD/Cisco-Management-0.01-w.tar.gz
+2010/02/01 20:50:47 ... index update [VINSWORLD,0.01-w,1265052300,Cisco-Management,1]
+2010/02/01 21:01:14 Updating CPAN entries
+2010/02/01 21:28:52 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 21:30:14 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 21:31:09 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 21:32:27 ... index update [VINSWORLD,0.01-w,1265052317,Cisco-Management,1]
+2010/02/01 21:33:42 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 21:33:43 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 21:34:05 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 21:34:13 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 21:36:29 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 21:39:26 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 21:42:30 ... index update [MARCEL,0.11,1265054007,Data-Conveyor,1]
+2010/02/01 21:44:05 Updating BACKPAN entries
+2010/02/01 21:44:08 Updating NNTP entries
+2010/02/01 21:44:10 .. from 39869 to 39871
+2010/02/01 21:44:10 ... [39870] subject=CPAN Upload: M/MA/MARCEL/Data-Conveyor-0.11.tar.gz
+2010/02/01 21:44:10 ... index update [MARCEL,0.11,1265053980,Data-Conveyor,1]
+2010/02/01 21:44:10 ... [39871] subject=CPAN Upload: K/KO/KONOBI/JavaScript-Runtime-OpcodeCounting-1.02.tar.gz
+2010/02/01 21:44:10 ... index update [KONOBI,1.02,1265056440,JavaScript-Runtime-OpcodeCounting,1]
+2010/02/01 22:01:12 Updating CPAN entries
+2010/02/01 22:12:23 ... index update [SANKO,0.06970_011,1265058043,Alien-FLTK2,1]
+2010/02/01 22:12:33 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/01 22:12:33 ... index update [AFF,0.13_02,1265057245,Parse-Dia-SQL,1]
+2010/02/01 22:12:36 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/01 22:12:38 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/01 22:12:38 ... index update [KONOBI,1.02,1265056437,JavaScript-Runtime-OpcodeCounting,1]
+2010/02/01 22:12:43 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/01 22:12:46 Updating BACKPAN entries
+2010/02/01 22:12:46 Updating NNTP entries
+2010/02/01 22:12:48 .. from 39871 to 39873
+2010/02/01 22:12:48 ... [39872] subject=CPAN Upload: A/AF/AFF/Parse-Dia-SQL-0.13_02.tar.gz
+2010/02/01 22:12:48 ... index update [AFF,0.13_02,1265057220,Parse-Dia-SQL,1]
+2010/02/01 22:12:48 ... [39873] subject=CPAN Upload: S/SA/SANKO/Alien-FLTK2-0.06970_011.tar.gz
+2010/02/01 22:12:48 ... index update [SANKO,0.06970_011,1265058000,Alien-FLTK2,1]
+2010/02/01 23:01:15 Updating CPAN entries
+2010/02/01 23:16:44 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/01 23:17:16 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/01 23:17:20 ... index update [DANDV,1.01,1265060516,SMS-Send-Wadja,1]
+2010/02/01 23:17:34 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/01 23:18:19 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/01 23:18:19 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/01 23:18:20 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/01 23:18:20 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/01 23:18:26 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/01 23:18:33 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/01 23:18:35 ... index update [ABIGAIL,2010020101,1265062151,Acme-Time-Baby,1]
+2010/02/01 23:18:40 ... index update [MARCEL,0.07,1265060799,Class-Accessor-Installer,1]
+2010/02/01 23:18:41 ... index update [MSERGEANT,1.17,1265060427,Time-Piece,1]
+2010/02/01 23:18:45 Updating BACKPAN entries
+2010/02/01 23:18:45 Updating NNTP entries
+2010/02/01 23:18:47 .. from 39873 to 39876
+2010/02/01 23:18:47 ... [39874] subject=CPAN Upload: M/MS/MSERGEANT/Time-Piece-1.17.tar.gz
+2010/02/01 23:18:47 ... index update [MSERGEANT,1.17,1265060400,Time-Piece,1]
+2010/02/01 23:18:47 ... [39875] subject=CPAN Upload: D/DA/DANDV/SMS-Send-Wadja-1.01.tar.gz
+2010/02/01 23:18:47 ... index update [DANDV,1.01,1265060460,SMS-Send-Wadja,1]
+2010/02/01 23:18:48 ... [39876] subject=CPAN Upload: M/MA/MARCEL/Class-Accessor-Installer-0.07.tar.gz
+2010/02/01 23:18:48 ... index update [MARCEL,0.07,1265060760,Class-Accessor-Installer,1]
+2010/02/02 00:01:15 Updating CPAN entries
+2010/02/02 00:15:18 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 00:15:20 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 00:15:21 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 00:15:26 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 00:15:27 ... index update [FXN,0.11,1265063490,Net-FluidDB,1]
+2010/02/02 00:15:28 Updating BACKPAN entries
+2010/02/02 00:15:28 Updating NNTP entries
+2010/02/02 00:15:29 .. from 39876 to 39878
+2010/02/02 00:15:29 ... [39877] subject=CPAN Upload: A/AB/ABIGAIL/Acme-Time-Baby-2010020101.tar.gz
+2010/02/02 00:15:29 ... index update [ABIGAIL,2010020101,1265062140,Acme-Time-Baby,1]
+2010/02/02 00:15:30 ... [39878] subject=CPAN Upload: F/FX/FXN/Net-FluidDB-0.11.tar.gz
+2010/02/02 00:15:30 ... index update [FXN,0.11,1265063460,Net-FluidDB,1]
+2010/02/02 01:01:21 Updating CPAN entries
+2010/02/02 01:16:20 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 01:16:25 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 01:16:26 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 01:16:30 ... index update [EVO,1.01,1265068633,Benchmark-Forking,1]
+2010/02/02 01:16:30 ... index update [EVO,2010.002,1265067230,String-Escape,1]
+2010/02/02 01:16:30 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 01:16:30 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 01:16:30 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 01:16:30 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 01:16:34 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 01:16:40 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 01:16:52 Updating BACKPAN entries
+2010/02/02 01:16:52 Updating NNTP entries
+2010/02/02 01:16:54 .. from 39878 to 39880
+2010/02/02 01:16:54 ... [39879] subject=CPAN Upload: E/EV/EVO/String-Escape-2010.002.tar.gz
+2010/02/02 01:16:54 ... index update [EVO,2010.002,1265067180,String-Escape,1]
+2010/02/02 01:16:54 ... [39880] subject=CPAN Upload: E/EV/EVO/Benchmark-Forking-1.01.tar.gz
+2010/02/02 01:16:54 ... index update [EVO,1.01,1265068620,Benchmark-Forking,1]
+2010/02/02 01:30:55 Backup via DBD drivers
+2010/02/02 01:35:01 START
+2010/02/02 01:35:02 Reindexing distros FAST
+2010/02/02 01:35:10 .. dist = App-Cinema
+2010/02/02 01:35:11 .. dist = Markapl
+2010/02/02 01:35:12 .. dist = Chess-Rep-Coverage
+2010/02/02 01:35:13 .. dist = RDF-Trine
+2010/02/02 01:35:13 .. dist = Term-ANSIColor-Print
+2010/02/02 01:35:13 .. dist = Test-Override-UserAgent
+2010/02/02 01:35:13 .. dist = Authen-Users
+2010/02/02 01:35:13 .. dist = Text-CSV-Basic
+2010/02/02 01:35:13 .. dist = Text-CSV-Basic
+2010/02/02 01:35:13 .. dist = Text-CSV-Basic
+2010/02/02 01:35:13 .. dist = ASP4
+2010/02/02 01:35:13 .. dist = Acme-Mahjong-Rule-CC
+2010/02/02 01:35:13 .. dist = Parse-Eyapp
+2010/02/02 01:35:13 .. dist = SWISH-Prog-KSx
+2010/02/02 01:35:13 .. dist = SWISH-Prog
+2010/02/02 01:35:13 .. dist = Gearman-Driver
+2010/02/02 01:35:13 .. dist = VIM-Packager
+2010/02/02 01:35:13 .. dist = Vimana
+2010/02/02 01:35:13 .. dist = DBIx-Simple-Batch
+2010/02/02 01:35:14 .. dist = VIM-Packager
+2010/02/02 01:35:14 .. dist = Curses-Toolkit
+2010/02/02 01:35:14 .. dist = DBIx-Class-Schema-Loader
+2010/02/02 01:35:14 .. dist = Net-Cassandra
+2010/02/02 01:35:14 .. dist = Padre
+2010/02/02 01:35:14 .. dist = Net-FTP-Robust
+2010/02/02 01:35:14 .. dist = Vimana
+2010/02/02 01:35:14 .. dist = Date-Holidays-EnglandWales
+2010/02/02 01:35:14 .. dist = Grades
+2010/02/02 01:35:14 .. dist = Date-Holidays-EnglandWales
+2010/02/02 01:35:14 .. dist = HTML-Tabulate
+2010/02/02 01:35:14 .. dist = Gearman-Driver
+2010/02/02 01:35:14 .. dist = Purple
+2010/02/02 01:35:14 .. dist = Device-Jtag-USB-FTCJTAG
+2010/02/02 01:35:14 .. dist = Device-Jtag-USB-FTCJTAG
+2010/02/02 01:35:14 .. dist = Net-Akamai
+2010/02/02 01:35:14 .. dist = Date-Holidays-EnglandWales
+2010/02/02 01:35:14 .. dist = DBIx-DBStag
+2010/02/02 01:35:14 .. dist = Catalyst-Model-DBIC-Schema
+2010/02/02 01:35:14 .. dist = DBIx-DBStag
+2010/02/02 01:35:14 .. dist = Getopt-Flex
+2010/02/02 01:35:14 .. dist = DBIx-DBO
+2010/02/02 01:35:14 .. dist = String-LCSS_XS
+2010/02/02 01:35:14 .. dist = Apache-Voodoo
+2010/02/02 01:35:14 .. dist = Algorithm-GooglePolylineEncoding
+2010/02/02 01:35:14 .. dist = Class-Scaffold
+2010/02/02 01:35:14 .. dist = Data-Compare
+2010/02/02 01:35:14 .. dist = Benchmark-Forking
+2010/02/02 01:35:14 .. dist = Catalyst-Plugin-Static-Simple
+2010/02/02 01:35:14 .. dist = HTML-FormHandler
+2010/02/02 01:35:14 .. dist = HTML-FormHandler-Model-DBIC
+2010/02/02 01:35:14 .. dist = Cisco-Management
+2010/02/02 01:35:14 .. dist = Data-Conveyor
+2010/02/02 01:35:14 .. dist = JavaScript-Runtime-OpcodeCounting
+2010/02/02 01:35:14 .. dist = Parse-Dia-SQL
+2010/02/02 01:35:14 .. dist = Alien-FLTK2
+2010/02/02 01:35:14 .. dist = Time-Piece
+2010/02/02 01:35:14 .. dist = SMS-Send-Wadja
+2010/02/02 01:35:14 .. dist = Class-Accessor-Installer
+2010/02/02 01:35:14 .. dist = Acme-Time-Baby
+2010/02/02 01:35:14 .. dist = Net-FluidDB
+2010/02/02 01:35:14 .. dist = String-Escape
+2010/02/02 01:35:14 .. dist = Benchmark-Forking
+2010/02/02 01:35:14 Reindexing distros FAST done
+2010/02/02 01:35:14 STOP
+2010/02/02 02:01:12 Updating CPAN entries
+2010/02/02 02:14:57 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 02:14:59 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 02:15:00 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 02:15:07 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 02:15:10 Updating BACKPAN entries
+2010/02/02 02:15:10 Updating NNTP entries
+2010/02/02 03:01:14 Updating CPAN entries
+2010/02/02 03:16:08 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 03:16:10 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 03:16:12 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 03:16:15 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 03:16:15 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 03:16:16 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 03:16:16 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 03:16:20 ... index insert [PEVANS,0.01,1265074671,Socket-Netlink,1]
+2010/02/02 03:16:20 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 03:16:25 ... index update [JKIM,0.14,1265074182,Net-Amazon-EC2,1]
+2010/02/02 03:16:26 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 03:16:41 Updating BACKPAN entries
+2010/02/02 03:16:41 Updating NNTP entries
+2010/02/02 03:16:42 .. from 39880 to 39882
+2010/02/02 03:16:42 ... [39881] subject=CPAN Upload: J/JK/JKIM/Net-Amazon-EC2-0.14.tar.gz
+2010/02/02 03:16:42 ... index update [JKIM,0.14,1265074140,Net-Amazon-EC2,1]
+2010/02/02 03:16:43 ... [39882] subject=CPAN Upload: P/PE/PEVANS/Socket-Netlink-0.01.tar.gz
+2010/02/02 04:01:10 Updating CPAN entries
+2010/02/02 04:11:16 ... index update [JPEACOCK,0.81,1265078495,version,1]
+2010/02/02 04:11:18 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 04:11:19 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 04:11:20 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 04:11:21 ... index update [KARMAN,0.06,1265078137,SWISH-API-More,1]
+2010/02/02 04:11:25 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 04:11:27 Updating BACKPAN entries
+2010/02/02 04:11:27 Updating NNTP entries
+2010/02/02 04:11:28 .. from 39882 to 39884
+2010/02/02 04:11:29 ... [39883] subject=CPAN Upload: K/KA/KARMAN/SWISH-API-More-0.06.tar.gz
+2010/02/02 04:11:29 ... index update [KARMAN,0.06,1265078100,SWISH-API-More,1]
+2010/02/02 04:11:29 ... [39884] subject=CPAN Upload: J/JP/JPEACOCK/version-0.81.tar.gz
+2010/02/02 04:11:29 ... index update [JPEACOCK,0.81,1265078460,version,1]
+2010/02/02 05:01:13 Updating CPAN entries
+2010/02/02 05:14:32 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 05:14:35 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 05:14:35 ... index update [DAGOLDEN,1.1709,1265082897,CPAN-Reporter,1]
+2010/02/02 05:14:36 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 05:14:42 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 05:14:42 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 05:14:42 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 05:14:43 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 05:14:47 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 05:14:48 ... index update [GFUJI,0.49,1265083327,Mouse,1]
+2010/02/02 05:14:55 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 05:15:00 ... index update [KARMAN,0.41,1265083339,Search-Tools,1]
+2010/02/02 05:15:00 ... index update [KARMAN,0.07,1265082307,SWISH-Prog-KSx,1]
+2010/02/02 05:15:00 ... index update [KARMAN,0.13,1265081035,SWISH-API-Object,1]
+2010/02/02 05:15:07 ... index insert [RSAVAGE,1.02,1265083833,App-Office-Contacts-Donations,1]
+2010/02/02 05:15:07 ... index insert [RSAVAGE,1.02,1265083820,App-Office-Contacts,1]
+2010/02/02 05:15:07 ... index update [RSAVAGE,1.04,1265083857,HTML-Parser-Simple,1]
+2010/02/02 05:15:07 ... index insert [RSAVAGE,1.02,1265083845,App-Office-Contacts-Import-vCards,1]
+2010/02/02 05:15:08 Updating BACKPAN entries
+2010/02/02 05:15:09 Updating NNTP entries
+2010/02/02 05:15:10 .. from 39884 to 39887
+2010/02/02 05:15:10 ... [39885] subject=CPAN Upload: K/KA/KARMAN/SWISH-API-Object-0.13.tar.gz
+2010/02/02 05:15:10 ... index update [KARMAN,0.13,1265081040,SWISH-API-Object,1]
+2010/02/02 05:15:10 ... [39886] subject=CPAN Upload: K/KA/KARMAN/SWISH-Prog-KSx-0.07.tar.gz
+2010/02/02 05:15:10 ... index update [KARMAN,0.07,1265082300,SWISH-Prog-KSx,1]
+2010/02/02 05:15:11 ... [39887] subject=CPAN Upload: D/DA/DAGOLDEN/CPAN-Reporter-1.1709.tar.gz
+2010/02/02 05:15:11 ... index update [DAGOLDEN,1.1709,1265082900,CPAN-Reporter,1]
+2010/02/02 06:01:11 Updating CPAN entries
+2010/02/02 06:11:49 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 06:11:50 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 06:11:51 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 06:11:57 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 06:12:00 Updating BACKPAN entries
+2010/02/02 06:12:00 Updating NNTP entries
+2010/02/02 06:12:02 .. from 39887 to 39893
+2010/02/02 06:12:02 ... [39888] subject=CPAN Upload: G/GF/GFUJI/Mouse-0.49.tar.gz
+2010/02/02 06:12:02 ... index update [GFUJI,0.49,1265083320,Mouse,1]
+2010/02/02 06:12:02 ... [39889] subject=CPAN Upload: K/KA/KARMAN/Search-Tools-0.41.tar.gz
+2010/02/02 06:12:02 ... index update [KARMAN,0.41,1265083320,Search-Tools,1]
+2010/02/02 06:12:03 ... [39890] subject=CPAN Upload: R/RS/RSAVAGE/App-Office-Contacts-1.02.tgz
+2010/02/02 06:12:03 ... [39891] subject=CPAN Upload: R/RS/RSAVAGE/App-Office-Contacts-Donations-1.02.tgz
+2010/02/02 06:12:04 ... [39892] subject=CPAN Upload: R/RS/RSAVAGE/App-Office-Contacts-Import-vCards-1.02.tgz
+2010/02/02 06:12:04 ... [39893] subject=CPAN Upload: R/RS/RSAVAGE/HTML-Parser-Simple-1.04.tgz
+2010/02/02 06:12:04 ... index update [RSAVAGE,1.04,1265083800,HTML-Parser-Simple,1]
+2010/02/02 07:01:10 Updating CPAN entries
+2010/02/02 07:01:22 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 07:01:24 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 07:01:26 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 07:01:31 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 07:01:31 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 07:01:32 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 07:01:32 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 07:01:34 ... index update [WYANT,0.028_01,1265088224,Astro-satpass,1]
+2010/02/02 07:01:36 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 07:01:42 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 07:01:52 ... index update [KARMAN,0.02,1265089327,Search-OpenSearch,1]
+2010/02/02 07:01:52 ... index update [KARMAN,0.05,1265089975,SWISH-3,1]
+2010/02/02 07:01:57 Updating BACKPAN entries
+2010/02/02 07:01:58 Updating NNTP entries
+2010/02/02 07:01:59 .. from 39893 to 39896
+2010/02/02 07:01:59 ... [39894] subject=CPAN Upload: W/WY/WYANT/Astro-satpass-0.028_01.tar.gz
+2010/02/02 07:01:59 ... index update [WYANT,0.028_01,1265088180,Astro-satpass,1]
+2010/02/02 07:02:00 ... [39895] subject=CPAN Upload: K/KA/KARMAN/Search-OpenSearch-0.02.tar.gz
+2010/02/02 07:02:00 ... index update [KARMAN,0.02,1265089320,Search-OpenSearch,1]
+2010/02/02 07:02:00 ... [39896] subject=CPAN Upload: K/KA/KARMAN/SWISH-3-0.05.tar.gz
+2010/02/02 07:02:00 ... index update [KARMAN,0.05,1265089920,SWISH-3,1]
+2010/02/02 08:01:15 Updating CPAN entries
+2010/02/02 08:13:41 ... index update [SAMPO,0.49,1265090848,zxid,1]
+2010/02/02 08:13:53 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 08:13:54 ... index update [ADAMK,0.43,1265093780,Aspect,1]
+2010/02/02 08:13:54 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 08:13:55 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 08:13:56 ... index update [KARMAN,0.04,1265090943,SWISH-Prog-Xapian,1]
+2010/02/02 08:14:00 ... index update [RPKELLY,0.62,1265092004,File-Find-Declare,1]
+2010/02/02 08:14:01 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 08:14:03 Updating BACKPAN entries
+2010/02/02 08:14:03 Updating NNTP entries
+2010/02/02 08:14:04 .. from 39896 to 39900
+2010/02/02 08:14:04 ... [39897] subject=CPAN Upload: S/SA/SAMPO/zxid-0.49.tgz
+2010/02/02 08:14:04 ... index update [SAMPO,0.49,1265090820,zxid,1]
+2010/02/02 08:14:05 ... [39898] subject=CPAN Upload: K/KA/KARMAN/SWISH-Prog-Xapian-0.04.tar.gz
+2010/02/02 08:14:05 ... index update [KARMAN,0.04,1265090940,SWISH-Prog-Xapian,1]
+2010/02/02 08:14:05 ... [39899] subject=CPAN Upload: R/RP/RPKELLY/File-Find-Declare-0.62.tar.gz
+2010/02/02 08:14:05 ... index update [RPKELLY,0.62,1265091960,File-Find-Declare,1]
+2010/02/02 08:14:05 ... [39900] subject=CPAN Upload: A/AD/ADAMK/Aspect-0.43.tar.gz
+2010/02/02 08:14:05 ... index update [ADAMK,0.43,1265093760,Aspect,1]
+2010/02/02 09:01:08 Updating CPAN entries
+2010/02/02 09:03:10 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 09:03:12 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 09:03:12 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 09:03:16 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 09:03:16 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 09:03:16 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 09:03:16 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 09:03:20 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 09:03:26 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 09:03:47 ... index update [FRANCKC,0.01,1265096913,Dancer-Template-MicroTemplate,1]
+2010/02/02 09:03:47 ... index update [FRANCKC,0.01,1265096931,Dancer-Logger-LogHandler,1]
+2010/02/02 09:03:47 Updating BACKPAN entries
+2010/02/02 09:03:47 Updating NNTP entries
+2010/02/02 09:03:48 .. from 39900 to 39902
+2010/02/02 09:03:48 ... [39901] subject=CPAN Upload: F/FR/FRANCKC/Dancer-Template-MicroTemplate-0.01.tar.gz
+2010/02/02 09:03:48 ... index update [FRANCKC,0.01,1265096880,Dancer-Template-MicroTemplate,1]
+2010/02/02 09:03:49 ... [39902] subject=CPAN Upload: F/FR/FRANCKC/Dancer-Logger-LogHandler-0.01.tar.gz
+2010/02/02 09:03:49 ... index update [FRANCKC,0.01,1265096880,Dancer-Logger-LogHandler,1]
+2010/02/02 10:01:13 Updating CPAN entries
+2010/02/02 10:17:03 ... index update [TSUCCHI,0.1.9,1265101042,Test-Module-Used,1]
+2010/02/02 10:17:04 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 10:17:05 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 10:17:05 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 10:17:07 ... index update [MSCHILLI,0.13,1265097961,Archive-Tar-Wrapper,1]
+2010/02/02 10:17:09 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 10:17:10 Updating BACKPAN entries
+2010/02/02 10:17:10 Updating NNTP entries
+2010/02/02 10:17:11 .. from 39902 to 39904
+2010/02/02 10:17:12 ... [39903] subject=CPAN Upload: M/MS/MSCHILLI/Archive-Tar-Wrapper-0.13.tar.gz
+2010/02/02 10:17:12 ... index update [MSCHILLI,0.13,1265097960,Archive-Tar-Wrapper,1]
+2010/02/02 10:17:12 ... [39904] subject=CPAN Upload: T/TS/TSUCCHI/Test-Module-Used-0.1.9.tar.gz
+2010/02/02 10:17:12 ... index update [TSUCCHI,0.1.9,1265101020,Test-Module-Used,1]
+2010/02/02 11:01:18 Updating CPAN entries
+2010/02/02 11:19:52 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 11:20:27 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 11:20:43 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 11:21:05 ... index update [ISAGE,0.41,1265102833,Bot-Jabbot,1]
+2010/02/02 11:21:06 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 11:21:06 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 11:21:07 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 11:21:07 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 11:21:11 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 11:21:15 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 11:21:29 Updating BACKPAN entries
+2010/02/02 11:21:29 Updating NNTP entries
+2010/02/02 11:21:31 .. from 39904 to 39905
+2010/02/02 11:21:31 ... [39905] subject=CPAN Upload: I/IS/ISAGE/Bot-Jabbot-0.41.tar.gz
+2010/02/02 11:21:31 ... index update [ISAGE,0.41,1265102820,Bot-Jabbot,1]
+2010/02/02 12:01:23 Updating CPAN entries
+2010/02/02 12:13:46 ... index update [SULLR,0.55_1,1265108010,Net-SIP,1]
+2010/02/02 12:14:09 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 12:14:11 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 12:14:12 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 12:14:18 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 12:14:20 Updating BACKPAN entries
+2010/02/02 12:14:20 Updating NNTP entries
+2010/02/02 12:14:21 .. from 39905 to 39906
+2010/02/02 12:14:22 ... [39906] subject=CPAN Upload: S/SU/SULLR/Net-SIP-0.55_1.tar.gz
+2010/02/02 12:14:22 ... index update [SULLR,0.55_1,1265107980,Net-SIP,1]
+2010/02/02 13:01:29 Updating CPAN entries
+2010/02/02 13:15:12 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 13:15:15 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 13:15:16 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 13:15:21 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 13:15:21 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 13:15:21 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 13:15:22 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 13:15:26 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 13:15:33 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 13:15:46 Updating BACKPAN entries
+2010/02/02 13:15:46 Updating NNTP entries
+2010/02/02 13:30:29 Backup via DBD drivers
+2010/02/02 14:01:16 Updating CPAN entries
+2010/02/02 14:18:34 ... index update [PYTHIAN,1.24,1265115543,DBD-Oracle,1]
+2010/02/02 14:18:44 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 14:18:45 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 14:18:46 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 14:18:55 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 14:18:56 Updating BACKPAN entries
+2010/02/02 14:18:56 Updating NNTP entries
+2010/02/02 14:18:57 .. from 39906 to 39907
+2010/02/02 14:18:57 ... [39907] subject=CPAN Upload: P/PY/PYTHIAN/DBD-Oracle-1.24.tar.gz
+2010/02/02 14:18:58 ... index update [PYTHIAN,1.24,1265115540,DBD-Oracle,1]
+2010/02/02 15:01:20 Updating CPAN entries
+2010/02/02 15:17:38 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 15:17:40 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 15:17:42 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 15:17:46 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 15:17:46 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 15:17:46 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 15:17:47 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 15:17:51 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 15:17:56 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 15:18:04 Updating BACKPAN entries
+2010/02/02 15:18:04 Updating NNTP entries
+2010/02/02 15:18:05 .. from 39907 to 39908
+2010/02/02 15:18:06 ... [39908] subject=CPAN Upload: F/FL/FLECERF/smp_launcher.pl
+2010/02/02 18:06:10 Updating CPAN entries
+2010/02/02 18:07:31 ... index update [GSLONDON,0.52,1265126819,Parse-Gnaw,1]
+2010/02/02 18:07:43 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 18:07:45 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 18:07:45 ... index update [AAR,1.24,1265122805,Crypt-GCrypt,1]
+2010/02/02 18:07:46 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 18:07:49 ... index insert [KAPPA,0.1,1265122004,Dancer-Session-Cookie,1]
+2010/02/02 18:07:52 ... index update [MASANORIH,0.0.3,1265124809,Net-SRCDS-Queries,1]
+2010/02/02 18:07:54 ... index update [RPETTETT,356,1265122600,ClearPress,1]
+2010/02/02 18:07:56 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 18:07:58 Updating BACKPAN entries
+2010/02/02 18:07:58 Updating NNTP entries
+2010/02/02 18:07:59 .. from 39908 to 39913
+2010/02/02 18:08:00 ... [39909] subject=CPAN Upload: K/KA/KAPPA/Dancer-Session-Cookie-0.1.tar.gz
+2010/02/02 18:08:00 ... [39910] subject=CPAN Upload: R/RP/RPETTETT/ClearPress-356.tar.gz
+2010/02/02 18:08:00 ... index update [RPETTETT,356,1265122560,ClearPress,1]
+2010/02/02 18:08:00 ... [39911] subject=CPAN Upload: A/AA/AAR/Crypt-GCrypt-1.24.tar.gz
+2010/02/02 18:08:00 ... index update [AAR,1.24,1265122800,Crypt-GCrypt,1]
+2010/02/02 18:08:01 ... [39912] subject=CPAN Upload: M/MA/MASANORIH/Net-SRCDS-Queries-0.0.3.tar.gz
+2010/02/02 18:08:01 ... index update [MASANORIH,0.0.3,1265124780,Net-SRCDS-Queries,1]
+2010/02/02 18:08:01 ... [39913] subject=CPAN Upload: G/GS/GSLONDON/Parse-Gnaw-0.52.tar.gz
+2010/02/02 18:08:01 ... index update [GSLONDON,0.52,1265126820,Parse-Gnaw,1]
+2010/02/02 19:12:32 Updating CPAN entries
+2010/02/02 19:22:08 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 19:22:12 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 19:22:14 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 19:22:19 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 19:22:19 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 19:22:20 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 19:22:20 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 19:22:25 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 19:22:33 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 19:22:34 ... index update [TFRAYNER,0.99,1265134685,Bio-MAGETAB,1]
+2010/02/02 19:22:37 ... index update [ANDREMAR,0.100330,1265134353,Catalyst-Plugin-Devel-ModuleVersions,1]
+2010/02/02 19:22:48 Updating BACKPAN entries
+2010/02/02 19:22:48 Updating NNTP entries
+2010/02/02 19:22:50 .. from 39913 to 39914
+2010/02/02 19:22:50 ... [39914] subject=CPAN Upload: A/AN/ANDREMAR/Catalyst-Plugin-Devel-ModuleVersions-0.100330.tar.gz
+2010/02/02 19:22:50 ... index update [ANDREMAR,0.100330,1265134320,Catalyst-Plugin-Devel-ModuleVersions,1]
+2010/02/02 20:05:12 Updating CPAN entries
+2010/02/02 20:12:43 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 20:12:44 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 20:12:45 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 20:12:50 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 20:12:52 Updating BACKPAN entries
+2010/02/02 20:12:52 Updating NNTP entries
+2010/02/02 20:12:53 .. from 39914 to 39915
+2010/02/02 20:12:54 ... [39915] subject=CPAN Upload: T/TF/TFRAYNER/Bio-MAGETAB-0.99.tar.gz
+2010/02/02 20:12:54 ... index update [TFRAYNER,0.99,1265134680,Bio-MAGETAB,1]
+2010/02/02 21:02:25 Updating CPAN entries
+2010/02/02 21:07:04 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 21:07:06 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 21:07:07 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 21:07:10 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 21:07:10 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 21:07:11 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 21:07:11 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 21:07:14 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 21:07:19 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 21:07:24 ... index insert [KRYDE,18,1265139068,rss2leafnode,1]
+2010/02/02 21:07:31 Updating BACKPAN entries
+2010/02/02 21:07:31 Updating NNTP entries
+2010/02/02 21:07:32 .. from 39915 to 39916
+2010/02/02 21:07:32 ... [39916] subject=CPAN Upload: K/KR/KRYDE/rss2leafnode-18.tar.gz
+2010/02/02 22:01:14 Updating CPAN entries
+2010/02/02 22:35:17 ... index update [PLU,0.01021,1265142939,Gearman-Driver,1]
+2010/02/02 22:35:17 ... index update [PLU,0.01020,1265141671,Gearman-Driver,1]
+2010/02/02 22:35:39 ... index update [JESSE,0.41_01,1265141460,HTTP-Server-Simple,1]
+2010/02/02 22:35:45 ... index update [TROTSKEY,0.21,1265141854,Acme-Mahjong-Rule-CC,1]
+2010/02/02 22:35:46 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/02 22:35:48 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/02 22:35:49 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/02 22:35:59 ... index update [MAGGIEXYZ,0.4.1,1265145320,PDL-Stats,1]
+2010/02/02 22:36:01 ... index update [MISHOO,0.7,1265144286,Chess-Rep,1]
+2010/02/02 22:36:06 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/02 22:36:15 Updating BACKPAN entries
+2010/02/02 22:36:15 Updating NNTP entries
+2010/02/02 22:36:17 .. from 39916 to 39922
+2010/02/02 22:36:18 ... [39917] subject=CPAN Upload: J/JE/JESSE/HTTP-Server-Simple-0.41_01.tar.gz
+2010/02/02 22:36:18 ... index update [JESSE,0.41_01,1265141460,HTTP-Server-Simple,1]
+2010/02/02 22:36:18 ... [39918] subject=CPAN Upload: P/PL/PLU/Gearman-Driver-0.01020.tar.gz
+2010/02/02 22:36:18 ... index update [PLU,0.01020,1265141640,Gearman-Driver,1]
+2010/02/02 22:36:19 ... [39919] subject=CPAN Upload: T/TR/TROTSKEY/Acme-Mahjong-Rule-CC-0.21.tar.gz
+2010/02/02 22:36:19 ... index update [TROTSKEY,0.21,1265141820,Acme-Mahjong-Rule-CC,1]
+2010/02/02 22:36:19 ... [39920] subject=CPAN Upload: P/PL/PLU/Gearman-Driver-0.01021.tar.gz
+2010/02/02 22:36:19 ... index update [PLU,0.01021,1265142900,Gearman-Driver,1]
+2010/02/02 22:36:19 ... [39921] subject=CPAN Upload: M/MI/MISHOO/Chess-Rep-0.7.tar.gz
+2010/02/02 22:36:19 ... index update [MISHOO,0.7,1265144280,Chess-Rep,1]
+2010/02/02 22:36:20 ... [39922] subject=CPAN Upload: M/MA/MAGGIEXYZ/PDL-Stats-0.4.1.tar.gz
+2010/02/02 22:36:20 ... index update [MAGGIEXYZ,0.4.1,1265145300,PDL-Stats,1]
+2010/02/02 23:01:10 Updating CPAN entries
+2010/02/02 23:16:25 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/02 23:16:28 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/02 23:16:29 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/02 23:16:32 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/02 23:16:32 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/02 23:16:33 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/02 23:16:33 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/02 23:16:36 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/02 23:16:42 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/02 23:16:43 ... index update [TBR,0.03,1265146265,WKHTMLTOPDF,1]
+2010/02/02 23:16:43 ... index update [TROTSKEY,0.22,1265148495,Acme-Mahjong-Rule-CC,1]
+2010/02/02 23:16:51 Updating BACKPAN entries
+2010/02/02 23:16:51 Updating NNTP entries
+2010/02/02 23:16:53 .. from 39922 to 39923
+2010/02/02 23:16:53 ... [39923] subject=CPAN Upload: T/TB/TBR/WKHTMLTOPDF-0.03.tar.gz
+2010/02/02 23:16:53 ... index update [TBR,0.03,1265146260,WKHTMLTOPDF,1]
+2010/02/03 00:07:33 Updating CPAN entries
+2010/02/03 00:24:40 ... index update [ELLIOTJS,v1.15.0,1265151000,MooseX-Getopt-Defanged,1]
+2010/02/03 00:25:04 ... index update [TOBYINK,0.05,1265151019,XRD-Parser,1]
+2010/02/03 00:25:06 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 00:25:07 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 00:25:08 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 00:25:10 ... index update [MAVERICK,3.0001,1265148925,Apache-Voodoo,1]
+2010/02/03 00:25:13 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 00:25:15 Updating BACKPAN entries
+2010/02/03 00:25:15 Updating NNTP entries
+2010/02/03 00:25:16 .. from 39923 to 39927
+2010/02/03 00:25:16 ... [39924] subject=CPAN Upload: T/TR/TROTSKEY/Acme-Mahjong-Rule-CC-0.22.tar.gz
+2010/02/03 00:25:16 ... index update [TROTSKEY,0.22,1265148480,Acme-Mahjong-Rule-CC,1]
+2010/02/03 00:25:17 ... [39925] subject=CPAN Upload: M/MA/MAVERICK/Apache-Voodoo-3.0001.tar.gz
+2010/02/03 00:25:17 ... index update [MAVERICK,3.0001,1265148900,Apache-Voodoo,1]
+2010/02/03 00:25:17 ... [39926] subject=CPAN Upload: E/EL/ELLIOTJS/MooseX-Getopt-Defanged-v1.15.0.tar.gz
+2010/02/03 00:25:17 ... index update [ELLIOTJS,v1.15.0,1265151000,MooseX-Getopt-Defanged,1]
+2010/02/03 00:25:18 ... [39927] subject=CPAN Upload: T/TO/TOBYINK/XRD-Parser-0.05.tar.gz
+2010/02/03 00:25:18 ... index update [TOBYINK,0.05,1265151000,XRD-Parser,1]
+2010/02/03 01:02:00 Updating CPAN entries
+2010/02/03 01:25:38 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 01:27:34 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 01:28:29 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 01:28:51 ... index update [BLUEFEET,0.07,1265154859,GIS-Distance,1]
+2010/02/03 01:28:51 ... index update [BLUEFEET,0.06,1265154946,GIS-Distance-Fast,1]
+2010/02/03 01:31:26 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 01:31:26 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 01:31:28 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 01:31:30 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 01:31:44 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 01:34:08 ... index update [JMCNAMARA,2.37,1265155417,Spreadsheet-WriteExcel,1]
+2010/02/03 01:34:09 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 01:34:41 Updating BACKPAN entries
+2010/02/03 01:34:41 Updating NNTP entries
+2010/02/03 01:34:43 .. from 39927 to 39930
+2010/02/03 01:34:43 ... [39928] subject=CPAN Upload: B/BL/BLUEFEET/GIS-Distance-0.07.tar.gz
+2010/02/03 01:34:43 ... index update [BLUEFEET,0.07,1265154840,GIS-Distance,1]
+2010/02/03 01:34:44 ... [39929] subject=CPAN Upload: B/BL/BLUEFEET/GIS-Distance-Fast-0.06.tar.gz
+2010/02/03 01:34:44 ... index update [BLUEFEET,0.06,1265154900,GIS-Distance-Fast,1]
+2010/02/03 01:34:44 ... [39930] subject=CPAN Upload: J/JM/JMCNAMARA/Spreadsheet-WriteExcel-2.37.tar.gz
+2010/02/03 01:34:44 ... index update [JMCNAMARA,2.37,1265155380,Spreadsheet-WriteExcel,1]
+2010/02/03 02:02:08 Updating CPAN entries
+2010/02/03 03:15:33 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 03:16:22 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 03:16:59 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 03:21:33 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 03:22:46 Updating BACKPAN entries
+2010/02/03 03:22:51 Updating NNTP entries
+2010/02/03 04:28:16 Updating CPAN entries
+2010/02/03 04:37:46 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 04:37:54 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 04:37:58 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 04:38:07 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 04:38:07 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 04:38:10 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 04:38:10 ... index update [SMAN,1.17,1265163837,App-Cinema,1]
+2010/02/03 04:38:11 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 04:38:13 ... index update [SANKO,0.06970_012,1265165718,Alien-FLTK2,1]
+2010/02/03 04:38:20 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 04:38:39 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 04:39:10 Updating BACKPAN entries
+2010/02/03 04:39:10 Updating NNTP entries
+2010/02/03 04:39:11 .. from 39930 to 39932
+2010/02/03 04:39:12 ... [39931] subject=CPAN Upload: S/SM/SMAN/App-Cinema-1.17.tar.gz
+2010/02/03 04:39:12 ... index update [SMAN,1.17,1265163840,App-Cinema,1]
+2010/02/03 04:39:12 ... [39932] subject=CPAN Upload: S/SA/SANKO/Alien-FLTK2-0.06970_012.tar.gz
+2010/02/03 04:39:12 ... index update [SANKO,0.06970_012,1265165700,Alien-FLTK2,1]
+2010/02/03 05:04:58 Updating CPAN entries
+2010/02/03 05:45:42 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 05:45:45 ... index update [ANDK,1.94_55,1265168629,CPAN,1]
+2010/02/03 05:46:06 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 05:46:09 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 05:46:19 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 05:46:21 Updating BACKPAN entries
+2010/02/03 05:46:21 Updating NNTP entries
+2010/02/03 05:46:22 .. from 39932 to 39933
+2010/02/03 05:46:22 ... [39933] subject=CPAN Upload: A/AN/ANDK/CPAN-1.94_55.tar.gz
+2010/02/03 05:46:22 ... index update [ANDK,1.94_55,1265168580,CPAN,1]
+2010/02/03 06:03:09 Updating CPAN entries
+2010/02/03 06:09:53 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 06:09:59 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 06:10:00 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 06:10:04 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 06:10:04 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 06:10:05 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 06:10:05 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 06:10:10 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 06:10:16 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 06:10:25 ... index update [MIYAGAWA,0.09_03,1265172380,Plack-Middleware-Session,1]
+2010/02/03 06:10:30 Updating BACKPAN entries
+2010/02/03 06:10:30 Updating NNTP entries
+2010/02/03 06:10:31 .. from 39933 to 39934
+2010/02/03 06:10:31 ... [39934] subject=CPAN Upload: M/MI/MIYAGAWA/Plack-Middleware-Session-0.09_03.tar.gz
+2010/02/03 06:10:31 ... index update [MIYAGAWA,0.09_03,1265172360,Plack-Middleware-Session,1]
+2010/02/03 07:03:34 Updating CPAN entries
+2010/02/03 07:40:40 ... index update [SGRAHAM,1.01_10,1265176365,Template-Sandbox,1]
+2010/02/03 07:40:52 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 07:40:53 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 07:40:54 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 07:40:59 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 07:41:01 Updating BACKPAN entries
+2010/02/03 07:41:01 Updating NNTP entries
+2010/02/03 07:41:04 .. from 39934 to 39935
+2010/02/03 07:41:04 ... [39935] subject=CPAN Upload: S/SG/SGRAHAM/Template-Sandbox-1.01_10.tar.gz
+2010/02/03 07:41:04 ... index update [SGRAHAM,1.01_10,1265176320,Template-Sandbox,1]
+2010/02/03 08:05:07 Updating CPAN entries
+2010/02/03 08:49:55 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 08:52:43 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 08:54:02 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 08:56:32 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 08:56:32 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 08:56:52 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 08:57:03 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 08:58:52 ... index update [PLOBBES,3.23,1265181152,Mail-IMAPClient,1]
+2010/02/03 08:59:23 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 09:01:25 ... index update [CSJEWELL,0.009,1265180166,WiX3,1]
+2010/02/03 09:03:46 ... index update [JINGRAM,0.09,1265180349,Data-Maker,1]
+2010/02/03 09:04:03 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 09:08:47 ... index update [KARMAN,0.42,1265180441,Search-Tools,1]
+2010/02/03 09:08:47 ... index update [KARMAN,0.03,1265180526,Search-OpenSearch,1]
+2010/02/03 09:13:37 ... index update [FLORA,0.27,1265181636,Data-Visitor,1]
+2010/02/03 09:14:13 Updating BACKPAN entries
+2010/02/03 09:14:16 Updating NNTP entries
+2010/02/03 09:14:18 .. from 39935 to 39941
+2010/02/03 09:14:21 ... [39936] subject=CPAN Upload: C/CS/CSJEWELL/WiX3-0.009.tar.gz
+2010/02/03 09:14:21 ... index update [CSJEWELL,0.009,1265180160,WiX3,1]
+2010/02/03 09:14:21 ... [39937] subject=CPAN Upload: J/JI/JINGRAM/Data-Maker-0.09.tar.gz
+2010/02/03 09:14:21 ... index update [JINGRAM,0.09,1265180340,Data-Maker,1]
+2010/02/03 09:14:22 ... [39938] subject=CPAN Upload: K/KA/KARMAN/Search-Tools-0.42.tar.gz
+2010/02/03 09:14:22 ... index update [KARMAN,0.42,1265180400,Search-Tools,1]
+2010/02/03 09:14:22 ... [39939] subject=CPAN Upload: K/KA/KARMAN/Search-OpenSearch-0.03.tar.gz
+2010/02/03 09:14:23 ... index update [KARMAN,0.03,1265180520,Search-OpenSearch,1]
+2010/02/03 09:14:23 ... [39940] subject=CPAN Upload: P/PL/PLOBBES/Mail-IMAPClient-3.23.tar.gz
+2010/02/03 09:14:23 ... index update [PLOBBES,3.23,1265181120,Mail-IMAPClient,1]
+2010/02/03 09:14:23 ... [39941] subject=CPAN Upload: F/FL/FLORA/Data-Visitor-0.27.tar.gz
+2010/02/03 09:14:23 ... index update [FLORA,0.27,1265181600,Data-Visitor,1]
+2010/02/03 10:05:49 Updating CPAN entries
+2010/02/03 10:28:20 ... index update [SULLR,0.56,1265184115,Net-SIP,1]
+2010/02/03 10:28:32 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 10:28:33 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 10:28:35 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 10:28:36 ... index update [MDOOTSON,0.06,1265187720,Wx-TreeListCtrl,1]
+2010/02/03 10:28:39 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 10:28:40 ... index update [OVID,0.02,1265184452,Test-Class-Most,1]
+2010/02/03 10:28:40 ... index update [OPI,0.07,1265186388,MMapDB,1]
+2010/02/03 10:28:40 Updating BACKPAN entries
+2010/02/03 10:28:41 Updating NNTP entries
+2010/02/03 10:28:42 .. from 39941 to 39945
+2010/02/03 10:28:43 ... [39942] subject=CPAN Upload: S/SU/SULLR/Net-SIP-0.56.tar.gz
+2010/02/03 10:28:43 ... index update [SULLR,0.56,1265184060,Net-SIP,1]
+2010/02/03 10:28:43 ... [39943] subject=CPAN Upload: O/OV/OVID/Test-Class-Most-0.02.tar.gz
+2010/02/03 10:28:43 ... index update [OVID,0.02,1265184420,Test-Class-Most,1]
+2010/02/03 10:28:43 ... [39944] subject=CPAN Upload: O/OP/OPI/MMapDB-0.07.tar.gz
+2010/02/03 10:28:43 ... index update [OPI,0.07,1265186340,MMapDB,1]
+2010/02/03 10:28:44 ... [39945] subject=CPAN Upload: M/MD/MDOOTSON/Wx-TreeListCtrl-0.06.tar.gz
+2010/02/03 10:28:44 ... index update [MDOOTSON,0.06,1265187720,Wx-TreeListCtrl,1]
+2010/02/03 11:01:12 Updating CPAN entries
+2010/02/03 11:24:59 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 11:26:06 ... index insert [DMAKI,0.00001,1265189219,Test-TCP-Multi,1]
+2010/02/03 11:26:16 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 11:27:33 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 11:29:49 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 11:29:50 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 11:30:03 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 11:30:13 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 11:32:31 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 11:35:50 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 11:38:14 Updating BACKPAN entries
+2010/02/03 11:38:16 Updating NNTP entries
+2010/02/03 11:38:18 .. from 39945 to 39946
+2010/02/03 11:38:18 ... [39946] subject=CPAN Upload: D/DM/DMAKI/Test-TCP-Multi-0.00001.tar.gz
+2010/02/03 11:38:18 ... index update [DMAKI,0.00001,1265189220,Test-TCP-Multi,1]
+2010/02/03 11:50:59 START
+2010/02/03 11:51:00 Reindexing distros FAST
+2010/02/03 11:51:07 .. dist = Net-Amazon-EC2
+2010/02/03 11:51:07 .. dist = SWISH-API-More
+2010/02/03 11:51:07 .. dist = version
+2010/02/03 11:51:07 .. dist = SWISH-API-Object
+2010/02/03 11:51:07 .. dist = SWISH-Prog-KSx
+2010/02/03 11:51:07 .. dist = CPAN-Reporter
+2010/02/03 11:51:07 .. dist = Mouse
+2010/02/03 11:51:07 .. dist = Search-Tools
+2010/02/03 11:51:07 .. dist = HTML-Parser-Simple
+2010/02/03 11:51:07 .. dist = Astro-satpass
+2010/02/03 11:51:08 .. dist = Search-OpenSearch
+2010/02/03 11:51:08 .. dist = SWISH-3
+2010/02/03 11:51:08 .. dist = zxid
+2010/02/03 11:51:08 .. dist = SWISH-Prog-Xapian
+2010/02/03 11:51:08 .. dist = File-Find-Declare
+2010/02/03 11:51:08 .. dist = Aspect
+2010/02/03 11:51:08 .. dist = Dancer-Template-MicroTemplate
+2010/02/03 11:51:08 .. dist = Dancer-Logger-LogHandler
+2010/02/03 11:51:08 .. dist = Archive-Tar-Wrapper
+2010/02/03 11:51:08 .. dist = Test-Module-Used
+2010/02/03 11:51:08 .. dist = Bot-Jabbot
+2010/02/03 11:51:08 .. dist = Net-SIP
+2010/02/03 11:51:08 .. dist = DBD-Oracle
+2010/02/03 11:51:08 .. dist = ClearPress
+2010/02/03 11:51:08 .. dist = Crypt-GCrypt
+2010/02/03 11:51:08 .. dist = Net-SRCDS-Queries
+2010/02/03 11:51:08 .. dist = Parse-Gnaw
+2010/02/03 11:51:08 .. dist = Catalyst-Plugin-Devel-ModuleVersions
+2010/02/03 11:51:08 .. dist = Bio-MAGETAB
+2010/02/03 11:51:08 .. dist = HTTP-Server-Simple
+2010/02/03 11:51:08 .. dist = Gearman-Driver
+2010/02/03 11:51:08 .. dist = Acme-Mahjong-Rule-CC
+2010/02/03 11:51:08 .. dist = Gearman-Driver
+2010/02/03 11:51:08 .. dist = Chess-Rep
+2010/02/03 11:51:08 .. dist = PDL-Stats
+2010/02/03 11:51:08 .. dist = WKHTMLTOPDF
+2010/02/03 11:51:08 .. dist = Acme-Mahjong-Rule-CC
+2010/02/03 11:51:08 .. dist = Apache-Voodoo
+2010/02/03 11:51:08 .. dist = MooseX-Getopt-Defanged
+2010/02/03 11:51:08 .. dist = XRD-Parser
+2010/02/03 11:51:08 .. dist = GIS-Distance
+2010/02/03 11:51:08 .. dist = GIS-Distance-Fast
+2010/02/03 11:51:08 .. dist = Spreadsheet-WriteExcel
+2010/02/03 11:51:08 .. dist = App-Cinema
+2010/02/03 11:51:08 .. dist = Alien-FLTK2
+2010/02/03 11:51:08 .. dist = CPAN
+2010/02/03 11:51:08 .. dist = Plack-Middleware-Session
+2010/02/03 11:51:08 .. dist = Template-Sandbox
+2010/02/03 11:51:08 .. dist = WiX3
+2010/02/03 11:51:08 .. dist = Data-Maker
+2010/02/03 11:51:08 .. dist = Search-Tools
+2010/02/03 11:51:08 .. dist = Search-OpenSearch
+2010/02/03 11:51:08 .. dist = Mail-IMAPClient
+2010/02/03 11:51:08 .. dist = Data-Visitor
+2010/02/03 11:51:08 .. dist = Net-SIP
+2010/02/03 11:51:08 .. dist = Test-Class-Most
+2010/02/03 11:51:08 .. dist = MMapDB
+2010/02/03 11:51:08 .. dist = Wx-TreeListCtrl
+2010/02/03 11:51:08 Reindexing distros FAST done
+2010/02/03 11:51:08 STOP
+2010/02/03 11:51:46 Backup via DBD drivers
+2010/02/03 12:01:13 Updating CPAN entries
+2010/02/03 12:07:05 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 12:07:06 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 12:07:06 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 12:07:09 ... index update [RPETTETT,357,1265193340,ClearPress,1]
+2010/02/03 12:07:10 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 12:07:11 Updating BACKPAN entries
+2010/02/03 12:07:11 Updating NNTP entries
+2010/02/03 12:07:12 .. from 39946 to 39947
+2010/02/03 12:07:12 ... [39947] subject=CPAN Upload: R/RP/RPETTETT/ClearPress-357.tar.gz
+2010/02/03 12:07:12 ... index update [RPETTETT,357,1265193300,ClearPress,1]
+2010/02/03 13:01:12 Updating CPAN entries
+2010/02/03 13:08:00 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 13:08:06 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 13:08:07 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 13:08:10 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 13:08:10 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 13:08:11 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 13:08:11 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 13:08:15 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 13:08:17 ... index update [CORNELIUS,2010.03419,1265195416,Vimana,1]
+2010/02/03 13:08:19 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 13:08:27 Updating BACKPAN entries
+2010/02/03 13:08:29 Updating NNTP entries
+2010/02/03 13:08:31 .. from 39947 to 39948
+2010/02/03 13:08:31 ... [39948] subject=CPAN Upload: C/CO/CORNELIUS/Vimana-2010.03419.tar.gz
+2010/02/03 13:08:31 ... index update [CORNELIUS,2010.03419,1265195400,Vimana,1]
+2010/02/03 14:01:04 Updating CPAN entries
+2010/02/03 14:03:36 ... index update [JWIED,1.03,1265200359,BZ-Client,1]
+2010/02/03 14:03:42 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 14:03:43 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 14:03:44 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 14:03:53 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 14:03:55 Updating BACKPAN entries
+2010/02/03 14:03:55 Updating NNTP entries
+2010/02/03 14:03:56 .. from 39948 to 39949
+2010/02/03 14:03:56 ... [39949] subject=CPAN Upload: J/JW/JWIED/BZ-Client-1.03.tar.gz
+2010/02/03 14:03:56 ... index update [JWIED,1.03,1265200320,BZ-Client,1]
+2010/02/03 15:01:05 Updating CPAN entries
+2010/02/03 15:02:51 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 15:02:54 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 15:02:56 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 15:03:01 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 15:03:01 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 15:03:01 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 15:03:01 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 15:03:06 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 15:03:14 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 15:03:25 ... index update [RENEEB,1.2,1265204096,Test-CheckManifest,1]
+2010/02/03 15:03:28 Updating BACKPAN entries
+2010/02/03 15:03:28 Updating NNTP entries
+2010/02/03 15:03:29 .. from 39949 to 39950
+2010/02/03 15:03:29 ... [39950] subject=CPAN Upload: R/RE/RENEEB/Test-CheckManifest-1.2.tar.gz
+2010/02/03 15:03:29 ... index update [RENEEB,1.2,1265204040,Test-CheckManifest,1]
+2010/02/03 16:01:05 Updating CPAN entries
+2010/02/03 16:06:00 ... index update [DMAKI,0.00002,1265206714,Test-TCP-Multi,1]
+2010/02/03 16:06:01 ... index update [BINGOS,0.56,1265206885,IPC-Cmd,1]
+2010/02/03 16:06:01 ... index update [BINGOS,1.56,1265208015,Archive-Tar,1]
+2010/02/03 16:06:09 ... index update [GPHAT,0.02,1265207799,Template-Plugin-Time-Duration,1]
+2010/02/03 16:06:15 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 16:06:17 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 16:06:18 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 16:06:23 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 16:06:24 Updating BACKPAN entries
+2010/02/03 16:06:25 Updating NNTP entries
+2010/02/03 16:06:27 .. from 39950 to 39954
+2010/02/03 16:06:27 ... [39951] subject=CPAN Upload: D/DM/DMAKI/Test-TCP-Multi-0.00002.tar.gz
+2010/02/03 16:06:27 ... index update [DMAKI,0.00002,1265206680,Test-TCP-Multi,1]
+2010/02/03 16:06:27 ... [39952] subject=CPAN Upload: B/BI/BINGOS/IPC-Cmd-0.56.tar.gz
+2010/02/03 16:06:27 ... index update [BINGOS,0.56,1265206860,IPC-Cmd,1]
+2010/02/03 16:06:28 ... [39953] subject=CPAN Upload: G/GP/GPHAT/Template-Plugin-Time-Duration-0.02.tar.gz
+2010/02/03 16:06:28 ... index update [GPHAT,0.02,1265207760,Template-Plugin-Time-Duration,1]
+2010/02/03 16:06:28 ... [39954] subject=CPAN Upload: B/BI/BINGOS/Archive-Tar-1.56.tar.gz
+2010/02/03 16:06:28 ... index update [BINGOS,1.56,1265208000,Archive-Tar,1]
+2010/02/03 17:01:05 Updating CPAN entries
+2010/02/03 17:02:46 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 17:02:48 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 17:02:48 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 17:02:50 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 17:02:50 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 17:02:51 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 17:02:51 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 17:02:53 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 17:02:57 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 17:03:04 ... index update [MELO,0.002,1265212543,DBICx-DataDictionary,1]
+2010/02/03 17:03:07 Updating BACKPAN entries
+2010/02/03 17:03:07 Updating NNTP entries
+2010/02/03 17:03:08 .. from 39954 to 39955
+2010/02/03 17:03:09 ... [39955] subject=CPAN Upload: M/ME/MELO/DBICx-DataDictionary-0.002.tar.gz
+2010/02/03 17:03:09 ... index update [MELO,0.002,1265212500,DBICx-DataDictionary,1]
+2010/02/03 18:01:10 Updating CPAN entries
+2010/02/03 18:06:21 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 18:06:23 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 18:06:23 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 18:06:29 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 18:06:30 Updating BACKPAN entries
+2010/02/03 18:06:31 Updating NNTP entries
+2010/02/03 19:01:27 Updating CPAN entries
+2010/02/03 19:17:30 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 19:17:42 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 19:17:49 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 19:18:00 ... index update [INA,2.13.4.3,1265219273,jacode,1]
+2010/02/03 19:18:02 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 19:18:02 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 19:18:04 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 19:18:05 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 19:18:10 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 19:18:19 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 19:18:29 ... index update [MFROST,0.12,1265217565,GnuPG,1]
+2010/02/03 19:18:33 ... index update [MIYAGAWA,0.07,1265219759,Plack-Middleware-Debug,1]
+2010/02/03 19:18:37 Updating BACKPAN entries
+2010/02/03 19:18:37 Updating NNTP entries
+2010/02/03 19:18:38 .. from 39955 to 39958
+2010/02/03 19:18:39 ... [39956] subject=CPAN Upload: M/MF/MFROST/GnuPG-0.12.tar.gz
+2010/02/03 19:18:39 ... index update [MFROST,0.12,1265217540,GnuPG,1]
+2010/02/03 19:18:39 ... [39957] subject=CPAN Upload: I/IN/INA/jacode/jacode-2.13.4.3.tar.gz
+2010/02/03 19:18:39 ... index update [INA,2.13.4.3,1265219220,jacode,1]
+2010/02/03 19:18:39 ... [39958] subject=CPAN Upload: M/MI/MIYAGAWA/Plack-Middleware-Debug-0.07.tar.gz
+2010/02/03 19:18:39 ... index update [MIYAGAWA,0.07,1265219760,Plack-Middleware-Debug,1]
+2010/02/03 20:01:04 Updating CPAN entries
+2010/02/03 20:03:24 ... index update [VLYON,0.01_02,1265222505,DBIx-DBO,1]
+2010/02/03 20:03:37 ... index update [CORNELIUS,0.07,1265222331,VIM-Uploader,1]
+2010/02/03 20:03:37 ... index update [CORNELIUS,0.06,1265221999,VIM-Uploader,1]
+2010/02/03 20:03:44 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 20:03:46 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 20:03:47 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 20:04:00 ... index update [RURBAN,1.17,1265222753,B-C,1]
+2010/02/03 20:04:01 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 20:04:02 ... index update [OALDERS,0.05,1265221735,HTML-Restrict,1]
+2010/02/03 20:04:03 Updating BACKPAN entries
+2010/02/03 20:04:03 Updating NNTP entries
+2010/02/03 20:04:04 .. from 39958 to 39963
+2010/02/03 20:04:04 ... [39959] subject=CPAN Upload: O/OA/OALDERS/HTML-Restrict-0.05.tar.gz
+2010/02/03 20:04:04 ... index update [OALDERS,0.05,1265221680,HTML-Restrict,1]
+2010/02/03 20:04:05 ... [39960] subject=CPAN Upload: C/CO/CORNELIUS/VIM-Uploader-0.06.tar.gz
+2010/02/03 20:04:05 ... index update [CORNELIUS,0.06,1265221980,VIM-Uploader,1]
+2010/02/03 20:04:05 ... [39961] subject=CPAN Upload: C/CO/CORNELIUS/VIM-Uploader-0.07.tar.gz
+2010/02/03 20:04:05 ... index update [CORNELIUS,0.07,1265222280,VIM-Uploader,1]
+2010/02/03 20:04:05 ... [39962] subject=CPAN Upload: V/VL/VLYON/DBIx-DBO-0.01_02.tar.gz
+2010/02/03 20:04:05 ... index update [VLYON,0.01_02,1265222460,DBIx-DBO,1]
+2010/02/03 20:04:06 ... [39963] subject=CPAN Upload: R/RU/RURBAN/B-C-1.17.tar.gz
+2010/02/03 20:04:06 ... index update [RURBAN,1.17,1265222700,B-C,1]
+2010/02/03 21:01:10 Updating CPAN entries
+2010/02/03 21:07:06 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 21:07:08 ... index insert [DSTH,v0.0.1,1265224913,Algorithm-BaumWelch,1]
+2010/02/03 21:07:10 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 21:07:12 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 21:07:17 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 21:07:17 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 21:07:17 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 21:07:17 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 21:07:22 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 21:07:27 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 21:07:30 ... index update [APOCAL,0.08,1265227560,Test-Apocalypse,1]
+2010/02/03 21:07:30 ... index insert [APOCAL,0.01,1265226310,Test-Pod-No404s,1]
+2010/02/03 21:07:37 Updating BACKPAN entries
+2010/02/03 21:07:37 Updating NNTP entries
+2010/02/03 21:07:39 .. from 39963 to 39965
+2010/02/03 21:07:39 ... [39964] subject=CPAN Upload: D/DS/DSTH/Algorithm-BaumWelch-v0.0.1.tar.gz
+2010/02/03 21:07:39 ... [39965] subject=CPAN Upload: A/AP/APOCAL/Test-Pod-No404s-0.01.tar.gz
+2010/02/03 22:01:09 Updating CPAN entries
+2010/02/03 22:06:15 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/03 22:06:16 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/03 22:06:17 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/03 22:06:22 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/03 22:06:24 Updating BACKPAN entries
+2010/02/03 22:06:24 Updating NNTP entries
+2010/02/03 22:06:26 .. from 39965 to 39966
+2010/02/03 22:06:26 ... [39966] subject=CPAN Upload: A/AP/APOCAL/Test-Apocalypse-0.08.tar.gz
+2010/02/03 22:06:26 ... index update [APOCAL,0.08,1265227560,Test-Apocalypse,1]
+2010/02/03 23:01:04 Updating CPAN entries
+2010/02/03 23:03:15 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/03 23:03:17 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/03 23:03:17 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/03 23:03:18 ... index update [BARBIE,0.78,1265232348,CPAN-Testers-WWW-Statistics,1]
+2010/02/03 23:03:20 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/03 23:03:20 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/03 23:03:20 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/03 23:03:20 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/03 23:03:23 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/03 23:03:27 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/03 23:03:27 ... index update [TOKUHIROM,0.06,1265233618,FormValidator-Lite,1]
+2010/02/03 23:03:37 Updating BACKPAN entries
+2010/02/03 23:03:38 Updating NNTP entries
+2010/02/03 23:03:41 .. from 39966 to 39968
+2010/02/03 23:03:41 ... [39967] subject=CPAN Upload: B/BA/BARBIE/CPAN-Testers-WWW-Statistics-0.78.tar.gz
+2010/02/03 23:03:41 ... index update [BARBIE,0.78,1265232300,CPAN-Testers-WWW-Statistics,1]
+2010/02/03 23:03:41 ... [39968] subject=CPAN Upload: T/TO/TOKUHIROM/FormValidator-Lite-0.06.tar.gz
+2010/02/03 23:03:41 ... index update [TOKUHIROM,0.06,1265233620,FormValidator-Lite,1]
+2010/02/04 00:40:16 Updating CPAN entries
+2010/02/04 00:41:16 ... index update [BARBIE,0.40,1265236494,CPAN-Testers-Data-Generator,1]
+2010/02/04 00:41:16 ... index update [BARBIE,0.79,1265235074,CPAN-Testers-WWW-Statistics,1]
+2010/02/04 00:41:21 ... index update [PLU,0.01022,1265238059,Gearman-Driver,1]
+2010/02/04 00:41:29 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 00:41:30 ... index update [ABH,1.08,1265238254,Apache-DBI,1]
+2010/02/04 00:41:31 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 00:41:31 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 00:41:37 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 00:41:38 Updating BACKPAN entries
+2010/02/04 00:41:38 Updating NNTP entries
+2010/02/04 00:41:40 .. from 39968 to 39972
+2010/02/04 00:41:40 ... [39969] subject=CPAN Upload: B/BA/BARBIE/CPAN-Testers-WWW-Statistics-0.79.tar.gz
+2010/02/04 00:41:40 ... index update [BARBIE,0.79,1265235060,CPAN-Testers-WWW-Statistics,1]
+2010/02/04 00:41:41 ... [39970] subject=CPAN Upload: B/BA/BARBIE/CPAN-Testers-Data-Generator-0.40.tar.gz
+2010/02/04 00:41:41 ... index update [BARBIE,0.40,1265236440,CPAN-Testers-Data-Generator,1]
+2010/02/04 00:41:41 ... [39971] subject=CPAN Upload: P/PL/PLU/Gearman-Driver-0.01022.tar.gz
+2010/02/04 00:41:41 ... index update [PLU,0.01022,1265238060,Gearman-Driver,1]
+2010/02/04 00:41:41 ... [39972] subject=CPAN Upload: A/AB/ABH/Apache-DBI-1.08.tar.gz
+2010/02/04 00:41:41 ... index update [ABH,1.08,1265238240,Apache-DBI,1]
+2010/02/04 01:03:10 Updating CPAN entries
+2010/02/04 01:11:52 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 01:11:55 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 01:11:56 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 01:12:00 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 01:12:00 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 01:12:00 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 01:12:00 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 01:12:04 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 01:12:09 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 01:12:21 Updating BACKPAN entries
+2010/02/04 01:12:21 Updating NNTP entries
+2010/02/04 02:03:26 Updating CPAN entries
+2010/02/04 02:07:29 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 02:07:30 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 02:07:30 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 02:07:37 ... index insert [MICHAEL,0.01,1265244203,XML-xmlapi,1]
+2010/02/04 02:07:38 ... index update [MIYAGAWA,0.99_03,1265242509,Plack,1]
+2010/02/04 02:07:43 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 02:07:46 Updating BACKPAN entries
+2010/02/04 02:07:46 Updating NNTP entries
+2010/02/04 02:07:47 .. from 39972 to 39974
+2010/02/04 02:07:47 ... [39973] subject=CPAN Upload: M/MI/MIYAGAWA/Plack-0.99_03.tar.gz
+2010/02/04 02:07:47 ... index update [MIYAGAWA,0.99_03,1265242500,Plack,1]
+2010/02/04 02:07:48 ... [39974] subject=CPAN Upload: M/MI/MICHAEL/XML-xmlapi-0.01.tar.gz
+2010/02/04 02:15:13 START
+2010/02/04 02:15:13 Reindexing distros FAST
+2010/02/04 02:15:21 .. dist = ClearPress
+2010/02/04 02:15:21 .. dist = Vimana
+2010/02/04 02:15:21 .. dist = BZ-Client
+2010/02/04 02:15:21 .. dist = Test-CheckManifest
+2010/02/04 02:15:21 .. dist = Test-TCP-Multi
+2010/02/04 02:15:21 .. dist = IPC-Cmd
+2010/02/04 02:15:21 .. dist = Template-Plugin-Time-Duration
+2010/02/04 02:15:21 .. dist = Archive-Tar
+2010/02/04 02:15:21 .. dist = DBICx-DataDictionary
+2010/02/04 02:15:21 .. dist = GnuPG
+2010/02/04 02:15:21 .. dist = jacode
+2010/02/04 02:15:21 .. dist = Plack-Middleware-Debug
+2010/02/04 02:15:21 .. dist = HTML-Restrict
+2010/02/04 02:15:21 .. dist = VIM-Uploader
+2010/02/04 02:15:21 .. dist = VIM-Uploader
+2010/02/04 02:15:21 .. dist = DBIx-DBO
+2010/02/04 02:15:21 .. dist = B-C
+2010/02/04 02:15:21 .. dist = Test-Apocalypse
+2010/02/04 02:15:21 .. dist = CPAN-Testers-WWW-Statistics
+2010/02/04 02:15:21 .. dist = FormValidator-Lite
+2010/02/04 02:15:21 .. dist = CPAN-Testers-WWW-Statistics
+2010/02/04 02:15:21 .. dist = CPAN-Testers-Data-Generator
+2010/02/04 02:15:21 .. dist = Gearman-Driver
+2010/02/04 02:15:21 .. dist = Apache-DBI
+2010/02/04 02:15:21 .. dist = Plack
+2010/02/04 02:15:21 Reindexing distros FAST done
+2010/02/04 02:15:21 STOP
+2010/02/04 02:15:31 Backup via DBD drivers
+2010/02/04 03:02:26 Updating CPAN entries
+2010/02/04 03:07:03 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 03:07:06 ... index update [DMAKI,0.00006,1265245993,Crypt-DH-GMP,1]
+2010/02/04 03:07:06 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 03:07:09 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 03:07:13 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 03:07:13 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 03:07:13 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 03:07:14 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 03:07:18 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 03:07:24 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 03:07:34 ... index insert [MICHAEL,0.01,1265249119,XML-xmlapi-fixed,1]
+2010/02/04 03:07:34 ... index update [MICHAEL,0.01-withoutworldwriteables,1265246404,XML-xmlapi,1]
+2010/02/04 03:07:40 ... index update [FLORA,0.30,1265248711,MooseX-Method-Signatures,1]
+2010/02/04 03:07:40 ... index update [FLORA,0.33,1265248724,MooseX-Declare,1]
+2010/02/04 03:07:40 ... index update [FLORA,0.20,1265248696,MooseX-Types-Structured,1]
+2010/02/04 03:07:41 Updating BACKPAN entries
+2010/02/04 03:07:41 Updating NNTP entries
+2010/02/04 03:07:42 .. from 39974 to 39979
+2010/02/04 03:07:42 ... [39975] subject=CPAN Upload: D/DM/DMAKI/Crypt-DH-GMP-0.00006.tar.gz
+2010/02/04 03:07:43 ... index update [DMAKI,0.00006,1265245980,Crypt-DH-GMP,1]
+2010/02/04 03:07:43 ... [39976] subject=CPAN Upload: M/MI/MICHAEL/XML-xmlapi-0.01-withoutworldwriteables.tar.gz
+2010/02/04 03:07:43 ... index update [MICHAEL,0.01-withoutworldwriteables,1265246400,XML-xmlapi,1]
+2010/02/04 03:07:43 ... [39977] subject=CPAN Upload: F/FL/FLORA/MooseX-Types-Structured-0.20.tar.gz
+2010/02/04 03:07:43 ... index update [FLORA,0.20,1265248680,MooseX-Types-Structured,1]
+2010/02/04 03:07:44 ... [39978] subject=CPAN Upload: F/FL/FLORA/MooseX-Declare-0.33.tar.gz
+2010/02/04 03:07:44 ... index update [FLORA,0.33,1265248680,MooseX-Declare,1]
+2010/02/04 03:07:44 ... [39979] subject=CPAN Upload: F/FL/FLORA/MooseX-Method-Signatures-0.30.tar.gz
+2010/02/04 03:07:44 ... index update [FLORA,0.30,1265248680,MooseX-Method-Signatures,1]
+2010/02/04 04:06:34 Updating CPAN entries
+2010/02/04 04:13:17 ... index update [SANKO,0.06970_013,1265252554,Alien-FLTK2,1]
+2010/02/04 04:13:27 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 04:13:30 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 04:13:31 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 04:13:36 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 04:13:37 Updating BACKPAN entries
+2010/02/04 04:13:37 Updating NNTP entries
+2010/02/04 04:13:39 .. from 39979 to 39980
+2010/02/04 04:13:39 ... [39980] subject=CPAN Upload: M/MI/MICHAEL/XML-xmlapi-fixed-0.01.tar.gz
+2010/02/04 05:03:20 Updating CPAN entries
+2010/02/04 05:05:15 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 05:05:17 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 05:05:18 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 05:05:20 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 05:05:20 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 05:05:20 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 05:05:20 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 05:05:22 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 05:05:28 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 05:05:33 ... index update [KARMAN,0.021,1265253937,CatalystX-CRUD-YUI,1]
+2010/02/04 05:05:39 ... index update [FLORA,0.03,1265253431,MooseX-LexicalRoleApplication,1]
+2010/02/04 05:05:39 Updating BACKPAN entries
+2010/02/04 05:05:39 Updating NNTP entries
+2010/02/04 05:05:41 .. from 39980 to 39983
+2010/02/04 05:05:41 ... [39981] subject=CPAN Upload: S/SA/SANKO/Alien-FLTK2-0.06970_013.tar.gz
+2010/02/04 05:05:41 ... index update [SANKO,0.06970_013,1265252520,Alien-FLTK2,1]
+2010/02/04 05:05:41 ... [39982] subject=CPAN Upload: F/FL/FLORA/MooseX-LexicalRoleApplication-0.03.tar.gz
+2010/02/04 05:05:41 ... index update [FLORA,0.03,1265253420,MooseX-LexicalRoleApplication,1]
+2010/02/04 05:05:42 ... [39983] subject=CPAN Upload: K/KA/KARMAN/CatalystX-CRUD-YUI-0.021.tar.gz
+2010/02/04 05:05:42 ... index update [KARMAN,0.021,1265253900,CatalystX-CRUD-YUI,1]
+2010/02/04 06:02:27 Updating CPAN entries
+2010/02/04 06:07:23 ... index update [DMAKI,0.00003,1265257647,Test-TCP-Multi,1]
+2010/02/04 06:07:40 ... index update [JKEGL,0.005_000,1265258939,Marpa,1]
+2010/02/04 06:07:43 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 06:07:44 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 06:07:45 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 06:07:46 ... index update [KARMAN,0.06,1265258787,SWISH-API-Stat,1]
+2010/02/04 06:07:48 ... index update [MICHAEL,0.02,1265256568,XML-xmlapi,1]
+2010/02/04 06:07:50 ... index update [RKITOVER,0.40,1265256926,Catalyst-Model-DBIC-Schema,1]
+2010/02/04 06:07:51 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 06:07:52 ... index update [FLORA,0.95,1265258144,Moose,1]
+2010/02/04 06:07:53 Updating BACKPAN entries
+2010/02/04 06:07:53 Updating NNTP entries
+2010/02/04 06:07:54 .. from 39983 to 39989
+2010/02/04 06:07:54 ... [39984] subject=CPAN Upload: M/MI/MICHAEL/XML-xmlapi-0.02.tar.gz
+2010/02/04 06:07:54 ... index update [MICHAEL,0.02,1265256540,XML-xmlapi,1]
+2010/02/04 06:07:54 ... [39985] subject=CPAN Upload: R/RK/RKITOVER/Catalyst-Model-DBIC-Schema-0.40.tar.gz
+2010/02/04 06:07:54 ... index update [RKITOVER,0.40,1265256900,Catalyst-Model-DBIC-Schema,1]
+2010/02/04 06:07:55 ... [39986] subject=CPAN Upload: D/DM/DMAKI/Test-TCP-Multi-0.00003.tar.gz
+2010/02/04 06:07:55 ... index update [DMAKI,0.00003,1265257620,Test-TCP-Multi,1]
+2010/02/04 06:07:55 ... [39987] subject=CPAN Upload: F/FL/FLORA/Moose-0.95.tar.gz
+2010/02/04 06:07:55 ... index update [FLORA,0.95,1265258100,Moose,1]
+2010/02/04 06:07:55 ... [39988] subject=CPAN Upload: K/KA/KARMAN/SWISH-API-Stat-0.06.tar.gz
+2010/02/04 06:07:55 ... index update [KARMAN,0.06,1265258760,SWISH-API-Stat,1]
+2010/02/04 06:07:56 ... [39989] subject=CPAN Upload: J/JK/JKEGL/Marpa-0.005_000.tar.gz
+2010/02/04 06:07:56 ... index update [JKEGL,0.005_000,1265258940,Marpa,1]
+2010/02/04 07:03:16 Updating CPAN entries
+2010/02/04 07:07:51 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 07:07:52 ... index insert [LGEHLEN,0.005,1265262964,Math-Vector-BestRotation,1]
+2010/02/04 07:07:54 ... index update [DESPAIR,2.14,1265261487,Net-Whois-Raw,1]
+2010/02/04 07:07:54 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 07:07:55 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 07:07:59 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 07:07:59 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 07:07:59 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 07:08:00 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 07:08:03 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 07:08:10 ... index update [JAYK,0.11003,1265261386,Form-Sensible,1]
+2010/02/04 07:08:10 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 07:08:25 Updating BACKPAN entries
+2010/02/04 07:08:25 Updating NNTP entries
+2010/02/04 07:08:26 .. from 39989 to 39992
+2010/02/04 07:08:26 ... [39990] subject=CPAN Upload: J/JA/JAYK/Form-Sensible-0.11003.tar.gz
+2010/02/04 07:08:26 ... index update [JAYK,0.11003,1265261340,Form-Sensible,1]
+2010/02/04 07:08:27 ... [39991] subject=CPAN Upload: D/DE/DESPAIR/Net-Whois-Raw-2.14.tar.gz
+2010/02/04 07:08:27 ... index update [DESPAIR,2.14,1265261460,Net-Whois-Raw,1]
+2010/02/04 07:08:27 ... [39992] subject=CPAN Upload: L/LG/LGEHLEN/Math-Vector-BestRotation-0.005.tar.gz
+2010/02/04 08:03:36 Updating CPAN entries
+2010/02/04 08:06:06 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 08:06:06 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 08:06:07 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 08:06:10 ... index update [MSCHILLI,0.06,1265266584,Mail-DWIM,1]
+2010/02/04 08:06:10 ... index update [MIYAGAWA,0.32,1265264139,Web-Scraper,1]
+2010/02/04 08:06:12 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 08:06:13 ... index update [FLORA,5.80020,1265264371,Catalyst-Runtime,1]
+2010/02/04 08:06:14 Updating BACKPAN entries
+2010/02/04 08:06:14 Updating NNTP entries
+2010/02/04 08:06:15 .. from 39992 to 39995
+2010/02/04 08:06:16 ... [39993] subject=CPAN Upload: M/MI/MIYAGAWA/Web-Scraper-0.32.tar.gz
+2010/02/04 08:06:16 ... index update [MIYAGAWA,0.32,1265264100,Web-Scraper,1]
+2010/02/04 08:06:16 ... [39994] subject=CPAN Upload: F/FL/FLORA/Catalyst-Runtime-5.80020.tar.gz
+2010/02/04 08:06:16 ... index update [FLORA,5.80020,1265264340,Catalyst-Runtime,1]
+2010/02/04 08:06:16 ... [39995] subject=CPAN Upload: M/MS/MSCHILLI/Mail-DWIM-0.06.tar.gz
+2010/02/04 08:06:17 ... index update [MSCHILLI,0.06,1265266560,Mail-DWIM,1]
+2010/02/04 09:03:20 Updating CPAN entries
+2010/02/04 09:04:50 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 09:04:52 ... index insert [DMAKI,0.00001,1265268011,Test-Memcached,1]
+2010/02/04 09:04:53 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 09:04:54 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 09:04:59 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 09:04:59 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 09:05:00 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 09:05:00 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 09:05:02 ... index insert [WINTRU,0.02,1265268433,Package-Transporter,1]
+2010/02/04 09:05:04 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 09:05:11 ... index update [JINGRAM,0.10,1265267446,Data-Maker,1]
+2010/02/04 09:05:11 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 09:05:24 Updating BACKPAN entries
+2010/02/04 09:05:24 Updating NNTP entries
+2010/02/04 09:05:25 .. from 39995 to 39998
+2010/02/04 09:05:26 ... [39996] subject=CPAN Upload: J/JI/JINGRAM/Data-Maker-0.10.tar.gz
+2010/02/04 09:05:26 ... index update [JINGRAM,0.10,1265267400,Data-Maker,1]
+2010/02/04 09:05:26 ... [39997] subject=CPAN Upload: D/DM/DMAKI/Test-Memcached-0.00001.tar.gz
+2010/02/04 09:05:26 ... [39998] subject=CPAN Upload: W/WI/WINTRU/Package-Transporter-0.02.tar.gz
+2010/02/04 10:03:54 Updating CPAN entries
+2010/02/04 10:09:16 ... index update [JROCKWAY,0.03,1265272524,Event-Join,1]
+2010/02/04 10:09:17 ... index update [JUMASH,0.04,1265272026,WWW-phpBB-Poster,1]
+2010/02/04 10:09:19 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 10:09:21 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 10:09:21 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 10:09:24 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 10:09:25 Updating BACKPAN entries
+2010/02/04 10:09:25 Updating NNTP entries
+2010/02/04 10:09:26 .. from 39998 to 40000
+2010/02/04 10:09:27 ... [39999] subject=CPAN Upload: J/JU/JUMASH/WWW-phpBB-Poster-0.04.tar.gz
+2010/02/04 10:09:27 ... index update [JUMASH,0.04,1265272020,WWW-phpBB-Poster,1]
+2010/02/04 10:09:27 ... [40000] subject=CPAN Upload: J/JR/JROCKWAY/Event-Join-0.03.tar.gz
+2010/02/04 10:09:27 ... index update [JROCKWAY,0.03,1265272500,Event-Join,1]
+2010/02/04 11:02:30 Updating CPAN entries
+2010/02/04 11:04:44 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 11:04:46 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 11:04:47 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 11:04:51 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 11:04:51 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 11:04:51 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 11:04:51 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 11:04:55 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 11:05:01 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 11:05:12 Updating BACKPAN entries
+2010/02/04 11:05:12 Updating NNTP entries
+2010/02/04 12:03:29 Updating CPAN entries
+2010/02/04 12:05:59 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 12:06:02 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 12:06:03 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 12:06:04 ... index update [KUNIYOSHI,1.06,1265278783,WWW-NicoSound-Download,1]
+2010/02/04 12:06:13 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 12:06:16 Updating BACKPAN entries
+2010/02/04 12:06:16 Updating NNTP entries
+2010/02/04 12:06:17 .. from 40000 to 40001
+2010/02/04 12:06:17 ... [40001] subject=CPAN Upload: K/KU/KUNIYOSHI/WWW-NicoSound-Download-1.06.tar.gz
+2010/02/04 12:06:17 ... index update [KUNIYOSHI,1.06,1265278740,WWW-NicoSound-Download,1]
+2010/02/04 13:03:26 Updating CPAN entries
+2010/02/04 13:07:12 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 13:07:16 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 13:07:17 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 13:07:18 ... index update [BRAMBLE,0.07,1265284669,Padre-Plugin-Swarm,1]
+2010/02/04 13:07:21 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 13:07:21 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 13:07:23 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 13:07:23 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 13:07:26 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 13:07:31 ... index update [JROCKWAY,0.01,1265283740,AnyEvent-Subprocess,1]
+2010/02/04 13:07:32 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 13:07:45 Updating BACKPAN entries
+2010/02/04 13:07:45 Updating NNTP entries
+2010/02/04 13:07:47 .. from 40001 to 40003
+2010/02/04 13:07:47 ... [40002] subject=CPAN Upload: J/JR/JROCKWAY/AnyEvent-Subprocess-0.01.tar.gz
+2010/02/04 13:07:47 ... index update [JROCKWAY,0.01,1265283720,AnyEvent-Subprocess,1]
+2010/02/04 13:07:47 ... [40003] subject=CPAN Upload: B/BR/BRAMBLE/Padre-Plugin-Swarm-0.07.tar.gz
+2010/02/04 13:07:47 ... index update [BRAMBLE,0.07,1265284620,Padre-Plugin-Swarm,1]
+2010/02/04 14:03:53 Updating CPAN entries
+2010/02/04 14:07:24 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 14:07:25 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 14:07:26 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 14:07:27 ... index update [KITANO,0.20,1265287776,CPAN-Packager,1]
+2010/02/04 14:07:28 ... index insert [MARCEL,0.01,1265287114,Getopt-Inherited,1]
+2010/02/04 14:07:31 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 14:07:33 Updating BACKPAN entries
+2010/02/04 14:07:33 Updating NNTP entries
+2010/02/04 14:07:34 .. from 40003 to 40005
+2010/02/04 14:07:34 ... [40004] subject=CPAN Upload: M/MA/MARCEL/Getopt-Inherited-0.01.tar.gz
+2010/02/04 14:07:35 ... [40005] subject=CPAN Upload: K/KI/KITANO/CPAN-Packager-0.20.tar.gz
+2010/02/04 14:07:35 ... index update [KITANO,0.20,1265287740,CPAN-Packager,1]
+2010/02/04 15:03:29 Updating CPAN entries
+2010/02/04 15:05:32 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 15:05:35 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 15:05:37 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 15:05:40 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 15:05:40 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 15:05:41 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 15:05:41 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 15:05:44 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 15:05:49 ... index update [CASIANO,1.156,1265291832,Parse-Eyapp,1]
+2010/02/04 15:05:52 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 15:06:03 Updating BACKPAN entries
+2010/02/04 15:06:03 Updating NNTP entries
+2010/02/04 15:06:04 .. from 40005 to 40006
+2010/02/04 15:06:04 ... [40006] subject=CPAN Upload: C/CA/CASIANO/Parse-Eyapp-1.156.tar.gz
+2010/02/04 15:06:04 ... index update [CASIANO,1.156,1265291820,Parse-Eyapp,1]
+2010/02/04 16:05:51 Updating CPAN entries
+2010/02/04 16:09:54 ... index update [LIMAONE,1.0_11,1265294889,String-LCSS_XS,1]
+2010/02/04 16:09:55 ... index update [DSTH,0.0.2,1265294863,Statistics-MVA-BayesianDiscrimination,1]
+2010/02/04 16:09:59 ... index update [VLYON,0.01_03,1265292715,DBIx-DBO,1]
+2010/02/04 16:10:11 ... index update [JCRISTY,6.59,1265295651,PerlMagick,1]
+2010/02/04 16:10:15 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 16:10:17 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 16:10:17 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 16:10:19 ... index update [KITANO,0.21,1265294987,CPAN-Packager,1]
+2010/02/04 16:10:23 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 16:10:25 Updating BACKPAN entries
+2010/02/04 16:10:25 Updating NNTP entries
+2010/02/04 16:10:26 .. from 40006 to 40010
+2010/02/04 16:10:27 ... [40007] subject=CPAN Upload: V/VL/VLYON/DBIx-DBO-0.01_03.tar.gz
+2010/02/04 16:10:27 ... index update [VLYON,0.01_03,1265292660,DBIx-DBO,1]
+2010/02/04 16:10:27 ... [40008] subject=CPAN Upload: D/DS/DSTH/Statistics-MVA-BayesianDiscrimination-0.0.2.tar.gz
+2010/02/04 16:10:29 ... index update [DSTH,0.0.2,1265294820,Statistics-MVA-BayesianDiscrimination,1]
+2010/02/04 16:10:30 ... [40009] subject=CPAN Upload: L/LI/LIMAONE/String-LCSS_XS-1.0_11.tar.gz
+2010/02/04 16:10:30 ... index update [LIMAONE,1.0_11,1265294880,String-LCSS_XS,1]
+2010/02/04 16:10:30 ... [40010] subject=CPAN Upload: K/KI/KITANO/CPAN-Packager-0.21.tar.gz
+2010/02/04 16:10:30 ... index update [KITANO,0.21,1265294940,CPAN-Packager,1]
+2010/02/04 17:03:13 Updating CPAN entries
+2010/02/04 17:05:09 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 17:05:10 ... index update [DSTH,v0.0.2,1265297678,Algorithm-BaumWelch,1]
+2010/02/04 17:05:11 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 17:05:13 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 17:05:17 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 17:05:17 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 17:05:17 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 17:05:17 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 17:05:19 ... index update [SAXJAZMAN,0.03_1,1265296958,RT-IODEF,1]
+2010/02/04 17:05:21 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 17:05:23 ... index insert [GUGU,0.02,1265298548,Test-Pod-Coverage-Permissive,1]
+2010/02/04 17:05:23 ... index update [GUGU,0.03,1265298856,Test-Pod-Coverage-Permissive,1]
+2010/02/04 17:05:29 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 17:05:39 Updating BACKPAN entries
+2010/02/04 17:05:39 Updating NNTP entries
+2010/02/04 17:05:40 .. from 40010 to 40017
+2010/02/04 17:05:40 ... [40011] subject=CPAN Upload: J/JC/JCRISTY/PerlMagick-6.59.tar.gz
+2010/02/04 17:05:40 ... index update [JCRISTY,6.59,1265295600,PerlMagick,1]
+2010/02/04 17:05:41 ... [40012] subject=CPAN Upload: S/SA/SAXJAZMAN/RT/RT-IODEF-0.03_1.tar.gz
+2010/02/04 17:05:41 ... index update [SAXJAZMAN,0.03_1,1265296920,RT-IODEF,1]
+2010/02/04 17:05:41 ... [40013] subject=CPAN Upload: D/DS/DSTH/Algorithm-BaumWelch-v0.0.2.tar.gz
+2010/02/04 17:05:41 ... index update [DSTH,v0.0.2,1265297640,Algorithm-BaumWelch,1]
+2010/02/04 17:05:41 ... [40014] subject=CPAN Upload: G/GU/GUGU/Test-Pod-Coverage-Permissive-0.01.tar.gz
+2010/02/04 17:05:42 ... [40015] subject=CPAN Upload: G/GU/GUGU/Test-Pod-Coverage-Permissive-0.02.tar.gz
+2010/02/04 17:05:42 ... [40016] subject=CPAN Upload: Q/QO/QOS/NewsSurfer_v3_10.pl
+2010/02/04 17:05:42 ... [40017] subject=CPAN Upload: G/GU/GUGU/Test-Pod-Coverage-Permissive-0.03.tar.gz
+2010/02/04 17:05:42 ... index update [GUGU,0.03,1265298840,Test-Pod-Coverage-Permissive,1]
+2010/02/04 18:05:37 Updating CPAN entries
+2010/02/04 18:05:48 ... index insert [SMUELLER,0.01,1265300915,Math-ThinPlateSpline,1]
+2010/02/04 18:05:59 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 18:06:01 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 18:06:01 ... index update [AMBS,0.02,1265301678,Quiki,1]
+2010/02/04 18:06:01 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 18:06:07 ... index update [MIRK,1.12,1265301443,Net-Z3950-SimpleServer,1]
+2010/02/04 18:06:08 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 18:06:10 Updating BACKPAN entries
+2010/02/04 18:06:10 Updating NNTP entries
+2010/02/04 18:06:12 .. from 40017 to 40020
+2010/02/04 18:06:12 ... [40018] subject=CPAN Upload: S/SM/SMUELLER/Math-ThinPlateSpline-0.01.tar.gz
+2010/02/04 18:06:13 ... [40019] subject=CPAN Upload: M/MI/MIRK/Net-Z3950-SimpleServer-1.12.tar.gz
+2010/02/04 18:06:13 ... index update [MIRK,1.12,1265301420,Net-Z3950-SimpleServer,1]
+2010/02/04 18:06:13 ... [40020] subject=CPAN Upload: A/AM/AMBS/Quiki/Quiki-0.02.tar.gz
+2010/02/04 18:06:13 ... index update [AMBS,0.02,1265301660,Quiki,1]
+2010/02/04 19:04:30 Updating CPAN entries
+2010/02/04 19:08:15 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 19:08:16 ... index update [DPAVLIN,0.1,1265304223,MARC-Fast,1]
+2010/02/04 19:08:18 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 19:08:18 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 19:08:21 ... index update [EXODIST,0.002,1265303674,PDT-Config,1]
+2010/02/04 19:08:22 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 19:08:22 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 19:08:22 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 19:08:22 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 19:08:26 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 19:08:31 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 19:08:40 ... index update [OVID,0.03,1265305229,Test-Class-Most,1]
+2010/02/04 19:08:41 Updating BACKPAN entries
+2010/02/04 19:08:41 Updating NNTP entries
+2010/02/04 19:08:42 .. from 40020 to 40023
+2010/02/04 19:08:43 ... [40021] subject=CPAN Upload: E/EX/EXODIST/PDT-Config-0.002.tar.gz
+2010/02/04 19:08:43 ... index update [EXODIST,0.002,1265303640,PDT-Config,1]
+2010/02/04 19:08:43 ... [40022] subject=CPAN Upload: D/DP/DPAVLIN/MARC-Fast-0.1.tar.gz
+2010/02/04 19:08:43 ... index update [DPAVLIN,0.1,1265304180,MARC-Fast,1]
+2010/02/04 19:08:43 ... [40023] subject=CPAN Upload: O/OV/OVID/Test-Class-Most-0.03.tar.gz
+2010/02/04 19:08:43 ... index update [OVID,0.03,1265305200,Test-Class-Most,1]
+2010/02/04 20:02:45 Updating CPAN entries
+2010/02/04 20:04:58 ... index update [LUKEC,0.30,1265307898,Socialtext-Resting,1]
+2010/02/04 20:05:15 ... index update [ARNIE,0.01,1251730892,WWW-Alltop,1]
+2010/02/04 20:05:17 ... index update [AKHOBOV,0.02,1023787648,Business-OnlinePayment-2CheckOut,1]
+2010/02/04 20:05:17 ... index update [ACALPINI,0.02,1181297303,Lingua-Stem-It,1]
+2010/02/04 20:05:20 ... index insert [MIYAGAWA,0.10,1265308784,HTTP-Server-Simple-PSGI,1]
+2010/02/04 20:05:22 ... index update [RA,1.02,937838787,GIFgraph_Map,1]
+2010/02/04 20:05:24 Updating BACKPAN entries
+2010/02/04 20:05:24 Updating NNTP entries
+2010/02/04 20:05:25 .. from 40023 to 40025
+2010/02/04 20:05:26 ... [40024] subject=CPAN Upload: L/LU/LUKEC/Socialtext-Resting-0.30.tar.gz
+2010/02/04 20:05:26 ... index update [LUKEC,0.30,1265307900,Socialtext-Resting,1]
+2010/02/04 20:05:26 ... [40025] subject=CPAN Upload: M/MI/MIYAGAWA/HTTP-Server-Simple-PSGI-0.10.tar.gz
+2010/02/04 21:02:43 Updating CPAN entries
+2010/02/04 21:04:30 ... index update [LEOCHARRE,1.03,1257786686,LEOCHARRE-Debug,1]
+2010/02/04 21:04:31 ... index update [DERF,0.1,1247432361,simplestore,1]
+2010/02/04 21:04:32 ... index update [HCCHIEN,0.2,1246355300,Yahoo-CAS,1]
+2010/02/04 21:04:36 ... index update [UNERA,0.6,1256198977,AProf,1]
+2010/02/04 21:04:36 ... index update [SVIEBROCK,0.01_01,1234038559,Twitter-CLI,1]
+2010/02/04 21:04:36 ... index update [SROHIT,0_01,968350622,Spice,1]
+2010/02/04 21:04:37 ... index update [SPARSONS,1.0.0,1167253247,Net-Dev-Tools-Syslog,1]
+2010/02/04 21:04:40 ... index update [PERRAD,0.62,1216217476,CORBA-XS,1]
+2010/02/04 21:04:41 ... index update [GUGU,0.04,1265310979,Test-Pod-Coverage-Permissive,1]
+2010/02/04 21:04:41 ... index update [GWILLIAMS,0.117,1265313629,RDF-Trine,1]
+2010/02/04 21:04:44 ... index update [JMMILLS,0.04,1233691808,DBIx-Class-InflateColumn-Object-Enum,1]
+2010/02/04 21:04:45 ... index update [TOBYINK,0.04,1265311260,RDF-TrineShortcuts,1]
+2010/02/04 21:04:45 ... index update [TOBYINK,1.00_01,1265311971,RDF-RDFa-Parser,1]
+2010/02/04 21:04:46 ... index update [TRIDDLE,0.0.9,1265312838,MediaWiki-DumpFile,1]
+2010/02/04 21:04:56 Updating BACKPAN entries
+2010/02/04 21:04:56 Updating NNTP entries
+2010/02/04 21:04:57 .. from 40025 to 40030
+2010/02/04 21:04:58 ... [40026] subject=CPAN Upload: G/GU/GUGU/Test-Pod-Coverage-Permissive-0.04.tar.gz
+2010/02/04 21:04:58 ... index update [GUGU,0.04,1265310960,Test-Pod-Coverage-Permissive,1]
+2010/02/04 21:04:58 ... [40027] subject=CPAN Upload: T/TO/TOBYINK/RDF-TrineShortcuts-0.04.tar.gz
+2010/02/04 21:04:58 ... index update [TOBYINK,0.04,1265311260,RDF-TrineShortcuts,1]
+2010/02/04 21:04:58 ... [40028] subject=CPAN Upload: T/TO/TOBYINK/RDF-RDFa-Parser-1.00_01.tar.gz
+2010/02/04 21:04:59 ... index update [TOBYINK,1.00_01,1265311980,RDF-RDFa-Parser,1]
+2010/02/04 21:04:59 ... [40029] subject=CPAN Upload: T/TR/TRIDDLE/MediaWiki-DumpFile-0.0.9.tar.gz
+2010/02/04 21:04:59 ... index update [TRIDDLE,0.0.9,1265312820,MediaWiki-DumpFile,1]
+2010/02/04 21:04:59 ... [40030] subject=CPAN Upload: G/GW/GWILLIAMS/RDF-Trine-0.117.tar.gz
+2010/02/04 21:04:59 ... index update [GWILLIAMS,0.117,1265313600,RDF-Trine,1]

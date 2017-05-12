@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+<<' */'=~m>>;
+
+/*
+ * How to fool readline into working with Coro
+ * Category: dirty hack
+ */
+
+use Coro;
+use Coro::Event;
+use Term::ReadLine;
+
+$|=1;
+
+my $rl = new Term::ReadLine "Coro";
+
+# fool the Term::ReadLine packages.. 
+my $stdin_ready = Coro::Event->io(fd => \*STDIN, poll => "r");
+sub Term::ReadLine::Tk::Tk_loop { $stdin_ready->next }
+sub Tk::DoOneEvent { }
+sub Term::ReadLine::Tk::register_Tk { }
+$rl->tkRunning(1);
+
+async {
+   while ($rl->readline("Enter EXIT to exit> ") ne "exit") {
+      print "not exiting yet...\n";
+   }
+   unloop;
+};
+
+async {
+   my $timer = Coro::Event->timer(after => 1, interval => 1, hard => 1);
+   while ($timer->next) {
+      print ".";
+   }
+};
+
+cede; # make sure the watchers are installed
+loop;
+

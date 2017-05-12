@@ -1,0 +1,26 @@
+bin/jmerge.bat
+bin/jmerge.pl
+bin/jmerge.sh
+bin/jwand.pl
+CHANGES
+Comskil-JIRA-00.11329.tar.gz
+Comskil-JIRA.ppd
+INSTALL
+lib/Comskil.pm
+lib/Comskil/JQueue.pm
+lib/Comskil/JQueue/POP.pm
+lib/Comskil/JServer.pm
+lib/Comskil/JWand.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

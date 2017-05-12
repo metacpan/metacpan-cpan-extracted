@@ -1,0 +1,83 @@
+[% 
+    title = "Change Profile" ;
+
+    crumb2_name = 'User' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Change Profile' ;
+%]
+
+[% IF data %]
+<div class="box">
+[% IF thanks %]<p>[% thanks %]</p>[% END %]
+<p>Fields marked * are mandatory fields and must be completed.</p>
+<p><b>Please take the time to enter your details, as it helps others to identify you when you make any
+changes to the pages on the site. Note that only the details shown in the preview at the bottom of
+the page, will be visible on the wiki.</b></p>
+</div>
+
+[% IF errmess %]
+<div class="box">
+<p class="alert">There are invalid or missing fields, as noted by the &empty; symbol.</p>
+</div>
+[% END %]
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="user-amend" />
+<div class="box">
+    <table width="100%">
+
+	<tr><th width="150">Primary Email *</th>
+        <th width="10" class="alert">[% data.email_err %]</th>
+        <td><input type="text" name="email" value="[% data.email %]" size="40" />
+        <p>Your primary email address will be your login and will be used to send you a site password.</p>
+        </td>
+    </tr>
+    <tr><th>Display Name *</th>
+        <th class="alert">[% data.realname_err %]</th>
+        <td colspan="3"><input type="text" name="realname" value="[% data.realname %]" size="40" /></td>
+    </tr>
+
+	<tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+	</table>
+</div>
+</form>
+
+<!--
+<br />
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-remove" />
+<div class="box">
+    <table width="100%">
+    <tr><td width="150">Registered Emails</td>
+        <td width="10"></td>
+        <td>[% IF data.confirmed %]
+			[% FOREACH mail = data.confirmed %]<input type="checkbox" name="LIST" value="[% mail.email %]" /> [% mail.email %]<br />[% END %]
+			<input type="submit" name="submit" value="UPDATE" />
+			[% ELSE %]n/a[% END %]</td>
+    </tr>
+	</table>
+</div>
+</form>
+
+<form method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name="act" value="tester-submit" />
+<div class="box">
+    <table width="100%">
+	<tr><td width="150">Register Email</td>
+        <td width="10" class="alert">[% data.confirm_err %]</td>
+        <td><input type="text" name="email" value="[% data.confirm %]" size="40" /></td>
+    </tr>
+
+	<tr><td colspan="2"></td><td>If you have submitted reports from multiple addresses, please confirm each in turn to be allowed to delete then from this account,</td></tr>
+	<tr><td colspan="2"></td><td><input type="submit" name="submit" value="UPDATE" /></td></tr>
+	</table>
+</div>
+</form>
+-->
+
+[% ELSE %]
+
+<div class="box"><p>User not found.</div>
+
+[% END %]

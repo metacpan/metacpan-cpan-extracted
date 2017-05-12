@@ -1,0 +1,13 @@
+Revision history for Perl extension Class::DBI::Cacheable.
+
+0.03  Sat Dec  4 21:09:46 PST 2004
+    - Added a removeCache method to explicitly remove an object
+      from the cache
+
+0.02  Thu May 20 23:17:45 PDT 2004
+    - Made the objects continue to function if, for some reason,
+      the cache directories cannot be created on disk
+
+0.01  Fri May  7 20:01:10 PDT 2004
+    - original version; created by h2xs 1.20
+

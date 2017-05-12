@@ -1,0 +1,155 @@
+NAME
+    Catalyst::Plugin::HashedCookies - Tamper-resistant HTTP Cookies
+
+VERSION
+    version 1.131710
+
+SYNOPSIS
+     use Catalyst qw/HashedCookies/;
+     MyApp->config->{hashedcookies} = {
+         key       => $secret_key,
+         algorithm => 'SHA1', # optional
+         required  => 1,      # optional
+     };
+     MyApp->setup;
+
+     # later, in another part of MyApp...
+
+     print "this cookie tastes good!\n"
+      if $c->request->valid_cookie('my_cookie_name');
+
+DESCRIPTION
+  Overview
+    When HTTP cookies are used to store a user's state or identity it's
+    important that your application is able to distinguish legitimate
+    cookies from those that have been edited or created by a malicious user.
+
+    This module allows you to determine whether a cookie presented by a
+    client was created in its current state by your own application.
+
+  Implementation
+    HashedCookies adds a keyed cryptographic hash to each cookie that your
+    application creates, and checks every client-provided cookie for a valid
+    hash.
+
+    This is done in a transparent way such that you do not need to change
+    any application code that handles cookies when using this plugin. A
+    cookie that fails to contain a valid hash will still be available to
+    your application through "$c->request->cookie()".
+
+    Two additional methods within the Catalyst request object allow you to
+    check the status (in other words, the vailidity) of your cookies.
+
+METHODS
+  Catalyst Request Object Methods
+    "$c->request->valid_cookie($cookie_name)"
+        If a cookie was successfully authenticated then this method will
+        return True, otherwise it will return False.
+
+    "$c->request->invalid_cookie($cookie_name)"
+        If a cookie failed its authentication, then this method will return
+        True, otherwise it will return False. Please read the
+        "CONFIGURATION" section below to understand what 'failed
+        authentication' really means.
+
+CONFIGURATION
+    key
+         MyApp->config->{hashedcookies}->{key} = $secret_key;
+
+        This parameter is required, and sets the secret key that is used to
+        generate a message authentication hash. Clearly, for a returned
+        cookie to be authenticated the same key must be used both when
+        setting the cookie and retrieving it.
+
+    algorithm
+         MyApp->config->{hashedcookies}->{algorithm} = 'SHA1';
+           # or
+         MyApp->config->{hashedcookies}->{algorithm} = 'MD5';
+
+        This parameter is optional, and will default to "SHA1" if not set.
+        It instructs the module to use the given message digest algorithm.
+
+    required
+         MyApp->config->{hashedcookies}->{required} = 0;
+           # or
+         MyApp->config->{hashedcookies}->{required} = 1;
+
+        This parameter is optional, and will default to 1 if not set.
+
+        If a cookie is read from the client but does not contain a
+        HashedCookies hash (i.e. this module was not running when the cookie
+        was set), then this parameter controls whether the cookie is
+        ignored.
+
+        Setting this parameter to True means that a cookie without a hash is
+        treated as if it did have a hash, and therefore the authentication
+        will fail. Setting this parameter to False means that the cookie
+        will be ignored.
+
+        When a cookie is ignored, neither "$c->request->valid_cookie()" nor
+        "$c->request->invalid_cookie()" will return True, but you can of
+        course still access the cookie through "$c->request->cookie()".
+
+DIAGNOSTICS
+    'Request for unknown digest algorithm to ...'
+        You have attempted to configure this module with an unrecognized
+        message digest algorithm. Please see the "CONFIGURATION" section for
+        the valid algorithms.
+
+    '"key" is a required configuration parameter to ...'
+        You have forgotten to set the secret key that is used to generate a
+        message authentication hash. See the "SYNOPSIS" or "CONFIGURATION"
+        section for examples of how to set this parameter.
+
+    'Attempted use of restricted ("_hashedcookies_*") value in cookie'
+        This module adds values to your cookie, and to avoid clashes with
+        your own values they are named in a special way. If you try to set a
+        cookie with values matching this special name format, your Catalyst
+        Engine's default error handler will be triggered, and the response
+        status code will be set to "500".
+
+        You cannot trap such errors because they are raised after all the
+        application code has run, but you will see the above error in your
+        log file, and your Application will certainly halt so that Catalyst
+        can display its error page.
+
+    'Please make a Request subclass for your application which isa
+    Catalyst::Request::HashedCookies'
+        In order to properly hook into Catalyst, you need a Class for the
+        Catalyst Request object which isa
+        "Catalyst::Request::HashedCookies". This error is thrown not if you
+        are using "Catalyst::Request" as the Class (this is detected and
+        worked around), but instead some 3rd party Class.
+
+        It can happen, apparently, to "Catalyst::Action::REST" users. Please
+        check the Catalyst wiki for some examples on how to fix your
+        application.
+
+DEPENDENCIES
+    Other than the natural dependencies of Catalyst and the contents of the
+    standard Perl distribution, you will need the following:
+
+    *   Digest::HMAC
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-catalyst-plugin-hashedcookies@rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Catalyst-Plugin-HashedCo
+    okies>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SEE ALSO
+    Catalyst, Digest::HMAC_SHA1, Digest::HMAC_MD5
+
+    <http://www.schneier.com/blog/archives/2005/08/new_cryptanalyt.html>
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by University of Oxford.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

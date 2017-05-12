@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 156
+name: fd9c
+registers:
+  AF: 42058
+  AF_: 0
+  BC: 16079
+  BC_: 0
+  DE: 52947
+  DE_: 0
+  HL: 26348
+  HL_: 0
+  I: 0
+  IX: 19455
+  IY: 45363
+  PC: 0
+  R: 0
+  SP: 0

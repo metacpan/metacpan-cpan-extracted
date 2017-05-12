@@ -1,0 +1,45 @@
+NAME
+    Changes - List of significant changes to Cache::Memcached::Mock
+
+  Changes in Cache::Memcached::Mock 0.07         12th August 2013
+
+      Fixed warning when trying to store an undefined value.
+        Thanks to Kurt Starsinic for reporting and the patch.
+
+  Changes in Cache::Memcached::Mock 0.06           27th July 2010
+
+      Implemented emulation of the fixed-width integer arithmetic
+        (truncate and overflow) when incrementing/decrementing.
+
+      Fixed the increment/decrement functions to not define the
+        key implicitly and to work correctly when using 0 (zero)
+        as the delta value.
+
+  Changes in Cache::Memcached::Mock 0.05           10th July 2010
+
+      Fixed code to run under perl 5.8.x. Was using '//='.
+      Documented the 'size_limit' artificial option.
+
+  Changes in Cache::Memcached::Mock 0.04           08th July 2010
+
+      Added a $VERSION, so we can express prerequisite relations.
+
+  Changes in Cache::Memcached::Mock 0.03           08th July 2010
+
+      Fixed fetching of multiple keys to conform to the interface.
+
+      Fixed storage of reference values bigger in size than the
+        (artificial) limit.
+
+  Changes in Cache::Memcached::Mock 0.02           07th July 2010
+
+      Added new methods: add(), replace(), incr(), decr(),
+        set_servers(), set_compress_threshold() and related
+        test cases.
+
+      Added mimicking of default size limit for values, through
+        a new tunable 'size_limit' constructor option.
+
+  Changes in Cache::Memcached::Mock 0.01           June 2010
+      Initial version released
+

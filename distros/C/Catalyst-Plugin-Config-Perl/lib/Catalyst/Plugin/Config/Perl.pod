@@ -1,0 +1,84 @@
+=head1 NAME
+
+Catalyst::Plugin::Config::Perl - use Panda::Config::Perl with catalyst.
+
+=head1 SYNOPSIS
+
+See L<Panda::Config::Perl> for synopsis of config files.
+
+    use Catalyst 'Config::Perl';
+
+    ...
+    
+    $cfg = $myapp->config;
+    $cfg = $myapp->cfg; # the same but much faster
+    if ($myapp->dev) { ... } # alias for $myapp->cfg->{dev}
+    
+    ...
+    
+    $c->config_reload; # read configs again
+    my $fresh_config = $c->cfg;
+
+=head1 DESCRIPTION
+
+This plugin automatically processes configs via L<Panda::Config::Perl>'s C<process> passing C<local.conf> as starting config file if
+it exists. If it doesn't, C<conf/[myapp].conf> is used.
+
+If you want other file to be used, set C<file> option of this module's config before setup phase. For example:
+
+    MyApp->config->{'Plugin::Config::Perl'}{file} = 'conf/myfile.conf'; # path is relative to the project's dir
+
+This plugin passes C<MyApp->config> as an initial config for L<Panda::Config::Perl>'s C<process>.
+
+This plugin is a new version of L<Catalyst::Plugin::ConfigLoader::MultiState>.
+
+=head1 METHODS
+
+=over
+
+=item dev
+
+Development server flag. $c->dev is true if current installation is development.
+Also available through $c->cfg->{dev}.
+
+=item cfg
+
+Fast accessor for getting config hash.
+It is 30x faster than original ->config accessor.
+
+=item config_reload
+
+Reads configs again using the same initial config as it was for the first time. Updates $c->config and $c->cfg.
+
+=item config_initial
+
+The content of $c->config before the first processing of configs. You can change it to C<reload> configs using another initial values.
+
+=item setup
+
+Called by catalyst at setup phase. Initializes config.
+
+=item finalize_config
+
+This method is called after the config file has been processed. It can be used to implement tuning of config values that can only
+be done at runtime.
+
+=back
+
+=head1 Startup perfomance
+
+    It takes about 9ms to initialize config system with 30 files (225kb summary) on Core i7 3930K.
+
+=head1 SEE ALSO
+
+L<Catalyst::Runtime>, L<Catalyst::Plugin::ConfigLoader>, L<Catalyst::Plugin::ConfigLoader::MultiState>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

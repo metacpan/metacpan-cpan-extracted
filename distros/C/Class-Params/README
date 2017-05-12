@@ -1,0 +1,154 @@
+NAME
+     Class::Params - Parameter utils for constructor.
+
+SYNOPSIS
+     use Class::Params qw(params);
+     params($self, $def_hr, $params_ar);
+
+DEFINITION FORMAT
+     There is hash with parameters.
+     internal_name => [real_name, class, possible_types, requirement]
+
+     Example:
+     'par1' => ['_par1', undef, 'SCALAR', 1],
+     'par2' => ['_par2', undef, ['SCALAR', 'HASH'], 0],
+     'par3' => ['_par3', 'Class', ['SCALAR', 'Class'], 0],
+
+SUBROUTINES
+    "params($self, $def_hr, $params_ar)"
+             Check for structure over definition and save input data to $self.
+             Parameters:
+             $self - Structure, for data save.
+             $def_hr - Definition hash ref.
+             $params_ar - Reference to array of key-value pairs.
+             Returns undef.
+
+ERRORS
+     params():
+             Bad parameter '%s' type.
+             Parameter '%s' is required.
+             Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Params qw(params);
+
+     # Definition.
+     my $self = {};
+     my $def_hr = {
+             'par' => ['_par', undef, 'SCALAR', 1],
+     };
+
+     # Check.
+     # output_structure, definition, array of pairs (key, value).
+     params($self, $def_hr, ['bad_par', 1]);
+
+     # Output:
+     # Unknown parameter 'bad_par'.
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Params qw(params);
+     use Data::Printer;
+
+     # Definition.
+     my $self = {};
+     my $def_hr = {
+             'par' => ['_par', undef, 'SCALAR', 1],
+     };
+
+     # Check.
+     # output_structure, definition, array of pairs (key, value).
+     params($self, $def_hr, ['par', 1]);
+
+     # Dump $self.
+     p $self;
+
+     # Output:
+     # \ {
+     #     _par   1
+     # }
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Params qw(params);
+
+     # Definition.
+     my $self = {};
+     my $def_hr = {
+             'par' => ['_par', 'Moo', ['ARRAY', 'Moo'], 0],
+     };
+
+     # Fake class.
+     my $moo = bless {}, 'Moo';
+
+     # Check bad 'par' parameter which has bad 'bar' scalar.
+     params($self, $def_hr, ['par', [$moo, 'bar']]);
+
+     # Output like:
+     # Bad parameter 'par' class.
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Class::Params qw(params);
+     use Data::Printer;
+
+     # Definition.
+     my $self = {};
+     my $def_hr = {
+             'par' => ['_par', 'Moo', ['ARRAY', 'Moo'], 0],
+     };
+
+     # Fake class.
+     my $moo = bless {}, 'Moo';
+
+     # Check right 'par' parameter which has array of 'Moo' objects.
+     params($self, $def_hr, ['par', [$moo, $moo]]);
+
+     # Dump $self.
+     p $self;
+
+     # Output like:
+     # \ {
+     #     _par   [
+     #         [0] Moo  {
+     #             public methods (0)
+     #             private methods (0)
+     #             internals: {}
+     #         },
+     #         [1] var{_par}[0]
+     #     ]
+     # }
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly, Scalar::Util.
+
+REPOSITORY
+    <https://github.com/tupinek/Class-Params>
+
+AUTHOR
+    Michal Špaček skim@cpan.org
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2011-2015
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

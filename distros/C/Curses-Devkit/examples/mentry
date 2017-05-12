@@ -1,0 +1,37 @@
+#!../../../perl
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Mentry Widget
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+
+#
+# Initialize Cdk.
+#
+Cdk::init();
+
+# Create the multi-line entry object.
+$mentry	= new Cdk::Mentry ('Label' => "</5>Filename: ",
+				'Width' => 20,
+				'Prows' => 5,
+				'Lrows' => 10);
+
+# Activate the object.
+my $filename = $mentry->activate();
+
+# Check the results.
+if (!defined $filename)
+{
+   popupLabel (["<C>Escape hit. No information returned."]);
+}
+else
+{
+   popupLabel (["<C>You typed in", "<C>$filename"]);
+}
+
+# Shut down Cdk.
+Cdk::end();

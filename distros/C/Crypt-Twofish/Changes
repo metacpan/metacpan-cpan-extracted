@@ -1,0 +1,42 @@
+2.16    2013-04-10      Abhijit Menon-Sen <ams@toroid.org>
+
+    * Another attempt to silence cpantesters. No functional changes.
+
+2.15    2012-09-07      Abhijit Menon-Sen <ams@toroid.org>
+
+    * Include 'strict' in PREREQ_PM to silence cpantesters. No
+      functional changes.
+
+2.14    2010-05-08      Abhijit Menon-Sen <ams@toroid.org>
+
+    * Fix inaccurate dependency in Makefile.PL
+
+2.13    2009-05-11      Abhijit Menon-Sen <ams@toroid.org>
+
+    * Relicensed on request from the old Artistic License to "the same
+      terms as Perl itself" (i.e. new Artistic/GPL).
+
+      (No functional changes.)
+
+2.12    2001-05-21
+
+    * More Makefile.PL feature-probing updates.
+
+2.10    2001-05-07
+
+    * Makefile.PL now tries to do the right thing on systems which don't
+      have <inttypes.h>.
+    * This release should work under Activeperl (thanks to Tony Cook).
+
+2.02    2001-05-04
+
+    * The module is now distributed under the Artistic License.
+
+2.00    2001-05-01  (By Abhijit Menon-Sen <ams@wiw.org>)
+
+    * Complete rewrite. The module is now Crypt::CBC compatible, has new
+      test cases, and a cleaner Twofish implementation.
+
+1.00    1999-11-08  (By Nishant Kakani)
+
+    * original version; created by h2xs 1.16

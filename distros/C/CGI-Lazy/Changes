@@ -1,0 +1,139 @@
+Revision history for Perl extension CGI::Lazy.
+1.10	-fixed bug in Recordset where it was trying to use an array for insertadditional and update additional
+	-fixed issue in Template where creation of an empty Lazy object was causing things to blow up under Strawberry Perl- didn't affect any real use, but the failure emails were getting annoying
+
+1.09	-fixed bug in Dataset radio buttons where lables weren't being populated right
+	-got religion on TDD.  Expanded test suite.  (Ok, Ok, actually wrote a test suite.  It's about time.  It's not much yet, but I'll expand on it, I promise.)  
+
+1.08	-exposed Multiple Dataset field labels to the templates.  Likely not used much, but doesn't hurt anything, and there's always that one need.
+
+1.07	-fixed some spelling and grammar issues in the POD.  Thanks to Bob McClure for spotting them.
+	-added noMinify flag to constructor.  If set to true, javascript will not be minified.  Helpful for debugging client side problems.
+
+1.06	-fixed some misleading cruft in the docs.  (old documentation that was never updated)  Thanks to Greg Jessup for spotting the problems.
+	-fixed bug where Datasets in Multi mode would insert into database in random order.  Now it inserts in the order in which you enter the data in the UI- as expected.
+	-fixed issue in Widget.pm where backslashes in form inputs would save to db, but would blow up on searches- bad escaping blew up the JSON parser.
+	-updated JSON parser to current version.  Still evals, but is safer.
+
+1.05	-Fixed bug in Session where sessions could not be explicitly terminated.  Removed need for 'expired' field in session table.  data object now sets a 'terminated' flag in the main data field.
+	-Changed handling of template and build directories so that they build off of the absolute path of the server (filesystem)  not the document root.  Leaving them in the document root exposes the templates and possible logic to the world at large.  Bad idea for security.  With them outside of the document root, the world will only see the html that's returned to the browser.
+	-Fixed Javascript.pm so that it will recursively parse contents of composite widgets for necessary javascript libraries
+	-added HTTP error code checking into ajax functions.  Will now alert if ajax request returns something other than a 200.
+	-added JSON parse error trapping to ajax fuction.  will pop a generic alert if ajax returns html rather than json due to a session timeout or redirection.
+
+1.04	-Fixed bug in Javascript.pm where pushRow was clearing out the values of checkboxes in pushRow.  Dynamically generated checkboxes returned no value whether checked or not.
+	-Fixed bug in Config.pm where paths to config file weren't building correctly.
+	-fixed bug in Recordset where insertdefaults weren't handling sql queries consistent with the rest of the API
+	-Reworked ErrorHandler so that it doesn't print to the screen.  Now it pushes the errors onto an array for later retrieval.  Also it prints errors to STDERR.  New flag added to Lazy itself to prevent this printing behavor if desired.
+	-Fixed Session so that the expired method actually calculates if the session is expired based on timestamp rather than relying on db flag which isn't always set.
+
+1.03	- Fixed bug in Boilerplate where checkbox 'checked' tmplvar wasn't populating fieldname
+	- Added Controller widget for use in Composites with Datasets.  Dataset will query based on valuse in Controller
+	- Added Support for Controller to Boilerplate
+	- Removed use warnings from all modules.
+
+1.02	- Completed Authz and Authn
+	- extended RecordSet to handle password fields for Authn
+	- Cleaned up Javascript to fix multiple issues for pushrow.
+	- Added support for Password fields in recordset.  Their values will be automatically hashed in accordance with Authn, and their values will never be selected.
+	- Fixed multiple bugs relating to webcontrols in Datasets
+
+1.01	- Fixed Boilerplate for changes from 1.00.  It was forgotten, and boilerplate objects did nothing
+	- Removed last (hopefully) references to Ajax object from pod
+	- Added to Dataset so that single datasets with webcontrols have the display values, not the values themselves show up on multiple return templates
+	- Fixed native search issues for Composite.
+	- Added more encapsulation to Javascript for dataset pushrow to deal with IE issues.  
+
+1.00	-changed Ajax class to Widget.
+	-modified Dataset so it can take an existing recordset, or just a hashref for a recordset, which will be created on the fly.
+	-likewise modded Composite so it can take data structures as well as widgets.
+	-fixed bug in Dataset where multiple search results wouldn't display properly, and wouldn't take one to a particular record.
+	-changed like and likevars to searchLike and searchLikeVars respectively to remove ambiguity.
+	-fixed bug in Dataset where multiple returns on a single dataset would, when searching for a particular primary key value, would use 'like' if searchLike was set
+	-fixed bug in checkbox handling where searches took unchecked checkboxes to be checked (updeate in Javascript.pm)
+	-added code to Recordset so unchecked checkboxes would write to db as ''
+
+0.12	-fixed Dataset to respect order of arrays or hashes sent to it for select webcontrols
+	-added sql support for select widgets in dataset
+	-added missing method to ErrorHandler to handle CSS object errors
+	-fixed bugs in CSS and Javascript modules where paths to files weren't being created correctly.
+	-fixed bug in Template where explicit slash in tmplDir property could end up doubling.
+	-updated Lazy POD
+	-fixed all modules to throw no uninitialized or redefinition warnings.
+	-renamed Auth.pm to Authn.pm
+
+0.11	-added ajax search to dataset
+	-renamed Ajax method ajaxSelect to select.  ajaxSelect method now calls select and returns JSON to web
+	-changed Composite to reflect those changes
+	-added js object of visible field names in dataset for built in ajax search.
+	-renamed multiSearchReturn in Javascript for dataset to searchReturn.  now used by both search and multiSearch.
+	-reworked Boilerplate and renamed to CGI::Lazy::Template::Boilerplate.  Now takes widgets as it's argument and builds template stubs for the widgets.
+	-added support for selects, checkboxes, and radio buttons to Dataset and Recordset, also Boilerplate
+	-fixed problem in Ajax where edited records deliberately set blank were not updateing database as such.  Insert won't insert blanks, but Update will now.
+
+0.10	-added Image and CSS modules
+	-moved jsload into Javascript module from Ajax, renamed it to just 'load'.
+	-removed redundant jswrap method from Ajax
+	-fixed typos in Boilerplate
+	-fixed header function in Lazy so can pass hash or hashref as you please
+
+0.09	-added ability to do sql binds in updateadditional and insertadditional in RecordSet
+	-added insertIds deleteIds updateIds methods to Ajax for easy retrieval of primary keys on which each operation will be performed.
+	-reworked DB.pm so gethash method takes query, id, @binds
+	-Fixed Ajax to deal with above change
+
+0.08	-updated documentation in Recordset
+	-added ability in Dataset to have multi headers in div separate from data, so a scrolling div won't lose headings on scroll
+	-fixed issue in Boilerplate where dataset, singleMulti stubs were building with text inputs, not links
+	-added ability to use binds in $recordset->where method
+
+0.07	-fixed bug in errorhandler where it was calling lazyversion incorrectly.
+	-added ajaxBlank method to Composite widget
+	-fixed bug in Composite where providing no type causes deep recursion
+	-fixed bug in Dataset where field id not set correctly causing searchMulti to bomb
+
+0.06	-removed submit from boilerplate and dataset.  not flexible enough.  add it to the template as needed
+	-changed non-external methods in Debug to return text, not print, and to print them to a div of id="debug"
+	-added ability for dataset multiple to have no headers
+	-added headings method to dataset to return tmpl vars with header strings
+	-added header tmpl to boilerplate
+	-fixed bug in Composite ParentChild for inserting records with autoincrement primary keys
+	-added get mehtod to DB for returning only a single value
+	-fixed bug in Dataset where singles couldn't insert.
+	-fixed bug in Dataset where headings method didn't have any data till after a select.
+	-fixed bug in Composite ParentChild where a search on the parent that returned no data put things into an endless loop
+
+0.05	-removed bad js call to pushRow in Boilerplate Dataset single template
+	-added some more error trapping to Javascript
+	-extended Recordset to allow for table.field if table is recordset's native table
+	-fixed bug between Ajax, Dataset, and Javascript that prevented insert of records > 9
+	-added client side javascript example for Composite, Dataset.
+	-added full Composite example to Composite.pm
+	-improved documentation of Ajax.pm
+	-extended ajaxSearch method of Ajax objects to allow for like queries.  can set like => 'liketype' to apply to web inputs or likevars => 'liketype' to do likes off of cgi vars
+	-changed children and childarray methods of Composite to members and memberarray for accuracy sake, and to prevent confusion for parent/child relationships between member widgets
+	-likewise changed Dataset property parentId to containerId
+	-added 'type' to Composite, and added type parentChild which, when set up correctly, will handle select/insert/update on member widgets based on configureation.  delete will wait for further pondering.
+
+0.04	-moved $VERSION into Lazy.pm 'cos ModPerl and Auth versions were overwriting it
+	-fixed bug in Boilerplate.pm where __WIDGETID__ tag wasn't being parsed.
+	-cleaned up deprecated code in Ajax.pm and Dataset.pm for parsing widget-specific javascript.  No real change, but build mechanism and naming convention much clearer now.
+	-added readonly mode to Dataset
+	-set Template.pm to die_on_bad_params => 0  It won't care now if you output a parameter to a template that doesn't contain that tag- will just ignore it
+
+0.03	-split Authn.pm and Authz.pm ito separate distros
+	-lowered requirements in Makefile.PL  they were unnecessarily high
+
+0.02-r3 -fixed pod formatting again.  no changes to code
+
+0.02-r2 -uploaded partial distro to CPAN  oops.
+
+0.02	Sat Aug 2
+	-reformatted POD so it will display on cpan
+	-pulled ModPerl.pm from distribution so tests pass.  ModPerl will be distributed separately
+
+0.01  Tue Jul 29 15:37:23 2008
+	- original version; created by h2xs 1.23 with options
+		-X CGI::Lazy
+	then added the real code... here goes...
+

@@ -1,0 +1,25 @@
+---
+name: CGI-Session-ID-crypt_openssl
+version: 1.02
+author:
+  - 'Helmut Weber <helmut.weber@bitbetrieb.de>'
+abstract: CGI::Session ID driver for generating IDs based on Crypt::OpenSSL::Random
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bitbetrieb/CGI-Session-ID-crypt_openssl
+build_requires:
+  CGI::Session: 4
+  Crypt::OpenSSL::Random: 0
+  Digest::MD5: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.340201
+provides:
+  CGI::Session::ID::crypt_openssl:
+    file: lib/CGI/Session/ID/crypt_openssl.pm
+    version: 1.02
+generated_by: Module::Build version 0.340201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

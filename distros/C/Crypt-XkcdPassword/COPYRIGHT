@@ -1,0 +1,72 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Crypt-XkcdPassword
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Crypt-XkcdPassword
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/crypt-random.pl
+ examples/filter-profanity.pl
+ examples/filter-spelling.pl
+ examples/filter.pl
+ examples/password-gen.pl
+ util/make_en_words.pl
+ util/make_en_words2.pl
+ util/make_it_words.pl
+Copyright: Unknown
+License: Unknown
+
+Files: Changes
+ META.json
+ META.yml
+ bin/passphrase
+ dist.ini
+ doap.ttl
+ lib/Crypt/XkcdPassword/Words.pm
+ lib/Crypt/XkcdPassword/Words/EN.pm
+ lib/Crypt/XkcdPassword/Words/EN/Roget.pm
+ lib/Crypt/XkcdPassword/Words/IT.pm
+ lib/Crypt/XkcdPassword/Words/sys.pm
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/02nonrandom.t
+ t/03filter.t
+ t/04roget.t
+Copyright: Copyright 2012 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/Crypt/XkcdPassword.pm
+Copyright: This software is copyright (c) 2012, 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Crypt/XkcdPassword/Examples.pod
+Copyright: This software is copyright (c) 2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2014 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

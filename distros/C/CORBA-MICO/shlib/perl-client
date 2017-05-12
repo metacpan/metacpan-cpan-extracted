@@ -1,0 +1,13 @@
+#!/usr/bin/perl -w
+
+use CORBA::MICO;
+
+my $orb = CORBA::ORB_init("mico-local-orb");
+my $boa = $orb->BOA_init("mico-local-boa");
+
+(@ARGV == 1) || die "Usage: perl-client address";
+
+$obj = $orb->bind ("IDL:Hello:1.0", undef, $ARGV[0]);
+$obj || die "cannot bind to $ARGV[0]\n";
+
+$obj->hello ("hello world");

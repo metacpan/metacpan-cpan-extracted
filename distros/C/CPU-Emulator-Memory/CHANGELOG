@@ -1,0 +1,18 @@
+1.1004  2017-04-12      Patch tests to make them work under perl 5.26
+
+1.1003  2012-05-27      Apply patch from Paulo Custodio to make 'size'
+                          param optional in constructors when i can be
+                          sensibly defaulted from data (RT 62381)
+
+1.1002  2010-12-26      Fix RT 62375, 62379
+
+1.1001  2008-02-28      Forgot to update version in CPU::E::M::B
+                          in previous release
+
+1.1     2008-02-28      Banked ROMs can now be read from a filehandle as
+                          well as from a file;
+                        Added dependency on perl 5.6;
+                        Added CHANGES file;
+                        Added POD tests
+
+1.0     2008-02-14      Original release

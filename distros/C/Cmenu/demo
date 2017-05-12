@@ -1,0 +1,492 @@
+#!/usr/bin/perl -w
+#
+# Last updated Time-stamp: <01/10/20 22:40:43 devel>
+#
+# Cmenu Demo
+# ---------------
+# This is a simple script to demonstrate the features and use of
+# the Cmenu module.
+
+# Packages to use
+use Curses;
+use Cmenu;
+
+# -------------------------------------------------
+# Use utility stuff to make the demo more sensible
+$numbers="none yet";
+# Colours for menu 2
+$colour[0]="Red";
+$colour[1]="Orange";
+$colour[2]="Yellow";  # initial selection
+$colour[3]="Green";
+$colour[4]="Cyan";
+$colour[5]="Blue";
+$colour[6]="Indigo";
+$colour[7]="Violet";
+$colours=2;
+# Languages for menu 3
+$language[0]="Ada";
+$language[1]="Basic";
+$language[2]="C";
+$language[3]="C++";
+$language[4]="Corba";
+$language[5]="Fortran";
+$language[6]="Pascal";
+$language[7]="Perl";
+$lang[0]=0;
+$lang[1]=0;
+$lang[2]=1;  # C is on
+$lang[3]=0;
+$lang[4]=0;
+$lang[5]=0;
+$lang[6]=0;
+$lang[7]=1;  # Perl is on
+# Data for data editing
+$data[0]="Andy";$label[0]="Forename";
+$data[1]="Ferguson";$label[1]="Surname";
+$data[2]="Croft Road";$label[2]="Street";
+$data[3]="Holywood";$label[3]="Town";
+$data[4]="BT18 0PR";$label[4]="Post code";
+$data[5]="andy\@moil.demon.co.uk";$label[5]="eMail";
+$data[6]=21;$label[6]="Age";
+$data[7]=1;$label[7]="Male";
+$data[8]=0;$label[8]="Female";
+$data[9]=0;$label[9]="Other";
+$data[10]=1;$label[10]="Beer";
+$data[11]=1;$label[11]="Wine";
+$data[12]=1;$label[12]="Spirits";
+$data[13]=1;$label[13]="Coffee";
+$data[14]=0;$label[14]="Milk";
+# -------------------------------------------------
+
+# Setup the screen to handle curses and colour
+menu_initialise("Cmenu Demonstration","Copyright andy\@moil.demon.co.uk");
+$top_item=0;           # used to remember the position of the menu selector
+
+# ---< main menu >----------------------------------------------
+do {
+
+  # Simple List
+  # -----------
+  # This is the simplest type of menu with a list of options and labels; each label
+  # has a highlight letter which can be used for quick jumps through the menu.
+  #
+  &menu_init("Main Menu","Standard menu options with Text Labels. You can use <Arrows Keys>, <Page Keys>, <Home> and <End> keys and option letters to navigate this menu. Paging only works if the menu options exceed the depth of the screen. The menu will also cope with being resized in an xterm window.<TAB> jumps over the Buttons at the bottom.");
+
+  # Create three buttons
+  # Meaning of buttons is fixed but label can be changed and individual
+  # buttons can be enabled or disabled
+  &menu_button_set(1,"Select");           # switch on a button labelled "Okay"
+  &menu_button_set(2,"Help");             # switch on a button labelled "Help"
+  &menu_button_set(3,"Exit");             # switch on a button labelled "Exit"
+  
+  # Now follows a list of menu_item calls defining menu options
+  &menu_item("Type 1 Numbered Menus",     "numbers"); 
+  &menu_item("Type 2 Radio Buttons",      "radio");
+  &menu_item("Type 3 Check List",         "check");
+  &menu_item("Type 4 Left Aligned List",  "left");
+  &menu_item("Type 5 Right Aligned List", "right");
+  &menu_item("- Splash Screens",     "splash");
+  &menu_item("Editing Functions ",   "-------",9);  # option seperator
+  &menu_item("Type 6 Edit Alpha Fields",  "alpha");
+  &menu_item("Type 7 Edit Numeric Fields","numeric");
+  &menu_item("---------------------"," ",9);        # option seperator
+  &menu_item("Type 8 A data list",        "list");
+  &menu_item("- A mixed list",       "mixer");
+
+  # Use menu_display to actual display the menu. It returns the selected option
+  chop($sel=&menu_display("Choose your option",$top_item));
+
+  # In more complicated user responses, the return value from the menu is an array
+  # of strings seperated by a control character; for this simple menu we can just
+  # drop the seperator and get the return value.
+
+  # Based on the return value, chain to a sub-menu
+ SUB_MENU: for($sel) {
+    /numbers/ && do {
+      &menu01;
+      $top_item=0;
+      last SUB_MENU;
+    };
+    /radio/ && do {
+      &menu02;
+      $top_item=1;
+      last SUB_MENU;
+    };
+    /check/ && do {
+      &menu03;
+      $top_item=2;
+      last SUB_MENU;
+    };
+    /left/ && do {
+      &menu04;
+      $top_item=3;
+      last SUB_MENU;
+    };
+    /right/ && do {
+      &menu05;
+      $top_item=4;
+      last SUB_MENU;
+    };
+    /splash/ && do {
+      &menu06;
+      $top_item=5;
+      last SUB_MENU;
+    };
+    /alpha/ && do {
+      &menu07;
+      $top_item=7;
+      last SUB_MENU;
+    };
+    /numeric/ && do {
+      &menu08;
+      $top_item=8;
+      last SUB_MENU;
+    };
+    /list/ && do {
+      &menu09;
+      $top_item=10;
+      last SUB_MENU;
+    };
+    /mixer/ && do {
+      &menu10;
+      $top_item=11;
+      last SUB_MENU;
+    };
+    /%UP%/ && do {
+      $sel="%EMPTY%";
+      last SUB_MENU;
+    };
+  };
+
+} until($sel eq "%EMPTY%");
+# ---< terminating >--------------------------------------------
+
+&menu_terminate("Reached the end safely");
+
+# ===< END >====================================================
+
+# ---< menu 01 >----------------------------------------------------
+# This is a primitive numbered menu 
+# Menu numbers are allocated automatically by the module in the order
+# items are declared
+sub menu01 {
+
+  &menu_button_set(2,"");             # switch off "Help"
+  &menu_init("Numbered List","A simple numbered list of menu options; nothing special happens here");
+
+  # Here are the list of options
+  &menu_item("First option",        "one",1);
+  &menu_item("Second option",       "two",1);
+  &menu_item("Third option",        "three",1);
+  &menu_item("Fourth option",       "four",1);
+  &menu_item("Fifth option",        "five",1);
+  &menu_item("Sixth option",        "six",1);
+  &menu_item("Seventh option",      "seven",1);
+  &menu_item("Eighth option",       "eight",1);
+  &menu_item("Splash Results",      "splash");
+
+  # Menu just returns to the main menu without doing any thing
+  chop($sel=&menu_display("Choose an Number with the Arrow keys"));
+
+  if($sel eq "splash") {
+    &menu_button_set(1,"Continue");
+    &menu_button_set(2,"");
+    &menu_button_set(3,"");
+    &menu_show("Numbers"," You last chose the <".$numbers."> option from this menu","HELP");
+  } else {
+    $numbers=$sel;
+  }
+}
+
+# ---< menu 02 >----------------------------------------------------
+# This is a Radio List
+# Only one option can be selected; this menu pre-selects the 3rd item 
+sub menu02 {
+
+  &menu_button_set(1,"Accept");       # switch on a button labelled "Help"
+  &menu_button_set(2,"");             # switch on a button labelled "Help"
+  &menu_button_set(3,"");             # switch on a button labelled "Help"
+  &menu_init("Radio List- Rainbow Colours","Radio items are toggled with the <SPACE> bar");
+
+  # Here are the option calls
+  for($i=0;$i<=7;$i++) {
+    if($i==$colours) {
+      &menu_item($colour[$i],$i,2,1);   # starting option
+    } else {
+      &menu_item($colour[$i],$i,2);
+    }
+  }
+  # Menu just returns to the main menu without doing any thing
+  $sel=&menu_display("Choose an Colour");
+  chop($sel);
+  (undef,$col)=split(/$Cmenu::menu_sep/,$sel);
+  &menu_button_set(1,"Continue");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"");
+  &menu_show("Colours","Selected colour is ".$col." ".$colour[$col]);
+  $colours=$col;
+}
+
+# ---< menu 3 >----------------------------------------------------
+# This is a check-list menu where multiple choices can be made
+# These are returned as a string of tokens
+sub menu03 {
+
+  &menu_button_set(1,"Accept");             # switch on a button labelled "Help"
+  &menu_button_set(2,"");             # switch on a button labelled "Help"
+  &menu_button_set(3,"");             # switch on a button labelled "Help"
+  &menu_init("Check List","Select which languages you use; toggle items with the SPACE bar");
+
+  # Here are the option calls
+  for($i=0;$i<=7;$i++) {
+    &menu_item($language[$i],$i,3,$lang[$i]);
+  }
+  $sel=&menu_display("Choose Languages");
+
+  # Breakout the checked options
+  @x=split(/$Cmenu::menu_sep/,$sel);
+  &menu_button_set(1,"Continue");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"");
+  if($#x<=1) {
+    &menu_show("Oops","You have selected NO langauges",ERROR);
+  } else {
+    $text=" You have selected the following languages:\n";
+    for($i=1;$i<$#x+1;$i++) {
+      $text=$text."   $x[$i] = $language[$x[$i]]\n";
+      $lang[$x[$i]]=1;
+    }
+    &menu_show("Language Selection",$text);
+  }
+}
+
+# ---< menu 4 >----------------------------------------------------
+sub menu04 {
+
+  &menu_button_set(1,"Select");             # switch on a button labelled "Help"
+  &menu_button_set(2,"");             # switch on a button labelled "Help"
+  &menu_button_set(3,"");             # switch on a button labelled "Help"
+  &menu_init("Data Fields","Lists a number of data fields, left aligned. You can press a letter to jump to a particular item");
+
+  # Here are the option calls
+  for($i=0;$i<=6;$i++) {
+    &menu_item($data[$i],$label[$i],4);
+  }
+  for($i=7;$i<=9;$i++) {
+    if($data[$i]==1) {&menu_item($label[$i],"Sex",4); }
+  }
+  &menu_item("------------","Drinks",9);
+  for($i=10;$i<=14;$i++) {
+    if($data[$i]==1) {&menu_item($label[$i],$i-9,8,$label[$i]); }
+  }
+  $sel=&menu_display("Choose a Field");
+  chop($sel);
+  if($sel eq "%EMPTY%") {
+    $sel="You pressed the <EXIT> function Key"; 
+  } else {
+    $sel="You selected the <$sel> field";
+  }
+  &menu_show("Selected Item",$sel,HELP);
+
+}
+
+# ---< menu 5 >----------------------------------------------------
+sub menu05 {
+
+  &menu_button_set(1,"Select");             # switch on a button labelled "Help"
+  &menu_button_set(2,"");             # switch on a button labelled "Help"
+  &menu_button_set(3,"");             # switch on a button labelled "Help"
+  &menu_init("Data Fields","Lists a number of data fields, right aligned. You can press a letter to jump to a particular item");
+
+  # Here are the option calls
+  for($i=0;$i<=4;$i++) {
+    &menu_item($data[$i],$label[$i],5);
+  }
+  &menu_item($data[6],$label[6],5);
+  for($i=7;$i<=9;$i++) {
+    if($data[$i]==1) {&menu_item($label[$i],"Sex",5); }
+  }
+  $sel=&menu_display("Choose a Field");
+  chop($sel);
+  if($sel eq "%EMPTY%") {
+    $sel="You pressed the <EXIT> function Key"; 
+  } else {
+    $sel="You selected the <$sel> field";
+  }
+  &menu_show("Selected Item",$sel,HELP);
+
+}
+
+# ---< menu 6 >----------------------------------------------------
+# This option does a word count on the script, holds a processing popup for a while
+#  and then displays the results
+sub menu06 {
+  &menu_button_set(1,"Accept");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"Reject");
+  &menu_popup("Counting the number of words in this script");
+  system("wc demo >yum");
+  open(IN,"<yum");
+  while(<IN>) {
+    chop;
+    ($wcl,$wcw,$wcb,$wcf)=split;
+  }
+  close(IN);
+  system("rm yum");
+  system("sleep 2");
+  $yum="\n  Line count = $wcl\n  Word count = $wcw\n  Byte count = $wcb\nfor file $wcf\n";
+  &menu_popup();
+  $yum="This is the results of calling wc on file demo although it is not formated properly it may look half decent".$yum;
+
+  # Here we show how to catch the results of a popup screen
+  $sel=&menu_show("Confirm Word-count",$yum,WARN);
+  &menu_button_set(1,"Continue");
+  &menu_button_set(3,"");
+  if($sel eq "YES") {
+    &menu_show("Word Count Accepted",$yum,HELP);
+  } else {
+    &menu_show("Word Count Rejected",$yum,ERROR);
+  }
+}
+
+# ---< menu 7 >----------------------------------------------------
+sub menu07 {
+
+  &menu_button_set(1,"Edit or Accept");
+  &menu_button_set(2,"Help");
+  &menu_button_set(3,"Accept");
+  &menu_init("Edit Alpha Fields","Lists a number of data fields, left aligned. You can press a letter to jump to a particular item. Alphabetic fields can be edited","edit.txt");
+
+  # Here are the option calls
+  for($i=0;$i<=6;$i++) {
+    if($i==6) {
+      &menu_item($data[$i],$label[$i],4);
+    } else {
+      &menu_item($data[$i],$label[$i]." (edit)",6,$i,"25 0 0 ");
+    }
+  }
+  $sel=&menu_display("Editing Text Fields");
+  &menu_button_set(1,"Continue");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"");
+  @x=split(/$Cmenu::menu_sep/,$sel);
+  if($#x==0) {
+    &menu_show("No fields Changed","No fields have been changed",ERROR);
+  } else {
+    $text="Text fields have been amended\n";
+    for($i=1;$i<=$#x;$i++) {
+      # Breakout field label and new data
+      ($field,$newdata)=split(/$Cmenu::menu_sepn/,$x[$i]);
+      $text=$text."  Field $field $label[$field] set to <$newdata>\n";
+      $data[$field]=$newdata;
+    }
+    $text=$text."  Field 6 $label[6] remains unchanged as $data[6]";
+    &menu_show("Data edited",$text,WARN);
+  }
+}
+
+# ---< menu 8 >----------------------------------------------------
+sub menu08 {
+
+  &menu_button_set(1,"Edit or Accept");
+  &menu_button_set(2,"Help");
+  &menu_button_set(3,"Accept");
+  &menu_init("Edit Numeric Fields","Lists a number of data fields, left aligned. You can press a letter to jump to a particular item. The Age field is numeric and can be edited","edit.txt");
+
+  # Here are the option calls
+  for($i=0;$i<=6;$i++) {
+    if($i==6) {
+      &menu_item($data[$i],$label[$i]." (edit)",7,$i,"3 0 0 ");
+    } else {
+      &menu_item($data[$i],$label[$i],4);
+    }
+  }
+  $sel=&menu_display("Editing Numeric Fields");
+  @x=split(/$Cmenu::menu_sep/,$sel);
+  &menu_button_set(1,"Continue");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"");
+  if($#x==0) {
+    &menu_show("No fields Changed","No fields have been changed",ERROR);
+  } else {
+    $text="Numeric fields have been amended \n";
+    for($i=1;$i<=$#x;$i++) {
+      # Breakout field label and new data
+      ($field,$newdata)=split(/$Cmenu::menu_sepn/,$x[$i]);
+      $text=$text."  Field $field $label[$field] <$newdata>\n";
+      $data[$field]=$newdata;
+    }
+    &menu_show("Data edited",$text,WARN);
+  }
+
+}
+
+# ---< menu 9 >----------------------------------------------------
+sub menu09 {
+
+  &menu_button_set(2,"");             # switch off "Help"
+  &menu_init("Data Offset List","Lists a number of data fields, left alighned. You can press a letter to jump to a particular item. The values returned from this menu are a numeric reference rather than a text label");
+
+  # Here are the option calls
+  for($i=0;$i<=7;$i++) {
+    &menu_item($data[$i],$label[$i],8,$i);
+  }
+  $sel=&menu_display("Choose an Item");
+  chop($sel);
+  if(($sel eq "%EMPTY%")||($sel eq "%UP%")) {
+    &menu_show("Results","Menu type 8 returns an offset marker for the menu item selected rather than the label used in other types. This is useful for displaying data from databases where the label may be used to describe the text while the offset is a pointer to a record in a database\nIn this case you have pressed the <EXIT> function key which returns no data!",HELP);
+  } else {
+    &menu_show("Results","Menu type 8 returns an offset marker for the menu item selected rather than the label used in other types. This is useful for displaying data from databases where the label may be used to describe the text while the offset is a pointer to a record in a database\nIn this case you have selected option $sel where\n    Label    = $label[$sel]\n    Data     = $data[$sel]\nand Offset   = $sel\n",HELP);
+  }
+
+}
+
+# ---< menu 10 >---------------------------------------------------
+# Demonstrates a mizture of item types in theone menu
+sub menu10 {
+
+  &menu_button_set(1,"Accept");
+  &menu_button_set(2,"");
+  &menu_button_set(3,"");
+  &menu_init("Mixed Items","Lists a number of data fields with a radio and a check list. You can press a letter to jump to a particular item");
+
+  # Here are the option calls
+  for($i=0;$i<=5;$i++) {
+    &menu_item($data[$i],$label[$i],4);
+  }
+  &menu_item("what is their sex?","Sex",9);
+  for($i=7;$i<=9;$i++) {
+    &menu_item($label[$i],$i,2,$data[$i]);
+  }
+  &menu_item("what is their preference?","Drinks",9);
+  for($i=10;$i<=14;$i++) {
+    &menu_item($label[$i],$i,3,$data[$i]);
+  }
+  
+  &menu_item($data[6],$label[6],4);
+  $sel=&menu_display("Choose a Field");
+
+  # Deal with data reurned
+  @x=split(/$Cmenu::menu_sep/,$sel);
+  $text="Text and Numeric fields remain untouched, but Radio and Checklist items may have changed\n";
+  for($i=7;$i<=14;$i++) {
+    # toggle of switches of
+    $data[$i]=0;
+  }
+  for($i=1;$i<=$#x;$i++) {
+    if(($x[$i]>=7)&&($x[$i]<=9)) {
+      # caught a radio label
+      $data[$x[$i]]=1;
+      $text=$text."  Radio button <$label[$x[$i]]> has been toggled on\n";
+    }
+    if($x[$i]>9) {
+      # caught a checked item
+      $data[$x[$i]]=1;
+      $text=$text."  Check list item <$label[$x[$i]]> has been toggled on\n";
+    }
+  }
+  $text=$text."Only one Radio list and one Check list permitted per menu!\ntext and numeric data fields could have been edited on the menu too.";
+  &menu_show("Results",$text,HELP);
+}
+

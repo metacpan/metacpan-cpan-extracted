@@ -1,0 +1,2 @@
+Crypt::OpenBSD::Blowfish			T_PTROBJ
+blf_ctx *					T_PTROBJ

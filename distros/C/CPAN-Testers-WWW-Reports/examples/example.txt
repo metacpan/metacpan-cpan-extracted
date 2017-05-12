@@ -1,0 +1,21 @@
+To see examples for this distribution, it is recommended you look in the 
+following directories:
+
+* ./vhost/cgi-bin
+* ./vhost/toolkit
+
+In these directories are the scripts used to run the CPAN Testers Reports
+website. Not just the main CGI scripts, but also the various scripts to help
+create and manage the site.
+
+I may add further examples should the need ever arise. If you have any example
+scripts that use the distribution in an unusual way or make good use of all the
+features available, please feel free to submit one. If submitting an example
+script, please sure to include the following in your POD:
+
+* Author
+* License
+* Copyright
+
+Thanks,
+Barbie.

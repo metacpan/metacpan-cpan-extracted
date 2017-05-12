@@ -1,0 +1,55 @@
+0.18 Sep 2 2009
+* fixed the source code repos in the POD. now we use the following
+  git repos:
+     http://github.com/agentzh/cookiexs/
+
+0.17 Sep 2 2009
+* fixed a parser bug when variables take empty values like "foo=",
+  reported and fixed by Colin Keith (rt.cpan.org #49302)
+
+0.16 Sep 12 2008
+* Fixed an issue in POD.
+
+0.15 Sep 11 2008
+* Some minor optimization (";" is never actually used to separate multiple values for a single key).
+* Added Filter::Util::Call to the dependency list.
+
+0.14 Sep 10 2008
+* Carefully reviewed the old implementation and gave it a massive rewrite.
+* Fixed the issue in #39120
+* Fixed a lot of incompatibilities with the latest CGI::Cookie.
+
+0.13 Arg 4 2008
+* Fixed the module name in the test suite; we now use CGI::Cookie::XS, rather than Cookie::XS.
+
+0.12 Arg 4 2008
+* Fixed a typo in the POD.
+
+0.11 Aug 4 2008
+* Renamed the module to CGI::Cookie::XS.
+
+0.10 Aug 4 2008
+* Put a notice saying that Cookie::XS is deprecated; one should use CGI::Cookie::XS instead.
+
+0.09 Mar 24 2008
+* Enabled the tests in 99-pod-coverage.t.
+
+0.08 Mar 20 2008
+* Fixed the foo=ba=r bug reported by RT #34238.
+* Fixed a stack overflow when input cookies are too big.
+* Added a lot of stuff to the POD documentation.
+* Cleaned up the XS code a bit.
+
+0.07 Mar 6 2008
+* Fixed "const char*" in XS.xs to make it parsable by perl 5.6.x
+
+0.06 Mar 3 2008
+* Fixed the duplicate BUGS section in the POD.
+* Fixed the version number in META.yml.
+
+0.05 Mar 3 2008
+* Fixed a lot of typos in the POD.
+
+0.04 Mar 3 2008
+* initial CPAN release
+

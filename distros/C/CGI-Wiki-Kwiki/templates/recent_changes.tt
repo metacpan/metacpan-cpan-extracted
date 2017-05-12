@@ -1,0 +1,50 @@
+[%# The recent changes page
+-%]
+
+[%- INCLUDE header.tt node_name = "Recent Changes" %]
+
+<h1>[% site_name %] - Recent Changes</h1>
+
+[% content %]
+
+[% BLOCK changes %]
+  <ul>
+  [% FOREACH node = nodes %]
+    <li><a href="[% node.url %]">[% node.name %]</a>
+        [% node.last_modified %]
+        (<a href="[% node.url %];action=list_all_versions">see changes</a>)
+        [% IF node.edit_type %]
+          <i>([% node.edit_type %])</i>
+        [% END %]
+        [% IF node.comment %]
+          <b>[[% node.comment %]]</b>
+        [% END %]
+        [% IF node.username %]
+          ..... <a href="[% cgi_url %]?username=[% node.username %];action=userstats">[% node.username %]</a>
+        [% END %]
+    </li>
+  [% END %]
+  </ul>
+[% END %]
+
+[% IF recent_changes.1 %]
+  <h2>Pages changed in the last 24 hours:</h2>
+  [% INCLUDE changes nodes = recent_changes.1 %]
+[% END %]
+
+[% IF recent_changes.7 %]
+  <h2>Pages changed in the last week:</h2>
+  [% INCLUDE changes nodes = recent_changes.7 %]
+[% END %]
+
+[% IF recent_changes.14 %]
+  <h2>Pages changed in the last fortnight:</h2>
+  [% INCLUDE changes nodes = recent_changes.14 %]
+[% END %]
+
+[% IF recent_changes.30 %]
+  <h2>Pages changed in the last 30 days:</h2>
+  [% INCLUDE changes nodes = recent_changes.30 %]
+[% END %]
+
+[% INCLUDE footer.tt %]

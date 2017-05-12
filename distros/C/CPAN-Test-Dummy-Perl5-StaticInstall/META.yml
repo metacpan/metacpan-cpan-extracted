@@ -1,0 +1,31 @@
+---
+abstract: 'Dummy CPAN distribution with x_static_install metadata'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Test-Dummy-Perl5-StaticInstall
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-StaticInstall/issues
+  homepage: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-StaticInstall
+  repository: https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-StaticInstall.git
+version: '0.01'
+x_static_install: '1'

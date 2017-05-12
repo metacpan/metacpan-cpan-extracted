@@ -1,0 +1,299 @@
+Revision history for Perl extension Class::Prototyped
+
+1.13  Wed Aug 28 2013
+ - Added version numbers to sub-packages to eliminate PAUSE indexer issues.
+
+1.12  Thu Aug 22 2013
+ - Updated test suite to use getSlots(undef, 'rotated') to resolve issues with
+   5.18 due to the introduction of hash order randomization.
+
+1.11  Tue Dec 18 2007
+ - Fixed error in synopsis (C::P->new is correct, C::P::new isn't).  Thanks
+   to Matthew Browning.
+ - Added @$isa=@$isa changes to workaround @ISA issues in 5.10.0.
+
+1.10  Tue Mar 15 2005
+ - Merlyn strongly suggested that I unify the behavior of new() for named
+   classes and un-named objects.  After much discussion, I concurred.  This
+   is a BACKWARDS INCOMPATIBLE change.  Hopefully it will not affect too
+   much code.  In 1.01, calling new() on an un-named object was identical
+   to calling Class::Prototyped->new().  In 1.10, calling new() on an
+   un-named object ALSO adds 'class*' as a slot pointing to the original
+   object.  This also necessitated a change to clone.
+ - Two new Class::Prototyped methods are added: clonePackage (a cross between
+   clone and newPackage) and newCore (implements core object instantiation
+   behavior).  If you implement either method in any of your Class::Prototyped
+   code, there will be problems!
+ - Fixed a bug in Class::Prototyped::Mirror::Normal::new that affected
+   superable calls to C::P objects following reflection on a non-C::P object
+   blessed into a C::P class.
+
+1.01  Sat Mar 20 2004
+ - Now using create_makefile_pl => 'traditional' because passthrough
+   doesn't seem to work with subclassing (Thanks merlyn for reporting this)
+
+1.00  Sat Mar 20 2004
+ - Now using Module::Build!
+ - Now generating PPMs as well!
+ - Long live Module::Build!
+
+0.98  Mon Jan 19 2004
+ - Distribution updated to migrate Class directory into lib and update
+   Manifest and Makefile.pl.
+
+0.97  Mon Sep 22 2003
+ - Slot attribute 'profile' modified to support recording
+   calling location.
+
+0.96  Tue Sep 16 2003
+ - More POD changes and updates
+
+0.95  Mon Sep 8 2003
+ - Minor changes to POD
+ - Minor changes to test code
+
+0.94  Thu Jan 9 2003 (not released)
+ - Rationalized and codified attribute support
+ - Moved addSlots parsing/checking code into separate method from
+   implementation, thus eating up a good chunk of the optimizations.
+   On the other hand, this improved the handling of error conditions
+   in addSlots and exposes the parsing to external code.  In addition,
+   implementation of slots was moved into separate method so that the
+   slots could be parsed, then modified in parsed form, and then passed
+   to the implementor.
+ - Cleared up bug that caused infinite recursion when non-C::P structured
+   objects that inherit from C::P from call $self->reflect->super().  Using
+   reflect on objects (not classes) that are not C::P structured is still
+   fraught with peril, but super is at least safe.
+ - Added support for defaultAttributes.
+ - Unfortunately, we lost the performance battle.  Package creation is
+   running slightly faster than in 0.90.  Package instantion from subs is
+   running much faster.  addSlots, however, is running around 20% slower
+   (it's a hard call because there are both constant and proportional terms).
+   Individual calls appear to be slightly faster, but each slot handled in
+   the call appears to be somewhat slower.  All in all, the optimizations
+   applied have managed to keep in check the performance hits from all of the
+   added functionality.
+ - Added support for FIELD attribute 'autoload' (i.e. FIELD slots that are
+   initialized with a subroutine reference - the first access to the FIELD
+   slot causes the subroutine to be executed).  Tied interface access to
+   these slots is _not_ supported for the first call.
+ - Added support for the FIELD attribute 'wantarray'.  This looks at the
+   wantarray value to determine whether to unwrap an array reference and
+   return it as a list.
+ - Added incomplete support for the METHOD attribute 'profile'.  This
+   keeps track of the number of calls to this method in a C::P::Mirror
+   global.
+
+0.93  Mon Jan 6 2003 (not released)
+ - Lots of attempted and somewhat successful optimizations
+ - Addition of :NO_CHECK import option that eliminates additional checks
+   in order to improve performance
+ - More work remains to be done in this area - packages are expensive, and
+   any work that can be done to optimize this would be advantageous.
+
+0.92  Fri Jan 3 2003 (not released)
+ - Added support for extended slot syntax via anonymous arrays for addSlots
+ - Migrated trailing character support (second * for parent slots,
+   ! on methods, & on fields) to use slot attributes.  First two
+   notations maintained for backward compatibility, but deprecated.
+ - Defined optimizations for extended slot syntax
+ - Updated tests and documentation to use extended slot syntax
+ - Updated getSlot to use extended slot syntax
+ - Added support to getSlot for format parameter
+ - Moved Carp::Croak lines to head of addSlots so object remains unchanged
+
+0.91  Sun Dec 29 2002 (not released)
+ - Added support for constant field slots using trailing & notation
+ - Added tiedInterfacePackage to C::P::M
+ - Modified C::P::new to respect return value of tiedInterfacePackage
+ - tiedInterfacePackage is now read/write!
+ - :TIED_INTERFACE is being removed (good riddance!)
+ - tiedInterfacePackage is inherited when class packages are objectified
+ - Oodles of tests on the new tied interface support
+ - Tests for the new constant field slot support
+
+
+0.90  Wed Dec 18 2002
+ - Moved addition of DESTROY symbol table entry in newPackage into
+   code guarded by check for PREFIXED package name
+ - Created $parent_DESTROY search code that looks for DESTROYs that
+   aren't clones of C::P::DESTROY
+ - Modified destroy and DESTROY so that parent slots aren't deleted
+   until the destruction sequence on an object is complete
+ - Updated destroy.t to include parent** slots, more explicit scope
+   ordering (which fixed test variations related to changes in the
+   order in which lexicals exit scope), as well as use of field slots
+ - Added more tests to super.t
+ - Code passes all tests under:
+   ActivePerl 804 (based on v5.8.0)
+   ActivePerl 633 (based on v5.6.1)
+   ActivePerl 517 (based on v5.005_03)
+ - Incremented version number to 0.90 to reflect code maturity level
+
+
+0.11 (released 7/14/01) and prior:
+
+RCS file: /usr/local/cvsroot/perl/Class/Prototyped/Class/Prototyped.pm,v
+Working file: Class/Prototyped.pm
+head: 1.36
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 36;	selected revisions: 36
+description:
+----------------------------
+revision 1.36
+date: 2001/07/15 01:05:37;  author: ned;  state: Exp;  lines: +5 -1
+added credit for chromatic
+----------------------------
+revision 1.35
+date: 2001/07/15 01:05:08;  author: ned;  state: Exp;  lines: +13 -7
+More changes for DESTROY/import problems under 5.005 by chromatic
+----------------------------
+revision 1.34
+date: 2001/07/15 00:54:27;  author: ned;  state: Exp;  lines: +43 -20
+5.005_03 changes by chromatic and ned
+----------------------------
+revision 1.33
+date: 2001/07/13 00:09:57;  author: ned;  state: Exp;  lines: +78 -33
+Toby's bug fixes, added findImplementation
+----------------------------
+revision 1.32
+date: 2001/07/12 01:10:47;  author: ned;  state: Exp;  lines: +69 -36
+Added Data::Dumper support.
+----------------------------
+revision 1.31
+date: 2001/07/12 00:59:10;  author: ned;  state: Exp;  lines: +20 -18
+More changes and bug fixes
+----------------------------
+revision 1.30
+date: 2001/07/11 22:27:37;  author: ned;  state: Exp;  lines: +216 -203
+With changes for reflection of anything,
+detecting odd numbers of args to addSlots,
+auto-numbering parent slots.
+----------------------------
+revision 1.29
+date: 2001/07/11 19:24:32;  author: ned;  state: Exp;  lines: +19 -17
+Moved lexicals into globals
+----------------------------
+revision 1.28
+date: 2001/07/11 19:15:28;  author: ned;  state: Exp;  lines: +5 -2
+changed version number
+----------------------------
+revision 1.27
+date: 2001/07/11 19:15:05;  author: ned;  state: Exp;  lines: +15 -11
+Made sure that we don't pollute symbol tables.
+----------------------------
+revision 1.26
+date: 2001/07/11 19:02:23;  author: ned;  state: Exp;  lines: +19 -10
+Fixed problems with include and vivification
+----------------------------
+revision 1.25
+date: 2001/07/11 18:04:16;  author: ned;  state: Exp;  lines: +5 -2
+added =back
+----------------------------
+revision 1.24
+date: 2001/07/11 17:49:20;  author: ned;  state: Exp;  lines: +6 -2
+Added Toby's blessed hash tie work
+----------------------------
+revision 1.23
+date: 2001/07/11 16:41:59;  author: ned;  state: Exp;  lines: +632 -208
+More edits from Toby for adding tied-hash capability.
+Whew! major rework, again...
+----------------------------
+revision 1.22
+date: 2001/07/11 05:05:00;  author: ned;  state: Exp;  lines: +22 -9
+More edits
+----------------------------
+revision 1.21
+date: 2001/07/10 17:05:49;  author: ned;  state: Exp;  lines: +8 -3
+Fixed a couple of class reflection bugs
+----------------------------
+revision 1.20
+date: 2001/07/10 03:34:48;  author: ned;  state: Exp;  lines: +37 -15
+Added debugging for global destruction
+----------------------------
+revision 1.19
+date: 2001/07/10 02:11:07;  author: ned;  state: Exp;  lines: +8 -6
+fixed typos made by Ned
+----------------------------
+revision 1.18
+date: 2001/07/10 02:05:28;  author: ned;  state: Exp;  lines: +465 -214
+Much more work by Toby.
+----------------------------
+revision 1.17
+date: 2001/07/09 04:47:32;  author: ned;  state: Exp;  lines: +160 -44
+Fix clones and super methods;
+autovivification of classes after includes.
+----------------------------
+revision 1.16
+date: 2001/07/08 23:54:14;  author: ned;  state: Exp;  lines: +26 -12
+Fixed POD
+----------------------------
+revision 1.15
+date: 2001/07/08 23:43:18;  author: ned;  state: Exp;  lines: +111 -38
+(toby) Added super method to ::Mirror and :EZACCESS
+(ned) Added explanation of super, include to POD
+Cleaned up croak messages
+Do not do include if we have a symbol table
+rename _include as include so it's public
+----------------------------
+revision 1.14
+date: 2001/07/08 19:49:27;  author: ned;  state: Exp;  lines: +26 -49
+Fixed POD docs
+----------------------------
+revision 1.13
+date: 2001/07/08 19:31:25;  author: ned;  state: Exp;  lines: +43 -35
+More debugging
+----------------------------
+revision 1.12
+date: 2001/07/08 18:23:37;  author: ned;  state: Exp;  lines: +11 -3
+added :REFLECT back in
+----------------------------
+revision 1.11
+date: 2001/07/08 18:16:14;  author: ned;  state: Exp;  lines: +6 -3
+Fixed reflect on classes
+----------------------------
+revision 1.10
+date: 2001/07/08 18:09:04;  author: ned;  state: Exp;  lines: +15 -8
+Added reflect to CORE::GLOBAL, changed :REFLECT to :EZACCESS
+----------------------------
+revision 1.9
+date: 2001/07/08 16:16:55;  author: ned;  state: Exp;  lines: +39 -45
+bug fixes, fixed overloading
+----------------------------
+revision 1.8
+date: 2001/07/08 07:41:34;  author: ned;  state: Exp;  lines: +208 -193
+Initial work by Ned on Toby's stuff.
+----------------------------
+revision 1.7
+date: 2001/07/08 02:59:26;  author: ned;  state: Exp;  lines: +259 -226
+Perltidy --tabs --indent-columns=4 -pt=1 -bt=1 -sbt=1 -nbl
+----------------------------
+revision 1.6
+date: 2001/07/08 02:25:58;  author: ned;  state: Exp;  lines: +394 -191
+Second rev from Toby, with POD
+----------------------------
+revision 1.5
+date: 2001/07/08 02:17:46;  author: ned;  state: Exp;  lines: +301 -297
+First rev from Toby
+----------------------------
+revision 1.4
+date: 2001/07/06 19:43:35;  author: ned;  state: Exp;  lines: +148 -101
+Added better test routines; got fields working right.
+Fixed DESTROY (was not destroying symbol tables).
+----------------------------
+revision 1.3
+date: 2001/07/06 04:46:19;  author: ned;  state: Exp;  lines: +58 -27
+added ability to overload ref to provide "parent". Not sure this is useful yet. Also added class field pointing back at package for efficiency.
+----------------------------
+revision 1.2
+date: 2001/07/06 00:49:36;  author: ned;  state: Exp;  lines: +140 -29
+Made Data::Dumping work; removed memory leak.
+----------------------------
+revision 1.1
+date: 2001/07/05 22:27:47;  author: ned;  state: Exp;
+Initial revision

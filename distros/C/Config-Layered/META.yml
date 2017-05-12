@@ -1,0 +1,23 @@
+---
+abstract: 'Layered config from files, command line, and other sources.'
+author:
+  - '=over 4'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Layered
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Any: 0
+  Getopt::Long: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000003

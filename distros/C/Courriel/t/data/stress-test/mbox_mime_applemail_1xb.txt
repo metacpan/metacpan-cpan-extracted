@@ -1,0 +1,169 @@
+From tomcat-user-return-85601-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Wed Dec 03 23:53:48 2003
+Return-Path: <tomcat-user-return-85601-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 16677 invoked from network); 3 Dec 2003 23:53:48 -0000
+Received: from daedalus.apache.org (HELO mail.apache.org) (208.185.179.12)
+  by minotaur-2.apache.org with SMTP; 3 Dec 2003 23:53:48 -0000
+Received: (qmail 89276 invoked by uid 500); 3 Dec 2003 23:52:57 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 89252 invoked by uid 500); 3 Dec 2003 23:52:57 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 89239 invoked from network); 3 Dec 2003 23:52:56 -0000
+Received: from unknown (HELO sccrmhc11.comcast.net) (204.127.202.55)
+  by daedalus.apache.org with SMTP; 3 Dec 2003 23:52:56 -0000
+Received: from [192.168.0.198] (c-67-162-133-54.client.comcast.net[67.162.133.54])
+          by comcast.net (sccrmhc11) with SMTP
+          id <2003120323530201100i4rhke>; Wed, 3 Dec 2003 23:53:03 +0000
+In-Reply-To: <3FCE6FDC.4040304@cyberspaceroad.com>
+References: <D11FD8AE7B15D64285EA3A41DFCCFFB19B2713@HORIZON2.horizon-asset.co.uk> <A40A3E5E-25CE-11D8-9774-000A958E58CC@raibledesigns.com> <3FCE6FDC.4040304@cybers
+paceroad.com>
+Mime-Version: 1.0 (Apple Message framework v606)
+Content-Type: multipart/signed; micalg=sha1; boundary=Apple-Mail-2--153422392; protocol="application/pkcs7-signature"
+Message-Id: <CFFAB8F8-25EB-11D8-B07E-000A958E58CC@raibledesigns.com>
+Cc: Tomcat Users List <tomcat-user@jakarta.apache.org>
+From: Matt Raible <matt@raibledesigns.com>
+Subject: Re: servlet sendRedirect() to j_security_check problem (remember me)
+Date: Wed, 3 Dec 2003 16:52:54 -0700
+To: Adam Hardy <ahardy.struts@cyberspaceroad.com>
+X-Mailer: Apple Mail (2.606)
+X-Spam-Rating: daedalus.apache.org 1.6.2 0/1000/N
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+--Apple-Mail-2--153422392
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+        charset=US-ASCII;
+        format=flowed
+
+It's standard container managed security stuff - I first invoke a
+protected URL - in index.jsp - I redirect to mainMenu.do - and *.do is
+protected.  Based on security constraints in web.xml, I'm presented
+with a form-login-page "login.jsp" - rather than having
+action="j_security_check" in this form, I have
+action="/security/authorize" - which is mapped to my own LoginServlet.
+In the LoginServlet, I encrypt the password (optionally based on an
+init-parameter), set some cookies and do an HTTP Post to
+j_security_check.  Works on Tomcat 4-5 and Resin 3.x.
+
+Matt
+
+On Dec 3, 2003, at 4:21 PM, Adam Hardy wrote:
+
+> Matt,
+> are you really managing to post a form to j_security_check without
+> invoking it first, or is that some sort of black magic you've cooked
+> up?
+>
+> Or have I just misunderstood what Chris said?
+>
+> Adam
+>
+> On 12/03/2003 09:24 PM Matt Raible wrote:
+>> Chris,
+>> I found your post at
+>> http://www.mail-archive.com/tomcat-user%40jakarta.apache.org/
+>> msg111700.html and I'm cc'ing the list in case anyone else is
+>> interested in this info (I'm not subscribed).
+>> I've actually improved the "Remember Me" feature a fair amount since
+>> I  posted to the Tomcat User list.  The sendRedirect works, however,
+>> it  (in some browsers) puts the URL (with password) into the address
+>> bar.   This isn't a big deal IMO since it's the user that just logged
+>> in and  they don't mind seeing their own passwords.  However, the URL
+>> tends to  show up in server log files which can be a security hole.
+>> Because of  this, I changed to using an HTTP Post with Jakarta
+>> Common's HttpClient.   I also moved my form-login-page and
+>> form-error-page into a "security"  folder and then set my cookies for
+>> the /appname/security path rather  than / - this makes it so the
+>> user/pass cookies are more secure and can  only be retrieved when
+>> logging in, rather than for any URL in the site.
+>> That being said, I've updated one of my sample apps with these
+>> changes  and you can download it if you'd like:
+>> http://raibledesigns.com/wiki/Wiki.jsp?page=AppFuse
+>> Here's my updated LoginServlet that does an Http Post instead of a
+>> Get:
+>> http://tinyurl.com/xl80
+>> HTH,
+>> Matt
+>> On Dec 3, 2003, at 12:52 PM, Chris Ward wrote:
+>>>
+>>> Hi Matt,
+>>>
+>>> Sorry for sending unsolicited email but I've been looking at some
+>>> of your postings to Tomcat-User and wondered if I could ask a
+>>> couple of questions.  I've tried posting to list but had no response
+>>> from anyone there.
+>>>
+>>> Specifically, it's regarding your "remember me" login stuff.  If this
+>>> is a pain feel free to ignore this email.
+>>>
+>>>
+>>> Best regards
+>>> Chris
+>>>
+>>> p.s. My question the list was under the subject
+>>> "servlet sendRedirect() to j_security_check problem"
+>
+>
+> --
+> struts 1.1 + tomcat 5.0.14 + java 1.4.2
+> Linux 2.4.20 RH9
+
+--Apple-Mail-2--153422392
+Content-Transfer-Encoding: base64
+Content-Type: application/pkcs7-signature;
+        name=smime.p7s
+Content-Disposition: attachment;
+        filename=smime.p7s
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIGIDCCAtkw
+ggJCoAMCAQICAwsccTANBgkqhkiG9w0BAQQFADBiMQswCQYDVQQGEwJaQTElMCMGA1UEChMcVGhh
+d3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFsIEZyZWVt
+YWlsIElzc3VpbmcgQ0EwHhcNMDMxMTA5MTczNDEyWhcNMDQxMTA4MTczNDEyWjBIMR8wHQYDVQQD
+ExZUaGF3dGUgRnJlZW1haWwgTWVtYmVyMSUwIwYJKoZIhvcNAQkBFhZtYXR0QHJhaWJsZWRlc2ln
+bnMuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAla58rYCRWEPkVegsRQWT44kB
+5t4xQFt0YijF8TilOATYUF6IDuBFYvdR7JYYYqYu1V5lQaVtWSIRq76ZCyeuN3e2A/pC1gDNbgQa
+XSpMMdHBM0lBGYv4XHRj3HG5r9La2b1lVBjn46hxcVx3FLtqx0EY305gO/Mi5IbQPzJTaEaxZkeK
+aVa3lid+RoFR4wWFJFa/gk4IapgnnB8S3qSILiYzlatlnmINEePIMLB0plJqTQQkTZikp8ThR/rA
+N5vTyp+79AKaJaE60Qd+TyuvuxxVMqeFxvw2zgDMpVjtKXEgzttxFMhFyaZTEFV3YY1ZjAvSIOnz
+CtTbeJm2eib8nQIDAQABozMwMTAhBgNVHREEGjAYgRZtYXR0QHJhaWJsZWRlc2lnbnMuY29tMAwG
+A1UdEwEB/wQCMAAwDQYJKoZIhvcNAQEEBQADgYEAeupTLdOtmAOhwqaDNPLbcwHV62WnTejaox0p
+qoYnM5A+LTMKVUPmwetnYeeJX30cRvRbzgtoecTHotCnogdv2LGja+X+ydqb6fZW4XKu8gOFJMM+
+ikS+NwaWQR7hV0yIlfFhy/IjKLdXRi0rMIHwFfbRnwO95wz2BWGYs5saf+4wggM/MIICqKADAgEC
+AgENMA0GCSqGSIb3DQEBBQUAMIHRMQswCQYDVQQGEwJaQTEVMBMGA1UECBMMV2VzdGVybiBDYXBl
+MRIwEAYDVQQHEwlDYXBlIFRvd24xGjAYBgNVBAoTEVRoYXd0ZSBDb25zdWx0aW5nMSgwJgYDVQQL
+Ex9DZXJ0aWZpY2F0aW9uIFNlcnZpY2VzIERpdmlzaW9uMSQwIgYDVQQDExtUaGF3dGUgUGVyc29u
+YWwgRnJlZW1haWwgQ0ExKzApBgkqhkiG9w0BCQEWHHBlcnNvbmFsLWZyZWVtYWlsQHRoYXd0ZS5j
+b20wHhcNMDMwNzE3MDAwMDAwWhcNMTMwNzE2MjM1OTU5WjBiMQswCQYDVQQGEwJaQTElMCMGA1UE
+ChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNvbmFs
+IEZyZWVtYWlsIElzc3VpbmcgQ0EwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMSmPFVzVftO
+ucqZWh5owHUEcJ3f6f+jHuy9zfVb8hp2vX8MOmHyv1HOAdTlUAow1wJjWiyJFXCO3cnwK4Vaqj9x
+VsuvPAsH5/EfkTYkKhPPK9Xzgnc9A74r/rsYPge/QIACZNenprufZdHFKlSFD0gEf6e20TxhBEAe
+ZBlyYLf7AgMBAAGjgZQwgZEwEgYDVR0TAQH/BAgwBgEB/wIBADBDBgNVHR8EPDA6MDigNqA0hjJo
+dHRwOi8vY3JsLnRoYXd0ZS5jb20vVGhhd3RlUGVyc29uYWxGcmVlbWFpbENBLmNybDALBgNVHQ8E
+BAMCAQYwKQYDVR0RBCIwIKQeMBwxGjAYBgNVBAMTEVByaXZhdGVMYWJlbDItMTM4MA0GCSqGSIb3
+DQEBBQUAA4GBAEiM0VCD6gsuzA2jZqxnD3+vrL7CF6FDlpSdf0whuPg2H6otnzYvwPQcUCCTcDz9
+reFhYsPZOhl+hLGZGwDFGguCdJ4lUJRix9sncVcljd2pnDmOjCBPZV+V2vf3h9bGCE6u9uo05RAa
+WzVNd+NWIXiC3CEZNd4ksdMdRv9dX2VPMYIC5zCCAuMCAQEwaTBiMQswCQYDVQQGEwJaQTElMCMG
+A1UEChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMjVGhhd3RlIFBlcnNv
+bmFsIEZyZWVtYWlsIElzc3VpbmcgQ0ECAwsccTAJBgUrDgMCGgUAoIIBUzAYBgkqhkiG9w0BCQMx
+CwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0wMzEyMDMyMzUyNTRaMCMGCSqGSIb3DQEJBDEW
+BBRr1qrnVkmh2gCGkLjUdJQtQRaXZjB4BgkrBgEEAYI3EAQxazBpMGIxCzAJBgNVBAYTAlpBMSUw
+IwYDVQQKExxUaGF3dGUgQ29uc3VsdGluZyAoUHR5KSBMdGQuMSwwKgYDVQQDEyNUaGF3dGUgUGVy
+c29uYWwgRnJlZW1haWwgSXNzdWluZyBDQQIDCxxxMHoGCyqGSIb3DQEJEAILMWugaTBiMQswCQYD
+VQQGEwJaQTElMCMGA1UEChMcVGhhd3RlIENvbnN1bHRpbmcgKFB0eSkgTHRkLjEsMCoGA1UEAxMj
+VGhhd3RlIFBlcnNvbmFsIEZyZWVtYWlsIElzc3VpbmcgQ0ECAwsccTANBgkqhkiG9w0BAQEFAASC
+AQAPbA2xWIwO9AqEtzskJ2XS8Z2By4EHec1ct8JVB4FkbZPWqMxq1KMWpNGjCUHwegxn+PFKeLQr
+10x8WuuFNRybi401Y4LZYHPj1/Keulmjj5xgsAqSNsggV66d/+Zqe63wmUSss4Sj/AvOUGhSSPiA
+dFOa5TQreNon5mmb1yyFxOeoEX1tM+DD7iK1DoBAeesNkQKp/7lXpctPraastXPXyw0Z3wR0/hIp
+m2SZ0TMTu9GEPNdo/tiCgN4sNsTQroUeZkJrvt4hm4dX2iVqB4jlhWjFhKG+aQAEOM+H9Q3v2F5R
+BmbLXHbXHCbbYbr/kTH6IEGCgZWZxi7RSeJUa+HmAAAAAAAA
+
+--Apple-Mail-2--153422392--

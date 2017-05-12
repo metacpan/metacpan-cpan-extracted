@@ -1,0 +1,17 @@
+Revision history for Perl extension Convert::Translit.
+
+1.00   21 October 1997
+    - original version
+
+1.01   24 October 1997
+    - improved documentation
+
+1.02   3 November 1997
+    - dirname() may return relative path
+    - correct bugs in non-equivalent substitution
+    - cleanup warning diagnostics
+    - separate scripts for make test and for example
+
+1.03   5 November 1997
+    - never die inside module subroutines, instead return undef
+    - cleanup warning diagnostic

@@ -1,0 +1,216 @@
+Revision history for CatalystX-CRUD-YUI
+
+0.031 2014-05-31
+ - improve the autocomplete search algorithm to act more like
+   what most people would expect
+ - require Template::Plugin::Autoformat 2.75
+ - added Search::Tools dependency to the Makefile.PL
+
+0.030 21 Jan 2014
+ - YUI 2.x is deprecated since 2011 and they finally changed the icon urls.
+   Fix the calendar icon.
+
+0.029 24 Sept 2013
+ - default View now coerces all output to UTF-8.
+ - pass object to form.metadata.related_field() in case object affects
+   the relationship returned.
+
+0.028 12 Sept 2013
+ - fix autoformat() use in crud/form.tt
+
+0.027 31 Oct 2012
+ - no code change, just adding missing files from 0.026
+
+0.026 31 Oct 2012
+ - bundle livegrid js/css with package
+ - support serialization of objects with their related objects
+
+0.025 23 Oct 2010
+ - change field.description.length to .defined to appease TT.
+ - add Create Related links. Patch from Adam Mackler.
+ - fix some XHTML compliance bugs (reported by Adam Mackler).
+ - change 'use Class::C3' to 'use MRO::Compat' in test libs.
+ - add m2m example to MyDBIC test app
+
+0.024 18 Mar 2010
+ - check for field.description.length, since localization object will
+   return true.
+
+0.023 20 Feb 2010
+ - support for Field->description. Patch from Adam Mackler.
+
+0.022 17 Feb 2010
+ - no changes but version bump to accomodate CPAN. Apparently I was too
+   aggressive in  cleaning up old files and deleted 0.021...
+
+0.021 03 Feb 2010
+ - add missing META.yml
+ - change base URLs for ExtJS and Livegrid to point at non-MSI URLs and
+   remove warning about "get your own"
+
+0.020 1 Dec 2009
+ - add missing dep on Template::Plugin::Autoformat to Makefile
+ - fix dbic test to make sort order explicit with table prefix
+ - allow for cxc-* params to be set in livegrid.js and default there.
+
+0.019 17 May 2009
+ - fix number of skipped tests in 01-rdbo.t
+ - switch from Class::C3 to MRO::Compat and update deps in Makefile.PL
+ - change Livegrid->new to accept 'c' arg instead of getting it from
+   form->app. This fixes bug affecting tests under perl 5.10.
+
+0.018 1 May 2009
+ - move logic for can_write() check into edit.tt so that related values can
+   be edited. This logic change is first supported in CatalystX::CRUD 0.40.
+ - fix authz check for m2m relationships to look at the m2m controller
+   (map_class_controller) rather than the foreign class controller.
+ - reduce clicks when viewing related records in edit mode by making the
+   row click take you to the edit url rather than the view url.
+ - bump RHxFR dep version in Makefile.PL
+   (https://rt.cpan.org/Ticket/Display.html?id=45631)
+
+0.017 16 April 2009
+ - fix bug with missing 'Export as Excel' link when in View mode
+ - change to extjs grey style css
+ - add support for sort_prefix() in RHxFR::Metadata. This allows for
+   setting explicit sort prefix strings on column names and (in theory)
+   allows for sorting on JOINed tables as with m2m and o2m and FK "virtual"
+   columns.
+ - fix bug when related FK is undef in Serializer
+ - enable Create and Reassign links without having to go to edit mode	  
+ - fix Excel view and list.xls.tt to work (finally!) with
+   LiveGrid+Serializer
+ - hide parent record action buttons when viewing related records in Edit
+   mode (reduce confusion particularly for Delete button)
+ - fix Export as Excel link to not escape & since it is in script tag
+
+0.016 11 March 2009
+ - add c.config.cxcy.search_uri config option for rendering search box
+ - slight optimization in filter_relationships.tt for clarity
+ - add id attributes to crud buttons
+ - add support for arbitrary code to run on form submit with
+   YAHOO.crud.onFormSubmit array
+ - add YAHOO.crud.wysiwygify() to crud.js for optional Rich Text Editor on
+   textarea fields.
+
+0.015 27 Jan 2009
+ - fix IE-related bugs in JS (extra commas, IE idiosyncrasies)
+
+0.014 26 Jan 2009
+ - tweek text for Add button in rel mgr to say 'Reassign' if a o2m
+   relationship
+ - add Config::General to reqs
+ - LiveGrid title comes from object_class (or object_class->moniker if
+   defined)  rather than controller class name. 
+
+0.013 14 Jan 2009
+ - fix undef warnings in html escape.
+ - remove old crud/yui_related_datatable_js.tt
+ - fix console js bug evidenced with new Firebug release
+
+0.012 12 Dec 2008
+ - split related_field_info BLOCK into its own related_field_link.tt file.
+   Then use it in autocomplete_field.tt
+ - tweeks to results livegrid size
+ - textarea fields use <pre>+autowrap+htmlescape unless they have HTML
+   markup in them.
+ - click on related_field_link always defaults to 'view' regardless of
+   can_write. may be overridden with c.session.prefs.default_crud_action
+ - add html_escape feature to Serializer
+ - support dot notation for field_methods that chain related objects
+   together.
+ - skip ManyToOne and OneToOne rels in filter_relationships.tt since we
+   assume those are handled by related_field_link.tt
+
+0.011 02 Dec 2008
+ - revert crud.js to ignore m2m_url on livegrid row click. The feature
+   needs more thought.
+ - fix bug with limit != count so increased livegrid buffer size from 50 to
+   200.
+ - disable m2m features for Excel, etc., till they can be thought through
+   for usability.
+
+0.010 24 Nov 2008
+ - add unique_value() check in form related label even if foreign_field is
+   undef
+ - fix autocomplete_field to initialize the hidden input with the original
+   internal_value
+ - livegrid_create_form() controller method and supporting JS. This enables
+   o2m and m2m creation without leaving the current page. The number of
+   fields controls whether it is enabled or not. See the LIVEGRID_FORM_SIZE
+   setting in crud/tt_config.tt.
+ - replace all 'datatable' instances with 'livegrid' in Serializer class.
+ - PK value in Serializer comes from controller to allow app override of
+   schema class.
+
+0.009 18 Nov 2008
+ - support multi-col PKs and hidden PKs with livegrid
+ - livegrid width now auto based on window width
+ - add warnings to get your own copy of ExtJS and LiveGrid for local
+   consumption
+
+0.008 17 Nov 2008
+ - tweek CSS for a.box to fix padding in relation to form.inline,
+   button.box
+ - fix crud.js bug to allow for sort column to include table prefix (e.g.,
+   t2.name)
+ - total refactor of UI to include: * left menu instead of tabbed
+   relationships view * stricter dom structure * yui_header.tt * split up
+   some .tt into smaller chunks * RelOpts hash instead of separate
+   *_relationships vars in .tt * use LiveGrid instead of YUI DataTable
+ - ***NOTE*** all the YUI DataTable support is now dropped in favor of
+   LiveGrid
+
+0.007 21 Oct 2008
+ - fix a couple legacy params from _no_page to cxc-no_page
+ - add .button css 
+ - add error tagset to end of autocomplete input 
+ - revert to 2.5.1 of YUI lib till bugs using 2.5.2 are identified
+ - move most of ::TT into Template::Plugin::Handy
+ - remove static height on tabbed relationship container css 
+ - add support for form.metadata.default_selected to Tabs in
+   show_relationships.tt
+ - allow for explicit sort direction in initial datatable sort
+
+0.006 26 Sept 2008
+ - clarify debugging statement in Controller->end
+ - allow for per-session prefs
+ - make tab label different than viewable label
+ - pass tabindex to autocomplete field maker
+ - bump default yui version and set default var types if not using
+   tt_config.tt
+
+0.005 16 Sept 2008
+ - add missing generic crud/count.tt file to flesh out API support
+ - fix bug in form.tt with generating url for related foreign object.
+ - fix bug in form.tt to allow related_value map to use non-unique column
+ - add calendar popup feature to Date and DateTime field types
+ - add missing POD to TT and Serializer
+
+0.004 11 Sept 2008
+ - added configure option to hide PK columns in DataTable
+ - support core API changes to param names
+ - add fuzzy_search() and hide_pk_columns() config opts in Controller
+ - flesh out Controller docs
+ - add end() RenderView method in Controller based on cxc-fmt req param
+ - switch to Module::Install
+ - add TabView to set of core YUI components and switch relationships to
+   using them.
+ - View will now default to generic edit/view/list/search if no specific
+   action .tt file exists
+ - add generic view.tt and tweek form.tt to set certain common field names
+   as readonly (ctime mtime created modified)
+
+0.003 26 Aug 2008
+ - add missing JSON::XS to Makefile.PL dependencies
+ - get_controller() fixes
+ - lots of fixes to support the change in RHTMLO where autoincrement fields
+   are no longer in $form
+
+0.002 25 Aug 2008
+ - change show_relationships.tt to use RelInfo->get_controller
+ - tweek skip() checks in tests
+
+0.001 24 Aug 2008
+ - First version, released on an unsuspecting world.
+

@@ -1,0 +1,77 @@
+{
+   "abstract" : "A bundle of Catmandu modules for working with data from EuropePMC",
+   "author" : [
+      "Vitali Peil"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-EuropePMC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0",
+            "Catmandu::XML" : "0",
+            "Furl" : "0",
+            "Moo" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Catmandu-EuropePMC/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Catmandu-EuropePMC",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Catmandu-EuropePMC.git",
+         "web" : "https://github.com/LibreCat/Catmandu-EuropePMC"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "vpeil <vitali.peil@uni-bielefeld.de>"
+   ]
+}
+

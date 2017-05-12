@@ -1,0 +1,75 @@
+NAME
+    Class::DBI::AsForm - Produce HTML form elements for database columns
+
+SYNOPSIS
+        package Music::CD;
+        use Class::DBI::AsForm;
+        use base 'Class::DBI';
+        use CGI;
+        ...
+
+        sub create_or_edit {
+            my $class = shift;
+            my %cgi_field = $class->to_cgi;
+            return start_form,
+                   (map { "<b>$_</b>: ". $cgi_field{$_}->as_HTML." <br>" } 
+                        $class->Columns),
+                   end_form;
+        }
+
+        # <form method="post"...>
+        # Title: <input type="text" name="Title" /> <br>
+        # Artist: <select name="Artist"> 
+        #           <option value=1>Grateful Dead</option>
+        #           ...
+        #         </select>
+        # ...
+        # </form>
+
+DESCRIPTION
+    This module helps to generate HTML forms for creating new database rows
+    or editing existing rows. It maps column names in a database table to
+    HTML form elements which fit the schema. Large text fields are turned
+    into textareas, and fields with a has-a relationship to other
+    "Class::DBI" tables are turned into select drop-downs populated with
+    objects from the joined class.
+
+METHODS
+    The module is a mix-in which adds two additional methods to your
+    "Class::DBI"-derived class.
+
+  to_cgi
+    This returns a hash mapping all the column names of the class to
+    HTML::Element objects representing form widgets.
+
+  to_field($field [, $how])
+    This maps an individual column to a form element. The "how" argument can
+    be used to force the field type into one of "textfield", "textarea" or
+    "select"; you can use this is you want to avoid the automatic detection
+    of has-a relationships.
+
+CHANGES
+    Version 1.x of this module returned raw HTML instead of "HTML::Element"
+    objects, which made it harder to manipulate the HTML before sending it
+    out. If you depend on the old behaviour, set
+    $Class::DBI::AsForm::OLD_STYLE to a true value.
+
+MAINTAINER
+    Tony Bowden
+
+ORIGINAL AUTHOR
+    Simon Cozens
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Class-DBI-AsForm@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2004 by Simon Cozens / Tony Bowden
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Class::DBI, Class::DBI::FromCGI, HTML::Element.
+

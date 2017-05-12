@@ -1,0 +1,15 @@
+<li>
+  <button class="link" name="cmd" value="start" class="<%= $state eq 'connected' ? 'inactive' : '' %>">Connect</button>
+</li>
+<li>
+  <button class="link" name="cmd" value="stop" class="<%= $state eq 'disconnected' ? 'inactive' : '' %>">Disconnect</button>
+</li>
+<li>
+  <button class="link" name="cmd" value="restart">Restart</button>
+</li>
+<li>
+  %= link_to 'Edit', active_class('connection.edit', { name => $network })
+</li>
+<li>
+  %= link_to 'Delete', active_class('connection.delete', { name => $network })
+</li>

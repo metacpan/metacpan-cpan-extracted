@@ -1,0 +1,18 @@
+Revision history for Perl extension Catalyst::Plugin::Compress::Bzip2
+
+0.05  2010-07-01
+       - Deprecate in favour of Catalyst::Plugin::Compress
+
+0.04  2009-11-20
+       - Update Module::Install to 0.91
+       - Switch from NEXT to MRO::Compat
+
+0.03  2007-08-06
+        - Fix missing inc/ problem.
+
+0.02  2007-04-2 02:00:00
+        - Compress Content-Type that matches /^text|xml$|javascript$/
+        - Switch to Module-Install
+
+0.01  Wed Apr 27 01:00:00 2005
+        - original version.

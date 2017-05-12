@@ -1,0 +1,32 @@
+[% 
+    title = 'Talks Admin' ;
+
+    crumb3_name = 'Event' ;
+    crumb3_href = '/cgi-bin/pages.cgi?act=event-admin' ;
+    crumb2_name = 'Talks' ;
+    crumb2_href = '/cgi-bin/pages.cgi?act=venue-admin' ;
+    crumb1_name = 'List' ;
+%]
+
+<form name=datalist method="post" action="[% cgipath %]/pages.cgi">
+<input type="hidden" name='act' value='event-listtalk' />
+
+<div class="boxer">
+<table class="blocker" summary="Talks List">
+<tr><th>Event</th><th>Speaker</th><th>Talk</th><th>Select</th></tr>
+
+[% FOREACH item = data %]
+<tr><td>[% item.title %]</td>
+    <td>[% item.realname %]</td>
+    <td><a href="[% cgipath %]/pages.cgi?act=event-edittalk&amp;talkid=[% item.talkid %]">[% item.talktitle %]</a></td>
+    <td><input type="checkbox" name="LISTED" value="[% item.talkid %]" /></td></tr>
+[% END %]
+
+</table>
+</div>
+
+[% IF norecs %]<p align="center">No venues currently listed[% END %]
+
+<p>
+<input type="submit" name='doaction' value='Delete' />
+</form>

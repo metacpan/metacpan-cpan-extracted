@@ -1,0 +1,48 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-DBI-FormBuilder",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::FormBuilder" : "3",
+            "Class::DBI" : "0",
+            "Class::DBI::AbstractSearch" : "0",
+            "Class::Data::Inheritable" : "0",
+            "List::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "UNIVERSAL::require" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.483"
+}

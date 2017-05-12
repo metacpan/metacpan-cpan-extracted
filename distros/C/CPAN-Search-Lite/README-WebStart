@@ -1,0 +1,72 @@
+PAR-WebStart helper applications
+
+Beneath the par/ subdirectory are files enabling one to
+provide support of installation of CPAN distributions and
+Win32 ppm packages via a PAR::WebStart application. 
+PAR-WebStart is a helper application associated
+with a browser. When a user clicks on a link that points to a 
+PNLP [PAR Network Launch Protocol] launch file (a special XML file), 
+it causes the browser to launch PAR-WebStart, which then 
+automatically downloads, caches, and runs the specified
+PAR-based application. 
+
+To enable this feature, first install the PAR-WebStart distribution
+from CPAN. The PAR applications may then be built with the
+make_par.pl script of PAR-WebStart:
+
+  $ cd par
+  $ cd cpan
+  $ make_par.pl --name cpan --dst_dir /path/to/Apache/htdocs/par_directory
+  $ cd ../ppm
+  $ make_par.pl --name ppm --dst_dir /path/to/Apache/htdocs/par_directory
+
+This will produce PAR applications signed with Module::Signature;
+if you want to disable such signing, pass the "--no-sign" option
+to the make_par.pl script.
+
+Links to launch these applications are enabled through the "mirror"
+menu item of CPAN-Search-Lite web pages by checking the indicated
+checkbox. The links point to the "cpaninstall" and "ppminstall"
+locations specified within tt2/config, and are intended to be
+handled by the Apache2::WebStart handler of PAR-WebStart (this creates
+the PNLP xml file used by the client to launch the application). 
+Example Apache directives are
+
+ PerlModule Apache2::WebStart
+ <Location /cpan_install>
+   SetHandler perl-script
+   PerlResponseHandler Apache2::WebStart
+   PerlSetVar WS_codebase "par_directory"
+   PerlSetVar WS_title "CPAN install"
+   PerlSetVar WS_vendor "Your institution name"
+   PerlSetVar WS_homepage "docs/webstart.html"
+   PerlSetVar WS_description "Install CPAN modules via PAR::WebStart"
+   PerlAddVar WS_par "cpan.par"
+   PerlSetVar WS_long_opts 1
+ </Location>
+ <Location /ppm_install>
+   SetHandler perl-script
+   PerlResponseHandler Apache2::WebStart
+   PerlSetVar WS_codebase "par_directory"
+   PerlSetVar WS_title "PPM install"
+   PerlSetVar WS_vendor "Your institution name"
+   PerlSetVar WS_homepage "docs/webstart.html"
+   PerlSetVar WS_description "Install Win32 ppm packages via PAR::WebStart"
+   PerlSetVar WS_os "MSWin32"
+   PerlAddVar WS_par "ppm.par"
+   PerlSetVar WS_long_opts 1
+ </Location>
+
+If you disabled signing of the PAR applications by Module::Signature
+when making the applications by make_par.pl, add the directive
+
+   PerlSetVar WS_no_sign 1
+
+within these locations. The above directives will specify the
+par files to be accessible under
+
+  http://your.server.edu/par_directory/
+
+with a help page (available under the htdocs/ subdirectory) found as
+
+  http://your.server.edu/docs/webstart.html

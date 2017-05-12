@@ -1,0 +1,25 @@
+{
+ title  => 'Artist',
+ model  => 'TestModel::Artist',
+ uses   => {
+           },
+
+ columns => {
+             OBJECT   => {primary_key => 'id'},
+             aid            => {field=>'id', heading => 'Artist ID'},
+             asname         => {field=>'artist_sname', heading => 'Artist Surname'},
+             afname         => {field=>'artist_fname', heading => 'Artist Forename'},
+             aname          => {field=>'artist_pseudonym', heading => 'Artist Known As'},
+             acombined_name => {field=>['artist_fname', \' ', 'artist_sname'], heading => 'Artist Name',
+                                order_by=>['artist_sname', 'artist_fname']},
+             aborn          => {field=>'born', type=>'date', heading=>'Artist Born'},
+            },
+
+ searches => {
+              apn     => {heading=>'Pseudonym', op=>'like', field=>'artist_pseudonym'},
+              apnauto => {heading=>'Pseudonym', field=>'id'},
+             },
+           
+}
+
+

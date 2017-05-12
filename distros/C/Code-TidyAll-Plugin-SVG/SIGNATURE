@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b6d8b30941e9581ffa7bc21d279bcf75b90ce82e COPYRIGHT
+SHA1 36c95b7e423ed04ab775498b387b0c6ae2bd7ff2 CREDITS
+SHA1 4e85d57575a63d27246e3ddef7b6d398701fcda2 Changes
+SHA1 fab8f3aa03e2ef1cbdbf2eb80499700057a390e1 INSTALL
+SHA1 f2eb4743622d543c7d59bfc25ec9490c32109cf5 LICENSE
+SHA1 5ef622612931635c434ac2ea2f85f783b5d3d916 MANIFEST
+SHA1 785ddbd2d28e6a84ccb62c2ed67dbb88ea4874f9 META.json
+SHA1 ea4fe34c8a2c5981633e1ef230fcc0398d0044ff META.yml
+SHA1 52878418e5f6c8fe238280f4e4926ebf343b202f Makefile.PL
+SHA1 24f39f5f4fa42d91ad63bdeee7b635782110a68f README
+SHA1 e6fcdbed071c03c1b991b3b9ee43ca5e6792f4a2 dist.ini
+SHA1 fa8467a315f88a9a717ae15e7eef2646331f77f7 doap.ttl
+SHA1 ea0c1dcdfbb57913e7e2a614ba94778129f228ee lib/Code/TidyAll/Plugin/SVG.pm
+SHA1 2063956cc85dda465bfb5178f1f5db8518c22536 t/00_compile.t
+SHA1 522dd6ed52477ffbcf4e22d278ef098877fa4033 t/fixme.t
+SHA1 b683b80ac893ec4a10b4f30a836a782a60c3ea83 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXLi65AAoJECx8MUbBoAEhKeUP/ib8QGBmkRIUAR5hXfeTjyi3
+Q4W3D6TskrLRWjgFltSj+kNqb1VJGgJgbfV/u5J6cYI98+pOac742wAM5qw6MaNY
+EyXZdy9ZT0FIDYdBgipATu58Y/dX0rUxsu4YtB6kktI7IgaltTnZih44JxzZZNbS
+ika06KdHXT/ouHoUVaGcFlL/QTVMh8yX89MclfEGULib12k/dPpHNX5/oDDl1GRj
+cv1iQqChqvtShuQhinScR0B7/sPB9voM9XyW/EMlQ38G5jk/G4MDKstIxWv69kUC
+jmlSJqhERxIrlvPNE2rIFFgYuSM7FTjTC5ObOmYbmbtXPb8Oiv4RE84JWKIWogra
+BLnSvVI8wOxQhzcNAwHrxOAVgotFCiQCcyhvYNeMM3YB9/UULZ4EINzV5ryyAOKq
+1eTNH4A8omGabT1/c/FaWkyT3U3I6+as63FFVboJSFvUDAbUITXZ3YqwxBZDF/St
+7iUQVYmXHV244+Rmp1ToGHNKTOeTbnYyCiNn7INlGOK4hcgRvmTTku4rlyoimg2v
+c/ZKgvkNEtBSnzJYVPfGOLYLxrCm8/5U2DJEfXim91NB3V+VvXkfZ9xBv08GUE97
+Bd0Al9hY89xTD3jNjLGTqI2EVVbn5uQ+iw+ywQCJpRjvR73Z/K9LeqKFooQzUiVp
+HHIBgHLq1seDnknfl5Ze
+=ULuA
+-----END PGP SIGNATURE-----

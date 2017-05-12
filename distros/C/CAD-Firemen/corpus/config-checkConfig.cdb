@@ -1,0 +1,6151 @@
+﻿# ASCII
+# Creo  TM  Version L-05-47  (c) 2011 by Parametric Technology Corporation  All Rights Reserved.
+# DECLARATION_FILE 0 cad
+#
+2D_PALETTE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+ACCESSORY_WINDOW_DISPLAY  ( -Aw )
+{
+   UNDOCKED
+   DOCKED
+}
+ACCURACY_LOWER_BOUND  ( -Aw )
+{
+        ( -Fs )
+}
+ACIS_EXPORT_PARAMS  ( -Aw )
+{
+   YES
+   NO
+}
+ACIS_EXPORT_UNITS  ( -Aw )
+{
+   IN
+   FT
+   M
+   MM
+   CM
+   MICRON
+   DEFAULT
+}
+ACIS_OUT_VERSION  ( -Aw )
+{
+   4
+   5
+}
+ACROBAT_READER  ( -Aw )
+{
+        ( -Fs )
+}
+ADD_JAVA_CLASS_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+ADD_LOWER_LEVEL_COMPS_TO_LAYER  ( -Aw )
+{
+   YES
+   NO
+}
+ADD_OFFSET_TO_CONSTRAINT_COMP  ( -Aw )
+{
+   YES
+   NO
+}
+ADD_WELD_MP  ( -Aw )
+{
+   YES
+   NO
+}
+ADVANCED_INTERSECTION  ( -Aw )
+{
+   YES
+   NO
+}
+ADVANCED_STYLE_SURFACE_EDIT  ( -Aw )
+{
+   YES
+   NO
+}
+AEC_DWG_ANNO_ATTRPAR_SPEC_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+AEC_OBJECT_TYPE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+AEC_PARAMETER_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+AE_PROPAGATE_DETAIL_DEPENDENCY  ( -Aw )
+{
+   DEPENDENT
+   INDEPENDENT
+}
+AF_COPY_REFERENCES_FLAG  ( -Aw )
+{
+   NO
+   YES
+}
+ALIGN_CABLE_BUNDLES  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_ANATOMIC_FEATURES  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_CONFIRM_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_DELETE_MANY_IN_DRAWINGS  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_FLOAT_OPT_CHECKOUT  ( -Aw )
+{
+   NO
+   YES
+}
+ALLOW_FULLY_DEPENDENT_COPY  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_HARN_MFG_ASSY_RETRIEVAL  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_IMPORT_FILE_EXTENSION  ( -Aw )
+{
+        ( -Fs )
+}
+ALLOW_MFG_IN_ASSEM_MODE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_MOVE_ATTACH_IN_DTL_MOVE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_MOVE_VIEW_WITH_MOVE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_PACKAGE_CHILDREN  ( -Aw )
+{
+   ALL
+   FEAT
+   NONE
+}
+ALLOW_PLY_CROSS_SECTION  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_REDO_INTERSECTIONS  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_REFS_TO_GEOM_REPS_IN_DRWS  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_REF_SCOPE_CHANGE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_RFS_DEFAULT_GTOLS_ALWAYS  ( -Aw )
+{
+   NO
+   YES
+}
+ALLOW_SAVE_AS_INSTANCE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_SAVE_FAILED_MODEL  ( -Aw )
+{
+   YES
+   NO
+   PROMPT
+}
+ALLOW_SHRINK_DIM_BEFORE  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_SOLID_PERSPECTIVE_HLR  ( -Aw )
+{
+   NO
+   YES
+}
+ALLOW_UDF_STYLE_COSM_THREADS  ( -Aw )
+{
+   YES
+   NO
+}
+ALLOW_UPDATE_PART_SIMP_REP_DATA  ( -Aw )
+{
+   YES
+   NO
+   PROMPT
+}
+ALLOW_WORKPIECE_SILHOUETTE  ( -Aw )
+{
+   YES
+   NO
+   AUTO
+}
+ANALYSIS_CRT_TMP_FILE_ON_REGEN  ( -Aw )
+{
+   YES
+   NO
+}
+ANGLE_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.0  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.00  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.000  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.0000  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.00000  ( -Aw )
+{
+        ( -Fs )
+}
+ANGULAR_TOL_0.000000  ( -Aw )
+{
+        ( -Fs )
+}
+ANG_DIM_IN_SCREEN  ( -Aw )
+{
+   YES
+   NO
+}
+ANG_UNITS  ( -Aw )
+{
+   ANG_DEG
+   ANG_MIN
+   ANG_SEC
+}
+ANIMATE_EXPLODE_STATES  ( -Aw )
+{
+   YES
+   NO
+}
+ANIMATION_IMPORTED_PBK_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+ARC_RADIUS_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+ASK_DESIGNATE_OWNERS  ( -Aw )
+{
+   YES
+   NO
+}
+ASSEMBLE_PARENT_CONNECTOR  ( -Aw )
+{
+   YES
+   NO
+}
+ASSY_MFG_OPEN_MODE  ( -Aw )
+{
+   ANY_MODE
+   MFG
+   PROCESS
+   FEATURE
+}
+ATB_AUTO_CHECK_ON_ACTIVATE  ( -Aw )
+{
+   ON
+   OFF
+}
+ATB_AUTO_CHECK_ON_RETRIEVE  ( -Aw )
+{
+   ON
+   OFF
+}
+ATB_AUTO_CHECK_ON_UPDATE  ( -Aw )
+{
+   ON
+   OFF
+}
+ATB_IDENT_CADDS_FILES  ( -Aw )
+{
+   YES
+   NO
+}
+ATB_PROD_ASM_UPD_BY_COMP_IDS  ( -Aw )
+{
+   YES
+   NO
+}
+ATB_SEARCH_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+ATB_SHOW_LOG  ( -Aw )
+{
+   ON
+   OFF
+}
+ATTACH_MENUMANAGER  ( -Aw )
+{
+   YES
+   NO
+}
+AUTOBUILDZ_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+AUTODRILLING_CONFIG_FILENAME  ( -Aw )
+{
+        ( -Fs )
+}
+AUTODRILLING_HOLESTYLE_PARAM  ( -Aw )
+{
+        ( -Fs )
+}
+AUTODRILL_UDF_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+AUTOHIDE_COPIED_GROUP_AF  ( -Aw )
+{
+   YES
+   NO
+}
+AUTOHIDE_EXTERNAL_SKETCH  ( -Aw )
+{
+   YES
+   NO
+}
+AUTOPLACE_SINGLE_COMP  ( -Aw )
+{
+   NO
+   YES
+}
+AUTOROUND_MAX_N_CHAINS_PER_FEAT  ( -Aw )
+{
+        ( -Fs )
+}
+AUTOROUTE_PATH_PARAM_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+AUTO_ADD_REMOVE  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_AE_PARAM_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+AUTO_ASSEMBLY_WITH_NOTEBOOKS  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_ASSOCIATE_DIMENSIONS  ( -Aw )
+{
+   NO
+   YES
+}
+AUTO_BACKUP_NEW_PLACEMNT_REFS  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_CONSTR_ALWAYS_USE_OFFSET  ( -Aw )
+{
+   YES
+   NO
+   NEVER
+}
+AUTO_CONSTR_OFFSET_TOLERANCE  ( -Aw )
+{
+        ( -Fs )
+   #DOUBLE
+}
+AUTO_CONVERT_CABLES  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_EVALUATE_SIMPREP_RULES  ( -Aw )
+{
+   NO
+   YES
+}
+AUTO_INCLUDE_ANNOT_PLANE  ( -Aw )
+{
+   NO
+   YES
+}
+AUTO_PLACE_MAX_NUMBER  ( -Aw )
+{
+        ( -Fs )
+}
+AUTO_PROPAGATE_AE  ( -Aw )
+{
+   NO
+   YES
+}
+AUTO_REGEN_VIEWS  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_SHOW_3D_DETAIL_ITEMS  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_TRACEBACK  ( -Aw )
+{
+   ALWAYS
+   YES
+   ASK
+   NO
+   NEVER
+}
+AUTO_UPDATE_INTERSECTED_MODELS  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_XML_ON_RETRIEVE  ( -Aw )
+{
+   YES
+   NO
+}
+AUTO_XML_ON_SAVE  ( -Aw )
+{
+   YES
+   NO
+}
+AUXAPP_POPUP_MENU_INFO  ( -Aw )
+{
+   YES
+   NO
+}
+BELL  ( -Aw )
+{
+   YES
+   NO
+}
+BITMAP_SIZE  ( -Aw )
+{
+        ( -Fs )
+}
+BLANK_LAYER  ( -Aw )
+{
+        ( -Fs )
+}
+BLENDED_TRANSPARENCY  ( -Aw )
+{
+   NO
+   YES
+}
+BMGR_PREF_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+BMX_PARAM_RESTRICTIONS  ( -Aw )
+{
+   YES
+   NO
+}
+BM_GRAPH_TOOL  ( -Aw )
+{
+   DEFAULT
+}
+BOEING_EXTRACT_BUNDLE  ( -Aw )
+{
+   YES
+   NO
+}
+BOM_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+BROWSER_FAVORITE  ( -Aw )
+{
+        ( -Fs )
+}
+BUMP_REVNUM_ON_RETR_REGEN  ( -Aw )
+{
+   YES
+   NO
+}
+BUTTON_NAME_IN_HELP  ( -Aw )
+{
+   YES
+   NO
+}
+CABLES_WITH_HLR  ( -Aw )
+{
+   NO
+   YES
+}
+CABLE_INT_PORTIONS_FOR_CLR  ( -Aw )
+{
+   NO
+   YES
+}
+CABLE_LOCATION_OVERRIDE_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+CABLE_SEGMENT_OVERRIDE_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+CADDS_IMPORT_LAYER  ( -Aw )
+{
+   YES
+   NO
+}
+CAMPOST_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+CAN_SNAP_TO_MISSING_REF  ( -Aw )
+{
+   YES
+   NO
+}
+CAPPED_CLIP  ( -Aw )
+{
+   NO
+   YES
+}
+CATIA_OUT_TO_EXISTING_MODEL  ( -Aw )
+{
+   APPEND
+   OVERWRITE
+}
+CENTIMETER_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+CGM_USE_PENTABLE  ( -Aw )
+{
+   NO
+   YES
+}
+CHECK_INTERFACE_CRITERIA  ( -Aw )
+{
+   YES
+   NO
+}
+CHECK_INTERFERENCE_OF_MATCHES  ( -Aw )
+{
+   YES
+   NO
+}
+CHECK_SAME_ASSY_PARTS  ( -Aw )
+{
+   YES
+   NO
+}
+CHECK_UDF_INT_KEY  ( -Aw )
+{
+   YES
+   NO
+}
+CHK_PART_SURFS_PROFPOCK  ( -Aw )
+{
+   YES
+   NO
+}
+CHOOSER_SIZE_FILTER_DEFAULT  ( -Aw )
+{
+        ( -Fs )
+}
+CLEARANCE_TRIANGULATION  ( -Aw )
+{
+   NONE
+   LOW
+   MEDIUM
+   HIGH
+}
+CLIP_ALWAYS  ( -Aw )
+{
+   NO
+   YES
+}
+CLOCK  ( -Aw )
+{
+   YES
+   NO
+}
+CLR_PRINT_PLUS_MINUS  ( -Aw )
+{
+   YES
+   NO
+}
+CL_ARROW_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+CL_ROTATE_SIGN_CONVENTION  ( -Aw )
+{
+   TABLE
+   TOOL
+}
+CMDMGR_TRAIL_OUTPUT  ( -Aw )
+{
+   YES
+   NO
+}
+CMM_CUSTOM_TOOL_PARAM_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+COLLECT_DIMS_IN_ACTIVE_LAYER  ( -Aw )
+{
+   YES
+   NO
+}
+COLOR  ( -Aw )
+{
+   NO
+   YES
+}
+COLOR_RAMP_SIZE  ( -Aw )
+{
+        ( -Fs )
+}
+COLOR_RESOLUTION  ( -Aw )
+{
+        ( -Fs )
+}
+COLOR_WINDOWS  ( -Aw )
+{
+   ALL_WINDOWS
+   ONE_WINDOW
+}
+COMBINED_VIEWS_CUSTOMIZATION  ( -Aw )
+{
+   YES
+   NO
+}
+COMPACT_CABLES_PACKING  ( -Aw )
+{
+   YES
+   NO
+}
+COMPANY_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+COMPRESS_OUTPUT_FILES  ( -Aw )
+{
+   YES
+   NO
+}
+COMP_ANGLE_OFFSET_EPS  ( -Aw )
+{
+        ( -Fs )
+}
+COMP_ASSEMBLE_START  ( -Aw )
+{
+   DEFAULT
+   PACKAGE
+   CONSTRAIN_IN_WINDOW
+   MOVE_THEN_PLACE
+}
+COMP_ASSEMBLE_WITH_INTERFACE  ( -Aw )
+{
+   DEFAULT_MULTI
+   DEFAULT_SINGLE
+   FROM_LIST
+   NONE
+}
+COMP_INTERFACE_PLACEMENT  ( -Aw )
+{
+   INTERFACE_TO_INTERFACE
+   INTERFACE_TO_GEOM
+}
+COMP_NORMAL_OFFSET_EPS  ( -Aw )
+{
+        ( -Fs )
+}
+COMP_PLACEMENT_ASSUMPTIONS  ( -Aw )
+{
+   YES
+   NO
+}
+COMP_RETR_ANGULAR_INCREMENT  ( -Aw )
+{
+        ( -Fs )
+}
+COMP_ROLLBACK_ON_REDEF  ( -Aw )
+{
+   YES
+   NO
+}
+COMP_SNAP_ANGLE_TOLERANCE  ( -Aw )
+{
+        ( -Fs )
+}
+COMP_SNAP_DIST_TOLERANCE  ( -Aw )
+{
+        ( -Fs )
+}
+CONF_MOUSE_ANIM  ( -Aw )
+{
+   NO
+   YES
+}
+CONSTRAINT_REFERENCE_REDEFINE  ( -Aw )
+{
+   KEEP_CONSTRAINT_TYPE
+   RESET_CONSTRAINT_TYPE
+}
+CONTACT_SURFACES_GAP  ( -Aw )
+{
+        ( -Fs )
+}
+CONVERT_TO_WF3_REPLACE  ( -Aw )
+{
+   YES
+   NO
+}
+COPY_GEOMETRY_METHOD  ( -Aw )
+{
+   PUBLISH_GEOMETRY
+   REFERENCES
+}
+COPY_GEOM_UPDATE_PRE_2000I_DEP  ( -Aw )
+{
+   NO
+   YES
+}
+COPY_SET_DATUM_ATTR  ( -Aw )
+{
+   YES
+   NO
+}
+COSMETIC_THREAD_MATCH_TOLERANCE  ( -Aw )
+{
+        ( -Fs )
+}
+CPUS_TO_USE  ( -Aw )
+{
+        ( -Fs )
+}
+CREATE_DRAWING_DIMS_ONLY  ( -Aw )
+{
+   YES
+   NO
+}
+CREATE_FRACTION_DIM  ( -Aw )
+{
+   YES
+   NO
+}
+CREATE_NUMBERED_LAYERS  ( -Aw )
+{
+   YES
+   NO
+}
+CREATE_TEMP_INTERFACES  ( -Aw )
+{
+   YES
+   NO
+}
+CRI_GRAFTING_ENABLE  ( -Aw )
+{
+   YES
+   NO
+}
+CTI_CLASS_COLOR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+CURR_PROC_COMP_DEF_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+CURR_PROC_COMP_DEF_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+CUSTOM_RAINBOW  ( -Aw )
+{
+        ( -Fs )
+}
+DATA_SHARING_GEN_NOTIFICATION  ( -Aw )
+{
+   OFF
+   ON
+}
+DATUM_POINT_SYMBOL  ( -Aw )
+{
+   DOT
+   CROSS
+   CIRCLE
+   TRIANGLE
+   SQUARE
+}
+DAZIX_DEFAULT_PLACEMENT_UNIT  ( -Aw )
+{
+   MICRON
+   MM
+   THOU
+}
+DAZIX_EXPORT_MOUNTHOLE  ( -Aw )
+{
+   YES
+   NO
+}
+DAZIX_Z_TRANSLATION  ( -Aw )
+{
+   YES
+   NO
+}
+DEFAULT_ABS_ACCURACY  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_ANG_DEC_PLACES  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_ANG_UNITS  ( -Aw )
+{
+   ANG_DEG
+   ANG_MIN
+   ANG_SEC
+}
+DEFAULT_COMP_GEOM_SCOPE  ( -Aw )
+{
+   ALL
+   PG
+   NONE
+}
+DEFAULT_COMP_INVALID_REFS  ( -Aw )
+{
+   COPY
+   PROHIBIT
+}
+DEFAULT_COMP_SCOPE_SETTING  ( -Aw )
+{
+   ALL
+   NONE
+   SUBASSEMBLIES
+   SKELETON_MODEL
+}
+DEFAULT_COMP_SKEL_GEOM_SCOPE  ( -Aw )
+{
+   ALL
+   PG
+   NONE
+}
+DEFAULT_COMP_SKEL_SCOPE_SETTING  ( -Aw )
+{
+   ALL
+   NONE
+   SUBASSEMBLIES
+   SKELETON_MODEL
+}
+DEFAULT_DEC_PLACES  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_DEP_COPY_OPTION  ( -Aw )
+{
+   FULL_DEP
+   DEP_DIM
+}
+DEFAULT_DIM_NUM_DIGITS_CHANGES  ( -Aw )
+{
+   YES
+   NO
+}
+DEFAULT_DRAW_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_EXT_REF_SCOPE  ( -Aw )
+{
+   ALL
+   NONE
+   SUBASSEMBLIES
+   SKELETON_MODEL
+}
+DEFAULT_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_FONT_KERNING_IN_DRAWING  ( -Aw )
+{
+   YES
+   NO
+}
+DEFAULT_GEOM_ANALYSIS_TYPE  ( -Aw )
+{
+   QUICK
+   SAVED
+   FEATURE
+}
+DEFAULT_GEOM_SCOPE  ( -Aw )
+{
+   ALL
+   PG_IF_EXISTS
+   PG_ONLY
+}
+DEFAULT_LAYER_MODEL  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_MOLD_BASE_VENDOR  ( -Aw )
+{
+   FUTABA_MM
+   DME
+   HASCO
+   DME_MM
+   HASCO_MM
+}
+DEFAULT_OBJECT_GEOM_SCOPE  ( -Aw )
+{
+   ALL
+   PG
+   NONE
+}
+DEFAULT_OBJECT_INVALID_REFS  ( -Aw )
+{
+   COPY
+   PROHIBIT
+}
+DEFAULT_OBJECT_SCOPE_SETTING  ( -Aw )
+{
+   ALL
+   NONE
+   SUBASSEMBLIES
+   SKELETON_MODEL
+}
+DEFAULT_OBJ_CONSTRAINTS_SCOPE  ( -Aw )
+{
+   ALL
+   INTERFACES
+   NONE
+}
+DEFAULT_PLACEMENT_SCOPE  ( -Aw )
+{
+   ALL
+   INTRF_IF_EXISTS
+   INTRF_ONLY
+}
+DEFAULT_PLACEMENT_SURFACEFINISH  ( -Aw )
+{
+   WITH_LEADERS
+   ON_ENTITY
+   NORMAL_TO_ENTITY
+   FREE
+}
+DEFAULT_RAMP_SIZE  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_SCENE_FILENAME  ( -Aw )
+{
+        ( -Fs )
+}
+DEFAULT_SHRINK_FORMULA  ( -Aw )
+{
+   ASME
+   SIMPLE
+}
+DEF_FAIL_DLG_DURATION  ( -Aw )
+{
+        ( -Fs )
+}
+DEF_LAYER  ( -Aw )
+{
+   LAYER_3D_ITEMS
+   LAYER_AE_DRIVING_DIM
+   LAYER_ALL_DETAIL_ITEMS
+   LAYER_ANNOTATION_ELEMENT
+   LAYER_ASSEM_MEMBER
+   LAYER_ASSY_CUT_FEAT
+   LAYER_AXIS
+   LAYER_AXIS_ENT
+   LAYER_CHAMFER_FEAT
+   LAYER_COMP_DESIGN_MODEL
+   LAYER_COMP_FIXTURE
+   LAYER_COMP_WORKPIECE
+   LAYER_COPY_GEOM_FEAT
+   LAYER_CORN_CHAMF_FEAT
+   LAYER_COSM_ROUND_FEAT
+   LAYER_COSM_SKETCH
+   LAYER_CSYS
+   LAYER_CSYS_ENT
+   LAYER_CURVE
+   LAYER_CURVE_ENT
+   LAYER_CUT_FEAT
+   LAYER_DATUM
+   LAYER_DATUM_PLANE
+   LAYER_DATUM_POINT
+   LAYER_DETAIL_ITEM
+   LAYER_DGM_CONN_COMP
+   LAYER_DGM_HIGHWAY
+   LAYER_DGM_RAIL
+   LAYER_DGM_WIRE
+   LAYER_DIM
+   LAYER_DRAFT_CONSTR
+   LAYER_DRAFT_DIM
+   LAYER_DRAFT_DTM
+   LAYER_DRAFT_ENTITY
+   LAYER_DRAFT_FEAT
+   LAYER_DRAFT_GEOM
+   LAYER_DRAFT_GRP
+   LAYER_DRAFT_HIDDEN
+   LAYER_DRAFT_OTHERS
+   LAYER_DRAFT_REFDIM
+   LAYER_DRAFT_XSEC
+   LAYER_DRIVEN_DIM
+   LAYER_DWG_TABLE
+   LAYER_EXT_COPY_GEOM_FEAT
+   LAYER_FEATURE
+   LAYER_GEOM_FEAT
+   LAYER_GTOL
+   LAYER_HOLE_FEAT
+   LAYER_HOLE_THREAD
+   LAYER_INTCHG_FUNCT
+   LAYER_INTCHG_SIMP
+   LAYER_NOGEOM_FEAT
+   LAYER_NOTE
+   LAYER_PARAMETER_DIM
+   LAYER_PART_REFDIM
+   LAYER_POINT
+   LAYER_PROTRUSION_FEAT
+   LAYER_QUILT
+   LAYER_REFDIM
+   LAYER_RIBBON_FEAT
+   LAYER_RIB_FEAT
+   LAYER_ROUND_FEAT
+   LAYER_SET_DATUM_TAG
+   LAYER_SFIN
+   LAYER_SHELL_FEAT
+   LAYER_SKELETON_MODEL
+   LAYER_SLOT_FEAT
+   LAYER_SNAP_LINE
+   LAYER_SOLID_GEOM
+   LAYER_SURFACE
+   LAYER_SYMBOL
+   LAYER_SYMBOL
+   LAYER_THREAD_FEAT
+   LAYER_TRIM_LINE_FEAT
+   LAYER_WELD_FEAT
+}
+DELETE_AFTER_PLOTTING  ( -Aw )
+{
+   YES
+   NO
+}
+DEPTHCUE_ALWAYS  ( -Aw )
+{
+   NO
+   YES
+}
+DEPTHCUE_VALUE  ( -Aw )
+{
+}
+DESIGNATE_MODEL_ITEM_PARAMS  ( -Aw )
+{
+   YES
+   NO
+}
+DIAGRAM_EXPORT_ALLOW  ( -Aw )
+{
+   NO
+   YES
+}
+DIAGRAM_PIN_EDIT_MULTI_LINE  ( -Aw )
+{
+   YES
+   NO
+}
+DIALOG_TRANSLATION  ( -Aw )
+{
+   YES
+   NO
+}
+DIM_FRACTION_DENOMINATOR  ( -Aw )
+{
+        ( -Fs )
+}
+DIM_FRACTION_FORMAT  ( -Aw )
+{
+   STD
+   AISC
+}
+DIM_INACTIVE_COMPONENTS  ( -Aw )
+{
+   ALWAYS
+   NEVER
+   SHADED_ONLY
+}
+DIM_OFFSCREEN_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+DIN_STD_LINE_PRIORITY  ( -Aw )
+{
+   YES
+   NO
+}
+DIRECT_VRML  ( -Aw )
+{
+   YES
+   NO
+}
+DIR_CACHE_MAX  ( -Aw )
+{
+        ( -Fs )
+}
+DISABLE_SEARCH_PATH_CHECK  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY  ( -Aw )
+{
+   WIREFRAME
+   HIDDENVIS
+   HIDDENINVIS
+   SHADE
+   SHADEWITHREFLECT
+   SHADEWITHEDGES
+}
+DISPLAY_ALL_DIMS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_ANNOTATIONS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_AXES  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_AXIS_TAGS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_COMPS_TO_ASSEMBLE  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_COORD_SYS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_COORD_SYS_TAGS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_DRAGGERS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_DWG_SKETCH_CONSTRAINT  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_DWG_TOL_TAGS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_FLORIN  ( -Aw )
+{
+   NO
+   YES
+}
+DISPLAY_FULL_OBJECT_PATH  ( -Aw )
+{
+   NO
+   YES
+}
+DISPLAY_IE8_WARNING_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_INTERNAL_CABLE_PORTION  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_IN_ADDING_VIEW  ( -Aw )
+{
+   WIREFRAME
+   MINIMAL_WIREFRAME
+   DEFAULT
+}
+DISPLAY_LAYER  ( -Aw )
+{
+        ( -Fs )
+}
+DISPLAY_MFG_ICON_FOR_MFG_ASSY  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_PDM_SERVER_QUICK_VIEW  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_PLANES  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_PLANE_TAGS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_POINTS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_POINT_TAGS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_POPUP_VIEWER  ( -Aw )
+{
+   YES
+   NO
+   FILE_OPEN_ONLY
+}
+DISPLAY_ROUTE_CABLE_PREVIEW  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_SILHOUETTE_EDGES  ( -Aw )
+{
+   NO
+   YES
+}
+DISPLAY_SKETCH_DIMS  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_THICK_CABLES  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_THICK_INSULATION  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_THICK_PIPES  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_TOL_BY_1000  ( -Aw )
+{
+   YES
+   NO
+}
+DISPLAY_Z_EXTENSION_LINES  ( -Aw )
+{
+   YES
+   NO
+}
+DISP_IN_OPEN_REP_CREATE  ( -Aw )
+{
+   YES
+   DEFAULT REP
+   NO
+}
+DISP_REGEN_SUCCESS_MSG  ( -Aw )
+{
+   YES
+   NO
+}
+DISP_TRIMETRIC_DWG_MODE_VIEW  ( -Aw )
+{
+   YES
+   NO
+}
+DM_AUTO_OPEN_ZIP  ( -Aw )
+{
+   YES
+   NO
+}
+DM_CACHE_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+DM_CACHE_MODE  ( -Aw )
+{
+   NONE
+   MODIFIED
+   ALL
+}
+DM_CHECKOUT_ON_THE_FLY  ( -Aw )
+{
+   CHECKOUT
+   CONTINUE
+}
+DM_ENABLE_SIMPLE_IMPORT_EXPORT  ( -Aw )
+{
+   YES
+   NO
+}
+DM_FALLBACK_SERVER_LOCATION  ( -Aw )
+{
+        ( -Fs )
+}
+DM_HTTP_COMPRESSION_LEVEL  ( -Aw )
+{
+        ( -Fs )
+}
+DM_NC_PROCESS  ( -Aw )
+{
+   YES
+   NO
+}
+DM_NC_REFERENCES  ( -Aw )
+{
+   YES
+   NO
+}
+DM_OFFLINE_AFTER_EVENT  ( -Aw )
+{
+   YES
+   NO
+}
+DM_OFFLINE_OPTIONS_ACTIVATED  ( -Aw )
+{
+   YES
+   NO
+}
+DM_OVERWRITE_CONTENTS_ON_UPDATE  ( -Aw )
+{
+   YES
+   NO
+}
+DM_REMEMBER_SERVER  ( -Aw )
+{
+   NO
+   YES
+}
+DM_SAVE_AS_ATTACHMENT  ( -Aw )
+{
+   YES
+   NO
+}
+DM_SEARCH_PRIMARY_SERVER  ( -Aw )
+{
+   YES
+   NO
+}
+DM_SECONDARY_UPLOAD  ( -Aw )
+{
+   AUTOMATIC
+   EXPLICIT
+}
+DM_SYNCHRONIZE_IN_BACKGROUND  ( -Aw )
+{
+   YES
+   NO
+}
+DM_UPLOAD_OBJECTS  ( -Aw )
+{
+   AUTOMATIC
+   EXPLICIT
+}
+DM_USER_PRESENCE  ( -Aw )
+{
+   YES
+   NO
+}
+DONT_SHOW_SYMBOL_NODES  ( -Aw )
+{
+   YES
+   NO
+}
+DRAWING_OLE_IMAGE_DPI  ( -Aw )
+{
+        ( -Fs )
+}
+DRAWING_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+DRAWING_SHADED_VIEW_DPI  ( -Aw )
+{
+}
+DRAWING_VIEW_ORIGIN_CSYS  ( -Aw )
+{
+   NONE
+   #STRING
+}
+DRAW_MODELS_READ_ONLY  ( -Aw )
+{
+   YES
+   NO
+   COSMETIC_ONLY
+}
+DRAW_POINTS_IN_MODEL_UNITS  ( -Aw )
+{
+   YES
+   NO
+}
+DRM_POLICY_SERVER  ( -Aw )
+{
+        ( -Fs )
+}
+DWG_EXPORT_FORMAT  ( -Aw )
+{
+   14
+   2000
+   2004
+   2007
+   2010
+}
+DWG_UNICODE_CONVERSION_LANGUAGE  ( -Aw )
+{
+   FILE
+   SESSION
+   USASCII
+   ENGLISH
+   JAPANESE
+   FRENCH
+   GERMAN
+   RUSSIAN
+   ITALIAN
+   SPANISH
+   KOREAN
+   CHINESE_TW
+   CHINESE_CN
+   HEBREW
+   GREEK
+   TURKISH
+   CZECH
+   POLISH
+   HUNGARIAN
+   SLOVENIAN
+   PORTUGUESE
+   SLOVAK
+}
+DXFIO_IN_SJIS  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_BLOCK_TO_PRO_SYMBOL  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_EXPORT_FORMAT  ( -Aw )
+{
+   12
+   13
+   14
+   2000
+   2004
+   2007
+   2010
+}
+DXF_IN_FACETED_BREP  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_IN_PROXY_ENTITY  ( -Aw )
+{
+   NO
+   YES
+}
+DXF_OUT_COMMENTS  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_OUT_DRAWING_SCALE  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_OUT_SCALE_VIEWS  ( -Aw )
+{
+   YES
+   NO
+}
+DXF_OUT_SEP_DIM_W_BREAKS  ( -Aw )
+{
+   YES
+   NO
+}
+DYNAMIC_PREVIEW  ( -Aw )
+{
+   ATTACHED
+   UNATTACHED
+   NO
+}
+ECAD_AREA_DEFAULT_IMPORT  ( -Aw )
+{
+   3D_VOLUME
+   COSM_AREA
+}
+ECAD_BOARD_CSYS_DEF_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_COMP_CSYS_DEF_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_COMP_LAYER_MAP  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_COMP_NAMING_CONVENTION  ( -Aw )
+{
+   ECAD_NAME
+   ECAD_NAME_ECAD_ALT_NAME
+   ECAD_ALT_NAME
+}
+ECAD_COMP_XSEC_DEF_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_CREATE_HINT_ADD  ( -Aw )
+{
+   NO
+   YES
+}
+ECAD_DEFAULT_COMP_HEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_DEFAULT_COMP_PLACE_STATUS  ( -Aw )
+{
+   UNPLACED
+   FIXED
+   PLACED
+   MCAD
+   ECAD
+}
+ECAD_EDMD_OUT_VERSION  ( -Aw )
+{
+   1.2
+   2.0
+}
+ECAD_EXPORT_CUTS_AS_HOLES  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_EXPORT_HOLES_AS_CUTS  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_EXP_BOTH_TWO_AREAS  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_IMPORT_HOLES_AS_FEATURES  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_IMPORT_RELATIVE_ACCURACY  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_LOAD_FILTERED_HOLES_TO_UI  ( -Aw )
+{
+   YES
+   NO
+}
+ECAD_MAPPING_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_MISSING_COMPONENT_STATUS  ( -Aw )
+{
+   KEEP_MISSING
+   DELETE_MISSING
+}
+ECAD_MTG_HOLE_IMPORT  ( -Aw )
+{
+   YES
+   NO
+   AS LIGHTWEIGHT
+}
+ECAD_OTHER_OUTL_CSYS_DEF_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_OUTLINE_HOLES_EXP_METHOD  ( -Aw )
+{
+   DEFAULT
+   ARCS
+}
+ECAD_PANEL_CSYS_DEF_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+ECAD_PIN_HOLE_IMPORT  ( -Aw )
+{
+   YES
+   NO
+   AS LIGHTWEIGHT
+}
+ECAD_REJECT_STRATEGY  ( -Aw )
+{
+   UI_BASED
+   AS_ORIGINAL
+   AS_BASE
+}
+ECAD_SET_INTERCOMM_COMPATIBLE  ( -Aw )
+{
+   NO
+   YES
+}
+ECAD_TOOL_HOLE_IMPORT  ( -Aw )
+{
+   YES
+   NO
+   AS LIGHTWEIGHT
+}
+ECAD_VIA_HOLE_IMPORT  ( -Aw )
+{
+   YES
+   NO
+   AS LIGHTWEIGHT
+}
+EDGE_DISPLAY_QUALITY  ( -Aw )
+{
+   NORMAL
+   HIGH
+   VERY_HIGH
+   LOW
+}
+EFX_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_3DMODELSPACE_BROWSER_TAB  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_ABSOLUTE_ACCURACY  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_ACIS_EXPORT_EXTENSION  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_ADVANCE_COLLISION  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_ASSEMBLY_ACCURACY  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_AUTO_REGEN  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_CADRA_EXPORT  ( -Aw )
+{
+   NO
+   YES
+}
+ENABLE_FACE_PRESELECTION  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_FACE_THREAD_TURNING  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_FLAT_STATE  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_HLR_HASHING  ( -Aw )
+{
+   NO
+   YES
+}
+ENABLE_IMPLIED_JOINTS  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_OFFSET_FAN_CURVE  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_OPENGL_SHADER  ( -Aw )
+{
+   NO
+   YES
+}
+ENABLE_POPUP_HELP  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_PROTK_XML_SCHEMA  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_SHADED_VIEW_IN_DRAWINGS  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_TAPERED_EXTRUDE  ( -Aw )
+{
+   YES
+   NO
+}
+ENABLE_TRANSPARENT_TEXT_BG  ( -Aw )
+{
+   NO
+   YES
+}
+ENABLE_TREE_INDEP  ( -Aw )
+{
+   YES
+   NO
+}
+ERV_SHOW_EXTERNAL_ONLY  ( -Aw )
+{
+   YES
+   NO
+}
+ESR_MASS_PROPERTIES  ( -Aw )
+{
+   DESIGN_ONLY
+   EXTENDED
+}
+EXCEL_ANALYSIS_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+EXCEL_FAMILY_TABLE_KEEP_FILE  ( -Aw )
+{
+   YES
+   NO
+}
+EXEC_PROG_ON_ASSEM_RETR  ( -Aw )
+{
+   YES
+   NO
+}
+EXPAND_ALL_WITH_NESTED_LAYERS  ( -Aw )
+{
+   YES
+   NO
+}
+EXPLODE_ANIMATION_MAX_TIME  ( -Aw )
+{
+        ( -Fs )
+}
+EXPLODE_IGES_DIMENSION_NOTE  ( -Aw )
+{
+   YES
+   NO
+}
+EXPORT_3D_FORCE_DEFAULT_NAMING  ( -Aw )
+{
+   YES
+   NO
+}
+EXPORT_REPORT_FORMAT  ( -Aw )
+{
+   COMMA_DELIMITED
+   RICH_TEXT
+}
+EXPORT_TO_SHIPIT  ( -Aw )
+{
+   YES
+   NO
+}
+EXTEND_CVPATH  ( -Aw )
+{
+        ( -Fs )
+}
+EXTERNAL_ANALYSIS_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+FAIL_REF_COPY_WHEN_MISSING_ORIG  ( -Aw )
+{
+   YES
+   NO
+}
+FAIL_UNATTACHED_FEATURE  ( -Aw )
+{
+   YES
+   NO
+}
+FAN_SIGNIFICANT_LOCATIONS_ONLY  ( -Aw )
+{
+   YES
+   NO
+}
+FAN_WITH_NETWORK  ( -Aw )
+{
+   YES
+   NO
+}
+FASTHLR  ( -Aw )
+{
+   NO
+   YES
+}
+FASTHLR_DRAWING  ( -Aw )
+{
+   NO
+   YES
+}
+FAST_HIGHLIGHT  ( -Aw )
+{
+   NO
+   YES
+}
+FEATURE_CREATE_AUTO_BEGIN  ( -Aw )
+{
+   YES
+   NO
+}
+FEATURE_CREATE_AUTO_OK  ( -Aw )
+{
+   YES
+   NO
+}
+FILE_DIALOG_UNITS_CLASS  ( -Aw )
+{
+   IPS
+   MKS
+}
+FILE_OPEN_DEFAULT_FOLDER  ( -Aw )
+{
+   DEFAULT
+   WORKING_DIRECTORY
+   IN_SESSION
+   PRO_LIBRARY
+}
+FILE_OPEN_DEFAULT_VIEW  ( -Aw )
+{
+   LIST
+   DETAILS
+}
+FILE_OPEN_PREVIEW_DEFAULT  ( -Aw )
+{
+   EXPANDED
+   COLLAPSED
+}
+FILE_OPEN_PREVIEW_DELAY  ( -Aw )
+{
+        ( -Fs )
+}
+FILE_TIMESTAMP_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+FIX_AUTOCAD_IGES_TEXT_SCALE  ( -Aw )
+{
+   YES
+   NO
+}
+FIX_CATIA_IGES_SYM_NOTE  ( -Aw )
+{
+   YES
+   NO
+}
+FIX_IMPORTED_SET_VIEW_ORIENT  ( -Aw )
+{
+   YES
+   NO
+}
+FIX_REFS_TO_INTERSECTIONS  ( -Aw )
+{
+   YES
+   NO
+}
+FLANGE_SHAPE_SKETCHES_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+FLAT_SHAPE_SKETCHES_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+FLIP_ARROW_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+FLOATING_LAYER_TREE  ( -Aw )
+{
+   YES
+   NO
+}
+FONTS_SIZE  ( -Aw )
+{
+   SMALL
+   MEDIUM
+   LARGE
+}
+FOOT_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+FORCE_NEW_FILE_OPTIONS_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+FORCE_UPD_ASSEM_MP_IN_SIMP_REP  ( -Aw )
+{
+   YES
+   NO
+   USE_STORED
+}
+FORCE_WIREFRAME_IN_DRAWINGS  ( -Aw )
+{
+   YES
+   NO
+}
+FORMAT_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+FRAMES_PER_SEC  ( -Aw )
+{
+   NO
+   YES
+}
+FRAMES_PER_SEC_VALUE  ( -Aw )
+{
+}
+FREEZE_FAILED_ASSY_COMP  ( -Aw )
+{
+   YES
+   NO
+}
+FREEZE_FAILED_CABLE_LOCATIONS  ( -Aw )
+{
+   YES
+   NO
+}
+FRT_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+FULL_HLR_FOR_CABLES  ( -Aw )
+{
+   NONE
+   FULL
+   PARTIAL
+}
+GENERAL_UNDO_STACK_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+GENERATE_VIEWABLE_ON_SAVE  ( -Aw )
+{
+   YES
+   NO
+}
+GEOMETRY_ANALYSIS_COLOR_SCHEME  ( -Aw )
+{
+        ( -Fs )
+}
+GERBER_360_INTERPOLATION  ( -Aw )
+{
+   NO
+   YES
+}
+GLOBAL_APPEARANCE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+GPOSTPP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+GRAPHICS  ( -Aw )
+{
+   OPENGL
+   X_WINDOWS
+}
+GRID_SNAP  ( -Aw )
+{
+   YES
+   NO
+}
+GROUP_REPLACE_RENAME  ( -Aw )
+{
+   YES
+   NO
+}
+GROUP_REPL_WITH_RECYCLE  ( -Aw )
+{
+   YES
+   NO
+}
+GTOL_DIM_PLACEMENT  ( -Aw )
+{
+   ON_BOTTOM
+   UNDER_VALUE
+}
+HARN_START_MODEL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+HARN_TANG_LINE_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+HDIC_EXPORT_V5_TO_WS_ENABLE  ( -Aw )
+{
+   NO
+   YES
+}
+HELP_TRANSLATION  ( -Aw )
+{
+   YES
+   NO
+}
+HIGHLIGHT_ERASED_DWG_VIEWS  ( -Aw )
+{
+   YES
+   NO
+}
+HIGHLIGHT_GEOMETRY  ( -Aw )
+{
+   YES
+   NO
+}
+HIGHLIGHT_LAYER_ITEMS  ( -Aw )
+{
+   YES
+   NO
+}
+HIGHLIGHT_NEW_DIMS  ( -Aw )
+{
+   YES
+   NO
+}
+HLR_FOR_QUILTS  ( -Aw )
+{
+   YES
+   NO
+}
+HLR_FOR_XHATCHES  ( -Aw )
+{
+   NO
+   YES
+}
+HOLE_DIAMETER_OVERRIDE  ( -Aw )
+{
+   YES
+   NO
+}
+HOLE_FILE_RESOLUTION  ( -Aw )
+{
+   REPLACE_WITH_EXTERNAL
+   USE_INTERNAL
+}
+HOLE_PARAMETER_FILE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+ICONIFY_ENTIRE_PRO  ( -Aw )
+{
+   NO
+   YES
+}
+IDD_REPAIR_TANGENCY  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_CLIP_VIEW_ENT  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_CLIP_VIEW_NOTE  ( -Aw )
+{
+   NO_CLIP
+   FULL_CLIP
+   PARTIAL_CLIP
+}
+IGES_EXPORT_DWG_VIEWS  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_IN_DWG_COLOR  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_IN_DWG_LINE_FONT  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_IN_GROUP_TO_DWG_LAYER  ( -Aw )
+{
+   NO
+   YES
+}
+IGES_NOTE_DISP  ( -Aw )
+{
+   AS_GEOMETRY
+   ALL_VIEWS
+   NO_VIEWS
+   AS_IS
+}
+IGES_OUT_ALL_SRFS_AS  ( -Aw )
+{
+   128
+   114
+   DEFAULT
+}
+IGES_OUT_ASSEMBLY_DEFAULT_MODE  ( -Aw )
+{
+   FLAT
+   ONE_LEVEL
+   ALL_LEVELS
+   ALL_PARTS
+}
+IGES_OUT_CATIA_GDT_WIDTH  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_CATIA_NOTES  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_DWG_COLOR  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_DWG_LINE_FONT  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_ENT_AS_BSPLINE  ( -Aw )
+{
+   TRUE
+   FALSE
+}
+IGES_OUT_JAMAIS_COMPLIANT  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_MIL_D_28000  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_SPL_CRVS_AS_126  ( -Aw )
+{
+   NO
+   YES
+}
+IGES_OUT_SPL_SRFS_AS_128  ( -Aw )
+{
+   NO
+   YES
+}
+IGES_OUT_START_NOTE  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_SYMBOL_ENTITY  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_TRIM_CURVE_DEVIATION  ( -Aw )
+{
+        ( -Fs )
+}
+IGES_OUT_TRIM_XYZ  ( -Aw )
+{
+   YES
+   NO
+}
+IGES_OUT_TRM_SRFS_AS_143  ( -Aw )
+{
+   NO
+   YES
+}
+IGES_ZERO_VIEW_DISP  ( -Aw )
+{
+   ALL_VIEWS
+   NO_VIEWS
+   AS_IS
+}
+IGNORE_ALL_REF_SCOPE_SETTINGS  ( -Aw )
+{
+   YES
+   NO
+}
+IGNORE_EXPORT_GEOM_DECLARATION  ( -Aw )
+{
+   YES
+   NO
+}
+IGNORE_NON_DISPLAYED_ITEMS  ( -Aw )
+{
+   YES
+   NO
+}
+INCH_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+INCLUDE_ALL_TOOLS_IN_LIST  ( -Aw )
+{
+   YES
+   NO
+}
+INCLUDE_SUB_MODEL_INTERFACES  ( -Aw )
+{
+   YES
+   NO
+}
+INFO_OUTPUT_FORMAT  ( -Aw )
+{
+   TEXT
+   HTML
+}
+INFO_OUTPUT_MODE  ( -Aw )
+{
+   CHOOSE
+   SCREEN
+   FILE
+   BOTH
+}
+INITIAL_BEND_Y_FACTOR  ( -Aw )
+{
+        ( -Fs )
+}
+INITIAL_DRM_WARNING  ( -Aw )
+{
+   YES
+   NO
+}
+INSTANCE_SEARCH_EXHAUSTIVE  ( -Aw )
+{
+   NO
+   YES
+}
+INTERFACE_CRITERIA_MISMATCH  ( -Aw )
+{
+   WARNING_ONLY
+   FAIL_PLACEMENT
+   IGNORE
+}
+INTERFACE_QUALITY  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_FIT_INCOMPATIBLE_DATA  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IGES_OUT_HATCH  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_ACAD_IGNORE_3D  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_ASSOC_DIM_GEOM  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_BOTTOM_MARGIN  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_CREATE_MULTILINE_NOTE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_DIM  ( -Aw )
+{
+   AS_SEP_ENT
+   AS_IS
+   AS_SYMBOL
+}
+INTF2D_IN_DXF_MAPPING_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_IGES_HATCH_BND_LAYER  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_IGES_SYMBOLS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_LEFT_MARGIN  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_MI_MAPPING_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_OPEN_LOG_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_RECOMPUTE_DIM_VALUE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_RIGHT_MARGIN  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_STD_CLRS_AS_USER_DEF  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_IN_TOP_MARGIN  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_IN_WHITE_AS_BLACK  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_ACAD_BRK_TBL_W_BL_LN  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_ACAD_MTEXT  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_ACAD_OLE_AS_IMAGE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_ACAD_TEXT_ALIGN  ( -Aw )
+{
+   AS_IS
+   FIT
+}
+INTF2D_OUT_ACAD_UNICODE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_BLANKED_LAYERS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_CGM_OLD_LFONT_MAP  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_CGM_VER  ( -Aw )
+{
+   1
+   3
+}
+INTF2D_OUT_DXF_MAPPING_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF2D_OUT_ENHANCED_ENTS  ( -Aw )
+{
+   SPLINE_AND_HATCH
+   SPLINE_ONLY
+   HATCH_ONLY
+   NONE
+}
+INTF2D_OUT_IGES_LAYERS_WITH_ID  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_IMAGE_FORMAT  ( -Aw )
+{
+   PNG
+   JPEG
+}
+INTF2D_OUT_LINEMERGE_IGN_LAYERS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_LINE_WIDTH  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_OPEN_LOG_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_PNT_ENT  ( -Aw )
+{
+   YES
+   NO
+}
+INTF2D_OUT_STROKE_TEXT  ( -Aw )
+{
+   NONE
+   SPECIAL
+   ALL
+}
+INTF3D_IDEAS_IMPORT_FILTER  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_IDEAS_INSTALL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_IDEAS_RUN_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_IN_ENABLE_LAYER_JOIN  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_IN_IMPORT_AS_FACETS  ( -Aw )
+{
+   YES
+   NO
+   DEFAULT
+}
+INTF3D_OUT_ANNO_AS  ( -Aw )
+{
+   GRAPHIC
+   SEMANTIC
+   NONE
+   DEFAULT
+}
+INTF3D_OUT_CAT2_IDENT_CRV  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CAT2_IDENT_PT  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CAT2_INFINITY  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CAT2_MODEL_SZ  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CAT2_SAG  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CAT2_STEP  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_CATIA_V5_VERSION  ( -Aw )
+{
+   16
+   17
+   18
+   19
+   20
+}
+INTF3D_OUT_DATUMS_BY_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_DEFAULT_OPTION  ( -Aw )
+{
+   WIREFRAME
+   SURFACES
+   WIREFRAME_SURFACES
+   SOLID
+   SHELLS
+   NONE
+}
+INTF3D_OUT_EXTEND_SURFACE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_FORCE_SURF_NORMALS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_JT_AUTO_LODS  ( -Aw )
+{
+   NO
+   YES
+}
+INTF3D_OUT_JT_BREP  ( -Aw )
+{
+   NO
+   JT_BREP
+   XT_BREP
+}
+INTF3D_OUT_JT_CONFIG_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_JT_CONFIG_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_JT_STRUCTURE  ( -Aw )
+{
+   PER_PART
+   FULLY_SHATTERED
+   MONOLITHIC
+}
+INTF3D_OUT_PARAMETERS  ( -Aw )
+{
+   ALL
+   NONE
+   DESIGNATED
+}
+INTF3D_OUT_PROP_CHORD_HEIGHTS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_PROP_STEP_SIZES  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_SURFACE_DEVIATION  ( -Aw )
+{
+        ( -Fs )
+}
+INTF3D_OUT_UNICODE_TO_NEUTRAL  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_USE_NUM_NAMES  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_OUT_USE_STEP_SIZE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF3D_PARASOLID_EXPORT_SCHEMA  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_CADDS_IMPORT_MAKE_SOLID  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_CADDS_VERSION  ( -Aw )
+{
+   14
+   15
+}
+INTF_GENERATE_LOG_FILE  ( -Aw )
+{
+   NO
+   SHORT
+   LONG
+}
+INTF_IN_DWG_PNT_ENT  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_IN_DWG_VIEW  ( -Aw )
+{
+   NO
+   2D_VIEWS
+   3D_VIEWS
+}
+INTF_IN_EXTRACT_PROFILES  ( -Aw )
+{
+   NONE
+   COMP
+   ALL
+}
+INTF_IN_GRANITE_DIRECT_ENABLE  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_IN_LAYER_ASM_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_IN_PROFILE_DEFAULT  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_ASM_MAPPED_ITEM  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_OUT_ASSIGN_NAMES  ( -Aw )
+{
+   NO_NAME
+   USER_NAME
+   ID_NAME
+}
+INTF_OUT_AS_BEZIER  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_OUT_AUTO_LAYER_IDS  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_OUT_BLANKED_ENTITIES  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_OUT_CAT_START_MODEL  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_ED_RECIPE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_LAYER  ( -Aw )
+{
+   NONE
+   PART_LAYER
+   BLOCK_LAYER
+   BLOCK_NESTED_LAYER
+   BLOCK_VIEW_BASED_LAYER
+   BLOCK_NESTED_VIEW_BASED_LAYER
+}
+INTF_OUT_LAYER_RENAME_TABLE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_MAX_BSPL_DEGREE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_PVS_RECIPE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_OUT_TEXT_LENGTH  ( -Aw )
+{
+   AS_IS
+   FULL_SIZE
+   ADJUSTED
+}
+INTF_PDF_U3D_CREATE_U3D_FILES  ( -Aw )
+{
+   YES
+   NO
+}
+INTF_PROFILE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_PV_RECIPE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+INTF_UG_VERSION  ( -Aw )
+{
+   NX5
+   NX6
+   NX7
+}
+INTF_USE_VARIABLE_SIZE  ( -Aw )
+{
+   NO
+   YES
+}
+ISOGEN_ATTRIBUTE_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_ENDTYPE_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_MANDATORY_ATTR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_NOMINAL_SIZE_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_OUTPUT_FILES_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_PCF_FILENAME_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+ISOGEN_SYMBOL_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+JLINK_JAVA2  ( -Aw )
+{
+   OFF
+   ON
+}
+JLINK_JAVA_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+KBD_CMD_ABBREVIATION  ( -Aw )
+{
+   ON
+   OFF
+}
+KBD_SELECTION  ( -Aw )
+{
+   NO
+   YES
+}
+KEEP_INFO_DATUMS  ( -Aw )
+{
+   YES
+   NO
+}
+KEEP_MODEL_IN_OPEN_WINDOW  ( -Aw )
+{
+   NO
+   YES
+}
+KEEP_STYLE_ITEMS_HIDDEN_ON_EXIT  ( -Aw )
+{
+   YES
+   NO
+}
+LANG_PROPAGATE  ( -Aw )
+{
+   YES
+   NO
+}
+LAST_SESSION_DIRECTORY_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+LAST_SESSION_RETRIEVAL  ( -Aw )
+{
+   YES
+   NO
+}
+LAYER_ITEM_HIGHLIGHT_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+LAYER_RULE_RETRIEVE_OBJECTS  ( -Aw )
+{
+   PROMT
+   OK
+   CANCEL
+}
+LAYOUT_DEFAULT_ENTITY_TYPE  ( -Aw )
+{
+   PRIVATE
+   PUBLIC
+}
+LAYOUT_SCROLL_BARS  ( -Aw )
+{
+   YES
+   NO
+}
+LAYOUT_SNAP  ( -Aw )
+{
+   YES
+   NO
+}
+LAYOUT_SYMBOL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+LAYOUT_SYMBOL_INST_PALETTE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+LAYOUT_TEMPLATE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+LDA_BATCH_MAPPING_OPTION  ( -Aw )
+{
+   ALL
+   MODEL_ONLY
+   VIEWS_ONLY
+   ANNOTATIONS_ONLY
+   MODEL_AND_VIEWS
+   VIEWS_AND_ANNOTATIONS
+}
+LDA_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+LDA_MODEL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+LDA_OVERALL_VIEW_MAP_TIME_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+LDA_VIEW_MAP_TIME_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+LET_PROE_RENAME_PDM_OBJECTS  ( -Aw )
+{
+   NO
+   YES
+}
+LINEAR_TOL  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.0  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.00  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.000  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.0000  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.00000  ( -Aw )
+{
+        ( -Fs )
+}
+LINEAR_TOL_0.000000  ( -Aw )
+{
+        ( -Fs )
+}
+LOAD_UI_CUSTOMIZATION_RUN_DIR  ( -Aw )
+{
+   NO
+   YES
+}
+LODS_ENABLED  ( -Aw )
+{
+   NO
+   YES
+}
+LODS_VALUE  ( -Aw )
+{
+}
+MAINTAIN_LIMIT_TOL_NOMINAL  ( -Aw )
+{
+   YES
+   NO
+}
+MAKE_AUX_VIEW_NOTES  ( -Aw )
+{
+   YES
+   NO
+}
+MAKE_PARAMETERS_FROM_FMT_TABLES  ( -Aw )
+{
+   YES
+   NO
+}
+MAKE_PROJ_VIEW_NOTES  ( -Aw )
+{
+   YES
+   NO
+}
+MANIKIN_DRAG_AUTO_LOCKS  ( -Aw )
+{
+   YES
+   NO
+}
+MANIKIN_DRAG_LEGACY_ROTATE  ( -Aw )
+{
+   YES
+   NO
+}
+MANIKIN_FLEXIBILITY  ( -Aw )
+{
+   FULL
+   NONE
+   DEFAULT
+}
+MANIKIN_REPLACE_KEEP_POSTURE  ( -Aw )
+{
+   YES
+   NO
+}
+MAPKEY  ( -Aw )
+{
+        ( -Fs )
+}
+MAPKEYS_EXECUTION  ( -Aw )
+{
+   NO_FEEDBACK
+   EXECUTE_WITH_FEEDBACK
+   STOP_AT_FAILURE
+}
+MARK_APPROXIMATE_DIMS  ( -Aw )
+{
+   YES
+   NO
+}
+MASS_PROPERTY_CALCULATE  ( -Aw )
+{
+   BY_REQUEST
+   AUTOMATIC
+   CHECK_UPON_SAVE
+}
+MASS_PROP_LOAD_FROM_FILE  ( -Aw )
+{
+   BY_REQUEST
+   ALWAYS
+}
+MATERIAL_UPD_SMT_BEND_TABLE  ( -Aw )
+{
+   ALWAYS_REPLACE
+   NEVER_REPLACE
+}
+MATHCAD_ANALYSIS_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+MATHCAD_AUTOMAPPING  ( -Aw )
+{
+   YES
+   NO
+}
+MAT_ASSIGN_APPEARANCE  ( -Aw )
+{
+   YES
+   NO
+}
+MAX_ANIMATION_TIME  ( -Aw )
+{
+}
+MAX_IMAGE_DIMENSION  ( -Aw )
+{
+   4096
+   1024
+   2048
+   8192
+   16384
+}
+MAX_REGEN_TIME_ATTACH_PREVIEW  ( -Aw )
+{
+        ( -Fs )
+}
+MDL_TREE_CFG_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MDO_CL_EXECUTABLE  ( -Aw )
+{
+        ( -Fs )
+}
+MDO_INTEGRATION_METHOD  ( -Aw )
+{
+   AUTO
+   EXPLICIT
+   IMPLICIT
+}
+MDO_SPRING_WIRE_RADIUS  ( -Aw )
+{
+        ( -Fs )
+}
+MDX_BELT_ICON_WIDTH  ( -Aw )
+{
+        ( -Fs )
+}
+MDX_COLLISION_NUM_TRIANGLES  ( -Aw )
+{
+        ( -Fs )
+}
+MEASURE_DEC_PLACES  ( -Aw )
+{
+        ( -Fs )
+}
+MEASURE_SIG_FIGURES  ( -Aw )
+{
+        ( -Fs )
+}
+MEDUSA_2D_CONFIG_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MENTOR_VER_2_0  ( -Aw )
+{
+   YES
+   NO
+}
+MENU_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+MENU_MANAGER_POSITION  ( -Aw )
+{
+   OUTSIDE
+   INSIDE
+   ADAPTIVE
+}
+MENU_MAPPER_LOCATION  ( -Aw )
+{
+        ( -Fs )
+}
+MENU_SHOW_INSTANCES  ( -Aw )
+{
+   YES
+   NO
+}
+MENU_TRANSLATION  ( -Aw )
+{
+   YES
+   NO
+   BOTH
+}
+MERGE_SMT_SRFS_WITHOUT_SEAM  ( -Aw )
+{
+   YES
+   NO
+}
+MERGE_TYPE  ( -Aw )
+{
+   JOIN
+   INTERSECT
+}
+MESH_SPLINE_SURF  ( -Aw )
+{
+   NO
+   YES
+}
+METER_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_AUTO_REF_MFG_TEMPLATE  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_AUTO_REF_PRT_AS_CHK_SRF  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_AUTO_RETRACT_CLEAR_DIST  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_CUSTOMIZE_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_CUSTOM_TOOL_PARAM_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_CUTLINE_SAVE_MESH  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_IJK_NUM_DIGITS  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_INFO_LOCATION  ( -Aw )
+{
+   TOP_LEFT
+   BOTTOM_RIGHT
+}
+MFG_MODAL_COMMAND_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_PARAM_AUTO_COPY_FROM_TOOL  ( -Aw )
+{
+   NONE
+   ALL
+   MISC
+   CUTTING
+}
+MFG_PROCESS_PRINT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_PROCESS_SYNC_BY_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_PROCESS_TABLE_SETUP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_PROCESS_TEMPLATE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_SETUP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_START_MODEL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_STOCK_DISPLAY_SHOW_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+MFG_TAP_MAT_REM_COEF  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_TEMPLATE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_TOOL_DIALOG_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_UDF_INFO_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_WORKPIECE_TRANSPARENCY  ( -Aw )
+{
+        ( -Fs )
+}
+MFG_XYZ_NUM_DIGITS  ( -Aw )
+{
+        ( -Fs )
+}
+MILLIMETER_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+MINIMUM_ANGLE_DIMENSION  ( -Aw )
+{
+        ( -Fs )
+}
+MIN_ANIMATION_STEPS  ( -Aw )
+{
+}
+MODELCHECK_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+MODELCHECK_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+MODELTREE_SHOW_GEN_OF_INSTANCE  ( -Aw )
+{
+   YES
+   NO
+}
+MODEL_ALLOW_REF_SCOPE_CHANGE  ( -Aw )
+{
+   YES
+   NO
+}
+MODEL_DETAIL_OPTIONS_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_GRID_BALLOON_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+MODEL_GRID_NEG_PREFIX  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_GRID_NUM_DIG  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_GRID_SPACING  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_NOTES_AS_LABELS  ( -Aw )
+{
+   NO
+   YES
+}
+MODEL_RENAME_TEMPLATE  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_TREE_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+MODEL_TREE_START  ( -Aw )
+{
+   NO
+   YES
+}
+MODIFIED_OBJS_IN_NEW_DIR  ( -Aw )
+{
+   YES
+   NO
+}
+MODIFY_OFFSET_DURING_COMP_DRAG  ( -Aw )
+{
+   YES
+   NO
+}
+MOLD_LAYOUT_ORIGIN_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+MOLD_VOL_SURF_NO_AUTO_ROLLBACK  ( -Aw )
+{
+   YES
+   NO
+}
+MOTION_ENVLP_ALERT  ( -Aw )
+{
+   YES
+   NO
+}
+MOVE_MECHANISM_IN_NONGEOM_REPS  ( -Aw )
+{
+   NO
+   YES
+   EXCLUDE_TO_MOVE
+}
+MP_CALC_LEVEL  ( -Aw )
+{
+   ASSEMBLY_ONLY
+   ALL_MODELS
+}
+MP_DENS_FT_COLUMN_MTRL_ASSIGNED  ( -Aw )
+{
+   NO
+   YES
+}
+MSG_TRANSLATION  ( -Aw )
+{
+   YES
+   NO
+}
+MTRL_CONVERT_UNITS  ( -Aw )
+{
+   YES
+   NO
+}
+MULTIPLE_SKELETONS_ALLOWED  ( -Aw )
+{
+   YES
+   NO
+}
+NATIVE_KBD_MACROS  ( -Aw )
+{
+   NO
+   YES
+}
+NCCHECK_TYPE  ( -Aw )
+{
+   VERICUT
+   NCCHECK
+}
+NCL_FILE_EXTENSION  ( -Aw )
+{
+        ( -Fs )
+}
+NCMDL_BAR_STOCK_PART_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+NCMDL_BILLET_STOCK_PART_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+NCPOST_TYPE  ( -Aw )
+{
+   GPOST
+   NCPOST
+}
+NCSEQ_OUTBND_CURVE  ( -Aw )
+{
+   NO
+}
+NCSEQ_OUTBOUND_CURVE  ( -Aw )
+{
+   YES
+}
+NC_AUTODOC_PARAM_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+NC_AUTODOC_REPORT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+NC_AUTODOC_SETUP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+NC_AUTODOC_TEMPLATE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+NC_JOBMAN_VISIBLE  ( -Aw )
+{
+   YES
+   NO
+}
+NETWORK_LOCATION_OVERRIDE_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+NETWORK_SEGMENT_OVERRIDE_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+NEW_PARAMETER_UI  ( -Aw )
+{
+   YES
+   NO
+}
+NEW_REF_PART_NAME_DISABLED  ( -Aw )
+{
+   YES
+   NO
+}
+NEW_RELATION_UI  ( -Aw )
+{
+   YES
+   NO
+}
+NEW_TURN_SCAN_TYPE  ( -Aw )
+{
+   YES
+   NO
+}
+NEW_WF5_SIMP_REP_UI  ( -Aw )
+{
+   YES
+   NO
+}
+NUMBER_USER_COLORS  ( -Aw )
+{
+        ( -Fs )
+}
+OFFSET_LINE_DEF_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+OFFSET_LINE_DEF_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+OLD_STYLE_SET_DATUM  ( -Aw )
+{
+   YES
+   NO
+}
+ONLINE_RESOURCES_LOCATION  ( -Aw )
+{
+        ( -Fs )
+}
+OPEN_DRAW_SIMP_REP_BY_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+OPEN_SIMPLIFIED_REP_BY_DEFAULT  ( -Aw )
+{
+        ( -Fs )
+}
+ORIENTATION  ( -Aw )
+{
+   ISOMETRIC
+   TRIMETRIC
+   USER_DEFAULT
+}
+ORIENTATION_STYLE  ( -Aw )
+{
+   ANCHORED
+   DYNAMIC
+}
+ORTHOGONAL_SNAP  ( -Aw )
+{
+   YES
+   NO
+}
+OUTPUT_MFG_XML  ( -Aw )
+{
+   YES
+   NO
+}
+OVERLAYS_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+OVERRIDE_STORE_BACK  ( -Aw )
+{
+   YES
+   NO
+}
+PACKAGE_CONSTRAINTS  ( -Aw )
+{
+   DISALLOW
+   FREEZE
+   UPDATE
+}
+PACKAGE_REF_ALERT  ( -Aw )
+{
+   YES
+   NO
+}
+PARAMETER_DIALOG_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PARAM_DEC_PLACES  ( -Aw )
+{
+        ( -Fs )
+}
+PARENTHESIZE_REF_DIM  ( -Aw )
+{
+   YES
+   NO
+}
+PART_TABLE_EDITOR  ( -Aw )
+{
+   PROTAB
+   EDITOR
+   EXCEL
+}
+PATTERN_EXACT_INCREMENTAL_DIM  ( -Aw )
+{
+   NO
+   YES
+}
+PATTERN_RELATIONS_COPY  ( -Aw )
+{
+   YES
+   NO
+}
+PDF_LINECAP  ( -Aw )
+{
+   BUTT
+   ROUND
+   PROJECTING SQUARE
+}
+PDF_LINEJOIN  ( -Aw )
+{
+   MITER
+   ROUND
+   BEVEL
+}
+PDF_USE_PENTABLE  ( -Aw )
+{
+   NO
+   YES
+}
+PDM_REV  ( -Aw )
+{
+   PDMREV_FMT_REV_VER
+   PDMREV_FMT_REV
+   PDMREV_FMT_BRANCH_REV_VER
+   PDMREV_FMT_BRANCH_REV
+}
+PDM_SERVER_QUICKVIEW_ROWS_NUM  ( -Aw )
+{
+        ( -Fs )
+}
+PEN1_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN2_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN3_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN4_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN5_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN6_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN7_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN8_LINE_WEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PEN_SLEW  ( -Aw )
+{
+        ( -Fs )
+}
+PEN_SLEW_XY  ( -Aw )
+{
+        ( -Fs )
+}
+PEN_TABLE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PHOTORENDER_CAPABILITY_WARNINGS  ( -Aw )
+{
+   YES
+   NO
+}
+PHOTORENDER_DEFAULT_HEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+PHOTORENDER_DEFAULT_WIDTH  ( -Aw )
+{
+        ( -Fs )
+}
+PHOTORENDER_MEMORY_USAGE  ( -Aw )
+{
+        ( -Fs )
+}
+PHOTORENDER_PREVIEW_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+PICK_APERTURE_RADIUS  ( -Aw )
+{
+        ( -Fs )
+}
+PICK_CHAIN_TANGENT_ONLY  ( -Aw )
+{
+   YES
+   NO
+}
+PIPELINE_ASSEMBLY_LIBRARY_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PIPELINE_ASSEMBLY_NAME_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPELINE_LABEL_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPELINE_SOLID_START_PART_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+PIPELINE_SPOOL_LABEL_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPELINE_START_ASSEMBLY_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+PIPE_3D_BEND_THEOR_INT_PTS  ( -Aw )
+{
+   NO
+   YES
+}
+PIPE_BEND_LOCATIONS_CSYS_UNITS  ( -Aw )
+{
+   YES
+   NO
+}
+PIPE_PRE_22_BENDINFO_CONV  ( -Aw )
+{
+   YES
+   NO
+}
+PIPE_SOLID_CENTERLINE  ( -Aw )
+{
+   YES
+   NO
+}
+PIPE_SOLID_LABEL_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPE_UPDATE_PRE_20_INT_PTS  ( -Aw )
+{
+   YES
+   NO
+}
+PIPING_APPEARANCE_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_BOLT_NUT_SELECT_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_DESIGN_METHOD  ( -Aw )
+{
+   NON_SPEC_DRIVEN
+   SPEC_DRIVEN
+   USER_DRIVEN
+}
+PIPING_ENABLE_DESIGNATE_REPORT  ( -Aw )
+{
+   YES
+   NO
+}
+PIPING_END_COMPATIBILITY_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_EXTEND_DIM_SCHEME  ( -Aw )
+{
+   CARTESIAN
+   CYLINDRICAL
+   SPHERICAL
+}
+PIPING_EXTEND_SHOW_CSYS  ( -Aw )
+{
+   YES
+   NO
+}
+PIPING_FITT_ANGLE_TOLERANCE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_FITT_CATEGORY_MAP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_FITT_LIBRARY_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_FLUID_PARAMETER  ( -Aw )
+{
+   NO
+   YES
+}
+PIPING_INSULATION_DIR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_JOINT_FITTING_CLEARANCE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_JOINT_FITTING_OFFSET  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_MANUFACTURE_DIR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_MATERIAL_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_MATERIAL_SOURCE  ( -Aw )
+{
+   WEIGHT_LENGTH
+   MATERIAL_DIR
+}
+PIPING_MCAT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_MCAT_DIR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_MIN_BOLTING_CLEARANCE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_PROJECT_DATA_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_SCHEMATIC_DRIVEN  ( -Aw )
+{
+   NO
+   YES
+}
+PIPING_SCHEMATIC_XML_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_SPEC_DIR_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_SYSTEM_TREE_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_THUMB_WHEEL_INCREMENT  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_THUMB_WHEEL_RATIO_INC  ( -Aw )
+{
+        ( -Fs )
+}
+PIPING_WILDFIRE_CONVERT  ( -Aw )
+{
+   MANUAL
+   NEVER
+   AUTOMATIC
+}
+PLACEMENT_REP_BY_DEFAULT  ( -Aw )
+{
+        ( -Fs )
+}
+PLOTTER  ( -Aw )
+{
+        ( -Fs )
+}
+PLOTTER_COMMAND  ( -Aw )
+{
+   WINDOWS_PRINT_MANAGER
+   #STRING
+}
+PLOTTER_HANDSHAKE  ( -Aw )
+{
+   HARDWARE
+   SOFTWARE
+}
+PLOT_CARBERRY_EXTENDS  ( -Aw )
+{
+   YES
+   NO
+}
+PLOT_FILE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PLOT_LINESTYLE_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+PLOT_NAMES  ( -Aw )
+{
+   YES
+   NO
+}
+PLOT_NAMES_WITH_SHEET  ( -Aw )
+{
+   YES
+   NO
+}
+PLOT_PROCEED_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+PLOT_TO_SCALE_FULL_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+POPUPHELP_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+POPUP_REFPAIRINTCH_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+POSTSCRIPT_COMPRESSION  ( -Aw )
+{
+   YES
+   NO
+}
+PREFERRED_EXPORT_FORMAT  ( -Aw )
+{
+   IGES
+   DXF
+   STEP
+   CGM
+   DWG
+   TIFF
+   STHENO
+}
+PREFERRED_SAVE_AS_TYPE  ( -Aw )
+{
+        ( -Fs )
+}
+PREHIGHLIGHT  ( -Aw )
+{
+   YES
+   NO
+}
+PREHIGHLIGHT_TREE  ( -Aw )
+{
+   YES
+   NO
+}
+PRESERVE_COMP_COLOR_IN_PREVIEW  ( -Aw )
+{
+   NO
+   YES
+}
+PREV_PROC_COMP_DEF_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+PREV_PROC_COMP_DEF_FONT  ( -Aw )
+{
+        ( -Fs )
+}
+PRIME_ANALYSIS_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+PRIME_AUTOMAPPING  ( -Aw )
+{
+   YES
+   NO
+}
+PRODEVDAT  ( -Aw )
+{
+        ( -Fs )
+}
+PROE_MEMORY_BUFFER_SIZE  ( -Aw )
+{
+        ( -Fs )
+}
+PROFILE_OUTPUT_UTILS  ( -Aw )
+{
+   YES
+   NO
+}
+PROMPT_ON_ERASE_NOT_DISP  ( -Aw )
+{
+   YES
+   NO
+}
+PROMPT_ON_EXIT  ( -Aw )
+{
+   YES
+   NO
+}
+PRONCPOST_DBF  ( -Aw )
+{
+        ( -Fs )
+}
+PROPAGATE_BY_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+PROPAGATE_CHANGE_TO_PARENTS  ( -Aw )
+{
+   YES
+   NO
+}
+PROPAGATE_INACTIVE_ANNOTATION  ( -Aw )
+{
+   NO
+   YES
+}
+PROREMBATCH_QUEUE_MANAGER  ( -Aw )
+{
+        ( -Fs )
+}
+PROTABLE_IN_BACKGROUND  ( -Aw )
+{
+   NO
+   YES
+}
+PROTKDAT  ( -Aw )
+{
+        ( -Fs )
+}
+PROVIDE_PICK_MESSAGE_ALWAYS  ( -Aw )
+{
+   YES
+   NO
+}
+PRO_CATALOG_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_CAV_LAY_RULE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_CBLTRM_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_COLORMAP_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_CROSSHATCH_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_DESIGN_TEST_MODE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_DTL_SETUP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_EDITOR_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_FONT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_FORMAT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_GPLUG_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_GROUP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_INSULATION_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_LIBRARY_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MATERIAL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MDB_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MFG_CMDSYN_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_CLAMP_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_CL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_PARAM_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_TAPE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_TPRM_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_MF_WORKCELL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_NOTE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_PALETTE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_PIP_FITT_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_PIP_LNSTK_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_PLOT_CONFIG_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SHEET_MET_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SMT_PARAMS_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SPACE_CLAIM_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SPOOL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_STHENO_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SURFACE_FINISH_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_SYMBOL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_TABLE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_TEXTURE_LIBRARY  ( -Aw )
+{
+        ( -Fs )
+}
+PRO_UNIT_LENGTH  ( -Aw )
+{
+   UNIT_INCH
+   UNIT_FOOT
+   UNIT_MM
+   UNIT_CM
+   UNIT_M
+}
+PRO_UNIT_MASS  ( -Aw )
+{
+   UNIT_OUNCE
+   UNIT_POUND
+   UNIT_TON
+   UNIT_GRAM
+   UNIT_KILOGRAM
+   UNIT_TONNE
+}
+PRO_UNIT_SYS  ( -Aw )
+{
+   MKS
+   CGS
+   MMNS
+   FPS
+   IPS
+   PROE_DEF
+   MMKS
+}
+PRO_WELD_PARAMS_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+PS_OUTPUT_WITH_PAGESIZE  ( -Aw )
+{
+   YES
+   NO
+}
+PTC_MANIKIN_LIBRARY_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+PTC_MANIKIN_POSTURE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+PTNCPOST_DBF  ( -Aw )
+{
+        ( -Fs )
+}
+PUNCH_AXIS_POINTS  ( -Aw )
+{
+   YES
+   NO
+}
+PUNCH_MODELS_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+PUT_IGES_DRAWING_ENTITY  ( -Aw )
+{
+   YES
+   NO
+}
+PVWB_SHAPE  ( -Aw )
+{
+   COMBO
+   BOX
+   CIRCLE
+}
+QTY_BALLOON_CHANGE_WARNING  ( -Aw )
+{
+   DIALOG
+   MESSAGE
+}
+QUICK_PRINT_DRAWING_TEMPLATE  ( -Aw )
+{
+        ( -Fs )
+}
+QUICK_PRINT_PLOTTER_CONFIG_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+RADIAL_HOLE_LINEAR_DIM  ( -Aw )
+{
+   YES
+   NO
+}
+RASTER_PLOT_DPI  ( -Aw )
+{
+   100
+   200
+   300
+   400
+}
+RATIO_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+READ_FAMTAB_FILE_ON_RETRIEVE  ( -Aw )
+{
+   NO
+   YES
+}
+READ_PARAMETERS_OF_EXCLUDED  ( -Aw )
+{
+   YES
+   NO
+   COMMON_NAME_ONLY
+}
+REAL_TIME_RENDERING_DISPLAY  ( -Aw )
+{
+   DISABLE
+   TRANSPARENT_FLOOR
+   ROOM_DISPLAY
+}
+REF_SCOPE_COPY_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+REF_SCOPE_COPY_COLOR_CHANGE  ( -Aw )
+{
+   NO
+   YES
+}
+REF_SCOPE_NO_PICK_TO_COPY  ( -Aw )
+{
+   NO
+   YES
+}
+REF_SCOPE_NO_PICK_TO_PROHIBIT  ( -Aw )
+{
+   NO
+   YES
+}
+REF_SCOPE_PROHIBIT_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+REF_SCOPE_PROHIBIT_COLOR_CHANGE  ( -Aw )
+{
+   NO
+   YES
+}
+REGENERATE_READ_ONLY_OBJECTS  ( -Aw )
+{
+   YES
+   NO
+}
+REGEN_BACKUP_DIRECTORY  ( -Aw )
+{
+        ( -Fs )
+}
+REGEN_BACKUP_USING_DISK  ( -Aw )
+{
+   YES
+   NO
+}
+REGEN_FAILURE_HANDLING  ( -Aw )
+{
+   RESOLVE_MODE
+   NO_RESOLVE_MODE
+}
+REGEN_INT_MDLS_ON_RETR  ( -Aw )
+{
+   YES
+   NO
+}
+REGEN_NOTEBOOK_W_ASSEM  ( -Aw )
+{
+   YES
+   NO
+}
+REGEN_SIMP_RETRIEVE  ( -Aw )
+{
+   YES
+   NO
+}
+REGEN_SOLID_BEFORE_SAVE  ( -Aw )
+{
+   PROMPT
+   YES
+   NO
+}
+RELATIONS_NUM_CONST_UNITS  ( -Aw )
+{
+   YES
+   NO
+}
+RELATIONS_UNITS_SENSITIVE  ( -Aw )
+{
+   YES
+   NO
+}
+RELATION_FILE_EDITOR  ( -Aw )
+{
+   PROTAB
+   EDITOR
+}
+RELATION_TEXT_TRAIL_OUTPUT  ( -Aw )
+{
+   YES
+   NO
+}
+RELATION_TOOL_MAPKEY_BEHAVIOR  ( -Aw )
+{
+   INCREMENT
+   FULL_OUTPUT
+}
+REMEMBER_LAST_ATTACH_TYPE  ( -Aw )
+{
+   YES
+   NO
+}
+REMEMBER_LAST_GET_POINT_OPTION  ( -Aw )
+{
+   YES
+   NO
+}
+REMEMBER_REPLACED_COMPONENTS  ( -Aw )
+{
+   YES
+   NO
+}
+RENAME_DRAWINGS_WITH_OBJECT  ( -Aw )
+{
+   NONE
+   PART
+   ASSEM
+   BOTH
+}
+REPLACE_COMP_NAME_METHOD  ( -Aw )
+{
+   TRANSFER
+   REMOVE
+   PRESERVE
+}
+REPLACE_COMP_NOTES_METHOD  ( -Aw )
+{
+   TRANSFER
+   REMOVE
+   PRESERVE
+}
+REPLACE_HISTORY_RULE_ORDER  ( -Aw )
+{
+   DISABLE
+   1
+   2
+   3
+   4
+   5
+}
+REPLACE_INTERFACE_RULE_ORDER  ( -Aw )
+{
+   DISABLE
+   1
+   2
+   3
+   4
+   5
+}
+REPLACE_SAMEID_RULE_ORDER  ( -Aw )
+{
+   DISABLE
+   1
+   2
+   3
+   4
+   5
+}
+REPLACE_SAMENAME_RULE_ORDER  ( -Aw )
+{
+   DISABLE
+   1
+   2
+   3
+   4
+   5
+}
+REPLACE_SAMEPARAM_RULE_ORDER  ( -Aw )
+{
+   DISABLE
+   1
+   2
+   3
+   4
+   5
+}
+REPLACE_UNRELATED_AUTOMATIC  ( -Aw )
+{
+   YES
+   NO
+}
+REPORT_END_SPLICE  ( -Aw )
+{
+   YES
+   NO
+}
+RESERVED_MENU_SPACE  ( -Aw )
+{
+        ( -Fs )
+}
+RESTRICTED_GTOL_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+RESTRICTED_VAL_DEFINITION  ( -Aw )
+{
+        ( -Fs )
+}
+RETAIN_DISPLAY_MEMORY  ( -Aw )
+{
+   YES
+   NO
+}
+RETRIEVE_DATA_SHARING_REF_PARTS  ( -Aw )
+{
+   YES
+   NO
+   IGNORE_MISSING
+}
+RETRIEVE_DISPLAY  ( -Aw )
+{
+   BACKGROUND
+   FOREGROUND
+}
+RETRIEVE_INSTANCE_DEPENDENCIES  ( -Aw )
+{
+   INSTANCE_DEPS_ONLY
+   INSTANCE_AND_GENERIC_DEPS
+   INSTANCE_REQ_GENERIC
+}
+RETRIEVE_MERGE_REF_PARTS  ( -Aw )
+{
+   YES
+   NO
+   IGNORE_MISSING
+}
+REVERSE_SPIRAL_FINISH_TYPE  ( -Aw )
+{
+        ( -Fs )
+}
+RIBBON_CABLE_FLAT_DIRECTION  ( -Aw )
+{
+   Y_AXIS
+   X_AXIS
+}
+RIGHT_MOUSE_BUTTON_POPUP  ( -Aw )
+{
+   YES
+   NO
+}
+ROOM_ROTATION_LOCK  ( -Aw )
+{
+   STUDIO
+   MODEL
+}
+ROTATE_POSTSCRIPT_PRINT  ( -Aw )
+{
+   YES
+   NO
+}
+ROUND_DISPLAYED_DIM_VALUES  ( -Aw )
+{
+   YES
+   NO
+}
+ROUND_PREWF5_DISPLAYED_DIM_VAL  ( -Aw )
+{
+   ROUND ALL
+   ROUND NONE
+   CALCULATED
+}
+RV_CURRENT_OBJECT  ( -Aw )
+{
+   COMPONENT
+   MODEL
+   COMPONENT + MODEL
+}
+RV_SEARCH_SCOPE  ( -Aw )
+{
+   SESSION
+   WINDOW
+}
+SAVEUNDERS_ENABLED  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_BITMAP  ( -Aw )
+{
+   NONE
+   TOPLEVELONLY
+   ALLLEVELS
+}
+SAVE_BITMAP_TYPE  ( -Aw )
+{
+   BMP
+   TIFF
+   GIF
+   CGM
+   JPEG
+}
+SAVE_CLIPPED_VIEW  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_DIALOG_FOR_EXISTING_MODELS  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_DISPLAY  ( -Aw )
+{
+   NO
+   YES
+}
+SAVE_DISPLAY_STATUS_IN_SUBMODEL  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_DRAWING_PICTURE_FILE  ( -Aw )
+{
+   NO
+   EXPORT
+   EMBED
+   BOTH
+}
+SAVE_HIDDEN_ITEMS_W_STATUS  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_INSTANCE_ACCELERATOR  ( -Aw )
+{
+   NONE
+   EXPLICIT
+   ALWAYS
+   SAVED_OBJECTS
+}
+SAVE_MODEL_DISPLAY  ( -Aw )
+{
+   WIREFRAME
+   SHADING_LOW
+   SHADING_HIGH
+   SHADING_LOD
+}
+SAVE_MODIFIED_DRAW_MODELS_ONLY  ( -Aw )
+{
+   NO
+   YES
+}
+SAVE_OBJECTS  ( -Aw )
+{
+   ALL
+   CHANGED
+   CHANGED_AND_SPECIFIED
+   CHANGED_AND_UPDATED
+}
+SAVE_OBJECT_IN_CURRENT  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_SCENE_WITH_FILE  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_TEXTURE_WITH_MODEL  ( -Aw )
+{
+   YES
+   NO
+}
+SAVE_TRIANGLES_FLAG  ( -Aw )
+{
+   NO
+   YES
+}
+SAVE_UNCHANGED_PDM_OBJECT  ( -Aw )
+{
+   AS_REF
+   AS_COPY
+}
+SAVE_VIEW_STATES_METHOD  ( -Aw )
+{
+   PROMPT
+   SAVE CHANGES
+   DISCARD CHANGES
+}
+SAVING_MODEL_THUMBNAILS  ( -Aw )
+{
+   YES
+   NO
+}
+SCOPE_INVALID_REFS  ( -Aw )
+{
+   COPY
+   PROHIBIT
+}
+SEARCH_AREA_FOR_COMP_INTERFACES  ( -Aw )
+{
+        ( -Fs )
+}
+SEARCH_NOT_RETRIEVED_MODELS  ( -Aw )
+{
+   YES
+   NO
+}
+SEARCH_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+SEARCH_PATH_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+SECTION_COLOR  ( -Aw )
+{
+   DEFAULT
+   SKETCH_COLOR
+   DRAWING_COLOR
+}
+SELECTION_DRAGGER_DISPLAY_MAX  ( -Aw )
+{
+        ( -Fs )
+}
+SELECTION_OF_REMOVED_ENTITIES  ( -Aw )
+{
+   YES
+   NO
+}
+SELECT_HIDDEN_EDGES_IN_DWG  ( -Aw )
+{
+   YES
+   NO
+}
+SELECT_ON_DTM_EDGES  ( -Aw )
+{
+   ALL_MODES
+   SKETCHER_ONLY
+}
+SEL_INSTS_ON_COMP_RETRIEVAL  ( -Aw )
+{
+   YES
+   NO
+}
+SET_MENU_WIDTH  ( -Aw )
+{
+        ( -Fs )
+}
+SET_MODEL_TYPES_TO_SAVE  ( -Aw )
+{
+        ( -Fs )
+}
+SET_TRAIL_SINGLE_STEP  ( -Aw )
+{
+   YES
+   NO
+}
+SHADED_POSTSCRIPT_BACKGROUND  ( -Aw )
+{
+   YES
+   NO
+}
+SHADE_MFG_REF_MODELS  ( -Aw )
+{
+   NO
+   YES
+}
+SHADE_MOVING_COMP  ( -Aw )
+{
+   YES
+   NO
+}
+SHADE_QUALITY  ( -Aw )
+{
+   3
+   1
+   2
+   4
+   5
+   6
+   7
+   8
+   9
+   10
+   11
+   12
+   13
+   14
+   15
+   16
+   17
+   18
+   19
+   20
+   21
+   22
+   23
+   24
+   25
+   26
+   27
+   28
+   29
+   30
+   31
+   32
+   33
+   34
+   35
+   36
+   37
+   38
+   39
+   40
+   41
+   42
+   43
+   44
+   45
+   46
+   47
+   48
+   49
+   50
+}
+SHADE_SURFACE_FEAT  ( -Aw )
+{
+   YES
+   NO
+}
+SHADE_WINDOWS  ( -Aw )
+{
+   ALL_WINDOWS
+   ONE_WINDOW
+}
+SHADE_WITH  ( -Aw )
+{
+   CURVES
+   NO
+}
+SHOW_ANNOTATIONS_DIALOG_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+SHOW_AXES_FOR_EXTR_ARCS  ( -Aw )
+{
+   YES
+   NO
+}
+SHOW_CAV_FIT_LOC_SYS  ( -Aw )
+{
+   YES
+   NO
+}
+SHOW_DESCRIPTION_VIEW_MGR  ( -Aw )
+{
+   YES
+   NO
+}
+SHOW_DIM_SIGN  ( -Aw )
+{
+   YES
+   NO
+}
+SHOW_GEOM_CHECKS_ON_CREATION  ( -Aw )
+{
+   YES
+   NO
+}
+SHOW_PREVIEW_DEFAULT  ( -Aw )
+{
+   KEEP
+   REMOVE
+}
+SHOW_SELECTED_ITEM_ID  ( -Aw )
+{
+   NO
+   YES
+}
+SHOW_SKETCH_DIMS_IN_FEATURE  ( -Aw )
+{
+   YES
+   NO
+}
+SHRINKAGE_VALUE_DISPLAY  ( -Aw )
+{
+   FINAL_VALUE
+   PERCENT_SHRINK
+}
+SHRINKWRAP_ALERT  ( -Aw )
+{
+   YES
+   NO
+}
+SIMPREP_COLUMN_DISPLAY  ( -Aw )
+{
+   AUTOMATIC
+   MANUAL
+}
+SIMPREP_COLUMN_FORMAT  ( -Aw )
+{
+   NAMES ONLY
+   ICONS ONLY
+   ICONS AND NAMES
+}
+SIMPREP_DEFAULT_MODEL_STATUS  ( -Aw )
+{
+   EXCLUDE
+   MASTER
+   GRAPHICS
+   GEOMETRY
+   LIGHT GRAPHICS REP
+}
+SIMPREP_ONDEMAND_ACTIVATION  ( -Aw )
+{
+   YES
+   NO
+}
+SIMPREP_ONDEMAND_CLEANUP  ( -Aw )
+{
+   DISABLE
+   RESTORE
+   RESTORE_AND_ERASE
+}
+SIMPREP_ONDEMAND_EDITING  ( -Aw )
+{
+   DISABLE
+   MASTER
+   AUTOMATIC
+   MASTER_WITH_ANCESTORS
+}
+SIMPREP_ONDEMAND_REGENERATION  ( -Aw )
+{
+   AUTOMATIC
+   MASTER
+   DISABLE
+}
+SIMPREP_ONDEMAND_SELECTION  ( -Aw )
+{
+   AUTOMATIC
+   MASTER
+   DISABLE
+}
+SIMPREP_ONDEMAND_SETTINGS  ( -Aw )
+{
+   PROMPT
+   NEVER_PROMPT
+   DISABLE
+}
+SIM_HYPERELASTIC_MATERIAL_FIT  ( -Aw )
+{
+   NORMALIZED
+   NON-NORMALIZED
+}
+SKELETON_MODEL_DEFAULT_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_ANIMATED_MODIFY  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_AUTO_CREATE_REFERENCES  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_AUTO_CREATE_REFS  ( -Aw )
+{
+   0
+   1
+   2
+}
+SKETCHER_BLENDED_BACKGROUND  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_COLLINEAR_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_CURVE_COLOR_SYNCH  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DEFAULT_FONT_KERNING  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DIMENSION_AUTOLOCK  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_DIM_OF_REVOLVE_AXIS  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_DISP_CONSTRAINTS  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DISP_DIMENSIONS  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DISP_GRID  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DISP_VERTICES  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_DISP_WEAK_DIMENSIONS  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_EQUAL_LENGTH_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_EQUAL_RADII_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_GRID_ANGLE  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_GRID_LINE_QUANTITY  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_GRID_RADIUS_SPACING  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_GRID_TYPE  ( -Aw )
+{
+   CARTESIAN
+   POLAR
+}
+SKETCHER_HIGHLIGHT_OPEN_ENDS  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_IMPORT_EXACT_GEOM  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_KNOWN_DIM_ON_REF_ENT  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_LINEUP_HOR_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_LINEUP_VER_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_LOCK_MODIFIED_DIMS  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_MIDPOINT_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_PALETTE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_PARALLEL_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_PERPENDICULAR_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_POINT_ON_ENTITY_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_REFIT_AFTER_DIM_MODIFY  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_REL_ACCURACY  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_SAME_POINT_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_SAVE_PREVIEW_IMAGE  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_SET_GRID_METHOD  ( -Aw )
+{
+   DYNAMIC
+   STATIC
+}
+SKETCHER_SET_GRID_X_MAJOR  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_SET_GRID_X_SPACING  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_SET_GRID_Y_MAJOR  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_SET_GRID_Y_SPACING  ( -Aw )
+{
+        ( -Fs )
+}
+SKETCHER_SHADE_CLOSED_LOOPS  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_STARTS_IN_2D  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_STRNGTHN_TO_DEF_DEC_PL  ( -Aw )
+{
+   YES
+   NO
+}
+SKETCHER_SYMMETRIC_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_TANGENT_CONSTR  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_UNDO_REORIENT_VIEW  ( -Aw )
+{
+   NO
+   YES
+}
+SKETCHER_UNDO_STACK_LIMIT  ( -Aw )
+{
+        ( -Fs )
+}
+SKET_IMPORT_GEOMETRY_LINE_STYLE  ( -Aw )
+{
+   YES
+   NO
+}
+SKIP_SMALL_SURFACES  ( -Aw )
+{
+   NO
+   YES
+}
+SMALLER_BUNDLE_MIN_BEND_RAD  ( -Aw )
+{
+   YES
+   NO
+}
+SMOOTH_LINES  ( -Aw )
+{
+   NO
+   YES
+}
+SMT_ALLOW_FLIP_SKETCH  ( -Aw )
+{
+   YES
+   NO
+}
+SMT_BEND_NOTES_DFLT_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+SMT_BEND_NOTES_DIRECTION_DOWN  ( -Aw )
+{
+        ( -Fs )
+}
+SMT_BEND_NOTES_DIRECTION_UP  ( -Aw )
+{
+        ( -Fs )
+}
+SMT_BEND_NOTES_ORDER  ( -Aw )
+{
+        ( -Fs )
+}
+SMT_BEND_NOTES_TYPE_FORMED  ( -Aw )
+{
+        ( -Fs )
+}
+SMT_BEND_NOTES_TYPE_ROLLED  ( -Aw )
+{
+        ( -Fs )
+}
+SMT_CRN_REL_DISPLAY  ( -Aw )
+{
+   NO
+   YES
+}
+SMT_DRIVE_BEND_BY_PARAMETERS  ( -Aw )
+{
+   YES
+   NO
+}
+SMT_DRIVE_TOOLS_BY_PARAMETERS  ( -Aw )
+{
+   YES
+   NO
+}
+SMT_FORM_ABORT_ON_FAIL_PLC  ( -Aw )
+{
+   YES
+   NO
+}
+SMT_MP_METHOD  ( -Aw )
+{
+   MASS
+   CG
+   BOTH
+}
+SMT_OUTSIDE_MOLD_LINES  ( -Aw )
+{
+   YES
+   NO
+}
+SNAP_SINGLE_CONSTRAINTS  ( -Aw )
+{
+   YES
+   NO
+}
+SNAP_TO_CONSTRAINTS_DURING_DRAG  ( -Aw )
+{
+   YES
+   NO
+}
+SPHERICAL_MAP_SIZE  ( -Aw )
+{
+   256X256
+   512X512
+   1024X1024
+}
+SPIN_CENTER_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+SPIN_RATE_ZOOM_SENSITIVE  ( -Aw )
+{
+   YES
+   NO
+}
+SPIN_WITH_NOTES  ( -Aw )
+{
+   YES
+   NO
+}
+SPIN_WITH_ORIENTATION_CENTER  ( -Aw )
+{
+   YES
+   NO
+}
+SPIN_WITH_PART_ENTITIES  ( -Aw )
+{
+   YES
+   NO
+}
+SPIN_WITH_SILHOUETTES  ( -Aw )
+{
+   NO
+   YES
+}
+STARTUP_CHECK_FOR_VISUALIZATION  ( -Aw )
+{
+   YES
+   NO
+}
+START_APPMGR  ( -Aw )
+{
+   YES
+   NO
+}
+START_MODEL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+STEP_APPEARANCE_LAYERS_GROUPS  ( -Aw )
+{
+   YES
+   NO
+}
+STEP_EXPORT_AP214_ASM_DEF_MODE  ( -Aw )
+{
+   SINGLE_FILE
+   SEPARATE_PARTS_ONLY
+   SEPARATE_ALL_OBJECTS
+}
+STEP_EXPORT_DWG_VIEWS  ( -Aw )
+{
+   NO
+   AS_3D_VIEWS
+   AS_3D_VIEWS_ASSOC_DRAFT
+}
+STEP_EXPORT_FORMAT  ( -Aw )
+{
+   AP203_IS
+   AP202_IS
+   AP203_IS_EXT
+   AP209_DIS
+   AP214_IS
+   AP203_E2
+}
+STEP_OUT_ASM_VAL_PROP  ( -Aw )
+{
+   YES
+   NO
+}
+STEP_OUT_MATERIAL  ( -Aw )
+{
+   YES
+   NO
+}
+STEP_OUT_MATERIAL_AS_PRODUCT  ( -Aw )
+{
+   YES
+   NO
+}
+STEP_OUT_SUPPL_GEOM  ( -Aw )
+{
+   YES
+   NO
+}
+STORE_TOOL_PATH_FILE  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_AUTO_REGEN_CURVES  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_AUTO_REGEN_SHADED_SURFACE  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_AUTO_REGEN_SURFACE  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_CONNECTION_ARROW_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+STYLE_DEFAULT_CONNECTIONS  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_DISPLAY_GRID  ( -Aw )
+{
+   YES
+   NO
+}
+STYLE_GRID_SPACING  ( -Aw )
+{
+        ( -Fs )
+}
+STYLE_STATE_TRANSPARENCY  ( -Aw )
+{
+}
+STYLE_SURFACE_MESH_DISPLAY  ( -Aw )
+{
+   OFF
+   ON
+   OFF WHEN SHADED
+}
+STYLE_SURFACE_MESH_QUALITY  ( -Aw )
+{
+        ( -Fs )
+}
+SUMMARY_HELP  ( -Aw )
+{
+   YES
+   NO
+}
+SUPPRESS_APPEARANCE_MESSAGE  ( -Aw )
+{
+   YES
+   NO
+}
+SUPPRESS_DLG_LICENSE_EXPIRED  ( -Aw )
+{
+        ( -Fs )
+}
+SUPPRESS_LICENSE_LOSS_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+SWITCH_DIMS_FOR_NOTES  ( -Aw )
+{
+   YES
+   NO
+}
+SYMBOL_INSTANCE_PALETTE_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+SYMBOL_PALETTE_INPUT  ( -Aw )
+{
+   YES
+   NO
+}
+SYM_LEADER_ORIENT_MOVE_TEXT  ( -Aw )
+{
+   YES
+   NO
+}
+SYSTEM_BACKGROUND_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_COLORS_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_CURVES_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_DIMMED_MENU_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_EDGE_HIGH_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_GEOMETRY_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_HIDDEN_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_HIGHLIGHT_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_IGES_HEADER_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_LETTER_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_SECTION_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_SHEETMETAL_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+SYSTEM_VOLUME_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+TABLET_DEVICE_NAME  ( -Aw )
+{
+        ( -Fs )
+}
+TANGENT_EDGE_DISPLAY  ( -Aw )
+{
+   NO
+   SOLID
+   CENTERLINE
+   PHANTOM
+   DIMMED
+}
+TAN_ANGLE_FOR_DISP  ( -Aw )
+{
+        ( -Fs )
+}
+TBL_DRIVEN_TOL_VAL_EDIT  ( -Aw )
+{
+   YES
+   NO
+}
+TEMPLATE_CONFIG_ASM  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_CONTAINER  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_DESIGNASM  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_DRAWING  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_ECADASM  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_ECADPART  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_ESRASM  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_FLAT_HARNESS  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_HARNESSPART  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_LAYOUT  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MFGCAST  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MFGCMM  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MFGEMO  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MFGMOLD  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MFGNC  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_MOLD_LAYOUT  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_SHEETMETALPART  ( -Aw )
+{
+        ( -Fs )
+}
+TEMPLATE_SOLIDPART  ( -Aw )
+{
+        ( -Fs )
+}
+TERMINAL_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+TERMINATOR_TABLE_OUT_UNICODE  ( -Aw )
+{
+   YES
+   NO
+}
+TEXTURE  ( -Aw )
+{
+   NO
+   YES
+}
+TEXTURE_SEARCH_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+THERMO_POSITION_HINT  ( -Aw )
+{
+   NO_WINDOW_OVERLAP
+   WINDOW_OVERLAP
+}
+TIFF_COMPRESSION  ( -Aw )
+{
+   NONE
+   G4
+   PACKBITS
+   DEFLATE
+}
+TIFF_TYPE  ( -Aw )
+{
+   RGB
+   PALETTE
+   GRAYSCALE
+   MONO
+}
+TODAYS_DATE_NOTE_FORMAT  ( -Aw )
+{
+        ( -Fs )
+}
+TOLERANCE_CLASS  ( -Aw )
+{
+   FINE
+   MEDIUM
+   COARSE
+   VERY_COARSE
+}
+TOLERANCE_STANDARD  ( -Aw )
+{
+   ANSI
+   ISO
+}
+TOLERANCE_TABLE_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+TOL_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+TOL_NUM_DIGITS_DEFAULT_DRIVEN  ( -Aw )
+{
+   YES
+   NO
+}
+TOOLKIT_REGISTRY_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+TOOL_PATH_PREVIEW_DEFAULT  ( -Aw )
+{
+   OFF
+   ON
+   AUTO
+}
+TRACESKETCH  ( -Aw )
+{
+   NO
+   YES
+}
+TRACE_THRU_SPLICE_CONNECTOR  ( -Aw )
+{
+   YES
+   NO
+}
+TRAIL_DELAY  ( -Aw )
+{
+        ( -Fs )
+}
+TRAIL_DIR  ( -Aw )
+{
+        ( -Fs )
+}
+TRAIN_FILE_PATH  ( -Aw )
+{
+        ( -Fs )
+}
+TRANSPARENCY  ( -Aw )
+{
+   NO
+   YES
+}
+TRAVEL_BOUNDS_DISPLAY  ( -Aw )
+{
+   YES
+   NO
+}
+TRAVEL_BOUNDS_TRANSPARENCY  ( -Aw )
+{
+        ( -Fs )
+}
+TRIANGULATE_FILLED_AREAS  ( -Aw )
+{
+   YES
+   NO
+}
+TROUBLESHOOTER_SHOW_INFO_GCHECK  ( -Aw )
+{
+   NO
+   YES
+}
+TTF_HANDLING_FOR_PLOT_FILES  ( -Aw )
+{
+   STROKE ALL FONTS
+   USE TRUE TYPE FONTS
+}
+TURN_AVOID_HOLDER_INTERFERENCE  ( -Aw )
+{
+   YES
+   NO
+}
+UDF_AF_NAME_POSTFIX  ( -Aw )
+{
+   YES
+   NO
+}
+UNITS_SYSTEM_DIC_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+UPDATE_COPY_GEOM_LOCATION  ( -Aw )
+{
+   YES
+   NO
+}
+UPDATE_HARNESS_MFG_LINE_COLOR  ( -Aw )
+{
+   YES
+   NO
+}
+UPDATE_PRE_130_HARNESS  ( -Aw )
+{
+   YES
+   NO
+}
+UPDATE_PRE_16_CABLE_LAYERS  ( -Aw )
+{
+   YES
+   NO
+}
+UPDATE_REP_REFS  ( -Aw )
+{
+   YES
+   NO
+}
+UPD_PARAM_ON_RETR_MARK_MODIFIED  ( -Aw )
+{
+   YES
+   NO
+}
+USER_DEFINED_GRID_INTERVAL  ( -Aw )
+{
+        ( -Fs )
+}
+USER_IGES_HEADER_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+USE_3D_THUMBNAIL_IN_LWG_REP  ( -Aw )
+{
+   YES
+   NO
+}
+USE_8_PLOTTER_PENS  ( -Aw )
+{
+   NO
+   YES
+}
+USE_ACTIVE_MODEL_IN_TRANSFORM  ( -Aw )
+{
+   YES
+   NO
+}
+USE_EXPORT_2D_DIALOG  ( -Aw )
+{
+   YES
+   NO
+}
+USE_IGES_FONT_1003  ( -Aw )
+{
+   YES
+   NO
+}
+USE_IGES_KANJI_FONT_2001  ( -Aw )
+{
+   YES
+   NO
+}
+USE_MAJOR_UNITS  ( -Aw )
+{
+   YES
+   NO
+}
+USE_MASTER_FOR_BAD_DISP_REPS  ( -Aw )
+{
+   YES
+   NO
+   YES
+   NO
+}
+USE_NOM_DIM_VAL_IN_EXPR  ( -Aw )
+{
+   YES
+   NO
+}
+USE_OUTDATED_ACCEL_IN_GEOM_REP  ( -Aw )
+{
+   NO
+   YES
+}
+USE_PART_COLOR_FOR_HIDDEN_LINES  ( -Aw )
+{
+   NO
+   YES
+}
+USE_PRE_WILDFIRE_TEXT_FONT  ( -Aw )
+{
+   NO
+   YES
+}
+USE_SOFTWARE_LINEFONTS  ( -Aw )
+{
+   YES
+   NO
+}
+USE_STRICT_UI_TRAIL  ( -Aw )
+{
+   YES
+   NO
+}
+USE_TEMP_DIR_FOR_INST  ( -Aw )
+{
+   NO
+   YES
+}
+USE_WEB_PAGE_FONT_IN_REPORTS  ( -Aw )
+{
+   YES
+   NO
+}
+VARIABLE_PLOTS_IN_INCHES  ( -Aw )
+{
+   YES
+   NO
+}
+VARIANT_DRAWING_ITEM_SIZES  ( -Aw )
+{
+   YES
+   NO
+}
+VDA_HEADER  ( -Aw )
+{
+        ( -Fs )
+}
+VERIFY_ON_SAVE_BY_DEFAULT  ( -Aw )
+{
+   YES
+   NO
+}
+VERSATEC_CUTTER_INSTALLED  ( -Aw )
+{
+   NO
+   YES
+}
+VISIBLE_MAPKEYS  ( -Aw )
+{
+   NO
+   YES
+}
+VISIBLE_MESSAGE_LINES  ( -Aw )
+{
+        ( -Fs )
+}
+VISIBLE_RECENT_FILES  ( -Aw )
+{
+        ( -Fs )
+}
+VRML_ANCHOR_URL  ( -Aw )
+{
+        ( -Fs )
+}
+VRML_BACKGROUND_COLOR  ( -Aw )
+{
+   YES
+   NO
+}
+VRML_EXPLODE_LINES  ( -Aw )
+{
+   YES
+   NO
+}
+VRML_EXPORT_RESOLUTION  ( -Aw )
+{
+   HIGH
+   MEDIUM
+   LOW
+}
+VRML_EXPORT_VERSION  ( -Aw )
+{
+   2.0
+   1.0
+}
+VRML_FILE_DUPLICATE_MATERIAL  ( -Aw )
+{
+   YES
+   NO
+}
+VRML_MULTIPLE_VIEWS  ( -Aw )
+{
+   NONE
+   ALL
+   TOP
+}
+VRML_PARAMETERS  ( -Aw )
+{
+   DESIGNATED
+   ALL
+   NONE
+}
+VRML_SIMPREP_EXPORT  ( -Aw )
+{
+   YES
+   NO
+}
+WARN_IF_ISO_TOL_MISSING  ( -Aw )
+{
+   YES
+   NO
+}
+WCELL_FIXT_INFO_SETUP_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WEB_BROWSER_HISTORY_DAYS  ( -Aw )
+{
+        ( -Fs )
+}
+WEB_BROWSER_HOMEPAGE  ( -Aw )
+{
+        ( -Fs )
+}
+WEB_BROWSER_IN_SEPARATE_WINDOW  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_DISABLE_JS_COMMAND  ( -Aw )
+{
+        ( -Fs )
+}
+WEB_ENABLE_JAVASCRIPT  ( -Aw )
+{
+   ON
+   OFF
+}
+WEB_ENABLE_SUBSCRIPTION  ( -Aw )
+{
+   NO
+   YES
+}
+WEB_LINK_FILE_READ  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_LINK_FILE_WRITE  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_LINK_PROE_READ  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_LINK_PROE_WRITE  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_LINK_SECURITY_AUTOPROMPT  ( -Aw )
+{
+   YES
+   NO
+}
+WEB_MAX_MAIL_SIZE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_ASK_XSEC_REFS  ( -Aw )
+{
+   NO
+   YES
+}
+WELD_COLOR  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_DEC_PLACES  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_EDGE_PREP_DRIVEN_BY  ( -Aw )
+{
+   PART
+   ASSEMBLY
+}
+WELD_EDGE_PREP_GROOVE_ANGLE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_EDGE_PREP_GROOVE_DEPTH  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_EDGE_PREP_INSTANCE  ( -Aw )
+{
+   YES
+   NO
+}
+WELD_EDGE_PREP_NAME_SUFFIX  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_EDGE_PREP_ROOT_OPEN  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_EDGE_PREP_VISIBILITY  ( -Aw )
+{
+   GENERIC
+   INSTANCE
+}
+WELD_FILLET_PREFERENCES_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_GENERAL_PREFERENCES_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_GEOM_TYPE_DEFAULT  ( -Aw )
+{
+   SURFACE
+   LIGHT
+}
+WELD_GROOVE_PREFERENCES_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_NOTCH_CORNER_RADIUS  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_NOTCH_HEIGHT  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_NOTCH_RADIUS  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_NOTCH_WIDTH  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_PLUG_SLOT_PREFERENCES_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_SPOT_PREFERENCES_FILE  ( -Aw )
+{
+        ( -Fs )
+}
+WELD_UI_STANDARD  ( -Aw )
+{
+   ISO
+   ANSI
+}
+WINDOWS_BROWSER_TYPE  ( -Aw )
+{
+   IE_IN_PROCESS
+   IE_IN_SEP_PROCESS
+   MOZILLA_BASED_BROWSER
+}
+WINDOWS_SCALE  ( -Aw )
+{
+        ( -Fs )
+}
+WINDOW_GAMMA  ( -Aw )
+{
+        ( -Fs )
+}
+WORKPIECE_INSTANCES  ( -Aw )
+{
+   NONE
+   OPERATIONS
+   STEPS
+   OPERATIONS_AND_STEPS
+}
+WWW_ADD_AUX_FRAME  ( -Aw )
+{
+   NO
+   YES
+}
+WWW_EXPORT_GEOMETRY_AS  ( -Aw )
+{
+   VRML
+   CGM
+   JPG
+   CGM_VRML
+   JPG_VRML
+   CGM_JPG
+   ALL
+}
+WWW_MULTIPLE_VIEWS  ( -Aw )
+{
+   NONE
+   ALL
+   TOP
+}
+WWW_TREE_LOCATION  ( -Aw )
+{
+   OUT
+   IN
+}
+X_ANGLE  ( -Aw )
+{
+        ( -Fs )
+}
+Y_ANGLE  ( -Aw )
+{
+        ( -Fs )
+}

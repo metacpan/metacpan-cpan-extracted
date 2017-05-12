@@ -1,0 +1,33 @@
+Config-Cascade-0.01
+
+Config::Cascade is intended to supply the user with easily managable cascading 
+configurations. A series of scripts can be given a common global config, more
+specific configuration files, and the option to override any config options 
+from the command line. Configuration files use a simple syntax, and are validated
+using various regexp functions to warn the user when they include unknown or 
+improperly formatted configuration options.
+
+This module requires Regexp::Common.
+
+BUGS
+
+Probably. This is my first module. Be kind.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 Bill Nash
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

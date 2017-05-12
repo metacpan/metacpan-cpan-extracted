@@ -1,0 +1,17 @@
+# This file specifies win32 specific options for building CORBA::omniORB
+
+# !!! IMPORRTANT !!!
+# You must set OMNIORBPREFIX to omniORB's root source directory !
+
+OMNIORBPREFIX = C:/omniORB
+
+OMNIORBLIBS = -lomniORB406_rt -lomniDynamic406_rt -lomnithread31_rt -lmsvcprt
+
+# The values below specify win32-specific compiler & linker
+# options. You normally shouldn't have to change these!
+
+CC		= cl
+CCFLAGS		= -nologo -GX -GR -TP
+LDDLFLAGS	= -nologo -dll -map
+DEFINE		= -D_WINDOWS -DWIN32 -D__WIN32__ -D__x86__ -D_WIN32_WINNT=0x0400 -D__NT__ -D__OSVERSION__=4
+XSOPT		= -C++ -nolinenumbers

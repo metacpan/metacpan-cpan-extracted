@@ -1,0 +1,9 @@
+README
+Changes
+CIsam.pm
+eg/Person.pm
+CIsam.xs
+IsamObjects.pm
+Makefile.PL
+MANIFEST
+test.pl

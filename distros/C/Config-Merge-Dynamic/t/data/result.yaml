@@ -1,0 +1,20 @@
+---
+
+apache :
+    timeout : 300
+    worker :
+        - 
+        - fast
+
+app :
+    passphrase : 'my secret'
+    password   : 'change password!'
+    user : 'my name'
+
+redis :
+    server : '192.168.1.22:6379'
+    debug : 0
+    encoding : utf8
+    helper : 'redis'
+
+# do not delete next line

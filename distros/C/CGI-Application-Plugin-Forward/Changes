@@ -1,0 +1,38 @@
+Revision history for CGI-Application-Plugin-Forward
+
+1.06    October 18, 2005
+        - fixed test failure due to incompatibility with new
+          CAP::AutoRunmode (discovered by Shawn Sorichetti)
+        - removed TODO, since everything on the list has been done
+
+1.05    October 03, 2005
+        - fixed to work with old versions of CGI::Application that don't
+          support callbacks
+
+        - now explicitly 'use CGI::Application' to make the registration
+          of hooks it possible to register hooks at class load time.
+
+        - added docs describing the difference between this module and
+          CGI::Application::Plugin::Redirect, and also providng some
+          notes on when to use each method.
+
+1.04    September 15, 2005
+        - actually, NOW I added the 'forward_prerun' hook
+        - added support for AutoRunmode
+
+1.03    August 23, 2005
+        - added the 'forward_prerun' hook
+
+1.02    August 1, 2005
+        - added CGI::Application to the prerequisites
+
+1.01    July 30, 2005
+        - added Makefile.PL compatibility to the distribution
+
+1.00    July 28, 2005
+        - document and test support for coderef runmodes (Mark Stosberg)
+        - API declared stable
+
+0.01    July 27, 2005
+        - First version
+

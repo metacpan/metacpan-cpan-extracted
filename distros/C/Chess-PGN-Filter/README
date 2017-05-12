@@ -1,0 +1,34 @@
+Chess/PGN/Filter version 0.15
+=============================
+
+This is a simple text filter, i.e. text in one side, reformatted text out the other side. This
+release supports PGN to XML using an available DTD. It also supports a TEXT filter type that
+attempts to normalize possibly non-standard PGN input. There is now a DOM output type that is
+used primarily for debugging other filter types during development.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTE that 'make' may be nmake or dmake or whatever works for your system...
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+use Chess::PGN::Parse;
+use Chess::PGN::EPD;
+use Text::DelimMatch;
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Hugh S. Myers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

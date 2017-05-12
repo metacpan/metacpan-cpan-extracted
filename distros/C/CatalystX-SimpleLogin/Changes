@@ -1,0 +1,101 @@
+0.19 Mon, 22 February 2016 18:16:00 +0100
+  * Remove test dependency on Session::Store::File
+  * Fix "remember" checkbox (Yaroslav Polyakov)
+  * Made remember me behaviour extensible and configurable.
+  * Rotate session id after login/logout
+  * Catch exceptions thrown by the authenticate method
+
+0.18 Sat, 21 July 2012 14:39:00 +0100
+  * Stop depending on the now unused Catalyst::Controller::ActionRole
+    RT#78500
+
+0.17 Sun, 15 July 2012 18:23:00 +0100
+  * Better fix for Catalyst versions >= 5.90013 RT#78340, one module
+    and some documentation was missed.
+
+0.16 Fri, 13 July 2012 15:41:00 +0100
+  * Ensure that temp directories created in tests get removed.
+  * Fix for Catalyst versions >= 5.90013 RT#78340
+
+0.15 Tue, 6 Sept 2011 09:59:00 +0100
+  * Various documentation fixes and improvements
+  * Add tab index to forms
+  * Fix login redirect to just use the URI, rather than trying to compose
+    an action, as in some cases we may not have an action.
+    (E.g. when you have a sub default : Private { action)
+
+0.14 Tue, 12 Oct 2010 17:54:00 +0100
+  * Large improvements in the documentation to pass all POD coverage tests
+    and document examples well thanks to Shlomi Fish.
+
+0.13 Thu, 07 Oct 2010 09:35:00 +0100
+  * Fix the docs to make it clearer how to remove traits and use your own
+    login form.
+
+0.12
+  * Fix test failures with various DBIC versions by relying on the DBIC
+    dependency magic (RT#58307).
+
+0.11
+  * Add a chunk of documentation (Drew Taylour)
+
+0.10  Wed, 02 Jul 2010 17:03:41 +0000
+  * Add a clear_session_on_logout config setting which will blow away the
+    contents of the session on logout.
+
+0.09  Sat, 20 Feb 2010 18:05:05 +0000
+  * Add actions for people using Chained controllers to chain off.
+    /login/required and /login/not_required
+  * Point new users to the manual at the top of the POD so they know it's there.
+  * Add SQL::Translator as a test dependency.
+
+0.08  Wed, 27 Jan 2010 22:02:11 +0000
+  * Fix Login controller so that it works with the RequiresLogin action
+    role without the WithRedirect trait composed.
+  * Added redirect_after_login_uri configuration key to Controller::Login which
+    can be used to set the path to redirect the user after login (if the
+    WithRedirect trait is not used)
+  * Added redirect_after_logout_uri configuration key to Controller::Login which
+    can be used to set the path to redirect the user after logout.
+  * Fix manual typo (Curtis 'Ovid' Poe)
+
+0.07  Sun, 13 Dec 2009 20:00:23 +0000
+  * Fix so that you can pass parameters to the login form from config to change
+    the keys used in the $c->authenticate call, so that you can use an arbitrary
+    DBIC schema result class.
+  * Add tests with a DBIC using app.
+  * Significant refactoring in the test suite to reduce code and template duplication
+    between the test applications.
+
+0.06  Fri, 11 Dec 2009 00:01:23 +0000
+  * Fix Catalyst::ActionRole::NeedsLogin to correctly detach from
+    action chains + tests.
+  * Add an experimental controller for OpenID support.
+
+0.05  Wed, 09 Dec 2009 22:50:23 +0000
+  * WARNING: BREAKING CHANGE - The WithRedirect and RenderAsTTTemplate
+    traits are now composed as default to reduce the amount of config
+    needed in the tutorial, and as these are mostly what people want.
+    If you don't want these traits, then you'll have to remove them with
+    config.
+  * Various documentation cleanups.
+  * Remove dependency on Test::MockModule
+  * Make OpenID support optional so that people don't get stuck installing
+    Crypt::DH without the support modules which stop it taking forever.
+
+0.04  Sun, 06 Dec 2009 13:25:23 +0000
+  * Fix too low a dependency on HTML::Formhandler
+  * Clean up a couple of things in the controller code to use $self
+    rather than $c->controller('Login').
+
+0.03  Sat, 14 Nov 2009 16:28:23 +0000
+  * Fix dependency on Authentication::Credential::OpenID
+  * Doc fixes
+
+0.02  Sat, 07 Nov 2009 21:20:00 +0000
+  * Much more documentation
+  * Traits are automatically merged
+  * Added OpenID support
+
+0.01  Wed, 30 Sep 2009 02:17:00 +0200
+  * Initial release.

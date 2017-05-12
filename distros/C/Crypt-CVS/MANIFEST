@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Crypt/CVS.pm
+t/00-compile.t
+t/release-pod-syntax.t
+t/scramble.t

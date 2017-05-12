@@ -1,0 +1,7 @@
+Revision history for Coro::MP
+
+0.1  Tue Oct  6 03:40:01 CEST 2009
+	- initial CPAN release.
+
+0.0  Tue Sep 22 07:37:52 CEST 2009
+	- original version, a Coro::MP clone.

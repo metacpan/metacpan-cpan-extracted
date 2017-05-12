@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Untaint::isbn.
+
+0.01  Fri Dec 10 23:49:53 2001
+	- original version; created by h2xs 1.1.1.4 with options
+		-AXf -n CGI::Untaint::isbn
+

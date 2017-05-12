@@ -1,0 +1,57 @@
+0.11
+	CHANGED: replace POD::Spelling with Perl::Critic policy
+	ADDED: test for structured and object variables
+
+0.10
+	CHANGED: Validator error message displays the invalid value
+	ADDED: EVAL
+	ADDED: LOG_ACCESS
+	ADDED: check the constructor named arguments
+	CHANGED: pod to remove 'arguments' and 'return' from the index
+	CHANGED: major rework of the subroutines header in the POD 
+	
+0.09
+	FIXED: Typo in synopsis
+	CHANGED: ALIAS to ALIAS CATEGORY. not backward a compatible change
+	CHANGED: handle override in CATEGORIES_TO_EXTRACT_FROM
+	ADDED: warning when categories are passed in an unexpected order
+	FIXED: CORE::print
+	
+0.08
+	ADDED: SET_VALIDATOR
+	
+0.07
+	CHANGED: test 099_Cookbook.t to match new test module format
+	ADDED: entry in cookbook about config variable attribute
+	
+0.06
+	ADDED: Attribute per variable
+	FIXED: VALUE = undef properly handled in display
+	
+0.05
+	REMOVED: Cookbook based on POD::Tested
+	ADDED: Cookbook based on Test::Cookbook
+	CHANGED: documentation
+	
+0.04
+	ADDED: Cookbook based on POD::Tested
+
+0.03
+	ADDED: category locking
+	
+0.02
+	ADDED: Config:Hierarchical::Tie::ReadOnly
+	ADDED: Config:Hierarchical::Delta
+	FIXED: removed dependency to Data::TreeDumper in Build.pl
+	CHANGED: precedence given to X::Y'  should be 'X::Y takes precedence'
+	CHANGED: override variable is always override even if the OVERRIDE parameter is not passed
+	CHANGED: variable history categories displayed in priority order order
+	ADDED: CHECK_LOWER_LEVEL_CATEGORIES
+	ADDED: WARN_FOR_EXPLICIT_CATEGORY
+	ADDED: GET_CATEGORY
+	FIXED: status and warning messages made uniform
+	ADDED: check number of element in all subs to avoid 'odd number of ...' message
+	ADDED:; COMMENT
+	FIXED: status was not added to history when locking is done through 'set'. 
+	ADDED: VALIDATOR and AddValidator
+

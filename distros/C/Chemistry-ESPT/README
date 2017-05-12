@@ -1,0 +1,37 @@
+Chemistry/ESPT version 1.03
+===========================
+
+The Electronic Structure Perl Toolkit provides basic objects and methods for 
+accessing and manipulating data contained in popular electronic structure packages.
+
+INSTALLATION
+
+To install this module type the following:
+   
+   Install Module::Build if necessary
+   perl Build.PL
+   ./Build
+   ./Build test
+   su
+   ./Build install
+
+CHANGES
+
+Please refer to the individual .pm files.
+
+DEPENDENCIES
+
+Module::Build
+
+TO DO LIST
+
+Please refer to the individual .pm files for more verbose details.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Dr. Jason L. Sonnenberg <sonnenberg.11@osu.edu>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. I would like to hear of any 
+suggestions for improvement.
+

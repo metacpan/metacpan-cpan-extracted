@@ -1,0 +1,14 @@
+<tr class="cpac_row[% ' cpac_stripe' IF stripe % 2 %]">
+[% FOR col IN cpac.tc.cols %]
+    [% NEXT IF cpac.tc.hidden_cols.exists(col)
+        OR (cpac.tm.f.$col.extra('is_reverse') AND cpac.tm.f.$col.extra('rel_type').match('_many')) %]
+    <td class="cpac_cell">
+        [% PROCESS skinny/cell.tt
+            value = item.$col
+            meta  = cpac.tm.f.$col
+        %]
+    </td>
+[% END %]
+</tr>
+
+[% SET stripe = stripe + 1 %]

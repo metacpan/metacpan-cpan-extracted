@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Carp-Throw
+version:      0.04
+version_from: lib/CGI/Carp/Throw.pm
+installdirs:  site
+requires:
+    CGI::Carp:                     1
+    Exporter:                      1
+    File::Spec:                    0.7
+    FileHandle:                    1
+    IPC::Open3:                    1
+    Test::More:                    0.3
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17
+license: perl

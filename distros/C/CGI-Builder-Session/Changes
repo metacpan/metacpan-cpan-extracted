@@ -1,0 +1,43 @@
+CGI-Builder-Session Latest Versions Changes
+
+Version 1.26
+- Removed the internal use of lvalue assigments incompatible with
+  the perl-bug #17663 (Perl 5 Debugger doesn't handle properly lvalue
+  sub assignment)
+
+Version 1.25
+- Maintainance release. A few minor changes
+
+Version 1.24
+- Added the 'new_session_init' and the 'session_init' options to the
+  'cs_new_args' accessor
+- A few minor changes in the Makefile.PL and the POD
+- Added memory leaking test
+
+Version 1.23
+- Eliminated version check and installation feedback system
+  ("phone home" opt-out) from Makefile.PL to make Randal L Schwartz happy :-)
+  and sad the author :-(
+
+Version 1.22
+- Minor POD changes
+
+Version 1.21
+- Changed Makefile.PL version check
+- Minor POD changes
+
+Version 1.2
+- Eliminated the OH_cleanup handler to auto-flush the object (now useless)
+- Changed the prerequisite to C::B version 1.2
+- Some internal changes to be more consistent with new 1.2 version
+- Some POD restyling
+
+Version 1.1
+- Added cs_new_args group accessor to allow customization avoiding
+  overriding of cs_new method
+- Added automatic setting of SID with cookie and param (cs_init)
+- Added an OH_cleanup handler to auto-flush the object
+- Added some tests
+
+Version 1.0
+- First public release

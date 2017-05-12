@@ -1,0 +1,272 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:5834678
+Return-Path: <bingos@cpan.org>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 2039 invoked from network); 1 Nov 2009 14:08:27 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 1 Nov 2009 14:08:27 -0000
+Received: (qmail 28815 invoked by uid 225); 1 Nov 2009 14:08:26 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 28701 invoked by alias); 1 Nov 2009 14:08:25 -0000
+X-Spam-Status: No, hits=-4.0 required=8.0
+	tests=PERLBUG_CONF
+X-Spam-Check-By: la.mx.develooper.com
+Received: from kidney-bingos.demon.co.uk (HELO kidney-bingos.demon.co.uk) (62.49.18.107)
+    by la.mx.develooper.com (qpsmtpd/0.28) with SMTP; Sun, 01 Nov 2009 06:08:24 -0800
+Date: Sun, 1 Nov 2009 14:07:11 +0000
+Subject: FAIL Find-Lib-1.0 i386-midnightbsd 0.1.1-release
+To: cpan-testers@perl.org
+Message-ID: <1257084431.10F7D270.58422@mnbsd.localdomain>
+X-Reported-Via: Test::Reporter 1.54, via CPANPLUS 0.89_06
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: bingos@cpan.org
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+
+Dear YANNK,
+=20=20=20=20
+This is a computer-generated error report created automatically by
+CPANPLUS, version 0.89_06. Testers personal comments may appear=20
+at the end of this report.
+
+
+Thank you for uploading your work to CPAN.  However, it appears that
+there were some problems testing your distribution.
+
+TEST RESULTS:
+
+Below is the error stack from stage 'make test':
+
+[MSG] [Sun Nov  1 14:07:06 2009] cp lib/Find/Lib.pm blib/lib/Find/Lib.pm
+Manifying blib/man3/Find::Lib.3
+
+[ERROR] [Sun Nov  1 14:07:10 2009] MAKE TEST failed: No such file or direct=
+ory PERL_DL_NONLAZY=3D1 /usr/home/cpan/pit/bare/perl-5.10.0/bin/perl "-MExt=
+Utils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t t=
+/moretests/*t
+t/00-compile.t ................... ok
+t/01-basic.t ..................... ok
+t/02-use.t ....................... ok
+t/03-missinginc.t ................ ok
+t/06-empty.t ..................... ok
+t/07-libs.t ...................... ok
+t/08-dupe-slashes.t .............. ok
+t/moretests/01-relative.t ........ ok
+# ERROR was: The script/base dir cannot be found at t/moretests/02-dollar0-=
+begin.t line 9
+t/moretests/02-dollar0-begin.t ... ok
+t/moretests/02-dollar0.t ......... ok
+t/moretests/03-chdir-begin.t ..... ok
+
+#   Failed test 'we didn't die because chdir doesn't change PWD, so we are =
+safe'
+#   at t/moretests/03-chdir-topbegin.t line 12.
+# The script/base dir cannot be found at t/moretests/03-chdir-topbegin.t li=
+ne 9
+# Looks like you planned 2 tests but ran 1.
+# Looks like you failed 1 test of 1 run.
+t/moretests/03-chdir-topbegin.t ..=20
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 2/2 subtests=20
+t/moretests/03-chdir.t ........... ok
+t/moretests/03-pwd-begin.t ....... ok
+Can't locate MyLibNoTest.pm in @INC (@INC contains: /usr/home/cpan/pit/bare=
+/conf/perl-5.10.0/.cpanplus/5.10.0/build/Find-Lib-1.0/blib/lib /usr/home/cp=
+an/pit/bare/conf/perl-5.10.0/.cpanplus/5.10.0/build/Find-Lib-1.0/blib/arch =
+/usr/home/cpan/pit/bare/perl-5.10.0/lib/5.10.0/i386-midnightbsd /usr/home/c=
+pan/pit/bare/perl-5.10.0/lib/5.10.0 /usr/home/cpan/pit/bare/perl-5.10.0/lib=
+/site_perl/5.10.0/i386-midnightbsd /usr/home/cpan/pit/bare/perl-5.10.0/lib/=
+site_perl/5.10.0 .) at symlink_test.pl line 6.
+BEGIN failed--compilation aborted at symlink_test.pl line 6.
+
+#   Failed test 'script succeeded, meaning that compilation with symlink wo=
+rked'
+#   at t/moretests/04-symlinks.t line 51.
+# PWD=3D/home/cpan/pit/jail/symlink_58543, script=3Dsymlink_test.pl
+Can't locate MyLibNoTest.pm in @INC (@INC contains: /usr/home/cpan/pit/bare=
+/conf/perl-5.10.0/.cpanplus/5.10.0/build/Find-Lib-1.0/blib/lib /usr/home/cp=
+an/pit/bare/conf/perl-5.10.0/.cpanplus/5.10.0/build/Find-Lib-1.0/blib/arch =
+/usr/home/cpan/pit/bare/perl-5.10.0/lib/5.10.0/i386-midnightbsd /usr/home/c=
+pan/pit/bare/perl-5.10.0/lib/5.10.0 /usr/home/cpan/pit/bare/perl-5.10.0/lib=
+/site_perl/5.10.0/i386-midnightbsd /usr/home/cpan/pit/bare/perl-5.10.0/lib/=
+site_perl/5.10.0 .) at .///symlink_test.pl line 6.
+BEGIN failed--compilation aborted at .///symlink_test.pl line 6.
+
+#   Failed test 'crufty path doesn't make it blow up'
+#   at t/moretests/04-symlinks.t line 55.
+# Looks like you failed 2 tests of 2.
+t/moretests/04-symlinks.t ........=20
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 2/2 subtests=20
+t/moretests/05-backcompat.t ...... ok
+t/moretests/06-conflict.t ........ ok
+
+Test Summary Report
+-------------------
+t/moretests/03-chdir-topbegin.t (Wstat: 256 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+  Parse errors: Bad plan.  You planned 2 tests but ran 1.
+t/moretests/04-symlinks.t      (Wstat: 512 Tests: 2 Failed: 2)
+  Failed tests:  1-2
+  Non-zero exit status: 2
+Files=3D17, Tests=3D41,  3 wallclock secs ( 0.02 usr  0.90 sys +  0.72 cusr=
+  1.77 csys =3D  3.40 CPU)
+Result: FAIL
+Failed 2/17 test programs. 3/41 subtests failed.
+*** Error code 255
+
+Stop in /usr/home/cpan/pit/bare/conf/perl-5.10.0/.cpanplus/5.10.0/build/Fin=
+d-Lib-1.0.
+
+[MSG] [Sun Nov  1 14:07:10 2009] DEFAULT 'proceed_on_test_failure' HANDLER =
+RETURNING 'sub return value'
+
+
+MISSING PREREQUISITES:
+
+It was observed that the test suite seem to fail without these modules:
+
+MyLibNoTest
+
+As such, adding the prerequisite module(s) to 'PREREQ_PM' in your
+Makefile.PL should solve this problem.  For example:
+
+WriteMakefile(
+    AUTHOR      =3D> 'YANNK (cpanplus-info@lists.sf.net)',
+    ... # other information
+    PREREQ_PM   =3D> {
+	'MyLibNoTest'	=3D> '0', # or a minimum working version
+    }
+);
+
+Thanks! :-)
+
+PREREQUISITES:
+
+Here is a list of prerequisites you specified and versions we=20
+managed to load:
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20
+	  Module Name                        Have     Want
+	  File::Spec                       3.2501        0
+	  Test::More                         0.94        0
+
+Perl module toolchain versions installed:
+	Module Name                        Have
+	CPANPLUS                        0.89_06
+	CPANPLUS::Dist::Build              0.40
+	Cwd                              3.2501
+	ExtUtils::CBuilder                 0.27
+	ExtUtils::Command                  1.16
+	ExtUtils::Install                  1.54
+	ExtUtils::MakeMaker                6.54
+	ExtUtils::Manifest                 1.57
+	ExtUtils::ParseXS                  2.21
+	File::Spec                       3.2501
+	Module::Build                      0.35
+	Test::Harness                      3.17
+	Test::More                         0.94
+	version                          0.7701
+
+******************************** NOTE ********************************
+The comments above are created mechanically, possibly without manual
+checking by the sender.  As there are many people performing automatic
+tests on each upload to CPAN, it is likely that you will receive=20
+identical messages about the same problem.
+
+If you believe that the message is mistaken, please reply to the first
+one with correction and/or additional informations, and do not take
+it personally.  We appreciate your patience. :)
+**********************************************************************
+
+Additional comments:
+=20
+
+This report was machine-generated by CPANPLUS::Dist::YACSmoke 0.45_01.
+Powered by minismokebox version 0.18
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING =3D 1
+    PATH =3D /sbin:/bin:/usr/sbin:/usr/bin:/usr/games:/usr/local/sbin:/usr/=
+local/bin:/usr/X11R6/bin:/home/cpan/bin
+    PERL5LIB =3D :/usr/home/cpan/pit/bare/conf/perl-5.10.0/.cpanplus/5.10.0=
+/build/Find-Lib-1.0/blib/lib:/usr/home/cpan/pit/bare/conf/perl-5.10.0/.cpan=
+plus/5.10.0/build/Find-Lib-1.0/blib/arch
+    PERL5_CPANPLUS_IS_RUNNING =3D 58422
+    PERL5_CPANPLUS_IS_VERSION =3D 0.89_06
+    PERL5_MINISMOKEBOX =3D 0.18
+    PERL5_YACSMOKE_BASE =3D /usr/home/cpan/pit/bare/conf/perl-5.10.0/
+    PERL_EXTUTILS_AUTOINSTALL =3D --defaultdeps
+    PERL_MM_USE_DEFAULT =3D 1
+    SHELL =3D /usr/local/bin/bash
+    TERM =3D screen
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    Perl: $^X =3D /usr/home/cpan/pit/bare/perl-5.10.0/bin/perl
+    UID:  $<  =3D 1001
+    EUID: $>  =3D 1001
+    GID:  $(  =3D 1001 1001 1001
+    EGID: $)  =3D 1001 1001 1001
+
+
+-------------------------------
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=3Dmidnightbsd, osvers=3D0.1.1-release, archname=3Di386-midnightb=
+sd
+    uname=3D'midnightbsd mnbsd.localdomain 0.1.1-release midnightbsd 0.1.1-=
+release #0: fri nov 9 16:48:25 utc 2007 root@defiant.midnightbsd.org:usrobj=
+usrsrcsysgeneric i386 '
+    config_args=3D'-de -Dprefix=3D/usr/home/cpan/pit/bare/perl-5.10.0'
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Ddefine
+    useithreads=3Dundef, usemultiplicity=3Dundef
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef
+    use64bitint=3Dundef, use64bitall=3Dundef, uselongdouble=3Dundef
+    usemymalloc=3Dn, bincompat5005=3Dundef
+  Compiler:
+    cc=3D'cc', ccflags =3D'-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-stric=
+t-aliasing -pipe -I/usr/local/include',
+    optimize=3D'-O',
+    cppflags=3D'-DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H -fno-strict-aliasing =
+-pipe -I/usr/local/include'
+    ccversion=3D'', gccversion=3D'3.4.4 [MidnightBSD] 20050518', gccosandve=
+rs=3D''
+    intsize=3D4, longsize=3D4, ptrsize=3D4, doublesize=3D8, byteorder=3D1234
+    d_longlong=3Ddefine, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D12
+    ivtype=3D'long', ivsize=3D4, nvtype=3D'double', nvsize=3D8, Off_t=3D'of=
+f_t', lseeksize=3D8
+    alignbytes=3D4, prototype=3Ddefine
+  Linker and Libraries:
+    ld=3D'cc', ldflags =3D'-Wl,-E  -L/usr/local/lib'
+    libpth=3D/usr/lib /usr/local/lib
+    libs=3D-lm -lcrypt -lutil -lc
+    perllibs=3D-lm -lcrypt -lutil -lc
+    libc=3D, so=3Dso, useshrplib=3Dfalse, libperl=3Dlibperl.a
+    gnulibc_version=3D''
+  Dynamic Linking:
+    dlsrc=3Ddl_dlopen.xs, dlext=3Dso, d_dlsymun=3Dundef, ccdlflags=3D' '

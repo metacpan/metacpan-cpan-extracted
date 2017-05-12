@@ -1,0 +1,10 @@
+MANIFEST
+Changes
+META.yml
+Makefile.PL
+README
+Build.PL
+LICENSE
+t/test.t
+lib/Class/PublicPrivate.pod
+lib/Class/PublicPrivate.pm

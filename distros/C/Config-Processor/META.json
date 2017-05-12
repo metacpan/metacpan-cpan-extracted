@@ -1,0 +1,59 @@
+{
+   "abstract" : "Cascading configuration files processor with additional features",
+   "author" : [
+      "Eugene Ponizovsky <ponizovsky@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Processor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.013",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cpanel::JSON::XS" : "3.0104",
+            "File::Spec" : "0",
+            "Hash::Merge" : "0.200",
+            "Scalar::Util" : "0",
+            "YAML::XS" : "0.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iph0/Config-Processor/issues"
+      },
+      "homepage" : "https://github.com/iph0/Config-Processor",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/iph0/Config-Processor"
+      }
+   },
+   "version" : "0.26"
+}

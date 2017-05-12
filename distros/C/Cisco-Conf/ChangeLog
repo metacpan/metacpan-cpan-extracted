@@ -1,0 +1,34 @@
+2000-03-29  Jochen Wiedmann  <joe@ispsoft.de> (0.10)
+
+	* Runs with Cisco IOS 12.0 now.
+
+1998-11-30  Jochen Wiedmann  <joe@ispsoft.de> (0.08)
+
+	* cisconf.PL (Add): The Add command is now creating an empty file
+	  or loading the current configuration as initial version.
+	  Suggested by Philipp Buehler <philipp@buehler.de>.
+	* Added lib/Bundle/Cisco/Conf.pm.
+	* Fixed "make install" problems on Solaris.
+
+1998-09-22  Jochen Wiedmann  <joe@ispsoft.de> (0.07)
+
+	* cisconf.PL (Add): Added username. Mike Newton <mike@delusion.org>
+	* lib/Cisco/Conf.pm (Info): Added support for the Rcs module.
+	  Mike Newton <mike@delusion.org>
+
+1998-07-17  Jochen Wiedmann  <joe@ispsoft.de> (0.05)
+
+	* cisconf.PL: Fixed bug in cisconf/Save; the tftp_file was
+	  not always closed. My thanks to Tungning Cheng <cherng@bbn.com>.
+	* cisconf.PL: Made stripping of comments configurable; suggested
+	  by Tungning Cheng <cherng@bbn.com>.
+
+1998-07-14  Jochen Wiedmann  <joe@ispsoft.de> (0.04)
+
+	* lib/Cisco/Conf.pm: Added config->{tftp_prefix}, requested
+	  by Tungning Cheng <cherng@bbn.com>.
+
+1998-05-20  Jochen Wiedmann  <joe@ispsoft.de>
+
+	* Original version
+

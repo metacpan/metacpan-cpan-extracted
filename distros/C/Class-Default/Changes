@@ -1,0 +1,44 @@
+Revision history for Perl extension Class::Default.
+
+1.51 Fri 16 Nov 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.68
+	- Removing the use of base.pm
+
+1.50 Mon  4 Sep 2006
+	- No functional change
+	- Upgrading to Module::Install 0.64
+	- Moving to 2 digit secondary version number
+
+1.4 Fri 24 Feb 2006
+	- No functional changes.
+	- Upgrading to Module::Install 0.57.
+	- Resolved #16946: Incorrect examples in documentation (DJERIUS)
+	- Moved over from older CVS repository to newer SVN one
+	- Changes to test to handle the new directory structure.
+
+1.3 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+1.2  Tue Jan 11 2005
+	- There are no functional changes in this release
+	- Resolved CPAN #9581 Missing changes for 1.1
+	- See rt.cpan bug page for why I released to fix this if needed.
+
+1.1  Sat Oct  2 2004
+	- There are no functional changes in this release
+	- Upgraded Makefile.PL to Module::Build
+	- Modernised the test scripts
+	- Call Carp::croak explicitly
+
+1.0  Mon Dec 15 2003
+	- Minor code cleanup to slightly reduce memory overhead
+	- Incrementing to version 1.0
+
+0.2  Mon May 27 11:37:06 2002
+        - Added the _class method
+        - Fixed Makefile.PL to install Class::Inspector before testing
+
+0.1  Thu May 25 20:09:55 2002
+	- original version
+

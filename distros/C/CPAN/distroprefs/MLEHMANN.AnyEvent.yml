@@ -1,0 +1,36 @@
+---
+comment: |
+
+  Seven of my perls hang with it in 03_child.t, so we skip this test here
+
+match:
+  distribution: '^MLEHMANN/AnyEvent-3.4.tar.gz'
+test:
+  args:
+    - TEST_FILES=t/0[0124]*.t
+  env:
+    PERL_ANYEVENT_VERBOSE: 2
+depends:
+  configure_requires:
+    Event: 0
+  requires:
+    Event: 0
+---
+comment: |
+
+  7.05 has a resolver test that fails at my site, unrelated to AnyEvent
+
+match:
+  distribution: '^MLEHMANN/AnyEvent-7\.05'
+goto: "MLEHMANN/AnyEvent-7.04.tar.gz"
+---
+match:
+  distribution: '^MLEHMANN/AnyEvent-\d'
+test:
+  env:
+    PERL_ANYEVENT_VERBOSE: 2
+depends:
+  configure_requires:
+    Event: 0
+  requires:
+    Event: 0

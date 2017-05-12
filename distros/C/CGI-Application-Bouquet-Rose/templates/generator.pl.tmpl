@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Carp;
+use File::Spec;
+use HTML::Template;
+use <tmpl_var name=module>::Config;
+
+# -------------------------------------------------
+
+if (<tmpl_var name=verbose>)
+{
+	print STDERR "Processing CGI::Application-based modules:\n";
+}
+
+# Generate the main menu from main.menu.tmpl.
+
+my($config)       = <tmpl_var name=module>::Config -> new();
+my(@component)    = split(/::/, lc '<tmpl_var name=module>');
+my($io_dir_name)  = File::Spec -> catdir('htdocs', 'assets', 'templates', @component);
+my($io_file_name) = File::Spec -> catfile($io_dir_name, 'main.menu.tmpl');
+my($template)     = HTML::Template -> new(filename => $io_file_name);
+
+my(@param);
+
+<tmpl_loop name=module_loop>push @param,
+{
+	form_action => $config -> get_form_action(),
+	module      => '<tmpl_var name=module_name>',
+	table       => '<tmpl_var name=table_name>',
+};
+</tmpl_loop>
+
+$template -> param(module_loop =>\@param);
+
+if (<tmpl_var name=verbose>)
+{
+	print STDERR "Updating $io_file_name\n";
+}
+
+chmod 0644, $io_file_name;
+
+open(OUT, "> $io_file_name") || die "Can't open(> $io_file_name):$ !";
+print OUT $template -> output();
+close OUT;
+
+# Generate CGI/CGIApp/*.pm (1 per table).
+# The next 4 have to have their own declarations. We can't put them inside module_loop,
+# because then they would have to 'belong' to module_loop.
+
+my($dir_name)  = '<tmpl_var name=dir_name>';
+my($prefix)    = '<tmpl_var name=module>';
+my($tmpl_path) = '<tmpl_var name=tmpl_path>';
+my($verbose)   = <tmpl_var name=verbose>;
+
+my($output_file_name);
+my($table_name);
+
+<tmpl_loop name=module_loop>
+$output_file_name = File::Spec -> catfile($dir_name, '<tmpl_var name=module_name>.pm');
+$template         = HTML::Template -> new(filename => File::Spec -> catfile($tmpl_path, 'run.mode.pm.tmpl') );
+$table_name       = lc '<tmpl_var name=table_name>';
+$table_name       =~ s/_//g; # Zap '_' to keep Rose happy.
+
+$template -> param(iterator => $table_name);
+$template -> param(module   => '<tmpl_var name=module_name>');
+$template -> param(package  => "$prefix\::CGI\::CGIApp");
+$template -> param(prefix   => $prefix);
+$template -> param(table    => '<tmpl_var name=table_name>');
+
+open(OUT, "> $output_file_name") || croak "Can't open(> $output_file_name): $!";
+print OUT $template -> output();
+close OUT;
+
+if ($verbose)
+{
+	print STDERR "Generated $output_file_name\n";
+}
+</tmpl_loop>
+
+if (<tmpl_var name=verbose>)
+{
+	print STDERR "Success\n";
+}

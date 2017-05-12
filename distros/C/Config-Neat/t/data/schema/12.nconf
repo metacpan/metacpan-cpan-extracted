@@ -1,0 +1,24 @@
+array_of_arrays {
+    0           test0
+    1           test1
+    2           test2
+    3           test3
+}
+
+array_of_hashes {
+    0 {
+        test    test0
+    }
+
+    1 {
+        test    test1
+    }
+
+    2 {
+        test    test2
+    }
+
+    3 {
+        test    test3
+    }
+}

@@ -1,0 +1,37 @@
+<div style="border-top: 1px solid #666; margin-top: 30px;">
+[% moniker = moniker || thing.moniker %]
+[% typetitle = factory.title(moniker) %]
+
+<form action="[% config.url %]" method="POST">
+
+<input type="hidden" name="moniker" value="[% moniker %]">
+<input type="hidden" name="id" value="[% thing.id || 'new' %]">
+<input type="hidden" name="op" value="store">
+
+<h2>
+[% IF thing.is_ghost %]
+    add a new [% typetitle %]
+[% ELSE %]
+    edit [% thing.class_title %] '[% thing.title %]'
+[% END %]
+</h2>
+
+<p><b>title</b><br>
+<input type="text" name="title" value="[% thing.title %]" size="44">
+</p>
+
+<p><b>description</b><br>
+<textarea name="description" wrap="virtual" rows="12" cols="44">[% thing.description %]</textarea>
+</p>
+
+[% FOREACH relationship IN factory.relationships(moniker) %]
+	[% method = relationship.key %]
+	[% INCLUDE furniture/choose.html moniker=relationship.key this=thing.$method %]
+[% END %]
+
+<input type="submit" value=" store [% typetitle %]">
+
+<p>To edit or create objects you must have the appropriate permission on both <tt>[% config.db_name %]</tt> and the directory that contains it.</p>
+
+</form>
+</div>

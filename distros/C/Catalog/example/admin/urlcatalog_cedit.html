@@ -1,0 +1,60 @@
+<body bgcolor=#ffffff>
+<title>Edit category _CATEGORY_</title>
+
+<center><h3><font color=red>_COMMENT_</font></h3></center>
+
+<center>
+<form action=_SCRIPT_ method=POST>
+<input type=hidden name=name value=_NAME_>
+<input type=hidden name=context value=csearch>
+<input type=hidden name=style value=urlcatalog>
+<input type=hidden name=mode value=_CONTEXT_>
+<input type=text size=40 name=text value='_TEXT-QUOTED_'>
+<input type=submit value='search'><br>
+</form>
+</center>
+
+<h3>Edit category _CATEGORY_</h3> 
+<a href='_CENTRYINSERT_'><img src=_HTMLPATH_/images/new.gif alt='Insert a new record and link it to this category' border=0></a>
+<a href='_CENTRYSELECT_'><img src=_HTMLPATH_/images/link.gif alt='Link an existing record to this category' border=0></a>
+<a href='_CATEGORYINSERT_'><img src=_HTMLPATH_/images/open.gif alt='Create a sub category' border=0></a>
+<a href='_CATEGORYSYMLINK_'><img src=_HTMLPATH_/images/plus.gif alt='Create a symbolic link to another category' border=0></a>
+<a href='_CONTROLPANEL_'><img src=_HTMLPATH_/images/control.gif alt='Control panel' border=0></a>
+<p>
+<p>
+_PATH_
+<p>
+
+<!-- start categories -->
+<h3>Sub categories</h3>
+<table>
+<!-- params 'style' => 'table', 'columns' => 2 -->
+<!-- start row --> 
+<tr>
+<!-- start entry -->
+<td> _LINKS_ <a href='_URL_'>_NAME_</a> (_COUNT_) </td>
+<!-- end entry -->
+</tr>
+<!-- end row --> 
+</table>
+<!-- end categories -->
+<p>
+
+<!-- start entry -->
+<!-- _ROWID_ -->
+<table><tr><td>_LINKS_</td> 
+<td>
+<dt><a href='_URL-QUOTED_'>_COMMENT_</a>
+<dd>
+<a href='_URL-QUOTED_'>_URL_</a>
+<dd>
+<i><font size=-1>Created _CREATED_</font></i><br>
+</td></tr></table>
+<p>
+<!-- end entry -->
+
+<!-- start pager -->
+Number of pages _MAXPAGES_
+<p>
+_PAGES_
+<!-- end pager -->

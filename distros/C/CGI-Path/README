@@ -1,0 +1,202 @@
+NAME
+    CGI::Path - module to aid in traversing one or more paths
+
+SYNOPSIS
+    CGI::Path allows for easy navigation through a set of steps, a path. It
+    uses a session extensively (managed by default via Apache::Session) to
+    hopefully simplify path based cgis.
+
+A PATH
+    A path is a package, like CGI::Path::Skel. The path needs to be @ISA
+    CGI::Path. The package can contain the step methods as described below.
+    You can also make a directory for the path, like CGI/Path/Skel, where
+    the direectory will contain a package for each step. This could be done
+    from your $ENV{PERL5LIB}.
+
+path_hash
+    The path_hash is what helps generate the path_array, which is just an
+    array of steps. It is a hash to allow for easy overrides, since it is
+    sort of hard to override the third element of an array through a series
+    of news.
+
+    The path_hash needs a key named 'initial_step', and then steps that
+    point down the line, like so
+
+      path_hash => {
+        initial_step => 'page_one',
+        page_one     => 'page_two',
+        page_two     => 'page_three',
+      },
+
+    since page_three doesn't point anywhere, the path_array ends. You can
+    just override $self->path_hash, and have it return a hash ref as above.
+
+    It is quite easy to look at $ENV{PATH_INFO} and control multiple paths
+    through a single cgi. I offer the following as a simple example
+
+    sub path_hash { my $self = shift; my $sub_path = ''; if($ENV{PATH_INFO}
+    && $ENV{PATH_INFO} =~ m@/(\w+)@) { $sub_path = $1; } my $sub_path_hash =
+    { '' => { initial_step => 'main', main => '', }, };
+
+      ### this is the generic path for adding something
+      if($sub_path =~ /^add_(\w+)$/ && !exists $sub_path_hash->{$sub_path}) {
+        $sub_path_hash->{$sub_path} = {
+          initial_step          => $sub_path,
+          $sub_path             => "${sub_path}_confirm",
+          "${sub_path}_confirm" => "${sub_path}_receipt",
+        };
+      }
+      $sub_path = '' unless(exists $sub_path_hash->{$sub_path});
+      return $sub_path_hash->{$sub_path};
+    }
+
+    The above path_hash method was used to manage a series of distinct add
+    paths. Distinct paths added users, categories, blogs and entries. Each
+    path was to handled differently, but they each had a path similar to the
+    add_user path, which looked like this
+
+    add_user => add_user_confirm => add_user_receipt
+
+my_module
+    my_module by default is something like CGI::Path::Skel. You can override
+    $self->my_module and have it return a scalar containing your my_module.
+    Module overrides are done based on my_module.
+
+my_content
+    my_module by default is something like path/skel. It defaults to a
+    variant of my_module. You can override $self->my_content and have it
+    return a scalar your my_content. html content gets printed based on
+    my_content.
+
+path_array
+    The path_array is formed from path_hash. It is an array ref of the steps
+    in the path.
+
+navigate
+    $self->navigate walks through a path of steps, where each step
+    corresponds to a .htm content file and a .val validation hash.
+
+    A step corresponds to a .htm content file. The .htm and .val need to
+    share the base same name.
+
+    $self->{this_step} is hash ref containing the following previous_step =>
+    the last step this_step => the current step validate_ref => the
+    validation ref for the current step
+
+    Generally, navigate generates the form (see below), and for each step
+    does the following
+
+    -- Get the validate ref (val_ref) for the given page -- Comparing the
+    val_ref to the form see if info exists for the step -- Validate
+    according to the val_ref -- If validation fails, or if info doesn't
+    exist, process the page and stop
+
+    More specifically, the following methods can be called for a step, in
+    the given order.
+
+    step details/possible uses ---------------------------------------------
+    ${step}_hook_pre initializations, must return 0 or step gets skipped
+    info_exists checks to see if you have info for this step
+    ${step}_info_complete can be used to make sure you have all the info you
+    need
+
+      validate                contains the following
+      ${step}_pre_validate    stuff to check before validate proper
+      validate_proper         runs the .val file validation
+      ${step}_post_validate   stuff to run after validate proper
+
+      ${step}_hash_fill       return a hash ref of things to add to $self->fill
+                              fill is a hash ref of what fills the forms
+      ${step}_hash_form       perhaps set stuff for $self->{my_form}
+                              my_form is a hash ref that gets passed to the process method
+      ${step}_hash_errors     set errors
+      ${step}_step            do actual stuff for the step
+      ${step}_hook_post       last chance
+
+generate_form
+    The goal is that the programmer just look at $self->form for form or
+    session information. To help facilitate this goal, I use the following
+
+      $self->this_form           - form from the current hit
+      $self->{session_only} = [] - things that get deleted from this_form and get inserted from the session
+      $self->{session_wins} = [] - this_form wins by default, set this if you want something just from the session
+
+    The code then sets the form with the following line
+
+      $self->{form} = {%{$self->session}, %{$this_form}, %{$form}};
+
+magic_fill
+    magic_fill is written to help aid in rapid development. It is a simple,
+    space-delimited file of key/value pairs, like so
+
+      address                       123 Fake Street
+      email,email_address,from      cpan@spack.net
+
+    I split on the first white space, then split on commas for the key
+    names. In the above example, I would end up with a ref like this
+
+      {
+        address       => '123 Fake Street',
+        email         => 'cpan@spack.net',
+        email_address => 'cpan@spack.net',
+        from          => 'cpan@spack.net',
+      }
+
+    Once I have a ref, those values will get filled into forms as pages are
+    displayed. Makes it nice to fill forms with dummy data and test the flow
+    of your script.
+
+    magic_fill is turned off by default. The method allow_magic_fill
+    determines if magic_fill is on. By default allow_magic_fill just looks
+    at $self->{allow_magic_fill} and returns true or false accordingly.
+    magic_fill_filename points to the location of your file.
+
+    When you new up your CGI::Path object you just need to do something like
+    the following
+
+    my $self = CGI::Path->new({ allow_magic_fill => 1, magic_fill_filename
+    => "/path/to/magic_fill_file", });
+
+    You can use variable values using the magic_fill_interpolation_hash. By
+    default you can use Template::Toolkit tags, like so
+
+    currenttime [% localtime %]
+
+    Currently, the following are included by default in the
+    magic_fill_interpolation_hash
+
+      script    - a good guess at the name of your script
+      _script   - the stuff after the last _ in the above script
+      localtime - scalar (localtime),
+      time      - time,
+
+    I also include %ENV
+
+    Two other keys are not available by default, based on micro seconds
+    namely
+
+      micro      - join(".", &Time::HiRes::gettimeofday()), which really tries to get you a unique value
+      micro_part - (&Time::HiRes::gettimeofday())[1];, which is just the micro seconds
+
+    To make these swaps available you need to set $self->{allow_magic_micro}
+    to a true value.
+
+Session management
+    CGI::Path uses Apache::Session::File by default for session management.
+    If you use this default you will need to write the following methods
+
+      session_dir      - returns the directory where the session files will go
+      session_lock_dir - returns the directory where the session lock files will go
+
+AUTHOR
+    Copyright 2003-2004, Earl J. Cahill. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Address bug reports and comments to: cpan@spack.net.
+
+    When sending bug reports, please provide the version of CGI::Path, the
+    version of Perl, and the name and version of the operating system you
+    are using.
+

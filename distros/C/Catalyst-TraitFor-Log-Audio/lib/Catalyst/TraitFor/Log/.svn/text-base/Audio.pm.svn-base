@@ -1,0 +1,14 @@
+package Catalyst::TraitFor::Log::Audio;
+
+use Moose::Role;
+
+sub speak
+{
+    my ($self, $txt) = @_;
+    
+    return unless $txt;
+    
+    system("say $txt &") if $ENV{'SPEAK'};
+}
+
+1;

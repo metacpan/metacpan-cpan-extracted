@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CPANPLUS/Internals/Source/MetaCPAN.pm
+lib/CPANPLUS/Internals/Source/MetaCPAN/HTTP.pm
+lib/CPANPLUS/Internals/Source/MetaCPAN/Tie.pm
+t/00-compile.t
+t/01-doworky.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

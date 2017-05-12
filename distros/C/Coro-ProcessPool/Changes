@@ -1,0 +1,108 @@
+0.26    2015-06-09
+    * More reliable process management
+    * Cleaner shutdown for processes and pool itself
+    * Pipeline detects parent pool shutdown and shuts itself down
+    * Additional include paths may now be manually specified to the pool
+    * Correct handling of MSWin32 in Makefile.PL (thanks Alexandr Ciornii)
+    * Killed processes replaced on check-in
+
+0.25    2015-04-17
+    * Fix year in previous entry to Changes
+    * Pipeline->next now recroaks errors
+    * MSWin32 now fails to build in Makefile.PL
+
+0.24    2015-03-31
+    * Fixed missing argument
+
+0.23    2015-03-31
+    * Set min version of Types::Standard to avoid errors on older cpan testers boxes
+    * Default values now use subs for older Moo versions
+    * Fixed bug where message was incorrectly encoded when task result was the value '0' (zero)
+    * Added Coro::ProcessPool::Pipeline class and pipeline method to Coro::ProcessPool
+
+0.22    2015-03-13
+    * Disabled test that was running out of memory on cpan testers - sorry!
+
+0.21    2015-03-12
+    * Switched from Storable to Sereal
+    * Added tests for oversized data
+
+0.20    2015-03-11
+    * Fixed bug causing processes to hang when shutting down
+    * Better integration tests
+    * Removed queue() method; it was redundant
+
+0.19    2015-03-10
+    * More refactoring of workflow
+    * Classes now use Moo
+    * Deprecated Coro::ProcessPool::Mailbox
+    * Better handling of child processes
+    * ProcessPool now starts processes immediately
+
+0.18    2015-03-04
+    * Fixed ugly bug where pool did not automatically shut down
+
+0.17    2015-03-04
+    * Rewrite of workflow for safe worker shutdown
+    * Added queue() method
+
+0.16    2014-12-24
+    * Added AnyEvent as a dependency to catch obscure error on Linux/ARM systems
+
+0.15    2014-11-14
+    * Processing errors now include better information
+    * Tasks may now be submitted with the name of a class implementing new(@args) and run()
+
+0.14    2014-11-06
+    * Better support for Perl 5.8.9
+    * Removed dependency on Sys::Info (unsupported on too many platforms and perl versions)
+
+0.13    2014-11-06
+    * Boosted Storable minimum version to 2.05 (when CODE refs were added)
+    * Added test to verify CODE refs usable with encode/decode routines
+    * Removed use of fields pragma
+
+0.12    2014-10-31
+    * Messages now stringified using Coro::Storable
+
+0.11    2014-10-15
+    * Fixed recursive call to readable when waiting on inbox handle readability
+    * map() now defined in terms of defer()
+
+0.10    2014-08-15
+    * Updated documentation to clarify use of use vs require pragma
+    * Fixed unchecked safe_cancel in mailbox cleanup
+
+0.09    2014-01-24
+    * Fixed bug when Sys::Info fails on some platforms
+
+0.08    2014-01-16
+    * Fixed bad test
+
+0.07    2014-01-10
+    * Added timeout parameter to process()
+
+0.06    2013-12-18
+    * Fixed unintentional MSWin32 errors due to imports in tests
+    * More efficient I/O workflow to allow higher throughput
+    * Manages worker pool more efficiently
+
+0.05    2013-12-03
+    * Updated documentation
+
+0.04    2013-12-03
+    * Fixed documentation errors
+    * Added map()
+    * Added defer()
+    * +added awesomeness using Guard module
+
+0.03    2013-11-25
+    * Replaced Sys::CPU with Sys::Info
+
+0.02    2013-11-25
+    * Miscellaneous bugfixes
+    * POD updates
+    * Added die() statements to prevent unsafe running on MSWin32
+
+0.01    2013-11-25
+    * Initial release

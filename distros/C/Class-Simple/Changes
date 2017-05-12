@@ -1,0 +1,70 @@
+Revision history for Perl extension Class::Simple.
+$Id: Changes,v 1.19 2008/02/01 00:38:45 sullivan Exp $
+
+0.19 Thu Jan 31 16:38:15 PST 2008
+	- Cleaned up the whole set__foo() and _foo() stuff.  I think.
+
+0.18 Wed Jan 30 09:55:37 PST 2008
+	- Took out the conflict resolution feature.  There was a problem
+	caused by multiple inheritance that I don't have time to ponder
+	right now.
+
+	Removed uninitialized().
+
+0.17 Mon Dec 31 11:55:17 PST 2007
+	- Added conflict resolution for inherited attributes.  That means
+	  you can do $obj->set_a(1) and it won't conflict with the derived
+	  class doing a $self->set_a(2).
+
+0.16 Mon Oct 29 14:06:05 PDT 2007
+	- Added STORABLE_freeze() and STORABLE_thaw() to support Storable.
+	  Doing that meant I removed DUMP and SLURP.  If anybody actually
+	  uses those, let me know and I'll put them back in.
+
+0.15 Wed Oct  3 16:33:04 PDT 2007
+	- Added NONEW
+
+0.14 Tue Oct  2 16:03:10 PDT 2007
+	- Added support for get__foo() and set__foo().
+
+0.13 Tue Sep  4 10:03:06 PDT 2007
+	- Finally found a way to test the JSON stuff on boxes where it's
+	  not installed.
+
+0.12 Fri Aug 31 13:54:11 PDT 2007
+	- Bug fix.
+
+0.11 Tue Aug 28 17:08:48 PDT 2007
+	- Removed the default ATTRIBUTES().
+
+0.10 Tue Aug 28 16:42:28 PDT 2007
+	- Put the JSON stuff back in.
+
+0.09 Mon Aug 27 15:06:18 PDT 2007
+	- Took out the JSON stuff (for now).  Gave ATTRIBUTES() a default.
+
+0.08 Thu Aug 23 12:10:31 PDT 2007
+	- Added ATTRIBUTES().
+
+0.07 Tue Apr  3 12:50:43 PDT 2007
+	- BUILDs should first happen in the furthest ancestor.
+
+0.06 Wed Jan 24 11:39:13 PST 2007
+	- Fixed a weird bug with some arguments.
+
+0.05 Fri Jan 12 14:17:52 PST 2007
+	- Fixed a bug with underscores in method names.
+
+0.04 Tue Oct 31 14:52:17 PST 2006
+	- Fixed a bug with _foo when set_foo is overridden.
+
+0.03 Fri Oct 20 11:43:14 PDT 2006
+	- Reworked the privatization of methods after finding a pretty good bug.
+
+0.02 Wed Oct 18 16:18:03 PDT 2006
+	- Added uninitialized()
+
+0.01  Wed Oct  4 12:29:59 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn Class::Simple
+

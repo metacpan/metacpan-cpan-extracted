@@ -1,0 +1,31 @@
+# file: Changes
+# CGI::Authenticate - Simple CGI Authentication in Perl
+# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+# $Date: $
+# $Id: $
+
+Revision history for Perl extension CGI::Authenticate
+
+0.1  Sat Jun 23 00:14:20 ADT 2012
+	- created module based on code form 2011
+
+0.2  Thu Jun 28 14:57:25 ADT 2012
+	- starfish-related improvements
+	- introducing protected namespace CGI::Authenticate with
+  	  appropriate exports of names
+	- improvement in the example/1 and in the documentation
+	- introduced: require_login
+	- introduced: reset_and_send_email_reminder
+	- added examples/2/index.cgi
+
+0.3  Thu Jun 28 15:11:29 ADT 2012
+	- documentation improvement
+
+1.0  Thu May  1 13:33:12 ADT 2014
+	- example improvement, introduced: import_dir_and_config
+	- sending logs to admin introduced, as option
+	- added test.pl for testing
+	- documentation changes
+	- fixed change to package main before requiring
+  	  configuration.pl
+	- make module abstract more standard

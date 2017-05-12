@@ -1,0 +1,3 @@
+<config>
+    <include path='t/confs/conf_error.xml' />
+</config>

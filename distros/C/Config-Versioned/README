@@ -1,0 +1,63 @@
+Config-Versioned
+
+Config::Versioned allows an application to access configuration parameters
+not only by parameter name, but also by version number. This allows for
+the configuration subsystem to store previous versions of the configuration
+parameters. When requesting the value for a specific attribute, the programmer
+specifies whether to fetch the most recent value or a previous value.
+
+This is useful for long-running tasks such as in a workflow-based application
+where task-specific values (e.g.: profiles) are static over the life of a
+workflow, while global values (e.g.: name of an LDAP server to be queried)
+should always be the most recent.
+
+Config::Versioned handles the versions by storing the configuration data
+in an internal Git repository. Each import of configuration files into
+the repository is documented with a commit. When a value is fetched, it is
+this commit that is referenced directly when specifying the version.
+
+The access to the individual attributes is via a named-parameter scheme, where 
+the key is a dot-separated string.
+
+Currently, Config::Std is used for the import of the data files into the 
+internal Git repository. Support for other configuration modules (e.g.:
+Config::Any) is planned.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Versioned
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Versioned
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config-Versioned
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config-Versioned
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-Versioned/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Scott T. Hardin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

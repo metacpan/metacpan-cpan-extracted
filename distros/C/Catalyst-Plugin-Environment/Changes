@@ -1,0 +1,8 @@
+changes from 0.01 to 0.02
+=========================
+
+  * removed MYMETA.yml and MYMETA.json from module distribution
+    per CPAN standards (RT-89135)
+
+  * updated documentation to reflect new formatting standards
+

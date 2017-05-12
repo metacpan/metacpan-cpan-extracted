@@ -1,0 +1,20 @@
+0.21
+ - Reviewed and added to existing documentation
+ - Fix querying to use full domain names
+0.22
+ - Converted documentation as bare perl comments to POD
+ - Added file: Changes (this file)
+0.23
+ - Cleanup timeout error messages to be more human readable
+ - Cleanup host:session notation in doc sections
+ - Add "main module" placeholder Citrix.pm for later Module hierarchy and API Cleanup
+ - New use-case specific timeouts (user, host,op)
+0.24
+ - Declare Citrix::Farm as Formal class instead of plain hash (no major structural change,
+   just enforce Farm content to blessed)
+ - Encapsulate farm ID ('farmid') in Citrix::Farm node
+ - Deprecate Citrix::Config (to be deleted)
+ - Rename Citrix::Farm members
+ - First public (CPAN) release
+  
+  

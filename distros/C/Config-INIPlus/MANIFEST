@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/example.ini
+lib/Config/INIPlus.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/main.t
+t/pod-coverage.t
+t/pod.t
+META.json

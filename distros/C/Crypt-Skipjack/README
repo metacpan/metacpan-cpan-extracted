@@ -1,0 +1,31 @@
+Crypt::Skipjack
+===============
+
+Skipjack is the secret key encryption algorithm designed by the
+National Security Agency, and is used in the Clipper chip and Fortezza
+PC card. It was implemented in tamper-resistant hardware and its
+structure had been classified since its introduction in 1993. Skipjack
+was unclassified on June 24, 1998.
+
+Skipjack is an 80-bit key, 64-bit block cipher.
+
+BONUS
+
+The C file, _skipjack.c, is a standalone Skipjack implementation. To
+compile it, type:
+
+        gcc -Wall _skipjack.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque <jcduque (AT) lycos (DOT) com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

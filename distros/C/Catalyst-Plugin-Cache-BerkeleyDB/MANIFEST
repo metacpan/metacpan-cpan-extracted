@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/Cache/BerkeleyDB.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+README

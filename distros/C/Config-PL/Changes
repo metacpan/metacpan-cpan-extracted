@@ -1,0 +1,9 @@
+Revision history for Perl extension Config-PL
+
+0.02 2013-05-26T14:57:09Z
+    - narrow localize scope to prevent intended behavior. (Thanks gSVubG)
+
+0.01 2013-05-03T14:44:25Z
+
+    - original version
+

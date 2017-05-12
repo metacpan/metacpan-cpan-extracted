@@ -1,0 +1,12 @@
+Revision history for Perl extension CatalystX::Dispatcher::AsGraph
+
+0.03    Thu June 10 2010
+        - add 'package'
+        - nogetopt trait for graph attribute
+        - remove universal to use Class::MOP
+
+0.02    Wed Jun  3
+        - fix makefile
+
+0.01    Sat May 30 10:36:31 2009
+        - original version

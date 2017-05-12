@@ -1,0 +1,29 @@
+---
+abstract: "Catalyst support for JA-SIG's Central Authentication Service."
+author:
+  - 'jason hord <pravus@cpan.org>'
+build_requires:
+  Catalyst::Authentication::Store::Minimal: 0
+  Catalyst::Plugin::Authentication: 0
+  Catalyst::Runtime: 5.80
+  Catalyst::Test: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Authentication-Credential-CAS
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Authen::CAS::Client: 0
+  Moose: 0
+  namespace::autoclean: 0
+version: 0.05

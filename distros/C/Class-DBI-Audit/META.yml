@@ -1,0 +1,24 @@
+---
+name: Class-DBI-Audit
+version: 0.04
+author:
+  - 'Brian Duggan <bduggan@matatu.org>'
+abstract: Audit changes to columns in CDBI objects.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::DBI: 0
+  DBD::SQLite: == 1.12
+  SQL::Abstract: 0
+  mixin: 0
+build_requires:
+  Test::More: 0
+provides:
+  Class::DBI::Audit:
+    file: lib/Class/DBI/Audit.pm
+    version: 0.04
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

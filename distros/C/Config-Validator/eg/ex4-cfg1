@@ -1,0 +1,13 @@
+#
+# config file for ex4
+#
+
+# tree-style can be used
+<src>
+  host = localhost
+  port = 80
+</src>
+
+# flat-style can be used too
+dst-host = localhost
+dst-port = 8080

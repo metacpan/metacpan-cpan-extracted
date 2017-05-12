@@ -1,0 +1,58 @@
+Revision history for Perl module Chemistry::Elements
+
+1.071 2016-12-30T20:11:12Z
+	* Version adjustment to be greater than what's on CPAN
+
+1.065 2016-12-24T18:07:06Z
+	* Add the rest of the Japanese element names
+
+1.064 2016-12-24T17:24:18Z
+	* Ben Bullock adds Japanese element names and fixes some sloppy
+	typing while he's in there.
+
+1.063 2016-12-24T03:46:31Z
+	* New names for 113, 115, 117, and 118
+	https://iupac.org/iupac-announces-the-names-of-the-elements-113-115-117-and-118/
+
+1.062 2016-01-12T19:38:47Z
+	* Fix the GitHub reference
+
+1.061 2016-01-12T19:28:38Z
+	* Add the latest chemical elements. We're up to 118 now.
+	* http://periodic.lanl.gov/index.shtml
+
+1.06 - 2008-08-31
+	* Bump to a release version. There are no changes since the
+	last development version.
+
+1.05_02 - 2008-08-29
+	* Fix some element name typoes
+	* All of this is now in github
+	git://github.com/briandfoy/chemistry--elements.git
+
+1.05_01 - 2008-06-28
+	* Adding multi-language support
+	* This is a test version for the new tests and the big move
+
+1.05 - 2007-11-09
+	* cleanups for the move from CVS to SVN, and latest kwalitee
+	* no need to upgrade
+
+1.04 - 2007-07-30
+	* Updated distro to use new subversion repo, and for kwalitee
+
+1.03 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.01 - 2005-05-24
+	* Fixed up the distro to have tests and more documentation
+	* Added license info: this package is under the same terms as Perl itself
+
+0.97.1018 - 1997-10-19
+	* original version; created by h2xs 1.18
+
+0.97.1102 - 1997-11-02
+	* gutsy enough to actually release it for testing and comments
+	* working on a German version to be released RSN (just need a free hour)
+

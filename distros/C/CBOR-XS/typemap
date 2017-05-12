@@ -1,0 +1,15 @@
+CBOR *		T_CBOR
+
+INPUT
+
+T_CBOR
+	if (!(
+           SvROK ($arg)
+           && SvOBJECT (SvRV ($arg))
+           && (SvSTASH (SvRV ($arg)) == CBOR_STASH || sv_derived_from ($arg, \"CBOR::XS\"))
+        ))
+          croak (\"object is not of type CBOR::XS\");
+        /**/
+        $var = (CBOR *)SvPVX (SvRV ($arg));
+
+

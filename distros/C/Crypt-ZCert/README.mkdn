@@ -1,0 +1,185 @@
+# NAME
+
+Crypt::ZCert - Manage ZeroMQ 4+ ZCert CURVE keys and certificates
+
+# SYNOPSIS
+
+    use Crypt::ZCert;
+
+    my $zcert = Crypt::ZCert->new(
+      public_file => "/foo/mycert",
+      # Optionally specify a secret file;
+      # defaults to "${public_file}_secret":
+      secret_file => "/foo/sekrit",
+    );
+
+    # Loaded from existing 'secret_file' if present,
+    # generated via libzmq's zmq_curve_keypair(3) if not:
+    my $pubkey = $zcert->public_key;
+    my $seckey = $zcert->secret_key;
+
+    # ... or as the original Z85:
+    my $pub_z85 = $zcert->public_key_z85;
+    my $sec_z85 = $zcert->secret_key_z85;
+
+    # Alter metadata:
+    $zcert->metadata->set(foo => 'bar');
+
+    # Commit certificate to disk
+    # (as '/foo/mycert', '/foo/mycert_secret' pair)
+    # Without '->new(adjust_permissions => 0)', _secret becomes chmod 0600:
+    $zcert->commit;
+
+    # Retrieve a public/secret ZCert file pair (as ZPL) without writing:
+    my $certdata = $zcert->export_zcert;
+    my $pubdata  = $certdata->public;
+    my $secdata  = $certdata->secret;
+
+    # Retrieve a newly-generated key pair (no certificate):
+    my $keypair = Crypt::ZCert->new->generate_keypair;
+    my $pub_z85 = $keypair->public;
+    my $sec_z85 = $keypair->secret;
+
+# DESCRIPTION
+
+A module for managing ZeroMQ "ZCert" certificates and calling
+[zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair) from [libzmq](http://www.zeromq.org) to generate CURVE
+keys.
+
+## ZCerts
+
+ZCert files are `ZPL` format (see [Text::ZPL](https://metacpan.org/pod/Text::ZPL)) with two subsections,
+`curve` and `metadata`. The `curve` section specifies `public-key` and
+`secret-key` names whose values are `Z85`-encoded (see [Convert::Z85](https://metacpan.org/pod/Convert::Z85)) CURVE
+keys.
+
+On disk, the certificate is stored as two files; a ["public\_file"](#public_file) (containing
+only the public key) and a ["secret\_file"](#secret_file) (containing both keys).
+
+Also see: [http://czmq.zeromq.org/manual:zcert](http://czmq.zeromq.org/manual:zcert)
+
+## ATTRIBUTES
+
+### public\_file
+
+The path to the public ZCert.
+
+Coerced to a [Path::Tiny](https://metacpan.org/pod/Path::Tiny).
+
+Predicate: `has_public_file`
+
+### secret\_file
+
+The path to the secret ZCert; defaults to appending '\_secret' to
+["public\_file"](#public_file).
+
+Coerced to a [Path::Tiny](https://metacpan.org/pod/Path::Tiny).
+
+Predicate: `has_secret_file`
+
+### adjust\_permissions
+
+If boolean true, `chmod` will be used to attempt to set the ["secret\_file"](#secret_file)'s
+permissions to `0600` after writing.
+
+### ignore\_existing
+
+If boolean true, any existing ["public\_file"](#public_file) / ["secret\_file"](#secret_file) will not be
+read; calling a ["commit"](#commit) will cause a forcible key regeneration and rewrite
+of the existing certificate files.
+
+(Obviously, this should be used with caution.)
+
+### public\_key
+
+The public key, as a binary string.
+
+If none is specified at construction-time and no ["secret\_file"](#secret_file) exists, a new
+key pair is generated via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair) and ["secret\_key"](#secret_key) is set
+appropriately.
+
+### secret\_key
+
+The secret key, as a binary string.
+
+If none is specified at construction-time and no ["secret\_file"](#secret_file) exists, a new
+key pair is generated via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair) and ["public\_key"](#public_key) is set
+appropriately.
+
+### public\_key\_z85
+
+The ["public\_key"](#public_key), as a `Z85`-encoded ASCII string (see [Convert::Z85](https://metacpan.org/pod/Convert::Z85)).
+
+### secret\_key\_z85
+
+The ["secret\_key"](#secret_key), as a `Z85`-encoded ASCII string (see [Convert::Z85](https://metacpan.org/pod/Convert::Z85)).
+
+### metadata
+
+    # Get value:
+    my $foo = $zcert->metadata->get('foo');
+
+    # Iterate over metadata:
+    my $iter = $zcert->metadata->iter;
+    while ( my ($key, $val) = $iter->() ) {
+      print "$key -> $val\n";
+    }
+
+    # Update metadata & write to disk:
+    $zcert->metadata->set(foo => 'bar');
+    $zcert->commit;
+
+The certificate metadata, as a [List::Objects::WithUtils::Hash](https://metacpan.org/pod/List::Objects::WithUtils::Hash).
+
+If the object is constructed from an existing ["public\_file"](#public_file) /
+["secret\_file"](#secret_file), metadata key/value pairs in the loaded file will override
+key/value pairs that were previously set in a passed `metadata` hash.
+
+### zmq\_soname
+
+The `libzmq` dynamic library name; by default, the newest available library
+is chosen.
+
+## METHODS
+
+### commit
+
+Write ["public\_file"](#public_file) and ["secret\_file"](#secret_file) to disk.
+
+### export\_zcert
+
+Generate and return the current ZCert; the certificate is represented as a
+struct-like object with two accessors, **public** and **secret**, containing
+ZPL-encoded ASCII text:
+
+    my $certdata = $zcert->export_zcert;
+    my $public_zpl = $certdata->public;
+    my $secret_zpl = $certdata->secret;
+
+### generate\_keypair
+
+Generate and return a new key pair via [zmq\_curve\_keypair(3)](http://man.he.net/man3/zmq_curve_keypair); if called as
+an instance method, the current ZCert object remains unchanged.
+
+The returned key pair is a struct-like object with two accessors, **public**
+and **secret**:
+
+    my $keypair = $zcert->generate_keypair;
+    my $pub_z85 = $keypair->public;
+    my $sec_z85 = $keypair->secret;
+
+Can be called as either a class or instance method.
+
+# SEE ALSO
+
+[Text::ZPL](https://metacpan.org/pod/Text::ZPL)
+
+[Convert::Z85](https://metacpan.org/pod/Convert::Z85)
+
+[POEx::ZMQ](https://metacpan.org/pod/POEx::ZMQ)
+
+[ZMQ::FFI](https://metacpan.org/pod/ZMQ::FFI)
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

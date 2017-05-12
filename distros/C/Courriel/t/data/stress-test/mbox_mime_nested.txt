@@ -1,0 +1,111 @@
+From catalyst-bounces@lists.rawmode.org  Sat Nov 19 09:37:32 2005
+Return-Path: <catalyst-bounces@lists.rawmode.org>
+Received: from rawmode.org (rawmode.org [213.239.209.201])
+        by s69759.xenosight.com (8.12.11/8.12.11) with ESMTP id jAJFbWu0028232
+        for <archive_catalyst_lists.rawmode.org@mazrmail.com>; Sat, 19 Nov 2005 09:37:32 -0600
+Received: from localhost ([127.0.0.1])
+        by rawmode.org with esmtp (Exim 4.52)
+        id 1EdUf9-0005hG-QS; Sat, 19 Nov 2005 16:29:59 +0100
+Received: from xproxy.gmail.com ([66.249.82.193])
+        by rawmode.org with esmtp (Exim 4.52) id 1EdUf2-00032G-Rf
+        for catalyst@lists.rawmode.org; Sat, 19 Nov 2005 16:29:56 +0100
+Received: by xproxy.gmail.com with SMTP id t4so383035wxc
+        for <catalyst@lists.rawmode.org>; Sat, 19 Nov 2005 07:35:26 -0800 (PST)
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws; s=beta; d=gmail.com;
+        h=received:message-id:date:from:to:subject:mime-version:content-type;
+        b=H8AsLHc82HF4n/oqgQLtdLzrMYeqXL/CI9GMv2DCyNL09SsfadcbXT/P0YG/xC6ChTXuJ8HSdO/buPAcQbbKUV4ZAOknULKF7cmHr+PqcV0U35yQel85cfOFuqHuo0jZ4y+Z9p9Nba3/8gy7BDoleiWbU3J
+niV1yvhmOck6I3RA=
+Received: by 10.70.52.13 with SMTP id z13mr614083wxz;
+        Sat, 19 Nov 2005 07:35:26 -0800 (PST)
+Received: by 10.70.44.10 with HTTP; Sat, 19 Nov 2005 07:35:26 -0800 (PST)
+Message-ID: <c788b4850511190735m6a48bd00l66ecb08c29ee258c@mail.gmail.com>
+Date: Sat, 19 Nov 2005 10:35:26 -0500
+From: Drew Taylor <taylor.andrew.j@gmail.com>
+To: The elegant MVC web framework <catalyst@lists.rawmode.org>,
+        handel@lists.rawmode.org
+MIME-Version: 1.0
+Subject: [Catalyst] Handle support for non-CDBI ORMs
+X-BeenThere: catalyst@lists.rawmode.org
+X-Mailman-Version: 2.1.5
+Precedence: list
+Reply-To: The elegant MVC web framework <catalyst@lists.rawmode.org>
+List-Id: The elegant MVC web framework <catalyst.lists.rawmode.org>
+List-Unsubscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=unsubscribe>
+List-Archive: <http://lists.rawmode.org/pipermail/catalyst>
+List-Post: <mailto:catalyst@lists.rawmode.org>
+List-Help: <mailto:catalyst-request@lists.rawmode.org?subject=help>
+List-Subscribe: <http://lists.rawmode.org/mailman/listinfo/catalyst>,
+        <mailto:catalyst-request@lists.rawmode.org?subject=subscribe>
+Content-Type: multipart/mixed; boundary="===============0167484140=="
+Mime-version: 1.0
+Sender: catalyst-bounces@lists.rawmode.org
+Errors-To: catalyst-bounces@lists.rawmode.org
+Status: O
+X-Status:
+X-Keywords:
+X-UID: 13
+
+--===============0167484140==
+Content-Type: multipart/alternative;
+        boundary="----=_Part_11516_12935954.1132414526093"
+
+------=_Part_11516_12935954.1132414526093
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+(Cross posting to both lists because Handel will be used with Catalyst)
+
+I'm about to start on a project using Handel, but I'd like to try out other
+ORM packages (namely DBIx::Class or Rose::DB::Object). How tightly
+integrated is CDBI into Handel? Could I use Sweet or perhaps
+DBIx::Class::Compat(sp?) which should use the same interface as CDBI?
+
+BTW, the Handel article on perl.com <http://perl.com> was excellent. :-)
+
+Drew
+--
+----------------------------------------------------------------
+Drew Taylor * Web development & consulting
+Email: drew@drewtaylor.com * Site implementation & hosting
+Web : www.drewtaylor.com <http://www.drewtaylor.com> *
+perl/mod_perl/DBI/mysql/postgres
+----------------------------------------------------------------
+
+------=_Part_11516_12935954.1132414526093
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+(Cross posting to both lists because Handel will be used with Catalyst)<br>=
+<br>I'm about to start on a project using Handel, but I'd like to try out o=
+ther ORM packages (namely DBIx::Class or Rose::DB::Object). How tightly int=
+egrated is CDBI into Handel? Could I use Sweet or perhaps DBIx::Class::Comp=
+at(sp?) which should use the same interface as CDBI?
+<br><br>BTW, the Handel article on <a href=3D"http://perl.com">perl.com</a>=
+ was excellent. :-)<br><br clear=3D"all">Drew<br>-- <br>-------------------=
+---------------------------------------------<br> Drew Taylor&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp; *&nbsp;&nbsp;Web development &amp; consulting
+<br> Email: <a href=3D"mailto:drew@drewtaylor.com">drew@drewtaylor.com</a>&=
+nbsp;&nbsp;*&nbsp;&nbsp;Site implementation &amp; hosting<br> Web&nbsp;&nbs=
+p;: <a href=3D"http://www.drewtaylor.com">www.drewtaylor.com</a>&nbsp;&nbsp=
+; *&nbsp;&nbsp;perl/mod_perl/DBI/mysql/postgres<br>
+ ----------------------------------------------------------------
+
+------=_Part_11516_12935954.1132414526093--
+
+
+--===============0167484140==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+Catalyst mailing list
+Catalyst@lists.rawmode.org
+http://lists.rawmode.org/mailman/listinfo/catalyst
+
+--===============0167484140==--

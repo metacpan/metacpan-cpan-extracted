@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fd5e
+registers:
+  AF: 28475
+  AF_: 0
+  BC: 59868
+  BC_: 0
+  DE: 31372
+  DE_: 0
+  HL: 5363
+  HL_: 0
+  I: 0
+  IX: 60534
+  IY: 35498
+  PC: 3
+  R: 2
+  SP: 0

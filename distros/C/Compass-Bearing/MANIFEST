@@ -1,0 +1,15 @@
+scripts/Compass-Bearing-example-plot-1-digit.png
+scripts/Compass-Bearing-example-plot-2-digit.png
+scripts/Compass-Bearing-example-plot-3-digit.png
+scripts/Compass-Bearing-example-plot.pl
+scripts/Compass-Bearing-example.pl
+Changes
+lib/Compass/Bearing.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_bearing.t
+perl-Compass-Bearing.spec
+META.yml                                 Module meta-data (added by MakeMaker)

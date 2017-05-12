@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 258c41ea32fae48d29705372d70c10a2abcd7cb7 Build.PL
+SHA1 92884f7daca7f6e8c82576bdc476ae9121f4b8dd CHANGES
+SHA1 6e0ef6fd898cfeca712579753b0a69161dbabde9 LICENSE
+SHA1 2d211a20e5752071f610299f75a74ac8682f0168 MANIFEST
+SHA1 c03a1657841343260efb593d17db2ec7c3d64858 META.json
+SHA1 d85988a86fdee73cd180af7bcc32e0979918b77c META.yml
+SHA1 b6d2b09e7ffb0150ab6e5afc2728170c9bd705d3 README
+SHA1 795ba34bfc05612d6f154304d92eaafac8939b2a bin/cpan_webserver
+SHA1 e704335f7193bd2dcc38f62848aa02b4ea3f0081 lib/CPAN/Webserver.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk5HmcMACgkQnvdMljFk9hXIwACgstROXOk3bHuGYSojs4ncWYt6
+9B0An19hg09E+9xmJpbsf6OiYEwc5kPQ
+=YLAx
+-----END PGP SIGNATURE-----

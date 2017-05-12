@@ -1,0 +1,39 @@
+{
+    "abstract": "Perl interface to the Nettle cryptographic library", 
+    "author": [
+        "Daniel Kahn Gillmor <dkg@fifthhorseman.net>"
+    ], 
+    "dynamic_config": 1, 
+    "generated_by": "Daniel Kahn Gillmor <dkg@fifthhorseman.net>", 
+    "license": "gpl_2", 
+    "meta-spec": {
+        "url": "http://search.cpan.org/perldoc?CPAN::Meta::Spec", 
+        "version": "2"
+    }, 
+    "name": "Crypt-Nettle", 
+    "prereqs": {
+        "configure": {
+            "requires": {
+                "Config": 0, 
+                "ExtUtils::MakeMaker": 0
+            }
+        }, 
+        "runtime": {
+            "requires": {}
+        }, 
+        "test": {
+            "requires": {
+                "Data::Dumper": 0, 
+                "MIME::Base64": 0
+            }
+        }
+    }, 
+    "release_status": "unstable", 
+    "resources": {
+        "repository": {
+            "type": "git", 
+            "url": "git://lair.fifthhorseman.net/~dkg/libcrypt-nettle-perl"
+        }
+    }, 
+    "version": "0.2"
+}

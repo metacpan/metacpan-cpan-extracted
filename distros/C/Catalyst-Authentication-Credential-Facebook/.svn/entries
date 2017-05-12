@@ -1,0 +1,72 @@
+9
+
+dir
+0
+https://staynalive.svn.beanstalkapp.com/socialtoo/trunk/Catalyst-Authentication-Credential-Facebook-0.01000
+https://staynalive.svn.beanstalkapp.com/socialtoo
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+t
+dir
+
+
+
+add
+
+lib
+dir
+
+
+
+add
+
+META.yml
+file
+
+
+
+add
+
+MANIFEST
+file
+
+
+
+add
+
+Makefile.PL
+file
+
+
+
+add
+
+Changes
+file
+
+
+
+add
+
+Build.PL
+file
+
+
+
+add
+
+README
+file
+
+
+
+add
+

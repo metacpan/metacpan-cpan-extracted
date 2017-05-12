@@ -1,0 +1,282 @@
+2005-04-22 22:28  chris
+
+	* MANIFEST: fix manifest
+
+2005-04-22 22:28  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html,
+	  lib/CAM/SQLManager.pm: v1.13 Relicensing
+
+2004-10-14 13:55  chris
+
+	* Build.PL, Makefile.PL, lib/CAM/SQLManager.pm:
+	  v1.12 Added Win32 support New dependency on File::Spec
+
+2004-09-01 09:44  chris
+
+	* Build.PL: Fix mistaken version number
+
+2004-09-01 09:43  chris
+
+	* Build.PL: Update XML::Xerces version number
+
+2004-09-01 09:42  chris
+
+	* lib/CAM/SQLManager.pm: v1.11 Update for XML::Xerces 2.3.0 Add a
+	  bunch of new validation features Fix some problems with caching
+	  database handles -- now we cache less   aggressively
+
+2004-01-05 14:22  chris
+
+	* CAM-SQL.dtd, test.pl, lib/CAM/SQLManager.pm: v1.10  * Add support
+	  for "default" attributes on bind tags
+
+2003-09-16 16:29  chris
+
+	* SQLManager.pm: Delete duplicate old version of program
+
+2003-09-16 16:26  chris
+
+	* Build.PL, LICENSE, MANIFEST, Makefile.PL, README, index.html,
+	  test.pl, lib/CAM/SQLManager.pm: v1.00 Update for new build and
+	  license infrastructure
+
+2003-09-03 16:19  chris
+
+	* MANIFEST, test.pl: Tiny fix to test script
+
+2003-08-28 15:07  chris
+
+	* SQLManager.pm: v0.84 Add "retrieveByKey" to the list of queries
+	  for statistics collection.  This change is purely to support the
+	  CAM::SQLObject change in v0.84
+
+2003-08-14 13:41  tasc
+
+	* SQLManager.pm: Add slightly better error handling to SQL query
+	  failure
+
+2003-08-13 16:11  tasc
+
+	* SQLManager.pm: v0.82 Make fillObject() return the result value of
+	  the SQL query
+
+2003-07-29 11:15  chris
+
+	* SQLManager.pm: v0.81 Add optional -dbh => $dbh argument to
+	  getMgr() (for use with setDBH() in CAM::SQLObject).
+
+2003-05-05 14:01  chris
+
+	* CAM-SQL.dtd, Makefile.PL, SQLManager.pm, test.pl: v0.80 * Add
+	  tableName() and keyName(), add tests * Add getAllCmds() and
+	  overhaul testCommands() * Try to use CAM::XML functions instead
+	  of delving into its data structure   (small performance penalty).
+	  Now we rely on CAM::XML v0.25 * Clean up comments, Makefile
+
+2003-04-29 14:42  chris
+
+	* test.pl: Add tests (still v0.77)
+
+2003-04-29 14:33  chris
+
+	* SQLManager.pm: v0.77 Create option to skip safety evals if you
+	  know that your accessors and mutators will be real functions, or
+	  autoloads.
+
+2003-04-16 16:05  tasc
+
+	* SQLManager.pm: v0.76 Add capability for subdirectories in the cmd
+	  in the constructor
+
+2003-04-07 16:05  chris
+
+	* SQLManager.pm: Workaround for XML::Xerces bug.
+
+2003-03-19 14:46  chris
+
+	* SQLManager.pm: v0.74 Bugfix: error in accessing properties of an
+	  object with no "accessor" attribute.
+
+2003-03-11 09:19  chris
+
+	* SQLManager.pm, test.pl: More tests
+
+2003-03-11 08:57  chris
+
+	* Makefile.PL, SQLManager.pm, test.pl: v0.73 Performance
+	  enhancements and testing Some minor cleanup of the stats data
+	  structure
+
+2003-03-07 11:42  chris
+
+	* SQLManager.pm: v0.72 Make object queries take additional override
+	  parameters
+
+2003-03-07 11:15  chris
+
+	* SQLManager.pm: Minor doc fix
+
+2003-03-05 22:25  chris
+
+	* SQLManager.pm: Fiddle with the benchmarking code to make it work
+	  better in mod_perl
+
+2003-02-21 23:16  chris
+
+	* Makefile.PL, SQLManager.pm, test.pl: 0.70 Significant backend
+	  changes: * remove old SQL style in favor of XML only * convert
+	  from XML::Parser to CAM::XML for data structure   (added CAM::XML
+	  as a prereq) * improved the internal _gettag function
+
+2003-02-05 16:07  tasc
+
+	* SQLManager.pm: v0.67 Bugfix: only run "explain" queries on
+	  "select" statements!
+
+2003-01-17 11:47  chris
+
+	* SQLManager.pm: v0.66 Add the ability for getMgr to search
+	  multiple potential files.
+
+2003-01-03 16:13  tasc
+
+	* SQLManager.pm: Move document summary to a different test page
+
+2003-01-03 16:07  tasc
+
+	* SQLManager.pm: Add "EXPLAIN" output to the query results
+
+2003-01-03 12:44  chris
+
+	* SQLManager.pm: Fix documentation
+
+2003-01-03 12:08  tasc
+
+	* SQLManager.pm: Make the tester use the new HTML format
+
+2003-01-03 12:04  tasc
+
+	* SQLManager.pm: Rewrite stats HTML to omit Data::Dumper
+
+2003-01-03 11:46  tasc
+
+	* SQLManager.pm: bug fix on the last commit
+
+2003-01-03 11:44  tasc
+
+	* SQLManager.pm: Add HTML version of the stats output
+
+2003-01-03 10:44  chris
+
+	* SQLManager.pm: Use high resolution timing for benchmarking, since
+	  we want wall time, not CPU time
+
+2003-01-03 10:00  chris
+
+	* SQLManager.pm: v0.65: Add code to facilitate benchmarking and
+	  performance analysis
+
+2002-12-19 17:07  chris
+
+	* SQLManager.pm: Support "table.column" notation in retrieves for
+	  objects
+
+2002-12-17 14:14  chris
+
+	* SQLManager.pm: v 0.63 Clean up some code Turn off Carp warnings
+	  for Xerces loading
+
+2002-10-24 14:06  chris
+
+	* SQLManager.pm: v0.62 (prev commit)
+
+2002-10-24 14:05  tasc
+
+	* SQLManager.pm: Bugfix: pass the result
+
+2002-10-23 11:25  chris
+
+	* SQLManager.pm: Typing change
+
+2002-10-23 11:14  chris
+
+	* SQLManager.pm: Deprecate getmgr in favor of getMgr
+
+2002-10-22 16:57  chris
+
+	* CAM-SQL.dtd, SQLManager.pm: Support multiple SQL commands per
+	  query
+
+2002-09-19 19:06  chris
+
+	* CAM-SQL.dtd, SQLManager.pm: Add <replace> tag for unquoted
+	  insertion into the sql
+
+2002-09-11 14:39  chris
+
+	* CAM-SQL.dtd, SQLManager.pm: Add support for "as" attributes
+
+2002-09-05 14:58  chris
+
+	* SQLManager.pm: Apply previous patch in one more place
+
+2002-09-05 14:54  chris
+
+	* SQLManager.pm: Allow "select <dbname>.* from ..." bump version
+
+2002-06-10 16:36  tasc
+
+	* SQLManager.pm: Change all class methods to require
+	  PACKAGE->method() syntax.  Bumped version
+
+2002-06-06 12:44  chris
+
+	* SQLManager.pm: Document XML structure a little bit
+
+2002-06-06 09:33  tasc
+
+	* SQLManager.pm: Added support for "select *" in regard to objects
+	  Bumped version
+
+2002-05-23 14:46  chris
+
+	* Changes, MANIFEST: Change from Changes to ChangeLog
+
+2002-05-23 14:40  tasc
+
+	* SQLManager.pm: Added fillObject method
+
+2002-05-22 16:29  tasc
+
+	* SQLManager.pm: Numerous bug fixes
+
+2002-05-21 16:54  chris
+
+	* SQLManager.pm: Remove errorneous use of $!
+
+2002-05-13 10:54  chris
+
+	* SQLManager.pm: bug fix: forgot to return the object in getmgr()
+
+2002-05-10 16:43  chris
+
+	* CAM-SQL.dtd, SQLManager.pm: Change to handle multiple queries;
+	  other changes
+
+2002-05-09 12:07  chris
+
+	* CAM-SQL.dtd, SQLManager.pm, test.pl: Changes to include expanded
+	  XML capabilities
+
+2002-05-08 13:21  chris
+
+	* CAM-SQL.dtd, Changes, MANIFEST, Makefile.PL, SQLManager.pm,
+	  test.pl: Initial revision
+
+2002-05-08 13:21  chris
+
+	* CAM-SQL.dtd, Changes, MANIFEST, Makefile.PL, SQLManager.pm,
+	  test.pl: reimport SQL repository as SQLManager, with changed
+	  files
+

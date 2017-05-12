@@ -1,0 +1,105 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79a7d25ee813db5728787ee61d883085cefd9b67 Build.PL
+SHA1 fe65b1f2181ce6d27a5961ebf2d042a33fcba6ee Changes
+SHA1 57acc38aa85e47d2c8e27327a7bb2faf3574a114 Examples/GDS2Tool/README
+SHA1 16345a8721d07b69fa04150b8a4eadd1969af1aa Examples/GDS2Tool/and.gds2
+SHA1 1f7a9eb2586a38aabc67b3d4a2d6bd07511ce45d Examples/GDS2Tool/and.gdt
+SHA1 f5a5f8c625ef6abf128ea48cf687ec269380a3bc Examples/GDS2Tool/gds2tool
+SHA1 8edbc04da3156ad2e821cd956e03a2bb8e83e187 Examples/GDS2Tool/stipple/O.stipple
+SHA1 41f39e3f126ac2c6c1e3114b4800b9da7e0d51cf Examples/GDS2Tool/stipple/README
+SHA1 9ac340a75deaea52ed45ef8448a23b9b143fe74e Examples/GDS2Tool/stipple/bows.stipple
+SHA1 1da728f3707419f011665bd48df6624dc9f98e5f Examples/GDS2Tool/stipple/bslash.stipple
+SHA1 668581f63104a808e71031ba3bb218e14118150d Examples/GDS2Tool/stipple/circle.stipple
+SHA1 2b246832d331a7dace4fc06a6cdfc1384877ba57 Examples/GDS2Tool/stipple/clear.stipple
+SHA1 f6d9dc2b591fccfa2daa7b7eb34e1bf416b666a8 Examples/GDS2Tool/stipple/dot.stipple
+SHA1 719f721f1f41cea054fa1fd461ecabd1a71f733b Examples/GDS2Tool/stipple/fslash.stipple
+SHA1 9dbdc8db63319064c78f3151700abbbafc93ab64 Examples/GDS2Tool/stipple/heart.stipple
+SHA1 0ad63e7d7bfe197b163f86eea2356fedad31a273 Examples/GDS2Tool/stipple/horizontal.stipple
+SHA1 51cdea518b3bf19dcd72dac9de2dfb6e58004d3a Examples/GDS2Tool/stipple/l_diag.stipple
+SHA1 5b44d1288cece394e97392d90e8662f5c61615e8 Examples/GDS2Tool/stipple/l_diag2.stipple
+SHA1 f125b896629d1f64e3fb5223c494aa376cc4cf18 Examples/GDS2Tool/stipple/l_diag_fine.stipple
+SHA1 4252fd355ef4a179d09d6c90ed2a85d439cdeb55 Examples/GDS2Tool/stipple/l_diag_heavy.stipple
+SHA1 b3781464ce38c8524b85cf65870cd1ff7323eb98 Examples/GDS2Tool/stipple/l_diag_light.stipple
+SHA1 ffbec659d98468896ed4bae7e37ea41540943f53 Examples/GDS2Tool/stipple/left_diagonal.stipple
+SHA1 3fe8fa517cec0db4d142e293b90bcbff08d117c2 Examples/GDS2Tool/stipple/lf_rain.stipple
+SHA1 457deeea434114241deb5f233fbf11afaea5260f Examples/GDS2Tool/stipple/lips.stipple
+SHA1 59d10516d5bd0d0b0858af24b3f6da4d90c0bac5 Examples/GDS2Tool/stipple/lt_diag.stipple
+SHA1 ffc2f15a2e46640e35bebbfaef9eda3087d37b68 Examples/GDS2Tool/stipple/pacman.stipple
+SHA1 e5ddad4f7e7a296fa393e572c2e362557cde9c9b Examples/GDS2Tool/stipple/percent1.stipple
+SHA1 344425127a9052c5d3a6f3ee1436489a34bca1d9 Examples/GDS2Tool/stipple/percent10.stipple
+SHA1 8d0073f95e49c074dcb63c4e540dfe8b29655e04 Examples/GDS2Tool/stipple/percent10b.stipple
+SHA1 c8a95104a13bc2f0b652f3e87048dfc7264a8679 Examples/GDS2Tool/stipple/percent50.stipple
+SHA1 1e78c93527c3cc399897b70f31512645017b773e Examples/GDS2Tool/stipple/percent50b.stipple
+SHA1 f22e959b42ea935fef828a2d88958849be30805a Examples/GDS2Tool/stipple/percent60.stipple
+SHA1 b1b4715339a9a0851bf7960633e0e27afdfe6822 Examples/GDS2Tool/stipple/percent80.stipple
+SHA1 e2603ba45f8d2f18169d0b32e177f9ca99971a2d Examples/GDS2Tool/stipple/percent90.stipple
+SHA1 1af5c51a7561f43301921f071f77c0ff9af66fbe Examples/GDS2Tool/stipple/percent_10.stipple
+SHA1 cdc7b75b558b0418b89f9372852900af5370a0a1 Examples/GDS2Tool/stipple/percent_20.stipple
+SHA1 ded479c4c0945b0f3b65d0cb8cff5880ad6902c6 Examples/GDS2Tool/stipple/percent_37.stipple
+SHA1 4b09d8598d6e48e5bc6aedcc449d451faa1e0fa5 Examples/GDS2Tool/stipple/percent_50.stipple
+SHA1 74bef0df361d87e10c54d4d44b2d6f13167b40c6 Examples/GDS2Tool/stipple/percent_50b.stipple
+SHA1 7e872bb91adf7351f6fccab0184f67ec80caa505 Examples/GDS2Tool/stipple/percent_50f.stipple
+SHA1 39814e369b454b4a46e81a00351ba82a05ffe3d4 Examples/GDS2Tool/stipple/percent_60.stipple
+SHA1 ffebe1ca89759afdc381d244b655459c66af26d0 Examples/GDS2Tool/stipple/percent_80.stipple
+SHA1 9ab967709716881abac9ede4745e58d751eaeb2e Examples/GDS2Tool/stipple/r_diag.stipple
+SHA1 71f3e24c65b98bfdfb903e05b62d09d7f62a0a63 Examples/GDS2Tool/stipple/r_diag2.stipple
+SHA1 62a98ee79eb41b5364c8f2d0553af8456859da0a Examples/GDS2Tool/stipple/r_diag_fine.stipple
+SHA1 84e28ad9392a65546ec2467867d90928c61d5045 Examples/GDS2Tool/stipple/r_diag_heavy.stipple
+SHA1 d40f63c1e44c637551edefbff3f28d695c415a64 Examples/GDS2Tool/stipple/r_diag_light.stipple
+SHA1 12f0b59c5b19196ea1120399ae259f526a45c0e9 Examples/GDS2Tool/stipple/random1.stipple
+SHA1 efe84daa4f410e4ce48bcff85b07283076c550fc Examples/GDS2Tool/stipple/random2.stipple
+SHA1 db52e27e8c581724c2c9d4df7a525ccb75d9dbd7 Examples/GDS2Tool/stipple/randomx.stipple
+SHA1 f776c130ba2fda2aa68700c21388233b9b929bee Examples/GDS2Tool/stipple/randomx2.stipple
+SHA1 308819e9e94600c6a0764e0aaaf72820071a9bc6 Examples/GDS2Tool/stipple/reverse_weave.stipple
+SHA1 26c270bf04d166373e39bc1dc2e0a5264690cfb5 Examples/GDS2Tool/stipple/right_diagonal.stipple
+SHA1 d6c1924fcd6058a13f3ead66608bddefa6114f22 Examples/GDS2Tool/stipple/rt_diag.stipple
+SHA1 0161664fbbb4993fca2cfe7de129fb71e883546f Examples/GDS2Tool/stipple/rt_rain.stipple
+SHA1 7c9faf9d94e9f4a7f8e4409d83c992c080d8a1ce Examples/GDS2Tool/stipple/solid.stipple
+SHA1 a69a0c7bd78d4594222dcc04188462d2c8e0de82 Examples/GDS2Tool/stipple/square.stipple
+SHA1 134688cf117303fcc533c81da28b6599e0d76e5c Examples/GDS2Tool/stipple/star.stipple
+SHA1 9cb8adc303701b4459efe516444d4751c7a58857 Examples/GDS2Tool/stipple/star1.stipple
+SHA1 faa7296d11e36a40fdfe70f6f080e963902e6cc4 Examples/GDS2Tool/stipple/star2.stipple
+SHA1 f88c892f93d4831d156d64e4abb8ea54a5e97a5b Examples/GDS2Tool/stipple/star2f.stipple
+SHA1 f037330bb6bc8d3b3f36455d38966dbdaca45b6d Examples/GDS2Tool/stipple/thin2_lf_diag.stipple
+SHA1 76927f937b2414f6f95ee71bc1e62f9897b3665c Examples/GDS2Tool/stipple/thin2_rt_diag.stipple
+SHA1 106e2f80d9c64c5d844b1170892579376ddcb633 Examples/GDS2Tool/stipple/thin3_lf_diag.stipple
+SHA1 d39edd175ecefe6cbb06a89add6a37c714e9a370 Examples/GDS2Tool/stipple/thin_lf_diag.stipple
+SHA1 21532026081b1d79c1af26875a3b24656ec6915a Examples/GDS2Tool/stipple/thin_rt_diag.stipple
+SHA1 a79c5ee58394f6e27d4815ce6c2be24dc60a6e4c Examples/GDS2Tool/stipple/vertical.stipple
+SHA1 c65516eb768ea4f40462570b0c6088ef2158be8b Examples/GDS2Tool/stipple/weave.stipple
+SHA1 31d92a6cbce530cbc43ea94974abda15515dfbc0 Examples/GDS2Tool/stipple/x.stipple
+SHA1 fd4d7acff6df40f78ac44393faf7744b68eb1146 Examples/GDS2Tool/tech/README
+SHA1 85ea17b94a2e93bcc07b407344abef64677350e7 Examples/GDS2Tool/tech/common.tech
+SHA1 0dd2055ecedc8da6844221dc4220ca14d8ef9f68 Examples/extent
+SHA1 062cd722744cf942692071d16ab0c55e62fd281e Examples/inside
+SHA1 10608a6ee2436e355ab88f9a7365e03d97e620d3 Examples/overload
+SHA1 a568630a82380119b994830102d098b494c4ee18 Examples/rectangle
+SHA1 c4043adb10da421dd76b813c4405957eaee5164e INSTALL
+SHA1 62ad2140ef49cb6e25c053ef5ec984ffa00fd526 MANIFEST
+SHA1 0ab6d446d95a89932a9f3f24a7af9cfe024fee49 META.yml
+SHA1 cf1750e1e2343e0284a33b089661500b1e4fe2d5 Makefile.PL
+SHA1 6d4b0e52f1e4c8b19fefc5582a751df0fb0d07c1 README
+SHA1 2ce372852897c4a8e2a349fe13baee422a7cfc2b lib/CircuitLayout.pm
+SHA1 f49976dc913217c133ff1630e14b01fbbd4005c2 t/01load.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (GNU/Linux)
+
+iD8DBQFAD3D18yYS6i8J7sERAs+FAJ9ru9LZ0fZFQo4lp+Mq6qonO8TufwCg2qC/
+DEdWhi5D5QpV9wctdWd3K88=
+=7wmj
+-----END PGP SIGNATURE-----

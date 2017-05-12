@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcba4
+registers:
+  AF: 13189
+  AF_: 0
+  BC: 9758
+  BC_: 0
+  DE: 42119
+  DE_: 0
+  HL: 50621
+  HL_: 0
+  I: 0
+  IX: 19343
+  IY: 49357
+  PC: 4
+  R: 2
+  SP: 0

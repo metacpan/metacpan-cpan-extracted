@@ -1,0 +1,85 @@
+NAME
+    Config::Cmd - Command line to config file two way interface
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+       # user writes options in a file;
+       configcmd parallel -j 8 --verbose
+       # stored in ./parallel_conf.yaml
+
+       # same functionality when using the module directly
+       use Config::Cmd;
+       my $conf = Config::Cmd(section => 'parallel');
+       $conf->set('-j 8 --verbose');
+
+       # main application uses the options
+       use Config::Cmd;
+       my $conf = Config::Cmd(section => 'parallel');
+       my $parallel_opts = $conf->get;  # read from ./parallel_conf.yaml
+       # call external program
+       `$exe $parallel_opts @args`;
+
+DESCRIPTION
+    This module makes it easy to take a set of command line options, store
+    them into a config file, and read them later in for passing to an
+    external program. Part of this distribution is a command line program
+    configcmd for writing these options into a file. The main application
+    can then use this module to automate reading of these options and
+    passing them on.
+
+    The options stored by Command::Cmd and its command line tool use single
+    quotes around options with white space, but that can be changed to
+    double quotes if needed by using method quote. Usually you will want
+    stick with single quotes.
+
+  Finding the configuration files
+    The command line program writes into the working directory. The default
+    filename is the section name appended with string '_conf.yaml'. This
+    file can be moved and renamed.
+
+    The method filename can be used to set the path where the file is found.
+    This overrides all other potential places. If the filename has not been
+    set, the module uses the section name to find the configuration file
+    from the working directory (./[section]_conf.yaml). If that file is not
+    found, it looks into user's home directory for a file
+    ~/.[section]_conf.yaml.
+
+METHODS
+  section
+    The obligatory section name for the stored configuration. This string,
+    typically a program name, defines the name of the config file.
+
+  filename
+    Override method that allows user to determine the filename where a
+    config is to be written or read.
+
+  set
+    Store the command line into a file as YAML. Returns true value on
+    success.
+
+  set_silent
+    Same as set() but does not report to STDERR.
+
+  get
+    Get the command line options stored in the file as a string.
+
+  quote
+    The quote character to put around a string with white spaces by method
+    get. Defaults to single quote to make it possible to use double quotes
+    for the whole string. Can be set to any string but you would foolish to
+    set to anything else than single or double quote character.
+
+SEE ALSO
+    configcmd, Config::Auto
+
+AUTHOR
+    Heikki Lehvaslaiho <heikki.lehvaslaiho@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Heikki Lehvaslaiho.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

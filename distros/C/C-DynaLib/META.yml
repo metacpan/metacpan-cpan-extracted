@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               C-DynaLib
+version:            0.61
+abstract:           Dynamic Perl interface to C compiled code.
+author:
+    - John Tobey <John.Tobey@gmail.com>, Reini Urban <rurban@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Convert::Binary::C:   0.7
+    GCC::TranslationUnit:  1.00
+    Test:                 0
+    Test::More:           0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/rurban/c-dynalib
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+recommends:
+    Convert::Binary::C:   0.74
+    GCC::TranslationUnit:  1.01

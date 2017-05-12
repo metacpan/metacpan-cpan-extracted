@@ -1,0 +1,23 @@
+Revision history for Perl extension Config::Setting.
+
+0.04  Wed Aug 31 20:58:25 BST 2005
+	- Add tests for correct POD.
+	- Despam email address.
+
+0.03  Tue Feb 22 12:46:02 GMT 2005
+	- Don't blow up if the first file asked for isn't there.
+	  Instead, check the is_configured() method of the main
+	  Config::Setting object.
+	- Introduce Config::Setting::Chunk as an abstract representation
+	  instead of repeating the same idea throughout the code.
+	- Relicense as BSD.
+	- Switch to Module::Build, Test::More and subversion.
+
+0.02  Mon Feb  4 08:37:44 GMT 2002
+	- Move to Test::Simple.
+	- Make some methods private.
+
+0.01  Sun Jun 24 16:23:36 BST 2001
+	- original version; created by h2xs 1.19
+
+vim: set ai noet sw=8 :

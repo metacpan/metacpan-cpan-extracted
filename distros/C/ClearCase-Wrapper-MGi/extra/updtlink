@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Basename;
+use POSIX qw(strftime);
+use Getopt::Long;
+use ClearCase::Argv;
+use vars qw($help $vob @lbtype $user);
+use constant EQHL => 'EqInc';
+use constant PRHL => 'PrevInc';
+
+ClearCase::Argv->ipc(1);
+my $ct = ClearCase::Argv->new({autochomp=>1});
+my $prog = basename $0;
+my @mon = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+
+sub usage {
+  my $err = shift;
+  print STDERR "$err\n\n" if $err;
+  print STDERR <<"  EOT";
+Usage: $prog [ --vob <vob> --lbtype <lbtypes> --user <account> | --help ]
+
+  This script must be run as vob owner
+  Unlock the floating label type, as well as its equivalent fixed type
+  Update the equivalent incremental type hyperlink
+  Create a new previous incremental type hyperlink
+  Re-lock the previous incremental type, retaining the timestamp and owner
+
+  --lbtype: floating, and (new) equivalent fixed, label types
+  --vob:    vob common to the two types
+  --user:   account creating the previous incremental type hyperlink
+
+  EOT
+  exit 1;
+}
+my $res = GetOptions("help" => \$help, "vob=s" => \$vob,
+		     "user=s" => \$user, "lbtype=s" => \@lbtype);
+usage if $help or !($res and $vob and $user and @lbtype);
+@lbtype = split(/,/, join(',', @lbtype));
+usage('2 types expected: ' . join(', ', @lbtype)) unless @lbtype == 2;
+usage("Not a vob: $vob") unless $ct->argv(qw(des -s), "vob:$vob")->qx eq $vob;
+usage("Unknown account: $user") unless getpwnam($user);
+my $vbown = $ct->argv(qw(des -fmt), '%[owner]p', "vob:$vob")->qx;
+$vbown =~ s%^.*/(.*)%$1%;
+my $account = (getpwuid($<))[0];
+usage("Not vob owner ($vbown): $account") unless $account eq $vbown;
+map { $_ = "lbtype:$_\@$vob" } @lbtype;
+usage if $ct->argv(qw(des -s), @lbtype)->stdout(0)->system;
+my ($pair) = grep s/^\s*(.*) -> (lbtype:.*)$/$1,$2/,
+  $ct->argv(qw(des -l -ahl), EQHL, $lbtype[0])->stderr(0)->qx;
+my ($hlk, $prev) = split(/,/, $pair) if $pair;
+$ct->argv('unlock', $lbtype[0])->stderr(0)->system; #Ignore failure: not locked
+$ct->argv('mkhlink', EQHL, @lbtype)->system and die;
+if ($prev) {
+  no warnings 'qw';
+  my $now = strftime '%d-%b-%Y.%H:%M:%S', localtime;
+  my ($ts, $lu) = split(/,/,
+    $ct->argv(qw(lslock -fmt %Nd,%u), $prev)->stderr(0)->qx);
+  my @dt = $ts =~ /^(\d{4})(\d{2})(\d{2})\.(\d{2})(\d{2})(\d{2})$/;
+  $ts = join('-', $dt[2], $mon[$dt[1] - 1], $dt[0]) . '.' .
+    join(':', @dt[3..5]);
+  $ct->argv('unlock', $prev)->system;
+  $ct->argv('rmhlink', $hlk)->system;
+  $ct->argv(qw(setevent -time), $now, '-user', $user)->system;
+  $ct->argv('mkhlink', PRHL, $lbtype[1], $prev)->system;
+  $ct->argv(qw(setevent -time), $ts, '-user', $lu)->system;
+  $ct->argv('lock', $prev)->system;
+  $ct->argv(qw(setevent -unset))->system;
+}
+exit $?;

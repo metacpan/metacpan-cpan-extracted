@@ -1,0 +1,11 @@
+[cars]
+reno= blue_
+fiat= white_ , black_
+reno= white
+fiat= green , blue
+[person]
+john = 0
+sun = 0, 0
+sun = 1, 0
+john = 38
+sun = 99, 100

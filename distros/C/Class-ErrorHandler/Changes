@@ -1,0 +1,18 @@
+# $Id: Changes,v 1.1.1.1 2004/08/15 14:55:43 btrott Exp $
+
+Revision history for Class::ErrorHandler
+
+0.04 2015-05-10T22:08:23Z
+
+    - use EU::MM
+
+0.03 2013-08-14T03:15:44Z
+
+    - minl migrate
+
+0.02  2013.04.25
+    - Re-packaging without auto_install().
+      (ANDK)
+
+0.01  2004.08.15
+    - Initial distribution.

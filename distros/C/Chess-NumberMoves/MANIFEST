@@ -1,0 +1,9 @@
+benko-najdorf.pgo
+Changes
+Makefile.PL
+MANIFEST
+lib/Chess/NumberMoves.pm
+README
+scripts/pgo2pgn
+t/1.t
+META.yml                                Module meta-data (added by MakeMaker)

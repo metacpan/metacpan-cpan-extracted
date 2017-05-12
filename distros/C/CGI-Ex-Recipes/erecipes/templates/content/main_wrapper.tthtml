@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="bg" >
+    <head> 
+        <title>CGI::Ex::Recipes Today: [% today %]</title>
+        <meta http-equiv="Content-Type" content="text/xml; charset=UTF-8" />
+        <meta name="description" content="CGI::Ex::Recipes - A usage example of CGI::Ex::App!" />
+        <meta name="description" content="the htmland css is based on Design by Jason Murray Cole [jason.murray.cole@gmail.com]" />
+        <meta name="author" content="Krassimir Berov" />
+        <meta name="generator" content="CGI::Ex::App" />
+        <meta name="generator" content="Template::Alloy" />
+        <meta name="generator" content="CGI::Ex::Recipes" />
+        <meta name="generator" content="VIM" />
+        <!--
+        <meta name="generator" content="jEdit" />
+        <meta name="generator" content="Inkscape" /> 
+        -->
+        <meta name="keywords" 
+        content="уеб, съдържание, сайт, разработка, Perl, CGI XHTML, JavaScript" />
+        <link href="[% install_path_url _ 'files/style.css' %]" rel="stylesheet" type="text/css" media="screen"  />
+        <style>
+        #container {  background-image:url([% install_path_url %]files/img/logo.png);}
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h1 style="text-align:center">CGI::Ex::Recipes</h1>
+            <div id="menu">
+                <ul>
+                <li><a href="[% url %]">About</a></li>
+                    <li><a href="http://bcc.sourceforge.net/" target="_blank">The Project</a></li>
+                    <li><a href="" target="_blank">Download</a></li>
+                    [% IF app.is_authed %]
+                    <li><a href="[% script_name _ '/default/?logout=1' %]">Logout</a></li>
+                    [% ELSE %]
+                    <li><a href="[% script_name _ '/edit' %]">Edit</a></li>
+                    [% END %]
+                </ul>
+                Today: [% today %]
+            </div> 
+            [% content %]
+            
+<h6 class="clear">
+    Author: <a href="mailto:k.berov@gmail.com">&copy; Красимир Беров</a> - 2007<br />
+</h6>
+		</div>
+    </body>
+</html>    

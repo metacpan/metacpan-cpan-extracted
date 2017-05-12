@@ -1,0 +1,27 @@
+2003-12-18  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.04
+
+   Make it work with modern versions of recode.  Needs recode v3.5
+   or better now.
+
+   Make it work on systems where /dev/null is spelled differently.
+
+   Documentation fixes by Paul Croome <Paul.Croome@softwareag.com>.
+
+
+
+1997-09-19   Gisle Aas <aas@sn.no>
+
+   Release 1.03
+
+   Support strict_ versions of the mapping functions.
+
+   Prototype the mapping functions to take a single scalar argument.
+
+
+
+1997-09-18   Gisle Aas <aas@sn.no>
+
+   Release 1.01
+

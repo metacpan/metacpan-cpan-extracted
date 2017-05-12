@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb59
+registers:
+  AF: 32824
+  AF_: 0
+  BC: 48938
+  BC_: 0
+  DE: 6153
+  DE_: 0
+  HL: 60721
+  HL_: 0
+  I: 0
+  IX: 65067
+  IY: 64211
+  PC: 4
+  R: 2
+  SP: 0

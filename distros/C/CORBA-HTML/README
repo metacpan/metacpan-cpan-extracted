@@ -1,0 +1,31 @@
+CORBA::HTML - HTML documentation generator from IDL source files.
+
+Description:
+------------
+    idl2html parses the declarations and doc comments in a IDL source file
+    and formats these into a set of HTML pages.
+
+    idl2html works like javadoc.
+
+Prerequisites:
+--------------
+    CORBA::IDL
+
+See also:
+---------
+    CORBA::C - Implements CORBA C language mapping
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) are 
+    available on <http://www.omg.org/>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

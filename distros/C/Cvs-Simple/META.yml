@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Cvs-Simple
+version:             0.06
+abstract:            Perl interface to cvs
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Std::Utils:             0
+    Cwd:                           0
+    File::Copy:                    0
+    File::Path:                    0
+    File::Spec:                    0
+    Scalar::Util:                  0
+    Test::More:                    0
+    Test::Pod:                     1.14
+    Test::Pod::Coverage:           1.04
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Stephen Cardie <stephenca@ls26.net>

@@ -1,0 +1,15 @@
+Revision history for Perl extension CGI::Session::Driver::memcached.
+
+0.04  Fri Sep 11 20:10:10 2009
+  - Fixed detection of Cache::Memcached::Fast.
+  - Updated POD
+
+0.03  Wed Nov 1 10:09:21 2008
+  - Fixed memcached server live detection in test.
+  - Detect Cache::Memcached::Fast in Makefile.PL 
+
+0.02  Wed Sep 13 13:09:21 2006
+  - Fixed some tests failure if memcached server is dead.
+
+0.01  Tue Aug 15 00:15:42 2006
+  - The first release

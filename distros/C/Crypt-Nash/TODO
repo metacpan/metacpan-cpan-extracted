@@ -1,0 +1,3 @@
+Should take strings rather than bit fields
+Shouldn't be necessary to pass in n - we should work it out from the size of the inputs
+

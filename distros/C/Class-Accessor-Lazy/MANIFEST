@@ -1,0 +1,10 @@
+Changes
+lib/Class/Accessor/Lazy.pm
+lib/Class/Accessor/Lazy/Fast.pm
+lib/Class/Accessor/Lazy/Original.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
+t/Class-Accessor-Lazy.t

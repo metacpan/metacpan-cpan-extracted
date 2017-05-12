@@ -1,0 +1,452 @@
+
+=pod
+
+=head1 NAME
+
+Class::DBI::Lite::Tutorial - How To Use Class::DBI::Lite
+
+=head1 QUICKSTART
+
+The following examples are intended to work with MySQL version 5.1.x
+
+=head2 Example Database
+
+  create table artists (
+    artist_id   integer unsigned not null primary key auto_increment,
+    name        varchar(100) not null,
+  ) engine=innodb charset=utf8;
+
+  create table albums (
+    album_id    integer unsigned not null primary key auto_increment,
+    arist_id    integer unsigned not null,
+    name        varchar(100) not null,
+    unique(artist_id, name),
+    foreign key fk_albums_artists (artist_id) references artists( artist_id ) on delete restrict
+  ) engine=innodb charset=utf8;
+
+=head2 Example Classes
+
+First you must subclass C<Class::DBI::Lite::*> and define your database connection:
+
+=head3 Your 'Model' Class:
+
+File C<lib/App/db/model.pm>
+
+  package App::db::model;
+  
+  use strict;
+  use warnings 'all';
+  use base 'Class::DBI::Lite::mysql';
+  
+  __PACKAGE__->connection(
+    'DBI:mysql:dbname:hostname', 'username', 'password'
+  );
+  
+  1;# return true:
+
+=head3 Your 'Entity' Classes:
+
+File C<lib/App/db/artist.pm>
+
+  package App::db::artist;
+  
+  use strict;
+  use warnings 'all';
+  use base 'App::db::model';
+  
+  __PACKAGE__->set_up_table('artists');
+  
+  # Artists have many Albums, referenced by the field 'artist_id':
+  __PACKAGE__->has_many(
+    albums  =>
+      'App::db::album' =>
+        'artist_id'
+  );
+  
+  1;# return true:
+
+File C<lib/App/db/album.pm>
+
+  package App::db::album;
+  
+  use strict;
+  use warnings 'all';
+  use base 'App::db::model';
+  
+  __PACKAGE__->set_up_table('albums');
+  
+  # Albums have an artist, referenced by the field 'artist_id'
+  __PACKAGE__->belongs_to(
+    artist  =>
+      'App::db::artist'  =>
+        'artist_id'
+  );
+  
+  1;# return true:
+
+=head2 Example Usage
+
+Using C<Class::DBI::Lite> is simple.
+
+  #!/usr/bin/perl -w
+  
+  use strict;
+  use warnings 'all';
+  
+  use App::db::artist;
+  use App::db::album;
+
+  # Now you're all set!
+
+=head2 Table Relationships
+
+If you have relationships between your classes, you can express them like this:
+
+=head3 One-To-Many Relationships
+
+  __PACKAGE__->has_many(
+    <methodname> =>
+      <classname> =>
+        <their_fieldname>
+  );
+
+=head3 One-To-One Relationships
+
+  __PACKAGE__->has_one(
+    <methodname> =>
+      <classname> =>
+        <my_fieldname>
+  );
+
+...or...
+
+  __PACKAGE__->belongs_to(
+    <methodname> =>
+      <classname> =>
+        <my_fieldname>
+  );
+
+So in our example we say:
+
+  # Artists have many Albums, referenced by the field 'artist_id':
+  __PACKAGE__->has_many(
+    albums  =>
+      'App::db::album' =>
+        'artist_id'
+  );
+
+Which means that given an instance of C<My::Artist> you can do this:
+
+  # Fetch the artist:
+  my $artist = App::db::artist->retrieve( 1 );
+  
+  # Fetch the artist's albums:
+  my @albums = $artist->albums;
+  
+  # Print the artist's name for each of these albums:
+  foreach my $album ( @albums ) {
+    print $album->artist->name;
+  }
+
+  # As of version 1.005 You can also do the following:
+  my @best_of = $artist->albums({name => { LIKE => '%Best of%'} });
+  
+  my @sorted = $artist->albums(undef, { order_by => 'name DESC' } );
+  
+  my @sorted_best = $artist->albums({
+    name => { LIKE => '%Best of%' }
+  }, {
+    order_by => 'name DESC'
+  });
+  
+  my @top_five = $artist->albums({
+    name => { LIKE => '%Best of%' }
+  }, {
+    order_by => 'name DESC limit 0, 5'
+  });
+
+That example would look like this if we were doing it with hand-coded SQL statements:
+
+  # **** THE OLD WAY: ****
+  use DBI;
+  
+  my $dbh = DBI->connect('DBI:mysql:dbname:hostname', 'username', 'password' );
+  
+  # Fetch the artist:
+  my $sth = $dbh->prepare("SELECT * FROM artists WHERE artist_id = ?");
+  $sth->execute( 1 );
+  my ($artist) = $sth->fetchrow_hashref;
+  $sth->finish();
+  
+  # Fetch the artist's albums:
+  my @albums = ( );
+  $sth = $dbh->prepare("SELECT * FROM albums WHERE artist_id = ?");
+  $sth->execute( $artist->{artist_id} );
+  while( my $album = $sth->fetchrow_hashref ) {
+    push @albums, $album;
+  }
+  $sth->finish();
+  
+  # Print the artist's name for each of these albums:
+  $sth = $dbh->prepare("SELECT * FROM artists WHERE artist_id = ?");
+  foreach my $album ( @albums ) {
+    $sth->execute( $album->{artist_id} );
+    my ($artist) = $sth->fetchrow_hashref;
+    print $artist->{name};
+  }
+  $sth->finish();
+
+=head3 Creating
+
+  # Create an artist:
+  my $artist = App::db::artist->create( name => 'Bob Marley' );
+  
+  # These both do the same:
+  print $artist->id;
+  print $artist->artist_id;
+
+=head3 List Context vs Scalar Context
+
+If you execute a search method in list context, you get an array.  Executing a search
+method in scalar context returns an iterator.
+
+B<List Context>:
+
+  my @albums = App::db::album->search( name => 'Legend' );
+
+  my @albums = $artist->albums;
+
+B<Scalar Context>:
+
+  my $albums = App::db::album->search( name => 'Legend' );
+  
+  my $albums = $artist->albums;
+
+Iterators can be worked through like this:
+
+  while( my $album = $albums->next ) {
+    # Work with $album:
+    print $album->name;
+  }
+  
+  # How many items are in the iterator?
+  print $albums->count;
+
+B<**NOTE:> Any C<has_many> extension methods are also considered 'search' methods,
+so they will conform to this list/scalar context behavior as well.
+
+=head3 Searching
+
+Returns all results as objects of the correct type:
+
+B<Basic Searching>
+
+  my @albums = App::db::album->search( name => 'Legend' );
+  my @albums = App::db::album->search(
+    artist_id => $artist->id,
+  );
+
+B<Advanced Searching>
+
+Advanced searching takes 1 or 2 parameters:
+
+  App::db::album->search_where( { <args> }, [<order_by and limits>] );
+
+Examples:
+
+  my @albums = App::db::album->search_where({
+    artist_id => { IN => [ 1, 2, 3 ] }
+  });
+  
+  my @albums = App::db::album->search_where({
+    name  => { LIKE => 'Lege%' }
+  }, {
+    order_by => 'name DESC LIMIT 0, 10'
+  });
+
+C<search_where> uses L<SQL::Abstract> to generate the SQL, so look there for more examples.
+
+=head3 Counting
+
+Sometimes you just need to know how many records match your query:
+
+  my $count = App::db::album->count_search( name => 'Bob Marley' );
+
+Using C<count_where> you can make more interesting queries:
+
+  my $count = App::db::album->count_search_where({
+    name  => { LIKE => 'Legen%' },
+    artist_id => { IN => [ 1, 2, 3 ] }
+  });
+
+C<count_search_where> uses L<SQL::Abstract> to generate the SQL, so look there for more examples.
+
+=head3 Updating
+
+Example:
+
+  my $artist = App::db::artist->create( name => 'Bob Marley' );
+  
+  # Change the name:
+  $artist->name( 'Bob' );
+  
+  print $artist->name; # Bob
+  
+  # Save the changes to the database:
+  $artist->update;
+
+If you don't call C<update> after making changes to an object, you will get a warning that looks like this:
+
+  My::Artist #1 DESTROY'd without saving changes to name
+
+To cause the object to forget about any unsaved changes you made to it, do this:
+
+  # Hit the reset button:
+  $artist->discard_changes;
+
+=head3 Deleting
+
+Removes the item from the database instantly:
+
+  $artist->delete;
+
+It's the same as:
+
+  my $sth = $dbh->prepare("DELETE FROM artists WHERE artist_id = ?");
+  $sth->execute( 1 );
+  $sth->finish();
+
+=head1 INTERMEDIATE
+
+=head2 Event Triggers
+
+You can program triggers from within your application code.  These can be useful
+but beware of mixing too much business logic in with your data logic.
+
+=head3 before_create
+
+  __PACKAGE__->add_trigger( before_create => sub {
+    my ($self) = @_;
+    
+    # Do something before we are created:
+  });
+
+=head3 after_create
+
+  __PACKAGE__->add_trigger( after_create => sub {
+    my ($self) = @_;
+    
+    # Do something now that we've been created:
+  });
+
+=head3 before_update
+
+  __PACKAGE__->add_trigger( before_update => sub {
+    my ($self) = @_;
+    
+    # Do something before we are updated:
+  });
+
+=head3 after_update
+
+  __PACKAGE__->add_trigger( after_update => sub {
+    my ($self) = @_;
+    
+    # Do something now that we've been updated:
+  });
+
+=head3 before_delete
+
+  __PACKAGE__->add_trigger( before_delete => sub {
+    my ($self) = @_;
+    
+    # Do something before we are deleted:
+  });
+
+=head3 after_delete
+
+  __PACKAGE__->add_trigger( after_delete => sub {
+    my ($obj) = @_;
+    
+    # Obj only contains { artist_id => 1 }
+    # Do something with $obj:
+  });
+
+=head2 Field Triggers
+
+Sometimes you just want to add a trigger to a specific field.
+
+=head3 before_update_<fieldname>
+
+  package App::db::artist;
+  ...
+  __PACKAGE__->add_trigger( before_update_name => sub {
+    my ($self, $old_value, $new_value) = @_;
+    
+    warn "About to change this artist's name from '$old_value' to '$new_value'";
+  });
+
+=head3 after_update_<fieldname>
+
+  package App::db::artist;
+  ...
+  __PACKAGE__->add_trigger( after_update_name => sub {
+    my ($self, $old_value, $new_value) = @_;
+    
+    warn "Finished changing this artist's name from '$old_value' to '$new_value'";
+  });
+
+=head2 Transactions
+
+This is how transactions are done with C<Class::DBI::Lite>:
+
+  # Safely update the name of every album:
+  eval {
+    App::db::artist->do_transaction( sub {
+    
+      # Your transaction code goes here:
+      my $artist = App::db::artist->retrieve( 1 );
+      foreach my $album ( $artist->albums ) {
+        $album->name( $artist->name . ': ' . $album->name );
+        $album->update;
+      }
+    });
+  };
+  
+  if( $@ ) {
+    # There was an error:
+    die $@;
+  }
+  else {
+    # Everything was OK:
+  }
+
+=head2 Getting the Database Handle
+
+You can get the normal database handle by calling C<db_Main> on any of your classes.
+
+  my $dbh = App::db::artist->db_Main;
+
+=head2 Custom SQL Queries:
+
+You can call the C<sth_to_objects> method to convert a prepared statement into
+objects of a pre-defined type:
+
+  # Step 1: Prepare the statement:
+  my $sth = App::db::artist->db_Main->prepare("SELECT * FROM artists WHERE name LIKE ?");
+  
+  # Step 2: Execute the statement:
+  $sth->execute( 'Bob%' );
+  
+  # Step 3: Call sth_to_objects:
+  my @artists = App::db::artist->sth_to_objects( $sth );
+
+=head1 ADVANCED TOPICS
+
+=head2 Running under mod_perl
+
+C<Class::DBI::Lite> is fully-tested and works perfectly under C<mod_perl>.  Because
+it uses L<Ima::DBI::Contextual> under the hood, you get all of its benefits.
+
+=cut
+

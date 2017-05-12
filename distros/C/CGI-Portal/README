@@ -1,0 +1,191 @@
+CGI::Portal - MVC Framework for Multiuser Applications
+
+SYNOPSIS
+
+    use CGI::Portal;
+
+    CGI::Portal::activate({'database_type'       => "mysql",
+
+                           'database_name'       => "some_name",
+                           'database_host'       => "localhost",
+                           'database_user'       => "some_user",
+                           'database_passw'      => "some_password",
+
+                           'user_table'          => "users",
+                           'user_index_field'    => "id",
+                           'user_user_field'     => "user",
+                           'user_passw_field'    => "passw",
+                           'user_additional'     => ["email","first_name","middle_initial","last_name","city","state","country"],
+                           # at least:              ["email"],
+
+                           'session_table'       => "sessions",
+                           'session_index_field' => "id",
+                           'session_sid_field'   => "sid",
+                           'session_user_field'  => "user",
+                           'session_start_field' => "session_start",
+                           'session_additional'  => "",
+
+
+                           # Accessible classes, the first is the default action
+
+                           'actions'             => ["logon", "logoff", "register", "profile", "changepw", "emailpw"],
+
+                           'session_length'      => 7200,
+                           'admin_email'         => "some_user\@some_host.com",
+
+                           'template_dir'        => "templates/", # include trailing slash
+                           'header_html'         => "header.html",
+                           'footer_html'         => "footer.html",
+                           'logon_success_html'  => "logon.html"});
+
+DESCRIPTION
+
+CGI::Portal is a MVC framework for the design of extensible,
+plug-configure-and-play multiuser web applications based on preferred object
+oriented coding standards. It provides authentication, session management, internal 
+redirects and a modular architecture to build complex applications.
+
+It requires a database including a user and a sessions table, a collection of HTML::Template
+style templates and a properly configured starrtup script. To start with CGI::Portal you
+may want to install the provided Templates at http://cgi-portal.sourceforge.net/
+
+All requests access through the startup script, and are handled by the class in
+the CGI::Portal::Scripts and CGI::Portal::Controls namespace that corresponds to the desired action.
+
+portal.cgi?action=foo calls CGI::Portal::Scripts::foo::launch()
+
+portal.cgi?action=foo&Submit=1 calls CGI::Portal::Controls::foo::launch()
+
+FUNCTIONS
+
+activate
+
+CGI::Portal::activate($conf) takes a reference to the configuration hash, collects
+input parameters, creates a database object, and passes those on to your class
+for creating an object instance. It then runs your classes "launch" method and
+concludes by doing the printing for you. This function is called once from your
+startup script.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+CGI::Portal::Scripts - Building Applications
+
+SYNOPSIS
+
+    package CGI::Portal::Scripts::some_name;
+
+    use CGI::Portal::Scripts;
+    use vars qw(@ISA);
+
+    @ISA = qw(CGI::Portal::Scripts);
+
+    1;
+
+    sub launch {
+      my $self = shift;
+      .... 
+    }
+
+Internal Redirects
+
+    package CGI::Portal::Scripts::some_name;
+
+    use CGI::Portal::Scripts;
+    use CGI::Portal::Scripts::other_name;
+    use vars qw(@ISA);
+
+    @ISA = qw(CGI::Portal::Scripts);
+
+    1;
+
+    sub launch {
+      my $self = shift;
+      .... 
+
+      bless $self, "CGI::Portal::Scripts::other_name";
+      $self->launch;
+    }
+
+DESCRIPTION
+
+CGI::Portal applications are build by creating classes that reside in the
+CGI::Portal::Scripts and CGI::Portal::Controls namespaces and extend CGI::Portal::Scripts. These classes
+must provide a subroutine launch() that CGI::Portal calls as an object method to
+run your code.
+
+Classes in the CGI::Portal::Scripts handle the assembly of pages, classes in the CGI::Portal::Controls
+namespace handle form submissions. 
+
+CGI::Portal::Controls are called by providing input parameter "Submit" or "submit"
+and should provide internal redirects to call a CGI::Portal::Scripts class.
+
+In your classes, do not print() or exit(). Instead of "print"ing append to $self->{'out'}
+or $self->{'cookies'} and instead of "exit"ing, "return" from launch().
+
+Extending CGI::Portal::Scripts, gives you access to an object with the following attributes.
+
+ATTRIBUTES
+
+conf
+
+$self->{'conf'} references a hash containing all values as set in the startup script.
+
+in
+
+$self->{'in'} references a hash containing all input parameters, stripped off any HTML tags.
+
+user
+
+$self->{'user'} is set by $self->authenticate_user() if logon succeeds.
+
+rdb
+
+$self->{'rdb'} is a CGI::Portal::RDB database object holding a database handle.
+
+out
+
+$self->{'out'} supposed to collect all output.
+
+cookies
+
+$self->{'cookies'} collects cookie headers you might want to set. It is also used for
+Sessions, so you might want to append to it.
+
+FUNCTIONS
+
+authenticate_user
+
+$self->authenticate_user() takes no arguments and does not return anything. It sets
+$self->{'user'} and starts a session if user logon succeeds. If user logon fails
+it writes the HTML for a logon form to $self->{'out'}. It also maintains the sessions
+during subsequent calls.
+
+    $self->authenticate_user();
+    return unless $self->{'user'};
+    ....
+
+logoff
+
+$self->logoff() takes no arguments and does not return anything. It removes the current
+users session id from the database and unsets the session cookie.
+
+RDB->exec
+
+$self->{'rdb'}->exec($sql) is an object method for the database object. It takes a SQL
+statement as argument and returns a DBI statement handle.
+
+The database handle can be directly retrieved from $self->{'rdb'}{'dbh'}.
+
+RDB->escape
+
+$self->{'rdb'}->escape(@values) takes an array of SQL values. It uses DBI's quote() on those
+values and returns them as a string seperated by commas.
+
+AUTHOR
+
+Alexander David P <cpanalpo@yahoo.com>

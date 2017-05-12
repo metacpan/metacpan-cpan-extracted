@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-Nested
+version:      2.0.1
+version_from: lib/Config/Nested.pm
+installdirs:  site
+requires:
+    Carp:                          1
+    Data::Dumper:                  1
+    Parse::RecDescent:             1
+    Storable:                      2
+    Text::Abbrev:                  1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

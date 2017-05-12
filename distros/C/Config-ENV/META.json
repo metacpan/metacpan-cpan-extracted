@@ -1,0 +1,80 @@
+{
+   "abstract" : "Various config determined by %ENV",
+   "author" : [
+      "cho45 <cho45@lowreal.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-ENV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Name::FromLine" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Lite" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Config::ENV" : {
+         "file" : "lib/Config/ENV.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cho45/Config-ENV/issues"
+      },
+      "homepage" : "https://github.com/cho45/Config-ENV",
+      "repository" : {
+         "url" : "git://github.com/cho45/Config-ENV.git",
+         "web" : "https://github.com/cho45/Config-ENV"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>",
+      "ysasaki <aloelight@gmail.com>",
+      "issm <issmxx@gmail.com>"
+   ]
+}

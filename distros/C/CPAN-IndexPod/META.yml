@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                CPAN-IndexPod
+version:             0.25
+abstract:            Index the POD from an unpacked CPAN
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Class::Accessor::Chained:      0
+    File::Find::Rule:              0
+    KinoSearch:                    0
+    Pod::Simple:                   0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

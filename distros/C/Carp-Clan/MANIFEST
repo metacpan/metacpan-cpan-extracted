@@ -1,0 +1,17 @@
+Changes
+lib/Carp/Clan.pm
+lib/Carp/Clan.pod
+license/Artistic.txt
+license/GNU_GPL.txt
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01pod.t
+t/03yaml.t
+t/10basic.t
+t/11basic.t
+t/20pre560.t
+t/21pre560.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

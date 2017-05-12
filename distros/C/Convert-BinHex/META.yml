@@ -1,0 +1,38 @@
+---
+abstract: 'extract data from Macintosh BinHex files'
+author:
+  - 'Eriq <eryq@zeegee.com>'
+build_requires:
+  File::Compare: '0'
+  File::Slurp: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  autodie: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Convert-BinHex
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  FileHandle: '0'
+  Getopt::Std: '0'
+  POSIX: '0'
+  integer: '0'
+  lib: '0'
+  perl: v5.6.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stephenenelson/convert-binhex
+version: '1.125'

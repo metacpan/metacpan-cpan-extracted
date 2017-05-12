@@ -1,0 +1,119 @@
+=pod
+
+=head1 NAME
+
+Cwd::Ext - get abs path without symlink dereference and more
+
+=head1 SYNOPSIS
+
+Let's imagine that '/home/myself/stuff/music' is a soft link to '/home/myself/documents/music', and our
+current working directory is '/home/myself'..
+
+   use Cwd::Ext ':all';
+   
+   abs_path_nd('./stuff/music'); # returns /home/myself/stuff/music
+   
+   abs_path_is_in_nd( '/home/myself/stuff/music', '/home/myself/stuff' ); 
+   # returns /home/myself/stuff/music
+   
+   abs_path_is_in( '/home/myself/thisdir', '/tmp' );
+   # returns false, beacuse is not inside tmp
+
+Is path in webshare?
+
+   abs_path_in_nd( '/home/myself/public_html/resource', $ENV{DOCUMENT_ROOT} );
+
+=head1 DESCRIPTION
+
+These are some things that feel missing from Cwd. 
+
+Questions like, 
+   Is path a inside the filesystem hierarchy of path b?
+   What is the resolved absolute path of a file, without dereferencing symlinks?
+
+Unlike with Cwd, this module is in baby stage. So it is NOT tweaked for OS2, NT, etc etc.
+This is developed under POSIX.
+
+This module does not export by default. You must explicitely import what you want to use.
+
+=head1 SUBS
+
+=head2 abs_path_nd()
+
+Argument is a path string.
+Returns abs path.
+
+Works just like Cwd::abs_path , only it does (n)o symlink (d)ereference.
+
+=head2 abs_path_is_in()
+
+Arguments are path string for child path in question, parent string path to test against.
+Returns resolved abs path of child.
+If false, returns false.
+
+Will confess if missing arguments.
+If either path can't be resolved, warns and returns undef.
+
+Is /home/myself/file1.jpg inside the filesystem hierarchy of /home/myself ?
+
+   my $child  = '/home/myself/file1.jpg';
+   my $parent = '/home/myself';
+
+   printf "Does [$child] reside in [$parent]? %s\n",
+      
+      ( Cwd::Ext::abs_path_is_in($child,$parent) ? 'yes' : 'no' );   
+
+If both paths resolve to same place, returns abs path and warns.
+(Should this be different? Is /home/me inside /home/me? At present we deem yes.)
+
+=head2 abs_path_is_in_nd()
+
+Same as abs_path_is_in() but does not resolve symlinks.
+
+=head2 abs_path_matches_into()
+
+Arg is child abs path, and parent abs path.
+Does not use Cwd to resolve anything, this just performs a substring match.
+Returns boolean.
+
+=head2 symlinks_supported()
+
+Does an eval to check if this machine supports symlinks.
+Returns boolean.
+
+=head1 CAVEATS
+
+This module is in ALPHA state. Needs feedback.
+
+=head1 TODO
+
+I want this to inherit Cwd. So that cwd(), etc are exported. 
+Currently, you have to use Cwd and Cwd::Ext to
+access both these subs and Cwd subs.
+
+=head1 SEE ALSO
+
+L<Cwd>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+

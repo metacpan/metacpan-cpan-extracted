@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Crypt-Random-Source-Weak-OpenSSLRand
+version:             0.01
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Crypt::Random::Source:         0.02
+    Mouse:                         0.04
+    OpenSSL::Rand:                 0
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,36 @@
+* Introduction
+
+This is the README file for CPANPLUS::Shell::Default::Plugins::Changes,
+a CPANPLUS shell plugin for showing the changelog file of a
+distribution.
+
+See 'perldoc CPANPLS::Shell::Default::Plugins::Changes' after
+installation for details about this module.
+
+* Description
+
+This plugin allows you to display the Changes (or Changelog, ChangeLog,
+etc.) file of a module to get an overview of what (according to the
+maintainer) has changed.
+
+* Installation
+
+CPANPLUS::Shell::Default::Plugins::Changes follows the standard Perl
+module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+* Author
+
+This module is written by Arjen Laarhoven <arjen@cpan.org>.
+
+* Copyright
+
+Copyright (c) 2006 Arjen Laarhoven <arjen@cpan.org>.
+
+This library is free software; you may redistribute and/or modify it
+under the same terms as Perl itself.
+

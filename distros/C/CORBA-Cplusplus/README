@@ -1,0 +1,37 @@
+CORBA::Cplusplus - IDL compiler to language C++ mapping
+
+Description:
+------------
+    idl2cpp parses the given input file (IDL) and generates a include file
+    following the language C++ mapping rules.
+
+    idl2cpp is a Perl OO application what uses the Visitor design pattern.
+
+Prerequisites:
+--------------
+    CORBA::IDL
+    CORBA::C
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation 
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    C++ Language Mapping are available on <http://www.omg.org/>.
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+
+To Do:
+------
+    This module is not currently complete
+    - union, exception, value type, ...
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

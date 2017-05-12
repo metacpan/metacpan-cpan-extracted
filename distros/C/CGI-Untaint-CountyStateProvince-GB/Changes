@@ -1,0 +1,40 @@
+Revision history for CGI-Untaint-CountyStateProvince-GB
+
+0.11	Sun Dec 30 17:01:14 EST 2012
+	Added t/strict.t
+	Handle westmidlands without a space, mapping to West Midlands
+
+0.10	Wed Oct 31 13:47:02 GMT 2012
+	Added t/unused.t and t/changes.t
+
+0.09	Tue Aug 28 08:31:51 BST 2012
+	Cleveland is no longer a county. Accept Teesside instead.
+
+0.08	Mon Jul 16 20:21:06 BST 2012
+	Added mapping of Durham to County Durham
+
+0.07	Sun Apr 15 11:42:55 BST 2012
+	Fix t/taint.t and t/untaint.t on systems without Test::Taint and/or
+		Test::Untaint
+
+0.06	Sat Apr 14 14:17:33 BST 2012
+	is_valid() no longer takes an argument
+	Added extra trivial tests to t/csp-gb.t and t/taint.t
+	Added t/noplan.t and t/untaint.t
+
+0.05	Sun Apr  8 04:20:24 BST 2012
+	Added t/taint.t and fixed an untainting problem it showed
+
+0.04	Wed Mar 21 13:31:39 EDT 2012
+	Added northants and hants as abbreviations
+	Only do kwalitee test in author environment because it throws too
+		many false positives
+
+0.03	Sat Jan 21 17:50:16 GMT 2012
+	Fix return values to remove sloppies e.g. yorks instead of yorkshire
+
+0.02
+	Renamed from CGI::Untaint::CountyStateProvince::GB
+
+0.01	Wed Jan 18 21:18:39 GMT 2012
+        First draft

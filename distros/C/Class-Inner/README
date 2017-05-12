@@ -1,0 +1,17 @@
+INSTALLATION
+    Just perform the usual incantation:
+
+    gunzip Class-Inner-0.1.tar.gz
+    tar -xvf Class-Inner-0.1.tar 
+    cd Class-Inner-0.1
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+AUTHOR
+    Copyright (c) 2001 Piers Cawley, <pdcawley@iterative-software.com>.
+
+    All rights reserved. This program is free software; you can
+    redistribute it and/or modify it under the same terms as
+    Perl itself.

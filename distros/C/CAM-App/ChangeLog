@@ -1,0 +1,246 @@
+2005-04-22 22:47  chris
+
+	* Build.PL, LICENSE, MANIFEST, README, index.html, lib/CAM/App.pm:
+	  v1.07 Relicense
+
+2005-03-01 15:08  tasc
+
+	* lib/CAM/App.pm: minor formatting tweaks and comments (backed out
+	  failed changes)
+
+2005-02-16 14:53  tasc
+
+	* lib/CAM/App.pm: fix typo
+
+2005-02-16 14:52  tasc
+
+	* lib/CAM/App.pm: Make loadModule be a class or instance method
+	  instead of just instance Add getPkgTemplate method Support named
+	  databases for session objects
+
+2004-11-10 10:19  chris
+
+	* lib/CAM/App.pm: bugfix
+
+2004-11-10 09:29  chris
+
+	* lib/CAM/App.pm: v1.06 Added fullURL as a standard template
+	  parameter
+
+2004-09-27 17:03  chris
+
+	* Build.PL: Add File::Spec dependency
+
+2004-09-27 17:02  chris
+
+	* lib/CAM/App.pm:
+	  v1.05 Path tweaks to make this work under Windows
+
+2004-09-01 09:37  chris
+
+	* lib/CAM/App.pm: v1.04 Fix some bugs regarding cached database
+	  handles
+
+2004-05-27 09:31  chris
+
+	* lib/CAM/App.pm: Make the RaiseError dbh property be dependent on
+	  the new dbnonfatal flag
+
+2004-05-27 09:16  chris
+
+	* lib/CAM/App.pm: Add nonfatal flag for database connecting
+
+2004-05-27 08:40  chris
+
+	* lib/CAM/App.pm: Another typo
+
+2004-05-27 08:35  chris
+
+	* lib/CAM/App.pm: Typo fix
+
+2004-05-27 08:33  chris
+
+	* lib/CAM/App.pm: v1.03 Changes to DB selection:   - support port
+	  as config option   - break functions into smaller chunks to
+	  permit easier overriding in	  subclasses
+
+2004-01-19 12:22  chris
+
+	* Makefile.PL, test.pl, lib/CAM/App.pm: Make regression test
+	  optional if CAM::EmailTemplate is not installed
+
+2003-09-17 16:22  chris
+
+	* Makefile.PL, lib/CAM/App.pm: v1.01 Fix computeDir() for some
+	  special case paths, like "." and ".." Clean up Makefile.PL
+
+2003-09-12 16:50  chris
+
+	* Build.PL, Makefile.PL, index.html: Backward compatibility
+
+2003-09-11 17:25  chris
+
+	* Build.PL: One last fix for build fix
+
+2003-09-11 17:09  chris
+
+	* Build.PL: More tweaks for the build script
+
+2003-09-11 17:00  chris
+
+	* App.pm, Build.PL, MANIFEST, README, lib/CAM/App.pm: Add support
+	  for Module::Build infrastructure
+
+2003-09-11 15:45  chris
+
+	* App.pm, COPYRIGHT, LICENSE, MANIFEST, Makefile.PL, README,
+	  index.html: v1.00 Update CAM::App as exemplar for new
+	  distribution system  * Changed licensing  * Moved license to top
+	  of files  * Added index.html template  * Cleaned up documentation
+
+2003-08-18 10:54  chris
+
+	* App.pm, test.pl: v0.10 * allow template instantiation without a
+	  file (for simple string templates) * add some regression tests
+	  for templates
+
+2003-04-30 13:34  chris
+
+	* App.pm: Fix doc indentation
+
+2003-04-15 12:05  chris
+
+	* App.pm, test.pl: still 0.09 * bugfixes in loadModule * test
+	  script additions
+
+2003-04-15 11:01  chris
+
+	* App.pm: still 0.09: * doc cleanup * smarter getDBH: notice if we
+	  request a different $name * make loadModule check for @ISA as
+	  well as $VERSION
+
+2003-04-15 10:18  chris
+
+	* App.pm: Fix tiny POD error
+
+2003-04-15 10:17  chris
+
+	* App.pm: v0.09 * add license statement * make header() and error()
+	  work in a non-cgi environment * make all get() methods do
+	  exists() checks instead of truth checks so   deliberate undefs
+	  are honored.	* support alternate class lineage for CAM::Session
+	  * Move CGI::Compress::Gzip support into getCGI() * tweak
+	  documentation
+
+2003-03-24 15:13  chris
+
+	* App.pm: Bug fix on previous change: make CGI, etc start off
+	  !exist in new()
+
+2003-03-24 13:36  chris
+
+	* App.pm: v0.08
+
+2003-03-24 13:36  chris
+
+	* App.pm: Block creation of CGI object if anything is passed in
+
+2003-03-14 17:59  chris
+
+	* Makefile.PL, README: Update documentation for v0.07
+
+2003-03-14 17:49  chris
+
+	* App.pm: v0.07 Doc updates CGI::Compress::Gzip support Added
+	  DESTROY method so subclasses can safely call
+
+2003-03-09 09:54  chris
+
+	* App.pm: Another one I missed
+
+2003-03-09 09:51  chris
+
+	* App.pm: Simple doc cleanup
+
+2003-03-07 16:28  chris
+
+	* App.pm: v0.06 Create addStatusMessage() and related methods
+
+2003-02-27 16:08  chris
+
+	* App.pm: Version 0.05
+
+2003-02-27 16:07  chris
+
+	* App.pm: Fix cookie sending in session-based apps
+
+2003-02-27 13:28  chris
+
+	* README: Fix doc typo
+
+2003-02-25 16:04  chris
+
+	* App.pm: Better support for running in a non-CGI environment
+
+2003-02-25 15:13  chris
+
+	* App.pm: Documentation typo
+
+2003-01-27 08:32  chris
+
+	* App.pm: Typo correction in docs This is the CPAN v0.04 release
+
+2003-01-23 14:40  chris
+
+	* App.pm: comment out die handler
+
+2003-01-23 14:03  chris
+
+	* App.pm: bug: missing "=cut"
+
+2003-01-22 18:06  chris
+
+	* App.pm: v0.04 Tons of documentation Split up some functions Added
+	  new methods: addDB(), selectDB() Enhanced DBH connection Prefill
+	  some config vars
+
+2003-01-08 11:52  chris
+
+	* README: Clean up the README file
+
+2003-01-08 11:05  chris
+
+	* App.pm: v0.03 Tested the core functions under the FamilyWeb
+	  application.	The functions that use the optional libraries (DBI,
+	  CAM::EmailTemplate, CAM::Session, CAM::SQLManager, etc) are all
+	  untested.
+
+2003-01-08 10:54  chris
+
+	* App.pm, README: Fix broken loadModule
+
+2003-01-08 10:25  chris
+
+	* App.pm, MANIFEST, Makefile.PL, README, SampleConfig.pm, test.pl,
+	  example/SampleConfig.pm: v0.02 - still untested, but much more
+	  refined and complete
+
+2003-01-08 02:57  chris
+
+	* App.pm: Forgot to change the name of a function
+
+2003-01-08 02:54  chris
+
+	* App.pm, MANIFEST, SampleConfig.pm: Development.  Untested so
+	  far...
+
+2003-01-08 01:04  chris
+
+	* App.pm, COPYRIGHT, MANIFEST, Makefile.PL, README, test.pl:
+	  Initial revision
+
+2003-01-08 01:04  chris
+
+	* App.pm, COPYRIGHT, MANIFEST, Makefile.PL, README, test.pl:
+	  initial import
+

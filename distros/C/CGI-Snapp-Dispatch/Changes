@@ -1,0 +1,39 @@
+Revision history for Perl extension CGI::Snapp::Dispatch.
+
+2.00  2016-09-04T12:10:00
+	- Hash::FieldHash has been replaced by Moo.
+		By default Moo has no XS. And since Hash::FieldHash had an XS component, this switch to Moo
+		may help some users there too.
+		Also note, from the Moo docs: 'If a new enough version of Class::XSAccessor is available,
+		it will be used ...'.
+	- Add github repo.
+	- Adopt new repo structure. This includes changing the licence from Artistic to Perl. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Adopt patch to t/lib/CGI/Snapp/Dispatch/RunScript from twata. See RT#81241. With thanx.
+		V 2.00 is being released because this new version of RunScript.pm was inserted into
+		CGI::Snapp but not into CGI::Snapp::Dispatch at the same time. See RT#118198 and RT#118198.
+
+1.05  Wed Feb 18 16:32:00 2015
+	- Rename CHANGES to Changes.
+
+1.04  Tue Aug 20 12:49:00 2013
+	- Switch from Test::More.is_deeply() to Test::Deep.cmp_deeply().
+		This is to avoid hash key randomization issues.
+
+1.03  Wed Jun 12 09:16:00 2013
+	- Rename CHANGES to Changes as per CPAN::Changes::Spec.
+	- Fix use statement in t/logs.t which referred to CGI::Snapp::RunScript when it should have been
+		CGI::Snapp::Dispatch::RunScript. It's under the t/ directory, and so is not installed.
+	- Update pre-req to CGI::Snapp V 1.04.
+
+1.02  Sat Nov 17 10:31:00 2012
+	- Use File::Spec -> catfile('t', 'x.pl') instead of 't/x.pl' in tests.
+	- Update pre-req to CGI::Snapp V 1.03.
+
+1.01  Tue Sep 18 11:23:00 2012
+	- Make CGI::Snapp V 1.02 the pre-req, up from V 1.01.
+	- Remove CGI::PSGI from the pre-reqs, now that it's properly a pre-req for CGI::Snapp, as it
+		should have been all along.
+
+1.00  Sun Apr  8 10:40:00 2012
+	  - Original version

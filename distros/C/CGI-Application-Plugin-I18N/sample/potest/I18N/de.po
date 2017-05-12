@@ -1,0 +1,34 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: German demo\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-01-08 00:25-0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Lyle Hopkins <webmaster@cosmicperl.com>\n"
+"Language-Team: Demo <not@now.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-KeywordsList: localtext\n"
+"X-Poedit-SearchPath-0: c:\\temp\\potest\n"
+
+#: c:\temp\potest/potest.pm:43
+msgid "PO file test"
+msgstr "PO-Aktentest"
+
+#: c:\temp\potest/potest.pm:44
+msgid "Input locale"
+msgstr "Eingangsschauplatz"
+
+#: c:\temp\potest/potest.pm:45
+msgid "Hello"
+msgstr "Hallo"
+
+#: c:\temp\potest/potest.pm:46
+msgid "Colour"
+msgstr "Farbe"
+

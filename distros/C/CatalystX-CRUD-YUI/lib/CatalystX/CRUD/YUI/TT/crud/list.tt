@@ -1,0 +1,13 @@
+[%# generic browse screen %]
+<div id="main">
+  
+ [% IF results.count != 0 %]
+  [% PROCESS crud/results.tt %]
+ [% ELSIF results.plain_query_str %]
+  <div>Sorry, no results for 
+  <strong>[% results.plain_query_str %]</strong>.</div>
+ [% ELSE %]
+  <div>Sorry, no records.</div>
+ [% END %]
+ 
+</div><!-- end main -->

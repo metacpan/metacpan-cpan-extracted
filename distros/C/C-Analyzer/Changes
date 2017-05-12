@@ -1,0 +1,9 @@
+Revision history for Perl module C::Analyzer
+
+0.01 Sat Dec 22 22:43:31 2007
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+0.02 Tue Dec 25 22:21:31 2007
+    - Fixed installation issues
+    - Minor documentation and comment typos removed.
+

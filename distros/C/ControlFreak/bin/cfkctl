@@ -1,0 +1,164 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Carp;
+use ControlFreak::Util;
+use File::Spec();
+use Getopt::Long;
+use Pod::Usage;
+use ControlFreak::Commander;
+
+my %options = ( address => "unix:/$ENV{HOME}/.controlfreak/sock" );
+
+GetOptions(
+    'y|yes'      => \$options{yes},
+    'address=s'  => \$options{address},
+    'basedir=s'  => \$options{basedir},
+
+    'h|help'     => \$options{help},
+    'm|man'      => \$options{man},
+) or pod2usage(2);
+
+pod2usage(1)             if $options{help};
+pod2usage(-verbose => 2) if $options{man};
+
+my $command = shift || pod2usage(2);
+
+my $socket = ControlFreak::Util::get_sock_from_addr($options{address});
+if (! $socket) {
+    print STDERR "Cannot get a socket for '$options{address}'\n";
+    print STDERR "Maybe you need to start cfkd?\n";
+    exit -1;
+}
+
+my $cmd = "cmd_$command";
+
+my $commander = ControlFreak::Commander->new(
+    basedir => $options{basedir},
+    socket  => $socket,
+);
+
+if (my $coderef = $commander->can($cmd)) {
+    my $out = $coderef->($commander, @ARGV);
+    print "$out\n" if defined $out && length $out;
+}
+else {
+    croak "Sorry unknown command $command";
+}
+
+$commander->exit;
+
+
+__END__
+
+=head1 NAME
+
+cfkctl - control ControlFreak!
+
+=head1 SYNOPSIS
+
+cfkctl [options] command [svcref ...]
+
+ Options:
+    -y, --yes           Run non-interactively without asking for confirmations
+    -h, --help          Help
+    -m, --man           More help
+    --basedir=<dir>     change BASE (for the load command)
+                        [defaults to current directory]
+    --address=SOCK      UNIX or TCP socket to connect to ControlFreak
+                        See ADDRESS FORMAT below for more details
+                        [defaults to unix://$ENV{HOME}.controlfreak/sock]
+
+ Service commands: (take a list of service references in arguments)
+    up                  Make sure service(s) is(are) up
+    down                Make sure service(s) is(are) down
+    stop                Stop the service(s)s
+    restart             Stop the service(s) (if up), and then start
+    status              Print status(es) of service(s)
+    pids                Print service pid(s)
+    desc                Print a description of the service(s)
+    destroy             Down a service and deletes it
+
+ Proxy commands:
+    proxystatus         Print status(es) of proxy(ies)
+    proxyup <proxy>     Up specified proxy
+    proxydown <proxy>   Down specified proxy; down any attached service
+
+ Other commands
+    pid <service>       Print the pid of the specified service
+    list                List all services
+    version             Print server's version
+    shutdown            Stop everything, including cfkd
+
+ Service references:
+    all                 All known services [default]
+    svcname             A string of the name of the service
+    @tag                All services tagged with the tag C<tag>
+
+  List of possible status returned:
+    running             all is well
+    starting            should soon be 'running' if all is well
+    stopping            should soon be 'stopped' if all is well
+    stopped             not ever started, downed or completed
+    fail                service terminated abnormally
+    fatal               couldn't start the service
+    backoff             couldn't start, but will try again
+
+
+=head1 OPTIONS
+
+Please see L<SYNOPSIS>.
+
+=head1 DESCRIPTION
+
+B<cfkctl> is B<ControlFreak> command line interface, it connects to
+the management port and issues commands to it.
+
+This script is intended to manage the communication with a B<cfkd>
+instance running on a local or remote host.
+
+=head1 EXAMPLES
+
+    ## stop everything that is not already stopped
+    cfkctl down all
+
+    ## make sure all webs are up (FastCGI processes for instance)
+    cfkctl up @webs
+
+    ## list all services
+    cfkctl list
+
+    ## status of some services
+    cfkctl status
+    cfkctl status @webs
+    cfkctl status s1
+
+    ## pid of services
+    cfkctl pid s1
+    cfkctl pids
+
+    ## remove a service reference completely
+    cfkctl destroy syncer
+
+=head1 ADDRESS FORMAT
+
+C<cfkctl> can connect to a C<cfkd> process using a UNIX or INET socket,
+depending on what the server is running (See C<cfkd> manpage for details
+on how to set that up). By default the UNIX socket named C<sock> in
+C<cfkd> home directory is used (Usually $ENV{HOME}/.controlfreak/).
+
+Please look at the following examples to understand the format
+
+=over 4
+
+  /tmp/cfkd.sock            # same as the default (UNIX socket)
+  unix:/tmp/cfkd.sock       # same
+  tmp/cfkd.sock             # same (not recommended)
+
+  cfkd.sock                 # ambiguous, will resolve to UNIX socket
+
+  127.0.0.1:7000            # TCP socket on localhost port 7000
+  yourserver.com:6000       # TCP socket on yourserver.com port 6000
+
+=back

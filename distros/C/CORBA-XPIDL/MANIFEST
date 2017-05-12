@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/CORBA/XPIDL.pm
+lib/CORBA/XPIDL/CheckVisitor.pm
+lib/CORBA/XPIDL/DocVisitor.pm
+lib/CORBA/XPIDL/HeaderVisitor.pm
+lib/CORBA/XPIDL/JavaVisitor.pm
+lib/CORBA/XPIDL/NameVisitor.pm
+lib/CORBA/XPIDL/XptVisitor.pm
+lib/CORBA/XPIDL/XPT.pm
+lib/CORBA/XPIDL/XPT/Annotation.pm
+lib/CORBA/XPIDL/XPT/ConstDescriptor.pm
+lib/CORBA/XPIDL/XPT/File.pm
+lib/CORBA/XPIDL/XPT/IID.pm
+lib/CORBA/XPIDL/XPT/InterfaceDescriptor.pm
+lib/CORBA/XPIDL/XPT/InterfaceDirectoryEntry.pm
+lib/CORBA/XPIDL/XPT/MethodDescriptor.pm
+lib/CORBA/XPIDL/XPT/ParamDescriptor.pm
+lib/CORBA/XPIDL/XPT/TypeDescriptor.pm
+bin/xpidl
+bin/xpt_dump
+bin/xpt_link
+META.yml                                 Module meta-data (added by MakeMaker)

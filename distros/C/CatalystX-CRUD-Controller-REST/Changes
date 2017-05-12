@@ -1,0 +1,18 @@
+Revision history for CatalystX-CRUD-Controller-REST
+
+0.005 18 Nov 2015
+ - two_args_POST now defers to model to indicate support for $model->create_related
+ - refactor tests to set explicit content-type for PUT requests (https://rt.cpan.org/Ticket/Display.html?id=108962)
+
+0.004 11 May 2014
+ - fix bug calling status_bad_request()
+
+0.003 01 Jan 2013
+ - switch dependency from JSON::XS to JSON
+
+0.002 21 Nov 2012
+ - add missing required plugin for tests
+
+0.001 5 Nov 2012
+ - First version, released on an unsuspecting world.
+

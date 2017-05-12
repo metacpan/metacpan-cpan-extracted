@@ -1,0 +1,212 @@
+NAME
+    CGI::Application::PhotoGallery - module to provide a simple photo
+    gallery
+
+SYNOPSIS
+        use CGI::Application::PhotoGallery;
+    
+        my $webapp = CGI::Application::PhotoGallery->new(
+            PARAMS => {
+                photos_dir  => '/path/to/photos'
+            }
+        );
+    
+        $webapp->run();
+
+DESCRIPTION
+    CGI::Application::PhotoGallery is a CGI::Application module allowing
+    people to create their own simple photo gallery. There is no need to
+    generate your own thumbnails since they are created on the fly (using
+    either the GD or Image::Magick modules).
+
+    To use this module you need to create an instance script. It should look
+    like:
+
+        #!/usr/bin/perl
+    
+        use CGI::Application::PhotoGallery;
+    
+        my $webapp = CGI::Application::PhotoGallery->new(
+            PARAMS => {
+                photos_dir  => '/path/to/photos'
+            }
+        );
+    
+        $webapp->run();
+
+    You'll need to replace the "/path/to/photos" with the real path to your
+    photos (see the photos_dir options below).
+
+    Put this somewhere where CGIs can run and name it something like
+    "index.cgi".
+
+    This gets you the default behavior and look. To get something more to
+    your specifications you can use the options described below.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+OPTIONS
+    CGI::Application modules accept options using the PARAMS arguement to
+    "new()". To give options for this module you change the "new()" call in
+    the instance script shown above:
+
+        my $webapp = CGI::Application::PhotoGallery->new(
+            PARAMS => {
+                photos_dir  => '/path/to/photos',
+                title       => 'My Photos'
+            }
+        );
+
+    The "title" option tells PhotoGallery to use 'My Photos' as the title
+    rather than the default value. See below for more information about
+    "title" and other options.
+
+  photos_dir (required)
+    This parameter is used to specify where all of your photos are located.
+
+    Previous limitations of this directory have been lifted.
+
+    Your photos directory can have any number of images and sub-directories
+    of images. This is applied recursively so a gallery can have any number
+    of sub-galleries.
+
+  script_name
+    This parameter uses $0 by default, you can change it (or set it to the
+    empty string) if you neeed to. It is needed for creating self
+    referencial links.
+
+  title
+    By default every page will start with the title "My Photo Gallery". You
+    can specify your own using the title parameter.
+
+  thumb_size
+    By default PhotoGallery displays thumbnail images that are 100 x 100 on
+    the index page. You can change this by specifying a number (in pixels)
+    for this option.
+
+  preview_thumbs
+    Before viewing the entire contents of a gallery, you are shown a few
+    preview image. The default number of thumbnails is 4. You can change it
+    by specifying your own value in the instance script.
+
+  graphics_lib
+    You can specifify which graphics library you wish to use to size your
+    thumbnails. Included in this package are "Magick" (Image::Magick) and
+    the default: "GD". You can also create your own if you wish.
+
+  index_template
+    This application uses HTML::Template to generate its HTML pages. If you
+    would like to customize the HTML you can copy the default form template
+    and edit it to suite your needs. The default form template is called
+    'photos_index.tmpl' and you can get it from the distribution or from
+    wherever this module ended up in your @INC. Pass in the path to your
+    custom template as the value of this parameter.
+
+    See HTML::Template for more information about the template syntax.
+
+  single_template
+    The default template for an individual photo is called
+    'photos_single.tmpl' and you can get it from the distribution or from
+    wherever this module ended up in your @INC. Pass in the path to your
+    custom template as the value of this parameter.
+
+    See HTML::Template for more information about the template syntax.
+
+  max_width
+    Setting this value will force the browser to scale images down to this
+    particular width and proportioned height. This is done by setting the
+    width and height attributes on the image tag, thus saving the image will
+    retain the full resolution.
+
+  max_height
+    Setting this value will force the browser to scale images down to this
+    particular height and proportioned width. This is done by setting the
+    width and height attributes on the image tag, thus saving the image will
+    retain the full resolution.
+
+  cache_root
+    Specifies where the file cache data will be stored. Defaults to
+    FileCache under the OS-specific temporary filesdirectory (e.g.
+    /tmp/FileCache). You may want to move this to make the cache persist.
+    Under selinux, however, be careful to put it in a webserver-writable
+    directory.
+
+  cache_namespace
+    Specifies the namespace for this gallery's cache data. Defaults to the
+    gallery title - or 'default'. Changing this will orphan the cache data.
+
+  cache_dirumask
+    Specifies the umask value to use when cache directories are created.
+    Defaults to 0007 to avoid cache poisioning attacks.
+
+  cache_datumask
+    Specifies the umask value to use when cache data is written. Defaults to
+    006 to avoid cache poisioning attacks. Note that this becomes the umask
+    for all files written by this script. (See Cache::FileCache
+    documentation for why.)
+
+CAPTIONS
+    You can include captions for your photos by creating a tab-separated
+    database named "captions.txt" in your "photos_dir". The filename should
+    be specified relative of your "photos_dir".
+
+        1.jpg   This is a caption.
+        Test Gallery/1.jpg  This is another caption.
+
+METHODS
+  setup( )
+    This method sets the default options and makes sure all required
+    parameteres are set.
+
+  get_photos( $dir )
+    This method finds all of the "image/*" files in the specified directory.
+
+  mime_types( )
+    This method will create (if needed) and return a new MIME::Types object.
+
+  gfx_lib( )
+    This method will create (if needed) and return the graphics adaptor
+    specified by the user (default is GD).
+
+  cache( )
+    This method will create (if needed) and return a Cache::FileCache
+    object,
+
+RUN MODES
+  gallery_index( )
+    Reads in the contents of your "photos_dir" and generates an index of
+    photos.
+
+  thumbnail( )
+    Generates a thumbnail for the requested image using the selected
+    graphics library.
+
+  show_image( )
+    Sends the contents of the image to the browser.
+
+  single_index( )
+    Fills and sends the template for viewing an individual image.
+
+  handle_error( )
+    Renders a template for any failed action.
+
+SEE ALSO
+    *   CGI::Application
+
+    *   HTML::Template
+
+    *   CGI::Application::MailPage
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2003-2013 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

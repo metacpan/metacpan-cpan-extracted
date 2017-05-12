@@ -1,0 +1,9 @@
+Ex8.pm
+Ex8.xs
+Changes
+MANIFEST
+Makefile.PL
+t/test1.t
+Av_CharPtrPtr.c
+Av_CharPtrPtr.h
+typemap

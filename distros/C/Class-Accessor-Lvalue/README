@@ -1,0 +1,73 @@
+README for Class::Accessor::Lvalue 0.11
+
+=head1 NAME
+
+Class::Accessor::Lvalue - create Lvalue accessors
+
+=head1 SYNOPSIS
+
+ package Foo;
+ use base qw( Class::Accessor::Lvalue );
+ __PACKAGE__->mk_accessors(qw( bar ))
+
+ my $foo = Foo->new;
+ $foo->bar = 42;
+ print $foo->bar; # prints 42
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::Accessor
+ Want
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.11	Tuesday 16th December, 2003
+
+	Fix MANIFEST
+	add NINJA support.
+
+
+=item 0.10	Monday, 15th December, 2003
+
+	Implement proper proxy ties so that the main class correctly emulates
+	Class::Accessor
+
+
+=item 0.01	Friday, 12th December, 2003
+
+	Initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net> with many thanks to Yuval
+Kogman for helping with the groovy lvalue tie magic used in the main
+class.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Class::Accessor>, L<Class::Accessor::Lvalue::Fast>
+

@@ -1,0 +1,23 @@
+Revision history for Class-DBI-Replicated
+
+0.040   2006-08-28
+
+        Freshen Module::Install
+
+0.03_01 Mon Mar 20 13:31:29 EST 2006
+
+        New slave status algorithm for Slony1: use sl_status.
+
+0.03    Fri Jan 27 00:07:50 EST 2006
+
+        Switch to Module::Install.
+        Don't fail tests for optional modules.
+
+0.02    Wed Jan 18 11:38:17 EST 2006
+
+        Fix missing dependency on Sub::Install
+
+0.01    Tue Jan 17 18:27:46 EST 2006
+
+        First version, released on an unsuspecting world.
+

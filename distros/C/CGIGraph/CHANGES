@@ -1,0 +1,10 @@
+v.93
+fixed various bugs (thanks to Joseph P.)
+added a simple test script (try 'make test')
+
+v.92
+
+added 'new' function in CGI::Graph.pm. You can use it like this:
+$myGraph = new CGI::Graph($hash_reference);
+This should allow you to pass in a hash reference and have the correct graph type returned to you.
+The object will not actually be of the type CGI::Graph, but a dervived class.

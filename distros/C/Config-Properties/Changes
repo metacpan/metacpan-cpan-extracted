@@ -1,0 +1,233 @@
+Revision history for Perl extension Config::Properties.
+
+1.80  May 14, 2015
+    - add be_like_java feature (bug report by Bojan Jovanovic)
+    - generate warnings only when enabled
+
+1.79  May 7, 2015
+    - add repository metadata
+
+1.78  May 7, 2015
+    - accept any end of line terminator (i.e. "\r\n", "\r" or "\n")
+      independently of the underlaying operating system (bug report by
+      William Fishburne, problem analysis by Alexander Brett)
+
+1.77  Apr 27, 2014
+    - binmode doesn't work on IO::String and others tied objects (bug
+      report by Mithun Ayachit)
+    - fix spelling errors
+
+1.76  Feb 13, 2014
+    - add encoding feature
+
+1.75  Jul 16, 2012
+    - add support for order feature
+    - silence warning on saveToString method (bug report by Mithun
+      Ayachit)
+
+1.73  Oct 4, 2011
+    - allow disabling wrapping
+
+1.72  Jul 13, 2011
+    - reorganize package structure
+    - improve documentation
+    - accept a filename on the constructor and load it
+    - accept optional arguments on the constructor
+    - accept a hash as defaults
+
+1.71  May 31, 2009
+    - changeProperties was generating a warning when the former value
+      was undef (bug report by Jony Salonen)
+
+1.70  Apr 22, 2009
+    - Solve bug in testing file 6_sorted.t (bug report and patch by
+      Ian Malpass)
+
+1.69  Dec 1, 2008
+    - Delete temporal files created on tests (bug report by
+      Andreas Koenig)
+
+1.68  Oct 27, 2007
+    - the regular expresion used to detect unicode BOM was not correct
+    - work around unicode bug in perl 5.6.0
+    - require perl 5.6.0 in Makefile.PL
+    - test pods
+
+1.67  Aug 20, 2007
+    - splitToTree was not handling defaults properly (bug report
+      and patch submitted by Filip Chodounsky)
+
+1.66  Sep 8 2006
+    - this module is very stable now, use 1.x version numbers to
+      reflect it.
+
+0.65  Sep 8 2006
+    - add setFromTree and changeFromTree methods as requested by
+      Nito.
+
+0.64  Jul 26 2006
+    - add support for start parameter to splitToTree method.
+
+0.63  Mar 30 2006
+	- silly bug on test file removed
+
+0.62  Mar 29 2006
+	- add support for saveToString and splitToTree methods
+	  (suggested by Clayton Scott).
+
+0.61  Jul 27 2005
+	- the regular expression used to remove utf8 byte order marks
+	  was failing on 5.6.x due to a perl bug (reported by Dominik
+	  Stadler).
+
+0.60  Jun 27 2005
+	- handle utf8 BOM (bug reported by Trent Wood).
+	- doc typos corrected
+
+0.59  Apr 14 2005
+	- remove old unused deprecated features PERL_MODE and object
+	  creation from prototype.
+	- remove undocumented redundant list function.
+	- remove deprecated perlMode and setPerlMode functions.
+	- change validator processing, to allow for key redefinition.
+	- remembers key line numbers for expressive duplicate error
+	  reports.
+	- empty properties before loading new file.
+	- improve docs.
+	- license notice added to the docs.
+
+0.58  Sep 16 2004
+	- on getProperty methods admit several defaults and take the
+	  first defined one.
+	- new requireProperty method
+
+0.57  May 07 2004
+	- retain properties read/construction order when saving
+
+0.56  Oct 20 2003
+	- corrected \uXXXX unescaping (Guntis)
+
+0.55  Sep 22 2003
+	- corrected bug in getProperties returning a flatten hash
+	  instead of a reference to it.
+
+0.54  Sep 19 2003
+	- public methods documented
+	- new method changeProperty
+	- new method deleteProperty
+	- propertyNames now also returns names from default properties
+	- getProperties now also returns default properties
+	- new properties method returning a flatten hash with all the
+	  properties added
+	- setProperty doesn't return the old value anymore... anyway
+	  it's implementation was always broken!
+	- parameter checking changed to use some common functions
+
+0.53  Aug 15 2003
+	- fall back mode and warning when Text::Wrap module is not
+	  recent enough.
+
+0.52  Jul 30 2003
+	- added new test for saving and wrapping
+
+0.51  Jun 10 2003
+	- improved docs for beginners
+	- pointer to Config::Properties::Simple added
+
+0.50  May 27 2003
+	- escape $_ on test name on 1_parse.t
+	- require latest Text::Wrap version
+
+0.49  May 20 2003
+	- CRLF line ends from windows files were not correctly handled
+	  on unix
+	- test for that bug
+
+0.48  May 1 2003
+	- added new test for parsing \\
+
+0.47  Apr 26 2003
+	- more tests added
+	- escape '#' and '!' at key starts / unescape
+	- process_line method signature changed
+	- don't use $_ because it can be read only bug (Craig Manley)
+
+0.46  Apr 24 2003
+	- 5_test.t was printing debug information
+
+0.45  Apr 24 2003
+	- more tests added
+	- wrapping of several consecutive spaces works now
+	- spaces at the beginning and at the end of keywords and
+	  values escaped when saving
+	- added wrapping when saving long properties
+
+0.44  Apr 23 2003
+	- process_line deep recursion problem fixed (Eric Kolve)
+	- getProperties now return a copy and not a ref to the
+	  properties hash inside the object
+	- new from object deprecated
+	- unused PERL_MODE deprecated
+	- general code cleanup
+	- code reformated to 4 space indents
+
+0.43  Tue Apr 15 2003
+	- module maintenace changed from Craig Manley to Salvador
+	  Fandiño <sfandino@yahoo.com>
+
+0.42  Tue Apr 15 2003
+	- Added 'setValidator', 'getValidator' and 'validator'
+	  methods
+	- Added 'validate' method to perform validations on
+	  property/value pairs
+	- Added 'fail' method to report errors
+	- Added 'line_number' method
+	- Use Carp to report interface errors
+	- Reworked unescape to handle unicode sequences
+	- Reworked parsing regexp to support escaping [:= ] on
+	  property names
+	- Escape conflicting chars when writing
+	- Tests changed to use to Test::More
+	- Added some tests
+
+0.41  Tue Jul 10 00:00:00 2002
+	- Fixed value checks in most methods that incorrectly treated the
+	  value '0' or the empty string as an undefined value. I could not
+	  contact the original author in any way (tried 3 email addresses 
+	  and news://comp.lang.perl.modules), so I uploaded this version
+	  myself. Craig Manley (c.manley at skybound.nl).
+
+0.40  Tue Jul 10 11:32:00 2001
+	- 0.4 (almost half-way there) release
+	- Add format/getFormat/setFormat() to change the appearance of saved properties 
+		(thanks to David Boyce for the idea)
+	- Added POD documenation for format feature
+	- Typo fixes in POD
+	- Add reference to official JavaDoc (idea thanks to David Boyce)
+	Randy Jay Yarger (ryarger@mediaone.net)
+
+	- Fixed default handling when retrieving a property value
+	David Boyce (dsb@world.std.com)
+	
+0.03  Sat May 19 21:56:10 2001
+	- Corrected Object Oriented behavior (was using class variables for everying,
+		now using instance variables)
+	- Skip blank lines (spotted by Eric Zylberstejn and Christian Niles)
+	- Fixed borked packaging (#$@% Windows!) (spotted by Ken Ho,
+		Michael Peterson and David Boyce)
+	- Fixed incorrect version number (spotted by Michael Peterson and David Boyce)
+	Randy Jay Yarger (ryarger@mediaone.net)
+	
+	- Allow the escape characters proscribed by the Java API spec
+	Christian Niles (can207@nyu.edu)
+
+0.02  Thu May 03 21:19:00 2001
+	- Fixed bug relating to doubled escape characters(\\). 
+		Thanks to David Boyce for the spot.
+	Randy Jay Yarger (ryarger@mediaone.net)
+
+0.01  Wed Jan 17 15:38:07 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Config::Properties
+	Randy Jay Yarger (ryarger@mediaone.net)	
+

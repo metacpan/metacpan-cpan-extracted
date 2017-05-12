@@ -1,0 +1,20 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Calendar Widget
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the celendar object.
+my $calendar = new Cdk::Calendar ();
+
+# Activate the object.
+my $ret = $calendar->activate();
+
+# Exit Cdk.
+Cdk::end();

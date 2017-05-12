@@ -1,0 +1,44 @@
+[%
+    passmatrix = 1
+
+    htmltitle = 'CPAN distributions for Perl ' _ perl
+    title = 'CPAN distributions for Perl ' _ perl
+
+    crumb2_name = 'Perl' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Platform' ;
+%]
+
+[% USE Comma -%]
+
+<h1>CPAN modules with their latest version (with a PASS) for Perl [% perl %] grouped by platform </h1>
+
+<p>The following table lists the count of distributions that have had at least one 
+PASS report submitted for the given perl version and platform. 
+Note that we list the generic platform name, and reports may have been processed for 
+different release versions of that operating system.</p>
+
+<p>Total number of modules with a PASS report for this perl: <strong>[% cnt_modules | comma %]</strong>.</p>
+
+<p>See also: <a href="index.html">All stats</a>, <a href="perl_[% perl %].html">cummulative table</a>.</p>
+
+<div class="container">
+<table class="test_results">
+<tr><th><img src="/images/headings/distribution.png" alt="Distribution" /></th>
+   [% FOREACH name = osnames %]
+     <th><img src="/images/headings/[% name.oscode | lower %].png" alt="[% name.osname %]" /><br />([% name.cnt | comma %])</th>
+   [% END %]
+</tr>
+
+[% FOREACH d = dists %]
+<tr><td><a href="distro/[% d.dist.substr(0,1) %]/[% d.dist %].html">[% d.dist %]</a></td>
+[%- FOREACH v = d.osversion -%]
+[%- IF v.ver %]<td>[% v.ver %]</td>
+[%- ELSE %]<td></td>
+[%- END -%]
+[%- END -%] 
+</tr>
+[% END %] 
+</table>
+</div>
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Cache::YAML.
+
+0.01  Tue Oct 25 15:14:55 2005
+
+	- original version; created by h2xs 1.21 with options
+		-O -X -n Cache::YAML
+

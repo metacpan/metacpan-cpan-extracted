@@ -1,0 +1,43 @@
+digraph "Cluster::Init::DFA::Group"
+{
+  size="7.5,10";
+  //rankdir=LR;
+  ratio=fill;
+
+  //async: halt tell
+  configured -> starting [label="tell/startnext"];
+  configured -> configured [label="halt/"];
+  starting -> starting [label="proc/startnext"];
+  starting -> checking [label="all_started/ckproc"];
+  starting -> stopping [label="tell/stopold"];
+  starting -> halting [label="halt/haltgrp"];
+  checking -> checking [label="proc/ckproc"];
+  checking -> done [label="all_done/"];
+  checking -> passed [label="all_passed/"];
+  checking -> failed [label="any_failed/"];
+  checking -> stopping [label="tell/stopold"];
+  checking -> halting [label="halt/haltgrp"];
+  done -> stopping [label="tell/stopold"];
+  done -> halting [label="halt/haltgrp"];
+
+  stopping -> dumping [label="old_stopped/garbage_collect"];
+  stopping -> stopping [label="timeout/ckstop"];
+  stopping -> stopping [label="kickme/kick"];
+  stopping -> stopping [label="tell/stopold"];
+  stopping -> halting [label="halt/haltgrp"];
+
+  halting -> configured [label="all_halted/"];
+  halting -> halting [label="timeout/ckhalt"];
+  halting -> halting [label="kickme/kick"];
+  halting -> halting [label="halt/haltgrp"];
+  halting -> stopping [label="tell/stopold"];
+
+  passed -> stopping [label="tell/stopold"];
+  passed -> configured [label="halt/"];
+  failed -> stopping [label="tell/stopold"];
+  failed -> configured [label="halt/"];
+  dumping -> stopping [label="tell/stopold"];
+  dumping -> starting [label="clean/startnext"];
+  dumping -> halting [label="halt/haltgrp"];
+  
+}

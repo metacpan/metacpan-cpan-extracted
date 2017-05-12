@@ -1,0 +1,11 @@
+# CHECKSUMS file written on Wed Feb 13 03:44:01 2008 GMT by CPAN::Checksums (v1.064)
+$cksum = {
+  'Bogus-Fail-0.01_01.tar.gz' => {
+    'md5' => 'd59a04393812e66619686c84f1aab7fa',
+    'md5-ungz' => 'eab1658ad451035b75667243987e841a',
+    'mtime' => '2008-02-04',
+    'sha256' => '66a5d9e8fa131a81b2ff52705bd00e01f959af2630ea82857259516a885ddbe4',
+    'sha256-ungz' => '2a737c1579ab2065a79d5f69406567951c935a70ee9d51e4a997e05b18086997',
+    'size' => 968
+  }
+};

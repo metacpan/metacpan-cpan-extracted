@@ -1,0 +1,40 @@
+Revision history for Perl extension Chart::Scientific.
+
+0.16  ??? ?? ??? ??:??:?? 2004
+	- For consistency with the rest of the parameters, which have a [xy]_
+      naming scheme, I changed the names of the following parameters:
+          xcol      -> x_col      
+          xdata     -> x_data     
+          xlabel    -> x_label    
+          xlog      -> x_log      
+          xrange    -> x_range   
+          ycol      -> y_col      
+          ydata     -> y_data    
+          yerr_col  -> y_err_col  
+          yerr_data -> y_err_data 
+          ylabel    -> y_label    
+          ylog      -> y_log      
+          yrange    -> y_range.
+      The old [xy] style is supported but depreciated.
+
+
+0.15  Thu 15 Dec 08:57:00 2004
+	- Oop, didn't have PGPLOT in the Makefile.PL dependencies.
+
+0.14  Thu 09 Dec 09:37:00 2004
+	- Problems with test more prenicious than I thought.  They succeede with "perl t/Chart-Scientific", but not "make test".  Problem with my machine? Removed most tests for now.
+
+0.13  Tue Nov 30 15:55:00 2004
+	- Fixed problem with test in t/.
+
+0.12  Tue Nov 30 09:35:30 2004
+	- Changed parameter axis_residual to axis_residuals for consistency,
+      updated documentation.
+
+0.11  Tue Nov 30 08:35:30 2004
+	- Fixed bad POD-- it was breaking the indexing on CPAN.
+
+0.10  Sun Nov 21 21:35:30 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n Chart::Scientific
+

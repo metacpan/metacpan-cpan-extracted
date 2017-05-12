@@ -1,0 +1,37 @@
+# Regression test: minor namespace cleanup in verion 1.20
+# not used, because cleanup attempted in 1.20 didn't work abnd was reverted
+
+package NonPersistent;
+use base qw(Class::AutoClass);
+use vars qw(@AUTO_ATTRIBUTES);
+@AUTO_ATTRIBUTES=qw(name);
+Class::AutoClass::declare;
+
+# override oid
+sub oid {'override'}
+
+package Persistent;
+use base qw(NonPersistent);
+use vars qw(%AUTODB);
+%AUTODB=1;
+Class::AutoClass::declare;
+
+package main;
+use t::lib;
+use strict;
+use Carp;
+use Test::More;
+use Class::AutoDB;
+use autodbUtil;
+
+my $autodb=new Class::AutoDB(database=>'test',create=>1); # create database
+isa_ok($autodb,'Class::AutoDB','class is Class::AutoDB - sanity check');
+my $parent=new NonPersistent name=>'parent';
+my $child=new Persistent name=>'child';
+
+# original behavior: override works in parent, not child
+# fixed behavior: override works in both
+is($parent->oid,'override','parent');
+is($child->oid,'override','child');
+
+done_testing();

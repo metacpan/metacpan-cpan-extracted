@@ -1,0 +1,51 @@
+---
+abstract: 'Drive Config::AutoConf with an INI file'
+author:
+  - 'Jean-Damien Durand <jddpause@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Config::AutoConf: '0.313'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-AutoConf-INI
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  Config::AutoConf::INI:
+    file: lib/Config/AutoConf/INI.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Config::AutoConf: '0.313'
+  Config::Tiny::Ordered: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-AutoConf-INI
+  homepage: https://metacpan.org/release/Config-AutoConf-INI
+  repository: git://github.com/jddurand/perl-config-autoconf-ini.git
+version: '0.005'
+x_authority: cpan:JDDPAUSE
+x_serialization_backend: 'YAML::Tiny version 1.70'

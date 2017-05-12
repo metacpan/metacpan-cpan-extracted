@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<UL>
+    <LI> <OBJECT type="text/sitemap">
+        <param name="Name" value="Main Window">
+        <param name="Local" value="index.html">
+        </OBJECT>
+    <UL>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Menu Bar">
+            <param name="Local" value="menubar.html">
+            </OBJECT>
+        <UL>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="File menu">
+                <param name="Local" value="menu_file.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Edit Menu">
+                <param name="Local" value="menu_edit.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Help menu">
+                <param name="Local" value="menu_help.html">
+                </OBJECT>
+        </UL>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Tool Bar">
+            <param name="Local" value="toolbar.html">
+            </OBJECT>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Search Bar">
+            <param name="Local" value="searchbar.html">
+            </OBJECT>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Notebook Views">
+            <param name="Local" value="notebook.html">
+            </OBJECT>
+        <UL>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Modules View">
+                <param name="Local" value="notebook_modules.html">
+                </OBJECT>
+            <UL>
+                <LI> <OBJECT type="text/sitemap">
+                    <param name="Name" value="Information Panel">
+                    <param name="Local" value="info_pane.html">
+                    </OBJECT>
+                <UL>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Info View">
+                        <param name="Local" value="info_info.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Actions View">
+                        <param name="Local" value="info_actions.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Files View">
+                        <param name="Local" value="info_files.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Readme.txt View">
+                        <param name="Local" value="info_readme.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Status View">
+                        <param name="Local" value="info_status.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Prerequisites View">
+                        <param name="Local" value="info_prereqs.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Contents View">
+                        <param name="Local" value="info_contents.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Report View">
+                        <param name="Local" value="info_report.html">
+                        </OBJECT>
+                    <LI> <OBJECT type="text/sitemap">
+                        <param name="Name" value="Validate View">
+                        <param name="Local" value="info_validate.html">
+                        </OBJECT>
+                </UL>
+            </UL>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Actions View">
+                <param name="Local" value="notebook_actions.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Log View">
+                <param name="Local" value="notebook_log.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="POD Reader View">
+                <param name="Local" value="notebook_podreader.html">
+                </OBJECT>
+        </UL>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Preferences">
+            <param name="Local" value="preferences.html">
+            </OBJECT>
+        <UL>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="General">
+                <param name="Local" value="prefs_general.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Mirrors">
+                <param name="Local" value="prefs_mirrors.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Build">
+                <param name="Local" value="prefs_build.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Network">
+                <param name="Local" value="prefs_network.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Paths">
+                <param name="Local" value="prefs_paths.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Libraries">
+                <param name="Local" value="prefs_lib.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="Programs">
+                <param name="Local" value="prefs_programs.html">
+                </OBJECT>
+            <LI> <OBJECT type="text/sitemap">
+                <param name="Name" value="wxCPAN">
+                <param name="Local" value="prefs_wxcpan.html">
+                </OBJECT>
+        </UL>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Searching">
+            <param name="Local" value="searching.html">
+            </OBJECT>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="POD Reader">
+            <param name="Local" value="podreader.html">
+            </OBJECT>
+        <LI> <OBJECT type="text/sitemap">
+            <param name="Name" value="Symbols">
+            <param name="Local" value="symbols.html">
+            </OBJECT>
+    </UL>
+</UL>
+</BODY></HTML>

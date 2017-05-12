@@ -1,0 +1,45 @@
+@chapter Adding your own style sheet
+
+The various modules provide methods for generating HTML fragments, something
+@file{sys.cgi} (@pxref{sys.cgi}) uses as an example.  The HTML is done in a
+style-sheet friendly way.
+
+Cascading Style Sheets (CSS) are easy enough that we recommend looking at the
+existing style sheet (@file{cgi/CfgTie.css}) and skim the spec
+(@url{http://www.w3.org/Style/CSS/}). The only really non-straightforward thing
+is the nesting of styles and cascading. You don't need to read the entire long
+document in full to understand it; Skimming it is plenty.
+
+The key to style-sheets is @dfn{classes}.  HTML markup can include a class
+attribute to indicate how it should rendered.  An example might be:
+@example
+	<td class="cfgval">blah</td>
+@end example
+
+CfgTie uses the @samp{cfgval} class to indicate values for various settings,
+and @samp{cfgattr} to indicate the variable names that are being set.
+
+@heading Nesting in style sheets
+The following CSS fragment means that paragraphs nested inside TDs of class
+@samp{cfgattr}  will have black text and yellow backgrounds. 
+
+@example
+   TD.cfgattr P @{ color: black; background: yellow; @}
+@end example
+
+Contrast this with:
+
+@example
+   TD.cfgattr, TD.cfgval @{ ... @}
+@end example
+
+Which means that both TDs of class @samp{cfgattr} and @samp{cfgval} will have
+the given style. Commas: terseness, No commas: nesting. There's a few nice
+paragraphs dedicated to this in the spec.
+
+As for cascading, that's the downfall of style sheets and their greatest
+benefit. Read the spec for that, it's pretty involved and is described
+there better than we could do anyway.
+
+Basically, the spec is the best source of info on this, and experimentation
+with existing style sheets is the best way to learn.

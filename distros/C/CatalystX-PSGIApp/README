@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution CatalystX-PSGIApp,
+version 0.01:
+
+  Get a psgi_app in a unified way across different Catalyst versions
+
+This software is copyright (c) 2012 by Peter Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

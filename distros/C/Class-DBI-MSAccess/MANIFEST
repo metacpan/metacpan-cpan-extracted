@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+SIGNATURE
+lib/Class/DBI/MSAccess.pm
+t/0-signature.t
+t/00-load.t
+t/multiple_primary_keys.t
+t/pod-coverage.t
+t/pod.t
+t/single_primary_key.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

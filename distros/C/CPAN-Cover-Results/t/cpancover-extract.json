@@ -1,0 +1,65 @@
+{
+   "AI-Genetic-Pro-Macromolecule" : {
+      "0.09280.0_001" : {
+         "coverage" : {
+            "total" : {
+               "statement" : "91.67",
+               "subroutine" : "100.00",
+               "total" : "93.75"
+            }
+         }
+      }
+   },
+   "Graph" : {
+      "0.96" : {
+         "coverage" : {
+            "total" : {
+               "branch" : "74.89",
+               "condition" : "66.27",
+               "pod" : "87.15",
+               "statement" : "89.97",
+               "subroutine" : "92.20",
+               "total" : "84.27"
+            }
+         }
+      },
+      "0.96_01" : {
+         "coverage" : {
+            "total" : {
+               "branch" : "77.56",
+               "condition" : "67.61",
+               "pod" : "87.15",
+               "statement" : "91.56",
+               "subroutine" : "94.98",
+               "total" : "86.12"
+            }
+         }
+      }
+   },
+   "Module-Path" : {
+      "0.13" : {
+         "coverage" : {
+            "total" : {
+               "branch" : "64.29",
+               "condition" : "33.33",
+               "pod" : "0.00",
+               "statement" : "93.75",
+               "subroutine" : "100.00",
+               "total" : "82.46"
+            }
+         }
+      },
+      "0.14" : {
+         "coverage" : {
+            "total" : {
+               "branch" : "64.29",
+               "condition" : "33.33",
+               "pod" : "0.00",
+               "statement" : "93.75",
+               "subroutine" : "100.00",
+               "total" : "82.46"
+            }
+         }
+      }
+   }
+}

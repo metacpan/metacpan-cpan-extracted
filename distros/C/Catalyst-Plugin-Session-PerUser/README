@@ -1,0 +1,116 @@
+NAME
+    Catalyst::Plugin::Session::PerUser - Per user sessions (instead of per
+    browser sessions).
+
+SYNOPSIS
+            use Catalyst qw/
+                    Session
+                    Authentication
+                    Authentication::Store::Foo
+                    Session::PerUser
+            /;
+
+            sub action : Local {
+                    my ( $self, $c ) = @_;
+                    $c->user_session->{foo} = "bar";
+            }
+
+DESCRIPTION
+    This plugin allows you to write e.g. shopping cart code which should
+    behave well for guests as well as permanent users.
+
+    The basic idea is both logged in and not logged in users can get the
+    same benefits from sessions where it doesn't matter, but that logged in
+    users can keep their sessions accross logins, and will even get the data
+    they added/changed assimilated to their permanent account if they made
+    the changes as guests and then logged in.
+
+    This is probably most useful for e-commerce sites, where the shopping
+    cart is typically used before login, and should be equally accessible to
+    both guests and logged in users.
+
+STORING SESSION DATA
+    This module can store session data in two ways:
+
+  Within the User
+    If "$c->user->supports("session_data")" then
+    "$c->user->get_session_data" and "$c->user->store_session_data($data)"
+    are used to access and store the per-user session hash reference.
+
+    This is useful for Catalyst::Plugin::Authentication::Store
+    implementations that rely on a database or another fast, extensible
+    format.
+
+  Within the Session Store
+    If the user does not support the "session_data" feature, the
+    Catalyst::Plugin::Session::Store plugin in use will be used to save the
+    session data instead.
+
+    The session ID used to save this data is set by "user_session_sid".
+
+    Note that this method could potentially have security issues if you
+    override the default "user_session_sid" or "validate_session_id" in
+    Catalyst::Plugin::Session. See "CAVEATS" for details.
+
+METHODS
+    user_session
+        If no user is logged in, returns "$c->session".
+
+        If a user is logged in, and "$user->supports("session_data")" it
+        will return "$c->user->get_session_data". Otherwise it will return
+        data from the normal session store, using "user_session_sid" as a
+        session ID.
+
+INTERNAL METHODS
+    merge_session_to_user
+        Uses Hash::Merge to merge the browser session into the user session,
+        omitting the special keys from the browser session.
+
+        Should be overloaded to e.g. merge shopping cart items more
+        intelligently.
+
+    user_session_sid
+        By default returns
+
+                "user:" . $c->user->id
+
+EXTENDED METHODS
+    set_authenticated
+        Calls "merge_session_to_user".
+
+CONFIGURATION
+            $c->config->{user_session} = {
+            ...
+        };
+
+    migrate
+        Whether "$c->session" should be merged over "$c->user_session" on
+        login. On by default.
+
+    merge_type
+        Passed to "set_behavior" in Hash::Merge. Defaults to
+        "RIGHT_PRECEDENT".
+
+    *
+
+    CAVEATS
+    If you override "validate_session_id" in Catalyst::Plugin::Session make
+    sure its format DOES NOT ALLOW the format returned by
+    "user_session_sid", or malicious users could potentially set their
+    cookies to have sessions formatted like a string returned by
+    "user_session_sid", and steal or destroy another user's session without
+    authenticating. =back
+
+SEE ALSO
+    Catalyst::Plugin::Authentication, Catalyst::Plugin::Session
+
+AUTHORS
+    David Kamholz, "dkamholz@cpan.org"
+
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

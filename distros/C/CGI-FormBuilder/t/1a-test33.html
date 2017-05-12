@@ -1,0 +1,68 @@
+<script type="text/javascript"><!-- hide from old browsers
+function validate_parts (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // ticket: standard text, hidden, password, or textarea box
+    var ticket = form.elements['ticket'].value;
+    if (ticket == null || ! ticket.match(/^\d+$/)) {
+        alertstr += '- Invalid entry for the "Ticket" field\n';
+        invalid++;
+        invalid_fields.push('ticket');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+<noscript><span class="fb_invalid">Please enable Javascript or use a newer browser.</span></noscript>
+<p>Fields that are <span class="fb_required">highlighted</span> are required.</p>
+<form action="TEST" class="fb_form" id="parts" method="post" name="parts" onsubmit="return validate_parts(this);">
+<div class="fb_state" id="parts_state"><input id="_submitted_parts" name="_submitted_parts" type="hidden" value="1" /></div>
+<div class="fb_extra" id="parts_extra"><input id="replacement" name="replacement" type="hidden" value="TRUE" />
+<input id="action" name="action" type="hidden" value="Unsubscribe" />
+<input id="name" name="name" type="hidden" value="Pete Peteson" />
+<input id="extra" name="extra" type="hidden" value="junk" />
+<input id="other_test" name="other_test" type="hidden" value="_other_other_test" /></div>
+<div class="fb_tab" id="parts_tab1">
+<fieldset class="fb_set" id="parts_acct">
+<legend>Account Information</legend>
+<div id="parts_ticket_row">
+  <div class="fb_label" id="parts_ticket_label"><span class="fb_required">Ticket</span></div>
+  <div class="fb_field" id="parts_ticket_field"><input class="fb_input" id="ticket" name="ticket" type="text" value="111" /></div>
+</div>
+</fieldset>
+</div>
+<div class="fb_tab" id="parts_tab2">
+<fieldset class="fb_set" id="parts_prefs">
+<legend>Part Information</legend>
+<div id="parts_email_row">
+  <div class="fb_label" id="parts_email_label">Email</div>
+  <div class="fb_field" id="parts_email_field"><input class="fb_input" id="email" name="email" type="text" value="pete@peteson.com" /></div>
+</div>
+</div>
+</fieldset>
+<div class="fb" id="parts_body">
+<div id="parts_user_row">
+  <div class="fb_label" id="parts_user_label">User</div>
+  <div class="fb_field" id="parts_user_field"><input class="fb_input" id="user" name="user" type="text" value="pete" /></div>
+</div>
+<div id="parts_part_number_row">
+  <div class="fb_label" id="parts_part_number_label">Part Number</div>
+  <div class="fb_field" id="parts_part_number_field"><input class="fb_input" id="part_number" name="part_number" type="text" /></div>
+</div>
+</div>
+<div class="fb_controls" id="parts_controls">
+<div id="parts_submit_row">
+  <div class="fb_submit"><input class="fb_button" id="parts_submit" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Update" /></div>
+  <div class="fb_submit"><input class="fb_button" id="parts_submit_2" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Delete" /></div>
+  <div class="fb_submit"><input class="fb_button" id="parts_submit_3" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Cancel" /></div>
+</div>
+</div>
+</form>

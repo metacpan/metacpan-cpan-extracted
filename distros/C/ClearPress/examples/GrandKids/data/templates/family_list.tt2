@@ -1,0 +1,16 @@
+
+<h2>families </h2>
+<table id="family_list">
+ <caption>family list</caption>
+ <thead><tr><th>address</th><th>city</th><th>name</th><th>state</th><th>zip</th></tr></thead>
+ <tbody>
+[% FOREACH family = model.families %]
+<tr>
+ <td>[% family.address %]</td><td>[% family.city %]</td><td>[% family.name %]</td><td>[% family.state %]</td><td>[% family.zip %]</td>
+ <td>[<a href="[% SCRIPT_NAME %]/family/[% family.id_family %]">details</a>]</td>
+</tr>
+[% END %]
+ </tbody>
+</table>
+
+ 

@@ -1,0 +1,62 @@
+<html>
+    <head>
+      <title>TEST</title>
+      <script type="text/javascript"><!-- hide from old browsers
+function validate (form) {
+    var alertstr = '';
+    var invalid  = 0;
+    var invalid_fields = new Array();
+
+    // yomomma: standard text, hidden, password, or textarea box
+    var yomomma = form.elements['yomomma'].value;
+    if (yomomma == null || ! yomomma.match(/^[a-zA-Z]+$/)) {
+        alertstr += '- Invalid entry for the "Yomomma" field\n';
+        invalid++;
+        invalid_fields.push('yomomma');
+    }
+    if (invalid > 0 || alertstr != '') {
+        if (! invalid) invalid = 'The following';   // catch for programmer error
+        alert(''+invalid+' error(s) were encountered with your submission:'+'\n\n'
+                +alertstr+'\n'+'Please correct these fields and try again.');
+        return false;
+    }
+    return true;  // all checked ok
+}
+//-->
+</script>
+    </head>
+    <body>
+      <form action="TEST" method="get" onsubmit="return validate(this);"><input id="_submitted" name="_submitted" type="hidden" value="1" />
+      <table>
+        
+        <tr valign="top">
+          <td>
+            <b>Yomomma</b>
+          </td>
+          <td>
+            
+
+        <input id="yomomma" name="yomomma" type="text" />
+      </td>
+    </tr>
+        
+        <tr valign="top">
+          <td>
+            Mymomma
+          </td>
+          <td>
+            
+
+        <input id="mymomma" name="mymomma" type="text" value="medium" /><input id="mymomma" name="mymomma" type="text" value="large" /><input id="mymomma" name="mymomma" type="text" value="xxl" />
+      </td>
+    </tr>
+        
+        <tr>
+          <td colspan="2" align="center">
+            <input id="_submit" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Remove" /><input id="_submit_2" name="_submit" onclick="this.form._submit.value = this.value;" type="submit" value="Dance_With" /> <input id="_reset" name="_reset" type="reset" value="Reset" />
+          </td>
+        </tr>
+      </table>
+      </form>
+    </body>
+    </html>

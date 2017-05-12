@@ -1,0 +1,26 @@
+1.54   2016-09-27    Clean up some nasty old code, no functional changes
+
+1.53   2016-09-26    Fix handling of no_index/directory
+
+1.52   2013-06-13    Make tests work even if Test::Pod::Coverage isn't
+                       available
+
+1.51   2013-06-07    Warn about Windows not being fully supported
+
+1.5    2013-05-25    Safe.pm is now incompatible with signals, so use
+                       Parallel::ForkManager are Dark Magic to time
+                       out the Safe compartment
+
+1.4    2011-07-02    recognize modules stored as blah.pm.PL
+
+1.3    2011-01-13    recognize -TRIAL versions in isdevversion()
+
+1.2    2010-09-01    Add the use_tar argument
+
+1.11   2010-05-15    version.pm broke qv() sometime between 0.74 and 0.82,
+                     so add more regex craziness for the Safe compartment
+
+1.1    2009-04-04    Damn, I was hoping I could ignore META.yml, but no ...
+                     Added dumpcpandist utility
+
+1.0    2009-03-30    Initial version extracted form the CPXXXAN project

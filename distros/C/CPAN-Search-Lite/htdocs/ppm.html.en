@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+  <title>Using ppm</title>
+  </head>
+
+  <body>
+<br><div class=t4> PPM repositories</div>
+Consult the documentation that comes with 
+<a href="http://www.activestate.com/">ActivePerl</a>
+for general directions for using ppm. The ppm packages
+that appear here can be installed with the ppm utility.
+For the ActivePerl packages, you should just be able to install
+the package as <code>install Package-Name</code> from within
+the ppm shell; for the other packages, you may have to
+add the indicated location to your list of repositories:
+</p>
+<ul>
+<li><b>http://www.bribes.org/perl/ppm</b>, for
+the <i>www.bribes.org Perl 5.6 and 5.8 repository</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer</b>,
+for the <i>uwinnipeg Perl 5.6 repository</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58</b> (ActivePerl Builds &lt; 819) /
+<b>http://theoryx5.uwinnipeg.ca/ppms/</b> (ActivePerl Builds &gt;= 819),  
+for the <i>uwinnipeg Perl 5.8 repository</i></li>
+</ul>
+Make sure that you use a repository appropriate for your
+Perl version (5.6 repositories for ActivePerl builds 6xx, and
+5.8 repositories for ActivePerl builds 8xx). Also note that
+the name of the package that appears here, based on the
+CPAN distribution name, is the one to use when installing
+a package; this often, but not always, corresponds to the
+name of the main module in the package.
+</p>
+</body></html>

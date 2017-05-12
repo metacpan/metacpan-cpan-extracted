@@ -1,0 +1,196 @@
+TYPEMAP
+gpgme_ctx_t	GPGME_CTX_T
+perl_gpgme_ctx_or_null_t	PERL_GPGME_CTX_OR_NULL_T
+gpgme_protocol_t	GPGME_PROTOCOL_T
+gpgme_keylist_mode_t	GPGME_KEYLIST_MODE_T
+gpgme_data_t	GPGME_DATA_T
+gpgme_sig_mode_t	GPGME_SIG_MODE_T
+gpgme_key_t	GPGME_KEY_T
+const gpgme_key_t	GPGME_KEY_T
+gpgme_validity_t	GPGME_VALIDITY_T
+gpgme_sig_notation_flags_t	GPGME_SIG_NOTATION_FLAGS_T
+
+OUTPUT
+
+GPGME_CTX_T
+	$arg = perl_gpgme_new_sv_from_ptr ($var, \"Crypt::GpgME\");
+
+GPGME_PROTOCOL_T
+	$arg = perl_gpgme_protocol_to_string ($var);
+
+GPGME_KEYLIST_MODE_T
+	{
+		AV *av = newAV ();
+
+		if ($var & GPGME_KEYLIST_MODE_LOCAL) {
+			av_push (av, newSVpvn (\"local\", 5));
+		}
+		if ($var & GPGME_KEYLIST_MODE_EXTERN) {
+			av_push (av, newSVpvn (\"extern\", 6));
+		}
+		if ($var & GPGME_KEYLIST_MODE_SIGS) {
+			av_push (av, newSVpvn (\"sigs\", 4));
+		}
+		if ($var & GPGME_KEYLIST_MODE_SIG_NOTATIONS) {
+			av_push (av, newSVpvn (\"sig-notations\", 13));
+		}
+		if ($var & GPGME_KEYLIST_MODE_VALIDATE) {
+			av_push (av, newSVpvn (\"validate\", 8));
+		}
+
+		$arg = newRV_noinc ((SV *)av);
+	}
+
+GPGME_DATA_T
+	$arg = perl_gpgme_data_to_sv ($var);
+
+GPGME_VALIDITY_T
+	$arg = perl_gpgme_validity_to_string ($var);
+
+GPGME_KEY_T
+	$arg = perl_gpgme_new_sv_from_ptr ($var, \"Crypt::GpgME::Key\");
+
+INPUT
+
+GPGME_CTX_T
+	$var = ($type)perl_gpgme_get_ptr_from_sv ($arg, \"Crypt::GpgME\");
+
+PERL_GPGME_CTX_OR_NULL_T
+	if (!$arg || !SvOK ($arg) || !SvROK ($arg)) {
+		$var = NULL;
+	}
+	else {
+		$var = ($type)perl_gpgme_get_ptr_from_sv ($arg, \"Crypt::GpgME\");
+	}
+
+GPGME_PROTOCOL_T
+	{
+		char *protocol = SvPV_nolen ($arg);
+
+		if (strcasecmp (protocol, \"openpgp\") == 0) {
+			$var = GPGME_PROTOCOL_OpenPGP;
+		}
+		else if (strcasecmp (protocol, \"cms\") == 0) {
+			$var = GPGME_PROTOCOL_CMS;
+		}
+		else {
+			croak (\"unknown protocol\");
+		}
+	}
+
+GPGME_KEYLIST_MODE_T
+	{
+		AV *av;
+		int i;
+
+		if (!$arg || !SvOK ($arg) || !SvROK ($arg) || !(SvTYPE (SvRV ($arg)) == SVt_PVAV)) {
+			croak (\"not an array reference\");
+		}
+
+		av = (AV *)SvRV ($arg);
+		$var = 0;
+
+		for (i = 0; i <= av_len (av); i++) {
+			char *keylist_mode;
+			SV **ae = av_fetch (av, i, 0);
+
+			if (!ae) {
+				croak (\"failed to fetch array element\");
+			}
+
+			keylist_mode = SvPV_nolen (*ae);
+
+			if (strcasecmp (keylist_mode, \"local\") == 0) {
+				$var |= GPGME_KEYLIST_MODE_LOCAL;
+			}
+			else if (strcasecmp (keylist_mode, \"extern\") == 0) {
+				$var |= GPGME_KEYLIST_MODE_EXTERN;
+			}
+			else if (strcasecmp (keylist_mode, \"sigs\") == 0) {
+				$var |= GPGME_KEYLIST_MODE_SIGS;
+			}
+			else if (strcasecmp (keylist_mode, \"sig-notations\") == 0) {
+				$var |= GPGME_KEYLIST_MODE_SIG_NOTATIONS;
+			}
+			else if (strcasecmp (keylist_mode, \"validate\") == 0) {
+				$var |= GPGME_KEYLIST_MODE_VALIDATE;
+			}
+			else {
+				croak (\"unknown keylist mode\");
+			}
+		}
+
+	}
+
+GPGME_DATA_T
+	{
+		SV *tmp;
+
+		if (!SvROK ($arg)) {
+			tmp = perl_gpgme_data_io_handle_from_scalar ($arg);
+		}
+		else {
+			tmp = $arg;
+		}
+
+		if (tmp && SvOK (tmp)  && sv_isobject (tmp) && sv_derived_from (tmp, \"IO::Handle\")) {
+			$var = ($type)perl_gpgme_data_from_io_handle (tmp);
+		}
+		else {
+			croak (\"not a valid IO::Handle\");
+		}
+	}
+
+GPGME_SIG_MODE_T
+	{
+		char *sig_mode = SvPV_nolen ($arg);
+
+		if (strcasecmp (sig_mode, \"normal\") == 0) {
+			$var = GPGME_SIG_MODE_NORMAL;
+		}
+		else if (strcasecmp (sig_mode, \"detach\") == 0) {
+			$var = GPGME_SIG_MODE_DETACH;
+		}
+		else if (strcasecmp (sig_mode, \"clear\") == 0) {
+			$var = GPGME_SIG_MODE_CLEAR;
+		}
+		else {
+			croak (\"unknown sig mode\");
+		}
+	}
+
+GPGME_KEY_T
+	$var = ($type)perl_gpgme_get_ptr_from_sv ($arg, \"Crypt::GpgME::Key\");
+
+GPGME_SIG_NOTATION_FLAGS_T
+	if (!$arg || !SvOK ($arg) || !SvROK ($arg) || !(SvTYPE (SvRV ($arg)) != SVt_PVAV)) {
+		croak (\"not a valid flags array reference\");
+	}
+
+	{
+		AV *av;
+		SV **sv;
+		int i, len;
+		char *str;
+
+		av = (AV *)SvRV ($arg);
+		len = av_len (av);
+
+		for (i = 0; i <= len; i++) {
+			sv = av_fetch (av, i, 0);
+			if (!sv) {
+				croak (\"failed to fetch array element\");
+			}
+
+			str = SvPV_nolen (*sv);
+			if (strcasecmp (str, \"human-readable\") == 0) {
+				$var |= GPGME_SIG_NOTATION_HUMAN_READABLE;
+			}
+			else if (strcasecmp (str, \"critical\") == 0) {
+				$var |= GPGME_SIG_NOTATION_CRITICAL;
+			}
+			else {
+				croak (\"invalid notation flag\");
+			}
+		}
+	}

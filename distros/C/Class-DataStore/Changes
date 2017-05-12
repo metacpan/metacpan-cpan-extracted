@@ -1,0 +1,29 @@
+Revision history for Perl extension Class::DataStore
+
+0.07  Fri Aug 26 2005
+    - minor documentation changes
+
+0.06  Fri Jul 1 2005
+    - get() now returns a list if wantarray and the value is a hashref;
+      previously returned the hashref regardless of context
+    - dump() now returns a list if wantarray
+
+0.05  Mon May 16 2005
+	- fixed a bug when using AUTOLOAD set with an undef value
+	- cleaned up documentation for CPAN release
+
+0.04  Wed Apr 20 2005
+    - fixed a bug that prevented AUTOLOAD get from returning list in array
+      context
+
+0.03  Sun Mar 27 2005
+    - broke out MasonX::App::DataStore into seperate package, Class::DataStore
+    - rebuilt Changes file based on MasonX::App's Changes
+    - rolled get_array() into get() using 'wantarray'
+
+0.02  Tue Nov 16 2004
+	- added get_array() to return value as an array
+	- added exists() to determine if element in internal hashref exists
+
+0.01  Wed Sep 15 2004
+	- first release as part of MasonX::App package

@@ -1,0 +1,67 @@
+NAME
+    `Convert::Color::Library' - named lookup of colors from `Color::Library'
+
+SYNOPSIS
+    Directly:
+
+     use Convert::Color::Library;
+
+     my $red = Convert::Color::Library->new( 'red' );
+
+     # Only use the SVG dictionary
+     my $brown = Convert::Color::Library->new( 'svg/brown' );
+
+     # Use either HTML or SVG dictionary
+     my $pink = Convert::Color::Library->new( 'html,svg/pink' );
+
+    Via Convert::Color:
+
+     use Convert::Color;
+
+     my $cyan = Convert::Color->new( 'lib:cyan' );
+
+     my $darkcyan = Convert::Color->new( 'lib:windows/darkcyan' );
+
+DESCRIPTION
+    This subclass of Convert::Color::RGB8 provides lookup of color names
+    using Robert Krimen's Color::Library module. It therefore provides
+    convenient access to named colours in many dictionaries, such as SVG,
+    X11 and HTML.
+
+CONSTRUCTOR
+  $color = Convert::Color::Library->new( $name )
+    Returns a new object to represent the named color.
+
+    If the name is of the form
+
+     dicts/name
+
+    Then `dicts' is parsed as a comma-separated list of dictionary names to
+    pass to `Color::Library'.
+
+METHODS
+  $name = $color->name
+  $dict = $color->dict
+    Returns the name of the color within its dictionary, and the name of the
+    dictionary itself.
+
+TODO
+    *   Consider an API for getting the list of dictionary names and colour
+        names. That said, it's easy enough to do directly to
+        `Color::Library', so maybe not needed.
+
+    *   Expose other dictionaries (SVG? Windows?) as named spaces, like the
+        HTML one.
+
+SEE ALSO
+    *   Convert::Color - color space conversions
+
+    *   Color::Library - An easy-to-use and comprehensive named-color
+        library
+
+    *   Convert::Color::HTML - color conversion using
+        `Color::Library::Dictionary::HTML'
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

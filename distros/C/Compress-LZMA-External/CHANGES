@@ -1,0 +1,28 @@
+CHANGES file for Compress::LZMA::External:
+
+0.37 Tue Jul 19 11:07:36 BST 2011
+  - be flexible on compression test
+
+0.36 Mon Dec 28 12:30:25 CET 2009
+  - add compress_fast and compress_best as suggested by Brian Szymanski
+
+0.35 Wed Sep 10 20:53:41 BST 2008
+  - add machine- and human-readable license
+
+0.34 Wed Jan 23 18:20:12 GMT 2008
+  - add dependency for File::Temp 0.19
+  - warn and exit 0 if lzma is not found
+  - remove 'use lib' in the test
+  - (thanks to Adriano Ferreira)
+
+0.33 Mon Jan 21 07:29:57 GMT 2008
+  - update docs
+  - only export functions upon request
+
+0.32 Sun Jan 20 16:02:34 GMT 2008
+  - rename uncompress to decompress to be more like the other
+    Compress:: modules
+  - add prototypes
+
+0.31 Sun Jan 20 15:58:53 GMT 2008
+  - first release

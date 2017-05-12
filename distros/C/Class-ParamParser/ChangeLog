@@ -1,0 +1,205 @@
+2003-03-16   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.041.
+
+	* This is a small maintenance release that is mainly for improving
+	documentation.  Similar maintenance releases are being done with all of my
+	distributions simultaneously.  A lot of it was formatting issues that were
+	easy to miss before; the other bullet points below list the non-formatting
+	issues.  These files had formatting fixes: ParamParser.pm, ChangeLog.
+
+	* The distribution file layouts have also been standardized, with modules
+	going in a "lib" folder and tests going in a "t" folder.  "test.pl" was
+	changed to "t/Class-ParamParser.t" and "ParamParser.pm" was changed
+	to "lib/Class/ParamParser.pm".
+
+	* Updated NAME in ParamParser.pm to match the official registered module
+	list.
+
+	* Updated all Copyright statements to a better (and longer) version, which
+	is dated 1999-2003.  Your rights to use these modules haven't changed, but
+	they may now be easier to understand.  These statements appear once in the
+	ReadMe file at the bottom (under "AUTHOR"), and twice in each module (.pm
+	file), a full version at the bottom (under "AUTHOR") and a shorter version
+	at the top (in code comments).
+
+	* Added the "use warnings" pragma at the top of all files beside "use
+	strict"; every occurance of "use strict" gained a "use warnings" whether it
+	was in the module proper or in its test script or in its SYNOPSIS.  This
+	should save users from having to put -w on the command line for them.
+
+	* Incremented the module $VERSION number by 0.0009, and all test scripts to
+	require the new version.  Also, where any of my modules use others of my
+	modules, they now require the latest version as of this writing, for
+	simplicity of maintenance.
+
+	* Updated all test scripts to read $verbose from @ARGV (command line
+	arguments), and other test script improvements.
+
+	* Updated these sections of the ReadMe file: INSTALLATION.
+
+2001-05-28   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0401.
+
+	* Corrected a warning that appears when converting a positional SOURCE to 
+	named where SOURCE has more array elements than NAMES.  While the correct 
+	result was returned all along, warnings can be annoying in this context.  
+	Thanks to Laurie Shammel <lshammel@imt.net> for alerting me to this.
+
+2001-05-01   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.04.
+
+	* This module has been reorganized internally by separating its core 
+	functionality into a set of private methods: _args_are_named(), 
+	_posit_to_named(), _named_to_posit(), _rename_named_args().  The two public 
+	methods, params_to_hash() and params_to_array() make use of these as much as 
+	possible and otherwise handle their proprietary details on their own.
+
+	* The above changes were made in preparation for merging this module with 
+	other existing named-arguments modules to produce a new standard module.  
+	Of course, there is a chance nothing will happen, in which case this module 
+	is simply better organized now than before, as well as easier to subclass.
+
+	* The pseudo-public method params_to_hash_or_array() no longer exists, so 
+	any code that calls it directly will break.  No one should have been using 
+	it directly anyway, as it was just to implement the other public methods.
+	The count of tests was reduced to 90 from 92 as the two missing ones called 
+	the removed method directly.
+
+	* Named arguments being renamed are now moved into a second hash during the 
+	process rather than being re-inserted into the one they came from.  As a 
+	result, some name-collisions may result in one value overriding the other 
+	instead of the reverse.  Note that the results of collisions are now easier 
+	to predict than before.  This change affected two test results, which have 
+	been updated to make the new way correct.  Of course, you should never set 
+	up your renaming such that there are collisions anyway.
+
+2001-02-06   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.03.
+
+	* This release fixes issues discovered by cpan-testers@perl.org, as detailed 
+	in brief below.
+
+	* Renamed some included files to "Makefile.PL", "test.pl", and "MANIFEST".  
+	Due to the case-sensitivity of some systems, it is like the files aren't 
+	there otherwise.
+
+	* The RENAME hash is now iterated over in the order of "sort keys %hash" 
+	instead of "keys %hash".  This ensures that renaming pairs are always 
+	evaluated in the same order across different Perl installs (given the same 
+	hash, "keys %hash" returns its results in a different order on some systems 
+	than on others).  During normal use, this wouldn't affect anything, because 
+	one isn't *supposed* to be renaming one key to the same thing another is 
+	renamed from.  But in the odd circumstance that one is doing that, it does 
+	make a difference in which order "a->b,c->a" is evaluated.
+
+	* The serialize() function inside "test.pl", that I use to stringify the 
+	multi-dimensional data structures it needs to compare, has been modified such 
+	hashes are now serialized in the order of "sort keys %hash" instead of 
+	"keys %hash".  This change was prompted by test failures on one system due to 
+	the fact that equal hashes were serializing in a different order across 
+	systems, so the comparisons as scalars didn't always match.
+
+	* Improved the install instructions in my ReadMe file.
+
+2001-02-04   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.02.
+
+	* This release is the first one that includes the CPAN standard files 
+	"MakeFile.pl", "Test.pl", and "Manifest", which were all created following 
+	the previous release.  "Test.pl" was used to discover several bugs that my 
+	production use of the modules didn't; their fixes are detailed below.
+	The content of "Manifest" was previously inside the "ReadMe" file.
+
+	* Added a third method, params_to_hash_or_array(), which is now used to 
+	implement both of the existing methods; this eliminates an 80% redundancy in 
+	their code.  The first argument of the new method says which of the original 
+	two, params_to_hash() or params_to_array(), it acts like.
+
+	* Added a sixth argument to all methods, which lowercases (makes 
+	case-insensitive) named source parameters when true, for easier matching.
+
+	* Added programmer documentation to the various blocks of code, so it is 
+	easier to see how they work; useful because a lot is done with little code.
+
+	* Fixed bug where RENAME failed to match parameters for renaming to "", 
+	which is the explicit signal to delete them.
+
+	* Any SOURCE that has an odd number of elements will now be interpreted as 
+	positional format; previously, SOURCE needed to have exactly one element for 
+	this to happen.  As before, tests for named format have higher precedence, 
+	so a SOURCE whose first element is either a hash or starts with a "-" is 
+	considered named regardless of the number of elements in SOURCE.  This 
+	change fixed a bug causing an "Odd number of elements in hash list" warning 
+	when an odd number of SOURCE elements was interpreted as named format; 
+	however, that warning will still appear with an odd list starting with "-".
+
+	* If there are multiple "remaining" values in SOURCE, they are now all 
+	returned rather than just the first one.  See the parameter documentation 
+	for REM for details.  This means that previously ignored second and third 
+	"remaining" values will cause the return value for REM to be an array ref 
+	instead of a scalar, so your code may have to check for this.
+
+	* Fixed bug where NAMES defaulted to a single value of "" when it should 
+	have defaulted to an empty list; this had resulted in params_to_array() 
+	always returning a value when it should have returned none.
+
+	* Fixed bug occurring when we make positional output from an empty 
+	SOURCE whereby the output is an array containing "undef" values; the 
+	count of these values was the same as the number of values in NAMES; 
+	now the returned array is empty as it should be.
+
+2001-01-01   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.01.
+
+	* This release is the first one following official registrations with 
+	"The Perl 5 Module List".  The updated entry would look like this:
+
+Class::
+::ParamParser     bdpO Provides complex parameter list parsing      DUNCAND
+
+	* Module POD has been significantly updated, particularly in the Synopsis 
+	section, and the ReadMe file was overhauled.
+
+	* There were no changes to the code itself.
+
+2000-08-26   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Release 1.0.
+
+	* This release contains my "Class::ParamParser" module which was previously a
+part of my "libdwg" distribution, but I have set it off on its own for those of
+you who only want to use this and not the other modules.
+
+	* This module contains complete POD within it.
+
+	* This module requires Perl version 5.004.
+
+2000-08-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.11, the last version of the distribution to include
+Class::ParamParser, was released.
+
+2000-07-23   Darren Duncan <perl@DarrenDuncan.net>
+
+	* libdwg 1.0, the first version of any distribution to include
+Class::ParamParser, was released on CPAN.
+
+2000-04-21   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Completed primary development on this module.
+
+2000-01-30   Darren Duncan <perl@DarrenDuncan.net>
+
+	* Began development on the final version of this module.
+
+	* Module based on a template created by h2xs 1.18.
+
+1999-07-29 thru 1999-11-13
+
+	* Worked on prototype of code that ended up in this module.

@@ -1,0 +1,75 @@
+*** THIS MODULE IS NOW DEPRECATED -- USE GD::Graph INSTEAD ***
+
+This is PNGgraph 1.21, a package to generate PNG charts, using Lincoln
+Stein's GD.pm.  It's a wrapper around GD::Graph, provided for backward
+compatibility with existing Chart::PNGgraph scripts only.
+
+This package is deprecated. I would recommend that you use GD::Graph
+directly.
+
+INSTALLATION
+
+needed to install (also see TESTED PLATFORMS):
+
+	perl 5.005 (5.004 might work)
+	GD > 1.18
+	GD::Graph
+	GDTextUtils (for GD::Graph)
+
+to install:
+
+	perl Makefile.PL
+	make
+	make install
+
+to see some samples:
+
+	cd samples
+	make
+
+That should generate a set of pngs, which you can view using the HTML
+pages in the same directory (or whichever other way pleases you).
+
+IMPORTANT CHANGE SINCE VERSION 1.15
+
+Chart::PNGgraph no longer contains any of the code to generate charts. Instead
+it has become a wrapper around GD::Graph. The main reason for this is
+that the two code bases for GIFgraph and Chart::PNGgraph have been
+merged back together, and will be maintained in a single spot again.
+Blame Unisys and their childishness over the LZW patent for all this.
+
+GD VERSIONS
+
+If you want to use a GD version 1.20 or up, you will need to have
+something installed that can do an on-the-fly conversion of PNG to GIF.
+I can't recommend that you do this way, but there may be some obscure
+and odd reason that you want to produce PNG images, but have to use an
+old GD. If you have to: I recommend that you use Image::Magick, since
+that is what the Chart::PNGgraph module has been setup to use. If you
+don't want to, or can't install Image::Magick, you will have to edit the
+file Chart/PNGgraph/Convert.pm to provide a different sub gif2png.
+
+TESTED PLATFORMS
+
+None.  In fact the tests have been removed as a reminder that this package
+now exists solely for backward compatibility.  If your existing scripts work
+with this module, then that is all that's important at this stage.
+
+AUTHOR
+
+Martien Verbruggen
+mgjv@comdyn.com.au
+
+PNG PORT
+
+Steve Bonds
+sbonds@agora.rdrop.com
+
+COPYRIGHT
+
+Copyright (c) 1995-1999 Martien Verbruggen. All rights reserved.
+Copyright (c) 1999 Steve Bonds.  All rights reserved.
+
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

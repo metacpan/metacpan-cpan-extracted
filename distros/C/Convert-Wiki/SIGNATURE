@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.42.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+
+SHA1 676a6e15ac23fff97ee28683c74f6ada3f954551 CHANGES
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 0547777a71751df7e59770ecd2ab8a3819224c86 MANIFEST
+SHA1 8888a4de59b79e736607fc951aaae8a19c6d6815 META.yml
+SHA1 23e80e4b4716354ef0301d5aa61cfbd31ae30c0b Makefile.PL
+SHA1 8adc06ba3bed509f3043d2dd4e3956c38e822aef README
+SHA1 5666c3cd35a36e4fd43cce6d098ab6c10fa56868 TODO
+SHA1 23ff5d0b637a1f40dba40a539382acf8308cf8bb examples/txt2wiki
+SHA1 d459987dac2ce768716186bceb2f338c9724cd7f lib/Convert/Wiki.pm
+SHA1 06272eb313660ace391871ed548da87470459dae lib/Convert/Wiki/Node.pm
+SHA1 6787ba79bd1494c9d3c939d75c629aa49455e9a7 lib/Convert/Wiki/Node/Head.pm
+SHA1 ab2f89b7f6ba49e7ce4e7c9cb7bf238d2bda0e50 lib/Convert/Wiki/Node/Item.pm
+SHA1 6ecdce1270d5e6eef3a392eb0939231607567209 lib/Convert/Wiki/Node/Line.pm
+SHA1 66a81d57321f65398ef0e8f4fe56d2aa88fb7a52 lib/Convert/Wiki/Node/Mono.pm
+SHA1 fb5d7d5ec1c9000adedfddf72e32aa6a16f282da lib/Convert/Wiki/Node/Para.pm
+SHA1 815efe330ba98423600d48f022a89a81be427852 lib/Convert/Wiki/Txt.pm
+SHA1 f7f20df10e62c5ba23b59e387176a6aa31627949 t/conv.t
+SHA1 8fffcc45f8f1121a9f1cce07d5d1b92563637627 t/head.t
+SHA1 9b77493073d39b340691b361a24b810f56a2c08b t/item.t
+SHA1 3da51208e5bb0d8b70144e4d611f6ea889726254 t/line.t
+SHA1 bcf5f794592a350f44de8491bb1a94343d17714e t/mono.t
+SHA1 a74afdbd36def9a6cec5906eb0173f5b2fe8fd20 t/node.t
+SHA1 53ea0d0518ac7b4e9541ddfa2c7f8978bd3610c6 t/out/00.txt
+SHA1 9b4893d76df9795764976debabb36cda88a0c8e4 t/out/01.txt
+SHA1 9b4893d76df9795764976debabb36cda88a0c8e4 t/out/02.txt
+SHA1 bd86de0827909737182063fa6e0aec0f41d3d86f t/out/03.txt
+SHA1 ed0da170aed2936ca93aa83010eade1d662df870 t/out/04.txt
+SHA1 33840a2cb522bc105262fbe94573123f5157921f t/out/05.txt
+SHA1 812b3677d2f6546caba56dcfd703fa5e0d385c85 t/para.t
+SHA1 81e72a5c48043cb2d108e5a36fb8d580f7b5ea81 t/txt/00.txt
+SHA1 2c01b45d5a983f52e3eaf2ec5c5b653af34c204b t/txt/01.txt
+SHA1 82273e4d59cca7169b59f9c840c11b56e2c84f1b t/txt/02.txt
+SHA1 d8a60e761169956adb8b8be7dccbf2ebc92d7b3e t/txt/03.txt
+SHA1 a07e5f0e775edcbb1cd34264d2e0cdb4769c4bb5 t/txt/04.txt
+SHA1 298046050c6ea0332427b87a5640485673f11bc6 t/txt/05.txt
+SHA1 3660be595dffcebaca40d3c14fa18dda71229512 t/txt/i05.txt
+SHA1 baa13b0e0b8791d7166e2437b0ea0f3fb4af8d1c t/wikipm.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iQEVAwUBQc7XRXcLPEOTuEwVAQFQOgf7BCVuBC6VlHqHmhApWqfIHuo+jCEa4AIx
+jgiCd3kVbMBlRY5e3zQq9WmFUq3K9ORTFGQTHpbQEXhmGylasNaI9+HEIqBu56ef
+nTuLPfU1Oyi3BNeF5O7+o6YJnMYDR9oan2riT9/7lELdn4j19l+zyVYQ9Zp6gX6B
+8GxIyKoTbGe+8bqvoO/jNeK4zG8EK9+5QldzTO60vAFzWqnh94XuY142q0JOrGwV
+51STwrCBG9zezNj34s3w5gTHZBi4dMKQRlmx2aBXDZ5CncPJE7akFUQF4IMsQKZn
+CoyQn0Wu2j2gOASvkNBtc0vsS/fL3H+x2sHlnAZPCT5saHzu3inlxQ==
+=UgS9
+-----END PGP SIGNATURE-----

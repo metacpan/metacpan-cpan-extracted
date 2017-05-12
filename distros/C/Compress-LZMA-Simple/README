@@ -1,0 +1,18 @@
+Compress::LZMA::Simple
+  -- A simple utility of LZMA compression/decompression
+
+
+This module is a Perl interface of "lzmalib", which is a tiny wrapper
+of the LZMA SDK.
+"lzmalib" can be downloaded at http://tokyocabinet.sourceforge.net/misc/ .
+
+To install this module, perform the following steps.
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+See the POD file for usage.
+
+Thanks.

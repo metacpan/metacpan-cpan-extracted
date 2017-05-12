@@ -1,0 +1,16 @@
+lib/Class/DBI/Informix.pm
+lib/Class/DBI/Loader/Informix.pm
+examples/stores.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+Build.PL
+t/0-signature.t
+t/00pod.t
+t/01load.t
+t/02tables.t
+t/03stores.t
+README
+ChangeLog
+META.yml                                Module meta-data (added by MakeMaker)
+SIGNATURE    Added here by Module::Build

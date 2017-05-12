@@ -1,0 +1,66 @@
+Revision history for CGI-Application-Plugin-LinkIntegrity
+
+0.06 May 18, 2006
+        - the entry point code added so many months ago had a bug in it:
+          When there is a blank query string, CGI.pm adds an empty 'keywords'
+          key to the query paremeters.  This meant that 'GET' requests
+          without parameters would fail.
+
+0.05 October 3, 2005
+        - now install 'invalid_checksum' hook at class load time
+
+0.04 October 3, 2005
+        - made the module actually useful!  In order to generate a valid
+          link, you need to load the module.  However you can't load the
+          module if the application was invoked with an invalid URL.
+          Catch-22.  So now there's an entry point:  if the invoking URL
+          contained no parameters, then it is considered to be valid.
+
+        - changed setup of hooks to happen at config time instead of
+          import time.  Hopefully this makes it possible to use '@ISA'
+          instead of 'use base':
+
+              # Typical usage
+              use base 'CGI::Application';
+              use CGI::Application::Plugin::LinkIntegrity;
+
+              # This also works
+              use CGI::Application;
+              our @ISA = qw(CGI::Application);
+              use CGI::Application::Plugin::LinkIntegrity;
+
+        - made CGI version 2.37 or greater a prerequisite (for url_param)
+
+0.03 August 21, 2005
+        - NOTE:  This release is not compatible with previous versions.
+        - API radically rewritten to make it possible to protect links
+          directly from within templates (Thanks to Michael Peter and
+          Mark Stosberg for the feedback and ideas)
+        - the following methods have changed:
+
+          Old Syntax                                         New Syntax
+          ==========                                         ==========
+          ->make_link($url, { 'p1' => 'v1'})                 ->link($url, 'p1' => 'v1')
+
+          ->make_self_link($url,                             ->self_link($url, 'p1' => 'v1')
+                            keep_path_info => 1,
+                            params => { 'p1' => 'v1'})
+
+          ->make_self_link($url,                             ->path_link('', 'p1' => 'v1')
+                            keep_path_info => 0,
+                            params => { 'p1' => 'v1'})
+
+          ->make_self_link($url,                             ->path_link('/new/path', 'p1' => 'v1')
+                            path_info => '/new/path'
+                            params => { 'p1' => 'v1'}
+                          )
+
+        - added documentation illustrating how to call link, make_link,
+          etc. directly from templates
+
+0.02 ????
+        - added 'additional_data' feature
+
+0.01 ????
+        - First development version released for comments and feedback
+

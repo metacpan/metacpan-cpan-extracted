@@ -1,0 +1,35 @@
+Revision history for Crypt::DH
+
+0.07  2012.06.06
+    - Made Math::BigInt::* dependency dynamic to avoid Math::BigInt falling
+      back to BigInt backends that are too slow for practical use.
+
+0.06  2005.06.10
+    - Fixed compute_key/compute_secret to accept a Math::Pari object, so that
+      it's backwards-compatible with e.g. Net::SSH::Perl.
+    - Added _any2bigint and tests for same.
+
+0.05  2005.06.06 (bradfitz)
+    - use makerandom_itv w/ proper range for priv_key (thanks to Paul
+      Crowley!)
+    - make _makerandom_itv wrapper around _makerandom to behave similarly
+      when Crypt::Random is not available
+
+0.04  2005.06.06 (bradfitz)
+    - Ported to Math::BigInt (which can use PARI,GMP,etc)
+    - Don't depend on Crypt::Random, just use it if already loaded
+    - renamed compute_key to compute_secret (kept old name)
+    - updated POD docs
+    - made test.pl sane and test everything realistically; moved into t/
+    - Updated Makefile.PL to use Module::Install
+
+0.03  2002.01.20
+    - Added patch from Kurt D. Starsinic to enable setting the
+      private key, rather than always having it generated.
+    - Removed unnecessary mp2bin function.
+
+0.02  2001.04.24
+    - Fixed broken test program (still need more tests).
+
+0.01  2001.03.22
+    - original version; created by h2xs 1.19

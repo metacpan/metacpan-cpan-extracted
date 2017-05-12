@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Catalyst-Engine-XMPP2
+version:            0.4
+abstract:           AnyEvent::XMPP::Connection Catalyst Engine
+author:
+    - Daniel Ruoso <daniel@ruoso.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    AnyEvent::XMPP:       0
+    Catalyst::Engine::Embeddable:  0
+    Catalyst::Plugin::ConfigLoader:  0
+    Catalyst::Runtime:    5.7011
+    Event:                0
+    HTTP::Body:           1.03
+    HTTP::Request:        0
+    HTTP::Response:       0
+    URI:                  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

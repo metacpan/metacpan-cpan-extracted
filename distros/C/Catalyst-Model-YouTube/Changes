@@ -1,0 +1,15 @@
+Revision history for Perl extension Catalyst::Model::YouTube.
+
+0.13  Thu Jan 4 2007
+    - Changing Build.PL to run Makefile.PL, using Module::Install
+    - Changing config order so ConfigLoader overrides module defaults
+
+0.12  Tue Dec 5 2006
+    - Fixed Build.PL to list Class::C3 as a dependency.
+
+0.11  Mon Dec 4 2006
+    - Patch to use Class::C3
+    - Merge config and argument hashes
+
+0.01  Fri Nov 10 2006
+	- First release

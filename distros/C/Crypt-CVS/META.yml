@@ -1,0 +1,29 @@
+---
+abstract: 'Substitution cipher for CVS passwords'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101830, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-CVS
+no_index:
+  directory:
+    - t
+requires:
+  Exporter: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-CVS
+  homepage: http://search.cpan.org/dist/Crypt-CVS/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/avar/crypt-cvs.git
+version: 0.03
+x_authority: cpan:AVAR

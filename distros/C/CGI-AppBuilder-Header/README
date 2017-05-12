@@ -1,0 +1,74 @@
+NAME
+    CGI::AppBuilder::Header - Configuration initializer
+
+SYNOPSIS
+      use CGI::AppBuilder::Header;
+
+      my $ab = CGI::AppBuilder::Header->new(
+         'ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+      my ($q, $ar, $ar_log) = $ab->start_app($0, \%ARGV);
+      print $ab->disp_form($q, $ar);
+
+DESCRIPTION
+    This class provides methods for reading and parsing configuration files.
+
+  new (ifn => 'file.cfg', opt => 'hvS:')
+    This is a inherited method from CGI::AppBuilder. See the same method in
+    CGI::AppBuilder for more details.
+
+   build_html_header ($q, $ar)
+    Input variables:
+
+      $q    - CGI object
+      $ar   - array ref for parameters
+
+    Variables used or routines called:
+
+      Debug::EchoMessage
+        echo_msg - echo messages
+        set_param - get a parameter from hash array
+
+    How to use:
+
+      my $ifn = 'myConfig.ini';
+      my ($q,$ar) = $s->get_inputs($ifn);
+      my $hrf = $self->build_html_header($q, $ar);
+
+    Return: hash array or array ref
+
+    This method performs the following tasks:
+
+      1) check the following parameters: page_title, page_style,
+         page_meta, page_author, page_target, js_src, js_code
+      2) writes log records to log files
+      3) close database connection if it finds DB handler in {dbh}
+
+HISTORY
+    *   Version 0.10
+
+        This version extracts the disp_form method from CGI::Getopt class.
+
+          0.11 Inherited the new constructor from CGI::AppBuilder.
+
+    *   Version 0.20
+
+SEE ALSO (some of docs that I check often)
+    Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy,
+    CGI::AppBuilder, CGI::AppBuilder::Message, CGI::AppBuilder::Log,
+    CGI::AppBuilder::Config, etc.
+
+AUTHOR
+    Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+    This package is free software and is provided "as is" without express or
+    implied warranty. It may be used, redistributed and/or modified under
+    the terms of the Perl Artistic License (see
+    http://www.perl.com/perl/misc/Artistic.html)
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 149:
+        You forgot a '=back' before '=head1'
+

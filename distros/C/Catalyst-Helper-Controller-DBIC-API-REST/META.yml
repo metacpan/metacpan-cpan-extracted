@@ -1,0 +1,54 @@
+---
+abstract: 'REST Controller for [% schema_class %]'
+author:
+  - 'Amiri Barksdale <amiri@roosterpirates.com>'
+build_requires:
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  Catalyst::Controller::DBIC::API::REST: '2.006002'
+  Catalyst::Helper: '0'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Utils: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::ResultSet: '0'
+  DBIx::Class::Schema: '0'
+  File::Copy::Recursive: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON::XS: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::Catalyst: '0'
+  URI: '0'
+  base: '0'
+  blib: '1.01'
+  bytes: '0'
+  parent: '0'
+  perl: v5.6.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Helper-Controller-DBIC-API-REST
+requires:
+  Class::Load: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
+  lib: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/amiri/Catalyst-Helper-Controller-DBIC-API-REST-0.01/issues
+  repository: git://github.com/amiri/Catalyst-Helper-Controller-DBIC-API-REST-0.01.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,14 @@
+CHANGELOG			Changes
+README				A readme file
+MANIFEST                	This file
+Makefile.PL             	Makefile maker
+lib/Config/Simple/Conf.pm	The module
+LICENSE           	     	This modules LICENSE policy
+example/test.conf		test configuration 
+example/test.pl			test script
+example/test_inc.conf		test includes
+example/test_die.conf		test die (should fail)
+example/test_inc_fail.conf	test include failure (should fail)
+example/exists.conf		test includes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

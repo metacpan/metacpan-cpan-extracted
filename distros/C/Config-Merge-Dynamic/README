@@ -1,0 +1,62 @@
+Config-Merge-Dynamic
+
+This module may load a configuration directory tree containing
+YAML, JSON, XML, Perl, INI or Config::General files AND alter it in runtime.
+
+Example how to add (or replace, if values exists) values in config object:
+
+	use Config::Merge::Dynamic;
+	my $config = Config::Merge->new('/path/to/config');	
+	my $all_data = $config->inject( 'key_one.key_two.keyn', { foo =>'bar' } );
+	my $new_conf = $config->move( 'user_config', 'system_config' );
+
+L<Config::Merge::Dynamic> inherits all methods from L<Config::Merge> and implements
+C<inject()> and C<move()> methods to alter config object.
+
+For more documentation about base method see L<Config::Merge>.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEVELOPMENT
+  
+    https://github.com/Meettya/Config-Merge-Dynamic
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Merge::Dynamic
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Merge-Dynamic
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Config-Merge-Dynamic
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Config-Merge-Dynamic
+
+    Search CPAN
+        http://search.cpan.org/dist/Config-Merge-Dynamic/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Meettya
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

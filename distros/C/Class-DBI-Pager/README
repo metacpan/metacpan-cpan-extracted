@@ -1,0 +1,80 @@
+NAME
+    Class::DBI::Pager - Pager utility for Class::DBI
+
+SYNOPSIS
+      package CD;
+      use base qw(Class::DBI);
+      __PACKAGE__->set_db(...);
+
+      use Class::DBI::Pager;        # just use it
+
+      # then, in client code!
+      package main;
+
+      use CD;
+      my $pager = CD->pager(20, 1);     # ($items_per_page, $current_page)
+      my @disks = $pager->retrieve_all;
+
+DESCRIPTION
+    Class::DBI::Pager is a plugin for Class::DBI, which glues Data::Page
+    with Class::DBI. This module reduces your work a lot, for example when
+    you have to do something like:
+
+      * retrieve objects from a database
+      * display objects with 20 items per page
+
+    In addition, your work will be reduced more, when you use
+    Template-Toolkit as your templating engine. See the section on "EXAMPLE"
+    for details.
+
+EXAMPLE
+      # Controller: (MVC's C)
+      my $query    = CGI->new;
+      my $template = Template->new;
+
+      my $pager    = Film->pager(20, $query->param('page') || 1);
+      my $movies   = $pager->retrieve_all;
+      $template->process($input, {
+          movies => $movies,
+          pager  => $pager,
+      });
+
+      # View: (MVC's V)
+      Matched [% pager.total_entries %] items.
+
+      [% WHILE (movie = movies.next) %]
+      Title: [% movie.title | html %]
+      [% END %]
+
+      ### navigation like: [1] [2] [3]
+      [% FOREACH num = [pager.first_page .. pager.last_page] %]
+      [% IF num == pager.current_page %][[% num %]]
+      [% ELSE %]<a href="display?page=[% num %]">[[% num %]]</a>[% END %]
+      [% END %]
+
+      ### navigation like: prev 20 | next 20
+      [% IF pager.previous_page %]
+      <a href="display?page=[% pager.previous_page %]">
+      prev [% pager.entries_per_page %]</a> |
+      [% END %]
+      [% IF pager.next_page %]
+      <a href="display?page=[% pager.next_page %]">
+      next [% pager.entries_per_page %]</a>
+      [% END %]
+
+NOTE / TODO
+    This modules internally retrieves itertors, then creates "Data::Page"
+    object for paging utility. Using SQL clauses "LIMIT" and/or "OFFSET"
+    with "DBIx::Pager" might be more memory efficient.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    Original idea by Tomohiro Ikebe <ikebe@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Class::DBI manpage, the Data::Page manpage
+

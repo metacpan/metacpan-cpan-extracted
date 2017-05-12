@@ -1,0 +1,3 @@
+comedi_t *     T_PTRREF
+lsampl_t       T_U_INT
+comedi_range * T_PTRREF

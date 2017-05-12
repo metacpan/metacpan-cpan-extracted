@@ -1,0 +1,7 @@
+Revision history for Perl extension Compress::Deflate7.
+
+1.0  March 2011
+	- Added Cycles flag (see `-mmc` in 7za)
+
+0.9  Sat Mar  5 00:21:15 2011
+	- original version; created by h2xs 1.23

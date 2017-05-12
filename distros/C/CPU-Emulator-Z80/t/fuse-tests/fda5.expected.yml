@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fda5
+registers:
+  AF: 84
+  AF_: 0
+  BC: 25933
+  BC_: 0
+  DE: 38483
+  DE_: 0
+  HL: 11059
+  HL_: 0
+  I: 0
+  IX: 24996
+  IY: 36744
+  PC: 2
+  R: 2
+  SP: 0

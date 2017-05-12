@@ -1,0 +1,34 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk file selector widget.
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create the file selector.
+my $fselect = new Cdk::Fselect ('Label' => "</B/16>Filename:", 
+				'Filler' => "</B/24>_",
+				'Height' => 0,
+				'Width' => 0);
+
+# Activate the object.
+$fselect->set ('ULChar' => "#");
+my $filename = $fselect->activate();
+
+# Check the results.
+if (! defined $filename)
+{
+   popupLabel (["<C>You hit escape. No file selected."]);
+}
+else
+{
+   popupLabel (["<C>You selected the following file", "<C>($filename)"]);
+}
+
+# Exit Cdk.
+Cdk::end();

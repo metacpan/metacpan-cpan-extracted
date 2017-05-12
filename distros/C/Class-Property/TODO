@@ -1,0 +1,3 @@
+TODO
+- warning about overriding/shadowing function by property
+- it's possible to implement Class::Variable functionality to restrict acces, may be in other module

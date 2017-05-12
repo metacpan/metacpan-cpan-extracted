@@ -1,0 +1,85 @@
+{
+   "abstract" : "Inheritable, overridable, translucent class data / object attributes",
+   "author" : [
+      "Ryan McGuigan, Steve Hay <shay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Data-Inheritable-Translucent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "podtest" : {
+         "description" : "POD testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod" : "1.14",
+                  "Test::Pod::Coverage" : "1.04"
+               }
+            }
+         }
+      },
+      "subname" : {
+         "description" : "Naming subroutines in caller() messages etc.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Sub::Name" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/steve-m-hay/Class-Data-Inheritable-Translucent.git"
+      }
+   },
+   "version" : "1.04"
+}

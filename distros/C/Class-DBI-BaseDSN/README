@@ -1,0 +1,56 @@
+README for Class::DBI::BaseDSN 1.22
+
+=head1 NAME
+
+Class::DBI::BaseDSN - DSN sensitive base class
+
+=head1 SYNOPSIS
+
+  package My::DBI;
+  use base 'Class::DBI::BaseDSN'; # we'll decide later what our real
+                                   # parent class will be
+  __PACKAGE__->set_db( Main => $ENV{TESTING} ? @test_dsn : @real_dsn );
+
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ Class::DBI
+ Test::More
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 1.22	Wednesday October 8th, 2003
+
+	Check that it's the thing we were importing that went boom,
+	not something *it* was importing. (rt.cpan.org #3982)
+
+
+=item 1.21	9th June, 2003
+
+	Initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 SEE ALSO
+
+L<Class::DBI>
+

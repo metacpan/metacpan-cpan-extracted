@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Snapp::Demo::Two.
+
+1.02  Sat Nov 17 10:31:00 2012
+	- Update pre-req to Config::Plugin::Tiny V 1.01, which has the same fix.
+
+1.01  Tue Sep 18 11:23:00 2012
+	- Make CGI::Snapp V 1.02 the pre-req, up from V 1.00.
+
+1.00  Thu Mar  1 09:00:00 2012
+	  - Original version

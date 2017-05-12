@@ -1,0 +1,35 @@
+---
+abstract: 'a CHI backed caching store'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Module::Build: '0.3601'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Store-CHI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  CHI: '0.58'
+  Catmandu: '0.9202'
+  Moo: '1.0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Store-CHI/issues
+  homepage: https://github.com/LibreCat/Catmandu-Store-CHI
+  repository: https://github.com/LibreCat/Catmandu-Store-CHI.git
+version: '0.02'

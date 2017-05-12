@@ -1,0 +1,11 @@
+.cvsignore
+COPYING
+INSTALL
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/CDB_File/Generator.pm
+make-rpm-command
+my.cdb
+t/generate.t

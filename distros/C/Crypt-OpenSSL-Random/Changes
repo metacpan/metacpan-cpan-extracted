@@ -1,0 +1,45 @@
+Revision history for Perl extension Crypt::OpenSSL::Random.
+
+0.11  2015-10-09 rurban
+        - add libressl support, unsupported random_egd() with libressl 
+
+0.10  2015-02-04 rurban
+        - fix LIBS argument, fatal on Windows. thanks to kmx
+
+0.09  2015-02-04 rurban
+        - add missing hints/MSWin32.pl (kmx, RT #56455)
+        - add a couple of distro tests
+        - fix gcov target
+
+0.08  2015-02-03 rurban
+        - remove Devel::CheckLib which does not work for 2 required libs
+        - replace DynaLoader by XSLoader
+
+0.07  2015-02-03 rurban
+	- Bump version to publish an official release
+
+0.06  rurban
+	- Typo in doc (dsteinbrunner)
+
+0.05  2013-04-02 14:31:30 rurban
+	- Add inc/Devel/CheckLib, improve POD, add README and some helper targets
+	- Better diagnostics when the openssl libraries are not found
+	- Support INCDIR= and LIBDIR= arguments to Makefile.PL
+	- Add MSWin32 hints to find the openssl libraries
+        - Autocreate README
+	- Fix some -Wpointer-sign warnings
+	- Remove wrong Crypt::OpenSSL::RSA package names in docs and errmsg
+
+0.04  Sun May 20 13:41:04 2007
+        - Add a LICENSE file.
+        - Better use of types.
+
+0.03  Thu Sep 06 23:05:36 2001
+        - Added documentation
+
+0.02  Mon Apr  9 18:55:30 2001
+        - Got rid of perl 5.6 dependencies.  Bad perl! Bad!
+
+0.01  Sun Apr  8 15:25:10 2001
+	- original version; created by h2xs 1.20 with options
+		-n Crypt::OpenSSL::Random

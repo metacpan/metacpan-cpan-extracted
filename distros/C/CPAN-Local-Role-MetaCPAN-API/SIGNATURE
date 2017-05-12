@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 6fe93a851b14d1f1cdb73ad8c29d6152eb20a59b Changes
+SHA1 e83b6ec9be865f5d948c6eba659a3f9d91d3144f INSTALL
+SHA1 7ca615d9e94ecf9f158ef73751fd14ea6cf7a11d LICENSE
+SHA1 b51840ce60e1794f5014df5a0f012a32892cbdc6 MANIFEST
+SHA1 d88fbe593832d66be3ace3166f04ca2990557ccb META.json
+SHA1 d2c02496654ee687b824f1d86fc699422accc66a META.yml
+SHA1 bb3b2af173f9c81b76e89fb9aee7734f43c82a55 Makefile.PL
+SHA1 b963593c497b67829f7d33cb8e870e8e3dd9d239 README
+SHA1 139e3596a65e96674291876dca444afe6952817d cpanfile
+SHA1 9f0b7e785c8f5c155fb640bb5bcba5ff07b5102d dist.ini
+SHA1 14aad1077bb73e71dca9a7dbcbf722576b1cf3ff lib/CPAN/Local/Role/MetaCPAN/API.pm
+SHA1 241148156a8a145415699568f927844f7efff9bd t/00-compile.t
+SHA1 4e153544184e0c5ebd0dc4b434d88d79e5575c3d t/000-report-versions-tiny.t
+SHA1 de413f537d9b642aeec405f7a1b39d58795fc3f1 t/author-pod-spell.t
+SHA1 4400138856ef9ec8fad9797eba0138d0221cc51b t/basic.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 c1fb0c917bd42b36fd228063a8cc911f287da256 t/release-has-version.t
+SHA1 8400e8ac1fc46baa26e19ec520ef0a6ca8af004c t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 b46ad65e1f7a8649b2ffbc934723d4cd584edb49 t/release-pod-coverage.t
+SHA1 b8b9f9d2ea4f0eb6522ec18751351037fd2d00a6 t/release-pod-linkcheck.t
+SHA1 7811f2316743b29c973c6fa2c70fdcc4f6d072c9 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRbNQZAAoJEOd5N1CvIgQkqXMH/3yq4Q3ltEnyvAbW94dZC0ia
+TCP1CRs92FDmP8RtQpnwS+AcaOPwjN/gL617lcVg0Y7iusXoRxz/IYIa2yeuN4lA
+TWVUk4PRW2mkXlwxXHbO8aTmTMJ6VVlymIX3Vu/BhnpWXQwB8NXf+IZzFMu/cLNR
+T1jEH0pvuhXX6YmkCfcgbNKvzgKxhBBbafGQCe8OJCjGH3IB9JPVm9kcmXwZDsMo
+li4u4+Lwp5EDhpQijVCUjadbqLsI00ngWysnoaJbUeDIvPN+NW8xlPl3o41Qps2P
+sCN07kP8OX44OeTxgrjlHhqkMfuhrXY6b2M0yhgwzf9PFBzeJA38dcbIIeJYwHM=
+=LYmJ
+-----END PGP SIGNATURE-----

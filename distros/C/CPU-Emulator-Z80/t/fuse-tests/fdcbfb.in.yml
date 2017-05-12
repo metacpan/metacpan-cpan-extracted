@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 186
+    - 251
+  63535:
+    - 237
+name: fdcbfb
+registers:
+  AF: 21315
+  AF_: 0
+  BC: 45586
+  BC_: 0
+  DE: 2506
+  DE_: 0
+  HL: 58310
+  HL_: 0
+  I: 0
+  IX: 52523
+  IY: 63605
+  PC: 0
+  R: 0
+  SP: 0

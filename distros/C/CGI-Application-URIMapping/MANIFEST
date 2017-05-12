@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01base.t
+t/02allparam.t
+t/pod-coverage.t
+lib/CGI/Application/URIMapping.pm
+META.yml                                 Module meta-data (added by MakeMaker)

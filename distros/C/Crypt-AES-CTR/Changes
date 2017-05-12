@@ -1,0 +1,14 @@
+Revision history for Crypt-AES-CTR
+
+0.03    01 Sept 2013
+
+	= Removed use of splice to be backwards compatible with perl versions prior to 5.14
+
+0.02    31 Aug 2013
+        + Added oo-interface
+	+ Added padding override for base64
+	= Fixed attribution to include url to original site
+
+0.01    29 Aug 2013
+        = First version, released on an unsuspecting world.
+

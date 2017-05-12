@@ -1,0 +1,196 @@
+CHANGES
+-------
+
+  2.074 18 Feb 2017
+
+      * Lzma.xs
+        Comment out unused variables & remove C++-ism
+        #120272: [PATCH] Unbreak compilation
+
+      * Make failure when LZMA_VERSION != lzma_version_number more excplicit
+
+      * Added interface to LZMA_VERSION and LZMA_VERSION_STRING
+
+  2.072 4 Feb 2017
+      * Makefile.PL
+        #120084: Need Fix for Makefile.PL depending on . in @INC
+
+      * #105460: use of Compress::Raw::Lzma::RawDecoder fails with large amount of data
+        AppendOutput for "encode" methods said default was 1. It is actually.
+
+  2.070 28 Dec 2016
+
+      * #119207: Compress-Raw-Lzma-2.069 bug report
+
+  2.069 26 Sep 2015
+
+      * No Changes
+
+  2.068 23 Dec 2014
+
+      * No Changes
+
+  2.067 8 Dec 2014
+
+      * No Changes
+
+  2.066 21 Sept 2014
+
+      * No Changes
+
+  2.064 1 February 2014
+
+      * [PATCH] Handle non-PVs better
+        [#91558]
+
+  2.062 11 August 2013
+
+      * fix typos
+        [RT #86418]
+        
+  2.061 19 May 2013
+
+      * silence compiler warning by making 2nd parameter to 
+        DispStream a const char*
+
+  2.060 7 January 2013
+
+      * No Changes
+
+  2.059 24 November 2012
+
+      * Copy-on-write support
+
+  2.058 12 November 2012
+
+      * No Changes
+
+  2.057 10 November 2012
+
+      * update to ppport.h that includes SvPV_nomg_nolen
+      * added PERL_NO_GET_CONTEXT
+
+  2.055 5 August 2012
+
+      * Fix misuse of magic in API
+
+  2.052 29 April 2012
+
+      * Fixed to allow building with C++
+
+  2.049 17 February 2012
+
+      * README wasn't included in the distribution.
+
+  2.048 29 January 2012
+
+      * No Changes
+
+  2.047 28 January 2012
+
+      * Set minimum Perl version to 5.6
+
+  2.045 3 December 2011
+
+      * Moved FAQ.pod to IO::Compress
+
+  2.044 2 December 2011
+
+      * Moved FAQ.pod under the lib directory so it can get installed
+
+  2.043 20 November 2011
+
+      * No Changes
+
+  2.042 17 November 2011
+
+      * No Changes
+
+  2.040 28 October 2011
+
+      * No Changes
+
+  2.039 28 October 2011
+
+      * croak if attempt to freeze/thaw compression object
+        [RT #69985]
+
+  2.037 22 June 2011
+
+      * No Changes
+
+  2.036 18 June 2011
+
+      * A number of changes to facilitate adding LZMA support to
+        IO::Compress::Zip & IO::Uncompress::Unzip
+
+          * Added preset filters Lzma::Filter::Lzma1::Preset & 
+            Lzma::Filter::Lzma2::Preset
+
+          * Added forZip option to Compress::Raw::Lzma::Encoder
+
+          * Added properties option to Compress::Raw::Lzma::RawDecoder
+
+  2.035 6 May 2011
+
+      * No Changes
+
+  2.033 11 Jan 2011
+
+      * Changed default MemLimit from 128Meg to unlimited.
+
+  2.032 4 Jan 2011
+
+      * No Changes
+
+  2.031 26 Oct 20100
+
+      * Changed to build with XZ 5.0.0
+        Dropped symbolic constants provided by subblock.h
+        [RT #62461]
+
+  2.030 22 July 2010
+
+      * No Changes
+
+  2.029 8 May 2010
+
+      * Compress::Raw::Lzma::EasyEncoder with Preset => 9 needs a *lot* of
+        memory. This was triggering smoke failures on some systems.
+        Reworked that test harness to spot the memory failure.
+
+  2.028 3 May 2010
+
+      * Remove 'Persistent' option from  Lzma::Filter::Lzma. 
+        The underlying lzma library doesn't support it anymore.
+        [RT #57080]
+
+      * Silenced a pile of compiler warnings.
+
+  2.027 24 April 2010
+
+      * No Changes
+
+  2.026 7 April 2010
+
+      * No Changes
+
+  2.025 27 March 2010
+
+      * No Changes
+
+  2.024 7 January 2010
+
+      * Documentation updates.
+
+      * Silence the warning "UNIVERSAL->import is deprecated and will be
+        removed in a future perl" when running perl 5.11
+
+      * Fixed a problem with the code that generated the LZMA constants.
+        This issue was found in with the version of the lzma library that
+        comes with Ubuntu 9.10 
+        Pronlem reported by Graham Jenkins
+
+  2.023 9 November 2009
+
+      * First public beta

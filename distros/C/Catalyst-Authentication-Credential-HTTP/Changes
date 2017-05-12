@@ -1,0 +1,128 @@
+1.016 2013-07-27
+   - Fix repository metadata. RT#87114
+
+1.015 2012-06-27
+   - Add broken_dotnet_digest_without_query_string option
+
+     Allows digest authentication from .NET, which does not include the
+     query string in the uri in the digest Authorization header.
+
+   - Fix broken synopsis. RT#75254
+
+1.014 2012-02-05
+   - Add require_ssl configuration setting.
+   - Add no_unprompted_authorization_required configuration setting.
+
+1.013 2010-12-14
+   - Call store_digest_authorization_nonce() instead of $c->cache->set()
+     in authenticate_digest() (RT#63669) (rjk)
+   - Make Test::Exception and Test::MockObject be listed as test_requires
+     rather than requires (RT#54029)
+   - Skip WWW::Mech tests unless WWW::Mech is a new enough version (RT#55303).
+   - Improve documentation for authenticate_digest() (rjk)
+     - depends on Catalyst::Plugin::Cache, not Catalyst::Plugin::Session
+     - reorganize and clarify
+
+1.012 2010-03-07
+   - Move actions out of the test applications to stop warnings.
+
+   - Make Pod tests author only.
+
+1.011 2009-06-26
+   - Added true/false check to _debug option
+
+1.010 2009-05-14
+   - Moved tests out to t/lib/ (dhoss)
+
+   - Add debug when a user is found, but passwords don't match (abraxxa)
+
+1.009  2009-01-04
+   - Remove use of _config accessor, which I'd stupidly cargo-culted.
+     As we don't ever run in auth back-compat mode, we can store
+     everything in instance data without worrying about conflicts.
+     Note however - have to keep the accessor itself so that our
+     parent class (which is still stupid and uses it) continues to work.
+
+1.008  2008-12-10
+  - Fix issue with the user not being authenticated into the correct
+    realm, by not calling $c->set_authenticated ourselves, but instead
+    just returning the user object. Fix suggested by Bernhard Graf. (t0m)
+    - Add test for this (t0m)
+  - Change $user to $user_obj in authenticate_digest for consistency (t0m)
+
+1.007  2008-11-19
+  - Add test for query strings in digest auth as digest header is built using
+    the full URI (t0m)
+  - Fix for this (Peter Corlett)
+  - Fix warning when used with self_check => 1 (t0m)
+  - Added respository info to META.yml (t0m)
+
+1.006  2008-10-06
+  - Added username_field configuration option. I need this to play
+    nice with Catalyst::Authentication::Store::Tangram.
+  - Doc cleanups / clarifications related to RT#39838
+
+1.005  2008-09-25
+  - Added better description of the use of the domains and
+    use_uri_for options (info culled from RFC2617).
+  - Split init method out to make this module easier to sub-class
+    (used by Catalyst::Authentication::HTTP::Proxy).
+
+1.004  2008-09-12
+   - Add tests for use_uri_for configuration options.
+   - Add tests and documentation for storing an MD5
+     of "$user:$relam:$password" instead of cleartext password
+     when doing digest auth.
+
+1.003  2008-09-11
+   - Add ability to override the realm name presented for authentication
+     when calling $c->authenticate. Documentation and tests for this.
+   - Clean up documentation of options inherited from 
+     Catalyst::Authentication::Credential::Password.
+   - Added an example of calling methods in the credential module from a 
+     controller to the POD.
+   - Tests for the authorization_required_message configuration parameter. 
+   - Document use_uri_for configuration option
+   - Document domain option (passed through from $c->authenticate) and add 
+     tests for this option.
+
+1.002  2008-09-03
+   - Fix the assumptions that the password field is named password when doing 
+     digest auth.
+
+1.001  2008-09-02
+   - Fix some of the assumptions about the user class by inheriting from the
+     Catalyst::Authentication::Credential::Password module. This should make
+     using DBIC as a store work correctly for basic auth.
+   - Updated synopsis and todo list, this module still needs some work before
+     it's ready for prime time again..
+
+1.000  2008-09-01
+   - Rename to remove Plugin from namespace. This is a pretty breaking change,
+     as lots of things work differently with the new auth refactor.
+   - Pull out some functionality which I think is better in other 
+     modules (realms/stores). With the auth refactor, this module didn't need
+     to do so much. If anyone misses any of the functionality, please yell at
+     me and I'll put it back.
+
+0.11  2008-07-12
+    - Changed cache modules used in the tests to not be deprecated.
+    - Fix RT#31036, and comply with RFC2617 Section 1.2.
+
+0.10  2007-04-26
+    - switch to Module::Install
+
+0.09  2006-12-31
+    - clean up tests
+    - clean up docs
+    - add body to 401 status
+
+0.08  2006-10-12
+    - Fix basic test when using Test::MockObject 1.07 (die if using undefined
+      interfaces)
+
+0.07  2006-09-12
+    - Applied Ton Voon's patch that fixed option propagation for basic auth.
+
+0.06  2006-09-07
+    - Refactored internals into smaller methods

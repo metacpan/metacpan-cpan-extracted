@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Convert/DUDE.pm
+t/00_dude.t

@@ -1,0 +1,139 @@
+Catalyst-Plugin-Session-CGISession version 0.2
+
+NAME
+    Catalyst::Plugin::Session::CGISession - use CGI::Session for persistent
+    session data
+
+SYNOPSIS
+        use Catalyst  qw{ ... Session::CGISession ... };
+
+        MyApp->config->{session} = {
+            expires   => 3600,
+            rewrite   => 1,
+        };
+
+        $c->session->{foo} = 'bar';
+        print $c->sessionid;
+
+
+DESCRIPTION
+    This plugin provides the same functionality as the original
+    Session::FastMmap plugin but uses the CGI::Session module for the
+    session data management.
+
+    The motivations to develop this plugin were:
+
+    * provide better session data expiration handling, as is available
+    through the CGI::Session module
+    * provide an easier migration to Catalyst for applications that have
+    been using CGI::Session and its param() and other methods
+    * allow Windows users to avoid the workarounds needed to make
+    Cache::FastMmap work
+
+    The difference in session expiration between this plugin and
+    Session::FastMmap is small but important. CGI::Session resets the
+    expiration time limit on every access to the session. A one day time
+    limit means the session data disappears 24 hours after the *last*
+    request using that session. With Session::FastMmap the limit would be 24
+    hours after the *first* request, when the session is created.
+
+    While this plugin adds some functions and methods beyond those available
+    with Session::FastMmap, new development most likely should avoid using
+    these features. Try to use only the common feature, session(), to stay
+    compatible with "Session::FastMmap" and other future session plugins.
+
+
+DEPENDENCIES
+
+  CGI::Session
+    This module was developed using the first CGI::Session 4.00 release. It
+    was subsequently tested under 3.95, the last 3.x version.
+
+    Testing has been done using:
+
+        Windows XP
+
+            CGI::Session 4.00   'File' driver
+
+            CGI::Session 4.00   MySQL 3.23.x
+
+            CGI::Session 3.95   MySQL 3.23.x
+                Note: driver name case sensitivity, e.g.
+                    cgis_dsn: driver:MySQL;serializer:Storable;id:MD5
+                Note: TableName not available, must use global variable, e.g.
+                    $CGI::Session::MySQL::TABLE_NAME = 'myapp_sessions';
+
+            CGI::Session 3.95   'File' driver
+                Note: different global variable $CGI::Session::File::FileName
+
+        Linux
+
+            CGI::Session 3.95   'File' driver
+                Note: this driver leaves session data tainted
+
+            CGI::Session 3.95   MySQL 3.23.x
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install without Module::Build, you can use the 
+following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+THANKS
+    To Christian Hansen, from whose test program implementation of
+    CGI::Session use I borrowed extensively,
+
+    To Andy Grundman, for the solution to poking cookie values,
+
+    To Sebastian Riedel and Marcus Ramberg, for the
+    Catalyst::Plugin::Session::FastMmap module used to get me started,
+
+    And to them and the rest of the contributors to Catalyst, for a great
+    start!
+
+AUTHOR
+    Thomas L. Shinnick "<tshinnic@cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2005, Thomas L. Shinnick "<tshinnic@cpan.org>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

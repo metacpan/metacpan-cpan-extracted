@@ -1,0 +1,126 @@
+
+
+                           TODO for Crypt::RSA
+            $Id: TODO,v 1.25 2001/05/20 23:37:42 vipul Exp $
+
+-------------------------------------------------------------------------------
+P No Task                                              Status
+- -- ------------------------------------------------  ------------------------
+   1 Implement "Optimal Asymetric Encryption" (OAEP)   Jan 01 2001  0130 
+     + oaep_encode()                                   Dec 25 2000  0000 
+     + oaep_decode()                                   Dec 25 2000  0025 
+     + oaep_encrypt()                                  Dec 25 2000  0100 
+     + oaep_decrypt()                                  Dec 25 2000  0100 
+     + implement octet_xor()                           Dec 26 2000  0245 
+   2 oaep_encrypt()/decrypt() should work with         Jan 01 2001  0130 
+     moduli of lengths that are not multiples
+     of 8.
+   3 SSLv3 compatability                               Postponed.
+*  4 Read/write SSH public keys
+     ::Key::Public::SSH should derive from 
+     ::Key::Public and override its read() and 
+     write()
+*  5 Choose a large `e' with Maurer's method
+   6 Move rsaparams() over to Crypt::RSA::Key          Not required.
+   7 Implement i2osp(), os2ip(), mgf1()                Dec 21 2000  0425 
+   8 Find & study PKCS #7 specification                Feb 19 2001  2345
+   9 Read/write PGP 2.6i/5.x and GPG keys
+     (Crypt::OpenPGP should do this, not us.)
+  10 A comprehensive test suite                        Mar 03 2001  1900 
+  11 Implement decryption using the Chinese            Apr 07 2001  1300
+     Remainder Theorem (in core_decrypt()).
+     (Patch by Benjamin Trott)
+* 12 Resolve endianness issues.
+  13 Move OAEP code to Crypt::RSA::EME::OAEP           Feb 12 2001  2000
+  14 Ensure n is exactly specified number of           Mar 06 2001  2315
+     bits
+*    + Modify Crypt::Primes::maurer() to accept 
+       an integer range instead of bitsize.
+  15 Better exception handling in oaep_decrypt()       Not required.
+     Cloak calls to os2ip/ip2os and core_decrypt()
+     in evals and croak with "Decryption Error"
+     if an exception is raised in these methods
+     (Suggestion by magister on #perl: 
+      Use DBI's error handling method) 
+  16 Add support for Math::Pari bigints to             Apr 19 2001  1200
+     Convert::ASN1.  <ben@rhumba.pair.com>                                  
+  17 Add support for DER encoding in Convert::ASN1.    Postponed.
+  18 Replace mod2int with Math::Pari::lift()           Feb 14 2001  0300 
+  19 Implement core_sign() and core_verify()           Feb 12 2001  1330 
+     + clock calls to core_encrypt()/decrypt()      
+       in evals and return appropriate error
+       messages. 
+  19 Signature with appendix Crypt::RSA::PKCS15        Postponed.
+     (Requires ASN1) 
+  20 Signature with appendix (randomized)              Feb 19 2001  2030 
+     Crypt::RSA::SSA::PSS 
+  21 Split the code into modules listed in             Feb 14 2001  2100 
+     MANIFEST 
+     + Update tests.                                   Feb 14 2001  2100 
+  22 Use the DBI error handling method.                Feb 15 2001  2300
+  23 Plaintext and key material should                 Feb 15 2001  2300 
+     we wiped out from memory at error
+     and DESTROY() 
+     + Implement Crypt::RSA::Key::DESTROY              Mar 03 2001  1500
+  24 Move mgf1 to Crypt::RSA::DataFormat               Feb 15 2001  2100 
+     and wrap in a method in 
+     EME::OAEP, SSA::PSS
+  25 Rename Cyphertext to Ciphertext in                Mar 06 2001  2315
+     Crypt::RSA::Primitives::decrypt()
+  26 Restructre Key modules into                       Mar 02 2001  2100
+     Crypt::RSA::Key
+     Crypt::RSA::Key::Public 
+     %key = ( version  => ...,
+              owner    => [],
+              ownersig => [],
+              type    => type
+              size    => size in bits of n,
+              n       => modulus
+              e       => exponent
+            ), 
+     Crypt::RSA::Key::Private
+     Same as public key and: 
+     %key = (
+             __d      => decryption exp,
+             __p      => prime, 
+             __q      => prime, 
+            )
+* 27 $key->check before operations
+       n == p*q 
+       d*e mod p == 1 
+       d*e mod q == 1 
+       p*u mod q == 1 
+
+  28 Add support for version specific operations       Mar 31 2001  0400
+     in EME::* and SSA::*.  Version number 
+     should be provided at new()
+  29 Crypt::RSA should be able to use non-native       Apr 29 2001  0400
+     key formats through a mechanism similar to 
+     variable EME/SSA support.
+  30 Consider renaming EME to ES and SSA to SS.        Mar 31 2001  1500
+     (Renamed EME to ES, SSA to SS)
+* 31 Re-orgazine Crypt::RSA::Primitives.  
+     core_encrypt|decrypt|sign|verify() should be
+     replaced with rsaop() that uses the encryption 
+     exponent or the decryption exponent depending
+     on the type of key passed.  Also implement 
+     decryption with CRT here.
+  32 Write Crypt::RSA::EME|SSA::RSAREF2                Apr 06 2001  1930
+     (as ::ES/SS::PKCS1v15)
+* 33 Write Crypt::RSA::EME|SSA::Textbook
+  34 Write a note in documentation on insecurity of    Apr 30 2001  0300
+     Textbook RSA.  Also explain the concept of 
+     Schemes.
+* 35 Remove use lib 'locallib' from all modules 
+     in production version. (nhuillard@ghs.fr)
+* 36 Fix parameterization in ::ES::OAEP and 
+     ::ES::PSS 
+ 
+-------------------------------------------------------------------------------
+
+LEGEND
+ - Date in the Status field indicates the task was completed on that date.
+ - `*' in P field distinguishes pending tasks.
+ - `+' before the task description indicates a sub-task.
+
+

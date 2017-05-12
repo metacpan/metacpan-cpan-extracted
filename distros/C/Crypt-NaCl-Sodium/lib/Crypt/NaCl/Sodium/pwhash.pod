@@ -1,0 +1,250 @@
+# PODNAME: Crypt::NaCl::Sodium::pwhash
+# ABSTRACT: Password hashing (yescrypt)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::pwhash - Password hashing (yescrypt)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_pwhash = Crypt::NaCl::Sodium->pwhash();
+
+    my ($salt, $key, $hashed, $password);
+
+    # Some simple password vulnerable to dictionary attack
+    $password = "letmein1";
+
+    ## Key derivation
+    ########
+
+    # generate salt
+    $salt = $crypto_pwhash->salt();
+
+    # can be used later in other methods as the actual key
+    $key = $crypto_pwhash->key( $password, $salt, bytes => 32 );
+
+    ## Password storage
+    ########
+
+    # save this in database as hash of user password
+    $hashed = $crypto_pwhash->str( $password );
+
+=head1 DESCRIPTION
+
+Secret keys used to encrypt or sign confidential data have
+to be chosen from a very large keyspace. However, passwords
+are usually short, human-generated strings, making dictionary attacks
+practical.
+
+The C<crypto_pwhash> provides methods to derive a secret key of any size from
+a password and a salt.
+
+=over 4
+
+=item * The generated key has the size defined by the application, no matter
+what the password length is.
+
+=item * The same password hashed with same parameters will always
+produce the same key.
+
+=item * The same password hashed with different salts will produce
+different keys.
+
+=item * The function deriving a key from a password and a salt is
+CPU intensive and intentionally requires a fair amount of
+memory. Therefore, it mitigates brute-force attacks by requiring a
+significant effort to verify each password.
+
+=back
+
+Common use cases:
+
+=over 4
+
+=item * Protecting an on-disk secret key with a password,
+
+=item * Password storage, or rather: storing what it takes to verify a
+password without having to store the actual password.
+
+=back
+
+=head1 METHODS
+
+=head2 salt
+
+    my $salt = $crypto_pwhash->salt();
+
+Helper method to generate a random salt to be used by L</key>.
+
+The length of the C<$salt> equals L</SALTBYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 key
+
+    my $key = $crypto_pwhash->key( $password, $salt,
+        bytes => $bytes, opslimit => $opslimit, memlimit => $memlimit
+    );
+
+Derive an C<$bytes> long key from a password C<$password> and salt C<$salt>
+by performing a maximum of C<$opslimit> number of computations and using up to
+C<$memlimit> amount of RAM.
+
+The optional C<$bytes> parameter specifies the output length of the C<$key>
+and has the default value of L</STRBYTES>.
+
+The optional C<$opslimit> represents a maximum amount of computations
+to perform. Raising this number will make the function require
+more CPU cycles to compute a key. Default value is L</OPSLIMIT_INTERACTIVE>.
+
+The optional C<$memlimit> is the maximum amount of RAM that the function
+will use, in bytes. It is highly recommended to allow the function
+to use at least 16 megabytes. Default value is L</MEMLIMIT_INTERACTIVE>.
+
+B<NOTE:> For interactive sessions, L</OPSLIMIT_INTERACTIVE> and
+L</MEMLIMIT_INTERACTIVE> provide a safe base line for these two parameters.
+However, using higher values may improve security.
+
+For highly sensitive data, L</OPSLIMIT_SENSITIVE> and L</MEMLIMIT_SENSITIVE>
+can be used as an alternative. But with these parameters, deriving
+a key takes more than 10 seconds on a 2.8 Ghz Core i7 CPU and requires up
+to 1 gigabyte of dedicated RAM.
+
+Keep in mind that in order to produce the same C<$key> that is C<$bytes> long from
+the same C<$password>, the same C<$salt>, and the same values for C<$opslimit>
+and C<$memlimit> have to be used. Therefore, these parameters have to be stored
+for each user.
+
+The length of the C<$key> equals the value of C<$bytes>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 str
+
+    my $hashed = $crypto_pwhash->str( $password,
+        opslimit => $opslimit, memlimit => $memlimit
+    );
+
+Returns ASCI encoded string, which includes:
+
+=over 4
+
+=item * the result of a memory-hard, CPU-intensive hash function applied to
+the password C<$password>
+
+=item * the automatically generated salt used for the previous computation
+
+=item * the other parameters required to verify the password:
+C<$opslimit> and C<$memlimit>
+
+=back
+
+The output string is zero-terminated, includes only ASCII
+characters and can be conveniently stored into SQL databases
+and other data stores. No additional information has to be stored in
+order to verify the password.
+
+For the description of the optional C<$opslimit> and C<$memlimit> please refer
+to the L</key>.
+
+The length of the C<$hashed> equals C<STRBYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 verify
+
+    if ( $crypto_pwhash->verify($hashed, $password) ) {
+        # password is correct
+    }
+
+Verify that the C<$hashed> password verification string (as generated by L</str>)
+matches the password C<$password>.
+
+Returns true if they match, false otherwise.
+
+B<NOTE:> If C<$hashed> is L</STRBYTES> long, it is required that it is
+zero-terminated (last character of the string is a C<null> byte). This function
+however also accepts C<$hashed> which is C<STRBYTES - 1> long.
+
+=head1 CONSTANTS
+
+=head2 SALTBYTES
+
+    my $salt_length = $crypto_pwhash->SALTBYTES;
+
+Returns the length of salt.
+
+=head2 STRBYTES
+
+    my $hashed_length = $crypto_pwhash->STRBYTES;
+
+Returns the length of password verification string.
+
+=head2 OPSLIMIT_INTERACTIVE
+
+    my $opslimit_interactive = $crypto_pwhash->OPSLIMIT_INTERACTIVE;
+
+Returns a value which represents the default maximum amount of computations
+to perform.
+
+=head2 MEMLIMIT_INTERACTIVE
+
+    my $memlimit_interactive = $crypto_pwhash->MEMLIMIT_INTERACTIVE;
+
+Returns a value which represents the maximum amount of RAM to use, in bytes.
+
+=head2 OPSLIMIT_SENSITIVE
+
+    my $opslimit_sensitive = $crypto_pwhash->OPSLIMIT_SENSITIVE;
+
+Returns a value which represents the suggested for highly sensitive data amount
+of computations to perform.
+
+=head2 MEMLIMIT_SENSITIVE
+
+    my $memlimit_sensitive = $crypto_pwhash->MEMLIMIT_SENSITIVE;
+
+Returns a value which represents the suggested for highly sensitive data amount
+of RAM to use, in bytes.
+
+=head1 ALGORITHM DETAILS
+
+C<crypto_pwhash> uses I<yescrypt> key derivation algorithm, which has been
+submitted to the I<Password Hashing Competition>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Password Hashing Competition|http://password-hashing.net>
+
+=item * L<scrypt - key derivation function|http://www.tarsnap.com/scrypt.html>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,13 @@
+data
+{
+    base
+    {
+        repeating_node    a1 b1
+        repeating_node    a2 b2
+    }
+}
+
+@inherit .#data/base
+
++repeating_node    a3 b3
+#+repeating_node    a4 b4

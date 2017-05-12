@@ -1,0 +1,42 @@
+Revision history for Perl extension CGI::Application::Plugin::Header.
+
+0.63008  Nov 15th, 2013
+
+  - tests require CAP::Session 1.04 or higher
+  - Since RT#81611 is closed, t/33_session_delete.t is not skipped anymore
+
+0.63007  Oct 31st, 2013
+
+  - skip t/33_session_delete.t due to CAP::Session's bug, RT#81611
+    (thanks to CPAN testers)
+
+0.63006  Oct 30th, 2013
+
+  - META.yml itself was missing
+  - no code changes
+
+0.63005  Oct 30th, 2013
+
+  - fix META.yml ("version" was broken)
+  - no code changes
+
+0.63004  Oct 30th, 2013
+
+  - add test for CGI::Application::Plugin::Stream
+  - add tests for CGI::Application::Plugin::Session
+
+0.63003  Oct 30th, 2013
+
+  - add test for CGI::Application::Plugin::Redirect
+
+0.63002  Oct 30th, 2013
+
+  - #header is rw
+
+0.63001  Oct 29th, 2013
+
+  - requires CGI::Header 0.63 or higher
+
+0.01  May 26th, 2013
+
+  - original version

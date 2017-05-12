@@ -1,0 +1,64 @@
+Crypt-FNA-Async
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+	OR
+	
+	perl Buil.PL
+	build test
+	build install
+
+IMPORTANT
+
+---> require threads!!!!! <----
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Crypt::FNA
+    perldoc Crypt::FNA::Async
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-FNA
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Crypt-FNA
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Crypt-FNA
+
+    Search CPAN
+        http://search.cpan.org/dist/Crypt-FNA/
+        
+    Algorithm description
+    	http://www.perl.it/documenti/articoli/2010/04/anakryptfna.html
+  
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 2010 2011 Mario Rossano aka Anak
+birthday 05/08/1970; birthplace: Italy
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either:
+CC-NC-BY-SA 
+license http://creativecommons.org/licenses/by-nc-sa/2.5/it/deed.en
+Creative Commons License: http://i.creativecommons.org/l/by-nc-sa/2.5/it/88x31.png
+FNA Fractal Numerical Algorithm for a new cryptography technology, author Mario Rossano
+is licensed under a: http://creativecommons.org/B/by-nc-sa/2.5/it/deed.en - Creative Commons Attribution-Noncommercial-Share Alike 2.5 Italy License
+Permissions beyond the scope of this license may be available at software@netlogicalab.com
+
+

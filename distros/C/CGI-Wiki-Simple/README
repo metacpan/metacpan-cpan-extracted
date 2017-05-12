@@ -1,0 +1,54 @@
+NAME
+    CGI::Wiki::Simple - A simple wiki application using CGI::Application.
+
+DESCRIPTION
+    This is an instant wiki.
+
+SYNOPSIS
+      use strict;
+      use CGI::Wiki::Simple;
+
+      # Change this to match your setup
+      use CGI::Wiki::Store::SQLite;
+      my $store = CGI::Wiki::Store::SQLiteMySQL->new( dbname => "test" );
+
+      my $search = undef;
+      my $wiki = CGI::Wiki::Simple->new( TMPL_PATH => "templates",
+                                         PARAMS => {
+                                            store => $store,
+                                         })->run;
+
+EXAMPLE WITHOUT HTML::Template
+    It might be the case that you don't want to use HTML::Template, and in
+    fact, no templates at all. Then you can simple use the following example
+    as your wiki, which does not rely on HTML::Template to prepare the
+    content :
+
+      use strict;
+      use CGI::Wiki::Simple::NoTemplates;
+      use CGI::Wiki::Store::MySQL; # Change this to match your setup
+
+      my $store = CGI::Wiki::Store::MySQL->new( dbname => "test",
+                                                dbuser => "master",
+                                                dbpass => "master" );
+
+      my $search = undef;
+      my $wiki = CGI::Wiki::Simple::NoTemplates
+                 ->new( PARAMS => {
+                                    store => $store,
+                                  })->run;
+
+METHODS
+    new "new" passes most of the parameters on to the constructor of the
+        CGI::Wiki manpage. If HTML::Template is not available, you'll
+        automagically get a non-templated wiki in the subclass
+        CGI::Wiki::Simple::NoTemplates.
+
+    render_commit
+        Renders either the display page or a page indicating that there was
+        a version conflict.
+
+  cgiapp_prerun
+
+    Loads some values for the subsequent rendering.
+

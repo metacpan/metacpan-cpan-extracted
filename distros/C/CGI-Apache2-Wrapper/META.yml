@@ -1,0 +1,53 @@
+--- #YAML:1.0
+name:         CGI::Apache2::Wrapper
+version:      0.215
+version_from: lib/CGI/Apache2/Wrapper.pm
+license:      perl
+abstract:     CGI.pm-compatible methods via mod_perl
+installdirs:  site
+author:
+    - 'Randy Kobes <r.kobes@uwinnipeg.ca>'
+requires:
+    File::Spec:         0.8
+    Apache2::Request:    0
+    Apache2::RequestRec: 0
+provides:
+  CGI::Apache2::Wrapper:
+    file: lib/CGI/Apache2/Wrapper.pm
+    version: 0.215
+  CGI::Apache2::Wrapper::Cookie:
+    file: lib/CGI/Apache2/Wrapper/Cookie.pm
+    version: 0.215
+  CGI::Apache2::Wrapper::Upload:
+    file: lib/CGI/Apache2/Wrapper/Upload.pm
+    version: 0.215
+distribution_type: module
+no_index:
+    file:
+         - t/response/TestCGI/basic.pm
+         - t/response/TestCGI/cookie.pm
+         - t/response/TestCGI/cookie2.pm
+         - t/response/TestCGI/cookie3.pm
+         - t/response/TestCGI/param.pm
+         - t/response/TestCGI/extra.pm
+         - t/response/TestCGI/misc.pm
+         - t/response/TestCGI/upload.pm
+         - t/response/TestCGI/upload1.pm
+         - t/response/TestCGI/use_cgi_pm.pm
+urls:
+   license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+resources:
+  license: http://dev.perl.org/licenses/
+  homepage: http://cpan-search.svn.sourceforge.net/viewvc/cpan-search/CGI-Apache2-Wrapper/
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Apache2-Wrapper
+  AnnoCPAN: http://annocpan.org/dist/CGI-Apache2-Wrapper
+  CPANForum: http://www.cpanforum.com/dist/CGI-Apache2-Wrapper
+  CPANTS: http://cpants.perl.org/dist/CGI-Apache2-Wrapper
+  Rating: http://cpanratings.perl.org/d/CGI-Apache2-Wrapper
+  SearchCPAN: http://search.cpan.org/~RKOBES/CGI-Apache2-Wrapper/
+  Testers: http://cpantesters.perl.org/show/CGI-Apache2-Wrapper.html
+  UWinnipeg: http://cpan.uwinnipeg.ca/dist/CGI-Apache2-Wrapper
+generated_by: Randy Kobes

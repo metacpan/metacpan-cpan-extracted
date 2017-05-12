@@ -1,0 +1,19 @@
+---
+abstract: 'The C''Dent Runtime for Perl'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: CDent
+name: CDent
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.005003
+version: 0.01

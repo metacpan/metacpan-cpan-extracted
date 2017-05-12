@@ -1,0 +1,19 @@
+Changes
+lib/Cluster/Similarity.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-new.t
+t/02-load_data.t
+t/10-contingency.t
+t/11-objects.t
+t/20-pair_wise.t
+t/30-mutual_information.t
+t/40-rand_index.t
+t/50-rand_adjusted.t
+t/60-matching_index.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+=============================================================================
+
+choice of c-level coroutine model:
+
+# to be written, please read the messages you get while configuring Coro
+
+=============================================================================
+
+Event-0.85 cannot be found / Event programs do not work.
+
+There is a serious bug in Event's (<0.85) poll implementation (if your os
+uses select for io multiplexing then this bug doesn't affect you), in that
+errors never get reported and result in endless loops.
+
+The fix is easy. Unpack Event and edit the file c/unix.c and look for the
+following line (at or around line 141 in the file):
+
+            if (mask & (POLLRDBAND | POLLPRI)) got |= PE_E;
+
+now replace this line by:
+
+            if (mask & (POLLRDBAND | POLLPRI | POLLERR | POLLHUP)) got |= PE_E;
+
+and then recompile.
+
+=============================================================================

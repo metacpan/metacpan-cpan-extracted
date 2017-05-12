@@ -1,0 +1,72 @@
+Serializer(3)         User Contributed Perl Documentation        Serializer(3)
+
+
+
+NNAAMMEE
+       Catalyst::View::REST::Data::Serializer - Data::Serializer View Class
+
+SSYYNNOOPPSSIISS
+           # lib/MyApp/View/REST.pm
+           package MyApp::View::REST;
+
+           use base 'Catalyst::View::REST::Data::Serializer';
+
+           1;
+
+           $c->forward('MyApp::View::REST');
+
+DDEESSCCRRIIPPTTIIOONN
+       This is the "Data::Serializer" view class.  It can be used to use any
+       number of Serialization methods (YAML, Storable, Data::Dumper) to
+       implement a REST view.  It also supports optional compression, encryp-
+       tion, and a host of other useful goodies.
+
+       CCOONNFFIIGGUURRAATTIIOONN OOPPTTIIOONNSS
+
+       Any of the options you can pass to Data::Serializer you can put into
+       $c->config->{'serializer'}, and have them passed on to it.  If you
+       don't pass any options, the following are used:
+
+                   serializer       => 'Data::Dumper',
+                   digester         => 'SHA1',
+                   cipher           => 'Blowfish',
+                   secret           => undef,
+                   portable         => '1',
+                   compress         => '0',
+                   serializer_token => '1',
+                   options          => {},
+
+       They are the same as the Data::Serializer defaults.  The only addi-
+       tional option is:
+
+       _a_s_t_e_x_t
+
+       Setting this to a true value will allow you to pass the "astext=1"
+       param to any request processed by this View.  The results will be the
+       contents of $c->stash passed through Data::Dumper, as opposed to your
+       Serialized object.
+
+       This should be turned off in production environments concerned about
+       security.  It's great for debugging, though!
+
+       OOVVEERRLLOOAADDEEDD MMEETTHHOODDSS
+
+       _p_r_o_c_e_s_s
+
+       Serializes $c->stash to $c->response->output.  If you pass "astext=1"
+       as a param, and the $c->config->{'serializer'}->{'astext'} option is
+       true, then it will return the output of the stash via Data::Dumper.
+
+SSEEEE AALLSSOO
+       Catalyst, Data::Serializer
+
+AAUUTTHHOORR
+       Adam Jacob, "adam@stalecoffee.org"
+
+CCOOPPYYRRIIGGHHTT
+       This program is free software, you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.6                       2005-09-13                     Serializer(3)

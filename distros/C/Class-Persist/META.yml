@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name: Class-Persist
+version: 0.02
+author: ~
+abstract: Persistency framework for objects
+license: perl
+requires:
+  Class::Accessor::Chained: 0
+  Class::Data::Inheritable: 0
+  DBI: 0.01
+  Data::Structure::Util: 0
+  DateTime: 0.21
+  EO: 0.93
+  perl: 5.008
+build_requires:
+  DBD::SQLite: 0
+  File::Find::Rule: 0
+  Test::More: 0
+  Test::Pod: 1.00
+  Test::Simple: 0
+provides:
+  Class::Persist:
+    file: lib/Class/Persist.pm
+    version: 0.02
+  Class::Persist::Base:
+    file: lib/Class/Persist/Base.pm
+    version: 0.01
+  Class::Persist::Deleted:
+    file: lib/Class/Persist/Deleted.pm
+  Class::Persist::Proxy:
+    file: lib/Class/Persist/Proxy.pm
+  Class::Persist::Proxy::Collection:
+    file: lib/Class/Persist/Proxy/Collection.pm
+  Class::Persist::Tracker:
+    file: lib/Class/Persist/Tracker.pm
+generated_by: Module::Build version 0.25

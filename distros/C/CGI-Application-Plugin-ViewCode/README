@@ -1,0 +1,118 @@
+NAME
+    CGI::Application::Plugin::ViewCode - View the source of the running
+    application
+
+SYNOPSIS
+    In your CGI::Application based class
+
+        use CGI::Application::Plugin::ViewCode;
+
+    Then you can view your module's source (or pod) as it's running by
+    changing the url
+
+        ?rm=view_code
+        ?rm=view_code#215
+        ?rm=view_code&pod=0&line_no=0
+        ?rm=view_code&module=CGI-Application
+
+        ?rm=view_pod
+        ?rm=view_pod&module=CGI-Application
+
+INTERFACE
+    This plugin works by adding extra run modes (named `view_code' and `
+    view_pod ') to the application. By calling this run mode you can see the
+    source or POD of the running module (by default) or you can specify
+    which module you would like to view (see SECURITY).
+
+  view_code
+
+    This extra run mode will accept the following arguments in the query
+    string:
+
+    module
+        The name of the module to view. By default it is the module
+        currently being run. Also, since colons (':') aren't simply typed
+        into URL's, you can just substitute '-' for '::'.
+
+            ?rm=view_code?module=My-Base-Class
+
+    highlight
+        Boolean indicates whether syntax highlighting (using
+        Syntax::Highlight::Perl::Improved) is `on' or `off'. By default it
+        is `on'.
+
+    line_no
+        Boolean indicates whether the viewing of line numbers is `on' or
+        `off'. By default it is `on'. It `line_no' is on, you can also
+        specify which line number you want to see by adding an anchor to the
+        link:
+
+            ?rm=view_code#215
+
+        This will take you immediately to line 215 of the current
+        application module.
+
+    pod Boolean indicates whether POD is seen or not. By default it is
+        seen>.
+
+  view_pod
+
+    This extra run mode will accept the following arguments in the query
+    string:
+
+    module
+        The name of the module to view. By default it is the module
+        currently being run. Also, since colons (':') aren't simply typed
+        into URL's, you can just substitute '-' for '::'.
+
+            ?rm=view_pod?module=My-Base-Class
+
+AS A POPUP WINDOW
+    This plugin can be used in conjunction with
+    CGI::Application::Plugin::DevPopup. If we detect that
+    CGI::Application::Plugin::DevPopup is running and turned on, we will
+    create a sub-report that includes the highlighted source code.
+
+    So you can simply do the following:
+
+        BEGIN { $ENV{CAP_DEVPOPUP_EXEC} = 1; } # turn it on for real
+        use CGI::Application::Plugin::DevPopup;
+        use CGI::Application::Plugin::ViewCode;
+
+    Befault, this report will be the same thing produced by `view_code'. If
+    you want this report to include the `view_pod' report, simply set the
+    the `$ENV{CAP_VIEWCODE_POPUP_POD}' to true. You can also turn off the
+    `view_code' report but setting `$ENV{CAP_VIEWCODE_POPUP_CODE}' to false.
+
+        # have the POD report, but not the code in the dev popup window
+        BEGIN { 
+            $ENV{CAP_DEVPOPUP_EXEC} = 1;       # turn it on for real
+            $ENV{CAP_VIEWCODE_POPUP_POD} = 1;  # turn on POD report
+            $ENV{CAP_VIEWCODE_POPUP_CODE} = 0; # turn off code report
+        }
+        use CGI::Application::Plugin::DevPopup;
+        use CGI::Application::Plugin::ViewCode;
+
+SECURITY
+    This plugin is designed to be used for development only. Please do not
+    use it in a production system as it will allow anyone to see the source
+    code for any loaded module. Consider yourself warned.
+
+AUTHOR
+    Michael Peters, `<mpeters@plusthree.com>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-cgi-application-plugin-viewsource@rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Application-Plugin-Vi
+    ewCode. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2005 Michael Peters, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

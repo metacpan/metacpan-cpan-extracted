@@ -1,0 +1,12 @@
+This example requires:
+
+CatalystX::Menu::Suckerfish - used to generate a Superfish navbar from test application's action attributes.
+
+Read the begin action in TestApp/Controller/Root.pm to see how the jQuery wrapper instance
+(JavaScript::Framework::jQuery::Plugin::Superfish) is instantiated so that its assets
+will be inserted into the template (TestApp/root/src/index.tt2).
+
+Run the example with:
+
+perl script/testapp_server.pl 
+

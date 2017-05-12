@@ -1,0 +1,19 @@
+Revision history for Perl extension Crypt::Rot47.
+
+0.01  Sun Nov 1 11:00:00 2008
+    - original version
+
+0.02  Thu Dec 18 22:30:00 2008
+    - fixed a mistake in the POD documentation. rot47() shouldn't be called with the package name as its first argument.
+
+0.03  Fri Dec 19 23:30:00 2008
+    - fixed the $VERSION variable so that it is now correct
+
+0.04  Thu Feb 25 23:30:00 2010
+    - fixed some documentation
+
+0.05  Thu Feb 25 24:30:00 2010
+    - removed world writable permission from directory
+	
+0.06  Wed Sep 19 11:00:00 2012
+    - added an example script and corrected some mistakes in META.yml

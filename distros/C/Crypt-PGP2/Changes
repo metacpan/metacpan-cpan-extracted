@@ -1,0 +1,8 @@
+Revision history for Perl extension Crypt::PGP2.
+
+0.01  Mon Jan 22 04:12:54 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Crypt::PGP2
+
+0.02 2001 01 22
+	- updated module interface

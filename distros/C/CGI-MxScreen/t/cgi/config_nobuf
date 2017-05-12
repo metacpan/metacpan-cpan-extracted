@@ -1,0 +1,28 @@
+: # feed this into perl
+	eval 'exec perl -S $0 ${1+"$@"}'
+		if $running_under_some_shell;
+
+#
+# $Id: config_nobuf,v 0.1 2001/04/22 17:57:04 ram Exp $
+#
+#  Copyright (c) 1998-2001, Raphael Manfredi
+#  Copyright (c) 2000-2001, Christophe Dehaudt
+#  
+#  You may redistribute only under the terms of the Artistic License,
+#  as specified in the README file that comes with the distribution.
+#
+# HISTORY
+# $Log: config_nobuf,v $
+# Revision 0.1  2001/04/22 17:57:04  ram
+# Baseline for first Alpha release.
+#
+# $EndLog$
+#
+
+use CGI::MxScreen::Config ({
+	-FILE				=> "./mx-config.pl",
+	-mx_buffer_stdout	=> 0,
+});
+
+do "./basic";
+

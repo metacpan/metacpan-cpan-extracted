@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Crypt-GCM
+version:             0.02
+abstract:            Galois/Counter Mode (GCM)
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Crypt::Rijndael:               0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Hiroyuki OYAMA <oyama@module.jp>

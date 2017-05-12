@@ -1,0 +1,32 @@
+---
+abstract: "Perl interface to Cassandra's native protocol"
+author:
+  - 'Tom van der Woerdt <tvdw@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  Compress::LZ4: '0.20'
+  Compress::Snappy: '0.23'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cassandra-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.36'
+  EV: '4.0'
+  Net::SSLeay: '1.63'
+  Promises: '0.94'
+  Ref::Util: '0.008'
+  Sub::Current: '0.02'
+  perl: '5.01'
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

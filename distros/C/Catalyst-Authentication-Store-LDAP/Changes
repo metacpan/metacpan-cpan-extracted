@@ -1,0 +1,138 @@
+1.016 11 Februrary 2016
+  - Document how to limit the attributes returned from the LDAP search
+  - Add persist_in_session config option to allow storing of user and its
+    roles in the session without hitting the LDAP store on each request
+  - fix use_roles enabled if explicitly disabled
+
+1.015 20 February 2015
+  - Escape special characters in user/role names
+  - Use the stored user credentials to look up roles
+  - Split credential checking into a separate method from generic binding
+
+1.014 26 April 2013
+  - Don't fall back to unauthenticated bind when authenticating
+
+1.013  9 January 2013
+  - fix for https://rt.cpan.org/Ticket/Display.html?id=81908 security hole.
+
+1.012  5 October 2010
+  - add methods conforming to the Catalyst::Authentication::User API
+    as required here:
+    http://search.cpan.org/dist/Catalyst-Plugin-Authentication/lib/Catalyst/Plugin/Authentication/Internals.pod#USER_METHODS
+    Nudging provided via RT https://rt.cpan.org/Ticket/Display.html?id=60793
+  - add documentation for Active Directory at suggestion of Adam Wohld
+  - Make ->can work for AUTOLOADED $user methods
+
+1.011  7 July 2010
+  - fix t/05-user_attributes.t to skip correct number of tests if
+    Catalyst::Model::LDAP is not installed.
+
+1.010  6 July 2010
+  - Make AUTOLOAD method work for ->dn by generically calling has_attribute
+    which has a special case for it.
+  - Unify the handling of the ->username method between AUTOLOAD and
+    has_attribute by special casing it more generically in has_attribute.
+    Both RT#57610, patch and tests by Jason Fried
+
+1.009  15 May 2010
+   - Fix pod for get_user() and from_session() in Backend.pm, adding
+     the missing $c param. Pass $c in from_session() through to get_user().
+     Reported in https://rt.cpan.org/Ticket/Display.html?id=56983 with
+     patch from Bjørn-Olav Strand.
+
+1.008  02 April 2010
+   - Allow for multiple uid values on a User object. See RT
+     https://rt.cpan.org/Ticket/Display.html?id=51505
+     and patch from Andrew Kirkpatrick.
+
+1.007  19 Mar 2010
+   - Store the user password for the ldap_connection method in an inside
+     out hash rather than a closure so that the user object can be serialized
+     with Storable as people are putting them in the session (RT#53279)
+
+1.006  11 Dec 2009
+   - Pass $c along to find_user method so overridden user_class users can
+     get at models (or whatever crazy things they might do) (gphat)
+   - Add an ldap_connection method to the user class, which will return
+     an LDAP connection bound as the user who authenticated.
+   - Trim trailing whitespace from submitted usernames otherwise we generate
+     bad LDAP queries.
+
+0.1005  30 April 2009
+   - Stop throwing an exception when the lookup_user method fails
+      to find a user and instead return undef. (t0m)
+   - Add tests for above (t0m)
+   - Change documentation which still refers to the old ::Plugin:: style
+     auth system to use ->authenticate instead of ->login, and not say that
+     you need to do things manually to have multiple stores. (t0m)
+
+0.1004  21 Oct 2008
+   - Add the ability to have the user inflated into a custom
+     user class with the user_class option (t0m)
+   - Add the ability for role lookup to be performed within
+     the same (user) bind context that the user's password is
+     checked in (t0m)
+
+0.1003  10 Sept 2008
+    - get entries in array context rather than scalar context, 
+      allowing for multiple values. patch by scpham.
+    - lc() to compare Net::LDAP results with supplied $id
+      bug reported via RT #39113
+
+
+0.1002  9 July 2008
+    - tests updated to use Net::LDAP::Server::Test 0.03
+
+
+0.1001  9 April 2008
+    - matthewr pointed out that the SYNOPSIS 'use Catalyst' line is wrong.
+    - imacat reported that t/03-entry was failing when Catalyst::Model::LDAP was
+      not installed. Fixed RT# 34777.
+
+
+0.1000  4 Feb 2008
+    - forked from Catalyst::Plugin::Authentication::Store::LDAP and name changed 
+      to Catalyst::Authentication::Store::LDAP
+    - tests now use Net::LDAP::Server::Test instead of relying on openldap.org
+    - changed release date for 0.0600
+    - added AD config suggestions from matija@serverflow.com
+    - bumped req base Auth package to 0.10003
+    - lookup_user() now throws an exception if there is more than one entry returned
+      from a LDAP search
+    - added new user_search_filter config option to filter out multiple entries on
+      Perl side
+
+
+0.0600  karman 18 Oct 2007 [was: omega Thu Aug 09 09:22:00 CET 2007]
+    - Someone had put some 0.052 version out, need to bump past that
+    - Add realms API support to match newest C::P::Authentication API. (karman)
+    - Add POD tests. (karman)
+    
+0.06 omega Thu Aug 09 09:00:00 CET 2007
+    - Added support for entry_class in the same way that Catalyst::Model::LDAP
+      supports it, allowing one to override what class is returned from
+      $c->user->ldap_entry, and thus allowing one to add methods to the user
+      object
+      
+0.05
+    - Added support for multiple identifiers.
+
+0.04 adam Tue Mar 21 15:31:57 PST 2006
+    - Fixed rt.cpan.org #18250, sample YAML config incorrectly using arrays
+    - Added some error checking around whether or not we have been properly
+      configured.
+
+0.03 adam Fri Feb 17 09:51:36 PST 2006
+    - Gavin Henry's documentation patch for YAML configuration
+
+0.02 adam Fri Feb 10 14:10:23 PST 2006
+    - Now throws an exception if the initial bind fails
+    - Changed the default role_filter from (member=%s) to (memberUid=%s)
+    - Fixed bug in Backend->lookup_user that was not properly handling
+      when a user was not found in the backing store at all.
+
+0.01 adam Thu Feb  8 14:28:18 2006  
+    - initial revision
+    - supports authentication
+    - supports roles
+

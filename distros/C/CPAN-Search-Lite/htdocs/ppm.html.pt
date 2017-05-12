@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+  <title>Uso de ppm</title>
+  </head>
+
+  <body>
+<br><div class=t4>Repositórios PPM</div>
+Consulte a documentação que vem com o
+<a href="http://www.activestate.com/">ActivePerl</a>
+para informações gerais sobre o ppm. Os pacotes ppm
+que aqui aparecem podem ser instalados com o utilitário ppm.
+Para os pacotes ActivePerl, deve poder instalar usando
+ <code>install Nome-Pacote</code> a partir do utilitário ppm;
+para os outros pacotes, é provável que tenha de adicionar a localização
+indicada na sua lista de repositórios:
+</p>
+<ul>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer</b>,
+para o <i>repositório uwinnipeg Perl 5.6</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58</b> (ActivePerl Builds &lt; 819) /
+<b>http://theoryx5.uwinnipeg.ca/ppms/</b> (ActivePerl Builds &gt;= 819),  
+para o <i>repositório uwinnipeg Perl 5.8</i></li>
+</ul>
+<p>
+Tenha a certeza de que usa um repositório apropriado para a sua versão
+de Perl (repositórios 5.6 para ActivePerl 6xx, e repositórios
+5.8 para ActivePerl 8xx). Também, note que o nome do pacote que aqui aparece,
+baseado no nome da distribuição CPAN, é o que deve ser usado quando instala
+um pacote;  este corresponde, mas nem sempre, ao nome do módulo principal do 
+pacote.
+</p>
+</body></html>

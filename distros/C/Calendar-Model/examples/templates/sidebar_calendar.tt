@@ -1,0 +1,104 @@
+<html>
+
+<head>
+<title>Wordpress style sidebar calendar</title>
+<style>
+
+/* Sidebar
+---------------------------
+*/
+#sidebar {
+	float: left;
+	font-size: 11px;
+	text-align: left;
+}
+#sidebar h3 {
+	font-size: 12px;
+	font-weight: bold;
+	margin: 20px 0 5px 0;
+}
+#sidebar h3 a {
+	color: #d4e7f7;
+}
+#sidebar ul {
+	list-style: none;
+}
+#sidebar ul ul {
+	margin: 5px 0 0 10px;
+}
+#sidebar ul ul ul {
+	margin: 5px 0 0 10px;
+}
+#sidebar ul li {
+	padding: 0 0 5px 0;
+}
+#author h3 {
+	margin: 5px 0 5px 0;
+}
+#sidebar li.widget {
+	overflow: hidden;
+	word-wrap: break-word;
+}
+
+
+
+/* Widgets */
+#wp-calendar {
+	padding: 10px 0 0 0;
+}
+#wp-calendar caption {
+	text-align: left;
+	padding: 0 0 3px 0;
+}
+#wp-calendar tr th,
+#wp-calendar tr td {
+	padding: 0 4px 0 0 ;
+	text-align: right;
+}
+#wp-calendar td a {
+	font-weight: bold;
+}
+#wp-calendar td a:hover {
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div id="sidebar">
+<div id="calendar_wrap"><table id="wp-calendar">
+	<caption>[% cal.month_name() %] [% cal.year() %]</caption>
+	<thead>
+	<tr>
+        [% FOREACH column IN cal.columns() %]
+		<th title="[% column %]" scope="col">[% column.substr(0,1) %]</th>
+        [% END %]
+	</tr>
+	</thead>
+
+	<tfoot>
+	<tr>
+		<td id="prev" colspan="3"><a title="View posts for [% cal.month_name() %] [% cal.year() %]" href="/[% cal.year() %]/[% cal.month() %]/"> &lt; [% cal.month_name('previous') %]</a></td>
+		<td class="pad">&nbsp;</td>
+		<td class="pad" id="next" colspan="3">&nbsp;</td>
+	</tr>
+	</tfoot>
+
+	<tbody>
+        [% FOREACH week IN cal.weeks %]
+	<tr>
+        [% FOREACH day IN week %]
+          [% IF day.mm != cal.month;%]
+            <td class="pad">&nbsp;</td>
+          [% ELSE %]
+            <td>[% day.dd %]</td>
+          [% END %]
+		<td></td>
+        [% END %]
+	</tr>
+        [% END %]
+	</tbody>
+	</table></div></div>
+</body>
+
+</html>

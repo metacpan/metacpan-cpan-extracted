@@ -1,0 +1,52 @@
+<div id="crud-menu">
+[% PROCESS crud/crud_search.tt %]
+[% IF (object || CrudLinks.size || RelsToShow.size) %]
+ <ul id="crud-links">
+ [% IF object %]
+  <li class="item first">You are [% c.action.name.replace('(e|_\w+)$') %]ing:</li>
+  <li class="item main"><a id="main-link" 
+    onclick="return false" class="selected" 
+    href="#main">[% ThisObjectName %]:<br/>[% object.unique_value %]</a></li>
+ [% END %]
+ [% FOREACH link IN CrudLinks %]
+  <li class="item"><a href="[% link.href %]">[% link.text %]</a></li>
+ [% END %]
+ [% IF RelsToShow.size %]
+  <li class="item first">Related</li>
+ [% FOREACH r IN RelsToShow %]
+  <li class="item"><a id="[% r.tabLabel %]Tab-link" 
+   href="#[% r.tabLabel %]Tab" onclick="return false">[% r.thisLabel %]</a></li>
+ [% END %]
+ [% END # RelsToShow.size %]
+ [% IF RelsCreateLinks.size %]
+  <li class="item first">Create a new [% ThisObjectName %]</li>
+  [% SET urlbase = c.uri_for('/' _ c.controller.path_prefix _ '/create');
+     FOREACH r IN RelsCreateLinks;
+       USE create_url = url(urlbase, r.params );  %]
+       <li><a href="[% create_url %]">for [% r.text %]</a></li>
+  [% END %]
+ [% END # RelsCreateLinks.size %] </ul>
+[% END # if any links %]
+</div>
+
+[% IF object %]
+<script type="text/javascript">
+/* <![CDATA[ */
+ YAHOO.util.Event.on('crud-links', 'click', YAHOO.crud.handle_crud_link_click);
+ var bookmarkedTabViewState = YAHOO.util.History.getBookmarkedState("tabview");
+ var initialTabViewState = bookmarkedTabViewState || "main";
+ //YAHOO.crud.log("history state = " + initialTabViewState);
+ if (initialTabViewState != 'main') {
+    //YAHOO.crud.log("set LOADGRID = " + initialTabViewState);
+    YAHOO.crud.LOADGRID = initialTabViewState;
+ }
+ YAHOO.util.History.register("tabview", initialTabViewState, function (state) {
+    // This is called after calling YAHOO.util.History.navigate, or after the user
+    // has trigerred the back/forward button. We cannot discriminate between
+    // these two situations.
+    YAHOO.crud.set_active_tab(state);
+ });
+ YAHOO.crud.HISTORY.push(YAHOO.crud.init_tabview_history);
+/* ]]> */
+</script>
+[% END %]

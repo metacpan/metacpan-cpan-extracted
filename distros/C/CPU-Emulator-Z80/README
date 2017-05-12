@@ -1,0 +1,22 @@
+This module implements a Z80 emulator.
+
+To install, do the usual:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+You may use, modify and distribute most of the distribution under
+the terms of either the GNU General Public Licence version 2 or
+the Artistic Licence.  It's up to you which one you use.  The full
+text of the licences can be found in the files GPL2.txt and
+ARTISTIC.txt, respectively.
+
+Files consisting solely of documentation are licenced under the
+Creative Commons Attribution-Share Alike 2.0 UK: England & Wales
+Licence.
+
+The files in t/fuse-tests are licenced under the GNU
+GPL version 2 or higher, as they are derived directly from the
+tests of the FUSE project.  Please see the *README* and COPYING
+files in that directory for details.

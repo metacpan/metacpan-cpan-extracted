@@ -1,0 +1,109 @@
+0.27	- 11 Aug 2016, H.Merijn Brand
+    * Sync with 5.25.3 - add PERL_OP_PARENT
+
+0.26	- 10 May 2016, H.Merijn Brand
+    * Some flags are special and can have embedded quotation
+    * Add windos 5.23.5/cl config
+    * It's 2016
+    * Sync up with 5.24.0 - add SILENT_NO_TAINT_SUPPORT
+
+0.25	- 18 Nov 2015, H.Merijn Brand
+    * Travis will work on a git checkout *with* xt
+    * Add PERL_COPY_ON_WRITE (renamed from PERL_NEW_COPY_ON_WRITE)
+    * Add tests for 5.20.2 and 5.22.0
+    * Add CONTRIBUTING.md
+    * Add USE_NO_REGISTRY (WIN32_NO_REGISTRY) for 5.23.x
+    * Add Strawberry 5.22.0.1 configuration test
+
+0.24	- 16 Apr 2015, H.Merijn Brand
+    * Typo in README
+    * Add USE_QUADMATH
+    * Auto-check against core
+
+0.23	- 11 Feb 2015, H.Merijn Brand
+    * Update copyright to 2015
+    * Add summary tests
+    * Remove perl recommendation from META as it breaks cpan clients
+    * Move repo to github
+
+0.22	- 02 Aug 2014, H.Merijn Brand
+    * Fixed parsing locally applied patches (passed only first line)
+    * Fixed parsing compile-time options (passed only first line)
+    * Some settings run unquoted to end-of-line
+    * Not all key-value pairs were separated by ',' in older perl
+    * Small typo in test comment
+
+0.21	- 01 Aug 2014, H.Merijn Brand
+    * Add tests for each major distribution since 5.6.2
+    * Better detect build times
+    * Sync with 5.20.1
+
+0.20	- 19 Feb 2014, H.Merijn Brand
+    * Update copyright to 2014
+    * Typo fix in comment (RT#92469)
+    * Sync up with blead
+
+0.19	- 30 Jul 2013, H.Merijn Brand
+    * TEST_REQUIRES was added in 6.63_03 (RT#85811)
+    * Removed duplicate entry (no visible change)
+
+0.18	- 24 May 2013, H.Merijn Brand
+    * Fixed typo in META (Chorny)
+    * Support for using uninstalled Test::NoWarnings (RT#82386)
+    * Sync up with perl-5.18.0 (and 5.19.0)
+
+0.17	- 10 Feb 2013, H.Merijn Brand
+    * Deal with spaces in patch descriptions
+
+0.16	- 25 Jan 2013, H.Merijn Brand
+    * Do not shell out on 5.14.0 and up if perl provides internals (Nicholas)
+    * Update copyright to 2013
+    * Update list of known symbols to 5.17.8
+    * Prevent tar paxheaders (http://www.perlmonks.org/?node_id=1004571)
+
+0.15	- 07 Jun 2012, H.Merijn Brand
+    * Update copyright to 2012
+    * Prepare for CORE inclusion (BinGOs)
+
+0.14	- 07 Sep 2011, H.Merijn Brand
+    * Upped copyright to 2011
+    * NAME / DISTNAME in Makefile.PL
+
+0.13	- 07 Sep 2011, H.Merijn Brand
+    * Some spelling fixes
+    * More cross-checks for META data
+
+0.12	- 16 Mar 2010, H.Merijn Brand
+    * YAML dropped to spec 1.0 (RT#55614)
+
+0.11	- 15 Mar 2010, H.Merijn Brand
+    * Upped copyright to 2010
+    * osname in {build} can be different from {config} (OpenBSD vs openbsd)
+    * Add USE_ATTRIBUTES_FOR_PERLIO to the list of -V's compile-time options.
+    * Add USE_PERL_ATOF to the list of -V's compile-time options.
+
+0.10	- 24 Sep 2009, H.Merijn Brand
+    * Add PERL_DISABLE_PMC to the list of -V's compile-time options.
+    * Add PERL_IS_MINIPERL to the list of -V's compile-time options.
+    * pod fix (Jim Cromie)
+
+0.05	- 01 Jul 2009, H.Merijn Brand
+    * 0.04 was shipped with 0.05 as $VERSION. Sorry
+
+0.04	- 01 Jul 2009, H.Merijn Brand
+    * Default for summary is myconfig
+    * Added signature ()
+    * Added @EXPORT_OK and EXPORT_TAGS
+
+0.03	- 05 Apr 2009, H.Merijn Brand
+    * Reconstruct version from perl-v output (dagolden)
+
+0.02	- 30 Mar 2009, H.Merijn Brand
+    * Added plv2hash ()
+    * Documentation
+    * Added all (new) version related config entries, including git
+    * Added a derived section
+    * Added summary ()
+
+0.01	- 29 Mar 2009, H.Merijn Brand
+    * Initial release

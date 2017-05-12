@@ -1,0 +1,43 @@
+Revision history for Perl extension Catalyst::Plugin::I18N.
+
+0.10  Mon Jun 14 2010
+        - Add Installed Languages feature by Ton Voon and Chris Dolan
+          (RT #25050)
+        - Add dependency and tests for i-default fallback feature in
+          Locale::Maketext::Simple 0.19
+
+0.09  Sat Apr 18 2009
+        - switch NEXT out for MRO::Compat
+
+0.08  Wed Aug 06 2008
+        - update dependency on I18N::LangTags
+
+0.07  Mon Jan 07 2008
+        - allow overriding of options sent to Locale::Maketext::Simple (RT #32132)
+        - include a draft manual from a while back
+        - Makefile.PL updates
+
+0.06  Tue Jul 17 2007
+        - re-org distro
+        - switch to Module::Install
+        - added language_tag() method
+        - pod fixes
+
+0.05  Sun Jan 09 2006
+        - added language() method (Daisuke Murase)
+
+0.04  Wed Nov 30 2005
+        - added alias loc to localize
+        - added Decode to Locale::Maketext::Simple import args
+        - improved detecting of user locale
+        - updated dependencies
+
+0.03  Mon Nov 28 14:42:00 2005
+        - added tests
+        - doc fix
+
+0.02  Fri Apr 15 16:17:00 2005
+        - added doc tests.
+
+0.01  Fri Jan 28 22:00:00 2005
+        - first release

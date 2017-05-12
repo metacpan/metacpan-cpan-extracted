@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings FATAL => 'all';
+use autodie;
+
+chomp(my $OLD = qx(grep '^[0-9]' Changes | head -1 | awk '{print \$1}'));
+
+my @parts = map { m/(\d{1,6})/g } split /\./, $OLD;
+my @length = map { length } @parts;
+
+my %bump_part = (major => 0, minor => 1, bugfix => 1);
+
+my $bump_this = 
+  $bump_part{$ARGV[0]||'bugfix'}
+    // die "no idea which part to bump - $ARGV[0] means nothing to me";
+
+my @new_parts = @parts;
+
+$new_parts[$bump_this]++;
+
+my $NEW = sprintf(
+    join('.', map { '%0' . $_ . 'i' } @length),
+    #'%i.%03i%03i',
+    @new_parts);
+
+my @PM_FILES = ( 'lib/Catalyst/Manual.pm' );
+
+foreach my $filename (@PM_FILES) {
+  warn "Bumping $OLD -> $NEW in $filename\n";
+
+  my $file = do { local (@ARGV, $/) = ($filename); <> };
+
+  $file =~ s/(?<=\$VERSION = ')${\quotemeta $OLD}/${NEW}/;
+
+  open my $out, '>', $filename;
+
+  print $out $file;
+}

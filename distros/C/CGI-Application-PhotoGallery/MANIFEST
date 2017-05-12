@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/CGI/Application/PhotoGallery.pm
+lib/CGI/Application/PhotoGallery/GD.pm
+lib/CGI/Application/PhotoGallery/Imager.pm
+lib/CGI/Application/PhotoGallery/Magick.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+share/error.tmpl
+share/photos_index.tmpl
+share/photos_single.tmpl
+t/01-use.t
+t/98-pod_coverage.t
+t/99-pod.t

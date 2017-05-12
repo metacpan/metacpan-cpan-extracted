@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#
+# Example script to strip SSHv1 (replaced by SSHv2 for over a decade as
+# of 2010) public keys from an authorized_keys file. Pipe to spong (part
+# of moreutils) or update the script to operate in-place to actually
+# update the authorized_keys file.
+
+use strict;
+use warnings;
+
+use Config::OpenSSH::Authkey ();
+my $ak = Config::OpenSSH::Authkey->new();
+
+my $file = shift || die "Usage: $0 auth_key-file\n";
+
+$ak->file($file);
+
+while ( my $entry = $ak->iterate ) {
+  if ( $entry->can('protocol') and $entry->protocol == 1 ) {
+    warn "notice: skipping SSHv1 key at $file line $.\n";
+    next;
+  }
+
+  print $entry->as_string, "\n";
+}

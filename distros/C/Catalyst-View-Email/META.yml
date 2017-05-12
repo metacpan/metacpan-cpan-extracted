@@ -1,0 +1,41 @@
+---
+abstract: 'Send Email from Catalyst'
+author:
+  - 'J. Shirley <jshirley@gmail.com>'
+  - 'J. Shirley <jshirley@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-Email
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Authen::SASL: '2.13'
+  Catalyst: '5.7'
+  Email::MIME: '1.859'
+  Email::MIME::Creator: '1.455'
+  Email::Sender::Simple: '0.100110'
+  MIME::Base64: '3.08'
+  Module::Runtime: '0.014'
+  Moose: '0.93'
+  Test::More: '0.88'
+  parent: '0.223'
+resources:
+  IRC: irc://irc.perl.org/#catalyst
+  Mailing_list: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
+  bugtracker: https://github.com/dhoss/catalyst-view-email/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dhoss/catalyst-view-email
+version: '0.36'

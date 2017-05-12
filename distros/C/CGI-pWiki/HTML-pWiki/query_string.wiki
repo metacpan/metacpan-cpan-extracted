@@ -1,0 +1,12 @@
+<wiki title="Query Strings">
+
+Each location can be extended by one of the [query_string]s :
+
+| query | method | display |
+| ?error | get | error message |
+| ?diff | get | context diff since last commit |
+| ?search=pattern | get | search the database |
+| ?edit | post | edit form |
+| ?save | post | save form |
+
+The post events require user authentication at most sites.

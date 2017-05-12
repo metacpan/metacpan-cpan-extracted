@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+buffy
+demo_buffy.pl
+demo_simple.pl
+lib/Acme/Buffy.pm
+t/buffy.t

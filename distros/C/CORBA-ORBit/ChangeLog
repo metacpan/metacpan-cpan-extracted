@@ -1,0 +1,190 @@
+Wed Oct 25 03:51:29 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* ORBit.pm up version to 0.4.3.
+
+Wed Oct 25 03:46:54 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* server.c (call_implementation): Account for the
+	fact that giop_send_reply_buffer_use() may return
+	NULL if the connection to the client has already
+	been closed.
+
+	* ORBit/mapping.pod: Fix to be a proper manpage, if
+	worse HTML.
+
+Wed Oct 25 03:23:29 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* README MANIFEST ORBit/mapping.pod: Check in the
+	mapping.pod document originally from CORBA::MICO
+	with ORBit revisions from my web site.
+
+	* ORBit.xs (CORBA): Apply patch from Paolo Molaro
+	to fix memory leak of argv strings recognized
+	by ORBit.
+
+Tue Oct 10 15:09:13 2000    <otaylor@redhat.com>
+
+	* ORBit.xs (MODULE): Fix typo reported davide.rossetti.
+
+Tue Jul 11 14:38:24 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* demarshal.c (get_sequence): Fix problem with the
+	length of sequences of octets and chars. (Bug
+	found by Guillaume Schmid.)
+
+Sat Jul  8 15:04:22 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* ORBit.pm README: Up version to 0.4.2
+
+	* idl.c (tree_post_func, do_type_dcl): Register typecodes
+	for all named types, not just named types that happen
+	to be referenced elsewhere.
+
+	* idl.c (porbit_parse_idl_file): Remvoing -D__ORBIT_IDL__
+	since with it, the GNOME IDL files break badly
+	by using #pragma inhibit push to avoid compiling bits
+	that are predefined in C libraries.
+
+	* idl.c (porbit_parse_idl_file): Enable codefrag
+	syntax, since GNORBA uses it.
+
+	* interfaces.c (load_ancestor): call ensure_iface_repository,
+	before trying to access iface repository. Also, try
+	to produce a bit more graceful warnings and death
+	when things aren't found.
+
+Sat May  6 11:55:31 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* ORBit.pm README: Released 0.4.1
+
+Sun Apr 16 14:58:20 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* ORBit.xs (CORBA): Copy strings from argv array when 
+	passing to ORBit for initialization. (The code to
+	recreate the array afterwords was reading uninitalized
+	memory.)
+
+Thu Apr 13 11:52:24 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* TODO: Add note about a test suite.
+
+Thu Apr 13 11:48:24 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* README (CORBA): Updated test output to correspond to current
+	client/server pair.
+
+Sat Mar 25 14:47:54 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* Released 0.4.0
+
+Fri Mar 24 12:41:54 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* errors.c (porbit_system_except): Deal with the fact
+	that ORBit uses IDL:CORBA in its system exception names instead
+	of IDL:omg.org/CORBA.
+
+	* demarshal.c (porbit_get_exception): Hack around incorrect
+	marshalling of system exceptions by ORBit.
+
+	* marshal.c (put_objref): Check outgoing object references
+	against the typecode. There are some problems here if
+	the object we are marshalling is not a local object and
+	we don't have compete type information. Perhaps this
+	check should only be for local object references?
+
+	* server.c: Add more detailed information in warning
+	messages about the location where errors occur.
+
+Wed Mar 22 15:44:51 2000  Owen Taylor  <otaylor@redhat.com>
+
+        * Released 0.3.9
+	
+	* ORBit.pm: Temporarily disable dereferencing 
+	ORB, POA, POAManager, since ORBit is broken when 
+	doing so.
+
+	* server client: Add test for creating and destroying servants
+	on the fly.
+
+	* ORBit.xs server.[ch]: Remove pin table, which was
+	no longer used for useful purposes. (We were already
+	storing the information in the servant.) Implicitely
+	reference active servants so it isn't necessary for
+	for applications to keep references to such servants
+	themselves.
+
+Tue Mar 14 11:16:35 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* idl.c (porbit_parse_idl_file): Define __ORBIT_IDL__
+	when parsing, to allow people to #define around 
+	libIDL pecularities in IDL files. (Michael Meeks)
+
+	* idl.c (do_operation): Advance properly to the next
+	exception when iterating over exceptions. (Pointed
+	out by Jason Tackaberry.)
+
+Sun Jan  2 19:52:13 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* Released 0.3.0
+
+	* Account.idl: Fix stupid left-in debugging change.
+
+	* README (CORBA): Up version number. Add more information
+	about ORBit dependencies.
+
+Tue Jan  4 03:19:59 2000  Owen Taylor  <otaylor@redhat.com>
+
+	* demarshal.c (porbit_get_exception): Fix bug in
+	demarshalling system exceptions.
+
+	* server.c (porbit_call_method): Fix leak of stack space
+	for operations returning void.
+
+	* server.c (call_implementation): Add a SAVETMPS/FREETMPS
+	around method calls, otherwise we leak like a sieve.
+	(Could also avoid mortalizing outside of our method calls,
+	I think.)
+
+	* ORBit.pm (import): Handle absolute pathnames correctly.
+
+Tue Dec  7 13:56:33 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* idl.c (porbit_parse_idl_file): Add the IDLF_TYPECODES
+	flag so that typecodes are understood.
+	(From Michael Meeks <mmeeks@gnu.org>)
+
+Fri Oct  8 01:08:26 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* Released 0.2.0.
+
+	* porbit-perl.h (PL_sv_undef): Add additional compatibility
+	defines.
+
+Mon Sep 27 23:31:41 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* ORBit.xs: Made orb->run()/shutdown(), etc, use
+	  g_main.
+
+	* idl.c marshal.c demarshal.c: Add support for fixed.
+
+Tue Sep 21 22:53:40 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* idl.c: Add names into struct/enum/except/etc. typecodes
+	because the marshalling code in ORBit expects them
+	(spec says that "" would be valid, so we could use
+	that, but NULL segfaults).
+
+	* marshal.c demarshal.c ORBit.pm: Add support for Anys.
+
+	* ORBit.xs interfaces.c: Provide an interface for
+	creating TypeCodes.
+
+	* client.c: Split stubs into a separate file.
+	
+	* interfaces.c server.c: Add support for oneway
+	operations.
+
+Sun Sep 19 04:24:13 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* Started ChangeLog in preparation for a 0.1.0 release.
+

@@ -1,0 +1,466 @@
+# PODNAME: Config::Model::models::LCDd
+# ABSTRACT:  Configuration class LCDd
+=encoding utf8
+
+=head1 NAME
+
+Config::Model::models::LCDd - Configuration class LCDd
+
+=head1 DESCRIPTION
+
+Configuration classes used by L<Config::Model>
+
+
+
+Model information was extracted from /etc/LCDd.conf
+
+=head1 Elements
+
+=head2 server
+
+I<< Optional. Type node of class L<LCDd::server|Config::Model::models::LCDd::server> .  >> 
+
+=head2 CFontz
+
+I<< Optional. Type warped_node of class L<LCDd::CFontz|Config::Model::models::LCDd::CFontz> .  >> 
+
+=head2 CFontzPacket
+
+I<< Optional. Type warped_node of class L<LCDd::CFontzPacket|Config::Model::models::LCDd::CFontzPacket> .  >> 
+
+=head2 CwLnx
+
+I<< Optional. Type warped_node of class L<LCDd::CwLnx|Config::Model::models::LCDd::CwLnx> .  >> 
+
+=head2 EyeboxOne
+
+I<< Optional. Type warped_node of class L<LCDd::EyeboxOne|Config::Model::models::LCDd::EyeboxOne> .  >> 
+
+=head2 IOWarrior
+
+I<< Optional. Type warped_node of class L<LCDd::IOWarrior|Config::Model::models::LCDd::IOWarrior> .  >> 
+
+=head2 IrMan
+
+I<< Optional. Type warped_node of class L<LCDd::IrMan|Config::Model::models::LCDd::IrMan> .  >> 
+
+=head2 MD8800
+
+I<< Optional. Type warped_node of class L<LCDd::MD8800|Config::Model::models::LCDd::MD8800> .  >> 
+
+=head2 MtxOrb
+
+I<< Optional. Type warped_node of class L<LCDd::MtxOrb|Config::Model::models::LCDd::MtxOrb> .  >> 
+
+=head2 NoritakeVFD
+
+I<< Optional. Type warped_node of class L<LCDd::NoritakeVFD|Config::Model::models::LCDd::NoritakeVFD> .  >> 
+
+=head2 SureElec
+
+I<< Optional. Type warped_node of class L<LCDd::SureElec|Config::Model::models::LCDd::SureElec> .  >> 
+
+=head2 bayrad
+
+I<< Optional. Type warped_node of class L<LCDd::bayrad|Config::Model::models::LCDd::bayrad> .  >> 
+
+=head2 curses
+
+I<< Optional. Type warped_node of class L<LCDd::curses|Config::Model::models::LCDd::curses> .  >> 
+
+=head2 ea65
+
+I<< Optional. Type warped_node of class L<LCDd::ea65|Config::Model::models::LCDd::ea65> .  >> 
+
+=head2 g15
+
+I<< Optional. Type warped_node of class L<LCDd::g15|Config::Model::models::LCDd::g15> .  >> 
+
+=head2 glcd
+
+I<< Optional. Type warped_node of class L<LCDd::glcd|Config::Model::models::LCDd::glcd> .  >> 
+
+=head2 glcdlib
+
+I<< Optional. Type warped_node of class L<LCDd::glcdlib|Config::Model::models::LCDd::glcdlib> .  >> 
+
+=head2 glk
+
+I<< Optional. Type warped_node of class L<LCDd::glk|Config::Model::models::LCDd::glk> .  >> 
+
+=head2 hd44780
+
+I<< Optional. Type warped_node of class L<LCDd::hd44780|Config::Model::models::LCDd::hd44780> .  >> 
+
+=head2 icp_a106
+
+I<< Optional. Type warped_node of class L<LCDd::icp_a106|Config::Model::models::LCDd::icp_a106> .  >> 
+
+=head2 imon
+
+I<< Optional. Type warped_node of class L<LCDd::imon|Config::Model::models::LCDd::imon> .  >> 
+
+=head2 imonlcd
+
+I<< Optional. Type warped_node of class L<LCDd::imonlcd|Config::Model::models::LCDd::imonlcd> .  >> 
+
+=head2 irtrans
+
+I<< Optional. Type warped_node of class L<LCDd::irtrans|Config::Model::models::LCDd::irtrans> .  >> 
+
+=head2 joy
+
+I<< Optional. Type warped_node of class L<LCDd::joy|Config::Model::models::LCDd::joy> .  >> 
+
+=head2 lb216
+
+I<< Optional. Type warped_node of class L<LCDd::lb216|Config::Model::models::LCDd::lb216> .  >> 
+
+=head2 lcdm001
+
+I<< Optional. Type warped_node of class L<LCDd::lcdm001|Config::Model::models::LCDd::lcdm001> .  >> 
+
+=head2 lcterm
+
+I<< Optional. Type warped_node of class L<LCDd::lcterm|Config::Model::models::LCDd::lcterm> .  >> 
+
+=head2 lirc
+
+I<< Optional. Type warped_node of class L<LCDd::lirc|Config::Model::models::LCDd::lirc> .  >> 
+
+=head2 lis
+
+I<< Optional. Type warped_node of class L<LCDd::lis|Config::Model::models::LCDd::lis> .  >> 
+
+=head2 mdm166a
+
+I<< Optional. Type warped_node of class L<LCDd::mdm166a|Config::Model::models::LCDd::mdm166a> .  >> 
+
+=head2 menu
+
+I<< Optional. Type node of class L<LCDd::menu|Config::Model::models::LCDd::menu> .  >> 
+
+=head2 ms6931
+
+I<< Optional. Type warped_node of class L<LCDd::ms6931|Config::Model::models::LCDd::ms6931> .  >> 
+
+=head2 mtc_s16209x
+
+I<< Optional. Type warped_node of class L<LCDd::mtc_s16209x|Config::Model::models::LCDd::mtc_s16209x> .  >> 
+
+=head2 mx5000
+
+I<< Optional. Type warped_node of class L<LCDd::mx5000|Config::Model::models::LCDd::mx5000> .  >> 
+
+=head2 picolcd
+
+I<< Optional. Type warped_node of class L<LCDd::picolcd|Config::Model::models::LCDd::picolcd> .  >> 
+
+=head2 pyramid
+
+I<< Optional. Type warped_node of class L<LCDd::pyramid|Config::Model::models::LCDd::pyramid> .  >> 
+
+=head2 rawserial
+
+I<< Optional. Type warped_node of class L<LCDd::rawserial|Config::Model::models::LCDd::rawserial> .  >> 
+
+=head2 sdeclcd
+
+I<< Optional. Type warped_node of class L<LCDd::sdeclcd|Config::Model::models::LCDd::sdeclcd> .  >> 
+
+=head2 sed1330
+
+I<< Optional. Type warped_node of class L<LCDd::sed1330|Config::Model::models::LCDd::sed1330> .  >> 
+
+=head2 sed1520
+
+I<< Optional. Type warped_node of class L<LCDd::sed1520|Config::Model::models::LCDd::sed1520> .  >> 
+
+=head2 serialPOS
+
+I<< Optional. Type warped_node of class L<LCDd::serialPOS|Config::Model::models::LCDd::serialPOS> .  >> 
+
+=head2 serialVFD
+
+I<< Optional. Type warped_node of class L<LCDd::serialVFD|Config::Model::models::LCDd::serialVFD> .  >> 
+
+=head2 shuttleVFD
+
+I<< Optional. Type warped_node of class L<LCDd::shuttleVFD|Config::Model::models::LCDd::shuttleVFD> .  >> 
+
+=head2 sli
+
+I<< Optional. Type warped_node of class L<LCDd::sli|Config::Model::models::LCDd::sli> .  >> 
+
+=head2 stv5730
+
+I<< Optional. Type warped_node of class L<LCDd::stv5730|Config::Model::models::LCDd::stv5730> .  >> 
+
+=head2 svga
+
+I<< Optional. Type warped_node of class L<LCDd::svga|Config::Model::models::LCDd::svga> .  >> 
+
+=head2 t6963
+
+I<< Optional. Type warped_node of class L<LCDd::t6963|Config::Model::models::LCDd::t6963> .  >> 
+
+=head2 text
+
+I<< Optional. Type warped_node of class L<LCDd::text|Config::Model::models::LCDd::text> .  >> 
+
+=head2 tyan
+
+I<< Optional. Type warped_node of class L<LCDd::tyan|Config::Model::models::LCDd::tyan> .  >> 
+
+=head2 ula200
+
+I<< Optional. Type warped_node of class L<LCDd::ula200|Config::Model::models::LCDd::ula200> .  >> 
+
+=head2 vlsys_m428
+
+I<< Optional. Type warped_node of class L<LCDd::vlsys_m428|Config::Model::models::LCDd::vlsys_m428> .  >> 
+
+=head2 xosd
+
+I<< Optional. Type warped_node of class L<LCDd::xosd|Config::Model::models::LCDd::xosd> .  >> 
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<cme>
+
+=item *
+
+L<Config::Model::models::LCDd::CFontz>
+
+=item *
+
+L<Config::Model::models::LCDd::CFontzPacket>
+
+=item *
+
+L<Config::Model::models::LCDd::CwLnx>
+
+=item *
+
+L<Config::Model::models::LCDd::EyeboxOne>
+
+=item *
+
+L<Config::Model::models::LCDd::IOWarrior>
+
+=item *
+
+L<Config::Model::models::LCDd::IrMan>
+
+=item *
+
+L<Config::Model::models::LCDd::MD8800>
+
+=item *
+
+L<Config::Model::models::LCDd::MtxOrb>
+
+=item *
+
+L<Config::Model::models::LCDd::NoritakeVFD>
+
+=item *
+
+L<Config::Model::models::LCDd::SureElec>
+
+=item *
+
+L<Config::Model::models::LCDd::bayrad>
+
+=item *
+
+L<Config::Model::models::LCDd::curses>
+
+=item *
+
+L<Config::Model::models::LCDd::ea65>
+
+=item *
+
+L<Config::Model::models::LCDd::g15>
+
+=item *
+
+L<Config::Model::models::LCDd::glcd>
+
+=item *
+
+L<Config::Model::models::LCDd::glcdlib>
+
+=item *
+
+L<Config::Model::models::LCDd::glk>
+
+=item *
+
+L<Config::Model::models::LCDd::hd44780>
+
+=item *
+
+L<Config::Model::models::LCDd::icp_a106>
+
+=item *
+
+L<Config::Model::models::LCDd::imon>
+
+=item *
+
+L<Config::Model::models::LCDd::imonlcd>
+
+=item *
+
+L<Config::Model::models::LCDd::irtrans>
+
+=item *
+
+L<Config::Model::models::LCDd::joy>
+
+=item *
+
+L<Config::Model::models::LCDd::lb216>
+
+=item *
+
+L<Config::Model::models::LCDd::lcdm001>
+
+=item *
+
+L<Config::Model::models::LCDd::lcterm>
+
+=item *
+
+L<Config::Model::models::LCDd::lirc>
+
+=item *
+
+L<Config::Model::models::LCDd::lis>
+
+=item *
+
+L<Config::Model::models::LCDd::mdm166a>
+
+=item *
+
+L<Config::Model::models::LCDd::menu>
+
+=item *
+
+L<Config::Model::models::LCDd::ms6931>
+
+=item *
+
+L<Config::Model::models::LCDd::mtc_s16209x>
+
+=item *
+
+L<Config::Model::models::LCDd::mx5000>
+
+=item *
+
+L<Config::Model::models::LCDd::picolcd>
+
+=item *
+
+L<Config::Model::models::LCDd::pyramid>
+
+=item *
+
+L<Config::Model::models::LCDd::rawserial>
+
+=item *
+
+L<Config::Model::models::LCDd::sdeclcd>
+
+=item *
+
+L<Config::Model::models::LCDd::sed1330>
+
+=item *
+
+L<Config::Model::models::LCDd::sed1520>
+
+=item *
+
+L<Config::Model::models::LCDd::serialPOS>
+
+=item *
+
+L<Config::Model::models::LCDd::serialVFD>
+
+=item *
+
+L<Config::Model::models::LCDd::server>
+
+=item *
+
+L<Config::Model::models::LCDd::shuttleVFD>
+
+=item *
+
+L<Config::Model::models::LCDd::sli>
+
+=item *
+
+L<Config::Model::models::LCDd::stv5730>
+
+=item *
+
+L<Config::Model::models::LCDd::svga>
+
+=item *
+
+L<Config::Model::models::LCDd::t6963>
+
+=item *
+
+L<Config::Model::models::LCDd::text>
+
+=item *
+
+L<Config::Model::models::LCDd::tyan>
+
+=item *
+
+L<Config::Model::models::LCDd::ula200>
+
+=item *
+
+L<Config::Model::models::LCDd::vlsys_m428>
+
+=item *
+
+L<Config::Model::models::LCDd::xosd>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item 2011-2016, Dominique Dumont
+
+=item 1999-2013, William Ferrell and others
+
+
+=back
+
+=head1 LICENSE
+
+=over
+
+=item GPL-2
+
+
+=back
+
+=cut
+

@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+BEGIN {
+    $ENV{CATALYST_SCRIPT_GEN} = 40;
+	use File::Spec;
+	use FindBin '$Bin';
+	use lib File::Spec->catdir($Bin,'lib');
+}
+
+use TestApp::boot;
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('TestApp','Server');
+
+1;
+

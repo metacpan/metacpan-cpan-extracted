@@ -1,0 +1,28 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 237
+    - 109
+  23763:
+    - 169
+    - 115
+name: ed6d
+registers:
+  AF: 14432
+  AF_: 0
+  BC: 17114
+  BC_: 0
+  DE: 22837
+  DE_: 0
+  HL: 56336
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 23763

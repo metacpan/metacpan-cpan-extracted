@@ -1,0 +1,2 @@
+primary = parent.cnf
+%include ../include/secondary.cnf

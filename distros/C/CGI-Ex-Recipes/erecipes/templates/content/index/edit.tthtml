@@ -1,0 +1,74 @@
+<div id="content"><div style="width:100%;text-align:center">
+<form method="post" name="[% form_name %]" id="[% form_name %]">
+<fieldset>
+[% IF step eq 'add' ~%]
+    <legend>Add New Recipe</legend>
+[% ELSIF step eq 'edit' ~%]
+    <legend>Edit Recipe</legend>
+    <div class="form_row clear">
+    <input type="hidden" name="id" />
+        <div class="right" style="width:80%"><span 
+        class="left">[% app.strftmime("%Y-%m-%d %H:%M", date_added); %]</span></div>
+        <label for="date_added" >Date Added</label>
+    </div>
+[% END ~%]
+
+    <div class="form_row clear">
+        <input type="text" class="input_text right" name="title" id="title"  />
+        <label for="title" >Title</label>
+    </div>
+    <div class="form_row clear">
+        <select class="input_select right" name="pid" id="pid">
+        <option value="" ></option>
+        <option value="0" >Top</option>
+        [% FOREACH c IN app.categories(['id' 'pid' 'is_category' 'title'],{'is_category' => 1}) %]
+            [% IF c.id != id %]
+                <option value="[% c.id %]" >[% c.title %]</option>
+            [% END %]
+        [% END %]
+        [%#TODO: recurcively Iterate over items which are "is_category" %]
+        [%#WISHLIST: on change use ajax and fill the sortorder list %]
+        </select>
+        <label for="pid" >Category</label>
+    </div>
+    <div class="form_row clear">
+        <div class="right" style="width:80%"><input type="checkbox" class="input_checkbox left" name="is_category" id="is_category" value="1" /></div>
+        <label for="is_category" >Is Category</label>
+    </div>
+    <div class="form_row clear">
+        <textarea class="input_textarea right" name="problem" style="height:5em;" 
+        id="problem"  ></textarea>
+        <label for="problem">Problem</label>
+        <br class="clear" />
+    </div>
+    <div class="form_row clear">
+        <textarea class="input_textarea right" style="height:5em;" 
+        name="analysis" id="analysis"  ></textarea>
+        <label for="Analysis" >Analysis</label>
+        <br class="clear" />
+    </div>
+    <div class="form_row clear">
+        <textarea class="input_textarea right" 
+        name="solution" id="solution" ></textarea>
+        <label for="title" >Solution</label>
+        <br class="clear" />
+    </div>
+    <div class="form_row clear">
+        <select class="input_select right" name="sortorder" id="sortorder">
+        <option value="0" >first</option>
+        [%# maybe Iterate over ids in the current category %]
+        [%
+            FOREACH item IN app.recipes(['id','title'],{'pid'=>pid})
+        %]
+        <option value="[% item.id %]">[% item.title %]</option>
+        [% END %]
+        </select>
+        <label for="sortorder" >Position</label>
+    </div>
+    <div class="form_row clear"><input type="submit" value="Save" class="right" /></div>
+</fieldset>
+</form>
+</div>
+    [%app.hi%]
+    [% js_validation %]
+</div>

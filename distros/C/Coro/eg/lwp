@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use Coro::LWP; # should be use'd as early as possible
+
+use Coro;
+use Coro::AnyEvent;
+use LWP::Simple;
+
+$SIG{PIPE} = 'IGNORE';
+
+my @pids;
+
+for (1..1) {
+   push @pid, async {
+      print "starting to fetch http://www.google.de/\n";
+      get "http://www.google.de/";
+      print "fetched http://www.google.de/\n";
+   };
+
+   push @pid, async {
+      print "starting to fetch http://www.yahoo.com/\n";
+      get "http://www.yahoo.com/";
+      print "fetched http://www.yahoo.com/\n";
+   };
+}
+
+$_->join for @pid;
+

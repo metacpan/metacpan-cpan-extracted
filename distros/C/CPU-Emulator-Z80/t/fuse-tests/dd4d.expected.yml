@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd4d
+registers:
+  AF: 18078
+  AF_: 0
+  BC: 30890
+  BC_: 0
+  DE: 27226
+  DE_: 0
+  HL: 226
+  HL_: 0
+  I: 0
+  IX: 41386
+  IY: 3439
+  PC: 2
+  R: 2
+  SP: 0

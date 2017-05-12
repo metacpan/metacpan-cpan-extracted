@@ -1,0 +1,4 @@
+Changes for Catalyst-Plugin-Devel-ModuleVersions
+
+0.100330  2010-02-02 19:11:28 Europe/Oslo
+  - Remove direct usage of Class::C3, and change it to MRO::Compat + use mro 'c3' (Fixes #54092)

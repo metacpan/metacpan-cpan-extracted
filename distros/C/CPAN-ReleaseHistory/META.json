@@ -1,0 +1,53 @@
+{
+   "abstract" : "information about all files ever released to CPAN",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-ReleaseHistory",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "Carp" : "0",
+            "Getopt::Long" : "0",
+            "Moo" : "0",
+            "MooX::Role::CachedURL" : "0.06",
+            "autodie" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilbowers/CPAN-ReleaseHistory",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilbowers/CPAN-ReleaseHistory.git",
+         "web" : "https://github.com/neilbowers/CPAN-ReleaseHistory"
+      }
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

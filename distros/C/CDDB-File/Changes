@@ -1,0 +1,41 @@
+Revision history 
+
+1.05  Tue Oct  4 11:22:23 UTC 2005
+        - Quote PREREQs in Makefile.PL to keep broken 5.8.0 happy
+
+1.04  Sat Sep  3 15:19:08 UTC 2005
+        - Remove obsolete submitted_by (should be using submitted_via)
+
+1.03  Wed Aug 21 2002
+        - Handle length as "dddd secs" as well as "dddd seconds"
+           (Thanks to Andy Warley)
+
+1.02  Tue Feb 19 2002
+        - Only extract separate artist for song titles if the CD artist
+           is "Various" (as per specification). 
+
+1.01  Sat Feb  9 2002
+        - Loosen match for titles to split on any amount of whitespace
+
+0.96  Mon Dec 24 2001
+        - Loosen match for offsets. Some CD files have no spaces before
+          these.
+
+0.95  Sun Dec 23 2001
+        - Allow access to the track offsets directly
+
+0.94  Sat Dec  8 2001
+        - Added support for 'processed_by'
+        - renamed 'submitted_by' to 'submitted_via'
+
+0.93  Wed Dec  5 2001
+        - Fixed bug where track offsets were being calculated incorrectly
+          for some files with slightly different data format
+
+0.92  Tue Dec  4 2001
+        - Added support for 'artist' info in tracks on compilations
+
+0.91  Mon Dec  3 2001
+        - Created this
+
+

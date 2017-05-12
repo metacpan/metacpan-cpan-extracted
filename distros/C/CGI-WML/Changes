@@ -1,0 +1,102 @@
+Revision history for Perl extension CGI::WML.
+
+0.01  Thu Feb 10 17:04:26 2000
+        - original version; created by h2xs 1.19
+
+1.2   Sat Feb 12 12:46:28 GMT 2000
+        - RCS Versioning, POD documentation
+
+1.3   2000/02/12 12:59:21
+        - Bugfix on XML lang element in WML header
+
+1.4   2000/02/17 11:51:26, 
+        - Added XML charset encoding argument to start_wml()
+
+1.5   2000/04/20 10:45:26,
+        - Added 'wml_to_wmlc' function.
+
+1.51  2000/05/13 19:30:12,
+        - Bugfix on documentation
+
+1.52  2000/05/14 19:11:21
+        - Merged modifications contributed by Andy Murren <amurren@oven.com>
+
+1.53  2000/05/17 19:03:44
+       	- Added new header routine contributed by
+          Wilbert Smits <wilbert@telegraafnet.nl>
+
+1.54  2000/06/03
+        - Added Andy Murren's 'img' tag routine, and POD, and 'dialtag' POD
+        - Removed code which tried to sidestep the XML::Parser dependancy, it
+          didn't work anyway.
+
+1.55  2000/06/03
+        - Trying to be compatible with LDS's new CGI::Util setup, the
+          $self->SUPER::rearrange() stuff has been replaced with a straight
+          local copy of CGI::Util's 'rearrange' routine since it was causing
+          problems accross installations.
+
+1.56  2000/06/25
+	- Added in Andy Murren's "p" method and POD documentation.
+	- Added first implementation of C-HTML to WML converter.
+        - Added module to CPAN as CGI::WML-0.01
+
+1.57  2000/07/01
+        - Rewrote C-HTML -> WML stuff.
+        - Added module to CPAN as CGI::WML-0.02
+
+1.58  2000/07/07
+        - Corrected WBXML constants by Andy Murren <amurren@oven.com>
+        - String table support in WBXML compiler. Compiler now is as good
+          as, or within 1 byte of, Nokia's WBXML compiler.
+        - POD updates.
+        - Added option to disable XML::Parser dependancy at install-time.
+        - Improved HTML->WML conversion slightly.
+
+1.59  2000/07/14
+	- Added table handling routine to html_to_wml conversion.
+
+1.60  2000/07/16
+	- Added in Andy Murren's AUTOLOAD code, now you can print
+          $q->p("paratext") and use any WML tag as an object method.
+	- Rearrenged object inheretance, allowed removal of new() method.
+
+1.61  2000/07/16
+	- Documentation changes, added POD for AUTOLOADed stuff.
+    - Added module to CPAN as CGI::WML-0.03
+
+1.62  2000/07/16
+	- Bugfix on autoloader.
+    - Added module to CPAN as CGI::WML-0.04
+
+1.63  2000/07/24
+	- New AUTOLOADER and manual import list, should fix problems with
+	  functions getting lost and AUTOLOADers getting into loops.
+
+1.64  2000/08/25
+	- Added to CPAN as CGI::WML-0.05
+
+1.65  2003/01/12
+	- Fixed TempFile problem in html_to_wml()
+	  Added to http://sourceforge.net/projects/cgi-wml/  as CGI::WML-0.06
+	  Submitted to CPAN as CGI::WML-0.06
+      Changed email address for Andy Murren to amurren@users.sourceforge.net
+
+1.66  2003/01/29
+	- Corrected some documentation about constructing a deck and the TO DO
+	  Added to http://sourceforge.net/projects/cgi-wml/  as CGI::WML-0.07
+	  Submitted to CPAN as CGI::WML-0.07
+
+1.67  2003/02/18
+	- Now requires CGI.pm version >= 2.79 so CGITempFile is available.
+	  Added to http://sourceforge.net/projects/cgi-wml/  as CGI::WML-0.08
+	  Submitted to CPAN as CGI::WML-0.08
+
+1.68  2003/02/21
+	- Fixed Makefile.PL to reflect CGI.pm version >= 2.79 requirement
+	- While testing $USEXMLPARSER got set to 0 in WML.pm ( Doh!) which
+	  turned off using XML all together.  This is not the setting we want. 
+      To fix that I changed the it to $USEXMLPARSER=1 so XML is installed 
+      by default.
+	  Added to http://sourceforge.net/projects/cgi-wml/  as CGI::WML-0.09
+	  Submitted to CPAN as CGI::WML-0.09

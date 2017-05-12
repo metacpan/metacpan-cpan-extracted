@@ -1,0 +1,13 @@
+Changes
+lib/CORBA/HTML.pm
+lib/CORBA/HTML/CommentVisitor.pm
+lib/CORBA/HTML/DeclVisitor.pm
+lib/CORBA/HTML/HtmlVisitor.pm
+lib/CORBA/HTML/IndexVisitor.pm
+lib/CORBA/HTML/NameVisitor.pm
+bin/idl2html
+MANIFEST
+Makefile.PL
+test.pl
+README
+META.yml                                 Module meta-data (added by MakeMaker)

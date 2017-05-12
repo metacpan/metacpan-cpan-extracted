@@ -1,0 +1,55 @@
+Color-Model-Munsell-Util
+
+Utility subroutines for Color::Model::Munsell
+
+----------
+
+INSTALLATION
+~~~~~~~~~~~~
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEMO
+~~~~
+After install, execute demo/demo.pl for making demo html which shows
+popular Munsell color and its RGB colors of several RGB models.
+
+	perl demo/demo.pl > somedir/demo.html
+
+
+SUPPORT AND DOCUMENTATION
+~~~~~~~~~~~~~~~~~~~~~~~~~
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Color::Model::Munsell::Util
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Color-Model-Munsell-Util
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Color-Model-Munsell-Util
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Color-Model-Munsell-Util
+
+    Search CPAN
+        http://search.cpan.org/dist/Color-Model-Munsell-Util/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2010 T.Onodera.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

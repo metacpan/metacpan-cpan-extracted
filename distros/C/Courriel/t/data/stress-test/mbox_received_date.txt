@@ -1,0 +1,77 @@
+From sat-guru@home.com  Sun Jan 28 20:15:59 2001
+Return-Path: <sat-guru@home.com>
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 92741 invoked from network); 28 Jan 2001 20:15:59 -0000
+Received: from ha1.rdc1.il.home.com (HELO mail.rdc1.il.home.com) (imail@24.2.1.66)
+  by h31.sny.collab.net with SMTP; 28 Jan 2001 20:15:59 -0000
+Received: from javadev ([65.10.144.44]) by mail.rdc1.il.home.com
+          (InterMail vM.4.01.03.00 201-229-121) with SMTP
+          id <20010128201602.EBIH24206.mail.rdc1.il.home.com@javadev>
+          for <tomcat-user@jakarta.apache.org>;
+          Sun, 28 Jan 2001 12:16:02 -0800
+Message-IDX: <001c01dc9092$933dd440$0200a8c0@javadev>
+Reply-To: "Dave Smith" <dsmith@vymac.com>
+From: "Dave Smith" <sat-guru@home.com>
+To: <tomcat-user@jakarta.apache.org>
+References: <Pine.LNX.4.20.0101281203260.23372-100000@reality.math.luc.edu>
+Subject: Re: more problems with mod_jk
+Date: Wed, 28 Jan 2026 14:13:32 -0600
+JW-Date: Sat, 09 Jan 1904 02:19:28 -0800
+Organization: VYMAC Corp
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 5.50.4522.1200
+X-MimeOLE: Produced By Microsoft MimeOLE V5.50.4522.1200
+X-Spam-Rating: h31.sny.collab.net 1.6.2 0/1000/N
+
+You don't have the DSO compiled correctly yet. Are you using the
+directions in the mod_jk.so how-to? Don't use the makefile, just follow
+those directions exactly and you'll be OK.
+
+Dave
+----- Original Message -----
+From: "Ryan Cuprak" <rcupr@acm.math.luc.edu>
+To: "tomcat" <tomcat-user@jakarta.apache.org>
+Sent: Sunday, January 28, 2001 12:16 PM
+Subject: more problems with mod_jk
+
+
+> Hello,
+>  I have no idea what changed between last night and this morning, but I am
+> now getting a different error message. To compile mod_jk I edited the
+> makefile in ...src/native/apache1.3 so that apxs pointed to correct
+> location. I then did a make clean and a make all. Copied the mod_jk.so
+> over to my libexec and tried starting apache. I did not make any changes
+> to mod_jk.conf-auto.
+>  (note on building, I did not get an error message and have to use:
+> gcc -shared -o mod_jk.so *.o)
+>   Believing that perhaps I messed up a file in my multiple attempts, I
+> redownloaded  jakarta-tomcat-3.2.1-src.tar.gz and did the above steps-
+> getting the same error as below.
+>
+>   Ryan
+> Error message:
+> reality:/usr/local/apache/bin# ./httpd start
+> Syntax error on line 8 of /usr/local/tomcat/conf/mod_jk.conf-auto:
+> API module structure `jk_module' in file
+> /usr/local/apache/libexec/mod_jk.so is garbled - perhaps this is not an
+> Apache module DSO?
+>
+> ==========================================================================
+> | Ryan Cuprak                                                            |
+> | rcuprak@acm.org                 <www.cuprak.net>                       |
+> | Home    Ph: (860)-742-5561 46 Prospect St. Coventry CT 06238           |
+> | College Ph: (773)-973-9661 1400 W. Devon Ave. PMB 271 Chicago, IL 60660|
+> ==========================================================================
+>
+>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+> For additional commands, email: tomcat-user-help@jakarta.apache.org
+>
+>

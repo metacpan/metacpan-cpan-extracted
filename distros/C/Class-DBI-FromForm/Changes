@@ -1,0 +1,14 @@
+Revision history for Perl extension Class::DBI::FromForm
+
+0.04  Fri Mar 03 09:23:00
+        - Add support for HTML::Widget
+        - Added a fill_widget for HTML::Widget
+
+0.03  Mon May 09 08:00:00 2005
+        - allow undef (Andy Grundman)
+
+0.02  Mon Mar 21 08:00:00 2005
+        - allow 0 values (adtim@mail.ru)
+
+0.01  Thu Jan 04 00:00:00 2005
+        - initial release

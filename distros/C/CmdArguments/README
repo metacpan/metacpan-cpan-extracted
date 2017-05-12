@@ -1,0 +1,156 @@
+NAME
+    CmdArguments - Module to process arguments passed on command line
+
+SYNOPSIS
+        # program name args.pl
+        use CmdArguments;
+
+        my $var1 = 10;          # initialize variable
+        my $var2 = 0;           # with default values.
+        my @var3 = ( 1, 2, 3);  # well, if you like to.
+        my @var4;               # but, not necessary
+
+        my $parse_ref = [
+                         [ "arg1", \$var1 ], # argTypeScalar is assumed
+                         [ "arg2", \$var2,
+                           {TYPE => argTypeSwitch}], # explicit argTypeSwitch
+                         [ "arg3", \@var3 ], # argTypeArray assumed
+                         [ "arg4", \@var4,
+                           {UNIQUE => 1}], # argTypeArray assumed
+                        ];
+
+        CmdArguments::parse(@ARGV, $parse_ref);
+
+        print "var1 = $var1\n";
+        print "var2 = $var2\n";
+        print "var3 = @var3\n";
+        print "var4 = @var4\n";
+
+        exit 0;
+
+    test command ...
+
+        args.pl -arg1 23 -arg2 -arg3 2 4 3 2 5 -arg4 2 4 3 2 4
+
+    should generate following output...
+
+        var1 = 23
+        var2 = 1
+        var3 = 2 4 3 2 5
+        var4 = 2 4 3
+
+DESCRIPTION
+    This module provides some handy functions to process command line
+    options.
+
+    When this module is included it introduces following constants in the
+    calling program namespace...
+
+        argTypeScalar = 0
+        argTypeArray  = 1
+        argTypeSwitch = 2
+
+    CmdArguments::parse
+     Simplest way to use this program is to call parse (static function).
+
+     Calling syntax is...
+
+     *parse(@arguments, $array_ref, *$text_or_func1*, *$text_or_func2*)*
+
+     *@arguments*
+       array of command line arguments. So, @ARGV could be passed instead.
+
+     *$array_ref*
+       reference to an array containing information about how to parse data
+       in @arguments.
+
+       basic structure of $array_ref is...
+
+       $array_ref = [ *$array_ref_for_individual_tag*, ...];
+
+       $array_ref_for_individual_tag = [*$option_tag* , *$ref_of_variable*,
+       *$hash_ref*]; # $hash_ref is optional
+
+       *$hash_ref*
+          reference to a hash containing supplementary information about
+          $option_tag
+
+            $hash_ref = {
+              TYPE   => argType..., # argTypeSwitch
+                                    # argTypeArray or argTypeScalar
+
+              UNIQUE => 1,          # 1 or 0
+
+              USAGE  => "help information", # try giving -h or -help
+                                            # on command line
+
+              FUNC   => sub { eval $_[0] }
+            };
+
+          TYPE
+              this specifies what kind of variable reference is passed in
+              $ref_of_variable. If TYPE is argTypeScalar or argTypeSwitch it
+              assumes reference to a scalar. If TYPE is argTypeArray it
+              assumes reference to an array.
+
+              if TYPE tag is not provided then ...
+
+              1. *argTypeScalar* is assumed if $ref_of_variable is a scalar
+              reference
+
+              2. *argTypeArray* is assumed if $ref_of_variable is an array
+              reference
+
+              What is argType...?
+
+                   argTypeSwitch
+                         on command line you can not provide value for an
+                         option.
+
+                   argTypeScalar
+                         on command line you must provide one and only one
+                         value
+
+                   argTypeArray
+                         on command line you can provide zero or more values
+
+          UNIQUE
+              this tag is applicable for option type *argTypeArray* only. it
+              can be 0 or 1. 1 means make unique array. So, if an option is
+              defined as UNIQUE then on command line if you give say 2 3 4 5
+              3 4 6 7 then array will hold 2 3 4 5 6 7. If it was not unique
+              then it will hold 2 3 4 5 3 4 6 7.
+
+          FUNC
+              Holds a reference to a function. Function should take a scalar
+              argument and return a scalar if option is argTypeScalar and
+              return an array if option is argTypeArray. This is not used
+              for option type argTypeSwitch.
+
+              Example: if option type is an argTypeArray. and function is
+              defined like
+
+              FUNC => sub { eval $_[0] }
+
+              and if on the command line something like 1..3 or 1,2,3 is
+              passed then it will generate an array having values 1 2 3.
+
+       *$ref_of_variable*
+          Can pass reference of a scalar or an array variable depending on
+          what require from command line.
+
+       *$option_tag*
+          It is the name of the option tag. if option tag is *opt* then on
+          command line you have to specify option like *-opt*.
+
+     $text_or_func1
+     $text_or_func2
+       pass text or reference to a function. If function is passed it should
+       return text or should itself print message on STDERR. Try
+       experimenting by passing -h or -help in the argument. $text_or_func1
+       is printed after the help text is printed and $text_or_func1 is used
+       before printing helptext.
+
+AUTHOR
+    Navneet Kumar, <navneet_k@hotmail.com>
+

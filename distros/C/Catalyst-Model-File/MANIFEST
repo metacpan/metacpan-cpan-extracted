@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Catalyst/Helper/Model/File.pm
+lib/Catalyst/Model/File.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01use.t
+t/02pod.t
+t/04basic.t
+t/05cd.t
+t/06live.t
+t/07stat.t
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Root.pm
+t/lib/TestApp/Model/File.pm

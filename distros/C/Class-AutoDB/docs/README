@@ -1,0 +1,10 @@
+Class-AutoDB/docs/README
+
+The 'docs' directory contains additional documentation.  All of this
+is presently for internal classes.
+
+Documentation of internal classes, in the form of '.pod' files, are in
+the 'Developer' subdirectory tree.
+
+Caveat: This documentation was not updated for version 1.10 and and
+may be incorrect in places.  It is certainly incomplete.

@@ -1,0 +1,37 @@
+BOTTOM LINE: using flock() on log file is faster than echo by a factor 
+of about 35. it also preserves quotes properly and writes are still 
+guaranteed. we still fall back to the slower logging mechanism when
+'require Flock' fails, so no extra dependencies.
+
+SPEED TESTING:
+iter=100000; perl -e 'use lib "./lib"; use Cache::Static; my $start = time; foreach my $i (0..'$iter') { Cache::Static::_log(3, "speed test iter $i"); } my $end = time;  my $start_exp = time; foreach my $i (0..'$iter') { Cache::Static::_log_exp(3, "speed test iter $i"); } my $end_exp = time; print "old: start: $start, end: $end\n"; print "new: start: $start_exp, end: $end_exp\n";'
+
+RESULTS:
+1_000 iter:
+old: start: 1136329230, end: 1136329234 (4)
+new: start: 1136329234, end: 1136329234 (0)
+speedup: unknown
+
+10_000 iter:
+old: start: 1136329249, end: 1136329290 (41)
+new: start: 1136329290, end: 1136329291 (1)
+speedup: 41
+
+100_000 iter:
+old: start: 1136329353, end: 1136329684 (331)
+new: start: 1136329684, end: 1136329693 (9)
+speedup: 36.78
+
+1_000_000 iter:
+old: start: 1136330081, end: 1136333395 (3314)
+new: start: 1136333395, end: 1136333489 (94)
+speedup: 35.26
+
+#testing concurrent writes:
+for i in `seq 1 99` ; do perl -e 'use lib "./lib"; use Cache::Static; foreach my $n (0..1000) { Cache::Static::_log_exp(4, "hello world[ '$i' ] iter $n"); } ' & true ; done
+
+cp /usr/local/Cache-Static/log ./log.exp
+
+for i in `seq 1 99` ; do for j in `seq 0 1000` ; do grep
+"hello world\[ $i \] iter $j" log.exp >/dev/null || echo problem $i $j ;
+done ; echo $i done ; done

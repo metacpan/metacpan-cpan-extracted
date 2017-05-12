@@ -1,0 +1,61 @@
+{
+   "abstract" : "GTK based Catalyst server restarter.",
+   "author" : [
+      "Dhaval Dhanani L<mailto:dhaval070@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-Restarter-GTK",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Catalyst::Devel" : "0",
+            "Catalyst::Runtime" : "5.80032",
+            "Gtk2" : "0",
+            "IO::Handle" : "0",
+            "IPC::SysV" : "0",
+            "Moose" : "0",
+            "MooseX::Types" : "0",
+            "Object::Destroyer" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://dev.catalyst.perl.org/repos/Catalyst/CatalystX-Restarter-GTK/trunk"
+      }
+   },
+   "version" : "0.06"
+}

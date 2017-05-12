@@ -1,0 +1,55 @@
+CGI-Lazy version 1.09
+=====================
+CGI::Lazy was designed to simply abstract some of the more common cgi scripting tasks because the author finally got sick of writing the same code by hand for every new site or client that comes along.  It is my attempt to extend the wonderful CGI.pm with things that just about every modern website needs or wants, and to do it in a fairly portable manner.
+
+There are plenty of webdev frameworks out there, many are far more full- featured.  Often these solutions are so monstrous that they are overkill for small apps, or so optimized that they require full admin rights on the server they run on.  CGI::Lazy was intended to be lightweight enough to run on any given server that could run perl cgis.  Of course, the more power you have, the fancier you will be able to get, so Lazy was written to be extensible and to (hopefully) play nice with whatever magic you have up your sleeve. In short, it was made to easily do things for which the author has had need, while not getting in the way of things that the author hasn't thought of yet.
+
+Lazy has also been written to be useful in a mod_perl environment if that is your pleasure.  The wonders of persistence and namespaces have been (again, hopefully) all accounted for.  It should plug into your mod_perl environment with little or no fuss.
+
+For the most part, CGI::Lazy is simply a subclass of CGI::Pretty, which is an easier to read version of CGI.pm. 
+
+We need to use CGI::Pretty due to a css issue in IE where the style definitions aren't always followed unless there is the appropriate amount of whitespace between html tags.  Luckilly, CGI::Pretty takes care of this pretty transparently, and it's output is easier to read and debug.
+
+CGI::Lazy adds a bunch of hooks in the interest of not working any harder than we need to, otherwise it's a CGI::Pretty object.
+
+Probably 80% of the apps the author has been asked to write have been front ends to some sort of database, so that's definitely the angle Lazy is coming from.  It works just fine with no db, but most of the fancy work is unavailable.
+
+Output to the web is intended to be through templates via HTML::Template.  However, if you want to write your content into the code manually, we won't stop you.  Again, the whole point was to be flexible and reusable, and to spend our time writing new stuff, not the same old crap over and over again.
+
+The CGI::Lazy::Ajax::Dataset module especially was written to bring spreadsheet-like access to a database table to the web in a fairly transparent manner- after all, most of the time you're doing one of 4 operations on a database: select, insert, update, delete.  The Dataset is, at least at the time of the original writing, the crown jewel of the Lazy framework.
+
+In any event, it is my hope that this is useful to you.  It has saved me quite alot of work.  I hope that it can do the same for you.  Bug reports and comments are always welcome.
+
+Lazy is just a framework- a front end to commonly called routines in HTML::Template, DBI, and others.  It is NOT a content management system, and it's not a magical solution to whatever web monstrosity some client thinks they want.  It does not replace the perl developer in any way, it just tries to give him/her a helping hand when asked for.  The rest fo the time it stays the heck out of the way.  Your cgi's are still yours to design and build.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  HTML::Template
+  DBI
+  JSON
+  JavaScript::Minifier
+  Tie::IxHash
+  Digest::MD5
+  Time::HiRes
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Nik Ogura
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

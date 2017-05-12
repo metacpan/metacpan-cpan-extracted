@@ -1,0 +1,62 @@
+{
+   "abstract" : "define and export constants easily",
+   "author" : [
+      "punytan <punytan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Constant-Exporter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.023"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/punytan/p5-Constant-Exporter/issues"
+      },
+      "homepage" : "https://github.com/punytan/p5-Constant-Exporter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/punytan/p5-Constant-Exporter.git",
+         "web" : "https://github.com/punytan/p5-Constant-Exporter"
+      }
+   },
+   "version" : "0.01"
+}
+

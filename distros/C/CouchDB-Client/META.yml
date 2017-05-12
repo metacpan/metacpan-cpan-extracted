@@ -1,0 +1,32 @@
+---
+abstract: 'Simple, correct client for CouchDB'
+author:
+  - 'Robin Berjon, <robin @t berjon d.t com>'
+  - 'Maverick Edwards <maverick @t smurfbane d.t org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CouchDB-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Request: 0
+  JSON::Any: 1.17
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  URI::Escape: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/maverick/couchdb-client
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/maverick/couchdb-client.git
+version: 0.09

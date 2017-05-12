@@ -1,0 +1,8 @@
+Revision history for Perl extension Config::Abstract::Ini.
+
+0.09  Wed Jan 29 16:44:38 2003
+	- original version; created from Configfile::Ini
+0.10 Thu Jan 30 11:10:42 2003
+	- Cleaned up docs
+0.13 Thu Apr 27 05:13:24 2006
+	- Fixed broken regexp in _parse_settings_file, bug reported, with the fix, by Eric Schultz. 

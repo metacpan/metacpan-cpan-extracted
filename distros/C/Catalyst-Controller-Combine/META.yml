@@ -1,0 +1,44 @@
+---
+abstract: 'Combine JS/CSS Files'
+author:
+  - 'Wolfgang Kinkeldei <wolfgang@kinkeldei.de>'
+build_requires:
+  Catalyst: 0
+  Catalyst::Runtime: 0
+  Catalyst::Test: 0
+  DateTime::Duration: 0
+  Exporter: 0
+  FindBin: 0
+  Path::Class::File: 0
+  Test::Exception: 0
+  Test::More: 0
+  base: 0
+  namespace::autoclean: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-Combine
+requires:
+  Catalyst::Controller: 0
+  Catalyst::Runtime: 5.80
+  DateTime: 0.72
+  File::stat: 1.00
+  FindBin: 1.47
+  List::Util: 1.21
+  Moose: 1.0
+  Path::Class: 0.23
+  Test::Builder: 0.86
+  Test::Builder::Tester: 1.18
+  Test::Exception: 0.27
+  Test::Harness: 3.14
+  Test::More: 0.86
+  Text::Glob: 0.08
+  namespace::autoclean: 0.09
+  strict: 0
+version: 0.15

@@ -1,0 +1,19 @@
+---
+name: CGI-Application-Plugin-Config-Simple
+version: 1.01
+author:
+  - Michael Peters <mpeters@plusthree.com>
+abstract: Add Config::Simple support to CGI::Application
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI::Application: 3.21
+  Config::Simple: 0
+  Exporter: 0
+  Test::More: 0
+provides:
+  CGI::Application::Plugin::Config::Simple:
+    file: lib/CGI/Application/Plugin/Config/Simple.pm
+    version: 1.01
+generated_by: Module::Build version 0.2703

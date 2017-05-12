@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/Crypt/VERPString.pm
+t/pod-coverage.t
+t/00.load.t
+t/pod.t
+t/does-it-work.t

@@ -1,0 +1,49 @@
+# NAME
+
+Convert::GeekCode - Convert and generate geek code sequences
+
+# SYNOPSIS
+
+    use Convert::GeekCode; # exports geek_decode()
+
+    my @out = geek_decode(q(
+    -----BEGIN GEEK CODE BLOCK-----
+    Version: 3.12
+    GB/C/CM/CS/CC/ED/H/IT/L/M/MU/P/SS/TW/AT d---x s+: a-- C++++ UB++++$
+    P++++$ L+ E--->+ W+++$ N++ !o K w--(++) O-- M-@ !V PS+++ PE Y+>++
+    PGP++ t+ 5? X+ R+++ !tv b++++ DI+++@ D++ G++++ e-(--) h* r++(+) z++*
+    ------END GEEK CODE BLOCK------
+    )); # yes, that's the author's geek code
+
+    my ($key, $val);
+    print "[$key]\n$val\n\n" while (($key, $val) = splice(@out, 0, 2));
+
+# DESCRIPTION
+
+__Convert::GeekCode__ converts and generates Geek Code sequences (cf.
+[http://geekcode.com/](http://geekcode.com/)). It supports different langugage codes and
+user-customizable codesets.
+
+Since version 0.5, this module uses __YAML__ to represent the geek code
+tables, for greater readability and ease of deserialization.  Please
+refer to [http://www.yaml.org/](http://www.yaml.org/) for more related information.
+
+The `geekgen` and `geekdec` utilities are installed by default,
+and may be used to generate / decode geek code blocks, respectively.
+
+# SEE ALSO
+
+[geekgen](http://search.cpan.org/perldoc?geekgen), [geekdec](http://search.cpan.org/perldoc?geekdec), [YAML](http://search.cpan.org/perldoc?YAML)
+
+# AUTHORS
+
+唐鳳 <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to Convert-GeekCode.
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)

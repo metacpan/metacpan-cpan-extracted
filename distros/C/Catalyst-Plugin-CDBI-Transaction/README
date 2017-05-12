@@ -1,0 +1,102 @@
+NAME
+    Catalyst::Plugin::CDBI::Transaction - Simple transaction handling for
+    Catalyst apps that use Class::DBI models
+
+SYNOPSIS
+        # ... in your application class:
+        package MyApp;
+
+        use Catalyst qw/CDBI::Transaction/;
+
+        # ... in a controller class:
+        package MyApp::Controller::Foo;
+
+        sub create_in_transaction : Local  {
+            my ( $self, $c ) = @_;
+
+            $c->transaction( sub { 
+                MyApp::M::CDBI::Sometable->create({
+                    field_1 => 'value 1',
+                    field_2 => 'value 2',
+                }); 
+            } )
+                or $c->log->error("Transaction failed: " . $c->error->[-1]);
+        }
+
+DESCRIPTION
+    Handle Catalyst::Model::CDBI database operations inside a transaction
+
+METHODS
+    $c->transaction
+    $c->trans
+    $c->atomic
+        Pass a coderef to $c->transaction, and it will be executed
+        atomically (inside of a transaction):
+
+            $c->transaction( $ref_to_anonymous_subroutine );
+
+        Returns true and commits the transaction if all the statements
+        inside the coderef were successful. Upon failure, adds the error
+        message to $c->error, returns false and automatically rolls back the
+        transaction.
+
+        This method was adapted from the idiom presented in the Class::DBI
+        documentation, under the TRANSACTIONS heading.
+
+    $c->_cdbi_models
+        Called internally by $c->transaction to search all laoded components
+        and return those that have a db_Main() method and where AutoCommit
+        is not explicitly disabled. Caches the search result for subsequent
+        calls. Returns an arrayref containing all the found components, or
+        undef if none found.
+
+NOTES/CAVEATS
+    All loaded model components used in the coderef passed to
+    $c->transaction must have AutoCommit set to a true value. If AutoCommit
+    is off for a connection, $c->transaction will not trigger commits or
+    rollbacks on that connection, and you will need to take care of the
+    commit yourself.
+
+    This plugin is intended for running the occasional transaction on a
+    database connection that normally runs in AutoCommit mode. If you choose
+    to run with AutoCommit off, then you probably should handle your
+    transactions manually rather than with
+    Catalyst::Plugin::CDBI::Transaction.
+
+    This plugin currently only works with Class::DBI models. It has been
+    tested with Catalyst::Model::CDBI and Catalyst::Model::CDBI::Sweet.
+
+    Be careful when running this plugin under mod_perl. If the coderef
+    passed to $c->transaction is from a named subroutine, mod_perl won't
+    recompile that subroutine on each request, and thus will ignore future
+    changes to the lexical variables outside the subroutine. This is
+    probably not what you want. In summary, always pass an *anonymous*
+    subroutine to $c->transaction, like in the SYNOPSIS above. And check
+    your error logs for the infamous "won't stay shared" message. See the
+    mod_perl docs, specifically "Understanding Closures", for more details.
+
+SEE ALSO
+    Class::DBI (especially the TRANSACTIONS section), Catalyst
+
+AUTHOR
+    Brian Cooke, "mrkoffee@saltedsnail.com"
+
+LICENSE
+    This plugin is free software. You may redistribute or modify it under
+    the same terms as Perl itself.
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+        or
+
+        perl Makefile.PL
+        make
+        make test
+        make install

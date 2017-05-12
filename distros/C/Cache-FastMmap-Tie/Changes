@@ -1,0 +1,21 @@
+Revision history for Perl extension Cache::FastMmap::Tie
+
+0.03     Mon Jan 28  2008
+        - exists Bugfix.
+        - The parameter is changed in a list from hash reference. 
+          However, an extended option (yaml_file) is with a hash reference.
+
+0.02     Wed Jan  9  2008
+        - Document modifications
+
+0.01_02  Wed Jan  9  2008
+        - Basic global parameter can also be obtained from a YAML file.
+
+0.01_01  Mon Dec 24  2007
+        - Makefile.PL file modifications
+
+0.01     Wed Dec 19  2007
+        - Document modifications
+
+0.00_01  Tue Dec 18  2007
+        - original version

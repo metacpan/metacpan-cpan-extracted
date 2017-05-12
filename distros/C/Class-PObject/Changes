@@ -1,0 +1,108 @@
+Revision history of Class::PObject
+=======================================
+
+2.17        Sunday, February 20, 2005
+
+            -NEW: set_driver() method defined for setting the driver
+
+2.16        Wednesday, January 26, 2005
+
+            -NEW: set_datasource() method defined for setting datasource, but still experimental
+            -DOC: pobject_init() method is documented.
+            -CODE: cleaned up
+
+2.14        Wednesday, May 19, 2004
+
+            - NEW: member functions added. Details found in Class::PObject::Type.pm
+
+2.13	   Friday, December 12, 2003
+
+	    -FIX: if reserved names were used as column names, no operations on such 
+	    columns were possible if using mysql driver.
+
+2.12        Friday, November 07, 2003
+
+            - FIX: more optimized datasource initialization
+            - NEW: New section in documentation called "KNOWN BUGS AND ISSUES"
+
+
+2.10        Thursday, November 06, 2003
+
+            - FIX: 'freezethaw' serializer didn't work on empty objects
+
+
+2.09        Wednesday, November 05, 2003
+
+            - FIX: Empty distribution
+
+2.08        Wednesday, November 05, 2003
+
+            - FIX: All the new features of 2.07_01, and some minor fixes
+              to test suits to avoid (partially) hitting on ithreads bug 
+              of Perl 5.8. Thanks to Marek Rouchal.
+
+2.07_01     Tuesday, September 09, 2003
+
+            - NEW: mysql and sqlite drivers can now create necessary 
+              tables if they are missing.
+
+2.07        Monday, September 08, 2003
+            
+            - NEW: Fully implemented type-map specification
+            - NEW: Has-a relationships through type-mapping
+            - NEW: More complete manuals
+            - FIX: Oodles of bug fixes
+
+2.05        Wednesday, August 27, 2003
+
+            - Minor inaccuracies in the Iterator.pm's manual fixed
+            - Test suit fixed
+
+2.04        Wednesday, August 27, 2003
+
+            - Iterator class was missing in the distribution
+
+2.03        Tuesday, August 26, 2003
+            
+            - More comprehensive manual
+            - Object iterator supported through fetch() method
+            - Driver specs revisited
+            
+2.00_01     Saturday, August 23, 2003
+
+            - Stable drivers and driver specifications
+            - DBI-related drivers re-written
+            - More complete manuals
+            - More test suits
+
+1.8         Friday, June 20, 2003
+
+            - 'csv' driver fixed, and should be stable.
+            - empty object in array context used to load an array with a single
+              undefined value. Fixed in this release
+            - drivers no longed need to provide remove_all() method. If missing
+              Class::PObject will take care of them using remove()
+            - 'file' driver now works undef taint mode
+
+1.7         Monday, June 09, 2003
+
+            - in cases no matches can be loaded, load() of the drivers' still
+              used to return a defined array with a single undefined element.
+              Fixed in 1.7
+
+1.5         Monday, June 09, 2003
+
+            - columns() method added.
+            - struct() is documented
+
+1.3         Sunday, June 08, 2003
+
+            - first public release, alpha
+
+0.01        Tuesday, June 03 2003
+
+            - original version; created by h2xs 1.21 with options
+              AXn Class::Struct::Persistent
+
+=======================================
+Changes,v 1.21 2005/02/20 18:05:00 sherzodr Exp

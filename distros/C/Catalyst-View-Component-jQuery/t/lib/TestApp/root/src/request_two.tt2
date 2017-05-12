@@ -1,0 +1,4 @@
+[% c.action %]
+[% jquery.link_elements %]
+[% jquery.script_src_elements %]
+[% jquery.document_ready %]

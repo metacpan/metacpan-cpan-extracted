@@ -1,0 +1,27 @@
+package <tmpl_var name=prefix>::Dispatcher;
+
+use base 'CGI::Application::Dispatch';
+use strict;
+use warnings;
+
+our $VERSION = '1.00';
+
+# -----------------------------------------------
+
+sub dispatch_args
+{
+	return
+	{
+		prefix => '<tmpl_var name=prefix>::CGIApp',
+		table  =>
+		[
+		 ''         => {app => 'main-menu', prefix => '<tmpl_var name=prefix>', rm => 'main_menu'},
+		 ':app/:rm' => {},
+		],
+	};
+
+} # End of dispatch_args.
+
+# -----------------------------------------------
+
+1;

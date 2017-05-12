@@ -1,0 +1,32 @@
+=head1 Application Name
+
+=over 4
+
+=item B<General Information>
+
+ Type: Programming Language [Platform] Library|Application 
+ Availibility: URL
+
+=item B<Encryption|Signatures|Envelopes|Key Format>
+
+ Standard: Cryptographic Standard Implemented.
+
+ Mapping from Crypt::RSA methods to Library methods/functions or
+ Application switches/interface commands. This is can be a free-form
+ description. Instructional code snippets are fine too. If the code is
+ meant for production, it can be included with the distribution.
+
+ Crypt::RSA Version: 
+ Submitted By: Name <Email address>
+
+=item B<Encryption|Signatures|Envelopes|Key Format>
+
+ ...
+ ... 
+
+=back
+
+ # edit the source of this file in a text editor.
+ # send filled out template to Vipul Ved Prakash <mail@vipul.net>
+ # SEE ALSO: crypt-rsa-interoperability(3)
+

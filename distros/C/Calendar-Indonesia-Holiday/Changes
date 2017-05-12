@@ -1,0 +1,208 @@
+Revision history for Calendar-Indonesia-Holiday
+
+0.28    2016-04-23 (PERLANCAR)
+
+	- Add official holidays of 2017.
+
+
+0.27    2015-12-09 (PERLANCAR)
+
+	- Add 2015 holiday: Pilkada Serentak (2015-12-09).
+
+
+0.26    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.25    2015-07-25 (PERLANCAR)
+
+	- Update with official 2016 holidays (Isra Miraj is May 6th not
+	  4th, Idul Adha is Sep 12th not 13th, Hijra is Oct 2nd not 3rd).
+
+
+0.24    2015-04-28 (PERLANCAR)
+
+	- Add tentative holidays for 2016.
+
+	- Split CLIs to its own dist App-IndonesianHolidaysUtils to reduce
+	  deps.
+
+	- Replace Log::Any with Log::Any::IfLOG.
+
+
+0.23     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.22     2014-08-06 (SHARYANTO)
+
+         - Update data: 2015 holidays (official, decreed May 7th, so I'm a bit
+           late).
+
+
+0.21     2014-07-02 (SHARYANTO)
+
+         - No functional changes.
+
+         - [Bugfix] scripts/ or bin/ files need to have something like #!perl and
+           not #!/usr/bin/env perl so it can be replaced to the path of perl when
+           installing [RT#96884]
+
+
+0.20     2014-06-26 (SHARYANTO)
+
+         - Add script: list-id-workdays.
+
+
+0.19     2014-04-24 (SHARYANTO)
+
+         - bin/list-id-holidays: Experiment with Text::ANSITable's style set.
+
+
+0.18     2014-04-16 (SHARYANTO)
+
+         - Change wording of Pemilu -> Pemilu Legislatif, Pilpres -> Pemilu
+           Presiden.
+
+
+0.17     2014-04-08 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename fields 'id_aliases' -> 'ind_aliases' and 'en_aliases' ->
+           'eng_aliases' to be more consistent (language codes in field/function
+           names use ISO 3-letter codes while country names use ISO 2-letter
+           codes).
+
+         [ENHANCEMENTS]
+
+         - Add tentative holiday: Pilpres 2014.
+
+         - Add holidays: Pemilu 2009, Pilpres 2009.
+
+         - Add note field (currently unused).
+
+         - Add year and month to positional arguments so you can just say
+           'list-id-holidays 2014' or 'list-id-holidays 2014 4' instead of
+           'list-id-holidays --year 2014 --month 4'. This is a bit like the Unix
+           'cal' command, except that the order of arguments is (year) or
+           (year,month) instead of (year) or (month,year).
+
+
+0.16     2014-04-08 (SHARYANTO)
+
+         - Add holiday: Pemilu 2014.
+
+         - Add decree_date and decree_note fields when data is available (only
+           for a couple of holidays so far).
+
+
+0.15     2013-12-12 (SHARYANTO)
+
+         - No functional changes.
+
+         [REMOVED FEATURES]
+
+         - Remove alias module Calendar::Indonesia::Holiday. I'm in general no
+           longer in favor of alias modules, except when it's really needed
+           (e.g. original name is really long).
+
+
+0.14     2013-08-27 (SHARYANTO)
+
+         - Update data: 2014 holidays (official, decreed Aug 21st).
+
+
+0.13     2013-07-25 (SHARYANTO)
+
+         - Update data: 2014 holidays (tentative, no decree yet).
+
+
+0.12     2012-08-04 (SHARYANTO)
+
+         - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.16.
+
+
+0.11     2012-08-04 (SHARYANTO)
+
+         - Update data: 2013 holidays (decreed Jul 19).
+
+
+0.10     2012-07-11 (SHARYANTO)
+
+         - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.14.
+
+
+0.09     2012-06-04 (SHARYANTO)
+
+         - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.11.
+
+
+0.08     2012-03-22 (SHARYANTO)
+
+         - No functional changes. Update to Perinci::Sub::Gen::AccessTable 0.08.
+
+
+0.07     2011-12-14 (SHARYANTO)
+
+         - No functionality changes.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Column 'id_name' becomes 'ind_name', 'en_name' becomes 'eng_name'.
+           Sorry. The use of 'id' for 'Indonesian' is easily confused with
+           'identifier'.
+
+
+0.06     2011-12-14 (SHARYANTO)
+
+         - No library changes. Add command-line script.
+
+
+0.05     2011-10-05 (SHARYANTO)
+
+         - Fix some calendar mistakes, add holidays from 2002-2007.
+
+
+0.04     2011-07-19 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - enum_id_workdays() (and count_id_workdays()) now accepts 'start_date'
+           and 'end_date' arguments instead of 'year'/'mon', to be more flexible
+           (list_id_holidays() should probably do too, but this requires
+           enhancements to Sub::Spec::Gen::ReadTable first).
+
+         [FIXES]
+
+         - Calendar::ID::Holiday alias module previously couldn't export
+           functions.
+
+
+0.03     2011-07-10 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add alias Calendar::ID::Holiday
+
+
+0.02     2011-06-30 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add functions: enum_id_workdays(), count_id_workdays().
+
+         - (documentation) Add FAQ.
+
+
+0.01     2011-06-14 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,54 @@
+Revision history 
+
+1.00  Tue Oct  4 09:46:44 UTC 2005
+  - Fix errors in docs (Andrew McAlister, Jesse Sheidlower)
+  - Check args to untaint_columns (Dave Howorth)
+  - Add some more docs.
+
+0.94  Tue Apr  8 2003
+        - Update using Class::DBI's set() method so that constraints can
+          check values of other columns (Thanks to Mark Hughes)
+
+0.93  Fri Mar 14 2003
+        - Upgrade to Class::DBI 0.91 (using deprecated methods)
+        - Change dependency to DBD::SQLite
+
+
+0.92  Wed Nov 27 2002
+        - Upgrade to Class::DBI 0.90 (using deprecated methods)
+
+0.91  Wed Mar 06 2002
+        - cope with case of not required field not being receieved at all
+          (as opposed to not untainting correctly)
+
+0.9   Mon Feb 25 2002
+        - added 'create_from_cgi' method
+
+0.8   Sat Feb 23 2002
+        - Can now ask what the untaint type for a given column would be
+
+0.07  Sun Dec 23 2001
+        - Can now specify fields which must be filled, and fields which
+          should be ignored.
+
+0.06  Mon Dec 17 2001
+        - Auto-detect 'text' fields with mysql also
+
+0.05  Fri Nov  9 2001
+        - Attempts to set default untaint patterns based on DB schema
+          if used with Class::DBI::mysql
+
+0.04  Wed Nov  7 2001
+        - auto-skips primary key
+        - defaults to $obj->columns('All') where none specified
+
+0.03  Thu Nov  1 2001
+        - removed framework-specific behavior so can stand alone 
+        - First CPAN release
+
+0.02  Fri Oct 15 2001
+	      - allow untaint_columns to take many pairs, instead of just one 
+
+0.01  Sun Sep 23 2001
+        - original version
+

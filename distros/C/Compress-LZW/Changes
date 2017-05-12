@@ -1,0 +1,49 @@
+Changelog for Compress-LZW
+
+0.04 2015-02-10T00:27:05
+ - Fix readme catching pre-podweaver input, fix new error about adding
+   Changes twice (Meredith Howard)
+ - Add v0.03 Changes (Meredith Howard)
+ - Fix losing characters in block mode on reset (Alex Kapranoff)
+ - Fix decompression of the last (short) code (Alex Kapranoff)
+ - Expected is first in cmp_ok (Alex Kapranoff)
+ - Fix decompression in block mode (Meredith Howard)
+ - Fix being code-capped in decompress and the check for known code
+   (Meredith Howard)
+ - Bring closer in line with current state of rb-compress-lzw (Meredith
+   Howard)
+ - Kwalitee fixes (Meredith Howard)
+
+0.03 2014-01-23T00:28:05Z
+ - Doc updates, add a sanity check, pile more junk on dzil (Meredith
+   Howard)
+ - Add Type::Tiny constraints for ~public attributes (Meredith Howard)
+ - Add subtest for extended code size (Meredith Howard)
+ - Add subtest for non-default init code size (Meredith Howard)
+ - add tests for some non-default options and fixes to match (block resets
+   and msb0 mode) (Meredith Howard)
+ - Fix defaults included in method headings (Meredith Howard)
+ - Fix hex constant (only failed to compile on some systems?) (Meredith
+   Howard)
+
+0.02 2014-01-15T01:13:03Z
+ - Rearrange a bit and fill in more pod (Meredith Howard)
+ - enable github, git stuff (Meredith Howard)
+ - build changes (Meredith Howard)
+ - Remove readme (Meredith Howard)
+ - Add reset methods for object reuse, fixes for tests, pod stubs (Meredith
+   Howard)
+ - Expand tests (Meredith Howard)
+ - Break out modules into separate files (Meredith Howard)
+ - Clean up (Meredith Howard)
+ - forget Changes (Meredith Howard)
+ - Forget Changes, tweak dist.ini more (Meredith Howard)
+ - dist.ini updates, add Changes file (Meredith Howard)
+ - rearrange pod (Meredith Howard)
+ - Implement decompression, add test for larger data that requires scaling
+   up to 16 bits (Meredith Howard)
+ - Add init_code_size, reorganize (Meredith Howard)
+ - Rewrite compression (Meredith Howard)
+ - Rewrite compression, modify tests. (Meredith Howard)
+ - Initial (Meredith Howard)
+

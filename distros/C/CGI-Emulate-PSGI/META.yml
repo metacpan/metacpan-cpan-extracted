@@ -1,0 +1,47 @@
+---
+abstract: 'PSGI adapter for CGI'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::Requires: '0.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Emulate-PSGI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  CGI: '3.63'
+  HTTP::Response: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/p5-cgi-emulate-psgi/issues
+  homepage: https://github.com/tokuhirom/p5-cgi-emulate-psgi
+  repository: https://github.com/tokuhirom/p5-cgi-emulate-psgi.git
+version: '0.23'
+x_contributors:
+  - 'Bastian Blank <waldi@debian.org>'
+  - 'Clay Fouts <cfouts@liblime.com>'
+  - 'dakkar <dakkar@thenautilus.net>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'James Wright <james2vegas@aim.com>'
+  - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Mark Stosberg <mark@stosberg.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Nick Stokoe <github.wu-lee@noodlefactory.co.uk>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

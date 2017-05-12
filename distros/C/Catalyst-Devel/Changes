@@ -1,0 +1,293 @@
+This file documents the revision history for Perl extension Catalyst-Devel.
+
+1.39 2013-06-14 12:44:17
+        - Write =encoding utf8 into generated Pod files so that things
+          work as expected for people with utf-8 characters in their unix
+          username as returned by getpwuid (RT#84613)
+        - Fix unbalanced parenthesis in comptest.tt (RT#85661)
+
+1.38 2013-04-11 20:54:00
+        - Remove all PAR based deployment options, as they're unsupported
+          and don't even pretend to work on 5.9 RT#83936
+
+1.37 2012-05-19 11:19:00
+        - Add x_authority metadata to the distribution for PAUSE.
+
+        - Fix restarter regex to apply to files being created/changed,
+          not just those being deleted.
+
+        - Use iomode => ":raw" to stop PNG files getting corrupted
+          when being slurped on windows as noted on the mailing list.
+
+1.36 2011-10-24 17:58:00
+        - New apps send an X-Catalyst header by default (this can be
+          disabled by changing the config in the generated app)
+        - Fix leaking temporary files in tests. RT#59166
+        - Fix generated Makefile.PL to always contain unix style paths,
+          even on Win32. RT#65456
+        - Fix tests generated for controllers generated with --mechanize
+          to work with newer versions of Test::WWW::Mechanize::Catalyst
+        - bump Module::Install dep to 1.02
+        - Removed stderr hiding from 'make catalyst_par' to display errors 
+          from PAR::Packer
+
+1.35 2011-09-05 13:05:00
+        - Stop requiring Starman and MooseX::Daemonize on Win32 as they're
+          optional components in Catalyst::Runtime and won't install
+          on Windows.
+        - Fix test to work on Windows. 
+
+1.34 2011-08-16 09:02:00
+        - Bump required version of Catalyst to 5.9
+        - Merge psgi support. catalyst.pl will now generate a default
+          myapp.psgi file with the default middlewares applied.
+        - Fix scripts being generated mode 0700, rather than 0755
+        - Fix duplicate 'use Test::More' statement in generated components.
+        - Fix Pod for catalyst_ignore function in Module::Install::Catalyst
+          RT#68563
+
+1.33 2011-03-24 15:10:00
+        - Fix a regression introduced in 1.32 that caused Catalyst::Restarter
+          to not work at all.
+
+1.32 2011-03-22 09:17:00
+        - Fix RT#65907: missing build require: Test::Exception
+        - Fix RT#57019: Fix bundling of File::Copy::Recursive in inc/
+          by Module::Install::Catalyst
+
+1.31 2011-01-20 01:08:00
+        - Fix for copying generated files into installed apps + tests
+          to ensure it keeps working. abraxxa++
+        - Make Pod tests author only
+
+1.30 2011-01-11 23:54:00
+        - Increased Catalyst::Plugin::ConfigLoader dependency to 0.30
+        - Include File::Copy::Recursive in inc/ when building a dist of an
+          application.
+
+1.29 2011-01-11 23:51:00
+        - Add documentation for the --proc_title option to the generated
+          fastcgi scripts
+        - Don't bother with the BEGIN { use_ok dance for created tests
+          - the test will fail to compile (and ergo fail) using just use,
+          and that's less typing (and less copy-pasting)
+        - Split method for creating tests into multiple methods to allow
+          subclasses to override the generation of some tests.
+        - Allow the author to be defined in the call to ->new to help things
+          which want to call Catalyst::Helper programatically.
+        - Remove $VERSION = eval $VERSION handwave in generated code as:
+          - Gives a perl critic violation.
+          - If you're shipping a dev release, best practice is you should do
+            it by renaming the tarball, rather than having a _ in the VERSION.
+        - Allow catalyst.pl . to work for already created applications
+          when in the application's directory.
+        - Note that plugin order is important in the generated skeleton.
+        - Don't pollute M::I plugin detector with GetOptions symbol from
+          GetOpt::Long
+        - Fix typo in share/script/myapp_server.pl.tt (RT #58475)
+
+1.28 2010-06-16 02:43:00
+        - Fix generated Pod tests so that the first check is if the TEST_POD
+          environment variable is set. (RT#58433)
+        - Fix link in the Pod for Catalyst::Restarter (RT#57362)
+        - Fix the pod-coverage version required by the generated app tests.
+        - Fix the restarter to only act upon file events (and ergo ignore
+          the creation of empty directories).
+
+1.27  2010-02-23 10:44:20
+        - Add the catalyst_par_options option.
+        - Change the version of Catalyst required to 5.80015 as retarded
+          packaging systems consider 5.8001402 greater than 5.80015.
+
+1.26  2010-01-12 03:55:50
+        - Depend on Catalyst::Plugin::Static::Simple 0.28 to avoid failures
+          caused by a bug in 0.27.
+
+1.25  2010-01-02 16:13:06
+        - Update repository metadata after moving from svn to git.
+
+1.24  2009-12-07 23:23:36
+        - File name for .yml file generated is now correct.
+        - Fixes for consistent spacing in generated application template.
+        - Stop requiring generated test files to have a true return value.
+        - Win32 compatibility fixes:
+          1) hardcoded 'make' replaced by: $Config{make}||'make'
+          2) testing executable flags skipped on Win32
+        - Fix pod to match option names on Catalyst::Script::Server
+
+1.23  2009-12-06 12:22:12
+        - Fix generated app test to be multi-platform and fix issue with case
+          for generated files. (Dave Rolsky)
+        - Fix Test::More version dependency so that subtest works correctly.
+        - Add a $VERSION to Catalyst::Helper as PAUSE used to pull $VERSION
+          (i.e. 0.01) out of the app template section and use that, so we now
+          can't not have a version number here or it makes pause unhappy.
+
+1.22  2009-12-05 07:23:00
+        - Use MooseX::Emulate::Class::Accessor::Fast so that options
+          supplied to ->new are put into the hash even if attributes
+          do not exist for them. This fixes -force recreating application
+          scripts.
+
+1.21_01  2009-12-01 03:34:23
+        - Update generated scripts to use the new Catalyst::Script:: classes
+          available from Catalyst 5.80014_02.
+          Note: Any applications whos scripts are upgraded will need to depend
+          on at least this version of Catalyst.
+        - Change application templates from being inlined in Catalyst::Helper
+          to being in a share dir making the templates much easier to maintain
+          and patch.
+        - Generate new applications with Moose and Moose style components.
+        - Remove dependency on parent.pm as this has been removed from the generated
+          application template.
+        - Turn off deprecated regex component lookup in the config of new
+          applications.
+        - Test application generation and helper classes properly.
+        - Change tests in generated application and components to use the new
+          done_testing feature rather than having test plans.
+        - Update required versions of dependencies to ensure the installed versions
+          won't cause deprecation warnings with the latest Catalyst.
+        - Exclude root/, t/ and hidden dirs from file change monitoring when
+          using File::ChangeNotify 0.08+. (dew)
+        - Updated POD of Module/Install/Catalyst.pm (Karsten Heymann)
+        - Added debian package building temp files to the list
+          of ignored files/directories and fix ignore for subversion
+          checkouts. (Karsten Heymann)
+
+1.21   2009-10-18 18:33:33
+        - The Restarter code caused stack traces for certain types of errors
+          to grow longer and longer with every restart. (Dave Rolsky)
+
+        - Fixed an issue with the Restarter in Win32 where @INC didn't get
+          passed along when restarting.
+
+1.20    2009-08-11 23:30:30
+        - Bump required File::ChangeNotify version to 0.07. Closes RT#48610.
+
+1.19    2009-06-29 00:36:50
+        - Update Module::Install to a version that doesn't screw up
+          auto_install anymore (Closes: RT#45784).
+        - Generate Makefile.PLs with unix-paths, even on windows (Closes:
+          RT#46059).
+
+1.18    2009-06-10 17:43:12
+        - The forking restarter was not waiting for the child to exit,
+          which could lead to a race condition. If the old child did
+          not exit before the new child tried to bind to its socket,
+          it would find the old child blocking the port it wanted.
+        - More fixes for the Win32 restarter. It was effectively
+          ignoring all command-line options except those related to
+          the restarter itself.
+
+1.17    2009-05-24 18:18:17
+        - Catalyst::Restarter::Forking loaded the threads and
+          Thread::Cancel modules, even though it doesn't need them.
+
+1.16    2009-05-23 17:29:29
+        - Catalyst prereq changed to 5.80. Thanks, kold! (jhannah)
+        - Fixed the restarter to actually work on Win32. The fix means
+          that the restarter is as slow as ever on Win32, but it
+          works. Thanks to Rodrigo for the bug report and suggestion
+          on how to fix it. (Dave Rolsky)
+        - Actually fix -p option for port number, as I failed to do it
+          right last time as I'm an idiot (t0m)
+
+1.15    2009-05-13 20:02
+        - Remove -p option for pid file, and restore it to the port number,
+          as it should be -port|-p (t0m)
+        - Document -pidfile in myapp_server.pl POD (t0m)
+
+1.14_02 2009-05-11 04:29
+        - Small changes to work with File::ChangeNotify 0.03. (Dave
+          Rolsky)
+
+1.14_01 2009-05-11 03:45
+        - This release moves the restarter functionality into a new
+          module Catalyst::Restarter, that is not a Catalyst Engine
+          subclass.
+
+          The new restarter is simpler and more reliable, because it
+          does not try to test if a changed piece of code can be
+          compiled. It simply restarts the server whenever it detects
+          changes. This also makes it much faster.
+
+          However, this does mean that the server can simply die when
+          a changed file cannot compile. This is different than the
+          old behavior, where the server remained running without
+          incorporating the change.
+
+          Finally, the new restarter relies on File::ChangeNotify,
+          which is designed to accomodate per-OS methods of detecting
+          changed files. As of this writing, it currently ships with a
+          file watcher that uses inotify on Linux systems, and a
+          default fallback class that does everything in pure Perl.
+          (Dave Rolsky)
+
+1.13    2009-05-11 02:50
+        - add [-pidfile|-p] option for myapp_server.pl (caelum)
+        - Bump dependency on Config::General (caelum)
+        - On perls with c3 method dispatch, make sure Class::C3 is recent
+          enough to not produce warnings if it is already installed (caelum)
+        - add resources to META.yml (caelum)
+
+1.12    2009-04-26 15:42
+        - Remove the deprecated BindLex from the _create.pl help message (rafl)
+
+1.11    2009-04-22 19:02
+        - Add check for "Unknown error" bug (caelum)
+        - Change generated scripts to use /usr/bin/env perl if /usr/bin/env
+          exists, otherwise fall back to the current perl binary. (t0m)
+        - Fix getopt spec in generated scripts to match docs (rjbs)
+        - Additional documentation (ash)
+        - Informational message after an application is created (kd)
+        - Add a -background option to the dev server (duncs)
+
+1.10    2009-02-05 15:04
+        - fix a bug in created helper scripts that prevened them working (rjbs)
+
+1.09    2009-02-04 23:57
+        - Add Sebastian's PROJECT FOUNDER note to Devel.pm as requested
+        - Fix warning when devel is not installed.
+
+1.08    2008-07-13 18:00
+        - Revert to use Catalyst qw/@plugins/
+        - Require Config::General instead of YAML
+
+1.07    2008-05-28
+        - helpers now create default :Path and index :Path :Args(0)
+        - Moved Helper.pm to generate .conf rather than YAML
+        - Made a warning in the generated Makefile.PL not to delete it.
+        -  Incorrect generated pod.
+
+1.06    2008-04-09 08:19:00
+        - load plugins in setup, not plugins. (ema_zep@libero.it)
+
+1.05    2008-04-07 11:55:00
+        - Add missing parent dependency to created projects.
+
+1.04    2008-04-06 16:04:00
+        - Update default actions in Root.pm
+        - Patch Helper.pm so Module::Pluggable::Object ignores emacs temp
+          files appropriately for restarting server
+        - Patched Helper.pm so the correct options for mulitple restart
+          directories and symlink resolution will be set in myapp_server.pl
+          (Sebastian Willert)
+        - Change from use Catalyst to use parent and load plugins  in setup call
+        - Remove Catalyst::Manual dependency.
+
+1.03    2007-08-10 08:10:00
+        - Changed default dependency to Catalyst::Runtime
+        - Added BindLex example to create script
+        - Don't change a manually-specified engine when using the
+          -r switch with server.pl
+
+1.02    2006-11-15  16:45:00
+        - Added dep to Catalyst::Manual
+        - added option to send errors to STDOUT in fastcgi script
+
+1.01    2006-09-17 23:49:00
+        - Upped M::I dependency
+        - fix for warnings
+
+1.00    2006-07-06 19:23:00
+        - Initial release

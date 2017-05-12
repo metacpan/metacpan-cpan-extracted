@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:35Z">
+<BookList total_results="252" page_size="10" page_number="10" shown_results="10">
+<BookData book_id="scenes_from_politician" isbn="0585052247">
+<Title>Scenes from "Politician"</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2004-07-26T00:25:38Z" price_time="2006-10-08T07:58:03Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction.Boulder, Colo. :NetLibrary,2001.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://ezproxy.lib.monash.edu.au/login?url=http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1086020 Full text available online via NetLibrary (restricted access)</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="rome_drama">Rome -- Drama</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Monash University" last_update="2004-07-26T00:25:38Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-scenes_from_politician-20040725.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_poetry_and_prose_a12" isbn="0075536412">
+<Title>Selected Poetry and Prose</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="mcgraw_hill_humanities_social_">McGraw-Hill Humanities/Social Sciences/Languages</PublisherText>
+<Details dewey_decimal="810.81" physical_description_text="427 pages" language="" edition_info="Paperback; 1951-06-01" dewey_decimal_normalized="810.81" lcc_number="" change_time="2006-08-24T23:05:50Z" price_time="2006-10-08T07:58:06Z" />
+<Summary>Edited, with an Introduction, by T.O. Mabbott</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Selected Poetry and Prose by Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-24T23:07:39Z" currency_rate="1" price="1.7" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=42233282&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-24T23:07:40Z" currency_rate="1" price="32.24" />
+<Price store_isbn="" store_title="Selected Poetry and Prose of Poe" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-24T23:07:40Z" currency_rate="1" price="14.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-24T23:07:40Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-24T23:07:40Z" currency_rate="1" price="17.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:24Z" currency_rate="1" price="13.13" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:24Z" currency_rate="1" price="0.98" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:24Z" currency_rate="1" price="12.35" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:24Z" currency_rate="1" price="12.07" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="14.24" />
+<Price store_isbn="" store_title="Selected poetry and prose" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="14.24" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="1.22" />
+<Price store_isbn="" store_title="Selected Poetry and Prose of Edgar Allan Poe" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D33732127%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:41Z" currency_rate="1" price="15.75" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0075536412&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:05Z" currency_rate="1" price="18.75" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:09Z" currency_rate="1" price="13.03" />
+<Price store_isbn="" store_title="Selected Poetry and Prose Product 1529574" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1529574&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:35Z" currency_rate="1" price="13.28" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_poetry_and_prose_a12/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:58:06Z" currency_rate="1" price="16.23" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_prose_poetry_and_eureka" isbn="0030077958">
+<Title>Selected prose, poetry, and Eureka</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edited, with an introd., by W. H. Auden</AuthorsText>
+<PublisherText publisher_id="holt_rinehart_and_winston">New York, Holt, Rinehart and Winston [1968?, c1950]</PublisherText>
+<Details dewey_decimal="818/.3/09" physical_description_text="xxvi, 590 p. 21 cm." language="eng" edition_info="" dewey_decimal_normalized="818.309" lcc_number="PS2602" change_time="2006-04-10T05:40:14Z" price_time="2006-10-08T07:58:09Z" />
+<Summary></Summary>
+<Notes>Originally published under title: Selected prose and poetry.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Selected prose, poetry, and Eureka (Rinehart editions, 42)" store_url="http://isbndb.com/x/book/selected_prose_poetry_and_eureka/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:24Z" currency_rate="1" price="9.54" />
+<Price store_isbn="" store_title="Selected prose, poetry, and Eureka (Rinehart editions, 42)" store_url="http://isbndb.com/x/book/selected_prose_poetry_and_eureka/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="9.54" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Purdue University Library" last_update="2006-04-10T05:40:14Z" marc_url="http://isbndb.com/x/libdata/isbndb-purdueuniv-selected_prose_poetry_and_eureka-20060409.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_tales" isbn="0192832247">
+<Title>Selected tales</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with an introduction and notes by David Van Leer</AuthorsText>
+<PublisherText publisher_id="oxford_university_press">Oxford ; Oxford University Press, 1998.</PublisherText>
+<Details dewey_decimal="" physical_description_text="xxviii, 338 p. ; 20 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PS2612" change_time="2003-10-20T09:53:17Z" price_time="2006-10-08T07:58:16Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. [xxiii]-xxv).</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Selected Tales " store_url="86559932&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:08:35Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Selected Tales: Edgar Allan Poe (Oxford World's Classics Series)" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:08:35Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780192832245" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:08:35Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:09:21Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:09:21Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="Selected Tales (World's Classics) by Edgar Allan Poe; D" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-04T19:40:40Z" currency_rate="1" price="3.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:25Z" currency_rate="1" price="5.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:25Z" currency_rate="1" price="4.05" />
+<Price store_isbn="" store_title="Selected Tales (World's Classics)" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="7.14" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="5.61" />
+<Price store_isbn="" store_title="Selected Tales (World's Classics)" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="0.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="4.99" />
+<Price store_isbn="" store_title="Selected Tales" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:29Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Selected Tales" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:29Z" currency_rate="1" price="4.86" />
+<Price store_isbn="" store_title="Selected Tales (Oxford World's Classics)" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:31Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30272555%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:44Z" currency_rate="1" price="7.15" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0192832247&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:11Z" currency_rate="1" price="7.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:15Z" currency_rate="1" price="5.96" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:53:15Z" currency_rate="1" price="4.77" />
+<Price store_isbn="" store_title="Selected Tales Product 510239" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.510239&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:39Z" currency_rate="1" price="6.71" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:58:16Z" currency_rate="1" price="7.41" />
+</Prices>
+<Subjects>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of North Texas" last_update="2003-10-20T09:53:17Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-selected_tales-20031020.mrc" />
+<MARC library_name="Washington Research Library Consortium" last_update="2006-07-22T04:40:50Z" marc_url="http://isbndb.com/x/libdata/isbndb-213-selected_tales-20060721.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="van_leer_david">Van Leer, David</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_tales_a04" isbn="0140621164">
+<Title>Selected Tales</Title>
+<TitleLong>Selected Tales (Penguin Popular Classics)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="penguin_books_ltd">Penguin Books Ltd</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Paperback; 1994-08-25" dewey_decimal_normalized="" lcc_number="" change_time="2005-08-24T03:31:04Z" price_time="2006-10-08T07:58:19Z" />
+<Summary>Edgar Allan Poe's Gothic tales have established themselves as classics of horror fiction, and himself as the inventor of the modern mystery. Attentive to the historical and political dimensions of these very American tales, this new selection of twenty-four tales places the most popular --"The Fall of the House of Usher," "The Masque of the Red Death," "The Murders in the Rue Morgue," and "The Purloined Letter"--alongside less well-known travel narratives, metaphysical essays, and political satires.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-23T03:41:12Z" currency_rate="1" price="3.5" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-23T03:41:12Z" currency_rate="1" price="33.5" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=29293863&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-23T03:41:19Z" currency_rate="1" price="3.26" />
+<Price store_isbn="" store_title="Selected Tales (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="4.37" />
+<Price store_isbn="" store_title="Selected Tales (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:26Z" currency_rate="1" price="1.87" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:29Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Selected Tales (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:29Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Selected Tales (Penguin Popular Classics)" store_url="http://isbndb.com/x/book/selected_tales_a04/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="1" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_tales_of_edgar_allan_poe" isbn="0786242825">
+<Title>Selected tales of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="thorndike_press">Waterville, Me. : Thorndike Press, [2002]</PublisherText>
+<Details dewey_decimal="" physical_description_text="375 p. (large print) ; 22 cm." language="eng" edition_info="(lg. print:hc : alk. paper)" dewey_decimal_normalized="" lcc_number="" change_time="2003-11-25T09:03:56Z" price_time="2006-10-08T07:58:22Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Selected Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:08:38Z" currency_rate="1" price="29.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-04T19:09:24Z" currency_rate="1" price="33.5" />
+<Price store_isbn="" store_title="Thorndike Classics - Large Print - Selected Tales of Edgar Allan Poe (Thorndike Classics - Large Print)" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:27Z" currency_rate="1" price="29.95" />
+<Price store_isbn="" store_title="Thorndike Classics - Large Print - Selected Tales of Edgar Allan Poe (Thorndike Classics - Large Print)" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:27Z" currency_rate="1" price="14.66" />
+<Price store_isbn="" store_title="Selected Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="39.88" />
+<Price store_isbn="" store_title="Selected Tales of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:30Z" currency_rate="1" price="39.88" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:32Z" currency_rate="1" price="2.91" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30970343%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:46Z" currency_rate="1" price="29.95" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0786242825&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:16Z" currency_rate="1" price="33.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_tales_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:20Z" currency_rate="1" price="28.15" />
+<Price store_isbn="" store_title="Selected Tales of Edgar Allan Poe Product 1838309" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1838309&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:54:46Z" currency_rate="1" price="29.95" />
+</Prices>
+<Subjects>
+<Subject subject_id="large_type_books">Large type books</Subject>
+<Subject subject_id="horror_tales_american">Horror tales, American</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Minneapolis Public Library" last_update="2003-11-25T09:03:56Z" marc_url="http://isbndb.com/x/libdata/isbndb-91-selected_tales_of_edgar_allan_poe-20031125.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selected_writings_a66" isbn="039505110X">
+<Title>Selected writings</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited with an introduction and notes by Edward H. Davidson</AuthorsText>
+<PublisherText publisher_id="houghton_mifflin">Boston : Houghton Mifflin, [1956]</PublisherText>
+<Details dewey_decimal="810.81" physical_description_text="xxxii, 508 p. : ill. ; 21 cm." language="eng" edition_info="" dewey_decimal_normalized="810.81" lcc_number="PS2602" change_time="2005-02-08T15:34:37Z" price_time="2006-03-06T19:58:44Z" />
+<Summary></Summary>
+<Notes>Bibliography: p. xxix.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:42:30Z" currency_rate="1" price="4" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:42:30Z" currency_rate="1" price="24.95" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:42:31Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-06T19:42:31Z" currency_rate="1" price="23.36" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe Product 1272194" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.1272194&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-03-06T19:42:34Z" currency_rate="1" price="16.68" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe (Riverside Editions, A11)" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:42:57Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe (Riverside Editions, A11)" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:43:15Z" currency_rate="1" price="0.48" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe (Riverside Editions, A11)" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-03-06T19:43:15Z" currency_rate="1" price="17.56" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe " store_url="http://www.biblio.com/details.php?dcx=42195323&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:44:44Z" currency_rate="1" price="1.91" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:45:16Z" currency_rate="1" price="13.5" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:48:29Z" currency_rate="1" price="13.35" />
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780395051108" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-03-06T19:48:29Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-03-06T19:48:55Z" currency_rate="1" price="15.8" />
+<Price store_isbn="" store_title="Selected Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selected_writings_a66/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-03-06T19:58:44Z" currency_rate="1" price="19.32" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Louisiana State University--Shreveport" last_update="2005-02-08T15:34:37Z" marc_url="http://isbndb.com/x/libdata/isbndb-314-selected_writings_a66-20050208.mrc" />
+<MARC library_name="Arizona State University" last_update="2006-02-07T02:05:50Z" marc_url="http://isbndb.com/x/libdata/isbndb-31-selected_writings_a66-20060206.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="selections_from_the_critical_writings_of_edgar_allan_poe" isbn="0877521824">
+<Title>Selections from the critical writings of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited, with an introd. and notes, by F. C. Prescott; new pref. by J. Lesley Dameron; new introd. by Eric W. Carlson</AuthorsText>
+<PublisherText publisher_id="gordian_press">New York : Gordian Press, 1981.</PublisherText>
+<Details dewey_decimal="" physical_description_text="li, 348 p. ; 23 cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="PS2619" change_time="2004-08-19T17:16:30Z" price_time="2006-08-22T21:46:32Z" />
+<Summary></Summary>
+<Notes>"Second edition."
+
+Reprint of the 1909 ed. published by Holt, New York, in series: English-readings.
+
+Includes bibliographical references.
+
+Letter to B--*---.--Drake's Culprit fay.--Bryant's Poems.--Moore's Alciphron.--Exordium.--Longfellow's Ballads.--Hawthorne's Twice told tales.--N.P. Willis.--The American drama.--Preface to the Poems.--The philosophy of composition.--The rationale of verse.--The poetic principle.--Marginalia.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Selections from the Critical Writings of Edgar All" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-22T21:46:29Z" currency_rate="1" price="46" />
+<Price store_isbn="" store_title="Selections from the Critical Writings of Edgar All" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-22T21:46:29Z" currency_rate="1" price="50" />
+<Price store_isbn="" store_title="Selections from the Critical Writings of Egar Allan Poe" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-22T21:46:29Z" currency_rate="1" price="18" />
+<Price store_isbn="" store_title="Selections from the Critical Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-22T21:46:29Z" currency_rate="1" price="50" />
+<Price store_isbn="" store_title="Selections From the Critical Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-08-22T21:46:32Z" currency_rate="1" price="126.76" />
+<Price store_isbn="" store_title="Selections from the Critical Writings of Edgar Allan Poe" store_url="http://isbndb.com/x/book/selections_from_the_critical_writings_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-08-22T21:46:32Z" currency_rate="1" price="126.76" />
+</Prices>
+<Subjects>
+<Subject subject_id="poe_edgar_allan_1809_1849_aesthetics">Poe, Edgar Allan,1809-1849 -- Aesthetics</Subject>
+<Subject subject_id="american_literature_19th_century_history_and_criticism">American literature -- 19th century -- History and criticism</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--Parkside" last_update="2004-08-19T17:16:30Z" marc_url="http://isbndb.com/x/libdata/isbndb-291-selections_from_the_critical_writings_of_edgar_allan_poe-20040819.mrc" />
+<MARC library_name="University of Massachusetts Dartmouth" last_update="2005-06-27T12:44:16Z" marc_url="http://isbndb.com/x/libdata/isbndb-234-selections_from_the_critical_writings_of_edgar_allan_poe-20050627.mrc" />
+<MARC library_name="University of Pennsylvania" last_update="2006-01-09T05:01:43Z" marc_url="http://isbndb.com/x/libdata/isbndb-244-selections_from_the_critical_writings_of_edgar_allan_poe-20060108.mrc" />
+<MARC library_name="Library of Congress" last_update="2006-08-22T21:46:27Z" marc_url="http://isbndb.com/x/libdata/isbndb-loc-selections_from_the_critical_writings_of_edgar_allan_poe-20060822.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="prescott_frederick">Prescott, Frederick</Person>
+</Authors>
+</BookData>
+<BookData book_id="seven_tales" isbn="0805234012">
+<Title>Seven tales</Title>
+<TitleLong></TitleLong>
+<AuthorsText>With a French translation and prefatory essay by Charles Baudelaire. Edited by W. T. Bandy</AuthorsText>
+<PublisherText publisher_id="schocken_books">New York, Schocken Books [1971]</PublisherText>
+<Details dewey_decimal="813/.3" physical_description_text="245 p. illus. 22 cm." language="eng" edition_info="" dewey_decimal_normalized="813.3" lcc_number="PZ3" change_time="2003-11-23T02:34:54Z" price_time="2005-05-02T05:37:14Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references.
+
+Le chat noir. The black cat.--Révélation magnétique. Mesmeric revelation.--Ligeia. Ligeia.--L'homme des foules. The man of the crowd.--Le portrait ovale. The oval portrait.--La chute de la Maison Usher. The fall of the House of Usher.--La lettre volée. The purloined letter.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/seven_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-02T05:37:12Z" currency_rate="1" price="15" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/seven_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-02T05:37:13Z" currency_rate="1" price="12" />
+<Price store_isbn="" store_title="Seven tales." store_url="http://isbndb.com/x/book/seven_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-02T05:37:13Z" currency_rate="1" price="10.45" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Washington State University" last_update="2003-11-23T02:34:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-120-seven_tales-20031122.mrc" />
+<MARC library_name="Missouri Education and Research Library Information Network (MERLIN)" last_update="2003-11-23T12:16:19Z" marc_url="http://isbndb.com/x/libdata/isbndb-281-seven_tales-20031123.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="baudelaire_charles">Baudelaire, Charles</Person>
+</Authors>
+</BookData>
+<BookData book_id="shadow_a_parable" isbn="0585065977">
+<Title>Shadow, a parable</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue, [199-?].</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="PS2618" change_time="2003-11-26T17:26:34Z" price_time="2006-06-25T19:05:57Z" />
+<Summary></Summary>
+<Notes>Electronic reproduction. Boulder, Colo. : NetLibrary, 1999. Available via World Wide Web. Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>Bibliographic record display http://0-www.netlibrary.com.library.vu.edu.auurlapi.asp?action=summary&amp;v=1&amp;bookid=1086158 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="death_fiction">Death -- Fiction</Subject>
+<Subject subject_id="shadows_fiction">Shadows -- Fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Victoria University (Melbourne, Australia)" last_update="2003-11-26T17:26:34Z" marc_url="http://isbndb.com/x/libdata/isbndb-296-shadow_a_parable-20031126.mrc" />
+<MARC library_name="Monash University" last_update="2004-02-24T22:11:01Z" marc_url="http://isbndb.com/x/libdata/isbndb-223-shadow_a_parable-20040224.mrc" />
+<MARC library_name="University of Iowa" last_update="2004-12-09T05:30:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-211-shadow_a_parable-20041208.mrc" />
+<MARC library_name="Milwaukee Public Library" last_update="2005-01-08T08:35:41Z" marc_url="http://isbndb.com/x/libdata/isbndb-269-shadow_a_parable-20050108.mrc" />
+<MARC library_name="California State University, Pomona" last_update="2005-03-08T23:52:08Z" marc_url="http://isbndb.com/x/libdata/isbndb-161-shadow_a_parable-20050308.mrc" />
+<MARC library_name="University of North Texas" last_update="2006-06-25T15:14:48Z" marc_url="http://isbndb.com/x/libdata/isbndb-238-shadow_a_parable-20060625.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

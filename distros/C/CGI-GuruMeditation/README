@@ -1,0 +1,27 @@
+CGI::GuruMeditation
+===================
+
+ABSTRACT
+
+This is a small module accompanying the CGI module, providing the
+display of an error screen (somewhat resembling the classical
+red-on-black blinking Guru Meditation from the good-old AmigaOS before
+version 2.04) in case of abnormal termination of a CGI.
+
+The module simply installs a $SIG{__DIE__} handler which sends a HTTP
+response showing a HTML/CSS based screen which optionally includes the
+Perl run-time error message, an excerpt from the CGI source code and the
+Perl run-time environment variables. This provides both optically more
+pleasant and functionally more elaborate error messages for CGIs.
+
+This module supports both the regular CGI and the Apache/mod_perl CGI
+environment.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+

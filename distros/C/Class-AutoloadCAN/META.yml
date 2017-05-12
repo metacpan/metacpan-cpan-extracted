@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name: Class-AutoloadCAN
+version: 0.03
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Class::AutoloadCAN:
+    file: lib/Class/AutoloadCAN.pm
+    version: 0.03
+generated_by: Module::Build version 0.20

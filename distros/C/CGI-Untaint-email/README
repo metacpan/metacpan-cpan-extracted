@@ -1,0 +1,24 @@
+NAME
+    CGI::Untaint::email - validate an email address
+
+SYNOPSIS
+      use CGI::Untaint;
+      my $handler = CGI::Untaint->new($q->Vars);
+
+      my $email = $handler->extract(-as_email => 'emailaddress');
+
+DESCRIPTION
+    CGI::Untaint::email input handler verifies that it is a valid RFC2822
+    mailbox format.
+
+    The resulting value will be a Mail::Address instance.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the CGI::Untaint manpage, the Email::Valid manpage
+

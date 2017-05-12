@@ -1,0 +1,40 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Alphalist Widget.
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Get the contents of the current directory.
+my @info = qx (ls);
+chomp @info;
+
+# Create a new alphalist object.
+my $alphalist = new Cdk::Alphalist ('Label' => "Type Anything:",
+					'Filler' => "</R/24>_",
+					'Height' => 20,
+					'Width' => 60,
+					'List' => \@info);
+
+$alphalist->set ('BoxAttribute' => "</R>");
+
+# Activate the object.
+my $info = $alphalist->activate();
+
+# Check the results...
+if (! defined $info)
+{
+   popupLabel (["<C>You hit escape to exit the widget."]);
+}
+else
+{
+   popupLabel (["<C>You selected ($info)"]);
+}
+
+# Exit Cdk.
+Cdk::end();

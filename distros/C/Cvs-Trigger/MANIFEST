@@ -1,0 +1,11 @@
+Changes
+lib/Cvs/Trigger.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/001Basic.t
+t/002Cache.t
+t/003Loginfo.t
+t/004VerifyMsg.t

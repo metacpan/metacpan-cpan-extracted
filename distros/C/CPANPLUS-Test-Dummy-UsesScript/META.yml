@@ -1,0 +1,21 @@
+---
+abstract: 'CPANPLUS Test Dummy'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPANPLUS-Test-Dummy-UsesScript
+requires:
+  CPANPLUS::Test::Dummy::HasScript: 0.0004
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/cpanplus-test-dummy-usesscript
+  repository: https://github.com/bingos/cpanplus-test-dummy-usesscript.git
+version: 0.0004

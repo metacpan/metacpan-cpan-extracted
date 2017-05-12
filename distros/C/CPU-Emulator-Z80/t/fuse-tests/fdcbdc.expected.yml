@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  22942:
+    - 29
+name: fdcbdc
+registers:
+  AF: 23802
+  AF_: 0
+  BC: 11819
+  BC_: 0
+  DE: 7447
+  DE_: 0
+  HL: 7670
+  HL_: 0
+  I: 0
+  IX: 42226
+  IY: 22842
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,36 @@
+<div class=path>
+<a href="[% home %]/[% mode %]">[% pages.list.$mode %]</a>
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+[% IF subletter %]
+<a href="[% home %]/[% mode %]/[% letter %]/">
+[% letter %]</a>
+&nbsp; &nbsp; <b>&gt; &gt;</b> &nbsp; &nbsp;
+<B>[% subletter %]</B>
+[% ELSE -%]
+<B>[% letter -%]</B>
+[% END -%]
+</div>
+[% class = 's' %]
+<table width="100%">
+[% USE table(results, rows=3) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END -%]
+[% IF item.letter %]
+<td><a
+href="[% home %]/[% mode %]/[% item.letter %]/"><b>[% item.letter %]::*</b></a>
+<br /><small>[ more ... ]</small></td>
+[% ELSIF item.mod_name %]
+<td><a
+href="[% home %]/[% mode %]/[% item.mod_name %]"><b>[% item.mod_name %]</b></a>
+<br /><small>[% item.mod_abs %]</small></td>
+[% END -%]
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>

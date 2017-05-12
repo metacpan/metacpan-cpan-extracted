@@ -1,0 +1,61 @@
+---
+abstract: 'Factory class for Cache::Cache and other modules.'
+author:
+  - 'Sam Graham <libcache-cachefactory-perl@illusori.co.uk>'
+build_requires:
+  Module::Build: 0.07
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cache-CacheFactory
+provides:
+  Cache::CacheFactory:
+    file: lib/Cache/CacheFactory.pm
+    version: 1.10
+  Cache::CacheFactory::Expiry:
+    file: lib/Cache/CacheFactory/Expiry.pm
+    version: 1.10
+  Cache::CacheFactory::Expiry::Base:
+    file: lib/Cache/CacheFactory/Expiry/Base.pm
+    version: 1.10
+  Cache::CacheFactory::Expiry::LastModified:
+    file: lib/Cache/CacheFactory/Expiry/LastModified.pm
+    version: 1.10
+  Cache::CacheFactory::Expiry::Size:
+    file: lib/Cache/CacheFactory/Expiry/Size.pm
+    version: 1.10
+  Cache::CacheFactory::Expiry::Time:
+    file: lib/Cache/CacheFactory/Expiry/Time.pm
+    version: 1.10
+  Cache::CacheFactory::Object:
+    file: lib/Cache/CacheFactory/Object.pm
+    version: 1.10
+  Cache::CacheFactory::Storage:
+    file: lib/Cache/CacheFactory/Storage.pm
+    version: 1.10
+recommends:
+  Cache::FastMemoryCache: 0.01
+  Cache::FileCache: 0
+  Cache::MemoryCache: 0
+  Cache::SharedMemoryCache: 0
+  Devel::Size: 0.69
+  File::Basename: 0
+  File::Path: 0
+  File::Temp: 0
+requires:
+  Cache::BaseCache: 0
+  Cache::Cache: 1
+  Cache::Object: 0
+  Carp: 0
+  Class::Factory: 0
+  Scalar::Util: 0
+  Storable: 1.014
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.10

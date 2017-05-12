@@ -1,0 +1,22 @@
+[%
+   title=  name
+   description= name
+%]
+[% INCLUDE incl/header.tt %]
+
+<div id="grep">
+<ul>
+[% FOR m IN matches %]
+  <li>
+    <a href="/m/[% m.value.link %]">[% m.key %]</a>
+    <ul>
+    [% FOR l IN m.value.match %]
+       <li><a href="/syn/[% dist %]/[% m.key %]#[% l.cnt %]">[% l.cnt %]</a> - [% l.line %]</li>
+    [% END %]
+    </ul>
+  </li>
+[% END %]
+</ul>
+</div>
+
+[% INCLUDE incl/footer.tt %]

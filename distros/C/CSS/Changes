@@ -1,0 +1,17 @@
+Revision history for CSS.pm
+
+1.09		Recompiled P::RD Grammar against newer version to fix https://rt.cpan.org/Public/Bug/Display.html?id=53948
+1.08		Dual licensed
+1.07		Corrected some typos in the POD
+1.06		Fixed bug where '0' properties would be stored as the empty string
+		Added parser test to catch this in future
+1.05		Improved CSS::Adaptor::Pretty to ouput correct amount of tabs
+		Added test suite for CSS::Adaptor::* modules
+1.04		Added search methods to extract CSS::Style and CSS::Property objects
+1.03		Fix to property regexp in CSS::Parse::Lite (thanks to Burak Gürsoy)
+1.01		Bugfix in t/01_basic.t which was looking for a renamed module
+1.00		Complete rewrite with pluggable parsers and full object tree
+		(Backwards compatibility broken!)
+0.08		Added new_scalar constructor and added simple support for multiple selectors
+0.05		Re-instantiating to the CPAN by popular demand.
+0.01-0.04	Lost...

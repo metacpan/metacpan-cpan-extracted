@@ -1,0 +1,6 @@
+Ex6.pm
+Ex6.xs
+MANIFEST
+Makefile.PL
+t/test1.t
+typemap

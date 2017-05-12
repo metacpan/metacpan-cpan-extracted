@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 128
+  42758:
+    - 10
+name: cb80
+registers:
+  AF: 36608
+  AF_: 0
+  BC: 28719
+  BC_: 0
+  DE: 6077
+  DE_: 0
+  HL: 42758
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

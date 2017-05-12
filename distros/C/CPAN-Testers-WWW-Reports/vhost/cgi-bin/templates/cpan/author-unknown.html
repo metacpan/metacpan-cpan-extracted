@@ -1,0 +1,18 @@
+[% 
+    link = author
+    crosslink = '/author/' _ letter _ '.html'
+
+    htmltitle = 'Unknown author "' _ author _ '"'
+    title = htmltitle
+
+    crumb3_name = 'Authors' ;
+    crumb3_href = '/' ;
+    crumb2_name = letter ;
+    crumb2_href = '/author/' _ crumb2_name ;
+    crumb1_name = author ;
+%]
+
+<p>Sorry, but that author is unknown within the system. If this is an author who has only 
+recently registered to PAUSE, please note that author pages are only generated once there
+has been at least one distribution uploaded to PAUSE with the associated PAUSE ID.</p>
+

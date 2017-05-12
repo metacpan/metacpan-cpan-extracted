@@ -1,0 +1,9 @@
+Revision history for Color-TupleEncode
+
+0.11   29 March 2010
+       Bug release. Removed Smart::Comments from code - this wasn't in
+       PREREQ_PM and causing tests to fail.
+
+0.1    22 March 2010
+       First version.
+

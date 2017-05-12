@@ -1,0 +1,57 @@
+This is ConfigReader 0.5.  I'm calling it an alpha release, as I'd
+like to get feedback on the interface.
+
+ConfigReader is a set of classes for reading configuration files.  The
+programmer can easily specify the directives to be read, as well as
+their default values and a parsing function or method to use.  A lot
+of work went into error handling.  The class implementation means that
+a simple subclass can be written to parse a different style of
+configuration file, and it will automatically get the specifying,
+error handling, and parser features of ConfigReader.
+
+You'll find documentation in ConfigReader.pod, as well as in the
+source files.  The *.pm files should be installed in a "ConfigReader"
+subdirectory on your Perl include path.
+
+Copyright terms are under the GLPL (the GNU *Library* Public License
+which is less restrictive than the more well known GPL.  I like the
+GLPL, as I think it does a good job of expressing my wish that the
+end-user can see and use my source code, without restricting the rest
+of the program.
+
+But please let me know if the GLPL would cause a problem for you.
+(Especially if you'd like to write some additional ConfigReader
+subclasses :-).
+
+There is one point of terminology in the documentation which I
+now realize is confusing.  The config file parser class specifies the
+syntax of how directives and values are written in the config file:
+
+    Verbose yes
+    Verbose=yes
+    {Verbose => 'yes'}
+
+The programmer can create a "parsing function or method", which
+converts a string representation into a Perl value (or object).  This
+code can than be used transparently with any of the file parsing
+classes.
+
+    sub yes_no {
+        my ($val) = @_;
+        if ($val =~ m/^y/i) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    directive $c, 'Verbose', undef, \&yes_no;
+    directive $c, 'HomePage', undef, 'new URI::URL';
+
+I think it might be clearer if "parsing" where used for parsing the
+configuration file into directive and value string pairs, and the
+"parsing function or method" was called something else.  Suggestions
+are welcome.
+
+Andrew Wilcox
+awilcox@world.std.com

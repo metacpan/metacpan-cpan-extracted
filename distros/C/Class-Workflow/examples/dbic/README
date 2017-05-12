@@ -1,0 +1,6 @@
+Look in the docs at every one of the Foo::DB classes, therein their purpose is
+explained.
+
+The test t/example_dbic.t will show usage, but it's pretty much just mint DBIC
+and Class::Workflow work.
+

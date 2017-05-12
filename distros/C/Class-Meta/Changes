@@ -1,0 +1,343 @@
+Revision history for Perl extension Class::Meta.
+
+0.66  2012-07-03T13:46:47Z
+      - Fixed broken rt.cpan.org email address.
+      - Added missing call to `build()` in the synopsis. Thanks to Laurnet
+        Dami for the report (RT #72058).
+      - Fixed a couple of typos in the Pod, with thanks to Gregor Herrmann and
+        the Debian project (RT #78163).
+
+0.65  2011-06-21T18:33:57
+      - Require Test::Pod 1.41 to run the Pod tests.
+      - Removed redundant bug reporting email address from the documentation.
+      - Fixed tests failures on Windows (hopefully). Thanks to Eric Brine for
+        the suggested fix.
+
+0.64  2011-06-20T00:30:45
+      - Moved repostitory to [GitHub](https://github.com/theory/class-meta/).
+      - Switched to a "traditional" `Makefile.PL`.
+
+0.63  2009-04-06T18:37:03
+      - Fixed POD formatting typo in Class::Meta::Type with thanks to Gregor
+        Herrmann (RT #36143).
+
+0.62  2008-05-22T03:08:06
+      - Fixed a warning from Perl 5.11 (I think).
+      - Removed the spelling test from the distribution, since it can
+        fail on systems without a spell program or using a different locale.
+        Reported by Andreas Koenig.
+
+0.61  2008-05-15T03:15:03
+      - Fixed test failures on Perl 5.6. Reported by Slaven Rezic and many
+        others via cpan-testers.
+
+0.60  2008-05-13T03:42:13
+      - Required constraints are now enforced by the constructor, as well as
+        the individual attributes themselves. Frankly, it was a bug that this
+        isn't the way it worked before, although at the time I thought it was
+        a feature. This is a backwards compatibility change, but see the next
+        point. Reported by Jon Swartz.
+      - Added support for an optional subroutine reference to be passed as the
+        final argument to constructors created by Class::Meta. The object
+        being constructed will be passed to the anonymous sub after all of the
+        specified and default values have been set, but before required
+        constraints are enforced. This allows developers to have a scope
+        within which to work before required attributes throw an exception.
+        Yes, I did borrow this idea from Ruby.
+      - Added a link to the Subversion repository.
+      - Moved the "Justification" section of the documentation nearer to the
+        bottom. Suggested by Jon Swartz.
+      - The "view" parameter (PUBLIC, PRIVATE, PROTECTED, TRUSTED) is now
+        enforced for methods when the method body is passed via the "code"
+        parameter. Reported by Jon Swartz.
+      - Added the `trusted` method to Class::Meta::Class.
+      - You can now use strings to specify constant values when declaring
+        class attributes, methods, etc. The strings correspond to their
+        equivalent constant names, such as "PUBLIC", "PRIVATE", "GET", "SET",
+        "OBJECT", "CLASS", and so on. The corresponding constant value will,
+        however, be stored in the resulting Class::Meta object.
+      - A more useful exception is now thrown when an attribute is added with
+        a missing or unknown type.
+      - Added the `default_type` parameter to `new()`, and the corresponding
+        attribute to Class::Meta::Class. This value will be used for the data
+        type of attributes created without a data type. Borrowed from
+        Class::Meta::Express.
+      - Many of the parameters to `Class::Meta->new` are now passed on to
+        suclasses if they are not explicitly specified by those subclasses.
+        This makes it easier to get the same settings (e.g., for Class::Meta
+        subclasses or for the default type) without typing the same things
+        over and over in subclasses.
+      - Added a spelling test. This has the benefit of reducing the number of
+        annoying spelling errors in the documentation.
+
+0.55  2008-05-05T18:02:27
+      - Added the "configure_requires", and "recommends" parameters to
+        Build.PL.
+      - Updated the copyright.
+
+0.54  2006-11-13T17:05:05
+      - Documented the 'name' parameter to new().
+      - The 'name' attribute of classes now defaults to the key name with
+        underscores replaced with spaces and each word capitalized by the
+        ucfirst operator. So "foo" will become "Foo" and "contact_type" will
+        become "Contact Type".
+      - Added an example and brief discussion of Class::Meta::Express to the
+        docs. Suggested by Jonathan Swartz.
+
+0.53  2006-05-30T00:54:52
+      - Added 'code' parameter to "new_constructor()" to install a constructor
+        written by the user. This essentially works just like the 'code'
+        method parameter.
+      - Fixed tests that fail with Data::Types 0.06 and later.
+      - Added 'is' parameter to the attribute constructor as an alias for
+        'type'. If both 'type and 'is' are passed to the attribute
+        constructor, 'is' will be used.
+      - Added the boolean method is() to the attribute class to compare a
+        type.
+      - Documented the 'create' parameter to "new_constructor()".
+      - Data types in defined in the Class::Meta::Types namespace are now
+        automatically loaded if they are used in an attribute and not
+        already loaded.
+
+0.52  2005-12-30T00:08:36
+      - The constructor method created by Class::Meta::Constructor no longer
+        assigns the default value to an attribute if that attribute has
+        already been set by another attribute accessor. This is useful, for
+        example, when the setting of one attribute triggers the setting of
+        another attribute, as when a public attribute implicitly sets a
+        private attribute.
+
+0.51  2005-12-17T03:40:26
+      - Added "code" parameter to add_method(), so that a new method can be
+        defined right in the call to add_method(), and Class::Meta::Method
+        will install it. Inspired by Ovid's Class::Meta::Declare.
+
+0.50  2005-12-14T04:33:46
+      - Constructors created by Class::Meta now iterate over the attributes
+        when assigning arguments or defaults in the order in which the
+        were defined, rather than randomly.
+      - The "attributes()", "constructors()", and "methods()" methods of
+        Class::Meta::Class now return *all* objects, including private and
+        trusted objects, when called from the class that defined those
+        objects.
+      - Minor optimizations to the constructor created by Class::Meta.
+
+0.49  2005-11-02T03:27:10
+      - Added "keys" method to allow all Class Object keys to be fetched.
+      - Added "args" and "returns" parameters to "add_method()" to allow
+        methods to be better described.
+      - Added "clear" method to delete Class Object keys.
+
+0.48  2005-04-13T21:32:39
+      - Fixed accessor generation for "once" attributes with a default so that
+        a value can be passed to a constructor and properly assigned to the
+        "once" attribute instead of its default, rather than throwing a
+        read-only exception.
+      - Added "default_builder()" class method to Class::Meta::Type. This
+        allows a default builder other than "default" to be specified when
+        none is explicitly passed to Class::Meta::Type->add(), such as when
+        data types are implicitly created for attributes that reference
+        objects of Class::Meta classes.
+
+0.47  2005-04-05T16:25:28
+      - Changed the "constructors()", "attributes()", and "methods()" methods
+        in Class::Meta::Class so that any classes thta inherit from
+        Class::Meta::Class are never considered to be the caller.
+      - Added the "trusted" parameter to "new()" to identify trusted packages.
+        Added a new constant, TRUSTED, for the "view" parameter to identfy
+        constructors, attributes, and methods that can be used by trusted
+        packages.
+
+0.46  2005-03-09T18:24:59
+      - Fixed documentation to reflect that the "class()" method in the
+        Constructor class requires the package name as its first argument.
+      - Modified "add_method()" so that methods can optionally be
+        automatically created by "build()". Patch from Tim Canfield.
+      - A call to "build()" now deletes unneeded references to objects,
+        freeing up a bit of memory.
+      - Changed minimum required Perl version to 5.6.1. Certain tests are
+        disabled in this version, since the version of Carp included in
+        Perl 5.6 lacks the @CARP_NOT feature. Everything should work fine,
+        however. Suggested by Tim Canfield.
+
+0.45  2005-01-07T19:41:41
+      - Added "parents()" method to Class::Meta::Class to return the class
+        objects for any classes that the class inherits from.
+      - Attributes that use an alias to set their types will now have the
+        alias converted to the canonical type key.
+      - Fixed typo in Class::Meta that named the generated method "class()"
+        instead of "my_class()". Reported by Curtis Poe.
+      - Documented "bool" synonym for the "boolean" data type in the
+        Class::Meta library documentation (it was already documented in
+        Class::Meta::Types::Boolean, of course).
+      - Fixed broken links to Class::Meta::Types classes in Class::Meta
+        library documentation. Reported by Curtis Poe.
+
+0.44  2004-10-28T01:25:12
+      - Classes created by Class::Meta will now be used as data types. This
+        saves the developer having to generate classes *and* add the new
+        classes as data types when objects of a class will be attributes of
+        another class.
+      - Added "class_validation_generator()" class method to Class::Meta::Type
+        so that a custom object validation generator can be specified instead
+        of the default. This simplifies specifying objects as data types
+        without custom creating validation checks for every one, and is
+        especially useful with the new implicit Class::Meta class data types,
+        as it will be used to generate the validation checks.
+
+0.43  2004-09-20T06:19:27
+      - Accessor builder classes that don't properly load will now correctly
+        cause Class::Meta to die.
+      - Class::Meta::Class->handle_error() now joins multiple arguments it
+        receives into a single string to be passed to the error handler
+        code reference.
+      - Class::Meta::Attribute now correctly finds attribute accessors that
+        were not created by Class::Meta (that is, when the "create" parameter
+        is set to NONE), provided that the build_attr_set() and
+        build_attr_get() functions of the accessor builder package can
+        find them (as the accessor builders include with Class::Meta can).
+
+0.42  2004-09-19T23:57:53
+      - Fixed test failures on Windows in "t/errors.t".
+      - Added "abstract" attribute to class objects to identify abstract
+        (a.k.a. "virtual") classes. Constructors generated by Class::Meta
+        will throw an exception if they are used to try to construct an
+        object in an abstract class.
+
+0.41  2004-08-27T02:32:17
+      - Added "for_key()" class method to Class::Meta to return a
+        Class::Meta::Class class for a class key.
+      - Eliminated '"my" variable $objs masks earlier declaration in same
+        scope' warning.
+
+0.40  2004-08-27T01:51:12
+      - Remembered to actually apply the patch taht fixes the tests under
+        Windows. Sheesh!
+      - Subclasses of Class, Constructor, Attribute, and Method can now call
+        "SUPER::new()" and "SUPER::build()" without getting errors.
+      - Changed implementation of Class::Meta::Class so that its attributes
+        are stored in the object hash itself. This brings it in line with
+        the implementation of Constructor, Attribute, and Method, thus
+        making subclassing consistent with those classes. However it also
+        required that references to its contents be changed in all the other
+        classes, as well. Hence the bump to 0.40.
+
+0.36  2004-07-30T00:59:31
+      - Finally, truly got the tests fixed for Windows. Without question.
+        The fix was even tested, first! Thanks to Robert Rothenberg for
+        his persistence.
+      - Minor doc fixes, repoted by Jesse Vincent.
+      - Added simple example for a default value code reference. Suggested
+        by Jesse Vincent.
+
+0.35  2004-06-28T23:16:16
+      - Fixed the names of the included types classes in the documentation
+        of Class::Meta::Type. Spotted by Dan Kubb.
+      - Fixed a few documentation references to a "class()" method to
+        reference the correctly named "my_class()" method.
+      - Fixed failing tests on Win32. For real this time, I hope! Reported
+        by Robert Rothenberg's CPAN testing.
+      - Added build() method to Class::Meta::Method to parallel the same
+        method in Class::Meta::Attribute and Class::Meta::Constructor.
+        It's a no-op, but will be called when Class::Meta::build() is
+        called, so it could be useful for subclasses. Inspired by a
+        suggestion by Mark Jaroski.
+      - Added POD coverage test.
+      - Documented undocumented methods and functions. Most of these are
+        actually protected methods, but they will be of interest to those
+        creating their own subclasses or accessor generators Class::Meta.
+
+0.34  2004-06-17T17:52:30
+      - Fixed failing tests on Win32. Reported by Robert Rothenberg's CPAN
+        testing.
+
+0.33  2004-06-17T00:05:47
+      - Added "override" parameter to "add_attribute()" so that subclasses
+        can override attributes in their parent classes.
+
+0.32  2004-05-25T17:09:39
+      - Fixed the MANIFEST so that the new semi-affordance accessor generation
+        actually works. Reported by Mark Jaroski.
+
+0.31  2004-04-20T18:25:25
+      - Moved extra code to prevent AccessorBuilder from pointing to
+        Constructor in the default (croak) error handler from AccessorBuilder
+        to the default error handler. Carp is a PITA.
+      - Added "handle_error()" class method to Class::Meta. This method is
+        used by Class::Meta classes when no Class::Meta::Class object is
+        available
+
+0.30  2004-04-19T23:44:26
+      - Added semi-affordance accessor generation.
+      - Modified arguments passed to check code references. Now, in addition
+        to the new value to be assiged to the attribute, the object being
+        assigned to and the Class::Meta::Attribute object that describes the
+        attribute are passed. If the attribute is a class attribute, then the
+        second argument is a hash reference containing the existing value and
+        the name of the package.
+      - Thanks the the presence of the attribute object as an argument to
+        check code references, the name of the attribute is now included in
+        exceptions thrown for "once" and "required" attributes.
+      - Added "class" accessors to Constructor, Attribute, and Method, to
+        return the Class object for the class in which the constructor,
+        attribute, or method was defined.
+      - Added "error_handler" parameter to Class::Meta->new to be called for
+        fatal errors.
+      - Added default_error_handler() class method to Class::Meta to act
+        as the default error handler when no "error_handler" parameter is
+        passed to Class::Meta->new.
+
+0.20  2004-01-28T22:03:09
+      - Added more documentation to the Class::Meta synopsis that highlights
+        the generated constructor and attribute accessors, as well as the
+        introspection API.
+      - Fixed documentation to reflect that the introspection class method
+        installed in a generated class is called my_class(), not class().
+        Thanks to Marcus Ramberg for the spot!
+      - Documented the "required" attribute of Class::Meta::Attribute.
+      - Added "once" attribute to Class::Meta::Attribute. This attribute
+        indicates whether an attribute value can be set to a defined value
+        only once.
+      - Renamed the call_get() and call_set() methods of
+        Class::Meta::Attribute to simply get() and set().
+
+0.14  2004-01-21T01:00:18
+      - Private and protected constructors generated by Class::Meta are now
+        truly private and protected.
+      - Class::Meta no longer generates constructors when they're added with
+        create => 0.
+
+0.13  2004-01-20T21:36:30
+      - For default accessors, object and class attribute accessors were
+        reversed.
+      - Private and protected attributes now are truly private and protected
+        if they're constructed by the accessor builder packages that come with
+        Class::Meta.
+      - The call_get() and call_set() methods of Class::Meta::Attribute and
+        the call() methods of Class::Meta::Constructor and
+        Class::Meta::::Method now use goto to execute the true methods. This
+        removes the call to call_get() or call_set() or call() from the call
+        stack trace, and makes it possible for the private and protected
+        checks to always work properly.
+
+0.12  2004-01-17T20:25:58
+      - The class "name" attribute now defaults to be the same as the key
+        if it is not explicitly set.
+      - The constructor generated by Class::Meta no longer attempts to set
+        class attributes.
+      - A package name now must be passed to the Class::Meta::Constructor's
+        call() method as the first argument. This is allow for proper support
+        for inheritance.
+      - Accessor generators now create accessors for class attributes as
+        class attributes, instead of as object attributes.
+
+0.11  2004-01-15T03:47:33
+      - Added link to rt.cpan.org for reporting bugs.
+      - Added distribution information to all modules.
+      - The package attribute now properly defaults to the package
+        calling Class::Meta->new.
+      - Class::Meta::Class->construtors now works.
+
+0.10  2004-01-09T03:56:11
+      - Initial public release.
+

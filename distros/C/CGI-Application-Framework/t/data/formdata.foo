@@ -1,0 +1,24 @@
+Content-Type: multipart/form-data; boundary=-------------cgi-test--------------102102619-2089727187
+Content-Length: 765
+
+---------------cgi-test--------------102102619-2089727187
+Content-Disposition: form-data; name="come_from_rm"
+
+page_the_second
+---------------cgi-test--------------102102619-2089727187
+Content-Disposition: form-data; name="rm"
+
+page_the_second
+---------------cgi-test--------------102102619-2089727187
+Content-Disposition: form-data; name="_session_id"
+
+29e6894863b482484b34a0ff1cc180fd
+---------------cgi-test--------------102102619-2089727187
+Content-Disposition: form-data; name="upfile"; filename="t/data/test_upload.txt"
+Content-Type: application/octet-stream
+
+'Twas brillig and the slithy toves
+Did gyre and gimble on the wabe
+All mimsy were the borogoves
+And the mome raths outgrabe
+---------------cgi-test--------------102102619-2089727187

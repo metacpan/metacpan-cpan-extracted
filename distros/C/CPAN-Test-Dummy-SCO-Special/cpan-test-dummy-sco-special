@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+print "Hi\n";
+
+=head1 NAME
+
+cpan-test-dummy-sco-special - command line tool
+
+=head DESCRIPTION
+
+Used by the <search.cpan.org clone project|http://perlmaven.com/search-cpan-org>.
+
+=cut
+
+

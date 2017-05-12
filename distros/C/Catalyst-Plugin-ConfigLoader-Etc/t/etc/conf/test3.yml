@@ -1,0 +1,9 @@
+---
+name: The Test TEST3
+scalar: s3
+array:
+    - bug3
+    - sweet3
+    - foobar3
+hash:
+    foo: bar3

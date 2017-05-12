@@ -1,0 +1,24 @@
+---
+abstract: 'Application Configuration via Environment Variables'
+author:
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-Environment
+requires:
+  Hash::Flatten: 0
+  Hash::Merge::Simple: 0
+  Moo: 0
+resources:
+  bugtracker: https://github.com/alnewkirk/Config-Environment/issues
+  homepage: http://search.cpan.org/dist/Config-Environment/
+  repository: git://github.com/alnewkirk/Config-Environment.git
+version: 0.000010

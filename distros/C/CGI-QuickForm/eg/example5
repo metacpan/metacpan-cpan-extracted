@@ -1,0 +1,129 @@
+#!/usr/bin/perl -Tw
+
+# $Id: bicycle,v 1.8 2000/04/23 14:04:36 root Exp root $
+
+# Copyright (c) Mark Summerfield 1999-2000. All Rights Reserved.
+# May be used/distributed under the GPL.
+
+# WARNING - this program is provided as an example of QuickForm use and not as
+# an example of production quality CGI code - it may not be secure. 
+
+# You'll also need sunglasses...
+
+use strict ;
+
+use vars qw( $VERSION ) ; $VERSION = '0.13' ;
+
+use CGI qw( :standard :html3 ) ;
+use lib '.' ; # This is 'cos my host provider hasn't installed QuickForm!
+use CGI::QuickForm ;
+
+my $TITLE = 'Bicycle Form' ;
+
+sub my_header {
+    print 
+	header . start_html( $TITLE ) .
+	h3( $TITLE ) .
+	p( 'This is a test form that uses code refs for its header. ' .
+	   'Any data entered is discarded.' ) ;
+}
+
+
+show_form(
+    -LANGUAGE         => 'user',
+    -USER_REQUIRED    => 'Put the data here: ~R~ OK!<br />',
+    -USER_INVALID     => "I don't mean to be rude but look at these ~I~ fields!",
+    -HEADER           => \&my_header,
+    -VALIDATE         => \&valid_form, # Form validation
+#    -ACCEPT           => \&on_valid_form_redirect,
+    -ACCEPT           => \&on_valid_form,
+    -BORDER           => 0,
+    -STYLE_FIELDNAME  => 'style="background-color:#AAAAAA"',
+    -STYLE_FIELDVALUE => 'style="background-color:#DDDDDD"',
+    -STYLE_WHY        => 'style="font-style:italic;color:red"',
+    -STYLE_DESC       => 'style="color:darkblue"',
+    -FIELDS           => [
+            { 
+                -LABEL            => 'Forename', 
+                -REQUIRED         => 1,
+                # Over-ride global settings:
+                -STYLE_FIELDNAME  => 'style="background-color:LIGHTGREEN"', 
+                -STYLE_FIELDVALUE => 'style="background-color:YELLOW"', 
+                -default          => 'Jane',
+            },
+            { 
+                -LABEL            => 'Surname',  
+                -REQUIRED         => 1,
+                -STYLE_ROW        => 'valign="top" bgcolor="#ff8080"', 
+                # We have to over-ride global settings; have to use a space
+                # since if we use '' then the global setting will be applied.
+                -STYLE_FIELDNAME  => ' ', 
+                -STYLE_FIELDVALUE => ' ', 
+                -default          => 'Doe',
+            },
+            {
+                # No explicit validation - browser will ensure that one of
+                # these is selected
+                -LABEL      => 'Gears',  
+                -TYPE       => 'radio_group',
+                -DESC       => 'Choose which gear system you require',
+                '-values'   => [ 'Sturmey-Archer', 'Derallieur' ],
+                # Over-ride global settings:
+                -STYLE_DESC => 'style="color:violet"',
+                -STYLE_FIELDVALUE => 'style="background-color:cyan"', 
+            },
+            { 
+                -LABEL    => 'Speeds',
+                -VALIDATE => \&valid_speeds, # Field validation
+                -DESC     => 'Pick the number of speeds required',
+                -default  => 15, # Makes it invalid.
+            },
+        ],
+    ) ;
+
+
+sub valid_speeds { 
+
+    ( scalar( $_[0] =~ /^(?:[3567]|1[02458]|21)$/o ), 
+      "<br />May only choose 3,5,6,7,10,12,14,15,18 or 21 speeds" ) ; 
+}   
+
+
+sub valid_form {
+    my %field = @_ ;
+    my $valid = 0 ; # Assume invalid.
+    my $why   = '' ;
+
+    if( $field{'Gears'} eq 'Sturmey-Archer' ) {
+        $valid = 1 if $field{'Speeds'} == 3 or $field{'Speeds'} == 5 ; 
+        $why   = "Sturmey-Archer gears only have 3 or 5 speeds" ; 
+    }
+    else {
+        $valid = $field{'Speeds'} =~ /^(?:[567]|1[02458]|21)$/o ;
+        $why   = "Derallieurs only have 5,6,7,10,12,14,15,18 or " .
+                 "21 speeds" ;
+    }
+
+    ( $valid, $why ) ;
+}
+
+sub on_valid_form {
+    my $forename = param( 'Forename' ) ;
+    my $gears    = param( 'Gears' ) ;
+    my $speeds   = param( 'Speeds' ) ;
+
+    print header, start_html( 'Bicycle Form' ), h3( 'Bicycle Form' ),
+          p( "Thank you $forename for your data, you chose $gears gears ",
+          "and $speeds speeds." ), 
+          qq{<a href="/perl/quickform.html#examples">QuickForm examples</a>},
+          end_html ;
+}
+
+
+sub on_valid_form_redirect {
+    print redirect( -uri => "http://localhost/index.html" ),
+          start_html( 'Bicycle Form' ), h3( 'Bicycle Form' ),
+          end_html ;
+}
+
+

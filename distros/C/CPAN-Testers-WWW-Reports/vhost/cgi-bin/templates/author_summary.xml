@@ -1,0 +1,8 @@
+[% IF distributions %]
+<distributions>
+[% FOREACH d = distributions %]
+[%- s = d.summary -%]
+<distribution name="[% d.distribution %]" version="[% s.version %]" all="[%- s.ALL || 0 -%]" pass="[%- s.PASS || 0 -%]" fail="[%- s.FAIL || 0 -%]" na="[%- s.NA || 0 -%]" unknown="[%- s.UNKNOWN || 0 -%]" />
+[% END %]
+</distributions>
+[% END %]

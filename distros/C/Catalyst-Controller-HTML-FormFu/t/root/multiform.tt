@@ -1,0 +1,10 @@
+<html>
+<body>
+[% IF multiform.complete %]
+Complete
+[% results %]
+[% ELSE %]
+[% multiform %]
+[% END %]
+</body>
+</html>

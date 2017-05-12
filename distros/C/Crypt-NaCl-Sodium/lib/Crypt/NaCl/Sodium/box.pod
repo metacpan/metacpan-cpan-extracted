@@ -1,0 +1,421 @@
+# PODNAME: Crypt::NaCl::Sodium::box
+# ABSTRACT: Public-key authenticated encryption (Curve25519/XSalsa20/Poly1305 MAC)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Crypt::NaCl::Sodium::box - Public-key authenticated encryption (Curve25519/XSalsa20/Poly1305 MAC)
+
+=head1 VERSION
+
+version 1.0.8.0
+
+=head1 SYNOPSIS
+
+    use Crypt::NaCl::Sodium qw( :utils );
+
+    my $crypto_box = Crypt::NaCl::Sodium->box();
+
+    my ($a_skey, $a_pkey, $a_key, $b_skey,
+        $b_pkey, $b_key,
+        $a_precal_key, $b_precal_key,
+        $nonce, $decrypted_msg, $msg, $secret);
+
+    ## Alice
+    ########
+
+    # Alice generates secret keypair
+    ($a_pkey, $a_skey) = $crypto_box->keypair();
+
+    # ... and shares the public key with Bob
+    send_to( Bob => { public_key => $a_pkey } );
+
+    ## Bob
+    ########
+
+    # Bob generates his secret keypair
+    ($b_pkey, $b_skey) = $crypto_box->keypair();
+
+    # Bob receives the public key from Alice
+    $a_key = receive_for( Bob => 'public_key' );
+
+    # ... and shares his public key with Alice
+    send_to( Alice => { public_key => $b_pkey } );
+
+    # now Alice and Bob can start communicating
+
+    ## Alice
+    ########
+
+    # Alice receives the public key from Bob
+    $b_key = receive_for( Alice => 'public_key' );
+
+    # Alice generates random nonce
+    $nonce = $crypto_box->nonce();
+
+    send_to( Bob => { nonce => $nonce } );
+
+    # Alice's message to Bob
+    $msg = "Hi Bob!";
+
+    # encrypts using combined mode
+    $secret = $crypto_box->encrypt( $msg, $nonce, $b_key, $a_skey );
+
+    # message is ready for Bob
+    send_to( Bob => { secret => $secret } );
+
+    ## Bob
+    ########
+
+    # Bob receives the random nonce
+    $nonce = receive_for( Bob => 'nonce' );
+
+    # and is now ready to receive first message from Alice
+    $secret = receive_for( Bob => 'secret' );
+
+    # since Bob already has Alice's public key we have all information required to decrypt message
+    $decrypted_msg = $crypto_box->decrypt( $secret, $nonce, $a_key, $b_skey );
+
+    # Bob is going to send a lot of messages to Alice, so we speed up the
+    # encryption and decryption by pre-calculating the shared key
+    $b_precal_key = $crypto_box->beforenm( $a_key, $b_skey );
+
+    # now it is time to reply
+    $msg = "Hello Alice!";
+
+    # generates new nonce
+    $nonce = $crypto_box->nonce();
+
+    # this time we use detached mode using precalculated key
+    ($mac, $secret) = $crypto_box->encrypt_afternm( $msg, $nonce, $b_precal_key );
+
+    # Alice needs all pieces to verify and decrypt Bob's message
+    send_to( Alice => { nonce => $nonce } );
+    send_to( Alice => { mac => $mac } );
+    send_to( Alice => { secret => $secret } );
+
+    ## Alice
+    ########
+
+    # Bob used the detached mode
+    $nonce  = receive_for( Alice => 'nonce' );
+    $mac    = receive_for( Alice => 'mac' );
+    $secret = receive_for( Alice => 'secret' );
+
+    # Alice also pre-calculates the shared key
+    $a_precal_key = $crypto_box->beforenm( $b_key, $a_skey );
+
+    # we have now all information required to decrypt message
+    $decrypted_msg = $crypto_box->decrypt_detached_afternm( $mac, $secret, $nonce, $a_precal_key );
+
+    # NOTE: send_to() and receive_for() and user functions providing transport of
+    # messages
+
+=head1 DESCRIPTION
+
+C<crypto_box> function is designed to meet the standard notions of privacy and
+third-party unforgeability for a public-key authenticated-encryption scheme
+using nonces.
+
+The C<crypto_box> function is not meant to provide non-repudiation. On the
+contrary: the crypto_box function guarantees repudiability. A receiver can
+freely modify a boxed message, and therefore cannot convince third parties that
+this particular message came from the sender. The sender and receiver are
+nevertheless protected against forgeries by other parties. C<crypto_box> uses
+I<public-key authenticators> rather than I<public-key signatures>.
+
+Users who want public verifiability (or receiver-assisted public verifiability)
+should instead use L<Crypt::NaCl::Sodium::sign>.
+
+Using public-key authenticated encryption, parties involved can encrypt a
+confidential message using their public keys, while keeping their secret keys
+confidential.
+
+Using the sender's public key, only the receiver can verify that the encrypted
+message was actually created by the sender and was not tampered
+with, before eventually decrypting it. This bidirectional guarantee around
+identity is known as mutual authentication.
+
+The same keypair can be used with multiple other users, without the need of
+generating a distinct set of keys.
+
+Nonce (number used once) does not have to be protected, but it is crucial that
+the same nonce has not been ever reused with the same C<{sender, receiver}> set.
+
+=head1 METHODS
+
+=head2 keypair
+
+    my ($public_key, $secret_key) = $crypto_box->keypair();
+
+    # or deterministically derived from a single key seed
+    my ($public_key, $secret_key) = $crypto_box->keypair( $seed );
+
+Helper method to generate a random secret key and corresponding public key
+to be used by C<$crypto_box>.
+
+See L</seed> for more details when generating key pair using given C<$seed>.
+
+The length of the C<$public_key> equals L</PUBLICKEYBYTES>.
+
+The length of the C<$secret_key> equals L</SECRETKEYBYTES>.
+
+B<NOTE:> keep the secret key confidential.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 public_key
+
+    my $public_key = $crypto_box->public_key( $secret_key );
+
+Computes the public key for given secret key.
+
+The length of the C<$public_key> equals L</PUBLICKEYBYTES>.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 seed
+
+    my $seed = $crypto_box->seed();
+
+    my ($public_key, $secret_key) = $crypto_box->keypair( $seed );
+
+Helper method to generate a random seed, that can be used to deterministically
+compute the key pair derived from it.
+
+The length of the C<$seed> equals L</SEEDBYTES>.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 beforenm
+
+    my $shared_key = $crypto_box->beforenm( $public_key, $secret_key );
+
+Applications that send several messages to the same receiver
+or receive several messages from the same sender can gain
+speed by calculating the shared key only once, and reusing it in
+subsequent operations.
+
+The length of the C<$shared_key> equals L</BEFORENMBYTES>.
+
+Returns L<Data::BytesLocker> objects.
+
+=head2 nonce
+
+    my $nonce = $crypto_box->nonce();
+
+Helper method to generate a random nonce to be used by C<$crypto_box>.
+
+The length of the nonce equals L</NONCEBYTES>.
+
+If initial value has been passed as the argument, it will then padded with
+C<null> bytes.
+
+    my $counter = 121;
+    my $nonce = $crypto_box->nonce($counter);
+    $nonce =~ /^121\0+$/ or die;
+
+B<NOTE:> nonce does not have to be random nor confidential, but it must never
+be reused with the same C<{sender, receiver}> set.
+
+If random nonce is being used it needs to be provided to the other party to
+allow decryption.
+
+If counter is being used store it alongside the recipient's public key to avoid
+accidental reuse on the next session. In connection-oriented protocols
+counter-based nonce could help rejecting duplicate messages.
+
+Returns L<Data::BytesLocker> object.
+
+=head2 encrypt
+
+    # combined mode - MAC and encrypted message stored together
+    my $secret = $crypto_box->encrypt($msg, $nonce,
+        $recipient_public_key, $sender_secret_key);
+
+    # detached mode - MAC and encrypted message returned separate
+    my ($mac, $ciphertext) = $crypto_box->encrypt($msg, $nonce,
+        $recipient_public_key, $sender_secret_key);
+
+Encrypts the plaintext message using given C<$nonce>, C<$recipient_public_key>
+and C<$sender_secret_key>.
+
+In scalar context works in combined mode, where MAC and encrypted message are stored
+together.
+The length of the C<$secret> equals the length of C<$msg> + L</MACBYTES>.
+
+In list context the C<$mac> and C<$ciphertext> are returned separately.
+The length of the C<$ciphertext> equals the length of C<$msg>, while length
+of C<$mac> is L</MACBYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 encrypt_afternm
+
+    # combined mode - MAC and encrypted message stored together
+    my $secret = $crypto_box->encrypt_afternm($msg, $nonce,
+        $shared_key);
+
+    # detached mode - MAC and encrypted message returned separate
+    my ($mac, $ciphertext) = $crypto_box->encrypt_afternm($msg, $nonce,
+        $shared_key);
+
+Same as above but encrypts using pre-calculated C<$shared_key> (as returned by L</beforenm>).
+
+=head2 decrypt
+
+    my $msg;
+    eval {
+        $msg = $crypto_box->decrypt($secret, $nonce,
+            $sender_public_key, $recipient_secret_key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Verify and decrypt the secret message using given C<$nonce>,
+C<$sender_public_key> and C<$recipient_secret_key>.
+
+Function croaks if the verification fails. Otherwise returns the decrypted message.
+
+The length of the C<$msg> equals the length of C<$secret> - L</MACBYTES>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 decrypt_afternm
+
+    my $msg;
+    eval {
+        $msg = $crypto_box->decrypt_afternm($secret, $nonce,
+            $shared_key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Same as above but decrypts using pre-calculated C<$shared_key> (as returned by L</beforenm>).
+
+=head2 decrypt_detached
+
+    my $msg;
+    eval {
+        $msg = $crypto_box->decrypt_detached($mac, $ciphertext, $nonce,
+            $sender_public_key, $recipient_secret_key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Verify and decrypt the secret message C<$ciphertext> authenticated with C<$mac>
+using given C<$nonce>, C<$sender_public_key> and C<$recipient_secret_key>.
+
+Function croaks if the verification fails. Otherwise returns the decrypted message.
+
+The length of the C<$msg> equals the length of C<$ciphertext>.
+
+Returns L<Data::BytesLocker> object.
+
+=head3 decrypt_detached_afternm
+
+    my $msg;
+    eval {
+        $msg = $crypto_box->decrypt_detached_afternm($mac, $ciphertext, $nonce,
+            $shared_key);
+    };
+    if ( $@ ) {
+        warn "Message forged!";
+    } else {
+        print "Decrypted message: $msg\n";
+    }
+
+Same as above but decrypts using pre-calculated C<$shared_key> (as returned by L</beforenm>).
+
+=head1 CONSTANTS
+
+=head2 NONCEBYTES
+
+    my $nonce_length = $crypto_box->NONCEBYTES;
+
+Returns the length of nonce.
+
+=head2 SECRETKEYBYTES
+
+    my $skey_length = $crypto_box->SECRETKEYBYTES;
+
+Returns the length of secret key.
+
+=head2 PUBLICKEYBYTES
+
+    my $pkey_length = $crypto_box->PUBLICKEYBYTES;
+
+Returns the length of public key.
+
+=head2 SEEDBYTES
+
+    my $seed_length = $crypto_box->SEEDBYTES;
+
+Returns the length of seed key.
+
+=head2 BEFORENMBYTES
+
+    my $shared_key_length = $crypto_box->BEFORENMBYTES;
+
+Returns the length of pre-calculated shared key.
+
+=head2 MACBYTES
+
+    my $mac_length = $crypto_box->MACBYTES;
+
+Returns the length of MAC.
+
+=head1 ALGORITHM DETAILS
+
+C<crypto_box> for encryption uses XSalsa20 stream cipher (which is based
+on Salsa20, but with much longer nonce) and Poly1305 MAC for authentication,
+for key exchange Curve25519 is used.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Data::BytesLocker> - guarded data storage
+
+=item * L<Crypt::Curve25519>
+
+=item * L<Terminology of public-key authenticators|http://groups.google.com/group/sci.crypt/msg/ec5c18b23b11d82c>
+
+=item * L<Cryptography in NaCl|http://cr.yp.to/highspeed/naclcrypto-20090310.pdf>
+
+=item * L<A state-of-the-art Diffie-Hellman function|http://cr.yp.to/ecdh.html>
+- Curve25519
+
+=item * L<Extending the Salsa20 nonce|http://cr.yp.to/snuffle/xsalsa-20110204.pdf>
+- the paper introducing XSalsa20
+
+=item * L<The Poly1305-AES message-authentication code|http://cr.yp.to/mac/poly1305-20050329.pdf>
+
+=back
+
+=head1 AUTHOR
+
+Alex J. G. Burzyński <ajgb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Alex J. G. Burzyński <ajgb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

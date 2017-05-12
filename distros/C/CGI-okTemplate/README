@@ -1,0 +1,51 @@
+CGI-okTemplate version 0.03
+============================
+
+CGI::okTemplate - Perl extension for easy creating websites with 
+using templates. This module can include template files into main 
+template (for example for including same header and footer to 
+different pages).
+
+Tihs module have been created to use easy templates for enough
+difficult pages.
+
+Hope this module can be used enough easy by designers 
+and webdevelopers both.
+
+Use perldoc CGI::okTemplate for more information.
+
+Hope you will like it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+or if you need to setup module to your own lib catalog use
+the INSTALLSITELIB environment variable. For example:
+   perl Makefile.PL INSTALLSITELIB=~/myperl
+After Makefile is created run next commands:
+   make
+   make test
+   make install
+
+If you used INSTALLSITELIB then put next string in your script:
+
+use lib "~/myperl";
+use CGI::okTemplate;
+
+to use your own lib location in script.
+
+DEPENDENCIES
+
+This module does not require other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 O. A. Kobyakovskiy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

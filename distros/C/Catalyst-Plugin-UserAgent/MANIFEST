@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Catalyst/Plugin/UserAgent.pm
+LICENSE
+MANIFEST			This list of files
+t/01-use.t
+t/02-pod.t
+t/03-user_agent.t
+Makefile.PL
+README
+META.yml

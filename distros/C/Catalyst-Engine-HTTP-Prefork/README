@@ -1,0 +1,73 @@
+NAME
+    Catalyst::Engine::HTTP::Prefork - High-performance pre-forking Catalyst
+    engine
+
+SYNOPIS
+        CATALYST_ENGINE='HTTP::Prefork' script/yourapp_server.pl
+
+DESCRIPTION
+    This engine is designed to run as a standalone Catalyst server, without
+    requiring the use of another web server. It's goals are
+    high-performance, HTTP/1.1 compliance, and robustness. It is also
+    suitable for use as a faster development server with support for
+    automatic restarting.
+
+    This engine is designed to replace the Catalyst::Engine::HTTP::POE
+    engine, which is now deprecated.
+
+RESTART SUPPORT
+    This engine supports the same restart options as Catalyst::Engine::HTTP.
+    The server may also be restarted by sending it a HUP signal.
+
+HTTP/1.1 support
+    This engine fully supports the following HTTP/1.1 features:
+
+  Chunked Requests
+    Chunked body data is handled transparently by HTTP::Body.
+
+  Chunked Responses
+    By setting the Transfer-Encoding header to 'chunked', you can indicate
+    you would like the response to be sent to the client as a chunked
+    response. Also, any responses without a content-length will be sent
+    chunked.
+
+  Pipelined Requests
+    Browsers sending any number of pipelined requests will be handled
+    properly.
+
+  Keep-Alive
+    Keep-alive is supported for both HTTP/1.1 (by default) and HTTP/1.0 (if
+    a Connection: keep-alive header is present in the request).
+
+CUSTOMIZATION
+    Additional options may be passed to the engine by modifying
+    yourapp_server.pl to send additional items to the run() method.
+
+  min_servers
+    The minimum number of servers to keep running. Defaults to 5.
+
+  min_spare_servers
+    The minimum number of servers to have waiting for requests. Minimum and
+    maximum numbers should not be set too close to each other or the server
+    will fork and kill children too often. Defaults to 2.
+
+  max_spare_servers
+    The maximum number of servers to have waiting for requests. Defaults to
+    10.
+
+  max_servers
+    The maximum number of child servers to start. Defaults to 50.
+
+  max_requests
+    Restart a child after it has served this many requests. Defaults to
+    1000. Note that setting this value to 0 will not cause the child to
+    serve unlimited requests. This is a limitation of Net::Server and may be
+    fixed in a future version.
+
+AUTHOR
+    Andy Grundman, <andy@hybridized.org>
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

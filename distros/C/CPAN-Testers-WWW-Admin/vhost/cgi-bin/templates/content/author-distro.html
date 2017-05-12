@@ -1,0 +1,25 @@
+[%
+
+    title = 'Browse by Distribution' ;
+    crumb2_name = 'Author' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Browse by Distribution' ;
+
+    box_prefs = 1 ;
+    javascript = 1 ;
+
+%]
+
+<h2>Browse by Distribution</h2>
+
+<p>Select the distribution to view reports.</p>
+
+[% IF data.distros %]
+<ul>
+[% FOREACH d = data.distros %]
+<li><a href="[% cgipath %]/pages.cgi?act=author-dist&amp;dist=[% d.dist %]"">[% d.dist %]</a></li>
+[% END %]
+</ul>
+[% ELSE %]
+<p>Sorry, no reports found for this distribution version.</p>
+[% END %]

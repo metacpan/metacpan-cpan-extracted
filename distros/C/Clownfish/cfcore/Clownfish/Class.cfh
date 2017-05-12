@@ -1,0 +1,157 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/** Class.
+ *
+ * Classes are first-class objects in Clownfish.  Class objects are instances
+ * of Clownfish::Class.
+ */
+
+public final class Clownfish::Class inherits Clownfish::Obj {
+
+    Class                   *parent;
+    String                  *name;
+    String                  *name_internal;
+    uint32_t                 flags;
+    const cfish_ParcelSpec  *parcel_spec;
+    uint32_t                 obj_alloc_size;
+    uint32_t                 class_alloc_size;
+    void                    *host_type;
+    Method                 **methods;
+    cfish_method_t[1]        vtable; /* flexible array */
+
+    inert uint32_t offset_of_parent;
+
+    inert void
+    bootstrap(const cfish_ParcelSpec *parcel_spec);
+
+    /** Return a singleton.  If a Class can be found in the registry based on
+     * the supplied class name, it will be returned.  Otherwise, a new Class
+     * will be created using `parent` as a base.
+     *
+     * If `parent` is [](@null), an attempt will be made to find it.  If the
+     * attempt fails, an error will result.
+     */
+    public inert Class*
+    singleton(String *class_name, Class *parent);
+
+    /** Register a class, so that it can be retrieved by class name.
+     *
+     * TODO: Move this functionality to some kind of class loader.
+     *
+     * @return true on success, false if the class was already registered.
+     */
+    inert bool
+    add_to_registry(Class *klass);
+
+    inert bool
+    add_alias_to_registry(Class *klass, const char *alias_ptr,
+                          size_t alias_len);
+
+    /** Initialize the registry.
+     */
+    inert void
+    init_registry();
+
+    /** Tell the host about the new class.
+     */
+    inert void
+    register_with_host(Class *klass, Class *parent);
+
+    /** Find a registered class.  May return [](@null) if the class is not
+     * registered.
+     */
+    public inert nullable Class*
+    fetch_class(String *class_name);
+
+    /** Given a class name, return the name of a parent class which descends
+     * from Clownfish::Obj, or NULL if such a class can't be found.
+     */
+    inert nullable String*
+    find_parent_class(String *class_name);
+
+    /** List all of the methods defined directly within a host subclass.
+     */
+    inert incremented Vector*
+    fresh_host_methods(String *class_name);
+
+    /** Replace a function pointer in the Class's vtable.
+     */
+    public void
+    Override(Class *self, cfish_method_t method_ptr, uint32_t offset);
+
+    /** Create an empty object of the type defined by the Class: allocate,
+     * assign its class and give it an initial refcount of 1.  The caller is
+     * responsible for initialization.
+     */
+    public incremented Obj*
+    Make_Obj(Class *self);
+
+    /** Take a raw memory allocation which is presumed to be of adequate size,
+     * assign its class and give it an initial refcount of 1.
+     */
+    public incremented Obj*
+    Init_Obj(Class *self, void *allocation);
+
+    void
+    Add_Host_Method_Alias(Class *self, const char *alias,
+                          const char *meth_name);
+
+    void
+    Exclude_Host_Method(Class *self, const char *meth_name);
+
+    /** Return the name of the class.
+     */
+    public String*
+    Get_Name(Class *self);
+
+    /** Return the parent class, or [](@null) for a root of the class
+     * hierarchy.
+     */
+    public nullable Class*
+    Get_Parent(Class *self);
+
+    /** Return the number of bytes needed to hold an instance of the class.
+     */
+    public uint32_t
+    Get_Obj_Alloc_Size(Class *self);
+
+    /** Return novel methods of the class.
+     */
+    incremented Vector*
+    Get_Methods(Class *self);
+
+    public void
+    Destroy(Class *self);
+}
+
+__C__
+
+#define CFISH_ALLOCA_OBJ(class) \
+    cfish_alloca(CFISH_Class_Get_Obj_Alloc_Size(class))
+
+/** Bootstrapping hook/hack needed by the Python bindings.
+ *
+ * TODO: Refactor this away in favor of a more general solution.
+ */
+typedef void
+(*cfish_Class_bootstrap_hook1_t)(cfish_Class *self);
+extern cfish_Class_bootstrap_hook1_t cfish_Class_bootstrap_hook1;
+
+__END_C__
+

@@ -1,0 +1,78 @@
+#!/bin/bash
+
+
+TYPE="$1"
+SVNID="$2"
+REPOS="$3"
+TXN="$4"
+
+
+TMPDIR="/tmp/svn.$SVNID"
+TMPTREE="$TMPDIR/files"
+
+SVNLOOK="/usr/bin/svnlook"
+EMERGENCY="NOCHECK"
+
+
+function msg_info() {
+   local msg="$1"
+   echo -e "\e[1;32m$msg\e[0m" >&2
+}
+
+
+case $TYPE in
+   pre-commit)
+      if [ -z $TXN ]; then
+         echo "E: pre-commit requires a TXN" >&2
+         exit 1
+      fi
+      mkdir -p "$TMPTREE"
+      cd "$TMPTREE"
+
+      # Dump all files in $TMPTREE
+      $SVNLOOK changed -t "$TXN" "$REPOS" | while read s f; do
+         [[ "x$s" = "xD" ]] && continue
+         [[ "x${f%/}" = "x$f" ]] || continue
+         # Ignore symlinks
+         $SVNLOOK proplist -t "$TXN" "$REPOS" "$f" | \
+            grep -q "svn:special" && continue
+         dirname=$(dirname "$f")
+         mkdir -p "$dirname"
+
+         $SVNLOOK cat -t "$TXN" "$REPOS" "$f" > "$f"
+      done
+
+      # Emergency hook
+      $SVNLOOK propget --revprop -t "$TXN" "$REPOS" "svn:log" | \
+         grep "$EMERGENCY" && exit 0
+
+      /usr/bin/augeas-validator -re *
+      if [[ $? = 1 ]]; then
+         msg_info "\nI: ==> Add the '$EMERGENCY' keyword to your commit message to bypass this check."
+         exit 1
+      fi
+      ;;
+   post-commit)
+      if [ -d "$TMPDIR" ]; then
+         cd "$TMPTREE"
+         /usr/bin/augeas-validator -re *
+         if [[ $? != 0 ]]; then
+            msg_info "\nI: Commit succeeded with warnings."
+            exit 1
+         fi
+         rm -rf "$TMPDIR"
+      else
+         echo "E: Could not find $TMPDIR, cannot run tests." >&2
+         exit 1
+      fi
+      ;;
+   *)
+      echo "E: Unknown hook type $TYPE." >&2
+      exit 1
+      ;;
+esac
+
+# All checks passed, so allow the commit.
+exit 0
+
+

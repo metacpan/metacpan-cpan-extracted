@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Crypt-Vernam.t
+lib/Crypt/Vernam.pm

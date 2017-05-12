@@ -1,0 +1,48 @@
+
+RCS file: /home/nwiger/perlmod/lib/Catalyst/Plugin/RCS/FormBuilder.pm,v
+Working file: /home/nwiger/perlmod/lib/Catalyst/Plugin/FormBuilder.pm
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 7;	selected revisions: 7
+description:
+Copyright (c) Nathan Wiger <nate@wiger.org>. All Rights Reserved.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License (GPL) for more details.
+----------------------------
+revision 1.7
+date: 2007/01/08 18:17:33;  author: nwiger;  state: Exp;  lines: +12 -2
+added deprecation notice to CPAN version (discarded subrequest changes)
+----------------------------
+revision 1.6
+date: 2006/09/13 21:07:54;  author: nwiger;  state: Exp;  lines: +22 -11
+fixed issues with debug messages, and applied patches from Roy Magne-Mo
+to correct a few catalyst internals misunderstandings
+----------------------------
+revision 1.5
+date: 2006/09/07 18:20:46;  author: nwiger;  state: Exp;  lines: +18 -15
+Bug fix for bad hash dereferencing
+----------------------------
+revision 1.4
+date: 2006/08/25 21:28:25;  author: nwiger;  state: Exp;  lines: +2 -2
+Fixes for header => 0 and cookies => 0 to prevent loading CGI.pm,
+which doesn't work with Catalyst in mod_perl.
+----------------------------
+revision 1.3
+date: 2006/08/25 21:27:49;  author: nwiger;  state: Exp;  lines: +57 -28
+Documentation issues
+----------------------------
+revision 1.2
+date: 2006/08/16 23:36:44;  author: nwiger;  state: Exp;  lines: +2 -1
+First revision destined for CPAN
+----------------------------
+revision 1.1
+date: 2006/08/16 23:34:22;  author: nwiger;  state: Exp;
+Initial revision
+=============================================================================

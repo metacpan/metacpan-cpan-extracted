@@ -1,0 +1,3 @@
+TYPEMAP
+Crypt::OpenSSL::Bignum          T_PTROBJ
+Crypt::OpenSSL::Bignum::CTX     T_PTROBJ

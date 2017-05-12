@@ -1,0 +1,161 @@
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/DynaVision.html,v
+Working file: DynaVision.html
+head: 1.21
+branch:
+locks: strict
+access list:
+symbolic names:
+	ILAB-1-7: 1.21
+	ILAB-1-6-patches: 1.19.0.2
+	ILAB-1-6: 1.19
+	ILAB-1-5: 1.16
+	ILAB-1-4: 1.8
+keyword substitution: kv
+total revisions: 21;	selected revisions: 21
+description:
+----------------------------
+revision 1.21
+date: 2003/01/28 12:48:47;  author: bkuemmer;  state: Exp;  lines: +3 -3
+Just a test (sorry, sven)
+----------------------------
+revision 1.20
+date: 2003/01/24 13:10:47;  author: sven;  state: Exp;  lines: +5 -5
+update DynaVision 1.4
+----------------------------
+revision 1.19
+date: 2002/10/08 14:15:21;  author: sven;  state: Exp;  lines: +5 -2
+added: new "Async" functionality for independant ROI definitions in both datasets
+----------------------------
+revision 1.18
+date: 2002/09/18 13:49:59;  author: sven;  state: Exp;  lines: +6 -6
+minor changes
+----------------------------
+revision 1.17
+date: 2002/07/10 11:52:00;  author: sven;  state: Exp;  lines: +5 -4
+added: link to howto documentation
+----------------------------
+revision 1.16
+date: 2002/07/08 12:23:13;  author: sven;  state: Exp;  lines: +87 -49
+update: V1.3
+----------------------------
+revision 1.15
+date: 2002/07/04 15:14:20;  author: sven;  state: Exp;  lines: +7 -4
+added: link to history file
+----------------------------
+revision 1.14
+date: 2002/07/04 13:21:54;  author: sven;  state: Exp;  lines: +4 -2
+warning, that documentation does not cover latest version
+----------------------------
+revision 1.13
+date: 2002/07/04 12:20:42;  author: sven;  state: Exp;  lines: +91 -33
+V1.2
+----------------------------
+revision 1.12
+date: 2002/04/23 12:23:19;  author: sven;  state: Exp;  lines: +8 -4
+added: screenshots in online documentation
+----------------------------
+revision 1.11
+date: 2002/04/02 11:29:30;  author: sven;  state: Exp;  lines: +3 -2
+added: different cine modi
+----------------------------
+revision 1.10
+date: 2002/04/02 08:26:07;  author: sven;  state: Exp;  lines: +7 -3
+added: CineMode
+----------------------------
+revision 1.9
+date: 2002/03/27 07:38:32;  author: sven;  state: Exp;  lines: +21 -3
+update: Welcome screen doku
+----------------------------
+revision 1.8
+date: 2002/03/20 15:52:33;  author: sven;  state: Exp;  lines: +5 -2
+minor changes
+----------------------------
+revision 1.7
+date: 2002/03/19 11:18:12;  author: sven;  state: Exp;  lines: +3 -3
+minor changes in cropping description
+----------------------------
+revision 1.6
+date: 2002/03/18 15:02:58;  author: sven;  state: Exp;  lines: +29 -32
+update
+----------------------------
+revision 1.5
+date: 2002/03/15 15:00:05;  author: sven;  state: Exp;  lines: +337 -131
+updated online help
+----------------------------
+revision 1.4
+date: 2001/12/07 14:36:34;  author: sven;  state: Exp;  lines: +11 -7
+updated.
+----------------------------
+revision 1.3
+date: 2001/12/07 13:50:33;  author: sven;  state: Exp;  lines: +5 -4
+updated.
+----------------------------
+revision 1.2
+date: 2001/12/06 12:43:02;  author: sven;  state: Exp;  lines: +12 -1
+updated howto
+----------------------------
+revision 1.1
+date: 2001/11/20 11:21:19;  author: sven;  state: Exp;
+updated documentation of script.
+=============================================================================
+
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/DynaVisionShort.html,v
+Working file: DynaVisionShort.html
+head: 1.7
+branch:
+locks: strict
+access list:
+symbolic names:
+	ILAB-1-7: 1.6
+	ILAB-1-6-patches: 1.6.0.2
+	ILAB-1-6: 1.6
+	ILAB-1-5: 1.6
+	ILAB-1-4: 1.3
+keyword substitution: kv
+total revisions: 7;	selected revisions: 7
+description:
+----------------------------
+revision 1.7
+date: 2003/01/28 12:36:34;  author: bkuemmer;  state: Exp;  lines: +3 -2
+Just a test (sorry, sven)
+----------------------------
+revision 1.6
+date: 2002/07/08 12:23:13;  author: sven;  state: Exp;  lines: +25 -12
+update: V1.3
+----------------------------
+revision 1.5
+date: 2002/07/04 12:20:42;  author: sven;  state: Exp;  lines: +11 -5
+V1.2
+----------------------------
+revision 1.4
+date: 2002/04/23 12:23:19;  author: sven;  state: Exp;  lines: +1 -39
+added: screenshots in online documentation
+----------------------------
+revision 1.3
+date: 2002/03/20 15:52:33;  author: sven;  state: Exp;  lines: +2 -2
+minor changes
+----------------------------
+revision 1.2
+date: 2002/03/18 15:02:58;  author: sven;  state: Exp;  lines: +8 -4
+update
+----------------------------
+revision 1.1
+date: 2002/03/15 14:59:51;  author: sven;  state: Exp;
+summary of keybindings and windows
+=============================================================================
+
+RCS file: /projects/repositories/mevis/Libraries/ILABModules/Applications/DynaVision/html/test.txt,v
+Working file: test.txt
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2003/01/28 12:52:02;  author: bkuemmer;  state: Exp;
+Just a test (sorry, sven)
+=============================================================================

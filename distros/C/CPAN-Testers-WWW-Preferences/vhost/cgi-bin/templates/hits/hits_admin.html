@@ -1,0 +1,18 @@
+<h2>Hits</h2>
+
+<div class="admin">
+<h3>Counters for main site pages</h3>
+<table>
+<tr>
+    <th>Area</th>
+    <th>Counter</th>
+</tr>
+[% FOREACH record = pages %]
+<tr>
+    <td>[% record.area %]</td>
+    <td>[% record.counter %]</td>
+</tr>
+[% END %]
+</table>
+</div>
+

@@ -1,0 +1,35 @@
+NAME
+    Canary::Stability - canary to check perl compatibility for schmorp's
+    modules
+
+SYNOPSIS
+     # in Makefile.PL
+     use Canary::Stability DISTNAME => 2001, MINIMUM_PERL_VERSION;
+
+DESCRIPTION
+    This module is used by Schmorp's modules during configuration stage to
+    test the installed perl for compatibility with his modules.
+
+    It's not, at this stage, meant as a tool for other module authors,
+    although in principle nothing prevents them from subscribing to the same
+    ideas.
+
+    See the Makefile.PL in Coro or AnyEvent for usage examples.
+
+ENVIRONMENT VARIABLES
+    "PERL_CANARY_STABILITY_NOPROMPT=1"
+        Do not prompt the user on alert messages.
+
+    "PERL_CANARY_STABILITY_COLOUR=0"
+        Disable use of colour.
+
+    "PERL_CANARY_STABILITY_COLOUR=1"
+        Force use of colour.
+
+    "PERL_CANARY_STABILITY_DISABLE=1"
+        Disable this modules functionality completely.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://software.schmorp.de/pkg/Canary-Stability.html
+

@@ -1,0 +1,8 @@
+Revision history for Crypt-Argon2
+
+0.002     2016-09-21 23:24:25+02:00 Europe/Amsterdam
+          - Include an upstream fix to encoded_length
+          - Add attribution to original authors
+
+0.001     2016-09-21 10:36:32+02:00 Europe/Amsterdam
+          Initial release to an unsuspecting world

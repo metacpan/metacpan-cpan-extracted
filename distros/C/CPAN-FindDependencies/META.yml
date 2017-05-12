@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-FindDependencies
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.05'
+  Devel::CheckOS: '1.52'
+  File::Temp: '0.19'
+  LWP::UserAgent: '0'
+  Module::CoreList: '2.9'
+  Parse::CPAN::Packages: '2.31'
+  Scalar::Util: '1.14'
+  URI::file: '4.13'
+  YAML::Tiny: '1.57'
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies/issues
+  repository: https://github.com/DrHyde/perl-modules-CPAN-FindDependencies
+version: '2.47'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

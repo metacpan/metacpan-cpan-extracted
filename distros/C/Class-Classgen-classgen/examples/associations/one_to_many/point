@@ -1,0 +1,8 @@
+header:
+	package Point;
+
+variables:
+	$x	# coordinate
+	$y	# coordinate
+	
+	$a_belongs_to	# a 'belong to' association

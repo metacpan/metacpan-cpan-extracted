@@ -1,0 +1,31 @@
+Revision history for Perl extension Catalyst::View::Wkhtmltopdf.
+
+0.5.2
+    - Fixed error in documentation (default stash key was wrong)
+
+0.5.1
+    - Typos
+
+0.5.0
+    - Factored out rendering to render(), which can also be called
+      directly to get PDF in a variable instead of outputting it
+    - Default tmpdir is now guessed through File::Spec instead
+      of assuming it to be /tmp
+    - The name of the TemplateToolkit view is now a configuration
+      option (which defaults to "TT")
+    - Switch to semantic versioning
+    - Fixed bugs here and there
+
+0.0004
+    - Fixed bug if passing a TT template (jegade)
+    - Add "orientation" option (jegade)
+
+0.0003
+    - Changed a // to || so now the lib works on perl 5.8.x as well
+
+0.0002
+    - remove a 0 from version number ;-)
+    - fix doc
+
+0.00001  Mon Mar 14 2011
+    - original version

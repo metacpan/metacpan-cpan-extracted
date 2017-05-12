@@ -1,0 +1,14 @@
+Revision history for Perl module Catalyst::Plugin::Authentication::Credential::Hatena
+
+0.04 2007-04-03T11:34:03+09:00
+	 - fixed failing test with latest Test::MockObject 1.07
+
+0.03 2006-11-23T12:24:45+09:00
+     - added extra parameter support to authenticate_hatena_url
+         thanks to Jiro Nishiguchi.
+
+0.02 2006-05-22T13:58:44+09:00
+     - fixed a stupid typo
+
+0.01 2006-04-24T21:57:05+09:00
+     - original version;

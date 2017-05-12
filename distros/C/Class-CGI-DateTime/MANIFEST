@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Class/CGI/DateTime.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-datetime.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+META.json
+README
+lib/CPAN/Testers/Common/DBUtils.pm
+t/01base.t
+t/02load.t
+t/10database.t
+t/90podtest.t
+t/91podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t

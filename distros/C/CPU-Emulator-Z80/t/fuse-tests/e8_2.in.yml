@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 232
+  17399:
+    - 233
+    - 175
+name: e8_2
+registers:
+  AF: 156
+  AF_: 0
+  BC: 0
+  BC_: 0
+  DE: 0
+  DE_: 0
+  HL: 0
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 17399

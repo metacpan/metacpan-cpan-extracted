@@ -1,0 +1,26 @@
+---
+abstract: 'Provide interoperable MD5-based crypt() functions'
+author:
+  - 'Luis E. Muñoz <luismunoz@cpan.org>'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-PasswdMD5
+provides:
+  Crypt::PasswdMD5:
+    file: lib/Crypt/PasswdMD5.pm
+    version: 1.40
+requires:
+  Digest::MD5: 2.53
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.40

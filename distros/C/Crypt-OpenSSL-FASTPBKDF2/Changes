@@ -1,0 +1,7 @@
+Revision history for Perl extension Crypt::OpenSSL::FASTPBKDF2.
+
+0.01  Wed Apr 19 09:28:13 2017
+	- original version; created by h2xs 1.23 with options
+		-Afn Crypt::OpenSSL::FASTPBKDF2
+	- Wrapped fastpbkdf2
+

@@ -1,0 +1,29 @@
+Revision history for CGI-Application-Plugin-REST
+
+0.3     Fri Mar  6 16:49:50 EST 2015
+
+        Many changes suggested by Bill.Costa@unh.edu
+
+        * Change error status 400 No Dispatch Table to 500
+        * Include function name in error status 501 message.
+        * Do not set up a default route that calls dump_html()
+        * Add support for the OPTIONS HTTP method.
+        * Add function rest_route_info() which gives some information
+          about the current route.
+        * Change route info given in C::A::P::DevPopup support to show the
+          route as originally specified not its' regexp transformation.
+        * Document using '' as a base route with no trailing /
+        * rest_error_mode() handlers receive the value of $@ as a parameter.
+        * When the client does not provide an HTTP Accept header, try and
+          see if there is a handler for */* before giving 415 error status.
+
+0.2     Fri Oct 15 07:14:00 EDT 2010
+        Added a rest_resource() function to create an entire set of routes
+        in one go.
+
+0.11    Mon Oct 11 21:33:30 EDT 2010
+        Added C::A::P::DevPopup to the build requirements as it is
+        needed for t/devpopup.t.
+
+0.1     Sun Oct 10 04:57:56 EDT 2010
+        First version, released on an unsuspecting world.

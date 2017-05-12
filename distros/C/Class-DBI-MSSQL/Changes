@@ -1,0 +1,13 @@
+Revision history for Class-DBI-MSSQL
+
+0.122   2006-11-10
+0.121   2006-11-10
+        packaging updates
+
+0.10    2004-09-22 07:35
+        added column_type and set_up_table methods (from James O'Sullivan)
+        minor documentation improvements
+
+0.01_01 2004
+        first release, bare minimum to use MSSQL+ODBC
+

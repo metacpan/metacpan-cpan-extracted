@@ -1,0 +1,57 @@
+INSERT INTO foodcat VALUES('1','Fresh food');
+INSERT INTO foodcat VALUES('2','Dried Food');
+INSERT INTO foodcat VALUES('3','Tinned Food');
+INSERT INTO foodcat VALUES('4','Dairy Produce');
+INSERT INTO foodcat VALUES('5','Frozen Food');
+INSERT INTO foodcat VALUES('6','Meat');
+INSERT INTO foodcat VALUES('7','Drinks');
+INSERT INTO foodcat VALUES('8','Non-food');
+INSERT INTO foodcat VALUES('9','Booze');
+
+INSERT INTO foodcat VALUES('10','Vegetables');
+INSERT INTO foodcat VALUES('11','Fruit');
+INSERT INTO foodcat VALUES('12','Bread');
+
+INSERT INTO foodcat VALUES('20','Cereals');
+INSERT INTO foodcat VALUES('21','Biscuits');
+INSERT INTO foodcat VALUES('22','Rice & Pasta');
+INSERT INTO foodcat VALUES('23','Soups');
+
+INSERT INTO foodcat VALUES('30','Soups');
+INSERT INTO foodcat VALUES('31','Sauces');
+INSERT INTO foodcat VALUES('32','Spices');
+INSERT INTO foodcat VALUES('33','Pickles');
+
+INSERT INTO foodcat VALUES('40','Meats');
+INSERT INTO foodcat VALUES('41','Cheese');
+INSERT INTO foodcat VALUES('42','Milk products');
+INSERT INTO foodcat VALUES('49','Processed');
+
+INSERT INTO foodcat VALUES('50','Vegetables');
+INSERT INTO foodcat VALUES('51','Meat & Fish');
+INSERT INTO foodcat VALUES('52','Desserts');
+INSERT INTO foodcat VALUES('59','Processed');
+
+INSERT INTO foodcat VALUES('60','Chicken');
+INSERT INTO foodcat VALUES('61','Beef');
+INSERT INTO foodcat VALUES('62','Pork');
+INSERT INTO foodcat VALUES('63','Lamb');
+INSERT INTO foodcat VALUES('64','Turkey');
+INSERT INTO foodcat VALUES('65','Other');
+INSERT INTO foodcat VALUES('69','Processed');
+
+INSERT INTO foodcat VALUES('70','Pure Juice');
+INSERT INTO foodcat VALUES('71','Dilute Juice');
+INSERT INTO foodcat VALUES('72','Tea & Coffee');
+INSERT INTO foodcat VALUES('73','Fizzy');
+
+INSERT INTO foodcat VALUES('80','Tissues');
+INSERT INTO foodcat VALUES('81','Cleaning mats');
+INSERT INTO foodcat VALUES('89','General');
+
+INSERT INTO foodcat VALUES('90','Beer');
+INSERT INTO foodcat VALUES('91','Wine');
+INSERT INTO foodcat VALUES('92','Minerals');
+INSERT INTO foodcat VALUES('93','Spirits');
+INSERT INTO foodcat VALUES('94','Snacks');
+INSERT INTO foodcat VALUES('95','Tobacco');

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+$PERL -x 3<&0 <<'END_OF_SCRIPT'
+#!perl
+
+use CGI qw/:standard/;
+
+# 2 argument open here for older Perls
+open STDIN, '<&3' or die "Can't reopen STDIN";
+
+print header(-type => "text/plain");
+
+local $CGI::LIST_CONTEXT_WARN = 0;
+
+foreach my $name (param()) {
+	my @value = param($name);
+	foreach (@value) { tr/\n/ /; }
+	print "$name\t@value\n";
+}
+
+END_OF_SCRIPT

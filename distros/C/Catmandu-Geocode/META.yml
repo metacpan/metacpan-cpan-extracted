@@ -1,0 +1,36 @@
+---
+abstract: 'Catmandu modules for the Google Maps geocoding api'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Test::Exception: '0.32'
+  Test::More: '1.001003'
+  Test::Simple: '1.001003'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-Geocode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0'
+  Geo::Coder::Google: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-Geocode/issues
+  homepage: https://github.com/LibreCat/Catmandu-Geocode
+  repository: https://github.com/LibreCat/Catmandu-Geocode.git
+version: '0.01'
+x_contributors:
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'

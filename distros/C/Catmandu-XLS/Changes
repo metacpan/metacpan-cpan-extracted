@@ -1,0 +1,37 @@
+Revision history for Catmandu-XLS
+
+0.08  2016-01-12 16:31:41 CET
+  - Add Spreadsheet::ParseXLSX to cpanfile
+  - GH#5: Fix XSLX importer to keep the formatting rules of columns
+  - Fix POD: delete limitation to first worksheet
+
+0.07  2016-01-08 12:03:42 CET
+  - GH#15: Add option worksheet
+  - Fix coverall.io badge link
+  - Fix typo in POD
+
+0.06  2015-10-06 15:18:57 CEST
+  - Edit PODs
+  - Fix version
+  - Add badges
+  - Add .travis.yml
+  - Bugfix for formatted dates in XLS importer
+  - Add option columns to XLS(X) exporter
+
+0.05  2015-06-24 16:01:43 CEST
+  - adding columns option
+  - adding header option
+
+0.04  2014-06-27 09:13:18 CEST
+  - add importer for XLS and XLSX files.
+  - add test for importer
+  - add XLS and XLSX test files
+  - switch to Dist::Milla
+  - modify pod
+
+0.03    2013-09-12
+  - sort keys extracted from a hash in Exporter::XLS
+
+0.02    2012-06-13
+  - initial release
+

@@ -1,0 +1,8 @@
+For examples, see the objects used in testing located in t/Object/.
+
+In particular, t/Object/Animal.pm and the subclasses in t/Object/Animal/
+show typical object inheritance techniques.
+
+For an example of foreign/black-box inheritance of an IO::File object,
+see t/Object/Foreign.pm.
+

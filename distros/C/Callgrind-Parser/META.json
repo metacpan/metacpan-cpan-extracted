@@ -1,0 +1,56 @@
+{
+   "abstract" : "Parses Callgrind output file into a hashref representing the call tree of the source program",
+   "author" : [
+      "Dave Mueller <dave@perljedi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Callgrind-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "base" : "0",
+            "perl" : "v5.14.0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/perljedi/callgrind-parser",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perljedi/callgrind-parser.git",
+         "web" : "https://github.com/perljedi/callgrind-parser"
+      }
+   },
+   "version" : "0.002"
+}
+

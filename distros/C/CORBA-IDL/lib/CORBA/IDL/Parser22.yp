@@ -1,0 +1,1702 @@
+/*
+ *  Interface Definition Language (OMG IDL CORBA v2.2)
+ */
+
+%token  IDENTIFIER
+%token  INTEGER_LITERAL
+%token  STRING_LITERAL
+%token  WIDE_STRING_LITERAL
+%token  CHARACTER_LITERAL
+%token  WIDE_CHARACTER_LITERAL
+%token  FIXED_PT_LITERAL
+%token  FLOATING_PT_LITERAL
+    /*  Keyword     */
+%token  ANY
+%token  ATTRIBUTE
+%token  BOOLEAN
+%token  CASE
+%token  CHAR
+%token  CONST
+%token  CONTEXT
+%token  DEFAULT
+%token  DOUBLE
+%token  ENUM
+%token  EXCEPTION
+%token  FALSE
+%token  FIXED
+%token  FLOAT
+%token  IN
+%token  INOUT
+%token  INTERFACE
+%token  LONG
+%token  MODULE
+%token  NATIVE
+%token  OBJECT
+%token  OCTET
+%token  ONEWAY
+%token  OUT
+%token  RAISES
+%token  READONLY
+%token  SEQUENCE
+%token  SHORT
+%token  STRING
+%token  STRUCT
+%token  SWITCH
+%token  TRUE
+%token  TYPEDEF
+%token  UNION
+%token  UNSIGNED
+%token  VOID
+%token  WCHAR
+%token  WSTRING
+
+%start  specification
+
+%%
+
+/* 1 */     /* 3.5  OMG IDL Specification */
+specification
+:   definitions
+        {
+            $_[0]->YYData->{root} = new CORBA::IDL::Specification($_[0],
+                    'list_decl'         =>  $_[1],
+            );
+        }
+|   /* empty */
+        {
+            $_[0]->Error("Empty specification.\n");
+        }
+|   error
+        {
+            $_[0]->Error("definition declaration expected.\n");
+        }
+;
+
+definitions
+:   definition
+        {
+            [$_[1]->getRef()];
+        }
+|   definition  definitions
+        {
+            unshift @{$_[2]}, $_[1]->getRef();
+            $_[2];
+        }
+;
+
+/* 2 */
+definition
+:   type_dcl        check_semicolon
+                                        #default action
+|   const_dcl       check_semicolon
+                                        #default action
+|   except_dcl      check_semicolon
+                                        #default action
+|   interface       check_semicolon
+                                        #default action
+|   module          check_semicolon
+                                        #default action
+|   IDENTIFIER      error   ';'
+        {
+            # when IDENTIFIER is a future keyword
+            $_[0]->Error("'$_[1]' unexpected.\n");
+            $_[0]->YYErrok();
+            new CORBA::IDL::Node($_[0],
+                    'idf'                   =>  $_[1]
+            );
+        }
+;
+
+check_semicolon
+:   ';'
+                                        #default action
+|   error
+        {
+            $_[0]->Warning("';' expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 3 */     /* 3.5.1    Module Declaration */
+module
+:   module_header   '{' definitions '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentRoot($_[1]);
+            $_[1]->Configure($_[0],
+                    'list_decl'         =>  $_[3]
+            ) if (defined $_[1]);
+        }
+|   module_header   '{' error       '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentRoot($_[1]);
+            $_[0]->Error("definition declaration expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   module_header   '{' '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentRoot($_[1]);
+            $_[0]->Error("Empty module.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   module_header   error   '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentRoot($_[1]);
+            $_[0]->Error("'\x7b' expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+module_header
+:   MODULE  IDENTIFIER
+        {
+            new CORBA::IDL::Module($_[0],
+                    'idf'               =>  $_[2],
+            );
+        }
+|   MODULE  error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 4 */     /* 3.5.2    Interface Declaration */
+interface
+:   interface_dcl
+                                        #default action
+|   forward_dcl
+                                        #default action
+;
+
+/* 5 */
+interface_dcl
+:   interface_header    '{' '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->YYData->{curr_itf} = undef;
+            $_[1]->Configure($_[0],
+                    'list_decl'     =>  []
+            ) if (defined $_[1]);
+        }
+|   interface_header    '{' interface_body  '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->YYData->{curr_itf} = undef;
+            $_[1]->Configure($_[0],
+                    'list_decl'     =>  $_[3]
+            ) if (defined $_[1]);
+        }
+|   interface_header    '{' error           '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->YYData->{curr_itf} = undef;
+            $_[0]->Error("export declaration expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+/* 6 */
+forward_dcl
+:   INTERFACE   IDENTIFIER
+        {
+            new CORBA::IDL::ForwardRegularInterface($_[0],
+                    'idf'                   =>  $_[2]
+            );
+        }
+|   INTERFACE   error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 7 */
+interface_header
+:   INTERFACE   IDENTIFIER  interface_inheritance_spec
+        {
+            new CORBA::IDL::RegularInterface($_[0],
+                    'idf'                   =>  $_[2],
+                    'inheritance'           =>  $_[3]
+            );
+        }
+|   INTERFACE   error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 8 */
+interface_body
+:   exports
+                                        #default action
+;
+
+exports
+:   export
+        {
+            [$_[1]->getRef()];
+        }
+|   export  exports
+        {
+            unshift @{$_[2]}, $_[1]->getRef();
+            $_[2];
+        }
+;
+
+/* 9 */
+export
+:   type_dcl        check_semicolon
+                                        #default action
+|   const_dcl       check_semicolon
+                                        #default action
+|   except_dcl      check_semicolon
+                                        #default action
+|   attr_dcl        check_semicolon
+                                        #default action
+|   op_dcl          check_semicolon
+                                        #default action
+;
+
+/* 10 */
+interface_inheritance_spec
+:   ':' interface_names
+        {
+            new CORBA::IDL::InheritanceSpec($_[0],
+                    'list_interface'        =>  $_[2]
+            );
+        }
+|   ':' error
+        {
+            $_[0]->Error("Interface name expected.\n");
+            $_[0]->YYErrok();
+        }
+|   /* empty */
+                                        #default action
+;
+
+interface_names
+:   interface_name
+        {
+            [$_[1]];
+        }
+|   interface_name  ',' interface_names
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+;
+
+interface_name
+:   scoped_name
+        {
+                CORBA::IDL::Interface->Lookup($_[0], $_[1]);
+        }
+;
+
+/* 11 */
+scoped_name
+:   IDENTIFIER
+                                        #default action
+|   '::'    IDENTIFIER
+        {
+            $_[1] . $_[2];
+        }
+|   '::'    error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+            '';
+        }
+|   scoped_name '::'    IDENTIFIER
+        {
+            $_[1] . $_[2] . $_[3];
+        }
+|   scoped_name '::'    error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+/* 12 */    /* 3.7  Constant Declaration */
+const_dcl
+:   CONST   const_type  IDENTIFIER  '=' const_exp
+        {
+            new CORBA::IDL::Constant($_[0],
+                    'type'              =>  $_[2],
+                    'idf'               =>  $_[3],
+                    'list_expr'         =>  $_[5]
+            );
+        }
+|   CONST   const_type  IDENTIFIER  '=' error
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+|   CONST   const_type  IDENTIFIER  error
+        {
+            $_[0]->Error("'=' expected.\n");
+            $_[0]->YYErrok();
+        }
+|   CONST   const_type  error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+|   CONST   error
+        {
+            $_[0]->Error("const_type expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 13 */
+const_type
+:   integer_type
+                                        #default action
+|   char_type
+                                        #default action
+|   wide_char_type
+                                        #default action
+|   boolean_type
+                                        #default action
+|   floating_pt_type
+                                        #default action
+|   string_type
+                                        #default action
+|   wide_string_type
+                                        #default action
+|   fixed_pt_const_type
+                                        #default action
+|   scoped_name
+        {
+            CORBA::IDL::TypeDeclarator->Lookup($_[0], $_[1]);
+        }
+;
+
+/* 14 */
+const_exp
+:   or_expr
+                                        #default action
+;
+
+/* 15 */
+or_expr
+:   xor_expr
+                                        #default action
+|   or_expr     '|'     xor_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 16 */
+xor_expr
+:   and_expr
+                                        #default action
+|   xor_expr    '^'     and_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 17 */
+and_expr
+:   shift_expr
+                                        #default action
+|   and_expr    '&'     shift_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 18 */
+shift_expr
+:   add_expr
+                                        #default action
+|   shift_expr  '>>'    add_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+|   shift_expr  '<<'    add_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 19 */
+add_expr
+:   mult_expr
+                                        #default action
+|   add_expr    '+'     mult_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+|   add_expr    '-'     mult_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 20 */
+mult_expr
+:   unary_expr
+                                        #default action
+|   mult_expr   '*'     unary_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+|   mult_expr   '/'     unary_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+|   mult_expr   '%'     unary_expr
+        {
+            BuildBinop($_[1], $_[2], $_[3]);
+        }
+;
+
+/* 21 */
+unary_expr
+:   unary_operator  primary_expr
+        {
+            BuildUnop($_[1], $_[2]);
+        }
+|   primary_expr
+                                        #default action
+;
+
+/* 22 */
+unary_operator
+:   '-'
+                                        #default action
+|   '+'
+                                        #default action
+|   '~'
+                                        #default action
+;
+
+/* 23 */
+primary_expr
+:   scoped_name
+        {
+            [
+                CORBA::IDL::Constant->Lookup($_[0], $_[1])
+            ];
+        }
+|   literal
+        {
+            [ $_[1] ];
+        }
+|   '(' const_exp   ')'
+        {
+            $_[2];
+        }
+|   '(' error       ')'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 24 */
+literal
+:   INTEGER_LITERAL
+        {
+            new CORBA::IDL::IntegerLiteral($_[0],
+                    'value'             =>  $_[1],
+                    'lexeme'            =>  $_[0]->YYData->{lexeme}
+            );
+        }
+|   string_literal
+        {
+            new CORBA::IDL::StringLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   wide_string_literal
+        {
+            new CORBA::IDL::WideStringLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   CHARACTER_LITERAL
+        {
+            new CORBA::IDL::CharacterLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   WIDE_CHARACTER_LITERAL
+        {
+            new CORBA::IDL::WideCharacterLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   FIXED_PT_LITERAL
+        {
+            new CORBA::IDL::FixedPtLiteral($_[0],
+                    'value'             =>  $_[1],
+                    'lexeme'            =>  $_[0]->YYData->{lexeme}
+            );
+        }
+|   FLOATING_PT_LITERAL
+        {
+            new CORBA::IDL::FloatingPtLiteral($_[0],
+                    'value'             =>  $_[1],
+                    'lexeme'            =>  $_[0]->YYData->{lexeme}
+            );
+        }
+|   boolean_literal
+                                        #default action
+;
+
+string_literal
+:   STRING_LITERAL
+                                        #default action
+|   STRING_LITERAL  string_literal
+        {
+            $_[1] . $_[2];
+        }
+;
+
+wide_string_literal
+:   WIDE_STRING_LITERAL
+                                        #default action
+|   WIDE_STRING_LITERAL wide_string_literal
+        {
+            $_[1] . $_[2];
+        }
+;
+
+/* 25 */
+boolean_literal
+:   TRUE
+        {
+            new CORBA::IDL::BooleanLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   FALSE
+        {
+            new CORBA::IDL::BooleanLiteral($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 26 */
+positive_int_const
+:   const_exp
+        {
+            new CORBA::IDL::Expression($_[0],
+                    'list_expr'         =>  $_[1]
+            );
+        }
+;
+
+/* 27 */    /* 3.8      Type Declaration */
+type_dcl
+:   TYPEDEF     type_declarator
+        {
+            $_[2];
+        }
+|   struct_type
+                                        #default action
+|   union_type
+                                        #default action
+|   enum_type
+                                        #default action
+|   NATIVE      simple_declarator       /* 3.8.5    Native Types */
+        {
+            new CORBA::IDL::NativeType($_[0],
+                    'idf'               =>  $_[2]
+            );
+        }
+|   TYPEDEF     error
+        {
+            $_[0]->Error("type_declarator expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 28 */
+type_declarator
+:   type_spec   declarators
+        {
+            new CORBA::IDL::TypeDeclarators($_[0],
+                    'type'              =>  $_[1],
+                    'list_expr'         =>  $_[2]
+            );
+        }
+;
+
+/* 29 */
+type_spec
+:   simple_type_spec
+                                        #default action
+|   constr_type_spec
+                                        #default action
+;
+
+/* 30 */
+simple_type_spec
+:   base_type_spec
+                                        #default action
+|   template_type_spec
+                                        #default action
+|   scoped_name
+        {
+            CORBA::IDL::TypeDeclarator->Lookup($_[0], $_[1]);
+        }
+|   VOID
+        {
+            $_[0]->Error("simple_type_spec expected.\n");
+            new CORBA::IDL::VoidType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 31 */
+base_type_spec
+:   floating_pt_type
+                                        #default action
+|   integer_type
+                                        #default action
+|   char_type
+                                        #default action
+|   wide_char_type
+                                        #default action
+|   boolean_type
+                                        #default action
+|   octet_type
+                                        #default action
+|   any_type
+                                        #default action
+|   object_type
+                                        #default action
+;
+
+/* 32 */    /* 3.8.3    Template Types */
+template_type_spec
+:   sequence_type
+                                        #default action
+|   string_type
+                                        #default action
+|   wide_string_type
+                                        #default action
+|   fixed_pt_type
+                                        #default action
+;
+
+/* 33 */    /* 3.8.2    Constructed Types */
+constr_type_spec
+:   struct_type
+                                        #default action
+|   union_type
+                                        #default action
+|   enum_type
+                                        #default action
+;
+
+/* 34 */
+declarators
+:   declarator
+        {
+            [$_[1]];
+        }
+|   declarator  ',' declarators
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+;
+
+/* 35 */
+declarator
+:   simple_declarator
+        {
+            [$_[1]];
+        }
+|   complex_declarator
+                                        #default action
+;
+
+/* 36 */
+simple_declarator
+:   IDENTIFIER
+                                        #default action
+|   error   ','
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+|   error   ';'
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 37 */    /* 3.8.4    Complex Declarator */
+complex_declarator
+:   array_declarator
+                                        #default action
+;
+
+/* 38 */    /* 3.8.1    Basic Types */
+floating_pt_type
+:   FLOAT
+        {
+            new CORBA::IDL::FloatingPtType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   DOUBLE
+        {
+            new CORBA::IDL::FloatingPtType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   LONG    DOUBLE
+        {
+            new CORBA::IDL::FloatingPtType($_[0],
+                    'value'             =>  $_[1] . q{ } . $_[2]
+            );
+        }
+;
+
+/* 39 */
+integer_type
+:   signed_int
+                                        #default action
+|   unsigned_int
+                                        #default action
+;
+
+/* 40 */
+signed_int
+:   signed_short_int
+                                        #default action
+|   signed_long_int
+                                        #default action
+|   signed_longlong_int
+                                        #default action
+;
+
+/* 41 */
+signed_short_int
+:   SHORT
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 42 */
+signed_long_int
+:   LONG
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 43 */
+signed_longlong_int
+:   LONG    LONG
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1] . q{ } . $_[2]
+            );
+        }
+;
+
+/* 44 */
+unsigned_int
+:   unsigned_short_int
+                                        #default action
+|   unsigned_long_int
+                                        #default action
+|   unsigned_longlong_int
+                                        #default action
+;
+
+/* 45 */
+unsigned_short_int
+:   UNSIGNED    SHORT
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1] . q{ } . $_[2]
+            );
+        }
+;
+
+/* 46 */
+unsigned_long_int
+:   UNSIGNED    LONG
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1] . q{ } . $_[2]
+            );
+        }
+;
+
+/* 47 */
+unsigned_longlong_int
+:   UNSIGNED    LONG    LONG
+        {
+            new CORBA::IDL::IntegerType($_[0],
+                    'value'             =>  $_[1] . q{ } . $_[2] . q{ } . $_[3]
+            );
+        }
+;
+
+/* 48 */
+char_type
+:   CHAR
+        {
+            new CORBA::IDL::CharType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 49 */
+wide_char_type
+:   WCHAR
+        {
+            new CORBA::IDL::WideCharType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 50 */
+boolean_type
+:   BOOLEAN
+        {
+            new CORBA::IDL::BooleanType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 51 */
+octet_type
+:   OCTET
+        {
+            new CORBA::IDL::OctetType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 52 */
+any_type
+:   ANY
+        {
+            new CORBA::IDL::AnyType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 53 */
+object_type
+:   OBJECT
+        {
+            new CORBA::IDL::ObjectType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+/* 54 */
+struct_type
+:   struct_header   '{' member_list '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[1]->Configure($_[0],
+                    'list_expr'         =>  $_[3]
+            ) if (defined $_[1]);
+        }
+|   struct_header   '{' error       '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("member expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+struct_header
+:   STRUCT  IDENTIFIER
+        {
+            new CORBA::IDL::StructType($_[0],
+                    'idf'               =>  $_[2]
+            );
+        }
+|   STRUCT  error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 55 */
+member_list
+:   member
+        {
+            [$_[1]];
+        }
+|   member  member_list
+        {
+            unshift @{$_[2]}, $_[1];
+            $_[2];
+        }
+;
+
+/* 56 */
+member
+:   type_spec   declarators check_semicolon
+        {
+            new CORBA::IDL::Members($_[0],
+                    'type'              =>  $_[1],
+                    'list_expr'         =>  $_[2]
+            );
+        }
+;
+
+/* 57 */
+union_type
+:   union_header    SWITCH  '(' switch_type_spec    ')' '{' switch_body '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[1]->Configure($_[0],
+                    'type'              =>  $_[4],
+                    'list_expr'         =>  $_[7]
+            ) if (defined $_[1]);
+        }
+|   union_header    SWITCH  '(' switch_type_spec    ')' '{' error       '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("switch_body expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   union_header    SWITCH  '(' switch_type_spec    ')' error
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("'\x7b' expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   union_header    SWITCH  '(' error               ')'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("switch_type_spec expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   union_header    SWITCH  error
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("'(' expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+union_header
+:   UNION   IDENTIFIER
+        {
+            new CORBA::IDL::UnionType($_[0],
+                    'idf'               =>  $_[2],
+            );
+        }
+|   UNION   error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 58 */
+switch_type_spec
+:   integer_type
+                                        #default action
+|   char_type
+                                        #default action
+|   boolean_type
+                                        #default action
+|   enum_type
+                                        #default action
+|   scoped_name
+        {
+            CORBA::IDL::TypeDeclarator->Lookup($_[0], $_[1]);
+        }
+;
+
+/* 59 */
+switch_body
+:   case
+        {
+            [$_[1]];
+        }
+|   case    switch_body
+        {
+            unshift @{$_[2]}, $_[1];
+            $_[2];
+        }
+;
+
+/* 60 */
+case
+:   case_labels element_spec    check_semicolon
+        {
+            new CORBA::IDL::Case($_[0],
+                    'list_label'        =>  $_[1],
+                    'element'           =>  $_[2]
+            );
+        }
+;
+
+case_labels
+:   case_label
+        {
+            [$_[1]];
+        }
+|   case_label  case_labels
+        {
+            unshift @{$_[2]}, $_[1];
+            $_[2];
+        }
+;
+
+/* 61 */
+case_label
+:   CASE    const_exp   ':'
+        {
+            $_[2];                      # here only a expression, type is not known
+        }
+|   CASE    const_exp   error
+        {
+            $_[0]->Error("':' expected.\n");
+            $_[0]->YYErrok();
+            $_[2];
+        }
+|   CASE    error
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+|   DEFAULT     ':'
+        {
+            new CORBA::IDL::Default($_[0]);
+        }
+|   DEFAULT     error
+        {
+            $_[0]->Error("':' expected.\n");
+            $_[0]->YYErrok();
+            new CORBA::IDL::Default($_[0]);
+        }
+;
+
+/* 62 */
+element_spec
+:   type_spec   declarator
+        {
+            new CORBA::IDL::Element($_[0],
+                    'type'          =>  $_[1],
+                    'list_expr'     =>  $_[2]
+            );
+        }
+;
+
+/* 63 */
+enum_type
+:   enum_header '{' enumerators '}'
+        {
+            $_[1]->Configure($_[0],
+                    'list_expr'     =>  $_[3]
+            ) if (defined $_[1]);
+        }
+|   enum_header '{' error       '}'
+        {
+            $_[0]->Error("enumerator expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   enum_header error
+        {
+            $_[0]->Error("'\x7b' expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+enum_header
+:   ENUM    IDENTIFIER
+        {
+            new CORBA::IDL::EnumType($_[0],
+                    'idf'               =>  $_[2],
+            );
+        }
+|   ENUM    error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+enumerators
+:   enumerator
+        {
+            [$_[1]];
+        }
+|   enumerator  ',' enumerators
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+|   enumerator  ','
+        {
+            $_[0]->Warning("',' unexpected.\n");
+            [$_[1]];
+        }
+|   enumerator  ';'
+        {
+            $_[0]->Error("';' unexpected.\n");
+            [$_[1]];
+        }
+;
+
+/* 64 */
+enumerator
+:   IDENTIFIER
+        {
+            new CORBA::IDL::Enum($_[0],
+                    'idf'               =>  $_[1]
+            );
+        }
+;
+
+/* 65 */
+sequence_type
+:   SEQUENCE    '<' simple_type_spec    ',' positive_int_const  '>'
+        {
+            new CORBA::IDL::SequenceType($_[0],
+                    'value'             =>  $_[1],
+                    'type'              =>  $_[3],
+                    'max'               =>  $_[5]
+            );
+        }
+|   SEQUENCE    '<' simple_type_spec    ',' error               '>'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+|   SEQUENCE    '<' simple_type_spec    '>'
+        {
+            new CORBA::IDL::SequenceType($_[0],
+                    'value'             =>  $_[1],
+                    'type'              =>  $_[3]
+            );
+        }
+|   SEQUENCE    '<' error               '>'
+        {
+            $_[0]->Error("simple_type_spec expected.\n");
+            $_[0]->YYErrok();
+        }
+|   SEQUENCE    error
+        {
+            $_[0]->Error("'<' expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 66 */
+string_type
+:   STRING  '<' positive_int_const  '>'
+        {
+            new CORBA::IDL::StringType($_[0],
+                    'value'             =>  $_[1],
+                    'max'               =>  $_[3]
+            );
+        }
+|   STRING
+        {
+            new CORBA::IDL::StringType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   STRING  '<' error               '>'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 67 */
+wide_string_type
+:   WSTRING '<' positive_int_const  '>'
+        {
+            new CORBA::IDL::WideStringType($_[0],
+                    'value'             =>  $_[1],
+                    'max'               =>  $_[3]
+            );
+        }
+|   WSTRING
+        {
+            new CORBA::IDL::WideStringType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   WSTRING '<' error               '>'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 68 */
+array_declarator
+:   IDENTIFIER  fixed_array_sizes
+        {
+            unshift @{$_[2]}, $_[1];
+            $_[2];
+        }
+;
+
+fixed_array_sizes
+:   fixed_array_size
+        {
+            [$_[1]];
+        }
+|   fixed_array_size    fixed_array_sizes
+        {
+            unshift @{$_[2]}, $_[1];
+            $_[2];
+        }
+;
+
+/* 69 */
+fixed_array_size
+:   '[' positive_int_const  ']'
+        {
+            $_[2];
+        }
+|   '[' error               ']'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 70 */    /* 3.11 Attribute Declaration */
+attr_dcl
+:   attr_mod    ATTRIBUTE   param_type_spec simple_declarators
+        {
+            new CORBA::IDL::Attributes($_[0],
+                    'modifier'          =>  $_[1],
+                    'type'              =>  $_[3],
+                    'list_expr'         =>  $_[4]
+            );
+        }
+|   attr_mod    ATTRIBUTE   error
+        {
+            $_[0]->Error("type expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+attr_mod
+:   READONLY
+                                        #default action
+|   /* empty */
+                                        #default action
+;
+
+simple_declarators
+:   simple_declarator
+        {
+            [$_[1]];
+        }
+|   simple_declarator   ',' simple_declarators
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+;
+
+/* 71 */    /* 3.9  Exception Declaration */
+except_dcl
+:   exception_header    '{' '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[1];
+        }
+|   exception_header    '{' member_list '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[1]->Configure($_[0],
+                    'list_expr'         =>  $_[3]
+            ) if (defined $_[1]);
+        }
+|   exception_header    '{' error   '}'
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("'members expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+|   exception_header    error
+        {
+            $_[0]->YYData->{symbtab}->PopCurrentScope($_[1]);
+            $_[0]->Error("'\x7b' expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+exception_header
+:   EXCEPTION   IDENTIFIER
+        {
+            new CORBA::IDL::Exception($_[0],
+                    'idf'               =>  $_[2],
+            );
+        }
+|   EXCEPTION   error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 72 */    /* 3.10 Operation Declaration */
+op_dcl
+:   op_header   parameter_dcls  raises_expr context_expr
+        {
+            delete $_[0]->YYData->{unnamed_symbtab}
+                    if (exists $_[0]->YYData->{unnamed_symbtab});
+            $_[1]->Configure($_[0],
+                    'list_param'    =>  $_[2],
+                    'list_raise'    =>  $_[3],
+                    'list_context'  =>  $_[4]
+            ) if (defined $_[1]);
+        }
+|   op_header   error
+        {
+            delete $_[0]->YYData->{unnamed_symbtab}
+                    if (exists $_[0]->YYData->{unnamed_symbtab});
+            $_[0]->Error("parameters declaration expected.\n");
+            $_[0]->YYErrok();
+            $_[1];
+        }
+;
+
+op_header
+:   op_mod  op_type_spec    IDENTIFIER
+        {
+            new CORBA::IDL::Operation($_[0],
+                    'modifier'          =>  $_[1],
+                    'type'              =>  $_[2],
+                    'idf'               =>  $_[3]
+            );
+        }
+|   op_mod  op_type_spec    error
+        {
+            $_[0]->Error("Identifier expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+op_mod
+:   op_attribute
+                                        #default action
+|   /* empty */
+                                        #default action
+;
+
+/* 73 */    /* 3.10.1   Operation Attribute */
+op_attribute
+:   ONEWAY
+                                        #default action
+;
+
+/* 74 */
+op_type_spec
+:   op_param_type_spec
+                                        #default action
+|   VOID
+        {
+            new CORBA::IDL::VoidType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+|   sequence_type
+        {
+            $_[0]->Error("op_type_spec expected.\n");
+            $_[1];                      #default action
+        }
+;
+
+/* 75 */    /* 3.10.2   Parameter Declarations */
+parameter_dcls
+:   '(' param_dcls  ')'
+        {
+            $_[2];
+        }
+|   '(' param_dcls  ',' '...'   ')'
+        {
+            $_[0]->Error("'...' unexpected.\n");
+            $_[2];
+        }
+|   '(' param_dcls  ',' ')'
+        {
+            $_[0]->Warning("',' unexpected.\n");
+            $_[2];
+        }
+|   '(' ')'
+        {
+            undef;
+        }
+|   '(' '...'   ')'
+        {
+            $_[0]->Error("'...' unexpected.\n");
+            undef;
+        }
+|   '(' error       ')'
+        {
+            $_[0]->Error("parameters declaration expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+param_dcls
+:   param_dcl
+        {
+            [$_[1]];
+        }
+|   param_dcls  ',' param_dcl
+        {
+            push @{$_[1]}, $_[3];
+            $_[1];
+        }
+|   param_dcl   ';'
+        {
+            $_[0]->Error("';' unexpected.\n");
+            [$_[1]];
+        }
+;
+
+/* 76 */
+param_dcl
+:   param_attribute param_type_spec simple_declarator
+        {
+            new CORBA::IDL::Parameter($_[0],
+                    'attr'              =>  $_[1],
+                    'type'              =>  $_[2],
+                    'idf'               =>  $_[3]
+            );
+        }
+;
+
+/* 77 */
+param_attribute
+:   IN
+                                        #default action
+|   OUT
+                                        #default action
+|   INOUT
+                                        #default action
+|   /* empty */
+        {
+            $_[0]->Error("(in|out|inout) expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 78 */    /* 3.10.3   Raises Expressions */
+raises_expr
+:   RAISES  '(' exception_names ')'
+        {
+            $_[3];
+        }
+|   RAISES  '(' error           ')'
+        {
+            $_[0]->Error("name expected.\n");
+            $_[0]->YYErrok();
+        }
+|   RAISES  error
+        {
+            $_[0]->Error("'(' expected.\n");
+            $_[0]->YYErrok();
+        }
+|   /* empty */
+                                        #default action
+;
+
+exception_names
+:   exception_name
+        {
+            [$_[1]];
+        }
+|   exception_name  ',' exception_names
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+;
+
+exception_name
+:   scoped_name
+        {
+            CORBA::IDL::Exception->Lookup($_[0], $_[1]);
+        }
+;
+
+/* 79 */    /* 3.10.4   Context Expressions */
+context_expr
+:   CONTEXT '(' string_literals ')'
+        {
+            $_[3];
+        }
+|   CONTEXT '(' error           ')'
+        {
+            $_[0]->Error("string expected.\n");
+            $_[0]->YYErrok();
+        }
+|   CONTEXT error
+        {
+            $_[0]->Error("'(' expected.\n");
+            $_[0]->YYErrok();
+        }
+|   /* empty */
+                                        #default action
+;
+
+string_literals
+:   string_literal
+        {
+            [$_[1]];
+        }
+|   string_literal  ',' string_literals
+        {
+            unshift @{$_[3]}, $_[1];
+            $_[3];
+        }
+;
+
+/* 80 */
+param_type_spec
+:   op_param_type_spec
+                                        #default action
+|   VOID
+        {
+            $_[0]->Error("param_type_spec expected.\n");
+            $_[1];                      #default action
+        }
+|   sequence_type
+        {
+            $_[0]->Error("param_type_spec expected.\n");
+            $_[1];                      #default action
+        }
+|   constr_type_spec
+        {
+            $_[0]->Error("param_type_spec expected.\n");
+            $_[1];                      #default action
+        }
+;
+
+op_param_type_spec
+:   base_type_spec
+                                        #default action
+|   string_type
+                                        #default action
+|   wide_string_type
+                                        #default action
+|   fixed_pt_type /* removed in 2.4 */
+                                        #default action
+|   scoped_name
+        {
+            CORBA::IDL::TypeDeclarator->Lookup($_[0], $_[1]);
+        }
+;
+
+/* 81 */
+fixed_pt_type
+:   FIXED   '<' positive_int_const  ',' positive_int_const  '>'
+        {
+            new CORBA::IDL::FixedPtType($_[0],
+                    'value'             =>  $_[1],
+                    'd'                 =>  $_[3],
+                    's'                 =>  $_[5]
+            );
+        }
+|   FIXED   '<' positive_int_const  ',' error               '>'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+|   FIXED   '<' error                                       '>'
+        {
+            $_[0]->Error("Expression expected.\n");
+            $_[0]->YYErrok();
+        }
+|   FIXED   error
+        {
+            $_[0]->Error("'<' expected.\n");
+            $_[0]->YYErrok();
+        }
+;
+
+/* 82 */
+fixed_pt_const_type
+:   FIXED
+        {
+            new CORBA::IDL::FixedPtConstType($_[0],
+                    'value'             =>  $_[1]
+            );
+        }
+;
+
+%%
+
+use warnings;
+
+our $VERSION = '2.61';
+our $IDL_VERSION = '2.2';
+
+sub BuildUnop
+{
+    my ($op, $expr) = @_;
+
+    my $node = new CORBA::IDL::UnaryOp($_[0],
+            'op'    =>  $op
+    );
+    push @$expr, $node;
+    return $expr;
+}
+
+sub BuildBinop
+{
+    my ($left, $op, $right) = @_;
+
+    my $node = new CORBA::IDL::BinaryOp($_[0],
+            'op'    =>  $op
+    );
+    push @$left, @$right;
+    push @$left, $node;
+    return $left;
+}
+

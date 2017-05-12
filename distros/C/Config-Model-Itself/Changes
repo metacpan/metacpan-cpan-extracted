@@ -1,0 +1,564 @@
+2.009 2017-04-29
+
+  New features:
+    * add assign_char and assign_with parameter
+    * add support for hash write_empty_value option
+
+  Build:
+    * requires Config::Model >= 2.101
+
+2.008 2017-03-11
+
+  New features:
+    * add support_info in application model. Used by
+      Comfig::Model 2.100 to inform user how to report
+      a bug when a parameter is missing from a model
+
+2.007 2017-03-05
+
+  New features:
+    * add file_mode parameter to backend model
+    * Allow plugin injection in other class
+      (depends on Config::Model 2.098)
+    * add synopsis and link_to_doc parameter to the
+      model class that represent application
+
+  Build:
+    * update © years
+    * requires Path::Tiny >= 0.062
+
+  Bug fixes:
+    * cme meta: don't read plugin when loading model..
+    * remove obsolete config-model-edit command
+
+  Doc updates:
+    * show all commands in meta's description
+    * update compute value doc in model
+    * mention &index in backend file parameter
+    * update INI comment_delimiter doc
+
+2.006 2016-09-14
+
+  Bug fix following removal of '.' from @INC
+    * fix load of model snippet when '.' is not in @INC
+      (Closes Debian #837682)
+    * requires Config::Model 2.091
+
+2.005 2016-07-03
+
+  Made change to fix tests brought by the changes done
+  in Config::Model::WarpedNode parameters:
+    * depends on Config::Model 2.087
+    * fix deprecated warped_node params in Itself model
+    * fix model for new WarpedNode
+
+  Other changes:
+    * removed long deprecated 'experience' parameter
+    * added CONTRIBUTING.md file
+
+2.004 2016-04-21
+
+  New features:
+    * added auto_delete parameter for read/write backend
+      this requires Config::Model 2.083
+
+  Doc updates in model:
+    * updated Class doc
+    * added help for value_type
+
+  Bug fixes:
+    * detect backend in local dev environment.
+
+2.003 2016-01-27
+
+  New features:
+    * added config_dir parameter to application
+    * Replace ini_file backend with IniFile
+    * Added split/join checklist param to ini backend
+      (requires Config::Model 2.076)
+
+  Improved usability:
+    * simplified creation of Itself object.
+    * Build.PL: avoid dependency on cme to generate doc
+
+  Bug fixes:
+    * Config classes created with 'cme meta edit' are now saved
+    * meta: warn if save failed in test_and_quit mode
+    * Avoid a crash creating a config class
+    * fix test failure under debian ci
+      (helps with Debian #809294 and fix github #1)
+
+2.002 2015-12-02
+
+  Test enhancements:
+  * Skip cme-meta tests involing Tk when a display is not available.
+  
+2.001 2015-11-29
+
+  Major feature enhancement:
+
+  This modules provides a new sub command for cme: the "meta" sub
+  command. By default "cme meta edit" opens a graphical editor and
+  loads the model found in current directory. "cme meta" also provides
+  sub commands to check a model or to create a dot diagram showing a
+  model structure. "cme meta" comes with bash completion. See
+  App::Cme::Command::meta for more details.
+
+  Other changes:
+
+    + new App::Cmd dependency
+    * requires Config::Model 2.075
+    * config-model-edit is now deprecated in favor of "cme meta edit"
+    * updated README in changed it to README.md
+    * "cme edit" now support app files (e.g. files in lib/Config/Model/*.d )
+
+1.245 2015-07-19
+
+  Bug fixes in config-model-edit:
+    * fix saving of model done before launching test from menu
+    * fix creation of model directory done when starting a model from scratch
+
+  Doc fix:
+    * small synopsis fix in doc of Config::Model::Itself
+
+1.244 2015-05-23
+
+   A minor new feature:
+   * Class model: added include_backend parameter (for Xorg...)
+
+1.243 2015-01-11
+
+   A small change for this release:
+  
+    * Version 1.242 added the possibility to override the Perl class
+      implementing a configuration node by adding a class parameter in a
+      place that is confusing. This release fix this bug: this optional
+      override class is now declared at the top of a configuration class.
+    * Depends on Config::Model 2.064
+
+1.242 2014-11-29
+
+	New feature:
+    * Allow 'class' parameter for node, hash and list. This parameter
+      can be used to override the Perl class used to implement node,
+      hash or list element. Use with care.
+
+    Bug fix:
+    * replaced dep declaration YAML::any with YAML::Tiny
+
+1.241 2014-10-22
+
+    * config-model-edit: 
+      + added system option to read a model from system files
+      * fix yaml and load_yaml options
+      * fix dump and dumptype options
+      * fixed dot diagram generator (i.e. -dot-diagram option)
+    * dependency change: use YAML::Tiny instead of YAML::Any
+    * leaf value model:
+      + added file and dir and warn_if properties
+
+1.240 2014-05-22
+
+    Main change is the deprecation of the experience attribute.
+    config-model-edit can be used to clean up experience parameter
+    from existing model.
+
+    Dependency changes:
+    * removed usage of AnyEvent (requires C::M 2.055)
+    * removed use namespace::autoclean
+    * config-model-edit: use Path::Tiny instead of Path::Class
+
+    Other changes:
+    * min and max parameters accept number.
+    * removed obsolete permission attribute from test models
+      (which broke test with C::M >= 2.056)
+    * preserve header comments when reading/writing model files
+    * config-model-edit begins with "#!/usr/bin/env perl"
+
+2013-08-27 - 1.239
+
+   * Itself writer: ensure that hash data in models snippets 
+     have a predictable order (fix tests for perl 5.18)
+
+2013-08-25 - 1.238
+
+   * Added default_layer backend parameter with DefaultLayer
+     class. This enable user to create a model with a global system
+     configuration file à la /etc/ssh/ssh_config. This requires
+     Config::Model 2.039
+
+1.237 2013-04-19
+
+    * Replaced Any::Moose with Mouse
+    * backend detector: do not list twice the same backend
+    * Removed augeas from model and tests. Augeas meta-model
+      is now delivered with Config::Model::Backend::Augeas
+
+1.236 2013-03-23
+
+    * Itself: use named parameters with load_data to avoid warnings
+    * Depends on Config::Model >= 2.030
+    * delegate Tk init to AnyEvent to avoid blocking at program exit
+    + Depends on AnyEvent
+
+1.235 2012-11-27
+
+    * Fix quit bug in model test widget
+    * integrate model pod generation at build time
+    * Added memory cycle tests where possible
+    * Bump dependency on Config::Model 2.028 to generate 
+      properly the documentation for Itself model (which
+      may be should be called C::M::MyOwnDogFood... )
+
+1.234 2012-06-19
+
+    * Fix test that relied on Dpkg model (which used to be provided
+      by Config::Model)
+
+1.232 2012-06-19
+
+    * model Itself::Class: added accept_after
+      (requires Config::Model 2.020)
+    * config-model-edit: make sure that loading models are not 
+      recorded as changed data
+
+1.231 2012-05-22
+
+    * added migrate_values_from (requires Config::Model 2.015)
+    * migrate_keys_from cannot be warped (too complicated to mix
+      warp and migration)
+
+1.230 2012-05-04
+
+    * Itself reader/writer: added force_write attribute
+
+1.229 2012-04-14
+
+    + new runtime dependency: Data::Compare, Path::Class
+    + new test dependency: File::Copy::Recursive
+    * Depends on Config::Model 2.009
+
+    * config-model-edit:
+      + new option -plugin-file option. This option can be used to create model
+	plugins: small modification of an existing model that can be distributed
+	in a separate file or package.
+      * removed capacity to read models from systems files if the model
+	is not found locally. This behavior does not work well with model
+	plugins. This command can no longer read from one dir and write to
+	another for the same reason.
+      - removed obsolete option (-verbose -debug). These are now replaced
+        by the Log::Log4Perl framework
+      * replaced '_' by '-' in options names. Old options are still accepted
+        but are not documented
+    * Itself model: added use_as_upstream_default parameter
+    * Itself backend: do not write empty model file
+
+1.228 2011-11-29
+
+    * Requires Config::Model >= 1.263
+    * Meta model changes:
+        * Itself/CommonElement: enable convert for hash indexes. 
+        * Itself/Class, added in ini backend a lot of paramaters to
+          cope with various conventions:
+          + force_lc_* parameters. 
+          + write_boolean_as parameter
+          + join_list_value parameter
+          + store_class_in_hash section_map split_list_value 
+        * Itself/CommonElement: max_index can be used in lists
+        * Itself/NonWarpableElement:
+          + added write_as parameter (for booleans)
+
+1.227 2011-09-15
+
+	* MigratedValue.pl: replaced value can be a string, not only a
+	uniline
+	* CommonElement.pl: added assert and warn_unless parameters 
+	  (requires Config::Model 1.258)
+
+1.226 2011-09-02
+
+        * WarpableElement.pl: added duplicates parameter
+        * Depends on Config::Model 1.252
+
+
+1.225 2011-06-07
+
+        * Itself.pm:  munge pod text embedded in description 
+          to avoid spurious pod formatting in model files
+        * WarpableElement.pl: allow default_with_init for list (like hash)
+        * MigratedValue.pl: updated undef_is doc: use '' to have an empty string
+        * CommonElement.pl: warn parameter is a string and not a uniline
+	- Class.pl: name_match parameter is deprecated.
+
+1.224 2011-04-04
+
+        * Class.pl: added full_dump parameter for YAML and Perl backend
+
+1.223 2011-04-01
+
+        * dump and load annotations in pod doc in config class file
+        * Class.pl: added copyright, author, license elements
+        * Search backend in all @INC directories (useful for dev)
+        * Reduced indentation of generated Perl files.
+        * NonWarpableElement: added replace_follow parameter 
+        * Build depend on Test::Differences
+        * Requires Config::Model 1.236
+
+1.222 2011-01-20
+
+        * added migrate_keys_from, undef_is parameters 
+        * Above require Config::Model 1.230
+
+1.221 2011-01-09
+
+	* Remove unwanted test package file (oops)
+
+1.220 2011-01-09
+
+	* config-model-edit: use same log4perl config files as config-edit
+	* CommonElement: added warn* parameters 
+          (require Config::Model 1.228)
+        * Fix class deletion issue
+        * Adapted model and test to new style of accept specification
+
+1.219 2010-10-15
+
+	* removed obsolete push/pop_no_value_check calls 
+	* requires Config::Model 1.212
+
+1.218 2010-09-16
+
+	* Fixed missing dependencies in Build.PL (Building from hg
+	requires Dist::Zilla and Dist-Zilla-Plugins-CJM >= 3.01)
+
+1.217 2010-09-14
+
+	* Added allow_keys_matching parameter in ItselfWarpableElement.pl
+	(requires Config::Model 1.207)
+	* config-model-edit :doc fix
+	* Itself.pm: display hash or list cargo type in dot diagram"
+	* BackendDetector.pm: Fixed to handle backend names with embedded
+	:: (e.g. Debian::Dep5)
+
+1.216 2010-08-13
+
+	* Added accept parameter in Itself/Class.pl
+	(requires Config::Model 1.206)
+	* Build.PL: added dependency on Tk to avoid CPAN smoke test
+	failure
+
+1.215 2010-04-06
+
+	* t/itself.t: Fix skip part to avoid failures when X is not
+	available.
+
+1.214 2010-03-31
+
+	* config-model-edit (): ensure that model modified by loading data
+	or YAML is saved later on by the GUI.
+
+1.213 2010-03-25
+
+	* lib/Config/Model/Itself/BackendDetector.pm (): New class derived
+	from Config::Model::Value so config-model-edit can detect
+	available read/write plugin backend and propose relevant choice
+	for 'backend' model specification.
+
+	* Build.PL: Added dedendency on Pod::POM, depends on Config::Model
+	1.001
+
+
+	* lib/Config/Model/models/Itself/CommonElement.pl: add match
+	parameter from Config::Model 1.001
+
+
+	* config-model-edit (): can use -force_load when loading data or
+	yaml data.
+	* Build.PL: depends on YAML::Any
+
+1.212 2010-02-26
+
+	* Build.PL: depends on Config::Model 0.643
+
+
+	* config-model-edit: added load_yaml option to load model from a
+	YAML file.
+
+
+	* config-model-edit: added dump_yaml option to dump models as YAML
+	file.
+
+
+	* config-model-edit: added -dump -dump_type -load options. Non
+	options args are now interpreted as model modifications
+
+
+	* lib/Config/Model/models/Itself/CommonElement.pl: warp out min and max
+
+1.211 2009-06-24
+
+	* Build.PL: depend on Config::Model 0.637 and C::M::TkUI 1.210
+
+
+	* lib/Config/Model/models/Itself/*.pl: Changed built_in parameter
+	to upstream_default and built_in_list to upstream_default_list
+
+
+	* config-model-edit: added -save option.
+
+	* lib/Config/Model/models/Itself/Class.pl: Changed config_file
+	parameter to file (Req by Config::Model 0.636)
+
+1.210 2009-04-20
+
+	* config-model-edit: Fixed Log::Log4perl default configuration
+
+
+	* lib/Config/Model/models/Itself/Class.pl: Added auto_create and
+	file parameter to read/write spec (Req by Config::Model
+	0.635). Parameter allow_empty is deprecated and will be replaced
+	by auto_create when you run config-edit-model
+
+
+	* config-model-edit: new -dot_diagram option to get a dot file to
+	reprensent the structure of the configuration model
+
+	* lib/Config/Model/Iself.pm (get_dot_diagram): New method to draw a
+	diagram of the configuration class with "include" and
+	usage (e.g. with "config_class_name" parameter).
+
+	* lib/Config/Model/models/Itself/Element.pl: index_type is now
+	mandatory for hash types
+
+
+	* lib/Config/Model/models/Itself/Element.pl: Added summary model
+	parameter (Config::Model 0.635)
+
+
+	* lib/Config/Model/models/Itself/CommonElement.pl: 'choice' is
+	also available for 'reference' values
+
+1.209 2009-03-10
+
+	* t/*.t: Backported mkpath calls to File::Path delivered by perl
+	5.8.8
+
+
+	* lib/Config/Model/models/Itself/WarpableElement.pl: changed
+	auto_create in auto_create_keys and auto_create_ids (required by
+	Config::Model 0.634)
+
+1.208 2009-01-09
+
+	* lib/Config/Model/models/Itself/Class.pl: Added allow_empty
+	parameter. Minor corrections related to Augeas integration.
+
+1.207 2008-10-14
+
+	* lib/Config/Model/models/Itself/CommonElement.pl: Added ordered
+	parameter to checklist. Ordered checklist feature is required by
+	Ssh model for Ciphers list (see Config::Model::OpenSsh).
+
+	* Build.PL: Extract version from Config/Model/Itself.pm (hence the
+	bump to v 1.207) so that the pm file versions matches the .tgz
+	distribution version.
+
+0.206 2008-09-23
+
+	* lib/Config/Model/models/Itself/Class.pl: Added seq_with_lens
+	parameter for Augeas backend.
+
+
+	* lib/Config/Model/models/Itself/Class.pl: Bug fix on Augeas
+	parameters
+
+0.205 2008-07-25
+
+	* lib/Config/Model/models/Itself/Class.pl: Fixed specification of
+	Augeas parameters
+
+0.204 2008-07-25
+
+	* lib/Config/Model/models/Itself/*.pl: 
+	All the changes described below will be handled by the 
+	upgrade facility of Config::Model. I.e. to upgrade your 
+	configuration model, load your model in config-model-edit, 
+	save it, and you're done.
+	Changes:
+	- Changed auto read and auto write meta-model (needed by 
+	  Config::Model 0.624). 
+	- autoread autowrite 'syntax' parameter is replaced by 'backend'. 
+	- Added auto-read/write 'augeas' backend. 
+	- Added migrate_from in Class so that your own model will be able 
+	  to smoothly upgrade configuration data (See upgrade doc in 
+	  Config::Model::Value)
+	- Added use_eval for more complex string computation when the power 
+	  of Perl is needed (See Config::Model::ComputedValue documentation)
+
+
+0.203 2008-05-21
+
+	* config-model-edit: Fixed bug that prevented testing of the
+	configuration editor when starting from scratch.
+
+0.202 2008-05-18
+
+	* lib/Config/Model/models/Itself/CommonElement.pl: Added support for 
+	built in default list for check_list elements
+
+
+	* config-model-edit: Will now always launch Tk interface which has
+	a menu to test the configuration editor from the model under edition.
+	(some tests still to be written)
+
+
+	* lib/Config/Model/Itself.pm (list_class_element): new method to
+	help model debug
+
+
+	* lib/Config/Model/Itself.pm (read_all): Reworked model to fit with
+	new cargo arguments.
+	* tests: suppress legacy warnings
+	
+0.201 2008-04-03
+
+	* lib/Config/Model/models/Itself/Element.pl: Fixed element and
+	cargo models. 
+
+
+	* lib/Config/Model/models/Itself/WarpableElement.pl: added
+	description for 'replace' element
+
+
+	* lib/Config/Model/models/Itself/WarpableElement.pl: removed
+	enum_integer type
+
+	* config-model-edit: Clarified where models are read and
+	written. 
+
+0.102 2008-03-18
+
+	* config-model-edit: Now use Config::Model::TkUI instead of
+	Config::Model::TkUi
+
+
+	* lib/Config/Model/Itself.pm (read_all): Skip svn directory when
+	reading model files
+
+
+	* lib/Config/Model/Itself.pm (write_all): can now write
+	configuration class created with the editor. Each class created
+	will be saved in its own file. I.e. configuration class Foo::Bar
+	will be saved in Foo/Bar.pl
+
+
+	* config-model-edit: added possibity to use Tk interface.
+
+	* lib/Config/Model/models/Itself/WarpableElement.pl: added
+	'replace' parameter
+
+0.101 2007-10-16
+
+	* All: first version
+	
+

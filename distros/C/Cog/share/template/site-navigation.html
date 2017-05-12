@@ -1,0 +1,21 @@
+<div class="site-navigation">
+[% INCLUDE nav_list nav=site_navigation %]
+</div>
+
+[% BLOCK nav_list %]
+<ul>
+[% FOR elem = nav %]
+[% SET label = elem.0 %]
+[% SET url = elem.1 %]
+[% SET sublist = elem.2 %]
+[% IF url.search("") %]
+  <li><a href="[% base_url %][% url %]" class="[% label.replace('&nbsp;', ' ') | lower %]">[% label %]</a>
+[%- ELSE -%]
+  <li><a href="[% url.0 %]" class="_navigate [% label.replace('&nbsp;', ' ') | lower %]">[% label %]</a>
+[%- END -%]
+[% IF sublist %]
+[% INCLUDE nav_list nav=sublist %]
+[% END %]</li>
+[% END %]
+ </ul>
+[% END %]

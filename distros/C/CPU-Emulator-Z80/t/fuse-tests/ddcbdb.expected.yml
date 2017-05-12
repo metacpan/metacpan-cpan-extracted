@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  11210:
+    - 24
+name: ddcbdb
+registers:
+  AF: 63878
+  AF_: 0
+  BC: 27211
+  BC_: 0
+  DE: 25880
+  DE_: 0
+  HL: 53960
+  HL_: 0
+  I: 0
+  IX: 11133
+  IY: 22599
+  PC: 4
+  R: 2
+  SP: 0

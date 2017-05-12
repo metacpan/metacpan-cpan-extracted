@@ -1,0 +1,77 @@
+{
+   "abstract" : "Class::Accessor::Lite with lazy accessor feature",
+   "author" : [
+      "motemen <motemen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Accessor-Lite-Lazy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0.05",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Accessor::Lite::Lazy" : {
+         "file" : "lib/Class/Accessor/Lite/Lazy.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/motemen/Class-Accessor-Lite-Lazy/issues"
+      },
+      "homepage" : "https://github.com/motemen/Class-Accessor-Lite-Lazy",
+      "repository" : {
+         "url" : "git://github.com/motemen/Class-Accessor-Lite-Lazy",
+         "web" : "https://github.com/motemen/Class-Accessor-Lite-Lazy"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,2 @@
+primary = l1/primary.cnf
+%include other.cnf

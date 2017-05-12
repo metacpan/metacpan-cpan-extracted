@@ -1,0 +1,62 @@
+NAME
+    CPANPLUS::Dist::GitHook - Use Git::CPAN::Hook to commit each install in
+    a Git repository
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      # CPANPLUS configuration
+
+      cpanp> s conf dist_type CPANPLUS::Dist::GitHook
+
+      cpanp> s save
+
+      # Git::CPAN::Hook configuration
+
+      # put your local::lib under Git control
+      $ perl -MGit::CPAN::Hook -e init ~/perl5
+
+      # Use cpanp/CPANPLUS normally.
+
+      # or use cpan2dist
+
+      $ cpan2dist --format CPANPLUS::Dist::GitHook --install Some::Funky::Module
+
+DESCRIPTION
+    CPANPLUS::Dist::GitHook integrates Philippe Bruhat's Git::CPAN::Hook
+    module into CPANPLUS.
+
+    Commits are made after any "install" or "uninstall" that CPANPLUS
+    undertakes.
+
+METHODS
+    The following methods are provided. They are not meant to be called
+    directly by the user.
+
+    "install"
+        Called to install a distribution. This will in turn call the parent
+        install method, check the return status and call Git::CPAN::Hook's
+        "commit" method.
+
+    "uninstall"
+        Called to uninstall a distribution. This will in turn call the
+        parent uninstall method, check the return status and call
+        Git::CPAN::Hook's "commit" method.
+
+SEE ALSO
+    CPANPLUS
+
+    Git::CPAN::Hook
+
+    cpan2dist
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

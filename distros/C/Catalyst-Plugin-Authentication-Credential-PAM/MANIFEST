@@ -1,0 +1,7 @@
+Changes
+lib/Catalyst/Plugin/Authentication/Credential/PAM.pm
+Makefile.PL
+MANIFEST
+t/authpam.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

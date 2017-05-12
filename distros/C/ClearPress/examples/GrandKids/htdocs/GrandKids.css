@@ -1,0 +1,21 @@
+
+html{background:#3B3B3B;padding:0 20px 0 20px}
+body{background:#C4C4C4;padding:20px 10px 0 10px;font-family:helvetica,arial,sans-serif;min-height:500px}
+h1,h2,h3,h4,h5{color:#78443E;font-family:garamond,times,serif;font-style:italic}
+a{color:#78443E;padding:2px}
+a:hover{background:#78443E;color:#C4C4C4}
+thead tr{background:#3B3B3B}
+thead th{color:#C4C4C4}
+tbody tr.tabrow1{background:#C49F66}
+tbody tr.tabrow2{background:#78613E}
+table caption{font-size:smaller;text-transform:capitalize}
+table tr{padding:0;margin:0}
+table td,table th{margin:0;padding:2px}
+table th{text-align:left;text-transform:capitalize}
+form li label{display:block;float:left;width:120px}
+form li input{float:left}
+form li{clear:both}
+form ul{list-style-type:none}
+ul#actions{list-style-type:none;padding:0}
+ul#actions li{margin:0;display:inline}
+ 

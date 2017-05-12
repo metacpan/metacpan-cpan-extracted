@@ -1,0 +1,7 @@
+\.swp$
+^blib
+\.bak$
+^Class-Accessor-Ref-
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$

@@ -1,0 +1,19 @@
+Revision history for Clone-Util
+
+0.03    2016-03-10 (PERLANCAR)
+
+	- Provide clone() (from Function::Fallback::CoreOrPP) for import,
+	  for convenience.
+
+
+0.02    2016-03-10 (PERLANCAR)
+
+	- Add sclone().
+
+	- [ux] modclone(): Allow and re-pass extra arguments so we can omit
+	  parentheses in 'modclone {...} $data, modclone {...} $data'.
+
+
+0.01    2016-03-10 (PERLANCAR)
+
+        - First release.

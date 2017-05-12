@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Costume-Doublet.t
+lib/Costume/Doublet.pm
+META.yml                                 Module meta-data (added by MakeMaker)

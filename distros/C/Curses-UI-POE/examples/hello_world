@@ -1,0 +1,9 @@
+#!/usr/bin/perl -w
+use strict;
+
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Curses::UI::POE;
+
+my $cui = new Curses::UI::POE (-clear_on_exit => 1);
+$cui->dialog("Hello, world!");

@@ -1,0 +1,540 @@
+=head1 NAME
+
+Legacy - Describes Class::IntrospectionMethods legacy API
+
+=head1 SYNOPSIS
+
+ None
+
+=head1 DESCRIPTION
+
+This man page describes the legacy API of Class::IntrospectionMethods
+that's provided for backward compatibility with Class::MethodMaker
+v1.08.
+
+
+=head1 CLASS INTROSPECTION
+
+=head2 slot query: the catalog option
+
+The catalog feature keeps a catalog in the object of all the slots
+that are defined with MethodMaker. This feature enables the user to
+query a class created by MethodMaker to retrieved all available slots.
+
+The C<-catalog> option must be used with a catalog name
+(i.e. C<-catalog =E<gt> foo>. You can use several catalog names.
+
+When used, the C<-catalog> option will add 4 methods to the CMMed class:
+
+=over
+
+=item *
+
+A C<CMM_CATALOG_LIST> method to retrieve a list of all catalogs. Also
+available as a class method.
+
+=item *
+
+A C<CMM_CATALOG> method to retrieve a list of the slot of a catalog. Also
+available as a class method.
+
+=item *
+
+A C<CMM_SLOT_CATALOG> method that takes a slot name and returns the
+name of its catalog . Also available as a class method.
+
+=item *
+
+A C<CMM_SLOT_DETAIL> method to retrieve the details of a given
+slot. Also available as a class method.
+
+The details are returned in an array that contains:
+
+=over 8
+
+=item *
+
+The slot type: i.e. either C<slot_type =E<gt> scalar>, 
+C<slot_type =E<gt> array> or C<slot_type =E<gt> hash>.
+
+=item *
+
+If the index is tied (for C<array> or C<hash> slot type), the array
+will contain: C<tie_index =E<gt> $tie_class>. If some constructor
+arguments are used, the array will also contain C<tie_index_args
+=E<gt> \@args>.
+
+=item *
+
+If the target value (i.e. the scalar) is tied (for all slot types),
+the array will contain: C<tie_scalar =E<gt> $tie_class>. If some constructor
+arguments are used, the array will also contain 
+C<tie_scalar_args =E<gt> \@args>.
+
+=item *
+
+If the target value (i.e. the scalar) is a plain object (for all slot
+types), the array will contain: C<class =E<gt> $class>. If some
+constructor arguments are used, the array will also contain 
+C<class_args =E<gt> \@args>.
+
+=back
+
+=back
+
+When the C<-catalog =E<gt> cat_name> option is used, the slot names
+defined after the option are stored in a catalog using the specified
+catalog name. For instance, the following code will store slot C<fooa>
+and C<foob> in the C<my_foo_cat> catalog, C<bar1> and C<bar2> in the
+C<my_bar_cat> catalog, and C<hidden_slot> will not be cataloged:
+
+ package MyClass ; 
+ use Class::MethodMaker 
+  -catalog => 'my_foo_cat', 
+  get_set => [qw/fooa foob/],
+  -catalog => undef,
+  get_set => 'hidden_slot',
+  -catalog => 'my_bar_cat',
+  get_set => [qw/bar1 bar2/] ;
+  object_tie_hash => 
+  [
+   {
+    slot => 'a',
+    tie_hash => ['myHash', dummy => 'booh'],
+    class => ['myObj', 'a' => 'foo']
+   },
+  ]
+
+To retrieve the list of catalogs defined for each object:
+
+ my @catalog = $obj->CMM_CATALOG_LIST ; # gives 'my_foo_cat','my_bar_cat'
+
+To retrieve the catalog of a C<MyClass> object C<$obj>:
+
+ my @foo_slots = $obj ->CMM_CATALOG('my_foo_cat');
+ my $foo_slots = $obj ->CMM_CATALOG('my_foo_cat'); # array ref
+
+ my @bar_slots = $obj ->CMM_CATALOG('my_bar_cat');
+ my $bar_slots = $obj ->CMM_CATALOG('my_bar_cat'); # array ref
+
+ my @all_slots = $obj->CMM_CATALOG('my_foo_cat','my_bar_cat') ;
+ my @all_slots = $obj->CMM_CATALOG() ; # as above
+
+These methods also work as Class methods:
+
+ &MyClass::CMM_CATALOG_LIST ; # gives 'my_foo_cat','my_bar_cat'
+ &MyClass::CMM_CATALOG('my_foo_cat'); # gives qw/fooa foob/
+
+ &MyClass::CMM_SLOT_DETAIL('a'); 
+
+returns
+
+  [ 
+    'scalar' ,
+    tie_index      => 'myHash', 
+    tie_index_args => [ dummy => 'booh' ],
+    class          => 'myObj',
+    class_args     => [ 'a' => 'foo']
+  ]
+
+By the way, the C<CMM_*> names are ugly, but they should not clash
+with user design ;-) .
+
+Note: does not work yet for all slots types.
+
+=head2 From slot to object: the parent option.
+
+If you use tied scalars (with the C<tied_scalar> or C<tie_tie_hash>
+method types), or object method type, your tied scalars or objects may
+need to call the parent CMMed object.
+
+For instance, if you want to implement error handling in your tied
+scalar or objects that will call the parent CMMed object or display
+error messages giving back to the user the slot name containing the
+faulty object.
+
+SO if you need to query the slot name, or index value (for
+C<tie_tie_hash> method types), or be able to call the parent object,
+you can use the C<-parent> option when creating the parent CMMed class:
+
+ package FOO ;
+ use Class::MethodMaker
+   '-parent' ,
+   object => [ 'Y' => [qw/g h j/ ]];
+
+Using this option will graft the following attributes (with their
+accessor method) in each object created using the slots that follow
+the C<-parent> option until the next C<-noparent> option.
+
+=over
+
+=item C<CMM_PARENT> 
+
+Reference of the parent object.
+
+=item C<CMM_SLOT_NAME>
+
+slot name to use to get the child object from the parent.
+
+=item C<CMM_INDEX_VALUE>
+
+index value (for C<tie_tie_hash> method type) to use to get the child
+object from the parent.
+
+=back
+
+When using the C<-parent> option, a C<CMM_PARENT>, C<CMM_SLOT_NAME>
+and C<CMM_INDEX_VALUE> methods are also grafted to the child's
+class.
+
+Here is an example to retrieve a parent object :
+
+ package FOO ;
+ use ExtUtils::testlib;
+  '-parent' ,
+  object_tie_hash =>
+  [
+   {
+    slot => 'bar',
+    tie_hash => ['MyHash'],
+    class => ['MyObj', 'a' => 'foo']
+   }
+  ],
+  new => 'new';
+
+In the C<MyObj> implementation you can do :
+
+ $daddy  = $self -> CMM_PARENT ; 
+ $d_slot = $self -> {CMM_SLOT_NAME} ; # 'bar'
+ $d_idx  = $self -> {CMM_INDEX_VALUE} ;
+
+The object hidden behind the tied hash can also use the parent
+functions. In the C<MyHash> implementation, you can do:
+
+ $parent = $self-> CMM_PARENT ; 
+ $slot =   $self -> {CMM_SLOT_NAME} ; # 'bar'
+
+But, obviously, you cannot query C<CMM_INDEX_VALUE> in the tied hash
+class. 
+
+=head1 LEGACY METHOD TYPES
+
+=head2 object
+
+This method is supported by L<Class::IntrospectionMethods> with a
+different API. Nevertheless, the old API still works. Here's the old
+API doc.
+
+C<object> creates methods for accessing a slot that contains an object
+of a given class as well as methods to automatically pass method calls
+onto the object stored in that slot.
+
+    object => [
+               'Foo' => 'phooey',
+               'Bar' => [ qw / bar1 bar2 bar3 / ],
+               'Baz' => {
+                         slot => 'foo',
+                         comp_mthds => [ qw / bar baz / ],
+                         constructor_args => [ set => 'it' ]
+                        },
+               'Fob' => [
+                         {
+                          slot => [qw/dog fox/],
+                          comp_mthds => 'bark',
+                         },
+                         {
+                          slot => 'cat',
+                          comp_mthds => 'miaow',
+                         },
+                        ];
+              ];
+
+
+The main argument should be a reference to an array. The array should
+contain pairs of class => sub-argument pairs.
+The sub-arguments parsed thus:
+
+=over 4
+
+=item   Hash Reference
+
+See C<Baz> above.  The hash should contain the following keys:
+
+=over 4
+
+=item   slot
+
+The name of the instance attribute (slot). This can be an array ref if you want to
+specify several slots the same way (but then you cannot use comp_mthds).
+
+=item constructor_args
+
+A array ref containing arguments that are passed to the C<new> constructor.
+
+=back
+
+=item   Array Reference
+
+As for C<String>, for each member of the array.  Also works if each
+member is a hash reference (see C<Fob> above).
+
+=item   String
+
+The name of the instance attribute (slot).
+
+=head2 tie_scalar
+
+Supported without much change. Generated methods C<tied_xx> and
+C<xx_tied> are deprecated in favor of C<tied_storage_xx>
+
+
+=head2 hash
+
+Supported and vastly extended. But older API will still work.
+
+# ----------------------------------------------------------------------------
+
+=head2  tie_hash
+
+Deprecated. Use C<hash> instead.
+
+Much like C<hash>, but uses a tied hash instead.
+
+Takes a list of pairs, where the first is the name of the component,
+the second is a hash reference.  The hash reference recognizes the
+following keys:
+
+=over 4
+
+=item   tie
+
+I<Required>.  The name of the class to tie to.
+I<Make sure you have C<use>d the required class>.
+
+=item   args
+
+I<Required>.  Additional arguments for the tie, as an array ref.
+
+=back
+
+The first argument can also be an arrayref, specifying multiple
+components to create.
+
+Example:
+
+   tie_hash     => [
+                    hits        => {
+                                    tie => qw/ Tie::RefHash /,
+                                    args => [],
+                                   },
+                   ],
+
+
+=head2 object_tie_hash
+
+Deprecated. Use C<hash> instead.
+
+Functions like C<tie_hash>, but maintains an array of referenced objects
+in each slot.
+
+ object_tie_hash =>
+  [
+    {
+      slot => xxx, # or [ ... , ... ]
+      tie_hash => [ 'HashName', args ,...] ,
+      class => ['ObjName', @constructor_args ]
+    },
+    ...
+  ]
+
+If you omit the 'tie_hash' parameter, a standard hash will be used to
+store the objects.
+
+When xxx is called with more than one argument, xxx is treated as the
+key.  If the second argument is a:
+
+=over
+
+=item *
+
+An object of the class 'ObjName' then the object is the new value of
+the key 'xxx'.
+
+=item *
+
+Anything else: A new object is created using the default constructor
+arguments.
+
+=back
+
+Example, if the default constructor arguments of 'ObjName' are @c_args :
+
+ xxx( 
+     # xxx{foo} = $obj->isa('ObjName') ? $obj : croak
+     foo => $obj,
+
+     # xxx{foo2} = ObjName->new(@c_args, arg => 'bar') 
+     foo2 => [ arg => 'bar'],
+
+     # xxx{foo3} = ObjName->new(@constructor_arg)
+     # xxx{foo4} = ObjName->new(@constructor_arg)
+     qw/foo3 foo4/
+    )
+
+C<object_tie_hash> provides a C<tied_foo> method that return the 
+tied object. This tied object is auto-vivified. I.e. C<tied_foo>
+always return an object.
+
+If the stored object features a C<cim_init> method (either directly or
+through inheritance), this method will be called right after creation and
+installation of parent methods.
+
+=head2 tie_tie_hash
+
+Deprecated. Use C<hash> instead.
+
+Functions like C<tie_hash>, but maintains an array of tied scalar
+in each slot.
+
+ tie_tie_hash =>
+  [
+    {
+      slot => xxx, # or [ ... , ... ]
+      tie_hash   => [ 'HashName', args ,...] ,
+      tie_scalar => ['ObjName', @constructor_args ]
+    },
+    ...
+  ]
+
+If you omit the 'tie_hash' parameter, a standard hash will be used to
+store the values.
+
+If you omit the 'tie_scalar' parameter, a standard scalar will be used.
+
+If the class used with the C<tie_hash> parameter must either:
+
+=over 4
+
+=item *
+
+Inherit Tie::StdHash
+
+=item *
+
+Store the actual hash in C<$self-E<gt>{data}> or C<$self-E<gt>{DATA}>
+(like the example given in the camel book).
+
+=item *
+
+Provide a C<get_data_ref> method. This method accepts a key parameter
+and returns a ref to the value pointed by key. Something like:
+
+ sub get_data_ref 
+   {
+     my ($self, $key) = @_ ;
+     return \$self->{my_internal_hash}{$key} ;
+   }
+
+=back
+
+The tie_tie_hash provides the folowing methods:
+
+=over
+
+=item tied_hash_x
+
+Returns the object hidden behind the tied hash.
+
+=item tied_scalar_x
+
+Returns the object hidden behind the tied scalar.
+
+
+=head2 list
+
+Deprecated. Use C<array> instead.
+
+Creates several methods for dealing with slots containing list
+data. Takes a string or a reference to an array of strings as its
+argument.
+
+=head2 tie_list
+
+Deprecated. Use C<array> instead.
+
+Much like list, but can use a tied list instead.
+
+Takes a list of pairs, where the first is the name of the component,
+the second is an array reference.  The array reference takes the usual
+tie parameters.
+
+For instance if Array_A and ArrayB are tied arrays, you can have:
+
+  tie_list =>
+  [
+   foo => [ 'Array_A',   foo => 'x', bar => 'B' ],
+   baz => [ 'ArrayB',    baz => 0]
+  ],
+
+
+=head2 object_list
+
+Deprecated. Use C<array> instead.
+
+Functions like C<list>, but maintains an array of referenced objects
+in each slot. Forwarded methods return a list of the results returned
+by C<map>ping the method over each object in the array.
+
+Arguments are like C<object>.
+
+When required, the C<xxx_index> methods will auto-vivify the object
+held in the slot. Hence it can never return undef.
+
+If the stored object features a C<cim_init> method (either directly or
+through inheritance), this method will be called right after creation and
+installation of parent methods.
+
+
+=head2 object_tie_list
+
+Deprecated. Use C<array> instead.
+
+Functions like C<tie_list>, but maintains an array of referenced objects
+in each slot.
+
+ object_tie_list =>
+  [
+    {
+      slot => xxx, # or [ ... , ... ]
+      tie_array => [ 'ArrayName', args ,...] ,
+      class => ['ObjName', constructor_args ]
+    },
+    ...
+  ]
+
+When xxx is called with one or several arguments,
+Each argument is:
+
+=over
+
+=item *
+
+Stored in the array if the argument is an object of the class 'ObjName'.
+
+=item *
+
+Used to create a new object of the class 'ObjName' if the argument is
+an array ref. The elements of the array ref are passed to the
+constructor *after* the default constructor arguments.
+
+=item *
+
+Discarded if any other case. A new object is created using the default
+constructor arguments and stored in the array.
+
+=back
+
+If the stored object features a C<cim_init> method (either directly or
+through inheritance), this method will be called right after creation and
+installation of parent methods.
+

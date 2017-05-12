@@ -1,0 +1,64 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::SEAL2;
+
+my $key = pack "H40", "00112233445566778899aabbccddeeff00112233";
+my $cipher = new Crypt::SEAL2 $key;
+
+my $ks = $cipher->keysize;
+print "keysize=$ks bytes\n";
+
+my $plaintext1 = pack "H16", "0123456789abcdef";
+print "old plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1     : ", unpack("H*", $ciphertext1), "\n";
+
+$cipher->reset();
+my $decrypted1 = $cipher->decrypt($ciphertext1);
+print "new plaintext1  : ", unpack("H*", $decrypted1), "\n";
+
+print "\n";
+
+my $plaintext2 = pack "H40", "fedcba98765432100123456789abcdef01234567";
+print "old plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+$cipher->reset();
+my $ciphertext2 = $cipher->encrypt($plaintext2);
+print "ciphertext2     : ", unpack("H*", $ciphertext2), "\n";
+
+$cipher->reset();
+my $decrypted2 = $cipher->decrypt($ciphertext2);
+print "new plaintext2  : ", unpack("H*", $decrypted2), "\n";
+$cipher->reset();
+print "\n";
+
+print "old plaintext1  : ", unpack("H*", $plaintext1), "\n";
+print "old plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+print "\nEncrypting plaintext1 followed by plaintext2, without reset()\n";
+$ciphertext1 = $cipher->encrypt($plaintext1);
+$ciphertext2 = $cipher->encrypt($plaintext2);
+print "ciphertext1 : ", unpack("H*", $ciphertext1), "\n";
+print "ciphertext2 : ", unpack("H*", $ciphertext2), "\n";
+
+print "\nNow, concatenate the two strings and encrypt the result\n";
+$cipher->reset();
+my $plaintext3 = $plaintext1 . $plaintext2;
+print "old plaintext3  : ", unpack("H*", $plaintext3), "\n";
+my $ciphertext3 = $cipher->encrypt($plaintext3);
+print "ciphertext3     : ", unpack("H*", $ciphertext3), "\n";
+
+print "\nNow, advance the pointer, and encrypt the second string\n";
+$cipher->reset();
+print "old plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+# get the length of $plaintext1, and skip forward by that amount
+$cipher->repos(length($plaintext1));
+
+my $ciphertext4 = $cipher->encrypt($plaintext2);
+print "ciphertext4     : ", unpack("H*", $ciphertext4), "\n";
+

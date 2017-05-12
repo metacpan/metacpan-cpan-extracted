@@ -1,0 +1,41 @@
+ CGI-MiniFramework
+===================
+
+DESCRIPTION
+
+"CGI::MiniFramework" is CGI framework of a minimum composition.
+"CGI::MiniFramework" doesn't depend on other modules excluding strict and warning.
+The easy one is easily done. 
+Please do it difficult by another framework.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or 
+
+You copies it onto an arbitrary place if you want to use this. 
+
+
+DEPENDENCIES
+
+This module only requires these other modules and libraries:
+
+  - strict
+  - warnings
+
+However,If you don't want to use even it, you can exclude it. 
+Though I don't think that it is good.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.
+

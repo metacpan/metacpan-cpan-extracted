@@ -1,0 +1,58 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.17',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.072',
+                                      'English' => '0',
+                                      'File::Spec' => '0',
+                                      'File::Temp' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::License::Apache_2_0' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1',
+                                      'blib' => '1.01'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'CPAN' => '1.92',
+                                      'CPAN::HandleConfig' => '0',
+                                      'CPAN::Mini' => '0.567',
+                                      'CPAN::Tarzip' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Path' => '0',
+                                      'File::Spec' => '3.27',
+                                      'File::Temp' => '0.20',
+                                      'YAML::Syck' => '1.07',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '3.27',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/testFilter.t
+t/testImport.t
+t/testTheRest.t
+t/testPrint.t
+lib/CAE/Nastran/Nasmod.pm
+lib/CAE/Nastran/Nasmod/Entity.pm
+spl/model.nas
+LICENSE

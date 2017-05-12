@@ -1,0 +1,42 @@
+This is Crypt::IDEA version 1.06, an XS-based implementation of the
+patent-encumbered IDEA cryptography algorithm.  It's designed
+to take full advantage of Crypt::CBC when desired.  This module builds
+on many plaforms, with a little assistance (although this should be
+more rare now).
+
+Prerequisites
+-------------
+
+For the full test suite to run, Crypt::CBC, version 1.22 or higher
+is required (recommended is 1.25 or higher), however this module 
+is not mandatory for standalone IDEA use.  
+
+Installing Crypt::IDEA
+--------------------------
+
+nothing unusual:
+
+	1. perl Makefile.PL
+	2. make
+	3. make test
+	4. sudo make install
+
+Notes
+-----
+
+This module has been tested successfully against the following:
+Linux 2.0.X (x86)
+Linux 2.2.X (x86)
+Linux 2.4.X (x86)
+Mac OS X 10.4.X (G4)
+Solaris 8 (x86 and SPARC)
+HP-UX 11
+Win32 (mingw 3.4.5, WinXP)
+
+Perl 5.004_01, 5.004_04, 5.005_03, 5.6.0, 5.6.1, 5.8.*
+
+Please send other successful OS/platform combinations to:
+amused@pobox.com . Thanks.
+
+Dave Paris - W3Works, LLC
+<amused@pobox.com>

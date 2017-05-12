@@ -1,0 +1,17 @@
+---
+name: Catalyst-Plugin-Upload-Basename
+version: 0.01
+author:
+  - 'Christian Hansen, C<ch@ngmedia.com>'
+abstract: Basename for uploads
+license: perl
+requires:
+  Catalyst: 5.2
+provides:
+  Catalyst::Plugin::Upload::Basename:
+    file: lib/Catalyst/Plugin/Upload/Basename.pm
+    version: 0.01
+  Catalyst::Request::Upload:
+    file: lib/Catalyst/Plugin/Upload/Basename.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

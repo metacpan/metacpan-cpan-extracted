@@ -1,0 +1,12 @@
+COPYING
+Changes
+MANIFEST
+Makefile.PL
+OOorNO.pm
+OOorNO.pod
+README
+t/1_canuseit.t
+t/2_isa.t
+t/3_can.t
+t/4_export_ok.t
+t/5_empty_subclass.t

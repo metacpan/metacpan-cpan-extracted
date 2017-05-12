@@ -1,0 +1,210 @@
+NAME
+    CGI::Application::Plugin::Mason - HTML::Mason plugin for
+    CGI::Application
+
+VERSION
+    1.01
+
+SYNOPSIS
+      package YourApp;
+
+      use strict;
+      use base qw(CGI::Application);
+      use CGI::Application::Plugin::Stash; # require!
+      use CGI::Application::Plugin::Mason;
+
+      # cgiapp_init
+      sub cgiapp_init {
+        my $self = shift;
+        $self->interp_config( comp_root => "/path/to/root", data_dir => "/tmp/mason" );
+      }
+
+      # runmode
+      sub start {
+        my $self = shift;
+
+        # Catalyst like
+        $self->stash->{name} = "kurt";
+        $self->stash->{age}  = 27;
+        # template path
+        $self->stash->{template} = "/start.mason";
+        return $self->interp_exec;
+      }
+
+      # start.mason
+      <%args>
+      $name
+      $age
+      </%args>
+      <html>
+      <head>
+      <% # $c is YourApp object %>
+      <title><% $c->get_current_runmode %></title>
+      </head>
+
+      <body>
+      name : <% $name | h %><br>
+      age : <% $age | h %>
+      </body>
+      </html>
+
+DESCRIPTION
+    CGI::Application::Plugin::Mason is Plug-in that offers HTML::Mason
+    template engine.
+
+METHOD
+  interp_config
+    Initialize HTML::Mason::Interp method.
+
+    Option:
+
+      comp_root          : HTML::Mason root dir(default: Cwd::getcwd value)
+      data_dir           : HTML::Mason cache and object file directory(default: /tmp/mason)
+      template_extension : template extension(default: .mason)
+
+    Example:
+
+      sub cgiapp_init {
+        my $self = shift;
+        $self->interp_config( comp_root => "/path/to/comp_root", data_dir => "/tmp/mason" );
+
+        # When pass other HTML::Mason option
+        $self->interp_config(
+                            comp_root            => "/path/to/comp_root",
+                            default_escape_flags => [ "h" ],
+                            autohandler_name     => "autohandler",
+                            );
+      }
+
+  interp
+    HTML::Mason::Interp object wrapper
+
+    Example:
+
+      # HTML::Mason::Interp#set_escape
+      $self->interp->set_escape( uc => sub { ${$_[0]} =~ tr/a-z/A-Z/ } );
+      # HTML::Mason::Interp#comp_root
+      my $comp_root = $self->interp->comp_root;
+
+  interp_exec
+    Return HTML::Mason::Interp#exec result.
+
+    The specification of the template file
+
+    Example:
+
+      # file name
+      $self->stash->{template} = "/template.mason"
+      # file handle
+      open my $fh, "/path/to/template.mason" or croak("can not open file");
+      $self->stash->{template} = $fh;
+      # scalarref
+      $self->stash->{template} = \q{<%args>$name</%args> my name is <% $name %>};
+
+    default template name is /package_name/runmode_method_name .
+    ${template_extension}
+
+    Example:
+
+      # ex1
+      package MyApp;
+      sub start {
+        my $self = shift;
+        do something...
+ 
+        # The file passing used at this time is /MyApp/start.mason
+        return $self->interp_exec;
+      }
+
+      # ex2
+      package My::App;
+      sub start {
+        my $self = shift;
+        do something...
+ 
+        # The file passing used at this time is /My/App/start.mason
+        return $self->interp_exec;
+      }
+
+    Specification of variable allocated in template
+
+    Example:
+
+      # ex1
+      sub start {
+        my $self = shift;
+        # stash method setting
+        $self->stash->{name} = "kurt";
+        $self->stash->{age}  = 27;
+        return $self->interp_exec;
+      }
+
+      # ex2
+      sub start {
+        my $self = shift;
+        # interp_exec param setting
+        return $self->interp_exec( name => "kurt", age => 27 );
+      }
+
+  interp_pre_exec
+    Trigger method before interp_exec. the argument is $temlate, and $arg.
+
+      $template : $self->{template} value
+      $args     : $self->{stash} or $self->interp_exec args hashref
+
+    Example:
+
+      sub interp_pre_exec {
+        my($self, $template, $args) = @_;
+        $args->{newval} = "interp_pre_exec setting value!";
+      }
+
+      # or
+
+      $self->add_callback("interp_pre_exec", sub {
+        my($self, $template, $args) = @_;
+        $args->{newval} = "interp_pre_exec setting value!";
+      });  
+
+  interp_post_exec
+    Trigger method after interp_exec. the argument is $bodyref.
+
+      $bodyref : content value scalarref
+
+    Example:
+
+      sub interp_post_exec {
+        my($self, $bodyref) = @_;
+        ${$bodyref} = encode("shiftjis", decode("utf8", ${$bodyref}));
+      }
+
+      # or
+
+      $self->add_callback("interp_post_exec", sub {
+        my($self, $bodyref) = @_;
+        ${$bodyref} = encode("shiftjis", decode("utf8", ${$bodyref}));
+      });  
+
+ESCAPE METHOD
+  h
+    html escape
+
+  hs
+    html escape and replace white space and linefeed
+
+PRIVATE METHOD
+  _get_interp_template_path
+    Get default template path.
+
+SEE ALSO
+    CGI::Application CGI::Application::Plugin::Stash HTML::Mason
+
+AUTHOR
+    Akira Horimoto
+
+COPYRIGHT AND LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+
+    Copyright (C) 2007 Akira Horimoto
+

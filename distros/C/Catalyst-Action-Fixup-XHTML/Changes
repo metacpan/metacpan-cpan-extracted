@@ -1,0 +1,18 @@
+Revision history for Catalyst-Action-Fixup-XHTML
+
+0.05    2009.02.09
+        use Catalyst::View::ContentNegotiation::XHTML
+
+0.04    2009.02.09
+        re-package
+
+0.03    2009.02.09
+        replace NEXT by MRO::Compat
+        use headers->clone to avoid change the original value
+
+0.02	2008.12.17
+		fix warnings
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

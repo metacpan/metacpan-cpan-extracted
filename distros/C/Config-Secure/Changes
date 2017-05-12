@@ -1,0 +1,6 @@
+Revision history for Perl extension Config::Secure.
+
+0.0.1  Wed Sep  5 16:39:36 2001
+	- original version; created by h2xs 1.21 with options
+		-b 5.5.3 -X Config::Secure
+

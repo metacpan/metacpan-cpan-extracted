@@ -1,0 +1,114 @@
+Revision history for Perl extension Chess::PGN::Parse.
+
+0.20 23-Jan-2015
+    - Applied patch by Steinar H. Gunderson to fix a malformed PGN issue
+
+0.19 10-Jan-2006
+    - fixed bug in recursive comment printout.
+      Thanks to Dadi Jonsson for reporting it;
+    - Added support for comments with newlines in between. 
+      Thanks to Marcin Kasperski for the test case. 
+    - Added support for promotions without the equal sign
+      (e.g.: e8Q instead of e8=Q)
+      Thanks to Andrew Nikitin for reporting it.
+    - Tidied the code a bit.
+
+0.18 25-May-2004
+    - Broken compatibility release. 
+      Perl 5.8.4 won't compile a recursive regex without
+      some minor modifications. Fixed.
+      If you are still using a previous version of Perl, there
+      is no need to switch.
+
+0.17 15-Jul-2003
+    - Added some more control to parse irregularly formatted tags
+    - Added set_{tag} methods, to set game, moves, white, black,
+      site, event, eco, elos, result. 
+      Such functionality is kept distinct from teh relative
+      {tag} methods, to keep good performance and to avoid problems
+      with existing programs.
+      Thanks to Johannes Fuernkranz for feedback and advice
+0.16 09-Jul-2003
+    - Fixed yet another minor POD formatting problem
+0.15 09-Jul-2003
+    - Fixed minor POD formatting problem
+0.14 08-Jul-2003
+    - Added method add_comments(), to add comments to an
+      already parsed game;
+    - Modified bahavior of standard_PGN() so that it can use
+      derived class methods for comments.
+0.13 07-Jul-2003
+    - Minor bug in parse_game(). {save_comments => 'no'} did
+      not work as expected. Fixed.
+0.12 06-Jul-2003
+    - Fixed bug in standard_PGN() when printing comments.
+0.11 05-Jul-2003
+    - Added feature in standard_PGN(). Now it can also
+      print comments
+0.10 23-Dec-2002
+    - Changed behavior in parse_game. Now the array in moves() is 
+    always initialized and the method returns a valid array also when
+    no moves are found (although it coud empty).
+0.09 22-Dec-2002
+    - Changed parse engine, to make it 5% faster. Thanks to [Tye]
+0.08 22-Dec-2002
+    - Fixed a Regex mistake, which didn't have effect on accuracy, 
+      but was affecting performamce negatively. Thanks to
+      Nathan Neff for the tip.
+0.07 28-Mar-2002
+	- a new read_game() method to support irregular input 
+      1. no blank line between tags and moves;
+      2. no blank line between games
+      3. blank line(s) before a game (start of file)
+      4. multiple tags in the same line
+      5. tags spanning over more lines 
+      6. No tags (only moves). 
+         (can't cumulate with rule 2)
+      7. semicolon comments outside the moves. 
+    - The above changes make it possible to deal with
+      Recursive Annotated Variations .
+    - old read_game() renamed into read_standard_game()
+	- modified parse_game() to support non numbered input games
+	- modified standard_PGN() to output a blank line between
+	  tags and game.
+	- Changed dependency. IO::File instead of FileHandle.
+    - added stronger structures to store comments.
+	  Calling parse_game(), you can specify if the comments
+	  are stored as a 'string' (default), an 'array' of strings,
+	  or a 'hol', hash of lists, to identify which type of
+	  comment it is (RAV, NAG, brace, semicolon, escaped).
+    - fixed bug in _init(). $self->{GameErrors} was not 
+      initialized after each parse.
+    - fixed bug in parse_game(). FirstMove was not set correctly for
+      games starting with numbers bigger than 1;
+    - Added handler for the above move numbers in standard_PGN();
+	- extended documentation to reflect the changes and
+	  explain the module functionality.
+      
+0.06 16-Feb-2002
+	- improved "new" method. Input can be either a string 
+      or a file.
+	- output to standard PGN format. Can also be customized for
+	  special output such as HTML. Selection of tags for output
+	  is supported.
+
+0.05 5-Feb-2002
+	- installation procedure, ready for distribution
+
+0.04 4-Feb-2002
+	- maintenance version. Small bug fixed in parse_game()
+
+0.03 26-Jan-2002
+	- remove dependency on Regexp::Common
+	  (recursive RegEx extracted and integrated)
+	  Twice as fast as the previous version!
+	- bug fix in shrink_epd and expand_epd
+
+0.02 24-Jan-2002
+	- Parser re-written with Regular Expressions
+	- use Regexp::Common to parse nested parentheses
+
+0.01  21-Jan-2002
+	- original version; 
+	- Working parser. Complete but quite slow 
+

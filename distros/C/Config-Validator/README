@@ -1,0 +1,40 @@
+Config-Validator
+
+This module allows to perform schema based configuration validation.
+
+The idea is to define in a schema what valid data is. This schema can
+be used to create a validator object that can in turn be used to make
+sure that some data indeed conforms to the schema.
+
+Although the primary focus is on "configuration" (for instance as
+provided by modules like Config::General) and, to a lesser extent,
+"options" (for instance as provided by modules like Getopt::Long),
+this module can in fact validate any data structure.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Config::Validator
+
+You can also find some examples in the eg directory.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2012-2015
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

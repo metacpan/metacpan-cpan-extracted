@@ -1,0 +1,61 @@
+Dear CPAN Author,
+
+It has been noted that one or more uploads recently were incorrectly formatted, such that the tools to provide automated CPAN Testing, and the reporting mechanisms for the CPAN Testers and CPAN Statistics sites are unable to record your uploads.
+
+The upload messages in question are:
+
+[% subjects %]
+
+The number at the beginning of the line is the NNTP ID of the message as recorded by the CPAN testers NNTP server, and can be seen by searching list archives replace the <NNTP ID> in the following URL with the appropriate number:
+
+http://www.nntp.perl.org/group/perl.cpan.testers/<NNTP ID>
+
+In order to be correctly recorded, please note your upload needs to be of the format:
+
+<distribution name>-<distribution version>.<archive extension>
+
+For example something like
+
+Acme-Example-0.01.tar.gz
+
+With the accepted archive extensions being:
+
+* .tar.gz
+* .tar.bz2
+* .tgz
+* .zip
+
+While there is nothing stopping you creating your own format to upload distributions, please note that only distributions uploaded in the above formats will be recorded and tested within the CPAN testers system. 
+
+The best way to generate a correctly formatted tarball, ready for upload, is to use one of the methods described below:
+
+
+1) Using your Makefile.PL
+
+$> perl Makefile.PL
+$> make dist
+
+If you are on a Win32 platform, 'nmake dist' is compatible.
+
+
+2) Using your Build.PL
+
+$> perl Build.PL
+$> ./Build dist
+
+For further options see Module::Build documentation.
+
+
+If you have since corrected this upload with a correctly formatted one, please ignore this mail. This mail is automatically generated based on recent upload messages, and only notes the uploads which have not been parsed correctly for the CPAN Statistics site.
+
+If you have any questions about the CPAN testers mechanisms, please don't hesitate to ask. For more information about CPAN Testers, please see the CPAN Testers Wiki - http://wiki.cpantesters.org - or join the CPAN Testers Discuss mailing list by sending a blank email to cpan-testers-discuss-subscribe@perl.org.
+
+Thanks for contributing to CPAN and Perl.
+
+Regards,
+Barbie.
+--
+CPAN Testers Reports    - http://www.cpantesters.org
+CPAN Testers Statistics - http://stats.cpantesters.org
+CPAN Testers Wiki       - http://wiki.cpantesters.org
+CPAN Testers Discuss    - cpan-testers-discuss@perl.org

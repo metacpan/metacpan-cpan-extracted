@@ -1,0 +1,87 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 95a797cc83966e4549083166706faede0033c02e ChangeLog
+SHA1 2bf572da781c106f615754e11dd1523480f4a25b LICENSE
+SHA1 84af6f43ee677a8517171da76c222c5663b2cfac MANIFEST
+SHA1 1383bc711147d4e8b27cf33e0a71598867763d21 META.json
+SHA1 be1839de63caa8458fa97aaf0ec7ef8ff55cd457 META.yml
+SHA1 110ea3a472d2edd79860232cdbe23e2e2b9d7dbd Makefile.PL
+SHA1 34baa595be366d4d07d3719e0ffedec7598dd5cb OldChanges
+SHA1 8505ff40c7ae961f694d42fd0e5b3a71b3b43d3c README.md
+SHA1 96177abd8d9a3cba4927b4c1dd9e3bb8b5ec8d10 dist.ini
+SHA1 905b1f3ec388b43432882585f70627d81a2d64eb examples/ldap
+SHA1 731cdbffc8b4275c20f194422584b6278a728fa0 examples/ldap-search
+SHA1 e9c1b61ecaf01da809b2311e48e779d7855f2703 examples/x509decode
+SHA1 d6b43486eeb24bbf3e95d9fdd7f68cc4467e39de lib/Convert/ASN1.pm
+SHA1 749e448b66badf820f0330a6e4b4a98457411fa5 lib/Convert/ASN1.pod
+SHA1 1a485981089f46207e4cd2376cc770e3980abb2e lib/Convert/ASN1/Debug.pm
+SHA1 dd559f8259616a66998df6c31d5d05d3b8efd136 lib/Convert/ASN1/IO.pm
+SHA1 702f64aee094f179bed1cc90e16d4b5e22284c11 lib/Convert/ASN1/_decode.pm
+SHA1 440b181e7343d7f0f37bdac68ecef3a3980c97a4 lib/Convert/ASN1/_encode.pm
+SHA1 a90d553c0508b7c662d21d29234925528909aff8 lib/Convert/ASN1/parser.pm
+SHA1 025eb26d2828ae9153d5b5e50eb2cafed8d91ec0 mkparse
+SHA1 49ea4886da04ec358bf75114917784ffe01ef9ca parser.y
+SHA1 47ea660ec5b7d891511376631ca8bc703152de52 t/00prim.t
+SHA1 be18a157f0146d6565ee8d408953fc4fb6b5a277 t/01tag.t
+SHA1 99d1ebf5730490b798bd72101a891098f274c106 t/02seq.t
+SHA1 1f2efdd0eb2c3105fa9004f29a6b48b58a3bb6a2 t/03seqof.t
+SHA1 052881761fe4f75b21be7d4f053e0b5ca7c3bf49 t/04opt.t
+SHA1 6ea952799c1f8e5fca2c56a87b8c75d4c1c3c2af t/05time.t
+SHA1 3eb1f4fddf2a2ed424e5efc833e258241b1340ca t/06bigint.t
+SHA1 eb66af2adefb38a4f3ba05374007a9fa6179c368 t/07input.dat
+SHA1 6ec4a7f978fab3e0e9afeb4a5ad23f8071994491 t/07io.t
+SHA1 7dd7bb7e54ae35e3cc1ae324c5a796aac37a98e1 t/08set.t
+SHA1 37137256d188382385b4751daa104fd9dcbe309b t/09contr.t
+SHA1 5db8faa253b5b05c8483bbe83417aef68d63b390 t/10choice.t
+SHA1 e19b783d36c747212c20cba92645c90439248c6e t/11explicit.t
+SHA1 6eec4adad72499b9e42bbe4e0e2b41b81771c2bb t/11indef.t
+SHA1 3d6b0ebe0f12297666e095388152adb695a389c5 t/12der.t
+SHA1 a6668ec882a88fcf18f16c0e45db93c358dbb764 t/13utf8.t
+SHA1 c07c93dcd8a0c0ecd346a9623735235e9aee09db t/14any.t
+SHA1 4ad9e59d332f55d19c1aa6b6dc851f93d08fba03 t/15extseq.t
+SHA1 204dcecb1793fc8347a58d54af27fd5fa87c3fd7 t/16extset.t
+SHA1 40041d7c6b861590d977f183801a5ee929a46801 t/17extchoice.t
+SHA1 a07dfd87a3d672f546500b302526710245ee611a t/18tagdefault.t
+SHA1 fe78bbe85d225fd7030703537c9ae65157e69d81 t/99misc.t
+SHA1 4478dba7f3c409d8cd4673022470301d7197eb74 t/aj.cer
+SHA1 b4dfb113e0d45ae9c5dce0311ec3c604d9913ba5 t/aj2.cer
+SHA1 a82a05d7a22a348abe1e01116ecaf118d22a67ff t/allianz_root.cer
+SHA1 59d0504e0044defc1b8fec9ee6ae6085db38f60e t/dsacert.der
+SHA1 86a8f5b8402ce9813e1467d61cd40bb0959866d1 t/funcs.pl
+SHA1 02fff6b3fc815c57e6832dfc3861851333b0c30b t/new_root_ca.cer
+SHA1 7ec9e04b1a926299ca3d4aa1a3e206f992043438 t/pgpextension.der
+SHA1 eef94a05ef12c316e052233a1d903d3850245de3 t/subca_2.cer
+SHA1 48994ae679ae98975889b7e60d004b6532ddd537 t/telesec_799972029.crt
+SHA1 273ee12457fdc4f90c55e82b56167f62f532e547 t/verisign.der
+SHA1 e908b8c53c098d96bb4499a56e1d5320173ccae9 t/x509.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTqxlCAAoJEF0awSLzqjNNWkAQAJhWThEq4+yfpDYAp7W6Fuil
+FD7NRfC5GuiDzfh2AU1tyPrvVEWIQOVkKxlyTvsfyV4iwfhDIpFp378KhmaSFNoV
++xfjI7lPj5/N1QzHvHRzApU0myZpPFK0sftfkuDB/K8XM18c2Z69PKAFaNSdceVg
+xAHJXxCZmlcp4fNPoMyrStqBJmJzPICIJmeWrh32gqgs29HOzOvzINELs54C0Jw3
+ZqxoeskBMcmICF+RsfQjCZ3bxpn+C873wPeXE7Yx3frBCL61JjphCCBRgEC8FfGf
+rkZK+tmkQoiKiDNu5tK1JJ32m9odh1eazxuZpmfC2Nh5nHDzZnXog4PqFcqwlRZm
+3gP3rMlmaWDurNBXOMH/uWygvSYh5XevygQPf1JrleVo1G1qXb28u1Bfgkh2PSQX
+gnGp642Zkrd40r2Fo4+ckmnf4NBa/Ayu/qfUPdYTv28x26HoXmTJhQZcuVAXAUYi
+w7ISFsK1sVXkERRfD4JoIXn4kkXKXVTesGsNzFSmmY1Dyve0CQBNuCv2qNF6+hv9
+X8fW1czVuDLElJw0y0uqXquR+NH7mWg55gwXAevhxbrHZRqmhgEUfs4JX0WVhyOM
+zv06eq4hy43H61l+RCdtu7MSDucL5DeAbp2OgrStNqAG3NGFWf4PX/NirxX+3k7D
+1EcaVqHSXp5uvWdtJdUt
+=Tocd
+-----END PGP SIGNATURE-----

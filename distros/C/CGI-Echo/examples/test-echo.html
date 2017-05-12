@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<title>Test Echo</title>
+		<link rel="stylesheet" type="text/css" href="/css/default.css" />
+	</head>
+
+	<body bgColor = '#80C0FF'>
+
+	<h1 align = 'center'>Test Echo</h1>
+
+	<h3 align = 'center'>Test your form's design via the echo.cgi program</h3>
+
+	<form action = 'http://127.0.0.1/cgi-bin/echo.cgi' method = 'post' name = 'echo_form'>
+		<table align = 'center' border = '1'>
+			<tr>
+				<th>Radio reception</th>
+				<td>
+<input type = 'radio' id = 'reception' name = 'reception' value = 'Good' checked = 'checked' />Good<br />
+<input type = 'radio' id = 'reception' name = 'reception' value = 'Bad' />Bad<br />
+<input type = 'radio' id = 'reception' name = 'reception' value = 'Terrible' />Terrible<br />
+<input type = 'radio' id = 'reception' name = 'reception' value = 'Country Music' />Country Music<br />
+				</td>
+			</tr>
+			<tr>
+				<th>Books</th>
+				<td>
+<input type = 'checkbox' id = 'title' name = 'title' value = 'HTML and XHTML' checked = 'checked' />HTML and XHTML<br />
+<input type = 'checkbox' id = 'title' name = 'title' value = 'JavaScript' />JavaScript<br />
+				</td>
+			</tr>
+			<tr>
+				<th>Input text</th>
+				<td>
+<input type = 'text' id = 'text_field' name = 'text_field' size = '20' maxlength = '100' value = 'Replace this default' />
+				</td>
+			</tr>
+			<tr>
+				<th>Menu</th>
+				<td>
+<select id = 'menu_field' name = 'menu_field'>
+	<option value = 'First choice' selected = 'selected' />First choice
+	<option value = 'Second choice' />Second choice
+</select>
+				</td>
+			</tr>
+			<tr>
+				<td align = 'center'>
+<input type = 'reset' class = 'submit' value = 'Click to reset form field defaults' />
+				</td>
+				<td align = 'center'>
+<input type = 'submit' class = 'submit' value = 'Click to echo form data' />
+				</td>
+			</tr>
+			<tr>
+				<td align = 'center' colspan = '2'>
+Note: You can use your own form instead of this one, if you wish to experiment
+with other types of input fields.<br />
+Just remember to use the very same form action I have used in this form.<br />
+				</td>
+			</tr>
+			<tr>
+				<td align = 'center' colspan = '2'>
+echo.cgi is written in Perl. In order to use echo.cgi on your own PC, you will
+have to install a web server and the Perl programming language.<br />
+Instructions for installing the Apache web server and Perl, both for MS Windows,
+are available <a href = 'http://savage.net.au/Perl/html/configure-apache.html'>here</a>.
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	</body>
+</html>

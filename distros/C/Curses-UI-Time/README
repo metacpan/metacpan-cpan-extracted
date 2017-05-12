@@ -1,0 +1,246 @@
+NAME
+    Curses::UI::Time - Create and manipulate time widgets.
+
+CLASS HIERARCHY
+     Curses::UI::Widget
+     Curses::UI::ContainerWidget
+        |
+        +----Curses::UI::ContainerWidget
+           --Curses::UI::Label
+           --Curses::UI::Number
+                |
+                +----Curses::UI::Time
+
+SYNOPSIS
+     use Curses::UI;
+     my $win = $cui->add('window_id', 'Window');
+     my $time = $win->add(
+             'mynum', 'Curses::UI::Time',
+             -time => 1400609240,
+     );
+     $time->draw;
+
+DESCRIPTION
+    Curses::UI::Time is a widget that shows a time in graphic form.
+
+STANDARD OPTIONS
+    "-parent", "-x", "-y", "-width", "-height", "-pad", "-padleft",
+    "-padright", "-padtop", "-padbottom", "-ipad", "-ipadleft",
+    "-ipadright", "-ipadtop", "-ipadbottom", "-title", "-titlefullwidth",
+    "-titlereverse", "-onfocus", "-onblur".
+
+    For an explanation of these standard options, see Curses::UI::Widget.
+
+WIDGET-SPECIFIC OPTIONS
+    *       "-colon" < NUMBER >
+
+             View colon flag.
+             Default value is '1'.
+
+    *       "-date" < DATE_FLAG >
+
+             View date flag.
+             Default value is 0.
+
+    *       "-fg" < CHARACTER >
+
+             Foreground color.
+             Possible values are defined in Curses::UI::Color.
+             Default value is '-1'.
+
+    *       "-time" < TIME >
+
+             Time.
+             Default value is actual time.
+
+    *       "-second" < SECOND_FLAG >
+
+             View second flag.
+             Default value is 0.
+
+STANDARD METHODS
+    "layout", "draw", "intellidraw", "focus", "onFocus", "onBlur".
+
+    For an explanation of these standard methods, see Curses::UI::Widget.
+
+WIDGET-SPECIFIC METHODS
+    *       "new(%parameters)"
+
+             Constructor.
+             Create widget with volume in graphic form, defined by -volume number.
+             Returns object.
+
+    *       "colon()"
+
+             Get or set colon flag.
+             Returns colon flag.
+
+    *       "time()"
+
+             Get or set time (and date with -date => 1).
+             Returns time in seconds.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new;
+ 
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+ 
+     # Add volume.
+     $win->add(
+             undef, 'Curses::UI::Time',
+             '-time' => 1400609240,
+     );
+ 
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+ 
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # ██████ ██████      ██████ ██████
+     #     ██ ██  ██  ██  ██  ██     ██
+     # ██████ ██  ██      ██  ██     ██
+     # ██     ██  ██  ██  ██  ██     ██
+     # ██████ ██████      ██████     ██
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new(
+             -color_support => 1,
+     );
+ 
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+
+     # Add time.
+     my $time = $win->add(
+             undef, 'Curses::UI::Time',
+             '-border' => 1,
+             '-second' => 1,
+             '-time' => time,
+     );
+ 
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+
+     # Timer.
+     $cui->set_timer(
+             'timer',
+             sub {
+                     $time->time(time);
+                     $cui->draw(1);
+                     return;
+             },
+             1,
+     );
+ 
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # ┌────────────────────────────────────────────────────┐
+     # │    ██     ██      ██████ ██████          ██ ██████ │
+     # │    ██     ██  ██  ██  ██ ██  ██  ██      ██ ██  ██ │
+     # │    ██     ██      ██  ██ ██  ██          ██ ██████ │
+     # │    ██     ██  ██  ██  ██ ██  ██  ██      ██     ██ │
+     # │    ██     ██      ██████ ██████          ██ ██████ │
+     # └────────────────────────────────────────────────────┘
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Curses::UI;
+
+     # Object.
+     my $cui = Curses::UI->new(
+             -color_support => 1,
+     );
+ 
+     # Main window.
+     my $win = $cui->add('window_id', 'Window');
+
+     # Add time.
+     my $time = $win->add(
+             undef, 'Curses::UI::Time',
+             '-border' => 1,
+             '-date' => 1,
+             '-second' => 1,
+             '-time' => time,
+     );
+ 
+     # Binding for quit.
+     $win->set_binding(\&exit, "\cQ", "\cC");
+
+     # Timer.
+     $cui->set_timer(
+             'timer',
+             sub {
+                     $time->time(time);
+                     $cui->draw(1);
+                     return;
+             },
+             1,
+     );
+ 
+     # Loop.
+     $cui->mainloop;
+
+     # Output like:
+     # ┌────────────────────────────────────────────────────┐
+     # │    ██     ██      ██████ ██████      ██  ██ ██████ │
+     # │    ██     ██  ██  ██  ██ ██  ██  ██  ██  ██ ██  ██ │
+     # │    ██     ██      ██  ██ ██  ██      ██████ ██  ██ │
+     # │    ██     ██  ██  ██  ██ ██  ██  ██      ██ ██  ██ │
+     # │    ██     ██      ██████ ██████          ██ ██████ │
+     # │                                                    │
+     # │                      2014-05-24                    │
+     # └────────────────────────────────────────────────────┘
+
+DEPENDENCIES
+    Curses, Curses::UI::Common, Curses::UI::Label, Curses::UI::Number,
+    Curses::UI::Widget, Encode, Readonly.
+
+SEE ALSO
+    Task::Curses::UI
+        Install the Curses::UI modules.
+
+REPOSITORY
+    <https://github.com/tupinek/Curses-UI-Time>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2015 Michal Špaček
+     BSD 2-Clause License
+
+DEDICATION
+    To Czech Perl Workshop 2014 and their organizers.
+
+    tty-clock program.
+
+VERSION
+    0.05
+

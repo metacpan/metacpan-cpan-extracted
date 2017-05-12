@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 32
+  52406:
+    - 26
+name: cb20
+registers:
+  AF: 50944
+  AF_: 0
+  BC: 1175
+  BC_: 0
+  DE: 55083
+  DE_: 0
+  HL: 52406
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

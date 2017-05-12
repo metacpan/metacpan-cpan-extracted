@@ -1,0 +1,47 @@
+Revision history for Perl extension Convert::Ethiopic.
+
+0.12 Thu Feb 17 21:10:19 EST 2000
+	- moved ethiosys to ethiosysx for secondary fonts.
+	- added enumeration calls to BEGIN method.
+
+0.11 Sun Jan 30 20:46:53 EST 2000
+	- addition of new GeezFont typefaces AddisB1, AddisL1, AddisT1.
+	- $VERSION added to all .pm files.
+
+0.10 Fri Nov 27 08:56:27 EST 1999
+	- addition of EthioWalia and GFZemen2K systems.
+
+0.09 Sat Jul 31 21:10:31 EET DST 1999
+	- bug fix in System.pm for $monotype variable to become $monotype1.
+
+0.08 Sun Jul 11 16:34:31 EET DST 1999
+	- extremely minor, but crucial, bug fix.
+
+0.07 Wed Jun 30 03:02:48 EET DST 1999
+	- updates to System.pm to better detect typeface names in HTML files.
+
+0.06 Sat May 15 21:49:26 EET DST 1999
+	- emergency bug fix release for Convert::System.
+	- rechristianed "Convert-Ethiopic".
+
+0.05 Sun May  9 17:53:15 EET DST 1999
+	- the Et module is now the "Convert::Ethiopic" module.
+	- Ethiopic/Convert.pm is now Ethiopic/Cstocs.pm
+	- "ROADMAP" file added.
+
+0.04  Sat Apr 17 23:47:39 EET 1999
+	- the LibEth module in now the "Et" module.
+	- Convert.pm and Time.pm added (similar to Cz structure).
+	- in sync with libeth-0.34b and Zobel-0.01
+
+0.03  Sat Apr 10 19:01:14 EET 1999
+	- extended APIs to work with libeth-0.34 "options".
+	- as much C code as possible moved out of LibEth.xs and into libeth.
+	- "ConvertEthiopicFileByLine" is removed.
+
+0.02  Sun Feb 28 10:29:14 1999
+	- additional interfaces added to calendar routines, some calendar
+	  routines also renamed
+
+0.01  Tue Dec  1 01:49:41 1998
+	- original version; created by h2xs 1.18

@@ -1,0 +1,124 @@
+NAME
+    CPAN::Cache - Abstract locally-cached logical subset of a CPAN mirror
+
+DESCRIPTION
+    There have been any number of scripts and modules written that contain
+    as part of their functionality some form of locally stored partial
+    mirror of the CPAN dataset.
+
+    CPAN::Cache does the same thing, except that in addition it has the
+    feature that the downloading and storage of CPAN data is all that it
+    does, so it should not introduce any additional dependencies or bloat,
+    and should be much easier to reuse that existing modules, which
+    generally are more task-specific.
+
+    The intent is that this module will be usable by everything that is in
+    the business of pulling modules from CPAN, storing them locally, and
+    doing something with them.
+
+    In this way, it really does little other than mirror data from a remote
+    URI, except that CPAN::Cache also provides some additional intelligence
+    about which files are and are not static (will never change) which
+    aren't, and is typed specifically as a mirror of CPAN, instead of any
+    other sort of mirror.
+
+    By building this module as a seperate distribution, it is hoped we can
+    improve seperation of concerns in the CPAN-related modules and ensure
+    cleaner, smaller, and more robust tools that interact with the CPAN in
+    the most correct ways.
+
+METHODS
+  new
+      my $cache = CPAN::Cache->new(
+          remote_uri => 'http://search.cpan.org/CPAN/',
+          local_dir  => '/tmp/cpan',
+          );
+
+  remote_uri
+    The "remote_uri" accessor returns a URI object for the remote CPAN
+    repository.
+
+  local_dir
+    The "local_dir" accessor returns the filesystem path for the root root
+    directory of the CPAN cache.
+
+  file path/to/file.txt
+    The "file" method takes the path of a file within the repository, and
+    returns a URI::ToDisk object representing it's location on both the
+    server, and on the local filesystem.
+
+    Paths should always be provided in unix/web format, not the local
+    filesystem's format.
+
+    Returns a HTML::ToDisk or throws an exception if passed a bad path.
+
+  get path/to/file.txt
+    The "get" method takes the path of a file within the repository, and
+    fetches it from the remote repository, storing it at the appropriate
+    local path.
+
+    Paths should always be provided in unix/web format, not the local
+    filesystem's format.
+
+    Returns the URI::ToDisk for the file if retrieved successfully, false
+    false if the file does not exist within the repository, or throws an
+    exception on error.
+
+  mirror path/to/file.txt
+    The "mirror" method takes the path of a file within the repository, and
+    mirrors it from the remote repository, storing it at the appropriate
+    local path.
+
+    Using this method if preferable for items like indexs for which want to
+    ensure you have the current version, but do not want to freshly download
+    each time.
+
+    Paths should always be provided in unix/web format, not the local
+    filesystem's format.
+
+    Returns the URI::ToDisk for the file if mirrored successfully, false if
+    the file did not exist in the repository, or throws an exception on
+    error.
+
+  static
+    The "static" method determines whether a given path within CPAN is able
+    to change or not.
+
+    In the CPAN, some files such as index files and checksum can change,
+    while other files such as the tarball files will be static, and once
+    committed to the repository will never be changed (altough they may be
+    deleted).
+
+    In a caching scenario, this means that if the file exists locally, we
+    will never need to return to the server to check for a new version, we
+    enables additional optimisations for CPAN-related algorithms.
+
+    Returns true if the file will never change, false if not, or throws an
+    exception on error.
+
+TO DO
+    - Write a proper test suite, not just a compile test (even though this
+    was taken from working JSAN code)
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPAN-Cache>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    CPAN::Index, CPAN::Mini, DBIx::Class
+
+COPYRIGHT
+    Copyright 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

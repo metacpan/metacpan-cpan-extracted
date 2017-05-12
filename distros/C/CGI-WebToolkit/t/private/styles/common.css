@@ -1,0 +1,8 @@
+
+/* used for clearing multiple floating containers */
+html div.clear {
+	clear: both;
+	float: none;
+	width: 100%;
+}
+

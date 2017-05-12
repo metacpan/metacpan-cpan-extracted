@@ -1,0 +1,14 @@
+CHANGELOG
+lib/Config/Checker.pm
+lib/Config/YAMLMacros.pm
+lib/Config/YAMLMacros/YAML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module meta-data (added by MakeMaker)
+t/checker.t
+t/config.t
+t/data/config2a.yml
+t/data/config2b.yml
+t/data/config2c.yml
+t/data/config2d.yml
+t/data/config2.yml

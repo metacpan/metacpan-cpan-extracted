@@ -1,0 +1,19 @@
+Revision history for CGI-Cookie-Splitter
+
+0.05      2015-08-16 05:58:41Z
+        - bump namespace::clean prereq to guarantee needed Package::Stash
+          interfaces
+
+0.04      2014-02-16 20:05:57Z
+        - convert to Dist::Zilla, with more metadata
+
+0.03      2014-02-03 01:12:11Z
+        - fix test failures due to hash randomization (RT#81612), and some
+          unintialized warnings (thanks, Shlomi Fish!)
+
+0.02      2007-01-29 18:40:35Z
+	- Change the CGI::Simple prereq so it works better on debian
+	- Increase the serialization overhead futz number
+
+0.01      2006-05-28 23:09:55Z
+	- Initial release

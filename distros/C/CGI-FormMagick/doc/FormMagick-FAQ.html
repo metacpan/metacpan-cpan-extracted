@@ -1,0 +1,123 @@
+<HTML>
+<HEAD>
+<TITLE>FAQ - Frequently asked questions about FormMagick</TITLE>
+<LINK REV="made" HREF="mailto:prospector@porky.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#how do i...">HOW DO I...</A></LI>
+	<UL>
+
+		<LI><A HREF="#how do i check that my xml is valid">How do I check that my XML is valid?</A></LI>
+		<LI><A HREF="#how do i customise the look and feel of my forms">How do I customise the look and feel of my forms?</A></LI>
+		<LI><A HREF="#how do i make my own validation routines">How do I make my own validation routines?</A></LI>
+		<LI><A HREF="#how do i add translations into another language">How do I add translations into another language?</A></LI>
+		<LI><A HREF="#how do i do extra processing when a user clicks next">How do I do extra processing when a user clicks ``Next''?</A></LI>
+		<LI><A HREF="#how do i choose which page to go to based on user input">How do I choose which page to go to based on user input?</A></LI>
+	</UL>
+
+	<LI><A HREF="#troubleshooting">TROUBLESHOOTING</A></LI>
+	<UL>
+
+		<LI><A HREF="#general troubleshooting tips">General troubleshooting tips</A></LI>
+		<LI><A HREF="#why isn't my data preserved from one page to the next">Why isn't my data preserved from one page to the next?</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>FormMagick FAQ - Frequently asked questions about FormMagick</P>
+<P>
+<HR>
+<H1><A NAME="how do i...">HOW DO I...</A></H1>
+<P>
+<H2><A NAME="how do i check that my xml is valid">How do I check that my XML is valid?</A></H2>
+<P>In theory, you validate it against the DTD provided with the FormMagick
+distribution, using a suitable XML validation tool.  Unfortuneately we
+haven't found one yet, but when we do we'll write a script and
+distribute it with FormMagick.</P>
+<P>
+<H2><A NAME="how do i customise the look and feel of my forms">How do I customise the look and feel of my forms?</A></H2>
+<P>Use cascading style sheets.  Take a look at the HTML source output by
+FormMagick, and you'll see that most things have a ``label'' attribute to
+make CSS easier.</P>
+<P>
+<H2><A NAME="how do i make my own validation routines">How do I make my own validation routines?</A></H2>
+<P>Simply create a routine in your CGI script which accepts the data to
+validate as an argument.  Have it return ``OK'' on success or a detailed
+error message on failure.</P>
+<PRE>
+    sub my_validation {
+        my $data = shift;
+        if ($data =~ /$some_pattern/) {
+            return &quot;OK&quot;;
+        } else {
+            return &quot;That looks wrong to me.&quot;;
+        }
+    }</PRE>
+<P>
+<H2><A NAME="how do i add translations into another language">How do I add translations into another language?</A></H2>
+<P>Use the <CODE>add_lexicon()</CODE> method:</P>
+<PRE>
+    $f-&gt;add_lexicon(&quot;fr&quot;, { &quot;Yes&quot; =&gt; &quot;Oui&quot;, &quot;No&quot; =&gt; &quot;Non&quot; });</PRE>
+<P>
+<H2><A NAME="how do i do extra processing when a user clicks next">How do I do extra processing when a user clicks ``Next''?</A></H2>
+<P>Use a POST-EVENT on the PAGE element.  Create a subroutine that does
+what you want:</P>
+<PRE>
+    sub process_credit_card {
+        my $cgi = shift;
+        my $cardnum = $cgi-&gt;param(&quot;cardnum&quot;);
+        my $response = do_processing($cardnum);
+        print &quot;&lt;p&gt;$response&lt;/p&gt;&quot;;
+    }</PRE>
+<P>
+<H2><A NAME="how do i choose which page to go to based on user input">How do I choose which page to go to based on user input?</A></H2>
+<P>Use a PAGE POST-EVENT and set the value of the ``wherenext'' CGI
+parameter:</P>
+<PRE>
+    sub my_post_page_event {
+        my $cgi = shift;
+        if ($cgi-&gt;param(&quot;foo&quot;) eq &quot;bar&quot;) {
+            $cgi-&gt;param(-name =&gt; &quot;wherenext&quot;, -value =&gt; &quot;GoToThisPageName&quot;)
+        } elsif ($cgi-&gt;param(&quot;had_enough&quot;) eq &quot;Yes&quot;) {
+            $cgi-&gt;param(-name =&gt; &quot;wherenext&quot;, -value =&gt; &quot;Finish&quot;)
+        }
+    }</PRE>
+<P>
+<HR>
+<H1><A NAME="troubleshooting">TROUBLESHOOTING</A></H1>
+<P>
+<H2><A NAME="general troubleshooting tips">General troubleshooting tips</A></H2>
+<P>Try turning on debugging when you invoke FormMagick:
+</P>
+<PRE>
+
+    my $f = new CGI::FormMagick( DEBUG =&gt; 1 );</PRE>
+<P>
+<H2><A NAME="why isn't my data preserved from one page to the next">Why isn't my data preserved from one page to the next?</A></H2>
+<P>You probably need to make your <CODE>session-tokens</CODE> directory writable and
+executable by the web server.  Either:</P>
+<PRE>
+    chown www session-tokens 
+       (assuming your webserver runs as the www user)
+    chmod 700 session-tokens</PRE>
+<P>Or...</P>
+<PRE>
+    chmod 777 session-tokens</PRE>
+<P>Note that the latter allows anyone on the system to write to this
+directory, and is a greater security risk than the former method.</P>
+
+</BODY>
+
+</HTML>

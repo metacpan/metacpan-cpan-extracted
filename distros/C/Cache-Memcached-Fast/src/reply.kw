@@ -1,0 +1,42 @@
+# Input file for genparser.pl script.
+
+# Name of the parser function.
+parser_func = parse_keyword
+
+# When loose_match is enabled the parser matches only essential
+# characters.  This is faster, but not future-compatible.  For
+# instance, NOT_FOUND and NOT_STORED can be matched by testing first
+# and fifth character, but if, say, NOT_SET would be introduced, the
+# parser will match it to NOT_STORED until it knows the new keyword.
+loose_match = 0
+
+
+%%
+
+# List keywords below (in any order).
+
+CLIENT_ERROR
+DELETED
+END
+ERROR
+EXISTS
+NOT_FOUND
+NOT_STORED
+OK
+SERVER_ERROR
+STAT
+STORED
+TOUCHED
+VALUE
+VERSION
+# incr and decr return non-negative number.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9

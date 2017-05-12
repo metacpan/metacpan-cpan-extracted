@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+	<title><tmpl_var name=title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<link type="text/css" rel="stylesheet" href="<tmpl_var name=css_url>" />
+<script language="javascript">
+<!--
+function set(rm)
+{
+	if (rm != '')
+	{
+		document.cgi_app.rm.value = rm;
+	}
+}
+
+// -->
+</script>
+</head>
+<body>
+	<div align='center' class='cgi_app_heading'>CGI::Application::Demo::Basic</div>
+	<form method="post" name="cgi_app" action="<tmpl_var name=url>" enctype="application/x-www-form-urlencoded">
+		<tmpl_var name=content><br />
+		<input type="hidden" name="rm" value="<tmpl_var name=rm>" />
+		<input type="hidden" name="CGISESSID" value="<tmpl_var name=sid>" />
+	</form>
+</body>
+</html>

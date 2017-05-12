@@ -1,0 +1,89 @@
+ClearCase::Wrapper::MGi
+==================================
+
+PURPOSE
+
+This is an overlay module for ClearCase::Wrapper. See the POD for that
+module. It is built following the example of ClearCase::Wrapper::DSB.
+The extensions contained here are meant to support a consistent
+branching policy, advocated in:
+ http://www.cmcrossroads.com/cgi-bin/cmwiki/view/CM/BranchYesMergeNo
+It also offers a port of cleartool over cygwin.
+Beyond this module, changes were also made to ClearCase::SyncTree,
+which closely relate to the same purpose.
+The module has to adapt many functions from DSB.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+VERSIONS
+
+Notice as from ClearCase::Wrapper::DSB--there is no strict correlation
+between versions of the base module and overlay modules. I.e. you do
+not necessarily need ClearCase::Wrapper::DSB 1.04 if you have
+ClearCase::Wrapper 1.04.  If an overlay requires a certain feature in
+the base module this dependency will be noted in the prerequisites
+within Makefile.PL.  In other words, if the install sequence doesn't
+generate a warning you should be ok.
+
+DEPENDENCIES
+
+  ClearCase::Wrapper
+  Date::Format
+  Date::Parse
+  File::Slurp
+
+  Even if ClearCase::Wrapper::DSB is not a dependency, the extension
+to catcs developed in it is compatible with the extension of config
+specs presented here, and can be used to display it.
+
+These modules are non standard and used by at least one function.
+Note that the optional configuration files in the 'extra' directory
+have more dependencies. Consult the Configuration.pod there
+
+KNOWN BUGS AND MISSING FEATURES
+
+  - No tests provided.
+  - The view attribute is not searched from included config spec
+    fragments.
+  - Interactive queries from cleartool require specific attention.
+    When missing, they may result in apparent hanging.
+
+Many more functions need to be modified in order to support the
+'BranchOff: root' functionality:
+  - describe -fmt "%Pn": should return a merge contributor, unless a
+    direct parent is found on the same branch
+  - ls: should mention '-off /{root}' if 'BranchOff: root' is set
+  - lsgen: should support a -graphical option
+
+I don't intend (for now) to modify findmerge, on the following
+grounds:
+  - the only common usage pattern under 'BranchOff: root' is the 'home
+    merge', i.e. merging towards one's changes, already in a branch.
+  - the purpose of branching off the root of the version tree is to
+    avoid cascading far away; few levels of cascading are innocuous.
+
+A type family functionality is offered to support in-place publication,
+directly from the development branches, in order to make the
+application of labels cheaper than it currently is.
+
+Another 'view attribute' is supported, although seldom needed:
+'##:IncrementalLabels: LBTYPE@/vob/tag'.
+The initial documentation can be found at:
+  http://www.cmcrossroads.com/cgi-bin/cmwiki/view/CM/LabelFamily
+  http://www.cmcrossroads.com/cgi-bin/cmwiki/view/CM/IncrementalTypesImp
+See also the collaborative maintenance site:
+  http://code.google.com/p/clearcase-cpan/
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 IONA Technologies PLC until v 0.05.
+Copyright (c) 2008-2012 Marc Girod (marc.girod@gmail.com) for later changes.
+All rights reserved. This Perl program is free software; you may
+redistribute it and/or modify it under the same terms as Perl itself.

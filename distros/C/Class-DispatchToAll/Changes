@@ -1,0 +1,19 @@
+#-----------------------------------------------------------------
+# Changes for Class::DispatchToAll
+#-----------------------------------------------------------------
+
+0.11    2006-09-30
+    - no changes / additions to functionality, this is a purly housekeeping
+      release!
+    - changed to Module::Build
+    - added various dist tests (99_pod*)
+
+
+0.10   2002-07-15
+    - First release to CPAN
+
+
+0.01  Wed Jul 10 15:40:58 2002
+	- original version; created by h2xs 1.21 with options
+		-AXn Class::DispatchToAll
+

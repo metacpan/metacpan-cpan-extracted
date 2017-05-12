@@ -1,0 +1,11 @@
+NAME
+    CCCP::SQLiteWrap - wrapper on SQLite (only for nix)
+    
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

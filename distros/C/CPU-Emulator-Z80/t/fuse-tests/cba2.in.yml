@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 162
+  28608:
+    - 97
+name: cba2
+registers:
+  AF: 56576
+  AF_: 0
+  BC: 11021
+  BC_: 0
+  DE: 21844
+  DE_: 0
+  HL: 28608
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

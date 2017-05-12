@@ -1,0 +1,24 @@
+Revision history for Perl extension Cindy::Apache2.
+
+0.01  Fri Feb 26 22:44:14 2010
+	- split off from Cindy-0.07 
+0.02  
+  - removed dependency from Apache2::Request
+  - fixed cindy test
+  - added override test
+0.03
+  - Changed Makefile.PL so that CPAN testers use
+    Apache::Test
+  - 2nd Apache::Test workaround for httpd autodetection 
+0.04
+  - The exampe site requires Cindy 0.11 to work
+0.05
+  - Fixed charset problem by adding HTTPCore.xs
+0.06
+  - Added CINDY_FATALS_TO_BROWSER
+0.07
+  - Versioning mistake
+0.08
+  - Fixed Apache2::RequestRec namespace violation
+0.09
+  - Requires Cindy 0.22 and does just pass the doctype

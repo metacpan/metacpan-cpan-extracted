@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  12758:
+    - 253
+name: fdcb18
+registers:
+  AF: 9128
+  AF_: 0
+  BC: 64791
+  BC_: 0
+  DE: 5856
+  DE_: 0
+  HL: 26772
+  HL_: 0
+  I: 0
+  IX: 47368
+  IY: 12822
+  PC: 4
+  R: 2
+  SP: 0

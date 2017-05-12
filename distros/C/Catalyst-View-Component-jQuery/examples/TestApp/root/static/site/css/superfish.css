@@ -1,0 +1,107 @@
+/*
+ Skin styles for Superfish (Suckerfish) navbar menus.
+
+ This stylesheet adds declarations for SPAN elements with class "sf-label" to
+ apply the same styles to the SPANs as the distribution Superfish stylesheets
+ apply to A elements so that menu entries can be plain text instead of links.
+
+ Number in comments indicates source line.
+*/
+
+/*** ESSENTIAL STYLES ***/
+span.sf-label {
+    margin-bottom: 0;
+}
+span.sf-menu {
+    color: #304122;
+}
+
+/* from distribution superfish.css */
+
+/* 26 */
+.sf-menu span.sf-label {
+	display:		block;
+	position:		relative;
+}
+
+/*** SKIN WAS HERE ***/
+/*** BEGIN brought back from skin ***/
+/* 60 */
+.navbar {
+    height: 35px;
+}
+.sf-menu a, .sf-menu span.sf-label {
+	border-left:	1px solid #FFFFFF;
+	border-top:		1px solid #CFDEFF;
+	padding: 		10px;
+	text-decoration:none;
+}
+/*** END brought back from skin ***/
+
+/*** arrows ***/
+/* 85 */
+.sf-menu span.sf-with-ul {
+	padding-right: 	2.25em;
+	min-width:		1px; /* trigger IE7 hasLayout so spans position accurately */
+}
+/* 100 */
+span.sf-label > .sf-sub-indicator {
+	top:			.8em;
+	background-position: 0 -100px; /* use translucent arrow for modern browsers*/
+}
+/* 104 */ 
+/* apply hovers to modern browsers */
+span.sf-label:focus > .sf-sub-indicator,
+span.sf-label:hover > .sf-sub-indicator,
+span.sf-label:active > .sf-sub-indicator {
+	background-position: -10px -100px; /* arrow hovers for modern browsers*/
+}
+/* 113 */
+.sf-menu ul span.sf-label > .sf-sub-indicator { background-position:  0 0; }
+/* apply hovers to modern browsers */
+.sf-menu ul span.sf-label:focus > .sf-sub-indicator,
+.sf-menu ul span.sf-label:hover > .sf-sub-indicator,
+.sf-menu ul span.sf-label:active > .sf-sub-indicator {
+	background-position: -10px 0; /* arrow hovers for modern browsers*/
+}
+
+/* from distribution superfish-navbar.css */
+
+/* 13 */
+.sf-navbar span.sf-label {
+	border-top:		none;
+}
+/* 33 */
+.sf-navbar span.sf-label, .sf-navbar span.sf-label:visited {
+	border:			none;
+}
+/* 39 */
+.sf-navbar span.sf-label:focus, .sf-navbar span.sf-label:hover, .sf-navbar span.sf-label:active {
+	background:		#BDD2FF;
+}
+/* 45 */
+.sf-navbar ul span.sf-label:focus, .sf-navbar ul span.sf-label:hover, .sf-navbar ul span.sf-label:active {
+	background:		#D1DFFF;
+}
+/* 52 */
+.sf-navbar ul li li span.sf-label:focus, .sf-navbar ul li li span.sf-label:hover, .sf-navbar ul li li span.sf-label:active {
+	background:		#E6EEFF;
+}
+/* 68 */
+.sf-navbar li li.current > span.sf-label {
+	font-weight:	bold;
+}
+/* 72 */
+/*** point all arrows down ***/
+/* point right for anchors in subs */
+.sf-navbar ul span.sf-label > .sf-sub-indicator { background-position: 0 -100px; }
+/* 76 */
+/* apply hovers to modern browsers */
+.sf-navbar ul span.sf-label:focus > .sf-sub-indicator,
+.sf-navbar ul span.sf-label:hover > .sf-sub-indicator,
+.sf-navbar ul span.sf-label:active > .sf-sub-indicator,
+.sf-navbar ul li:hover > span.sf-label > .sf-sub-indicator,
+.sf-navbar ul li.sfHover > span.sf-label > .sf-sub-indicator {
+	background-position: -10px -100px; /* arrow hovers for modern browsers*/
+}
+

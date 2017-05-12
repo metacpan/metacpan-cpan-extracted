@@ -1,0 +1,13 @@
+Change history for Cache-Meh
+
+0.04        2014-09-08
+            Add a memory-only mode if "only_memory" is set.
+
+0.03        2014-04-07
+            Close temp filehandle for better Windows compatibility
+
+0.02        2014-04-01
+            Instead of rename, use File::Copy::move to be more portable.
+
+0.01        2014-03-26
+            Initial release

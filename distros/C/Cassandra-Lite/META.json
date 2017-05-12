@@ -1,0 +1,59 @@
+{
+   "abstract" : "Simple way to access Cassandra 0.7/0.8",
+   "author" : [
+      "Gea-Suan Lin <gslin@gslin.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Cassandra-Lite",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Any::Moose" : 0,
+            "Class::Accessor" : 0,
+            "Thrift" : 0,
+            "Thrift::BinaryProtocol" : 0,
+            "Thrift::FramedTransport" : 0,
+            "Thrift::Socket" : 0,
+            "constant" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gslin/cassandra-lite-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gslin/cassandra-lite-perl.git",
+         "web" : "https://github.com/gslin/cassandra-lite-perl"
+      }
+   },
+   "version" : "0.4.0"
+}
+

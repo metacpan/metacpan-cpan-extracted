@@ -1,0 +1,81 @@
+/* Style sheet for CfgTie-generated Web pages */
+
+/* By Christopher Palmer <reid@pconline.com> */
+
+BODY { color: black; background: white; line-height: 125%; }
+
+A:link { color: green; }
+A:active { color: red; }
+A:visited { color: gray; }
+A:name { }
+
+
+/* Tables */
+
+TD.outerShell	{
+	background: black;
+	}
+
+TH	{
+	background: #AAAA66;
+	color: black;
+	font-weight: bold;
+	}
+
+TH.cfgattr	{
+	background: black;
+	color: white;
+	font-weight: bold;
+	}
+TD.cfgattr	{
+	background: black;
+	color: white;
+	font-weight: bold;
+	}
+
+TD.cfgval	{
+	background: white;
+	color: black;
+	}
+
+
+/* Headers */
+
+H1	{
+	font-weight: bold;
+	font-size: large;
+	font-family: arial,helvetica;
+	font-style: italic;
+	}
+
+H2	{
+	line-height: 200%;
+	font-weight: bold;
+	font-size: large;
+	font-family: arial,helvetica;
+	font-style: roman;
+	}
+
+H3	{
+	line-height: 200%;
+	font-weight: medium;
+	font-size: large;
+	font-family: arial,helvetica;
+	font-style: roman;
+	}
+
+H4	{
+	line-height: 200%;
+	font-weight: medium;
+	font-size: medium;
+	font-family: arial,helvetica;
+	font-style: roman;
+	}
+
+H5	{
+	line-height: 200%;
+	font-weight: medium;
+	font-size: medium;
+	font-family: arial,helvetica;
+	font-style: italic;
+	}

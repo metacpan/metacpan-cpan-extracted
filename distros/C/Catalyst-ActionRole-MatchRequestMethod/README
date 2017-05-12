@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-ActionRole-MatchRequestMethod,
+version 0.03:
+
+  Dispatch actions based on HTTP request methods
+
+This software is copyright (c) 2010 by Florian Ragwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

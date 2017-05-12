@@ -1,0 +1,4 @@
+- Tests, V0.001 was totally screwed and I didn't realize it
+- array_ref support for user_field
+- support for real and fake user (maybe extra module?)
+

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Web MVC Framework Example Application #4 -- Main View</title>
+  </head>
+
+  <body>
+    <h1>Web MVC Framework Example Application #4 -- Main View</h1>
+    <h2>Template Toolkit Version</h2>
+
+<pre>
+[% INCLUDE "README-tt.txt" %]
+</pre>
+
+<p align=center>
+  <table border="5" bgcolor="#40c040">
+    <tr>
+      <td align=center valign=middle>
+        <p>
+          <a href="[% SELF_HREF_LINK %]">
+<b>Click me to reload this page...</b>
+          </a>
+        </p>
+      </td>
+    </tr>
+  </table>
+</p>
+
+<p>
+The purpose of this example application is to demonstrate the use of
+the "CGIAPP.embed()" statement within Template::Toolkit objects, which
+are used to display the content of one run mode within another run mode.
+Inspect this source .html file to see how "CGIAPP.embed()" is used.
+</p>
+
+<p>
+<b>Number of times you have loaded this page:</b>
+[% load_count %]
+</p>
+
+1.
+<hr />
+
+[% CGIAPP.embed("outer_component") %]
+
+<hr />
+
+2.
+<hr />
+
+[% CGIAPP.embed("outer_component") %]
+
+<hr />
+
+<p>
+<b>Number of times you have loaded this page:</b>
+[% load_count %]
+</p>
+  </body>
+</html>
+
+
+

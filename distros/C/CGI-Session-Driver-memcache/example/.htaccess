@@ -1,0 +1,14 @@
+# Helper .htaccess to quickly ramp-up (on Apache) with testing.
+# Note Allowing AddHandler (and other directives) in .htaccess may require 
+# changes in Apache main httpd.conf.
+AddHandler cgi-script .pl
+Options +ExecCGI
+
+# If you have mod_perl installed, create a symbolic link to test:
+# ln -s memc_example.pl memc_example.mpl
+<IfModule perl_module>
+AddHandler perl-script .mpl
+PerlResponseHandler ModPerl::Registry
+# MUST have ParseHeaders when outputting headers by plain print()
+PerlOptions +SetupEnv +ParseHeaders
+</IfModule>

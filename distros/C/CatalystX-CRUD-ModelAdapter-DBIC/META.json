@@ -1,0 +1,52 @@
+{
+   "abstract" : "CRUD for Catalyst::Model::DBIC::Schema",
+   "author" : [
+      "Peter Karman <karman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-CRUD-ModelAdapter-DBIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Model::DBIC::Schema" : "0",
+            "CatalystX::CRUD" : "0.42",
+            "CatalystX::CRUD::Controller::REST" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::RDBOHelpers" : "0.04",
+            "Data::Dump" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/karpet/catalystx-crud-modeladapter-dbic"
+      }
+   },
+   "version" : "0.15"
+}

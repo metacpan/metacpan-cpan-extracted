@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
+            last-generated='Tue May  3 16:19:02 2011 GMT'
+            generated-by='Id'>
+ <cpanid>
+  <id>AFOXSON</id>
+  <type>author</type>
+  <fullname></fullname>
+ </cpanid>
+ <cpanid>
+  <id>SPECTRUM</id>
+  <type>author</type>
+  <fullname>Черненко Эдуард Павлович</fullname>
+  <asciiname>Edward Chernenko</asciiname>
+  <email>edwardspec@gmail.com</email>
+  <homepage>http://absurdopedia.net/wiki/User:Edward_Chernenko</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>KORSHAK</id>
+  <type>author</type>
+  <fullname>Ярослав Коршак</fullname>
+  <email>CENSORED</email>
+ </cpanid>
+ <cpanid>
+  <id>YKO</id>
+  <type>author</type>
+  <fullname>Ярослав Коршак</fullname>
+  <asciiname>Yaroslav Korshak</asciiname>
+  <email>ykorshak@gmail.com</email>
+  <homepage>http://korshak.name/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>FAKE1</id>
+  <type>author</type>
+  <fullname>גאבור סבו - Gábor Szabó</fullname>
+  <asciiname>Gabor Szabo</asciiname>
+  <email>gabor@pti.co.il</email>
+  <homepage>http://szabgab.com/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>NUFFIN</id>
+  <type>author</type>
+  <fullname>יובל קוג'מן (Yuval Kogman)</fullname>
+  <asciiname>Yuval Kogman</asciiname>
+  <email>nothingmuch@woobling.org</email>
+  <homepage>http://nothingmuch.woobling.org/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>XMLML</id>
+  <type>list</type>
+  <asciiname>Perl-XML Mailing List</asciiname>
+  <email>perl-xml@listserv.ActiveState.com</email>
+  <info>Send mail to subscribe-perl-xml@lyris.activestate.com</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+</cpan-whois>

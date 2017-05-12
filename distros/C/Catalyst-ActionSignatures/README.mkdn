@@ -1,0 +1,149 @@
+# NAME
+
+Catalyst::ActionSignatures - so you can stop looking at @\_
+
+# SYNOPSIS
+
+    package MyApp::Controller::Example;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use Catalyst::ActionSignatures;
+
+    extends 'Catalyst::Controller';
+
+    sub test($Req, $Res, Model::A $A, Model::Z $Z) :Local {
+        # has $self implicitly
+        $Res->body('Look ma, no @_!')
+    }
+
+    sub regular_method ($arg1, $arg1) {
+      # has $self implicitly
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+Lets you declare required action dependencies via the method signature.
+
+This subclasses [signatures](https://metacpan.org/pod/signatures) to allow you a more concise approach to
+creating your controllers.  This injects your method signature into the
+code so you don't need to use @\_.  You should read [signatures](https://metacpan.org/pod/signatures) to be
+aware of any limitations.
+
+For actions and regular controller methods, "$self" is implicitly injected,
+but '$c' is not.  You should add that to the method signature if you need it
+although you are encouraged to name your dependencies rather than hang it all
+after $c.
+
+You should review [Catalyst::ActionRole::MethodSignatureDependencyInjection](https://metacpan.org/pod/Catalyst::ActionRole::MethodSignatureDependencyInjection)
+for more on how to construct signatures.
+
+Also [Catalyst::ActionSignatures::Rationale](https://metacpan.org/pod/Catalyst::ActionSignatures::Rationale) may be useful.
+
+# Args and Captures
+
+If you specify args and captures in your method signature, you can leave off the
+associated method attributes (Args($n) and CaptureArgs($n)) IF the method 
+signature is the full specification.  In other works instead of:
+
+     sub chain(Model::A $a, Capture $id, $res) :Chained(/) CaptureArgs(1) {
+       Test::Most::is $id, 100;
+       Test::Most::ok $res->isa('Catalyst::Response');
+     }
+
+       sub endchain($res, Arg0 $name) :Chained(chain) Args(1) {
+         $res->body($name);
+       }
+    
+       sub endchain2($res, Arg $first, Arg $last) :Chained(chain) PathPart(endchain) Args(2) {
+         $res->body("$first $last");
+       }
+
+You can do:
+
+     sub chain(Model::A $a, Capture $id, $res) :Chained(/) {
+       Test::Most::is $id, 100;
+       Test::Most::ok $res->isa('Catalyst::Response');
+     }
+
+       sub endchain($res, Arg0 $name) :Chained(chain)  {
+         $res->body($name);
+       }
+    
+       sub endchain2($res, Arg $first, Arg $last) :Chained(chain) PathPart(endchain)  {
+         $res->body("$first $last");
+       }
+
+# Type Constraints
+
+If you are using a newer [Catalyst](https://metacpan.org/pod/Catalyst) (greater that 5.90090) you may declare your
+Args and CaptureArgs typeconstraints via the method signature.
+
+    use Types::Standard qw/Int Str/;
+
+    sub chain(Model::A $a, Capture $id isa Int, $res) :Chained(/) {
+      Test::Most::is $id, 100;
+      Test::Most::ok $res->isa('Catalyst::Response');
+    }
+
+      sub typed0($res, Arg $id) :Chained(chain) PathPart(typed) {
+        $res->body('any');
+      }
+
+      sub typed1($res, Arg $pid isa Int) :Chained(chain) PathPart(typed) {
+        $res->body('int');
+      }
+
+**NOTE** If you declare any type constraints on args or captures, all declared
+args or captures must have them.
+
+# Implicit 'CaptureArgs(0)' and 'Args(0)' in chained actions
+
+If you fail to use an Args or CaptureArgs attributes and you do not declare
+any captures or args in your chained action method signatures, we automatically
+add a CaptureArgs(0) attribute.  However, since we cannot properly detect the
+end of a chain, you must still use Args(0) to terminate chains when the
+last action has no arguments.  You may instead use "Chained(link/)" and
+note the terminal '/' in the chained attribute value to declare a terminal
+Chain with an implicit Args(0).
+
+    sub another_chain() :Chained(/) { }
+
+      sub another_end($res) :Chained(another_chain/) {
+        $res->body('another_end');
+      }
+
+# Model and View parameters
+
+If your Model or View is a factory that takes parameters, you may supply those
+from other existing dependencies:
+
+    # like $c->model('ReturnsArg', $id);
+    sub from_arg($res, Model::ReturnsArg<Arg $id isa '"Int"'> $model) :Local {
+      $res->body("model $model");
+      # $id is also available.
+    }
+
+# ENVIRONMENT VARIABLES.
+
+Set `CATALYST_METHODSIGNATURES_DEBUG` to true to get initial debugging output
+of the generated method signatures and attribute changes. Useful if you are
+having trouble and want some help to offer a patch!
+
+# SEE ALSO
+
+[Catalyst::Action](https://metacpan.org/pod/Catalyst::Action), [Catalyst](https://metacpan.org/pod/Catalyst), [signatures](https://metacpan.org/pod/signatures),
+[Catalyst::ActionRole::MethodSignatureDependencyInjection](https://metacpan.org/pod/Catalyst::ActionRole::MethodSignatureDependencyInjection)
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

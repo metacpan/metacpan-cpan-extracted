@@ -1,0 +1,12 @@
+Revision history for Perl extension Crypt::SecurID.
+
+0.01  Sun Jan 26 15:30:19 2003
+   - original version; created by h2xs 1.21 with options
+		-XA -n Crypt::SecurID
+
+0.03  Sun Jan 26 22:41:50 2003
+   - first CPAN release
+
+0.04  Wed Aug  6 15:45:46 CDT 2003
+   - second CPAN release with cleaner pod, test values test 
+   - in Makefile.PL, added pseudo command-line 'LD=g++' to force C++ link

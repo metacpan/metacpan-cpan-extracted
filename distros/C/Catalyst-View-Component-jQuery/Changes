@@ -1,0 +1,18 @@
+Revision history for Catalyst-View-Role-jQuery
+
+0.05 - Sun May 24 17:28:20 2009
+	Added Catalyst::Plugin::ConfigLoader to dependencies.
+	First release using Module::Release.
+
+
+0.04  Wed May 20 09:22:55 CDT 2009
+      - Added inc/ to MANIFEST.
+      - Removed 'inc' from MANIFEST.skip.
+      - Updated t/content.t to look for correct markup.
+0.03  Mon May 18 10:36:26 CDT 2009
+      - Added Catalyst::View::TT to Makefile.PL build_requires.
+0.02  Sun May 17 08:30:39 CDT 2009
+      - First public release.
+0.01  not release
+      - Internal use only, not released.
+

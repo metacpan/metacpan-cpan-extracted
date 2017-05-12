@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb5b
+registers:
+  AF: 23669
+  AF_: 0
+  BC: 46013
+  BC_: 0
+  DE: 9661
+  DE_: 0
+  HL: 39119
+  HL_: 0
+  I: 0
+  IX: 11169
+  IY: 12636
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  53782:
+    - 122
+name: ddcbdf
+registers:
+  AF: 31370
+  AF_: 0
+  BC: 23362
+  BC_: 0
+  DE: 20701
+  DE_: 0
+  HL: 19424
+  HL_: 0
+  I: 0
+  IX: 53799
+  IY: 18707
+  PC: 4
+  R: 2
+  SP: 0

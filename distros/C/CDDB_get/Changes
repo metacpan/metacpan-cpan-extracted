@@ -1,0 +1,97 @@
+Revision history for Perl extension CDDB/CDDB_get.
+
+0.9   13.05.2000 
+      beta release version
+
+0.91  small bug fix
+
+0.95  offline version
+
+1.00  12.06.2000
+      output format for disc-cover
+
+1.10  23.07.2000
+      corrected output format to xmcd format
+      disc-cover can read this now, as other programs
+
+1.11  21.10.2000
+      perl -w warnings resolved, thanx: Kyle <kaf@nwlink.com>
+
+1.2   12.11.2000
+      now solaris works too, thanx: Adam <arp@shelly.metachar.net>
+
+1.4   01.12.2000
+      some cleanup, default is freedb.freedb.org from now on
+
+1.5   23.03.2001
+      solaris works now (for real now), thanx: Joe <jpreiser@mediaone.net>
+      http mode implemented, thanx: Michael <mgrabens@popd.isinet.com>
+
+1.51  25.02.2001
+      proxy mode implemented (for http)
+
+1.52  beta test version
+
+1.6   28.03.2001
+      netbsd works for now, maybe other bsd variants too
+      there may be endian issues on bsd, so this is beta now
+
+1.61  28.03.2001
+      small correction and tests
+
+1.66  31.05.2001
+      Now works with OpenBSD.
+
+2.01b 11.03.2002
+      The information can now be saved in xmcd format. 
+      An untested feature for loading data directly into a database was added. 
+      A data flag for each track was added. 
+      A fix was made for "/" characters in an artist's name. 
+      The HTTP proxy recognition was fixed. 
+      All entries are returned if a flag is set. 
+      An RPM spec file is now included. 
+      A command for encoding the CD with LAME is now output.
+
+2.10  12.03.2002
+      A fix for total disk length calculation
+      tested MySQL
+      a -O flag for overwrite (xmcd file and mysql-db)
+      a fix for a small bug in the Red Hat spec file
+
+2.11  10.10.2002
+      small proxy regex bugfix
+
+2.12  15.04.2003
+      Added better device handling (I now have 3 cdroms)
+      (internal test release)
+
+2.2   29.04.2003
+      Added direct device handling in cddb.pl 
+      Firewall fix with additional \n
+
+2.22  12.08.2003
+      cddb proto5: new year and genre fields
+
+2.23  07.09.2003
+      openbsd 64bit support, may (not) work on other 64bit platforms ;-)
+      (thanks to: Enache Adrian, Jolan Luff and Dan Weeks)
+      pod cleanup
+
+2.25  15.06.2005
+      user:pass with proxy support - untested (thanks to Peter)
+        Please try it, I don't have such a setup.
+      Cache module: use CDDB_cache instead of CDDB_get
+        All files are saved in a local tree and can be reused from there.
+        Please try it if you like, it's not really tested.
+
+2.26  22.06.2005 (unreleased)
+      added postgres/oracle/sqlite support (untested)
+      thanks to Rick for starting with a postgres version
+
+2.27  01.01.2006
+      default port is now 8880 (not 888 anymore)
+      fixes an ioctl perl problem on current redhat/fedora (thanks to Gregory K. Ruiz-Ade
+      and the redhat/fedora guys)
+
+2.28  06.03.2012
+      make tests work with perl 5.15.x

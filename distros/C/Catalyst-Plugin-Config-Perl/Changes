@@ -1,0 +1,8 @@
+1.0.3   13.04.2015
+    - bugfix: MyApp->dev wasn't set
+1.0.2   10.04.2015
+    - fix module requirements (Catalyst::Runtime)
+1.0.1   10.04.2015
+    - added config_reload, config_initial
+1.0.0	09.04.2015
+    - Initial release

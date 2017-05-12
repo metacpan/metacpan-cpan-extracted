@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Compellent-CompCU.t
+lib/Compellent/CompCU.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+Revision history for Circle-Net-Matrix
+
+0.03    2017/03/27 18:34:47
+        [CHANGES]
+         * Markdown-like formatted message sending
+         * Try harder to pick a friendly room name
+         * Configurable initial backscroll at connect time
+         * Prettier message display formatting for common kinds of room and
+           member state changes
+
+0.02    2017/03/20 17:29:46
+        [CHANGES]
+         * Support some incoming message formatting
+         * Add a status bar - show invite and visibility rules, member count,
+           typing notifications
+         * Bidirectional syncing of read receipts for activity level reset
+         * Handle `m.notice` events
+         * Pick peer's displayname on 1:1 direct-message rooms
+
+0.01    2017/03/16 16:02:32
+        First version, released on an unsuspecting world.

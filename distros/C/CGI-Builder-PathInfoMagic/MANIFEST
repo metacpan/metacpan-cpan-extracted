@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+README
+MANIFEST
+lib/CGI/Builder/PathInfoMagic.pm
+t/00-compile.t
+t/02-cgi-builder-pathinfomagic.t

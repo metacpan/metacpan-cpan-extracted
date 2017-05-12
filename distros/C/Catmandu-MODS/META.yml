@@ -1,0 +1,36 @@
+---
+abstract: 'Catmandu modules for working with MODS records'
+author:
+  - 'Nicolas Franck'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-MODS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '0.9301'
+  MODS::Record: '0.09'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-MODS/issues
+  homepage: https://github.com/LibreCat/Catmandu-MODS
+  repository: https://github.com/LibreCat/Catmandu-MODS.git
+version: '0.31'
+x_contributors:
+  - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'njfranck <njfranck@ca20c521.ugent.be>'

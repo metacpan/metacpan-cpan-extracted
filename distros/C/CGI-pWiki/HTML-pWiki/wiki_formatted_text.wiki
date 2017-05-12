@@ -1,0 +1,16 @@
+pWiki is using simple formatting rules to translate wiki files.
+
+The pWiki translator knows 5 kinds of paragraphs :
+
+| list_paragraph | all lines start with asterix or dash |
+| table_paragraph | all lines start and end by a bar |
+| verbatim_paragraph | all lines are intended by whitespace |
+| command_paragraph | a single line starting with an equal sign |
+| ordinary_paragraph | blocked text |
+
+Wikiness is defined the following autolink patterns :
+
+- words surrounded by [] marks
+- words with embedded underscore, dash or slash in it 
+- words with embedded capital letters
+

@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+lib/Class/Methods.pm
+SIGNATURE
+test.pl

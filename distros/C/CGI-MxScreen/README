@@ -1,0 +1,170 @@
+                         CGI::MxScreen 0.1
+                 Copyright (c) 1998-2001, Raphael Manfredi
+                 Copyright (c) 2000-2001, Christophe Dehaudt
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+       *** This is alpha software -- use at your own risks ***
+
+Name           DSLI  Description                                  Info
+-------------  ----  -------------------------------------------- -----
+CGI::MxScreen  adpO  A multi-screen stateful CGI framework        PURDY
+
+
+------------------------------------------------------------------------
+This software was released by Raphael Manfredi to my care as a
+maintainer, as he has since "retired" to spend more time with family and
+the real world.  So while you read the documentation (which I've left
+intact so far) and code (also intact), please redirect any questions
+you may have to me instead of Raphael.
+
+I am still learning this module and appreciate your patience - if you
+have any bug reports or patches to submit, I will gladly accept them.
+
+Best of luck to Raphael in his future endeavours and thank you for
+downloading CGI::MxScreen.
+
+Jason Purdy
+Jason@Purdy.INFO
+October 15, 2004
+------------------------------------------------------------------------
+
+CGI::MxScreen is a framework for building multi-screen stateful CGI
+programs.  It is mostly object-oriented, in that you interact with
+objects, but has some peculiarities due to serialization constraints.
+
+Here are the main features of `CGI::MxScreen':
+
+*   The module is a superset of the `CGI' module. You can continue to use
+    `CGI' routines wherever you like.
+
+*   It handles sessions for you, saving much of the application state, and
+    making CGI hidden parameters useless. You may save sessions within
+    the browser, or to files, or you may even build your own medium
+    backend. You may also define your own serializing options, although
+    `Storable' is natively supported. See the
+    CGI::MxScreen::Session::Medium manpage for the medium interface and
+    the CGI::MxScreen::Serializer manpage for the serialization
+    interface.
+
+*   It handles the state machine for you. You define the various screen
+    objects, and then specify, for each submit button, which state the
+    application should go. The target state can be specified statically,
+    or computed dynamically by the application. Action routines can be
+    attached to the button, to run some processing during the state
+    change. See the CGI::MxScreen::Form::Button manpage for more
+    information.
+
+*   It has an object-oriented design. Each screen is an object inheriting
+    from `CGI::MxScreen::Screen' and redefining the `display' routine,
+    at least. There are also `enter' and `leave' hooks for each screen.
+    Each created screen object is made persistent accross the whole
+    session. See the CGI::MxScreen::Screen manpage for the full
+    interface.
+
+*   Any script output done before the screen's `display' routine is called
+    will be trapped and discarded (with logging showing the place where
+    such a violation occurs). This architecturally enforces proper
+    application behaviour. Furthermore, by default, the whole output is
+    buffered until it is time to save the context, thereby protecting
+    against further submits with a partially received form on the
+    browser side, and also strengthening the protection when the
+    application uses bounce exceptions to jump into another state.
+
+*   Each CGI parameter (form control) can be given an explicit storage
+    indication (i.e. how the application should dispose of the value), a
+    validation routine, and an on-the-fly patching routines (to
+    normalize values, for instance). Each parameter may also be given a
+    mandatory status, causing an error when it is not filled. See the
+    CGI::MxScreen::Form::Field manpage for more information.
+
+*   There is a global hash that is made available to all screens and which
+    is made persistent accross the whole session. By default, every key
+    access to that hash is checked to prevent typos, and reading an
+    unknown key is a fatal error (at run-time, unfortunately).
+
+*   There are layout hooks allowing the generation of a common preamble and
+    postamble section, common to a group of scripts. See the
+    CGI::MxScreen::Layout manpage for details.
+
+*   The framework can be configured by loading a configuration Perl script,
+    allowing easy sharing of the settings among a set of scripts, with
+    possible local superseding on a script basis. See the
+    CGI::MxScreen::Config manpage for details.
+
+*   All error logging is done via `Log::Agent', and application logging is
+    done via `Log::Agent::Logger', which ensures the maximum
+    flexibility. Logfile rotation is also supported via
+    `Log::Agent::Rotate'. Configuration of the various logging
+    parameters is done via the `CGI::MxScreen::Config' interface.
+
+*   `CGI::MxScreen' uses `Carp::Datum' internally. If you have chosen to
+    install a non-stripped version, you may trace parts of the module to
+    better understand what is going on with the various callbacks you
+    register.
+
+Here is a high-level description of the processing flow when issuing
+requests to a `CGI::MxScreen' script:
+
+*   An initial log tracing the user (if HTTP authentication is used), the
+    time since the session started, the elapsed time since the previous
+    display, and the CGI query string is emitted.
+
+*   The session context is retrieved if any, otherwise a new one is created.
+    The context holds the various screen objects, the submit buttons and
+    other form fields descriptions, plus all the other data stored
+    within the persistent global hash.
+
+*   Input parameters are processed, following the directives held within the
+    session to validate and optionally store them in some place. If an
+    error is detected, the application remains in the same state and the
+    previous screen is redisplayed.
+
+*   If no error occurred during parameter processing, the target state is
+    computed based on the descriptions attached to the button that was
+    pressed. The state can be given statically, or computed by a
+    routine. The determined target state is composed of a screen object,
+    plus some optional arguments that are to be given to its `display'
+    routine. Any processing action attached to the button is also run at
+    that point.
+
+*   The transition is logged, tracing the pressed button, the previous state
+    and the new one.
+
+*   If a screen change occurs (i.e. the new screen to display is not the
+    same as the previously displayed one), the `leave' routine is called
+    on the old screen and `enter' is called on the new one.
+
+*   The enclosing form setting is emitted, and the screen's `display'
+    routine is called to actually generate the form's content. Before
+    they output anything, screens are allowed to request the bouncing to
+    some other state, based on some local information (but if output
+    buffering is configured, any spurious output from the old screen
+    will be cleanly discarded). Any other exception that can occur
+    during `display' is trapped and cleanly logged, before displaying an
+    internal error message.
+
+*   The application context is saved, the form is closed, and buffered
+    output is emitted. A final log tracing the total time spent is
+    emitted.
+
+CGI::MxScreen's foundation were greatly inspired by Tom Christiansen's
+MxScreen program.  We would like to deeply thank Tom for having released
+his code in the first place.  We believe we have improved what Tom had
+informally expressed, both in terms of functionality and in terms of
+reusability, but that's what open-source is about.  Learn, and then give
+back.
+
+We're happy to give back that framework to the Perl community.
+
+-- Raphael Manfredi && Christophe Dehaudt
+

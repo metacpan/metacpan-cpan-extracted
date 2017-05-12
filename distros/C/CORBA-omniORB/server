@@ -1,0 +1,249 @@
+#!/usr/bin/perl -w
+
+use CORBA::omniORB ids => [ 'IDL:Bank:1.0' => undef ];
+
+my %counters = ();
+my @servers;
+
+my $poa;
+my $current;
+
+package PlainCounter;
+
+sub new {
+    my $class = shift;
+
+    my $count = 0;
+    my $self = bless \$count, $class;
+    $counters{$self} = $self;
+
+    $self;
+}
+
+sub next {
+    my $self = shift;
+    return (++$$self);
+}
+
+sub destroy {
+    my $self = shift;
+    $poa->deactivate_object ($poa->servant_to_id ($self));
+}
+
+package MyCounter;
+
+@MyCounter::ISA = qw(PlainCounter POA_Bank::AcctCounter);
+
+package MyServantActivator;
+
+@MyServantActivator::ISA = qw(POA_PortableServer::ServantActivator);
+
+sub new {
+    bless {}, shift;
+}
+
+sub incarnate {
+    my ($self, $oid, $adapter) = @_;
+
+    print "created counter!\n";
+    
+    new MyCounter;
+}
+
+sub etherealize {
+    my ($self, $oid, $adapter, $servant, $cleanup_in_progress, $remaining_activations) = @_;
+
+    delete $counters{$servant};
+    print "destroyed counter!\n";
+}
+
+package MyAccount;
+
+@MyAccount::ISA = qw(POA_Bank::Account);
+
+use Error qw(:try);
+
+sub new {
+    my ($class) = @_;
+    my $self = bless {}, $class;
+
+    $self->{current_balance} = 0;
+    $self->{prefs} = {
+		      favorite_color => 'burgundy',
+		      lottery_numbers => [ 1, 2, 3, 4],
+		      nickname => 'Sneezy'
+		     };
+    $self->{appearance} = [ map { [ (0..9) ] } 0..5 ];
+    $self->{something} = "";
+
+    $self;
+}
+
+sub set_pref {
+    my $self = shift;
+    my ($d, $v) = @{shift()};
+
+    if ($d eq "pt_color") {
+	$self->{prefs}->{favorite_color} = $v;
+    } elsif ($d eq "pt_lotnum") {
+	$self->{prefs}->{lottery_numbers} = $v;
+    } elsif ($d eq "pt_nickname") {
+	$self->{prefs}->{nickname} = $v;
+    }
+}
+
+sub get_pref {
+    my ($self,$d) = @_;
+
+    if ($d eq "pt_color") {
+	return [$d, $self->{prefs}->{favorite_color}];
+    } elsif ($d eq "pt_lotnum") {
+	return [$d, $self->{prefs}->{lottery_numbers}];
+    } elsif ($d eq "pt_nickname") {
+	return [$d, $self->{prefs}->{nickname}];
+    }
+}
+
+sub get_pref_any {
+    my ($self,$d) = @_;
+
+    if ($d eq "pt_color") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/Color:1.0'),
+			       $self->{prefs}->{favorite_color});
+    } elsif ($d eq "pt_lotnum") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/numbers:1.0'),
+			       $self->{prefs}->{lottery_numbers});
+    } elsif ($d eq "pt_nickname") {
+	return new CORBA::Any (CORBA::TypeCode->new('IDL:CORBA/String:1.0'),
+			       $self->{prefs}->{nickname});
+    }
+}
+
+sub get_da_struct {
+    my $self = shift;
+
+    my $res = {
+      lval => 17,
+      sval => "seventeen",
+      fval => "17.03",
+      enval => "da_enum_2",
+    };
+
+    
+    return new CORBA::Any (CORBA::TypeCode->new('IDL:Bank/Account/da_struct:1.0'), $res );
+}
+
+sub deposit {
+    my ($self,$amount) = @_;
+    $self->{current_balance} += $amount;
+}
+
+sub withdraw {
+    my ($self,$amount) = @_;
+
+    if ($amount > $self->{current_balance}) {
+	throw Bank::Account::InsufficientFunds
+	    overdraft => $amount - $self->{current_balance};
+	
+    } else {
+	$self->{current_balance} -= $amount;
+    }
+}
+
+sub balance {
+    $_[0]->{current_balance}
+};
+
+sub counter {
+    $poa->create_reference("IDL:Bank/AcctCounter:1.0");
+}
+
+sub add {
+    my ($self, $a, $b) = @_;
+    $a+$b;
+}
+
+# Possible alternative mapping
+#
+#sub prefs {
+#    ($self, $val) = @_;
+#    defined $val || return $self->{prefs};
+#    $self->{prefs} = $val;
+#}
+
+sub _set_appearance {
+    my ($self,$a) = @_;
+    $self->{appearance} = $a;
+}
+
+sub _get_appearance {
+    $_[0]->{appearance};
+}
+
+sub _get_prefs {
+    $_[0]->{prefs};
+}
+
+sub _set_prefs {
+    my ($self,$p) = @_;
+    $self->{prefs} = $p;
+}
+
+###
+sub set_new_get_old {
+    my ($self,$smth) = @_;
+    my $old = $self->{something};
+    $self->{something} = $$smth;
+    $$smth = $old;
+}
+
+package main;
+
+use Error qw(:try);
+
+$orb = CORBA::ORB_init("omniORB4");
+$root_poa = $orb->resolve_initial_references("RootPOA");
+$current = $orb->resolve_initial_references("POACurrent");
+
+#  # Create a sub-poa with a servant manager
+
+$poa = $root_poa->create_POA ("MyPOA", undef,
+ 			      request_processing => 'USE_SERVANT_MANAGER',
+ 			      implicit_activation => 'IMPLICIT_ACTIVATION');
+
+$manager = new MyServantActivator;
+$poa->set_servant_manager ($poa->servant_to_reference ($manager));
+
+# Or, we could use a default servant
+
+#$poa = $root_poa->create_POA ("MyPOA", undef,
+#			      request_processing => 'USE_DEFAULT_SERVANT');
+#
+#$counter = new MyCounter;
+#$poa->set_servant ($counter);
+
+
+# Create the main server object
+
+$servant = new MyAccount;
+push @servers, $servant;
+
+$id = $root_poa->activate_object ($servant);
+#$ref = $root_poa->id_to_reference ($id);
+#$ref = $root_poa->servant_to_reference ($servant);
+$ref = $root_poa->create_reference_with_id($id, $servant->_pomni_repoid);
+
+open (OUT, ">account.ref");
+print OUT $orb->object_to_string ($ref);
+close OUT;
+
+# Activate our POA's
+
+$root_poa->_get_the_POAManager->activate;
+$poa->_get_the_POAManager->activate;
+
+print "The daily maximum is: ", Bank::DAILY_MAX, "\n";
+
+$orb->run ();
+
+exit (0);			# Never reached

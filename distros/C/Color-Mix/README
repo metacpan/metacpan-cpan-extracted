@@ -1,0 +1,38 @@
+Color::Mix version 0.02
+=======================
+
+Color::Mix is a lightweight color scheme generator for Perl.
+
+This module allows you to generate a variety of different type
+color schemes Complementary, Double Complementary, Trinary
+and Analogous.
+
+The module can be used with hexadecimal RGB color codes or
+alternatively valid color names from the X11 color list.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+ 
+  Test::More
+  Test::Warn
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Lee Dalton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,11 @@
+Sat Jul 23 10:03:00 MST 2005
+- version 1.04
+
+Sat Sep 13 23:36:44 PDT 2008
+- added tests
+- added POD documentation to methods
+- version 1.05
+
+Tue Nov 25 14:43:45 PST 2008
+- tests now skipped if CGI::Session not installed
+- version 1.06

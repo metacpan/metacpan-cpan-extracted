@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+use 5.008005;
+use strict;
+use Getopt::Long      ();
+use Time::Elapsed     ();
+use CPANDB::Generator ();
+
+our $VERSION = '0.19';
+
+# Check params
+my $QUIET = 0;
+Getopt::Long::GetOptions(
+	'quiet' => \$QUIET,
+) or die("Failed to parse options");
+
+my $start  = time;
+my $cpandb = CPANDB::Generator->new(
+	trace => ! $QUIET,
+);
+$cpandb->run;
+
+my $elapsed = Time::Elapsed::elapsed(time - $start);
+print "Run completed in $elapsed\n";
+
+exit(0);

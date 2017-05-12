@@ -1,0 +1,27 @@
+Revision history for Catalyst-Action-FromPSGI
+
+0.001006  2014-08-04 20:59:58-05:00 America/Chicago
+  - Make streaming/deferal work by leveraging Catalyst from October 2013
+    (Thanks Thomas Sibley!)
+
+0.001005  2013-09-18 15:56:55 America/Chicago
+  - Fixed yet another psgi.input issue (thanks Wes Malone for finding this)
+
+0.001004  2013-07-12 23:41:13 CST6CDT
+  - Correctly set psgi.input (thanks Fitz Elliott for the test/bug report and
+    miyagawa for helping find the fix)
+
+0.001003  2013-06-13 19:15:03 CST6CDT
+  - abandon RT
+  - match trailing slashes when nesting (Fitz Elliott)
+
+0.001002  2013-05-13 14:26:54 CST6CDT
+  - fix terminology (PSGI is spec, Plack is impl)
+  - fix warning from Plack::App::URLMap
+
+0.001001  2012-11-17 16:43:57 CST6CDT
+  - Put MetaYAML back in dist
+
+0.001000  2012-06-24 17:48:55 America/Chicago
+  - Initial Release
+

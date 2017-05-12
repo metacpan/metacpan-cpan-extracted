@@ -1,0 +1,259 @@
+Revision history for Perl extension Catalyst::Model::DBIC::Schema
+
+0.65  2014-08-04 11:00:00
+        - Make compose_namespaces and install model shortcuts optional
+
+0.64  2014-07-22 23:00:00
+        - Fix Replicated trait that got busted when someone assumed
+          Module::Runtime was a drop in replacement for Class::MOP::load_class
+
+0.63  2014-05-05 22:56:43
+        - Make MooseX::MarkAsMethods a hard prerequisite (RT#94923)
+        - Fix t/08helper.t with Data::Dumper >= 2.151 (RT#94599)
+
+0.62  2014-01-06 12:32:27
+        - Don't ship MYMETA.* files (RT#91808)
+        - Stop using deprecated Class::MOP::load_module
+
+0.61  2013-06-19 12:48:34
+        - Fix test failure caused by hash randomisation in perl 5.17 (RT#82917)
+
+0.60  2012-06-12 16:27:00
+        - Add per_request_schema hook to PerRequestSchema trait and docs
+        - Additional paranoia in types as it's possible for loading code
+          to clobber $_
+
+0.59  2011-11-01 11:20:46
+        - update helper deps for new loader
+
+0.58  2011-10-25 19:19:43
+        - remove ->make_immutable from the PerRequestSchema trait
+
+0.57  2011-10-22 16:01:45
+        - add POD for PerRequestSchema trait
+
+0.56  2011-10-22 15:34:59
+        - add PerRequestSchema trait (t0m)
+
+0.55  Fri Sep 16 08:55:53 UTC 2011
+        - add DBD::SQLite to test_requires (RT#70357)
+
+0.54  Fri Aug  5 11:29:00 EDT 2011
+        - Changed t/08helper.t to skip if required features are not installed.
+        - tweaked the Makefile.PL to support these changes
+
+0.53  Wed Aug  3 03:45:07 UTC 2011
+        - check loader args after connect_info against loader methods and remove
+          them from connect_info
+
+0.52  Thu Jul 28 22:07:38 UTC 2011
+        - fix a bug in loader args reading after connect_info (skip structs)
+
+0.51  Wed Jul 27 20:57:47 UTC 2011
+        - warn when helper finds no tables
+        - accept loader args after connect_info
+
+0.50  Fri May 20 22:45:07 UTC 2011
+        - change repository link to the new git repo
+        - get t/05testapp.t to run on Win32
+
+0.49  Wed May 11 06:03:50 UTC 2011
+        - make sure storage_type class is loaded before ->isa check in
+          Replicated trait (RT#65791)
+        - fix regex stringification test for perl 5.14 (RT#68098)
+        - update connect_info POD (RT#66010)
+
+0.48  Thu Dec  9 21:08:33 UTC 2010
+        - fix usage of Try::Tiny in helper
+
+0.47  Wed Dec  8 22:21:06 UTC 2010
+        - fix loader version check
+
+0.46  Wed Dec  8 13:35:28 UTC 2010
+        - make use_moose detection more robust
+
+0.45  Wed Dec  8 12:05:58 UTC 2010
+        - fix bug where non-result files were picked up for Moose check
+
+0.44  Tue Dec  7 03:50:48 UTC 2010
+        - do not upgrade non-Moose schemas to use_moose=1 (RT#60558)
+        - added col_collision_map => 'column_%s' as default loader option
+          (will take effect on release of loader 0.07003)
+
+0.43  Sun Jul 25 01:00:34 UTC 2010
+        - add dep for MooseX::NonMoose for the use_moose=1 option
+
+0.42  Sat Jul 24 23:14:27 UTC 2010
+        - add use_moose=1 to loader options by default for create=static
+
+0.41  Wed Apr 28 08:42:13 EDT 2010
+        - allow configuring ResultSets using the SchemaProxy trait
+
+0.40  Wed Feb  3 23:12:16 EST 2010
+        - fix Replicated trait deps
+
+0.39  Mon Feb  1 10:08:51 EST 2010
+        - better 'on_connect_do' parsing in Helper
+
+0.38  Fri Jan 15 06:41:24 EST 2010
+        - re-add the 'storage' proxy method
+
+0.37  Thu Jan 14 10:20:43 EST 2010
+        - support single replicant hashref from config
+
+0.36  Thu Jan 14 09:21:10 EST 2010
+        - upgrading a schema to use_namespaces=1 will also turn on
+          components=InflateColumn::DateTime (the default.)
+
+0.35  Sun Dec 27 04:50:53 EST 2009
+        - forgot to edit Changes on last upload
+
+0.34  Sun Dec 27 03:49:34 EST 2009
+        - move schema proxying into SchemaProxy trait which is off by default
+
+0.33  Sat Dec 26 08:04:49 EST 2009
+        - fix test failure in 05testapp.t when env var not set (RT#53101)
+
+0.32  Wed Dec 23 01:22:06 EST 2009
+        - Move documentation on setting up authentication into its own section
+          for clarity.
+        - Other misc documentation enhancements to make the docs more clear
+          about the important things to know.
+        - Convert Authentication Plugin configuration example to new style.
+        - Support Coderefs in loader options for helper
+          (patch from Ozum Eldogan ozum@ozum.net)
+
+0.31  Sun Oct 18 18:50:00 BST 2009
+        - update for copyright info
+
+0.30  Sun Oct 18 01:35:36 EDT 2009
+        - change no sources error to a warning (with a way to turn it off)
+        - write connect_info to Model without a create= option as well
+
+0.29  Mon Sep  7 15:31:29 EDT 2009
+        - support for coderef connect_info's
+
+0.28  Thu Aug 27 08:14:05 EDT 2009
+        - autobox issues in dep chain, bump CX::Component::Traits dep
+        (caelum)
+
+0.27  Wed Aug 26 09:09:44 EDT 2009
+        - remove autobox usage due to reports of strange errors (caelum)
+        - make schema a delegate for model, config too (caelum)
+
+0.26  Wed Jul 29 16:16:09 PDT 2009
+        - fix loading connect_info from schema-defined connection
+          (bluefeet, RT 48084)
+        - detect wrong case for "dbi:" DSN part in DBIC helper (caelum)
+        - Fix missing dep on Catalyst::Helper that made tests fail
+          (wintrmute, RT 47449)
+
+0.25  Fri Jun 19 08:35:38 PDT 2009
+        - fix dep on Tie::IxHash that made tests fail
+        - add more attributes to ::Replicated trait
+        - fixed infinte loop in helper if SQLite connect_info has only
+          a DSN (dandv, RT #47101)
+
+0.24  Tue Jun 16 06:18:58 PDT 2009
+        - Add tests for issues with Class::C3 which are caused to
+          applications which use new Catalyst but old DBIC, and have
+          use Class::C3 in the MyApp class (t0m)
+        - die on empty schema
+        - create=dynamic deprecation warning
+        - helper passes loader opts to dynamic schemas
+        - conversion to Moose
+        - cursor caching support (via
+          Catalyst::TraitFor::Model::DBIC::Schema::Caching)
+        - ::Storage::Replicated support (via ::Replicated trait)
+        - switch to hashref connect_info for DBIC 8100
+        - better helper option parsing, with support for more options
+        - more tests
+
+0.23  Sun Mar  8 20:30:02 GMT 2009
+        - Kill a couple of warnings (one due to MRO::Compat)
+
+0.22  Tue Mar  3 15:54:19 UTC 2009
+        - Fix oddly formatted error message.
+        - Doc patch to clarify generated classes
+        - Switch to use_namespaces and InflateColumn::DateTime for create=static
+          by default, with backcompat
+        - Switch to MRO::Compat from NEXT
+        - Add support for extra Schema::Loader options such as db_schema and
+          components
+
+0.21  Fri Aug 22 00:26:05 UTC 2008
+        - doc fix (RT #31848)
+        - connection_info can be just the DSN instead of an arrayref
+
+0.20  Wed May 23, 2007
+        - Fix for rt.cpan.org #22426
+        - Switch to Module::Install
+        - Assorted small pod and cleanliness fixes
+        - Some requirements bumped to the latest maint
+          releases of the same major feature release
+
+0.18  Tue Aug  8 04:34:42 UTC 2006
+        - Version bump for public release, no functional change
+
+0.17_01 Thu Jul 27 01:06:13 UTC 2006
+        - Updated for DBIC 0.07
+
+0.16  Thu Jul  6 13:28:45 UTC 2006
+        - Bugfix for create=static and connect_info coderef snippets
+	- Be more verbose when connection_info is not set.
+
+0.15  Tue Jun  6 01:33:57 UTC 2006
+        - Fixed a serious bug in create=static usage
+        - Re-arranged output generation so that the more likely
+          failure to generate Schemas via create= will cause the
+          helper to abort before generating the Model class itself
+
+0.14  Mon Jun  5 23:34:35 UTC 2006
+        - Helpers merged, helper syntax changed
+        - Everything updated for Schema::Loader 0.03001 support, including
+          what amounts to using Loader in one-shot mode to generate
+          a manual Schema with matching Model.
+        - fixed stupid typo in docs
+
+0.13  Wed Apr 26 2006
+        - noted support via mailing lists
+
+0.12  Tue Apr 25 2006
+        - SYNOPSIS improved substantially to help newbies get started
+
+0.11  Sun Mar 26 17:22:31 UTC 2006
+        - Removed on_connect_do config setting (it was only out
+          in public for 4 days...).
+        - Support for on_connect_do and sql_maker options as part
+          of connect_info
+
+0.10  Wed Mar 22 07:06:02 UTC 2006
+        - Added on_connect_do config setting
+        - Added convenience method for ->schema->storage from paulm
+
+0.08  Tue Feb 28 00:04:16 UTC 2006
+        - Bumped D::C::Schema::Loader recommendation to 0.02003
+          (should have been done last release)
+        - Removed the ->require stuff added in 0.07, it doesn't
+          do what it is supposed to do.  For now, users can layer
+          at the Schema::Loader level rather than at Model.
+
+0.07  Sun Feb 19 21:50:18 UTC 2006
+        - bugfix for ::SchemaLoader::Foo password argument, and
+          switch to connect_info argument of new Schema::Loader
+        - Added ->require for source classes, so that you can
+          layer in lib/MyApp/Model/Foo/Bar.pm on top of the
+          generated MyApp::Model::Foo::Bar.
+
+0.06  Sat Feb 18 19:05:17 UTC 2006
+        - Fix simple pod-related bug introduced in last rev
+        - Added optional test that uses the helpers
+
+0.05  Fri Feb 17 20:52:21 UTC 2006
+        - Stop showing the template pod in pod tools and cpan,
+          per Gavin's email.
+        - Bump DBIx::Class pre-req to 0.05006, to prevent likely but
+          subtle issues under mod_perl engines.
+
+0.04  Mon Feb 13 04:22:49 UTC 2006
+        - First public release

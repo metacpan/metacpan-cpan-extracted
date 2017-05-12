@@ -1,0 +1,14 @@
+Revision history for Perl extension CLI::Gwrap
+
+Version 0.030 Mon Aug  5 12:51:56 PDT 2013
+    add exec_callback so we can use CLI::Gwrap directly in the script
+
+Version 0.029 Fri Jul 26 13:44:37 PDT 2013
+    fix a bunch of POD problems
+
+Version 0.027 Wed Jul 24 12:57:12 PDT 2013
+    add this Changes file
+
+Version 0.026 Wed Jul 24 12:51:12 PDT 2013
+    first release
+

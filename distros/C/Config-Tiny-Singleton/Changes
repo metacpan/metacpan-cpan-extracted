@@ -1,0 +1,9 @@
+Revision history for Perl extension Config::Tiny::Singleton.
+
+0.02  Sat Jun 25 02:15:00 2005
+	- fixed typo in pod
+
+0.01  Fri Jun 24 11:47:38 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Config::Tiny::Singleton
+

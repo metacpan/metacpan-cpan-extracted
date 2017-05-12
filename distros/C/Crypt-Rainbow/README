@@ -1,0 +1,32 @@
+Crypt::Rainbow
+==============
+
+Rainbow is 128-bit block cipher that accepts a 128-bit key. Designed by
+Chang-Hyi Lee and Jeong-Soo Kim of Samsung Advanced Institute of
+Technology, Rainbow is similar to the block ciphers Square and Shark.
+
+Rainbow was submitted as an AES candidate but was rejected because it
+was deemed not "complete and proper", based on the requirements
+specified by NIST in the Federal Register on September 12, 1997.
+
+BONUS
+
+The C file, _rainbow.c, is a standalone Rainbow implementation. To
+compile it, type:
+
+        gcc -Wall _rainbow.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque. Please read contact.html for
+details on how to contact the author.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

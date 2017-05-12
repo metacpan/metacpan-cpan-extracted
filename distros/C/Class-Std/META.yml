@@ -1,0 +1,35 @@
+---
+abstract: Support for creating standard "inside-out" classes
+author:
+  - 'Damian Conway <DCONWAY@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - OOP
+  - class
+  - object
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Std
+provides:
+  Class::Std:
+    file: lib/Class/Std.pm
+    version: 0.013
+  Class::Std::SCR:
+    file: lib/Class/Std.pm
+    version: 0.013
+requires:
+  Data::Dumper: 0
+  Scalar::Util: 0
+  Test::More: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/chorny/Class-Std
+version: 0.013

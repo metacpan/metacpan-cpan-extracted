@@ -1,0 +1,18 @@
+
+
+This perl-module contains functions that ease updating
+small text files, usually configuration files.
+It is easy to write small scripts that can do editing
+in 'batch mode', a necessary thing when updating *many*
+hosts at the same time.
+
+There is a simple program, update-cfe, that can be
+used in shell scripts for those who like that.
+(Sometimes update-cfe is enough to update a section
+in a file.)
+
+
+As the name suggests, cfe is modelled after the builtin editor
+in cfengine (a very nice program, but I like perl... :-).
+And it can only edit files, it can not do all the other stuff that
+cfengine does.

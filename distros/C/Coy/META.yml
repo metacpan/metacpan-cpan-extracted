@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Coy
+version:            0.06
+abstract:           Like Carp only prettier
+author:
+    - Damian Conway <dconway@cpan.org>
+    - Michael G Schwern <schwern@pobox.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Lingua::EN::Inflect:  1.89
+    perl:                 5.006001
+    Test::More:           0.47
+resources:
+    bugtracker:  http://rt.cpan.org/Public/Dist/Display.html?Name=Coy
+    homepage:    http://search.cpan.org/dist/Coy
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/schwern/coy/tree/master
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.51_04
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

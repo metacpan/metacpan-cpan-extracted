@@ -1,0 +1,19 @@
+
+<h2>child </h2>
+<form method="post" action="[% SCRIPT_NAME %]/child/">
+ <ul>
+  <li>
+   <label for="id_family">id_family</label>
+   <input type="hidden" id="[% model.id_family %]" name="id_family" value="[% model.id_family %]" />[% model.id_family %]
+  </li>
+  <li>
+   <label for="birthday">birthday</label>
+   <input type="text" id="birthday" name="birthday" value="[% model.birthday %]" />
+  </li>  <li>
+   <label for="name">name</label>
+   <input type="text" id="name" name="name" value="[% model.name %]" />
+  </li>
+ </ul>
+ <input type="submit" value="Add" />
+</form>
+ 

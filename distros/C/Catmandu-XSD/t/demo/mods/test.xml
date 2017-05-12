@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods version="3.3"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.loc.gov/mods/v3"
+    xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
+
+<genre authority="ugent">dissertation</genre>
+<classification authority="ugent" edition="publication-types">D1</classification>
+<titleInfo>
+    <title>Next generation bioreactor models for wastewater treatment systems by means of detailed combined modelling of mixing and biokinetics</title>
+</titleInfo>
+<name type="personal" ID="ug_802001229613">
+    <namePart type="given">Usman</namePart>
+    <namePart type="family">Rehman</namePart>
+    <role>
+        <roleTerm authority="marcrelator" type="code">aut</roleTerm>
+        <roleTerm type="text">author</roleTerm>
+    </role>
+    <affiliation>ug_LA10</affiliation>
+</name>
+<name type="personal" ID="ug_801001371090">
+    <namePart type="given">Ingmar</namePart>
+    <namePart type="family">Nopens</namePart>
+    <role>
+        <roleTerm type="text">promoter</roleTerm>
+    </role>
+    <affiliation>ug_LA10</affiliation>
+</name>
+<name type="personal" ID="ug_802001008533">
+    <namePart type="given">Youri</namePart>
+    <namePart type="family">Amerlinck</namePart>
+    <role>
+        <roleTerm type="text">promoter</roleTerm>
+    </role>
+    <affiliation>ug_LA10</affiliation>
+</name>
+<language>
+    <languageTerm authority="iso639-2b" type="code">eng</languageTerm>
+</language>
+<abstract>Wastewater treatment plants (WWTP) are needed to treat municipal wastewater to reduce the impact of pollutants on the environment and the ambient nature. The discharge of treated wastewater and the disposal of sludge from treatment plants treating domestic or industrial wastewater are subject to regulations imposed by the authorities. Moreover, during the wastewater treatment process greenhouse gas emissions are produced. These emissions from WWTPs are a matter of growing concern.
+The increased importance of wastewater treatment has led to development of mathematical models for optimization and design of wastewater treatment plants. WWTP modelling entails the modelling of the biological reactions (biokinetics) and underlying flow physics of the bioreactors (hydrodynamics). Currently, to model the hydrodynamics of a bioreactor, the tanks-in-series (TIS) modelling approach, which at best can model the flow variations in one direction, is widely used. These models assume a bioreactor as a series of completely mixed tanks and, hence, ignore any variation in the concentrations stemming from the design of a bioreactor or operational conditions. Therefore, these models eventually need rigorous calibration efforts to match measurements. This calibration is generally performed by manipulating kinetic parameters such as half saturation indices (K-values). The calibrated models are then used to assess or formulate different control strategies which includes the determination of an appropriate sensor location and a well-chosen setpoint for the controllers. In addition, the calibrated models are then extrapolated to predict the WWTP performance under different dynamic conditions (diurnal and dry/wet weather conditions) assuming that the flow patterns remain unchanged.  
+In this thesis, it is hypothesised and confirmed that the bioreactors are not at all completely mixed and, hence, current models wrongfully calibrate the kinetic parameters by correcting for the errors induced by the over-simplified modelling of mixing. Consequently, the need for re-calibration arises at different operational conditions due to the limitation of the current models to incorporate changes in operational conditions. 
+The thesis comprises of four parts. The first part provides the detailed account of CFD (computational fluid dynamics) modelling of WWTPs. Second part is about integration of CFD hydrodynamic models with the biokinetic models to evaluate the impact of mixing on the process performance. Third part is about model reduction, where detailed knowledge gained from the CFD-biokinetic modelling is used to develop simple but spatially localized compartmental model. The fourth part provides the insight about impact of mixing on the TIS model calibrations. 
+In the first part, detailed CFD hydrodynamic modelling of a bioreactor of Eindhoven WWTP is performed. The impact of reactor configuration and process conditions on gas dispersion is observed. Potential regions of poor mixing are identified. The different flow patterns are discussed in detail. Similarly, hydrodynamic modelling of an oxidation ditch (OD) of La Bisbal d’Empordà WWTP is performed. The OD is equipped with four surface aerators (rotors). The impact of 2-rotor and 4-rotor strategy on the flow patterns is observed and discussed in detail.
+In the second part, the CFD hydrodynamic model of Eindhoven WWTP is extended by integrating it with bio-kinetic models, firstly with ASM1 and secondly with ASMG1. The impact of local mixing conditions on the dissolved oxygen (DO) and ammonium concentrations is observed and described. Regions of poor mixing are observed and hence their impact on overall process heterogeneity is discussed. The impact of DO variations on the nitrous oxide concentrations is also observed and it is shown that low DO concentrations tend to increase the nitrous oxide production. Similarly, the OD is also extended with a bio-kinetic model i.e. the ASM1 model. It is observed that the surface aerators have an inherent operational limitation and the DO concentrations at the bottom are very low (nearly anoxic). 
+In the third part, the compartmental modelling (CM) was setup based on the DO concentrations using CFD-biokinetic model. A novel idea of cumulative species distribution (CSDs) to quantify the variations is introduced here as well. The CSDs serve as a decision support tool for the CM. A detailed stepwise procedure for the compartmentalisation is provided. Based on the procedure, the CMs are developed for both case studies. The CMs are also developed for different conditions and it is found that the CM network is different under varying conditions. Therefore, an idea of dynamic compartmental model is suggested at the end. Furthermore, this part also illustrates the impact of sensor location on the controller performance using a compartmental model. It is found that the controller’s performance highly depends on the sensor location and setpoint. An optimal sensor location can improve the effluent quality at reduced cost. 
+In the last part, the impact of mixing on a CSTR based model calibration is shown. It is shown that the TIS models predict different estimated values under different mixing conditions. Therefore, it is important to take into account the mixing conditions before performing calibrations. The impact of sensor locations on the TIS model calibrations is also shown. The TIS model calibrations vary significantly if the sensor location for data collection are changed. 
+It is concluded that this thesis has demonstrated the ability of CFD-biokinetic modelling to evaluate the process more accurately. Tthe derivation of a compartmental model has also provided the solution of high computational demands, commonly attributed to CFD modelling.</abstract>
+<subject>
+    <topic>Earth and Environmental Sciences</topic>
+</subject>
+<subject>
+    <topic>wastewater treatment modelling</topic>
+</subject>
+<subject>
+    <topic>Computational fluid dynamics</topic>
+</subject>
+<subject>
+    <topic>compartmental modelling</topic>
+</subject>
+<identifier type="hdl">http://hdl.handle.net/1854/LU-8109100</identifier>
+<identifier type="isbn">9789059899322</identifier>
+
+<originInfo>
+    <place>
+        <placeTerm>Ghent, Belgium</placeTerm>
+    </place>
+    <publisher>Ghent University. Faculty of Bioscience Engineering</publisher>
+    <dateIssued>2016</dateIssued>
+</originInfo>
+<accessCondition type="useAndReproduction">I have transferred the copyright for this publication to the publisher</accessCondition>
+<note type="venue">Gent : Faculteit Bio-ingenieurswetenschappen (A0.030)</note>
+<location>
+    <url displayLabel="PhD_thesis_final_version.pdf">https://biblio.ugent.be/publication/8109100/file/8109104</url>
+</location>
+<physicalDescription>
+    <internetMediaType>application/pdf</internetMediaType>
+</physicalDescription>
+<accessCondition type="restrictionOnAccess">restricted(changes to open on 2019-10-11)</accessCondition>
+<recordInfo>
+    <recordContentSource>ug</recordContentSource>
+    <recordIdentifier>8109100</recordIdentifier>
+    <recordCreationDate encoding="iso8601">2016-10-10T16:48:32Z</recordCreationDate>
+    <recordChangeDate encoding="iso8601">2016-10-11T09:14:43Z</recordChangeDate>
+</recordInfo>
+<extension type="pt">
+    <pubtype src="ug">D1</pubtype>
+</extension>
+
+</mods>

@@ -1,0 +1,14 @@
+Revision history for Perl extension Catalyst-View-MicroTemplate-DataSection
+
+0.03 2016-02-02T01:30:48Z
+    - include dependencies from cpanfile
+
+0.02 2015-09-28T14:23:14Z
+
+    - support multiple file encoding
+    - add documents (one file .psgi)
+
+0.01 2015-09-28T04:01:57Z
+
+    - original version
+

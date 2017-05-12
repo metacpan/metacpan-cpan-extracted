@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  47619:
+    - 155
+name: cbde
+registers:
+  AF: 6400
+  AF_: 0
+  BC: 36879
+  BC_: 0
+  DE: 54642
+  DE_: 0
+  HL: 47619
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

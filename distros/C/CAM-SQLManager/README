@@ -1,0 +1,43 @@
+CAM::SQLManager - Encapsulated SQL statements
+
+
+LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module.  Contact us at info@clotho.com.
+
+
+INSTALLATION
+
+Install via one of the following:
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+
+DESCRIPTION
+
+This package implements SQL templates.  This allows the programmer to
+increase the separation between the SQL RDBMS and the Perl programming
+logic of any project.  This package has features that make it
+particularly useful in a web environment, as it is quite easy to write
+a CGI program to allow testing and evalutation of the SQL templates.
+
+See CAM::SQLObject for a nice OO interface to database structures
+returned by the CAM::SQLManager XML queries.

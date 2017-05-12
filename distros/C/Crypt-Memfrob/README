@@ -1,0 +1,38 @@
+NAME
+    Crypt::Memfrob - memfrob implementation in pure Perl
+
+SYNOPSIS
+      use Crypt::Memfrob 'memfrob';
+      my $frobed = memfrob($str);
+
+DESCRIPTION
+    This package provides one function 'memfrob.' This is equivalent to the
+    memfrob function included in glibc. With this library, you can generate
+    glibc-compatible frobnicated (encrypted) strings, and defrobnicate
+    glibc-generated strings, in Perl.
+
+FUNCTIONS
+    memfrob
+        This function frobnicates given string and returns the result.
+
+FROBNICATION
+    This library is based on GNU libc 2.2.4. From memfrob(3):
+
+       The memfrob() function encrypts the first n bytes of the
+       memory areas by exclusive-ORing each character with the
+       number 42.  The effect can be reversed by using memfrob()
+       on the encrypted memory area.
+
+       Note that this function is not a proper encryption routine
+       as the XOR constant is fixed, and is only suitable for
+       hiding strings.
+
+SEE ALSO
+    memfrob(3).
+
+COPYRIGHT
+    Copyright 2001 Keiichiro Nagano <knagano@sodan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

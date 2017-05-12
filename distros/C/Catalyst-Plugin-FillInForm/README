@@ -1,0 +1,25 @@
+NAME
+    Catalyst::Plugin::FillInForm - FillInForm for Catalyst
+
+SYNOPSIS
+        use Catalyst 'FillInForm';
+
+        $c->fillform;
+
+DESCRIPTION
+  EXTENDED METHODS
+   finalize
+  METHODS
+   fillform
+    Fill form.
+
+SEE ALSO
+    Catalyst.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

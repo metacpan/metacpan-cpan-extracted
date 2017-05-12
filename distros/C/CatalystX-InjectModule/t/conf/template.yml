@@ -1,0 +1,11 @@
+name: MyApp
+
+CatalystX::InjectModule:
+  debug: 0
+  path:
+    - t/share/modulesX
+    - t/share/modules
+#    - __INC__
+  inject:
+    - Template
+  persistent_dir: t/var/

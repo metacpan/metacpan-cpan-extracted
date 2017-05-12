@@ -1,0 +1,107 @@
+NAME
+    Convert::MRC - CONVERT MRC TO TBX-BASIC
+
+VERSION
+    version 4.03
+
+SYNOPSIS
+            use strict;
+            use warnings;
+
+            my $converter = Convert::MRC->new;
+            $converter->input_fh('/path/to/MRC/file.mrc');
+            $converter->tbx_fh('/path/to/output/file.tbx');
+            $converter->log_fh('/path/to/log/file.log');
+            $converter->convert;
+
+DESCRIPTION
+  MRC
+    The MRC format is fully described in an article by Alan K. Melby which
+    appeared in Tradumatica
+    <http://www.ttt.org/tbx/AKMtradumaArticle-publishedVersion.pdf>. At an
+    approximation, it is a file of tab-separated rows, each consisting of an
+    ID, a data category, and a value to be stored for that category in the
+    object with the given ID. The file should be sorted on its first column.
+    If it is not, the converter may skip rows (if they are at too high a
+    level) or end processing early (if the order of A-rows, C-rows, and
+    R-rows is broken).
+
+  CONVERSION TO TBX-BASIC
+    This translator receives a file or list of files in this format and
+    emits TBX-Basic, a standard format for terminology interchange.
+    Incorrect or unusable input is skipped, with one exception, and the
+    problem is noted in a log file. The outputs generally have the same
+    filename as the inputs, and a suffix of .tbx and .warnings, but a number
+    may be added to the filename to ensure the output filenames are unique.
+
+    The exception noted is this: If the user documents a party responsible
+    for some change in the termbase, but does not state whether that party
+    is a person or an organization, the party will be included in the TBX as
+    a "respParty". This designation does not conform to the TBX-Basic
+    standard and will need to be changed (to "respPerson" or "respOrg")
+    before the file will validate. This is one of the circumstances in which
+    the converter will output invalid TBX-Basic.
+
+    The other circumstance is that a file might not contain a definition, a
+    part of speech, or a context sentence for some term, or might not
+    contain a term itself. The converter detects these and warns about them,
+    but there is no way it could fix them. It does not detect or warn about
+    concepts containing no langSet or langSets containing no term, but these
+    are also invalid.
+
+NAME
+    Convert::MRC- Perl extension for converting MRC files into TBX-Basic.
+
+METHODS
+  "new"
+    Creates and returns a new instance of Convert::MRC.
+
+  "tbx_fh"
+    Optional argument: string file path or GLOB
+
+    Sets and/or returns the file handle used to print the converted TBX.
+
+  "log_fh"
+    Optional argument: string file path or GLOB
+
+    Sets and/or returns the file handle used to log any messages.
+
+  "input_fh"
+    Optional argument: string file path or GLOB; '-' means STDIN
+
+    Sets and/or returns the file handle used to read the MRC data from.
+
+  "batch"
+    Processes each of the input files, printing the converted TBX file to a
+    file with the same name and the suffix ".tbx". Warnings are also printed
+    to a file with the same name and the suffix ".log".
+
+  "convert"
+    Converts the input MRC data into TBX-Basic:
+
+    * Reading MRC data from "input_fh"
+
+    * Printing TBX-Basic data to "tbx_fh"
+
+    * Logging messages to "log_fh"
+
+SEE ALSO
+    * The homepage for this program is located here
+      <http://tbxconvert.gevterm.net/mrc2tbx/index.html>. You can use it
+      online (one file at a time), and can also view a tutorial about MRC
+      files.
+
+    * A more in-depth look at MRC can be found in this article
+      <http://www.ttt.org/tbx/AKMtradumaArticle-publishedVersion.pdf>.
+
+    * General TBX iformation can be found here <http://www.ttt.org/tbx>.
+
+AUTHOR
+    Nathan Rasmussen, Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Alan K. Melby.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

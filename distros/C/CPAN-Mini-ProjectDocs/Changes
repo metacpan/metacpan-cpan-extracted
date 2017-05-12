@@ -1,0 +1,53 @@
+commit 76fe863d27e897154fa82d4e3601fadbba1df5a1 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Feb 16 01:39:33 2009 +0100
+
+    CHANGED: made elinks the default text browser
+
+commit 226c8ba6c78a02017cdb74ccadd285f0db6e1969
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Feb 16 01:24:18 2009 +0100
+
+    CHANGED: module description
+
+commit 15217fbb39bbbeecffc1e08d43a6705ae0e9cd37
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Feb 16 01:17:50 2009 +0100
+
+    FIXED: set the HTML document title properly
+
+commit 9b8739efdf29fde2c45229e418f2e025640fbfcd
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Feb 16 00:50:01 2009 +0100
+
+    ADDED: pure html index generation
+
+commit 47131bef5476252b622ea3e4ec653d140128dc19
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Feb 14 14:02:35 2009 +0100
+
+    CHANGED: can not have -b and -s simulteanously
+
+commit b35dc9e5b9d119ae4f5183fd97eec8c9612256c8
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Feb 14 12:37:36 2009 +0100
+
+    CHANGED: moved core code to module
+
+commit 275ba1aefb2ffe42378ae93216bda86e9830ca00
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Feb 14 11:24:15 2009 +0100
+
+    CHANGED: refactored script
+
+commit 8c1ed4c1e169e91d0b999b8317d95be81f11587c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Feb 14 01:03:00 2009 +0100
+
+    ADDED: --browser option
+
+commit 7623955ecdba833a082ebbde962f4b13ca699fe2
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Feb 14 00:43:03 2009 +0100
+
+    ADDED: Initial commit

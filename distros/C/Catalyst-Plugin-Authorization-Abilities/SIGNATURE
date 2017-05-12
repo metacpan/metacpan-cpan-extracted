@@ -1,0 +1,110 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 44e4b1fadaf1354340d6cf9145a24cae8908b5eb Changes
+SHA1 923e30715ea029a358c4a9c18024efec1228ac80 INSTALL
+SHA1 d38085d38a0d811f563a79af5ca3594c53b9d948 LICENSE
+SHA1 0a1f5394ec0cf8628cabb25c07f40b3bf049edc1 MANIFEST
+SHA1 86bf0a0d9007d82bb807ab2ef6b0d374edac0da9 MANIFEST.SKIP
+SHA1 78dc5e750c47d4180f39e2770d68d29a0523d993 META.json
+SHA1 12a10710e89c7c8ac234a8915d66c29a47efd227 META.yml
+SHA1 c8d0bb174eab572ab6a6437e97139e97706adf09 Makefile.PL
+SHA1 ef7a2f29b42cc5dbf0b26d9b28f6cce2c54190b3 README
+SHA1 81b72d25d6d18298804d73bbfffdc5f9681ff359 dist.ini
+SHA1 937f0d2e80478c70a39800bc2ee7a87fc5282ea3 lib/Catalyst/Plugin/Authorization/Abilities.pm
+SHA1 ce976f9eed96e4d48d2e99075b72f9f0fb4164c5 t/00-load.t
+SHA1 c8b18630f48c71d55e24e2a720da73842c7ac781 t/01-schema.t
+SHA1 c3919925b3461f7c356e431bd76443d79f99dae5 t/02-abilities.t
+SHA1 18db83e79d8f797c4c0ac70565f2dd1d0a142355 t/META.yml
+SHA1 395de488bc1a35815e4e3ea660a94d79507cc56a t/Makefile.PL
+SHA1 8e14135c9273943e6c9f0d5dc8932815bafda4d5 t/README
+SHA1 a88868c04ec4740bde86d72eb735a1ecac00586b t/conf/abilities.yml
+SHA1 d7e9808c308173e3a3a95a53a291dfc386549c6d t/lib/MyApp.pm
+SHA1 b1d948c02d27b5f22701189f653c2de22b903e07 t/lib/MyApp/Controller/Admin.pm
+SHA1 2a62d30fecd024245ee04bc1fc7ea00bbde7b2fd t/lib/MyApp/Controller/Admin/Action.pm
+SHA1 7d92983eaea2406a5f295544fea14dacaacccbd5 t/lib/MyApp/Controller/Admin/Role.pm
+SHA1 abf43bce909569331670983bad69cc92a7a70edf t/lib/MyApp/Controller/Admin/User.pm
+SHA1 d72a8a36956bfff88adec25c42a3afd1aaf76a59 t/lib/MyApp/Controller/Root.pm
+SHA1 d4ba4099bf2c8d74730d49298a6a20c5b68f719b t/lib/MyApp/Model/DBIC.pm
+SHA1 f0d44c0738484e2fb6cd8f19504aeb1b42c2512f t/lib/MyApp/Model/DBIC.pm.new
+SHA1 3b4dd1b040d7df55e7fd87368d290eb084b41876 t/lib/MyApp/View/TT.pm
+SHA1 cb0add800291a9a87a20534e1a560a45747f586d t/lib/Schema/Abilities.pm
+SHA1 7821e2bb6bf42e7f9115339761aa399e0e95d9ad t/lib/Schema/Abilities/Result/Action.pm
+SHA1 36b087a502408a7443ccad322af1944d32cd0887 t/lib/Schema/Abilities/Result/Role.pm
+SHA1 c798ec2c6b26abd9acb91103c7d41f17d8f17bc7 t/lib/Schema/Abilities/Result/RoleAction.pm
+SHA1 ac55748c1f668eb271c5358eaaaeea1725113ce7 t/lib/Schema/Abilities/Result/RoleRole.pm
+SHA1 cf8f03d448e0b9709d674aa27322f8613bd113da t/lib/Schema/Abilities/Result/User.pm
+SHA1 832bf7d9f89b383bdc7ee7b9e33d3ce2894bfae2 t/lib/Schema/Abilities/Result/UserAction.pm
+SHA1 163cb301275d8980808853db5185eaf0c1c2d083 t/lib/Schema/Abilities/Result/UserRole.pm
+SHA1 34bd144c93129a2be3ff0d396a14fb1e1131f455 t/lib/Schema/Utils.pm
+SHA1 bdf979252a45793cf8adb185c3776073e50fd42e t/myapp.yml
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+SHA1 6970bc48e7234cf17d8eecdfe84dff097996f047 t/root/favicon.ico
+SHA1 37711bc68af33b8d612f503c861b004fa973b8de t/root/lib/config/col
+SHA1 5dd117ada18f5d37d303b21e8b5888aab6a69099 t/root/lib/config/main
+SHA1 1faef5a9722505794c5df6be5edfe87716030eb1 t/root/lib/config/url
+SHA1 b4211180c1403f65eaf58173b0eb95c4e5b3e86a t/root/lib/site/footer
+SHA1 bd604c1474972f4618d9aee5f4bd81191d1459f1 t/root/lib/site/header
+SHA1 933bc4efbba48350f4910b9095d28ce7c1b00cd6 t/root/lib/site/html
+SHA1 edc6972bb843fc42d65f93a3a7b3eaf1bf6bb35b t/root/lib/site/layout
+SHA1 c7aa392871aba0edcb3a215b0b3d78bef2568834 t/root/lib/site/wrapper
+SHA1 6874899af0c2e95497cc4ab2bed68cf0e2e48414 t/root/src/admin/action/add_action.tt
+SHA1 f765762c39344f792ee4bf812471728ac0230b8e t/root/src/admin/action/edit_action.tt
+SHA1 cac448b57b78873b7b93de5bfb4552892427a661 t/root/src/admin/action/list_action.tt
+SHA1 38bfdc55efc2d32d1634356bab5a5b72c8af8df1 t/root/src/admin/action/view_action.tt
+SHA1 793e22219d00eb661b25ed700c2c895462946b1b t/root/src/admin/index.tt
+SHA1 920ee5c515da8f6cd0b13f31f443ed4ecd640be2 t/root/src/admin/role/add_role.tt
+SHA1 a99c9a7df18aeed44c9c30595f91060438afa191 t/root/src/admin/role/del_role.tt
+SHA1 4da55b5f5a2b5863af8d9fb8383e7f3b53feb8ce t/root/src/admin/role/edit_role.tt
+SHA1 87288b4b277275e80771bce7db9ec9cc314218af t/root/src/admin/role/index.tt
+SHA1 ce5cd093c39fc28f721cfafd7ebd4ea78192e5c7 t/root/src/admin/role/list_role.tt
+SHA1 b463d715330b28f62d13b269bd80e5fd726374e9 t/root/src/admin/role/view_role.tt
+SHA1 b5c94d8620eea1d630b2a4375024d494011e1f8f t/root/src/admin/user/add_user.tt
+SHA1 02396e5894c10b740bd48427824b8b3d4dfa93a1 t/root/src/admin/user/del_user.tt
+SHA1 6810b861de6e78465423db8fb43fe01cc6e08d5f t/root/src/admin/user/edit_user.tt
+SHA1 09e8073c38ffab585027cc8d6374cd60251dce98 t/root/src/admin/user/list_user.tt
+SHA1 752a44b4f416b3d0584f3f791b1749aa7e91d305 t/root/src/admin/user/view_user.tt
+SHA1 4ab2cd3a5860b33068d7494106135e21607d051e t/root/src/error.tt2
+SHA1 1cee780596560a34c6be3eb17e06ef88e2157cb7 t/root/src/index.tt
+SHA1 257b986556472c9a3f68c3dbe4b7eb1faf41622f t/root/src/message.tt2
+SHA1 016e25046aa24be780546227b32e86a2d3f8bd21 t/root/src/show_user.tt
+SHA1 831987a445032a56742f5f07ffb6e470c2f309f6 t/root/src/ttsite.css
+SHA1 c4405c4331672d4dff4346695ab6473609703957 t/root/src/welcome.tt2
+SHA1 cb6adfa77eccab38cb4a4ff918910be77f6c86da t/root/static/css/blueprint/ie.css
+SHA1 69df6bba4e3de453a89f34ee76c4331b1d07f0e7 t/root/static/css/blueprint/plugins/buttons/readme.txt
+SHA1 f3f0224a99e9635c0c5491735aac49927fe2c599 t/root/static/css/blueprint/plugins/buttons/screen.css
+SHA1 18895dd7572dc40c046d00a665c3360cc06fa2e1 t/root/static/css/blueprint/plugins/fancy-type/readme.txt
+SHA1 7d4b6bd315a0756370a0b59b2b7ecee0a75432be t/root/static/css/blueprint/plugins/fancy-type/screen.css
+SHA1 e64c08ae33e1ca31ea7e430ffe28cb4dad26ab2d t/root/static/css/blueprint/print.css
+SHA1 3d5de1b1a60e3de609b80e260184112dcaedd818 t/root/static/css/blueprint/screen.css
+SHA1 9d78a50749bd098e7ee99f4cfb8d28eab3c77cca t/root/static/css/formfu.css
+SHA1 a54e44499f7b408c6c58c209ed08fa14c07b2b7c t/root/static/images/icons/cross.png
+SHA1 d0a90047653afcdac85171e6b34d599538b89773 t/root/static/images/icons/tick.png
+SHA1 86493936e77a9ad6e603d794ca3d0de6a2776d1a t/script/myapp_cgi.pl
+SHA1 3e583d7352aa8ba0bc3af67fe1bbb83d15f0df77 t/script/myapp_create.pl
+SHA1 657c432d8374763d239d5b67a5a94deb072bf897 t/script/myapp_fastcgi.pl
+SHA1 babd64efa0dfe868b105ef47728978ef4be59a56 t/script/myapp_server.pl
+SHA1 d576ce08340444ef8cbb164bb6bc385ab73ce6a0 t/script/myapp_test.pl
+SHA1 d08a4513640f64b4f0fc7b1da808020cc554b1c1 t/script/version_schema.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+iF4EAREIAAYFAlBI81gACgkQa4OHQAFM10c6wAD/WjR9aJy/ULn4sBfXeda1Qd7m
+WZZMEZGBL8xEwxGDBakBAJiFECg+WbsOHl3hZRf+wamSaKQM9Tb7rARm6/7RpJrF
+=DSvO
+-----END PGP SIGNATURE-----

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/CSS/Minifier.pm
+t/CSS-Minifier.t
+t/sheets/s2.css
+t/sheets/s2-expected.css
+t/sheets/s3.css
+t/sheets/s3-expected.css
+META.yml                                 Module meta-data (added by MakeMaker)

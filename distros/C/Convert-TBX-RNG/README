@@ -1,0 +1,60 @@
+NAME
+    Convert::TBX::RNG - Create an RNG to validate a TBX dialect
+
+VERSION
+    version 0.04
+
+DESCRIPTION
+    This module creates RNG files for validating TBX dialects. Currently,
+    the user can generate RNG using XCS files, but in the future there may
+    be functionality for tweaking the core structure.
+
+SYNOPSIS
+    use Convert::TBX::RNG qw(generate_rng);
+    my $rng = generate_rng(xcs_file => '/path/to/xcs');
+    print $$rng;
+METHODS
+  "generate_rng"
+    Creates an RNG representation of this dialect and returns it in a string
+    pointer.
+
+    Currently one argument is requried: "xcs_file", which specifies the
+    location of an XCS file which defines the desired dialect.
+
+  "core_structure_rng"
+    Returns a pointer to a string containing the TBX core structure (version
+    2) RNG. This RNG file has been edited to make processing by this module
+    easier, but it still properly validates the core structure of a TBX
+    file.
+
+GOTCHAS
+    RNG does not validate IDREF attributes, unlike DTD. Therefore, you will
+    not be able to check that target attributes refer to actual IDs within
+    the file.
+
+    Most of the functionality of the produced RNG files matches the TBX
+    Checker exactly; however, some features remain unimplemented in the
+    TBXChecker, and so behavior may not always match.
+
+FUTURE WORK
+    Currently, nothing is done to check the validity of ref objects; the RNG
+    validates only their core structure.
+
+    In the future we may provide functionality to tweak the TBX core
+    structure.
+
+SEE ALSO
+    Other features and documentation to help validate TBX documents can be
+    found on our gitHub <https://github.com/byutrg/TBX-Spec> page.
+
+    1;
+
+AUTHOR
+    Nathan Glenn <garfieldnate@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Alan K. Melby.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,7 @@
+Changes
+lib/CGI/ParamComposite.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/CGI-ParamComposite.t

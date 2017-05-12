@@ -1,0 +1,12 @@
+<PUBLIC:PROPERTY NAME="speed" />
+<PUBLIC:METHOD NAME="blink_it" />
+<PUBLIC:ATTACH event="oncontentready" handler="init_blinking" />
+<SCRIPT>
+function blink_it() {
+	this.style.visibility = this.style.visibility=="" ? "hidden" : ""
+}
+function init_blinking() {
+	if (!speed) speed=500
+	setInterval(uniqueID+".blink_it()",speed)
+}
+</SCRIPT>

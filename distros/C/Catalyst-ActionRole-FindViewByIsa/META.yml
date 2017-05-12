@@ -1,0 +1,30 @@
+---
+abstract: 'Select from the available application views by type'
+author:
+  - 'Tomas Doran (t0m), C<< <bobtfish@bobtfish.net> >>'
+build_requires:
+  Catalyst::Action::RenderView: 0
+  Catalyst::Controller::ActionRole: 0
+  Catalyst::Runtime: 5.80
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-ActionRole-FindViewByIsa
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose::Role: 0
+  namespace::autoclean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bobtfish/catalyst-actionrole-findviewbyisa
+version: 0.000003

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Catalyst-Plugin-Twitter
+version:             0.01
+abstract:            ~
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Catalyst:                      0
+    Data::Dumper:                  0
+    Net::Twitter:                  0
+    Sub::Override:                 0
+    Test::WWW::Mechanize::Catalyst: 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

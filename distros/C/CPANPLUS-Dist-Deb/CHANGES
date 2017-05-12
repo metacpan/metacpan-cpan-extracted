@@ -1,0 +1,60 @@
+Changes for 0.12        Fri May  8 12:35:57 2009
+================================================
+*   We were using an internal deprecated module from CPANPLUS 
+    directly, which has been removed in the latest stable release.
+    Since the module provided no needed functionality, the use
+    statement has simple been removed.
+    Users of CPANPLUS 0.85_01 and later should upgrade to this
+    release.
+
+Changes for 0.10        Fri Oct 19 15:26:42 2007
+================================================
+*   Promote 0.09_01 to stable.
+
+Changes for 0.09_01     Fri Oct 19 15:09:44 2007
+================================================
+*   Make $dist->create adhere to the 'keep_source' option,
+    if provided, as reminded by Andreas Marienborg. This
+    means that cpan2dist --keepsource will now work as
+    expected.
+
+Changes for 0.08        Sat Jul  7 11:35:34 2007
+================================================
+*   Address #27562 (A way to specify external dependencies would be
+    grand) by supporting the new metafile munge callback as supported 
+    by CPANPLUS > 0.81.
+*   Constify the DEB spec version
+
+Changes for 0.06        Sun Jun 17 14:21:15 2007
+================================================
+*   Address #27558 - setting deb_version=2 does not promote 
+    a rebuild of a package. --deb_version=X wasn't being
+    passed around properly.
+*   Fix file clean up regex    
+*   Fix uninit variable warning
+*   Package names with a '+' caused errors in deb-genchanges;
+    substituted to '-'
+
+Chnages for 0.05        Sun Aug 13 15:28:48 2006
+================================================
+*   small changes to make tests pass without warnings if
+    there are no signature checking modules installed
+*   Up CPANPLUS prerequisite to 0.061
+
+Changes for 0.04        Wed Mar 15 16:09:03 2006
+================================================
+*   use Package::Constants to list constants
+*   documentation improvements
+*   add heuristics what versions of prereqs
+    to depend on rather than just assuming
+    CPAN most recent
+*   Due to a bug in module::build we need to
+    remove the .packlist from their installations
+    (see rt bug #18162)
+*   Make sure the first letter of the 'pool' dir
+    is from the package name, not the module name
+
+
+Changes for 0.03_01     Sun Oct 16 13:09:17 2005
+================================================
+*   First public beta  release of CPANPLUS::Dist::Deb

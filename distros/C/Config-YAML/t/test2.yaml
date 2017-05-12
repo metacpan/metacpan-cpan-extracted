@@ -1,0 +1,6 @@
+--- #YAML:1.0
+nuval: 1
+clobber: 2
+media:
+  - ogg
+  - mp3

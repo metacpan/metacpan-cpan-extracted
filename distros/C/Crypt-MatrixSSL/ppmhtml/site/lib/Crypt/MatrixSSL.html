@@ -1,0 +1,273 @@
+<?xml version="1.0" ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0017)http://localhost/ -->
+<script language="JavaScript" src="../../../displayToc.js"></script>
+<script language="JavaScript" src="../../../tocParas.js"></script>
+<script language="JavaScript" src="../../../tocTab.js"></script>
+<link rel="stylesheet" type="text/css" href="../../../scineplex.css">
+<title>Crypt::MatrixSSL - Perl extension for SSL and TLS using MatrixSSL.org</title>
+<link rel="stylesheet" href="../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<script>writelinks('__top__',3);</script>
+<h1><a>Crypt::MatrixSSL - Perl extension for SSL and TLS using MatrixSSL.org</a></h1>
+<p><a name="__index__"></a></p>
+
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#export">EXPORT</a></li>
+		<ul>
+
+			<li><a href="#functions_exported_by_default">FUNCTIONS EXPORTED BY DEFAULT</a></li>
+			<li><a href="#constants_exported_by_default">CONSTANTS EXPORTED BY DEFAULT</a></li>
+			<li><a href="#hashes_export_by_default">HASHES EXPORT BY DEFAULT</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Crypt::MatrixSSL - Perl extension for SSL and TLS using MatrixSSL.org</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Crypt::MatrixSSL</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="comment"># 1. See the MatrixSSL documentation.</span>
+  <span class="comment"># 2. See scripts included in this package:</span>
+  <span class="comment">#     sample_ssl_client.pl</span>
+  <span class="comment">#     sample_ssl_server.pl</span>
+  <span class="comment">#     sample_functions.pl</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Crypt::MatrixSSL lets you use the MatrixSSL crypto library (see
+<a href="http://matrixssl.org/)">http://matrixssl.org/)</a> from Perl.  With this module, you will be
+able to easily write SSL and TLS client and server programs.</p>
+<p>MatrixSSL includes everything you need, all in under 50KB.</p>
+<p>You will need a &quot;C&quot; compiler to build this, unless you're getting
+the &quot;.ppm&quot; prebuilt Win32 version.  Crypt::MatrixSSL builds cleanly
+on (at least) Windows, Linux, and Macintosh machines.</p>
+<p>MatrixSSL is an Open Source (GNU Public License) product, and is
+also available commercially if you need freedom from GNU rules.</p>
+<p>Everything you need is included here, but check the MatrixSSL.org
+web site to make sure you've got the latest version of the 
+MatrixSSL &quot;C&quot; code if you like (it's in the directory &quot;./matrixssl&quot;
+of this package if you want to replace the included version from
+the MatrixSSL.org download site.)</p>
+<p>
+</p>
+<h2><a name="export">EXPORT</a></h2>
+<p>
+</p>
+<h3><a name="functions_exported_by_default">FUNCTIONS EXPORTED BY DEFAULT</a></h3>
+<p>See MatrixSSL documentations about these functions. This documentation will
+describe only differences between original C interface provided by MatrixSSL
+and Perl interface provided by this module (see below).</p>
+<pre>
+ matrixSslOpen()
+ matrixSslClose()
+ matrixSslReadKeys()
+ matrixSslReadKeysMem()
+ matrixSslFreeKeys()
+ matrixSslNewSession()
+ matrixSslDeleteSession()
+ matrixSslDecode()
+ matrixSslEncode()
+ matrixSslEncodeClosureAlert()
+ matrixSslEncodeClientHello()
+ matrixSslEncodeHelloRequest()
+ matrixSslSetSessionOption()
+ matrixSslHandshakeIsComplete()
+ matrixSslGetSessionId()
+ matrixSslFreeSessionId()
+ matrixSslSetCertValidator()
+ matrixSslGetAnonStatus()
+ matrixSslAssignNewKeys()
+ matrixSslSetResumptionFlag()
+ matrixSslGetResumptionFlag()</pre>
+<p>
+</p>
+<h3><a name="constants_exported_by_default">CONSTANTS EXPORTED BY DEFAULT</a></h3>
+<p>Return code in user validation callback:</p>
+<pre>
+ $SSL_ALLOW_ANON_CONNECTION</pre>
+<p>Max size for message in matrixSslEncode():</p>
+<pre>
+ $SSL_MAX_PLAINTEXT_LEN</pre>
+<p>Flags for matrixSslNewSession():</p>
+<pre>
+ $SSL_FLAGS_SERVER
+ $SSL_FLAGS_CLIENT_AUTH</pre>
+<p>Options for matrixSslSetSessionOption():</p>
+<pre>
+ $SSL_OPTION_DELETE_SESSION</pre>
+<p><a href="#matrixssldecode"><code>matrixSslDecode()</code></a> return values:</p>
+<pre>
+ $SSL_SUCCESS
+ $SSL_ERROR
+ $SSL_FULL
+ $SSL_PARTIAL
+ $SSL_SEND_RESPONSE
+ $SSL_PROCESS_DATA
+ $SSL_ALERT
+ $SSL_FILE_NOT_FOUND
+ $SSL_MEM_ERROR</pre>
+<p><a href="#matrixssldecode"><code>matrixSslDecode()</code></a> alertLevel:</p>
+<pre>
+ $SSL_ALERT_LEVEL_WARNING
+ $SSL_ALERT_LEVEL_FATAL</pre>
+<p><a href="#matrixssldecode"><code>matrixSslDecode()</code></a> alertDescription:</p>
+<pre>
+ $SSL_ALERT_CLOSE_NOTIFY
+ $SSL_ALERT_UNEXPECTED_MESSAGE
+ $SSL_ALERT_BAD_RECORD_MAC
+ $SSL_ALERT_DECOMPRESSION_FAILURE
+ $SSL_ALERT_HANDSHAKE_FAILURE
+ $SSL_ALERT_NO_CERTIFICATE
+ $SSL_ALERT_BAD_CERTIFICATE
+ $SSL_ALERT_UNSUPPORTED_CERTIFICATE
+ $SSL_ALERT_CERTIFICATE_REVOKED
+ $SSL_ALERT_CERTIFICATE_EXPIRED
+ $SSL_ALERT_CERTIFICATE_UNKNOWN
+ $SSL_ALERT_ILLEGAL_PARAMETER</pre>
+<p>
+</p>
+<h3><a name="hashes_export_by_default">HASHES EXPORT BY DEFAULT</a></h3>
+<pre>
+ %SSL_alertLevel
+ %SSL_alertDescription</pre>
+<p>
+</p>
+<hr />
+<h1><a name="functions">FUNCTIONS</a></h1>
+<dl>
+<dt><strong><a name="matrixssldecode" class="item"><strong>matrixSslDecode</strong>( $ssl, $inBuf, $outBuf, $error, $alertLevel, $alertDescription )</a></strong></dt>
+
+<dd>
+<p>$inBuf and $outBuf are usual string scalars, not (sslBuf_t *) as in C interface.</p>
+<p>After succesfull decoding one packet, <a href="#matrixssldecode"><code>matrixSslDecode()</code></a> will cut decoded
+packet from $inBuf's beginning.</p>
+<p>Reply SSL packets or application data will be appended to $outBuf, if any.</p>
+<p>To convert error/alert codes into text use exported hashes:</p>
+<pre>
+ <span class="variable">$SSL_alertDescription</span><span class="operator">{</span> <span class="variable">$error</span> <span class="operator">}</span>
+ <span class="variable">$SSL_alertLevel</span><span class="operator">{</span> <span class="variable">$alertLevel</span> <span class="operator">}</span>
+ <span class="variable">$SSL_alertDescription</span><span class="operator">{</span> <span class="variable">$alertDescription</span> <span class="operator">}</span>
+</pre>
+</dd>
+<dt><strong><a name="matrixsslencode" class="item"><strong>matrixSslEncode</strong>( $ssl, $inBuf, $outBuf )</a></strong></dt>
+
+<dt><strong><a name="matrixsslencodeclosurealert" class="item"><strong>matrixSslEncodeClosureAlert</strong>( $ssl, $outBuf )</a></strong></dt>
+
+<dt><strong><a name="matrixsslencodeclienthello" class="item"><strong>matrixSslEncodeClientHello</strong>( $ssl, $outBuf, $cipherSuite )</a></strong></dt>
+
+<dt><strong><a name="matrixsslencodehellorequest" class="item"><strong>matrixSslEncodeHelloRequest</strong>( $ssl, $outBuf )</a></strong></dt>
+
+<dd>
+<p>$outBuf in all matrixSslEncode* functions is usual string scalar,
+not (sslBuf_t *) as in C interface.</p>
+<p>Encoded SSL packet will be appended to $outBuf.</p>
+<p>If you need to <a href="#matrixsslencode"><code>matrixSslEncode()</code></a> huge $inBuf, then you should split $inBuf
+into strings with size &lt;= $SSL_MAX_PLAINTEXT_LEN and call <a href="#matrixsslencode"><code>matrixSslEncode()</code></a>
+for each of these strings. If you don't do this <a href="#matrixsslencode"><code>matrixSslEncode()</code></a> will return
+one of these errors: $SSL_ERROR, $SSL_FULL or <a href="#matrixssldecode"><code>matrixSslDecode()</code></a> on other side
+will return $SSL_ERROR.</p>
+</dd>
+<dt><strong><a name="matrixsslsetcertvalidator" class="item"><strong>matrixSslSetCertValidator</strong>( $ssl, \&amp;cb, $cb_arg )</a></strong></dt>
+
+<dd>
+<p>While interface of this function is same as in C, there some important notes
+about perl callback \&amp;cb. Perl callback will be called with two scalar params:
+$certInfo and $cb_arg - just like in C.</p>
+<p>But $certInfo instead of (sslCertInfo_t *) will contain reference to array
+with certificates. Each certificate will be hash in this format:</p>
+<pre>
+ <span class="string">verified</span>       <span class="operator">=&gt;</span> <span class="variable">$verified</span><span class="operator">,</span>
+ <span class="string">notBefore</span>      <span class="operator">=&gt;</span> <span class="variable">$notBefore</span><span class="operator">,</span>
+ <span class="string">notAfter</span>       <span class="operator">=&gt;</span> <span class="variable">$notAfter</span><span class="operator">,</span>
+ <span class="string">subjectAltName</span> <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">dns</span>             <span class="operator">=&gt;</span> <span class="variable">$dns</span><span class="operator">,</span>
+                <span class="string">uri</span>             <span class="operator">=&gt;</span> <span class="variable">$uri</span><span class="operator">,</span>
+                <span class="string">email</span>           <span class="operator">=&gt;</span> <span class="variable">$email</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+ <span class="string">subject</span>        <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">country</span>         <span class="operator">=&gt;</span> <span class="variable">$country</span><span class="operator">,</span>
+                <span class="string">state</span>           <span class="operator">=&gt;</span> <span class="variable">$state</span><span class="operator">,</span>
+                <span class="string">locality</span>        <span class="operator">=&gt;</span> <span class="variable">$locality</span><span class="operator">,</span>
+                <span class="string">organization</span>    <span class="operator">=&gt;</span> <span class="variable">$organization</span><span class="operator">,</span>
+                <span class="string">orgUnit</span>         <span class="operator">=&gt;</span> <span class="variable">$orgUnit</span><span class="operator">,</span>
+                <span class="string">commonName</span>      <span class="operator">=&gt;</span> <span class="variable">$commonName</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+ <span class="string">issuer</span>         <span class="operator">=&gt;</span> <span class="operator">{</span>
+                <span class="string">country</span>         <span class="operator">=&gt;</span> <span class="variable">$country</span><span class="operator">,</span>
+                <span class="string">state</span>           <span class="operator">=&gt;</span> <span class="variable">$state</span><span class="operator">,</span>
+                <span class="string">locality</span>        <span class="operator">=&gt;</span> <span class="variable">$locality</span><span class="operator">,</span>
+                <span class="string">organization</span>    <span class="operator">=&gt;</span> <span class="variable">$organization</span><span class="operator">,</span>
+                <span class="string">orgUnit</span>         <span class="operator">=&gt;</span> <span class="variable">$orgUnit</span><span class="operator">,</span>
+                <span class="string">commonName</span>      <span class="operator">=&gt;</span> <span class="variable">$commonName</span><span class="operator">,</span>
+                <span class="operator">}</span><span class="operator">,</span>
+</pre>
+<p>This callback must return single scalar with integer value (as described in
+MatrixSSL documentation). If callback <a href="../../../lib/pods/perlfunc.html#die"><code>die()</code></a>, then warning will be printed,
+and execution will continue assuming callback returned -1.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="http://www.MatrixSSL.org">http://www.MatrixSSL.org</a> - the download from this site includes
+simple yet comprehensive documentation in PDF format.</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>C. N. Drake, &lt;<a href="mailto:christopher@pobox.com">christopher@pobox.com</a>&gt;
+Alex Efros</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>MatrixSSL is distrubed under the GNU Public License:-
+<a href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</a></p>
+<p>Crypt::MatrixSSL uses MatrixSSL, and so inherits the same License.</p>
+<p>Copyright (C) 2005 by C. N. Drake.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.</p>
+
+</body>
+
+</html>

@@ -1,0 +1,257 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Crypt::Keyczar::Tool;
+use Crypt::Keyczar::FileWriter;
+use Getopt::Long;
+
+
+my $method = shift;
+my $location;
+my $purpose;
+my $status;
+my $destination;
+my $name;
+my $size;
+my $version;
+my $asymmetric;
+my $type;
+my $rc = GetOptions('location=s' => \$location,
+                    'purpose=s' => \$purpose,
+                    'status=s' => \$status,
+                    'name=s' => \$name,
+                    'size=i' => \$size,
+                    'version=i' => \$version,
+                    'destination=s' => \$destination,
+                    'type=s' => \$type,
+                    'asymmetric:s' => \$asymmetric);
+
+exit show_usage() if !$method || !$rc;
+
+my $writer = Crypt::Keyczar::FileWriter->new();
+my $app = Crypt::Keyczar::Tool->new($writer);
+
+if ($method eq 'create') {
+    exit show_usage() if !$location || !$purpose;
+    $app->create($location, $purpose, { name => $name, asymmetric => $asymmetric, type => $type });
+    exit 0;
+}
+elsif ($method eq 'addkey') {
+    exit show_usage() if !$location;
+    $app->addkey($location, $status, { size => $size });
+    exit 0;
+}
+elsif ($method =~ /^(?:promote|demote|revoke)$/) {
+    exit show_usage() if !$location || !defined $version;
+    $app->$method($location, $version);
+    exit 0;
+}
+elsif ($method eq 'pubkey') {
+    exit show_usage() if !$location || !defined $destination;
+    $app->pubkey($location, $destination);
+    exit 0;
+}
+elsif ($method eq 'usekey') {
+    my $message = shift @ARGV;
+    exit show_usage() if !$location || !defined $message;
+    $app->usekey($location, $message, $destination, {});
+    exit 0;
+}
+else {
+    exit show_usage();
+}
+
+
+sub show_usage {
+    print <<__USAGE__;
+Usage: keyczar COMMAND OPTIONS
+       keyczar create  --location=/path/to/keyset --purpose=[sign | crypt] [--name=NAME] [--asymmetric[=TYPE]] [--type=TYPE]
+       keyczar addkey  --location=/path/to/keyset [--status=primary]
+       keyczar promote --location=/path/to/keyset --version=NUMBER
+       keyczar demote  --location=/path/to/keyset --version=NUMBER
+       keyczar revoke  --location=/path/to/keyset --version=NUMBER
+       keyczar pubkey  --location=/path/to/keyset --destination=/path/to/public-keyset
+       keyczar usekey  --location=/path/to/keyset [--destination=/path/to/output]
+__USAGE__
+    return 0;
+}
+__END__
+
+=head1 NAME
+
+keyczar - Command line tool for generating Keyczar key files.
+
+=head1 SYNOPSIS
+
+  $ keyczar create --location=/path/to/your/crypt-keyset --purpose=crypt
+  $ keyczar addkey --location=/path/to/your/crypt-keyset
+
+  $ keyczar create --location=/path/to/your/sign-keyset --purpose=sign
+  $ keyczar addkey --location=/path/to/your/sign-keyset
+  $ keyczar addkey --location=/path/to/your/sign-keyset --status=primary
+
+  $ keyczar pubkey --location=/path/to/your/asymmetric-keyset --destination=/path/to/public-keyset
+
+  $ keyczar usekey --location=/path/to/your/keyset
+
+=head1 DESCRIPTION
+
+All Keyczar keys are generated with the B<keyczar> command line tool. The following commands are supported:
+
+=over 4
+
+* create
+
+create a new key store.
+
+* addkey
+
+add new key to existing store.
+
+* promote
+
+promote status of a key version in existing store.
+
+* demote
+
+demote status of a key version in existing store.
+
+* revoke
+
+revoke key version in existing store.
+
+* pubkey
+
+export a public key set from existing private key store.
+* usekey
+
+encrypt or sing by primary key.
+
+=back 4
+
+=head1 OPTIONS
+
+=head2 create
+
+B<keyczar> must first create a new keyset using the B<create> command. A newly created keyset will initially contain just a metadata file.
+B<create> commmand requires B<--location> and B<--purpose> command-line flags that specify the location of the key set and its purpose. Valid purpose are currently B<crypt> and B<sign>. The create command may also take an optional B<--name> flag to give a newly created keyset a name.
+
+Some example create commands:
+
+=over 4
+
+* Create a symmetric signing (HMAC) keyset:
+
+C<keyczar create --location=/path/to/keyset --purpose=sign>
+
+* Create a symmetric signing (HMAC-SHA256) keyset:
+
+C<keyczar create --location=/path/to/keyset --purpose=sign --type=HMAC_SHA256>
+
+* Create a symmetric crypting (AES) keyset named "Test":
+
+C<keyczar create --location=/path/to/keyset --purpose=crypt --name=Test>
+
+* Create a asymmetric crypting (RSA) keyset:
+
+C<keyczar create --location=/path/to/keyset --purpose=crypt --asymmetric>
+
+* Create a asymmetric signing (DSA) keyset:
+
+C<keyczar create --location=/path/to/keyset --purpose=sign --asymmetric>
+
+* Create a asymmetric signing (RSA) keyset:
+
+C<keyczar create --location=/path/to/keyset --purpose=sign --asymmetric=rsa>
+
+=back 4
+
+=head2 addkey
+
+All Keyczar keys are created using the B<addkey> command. This command requires a keyset B<--location> flag and may optionally have B<--status>, B<--crypter>, and B<--size> flags. B<--status> values they are I<primary>, I<active>, and I<inactive>. The default status is I<active>. User-specified key sizes are supported, although it is recommended that only default or larger key sizes are used.
+The B<addkey> command will create a new file in the keyset directory with an integer version number that is one greater than the currently largest version. For example, if the current keyset contains the key file B<1>, a new key version will be created in the file B<2>.
+Some example addkey commands:
+
+=over 4
+
+* Create a new primary key:
+
+C<keyczar addkey --locaiton=/path/to/keyset --status=primary>
+
+* Create a new active key:
+
+C<keyczar addkey --location=/path/to/keyset>
+
+=back 4
+
+=head2 promote, demote, and revoke
+
+The B<promote>, B<demote>, and B<revoke> commands are used to change key status values. Each of these commands require a B<--location> and B<--version> flag.
+Promoting an I<active> key will raise its status to I<primary>, and promoting an I<inactive> status will make it I<primary>. There can only be a single I<primary> key in given key set.
+Similarly, B<demote> will lower a I<primary> key to I<active>, and an I<active> key to I<inactive>. The B<revoke> command will only work for I<inactive> status values. The B<revoke> command will permenantly delete key material, so should be used with caution.
+Some example B<promote>, B<demote>, and B<revoke> commands. Suppose that key version 1 initially has an I<active> status:
+
+=over 4
+
+* Promote I<active> version 1 to I<primary>:
+
+C<keyczar promote --location=/path/to/keyset --version=1>
+
+* Demote I<primary> version 1 back to I<active>:
+
+C<keyczar demote --location=/path/to/keyset --version=1>
+
+* Demote I<active> version 1 to I<inactive>:
+
+C<keyczar demote --location=/path/to/keyset --version=1>
+
+* Revoke the I<inactive> version 1:
+
+C<keyczar revoke --location=/path/to/keyset --version=1>
+
+=back 4
+
+=head2 pubkey
+
+Create and exports public key files to given B<--destination> based on private key set at given B<--location>. Some example addkey commands:
+
+=over 4
+
+* Export public keyset from existing asymmetric key store:
+
+C<keyczar pubkey --location=/path/to/keyset --destination=/path/to/public-keyset>
+
+=back 4
+
+=head1 SUPPORT KEYSTORE TYPE
+
+The B<keyczar> command can operate the file based keysets. 
+
+=head1 SEE ALSO
+
+L<Crypt::Keyczar>,
+L<Crypt::Keyczar::Crypter>,
+L<Crypt::Keyczar::Signer>,
+L<Crypt::Keyczar::FileReader>,
+L<http://www.keyczar.org/>
+
+=head1 AUTHOR
+
+Hiroyuki OYAMA <oyama@mixi.co.jp>
+
+=head1 LICENSE
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+#
+# Author: Mohammad S Anwar (mohammad.anwar@yahoo.com)
+# Distribution: CPANTS::Kwalitee::Report v0.05.
+
+package KwaliteeReport;
+
+use CPANTS::Kwalitee::Report;
+use Moo;
+use namespace::clean;
+use MooX::Options;
+
+has 'reporter' => (is => 'rw', default => sub { CPANTS::Kwalitee::Report->new });
+
+option 'dist'                    => (is => 'ro', order => 1, format => 's', doc => 'Distribution name to generate Kwalitee report.');
+option 'metrics'                 => (is => 'ro', order => 2, doc => 'Show CPANTS Kwalitee metrics.');
+option 'recently_uploaded_dists' => (is => 'ro', order => 3, doc => 'Lookup recently uploaded distributions.');
+option 'n'                       => (is => 'ro', order => 4, format => 'i', default => sub { 5 }, doc => 'Distribution count to generate Kwalitee report. Default is 5.');
+option 'verbose'                 => (is => 'ro', order => 5, doc => 'Be more descriptive. Default is OFF.');
+
+sub BUILD {
+    my ($self) = @_;
+
+    unless ($self->metrics) {
+        unless ($self->recently_uploaded_dists || $self->dist) {
+            die "ERROR: Missing option --recently_uploaded_dists or --dist.\n";
+        }
+    }
+
+    if ($self->verbose) {
+        $self->reporter->verbose($self->verbose);
+    }
+}
+
+sub run {
+    my ($self) = @_;
+
+    if ($self->metrics) {
+        print sprintf("%s\n\n", join("\n", @{$self->reporter->get_generators}));
+    }
+    else {
+        my $scores = {};
+        if ($self->recently_uploaded_dists) {
+            my $dists = $self->reporter->recently_uploaded_distributions($self->n);
+            foreach my $dist (@$dists) {
+                $scores->{$dist->name} = $self->reporter->scores($dist->name);
+            }
+        }
+        elsif ($self->dist) {
+            $scores->{$self->dist} = $self->reporter->scores($self->dist);
+        }
+
+        print join "\n------\n", (values %$scores);
+    }
+}
+
+package main;
+
+KwaliteeReport->new_with_options->run;

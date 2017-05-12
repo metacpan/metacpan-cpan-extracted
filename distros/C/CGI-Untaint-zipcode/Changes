@@ -1,0 +1,10 @@
+Revision history for Perl extension CGI::Untaint::zipcode.
+
+0.02  Wed Feb  11
+        - fixed typo in POD;
+        my $zipcode = $handler->extract( -as_zipcode => 'zip' );
+	was originally "my $url" (ah, the pitfalls of cut-and-paste)
+
+0.01  Fri Feb  6 21:50:37 2004
+	- original version; created by h2xs 1.19
+

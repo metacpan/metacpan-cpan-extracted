@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Country-Codes.t
+lib/Country/Codes.pm

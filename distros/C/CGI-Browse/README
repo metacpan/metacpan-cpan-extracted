@@ -1,0 +1,33 @@
+CGI-Browse version 1.0.0
+
+CGI-Browse creates a browsable HTML list of data based on a field list-of-hashes and a SQL statement.
+
+The package includes working scripts and data, which should be copied to cgi-bin for testing or further development.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+DBI
+DBIx::MySperqlOO
+Class::Std
+Class::Std::Utils
+
+AUTHORS  
+                
+Roger Hall (roger@iosea.com), (rahall2@ualr.edu)
+Michael Bauer (mbkodos@gmail.com), (mabauer@ualr.edu) 
+
+COPYRIGHT AND LICENSE
+
+Copyleft (C) 2009, Roger A Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

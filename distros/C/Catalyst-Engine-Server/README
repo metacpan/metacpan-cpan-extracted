@@ -1,0 +1,36 @@
+NAME
+    Catalyst::Engine::Server - Catalyst Server Engine *DEPRECATED*
+
+SYNOPSIS
+    A script using the Catalyst::Engine::Server module might look like:
+
+        #!/usr/bin/perl -w
+
+        BEGIN {  $ENV{CATALYST_ENGINE} = 'Server' }
+
+        use strict;
+        use lib '/path/to/MyApp/lib';
+        use MyApp;
+
+        MyApp->run;
+
+DESCRIPTION
+  DEPRECATED
+
+    This module is no longer recommended, and does not work correctly with
+    latest versions of Catalyst. Please use Catalyst::Engine::HTTP, which is
+    included in the main Catalyst distribution.
+
+TODO
+    Make HTTP/1.1 optional.
+
+SEE ALSO
+    Catalyst, Catalyst::Engine, Catalyst::Engine::Server::PreFork.
+
+AUTHOR
+    Christian Hansen, `ch@ngmedia.com'
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

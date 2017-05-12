@@ -1,0 +1,12 @@
+Revision history for Perl extension Catalyst::Plugin::Cache::Memcached::Fast.
+
+0.13 Wed, Sep 30, 2009
+	- Minor changes
+
+0.11 Sun Oct  5 18:14:17 2008
+	- Fixed dependency
+
+0.1  Sat Oct  4 21:38:35 2008
+	- original version; created by h2xs 1.23 with options
+		-AX -n Catalyst::Plugin::Cache::Memcached::Fast -v 0.1
+

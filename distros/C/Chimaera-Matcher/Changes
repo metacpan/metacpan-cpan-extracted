@@ -1,0 +1,23 @@
+Revision history for Chimaera
+
+1.01    2015-10-08
+        Fixed the Manifest to actually include the module 
+
+1.00    2015-10-08
+        Added code and tests to ensure that the constructor throws an exception 
+        if the two haplotypes supplied are identical.
+        Added a test to ensure that possible_chimaera() reports
+        false if there is a mismatch between test sequence and the supplied
+        haplotype sequences.
+        Added code and tests to ensure that test sequences identical to one
+        or other haplotype are NOT reported as possible chimaeric sequences.
+        Removed a debugging print statement that had got left in the code by
+        mistake.
+
+0.02    2015-04-21
+        Minor changes. Altered comparisons to ignore case and added
+        a test to check that. Internal use only, never released.
+
+0.01    2015-04-20
+        First version, internal use only, never released.
+

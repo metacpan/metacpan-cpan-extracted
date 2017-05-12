@@ -1,0 +1,5 @@
+0.01 2012-12-27
+  - First release
+
+0.02 2013-12-6
+  - Fix failing tests due to undeclared test deps. RT #90078. Thanks to ANDK for reporting

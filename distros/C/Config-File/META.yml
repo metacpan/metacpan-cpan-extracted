@@ -1,0 +1,21 @@
+---
+name: Config-File
+version: 1.50
+author:
+  - 'Gunnar Wolf <gwolf@gwolf.org>'
+abstract: Parse a simple configuration file
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  Module::Build: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Config::File:
+    file: lib/Config/File.pm
+    version: 1.50
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

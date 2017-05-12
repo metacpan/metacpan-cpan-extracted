@@ -1,0 +1,40 @@
+
+# The _id field will be the directory name of our bagit
+copy_field(_identifier,bag._id)
+replace_all(bag._id,'[^a-zA-Z0-9]+','/')
+
+# Next we add a bit of Dublin Core to the bag
+copy_field(title,bag.tags.DC-Title)
+join_field(bag.tags.DC-Title,' ')
+
+copy_field(description,bag.tags.DC-Description)
+join_field(bag.tags.DC-Description,' ')
+
+copy_field(creator,bag.tags.DC-Creator)
+join_field(bag.tags.DC-Creator,' ')
+
+copy_field(identifier,bag.tags.DC-Identifier)
+join_field(bag.tags.DC-Identifier,' ')
+
+copy_field(rights,bag.tags.DC-Rights)
+join_field(bag.tags.DC-Rights,' ')
+
+# In Bielefeld PUB the fulltext download is contained in the identifier field
+# works for multiple files
+do list(path:identifier, var:loop)
+  if all_match(loop, 'download')
+    copy_field(loop,tmp.0)
+    copy_field(loop,tmp.1)
+    replace_all(tmp.1,'.*/','data/')
+    hash(tmp)
+    copy_field(tmp,bag.fetch.$append)
+    remove_field(tmp)
+  end
+end
+
+
+# Now we have all the data, delete the rest
+retain_field(bag)
+
+# Move all the bag fields into the root as required by Catmandu::BagIt
+move_field(bag,'')

@@ -1,0 +1,286 @@
+- iframe can be used to preserve caching (as can ajax of course)
+	just use iframe/ajax for your parts that need user-specific info
+	think about that in regards to cache::static
+
+- if hmc.pm is already installed, and then we build w/ -x=hmc,
+	the old hmc.pm is still there, causing problems!
+
+- make test fails w/o root b/c /usr/local/Cache-Static can't be created
+        use a different root in test scripts
+
+- steal good ideas from memcached, write up differences on scache webpage
+	http://www.danga.com/memcached/
+	example code: http://us2.php.net/memcache
+
+- think about hooks for Class::DBI, will be easier than DBI deps although
+	less used... also DBIx::Class
+
+- don't parse sql yerself... see sql::statement:
+  http://kobesearch.cpan.org/htdocs/SQL-Statement/SQL/Statement.html
+
+- t/filedep test 6 "get if same after set and dep touch" fails on mac os x
+
+- add config opt. for default perms (and user/group if poss., so root run
+	doesn't cause perm probs like with Comma docs)...
+
+- add a hook to install static-cache-cleanup.pl in Makefile.PL
+
+- allow for interactive prompting of modules to include/exclude
+	(in fact, do this unless we got a -x= on the cmd line) so we can
+	run from CPAN and not think about what we want enabled and the
+	syntax for doing it on the cmdline
+
+- API and docs for non-HTML::Mason usage
+
+- ./t/filedep.t doesn't clean up /tmp/Cache-Static-test/ after itself,
+	and should be using mktemp anyway
+
+- more .pod documentation for sub-modules, etc.
+
+- we don't detect the error of 
+	"_XML::Comma|Store|Post|main|$id"
+	(that should be Doc, not Store - detect by the number of pipes in the spec)
+
+- t/dbi.t fails with server in dsn (it's ok if we omit 127.0.0.1 tho)
+  see svn diff between dbi.t in revs. 599 and 603
+  http://chronicle.allafrica.com/svnweb/index.cgi/allafrica/log/trunk/Cache-Static/t/dbi.t
+
+- a bug: when we change a depended upon component, we don't check
+	the filemod time? or perhaps we aren't checking down the tree?
+		(note: i have no idea what this refers to, or if it still
+		exists. maybe it was something in hmc.pm?)
+
+- if there is no config file, do we keep trying to load it in?
+
+-- API should not force you to call most of the it's making you call...
+new API:
+	init
+	make_key (optional)
+	get_if_same
+	set
+in gis/set:
+	$key = make_key($key) unless($key isa Cache::Static::Key);
+you should get the same results regardless of if you called make_key,
+but calling make_key and saving the results saves you one MD5 lookup
+	(think about memoization tho)
+ALSO - it'd be nice to have the deps encoded in the key object too (?)
+THINK: do we want to expose is_same?
+every other function should be underscored!!!
+
+-- get a better solution for permission stuff.
+making everything 777/666 is not right.
+plus all the extra chmod calls (which are slow and a race condition)
+is there umask in perl? YES, see perldoc -f umask
+
+-- lock around set (EXCL) / get (LOCK_SH)
+  actually, need to lock around basically everything in HMU::cache_it...
+  but this should not be hacked in, should be an API level change...
+  get_if_same_or_lock() ... set() ?
+  probably do this:
+  get_if_same():
+    take an optional lock argument (default to what conf says)
+  set():
+    if there is a lock, clear it.
+  problem:
+    we need to pass a filehandle back to inherit the lock.
+    or we could save it globally somewheres?
+
+pseudo code:
+
+get_if_same:
+
+if(!defined(is_same(...))) {
+  if(my $FH = open_with_flock(LOCK_EX, block => 0)) {
+    $cache::static::_curr_locked_FH = $FH;
+  } else {
+    #wait until it's been set, then return it
+    open_with_flock(LOCK_SH, block => 1);
+    return get(...);
+  }
+} else {
+   return get(...);
+}
+
+set:
+my $FH = $cache::static::_curr_locked_FH || open(...);
+
+...
+close($FH);
+
+an optimization idea stolen from the lighthttpd folks:
+  (http://www.lighttpd.net/documentation/performance.html)
+		stat() cache
+
+		A stat(2) can be expensive; caching it saves time and context switches.
+
+		Instead of using stat() every time to check for the existence of a file 
+		you can stat() it once and monitor the directory the file is in for 
+		modifications. As long as the directory doesn't change, the files in it 
+		must all still be the same.
+
+		With the help of FAM or gamin you can use kernel events to assure that 
+		your stat cache is up to date.
+
+		server.stat-cache-engine = "fam"   # either fam, simple or disabled
+	granted, they are talking about the context of httpd serving static
+	pages, but it could still cut down on our number of stat calls by a
+	large factor in the common case...
+
+next up:
+in the case where you allow old results:
+  before writing, copy the cache file "$f" to "$f.bak"
+  any get_if_same() during that time reads "$f.bak"
+
+  when done, remove "$f.bak" (this results in race condition in reader:
+    1 - find the file locked, try the .bak file
+    2 - .bak file is removed, goto 1
+  OR have a crontab that runs e.g. hourly to clean up .bak files...
+
+
+  start the lock when generation starts, remove the lock when new value
+  has been set
+situation:
+  refresh of key K takes 30 seconds.
+  every 5 seconds, we get a hit.
+  this means we regenerate 6 times, when we only needed to do it once.
+  this is slower by half on average and takes 6* the resources.
+solution:
+  if we have fcntl:
+  exclusive lock while writing to the file
+  all attempts to read will block on the initial thread.
+  that's all.
+
+-- TODO: think - when is the right time to reload the config files?
+  right now we keep them loaded forever... which is ok, but there
+  should be some signal...
+
+-- dbi.t:
+exec this shit first:
+  drop database scache_test_db;
+  create database scache_test_db;
+  use scache_test_db;
+  create table test_table ( test_field1 TINYINT, test_field2 TINYINT );
+
+-- think about using a non-standard depend to parse the SQL code:
+http://www.perl.com/pub/a/2006/01/05/parsing.html
+http://perlmonks.org/index.pl?node_id=472684
+http://search.cpan.org/perldoc/SQL::Statement
+http://search.cpan.org/perldoc/SQL::Parser
+( SQL::Statement uses SQL::Parser )
+
+-- DBI implementation TODO:
+column level depends "DBI|column|$dsn|$tablename|$columname"
+row depends "DBI|row|$dsn|$tablename|$uid_column_name|$uid_value"
+	NOTE: don't have to do the hard work of figuring out where
+	the primary key is - let the programmer do that - for two reasons:
+		- 1: it's non-sensical/unclear to specify a uid_value without
+		     saying where it comes from
+		- 2: it's hard
+how to do row depends:
+	WORM - it's ok for a write to be expensive. so before exec(), do a
+	select primary_key_name from table_name where $WHERE_CLAUSE
+	then update those timestamps.
+	this implies we need a list of table -> primary key mappings
+		somewhere (we can try to get fancy and autodetect later)
+seperate out prepare()
+what about SELECT expressions, etc. that have
+	side-effects? for now, caveat emptor...
+	auto-increment just used at row create time (not read time).
+	actually i think we're ok except for triggers...
+also parsing, we need to watch out for compound statements (aka 
+	procedures)
+	http://dev.mysql.com/doc/refman/5.0/en/stored-procedure-syntax.html
+
+-- it'd be nice to add a config value for a threshold above which
+   items are compressed, e.g. 250k
+
+-- writing .dep file should be optional, controlled by a config time 
+   option
+-- implement a similar store which dumps friendly key name & conf time
+   option for it
+
+-- HTML_Mason_Util:
+ - cache component compile stuff for non-top-level depends
+		find the list of nodes that have changed.
+		save the tree and just update the children of those nodes
+		this requires saving a tree structure, not merely an array, to disk
+ - think about $m->comp() and $m->scomp() (currently unrecognized)
+ - configurability:
+   unrecognized_html_mason_dependency_returns => 0
+      (inherit from unrecognized_dependency_returns)
+   html_mason_recurse_levels => -1 (unlimited)
+      (disable with 0, or specify number of times to recurse)
+ - think about components that have content
+... it'd be nice to also depend on the relevant autohandlers too ...
+
+-- cleanup:
+ - use a TEST namespace for t/*.t in TEST.pm
+ - _DBI|... vs. DBI|... specs
+	is there a similar problem with XML_Comma vs. _XML_Comma ?
+ - permission handling on directories - making them all 777 is probably
+	not what we want...
+
+-- test suite
+finish tests:
+	test namespace overrides and init(), rebase(), etc. behavior
+	dbi tests should try to create db/table if they don't exist...
+	? dbi tests should look for a config file (from previous install) ?
+	html-mason-util.t (use HTML::Mason::Tests, hmc)
+	xml-comma-util.t
+	misc.t (_log... makekey, md5path, etc... misc from Static.pm)
+
+-- read old/write asynchronous option
+
+-- cleanup:
+extension/wrapper thing could be cleaner
+change way extensions work -> if possible, translate to a file
+	dependency, instead of checking the dependency in the extension.
+	this allows for scache to work on extensions
+
+--	documentation:
+null $deps in set()... two usage modes, one where we care,
+	one where we don't. be more explicit about this...
+this is not even the tip of the iceberg...
+
+---- STUFF FOR LATER ----
+
+-- the one second wait bug:
+you have to wait one second or else you will always regenerate
+this is a limitation of stat() and/or what's stored in most filesystems
+solution:
+   - if $have_fcntl, lock writes to lessen dependency expiration bursts
+		(only regen once)
+	since we have a WORM model, writes can be expensive. therefore,
+	- when you call set, also save a file called $cachefile.microseconds
+	- if timestamps are equal, THEN read $cachefile.microseconds.
+		use this to determine if we need a refresh or not
+		to do this we require Time::HiRes, but that's ok b/c this whole
+		functionality will be optional
+
+-- binary dependency lists, eg.
+( "file|/die/young" AND "file|/leave/a/beautiful/corpse" )
+   OR ( "file|/get/old" AND "file|/get/fat" AND "file|/get/ugly" )
+
+-- tools for manually purging groups of stuff from the cache...
+  e.g.
+		/items/200512140010?doc=mm_item|post|200512140010&offset=&per_page=20
+		a/0/Q/0lMqP_p04cdaaBZK2Dw
+	This will require having a list of MD5->orig names somewhere.
+
+-- cache expiration/replacement policies:
+we want to cache "forever" - but in reality, pages will go away, etc.
+	we should have a default timeout of say a week...
+	cronjob cleanups?
+
+-- perhaps make _Cache_Static_hmc a restricted namespace but allow
+	writes to it with !_Cache_Static_hmc ?
+
+-- XML_Comma_Util:
+it'd be nice to have an automagic depend on the def file
+	... but gettihg thru comma is too slow (0.02 sec on p4, 3GHz)...
+	this would require a caching scheme...
+	0) check in a hash in memory
+	1) check in /usr/local/Cache-Static/ext/XML_Comma/$defname
+		(whose contents will be just a .def file)
+	2) do the expensive lookup
+

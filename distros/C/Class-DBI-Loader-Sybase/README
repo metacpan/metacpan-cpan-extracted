@@ -1,0 +1,39 @@
+Class-DBI-Loader-Sybase version
+===============================
+
+This module provides a Sybase driver for Class::DBI::Loader.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In order to perform the tests, a Sybase server is required.  The
+following environmental variables should be set prior to running the
+tests:
+
+	SYBASE_NAME  - the database name
+	SYBASE_USER  - the database user
+	SYBASE_PASS  - the database user's password
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::DBI::Loader
+  DBD::Sybase
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2006 by The Smithsonian Astrophysical Observatory.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

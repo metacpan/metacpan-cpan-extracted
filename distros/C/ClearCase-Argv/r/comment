@@ -1,0 +1,73 @@
+# -*- cperl -*-
+use strict;
+use Benchmark;
+
+# Set one string comment to a temporary label type (created/removed).
+# Check that it succeeded.
+# This requires that the string value is properly quoted.
+# This case mirrors a similar suite for mkattr.
+# If an argument is given, sets dbglevel to 1
+#
+# This suite does not test the presence of triggers.
+
+use vars qw($ctx $tvob $tele);
+use constant MSWIN	=> $^O =~ /MSWin|Windows_NT/i ? 1 : 0;
+use constant CYGWIN	=> $^O =~ /cygwin/i ? 1 : 0;
+use Test::More tests => 40;
+select(STDERR); $| = 1; select(STDOUT); $| = 1;
+use ClearCase::Argv;
+use Argv 1.28; # for summary to work on perl 5.14+
+
+if (!defined do 'test.cfg') {
+  if ($@) {
+    die "$@\n";
+  }
+  warn "Failed to open 'test.cfg', using default values\n" if $!;
+}
+ClearCase::Argv->summary;      # start keeping stats
+ClearCase::Argv->ipc(1);
+my $ct = ClearCase::Argv->new({autochomp=>1});
+die "This test needs to be run in a view, in a vob\n"
+  unless $ct->ls([qw(-s -d)], $tele)->stderr(0)->qx;
+my $silent = $ct->clone({stdout=>0, stderr=>0});
+$silent->dbglevel(1) if @ARGV;
+$tvob = $ct->des(['-s'], 'vob:.')->qx unless $tvob;
+$tele = '.' unless $tele;
+my $wrap = $silent->clone({ct=>$ctx}) if $ctx;
+die "Failed to create temporary test lbtype, please rmtype if exists\n"
+  if $silent->mklbtype(['-c', 'temporary type for test case'],
+		                                      "CMTTC\@$tvob")->system;
+my $lbt = "lbtype:CMTTC\@$tvob";
+
+sub one_block {
+  my ($value, $mode) = @_;
+  (my $vrep = $value) =~ s/\n/<newline>/g;
+  ok(!$silent->chevent([qw(-rep -c), $value], $lbt)->system,
+     qq(String comment: "$vrep" ($mode mode, array syntax)));
+  ok(!$silent->argv(qq(chevent -rep -c "$value" $lbt))->system,
+     qq(String comment: "$vrep" ($mode mode, string syntax)));
+ SKIP: {
+    skip "No wrapper no fun", 2 unless $wrap;
+    ok(!$wrap->chevent([qw(-rep -c), $value], $lbt)->system,
+       qq(Wrapper--String comment: "$vrep" ($mode mode, array syntax)));
+    ok(!$wrap->argv(qq(chevent -rep -c "$value" $lbt))->system,
+       qq(Wrapper--String comment: "$vrep" ($mode mode, string syntax)));
+  }
+}
+
+sub one_pass {
+  my $ipc = shift;
+  my $mode = $ipc? 'ipc' : 'fork';
+  $silent->ipc($ipc);
+  $wrap->ipc($ipc) if $wrap;
+  one_block(q(foo), $mode);
+  one_block(q(O'Toole), $mode);
+  one_block(q(*test*), $mode);
+  one_block(qq(Two lines: one,\ntwo), $mode);
+  one_block('created_since(today)', $mode);
+}
+one_pass(0);
+one_pass(1);
+
+print STDERR "\n", ClearCase::Argv->summary;   # print out the stats we kept
+$silent->rmtype([qw(-f -rmall)], $lbt)->system;

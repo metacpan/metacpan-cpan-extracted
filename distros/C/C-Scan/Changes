@@ -1,0 +1,86 @@
+0.2:
+	Changed to use Data::Flow, strips extern from function declarations.
+	Can reliably restrict attention to some included file. 
+	Cpp no longer ignored.
+0.3:
+	Will not bark if an argument to a function is an array.
+	Minor misprint corrected. 
+	Minimal documentation added.
+0.4:
+	Made new() use two arg version of bless to allow subclassing
+	Made C::Scan a subclass of Data::Flow.
+	Added new attributes defines_full, defines_args_full, and
+           defines_no_args_full which use cpp -dM to get fully
+           resolved #defines.
+	Added $C::Scan::MACROS_ONLY which defaults to '-dM'
+	Fixed up test.pl a bit to output to a file, and to give more
+	   standard testing output.
+	Fixed regexp bug that didn't allow macros with any space
+	   between the end of the argument list and the beginning of
+	   the body section, e.g. #define FOO_NAME(bar)((BAZ*) fooBAR(bar))->baz
+	   which is a legal macro.
+	Fixed regexp bug which did TOO minimal a match on some
+	  argument lists.
+0.5:
+	Un-fixed bugfix in 0.4 that actually broke procesing
+	Added '__const' to list of keywords (which was the appropriate
+          way to fix the previously mentioned bug).
+0.51:
+	Fixed EMX 0.9d "feature" that include file names have \\ in them.
+0.52:
+	Add PREREQ_PM.  (Thanks to Michael G Schwern.)
+	Handle glibc-style gcc int32_t declarations.
+	  (Thanks to Michael G Schwern.)
+	Change POSIX to Symbol.  (Thanks to Mike Blazer.)
+	Include C9X keywords.
+0.61:	String and char literals were processed by (...)+, thus $1
+	contained the last char only.
+	The leading '/' in comments was not counted in the length.
+	(Thanks to Martin Cowie and Steven Knight for reporting and
+	fixing these problems.)
+0.70:
+	New attribute typedefs_whited (used by typedefs_maybe).
+	Remove trailing semicolons from typedefs.
+	Handle predeclarations (such as struct foo;).
+	Another attempt to remove $` etc.
+	Parse typedefs.
+	typedef_hash's has reasonable values.
+0.71:	Recognize that a list of function arguments may look like (int);
+	There was a REx quadratic in the length of input.
+	Allow for '__extension__ typedef' syntax (what does it mean?).
+0.72:	Updates by Hugo <hv@crypt0.demon.co.uk>:
+	  implement a new attribute 'typedef_structs'
+	  - adds one recipe, and two functions 'typedef_structs'
+	    and 'parse_struct'
+	  modifies the attribute 'typedef_texts' to remove #directives
+	  modifies the function 'typedef_texts' to avoid an unnecessary
+	    array copy
+	  modifies the function 'whited_decls' to white out the '+' character
+            within '[...]'. (A proper fix here would handle all legal
+	    expressions between the brackets, but that is well beyond the scope
+	    of this patch.)
+	  corrects the typo 'interwening'
+	  corrects the regexp matching continuation lines in function 'sanitize'.
+	Related updates to documentation (unfinished, since not explained), 
+	  related updates to the test suite.
+	Bug: Test produces typedef_structs which looks meaningless, such as
+		'typedef_hash' => HASH(0xbf440)
+		   '__fsid_t' => ARRAY(0x1298c8)
+		      0  ' struct
+  {
+    int __val[2];
+  } '
+		      1  ''
+		'typedef_structs' => HASH(0xc64d0)
+		   '__fsid_t' => ARRAY(0x149f64)
+		      0  ARRAY(0x149f7c)
+		         0  'int __val [ 2'
+		         1  '];'
+0.73:	Updates by Hugo <hv@crypt0.demon.co.uk>:
+	  implement a new attribute 'vdecls_hash'
+	  cleanup and fix implementation of 'typedef_structs' (fixes above bug)
+	Related updates to documentation and test suite
+	  vdecls_hash test produces no output with current test file
+0.74:	Updates by Hugo <hv@crypt0.demon.co.uk>:
+	  fix regexp bug that misparses pointers
+	  add README to MANIFEST

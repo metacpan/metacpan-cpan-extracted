@@ -1,0 +1,36 @@
+---
+abstract: 'write message handling apps with Catalyst.'
+author:
+  - 'Chris Andrews C<< <chris@nodnol.org> >>'
+build_requires:
+  Alien::ActiveMQ: 0.00003
+  Catalyst::Plugin::ConfigLoader: 0
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+dynamic_config: 0
+generated_by: 'Module::Install version 1.02, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Engine-Stomp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Engine::Embeddable: v0.0.1
+  Catalyst::Runtime: 5.80004
+  Data::Serializer: 0.49
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Workers: 0.05
+  Net::Stomp: 0.34
+  YAML: 0
+  YAML::XS: 0.32
+  namespace::autoclean: 0.05
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/pmooney/catalyst-engine-stomp.git
+version: 0.16.99

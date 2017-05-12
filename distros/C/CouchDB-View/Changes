@@ -1,0 +1,14 @@
+Revision history for CouchDB-View
+
+0.003   Sun May 18 13:36:42 EDT 2008
+
+        refresh packaging (AutoManifest)
+        missing prereq for URI::Escape
+
+0.002   Sun May 18 09:11:46 EDT 2008
+
+        add PadWalker as explicit dependency
+
+0.001   Sat May 17 12:41:25 EDT 2008
+
+        first release

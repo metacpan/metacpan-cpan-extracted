@@ -1,0 +1,145 @@
+
+Cisco::Conf - A module and utility for managing Cisco configurations
+              via TFTP
+====================================================================
+
+
+1.) What is it?
+
+    Are you managing a Cisco router? Perhaps not a single one, but
+    a large set of routers? You have learned how to retrieve a
+    routers configuration to a TFTP server or put a configuration
+    file to the router.
+
+    In that case this module will save you a lot of work. It offers
+    you methods to
+
+      - add or delete routers from or to a set of managed routers
+      - edit a routers configuration file; including invocation of
+        the revision control system (RCS)
+      - save a configuration file into the router
+      - retrieve a configuration file from the router
+
+    Each router has an associated set of administrators: The
+    administrators don't need root permissions, as the cisconf
+    utility (the command line representative of Cisco::Conf) will
+    usually be installed suid root - without a security penalty.
+    (At least no penalty I know of. :-)
+
+
+2.) Directory layout
+
+The recommended directory structure is as follows: A certain directory,
+by default '/usr/local/cisco/etc' contains the modules main config file
+('configuration') and a set of router configurations. If you have the
+routers 'myrouter' and 'internet', the configuration files will
+usually be named 'myrouter.conf' and 'internet.conf'.
+
+The router configurations may contain comments, any line may contain
+a comment, introduced by an exclamation mark.
+
+Another directory, by default '/usr/local/cisco/tftp', contains
+stripped versions of the router configurations. This directory is
+used by the TFTP server for sending and receiving files.
+
+
+3.) Installation
+
+Easy: First you have to install the prerequired Perl modules, the
+Data-Dumper module, the Net-Telnet module and perhaps the
+IO-stringy modules.
+
+This is done by fetching the archives and doing (for example) like
+this:
+
+    gzip -cd Data-Dumper-2.081.tar.gz | tar xf -
+    cd Data-Dumper-2.081
+    perl Makefile.PL
+    make
+    make test
+    su -c "make install"
+
+Installing the Cisco-Conf module is just as simple! The only difference
+is that the Makefile.PL will ask you a couple of question and allow you
+(for example) to choose the installation directories, enter the local
+hosts IP address and similar things.
+
+
+4.) Adding routers
+
+Once the module is installed you should insert your routers into the
+router list of the main configuration file. For example a machine
+'myrouter' is added by running
+
+    cisconf -a myrouter
+
+This will again ask you some questions, for example the hosts IP
+address and similar things. See the man pages of cisconf and
+Cisco::Conf for details by running
+
+    perldoc cisconf
+    perldoc Cisco::Conf
+
+
+5.) Retrieving configuration files from the router
+
+Once you have added a router to the configuration file, it is
+a good start to fetch the routers current configuration by
+executing
+
+    cisconf -l myrouter
+
+This will contact the router and save its configuration in
+'/usr/local/cisco/tftp/myrouter.conf'.
+
+
+6. Editing configuration files
+
+After the routers configuration is fetched, you can invoke the
+editor by running
+
+    cisconf -e myrouter
+
+For example the first step will typically be inserting the file
+you have just retrieved from the router.
+
+
+7. Saving configurations into the router
+
+Modifications are saved with
+
+    cisconf -s myrouter
+
+or
+
+    cisconf -s myrouter -w
+
+The former will modify the routers running configuration only, the
+latter will save the modifications into the non-volatile memory.
+
+
+8. Author and Copyright
+
+This program is
+
+        Copyright (C) 1998    Jochen Wiedmann
+                              Am Eisteich 9
+                              72555 Metzingen
+                              Germany
+
+                              Phone: +49 7123 14887
+                              Email: joe@ispsoft.de
+
+All rights reserved.
+
+You may distribute this module under the terms of either the GNU
+General Public License or the Artistic License, as specified in
+the Perl README file.
+
+
+9. See also
+
+the Cisco::Conf(3) manpage, the Cisco::Conf::Install(3) manpage,
+the tftpd(8) manpage
+
+

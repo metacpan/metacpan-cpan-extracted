@@ -1,0 +1,12 @@
+Revision history for Catalyst-Plugin-MessageStack
+
+0.03 Jun 8 2012
+  * Fix dropped messages on multiple redirects, thanks to sartak.
+    https://github.com/jshirley/Catalyst-Plugin-MessageStack/pull/2
+
+0.02 Sep 16 2011
+  * Catch when the stash contains a conflict, handle it gracefully with an error.
+
+0.01    Jul 11, 2011
+  * First release with the help of the wonderful Andrew Nelson
+

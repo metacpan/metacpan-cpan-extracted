@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+examples/pwlist.pl
+lib/Crypt/Pwsafe.pm
+t/00-load.t
+t/10-test-file.t
+t/test.psafe3

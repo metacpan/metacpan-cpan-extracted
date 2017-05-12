@@ -1,0 +1,17 @@
+lib/Class/XML/Parser.pm
+MANIFEST
+README
+Changes
+Makefile.PL
+t/01_flat.t
+t/02_flat_prune.t
+t/03_flat_prune_strip.t
+t/04_simple_hierarchy.t
+t/05_hierarchy_custom_mutator.t
+t/06_broken_xml.t
+t/07_hierarchy_validating.t
+t/08_hierarchy_validating_fail.t
+t/09_alternate_constructor.t
+t/10_aliases.t
+t/11_namespaces.t
+t/validator.dtd

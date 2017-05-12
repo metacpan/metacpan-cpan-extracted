@@ -1,0 +1,8 @@
+[% INCLUDE skinny/wrapper/head.tt %]
+<body>
+[% INCLUDE skinny/wrapper/header.tt %]
+[% INCLUDE skinny/wrapper/banner.tt %]
+[% INCLUDE skinny/wrapper/box.tt %]
+[% INCLUDE skinny/wrapper/footer.tt %]
+</body>
+</html>

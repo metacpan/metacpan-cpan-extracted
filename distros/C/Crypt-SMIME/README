@@ -1,0 +1,40 @@
+NAME
+    Crypt::SMIME - S/MIME message signing, verification, encryption
+                   and decryption
+
+DESCRIPTION
+    This module provides a class for handling S/MIME messages. It can
+    sign, verify, encrypt and decrypt messages. It requires libcrypto
+    (http://www.openssl.org).
+
+INSTALLATION
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+    After installing, you can find documentation for this module with
+    the perldoc command.
+
+      perldoc Crypt::SMIME
+
+    You can also look for information at:
+
+      CPAN
+          http://search.cpan.org/dist/Crypt-SMIME/
+
+BUGS
+    Please post any bug reports and feature requests to
+    rt.cpan.org. Failure to do so will result in a higher probability
+    of neglection:
+
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-SMIME
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2006-2014 YMIRLINK Inc.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.

@@ -1,0 +1,210 @@
+<!--
+
+EXAMPLE TEMPLATE
+
+Designed to be used for the TEMPLATE configuration with
+a TEMPLATE_TYPE of HTMLTemplate or HTMLTemplateExpr. This
+should be used in conjunction with the AJAX configuration param
+(but not as the AJAX template; that's 'ajax_results_listing.tmpl')
+
+This template demonstrates the following features of C::A::Search:
+
+  AJAX search (contains necessary Javascript calls)
+  AUTO_SUGGEST (contains necessary Javascript calls)
+  highlight_local_page (contains link with appropriate parameters)
+
+-->
+<tmpl_unless ajax>
+
+<html>
+<head>
+<!-- 
+  Prototype and Scriptaculous Javascript libraries
+  Latest versions available at http://script.aculo.us/
+
+  It's best to use the following <script> tags with a 'src'
+  attribute to remotely pull this JS code in since that allows
+  the browser to cache the compiled JS code, instead of reparsing
+  and compiling it on each request.
+
+  <script src="/prototype.js" type="text/javascript"></script>
+  <script src="/scriptaculous.js" type="text/javascript"></script>
+
+  But for the example templates, we'll just include it in there
+-->
+<tmpl_include prototype_javascript.tmpl>
+
+<!--
+  auto_complete styles needed for AUTO_SUGGEST functionality
+-->
+<style>
+
+label {
+    font-weight: bold;
+}
+div.pagination {
+    background: #eff7e9;
+    border: 1px solid #888888;
+}
+div.auto_complete {
+    width: 350px;
+    background: #fff;
+}
+div.auto_complete ul {
+    border:1px solid #888;
+    margin:0;
+    padding:0;
+    width:100%;
+    list-style-type:none;
+}
+div.auto_complete ul li {
+    margin:0;
+    padding:3px;
+}
+div.auto_complete ul li.selected {
+    background-color: #B82619;
+    color: #ffffff;
+}
+div.auto_complete ul strong.highlight {
+    color: #800;
+    margin:0;
+    padding:0;
+}
+</style>
+
+</head>
+<body>
+
+<h2>Search<tmpl_if searched> Results</tmpl_if></h2>
+
+<form id="search" name="search" onsubmit="return ajax_form_search(this);" >
+<input name="rm" value="perform_search" type="hidden">
+
+<table summary="layout">
+<tr>
+  <td><label for="keywords">Keyword(s)</label></td>
+  <td colspan="2">
+    <input id="keywords" name="keywords" value="" size="50" autocomplete="off">
+    <div class="auto_complete" id="keywords_auto_complete"></div>
+  </td>
+</tr>
+<tr>
+  <td colspan="2" align="right"><input value="Search" type="submit" name=".submit"></td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+<!--
+// THIS IS THE URL of the search app. The Ajax JS libraries need it
+var url = '<tmpl_var url>';
+new Ajax.Autocompleter( 'keywords', 'keywords_auto_complete', url, { parameters: "rm=suggestions"  })
+//-->
+</script>
+
+<div id="search_listing">
+</tmpl_unless>
+  <!-- 
+    If we don't have the ajax flag (eg, when we first come to this page)
+    then we need to include the listing in this template. Afterwards, submitting
+    the above form will just replace this div with the contents of the AJAX_TEMPLATE
+  -->
+<tmpl_if searched>
+  <tmpl_if hits>
+    <em>(Elapsed Time: <tmpl_var elapsed_time>s)</em>
+
+
+    <div class="pagination">
+
+    <tmpl_if pages>
+    <div>
+    Pages:&nbsp;&nbsp;&nbsp;
+    <tmpl_if first_page>
+        &laquo;Prev
+    <tmpl_else>
+        <a href="javascript:ajax_search('rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var prev_page>', 'Loading Page #<tmpl_var prev_page>')">&laquo;Prev</a>
+    </tmpl_if>
+    &nbsp;&nbsp;&nbsp;
+
+    <tmpl_loop pages>
+        <tmpl_if current>
+        <tmpl_var page_num>
+        <tmpl_else>
+        <a href="javascript:ajax_search('rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var page_num>', 'Loading Page #<tmpl_var page_num>')"><tmpl_var page_num></a>
+        </tmpl_if>
+        &nbsp;
+    </tmpl_loop>
+
+    <tmpl_if last_page>
+        Next&raquo;
+    <tmpl_else>
+        <a href="javascript:ajax_search('rm=perform_search&amp;keywords=<tmpl_var escape=url keywords>&amp;page=<tmpl_var next_page>', 'Loading Page #<tmpl_var next_page>')">Next&raquo;</a>
+    </tmpl_if>
+    &nbsp;&nbsp;&nbsp;
+    </div>
+    </tmpl_if>
+
+    Results: <tmpl_var start_num> to <tmpl_var stop_num> of <tmpl_var total_entries>
+
+    </div>
+
+
+    <dl>
+    <tmpl_loop hits>
+      <dt>
+      <a href="?rm=highlight_local_page&amp;path=<tmpl_var path escape='URL'>&amp;keywords=<tmpl_var keywords escape='URL'>">
+        <tmpl_if title><tmpl_var title><tmpl_else><tmpl_var escape=html path></tmpl_if>
+      </a>
+      <em><tmpl_var last_modified> - <tmpl_var size></em>
+      </dt>
+      <dd><p><tmpl_var description></p></dd>
+    </tmpl_loop>
+    </dl>
+
+  <tmpl_else>
+  <p><strong>No results found</strong></p>
+  </tmpl_if>
+</tmpl_if>
+
+<tmpl_unless ajax>
+</div>
+
+<script type="text/javascript">
+<!--
+// search with a query string and a message to display
+function ajax_search(query, msg) {
+    if( Ajax.getTransport != false ) {
+        query = query + '&ajax=1';
+        new Ajax.Updater( 
+            'search_listing',  
+            url, 
+            { 
+                parameters: query,
+                asynchronous: 1,
+                onLoading: function(request) {
+                    $('search_listing').innerHTML = "<strong>" + msg + " ...</strong>";
+                } 
+            } 
+        );
+    } else {
+        location.href = location.protocol + '//' +  location.hostname + url + "?" + query;
+    }
+}
+
+// serialize the form into a query string and display it
+function ajax_form_search(form) {
+    if( Ajax.getTransport != false ) {
+        ajax_search(Form.serialize(form), 'Searching');
+        return false;
+    } else {
+        return true;
+    }
+}
+//-->
+</script>
+
+
+</html>
+</body>
+</tmpl_unless>

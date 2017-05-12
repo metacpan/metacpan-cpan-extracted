@@ -1,0 +1,33 @@
+---
+abstract: 'Call functions/methods with a fake caller()'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Test::More: 0.95_02
+  constant: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Call-From
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Call::From:
+    file: lib/Call/From.pm
+    version: '0.001000'
+requires:
+  Exporter: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/kentnl/Call-From/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kentnl/Call-From
+version: '0.001000'
+x_authority: cpan:KENTNL

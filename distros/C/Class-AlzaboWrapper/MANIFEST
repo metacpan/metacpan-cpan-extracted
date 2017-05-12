@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Class/AlzaboWrapper.pm
+lib/Class/AlzaboWrapper/Cursor.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+t/99-pod.t
+t/basic.t
+Makefile.PL
+README
+SIGNATURE    Added here by Module::Build

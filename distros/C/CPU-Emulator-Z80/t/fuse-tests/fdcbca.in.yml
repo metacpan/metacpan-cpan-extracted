@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 26
+    - 202
+  20906:
+    - 144
+name: fdcbca
+registers:
+  AF: 51173
+  AF_: 0
+  BC: 9019
+  BC_: 0
+  DE: 8978
+  DE_: 0
+  HL: 63481
+  HL_: 0
+  I: 0
+  IX: 58391
+  IY: 20880
+  PC: 0
+  R: 0
+  SP: 0

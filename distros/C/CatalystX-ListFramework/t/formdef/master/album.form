@@ -1,0 +1,23 @@
+{
+ title  => 'Album',
+ model  => 'TestModel::Album',
+ uses   => {
+            artist      => 'artist',
+           },
+
+ columns => {
+             OBJECT   => {primary_key => 'id'},
+             albid    => {field=>'id', heading => 'Album ID'},
+             albtitle => {field=>'title', heading => 'Album title'},
+             albrec   => {field=>'recorded', heading => 'Recording date', type=>'date'},
+            },
+            
+ searches => {
+              albid => {heading=>'Album', field=>'id', op=>'='},
+              albtitle => {heading=>'Album title', field=>'title', op=>'like',},
+             },
+
+ create_uri => '/create/track',
+
+}
+

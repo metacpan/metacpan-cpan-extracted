@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+      "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>  
+
+<head>
+<title>FAIL Scriptalicious-1.15 i686-linux 2.6.26.5 -  nntp.perl.org</title>
+<link rel="stylesheet" type="text/css" href="/css/cnntp.css" title="Default CSS2" media="screen">
+
+
+</head>
+
+<body bgcolor="white"> 
+
+<a href="http://develooper.com/"><img src="http://develooper.com/images/develooperbutton.gif" height=43 width=43 alt="develooper" border=0 align=right></a>
+
+<a href="/">Front page</a> | <a href="/group/perl.cpan.testers/">perl.cpan.testers</a> |
+<a href="/group/perl.cpan.testers/2008/09.html">Postings from September 2008</a>
+
+<h2>FAIL Scriptalicious-1.15 i686-linux 2.6.26.5</h2>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/09/msg2326212.html">Thread Previous</a>
+
+
+ | 
+
+
+<a href="/group/perl.cpan.testers/2008/09/msg2326644.html">Thread Next</a>
+
+
+
+<div id="article_header">
+<div class="h_name">From:</div> <b>Rick Myers</b><br/>
+<div class="h_name">Date:</div> September 27, 2008 22:40<br/>
+<div class="h_name">Subject:</div> FAIL Scriptalicious-1.15 i686-linux 2.6.26.5<br/>
+</div>
+
+<pre>
+This distribution has been tested as part of the cpan-testers
+effort to test as many new uploads to CPAN as possible.  See
+http://testers.cpan.org/
+
+
+--
+Dear Sam Vilain,
+    
+This is a computer-generated report for Scriptalicious-1.15
+on perl 5.11.0 patch 34383, created by CPAN-Reporter-1.1702. 
+
+Thank you for uploading your work to CPAN.  However, there was a problem
+testing your distribution.
+
+If you think this report is invalid, please consult the CPAN Testers Wiki
+for suggestions on how to avoid getting FAIL reports for missing library
+or binary dependencies, unsupported operating systems, and so on:
+
+http://cpantest.grango.org/wiki/CPANAuthorNotes
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester: 
+
+this report is from an automated smoke testing program
+and was not reviewed by a human for accuracy
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 /home/tester/perl-5.11.0/bin/perl5.11.0 &quot;-MExtUtils::Command::MM&quot; &quot;-e&quot; &quot;test_harness(0, 'blib/lib', 'blib/arch')&quot; t/*.t
+t/01-mmmdelicious....ok
+t/02-script..........ok
+t/03-yaml............ok
+t/04-fork............04-fork.t: ERROR: Command `/home/tester/perl-5.11.0/bin/perl5.11.0 -Mlib=lib t/loopback.pl' killed by signal 13
+program output:
+
+# Looks like you planned 17 tests but only ran 8.
+# Looks like your test died just after 8.
+ Dubious, test returned 255 (wstat 65280, 0xff00)
+ Failed 9/17 subtests 
+t/05-prompt..........ok
+t/06-anydump.........ok
+t/07-tsay............
+#   Failed test 'Template say'
+#   at t/07-tsay.t line 19.
+#          got: 'Can't locate package Template::Provider for @Scriptalicious::DataLoad::ISA at lib/Scriptalicious.pm line 1045.
+# Can't locate package Template::Provider for @Scriptalicious::DataLoad::ISA at lib/Scriptalicious.pm line 1045.
+# tsay.pl: warning: Error trying template response using template `hello'; Can't locate object method &quot;new&quot; via package &quot;Scriptalicious::DataLoad&quot; at lib/Scriptalicious.pm line 1045.
+# 
+# tsay.pl: template variables:
+# name: Bernie'
+#     expected: 'Hello, Bernie
+# tsay.pl: Yo momma's so fat your family portrait has stretchmarks.'
+# Looks like you failed 1 test of 2.
+ Dubious, test returned 1 (wstat 256, 0x100)
+ Failed 1/2 subtests 
+t/08-unit............ok
+t/09-noyaml..........ok
+
+Test Summary Report
+-------------------
+t/04-fork        (Wstat: 65280 Tests: 8 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 17 tests but ran 8.
+t/07-tsay        (Wstat: 256 Tests: 2 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+Files=9, Tests=51,  8 wallclock secs ( 0.07 usr  0.00 sys +  3.55 cusr  0.40 csys =  4.02 CPU)
+Result: FAIL
+Failed 2/9 test programs. 1/51 subtests failed.
+make: *** [test_dynamic] Error 255
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module        Need Have
+    ------------- ---- ----
+    Term::ReadKey 0    2.30
+    Test::More    0    0.80
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    AUTOMATED_TESTING = 1
+    LANG = en_US
+    LC_COLLATE = C
+    PATH = /usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/usr/games:/opt/www/htdig/bin:/usr/lib/java/bin:/usr/lib/java/jre/bin:/opt/kde/bin:/usr/lib/qt/bin:/usr/share/texmf/bin
+    PERL5LIB = 
+    PERL5OPT = -I/tmp/CPAN-Reporter-lib-jvbL -MDevel::Autoflush
+    PERL5_CPANPLUS_IS_RUNNING = 6951
+    PERL5_CPAN_IS_RUNNING = 6951
+    PERL_CR_SMOKER_CURRENT = Scriptalicious-1.15
+    PERL_EXTUTILS_AUTOINSTALL = --defaultdeps
+    PERL_MM_USE_DEFAULT = 1
+    SHELL = /bin/bash
+    TERM = linux
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/tester/perl-5.11.0/bin/perl5.11.0
+    $UID/$EUID = 1016 / 1016
+    $GID = 100 11 17 18 19 100
+    $EGID = 100 11 17 18 19 100
+
+Perl module toolchain versions installed:
+
+    Module              Have   
+    ------------------- -------
+    CPAN                1.9205 
+    Cwd                 3.2701 
+    ExtUtils::CBuilder  0.24   
+    ExtUtils::Command   1.14   
+    ExtUtils::Install   1.50_01
+    ExtUtils::MakeMaker 6.44   
+    ExtUtils::Manifest  1.54   
+    ExtUtils::ParseXS   2.19   
+    File::Spec          3.2701 
+    Module::Build       0.30   
+    Module::Signature   0.55   
+    Test::Harness       3.14   
+    Test::More          0.80   
+    YAML                0.39   
+    YAML::Syck          1.05   
+    version             0.76   
+
+
+--
+
+Summary of my perl5 (revision 5 version 11 subversion 0 patch 34383) configuration:
+  Platform:
+    osname=linux, osvers=2.6.26.5, archname=i686-linux
+    uname='linux xbox 2.6.26.5 #1 preempt sat sep 20 13:33:30 edt 2008 i686 pentium4 i386 gnulinux '
+    config_args='-de -Uman1dir -Uman3dir -Dprefix=/home/tester/perl-5.11.0 -Uinstallusrbinperl -Dusedevel'
+    hint=recommended, useposix=true, d_sigaction=define
+    useithreads=undef, usemultiplicity=undef
+    useperlio=define, d_sfio=undef, uselargefiles=define, usesocks=undef
+    use64bitint=undef, use64bitall=undef, uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-fno-strict-aliasing -pipe -I/usr/local/include'
+    ccversion='', gccversion='3.4.6', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc
+    perllibs=-lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=/lib/libc-2.3.6.so, so=so, useshrplib=false, libperl=libperl.a
+    gnulibc_version='2.3.6'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -O2 -L/usr/local/lib'
+
+</pre>
+
+
+
+
+
+<a href="/group/perl.cpan.testers/2008/09/msg2326212.html">Thread Previous</a>
+
+
+ | 
+
+
+<a href="/group/perl.cpan.testers/2008/09/msg2326644.html">Thread Next</a>
+
+
+
+<ul>
+
+
+  
+  <ul>
+  
+  
+    <li><!-- #2326212 --><a href="/group/perl.cpan.testers/2008/09/msg2326212.html">
+      FAIL Scriptalicious-1.15 i686-linux 2.6.26.5</a>
+      by Rick Myers</li> 
+  
+  
+    <li><b>
+      FAIL Scriptalicious-1.15 i686-linux 2.6.26.5</b>
+      by Rick Myers</li> 
+  
+  
+    <li><!-- #2326644 --><a href="/group/perl.cpan.testers/2008/09/msg2326644.html">
+      FAIL Scriptalicious-1.15 i686-linux 2.6.26.5</a>
+      by Rick Myers</li> 
+
+
+
+
+
+</ul>
+
+
+
+
+</ul>
+
+
+
+
+
+<div style="clear:both"><br/>
+
+<script type="text/javascript"><!--
+google_ad_client = "pub-5551869059240207";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+//2007-04-09: nntp
+google_ad_channel = "0029566334";
+google_color_border = "336699";
+google_color_bg = "FFFFFF";
+google_color_link = "0000FF";
+google_color_text = "000000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+
+
+<hr noshade size=1>
+<span class="comments">Comments to <a href="http://www.askbjoernhansen.com/">Ask Bj&oslash;rn Hansen</a> at <a href="mailto:ask@perl
+.org">ask@perl.org</a>
+| <a href="/group/">Group listing</a>
+| <a href="/about/">About</a>
+</span>
+
+
+</body>
+
+</html>
+
+

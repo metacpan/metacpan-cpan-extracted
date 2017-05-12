@@ -1,0 +1,9 @@
+Crypt::OpenSSL::SMIME is a brain dead minimalistic not yet secure for use by 
+paranoid people wrapper around OpenSSL library which was extremely useful 
+for us at YASP Software Ltd to send sensitive information to Outlook and Mozilla
+mailboxes and requires NO additional support from the mail reader software
+to decrypt messages unlike PGP.
+
+version 0.04 should compile with OpenSSL 1.x
+
+Look at t/README for openssl help

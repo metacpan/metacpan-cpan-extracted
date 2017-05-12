@@ -1,0 +1,166 @@
+Test Plan for CAP-MessageStack
+
+* simple loading
+FILES: 00-load.t
+
+* cgiapp w/ html-template
+ * first request
+    - check output for ! message
+    - push an info message to see if we get error (w/ no session)
+FILES: 01-nosession.t, TestAppNoSession.pm, output.TMPL
+
+* cgiapp w/ html-template
+ * first request:
+    - establish session
+    - check output for ! message
+ * second request:
+    - pass in session
+    - push an info message
+ * third request:
+    - pass in session
+    - check output for message
+    - check message for proper classification
+ * fourth request:
+    - pass in session
+    - call messages() and compare
+    - check output for 'succeeded'
+FILES: 02-check_output.t, TestAppOutput.pm, output.TMPL
+
+* cgiapp w/ html-template
+ * same as before, but check scoping:
+    - in 2nd request, scope info message for non-existent runmode
+    - in 3rd request, check for ! message
+    - in 4th request, scope info message for arrayref runmodes
+    - in 5th request, check for message (1st arrayref value)
+    - in 6th request, check for message (2nd arrayref value)
+    - in 7th request, check for ! message
+FILES: 03-scope.t, TestAppScope.pm, output.TMPL
+
+* messages
+ * first request:
+    - establish session
+    - push in a few messages
+ * second request:
+    - pass in session
+    - call messages() and compare data structure
+ * third request:
+    - pass in session
+    - call messages() with scope and compare data structure
+ * fourth request:
+    - pass in session
+    - call messages() with classification and compare data structure
+ * fifth request:
+    - pass in session
+    - call messages() with both scope & classification and compare data structure
+FILES: 04-messages.t, TestAppMessages.pm
+
+* clear_messages
+ * first request:
+    - establish session
+    - clear private session var (where messages are stored)
+    - push in a few messages
+ * second request:
+    - pass in session
+    - call clear_messages()
+    - call messages() and compare
+ * recall first request
+ * third request:
+    - pass in session
+    - call clear_messages() with scope
+    - call messages() and compare
+ * recall first request
+ * fourth request:
+    - pass in session
+    - call clear_messages() with classification
+    - call messages() and compare
+ * recall first request
+ * fifth request:
+    - pass in session
+    - call clear_messages() with scope & classification
+    - call messages() and compare
+FILES: 05-clear_messages.t, TestAppClear.pm
+
+* pop_message
+ * first request:
+    - establish session
+    - clear private session var
+    - push in a few messages
+ * second request:
+    - pass in session
+    - call pop_message() and compare
+ * recall first request
+ * third request:
+    - pass in session
+    - call pop_message() with scope and compare
+ * recall first request
+ * fourth request:
+    - pass in session
+    - call pop_message() with classification and compare
+ * recall first request
+ * fifth request:
+    - pass in session
+    - call pop_message() with scope & classification and compare
+ * sixth request:
+    - pass in session
+    - compare the remaining messages()
+FILES: 06-pop_message.t, TestAppPop.pm
+
+* Template Toolkit Test (same as 02-check_output.t, but using CAP-TT)
+ * cgiapp w/ CAP-TT
+  * check for CAP-TT.  If ! installed, skip
+  * first request:
+    - establish/check for session
+    - check output for ! message
+  * second request:
+    - pass in session
+    - push an info message
+  * third request:
+    - pass in session
+    - check output for message
+    - check message for proper classification
+FILES: 07-template_toolkit.t, TestAppTT.pm, output.tt
+
+* capms_config w/ Automatic Clearing
+ * cgiapp w/ -automatic_clearing config
+  * first request
+    - establish session
+    - call capms_config with -automatic_clearing
+    - push in some messages
+  * second request
+    - pass in session
+    - check output for message
+  * third request
+    - pass in session
+    - call messages() and compare
+FILES: 08-capms_config_ac.t, TestAppConfigAC.pm, output.TMPL
+
+* capms_config w/ parameter name overrides
+ * cgiapp w/ parameter name configs
+  * first request
+    - establish session
+    - call capms_config with parameter name overrides
+    - push in some messages
+  * second request
+    - pass in session
+    - load original template (output.TMPL) and check for no message
+  * third request
+    - pass in session
+    - load in different template (output_params.TMPL) and check for message
+  * fourth request
+    - pass in session
+    - call messages() and compare
+FILES: 09-capms_config_params.t, TestAppConfigParams.pm, output.TMPL, output_params.TMPL
+
+* capms_config w/ dont_use_session
+ * cgiapp w/ dont_use_session config
+  * first request
+    - push in some messages
+    - check for no messages
+    - load_tmpl and check for output
+  * second request
+    - load_tmpl and check for no messages in output
+FILES: 10-capms_config_no_session.t, TestAppConfigNoSession.pm, output.TMPL
+
+* pod tests
+FILES: pod.t, pod-coverage.t
+

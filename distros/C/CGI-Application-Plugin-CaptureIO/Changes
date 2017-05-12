@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Application::Plugin::CaptureIO.
+
+0.01  Fri Dec  8 00:18:01 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -n CGI::Application::Plugin::CaptureIO
+

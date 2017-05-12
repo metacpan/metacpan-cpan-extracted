@@ -1,0 +1,80 @@
+{
+   "abstract" : "Automatic Trait Loading and Resolution for Catalyst Components",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-Component-Traits",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Catalyst" : "0",
+            "Class::Load" : "0",
+            "List::MoreUtils" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Traits::Pluggable" : "0",
+            "Scalar::Util" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moose" : "0",
+            "MooseX::MethodAttributes" : "0.15",
+            "Test::More" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CatalystX-Component-Traits@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CatalystX-Component-Traits"
+      },
+      "homepage" : "http://metacpan.org/release/CatalystX-Component-Traits",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/catalystx-component-traits.git",
+         "web" : "http://github.com/rkitover/catalystx-component-traits"
+      }
+   },
+   "version" : "0.19",
+   "x_authority" : "cpan:RKITOVER"
+}
+

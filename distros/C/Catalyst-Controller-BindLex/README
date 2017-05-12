@@ -1,0 +1,102 @@
+NAME
+    Catalyst::Controller::BindLex - Stash your lexical goodness.
+
+SYNOPSIS
+        package MyApp::Controller::Moose;
+        use base qw/Catalyst::Controller::BindLex/;
+
+        sub bar : Local {
+            my ( $self, $c ) = @_;
+
+            my $x : Stashed;
+            my %y : Stashed;
+
+            $x = 100;
+        
+            do_something( $c->stash->{x} ); # 100
+    
+            $c->forward( "gorch" );
+        }
+
+        sub gorch : Private {
+            my ( $self, $c ) = @_;
+            my $x : Stashed;
+
+            do_something( $x ); # still 100
+        }
+
+        sub counter : Local {
+            my ( $self, $c ) = @_;
+            my $count : Session;
+            $c->res->body( "request number " . ++$count );
+        }
+
+DESCRIPTION
+    This plugin lets you put your lexicals on the stash and elsewhere very
+    easily.
+
+    It uses some funky modules to get its job done: PadWalker,
+    Array::RefElem, Devel::Caller, Devel::LexAlias, and attributes. In some
+    people's opinion this hurts this plugin's reputation ;-).
+
+    If you use the same name for two variables with the same storage binding
+    attribute they will be aliased to each other, so you can use this for
+    reading as well as writing values across controller subs. This is almost
+    like sharing your lexical scope.
+
+WHY ISN'T THIS A PLUGIN?
+    The way attributes are handled this can't be a plugin - the
+    MODIFY_SCALAR_ATTRIBUTES methods and friends need to be in the class
+    where the lexical is attributed, and this is typically a controller.
+
+CONFIGURATION
+    You can add attributes to the configaration by mapping attributes to
+    handlers.
+
+    Handlers are either strings of methods to be called on $c with no
+    arguments, which are expected to return a hash reference (like "stash",
+    "session", etc), or code references invoked with $c, a reference to the
+    variable we're binding, and the name of the variable we're binding, also
+    expected to return a hash reference.
+
+DEFAULT ATTRIBUTES
+    Some default attributes are pre-configured:
+
+    Stash, Stashed
+    Session, Sessioned
+    Flash, Flashed
+        Bind the variable to a key in "stash", "session", or "flash"
+        respectively.
+
+        The latter two require the use of a session; see
+        Catalyst::Plugin::Session.
+
+METHODS
+  bindlex_default_config( )
+  MODIFY_ARRAY_ATTRIBUTES( )
+  MODIFY_HASH_ATTRIBUTES( )
+  MODIFY_SCALAR_ATTRIBUTES( )
+RECIPES
+    Param
+        To get
+
+            my $username : Param;
+
+        add
+
+            __PACKAGE__->config->{bindlex}{Param} => sub { $_[0]->req->params };
+
+AUTHORS
+    Matt S. Trout
+
+    Yuval Kogman
+
+SEE ALSO
+    PadWalker, Array::RefElem, Devel::Caller, Devel::LexAlias,
+    Sub::Parameters
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+

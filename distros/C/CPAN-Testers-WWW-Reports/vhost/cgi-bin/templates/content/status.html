@@ -1,0 +1,61 @@
+[% 
+    title = "Status" ;
+    box_help  = 1 ;
+
+    crumb2_name = 'Index' ;
+    crumb2_href = '/' ;
+    crumb1_name = 'Status' ;
+%]
+
+<h2>CPAN Testers Builder - Current Status</h2>
+<table>
+[% IF status.total %]
+<tr><th>Status</th><td [% 
+	IF    status.count > 25000 ; THEN ; 'class="FAIL"'    ;
+	ELSIF status.count > 15000 ; THEN ; 'class="UNKNOWN"' ;
+	ELSE                              ; 'class="PASS"'    ;
+	END
+%]>[%
+	IF    status.count > 25000 ; THEN ; 'OVERLOADED'  ;
+	ELSIF status.count > 20000 ; THEN ; 'STRUGGLING'  ;
+	ELSIF status.count > 15000 ; THEN ; 'STRAINING'   ;
+	ELSIF status.count > 10000 ; THEN ; 'MANAGEABLE'  ;
+	ELSIF status.count > 5000  ; THEN ; 'GOOD'        ;
+	ELSE                              ; 'EXCELLENT'   ;
+	END
+%]</td></tr>
+<tr><th>Most recent report</th><td>[% report.date %] ([% report.id %])</td></tr>
+<tr><th>Time of oldest page request</th><td>[% status.created %]</td></tr>
+<tr><th>Total page requests</th><td>[% status.total %]</td></tr>
+<tr><th>Total unique page requests</th><td>[% status.count %]</td></tr>
+[% ELSE %]
+<tr><th>Status</th><td class="PASS">EXCELLENT</td></tr>
+<tr><th>Most recent report</th><td>[% report.date %] ([% report.id %])</td></tr>
+<tr><th>Time of oldest page request</th><td>no requests found</td></tr>
+<tr><th>Total page requests</th><td>no requests found</td></tr>
+<tr><th>Total unique page requests</th><td>no requests found</td></tr>
+[% END %]
+</table>
+
+<p>The current status is purely a means to gauge current build times. Typically the builder can process around 10,000-15,000 
+unique page requests per day. This can translate into anything between 30,000 and 50,000 actual requests, although
+can occasionally be more. Following the monitoring of how the builder performs, the oldest request waiting to be 
+processed is usually between 3 to 4 days old, with higher profile pages being built within a few minutes.</p>
+<p>Below are the further graphs to help expand on the above metrics, thus helping us to monitor when the builder
+may be under extreme load, has stopped or has nothing to do.</p>
+
+<h2>CPAN Testers Builder - Performance (24 hours)</h2>
+<p>These graphs measure the amount of page requests outstanding at every snapshot.</p>
+<p><img src="/static/name_count-1d.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Unique Page Counts" /></p>
+<p><img src="/static/page_count-1d.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Page Counts" /></p>
+<p><img src="/static/page_weight-1d.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Page Weightings" /></p>
+
+<h2>CPAN Testers Builder - Performance (1 week)</h2>
+<p>These graphs measure the amount of page requests outstanding at every snapshot.</p>
+<p><img src="/static/name_count-1w.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Unique Page Counts" /></p>
+<p><img src="/static/page_count-1w.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Page Counts" /></p>
+<p><img src="/static/page_weight-1w.png" alt="CPAN Testers Builder - Performance (24 hours) - based on Page Weightings" /></p>
+
+<h2>CPAN Testers Builder - Performance (3 months)</h2>
+<p>This graphs measures the amount of page requests processed at every snapshot.</p>
+<p><img src="http://stats.cpantesters.org/stats/build1.png" alt="CPAN Testers Builder - Performance (3 months)" /></p>

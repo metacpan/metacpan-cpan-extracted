@@ -1,0 +1,64 @@
+!
+policy-map 8M
+  class class-default
+    police cir 8192000 bc 512000 be 512000
+     conform-action transmit
+     exceed-action drop
+policy-map rt_medium_512k
+  class highpriority
+    priority 256
+policy-map rt-school
+  class class-default
+    police cir 128000 bc 16000 be 16000
+     conform-action transmit
+     exceed-action drop
+policy-map 128K
+  class class-default
+    police cir 128000 bc 16000 be 16000
+     exceed-action drop
+policy-map police-1024k
+  class class-default
+    police cir 1024000 bc 256000 be 256000
+     conform-action transmit
+     exceed-action drop
+     violate-action drop
+policy-map rt_medium_512k_int
+  class class-default
+    shape average 512000
+   service-policy rt_medium_512k
+policy-map 512K
+  class class-default
+    police cir 512000 bc 64000 be 64000
+     exceed-action drop
+policy-map 256K
+  class class-default
+    police cir 256000 bc 32000 be 32000
+     exceed-action drop
+policy-map 1024K
+  class class-default
+    police cir 1024000 bc 64000 be 64000
+     exceed-action drop
+policy-map 15M
+  class class-default
+    police cir 15360000 bc 960000 be 960000
+     conform-action transmit
+     exceed-action drop
+policy-map 10M
+  class class-default
+    police cir 10240000 bc 640000 be 640000
+     conform-action transmit
+     exceed-action drop
+policy-map 64K
+  class class-default
+    police cir 64000 bc 8000 be 8000
+     exceed-action drop
+policy-map 2048K
+  class class-default
+    police cir 2048000 bc 128000 be 128000
+     exceed-action drop
+policy-map 4M
+  class class-default
+    police cir 4096000 bc 256000 be 256000
+     conform-action transmit
+     exceed-action drop
+!

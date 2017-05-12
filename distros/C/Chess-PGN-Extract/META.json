@@ -1,0 +1,67 @@
+{
+   "abstract" : "Parse PGN files by using `pgn-extract`",
+   "author" : [
+      "Mitsuhiro Nakamura <m.nacamura@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chess-PGN-Extract",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Encode" : "0",
+            "Exporter::Tiny" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "JSON::XS" : "0",
+            "Sys::Cmd" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Which" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Chess::PGN::Extract" : {
+         "file" : "lib/Chess/PGN/Extract.pm",
+         "version" : "0.02"
+      },
+      "Chess::PGN::Extract::Stream" : {
+         "file" : "lib/Chess/PGN/Extract/Stream.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

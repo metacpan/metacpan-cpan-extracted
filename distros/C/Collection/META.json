@@ -1,0 +1,104 @@
+{
+   "abstract" : "CRUD framework",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Collection",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Flow" : "0.6",
+            "JSON::XS" : "2.29",
+            "Storable" : 0,
+            "String::CRC32" : "1.4"
+         }
+      }
+   },
+   "provides" : {
+      "Collection" : {
+         "file" : "lib/Collection.pm",
+         "version" : "0.58"
+      },
+      "Collection::AutoSQL" : {
+         "file" : "lib/Collection/AutoSQL.pm",
+         "version" : "1.1"
+      },
+      "Collection::AutoSQLnotUnique" : {
+         "file" : "lib/Collection/AutoSQLnotUnique.pm",
+         "version" : "0.01"
+      },
+      "Collection::CrcColl" : {
+         "file" : "lib/Collection/CrcColl.pm",
+         "version" : "0.11"
+      },
+      "Collection::Index" : {
+         "file" : "lib/Collection/Index.pm",
+         "version" : "0.02"
+      },
+      "Collection::Mem" : {
+         "file" : "lib/Collection/Mem.pm",
+         "version" : "0.01"
+      },
+      "Collection::Memcached" : {
+         "file" : "lib/Collection/Memcached.pm",
+         "version" : "0.01"
+      },
+      "Collection::Storable" : {
+         "file" : "lib/Collection/Storable.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::ActiveRecord" : {
+         "file" : "lib/Collection/Utl/ActiveRecord.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::Base" : {
+         "file" : "lib/Collection/Utl/Base.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::Flow" : {
+         "file" : "lib/Collection/Utl/Flow.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::HashUnion" : {
+         "file" : "lib/Collection/Utl/HashUnion.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::Item" : {
+         "file" : "lib/Collection/Utl/Item.pm",
+         "version" : "0.02"
+      },
+      "Collection::Utl::LazyObject" : {
+         "file" : "lib/Collection/Utl/LazyObject.pm",
+         "version" : "0.01"
+      },
+      "Collection::Utl::Mirror" : {
+         "file" : "lib/Collection/Utl/Mirror.pm",
+         "version" : "0.02"
+      },
+      "Collection::Utl::StoreDir" : {
+         "file" : "lib/Collection/Utl/StoreDir.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.58"
+}

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CCCP-SQLiteWrap.t
+lib/CCCP/SQLiteWrap.pm

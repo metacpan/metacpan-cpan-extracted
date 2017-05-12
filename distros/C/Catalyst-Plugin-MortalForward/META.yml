@@ -1,0 +1,13 @@
+name: Catalyst-Plugin-MortalForward
+version: 0.01
+abstract: Make $c->forward() throw exceptions
+author: Six Apart <cpan@sixapart.com>
+license: perl
+distribution_type: module
+requires:
+  Catalyst: 0
+no_index:
+  directory:
+    - t
+    - inc
+generated_by: Module::Install version 0.39

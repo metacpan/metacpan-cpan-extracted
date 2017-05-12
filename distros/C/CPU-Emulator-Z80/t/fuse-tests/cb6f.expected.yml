@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb6f
+registers:
+  AF: 41264
+  AF_: 0
+  BC: 35968
+  BC_: 0
+  DE: 18040
+  DE_: 0
+  HL: 19764
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

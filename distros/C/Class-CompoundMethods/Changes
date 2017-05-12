@@ -1,0 +1,22 @@
+Revision history for Perl extension Class::CompoundMethods.
+
+0.01  Mon Apr 21 2003
+	- original version; created by h2xs 1.5 with options
+		-X -n Class::CompoundMethods -v 0.01
+0.02  Thu Aug 7, 2003
+        - Fixed to work with 5.005_03.
+
+0.03  Tue Nov 22, 2005
+        - Propagate list/scalar/void context to method calls.
+        - Document relative package name.
+        - Starting to do code coverage tests
+	- Refactoring.
+	- Faster hook method?
+	- Lots more debugging info
+0.04  Wed Nov 23, 2005
+        - Added t/03yaml.t
+        - Fixed META.yml syntax
+0.05  Mon Mar 19, 2007
+        - Removed Module::Build
+        - Removed signature
+        - Removed authoring stuff.

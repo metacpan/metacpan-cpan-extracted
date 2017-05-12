@@ -1,0 +1,62 @@
+Revision history for perl distribution Cloudinary
+
+0.15 2016-06-12T10:24:49-0700
+ - Remove delay, on_error and on_success
+ - Add support for blocking request
+ - Fix "/" in public_id #1
+   Contributor: Scott Kiehn
+
+0.14 2014-01-08T10:23:45Z
+ - Converting to Mojo::IOLoop->delay API
+ - Deprecating on_error and on_success
+ - Add .perltidyrc
+
+0.1301 2013-11-20T11:51:36Z
+ - Fix RT#89141: MYMETA.{yml,json} must not be bundled
+
+0.13 2013-05-23T21:19:20Z
+ - post_form() is deprecated
+ - Add support for easier API when working with images
+
+0.12 2012-08-26T08:44:51Z
+ - Add support for Mojo::IOLoop->delay()
+
+0.1102 2012-07-10T21:49:21Z
+ - Fix url_for(..., { type => 'facebook' });
+
+0.1101 2012-05-20T16:17:08Z
+ - Not sure why pause is still complaining...
+
+0.11 2012-05-20T16:12:32Z
+ - Need $VERSION in Mojolicious::Plugin::Cloudinary to make pause happy.
+
+0.10 2012-05-20T16:04:13Z
+ - Split base functionality to Cloudinary.pm
+
+0.0401 2012-05-20T14:52:56Z
+ - Forgot to test for "data-src" when creating cloudinary_js_image()
+
+0.04 2012-05-20T12:30:20Z
+ - Add cloudinary_image() mojolicious helper
+ - Add cloudinary_js_image() mojolicious helper
+ - Add support for both short and long options to methods that need to
+   shorten or expand w/width, h/height and friends: a => 'angle', b =>
+   'background', c => 'crop', d => 'default_image', e => 'effect', f =>
+   'fetch_format', g => 'gravity', h => 'height', l => 'overlay', p =>
+   'prefix', q => 'quality', r => 'radius', t => 'named_transformation', w
+   => 'width', x => 'x', y => 'y',
+
+0.03 2012-04-13T18:18:55Z
+ - Add public support for "resource_type"
+ - Add response structures to documentation
+
+0.02 2012-04-06T10:15:10Z
+ - Add destroy(), which deletes remote resources
+ - Fix adding "type" parameter when calculating "signature"
+ - Fix Use of uninitialized value in string eq at Cloudinary.pm line 355.
+ - Change api_url() and public_cdn() to private attributes, after receiving
+   feedback from cloudinary.
+
+0.01 2012-03-31T20:49:21Z
+ - Can upload images
+ - Generage url from public_id

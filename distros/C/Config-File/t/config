@@ -1,0 +1,11 @@
+# This is a comment
+foo = bar
+bar = $foo/bar
+foobar = $bar \# variable \# #comment
+dummy[1] = data 1
+dummy[2] = data 2
+dummy[3] = data 3
+quoted = "foo 'bar baz'"
+comment_limit = Complete value#this is discarded
+to'be^ignored = This should not exist
+malformed line that should be also dropped (no equal sign)

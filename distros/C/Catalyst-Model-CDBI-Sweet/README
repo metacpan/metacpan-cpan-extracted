@@ -1,0 +1,52 @@
+NAME
+        Catalyst::Model::CDBI::Sweet - Making sweet things sweeter
+
+SYNOPSIS
+        package MyApp::Model::CDBI;
+        use base 'Catalyst::Model::CDBI::Sweet';
+        MyApp::Model::CDBI->connection('DBI:driver:database');
+    
+        package MyApp::Model::Article;
+        use base 'MyApp::Model::CDBI';
+    
+            ... # table class config here
+
+DESCRIPTION
+    This model is a thin wrapper around Class::DBI::Sweet to let you use it
+    as a Catalyst Model easily. It's similar to
+    Catalyst::Model::CDBI::Plain.
+
+    If you want to use loader, you will probably want to add something like
+    this to your CDBI model config section instead:
+
+               left_base_classes       => qw/Class::DBI::Sweet/,
+
+    To see how you can take advantage of this module, please check out the
+    Class::DBI::Sweet documentation.
+
+SEE ALSO
+    Class::DBI::Sweet, Catalyst::Model::CDBI, Catalyst.
+
+AUTHOR
+    Christian Hansen <ch@ngmedia.com>
+
+THANKS TO
+    Danijel Milicevic, Jesse Sheidlower, Marcus Ramberg, Sebastian Riedel,
+    Viljo Marrandi
+
+SUPPORT
+    #catalyst on <irc://irc.perl.org>
+
+    <http://lists.rawmode.org/mailman/listinfo/catalyst>
+
+    <http://lists.rawmode.org/mailman/listinfo/catalyst-dev>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Catalyst
+
+    Class::DBI::Sweet
+

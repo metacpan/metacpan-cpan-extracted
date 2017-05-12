@@ -1,0 +1,37 @@
+From perl5-porters@perl.org  Wed Jan 31 11:52:41 2001
+Received: (qmail 12022 invoked by uid 511); 31 Jan 2001 19:49:54 -0000
+To: perl5-porters@perl.org
+Delivered-To: perlmail-perlbug@perl.org
+Cc: richard@perl.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [ID 20010131.021] OK: perl v5.6.1 +v5.6.1-TRIAL2 on VMS_AXP V7.1
+     (UNINSTALLED)
+MIME-Version: 1.0
+Date: Wed, 31 Jan 2001 11:52:41 -0800 (PST)
+Message-ID: <Pine.OSF.4.10.10101311152100.336633-100000@aspara.forte.com>
+From: pvhp@forte.com
+X-Authentication-Warning: aspara.forte.com: pvhp owned process doing -bs
+X-Errors-To: richard@perl.org
+X-Original-CC: vmsperl@perl.org
+X-Original-From: Peter Prymmer <pvhp@forte.com>
+X-Original-Message-Id: <Pine.OSF.4.10.10101311152100.336633-100000@aspara.forte.com>
+X-Original-Subject: OK: perl v5.6.1 +v5.6.1-TRIAL2 on VMS_AXP V7.1 (UNINSTALLED)
+X-Original-To: perlbug@perl.org
+X-Perlbug-Admin-Url-Bug: http://bugs.perl.org/admin/perlbug.cgi?req=bidmid
+     s&bidmids=20010131.021
+X-Perlbug-Url-Bug: http://bugs.perl.org/perlbug.cgi?req=bid&bid=20010131.021
+X-Perlbug: Perlbug(tron) v2.36
+Delivered-To: mailing list perl5-porters@perl.org
+Mailing-List: contact perl5-porters-help@perl.org; run by ezmlm
+Newsgroups: perl.perl5.porters,perl.vmsperl
+Path: nntp.perl.org
+Return-Path: <richard@perl.org>
+Xref: nntp.perl.org perl.perl5.porters:29960 perl.vmsperl:8084
+X-JNN-List-Post: <mailto:perl5-porters@perl.org>
+X-JNN-NNTPD-Xref: nntp.perl.org perl.perl5.porters:29960
+
+
+This is a success report for perl from pvhp@corie.forte.com,
+generated with the help of perlbug 1.33 running under perl v5.7.0.
+
+Perl reported to build OK on this system.

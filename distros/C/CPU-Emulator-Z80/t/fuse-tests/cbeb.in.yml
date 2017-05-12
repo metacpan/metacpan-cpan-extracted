@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 235
+  6682:
+    - 33
+name: cbeb
+registers:
+  AF: 61440
+  AF_: 0
+  BC: 21291
+  BC_: 0
+  DE: 41406
+  DE_: 0
+  HL: 6682
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,36 @@
+---
+abstract: 'simple CLI dispatcher'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Classy: '0.04'
+  Test::More: '0.47'
+  Test::UseAllModules: '0.15'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.07'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CLI-Dispatch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Inspector: '0'
+  Class::Unload: '0'
+  Encode: '0'
+  Getopt::Long: '0'
+  Log::Dump: '0.10'
+  Path::Tiny: '0'
+  Pod::Simple: '0'
+  String::CamelCase: '0'
+  Term::Encoding: '0'
+  Try::Tiny: '0'
+resources:
+  repository: https://github.com/charsbar/cli-dispatch
+version: '0.21'

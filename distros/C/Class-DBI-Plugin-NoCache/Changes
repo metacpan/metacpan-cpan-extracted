@@ -1,0 +1,13 @@
+Revision history for Perl extension Class::DBI::Plugin::NoCache.
+
+0.03  Sat Aug 27 19:00:00 2005
+	- fixed typo
+      reported by makamaka
+
+0.02  Sat Aug 27 15:00:00 2005
+	- CPAN release
+
+0.01  Sat Jun 11 02:13:37 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Class::DBI::Plugin::NoCache
+

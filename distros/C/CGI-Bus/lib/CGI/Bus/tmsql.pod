@@ -1,0 +1,1701 @@
+=head1 NAME
+
+CGI::Bus::tmsql - SQL database user interface to view and edit data
+
+
+=head1 SYNOPSIS
+
+ use CGI::Bus;
+ $s =CGI::Bus->new();
+ $s->dbi("DBI:mysql:mysql","root","");
+ $s->tmsql->set(-form=>[
+    {-tbl=>'mysql.user', -alias=>'u'}
+   ,{-flg=>'ak"',        -fld=>'host',-crt=>'localhost',-qry=>'localhost'}
+   ,{-flg=>'cieulqsk"',  -fld=>'user'}
+   ,{-flg=>'cevls"',     -fld=>'password'}
+   ]);
+ $s->tmsql->set(-lists=>{'default'=>{-orderby=>'1 ASC, 2 DESC'}});
+ $s->tmsql->evaluate;
+
+
+=head1 DESCRIPTION
+
+This module is an SQL database user interface to view and edit data,
+page transaction manager.
+
+There are a common C<TRANSACTION SEQUENCE> and two programming interfaces. 
+Simplest interface uses C<cmd>(-command) conditions and
+direct L<DBI|DBI> calls along with C<cnd> and C<qparam> calls.
+More usable interface (SQL generator) uses C<DATA DESCRIPTION> inside 
+C<-form> and C<-lists> slots  
+with C<eval> or C<evaluate> or C<cmd>('-cmd') call.
+
+See L<CGI::Bus::tm|CGI/Bus/tm> as base class.
+
+See L<CGI::Bus::Base|CGI/Bus/Base> for inherited slots and methods.
+
+
+
+=head1 TRANSACTION SEQUENCE
+
+Transaction sequence is a series of hooks dependent on
+current command C<cmd> and
+current generic (or general or global) command C<cmdg>.
+C<cmd>(-command) calls are used as conditions.
+In simplest programming interface this conditions should be programmed.
+In more usable programming interface (SQL generator) 
+this conditions are hidden inside 
+C<eval> or C<cmd>(C<-cmd>) call evaluating C<cmdCCC> methods, 
+but may be hooked with C<-cmdCCC> slots.
+
+Using simplest interface, transaction sequence looks like something as:
+
+ my $s =CGI::Bus->new();
+ my $t =$s->tmsql;
+ my $d =$s->dbi;        #
+ eval {                 # inside $t->eval(?connect, sub{
+   if ($t->cmd(-chk)) { # check before insert, update, delete # $t->cmdchk
+   }
+   if ($t->cmd(-ins)) { # insert record # $t->cmdins
+       $d->execute('insert ...', @{$t->qparam([names])});
+   }
+   if ($t->cmd(-upd)) { # update record where cnd # $t->cmdupd
+       $t->cnd(-upd, field=>flags,...);
+       $d->execute('update ...' .$t->cnd, @{$p->qparam([names])});       
+   }
+   if ($t->cmd(-del)) { # delete record where cnd # $t->cmddel
+       $t->cnd(-del, field=>flags,...);
+       $d->execute('delete ...' .$t->cnd);
+   }
+   if ($t->cmd(-sel)) { # select record fields to edit # $t->cmdsel
+       $t->cnd(-sel, field=>flags,...);
+       $p->qparam($d->selectrow_hashref('...' .$t->cnd));      
+   }
+   if ($t->cmd(-crt)) { # create new record values # $t->cmdcrt
+   }
+   if ($t->cmd(-qry)) { # list query condition # $t->cmdqry
+   }
+   if ($t->cmd(-htm)) { # html page begin # $t->cmdhtm
+       print $t->htmlhid;
+       print $t->htmlbar;
+   }
+   if ($t->cmd(-frm)) { # html record form # $t->cmdfrm
+     # print html form
+   }
+   if ($t->cmd(-lst)) { # list records # $t->cmdlst
+       $t->cnd(-lst, field=>flags,...);
+       $d->select...
+   }
+   if ($t->cmd(-end)) { # commit, inside $t->eval call
+       $d->commit
+   }
+ };
+ $t->print($t->htmlres);# result msg, inside $t->eval call
+}
+
+
+=head2 Transaction Sequence and Calls
+
+=over
+
+=item -chk
+
+Check or compute fields values before insert, update, delete operation - 
+C<cmdchk> call
+
+
+=item -ins
+
+Insert record into database - C<cmdins> call
+
+
+=item -upd
+
+Update record in the database.
+Previous values parameters names have C<-pxpv> prefix.
+C<cmdupd> call.
+
+
+=item -del
+
+Delete record in the database.
+Previous values parameters names have C<-pxpv> prefix.
+C<cmddel> call.
+
+
+=item -sel
+
+Select record fields into L<CGI|CGI> params to view or edit.
+Previous values parameters will be reseted.
+C<cmdsel> call.
+
+
+=item -crt
+
+Create new record fields values into L<CGI|CGI> params.
+Initiate to present new record form.
+C<cmdcrt> call.
+
+
+=item -qry
+
+List query condition values initiate as L<CGI|CGI> params
+- C<cmdqry> call
+
+
+=item -htm
+
+HTML page begin output - 
+print operations action bar
+and hidden HTML - 
+C<cmdhtm> call
+
+
+=item -frm
+
+Output HTML record form for query condition, view or edit - 
+C<cmdfrm> call
+
+
+=item -lst
+
+List records to user according to filter, view chosen, query condition given
+- C<cmdlst> call
+
+
+=item -end
+
+Commit database transaction, the last command,
+implemented inside C<eval> call along with C<htmlres> and rollback.
+
+
+=back
+
+
+
+
+=head1 DATA DESCRIPTION
+
+About all C<SLOTS> of C<CGI::Bus::tmsql> object are related to
+data description, but several slots have a complex format described below.
+All slots are available via C<new> or C<set> call.
+
+
+
+=head2 Form Description
+
+Form description C<-form> slot contains C<Table Description>,
+C<Field Description>, and HTML elements as array ref:
+
+C<set>(C<-form> => 
+[{ C<-tbl> => table_name, C<-alias>, C<-join>, C<-joina>, C<-joinw> },
+{ C<-fld> => field_name, C<-flg>, C<-col>, C<-src>, 
+C<-lbl>, C<-lblhtml>, C<-cmt>, 
+C<-inp>, C<-inphtml>, C<-hide>, C<-hidel>, C<-colspan>, C<-width>,
+C<-chk>, C<-sav>, 
+C<-qry>, C<-crt>, C<-frm>, 
+C<-null>, C<-cstr>, C<-clst>, C<-cdb>, C<-cdbC>, C<-cdbCa> }
+........,
+HTML, .......])
+
+
+Related to table fields should be described below table.
+
+Sequence of fields corresponds to form and default views.
+
+HTML element may be
+"" - to continue field placement in the current row
+(otherwise next field will be placed at the next row),
+"\t" - to skip table cell,
+"\f" - to finish tabular layout,
+"</table>" - to finish tabular layout and output of labels,
+"string" - string to print,
+\&sub - to eval and print
+
+
+
+=head2 Table Description
+
+{ C<-tbl> => table_name, C<-alias>, C<-join>, C<-joina>, C<-joinw> }
+element of C<Form Description> C<-form> slot
+
+Required are C<-tbl> and some of joins for joined tables
+
+=over
+
+=item -alias
+
+Table alias used in SQL selects
+
+
+=item -join
+
+Join operation in 'FROM' SQL 'SELECT' clause at the left of the table mention
+
+
+=item -joina
+
+Join operation in 'FROM' SQL 'SELECT' clause at the right of the table mention
+
+=item -joinw
+
+Join condition for 'WHERE' SQL 'SELECT' clause
+
+
+=item -tbl
+
+Table name in database
+ 
+
+=back
+
+
+=head2 Field Description
+
+{ C<-fld> => field_name, C<-flg>, C<-col>, C<-src>,
+C<-lbl>, C<-lblhtml>, C<-cmt>, 
+C<-inp>, C<-inphtml>, C<-hide>, C<-hidel>,
+C<-chk>, C<-sav>, C<-ins>, C<-upd>,
+C<-qry>, C<-crt>, C<-frm>, 
+C<-null>, C<-cstr>, C<-clst>, C<-cdb>, C<-cdbC>, C<-cdbCa> }
+element of C<Form Description> C<-form> slot.
+Required are only C<-fld> and C<-flg>.
+
+=over
+
+
+=item -cdb
+
+Convert param to database sub{}.
+Sub to convert field value (L<CGI|CGI> param) to database form
+
+
+=item -cdbC
+
+Convert or compute field value sub{} on 'C' database command -
+'i'nsert, 'u'pdate, or 'd'elete.
+In C<cmdsql> it will be evaluated
+just before command, when SQL generation.
+Autogenerated key value may be implemented via '-cdbi' sub.
+Computed fields may be implemented via C<-frm> or C<-sav> sub.
+See also C<-cdbCa>, C<-frm>, C<-sav>.
+
+
+=item -cdbCa
+
+Convert or compute field value sub{} after 'C' database command -
+'i'nsert, 'u'pdate, or 'd'elete.
+In C<cmdsql> it will be evaluated just after SQL execution.
+Generated by database key value may be retrieved via '-cdbia' sub{},
+e.g. -cdbia => sub{$_[0]->dbi->{'mysql_insertid'}}.
+See also C<-cdbC>, C<-frm>, C<-sav>.
+
+
+=item -chk
+
+ -chk => "perl code"
+ -chk => sub{}
+ -chk => [ sub{}, message string ]
+
+Check field value before C<-ins> or C<-upd> action - insert or update.
+
+
+=item -clst
+
+Convert sub{} to use in list.
+Sub{}(self, {field definition}, field data, {row data}) 
+to convert value to HTML for use in list of records (C<-lst> action).
+Default is nothing.
+
+
+=item -cmt
+
+=item -cmt_LNG
+
+Comment to field. LNG is C<lngname>
+
+
+=item -colspan
+
+'td' HTML tag attribute - number of form columns to occupy widget with
+
+
+=item -crt
+
+Create default field value.
+Default field value for new record creation (C<-crt> action).
+Sub{} or value.
+
+
+=item -cstr
+
+Convert to string sub{}.
+Sub{} to convert value to external form - 
+for use in list of records (C<-lst> action)
+or record edit/view form (C<-frm> action)
+
+
+=item -col
+
+Table column name.
+Database table column name of the field.
+May be database function call to use in SQL SELECT.
+Default is field name C<-fld>
+
+
+=item -del
+
+Delete record field value, sub{} or value, computed inside C<cmdchk>
+under C<-del> command. See also C<-ins>, C<-upd>, C<-sav>.
+
+
+=item -fld
+
+Field name, unique in the C<Form Description>, used as L<CGI|CGI> param name
+with or without prefix like C<-pxpv>
+
+
+=item -flg
+
+Field flags string:
+
+ 'a'll - use in all operations below (except 'f'etch, 'k'ey and below)
+
+ 'c'reate - create new record
+ 'e'dit   - edit record and field
+ 'v'iew   - view record or  field
+            'av' - always view only, not edit
+            'cv' - view only when new record created
+            'ev' - view only when record is edited
+ 'l'ist   - list records
+ 'f'etch  - fetch only when list
+ 'q'uery  - query condition form to list records
+
+ 'i'nsert - insert to database
+ 'u'pdate - update in database
+ 'd'elete - delete in database           (reserved)
+ 's'elect - select from database
+
+ 'k'ey       - key field, use to open record from list of records
+ 'w'here key - use field along with key in update or delete condition
+               for optimistic locking
+ 'm'andatory - value is required
+ 'g'enerated - value is generated by database
+ '"',"'"     - quote method of the value ('[' reserved)
+ 'n'umeric   - numeric value             (reserved)
+
+
+
+=item -frm
+
+Compute field value sub{}
+to evaluate on C<-chk> or C<-frm> command.
+See also C<-sav>
+
+
+=item -hide
+
+Hide field from Form (C<-frm>) condition sub{}
+
+
+=item -hidel
+
+Hide field from Form (C<-frm>) condition sub{}.
+Fields at the right will be shifted to the left.
+
+
+=item -inp
+
+Input or edit HTML widget description:
+-inp=>{?attributes} or -inp=>[input_type => {?attributes}].
+Short form may be used to describe 
+'textfield' or 'htmltextfield', 
+'textarea' or 'htmltextarea', 
+or 'popup_menu'.
+C<-htmlopt> => 1 attribute causes to use data as HTML if 
+HTML formatting detected with C<ishtml> L<CGI::Bus|CGI/Bus> method.
+'htmltextarea' URLs display behaviour is extended with 
+special URL protocol 'fsurl://' to be translated to C<fsurl> value.
+See also L<CGI::Bus|CGI/Bus> for 'htmltextfield' and 'htmltextarea'
+attributes.
+
+
+=item -inphtml
+
+Input/edit widget HTML background. Value or sub{} to compute it.
+HTML code to place into form with HTML widget C<-inp> embedded.
+May contain 'TD' or 'TH' HTML tags.
+'$_' marks the insertion point for widget.
+See also C<htmlddlb>.
+
+
+=item -ins
+
+Insert field value, sub{} or value, computed inside C<cmdchk>
+under C<-ins> command. See also C<-upd>, C<-del>, C<-sav>.
+
+
+=item -lbl
+
+=item -lbl_LNG
+
+Field label.
+External name of the field to use 
+in list of records (C<-lst>) or form (C<-frm>).
+LNG is C<lngname>
+
+
+=item -lblhtml
+
+Label HTML background. Value or sub{} to compute it.
+HTML code to place into form with field label C<-lbl> embedded.
+May contain 'TD' or 'TH' HTML tags.
+'$_' marks the insertion point for label.
+
+
+=item -null
+
+NULL or undefined value to present
+
+
+=item -qry
+
+Default query condition.
+Default value for query condition for the list of records.
+Sub{} or value.
+
+
+=item -sav
+
+Field value or sub{} to compute it before data save - 
+C<-ins>, C<-upd>, C<-del> - 
+for computed when saved fields, inside C<cmdchk>.
+Computed fields may be implemented via C<-frm> sub.
+See also C<-cdbC>, C<-frm>.
+
+
+=item -src
+
+Source of value, RESERVED.
+Source value field for join, insert, edit
+
+
+=item -upd
+
+Update field value, sub{} or value, computed inside C<cmdchk>
+under C<-upd> command. See also C<-ins>, C<-del>, C<sav>.
+
+
+=item -width
+
+Width of the data cell.
+Number of characters to use in lists.
+Or 'td' or 'th' HTML tag attribute to
+use in forms and lists
+
+
+=back
+
+
+
+
+=head2 Views Description
+
+Views description C<-lists> slot contains hash ref:
+
+C<set>(C<-lists> => 
+{ view_name=>{ C<-lst>, C<-lbl>, C<-cmt>, 
+C<-fields>, C<-key>, C<-listurm>,
+C<-dsub>, C<-sub>,
+C<-where>, C<-wherepar>, C<-filter>, C<-rowlst>, C<-orderby>, C<-groupby>,
+C<-href>, C<-hrefc>,
+C<-htmlts>, C<-htmlte>, C<-width>, C<-refresh>,
+C<-gant1>, C<-gant2>, C<-htmlg1>
+}
+, ........} )
+
+Default view should be marked with '_' at the end of the name or 
+it will be the first in sorted order.
+Hidden (from list of views) view should be marked with '_'
+at the begin of the name.
+
+
+=over
+
+=item -cmdCCC
+
+Transacion command 'CCC' hook subroutine reference. 
+Commands and default operation are described in L<CGI::Bus::tm|CGI/Bus/tm>,
+see TRANSACTION SEQUENCE and -cmdCCC slot.
+
+
+=item -cmt
+
+=item -cmt_LNG
+
+Comment text for view, string or array ref.
+LNG is C<lngname>
+
+
+=item -dsub
+
+Data feeder sub{} to provide array ref of rows instead SQL SELECT
+
+
+=item -fields 
+
+-fields => [field names to view]
+Field names to use in view, in left to right order.
+Default fields and order is specified by C<-form> and C<-flg>.
+
+
+=item -filter
+
+Filter 'WHERE' clause for SQL Select - string or sub{} - 
+to use instead upper C<-fltlst> or C<-filter>
+
+
+=item -gant1
+
+=item -gant2
+
+Datetime field names or SQL expressions 
+to produce left and right valies
+to generate Gant (timeline) chart.
+Values returned should be ISO date-time 'yyyy-mm-dd hh:mm:ss', where
+time digits are optional.
+
+
+=item -groupby 
+
+'GROUP BY' clause string for SQL 'SELECT'
+
+
+=item -htmlts
+
+=item -htmlte
+
+Starting and ending records table HTML, including '<table >' tags.
+
+
+=item -htmlg1
+
+Gant (timeline) chart cell HTML, including '<td>' tags.
+
+
+=item -href
+
+ -href => [ ?url, ?command_param, ?command_value ]
+
+URL to open view entry, used with key parameters added
+
+
+=item -hrefc
+
+Last view column number inside hyperlink.
+Default is 0 - first column only;
+-1 means all columns.
+
+
+=item -key
+
+ -key => [field,...]
+
+Key fields to open list entry parameters
+
+
+=item -lst
+
+=item -lst_LNG
+
+View name as displayed to user,
+default is key of view.
+LNG is C<lngname>
+
+
+=item -listrnm
+
+View rows number default margin.
+Margin of the number of the rows returned by C<-lst> operation
+
+
+=item -listurm
+
+ -listurm => [field,...]
+
+Fields to include into hyperlinks to produce 'unread marks' behaviour,
+defaults are 'w'here key fields
+
+
+=item -orderby
+
+'ORDER BY' clause string or array ref for SQL 'SELECT'.
+May be redefined by user in 'Query' screen.
+
+
+=item -refresh
+
+Refresh frequency for view HTML page,
+used to generate <meta http-equiv="refresh" CONTENT=XX>
+
+
+=item -rowlst
+
+Sub{}(self, [fields definitions], [row data], {row data})
+to allow row to be included in the list displayed.
+To use instead of upper C<-rowlst>.
+
+
+=item -sub
+
+View implementation sub{} instead C<cmdlst>
+
+
+=item -where
+
+'WHERE' clause part string for SQL 'SELECT'.
+Complete 'WHERE' clause is formed with C<-fltlst> or C<-filter>,
+C<-where>, 'Query' screen condition or C<-wherepar>.
+
+
+=item -wherepar
+
+Default 'Query' screen 'WHERE' condition to be used as a part for SQL 'SELECT'.
+
+
+=item -width
+
+Width of view records table, in '&nbsp;' chars
+
+
+
+=back
+
+
+=head2 Access Control Description
+
+Simple access control may be implemented with
+C<-filter>, C<-fltlst>, C<-fltedt> slots, that are
+additions to SQL statement 'where' clause.
+Operations with single record (C<-sel>, C<-ins>, C<-upd>, C<-del>)
+may use C<-acd> slot described below.
+Only this slot may be used with C<File Store Description>.
+
+C<set>(C<-acd>=>{C<-read>, C<-readsub>, C<-sread>, C<-write>, C<-swrite>, C<-oswrite>})
+
+
+=over
+
+=item -cC
+
+Substitution for 'c' slot (see below)
+and 'C' command ('i'nsert, 'u'pdate, 'd'elete).
+Array ref is treated as usernames are used for insert, fieldnames otherwise.
+
+
+=item -htaccess
+
+Force to generate '.htaccess' files without Apache - boolean or sub{} condition
+
+
+=item -oswrite
+
+Sub{} or array ref with usernames of operation system writers,
+used for file access control settings, default are
+Windows 'System' and 'Administrators'
+
+
+=item -read
+
+Sub{} or array ref with fieldnames with reader usernames.
+Usernames may be delimited with commas or semicolons inside field.
+
+
+=item -readsub
+
+Sub{} to test record read permission, along with C<-read> and C<-sread>.
+
+
+=item -sread
+
+Sub{} or array ref with usernames of system readers
+
+
+=item -swrite
+
+Sub{} or array ref with usernames of system writers
+
+
+=item -write
+
+Sub{} or array ref with fieldnames with writer usernames.
+Usernames may be delimited with commas or semicolons inside field.
+
+
+=back
+
+
+
+=head2 Version Store Description
+
+Record versioning description related slots are
+C<-keyfld> - single key field name and
+C<-vsd> - version store description.
+C<-vsd> slots 
+C<-npf>,  C<-cof>, C<-cvd>, C<-sf>, C<-svd>, C<-sd>, C<-uuf>, C<-utf>
+are described below
+
+=over
+
+=item -cof
+
+Checked out pointer field name, RESERVED
+
+
+=item -npf
+
+New version pointer field name
+
+
+=item -sd
+
+State deleted value of C<-sf>
+
+
+=item -sf
+
+State field name
+
+
+=item -cvd
+
+Condition version disable sub{}, 
+used instead of condition param(C<-sf>) eq C<-svd>
+
+
+=item -svd
+
+State versioning disable C<-sf> value
+
+
+=item -utf
+
+Update time field name.
+C<-sav> C<-form> field attribute may be used instead.
+
+
+=item -uuf
+
+Update user field name.
+C<-sav> C<-form> field attribute may be used instead.
+
+
+=back
+
+
+=head2 File Store Description
+
+Attached to records files storing related slots are
+C<-keyfld> - single key field name and
+C<-fsd> - file store description.
+C<-fsd> slots 
+C<-path>,  C<-vspath>, C<-urf>, C<-url>, C<-vsurf>, C<-vsurl>, C<-ksplit>, C<-acl>
+are described below
+
+=over
+
+=item -acl
+
+Access control list set sub{}, may be used inside C<fsacl>
+
+
+=item -ksplit
+
+Subdirectories size to split key value to, or splitter sub{}.
+Some file systems do not like very many entries in directory.
+0 - do not split.
+
+
+=item -path
+
+Path to file store root directory
+
+
+=item -urf
+
+Filesystem URL of file store root directory,
+to form 'file://' URLs
+
+
+=item -url
+
+URL of file store root directory
+
+
+=item -vspath
+
+Path to separate store old versions, optional
+
+
+=item -vsurf
+
+Filesystem URL to separate store old versions, optional
+
+
+=item -vsurl
+
+URL to separate store old versions, optional
+
+
+=back
+
+
+
+=head2 Other Descriptions
+
+C<-filter>, C<-fltsel>, C<-fltlst>, C<-fltedt>, C<-opflg>, 
+C<-listrnm>, C<-lboxrnm>, C<-listurm>
+
+
+
+=head2 Usage Tips
+
+=over
+
+=item File and Version Store
+
+Access to files in File Store is direct, unlike data in database,
+where previous values of the record are available.
+So, files editing is available only during 'edit' record state,
+determined by C<-svd> or C<-cvd>.
+Files editing is always available in applications without 
+versioning (C<-vsd> settings).
+
+
+=item Template Records with File and Version Store
+
+There may be special template data records to create new records with.
+User should open template record, edit it as needed, 
+and invoke 'Insert' action.
+Attached to template files inside File Store (C<-fsd>)
+and under Version Store (C<-vsd>) may be involved by
+opening template record, editing it, 
+choosing 'edit' (C<-svd>) record state, 
+invoking 'Insert' action.
+Creation record by template could not be implemented via
+'template' -> 'edit' -> 'Update' transition, because of
+template's own 'edit' state. So, 'template' -> 'non-template' -> 'Update'
+transition should only be applied to template record.
+
+
+=item Short Usernames
+
+It is not comfortable for user to always input user names 
+with domain name part, especially if domain is the same as user logged in.
+So, software may translate short user names to full, 
+or use variants of the user names.
+But long and complex SQL queries are not comfortable for software.
+And domain name is not always natural part of the name of the person.
+So, user names should be short if possible.
+
+
+
+=back
+
+
+
+=head1 SLOTS
+
+=over
+
+
+=item -acd
+
+Access control description hash ref. 
+See C<Access Control Description>
+
+
+=item -cmd
+
+Current transaction command cached by C<cmd>
+
+
+=item -cmdc
+
+Current transaction command cached inside C<cnd> calls
+
+
+=item -cmdCCC
+
+Transaction command 'CCC' hook subroutine reference.
+Default operation is C<cmdCCC> call.
+Commands are described in C<TRANSACTION SEQUENCE> above.
+
+
+=item -cmde
+
+Current transaction command edit state flag cached by C<cmd> calls
+
+
+=item -cmdg
+
+Generic (general, global) 
+transaction command cached by C<cmd>, available via C<cmdg>.
+This is any C<-cmd> command except form exchanges - 
+C<-frm>, C<-ins>, C<-upd> commands.
+
+
+=item -cnd
+
+Transaction condition string generated by C<cnd>
+
+
+=item -filter
+
+Filter 'WHERE' clause for all SQL commands - string or sub{}.
+C<-fltsel>, C<-fltlst>, C<-fltedt> takes precedence
+
+
+=item -fltedt
+
+Filter 'WHERE' clause SQL 'UPDATE' and 'DELETE' commands - string or sub{}
+
+
+=item -fltlst
+
+Filter 'WHERE' clause SQL 'SELECT' command to list records - string or sub{}
+
+
+=item -fltsel
+
+Filter 'WHERE' clause SQL 'SELECT' command to view record - string or sub{}
+
+
+=item -form
+
+Form data description, see C<Form Description>
+
+
+=item -formtgf
+
+Form Target Frame. 
+Target frame to open form for create new or edit existed record.
+Undefined value means the same browser window as for list of records, 
+'_BLANK' opens new browser window
+
+
+=item -fsd
+
+File store description hash ref. 
+See C<File Store Description>
+
+
+=item -ftext
+
+Full-text search expression template for use in query condition for C<-lists>,
+'$_' is placeholder.
+'%$_' placeholder prepends search string with '%' sign to use in 'LIKE'.
+Example: '(col1 LIKE %$_ OR col2 LIKE %$_)'.
+Example: 'MATCH (col1,col2,...) AGAINST ($_)'.
+
+
+=item -genedt
+
+Generated by C<cmdsql> SQL 'INSERT', 'UPDATE', or 'DELETE' statement
+
+
+=item -genfrom
+
+Generated by C<cmdlst> or C<cmdsel> or C<cmdsql> SQL statement 'FROM' clause
+
+
+=item -gensel
+
+Generated by C<cmdlst> or C<cmdsel> SQL 'SELECT' statement to list record(s)
+
+
+=item -genselg
+
+Generated by C<cmdlst> SQL 'SELECT' statement to get margins for
+Gant (timeline) chart using min(C<-gant1>) and max(C<-gant2>).
+
+
+=item -genselt
+
+Title of generated by C<cmdlst> SQL 'SELECT' statement to display above records.
+
+
+=item -genwhr
+
+Generated by C<cmdlst> or C<cmdsel> or C<cmdsql> SQL statement 'WHERE' clause
+
+
+=item -htmlts
+
+=item -htmlte
+
+Starting and ending data (form or view) table HTML.
+Commonly used by default are '<table>' and '/<table>'.
+
+
+=item -keyfld
+
+Single key field name for versioning and file fields, cached by C<keyfld>
+
+
+=item -lboxrnm
+
+Listbox rows number margin for C<htmlddlb>
+
+
+=item -lists
+
+Views data description, see C<Views Description>
+
+
+=item -listrnm
+
+View rows number default margin.
+Margin of the number of the rows returned by C<-lst> operation
+
+
+=item -listurm
+
+ -listurm => [field,...]
+
+Fields to include into hyperlinks to produce 'unread marks' behaviour,
+defaults are 'w'here key fields
+
+
+=item -logo
+
+Logotype to place at the left of the toolbar. 
+May be image URL or HTML.
+See also C<-tbarl>
+
+
+=item -opflg
+
+Operations allowed letters:
+'<' leftmost left navigation action bar from C<htmlbar>;
+'a'll:
+'c'reate/'i'nsert,
+'e'dit/'u'pdate,
+'d'elete record;
+'s'elect record (?), '!s'elect record button;
+'v'iew record, '!v'iew record mode;
+'l'ist records, 'q'uery condition
+
+
+
+=item -pxcb
+
+-pxcb => '_tcb_' - 
+Transaction command or button name prefix
+
+
+=item -pxqc 
+
+-pxqc  => '_tsw_' - 
+Special widget name prefix
+
+
+=item -pxpv
+
+-pxpv => '_tpv_' -
+Previous value parameter name prefix for C<-upd> and C<-del> operation
+
+
+=item -pxqc 
+
+-pxqc => '_tqc_' -
+Query condition parameter name prefix for save by C<-lst> operation
+
+
+
+=item -refresh
+
+Refresh frequency for all lists (views) of recods,
+used to generate <meta http-equiv="refresh" CONTENT=XX>
+
+
+
+=item -rowlst
+
+=item -rowsel
+
+=item -rowedt
+
+=item -rowsav
+
+=item -rowins
+
+=item -rowupd
+
+=item -rowdel
+
+Subs{} to allow or filter row operation given.
+Are used at a lower level, then C<-cmdCCC> subs{}.
+May be used for access control.
+C<-rowlst> is evaluated for each row in C<cmdlst> to filter rows to display.
+C<-rowedt> controls record edit appearance.
+C<-rowupd> and C<-rowdel> (and C<-rowsav> in this cases)
+are evaluated when previous values
+of fields are fetched to C<-pxpv> parameters.
+
+
+
+=item -rowsav1
+
+=item -rowsav2
+
+=item -rowsav1a
+
+=item -rowsav2a
+
+Like C<-rowsav>, but immediatelly before or 'a'fter database (SQL) command
+generation and execution.
+Actual field values to be used for or 'a'fter database command are 
+available as L<CGI|CGI> params.
+C<-rowsav1> is used for edited record only 
+(new value fieldnames not prefixed).
+C<-rowsav2> is used in each C<cmdsql> call
+(new value fieldnames may be prefixed).
+
+
+
+=item -rowsel1a
+
+=item -rowsel2a
+
+=item -rowsel3a
+
+Like C<-rowsel>, but immediatelly 'a'fter database (SQL SELECT) command
+generation and execution.
+Field values are available as L<CGI|CGI> params, 
+both previous (C<-pxpv>) and pending.
+C<-rowsel1a> is used while editing record operation only 
+(when previous field values selected).
+C<-rowsel2a> is used in each interactive C<cmdsel> call
+(previous or current field values selected).
+C<-rowsel3a> is used after each record fetch using C<cmdsel> call.
+
+
+
+=item -tbarl
+
+Left toolbar HTML or HTML strings array ref for C<-htm> operation
+
+
+=item -tbarr
+
+Right toolbar HTML or HTML strings array ref for C<-htm> operation
+
+
+=item -vsd
+
+Version store description hash ref. 
+See C<Version Store Description>
+
+
+=item -width
+
+Width of data (form or view) table, in '&nbsp;' chars
+
+
+=back
+
+
+
+=head1 METHODS
+
+Common methods: C<qparampv>, C<qparamsw>, C<qparampx>, C<htmlself>,
+C<cmd>, C<cmdg>, 
+C<htmlbar>, C<htmlhid>, C<htmlres>, C<htmlself>, 
+C<htmlddlb>, C<htmllst>,
+C<eval>, C<evaluate>
+
+Simplest programming interface: C<cmd>, C<cnd>, and above
+
+Usable programming interface: C<evaluate>, C<eval>, C<cmd>
+
+Advanced usable: C<cmdchk>, 
+C<cmdsql>, C<cmdins>, C<cmdupd>, C<cmddel>, C<cmdsel>, 
+C<cmdcrt>, C<cmdqry>, C<cmdhtm>, C<cmdfrm>, C<cmdlst>,
+C<acltest>, C<aclsel>,
+and above
+
+
+=over
+
+
+=item aclsel () -> SQL SELECT WHERE clause part
+
+=item aclsel (?'-t', ?'-and', ?'-not', ?field name,...,?[user names],...)
+
+Generates WHERE clause part for SQL SELECT from C<-acd>
+data or field names given. 
+'-t' option (default) is used to 't'est with C<acltest>('-lst')
+if condition needed (user not in C<-sread> or C<-swrite>).
+'-and' option produces ' AND' prefix before not empty condition.
+'-not' option produces 'AND ... NOT IN' behaviour.
+
+User names array ref replaces default or current user names list.
+Sub{}($self,$field,$users) will be evaluated for the field name followed.
+m/^\$_(regexp|rlike)$/i value produces 'REGEXP' or 'RLIKE' 
+MySQL-like expression on user names to match the field followed.
+m/.*\$_.*/ value is treated as a template string to be used for the field 
+followed, with '$_f' and '$_u' placeholders for field and user names.
+
+May be used in C<-fltlst>, C<-fltsel>, C<-filter>.
+
+
+=item cmd -> current command
+
+=item cmd (-command) -> is command matched?
+
+=item cmd (-cmd) -> execution of all commands required
+
+Current transaction command
+
+
+=item cmdchk () -> check before insert, update, delete
+
+Check fields (L<CGI|CGI> params) values before insert or update
+with C<-chk> subs{}.
+Calculate fields values with C<-frm>, C<-sav>, 
+C<-ins>, C<-upd>, C<-del> subs{} 
+before insert, update, delete
+
+
+=item cmdcrt () -> params with default values
+
+Create L<CGI|CGI> params with C<-crt> default values for new record
+
+
+=item cmddel (?-opt) -> DBI delete record
+
+Delete record in database using 
+C<cmdsel>(undef,C<-pxpv>) to fetch previous values
+and C<cmdsql>('-del',opt,@_) to update database.
+Options: '!s'elect, '!v'ersion.
+
+
+=item cmdfrm () -> HTML form fields printed
+
+Print HTML form fields for new, view or edit record
+
+
+=item cmdg -> current generic command
+
+=item cmdg (-command,...) -> is one of commands matched?
+
+Current generic (general, global) transaction command is any C<-cmd> command 
+except form exchanges like C<-frm>, C<-ins>, C<-upd>.
+
+
+=item cmdhtm ()  -> top form HTML printed
+
+Print HTML at the top of the list of records or form of record.
+By other words, print C<htmlbar> and C<htmlhid>.
+
+
+=item cmdins (?-opt) -> DBI insert record
+
+Insert new record into database using C<cmdsql>('-ins',opt,@_).
+Options: none
+
+
+=item cmdlst (?-opt, ?view name, ?where condition) -> list of records HTML printed
+
+Generate and invoke L<DBI|DBI> SQL SELECT according to filter, 
+view choosen, query condition given.
+Print result set in HTML form.
+Option string signs: 
+'g'enarate, e'x'ecute, 
+'m'inimize display,
+'!q'uery params use,
+default is '-gx'.
+
+C<cmdlst> call may be used inside C<-cmdfrm> custom sub{} 
+to embed view - 
+with '-gxm!q' options, 'view' and 'where' args, 
+under C<cmd>(C<-sel>) condition:
+
+ set(-cmdfrm =>sub{
+     my $s =shift;
+     $s->cmdfrm(@_);
+     if ($s->cmd('-sel')) {
+        $s->cmdlst('-gxm!q','All Versions','gwo.idnv=' .$s->dbi->quote($s->param('id')))
+     }
+ });
+
+
+=item cmdqry () -> params with default values
+
+Create L<CGI|CGI> params with C<-qry> default values for query parameters form
+
+
+=item cmdscan (? 'select...' || list name, ? sub{}) -> stmt handle
+
+=item cmdscan (?-cmdlstOpt, list name, ?cmdlst args, ? sub{}) -> stmt handle
+
+Scan data like cmdlst and eval sub{} given.
+Default SQL SELECT is obtained with C<cmdlst>('g');
+'-!q' C<cmdlst> option may be used.
+If sub{} is omitted, C<DBI> statement handle executed will be returned.
+C<cmdsel> and other methods may be called within sub{}.
+C<cmdscan> may be used to program data improvements or corrections.
+
+
+=item cmdscan1 ( cmdscan args ) -> first row
+
+Execute C<cmdscan> and return first row in hash ref or empty value
+
+
+=item cmdsel (?opt, ?prefix) -> DBI select record into params
+
+Generate and execute L<DBI|DBI> SQL SELECT for single record, 
+place data fetched into L<CGI|CGI> params.
+Option string signs: 'g'enarate, e'x'ecute, default is 'gx'.
+Default params names prefix is empty.
+
+
+=item cmdsql (?cmd, ?opt, ?pv_prefix, ?nv_prefix) -> DBI SQL executed
+
+Generate and execute edit L<DBI|DBI> SQL command - 
+'-ins','-upd', '-del'.
+Option string signs: 'g'enarate, e'x'ecute, default is 'gx'.
+Default previous values params names prefix is C<-pxpv>.
+Default new values params names prefix is empty.
+
+
+=item cmdupd (?-opt) -> DBI update record
+
+Update record in database using 
+C<cmdsel>(undef,C<-pxpv>) to fetch previous values
+and C<cmdsql>('-upd',opt,@_) to update database.
+Options: '!s'elect, '!v'ersion.
+
+
+=item cnd -> current transaction command condition string
+
+=item cnd (?-cmd, param => format,...) -> condition string
+
+=item cnd (?-cmd, ?'+', ?'-and|or', ?'+and|or', ?'prefix.', param, ?'fieldname=', format,...) -> condition string
+
+Makes dbi transaction command condition string or returns current condition string.
+'-+and|or' prepends or appends 'and' or 'or' to condition string 
+generated if it is not empty.
+Field values may contain condition expression used for C<-lst> transaction.
+Field values are given from CGI C<param>s.
+Field formats may be 
+empty, quote ("'", '"'), sub, string template with '?' placeholder for value.
+
+
+=item eval (?dbi connect parameters, ?sub{}) -> DBI transaction
+
+Connect to the database, execute given sub{} in L<DBI|DBI> transaction,
+print C<htmlres>, commit or rollback on errors.
+Default procedure is C<cmd>('-cmd').
+See also C<evaluate>
+
+
+=item evaluate () -> operation requested by browser
+
+Full L<CGI::Bus::tmsql|CGI/Bus/tmsql> execution.
+Like C<eval>, but with starting HTTP, 
+starting and ending HTML page.
+Uses '-htpgstart' and '-htpfstart' from parent L<CGI::Bus|CGI/Bus>
+
+
+=item htmlbar (?opt) -> action bar HTML
+
+Generate action bar HTML string dependent on options or C<-opflg>,
+current transaction, C<-tbarl> , C<-tbarr>.
+
+
+=item htmlddlb (widget | false, name, data, field name,...) -> HTML drop-down list box
+
+=item htmlddlb (widget | false, name, data, ?container, ?feed sub, field name,...)
+
+Generate input helper drop-down list box HTML.
+May be used in C<-inphtml>.
+Optional 'widget' parameter (html, '$_' placeholder, any other string or empty value),
+is used only to be placed after some javascript may be generated.
+Name is used as the common part of names of the HTML widgets - submits, 
+scrolling_list, buttons, which names are generated by appending '_' sign
+and suffix.
+Data may be array ref with list of values,
+hash ref with internal and external values,
+list name in C<-lists>,
+SQL Select statement,
+sub{} to produce above.
+Container may be used with list name or SQL Select, it may be [] or {}.
+Feed sub{} may be used with container to fill it.
+Other arguments are field names to fill with values.
+Field names with leading "\t" corresponds to multivalue fields,
+leading "\tmsab\t" hints to try Microsoft Address Book before if possible.
+
+
+=item htmlhid () -> hidden HTML
+
+Generate hidden HTML string.
+Hidden HTML contains saved parameters values like 
+previous values of fields.
+
+
+=item htmllst (data, [display cols], {col=>parname}, [href], header, row join, col join, footer) -> Data HTML list
+
+Produce HTML output of data.
+Data is SQL SELECT or array ref.
+Columns with display columns numbers will be displayed.
+Parameter column numbers will be used to form hyperlinks.
+Hyperlink hint is the same as C<-href> in C<Views Description>.
+Rows and columns joins are HTML delimiters to be inserted between rows
+and columns.
+
+
+=item htmlres () -> transaction result HTML
+
+Generate transaction result HTML string - 
+empty or success or error message.
+
+
+=item htmlself (command, param=>val,...) -> self command hyperlink HTML
+
+=item htmlself (command, param=>val,..., {attributes})
+
+=item htmlself ({attributes}, command, param=>val,...)
+
+Generate self script command hyperlink HTML.
+See C<cmd> and C<TRANSACTION SEQUENCE> for commands.
+Attributes for 'A' HTML tag may be given as an array or hash ref.
+
+
+=item pxnme ( prefix => name ) -> prefixed name
+
+=item pxcb ( name ) -> command button name
+
+=item pxsw ( name ) -> special widget name
+
+=item pxpv ( name ) -> previous value name
+
+=item pxqc ( name ) -> query condition name
+
+Prefix field or param name given to construct special name.
+Prefixes are C<-pxcb>, C<-pxsw>, C<-pxpv>, C<-pxqc>.
+
+
+=item qlst () -> queried list name
+
+List (view) name queried or default
+
+
+=item qparampv (name,...) -> previous value of param
+
+C<qparam> call with C<-pxpv> prefixed param names.
+
+
+=item qparampx (prefix) -> [field names]
+
+=item qparampx (prefix,...) -> qparam prefixed
+
+Get params names with prefix given or
+C<qparam> call with prefixed param names.
+Empty prefix means non-prefixed names.
+
+
+=item qparamsw (name,...) -> special widget value
+
+C<qparam> call with C<-pxsw> prefixed param names.
+
+
+=back
+
+
+=head1 VERSION
+
+=over
+
+
+=head2 26/11/2004
+
+New C<htmlddlb> optional 'field' parameter.
+
+
+=head2 17/11/2004
+
+New C<-rowsel1a>, C<-rowsel2a>, C<-rowsel3a> slots.
+
+
+=head2 05/11/2004
+
+
+=item Changed:
+
+C<-flg> new 'f'etch flag used in C<cmdlst>.
+
+
+=head2 25/10/2004
+
+
+=item Changed:
+
+C<cmdlst> binds now database columns to hash ref available from C<-rowlst> and C<-clst>.
+
+
+=head2 12/10/2004
+
+
+=item New:
+
+New C<-listurm> C<Views Description> C<SLOTS>.
+
+
+=head2 25/06/2003
+
+
+=item Changed:
+
+New C<-listrnm> C<Views Description> slot used in C<cmdlst>, alike common C<-listrnm>
+
+
+=head2 21/05/2003
+
+=item Fixed:
+
+Excluded 'order by', 'group by', 'limit' clauses from
+gant (timeline) chart minimum and maximum margins SQL 'select' command
+to escape fields to be defined in 'select' list.
+
+
+=head2 29/04/2003
+
+=item New:
+
+C<-wherepar> view description slot
+
+
+=head2 17/04/2003
+
+=item Fixed:
+
+C<acltest> - fixed record read delegation via C<-readsub>:
+it processes further only array refs from C<acl> now, 
+false values will be ignored in loop, true - returned.
+
+
+=head2 31/03/2003
+
+=item New:
+
+C<-htaccess> subslot of C<-acd>
+
+
+=head2 17/11/2002
+
+=item New:
+
+'thead' and 'tbody' HTML tags in C<cmdlst>.
+
+
+=head2 31/10/2002
+
+=item Changed:
+
+C<-inp> C<Field Description>: 'htmltextarea' URLs display behaviour 
+is extended with special URL protocol 'fsurl://' to be translated 
+to C<fsurl> value.
+
+
+=head2 31/08/2002
+
+=item Changed:
+
+C<cmdlst> - fixed parsing of query condition parameters with 
+leading '<>=' operators
+
+C<acltest> - field may contain several user names delimited with commas with 
+spaces allowed. Regular expression is used instead of 'eq' comparison.
+
+C<aclsel> - sub{}, m/^\$_(regexp|rlike)$/i, m/.*\$_.*/ 
+special parameters introduced 
+for the field name followed
+
+
+=head2 05/06/2002
+
+=item New:
+
+C<-refresh> view and common slots
+
+
+=head2 02/06/2002
+
+=item New:
+
+C<-htmlts>, C<-htmlte>, C<-width> common slots;
+C<-width> field slot.
+
+=item Changed:
+
+Timeline view supplied with predefined date margin columns from C<-gant1> and C<-gant2>,
+so 'gwo.cgi' changed
+
+
+
+=head2 16-17/05/2002
+
+=item New:
+
+C<-rowsav1> and C<-rowsav2> events inside C<cmdsql>.
+
+C<-htmlts>, C<-htmlte>, C<-gant1>, C<-gant2>, C<-htmlg1> view slots.
+
+
+=head2 05/04/2002 - 06/05/2002
+
+=item New:
+
+MySQL 'LIMIT rows' clause generation
+
+
+
+=head2 15/10/2001 - 23/03/2002
+
+=item New:
+
+Implemented and Documented.
+
+
+=item ToDo:
+
+ - review & test & debug
+
+=item Questions:
+
+ - how to move 'qparampv' and 'qparamsw' methods up to the application object?
+
+=item Issues:
+
+ - Values of SQL statement parameters are all binded inside SQL statement.
+ - Access rights encounted with multiple 'field IN(usernames)' expressions
+   if there are multiple fields with usernames. SQL may be too big and slow.
+ - Multiple columns cannot be SQL Selected into multiple rows.
+   Such views (lists) should be implemented with '-dsub' subs.
+   F.e., list of user names in multiple user name fields.
+ - Conditions like 'value IN (fields)' may be implemented only with WHERE 
+   query condition field
+ - File attachments should be published via some access control
+   scripts if application (password, not web server) authentication is used.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Andrew V Makarow <makarow at mail.com>
+
+=cut

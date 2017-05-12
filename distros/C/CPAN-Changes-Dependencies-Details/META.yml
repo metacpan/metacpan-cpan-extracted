@@ -1,0 +1,42 @@
+---
+abstract: 'Create CPAN::Changes style file only containing dependency change information'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  charnames: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Changes-Dependencies-Details
+provides:
+  CPAN::Changes::Dependencies::Details:
+    file: lib/CPAN/Changes/Dependencies/Details.pm
+    version: '0.001007'
+recommends:
+  Moo: '1.000008'
+requires:
+  CPAN::Changes: '0'
+  CPAN::Changes::Group::Dependencies::Details: '0.001001'
+  CPAN::Changes::Release: '0'
+  Carp: '0'
+  Moo: '0'
+  MooX::Lsub: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/CPAN-Changes-Dependencies-Details/issues
+  homepage: https://github.com/kentnl/CPAN-Changes-Dependencies-Details
+  repository: https://github.com/kentnl/CPAN-Changes-Dependencies-Details.git
+version: '0.001007'

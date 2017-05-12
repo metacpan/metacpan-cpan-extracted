@@ -1,0 +1,27 @@
+---
+abstract: 'Mason View Class'
+author:
+  - '=over 4, Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-View-Mason
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Catalyst: '5.50'
+  File::Spec: '0'
+  HTML::Mason: '0'
+  MRO::Compat: '0'
+  Scalar::Util: '0'
+  parent: '0'
+version: '0.19'

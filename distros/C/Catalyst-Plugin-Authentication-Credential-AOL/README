@@ -1,0 +1,27 @@
+This is Perl module Catalyst::Plugin::Authentication::Credential::AOL.
+
+INSTALLATION
+
+Catalyst::Plugin::Authentication::Credential::AOL installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Catalyst::Plugin::Authentication::Credential::AOL
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Catalyst::Plugin::Authentication::Credential::AOL documentation is available as in POD. So you can do:
+
+    % perldoc Catalyst::Plugin::Authentication::Credential::AOL
+
+to read the documentation online with your favorite pager.
+
+Tatsuhiko Miyagawa

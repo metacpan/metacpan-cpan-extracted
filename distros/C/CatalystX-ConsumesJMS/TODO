@@ -1,0 +1,3 @@
+- default action at the root bouncing to the DLQ?
+- role: after 'end' => sub { stuff in DLQ if status is not ok }
+- role: wrap some validation around the code, set status to failure if failure

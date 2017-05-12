@@ -1,0 +1,11 @@
+Revision history for Perl extension CGI::Application::Generator.
+
+1.0   Thu Feb 13 00:10:27 EST 2003
+        - First release version of CGI::Application::Generator, a
+          module intended to allow the creation of CGI::Application
+          modules dynamically.
+        - Implemented an Object-Oriented interface to specify the
+          functionality of your intended CGI::Application, used to 
+          build the structure automatically using a (configurable)
+          template file. 
+

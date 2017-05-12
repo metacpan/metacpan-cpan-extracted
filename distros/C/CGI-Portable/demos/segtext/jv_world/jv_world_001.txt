@@ -1,0 +1,26 @@
+sub textfield {
+	my $self = shift( @_ );
+	my $rh_params = $self->params_to_hash( \@_, 0, 
+		[ 'name', 'value', 'size', 'maxlength' ], 
+		{ 'default' => 'value' } );
+	$rh_params->{'type'} = 'text';
+	return( $self->make_html_tag( 'input', $rh_params ) );
+}
+
+sub textarea {
+	my $self = shift( @_ );
+	my $rh_params = $self->params_to_hash( \@_, 0, 
+		[ 'name', 'text', 'rows', 'cols' ], { 'default' => 'text', 
+		'value' => 'text', 'columns' => 'cols' }, 'text', 1 );
+	my $ra_text = delete( $rh_params->{'text'} );
+	return( $self->make_html_tag( 'textarea', $rh_params, $ra_text ) );
+}
+
+sub AUTOLOAD {
+	my $self = shift( @_ );
+	my $rh_params = $self->params_to_hash( \@_, 0, 'text', {}, 'text' );
+	my $ra_text = delete( $rh_params->{'text'} );
+	$AUTOLOAD =~ m/([^:]*)$/;
+	my $tag_name = $1;
+	return( $self->make_html_tag( $tag_name, $rh_params, $ra_text ) );
+}

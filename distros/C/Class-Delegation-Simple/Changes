@@ -1,0 +1,9 @@
+Revision history for Perl extension Class::Delegation::Simple.
+
+0.02 2008-05-15
+  - Added missing file to MANIFEST.
+
+0.01  Thu May 15 12:13:14 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Class::Delegation::Simple
+

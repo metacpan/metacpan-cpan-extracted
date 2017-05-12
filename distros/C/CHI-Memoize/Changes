@@ -1,0 +1,48 @@
+Revision history for CHI-Memoize
+
+** denotes an incompatible change
+
+0.07  Aug 13, 2014
+
+* Fixes
+  - Fix unterminated link in main POD
+
+0.06  Aug 13, 2014
+
+* Fixes
+  - Use Moo not Moose, and explicitly depend on it
+
+0.05  Aug 24, 2012
+
+* Documentation
+  - Simplify synopsis and refer to blog (Anirvan Chatterjee)
+
+0.04  May 6, 2012
+
+* Documentation
+  - Correct example demonstrating JSON key serialization, and add test to match - RT 77027
+    (Daniel B. Boorstein)
+
+0.03  May 6, 2012
+
+* Documentation
+  - Mention that memoizing a function will affect its call stack and its prototype
+
+* Fixes
+  - Preserve @_ in wrapped call - RT 77027 (Daniel B. Boorstein)
+
+0.02  May 5, 2012
+
+* Documentation
+  - Document cloned vs raw references and using RawMemory
+
+* Improvements
+  - Add NO_MEMOIZE flag that can be returned from key coderef
+
+* Fixes
+  - Fix synopsis whitespace
+
+0.01  May 2, 2012
+
+- Initial version
+

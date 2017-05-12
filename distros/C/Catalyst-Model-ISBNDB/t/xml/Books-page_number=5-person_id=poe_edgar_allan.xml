@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ISBNdb server_time="2006-10-08T08:04:29Z">
+<BookList total_results="252" page_size="10" page_number="5" shown_results="10">
+<BookData book_id="eight_tales_of_terror" isbn="0590411365">
+<Title>Eight Tales of Terror</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="scholastic_paperbacks">Scholastic Paperbacks</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="" edition_info="Paperback; 1991-02" dewey_decimal_normalized="" lcc_number="" change_time="2006-09-05T19:00:11Z" price_time="2006-10-08T07:56:08Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://service.bfast.com/bfast/click?bfmid=2181&amp;sourceid=41174902&amp;categoryid=oopsearch&amp;PEAN=9780590411363" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-05T19:00:18Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-05T19:00:19Z" currency_rate="1" price="1.95" />
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=27770654&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-05T19:00:23Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="Eight Tales of Terror by Edgar Allan Poe (1991)" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/ebay.html" store_id="ebay" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-09-05T19:00:25Z" currency_rate="1" price="0.09" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="0.2" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="0.01" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:09Z" currency_rate="1" price="1.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="1" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:14Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:14Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:50Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eight_tales_of_terror/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:50Z" currency_rate="1" price="2.99" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="essays_and_reviews_a04" isbn="0940450194">
+<Title>Essays and reviews</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="literary_classics_of_the_u_s">New York, N.Y. : Literary Classics of the U.S. : c1984. --</PublisherText>
+<Details dewey_decimal="809" physical_description_text="1544 p. : ill. ; 21 cm. --" language="eng" edition_info="$27.50" dewey_decimal_normalized="809" lcc_number="PS2619" change_time="2004-07-26T13:52:27Z" price_time="2006-10-08T07:56:11Z" />
+<Summary></Summary>
+<Notes>"G.R. Thompson wrote the notes and selected the texts for this volume"--Prelim. p.
+
+Includes bibliographical references and index.
+
+Theory of poetry -- Reviews of British and continental authors -- Reviews of American authors and American literature -- Magazines and criticism -- The literary and social scene -- Articles and marginalia.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Edgar Allan Poe: Essays and Reviews (Library of America)" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/bn.html" store_id="bn" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-01-04T20:20:52Z" currency_rate="1" price="16.28" />
+<Price store_isbn="" store_title="Edgar Allan Poe : Essays and Reviews : Theory of Poetry / Reviews of British and Continental Authors / Reviews of American Authors and American Literature / Magazines and Criticism / The Literary &amp; Social Scene / Articles and Marginalia (Library of America)" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="26.4" />
+<Price store_isbn="" store_title="Edgar Allan Poe : Essays and Reviews : Theory of Poetry / Reviews of British and Continental Authors / Reviews of American Authors and American Literature / Magazines and Criticism / The Literary &amp; Social Scene / Articles and Marginalia (Library of America)" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="26.4" />
+<Price store_isbn="" store_title="Edgar Allan Poe : Essays and Reviews : Theory of Poetry / Reviews of British and Continental Authors / Reviews of American Authors and American Literature / Magazines and Criticism / The Literary &amp; So" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="27.72" />
+<Price store_isbn="" store_title="Edgar Allan Poe: Essays and Reviews: Theory of Poetry / Reviews of British and Continental Authors / Reviews of American Authors and American Literature / Magazines and Criticism / the Literary &amp; So" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:14Z" currency_rate="1" price="27.67" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:14Z" currency_rate="1" price="144.95" />
+<Price store_isbn="" store_title="Edgar Allan Pos, Essays and Reviews" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D30255560%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:15Z" currency_rate="1" price="23.76" />
+<Price store_isbn="" store_title="Poe: Essays and Reviews" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=0940450194&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:50Z" currency_rate="1" price="44" />
+<Price store_isbn="" store_title="Poe Essays and Reviews Product 204943" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.204943&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:53:25Z" currency_rate="1" price="25.2" />
+<Price store_isbn="" store_title="Poe" store_url="http://isbndb.com/x/book/essays_and_reviews_a04/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:56:11Z" currency_rate="1" price="28" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="McGill University (Montreal, Canada)" last_update="2004-07-26T13:52:27Z" marc_url="http://isbndb.com/x/libdata/isbndb-48-essays_and_reviews_a04-20040726.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="thompson_gary_richard">Thompson, Gary Richard</Person>
+</Authors>
+</BookData>
+<BookData book_id="essays_and_reviews_a05" isbn="0521263425">
+<Title>Essays and reviews</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="literary_classics_of_the_u_s">New York, N.Y. : Literary Classics of the U.S. : c1984. --</PublisherText>
+<Details dewey_decimal="809" physical_description_text="1544 p. : ill. ; 21 cm. --" language="eng" edition_info="" dewey_decimal_normalized="809" lcc_number="PS2619" change_time="2004-07-26T13:52:29Z" price_time="2006-10-08T07:56:14Z" />
+<Summary></Summary>
+<Notes>"G.R. Thompson wrote the notes and selected the texts for this volume"--Prelim. p.
+
+Includes bibliographical references and index.
+
+Theory of poetry -- Reviews of British and continental authors -- Reviews of American authors and American literature -- Magazines and criticism -- The literary and social scene -- Articles and marginalia.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="McGill University (Montreal, Canada)" last_update="2004-07-26T13:52:29Z" marc_url="http://isbndb.com/x/libdata/isbndb-48-essays_and_reviews_a05-20040726.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="thompson_gary_richard">Thompson, Gary Richard</Person>
+</Authors>
+</BookData>
+<BookData book_id="essays_and_reviews_a06" isbn="0585364869">
+<Title>Essays and reviews</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="literary_classics_of_the_u_s">New York, N.Y. : Literary Classics of the U.S. : c1984.</PublisherText>
+<Details dewey_decimal="809" physical_description_text="1544 p. : ill. ; 21 cm." language="eng" edition_info="(electronic bk.) :$40.00" dewey_decimal_normalized="809" lcc_number="PS2619" change_time="2005-05-04T21:34:11Z" price_time="2006-10-08T07:56:18Z" />
+<Summary></Summary>
+<Notes>"G.R. Thompson wrote the notes and selected the texts for this volume"--Prelim. p.
+
+Includes bibliographical references and index.
+
+Theory of poetry -- Reviews of British and continental authors -- Reviews of American authors and American literature -- Magazines and criticism -- The literary and social scene -- Articles and marginalia.
+
+Electronic reproduction.Boulder, Colo. :NetLibrary,2001.Available via World Wide Web.Access may be limited to NetLibrary affiliated libraries.This netLibrary eBook does not include all of the text that was part of the original hardcopy book.</Notes>
+<UrlsText>Bibliographic record display http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=24819 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="literature_history_and_criticism_theory_etc">Literature -- History and criticism -- Theory, etc</Subject>
+<Subject subject_id="books_reviews">Books -- Reviews</Subject>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="Austin College" last_update="2005-05-04T21:34:11Z" marc_url="http://isbndb.com/x/libdata/isbndb-austin-essays_and_reviews_a06-20050504.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="thompson_gary_richard">Thompson, Gary Richard</Person>
+</Authors>
+</BookData>
+<BookData book_id="eureka_a22" isbn="025202849X">
+<Title>Eureka</Title>
+<TitleLong></TitleLong>
+<AuthorsText>Edgar Allan Poe; edited with an introduction, notes, and textual variants by Stuart Levine and Susan F. Levine</AuthorsText>
+<PublisherText publisher_id="university_of_illinois_press">Urbana : University of Illinois Press, c2004.</PublisherText>
+<Details dewey_decimal="811/.3" physical_description_text="xxxiv, 191 p. ; 24 cm." language="eng" edition_info="(Cloth : alk. paper)" dewey_decimal_normalized="811.3" lcc_number="PS2620" change_time="2005-03-23T05:15:55Z" price_time="2006-10-08T07:56:21Z" />
+<Summary></Summary>
+<Notes>Includes bibliographical references (p. 169-175) and index.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://www.biblio.com/details.php?dcx=87187445&amp;aid=isbn_db" store_id="biblio" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-06-17T01:57:36Z" currency_rate="1" price="41.15" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-06-17T01:57:38Z" currency_rate="1" price="12" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="52.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="52.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="28" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="35" />
+<Price store_isbn="" store_title="Eureka." store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="28" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:15Z" currency_rate="1" price="42" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:15Z" currency_rate="1" price="27.95" />
+<Price store_isbn="" store_title="" store_url="http://www.anrdoezrs.net/click-1389023-10391416?URL=http%3A%2F%2Fwww%2Ebuy%2Ecom%2Fretail%2Fproduct%2Easp%3Fsku%3D35212246%26loc%3D106%26sp%3D1" store_id="buycom" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:17Z" currency_rate="1" price="35" />
+<Price store_isbn="" store_title="" store_url="http://bookshop.blackwell.com/bobus/scripts/home.jsp?action=search&amp;type=isbn&amp;term=025202849X&amp;source=1154376025" store_id="blackwell" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:57Z" currency_rate="1" price="39" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:51:59Z" currency_rate="1" price="32.9" />
+<Price store_isbn="" store_title="Eureka Product 2439904" store_url="http://click.linksynergy.com/fs-bin/click?id=GJqZ1KMKkeQ&amp;offerid=64951.2439904&amp;type=2&amp;subid=0" store_id="walmart" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:53:34Z" currency_rate="1" price="33.25" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/eureka_a22/buy/isbn/bamm.html" store_id="bamm" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:56:21Z" currency_rate="1" price="38.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="cosmology">Cosmology</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Virginia" last_update="2005-03-23T05:15:55Z" marc_url="http://isbndb.com/x/libdata/isbndb-202-eureka_a22-20050322.mrc" />
+<MARC library_name="Bucknell University (Lewisburg, Pa.)" last_update="2005-05-29T11:21:49Z" marc_url="http://isbndb.com/x/libdata/isbndb-20-eureka_a22-20050529.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="levine_stuart_r">Levine, Stuart R.</Person>
+<Person person_id="levine_susan">Levine, Susan</Person>
+</Authors>
+</BookData>
+<BookData book_id="five_great_poets" isbn="0486269426">
+<Title>Five great poets</Title>
+<TitleLong>Five great poets: Shakespeare, Keats, Poe, Dickinson and Whitman</TitleLong>
+<AuthorsText></AuthorsText>
+<PublisherText publisher_id="dover">New York : Dover ; [1992?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="5 v." language="eng" edition_info="(Set)" dewey_decimal_normalized="" lcc_number="" change_time="2005-05-14T01:35:35Z" price_time="2006-10-08T07:56:27Z" />
+<Summary></Summary>
+<Notes>Contents: Complete sonnets / by William Shakespeare -- Lyric poems / by John Keats -- The raven and other favorite poems / by Edgar Allan Poe -- Selected poems / by Emily Dickinson -- Selected poems / by Walt Whitman.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-05-14T01:35:52Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/bookbyte.html" store_id="bookbyte" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="1.35" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:10Z" currency_rate="1" price="2.99" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman (Thrift Editions)" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="1.29" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman (Thrift Editions)" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-10-08T07:51:11Z" currency_rate="1" price="4.55" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman (Thrift Editions)" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:12Z" currency_rate="1" price="1.33" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:51:15Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-10-08T07:52:04Z" currency_rate="1" price="3.75" />
+<Price store_isbn="" store_title="Five Great Poets: Shakespeare, Keats, Poe, Dickinson and Whitman" store_url="http://isbndb.com/x/book/five_great_poets/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2006-10-08T07:52:04Z" currency_rate="1" price="5.64" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="National Library of Scotland" last_update="2005-05-14T01:35:35Z" marc_url="http://isbndb.com/x/libdata/isbndb-268-five_great_poets-20050513.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="shakespeare_william">Shakespeare, William</Person>
+<Person person_id="keats_john">Keats, John</Person>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="dickinson_emily">Dickinson, Emily</Person>
+<Person person_id="whitman_walt">Whitman, Walt</Person>
+</Authors>
+</BookData>
+<BookData book_id="forty_two_tales" isbn="070641053X">
+<Title>Forty-two tales</Title>
+<TitleLong>Forty-two tales: including the fall of the house of Usher; the murders in the Rue Morgue; the pit and the pendulum</TitleLong>
+<AuthorsText>illustrations by Harry Clarke</AuthorsText>
+<PublisherText publisher_id="octopus_books">London : Octopus Books, 1979.</PublisherText>
+<Details dewey_decimal="" physical_description_text="638 p. : ill. ; 22cm." language="eng" edition_info="" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-04T01:47:09Z" price_time="2005-06-04T01:47:11Z" />
+<Summary></Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Forty-Two Tales Including the Fall of the House of Usher" store_url="http://isbndb.com/x/book/forty_two_tales/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-04T01:47:10Z" currency_rate="1" price="2.25" />
+<Price store_isbn="" store_title="Forty-Two Tales Including the Fall of the House of Usher" store_url="http://isbndb.com/x/book/forty_two_tales/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-04T01:47:10Z" currency_rate="1" price="2.25" />
+<Price store_isbn="" store_title="Forty-two tales: including 'The fall of the House of Usher', 'The murders in the Rue Morgue', 'The pit and the pendulum'" store_url="http://isbndb.com/x/book/forty_two_tales/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-04T01:47:10Z" currency_rate="1" price="2.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="Bossier Parish Community College (North Bossier City, LA)" last_update="2005-06-04T01:47:09Z" marc_url="http://isbndb.com/x/libdata/isbndb-23-forty_two_tales-20050603.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="four_beasts_in_one_the_homo_cameleopard" isbn="0585051909">
+<Title>Four beasts in one-the homo cameleopard</Title>
+<TitleLong></TitleLong>
+<AuthorsText>by Edgar Allan Poe</AuthorsText>
+<PublisherText publisher_id="alex_catalogue">Raleigh, N.C. : Alex Catalogue ; [199-?]</PublisherText>
+<Details dewey_decimal="" physical_description_text="" language="eng" edition_info="(electronic bk.)" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-22T14:22:24Z" price_time="2006-09-13T08:54:50Z" />
+<Summary></Summary>
+<Notes>Access may be limited to NetLibrary affiliated libraries.</Notes>
+<UrlsText>http://www.netLibrary.com/urlapi.asp?action=summary&amp;v=1&amp;bookid=1085986 An electronic book accessible through the World Wide Web; click for information</UrlsText>
+<AwardsText></AwardsText>
+<Prices></Prices>
+<Subjects>
+<Subject subject_id="electronic_books">Electronic books</Subject>
+<Subject subject_id="american_fiction">American fiction</Subject>
+</Subjects>
+<MARCRecords>
+<MARC library_name="University of Wisconsin--River Falls" last_update="2005-06-22T14:22:24Z" marc_url="http://isbndb.com/x/libdata/isbndb-175-four_beasts_in_one_the_homo_cameleopard-20050622.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="gold_bug" isbn="0890612692">
+<Title>Gold Bug</Title>
+<TitleLong>Gold Bug (Jamestown Publishers)</TitleLong>
+<AuthorsText>Edgar Allan Poe, </AuthorsText>
+<PublisherText publisher_id="ntc_contemporary_publishing_co">NTC/Contemporary Publishing Company</PublisherText>
+<Details dewey_decimal="" physical_description_text="6.2&quot;x0.2&quot;x9.0&quot;; 48 pages; 0.2 lb" language="" edition_info="Paperback; 1982-06-01" dewey_decimal_normalized="" lcc_number="" change_time="2005-01-18T14:39:29Z" price_time="2006-07-21T04:34:25Z" />
+<Summary>Suspense, fear and the supernatural provide the center for this tale by the master prose writer.</Summary>
+<Notes></Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Gold Bug (Jamestown Publishers)" store_url="http://isbndb.com/x/book/gold_bug/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2006-07-21T04:34:16Z" currency_rate="1" price="5.98" />
+<Price store_isbn="" store_title="The Gold Bug" store_url="http://isbndb.com/x/book/gold_bug/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2006-07-21T04:34:16Z" currency_rate="1" price="5.5" />
+</Prices>
+<Subjects>
+<Subject subject_id="amazon_com_literature_fiction_world_literature_united__aaag5">Amazon.com -- Literature &amp; Fiction -- World Literature -- United States -- Classics -- Poe, Edgar Allen</Subject>
+</Subjects>
+<MARCRecords></MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+</Authors>
+</BookData>
+<BookData book_id="great_short_works_of_edgar_allan_poe" isbn="006083093X">
+<Title>Great short works of Edgar Allan Poe</Title>
+<TitleLong></TitleLong>
+<AuthorsText>edited with an introduction by G. R. Thompson</AuthorsText>
+<PublisherText publisher_id="perennial_library">New York : Perennial Library, c1970.</PublisherText>
+<Details dewey_decimal="" physical_description_text="ix, 564 p. ; 18 cm." language="eng" edition_info="(pbk.) :$5.95" dewey_decimal_normalized="" lcc_number="" change_time="2005-06-03T00:57:54Z" price_time="2005-06-03T00:58:10Z" />
+<Summary></Summary>
+<Notes>"Poems, tales, criticism"--cover.
+
+Bibliography: p. 552-558.
+
+Dreams -- Spirits of the dead -- Evening star -- A dream within a dream -- Stanzas : in youth have I known -- A dream -- The happiest day-- the happiest hour -- The lake-- to-- -- Sonnet-- to science -- To-- : the Bowers wherat, in dreams I see -- Fairy-land -- Introduction -- Alone -- To Helen -- Israfel -- The city in the sea -- The sleeper -- The valley of unrest -- Lenore -- To one in paradise -- The coliseum -- The haunted place -- Sonnet-- silence -- The conqueror worm -- Dream-land -- The raven -- Ulalumne-- a ballad -- The bells -- Eldorado -- For Annie -- Annabel Lee -- Metzengerstein : a tale in imitation of the German -- Loss of breath : a tale á la Blackwood -- MS : found in a bottle -- The assignation (the visionary) -- Berenice -- Some passages from the life of a lion (lionizing) -- Shadow-- a parable -- Silence-- a fable -- Ligeia -- How to write a Blackwood article : a predicament -- The fall of the House of Usher -- William Wilson -- The man of the crowd -- The murders in the Rue Morgue -- A descent into the maelström -- The colloquy of Monos and Una -- Never bet the devily your head : a tale with a moral -- The oval portrai -- The masque of the red death -- The pit and the pendulum -- The tell-tale heart -- The black cat -- A tale of the ragged mountains -- The premature burial -- The purloined letter -- Some words with a mummy -- The imp of the preverse -- The facts in the case of M. Valdemar -- The sphinx -- The cask of Amontillado -- Hop-frog, or, The eight chained ourang-outangs -- Review of Twice-told tales -- The philospohy of compositions -- Excerpts from The poetic principle.</Notes>
+<UrlsText></UrlsText>
+<AwardsText></AwardsText>
+<Prices>
+<Price store_isbn="" store_title="Great Short Works of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="0" is_historic="0" is_new="1" check_time="2005-06-03T00:57:59Z" currency_rate="1" price="5.95" />
+<Price store_isbn="" store_title="Great Short Works of Edgar Allan Poe" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/amazon.html" store_id="amazon" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:57:59Z" currency_rate="1" price="1.03" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/textbookx.html" store_id="textbookx" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:57:59Z" currency_rate="1" price="3.44" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/abebooks.html" store_id="abebooks" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:57:59Z" currency_rate="1" price="1.35" />
+<Price store_isbn="" store_title="Great Short Works of Edgar Allan Poe." store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/alibris.html" store_id="alibris" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:58:01Z" currency_rate="1" price="2.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:58:01Z" currency_rate="1" price="4.77" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/ecampus.html" store_id="ecampus" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-06-03T00:58:01Z" currency_rate="1" price="5.57" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/bnbquest.html" store_id="bnbquest" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:58:02Z" currency_rate="1" price="1.99" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="1" check_time="2005-06-03T00:58:10Z" currency_rate="1" price="13.95" />
+<Price store_isbn="" store_title="" store_url="http://isbndb.com/x/book/great_short_works_of_edgar_allan_poe/buy/isbn/powells.html" store_id="powells" currency_code="USD" is_in_stock="1" is_historic="0" is_new="0" check_time="2005-06-03T00:58:10Z" currency_rate="1" price="5.95" />
+</Prices>
+<Subjects></Subjects>
+<MARCRecords>
+<MARC library_name="George Mason University" last_update="2005-06-03T00:57:54Z" marc_url="http://isbndb.com/x/libdata/isbndb-97-great_short_works_of_edgar_allan_poe-20050602.mrc" />
+</MARCRecords>
+<Authors>
+<Person person_id="poe_edgar_allan">Poe, Edgar Allan</Person>
+<Person person_id="thompson_gary_richard">Thompson, Gary Richard</Person>
+</Authors>
+</BookData>
+</BookList>
+</ISBNdb>

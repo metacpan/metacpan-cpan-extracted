@@ -1,0 +1,18 @@
+jobs
+{
+    :label1 {
+        name            job2
+    }
+
+    {
+        name            job1
+    }
+
+    :label2 {
+        name            job3
+    }
+
+    {
+        name            job4
+    }
+}

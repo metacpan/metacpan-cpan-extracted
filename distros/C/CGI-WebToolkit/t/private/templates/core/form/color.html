@@ -1,0 +1,15 @@
+<dl>
+	<dt><label for="{name}">{label}</label></dt>
+	<dd class="info">
+		{info}
+	</dd>
+	<dd><input type="text" name="{name}" id="js_{name}" value="{content}"/></dd>
+	<script language="javascript">
+		Event.observe(window, 'load', function () {
+			jscolor.dir = '{public_url}/core/jscolor/';
+			var ColorPicker_{name} =
+				new jscolor.color($('js_{name}'));
+		});
+	</script>
+	{clear}
+</dl>

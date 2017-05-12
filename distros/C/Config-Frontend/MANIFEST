@@ -1,0 +1,15 @@
+Changes
+lib/Config/Frontend.pm
+lib/Config/Backend/String.pm
+lib/Config/Backend/File.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/2.t
+t/3.t
+t/cache.t
+t/default.t
+t/move.t
+t/move.t
+t/props.t

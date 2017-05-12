@@ -1,0 +1,237 @@
+=head1 NAME
+
+Changes - CGI::Widget::DBI::Search change logfile
+
+=head1 CHANGES
+
+all changes without author attribution are by Adi Fairbank
+
+=over 3
+
+=item 0.31 - Dec 8, 2014
+
+Add -i18n_translation_strings option for internationalization support (provide translations for
+user-visible english text)
+
+Add class attributes and <span>s to allow better styling: in AbstractDisplay->display_pager_links(),
+and Display::Table->render_column_headers()
+
+Add -page_nav_link_onclick option for running javascript in onclick event for all page navigation links
+
+Add -css_grid_id option for setting search results table HTML id attribute in Display::Grid
+
+Add -css_table_id option for setting search results table HTML id attribute in Display::Table
+
+Add -action_uri_js_function option, for use in AJAX mode
+
+Minor improvements to allow better styling: add table class attribute searchResultsNavBarTable
+to navigation bar tables at top and bottom of search results
+
+Fix for utf8 characters in -form_extra_vars param values when param set to undef (which is used
+by CGI::Widget::DBI::Browse)
+
+Fix for utf8 characters in -href_extra_vars param values when param set to undef (which is used
+in sortby and nav URIs)
+
+Minor / syntax fixes for backwards compatibility with perl 5.8, which had broken in 0.30
+
+=item 0.30 - Feb 11, 2014
+
+Add utf8 decoding method in Base class, and utf8-decode all non-numeric, non-columndata_closure cell
+data by default, with -skip_utf8_decode option to disable
+
+Refactoring to eliminate circular reference from Display object back to Search object,
+to prevent memory leaks
+
+Add missing </td> closing tag in AbstractDisplay->display_pager_links()
+
+Fix bug in handling -href_extra_vars for params having 0 value, which must be treated differently
+from params not sent at all; also escape utf8 chars in param values correctly in generated URI
+
+Minor fix to add support for -extra_table_header_cell_attributes in unsortable columns
+
+=item 0.27 - Mar 14, 2013
+
+Performance improvements by eliminating unnecessary calls to HTML-generation methods
+
+Append oddRow or evenRow to class attribute of <tr/> elements in Display::Table class appropriately,
+so alternating row style can be set in CSS stylesheet
+
+Use proper <thead/>, <tbody/> elements in Display::Table class
+
+Add new option -column_titles for setting the anchor tag title attribute in
+-display_mode => 'table'; if not set, also now default the title to "Sort by: <col display name>"
+
+Add new CSS skinning option -css_table_header_row_class, and rename
+options -css_table_{unsortable_,}header_class to -css_table_{unsortable_,}header_cell_class
+
+Add new options -extra_{grid,{table,_header}}_cell_attributes which support CODE or HASH ref,
+and can be used to set customized, record-specific HTML attributes in the rendered table
+
+=item 0.26 - Jun 27, 2010
+
+Improve and add documentation, including undocumented -form_extra_vars option
+
+Minor API refactoring:
+- remove support for string version of -href_extra_vars and add new option -href_extra_vars_qs
+  for the (query) string version of them
+- move extra_vars_for_uri() and extra_vars_for_form() methods from AbstractDisplay class into
+  core Search class, so it can be more easily called by external classes
+- refactor display code in Display::Table class to give finer-grained overriding control; new
+  methods: display_row(), display_field()
+
+Add PREREQ_PM for DBD::mysql in Makefile.PL, so hopefully cpantesters will stop complaining
+
+=item 0.25 - Oct 26, 2009
+
+Prevent SQL error when sortby param passed with a column not currently in select results
+
+Add append_where_clause() and append_bind_params() methods to make the addition of
+new expressions to the where clause cleaner
+
+Fix bug and add test for missing support for -form_extra_vars in Table display
+
+Change method syntax for logging methods: Base->log_error() and Base->warn()
+
+Add CSS skinning options: -css_grid_class, -css_grid_cell_class, -css_table_class,
+-css_table_row_class, -css_table_cell_class, -css_table_header_class, -css_table_unsortable_header_class
+
+Add -column_align option for specifying html column alignment in table display mode
+
+Add new optional feature (for performance when querying several tables using a join)
+which allow a two-step search:
+- first, perform search and store results in a temporary table, based on columns
+  listed in -sql_search_columns
+- second, join the temporary table (which only contains -max_results_per_page rows)
+  to the rest of the join tables listed in -sql_join_for_dataset to retrieve the
+  data necessary to display the full dataset to the user
+
+=item 0.24 - Jan 15, 2009
+
+New method sql_column_with_tbl_alias_for_alias() which will find the column name
+along with (appended to) SQL table alias, given its column alias or column name.
+
+Improve performance of retrieval of search results from database when no
+-fetchrow_closure not specified (I think), by simply calling DBI::fetchrow_hashref()
+instead of custom method; remove no longer used method default_fetchrow_closure(),
+since it worked exactly like DBI's fetchrow_hashref().
+
+Add new -dry_run option to just generate the SQL that would be executed, but
+not actually execute it.
+
+New config option -form_extra_vars which behaves exactly like -href_extra_vars,
+but creates hidden form fields instead of appending to links, and only in grid
+display mode, for use in http POST requests
+
+UI-only changes:
+- remove -display_table_padding option, since it can be implemented better using CSS
+- add class attributes to all relevant table and td html elements in search
+  result set for both grid and table display modes
+
+Fix bug in AbstractDisplay when generating sort_reverse query string value
+which caused search results to alternate sort direction every page; also 
+fix a bug in the display of the sort direction arrow in Display::Table
+
+Add new -sortable_columns configuration option to specify only those columns
+which user will be allowed to sort by
+
+Optimize getting total query size when using -show_total_numresults with
+MySQL FOUND_ROWS() function
+
+API change: -where_clause no longer should contain 'WHERE', but a backwards
+compatible change has been added so it is still supported if it does
+
+Add paging links to grid display in -browse_mode
+
+Fix obscure bug in Search->get_num_results() method which showed incorrect
+total number of search results in special cases such as when -opt_precols_sql
+equals 'DISTINCT', a common use of that
+
+UI improvements to default grid display layout: add 1px border around cells,
+and prefix each record value with its header column and a colon (:)
+
+Better error logging: show SQL attempted if statement failed to execute
+
+URI escape key/values in -href_extra_vars option when passed as hashref
+
+Add -browse_mode option for use by CGI::Widget::DBI::Browse, to hide sorting
+and paging features during tree navigation
+
+In Grid display class: add popup menu on upper right to allow re-sorting
+the dataset; and add page navigation links to top and bottom
+
+Changes to base class constructor to allow passing an object of package
+CGI::Widget::DBI::.* to be re-blessed as a Search widget (used by Browse)
+
+=item 0.23 - Apr 24, 2008
+
+Minor fixes to support use with Apache::DBI
+
+Refactor unit testing classes for simplicity, and to support subclassing by
+upcoming DBI Browse widget
+
+Update license to Affero General Public License v3
+
+=item 0.22 - Apr 17, 2008
+
+API change: -columndata_closures is now only expected to return a table cell
+contents, not the table cell itself (html <td/> element)
+
+New abstract base class for display classes CGI::Widget::DBI::Search::AbstractDisplay
+
+Add new display class CGI::Widget::DBI::Search::Display::Grid, plus unit tests
+
+Refactor several methods in CGI::Widget::DBI::Search::Display::Table for
+simplicity and to develop a better display API
+
+Get rid of several warnings emitted by CGI::Widget::DBI::Search::Display::Table
+
+Add unit tests for CGI::Widget::DBI::Search::Display::Table
+
+Add prerequisite perl modules CGI and DBI in Makefile.PL, to make cpan testers happier
+
+=item 0.21 - Apr 11, 2008
+
+Abstract all display code into separate class CGI::Widget::DBI::Search::Display::Table
+
+Add prerequisite perl module Test::Unit in Makefile.PL, to make cpan testers happy
+
+=item 0.20 - Apr 9, 2008
+
+Add a few basic unit tests, written in Test::Unit
+
+Add default list of ORDER BY columns with -default_orderby_columns setting
+
+Add navigation links to nearby pages in search set, customizable with
+-page_range_nav_limit setting
+
+Refactoring to clean up and reduce amount of code:
+ new method make_nav_uri
+ remove bloated, obsolete method generate_nav_links
+
+=item 0.12 - Jan 31, 2008
+
+Improvements to documentation
+
+=item 0.11 - not released
+
+Made the default -fetchrow_closure an explicit method default_fetchrow_closure()
+so it can be used by subclasses.
+
+Config option -href_extra_vars now supports HASHREF syntax.
+
+Better documentation: eg. defaults for config options.
+
+Refactored some code into smaller methods for better readability/maintainability.
+
+Support reverse sorting if user clicks on current sortby column.
+
+Bugfix: show Prev/Next links even if -show_total_numresults config option not set
+
+=item 0.10 - May 12, 2004
+
+initial public release
+
+=back
+
+=cut

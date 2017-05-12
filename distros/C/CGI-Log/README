@@ -1,0 +1,82 @@
+
+README for the Perl Module CGI::Log - 1.00
+
+	Copyright (c) 1998 Jason Moore <jmoore@sober.com>.  All rights
+	reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	Artistic License for more details.
+
+
+DESCRIPTION
+-----------
+
+CGI::Log is a perl extension for centralized logging of debug, error,
+status and success messages from scripts or other modules.  Debugging
+messages include a call trace to give you the appropriate context around
+each message.
+
+Developed for use with CGI or mod_perl, but is not limited to those
+applications.  Easy to use API allows for the same calling method to be
+used from other modules, libraries or scripts.
+
+
+INSTALLATION
+------------
+
+To install, unzip and untar the archive. In the directory created type:
+
+	perl Makefile.PL
+	make
+	make install
+
+Note: If this does not work, you can always just copy the file 'Log.pm' to
+the 'CGI' directory in your perl distribution.
+
+If you want to test out the module without installing it, you can add the following
+to your code:
+
+	BEGIN
+	{
+		unshift(@INC, "/wherever/you/put/CGI/Log.pm");
+	}
+
+	use CGI::Log;
+
+
+DOCUMENTATION
+-------------
+
+Documentation is included in the Log.pm module in pod format.  Once CGI::Log has been installed
+type:
+
+	perldoc CGI::Log
+
+or if is uninstalled:
+
+	perldoc ./Log.pm
+
+For more information on perldoc type 'perldoc perldoc'.
+
+
+AUTHOR
+------
+
+Jason Moore <jmoore@sober.com>
+
+Feel free to send along any comments, suggestions, or bug reports.
+
+
+CHANGES
+-------
+
+1.00	- initial rewrite
+
+
+
+

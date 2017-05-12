@@ -1,0 +1,73 @@
+NAME
+    Crypt::SSSS - implementation of Shamir's Secret Sharing System.
+
+SYNOPSIS
+        use Crypt::SSSS;
+
+        # use (3, 3) scheme
+        my $shares = ssss_distribute(
+            message => "\x06\x1c\x08",
+            k       => 3,
+        );
+
+        # Save shares
+        for my $share (1 .. 3) {
+            open my $fh, '>', "share${share}.dat";
+            print $fh $shares->{$share}->binary;
+            close $fh;
+        }
+
+        # Reconstruct message
+        my $ishares = {};
+        for my $share (1 .. 3) {
+            open my $fh, '<', "share${share}.dat";
+            $ishares->{$share} = do {
+                local $/;    # slurp!
+                <$fh>;
+            };
+            close $fh;
+        }
+
+        print "Original message: ", sprintf '"\x%02x\x%02x\x%02x"',
+          unpack('C*', ssss_reconstruct(p => 257, shares => $ishares));
+
+DESCRIPTION
+    Implementation of Shamir's Secret Sharing Scheme.
+
+ATTRIBUTES
+    Crypt::SSSS implements the following attributes.
+
+  "ssss_distribute"
+        my $shares = ssss_distribute(
+            message => $message,
+            k       => $k,
+            p       => $p,         # 257 by default
+            n       => $n,         # By default equals to k
+        );
+
+    Distribute $message to $n shares, so that any $k shares would be enough
+    to reconstruct the secret. $p is a prime number.
+
+    Returns hashref of Crypt::SSSS::Message.
+
+  "ssss_reconstruct"
+        my $secret = ssss_reconstruct(
+            shares => $shares,
+            p      => $p,        # 257 by default
+        );
+
+    Reconstruct message from given $shares. $p is a prime number used to
+    distribute message.
+
+AUTHOR
+    Sergey Zasenko, "undef@cpan.org".
+
+CREDITS
+    Mohammad S Anwar (MANWAR)
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011, 2016, Sergey Zasenko.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl 5.10.
+

@@ -1,0 +1,19 @@
+---
+abstract: 'Browser detection for Catalyst::Requests'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092200'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-TraitFor-Request-BrowserDetect
+requires:
+  Catalyst: 0
+  CatalystX::RoleApplicator: 0
+  HTTP::BrowserDetect: 0
+  Moose: 0
+  Test::More: 0.88
+  aliased: 0
+  namespace::autoclean: 0
+version: 0.02

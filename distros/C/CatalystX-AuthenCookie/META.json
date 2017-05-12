@@ -1,0 +1,54 @@
+{
+   "abstract" : "Plugin for cookie-based authentication",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CatalystX-AuthenCookie",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CGI::Util" : 0,
+            "Catalyst::Test" : 0,
+            "HTTP::Cookies" : 0,
+            "HTTP::Date" : 0,
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.80",
+            "Digest::SHA" : 0,
+            "Moose" : 0,
+            "MooseX::Params::Validate" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-catalystx-authencookie@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=CatalystX-AuthenCookie"
+      },
+      "repository" : {
+         "type" : "hg",
+         "url" : "http://hg.urth.org/hg/CatalystX-AuthenCookie",
+         "web" : "http://hg.urth.org/hg/CatalystX-AuthenCookie"
+      }
+   },
+   "version" : "0.02"
+}
+

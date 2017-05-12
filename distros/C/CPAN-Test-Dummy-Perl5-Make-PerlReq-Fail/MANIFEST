@@ -1,0 +1,16 @@
+Changes
+lib/CPAN/Test/Dummy/Perl5/Make/PerlReq/Fail.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01-CPAN-Test-Dummy-Perl5-Make-PerlReq-Fail.t
+xt/critic.t
+xt/kwalitee.t
+xt/metayml.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod-format.t
+xt/spelling.t
+xt/stopwords.txt

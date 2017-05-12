@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 63
+  30704:
+    - 124
+name: cb3f
+registers:
+  AF: 61696
+  AF_: 0
+  BC: 52970
+  BC_: 0
+  DE: 29214
+  DE_: 0
+  HL: 30704
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

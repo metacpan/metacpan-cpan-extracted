@@ -1,0 +1,89 @@
+NAME
+    CPANPLUS::Internals::Source::CPANMetaDB - CPAN Meta DB source
+    implementation
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+      # In the CPANPLUS shell
+
+      CPAN Terminal> s conf no_update 1
+      CPAN Terminal> s conf source_engine CPANPLUS::Internals::Source::CPANMetaDB
+      CPAN Terminal> s save
+
+DESCRIPTION
+    CPANPLUS::Internals::Source::CPANMetaDB is a CPANPLUS source
+    implementation.
+
+    It is deadly experimental.
+
+    Usually CPANPLUS retrieves the CPAN index files, extracts them and
+    builds an in-memory index of every module listed on CPAN. As you can
+    imagine, this is quite memory intensive.
+
+    This source implementation does things slightly different.
+
+    Instead of building an in-memory index, it queries the
+    <http://cpanmetadb.appspot.com/> website for module/distribution
+    information as and when it is required by CPANPLUS.
+
+    The default CPANMetaDB site is <http://cpanmetadb.appspot.com/>.
+
+    You may set the "PERL5_CPANMETADB_URL" environment variable to an
+    alternative if you wish.
+
+CAVEATS
+    There are some caveats.
+
+    As shown in the "SYNOPSIS" you must set the CPANPLUS configuration
+    variable "no_update" to a true value to use this source engine. This
+    prevents CPANPLUS from attempting to update CPAN indexes.
+
+    Attempting to searches and getting a list of out of date modules in
+    CPANPLUS are incredibly slow due the million or so web accesses that are
+    incurred.
+
+    I have included two scripts in the "examples" directory of this
+    distribution that may be of use. "installer.pl" does installation of
+    modules and "updater.pl" will find out of date modules and prompt to
+    update them.
+
+    The CPAN Meta DB does not index authors. This means that this source
+    engine has to cheat by populating the "author_tree" with
+    CPANPLUS::Module::Author::Fake objects. The only thing guaranteed to be
+    accurate is the CPAN ID of authors. Looking up a module in the
+    "module_tree" will trigger a query to the CPAN Meta DB site, from which
+    an author object will be created.
+
+    You cannot currently query an author. Because of the implementation you
+    will get back a CPANPLUS::Module::Author::Fake object, but the source
+    engine just assumes what you pass in as CPAN ID is valid.
+
+    If this is a problem have a look at CPANPLUS::Internals::Source::CPANIDX
+    instead.
+
+KUDOS
+    CPAN Meta DB was created by Tatsuhiko Miyagawa for App::cpanminus
+
+SEE ALSO
+    CPANPLUS
+
+    CPANPLUS::Internals::Source
+
+    <http://cpanmetadb.appspot.com/>
+
+    CPANPLUS::Internals::Source::CPANIDX
+
+AUTHORS
+    *   Chris Williams <chris@bingosnet.co.uk>
+
+    *   Jos Boumans <kane@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams, Jos Boumans, Roy
+    Hooper and Adam Kennedy.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

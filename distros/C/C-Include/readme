@@ -1,0 +1,358 @@
+NAME
+    C::Include - Package to easy operate with binary data via describing
+    they like C/C++ structs.
+
+CLASSES AND PACKAGES
+      C::Include         - Header file base parser class
+      C::Include::Struct - Struct wraper class
+
+USAGE
+      use C::Include;
+
+POSSIBILITY
+     - skip comments;
+
+     - valid preprocessor commands: define, ifdef, ifndef, endif, else;
+
+     - supported bitset and enclosed structs, enums;
+
+     - The compiled data may be cached in the external file and at repeated call not compiled
+       any more, that will speed up operation.8);
+
+     - may be defined and redefined type substitutions via #define
+       (Ex: #define WORD word );
+
+     - predefined standart types:
+         char
+         unsigned char
+         short
+         unsigned short
+         int
+         unsigned int
+         long
+         unsigned long
+         long long
+         unsigned long long
+         float
+         double
+         pointer
+         null
+         neganull
+         bit
+         short int
+         long int
+         long long int
+         unsigned
+         unsigned long int
+         unsigned short int
+         unsigned long long int
+         byte
+         dword
+         string  (null padded)
+         sstring (space padded)
+         zstring (null terminated, null padded)
+
+     - predefined standart type aliases:
+         'short int'              => 'short'
+         'long int'               => 'long'
+         'long long int'          => 'long long'
+         'unsigned'               => 'unsigned long'
+         'unsigned long int'      => 'unsigned long'
+         'unsigned short int'     => 'unsigned short'
+         'unsigned long long int' => 'unsigned long long'
+         'byte'                   => 'unsigned char'
+         'word'                   => 'unsigned short'
+         'dword'                  => 'unsigned long'
+
+CLASS C::Include
+    This class is a header file parser
+
+  FUNCTIONS
+
+    * new - New object constructor
+    * sizeof - Return length of type in bytes
+    * make_struct - Return instance of struct wrapper object
+    C::Include::Struct
+    * defined - Return TRUE if parameter is described in header
+    * INC - Return REF to alternative constructed instance C::Include
+  REFERENCE
+
+    new ( params )
+        As params there should be pairs (-name, value). If the name of the
+        param is absent - then it is accepted as 'source'.
+
+        Current version support two params types: -src and -cache.
+
+        -src param describe header file. May be \*FILEHANDLE or
+        'path/to/file.h'.
+
+        -cache say, that was cached the compiled header file. If the value
+        of this parameter is absent and -src the parameter describes path to
+        the file, the cache the file, will be created as 'Path/to/file.ph'.
+        Pay attention that, while the value of this parameter is absent and
+        -src the parameter is \*FILEHANDLE, the cache the file will not be
+        created.
+
+         Examples of usage:
+   
+            # Creating object from external header file
+            my $include = new C::Include( -src, '/usr/src/include.h' );
+            my $include = new C::Include( '/usr/src/include.h' );
+            my $include = new C::Include( '/usr/src/include.h', -cache );
+            my $include = new C::Include( '/usr/src/include.h', -cache, '/tmp/cache.ph' );
+
+            # Create object from embended header file in Perl
+            # script after __DATE__ directive
+            my $include = new C::Include( \*main::DATA );
+            my $include = new C::Include( \*main::DATA, -cache, '/tmp/cache.ph' );
+
+            # Alternative constructor call 
+            use C::Include qw(/usr/src/include.h -cache);
+
+    sizeof
+        Return length of type in bytes.
+
+         Examples of usage:
+
+            my $size_of_int = $include->sizeof(int);
+            my $size_of_struct = $include->sizeof(HEADER_STRUCT);
+
+    make_struct ( 'struct name' )
+        Returns a copy of the object C::Include::Struct - wrapper of
+        structure.
+
+         Examples of usage:
+
+            # Create wraper class for struct described in $include as 'HEADER_STRUCT'.
+            my $header = $include->make_struct( 'HEADER_STRUCT' );
+
+    INC( [module_name] )
+        Return REF to alternative constructed instance C::Include in module
+        "module_name". If "module_name" param not defined, then - current
+        call module name;
+
+        Note: There should be only one created instance of C::Include for
+        each calling unit module.
+
+         Examples of usage:
+
+            package My::Cfg;
+
+            # Alternative constructor call 
+            use C::Include qw(/usr/src/include.h -cache);
+
+            # Create wraper class for struct described in /usr/src/include.h
+            # as 'HEADER_STRUCT'.
+            my $header = INC->make_struct( 'HEADER_STRUCT' );
+
+         in other scripts may be called instance of C::Include created in package My::Cfg as
+
+            use C::Include;
+            my $header = INC('My::Cfg')->make_struct( 'HEADER_STRUCT' );
+
+CLASS C::Include::Struct
+    This class is a struct wrapper.
+
+  FUNCTIONS
+
+    * pack - Pack struct fields to binary and, if need, save it to file.
+    * unpack - Unpack binary data and fill with they self fields.
+    * size - Return length of struct in bytes.
+  REFERENCE
+
+    pack ( [\*FILEHANDLE] )
+        Pack struct fields to binary and, if need, save it to file.
+
+        As param may be REF to FILEHANDLE. If FILEHANDLE exists then packed
+        binary data will be saved to this file.
+
+        Function return resulted binary data as scalar.
+
+         Examples of usage:
+
+            $header_struct->pack( \*OUT_FILE );
+
+            my data =  $header_struct->pack();
+
+    unpack
+            unpack( data )
+            unpack( \*FILEHANDLE, [offset, [size]] )
+
+        To unpack the binary informations, and to fill by them in the
+        fields.
+
+        If first param is scalar, then it is binary data to unpacking.
+        Otherwise if first param is \*FILEHANDLE, then input binary data
+        will be reader from this file. If 'size' param not defined then from
+        file will be readed same counte of bytes as struct length. Param
+        'offset' describe count of bytes to skip before reading binary data.
+        Default offset equal 0;
+
+         Examples of usage:
+
+            $header_struct->unpack( $binary_data );
+            $header_struct->unpack( \*CFG );
+            $header_struct->unpack( \*CFG, 10, $header_struct->size );
+
+    size
+        Return length of struct in bytes.
+
+         Examples of usage:
+
+            # 8)
+            print 'Size of struct HEADER_STRUCT: ', $header_struct->size(), ' bytes';
+
+EXAMPLE
+        use C::Include;
+
+        # Create instance of object and cache it to 'data/database.ph'
+        # If 'data/database.ph' exists then only read compiled data from they.
+        my $include = new C::Include( 'data/database.h', -cache )
+            or die "Can't read include: $!";
+  
+        my $cfg = $include->make_struct('CONFIG')
+            or die "Can't create instance of CONFIG: $!";
+
+        # Open binary file 
+        open CFG, 'database.cfg';
+
+        # Read from CFG length of struct wraped by $cfg and fill self fields
+        $cfg->unpack( \*CFG );
+
+        close CFG;
+
+FAQ
+      * Q: Where I may see module tested header file?
+        A: Tested header file on which this package it
+           tested included in distribudion as 'test.h'
+
+      * Q: Why module work not correct?
+        A: Probably in your computer the old version required(demanded) Storable.pm
+           with an error is installed.
+
+INTERNAL REMARKS
+    1. For all field definitions with type array of chars will be produced
+    one string field:
+
+        struct file{
+          char path[__MAXPATH];   // first string field
+          char name[12];          // second string field
+        }
+
+    If you want to create array of bytes for definitions as array of chars,
+    you must change type, for example, to 'byte':
+
+        struct array{
+          char path[__MAXPATH];   // first string field
+          byte flags[12];         // second field as array of unsigned chars
+        }
+
+        or 
+
+        #define BYTE char
+        struct array{
+          char path[__MAXPATH];   // first string field
+          BYTE flags[12];         // second field as array of signed chars
+        }
+
+    2. All properties of C::Include::Struct object be in element with key
+    {''}. Do not delete and do not change them!:
+
+      delete $header_struct->{''};
+
+    3. You can describe in headers exclusive definitions like compiller
+    sensivity
+
+     Example:
+
+        #ifdef __WATCOM_C__
+            // some definitions
+        #endif
+
+        // __PERL__ is predefined in package default
+        // and processed correctly
+        #ifdef __PERL__  
+            #define skiptype neganull
+        #endif
+
+    4. For optimizing memory usage and speed for pack/unpack machanizm:
+
+      in this sample code:
+
+        1   typedef struct HEADER{
+        2       word revision;
+        3       byte reserved[1024];  // in wraper object will be allocated
+        4   };                        // array with 1024 elements and take CPU
+                                      // to process in every pack/unpack operation
+      line 3. best replace to 
+
+        char reserved[1024];      // will be created one string element
+                                  // with length 1024
+      or 
+
+        #ifndef __PERL__
+        #define nullbyte byte
+        #endif
+        nullbyte reserved[1024];  // this 1024 bytes will be skiped
+                                  // in operations pack/unpack and
+                                  // not allocated in wraper object
+                                  // as element
+
+    5. Note, that the current version processes of the preprocessor commands
+    only once, before parsing of the main code!
+
+      In this code:
+
+        #define __MAXPATH 56
+        struct file{
+          char path[__MAXPATH];
+          char name[12];
+        }
+        #define __MAXPATH 127
+
+      Length of a field file.path will be, equal 127 bytes!
+
+    6. All defined values via '#define' and 'enum' are availablis:
+
+        my $include = new C::Include( 'data/database.h', -cache )
+            or die "Can't read include: $!";
+
+        print $include->{__MAXPATH};
+
+    7. All copies of the predetermined structures also are availablis:
+
+        struct FILE{
+          char path[__MAXPATH];
+          char name[12];
+        }root, files[100];
+
+        $\ = "\n";
+        print $include->{root}{name};
+        print $include->{files}[$_]{name} for 0..99;
+
+    8. For parsing progress indicating, need switch a flag 'TEST' to '1':
+
+        use C::Include;
+        $C::Include::TEST = 1;
+
+        my $include = new C::Include( 'data/database.h', -cache )
+
+AUTHOR
+      Albert N. MICHEEV
+      email: Albert@f80.n5049.z2.fidonet.org
+      fido:  2:5049/80
+
+COPYRIGHT
+    Copyright 2000, Albert N. MICHEEV (Albert@f80.n5049.z2.fidonet.org)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AVAILABILITY
+    The latest version of this library is likely to be available from:
+
+     http://www.perl.com/CPAN
+
+SEE ALSO
+    Storable.
+

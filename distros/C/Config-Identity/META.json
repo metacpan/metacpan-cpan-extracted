@@ -1,0 +1,115 @@
+{
+   "abstract" : "Load (and optionally decrypt via GnuPG) user/pass identity information ",
+   "author" : [
+      "Robert Krimen <robertkrimen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Config-Identity",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Encoding" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "IPC::Run" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Config::Identity" : {
+         "file" : "lib/Config/Identity.pm",
+         "version" : "0.0019"
+      },
+      "Config::Identity::GitHub" : {
+         "file" : "lib/Config/Identity/GitHub.pm",
+         "version" : "0.0019"
+      },
+      "Config::Identity::PAUSE" : {
+         "file" : "lib/Config/Identity/PAUSE.pm",
+         "version" : "0.0019"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Config-Identity"
+      },
+      "homepage" : "https://github.com/dagolden/Config-Identity",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Config-Identity.git",
+         "web" : "https://github.com/dagolden/Config-Identity"
+      }
+   },
+   "version" : "0.0019",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

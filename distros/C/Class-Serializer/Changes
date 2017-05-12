@@ -1,0 +1,15 @@
+Revision history for Class-Serializer
+
+0.04    Mon Nov 30 20:06:54 2015
+        Fix tests so module is installable again.
+
+0.03    Thu Dec  4 13:36:34 2008
+        Switch to Data::Dump::Streamer, since it seems to handle closures
+        correctly. Fix test cases.
+
+0.02    Wed Sep 24 23:26:54 2008
+        Test cases should hopefully pass again on recent perl versions.
+
+0.01    Sat Mar 18 03:24:35 2006
+        First public version.
+

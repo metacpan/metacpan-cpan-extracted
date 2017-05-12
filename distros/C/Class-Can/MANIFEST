@@ -1,0 +1,7 @@
+Build.PL
+Makefile.PL
+META.yml
+MANIFEST
+MANIFEST.SKIP
+lib/Class/Can.pm
+t/can.t

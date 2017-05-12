@@ -1,0 +1,31 @@
+---
+abstract: 'Priority message queues for Coro'
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+build_requires:
+  AnyEvent::Loop: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Coro-PrioChannel
+requires:
+  AnyEvent: 0
+  Coro: 0
+  Coro::Semaphore: 0
+  List::Util: 0
+  Scalar::Util: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/dmcbride/Coro-PrioChannel
+  repository: https://github.com/dmcbride/Coro-PrioChannel.git
+version: 0.005
+x_contributors:
+  - 'Jeff Ober <jeffober@gmail.com>'

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+inc/Test/Run/Builder.pm
+lib/CPANPLUS/Dist/Fedora.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+t/style-trailing-space.t
+META.json

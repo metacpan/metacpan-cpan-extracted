@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+<link href="/htdocs/cpan.xml" rel="alternate"
+  type="application/rss+xml" title="Recent CPAN uploads" />
+<meta name="description" content="Browse and search CPAN" />
+<meta name="keywords" content="Perl modules, CPAN" />
+  <title>CPAN Browsen / Durchsuchen</title>
+ </head>
+<body onload="if (document.f) document.f.query.focus()">
+<table width="100%">
+<tr>
+<td width="5%" rowspan=3>
+<a href="http://www.cpan.org/">
+<img src="/htdocs/cpan.jpg" alt="CPAN" /></a></td>
+<td align=center>
+<table width="60%" border="0" cellpadding="0" cellspacing="0">
+<tr valign="top">
+<td valign="top" align="center">
+<a class="button" href="/htdocs/faqs/cpan-search.html">Home</a>&nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/cgi-bin/docperl">Dokumentation</a>&nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/recent">Neue Module</a>&nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/mirror">Pr&auml;ferenzen</a>&nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/module">Module</a>&nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/dist">Distributionen</a>&nbsp; &nbsp;</td>
+<td valign="top" align="center">
+<a class="button" href="/author">Autoren</a>&nbsp; &nbsp;</td>
+</tr>
+</table>
+</td></tr><tr><tr><td colspan=2 align=center>
+<form method=get action="/search" name=f>
+<table><tr><td>
+<font size="-1">Suche</font> &nbsp; 
+<input type="text" name="query" value="" size=20 ></td>
+<td align=left>&nbsp;<font size="-1">in</font>&nbsp; 
+<select name="mode">&nbsp; &nbsp;
+ <option value="dist">Distributionen</option>
+ <option value="module">Modulen</option>
+ <option value="author">Autoren</option>
+ <option value="chapter" selected="selected">Kategorien</option>
+</select>&nbsp;&nbsp; &nbsp;
+<input type="submit" value="Suchen">
+</td></tr></table>
+</form>
+</td></tr></table>
+<hr />
+<div class=path>
+<B>Kategorien</B>
+</div>
+<div class=box>
+<table width="99%">
+<tr valign="top" class="r">
+<td><a href="/chapter/Perl_Core_Modules"> 
+<b>Perl Kernmodule</b></a> 
+<td><a href="/chapter/Development_Support"> 
+<b>Entwicklungsunterst&uuml;tzung</b></a> 
+<td><a href="/chapter/Operating_System_Interfaces"> 
+<b>Betriebssystem-Schnittstellen</b></a> 
+</tr>
+<tr valign="top" class="s">
+<td><a href="/chapter/Networking_Devices_IPC"> 
+<b>Netzwerke Devices IPC</b></a> 
+<td><a href="/chapter/Data_Type_Utilities"> 
+<b>Datentyp-Utilities</b></a> 
+<td><a href="/chapter/Database_Interfaces"> 
+<b>Datenbankschnittstellen</b></a> 
+</tr>
+<tr valign="top" class="r">
+<td><a href="/chapter/User_Interfaces"> 
+<b>Benutzerschnittstellen</b></a> 
+<td><a href="/chapter/Language_Interfaces"> 
+<b>Sprachenschnittstellen</b></a> 
+<td><a href="/chapter/File_Names_Systems_Locking"> 
+<b>Dateinamen System Locking</b></a> 
+</tr>
+<tr valign="top" class="s">
+<td><a href="/chapter/String_Lang_Text_Proc"> 
+<b>Strings Sprachen Text Proc</b></a> 
+<td><a href="/chapter/Opt_Arg_Param_Proc"> 
+<b>Optionen Argumente Parameter Proc</b></a> 
+<td><a href="/chapter/Internationalization_Locale"> 
+<b>Internationalisierung Lokalisierung</b></a> 
+</tr>
+<tr valign="top" class="r">
+<td><a href="/chapter/Security_and_Encryption"> 
+<b>Sicherheit und Verschl&uuml;sselung</b></a> 
+<td><a href="/chapter/World_Wide_Web_HTML_HTTP_CGI"> 
+<b>World Wide Web HTML HTTP Cgi</b></a> 
+<td><a href="/chapter/Server_and_Daemon_Utilities"> 
+<b>Server D&auml;monen</b></a> 
+</tr>
+<tr valign="top" class="s">
+<td><a href="/chapter/Archiving_and_Compression"> 
+<b>Archivierung und Kompression</b></a> 
+<td><a href="/chapter/Images_Pixmaps_Bitmaps"> 
+<b>Bilder Pixmaps Bitmaps</b></a> 
+<td><a href="/chapter/Mail_and_Usenet_News"> 
+<b>eMail und Usenet</b></a> 
+</tr>
+<tr valign="top" class="r">
+<td><a href="/chapter/Control_Flow_Utilities"> 
+<b>Kontrollflu&szlig;-Utilities</b></a> 
+<td><a href="/chapter/File_Handle_Input_Output"> 
+<b>Dateihandles Input Output</b></a> 
+<td><a href="/chapter/Microsoft_Windows_Modules"> 
+<b>Microsoft Windows Module</b></a> 
+</tr>
+<tr valign="top" class="s">
+<td><a href="/chapter/Miscellaneous_Modules"> 
+<b>Verschiedene Module</b></a> 
+<td><a href="/chapter/Commercial_Software_Interfaces"> 
+<b>Kommerzielle Programmschnittstellen</b></a> 
+<td><a href="/chapter/Documentation"> 
+<b>Dokumentation</b></a> 
+</tr>
+<tr valign="top" class="r">
+<td><a href="/chapter/Pragma"> 
+<b>Pragma</b></a> 
+<td><a href="/chapter/Perl6"> 
+<b>Perl6</b></a> 
+<td><a href="/chapter/Not_In_Modulelist"> 
+<b>Noch nicht katalogisiert</b></a> 
+</tr>
+</table>
+</div>
+<HR />
+<table width="100%">
+<tr>
+<td align=left>
+<font size="-2">
+Probleme, Vorschl&auml;ge oder Anmerkungen bitte an <A HREF="mailto:randy@theoryx5.uwinnipeg.ca">Randy Kobes</A>.</font>
+</td><td align=right>
+<font size="-2">Fragen? Versuchen Sie mit der</font>
+<a href="/htdocs/faqs/faq.html"><font size="-1">FAQ</font></a>.
+</td></tr>
+<tr>
+<td align=left>
+</td><td align=right>
+<font size="-2">Enable installations using </font>
+<a href="/par/webstart.html"><font size="-2">PAR::WebStart</font></a>.
+</td></tr>
+</table>
+</body>
+</html>
+

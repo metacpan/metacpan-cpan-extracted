@@ -1,0 +1,18 @@
+---
+name: Catalyst-Plugin-CDBI-Transaction
+version: 0.03
+author:
+  - Brian Cooke <mrkoffee@saltedsnail.com>
+abstract: |-
+  Simple transaction handling for Catalyst 
+  apps that use Class::DBI models
+license: perl
+requires:
+  Catalyst: 5.00
+  Class::Data::Inheritable: 0
+  Test::More: 0
+provides:
+  Catalyst::Plugin::CDBI::Transaction:
+    file: lib/Catalyst/Plugin/CDBI/Transaction.pm
+    version: 0.03
+generated_by: Module::Build version 0.261

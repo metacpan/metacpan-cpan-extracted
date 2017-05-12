@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  51542:
+    - 97
+name: ddcbf2
+registers:
+  AF: 21250
+  AF_: 0
+  BC: 37380
+  BC_: 0
+  DE: 25068
+  DE_: 0
+  HL: 54848
+  HL_: 0
+  I: 0
+  IX: 51527
+  IY: 20209
+  PC: 4
+  R: 2
+  SP: 0

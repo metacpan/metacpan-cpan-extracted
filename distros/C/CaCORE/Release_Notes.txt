@@ -1,0 +1,135 @@
+                          Release Notes
+    
+             		       CaCOREperl
+                           Version 3.2
+                         December 14, 2006
+
+       National Cancer Institute Center for Bioinformatics
+
+
+================================================================
+                            Contents
+================================================================
+    
+    1.0 CaCOREperl Introduction
+    2.0 Known Issues
+    3.0 Bug fixes since last release
+    4.0 Bug Reports and Support
+    5.0 NCICB Web Pages
+
+
+================================================================
+                1.0 caCORE Introduction and History
+================================================================
+
+CaCOREperl is a Perl application programming interface to caCORE
+hosted vocabulary, metadata, and biomedical data. It implements the
+caCORE object model with object-oriented methodology, and encapsulates
+webservice invocations and XML parsing so that programmers deal with
+caCORE objects directly.
+
+
+
+================================================================
+                         2.0 Known Issues
+================================================================
+The following issues are due to the limitation on the CaCORE server
+webservice interface.
+
+1. By default, when calling ApplicationService->queryObject, the
+   caCORE server automatically trim the resultset to 1000 objects
+   if the there more than 1000. So in reality, if you want to retriev
+   anything beyond 1000, you must use ApplicationService->query.
+2. Some queries take a long time to execute on the caCORE server.
+   A few of them may cause a webservice timeout (default is 600 seconds).
+3. Some objects (for example, CaCORE::CaDSR::ClassificationSchemeItem) have
+   rather large footprints. If a search result contains a large amount of
+   these objects, the CaCORE server automatically trims the response XML,
+   which causes it to become invalid. Thus lead to the following error:
+       no element found at line 1, column 311296, byte 311296 at
+       C:/Perl/site/lib/XML/Parser.pm line 168
+   The workaround to this is the use the ApplicationService->query to limit
+   the result set size.
+4. If two classes are associated by more than one way, the navigation between
+   them can not be supported. An example of this is CaCORE::CaDSR::TriggerAction
+   and CaCORE::CaDSR::FormElement. TiggerAction contains both SourceFormElement
+   and TargetFormElement. Thus, searching for FormElment from TriggerAction is
+   not supported.
+
+================================================================
+                         3.0 Bug fixes
+================================================================
+
+================================================================
+                  4.0 Bug Reports and Support
+================================================================
+    
+    Send email to ncicb@pop.nci.nih.gov to request support or
+    report a bug.  
+
+    In addition, mailing lists are used by the caCORE developer
+    and user community to exchange ideas and make announcements.
+    You can subscribe at these addresses:
+
+    caBIO users
+
+    --  http://list.nih.gov/archives/cabio_users.html
+    
+    caBIO developers
+
+    --  http://list.nih.gov/archives/cabio_devel.html
+
+    caDSR users
+
+    --  http://list.nih.gov/archives/sbr_users.html
+
+    EVS users
+
+    --  http://list.nih.gov/archives/ncievs-l.html
+
+
+
+================================================================
+                        5.0 NCICB Web Pages
+================================================================
+    
+    The NCI Center for Bioinformatics
+
+    --  http://ncicb.nci.nih.gov/
+    
+    NCICB Application Support
+     
+    --  http://ncicbsupport.nci.nih.gov/sw/
+
+    NCICB Download Center
+
+    --  http://ncicb.nci.nih.gov/download/
+
+    caCORE SDK
+
+    -- http://ncicb.nci.nih.gov/NCICB/infrastructure/cacoresdk
+    -- http://gforge.nci.nih.gov/projects/cacoretoolkit/
+
+    caCORE
+
+    --  http://ncicb.nci.nih.gov/NCICB/infrastructure/cacore_overview
+    
+    caBIO
+
+    --  http://ncicb.nci.nih.gov/NCICB/infrastructure/cacore_overview/caBIO
+    --  http://gforge.nci.nih.gov/projects/cabiodb/
+    
+    caDSR
+
+    --  http://ncicb.nci.nih.gov/NCICB/infrastructure/cacore_overview/cadsr 
+    --  http://ncicb.nci.nih.gov/xml 
+    
+    EVS
+
+    --  http://ncicb.nci.nih.gov/NCICB/infrastructure/cacore_overview/vocabulary
+    
+    Common Security Module (CSM)
+    
+    --  http://ncicb.nci.nih.gov/NCICB/infrastructure/cacore_overview/csm
+
+//end

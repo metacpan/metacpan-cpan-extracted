@@ -1,0 +1,46 @@
+Revision history for CGI-Application-Plugin-Config-Any
+
+0.14    Wed, 17 July 2013 16:47:40 GMT
+        - fixed PDO problem causing fail reports
+
+0.13    Mon, 15 September 2008 10:25:45 GMT
+        - methods config_init(), config_name(), config_section() and
+          config_read() are no longer exported by default
+        - Minor fix in method _load() to avoid "use of uninitialized
+          value" message 
+        - Added POD for std_config() method to avoid build errors
+          caused by POD::Coverage
+        - some minor changes in tests
+        
+0.12    Thu, 11 September 2008 15:01:41 GMT
+        - added CGI::Application to prerequisites to avoid FAIL reports
+        - some minor code changes
+
+0.11    Mon, 8 September 2008 08:34:25 GMT
+        - TestApp.pm missing in MANIFEST
+
+0.10    Fri, 5 September 2008 18:59:01 GMT
+        - MAJOR API CHANGE!
+          THIS VERSION IS NOT BACKWARD COMPATIBLE!
+        - added std_config() for CGI::Application::Standard::Config
+          compliance (thanks to Mark Stosberg for feedback)
+        - renamed init()    to config_init()
+        - renamed param()   to config()
+        - renamed section() to config_section()
+        - renamed getall()  to config_read()
+        - added config_name() method to change current config name
+
+0.04    Fri, 5 September 2008 13:24:05 GMT
+        - left $DEBUG on accidentally in 0.03
+
+0.03    Fri, 5 September 2008 11:45:08 GMT
+        - moved to CGI::Application::Plugin::Config::Any namespace
+        - added function to find a key in the data structure
+          (if section name missing or key not found in this section)
+
+0.02    Tue, 2 September 2008 14:10:30 GMT
+        - fixed mail address in POD
+        
+0.01    Tue, 2 September 2008 09:24:06 GMT
+        - initial release
+

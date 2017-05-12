@@ -1,0 +1,29 @@
+Revision history for Color-Scheme
+
+1.07      2015-03-23 08:50:59-04:00 America/New_York
+        - allow for single-bit imprecision in color parts, as perl 5.21.x
+          has changed its rounding in some cases (with long doubles)
+
+1.06      2014-02-13 14:31:19-05:00 America/New_York
+          typo fixes (thanks, Yanick!)
+
+1.05      2013-07-01 20:59:24 America/New_York
+          repackage, update bugtracker, etc.
+
+1.04      Tue Jan  1 15:14:44 EST 2013
+          fix some documentation typos (thanks, Xavier Guimard)
+
+1.03      Mon Jun 18 17:56:43 EDT 2012
+          stop the pod tests from breaking install
+
+1.02      Sat Jan 28 20:06:21 EST 2006
+          Fixed from_hue bug thanks to Christoffer Vig
+
+1.01      Mon Nov 14 22:34:35 EST 2005
+          Changed license to same as Perl with explicit permission from Color
+          Schemes 2 author
+
+          Reorganized docs a little
+
+1.00      Sun Nov 13 16:13:50 EST 2005
+          First version, released on an unsuspecting world.

@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Chess-Games-DotCom
+version:      1.2
+version_from: DotCom.pm
+installdirs:  site
+requires:
+    Bundle::LWP:                   0.01
+    File::Butler:                  3.01
+    File::Temp:                    0.14
+    HTML::Tree:                    3.18
+    URI:                           1.1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

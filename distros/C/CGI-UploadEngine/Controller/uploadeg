@@ -1,0 +1,6 @@
+---
+max_size: 5000000
+min_size: 1
+allowed_types: .ahk .htm .html
+disallowed_types: .exe .pl
+

@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use Complete::Dist qw(complete_dist);
+     my $res = complete_dist(word => 'Text-AN');
+     # -> ['Text-ANSI-Util', 'Text-ANSITable']
+

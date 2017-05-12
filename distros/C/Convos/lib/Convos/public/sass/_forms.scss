@@ -1,0 +1,94 @@
+$inputWidth: 290px;
+
+form {
+  margin: 0;
+  label { display: block; margin-top: $bodyGutter; }
+
+  select[multi] { height: 30px; }
+  input[readonly] { background: darken($backgroundColor, 10%); color: lighten($fontColor, 20%); }
+  input, select {
+    background: darken($backgroundColor, 2%);
+    font-size: $fontSize - 1;
+    outline: none;
+    border: $formElementBorder;
+    padding: 6px 8px;
+    width: $inputWidth;
+
+    &:focus { outline: none; border: $formElementFocusBorder; }
+  }
+
+  input[type="checkbox"] { width: auto; }
+  input.field-with-error, select.field-with-error { border-color: $errorColor; }
+  input.half-size { width: ($inputWidth / 2 - 2); }
+  div.actions {
+    margin-top: 2em;
+    clear: left;
+    padding: 0.5em 0;
+  }
+  p.help {
+    color: #555;
+    font-size: 0.9em;
+    margin-top: 0.1em;
+  }
+}
+
+form.horizontal {
+  label {
+    margin-top: 4px;
+    float: left;
+    width: 8em;
+  }
+  div.form-group {
+    padding: 4px 0;
+    clear: left;
+  }
+  div.actions {
+    margin-top: 1em;
+    margin-left: 8em;
+  }
+  p.help, p.error {
+    font-size: 0.9em;
+    margin: 2px 0 0 (8em / 0.9);
+  }
+  p.error {
+    background: lighten($errorColor, 40%);
+    width: $inputWidth;
+    margin-top: -3px;
+    padding: 4px;
+    border-color: $errorColor;
+    border-top: 0;
+  }
+  input.field-with-error, select.field-with-error {
+    border-bottom: 0;
+  }
+
+  @media (max-width: $responsiveWidth + $sidebarWidth) {
+    label {
+      float: none;
+      width: 100%;
+    }
+    div.actions, p.help, p.error {
+      margin-left: 0;
+    }
+  }
+}
+
+button { vertical-align: baseline; } // make <a> and <button> align. at least in chrome
+
+button, .button {
+  background-color: darken($backgroundColor, 13%);
+  color: lighten($fontColor, 2%);
+  font-size: $fontSize - 1;
+  text-decoration: none;
+  padding: 8px;
+  border: $formElementBorder;
+  &:active, &.active { background: darken($backgroundColor, 20%); }
+  &:focus { outline: none; border: $formElementFocusBorder; }
+  &:hover { border: $formElementFocusBorder; }
+}
+
+button.confirm, a.confirm {
+  background-color: lighten($errorColor, 52%);
+  color: $errorColor;
+  border-color: $errorColor;
+}

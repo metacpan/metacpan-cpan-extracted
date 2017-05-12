@@ -1,0 +1,203 @@
+             FRAMEWORK FOR PORTABLE WEB APPLICATIONS
+----------------------------------------------------------------------
+
+by Darren Duncan <perl@DarrenDuncan.net>
+
+CONTENTS
+
+* Preface
+* Keeping Up To Date
+* Requirements
+* Installation
+* Support
+* To Do
+* Author
+
+PREFACE
+
+This distribution features the Perl 5 module named "CGI::Portable" as well as
+these 5 other modules that are recommended for use with it:
+CGI::Portable::Adapter[CGI|Socket],
+CGI::Portable::App[Static|MultiScreen|SplitScreen].
+
+All of my modules have complete POD inside of them, so please refer to that for a
+description of the module itself.
+
+This Read Me document concerns itself mainly with installation and support
+issues, and also includes any "To Do" lists.
+
+This distribution also includes 5 other modules, in the temporary name space 
+Demo*, that are designed to be used with CGI::Portable.  Each of these is 
+included as a demo "application component", and by looking at them, you should 
+have a better idea what CGI::Portable can do for you.  Unlike ordinary demos, 
+however, these are a lot more mature and are being used effectively in multiple 
+production environments.  For all intents and purposes, you should treat them 
+like "scripts" rather than "modules" as far as when you use them, due to their 
+more proprietary nature.  They are in "lib" along with the feature modules.
+
+This distribution now has a "demos" folder containing 41 files which are
+ready-to-use example scripts and data files that exercise CGI::Portable and all
+of the Demo* modules.  Many of these are exactly the same as the Synopsis POD
+for particular modules.  Some have minor adjustments or demonstrate the
+Synopsis examples that make use of the most features of the particular modules.
+ Many demos have extra files in them that never appeared in Synopsis.  It is my
+hope that these demos will make it an order of magnitude easier for you to
+adopt my modules and put them to work in a productive manner.  The provided
+demos include: a multi-page web site with usage tracking, guest books, mail and
+survey forms, static html and plain text pages, segmented text file display,
+redirection, and a few other strange modules that don't do anything useful but
+play with features.  Any actual modules in the demos folder are very immature
+and should not be used as is; rather, learn from them.  They intentionally have
+no POD and are not versioned.
+
+KEEPING UP TO DATE
+
+My module set is constantly under development.  You should be able to find the
+newest versions at my website, "http://www.DarrenDuncan.net", on the page called
+"Perl Libraries I Made" (name subject to change).  They can also be found on CPAN
+under the author name of "DUNCAND".  
+
+I am inclined to update the copies on my web site more often, but those
+intermediate versions are more likely to have been tested less, and the modules
+may be updated day by day without increasing the version numbers.  However, the
+copies on CPAN are guaranteed to have unique version numbers when the module has
+changed.
+
+REQUIREMENTS
+
+All of my modules require Perl 5.004 or newer, even though only some of them need
+it, in the interest of consistency.  That said, Perl 5.004 is already 3 years 
+old, is available as a binary on practically every OS that supports Perl at all, 
+and is a very solid release, so I see no reason to support anything older.
+
+Modules in this distribution require modules in these following distributions:
+
+File-VirtualPath-1.011.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- File::VirtualPath 1.011 is required by:
+		- CGI::Portable (stores file-system related paths)
+		- CGI::Portable (stores url related paths)
+
+CGI-MultiValuedHash-1.09.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- CGI::MultiValuedHash 1.09 is required by:
+		- CGI::Portable (stores and url-decodes user queries, posts, cookies)
+
+HTML-EasyTags-1.071.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- HTML::EasyTags 1.071 is required by:
+		- CGI::Portable (assembles the pieces of a new HTML page)
+
+mod_perl-1.24_01.tar.gz (older versions may work):
+	- Apache 1.27 is required by:
+		- CGI::Portable::AdapterCGI (when running under mod_perl)
+
+HTML-FormTemplate-2.021.tar.gz
+	- by Darren Duncan (DUNCAND)
+	- HTML::FormTemplate 2.021 is required by:
+		- DemoMailForm (for making input forms and form reports)
+		- DemoGuestBook (for making input forms and form reports)
+
+libnet-1.0703.tar.gz (older versions may work):
+	- by Graham Barr (GBARR)
+	- Net::SMTP 2.15 is required by:
+		- DemoMailForm (when sending e-mails of form data)
+		- DemoGuestBook (when sending e-mails of form data)
+		- DemoUsage (when sending e-mails of usage data)
+
+GD (any version I suppose) is required by the "image" demo.
+
+INSTALLATION
+
+To install these modules, cd to the directory that contains all of the extracted 
+distribution files, including this ReadMe file, and type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The last step probably won't work if you are not the administrator of your 
+machine; in that case you either need to get your administrator to install this 
+for you, or put it in a your own local directory instead.
+
+The Makefile.PL can do this for you if you substitute something like the 
+following for the first line above:
+
+	perl Makefile.PL PREFIX=/tmp/myperl5
+
+or:
+
+	perl Makefile.PL PREFIX=/home/me/myperl5
+
+If you are on a Mac system that is older than Mac OS X (Mac OS 9 or earlier)
+and/or you are otherwise having problems with the Makefile, you can still
+install this module the old fashioned way, by copying.
+
+Every file in the "lib" folder of this distribution goes in its corresponding 
+location within the "lib" folder that came with your Perl 5 distribution.
+
+Or alternately, put them anywhere you want, but you will need to have that 
+location added to your include path by your main program using something like 
+this:
+
+	use lib '/home/me/myperl5/lib';
+
+Then you would want to run the included test programs to make sure the modules
+are installed correctly.  Call them like this:
+
+	perl -w t/CGI-Portable.t
+
+Any existing POD is embedded in the modules themselves.  The Makefile probably 
+extracted it for you in the usual manner, or you can run a POD extractor on it 
+yourself to the same effect.  You can also find an HTMLized copy of the POD on 
+CPAN and other public source archives; I link to one copy of it on my web site.
+
+SUPPORT
+
+Currently I don't have any support arranged with other people, lists, newsgroups,
+or otherwise.  Feel free to ask me if you can't figure things out on your own, or
+another person whom you know has used this.  I may start a mailing list for 
+support issues later, so that users of my modules can help each other with them.
+
+TO DO
+
+	* Add feature that lets one export a CGI::Portable application to a set of 
+	static html files that can be used independantly of any script, except that 
+	they would still call the script to process any forms.  This would consist 
+	mainly of changing the self-referencing hyperlinks in generated screens.  
+	Advantages are greatly improved performance for applications with mostly 
+	static screens, including the initial page for forms.
+	* Add feature that lets one have separate "development" and "production" 
+	directories for application components or config files whereby equivalent 
+	files in the production directory are used by default, but copies in the 
+	development directory are used instead if they exist.  This makes it easier 
+	for someone to change the application while it is in use without normal 
+	users seeing the new version while it is being tested.
+	* Add a battery of ok / not ok tests.
+	* Improve the documentation.
+	* I have few more ideas in this regard, but am open to suggestions.
+	* Now all of my pre-conceived modules for public release are done, so all 
+	I've got left to do in that regards is improve the existing ones.
+
+AUTHOR
+
+Copyright (c) 1999-2004, Darren R. Duncan.  All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the same terms
+as Perl itself.  However, I do request that this copyright information and
+credits remain attached to the file.  If you modify this module and
+redistribute a changed version then please attach a note listing the
+modifications.  This module is available "as-is" and the author can not be held
+accountable for any problems resulting from its use.
+
+I am always interested in knowing how my work helps others, so if you put this
+module to use in any of your own products or services then I would appreciate
+(but not require) it if you send me the website url for said product or
+service, so I know who you are.  Also, if you make non-proprietary changes to
+the module because it doesn't work the way you need, and you are willing to
+make these freely available, then please send me a copy so that I can roll
+desirable changes into the main release.
+
+Address comments, suggestions, and bug reports to perl@DarrenDuncan.net.
+
+Share and Enjoy!

@@ -1,0 +1,35 @@
+1.006     2014-11-25 14:07:37+00:00 Europe/London
+ - allow passing args as list (not only hashref) to the adapted
+   class's constructor (thanks Ilmari)
+
+1.005     2014-07-29 10:55:10+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+1.004     2014-01-14 10:26:20 Europe/London
+ - use the MOP instead of Sub::Install (thanks ribasushi and mst for
+   the hint)
+ - fix the trait namespace lookup, it was completely wrong; now it
+   actually does what the documentation says (with test)
+
+1.003     2014-01-13 15:00:50 Europe/London
+ - Simplify use of MooseX::Traits::Pluggable, applying it to the
+   correct class
+
+1.002     2013-06-20 11:21:00 Europe/London
+ - Allow any component type, not just Model, View and Controller
+
+1.001     2012-03-30 13:22:04 Europe/London
+ - documentation fix, RT 76161
+   https://rt.cpan.org/Public/Bug/Display.html?id=76161
+
+1.0       2012-03-24 11:01:57 Europe/London
+ - first non-devel release
+
+0.1_03    2012-03-19 09:38:34 Europe/London
+ - add prereq Config::General, move req to test-requires
+
+0.1_02    2012-03-18 18:42:16 Europe/London
+ - fix prereq Catalyst::Plugin::ConfigLoader
+
+0.1_01    2012-03-14 12:15:40 Europe/London
+ - Initial release

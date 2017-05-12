@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<RDF xmlns:rdf="http://www.w3.org/TR/1999/REC-rdf-syntax-19990222#"
+     xmlns="http://www.ecila.fr/">
+
+ <Table>
+  <![CDATA[
+
+
+
+
+
+
+
+
+
+CREATE TABLE urldemo (
+  rowid int(11) DEFAULT '0' NOT NULL auto_increment,
+  created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+  modified timestamp(14),
+  info enum('active','inactive') DEFAULT 'active',
+  url char(128),
+  comment char(255),
+  UNIQUE cdemo1 (rowid)
+)
+
+
+  ]]>
+ </Table>
+
+ <Catalog>
+  <navigation>theme</navigation>
+  <tablename>urldemo</tablename>
+  <name>urltheme</name>
+ </Catalog>
+ <Link>
+  <row>3001</row>
+  <category>1</category>
+ </Link>
+ <Link>
+  <row>3002</row>
+  <category>1</category>
+ </Link>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.senga.org/</url>
+  <comment>Senga</comment>
+  <info>active</info>
+  <rowid>3001</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.lip6.fr/</url>
+  <comment>Lip6</comment>
+  <info>active</info>
+  <rowid>3002</rowid>
+ </Record>
+
+ <Category>
+  <externalid>2</externalid>
+  <name>Actualité, médias</name>
+  <rowid>12</rowid>
+  <created>1999-04-07 18:30:07</created>
+  <parent>1</parent>
+ </Category>
+ <Link>
+  <row>135</row>
+  <category>12</category>
+ </Link>
+ <Link>
+  <row>136</row>
+  <category>12</category>
+ </Link>
+ <Link>
+  <row>137</row>
+  <category>12</category>
+ </Link>
+ <Link>
+  <row>142</row>
+  <category>12</category>
+ </Link>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.mediaslink.com/</url>
+  <comment>Médias Link</comment>
+  <info>active</info>
+  <rowid>135</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.malexism.com/medias/</url>
+  <comment>Les Médias, mémoire de lhumanité</comment>
+  <info>active</info>
+  <rowid>136</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.fnps.fr/</url>
+  <comment>Fédération Nationale de la Presse Spécialisée</comment>
+  <info>active</info>
+  <rowid>137</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.nouvelobs.com/</url>
+  <comment>Le Nouvel Observateur</comment>
+  <info>active</info>
+  <rowid>142</rowid>
+ </Record>
+
+ <Category>
+  <externalid>201</externalid>
+  <name>Actualité, médias/Magazines</name>
+  <rowid>13</rowid>
+  <created>1999-04-07 18:30:08</created>
+  <parent>12</parent>
+ </Category>
+ <Link>
+  <row>138</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>139</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>140</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>141</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>142</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>143</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>144</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>145</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>146</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>147</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>148</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>149</row>
+  <category>13</category>
+ </Link>
+ <Link>
+  <row>150</row>
+  <category>13</category>
+ </Link>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.lexpress.presse.fr/</url>
+  <comment>LExpress</comment>
+  <info>active</info>
+  <rowid>138</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.courrierint.com/</url>
+  <comment>Courrier International</comment>
+  <info>active</info>
+  <rowid>139</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.telerama.fr/</url>
+  <comment>Télérama</comment>
+  <info>active</info>
+  <rowid>140</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.monde-diplomatique.fr/</url>
+  <comment>Le Monde Diplomatique</comment>
+  <info>active</info>
+  <rowid>141</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.electriccafe.org/Canard/</url>
+  <comment>Crème de Canard</comment>
+  <info>active</info>
+  <rowid>143</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.marianne-en-ligne.fr/</url>
+  <comment>Marianne en ligne</comment>
+  <info>active</info>
+  <rowid>144</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.parismatch.tm.fr/</url>
+  <comment>Paris Match</comment>
+  <info>active</info>
+  <rowid>145</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.t7j.com/</url>
+  <comment>Télé 7 Jours</comment>
+  <info>active</info>
+  <rowid>146</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.club-internet.fr/levenement/</url>
+  <comment>LEvénement</comment>
+  <info>active</info>
+  <rowid>147</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.francepresse.com/</url>
+  <comment>France Presse</comment>
+  <info>active</info>
+  <rowid>148</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.transfert.net/</url>
+  <comment>Transfert</comment>
+  <info>active</info>
+  <rowid>149</rowid>
+ </Record>
+ <Record table="urldemo">
+  <created>1999-03-22 00:00:00</created>
+  <url>http://www.atmospheres.com/pc/</url>
+  <comment>Atmosphères</comment>
+  <info>active</info>
+  <rowid>150</rowid>
+ </Record>
+
+ <Category>
+  <externalid>301</externalid>
+  <name>Actualité, médias/Femme</name>
+  <rowid>14</rowid>
+  <created>1999-04-07 18:30:08</created>
+  <parent>12</parent>
+ </Category>
+ <Symlink>
+  <up>14</up>
+  <down>13</down>
+ </Symlink>
+ <Auth>
+  <login>loic</login>
+  <category>12</category>
+ </Auth>
+ <Auth>
+  <login>loic</login>
+  <category>13</category>
+ </Auth>
+
+ <Sync/>
+</RDF>

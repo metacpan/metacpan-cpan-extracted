@@ -1,0 +1,72 @@
+---
+abstract: 'CPAN Testers report object'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-Testers-Report
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  CPAN::Testers::Fact::InstalledModules:
+    file: lib/CPAN/Testers/Fact/InstalledModules.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::LegacyReport:
+    file: lib/CPAN/Testers/Fact/LegacyReport.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::PerlConfig:
+    file: lib/CPAN/Testers/Fact/PerlConfig.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::Prereqs:
+    file: lib/CPAN/Testers/Fact/Prereqs.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::TestEnvironment:
+    file: lib/CPAN/Testers/Fact/TestEnvironment.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::TestOutput:
+    file: lib/CPAN/Testers/Fact/TestOutput.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::TestSummary:
+    file: lib/CPAN/Testers/Fact/TestSummary.pm
+    version: '1.999003'
+  CPAN::Testers::Fact::TesterComment:
+    file: lib/CPAN/Testers/Fact/TesterComment.pm
+    version: '1.999003'
+  CPAN::Testers::Report:
+    file: lib/CPAN/Testers/Report.pm
+    version: '1.999003'
+requires:
+  Carp: '0'
+  Metabase::Fact::Hash: '0.016'
+  Metabase::Fact::String: '0.016'
+  Metabase::Report: '0.016'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/CPAN-Testers-Report/issues
+  homepage: https://github.com/dagolden/CPAN-Testers-Report
+  repository: https://github.com/dagolden/CPAN-Testers-Report.git
+version: '1.999003'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Brian Fraser <brian.fraser@booking.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'

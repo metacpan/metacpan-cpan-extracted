@@ -1,0 +1,123 @@
+#!/usr/bin/perl -w
+use warnings;
+use strict;
+use FindBin qw($Bin);
+use File::Spec::Functions qw( catfile );
+use File::Copy;
+use CGI::Wiki::Kwiki;
+use Getopt::Long;
+
+=head1 NAME
+
+cgi-wiki-kwiki-install
+
+=head1 DESCRIPTION
+
+Creates a L<CGI::Wiki::Kwiki> wiki install in the current directory.
+
+=head1 USAGE
+
+To create a simple L<CGI::Wiki::Kwiki> wiki install in the current directory:
+
+  cgi-wiki-kwiki-install
+
+The page data will be stored in an SQLite database called C<wikidb>.
+B<Warning:> this database will be created as writeable by all users,
+to overcome problems in cases where user CGI scripts run as the
+webserver user.  If your setup allows you to make this database file
+more secure, please do so.
+
+To show this help:
+
+  cgi-wiki-kwiki-install --help
+
+=cut
+
+my $show_help;
+GetOptions( help => \$show_help );
+if ( $show_help ) {
+    show_help();
+    exit 0;
+}
+
+# where we're installing to
+my $target = "./wiki.cgi";
+
+# where we're installing from
+my $script = find_script("cgi-wiki-kwiki-cgi-script");
+
+# the setup script
+my $setup = find_script("cgi-wiki-setupdb");
+
+die "There's already a file 'wikidb' in the current directory. This probably
+means that you have already installed CGI::Wiki::Kwiki here. Stopping.\n"
+  if (-f "wikidb");
+
+
+my (undef, $path, undef) = File::Spec->splitpath($INC{'CGI/Wiki/Kwiki.pm'});
+my $templates = File::Spec->catfile( $path, "Kwiki", "templates" );
+die "Can't find CGI::Wiki::Kwiki's templates in '$path'"
+  unless (-d $templates);
+
+print "Installing CGI::Wiki::Kwiki...\n";
+
+print "  installing cgi script\n";
+copy($script, $target) or die "Can't install CGI script - $!\n";
+
+chmod(0755, $target) or die "Can't make CGI script executable - $!\n";
+
+print "  Installing templates to ./templates\n";
+mkdir "templates";
+opendir TEMPLATES, $templates or die "Can't open template source folder: $!\n";
+for (grep { /\.(tt|css)$/ } readdir(TEMPLATES)) {
+  print "    installing template $_\n";
+  File::Copy::copy(
+    File::Spec->catfile($templates, $_),
+    File::Spec->catfile("templates", $_ )
+  ) or die "Error copying $_: $!\n";
+}
+closedir(TEMPLATES);
+
+print "  setting up DB\n";
+system($setup, qw( --type sqlite --name wikidb )) and die "Can't set up DB\n";
+chmod(0666, "wikidb") or die "Can't make database writable by all users\n";
+
+print "CGI::Wiki::Kwiki is now installed in the current directory\n";
+print "Edit the script $target to set options\n";
+
+
+# little utility function to find a script and make sure it's +x, etc.
+sub find_script {
+  my $name = shift;
+
+  # for preference, we find files in the same dir as us. Really handy
+  # for development.
+  my $file = catfile($Bin, $name);
+  
+  # It's not with me. Look in the path.
+  unless (-f $file) { chomp( $file = `which $name` ) }
+
+  die "I can't find '$name' in $Bin or your path. Stopping.\n"
+    unless (-f $file);
+  die "I found '$name' at $file, but it's not executable. Stopping.\n"
+    unless (-x $file);
+
+  return $file;
+}
+
+sub show_help {
+    print qq(
+To create a simple wiki install in the current directory:
+
+  cgi-wiki-kwiki-install
+
+The page data will be stored in an SQLite database called "wikidb".
+
+WARNING: this database will be created as writeable by all users,
+to overcome problems in cases where user CGI scripts run as the
+webserver user.  If your setup allows you to make this database file
+more secure, please do so.
+
+);
+}
+

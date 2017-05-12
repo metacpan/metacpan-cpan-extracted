@@ -1,0 +1,20 @@
+t/pod.t
+t/pod-coverage.t
+lib/Class/DBI/ClassGenerator.pm
+CHANGELOG
+README
+MANIFEST
+Makefile.PL
+GPL2.txt
+ARTISTIC.txt
+lib/Class/DBI/ClassGenerator/DBD/mysql.pm
+lib/Class/DBI/ClassGenerator/DBD/SQLite.pm
+lib/Class/DBI/ClassGenerator/Extending.pod
+t/basics.t
+t/sqlite_create_db.pl
+t/mysql.t
+t/mysql_create_db.pl
+bin/c-dbi-classgenerator
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

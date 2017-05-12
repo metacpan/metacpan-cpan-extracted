@@ -1,0 +1,51 @@
+Revision history for Perl extension Catalyst::View::HTML::Template::Compiled.
+
+0.16  13.12.2006 21:32
+    - internal chnages
+    - blowed up interface to allow my sub-classing needs
+
+0.15  12.12.2006 00:50
+    - fixed: wrong template picked
+
+0.14  04.12.2006 01:48
+    - internal changes
+    - now tries more possible filenames before dieing
+
+0.12  Wed Aug 13 20:39:11 2006
+    - $c->config->{template}->{path} defaults now to '.'
+    - deprecated HTC options 'deref' and 'method_call' removed
+
+
+0.11  Fri Jul 21 19:37:34 2006
+    - Renamed Build.pl to Build.PL
+
+0.10  Fri Jul 21 10:39:11 2006
+	- Switched to Module::Build
+
+0.08  Wed Dec 14 23:39:41 2005
+	- Fixed case for directory names
+
+0.07  Thu Dec  1 01:46:35 2005
+	- POD fixed
+
+0.06  Fri Nov 25 02:30:00 2005
+	- Added $htc->param(c => $c) by default
+	- Set method_call => '.', # default ->
+	- Set deref       => '/', # default .
+	- Added use_default_path
+
+0.05  Wed Nov 23 16:56:00 2005
+	- Fixed a path problem
+
+0.04  Wed Nov 23 15:50:00 2005
+	- Workaround of HTML::Template::Compiled bug(s)
+
+0.03  Sat Nov 19 02:07:00 2005
+	- Minor fixes
+
+0.02  Fri Nov 18 17:10:44 2005
+	- Helper added
+
+0.01  Fri Nov 18 14:23:44 2005
+	- implemented functionality
+

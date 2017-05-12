@@ -1,0 +1,23 @@
+NAME
+    Crypt::Format - Conversion utilities for encryption applications
+
+SYNOPSIS
+        use Crypt::Format;
+
+        my $der = Crypt::Format::pem2der($pem);
+        my $pem = Crypt::Format::der2pem($der, 'CERTIFICATE REQUEST');
+
+DESCRIPTION
+    Not much more to say! This module is for simple conversions that I got
+    tired of writing out.
+
+AUTHOR
+    Felipe Gasper (FELIPE)
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

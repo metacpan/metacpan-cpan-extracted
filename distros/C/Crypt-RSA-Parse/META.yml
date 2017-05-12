@@ -1,0 +1,32 @@
+---
+abstract: 'Parse RSA keys'
+author:
+  - 'Felipe Gasper (FELIPE)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.01'
+  Test::NoWarnings: '0.01'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-RSA-Parse
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: '0.34'
+  Convert::ASN1: '0.27'
+  Crypt::Format: '0.06'
+  MIME::Base64: '3.15'
+  parent: '0'
+resources:
+  repository: https://github.com/FGasper/p5-Crypt-RSA-Parse.git
+version: 0.043
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,10 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Class/DBI/Plugin/Backtickify.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,82 @@
+[0.015] Mon Oct 05 21:13:30 EST 2010
+    - Changed around the Makefile.PL to assist automation and hopefully
+      standardize it a bit for readability.
+    - Updated a bunch of dependencies to modern versions and remove those
+      which are no longer used.
+    - Switched usage of MX:AttributeHelpers to use Native functions that are
+      present in modern Mooses.
+    - Made it so that parameterized action traits using 'deep' parameters
+      (those which are references and not simple scalars) actual work.  Added
+      tests for this and a few more test cases for parameterized action traits.
+
+[0.014] Mon Aug 30 22:52:30 EST 2010
+    - Fixed regression introduced in last version related to how
+      we expand 'shortname' actionrole namespaces.  We now revert
+      to the old behavior until we can reconcile with what is done
+      in Catalyst::Controller::ActionRole.
+    - Created tests to prevent above regression in the future
+
+[0.013] Wed Aug 25 19:29:01 EST 2010
+    - Controller now inherits from Catalyst::Controller::ActionRole
+    - ActionRoles can now be parameterized
+    - update dependencies
+    - docs and test for above
+
+[0.012] Thu Apr  1 21:03:30 CEST 2010
+    - fixed query parameter handling
+
+[0.011] Sun Oct 11 20:18:19 CEST 2009
+    - fixed broken isa RenderView test case
+    - parameterized roles now available
+    - path parts and chain base actions are parameterizable
+    - action names are parameterizable
+    - fixed parameterized role target meta object bug
+    - dispatch type mutabilisation for manipulation now done more
+      sanely (Tomas Doran).
+    - fixed M:I requirement handling for authors.
+    - controller roles are now applied all at once (Tomas Doran).
+    - private actions now have a default signature of (@).
+
+[0.010] Sun Sep 13 15:52:01 CEST 2009
+    - Fix Compat with MooseX::Method::Signatures >=0.22 ( KENTNL )
+
+[0.009] Fri Aug 21 23:54:11 CEST 2009
+    - action classes are now moosified after loading, this means that
+      RenderView should now work with isa. (thanks to all reporters!)
+    - documented 'isa' action class option (experimental!)
+    - fixed bug where setup wasn't called without plugins
+    - fixed bug where under block scope wasn't cleaned up
+    - action signatures now influence dispatching, non-matching actinos
+      will be skipped by the chained dispatch type
+
+[0.008] Tue Aug 18 19:59:57 CEST 2009
+    - default_inner now ignores arguments
+    - preparations for parameterized roles
+    - MooseX::Method::Signatures now publically exposes signature object
+
+[0.007] Sun Aug 16 04:12:43 CEST 2009
+    - used namespace keyword in examples
+    - allow namespace shorcuts in controller role application
+
+[0.006] Sun Aug 16 03:43:10 CEST 2009
+    - fixed keyword listing method to use new MXD around
+    - changed prereq for D:D to ensure fix of method call issue
+
+[0.005] Wed Aug 12 22:51:42 CEST 2009
+    - action signature errors now lead to 404's, not 400's
+    - prereq D:D version that fixed method invocation issue
+
+[0.004] Wed Aug  5 22:40:58 CEST 2009
+    - Added model and view keywords
+    - More configure_requires fixes
+
+[0.003] Mon Aug  3 21:38:42 CEST 2009
+    - Added File::Find::Rule(::Perl) to configure_requires
+
+[0.002] Mon Aug  3 17:30:23 CEST 2009
+    - Fixed Changes, hah!
+    - Fixed error in bad request handling being too greedy
+    - Added tests for errors in modified action methods
+
+[0.001] Sat Aug  1 21:26:41 CEST 2009
+    - Initial release

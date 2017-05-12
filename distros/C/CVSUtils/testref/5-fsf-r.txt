@@ -1,0 +1,3291 @@
+2000-09-04 20:41  kfogel
+
+	* include/svn_wc.h (1.17), libsvn_wc/apply_delta.c (1.34),
+	libsvn_wc/tests/checkout-test.c (1.12): 
+	(svn_wc_apply_delta): removed from public interface, as 
+	svn_wc_get_change_walker() is the way to do this now.  
+	
+	* checkout-test.c (apply_delta): new func in test suite, hooks up an 
+	XML delta with a walker to do the checkout.  
+
+2000-09-02 10:39  gstein
+
+	* libsvn_ra_dav/: commit.c (1.3), fetch.c (1.6),
+	tests/ra-dav-test.c (1.6): 
+	(svn_ra_checkout): don't pass pool; use the one in "ras" 
+	(svn_ra_get_commit_walker): add 'ras' param and drop the TBD thing 
+
+2000-09-02 10:22  gstein
+
+	* libsvn_ra_dav/tests/ra-dav-test.c (1.5): oops. svn_handle_error()
+	doesn't exit(). do it manually to prevent fallthru.  
+
+2000-09-02 10:09  gstein
+
+	* libsvn_ra_dav/tests/: Makefile.am (1.3), ra-dav-test.c (1.4): use
+	the real WC change walker (rather than our test hack).  
+
+2000-09-02 10:03  gstein
+
+	* include/svn_wc.h (1.16), libsvn_wc/apply_delta.c (1.33): 
+	(svn_wc_apply_delta): use svn_wc_get_change_walker() to create
+	    walker and batons for the XML parse step 
+	(svn_wc_get_change_walker): add repos and version parameters. store
+	    them into the walk_baton structure.  
+
+2000-09-02 10:00  gstein
+
+	* libsvn_ra_dav/: commit.c (1.2), fetch.c (1.5): tweak: update to
+	new walker callback interfaces 
+
+2000-09-02 04:50  kfogel
+
+	* include/svn_wc.h (1.15): 
+	(svn_wc_apply_delta): new `version' parameter.  
+
+2000-09-02 04:45  kfogel
+
+	* libsvn_wc/: adm_files.c (1.10), adm_ops.c (1.7), apply_delta.c
+	(1.32), wc.h (1.11), tests/checkout-test.c (1.11): Include version
+	number as part of the "context" of a delta application: 
+	
+	(w_baton): new version field.  
+	(svn_wc_apply_delta): take version arg, stuff it into walk baton.  
+	(add_directory, add_file): get version, pass it along.  
+	(svn_wc__ensure_adm, svn_wc__ensure_wc_prepared): accept and pass
+	along new version arg.  
+	(init_adm): take version, use it during file initialization.  
+
+2000-09-02 04:17  kfogel
+
+	* libsvn_wc/apply_delta.c (1.31): 
+	(svn_wc_get_change_walker): minor formatting fix.  
+
+2000-09-02 04:14  kfogel
+
+	* libsvn_wc/: README (1.38), adm_files.c (1.9), adm_ops.c (1.6),
+	apply_delta.c (1.30), wc.h (1.10): Rewritten.  
+
+2000-09-02 04:13  kfogel
+
+	* include/svn_types.h (1.41): 
+	(svn_dir_kind): replaces svn_directory_kind, enough keystrokes
+	already.  
+
+2000-09-01 22:38  jimb
+
+	* include/svn_delta.h (1.74): Doc fixes.  
+
+2000-09-01 22:24  kfogel
+
+	* libsvn_delta/delta.h (1.21), libsvn_delta/delta_parse.c (1.79),
+	libsvn_delta/tests/foo.delta (1.7),
+	libsvn_wc/tests/checkout-1.delta (1.8): Use "add" as the tagname
+	everywhere, instead of "new".  All sample deltas updated, and: 
+	
+	(svn_delta__tagmap): "add" replaces "new".  
+	(svn_delta__XML_t): svn_delta__XML_add replaces svn_delta__XML_new.  
+
+2000-09-01 22:12  sussman
+
+	* libsvn_delta/tests/deltaparse-test.c (1.26): 
+	
+	 * deltaparse-test.c:  (print_spaces, inc_spaces, dec_spaces) added.  
+	   (all other routines): above calls added, for pretty spacing of
+	   output.  
+
+2000-09-01 21:54  kfogel
+
+	* libsvn_wc/adm_files.c (1.8): 
+	(chop_admin_thing): replaces `chop_admin_name'.  
+	(svn_wc__make_adm_thing): special case making an empty thing, i.e., 
+	making the parent directory.  
+
+2000-09-01 21:42  kfogel
+
+	* libsvn_delta/delta_parse.c (1.78): 
+	(do_file_callback): oops, clean up a leftover from previous change.  
+
+2000-09-01 21:39  kfogel
+
+	* libsvn_delta/delta_parse.c (1.77): 
+	(do_directory_callback): avoid initialization issues by eliminating 
+	local var `child_baton' in favor of
+	`&(youngest_frame->child_baton)'.  
+	(do_file_callback): same as above, but for `file_baton'.  
+
+2000-09-01 21:32  kfogel
+
+	* libsvn_delta/delta_parse.c (1.76): 
+	(do_begin_textdelta): init window_consumer to NULL, so it's safe
+	even if the walker callback never sets it.  
+
+2000-09-01 21:26  sussman
+
+	* include/svn_delta.h (1.73), libsvn_delta/delta_parse.c (1.75),
+	libsvn_delta/tests/deltaparse-test.c (1.25): 
+	
+	 Adding walk_baton to the only two walker callbacks that didn't 
+	 already receive it.  
+	
+	 * svn_delta.h (svn_delta_walk_t): add walk_baton to finish_directory 
+	   and finish_file.  
+	 * delta_parse.c (do_finish_file, do_finish_directory): add
+	   walk_baton to callback invocations.  
+	 * deltaparse-test.c (test_finish_file, test_finish_directory): add 
+	   walk_baton argument.  
+
+2000-09-01 21:15  sussman
+
+	* include/svn_delta.h (1.72), libsvn_delta/delta_parse.c (1.74),
+	libsvn_delta/tests/deltaparse-test.c (1.24): 
+	
+	 As Karl suggests, change XML to xml in all symbols.  
+	
+	 * svn_delta.h (svn_XML_parse) renamed to svn_xml_parse 
+	 * delta_parse.c  (svn_XML_parse) renamed to svn_xml_parse 
+	 * deltaparse-test.c (svn_XML_parse) renamed to svn_xml_parse 
+
+2000-09-01 21:13  kfogel
+
+	* include/svn_delta.h (1.71): Revert recent `local-variables'
+	change.  
+
+2000-09-01 21:03  kfogel
+
+	* include/svn_path.h (1.10), libsvn_delta/delta_parse.c (1.73),
+	libsvn_subr/path.c (1.10), libsvn_wc/adm_files.c (1.7),
+	libsvn_wc/apply_delta.c (1.29), libsvn_wc/util.c (1.7): Partially
+	revert my change of 2000-08-31 15:29.  The svn_path library now
+	side-effects its operands again; all callers changed to account for
+	this, but not always exactly as they worked before.  
+	
+	* path.c, path.h (add_component_internal): revert to 1.7 behavior,
+	but also canonicalize result.  
+	(svn_path_add_component_nts, svn_path_add_component): revert to 1.7 
+	behavior.  
+	(svn_path_remove_component): revert to 1.7 behavior and prototype.  
+	
+	* delta_parse.c (maybe_derive_ancestry): dup a new path and add name 
+	to it as a component, to get ancestor.  
+	
+	* adm_files.c: revert to 1.5: 
+	(extend_with_adm_name): back to this name instead of
+	`make_adm_path', callers changed accordingly.  
+	(chop_admin_name): restored, calls restored as well.  
+	
+	* util.c (svn_wc__ensure_directory): dup a new path, then shorten
+	it, when recursing.  
+	
+	* apply_delta.c (maybe_prepend_dest, add_directory, add_file, 
+	finish_file): dup a new path, then operate on that.  
+	
+	Also, changes to accommodate new names: 
+	
+	* apply_delta.c (svn_wc_apply_delta): it's `svn_XML_parse' now, not 
+	`svn_delta_parse'.  
+
+2000-09-01 16:53  sussman
+
+	* include/svn_delta.h (1.70), libsvn_delta/delta_parse.c (1.72),
+	libsvn_delta/tests/deltaparse-test.c (1.23): 
+	
+	 MAJOR RENAME:  svn_delta_parse() is now renamed svn_XML_parse() ! 
+	
+	 * svn_delta.h:  (svn_delta_parse): renamed to svn_XML_parse 
+	 * delta_parse.c:  (svn_delta_parse): renamed to svn_XML_parse 
+	 * deltaparse-test.c: (main):  call svn_XML_parse 
+
+2000-09-01 03:36  sussman
+
+	* libsvn_delta/: delta_parse.c (1.71), tests/foo.delta (1.6): 
+	
+	 Fixed property-parsing buglets.  The trick was that xml_handle_end 
+	 shouldn't remove a stackframe right at the outset;  instead it
+	 should first *validate* that the removal is ok, *then* call walker 
+	 callbacks, *then* remove the stackframe.  I had implemented this 
+	 correctly earlier, but I hadn't updated property-handling to
+	 reflect this change! 
+	
+	 * foo.delta:  added more prop-deltas to experiement.  
+	
+	 * delta_parse.c: 
+	   (do_begin_propdelta): set current_propdelta fields to empty 
+	   strings, not NULL.  
+	   (do_propdelta_callback): if value is empty string, send NULL to 
+	   callback.  Set name/value to empty (not null) when done.  
+	   (xml_handle_end): check parent frame's tag for property
+	   deletions, duh.  
+
+2000-08-31 22:16  kfogel
+
+	* include/svn_delta.h (1.69): Fix up one page title.  
+
+2000-08-31 22:15  kfogel
+
+	* include/svn_delta.h (1.68): Follow conventions for titles after
+	page breaks.  
+
+2000-08-31 21:22  jimb
+
+	* include/svn_delta.h (1.67): Doc fixes.  
+
+2000-08-31 21:04  sussman
+
+	* libsvn_delta/: delta.h (1.20), delta_parse.c (1.70),
+	tests/deltaparse-test.c (1.22): 
+	
+	 Working out bugs in new libsvn_delta organization.  Still a couple
+	 of buglets to go, but we're no longer crashing.  (knock, knock).  
+	
+	 * deltaparse_test.c: 
+	   (test_add_directory, test_replace_directory):  set *child_baton
+	   to new directory's name.  
+	   (test_change_file_prop, test_change_dir_prop, 
+	   test_change_dirent_prop):  added new test functions.  
+	   (general):  add nicer indentation in my own callbacks.  
+	
+	 * delta.h: 
+	   (svn_propdelta_t): add new entry_name field to hold name of
+	   object being patched -- (needed by walker's change_dirent_prop).  
+	
+	 * delta_parse.c: 
+	   (do_begin_prop delta): copy parent stackframe's 'name' field into 
+	   current_propdelta->entity_name.  
+	   (do_prop_delta_callback):  pass this entity_name to
+	   change_dirent_prop.  
+	(do_finish_file):  drop batons *after* calling walker callback.  
+	   (do_finish_directory): drop batons *after* calling walker
+	   callback.  
+	(do_stack_remove):  only validates the stackframe removal now, 
+	   renamed to do_stack_check_remove.  
+	   (xml_handle_end): do the stackframe removal at the *end* of this
+	   routine.  
+
+2000-08-31 20:47  kfogel
+
+	* libsvn_subr/path.c (1.9): 
+	(add_component_internal): fix braino.  
+
+2000-08-31 20:29  kfogel
+
+	* include/svn_path.h (1.9), libsvn_delta/delta_parse.c (1.69),
+	libsvn_subr/path.c (1.8), libsvn_wc/adm_files.c (1.6),
+	libsvn_wc/apply_delta.c (1.28), libsvn_wc/util.c (1.6): Change path
+	library to always return non-shared results, instead of 
+	side-effecting its arguments (part of making libsvn_wc insensitive
+	to whether delta traversal happens depth-first vs breadth-first): 
+	
+	* path.c (add_component_internal): make and return a new string, 
+	canonicalizing it before returning.  
+	(svn_path_add_component_nts, svn_path_add_component): return a new 
+	string.  
+	(svn_path_remove_component): return a new string, and take a new
+	pool arg therefore.  
+	
+	* delta_parse.c (maybe_derive_ancestry): use new svn_path semantics; 
+	tighten up code and comments.  
+	
+	* adm_files.c (make_adm_path): replaces extend_with_adm_name(), no 
+	longer requires the caller to "unmake" the name later.  Callers
+	changed accordingly.  
+	(chop_admin_name): removed, no longer necessary.  
+	
+	* util.c (svn_wc__ensure_directory): use new svn_path semantics, 
+	improve comments.  
+	
+	* apply_delta.c (maybe_prepend_dest, add_directory, add_file, 
+	finish_file): use new svn_path semantics.  
+	
+	Also, changes to accommodate new names: 
+	
+	* apply_delta.c (window_handler): it's "txdelta", not "delta".  
+
+2000-08-31 17:40  kfogel
+
+	* include/svn_delta.h (1.66), libsvn_delta/delta.h (1.19),
+	libsvn_delta/delta_parse.c (1.68): 
+	(svn_delta_parse): make walker argument `const'.  
+	(svn_delta__digger_t): make walker field `const'.  
+
+2000-08-31 17:21  sussman
+
+	* include/svn_delta.h (1.65), libsvn_delta/delta_parse.c (1.67),
+	libsvn_delta/tests/deltaparse-test.c (1.21),
+	libsvn_delta/tests/foo.delta (1.5): 
+	 Adopted deltaparse-test program to new walker interface.  (It works 
+	 now.) Again, `delta_window' is renamed to `txdelta_window' 
+	 everywhere.  
+	
+	 * deltaparse-test.c: 
+	   (main):  take a filename as a command-line argument.  
+	   (test_begin_textdelta): renamed to `test_apply_textdelta'.  
+	   (test_begin_propdelta): removed, different prop-delta system now.  
+	   (test_change_file_prop, test_change_dir_prop, 
+	   test_change_dirent_prop): added.  
+	   (my_fileprop_handler, my_dirprop_handler, my_direntprop_handler): 
+	   deleted.  
+	   (test_add_file, test_replace_file, test_apply_textdelta):  deal 
+	   with new file_baton.  
+	
+	 * delta_parse.c: (xml_handle_end):  after </text-delta>, be sure to 
+	   call svn_vcdiff_parse() with len=0.  
+	   (do_delete_prop): check for initial existence of
+	   current_propdelta.  
+	(do_prop_delta_callback): DUH, check for walker callbacks before 
+	   trying to call them.  :) 
+	
+	 * svn_delta.h: (svn_vcdiff_parse): len is not a pointer.  
+
+2000-08-31 16:12  sussman
+
+	* libsvn_string/svn_string.c (1.43): 
+	
+	(svn_string_appendbytes): if passed a NULL string, then just create
+	a new string from BYTES.  
+
+2000-08-31 15:11  sussman
+
+	* libsvn_delta/prop_parse.c (1.8): prop_parse.c no longer needed;
+	much simpler model now.  
+
+2000-08-31 15:10  sussman
+
+	* libsvn_delta/: delta_parse.c (1.66), vcdiff_parse.c (1.11): 
+	 Still adopting libsvn_delta to new walker interface.  
+	
+	 * vcdiff_parse.c:  (svn_vcdiff_parse): fix `len' argument, it's not
+	   a pointer;  better comments;  if (len == 0), flush what's left in
+	   buffer.  
+	(svn_vcdiff_send_window): better comments.  
+	
+	 * delta_parse.c:  (xml_handle_data): fix `len' argument, it's not a
+	   pointer.  
+	(svn_finish_textdelta): deleted;  svn_vcdiff_parse flushes buffer
+	instead.  
+
+2000-08-31 14:17  gstein
+
+	* libsvn_ra_dav/fetch.c (1.4): while I'm thinking about it...  
+
+2000-08-31 13:52  gstein
+
+	* include/svn_ra.h (1.3), libsvn_ra_dav/Makefile.am (1.3),
+	libsvn_ra_dav/commit.c (1.1), libsvn_ra_dav/fetch.c (1.3),
+	libsvn_ra_dav/tests/ra-dav-test.c (1.3): continued development.  
+	fetch.c: 
+	  - added my_basename() to get the basename of a char* into an
+	  svn_string 
+	- added fetch_file() to grab files from the server 
+	  - added logic to call walker callbacks to create the working copy 
+	  - fetch_data is history: it becomes svn_ra_checkout() 
+	  - svn_ra_update() is gone. the algorithm will use a walker
+	    returned by svn_ra_get_update_walker() 
+	  - added svn_ra_get_update_walker() and associated functions
+	  (unused) commit.c: 
+	  - added svn_ra_get_commit_walker() and associated functions
+	  (unused) ra-dav-test.c: 
+	  - can't use svn_wc_get_change_walker(), so we add a temporary,
+	    internal debug walker to use.  Makefile.am: 
+	  - build commit.c and tests subdir svn_ra.h: 
+	  - bring up to date with new design 
+
+2000-08-31 13:44  gstein
+
+	* include/svn_wc.h (1.14), libsvn_wc/apply_delta.c (1.27): 
+	(svn_wc_get_change_walker): ADDED. provides a walker structure for
+	    effecting change against the working copy.  
+	
+	(svn_wc_apply_delta): don't use manual assignments to a walker
+	    structure; just use a static, constant structure. added
+	"change_walker" struct.  
+
+2000-08-31 13:40  gstein
+
+	* include/svn_path.h (1.8): add a new "component style" (for paths)
+	for the URL separator ('/') 
+
+2000-08-30 22:52  sussman
+
+	* include/svn_delta.h (1.64), libsvn_delta/Makefile.am (1.7),
+	libsvn_delta/delta.h (1.18), libsvn_delta/delta_parse.c (1.65),
+	libsvn_delta/vcdiff_parse.c (1.10): 
+	
+	Adopting code in libsvn_delta to use newly revised svn_delta_walk_t 
+	interface.  Test program in tests/ DOES NOT YET WORK.pp 
+	
+	In general, rename all "svn_delta_window_t" references to 
+	"svn_txdelta_window_t", and rename "svn_delta_window_handler_t" to 
+	"svn_txdelta_window_handler_t".  Rename "svn_delta_op_t" to 
+	"svn_txdelta_op_t". Also rename "svn_delta__vcdiff_parser_t" to 
+	"svn_vcdiff_parser_t" when moving from private to public header
+	file, as well as changing "svn_delta__vcdiff_parse" to
+	"svn_vcdiff_parse".  
+	
+	(Remove all references to pdelta_handler_t, pdelta_parser_t.) 
+	* delta.h: (svn_delta__digger_t):  added file_baton and
+	  current_propdelta.  
+	(svn_delta__stackframe_t): added file_baton.  
+	  (svn_vcdiff_parser_t): moved from private to public header.  
+	  (svn_make_vcdiff_parser): removed, already declared in public 
+	  header.  
+	  (svn_vcdiff_send_window): added so delta_parse can flush vcdiff 
+	  buffer (temporary only, until we get a real vcdiff implementation) 
+	  (svn_propdelta_t): define simpler in-memory prop-delta object.  
+	
+	* svn_delta.h: (svn_vcdiff_parser_t): added from private header.  
+	  (svn_make_vcdiff_parser): added pool arg, to create windows from.  
+	
+	* delta_parse.c: (do_file_callback, do_finish_file): deal with 
+	  file_baton now.  
+	  (do_finish_directory): drop the current dir baton when done.  
+	  (do_begin_textdelta): call apply_textdelta with new file_baton.  
+	  (do_finish_textdelta): scale down to a buffer flush only, no
+	  longer a walker callback for this.  
+	  (do_prop_delta_callback): added -- calls appropriate walker
+	  callback for property deltas.  
+	  (do_finish_setprop): deleted, made irrelevant by 
+	  do_prop_delta_callback.  
+	  (do_begin_propdelta, do_begin_setprop, do_delete_prop): major 
+	  rewrite to use new in-memory propdeltas.  
+	  (do_finish_propdelta): deleted, no longer needed.  
+	  (xml_handle_end): add *specific* test for </delete> in the context 
+	  of a <prop-delta> (as opposed to within a <tree-delta>) 
+	  (xml_handle_data): buffer property values internally, no longer
+	  need a "property parser" in prop_parse.c 
+	
+	* vcdiff_parse.c: (svn_delta__vcdiff_flush_buffer): removed, just
+	  put the one line into delta_parse.c:do_finish_textdelta.  
+	  (svn_vcdiff_send_window): no longer static -- called by 
+	  do_finish_text_delta to flush final buffer.  
+	
+	* prop_parse.c: deleted, no longer needed.  xml_handle_data can
+	  buffer property values as they come in from expat.  Much simpler
+	now! 
+	
+	* Makefile.am: remove prop_parse.c 
+	
+	TODO:  rename svn_delta_parse to something more specific.  
+	svn_XML_parse is fine, I think, because it's still a very 
+	general-purpose routine;  it takes an read function and a walk_t 
+	structure.  
+	
+	This would work for a "test" program: 
+	
+	     * reader function presents an XML file; 
+	     * callbacks are a bunch of dorky printf's 
+	
+	It would also work for WC use: 
+	
+	     * reader function implicitly crawls the working copy, assembling 
+	       an XML stream on-the-fly 
+	     * callbacks generate DAV calls 
+	
+	It would also work for WC *internal* use: 
+	
+	     * reader function implicitly crawls the working copy, assembling 
+	       an XML stream on-the-fly 
+	     * callbacks generate *new* XML to put in WC administrative
+	     files.  
+
+2000-08-30 09:55  gstein
+
+	* include/svn_ra.h (1.2), libsvn_ra_dav/fetch.c (1.2),
+	libsvn_ra_dav/ra_session.h (1.2), libsvn_ra_dav/session.c (1.2),
+	libsvn_ra_dav/tests/ra-dav-test.c (1.2), libsvn_wc/apply_delta.c
+	(1.26): wouldn't you know it... the file that I used as a template
+	    for the new RA/DAV files' license (it was apply_delta.c) happens to
+	    be the only file with a tweak in it. of all that I could have
+	chosen...  
+
+2000-08-30 09:46  gstein
+
+	* include/svn_ra.h (1.1), libsvn_ra_dav/Makefile.am (1.2),
+	libsvn_ra_dav/fetch.c (1.1), libsvn_ra_dav/ra_session.h (1.1),
+	libsvn_ra_dav/session.c (1.1), libsvn_ra_dav/tests/Makefile.am
+	(1.2), libsvn_ra_dav/tests/ra-dav-test.c (1.1): begin
+	implementation of the RA/DAV layer.  introduced "RA Session"
+	concept: svn_ra_open, svn_ra_close.  draft prototypes for:
+	svn_ra_update, svn_ra_checkout this "draft" will connect to a DAV
+	    server and traverse the URL space to fetch the DAV:target property
+	from each member resource.  
+
+2000-08-30 09:39  gstein
+
+	* include/svn_delta.h (1.63): eek! bad hack! with these additional
+	    types, we can at least include svn_delta.h and successfully compile.
+	these will disappear RSN.  
+
+2000-08-30 09:37  gstein
+
+	* include/svn_error.h (1.18): add a couple error codes for RA/DAV
+	usage 
+
+2000-08-30 06:24  gstein
+
+	* libsvn_delta/delta_parse.c (1.64): 
+	(svn_delta_parse): fix leaks of Expat parsers 
+
+2000-08-30 04:41  gstein
+
+	* Makefile.am (1.10), libsvn_ra_dav/.cvsignore (1.1),
+	libsvn_ra_dav/Makefile.am (1.1), libsvn_ra_dav/tests/.cvsignore
+	(1.1), libsvn_ra_dav/tests/Makefile.am (1.1): add config/build
+	framework for the RA/DAV layer.  
+
+2000-08-30 03:17  gstein
+
+	* libsvn_delta/tests/Makefile.am (1.2), libsvn_wc/tests/Makefile.am
+	(1.6): switch expat-lite over to automake (updates tests for
+	    libsvn_delta and libsvn_wc to use libexpat.la now) add some initial
+	work on config/build for Neon 
+
+2000-08-30 01:22  kfogel
+
+	* libsvn_wc/README (1.37): Start twisting XML format explanations
+	to match new `svn_delta_walk_t' plans.  
+
+2000-08-30 00:36  jimb
+
+	* include/svn_delta.h (1.62): Major doc fixes.  
+	
+	(svn_delta_read_fn_t): Moved to its own page at the top; this isn't 
+	specific to text or tree deltas.  
+	
+	Rename text delta functions and types, to avoid confusion with tree 
+	delta stuff.  
+	(svn_txdelta_op_t): Renamed from svn_delta_op_t.  
+	(svn_txdelta_source, svn_txdelta_target, svn_txdelta_new): Renamed
+	from svn_delta_source, svn_delta_target, and svn_delta_new.  
+	(svn_txdelta_window_t): Renamed from svn_delta_window_t.  
+	(svn_txdelta_free_window): Renamed from svn_free_delta_window.  
+	(svn_txdelta_window_handler_t): Renamed from
+	svn_text_delta_window_handler_t.  
+	
+	Reinstate the text delta creation and vcdiff handling interfaces.  
+	(svn_txdelta_stream_t): New type.  
+	(svn_txdelta_next_window, svn_txdelta, svn_txdelta_free, 
+	svn_txdelta_to_vcdiff, svn_make_vcdiff_parser, svn_vcdiff_parse):
+	New functions.  
+
+2000-08-30 00:31  kfogel
+
+	* libsvn_wc/apply_delta.c (1.25): Separate pages for walker
+	callbacks vs their helpers.  
+	
+	Return SVN_NO_ERROR instead of 0 everywhere.  
+	
+	Come into line with the new svn_delta_walk_t interface: 
+	(change_file_prop, change_dir_prop, change_dirent_prop, 
+	apply_textdelta): new callback functions, empty skeletons for now.  
+	(begin_textdelta, finish_textdelta): removed, but code preserved 
+	verbatim in apply_textdelta(), #ifdef'd out.  
+	(svn_wc_apply_delta): set up the new walker appropriately.  
+	
+	Also, unmush all walker callback function declarations, so they look 
+	the same as they do in the definition of `svn_delta_walk_t'.  
+
+2000-08-30 00:01  gstein
+
+	* tests-common/.cvsignore (1.1): "Looks like an orange on a
+	toothpick!" 
+
+2000-08-29 20:35  jimb
+
+	* include/svn_delta.h (1.61): 
+	(svn_delta_walk_t): Clean up handling of text and property deltas: 
+	Make `add_file' and `replace_file' create a baton to represent the 
+	file being created / changed.  Replace `begin_textdelta' and 
+	`finish_textdelta' with `apply_textdelta', which uses the file
+	baton.  Replace `begin_propdelta' and `finish_propdelta' with 
+	`change_dir_prop', `change_dirent_prop', and `change_file_prop'.  
+	(svn_propchange_location_t, svn_propchange_t, 
+	svn_propchange_handler_t): Delete.  As far as I can tell, these
+	aren't any streamier than the simpler interface now in
+	svn_delta_walk_t.  
+
+2000-08-29 01:21  kfogel
+
+	* libsvn_wc/README (1.36): Describe XML plans for working copy
+	administrative files.  
+
+2000-08-28 23:05  jimb
+
+	* include/svn_delta.h (1.60): Don't #include xmlparse.h; the parser
+	interface is independent of the representation, so this is
+	irrelevant.  
+
+2000-08-28 20:17  kfogel
+
+	* include/svn_hash.h (1.6): Put on `svn_' prefix.  
+
+2000-08-28 20:11  sussman
+
+	* Makefile.am (1.9), libsvn_string/tests/Makefile.am (1.7),
+	libsvn_string/tests/stringtest.c (1.23),
+	libsvn_subr/tests/Makefile.am (1.5),
+	libsvn_subr/tests/hashdump-test.c (1.11), tests-common/Makefile.am
+	(1.2), tests-common/svn_tests_main.c (1.2): Factorized main() out
+	of standard svn test programs.  
+
+2000-08-28 19:27  sussman
+
+	* tests-common/: Makefile.am (1.1), README (1.1), svn_tests_main.c
+	(1.1): common main() code for test-suite, not quite finished yet 
+
+2000-08-28 16:21  kfogel
+
+	* include/svn_delta.h (1.59), include/svn_error.h (1.17),
+	include/svn_fs.h (1.3), include/svn_hash.h (1.5),
+	include/svn_parse.h (1.5), include/svn_path.h (1.7),
+	include/svn_string.h (1.30), include/svn_svr.h (1.32),
+	include/svn_types.h (1.40), include/svn_wc.h (1.13),
+	libsvn_delta/delta.h (1.17), libsvn_delta/delta_parse.c (1.63),
+	libsvn_delta/prop_parse.c (1.7), libsvn_delta/vcdiff_parse.c (1.9),
+	libsvn_fs/err.c (1.2), libsvn_fs/err.h (1.2), libsvn_fs/fs.c (1.2),
+	libsvn_fs/fs.h (1.3), libsvn_string/svn_string.c (1.42),
+	libsvn_string/tests/stringtest.c (1.22), libsvn_subr/hashdump.c
+	(1.11), libsvn_subr/path.c (1.7), libsvn_subr/svn_error.c (1.31),
+	libsvn_subr/svn_parse.c (1.35), libsvn_subr/tests/hashdump-test.c
+	(1.10), libsvn_svr/server_fs.c (1.32), libsvn_svr/server_init.c
+	(1.32), libsvn_svr/plugin_security/plugin_security.c (1.20),
+	libsvn_vcdiff/hash.h (1.4), libsvn_vcdiff/vdelta.c (1.6),
+	libsvn_wc/adm_files.c (1.5), libsvn_wc/adm_ops.c (1.5),
+	libsvn_wc/apply_delta.c (1.24), libsvn_wc/lock.c (1.3),
+	libsvn_wc/questions.c (1.3), libsvn_wc/util.c (1.5), libsvn_wc/wc.h
+	(1.9), libsvn_wc/tests/checkout-test.c (1.10): Fixed Collab.Net
+	url, and other name change tweaks.  
+
+2000-08-28 16:09  sussman
+
+	* include/svn_fs.h (1.2): typo fix.  
+
+2000-08-28 15:59  kfogel
+
+	* libsvn_fs/fs.h (1.2): speling: "propage" ==> "propagate" 
+
+2000-08-25 21:31  jimb
+
+	* Makefile.am (1.8), include/svn_error.h (1.16), include/svn_fs.h
+	(1.1), libsvn_fs/.cvsignore (1.1), libsvn_fs/Makefile.am (1.1),
+	libsvn_fs/err.c (1.1), libsvn_fs/err.h (1.1), libsvn_fs/fs.c (1.1),
+	libsvn_fs/fs.h (1.1): 
+	* configure.in: Include subversion/libsvn_fs/Makefile in the list of 
+	Makefiles to produce.  
+	* subversion/Makefile.am (SUBDIRS): Add libsvn_fs.  
+	* subversion/include/svn_error.h (svn_errno_t): Add new error code, 
+	SVN_ERR_FS_GENERAL.  
+	* subversion/libsvn_fs: First inklings of filesystem implementation.  
+	
+	PR: Obtained from: Submitted by: Reviewed by: 
+
+2000-08-25 21:26  jimb
+
+	* libsvn_delta/.cvsignore (1.3), libsvn_wc/.cvsignore (1.5),
+	libsvn_wc/tests/.cvsignore (1.2), libsvn_delta/tests/.cvsignore
+	(1.2): Add .deps and .libs directories to the ignore lists.  PR: 
+	Obtained from: Submitted by: Reviewed by: 
+
+2000-08-25 21:21  sussman
+
+	* libsvn_subr/tests/hashdump-test.sh (1.2): don't need script
+	anymore 
+
+2000-08-25 21:20  sussman
+
+	* libsvn_string/tests/stringtest.c (1.21): fix comment 
+
+2000-08-25 21:19  sussman
+
+	* libsvn_subr/: hashdump.c (1.10), tests/hashdump-test.c (1.9): 
+	Improve hashdump testing (new test) 
+
+2000-08-25 20:42  sussman
+
+	* libsvn_subr/tests/: Makefile.am (1.4), hashdump-test.c (1.8): 
+	Convert hashdump-test to new testing system 
+
+2000-08-25 20:16  sussman
+
+	* libsvn_string/tests/: Makefile.am (1.6), stringtest.c (1.20): 
+	
+	Makefile.am:  write our own `check' rule.  automake's rules stink,
+	give us no control over automated-test output.  
+	
+	stringtest.c:  internally reorganized according to test test-suite
+	design.  Will serve as a good "template" for other test programs.  
+
+2000-08-25 20:09  kfogel
+
+	* include/svn_delta.h (1.58), include/svn_error.h (1.15),
+	include/svn_hash.h (1.4), include/svn_parse.h (1.4),
+	include/svn_path.h (1.6), include/svn_string.h (1.29),
+	include/svn_svr.h (1.31), include/svn_types.h (1.39),
+	include/svn_wc.h (1.12), libsvn_delta/delta.h (1.16),
+	libsvn_delta/delta_parse.c (1.62), libsvn_delta/prop_parse.c (1.6),
+	libsvn_delta/vcdiff_parse.c (1.8), libsvn_string/svn_string.c
+	(1.41), libsvn_string/tests/stringtest.c (1.19),
+	libsvn_subr/hashdump.c (1.9), libsvn_subr/path.c (1.6),
+	libsvn_subr/svn_error.c (1.30), libsvn_subr/svn_parse.c (1.34),
+	libsvn_subr/tests/hashdump-test.c (1.7), libsvn_svr/server_fs.c
+	(1.31), libsvn_svr/server_init.c (1.31),
+	libsvn_svr/plugin_security/plugin_security.c (1.19),
+	libsvn_vcdiff/hash.h (1.3), libsvn_vcdiff/vdelta.c (1.5),
+	libsvn_wc/adm_files.c (1.4), libsvn_wc/adm_ops.c (1.4),
+	libsvn_wc/apply_delta.c (1.23), libsvn_wc/lock.c (1.2),
+	libsvn_wc/questions.c (1.2), libsvn_wc/util.c (1.4), libsvn_wc/wc.h
+	(1.8), libsvn_wc/tests/checkout-test.c (1.9): Replace Collab.Net
+	with CollabNet everywhere.  
+
+2000-08-25 19:59  kfogel
+
+	* libsvn_wc/util.c (1.3): 
+	(check_existence): removed, as no longer used.  
+
+2000-08-25 19:58  kfogel
+
+	* include/svn_path.h (1.5), libsvn_subr/path.c (1.5),
+	libsvn_wc/apply_delta.c (1.22), libsvn_wc/util.c (1.2),
+	libsvn_wc/tests/checkout-test.sh (1.4): More changes for
+	context-sensitive delta application.  
+	
+	Do path canonicalization.  
+
+2000-08-25 19:08  kfogel
+
+	* libsvn_wc/apply_delta.c (1.21): 
+	(delete): call maybe_prepend_dest() here too.  
+
+2000-08-25 19:07  kfogel
+
+	* include/svn_path.h (1.4), libsvn_subr/path.c (1.4),
+	libsvn_wc/apply_delta.c (1.20), libsvn_wc/tests/checkout-test.sh
+	(1.3): Make sure dest_dir is accounted for in delta application.  
+	
+	(maybe_prepend_dest): new func, makes sure delta activity happens in 
+	the right place.  
+	
+	(svn_path_isempty): new func, helper for above.  
+
+2000-08-25 18:18  kfogel
+
+	* include/svn_path.h (1.3), include/svn_string.h (1.28),
+	include/svn_wc.h (1.11), libsvn_string/svn_string.c (1.40),
+	libsvn_subr/path.c (1.3), libsvn_wc/Makefile.am (1.7),
+	libsvn_wc/README (1.35), libsvn_wc/adm_files.c (1.3),
+	libsvn_wc/adm_ops.c (1.3), libsvn_wc/apply_delta.c (1.19),
+	libsvn_wc/questions.c (1.1), libsvn_wc/util.c (1.1), libsvn_wc/wc.h
+	(1.7), libsvn_wc/tests/checkout-test.c (1.8): Changes to for delta
+	application to take a destination directory: 
+	
+	(svn_wc_apply_delta): take `dest' and `repos' arguments.  
+	
+	(svn_path_last_component): new func.  
+	
+	(svn_string_find_char_backward): new func, helps out path library.  
+	
+	(svn_wc__working_copy_p): new func.  
+	
+	(svn_wc__ensure_directory): new func.  
+
+2000-08-25 02:36  sussman
+
+	* libsvn_string/tests/Makefile.am (1.5): Reflect new test-suite
+	design.  
+
+2000-08-25 02:36  sussman
+
+	* libsvn_string/tests/stringtest.c (1.18): In process of rewriting
+	stringtest.c according to new test-suite design.  
+
+2000-08-24 20:48  kfogel
+
+	* include/svn_wc.h (1.10), libsvn_wc/README (1.34),
+	libsvn_wc/adm_files.c (1.2), libsvn_wc/adm_ops.c (1.2),
+	libsvn_wc/apply_delta.c (1.18), libsvn_wc/tests/checkout-1.delta
+	(1.7): Documentation and #include fixes.  
+	
+	Add a top-level file to checkout-1.delta.  Grin.  
+
+2000-08-24 19:27  kfogel
+
+	* libsvn_wc/: Makefile.am (1.6), README (1.33), adm_files.c (1.1),
+	adm_ops.c (1.1), apply_delta.c (1.17), lock.c (1.1), wc.h (1.6),
+	wc_adm.c (1.12): Reorganize code: separate files for locking stuff,
+	adm path/file stuff, and adm operations.  
+	
+	Document general plan of interrupt-safe operation.  
+
+2000-08-24 02:16  kfogel
+
+	* libsvn_wc/wc_adm.c (1.11): Results of code review by Ben: 
+	
+	(svn_wc__adm_subdir): move static string inside, no reason for it to 
+	be external static.  
+	
+	Everywhere: return SVN_NO_ERROR where formerly returned 0.  
+
+2000-08-23 01:39  kfogel
+
+	* libsvn_wc/wc_adm.c (1.10): 
+	(make_adm_thing): restore path and return error correctly in all
+	cases.  
+	
+	(svn_wc__lock): restored error-checking.  Works now, but apr_sleep() 
+	appears to be broken so it's not actually retrying at the rate the 
+	user specifies.  
+
+2000-08-22 22:03  kfogel
+
+	* libsvn_wc/wc_adm.c (1.9): Tweak/test the locking code.  
+
+2000-08-22 21:48  kfogel
+
+	* libsvn_wc/: README (1.32), wc.h (1.5), wc_adm.c (1.8): Create
+	more of the working copy, do real locking.  
+
+2000-08-22 21:35  sussman
+
+	* libsvn_delta/: delta.h (1.15), delta_parse.c (1.61): 
+	- svn_delta_make_xml_parser:  prefix removed, this is a static
+	routine.  
+	
+	- svn_delta__tagmap[] added, rewrote do_stack_remove and set_tagtype 
+	                             accordingly... MUCH cleaner now.  
+	
+	- svn_delta__digger_t:  "stack" argument now represents YOUNGEST 
+	                         stackframe.  Many routines simplified
+	                         because of this.  (find_stack_newest()
+	removed.) 
+	
+	- do_stack_append: check that the first frame appended is always a 
+	                   tree-delta.  
+
+2000-08-22 20:19  kfogel
+
+	* libsvn_wc/wc_adm.c (1.7): Just use enums `svn_file_kind' and
+	`svn_directory_kind' from svn_types.h, instead of own enums.  Enough
+	is enough already.  
+
+2000-08-22 20:05  kfogel
+
+	* libsvn_delta/delta_parse.c (1.60): 
+	(maybe_derive_ancestry): declare p in the scope where it is used.  
+
+2000-08-22 20:04  kfogel
+
+	* libsvn_delta/delta_parse.c (1.59): 
+	(maybe_derive_ancestry): eliminate first_frame argument; we don't
+	need it anymore.  Caller changed.  
+
+2000-08-22 19:55  kfogel
+
+	* include/svn_path.h (1.2), libsvn_delta/delta_parse.c (1.58),
+	libsvn_subr/path.c (1.2), libsvn_wc/apply_delta.c (1.16),
+	libsvn_wc/wc_adm.c (1.6): 
+	(SVN_PATH_LOCAL_STYLE, SVN_PATH_REPOS_STYLE): new #defines.  
+	
+	(svn_path_remove_component, svn_path_add_component, 
+	svn_path_add_component_nts, add_path_internal): use them.  
+	
+	All callers changed.  
+	
+	This gives an interface handling both local paths (for files) and 
+	repository paths (for ancestry), though the implementation is all 
+	Unix-style right now, which is the same as repository style.  
+
+2000-08-22 17:30  kfogel
+
+	* include/svn_path.h (1.1), libsvn_delta/delta_parse.c (1.57),
+	libsvn_subr/Makefile.am (1.4), libsvn_subr/path.c (1.1),
+	libsvn_wc/apply_delta.c (1.15), libsvn_wc/wc.h (1.4),
+	libsvn_wc/wc_adm.c (1.5): Put mini-library for path manipulation
+	into libsvn_subr.  
+	
+	(maybe_derive_ancestor): always set to a full ancestry path, derived 
+	from both ancestors and names.  
+
+2000-08-22 16:52  sussman
+
+	* libsvn_delta/tests/: deltaparse-test.c (1.20), foo.delta (1.4): 
+	test program correctly recognizes prop-deltas on files, dirs, and
+	dirents.  
+
+2000-08-22 16:46  sussman
+
+	* libsvn_delta/delta_parse.c (1.56), libsvn_delta/prop_parse.c
+	(1.5), libsvn_delta/tests/deltaparse-test.c (1.19),
+	libsvn_delta/tests/foo.delta (1.3), libsvn_subr/svn_error.c (1.29): 
+	
+	 * when printing errors, specify if svn-specific 
+	 * fixed prop-delta handling routine 
+	 * fixed prop-delta "delete" validation logic 
+	
+	Prop-deltas seem to work correctly now! 
+
+2000-08-22 04:04  kfogel
+
+	* libsvn_delta/: delta.h (1.14), delta_parse.c (1.55), prop_parse.c
+	(1.4), vcdiff_parse.c (1.7): Derive ancestry correctly: 
+	
+	(derive_ancestry): new function, walks up from bottom frame, looking 
+	for ancestry information.  
+	
+	(do_stack_append): use it.  
+	
+	Plus, many changes for namespace protection: 
+	
+	(svn_delta__vcdiff_parser_t): replaces `svn_vcdiff_parser_t'.  
+	(svn_delta__make_vcdiff_parser): replaces `svn_make_vcdiff_parser'.  
+	(svn_delta__vcdiff_parse): replaces `svn_vcdiff_parse'.  
+	(svn_delta__vcdiff_flush_buffer): replaces
+	`svn_vcdiff_flush_buffer'.  
+	(svn_delta__stackframe_t): replaces `svn_delta_stackframe_t'.  
+	(svn_delta__digger_t): replaces `svn_delta_digger_t'.  
+	(svn_delta__pdelta_parser_t): replaces `svn_pdelta_parser_t'.  
+	(svn_delta__make_pdelta_parser): replaces `svn_make_pdelta_parser'.  
+	(svn_delta__pdelta_parse): replaces `svn_pdelta_parse'.  
+	(svn_delta__reset_parser_subpool): replaces
+	`svn_reset_parser_subpool'.  
+	(svn_delta__XML_t): replaces `svn_XML_t', and therefore: 
+	
+	   `svn_delta__XML_treedelta'  replaces   `svn_XML_treedelta' 
+	   `svn_delta__XML_new'        replaces   `svn_XML_new' 
+	   `svn_delta__XML_delete'     replaces   `svn_XML_delete' 
+	   `svn_delta__XML_replace'    replaces   `svn_XML_replace' 
+	   `svn_delta__XML_file'       replaces   `svn_XML_file' 
+	   `svn_delta__XML_dir'        replaces   `svn_XML_dir' 
+	   `svn_delta__XML_textdelta'  replaces   `svn_XML_textdelta' 
+	   `svn_delta__XML_propdelta'  replaces   `svn_XML_propdelta' 
+	   `svn_delta__XML_set'        replaces   `svn_XML_set' 
+
+2000-08-22 00:45  kfogel
+
+	* libsvn_wc/: README (1.31), wc.h (1.3), wc_adm.c (1.4): Started
+	locking code.  
+
+2000-08-22 00:37  kfogel
+
+	* include/svn_error.h (1.14): 
+	(svn_errno_t): new error code `SVN_ERR_ENCOUNTERED_LOCK'.  
+
+2000-08-22 00:25  kfogel
+
+	* libsvn_delta/: delta.h (1.13), delta_parse.c (1.54): Changes to
+	handle ancestor paths and versions correctly: 
+	
+	(svn_version_t): removed, use `svn_vernum_t' instead.  
+	
+	(svn_delta_stackframe_t): Added `ancestor_path' and
+	`ancestor_version' fields.  
+	
+	(xml_handle_start): look for "ancestor" and "ver" attributes, set
+	them in frame if present.  
+	
+	(do_stack_append): validate above new fields, then make them default 
+	to parent's values.  
+	
+	(do_directory_callback): pass correct ancestry information to
+	callbacks.  
+
+2000-08-21 23:37  kfogel
+
+	* libsvn_wc/: README (1.30), apply_delta.c (1.14), wc.h (1.2),
+	wc_adm.c (1.3): Many changes to do with creating administrative
+	subdirs.  
+
+2000-08-21 23:35  kfogel
+
+	* libsvn_string/svn_string.c (1.39): Fix typo.  
+
+2000-08-21 22:43  sussman
+
+	* libsvn_delta/: delta_parse.c (1.53), tests/deltaparse-test.c
+	(1.18), tests/foo.delta (1.2): save state 
+
+2000-08-21 22:15  sussman
+
+	* include/svn_delta.h (1.57), libsvn_delta/delta.h (1.12),
+	libsvn_delta/delta_parse.c (1.52), libsvn_delta/prop_parse.c (1.3),
+	libsvn_delta/vcdiff_parse.c (1.6),
+	libsvn_delta/tests/deltaparse-test.c (1.17): Property-delta stuff
+	at least compiles correctly now.  :) 
+
+2000-08-21 20:22  sussman
+
+	* include/svn_delta.h (1.56): begin_propdelta:  needs to return any
+	of 3 propchange_handler_t routines to consume an entire propchange.  
+
+2000-08-21 19:52  kfogel
+
+	* libsvn_subr/svn_error.c (1.28): 
+	(svn_create_error): copy the message to permanent storage, so don't 
+	have to worry about pointer lifetimes.  
+
+2000-08-21 19:14  kfogel
+
+	* include/.cvsignore (1.1): Ignore ChangeLog*.  
+
+2000-08-21 18:41  kfogel
+
+	* include/svn_delta.h (1.55): Revert previous change, after
+	discussion with Ben.  There are cases where knowing that a text or
+	prop delta is about to begin/end are useful, and even necessary.  
+
+2000-08-21 18:21  kfogel
+
+	* libsvn_string/tests/stringtest.c (1.17): Added a test for block
+	initialization and growth.  
+
+2000-08-21 18:04  kfogel
+
+	* libsvn_string/svn_string.c (1.38): Move & edit a comment to
+	compensate for some recent changes.  
+
+2000-08-21 18:02  kfogel
+
+	* libsvn_string/svn_string.c (1.37): 
+	(ensure_block_capacity): more accurate parameter name too.  
+
+2000-08-21 18:01  sussman
+
+	* include/svn_delta.h (1.54): Partial reversion:  place "consumer"
+	routines back in walker's add_file and replace_file fields.  
+
+2000-08-21 18:01  kfogel
+
+	* libsvn_string/svn_string.c (1.36): 
+	(ensure_block_capacity): new, more accurate name for
+	`lengthen_block'.  
+
+2000-08-20 02:47  kfogel
+
+	* libsvn_wc/: Makefile (1.6), apply_delta.c (1.13), wc.h (1.1),
+	wc_adm.c (1.2): 
+	(svn_wc__set_up_new_dir, svn_wc__working_name, svn_wc__read_lock, 
+	svn_wc__write_lock): new funcs, still skeletal.  
+	
+	(add_directory): just call `svn_wc__set_up_new_dir' now.  
+
+2000-08-20 02:44  kfogel
+
+	* libsvn_string/svn_string.c (1.35): 
+	(svn_string_appendbytes): add comment about null terminator.  
+
+2000-08-20 02:43  kfogel
+
+	* libsvn_string/svn_string.c (1.34): Anticipate svn_string_prepend*
+	functions.  
+	
+	(lengthen_block): new routine, does the extending of the block that 
+	used to be inlined in svn_string_appendbytes().  Loops, multiplying
+	by 2, until the block is big enough.  
+	
+	(svn_string_appendbytes): use above.  
+
+2000-08-19 01:31  kfogel
+
+	* include/svn_delta.h (1.53), libsvn_delta/vcdiff_parse.c (1.5),
+	libsvn_wc/apply_delta.c (1.12): Fill out the skeleton tree with
+	files and their contents.  
+	
+	(svn_delta_window_t): call it `pool', not `my_pool'.  All references 
+	changed.  
+
+2000-08-19 01:17  kfogel
+
+	* libsvn_delta/delta.h (1.11), libsvn_delta/delta_parse.c (1.51),
+	libsvn_wc/apply_delta.c (1.11), libsvn_wc/tests/checkout-test.c
+	(1.7): 
+	(svn_delta_digger_t): call it `pdelta_chunk_parser' instead of 
+	`chunk_parser', just to keep things straight.  
+	
+	Pass the new handler_baton, a.k.a. consumer_baton, as appropriate.  
+
+2000-08-19 01:10  kfogel
+
+	* include/svn_delta.h (1.52), libsvn_delta/delta.h (1.10): Moved
+	`svn_pdelta_chunk_parser_t' from public to internal.  
+	
+	(svn_delta_walker_t): add `handler_baton' argument to 
+	finish_propdelta, finish_textdelta.  
+
+2000-08-19 01:03  kfogel
+
+	* include/svn_delta.h (1.51), libsvn_delta/delta.h (1.9): Move
+	`svn_vcdiff_parser_t' from public to internal.  
+
+2000-08-19 00:58  kfogel
+
+	* libsvn_wc/: apply_delta.c (1.10), tests/checkout-1.delta (1.6),
+	tests/checkout-test.c (1.6), tests/checkout-test.sh (1.2): Test
+	suite improvements: make script do something useful, correct the 
+	test delta.  
+
+2000-08-19 00:35  kfogel
+
+	* libsvn_wc/apply_delta.c (1.9): Start building a tree.  
+
+2000-08-18 23:59  kfogel
+
+	* libsvn_delta/delta_parse.c (1.50), libsvn_string/svn_string.c
+	(1.33), libsvn_wc/apply_delta.c (1.8): Don't drop those batons.  
+
+2000-08-18 22:42  kfogel
+
+	* include/svn_delta.h (1.50), libsvn_delta/delta_parse.c (1.49),
+	libsvn_delta/tests/deltaparse-test.c (1.16),
+	libsvn_wc/apply_delta.c (1.7): Use `ancestor_path' and
+	`ancestor_version', instead of `base_path' and `base_version',
+	because less likely to cause confusion.  
+
+2000-08-18 22:37  kfogel
+
+	* libsvn_delta/delta.h (1.8), libsvn_delta/prop_parse.c (1.2),
+	libsvn_wc/apply_delta.c (1.6): Use new delta walker interface.  
+	
+	(Fix a few minor things in the delta library, too: missing prototype 
+	and missing return value.  Everything compiles now.) 
+
+2000-08-18 22:30  sussman
+
+	* include/svn_delta.h (1.49), libsvn_delta/Makefile.am (1.6),
+	libsvn_delta/delta.h (1.7), libsvn_delta/delta_parse.c (1.48),
+	libsvn_delta/prop_parse.c (1.1),
+	libsvn_delta/tests/deltaparse-test.c (1.15): 
+	
+	We made a interface change in svn_walk_t, which then required much 
+	hacking on libsvn_delta.  deltaparse-test now works correctly again.  
+	
+	We're now ready to start filling out prop_parse.c! 
+
+2000-08-18 22:05  kfogel
+
+	* include/svn_delta.h (1.48): 
+	(svn_pdelta_chunk_parser_t): more accurate name for 
+	`svn_pdelta_chunk_parser_t'.  
+	
+	(svn_delta_walk_t): correct some prototypes.  
+
+2000-08-18 22:03  kfogel
+
+	* include/svn_delta.h (1.47): 
+	(svn_pdelta_parser_t): fix typo.  
+
+2000-08-18 21:54  kfogel
+
+	* include/svn_delta.h (1.46): Comment on usage of fully-streamy
+	property change handlers.  
+
+2000-08-18 21:53  kfogel
+
+	* include/svn_delta.h (1.45): Comment on usage of fully-buffering
+	property change handlers.  
+	
+	(apply_dirent_propchange): fix name.  
+	
+	(dirent_pdelta): removed, as obsolete.  
+
+2000-08-18 21:46  kfogel
+
+	* include/svn_delta.h (1.44): Prop delta usage note.  
+
+2000-08-18 21:45  kfogel
+
+	* include/svn_string.h (1.27): 
+	(svn_string_chop_back_to_char): prototype.  
+
+2000-08-18 21:44  sussman
+
+	* include/svn_delta.h (1.43): comments update 
+
+2000-08-18 21:39  kfogel
+
+	* libsvn_string/: svn_string.c (1.32), tests/stringtest.c (1.16): 
+	(svn_string_chop_back_to_char): new func.  
+	
+	Chopping tests written.  
+
+2000-08-18 21:30  sussman
+
+	* include/svn_delta.h (1.42): New interface for optionally
+	streaming prop-deltas.  
+
+2000-08-18 17:09  kfogel
+
+	* libsvn_delta/delta_parse.c (1.47),
+	libsvn_string/tests/stringtest.c (1.15): Added copyright info, load
+	svn-dev.el.  
+	
+	This commit is also mainly to reproduce a problem with
+	commitlogging.  
+
+2000-08-18 17:06  kfogel
+
+	* libsvn_delta/tests/deltaparse-test.c (1.14),
+	libsvn_string/svn_string.c (1.31): Ignore this commit -- only
+	whitespace changes, done mainly to reproduce a problem with
+	commitlogging.  
+
+2000-08-18 17:00  kfogel
+
+	* libsvn_wc/: apply_delta.c (1.5), tests/checkout-test.c (1.5): 
+	Start baton usage.  
+	
+	More flexible test program.  
+
+2000-08-18 16:44  sussman
+
+	* include/svn_string.h (1.26), libsvn_delta/tests/deltaparse-test.c
+	(1.13), libsvn_string/svn_string.c (1.30), libsvn_subr/svn_parse.c
+	(1.33): Remove all cases of svn_string_print().  
+	
+	Remove compile warning on deltaparse-test.c.  
+
+2000-08-18 16:09  kfogel
+
+	* include/svn_string.h (1.25), libsvn_delta/tests/deltaparse-test.c
+	(1.12), libsvn_string/svn_string.c (1.29),
+	libsvn_string/tests/stringtest.c (1.14), libsvn_subr/svn_parse.c
+	(1.32), libsvn_svr/server_init.c (1.30): 
+	(svn_string_dup2cstring, svn_string_compare_2cstring): removed, no 
+	need for these funcs.  
+	
+	Rewrote test suite to exercise new functionality, and display
+	results readably.  
+
+2000-08-18 14:41  kfogel
+
+	* include/svn_string.h (1.24), libsvn_delta/tests/deltaparse-test.c
+	(1.11), libsvn_string/svn_string.c (1.28),
+	libsvn_string/tests/stringtest.c (1.13), libsvn_subr/svn_parse.c
+	(1.31), libsvn_svr/server_init.c (1.29): 
+	(svn_string_dup2cstring, svn_string_ncreate, svn_string_appendbytes, 
+	svn_string_chop): o-b-o-e repairs, thanks to Greg Stein 
+	<gstein@lyra.org> for catching them early.  
+	
+	(svn_string_dup2cstring): new name for `svn_string_2cstring'.  
+
+2000-08-18 01:28  kfogel
+
+	* libsvn_string/svn_string.c (1.27): 
+	(svn_string_appendbytes): tack on trailing null.  Note that this
+	takes care of svn_string_appendstr() as well, since that's just a
+	wrapper for this.  
+	
+	(svn_string_ncreate): tack on trailing null.  
+	
+	(svn_string_2cstring): fix math for trailing null byte.  
+	
+	(svn_string_fillchar): get rid of bogus safety check, since it would 
+	hide malformed strings and thus make a bug invisible without
+	removing its source.  
+
+2000-08-18 01:10  kfogel
+
+	* include/svn_string.h (1.23), libsvn_string/svn_string.c (1.26): 
+	(svn_string_chop): new func, does what you think it does.  
+	
+	(svn_string_setempty): just set len to 0, and null data[0] if 
+	appropriate.  Leave block and blocksize alone, however, so we can 
+	still call svn_string_appendstr() with all the rights, privileges,
+	and honors thereunto appertaining.  
+	
+	(svn_string_isempty): simplify.  
+
+2000-08-18 00:49  kfogel
+
+	* include/svn_delta.h (1.41), libsvn_delta/delta.h (1.6),
+	libsvn_delta/delta_parse.c (1.46), libsvn_delta/vcdiff_parse.c
+	(1.4), libsvn_delta/tests/deltaparse-test.c (1.10),
+	libsvn_wc/apply_delta.c (1.4), libsvn_wc/tests/checkout-test.c
+	(1.4): Making WC library use the new stuff in delta library: 
+	
+	`svn_text_delta_window_handler_t' replaces `svn_delta_handler_t', 
+	because more specific.  All uses changed.  
+	
+	(svn_delta_op_t): call field `action_code' instead of `op'.  Having 
+	two different things both called "op" was making my brain spin.  All
+	uses changed.  
+	
+	(do_file_callback, do_directory_callback): parenthesize for
+	precedence clarity.  
+	
+	(svn_vcdiff_parse): increment buffer offset only if ate a byte.  
+	
+	(svn_vcdiff_send_window): check if callback func is null before 
+	calling it.  
+	
+	(check_existence): include APR_READ flag when testing, because 
+	apr_open() always returns APR_EACCES if you fail to request at least 
+	one of reading or writing.  Also, remove the file after testing.  
+	
+	(window_handler): new func in wc library; skeleton, everything will 
+	depend on the baton.  
+	
+	(add_file, replace_file): store window_handler in *handler.  
+	
+	(checkout-test.c:main): be robuster.  
+	
+	(test_read_fn): interpret results of apr_full_read() correctly.  
+
+2000-08-17 23:21  sussman
+
+	* libsvn_delta/tests/deltaparse-test.c (1.9): trying to print
+	window contents now 
+
+2000-08-17 22:49  sussman
+
+	* libsvn_delta/tests/: Makefile.am (1.1), deltaparse-test.c (1.8): 
+	oops, forgot this file 
+
+2000-08-17 22:45  sussman
+
+	* libsvn_delta/: Makefile.am (1.5), delta_parse.c (1.45),
+	vcdiff_parse.c (1.3), tests/deltaparse-test.c (1.7),
+	tests/foo.delta (1.1): AHA... deltaparse-test actually WORKS.  Time
+	for a beer.  
+
+2000-08-17 19:39  sussman
+
+	* libsvn_delta/: Makefile.am (1.4), delta.h (1.5), vcdiff_parse.c
+	(1.2): vcdiff_parse.c now compiles.  
+
+2000-08-17 19:18  sussman
+
+	* libsvn_delta/delta_parse.c (1.44): compiles now, typo.  
+
+2000-08-17 17:47  sussman
+
+	* include/svn_delta.h (1.40), libsvn_delta/delta.h (1.4),
+	libsvn_delta/delta_parse.c (1.43), libsvn_delta/vcdiff_parse.c
+	(1.1), libsvn_delta/tests/deltaparse-test.c (1.6): Almost ready to
+	start compiling deltaparse-test 
+
+2000-08-16 23:01  kfogel
+
+	* include/svn_delta.h (1.39), include/svn_types.h (1.38),
+	include/svn_wc.h (1.9), libsvn_delta/delta_parse.c (1.42),
+	libsvn_wc/Makefile.am (1.5), libsvn_wc/apply_delta.c (1.3),
+	libsvn_wc/wc_adm.c (1.1), libsvn_wc/tests/checkout-test.c (1.3): 
+	(svn_delta_read_fn_t): add pool argument.  All callers changed.  
+	
+	(svn_vernum_t): new type.  Callers who formerly used `long int' use 
+	this now.  
+	
+	(svn_wc_apply_delta): correct arguments.  Def and callers changed.  
+	
+	(svn_delta_parse): pass pool to reader function.  
+	
+	(test_read_fn): finished.  
+	
+	Tweaked #includes and Makefiles as appropriate, and defined skeleton 
+	functions.  
+
+2000-08-16 22:36  sussman
+
+	* libsvn_delta/tests/deltaparse-test.c (1.5): typo 
+
+2000-08-16 22:35  sussman
+
+	* libsvn_delta/tests/deltaparse-test.c (1.4): Mostly finished test
+	of XML parser interface.  
+
+2000-08-16 21:38  kfogel
+
+	* libsvn_delta/delta_parse.c (1.41): You are in a maze of twisty
+	compilation errors, each slightly different.  
+
+2000-08-16 21:36  kfogel
+
+	* libsvn_delta/delta.h (1.3): 
+	(svn_delta_to_vcdiff): removed this hulking remnant of the bad old 
+	caller-pull days.  
+
+2000-08-16 21:35  kfogel
+
+	* include/svn_delta.h (1.38): Use `long int' instead of the
+	non-existent `svn_version_t'.  
+
+2000-08-16 16:37  kfogel
+
+	* libsvn_delta/delta_parse.c (1.40): 
+	(get_attribute_value): completed.  Never errors now, just returns
+	the value or NULL.  
+	
+	All callers changed.  
+
+2000-08-15 15:46  kfogel
+
+	* include/svn_wc.h (1.8): 
+	(svn_wc_make_skelta): restore this -- we still need skeltas for 
+	updates.  
+
+2000-08-14 23:19  kfogel
+
+	* libsvn_wc/apply_delta.c (1.2): Plug in new finish_file()
+	callback.  
+
+2000-08-14 23:17  kfogel
+
+	* libsvn_wc/: Makefile.am (1.4), README (1.29), apply_delta.c
+	(1.1), update.c (1.12), tests/checkout-test.c (1.2): Rewrite to use
+	the callee-push streaming interface.  
+	
+	This commit is _not_ going to compile, so don't even try.  
+
+2000-08-14 22:23  sussman
+
+	* include/svn_delta.h (1.37), include/svn_error.h (1.13),
+	libsvn_delta/delta.h (1.2), libsvn_delta/delta_parse.c (1.39): 
+	delta_parse.c is basically finished for now;  ready to start
+	fleshing out       dummy vcdiff parser stuff.  
+
+2000-08-14 20:12  kfogel
+
+	* include/svn_wc.h (1.7): Minor formatting/wording fix.  
+
+2000-08-14 20:11  kfogel
+
+	* include/svn_wc.h (1.6): Reflect the new callee-push interface.  
+	
+	Use the (svn_error_t *) and return-by-reference conventions that we 
+	have adopted everywhere else.  
+	
+	Got rid of non-streamable property functions.  
+	
+	Long comment about implementation of property reading and writing.  
+
+2000-08-14 19:04  sussman
+
+	* include/svn_delta.h (1.36), libsvn_delta/delta.h (1.1),
+	libsvn_delta/delta_parse.c (1.38): Moved private stuff from public
+	header to private header.  
+
+2000-08-14 17:58  sussman
+
+	* include/jimb-delta-parse.h (1.7), include/svn_delta.h (1.35),
+	include/svn_error.h (1.12), libsvn_delta/delta_parse.c (1.37): 
+	
+	Merged jimb's walker structure into svn_delta.h, jimb's own header
+	is not (any longer) relevant.  :) 
+	
+	Busy filling out parser's routines to call various svn_walker_t
+	callbacks.  
+
+2000-08-11 20:57  sussman
+
+	* include/jimb-delta-parse.h (1.6), include/svn_delta.h (1.34),
+	libsvn_delta/delta_parse.c (1.36): Entire interface rewritten, in
+	process of flushing out specific events now.  
+
+2000-08-11 17:50  sussman
+
+	* libsvn_delta/delta_parse.c (1.35): Tweak validity check.  
+
+2000-08-11 17:13  jimb
+
+	* include/svn_error.h (1.11), libsvn_subr/svn_error.c (1.27): 
+	* svn_error.h (svn_create_errorf): Use `extern' in declaration,
+	although it doesn't make any difference.  
+	
+	* svn_error.c: #include <stdarg.h> and "apr_strings.h", since we use 
+	facilities they provide.  
+	(svn_create_errorf): New function.  
+
+2000-08-11 16:37  sussman
+
+	* libsvn_delta/delta_parse.c (1.34): Split telescope_delta_stack()
+	into two routines, for better clarity.  They have different
+	validity-checking logic, and different execution logic.  
+
+2000-08-11 01:07  sussman
+
+	* include/jimb-delta-parse.h (1.5), include/svn_delta.h (1.33),
+	libsvn_delta/delta_parse.c (1.33): 
+	
+	Saving work... in the middle of huge rewrite, a big mess.  I'm doing
+	this because of repeated power outages here at home.  (I need to buy
+	a UPS *now*) 
+
+2000-08-10 23:54  jimb
+
+	* include/svn_error.h (1.10): Create a typedef for enum
+	svn_errno_t.  
+
+2000-08-10 23:27  jimb
+
+	* include/svn_error.h (1.9): Use an enum instead of a series of
+	#defines for the error codes.  The effect in the code is the same,
+	but the debugger can see and use enum values, while it is ignorant
+	of #defines.  
+
+2000-08-10 22:01  sussman
+
+	* libsvn_delta/delta_parse.c (1.32): Still rewriting parser.  
+
+2000-08-10 21:10  sussman
+
+	* libsvn_delta/delta_parse.c (1.31): 
+	
+	New error-returning strategy: 
+	
+	If we encounter a validation error while inside an expat callback, 
+	
+		1.  store the error in our digger structure 
+		2.  immediately set all of the expat callbacks to NULL 
+	
+	Item #2 causes XML_Parse() to finish its chunk rather quickly,
+	whereby our main parser loop then notices the existence of #1 and
+	returns.  
+
+2000-08-10 21:03  sussman
+
+	* include/jimb-delta-parse.h (1.4), include/svn_delta.h (1.32),
+	libsvn_delta/delta_parse.c (1.30): In process of rewriting parser
+	machinery.  
+
+2000-08-10 14:57  jimb
+
+	* include/svn_delta.h (1.31): 
+	(svn_delta_read_fn_t, svn_text_delta, svn_delta_to_vcdiff): Doc
+	fixes.  
+	
+	Turn VCDIFF parsing interface upside-down, to use a caller-pushes 
+	model.  This makes it easier to work properly with Expat.  
+
+2000-08-10 13:32  jimb
+
+	* include/svn_delta.h (1.30): Revert previous change, which added a
+	not-yet-implemented interface to svn_delta.h.  
+	
+	Mea culpa.  The CVS sources should always build.  In cases where it 
+	would be helpful to check in experimental code, or
+	not-yet-implemented interfaces, they can be put in an uncompiled
+	file until the work is completed.  
+
+2000-08-10 13:28  jimb
+
+	* include/jimb-delta-parse.h (1.3): Doc fixes.  
+	
+	(svn_delta_parse): Rename `context' arguments using `baton'.  Sounds 
+	kind of weird.  
+
+2000-08-09 21:51  jimb
+
+	* include/svn_delta.h (1.29): Replace tree delta traversal
+	interface.  The new interface does a better job of insulating the
+	consumer of the delta's data from details of the delta's
+	representation.  Both the parser and the client should be simpler
+	now.  
+	
+	(svn_next_delta_window, svn_delta_to_vcdiff, svn_vcdiff_to_delta):
+	Put values returned by reference first.  
+	
+	Doc fixes.  
+
+2000-08-09 17:42  kfogel
+
+	* include/svn_delta.h (1.28): Delete obsolete comment.  
+
+2000-08-09 16:53  jimb
+
+	* include/jimb-delta-parse.h (1.2): 
+	(svn_delta_walk_t): Add finish_directory function.  
+
+2000-08-09 16:06  jimb
+
+	* include/jimb-delta-parse.h (1.1): Possible new delta walking
+	interface.  
+
+2000-08-09 15:29  sussman
+
+	* libsvn_wc/update.c (1.11): comments 
+
+2000-08-09 04:38  kfogel
+
+	* libsvn_delta/.cvsignore (1.2): Ignore s'more.  
+
+2000-08-09 04:34  sussman
+
+	* libsvn_delta/delta_parse.c (1.29): temporarily report malformed
+	XML errors 
+
+2000-08-09 04:31  kfogel
+
+	* libsvn_wc/update.c (1.10): 
+	(delta_stack_to_path): fix iteration.  
+
+2000-08-09 00:24  sussman
+
+	* libsvn_delta/delta_parse.c (1.28): Duh, don't forget to set
+	previous ptr after appending stackframe.  
+
+2000-08-08 23:31  kfogel
+
+	* svn-dev.sh (1.5): Use SVN_WC instead of WC, and export it.  
+	
+	(Change suggested by Branko <branko.cibej@hermes.si>).  
+
+2000-08-08 23:22  kfogel
+
+	* libsvn_delta/Makefile.am (1.3), libsvn_string/Makefile.am (1.6),
+	libsvn_subr/Makefile.am (1.3), libsvn_wc/Makefile.am (1.3),
+	libsvn_wc/update.c (1.9), libsvn_wc/tests/Makefile.am (1.5): Use
+	static where appropriate.  
+	
+	Correct ordering of library dependencies; plus some accidental
+	newline removals that are easier to commit than revert.  
+
+2000-08-08 23:15  kfogel
+
+	* libsvn_string/svn_string.c (1.25): Compensate for the trailing
+	null byte.  
+
+2000-08-08 23:10  kfogel
+
+	* libsvn_delta/delta_parse.c (1.27): The usual strcmp() mishap.  
+
+2000-08-08 21:57  kfogel
+
+	* libsvn_delta/delta_parse.c (1.26): Fix allocation size buglets.  
+
+2000-08-08 19:29  kfogel
+
+	* libsvn_delta/delta_parse.c (1.25): Recurse, or, as Noah Friedman
+	likes to say, "recur".  
+
+2000-08-08 18:41  kfogel
+
+	* libsvn_delta/delta_parse.c (1.24): Allow null callbacks.  
+
+2000-08-08 18:14  kfogel
+
+	* svn-dev.sh (1.4), libsvn_string/tests/Makefile.am (1.4),
+	libsvn_subr/tests/Makefile.am (1.3), libsvn_wc/tests/Makefile.am
+	(1.4): Add new paths to LD_LIBRARY_PATH.  
+	
+	Don't install test programs in a "make install".  
+
+2000-08-08 17:48  sussman
+
+	* libsvn_wc/tests/Makefile.am (1.3): Added expat and libsvn_subr
+	dependencies.  
+
+2000-08-08 17:36  kfogel
+
+	* libsvn_wc/: .cvsignore (1.4), Makefile.am (1.2), update.c (1.8),
+	tests/Makefile.am (1.2): Fix various type and path buglets on way
+	to compilation.  
+
+2000-08-08 17:35  kfogel
+
+	* libsvn_delta/tests/.cvsignore (1.1): Ignore the usual stuff.  
+
+2000-08-08 17:34  sussman
+
+	* include/svn_delta.h (1.27), libsvn_delta/Makefile.am (1.2),
+	libsvn_delta/delta_parse.c (1.23): Delta library compiles now.  
+
+2000-08-08 17:03  kfogel
+
+	* include/svn_delta.h (1.26): 
+	(svn_delta_digger_t): uh, correct that other function pointer 
+	prototype, too.  
+
+2000-08-08 17:03  kfogel
+
+	* include/svn_delta.h (1.25): 
+	(svn_delta_digger_t): correct function pointer prototypes.  
+
+2000-08-08 16:53  kfogel
+
+	* libsvn_wc/: .cvsignore (1.3), tests/.cvsignore (1.1): Ignore
+	Makefile.in, Makefile, and ChangeLog* too.  
+
+2000-08-08 16:52  kfogel
+
+	* libsvn_delta/.cvsignore (1.1): Ignore Makefile.in, Makefile, and
+	ChangeLog*.  
+
+2000-08-08 16:51  kfogel
+
+	* Makefile.am (1.7): 
+	(SUBDIRS): include libsvn_wc.  
+
+2000-08-08 16:48  kfogel
+
+	* include/svn_delta.h (1.24): Clean up syntax errors -- we're
+	compiling now.  
+
+2000-08-08 16:35  sussman
+
+	* libsvn_delta/: Makefile.am (1.1), delta_parse.h (1.3): Don't need
+	intra-library header, but we do need automake.  
+
+2000-08-08 16:33  sussman
+
+	* libsvn_delta/delta_parse.c (1.22): 
+	
+	Make all routines static, except for one public interface: 
+	svn_delta_make_xml_parser() 
+
+2000-08-08 16:23  kfogel
+
+	* libsvn_wc/: Makefile.am (1.1), update.c (1.7), tests/Makefile.am
+	(1.1), tests/checkout-test.c (1.1), tests/checkout-test.sh (1.1): 
+	Print out checkout dirs.  
+	
+	Skeleton of a test framework; probably doesn't compile yet, more to 
+	come.  
+
+2000-08-08 16:20  sussman
+
+	* Makefile.am (1.6): Add delta dependency 
+
+2000-08-08 04:00  sussman
+
+	* libsvn_string/svn_string.c (1.24): Don't pollute global
+	namespace.  
+
+2000-08-08 03:01  jimb
+
+	* include/svn_delta.h (1.23): 
+	(svn_delta_stream_t): This shouldn't be a pointer to a struct; it's 
+	just an opaque struct.  
+	
+	(svn_delta_read_fn_t): Provide a way to return EOF and short reads.  
+	
+	(svn_delta_read_fn_t): Make this a function type, not a 
+	pointer-to-function type.  
+	(svn_text_delta): Adjust prototype.  
+	
+	(svn_text_delta): Doc fixes.  
+
+2000-08-08 02:59  kfogel
+
+	* include/svn_delta.h (1.22): 
+	(svn_delta_window_t): "ops", not "insns".  
+
+2000-08-08 02:49  jimb
+
+	* include/svn_delta.h (1.21): Rename: svn_delta_insn_t to
+	svn_delta_op_t.  
+
+2000-08-08 02:42  kfogel
+
+	* include/svn_delta.h (1.20): Minor comment in Jim's text delta
+	interface.  
+	
+	(svn_walk_delta_stack): obsolete, removed.  
+
+2000-08-08 00:49  kfogel
+
+	* libsvn_wc/update.c (1.6): 
+	(delta_stack_to_path): throw out hysterical raisin.  
+
+2000-08-08 00:40  kfogel
+
+	* libsvn_wc/update.c (1.5): 
+	(delta_stack_to_path): replaces delta_to_path(), extracts file or 
+	directory paths with equal alacrity.  
+
+2000-08-08 00:34  jimb
+
+	* include/: svn_delta.h (1.18), svn_delta.h (1.19): Doc fix.  
+
+2000-08-08 00:30  sussman
+
+	* libsvn_delta/delta_parse.c (1.21): Added type-checking to frame
+	append/unpend.  
+
+2000-08-08 00:16  jimb
+
+	* include/svn_delta.h (1.17): Add interface to text deltas.  
+
+2000-08-07 23:35  kfogel
+
+	* libsvn_delta/delta_parse.c (1.20): 
+	(svn_walk_delta): gone.  No need for a generic delta walker -- it's
+	so simple, it'll be clearer to write out the logic each time and
+	avoid an awkward callback mechanism.  
+
+2000-08-07 22:44  sussman
+
+	* include/svn_delta.h (1.16), libsvn_delta/delta_parse.c (1.19): 
+	Finished stackframe rewrite... much cleaner.  
+
+2000-08-07 22:04  sussman
+
+	* include/svn_delta.h (1.15), libsvn_delta/delta_parse.c (1.18): in
+	process of rewriting w/ stack frames 
+
+2000-08-07 20:29  sussman
+
+	* include/svn_delta.h (1.14): Added delta stackframe type.  
+
+2000-08-05 23:35  sussman
+
+	* libsvn_delta/delta_parse.c (1.17): Filled in some constructors.  
+
+2000-08-05 23:19  sussman
+
+	* libsvn_delta/delta_parse.c (1.16): 
+	
+	Finished 2nd draft (big rewrite) of: 
+	
+	 svn_find_delta_bottom() 
+	 svn_starpend_delta() 
+	 svn_xml_handle_start() 
+	 svn_xml_handle_end() 
+
+2000-08-05 22:55  kfogel
+
+	* include/svn_delta.h (1.13), libsvn_delta/delta_parse.c (1.15),
+	libsvn_wc/update.c (1.4): Codus Interruptus, saving state: 
+	
+	Implementing svn_walk_delta() before implementing delta_to_path() 
+	before implementing update_dir_handler().  
+	
+	Someone remind me to read this log entry to figure what to do next.  
+	
+	(svn_walk_delta): in progress.  
+	
+	(update_dir_handler): waiting on above and delta_to_path().  
+
+2000-08-05 22:40  sussman
+
+	* libsvn_delta/delta_parse.c (1.14): Factorization in progress.  
+
+2000-08-05 22:26  kfogel
+
+	* include/svn_delta.h (1.12): Correct prototype for
+	svn_delta_digger_t->dir_handler.  
+
+2000-08-05 22:20  kfogel
+
+	* libsvn_subr/tests/hashdump-test.c (1.6): Correct path to find
+	svn-dev.el in local vars section.  
+
+2000-08-05 22:19  sussman
+
+	* libsvn_delta/delta_parse.c (1.13): Fleshed out most of
+	svn_xml_handle_end().  
+
+2000-08-05 22:18  kfogel
+
+	* libsvn_wc/update.c (1.3): 
+	(check_existence): new func, helper for update() and later for
+	callbacks.  
+	
+	(update): use above.  
+	
+	(update_data_handler, update_dir_handler): replace 
+	`svn_update_data_handler' and `svn_update_data_handler'
+	respectively, albeit not respectfully.  
+
+2000-08-05 22:03  sussman
+
+	* libsvn_delta/delta_parse.c (1.12): Finished svn_starpend_delta()
+	-- appends object to bottom of delta, or deletes bottommost object
+	in delta.  
+	
+	Uses new version of svn_find_delta_bottom(), which now returns both 
+	the bottommost *and* penultimate objects in the delta (needed for 
+	deletion.) 
+
+2000-08-05 21:46  kfogel
+
+	* include/svn_error.h (1.8): 
+	(SVN_ERR_OBSTRUCTED_UPDATE): new error.  
+
+2000-08-05 21:33  kfogel
+
+	* libsvn_wc/update.c (1.2): 
+	(update): set up digger before passing it to the parser creator;
+	this is more intuitive although not technically necessary.  
+
+2000-08-05 21:21  kfogel
+
+	* libsvn_wc/update.c (1.1): 
+	(update): new function, entry point.  
+	
+	(svn_update_data_handler, svn_update_dir_handler): started helpers
+	for `update()'.  
+
+2000-08-05 21:07  sussman
+
+	* include/svn_error.h (1.7), libsvn_delta/delta_parse.c (1.11): 
+	
+	Broke apart recursive delta cdr() logic from appending logic.  
+
+2000-08-05 21:02  kfogel
+
+	* include/: svn_string.h (1.22), svn_types.h (1.37): Define
+	svn_string_t type in svn_string.h now, using explicit structs for
+	forward references.  
+
+2000-08-05 20:48  kfogel
+
+	* include/svn_delta.h (1.11), libsvn_delta/delta_parse.c (1.10),
+	libsvn_delta/tests/deltaparse-test.c (1.3): 
+	(svn_delta_make_xml_parser): new constructor function (rename of 
+	svn_xml_make_parser).  
+	
+	Use it in test program.  
+
+2000-08-05 20:44  kfogel
+
+	* include/svn_delta.h (1.10): Include xmlparse.h.  
+	
+	(svn_xml_make_parser): prototype.  
+
+2000-08-05 19:37  kfogel
+
+	* include/: svn_delta.h (1.9), svn_types.h (1.36): Moved all delta
+	definitions from svn_types.h to svn_delta.h.  
+	
+	Namespace-protect enum values with "svn_".  
+
+2000-08-05 17:56  sussman
+
+	* libsvn_delta/: delta_parse.c (1.9), delta_parse.h (1.2): Remove
+	useless constructors. :) 
+
+2000-08-05 17:41  kfogel
+
+	* include/svn_delta.h (1.8), libsvn_delta/delta_parse.c (1.8): Made
+	note about possible context optimization for data handler callback.  
+
+2000-08-05 17:34  kfogel
+
+	* include/svn_delta.h (1.7), include/svn_types.h (1.35),
+	libsvn_delta/delta_parse.c (1.7): Working with Ben: 
+	
+	Got rid of `svn_ancestor_t' -- it was only used for one thing, so
+	just hold its fields inline.  
+	
+	Say `this_edit_content' instead of `new_edit_content', to avoid 
+	implying that the type of the edit is `new'.  
+	
+	Point out some remaining bookkeeping tasks in comments.  
+	
+	Got rid of some old debugging code.  
+
+2000-08-05 16:53  sussman
+
+	* libsvn_delta/delta_parse.c (1.6): 
+	
+	First draft of svn_xml_startElement().  
+
+2000-08-05 16:40  sussman
+
+	* libsvn_wc/tests/checkout-1.delta (1.5): <new> tag always requires
+	name attribute.  
+
+2000-08-05 16:27  kfogel
+
+	* libsvn_subr/svn_parse.c (1.30): Oops, a little too eager in the
+	"FILE" ==> "file" conversion.  
+
+2000-08-05 16:26  kfogel
+
+	* libsvn_subr/svn_parse.c (1.29): "FILE" ==> "file" 
+
+2000-08-05 16:17  sussman
+
+	* include/svn_delta.h (1.6), libsvn_delta/delta_parse.c (1.5),
+	libsvn_delta/delta_parse.h (1.1): 
+	
+	Filling out main expat callback.  
+
+2000-08-05 03:44  sussman
+
+	* include/svn_delta.h (1.5), include/svn_types.h (1.34),
+	libsvn_delta/delta_parse.c (1.4): 
+	
+	1. Defined new enum svn_XML_elt_t, describing different XML elts we
+	   may encounter when building a delta.  
+	
+	2. Defined svn_append_to_delta(delta, object, svn_XML_elt_t), which 
+	   traverses a delta-in-progress recursively and attaches object to
+	   the tip.  
+	
+	3. Started filling in main expat "open paren" callback with above
+	routine.  
+
+2000-08-05 02:37  sussman
+
+	* include/svn_types.h (1.33): Removed *next field from svn_edit_t,
+	because our in-memory delta will _never_ need to hold more than one
+	edit at a time;  one edit will always be "closed" before the next
+	sibiling edit begins.  Thus the "edit" field of our delta should be
+	thought of us as "the current edit we're working on", _not_ a list
+	of edits.  
+
+2000-08-04 22:42  kfogel
+
+	* libsvn_delta/delta_parse.c (1.3): Start constructors for delta
+	components; we'll need destructors, too.  
+
+2000-08-04 22:24  kfogel
+
+	* include/svn_delta.h (1.4): 
+	(svn_delta_digger_t): explain how diggers are used.  
+
+2000-08-04 21:57  kfogel
+
+	* include/svn_delta.h (1.3): Hmmm, somehow missed the local eval
+	ritual -- put it in again.  
+
+2000-08-04 21:53  kfogel
+
+	* include/: svn_delta.h (1.2), svn_hash.h (1.3): Use `apr_pool_t'
+	now, not `ap_pool_t'.  
+	
+	Document callbacks as caller will use them.  
+	
+	Added the usual local eval ritual to the end of svn_delta.h and 
+	svn_hash.h.  
+	
+	(unknown_elt_handler): more descriptive name for `default_handler'.  
+
+2000-08-04 21:40  sussman
+
+	* include/svn_delta.h (1.1), include/svn_types.h (1.32),
+	libsvn_delta/delta_parse.c (1.2),
+	libsvn_delta/tests/deltaparse-test.c (1.2): Started XML-to-Delta
+	callback system.  
+
+2000-08-04 20:49  kfogel
+
+	* include/svn_types.h (1.31): Point out streamy
+	construction/deconstruction of deltas w.r.t. XML parser, remove note
+	about now-obsolete method.  
+
+2000-08-04 20:44  kfogel
+
+	* include/svn_types.h (1.30): 
+	(svn_edit_content_t): can include a tree delta as content.  
+	
+	(svn_ver_t, svn_user_t): cosmetic fix: use the `_t' suffix even in
+	the structure namespace, for consistency.  
+
+2000-08-04 20:34  kfogel
+
+	* libsvn_wc/tests/checkout-1.delta (1.4): Double quotes for
+	readability (as per Greg Stein's email about XML accepting either).  
+
+2000-08-04 19:23  sussman
+
+	* libsvn_delta/delta_parse.c (1.1),
+	libsvn_delta/tests/deltaparse-test.c (1.1), libsvn_wc/deltaparse.c
+	(1.2), libsvn_wc/tests/deltaparse-test.c (1.2): moving files around 
+
+2000-08-04 18:50  sussman
+
+	* libsvn_wc/: deltaparse.c (1.1), tests/deltaparse-test.c (1.1): 
+	deltaparser started 
+
+2000-08-04 17:06  kfogel
+
+	* libsvn_subr/hashdump.c (1.8): Null-terminate the hand-constructed
+	strings.  
+
+2000-08-04 17:03  kfogel
+
+	* include/svn_types.h (1.29): 
+	(svn_edit_t): add `action_end' in enum `kind', comment explaining
+	why.  
+
+2000-08-04 16:59  kfogel
+
+	* libsvn_wc/tests/checkout-1.delta (1.3): Quote the value of the
+	version number attribute, too.  
+
+2000-08-04 16:45  kfogel
+
+	* libsvn_subr/hashdump.c (1.7): Put in the standard emacs local
+	vars trailer.  
+
+2000-08-04 16:42  kfogel
+
+	* libsvn_wc/propdump.c (1.16): obsoleted by
+	../libsvn_subr/hashdump.c 
+
+2000-08-04 16:32  kfogel
+
+	* libsvn_wc/tests/checkout-1.delta (1.2): Single quotes, not double
+	quotes (this is XML).  
+
+2000-08-04 16:32  kfogel
+
+	* libsvn_wc/tests/: checkout-1.delta (1.1), checkout-1.txt (1.1): A
+	test delta.  
+
+2000-08-04 12:55  sussman
+
+	* include/svn_types.h (1.28): readability tweak 
+
+2000-08-04 12:36  sussman
+
+	* include/svn_types.h (1.27): tweak 
+
+2000-08-04 12:33  sussman
+
+	* include/svn_types.h (1.26): Heh, just tweaking Karl's data
+	schema... almost identical to mine. :) 
+
+2000-08-03 21:11  kfogel
+
+	* libsvn_wc/README (1.28): Settled skelta issues w/ Ben, able to
+	describe rest of working copy format.  
+
+2000-08-03 20:22  kfogel
+
+	* libsvn_subr/tests/hashdump-test.c (1.5): 
+	(main): pass 0, not NULL, as arg 2 to svn_create_error().  
+
+2000-08-03 14:39  sussman
+
+	* include/svn_error.h (1.6), include/svn_hash.h (1.2),
+	include/svn_parse.h (1.3), include/svn_string.h (1.21),
+	include/svn_svr.h (1.30), include/svn_types.h (1.25),
+	include/svn_wc.h (1.5), libsvn_string/svn_string.c (1.23),
+	libsvn_string/tests/stringtest.c (1.12), libsvn_subr/hashdump.c
+	(1.6), libsvn_subr/svn_error.c (1.26), libsvn_subr/svn_parse.c
+	(1.28), libsvn_subr/parsetest/parsetest.c (1.9),
+	libsvn_subr/tests/hashdump-test.c (1.4), libsvn_svr/server_fs.c
+	(1.30), libsvn_svr/server_init.c (1.28),
+	libsvn_svr/plugin_security/plugin_security.c (1.18),
+	libsvn_svr/tests/svrtest.c (1.4), libsvn_wc/propdump.c (1.15): 
+	whoa, APR has changed.  s/ap_/apr_ 
+
+2000-08-03 12:44  sussman
+
+	* libsvn_wc/README (1.27): Added some comments for discussion 
+
+2000-08-01 21:36  sussman
+
+	* libsvn_string/tests/.cvsignore (1.4),
+	libsvn_subr/tests/.cvsignore (1.2): tweaking .cvsignores 
+
+2000-08-01 21:31  sussman
+
+	* .cvsignore (1.1), libsvn_string/.cvsignore (1.1),
+	libsvn_string/tests/.cvsignore (1.3), libsvn_subr/.cvsignore (1.1),
+	libsvn_subr/tests/.cvsignore (1.1): adding .cvsignore files all
+	around which ignore automake/autoconf stuff 
+
+2000-08-01 21:29  sussman
+
+	* Makefile.am (1.5): tweak 
+
+2000-08-01 20:11  sussman
+
+	* Makefile.am (1.4), libsvn_string/tests/Makefile.am (1.3),
+	libsvn_string/tests/stringtest.c (1.11),
+	libsvn_subr/tests/Makefile.am (1.2),
+	libsvn_subr/tests/hashdump-test.sh (1.1): <make check> now runs
+	automated tests in libsvn_string and libsvn_subr 
+
+2000-08-01 18:06  sussman
+
+	* Makefile.am (1.3): doc/ should be autoconf'd now 
+
+2000-08-01 01:31  kfogel
+
+	* libsvn_wc/README (1.26): Start describing concrete working copy
+	layout and algorithms for walking around in it.  
+
+2000-08-01 01:30  sussman
+
+	* libsvn_subr/Makefile.am (1.2): tweak 
+
+2000-08-01 01:24  sussman
+
+	* libsvn_subr/tests/: Makefile (1.2), Makefile.am (1.1): autoconf
+	libsvn_subr/tests/ 
+
+2000-08-01 01:09  sussman
+
+	* libsvn_subr/Makefile.am (1.1): [no log message] 
+
+2000-08-01 01:08  sussman
+
+	* Makefile.am (1.2), include/svn_error.h (1.5),
+	libsvn_subr/README.errors (1.3), libsvn_subr/svn_error.c (1.25): 
+	saving autoconf work 
+
+2000-08-01 00:34  sussman
+
+	* libsvn_string/: Makefile.am (1.5), tests/Makefile.am (1.2): still
+	autoconfiscating... getting the hang of it. :) 
+
+2000-07-31 20:44  kfogel
+
+	* libsvn_wc/README (1.25): Scenario 2.  
+
+2000-07-31 19:04  sussman
+
+	* libsvn_string/Makefile.am (1.4): hacking on autoconfiscation 
+
+2000-07-31 18:11  kfogel
+
+	* libsvn_wc/README (1.24): Scenario 1.  
+
+2000-07-31 17:52  kfogel
+
+	* libsvn_wc/README (1.23): Point out the implied redundancy between
+	Tables 2 and 3.  
+
+2000-07-31 17:03  kfogel
+
+	* libsvn_wc/README (1.22): Quick tweak before working on scenarios.  
+
+2000-07-31 17:02  kfogel
+
+	* libsvn_wc/README (1.21): Get rid of the "working here" tag.  Not
+	working there anymore.  
+
+2000-07-31 16:55  kfogel
+
+	* libsvn_wc/README (1.20): The tables don't need to show conflict
+	foldability -- that's just an optimization, not a fundamental
+	property.  
+
+2000-07-31 16:43  kfogel
+
+	* libsvn_wc/README (1.19): Mark working point more clearly for
+	JimB.  
+
+2000-07-28 16:17  sussman
+
+	* libsvn_subr/hashdump.c (1.5): fixing casting warning 
+
+2000-07-28 04:31  kfogel
+
+	* libsvn_subr/hashdump.c (1.4): 
+	(svn_pack_bytestring): Don't reallocate, just assemble the string by 
+	hand, copying the data pointer.  
+
+2000-07-27 21:57  sussman
+
+	* libsvn_subr/: hashdump.c (1.3), tests/hashdump-test.c (1.3): Test
+	program works;  we can read/write hash tables to disk now.  
+
+2000-07-27 21:12  sussman
+
+	* include/svn_hash.h (1.1), libsvn_subr/hashdump.c (1.2),
+	libsvn_subr/tests/Makefile (1.1), libsvn_subr/tests/hashdump-test.c
+	(1.2), libsvn_wc/Makefile (1.5): Header file reorganization 
+
+2000-07-27 20:25  sussman
+
+	* include/svn_error.h (1.4), libsvn_subr/hashdump.c (1.1),
+	libsvn_subr/tests/hashdump-test.c (1.1), libsvn_wc/hashdump.c
+	(1.7): Movin' stuff around 
+
+2000-07-27 14:06  sussman
+
+	* libsvn_string/svn_string.c (1.22): typo in svn_string.c
+	(unfinished work?) 
+
+2000-07-27 06:00  kfogel
+
+	* libsvn_wc/hashdump.c (1.6): Document hash dump format more
+	accurately, too.  
+
+2000-07-27 05:57  kfogel
+
+	* libsvn_wc/hashdump.c (1.5): 
+	(read_length_line): document better.  
+
+2000-07-27 05:53  kfogel
+
+	* libsvn_wc/hashdump.c (1.4): 
+	(hash_read): started.  
+	
+	(read_length_line): helper for above.  
+
+2000-07-27 05:18  kfogel
+
+	* libsvn_wc/hashdump.c (1.3): Call return values `err', not
+	`status', and deprolicize accordingly.  
+	
+	Jim was right, we don't need the SVN_NO_ERROR mnemonic.  If we just 
+	use a variable named `err', then the clearest thing to do is test it 
+	as a boolean directly.  
+
+2000-07-27 04:17  kfogel
+
+	* libsvn_wc/: Makefile (1.4), hashdump.c (1.2): Run in static
+	space.  
+
+2000-07-27 04:16  kfogel
+
+	* libsvn_subr/svn_error.c (1.24): Fix format mismatch in fprintf().  
+
+2000-07-27 04:15  kfogel
+
+	* include/: svn_string.h (1.20), svn_types.h (1.24): Define
+	`svn_string_t' in svn_types.h after all, otherwise we had a circular
+	include problem.  
+
+2000-07-26 22:35  sussman
+
+	* libsvn_wc/hashdump.c (1.1): 
+	
+	PR:hash_write() is now generalized, taking a helper function.  TODO:
+	       hack the test program to use svn_unpack_bytestring() as the helper
+	function, and print out a property hash.  
+
+2000-07-26 21:20  sussman
+
+	* libsvn_wc/README (1.18): a few comments 
+
+2000-07-25 23:55  kfogel
+
+	* libsvn_wc/README (1.17): Clean out a lot of cruft.  
+	
+	Almost at a General Theory of Change Compatibility here.  
+
+2000-07-25 22:16  kfogel
+
+	* libsvn_wc/README (1.16): Justify the Symmetry Principle.  (As
+	close to proof as we're going to get, probably.) 
+
+2000-07-25 19:43  kfogel
+
+	* libsvn_wc/README (1.15): More expanation fill-in.  Following
+	through examples based on a few of the table cells (a pain now, will
+	be glad we did it later).  
+	
+	The examples are showing up a need to tweak Table 1, I think.  
+
+2000-07-24 22:07  kfogel
+
+	* libsvn_wc/README (1.14): Explain commit algorithm in full.  
+
+2000-07-24 16:43  kfogel
+
+	* libsvn_wc/README (1.13): Lay out third server decision table
+	(direct changes against direct changes).  
+	
+	Make earlier parts of text clearer.  
+
+2000-07-22 22:26  kfogel
+
+	* libsvn_wc/README (1.12): Write up conflict tables.  
+
+2000-07-22 00:06  kfogel
+
+	* libsvn_wc/README (1.11): Checkin so can go work at home.  
+
+2000-07-21 22:14  kfogel
+
+	* libsvn_wc/README (1.10): More explanation (writing with Ben, wish
+	commits could have N authors).  
+
+2000-07-21 21:48  kfogel
+
+	* libsvn_wc/README (1.9): Wow.  We are going to *own* this problem
+	by the time we're done.  
+	
+	In progress describing the pre-commit check and 
+	update-delta-generation algorithms.  It's kind of hairy, but Ben has 
+	found a theoretical framework, we are still applying it.  
+
+2000-07-21 17:06  kfogel
+
+	* libsvn_wc/README (1.8): more tweaks 
+
+2000-07-21 16:52  kfogel
+
+	* libsvn_wc/README (1.7): tweaks 
+
+2000-07-21 16:29  kfogel
+
+	* libsvn_wc/README (1.6): Update/commit algorithm described. 
+	Aaaah.  
+
+2000-07-21 16:08  kfogel
+
+	* libsvn_wc/README (1.5): Update/commit algorithm half-described
+	(good checkin point).  
+
+2000-07-21 15:46  kfogel
+
+	* libsvn_wc/README (1.4): List principles involved in the update
+	algorithm (next, describe the algorithm).  
+
+2000-07-18 21:23  kfogel
+
+	* libsvn_wc/propdump.c (1.14): Fix buglet noticed by JimB (that of
+	not being handling the most-negative number).  
+
+2000-07-18 20:19  sussman
+
+	* include/svn_svr.h (1.29), libsvn_string/svn_string.c (1.21),
+	libsvn_svr/server_fs.c (1.29), libsvn_svr/svn.conf (1.5): Removed
+	policy-level permission-checking from server;  redundant with
+	Apache.  
+
+2000-07-18 16:51  sussman
+
+	* libsvn_svr/server_fs.c (1.28): Compromise on server logic:  18
+	filesystem wrappers restored, each calling helper routine that
+	contains core logic.  
+
+2000-07-17 22:32  jimb
+
+	* include/: svn_string.h (1.19), svn_types.h (1.23): 
+	* svn_string.h: No need to #include <svn_types.h> any more.  Do
+	#include <apr_pools.h>, however.  
+	(svn_string_t): Move the definition of this type here.  
+	* svn_types.h: #include <svn_string.h>.  
+	(svn_string_t): Definition removed.  PR: Obtained from: Submitted
+	by: Reviewed by: 
+
+2000-07-17 22:19  jimb
+
+	* include/svn_parse.h (1.2): New parsing API, and underlying data
+	structure.  
+
+2000-07-17 21:47  sussman
+
+	* include/svn_error.h (1.3), include/svn_parse.h (1.1),
+	libsvn_subr/svn_error.h (1.26), libsvn_subr/svn_parse.h (1.9): 
+	moved headers to include/ 
+
+2000-07-17 21:09  jimb
+
+	* include/svn_string.h (1.18), include/svn_svr.h (1.28),
+	include/svn_types.h (1.22), include/svn_wc.h (1.4),
+	libsvn_subr/svn_error.h (1.25), libsvn_subr/svn_parse.h (1.8): 
+	Rename symbols used to protect header files from multiple #inclusion 
+	so the symbols don't tread on the system C library's name space.  
+	PR: Obtained from: Submitted by: Reviewed by: 
+
+2000-07-17 19:50  sussman
+
+	* libsvn_subr/svn_error.c (1.23): oops, I meant vfprintf 
+
+2000-07-17 19:23  sussman
+
+	* libsvn_subr/svn_error.c (1.22): fix default warning handler 
+
+2000-07-17 19:17  sussman
+
+	* include/svn_svr.h (1.27), libsvn_subr/svn_error.c (1.21),
+	libsvn_subr/svn_error.h (1.24), libsvn_subr/svn_parse.c (1.27),
+	libsvn_svr/server_init.c (1.27): add warning hook to policy
+	structure, replace warning calls appropriately.  
+
+2000-07-17 18:17  sussman
+
+	* libsvn_subr/svn_error.h (1.23), libsvn_subr/svn_parse.c (1.26),
+	libsvn_svr/server_fs.c (1.27), libsvn_svr/server_init.c (1.26),
+	libsvn_svr/plugin_security/plugin_security.c (1.17): 
+	tr/SVN_SUCCESS/SVN_NO_ERROR 
+
+2000-07-17 18:13  kfogel
+
+	* svn-dev.el (1.4): Get rid of annoying load-message pause.  
+	
+	I have no idea why I put it in there in the first place.  
+
+2000-07-17 16:46  sussman
+
+	* libsvn_svr/: server_fs.c (1.26), server_init.c (1.25): tweak-a
+	tweak-a 
+
+2000-07-17 15:57  sussman
+
+	* include/svn_svr.h (1.26), include/svn_types.h (1.21),
+	libsvn_subr/svn_error.h (1.22), libsvn_svr/server_fs.c (1.25),
+	libsvn_svr/plugin_security/plugin_security.c (1.16): 
+	
+	Major rewrite of Subversion Server logic: instead of 15 wrappered 
+	filesystem calls, we now have *one* filesystem wrapper that takes a 
+	svn_fsrequest_t structure as input.  MUCH CLEANER.  
+
+2000-07-17 14:09  sussman
+
+	* libsvn_subr/svn_error.h (1.21), libsvn_subr/svn_parse.c (1.25),
+	libsvn_svr/server_init.c (1.24): 
+	
+	No subversion routine calls svn_handle_error() anymore; instead, 
+	warnings are created by generating & nesting a stack of errors of
+	type SVN_WARNING.  At the end of the routine, the batch (stack) is 
+	returned.  Applications that have their own error-handling code
+	should recognized the SVN_WARNING type and realize it's non-fatal.  
+
+2000-07-15 00:14  sussman
+
+	* include/svn_svr.h (1.25), libsvn_subr/svn_error.h (1.20),
+	libsvn_svr/server_fs.c (1.24), libsvn_svr/server_init.c (1.23),
+	libsvn_svr/plugin_security/plugin_security.c (1.15): Fleshing out
+	lots of server routines... much stuff.  
+
+2000-07-14 21:30  sussman
+
+	* libsvn_subr/svn_error.c (1.20), libsvn_subr/svn_error.h (1.19),
+	libsvn_subr/svn_parse.c (1.24), libsvn_svr/server_init.c (1.22): 
+	Added src_err field to error structure, changed calls to
+	svn_create_error 
+
+2000-07-14 00:44  gstein
+
+	* libsvn_wc/propdump.c (1.13): 
+	*) there are easier ways to concatenate C strings 
+	*) note: svn_wc_proplist_write() should probably take a const char * 
+	*) tweaks for new error handling 
+
+2000-07-14 00:10  sussman
+
+	* include/svn_svr.h (1.24), libsvn_subr/svn_parse.c (1.23),
+	libsvn_subr/svn_parse.h (1.7), libsvn_svr/server_fs.c (1.23),
+	libsvn_svr/server_init.c (1.21), libsvn_svr/svn.conf (1.4): Changed
+	the way server inits; fixed other random typos.  
+
+2000-07-14 00:10  kfogel
+
+	* libsvn_string/Makefile (1.6): This Makefile will be generated
+	automatically now.  
+
+2000-07-14 00:08  kfogel
+
+	* libsvn_string/tests/: .cvsignore (1.2), Makefile.am (1.1): Okay,
+	stringtest builds too.  
+
+2000-07-13 23:53  kfogel
+
+	* libsvn_string/Makefile.am (1.3): Got libsvn_string.so building...  
+
+2000-07-13 22:07  kfogel
+
+	* libsvn_subr/README.errors (1.2), libsvn_subr/svn_error.h (1.18),
+	libsvn_svr/server_fs.c (1.22),
+	libsvn_svr/plugin_security/plugin_security.c (1.14): Got rid of
+	SVN_RETURN_IF_ERROR() and SVN_RETURN_WRAPPED_ERROR() macros; expand
+	to inline code everywhere they had been used.  
+	
+	There was a general consensus that a macro affecting control flow
+	must meet three criteria: 
+	
+	   1. The need must be compelling (for example, it replaces very 
+	      complex inline code).  
+	
+	   2. Its meaning must be obvious from looking at a use of the macro 
+	      (without reference to its expansion).  
+	
+	   3. It must work in any context.  
+	
+	These macros probably met 2 and 3, but not 1.  
+
+2000-07-13 19:42  sussman
+
+	* libsvn_subr/svn_error.c (1.19), libsvn_subr/svn_error.h (1.17),
+	libsvn_subr/svn_parse.c (1.22), libsvn_svr/server_fs.c (1.21),
+	libsvn_svr/server_init.c (1.20), libsvn_svr/tests/svrtest.c (1.3): 
+	Removed FATAL flag from error structure.  
+
+2000-07-13 15:04  gstein
+
+	* libsvn_wc/: .cvsignore (1.2), Makefile (1.3), propdump.c (1.12): 
+	compile/build fixes 
+
+2000-07-13 15:03  gstein
+
+	* libsvn_subr/: svn_error.c (1.18), svn_error.h (1.16): compilation
+	fixes 
+
+2000-07-13 12:05  gstein
+
+	* libsvn_subr/svn_error.h (1.15): tweak the macros so they bind
+	properly within an enclosing if/else construct 
+
+2000-07-13 05:57  kfogel
+
+	* libsvn_string/Makefile.am (1.2): more autoconfiscation work 
+
+2000-07-13 05:34  sussman
+
+	* libsvn_svr/README (1.3): tweaking README 
+
+2000-07-13 05:12  sussman
+
+	* include/svn_svr.h (1.23), libsvn_subr/svn_error.c (1.17),
+	libsvn_subr/svn_error.h (1.14): 
+	
+	 * Removed ap_err and ap_description fields from error structure 
+	 * svn_create_error() no longer tries to fill these fields 
+	 * svn_handle_error() calls ap_canonical_error() and ap_strerror() 
+	                      when printing error structure 
+
+2000-07-13 05:11  kfogel
+
+	* Makefile.am (1.1), libsvn_string/Makefile.am (1.1): 
+	autoconfiscation in progress 
+
+2000-07-13 04:20  sussman
+
+	* libsvn_svr/: server_fs.c (1.20), server_init.c (1.19): placed
+	svn__ prefix on all global routines not meant for client use 
+
+2000-07-13 04:13  sussman
+
+	* libsvn_subr/: svn_error.c (1.16), svn_error.h (1.13): tweaky
+	tweaky 
+
+2000-07-13 03:48  dlr
+
+	* libsvn_subr/svn_error.c (1.15): Corrected invalid pointer
+	deference on assignment introduced during last commit.  
+
+2000-07-13 03:36  sussman
+
+	* libsvn_subr/README.errors (1.1): Added instructions on exception
+	system 
+
+2000-07-13 03:15  sussman
+
+	* libsvn_subr/svn_error.c (1.14), libsvn_subr/svn_error.h (1.12),
+	libsvn_subr/svn_parse.c (1.21), libsvn_svr/server_fs.c (1.19),
+	libsvn_svr/plugin_security/plugin_security.c (1.13): error system
+	now nests exceptions 
+
+2000-07-12 21:29  sussman
+
+	* libsvn_subr/svn_error.h (1.11), libsvn_svr/server_fs.c (1.18),
+	libsvn_svr/plugin_security/plugin_security.c (1.12): prefixed
+	SVN_RETURN_IF_ERROR, and removed curly braces from it.  
+
+2000-07-12 20:53  kfogel
+
+	* libsvn_wc/propdump.c (1.11): Correct path to svn-dev.el in emacs
+	local vars.  
+
+2000-07-12 20:52  kfogel
+
+	* include/svn_types.h (1.20), libsvn_svr/server_fs.c (1.17): 
+	Namespace-protect svn_svr_action_t, to avoid enumbiguities.  (The
+	prefix is "svn_action_".  While "svn_svr_action_" would probably 
+	have been preferable, it's pretty long, and even starts getting
+	close to the 32-char limit, as in
+	`svn_svr_action_get_dirent_propnames'.) 
+	
+	Use `svn_delta_action_t' instead of `svn_change_action_t', due to 
+	possible noun/verb confusion.  
+	
+	All callers changed.  
+
+2000-07-12 19:38  kfogel
+
+	* svn-dev.el (1.3): restore old value of PAGER env var 
+
+2000-07-12 19:33  kfogel
+
+	* svn-dev.sh (1.3): wording tweak so output is less alarming 
+
+2000-07-12 19:32  kfogel
+
+	* libsvn_string/tests/.cvsignore (1.1): ignore stringtest
+	executable, etc 
+
+2000-07-12 19:27  kfogel
+
+	* libsvn_string/stringtest.c (1.11): moved testing code to tests/
+	subdir 
+
+2000-07-12 19:09  kfogel
+
+	* libsvn_string/stringtest.c (1.10), libsvn_string/svn_string.c
+	(1.20), libsvn_string/tests/stringtest.c (1.10),
+	libsvn_svr/server_fs.c (1.16), libsvn_svr/server_init.c (1.18),
+	libsvn_svr/plugin_security/plugin_security.c (1.11),
+	libsvn_svr/tests/svrtest.c (1.2), libsvn_wc/propdump.c (1.10),
+	libsvn_subr/svn_error.c (1.13), libsvn_subr/svn_parse.c (1.20),
+	libsvn_subr/parsetest/parsetest.c (1.8): Use suggested "" vs <>
+	#include convention everywhere.  
+
+2000-07-12 03:20  sussman
+
+	* include/svn_svr.h (1.22), include/svn_types.h (1.19),
+	libsvn_subr/svn_error.h (1.10), libsvn_svr/server_fs.c (1.15),
+	libsvn_svr/server_init.c (1.17),
+	libsvn_svr/plugin_security/plugin_security.c (1.10): saving work 
+
+2000-07-12 02:00  kfogel
+
+	* libsvn_wc/propdump.c (1.9): Hmm.  Not sure if this bug isn't in
+	apr_hash.c itself, now...  
+	
+	After this code 
+	
+	  /* Test overwriting: same key both times, but different values. */ 
+	  key = svn_string_create ("twice-used property name", pool); 
+	  ap_hash_set (proplist, key->data, key->len, 
+	               svn_string_create ("This is the FIRST value.",
+	  pool)); ap_hash_set (proplist, key->data, key->len, 
+	               svn_string_create ("This is the SECOND value.",
+	               pool)); 
+	
+	there should be no way for the "FIRST" value to still be in the hash 
+	table, right?  Why is it still appearing in the dump, and not 
+	"SECOND"? 
+
+2000-07-12 01:33  kfogel
+
+	* include/svn_svr.h (1.21), include/svn_types.h (1.18),
+	include/svn_wc.h (1.3), libsvn_svr/server_fs.c (1.14),
+	libsvn_svr/server_init.c (1.16), libsvn_wc/propdump.c (1.8): 
+	Eliminate typedef of `svn_proplist_t' to `ap_hash_t'.  
+	
+	Change all references to use `ap_hash_t'.  
+	
+	We'll be good, GCC.  Promise.  
+
+2000-07-12 01:26  kfogel
+
+	* libsvn_wc/propdump.c (1.7): Hash on (svn_string_t).data now.  
+	
+	There's still a bug, though; see the final two entries in the test 
+	main() function.  
+
+2000-07-12 01:19  sussman
+
+	* include/svn_svr.h (1.20), libsvn_svr/server_fs.c (1.13),
+	libsvn_svr/server_init.c (1.15): checking in current state, so karl
+	can do global search/replace 
+
+2000-07-12 00:51  sussman
+
+	* libsvn_subr/svn_parse.c (1.19): prefixed all non-exported
+	routines with svn_ to avoid namespace conflicts.  
+
+2000-07-12 00:42  sussman
+
+	* libsvn_subr/svn_parse.c (1.18): parser stores string->data as a
+	hash key now, not (string *), phew.  
+
+2000-07-12 00:21  sussman
+
+	* libsvn_subr/: svn_error.c (1.12), svn_error.h (1.9), svn_parse.c
+	(1.17), svn_parse.h (1.6), parsetest/parsetest.c (1.7): svn_parse()
+	now returns svn_error_t *, and takes ap_hash_t ** as an argument 
+
+2000-07-11 07:15  kfogel
+
+	* libsvn_wc/: README (1.3), propdump.c (1.6): Clean up some loose
+	ends, zzzzz.  
+
+2000-07-11 06:47  kfogel
+
+	* libsvn_wc/: Makefile (1.2), propdump.c (1.5): Clean up, add "make
+	test" rule.  
+
+2000-07-11 06:40  kfogel
+
+	* libsvn_wc/propdump.c (1.4): Remove debugging code.  
+
+2000-07-11 06:38  kfogel
+
+	* libsvn_wc/propdump.c (1.3): Be even more readable than that.  
+
+2000-07-11 06:37  kfogel
+
+	* libsvn_wc/propdump.c (1.2): Be more readable in
+	num_into_string().  
+
+2000-07-11 06:32  kfogel
+
+	* libsvn_wc/: .cvsignore (1.1), Makefile (1.1), README (1.2),
+	propdump.c (1.1): Implemented property dumping.  
+
+2000-07-11 06:31  kfogel
+
+	* libsvn_subr/svn_error.c (1.11): Don't output that line of
+	asterisks.  (Although we may have a server error prefix later, like
+	CVS's "E ".  
+
+2000-07-11 06:31  kfogel
+
+	* include/svn_wc.h (1.2): Minor textual tweaks.  
+
+2000-07-11 06:29  kfogel
+
+	* libsvn_svr/server_fs.c (1.12), libsvn_svr/server_init.c (1.14),
+	libsvn_subr/svn_error.h (1.8), libsvn_subr/svn_parse.c (1.16): 
+	Define SVN_FATAL and SVN_NON_FATAL, use in all error calls.  (For
+	readability).  
+
+2000-07-11 06:29  kfogel
+
+	* include/svn_types.h (1.17): Resolve some enumbiguities.  
+
+2000-07-11 06:27  kfogel
+
+	* svn-dev.el (1.2): Added `svn-perldoc' and friends.  
+	
+	Run "M-x svn-perldoc", using "apr/include/apr_lib.h" when it asks
+	for a file, to see what it does.  
+
+2000-07-11 01:28  sussman
+
+	* include/svn_svr.h (1.19), libsvn_svr/server_fs.c (1.11),
+	libsvn_svr/server_init.c (1.13),
+	libsvn_svr/plugin_security/plugin_security.c (1.9): saving work,
+	working on loading plugins 
+
+2000-07-10 22:37  sussman
+
+	* libsvn_subr/svn_error.c (1.10): nicer error printout 
+
+2000-07-08 05:23  sussman
+
+	* libsvn_svr/tests/: Makefile (1.1), svrtest.c (1.1),
+	testpolicy.conf (1.1): littletest program for svn_svr_init() 
+
+2000-07-08 01:42  kfogel
+
+	* include/svn_types.h (1.16): Added delta types (needed for
+	libsvn_wc).  
+
+2000-07-08 01:06  sussman
+
+	* include/svn_svr.h (1.18), libsvn_svr/server_init.c (1.12): 
+	svn_svr_init() test works...  
+
+2000-07-08 00:44  sussman
+
+	* include/svn_string.h (1.17), libsvn_string/stringtest.c (1.9),
+	libsvn_string/svn_string.c (1.19), libsvn_string/tests/stringtest.c
+	(1.9), libsvn_svr/server_init.c (1.11), libsvn_subr/svn_error.h
+	(1.7), libsvn_subr/svn_parse.c (1.15),
+	libsvn_subr/parsetest/configfile (1.4): saving lots of random work
+	threads.  
+
+2000-07-08 00:26  kfogel
+
+	* svn-dev.sh (1.2): Fix (thanks, Ben).  
+
+2000-07-07 20:53  sussman
+
+	* include/svn_svr.h (1.17), libsvn_subr/parsetest/configfile (1.3),
+	libsvn_svr/server_init.c (1.10), libsvn_svr/svn.conf (1.3),
+	libsvn_svr/plugin_security/plugin_security.c (1.8): save work\! 
+
+2000-07-07 20:35  kfogel
+
+	* svn-dev.sh (1.1): Set up development environment (handles
+	LD_LIBRARY_PATH for now).  
+
+2000-07-07 20:03  kfogel
+
+	* libsvn_subr/: svn_parse.c (1.14), svn_parse.h (1.5): Revert
+	formatting tweaks from previous commit.  
+	
+	Neurotic control tendencies *must be controlled*.  
+
+2000-07-07 19:57  kfogel
+
+	* libsvn_subr/: svn_parse.c (1.13), svn_parse.h (1.4): Change
+	return conventions of slurp__to(), tweak some formatting.  
+
+2000-07-07 04:51  sussman
+
+	* libsvn_string/svn_string.c (1.18), libsvn_subr/svn_parse.c
+	(1.12), libsvn_subr/parsetest/configfile (1.2): Parser bug fixed. 
+	Test program works correctly, and successfully pretty-prints our
+	hash of hashes.  Sorry, Karl, I beat you to it. :) 
+
+2000-07-07 00:45  sussman
+
+	* include/svn_string.h (1.16), libsvn_string/stringtest.c (1.8),
+	libsvn_string/svn_string.c (1.17), libsvn_string/tests/stringtest.c
+	(1.8), libsvn_subr/svn_error.c (1.9), libsvn_subr/svn_parse.c
+	(1.11), libsvn_subr/svn_parse.h (1.3),
+	libsvn_subr/parsetest/parsetest.c (1.6): debugging parser;
+	svn_string_print is temporarily altered 
+
+2000-07-06 23:32  sussman
+
+	* include/svn_string.h (1.15), libsvn_string/svn_string.c (1.16),
+	libsvn_subr/svn_parse.c (1.10), libsvn_subr/parsetest/parsetest.c
+	(1.5), libsvn_svr/README (1.2): moved some convenient string
+	routines from svn_parse.c to svn_string.c 
+
+2000-07-06 04:41  sussman
+
+	* include/svn_string.h (1.14), libsvn_string/stringtest.c (1.7),
+	libsvn_string/svn_string.c (1.15), libsvn_string/tests/stringtest.c
+	(1.7), libsvn_subr/svn_error.c (1.8), libsvn_subr/svn_error.h
+	(1.6), libsvn_subr/svn_parse.c (1.9),
+	libsvn_subr/parsetest/parsetest.c (1.4): bugfixes 
+
+2000-07-06 04:01  sussman
+
+	* libsvn_subr/: svn_error.c (1.7), svn_parse.c (1.8),
+	parsetest/parsetest.c (1.3): mmm, no more compiler warnings from
+	-Wall...  
+
+2000-07-06 03:50  sussman
+
+	* libsvn_subr/parsetest/: Makefile (1.2), configfile (1.1),
+	parsetest.c (1.2): debugging parser test 
+
+2000-07-06 03:11  sussman
+
+	* libsvn_subr/: svn_error.c (1.6), svn_error.h (1.5), svn_parse.c
+	(1.7), svn_parse.h (1.2), parsetest/Makefile (1.1),
+	parsetest/parsetest.c (1.1): svn_error.c and svn_parse.c actually
+	compile now.  
+
+2000-07-06 02:37  sussman
+
+	* libsvn_subr/svn_parse.c (1.6): time to write a parser test
+	program 
+
+2000-07-06 01:06  sussman
+
+	* libsvn_subr/svn_parse.c (1.5): almost done coding parser... heh 
+
+2000-07-06 00:22  sussman
+
+	* libsvn_subr/svn_parse.c (1.4): save, save, save...  
+
+2000-07-05 22:58  sussman
+
+	* libsvn_subr/: alloc.c (1.6), alloc.h (1.6), svn_error.c (1.5),
+	svn_error.h (1.4), svn_parse.c (1.3): removing uncessary alloc
+	files, we're using apr pools now.  
+
+2000-07-05 19:51  sussman
+
+	* include/svn_string.h (1.13), include/svn_types.h (1.15),
+	libsvn_string/stringtest.c (1.6), libsvn_string/svn_string.c
+	(1.14), libsvn_string/tests/stringtest.c (1.6),
+	libsvn_subr/svn_parse.c (1.2): added svn_string_2cstring() 
+
+2000-07-05 19:21  sussman
+
+	* libsvn_svr/server_init.c (1.9), libsvn_subr/svn_parse.c (1.1),
+	libsvn_subr/svn_parse.h (1.1): started writing parser 
+
+2000-07-04 20:28  sussman
+
+	* include/svn_svr.h (1.16), include/svn_types.h (1.14),
+	libsvn_svr/server_fs.c (1.10),
+	libsvn_svr/plugin_security/plugin_security.c (1.7): really big
+	checkin 
+
+2000-07-04 18:17  sussman
+
+	* libsvn_svr/: svn.conf (1.2), plugin_security/svn_security (1.2): 
+	rewrote two example config files using ben's proposed new config
+	file format 
+
+2000-07-04 03:17  sussman
+
+	* include/svn_types.h (1.13), libsvn_svr/server_fs.c (1.9): 
+	fleshing out filesystem wrappers in full, ahhh.  
+
+2000-07-04 02:30  sussman
+
+	* include/svn_svr.h (1.15), libsvn_svr/server_fs.c (1.8): adding
+	internal, non-exported routines to server library 
+
+2000-07-04 01:47  sussman
+
+	* include/svn_svr.h (1.14), libsvn_svr/server_fs.c (1.7),
+	libsvn_svr/server_init.c (1.8), libsvn_subr/svn_error.c (1.4),
+	libsvn_subr/svn_error.h (1.3): save save save 
+
+2000-07-04 01:12  sussman
+
+	* libsvn_subr/svn_error.c (1.3), libsvn_svr/server_init.c (1.7): 
+	error handler 
+
+2000-07-04 00:52  sussman
+
+	* libsvn_subr/svn_error.c (1.2), libsvn_subr/svn_error.h (1.2),
+	libsvn_svr/server_init.c (1.6): simple error handling stuff started 
+
+2000-07-03 23:25  kfogel
+
+	* include/svn_error.h (1.2), libsvn_subr/svn_error.h (1.1): Move
+	svn_error.h from include/ to svn_subr/, because it's an internal 
+	interface, not an exported one.  
+
+2000-07-03 23:22  sussman
+
+	* include/svn_error.h (1.1), libsvn_subr/svn_error.c (1.1): adding
+	error handling files 
+
+2000-07-03 19:56  sussman
+
+	* include/svn_svr.h (1.13), include/svn_types.h (1.12),
+	libsvn_svr/server_fs.c (1.6), libsvn_svr/server_init.c (1.5): Many
+	changes; using svn_strings, ap_arrays, ap_hashes, and ap_pools in
+	many new places.  
+
+2000-07-01 01:42  sussman
+
+	* include/svn_string.h (1.12), include/svn_svr.h (1.12),
+	include/svn_types.h (1.11), libsvn_svr/server_fs.c (1.5),
+	libsvn_svr/server_init.c (1.4),
+	libsvn_svr/plugin_security/plugin_security.c (1.6): save, save,
+	save 
+
+2000-06-30 23:09  kfogel
+
+	* include/svn_wc.h (1.1): Oops, forgot to add this header file in
+	the previous commit.  
+
+2000-06-30 23:08  kfogel
+
+	* include/svn_svr.h (1.11), include/svn_types.h (1.10),
+	libsvn_wc/README (1.1): Started working copy management library.  
+	
+	Update other headers and docs to note some `todo' items.  
+
+2000-06-29 20:57  sussman
+
+	* include/svn_string.h (1.11), libsvn_string/svn_string.c (1.13): 
+	peppered const's into string library.  yum.  
+
+2000-06-24 01:46  kfogel
+
+	* libsvn_string/Makefile (1.5): Applied Greg Stein
+	<gstein@lyra.org>'s patch fixing TABs, for compatibility with GNU
+	Make 3.77.  
+
+2000-06-23 20:52  sussman
+
+	* include/svn_string.h (1.10), libsvn_string/stringtest.c (1.5),
+	libsvn_string/svn_string.c (1.12), libsvn_string/tests/stringtest.c
+	(1.5): committed changes suggested by Greg Stein 
+
+2000-06-23 20:05  sussman
+
+	* libsvn_string/svn_string.c (1.11): hacky hacky 
+
+2000-06-23 15:21  sussman
+
+	* libsvn_string/Makefile (1.4): tweak 
+
+2000-06-23 15:11  sussman
+
+	* include/svn_string.h (1.9), libsvn_string/Makefile (1.3),
+	libsvn_string/stringtest.c (1.4), libsvn_string/svn_string.c
+	(1.10), libsvn_string/tests/stringtest.c (1.4): bytestrings now
+	work correctly with ap_pool_t 
+
+2000-06-22 23:48  sussman
+
+	* include/svn_string.h (1.8), libsvn_string/Makefile (1.2),
+	libsvn_string/stringtest.c (1.3), libsvn_string/svn_string.c (1.9),
+	libsvn_string/tests/stringtest.c (1.3): libsvn_string now uses
+	ap_pool_t instead of malloc;  but having LD problems trying to link
+	libapr.a in, argh 
+
+2000-06-21 18:54  sussman
+
+	* include/svn_string.h (1.7), libsvn_string/stringtest.c (1.2),
+	libsvn_string/svn_string.c (1.8), libsvn_string/tests/stringtest.c
+	(1.2): finished bytestring library and little test program.  
+
+2000-06-21 18:29  sussman
+
+	* include/svn_string.h (1.6), include/svn_types.h (1.9),
+	libsvn_string/Makefile (1.1), libsvn_string/stringtest.c (1.1),
+	libsvn_string/svn_string.c (1.7), libsvn_string/tests/stringtest.c
+	(1.1): adding tests 
+
+2000-06-21 17:28  sussman
+
+	* include/svn_string.h (1.5), libsvn_string/svn_string.c (1.6): 
+	added convenience routine 
+
+2000-06-21 17:11  sussman
+
+	* include/svn_string.h (1.4), libsvn_string/svn_string.c (1.5): 
+	fixed string routines 
+
+2000-06-21 15:14  sussman
+
+	* include/svn_string.h (1.3), libsvn_string/svn_string.c (1.4): 
+	about to fix errors 
+
+2000-06-20 22:16  kfogel
+
+	* libsvn_vcdiff/: Makefile (1.3), vdelta.c (1.4), tests/README
+	(1.2), tests/target0.txt (1.1): Added test with example text from
+	vdelta paper.  
+	
+	(make_vdelta): replaces take_delta().  Describe algorithm and
+	planned improvements in expository comment at top.  DTRT at end of
+	sequence.  Note o-b-o-e.  
+	
+	(main): Allow deltas against null source, since it's just
+	compression anyway.  
+
+2000-06-20 21:10  sussman
+
+	* include/svn_string.h (1.2), include/svn_types.h (1.8),
+	libsvn_string/svn_string.c (1.3): added bytestring routines 
+
+2000-06-19 23:48  kfogel
+
+	* libsvn_vcdiff/Makefile (1.2), libsvn_vcdiff/hash.c (1.3),
+	libsvn_vcdiff/hash.h (1.2), libsvn_vcdiff/vdelta.c (1.3),
+	libsvn_vcdiff/tests/README (1.1), libsvn_vcdiff/tests/source.txt
+	(1.1), libsvn_vcdiff/tests/target1.txt (1.1),
+	libsvn_vcdiff/tests/target2.txt (1.1),
+	libsvn_vcdiff/tests/target3.txt (1.1),
+	libsvn_vcdiff/tests/target4.txt (1.1),
+	libsvn_vcdiff/tests/target5.txt (1.1), libsvn_subr/alloc.c (1.5),
+	libsvn_subr/alloc.h (1.5): Commit what I have, though further
+	research with xdelta may make it moot.  
+	
+	This is a working binary diff engine now, by the way, though the 
+	output format is kind of bogus. :-)  Run `make', then `make test' to 
+	see it in action.  (Start at the top of the output and work your way 
+	down, for best comprehension, and read tests/README too.) 
+
+2000-06-19 21:52  sussman
+
+	* libsvn_string/svn_string.c (1.2): save 
+
+2000-06-19 21:32  sussman
+
+	* include/svn_string.h (1.1), include/svn_types.h (1.7),
+	libsvn_string/svn_string.c (1.1): add string files 
+
+2000-06-19 21:14  sussman
+
+	* include/svn_types.h (1.6), libsvn_svr/README (1.1): save 
+
+2000-06-16 22:58  sussman
+
+	* include/svn_svr.h (1.10), libsvn_svr/server_fs.c (1.4),
+	libsvn_svr/server_init.c (1.3),
+	libsvn_svr/plugin_security/plugin_security.c (1.5): plugins now
+	register themselves, rather than the server digging for them 
+
+2000-06-16 22:22  sussman
+
+	* include/svn_svr.h (1.9), include/svn_types.h (1.5),
+	libsvn_svr/server_fs.c (1.3): wrote authorization_hooks glue code
+	iterator thingie 
+
+2000-06-16 21:21  sussman
+
+	* include/svn_svr.h (1.8), libsvn_svr/server_init.c (1.2),
+	libsvn_svr/plugin_security/plugin_security.c (1.4): save save save 
+
+2000-06-16 17:33  sussman
+
+	* include/svn_svr.h (1.7), libsvn_svr/server_init.c (1.1),
+	libsvn_svr/plugin_security/plugin_security.c (1.3): saving work 
+
+2000-06-16 16:56  sussman
+
+	* include/svn_svr.h (1.6), include/svn_types.h (1.4),
+	libsvn_svr/server_fs.c (1.2),
+	libsvn_svr/plugin_security/plugin_security.c (1.2): save work 
+
+2000-06-16 01:58  kfogel
+
+	* libsvn_vcdiff/vdelta.c (1.2): Pseudocode outline.  
+	
+	Time to sleep.  
+
+2000-06-16 01:53  kfogel
+
+	* libsvn_vcdiff/vdelta.c (1.1): Start vdelta driver.  
+
+2000-06-16 01:53  kfogel
+
+	* libsvn_subr/: alloc.c (1.4), alloc.h (1.4): Call it
+	svn_slurp_file().  
+	
+	(Yes, I will check out APR tomorrow. :-) ) 
+
+2000-06-16 01:52  kfogel
+
+	* libsvn_subr/: alloc.c (1.3), alloc.h (1.3): Added slurp_file(),
+	with some reservations.  
+
+2000-06-16 01:24  kfogel
+
+	* libsvn_vcdiff/hash.c (1.2): silly formatting fix 
+
+2000-06-16 01:24  kfogel
+
+	* libsvn_vcdiff/Makefile (1.1), libsvn_vcdiff/hash.c (1.1),
+	libsvn_vcdiff/hash.h (1.1), libsvn_subr/alloc.c (1.2),
+	libsvn_subr/alloc.h (1.2): Started hash tables for use in vdelta.  
+
+2000-06-16 00:50  kfogel
+
+	* libsvn_subr/: alloc.c (1.1), alloc.h (1.1): started subr library 
+
+2000-06-15 22:59  sussman
+
+	* include/svn_svr.h (1.5), include/svn_types.h (1.3),
+	libsvn_svr/server_fs.c (1.1), libsvn_svr/svn_security (1.4),
+	libsvn_svr/plugin_security/plugin_security.c (1.1),
+	libsvn_svr/plugin_security/svn_security (1.1): started writing
+	server code and a first plugin 
+
+2000-06-15 18:25  sussman
+
+	* include/svn_svr.h (1.4), libsvn_svr/svn_security (1.3): tweak 
+
+2000-06-15 17:14  sussman
+
+	* libsvn_svr/svn_security (1.2): fixed backslashes 
+
+2000-06-14 22:20  sussman
+
+	* libsvn_svr/svn_security (1.1): added sample per-repository
+	permissions file 
+
+2000-06-14 22:11  sussman
+
+	* include/svn_svr.h (1.3): added svn_getuser () 
+
+2000-06-14 01:21  kfogel
+
+	* libsvn_vcdiff/: README (1.1), draft-korn-vcdiff-01.txt (1.1): 
+	moved from ../libsvn_vdiff 
+
+2000-06-13 15:34  sussman
+
+	* include/svn_types.h (1.2): changed typedefs for common svn types 
+
+2000-06-10 17:21  sussman
+
+	* libsvn_svr/svn.conf (1.1): sample svn.conf file, for general
+	subversion server behavior (*not* per-repository) 
+
+2000-06-09 22:29  sussman
+
+	* include/: svn_svr.h (1.2), svn_types.h (1.1): First stab at
+	global types, and basic declarations of server library.  
+
+2000-06-09 18:38  sussman
+
+	* include/svn_svr.h (1.1): saving work 
+
+2000-06-06 17:47  kfogel
+
+	* svn-dev.el (1.1): New files.  
+
+2000-06-05 21:58  kfogel
+
+	* LICENSE (1.1): license for new source code directory 
+

@@ -1,0 +1,15 @@
+Changes
+lib/Class/DBI/Plugin/MultiDatabases.pm
+Makefile.PL
+MANIFEST
+README
+t/00-init.t
+t/01-base.t
+t/02-exception.t
+t/99-end.t
+t/lib/Music/Artist.pm
+t/lib/Music/CD.pm
+t/lib/Music/DBI.pm
+t/lib/Music/LinerNotes.pm
+t/lib/Music/NotSub.pm
+META.yml                                 Module meta-data (added by MakeMaker)

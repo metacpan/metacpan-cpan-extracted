@@ -1,0 +1,39 @@
+Revision history for Catalyst-Controller-Imager
+
+0.06    2014-01-12
+        * added a mocked $c->stash() method to make failing tests work again
+        * stringified MIME content-type value to avoid errors in latest
+          Catalyst version
+
+0.05    2013-02-22
+        * added the requested file path to the error message in case a file
+          was not found [Alexander Kohsiek]
+
+        2011-11-26
+        * bumped Imager version to 0.86 and expanded requirements by
+          Imager::File::(GIF|JPEG|PNG) in order to give proper feedback
+          feedback during install failures and re-allow automated testing
+
+0.04    2011-05-10
+        * modified Makefile.PL to avoid running CPAN Testers
+          reason: Imager must be configured with gif, jpeg and png support
+          which is not the default but makes sense for a web environment.
+
+0.03    2011-05-03
+        * changed size-test limits for gif files,
+          some tests failed with certain gif-libs
+
+        2010-04-09
+        * switched to Dist::Zilla
+
+0.02    2010-03-18
+        * changed scale type to 'mixing'
+          improves very small thumbnail's quality
+          no visual changes for other sizes
+        * typo changes in docs
+        * eliminated trunk directory in repository
+        * changed from Module::Build to Module::Install
+
+0.01    2009-07-03
+        * First version, released on an unsuspecting world.
+

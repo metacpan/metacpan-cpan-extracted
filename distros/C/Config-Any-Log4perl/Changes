@@ -1,0 +1,15 @@
+
+Revision history
+----------------
+
+0.130020  2013-01-02 22:00:03 Europe/Paris
+          Use Dist::Zilla
+
+0.03      21.04.2012
+          Cosmetic changes and add prerequisite module 'parent' for Build.PL
+
+0.02      07.02.2012
+          Added 'parent' in the prerequisites
+
+0.01      05.02.2012
+          First version, released by LOSYME

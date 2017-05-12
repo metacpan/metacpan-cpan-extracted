@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 243
+    - 236
+  53982:
+    - 73
+name: fdcbec
+registers:
+  AF: 14500
+  AF_: 0
+  BC: 1984
+  BC_: 0
+  DE: 27886
+  DE_: 0
+  HL: 59157
+  HL_: 0
+  I: 0
+  IX: 61792
+  IY: 53995
+  PC: 0
+  R: 0
+  SP: 0

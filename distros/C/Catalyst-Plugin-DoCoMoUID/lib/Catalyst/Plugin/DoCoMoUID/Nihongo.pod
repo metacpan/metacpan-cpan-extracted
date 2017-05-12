@@ -1,0 +1,33 @@
+=encoding utf-8
+
+=head1 NAME
+
+Catalyst::Plugin::DoCoMoUID::Nihongo - HTTPリクエストヘッダにDoCoMoのuidを追加する
+
+=head1 概要
+
+ sub default : Private {
+     my ( $self, $c ) = @_;
+     my $uid = $c->req->header('X-DoCoMo-UID');
+ }
+
+=head1 説明
+
+このモジュールはL<Apache::DoCoMoUID>と似たような処理をするCatalystのプラグインです。
+
+DoCoMoのuidをHTTPリクエストヘッダにX-DoCoMo-UIDという名前で追加します。
+
+=head1 作者
+
+宮崎 一徹 E<lt>ittetsu.miyazaki@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Apache::DoCoMoUID>
+
+=cut

@@ -1,0 +1,55 @@
+                            Class::Phrasebook
+                            Class::Phrasebook::SQL
+
+  Copyright (c) 2001-2002 Ockham Technology N.V. & Rani Pinchuk.  
+  All rights reserved.  
+  This package is free software; you can redistribute it and/or 
+  modify it under the same terms as Perl itself.
+
+DESCRIPTION
+  
+  Class::Phrasebook implements the Phrasebook pattern. It lets us create
+  dictionaries of phrases. Each phrase can be accessed by a unique
+  key. Each phrase may have placeholders. Group of phrases are kept in
+  a dictionary. The first dictionary is the default one - which means
+  that it will always be read. One of the dictionaries might be used
+  to override the default one. The phrases are kept in an XML
+  document. 
+
+  See The Phrasebook Pattern - Yonat Sharon & Rani Pinchuk - PLoP2K -
+  http://jerry.cs.uiuc.edu/~plop/plop2k/proceedings/Pinchuk/Pinchuk.pdf
+  for some reasons for using this class.
+
+  Class::Phrasebook::SQL inherits from Class::Phrasebook and let us
+  manage all the SQL code we have in a project, in one file. The is
+  done by placing all the SQL statements as phrases in the XML file of
+  the Class::Phrasebook.   
+
+PREREQUISITES
+
+  Log::LogLite 0.2,
+  IO::LockedFile 0.1,
+  Term::ANSIColor 1.03,
+  XML::Parser 2.30
+
+INSTALLATION
+
+  Follow the standard installation procedure for Perl modules, which is to
+  type the following commands:
+
+          perl Makefile.PL
+          make
+          make test
+          make install
+
+  You'll probably need to do the last as root.  
+
+AUTHOR NOTES
+
+  These classes are used for quite a long time in our company.
+  Yet, it is very new in CPAN. If there are problems, suggestions 
+  or comments - please email me.
+
+Rani Pinchuk
+rani@cpan.org
+

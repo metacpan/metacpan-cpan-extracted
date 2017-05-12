@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Catalyst-Model-CDBI-CRUD
+version:      0.04
+version_from: CRUD.pm
+installdirs:  site
+requires:
+    Catalyst:                      2.99
+    Catalyst::Model::CDBI:         0
+    Catalyst::View::TT:            0
+    Class::DBI:                    0
+    Class::DBI::AsForm:            0
+    Class::DBI::FromForm:          0
+    Class::DBI::Loader:            0
+    Class::DBI::Plugin::RetrieveAll: 0
+    Template::Plugin::Class:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

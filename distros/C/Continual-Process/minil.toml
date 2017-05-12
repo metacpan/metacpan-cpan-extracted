@@ -1,0 +1,6 @@
+name = "Continual-Process"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

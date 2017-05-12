@@ -1,0 +1,29 @@
+---
+abstract: "Easily create, use, and verify CAPTCHAs in\nCGI::Application-based web applications."
+author:
+  - 'Jason A. Crome <cromedome@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::WWW::Mechanize: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-CAPTCHA
+provides:
+  CGI::Application::Plugin::CAPTCHA:
+    file: lib/CGI/Application/Plugin/CAPTCHA.pm
+    version: 0.04
+requires:
+  CGI::Application: 4.00
+  Data::Random: 0
+  Digest::SHA1: 0
+  GD::SecurityImage: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/cromedome/cgi-application-plugin-captcha
+version: 0.04

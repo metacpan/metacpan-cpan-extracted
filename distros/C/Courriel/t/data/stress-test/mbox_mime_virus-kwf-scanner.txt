@@ -1,0 +1,54 @@
+From tomcat-user-return-106130-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Sat Jul 24 05:56:04 2004
+Return-Path: <tomcat-user-return-106130-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 4473 invoked from network); 24 Jul 2004 05:56:04 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur-2.apache.org with SMTP; 24 Jul 2004 05:56:04 -0000
+Received: (qmail 83489 invoked by uid 500); 24 Jul 2004 05:55:42 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 83466 invoked by uid 500); 24 Jul 2004 05:55:41 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 83453 invoked by uid 99); 24 Jul 2004 05:55:41 -0000
+X-ASF-Spam-Status: No, hits=7.9 required=10.0
+        tests=MIME_MISSING_BOUNDARY,MISSING_MIMEOLE,NO_REAL_NAME,PRIORITY_NO_NAME,SUB_HELLO,X_MSMAIL_PRIORITY_HIGH,X_PRIORITY_HIGH
+X-Spam-Check-By: apache.org
+Received: from [202.141.137.170] (HELO jakarta.apache.org) (202.141.137.170)
+  by apache.org (qpsmtpd/0.27.1) with ESMTP; Fri, 23 Jul 2004 22:55:39 -0700
+From: jfrederic.clere@fujitsu-siemens.com
+To: tomcat-user@jakarta.apache.org
+Subject: Hello
+Date: Sat, 24 Jul 2004 11:20:10 +0800
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0006_0000519C.00003BBE"
+X-Priority: 1
+X-MSMail-Priority: High
+X-Virus-Checked: Checked
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+------=_NextPart_000_0006_0000519C.00003BBE
+Content-Type: text/plain;
+        charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+
+Important notice!
+
+
+------=_NextPart_000_0006_0000519C.00003BBE
+Content-Type: TEXT/PLAIN
+
+KWF Email scanner found a virus in following attachment:
+        Notice.zip
+Content type:
+        application/octet-stream
+Additional information from antivirus:
+        W95/Spaces.gen
+Attachement has been removed by firewall.

@@ -1,0 +1,58 @@
+Revision history for Perl extension Chef-Knife-Cmd
+
+0.15 2017-03-06T07:46:05Z
+    - Added support for 'knife vault download'
+
+0.14 2016-05-30T17:16:48Z
+    - Added support for 'knife vault remove'
+
+0.13 2016-05-18T01:58:27Z
+    - Added $item param to $knife->data_bag->show().  May not be backwards
+      compatible depending on what arguments your code passes to show().
+
+0.12 2016-05-15T02:18:34Z
+    - Added support for 'knife vault list'
+    - Added support for 'knife vault delete'
+
+0.11 2016-04-16T01:27:35Z
+    - Added support for 'knife node from file'
+
+0.10 2015-12-16T10:53:56Z
+    - Updated to use the latest version of Shell::Carapace.  Just updated the
+      cpanfile.
+
+0.09 2015-11-14T02:31:46Z
+    - Updated to use the latest version of Shell::Carapace.  To support this,
+      added the callback attribute
+
+0.08 2015-09-07T03:13:17Z
+    - Using Shell::Carapace v0.13.
+
+0.07 2015-09-05T22:28:05Z
+    - This version is not backwards compatible with the previous version
+    - Removed verbose, print_cmd, and logfile attributes
+    - Added the callback attribute
+    - The above changes are due to updates in the latest version of
+      Shell::Carapace and provide a more flexible user interface for logging.
+
+0.06 2015-05-23T19:04:47Z
+    - Make Minilla a develop dependency instead of a build dependency
+
+0.05 2015-05-10T21:13:55Z
+    - Added support for 'knife data bag show'
+    - Added support for 'knife search node'
+    - Added support for 'knife search index'
+
+0.04 2015-02-09T21:03:56Z
+    - Updates to pod
+
+0.03 2015-02-09T17:53:45Z
+    - Logfile param no longer required
+
+0.02 2015-02-09T12:59:53Z
+    - Automatic decoding when '--format json' is used
+    - Minor pod updates
+
+0.01 2015-02-09T01:06:44Z
+    - Original version
+

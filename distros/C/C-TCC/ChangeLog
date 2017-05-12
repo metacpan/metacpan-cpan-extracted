@@ -1,0 +1,23 @@
+2009-08-03  Tsukasa Hamano  <hamano@cpan.org>
+
+	* Suppurted tcc-0.9.25
+	* Release 0.05
+
+2009-02-21  Tsukasa Hamano  <hamano@klab.org>
+
+	* Added document and test
+	* Release 0.04
+
+2008-03-18  Tsukasa Hamano  <hamano@klab.org>
+
+	* Added methods(set_output_type, set_output_file)
+	* Release 0.03
+
+2008-03-17  Tsukasa Hamano  <hamano@klab.org>
+
+	* Added methods(add_include_path, add_sysinclude_path,
+	undefine_symbol, define_symbol)
+	* Release 0.02
+
+2008-03-17  Tsukasa Hamano  <hamano@klab.org>
+	* first released version 0.01

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Path-like config API with multiple file support, directory\nloading and arbitrary backends from Config::Any.",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Path",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Any" : "0",
+            "Hash::Merge" : "0",
+            "JSON::Any" : "0",
+            "JSON::XS" : "0",
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "XML::Simple" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/magazinesdotcom/config-path/issues"
+      },
+      "homepage" : "https://github.com/magazinesdotcom/config-path",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/magazinesdotcom/config-path.git",
+         "web" : "https://github.com/magazinesdotcom/config-path"
+      }
+   },
+   "version" : "0.13"
+}
+

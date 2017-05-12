@@ -1,0 +1,2 @@
+[%# simple proxy for edit view %]
+[% PROCESS crud/view.tt %]

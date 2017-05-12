@@ -1,0 +1,168 @@
+NAME
+    CPAN::Common::Index - Common library for searching CPAN modules, authors
+    and distributions
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+        use CPAN::Common::Index::Mux::Ordered;
+        use Data::Dumper;
+
+        $index = CPAN::Common::Index::Mux::Ordered->assemble(
+            MetaDB => {},
+            Mirror => { mirror => "http://cpan.cpantesters.org" },
+        );
+
+        $result = $index->search_packages( { package => "Moose" } );
+
+        print Dumper($result);
+
+        # {
+        #   package => 'MOOSE',
+        #   version => '2.0802',
+        #   uri     => "cpan:///distfile/ETHER/Moose-2.0802.tar.gz"
+        # }
+
+DESCRIPTION
+    This module provides a common library for working with a variety of CPAN
+    index services. It is intentionally minimalist, trying to use as few
+    non-core modules as possible.
+
+    The "CPAN::Common::Index" module is an abstract base class that defines
+    a common API. Individual backends deliver the API for a particular
+    index.
+
+    As shown in the SYNOPSIS, one interesting application is multiplexing --
+    using different index backends, querying each in turn, and returning the
+    first result.
+
+METHODS
+  search_packages (ABSTRACT)
+        $result = $index->search_packages( { package => "Moose" });
+        @result = $index->search_packages( \%advanced_query );
+
+    Searches the index for a package such as listed in the CPAN
+    02packages.details.txt file. The query must be provided as a hash
+    reference. Valid keys are
+
+    *   package -- a string, regular expression or code reference
+
+    *   version -- a version number or code reference
+
+    *   dist -- a string, regular expression or code reference
+
+    If the query term is a string or version number, the query will be for
+    an exact match. If a code reference, the code will be called with the
+    value of the field for each potential match. It should return true if it
+    matches.
+
+    Not all backends will implement support for all fields or all types of
+    queries. If it does not implement either, it should "decline" the query
+    with an empty return.
+
+    The return should be context aware, returning either a single result or
+    a list of results.
+
+    The result must be formed as follows:
+
+        {
+          package => 'MOOSE',
+          version => '2.0802',
+          uri     => "cpan:///distfile/ETHER/Moose-2.0802.tar.gz"
+        }
+
+    The "uri" field should be a valid URI. It may be a URI::cpan or any
+    other URI. (It is up to a client to do something useful with any given
+    URI scheme.)
+
+  search_authors (ABSTRACT)
+        $result = $index->search_authors( { id => "DAGOLDEN" });
+        @result = $index->search_authors( \%advanced_query );
+
+    Searches the index for author data such as from the CPAN 01mailrc.txt
+    file. The query must be provided as a hash reference. Valid keys are
+
+    *   id -- a string, regular expression or code reference
+
+    *   fullname -- a string, regular expression or code reference
+
+    *   email -- a string, regular expression or code reference
+
+    If the query term is a string, the query will be for an exact match. If
+    a code reference, the code will be called with the value of the field
+    for each potential match. It should return true if it matches.
+
+    Not all backends will implement support for all fields or all types of
+    queries. If it does not implement either, it should "decline" the query
+    with an empty return.
+
+    The return should be context aware, returning either a single result or
+    a list of results.
+
+    The result must be formed as follows:
+
+        {
+            id       => 'DAGOLDEN',
+            fullname => 'David Golden',
+            email    => 'dagolden@cpan.org',
+        }
+
+    The "email" field may not reflect an actual email address. The 01mailrc
+    file on CPAN often shows "CENSORED" when email addresses are concealed.
+
+  index_age
+        $epoch = $index->index_age;
+
+    Returns the modification time of the index in epoch seconds. This may
+    not make sense for some backends. By default it returns the current
+    time.
+
+  refresh_index
+        $index->refresh_index;
+
+    This ensures the index source is up to date. For example, a remote
+    mirror file would be re-downloaded. By default, it does nothing.
+
+  attributes
+    Return attributes and default values as a hash reference. By default
+    returns an empty hash reference.
+
+  validate_attributes
+        $self->validate_attributes;
+
+    This is called by the constructor to validate any arguments. Subclasses
+    should override the default one to perform validation. It should not be
+    called by application code. By default, it does nothing.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/CPAN-Common-Index/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/CPAN-Common-Index>
+
+      git clone https://github.com/dagolden/CPAN-Common-Index.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Helmut Wollmersdorfer <helmut@wollmersdorfer.at>
+
+    *   Kenichi Ishigaki <ishigaki@cpan.org>
+
+    *   Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

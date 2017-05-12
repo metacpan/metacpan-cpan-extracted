@@ -1,0 +1,29 @@
+---
+abstract: 'Compute digest of uploads with L<Digest>'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-Upload-Digest
+no_index:
+  directory:
+    - inc
+    - t
+    - example
+requires:
+  Catalyst: 5.2
+  Digest: 0
+  Test::More: 0
+resources:
+  Ratings: http://cpanratings.perl.org/d/Catalyst-Plugin-Upload-Digest
+  bugtracker: http://github.com/avar/catalyst-plugin-upload-digest/issues
+  homepage: http://search.cpan.org/dist/Catalyst-Plugin-Upload-Digest/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/avar/catalyst-plugin-upload-digest
+version: 0.03

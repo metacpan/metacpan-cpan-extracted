@@ -1,0 +1,28 @@
+Class/Colon version 0.01
+========================
+
+Class::Colon turns each line of a colon separated file into an object
+with one attribute for each field.  This version only supports reading
+files.  Future versions will allow writing out the whole file and
+updating individual lines just as soon as you send those patches.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Nothing but Perl.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.8.1 itself. 
+

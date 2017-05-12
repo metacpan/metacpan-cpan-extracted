@@ -1,0 +1,39 @@
+IO-CaptureSystemIO version 0.01
+=============================
+
+ABOUT IO-CaptureSystemIO
+
+Runs a system command from within Perl and captures both STDOUT
+and STDERR;
+  
+provides exception based interface to SIGINT and SIGQUIT;
+
+provides exceptions for non-zero return values.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Devel::StackTrace
+  Class::Data::Inheritable
+  Exception::Class
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2008 - 2010, Remote Linux, Inc.  All rights reserved.
+
+Portions Copyright (c) 2009-2010, Public Karma, Inc.
+
+Portions lifted from IO::CaptureOutput; copyright belongs to the respective authors.
+
+You may distribute under the terms of either the GNU General Public License or the Artistic License, as specified in the Perl README file.
+

@@ -1,0 +1,31 @@
++ 2007/03/05 vers 1.07
+
+Change the license terms: now the same as perl.
+
++ 2004/05/31 vers 1.05
+
+Alan D. Salewski <asalewski1121 at comcast.net> sent a patch
+(not used) to fix a warning in the test suite.  Fixed.
+
+Don't run store.t unless Storable is fairly recent.
+
++ 2002/11/20 vers 1.04
+
+Can now create callback objects from callback objects.
+
+Fix t/store.t -- it appears that the old require syntax for
+specific versions no longer works.
+
++ 2001/03/29 vers 1.02 & 1.03
+
+Changes from Raphael Manfredi <Raphael_Manfredi at pobox.com> to
+add serialize method callbacks using Storable.
+
+In addition Callback now dies if a method for a method callback
+does not exist at the time of creation.
+
++ 2000/08/22 vers 1.02
+
+Changes from Raphael Manfredi <Raphael.Manfredi at st.com> to 
+add the method form of callback invocation.
+

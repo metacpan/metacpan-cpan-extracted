@@ -1,0 +1,34 @@
+NAME
+    Catalyst::Action::Serialize::XML::Hash::LX - XML::Hash::LX serializer
+    for Catalyst
+
+SYNOPSIS
+        package Foo::Controller::Bar;
+
+        __PACKAGE__->config(
+        default => 'text/xml',
+        map => {
+            'text/xml' => 'XML::Hash::LX',
+            # or 
+            'text/xml' => [ 'XML::Hash::LX', { XML::Hash::LX options } ],
+        },
+        )
+        sub end : ActionClass('Serialize') {}
+
+DESCRIPTION
+    XML::Hash::LX serializer for Catalyst::Action::Serialize
+
+SEE ALSO
+    *   Catalyst::Action::Serialize
+
+    *   XML::Hash::LX
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

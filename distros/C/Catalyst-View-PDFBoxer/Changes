@@ -1,0 +1,6 @@
+Revision history for Perl extension Catalyst::View::PDFBoxer.
+
+0.001   10/11/11
+        - first release
+        - extend View::TT to process output with PDF::Boxer
+        - morph module into a role so it can be used with any view (as suggested by Tomas Doran)

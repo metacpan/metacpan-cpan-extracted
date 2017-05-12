@@ -1,0 +1,115 @@
+Config::Objective 0.9.1 - 7/23/03
+-----------------------
+
+- fixed bugs in test.conf to avoid "make test" failure
+
+-------------------------------------------------------------------------------
+
+Config::Objective 0.9 - 7/23/03
+---------------------
+
+- changed parser to allow multiple arguments to a method call
+- added new methods to Config::Objective::Table to use multiple args:
+  insert_row(), find_row(), replace_row_cells(), and append_to_row_cells()
+- added prepend() and gsub() methods to Config::Objective::String class
+- added find() and exists() methods to Config::Objective::Hash class
+- fixed Config::Objective::Hash->insert() to allow value_optional to trump
+  value_type and value_abspath
+
+-------------------------------------------------------------------------------
+
+Config::Objective 0.8 - 5/26/03
+---------------------
+
+- fixed config grammar bug that broke nested %if blocks
+
+-------------------------------------------------------------------------------
+
+Config::Objective 0.7 - 3/4/03
+---------------------
+
+- fixed documentation typos
+- fixed Config::Objective::DataType->new() to accept a default value for
+  the object
+- allow backslash-escaped quotes inside of quoted strings
+- improved error reporting
+
+-------------------------------------------------------------------------------
+
+Config::Objective 0.6 - 1/30/03
+---------------------
+
+- updated README file
+- minor documentation cleanups
+- added boolean '!' operator to expression syntax
+- cleaned up config grammar
+- require parens around conditional expressions
+- improved error reporting
+- split Config::Objective::DataType into multiple modules w/full documentation
+
+-------------------------------------------------------------------------------
+
+Config::Objective 0.5 - 1/18/03
+---------------------
+
+- renamed Config::Structured to Config::Objective
+- finished man page
+
+-------------------------------------------------------------------------------
+
+Config::Structured 0.4 - 11/25/02
+----------------------
+
+- accept "true", "false", 1, and 0 as values for boolean variables
+- don't process %include directives inside false conditionals
+- fixed grammar bug in conditional parsing
+- improved error reporting
+- added "%elif" conditional directive
+- fixed parser to detect unterminated "%if" block
+- added support for parenthesis and boolean '&&' and '||' operators
+  in conditional expression syntax
+
+-------------------------------------------------------------------------------
+
+Config::Structured 0.3 - 10/31/02
+----------------------
+
+- minor code cleanup
+- fixed bug in Config::Structured::Hash class when using list values
+- added var_obj() method
+
+-------------------------------------------------------------------------------
+
+Config::Structured 0.2 - 10/2/02
+----------------------
+
+- use Parse::Lex and Parse::Yapp instead of Parse::RecDescent
+- fixed Makefile.PL to create man page
+- fixed Config::Structured::Hash to handle appending data to list and
+  hash values
+- added Config::Structured::Table data type
+
+-------------------------------------------------------------------------------
+
+Config::Structured 0.1 - 9/26/02
+----------------------
+
+- updated README and MANIFEST
+- added COPYRIGHT file
+- moved readconfig.pl code into test.pl
+- added alternate data types
+- require list of variables and types to be passed to
+  Config::Structured->new()
+- moved config file parsing to parse() method
+- added AUTOLOAD() method for direct variable access
+- added conditional directives
+- added file inclusion directive
+
+-------------------------------------------------------------------------------
+
+Config::Structured 0.01 - 8/5/02
+-----------------------
+
+- initial import
+  (created by h2xs 1.21 with options "-n Config::Structured -X")
+

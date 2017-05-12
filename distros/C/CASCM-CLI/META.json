@@ -1,0 +1,79 @@
+{
+   "abstract" : "A unified CLI for CA Harvest SCM",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "cascm",
+      "harvest",
+      "cli",
+      "hv"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CASCM-CLI",
+   "no_index" : {
+      "directory" : [
+         ".author",
+         ".t",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.00",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.340201"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CASCM::Wrapper" : "1.000001",
+            "Config::Tiny" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Getopt::Mini" : "0",
+            "Hash::Merge" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::Callback" : "0",
+            "Object::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "CASCM::CLI" : {
+         "file" : "lib/CASCM/CLI.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-cascm-cli/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-cascm-cli",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-cascm-cli.git"
+      }
+   },
+   "version" : "v0.1.1"
+}

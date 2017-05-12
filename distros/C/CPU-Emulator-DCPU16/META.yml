@@ -1,0 +1,35 @@
+---
+abstract: "an emulator for Notch's DCPU-16 virtual CPU for the game 0x10c"
+author:
+  - 'Simon Wistow <simon@thegestalt.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPU-Emulator-DCPU16
+provides:
+  CPU::Emulator::DCPU16:
+    file: lib/CPU/Emulator/DCPU16.pm
+    version: 0.3
+  CPU::Emulator::DCPU16::Assembler:
+    file: lib/CPU/Emulator/DCPU16/Assembler.pm
+    version: 0
+  CPU::Emulator::DCPU16::Device:
+    file: lib/CPU/Emulator/DCPU16/Device.pm
+    version: 0
+  CPU::Emulator::DCPU16::Device::Console:
+    file: lib/CPU/Emulator/DCPU16/Device/Console.pm
+    version: 0
+  CPU::Emulator::DCPU16::Disassembler:
+    file: lib/CPU/Emulator/DCPU16/Disassembler.pm
+    version: 0
+requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.3

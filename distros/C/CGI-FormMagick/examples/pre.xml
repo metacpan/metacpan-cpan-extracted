@@ -1,0 +1,7 @@
+<form title="EventTest" header="head.tmpl" footer="foot.tmpl" pre-event="form_pre" post-event="say_hello">
+    <page name="PreEventTestingPage" pre-event="page_pre" post-event="page_post">
+        <field id="name" type="text" value="showUptime()" size="64">
+            <label>Current system uptime:</label>
+        </field>
+    </page>
+</form>

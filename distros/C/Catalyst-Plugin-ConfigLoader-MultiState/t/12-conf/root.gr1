@@ -1,0 +1,2 @@
+root;
+$gr1_var = l('gr1_var') * 100;

@@ -1,0 +1,146 @@
+#cpac_banner {
+    background-color: #E8CECC;
+    border: 1px solid #C9AFAF;
+    text-align: center;
+    border: 1px;
+    margin: 4px 4px 2px 4px;
+}
+
+#cpac_banner_icons {
+    position: absolute;
+    left: 10px;
+    top: 6px;
+    border: 0px;
+    /* background-color: #FFFFFF; */
+}
+
+#cpac_banner_icons img {
+    border: 0px;
+    border-style: none;
+}
+
+div.cpac_box {
+    position: relative;
+    border: 0px;
+    padding: 0px;
+    margin: 0px 2px 0px 2px;
+}
+
+#cpac_header {
+    background-color: #E2F0FF;
+    border: 1px solid #BED3DD;
+    font-size: small;
+    padding: 6px 4px 10px 4px;
+    margin: 4px 4px 2px 4px;
+}
+
+#cpac_header p,
+#cpac_header h3,
+#cpac_header br {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+
+#cpac_navcontainer {
+    margin-left: 20px;
+}
+
+#cpac_navcontainer ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+#cpac_navcontainer li {
+    margin: 0 0 .2em 0;
+}
+
+#cpac_navcontainer a {
+    display: block;
+    background-color: #369;
+    color: #FFF;
+    width: 9em;
+    padding: .2em .8em;
+    text-decoration: none;
+}
+
+#cpac_navcontainer a:hover {
+    background-color: #036;
+    color: #FFF;
+}
+
+#cpac_footer {
+    background-color: #E2F0FF;
+    border: 1px solid #BED3DD;
+    font-size: xx-small;
+    text-align: right;
+    padding: 2px;
+    margin: 0px 4px 0px 4px;
+}
+
+
+a.cpac_link { 
+    text-decoration: none; 
+    color:#225 
+}
+
+a.cpac_link:hover { 
+    text-decoration: underline; 
+    color:#222 
+}
+
+.cpac_table { 
+    border: 0px solid; 
+    background-color: #ffffff;
+    width: 100%;
+}
+
+.cpac_table_header {
+    background-color: #b5cadc;
+    border: 1px solid #778;
+    font: bold 12px Verdana, sans-serif;
+}
+
+.cpac_row { text-align: center; }
+.cpac_stripe { background-color:#e3eaf0; }
+.cpac_cell { font: 12px Verdana, sans-serif; }
+
+.cpac_pager {
+    font: 11px Arial, Helvetica, sans-serif;
+    text-align: center;
+    border: solid 1px #e2e2e2;
+    border-left: 0;
+    border-right: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0px;
+    background-color: #f3f6f8;
+}
+
+.cpac_pager a {
+    padding: 2px 6px;
+    border: solid 1px #ddd;
+    background: #fff;
+    text-decoration: none;
+}
+
+.cpac_pager a:visited {
+    padding: 2px 6px;
+    border: solid 1px #ddd;
+    background: #fff;
+    text-decoration: none;
+}
+
+.cpac_pager .cpac_current-page {
+    padding: 2px 6px;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.cpac_pager a:hover {
+    color: #fff;
+    background: #7d95b5;
+    border-color: #036;
+    text-decoration: none;
+}
+

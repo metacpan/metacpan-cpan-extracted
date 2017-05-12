@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI::ParamComposite.
+
+0.01  Wed Oct  6 18:49:50 2004
+	- original version; created by h2xs 1.23 with options
+		-AXn CGI::ParamComposite
+
+0.011 Same day, a few minutes later.
+	- small doc and Makefile.PL patches.

@@ -1,0 +1,125 @@
+v0.3: Stuff changed or added 
+This alpha should fix part of the test stuff -- the preinstall tests.
+
+I also fixed a couple of small spelling errors.
+3. Simplified TieUser quite a bit.
+       1. Fixed various modules to work with sys.cgi, the HTML browser thingy
+	2. Lots of little things that needed fixing, which I found with sys.cgi
+	3. Added a mail-validate utility; more on that in a moment
+	4. Simplified TieGeneric quite a bit.
+	6. Added more documentation
+	1. the test code is stable
+	2. the layout is done
+	3. the configuration space can mostly be tied into PERL now.
+
+Modules added:
+        1. Added the TieMTab module
+        2. Added the TieRsrc module
+
+Modules changed:
+        all of them, especially Cfgfile, TieGeneric, TieGroup, TieUser
+
+Samples added
+        CfgAliases
+        CfgNamed
+        DNS-find-free
+        mail-validate
+        sys.cgi
+
+ ----
+
+SAMPLES ADDED
+        CfgAliases
+        CfgNamed
+        DNS-find-free
+        mail-validate
+        sys.cgi
+
+CfgAliases is an example utility to modify the /etc/aliases file.  It removes
+aliases, add entries to an aliases, creates aliases, and removes entries from
+aliases.  It has a small test suite.
+
+CfgNamed is the next example utility, a command line DNS modifier.  Its
+purpose is to make life fun and easy with DNS.  Of course, the command line
+parameters have not been fully worked out, so please send me examples of what
+should be included.   CfgNamed right now has no validation tests, and is not
+ready to modify the DNS tables.  It needs a command line interface that
+reflects the operations.
+
+DNS-find-free: what is it and why
+DNS-find-free is simple sample script that employs TieNamed, and uses it to
+check out the DNS tables for a place to allocate usage, and such.  It is an
+example of how to write a script to help assign machine addresses.  It was
+written upon request, and partly supports a second 'feature':  it can
+gather information from ARIN template files, find a free space, and
+generate a SWIP report that is mostly suitable to send to ARIN.  ARIN, by
+the way, is the American Registry for Internet Numbers.  It should be
+relatively easy to modify DNS-find-free to support templates other than
+ARIN's.
+
+DNS-find-free does not change any file, or configuration.  It will only
+generate an SWIP report (and it requires a template to do so).  I am not
+even sure it will parse the ARIN and SWIP files properly, since I've never
+used them.
+
+mail-validate: what is it and why
+mail-validate is simple script that employs TieUser and TieGroup, and uses
+it to check out /var/spool/mail for any oddities, and such.  It is an
+example of how to write a script to validate a system; it is not a
+replacement for actual security checking tools.
+
+In the past, I've added some of the validation stuff to various modules
+(TieNamed, and TieAliases, for example).  The thinking was that the
+subroutines for correcting problems would be nice to be reusable by others.
+Especially since some of them do a lot of cross-reference, and integrity
+checking.  I'm rethinking that, and may move some of it back out into
+separate examples.
+
+The problem is that I don't know of any model for these things.  So, for
+now, their structure is a bit more on the exploratory side.  Having the
+validation routines in with the rest of the interface just confuses things.
+
+
+sys.cgi is a sample CGI to browse configuration space.   Of course, the HTML
+is pretty simple.  Chris Palmer provided a sample CSS to show people how to
+make HTML really pretty, but does *not* require them to change the library
+for the coolness.  It demostrates TieGeneric.  
+
+
+
+MODULES ADDED:
+        1. Added CfgTie::TieMTab module
+        2. Added CfgTie::TieRsrc module
+
+Because I was testing with Quota:: and BSD::Resources, it was fairly cheap
+to add CfgTie::TieMTab and CfgTie::TieRsrc.  TieMTab uses Quota:: (it won't
+tie anything if Quota:: is not installed) to (sorta) retrieve information
+about the mounted file systems.  Quota:: has been extensively ported, so
+this is a very good thing.  Currently, changing the mount table is not
+supported.  TieRsrc is similar: it employs BSD::Resources to check system
+wide resource limitations or set them.  TieRsrc is basically a wrapper.
+
+MODULES CHANGED:
+        Cfgfile
+        TieGeneric-- modified to still work with TieUser,TieGroup
+        TieGroup -- add @ISA and other fiex
+        TieUser  -- small typos, rearchitected
+A reworking of some of the object interlinks.
+
+Changes to Cfgfile. Cfgfile.pm handles most of the real work for updating
+*text* configuration files that do not have their own command-line program for
+modification.  Cfgfile.pm has a new method called 'RENAME' which is used to
+delete elements, and was as change their text name.  Specific objects -- like
+TieAliases -- mostly just format the PERL information into a form that is
+proper for /etc/aliases.  A little bit of this interaction between objects has
+been modified to allow  the RENAME method to be clean.
+
+CfgTie::TieUser has be internally rearchitected.  Various user record keys
+are now system dependent -- if the system does not support them, they keys
+will not exist.  The first example is the Quota:: module, which (if
+installed) is used to report on the given users limits and file system
+usage.  Another one is the BSD::Resources module (if present) can be used
+list how system wide resources the user has employed -- if BSD::Resources
+is installed.  (The 'use' command for these two is wrapped in an 'eval' so
+that CfgTie is useful without them.)  Similar modules can be added.
+

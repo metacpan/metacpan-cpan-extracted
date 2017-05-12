@@ -1,0 +1,12 @@
+This file documents the revision history for Catalyst::Engine::HTTP::Prefork.
+
+0.51    2009-06-12 10:15:00
+        - Added options for pid_file and setsid/background (J. Shirley)
+
+0.50    2008-12-08 16:30:00
+        - Added graceful_restart option which allows children to finish
+          the current request before exiting during a SIGHUP.
+        - Fixed typo in Net::Server option max_requests.
+
+0.01    2008-04-04 21:30:00
+        - Initial release.

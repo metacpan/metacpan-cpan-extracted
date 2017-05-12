@@ -1,0 +1,241 @@
+NAME
+    Class::SelfMethods - a Module for supporting instance-defined methods
+
+SYNOPSIS
+      use Class::SelfMethods;
+
+      package MyClass;
+      @ISA = qw(Class::SelfMethods);
+      use strict;
+
+      sub _friendly {
+        my $self = shift;
+        return $self->name;
+      }
+
+      package main;
+      no strict;
+
+      my $foo = MyClass->new( name => 'foo' );
+      my $bar = MyClass->new( name => 'bar', friendly => 'Bar');
+      my $bas = MyClass->new( name => 'bas',
+                              friendly => sub {
+                                my $self = shift;
+                                return ucfirst($self->_friendly);
+                              }
+                            );
+
+      print $foo->friendly, "\n";
+      print $bar->friendly, "\n";
+      print $bas->friendly, "\n";
+
+      $bas->friendly_SET('a reset friendly');
+      print $bas->friendly, "\n";
+
+      $bas->friendly_SET( sub { my $self = shift; return uc($self->_friendly) });
+      print $bas->friendly, "\n";
+
+      $bas->friendly_CLEAR;
+      print $bas->friendly, "\n";
+
+DESCRIPTION
+    Development of this module has largely lapsed due to the superior
+    performance and feature set of "Class::Prototyped". If you haven't
+    written code that depends upon "Class::SelfMethods", I strongly urge you
+    to look at "Class::Prototyped" first.
+
+    "Class::SelfMethods" merges some features of other Object Oriented
+    languages to build a system for implementing more flexible objects than
+    is provided by default in Perl.
+
+    The core features I was looking for when I wrote "Class::SelfMethods"
+    were:
+
+    Class-based inheritance hierarchy
+        I wanted to retain Perl's normal class-based inheritance hierarchy
+        rather than to write (or use) a completely prototype based system.
+        If you are looking for a purely prototype based system, see Sean M.
+        Burke's "Class::Classless". My reasoning on this is that it is
+        easier in file based languages (as opposed to world based languages
+        like Self) to code class based inheritance hierarchies (which are
+        largely static) than to code object based inheritance hierarchies
+        (since objects in such languages have a dynamicism that is not
+        granted to classes).
+
+    Instance-defined method overriding
+        I wanted instances to be able to override their class-defined
+        methods. In the example above, the "$bas" object has its own
+        "friendly" method. Instance-defined methods are passed the exact
+        same parameter list as class-defined methods.
+
+    Subroutine/Attribute equivalence
+        Borrowing from Self, I wanted to be able to treat methods and
+        attributes similarly. For instance, in the above example the "$bar"
+        object has an attribute "friendly", whereas the "$bas" object has a
+        method "friendly", and the "$foo" object uses the class-defined
+        method. The calling syntax is independent of the implementation.
+        Parameters can even be passed in the method call and they will
+        simply be ignored if the method is implemented by a simple attribute
+
+    In addition to those core features, I (and Damian) had a wish list of
+    additional features:
+
+    Simple syntax
+        I wanted the system to be reasonable easy to use for both
+        implementers of classes and users of objects. Simple syntax for
+        users is more important than simple syntax for implementers.
+
+    Full support for "SUPER" type concepts
+        I wanted instance-defined methods to be able to call the
+        class-defined methods they replace.
+
+    Support for calling methods at instantiation time
+        In some circumstances, rather than deal with multiple inheritance it
+        is easier to have a class-defined object method that sets up the
+        various instance-defined methods for a given object. To support
+        this, the "new" method allows deferred method calls to be passed in
+        as parameters.
+
+    Modifying objects post-instantiation
+        I originally had no need for modifying objects post-instantiation,
+        but Damian Conway thought it would be a Good Thing (TM) to support.
+        Being so very good at these sorts of thing, he instantly came up
+        with a good general syntax to support such. Method calls that end in
+        a "_SET" result in the first parameter being assigned to the
+        attribute/method. I noticed one remaining hole and added support for
+        "_CLEAR".
+
+HOW TO
+  Write A Class
+
+    Your class should inherit from "Class::SelfMethods". The class-defined
+    instance methods should be defined with a leading underscore and should
+    be called without a leading underscore. Don't do anything silly like
+    writing methods whose proper names have a leading underscore and whose
+    definitions have two leading underscores - that's just asking for
+    trouble.
+
+    Do not, of course, make use of attributes that have leading underscores
+    - that's also just asking for trouble. Also, do not access attributes
+    directly (i.e. "$self->{foo}"). That will prevent people who use your
+    class from substituting a method for an attribute. Instead, always read
+    attributes by making the corresponding method call ("$self->foo").
+
+    If you need to call "SUPER::methodname", call "SUPER::_methodname".
+
+  Create An Instance
+
+    The default "new" method uses named parameters. Unless you are
+    certifiable, you will too. To specify attributes, simply use the syntax
+    "name => 'value'" and to specify a method use "name => sub { my $self =
+    shift; . . . }". Note that methods and attributes are interchangeable.
+
+  Modify An Instance
+
+    Method calls that end in a "_SET" will result in their first parameter
+    being assigned to the appropriate attribute/method. For instance, in the
+    "SYNOPSIS" I use "$foo->friendly_SET" to specify both a value and a
+    method for "friendly". Method calls that end in a "_CLEAR" will delete
+    that attribute/method from the object. The "can" method will behave just
+    like "UNIVERSAL::can" - it returns a code reference that will
+    interoperate with the associated object properly using the
+    "$obj->$coderef()" syntax. For examples of usage, see "test.pl".
+
+  Installation instructions
+
+    Standard module installation procedure.
+
+INTERNALS
+  can
+
+    This implementation of "can" is the heart of the system. By making "can"
+    responsible for almost everything relating to accessing the objects, the
+    code for deciding how to respond to the various situtations is kept in
+    one place.
+
+    In order to get major speed improvements (a factor of 2 to 3 for
+    attribute retrieval and method calls), extensive symbol table
+    manipulation was used to build methods on the fly that react
+    appropriately.
+
+    The three types of methods are "_SET" methods, "_CLEAR" methods, and
+    "normal" methods. The first two are fairly straight forward as far as
+    implementation goes. First "UNIVERSAL::can" is called to determine
+    whether an appropriate entry has been made in the package symbol table.
+    If not, an anonymous subroutine (actually, a closure in this case
+    because "$func" is a lexically scoped variable defined outside the
+    anonymous subroutine and referenced from within) is created and assigned
+    into the package symbol table. In either case, a reference to the
+    appropriate closure is returned (normal "can" behavior is to return a
+    reference to the code or "undef" if the method call is not legal).
+
+    The "normal" methods are somewhat trickier. The outer "if" statement
+    exists to ensure that "can" returns "undef" for illegal method calls
+    (remember that there may be situations where "$self->can($func)" should
+    return false even though "UNIVERSAL::can($self, $func)" returns true).
+    It then checks whether an appropriate entry has been made in the package
+    symbol table. If not, it builds a closure that will do the trick.
+    Remember that the closure could get called on an object that is in any
+    of the four possible states - attribute, instance method, inherited
+    method, or illegal. The closure includes the logic to test for instance
+    methods and attributes, but if neither are present it will make the call
+    to "_method" regardless of whether or not there is an inherited method
+    with the proper name. It relies on "AUTOLOAD" to properly deal with
+    unhandled "_method" calls.
+
+  AUTOLOAD
+
+    "AUTOLOAD" gets called the first time a given method call is made. It
+    first strips off the package name from the function call to extract the
+    actual function name. It then checks to see if the function name starts
+    with an underscore. If it does, it's a failed call from the "normal"
+    method closure, so "AUTOLOAD" calls "croak" to die with the appropriate
+    error message. Notice that the underscore has been stripped off, so it
+    will "die" failing to find "method".
+
+    "AUTOLOAD" then calls "can", which will return a reference to the
+    appropriate "CODE" entity if the method call is supported. At the same
+    time, "can" puts an entry into the symbol table for "Class::SelfMethods"
+    to support future calls to that method. "AUTOLOAD" jumps to that "CODE"
+    entity if a valid entity was return. Otherwise, execution continues on
+    to another "croak" call.
+
+  new
+
+    The "new" method supplied in "Class::SelfMethods" provides one
+    interesting twist on an otherwise standard named parameters constructor.
+    It strips out any passed parameters that have leading underscores and
+    stores them away. It then creates the hash ref from the remaining
+    parameters and blesses it appropriately. Finally, it takes the stored
+    parameters that have leading underscores and makes the matching method
+    calls - the key is used for the method name and the value is
+    dereferenced to an array and passed as parameters.
+
+AUTHOR
+    Toby Ovod-Everett, tovod-everett@alascom.att.com
+
+CREDITS
+    Damian Conway, damian@cs.monash.edu.au
+        Responsible for accessor methods, module name, constructive
+        criticism and moral support. After I responded to Sean's suggestion
+        of implementing a "can" method, Damian completely rewrote my first
+        attempt by routing everything through "can". He also was the first
+        to point out direct symbol table manipulation by implementing it for
+        the "_SET" and "_CLEAR" methods. I rebutted his routing everything
+        through "can" by doing performance testing. He agreed that the
+        performance issues were a problem, but suggested retaining the
+        direct symbol table for the accessor methods. It was then that the
+        lightbulb went off and I realized that a properly written closure
+        could be used for the normal method calls. Damian's criticisms kept
+        me on track and from making a fool of myself, and the result is some
+        very fast (and I hope safe:) code.
+
+        I first started writing to Damian as a result of an excellent book
+        he wrote, Object Oriented Perl. I highly recommend it - get it, read
+        it.
+
+    Sean M. Burke, sburke@netadventure.net
+        Suggested implementing a "can" method. Sean was/is responsible for
+        "Class::Classless". If you need a full-featured purely prototype
+        based object system, check it out.
+

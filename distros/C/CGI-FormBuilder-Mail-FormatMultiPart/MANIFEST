@@ -1,0 +1,7 @@
+Build.PL
+changelog.txt
+lib/CGI/FormBuilder/Mail/FormatMultiPart.pm
+MANIFEST			This list of files
+README.txt
+t/use.t
+META.yml

@@ -1,0 +1,99 @@
+
+
+NAME
+
+
+CASCM::CLI - A unified CLI for CA Harvest SCM
+
+
+
+USAGE
+
+
+    hv [options] subcommand [options] [arguments]
+
+
+
+DESCRIPTION
+
+
+hv provides a unified, context aware CLI for CA Harvest SCM.
+
+
+
+CONTEXT
+
+
+hv looks for, collects, merges and passes on context and options to
+underlying Harvest commands. This allows context to be configured in
+various locations.
+
+Context files are .ini files. Please see the documentation in
+CASCM::Wrapper for the format and examples of context files.
+
+The following precedence is used when merging context from various
+sources.
+
+-   command-line
+
+        hv hci -st Developement
+
+    Harvest CLI options can be provided directly on the command line,
+    just like you would when running harvest commands directly
+
+-   Project-specific Context
+
+    The project context is a context file .hvcontext in the current
+    directory
+
+-   User-specific Context
+
+    The user's context file defaults to .hvcontext in the user's home
+    directory. This can also be specified using the HVCONTEXT
+    environment variable.
+
+-   System-wide Context
+
+    The system wide context file defaults to $CA_SCM_HOME/hvcontext or
+    $HARVEST_HOME/hvcontext
+
+
+
+LOGGING
+
+
+Unlike harvest commands, hv will, by default, log to STDOUT(or STDERR).
+Harvest specific log files are not created.
+
+
+
+SUBCOMMANDS
+
+
+Almost all harvest commands are supported as subcommands. Please see
+CASCM::Wrapper for a full list of supported commands.
+
+
+
+BUGS AND LIMITATIONS
+
+
+Please report any bugs or feature requests at
+https://github.com/mithun/perl-cascm-cli/issues
+
+
+
+AUTHOR
+
+
+Mithun Ayachit mithun@cpan.org
+
+
+
+LICENSE AND COPYRIGHT
+
+
+Copyright (c) 2014, Mithun Ayachit. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See perlartistic.

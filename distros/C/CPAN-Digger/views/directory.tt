@@ -1,0 +1,20 @@
+[%
+   title= "Directory listing"
+   description= "name"
+%]
+[% INCLUDE incl/header.tt %]
+
+
+<ul>
+
+[% FOR dir IN dirs %]
+  <li><a href="[% dir %]/">[% dir %]</a></li>
+[% END %]
+
+[% FOR file IN files %]
+  <li><a href="[% file %]">[% file %]</a></li>
+[% END %]
+</ul>
+
+
+[% INCLUDE incl/footer.tt %]

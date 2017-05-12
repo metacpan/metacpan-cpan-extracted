@@ -1,0 +1,390 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Fatal;
+use File::Spec;
+use File::Copy qw<copy>;
+use List::Util qw<max reduce>;
+use Storable ();
+use Term::ANSIColor;
+
+use CPAN::DistnameInfo 0.11;
+
+use Capture::Tiny qw<capture>;
+use LWP::UserAgent;
+use Parse::CPAN::Packages::Fast;
+
+use lib 'lib';
+use CPANPLUS::Dist::Gentoo::Atom;
+use CPANPLUS::Dist::Gentoo::Maps;
+
+use constant PACKAGES    => File::Spec->catdir(
+ $ENV{HOME}, '.cpanplus', '02packages.details.txt.gz'
+);
+use constant CPAN_MIRROR => 'http://www.cpan.org/';
+use constant PORTAGE     => '/usr/portage';
+use constant TARGET      => 'lib/CPANPLUS/Dist/Gentoo/Maps.pm';
+use constant BACKUP      => TARGET . '.bak';
+use constant DATA_FILE   => 'gentooisms.data.sto';
+use constant STATE_FILE  => 'gentooisms.state.sto';
+
+my %is_on_cpan = (
+ 'Audio-CD-disc-cover' => 0,
+ 'Video-Frequencies'   => 0,
+ 'Sphinx-Search'       => 1,
+ 'WattsUp-Daemon'      => 1,
+);
+
+sub p {
+ my ($indent, $fmt, @args) = @_;
+ $fmt = (' ' x ($indent * 3)) . $fmt;
+ printf $fmt, @args;
+}
+
+my $timestamp = CPANPLUS::Dist::Gentoo::Maps::get_portage_timestamp(PORTAGE);
+
+{
+ my $ua;
+
+ sub cpan_http_test {
+  my ($path) = @_;
+
+  unless (defined $ua) {
+   $ua = LWP::UserAgent->new;
+   $ua->agent('CPANPLUS::Dist::Gentoo gentooisms generator/1.0');
+  }
+
+  my $r = $ua->head(CPAN_MIRROR . $path);
+
+  return $r && $r->code == 200;
+ }
+}
+
+my %fetched_uri;
+my (@not_on_cpan, @unfindable, @missing, %name_mismatch, %version);
+
+sub parse_portage_tree {
+ my $pcp = Parse::CPAN::Packages::Fast->new(PACKAGES);
+
+ for my $category (qw<perl-core dev-perl>) {
+  p(0, "Browsing the $category category.\n");
+
+  my $cat_dir = File::Spec->catdir(PORTAGE, $category);
+
+  for my $pkg_dir (glob File::Spec->catdir($cat_dir, '*')) {
+   next unless -d $pkg_dir;
+
+   my $pkg_name = (File::Spec->splitdir($pkg_dir))[-1];
+
+   my $last = reduce { $a->[1] > $b->[1] ? $a : $b }
+               grep $_->[1] != 9999,
+                map [ $_, CPANPLUS::Dist::Gentoo::Atom->new_from_ebuild($_) ],
+                 glob File::Spec->catfile($pkg_dir, "$pkg_name-*");
+   my ($ebuild, $atom) = @$last;
+   p(1, "%s/%s-%s\n", map $atom->$_, qw<category name version>);
+
+   if (exists $is_on_cpan{$pkg_name} and not $is_on_cpan{$pkg_name}) {
+    p(2, colored("$pkg_name is not a CPAN distribution (forced)", 'bright_red')
+         . "\n");
+    push @not_on_cpan, "$category/$pkg_name";
+    next;
+   }
+
+   my $uri;
+   if (exists $fetched_uri{$ebuild}) {
+    $uri = $fetched_uri{$ebuild};
+   } else {
+    my @cmd = ('ebuild', $ebuild, 'help', '--debug');
+    my ($ret, $code);
+    (undef, my $err) = capture {
+     $ret  = system { $cmd[0] } @cmd;
+     $code = $?;
+    };
+    if ($ret != 0 or $code == -1 or $code & 127 or $code >> 8) {
+     die "system(\"@cmd\") returned $ret and/or failed with status $code";
+    }
+
+    my %map;
+    while ($err =~ /([a-zA-Z0-9_]+)=((['"]).*?\3|\S+)/gs) {
+     my $key = $1;
+     my $val = $2;
+     $val =~ s{^(['"])(.*?)\1$}{$2}s;
+     $map{$key} = $val;
+    }
+
+    $uri = $map{SRC_URI};
+    unless (defined $uri) {
+     my $author = $map{MODULE_AUTHOR};
+     if (defined $author) {
+      my ($au, $a)     = $author =~ /^((.).)/;
+      my $dist_version = $map{MODULE_VERSION};
+      $dist_version    = $last->[1] unless defined $dist_version;
+      $uri = "mirror://cpan/$a/$au/$author/$pkg_name/$dist_version.tar.gz";
+     }
+    }
+
+    $fetched_uri{$ebuild} = $uri;
+    Storable::store([
+     $timestamp,
+     \%fetched_uri,
+    ] => DATA_FILE);
+   }
+
+   my ($fqn_dist, $path);
+   if (defined $uri) {
+    if ($uri =~ m{cpan.*?/id/(\S+)}) {
+     $fqn_dist = $1;
+     $path     = "authors/id/$fqn_dist";
+     $is_on_cpan{$pkg_name} = 1;
+    } elsif ($uri =~ m{mirror://cpan/(\S+)}) {
+     $path     = $1;
+     $is_on_cpan{$pkg_name} = 1;
+    } elsif ($uri =~ m{/([^/\s]+)(?:\s|$)}) {
+     my $archive = $1;
+     my ($top_level) = $archive =~ /^([^-]+)/;
+     $path = "modules/by-module/$top_level/$archive";
+    }
+   }
+
+   unless (defined $path) {
+    p(2, "doesn't seem to be fetching its tarball from a CPAN mirror\n");
+    p(2, colored("$pkg_name is not a CPAN distribution", 'bright_red') . "\n");
+    push @not_on_cpan, "$category/$pkg_name";
+    next;
+   }
+   p(2, "fetches $path\n");
+
+   my $dist;
+   if (defined $fqn_dist) {
+    p(2, 'is indexed on the CPAN... ');
+    $dist = do {
+     local $@;
+     eval { $pcp->distribution($fqn_dist) }
+    };
+    print defined $dist ? "yes\n" : "no\n";
+   }
+
+   unless (defined $dist) {
+    p(2, 'can directly be found on a CPAN mirror... ');
+    if (cpan_http_test($path)) {
+     print "yes\n";
+     $dist = CPAN::DistnameInfo->new($path);
+    } else {
+     print "no\n";
+    }
+   }
+
+   my ($pseudo_dist, $latest_dist);
+
+   unless (defined $dist) {
+    p(2, 'has the same name as a distribution on the CPAN... ');
+    $path =~ m{([^/\s]+)$} or die 'Could not get the last part of the path';
+    my $archive  = $1;
+    $pseudo_dist = CPAN::DistnameInfo->new($archive);
+    $latest_dist = do {
+     local $@;
+     eval { $pcp->latest_distribution($pseudo_dist->dist) };
+    };
+
+    unless (defined $latest_dist) {
+     print "no\n";
+     p(2, 'is similiar to a module indexed in another distribution of the CPAN... ');
+     (my $mod_name = $pkg_name) =~ s/-/::/g;
+     $latest_dist = do {
+      local $@;
+      eval {
+       my $module = $pcp->package($mod_name);
+       defined $module ? $module->distribution : undef;
+      };
+     };
+     if (defined $latest_dist) {
+      # Re-forge the pseudo dist so that it will pick up the correct dist
+      # name when looking for a mismatch.
+      $pseudo_dist = CPAN::DistnameInfo->new(
+       $latest_dist->dist . '-' . $pseudo_dist->version
+                          . '.' . $pseudo_dist->extension
+      );
+     }
+    }
+
+    my ($latest_file, $latest_author);
+    if (defined $latest_dist) {
+     $latest_file   = $latest_dist->filename;
+     $latest_author = $latest_dist->cpanid;
+     printf "yes, %s by %s\n",
+            $latest_file,
+            (defined $latest_author ? $latest_author : 'unknown');
+    } else {
+     print "no\n";
+    }
+
+    if (defined $latest_author) {
+     my ($au, $a) = $latest_author =~ /^((.).)/ or die 'Author name too short';
+     p(2, 'is in that author\'s CPAN directory... ');
+     my $alternate_path = "authors/id/$a/$au/$latest_author/$archive";
+     if ($alternate_path eq $path) {
+      print "already checked\n";
+     } elsif (cpan_http_test($alternate_path)) {
+      $dist = CPAN::DistnameInfo->new($alternate_path);
+      print "yes\n";
+     } else {
+      print "no\n";
+     }
+     unless (defined $dist) {
+      push @missing,
+           "$category/$pkg_name (latest is $latest_file by $latest_author)";
+     }
+    }
+   }
+
+   unless (defined $dist) {
+    if ($latest_dist or $is_on_cpan{$pkg_name}) {
+     $dist = $pseudo_dist;
+     unless ($latest_dist) {
+      push @unfindable, "$category/$pkg_name";
+     }
+     p(2, "seems to come from the CPAN anyway\n");
+    } else {
+     p(2, colored("$pkg_name is not a CPAN distribution", 'bright_red') . "\n");
+     push @not_on_cpan, "$category/$pkg_name";
+     next;
+    }
+   }
+
+   my $dist_name = $dist->dist;
+   if ($dist_name ne $pkg_name) {
+    p(2, colored("$dist_name => $pkg_name", 'bright_yellow') . "\n");
+    $name_mismatch{$dist_name} = $pkg_name;
+   }
+
+   my $pkg_version = $atom->version . '';
+   $pkg_version =~ s/-r\d+$//;
+   my $dist_version = $dist->version;
+   my $mapped_version = CPANPLUS::Dist::Gentoo::Maps::version_c2g(
+    undef, # default conversion
+    $dist_version,
+   );
+   if ($mapped_version ne $pkg_version) {
+    my $str = "$dist_version => $mapped_version != $pkg_version";
+    p(2, colored($str, 'bright_cyan') . "\n");
+   }
+   $version{$dist_name} = [ $dist_version => $pkg_version ];
+  }
+ }
+}
+
+my $already_parsed = 0;
+
+if (-e STATE_FILE) {
+ my $state = Storable::retrieve(STATE_FILE);
+ if ($state->[0] == $timestamp) {
+  printf "State retrieved from %s\n", STATE_FILE;
+  @not_on_cpan   = @{ $state->[1] };
+  @unfindable    = @{ $state->[2] };
+  @missing       = @{ $state->[3] };
+  %name_mismatch = %{ $state->[4] };
+  %version       = %{ $state->[5] };
+  $already_parsed = 1;
+ } else {
+  printf "Obsolete state file %s, regenerating\n", STATE_FILE;
+  1 while unlink STATE_FILE;
+ }
+}
+
+unless ($already_parsed) {
+ if (-e DATA_FILE) {
+  my $data = Storable::retrieve(DATA_FILE);
+  if ($data->[0] == $timestamp) {
+   printf "Data retrieved from %s\n", DATA_FILE;
+   %fetched_uri = %{ $data->[1] };
+  } else {
+   printf "Obsolete data file %s, regenerating\n", DATA_FILE;
+   1 while unlink DATA_FILE;
+  }
+ }
+
+ parse_portage_tree();
+ print  "\n";
+
+ Storable::store([
+  $timestamp,
+  \@not_on_cpan,
+  \@unfindable,
+  \@missing,
+  \%name_mismatch,
+  \%version,
+ ] => STATE_FILE);
+ printf "State stored to %s\n", STATE_FILE;
+}
+
+print "\n";
+p(0, "Summary\n");
+
+p(1, "Not on the CPAN:\n");
+p(2, "$_\n") for @not_on_cpan;
+
+p(1, "Alleged to be on the CPAN, but unfindable:\n");
+p(2, "$_\n") for @unfindable;
+
+p(1, "Only a different version is on the CPAN:\n");
+p(2, "$_\n") for @missing;
+
+p(1, "Name mismatch:\n");
+for my $dist_name (sort keys %name_mismatch) {
+ my $pkg_name    = $name_mismatch{$dist_name};
+ my $mapped_name = CPANPLUS::Dist::Gentoo::Maps::name_c2g($dist_name);
+
+ my $fixed = $mapped_name eq $pkg_name;
+ my $eq    = $fixed ? '==' : '!=';
+ my $str   = colored(
+  "$dist_name => $mapped_name $eq $pkg_name",
+  $fixed ? 'bright_green' : 'bright_red'
+ );
+ p(2, "$str\n");
+}
+
+p(1, "Version mismatch:\n");
+for (sort keys %version) {
+ my ($dist_version, $pkg_version) = @{$version{$_}};
+ my $default_mapped_version = CPANPLUS::Dist::Gentoo::Maps::version_c2g(
+  undef,
+  $dist_version,
+ );
+ my $mapped_version = CPANPLUS::Dist::Gentoo::Maps::version_c2g(
+  $_,
+  $dist_version,
+ );
+ if ($default_mapped_version ne $pkg_version) {
+  my $fixed = $mapped_version eq $pkg_version;
+  my $eq    = $fixed ? '==' : '!=';
+  my $str   = colored(
+   "$dist_version => $mapped_version $eq $pkg_version",
+   $fixed ? 'bright_green' : 'bright_red'
+  );
+  p(2, "$_: $str\n");
+ }
+}
+
+copy TARGET, BACKUP or die "copy failed: $!";
+
+open my $src, '<', BACKUP;
+open my $dst, '>', TARGET;
+
+my $max = max map length, keys %name_mismatch;
+
+SRC: while (<$src>) {
+ if (/^sub TIMESTAMP/) {
+  print  $dst "sub TIMESTAMP () { $timestamp }\n";
+ } elsif (/^__DATA__$/) {
+  print  $dst "__DATA__\n";
+  printf $dst "%s%s %s\n", $_, (' ' x ($max - length)), $name_mismatch{$_}
+                                                   for sort keys %name_mismatch;
+  last SRC;
+ } else {
+  print $dst $_;
+ }
+}
+
+print "\n" . +(keys %name_mismatch) . " name mismatches found\n";

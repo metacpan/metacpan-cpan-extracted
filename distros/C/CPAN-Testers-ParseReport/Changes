@@ -1,0 +1,412 @@
+0.4.1 2016-08-16  k  <andk@cpan.org>
+
+	* Declare dependency on List::MoreUtil
+
+0.4.0 2016-08-16  k  <andk@cpan.org>
+
+	* Parse 'compiled at' from report
+
+	* Skip calculating regressions for some more of the parameters
+	that never are interesting
+
+	* Add some diagnostics about how long each regression run took
+
+0.3.0 2016-04-28  k  <andk@cpan.org>
+
+	* Parse output of Module::Versions::Report into mod: facts (Thomas
+	Sibley)
+
+	* Parse App::cpanminus::reporter version (Slaven Rezić)
+
+	* new option --reportfiles (Slaven Rezić)
+
+	* assorted minor bugfixes and documentation corrections
+
+	* bugfix: unify path variables with forward slashes (reported by
+	Slaven Rezić)
+
+	* bugfix: combine osname+perl instead of arch+perl; the latter is too
+	expensive, the former was intended because it matches the fields at
+	matrix.cpantesters.org
+
+0.2.9 2014-04-05  k  <andk@cpan.org>
+
+	* new composed variable meta:arch+perl made from conf:archname and
+	meta:perl (suggested by Christian Walde)
+
+0.2.8-tobe 2013-12-12  k  <andk@cpan.org>
+
+	* new options --minpass and --minfail
+
+	* pod clarification for the --vdistro option
+
+	* parse the names of the failing tests and include them in the
+	regressions
+
+	* improve diagnostics on subprocess errors
+
+0.2.7 2013-09-24  k  <andk@cpan.org>
+
+	* finish and activate GID and EGID calculations (thanks to Christian
+	Walde for the request)
+
+	* reformat changes file according to CPAN::Changes::Spec
+
+0.2.6 2013-09-15  Andreas Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* fix handling of cached gzipped results
+
+0.2.5 2013-09-11  Andreas Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* switch download URLs for reports to guid, they seem to have a greater
+	chance to succeed than the numeric ids
+
+	* RT #86898: fix META_ADD syntax to inject repository into META.yml
+	(thanks to Karen Etheridge)
+
+0.2.4 2012-08-22  Andreas Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bugfix: parsing of lines that nowadays have commas to separate
+	variables but that did not have commas with perl 5.8.9
+
+0.2.3 2012-05-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bugfix: parsing of config lines that have neither quotes nor commas
+	but spaces, thus need to consume the whole line, like libpth, libs and
+	perllibs
+
+0.2.2 2012-01-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* bugfix: prerequisites of "0" could be misparsed
+
+0.2.1 2011-12-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Replace the use of zcat with Compress::Zlib
+
+	* Remove all remnants of dependencies on XML::LibXML
+
+0.2.0 2011-11-27  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Upgrading to this release seems needed to get at reports of distros
+	for which a yaml formatted summary file is not available. I don't know
+	whether yaml files will reappear at cpantesters.org but I have
+	encountered distros that had no yaml file at all but did have a json
+	file.
+
+	* Minor incompatibility: old yaml files with summaries of results are no
+	longer supported. We now have settled to download JSON files from
+	cpantesters.org and use those. It seems that JSON is the preferred
+	format at cpantesters.org, at least for now. The path to the summary
+	files had to be adjusted.
+
+	* introduce --prefer-local-reports option to skip mirroring for all
+	reports we have ever downloaded before. Highly recommended to reduce
+	latency, especially since If-Modified-Since support at cpantesters seems
+	not always to be a given.
+
+	* on transport=http_cpantesters_gzip set the HTTP headers to get
+	compressed versions of reports. Highly recommended to reduce download
+	times.
+
+0.1.22 2011-10-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* support YAML::XS besides YAML::Syck
+
+	* set CPANPLUS version from the intro of the report if not reported
+	properly in the footer
+
+0.1.21 2011-05-31  Andreas J. Koenig  <andk@cpan.org>
+
+	* protect against zcat implementations that expect a $target.Z file
+	instead of a $target.gz file
+
+0.1.20 2011-05-28  Andreas J. Koenig  <andk@cpan.org>
+
+	* adjust default to official URLS
+
+0.1.19 2011-04-07  Andreas J. Koenig  <andk@cpan.org>
+
+	* introduce dependency on CPAN::Meta::Converter
+
+0.1.18 2011-04-06  Andreas J. Koenig  <andk@cpan.org>
+
+	* improve diagnostics for Makefile.PL failures
+
+0.1.17 2011-03-27  Andreas J. Koenig  <andk@cpan.org>
+
+	* fix misparsing of UID, EUID, GID, EGID, and $^X under CPANPLUS
+
+	* fix misparsing of UID and EUID under CPAN::Reporter
+
+0.1.16 2011-03-24  Andreas J. Koenig  <andk@cpan.org>
+
+	* add compression support for fetched and cached cpan testers reports
+
+	* rip out nntp support, the nntp server has closed its gates in 2010
+
+0.1.15 2010-08-26  Andreas J. Koenig  <andk@cpan.org>
+
+	* fix parsing bug with configure_requires
+
+0.1.14 2010-08-08  Andreas J. Koenig  <andk@cpan.org>
+
+	* support for new option --sample to limit number of observations
+
+0.1.13 2010-07-10  Andreas J. Koenig  <andk@cpan.org>
+
+	* parse the new cpantesters 2.0 raw page now with <strong> tag
+
+0.1.12 2010-02-17  Andreas J. Koenig  <andk@cpan.org>
+
+	* switching transport to new option "http_cpantesters" because nntp has
+	a broken disk and many reports missing; option "http" has been renamed
+	to http_nntp.
+
+0.1.11 2010-01-10  Andreas J. Koenig  <andk@cpan.org>
+
+	* CPANPLUS may paint an exclamation mark into the margin of the
+	prerequisties stanza
+
+0.1.10 2009-12-23  Andreas J. Koenig  <andk@cpan.org>
+
+	* if the summary at the end doesn't provide a perl version then use the
+	one from the first paragraph
+
+	* junk CARRIAGE RETURNs at end of line in time
+
+0.1.9 2009-12-09  Andreas J. Koenig  <andk@cpan.org>
+
+	* replace DateTime::Format::DateParse with D:F:Strptime
+
+	* patch from Slaven Rezic to show reports after mime processing
+
+	* RT #52550: move emacs stanza from shebang line to end (suggested
+	by Sean O'Rourke)
+
+	* fix typo in the compound config name "archname+osvers"
+
+0.1.8 2009-11-11  Andreas J. Koenig  <andk@cpan.org>
+
+	* CPANPLUS does not try to align the prereq stanza, using split as a
+	fallback
+
+0.1.7 2009-11-02  Andreas J. Koenig  <andk@cpan.org>
+
+	* CPANPLUS beginning with 0.89_06(?) has a toolchain stanza
+
+0.1.6 2009-11-01  Andreas J. Koenig  <andk@cpan.org>
+
+	* bugfix: not all reports have a correct MIME header; introduce
+	heuristics to parse MIME as MIME if it probably is.
+
+0.1.5 2009-10-26  Andreas J. Koenig  <andk@cpan.org>
+
+	* bugfix: allow an empty line after the Summary line
+
+	* bugfix: allow any whitespace after Date:
+
+0.1.4 2009-10-10  Andreas J. Koenig  <andk@cpan.org>
+
+	* introduce --ctdb option to use a local sqlite database instead of
+	asking cpantesters for yaml files (Andreas Koenig)
+
+	* Don't croak on invalid Date headers (Ask Bjørn Hansen) and protect
+	date to time converter against unexpected date format (Andreas Koenig)
+
+	* Avoid infinite loop if the last line of a report ends with
+	  a '!' (Ask Bjørn Hansen)
+
+0.1.3 2009-06-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* do not rely on the sort order of the cpantesters yaml file
+
+0.1.2 2009-05-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Fix parsing of files with a MIME-Version header which comes from
+	recent improvements on the Test::Reporter end.
+
+0.1.1 2009-03-29  Andreas J. Koenig  <andk@cpan.org>
+
+	* add the parsed prerequisites wanted version number to the result with
+	the prefix C<prereq:> (popular Birmingham hackathon demand)
+
+	* added a bin/conf2conf.pl script developed by H.Merijn Brand during
+	Birmingham hackathon. This will probably end up as a sub in
+	ParseReport.pm, needs to be decided later.
+
+0.1.0 2009-03-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* discontinued the support for more than one distro on the commandline;
+	it seemed unnneeded and confusing
+
+	* allow a versioned distro name as argument, obsoletes the --vdistro
+	option.
+
+	* generate a conf:git_commit_id if possible
+
+	* honour proxy environment
+
+	* return the %extract hash from parse_report (suggested by Ask B. Hansen)
+
+	* minor bugfixes
+
+0.0.23 2008-12-30  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* do not die when we cannot parse a date in an nntp article, for example
+	550894.
+
+	* if -solve is given, always provide a variable C<conf:archname+osvers>
+	that concatenates C<archname> and C<osvers> because the latter alone is
+	a pointless variable.
+
+	* do not die if Statistics::Regression::print() dies. Before it may come
+	to that introduce additional caution, checking the return value of
+	standarderrors().
+
+0.0.22 2008-12-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* dropped support for ctformat=html because cpantesters site is a moving
+	target.
+
+0.0.21 2008-12-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* solve switch: secondary sort order K ascending (suggested by Slaven)
+
+	* solvetop switch: overrule it when there are more results with R^2==1.0
+
+0.0.20 2008-12-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* catch errors from HTTP and NNTP server.
+
+0.0.19 2008-11-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* introduce a backdoor to feed an arbitrary article as argument to the
+	parser.
+
+	* RT #40812: with NNTP, when the date format doesn't match
+	expectations, use DateParse compatible parser.
+
+0.0.18 2008-11-06  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* switch to Net::NNTP instead of HTTP for the reports. HTTP can be
+	switched on with --transport=http
+
+0.0.17 2008-11-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* typo fix RT #40608
+
+	* bug fix RT #40609: division by zero error in Statistics::Regression
+
+	* new option --ycb to specify a callback for calculating Y
+
+0.0.16 2008-11-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* add protection against linear dependencies between columns
+
+0.0.15 2008-10-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* provide a normalized meta:perl for --solve
+
+0.0.14 2008-10-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* forgot dependency on Statistics::Regression
+
+0.0.13 2008-10-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* forgot to include the catalog files in the last release
+
+	* meta:writer now also detected on CPANPLUS::Dist::YACSmoke
+
+	* new option --cturl to temporarily switch servers
+
+	* new experimental option --solve to run some statistics to aid
+	determining blame candidates.
+
+0.0.12 2008-10-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* all output goes now to STDERR except for the output for --dumpvars
+	which goes to --dumpfile's option (default: ./ctgetreports.out)
+
+	* XML::LibXML parser object now has a catalog and is being cached.
+
+	* new option --quiet to suppress all output
+
+	* we have a real test now (but not many individual tests)
+
+	* env state was not turned off correctly, fixed.
+
+	* entities are now decoded
+
+0.0.11 2008-09-29  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* packaging issues: remove the overly clever idea to get the version into
+	the manpage. It screws the enduser who is using MM->parse_version.
+
+	* Since Barbie has switched to XHTML, drop HTML::TreeBuilder and parse
+	directly with XML::LibXML, set the default downloaded file back to html
+	because it is easier to debug and generally gets more attention.
+
+0.0.10 2008-09-21  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* RT #39458: make sort order descending with --ctformat:yaml
+	(suggested by Slaven Rezic)
+
+	* RT #39459: set display variable to captured regexp with qr:
+	(suggested by Slaven Rezic)
+
+	* temporarily setting --ctformat=yaml the default until cpantesters site
+	is stable again
+
+0.0.9 2008-09-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* packaging issues: META.yml and MANIFEST repaired, tests added
+
+0.0.8 2008-09-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* new options --raw and --q qr:REGEXP (suggested by Slaven Rezic)
+
+0.0.7 2008-09-13  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* support new option --report to parse a single report
+
+	* support envariables parsing and options of the form env:VARIABLE
+
+	* document so far undocumented query option meta:output_from
+
+0.0.6 2008-09-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* add meta:ok and meta:about as query parameter
+
+	* slightly improved manpage
+
+0.0.5 2008-08-23  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* minor bug fix: --vdistro and --ctformat=yaml did not work together
+
+0.0.4 2008-06-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* fixed a gotcha in the Makefile.PL produced by Module::Build: it
+	contained a reference to an inexistant file. Investigation pending,
+	switching to MakeMaker.
+
+0.0.3 2008-06-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* RT #37035: $ua could be uninitialized.
+
+	* introduce new option ctformat=html|yaml especially to analyze
+	DateTime::Format::Strptime which has a broken HTML page at the moment.
+
+0.0.2 2008-06-15  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* with docs and a bit of testing.
+
+0.0.1 2008-06-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* just the bare script I'm currently working with. very early alpha
+	quality
+
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	End:

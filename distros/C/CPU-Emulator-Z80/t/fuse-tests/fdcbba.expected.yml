@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  14455:
+    - 86
+name: fdcbba
+registers:
+  AF: 17391
+  AF_: 0
+  BC: 7256
+  BC_: 0
+  DE: 22179
+  DE_: 0
+  HL: 17689
+  HL_: 0
+  I: 0
+  IX: 46715
+  IY: 14399
+  PC: 4
+  R: 2
+  SP: 0

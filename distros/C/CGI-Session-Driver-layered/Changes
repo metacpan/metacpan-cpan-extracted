@@ -1,0 +1,42 @@
+0.8 -- June 9, 2011
+
+Make sure that exceptions thrown by drivers are handled gracefully.
+
+0.7 -- August 10, 2009
+
+Fixed bug where remove() was erroneously calling delete() instead of
+remove() on the layered drivers.
+
+0.6 -- July 24, 2009
+
+This file was not in the MANIFEST, whoops!
+
+Updated the tests to not use DB_File, which not everyone has.
+
+0.5 -- July 6, 2009
+
+We now keep track of which store has the most recent session, and return
+said session.  This way a store can go down and come back up with less
+pain.
+
+Made remove() a bit more robust.  It now tries to delete the session from
+each driver, regardless of errors encountered along the way.
+
+0.4 -- June 23, 2009
+
+Improved error handling.
+
+0.3 -- June 22, 2009
+
+Many people will have older versions of File::Path, so we much use the older
+API in the tests.
+
+0.2 -- June 22, 2009
+
+Changed arguments to be capitalized, better matching CGI::Session's style.
+
+Fixed tests to work on non-unix platforms (hopefully).
+
+0.1 -- June 19, 2009
+
+Intial Release

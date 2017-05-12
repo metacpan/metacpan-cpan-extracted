@@ -1,0 +1,59 @@
+Coro-Amazon-SimpleDB
+
+An asynchronous layer on top of Amazon's SimpleDB library.
+
+  use Coro::Amazon::SimpleDB;
+
+  my $sdb = Coro::Amazon::SimpleDB->new;
+  $sdb->aws_access_key($aws_access_key_id);
+  $sdb->aws_secret_access_key($aws_secret_access_key);
+  $sdb->domain_name($aws_simpledb_domain);
+
+  my $attributes = $sdb->async_get_items('name', 'rank', 'serial-number');
+  my $full_name = join(' ', @{ $attributes->{name} }{'first', 'last'};
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The Amazon SimpleDB client is required, but is not currently available
+via CPAN.  It is available here as of 2010-10-20:
+
+http://developer.amazonwebservices.com/connect/entry.jspa?externalID=1136
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Coro::Amazon::SimpleDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Coro-Amazon-SimpleDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Coro-Amazon-SimpleDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Coro-Amazon-SimpleDB
+
+    Search CPAN
+        http://search.cpan.org/dist/Coro-Amazon-SimpleDB/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2010 Campus Explorer http://www.campusexplorer.com/
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: the GNU General Public License Version
+3.0 as published by the Free Software Foundation (see
+http://www.gnu.org/licenses/gpl.html); or the Artistic License 2.0
+(see http://www.opensource.org/licenses/artistic-license-2.0.php).

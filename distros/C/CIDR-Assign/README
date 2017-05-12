@@ -1,0 +1,5 @@
+This module is designed to manage a CIDR block for reallocation to customers.
+It may be useful to you if you are providing IP blocks to others.
+
+Mark.
+31 May 1998

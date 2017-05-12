@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  12761:
+    - 134
+name: ddcb24
+registers:
+  AF: 47745
+  AF_: 0
+  BC: 31499
+  BC_: 0
+  DE: 22027
+  DE_: 0
+  HL: 34355
+  HL_: 0
+  I: 0
+  IX: 12785
+  IY: 56765
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,19 @@
+.perltidyrc
+Build.PL
+Changes
+lib/Carp/Fix/1_25.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml
+README
+t/fixed.t
+t/lib/Test/Builder.pm
+t/lib/Test/Builder/IO/Scalar.pm
+t/lib/Test/Builder/Module.pm
+t/lib/Test/Builder/Tester.pm
+t/lib/Test/Builder/Tester/Color.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm
+SIGNATURE    Added here by Module::Build

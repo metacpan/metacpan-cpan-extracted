@@ -1,0 +1,7 @@
+<collection>
+  <records>
+    <doc><foo>1</foo></doc>
+    <doc><foo>2</foo></doc>
+    <doc><foo>3</foo></doc>
+  </records>
+</collection>

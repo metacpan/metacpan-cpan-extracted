@@ -1,0 +1,51 @@
+package example_1;
+
+use strict;    # always a good idea to include these in your
+use warnings;  # modules
+
+
+use base qw ( Example );
+
+use Carp::Heavy;
+use Data::Dumper;
+use Time::Format qw ( %time );
+
+sub setup {
+    $_[0]->run_modes( [ qw ( main_display ) ] );
+}
+
+sub main_display {
+
+    my $self = shift;
+
+    my $config = $self->conf->context;
+
+
+    my %tmplvars = ();
+
+    $tmplvars{'current_time'}    = $time{'yyyy/mm/dd hh:mm:ss'};
+    $tmplvars{'timeout'}         = $config->{'session_timeout'};
+    $tmplvars{'self_state_dump'} = Data::Dumper->Dump([$self], [qw(*self)]);
+    $tmplvars{'load_count'}      = ++$self->session->{count};
+
+    $tmplvars{'stack_trace_dump'} = Carp::longmess_heavy
+	("Hey hey world I've got something to say... ");
+
+    $tmplvars{'SELF_HREF_LINK'} = $self->make_link
+	( qs_args => { rm => 'main_display', } );
+
+    my @random_loop_rows = ();
+    foreach my $key ( 1 .. 10 ) {
+	my %loopvars       = ();
+	$loopvars{'key'}   = $key;
+	$loopvars{'value'} = chr($key - 1 + 65) x $key;
+	push @random_loop_rows, \%loopvars;
+    }
+    $tmplvars{'a_random_loop'} = \@random_loop_rows;
+
+
+    return $self->template->fill(\%tmplvars);
+}
+
+1;
+

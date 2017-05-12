@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    %= include 'partials/head'
+  </head>
+  <body class="tactile">
+    %= content
+  </body>
+</html>

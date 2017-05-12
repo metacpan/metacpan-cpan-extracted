@@ -1,0 +1,27 @@
+---
+abstract: '(DEPRECATED) XML View Class'
+author:
+  - 'Sebastian Riedel, C<sri@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-REST-XML
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Runtime: 0
+  Test::More: 0
+  XML::Simple: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/historical/Catalyst-View-REST-XML/
+version: 0.02

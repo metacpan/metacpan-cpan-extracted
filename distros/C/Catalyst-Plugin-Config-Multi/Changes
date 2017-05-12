@@ -1,0 +1,8 @@
+Revision history for Catalyst::Plugin::Config::Multi
+
+0.02     2008-05-18/20:50
+        - YAML format for testapp_foo.yml was wrong....
+
+0.01    2008-05-18/18:23
+        First version, released on an unsuspecting world.
+

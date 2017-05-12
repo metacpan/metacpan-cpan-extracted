@@ -1,0 +1,18 @@
+INSTALL
+Makefile.PL
+README
+t/tmp/openssl
+t/tmp/sendmail
+t/tmp/crt
+t/01_init.t
+t/crt/bob_cert.pem
+t/crt/message.eml
+t/crt/duane.pem
+lib/Crypt/Simple/SMIME.pm
+MANIFEST
+Makefile.old
+etc/smime_report
+UserTag/smime.tag
+INSTALL.interchange
+ChangeLog
+META.yml                                 Module meta-data (added by MakeMaker)

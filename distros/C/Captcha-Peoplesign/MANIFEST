@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.txt
+dist.ini
+examples/basic_example.pl
+lib/Captcha/Peoplesign.pm
+t/00basic.t
+t/01live.t

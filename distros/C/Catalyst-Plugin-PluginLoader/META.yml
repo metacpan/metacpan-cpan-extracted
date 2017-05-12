@@ -1,0 +1,32 @@
+---
+abstract: 'Load Catalyst Plugins from Config'
+author:
+  - 'Ash Berlin, C<ash at cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.90'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-PluginLoader
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Catalyst::Plugin::PluginLoader:
+    file: lib/Catalyst/Plugin/PluginLoader.pm
+    version: 0.04
+requires:
+  Catalyst::Runtime: 5.80002
+  MRO::Compat: 0
+  Scalar::Util: 0
+  namespace::clean: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

@@ -1,0 +1,255 @@
+=head1 NAME
+
+Catmandu::MARC::Tutorial - A documentation-only module for new users of Catmandu::MARC
+
+=head1 SYNOPSIS
+
+  perldoc Catmandu::MARC::Tutorial
+
+=head1 READING
+
+=head2 Convert MARC21 records into JSON
+
+The command below converts file data.mrc into JSON:
+
+   $ catmandu convert MARC to JSON < data.mrc
+
+=head2 Convert MARC21 records into MARC-XML
+
+   $ catmandu convert MARC to MARC --type XML < data.mrc
+
+=head2 Convert UNIMARC records into JSON, XML, ...
+
+To read UNIMARC records use the RAW parser to get the correct character
+encoding.
+
+   $ catmandu convert MARC --type RAW to JSON < data.mrc
+   $ catmandu convert MARC --type RAW to MARC --type XML < data.mrc
+
+=head2 Create a CSV file containing all the titles
+
+To extract data from a MARC record on needs a Fix routine. This
+is a small language to manipulate data. In the example below
+we extract all 245 fields from MARC:
+
+   $ catmandu convert MARC to CSV --fix 'marc_map(245,title); retain(title)' < data.mrc
+
+The Fix C<marc_map> puts the MARC 245 field in the C<title> field.
+The Fix C<retain> makes sure only the title field ends up in the
+CSV file.
+
+=head2 Create a CSV file containing only the 245$a and 245$c subfields
+
+The C<marc_map> Fix can get one or more subfields to extract from MARC:
+
+   $ catmandu convert MARC to CSV --fix 'marc_map(245ac,title); retain(title)' < data.mrc
+
+=head2 Create a CSV file which contains a repeated field
+
+In the example below the 650a field can be repeated in some marc records.
+We will join all the repetitions in an comma delimited list for each record.
+
+First we create a Fix file containing all the Fixes, then we execute the
+catmandu command.
+
+Open a text editor and create the C<myfix.fix> file with content:
+
+    marc_map(650a,subject.$append)
+    join_field(subject,",")
+    retain(subject)
+
+And execute the command:
+
+   $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
+
+=head2 Create a list of the number of subjects per record
+
+We will create a list of subjects (650a) and count the number of items
+in this list for each record. The CSV file will contain the C<_id> (record
+identifier) and C<subject> the number of 650a fields.
+
+Open a text editor and create the C<myfix.fix> file with content:
+
+    marc_map(650a,subject.$append)
+    count(subject)
+    retain(_id, subject)
+
+And execute the command:
+
+   $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
+
+=head2 Create a list of all ISBN numbers in the data
+
+We will create first a Fix script which C<select>s only the records
+that contain an ISBN field (022$a). All the isbns found we will
+print inline using the C<add_to_exporter> Fix.
+
+Open a text editor and create the C<myfix.fix> file with content:
+
+    marc_map(020a,isbn.$append)
+
+    select exists(isbn)
+
+    # Loop over the ISBNs and print them to a CSV exporter
+    do list(path:isbn,var:c)
+     move_field(c,result.isbn)
+     add_to_exporter(result,CSV)
+    end
+
+Execute the following catmandu command, notice that we ignore the normal
+output with help of the C<Null> exporter (all output will be generated)
+by the Fix script:
+
+   $ catmandu convert MARC to Null --fix myfix.fix < data.mrc
+
+=head2 Create a list of all unique ISBN numbers in the data
+
+Here we can use the Fix script as in the previous example and use the
+UNIX "sort -u" command:
+
+   $ catmandu convert MARC to Null --fix myfix.fix < data.mrc | sort -u
+
+=head2 Create a list of all ISBN numbers for records with type 920a == book
+
+In the example we need an extra condition for match the content of the
+920a field against the string C<book>.
+
+Open a text editor and create the C<myfix.fix> file with content:
+
+    marc_map(020a,isbn.$append)
+    marc_map(920a,type)
+
+    select all_match(type,"book")
+    select exists(isbn)
+
+    # Loop over the ISBNs and print them to a CSV exporter
+    do list(path:isbn,var:c)
+     move_field(c,result.isbn)
+     add_to_exporter(result,CSV)
+    end
+
+And run the command:
+
+    $ catmandu convert MARC to Null --fix myfix.fix < data.mrc
+
+=head2 Show which MARC record don't contain a 900a field matching some list of values
+
+First we need to create a list of keys that need to be matched against our MARC records.
+In the example below we create a CSV file with a C<key> , C<value>
+header and all the keys that are OK:
+
+    $ cat mylist.txt
+    key,value
+    book,OK
+    article,OK
+    journal,OK
+
+Next we create a Fix script that maps the MARC 900a field to a field called
+C<type>. This C<type> field we lookup in the C<mylist.txt> file. If a match
+is found, then the C<type> field will contain the value in the list (OK). When
+no match is found then the C<type> will contain the original value. We reject
+all records that have OK as C<type> and keep only the ones that weren't matched
+in the file.
+
+Open a text editor and create the C<myfix.fix> file with content:
+
+    marc_map(900a,type)
+
+    lookup(type,'/tmp/mylist.txt')
+
+    reject all_match(type,OK)
+
+    retain(_id,type)
+
+And now run the command:
+
+    $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
+
+=head1 Create a CSV file of all ISSN numbers found at any MARC field
+
+To process this information we need to create a Fix script like the
+one below (line numbers are added here to explain the working of this script):
+
+    01: marc_map('***',text.$append)
+    02:
+    03: filter(text,'(\b\d{4}-?\d{3}[\dxX]\b)')
+    04: replace_all(text.*,'.*(\b\d{4}-?\d{3}[\dxX]\b).*',$1)
+    05:
+    06: do list(path:text)
+    07:   unless is_valid_issn(.)
+    08:     reject()
+    09:   end
+    10: end
+    11:
+    12: vacuum()
+    13:
+    14: select exists(text)
+    15:
+    16: join_field(text,' ; ')
+    17:
+    18: retain(_id,text)
+
+On line 01 all the text in the MARC record is mapped into a C<text> array.
+On line 03 we filter out this array all the lines that contain an ISSN string
+using a regular expression.
+On line 04 the C<replace_all> is used to delete everything in the C<text>
+array that isn't an ISSN number.
+On line 06-10 we go over every ISSN string and check if it has a valid checksum
+and erase it when not.
+On line 12 we use the C<vacuum> function to remove any remaining empty fields
+On line 14 we select only the records that contain a valid ISSN number
+On line 16 the ISSN get joined by a semicolon ';' into a long string
+On line 18 we keep only the record id and the ISSNs in for the report.
+
+Run this Fix script (without the line number) using this command
+
+    $ catmandu convert MARC to CSV --fix myfix.fix < data.mrc
+
+=head2 Create a MARC validator
+
+For this example we need a Fix script that contains validation rules we need to
+check. For instance, we require to have a 245 field and at least a 008 control
+field with a date filled in. This can be coded as in:
+
+    # Check if a 245 field is present
+    unless marc_has('245')
+      log("no 245 field",level:ERROR)
+    end
+
+    # Check if there is more than one 245 field
+    if marc_has_many('245')
+      log("more than one 245 field?",level:ERROR)
+    end
+
+    # Check if in 008 position 7 to 10 contains a 4 digit number ('\d' means digit)
+    unless marc_match('008/07-10','\d{4}')
+      log("no 4-digit year in 008 position 7 -> 10",level:ERROR)
+    end
+
+Put this Fix script in a file C<myfix.fix> and execute the Catmandu command
+with the "-D" option for logging and the Null exporter to discard the normal
+output
+
+    $ catmandu -D convert MARC to Null --fix myfix.fix < data.mrc
+
+=head1 WRITING
+
+=head2 Convert a MARC record into a MARC record (do nothing)
+
+    $ catmandu convert MARC to MARC < data.mrc > output.mrc
+
+=head2 Add a 920a field with value 'checked' to all records
+
+    $ catmandu convert MARC to MARC --fix 'marc_add("900",a,"checked")' < data.mrc > output.mrc
+
+=head2 Delete the 024 fields from all MARC records
+
+    $ catmandu convert MARC to MARC --fix 'marc_remove("024")' < data.mrc > output.mrc
+
+=head2 Set the 650p field to 'test' for all records
+
+    $ catmandu convert MARC to MARC --fix 'marc_add("650p","test")' < data.mrc > output.mrc
+
+=head2 Select only the records with 900a == book
+
+    $ catmandu convert MARC to MARC --fix 'marc_map(900a,type); select all_match(type,book)' < data.mrc > output.mrc

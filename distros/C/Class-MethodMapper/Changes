@@ -1,0 +1,8 @@
+1.0    Kevin Lenzo <lenzo@cs.cmu.edu>
+	Moved things back under lib/ in the vain hope that
+	the docs would get installed by CPAN.pm
+	Changed the License to same terms as Perl itself.
+
+0.9_00 Kevin Lenzo <lenzo@cs.cmu.edu>
+	Changed set_map and get_map to accept hashes
+	rather than hashrefs. 			

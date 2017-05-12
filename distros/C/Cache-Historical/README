@@ -1,0 +1,116 @@
+######################################################################
+    Cache::Historical 0.05
+######################################################################
+
+NAME
+    Cache::Historical - Cache historical values
+
+SYNOPSIS
+        use Cache::Historical;
+
+        my $cache = Cache::Historical->new();
+ 
+           # Set a key's value on a specific date
+        $cache->set( $dt, $key, $value );
+
+           # Get a key's value on a specific date
+        my $value = $cache->get( $dt, $key ); 
+
+           # Same as 'get', but if we don't have a value at $dt, but we 
+           # do have values for dates < $dt, return the previous 
+           # historic value. 
+        $cache->get_interpolated( $dt, $key );
+
+DESCRIPTION
+    Cache::Historical caches historical values by key and date. If you have
+    something like historical stock quotes, for example
+
+        2008-01-02 msft 35.22
+        2008-01-03 msft 35.37
+        2008-01-04 msft 34.38
+        2008-01-07 msft 34.61
+
+    then you can store them in Cache::Historical like
+
+        my $cache = Cache::Historical->new();
+
+        my $fmt = DateTime::Format::Strptime->new(
+                      pattern => "%Y-%m-%d");
+
+        $cache->set( $fmt->parse_datetime("2008-01-02"), "msft", 35.22 );
+        $cache->set( $fmt->parse_datetime("2008-01-03"), "msft", 35.37 );
+        $cache->set( $fmt->parse_datetime("2008-01-04"), "msft", 34.38 );
+        $cache->set( $fmt->parse_datetime("2008-01-07"), "msft", 34.61 );
+
+    and retrieve them later by date:
+
+        my $dt = $fmt->parse_datetime("2008-01-03");
+
+          # Returns 35.37
+        my $value = $cache->get( $dt, "msft" );
+
+    Even if there's no value available for a given date, but there are
+    historical values that predate the requested date, "get_interpolated()"
+    will return the next best historical value:
+
+        my $dt = $fmt->parse_datetime("2008-01-06");
+
+          # Returns undef, no value available for 2008-01-06
+        my $value = $cache->get( $dt, "msft" );
+
+          # Returns 34.48, the value for 2008-01-04, instead.
+        $value = $cache->get_interpolated( $dt, "msft" );
+
+  Methods
+    new()
+        Creates the object. Takes the SQLite file to put the date into as an
+        additional parameter:
+
+            my $cache = Cache::Historical->new(
+                sqlite_file => "/tmp/mydata.dat",
+            );
+
+        The SQLite file defaults to
+
+            $HOME/.cache-historical/cache-historical.dat
+
+        so if you have multiple caches, you need to use different SQLite
+        files.
+
+    time_range()
+               # List the time range for which we have values for $key
+            my($from, $to) = $cache->time_range( $key );
+
+    keys()
+               # List all keys
+            my @keys = $cache->keys();
+
+    values()
+               # List all the values we have for $key, sorted by date
+               # ([$dt, $value], [$dt, $value], ...)
+            my @results = $cache->values( $key );
+
+    clear()
+               # Remove all values for a specific key
+            $cache->clear( $key );
+
+               # Clear the entire cache
+            $cache->clear();
+
+    last_update()
+               # Return a DateTime object of the last update of a given key
+            my $when = $cache->last_update( $key );
+
+    since_last_update()
+               # Return a DateTime::Duration object since the time of the last
+               # update of a given key.
+            my $since = $cache->since_last_update( $key );
+
+LEGALESE
+    Copyright 2007-2011 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <cpan@perlmeister.com>
+

@@ -1,0 +1,50 @@
+Revision history for Perl extension Coteng
+
+0.11 2017-03-06T09:04:30Z
+
+    - Allow SQL::Maker::Condition and SQL::QueryMaker #16 by nonylene
+
+0.10 2014-01-13T06:36:08Z
+
+    - Reintroduce safe cache of dbh object by Scope::Container::DBI
+    - Change $Coteng::CLASS role.
+
+0.09 2014-01-12T03:03:24Z
+
+    - Don't cache dbh object because DBI cannot reconnect when db connection is killed
+
+0.08 2014-01-03T19:10:41Z
+
+    - Fix missing load SQL::NamedPlaceholder
+
+0.07 2013-12-30T11:00:18Z
+
+    - Add Coteng#new to DBI->connect format param
+    - Add Coteng#new to dbh param
+    - Add Coteng#count
+
+0.06 2013-12-29T19:54:58Z
+
+    - Fix return value of selecter methods (single, search, single_named, search_named, single_by_sql, search_by_sql)
+
+0.05 2013-12-29T18:15:58Z
+
+    - Fix delete method bug.
+
+0.04 2013-12-29T16:58:01Z
+
+    - Fix bug. don't work bulk_insert
+
+0.03 2013-12-29T09:35:12Z
+
+    - Add transaction support (DBIx::Sunny)
+
+0.02 2013-12-29T08:13:56Z
+
+    - Add $DBI_CLASS
+    - Remove root_dbi_class
+
+0.01 2013-12-28T16:33:21Z
+
+    - original version
+

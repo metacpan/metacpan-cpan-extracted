@@ -1,0 +1,19 @@
+Revision history of Cache::Weak
+
+1.0.3   Tue May 13 17:45:17 UTC 2008
+    - traditional Makefile.PL support removed;
+    - the project repo is moved to GitHub;
+    - minor POD changes;
+
+1.0.2   Tue Apr 22 15:22:45 UTC 2008
+    - refcount test added;
+    - minor POD fixes applied;
+    - 01_basic.t is altered to use count() instead of _keys();
+
+1.0.1   Sat Apr  5 19:07:48 UTC 2008
+    - count() method added;
+    - auto_purge property added;
+    - minor POD fixes applied;
+
+1.0.0   Fri Apr  4 00:38:10 UTC 2008
+    - initial release.

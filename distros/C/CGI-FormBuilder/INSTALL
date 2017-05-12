@@ -1,0 +1,31 @@
+NAME
+    INSTALL - how to install FormBuilder 3.0
+
+DESCRIPTION
+    To install in your root Perl tree:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    If you want to relocate it elsewhere, say for testing, you need to
+    change several "MakeMaker" variables:
+
+        perl Makefile.PL PREFIX=~/lib \
+                         INSTALLMAN1DIR=~/man/man1 \
+                         INSTALLMAN3DIR=~/man/man3 \
+                         INSTALLARCHLIB=~/lib \
+                         INSTALLPRIVLIB=~/lib \
+                         INSTALLSITELIB=~/lib \
+                         INSTALLSITEARCH=~/lib
+
+    Note: This is true for CPAN modules and is not specific to FormBuilder.
+
+AUTHOR
+    Copyright (c) Nate Wiger <http://nateware.com>. All Rights Reserved.
+
+    This module is free software; you may copy this under the terms of the
+    GNU General Public License, or the Artistic License, copies of which
+    should have accompanied your Perl kit.
+

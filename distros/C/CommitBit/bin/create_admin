@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use lib 'lib';
+
+use Jifty::Everything;
+use CommitBit::CurrentUser;
+use CommitBit::Model::User;
+use Getopt::Long;
+Jifty->new();
+my $email;
+GetOptions('email=s' => \$email,
+       );
+
+die "You must supply a --email=foo\@example.com flag to $0" unless ($email);
+
+my $u = CommitBit::Model::User->new(current_user => CommitBit::CurrentUser->superuser);
+
+my ($id,$msg) = $u->create( email => $email, password => 'password', email_confirmed => 1, admin => 1);
+print $msg ."\n";
+
+
+1;

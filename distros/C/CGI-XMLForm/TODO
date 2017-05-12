@@ -1,0 +1,6 @@
+TODO
+
+- Add in support for Doctype headers
+- Add in xmlcgi:combine (for combining 2 or more params into 1 element)
+- Add in more pragmas
+- Figure out how to figure out the encoding... :)

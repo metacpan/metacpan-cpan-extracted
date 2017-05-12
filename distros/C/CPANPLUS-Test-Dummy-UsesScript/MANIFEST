@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/CPANPLUS/Test/Dummy/UsesScript.pm
+t/00-compile.t
+t/02_script.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

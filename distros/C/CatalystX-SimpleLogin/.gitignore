@@ -1,0 +1,15 @@
+MYMETA.*
+MANIFEST.bak
+*.swp
+cover_db
+META.yml
+Makefile
+blib
+inc
+pm_to_blib
+MANIFEST
+Makefile.old
+README
+CatalystX-SimpleLogin-*
+t/lib/TestAppDBIC/testdbic.db
+

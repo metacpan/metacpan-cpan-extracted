@@ -1,0 +1,30 @@
+---
+abstract: 'Batch requests implementation for Catalyst JSON-RPC server plugin'
+author:
+    - 'Denis Ibaev <dionys@cpan.org>'
+build_requires:
+    ExtUtils::MakeMaker: 6.36
+    Test::More: 0
+configure_requires:
+    ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+    url: http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4
+name: Catalyst-Plugin-Server-JSONRPC-Batch
+no_index:
+    directory:
+       - inc
+       - t
+requires:
+    Catalyst::Plugin::Server::JSONRPC: 0
+    Class::Load: 0
+    HTTP::Body: 0
+    JSON::RPC::Common: 0
+resources:
+    bugtracker: http://github.com/dionys/catalyst-plugin-server-jsonrpc-batch/issues
+    license: http://dev.perl.org/licenses/
+    repository: http://github.com/dionys/catalyst-plugin-server-jsonrpc-batch
+version: 0.02

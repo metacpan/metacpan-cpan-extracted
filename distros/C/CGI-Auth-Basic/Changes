@@ -1,0 +1,47 @@
+Revision history for Perl extension CGI::Auth::Basic.
+
+1.23 Wed Jan 21 00:46:28 2015
+   => Fix for RT#100882.
+
+1.22 Mon Aug 27 01:22:53 2012
+   => Perl::Critic refactoring.
+   => Distro fixes.
+
+1.21 Wed Apr 22 04:30:21 2009
+   => Update builder.
+
+1.20 Sat Apr 18 05:27:47 2009
+   => Updating distro.
+
+1.11 Sun Dec 30 22:19:45 2007
+   => Fixed RT#31947.
+   => Fixed a security issue.
+
+1.10 Sun Jun 18 04:07:02 2006
+   => SIGNATURE sent to oblivion :p
+   => Exit handler fix.
+   => Oooh... I've just faced the infamous 
+      "The crypt() function is unimplemented due to excessive paranoia"
+      thing. Module now checks this error and enables 
+      Crypt::UnixCrypt::crypt() if 'Crypt::UnixCrypt' exists, dies 
+      otherwise.
+   => Updated test suite.
+   => Module::Build support.
+   => Renamed some private methods to pass pod coverage test.
+
+1.02 Sun Nov  7 05:27:49 2004
+   => Changed default CHMOD value to 0777 (it was 0644).
+      It must be 0666, but I think that 0777 is mostly 
+      better for CGI apps.
+   => Updated pod.
+   => Fixed typo in error messages.
+   => Added module version info to fatal html.
+
+1.01 Tue Aug 31 16:14:39 2004
+   => Added hidden option to new. You can now define 
+      some hidden areas globally in the templates.
+      They'll also be used in the query strings.
+   => New method exit_code() to set the exit code.
+      Default is CORE::exit.
+1.0 Sat Feb 21 16:12:56 2004
+   => First release.

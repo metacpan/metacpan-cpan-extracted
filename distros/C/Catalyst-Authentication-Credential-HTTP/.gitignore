@@ -1,0 +1,10 @@
+Catalyst-Authentication-Credential-HTTP-*
+MANIFEST
+MANIFEST.bak
+META.yml
+MYMETA.json
+MYMETA.yml
+Makefile
+inc/
+blib/
+pm_to_blib

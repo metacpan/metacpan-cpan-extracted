@@ -1,0 +1,14 @@
+<%args>
+$action
+$next
+</%args>
+<&|/_elements/wrapper, title => 'Preferences' &>
+<p>Update your password or nickname. (For now, you can't touch your email address)</p>
+<% Jifty->web->form->start(call => $next, name => "prefbox") %>
+<% $action->form_field('email', render_mode => 'read') %>
+<% $action->form_field('nickname') %>
+<% $action->form_field('password') %>
+<% $action->form_field('password_confirm') %>
+<% Jifty->web->form->submit(label => 'Save', submit => $action) %>
+<% Jifty->web->form->end %>
+</&>

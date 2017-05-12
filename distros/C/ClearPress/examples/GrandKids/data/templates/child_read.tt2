@@ -1,0 +1,15 @@
+
+[<a href="[% model.id_child %];edit">Edit</a>]
+<h2>child </h2>
+<table>
+ <tr><th>birthday</th><td>[% model.birthday %]</td></tr>
+ <tr><th>name</th><td>[% model.name %]</td></tr>
+ <tr>
+  <th>family</th>
+  <td>[<a href="[% SCRIPT_NAME %]/family/[% model.id_family %]">details</a>]</td>
+ </tr>
+</table>
+
+
+
+ 

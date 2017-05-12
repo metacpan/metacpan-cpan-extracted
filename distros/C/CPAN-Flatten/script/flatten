@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use CPAN::Flatten::CLI;
+
+CPAN::Flatten::CLI->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+flatten - flatten cpan module requirements without install
+
+=head1 SYNOPSIS
+
+  $ flatten Package::Name
+
+=head1 OPTIONS
+
+=over 4
+
+=item -q, --quiet
+
+be quiet
+
+=item -v, --verbose
+
+more verbose messages (show core requirements)
+
+=item --target-perl VERSION
+
+flatten requirements as if your perl version is VERSION
+
+=item -h, --help
+
+show help
+
+=item --version
+
+show version
+
+=back
+
+=head1 AUTHOR
+
+Shoichi Kaji
+
+=cut
+

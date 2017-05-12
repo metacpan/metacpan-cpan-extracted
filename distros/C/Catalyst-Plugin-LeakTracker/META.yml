@@ -1,0 +1,32 @@
+---
+abstract: 'Use L<Devel::Events::Objects> to track object'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::WWW::Mechanize::Catalyst: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-LeakTracker
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst::Plugin::C3: 0
+  Catalyst::Runtime: 5.7010
+  Class::Data::Inheritable: 0
+  Devel::Events: 0
+  Devel::Events::Objects: 0
+  Task::Weaken: 1.02
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.03

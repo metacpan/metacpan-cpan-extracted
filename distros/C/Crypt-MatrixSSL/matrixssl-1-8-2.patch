@@ -1,0 +1,14 @@
+Fix significant memory leak in loading certificates with unsupported
+extentions.
+
+diff -uNr matrixssl-1-8-open.orig/src/pki/x509.c matrixssl-1-8-open/src/pki/x509.c
+--- matrixssl-1-8-open.orig/src/pki/x509.c	2006-04-04 14:14:02.000000000 +0300
++++ matrixssl-1-8-2/src/pki/x509.c	2006-06-11 03:17:22.000000000 +0300
+@@ -834,6 +834,7 @@
+ 				matrixStrDebugMsg("extension format that is not currently\n", NULL);
+ 				matrixStrDebugMsg("recognized.  Please email support@peersec.com\n", NULL);
+ 				matrixStrDebugMsg("to add support for the extension.\n\n", NULL);
++				matrixX509FreeCert(cert);
+ 				return -1;
+ 			}
+ 		}

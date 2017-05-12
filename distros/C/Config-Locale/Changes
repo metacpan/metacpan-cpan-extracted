@@ -1,0 +1,25 @@
+Revision history for Perl extension Config::Locale.
+
+0.05      2013-07-21
+ - Don't use Moose since this module may often be used form CLI scripts where
+   Moose's slow startup can be annoying.
+
+0.04      2013-07-14
+ - Fix tests for Windows.
+ - Add require_defaults argument.
+
+0.03      2013-04-24
+ - Optimize the PERMUTE algorithm so that its not actually generating all the
+   possible permutations, which was VERY slow.
+ - Replace the default argument with default_stem and override_stem.  This
+   provides much more flexibility.
+
+0.02      2013-04-21
+ - Add algorithm argument to support the new PERMUTE algorithm.
+ - Add merge_behavior argument.
+ - Remove suggestions that one should use suffix for specifying the extension
+   of the configuration filenames.
+
+0.01      2012-03-19
+ - First release.
+

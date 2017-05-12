@@ -1,0 +1,28 @@
+[%
+   title=""
+   description= ""
+%]
+[% INCLUDE incl/header.tt %]
+
+<div id="links">
+[% IF dist %]
+<a href="/dist/[% dist %]">[% dist %]</a>
+[% END %]
+
+[% IF src %]
+<a href="[% src %]">src</a>
+[% END %]
+
+[% IF syn %]
+<a href="[% syn %]">syn</a>
+[% END %]
+
+[% IF pod %]
+<a href="[% pod %]">pod</a>
+[% END %]
+
+</div>
+
+[% html %]
+
+[% INCLUDE incl/footer.tt %]

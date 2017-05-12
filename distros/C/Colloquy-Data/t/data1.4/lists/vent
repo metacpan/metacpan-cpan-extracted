@@ -1,0 +1,10 @@
+return {
+  description = "Moan moan moan moan moan",
+  created = "Fri Nov 11 10:48:49 2005",
+  members = { "neech", "goolies", "heathers", "zoe", "bob", "botbot", "ricky", "heds", "tims", },
+  listname = "vent",
+  masters = { },
+  owner = "heds",
+  flags = "P",
+  used = 1132957959,
+}

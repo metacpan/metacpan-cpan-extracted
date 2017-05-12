@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<definitions targetNamespace="urn:simple"
+  xmlns:tns="urn:simple"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:enc="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+  <message name="testRequest">
+    <part name="data" type="xsd:string"/>
+  </message>
+  <message name="testResponse">
+    <part name="data" type="xsd:string"/>
+  </message>
+
+  <portType name="testInterface">
+    <operation name="test">
+      <input message="tns:testRequest"/>
+      <output message="tns:testResponse"/>
+    </operation>
+  </portType>
+
+  <binding name="testBinding" type="tns:testInterface">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="test">
+      <soap:operation soapAction="http://foo.com/test#test"/>
+      <input>
+        <soap:body use="encoded" namespace="http://foo.com/test"
+              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </input>
+      <output>
+        <soap:body use="encoded" namespace="http://foo.com/test"
+              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+      </output>
+    </operation>
+  </binding>
+
+  <service name="test">
+    <port name="testInterface" binding="tns:testBinding">
+      <soap:address location="http://www.foo.com/test.cgi"/>
+    </port>
+  </service>
+</definitions>
+
+

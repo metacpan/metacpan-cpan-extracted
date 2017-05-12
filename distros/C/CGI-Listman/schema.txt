@@ -1,0 +1,134 @@
+### CGI::Listman class ###
+#
+# class CGI::Listman {
+#   variables:
+#     db_name: string
+#     db_uname: string
+#     db_passwd: string
+#     db_host: string
+#     db_port: integer
+#     dbi_backend: string
+#     list: array_ref
+#     list_name: string
+#     list_dir: string
+#     table_name: string
+#     _commit: boolean (private)
+#     _db_connection: DBI object (private)
+#     _db_fields: array_ref (private)
+#     _dbi_params: string (private)
+#     _last_line_number: integer (private)
+#     _loading_list: boolean (private)
+#
+#   methods:
+#     check_params
+#     commit
+#     add_line
+#     delete_line
+#     delete_selection
+#     dictionary
+#     list_contents
+#     load_lines
+#     seek_line_by_num
+#     set_backend
+#     set_db_name
+#     set_user_infos
+#     set_host_infos
+#     set_list_name
+#     set_list_directory
+#     set_table_name
+#     _dbi_setup (private)
+#     _db_connect (private)
+#     _db_fields_setup (private)
+#     _prepare_record (private)
+# }
+#
+### CGI::Listman::line class ###
+#
+# class CGI::Listman::line {
+#   variables:
+#     data: array_ref
+#     exported: boolean
+#     number: integer
+#     seen: boolean
+#     timestamp: integer
+#     _updated: boolean
+#     _new_line: boolean
+#     _deleted: boolean
+#
+#   methods:
+#     line_fields
+#     mark_seen
+#     mark_exported
+#     number
+#     set_fields
+#     update_fields
+#     _build_from_listman_data (private)
+# }
+#
+### CGI::Listman::exporter class ###
+#
+# class CGI::Listman::exporter {
+#   variables:
+#     file_name: string
+#     lines: array_ref
+#     _csv (private): instance of Text::CSV_XS
+#     _needs_commit (private): boolean
+#     _file_read: boolean
+#
+#   methods:
+#     set_file_name
+#     add_line
+#     add_selection
+#     file_contents
+#     save_file
+#     _read_file (private)
+# }
+#
+### CGI::Listman::selection class ###
+#
+# class CGI::Listman::selection {
+#   variables:
+#     list: array_ref
+#
+#   methods:
+#     add_line
+#     add_line_by_number
+#     add_lines_by_number
+# }
+#
+### CGI::Listman::dictionary class ###
+#
+# class CGI::Listman::dictionary {
+#   variables:
+#     filename: string
+#     _loading: boolean (private)
+#     _terms: array_ref (private)
+#
+#   methods:
+#     add_term
+#     get_term
+#     increase_term_pos
+#     increase_term_pos_by_key
+#     decrease_term_pos
+#     decrease_term_pos_by_key
+#     reposition_term
+#     save
+#     term_pos_in_list
+#     terms
+#     _load (private)
+# }
+#
+### CGI::Listman::dictionary::term class ###
+#
+# class CGI::Listman::dictionary::term {
+#   variables:
+#     key: string
+#     definition: string
+#     mandatory: boolean
+#
+#   methods:
+#     definition
+#     set_term
+#     set_definition
+#     set_mandatory
+#}

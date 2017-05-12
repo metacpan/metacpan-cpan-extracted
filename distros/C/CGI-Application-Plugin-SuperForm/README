@@ -1,0 +1,136 @@
+NAME
+    CGI::Application::Plugin::SuperForm - Create sticky HTML forms in
+    CGI::Application run modes using HTML::SuperForm
+
+SYNOPSIS
+        use CGI::Application::Plugin::SuperForm;
+
+            sub form_runmode {
+                    my $c = shift;
+
+                    my $form_start = $c->superform->start_form(
+                            {
+                                    method => "POST",
+                                    action => $c->query()->url() . "/myapp/form_process",
+                            }
+                    );
+
+                    my $text = $c->superform->text( name => 'text', default => 'Default Text' );
+
+                    my $textarea = $c->superform->textarea(
+                            name    => 'textarea',
+                            default => 'More Default Text'
+                    );
+
+                    my $select = $c->superform->select(
+                            name    => 'select',
+                            default => 2,
+                            values  => [ 0, 1, 2, 3 ],
+                            labels  => {
+                                    0 => 'Zero',
+                                    1 => 'One',
+                                    2 => 'Two',
+                                    3 => 'Three'
+                            }
+                    );
+
+                    my $output = <<"END_HTML";
+                <html>
+                <body>
+                    <form>
+                    Text Field: $text<br>
+                    Text Area: $textarea<br>
+                    Select: $select
+                    </form>
+                </body>
+                </html>
+            END_HTML
+                    return $output;
+
+            }
+
+DESCRIPTION
+    Create sticky forms with "HTML::SuperForm".
+
+METHODS
+    sform
+        alias to superform
+
+    superform
+        Returns a instance of "HTML::SuperForm" preconfigured with sticky
+        and fallback options on. See HTML::SuperForm for more information
+        and examples.
+
+EXAMPLE USING TT PLUGIN
+    A simplistic but working app SuperForm, TT and AutoRunmode plugins. TT
+    brings in 'c' var to templates automatically, SuperForm brings in
+    'sform'.
+
+      Files:
+
+        ./lib/MyApp.pm
+        .MyApp/form.tmpl
+        ./server.pl
+
+      lib/MyApp.pm
+
+                    package MyApp;
+                    use base 'Titanium';
+
+                    use CGI::Application::Plugin::TT;
+                    use CGI::Application::Plugin::SuperForm;
+                    use CGI::Application::Plugin::AutoRunmode;
+
+                    sub form: Runmode{
+                            my $c = shift;
+                            $c->tt_process();
+                    }
+
+
+                    sub process_form(): Runmode{
+                            my $c = shift;
+                            # do something with user input.
+                            # redirect to success page, etc.
+                            return "You said: ". $c->query()->param('input1');
+                    }
+
+
+
+                    1;    # End of MyApp
+
+      MyApp/form.tmpl
+
+              <html>
+                    [% c.sform.start_form({method=>"POST"}) %]<br/>
+                    Say what? [% c.sform.text({name=>"input1"}) %]<br/>
+                    [% c.sform.hidden({name=>"rm", value=>"process_form"})  %]<br/>
+                    [% c.sform.submit()%]<br/>
+                    [% c.sform.end_form() %]<br/>
+              </html>
+
+      .server.pl
+
+                    use warnings;
+                    use strict;
+                    use CGI::Application::Server;
+                    use lib 'lib';
+                    use MyApp;
+
+                    my $app = MyApp->new(PARAMS => {});
+                    my $server = CGI::Application::Server->new();
+                    $server->document_root('.');
+                    $server->entry_points({
+                        '/index.cgi' => $app,
+                    });
+                    $server->run;
+
+SEE ALSO
+    HTML::SuperForm, Titanium, CGI::Application.
+
+AUTHOR
+    Gordon Van Amburg, "gordon@minipeg.net"
+
+LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

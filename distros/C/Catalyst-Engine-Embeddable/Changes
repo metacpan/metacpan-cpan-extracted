@@ -1,0 +1,13 @@
+0.000003 2009-11-18 Tomas Doran
+    - Patch by email from mike to add tests
+      and add the ability to get the $c->error
+      stack out of an embeddable engine.
+
+0.000002 2009-05-22 Tomas Doran
+
+    - Reduce perl dependency to 5.8.6
+    - Update to use Moose and Catalyst 5.80
+
+0.0.1 2007-12-12 Daniel Ruoso
+
+    - Initial revision

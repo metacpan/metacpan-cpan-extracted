@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>Clio with WebSockets</title>
+        <script type="text/javascript" src="jquery-1.6.2.min.js"></script>
+    </head>
+    <body>
+        <div id="commands">
+            <form id="commands_form" onsubmit="return send()">
+                <table>
+                    <tr>
+                        <th>input:</th>
+                        <th><input type="text" id="command_input"></th>
+                        <td><input type="submit"
+                            id="command_button" value="Send"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div id="output"></div>
+        <script type="text/javascript">
+            function msg(text) {
+                $('#output').prepend('<p>'+ text +'</p>');
+            };
+            var url = "ws://localhost:12345/";
+            var socket = new WebSocket(url);
+
+            function send() {
+                var cmd = $('#command_input').val();
+                msg(">> "+ cmd);
+                socket.send( cmd );
+
+                return false;
+            }
+
+            $(document).ready(function(){
+                socket.onopen = function() {
+                    msg("Connection opened");
+                };
+                socket.onerror = function() {
+                    msg("Connection error");
+                };
+                socket.onclose = function() {
+                    msg("Connection closed");
+                };
+                socket.onmessage = function(e) {
+                    msg("<< "+ e.data);
+                };
+            });
+        </script>
+    </head>
+    </body>
+</html>

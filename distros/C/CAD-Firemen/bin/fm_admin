@@ -1,0 +1,351 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2013 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_admin
+# ABSTRACT: Helper to change the configuration of CAD::Firemen
+
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use DBI;
+use CAD::Firemen;
+use CAD::Firemen::Common qw(
+  strip
+  maxLength
+  loadSettings
+  saveSettings
+  testPassed
+  testFailed
+  installationId
+  sharedDir
+);
+use CAD::Firemen::Load qw(loadCDB loadDatabase);
+
+
+sub setDefaultPath {
+  # Switching the default installation
+  my $settings = loadSettings();
+  if(!defined($settings)){
+    print "Could not load settings\n";
+    return 0;
+  }
+
+  my @paths = @{$settings->{"paths"}};
+  my $i = 0;
+  my $max = maxLength(@paths);
+  print "Select an installations:\n";
+  foreach my $path (sort(@paths)){
+  my $defaultPath = "";
+  if($path eq $settings->{"defaultPath"}){
+    $defaultPath = " (Default)";
+  }
+    print "  ". sprintf("%-". $max ."s", $path) ." ". $i . $defaultPath ."\n";
+    $i++;
+  }
+  print "Or enter -1 to exit: ";
+  my $input = <>;
+  $input = strip($input);
+  if($input eq ""){
+    print "Nothing changed\n";
+  return 0;
+  }
+  if($input =~ /^\d+$/){
+    if(($input >= 0) && ($input < scalar(@paths))){
+    $settings->{"defaultPath"} = $paths[$input];
+    if(saveSettings($settings) == 0){
+    print "Failed to save settings\n";
+    return 0;
+    }
+    else{
+        print "Changed default path to ". $settings->{"defaultPath"} ."\n";
+    return 1;
+    }
+  }
+  else{
+    print "Entered number is out of range!\n";
+      return 0;
+  }
+  }
+  return 0;
+ }
+
+
+sub setEnvironmentPath {
+  my $settings = loadSettings();
+  if(!defined($settings)){
+    print "Could not load settings\n";
+    return 0;
+  }
+  print "Current environment path is ". $settings->{"defaultEnvironmentPath"} ."\n";
+  print "Please enter a new path: ";
+  my $input = <>;
+  $input = strip($input);
+  if(!-d $input){
+    print "Entered path does not exist!\n";
+    return 0;
+  }
+  $settings->{"defaultEnvironmentPath"} = $input;
+  if(saveSettings($settings) == 0){
+    print "Could not save settings\n";
+    return 0;
+  }
+  print "Changed default environment path to ". $settings->{"defaultEnvironmentPath"} ."\n";
+  return 1;
+}
+
+my $showVersion = 0;
+# my $verbose = 0;
+my $default = 0;
+my $environmentPath = 0;
+my $cleanup = 0;
+my $verbose = 0;
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions(
+  'version' => \$showVersion,
+  'default|d' => \$default,
+  'environment|e' => \$environmentPath,
+  'cleanup|c' => \$cleanup,
+  'verbose|v:i' => \$verbose
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+my $dbh = undef;
+
+if($default){
+  if(!setDefaultPath()){
+    exit 1;
+  }
+  exit 0;
+}
+
+if($environmentPath){
+  if(!setEnvironmentPath()){
+    exit 1;
+  }
+  exit 0;
+}
+
+if($cleanup){
+  my $settings = loadSettings();
+  if(!defined($settings)){
+    print "Could not load settings\n";
+    exit 1;
+  }
+
+  # First cleanup paths
+  print "Cleaning up...\n";
+  my $test = "  paths";
+  if($verbose > 0){
+    print $test ."\n";
+  }
+  my @pathsNew;
+  my @pathsOld = @{$settings->{"paths"}};
+  for(my $i = 0; $i < scalar(@pathsOld); $i++){
+    if(-d $pathsOld[$i]){
+      push(@pathsNew, $pathsOld[$i]);
+    }
+    else{
+      if($verbose > 0){
+        print "    Marked for removal ". $pathsOld[$i] ."\n";
+      }
+    }
+  }
+  $settings->{"paths"} = \@pathsNew;
+  if(!saveSettings($settings)){
+    if($verbose == 0){
+      testFailed($test);
+    }
+  }
+  else{
+    if($verbose == 0){
+      testPassed($test);
+    }
+  }
+
+  # Cleanup defaultPath
+  $test = "  defaultPath";
+  if(!-d $settings->{"defaultPath"}){
+    if(!setDefaultPath()){
+      testFailed($test);
+    }
+    else{
+      testPassed($test);
+    }
+  }
+
+  # Cleanup defaultEnvironmentPath
+  $test = "  defaultEnvironmentPath";
+  if(!-d $settings->{"defaultEnvironmentPath"}){
+    if(!setEnvironmentPath()){
+      testFailed($test);
+    }
+    else{
+      testPassed($test);
+    }
+  }
+
+  # cleanup databases
+  $test = "  databases";
+  if($verbose > 0){
+    print $test ."\n";
+  }
+  my %databases;
+  my @paths = @{$settings->{"paths"}};
+  foreach my $key (sort(keys(%{$settings->{"databases"}}))){
+    # only use existent databases
+    my $dbFile = sharedDir() ."/". $settings->{"databases"}->{$key};
+    if($verbose > 0){
+      print "    Checking ". $key ." --> ". $dbFile ."\n";
+    }
+    if(!-e $dbFile){
+      if($verbose > 0){
+        print "      Marked for removal ". $dbFile ."\n";
+      }
+    }
+    else{
+      if($verbose > 0){
+        print "      Exists\n";
+      }
+      # check whether database is related to an existing installation
+      my $found = 0;
+      foreach my $path (@paths){
+        my $id = installationId($path);
+        if($key eq $id){
+          $found = 1;
+          last;
+        }
+      }
+      if($found){
+        $databases{$key} = $settings->{"databases"}->{$key};
+        if($verbose > 0){
+          print "      Related installation found --> Leaving untouched\n";
+        }
+      }
+      else{
+        print "    Installation of database ". $key ." does not exists anymore.\n";
+        print "    Delete the database file? (y/N): ";
+        my $input = <>;
+        $input = strip($input);
+        if($input eq ""){
+          print "    Leave file untouched\n";
+          $databases{$key} = $settings->{"databases"}->{$key};
+        }
+        else{
+          if($input ne "y"){
+            print "    Leave file untouched\n";
+            $databases{$key} = $settings->{"databases"}->{$key};
+          }
+          else{
+            if(unlink($dbFile) != 1){
+              print "    Failed to remove file ". $dbFile ."\n";
+              $databases{$key} = $settings->{"databases"}->{$key};
+            }
+            else{
+              print "    File removed\n";
+            }
+          }
+        }
+      }
+    }
+  }
+  $settings->{"databases"} = \%databases;
+  if(!saveSettings($settings)){
+   if($verbose == 0){
+     testFailed($test);
+   }
+  }
+  if($verbose == 0){
+    testPassed($test);
+  }
+
+  exit 0;
+}
+
+print "Please choose an option\n\n";
+pod2usage(0);
+
+exit 0;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_admin - Helper to change the configuration of CAD::Firemen
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_config_admin [options]
+
+This script allows you to maipulate the config file of CAD::Firemen.
+
+Options:
+
+  --help        -?            Prints this help.
+  --version                   Prints current version.
+  --default     -d            Switch the used default installation.
+  --environment -e            Change path of testing environment.
+  --cleanup     -c            Removes all databases from old, unavailable installations
+                              and invalid paths from configuration (and dbs from filesystem).
+  --verbose     -v            Verbose level
+
+Examples:
+
+  fm_admin
+
+=head1 DESCRIPTION
+
+C<fm_admin> allows the user to manipulate the configuration of CAD::Firemen.
+
+=head1 METHODS
+
+=head2 setDefaultPath
+
+=head2 setEnvironmentPath
+
+Changes the environmentPath according to the entered path from user.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

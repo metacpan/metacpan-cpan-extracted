@@ -1,0 +1,23 @@
+version: 1
+creator: xdebug 2.2.7
+cmd: /var/www/html/wordpress/output.php
+part: 1
+positions: line
+
+events: Time
+
+fl=php:internal
+fn=php::phpinfo
+1 6685
+
+fl=/var/www/html/wordpress/output.php
+fn={main}
+
+summary: 6738
+
+1 53
+cfl=php:internal
+cfn=php::phpinfo
+calls=1 0 0
+1 6685
+

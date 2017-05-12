@@ -1,0 +1,16 @@
+foo
+{
+    bar     baz
+}
+
+foo2
+{
+    @inherit `#foo`
+    bar2    baz2
+}
+
+foo3
+{
+    @inherit `#foo2`
+    bar3    baz3
+}

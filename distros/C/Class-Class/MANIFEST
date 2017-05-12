@@ -1,0 +1,11 @@
+lib/Class/Class.pm
+t/01load.t
+t/02simple.t
+t/03complex.t
+t/04polymorph.t
+t/05polyvolve.t
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+TODO

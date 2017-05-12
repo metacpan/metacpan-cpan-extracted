@@ -1,0 +1,29 @@
+---
+abstract: 'Smart validation with FormValidator::Simple'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-FormValidator-Simple-Auto
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Catalyst: 5.80001
+  Catalyst::Plugin::FormValidator::Simple: 0
+  FormValidator::Simple: 0.20
+  UNIVERSAL::isa: 0
+  YAML: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.18

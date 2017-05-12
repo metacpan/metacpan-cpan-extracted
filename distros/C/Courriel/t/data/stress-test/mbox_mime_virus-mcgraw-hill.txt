@@ -1,0 +1,61 @@
+From tomcat-user-return-104834-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org Tue Jul 06 19:49:57 2004
+Return-Path: <tomcat-user-return-104834-apmail-jakarta-tomcat-user-archive=jakarta.apache.org@jakarta.apache.org>
+Delivered-To: apmail-jakarta-tomcat-user-archive@www.apache.org
+Received: (qmail 56912 invoked from network); 6 Jul 2004 19:49:57 -0000
+Received: from hermes.apache.org (HELO mail.apache.org) (209.237.227.199)
+  by minotaur-2.apache.org with SMTP; 6 Jul 2004 19:49:57 -0000
+Received: (qmail 89832 invoked by uid 500); 6 Jul 2004 19:49:43 -0000
+Delivered-To: apmail-jakarta-tomcat-user-archive@jakarta.apache.org
+Received: (qmail 89793 invoked by uid 500); 6 Jul 2004 19:49:43 -0000
+Mailing-List: contact tomcat-user-help@jakarta.apache.org; run by ezmlm
+Precedence: bulk
+List-Unsubscribe: <mailto:tomcat-user-unsubscribe@jakarta.apache.org>
+List-Subscribe: <mailto:tomcat-user-subscribe@jakarta.apache.org>
+List-Help: <mailto:tomcat-user-help@jakarta.apache.org>
+List-Post: <mailto:tomcat-user@jakarta.apache.org>
+List-Id: "Tomcat Users List" <tomcat-user.jakarta.apache.org>
+Reply-To: "Tomcat Users List" <tomcat-user@jakarta.apache.org>
+Delivered-To: mailing list tomcat-user@jakarta.apache.org
+Received: (qmail 89780 invoked by uid 99); 6 Jul 2004 19:49:43 -0000
+X-ASF-Spam-Status: No, hits=2.5 required=10.0
+        tests=FROM_AND_TO_SAME,NO_REAL_NAME,RCVD_ILLEGAL_IP
+X-Spam-Check-By: apache.org
+Received: from [198.45.18.165] (HELO corp148mr3.mcgraw-hill.com) (198.45.18.165)
+  by apache.org (qpsmtpd/0.27.1) with ESMTP; Tue, 06 Jul 2004 12:49:41 -0700
+Received: from unknown (0.0.0.0)
+  by corp148mr3.mcgraw-hill.com with ; 06 Jul 2004 15:49:18 -0400
+Date: 06 Jul 2004 15:49:18 -0400
+To: tomcat-user@jakarta.apache.org
+From: <tomcat-user@jakarta.apache.org>
+Subject: Attachment type not allowed
+X-Virus-Checked: Checked
+X-Spam-Rating: minotaur-2.apache.org 1.6.2 0/1000/N
+
+We have received a message with your e-mail address (tomcat-user@jakarta.apache.org) as the sender, with the following as the Subject:
+"TEST" .
+
+Due to security standards maintained on the McGraw-Hill corporate network, one or more of the attachments contained in your
+message fall into the category of files that could potentially contain harmful or malicious coding such as viruses. Therefore
+the entire message was blocked and NOT delivered.
+
+If you are in fact the sender of this message, please contact the intended recipient(s):
+stan@mcgrawhill.ca to make alternate arrangements for delivering the attachments. If you did NOT send the message, no
+further action is required on your part.
+
+We apologize for the inconvenience.
+
+>From tomcat-user@jakarta.apache.org Tue Jul 06 15:49:10 2004
+X-IronPort-RCPT-TO: stan@mcgrawhill.ca
+From: tomcat-user@jakarta.apache.org
+To: stan@mcgrawhill.ca
+Subject: TEST
+Date: Tue, 6 Jul 2004 15:49:12 -0400
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+        boundary="----=_NextPart_000_0004_74614D2D.F09C944A"
+X-Priority: 3
+X-MSMail-Priority: Normal
+
+---------------------------------------------------------------------
+To unsubscribe, e-mail: tomcat-user-unsubscribe@jakarta.apache.org
+For additional commands, e-mail: tomcat-user-help@jakarta.apache.org

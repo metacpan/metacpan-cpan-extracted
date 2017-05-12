@@ -1,0 +1,24 @@
+---
+abstract: 'compute color similarity using the HCL color space'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Color-Similarity-HCL
+provides:
+  Color::Similarity::HCL:
+    file: lib/Color/Similarity/HCL.pm
+    version: 0.05
+requires:
+  List::Util: 0.01
+  Module::Build: 0.2607
+  Test::More: 0.48
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

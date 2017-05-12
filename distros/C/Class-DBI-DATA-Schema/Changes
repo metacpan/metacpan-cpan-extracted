@@ -1,0 +1,18 @@
+Revision history for Class::DBI::DATA::Schema.
+
+1.00  Sat Sep  3 20:08:56 UTC 2005
+	- Make the tests pass with newer SQLite
+	- Key the cache with DB info (Matthew Walker)
+
+0.04  Mar 17 2004
+	- Tests cope better if helper modules are missing
+
+0.03  Mar 16 2004
+	- Allow for Caching of the translations (undocumented)
+
+0.02  Mar 16 2004
+	- Allow SQL::Translate to do its thing (undocumented)
+
+0.01  Oct 15 2003
+	- original version 
+

@@ -1,0 +1,44 @@
+---
+abstract: 'Dispatch requests to CGI::Snapp-based objects'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Deep: '0.12'
+  Test::More: '1.302052'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-Snapp-Dispatch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI::PSGI: '0.15'
+  CGI::Snapp: '2.01'
+  Capture::Tiny: '0.44'
+  Carp: '1.2'
+  Class::Load: '0.23'
+  File::Spec: '3.4'
+  HTTP::Exception: '0.04001'
+  IO::Pipe: '1.15'
+  Log::Handler: '0.88'
+  Moo: '2.002004'
+  Proc::Fork: '0.804'
+  Try::Tiny: '0.27'
+  lib: '0'
+  parent: '0.234'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/CGI-Snapp-Dispatch.git
+version: '2.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

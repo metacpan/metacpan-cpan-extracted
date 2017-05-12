@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd7d
+registers:
+  AF: 51992
+  AF_: 0
+  BC: 37883
+  BC_: 0
+  DE: 27613
+  DE_: 0
+  HL: 14864
+  HL_: 0
+  I: 0
+  IX: 55243
+  IY: 49398
+  PC: 2
+  R: 2
+  SP: 0

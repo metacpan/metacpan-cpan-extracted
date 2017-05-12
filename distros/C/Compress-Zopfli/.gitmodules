@@ -1,0 +1,3 @@
+[submodule "zopflib"]
+	path = zopflib
+	url = https://github.com/google/zopfli

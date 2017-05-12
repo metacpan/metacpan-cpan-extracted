@@ -1,0 +1,113 @@
+{
+   "abstract" : "The crypto parts of an X509v3 Certification Authority",
+   "author" : [
+      "Dominique Quatravaux <domq@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-OpenSSL-CA",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Convert::ASN1" : "0.2",
+            "Devel::Leak" : "0",
+            "Devel::Mallinfo" : "0",
+            "Fatal" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Spec::Unix" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::File" : "0",
+            "IPC::Run" : "0",
+            "Inline" : "0.4",
+            "Inline::C" : "0",
+            "MIME::Base64" : "0",
+            "Module::Build" : "0.29",
+            "Module::Build::Compat" : "0",
+            "Net::SSLeay" : "1.25",
+            "POSIX" : "0",
+            "Test::Builder" : "0",
+            "Test::Group" : "0",
+            "Test::More" : "0",
+            "Test::Taint" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Fatal" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Spec::Unix" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "IO::File" : "0",
+            "Inline" : "0.4",
+            "Inline::C" : "0",
+            "Module::Build" : "0.29",
+            "Module::Build::Compat" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::OpenSSL::CA" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm",
+         "version" : "0.24"
+      },
+      "Crypt::OpenSSL::CA::CONF" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::ENGINE" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::Error" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::Inline::C" : {
+         "file" : "lib/Crypt/OpenSSL/CA/Inline/C.pm"
+      },
+      "Crypt::OpenSSL::CA::PrivateKey" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::PublicKey" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::X509" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::X509V3_EXT" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::X509_CRL" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      },
+      "Crypt::OpenSSL::CA::X509_NAME" : {
+         "file" : "lib/Crypt/OpenSSL/CA.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

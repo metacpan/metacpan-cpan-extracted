@@ -1,0 +1,91 @@
+NAME
+    Catalyst::Helper::View::TT::Bootstrap::YUI - Generate TT templates using
+    YUI
+
+SYNOPSIS
+    Helper for TT view. Creates the `MyAppView/TT.pm' file and a template
+    directory structure under MyApp/root containing templates, macros, and
+    links to the hosted version of the YUI `reset-fonts-grids.css' file.
+
+    Use the helper to create the view module and templates:
+
+        $ script/myapp_create.pl view TT TT::Bootstrap::YUI
+
+    The stash key for configuring everything is `$c->stash->{page}' with
+    defaults in `MyApp/root/site/shared/base.tt'.
+
+    Add something like the following to the page templates for your
+    application
+
+     [%~
+        page.layout = '2columns';  # use a 2 column layout (default is 'default')
+        page.header = 'my_custom'; # will load root/site/header/my_custom.tt
+        page.footer = 'none';      # don't display a footer
+
+        # adds these <link rel="stylsheet"...> tags to the <head>
+        page.head.stylesheets.push('foo.css','bar.css');
+
+        # adds these <script> tags to the <head>
+        page.head.scripts.push('foo.js','bar.js');
+
+        # adds these <script> tags to the bottom of the <body> -- usually preferable
+        page.body.scripts.push('baz.js','poop.js');
+
+        # adds these classes to the <body> tag
+        page.body.classes.push('foo','bar');
+     ~%]
+     ...your content here...
+
+DESCRIPTION
+    This helper module creates a Catalyst::View::TT class in your
+    application. It also creates a set of templates, macros, and a
+    stylesheet to let you focus on the content of your apps pages sooner
+    with less copy and pasting.
+
+    It also provides a mechanism for adding dynamic filters, for doing
+    things like date formatting.
+
+    If you already have a TT view in your application, make sure to include
+    the other directives that are created by the helper. Typically, this
+    file is simply `MyApp/lib/MyApp/View/TT.pm.new' if a file exists with
+    the same name.
+
+    See Catalyst::Helper::View::TT::Bootstrap::YUI::Manual for more details
+    on available variables and macros, and how to work with the layouts.
+
+  METHODS
+    mk_compclass
+    Generates the component class.
+
+    mk_templates
+    Generates the templates.
+
+SEE ALSO
+    Catalyst, Catalyst::View::TT, Catalyst::Helper,
+    Catalyst::Helper::View::TT
+
+AUTHORS
+    Jay Shirley <jshirley@cpan.org>
+
+    Lucas Smith <lsmith@lucassmith.name>
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+
+NAME
+    [% class %] - Catalyst TT::Bootstrap::YUI View
+
+SYNOPSIS
+    See [% app %]
+
+DESCRIPTION
+    Catalyst TT::Bootstrap::YUI View.
+
+AUTHOR
+    [% author %]
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

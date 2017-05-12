@@ -1,0 +1,21 @@
+---
+abstract: 'just for testing'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Acme-CPAN-Patches
+provides:
+  Acme::CPAN::Patches:
+    file: lib/Acme/CPAN/Patches.pm
+    version: 0.01
+requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Application-Plugin-Cache-File.t
+lib/CGI/Application/Plugin/Cache/File.pm
+META.yml                                 Module meta-data (added by MakeMaker)

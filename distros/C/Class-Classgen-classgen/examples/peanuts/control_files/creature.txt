@@ -1,0 +1,13 @@
+header:
+# --- created 18.3.2000 by Michael Schlueter --------------------
+#
+#     a Creture is the base class for other individuals
+#
+# ---------------------------------------------------------------
+
+	package Creature;
+	use strict;
+
+variables:
+	$name	# some creatures are given a name
+	$pos	# the actual position of this creature

@@ -1,0 +1,12 @@
+diff -Naur Acme-CPAN-Patches/lib/Acme/CPAN/Patches.pm Acme-CPAN-Patches.result/lib/Acme/CPAN/Patches.pm
+--- Acme-CPAN-Patches/lib/Acme/CPAN/Patches.pm	2010-07-15 12:18:04.000000000 +0200
++++ Acme-CPAN-Patches.result/lib/Acme/CPAN/Patches.pm	2010-07-15 12:18:33.000000000 +0200
+@@ -10,6 +10,8 @@
+ 
+ =head1 DESCRIPTION
+ 
++Just for testing
++
+ =cut
+ 
+ use warnings;

@@ -1,0 +1,20 @@
+Revision history for Perl extension Callerid.
+
+0.01  Wed Aug 11 22:21:05 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X -a -n Callerid
+
+0.02  Wed Aug 18 23:56:01 2004
+	- added format_phone_number()
+	- test scripts added
+
+0.03  Fri Aug 20 19:33:55 2004
+	- pod added
+	- start of push towards being ready for public consumption
+
+0.04
+	- lowered perl requirements to 5.6.1; see http://rt.cpan.org/NoAuth/Bug.html?id=7450
+	- using m// over substr() in format_phone_number()
+	- look for phone number immediately before the last two checksum digits; now 100% of phone number data works again
+	- inclusion of examples/hexdecode.pl; I use it enough to warrant its' inclusion
+	- inclusion of examples/parse.pl - this is a minimalist callerid parser

@@ -1,0 +1,31 @@
+Mon Jan 14 17:36:34 EST 2002	Dave Hoover <squirrel@cpan.org>
+
+. Description:
+
+	Minor updates and corrections throughout documention.
+
+Fri Jul 13 19:06:15 MEST 2001   Christophe Dehaudt <christophe@dehaudt.org>
+
+. Description:
+
+	Added DEBUG CONFIGURATION and HISTORY AND CREDITS sections
+	in the main manpage.
+
+	Fixed demo script to include leading DFEATURE call.
+
+	Random cleanup in Datum::Cfg documentation.
+
+Wed May 30 23:10:54 MEST 2001   Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+. Description:
+
+	Added LIMITATIONS section to warn about stringify overloading.
+	Since the argument list may be dumped at DFEATURE time, and $self
+	is part of that list, we would recurse when DFEATURE is called
+	and the argument list is printed.
+
+Sun Mar 25 17:40:43 MEST 2001	Raphael Manfredi <Raphael_Manfredi@pobox.com>
+
+	Version 0.1.0.
+	Initial public alpha relase.
+

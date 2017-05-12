@@ -1,0 +1,18 @@
+0.06  Fri, 26 Mar 2010 21:15:31 +0100
+  * Use native traits instead of AttributeHelpers.
+
+0.05  Sun, 29 Nov 2009 17:38:51 +0100
+  * Depend on a later version of PadWalker to avoid segfaults in the
+    Catalyst test suite.
+
+0.04  Sat, 12 Sep 2009 06:13:20 +0900
+  * Depend on PadWalker (Closes RT#49551).
+
+0.03  Sat, 05 Sep 2009 09:42:43 +0200
+  * Port to Devel::Cycle. We're now able to report a broader range of leaks.
+
+0.02  Thu, 25 Jun 2009 10:37:04 +0200
+  * Depend on Test::More 0.88 for done_testing.
+
+0.01  Thu, 25 Jun 2009 06:37:11 +0200
+  * Initial release.

@@ -1,0 +1,10 @@
+0.03    5 January 2005
+        Fix to tests so they don't die when no backends are configured
+          (spotted by Bob Walker).
+
+0.02    13 December 2004
+        Kludge to make the distance searching work with SQLite 3.
+
+0.01    23 November 2004
+        Initial release.  This module is a generalisation from version 0.09
+          of CGI::Wiki::Plugin::Locator::UK.

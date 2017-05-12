@@ -1,0 +1,96 @@
+Crypt::SEED version 0.01 
+========================
+
+Crypt::SEED provides the Perl community with the SEED encryption 
+algorithm which has been made by Korean Information Security Agency.
+
+  - About SEED (Quoted from an old document)
+
+	SEED is a symmetric encryption algorithm developed by KISA (Korea
+	Information Security Agency) and a group of experts since 1998.  The
+	input/output block size and key length of SEED is 128-bits.  SEED has
+	the 16-round Feistel structure.  A 128-bit input is divided into two
+	64-bit blocks and the right 64-bit block is an input to the round
+	function, with a 64-bit subkey generated from the key scheduling.
+
+	SEED is easily implemented in various software and hardware because
+	it takes less memory to implement than other algorithms and generates
+	keys without degrading the security of the algorithm.  In particular,
+	it can be effectively adopted in a computing environment with a
+	restricted resources, such as mobile devices and smart cards.
+
+	SEED is robust against known attacks including DC (Differential
+	cryptanalysis), LC (Linear cryptanalysis), and related key attacks.
+	SEED has gone through wide public scrutinizing procedures.  It has
+	been evaluated and is considered cryptographically secure by credible
+	organizations such as ISO/IEC JTC 1/SC 27 and Japan CRYPTREC
+	(Cryptography Research and Evaluation Committees)
+	[ISOSEED][CRYPTREC].
+
+
+SEED encryption/decryption uses a 'round key' which translated from a user key.
+Whenever you add user keys to the module using new or addKey or addKeys, the
+module will translate them to round keys and store them inside the module
+with user keys. (Of course, in hash)
+And, whenever you use the user key with encrypt, decrypt methods, the module
+look for the matching round key from inside the module to do real job.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+EXTRA Test Script
+
+The package contains extra testing script `filetest.pl'.
+You can use this script to verify two or more system decrypt imported data
+from others using the same user key used for the previous encryption.
+Run this script as below at sending system after you have installed whole package:
+
+  $ perl filetest.pl S
+
+and then you will have an encrypted file 'crypt_remote.sed' in the current directory.
+Send the file to other remote system which have installed the same module already.
+In the remote system, run
+
+  $ perl filetest.pl
+  Cipher O.K.
+  Recovered O.K.
+  $
+  
+And if you find two O.K lines, it's O.K. Otherwise, something went wrong.
+Be careful, however, to keep exactly the same version of filetest.pl on both system.
+
+ENDIAN Matters.
+
+This module contains codes affected by endian in SEED_KISA.c file,
+the bytes order of multibyte data type such as integer, long, short, etc.
+In almost all cases, the Makefile.PL file will handle this
+matter for you.
+But, test-failure cases are on which systems which have neither `Little Endian'
+nore `Big Endian'.
+In this cases, you may have to edit the SEED_KISA.c file by yourself to
+modify `EndianChange' macro `#define'd.
+If you have tested on such a system, please let me know how-to.
+
+Notes
+
+This module has been tested successfully against the following:
+  Linux  2.6.24.2 (x86)
+  Win32 XP (x86) with Camelbox Perl 5.10.x
+  SunOS 5.5.1 sparc SUNW,Ultra-Enterprise with Perl 5.8.0 (Big endian)
+  AIX 5.3 with Perl 5.8.2 (Big endian)
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Jongpil Jeon. Perl "Artistic License" applied.
+- Actually I don't care the `right'.
+

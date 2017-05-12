@@ -1,0 +1,44 @@
+Changes
+examples/site/.htaccess
+'examples/site/01 Linux at Home/.htaccess'
+'examples/site/01 Linux at Home/01_Linux_Family_Desktop.shtml'
+'examples/site/01 Linux at Home/05 ESTool kills raid superblock.shtml'
+'examples/site/01 Linux at Home/10_Snapshots_Save.shtml'
+'examples/site/01 Linux at Home/gdm.conf'
+'examples/site/01 Linux at Home/reinit-snapshot'
+'examples/site/01 Linux at Home/xorg.conf'
+examples/site/03_Web_Tech/05_Apache_for_Webdesigners.shtml
+examples/site/05_Gesundheit/01_Nächtliches_Jucken.shtml
+examples/site/10_About.shtml
+examples/site/tec/cindy/frame.cjs
+examples/site/tec/cindy/index.cjs
+examples/site/tec/css/local.css
+examples/site/tec/css/menu.css
+examples/site/tec/tmpl/frame.html
+examples/site/tec/tmpl/menu.html
+HTTPCore.xs
+lib/Cindy/Apache2.pm
+lib/Cindy/Log/Apache2.pm
+lib/Cindy/Apache2/RequestRec.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/conf/extra.conf.in
+t/htdocs/charset/.htaccess
+t/htdocs/charset/cindy.cjs
+t/htdocs/charset/cindy.html
+t/htdocs/charset/cindy.xml
+t/htdocs/charset/cindy_test.html
+t/htdocs/cindy/.htaccess
+t/htdocs/cindy/cindy.cjs
+t/htdocs/cindy/cindy.html
+t/htdocs/cindy/cindy.xml
+t/htdocs/cindy/cindy_test.html
+t/htdocs/override/.htaccess
+t/htdocs/override/test.html
+t/htdocs/test.html
+t/lib/My/TestHelper.pm
+t/main.t
+t/TEST.PL
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

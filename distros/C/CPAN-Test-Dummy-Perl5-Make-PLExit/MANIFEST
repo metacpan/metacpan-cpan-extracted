@@ -1,0 +1,10 @@
+Changes
+lib/CPAN/Test/Dummy/Perl5/Make/PLExit.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/pass.t
+xt/pod-coverage.t
+xt/pod.t

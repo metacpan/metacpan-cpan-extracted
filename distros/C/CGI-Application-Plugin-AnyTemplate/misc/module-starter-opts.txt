@@ -1,0 +1,2 @@
+
+  $ module-starter --mb --module=CGI::Application::Plugin::AnyTemplate --author="Michael Graham" --email=mag-perl@occamstoothbrush.com

@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcbcf
+registers:
+  AF: 31242
+  AF_: 0
+  BC: 41075
+  BC_: 0
+  DE: 50362
+  DE_: 0
+  HL: 23401
+  HL_: 0
+  I: 0
+  IX: 15175
+  IY: 49820
+  PC: 4
+  R: 2
+  SP: 0

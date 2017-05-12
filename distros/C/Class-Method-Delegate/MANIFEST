@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Class-Method-Delegate.t
+lib/Class/Method/Delegate.pm

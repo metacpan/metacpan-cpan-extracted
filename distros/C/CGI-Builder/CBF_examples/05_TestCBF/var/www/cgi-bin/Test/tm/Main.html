@@ -1,0 +1,15 @@
+<html>
+<head>
+<title>Main</title>
+</head>
+<body bgcolor=lightblue>
+<h1>CGI::Builder Test</h1>
+
+<ul>
+<li><a href="http://localhost/cgi-bin/Test/test.pl?p=Hello">Hello</a>: $s->page_content used
+<li><a href="http://localhost/cgi-bin/Test/test.pl?p=NiceHello">NiceHello</a>: $s->page_content used
+<li><a href="http://localhost/cgi-bin/Test/test.pl?p=TmHello">TmHello</a>: tm/TmHello.html with vars substitution in the template
+<li><a href="http://localhost/cgi-bin/Test/test.pl?p=Form1">Form1</a>: Checked input; FillInform used
+<li><a href="http://localhost/cgi-bin/Test/test.pl?p=Form2">Form2</a>: Checked input with DFVCheck; FillInform NOT used <i>(it seems not possible because automatically changes the hidden 'p' value)</i>
+</body>
+</html>

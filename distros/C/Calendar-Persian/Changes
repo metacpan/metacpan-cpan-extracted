@@ -1,0 +1,135 @@
+Revision history for Calendar::Persian
+
+0.35  Fri Jan 27 14:00:00 2017
+      - Upgraded to use Date::Persian::Simple v0.17.
+
+0.34  Wed Jan 11 10:20:00 2017
+      - Added dependency on Calendar::Plugin::Renderer v0.12.
+      - Removed method validate_params(), no longer required.
+
+0.33  Wed Jan 04 02:10:00 2017
+      - Added sample code for method as_text() in the SYNOPSIS section.
+      - Updated pod document for method as_text().
+
+0.32  Thu Dec 22 12:05:00 2016
+      - Upgraded to use Date::Persian::Simple v0.15.
+
+0.31  Fri Dec 09 14:10:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.30  Sat Nov 12 21:05:00 2016
+      - Upgraded to use Date::Persian::Simple v0.14.
+
+0.29  Tue Oct 18 10:50:00 2016
+      - Added dependency on Calendar::Plugin::Renderer v0.11.
+
+0.28  Mon Sep 12 09:50:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.27  Thu Aug 11 11:10:00 2016
+      - Updated pod section "SYNOPSIS".
+      - Upgraded to use Date::Persian::Simple v0.13.
+
+0.26  Thu Jul 07 07:00:00 2016
+      - Added method as_text().
+      - Added dependency on Calendar::Plugin::Renderer v0.07.
+      - Added test for method as_svg().
+
+0.25  Fri May 27 10:25:00 2016
+      - Fixed missing pre-reqs as reported by CPANTS.
+
+0.24  Mon May 23 11:10:00 2016
+      - Upgraded to use Date::Persian::Simple v0.10.
+      - Updated method as_svg() to handle month name.
+      - Refactored method current() and method from_gregorian().
+      - Updated pod document with regard to the Calendar::Plugin::Renderer v0.06.
+
+0.23  Fri Apr 29 10:40:00 2016
+      - Added method as_svg() using the plugin Calendar::Plugin::Renderer.
+      - Upgraded to use Date::Persian::Simple v0.08.
+      - Added section "SEE ALSO".
+      - Updated copyright year information.
+
+0.22  Mon Aug 31 12:20:00 2015
+      - Upgraded to use Date::Persian::Simple v0.07.
+
+0.21  Sun Jul 19 11:15:00 2015
+      - Upgraded to use Date::Persian::Simple v0.06.
+      - Making use of the method get_calendar() provided by Date::Persian::Simple.
+
+0.20  Thu Jul 09 09:45:00 2015
+      - Upgraded to use Date::Persian::Simple v0.05.
+
+0.19  Mon Jun 29 03:25:00 2015
+      - Upgraded the dependency on Date::Persian::Simple v0.04.
+
+0.18  Fri Jun 19 10:15:00 2015
+      - Fixed the bug in the method from_gregorian().
+
+0.17  Thu Jun 11 10:45:00 2015
+      - Updated method _calendar() to validate month and year.
+
+0.16  Mon May 25 13:05:00 2015
+      - Dropped the dependency on Date::Utils::Persian.
+      - Upgraded the dependency on Date::Persian::Simple v0.03.
+      - Updated code w.r.t the above changes.
+
+0.15  Thu Apr 30 12:20:00 2015
+      - Added LICENSE file.
+
+0.14  Thu Apr 23 23:40:00 2015
+      - Re-structured and consumed Date::Utils::Persian as Moo Role.
+
+0.13  Tue Apr 21 13:40:00 2015
+      - Fixed the bug in the method _calendar() the last cell is empty.
+
+0.12  Sun Apr 19 02:50:00 2015
+      - Fixed the bug in the method _calendar() when the first day of the month is Sunday.
+
+0.11  Sat Apr 18 03:40:00 2015
+      - Complete re-write of the entire distribution using Moo with unit tests.
+
+0.10  Fri Jan 16 15:10:10 2015
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.09  Fri Sep 12 19:42:17 2014
+      - Deleted Build.PL file.
+      - Removed dependency of Readonly.pm and Carp.pm.
+      - Added section "REPOSITORY" to the pod
+      - Added key "META_MERGE" to Makefile.PL
+
+0.08  Tue Aug 09 16:25:11 2011
+      - Made Readonly v1.03 as minimum requirement.
+      - Prepared the distribution using the Module::Signature v0.68.
+
+0.07  Tue Apr 19 15:09:09 2011
+      - More cosmetics changes.
+
+0.06  Mon Apr 18 16:30:00 2011
+      - Renamed method days_in_year_month() to days_in_month().
+      - Renamed title "SYNOPSIS" to "DESCRIPTION".
+      - Renamed the title "Persian Calendar for the month of Farvadin year 1390.".
+      - Renamed the title "Month Names" to "MONTHS" and set it head1.
+      - Set the title "WEEKDAYS" as head1.
+      - Minor cosmetics changes.
+
+0.05  Tue Apr 12 12:45:11 2011
+      - Fixed the internal method _validate_date().
+      - Added unit test 01-test-case.t
+
+0.04  Fri Apr 08 18:58:00 2011
+      - Fixed one more typo in the pod for method get_calendar().
+      - Removed boilerplate test.
+
+0.03  Fri Apr 08 16:17:18 2011
+      - Updated pod for SYNOPSIS.
+      - Fixed pod for method days_in_year_month().
+      - Fixed pod for method get_calendar().
+
+0.02  Tue Mar 29 10:35:10 2011
+      - Added more information about the Persian calendar to the pod.
+
+0.01  Thu Mar 28 17:11:23 2011
+      - First version released.

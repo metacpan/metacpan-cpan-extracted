@@ -1,0 +1,12 @@
+TODO
+====
+
+Currently only supports MySQL
+- Add a database abstraction layer and make it work with other databases.
+
+Build Test suite
+
+Handle and complain about problems better.
+
+Include better documentation
+

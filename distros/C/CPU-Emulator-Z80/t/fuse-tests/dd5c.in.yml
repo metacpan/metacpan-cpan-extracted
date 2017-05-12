@@ -1,0 +1,25 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 92
+name: dd5c
+registers:
+  AF: 44930
+  AF_: 0
+  BC: 9407
+  BC_: 0
+  DE: 10131
+  DE_: 0
+  HL: 63781
+  HL_: 0
+  I: 0
+  IX: 63907
+  IY: 2946
+  PC: 0
+  R: 0
+  SP: 0

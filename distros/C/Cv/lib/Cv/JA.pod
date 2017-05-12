@@ -1,0 +1,830 @@
+# -*- mode: pod; coding: utf-8; tab-width: 4; -*-
+
+=encoding utf8
+
+=head1 NAME
+
+Cv::JA - 日本語ドキュメントと小さな断片
+
+=head1 SYNOPSIS
+
+ use Cv;
+ 
+ my $image = Cv->LoadImage("/path/to/image", CV_LOAD_IMAGE_COLOR);
+ $image->ShowImage("image");
+ Cv->WaitKey;
+ 
+ my $capture = Cv->CaptureFromCAM(0);
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
+=head1 DESCRIPTION
+
+Cv::JA は、日本語のドキュメント、あるいは、ドキュメントになる前のメモや
+アイディアのようなものです。
+
+
+=head1 Cv
+
+C<Cv> は OpenCV コンピュータビジョンライブラリの Perl インタフェースで
+す。OpenCV の C言語のリファレンスを元にしたので、リファレンスとして
+http://opencv.willowgarage.com/ が使えます。とは言え、異なる部分もあり、
+少しずつ文書にまとめています。中途半端で申し訳ありません。
+
+コンピュータビジョンは少し難しいので、Perl のスローガンに則り「簡単なこ
+とは簡単に、難しいこともそれなりに」を心掛けています。
+
+=head2 オブジェクトの作成と解放
+
+OpenCV の画像やマトリクスのオブジェクトは、C言語と同様に
+C<Createなんとか()> で作ります。
+
+ my $img = Cv->CreateImage([ 320, 240 ], IPL_DEPTH_8U, 3);
+ my $mat = Cv->CreateMat(240, 320, CV_8UC4);
+
+オブジェクトは C<new> で作ることもできます。画像を作る CreateImage() と
+マトリクスを作る CreateMat() は、上の例のとおり呼び出し形式が違いますが。
+C<new> なら同じように作ることができます。
+
+ my $arr = Cv::Image->new($size, $type);
+ my $arr = Cv::Mat->new($size, $type);
+ my $arr = Cv::MatND->new($size, $type);
+ my $arr = Cv::SparseMat->new($size, $type);
+
+またオブジェクトを作るとき、元のオブジェクトがあれば引数を省略すること
+もできます。
+
+ my $sameone = $img->new;
+ my $gray = $color->new(CV_8UC1);
+
+オブジェクトが不要になったら、C言語では C<Createなんとか()> と対の
+C<Releaseなんとか()> で利用者がオブジェクトを解放します。Perl は同じ場
+面で C<DESTROY> を呼ぶので、C<Cv> はこの仕組みを使ってオブジェクトを解
+放します。従って解放について利用者が注意を払う必要はありません。解放で
+きないオブジェクトは C<Cv::なんとか::Ghost> というクラスで bless し、
+C<Cv> の中で識別できるようにしています。
+
+=head2 OpenCVのデータ型とCvのクラス名
+
+OpenCV には画像やマトリクスのデータ型として C<CvImage>, C<CvMat>,
+C<CvMatND>, C<CvSparseMat> など、いろいろな型があります。C<Cv> は、この
+データ型とクラス名が対応しています。クラス名は、C<Cv> の後に :: を置い
+た名前で、たとえば、C<CvImage> は C<Cv::Image> に、C<CvMat> は
+C<Cv::Mat> に対応しています。そして、オブジェクトは、OpenCV のデータの
+ポインタをそのデータ型に対応するクラス名で bless したものになります。
+
+OpenCV の画像やマトリクスのデータ型 C<CvMat>、C<CvImage> は、C<CvArr>
+から導出されたデータ型です。従って、画像やマトリクスは C<CvArr> を介し
+て受け渡されます。C<Cv> でも同様に、スーパクラスとして C<Cv::Arr> を用
+意し、メソッドはできるだけここに置くことにしました。
+
+OpenCV には更にシーケンスと呼ばれる動的なデータ型もありますが、これにつ
+いては、L</Cv::Seq> を参照してください。
+
+=head2 データ領域の共有
+
+OpenCV の画像やマトリクスは、ヘッダ部とデータ部が分れており、データ部の
+ないヘッダだけのオブジェクトが作れます。データのないことを伝えるために、
+次のとおり undef を渡します。
+
+ my $arr = Cv::Mat->new([$rows, $cols], $type, undef);
+
+このようにして作成したヘッダだけのオブジェクトは、GetRows(), GetCols()
+のようにデータ部を共有するメソッドで使っています。
+
+(注意) コードを見ると、undef の代りに文字列でデータ部を与えることが可能
+だと気付くかもしれません。別のシステムで作成した画像やマトリクスを扱う
+とき、データ変換の手間を減らすことができると考える人もいると思います。
+しかし、オブジェクトが開放されるとき Cv::Image ではエラーが起きます。
+Cv::Mat はなんとなく動いているように見えますが、安定していません。文字
+列でデータ部を渡さないようにしてください。(これは bugs へ)
+
+=head2 OpenCVの構造体
+
+Cv のオブジェクトは、OpenCV の構造体をその型名に対応するクラス名で
+bless したものです。従って、Cv (Perl) から OpenCV の構造体は直接操作で
+きません。しかし、OpenCV に同梱されているサンプルでは、構造体の大きさや
+要素の型を直接使っています。たぶんそれが簡単なんでしょう。Cv でも同様の
+使い方をするために、構造体のメンバの名前でメソッドを作りました。
+
+=head2 メソッドの名前とその統合
+
+メソッドの名前は、OpenCV の関数名の頭の C<cv> を省いた名前と、名前のは
+じめの大文字を小文字に直したものが使えます。次の 2つの例はどちらも
+C<cvCreateMat()> を呼び出します。
+
+ my $mat = Cv->CreateMat(240, 320, CV_8UC3);
+ my $mat = Cv->createMat(240, 320, CV_8UC3);
+
+それから C<cvAdd()> と C<cvAddS()> のような類似した関数はより簡潔な名前、
+つまりこの例では C<Add()> にまとめました。おそらく C言語では異なる型の
+引数を受けとることができないので、分けるしかなかったのでしょう。C<Cv>
+ではこれらを統合し、引数で呼び出す関数を決めています。
+
+ my $ar2 = Cv->CreateImage();      # ref Cv::Image
+ my $sc2 = cvScalar();             # ref ARRAY
+ my $d = $ar->Add($ar2);           # cvAdd($ar, $ar2)
+ my $d = $ar->Add($sc2);           # cvAddS($ar, $sc2)
+
+統合した関数は次のとおり。あまり多くありません。リファレンスを参照して、
+C<cvなんとか()> と C<cvなんとかS()> の両方あるものがそうだと考えてください。
+
+ AbsDiff(), Add(), And(), Cmp(), InRange(), Max(), Min(), Or(), Sub(), Xor()
+
+=head2 引数の省略、インプレース、戻り値
+
+出力先の画像やマトリクス (C<dst> として表わされることが多い) が省略され
+たとき、それが補える場合は補うようにしています。補える例とそうでない例の
+両方を示します。
+
+ my $dst = $src->Add($src2);
+ my $dst = $src->Add($src2, $mask);  # can't omit dst
+
+後者は、マスクとして与えた C<$mask> と出力先を区別することができません。
+このような場合には C<$dst> を呼び出し元で用意してください。C<$dst> が
+C<$src> と同じなら次のとおり。
+
+ my $dst = $src->Add($src2, $src->new, $mask); 
+
+OpenCV は、インプレース処理が可能な関数では出力先の画像やマトリクス
+C<dst> に C<NULL> を指定し、入力画像を出力先としても使います。C<Cv> で
+はこの C<NULL> を表わすために C<\0> を使います。次の例は左右反転した画
+像を返します。
+
+ my $dst = $src->Flip(\0);
+
+OpenCV の関数は、この Flip() に限らず、出力先は呼び出し元が用意します。
+そうした使い方では特に戻り値を使う必要はありません。しかし、上述のとお
+り C<Cv> では出力先を省略できるので、その場合にはメソッドの中で必要に応
+じて作られた出力先を戻り値として受けとることになります。
+
+この出力を戻り値として受けとる方法は、次の例のとおり、メソッドをつない
+で書けるようにしてくれますが、メソッドが呼ばれる度にオブジェクトの確保
+と開放があるので、その分だけオーバヘッドがあります。
+
+ my $bin = $src->cvtColor(CV_RGB2GRAY)->threshold(...);
+
+=head2 ビルド時の情報
+
+OpenCV は様々なライブラリを使います。またビルド時に指定できるオプション
+で利用できる機能が変ります。OpenCV 2.4.0 からその情報が取り出せるように
+なりました。
+
+=over
+
+=item GetBuildInformation()
+
+  my $info = Cv->GetBuildInformation()
+  my %info = Cv->GetBuildInformation()
+
+コンテクトがスカラなら cv::getBuildInformation() の戻り値を返し、リスト
+なら次の結果を返します。
+
+  'OpenCV modules' => {
+	'Disabled by dependency' => '-',
+	'Unavailable' => 'androidcamera java ocl',
+	'Disabled' => 'world',
+	'To be built' => 'core imgproc flann highgui features2d calib3d ml video objdetect contrib nonfree photo legacy gpu python stitching ts videostab'
+  },
+  'Version control' => 'commit:6484732',
+  'Linker flags (Debug)' => {
+	'Precompiled headers' => 'YES'
+  },
+  ...
+
+=item HasModule()
+
+ビルド時に組込みを指定できるモジュールなら次のとおり確かめることができ
+ます。
+
+ my $hasCore = Cv->HasModule('nonfree');
+ my $hasCore = Cv->HasModule('stitching');
+
+=back
+
+=head2 エラー処理
+
+eval { ... } で保護したブロックの中のエラーを検出できます。(Cv-0.13)
+
+ my $img = eval { Cv->createImage([-1, -1], 8, 3) };
+ if ($@) {
+    print STDERR "*** got error ***";
+ }
+
+
+=head2 エクスポート
+
+Cv の利用でインポートする名前は、use Cv の後に指定できます。(Cv-0.14)
+
+ use Cv qw(:all);
+ use Cv qw(/^(CV|IPL|cv)/);
+ use Cv;                      # use Cv qw(:all) と同じ
+
+何もインポートしないときは、空のリストを置いてください。
+
+ use Cv ();
+
+
+=head2 ヒント
+
+Cv を使っている方から、ちょっといい使い方を教えて戴きました。
+
+=over 4
+
+=item *
+
+Cv で作成した画像を CGI で直接出力するとき、
+EncodeImage() と Ptr() を使うことができます。
+画像をファイルに保存する必要がありません。
+
+ use Cv;
+ my $img = Cv::Image->new([240, 320], CV_8UC3);
+ $img->zero->circle([ 100, 100 ], 100, CV_RGB(255, 100, 100));
+ print "Content-type: image/jpg\n\n";
+ print $img->encodeImage(".jpg")->ptr;
+
+これは Imager 向けの変換にも使えます。
+
+ use Imager;
+ my $imager = Imager->new(data => $img->encodeImage(".ppm")->ptr);
+
+=item *
+
+C<Inline C> を使うためのコンフィギュレーションを用意しました。
+これは、いろいろな実験や拡張を容易にしてくれます。
+使い方は次のとおり簡単です。
+
+ use Cv::Config;
+ use Inline C => Config => %Cv::Config::C;
+
+=back
+
+=head2 サンプル
+
+OpenCV に付属しているサンプルを、いくつか C<Cv> で書き直しました。
+C<sample/> にあります。
+
+ bgfg_codebook.pl calibration.pl camshiftdemo.pl capture.pl chamfer.pl
+ contours.pl convexhull.pl delaunay.pl demhist.pl dft.pl distrans.pl
+ drawing.pl edge.pl facedetect.pl fback_c.pl ffilldemo.pl find_obj.pl
+ fitellipse.pl houghlines.pl image.pl imager.pl inpaint.pl kalman.pl
+ kmeans.pl laplace.pl lkdemo.pl minarea.pl morphology.pl motempl.pl
+ mser_sample.pl polar_transforms.pl pyramid_segmentation.pl squares.pl
+ stereo_calib.pl stereo_match.pl tiehash.pl video-thread.pl
+ watershed.pl
+
+=head2 バグ
+
+=over 4
+
+=item *
+
+バージョン 0.07 で名前付きの引数を諦めました。
+名前付きの引数を処理するためのオーバヘッドが大きかったからです。
+この版では C<Cv::TieHash> と C<Cv::TieArr> も削除しました。
+C<Cv::TieHash> は C<sample/tiehash.pl> を参照してください。
+
+=item *
+
+バージョン 0.14 で別名を整理しました。
+CV_MAKETYPE() のようなマクロのいくつかには Cv::MAKETYPE()
+のような別名もありましたが、もとの名前の方が短いので、
+別名を止めることにしました。
+
+=item *
+
+バージョン 0.16 で C<Cv> を分け、拡張したコードを分離して
+L<Cv::More> に置くことにしました。
+
+=item *
+
+Cv::More を使わないとき use Cv qw(:nomore) と書きますが、これは、代りに use Cv -more と書けました (0.20 - 0.23)。
+しかし、このオプションは不明瞭なので、Cv::More を使わないとき use Cv -more でなく use Cv -nomore と書くことにしました。
+(0.24)
+
+=back
+
+=head1 Cv::More
+
+C<Cv::More> は、L<Cv> から実験的な機能を切り離して整理するためのパッケー
+ジです。C<Cv> が拡張しやすくなると考えています。C<Cv::More> は、C<Cv>
+の一部を切り離したものなので、使わないことを明示しない限り取り込みます。
+
+ use Cv;              # Cv::More を使う
+ use Cv qw(:nomore);  # Cv::More を使わない
+ use Cv -more;        # Cv::More を使う
+ use Cv -nomore;      # Cv::More を使わない
+
+=head2 Perlの配列を使うメソッド
+
+=over
+
+=item FitEllipse2()
+
+ my $box2d = Cv->FitEllipse2($points);
+
+戻り値は CvBox2D です。cs のときには、リストコンテクストで呼ばれると、
+次のとおり要素が展開されます。
+
+ use Cv::More qw(cs);
+ my ($center, $size, $angle) = Cv->FitEllipse2($points);
+
+Perl のリストで表わした点と、それを FitEllipse2() で処理した結果を描き
+表示するサンプルを示します。
+
+ my $img = Cv::Image->new([250, 250], CV_8UC3)->fill(cvScalarAll(255));
+ $img->origin(1);
+ my @pts = (map { [ map { $_ / 4 + rand $_ / 2 } @{$img->size} ] } 1 .. 20);
+ $img->circle($_, 3, &color, 1, CV_AA) for @pts;
+ my $box = Cv->fitEllipse(\@pts);
+ $img->polyLine([[Cv->boxPoints($box)]], -1, &color, 1, CV_AA);
+ $img->ellipseBox($box, &color, 1, CV_AA);
+ $img->show("FitEllipse2");
+ Cv->waitKey;
+ sub color { [ map { rand 255 } 1 .. 3 ] }
+
+
+=item FitLine()
+
+FitLine() には、次の 2つの呼出し形式があります。Perl では (1) の使い方
+になると思いますが、OpenCV の C言語のインターフェースに合わせた (2) の
+使い方もできます。
+
+ my $line = Cv->FitLine($points, $dist_type, $param, $reps, $aeps);     # (1)
+ Cv->FitLine($points, $dist_type, $param, $reps, $aeps, my $line);      # (2)
+
+パラメータはたくさんありますが、$points 以外は省略できます。入力
+$points は、2次元の点または 3次元の点のリストで、結果は、この $points
+の次元数で決まります。
+
+ my $points2d = [ [$x1, $y1], [$x2, $y2], ... ];
+ my ($vx, $vy, $x0, $y0) = Cv->FitLine($points2d, ...);
+ my $points3d = [ [$x1, $y1, $z1], [$x2, $y2, $z2], ... ];
+ my ($vx, $vy, $vz, $x0, $y0, $z0) = Cv->FitLine($points3d, ...);
+
+いくつかの点の集りにフィッティングさせた直線を描いてみましょう。
+
+ my @pts = ([ 50, 50 ], [ 100, 120 ], [ 150, 150 ], [ 200, 150 ]);
+ my ($vx, $vy, $x0, $y0) = Cv->fitLine(\@pts); 
+ $img->line((map { [ $_, $vy / $vx * ($_ - $x0) + $y0 ] } 20, 230),
+			cvScalarAll(200), 3, CV_AA);
+
+サンプルのはじめと終りは C<FitEllipse2()> を参照してください。
+
+
+=item MinAreaRect2()
+
+ my $box2d = Cv->MinAreaRect2($points);
+ my ($center, $size, $angle) = Cv->MinAreaRect2($points);
+
+戻り値は CvBox2D です。FitEllipse2() と同じような結果を返しますが。重ね
+合わせてみると違いが分ります。
+
+ for ([ [ Cv->fitEllipse(\@pts)  ], [ 200, 200, 200 ] ],
+      [ [ Cv->minAreaRect(\@pts) ], [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+サンプルのはじめと終りは C<FitEllipse2()> を参照してください。
+
+C言語のインタフェースは次のとおり。メモリストレージを渡すこともできます。
+
+ CvBox2D cvMinAreaRect2(const CvArr* points, CvMemStorage* storage=NULL)
+
+Cv-0.15 までは、Perl の点のリストを Cv::Seq::Point にして使っていました。
+そのときはメモリストレージを使っていました。しかし、Cv-0.16 で Perl の
+点のリストを Cv::Mat に直したので、メモリストレージは使いません。
+
+
+=item MinEnclosingCircle()
+
+ my $circle = Cv->MinEnclosingCircle($points);                          # (1)
+ my ($center, $radius) = Cv->MinEnclosingCircle($points);               # (1')
+ Cv->MinEnclosingCircle($points, my $center, my $radius);               # (2)
+
+戻り値は、円の中心の座標 $center と半径 $radius です。CvBox2D の形に合
+わせて重ね合わせてみましょう。
+
+ my $rectangle = Cv->minAreaRect2(\@pts);
+ my $ellipse = Cv->fitEllipse2(\@pts);
+ my ($center, $radius) = Cv->minEnclosingCircle(\@pts);
+ my $circle = [ $center, [ ($radius * 2) x 2 ], 0 ];
+ for ([ $rectangle, [ 200, 200, 200 ] ],
+      # [ $ellipse,   [ 200, 200, 200 ] ],
+      [ $circle,    [ 100, 100, 255 ] ]) {
+   $img->polyLine([[Cv->boxPoints($_->[0])]], -1, $_->[1], 1, CV_AA);
+   $img->ellipseBox($_->[0], $_->[1], 1, CV_AA);
+ }
+
+サンプルで使った乱数による点のリストを処理してもあまり面白くないかもし
+れませね。点が表わすものを C<FitEllipse2()>, C<FitLine()>,
+C<MinAreaRect2()>, C<MinEnclosingCircle()> の中から元の形に合うものを選
+ぶといいでしょう。サンプルはどれも似ているので、そのはじめと終りは
+C<FitEllipse2()> から持って来てください。
+
+(注意) MinEnclosingCircle() の戻り値は、Cv-0.15 まで (1') の形式でした。
+つまり、いつも ($center, $radius) を返していました。しかし、Cv-0.16 で
+メソッドの戻り値を揃え [$center, $radius] を返すことにしました。
+
+=item BoundingRect()
+
+ my $rect = Cv->BoundingRect($points)
+ my ($x, $y, $width, $height) = Cv->BoundingRect($points)
+
+点を囲む傾いていない矩形を求めます。傾いている矩形には
+C<MinAreaRect2()> を使います。戻り値は CvRect なので、CvBox2D に直すと
+C<EllipseBox()> や C<BoxPoints()> とのつながりが良くなります。
+CvRect から CvBox2D への変換は次のとおり。
+
+ my $box2d = [ [ $x + $width / 2, $y + $height / 2 ], [ $width, $height ], 0 ];
+
+
+=item ContourArea()
+
+ my $s = Cv->ContourArea($points)
+ my $s = Cv->ContourArea($points, $slice)
+
+点で囲まれる領域の面積を求めます。
+
+ my @pts = ([100, 100], [100, 200], [200, 200], [200, 100]);
+ my $s = Cv->contourArea(\@pts);
+
+この面積 $s は、縦x横 (100x100) になります。
+
+
+=item Transform()
+
+ my $dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1)
+ my @dst = Cv->Transform([ $pt1, $pt2, ... ], $transmat);               # (1')
+ Cv->Transform([ $pt1, $pt2, ... ], my $dst, $transmat);                # (2)
+
+ my @points = ( [$x1, $y1], [$x2, $y2], ... );
+ my $arr = Cv::Mat->new([], CV_32FC2, @points);
+ my $dst = $arr->Transform($transmat);                                  # (3)
+ $arr->Transform(my $dst, $transmat);                                   # (4)
+
+ my $dst = $arr->WarpAffine($transmat);                                 # (5)
+ $arr->warpTransform(my $dst, $transmat);                               # (6)
+
+
+=item Affine()
+
+GetQuadrangleSubPix() を使って、画像やマトリクスの回転と縮小を行います。
+
+  my $mapMatrix = [ [ $A11, $A12, $b1 ],
+                    [ $A21, $A22, $b2 ] ];
+  my $dst = $src->Affine($mapMatrix);
+
+この Affine() は、GetQuadrangleSubPix() の変換行列を作るのが面倒だった
+ので、その対処として作ったものです。拡張した new() を使えば次の書き方で
+も同じことができます。
+
+  $src->GetQuadrangleSubPix(
+          Cv::Mat->new([], &Cv::CV_32FC1,
+                       [ $A11, $A12, $b1 ],
+                       [ $A21, $A22, $b2 ],
+                       ));
+
+こうしてみると、考えずに Affine() のようなものを作るのは良くないことで、
+GetQuadrangleSubPix() が $mapMatrix に C<Cv::Mat> と Perl の配列のどち
+らでも扱えるようにするのが良かったと分りました。これもそのうちに考えて
+みることにします。
+
+=item new()
+
+=item m_new()
+
+OpenCV の画像やマトリクスのオブジェクトは、大きさと要素の型を指定して作
+ります。C<Cv::Createなんとか()> か C<Cv::なんとか::new()> で作ります。
+C<m_new()> は、C<Cv::なんとか::new()> を再定義し、初期値を扱えるように
+拡張します。
+
+ my $mat1 = Cv::Mat->new([], 要素の型, 初期値のリスト);
+ my $mat2 = Cv::Mat->new(マトリクスの大きさ, 要素の型);
+ my $mat3 = $mat->new();
+ my $mat4 = $mat->new(マトリクスの大きさ);
+ my $mat5 = $mat->new(要素の型);
+
+C<m_new()> が拡張するのは、上の C<$mat1> を作る例です。マトリクスの大き
+さを指定するところに C<[]> を指定します。具体的な使い方については、
+L</Perlの配列でマトリクスを作る> を参照してください。他の例は、いまの
+C<Cv> の C<new()> でもできます。
+
+
+=item Set()
+
+=item m_set()
+
+ $mat->Set($index, $value);
+
+$index は配列のリファレンスで、より具体的に次のとおり書くことができます。
+
+ $mat->Set([], $value);       # マトリクス $mat 全体に $value を代入する
+ $mat->Set([$i], $value);     # マトリクス $mat の $i 行に〜
+ $mat->Set([$i, $j], $value); # マトリクス $mat の $i 行 $j 列に〜
+
+このように C<m_set()> は C<Set()> を拡張し、C<Set()> が 要素を 1つずつ
+代入していたところで、要素をひとまとめに代入することを可能にします。
+
+それは、C<$index> で指定されたマトリクスの要素の数と C<$value> で指定さ
+れた要素の値の数のバランスがとれるように、C<$index> を補うか C<$value>
+をばらし、そして、マトリクスの要素に値を 1つずつ代入するというものです。
+インデクス C<$index> が C<$mat> の要素を特定するために十分でないときは、
+足りないインデクスを補うために、C<$value> が値のリストなら C<$value> を
+ばらして 1つずつ C<m_set()> で再帰的に処理します。つまり、
+
+ $mat->m_set([@$index, $_], $value->[$_]) for 0 .. $#{$value};
+
+そうでない (C<$value> をばらせない) ときは、次のとおり単にインデクスに
+0 を補います。正確には、Nx1 のマトリクスの x1 のインデクスに相当する部
+分を 0 で補うのがいいと思いますが、次に示す手抜きでも十分でしょう。
+
+ $mat->m_set([@$index, 0], $value);
+
+
+=item ToArray()
+
+ my @array = $arr->ToArray();                                           # (1)
+ my @array = $arr->ToArray($slice);                                     # (2)
+
+シーケンスまたはマトリクス (1xN, Nx1) を Perl の点の配列に変換します。
+シーケンスを変換する cvCvtSeqToArray() をマトリクスも変換できるように拡
+張したものです。従って、範囲を与える $slice を指定することができます。
+これは、cvSlice() で作るか、単にはじめ $start と終り $end を対にした配
+列のリファレンス [$start, $end] で表わすことができます。省略したときは
+$arr のすべての要素を変換します。
+
+=back
+
+=head1 Cv::Seq
+
+OpenCV のシーケンスは、点、矩形、円など様々なデータを格納します。格納さ
+れたデータを型なしで扱うスーパクラス L<Cv::Seq> と、データに合わせた変
+換を行う派生クラス C<Cv::Seq::Point>, C<Cv::Seq::Rect>, ... に分け、デー
+タに合わせて blessして使います。C言語のキャストのようなものです。
+
+facedetect の一部を示します。HaarDetectObjects() は、検出した顔を複数の
+CvRect 型のデータのリストにして返します。次の例は、シーケンスを
+C<Cv::Seq::Rect> で bless して、顔を 1つずつ取り出します。
+
+  my $faces = bless $image->HaarDetectObjects(
+    $cascade, $storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30)), "Cv::Seq::Rect";
+  while (my @rect = $faces->shift) {
+    my ($x, $y, $w, $h) = @rect;
+    ...
+  }
+
+同じ部分の C言語のコードを並べておきます。比べやすくするために、余分な
+ものは省きました。
+
+  CvSeq* faces = cvHaarDetectObjects(
+    image, cascade, storage, 1.1, 2, CV_HAAR_SCALE_IMAGE,
+    cvSize(30, 30));
+  for (;;) {
+    CvRect rect;
+    cvSeqPopFront(faces, &rect);
+    ...
+  }
+
+=head2 メソッド
+
+=over
+
+=item Cv->CreateSeq()
+
+=item CreateSeq($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->MakeSeqHeaderForArray($seqFlags, $headerSize, $elemSize, $stor)
+
+=item Cv::Seq->new($seqFlags, $headerSize, $elemSize, $stor)
+
+=item $seq->Push(@elem)
+
+=item $seq->Pop()
+
+=item $seq->Unshift(@elem)
+
+=item $seq->Shift()
+
+=item $seq->Splice()
+
+	# splice($array, $offset, $length, @list)
+	# splice($array, $offset, $length)
+	# splice($array, $offset)
+
+=back
+
+=head2 メモリの解放
+
+動的なメモリは、主にシーケンスを置く領域として使います。Cv の中はそれが
+必要な呼出しにおいて与えられないとき、内部で確保することがあります。確
+保した領域は $Cv::STORAGE に置きますが、動的なメモリは、使い方によって
+は、その成長を制限する必要があります。OpenCV は cvClearMemStorage() を
+呼んでリセットできるようにしていますが、Perl では、次のとおり local を
+使うと簡単です。
+
+ {
+   local $Cv::STORAGE = $Cv::STORAGE;
+   my $seq = Cv::Seq::Point->new();
+   ...
+ }
+
+=head1 Cv::Histogram
+
+L<Cv::Histogram> はヒストグラムを扱います。Cv::Histogram は、Cv の一部
+を切り離したものなので、L</Cv::More>, L</Cv::Seq> と同様に使わないことを
+明示しない限り取り込みます。
+
+ use Cv;          # Cv::Histogram を使う
+ use Cv -nohist;  # Cv::Histogram を使わない  
+
+オブジェクトの作成は cvCreateHist を使います。いくつもの呼び方がありますが、
+Cv->CreateHist または Cv::Histogram->new が分り易いと思います。
+
+ my $hist = Cv->CreateHist([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::Histogram->new([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::Histogram::cvCreateHist([256], CV_HIST_ARRAY);
+
+ # or
+
+ my $hist = Cv::cvCreateHist([256], CV_HIST_ARRAY);
+
+=head2 メソッド
+
+メソッドの詳細は L<Cv::Histogram> を参照してください。
+
+=head1 Cv::Flipbook
+
+C<Cv::Flipbook> は、画像ファイルをひとつのディレクトリにまとめ、それを
+順番に読み込んでビデオ入力の代わりとして扱います。つまり、パラパラ漫画
+をビデオとして扱うということです。
+
+ use Cv;
+ use Cv::Flipbook;
+ 
+ my $capture = Cv->CaptureFromFlipbook("/path/to/flipbook");
+ while (my $frame = $capture->QueryFrame) {
+   $frame->Flip(\0, 1)->ShowImage;
+   my $c = Cv->WaitKey(100);
+   last if $c >= 0;
+ }
+
+次の注意する必要があります。
+
+=over
+
+=item 
+
+すべての画像の大きさを揃える。
+
+=item
+
+ファイル名に順序付けのための番号を含める。
+
+=back
+
+=head2 メソッド
+
+=over
+
+=item Cv::Flipbook->new($dir, $flags, $pattern)
+
+パラパラ画像をビデオ入力にするオブジェクトを返します。new の代りに
+C<Cv-E<gt>CaptureFromFlipbook> と C<Cv::Capture-E<gt>FromFlipbook> も使
+えます。
+
+=over
+
+=item $dir
+
+パラパラ漫画の画像ファイルをまとめたディレクトリです。省略時は、
+カレントディレクトリを対象として扱います。
+
+=item $flags
+
+画像ファイルの読み込みで LoadImage のフラグとして使います。省略時は、
+CV_LOAD_IMAGE_COLOR を使いれます。
+
+=item $pattern
+
+$dir と合わせて画像ファイルの一覧を得るためのパターンとして使います。ス
+カラかリストを指定します。省略したときには、いくつかの画像ファイルの拡
+張子が指定されたものとみなします。
+
+ glob("$dir/$pattern")               # scalar
+ map { glob("$dir/$_") } @$pattern   # list
+
+=back
+
+=item GrabFrame()
+
+次フレームの画像ファイルを準備します。次のフレーム番号は、
+CV_CAP_PROP_POS_FRAMES で得られるプロパティです。
+
+=item NextFrame()
+
+フレーム番号を 1つ進めます。
+
+=item RetrieveFrame()
+
+フレームを読み込んで返します。フレーム番号は 1つ進みます。次のプロパティ
+を更新します。
+
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+ CV_CAP_PROP_POS_MSEC      # CV_CAP_PROP_FPS が定義済なら
+
+3つ目の CV_CAP_PROP_POS_MSEC は、秒あたりのフレーム数 CV_CAP_PROP_FPS
+が C<SetCaptureProperty> で与えられていれば更新します。最後のフレームを
+越えると undef を返します。
+
+=item QueryFrame()
+
+次のフレームを読み込み、それを返します。
+
+=item GetCaptureProperty($property_id)
+
+パラパラビデオ入力のプロパティ $property_id を取得します。
+取り扱えるプロパティは次のとおり。
+
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_POS_MSEC
+ CV_CAP_PROP_POS_FRAMES
+ CV_CAP_PROP_FPS
+ CV_CAP_PROP_FRAME_WIDTH
+ CV_CAP_PROP_FRAME_HEIGHT
+
+詳細は OpenCV のリファレンスを参照してください。
+
+=item SetCaptureProperty($property_id, $value)
+
+パラパラビデオ入力のプロパティ $property_id に $value を与えます。
+
+=back
+
+=head2 エクスポート
+
+ありません。
+
+=head1 Cv::Qt
+
+Opencv のバックエンドに Qt を使用する場合、L<Cv::Qt> を利用することができます。
+デフォルトではインポートされないため、次のようにして明示をしてください。
+
+ use Cv -qt;  # Cv::Qt を使う。
+
+=head2 メソッド
+
+L<Cv::Qt> または
+http://docs.opencv.org/modules/highgui/doc/qt_new_functions.html を参照
+してください。
+
+=head1 Cv::BGCodeBookModel, Cv::Subdiv2D
+
+これらは Opencv で legacy に分類されているものや、リファレンスに無いも
+ので L<Cv> から切り離しをしました。L</Cv::Histogram> とは異なり、使用す
+ることを明示しない限りインポートされることはありません。
+
+ use Cv;          # Cv::BGCodeBookModel, Cv::Subdiv2D を使用しない
+ use Cv -bgcode;  # Cv::BGCodeBookModel を使用する
+ use Cv -subdiv;  # Cv::Subdiv2D を使用する
+
+=head2 メソッド
+
+これらは実験的な部分もあるため、将来実装方法は変更になることがあるかも
+しれません。提供されるメソッドは L<Cv::BGCodeBookModel>,
+L<Cv::Subdiv2D> を参照してください。
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Cv>
+
+=item L<http://opencv.willowgarage.com/>
+
+=item L<http://github.com/obuk/Cv-Olive>
+
+=back
+
+=head1 LICENCE
+
+MASUDA Yuta E<lt>yuta.cpan@gmail.comE<gt>
+
+Copyright (c) 2012, 2013 by MASUDA Yuta.
+
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

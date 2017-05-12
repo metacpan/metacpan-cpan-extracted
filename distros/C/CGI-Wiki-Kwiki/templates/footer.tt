@@ -1,0 +1,31 @@
+[%# the footer for every page in the site. Close anything you opened in the
+    header, and end the html
+-%]
+
+</div>[%# opened in header.tt %]
+
+<div class="page_actions">
+  [% UNLESS not_editable %]
+    [% IF version %]
+      <div class="page_actions_item">
+        <a href="[% cgi_url %]?node=[% node_param %]">View current version</a>
+      </div>
+    [% ELSE %]
+      <div class="page_actions_item">
+        <a href="[% cgi_url %]?node=[% node_param %];action=edit">Edit this page</a>
+      </div>
+      <div class="page_actions_item">
+        <a href="[% cgi_url %]?node=[% node_param %];action=list_all_versions">Other versions</a>
+      </div>
+      <div class="page_actions_item">
+        <a href="[% cgi_url %]?node=[% node_param %];action=show_backlinks">Links to this page</a>
+      </div>
+    [% END %]
+  [% END %]
+</div>
+
+<div class="credits">
+  <p>Powered by <a href="http://search.cpan.org/perldoc?CGI::Wiki::Kwiki">CGI::Wiki::Kwiki</a> (version [% dist_version %]).</p>
+</div>
+</body>
+</html>

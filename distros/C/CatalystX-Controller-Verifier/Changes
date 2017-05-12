@@ -1,0 +1,8 @@
+Revision history for CatalystX-Controller-Verifier
+
+0.02 Apr 15 2011
+        Making it so you can pass in parameters that override the default
+        parameters from $c->req->params
+
+0.01    2011-04-15
+        Initial release

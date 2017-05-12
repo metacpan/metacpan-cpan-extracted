@@ -1,0 +1,248 @@
+2009-04-28 11:32  cvs
+
+	* t/: 4_cpr_ls.t, 5_cpr_hash.t: the tests were failing because the
+	  tests were wrong.
+
+2007-03-28 19:42  cvs
+
+	* Makefile.PL: changes
+
+2007-03-28 13:54  cvs
+
+	* lib/CGI/PathRequest.pm, t/2_cpr_basic.t, lib/CGI/PathRequest.pod:
+	  upped
+
+2007-03-27 19:47  cvs
+
+	* lib/CGI/PathRequest.pm: changed to use File::PathInfo::Ext, which
+	  has extra stuff
+
+2007-03-27 18:44  cvs
+
+	* CGI-PathRequest-1.16.tar.gz: changes new dist
+
+2007-03-27 18:44  cvs
+
+	* CGI-PathRequest-1.15.tar.gz, lib/CGI/PathRequest.pm: cahnges
+
+2007-02-07 15:04  cvs
+
+	* t/4_cpr_ls.t: changed test to work.. needs work on ls i think
+	  what is happening is that when 'make test' runs..  new stuff is
+	  created and that's why it fails on checking listing coutns
+
+2007-02-07 14:47  cvs
+
+	* CGI-PathRequest-1.15.tar.gz, META.yml: updated distro
+
+2007-02-07 14:46  cvs
+
+	* Makefile.PL, lib/CGI/PathRequest.pm: fixed up to not freak out on
+	  file not in DOC ROOT
+
+2007-02-06 12:19  cvs
+
+	* CGI-PathRequest-1.08.tar.gz, META.yml: added dist , etc
+
+2007-02-06 12:19  cvs
+
+	* CGI-PathRequest-1.14.tar.gz: dist
+
+2007-02-06 11:22  cvs
+
+	* t/6_noexists.t: working on t/6
+
+2007-02-06 11:10  cvs
+
+	* lib/CGI/PathRequest.pm, lib/CGI/PathRequest.pod, t/2_cpr_basic.t,
+	  t/5_cpr_hash.t: A big change, a file not in document root no
+	  longer croaks module instance for example, a cgi-bin symlink
+	  would crash it! :) no more!
+
+2006-12-22 13:30  cvs
+
+	* CGI-PathRequest-1.13.tar.gz, MANIFEST, META.yml, Makefile.PL,
+	  t/6_noexists.t: making dist tweaks
+
+2006-12-20 12:38  cvs
+
+	* MANIFEST, Makefile.PL, lib/CGI/PathRequest.pm,
+	  lib/CGI/PathRequest.pod, lib/File/PathInfo.pm, t/0_FPI.t,
+	  t/1_fpi_hash.t, t/5_cpr_hash.t, t/6_noexists.t: added test 6 and
+	  some tweaks to doc
+
+2006-12-18 13:53  cvs
+
+	* lib/CGI/PathRequest.pm, lib/CGI/PathRequest.pod, t/5_cpr_hash.t:
+	  added nav_loop
+
+2006-12-07 20:45  cvs
+
+	* MANIFEST, t/0_FPI.t, t/5_cpr_hash.t,
+	  t/public_html/.hidden_file.txt: put in pod file, added some tests
+
+2006-12-07 20:41  cvs
+
+	* Makefile.PL, lib/CGI/PathRequest.pm, lib/CGI/PathRequest.pod,
+	  lib/File/PathInfo.pm, t/1_fpi_hash.t, t/2_cpr_basic.t,
+	  t/3_cpr_excerpt.t, t/4_cpr_ls.t, t/basic.t, t/excerpt.t, t/ls.t,
+	  t/public_html/house.txt: tweaked tests
+
+2006-12-07 19:38  cvs
+
+	* MANIFEST, lib/CGI/PathRequest.pm, t/1_fpi_hash.t, t/basic.t,
+	  t/default.t, t/ls.t, t/public_html/house.txt,
+	  t/public_html/oake.jpg: lots of changes! added new module as back
+	  support
+
+2006-12-01 21:22  cvs
+
+	* CGI-PathRequest-1.09.tar.gz, META.yml, Makefile.PL, t/basic.t,
+	  t/default.t, t/excerpt.t: the tests were messed up removed
+	  public_html and using just the one in ./t
+
+2006-11-27 15:21  cvs
+
+	* CGI-PathRequest-1.08.tar.gz, MANIFEST, META.yml, Makefile.PL,
+	  lib/CGI/PathRequest.pm, t/basic.t, t/default.t, t/excerpt.t,
+	  t/public_html/demo/civil.txt, t/public_html/demo/hellokitty.gif:
+	  dist
+
+2006-11-21 10:10  cvs
+
+	* lib/CGI/PathRequest.pm: fixed ls to sort, and took out leading
+	  slash on lsf
+
+2006-10-23 16:04  cvs
+
+	* lib/CGI/PathRequest.pm: added some methods for HTML::Temp;ate
+
+2006-10-19 18:56  cvs
+
+	* t/excerpt.t: excerpt .t
+
+2006-10-19 18:56  cvs
+
+	* MANIFEST, Makefile.PL, lib/CGI/PathRequest.pm: fixed excerpt, got
+	  rid of File::Slurp added excerpt.t
+
+2006-10-13 19:38  cvs
+
+	* t/basic.t: fixed t
+
+2006-10-13 19:37  cvs
+
+	* t/basic.t: corrected tests
+
+2006-10-13 19:32  cvs
+
+	* lib/CGI/PathRequest.pm, t/basic.t: tests, added docs also added
+	  is_file()  is_empty_dir()  ls()  lsd()  lsf()
+
+2006-10-12 17:25  cvs
+
+	* lib/CGI/PathRequest.pm: updates
+
+2006-10-12 15:01  cvs
+
+	* lib/CGI/PathRequest.pm, t/basic.t, t/default.t: tests
+
+2006-10-11 17:37  cvs
+
+	* t/basic.t: added test files
+
+2006-10-11 17:36  cvs
+
+	* lib/CGI/PathRequest.pm: updates
+
+2006-10-11 12:23  cvs
+
+	* MANIFEST, Makefile.PL, PathRequest.pm, lib/CGI/PathRequest.pm,
+	  t/test.pl: updating for test
+
+2006-10-10 16:51  cvs
+
+	* PathRequest.pm: return undef if !-e file
+
+2006-10-04 12:10  cvs
+
+	* PathRequest.pm: disabled smart comments
+
+2006-10-03 19:21  cvs
+
+	* PathRequest.pm: added print STDERR iof file does not exist
+
+2006-09-21 17:35  cvs
+
+	* t/test.pl: added test hacked toether
+
+2006-09-21 17:30  cvs
+
+	* PathRequest.pm: made it so on constructor, the DOCUMENT_ROOT can
+	  be specified, default is that it is read from
+	  $ENV{DOCUMENT_ROOT}, that is what will be read if no constructor
+	  argument for doc root is provided
+
+2006-09-04 03:41  cvs
+
+	* PathRequest.pm: took out comments
+
+2006-09-04 01:34  cvs
+
+	* PathRequest.pm: fixed excerpt
+
+2006-09-03 17:01  cvs
+
+	* Makefile.PL, PathRequest.pm: The makefile needed some more prereq
+	  module specs THe module was added method is_dir
+
+2006-08-29 20:35  cvs
+
+	* PathRequest.pm: made changes
+
+2006-08-29 18:48  cvs
+
+	* MANIFEST, Makefile.PL, PathRequest.pm: added some prereq to
+	  makefile
+
+2006-08-29 18:25  cvs
+
+	* PathRequest.pm: added a lot fo doc and extended functionality
+
+2006-08-28 17:34  cvs
+
+	* PathRequest.pm: adding doc
+
+2006-08-27 21:08  cvs
+
+	* PathRequest.pm: didnt need to see what pathrequest was returning
+	  anymore
+
+2006-08-22 17:24  cvs
+
+	* PathRequest.pm: added some subs
+
+2006-08-21 19:35  cvs
+
+	* PathRequest.pm: more tunning
+
+2006-08-21 17:51  cvs
+
+	* PathRequest.pm: more tuning
+
+2006-08-21 14:56  cvs
+
+	* PathRequest.pm: stableish
+
+2006-08-21 12:37  cvs
+
+	* MANIFEST, Makefile.PL, PathRequest.pm: devel
+
+2006-08-21 09:58  cvs
+
+	* PathRequest.pm: Initial revision
+
+2006-08-21 09:58  cvs
+
+	* PathRequest.pm: init import
+

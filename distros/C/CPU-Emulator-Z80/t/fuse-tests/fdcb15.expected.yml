@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  11666:
+    - 36
+name: fdcb15
+registers:
+  AF: 10276
+  AF_: 0
+  BC: 38194
+  BC_: 0
+  DE: 34353
+  DE_: 0
+  HL: 29988
+  HL_: 0
+  I: 0
+  IX: 58151
+  IY: 11643
+  PC: 4
+  R: 2
+  SP: 0

@@ -1,0 +1,26 @@
+---
+abstract: "port of Lua's Moonfall for dynamic CSS generation"
+author:
+  - '-2009 Shawn M Moore.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CSS-Moonfall
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Text::Balanced: 2.0.0
+resources:
+  homepage: http://github.com/sartak/CSS-Moonfall/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/CSS-Moonfall.git
+version: 0.04

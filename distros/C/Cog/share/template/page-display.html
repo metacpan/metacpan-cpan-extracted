@@ -1,0 +1,28 @@
+<ul class="page-navigation">
+  <li><a href="#">Edit</a></li>
+</ul>
+
+<h1 class="page-title">[% title %]</h1>
+<hr />
+
+[% IF tag.size %]
+<b>Tags:</b>
+<ul class="tag-list">
+[% FOR t = tag %]
+<li><a href="/tag/[% t %]/">[% t %]</a></li>
+[% END %]
+</ul>
+<hr />
+[% END %]
+
+[% IF url.size %]
+<b>Links:</b>
+<ul class="url-list">
+[% FOR u = url %]
+<li><a href="[% u %]">[% u %]</li>
+[% END %]
+</ul>
+<hr />
+[% END %]
+
+<div class="page">[% content %]</div>

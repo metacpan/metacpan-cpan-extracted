@@ -1,0 +1,8 @@
+Revision history for Class-DBI-SQL-Transformer-Quotify
+
+0.02    2008-01-13
+	Added DBD::Mock prerequisite
+
+0.01    2008-01-13
+	Initial release
+

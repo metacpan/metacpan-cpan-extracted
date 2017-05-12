@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                CGI-Ajax
+version:             0.707
+abstract:            CGI::Ajax
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    CGI:                           0
+    Class::Accessor:               0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Brian C. Thomas (bct.x42@gmail.com) Brent Pedersen (bpederse@gmail.com)

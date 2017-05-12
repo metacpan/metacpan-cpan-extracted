@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+######################
+#
+#    Copyright (C) 2011 - 2015 TU Clausthal, Institut fuer Maschinenwesen, Joachim Langenbach
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+######################
+
+# Pod::Weaver infos
+# PODNAME: fm_check_config
+# ABSTRACT: Runs some tests on the given config file.
+
+
+use strict;
+use POSIX;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use CAD::Firemen;
+use CAD::Firemen::Analyze qw(checkConfig);
+use CAD::Firemen::Common qw(getInstallationPath getInstallationConfigCdb dbConnect);
+
+
+my $showVersion = 0;
+my $verbose = 1;
+my $caseInsensitive = 0;
+my $description = 0;
+
+Getopt::Long::Configure ("bundling", "auto_help");
+if(!GetOptions(
+  'version' => \$showVersion,
+  'verbose|v:i' => \$verbose,
+  'case-insensitive|i' => \$caseInsensitive,
+  'description|d' => \$description
+)){
+  pod2usage(2);
+}
+
+if($showVersion){
+  CAD::Firemen::printVersion();
+}
+
+my $structUrl = "";
+my $dbh = undef;
+my $cdbUrl = shift;
+my $cfgUrl = shift;
+
+if(!defined($cfgUrl)){
+  $cfgUrl = $cdbUrl;
+  # if no cdb given, first try to use an existing database
+  $structUrl = getInstallationPath();
+  $dbh = dbConnect($structUrl, $verbose);
+  if(!$dbh){
+    # if $structUrl is empty, getInstallationConfigCdb let the user
+    # choose a path
+    $cdbUrl = getInstallationConfigCdb($structUrl);
+  }
+  else{
+    $cdbUrl = "";
+  }
+}
+
+if(!defined($dbh) && (!defined($cdbUrl) || $cdbUrl eq "")){
+  pod2usage(2);
+}
+
+if(!defined($cfgUrl) || $cfgUrl eq ""){
+  pod2usage(2);
+}
+
+# CAD::Firemen::Analyze::checkConfig requires an verbose level + 1
+# to get any output.
+$verbose++;
+my $result = checkConfig(
+  "databaseHandle" => $dbh,
+  "cdbUrl" => $cdbUrl,
+  "cfgUrl" => $cfgUrl,
+  "caseInsensitive" => $caseInsensitive,
+  "description" => $description,
+  "verbose" => $verbose
+);
+
+END {
+  if(defined($dbh) && ($dbh != 0) && !$dbh->disconnect){
+    print "Could not disconnect from database!\n";
+    print "Error: ". $DBI::errstr;
+    exit 1;
+  }
+}
+
+if($result){
+  exit 0;
+}
+exit 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+fm_check_config - Runs some tests on the given config file.
+
+=head1 VERSION
+
+version 0.7.2
+
+=head1 SYNOPSIS
+
+fm_check_config [options] [PATH_TO_CONFIG.CDB] PATH_TO_CONFIG.PRO
+
+This script compares a given config.pro file with the loaded options within
+print "the given cdb file. The config.pro file is also checked against duplicate
+print "entries of options.
+
+Options:
+
+  --help             -?   Prints this help.
+  --version               Prints current version.
+  --verbose          -v   The verbose level. 0 - least output, 2 most output (Default: 1).
+  --case-insensitive -i   Ignores all differences, with existing value, but different cases (e.g. YES and yes)
+                          The default is to print those differences in cyan. The count of ignored
+                          values is displayed.
+  --description      -d   Displays the description of each printed option.
+                          Only available, if a database can be queried.
+
+Normally you won't specify a cdb file. Just run fm_create_help before you run this script
+to create a database. If you do not want or cannot create a database for the installtion
+you want to use, specify a cdb file.
+If no cdb file is given, it tries to figure out the correct installation with help of $ENV{PATH}.
+
+Example:
+
+  fm_check_config c:\proeWildfire5\text\config.cdb c:\proeWildfire5\text\config.pro
+
+=head1 DESCRIPTION
+
+C<fm_check_config> checks the given config file against the given cdb file.
+Therefore it can check whether all given options and there specified values
+are supported. It also checks whether options are duplicated within the config
+file.
+
+=head1 AUTHOR
+
+Joachim Langenbach <langenbach@imw.tu-clausthal.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by TU Clausthal, Institut fuer Maschinenwesen.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

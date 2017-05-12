@@ -1,0 +1,73 @@
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by Hugh S. Myers (private) -->
+<!ELEMENT CHESSGAMES (GAME*)>
+<!ATTLIST CHESSGAMES
+	NAME CDATA #IMPLIED
+>
+<!ELEMENT NAME (#PCDATA)>
+<!ELEMENT GAME (TAGLIST, GAMETEXT, POSITION*)>
+<!ELEMENT TAGLIST (Event, Site, Date, Round, White, Black, Result, Annotator*, BlackElo*, BlackNA*, BlackTitle*, BlackType*, BlackUSCF*, Board*, ECO*, EventDate*, EventSponsor*, FEN*, Mode*, NIC*, Opening*, PlyCount*, Section*, SetUp*, Stage*, SubVariation*, Termination*, Time*, TimeControl*, UTCDate*, UTCTime*, Variation*, WhiteElo*, WhiteNA*, WhiteTitle*, WhiteType*, WhiteUSCF*)>
+<!ELEMENT Event (#PCDATA)>
+<!ELEMENT Site (#PCDATA)>
+<!ELEMENT Date EMPTY>
+<!ATTLIST Date
+	YEAR CDATA #IMPLIED
+	MONTH CDATA #IMPLIED
+	DAY CDATA #IMPLIED
+>
+<!ELEMENT Round (#PCDATA)>
+<!ELEMENT White (#PCDATA)>
+<!ELEMENT Black (#PCDATA)>
+<!ELEMENT Result EMPTY>
+<!ATTLIST Result
+	GAMERESULT (WHITEWIN | BLACKWIN | DRAW | UNKNOWN) #REQUIRED
+>
+<!ELEMENT Annotator (#PCDATA)>
+<!ELEMENT BlackElo (#PCDATA)>
+<!ELEMENT BlackNA (#PCDATA)>
+<!ELEMENT BlackTitle (#PCDATA)>
+<!ELEMENT BlackType (#PCDATA)>
+<!ELEMENT BlackUSCF (#PCDATA)>
+<!ELEMENT Board (#PCDATA)>
+<!ELEMENT ECO (#PCDATA)>
+<!ELEMENT EventDate (#PCDATA)>
+<!ELEMENT EventSponsor (#PCDATA)>
+<!ELEMENT FEN (#PCDATA)>
+<!ELEMENT Mode (#PCDATA)>
+<!ELEMENT NIC (#PCDATA)>
+<!ELEMENT Opening (#PCDATA)>
+<!ELEMENT PlyCount (#PCDATA)>
+<!ELEMENT Section (#PCDATA)>
+<!ELEMENT SetUp (#PCDATA)>
+<!ELEMENT Stage (#PCDATA)>
+<!ELEMENT SubVariation (#PCDATA)>
+<!ELEMENT Termination (#PCDATA)>
+<!ELEMENT Time (#PCDATA)>
+<!ELEMENT TimeControl (#PCDATA)>
+<!ELEMENT UTCDate (#PCDATA)>
+<!ELEMENT UTCTime (#PCDATA)>
+<!ELEMENT Variation (#PCDATA)>
+<!ELEMENT WhiteElo (#PCDATA)>
+<!ELEMENT WhiteNA (#PCDATA)>
+<!ELEMENT WhiteTitle (#PCDATA)>
+<!ELEMENT WhiteType (#PCDATA)>
+<!ELEMENT WhiteUSCF (#PCDATA)>
+<!ELEMENT GAMETEXT ((MOVENUMBER, (MOVE, (GAMETEXT*, COMMENT*, POSITION*, NAG*, FENstr*)*)*)+, GAMETERMINATION?)>
+<!ATTLIST GAMETEXT
+	LEVEL CDATA #IMPLIED
+>
+<!ELEMENT MOVENUMBER (#PCDATA)>
+<!ELEMENT MOVE (#PCDATA)>
+<!ELEMENT COMMENT (#PCDATA)>
+<!ELEMENT POSITION (ROW+)>
+<!ELEMENT ROW (#PCDATA)>
+<!ATTLIST POSITION
+	FONT CDATA #IMPLIED
+	SIZE CDATA #IMPLIED
+	xml:space (default | preserve) "preserve"
+>
+<!ELEMENT NAG (#PCDATA)>
+<!ELEMENT FENstr (#PCDATA)>
+<!ELEMENT GAMETERMINATION EMPTY>
+<!ATTLIST GAMETERMINATION
+	GAMERESULT (WHITEWIN | BLACKWIN | DRAW | UNKNOWN) #REQUIRED
+>

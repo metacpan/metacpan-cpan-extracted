@@ -1,0 +1,22 @@
+Revision history for Perl extension CGI::Application::Demo::Ajax.
+
+1.04  Sun Feb 21 12:54:23 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+
+1.03  Wed Feb 10 13:52:33 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+1.02  Sun Apr 19 15:01:00 2009
+	  - Add cgi-bin/ajax.cgi
+
+1.01  Sun Apr 12 09:21:00 2009
+	  - Remove unused Search.pm
+	  - Fix date in this file for V 1.00. 2009-04-11 was a Sat, not a Wed
+	  - Fix README which was copied from HTML::Parser::Simple and not updated
+	  - Add comments to cgi-bin/ajax.cgi and local/ajax
+
+1.00  Sat Apr 11 09:22:00 2009
+	  - Original version

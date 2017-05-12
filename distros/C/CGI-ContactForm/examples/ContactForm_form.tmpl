@@ -1,0 +1,40 @@
+<html>
+<head>
+<title><TMPL_VAR TITLE> <TMPL_VAR RECNAME></title>
+<style type="text/css">
+.error { font-weight: bold }
+</style>
+<TMPL_VAR STYLE>
+</head>
+<body>
+<form action="<TMPL_VAR SCRIPTNAME>" method="post">
+<table cellpadding="3">
+<tr>
+<td colspan="4"><h1 class="halign"><TMPL_VAR TITLE> <TMPL_VAR RECNAME></h1></td>
+</tr><tr>
+<td><p<TMPL_VAR NAMEERROR>><TMPL_VAR NAMELABEL></p></td><td><input type="text" name="name"
+ value="<TMPL_VAR NAME>" size="20" />&nbsp;</td>
+<td><p<TMPL_VAR EMAILERROR>><TMPL_VAR EMAILLABEL></p></td><td><input type="text" name="email"
+ value="<TMPL_VAR EMAIL>" size="20" /></td>
+</tr><tr>
+<td><p<TMPL_VAR SUBJECTERROR>><TMPL_VAR SUBJECTLABEL></p></td>
+<td colspan="3"><input type="text" name="subject" value="<TMPL_VAR SUBJECT>" size="55" /></td>
+</tr><tr>
+<td colspan="4"><p<TMPL_VAR MESSAGEERROR>><TMPL_VAR MSGLABEL></p></td>
+</tr><tr>
+<td colspan="4">
+<textarea name="message" rows="8" cols="65"<TMPL_VAR SOFTWRAP>><TMPL_VAR MESSAGE></textarea>
+</td>
+</tr><tr>
+<td colspan="4" class="halign">
+<TMPL_VAR ERRORALERT>
+<input class="button" type="reset" value="<TMPL_VAR RESET>" />&nbsp;&nbsp;
+<input class="button" type="submit" value="<TMPL_VAR SEND>" /></td>
+</tr><tr>
+<td colspan="4"><p class="returnlink"><a href="<TMPL_VAR RETURNLINKURL>">
+<TMPL_VAR RETURNLINKTEXT></a></p></td>
+</tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,30 @@
+[%
+    # generic RHTMLO form maker
+    DEFAULT oid = c.controller.make_primary_key_string( object ) || '0';
+    CALL form.action( c.uri_for(oid, 'save') );
+    CALL form.method('post');
+    
+    # specific to this example app
+    SET related_method = object.isa('MyCRUD::Main::Album')
+        ? 'songs' : 'albums';
+    SET related_uri    = object.isa('MyCRUD::Main::Album')
+        ? c.uri_for('/song') : c.uri_for('/album');
+%]
+
+<div id="form">
+
+ [% form.xhtml_table %]
+ 
+</div>
+
+[% IF oid %]
+<div id="related">
+ <h2>Related records</h2>
+  [% PROCESS list.tt 
+        fields = ['title', 'artist']
+        rows     = object.$related_method
+        base_uri = related_uri
+  %]
+
+</div>
+[% END %]

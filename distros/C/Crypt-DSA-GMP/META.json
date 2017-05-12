@@ -1,0 +1,52 @@
+{
+   "abstract" : "DSA Signatures and Key Generation",
+   "author" : [
+      "Dana A Jacobsen <dana@acm.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-DSA-GMP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "BufferWithInt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.45"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::Random::Seed" : "0",
+            "Data::Buffer" : "0.04",
+            "Digest::SHA" : "5.22",
+            "Exporter" : "5.562",
+            "MIME::Base64" : "0",
+            "Math::BigInt" : "1.78",
+            "Math::BigInt::GMP" : "0",
+            "Math::Prime::Util::GMP" : "0.15",
+            "base" : "0",
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/danaj/Crypt-DSA-GMP"
+   },
+   "version" : "0.02"
+}

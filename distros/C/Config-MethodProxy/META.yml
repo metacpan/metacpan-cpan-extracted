@@ -1,0 +1,31 @@
+---
+abstract: 'Integrate dynamic logic with static configuration.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-MethodProxy
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Module::Runtime: '0.014'
+  Scalar::Util: '0'
+  namespace::clean: '0.24'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Config-MethodProxy/issues
+  homepage: https://github.com/bluefeet/Config-MethodProxy
+  repository: https://github.com/bluefeet/Config-MethodProxy.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

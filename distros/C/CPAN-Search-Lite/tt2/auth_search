@@ -1,0 +1,31 @@
+<div class=path>
+[% results.size %] [% pages.results %]
+</div>
+[% class = 's' %]
+<div class=box>
+<table width="100%">
+[% USE table(results, rows=4) %]
+[% FOREACH column = table.cols %]
+[% FOREACH item = column %]
+[% IF item == column.first %]
+[% class = (class == 'r') ? 's' : 'r' %]
+<tr valign="top" class="[% class %]">
+[% END %]
+[% IF item.auth_id %]
+<td><a href="[% home %]/~[% item.cpanid | lower %]"> 
+<b>[% item.cpanid %] </b></a> 
+<br /><small>[% item.fullname %]</small></td>
+[% END %]
+[% IF item == column.last %]
+</tr>
+[% END -%]
+[% END -%]
+[% END -%]
+</table>
+</div>
+<hr />
+[% IF mode && query %]
+<font size="-1">[% pages.try %]</font> <a href=
+"[%searchcpan%]search?mode=[% mode %];query=[% query | uri | html %]">
+<font size="-1">search.cpan.org</font></a>
+[% END %]

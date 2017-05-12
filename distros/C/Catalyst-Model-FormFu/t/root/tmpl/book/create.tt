@@ -1,0 +1,7 @@
+[% WRAPPER page.tt %]
+
+<h1>Create a new book</h1>
+
+[% form %]
+
+[% END %]

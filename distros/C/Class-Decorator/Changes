@@ -1,0 +1,28 @@
+Revision history for Perl extension Class::Decorator.
+
+0.99  Tue Sept 16 18:46:12 2002
+	- fixed date of previous changelog
+	- fixed version number in README
+
+0.98  Tue Sept 16 18:09:50 2002
+	- eval() avoided (thanks swalters)
+	- isa() now dispatches correctly (thanks swalters)
+	- can() now dispatches correctly (me)
+	- VERSION() now dispatches correctly (me)
+
+0.02  Tue Aug 21 17:46:53 2002
+	- Changes is now being used (thanks acme)
+	- POD now has wrapped text (thanks davorg)
+	- uses strict pragma (thanks Trelane)
+	- checks success of $AUTOLOAD =~ /.../ (thanks davorg)
+	- croaks rather than dies in constructor (thanks Trelane)
+	- renamed $METH to $METHOD (thanks acme)
+	- expanded DESTROY note (thanks acme)
+	- added note about use of accessors (sorry Trelane)
+	- added more to 'see also' (thanks #london.pm)
+	- added basics of decorating single methods (me)
+
+0.01  Tue Aug 20 12:13:20 2002
+	- original version; created by h2xs 1.21 with options
+		-Axn Class::Decorator
+

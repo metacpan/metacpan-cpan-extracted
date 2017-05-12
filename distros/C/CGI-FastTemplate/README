@@ -1,0 +1,197 @@
+
+README for the Perl Module CGI::FastTemplate - 1.09
+
+	Copyright (c) 1998-1999 Jason Moore <jmoore@sober.com>.  All rights
+	reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	Artistic License for more details.
+
+
+DESCRIPTION
+-----------
+
+CGI::FastTemplate manages templates and parses templates replacing
+variable names with values.  It was designed for mid to large scale web
+applications (CGI, mod_perl) where there are great benefits to separating
+the logic of an application from the specific implementation details.
+
+For example using FastTemplate it is possible to:
+
+	- build multilingual applications
+
+	- allow users to select high-bandwidth or text-only versions of
+	  an application
+
+	- let graphic designers work on templates independantly of
+	  the programmers
+
+	- share the responsibility of interface design
+
+CGI::FastTemplate has the following attributes:
+
+       Speed
+
+       FastTemplate doesn't use eval, and parses with a single
+       regular expression.  It just does simple variable
+       interpolation (i.e. there is no logic that you can add to
+       templates - you keep the logic in the code).  That's why
+       it's has 'Fast' in it's name!
+
+       Efficiency
+
+       FastTemplate functions accept and return references
+       whenever possible, which saves needless copying of
+       arguments (hashes, scalars, etc).
+
+       Flexibility
+
+       The API is robust and flexible, and allows you to build
+       very complex HTML documents or HTML interfaces.  It is
+       100% perl and works on Unix or NT.  Also, it isn't
+       restricted to building HTML documents -- it could be used
+       to build any ascii based document (e.g. postscript, XML,
+       email).
+
+
+For more information see the pod documentation included in the file
+'FastTemplate.pm'.
+
+
+INSTALLATION
+------------
+
+To install, unzip and untar the archive. In the directory created type:
+
+	perl Makefile.PL
+	make
+	make install
+
+Note: If this does not work, you can always just copy the file
+'FastTemplate.pm' to the 'CGI' directory in your perl distribution.
+
+If you want to test out the module without installing it, you can add
+the following to your code:
+
+	BEGIN
+	{
+		unshift(@INC, "/wherever/you/put/CGI-FastTemplate/");
+	}
+
+	use CGI::FastTemplate;
+
+
+DOCUMENTATION
+-------------
+
+Documentation is included in the module in pod format.  Once
+CGI::FastTemplate has been installed type:
+
+	perldoc CGI::FastTemplate
+
+or if is uninstalled:
+
+	perldoc ./FastTemplate.pm
+
+For more information on perldoc type 'perldoc perldoc'.
+
+
+AUTHOR
+------
+
+Jason Moore <jmoore@sober.com>
+
+Feel free to send along any comments, suggestions, or bug reports.
+
+
+CHANGES
+-------
+
+Revision history for Perl extension CGI::FastTemplate.
+
+1.09 Sun Jun 27 23:40:14 EDT 1999
+
+    - object is now uses array ref, not a hash ref to store attributes
+    Thanks to: Greg Bacon from his talk "Building Objects out of Arrays" at YAPC
+    note: the API is the same -- this is a behind-the-scenes implementation change.
+
+	- minor pod doco edits
+	- added test scripts and 2 test templates
+
+1.08 Sun Jan 24 23:14:03 EST 1999
+
+	- minor pod doco edits
+	- added GNU copyright
+	- 'Changes' file no longer in distribution. See: 'README'
+
+1.07  Sun Jan 24 23:14:03 EST 1999
+
+	- edited main regexp to add support for new ${VAR} style variables.
+	Thanks to: Eric L. Brine <q2ir@unb.ca>
+	- minor pod doco edits
+
+
+1.06  Mon Jan  4 13:47:13 EST 1999
+
+	- extended clear_tpl() to allow for a selective clearing of loaded templates.
+	Useful for persistant or long running code where you want to use a large
+	template, but don't want to keep it in memory.
+
+	clear_tpl()         - clears all loaded templates from cache
+	clear_tpl(SCALAR)   - clears only template SCALAR
+	clear_tpl(ARRAY)    - clears templates named in ARRAY
+
+
+1.05  Fri Nov 27 15:27:54 EST 1998
+	- extended clear_parse() (alias: clear()) to handle array as well as
+	a scalar.   e.g. $tpl->clear("ROWS") or $tpl->clear("ROWS", "COLS", "HEAD"); 
+	are valid.
+
+
+1.04  Thu Oct 29 09:57:15 EST 1998
+	- strict() now leaves unknown variables in the final doc instead of
+	converting them to an empty string.  see: no_strict() to get the old 
+	behavior back.
+
+
+1.03  Thu Oct 15 10:42:14 EDT 1998
+	- minor change to prevent spurious warnings under -w (e.g. {strict} 
+	becomes {"strict"})
+
+
+1.02  Tue Sep 22 08:57:29 EDT 1998
+
+	- fixed bug that allowed first character after '$' to be a digit.
+	Variables are now: $[A-Z][A-Z0-9_]+
+	Thanks to: Benjamin Low <b.d.low@unsw.edu.au>
+	
+	- add strict() no_strict() which turns on/off complaints to STDERR
+	when a variable is found but no value found for it.
+
+
+1.01  Tue Sep 15 10:01:44 EDT 1998
+
+	- added clear(SCALAR) which clears the scalar from the parsed
+	hash. i.e. 
+		$tpl->clear("FOO");	## equivalent to:
+		$tpl->assign(FOO=>"");
+	
+	- made $v='' not undef in parse() to avoid spurious warnings
+	Thanks to: Benjamin Low <b.d.low@unsw.edu.au>
+
+	- added method define_nofile() (alias: define_raw) which allows
+	you to define a template without having to create a separate file
+	for your template.
+
+
+1.00  Thu Aug 20 11:59:22 1998
+	- original version; created by h2xs 1.18
+	- first public release (rewrite)
+
+
+

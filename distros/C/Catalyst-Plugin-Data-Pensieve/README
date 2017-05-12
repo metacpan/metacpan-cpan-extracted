@@ -1,0 +1,24 @@
+Catalyst::Plugin::Data::Pensieve
+====================
+
+Easy access to Data::Pensieve within Catalyst applications
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Data::Pensieve
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Michael Aquilina. All rights reserved.
+

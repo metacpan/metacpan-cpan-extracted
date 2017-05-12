@@ -1,0 +1,26 @@
+---
+abstract: 'Find configuration files in the native OS fashion'
+author:
+  - 'Salvador Fandino <sfandino@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Find
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::HomeDir: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  IO::File: '0'
+  Test::More: '0.70'
+version: '0.31'

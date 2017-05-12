@@ -1,0 +1,35 @@
+Crypt-URandom version 0.0.27
+
+This Module is intended to provide an interface to the strongest 
+available source of non-blocking randomness on the current platform.
+Platforms currently supported are anything supporting /dev/urandom
+and versions of Windows greater than or equal to Windows 2000.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, David Dick
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

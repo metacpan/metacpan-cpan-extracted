@@ -1,0 +1,32 @@
+Config::INI::Access - Syntactic sugar for accessing data from .ini-files
+
+/*
+	Description
+*/
+
+Config::INI::Access allows to access configuration data stored in Windows-formatted 
+.ini-files with arrows rather than hash braces.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+Config::INI::Access module is a free software. 
+You may redistribute and (or) modify it under the same terms as Perl.

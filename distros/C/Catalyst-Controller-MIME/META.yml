@@ -1,0 +1,27 @@
+---
+abstract: 'Multipart MIME viewer via Catalyst'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Controller-MIME
+requires:
+  Catalyst::Controller: 0
+  Catalyst::Utils: 0
+  Data::Dumper::Concise: 0
+  HTML::Entities: 0
+  HTML::TokeParser::Simple: 0
+  Moose: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/vanstyn/Catalyst-Controller-MIME.git
+version: 0.02

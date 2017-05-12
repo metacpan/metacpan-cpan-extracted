@@ -1,0 +1,4 @@
+Revision history for Perl extension Catalyst::Plugin::Authorization::CDBI::GroupToken
+
+0.01    2005-08-24 17:10:00
+        - Initial release.

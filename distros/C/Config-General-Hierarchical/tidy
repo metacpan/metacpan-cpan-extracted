@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl
+
+my @files = qw( lib/Config/General/Hierarchical.pm Hierarchical/Dump.pm Hierarchical/DumpTest.pm Hierarchical/Test.pm Makefile.PL t/01_new.t t/02_read.t t/03_get.t t/04_constraint.t t/99_dump.t );
+
+foreach my $file ( @files ) {
+    print "$file\n";
+
+    my $r = `perltidy $file`;
+
+    if( $r ) {
+        print $r;
+        next;
+    }
+
+    print `diff -u $file $file.tdy`;
+}

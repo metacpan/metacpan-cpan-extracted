@@ -1,0 +1,15 @@
+Revision history for Catalyst-TraitFor-Controller-DoesExtPaging
+
+1.000001  2013-07-21 20:12:37 CST6CDT
+ - Fix broken dep on non-extant version of SQL::Translator
+
+1.000000  2013-05-25 21:33:20 CST6CDT
+ - Stop using stupid autoversions
+ - Use Web::Util::ExtPaging
+
+0.093370 Thu Dec 03 12:54:00 CDT 2009
+ - Fix a dep
+
+0.093360 Tue Dec 01 09:51:00 CDT 2009
+ - Initial Release
+

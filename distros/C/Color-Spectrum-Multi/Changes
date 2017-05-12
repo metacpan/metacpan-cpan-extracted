@@ -1,0 +1,8 @@
+Revision history for Color-Spectrum-Multi
+
+0.02    2009-09-17
+        Bah - declaring Color::Spectrum as a dependency would be wise.
+
+0.01    2009-08-25
+        Initial version
+

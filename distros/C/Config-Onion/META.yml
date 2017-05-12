@@ -1,0 +1,30 @@
+---
+abstract: 'Layered configuration, because configs are like ogres'
+author:
+  - 'Dave Sherohman <dsheroh@cpan.org>'
+build_requires:
+  FindBin: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  YAML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Onion
+requires:
+  Config::Any: '0'
+  Exporter: '0'
+  Hash::Merge::Simple: '0'
+  Moo: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dsheroh/Config-Onion/issues
+  repository: https://github.com/dsheroh/Config-Onion.git
+version: '1.007'

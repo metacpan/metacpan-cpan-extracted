@@ -1,0 +1,49 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Sign In</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
+<form id="loginform" method="post" action="">
+  <div class="login">
+    <div class="login_header">
+      Sign In
+    </div>
+    <div class="login_content">
+      <ul class="message">
+<li>Please enter your username and password in the fields below.</li>
+      </ul>
+      <fieldset>
+        <label for="authen_loginfield" id="authen_loginfield_label" class="authen_label">User Name
+            <input id="authen_loginfield" class="authen_input" tabindex="1" type="text" name="authen_username" size="20" value="" />
+        </label>    
+        <label for="authen_passwordfield" id="authen_passwordfield_label" class="authen_label">Password
+            <input id="authen_passwordfield" class="authen_input" tabindex="2" type="password" name="authen_password" size="20" />
+        </label>
+        <label for="authen_rememberuserfield" id="authen_rememberuserfield_label" class="authen_label">Remember User Name
+    <input id="authen_rememberuserfield" class="authen_input" tabindex="3" type="checkbox" name="authen_rememberuser" value="1" />
+</label>
+
+      </fieldset>
+    </div>
+    <div class="login_footer">
+      <div class="buttons">
+        <input id="authen_loginbutton" tabindex="4" type="submit" name="authen_loginbutton" value="Sign In" class="button" />
+        
+        
+      </div>
+    </div>
+  </div>
+  <input type="hidden" name="destination" value="" />
+  <input type="hidden" name="rm" value="authen_login" />
+</form>
+
+
+</body>
+</html>

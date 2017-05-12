@@ -1,0 +1,61 @@
+{
+   "abstract" : "Interface to the calendar used by Bahai faith.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Calendar-Bahai",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "XML::SemanticDiff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Calendar::Plugin::Renderer" : "0.12",
+            "Date::Bahai::Simple" : "0.20",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Calendar::Bahai" : {
+         "file" : "lib/Calendar/Bahai.pm",
+         "version" : "0.46"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Calendar-Bahai.git",
+         "web" : "https://github.com/manwar/Calendar-Bahai"
+      }
+   },
+   "version" : "0.46",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

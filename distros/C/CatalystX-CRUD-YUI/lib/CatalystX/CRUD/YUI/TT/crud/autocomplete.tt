@@ -1,0 +1,24 @@
+[%# JSON format autocomplete response %]
+[%  IF (! ac_field.defined );
+        THROW crud '"ac_field" must be defined in ' _ component.name;
+    END;
+    IF (! ac_method.defined );
+        THROW crud '"ac_method" must be defined in ' _ component.name;
+    END;
+    
+    SET dataset = [];
+    SET no_wrapper = 1;
+    SET count = 0;
+    FOR r = results;
+        SET pk = r.primary_key_uri_escaped;
+        dataset.push({ $ac_field => r.$ac_method, 'pk' => "$pk" });
+        count = count + 1;
+    END;
+    resultset = {
+        'ResultSet' => {
+            'Count'  => count,
+            'Result' => dataset
+        }
+    };
+    resultset.as_json;
+%]

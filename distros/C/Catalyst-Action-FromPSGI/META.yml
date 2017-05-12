@@ -1,0 +1,24 @@
+---
+abstract: 'Use a PSGI app as a Catalyst action'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Test::More: '0.88'
+  Web::Simple: '0.016'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Action-FromPSGI
+requires:
+  Catalyst::Runtime: '5.90049004'
+  Plack: '0.992'
+resources:
+  bugtracker: https://github.com/frioux/Catalyst-Action-FromPSGI/issues
+  repository: git://github.com/frioux/Catalyst-Action-FromPSGI.git
+version: '0.001006'

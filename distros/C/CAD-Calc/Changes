@@ -1,0 +1,48 @@
+Revision history for CAD-Calc
+
+0.27 2008-05-05
+
+  * removed compatibility Makefile.PL
+
+0.26 2006-06-04
+
+  * minor fixup for transient Exporter.pm bug
+
+  * fixed nit in compatibility Makefile.PL
+
+0.25 2006-01-06
+
+  * different tests
+
+  * 0.24 was a bad release
+
+0.24 2006-01-04
+
+  * Added arc_2pt function.
+
+0.23
+
+  * Changed isleft() function to howleft().
+
+0.22
+
+  * Fixed shift_line() to properly use $distance
+
+  * Changed pgon_centroid calculation.
+
+  * Added foot_on_line() function.
+
+  * Added stringify_line() function.
+
+0.21 2004-04-20
+
+  * Several new functions and features.
+
+0.20 2004-02-18
+
+  * can't remember if this was released then or not
+
+See the source code repository for more detail.
+  http://scratchcomputing.com/svn/CAD-Calc/trunk
+
+vim:ts=2:sw=2:et:sta

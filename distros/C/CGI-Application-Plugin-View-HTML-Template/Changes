@@ -1,0 +1,7 @@
+Revision history for Perl extension CGI::Application::Plugin::View::HTML::Template.
+
+0.01  Thu Feb 21 15:13:35 2008
+	- original version; created by h2xs 1.23 with options
+		-AX CGI::Application::Plugin::View::HTML::Template
+0.02  Fri Feb 22 11:03:00 2008
+        - Fixed a couple errors in the POD.

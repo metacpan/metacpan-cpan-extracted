@@ -1,0 +1,681 @@
+#OQbody {
+  margin: 0;
+  font-family: Sans-serif;   
+  margin-bottom: 6em;
+}
+form.OQform a,
+form.OQform button {
+  cursor: pointer;
+}
+form.OQform input:focus, form.OQform select:focus {
+  background-color: #ffd;
+}
+
+form.OQform {
+  position: relative;
+  margin: 0;
+}
+
+.OQhead { position: relative; background-color: #666; color: #fff; overflow: hidden; padding: .2em; }
+.OQtitle {
+  width: 40%; float: left; padding: .3em 0;
+  font-weight: bold;
+}
+.OQsummary { width: 30%; text-align: center; float: left; padding: .3em 0; }
+.OQcmds { width: 30%; text-align: right; float: left; }
+
+@media (max-width:600px) {
+  .OQtitle, .OQsummary, .OQcmds {
+    width: 95%;
+    text-align: left;
+  }
+  .OQcmds {
+  margin-bottom: 4px;
+  }
+}
+
+.OQcmds > * {
+  font-size: .7em;
+  vertical-align: middle;
+}
+
+.OQinfo {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  color: #222;
+  font-size: .8em;
+}
+.OQinfo td {
+  padding: 6px 4px;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
+}
+.OQFilterDescr:hover td {
+  background-color: #ffd;
+}
+.OQinfo td.OQlabel {
+  width: 3em;
+  text-align: center;
+  padding-left: 0;
+  background-color: #ccc;
+  border: 1px solid #666;
+}
+.OQFilterDescr {
+  cursor: pointer;
+}
+
+.OQRecUpdateMsg {
+  background-color: #fdd;
+  text-align: center;
+  padding: 2px;
+  color: #222;
+  border: 1px solid #ffe;
+  font-weight: bold;
+}
+
+.OQBlocker {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  cursor: wait; 
+  display: none;
+}
+
+.OQAddColumnsPanel, .OQFilterPanel, .OQHelpPanel {
+  display: none;
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  right: 10px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+}
+
+.OQHelpPanel h3 {
+  margin: 0;
+  color: #c4c600;
+}
+.OQHelpPanel {
+  top: 35px;
+  right: 2px;
+  left: auto;
+  height: 14em;
+  width: 16em;
+  padding: .8em;
+  border-color: #c4c600;
+}
+.OQHelpHilight {
+  outline: 3px dotted #c4c600;
+}
+
+.OQCloseHelpBut, .OQNextHelpBut {
+  position: absolute;
+  bottom: 10px;
+  left: 1em;
+  width: 8em;
+}
+.OQNextHelpBut {
+  left: auto;
+  right: 10px;
+}
+
+.OQToolsPanel-pos-div {
+  position:relative;
+  overflow:visible;
+  height:0;
+  z-index: 99; /* needed for IE7 */
+}
+.OQToolsPanel-align-div {
+  width: auto;
+  position:absolute;
+  width: 600px;
+  top:0;
+  right:0;
+}
+.OQToolsPanel {
+  display: none;
+  position: relative;
+  border: 2px outset #ccc;
+  background-color: #eee;
+  border-radius: 6px;
+  z-index:99999;
+  top: 29px;
+}
+.OQToolsPanel * {
+  vertical-align: middle;
+}
+
+.OQToolsPanel ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none; 
+}
+.OQToolsPanel li + li {
+  border-top: 1px solid #ccc;
+}
+
+.OQToolsPanel h4 {
+  text-align: center;
+  margin: 0;
+  text-decoration: underline;
+}
+#OQSaveReportEmailAlertOpts {
+  border-color: transparent;
+  border-radius: 6px;
+  margin-top: .5em;
+}
+#OQSaveReportEmailAlertOpts > * {
+  display: none;
+}
+#OQSaveReportEmailAlertOpts.opened {
+  border-color: #eee;
+}
+#OQSaveReportEmailAlertOpts > legend,
+#OQSaveReportEmailAlertOpts.opened > * {
+  display: block;
+}
+
+.OQautoactionform a {
+  display: block;
+  padding: 6px;
+  text-decoration: none;
+}
+.OQautoactionform a:hover {
+  background-color: #ffd;
+}
+
+.OQemailmergetool {
+  overflow: hidden;
+}
+.OQemailmergeform, .OQemailmergetemplatevars {
+  float: left;
+  position: relative;
+  max-width: 35em;
+}
+
+.OQemailmergeform p {
+  margin: 10px;
+}
+
+.OQemailmergetemplatevars  {
+  padding: 6px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  margin-top: 4px;
+  margin-top: 4px;
+  border-radius: 2px;
+}
+ 
+.OQemailmergetemplatevars .OQTemplateVar {
+  cursor: pointer;
+  font-size: .9em;
+  padding: 6px;
+}
+
+.OQemailmergemsgs {
+  max-height: 30em;
+  overflow: auto;
+}
+
+.OQemailmergeview > * {
+  margin: 10px;
+}
+
+.oqemailmergepreviewbody {
+  white-space: pre;
+}
+
+
+.OQemailmergeform p > input {
+  width: 94%;
+}
+
+.OQnotify {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 100px;
+  padding: 20px;
+  background-color: #222;
+  color: white;
+}
+
+.OQnotifyOkBut {
+  position: absolute;
+  bottom: 10px;
+  left: 45%;
+}
+
+.OQmsg {
+  height: 60px;
+  overflow: auto;
+}
+
+.OQemailmergetemplatevarlist {
+  position: relative;
+  max-height: 32em;
+  overflow: auto;
+  min-width: 16em;
+}
+
+.OQemailmergeform p > label {
+  font-weight: bold;
+  color: #222;
+  margin: 4px;
+}
+.OQemailmergeform small {
+  color: #555;
+  margin-left: 6px;
+}
+
+.OQemailmergeform textarea {
+  height: 4em;
+  width: 94%;
+}
+
+.OQToolContent {
+  background-color: white;
+  padding: 16px;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #bbb;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.OQToolExpander {
+  font-size: .9em;
+  color: #444;
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.OQToolExpander:hover h3 {
+  background-color: #ffd;
+}
+.OQToolExpander h3 {
+  margin: 0;
+  padding: 10px;
+  cursor: pointer;
+}
+.AutoActionSummaryElem {
+  border-top: 1px solid #ccc;
+  clear: both;
+}
+.AutoActionSummaryElem:first-child {
+  border-top: 0;
+}
+
+.OQRemoveAutoActionBut {
+  float: right;
+  margin-top: .6em;
+}
+
+
+.OQAddColumnsPanel h1, .OQFilterPanel h1 {
+  font-size: 1.4em;
+  margin: .2em;
+  text-align: center;
+  color: #444;
+}
+
+.OQAddColumnsPanel br {
+  clear: left;
+}
+.OQAddColumnsPanel button {
+  font-size: 1.6em;
+  margin: .5em;
+}
+.OQAddColumnsPanel label {
+  min-width: 160px;
+  font-weight: normal;
+  font-size: 12px;
+  padding: 4px;
+  display: inline-block;
+  cursor: pointer;
+}
+.CancelFilterBut, .OKFilterBut {
+  font-size: 1.6em;
+  margin: .5em;
+}
+.OQFilterPanel table button.lp,
+.OQFilterPanel table button.rp {
+  color: #ccc;
+  border: 0;
+  background-color: transparent;
+  font-size: 1.2em;
+}
+.OQFilterPanel {
+  text-align: center;
+}
+.OQFilterPanel table {
+  margin: auto;
+  border-spacing: 0;
+}
+.OQFilterPanel td {
+  text-align: center;
+  vertical-align: top;
+  padding: 2px;
+}
+.OQFilterPanel select, .OQFilterPanel input {
+  padding: 4px 0 4px 4px !important;
+  margin: !important;
+  border-width: 0 !important;
+  background-color:#ddd;
+}
+.OQFilterPanel .rexptypesel {
+  position: relative;
+  width: 200px;
+  height: .9em;
+}
+.OQFilterPanel .rexptypesel input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 174px;
+  z-index: 20;
+}
+.OQFilterPanel .rexptypesel select {
+  position: absolute;
+  z-index: 5;
+  width: 200px;
+  right: 0;
+  z-index: 10;
+  top: 0;
+}
+
+
+
+.LoadingData .OQBlocker, 
+.OQFilterMode .OQBlocker,
+.OQAddColumnsMode .OQBlocker,
+.OQHelpMode .OQBlocker,
+.OQAddColumnsMode .OQAddColumnsPanel,
+.OQFilterMode .OQFilterPanel,
+.OQHelpMode .OQHelpPanel {
+  display: block;
+}
+
+
+
+table.OQdata {
+  border-collapse: collapse;
+  width: 100%;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 6px;
+}
+table.OQdata > tbody > tr:nth-child(odd) {
+  background-color: #ccc; 
+}
+table.OQdata > tbody > tr > td {
+  border-left: 1px solid #999;
+  padding-left: 6px;
+}
+table.OQdata > tbody > tr > td.OQdataLCol {
+  border:0;
+  padding: 0;
+}
+td.OQdataLCol * {
+  vertical-align: middle;
+}
+
+table.OQdata > tbody > tr > td {
+  max-width: 18em;
+  overflow: hidden;
+  font-size: 1em;
+}
+
+table.OQdata td.num,
+table.OQdata td.date {
+  text-align: right;
+}
+table.OQdata > thead td {
+  text-align: center;
+  background-color: #ddd;
+  font-size: .8em;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  border-width: 0 1px 1px 1px;
+  height: 3em;
+  font-weight: bold;
+}
+table.OQdata > thead td:hover {
+  background-color: #ffd;
+}
+table.OQdata > thead td[data-noselect][data-nosort][data-nosort] {
+  background-color: #ddd;
+  cursor: default;
+}
+table.OQdata > thead td:first-child, 
+table.OQdata > thead td:last-child {
+  background-color: #ddd;
+  width: 1%;
+}
+table.OQdata > tbody tr.OQupdatedRow td {
+  background-color: #fdd;
+}
+
+.OQColumnCmdPanel {
+  position: absolute;
+  width: 140px;
+  top: 0;
+  left: 0;
+  display: none;
+  border: 1px solid #666;
+  background-color: #fff;
+  cursor: pointer;
+}
+.OQColumnCmdPanel button {
+  padding: 10px;
+  padding-left: 34px;
+  color: black;
+  font-size: .9em;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #ddd;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 6px 6px;
+  text-align: left;
+  width: 100%;
+}
+.OQColumnCmdPanel button:hover {
+  background-color: #ffd;
+}
+
+.OQform button[disabled] {
+  color: #888;
+  text-shadow: 2px 2px 5px #ccc;
+}
+.OQColumnCmdPanel button[disabled]:hover {
+  background-color: transparent;
+  cursor: default;
+}
+
+a.OQeditBut, a.OQnewBut {
+  display: inline-block;
+}
+
+.OQRecViewCmds {
+  position: relative;
+  height: 0;
+}
+.OQRecViewCmds .OQAddColumnsBut {
+  padding: 10px;
+  padding-left: 34px;
+  color: black;
+  border-bottom: 1px solid #ddd;
+  background-repeat: no-repeat;
+  background-position: 6px 6px;
+  text-align: left;
+  position: absolute;
+  top: -50px;
+  right: 4px;
+}
+
+.OQnewBut,.OQrefreshBut,.OQToolsBut,.OQeditBut,.OQselectBut,.OQhelpBut {
+  width: 24px;
+  height: 24px;
+  margin: 0 0 0 20px;
+  border: 0;
+  background: transparent url(document-new-6.png) no-repeat center top;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent !important;
+}
+.OQhelpBut {
+  background-image: url(help.png);
+}
+.OQrefreshBut {
+  background-image: url(view-refresh-4.png);
+}
+.OQToolsBut {
+  background-image: url(document-export-2.png);
+}
+.OQeditBut {
+  background-image: url(page-white_go.png);
+  margin: 0;
+  height: 18px;
+  width: 18px;
+  margin: 4px;
+}
+.OQselectBut {
+  background-image: url(list-add-5.png);
+  margin: 0;
+}
+.OQSortBut {
+  background-image: url(view-sort-descending.png);
+}
+.OQReverseSortBut {
+  background-image: url(view-sort-ascending.png);
+}
+.OQFilterBut {
+  background-image: url(view-filter.png);
+}
+.OQLeftBut {
+  background-image: url(arrow-left-3.png);
+}
+.OQRightBut {
+  background-image: url(arrow-right-3.png);
+}
+.OQAddColumnsBut {
+  background-image: url(view-right-new.png);
+}
+.OQCloseBut {
+  background-image: url(view-left-close.png);
+}
+.OQStatsBut {
+  background-image: url(view-statistics.png);
+}
+.OQToolsCancelBut {
+  position:absolute;
+  right:4px;
+  top:4px;
+  font-size:20px;
+  font-weight:bold;
+  color:#858585;
+  cursor:pointer;
+  height:30px;
+  width:30px;
+  font-family:serif;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #eee;
+  padding: 0;
+  text-align: center;
+}
+.OQToolsCancelBut:hover {
+  background-color: #ddd;
+}
+
+.OQdialogs {
+  position: absolute;
+}
+.OQdialogs > * {
+  display: none;
+}
+
+.OQPager {
+  text-align: center;
+}
+.OQPager > * {
+  color: #222;
+  text-align: center;
+}
+.OQPager select {
+  border: 1px solid #eee;
+}
+.OQPager input {
+  width: 3em;
+  border: 1px solid #eee;
+}
+
+/* disable user select */
+label.ckbox, table.OQdata thead  {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.OQAddColumnsPanel {
+  padding: 15px;
+}
+.OQAddColumnsPanel .ckbox {
+  font-size: 11px;
+  min-width: 14em;
+  display: inline-block;
+  margin: 4px;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  text-align: left;
+}
+label.ckbox:hover {
+  background-color: #ffd;
+}
+.OQAddColumnsPanel .ckbox > * {
+  vertical-align: middle;
+}
+
+.OQAddColumnsPanel .ckbox > input {
+  margin: 0 4px 0 0;
+}
+
+.OQrecview {
+  margin: 6px;
+  border-radius: 1px;
+}
+.OQrecview td {
+  border: 0;
+  background-color: transparent;
+  font-size: .9em;
+  width: auto !important;
+}
+.OQrecview tr + tr td {
+}
+
+.OQrecview td * {
+  text-align: left;
+}
+.OQrecview tr td:first-child {
+  font-weight: bold;
+  text-align: right;
+  color: #333;
+}
+.OQrecview td:first-child:after {
+  content:':';
+}
+.OQrecviewLabel {
+  font-weight: bold;
+  margin-top: 6px;
+}
+.OQrecviewVal {
+  margin-left: 6px;
+}
+.OQrecviewVal * {
+  text-align: left;
+}

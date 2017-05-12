@@ -1,0 +1,15 @@
+Revision history for Perl extension Class::Method::Modifiers::Fast
+
+0.041 Thu Dec 24 16:40:37 2009
+    * Add install_modifier as a public API (gfx)
+    * Require Data::Util 0.55 explicitly (gfx)
+
+0.03 Sun Jan 18 17:19:17 2009
+	* added POD
+
+0.02 Sun Jan 18 17:19:17 2009
+	* fixed error message
+
+0.01 Sun Jan 18 17:19:17 2009
+	* original version
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension CGI::Log.
+
+1.00  Tue Aug 18 10:52:59 1998
+	- original version; created by h2xs 1.18
+	- complete rewrite
+	
+
+

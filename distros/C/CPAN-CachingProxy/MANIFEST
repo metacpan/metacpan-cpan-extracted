@@ -1,0 +1,11 @@
+.todo
+CachingProxy.pm
+CachingProxy.pod
+Changes
+example_cpan_caching_proxy.pl
+Makefile.PL
+MANIFEST
+README
+t/01_mg_new_auto.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

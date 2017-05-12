@@ -1,0 +1,24 @@
+.cvsignore
+Changes
+lib/Class/DBI/DataMigration.pm
+lib/Class/DBI/DataMigration/Mapper.pm
+lib/Class/DBI/DataMigration/Mapping.pm
+lib/Class/DBI/DataMigration/Mapping/HasAToHasA.pm
+lib/Class/DBI/DataMigration/Migrator.pm
+lib/Class/DBI/DataMigration/Synchronizer.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00.load.t
+t/Class-DBI-DataMigration-Mapper.t
+t/Class-DBI-DataMigration-Mapping-HasAToHasA.t
+t/Class-DBI-DataMigration-Mapping.t
+t/Class-DBI-DataMigration-Migrator.t
+t/Class-DBI-DataMigration-Synchronizer.t
+t/Class-DBI-DataMigration.t
+t/pod-coverage.t
+t/pod.t
+t/testlib/DMTestBase/SourceDB.pm
+t/testlib/DMTestBase/TargetDB.pm
+t/testlib/DMTestSetup.pm

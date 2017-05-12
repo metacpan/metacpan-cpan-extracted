@@ -1,0 +1,36 @@
+---
+abstract: 'Interface to the LZO compression library'
+author:
+  - 'Markus Franz Xaver Johannes Oberhumer <markus@oberhumer.com>'
+build_requires:
+  Scalar::Util: '0'
+  Test::More: '0.94'
+  perl: '5.004'
+  warnings: '0'
+configure_requires:
+  Devel::CheckLib: '0.9'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Compress-LZO
+provides:
+  Compress::LZO:
+    file: lib/Compress/LZO.pm
+    version: '1.09'
+requires:
+  AutoLoader: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  perl: '5.004'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/pepl/compress-lzo/issues
+  homepage: http://metacpan.org/release/Compress-LZO
+  repository: git://github.com/pepl/compress-lzo.git
+version: '1.09'
+x_serialization_backend: 'YAML::Tiny version 1.66'

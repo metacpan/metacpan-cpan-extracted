@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//ABISOURCE//DTD XHTML plus AWML 2.2//EN" "http://www.abisource.com/2004/xhtml-awml/xhtml-awml.mod">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:awml="http://www.abisource.com/2004/xhtml-awml/">
+ <head>
+  <!-- ======================================================= -->
+  <!-- Created by AbiWord, a free, Open Source wordprocessor.  -->
+  <!-- For more information visit http://www.abisource.com.    -->
+  <!-- ======================================================= -->
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <title>Snapshots Save</title>
+  <meta name="Author" content="jo" />
+  <link href="10_Snapshots_Save.shtml/styles.css" rel="stylesheet" type="text/css" />
+ </head>
+ <body>
+  <div>
+   <h1>Snapshots Save</h1>
+   <i>but you should still make Backups</i>
+   <h2>Snapshots</h2>
+   <p>A raid 1 protects your data against disk failure. It does not 
+    protect them against accidental user changes such as deletion or 
+    overwriting. Such protection can however be provided by snapshots.</p>
+   <p>Snapshots are a feature that is implemented by the kernels device 
+    mapper. They can be managed with the logical volume manager LVM2. They
+    provide a frozen image of a block device without the costs (in time 
+    and space) of copying the device. This is achieved using COW (Copy On 
+    Write). Every block on the device is saved to a separate block device
+    before it is written. This is used to reconstruct the original state 
+    through an appropriate block mapping.
+    </p>
+   <h2><code>/home</code> Safety</h2>
+   <p>The setup that is described is as follows. There is a raid1 device 
+    <code>/dev/md1</code> that is fed into a LVM2 volume group 
+    <code>volg1</code> as a physical volume. This provides a logical volume 
+    <code>/dev/volg1/home</code> that is mounted at <code>/home</code>.</p>
+   <p>A snapshot <code>/dev/volg1/home.old</code> of <code>/dev/volg1/home</code> 
+    is dropped and recreated at boot time. The snapshot is later mounted at 
+    <code>/home.old</code>. So everybody can easily restore the boot time state
+    of his files.</p>
+    <p>Snapshot recreation is done from 
+    <a href="reinit-snapshot">an init script</a>.
+    The critical line that creates the snapshot is
+    </p> 
+    <pre>
+    lvcreate -l 19539 -c 512  -s -p r -n home.old /dev/volg1/home /dev/sdc1
+    </pre>
+    <p>Note that this uses <code>/dev/hdc1</code> as the COW device. This is 
+    unfortunately an undocumented <code>lvcreate</code> parameter. It is only 
+    mentioned on 
+    <a href="http://copilotconsulting.com/mail-archives/linux-lvm.2005/msg00639.html"
+    >the linux-lvm mailing list</a>.
+    Using a separate physical COW device reduces the 
+    <a href="http://www.nikhef.nl/~dennisvd/lvmcrap.html">write performance penalty</a> 
+    of the snapshot. To do this <code>/dev/sdc1</code> has to be a physical volume in the 
+    <code>volg1</code> group: 
+    </p>
+    <pre>
+    pvcreate /dev/sdc1
+    vgextend volg1 /dev/sdc1
+    </pre>
+    <p>The rather large chunk size (<code>-c 512</code>) serves the same purpose.
+    The writes are however still slowed down by a factor of approximately 6. 
+    Snapshots can be writeable, <code>-p r</code> turns this off. <code>-l 19539</code> 
+    is the size of <code>/dev/sdc1</code> in physical extends:</p>
+    <pre>
+    enter:~# pvdisplay /dev/sdc1 | grep Total
+      Total PE              19539
+    </pre>
+    <p>To make sure the additional <code>lvcreate</code> parameter has not been silently
+    ignored we take a look at the device mapper table:</p>
+    <pre>
+    enter:~# dmsetup table
+    volg1-home.old-cow: 0 160063488 linear 8:33 384
+    volg1-home: 0 1468006400 snapshot-origin 253:2
+    volg1-home-real: 0 1468006400 linear 9:1 384
+    volg1-home.old: 0 1468006400 snapshot 253:2 253:3 P 1024
+    </pre>
+    <p>The <code>volg1-home.old-cow</code> lines major:minor of 8:33 is the one from 
+    <code>/dev/sdc1</code>:</p>
+    <pre>
+    enter:~# ls -l /dev/sdc1 
+    brw-rw---- 1 root disk 8, 33 22. Mär 17:44 /dev/sdc1
+    </pre>
+  </div>
+ </body>
+</html>

@@ -1,0 +1,233 @@
+NAME
+    CGI::Application::Plugin::Apache - Allow CGI::Application to use
+    Apache::* modules without interference
+
+SYNOPSIS
+        use base 'CGI::Application';
+        use CGI::Application::Plugin::Apache qw(:all);
+    
+        # then later we join our hero in a run mode...
+        sub mode1 {
+            my $self = shift;
+            my $q = $self->query(); # $q is an Apache::Request obj not a CGI.pm obj
+
+            # do some stuff
+        
+            # now we can bake a cookie using Apache::Cookie without interference  
+            $cookie = Apache::Cookie->new(
+                    $q,
+                    -name       => 'foo',
+                    -value      => 'bar',
+                    -expires    => '+2h',
+            );
+            $cookie->bake;
+
+            # now let's play with the content_type and other headers
+            $q->content_type('text/plain');
+            $q->header_out('MyHeader' => 'MyValue');
+
+            # do other stuff
+            return $content;
+        }
+
+        1;
+
+DESCRIPTION
+    This plugin helps to try and fix some of the annoyances of using
+    CGI::Application in a pure mod_perl (1.0 or 2.0) environment (see
+    INSTALLATION for specific issues regarding installation under mod_perl
+    2.x). CGI::Application assumes that you use CGI.pm, but I wanted to
+    avoid it's bloat and have access to the performance of the Apache::*
+    modules so along came this plugin. At the current moment it only does
+    two things:
+
+    Use Apache::Request as the "$self->query" object thus avoiding the
+    creation of the CGI.pm object.
+    Override the way CGI::Application creates and prints it's HTTP headers.
+    Since it was using CGI.pm's "header()" and "redirect()" method's we
+    needed an alternative. So now we use the "Apache->send_http_header()"
+    method. This has a few additional benefits other than just not using
+    CGI.pm. It means that we can use other Apache::* modules that might also
+    create outgoing headers (e.g. Apache::Cookie) without CGI::Application
+    clobbering them.
+
+EXPORTED METHODS
+    This module uses Exporter to provide methods to your application module.
+    Most of the time you will never actually use these methods since they
+    are used by CGI::Application itself, but I figured you'd like to know
+    what's going on.
+
+    No methods are exported by default. It is up to you to pick and choose,
+    but please choose wisely. You can import all of the methods by using:
+
+        use CGI::Application::Plugin::Apache qw(:all);
+
+    It is recommended that you import all of them since some methods will
+    require others. but the choice is yours. For instance, if you want to
+    override any method then you may not want to import it from here.
+
+  handler()
+    This method gives your application the ability to run as a straight
+    mod_perl handler. It simply creates an instance of you application and
+    then runs it (using "$app->new()" and "$app->run()"). It does not pass
+    any arguments into either method. It then returns an
+    "Apache::Constants::OK" value. If you need anything more than this,
+    please feel free to not import this method and write your own. You could
+    do it like this:
+
+        package MyApp;
+        use base 'CGI::Application';
+        use CGI::Application::Plugin::Apache qw(:all !handler);
+
+        sub handler {
+            # do what every you want here
+        }
+
+  cgiapp_get_query()
+    This overrides CGI:App's method for retrieving the query object. This is
+    the standard way of using something other than CGI.pm so it's no
+    surprise that we use it here. It simply creates and returns a new
+    Apache::Request object from "Apache->request".
+
+  _send_headers()
+    I didn't like the idea of exporting this private method (I'd rather
+    think it was a 'protected' not 'private) but right now it's the only way
+    to have any say in how the HTTP headers are created. Please see "HTTP
+    Headers" for more details.
+
+HTTP Headers
+    We encourage you to learn the mod_perl way of manipulating headers and
+    cookies. It's really not that hard we promise. But incase you're easing
+    your way into it, we try and provide as much backward compatibility as
+    possible.
+
+  Cookies
+    HTTP cookies should now be created using Apache::Cookie and it's
+    "bake()" method not with "header_add()" or "header_props()".
+
+    You can still do the following to create a cookie
+
+        my $cookie = CGI::Cookie->new(
+            -name  => 'foo',
+            -value => 'bar',
+        );
+        $self->header_add(-cookie => $cookie);
+
+    But now we encourage you to do the following
+
+        my $cookie = Apache::Cookie->new(
+            $self->query,
+            -name  => 'foo',
+            -value => 'bar',
+        );
+        $cookie->bake();
+
+  Redirects
+    You can still do the following to perform an HTTP redirect
+
+        $self->header_props( uri => $some_url);
+        $self->header_type('redirect');
+        return '';
+
+    But now we encourage you to do the following
+
+        $self->query->header_out(Location => $some_url);
+        $self->query->status(REDIRECT);
+        return '';
+
+    But it's really up to you.
+
+COMPATIBILITY
+    Upon using this module you completely leave behind the world of CGI.pm.
+    Don't look back or you might turn into a pillar of salt. You will have
+    to look at and read the docs of the Apache::* modules. But don't worry,
+    they are really easy to use and were designed to mimic the interface of
+    CGI.pm and family.
+
+    If you are trying to use this module but don't want to have to change
+    your previous code that uses "header_props()" or "header_add()" then we
+    try to help you out by being as CGI compatible as we can, but it is
+    always better to use the mod_perl api. If you still want to use
+    "header_props()" or "header_add()" remember that it will cause a
+    performance hit because it will use helper routines that try and emulate
+    CGI.pm.
+
+    If you wish to write code that performs well in both environments, you
+    can check the $ENV{MOD_PERL} environment setting and branch accordingly.
+    For example, to set a cookie:
+
+      if ($ENV{MOD_PERL}) {
+        require Apache::Cookie;
+        $cookie = Apache::Cookie->new(
+          $q,
+          -name       => 'favorite',
+          -value      => 'chocolate chip',
+          -expires    => '+2h',
+        );
+        $cookie->bake;
+      }
+      else {
+        $cookie = $self->query->cookie(
+          -name    => 'favorite',
+          -value   => 'chocolate chip',
+          -expires => '+2h',
+        );
+        $webapp->header_add(-cookie => [$cookie]);
+      }
+
+    If for some reason you are using this plugin in a non-mod_perl
+    environment, it will try to do the right thing by simply doing nothing
+    :)
+
+  CGI::Application::Plugin::Apache::Request
+    Sometimes the default compatability is not enough. For instance, if you
+    are using plugins that use the cookies or upload features of CGI.pm then
+    you might need some extra help.
+
+    This is what CGI::Application::Plugin::Apache::Request is for. You can
+    make this your "query" object by setting the "CAPA_CGI_Compat" var to
+    "On" in your Apache config file:
+
+        PerlSetVar CAPA_CGI_Compat On
+
+    Please see that module for more documentation on what it does.
+
+INSTALLATION
+    This module is designed to function equally under mod_perl 1.x and
+    mod_perl 2.x. The only real issue comes during the installation and
+    testing phase. In order to track dependencies, etc we need to know which
+    version you are trying to install this for. By default we assume
+    mod_perl 1.x unless we find mod_perl 2 installed on your system.
+
+    If you want to change this, you simple pass a "MP2" option to the
+    "Build.PL" script.
+
+      perl ./Build.PL MP2=1
+
+    That's pretty easy, right?
+
+AUTHOR
+    Michael Peters <mpeters@plusthree.com>
+
+    Thanks to Plus Three, LP (http://www.plusthree.com) for sponsoring my
+    work on this module
+
+CONTRIBUTORS
+    The following people have contributed to this module either through
+    docs, code, or ideas
+
+    William McKee <william@knowmad.com>
+    Cees Hek <ceeshek@gmail.com>
+    Drew Taylor <drew@drewtaylor.com>
+    Ron Savage <ron@savage.net.au>
+
+SEE ALSO
+    * CGI::Application
+    * Apache
+    * Apache::Request / Apache2::Request
+    * Apache::Cookie / Apache2::Cookie
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

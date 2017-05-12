@@ -1,0 +1,41 @@
+[% 
+    title = "Welcome" ;
+
+    crumb1_name = 'Welcome' ;
+%]
+
+[% IF realm == 'author' || (realm == 'admin' && user.author) %]
+
+[% INCLUDE "content/welcome-author.html" %]
+
+[% ELSIF realm == 'admin' %]
+
+[% INCLUDE "content/welcome-admin.html" %]
+
+[% ELSE %]
+
+<p>This website is to enable authors to select the preferences they require for
+receiving reports and/or summaries from the CPAN Testers system.<p>
+
+<p>When CPAN Testers began, reports to authors were sent by testers for each 
+report that were graded as FAIL or UNKNOWN. The reports were sent directly from
+the tester to the author. Unfortunately in more recent times, due to the amount 
+of test reports now being submitted, some authors have complained of the 
+overwhelming volume of mail they have been receiving. As a consequence the draft
+version of the Author Notification System was launched, together with the 
+suppression of mailing reports by smoke testers. 
+
+<p>The default daily summaries contain links to reports for the first instance 
+of a test report sent for any given Perl version and Operating System for each
+distribution version.</p>
+
+<p>This website aims to provide the authors with more controls over what they
+receive. Whether they wish to receive the daily summaries or receive the full
+reports, whether they wish to receive just notifications for FAIL graded 
+reports or all reports, whether they wish to receive reports for only specific
+distributions or many other fine grained preferences.</p>
+
+<p>Should there be any problems with your use of the website, please contact
+Barbie (barbie@cpan.org) with details.</p>
+
+[% END %]

@@ -1,0 +1,51 @@
+Short term:
+-----------
+- Composite:
+   When using bars in both, an option is necessary to define whether
+   to put the bars above each other or to put aside.
+   Add an option to start x-ticks at the left (i.e. 0 point) side and
+   end at the right side
+- Reorganize the relationship between
+  autoscale, 
+  y_ticks, min_y_ticks, max_y_ticks, xy_plot, integer_ticks_only, skip_int_ticks,
+  min_val, max_val
+  and document it.
+  (At the moment the autoscale is used as the default)
+- Include Skyplot (Direction->polar) into the distribution   
+- Add an option to lines, linespoints to start at (0,0) point not only
+  if option xy_plot is active
+- Add chart type candlestick
+
+- Correct pie chart:
+  - Add a flat pie chart where the legend appears on the left
+    of the chart, and the chart itself is about 50% smaller
+
+- Base class:
+  - Some labels on the top of each axis not printed: i.e.,
+      the graph goes to 100.6 but 100.6 is not printed. 
+  - Define an option to force the first point sits at the left border of
+    the graph, and the last point sits at the right border, without any spaces.
+   
+
+- Bars chart:
+  - User would like to override the color of specific bars in a Chart::Bars graph.
+  - Program should croak if a color is not defined for a bar.
+  - Within one Bar graph, I have two datasets, but would like to change the 
+    width of one of them (it should have a width of 1, to indicate a limit).
+  
+- Composite chart:
+  - Define different brush_sizes for example with one Lines dataset 
+    and one LinesPoints dataset. 
+    
+- Add output for png without header as modperl generates the headers
+  by itsself.
+  
+- Add output for gif again as the new GD module defines it again.
+
+Long term:
+----------
+- 3-D charts
+- include TrueType fonts as soon as GD supports it
+- include logarithmic x- and y-axis
+- Let plot arbitrary xy-functions in a defined area, like
+  y=sin(1/x)+2*x

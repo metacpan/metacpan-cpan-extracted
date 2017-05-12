@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+test.pl
+lib/Config/XMLPerl.pm

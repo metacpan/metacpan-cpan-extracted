@@ -1,0 +1,13 @@
+CGI::ConvertParam
+
+This is a Perl extension several hock to the CGI::param() method.
+
+To build the extensions, unpack this distribution somewhere, create
+the Makefile by running 'perl Makefile.PL' and do a 'make', 'make
+test', and if successful 'make install'.
+
+Copyright(c) 2000, OYAMA Hiroyuki. Japan. All rights reserved.
+
+CGI::ConvertParam class may be copied only under the terms of either
+the Artistic License or the GNU General Public License, which may be
+found in the Perl 5 source kit.

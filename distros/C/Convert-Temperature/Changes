@@ -1,0 +1,13 @@
+Revision history for Perl extension Convert::Temperature.
+
+0.03 Fri Fev 03 16:12:34 2008
+    - Bug in test
+    - Method extra
+
+0.02 Fri Fev 01 18:44:18 2008
+    - Small Bug in from_fahr_to_kelvin
+    - Tests for module
+
+0.01  Thu Jan 24 18:55:13 2008
+	- original version; created by Filipe Dutra
+		Convert::Temperature

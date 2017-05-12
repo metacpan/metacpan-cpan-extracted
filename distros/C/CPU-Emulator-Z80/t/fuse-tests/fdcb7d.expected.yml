@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: fdcb7d
+registers:
+  AF: 7353
+  AF_: 0
+  BC: 54805
+  BC_: 0
+  DE: 33370
+  DE_: 0
+  HL: 24164
+  HL_: 0
+  I: 0
+  IX: 13051
+  IY: 44091
+  PC: 4
+  R: 2
+  SP: 0

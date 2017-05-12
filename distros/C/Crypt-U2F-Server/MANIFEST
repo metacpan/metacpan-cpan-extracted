@@ -1,0 +1,21 @@
+.hgignore
+Changes
+examples/u2fsimple_authenticate.pl
+examples/u2fsimple_authenticate_replyonly.pl
+examples/u2fsimple_authenticate_requestonly.pl
+examples/u2fsimple_register.pl
+lib/Crypt/U2F/Server.pm
+lib/Crypt/U2F/Server/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/01-lowlevel-basic.t
+t/11-highlevel-basic.t
+typemap
+u2f.c
+u2f.h
+U2F.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

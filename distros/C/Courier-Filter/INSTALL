@@ -1,0 +1,47 @@
+System Requirements
+-------------------
+
+The following Perl version and packages are required for...
+
+...building Courier::Filter:
+
+  Perl 5.8
+  Module-Build
+
+...running Courier::Filter:
+
+  Perl 5.8
+  Error
+
+Some filter modules require additional Perl packages:
+
+  DNSBL:    Net-RBLClient
+  SPF:      Mail-SPF
+  SPFout:   Mail-SPF
+            Net-Address-IP-Local
+  FakeDate: DateTime
+            DateTime-Format-Mail
+  Parts:    MIME-tools 5.400
+            IO-stringy 2.110
+            Archive-Zip
+  ClamAVd:  MIME-tools 5.400
+            ClamAV-Client
+  SpamAssassin:
+            Mail-SpamAssassin
+
+Building and Installing
+-----------------------
+
+You can build and install Courier::Filter automatically through CPAN, or
+manually with the following commands:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Please read the Courier::Filter::Overview manpage for further installation
+instructions.
+
+# $Id: README 167 2005-01-17 18:26:45Z julian $
+# vim:tw=79

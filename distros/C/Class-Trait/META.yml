@@ -1,0 +1,42 @@
+---
+name: Class-Trait
+version: 0.31
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: Deprecated.  Please use Moose::Role.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor::Fast: 0
+  File::Spec: 0
+  Test::Differences: 0.47
+  Test::Simple: 0.62
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Class::Trait:
+    file: lib/Class/Trait.pm
+    version: 0.31
+  Class::Trait::Base:
+    file: lib/Class/Trait/Base.pm
+    version: 0.31
+  Class::Trait::Config:
+    file: lib/Class/Trait/Config.pm
+    version: 0.31
+  Class::Trait::Reflection:
+    file: lib/Class/Trait/Reflection.pm
+    version: 0.31
+  TComparable:
+    file: lib/Class/Trait/Lib/TComparable.pm
+    version: 0.31
+  TEquality:
+    file: lib/Class/Trait/Lib/TEquality.pm
+    version: 0.31
+  TPrintable:
+    file: lib/Class/Trait/Lib/TPrintable.pm
+    version: 0.31
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,23 @@
+#=======================================================================
+app:
+#=======================================================================
+  webserver:
+    virtual_hosts:
+        - sites:            example1
+          http:             *:80
+          https:            *:443
+          aliases:
+              localhost:    example1
+          options:
+              name_virtual_host: 0
+              listen:            0
+  db:
+    connections:
+      default_settings:
+        host:               localhost
+        password:           LoCal
+
+  images:
+    path:                       /srv/www/sites/example/images/
+  upload:
+    path:                       /srv/www/sites/example/images/temp/

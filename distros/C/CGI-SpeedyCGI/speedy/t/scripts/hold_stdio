@@ -1,0 +1,7 @@
+# Create a child process that holds open stdio.
+if (fork == 0) {
+    sleep($ARGV[0]);
+    print "child\n";
+    exit(1);
+}
+print "ok\n";

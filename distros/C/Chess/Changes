@@ -1,0 +1,12 @@
+Revision history for Perl extension Chess.
+
+0.5.0  Sat Mar 23 2002
+	- original version
+0.5.2  Wed Sep 25 2002
+	- contributed bugfixes to the 0.5.0 release
+0.6.0  Fri Aug 26 2005
+	- rewrite from scratch
+0.6.1  Fri Feb  9 2007
+	- get off my lazy butt and fix the CPAN build
+0.6.2  Mon Jul 30 2007
+	- http://rt.cpan.org/Public/Bug/Display.html?id=28540 fixed

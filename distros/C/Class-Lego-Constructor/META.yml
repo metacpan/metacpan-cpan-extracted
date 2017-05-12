@@ -1,0 +1,25 @@
+---
+name: Class-Lego-Constructor
+version: 0.004
+author:
+  - 'Adriano R. Ferreira <ferreira@cpan.org>'
+abstract: Automated constructor generation
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Exporter::Lite: 0
+  SUPER: 0
+  Scalar::Defer: 0.13
+  strict: 0
+  warnings: 0
+build_requires:
+  Test::More: 0
+provides:
+  Class::Lego::Constructor:
+    file: lib/Class/Lego/Constructor.pm
+    version: 0.004
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

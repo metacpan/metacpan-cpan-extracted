@@ -1,0 +1,37 @@
+---
+abstract: "Using '.pl' file as a configuration"
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Config-PL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Config::PL:
+    file: lib/Config/PL.pm
+    version: 0.02
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/Songmu/p5-Config-PL/issues
+  homepage: https://github.com/Songmu/p5-Config-PL
+  repository: git://github.com/Songmu/p5-Config-PL.git
+version: 0.02

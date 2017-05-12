@@ -1,0 +1,191 @@
+Revision history for Perl extension ClearCase::Wrapper.
+
+0.01  Tue Mar 28 10:59:30 2000
+	- original version; created by h2xs 1.20
+	- This is a replacement for ClearCase::Ct and picks up
+	  where version 1.20 of that leaves off.
+
+0.10 Thu Apr  6 03:32:02 EDT 2000
+	- First version in production use. Has not brought all
+	  the esoteric, underused functionality of ClearCase::Ct
+	  along but all the core stuff seems to work just fine.
+
+0.14 Fri May 12 12:13:11 EDT 2000
+	- FCS (first CPAN shipment). Some extensions tested on NT, not
+	  all.
+
+0.15 Wed May 31 17:10:08 EDT 2000
+	- Added 'lock -{allow,deny} flags.
+	- Fixed spurious warnings going into interactive mode.
+	- Added default for 'ct ci'.
+
+0.17 Tue Jul  4 22:52:08 EDT 2000
+	- Reworked setview/workon implementation.
+
+0.18 Sat Jul 15 08:56:38 EDT 2000
+	- Improvements to winkout.
+	- Various bugfixes in sample enhancements.
+	- Added -M flag.
+	- Only expand symlinks for ci/co cmds.
+	- New $CLEARCASE_WRAPPER_NATIVE EV to suppress all extensions.
+	- New mount extension for Windows.
+
+0.20 Wed Aug  9 13:52:56 EDT 2000
+	- Added mkelem -do flag.
+	- The usual round of bugfixes to sample enhancements.
+
+0.21 Fri Sep 22 10:02:24 EDT 2000
+	- Added 'diffcs' command.
+
+0.22 Wed Nov  1 20:58:08 EST 2000
+	- Some work on mkelem to allow aggregation to work
+	  in snapshot views (untested).
+	- Added a dependency on File::Spec 0.82, just because it's
+	  goodness and makes coding of ClearCase::Wrapper easier.
+	- Added support for a Site.pm file containing site-specific
+	  work. This is a significant improvement, as without Site.pm
+	  it's hard to modify and/or add new features to
+	  the module and also accept new versions from CPAN.
+
+0.23 Mon May 14 11:11:16 EDT 2001
+	- Reworked mkview code to depend on CC storage locations.
+	  Note: this mkview code now requires CC 4.1 or above.
+
+0.24 Fri May 18 11:52:43 EDT 2001
+	- Added checkout -dir/-rec. It was in an old rev and I was
+	  asked to put it back.
+	- Added mkelem -ok
+
+0.25 Thu Sep 20 15:42:01 EDT 2001
+	- Various minor tweaks.
+	- Added CLEARCASE_WRAPPER_PAGER to go with -M.
+	- Added recheckout ('ct reco') feature.
+
+0.26 Mon Dec 17 13:11:52 EST 2001
+	- Optimizations in 'ct lsp -dir|-rec' using -invob
+	- Improve -ok prompting so it works better in a GUI environment.
+	  This adds ClearCase::ClearPrompt to the set of required modules.
+	- Add -ok functionality to unco.
+	- Fix bug(s) in "ct co -dir/-rec".
+	- Allow "ct mkelem -dir/-rec" to be run in a view-private dir.
+	  It will traverse 'up' towards the vob root looking for a
+	  versioned dir to work from.
+	- Added -P (pause) flag (see README.GUI for why).
+
+1.01 Fri Jan 25 09:35:11 EST 2002
+	- *COMPATIBILITY ALERT*
+	  With this release the infrastructure is largely rewritten
+	  to make customizations/extensions easier to write and
+	  maintain. The old Site.pm hack is gone. In its place
+	  are "overlay modules". See the README and the POD in
+	  Wrapper.pm for details, but basically this makes it much
+	  easier to write (and potentially contribute) new features.
+
+	  *NOTE* If upgrading from a version <1.00, you should manually
+	  uninstall the old version.  See README.upgrade for details.
+	  The Makefile.PL has some code to try to warn you about this
+	  situation.
+
+1.02 Sun Jan 27 13:54:17 EST 2002
+	- Added README.upgrade and some upgrade help in
+	  Makefile.PL.
+	- Add some protection from mis-installed Wrapper.pm.
+
+1.03 Thu Jan 31 11:18:49 EST 2002
+	- Added Assert() function to aid extension writers.
+
+1.04 Fri Feb  1 23:25:34 EST 2002
+	- NOW REQUIRES Perl 5.6.0 (new features turn out to require new ops).
+	- Fixed mkelem -dir bug when run in a view-private dir
+	  within a dynamic view.
+	- Added 'ct extensions' cmd to list defined extensions
+	  and what package they come from.
+
+1.05 Fri Mar  1 10:28:25 EST 2002
+	- Moved help code into ClearCase::Wrapper module from
+	  cleartool.plx. Simpler, cleaner, and now 'ct help'
+	  shows extensions.
+
+1.06 Fri Mar  1 11:05:58 EST 2002
+	- Fixed a couple of minor bugs with 'ct help' code
+	  introduced in 1.05.
+
+1.07 Tue May  7 12:22:52 EDT 2002
+	- Formatting/doc improvements.
+	- Added 'lsprivate -eclipsed' flag.
+
+1.08 Wed Feb  5 08:44:22 EST 2003
+	- Infrastructure: extended Assert() to take optional messages.
+
+1.09 Tue Jul 22 10:41:32 EDT 2003
+	- Fixed contact data.
+
+1.10 Sat Mar 13 17:44:34 EST 2004
+	- Add warning when checking in files open in vim.
+
+1.11 Mon Mar 14 00:00:51 EST 2005
+	- Cleanups occasioned by port to new environment.
+	  Worked around an apparent bug in 5.6.1: the statement
+	  "local $0 = ..." causes the user's PATH to be trashed such
+	  that $ENV{PATH} looks ok but "system qw(printenv PATH)"
+	  doesn't. It's hard to see how that could be my bug but
+	  in any case it's not a problem in more modern Perls so
+	  I just worked around it for 5.6.
+	- The "ct ci" feature now considers only files checked out
+	  by the current user in the current view and dir.
+	- Port to NCA environments (see 'ncatool').
+
+1.12 Tue May  2 14:29:17 EDT 2006
+	- Flush the view cache after creating dirs. This is helpful
+	  when the cwd has been mkelem-ed (though you still need to
+	  "cd $PWD" after mkelem-ing the cwd).
+
+1.13 Tue May 16 11:56:18 EDT 2006
+	- New feature: "ct diffcr -data". Remove pseudo-differences
+	  in diffcr output, those caused by files with differing
+	  versions but identical contents.
+	- Removed the feature of "ct ci" which automatically added
+	  "-nc" to checkins of directories. It seemed overly
+	  intrusive for a standard wrapper.
+
+1.14 Fri Aug  3 12:26:29 EDT 2007
+	- Fixed rt.cpan.org bug #28648 "ct man query_language"
+	  does not work.
+
+1.15 Sun Dec 14 18:01:56 GMTST 2008
+	- Under CYGWIN as well, default to ipc mode.
+
+1.16 Fri May 14 07:40:25 EDT 2010
+        - Burrow function moved here from DSB.pm and exported.
+	- Loop reading std input when no args, including support for -status.
+	- Fixed man success return code.
+	- POD work.
+	- Added -mkhlink option to -revert option in checkin
+	- Assert can now be called from a subfunction
+	- Tweaked indenting in show usage function
+	- Thanks to Marc Girod and Stephen Rauch for these changes
+
+1.17 Sun Aug 12 10:14:43 EDT 2012
+        - help for new commands: skip the cleartool error text.
+	- wrapdebug: an alternative driver, preloading modules for ease of debugging.
+	  Instructions of use in README.
+	- unmasked warnings (except redefine) and reported errors while requiring
+	  packages, under the full @INC (to allow them to use modules).
+	- fixed the test of existence of the autosplit.ix file.
+	- fixed the filter for package symbols after require
+	Thanks to Marc Girod for these changes.
+	Several enhancements contributed by Stephen Rauch, together with the
+	original impulse to better support strict/warnings and debugging.
+	Thanks as well to Ben Morrow for assistance.
+
+1.18 Sat Mar  9 16:31:16 CET 2013
+        - cleartool.plx and wrapdebug: autoflush STDOUT for background use.
+	- renamed wrapdebug to cleartool.dbg, so that it can be used as ipc process
+	  in ClearCase::Argv
+	Thanks to Marc Girod for these changes.
+
+1.19 Fri Aug  9 15:52:08 EDT 2013
+	- Fixed a typo and some warnings, also a quoting bug.
+	- This also includes a whitespace cleanup, so the diff is large but
+	  the diff -w is small.
+	Thanks to Anders Petersen Girod for these changes.

@@ -1,0 +1,34 @@
+---
+abstract: 'Command-line client for CPAN::Mini::Inject::REST'
+author:
+  - 'Jon Allen (JJ), C<< <jj at jonalen.info> >>'
+  - 'Jon Allen (JJ) <jj@jonalen.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CPAN-Mini-Inject-REST-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::Cmd: 0
+  Config::General: 0
+  File::HomeDir: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  REST::Client: 0
+  Try::Tiny: 0
+  URI: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

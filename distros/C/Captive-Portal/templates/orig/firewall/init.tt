@@ -1,0 +1,108 @@
+#################################
+# create the capo firewall chains
+#################################
+ 
+[% UNLESS IDLE_TIME;   THROW 'IDLE_TIME undefined in config_file';   END %]
+[% UNLESS capture_net; THROW 'capture_net undefined in config_file'; END %]
+
+#-----------------------------------------------------------------------------------------
+# chain to mark authenticated traffic, clients get dynamically inserted/removed
+# first rule always checks if already MARKed
+#-----------------------------------------------------------------------------------------
+
+ipset create capo_sessions_ipset bitmap:ip,mac range [%- capture_net %] 
+
+iptables -t mangle -N capo_sessions
+
+# mark packets from authenticated clients ip/mac as auth
+iptables -t mangle -A capo_sessions -m set --match-set capo_sessions_ipset src,src -j MARK --set-mark 1
+
+#-----------------------------------------------------------------------------------------
+# chain to register all outgoing traffic with ip for allowed related incoming and IDLE checks
+#-----------------------------------------------------------------------------------------
+ipset create capo_activity_ipset bitmap:ip range [%- capture_net %] timeout [%- IDLE_TIME %] 
+
+iptables -t mangle -N capo_incoming
+iptables -t mangle -N capo_activity
+
+# mark INCOMING packets for active clients in order to all other incoming traffic
+# only active clients are allowed to get traffic from outside, poor-mans-related-filter
+iptables -t mangle -A capo_incoming -m set --match-set capo_activity_ipset dst -j MARK --set-mark 2
+
+# set ip/mac for activity/idle tests, refresh timeout
+# !!!!!
+# arrgh, default timeout for set NOT working with --add-set in versions:
+# ipset v6.12, protocol version: 6
+# iptables v1.4.16.3
+iptables -t mangle -A capo_activity -j SET --add-set capo_activity_ipset src --exist --timeout [%- IDLE_TIME %]
+
+#-----------------------------------------------------------------------------------------
+# chains to mark static allowed traffic for nets and services, like DNS, DHCP, VPN, ...
+#-----------------------------------------------------------------------------------------
+
+#########################################################################################
+# define allowed services and allowed networks for local clients
+#########################################################################################
+
+#-----------------------------------------------------------------------------------------
+# allow site local open services
+#-----------------------------------------------------------------------------------------
+iptables -t mangle -N capo_open_services
+
+[% UNLESS open_services; THROW 'open_services undefined in config_file'; END %]
+
+[%- FOREACH proto IN open_services.keys -%]
+  [%- FOREACH service IN open_services.$proto -%]
+    [%- FOREACH server IN ipv4_aton(service.servers) -%]
+
+iptables -t mangle -A capo_open_services -d [%- server -%] \
+  -p [%- proto -%] -m multiport --dports [%- service.ports.join(',') -%] \
+  -j MARK --set-mark 1
+
+    [%-  END -%]
+  [%-  END -%]
+[%-  END -%]
+
+#-------------------------------------------------------------------------------------------
+# allow defined open clients
+#-------------------------------------------------------------------------------------------
+iptables -t mangle -N capo_open_clients
+
+[% UNLESS open_clients; THROW 'open_clients undefined in config_file'; END %]
+
+[% FOREACH client IN open_clients %]
+
+  iptables -t mangle -A capo_open_clients -m mac --mac-source [%- client -%] \
+    -j MARK --set-mark 1
+
+[% END %]
+
+#-------------------------------------------------------------------------------------------
+# allow defined open networks
+#-------------------------------------------------------------------------------------------
+
+ipset create capo_open_map_ipset hash:net
+
+iptables -t mangle -N capo_open_map
+iptables -t mangle -A capo_open_map -m set --match-set capo_open_map_ipset dst -j MARK --set-mark 1
+
+[% UNLESS open_networks; THROW 'open_networks undefined in config_file'; END %]
+
+[% FOREACH network IN open_networks %]
+  ipset add capo_open_map_ipset [%- network -%]
+[% END %]
+
+#-------------------------------------------------------------------------------------------
+# allow defined open servers
+#-------------------------------------------------------------------------------------------
+
+[% UNLESS open_servers; THROW 'open_servers undefined in config_file'; END %]
+
+[% FOREACH server IN ipv4_aton(open_servers) %]
+
+  ipset add capo_open_map_ipset [%- server -%]
+
+[% END %]
+
+# vim: sw=2 ft=sh
+

@@ -1,0 +1,63 @@
+---
+abstract: 'Random passphrase generator loosely based on the Diceware algorithm'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  List::Util: '0'
+  Test::More: '0.96'
+  lib: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Diceware
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Crypt::Diceware:
+    file: lib/Crypt/Diceware.pm
+    version: '0.005'
+  Crypt::Diceware::Wordlist::Beale:
+    file: lib/Crypt/Diceware/Wordlist/Beale.pm
+    version: '0.005'
+  Crypt::Diceware::Wordlist::Common:
+    file: lib/Crypt/Diceware/Wordlist/Common.pm
+    version: '0.005'
+  Crypt::Diceware::Wordlist::Original:
+    file: lib/Crypt/Diceware/Wordlist/Original.pm
+    version: '0.005'
+requires:
+  Class::Load: '0'
+  Crypt::Rijndael: '0'
+  Crypt::URandom: '0'
+  Data::Entropy: '0'
+  Data::Entropy::Algorithms: '0'
+  Data::Entropy::RawSource::CryptCounter: '0'
+  Data::Entropy::Source: '0'
+  Sub::Exporter: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Crypt-Diceware/issues
+  homepage: https://github.com/dagolden/Crypt-Diceware
+  repository: https://github.com/dagolden/Crypt-Diceware.git
+version: '0.005'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Mario Domgoergen <mdom@taz.de>'
+  - 'Neil Bowers <neil@bowers.com>'

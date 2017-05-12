@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  17840:
+    - 194
+name: ddcba1
+registers:
+  AF: 44298
+  AF_: 0
+  BC: 43714
+  BC_: 0
+  DE: 3885
+  DE_: 0
+  HL: 33580
+  HL_: 0
+  I: 0
+  IX: 17851
+  IY: 41517
+  PC: 4
+  R: 2
+  SP: 0

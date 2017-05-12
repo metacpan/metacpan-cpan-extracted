@@ -1,0 +1,10 @@
+<!-- Multiple forms using both Catalyst::Controller::FormBuilder and Catalyst::Controller::FormBuilder::MultiForm render style -->
+
+<!-- Render whatever form is in the FormBuilder object -->
+[% FormBuilder.render %]
+
+<!-- Render foo form by name -->
+[% forms.foo.FormBuilder.render %]
+
+<!-- Render bar form by name -->
+[% forms.bar.FormBuilder.render %]

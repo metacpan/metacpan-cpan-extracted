@@ -1,0 +1,14 @@
+abstract: Concenate your CSS files.
+author: Marcus Ramberg C<mramberg@cpan.org>.
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Catalyst-View-CSS-Squish
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CSS::Squish: 0
+  Catalyst: 5.64
+version: 0.02

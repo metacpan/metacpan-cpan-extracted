@@ -1,0 +1,48 @@
+0.2.6 - 20080217 - Clayton O'Neill
+
+ * Changed debug output for array validation to print out the index of the
+   array element that's being validated.  Thanks to Diab Jerius for the
+   suggestion.
+
+0.2.5 - 20080217 - Clayton O'Neill
+
+ * Fixed a bug where the default for the debug handler was incorrect. 
+   Thanks to Diab Jerius for pointing it out.
+
+0.2.4 - 20080209 - Clayton O'Neill
+
+ * Changed to use Clone::PP instead of Scalar::Util::Clone, since the latter
+   doesn't build on 5.10 yet.
+
+0.2.3 - 20080209 - Clayton O'Neill
+
+ * Fixed up some of the tests so that they will be more likely to
+   succeed out side of my environment.
+
+0.2.2 - 20080208 - Clayton O'Neill
+
+ * Fixed a problem where the Config::General test required that
+   Data::Path be installed to succeed.
+
+ * README was accidently in man page format, not text
+
+0.2.1 - 20080208 - Clayton O'Neill
+
+ * Added README file
+
+ * Converted Makefile.PL to use Module::Install instead of
+   ExtUtils::MakeMaker
+
+0.2.0 - 20080207 - Clayton O'Neill
+
+ * Added Data::Path integration
+
+ * Added Config::General integration
+
+ * Fixed problem with bad interactions with OIO __DIE__ handler.
+
+ * Fixed a bug where boolean validation was considering whitespace to
+   be significant
+
+0.1.0 - 20080206 - Clayton O'Neill
+ * Initial release.

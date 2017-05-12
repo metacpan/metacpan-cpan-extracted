@@ -1,0 +1,91 @@
+/* $Id: local.css 61 2012-11-30 15:58:05Z jo $ */ 
+/* Local style additions */
+
+#main, #footer {
+  width:45em; 
+}
+
+p, ul, ol, form {
+  margin-left:2em;
+}
+pre {
+  margin-left:4em  
+}
+
+/* Form styles for formPersistence */
+
+label {
+  display: block;
+  float: left;
+  width: 120px; 
+  text-align: right; 
+  padding-right: 10px;
+}
+
+label:after {
+  /* Just couldn't resist */
+  content: ":";
+}
+
+input:not([type]), input[type=text], input[type=password] {
+  width: 100px; 
+}
+
+form br {
+  clear: left; 
+}
+
+fieldset {
+  border: thin solid grey;
+  padding:.5em;
+  display: inline;
+}
+
+form {
+  border: thin solid #ab0;
+  padding:.5em;
+  font-family: sans-serif;
+}
+
+form hr {
+  color:#ab0;
+  background-color:#ab0;
+  height:1px;
+  border:none;
+}
+
+/* Overwrite the givem menu size */
+.menu {
+  width:52em; 
+  padding-bottom:7em;
+}
+
+#footer form {
+  border: thin solid black;
+  padding:.5em;
+  font-family: sans-serif;
+}
+
+/* Style buttons as links */
+.link, .link:focus, .link:active {
+    /* Remove all decorations */
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    /* Look like a link */
+    background: none;
+    color: blue;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+}
+
+/* Remove extra space inside buttons in Firefox */
+.link::-moz-focus-inner {
+    border: none;
+    padding: 0em;
+}
+

@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 198
+  61630:
+    - 156
+name: cbc6
+registers:
+  AF: 47104
+  AF_: 0
+  BC: 883
+  BC_: 0
+  DE: 47111
+  DE_: 0
+  HL: 61630
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

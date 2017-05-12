@@ -1,0 +1,435 @@
+=pod
+
+=head1 NAME
+
+CGI::PathRequest - get file info in a cgi environment
+
+=head1 SYNOPSIS
+
+	use CGI::PathRequest;
+	
+	my $r = new CGI::PathRequest;
+
+   if( $r->set('/home/me/public_html/documents') ){
+      $r->is_in_DOCUMENT_ROOT or warn 'not in document root, sure you wanna serve?';
+      
+	
+	if ( $f->is_dir ){ 
+		print $f->filename . " is a directory in " . $f->rel_loc ." it contains ". $f->ls_count. " entries." ; 
+	};	
+	
+=head1 DESCRIPTION
+
+Conventions used in this document:
+
+resource = the main file requested, be it a directory, file, etc.
+
+This is kind of my swiss army knife of dealing with files in a cgi environment.
+It's mainly geared for taking requests from a client and setting default information about that resource.
+The constructor is told the relative path to a file (or directory) and from that you can ask a lot of
+really useful things like, relative path, absoltue path, filename, filesize, absolute location, relative
+location, etc. Things you normally have to regex for, they are already done here.
+
+CGI::PathRequest inherits L<File::PathInfo> and all its methods.
+
+=head1 new()
+
+Constructor. Takes hash ref as argument. Each key is a parameter.
+If requested does not exist, new returns undef.
+	
+	my $rq = CGI::PathRequest->new;	
+
+=head2 Optional Parameters
+
+	my $rq = CGI::PathRequest->new({
+
+		param_name => 'path', 		
+		DOCUMENT_ROOT => '/home/superduper/html', 
+		SERVER_NAME => 'superduper.com',		
+		rel_path => $url, 		
+		cgi => $cgi, 		
+	
+	});
+
+=over 4
+
+=item param_name
+
+if you are taking data from a form imput via POST or GET , by default we are looking for a 
+cgi param named 'path' - this can be overridden
+
+=item rel_path
+
+specify the relative path to the file or dir we want
+
+=item default
+
+if POST or GET do not yield a path and that path exists on disk, then default to what rel_path?
+Defaults to / (which would be your DOCUMENT ROOT )
+
+=item DOCUMENT_ROOT 
+
+Will try to determine automatically from ENV DOCUMENT_ROOT unless provided.
+Croaks if not determinded.
+
+=item cgi
+
+Pass it an already existing cgi object for re use.
+
+=item SERVER_NAME
+
+The name of your server or domain.
+
+=back
+
+=head1 abs_path()
+
+Absolute path on disk. Watch it, all /../ and links are resolved!
+
+=head1 rel_path()
+
+=head1 abs_loc()
+
+The directory upon which the requested resource sits, everything but the filename
+
+
+=head1 rel_loc()
+
+Like abs_loc() but relative to ENV DOCUMENT_ROOT
+
+=head1 filename()
+
+Returns the filename portion of the file
+
+=head1 filename_pretty()
+
+Returns the filename, but prettyfied.
+Turns 'how_are_you.pdf' to 'How Are You'.
+
+=head1 filetype()
+
+Returns 'd' if directory, 'f' if file.
+
+=head1 url()
+
+Returns how this file would be accessed via a browser.
+
+=head1 www()
+
+Returns domain name of current site.
+
+=head1 ext()
+
+Returns filename's extension.
+
+=head1 is_root()
+
+Returns true if the request is the same as ENV DOCUMENT_ROOT
+
+=head1 is_html()
+
+Returns boolean, accepts no argument. File is text and has htm type ext.
+
+=head1 EXTENDED METHODS
+
+These are methods that populate on call, that is, the values are not 
+fed before you ask for them. If you are creating many CGI::PathRequest objects
+in one run and you use these, they should slow your process.
+
+=head2 elements()
+
+Returns an array ref of all data elements that aare/can be defined for this resource.
+
+	my $elements = $r->elements;
+
+
+
+=head2 get_content() and get_content_encoded() 
+
+Get contents of resource if is_text() returns true, returns undef on failure or
+zero size. The encoded variant escapes for html.
+
+	$r->get_content();
+
+
+=head2 get_excerpt() and get_excerpt_encoded()
+
+Get first x characters from file content if get_content() is or can be defined
+returns undef on failure. The encoded variant escapes for html.
+The excerpt is ripped of any html.
+
+	$r->get_excerpt;
+
+=head2 filesize()
+
+Returns filesize in bites
+
+	$r->filesize;
+
+
+=head2 filesize_pretty()
+
+Returns filesize in k, with the letter k in the end returns 0k if filesize is 0 
+
+	$r->filesize_pretty;
+
+
+=head2 ctime()
+
+Returns ctime, unix time
+
+	$r->ctime;
+
+
+=head2 ctime_pretty()
+
+Returns ctime formatted to yyyy/mm/dd hh:mm by default
+
+	$r->ctime_pretty;
+
+
+=head2 atime()
+
+Returns atime, unix time 
+
+	$r->atime;
+
+
+=head2 atime_pretty()
+
+Returns atime formatted to yyyy/mm/dd hh:mm by default
+
+	$r->atime_pretty;
+
+
+=head2 mtime()
+
+Returns mtime, unix time 
+
+	$r->mtime;
+
+
+=head2 mtime_pretty()
+
+Returns mtime formatted to yyyy/mm/dd hh:mm by default
+
+	$r->mtime_pretty;
+
+
+
+
+=head2 is_dir()
+
+Returns true if it is a directory
+
+=head2 is_empty_dir()
+
+Returns true if it is an empty directory, slow, feeds ls, lsf, and lsd.
+
+=head2 is_file()
+
+returns true if it is a file 
+
+=head2 is_image()
+
+Returns true if mime type is an image type
+
+	$r->is_image;
+
+=head2 is_binary()
+
+Returns true if resource was binary, directories return true
+
+	$r->is_binary;
+
+=head2 is_text()
+
+Returns true if resource is text ( according to -T )
+
+	$r->is_text;
+
+
+	
+
+=head2 mime_type()
+	
+Returns mime type returned by File::MMagic. If the resource is a directory,
+returns undef.
+
+	$r->mime_type;
+	
+
+=head2 alt()
+
+Returns same as filename_pretty(), for use with an image alt tag, etc
+
+	$r->alt;
+	
+
+
+=head1 DIRECTORY METHODS
+
+All directory methods issue warnings and return undef if the resource is not a directory.
+
+=head2 ls()
+
+Returns array ref. listing of files if the resource is a directory
+returns undef if it is not a dir.
+returns all files and all dirs sorted in array ref.
+returns empty array ref [] if none found
+excludes . and ..
+
+=head2 lsd()
+
+returns sorted array ref listing of subdirs if resource is a directory.
+returns undef if it is not a directory.
+returns empty array ref [] if none found
+excludes . and .. by default.
+
+=head2 lsf()
+
+returns array ref listing of files
+returns undef if it is not a dir
+returns only files sorted
+returns empty array ref [] if none found
+excludes . and ..
+
+=head2 ls_count(), lsd_count(), and lsf_count()
+
+returns count of elements for all files, for directories, and for files, if the
+resource is a directory. If the resource is not a directory, returns undef.
+
+=head2 is_empty_dir()
+
+returns boolean true or false. returns undef if resource is not a directory.
+
+
+=head1 ERROR METHODS
+
+See File::PathInfo for details.
+
+
+=head1 get_datahash()
+
+Returns hash with data, abs_path, rel_path, etc etc
+
+
+
+=head1 METHODS FOR WITH HTML::Template
+
+
+=head2 nav_prepped()
+
+returns array ref for loop for HTML::Template
+This is a place people can click back to go to previous directories.
+which should be:
+
+	<!-- BEGIN NAV-->
+	
+	<h4> <a href="?rel_path=/">[ home ]</a> 
+	<TMPL_LOOP NAV>
+	 <TMPL_IF LAST>	
+	  &#xBB; <TMPL_VAR FILENAME>
+	 <TMPL_ELSE>
+	  &#xBB; <a href="?rel_path=<TMPL_VAR REL_PATH>"><TMPL_VAR FILENAME></a>
+	 </TMPL_IF>
+	</TMPL_LOOP>
+	</h4>
+	
+	<!--END NAV-->
+
+The vars that are returned for each are:
+
+	FILENAME, ABS_LOC, REL_PATH, REL_LOC, FILETYPE, EXT
+
+A problem right now is that if you are requesting / (document root) then the 
+returned value is []- which sets off warnings in HTML::Template
+
+=cut
+
+
+
+
+
+=head2 ls_prepped(), lsd_prepped() and lsf_prepped()
+
+Alike ls lsf and lsd, returns array ref with hashes representing
+directory listing excluding . and ..
+in hash form, suitable for html template.
+for example, if your template has
+
+	<TMPL_LOOP LS>
+		<TMPL_VAR FILENAME>
+		<TMPL_VAR REL_PATH>
+				
+	</TMPL_LOOP>
+
+You would feed it as 
+
+	$html_template_object->param( LS => $cms->ls_prepped ); 
+
+Returns empty array ref on none present [], that way it wont error on nothing there when
+you assign it to the tmpl loop
+
+The same for lsd_prepped() and lsf_prepped()
+The name of the TMPL_VAR will be the same as the name of the method, (LS, LSF, LSD).
+
+The TMPL_VAR set are :
+
+	rel_path, rel_loc, abs_path, abs_loc, filename, is_file, is_dir, filetype
+
+=head2 get_datahash_prepped()
+
+returns hash ref with data suitable for HTML::Template, none of the data that are arrays, etc are included
+For example:
+
+	$html_template_object->param( %{ $r->get_datahash_prepped } ); 
+
+Your template could say:
+
+	<TMPL_IF IS_DIR>
+		<p>This is a directory, it has <TMPL_VAR LSD_COUNT> sub directories and 
+		<TMPL_VAR LSF_COUNT> files.</p>
+	</TMPL_IF> 
+
+	<TMPL_IF IS_TEXT>
+		<p>The file <TMPL_VAR FILENAME> in <TMPL_VAR REL_LOC> is a
+		<TMPL_VAR FILESIZE_PRETTY> text file, created on <TMPL_VAR CTIME_PRETTY>.</p>
+	
+		<p><small> excerpt: <TMPL_VAR EXCERPT></small></p>		
+	</TMPL_IF> 
+
+Your HTML::Template object construction should include die_on_bad_params=>0 to make use of this.
+
+
+=head1 PREREQUISITES
+
+L<File::MMagic>, L<Carp>, L<File::PathInfo>
+
+=head1 SEE ALSO
+
+L<File::PathInfo>, L<CGI>, L<Cwd>
+
+=head1 TODO
+
+option not to resolve symlinks
+
+get rid of default.
+if resource does not exist, just return undef.
+
+=head1 CHANGES
+
+a file requested which is not in DOCUMENT ROOT (symlink) 
+no longer croaks module
+
+=head1 AUTHOR
+
+Leo Charre leo (at) leocharre (dot) com
+
+L<http://leocharre.com>
+
+=head1 SEE ALSO
+
+L<File::PathInfo>
+
+=cut

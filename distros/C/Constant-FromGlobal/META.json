@@ -1,0 +1,51 @@
+{
+   "abstract" : "declare constant(s) with value from global or environment variable",
+   "author" : [
+      "Neil Bowers <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Constant-FromGlobal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::OptList" : "0",
+            "Scalar::Util" : "0",
+            "constant" : "0",
+            "perl" : "v5.8.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Constant-FromGlobal",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Constant-FromGlobal.git",
+         "web" : "https://github.com/neilb/Constant-FromGlobal"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

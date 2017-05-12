@@ -1,0 +1,161 @@
+Revision history for Perl extension CBOR::XS
+
+TODO: pack_keys?
+TODO: document encode_cbor_sharing?
+TODO: weaken cyclic structures?
+TODO: large negative integers
+
+1.6  Wed Dec  7 15:13:23 CET 2016
+        - greatly expand the SECURITY IMPLICATIONS and similar sections.
+        - new constructor new_safe, to create a secure CBOR::XS object.
+        - new option forbid_objects, to disallow serialisation.
+        - new CBOR::XS::safe_filter functionality.
+        - fix a crash when decoding a cyclic data structure using
+          stringref/pack_strings when allow_cycles is disabled.
+        - fix a crash when decoding hash keys with length >= 2**31.
+        - avoid unreasonably long decoding times for certain
+          types of (corrupt) cbor texts.
+        - support arrays and hashes with >= 2**31 members.
+        - avoid overflow on pointer arithmetic when checking whether enough
+          data is available.
+        - fix a memory leak that occured when decoding failed while decoding
+          a tagged value.
+        - do not leak the partially constructed result when stringifying
+          a hash key throws an exception.
+        - various code size and efficiency optimizations (reduced code
+          from 42 to 40kB on my system, despite the new features).
+
+1.5  Wed Apr 27 11:38:39 CEST 2016
+        - Math::BigFloat madness workaround, see
+          http://blog.schmorp.de/2016-04-23-mathbigfloat-maintainer-fail.html
+          (bugreport by zdm@softvisio.net).
+        - add text_keys and text_strings options to force CBOR text encoding
+          for perl hash keys or all strings, as a result of discussions
+          with Fredrik Ljunggren.
+        - implement support for arbitrary-exponent numbers (see
+          http://peteroupc.github.io/CBOR/bigfrac.html, tags 264 and 265)
+          for both en- and decoding.
+        - implement support for rational numbers (see
+          http://peteroupc.github.io/CBOR/rational.html, tag 30) for both
+          en- and decoding.
+        - the above effectively implements all registered CBOR extensions
+          in a sensible manner.
+        - remove some weird dead code that was duplicated (%FILTER).
+        - add t/58_hv.t, which tests hashes and the new text_* flags.
+          hashes apparently were not encoded at all in any of the existing
+          tests.
+        - document Math::BigFloat base-2 performance/crash issues.
+        - use stability canary.
+
+1.41 Thu 25 Feb 15:22:03 CET 2016
+	- avoid perl panics on nested FREEZE/THAW calls (testcase by
+          Victor Efimov).
+
+1.4  Mon Feb  8 05:10:15 CET 2016
+        - buffer overflow fix: a fast path during decoding did not check
+          remaining length when decoding hash keys, found by fuzzing.
+          This can potentially leak information in the error message
+          or crash the process.
+	- use C style { 0 } struct initializer.
+        - upgrade libecb.
+
+1.3  Mon Apr 27 22:21:04 CEST 2015
+	- the incremental parser didn't properly parse tagged values
+          (testcase by Mons Anderson).
+	- slightly speed up encoding of plain (nonmagical) arrays.
+        - try to clarify further that effectively all 32 bit architectures
+          have 64 bit integer support.
+        - upgrade libecb.
+
+1.26 Sat Oct 25 08:35:44 CEST 2014
+	- update the t/57_incr.t subtest that would rely on 64 bit ints.
+        - disable t/50_rfc.t test that fails because of broken data::dumper.
+
+1.25 Sun Jan  5 15:19:14 CET 2014
+	- map key decoding was pretty much botched due to the recent cleanups.
+	- work around Time::Piece->epoch returning a string value, avoid encoding
+          this as a tag 1 string.
+        - enable more testcases in t/50_rfc.t, now that they work :)
+
+1.2  Tue Dec 10 22:06:42 CET 2013
+	- implement an incremental decoder.
+
+1.12 Tue Dec  3 11:23:22 CET 2013
+	- work around broken Time::Piece (in old versions of the module, %z doesn't
+          work as documented, gives different results on different platforms(!)).
+
+1.11 Sun Dec  1 18:00:00 CET 2013
+	- new setting: validate_utf8, for when you can't trust your cbor data.
+        - do not leak memory on decoding errors, when allow_cycles is enabled.
+        - add default filters for tags 0 and 1, using Time::Piece.
+        - more tests added.
+
+1.1  Sat Nov 30 19:14:27 CET 2013
+	- INCOMPATIBLE CHANGE: new decoder setting: allow_cyclic, needed to decode
+          cyclic data structures (to avoid memleaks in unsuspecting code).
+	- no longer "share" references that aren't, i.e. true/false/null/error/tagged.
+	- fix stringref w.r.t. indefinite-length strings.
+        - verify indefinite-length string chunk types.
+        - do not allow extremely large arrays - assume an array element
+          requires at least one CBOR byte, to avoid memory exhaustion attacks.
+        - major code overhaul.
+
+1.0  Thu Nov 28 16:43:31 CET 2013
+        - use the now official tag values for extensions. remove the
+          experimental notice. it's the real thing now, with real bugs.
+        - renamed allow_stringref to pack_strings.
+	- port to perl <= 5.16.
+        - slightly improve the documentation.
+
+0.09  Fri Nov 22 16:54:18 CET 2013
+	- bignum/bigfloat/decimal support.
+        - uri support.
+        - tag filter functions support for decoding.
+	- do not support reference-to-1/0/undef anymore, you need to use
+          the Types::Serialiser objects now.
+        - experimental sharable extension support (http://cbor.schmorp.de/value-sharing).
+        - experimental stringref extension support (http://cbor.schmorp.de/stringref).
+	- implement indirection tag (http://cbor.schmorp.de/indirection).
+
+0.08  Wed Oct 30 11:10:43 CET 2013
+	- defused another too fragile test.
+
+0.07  Tue Oct 29 23:04:07 CET 2013
+	- don't crash in decode when silly values are passed in.
+        - considerably speed up map decoding when map keys
+          are utf-8 or byte strings.
+        - raising an exception in THAW should now work without
+          leaking.
+
+0.06  Tue Oct 29 16:56:07 CET 2013
+	- do not leak when deserialiasing via THAW.
+        - implement and document CBOR::XS creation/access/mutate
+          methods.
+
+0.05  Mon Oct 28 22:27:47 CET 2013
+	- do not leak hash keys on decoding.
+
+0.04  Sun Oct 27 23:47:47 CET 2013
+	- implement TO_CBOR/FREEZE/THAW serialisation protocols.
+        - requested perl-object and generic-object tags from iana.
+        - switched to Types::Serialiser for true, false and error.
+        - disabled some fragile tests (thanks, andk).
+
+0.03  Sun Oct 27 00:28:41 CEST 2013
+	- improve 32 bit platform compatibility.
+        - take more advantage of ecb.h.
+        - preliminary and bare-bones tagged support.
+        - improved docs.
+
+0.02  Sat Oct 26 13:08:05 CEST 2013
+	- no aborts left.
+	- add $CBOR::XS::MAGIC.
+	- preliminary tagged decoding to arrayref.
+	- indefinite encoding fixed.
+        - half float decoding implemented.
+	- t/50_rfc.t adds test vectors from the rfc, which
+          are checked as applicable.
+
+0.01  Fri Oct 25 21:39:56 CEST 2013
+	- original version; cloned from JSON-XS
+

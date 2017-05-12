@@ -1,0 +1,84 @@
+NAME
+    Crypt::NSS - Perl bindings to NSS (Netscape Security Services)
+
+DESCRIPTION
+    This module provides an interface to Netscape Security Services (NSS)
+    which is a set of libraries that Firefox, Thunderbird and several other
+    applications uses for crypto, secure sockets, signing mail etc. NSS
+    provides support for SSL v2 and v3, TLS, PKCS #5, PKCS #7, PKCS #11,
+    PKCS #12, S/MIME, X.509 v3 certificates, and other security standards.
+
+    Currently this module only implements the SSL bits but in the future
+    (patches welcome!!) most of NSS will be available via this module.
+
+INTERFACE
+  MODULE IMPORT
+
+    During import no initalization is normally done. It's however possible
+    to do this by passing either `config_dir => PATH' or `init'. If the
+    later, import checks for the environment `NSS_CONFIG_DIR' and sets the
+    config dir to that if set.
+
+  CLASS METHODS
+
+    config_dir ( ) : string
+        Returns the path where to look for `cert8.db', `key3.db' and
+        `secmod.db' databases upon initialization.
+
+    set_config_dir ( $directory : string ) : boolean
+        Specify the path to the directory where the `cert8.db', `key3.db'
+        and `secmod.db' databases can be found. It's only allowed to set the
+        directory prior to initialization or this method with return a false
+        value.
+
+    is_initialized ( ) : boolean
+        Returns whether the underlying NSS library has been initialized or
+        not.
+
+    initialize ( ) : integer
+        Initializes NSS. Returns 0 on success or an error code on failure.
+        Initialization is usually done when importing this module by passing
+        either `config_dir => $path' or `init' to use the default config
+        directory (`.').
+
+    shutdown ( )
+        Closes the certificate and key databases.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to `bug-nss@rt.cpan.org', or
+    through the web interface at http://rt.cpan.org.
+
+SUPPORT
+    Commercial support is available from Versed Solutions. Contact author
+    for details.
+
+AUTHOR
+    Claes Jakobsson, Versed Solutions `<claesjac@cpan.org>'
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Versed Solutions `<info@versed.se>'. All rights
+    reserved.
+
+    This software is released under the MIT license cited below.
+
+  The "MIT" License
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               CGI-Carp-DebugScreen
+version:            0.16
+abstract:           provides a decent debug screen for Web applications
+author:
+    - Kenichi Ishigaki <ishigaki@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::Carp:   0
+    Test::More:  0.47
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

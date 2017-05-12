@@ -1,0 +1,94 @@
+#!/usr/bin/perl -w
+
+BEGIN {
+  $_ = '' for @ENV{qw(PATH ENV)};
+}
+use strict;
+use Sys::Hostname;
+use Getopt::Long;
+use ClearCase::Argv;
+use autodie qw(:system);
+use vars qw($help $unlock $vob $rep @op @nusers @lbtype);
+
+my $sudo = '/usr/bin/sudo';
+my $binct = '/opt/rational/clearcase/bin/cleartool';
+my $ct = ClearCase::Argv->new({ipc=>1, autochomp=>1});
+{
+  my $bn = 'locklbtype'; #under suid, $0 is smthg like /dev/fd/4
+  sub usage() {
+    print "Usage: $bn [ --unlock | [--nusers accounts] [--replace]]\n"
+      . "  --vob <vob> --lbtype <lbtypes> | --help\n\n"
+      . "    By default, lock; use --unlock explicitely.\n"
+      . "    Only one vob is accepted, and it is mandatory.\n"
+      . "    Multiple label types are possible, either with separate options"
+      . "\n     or as one comma separated list.\n"
+      . "    All the types must exist in the vob.\n"
+      . "\nDocumentation under: perldoc $bn\n";
+    exit 1;
+  }
+}
+sub untaint($) {
+  my $tainted = shift;
+  my @untaintedbits;
+  foreach (split //, $tainted) {
+    if (m%([-\@\w.])%) {
+      push @untaintedbits, $1;
+    }
+  }
+  return join '', @untaintedbits;
+}
+sub untaintpath($) {
+  my $tainted = shift;
+  my @dirs = split '/', $tainted;
+  map { $_ = untaint($_) } @dirs;
+  return join '/', @dirs;
+}
+sub untaintstring($) {
+  my $tainted = shift;
+  my @words = split /\s+/, $tainted;
+  map { $_ = untaint($_) } @words;
+  return join ' ', @words;
+}
+my $res = GetOptions("help" => \$help, "unlock" => \$unlock, "vob=s" => \$vob,
+		     "replace" => \$rep, "nusers=s" => \@nusers,
+		     "lbtype=s" => \@lbtype);
+usage if $help or !($res and $vob and @lbtype) or ($unlock and @nusers);
+@lbtype = split(/,/, join(',', @lbtype));
+map { $_ = untaint($_) } @lbtype;
+@nusers = split(/,/, join(',', @nusers));
+map { $_ = untaint($_) } @nusers;
+$vob = untaintpath($vob);
+$vob = $ct->des(['-s'], "vob:$vob")->qx;
+die "Couldn't find the vob $vob\n" unless $vob;
+$vob = untaintpath($vob);
+my $pwnam = (getpwuid($<))[6];
+$pwnam =~ s/^ *(.*[^ ]) *$/$1/;
+$pwnam = untaintstring($pwnam);
+my $account = getlogin || getpwuid($<) or die "Couldn't get the uid: $!\n";
+if ($unlock) {
+  my @t = localtime;
+  my $t = sprintf"%4d%02d%02d.%02d:%02d:%02d",
+    (1900+$t[5]),1+$t[4],$t[3],$t[2],$t[1],$t[0];
+  my $eaccount = getpwuid($>) or die "Couldn't get the euid: $!\n";
+  my $log = "/var/log/lbunlock.log";
+  open LOG, ">>", "$log" or die "Failed to open the $log log: $!\n";
+  print LOG "$t $account $vob @lbtype\n";
+  close LOG;
+  @op = ('unlock');
+} else {
+  @op = ('lock', '-c', "'Locked by: $account \($pwnam\)'");
+  push(@op, '-nusers', join(',', @nusers)) if @nusers;
+  push @op, '-rep' if $rep;
+}
+my ($owner) = grep s%^.*/(.*)$%$1%,
+  $ct->des([qw(-fmt %[owner]p)], "vob:$vob")->qx;
+$owner = untaint($owner);
+map { $_ = "lbtype:$_\@$vob" } @lbtype;
+foreach my $t (@lbtype) {
+  $ct->des(['-s'], $t)->stdout(0)->system
+    and die "Label type $t not found in $vob\n";
+}
+$< = $>;
+my $rc |= ((getpwuid($<))[0] eq $owner)? system($binct, @op, @lbtype)
+  : system($sudo, '-u', $owner, $binct, @op, @lbtype);
+exit $rc;

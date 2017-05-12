@@ -1,0 +1,35 @@
+CGI-UploadEngine version 0.9.3
+
+CGI::UploadEngine allows server administrators to easily enable file upload for 
+any perl application or developer. The upload "engine" has a simple API that not 
+only builds the necessary HTML but also validates (and optionally limits) the 
+file type, size, and destination directory. 
+
+
+INSTALLATION
+
+To install the software, read the CGI::UploadEngine perldoc.
+
+DEPENDENCIES
+
+  Class::Std
+  Class::Std::Utils
+  YAML::Any
+  DBIx::MySperql
+
+
+AUTHORS
+
+  Roger A Hall
+  Michael A Bauer
+  Kyle D Bolton
+  Aleksandra A Markovets
+
+
+COPYRIGHT AND LICENSE
+
+Copyleft (C) 2011, Roger A Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

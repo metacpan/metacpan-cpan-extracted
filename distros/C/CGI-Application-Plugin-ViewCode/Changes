@@ -1,0 +1,30 @@
+Revision history for CGI-Application-Plugin-ViewCode
+
+1.02
+    - Added ability to link to specific lines with an anchor tag
+    - Changed Build.PL create_makefile_pl option to 'small' so I don't
+        have to deal with EU::MM install details as well
+
+1.01
+    - No code changes, just cleaned up Makefile.PL and test scripts
+        to handle installation under CPAN
+
+1.00
+    - Added view_pod run mode to allow just the viewing of the formatted
+        POD using Pod::Xhtml
+
+0.04 
+    - Now works with CGI::Application::Plugin::DevPopup
+
+0.03    July 12, 2005
+    - Better test coverage (98%)
+    - fail better if the user's mode_param() returns a reference
+    - doc fixes
+
+0.02    June 25, 2005
+    - Renamed 'ViewCode' from 'ViewSource'
+    - Removed hard coding of run mode param ('rm') into links
+
+0.01    June 25, 2005
+    - First version, released on an unsuspecting world.
+

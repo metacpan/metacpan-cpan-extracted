@@ -1,0 +1,22 @@
+[% INCLUDE template/header.tt -%]
+<h1>TinyURL [% c.loc('List') %]</h1>
+
+<form>
+  <input type="button" name="btn_create" value="[% c.loc('New') %]" onclick="javascript:window.location='/tinyurl/create';"><br/>
+  <br/>
+</form>
+
+<table border="1">
+<tr>
+  <th>ID</th>
+  <th>URL</th>
+</tr>
+[% FOREACH tinyurl = c.stash.tinyurls -%]
+<tr>
+  <td>[% tinyurl.id %]</td>
+  <td><a href="/[% tinyurl.id %]">[% tinyurl.long_url %]</a></td>
+</tr>
+[% END -%]
+</table>
+[% INCLUDE template/footer.tt -%]
+

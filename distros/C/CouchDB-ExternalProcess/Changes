@@ -1,0 +1,11 @@
+Revision history for Perl module CouchDB::ExternalProcess
+
+0.02 Sun Feb 22 10:25:34 EST 2009
+    - POD fixes
+    - Test cases for metadata
+    - POD for _meta method
+
+0.01 Sat Jan 31 22:13:57 2009
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

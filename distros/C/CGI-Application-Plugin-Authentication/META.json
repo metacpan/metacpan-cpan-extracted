@@ -1,0 +1,77 @@
+{
+   "abstract" : "Authentication framework for CGI::Application",
+   "author" : [
+      "Cees Hek <ceeshek@gmail.com>",
+      "Nicholas Bamber <nicholas@periapt.co.uk>",
+      "Wes Malone <wesm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CGI-Application-Plugin-Authentication",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Apache::Htpasswd" : "1.8",
+            "CGI::Application::Plugin::Session" : "0",
+            "Color::Calc" : "0.12",
+            "Digest::MD5" : "0"
+         },
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "CGI" : "3.16",
+            "CGI::Application" : "4",
+            "Class::ISA" : "0",
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "UNIVERSAL::require" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Readonly" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "1.302015",
+            "Test::NoWarnings" : "0",
+            "Test::Regression" : "0",
+            "Test::Taint" : "0",
+            "Test::Warn" : "0.11",
+            "Test::Without::Module" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cees/cgi-application-plugin-authentication/issues"
+      },
+      "homepage" : "https://github.com/cees/cgi-application-plugin-authentication",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cees/cgi-application-plugin-authentication.git",
+         "web" : "https://github.com/cees/cgi-application-plugin-authentication"
+      }
+   },
+   "version" : "0.21",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

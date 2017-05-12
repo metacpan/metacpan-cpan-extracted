@@ -1,0 +1,33 @@
+Contextual-Return-Wrapper version 0.01
+======================================
+
+This module is functionally identical to Attribute::Context.
+
+The primary intention is to allow list-mutator functions to automatically 
+do the right thing when called in scalar context.
+
+More generally, it wraps any arbitrary list-mutator to effect various
+predefined functionality based on attribute style selectors.  The resulting
+functionality is dependent on context determined by implicitly calling 
+the wantarray operator.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Jim Schueler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

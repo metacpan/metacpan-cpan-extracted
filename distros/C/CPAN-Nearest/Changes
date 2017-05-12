@@ -1,0 +1,42 @@
+Revision history for perl module CPAN::Nearest
+
+0.13 2017-01-13
+
+* Use "Text::Fuzzy"
+
+0.12 2014-02-07
+
+* Declare minimum Perl version for module in Makefile.PL.
+
+0.11 2013-12-08
+
+* Bug fix with module dependencies (Text::Fuzzy version mismatch).
+
+0.10 2013-12-01
+
+* Add "Changes".
+* Fix build bugs on Microsoft Windows
+* Remove old "README.md". "README" is now auto-generated.
+
+0.09 2013-03-27
+
+0.08 2013-03-13
+
+* The algorithms of the module are now in Text::Fuzzy, which also
+  includes speedups not present in version 0.07 of this module.
+
+0.07 2012-07-16
+
+0.06 2012-06-24
+
+0.05 2012-06-23
+
+0.04 2012-06-22
+
+0.03 2012-06-22
+
+0.02 2012-06-21
+
+0.01 2012-06-21
+
+

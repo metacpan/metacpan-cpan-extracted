@@ -1,0 +1,32 @@
+diff -urNp CGI-Auth-Auto-1.20/blib/lib/CGI/Auth/Auto.pm CGI-Auth-Auto-1.21/blib/lib/CGI/Auth/Auto.pm
+--- CGI-Auth-Auto-1.20/blib/lib/CGI/Auth/Auto.pm	2008-06-18 09:06:29.000000000 +0200
++++ CGI-Auth-Auto-1.21/blib/lib/CGI/Auth/Auto.pm	2008-06-18 09:08:47.000000000 +0200
+@@ -220,11 +220,16 @@ sub get_cgi {
+ 
+ sub username {
+ 	my $self = shift;
+-	my $username =	$self->OpenSessionFile;
++	my ($username, undef) =	$self->OpenSessionFile;
+ 	$username or return;
+ 	return $username;
+ }
+ 
+m +sub start_session {
++	my $self = shift;
++	return $self->SUPER::start_session; 
++}
++
+ sub _get_sess_file_from_cookie {
+ 	## _load_cookie()
+ 	my $self = shift;
+@@ -517,6 +522,10 @@ Actually returns field 0 of the sess fil
+ Consult CGI::Auth for more on this.
+ Returns undef if no set.
+ 
++=head2 start_session()
++
++Returns the ticks when the session was created.  
++The CGI::Auth must be patched for this.
+ 
+ 
+ 

@@ -1,0 +1,6 @@
+Revision history for Catalyst-Plugin-Facebook
+0.2     2009-08-27
+        Fix a problem where we mistakingly mistook facebook config as facebook object
+0.1     2007-08-26
+        First version, released on an unsuspecting world.
+

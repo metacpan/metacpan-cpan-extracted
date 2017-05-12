@@ -1,0 +1,4 @@
+- optimisation - should walk directories in reverse order, skipping any 
+  already found files
+- add autovivifying Data::Dumper option
+- recursivity?

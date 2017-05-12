@@ -1,0 +1,63 @@
+CGI-Application-Plugin-PageLookup
+
+A model component for CGI::Application built around a table that has one row for each
+page and that provides aupport for multiple languages and the 'dot' notation in templates.
+The core is the cgiapp_pages table which contains one row for every page.
+There are side tables for language independent data (cgiapp_structure) and for
+data that should be consistent across a language (cgiapp_lang).
+There is also facility for using "dot notation" objects as described in HTML::Template::Plugin::Dot.
+This module also makes it easy to manage your XML sitemaps, meta data, not found pages and expiry headers
+	
+In particular this module provides:
+
+	Value	- manage pieces of text that are scattered across a website
+	Loop	- manage repitive list style structures in a website
+	Href	- manage your URLs so that they are always search engine friendly, independent
+		of internal representation and always in the language of that page.
+	Menu	- manage your menus and human readable sitemaps
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The database schema is described in CGI::Application::Plugin::PageLookup and for additional tables
+in the Value and Loop modules. No specific backend interface is currently available but the database
+can be managed using http://www.phpmyadmin.net/home_page/index.php.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Application::Plugin::PageLookup
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Application-Plugin-PageLookup
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Application-Plugin-PageLookup
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Application-Plugin-PageLookup
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Application-Plugin-PageLookup/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Nicholas Bamber
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

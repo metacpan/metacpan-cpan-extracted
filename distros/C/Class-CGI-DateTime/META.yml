@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Class-CGI-DateTime
+version: 0.02
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: "Fetch DateTime objects directly from your forms."
+license: perl
+generated_by: Module::Build version 0.2704, without YAML.pm

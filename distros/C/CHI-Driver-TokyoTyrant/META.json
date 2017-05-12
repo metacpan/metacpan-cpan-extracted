@@ -1,0 +1,53 @@
+{
+   "abstract" : "Use TokyoTyrant for cache storage",
+   "author" : [
+      "Jiří Pavlovský <jira@getnet.cz>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CHI-Driver-TokyoTyrant",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CHI" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0.241",
+            "TokyoTyrant" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CHI::Driver::TokyoTyrant" : {
+         "file" : "lib/CHI/Driver/TokyoTyrant.pm",
+         "version" : "0.02"
+      },
+      "CHI::t::Driver::TokyoTyrant" : {
+         "file" : "lib/CHI/t/Driver/TokyoTyrant.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

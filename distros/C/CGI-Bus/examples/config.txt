@@ -1,0 +1,15 @@
+
+Subdirectory/URL map
+====================
+(* Two IIS Guests used when 'RevertToSelf' not available)
+
+subdir	   http://     	    file:// IIS Guest* auth.    access  comment
+-------	   -------          ------- ---------  ------   ------  -------
+cgi-bin	-> /cgi-bin/cgi-bus	    IUSR_xxx   avoid    --x   application
+cgi-bin	-> /cgi-bin/cgi-bus/auth    -          required --x
+cgi-bin	-> /cgi-bin/cgi-bus/guest   IUSR_xxx_1 avoid    --x
+files	-> /cgi-bus		  + IUSR_xxx_1 possible rw-   file attachments
+users	-> /users		  + IUSR_xxx_1 possible r--   users files
+udata 					    	        rw-   users data files
+tmp						        rw-   temporary files
+

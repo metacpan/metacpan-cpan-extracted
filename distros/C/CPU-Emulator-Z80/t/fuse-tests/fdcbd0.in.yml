@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 188
+    - 208
+  15271:
+    - 32
+name: fdcbd0
+registers:
+  AF: 58043
+  AF_: 0
+  BC: 34357
+  BC_: 0
+  DE: 25868
+  DE_: 0
+  HL: 26778
+  HL_: 0
+  I: 0
+  IX: 4756
+  IY: 15339
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,37 @@
+<&|/_elements/wrapper, title => _('Welcome to CommitBit for %1', Jifty->config->app('site_name')) &>
+
+<div class="featured">
+<h2><%('Featured projects')%></h2>
+<dl>
+% while ( my $p = $featured->next ) {
+<dt>
+% if ($p->logo_url) {
+<img src="<%$p->logo_url%>"/>
+% }
+<%Jifty->web->link( url => '/project/'.$p->name, label => $p->name)%></dt>
+<dd><%$p->blurb|n%></dd>
+% }
+</dl>
+</div>
+
+<h2><%_('All locally hosted projects')%></h2>
+<dl>
+% while ( my $p = $projects->next ) {
+<dt><%Jifty->web->link( url => '/project/'.$p->name, label => $p->name)%></dt>
+<dd><%$p->description%></dd>
+% }
+</dl>
+
+</&>
+<%init>
+my $projects = CommitBit::Model::ProjectCollection->new;
+$projects->unlimit();
+$projects->order_by({ column => 'name', order => 'asc'});
+$projects->limit(column => 'publicly_visible', operator => '=',  value => '1' );
+my $featured = CommitBit::Model::ProjectCollection->new;
+$featured->limit(column => 'featured', operator => '=',  value => '1' );
+$featured->limit(column => 'publicly_visible', operator => '=',  value => '1' );
+$featured->order_by({ column => 'name', order => 'asc'});
+
+
+</%init>

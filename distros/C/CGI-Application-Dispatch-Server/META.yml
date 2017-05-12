@@ -1,0 +1,32 @@
+---
+abstract: 'A simple HTTP server for developing with CGI::Application::Dispatch'
+author: []
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Dispatch-Server
+provides:
+  CGI::Application::Dispatch::Server:
+    file: lib/CGI/Application/Dispatch/Server.pm
+    version: 0.53
+requires:
+  CGI::Application: 0
+  CGI::Application::Dispatch: 0
+  Carp: 0.01
+  HTTP::Request: 0
+  HTTP::Server::Simple: 0.18
+  HTTP::Server::Simple::CGI: 0
+  HTTP::Server::Simple::Static: 0.02
+  HTTP::Status: 0
+  IO::Capture::Stdout: 0
+  Params::Validate: 0
+  Scalar::Util: 1.18
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.53

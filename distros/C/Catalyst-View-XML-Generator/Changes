@@ -1,0 +1,7 @@
+Revision history for Catalyst-View-XML-Generator
+
+0.02  2009-09-06 10:47:00 PDT
+    Fixed output handling to not go to STDOUT
+
+0.01  2009-09-02 17:28:00 PDT
+    Initial revision

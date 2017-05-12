@@ -1,0 +1,162 @@
+Revision history for Perl extension Cache::Static.
+
+-------------------------------
+0.9904  2006/08/20 19:07:09 GMT
+-------------------------------
+
+- install Configuration.pm, duh
+- install binaries to /usr/local/bin
+- enable Makefile.PL +x=$extension syntax
+
+-------------------------------
+0.9903  2006/08/20 11:24:36 GMT
+-------------------------------
+
+- introduce Configuration.pm @ la comma 
+- store wanted extensions in Configuration.pm, don't bother trying to load
+   stuff that isn't in there
+- only run tests that we should, according to Configuration.pm
+- fix up POD docs.
+
+-------------------------------
+0.9902  2006/08/20 07:38:53 GMT
+-------------------------------
+
+- fix up Makefile.PL so it works with CPAN (pass extra args thru)
+
+-------------------------------
+0.9901  2006/08/19 19:45:00 GMT
+-------------------------------
+
+- build system uses misc::MakeMakerMod to hook in install steps
+	instead of the ugly kludges we had before
+- fighting with CPAN's "version numbers must increase" mandate...
+- 0.99 never existed, move along :)
+
+-----------------------------
+0.98  2006/08/19 12:56:06 GMT
+-----------------------------
+
+- add (stubbed) docs & otherwise prepare for CPAN
+
+-----------------------------
+0.97  2006/08/11 20:31:58 GMT
+-----------------------------
+
+- more flexible dependency enabling/disabling system in Makefile.PL
+  (used for compatibility with Gadgets)
+
+-----------------------------
+0.96  2006/04/20 01:30:48 GMT
+-----------------------------
+
+- introduced cache-static-cleanup.pl for cleaning old cruft
+- fix a bug with hmc getting the parent directory of a subcomponent wrong
+- fix a bug that was preventing setting log_level in top level config
+- some cleanup
+- per-namespace configs are inherited with namespace arguments
+- attempt to use illegal namespaces (ie, config, log, timestamps)
+  is caught
+
+-----------------------------
+0.95  2006/01/17 16:05:58 GMT
+-----------------------------
+
+- extraneous/duplicate log message cleanup
+- allow directories to disappear from underneath us (call _mkdir_p more)
+- recursed components are now cached for top level deps
+- set, get_if_same, (and _get, _is_same) allow overriding namespace 
+  from init() e.g.:
+    function(... args ...) => function(... args ..., namespace => $ns)
+- all directories created under $ROOT now default to mode 777,
+  and all files created are chmod'd to mode 666
+  this makes things work, but is not the right way, long term...
+- init() now re-loads global AND per-namespace configs
+- added support for namespaces, per-namespace configs
+- stopped overloading .dep files. timestamp files (for extensions)
+  are now in $ROOT/timestamps, with a .ts extension - note carefully
+  that these are NOT namespace dependent, so an update is global, as
+  they would be with a modification of a depended file.
+- move .dep files back into cache/ dir with .dep extension
+  (saves excess directories, easier to navigate)
+- md5_path() no longer translates '+' to '-', this works around a
+  display bug in ffox with HTML_Mason_Util::cache_it(), where e.g.
+    <!-- serving cached component a/b/c/d--z -->
+  would be displayed as is on the page. while strictly speaking, this
+  was invalid, the ffox developers are silly not to "fix" this... all
+  components with - in the name now will have + in place:
+    <!-- serving cached component a/b/c/d++z -->
+- extra depends from a HTML::Mason subcomponent are now recursed and 
+  searched for dependencies therein, etc.
+
+-----------------------------
+0.94  2006/01/15 07:07:36 GMT
+-----------------------------
+
+- added rudimentary support for automagically adding file dependencies
+  on HTML::Mason subcomponents, e.g:
+    <%init>
+    return if Cache::Static::HTML_Mason_Util::cache_it(
+       $r, $m, 1, [ ]);
+    </%init>
+    <& foo &>
+  automatically adds a dependency on the file foo (as well as the file
+  of the master component). Notes on this feature:
+		- <& foo &> - detected
+		- <& 'foo' &> - detected
+		- <& "foo" &> - detected
+		- <& "f${some_var_expanding_to_o}o" &> - NOT detected, never will be
+		- <& $foo &> - NOT detected, never will be
+		- <& pack("lll",(102,111,111)) &> - NOT detected, never will be
+		- <&| foo &>some content</&> - NOT supported, might be later
+		- code is unoptimized (will be later)
+		- code does not recurse to find depends (will later)
+		- code isn't configurable (will be later)
+- added HIT and MISS deps
+- fixed dep.ts file saving
+- doc fix for HTML_Mason_Util - use:
+    return if Cache::Static::HTML_Mason_Util::cache_it
+  (return instead of exit)
+- logging function 35 times faster by avoiding exec'ing echo
+
+-----------------------------
+0.93  2006/01/02 04:52:19 GMT
+-----------------------------
+
+- allow for different return values if a given dependency is in an 
+	unknown state (e.g. a file dependency is not found):
+		'file-0|/tmp/foo' #if ! -e /tmp/foo, regenerate
+		'file-1|/tmp/foo' #if ! -e /tmp/foo, serve
+		'file|/tmp/foo'   #use the config value "dep_file_not_found_returns"
+- added configuration file and implemented its 4 options:
+	log_level [ 0..4 ]
+	dep_file_not_found_returns [ BINARY ]
+	unrecognized_dependency_returns [ BINARY ]
+	recursive_unlink [ BINARY ]
+- dependency timestamp files in dep.ts/ record the plain text dep in the file
+- logging improved significantly
+- extension interface improved/cleaned a bit
+- seperation of cache/ and dep.ts/ directories
+- build process cleaned up
+
+-----------------------------
+0.92  2005/12/30 10:17:48 GMT
+-----------------------------
+
+- initial support for DBI dependencies (by database and table)
+- a few sundry small fixes
+
+-----------------------------
+0.91  2005/12/13 20:32:10 GMT
+-----------------------------
+
+- Cache::Static::HTML_Mason_Util cleanup:
+	- "dhandler_mode" deprecated (now auto-detected)
+	- dependency auto-addition for subcomponents fixed
+
+-----------------------------
+0.90  2005/12/13  3:05:37 GMT
+-----------------------------
+
+- initial release
+

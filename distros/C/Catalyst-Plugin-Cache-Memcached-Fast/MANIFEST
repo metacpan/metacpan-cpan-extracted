@@ -1,0 +1,11 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+t/Catalyst-Plugin-Cache-Memcached-Fast.t
+lib/Catalyst/Plugin/Cache/Memcached/Fast.pm
+META.yml
+t/pod-coverage.t
+t/pod.t
+examples/Example.pm

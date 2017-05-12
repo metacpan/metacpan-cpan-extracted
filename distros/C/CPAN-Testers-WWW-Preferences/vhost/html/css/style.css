@@ -1,0 +1,156 @@
+h1, h2, h3, h4, h5, h6, p {line-height:1.2em; color:#E76300 }
+h1 { font-size: 122%; font-weight:bold }
+h2 { font-size: 107%; margin-top:1.5em; margin-bottom:.2em; padding:1em 0 0 0; border-top:1px dashed #C3D2DC; font-weight:bold}
+h2.first { border-top:none; margin-top:0; margin-bottom:.2em}
+h3 { font-size: 100%; margin-bottom:.2em; font-weight:bold}
+p {color:#000; margin-bottom:1em }
+#bd { padding-top: 1em }
+#hd h1 { color:#ffffff }
+#hd { width:750px; text-indent:15px; padding:4px 0 2px 0; background: url(/images/layout/background.png) 0 0 repeat-x #00ee00; border: 1px solid #00A550; position:relative;}
+#hd h1 a { color: #ffff00; }
+#bd h2 a { color: #e76300; }
+#ft { font-size: 77%; padding-top:1em; text-align: center; }
+
+.nv { border: 1px dashed #C3D2DC; padding: 2px; margin-bottom: 1em}
+
+table { border-collapse: collapse; }
+table th { padding:2px; border-bottom:1px solid #000000; font-weight:bold; background:url(/images/layout/background.png) 0 0 repeat-x #00ee00; color:#fff; }
+table td { padding:2px; vertical-align: top;}
+.row { background:#ddf; }
+
+#reports {
+  margin: 10px 0 10px 0;
+  width: 100%;
+}
+
+ul {
+  margin: 0;
+  padding-left: 0em;
+}
+
+ul ul {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.orange_buttons {
+  float: right;
+}
+
+.orange_button {
+  border:1px solid;
+  border-color:#FC9 #630 #330 #F96;
+  padding:0 3px;
+  font:bold 10px verdana,sans-serif;
+  color:#FFF;
+  background:#F60;
+  text-decoration:none;
+  margin:0;
+}
+
+.PASS {
+  color: #009900;
+}
+
+.FAIL {
+  color: #990000;
+}
+
+.UNKNOWN {
+  color: #999900;
+  }
+
+.NA {
+  color: #999900;
+}
+
+
+.n {
+	background: #FFFF00; 
+}
+
+.p {
+	background: #00FF00; 
+	text-align: center; 
+}
+
+
+/**************** advert styles ****************/
+#adverts {
+    text-align: center;
+}
+#adverts p {
+	padding: 0;
+	font-size: 8pt;
+	line-height:1.15;
+	margin:5px 0px 10px 0px;
+}
+#adverts ul {
+}
+#adverts li {
+    text-align: center;
+    display: inline;
+    padding: 2px 4px 2px 4px;
+    border: 1px solid #000;
+    background-color: #fff;
+    font-size:8pt;
+    margin: 5px 0px 5px 0px;
+}
+
+/**************** preference styles ****************/
+.gPASS    { margin:0;padding:0; }
+.gFAIL    { margin:0;padding:0; }
+.gNA      { margin:0;padding:0; }
+.gUNKNOWN { margin:0;padding:0; }
+
+.oncpan   { margin:0;padding:0; }
+.backpan  { margin:0;padding:0; }
+.develrel { margin:0;padding:0; }
+.official { margin:0;padding:0; }
+.perldev  { margin:0;padding:0; }
+.perlfull { margin:0;padding:0; }
+.patch    { margin:0;padding:0; }
+.regular  { margin:0;padding:0; }
+
+.rightaligned { text-align: right }
+
+.emphasis {
+	font-weight: bold;
+	color: #f0f;
+}
+
+
+.alert {
+	font-weight: bold;
+	color: #f00;
+}
+
+
+a.tooltip, a.tooltip:visited {
+	position: relative;
+	color: #000;
+}
+ 
+a.tooltip span {
+	display: none;
+}
+ 
+a.tooltip:hover {
+	background-color: #ddf;
+	color: #ddf;
+}
+
+a.tooltip:hover span {
+	position: absolute;
+	top: 10px;
+	left: 30px;
+	display: block;
+	background: #000;
+	width: 200px;
+	padding: 4px;
+	color: #fff;
+} 
+
+.greyed {
+	background-color: #ddd;
+}

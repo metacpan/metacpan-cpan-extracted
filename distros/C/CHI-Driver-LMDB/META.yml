@@ -1,0 +1,52 @@
+---
+abstract: 'use OpenLDAPs LMDB Key-Value store as a cache backend.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Date::Parse: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Builder: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CHI-Driver-LMDB
+provides:
+  CHI::Driver::LMDB:
+    file: lib/CHI/Driver/LMDB.pm
+    version: '0.002004'
+  CHI::Driver::LMDB::t::CHIDriverTests:
+    file: lib/CHI/Driver/LMDB/t/CHIDriverTests.pm
+    version: '0.002004'
+recommends:
+  Moo: '1.000008'
+  Path::Tiny: '0.058'
+requires:
+  CHI::Driver: '0'
+  Carp: '0'
+  File::Spec::Functions: '0'
+  LMDB_File: '0.006'
+  Moo: '0'
+  Path::Tiny: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/CHI-Driver-LMDB/issues
+  homepage: https://github.com/kentnl/CHI-Driver-LMDB
+  repository: https://github.com/kentnl/CHI-Driver-LMDB.git
+version: '0.002004'

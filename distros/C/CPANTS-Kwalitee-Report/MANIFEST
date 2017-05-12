@@ -1,0 +1,17 @@
+Changes
+script/kwalitee-report
+lib/CPANTS/Kwalitee/Report.pm
+lib/CPANTS/Kwalitee/Report/Score.pm
+lib/CPANTS/Kwalitee/Report/Generator.pm
+lib/CPANTS/Kwalitee/Report/Indicator.pm
+lib/CPANTS/Kwalitee/Report/Distribution.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

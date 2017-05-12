@@ -1,0 +1,211 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication
+
+0.10023 11 Jan 2013
+   - Add Howto on using the auth from the proxy server with
+     ::Credential::Remote (Robert Rothenberg)
+
+0.10022 08 Jan 2013
+    - Fix NoPasswd store (skaufman)
+
+0.10021 30 June 2012
+    - Change all classes to Moose and MooseX::Emulate::Class::Accessor::Fast,
+      fixing undeclared dependency on Class::Accessor::Fast.
+    - Change Catalyst::Authentication::Realm to use String::RewritePrefix
+      rather than doing namespace mangling manually.
+    - Fix whitespace and tabs, add Test::EOL and Test::NoTabs
+    - Document optional methods in stores needed for auto_create_user
+      and auto_update_user in realms.
+    - Clarify support channels
+    - Note primary maintainer in docs.
+    - Add x_authority metadata.
+    - Get the NAME right by making it 1 line, due to crappy parsing
+      in EU::MM (RT#77028)
+
+0.10020 05 May 2012
+     - Allow user_class to be configured for Catalyst::Authentication::Store::Minimal
+       (Jochen Lutz <jlu@akk.org>)
+
+0.10019 14 April 2012
+     - Upgrade code to use Moose compatibility layer (jnap)
+     - Added some rules to .gitignore for people using macs (jnap)
+     - Updated copyright info
+     - Catalyst::Plugin::Authentication::Credential::NoPassword added
+       (Okko)
+     - Convert repository to git (fREW Schmidt)
+
+0.10018 29 Jul 2011
+     - Fix failing tests with the new PSGI Catalyst dev release
+
+0.10017 24 Jan 2010
+     - Fix failing tests with the new PSGI Catalyst dev release
+
+0.10016 22 Jan 2010
+     - Move root actions out of applcation class in tests to remove
+       warnings in the latest Catalyst.
+     - Add AUTOLOAD method to the default user class so that methods are
+       delegated down onto the underlieing user object retrieved from
+       the store (if present)
+     - Fix typos in documentation (RT#49476)
+     - Fix compatibilty with Catalyst 5.70 (RT#50466)
+     - Various documentation improvements
+     - Fix Realm::Processive's authinfo_munge option (RT#47106)
+
+0.10015 Tue Sep 1 01:40:36 BST 2009
+
+     - Remove (undeclared) dependency on Class::Data::Inhertiable (RT#49086)
+     - Remove dependency on Test::MockObject
+     - Fix repository metadata in META.yml / Makefile.PL
+     - Make POD tests author side only.
+
+0.10014 Tue Aug 25 15:42:57 BST 2009
+
+      - Don't always supply an "id" column in the authinfo passed to the store
+        class in ::Credential::Remote. This means that it works better with
+        the DBIC store. (t0m)
+
+      - Make auth_realms method ensure authentication is initialized
+        before calling methods which get created during auth initialization.
+        Fixes back compat cases where auth store is in the plugin list
+        before the authentication plugin. (t0m)
+
+0.10013 Fri Jun 19 16:08:00 BST 2009
+      - Add a username_field config item to ::Credential::Remote
+        (Nigel Metheringham)
+      - Die with a useful error message if we are about to try to restore
+        a user from a realm which does not exist. (t0m)
+
+0.10012 Sat Jun  6 10:58:43 BST 2009
+      - Add Catalyst::Authentication::Credential::Remote which authenticates you
+        directly from environment variables passed by your web server. This
+        allows the use of SSL client certificates, NTLM, or just basic/digest
+        auth done at the web server level to be used to authenticate users
+        to your Catalyst application (kmx)
+        - Tests for this
+      - Change ->config invocations to be best practices (t0m)
+      - Note about session auto-vification even when use_session is set
+        to false (robert).
+      - Note about how a realms key used to be needed to unconfuse people
+        running an old version, but browsing the docs on search.cpan (ruoso)
+
+0.10011 Sun Mar  8 23:32:12 GMT 2009
+      - Update t/live_app_session.t to skip unless you have a newer, more
+        reliable version of TWMC (RT#43817)
+      - Change check for isa Catalyst::Plugin::Session to just check the
+        existance of a session method. (Edmund von der Burg)
+
+0.10010
+      - Change from NEXT to MRO::Compat
+      - Chop a number off the versions to get back to the correct 0.10000
+        version scheme.
+
+0.100092_01
+      - Add hook for failing user restore.
+        - Add test for this.
+      - Fix bug in Credential::Password with password_type: clear.
+        - Add test for this.
+      - Add mock object tests for Credential::Password with password_type:
+        clear.
+
+0.100092
+      - Release new version, no changes since dev release.
+
+0.10009_01
+      - Fix POD escaping, from RT#38694 (Luke Ross)
+      - Change authentication backwards compatibility handling to not rely on
+        Class::Data::Inheritable side effects, and so be Catalyst 5.80 safe
+        (t0m)
+
+0.10009 2008-11-27
+        - Including progressive realm for multiple authentication attempts
+          in a single request.
+
+0.10008 2008-10-23
+      - Updating config to allow for inclusion of realm ref's in the main
+        config hash rather than in a subref called 'realms'
+
+0.10007 2008-08-17
+   - Update tests prereqs to include Test::Exception (RT #36339)
+        - Some documentation fixes (including RT #36062)
+        - Compatibility fix where the use of new style config and old
+          style Authentication::Store::Minimal would cause a crash
+          (Reported & fixed by Jos Boumans C<kane@cpan.org>)
+        - Documentation update on Password - to indicate proper field naming
+        - Decouple Authentication system from session.  The realm class
+          now allows complete control over how a user is persisted across
+          requests.
+        - pod fixes (RT #36062, RT #36063)
+
+0.10006 2008-02-15
+        - Additional documentation for Realms
+        - Added update_user_in_session routine to allow re-saving of user data
+          into the session.
+
+0.10005 2008-01-24
+        - Bugfix release - correcting 'Plugin::Authentication' configuration
+          problem.
+
+0.10004 2007-12-04
+        - Added some code for back-compatibility
+
+0.10003 2007-12-02
+        - Added a "Null" store for credentials that don't require real stores.
+        - Make realms bonafide objects
+        - Added auto_update_user and auto_create_user options to the Realm object
+        - Doc updates
+
+        [POSSIBLE INCOMPATIBILITIES]
+        - authenticate() in credentials are now passed a realm object instead of
+          a store object. A realm object still implements find_user() so unless
+          you're doing something special you won't notice the difference.
+
+0.10002 2007-07-22
+        - $user->store() should NOT be set by C::P::Auth - if it's needed - it
+          should be set by whatever module creates the user. We use realm for
+          saving into the session.
+
+0.10001 2007-07-17
+        - updated tests
+
+0.10000 2007-07-11
+        - Minor updates to work better with compatibility mode
+        - Producion release
+        - switch to Module::Install
+
+0.09999_01 2007-02-21
+        - major changes to the internals of the plugin, to better encapsulate
+          credentials and stores.
+        - introduction of 'realms' concept, allowing multiple different
+          pairs of credential and store in a single application.
+
+0.09    2006-08-01
+        - be a bit more pedantic about checking values for definedness before
+          invoking methods on them
+
+0.08    2006-07-29
+        - factor test applications out to files due to changes in Catalyst::Test
+        - don't load session at prepare time unless necessary
+
+0.07    2006-03-17 17:33:12
+        - allow base64 hashed passwords
+
+0.06    2006-03-14 19:23:50
+        - pass extra get_user args to store so they can be made use of
+
+0.05    2006-01-01 13:58:00
+        - Add debugging to Credential::Password
+        - Important doc fixes
+
+0.04
+        - With User::Hash and Store::Minimal together session will store
+          userid, not actual user object
+
+0.03    2005-12-03 18:00:00
+        - Added user_exists method.
+
+0.02    2005-11-29 11:39:00
+      - Fixed a typo (PLugin instead of Plugin) that caused user objects
+        to not be restored from the session properly. Modified test suite
+        to actually test for this case.
+
+0.01    2005-11-27 02:30:00
+        - Initial release.

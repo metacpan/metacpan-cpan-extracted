@@ -1,0 +1,48 @@
+NAME
+    CGI::Prototype::Hidden - Create a CGI application by subclassing -
+    hidden field
+
+SYNOPSIS
+      # in My/App.pm ---
+      package My::App;
+      use base qw(CGI::Prototype::Hidden);
+
+      # in /some/cgi-bin/program
+
+      use lib qw(/location);
+      use My::App;
+      My::App->activate;
+
+DESCRIPTION
+    CGI::Prototype::Hidden extends CGI::Prototype by providing a hidden
+    field mechanism for state, and a dispatching algorithm based on that
+    hidden field.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  CGI::Prototype
+  WWW::Mechanize
+
+AUTHOR
+    Randal L. Schwartz, <merlyn@stonehenge.com>
+
+    Special thanks to Geekcruises.com and an unnamed large university for
+    providing funding for the development of this module.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2003, 2004, 2005 by Randal L. Schwartz
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.

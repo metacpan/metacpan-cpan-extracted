@@ -1,0 +1,28 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Label Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Set up the label rows.
+my @mesg = ("<C>This is a test of the Perl Cdk extension.",
+		"", "",
+		"<L></22>Written by...",
+		"<C></5/R>Mike Glover");
+
+# Create the label object.
+my $title = new Cdk::Label ('Message' => \@mesg);
+
+# Draw the label.
+$title->set ('BoxAttribute' => "</B>");
+$title->draw ();
+$title->wait();
+
+# Exit Cdk.
+Cdk::end();

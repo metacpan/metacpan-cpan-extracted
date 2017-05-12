@@ -1,0 +1,85 @@
+foo
+{
+    bar              ARRAY
+    baz              STRING
+    etc
+    {
+        *            ARRAY
+        pwd          STRING
+    }
+}
+
+path                 STRING_OR_HASH
+{
+    *                STRING
+}
+
+path2                ARRAY_OR_HASH
+{
+    *                ARRAY
+}
+
+data                 DATA
+
+jobs                 ARRAY
+{
+    *
+    {
+        name         STRING
+    }
+}
+
+plugins
+{
+    *
+    {
+        name         STRING
+    }
+}
+
+options
+{
+    *                BOOLEAN
+}
+
+array_of_arrays      ARRAY
+{
+    *                ARRAY
+}
+
+array_of_hashes      ARRAY
+{
+    *                HASH
+    {
+        *            DATA
+    }
+}
+
+single_node          LIST
+{
+    *                ARRAY
+}
+
+repeating_node       LIST
+{
+    *                ARRAY_OR_HASH
+    {
+        *            ARRAY
+    }
+}
+
+single_hash_node     LIST
+{
+    *                HASH
+    {
+        *            STRING
+    }
+}
+
+repeating_hash_node  LIST
+{
+    *                HASH
+    {
+        *            STRING
+    }
+}

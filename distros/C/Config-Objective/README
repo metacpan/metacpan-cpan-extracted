@@ -1,0 +1,50 @@
+Config::Objective
+=================
+
+The Config::Objective module provides a mechanism for parsing config files
+to manipulate configuration data.  Unlike most other config file modules,
+which represent config data as simple variables, Config::Objective
+represents config data as perl objects.  This allows for a much more
+flexible configuration language, since new classes can be easily written
+to add methods to the config syntax.
+
+For more information, see the enclosed Config::Objective documentation.
+
+
+Prerequisites
+-------------
+
+You must have these modules installed in order to use Config::Objective:
+
+  Parse::Lex	(2.15)
+  Parse::Yapp	(1.05)
+
+
+Installation
+------------
+
+To build and install Config::Objective, you should be able to simply
+run these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+License
+-------
+
+Config::Objective is distributed under a BSD-style license.  See the
+COPYRIGHT file for the full text of the license.
+
+
+Author
+------
+
+Feedback is welcome.
+
+Mark D. Roth <roth@uiuc.edu>
+Campus Information Technologies and Educational Services
+University of Illinois at Urbana-Champaign
+

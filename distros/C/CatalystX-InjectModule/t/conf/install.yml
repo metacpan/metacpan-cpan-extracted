@@ -1,0 +1,9 @@
+name: Install
+
+CatalystX::InjectModule:
+  debug: 0
+  path:
+    - t/share/modules
+  inject:
+    - Install
+  persistent_dir: t/var/

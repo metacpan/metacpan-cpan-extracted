@@ -1,0 +1,71 @@
+Revision history for Perl extension Coro::Mysql
+
+1.27 Tue Jun  3 15:38:29 CEST 2014
+	- grrr, remove dbeugging code again.
+
+1.26 Tue Jun  3 15:37:40 CEST 2014
+	- fix a use-after-free corruption bug when closing database
+          handles.
+
+1.25 Tue Jun  3 05:17:12 CEST 2014
+	- mariadb 5.5 isn't actually binary-compatible to mysql 5.5,
+          work around that.
+	- remove debugging code (sigh).
+
+1.24 Tue Jun  3 05:08:07 CEST 2014
+	- port to mariadb 5.5 (and probably anything < 10), by treating it
+          like mysql with missing library symbols.
+
+1.23 Tue May  6 15:03:55 CEST 2014
+	- work around mariadb 10.0.10 no longer exporting vio functions by skipping
+          most of the safety checks - library mismatches will now cause memory
+          corruption causing crashes on the first sql statement execution.
+	- use correct header errno.h, not sys/errno.h.
+
+1.22 Fri Aug  2 06:06:14 CEST 2013
+	- experimental support for mariadb 10 (which has quite big changes).
+	- work around incompatible changes (again) in 5.16. use feature my ass.
+          (patch by....)
+
+1.21 Thu Oct 11 05:21:10 CEST 2012
+	- no functional changes.
+	- document the fact that the API used by this module is now public,
+          so it doesn't rely on library internals anymore.
+	- verified to work with mysql connector/C 6.0.2 (compatible to
+          5.5).
+
+1.2  Thu Jul 26 23:19:47 CEST 2012
+        - ensure DBD::mysql and Coro::Mysql are linked against the same
+          libmysqlclient version (required is same libmysqlclient, but no
+          idea how to check for that).
+        - explicitly support libmysqlclient 5.1 and 5.5 - 5.1 probably just
+          worked before on most (but not all) architectures.
+
+1.1   Sun Feb 20 11:34:38 CET 2011
+	- implement a special EV mode, used when EV was available at build
+          time AND is used by AnyEvent, otherwise fall back to Coro::Handle.
+	- perl 5.10 or 5.12 breaks the syntax used in the with_db. fixed.
+
+1.02  Wed Sep  1 18:37:48 CEST 2010
+	- use xgptr everywhere, so it actually works on those newer
+          systems.
+
+1.01  Tue Aug 31 16:40:16 CEST 2010
+	- gptr typedef is missing from newer libmysql, as
+          pointed out by Yury Zavarin.
+
+1.0   Sun Jun 21 02:56:05 CEST 2009
+	- allow unblock calls on non-mysql handles as well
+          (and return them unchanged).
+        - unpatching was done too late durign destruction -
+          hook diretcly into mysql's vio for that. saves memory
+          and should be faster, even though neither will make a big
+          difference :)
+        - added a nice usage example using PApp::SQL 1.04.
+
+0.1   Sat May 30 08:57:43 CEST 2009
+	- first cpan upload.
+
+0.01  Sun May 17 15:11:00 CEST 2009
+	- original version; cloned from Convert::Scalar.
+

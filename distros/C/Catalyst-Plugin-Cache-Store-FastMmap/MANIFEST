@@ -1,0 +1,8 @@
+lib/Catalyst/Plugin/Cache/Backend/FastMmap.pm
+lib/Catalyst/Plugin/Cache/Store/FastMmap.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/backend.t
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

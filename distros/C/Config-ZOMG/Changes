@@ -1,0 +1,19 @@
+Revision history for Config-ZOMG
+
+1.000000  2013-08-22 17:55:17 CST6CDT
+  - Make ->found not trigger a call to ->read (Jakob Voss)
+    !!! Note that the above change could break your code, if you depended on it
+    (though that seems unlikely) !!!
+
+0.002000  2013-04-04 18:55:29 CST6CDT
+  - add find method for searching for files again (Jakob Voss)
+
+0.001000  2011-01-11 22:16:52 CST6CDT
+  - Initial fork of Config::JFDI
+  - Stop using carp, people can use Carp::Always if they need it
+  - lots and lots of cleanup for more idiomatic Moose code
+  - Remove isa checks
+  - Remove install_accessor feature
+  - Remove substitute feature
+  - Switch to Moo
+  - No longer support config_local_suffix

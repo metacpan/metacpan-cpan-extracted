@@ -1,0 +1,78 @@
+Class::OOorNO version 0.01_1
+============================
+
+DESCRIPTION
+Transparently handles @_ for your class methods whether they were
+called in OO style or not.
+
+
+CHANGES IN LAST FEW RELEASES
+(listed in reverse cronological order by date and subversion)
+
+   0.01_1
+      1/9/03, 4:42 am
+      Significant, thorough documentation updates.  Various tweaks applied
+      to class methods based on comments from adrianh.
+
+   0.01_0
+      12/28/02, 1:54 am
+      Even more documentation completed.  Fixed an egregious flaw found in
+      two methods:
+         Class::OOorNO::myargs()
+         Class::OOorNO::myself()
+
+   0.00_9
+      12/28/02, 12:45 am
+      A little more documentation completed.  Completed move to namespace
+      Class::OOorNO from the errantly pre-assigned root namespace of OOorNO.
+
+   0.00_8
+      12/27/02, 5:50 pm
+      Much documentation has been added.  Various methods have been corrected
+      to use a much stricter policy for determining whether or not a given
+      method was called in OO or procedural style.  More in-depth discussion
+      regarding this issue is covered in the new documentation.
+
+   0.00_7
+      12/27/02, 11:08 am
+      Method Class::OOorNO::shave_opts() now uses UNIVERSAL::isa() rather than
+      CORE::ref() to check for an array ref as it should have in the beginning.
+
+   0.00_6
+      12/23/02, 2:01 pm
+      Miscellaneous optimizations
+
+   0.00_5
+      12/23/02, 2:47 am
+      Initial release of Class::OOorNO.pm
+
+
+INSTALLATION
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On windows machines use nmake rather than make; those running cygwin don't have
+to worry about this.  If you don't know what cygwin is, use nmake and check out
+<URL: http://cygwin.com/> after you're done installing this module if you want
+to find out.
+
+
+DEPENDENCIES
+None.
+
+
+AUTHOR
+   Tommy Butler <cpan@atrixnet.com>
+
+
+COPYRIGHT
+   Copyright (C) Tommy Butler 2001-2003, all rights reserved.
+
+
+LICENCE
+   This library is free software, you may redistribute it and/or modify it
+   under the same terms as Perl itself.

@@ -1,0 +1,139 @@
+Revision history for Perl extension Catalyst::Plugin::PageCache
+
+0.31    2010-11-09
+        - Fixed config in test apps to silence warnings from tests.
+        - Fixed module version number.
+        - Require File::Path 2.07.
+        - Made t/15busy_lock.t test more robust
+
+0.30    2010-11-03 16:03  r13688
+        - Updated tests to use Cache::FileCache instead of the deprecated ::FileCache.
+          Report and patch by Rod Taylor, RT#53304 & RT#47373.
+        - Fixed t/04critic.t to not fail if Test::Perl::Critic is not installed.
+        - Updated test app code to avoid deprecated constructs.
+        - Only serve GET and HEAD requests (instead of all except POST). RT#53307.
+        - Allow key_maker to be the name of a method to be called on $c. RT#53529.
+        - Assorted performance optimizations.
+        - Add cache_dispatch_hook and cache_finalize_hook to config. RT#53503.
+        - Refactored page cache storage logic, inspired by RT#53303.
+        - Use SHA1 to create cache key to limit length and charset. RT#62343.
+        - Treat the order of repeated URL parameter values as significant.
+        Changes to page index logic used by clear_cached_page():
+        - Documented race-hazard risks with page index concept.
+        - Reduced the race-hazard risk in one scenario.
+        - Added app class name to index key for added safety.
+        - clear_cached_page() now returns the number of entries matched.
+        - page index keys are original /path?query not altered by key_maker or sha1.
+        - Now warns if disable_index is not explicitly set in config.
+        - disable_index may default true in a future release.
+
+0.22    2009-06-25 10:38:00
+        - Update to use MRO::Compat
+
+0.21    2008-10-02 10:45:00
+        - Check for FileCache in new test to avoid test failures.
+
+0.20    2008-10-02 00:15:00
+        - Config option 'cache_headers' to cache HTTP headers.  This is needed
+          if operating behind edge caches such as Akamai. (Chris Alef)
+        - Config option 'busy_lock' borrowed from Mason, avoids the "dog-pile"
+          effect where many concurrent requests can generate and cache the same
+          page.  See the documentation for details.
+        - The ability to call clear_cached_page can be disabled to improve
+          performance (a cache index will not be created/updated).
+        
+0.19    2008-08-22 13:00:00
+        - Change config namespace to $c->config->{'Plugin::PageCache'}, old
+          namespace will still continue to work.
+        - key_maker method, allows custom cache keys to be used. (Martin Ellison)
+
+0.18    2008-04-25 11:30:00
+        - cache_hook method, run a method before returning a cached page.
+          (J. Shirley)
+
+0.17    2007-07-29 22:00:00
+        - If using C::P::I18N, allow caching of different versions of a
+          single URI based on the page language. (Roberto Henríquez)
+
+0.16    2007-07-24 10:30:00
+        - Fixed a bug where pages with query strings but no params
+          did not have the cache key created properly.
+        - Switched to Module::Install.
+
+0.15    2006-12-31 20:04:03
+        - Don't cache pages with errors.
+
+0.14    2006-10-19 22:15:00
+        - Support newer C::P::Cache modules.
+
+0.13    2006-08-12 14:43:00
+        - Add optional support to check Authentication plugin if user is
+          logged in. (marcus)
+
+0.12    2006-03-09 16:30:00
+        - Fixed race condition in HTTP header test.
+        - Fixed Content-type to retain charset (moseley)
+        - Send cache headers on all requests (was not sending on first
+          request) (moseley)
+        - Added ability to pass in a DateTime object to expire at a specific
+          time (moseley)
+        - Added ability to pass in an options list to set the cache expires
+          time separately from the expires time sent to client. (moseley)
+        - Test If-Modified-Since headers on request that loads the page cache.
+          Was only testing when returning a page already in the page cache.
+          (moseley)
+        - Now sends Expires and Cache-Control headers on 304 to reset client cache.
+          (moseley)
+        - Allow setting a zero expires to allow just page caching. (moseley)
+
+0.11    2005-09-13 14:50:00
+        - Fixed MANIFEST.
+
+0.10    2005-09-13 14:00:00
+        - Fixed bug in cache key generation that ignored duplicate key names.
+        - Fixed bug where clear_cached_page called with a regex did not
+          properly remove the page from cache.
+        - Fixed bug where cache metadata was not set properly if
+          content-type or content-encoding was missing.
+        - Added test suite.
+        - Code cleanup per Best Practices.
+
+0.09    2005-06-27 11:25:00
+        - Removed dependence on HTTP::Date.
+        - Make sure the same cache key checked during the dispatch phase
+          is used during the finalize phase.  This avoids problems if the
+          user adds or deletes request parameters.
+
+0.08    2005-06-16 00:20:00
+        - Debug is now enabled by default if in Catalyst -Debug mode.
+        - Expires now properly defaults to undef for Cache::Memcached backend.
+
+0.07    2005-06-13 23:15:00
+        - Bugfix: Define auto_cache to an empty arrayref if not specified.
+
+0.06    2005-06-07 23:40:00
+        - Die if no cache plugin is loaded. (chansen)
+        - Changed to isa() for cache backend detection. (chansen)
+
+0.05    2005-06-06 23:15:00
+        - Fixed bug in clear_cached_page when cache index is not
+          available.
+        - Added cache backend detection in order to properly keep the
+          cache index from expiring when possible.
+        - Remove page from cache index when it has expired.
+
+0.04    2005-06-05 16:20:00
+        - Removed unnecessary prepare_request method.
+
+0.03    2005-06-04 22:30:00
+        - Switched to Class::Accessor::Fast. (chansen)
+        - Preserve Last-Modified time of the cached data. (chansen)
+
+0.02    2005-06-04 18:13:00
+        - Preserve Content-Type and Content-Encoding of cached data. (chansen)
+        - Send 304 Not Modified header when a browser or proxy requests
+          If-Modified-Since and the data is still cached. (chansen)
+        - Don't check the auto list if the page will already be cached.
+
+0.01    2005-06-04 12:00:00
+        - initial release

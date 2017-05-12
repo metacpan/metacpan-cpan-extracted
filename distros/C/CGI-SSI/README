@@ -1,0 +1,225 @@
+NAME
+     CGI::SSI - Use SSI from CGI scripts
+
+SYNOPSIS
+     # autotie STDOUT or any other open filehandle
+
+       use CGI::SSI (autotie => 'STDOUT');
+
+       print $shtml; # browser sees resulting HTML
+
+     # or tie it yourself to any open filehandle
+
+       use CGI::SSI;
+
+       open(FILE,'+>'.$html_file) or die $!;
+       $ssi = tie(*FILE, 'CGI::SSI', filehandle => 'FILE');
+       print FILE $shtml; # HTML arrives in the file
+
+     # or use the object-oriented interface
+
+       use CGI::SSI;
+
+       $ssi = CGI::SSI->new();
+
+       $ssi->if('"$varname" =~ /^foo/');
+          $html .= $ssi->process($shtml);
+       $ssi->else();
+          $html .= $ssi->include(file => $filename);
+       $ssi->endif();
+
+       print $ssi->exec(cgi => $url);
+       print $ssi->flastmod(file => $filename);
+
+     #
+     # or roll your own favorite flavor of SSI
+     #
+
+       package CGI::SSI::MySSI;
+       use CGI::SSI;
+       @CGI::SSI::MySSI::ISA = qw(CGI::SSI);
+
+       sub include {
+          my($self,$type,$file_or_url) = @_; 
+          # my idea of include goes something like this...
+          return $html;
+       }
+       1;
+       __END__
+
+     #
+     # or use .htaccess to include all files in a dir
+     #
+
+       # in .htaccess
+       Action cgi-ssi /cgi-bin/ssi/process.cgi
+       <FilesMatch "\.shtml">
+          SetHandler cgi-ssi
+       </FilesMatch>
+   
+       # in /cgi-bin/ssi/process.cgi
+       #!/usr/local/bin/perl 
+       use CGI::SSI;
+       CGI::SSI->handler();
+       __END__
+
+DESCRIPTION
+    CGI::SSI is meant to be used as an easy way to filter shtml through CGI
+    scripts in a loose imitation of Apache's mod_include. If you're using
+    Apache, you may want to use either mod_include or the Apache::SSI module
+    instead of CGI::SSI. Limitations in a CGI script's knowledge of how the
+    server behaves make some SSI directives impossible to imitate from a CGI
+    script.
+
+    Most of the time, you'll simply want to filter shtml through STDOUT or
+    some other open filehandle. "autotie" is available for STDOUT, but in
+    general, you'll want to tie other filehandles yourself:
+
+        $ssi = tie(*FH, 'CGI::SSI', filehandle => 'FH');
+        print FH $shtml;
+
+    Note that you'll need to pass the name of the filehandle to "tie()" as a
+    named parameter. Other named parameters are possible, as detailed below.
+    These parameters are the same as those passed to the "new()" method.
+    However, "new()" will not tie a filehandle for you.
+
+    CGI::SSI has it's own flavor of SSI. Test expressions are Perlish. You
+    may create and use multiple CGI::SSI objects; they will not step on each
+    others' variables.
+
+    Object-Oriented methods use the same general format so as to imitate SSI
+    directives:
+
+        <!--#include virtual="/foo/bar.footer" -->
+
+      would be
+
+        $ssi->include(virtual => '/foo/bar.footer');
+
+    likewise,
+
+        <!--#exec cgi="/cgi-bin/foo.cgi" -->
+
+      would be
+
+        $ssi->exec(cgi => '/cgi-bin/foo.cgi');
+
+    Usually, if there's no chance for ambiguity, the first argument may be
+    left out:
+
+        <!--#echo var="var_name" -->
+
+      could be either
+
+        $ssi->echo(var => 'var_name');
+
+      or
+
+        $ssi->echo('var_name');
+
+    Likewise,
+
+        $ssi->set(var => $varname, value => $value)
+
+      is the same as 
+
+        $ssi->set($varname => $value)
+
+    $ssi->new([%args])
+        Creates a new CGI::SSI object. The following are valid (optional)
+        arguments:
+
+         DOCUMENT_URI    => $doc_uri,
+         DOCUMENT_NAME   => $doc_name,
+         DOCUMENT_ROOT   => $doc_root,
+         errmsg          => $oops,
+         sizefmt         => ('bytes' || 'abbrev'),
+         timefmt         => $time_fmt,
+         MAX_RECURSIONS  => $default_100, # when to stop infinite loops w/ error msg
+         COOKIE_JAR      => HTTP::Cookies->new,
+
+    $ssi->config($type, $arg)
+        $type is either 'sizefmt', 'timefmt', or 'errmsg'. $arg is similar
+        to those of the SSI "spec", referenced below.
+
+    $ssi->set($varname => $value)
+        Sets variables internal to the CGI::SSI object. (Not to be confused
+        with the normal variables your script uses!) These variables may be
+        used in test expressions, and retreived using $ssi->echo($varname).
+        These variables also will not be available in external, included
+        resources.
+
+    $ssi->echo($varname)
+        Returns the value of the variable named $varname. Such variables may
+        be set manually using the "set()" method. There are also several
+        built-in variables:
+
+         DOCUMENT_URI  - the URI of this document
+         DOCUMENT_NAME - the name of the current document
+         DATE_GMT      - the same as 'gmtime'
+         DATE_LOCAL    - the same as 'localtime'
+         LAST_MODIFIED - the last time this script was modified
+
+    $ssi->exec($type, $arg)
+        $type is either 'cmd' or 'cgi'. $arg is similar to the SSI "spec"
+        (see below).
+
+    $ssi->include($type, $arg)
+        Similar to "exec", but "virtual" and "file" are the two valid types.
+        SSI variables will not be available outside of your CGI::SSI object,
+        regardless of whether the virtual resource is on the local system or
+        a remote system.
+
+    $ssi->flastmod($type, $filename)
+        Similar to "include".
+
+    $ssi->fsize($type, $filename)
+        Same as "flastmod".
+
+    $ssi->printenv
+        Returns the environment similar to Apache's mod_include.
+
+    $ssi->cookie_jar([$jar])
+        Returns the currently-used HTTP::Cookies object. You may optionally
+        pass in a new HTTP::Cookies object. The jar is used for web requests
+        in exec cgi and include virtual directives.
+
+  FLOW-CONTROL METHODS
+    The following methods may be used to test expressions. During a "block"
+    where the test $expr is false, nothing will be returned (or printed, if
+    tied).
+
+    $ssi->if($expr)
+        The expr can be anything Perl, but care should be taken. This causes
+        problems:
+
+         $ssi->set(varname => "foo");
+         <!--#if expr="'\$varname' =~ /^foo$/" -->ok<!--#endif -->
+
+        The $varname is expanded as you would expect. (We escape it so as to
+        use the $varname within the CGI::SSI object, instead of that within
+        our progam.) But the $/ inside the regex is also expanded. This is
+        fixed by escaping the "$":
+
+         <!--#if expr="'\$varname' =~ /^value\$/" -->ok<!--#endif -->
+
+        The expressions used in if and elif tags/calls are tricky due to the
+        number of escapes required. In some cases, you'll need to write
+        "\\\\" to mean "\".
+
+    $ssi->elif($expr)
+    $ssi->else
+    $ssi->endif
+SEE ALSO
+    "Apache::SSI" and the SSI "spec" at
+    http://www.apache.org/docs/mod/mod_include.html
+
+AUTHOR
+    (c) 2000-2007 James Tolley <james@bitperfect.com> All Rights Reserved.
+
+    This is free software. You may copy and/or modify it under the same
+    terms as perl itself.
+
+CREDITS
+    Many Thanks to Corey Wilson for a bug report and fix.
+

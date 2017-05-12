@@ -1,0 +1,16 @@
+1.02
+    - fixed typo
+
+1.01
+    - Added routes_params (https://rt.cpan.org/Public/Bug/Display.html?id=43713)
+
+1.00
+    - Documentation updates (Mark Stosberg)
+
+0.03 
+    - Added Changes file, missed on both 0.01 and 0.02
+
+0.02 
+    - Added MANIFEST file missed on 0.01
+
+0.01 Initial Version

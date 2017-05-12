@@ -1,0 +1,27 @@
+NAME
+
+    Catmandu::Template - Catmandu modules for working with templates
+
+MODULES
+
+      * Catmandu::Exporter::Template
+
+      * Catmandu::Fix::template
+
+AUTHOR
+
+    Nicolas Steenlant, <nicolas.steenlant at ugent.be>
+
+CONTRIBUTOR
+
+    Vitali Peil, <vitali.peil at uni-bielefeld.de>
+
+    Jakob Voss, <jakob.voss at gbv.de>
+
+    Patrick Hochstenbach, <patrick.hochstenbach at ugent.be>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

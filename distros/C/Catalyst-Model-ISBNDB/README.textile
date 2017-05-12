@@ -1,0 +1,63 @@
+h1. Catalyst::Model::ISBNDB - Access to the isbndb.com API as a Catalyst model
+
+Version: 0.21
+
+h2. WHAT IS IT
+
+This is a module to provide programmatic access to the database of book and author information hosted by isbndb.com (see http://isbndb.com) to a Catalyst application, as a Model in the MVC scheme. To access the API provided by the site, you will have to register a user account and create an access key.
+
+h2. BUILDING/INSTALLING
+
+This package is set up to configure and build like a typical Perl extension.  To build:
+
+<pre>
+<code>
+        perl Makefile.PL
+        make all
+        make test
+</code>
+</pre>
+
+If Catalyst::Model::ISBNDB passes all tests, then:
+
+<pre>
+<code>
+        make install
+</code>
+</pre>
+
+You may need super-user access to install.
+
+h2. PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to rjray@blackperl.com
+
+h2. CHANGES
+
+* t/00_signature.t (deleted)
+
+p{margin-bottom:2em}. Deprecated test.
+
+* ChangeLog (deleted)
+* MANIFEST (deleted)
+* Makefile (deleted)
+
+p{margin-bottom:2em}. Deprecated files.
+
+* t/01_pod.t
+* t/02_pod_coverage.t
+* t/03_meta.t (added)
+* t/04_minimumversion.t (added)
+* t/05_critic.t (added)
+
+p{margin-bottom:2em}. Three new test suites added, two modified to run as developer-only tests.
+
+* lib/Catalyst/Helper/Model/ISBNDB.pm
+* lib/Catalyst/Model/ISBNDB.pm
+
+p{margin-bottom:2em}. Fixed license docs, other code-cleanliness changes.
+
+* README (deleted)
+* README.textile (added)
+
+p{margin-bottom:2em}. Replace README with README.textile and associated logic in Build.PL.

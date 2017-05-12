@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+use strict;
+use ClearCase::Argv;
+
+ClearCase::Argv->ipc(1);
+my $ct = ClearCase::Argv->new({autochomp=>1});
+my @hltypes = qw(EqInc PrevInc);
+
+for my $v ($ct->argv(qw(lsvob -s))->qx) {
+  my @hlt = @hltypes;
+  @hlt = map { $_ = "hltype:$_\@$v" } @hlt;
+  for ($ct->argv(qw(des -s), @hlt)->stderr(0)->qx) {
+    $ct->argv(qw(mkhltype -rep -shared), "hltype:$_\@$v")->system
+      if $ct->argv(qw(des -fmt %[type_mastership]p), "hltype:$_\@$v")->qx
+	eq 'unshared';
+  }
+}

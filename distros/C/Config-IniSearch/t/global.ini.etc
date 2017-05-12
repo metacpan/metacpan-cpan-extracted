@@ -1,0 +1,4 @@
+[testSection]
+fileName = /etc/global.ini
+[testSection2]
+fileName2 = /etc/global.ini

@@ -1,0 +1,98 @@
+#include "ns.h"
+
+%module{Compress::DSRC};
+
+%loadplugin{feature::default_xs_typemap};
+
+%name{Compress::DSRC::Settings} class DsrcCompressionSettings {
+
+    %name{new} DsrcCompressionSettings();
+    ~DsrcCompressionSettings();
+
+    dsrc::uint32 dnaCompressionLevel     %get{get_dna_level}   %set{set_dna_level};
+    dsrc::uint32 qualityCompressionLevel %get{get_qual_level}  %set{set_qual_level};
+    dsrc::uint64 tagPreserveMask         %get{get_tag_mask}    %set{set_tag_mask};
+    bool lossyQualityCompression         %get{get_lossy}       %set{set_lossy};
+    bool calculateCrc32                  %get{get_calc_crc32}  %set{set_calc_crc32};
+    dsrc::uint64 fastqBufferSizeMb       %get{get_buffer_size} %set{set_buffer_size};
+
+};
+
+
+%name{Compress::DSRC::Module} class DsrcModule {
+
+    %name{new} DsrcModule();
+    ~DsrcModule();
+
+    %name{compress} bool Compress(
+        std::string& inFastqFilename_,
+        std::string& outDsrcFilename_,
+        DsrcCompressionSettings& compSettings_,
+        dsrc::uint32 threadsNum_ = 1,
+        bool useFastqStdIo_ = false,
+        dsrc::uint32 qualityOffset_ = 0
+    );
+    %name{decompress} bool Decompress(
+        std::string& inDsrcFilename_,
+        std::string& outFastqFilename_,
+        dsrc::uint32 threadsNum_ = 1,
+        bool useFastqStdIo_ = false
+    );
+    %name{error} std::string& GetError();
+
+};
+
+%name{Compress::DSRC::Record} class FastqRecord {
+
+    %name{new} FastqRecord();
+    ~FastqRecord();
+
+    std::string tag      %get %set;
+    std::string sequence %get %set;
+    std::string plus     %get %set;
+    std::string quality  %get %set;
+
+};
+
+%name{Compress::DSRC::Reader} class DsrcArchiveRecordsReader {
+
+    %name{new} DsrcArchiveRecordsReader();
+    ~DsrcArchiveRecordsReader();
+
+    %name{start} bool StartDecompress(
+        std::string& dsrcFilename_,
+        dsrc::uint32 threadsNum_ = 1
+    );
+    %name{finish} void FinishDecompress();
+    %name{read_record} bool ReadNextRecord(FastqRecord& rec_);
+    %name{error} std::string& GetError();
+
+};
+
+%name{Compress::DSRC::Writer} class DsrcArchiveRecordsWriter {
+
+    %name{new} DsrcArchiveRecordsWriter();
+    ~DsrcArchiveRecordsWriter();
+
+    %name{start} bool StartCompress(
+        std::string& dsrcFilename_,
+        DsrcCompressionSettings& compressionSettings_,
+        dsrc::uint32 threadsNum_ = 1,
+        dsrc::uint32 qualityOffset_ = 0
+    );
+    %name{finish} void FinishCompress();
+    %name{write_record} bool WriteNextRecord(FastqRecord& rec_);
+    %name{error} std::string& GetError();
+
+};
+
+%name{Compress::DSRC::FastqFile} class FastqFileRecordsReader {
+
+    %name{new} FastqFile();
+    ~FastqFile();
+
+    %name{open} bool Open(std::string& filename_);
+    %name{next_record} bool ReadNextRecord(FastqRecord& rec_);
+    %name{close} void Close();
+
+};

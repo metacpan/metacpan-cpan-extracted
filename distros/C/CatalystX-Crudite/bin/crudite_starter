@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use CatalystX::Crudite::Script::Starter;
+CatalystX::Crudite::Script::Starter::run;
+
+=head1 NAME
+
+crudite_starter - create a CatalystX-Crudite-based project
+
+=head1 USAGE
+
+   $ crudite_starter MyApp
+   $ cd MyApp
+   $ ./test.sh
+   $ ./script/db_deploy.pl
+   $ ./script/myapp_server.pl
+   # enjoy
+
+=head1 SEE ALSO
+
+Read L<CatalystX::Crudite::Script::Starter> for all the details.
+
+=head1 AUTHOR
+
+Marcel Gruenauer C<< <marcel@cpan.org> >>
+
+=cut

@@ -1,0 +1,6 @@
+lib/CPANPLUS/Shell/Default/Plugins/RT.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01-RT.t

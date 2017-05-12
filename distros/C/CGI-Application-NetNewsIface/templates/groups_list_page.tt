@@ -1,0 +1,7 @@
+[% INCLUDE 'header.tt' %]
+<ul>
+[% FOREACH g = groups %]
+<li><a href="[% g %]/">[% g %]</a></li>
+[% END %]
+</ul>
+[% INCLUDE 'footer.tt' %]

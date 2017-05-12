@@ -1,0 +1,34 @@
+Revision history for Perl extension Return::Value.
+
+ 0.55 Mon Aug 20 16:37:48 EDT 2007
+    - FIXED:[rt.cpan.org #28852] t/basic.t fails on Win32 due to the path separator issue. Thanks to ISHIGAKI
+
+ 0.54 Mon Aug 13 17:18:51 EDT 2007
+    - Ditched Test::Inline like a lead brick.
+
+ 0.53  Mon May 30 16:52:44 EDT 2005
+        - sub error_condition returns undef, not 0 -- Thanks to Dave Glasser
+
+ 0.52  Oct 08, 2003
+	- Ported to Module::Install
+
+ 0.40  Sept 15, 2002
+        - MAJOR API CHANGES. (to fix some bugs in trying to marshall into an
+        array directly)
+
+ 0.22  Wed Aug 14 21:02:18 EDT 2002
+        - Fixing dependency list
+
+ 0.21  Fri Jul  5 23:49:23 EDT 2002
+        - Fixing test suite bugs.
+
+ 0.20  Fri Jul  5 17:49:23 EDT 2002
+        - Depend on Devel::StackTrace
+        - Add a couple new accessors
+        - Fixed a crashing bug on 5.6.1 which toasted when evaluating as a boolean
+
+
+ 0.01  Fri Jan 18 14:21:03 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-X -A -n Return::Value
+

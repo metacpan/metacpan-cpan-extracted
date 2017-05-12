@@ -1,0 +1,34 @@
+---
+abstract: 'Use the CHI cache handler for session storage.'
+author:
+  - 'Motortrak Ltd <duncan.garland@motortrak.com>'
+build_requires:
+  CHI: '0'
+  Carp::Assert: '0'
+  Catalyst: '5.8'
+  Catalyst::Model::DBIC::Schema: '0'
+  Catalyst::Plugin::Session::Store: '0'
+  Catalyst::Utils: '0'
+  Class::Data::Inheritable: '0'
+  File::Spec: '0'
+  MRO::Compat: '0'
+  Moose: '0'
+  Path::Class: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.132661'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catalyst-Plugin-Session-Store-CHI-CHI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+version: '0.002'

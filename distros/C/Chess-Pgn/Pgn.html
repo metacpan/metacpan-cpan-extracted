@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<TITLE>Chess::Pgn - Perl extension for manipulation of chess PGN format. PGN is for 
+Portable Game Notation and follow the I<Portable Game Notation Specification and Implementation Guide>
+revised 1994.03.12. You can find it at L<http://members.nbci.com/sghudson/standard.txt>.</TITLE>
+<LINK REV="made" HREF="mailto:prospector@porky.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#export">EXPORT</A></LI>
+	</UL>
+
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Chess::Pgn - Perl extension for manipulation of chess PGN format. PGN is for 
+Portable Game Notation and follow the <EM>Portable Game Notation Specification and Implementation Guide</EM>
+revised 1994.03.12. You can find it at <A HREF="http://members.nbci.com/sghudson/standard.txt">http://members.nbci.com/sghudson/standard.txt</A>.</P>
+<P>The goal of this module is not to play chess but to help to manipulate PGN File.</P>
+<P>A PGN file is like this :</P>
+<PRE>
+ [Event &quot;?&quot;]
+ [Site &quot;?&quot;]
+ [Date &quot;????.??.??&quot;]
+ [Round &quot;?&quot;]
+ [White &quot;Greco&quot;]
+ [Black &quot;NN&quot;]
+ [Result &quot;1-0&quot;]
+ [ECO &quot;C57&quot;]</PRE>
+<PRE>
+ 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7 Kxf7 7.Qf3+ Ke6
+ 8.Nc3 Ne7 9.O-O c6 10.Re1 Bd7 11.d4 Kd6 12.Rxe5 Ng6 13.Nxd5 Nxe5
+ 14.dxe5+ Kc5 15.Qa3+ Kxc4 16.Qd3+ Kc5 17.b4# 1-0</PRE>
+<PRE>
+ [Event &quot;?&quot;]
+ [Site &quot;corr CS ch 22 (FS&quot;]
+ [Date &quot;????.??.??&quot;]
+ [Round &quot;12.0&quot;]
+ [White &quot;Rosenzweig V&quot;]
+ [Black &quot;Necesany Z&quot;]
+ [Result &quot;1/2-1/2&quot;]
+ [ECO &quot;C55&quot;]</PRE>
+<PRE>
+ 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.O-O Be7 5.Nc3 Nxe4 6.Nxe4 d5 7.d4 dxc4
+ 8.d5 Nd4 9.Nxd4 Qxd5 10.Nf3 Qxe4 11.Re1 Qc6 12.Nxe5 Qf6 13.Bd2 O-O
+ 14.Bc3 Bc5 15.Re2 Qf5 16.Qd5 Bd6 17.Rae1 Be6 18.Qxb7 f6 19.Nc6 Bd5
+ 20.Rd2 Bxg2 21.Rxd6 Bxc6 22.Rxc6 Qg4+ 1/2-1/2</PRE>
+<P>With Chess:Pgn you will find a game by $game-&gt;date or $game-&gt;game. 
+For our last example we will have</P>
+<PRE>
+ $game-&gt;date : &quot;????.??.??&quot;
+ $game-&gt;game : &quot;1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7 Kxf7 7.Qf3+ Ke6
+ 8.Nc3 Ne7 9.O-O c6 10.Re1 Bd7 11.d4 Kd6 12.Rxe5 Ng6 13.Nxd5 Nxe5
+ 14.dxe5+ Kc5 15.Qa3+ Kxc4 16.Qd3+ Kc5 17.b4# 1-0&quot;</PRE>
+<P>The module provide a good set of tools to modify PGN File but you will have to make yourself the while :)</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+ use Chess::Pgn;
+ $p = new Chess::Pgn(&quot;2KTSDEF.PGN&quot; ) || die &quot;2KTSDEF.PGN not found&quot;;
+ while ( $p-&gt;ReadGame ) 
+  {
+   print $p-&gt;white ,&quot;&lt;=&gt;&quot;,$p-&gt;black, &quot;\n&quot;;
+  }
+ $p-&gt;quit();
+</PRE>
+<PRE>
+
+ $p-&gt;white(Kouatly);
+ $p-&gt;black(Kasparov);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+<PRE>
+ $p= new Chess::Pgn (&quot;name&quot;)
+</PRE>
+<PRE>
+
+open the file I&lt;name&gt; and if it doesn't exist return undef.</PRE>
+<DT><STRONG><A NAME="item_ReadGame">ReadGame</A></STRONG><BR>
+<DD>
+<PRE>
+ $p-&gt;ReadGame 
+</PRE>
+<PRE>
+
+This method read just one game and return undef at the end of file. You must use methods to read the game.</PRE>
+<DT><STRONG><A NAME="item_quit">quit</A></STRONG><BR>
+<DD>
+<PRE>
+ $p-&gt;quit
+</PRE>
+<PRE>
+
+Close the PGN file</PRE>
+<DT><STRONG><A NAME="item_Methods">Methods</A></STRONG><BR>
+<DD>
+<PRE>
+ site, date, round, white, black, result, eco, game : 
+</PRE>
+<PRE>
+
+return the value of the current game.</PRE>
+<PRE>
+ $p-&gt;black return Greco 
+</PRE>
+<PRE>
+
+=item set a value</PRE>
+<P>You can change a value if you put a argument to the method.</P>
+<P>For example :</P>
+<PRE>
+ $p-&gt;black(&quot;Gilles Maire&quot;) 
+</PRE>
+<PRE>
+
+will change the value of the black opponent. But just in memory ! You will need to write of file to save it.</PRE>
+<DT><STRONG><A NAME="item_variable">variable</A></STRONG><BR>
+<DD>
+You can access to method value bye the hash 
+
+<PRE>
+
+  $p-&gt;{Event}, $p-&gt;{Site} , p-&gt;{Date} ,p-&gt;{Round},$p-&gt;{White},$p-&gt;{Black},
+  $p-&gt;{Result}, $p-&gt;{ECO},$p-&gt;{Game}.</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="export">EXPORT</A></H2>
+<P>None by default.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Gilles Maire</P>
+<P><A HREF="mailto:Gilles.Maire@ungi.net">Gilles.Maire@ungi.net</A></P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>perl(1).</P>
+
+</BODY>
+
+</HTML>

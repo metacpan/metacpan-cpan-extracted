@@ -1,0 +1,30 @@
+[% FOREACH article = block %]
+[% IF article %]
+    [% IF article.type == 1 %]
+        [% IF article.link %]
+        [% IF article.align  %][% class  = article.align  %][% ELSE %][% class  = "inline" %][% END %]
+        [% IF article.href %]
+            <a href='[% article.href %]'><img class="[% class %]" src="[% webpath %]/[% article.link %]" alt="[% article.tag %]"
+            [% IF article.align  %]align="[% article.align %]"[% END %]
+            [% IF article.width  %]width="[% article.width %]"[% END %]
+            [% IF article.height %]height="[% article.height %]"[% END %]
+            /></a>
+        [% ELSE %]
+            <img class="[% class %]" src="[% webpath %]/[% article.link %]" alt="[% article.tag %]"
+            [% IF article.align  %]align="[% article.align %]"[% END %]
+            [% IF article.width  %]width="[% article.width %]"[% END %]
+            [% IF article.height %]height="[% article.height %]"[% END %]
+            />
+        [% END %]
+        [% END %]
+    [% END %]
+
+    [% IF article.type == 2 %]
+            [% article.body %]
+    [% END %]
+
+    [% IF article.type == 3 %]
+            <a href='[% article.href %]'>[% article.href %]</a>
+    [% END %]
+[% END %]
+[% END %]

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         CGI-Untaint-html
+version:      1.0
+version_from: html.pm
+installdirs:  site
+requires:
+    CGI::Untaint:                  0
+    HTML::Sanitizer:               0
+    Test::CGI::Untaint:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

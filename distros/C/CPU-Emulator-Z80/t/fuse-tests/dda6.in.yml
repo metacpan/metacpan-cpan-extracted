@@ -1,0 +1,28 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 166
+    - 65
+  32470:
+    - 199
+name: dda6
+registers:
+  AF: 7588
+  AF_: 0
+  BC: 8388
+  BC_: 0
+  DE: 60355
+  DE_: 0
+  HL: 55949
+  HL_: 0
+  I: 0
+  IX: 32405
+  IY: 24202
+  PC: 0
+  R: 0
+  SP: 0

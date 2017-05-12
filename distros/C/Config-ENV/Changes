@@ -1,0 +1,44 @@
+Revision history for Perl extension Config-ENV
+
+0.14 2016-12-08T10:57:00Z
+	- FIX: Avoid following warning "Constants from lexical variables potentially modified elsewhere are deprecated"
+
+0.13 2014-12-18T04:53:27Z
+        - FIX: A returning error in `load` (by issm)
+        - FIX: Skipping test perlcritic (by issm)
+
+2013-02-19  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.12: Fix docs (by ysasak)
+
+2012-03-08  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.11: Fix test (by Songmu).
+
+2011-10-31  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.10: Implement 'load' function.
+
+2011-10-24  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.09: Implement 'current' method.
+
+2011-10-12  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.08: Implement 'local' function.
+
+2011-08-02  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04: Remove config shorthand function.
+	* 0.05: Enable to export 'config' as any name.
+	* 0.06: Fix bug on merge data.
+	* 0.07: Fix crash on perl-5.8.8
+
+2011-07-27  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01: Initial release
+	* 0.02: Bug fix
+	* 0.03: Enable define default environment
+
+
+vim:set ft=changelog:

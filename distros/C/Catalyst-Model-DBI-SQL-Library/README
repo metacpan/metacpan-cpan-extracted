@@ -1,0 +1,99 @@
+NAME
+    Catalyst::Model::DBI::SQL::Library - SQL::Library DBI Model Class
+
+SYNOPSIS
+      # use the helper
+      create model DBI::SQL::Library DBI::SQL::Library dsn user password
+
+      # lib/MyApp/Model/DBI/SQL/Library.pm
+      package MyApp::Model::DBI::SQL::Library;
+
+      use base 'Catalyst::Model::DBI::SQL::Library';
+
+      # define configuration in package
+  
+      __PACKAGE__->config(
+        dsn => 'dbi:Pg:dbname=myapp',
+        username => 'postgres',
+        password => '',
+        options => { AutoCommit => 1 },
+        sqldir => 'root/sql2' #optional, will default to $c->path_to( 'root/sql' ),
+        sqlcache => 1 #can only be used when queries are loaded from file i.e. via scalar passed to load
+        sqlcache_use_mtime => 1 #will use modification time of the file to determine when to refresh the cache, make sure sqlcache = 1
+        loglevel = 1 #integer value to control log notifications between 1 and 3 with 3 being the most verbose, defaults to 1
+      );
+
+      1;
+  
+      # or define configuration in myapp.conf
+  
+      name MyApp
+
+      <Model::DBI::SQL::Library>
+        dsn "DBI:Pg:dbname=myapp"
+        username pgsql
+        password ""
+        <options>
+          AutoCommit 1
+        </options>
+        loglevel 1
+        sqlcache 1
+        sqlcache_use_mtime 1
+      </Model>
+
+      # then in controller / model code
+
+      my $model = $c->model( 'DBI::SQL::Library' );
+  
+      my $sql = $model->load( 'something.sql' ) ;
+
+      #or my $sql = $model->load( [ <FH> ] );
+      #or my $sql = $model->load( [ $sql_query1, $sql_query2 ] ) )
+
+      my $query = $sql->retr( 'some_sql_query' );
+
+      #or my $query = $model->sql->retr( 'some_sql_query );
+
+      $model->dbh->do( $query );
+
+      #do something else with $sql ...
+
+DESCRIPTION
+    This is the "SQL::Library" model class. It provides access to
+    "SQL::Library" via sql accessor. Additional caching options are provided
+    for increased performance via sqlcache and sqlcache_use_mtime, these
+    options can only be used when sql strings are stored within a file and
+    loaded by using a scalar value passed to load. The load and parse phase
+    is then bypassed if cached version of the file is found.
+
+    The use of these options can result in more memory being used but faster
+    access to query data when running under persistent environment such as
+    mod_perl or FastCGI. When sqlcache_use_mtime is in use, last
+    modification time of the file is being referenced upon every cache
+    check. If the modification time has changed only then query file is
+    re-loaded. This should be much faster then re-creating the SQL::Library
+    instance on every load. Please refer to the "SQL::Library" for more
+    information.
+
+METHODS
+    new Initializes database connection
+
+    $self->load
+        Initializes "SQL::Library" instance
+
+    $self->dbh
+        Returns the current database handle.
+
+    $self->sql
+        Returns the current "SQL::Library" instance
+
+SEE ALSO
+    Catalyst, DBI
+
+AUTHOR
+    Alex Pavlovic, "alex.pavlovic@taskforce-1.com"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

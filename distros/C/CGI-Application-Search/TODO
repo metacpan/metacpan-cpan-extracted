@@ -1,0 +1,6 @@
+- handle future release of SWISH::API to CPAN
+- build out t/conf/swish-e.index during install so that it's portable
+    (this includes locating the swish-e binary)
+- 100% test coverage
+ 
+

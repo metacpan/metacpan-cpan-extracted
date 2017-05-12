@@ -1,0 +1,66 @@
+Revision history for Perl extension CGI::Application::Plugin::Stream.
+
+2.12  Wed Mar 11 10:57:50 2015 -0400
+  * Fixed distribution header specification
+    - https://rt.cpan.org/Public/Bug/Display.html?id=102688
+    - Thanks, Kai Wasserbäch
+
+2.11  Mon Dec 23 10:05:51 2013 -0500
+  * Fixed header hyphen prefix that was causing testing failures
+    - https://rt.cpan.org/Public/Bug/Display.html?id=81646
+    - Thanks, Niko Tyni
+
+2.10  Mon Mar 30 12:04:57 EDT 2009
+  * Added support for CGI_APP_RETURN_ONLY env. variable
+    - Thanks, Brad Bailey
+
+2.06  Tue Dec 19 09:04:18 EST 2006
+  * Testing library was missing some override functions
+    - Thanks, Makio Tsukamoto
+  * Minor whitespace issue
+  * Added content regex to header check
+
+2.05  Tue Sep 27 14:39:41 EDT 2005
+    * Added README to MANIFEST (not sure how it got removed)
+
+2.04  Thu Sep  8 11:52:34 EDT 2005
+    * Added test coverage for the PODs, to boost Kwalitee
+
+2.03  Sun Jul  3 22:13:00 2005
+    [BUG FIX]
+    - Patch - tolerates absence of File::MMagic (Thilo Phanz)
+
+2.02  Thu Jun 23 17:01:00 2005
+    [BUG FIX]
+    - Added a binmode line to address a problem on Windows (William McKee)
+
+2.01  Wed Mar 30 14:59:17 2005
+    [BUG FIXES]
+    - We now use the correct 'Content-Length' header instead of 'Size'. (Mark Stosberg)
+    - A case in which the first few characters of the file could have been
+      missing after the stream was fixed. (Mark Stosberg)
+
+2.00  Mon Dec  6 14:26:17 2004
+    The use of the second argument to stream_file() has changed and is not
+    backward compatible.
+
+    [ENHANCEMENTS]
+    - header_props() and header_add() can now be used to manage headers
+    - The right content type will now attempt to be auto-detected if none is
+      provided.
+    - The chunk size of the stream is now configurable.
+
+    [INTERNALS]
+    - A test suite was added.
+    - started Exporter import technique is used now.
+    - Documentation was updated
+    - Test::More, File::MMagic and FileHandle are now required.
+    - Migrate distribution management to Module::Build
+
+1.00  Thu Dec  3 10:42:04 2004
+	- production version
+
+0.01  Thu Dec  2 16:07:45 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n CGI::Application::Plugin::Stream
+

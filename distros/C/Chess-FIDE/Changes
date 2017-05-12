@@ -1,0 +1,15 @@
+Revision history for Chess-FIDE
+
+1.00   13/06/2004 - first more or less robust version
+
+1.10   20/03/2011 - major cleanup
+
+1.11   24/01/2013 - fixed network issues in tests
+
+1.12   28/01/2013 - fixed dependencies
+
+1.20   14/09/2015 - major rewrite due to FIDE changing format of the
+                    rating list. Utility 'fidesearch' has been added.
+
+1.22   16/09/2015 - cleaned up tests to avoid fails on memory usage
+

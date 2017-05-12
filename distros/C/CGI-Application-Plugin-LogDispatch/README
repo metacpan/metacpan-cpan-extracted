@@ -1,0 +1,43 @@
+CGI::Application::Plugin::LogDispatch
+
+Plugin that adds Log::Dispatch support to CGI::Application
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, if you do not have Module::Build but you do have 'make',
+you can used the included Makefile.PL and run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+CGI::Application
+Log::Dispatch
+UNIVERSAL::require
+Scalar::Util
+
+RECOMMENDS
+
+Sub::WrapPackages
+Class::ISA
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Cees Hek, All Rights Reserved.
+
+This library is free software. You can modify and or distribute it under the same terms as Perl itself.
+

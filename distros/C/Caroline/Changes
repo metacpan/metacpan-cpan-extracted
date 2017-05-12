@@ -1,0 +1,128 @@
+Revision history for Perl extension Caroline
+
+0.22 2016-09-14T04:20:29Z
+
+    commit 9d3104bdce9fa9659f3b19fc44a140883af8e45d
+    Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+    Date:   Wed Sep 14 11:27:00 2016 +0900
+
+        handle partial input
+
+    commit 1bcbf775a71542c11f5b7a9df7ea9c18a1a87504
+    Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+    Date:   Wed Sep 14 11:26:32 2016 +0900
+
+        pass $state->pos to be possible to handle partial input
+
+0.21 2014-07-19T23:09:14Z
+
+    - Switch to MBTiny
+    - Documentation update.
+
+0.20 2014-04-11T05:18:39Z
+
+    - C-z -> sigtstp
+      (yoshidaster)
+
+0.19 2014-02-19T07:32:35Z
+
+    commit 7564b30e50a30b233bac6614e97b7fbcf6ac4e0b
+    Author: moznion <moznion@gmail.com>
+    Date:   Thu Jan 23 19:12:52 2014 +0900
+
+    Support multi byte characters as default on Term::Readline::Caroline
+
+0.18 2013-09-09T08:01:38Z
+
+    - Fxied deps for MSWin32
+
+0.17 2013-09-09T07:37:23Z
+
+    - Detect ambw's width by Unicode::EastAsianWidth::Detect.
+      https://github.com/tokuhirom/Caroline/issues/9
+      (Reported by disarmer++, implemented by mattn++)
+
+0.16 2013-08-24T08:28:22Z
+
+    - Load IO::Handle to call STDOUT->autoflush.
+      (Reported by KamunagiChiduru++)
+
+0.15 2013-08-14T03:07:05Z
+
+    - fixed deps for CPANTS
+
+0.14 2013-08-13T05:50:07Z
+
+    - Send SIGKILL to the process itself when got C-c.
+      (reported by miyagawa++)
+
+0.13 2013-08-13T04:46:18Z
+
+    - Added Term::ReadLine::Stub as a prent to care the module is using Term::UI.
+      (tokuhirom)
+
+0.12 2013-08-13T04:37:54Z
+
+    - Added some missing functions to Term::ReadLine::Caroline.
+      This change may fixed around cpan shell.
+      (reported by miyagawa++)
+
+0.11 2013-08-13T04:18:39Z
+
+    - Added Term::ReadLine::Caroline#StifleHistory for reply.
+      (tokuhirom)
+
+0.10 2013-08-13T04:06:55Z
+
+    - Fixes allow key handling on windows
+      (mattn)
+    - HOME/END key support
+      (mattn)
+
+0.09 2013-08-13T03:40:53Z
+
+    - win32 fixes
+      (mattn)
+
+0.08 2013-08-12T11:13:31Z
+
+    - Ah. older version can't input '0'.... '0' is a valid input value!
+      (tokuhirom)
+
+0.07 2013-08-10T22:57:02Z
+
+    - Fixed line editing issue
+      (tokuhirom)
+    - Show searching query while under the searching state
+      (tokuhirom)
+    - Example code fixes
+      (Ahmad M. Zawawi)
+
+0.06 2013-08-10T04:05:43Z
+
+    - Do not create history file if maximum history length was limited to 0.
+      (tokuhirom)
+
+0.05 2013-08-10T02:36:23Z
+
+    - write_history_file, read_history_file.
+      (tokuhirom)
+
+0.04 2013-08-10T02:04:54Z
+
+    - Win32 fixes
+      (mattn++)
+
+0.03 2013-08-09T11:52:14Z
+
+    - Added history_max_len
+
+0.02 2013-08-09T11:23:45Z
+
+    - Use Term::ReadKey to support MSWin32
+      (suggested by mattn++)
+
+0.01 2013-08-09T08:45:23Z
+
+    - original version
+

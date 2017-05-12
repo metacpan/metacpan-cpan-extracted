@@ -1,0 +1,47 @@
+# To build a release:
+
+Note: Replace '1.10' in the examples below with the current version.
+
+* Switch to develop branch and update it with latest commits
+
+* Start release branch
+
+    # Set the connver to the new version number
+    connver=1.10
+    git flow release start $connver develop
+
+* Bump version number in lib/Connector.pm
+
+    perl -i -pe "s{our \\\$VERSION = .+}{our \\\$VERSION = '$connver';};" \
+        lib/Connector.pm
+    git add lib/Connector.pm
+    git commit -m "bump version to $connver"
+
+* Make any last-minute fixes
+
+* Finalize release (write the version number in the TAG\_MSG)
+
+    git flow release finish "$connver"
+    git push origin develop master "$connver"
+
+* Build tarball
+
+    perl Makefile.PL
+    make manifest
+    make dist
+
+* Upload tarball to https://pause.perl.org
+
+# If the build env is not already set up, run the following:
+
+    curl -L http://install.perlbrew.pl | bash
+    echo "source $HOME/perl5/perlbrew/etc/bashrc" >> $HOME/.bashrc
+    source $HOME/perl5/perlbrew/etc/bashrc
+    perlbrew available
+    # Note: Adjust perl version based on results from 'perlbrew available'
+    perlbrew install perl-5.19.5
+    perlbrew switch perl-5.19.5
+    perlbrew install-cpanm
+    cpanm Module::Install
+    cpanm --installdeps --notest .
+

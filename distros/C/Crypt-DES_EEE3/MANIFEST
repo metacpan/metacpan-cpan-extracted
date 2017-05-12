@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/Crypt/DES_EEE3.pm
+test.pl
+META.yml                                Module meta-data (added by MakeMaker)

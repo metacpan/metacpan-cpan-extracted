@@ -1,0 +1,30 @@
+$Id: README 1069 2006-01-04 02:11:35Z btrott $
+
+This is Catalyst::Plugin::AtomServer, an implementation of a base Atom
+API server for Catalyst authentications, including.
+
+PREREQUISITES
+
+    * Catalyst
+    * Catalyst::Plugin::Authentication
+    * XML::Atom
+    * MIME::Base64
+    * Digest::SHA1
+
+INSTALLATION
+
+Catalyst::Plugins::AtomServer installation is straightforward. If your
+CPAN shell is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Catalyst::Plugin::AtomServer'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Six Apart / cpan@sixapart.com

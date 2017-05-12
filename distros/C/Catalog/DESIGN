@@ -1,0 +1,78 @@
+
+	Design notes about Catalog
+
+Unstructured notes on the design of Catalog. Don't expect too much from it, but
+it may help to understand the code.
+
+<db_type> can be : mysql
+
+Packages
+
+------ Catalog ------
+
+Catalog : HTML interface to Catalog
+   configuration: catalog.conf
+
+Catalog::implementation : Catalog functionalities
+   configuration: 
+
+Catalog::<db_type>::schema : table descriptions specific to Catalog
+
+Catalog::external : XML load / unload functions
+
+Catalog::path : thematic catalog path manipulation functions
+
+------ Database ------
+
+Catalog::db : hide database type
+   configuartion: db.conf
+
+Catalog::db::<db_type> : implentation of the database access functions for <db_type>
+   configuartion: <db_type>.conf
+
+------ Tools ------
+
+Catalog::tools::cgi : a few functions on top of CGI
+   configuartion: cgi.conf
+
+Catalog::tools::fulcrum
+Catalog::tools::hook_fulcrum : interface for full text search with Fulcrum Search Server
+   configuartion: hook_fulcrum.conf
+
+Catalog::tools::main : ARGV argument parsing and helpers
+
+Catalog::tools::sqledit : HTML editing of SQL database
+   configuartion: sqledit.conf
+
+Catalog::tools::<db_type>::schema : table descriptions specific to sqledit
+
+Catalog::tools::tools : Misc utilities (configuration files handling, debug, errors, serialize...)
+
+------ Dmoz ------
+
+Catalog::dmoz : HTML interface to dmoz.org Catalog
+   configuartion: dmoz.conf
+
+Catalog::dmoz::<db_type>::schema : table descriptions specific to dmoz
+
+Inheritance
+
+Catalog::tools::cgi -> CGI
+
+Catalog::dmoz -> Catalog
+
+Catalog |->  Catalog::tools::sqledit
+        |->  Catalog::implementation
+
+Membership
+
+Catalog::tools::sqledit -> Catalog::db |-> Catalog::db::<db_type> (db_type at present is only mysql)
+                                       |-> Catalog::<db_type>::schema (catalog tables description)
+                                       |-> Catalog::tools::<db_type>::schema (sqledit tables description)
+                                       |-> Catalog::dmoz::<db_type>::schema (dmoz tables description)
+
+Catalog::implementation -> Catalog::db |-> Catalog::db::<db_type> (db_type at present is only mysql)
+                                       |-> Catalog::<db_type>::schema (catalog tables)
+                                       |-> Catalog::dmoz::<db_type>::schema (dmoz tables)
+
+

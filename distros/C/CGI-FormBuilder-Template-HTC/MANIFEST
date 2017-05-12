@@ -1,0 +1,12 @@
+lib/CGI/FormBuilder/Template/HTC.pm
+README
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+META.yml
+examples/form_htc.pl
+examples/form_htc.html
+t/01_pod.t
+t/02_pod_cover.t
+t/03_HTC.t

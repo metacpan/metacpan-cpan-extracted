@@ -1,0 +1,197 @@
+Revision history for Catalyst-View-ByCode
+
+0.28    2015-06-07
+        * added missing dependency to MooseX::Types::Path::Class needed
+          for a test class
+
+0.27    2015-06-05
+        * added MockCatalyst class to circumvent different setup from latest
+          Catalyst releases resultung in test errors. Fixes RT #104513
+
+0.26    2015-01-12
+        * added a mocked $c->stash() method to make failing tests work again
+
+0.25    2014-03-19
+        * Tag attributes with undef value are rendered without value
+        * expanded attr() to allow a single setter argument to set an
+          attribute with undef value.
+
+0.24    2013-10-28
+        * allowed dash-separated names to appear for class and id names,
+          enabling div my-id.some-class { ... }
+
+0.23    2013-09-19
+        * added a content type for delivery to Catalyst > 5.90040
+
+0.22    2013-07-17
+        * scalar refs inside markup are not escaped by intention. This avoids
+          calling `print RAW 'string';` by simply using `\'string'`;
+          Feature wanted by Phil Söhnlein.
+
+0.21    2013-07-03
+        * stop depending on deprecated MooseX::AttributeHelpers
+          Fixes RT#86642 -- Thanks, Karen Etheridge
+
+0.20    2013-07-01
+        * changed all calls to any logging method containing coderefs to
+          stringified contents. Log::Log4perl::Catalyst calls coderefs instead
+          of printing them.
+        * added 3 more boolean attributes specified in HTML5:
+          autofocus, novalidate and formnovalidate. Thanks again, Phil.
+
+0.19    2013-06-22
+        * added HTML-5 tags and boolean attributes. Fixes github issues
+          #1 and #2. Issues reported by Phil Soehnlein
+        * reformatted tests to use "use ok" and all test methods without ()
+
+0.18    2013-05-11
+        * added "requried" to the list of binary attributes that expand to
+          required = "required" at rendering time.
+
+        2012-05-15
+        * removed a warning from a test. Ensured we work with
+          Perl-5.16.0-RC1
+
+0.17    2011-11-06
+        * bumped version of Devel::Declare to 0.006008
+          as earlier versions randomly behaved bad under Perl-5.14
+
+0.16    2011-07-19
+        * added HTML5 Tags which are not defined by HTML::Tagset
+
+        2011-05-03
+        * enabled objects that have a ->render() method to appear inside
+          a template {} code block.
+
+0.15    2011-05-03
+        * made doctype 'html' act as expected: <!doctype html>
+        * changed doctype 'html' as the default if no argument is given
+        * added a 'boilerplate' pseudo-tag
+          that generates a html-boilerplate-like <html> tag
+          see http://html5boilerplate.com
+
+        2011-01-02
+        * added HTML5 as doctype
+        * changed AutoPrereqs in dist.ini to avoid deprecacy warning
+
+        2011-01-20
+        * allowed block_content() to forward arguments into the code-block called.
+
+0.14    2010-12-09
+        * fixed a false escaping of render()'ed content from eg. FormFu
+        * removed some typos
+        * added more tests
+
+0.13    2010-12-09
+        * increased version number due to a CPAN upload problem
+
+0.12    2010-12-08
+        * complete rewrite of the whole rendering code
+          using simple structures instead of Moose for performance
+          changed speed for readability
+
+        2010-06-30
+        * changed some parts of markup generation to inline code for speedup
+
+0.11    2010-04-06
+        * changed parameters transfered from process() to render() as
+          actions with :Args() fail otherwise
+        * added a test for this.
+
+        2010-04-08
+        * added documentation
+
+        2010-04-15
+        * $VERSION is now generated from Dist::Zilla
+
+        2010-05-27
+        * added a rudimentary html5 doctype
+
+0.10    2010-04-01
+        * bumped MooseX::AttributeHelpers to Version 0.23, as 0.22 fails
+          Thanks, CPAN Testers!
+        * tried Dist::Zilla as a packaging system -- looks much easier to use.
+        * split up the process() method into render() and delivery to allow
+          my $html = $c->forward('View::ByCode', render => [qw(list of files)]);
+          without pollution of stash.
+
+        2010-03-31
+        * added a handy shortcut for checked, disabled, multiple, readonly
+          and selected attributes rendering a true value to the
+          attribute's name
+          eg: disabled => 1 will become disabled="disabled" in HTML
+        * added a params() sub that allows to specify a series of
+          param tags with one call.
+
+        2010-03-29
+        * fixed a bug that made block-definitions defined in 'old-scholl'
+          fashion unable to read attr()-values. Only declare-defined
+          blocks could read attr()-values.
+          Added a test to verify the improvement.
+          Bug reported by Phil Soehnlein
+        * added a yield-test
+
+0.09    2010-03-27
+        * updated test requirements
+
+0.08    2010-03-27
+        * eliminated trunk/ directory
+        * moved to Module::Install
+        * fixed a test that failed on Windows because path separator
+          was hard coded and wrong for this platform
+
+0.07    2010-03-13
+        * docs added, first CPAN upload
+
+0.06    2010-03-01
+        * changed version to 0.06
+        * updated META.yml, MANIFEST
+        * added some docs
+
+        2010-03-02
+        * added test for mixedCase and combined_name attribute keys
+        * fixed doc typos, expanded docs
+        * added logic to expand and shrink class names instead of setting them
+          class 'abc';  # sets a class name, is now: 'abc'
+          class '+xxx'; # adds class names,  is now: 'abc xyz'
+          class '-xxx'; # removes things,    is now: 'abc'
+          class 'uuu';  # set a name         is now: 'uuu'
+          class '+a selected'                is now: 'a selected uuu'
+          class '-a' 'uuu'                   is now: 'selected'
+          class '-selected +hui foo'         is now: 'foo hui'
+
+        2010-03-09
+        * íntroduced stringification in Document for tag-content objects
+        * used OUT/RAW/STDOUT in Renderer to avoid 'possible typo' warnings
+
+0.05    2010-02-23
+        * fixed a bug that made certain multiline prototype-like attributes fail
+        * added a test to verify that
+        * allow to use special attribute-names like
+          div(dataTarget => 'x')       becomes <div data-target="x">
+          div(data_target => 'x')      becomes <div data-target="x">
+          div(style => {zIndex => 9})  becomes <div style="z-index:9">
+
+        2010-03-01
+        * found a way to correctly export and Devel::Declare'able
+          all defined block()s into importing namespaces
+          the mechanics behind this is dark magic overwriting import()
+
+0.04    2009-08-12
+        * started rewriting the markup engine using Moose
+        * defining main sub with template {...}; now
+        * allow creation of blocks like block some_name => {...};
+        * block_content() sub for renderung block's coderef
+        * attr() is getter and setter now
+        * tests for most modules
+
+0.03    2009-07-18
+        * expanded markup syntax by using some Devel::Declare tricks
+        * corrected dependencies in Build.PL
+
+0.02    2009-04-26
+        added C::Helper::View::ByCode to allow create-script to work.
+
+0.01    2009-04-25
+        First version, released on an unsuspecting world.
+

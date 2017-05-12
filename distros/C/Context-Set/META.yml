@@ -1,0 +1,61 @@
+---
+abstract: 'A Contextual preference/configuration holder.'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  DBD::SQLite: 1.35
+  DBIx::Class::Schema::Loader: 0.0701
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Context-Set
+provides:
+  Context::Set:
+    file: lib/Context/Set.pm
+    version: 0.02
+  Context::Set::Holder:
+    file: lib/Context/Set/Holder.pm
+    version: 0
+  Context::Set::Manager:
+    file: lib/Context/Set/Manager.pm
+    version: 0
+  Context::Set::Restriction:
+    file: lib/Context/Set/Restriction.pm
+    version: 0
+  Context::Set::Role::Managed:
+    file: lib/Context/Set/Role/Managed.pm
+    version: 0
+  Context::Set::Role::Stored:
+    file: lib/Context/Set/Role/Stored.pm
+    version: 0
+  Context::Set::Storage:
+    file: lib/Context/Set/Storage.pm
+    version: 0
+  Context::Set::Storage::BlackHole:
+    file: lib/Context/Set/Storage/BlackHole.pm
+    version: 0
+  Context::Set::Storage::DBIC:
+    file: lib/Context/Set/Storage/DBIC.pm
+    version: 0
+  Context::Set::Storage::Split:
+    file: lib/Context/Set/Storage/Split.pm
+    version: 0
+  Context::Set::Storage::Split::Rule:
+    file: lib/Context/Set/Storage/Split/Rule.pm
+    version: 0
+  Context::Set::Union:
+    file: lib/Context/Set/Union.pm
+    version: 0
+requires:
+  Log::Log4perl: 1.29
+  Moose: 2.0401
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

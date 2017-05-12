@@ -1,0 +1,12 @@
+This archive contains the distribution Captcha-AreYouAHuman,
+version 0.00003:
+
+  Integrate the AreYouAHuman.com CAPTCHA-alternative human verification 
+  into your Perl application
+
+This software is copyright (c) 2011 by AreYouAHuman.com LLC
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Perl 5 Package modeled on Captcha-Peoplesign; thank you for a great example.

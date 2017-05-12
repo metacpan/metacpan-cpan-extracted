@@ -1,0 +1,27 @@
+---
+abstract: 'Class::DBI Authentication Driver'
+author:
+  - 'Shawn Sorichetti <ssoriche@coloredblocks.net>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Application-Plugin-Authentication-Driver-CDBI
+provides:
+  CGI::Application::Plugin::Authentication::Driver::CDBI:
+    file: lib/CGI/Application/Plugin/Authentication/Driver/CDBI.pm
+    version: 0.03
+requires:
+  CGI::Application::Plugin::Authentication: 0.06
+  CGI::Application::Plugin::Session: 0
+  Class::DBI: 0
+  DBD::SQLite: 0
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

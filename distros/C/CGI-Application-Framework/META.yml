@@ -1,0 +1,50 @@
+---
+name: CGI-Application-Framework
+version: 0.26
+author:
+  - Richard Dice <rdice@pobox.com>
+abstract: Fully-featured MVC web application platform
+license: perl
+requires:
+  Apache::Session: 0
+  Apache::SessionX: 0
+  CGI: 0
+  CGI::Application: 4
+  CGI::Application::Plugin::AnyTemplate: 0.11
+  CGI::Application::Plugin::Config::Context: 0
+  CGI::Application::Plugin::LogDispatch: 0
+  CGI::Application::Plugin::ValidateRM: 0
+  CGI::Carp: 0
+  CGI::Enurl: 0
+  Class::DBI: 0
+  Class::DBI::AbstractSearch: 0
+  Class::DBI::Loader: 0.22
+  Class::DBI::SQLite: 0
+  Config::General: 2.28
+  DBD::SQLite: 1.09
+  DBI: 0
+  DB_File: 0
+  Data::Dumper: 0
+  Date::Manip: 0
+  Digest::MD5: 0
+  HTML::Template: 0
+  IPC::Shareable: 0
+  Log::Dispatch: 0
+  Log::Dispatch::Config: 0
+  Module::Build: 0.2602
+  Module::Load: 0
+  Regexp::Common: 0
+  Test::More: 0
+  Text::CSV_XS: 0
+  Time::Format: 0
+  Time::HiRes: 0
+  URI: 0
+provides:
+  CGI::Application::Framework:
+    file: lib/CGI/Application/Framework.pm
+    version: 0.26
+  CGI::Application::Framework::CDBI:
+    file: lib/CGI/Application/Framework/CDBI.pm
+  CGI::Application::Framework::Constants:
+    file: lib/CGI/Application/Framework/Constants.pm
+generated_by: Module::Build version 0.2602

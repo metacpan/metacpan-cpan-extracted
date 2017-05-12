@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/CGI/Application/Plugin/Apache.pm
+lib/CGI/Application/Plugin/Apache/Request.pm
+lib/CGI/Application/Plugin/Apache2/Request.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-cgi.t
+t/02-cgi_compat.t
+t/03-mod_perl.t
+t/conf/extra.conf.in
+t/lib/ApachePlugin/CGI.pm
+t/lib/ApachePlugin/CGI_compat.pm
+t/lib/ApachePlugin/MP.pm
+META.json

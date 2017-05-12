@@ -1,0 +1,31 @@
+
+CodeManager.pm
+
+1. added package "package Prima::CodeManager::CodeManager"
+with version number for better versions managing.
+
+Now is possible:
+
+use package Prima::CodeManager::CodeManager 0.19
+
+The problem rised because I wanted to put all the modules inside the directory
+.../Prima/CodeManager, even the package Prima::CodeManager.
+
+2. Now on $project_color variable is randomly generated from the array @warpColors
+
+3. menuBackColor is synchronized with project_color.
+
+4. changed the order in menu: the Project.
+
+5. added colors (synchronized with the project one) to frames and some other minor
+
+changes in a look.
+
+6. Added to popup show window the option (Full) Delete and the old one changed into Backup.
+Added modal feature to this popup. Also added Copy feature.
+
+File.pm
+7. Some order changes.
+
+Notebooks.pm
+8. changed the width of edit area and file formating changes.

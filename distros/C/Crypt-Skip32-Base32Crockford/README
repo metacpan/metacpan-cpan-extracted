@@ -1,0 +1,38 @@
+NAME
+    Crypt::Skip32::Base32Crockford - Create url-safe encodings of 32-bit
+    values
+
+SYNOPSIS
+      use Crypt::Skip32::Base32Crockford;
+      my $key    = pack( 'H20', "112233445566778899AA" ); # Always 10 bytes!
+      my $cipher = Crypt::Skip32::Base32Crockford->new($key);
+      my $b32    = $cipher->encrypt_number_b32_crockford(3493209676); # 1PT4W80
+      my $number = $cipher->decrypt_number_b32_crockford('1PT4W80'); # 3493209676
+
+DESCRIPTION
+    This module melds together Crypt::Skip32 and Encode::Base32::Crockford.
+
+    Crypt::Skip32 is a 80-bit key, 32-bit block cipher based on Skipjack.
+    One example where Crypt::Skip32 has been useful: You have numeric
+    database record ids which increment sequentially. You would like to use
+    them in URLs, but you don't want to make it obvious how many X's you
+    have in the database by putting the ids directly in the URLs.
+
+    Encode::Base32::Crockford creates a 32-symbol notation for expressing
+    numbers in a form that can be conveniently and accurately transmitted
+    between humans and computer systems.
+
+    Putting the two together lets you have numeric database records ids
+    which you can use safely in URLs without letting users see how many
+    records you have or letting them jump forward or backwards between
+    records.
+
+    You should pick a different key to the one in the synopsis. It should be
+    10 bytes.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>.
+
+LICENSE
+    This code is distributed under the same license as Perl.
+

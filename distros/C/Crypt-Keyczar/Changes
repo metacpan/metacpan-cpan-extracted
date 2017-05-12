@@ -1,0 +1,50 @@
+0.09	Sun Apr 30 22:40:17 JST 2017
+	- support openssl 1.1.0, 1.0.2, 1.0.1, 0.9.8.
+
+0.08	Tue Oct  8 15:35:42 JST 2013
+	- remove illegal characters in metadata.
+
+0.07	Thu Oct 27 17:42:21 JST 2011
+	- support perl 5.14.x and later version.
+	- add java compat tests.
+	- fixed Key lifecycle management bug, enable promote INACTIVE to ACTIVE.
+	  https://rt.cpan.org/Public/Bug/Display.html?id=62032
+	  Thanks to Freaking Wildchild http://wildchild.sesamid.com/
+
+0.06	Wed Nov 18 17:47:22 JST 2009
+	- fixed Revoke operation bug.
+	  (There is not the compatibility of the keyset which "revoke" key)
+
+0.05	Tue Nov 17 15:10:09 JST 2009
+	- install 'bin/keyczar' tool. (thanks to Leon Brocard)
+	- independent JSON::XS. (thanks to CPAN testers)
+
+0.04	Thu Nov 12 19:16:26 JST 2009
+	- suppress null signature warnings.
+	- support expiration time.
+
+0.03	Wed Nov 11 17:07:11 JST 2009
+	- support HMAC-SHA224, HMAC-SHA256, HMAC-SHA384, HMAC-SHA512.
+
+0.02	Tue Aug 18 17:04:34 JST 2009
+	- rewrite Crypt::Keyczar::HmacEngine by XS.
+	- rewrite Crypt::Keyczar::Util::random() by XS.
+	- rewrite Crypt::Keyczar::AesEngine by XS.
+	- support RSA private key decrypt.
+	- support RSA public key encrypt.
+	- support RSA private key verify.
+	- support RSA private key sign.
+	- support RSA public key verify.
+	- support export RSA public key.
+	- independent Digest::SHA1
+	- add Crypt::Keyczar::FileWriter.
+	- support DSA public key verify.
+	- support DSA private key sign.
+
+0.01	Wed Jul 22 20:15:10 JST 2009
+	- add "usekey" option.
+	- add Java and Python test code.
+	- support "revoke".
+	- support AES-CBC with HMAC-SHA1 encryption.
+	- support HMAC-SHA1 sing/verify.
+	- fixed create keyset and ad-key operation.

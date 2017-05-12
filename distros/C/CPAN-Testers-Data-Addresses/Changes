@@ -1,0 +1,90 @@
+Revision history for CPAN-Testers-Data-Addresses
+================================================
+
+0.17    2014-09-15
+        - further test fixes for Test::Trap.
+
+0.16    2014-09-14
+        - added Test::Trap to recommended test requisites.
+        - made Test::Trap optional (thanks to XIONG's inspiration).
+
+0.15    2014-09-13
+        - fixed search testing with SQLIte.
+
+0.14    2014-09-13
+        - fixed skip numbers.
+        - added version option.
+        - added help tests.
+
+0.13    2014-09-10
+        - fixed license fields in META.json to be lists.
+        - extended test suite.
+        - added more process tests.
+        - rearranged configuration, to optimise logging.
+        - now checks and stores available drivers to ensure we have the 
+          required backup drivers installed.
+        - reordered option loading.
+
+0.12    2013-08-07
+        - forgot to update the skip value in tests :(
+
+0.11    2013-08-04
+        - added testerid, guid & fulldate to file format, so we can update the
+          ixaddress entries too.
+        - map against tester's display name.
+        - clean functionality added to de-duplicate addresses.
+
+        - script updates:
+        -- bin/addresses.pl - '--update' option requires a file.
+        -- bin/addresses.pl - added '--clean' option.
+        -- examples/addresses-parser.pl - added ability to update db.
+        -- added some example command lines via shell scripts.
+
+0.10    2012-11-25
+        - File::Spec is rarely the right answer. Removed.
+
+0.09    2012-11-18
+        - test plan fixes.
+
+0.08    2012-11-04
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - CHANGES to Changes.
+        - change file dates changed to meet W3CDTF standards.
+        - Artistic License v2 now sole license.
+        - added explicit LICENSE file.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - test suite updates.
+        - added support for writing to named output file.
+        - updated tests to use Test::Database.
+
+0.07    2012-04-08
+        - fixed POD error in supplementary script.
+        - updated SQL to include fulldate.
+
+0.06    2010-08-13
+        - file removal test doesn't work on Windows :(
+
+0.05    2010-08-11
+        - added META.json to the package files.
+        - removed references to NNTPID.
+        - added more domain filters to example settings.ini.
+
+0.04    2009-11-26
+        - added text for README
+        - updated documentation for wrapper script
+        - added and amended various links
+
+0.03    2009-11-24
+        - added example settings file
+        - added backup code
+
+0.02    2009-11-24
+        - added counters to update
+        - removed debugging statements
+        - added further address matching comparisons
+        - added missing prerequisite
+        - abstracted filters out into config file.
+
+0.01    2009-11-22
+        - initial release

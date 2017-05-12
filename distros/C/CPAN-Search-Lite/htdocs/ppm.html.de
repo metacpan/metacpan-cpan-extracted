@@ -1,0 +1,39 @@
+<html><meta http-equiv="content-type" content="text/html; charset=UTF-8"><base href="http://cpan.uwinnipeg.ca/htdocs/faqs/ppm.html">
+<!doctype HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- removed -->
+  <meta http-equiv="Content-Type" content="text/html ; CHARSET=UTF-8"><head>
+  <link rel="stylesheet" href="/htdocs/style.css" type="text/css">
+  <title>Verwenden von von PPMS</title>
+  </head>
+
+  <body>
+<br><div class=t4> PPMS Beh&auml;lter</div>
+Beraten Sie die Unterlagen, die mit 
+<a href="http://www.activestate.com/">ActivePerl 
+<a href="http://www.activestate.com/"></a></a>f&uuml;r</a>
+allgemeine 
+Gebrauchsanweisungen PPMS kommt. Die PPMS Pakete, die hier 
+erscheinen, k&ouml;nnen mit dem PPMS Dienstprogramm angebracht werden. 
+F&uuml;r die ActivePerl Pakete sollten Sie gerade in der LageSEIN, 
+das Paket wie <code>install Package-Name</code> innerhalb vom PPMS Oberteil anzubringen; 
+f&uuml;r die anderen Pakete k&ouml;nnen Sie die angezeigte Position 
+Ihrer Liste der Beh&auml;lter hinzuf&uuml;gen m&uuml;ssen:
+</p>
+<ul>
+<li><b></b><b>http://www.bribes.org/perl/ppm</b>, f&uuml;r den
+<i>www.bribes.org Perl 5.6 and 5.8
+Beh&auml;lter</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?Urne:/PPMServer</b>, f&uuml;r den <i>uwinnipeg Perl 5.6 Beh&auml;lter</i></li>
+<li><b>http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58</b> (ActivePerl Builds &lt; 819) /
+<b>http://theoryx5.uwinnipeg.ca/ppms/</b> (ActivePerl Builds &gt;= 819),  
+f&uuml;r den <i>uwinnipeg Perl 5.8 Beh&auml;lter</i></li>
+</ul>
+&Uuml;berpr&uuml;fen Sie, ob Sie einen Beh&auml;lter benutzen,
+der f&uuml;r Ihre Perl Version passend ist (5.6 Beh&auml;lter f&uuml;r ActivePerl 
+errichtet 6xx, und 5.8 Beh&auml;lter f&uuml;r ActivePerl errichtet 8xx). 
+Merken Sie auch, da&szlig; der Name des Pakets, das hier erscheint, 
+basiert auf dem CPAN Verteilung Namen, zu verwenden ist der,, wenn er 
+ein Paket anbringt; dieses h&auml;ufig, aber nicht immer, entspricht
+dem Namen des Hauptmoduls im Paket.
+</p>
+</body></html>

@@ -1,0 +1,125 @@
+Revision history for Perl extension CGI::SecureState.
+
+0.36
+	- Unicode support!
+	- New test for Unicode; requires Perl 5.8.0
+	- Updates to POD about Unicode and threading support.
+	- Minor updates to POD to fix mild inaccuracies.
+
+---Old Releases-----------------------------------------------
+
+0.35  Wednesday, January 1, 2003
+	- README update to explain Perl 5.005_03 compatibility.
+	- POD update to explain "recent memory" and to note that
+	  the Anthill Bug Manager is now the official large example
+	  of how to use CGI::SecureState.
+	- Fixed some minor security concerns.  These were:
+	  a) not including the remote IP address in the encryption
+	  key, and b) only having around 80 bits of randomness in ID
+	  generation instead of over 160.
+	- Since fixing the security concerns changed the encryption
+	  key, the binary format has changed Yet Again.  However, it
+	  is now more compact and fixes problems with corner cases.
+	- Added the clean_statedir() function to ease the purging
+	  of old state files from directories.
+	- Added some internal convenience functions (args_to_hash(),
+	  stringify_recent_memory(), recover_recent_memory(),
+	  generate_random_id()).
+	- Added the memory_as() function to add recent memory to the
+	  state_* functions.
+	- Added user_param(), user_params(), and user_delete() for
+	  interaction with "recent memory".
+	- Added tests for "recent memory".
+	- Addition of the "recent memory" concept that lets user-
+	  specified parameters take precedence over parameters in
+	  the state file.
+	- Fixes for Perl 5.005_03.
+	- Made new() check for ID tag in url_param (suggestion from
+	  Hise Chapman (hise at nc.rr.com).
+
+
+0.30  Sunday, June 23, 2002
+	- Updated the README to reflect changes.
+	- Updated the Makefile to spit out nasty warnings if
+	  the user was upgrading from a version below 0.29.
+	- Updated the Makefile to require Fcntl and File::Spec.
+	- Rewrote the POD to reflect changes.
+	- Changed test script to use Test::Harness properly.
+	- Split test script into pieces with distinct functionalities.
+	- Changed the Long-Filenames.t script to use File::Spec to
+	  check for a distinction between upper and lowercase filenames.
+	- Added lots of portability changes, so CGI::SecureState
+	  should work on just about any system now.
+	- Added extra_ and paranoid_ security options.
+	- Added Symlink Detection support.
+	- Added flock support.
+	- Changed new() to make a mindset specification mandatory.
+	- Changed new() to accept the hash-style argument listing.
+	- Added mindsets.
+	- Changed errormsg() to be able to deal with more errors.
+	- Changed errormsg() to allow for a user error message
+          subroutine.
+	- Added remember() to save current parameters.
+	- Added params() to return more than one CGI parameter at a time
+	- Added state_param() to return a name-value pair so other
+          scripts can use the same session.
+	- Allowed add() to add more than one parameter at a time.
+	- Changed encipher() to be able to update the timestamp
+	  on the state file if not given anything to encrypt.
+	- Changed functionality of encipher() and decipher() to only
+	  do encryption and decryption, and added save_memory() and
+	  recover_memory() functions to actually interact with the
+	  list of parameters in the CGI object.
+	- Rewrite of encipher() and decipher() to use reverse-CBC
+	  encryption instead of ECB encryption.
+
+
+0.26  Tuesday, May 29, 2001
+	- Quick and dirty bugfix ($test variable not declared)
+
+0.25  Monday, May 28, 2001
+	- Changed e-mail address
+	- Fixed Makefile problems
+	- Added note about future versions of CGI::SecureState
+
+0.24  Monday, March 26, 2001
+	- Quick and dirty bugfix ($test variable not declared)
+
+0.23  Thursday, March 22, 2001
+	- Added Dave Stafford's binmode fix.  Hopefully, the code will
+	  now work on Win32.
+	- changed delete() to accept multiple arguments
+	- fixed namespace intrusion
+	  (CGI::SecureState::Devel::counter->CGI::SecureState::counter)
+	- updated POD to reflect changes and fix misleading
+	  CGI::SecureState::errormsg section
+	- changed encipher() and decipher() to allow for single parameters
+	  having more than one value
+	- changed encipher() and decipher() to escape fewer characters,
+	  resulting in smaller state files.
+	- changed POD to reflect that I have tested the encryption and
+	  decryption and am satisfied that it works.
+
+
+0.22  Thursday, January 18, 2001
+	- fixed test.pl spelling error (should be installed)->(should
+	  not be installed) and changed it to test the new
+	  capabilities of the encipher and decipher functions.
+	- fixed POD to not include the blurb about rand() and time()
+	  and also add a blurb about age and the update to encipher
+          and decipher.
+	- added age() method to return the time in days since the last
+	  access of the state file
+	- fixed encipher and decipher so that they now support binary
+	  keys and values.
+	- Changed README and POD to reflect that CGI::SecureState now
+	  works with CGI.pm v2.74.
+	- Changed test.pl to detect systems without case sensitivity.
+
+0.21  Wednesday, January 10, 2001
+	- fixed test.pl to work with newer versions of CGI.pm.
+          New versions (i.e. 2.74) of CGI.pm don't assume command line
+	  parameter entry.
+
+0.20  Monday, January 2, 2001
+	- first public release.

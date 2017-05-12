@@ -1,0 +1,53 @@
+Revision history for Const-Fast
+
+0.014     2013-05-28 02:32:48 Europe/Amsterdam
+          Pass coderefs and globrefs unchanged
+          Conversion from Test::Exception to Test::Fatal (Karen Etheridge)
+          Convert to Module::Build::Tiny
+
+0.013     2012-09-07 23:50:25 Europe/Amsterdam
+          Lazy load Storable, it's usually not necessary
+
+0.012     2012-08-09 13:51:29 Europe/Bucharest
+          Depend on Test::Exception 0.29
+          Switch to Sub::Exporter::Progressive, for a faster startup
+
+0.011     2012-02-24 22:48:26 Europe/Amsterdam
+          Accept references to references as subject
+          Really fix compatibility with Carp 1.25
+
+0.010     2012-02-04 12:54:09 Europe/Amsterdam
+          Fix compatibility with dotted Carp (1.25?)
+
+0.009     2011-11-27 19:47:19 Europe/Amsterdam
+          Make sure the first argument comes in as a reference
+
+0.008     2011-08-22 13:14:05 Europe/Amsterdam
+          Recurse into scalar references too
+
+0.007     2011-02-16 22:58:27 Europe/Amsterdam
+          Deep clone earlier and using Storable::dclone
+
+0.006    2010-10-02
+         Don't make objects readonly. This also fixes RT#61726
+
+0.005    2010-09-03
+         Various documentation fixes by chromatic
+         Require 5.008 in Build.PL
+
+0.004    2010-09-01
+         Handle recursive datastructures
+         Fixed test on Windows
+         Made other tests more strict
+
+0.003    2010-08-27
+         Renamed from Const to Const::Fast
+         Added documentation
+         Added better diagnostics for hash assignment
+
+0.002    2010-07-09
+         Fixed dependencies
+
+0.001    2010-07-07
+         First version, released on an unsuspecting world.
+

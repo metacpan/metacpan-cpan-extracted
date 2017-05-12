@@ -1,0 +1,9 @@
+Revision history for Perl extension CGI::FormBuilder::Template::HTC
+
+0.02 Thu Nov 23 19:57:45 CET 2006
+- Fixed some typos
+- Fixed preqequisites
+
+0.01 Wed Nov 22 20:53:39 CET 2006
+	- original version
+

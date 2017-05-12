@@ -1,0 +1,23 @@
+Revision history for Perl extension Color::Similarity::HCL.
+
+0.05  Sun Apr 18 16:23:51 CEST 2010
+	- Fixed some rounding errors in the distance_hcl function.
+
+0.04  Wed Oct 17 23:07:49 CEST 2007
+	- Compatibility with old Math::Trig
+	  (reported by David Cantrell).
+
+0.03  Sun Oct 14 19:00:58 CEST 2007
+	- Corrected the RGB -> HCL transformation as per the research
+	  report of the same authors (thanks to David Hoerl)
+	  and added a link to the report.
+	- Replace the incorrect use of atan2() with atan()
+	  (the codomain is different).
+	- Changed rgb2hcl() interface.
+
+0.02  Mon Mar 12 19:37:15 CET 2007
+	- Compatibility fixes for Perl 5.6.x.
+
+0.01  Sun Mar 11 12:34:47 CET 2007
+	- First public release.
+

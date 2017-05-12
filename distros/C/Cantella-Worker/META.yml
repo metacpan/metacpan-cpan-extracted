@@ -1,0 +1,37 @@
+---
+abstract: 'Worker/Manager worker pool system'
+author:
+  - 'Guillermo Roditi (groditi) <groditi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Log::Dispatch::Array: 0
+  Test::Exception: 0
+  Test::More: 0
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Cantella-Worker
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::GUID: 0.044
+  Log::Dispatch: 2.26
+  Moose: 0.94
+  MooseX::Types: 0.15
+  MooseX::Types::Common: 0.001002
+  MooseX::Types::Log::Dispatch: 0.002000
+  POE: 1.000
+  POE::Wheel::Run: 1.000
+resources:
+  IRC: irc://irc.perl.org/#poe
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/groditi/Cantella-Worker.git
+version: 0.002003

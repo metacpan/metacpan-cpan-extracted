@@ -1,0 +1,13 @@
+LICENSE
+README
+Changes
+lib/Check/ISA.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/00-load.t
+t/01_basic.t
+t/02_moose.t
+t/03_asa.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

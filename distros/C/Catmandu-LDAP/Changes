@@ -1,0 +1,17 @@
+Revision history for Catmandu-LDAP
+
+0.0104  2017-02-23 09:50:43 CET
+  - Moving to Dist::Milla
+  - Adding POD
+  
+0.0103  2013-03-26
+  - import confess
+
+0.0102  2012-08-21
+  - bugfix: ldap search attrs should be arrayref
+
+0.0101  2012-05-09
+  - assume all attributes not matching /;binary/ are utf8 text
+
+0.01    2012-05-09
+  - initial release

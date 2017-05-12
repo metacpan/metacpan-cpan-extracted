@@ -1,0 +1,204 @@
+<html>
+<style>
+.error {
+  color: red;
+  font-size: 75%;
+}
+</style>
+
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+if (location.search) {
+  document.writeln('<span style="color:green"><h1>Form Information submitted</h1></span>');
+}
+if (! document.validate) {
+  document.writeln('<span style="color:red"><h1>Missing document.validate</h1>Path to ../lib/CGI/Ex/validate.js may be invalid.</span>');
+} else {
+  document.writeln('<span style="color:green"><h1>Found document.validate</h1></span>');
+}
+
+</script>
+
+
+<form name=a>
+<table>
+<tr>
+  <td valign=top>Username:</td>
+  <td>
+    <table border=0 cellspacing=0 cellpadding=0><tr><td><input type=text size=20 name=username></td><td> Try hitting enter rather than tab.</td></tr></table>
+    <span id=username_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Password:</td>
+  <td>
+    <input type=password size=20 name=password><br>
+    <span id=password_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Password:</td>
+  <td>
+    <input type=password size=20 name=verify_password><br>
+    <span id=verify_password_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Email:</td>
+  <td>
+    <input type=text size=40 name=email><br>
+    <span id=email_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Verify Email:</td>
+  <td>
+    <input type=text size=40 name=email2><br>
+    <span id=email2_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>State/Region:</td>
+  <td>
+    Specify State <input type=text size=2 name=state><br>
+    OR Region <input type=text size=20 name=region>
+    <span id=state_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Enum Check:</td>
+  <td>
+    <input type=text size=10 name=enum><br>
+    <span id=enum_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Compare Check:</td>
+  <td>
+    <input type=text size=10 name=compare><br>
+    <span id=compare_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Check one:</td>
+  <td>
+    <input type=checkbox name=checkone value=1> Foo<br>
+    <input type=checkbox name=checkone value=2> Bar<br>
+    <input type=checkbox name=checkone value=3> Baz<br>
+    <span id=checkone_error class=error></span>
+  </td>
+</tr>
+<tr>
+  <td valign=top>Check two:</td>
+  <td>
+    <input type=checkbox name=checktwo value=1> Foo<br>
+    <input type=checkbox name=checktwo value=2> Bar<br>
+    <input type=checkbox name=checktwo value=3> Baz<br>
+    <span id=checktwo_error class=error></span>
+  </td>
+</tr>
+<tr><td colspan=2><hr></td></tr>
+<tr>
+  <td valign=top>Fill In two:</td>
+  <td>
+    <span id=foo_error class=error></span><br>
+    <input type=text name=foo value="" size=30> Foo<br>
+    <input type=text name=bar value="" size=30> Bar<br>
+    <input type=text name=baz value="" size=30> Baz<br>
+  </td>
+</tr>
+<tr>
+  <td colspan=2 align=right>
+    <input type=submit value=Submit>
+  </td>
+</tr>
+</table>
+</form>
+
+<script src="../lib/CGI/Ex/yaml_load.js"></script>
+<script src="../lib/CGI/Ex/validate.js"></script>
+<script>
+document.validation = {
+  "group no_confirm": 1,
+  "group no_alert": 1,
+  "group order": ["username", "password", "verify_password", "email", "email2", "state", "region", "s_r_combo", "enum", "compare", "checkone", "checktwo", "foo"],
+  username: {
+    required: 1,
+    min_len: 3,
+    max_len: 30
+  },
+  password: {
+    required: 1,
+    min_len: 6,
+    max_len: 30,
+    match: ["m/\\d/", "m/[a-z]/"],
+    match_error: "$name must contain both a letter and a number."
+  },
+  verify_password: {
+    equals: "password",
+    equals_name: "password"
+  },
+  email: {
+    name: "Email",
+    required: 1,
+    max_len: 100,
+    type: 'email',
+    type_error: "$name must be a valid email address."
+  },
+  email2: {
+    name: "Verify email",
+    equals: "email",
+    equals_name: "email"
+  },
+  state: {
+    validate_if: ["state", "! region"],
+    match: "m/^\\w{2}$/",
+    match_error: "Please type a two letter state code."
+  },
+  region: {
+    validate_if: ["region", "! state"],
+    delegate_error: "state",
+    compare: "eq Manitoba",
+    compare_error: "For this test - the region should be Manitoba."
+  },
+  s_r_combo: {
+    field: "state",
+    delegate_error:   "state",
+    max_in_set:       "1 of state region",
+    max_in_set_error: "Specify only one of state and region.",
+    min_in_set:       "1 of state region",
+    min_in_set_error: "Specify one of state and region."
+  },
+  'enum': {
+    name: "Enum check",
+    'enum': ["one", "two", "three", "four"],
+    enum_error: "$name must be one of one, two, three, or four."
+  },
+  compare: {
+    required: 1,
+    required_error: "Please type a number",
+    replace: "s/\\D//g",
+    name: "Compare check",
+    compare: ['> 99', '< 1000'],
+    compare_error: '$name must be greater than 99 and less than 1000.'
+  },
+  checkone: {
+    name: "Check one",
+    required: 1,
+    max_values: 1
+  },
+  checktwo: {
+    name: "Check two",
+    min_values: 2,
+    max_values: 2
+  },
+  foo: {
+    min_in_set: "2 of foo bar baz",
+    max_in_set: "2 of foo bar baz"
+  }
+};
+if (document.check_form) document.check_form('a');
+</script>
+
+</html>
+<script>window.onload = function () { document.a.username.focus() }</script>

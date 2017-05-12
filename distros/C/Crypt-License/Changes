@@ -1,0 +1,89 @@
+Revision history for Perl extension Crypt-License
+
+2.04  Mon Sep 11 14:50:25 PDT 2006
+	Correct t/date2time.t so that it 
+	runs test right in all time zones
+
+2.03  Tue Dec 31 18:08:02 PST 2002
+	WARNING: this may break some existing License certificates
+	and require re-authorization / replacement of the keys.
+	Replace use of "hostname --long"
+	with &Sys::Hostname::hostname for compatibility
+	with most systems. Sys::Hostname::hostname generally
+	returns the short version of the hostname, not the long.
+
+	Update POD to provide additional information about use
+	of Crypt::License::Util to insert pointers in standard
+	modules used with Apache.
+
+2.02  Thu Dec 19 17:42:45 PST 2002
+	Correct typo in mod_parser.pl
+
+2.01  Mon Nov 25 08:21:26 PST 2002
+	Repair type in Makefile.PL
+
+2.00  Sun Sep 22 16:15:16 PDT 2002
+	changed group name to Crypt
+
+1.12  Tue Jan  1 17:03:40 PST 2002
+	update tests so next_sec uses select 0.1
+
+1.11  Sat Jan 27 12:27:11 PST 2001
+	update test suite to run 
+	when C_LockTite is missing
+
+1.10  Sat Jan 27 11:43:24 PST 2001
+	correct docs for Makefile.PL
+	modifications to use crypt, cryptdist
+
+1.09  Wed Jan 24 21:00:08 PST 2001
+	Update docs to reflect addition of
+	'cryptdist' to target Makefile.PL
+	Fix match string in get_vals.t
+	Remove exit (debug oops) from makeCrypt.pl
+
+1.08  Tue Jan 23 16:52:14 PST 2001
+	update Util 1.01
+
+1.07  Sun Jan 21 18:20:15 PST 2001
+	autoexport pointer 2 next License for autoload slices
+
+1.06  Fri Jan 19 14:46:45 PST 2001
+	modify decode routine to work with input 
+	shorter than search header -- potential bug
+
+1.05  Thu Jan 18 10:29:15 PST 2001
+	mostly a bug fix to facilitate AutoLoader
+	operation of nested AutoSplit module pieces
+
+1.04  Wed Jan 17 17:34:03 PST 2001
+	change to use updated CapnMidnite. Key setup
+	done by the import method, decode by 'sub'
+
+1.03  Tue Jan 16 10:27:17 PST 2001
+	add BZS::License::Notice to release
+
+1.02  Sun Jan 14 12:43:01 PST 2001
+	changed pwd to point to root/initial caller path and 
+	incorporated code to make this path always absolute.
+	changed bzs_License pointer name to ptr2_License
+
+1.01  Thu Jan 11 16:04:56 PST 2001
+	updated to use Filter::Util::Call
+
+0.04  Wed Jan 10 17:04:21 PST 2001
+	remove BEGIN{}, change documentation and tests to reflect
+	the need to 'require' modules that will be loaded so
+	that they can access the license pointer
+
+0.03  Tue Jan  9 20:20:52 PST 2001
+	NON - COMPATIBLE CHANGE
+	convert bzs_License pointer from array to hash
+
+0.02  Wed Dec 27 18:47:04 PST 2000
+	change the HOME pattern to do a match which contains
+	instead of a match starting with
+
+0.01  Tue Dec 26 21:52:06 PST 2000
+	- original version; created by h2xs 1.20 with options
+		-cn 

@@ -1,0 +1,92 @@
+NAME
+    Config::NameValue - Round trip simple name/value config file handling.
+
+VERSION
+      This document describes v1.03 of Config::NameValue - released February 09, 2012 as part of Config-NameValue.
+
+SYNOPSIS
+      use Config::NameValue;
+      my $c = Config::NameValue->new( 'config.file' );
+
+DESCRIPTION
+    Load simple name=value pair configuration files and save them.
+
+    Blank lines and comments are ignored.
+
+      # Begin config file
+
+      # Everything up to here will be ignored but continued in saved file.
+
+      name1=value1
+      name2=value2 # everything after the octothorpe will be ignored but be saved in the file when changes are made
+
+METHODS
+  new
+    Returns a Config::NameValue object. Can optionally be passed a filename,
+    which will be loaded via the "load" command.
+
+  load
+    Loads and parses the specified configuration file.
+
+    Leading and trailing whitespace are stripped.
+
+      name1=value1
+        name1=value1   # are equivalent
+
+  save
+    Saves the configuration, with any changes, to a file.
+
+    If no filename is passed the original file is overwritten, otherwise a
+    new file will be created.
+
+    As a special case, if the original filename is explicitly passed to save
+    and there have been no changes an exception will be thrown.
+
+  get
+    Returns the value for the requested name, undef for nonexistant or empty
+    names.
+
+  set
+    Modifies the requested name with the supplied value.
+
+    If the name does not exist it will be created and saved with a comment
+    indicating that it was added by this program
+
+  error
+    Returns the most recent error
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Alan Young <harleypig@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

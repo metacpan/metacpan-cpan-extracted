@@ -1,0 +1,33 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Entry Widget.
+
+#
+# Load in the Cdk Extension.
+#
+use Cdk;
+Cdk::init();
+
+# Create a new entry object.
+my $entry = new Cdk::Entry ('Label' => "Type Anything: ",
+				'Width' => 20,
+				'Min' => 0,
+				'Max' => 256);
+
+# Activate the object.
+my $info = $entry->activate();
+
+# Check the results.
+if (!defined $info)
+{
+   popupLabel (["<C>You hit escape, nothing returned."]);
+}
+else
+{
+   popupLabel (["<C>You typed in ($info)"]);
+}
+
+# Exit Cdk.
+Cdk::end();

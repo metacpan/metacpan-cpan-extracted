@@ -1,0 +1,89 @@
+NAME
+    Catalyst::Model::SVN - Catalyst Model to browse Subversion repositories
+
+SYNOPSIS
+        # Model
+        __PACKAGE__->config(
+            repository => '/path/to/svn/root/or/path'
+        );
+
+        # Controller
+        sub default : Private {
+            my ($self, $c) = @_;
+            my $path = join('/', $c->req->args);
+            my $revision = $c->req->param('revision') || 'HEAD';
+
+            $c->stash->{'repository_revision'} = MyApp::M::SVN->revision;
+            $c->stash->{'items'} = MyApp::M::SVN->ls($path, $revision);
+
+            $c->stash->{'template'} = 'blog.tt';
+        };
+
+DESCRIPTION
+    This model class uses the perl-subversion bindings to access a
+    Subversion repository and list items and view their contents. It is
+    currently only a read-only client but may expand to be a fill fledged
+    client at a later time.
+
+CONFIG
+    The following configuration options are available:
+
+  repository
+    Returns a URI object of the full path to the root of, or any directory
+    in your Subversion repository. This can be one of http://, svn://, or
+    file:/// schemes.
+
+    This value comes from the config key 'repository'.
+
+  revision
+    This is the default revision to use when no revision is specified. By
+    default, this will be "HEAD".
+
+METHODS
+  cat($path [, $revision])
+    Returns the contents of the path specified. If "path" is a copy, the
+    logs are transversed to find original. The request is then reissued for
+    the original path for the "revision" specified.
+
+  ls($path [, $revision])
+    Returns a array of Catalyst::Model::SVN::Item objects in list context,
+    each representing an entry in the specified repository path. In scalar
+    context, it returns an array reference. If "path" is a copy, the logs
+    are transversed to find the original. The request is then reissued for
+    the original path for the "revision" specified.
+
+  propget($path, $propname [, $revision])
+    Returns a specific property for a path at a specified revision name.
+
+    Note: This method is inefficient, if you want to extract multiple
+    properties of a single item then use the props_hr method.
+
+  properties_hr($path [, $revision])
+    Returns a reference to a hash with all the properties set on an object
+    at a specific revision.
+
+  repository
+    Returns the repository specified in the configuration "repository"
+    option.
+
+  revision
+    Returns the latest revisions of the repository you are connected to.
+
+SEE ALSO
+    Catalyst::Manual, Catalyst::Helper, Catalyst::Model::SVN::Item, SVN::Ra
+
+AUTHORS
+        Christopher H. Laco
+        CPAN ID: CLACO
+        claco@chrislaco.com
+        http://today.icantfocus.com/blog/
+    
+        Tomas Doran
+        CPAN ID: BOBTFISH
+        bobtfish@bobtfish.net
+   
+LICENSE
+            Copyright (c) 2005-2008 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+ 

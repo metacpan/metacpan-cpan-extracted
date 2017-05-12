@@ -1,0 +1,43 @@
+<%args>
+$form
+</%args>
+
+<head>
+  <title><% $form->{title} %></title>
+  <% $form->{jshead} %>
+</head>
+<body>
+
+  <div id="form">
+  <% $form->{start} %>
+
+% my $fields = $form->{fields} || [];
+% for my $field (@$fields) {
+    <div id="<% $field->{name} %>">
+      <div class="label">
+        <% $field->{required}
+              ? "<span class='required'>$field->{label}</span>"
+              : $field->{label}
+        %>
+      </div>
+      <div class="field">
+        <% $field->{field} %>
+        % if ( $field->{invalid} ) {
+            <span class="error">
+                Missing or invalid entry, please try again.
+            </error>
+        % }
+      </div>
+    </div>
+
+% }
+    <div id="submit"><% $form->{submit} %></div>
+    <div id="reset"><% $form->{reset} %></div>
+    <div id="state">
+      <% # The following two tags include state information %>
+      <% $form->{statetags}  %>
+      <% $form->{keepextras} %>
+    </div>
+  <% $form->{end} %>
+  </div>
+</body>

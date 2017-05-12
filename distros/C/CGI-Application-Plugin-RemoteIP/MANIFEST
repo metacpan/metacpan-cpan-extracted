@@ -1,0 +1,13 @@
+lib/CGI/Application/Plugin/RemoteIP.pm
+ChangeLog
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+META.yml
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/style-no-tabs.t
+t/style-no-trailing-whitespace.t
+t/test-strict.t

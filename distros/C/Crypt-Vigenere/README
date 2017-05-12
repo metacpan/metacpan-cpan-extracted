@@ -1,0 +1,35 @@
+Crypt/Vigenere version 0.6
+==========================
+
+This modules allows you to recreate the workings of the cryptographic
+cipher invented several hundred years ago by a French cryptographer,
+Blaise de Vigenère. 
+
+The Crypt::Vigenere module accepts only alpha characters in the keyword
+and will return an undefined object if any other characters are entered.
+The module also only encrypts/decrypts alpha characters, any other 
+characters will be stripped out of the resulting encrption/decryption.
+
+Please see the example scripts for more information and 
+usage instructions.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires these other modules and libraries:
+ 
+  none
+ 
+COPYRIGHT AND LICENCE
+ 
+Put the correct copyright and licence information here.
+ 
+Copyright (C) 2002 Alistair Mills <cpan@alizta.com>

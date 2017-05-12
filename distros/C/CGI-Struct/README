@@ -1,0 +1,49 @@
+CGI::Struct
+
+This is a module for building structured data from CGI inputs, in a
+manner reminiscent of how PHP does.
+
+See the CGI::Struct POD for details.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+SUPPORTED VERSIONS
+
+CGI::Struct is expected to work on 5.6 and later.
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Struct
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Struct
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/CGI-Struct
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/CGI-Struct
+
+    Search CPAN
+        http://search.cpan.org/dist/CGI-Struct/
+
+
+LICENSE AND COPYRIGHT
+
+This software is licensed under the 2-clause BSD license.  See the
+LICENSE file for details.

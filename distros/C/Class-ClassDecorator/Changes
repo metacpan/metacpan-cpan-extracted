@@ -1,0 +1,9 @@
+0.02  2003-11-01
+
+- Added an alternate implementation that doesn't use NEXT.pm.  NEXT.pm
+uses a depth-first search, which can sometimes cause problems.  The
+alternate implementation uses a different dispatch mechanism.
+
+0.01  2003-10-31
+
+- First release.

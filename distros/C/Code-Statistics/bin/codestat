@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+package codestat;
+{
+  $codestat::VERSION = '1.112980';
+}
+
+# ABSTRACT: gather code statistics on the command line
+
+use Code::Statistics::App;
+
+local @ARGV = qw( commands ) if !@ARGV;    # make sure it prints the global options by default
+
+Code::Statistics::App->run;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+codestat - gather code statistics on the command line
+
+=head1 VERSION
+
+version 1.112980
+
+=head1 DESCRIPTION
+
+See L<Code::Statistics> for use instructions.
+
+=head1 AUTHOR
+
+Christian Walde <mithaldu@yahoo.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2010 by Christian Walde.
+
+This is free software, licensed under:
+
+  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+
+=cut
+

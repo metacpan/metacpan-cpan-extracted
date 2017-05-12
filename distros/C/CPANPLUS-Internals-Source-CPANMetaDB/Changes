@@ -1,0 +1,29 @@
+==============================
+2011-12-15 14:43:19 +0000 0.06
+==============================
+
+  commit 84fe63ab1f07d4ee6fd7187c4d4e77688211ff3f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Dec 15 14:43:19 2011 +0000
+  
+    Update CPANMetaDB URL link 
+
+==============================
+2010-10-04 22:49:43 +0100 0.04
+==============================
+
+  commit 527e7b661fd112f8b68930b9e0fcb17e9501fb05
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Oct 4 22:49:43 2010 +0100
+  
+    POD fixes for HTTP.pm
+
+  commit 8e61108a380ea89dfc27075eec037d2dff3ef7fe
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Oct 4 22:27:11 2010 +0100
+  
+    Convert dist to dzil. 
+
+====================================
+End of changes in the last 1825 days
+====================================

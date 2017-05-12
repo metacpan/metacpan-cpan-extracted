@@ -1,0 +1,140 @@
+NAME
+       Config::Simple::Conf - A fast and lightweight configuration file
+       handler
+
+DESCRIPTION
+       The idea behind Config::Simple::Conf came from various INI style
+       parsers I've used in the past. In general these have worked well with
+       the exception of lack of complex configuration handling.
+
+       Config::Simple for example fails to account for common cases which are
+       extremely useful in any configuration file. These include useful
+       handling of duplicate keys (currently Config::Simple blows them away
+       without any notice), and second, internal macros.
+
+       In many of my usage cases I want something like your standard .INI file
+       format, with the above mentioned exceptions.
+
+	       # Define a configuration section
+	       [core section]
+
+	       # Define an entry in core section
+	       path = /root/to/my/stuff
+
+	       # Define a new configuration file section
+	       [section name]
+
+	       # Define an entry list and use the value from another section to complete
+	       # the configuration
+	       path = [core section: path]/abc
+	       path = [core section: path]/xyz
+
+       Such a configuration would allow me to do two things, establish a core
+       path argument, which is then used in other sections, and have a section
+       with multiple duplicate entires as a list.
+
+       An example of the code here would look something like:
+
+	       #!/usr/bin/perl
+
+	       use strict;
+	       use Config::Simple::Conf;
+
+	       my $conf = Config::Simple::Conf->new('/path/to/my.conf');
+
+	       print "My root is: " . $conf->value('core section', 'path') . "\n";
+	       print "My section paths are:\n";
+
+	       for($conf->value('section name', 'path')){
+		       print "\t$_\n";
+	       }
+
+       With the resulting output looking something like:
+
+	       My root is: /root/to/my/stuff
+	       My section paths are:
+		       /root/to/my/stuff/abc
+		       /root/to/my/stuff/xyz
+
+SYNOPSIS
+       use Config::Simple::Conf;
+
+       my $conf = Config::Simple::Conf->new('/etc/Something/Example.conf');
+
+       print $conf->value('global', 'example_key');
+
+CONFIGURATION FILE FORMAT
+       See examples/ directory for various configuration file examples
+
+METHODS
+   new()
+       Config::Simple::Conf->new(FILE, CFHASH)
+
+       Generate / Regenerate the configuration hash reference based on on
+       standard Ruckus configuration files and options.
+
+	FILE	     -	The configuratino file to process, if
+			undefined @ARGV will be processed for
+			arguments.
+
+	CFHASH	     -	An existing configuraiton hash generated
+			by Config::Simple::Conf  in which data should be appended
+			to.
+
+       Returns a hash reference with two types of values:
+
+       A standard string "abc", and array reference ["a","b","c"].  In cases
+       of unique keys data is stored as a string. In cases were there are
+       multiple duplicate keys data is stored in an array reference.
+
+       Keys may make use of other keys values with in the key value.
+
+	Example:
+	  [example]
+	  # sets [example:abc] to '123'
+	  abc = 123
+
+	  # sets [efg] to '123'
+	  efg = [example:abc]
+
+	  # sets [example:list] to [1, 2, 3]
+	  list = 1
+	  list = 2
+	  list = 3
+
+       When making use of other key's values (as explainded in the example
+       above) the embedded key '[abc]' MUST be unique. Using embedded keys in
+       a listing context is not allowed and will result in an fatal error.
+
+       In some cases configuration files may need to include other
+       configuration files.  The way this is done is via a speical key called
+       'include'. The same file will be automatically execluded if it's
+       detected multiple times.
+
+   value(SECTION, KEY)
+       Retrieve a configuration value or list from SECTION for KEY keyname.
+
+       By rule, entries outside of a section are 'global', entries within the
+       CLI arguments list are in section 'argv'
+
+   islist(SECTION, KEY)
+       Return true if the SECTION's KEY is a list of entries
+
+   sections()
+       Return a list of available sections
+
+   keys(SECTION)
+       Return the keys for a given section
+
+AUTHOR
+       Colin Faber <cfaber@fpsn.net>
+
+LICENSE AND COPYTIGHT
+       Copyright 2016 (C) Colin Faber
+
+       This library is licensed under the Perl Artistic license and may be
+       freely used and distributed under the terms of Perl itself.
+
+
+
+perl v5.18.2			  2016-04-25	       Config::Simple::Conf(3)

@@ -1,0 +1,22 @@
+---
+name: CAD-Drawing-IO-PgDB
+version: 0.03
+author:
+  - 'Eric L. Wilhelm <ewilhelm at cpan dot org>'
+abstract: PostgreSQL save / load methods
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CAD::Drawing: 0.26
+  DBD::Pg: 1.32
+  DBI: 1.4
+  Test::More: 0
+provides:
+  CAD::Drawing::IO::PgDB:
+    file: lib/CAD/Drawing/IO/PgDB.pm
+    version: 0.03
+generated_by: Module::Build version 0.2704
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

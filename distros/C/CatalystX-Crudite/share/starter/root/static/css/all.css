@@ -1,0 +1,30 @@
+body {
+  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+  position: relative;
+}
+
+.jumbotron {
+  position: relative;
+  padding: 40px 0;
+  color: #000;
+  text-align: center;
+}
+
+.jumbotron h1 {
+  font-size: 80px;
+  font-weight: bold;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.jumbotron p {
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.25;
+  margin-bottom: 30px;
+}
+
+/* A table that's only as wide as it needs to be */
+.table-nonfluid {
+    width: auto;
+}

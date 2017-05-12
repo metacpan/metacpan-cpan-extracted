@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+# the classical producer/consumer example.
+# one process produces items, send s a signal.
+# another process waits for that signal and
+# consumed the item.
+
+use Coro;
+use Coro::Signal;
+
+my $produced = new Coro::Signal;
+my $consumed = new Coro::Signal;
+my $finished = new Coro::Signal;
+
+async {
+   for (0..9) {
+      print "produced something\n";
+      $produced->send;
+      $consumed->wait;
+   }
+   print "work done\n";
+   $finished->send;
+};
+
+async {
+   while () {
+      $produced->wait;
+      print "consuming something\n";
+      $consumed->send;
+   }
+};
+
+$finished->wait;
+
+print "job finished\n";
+

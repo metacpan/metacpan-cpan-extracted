@@ -1,0 +1,25 @@
+#!../../../perl -w
+
+#
+# Purpose:
+#	To demonstrate the Perl5 Cdk Marquee Widget.
+
+#
+# Initialize Cdk.
+#
+use Cdk;
+Cdk::init();
+
+# Create the message to scroll.
+my $message = "</5>Hello there</K>!!!<!K> How are you today?<!5> ";
+
+# Create the marquee object.
+my $marquee = new Cdk::Marquee ('Width' => 20);
+
+# Activate the marquee object.
+$marquee->activate ('Message' => $message,
+			'Delay' => 3, 
+			'Repeat' => 3);
+
+# Exit Cdk.
+Cdk::end();

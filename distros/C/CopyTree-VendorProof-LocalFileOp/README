@@ -1,0 +1,62 @@
+CopyTree-VendorProof-LocalFileOp version 0.0013
+===============================
+
+This module provides a new [sic.] contructor and necessary subclass methods for CopyTree::VendorProof in order to deal with local file operations.
+
+The subclass methods provided in this connector objects include:
+	new
+	fdls				
+	is_fd
+	read_info_memory
+	write_from_memory
+	copy_local_files
+	cust_mkdir
+	cust_rmdir
+	cust_rmfile
+
+The functionality of these methods are descripbed in 
+perldoc CopyTree::VendorProof
+
+Under the section "Object specific instance methods for the base class CopyTree::VendorProof"
+
+To create a LocalFileOp connector instance:
+	my $lcfo_inst = CopyTree::VendorProof::LocalFileOp ->new;
+
+To add a source or destination item to a CopyTree::VendorProof instance:
+	my $ctvp_inst = CopyTree::VendorProof ->new;
+	$ctvp_inst ->src ('some_source_path_of_local_file_system', $lcfo_inst);
+	$ctvp_inst ->dst ('some_destination_path_of_local_file_system', $lcfo_inst);
+	$ctvp_inst ->cp;
+
+Therefore, CopyTree::VendorProof::LocalFileOp simply provides an instance and methods for its parent class, which does the heavy lifting portion of cp -rf.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CopyTree::VendorProof => 0.0011, 
+MIME::Base64=>3.01, 
+File::Basename=> 2.72, 
+Data::Dumper=> 2.121, 
+Carp=>1.02
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by dbmolester
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

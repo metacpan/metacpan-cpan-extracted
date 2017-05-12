@@ -1,0 +1,693 @@
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Alib/Alib.dsp,v
+Working file: Alib/Alib.dsp
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	myTag4: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Alib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Alib/Alib.dsw,v
+Working file: Alib/Alib.dsw
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	myTag4: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Alib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Alib/a.c,v
+Working file: Alib/a.c
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	myTag4: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Alib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Alib/Attic/a.h,v
+Working file: Alib/a.h
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Alib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.2
+date: 2000/07/20 10:39:37;  author: sreinst;  state: dead;  lines: +0 -0
+Created a new "common" directory and moved all the .h files to that directory.
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:42;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/App/App.dsp,v
+Working file: App/App.dsp
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	App1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/App/App.dsw,v
+Working file: App/App.dsw
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	App1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/App/app.c,v
+Working file: App/app.c
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	App1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:43;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Blib/Blib.dsp,v
+Working file: Blib/Blib.dsp
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Blib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Blib/Blib.dsw,v
+Working file: Blib/Blib.dsw
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Blib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Blib/b.c,v
+Working file: Blib/b.c
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Blib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Blib/Attic/b.h,v
+Working file: Blib/b.h
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Blib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.2
+date: 2000/07/20 10:39:39;  author: sreinst;  state: dead;  lines: +0 -0
+Created a new "common" directory and moved all the .h files to that directory.
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Clib/Clib.dsp,v
+Working file: Clib/Clib.dsp
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagCLIB5: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	MyNEwtag1: 1.1.1.1
+	mytag4: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag1a: 1.1.1.1
+	mytag1: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Clib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Clib/Clib.dsw,v
+Working file: Clib/Clib.dsw
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagCLIB5: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	MyNEwtag1: 1.1.1.1
+	mytag4: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag1a: 1.1.1.1
+	mytag1: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Clib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Clib/c.c,v
+Working file: Clib/c.c
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	MyTagCLIB5: 1.1.1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1.1.1
+	MyNEwtag1: 1.1.1.1
+	mytag4: 1.1.1.1
+	mytag3a: 1.1.1.1
+	mytag3: 1.1.1.1
+	mytag2a: 1.1.1.1
+	mytag2: 1.1.1.1
+	mytag1a: 1.1.1.1
+	mytag1: 1.1.1.1
+	mytag: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Clib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:44;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/Clib/Attic/c.h,v
+Working file: Clib/c.h
+head: 1.2
+branch:
+locks: strict
+access list:
+symbolic names:
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1.1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_12_47_42_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_11_04_20_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_52_53_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_47_37_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_20_07_2000_Time_10_45_09_IST-2IDT_product_promotion: 1.1.1.1
+	PROD_SampleProd_Date_18_07_2000_Time_10_35_48_IST-2IDT_product_promotion: 1.1.1.1
+	Clib1: 1.1.1.1
+	product: 1.1.1.1
+	myprod: 1.1.1
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.2
+date: 2000/07/20 10:39:40;  author: sreinst;  state: dead;  lines: +0 -0
+Created a new "common" directory and moved all the .h files to that directory.
+----------------------------
+revision 1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2000/07/18 06:40:45;  author: sreinst;  state: Exp;  lines: +0 -0
+Sample product for testing product promotion
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/common/a.h,v
+Working file: common/a.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1
+	MyTagCLIB5: 1.1
+	myTag4: 1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1
+	mytag3a: 1.1
+	mytag3: 1.1
+	mytag2a: 1.1
+	mytag2: 1.1
+	mytag: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1
+	Clib1: 1.1
+	Blib1: 1.1
+	Alib1: 1.1
+	App1: 1.1
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2000/07/20 10:39:48;  author: sreinst;  state: Exp;
+Created a new "common" directory and moved all the .h files to that directory.
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/common/b.h,v
+Working file: common/b.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1
+	MyTagCLIB5: 1.1
+	myTag4: 1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1
+	mytag3a: 1.1
+	mytag3: 1.1
+	mytag2a: 1.1
+	mytag2: 1.1
+	mytag: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1
+	Clib1: 1.1
+	Blib1: 1.1
+	Alib1: 1.1
+	App1: 1.1
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2000/07/20 10:39:48;  author: sreinst;  state: Exp;
+Created a new "common" directory and moved all the .h files to that directory.
+=============================================================================
+
+RCS file: z:\iil\iswp\data\apt\ISIS\repository/sampleprod/common/c.h,v
+Working file: common/c.h
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+	MyTagBlic0: 1.1
+	MyTagCLIB5: 1.1
+	myTag4: 1.1
+	COMP_Try_CVS_Date_03_08_2000_Time_08_39_25_IST-2IDT_Checked_in_from_outside_trycvs_: 1.1
+	mytag3a: 1.1
+	mytag3: 1.1
+	mytag2a: 1.1
+	mytag2: 1.1
+	mytag: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000_a: 1.1
+	My_Manual_Tag_20_43_00_27_07_2000: 1.1
+	PROD_SampleProd_Date_20_07_2000_Time_13_48_09_IST-2IDT_product_promotion: 1.1
+	Clib1: 1.1
+	Blib1: 1.1
+	Alib1: 1.1
+	App1: 1.1
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2000/07/20 10:39:48;  author: sreinst;  state: Exp;
+Created a new "common" directory and moved all the .h files to that directory.
+=============================================================================

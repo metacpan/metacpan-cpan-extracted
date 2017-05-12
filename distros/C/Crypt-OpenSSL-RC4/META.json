@@ -1,0 +1,48 @@
+{
+   "abstract" : "RC4 library based on OpenSSL",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-OpenSSL-RC4",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.99",
+            "Module::Build" : "0.4004"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::OpenSSL::RC4" : {
+         "file" : "lib/Crypt/OpenSSL/RC4.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tokuhirom/Crypt-OpenSSL-RC4"
+      }
+   },
+   "version" : "0.04",
+   "x_test_requires" : {
+      "Test::More" : "0.98"
+   }
+}

@@ -1,0 +1,74 @@
+{
+   "abstract" : "Load configuration from different file formats, transparently",
+   "author" : [
+      "Joel Bernstein <rataxis@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Any",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "develop" : {
+         "requires" : {
+            "Config::General" : "2.47",
+            "Config::Tiny" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "XML::NamespaceSupport" : "0",
+            "XML::Simple" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Pluggable::Object" : "3.6"
+         },
+         "suggests" : {
+            "Config::General" : "2.47",
+            "Config::Tiny" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "XML::NamespaceSupport" : "0",
+            "XML::Simple" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Config-Any@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Any"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Config-Any.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Config-Any.git;a=summary"
+      }
+   },
+   "version" : "0.32",
+   "x_authority" : "cpan:RATAXIS",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

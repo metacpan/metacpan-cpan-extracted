@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 253
+    - 203
+    - 226
+    - 94
+  57671:
+    - 23
+name: fdcb5e
+registers:
+  AF: 28553
+  AF_: 0
+  BC: 61429
+  BC_: 0
+  DE: 39227
+  DE_: 0
+  HL: 8885
+  HL_: 0
+  I: 0
+  IX: 3888
+  IY: 57701
+  PC: 0
+  R: 0
+  SP: 0

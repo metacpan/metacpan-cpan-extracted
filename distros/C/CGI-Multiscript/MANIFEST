@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+License
+t/CGI-Multiscript.t
+t/test_hello.ms
+lib/CGI/Multiscript.pm
+META.yml

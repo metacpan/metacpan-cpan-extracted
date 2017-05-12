@@ -1,0 +1,4 @@
+- bug in CBC mode with multitple blocks
+  maybe its just incompatible to Crypt::Rijndael
+- implementation of a faster version (fast-alg)
+- known answer test (reference test suite)

@@ -1,0 +1,26 @@
+---
+abstract: 'A resource guardian based on CGI::Session'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Session-MembersArea
+provides:
+  CGI::Session::MembersArea:
+    file: lib/CGI/Session/MembersArea.pm
+    version: 2.06
+requires:
+  CGI::Session: 0
+  Carp: 0
+  DBI: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 2.06

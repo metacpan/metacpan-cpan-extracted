@@ -1,0 +1,19 @@
+Crypt-X509 version 0.50
+=======================
+
+Crypt::X509 is an object oriented X.509 certificate parser with numerous
+methods for directly extracting information from certificates.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires:
+
+  Convert::ASN1

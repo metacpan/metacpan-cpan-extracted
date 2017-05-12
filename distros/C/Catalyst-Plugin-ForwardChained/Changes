@@ -1,0 +1,11 @@
+Revision history for Perl extension Catalyst::Plugin::Data.
+
+0.03  2008-06-26
+- mistakenly used custom base class for controller .. should be "Catalyst::Controller"
+
+0.02  2008-06-25
+- same version again, did include "blib" directory by mistake and CPAN doent want -0.01.tar.gz again..
+
+0.01  2008-06-25
+- first version; upload to CPAN 
+

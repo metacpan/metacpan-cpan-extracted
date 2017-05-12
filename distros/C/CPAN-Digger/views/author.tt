@@ -1,0 +1,80 @@
+[%
+   title=  name
+   description= name
+%]
+[% INCLUDE incl/header.tt %]
+
+<div id="path">
+    <a href="/id/[% pauseid %]">[% name %]</a><br />
+</div>
+<div id="email">
+  Email:
+  [% IF link_email %]
+    <a href="mailto:[% email %]">[% email %]</a>
+  [% ELSE %]
+     [% IF email %]
+        [% email %]
+     [% ELSE %]
+        No e-mail available.
+     [% END %]
+  [% END %]
+</div>
+
+<div id="author_json">
+[% IF author_json.file %]
+<a href="http://search.cpan.org/CPAN/authors/id/[% backpan %]/[% author_json.file %]">[% author_json.file %]</a><br>
+[% FOR p IN author_json.data.profile %]
+   [% IF p.name == "github" %]
+      <a href="http://github.com/[% p.id %]">on Github</a><br />
+   [% END %]
+   [% IF p.name == "perlmonks" %]
+      <a href="http://perlmonks.org/?node=[% p.id %]">on PerlMonks</a><br />
+   [% END %]
+[% END %]
+[% ELSE %]
+<a href="/faq/#author_json">author.json file missing</a>
+[% END %]
+
+
+</div>
+
+ [% IF homedir %]
+  <div>
+    <a href="http://backpan.perl.org/authors/id/[% backpan %]">Archive on Backpan</a><br />
+    <a href="http://search.cpan.org/CPAN/authors/id/[% backpan %]">[% pauseid %]</a><br />
+    Homepage: <a href="[% homepage %]">[% homepage %]</a><br />
+    Last upload: [% last_upload %]<br />
+  </div>
+  
+ 
+  <div id="cpan_testers">
+  CPAN Testers: 
+  [ <a href="http://www.cpantesters.org/author/[% pauseid %].html">Module test results</a> ]
+  [ <a href="http://matrix.cpantesters.org/?author=[% pauseid %]">CPAN Testers Author Matrix</a> ]
+  </div>
+  
+  <div id="distributions">
+  Releases
+  <table>
+    <tr>
+        <td>Distribution</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>Released</td>
+    </tr>
+  [% FOR d IN distributions %]
+    <tr>
+        <td><a href="/dist/[% d.name %]">[% d.name %]</a></td>
+        <td>[% d.version %]</td>
+        <td>[<a href="http://search.cpan.org/CPAN/authors/id/[% backpan %]/[% d.filename %]">Download</a>]</td>
+        <td>[<a href="http://search.cpan.org/src/[% pauseid %]/[% d.distrover %]">Browse</a>]</td>
+        <td>[% d.release %]</td>
+    </tr>
+  [% END %]
+  </table>
+  </div>
+
+
+[% END %]
+[% INCLUDE incl/footer.tt %]

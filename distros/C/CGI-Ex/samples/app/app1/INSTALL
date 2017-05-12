@@ -1,0 +1,7 @@
+To install and play with this sample, simply recursively copy or
+symlink the app1 directory into a cgi-bin or mod_perl registry script
+directory.  (If a symlink is made - be sure to set FollowSymlinks in
+your apache conf).
+
+Once the scripts are in the proper directory - make sure the permissions
+are set on app1.pl.  Then navigate to app1.pl through a web browser.

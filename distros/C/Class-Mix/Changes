@@ -1,0 +1,59 @@
+version 0.005; 2011-10-28
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.004; 2010-09-01
+
+  * mro option for mix_class(), to control the method resolution order
+    of the mixture class
+
+  * prefix option for mix_class(), to control where the mixture class
+    is located
+
+  * document that PREFIX missing from genpkg() means "don't care",
+    and change the actual default from "" to "Class::Mix::"
+
+  * check for required Perl version at runtime
+
+  * remove extra block around each sub definition, for readability
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.003; 2009-05-19
+
+  * bugfix: avoid unreliable "\w" in parsing PREFIX parameter for genpkg()
+
+  * use simpler "parent" pragma in place of "base"
+
+version 0.002; 2009-03-22
+
+  * use "base" pragma to import Exporter behaviour
+
+  * test POD syntax and coverage, and make a small style change in
+    documentation to satisfy the coverage test
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2006-08-12
+
+  * PREFIX parameter for genpkg() to allow it to root packages anywhere
+
+version 0.000; 2004-06-27
+
+  * initial released version

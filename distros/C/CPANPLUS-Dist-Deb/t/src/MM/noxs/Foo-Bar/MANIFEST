@@ -1,0 +1,8 @@
+CHANGES
+README
+Makefile.PL
+MANIFEST
+test.pl
+lib/Foo/Bar.pm
+bin/foobar.pl
+META.yml                                 Module meta-data (added by MakeMaker)

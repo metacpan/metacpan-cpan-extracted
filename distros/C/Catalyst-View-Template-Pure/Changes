@@ -1,0 +1,64 @@
+The following logs changes for the CPAN distribution Catalyst::View::Template::Pure
+
+0.016   22 December 2016
+        - A few optimizations
+
+0.016   22 December 2016
+        - Increase dependency versions to close known bugs
+
+0.015   21 December 2016
+        - Helpers shouldn't override selection scope
+
+0.014   21 December 2016
+        - Apply and Wrap helper will unwrap hashref data
+        
+0.013   14 December 2016
+        - URI Helper can now reference it's target action via a path path
+          instead of requiring you to hard code it into the template.
+
+0.012   16 November 2016
+        - More flexible Uri helper (with docs) and a few test cases.
+
+0.011   13 September 2016
+        - Increased version of Template::Pure dependency
+        - Fixed warnings when there is not set status code
+
+0.010   12 September 2016
+        - Changed dependency versions to fix known issues
+
+0.009   06 September 2016
+        - Fixed export bug in last release
+
+0.008   06 September 2016
+        - New directive helpers Wrap and Apply to allow you to delegate some directive
+          processing to another view.  Useful for code organization.
+
+0.007   31 August 2016
+        - Update Helper code
+
+0.006   31 August 2016
+        - Update version of Template::Pure to close known bugs
+        - use weaken in a few places to solve circular references
+        - pass the view object to the pure object so that we can use it in
+          pure callbacks.
+        - Start on new ::Helpers package with first Helper 'Uri' for generating
+          correct URIs.
+
+0.005   28 August 2016
+        - Update version of Template::Pure to close known bugs
+
+0.004   25 August 2016
+        - Update dependencies
+        - POD fixes
+
+0.003   24 August 2016
+        - Fixed bug that cause the view to be regenerated on every call instead
+          of once per context.
+        - Minor performance optimizations
+
+0.002   17 August 2016
+        - Fixed POD
+
+0.001   17 August 2016
+        - First usable version, with caveats (its still early access)
+

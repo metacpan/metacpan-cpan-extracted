@@ -1,0 +1,63 @@
+{
+   "abstract" : "CSS parser, data generator for ac-html-csswatcher.el",
+   "author" : [
+      "Olexandr Sydorchuk"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CSS-Watcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::Selector::Parser" : "0",
+            "Carp" : "0",
+            "File::Slurp" : "0",
+            "File::Which" : "0",
+            "IPC::Run3" : "0",
+            "List::MoreUtils" : "0",
+            "Log::Log4perl" : "0",
+            "PID::File" : "0",
+            "Path::Tiny" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0.38"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/osv/csswatcher.git",
+         "web" : "https://github.com/osv/csswatcher"
+      }
+   },
+   "version" : "v0.5.0",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

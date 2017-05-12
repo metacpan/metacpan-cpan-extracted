@@ -1,0 +1,48 @@
+Convert::Translit
+
+Copyright (c) 1997 Genji Schmeder. All rights reserved. This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+DESCRIPTION
+-----------
+
+This module provides the function "transliterate" for
+transliterating strings between any 8-bit character sets defined in
+RFC 1345 (about 128 character sets).  The RFC document is
+included so you can look up character set names and aliases (and it's
+also read by the module when creating transliteration maps).
+
+The module also contains the function "build_substitutes" which
+recreates a file of approximate substitutions when a character in the
+FROM set isn't defined in the TO set.  For example, "Latin capital A"
+substitutes for "Latin capital A with ogonek" (the "little tail" on
+Polish nazalized A and E).  It takes a long time to rebuild the file,
+but you should never need to.
+
+
+BUILDING THE MODULE
+-------------------
+
+    perl Makefile.PL
+    make
+    make test
+
+INSTALLATION
+------------
+
+    make install
+
+PORTABILITY
+-----------
+
+Developed with MacPerl on Macintosh 68040 OS 7.6.1.
+Tested on Sun Unix 4.1.3.
+
+Enjoy in good health.
+Benutze es heilsam gern!
+Genki dewa, yorokobi nasai.
+Cieszcie sie dobrym zdrowiem.
+Que gozen con salud.
+
+Genji Schmeder <genji@community.net>

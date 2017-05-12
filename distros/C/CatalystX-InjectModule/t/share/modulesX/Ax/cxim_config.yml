@@ -1,0 +1,5 @@
+name: Ax
+version: 1
+deps:
+  - Bx    >=  1
+  - Dx    =   1

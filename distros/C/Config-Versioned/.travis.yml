@@ -1,0 +1,11 @@
+language: perl
+
+#before_install:
+##    - sudo apt-get update -qq
+#    - sudo apt-get install -qq expat libexpat-dev openssl
+
+# Try to get debug from inst stuff
+install:
+    - cpanm --notest Config::Std
+    - cpanm --notest Config::Merge
+    - cpanm --installdeps --notest .

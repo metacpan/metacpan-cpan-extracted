@@ -1,0 +1,14 @@
+Revision history for Perl extension CGI::Prototype::Hidden
+
+0.21	 Thu May 12 07:11:18 EDT 2005
+	 Urgh.  Apparently IO::String breaks on 5.6.x, so falling
+	 back to File::Temp.
+
+0.20	 Wed May 11 19:20:36 EDT 2005
+	 Teach CGI::Prototype::Mecha how to handle every possible request
+	 including file-upload fields!
+
+0.10	 Wed Apr  6 10:47:07 PDT 2005
+	 Split out from CGI::Prototype
+
+

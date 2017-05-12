@@ -1,0 +1,59 @@
+{
+   "abstract" : "RDF view for your data",
+   "author" : [
+      "Thiago Rondon <thiago@aware.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-View-RDF",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::View" : 0,
+            "Moose" : 0,
+            "RDF::Simple::Serialiser" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Catalyst" : 0,
+            "Catalyst::Controller" : 0,
+            "Catalyst::Test" : 0,
+            "Encode" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "HTTP::Request::AsCGI" : 0,
+            "MRO::Compat" : 0,
+            "RDF::Simple::Parser" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/maluco/Catalyst-View-RDF/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/maluco/Catalyst-View-RDF",
+         "web" : "http://github.com/maluco/Catalyst-View-RDF"
+      }
+   },
+   "version" : "0.01"
+}
+

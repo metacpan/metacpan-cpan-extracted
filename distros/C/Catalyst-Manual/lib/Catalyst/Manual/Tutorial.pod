@@ -1,0 +1,735 @@
+=head1 NAME
+
+Catalyst::Manual::Tutorial - Catalyst Tutorial: Overview
+
+=head1 DESCRIPTION
+
+The Catalyst framework is a flexible and comprehensive environment for
+quickly building high-functionality web applications.  This tutorial is
+designed to provide a rapid introduction to its basics and its most
+commonly used features while focusing on real-world best practices.
+
+We suggest that you read this introduction on the web.  Make sure you are
+reading the latest version of the tutorial by visiting
+L<https://metacpan.org/module/Catalyst::Manual::Tutorial>.  Alternatively
+you can use CPAN modules like L<Pod::Webserver>, L<Pod::POM::Web>,
+L<Pod::Browser> (Catalyst based), or L<CPAN::Mini::Webserver> to read a local
+copy of the tutorial.
+
+The tutorial is divided into the following sections:
+
+B<NOTE: CLICK THESE LINKS TO JUMP TO CHAPTERS> (the index links above
+only navigate inside this page).
+
+=over 4
+
+=item 1
+
+L<Introduction|Catalyst::Manual::Tutorial::01_Intro>
+
+=item 2
+
+L<Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
+
+=item 3
+
+L<More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
+
+=item 4
+
+L<Basic CRUD|Catalyst::Manual::Tutorial::04_BasicCRUD>
+
+=item 5
+
+L<Authentication|Catalyst::Manual::Tutorial::05_Authentication>
+
+=item 6
+
+L<Authorization|Catalyst::Manual::Tutorial::06_Authorization>
+
+=item 7
+
+L<Debugging|Catalyst::Manual::Tutorial::07_Debugging>
+
+=item 8
+
+L<Testing|Catalyst::Manual::Tutorial::08_Testing>
+
+=item 9
+
+L<Advanced CRUD|Catalyst::Manual::Tutorial::09_AdvancedCRUD>
+
+=item 10
+
+L<Appendices|Catalyst::Manual::Tutorial::10_Appendices>
+
+=back
+
+Final code tarballs for each chapter of the tutorial are available at 
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/>.
+
+
+=head1 Detailed Table of Contents
+
+
+=head2 L<Chapter 1: Intro|Catalyst::Manual::Tutorial::01_Intro>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+VERSIONS AND CONVENTIONS USED IN THIS TUTORIAL
+
+=item *
+
+CATALYST INSTALLATION
+
+=item *
+
+DATABASES
+
+=item *
+
+WHERE TO GET WORKING CODE
+
+=back
+
+
+=head2 L<Chapter 2: Catalyst Basics|Catalyst::Manual::Tutorial::02_CatalystBasics>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+CREATE A CATALYST PROJECT
+
+=item *
+
+HELLO WORLD
+
+=over 4
+
+=item *
+
+The Simplest Way
+
+=item *
+
+Hello, World! Using a View and a Template
+
+=back
+
+=item *
+
+CREATE A SIMPLE CONTROLLER AND AN ACTION
+
+=back
+
+
+=head2 L<Chapter 3: More Catalyst Basics|Catalyst::Manual::Tutorial::03_MoreCatalystBasics>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+CREATE A NEW APPLICATION
+
+=item *
+
+EDIT THE LIST OF CATALYST PLUGINS
+
+=item *
+
+CREATE A CATALYST CONTROLLER
+
+=item *
+
+CATALYST VIEWS
+
+
+=over 4
+
+=item *
+
+Create a Catalyst View
+
+=item *
+
+Create a TT Template Page
+
+=item *
+
+Test Run The Application
+
+=back
+
+=item *
+
+CREATE A SQLITE DATABASE
+
+=item *
+
+DATABASE ACCESS WITH DBIx::Class
+
+=over 4
+
+=item *
+
+Create a Dynamic DBIC Model
+
+=back
+
+=item *
+
+ENABLE THE MODEL IN THE CONTROLLER
+
+=over 4
+
+=item *
+
+Test Run The Application
+
+=back
+
+=item *
+
+CREATE A WRAPPER FOR THE VIEW
+
+=over 4
+
+=item *
+
+Configure TT.pm For The Wrapper
+
+=item *
+
+Create the Wrapper Template File and Stylesheet
+
+=item *
+
+Test Run The Application
+
+=back
+
+=item *
+
+A STATIC DATABASE MODEL WITH DBIx::Class
+
+=over 4
+
+=item *
+
+Create Static DBIC Schema Files
+
+=item *
+
+Updating the Generated DBIC Schema Files
+
+=item *
+
+Run The Application
+
+=back
+
+=item *
+
+UPDATING THE VIEW
+
+=item *
+
+RUNNING THE APPLICATION FROM THE COMMAND LINE
+
+=item *
+
+OPTIONAL INFORMATION
+
+=over 4
+
+=item *
+
+Using RenderView for the Default View
+
+=item *
+
+Using The Default Template Name
+
+=item *
+
+Return To A Manually-Specified Template
+
+=back
+
+=back
+
+
+=head2 L<Chapter 4: Basic CRUD|Catalyst::Manual::Tutorial::04_BasicCRUD>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+FORMLESS SUBMISSION
+
+=over 4
+
+=item *
+
+Include a Create Action in the Books Controller
+
+=item *
+
+Include a Template for the url_create Action:
+
+=item *
+
+Try the url_create Feature
+
+=back
+
+=item *
+
+CONVERT TO A CHAINED ACTION
+
+=over 4
+
+=item *
+
+Try the Chained Action
+
+=item *
+
+Refactor to Use a "Base" Method to Start the Chains
+
+=back
+
+=item *
+
+MANUALLY BUILDING A CREATE FORM
+
+=over 4
+
+=item *
+
+Add a Method to Display the Form
+
+=item *
+
+Add a Template for the Form
+
+=item *
+
+Add Method to Process Form Values and Update Database
+
+=item *
+
+Test Out the Form
+
+=back
+
+=item *
+
+A SIMPLE DELETE FEATURE
+
+=over 4
+
+=item *
+
+Include a Delete Link in the List
+
+=item *
+
+Add a Common Method to Retrieve a Book for the Chain
+
+=item *
+
+Add a Delete Action to the Controller
+
+=item *
+
+Try the Delete Feature
+
+=item *
+
+Fixing a Dangerous URL
+
+=item *
+
+Try the Delete and Redirect Logic
+
+=item *
+
+Using uri_for to Pass Query Parameters
+
+=item *
+
+Try the Delete and Redirect With Query Param Logic
+
+=back
+
+=item *
+
+EXPLORING THE POWER OF DBIC
+
+=over 4
+
+=item *
+
+Add Datetime Columns to Our Existing Books Table
+
+=item *
+
+Update DBIC to Automatically Handle the Datetime Columns
+
+=item *
+
+Create a ResultSet Class
+
+=item *
+
+Chaining ResultSets
+
+=item *
+
+Adding Methods to Result Classes
+
+=back
+
+=back
+
+
+=head2 L<Chapter 5: Authentication|Catalyst::Manual::Tutorial::05_Authentication>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+BASIC AUTHENTICATION
+
+=over 4
+
+=item *
+
+Add Users and Roles to the Database
+
+=item *
+
+Add User and Role Information to DBIC Schema
+
+=item *
+
+Sanity-Check Reload of Development Server
+
+=item *
+
+Include Authentication and Session Plugins
+
+=item *
+
+Configure Authentication
+
+=item *
+
+Add Login and Logout Controllers
+
+=item *
+
+Add a Login Form TT Template Page
+
+=item *
+
+Add Valid User Check
+
+=item *
+
+Displaying Content Only to Authenticated Users
+
+=item *
+
+Try Out Authentication
+
+=back
+
+=item *
+
+USING PASSWORD HASHES
+
+=over 4
+
+=item *
+
+Get a SHA-1 Hash for the Password
+
+=item *
+
+Switch to SHA-1 Password Hashes in the Database
+
+=item *
+
+Enable SHA-1 Hash Passwords in Catalyst::Plugin::Authentication::Store::DBIC
+
+=item *
+
+Try Out the Hashed Passwords
+
+=back
+
+=item *
+
+USING THE SESSION FOR FLASH
+
+=over 4
+
+=item *
+
+Try Out Flash
+
+=item *
+
+Switch To Flash-To-Stash
+
+=back
+
+=back
+
+
+=head2 L<Chapter 6: Authorization|Catalyst::Manual::Tutorial::06_Authorization>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+BASIC AUTHORIZATION
+
+=over 4
+
+=item *
+
+Update Plugins to Include Support for Authorization
+
+=item *
+
+Add Config Information for Authorization
+
+=item *
+
+Add Role-Specific Logic to the ``Book List'' Template
+
+=item *
+
+Limit Books::add to admin Users
+
+=item *
+
+Try Out Authentication And Authorization
+
+=back
+
+=item *
+
+ENABLE MODEL-BASED AUTHORIZATION
+
+=back
+
+
+=head2 L<Chapter 7: Debugging|Catalyst::Manual::Tutorial::07_Debugging>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+LOG STATEMENTS
+
+=item *
+
+RUNNING CATALYST UNDER THE PERL DEBUGGER
+
+=item *
+
+DEBUGGING MODULES FROM CPAN
+
+=item *
+
+TT DEBUGGING
+
+=back
+
+
+=head2 L<Chapter 8: Testing|Catalyst::Manual::Tutorial::08_Testing>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+RUNNING THE "CANNED" CATALYST TESTS
+
+=item *
+
+RUNNING A SINGLE TEST
+
+=item *
+
+ADDING YOUR OWN TEST SCRIPT
+
+=item *
+
+SUPPORTING BOTH PRODUCTION AND TEST DATABASES
+
+=back
+
+
+=head2 L<Chapter 9: Advanced CRUD|Catalyst::Manual::Tutorial::09_AdvancedCRUD>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+ADVANCED CRUD OPTIONS
+
+=back
+
+
+=head2 L<Chapter 10: Appendices|Catalyst::Manual::Tutorial::10_Appendices>
+
+Note: Click on the heading in the previous line to jump to the actual 
+chapter. Below is a "table of contents" for this chapter.
+
+=over 4
+
+=item *
+
+APPENDIX 1: CUT AND PASTE FOR POD-BASED EXAMPLES
+
+=over 4
+
+=item *
+
+"Un-indenting" with Vi/Vim
+
+=item *
+
+"Un-indenting" with Emacs
+
+=back
+
+=item *
+
+APPENDIX 2: USING MYSQL AND POSTGRESQL
+
+=over 4
+
+=item *
+
+MySQL
+
+=item *
+
+PostgreSQL
+
+=back
+
+=item *
+
+APPENDIX 3: IMPROVED HASHING SCRIPT
+
+=back
+
+
+=head1 THANKS
+
+This tutorial would not have been possible without the input of many 
+different people in the Catalyst community.  In particular, the 
+primary author would like to thank:
+
+=over 4
+
+=item *
+
+Sebastian Riedel for founding the Catalyst project.
+
+=item *
+
+The members of the Catalyst Core Team for their tireless efforts to
+advance the Catalyst project.  Although all of the Core Team members
+have played a key role in this tutorial, it would have never been
+possible without the critical contributions of: Matt Trout, for his
+unfathomable knowledge of all things Perl and Catalyst (and his
+willingness to answer lots of my questions); Jesse Sheidlower, for his
+incredible skill with the written word and dedication to improving the
+Catalyst documentation; and Yuval Kogman, for his work on the Catalyst
+"Auth & Authz" plugins (the original focus of the tutorial) and other
+key Catalyst modules.
+
+=item *
+
+Other Catalyst documentation folks like Kieren Diment, Gavin Henry,
+and Jess Robinson (including their work on the original Catalyst
+tutorial).  
+
+=item *
+
+Kieren Diment for his oversight of Catalyst-related documentation.
+
+=item *
+
+Everyone on #catalyst and #catalyst-dev.
+
+=item *
+
+Louis Moore (who thanks Marcello Romani and Tom Lanyon) for the
+PostgreSQL content in the Appendix.
+
+=item *
+
+People who have emailed me with corrections and suggestions on the 
+tutorial. As of the most recent release, this include: Florian Ragwitz, 
+Mauro Andreolini, Jim Howard, Giovanni Gigante, William Moreno, Bryan 
+Roach, Ashley Berlin, David Kamholz, Kevin Old, Henning Sprang, Jeremy 
+Jones, David Kurtz, Ingo Wichmann, Shlomi Fish, Murray Walker, Adam 
+Witney and xenoterracide (Caleb Cushing). Thanks to Devin Austin for 
+coming up with an initial version of a non-TTSite wrapper page. Also, a 
+huge thank you to Kiffin Gish for all the hard work on the "database 
+depluralization" effort and Rafael Kitover for the work on updating the 
+tutorial to include foreign key support for SQLite. I'm sure I am 
+missing some names here... apologies for that (please let me know if you 
+name should be here). 
+
+=back
+
+=head1 AUTHOR
+
+Kennedy Clark, C<hkclark@gmail.com>
+
+Feel free to contact the author for any errors or suggestions, but the
+best way to report issues is via the CPAN RT Bug system at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Manual>.
+
+Copyright 2006-2010, Kennedy Clark, under the
+Creative Commons Attribution Share-Alike License Version 3.0
+(L<http://creativecommons.org/licenses/by-sa/3.0/us/>).

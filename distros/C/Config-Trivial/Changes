@@ -1,0 +1,78 @@
+$Id: Changes 63 2014-05-23 09:42:15Z adam $
+
+Revision history for Perl extension Config::Trivial
+
+0.81 Fri 23 May 2014
+    -   Minor test changes to accomodate Windows paths on tests (RT #95892)
+    -   No module changes
+    -   Added LICENCE file. Note module is now Lesser GPL not GPL
+
+0.80 Wed 21 May 2014
+    -   Add option to disable file test on very slow file systems (RT #95839)
+    -   Dependency update to later versions
+    -   Update to use later version of Perl (I no longer have access to older perls)
+    -   Correct test failure on Windows (possible fix RT #19049)
+    -   Using SVN instead of CVS
+    -   More tests
+    -   Simplified Build.PL and Makefile.PL
+
+0.70 Mon 28 May 2007
+    -   Work on Test failures on Windows with Module::Build (thanks to Corion)
+    -   Changes to test procedure because of failures on Perl 5.6.x (RT #19049)
+    -   Module crypto signature added
+    -   Added example directory
+    -   META.yml format updated and upgraded
+
+0.60 Sun 26 Feb 2006
+    MAJOR REVISION
+    -   New Features:
+        -   Multi-file read/write
+            -   Multi-read implemented
+            *   Multi-write NOT YET IMPLEMENTED
+    -   Code Review:
+        -   Standardise on PBP guidelines using Perl::Critic
+        -   Wash module though perltidy using PBP settings
+        -   Several subtle bugs eliminated
+        -   Extra logic checks within code
+        -   Several no-ops removed
+    -    Tests:
+        -   Using ./build testcover (Devel::Cover) to improve test coverage
+        -   Many new tests and better tests
+        -   Reorderd and renamed tests
+    -   Using MANIFEST.SKIP to avoid help packaging errors
+    -   Doc updates and fix
+
+0.51 Fri 21 Oct 2005
+    -    Repackaged, no changes
+
+0.50 Thu 20 Oct 2005
+    -    More tests, including more Pod testing.
+    -    Caution added to deal with data with a trailing "\".
+    -    Should now work with Module::Build.
+
+0.40 Tue 20 Jan 2004
+    -    Added get_configuration and set_configuration methods.
+    -    Extra tests and documentaion.
+    -    Fixed bug in writing out data that has a trailing \ in it.
+
+0.30 Sat 17 Jan 2004
+    -    Added the "write" method back - code still needs work.
+    -    Minor documentation corrections.
+    -    Extra tests and fixes.
+    -    Fix test missing from Makefile.PL.
+
+0.20 Fri 16 Jan 2004
+    -    Major redevelopment of code with OO interface.
+    -    A number of functions from the original module
+         have been removed, or not yet re-implemented.
+
+As Config::SimpleConf
+
+0.10 Sat Apr 06 2002
+    -    Added ability to work with a reference to a provided hash,
+         rather than just %settings.
+         Minor additions to the test script, and updates to the POD.
+
+0.08 Mon Nov 05 2001
+    -    Dirty mode added, can now de-taint quite dirty data.
+         More small changes to the test script.

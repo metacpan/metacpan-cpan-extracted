@@ -1,0 +1,7 @@
+<h1>Artist Listing</h1>
+<hr/>
+<ul>
+[% FOREACH artist IN c.model('DBIC').resultset('Artist').all %]
+    <li>[% artist.name %]</li>
+[% END %]
+</ul>

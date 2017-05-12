@@ -1,0 +1,45 @@
+NAME
+    Catalyst::Plugin::Static - Serve static files with Catalyst
+
+SYNOPSIS
+        use Catalyst 'Static';
+
+        # let File::MMagic determine the content type
+        $c->serve_static;
+
+        # or specify explicitly if you know better
+        $c->serve_static('text/css');
+
+DESCRIPTION
+    Serve static files from config->{root}.
+
+  METHODS
+    finalize
+        This plugin overrides finalize to make sure content is removed on
+        redirect.
+
+    serve_static
+        Call this method from your action to serve requested path as a
+        static file from your root. takes an optional content_type parameter
+
+    serve_static_file <file>
+        Serve a specified static file.
+
+SEE ALSO
+    Catalyst.
+
+CAVEATS
+    This module is not as optimized for static files as a normal web server,
+    and is most useful for stand alone operation and development.
+
+AUTHOR
+    Sebastian Riedel, "sri@cpan.org" Christian Hansen <ch@ngmedia.com>
+    Marcus Ramberg <mramberg@cpan.org>
+
+THANK YOU
+    Torsten Seemann and all the others who've helped.
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

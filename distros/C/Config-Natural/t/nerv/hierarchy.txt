@@ -1,0 +1,19 @@
+director = Ikari Gendo
+second_comander = Fuyutsuki Kozo
+project_director = Akagi Ritsuko
+executive_officer = Katsuragi Misato
+
+operators = (
+    Ibuki Maya
+    Hyuga Makoto
+    Aoba Shigeru
+)
+
+pilots = (
+    Ayanami Rei
+    Soryu Asuka Langley
+    Ikari Shinji
+    Suzuhara Toji
+    Nagisa Kaoru
+)
+

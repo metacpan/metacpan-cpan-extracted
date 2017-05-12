@@ -1,0 +1,249 @@
+=encoding utf-8
+
+=head1 NAME
+
+Crypt::SMIME::JA - S/MIMEの署名、検証、暗号化、復号
+
+=head1 概要
+
+  use Crypt::SMIME;
+
+  my $plain = <<'EOF';
+  From: alice@example.org
+  To: bob@example.com
+  Subject: Crypt::SMIME test
+
+  This is a test mail. Please ignore...
+  EOF
+
+  my $smime = Crypt::SMIME->new();
+  $smime->setPrivateKey($privkey, $crt);
+  # $smime->setPublicKey([$icacert]); # if need be.
+
+  my $signed = $smime->sign($plain);
+  print $signed;
+
+=head1 説明
+
+S/MIMEの署名、検証、暗号化、復号を行うクラス。
+libcrypto (L<http://www.openssl.org>) が必要。
+
+=head1 エクスポート
+
+既定でエクスポートされるシンボルは無いが、次のシンボルはエクスポート可能である。
+
+=over
+
+=item C<NO_CHECK_CERTIFICATE>
+
+L</check()> を参照。
+
+=item C<FORMAT_SMIME>
+
+=item C<FORMAT_ASN1>
+
+=item C<FORMAT_PEM>
+
+L</extractCertificates()> を参照。
+
+=item C<:constants>
+
+上記のもの全てをエクスポートする。
+
+=back
+
+=head1 メソッド
+
+=over 4
+
+=item new()
+
+  my $smime = Crypt::SMIME->new();
+
+引数無し
+
+=item setPrivateKey()
+
+  $smime->setPrivateKey($key, $crt);
+  $smime->setPrivateKey($key, $crt, $password);
+
+秘密鍵を設定する。ここで設定された秘密鍵は署名と復号の際に用いられる。
+ファイル名ではなく、鍵本体を渡す。
+
+対応しているフォーマットは PEM のみ。鍵の読み込みに失敗した場合はdieする。
+
+=item setPrivateKeyPkcs12()
+
+  $smime->setPrivateKeyPkcs12($key, $pkcs12);
+  $smime->setPrivateKeyPkcs12($key, $pkcs12, $password);
+
+秘密鍵およびその X.509 証明書を PKCS#12 から読み込んで設定する。秘密鍵は署名と復号の際に用いられる。
+読み込みに失敗した場合は die する。
+
+=item setPublicKey()
+
+  $smime->setPublicKey($crt);
+  $smime->setPublicKey([$crt1, $crt2, ...]);
+
+公開鍵を設定する。ここで設定された公開鍵は署名への添付、署名の検証、
+そして暗号化の際に用いられる。
+
+対応しているフォーマットは PEM のみ。鍵の読み込みに失敗した場合はdieする。
+
+=item setPublicKeyStore()
+
+  $smime->setPublicKeyStore($path, ...);
+
+信頼している証明書 (複数可)
+が入ったファイルやディレクトリのパス (複数可)
+を設定する。ここで設定された証明書ストアは、署名の検証の際に用いられる。
+
+証明書ストアの読み込みに失敗した場合はdieする。
+
+=item sign()
+
+  $signed_mime = $smime->sign($raw_mime);
+
+署名を行い、MIMEメッセージを返す。可能な署名はクリア署名のみ。
+
+C<Content-*>, C<MIME-*> 及び C<Subject> を除いたヘッダは
+multipartのトップレベルに移される。
+C<Subject> はS/MIMEを認識できないメーラのために, multipartの
+トップレベルと保護されるメッセージの両側に配置される。
+
+元の MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、署名されたメッセージも汚染される。
+
+=item signonly()
+
+  $sign = $smime->signonly($prepared_mime);
+
+署名の計算を行う。
+C<$sign> はBASE64でエンコードされて返る。
+C<$prepared_mime> には, L</prepareSmimeMessage> で返される値を渡す。
+
+元の MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、生成された署名も汚染される。
+
+=item prepareSmimeMessage()
+
+  ($prepared_mime, $outer_header)
+      = $smime->prepareSmimeMessage($source_mime);
+
+署名用のメッセージを準備する。
+C<$prepared_mime> には署名用に修正されたMIMEメッセージを返す。
+C<$outer_header> は、S/MIMEの外側に付与するヘッダを返す。
+
+C<$prepared_mime> の本文はC<$source_mime>と同じ物となるが、
+ヘッダに関してはC<Content-*>, C<MIME-*>, C<Subject> を除く全てが
+取り除かれる。取り除かれたヘッダは C<$outer_header> に返される。
+S/MIMEメッセージを構築する際にはこれをS/MIMEメッセージのヘッダに追加する。
+C<Subject> ヘッダのみは C<$prepared_mime> と C<$outer_header> の両方に
+現れる点に注意。
+
+=item check()
+
+  use Crypt::SMIME qw(:constants);
+
+  $source_mime = $smime->check($signed_mime);
+  $source_mime = $smime->check($signed_mime, $flags);
+
+検証を行う。検証に失敗した場合はその理由と共にdieする。
+
+C<$flags> として C<Crypt::SMIME::NO_CHECK_CERTIFICATE>
+オプションを指定した場合には、署名者の証明書チェーンを検証しない。
+C<$flags> のデフォルト値は C<0>
+であり、この場合には全ての整合性についての検証を行う。
+
+元の S/MIME メッセージ, C<$flags>, または公開鍵の少なくとも一つが汚染されている
+(tainted) ならば、検証されたメッセージも汚染される。
+
+=item encrypt()
+
+  $encrypted_mime = $smime->encrypt($raw_mime);
+
+暗号化を行う。
+
+C<Content-*>, C<MIME-*> 及び C<Subject> を除いたヘッダは
+multipartのトップレベルにコピーされる。
+C<Subject> はS/MIMEを認識できないメーラのために, multipartの
+トップレベルと保護されるメッセージの両側に配置される。
+
+元の MIME メッセージ、または公開鍵の少なくとも一つが汚染されている
+(tainted) ならば、暗号化されたメッセージも汚染される。
+
+=item decrypt()
+
+  $decrypted_mime = $smime->decrypt($encrypted_mime);
+
+復号を行う。復号に失敗した場合はその理由と共にdieする。
+
+元の S/MIME メッセージ、秘密鍵、またはその証明書のいずれかが汚染されている
+(tainted) ならば、復号されたメッセージも汚染される。
+
+=item isSigned()
+
+  $is_signed = $smime->isSigned($mime);
+
+渡されたMIMEメッセージがS/MIMEで署名されたものなら真を返す。
+クリア署名かどうかは問わない。
+署名後に暗号化したメッセージを渡した場合は、署名が直接見えない為、
+偽を返す事に注意。
+
+=item isEncrypted()
+
+  $is_encrypted = $smime->isEncrypted($mime);
+
+渡されたMIMEメッセージがS/MIMEで暗号化されたものなら真を返す。
+暗号化後に署名したメッセージを渡した場合は、暗号文が直接見えない為、
+偽を返す事に注意。
+
+=back
+
+=head1 関数
+
+=over 4
+
+=item extractCertificates()
+
+  use Crypt::SMIME qw(:constants);
+
+  @certs = @{Crypt::SMIME::extractCertificates($data)};
+  @certs = @{Crypt::SMIME::extractCertificates($data, FORMAT_SMIME)};
+
+<S/MIMEメッセージまたはPKCS#7オブジェクトに含まれるX.509証明書
+(や証明書失効リスト) をすべて取得する。
+オプションの C<$type> パラメータでデータの種類を指定できる。
+C<Crypt::SMIME::FORMAT_SMIME> (初期値) はS/MIMEメッセージ、
+C<Crypt::SMIME::FORMAT_ASN1>はバイナリ形式、
+C<Crypt::SMIME::FORMAT_PEM>はPEM形式。
+
+=item getSigners()
+
+  @certs = @{Crypt::SMIME::getSigners($data)};
+  @certs = @{Crypt::SMIME::getSigners($data, $type)};
+
+S/MIMEメッセージまたはPKCS#7オブジェクトに含まれる、署名者の
+X.509証明書を取得する。オプションの$typeパラメータでデータの種類を指定できる。
+
+この関数が返す公開鍵は検証されていないことに注意。
+公開鍵が有効であることを確かめるにはcheck()を実行すること。
+
+=back
+
+=head1 著者
+
+Copyright 2006-2014 YMIRLINK Inc. All Rights Reserved.
+
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself
+
+
+Bug reports and comments to: tl@tripletail.jp
+
+
+=for comment
+Local Variables:
+mode: cperl
+End:
+

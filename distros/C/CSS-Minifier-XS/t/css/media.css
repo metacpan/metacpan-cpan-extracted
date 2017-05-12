@@ -1,0 +1,6 @@
+/* CSS with media selector that requires '(' to have leading WS */
+@media all and (max-width:100px) {
+    div {
+        margin: 0px;
+    }
+}

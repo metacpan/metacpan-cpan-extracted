@@ -1,0 +1,12 @@
+[% # site map tree %]
+
+<table>
+[% FOREACH p IN pages %]
+ <tr class="list [% IF loop.count % 2 %]alt[% END %]">
+  <td><a href='[% c.uri_for(p.url) %]'>[% p.url %]</a></td><td>[% p.meta.title %]</td>
+ </tr>
+[%+ END %]
+</table>
+[% IF !pages || !pages.size %]
+Your CMS contains no pages.
+[% END %]

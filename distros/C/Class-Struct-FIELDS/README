@@ -1,0 +1,662 @@
+NAME
+    Class::Struct::FIELDS - Combine Class::Struct, base and fields
+
+SYNOPSIS
+    (This page documents "Class::Struct::FIELDS" v.1.1.)
+
+        use Class::Struct::FIELDS;
+                # declare struct, based on fields, explicit class name:
+        struct (CLASS_NAME => { ELEMENT_NAME => ELEMENT_TYPE, ... });
+
+        use Class::Struct::FIELDS;
+                # declare struct, based on fields, explicit class name
+                # with inheritance:
+        struct (CLASS_NAME => [qw(BASE_CLASSES ...)],
+                { ELEMENT_NAME => ELEMENT_TYPE, ... });
+
+        package CLASS_NAME;
+        use Class::Struct::FIELDS;
+                # declare struct, based on fields, implicit class name:
+        struct (ELEMENT_NAME => ELEMENT_TYPE, ...);
+
+        package CLASS_NAME;
+        use Class::Struct::FIELDS;
+                # declare struct, based on fields, implicit class name
+                # with inheritance:
+        struct ([qw(BASE_CLASSES ...)], ELEMENT_NAME => ELEMENT_TYPE, ...);
+
+        package MyObj;
+        use Class::Struct::FIELDS;
+                # declare struct with four types of elements:
+        struct (s => '$', a => '@', h => '%', x => '&', c => 'My_Other_Class');
+
+        $obj = new MyObj;               # constructor
+
+                                        # scalar type accessor:
+        $element_value = $obj->s;           # element value
+        $obj->s ('new value');              # assign to element
+
+                                        # array type accessor:
+        $ary_ref = $obj->a;                 # reference to whole array
+        $ary_element_value = $obj->a->[2];  # array element value
+        $ary_element_value = $obj->a (2);   # same thing
+        $obj->a->[2] = 'new value';         # assign to array element
+        $obj->a (2, 'newer value');         # same thing
+
+                                        # hash type accessor:
+        $hash_ref = $obj->h;                # reference to whole hash
+        $hash_element_value = $obj->h->{x}; # hash element value
+        $hash_element_value = $obj->h (x);  # same thing
+        $obj->h->{x} = 'new value';         # assign to hash element
+        $obj->h (x, 'newer value');         # same thing
+
+                                        # code type accessor:
+        $code_ref = $obj->x;                # reference to code
+        $obj->x->(...);                     # call code
+        $obj->x (sub {...});                # assign to element
+
+                                        # regexp type accessor:
+        $regexp = $obj->r;                  # reference to code
+        $string =~ m/$obj->r/;              # match regexp
+        $obj->r (qr/ ... /);                # assign to element
+
+                                        # class type accessor:
+        $element_value = $obj->c;            # object reference
+        $obj->c->method (...);               # call method of object
+        $obj->c (My_Other_Class::->new);     # assign a new object
+
+DESCRIPTION
+    "Class::Struct::FIELDS" exports a single function, "struct". Given a
+    list of element names and types, and optionally a class name and/or an
+    array reference of base classes, "struct" creates a Perl 5 class that
+    implements a "struct-like" data structure with inheritance.
+
+    The new class is given a constructor method, "new", for creating struct
+    objects.
+
+    Each element in the struct data has an accessor method, which is used to
+    assign to the element and to fetch its value. The default accessor can
+    be overridden by declaring a "sub" of the same name in the package. (See
+    Example 2.)
+
+    Each element's type can be scalar, array, hash, code or class.
+
+  Differences from "Class::Struct" "base" and "fields"
+
+    "Class::Struct::FIELDS" is a combination of "Class::Struct", "base" and
+    "fields".
+
+    Unlike "Class::Struct", inheritance is explicitly supported, and there
+    is better support for user overrides of constructed accessor methods.
+    One result is that you may no longer use the array ("[]") notation for
+    indicating internal representation. Also, "Class::Struct::FIELDS" relies
+    on "fields" for internal representation.
+
+    Also, "Class::Struct::FIELDS" supports code and regular expression
+    elements. ("Class::Struct" handles code and regular expressions as
+    scalars.)
+
+    Lastly, "Class::Struct::FIELDS" passes it's import list, if any, from
+    the call to "use Class::Struct::FIELDS ..." to "struct" so that you may
+    create new packages at compile-time.
+
+    Unlike "fields", each element has a data type, and is automatically
+    created at first access.
+
+  Calling "use Class::Struct::FIELDS"
+
+    You may call "use Class::Struct::FIELDS" just as with any module
+    library:
+
+        use Class::Struct::FIELDS;
+        struct Bob => [];
+
+    However, if you try "my Dog $spot" syntax with this example:
+
+        use Class::Struct::FIELDS;
+        struct Bob => [];
+        my Bob $bob = Bob::->new;
+
+    you will get a compile-time error:
+
+        No such class Bob at <filename> line <number>, near "my Bob"
+        Bareword "Bob::" refers to nonexistent package at <filename> line
+        <number>.
+
+    since the compiler has not seen your class declarations yet until after
+    the call to "struct", by which time it has already seen your "my"
+    declarations. Oops, too late. Instead, create the package for "Bob"
+    during compilation:
+
+        use Class::Struct::FIELDS qw(Bob);
+        my Bob $bob = Bob::->new;
+
+    This compiles without error as "import" for "Class::Struct::FIELDS"
+    calls "struct" for you if you have any arguments in the "use" statement.
+    A more interesting example is:
+
+        use Class::Struct::FIELDS Bob => { a => '$' };
+        use Class::Struct::FIELDS Fred => [qw(Bob)];
+        my Bob $bob = Bob::->new;
+        my Fred $fred = Fred::->new;
+
+  The "struct" subroutine
+
+    The "struct" subroutine has three forms of parameter-list:
+
+        struct (CLASS_NAME => { ELEMENT_LIST });
+        struct (CLASS_NAME, ELEMENT_LIST);
+        struct (ELEMENT_LIST);
+
+    The first form explicitly identifies the name of the class being
+    created. The second form is equivalent. The second form assumes the
+    current package name as the class name. The second and third forms are
+    distinguished by the parity of the argument list: an odd number of
+    arguments is taken to be of the second form.
+
+    Optionally, you may specify base classes with an array reference as the
+    first non-class-name argument:
+
+        struct (CLASS_NAME => [qw(BASE_CLASSES ...)], { ELEMENT_LIST });
+        struct (CLASS_NAME => [qw(BASE_CLASSES ...)], ELEMENT_LIST);
+        struct ([qw(BASE_CLASSES ...)], { ELEMENT_LIST });
+        struct ([qw(BASE_CLASSES ...)], ELEMENT_LIST);
+
+    (Since there is no ambiguity between CLASS_NAME and ELEMENT_LIST with
+    the interposing array reference, you may always make ELEMENT_LIST a list
+    or a hash reference with this form.)
+
+    The class created by "struct" may be either a subclass or superclass of
+    other classes. See the base manpage and the fields manpage for details.
+
+    The *ELEMENT_LIST* has the form
+
+        NAME => TYPE, ...
+
+    Each name-type pair declares one element of the struct. Each element
+    name will be usually be defined as an accessor method of the same name
+    as the field, unless a method by that name is explicitly defined (called
+    a "user override") by the caller prior to the "use" statement for
+    "Class::Struct::FIELDS". (See the Replacing member access methods with
+    user overrides entry elsewhere in this document.)
+
+    "struct" returns the name of the newly-constructed package.
+
+  Element Types and Accessor Methods
+
+    The five element types -- scalar, array, hash, code and class -- are
+    represented by strings -- "$", "@", "%", "&", "/" and a class name.
+
+    The accessor method provided by "struct" for an element depends on the
+    declared type of the element.
+
+    Scalar ("$", "\$" or "*$")
+        The element is a scalar, and by default is initialized to "undef"
+        (but see the Initializing with new entry elsewhere in this
+        document).
+
+        The accessor's argument, if any, is assigned to the element.
+
+        If the element type is "$", the value of the element (after
+        assignment) is returned. If the element type is "\$" or "*$", a
+        reference to the element is returned.
+
+    Array ("@", "\@" or "*@")
+        The element is an array, initialized by default to "()".
+
+        With no argument, the accessor returns a reference to the element's
+        whole array (whether or not the element was specified as "@", "\@"
+        or "*@").
+
+        With one or two arguments, the first argument is an index specifying
+        one element of the array; the second argument, if present, is
+        assigned to the array element. If the element type is "@", the
+        accessor returns the array element value. If the element type is
+        "\@" or "*@", a reference to the array element is returned.
+
+    Hash ("%", "\%" or "*%")
+        The element is a hash, initialized by default to "()".
+
+        With no argument, the accessor returns a reference to the element's
+        whole hash (whether or not the element was specified as "%", "\%" or
+        "*%").
+
+        With one or two arguments, the first argument is a key specifying
+        one element of the hash; the second argument, if present, is
+        assigned to the hash element. If the element type is "%", the
+        accessor returns the hash element value. If the element type is "\%"
+        or "*%", a reference to the hash element is returned.
+
+    Code ("&", "\&" or "*&")
+        The element is code, and by default is initialized to "undef" (but
+        see the Initializing with new entry elsewhere in this document).
+
+        The accessor's argument, if any, is assigned to the element.
+
+        If the element type is "&", the value of the element (after
+        assignment) is returned. If the element type is "\&" or "*&", a
+        reference to the element is returned. (It is unclear of what value
+        this facility is. XXX)
+
+    Regexp ("/", "\/" or "*/")
+        If the element type is "/", the value of the element (after
+        assignment) is returned. If the element type is "\/" or "*/", a
+        reference to the element is returned. (It is unclear of what value
+        this facility is. XXX)
+
+        Regular expressions really are special in that you create them with
+        special syntax, not with a call to a constructor:
+
+          $obj->r (qr/^$/); # fine
+          $obj->r (Regexp->new); # WRONG
+
+    Class ("Class_Name", "\Class_Name" or "*Class_Name")
+        The element's value must be a reference blessed to the named class
+        or to one of its subclasses. The element is initialized to the
+        result of calling the "new" constructor of the named class.
+
+        The accessor's argument, if any, is assigned to the element. The
+        accessor will "croak" if this is not an appropriate object
+        reference.
+
+        If the element type does not start with a "\" or "*", the accessor
+        returns the element value (after assignment). If the element type
+        starts with a "\" or "*", a reference to the element itself is
+        returned.
+
+        The class is automatically required for you so that, for example,
+        you can safely write:
+
+            struct MyObj {io => 'IO::Scalar'};
+
+        and access "io" immediately. The same applies for nested structs:
+
+            BEGIN {
+              struct Alice { when => '$' };
+              struct Bob { who => 'Alice' };
+            }
+
+            my Bob $b = Bob::->new;
+            $b->who->when ('what');
+
+        Note, however, the "BEGIN" block so that this example can use the
+        "my Dog $spot" syntax for "my Bob $b". Also, no actual import
+        happens for the caller -- the automatic use is only for convenience
+        in auto-constructing members, not magic. Another way to do this is:
+
+            { package Bob; use Class::Struct::FIELDS; struct }
+            my Bob $b = Bob::->new;
+
+        And of course the best way to do this is simply:
+
+            use Class::Struct::FIELDS qw(Bob);
+            my Bob $b = Bob::->new;
+
+    What about globs ("*") and other funny types?
+        At present, "Class::Struct::FIELDS" does not support special
+        notation for other intrinsic types. Use a scalar to hold a reference
+        to globs and other unusual specimens, or wrap them in a class such
+        as "IO::Handle" (globs). XXX
+
+  Initializing with "new"
+
+    "struct" always creates a constructor called "new". That constructor may
+    take a list of initializers for the various elements of the new struct.
+
+    Each initializer is a pair of values: *element name*" => "*value*. The
+    initializer value for a scalar element is just a scalar value. The
+    initializer for an array element is an array reference. The initializer
+    for a hash is a hash reference. The initializer for code is a code
+    reference.
+
+    The initializer for a class element is also a hash reference, and the
+    contents of that hash are passed to the element's own constructor.
+
+    "new" tries to be as clever as possible in deducing what type of object
+    to construct. All of these are valid:
+
+        use Class::Struct::FIELDS qw(Bob);
+        my Bob $b = Bob::->new; # good style
+        my Bob $b2 = $b->new; # works fine
+        my Bob $b3 = &Bob::new; # if you insist
+        my Bob $b4 = Bob::new (apple => 3, banana => 'four'); # WRONG!
+
+    The last case doesn't behave as hoped for: "new" tries to construct an
+    object of package "apple" (and hopefully fails, unless you actually have
+    a package named "apple"), not an object of package "Bob".
+
+    See Example 3 below for an example of initialization.
+
+  Initializing with "init"
+
+    You may also use "init" as a constructor to assign initial values to new
+    objects. (In fact, this is the preferred method.) "struct" will see to
+    it that you have a ready object to work with, and pass you any arguments
+    used in the call to "new":
+
+      sub init {
+        my MyObj $self = shift;
+
+        @self->a->[0..3] = (a..d);
+
+        return $self;
+      }
+
+    It is essential that you return an object from "init", as this is
+    returned to the caller of "new". You may return a different object if
+    you wish, but this would be rather uncommon.
+
+    First, "new" arranges for any constructor argument list to be processed
+    first before calling "init".
+
+    Second, "new" arranges to call "init" for base classes, calling them in
+    bottom-up order, before calling "init". This is so that ancestors may
+    construct an object before descendents.
+
+    There is no corresponding facility for DESTROY. XXX
+
+  Replacing member access methods with user overrides
+
+    You might want to create custom access methods, or user overrides. The
+    most straight forward way to do this and still retain "string" and
+    "warnings" is:
+
+        use strict;
+        use warnings;
+
+        sub Bob::ff ($;$$); # declare sub so Class::Struct::FIELDS can see
+
+        use Class::Struct::FIELDS Bob => { ff => '$' };
+
+        sub Bob::ff ($;$$) {
+          my Bob $self = shift;
+
+          &some_other_sub (@_);
+        }
+
+    If you do not declare the user override prior to the "use" statement, a
+    warning is issued if the warning flag (-w) is set.
+
+    Notice that we changed the default sub signature for *ff* from "($;$)"
+    to "($;$$)". Normally, this might generate a warning if we redefine the
+    sub, but declaring the sub ahead of time keeps "strict" and "warnings"
+    happy. You might prefer this construction:
+
+        { package Bob; }
+
+        sub Bob::ff ($;$$) {
+          my Bob $self = shift;
+
+          &some_other_sub (@_);
+        }
+
+        use Class::Struct::FIELDS Bob => { ff => '$' };
+
+    You might still want the advantages of the the constructed accessor
+    methods, even with user overrides (for example, checking that an
+    assigned value is the right type or package). "Class::Struct::FIELDS"
+    constructs the accessor with a special name, so that you may use it
+    yourself in the user override. That special name is the regular field
+    name prepended by a double underscore, "__". You can access these so:
+
+        use strict;
+        use warnings;
+
+        sub Bob::ff ($;$); # declare sub so Class::Struct::FIELDS can see
+        sub Bob::gg ($;$); # declare sub so Class::Struct::FIELDS can see
+
+        use Class::Struct::FIELDS Bob => { ff => '$', gg => '$' };
+
+        # This example is identical to having no user override.
+        sub Bob::ff ($;$) {
+          my Bob $self = shift;
+          $self->__ff (@_);
+        }
+
+        # This example illustrates a workaround for v5.6.0.
+        sub Bob::gg ($;$) {
+          # This silliness is due to a bug in 5.6.0: it thinks you can't
+          # fiddle with @_ if you've given it a prototype.  XXX
+          my @args = @_;
+          $args[1] *= 2 if @args == 2 and defined $args[1];
+          @_ = @args;
+          goto &Bob::__gg;
+        }
+
+  Private fields
+
+    Fields starting with a leading underscore, "_", are private: they are
+    still valid fields, but "Class::Struct::FIELDS" does not create
+    subroutines to access them. Instead, you should access them the usual
+    way for hash members:
+
+        $self->{_private_key}; # ok
+        $self->_private_key; # Compilation error
+
+    See the fields manpage for more details.
+
+  Extra magic: auto-stringify
+
+    If there exists a subroutine named "as_string" at the time you invoke
+    "struct" (or, equivalently, during the call to "use"), then
+    "Class::Struct::FIELDS" will glue that into auto-stringification with
+    "overload" for you.
+
+EXAMPLES
+    Example 1
+        Giving a struct element a class type that is also a struct is how
+        structs are nested. Here, "timeval" represents a time (seconds and
+        microseconds), and "rusage" has two elements, each of which is of
+        type "timeval".
+
+            use Class::Struct::FIELDS;
+
+            struct (rusage => {
+              ru_utime => timeval,  # seconds
+              ru_stime => timeval,  # microseconds
+            });
+
+            struct (timeval => {
+              tv_secs  => '$',
+              tv_usecs => '$',
+            });
+
+                # create an object:
+            my $t = new rusage;
+
+                # $t->ru_utime and $t->ru_stime are objects of type timeval.
+                # set $t->ru_utime to 100.0 sec and $t->ru_stime to 5.0 sec.
+            $t->ru_utime->tv_secs (100);
+            $t->ru_utime->tv_usecs (0);
+            $t->ru_stime->tv_secs (5);
+            $t->ru_stime->tv_usecs (0);
+
+    Example 2
+        An accessor function can be redefined in order to provide additional
+        checking of values, etc. Here, we want the "count" element always to
+        be nonnegative, so we redefine the "count" accessor accordingly.
+
+            package MyObj;
+            use Class::Struct::FIELDS;
+
+            # declare the struct
+            struct (MyObj => {count => '$', stuff => '%'});
+
+            # override the default accessor method for 'count'
+            sub count {
+              my MyObj $self = shift;
+
+              if (@_) {
+                die 'count must be nonnegative' if $_[0] < 0;
+                $self->{count} = shift;
+                warn "Too many args to count" if @_;
+              }
+
+              return $self->{count};
+            }
+
+            package main;
+            $x = new MyObj;
+            print "\$x->count (5) = ", $x->count (5), "\n";
+                                    # prints '$x->count (5) = 5'
+
+            print "\$x->count = ", $x->count, "\n";
+                                    # prints '$x->count = 5'
+
+            print "\$x->count (-5) = ", $x->count (-5), "\n";
+                                    # dies due to negative argument!
+
+    Example 3
+        The constructor of a generated class can be passed a list of
+        *element*=>*value* pairs, with which to initialize the struct. If no
+        initializer is specified for a particular element, its default
+        initialization is performed instead. Initializers for non-existent
+        elements are silently ignored.
+
+        Note that the initializer for a nested struct is specified as an
+        anonymous hash of initializers, which is passed on to the nested
+        struct's constructor.
+
+            use Class::Struct::FIELDS;
+
+            struct Breed =>
+            {
+              name  => '$',
+              cross => '$',
+            };
+
+            struct Cat =>
+            {
+              name     => '$',
+              kittens  => '@',
+              markings => '%',
+              breed    => 'Breed',
+            };
+
+            my $cat = Cat->new
+              (name     => 'Socks',
+               kittens  => ['Monica', 'Kenneth'],
+               markings => { socks => 1, blaze => "white" },
+               breed    => { name => 'short-hair', cross => 1 });
+
+            print "Once a cat called ", $cat->name, "\n";
+            print "(which was a ", $cat->breed->name, ")\n";
+            print "had two kittens: ", join(' and ', @{$cat->kittens}), "\n";
+
+    Example 4
+        "Class::Struct::FIELDS" has a very elegant idiom for creating
+        inheritance trees:
+
+            use Class::Struct::FIELDS Fred => [];
+            use Class::Struct::FIELDS Barney => [qw(Fred)];
+            use Class::Struct::FIELDS Wilma => [qw(Barney)],
+              { aa => '@',
+                bb => 'IO::Scalar' };
+
+        That's all the code it takes!
+
+EXPORTS
+    "Class::Struct::FIELDS" export "struct" for backwards-compatibility with
+    "Class::Struct".
+
+DIAGNOSTICS
+    The following are diagnostics generated by Class::Struct::Fields. Items
+    marked "(W)" are non-fatal (invoke "Carp::carp"); those marked "(F)" are
+    fatal (invoke "Carp::croak").
+
+    'struct' usage error
+        (F) The caller failed to read the documentation for
+        "Class::Struct::FIELDS" and follow the advice therein.
+
+    Accessor '%s' exists in package '%s' hides method in base class
+        (W) There is already a subroutine, with the name of one of the
+        accessors, located in a base class of the given package. You should
+        consider renaming the field with the given name.
+
+    Method '%s' exists in package '%s' overrides accessor
+        (W) There is already a subroutine, with the name of one of the
+        accessors, located in the given package. You may have intended this,
+        however, if defining your own custom accessors.
+
+    Method 'new' already exists in package '%s'
+        (W) There is already a 'new' subroutine located in the given
+        package. As long as the caveats for defining your own "new" are
+        followed, this warning is harmless; otherwise your objects may not
+        be properly initialized.
+
+    Initializer for '%s' must be %s reference
+        (F) At runtime, the caller tried to assign the wrong type of
+        argument to the element. An example which triggers this message:
+
+            use Class::Struct::FIELDS Bob => { ary => '@' };
+            my $b = Bob::->new;
+            $b->ary ({hash => 'reference'}); # croaks
+
+        The last statement will croak with the message, "Initializer for
+        'ary' must be ARRAY reference".
+
+    Initializer for '%s' must be %s object
+        (F) At runtime, the caller tried to assign the wrong class of
+        argument to the element. An example which triggers this message:
+
+            use Class::Struct::FIELDS Bob => { mary => 'Mary' };
+            use Class::Struct::FIELDS qw(Fred); # NOT inherit from Mary
+            my $b = Bob::->new;
+            $b->ary (Fred::->new); # croaks
+
+        The last statement will croak with the message, "Initializer for
+        'aa' must be Mary object".
+
+BUGS AND CAVEATS
+    Please see the TODO list.
+
+    GIANT MAN-EATING HOLE: due to bugs in lvalue subs in 5.6.0 (try running
+    some under the debugger), I had to disable the obvious syntax:
+
+        use Class::Struct::FIELDS Bob => { s => '$' };
+        my Bob $b = Bob::->new;
+        $b->s = 3;
+
+    and provide the clumsier:
+
+        use Class::Struct::FIELDS Bob => { s => '$' };
+        my Bob $b = Bob::->new;
+        $b->s (3);
+
+    Some of these constructs work fine as long as you don't try to debug the
+    generated code.
+
+CREDITS
+    Dean Roehrich, Jim Miner <jfm@winternet.com> and Dr. Damian Conway
+    <damian@conway.org> wrote the original "Class::Struct" which inspired
+    this module and provided much of its documentation.
+
+AUTHOR
+    B. K. Oxley (binkley) <binkley@bigfoot.com>
+
+    Copyright (c) 2000 B. K. Oxley (binkley). All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+    the Class::Contract manpage
+        "Class::Contract" is an extension module by Damian Conway for
+        writing in a design-by-contract object-oriented style. It has many
+        of the features of "Class::Struct::FIELDS", and many more besides.
+
+    the Class::Struct manpage
+        "Class::Struct" is a standard module for creating simple,
+        uninherited data structures.
+
+    the base manpage
+        "base" is a standard pragma for establishing IS-A relationships with
+        base classes at compile time.
+
+    the fields manpage
+        "fields" is a standard pragma for imbuing your class with efficient
+        pseudo-hashes for data members.
+
+    the overload manpage
+        "overload" is a standard pragma for overloading Perl syntax with
+        your own subroutines.
+

@@ -1,0 +1,20 @@
+lib/Config/LotusNotes.pm
+lib/Config/LotusNotes/Configuration.pm
+demo/editnotesini.pl
+demo/FindNotes.pl
+Makefile.PL
+MANIFEST
+README
+Changes
+t/Config-LotusNotes.t
+t/Config-LotusNotes-Configuration.t
+t/pod.t
+t/pod-coverage.t
+t/data/nlnotes.exe
+t/data/notes.ini
+t/data/nsd.exe
+t/data/readme.txt
+
+Config-LotusNotes.ppd
+Config-LotusNotes-0.34.tar.gz
+META.yml                                 Module meta-data (added by MakeMaker)

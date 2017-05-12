@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<TMPL_VAR NAME="lang">-<TMPL_VAR NAME="collation">">
+<body>
+<TMPL_IF NAME="loop.menu">
+    <ul>
+    <TMPL_LOOP NAME="loop.menu">
+        <li>
+                <a href="/<TMPL_VAR NAME="lang"><TMPL_VAR NAME="this.href1">/"><TMPL_VAR NAME="this.atitle1"></a>
+                <TMPL_IF NAME="this.submenu1">
+                <ul>
+                <TMPL_LOOP NAME="this.submenu1">
+                        <li>
+                                <a href="/<TMPL_VAR NAME="lang"><TMPL_VAR NAME="this.href2">/"><TMPL_VAR NAME="this.atitle2"></a>
+                                <TMPL_IF NAME="this.submenu2">
+                                <ul>
+                                <TMPL_LOOP NAME="this.submenu2">
+                                <li>
+                                        <a href="/<TMPL_VAR NAME="lang"><TMPL_VAR NAME="this.href3">/"><TMPL_VAR NAME="this.atitle3"></a>
+                                </li>
+                                </TMPL_LOOP>
+                                </ul>
+                                </TMPL_IF>
+                        </li>
+                </TMPL_LOOP>
+                </ul>
+                </TMPL_IF>
+        </li>
+    </TMPL_LOOP>
+    </ul>
+</TMPL_IF>
+</body>
+</html>

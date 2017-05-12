@@ -1,0 +1,81 @@
+NAME
+      CPAN::DistroBuilder - Create a distro from a bundle or a number of modules from CPAN
+
+SYNOPSIS
+      % perl -MCPAN::DistroBuilder -webuild ApacheSDK 0.1 Bundle::Apache
+
+      % perl -MCPAN::DistroBuilder -webuild CoolSDK 0.1 MD5 CGI
+
+DESCRIPTION
+    This package does a very simple thing. It fetches the source packages
+    from CPAN, using "CPAN.pm" and puts them all into a single *tar.gz*
+    package ready for distribution. This distribution package later can be
+    installed in one command and therefore very useful for users who have to
+    use our software, but know little or no Perl at all and don't know how
+    to use CPAN shell to fetch and install all the required packages.
+    Releasing Bundles and properly defining prerequisites in the CPAN
+    modules is very important, and we go one step further to actually
+    provide sort of SDK.
+
+    This package relies on the locally working "CPAN.pm"'s shell. If you
+    didn't configure your "CPAN.pm", do it before using this package. If
+    normally "CPAN.pm" works for you, this package should work too.
+
+CAVEATS
+    Some packages' build is interactive (i.e. user input is expected).
+    Therefore we use "CPAN.pm"'s "inactivity_timeout" attribute to interrupt
+    the awaiting for user's input after a few seconds, which works in *perl
+    Makefile.PL* stage, but not during *make*. In the latter case you have
+    to manually satisfy the requested input or interrupt it. Since here we
+    completely rely on "CPAN.pm"'s shell to do the right thing, there is not
+    much we can do. Remember that we have to run "perl Makefile.PL" to
+    extract the prerequisites. You can adjust the value of the
+    "inactivity_timeout" attribute in "CPAN::DistroBuilderConfig".
+
+    Unfortunately some packages define they own interactive methods which
+    CPAN cannot skip automatically, in this case you have to manually answer
+    the question.
+
+USAGE
+    To package the packages or bundles *Foo* and *Bar* into a ready for
+    distribution package *FooBar-0.2*, execute:
+
+      % perl -MCPAN::DistroBuilder -webuild FooBar 0.2 Foo Bar
+
+    this will create *FooBar-0.2.tar.gz* in the current directory.
+
+    To install the contents of the created distribution package, run:
+
+      % tar -xzvf FooBar-0.2.tar.gz
+      % cd FooBar-0.2
+      % perl Makefile.PL && make && make test && make install
+
+    The last command will go through all the source packages and run:
+
+      % perl Makefile.PL && make && make test && make install
+
+    in every one. You may need to do the "make install" part as a root user
+    if the files need to be installed system-wide.
+
+    When the packages are fetches from CPAN they are saved in the
+    *distro-build* directory (or a different one if you override the
+    "build_dir" attribute in "CPAN::DistroBuilderConfig") created at the
+    current directory. This directory is cleaned up automatically on the
+    next invocation of the this tool, if invoked from the same directory.
+
+    Notice that the build process is logged to the *make.out* file in the
+    current directory.
+
+    As a side-effect of using "CPAN.pm" is that it creates the *.cpan*
+    directory in the current directory where it downloads the index files
+    and the modules source packages.
+
+AUTHORS
+    Stas Bekman <stas@stason.org>
+
+    Inspired by Doug MacEachern <dougm@apache.org>
+
+COPYRIGHT
+    The "CPAN::DistroBuilder" module is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+

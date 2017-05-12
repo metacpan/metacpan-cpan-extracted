@@ -1,0 +1,21 @@
+Revision history for Perl module Catalyst::Plugin::Session::Store::MongoDB
+
+0.03 Mon Feb 22 17:00:14 EST 2016
+    - new version by "Ronald J Kimball <rjk@tamias.net>"
+
+    - use MongoDB::MongoClient rather than MongoDB::Connection
+      (now works with MongoDB v1 and later)
+
+    - added client_options attribute
+
+    - deprecated hostname and port attributes
+
+    - updated license (with permission from Stefan)
+
+    - updated and improved documentation
+
+0.02 Wed Jun  2 16:25:29 CEST 2010
+    - complete rewrite by "Stefan Völkel <bd@bc-bd.org>"
+
+0.01 Thu May 27 12:49:18 2010
+    - first version by "Cory G Watson <gphat at cpan.org>"

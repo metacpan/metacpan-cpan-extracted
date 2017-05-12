@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Class-DBI-Loader
+version:             0.34
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Class::DBI:                    0.89
+    DBI:                           1.3
+    Lingua::EN::Inflect:           0
+    Test::More:                    0.32
+    Text::Balanced:                0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

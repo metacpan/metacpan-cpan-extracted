@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.53.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 57f9c53fc954953054af0686d43a98975aeddb41 Build.PL
+SHA1 89efcbeac0e773c55079957818e9788cff544381 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 9b8ec16c38149f6e06853c3fd0fc86b92d873465 MANIFEST
+SHA1 14c05945f9965b546add7f14ea05f3e4c7df9268 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 20af79caee4986b814a1ed4fa617993c17887466 README
+SHA1 938cf52ebd3edbbd3de26ba0870ab58c0769ddff lib/Compress/LZW/Progressive.pm
+SHA1 2e665a3d08118e045153c1792eab5fa3e7a699de lib/Compress/LZW/Progressive/Dict.pm
+SHA1 58a781a42a9d0c56c242dfcdb11a997bf0f38f23 t/0-signature.t
+SHA1 5f3b94cce56ff47ba446c3204bbfabf404dcda6e t/1-dict.t
+SHA1 d93c7cdaf0fc2d3dc3f8f8c93f3f5fc27d55d19f t/2-test.t
+SHA1 c46325f20bd0cad70a15a398dda32c835dfd727b t/3-wide.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGYFLoHHIpFH/pKkIRAmk1AJ9pOkX+kdQFpxTQqhqXSyu+tNEeywCePiBn
+Gu+FTGA8TBACbboEtPof+R0=
+=bKpI
+-----END PGP SIGNATURE-----

@@ -1,0 +1,5 @@
+close(STDERR);
+my $here = `pwd`;
+chop $here;
+print "$here\n$$\n";
+chdir("/");

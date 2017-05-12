@@ -1,0 +1,31 @@
+Class::HPLOO
+============
+
+This is the implemantation of OO-Classes for HPL.
+This bring a easy way to create PM classes, but with HPL resources/style.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  'Filter::Simple'  => 0.02 ,
+  'Filter::Util::Call' => 1.06 ,
+  'Text::Balanced' => 1.89 ,
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Graciliano M. P. <gmpassos@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

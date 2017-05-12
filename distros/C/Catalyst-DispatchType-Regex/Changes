@@ -1,0 +1,55 @@
+Revision history for Catalyst-DispatchType-Regex
+
+5.90035 - Tue Mar 31 09:57:18 EDT 2015
+    Updates the deprecation message to reflect the fact that this module
+    has been dropped from Catalyst::Runtime.
+    [No meaningful code changes. No need to upgrade.]
+
+5.90034 - Tue Mar 31 09:47:32 EDT 2015
+    Adds Catalyst::Runtime to list of prereqs.
+    -  Catalyst::Runtime was not previously included as  prereq as it caused
+       circular dependencies. As of v5.90060, Catalyst::Runtime no longer
+       includes this module as a prereq. Since that was released 14 months ago,
+       it should be relatively safe to include Catalyst::Runtime as a prereq.
+    Adds travis.ci integration.
+    [No code changes. No need to upgrade.]
+
+5.90033 - Tue Jun 18 14:20:48 EDT 2013
+    - Fixes spelling of deprecation.
+    - Improves skips in tests.
+    - Adds env flag to suppress the deprecation warning message.
+
+5.90032 - Fri Apr 12 22:44:58 EDT 2013
+    Removes Catalyst-Runtime as a dependency
+
+    While some cpan clients can handle circular dependencies, apparently not
+    all of them can. Of course, it is hard to imagine anyone installing this
+    without already having Catalyst installed, so dropping the Catalyst
+    requirement is unlikely to cause any real problems other than limiting
+    the automated testing.
+
+5.90031 - Fri Apr 12 18:49:56 EDT 2013
+    Makes tests conditional on having Catalyst::Runtime 5.90030 installed
+
+    To ease the depreciation process Catalyst::Runtime is including
+    Catalyst::DispatchType::Regex as a requirement for a period of time.
+    This causes a circular dependency. The installers seem to be smart
+    enough to deal with the circular dependency, but the CDR tests fail
+    because Catalyst::Runtime 5.90030 isn't installed. The test will be
+    re-enabled once the requirement has been removed from Catalyst::Runtime.
+
+5.90030 - Wed Apr 10 10:04:59 EDT 2013
+    Initial release of standalone Catalyst-DispatchType-Regex
+
+    The Regex dispatch types have been depreciated and removed from
+    Catalyst core. This distribution is being made available as a
+    fallback for developers who need the Regex dispatch type until
+    they can convert to Chaind methods or other alternative.
+
+    This distribution creates a separate DispatchType for each of
+    Regex, Regexp, LocalRegex, and LocalRegexp. Previously C::Dispatcher
+    converted all of these to Regex before passing it off to that
+    one dispatch type.
+
+    Dispatch order is no longer guaranteed to be Regex before LocalRegex.
+    It now depends on when the DispatchType is seen in a controller.

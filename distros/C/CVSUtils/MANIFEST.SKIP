@@ -1,0 +1,18 @@
+^(.*/)?CVS/.*
+^Makefile$
+^blib/.*
+^pm_to_blib$
+^.cvsignore$
+CHECK-IT-RUNS-UNDER-5.005
+cvs2cl.pl
+# Not used in any tests
+data/log.txt.bz2
+mail/*
+BUGS.html
+cvs2cl-use
+cvs2log
+cvsu-2002-05-01-16.tar.gz
+data/indent.log
+BUGS.xml
+bugs2html.xslt
+Makefile-BUGS

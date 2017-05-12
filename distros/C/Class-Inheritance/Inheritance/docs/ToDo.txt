@@ -1,0 +1,28 @@
+
+ TODO:
+ 1. Add pod stuff
+ 2. Create module .tgz file for installation purposes. 
+DONE  3. Lowercase functions. Rename them to make them more intuitive.
+DONE  4. Return ref to arrays rather than a string. Make a print module for
+    the strings. 
+DONE 5. Eval the requires. If eval fails, fail script, but use carp module. 
+ 6. Add some more functions for more ideas about the inheritance problem.
+    a. function to say "choose the 2nd function in the list."
+    b. Return the ref to the function of any of the parents in the tree.
+       This is already possible, but it will make it easier for novices.
+    c. Function to print non-repeated entries in the Inherit_Tree function.
+    d. Dump text, html, xml, or graphic image of parent tree.
+    e. Sync or Pollute to remap a package to use another package. 
+    f. Find all children who have:
+       1. Inheritted this class
+       2. Directly inherited a method from this class. 
+       3. Directly inherited a method from this class and 
+          I am the original source. 
+DONE  7. Use Inherit_Tree->(class_name=>$class_name, tree=>$tree)
+    instead of Inherit_Tree->($class_name, $tree)
+    for all the functions, unless there is only one variable. 
+ 8. Consider Class::Inspector and whether it should use this module
+    or I should use its module, or both, or they should be merged. 
+    My gut reaction is that I would Inspector since Inspector seems to
+    be designed just for a class. 
+DONE 9. Replace :: with / for requires.

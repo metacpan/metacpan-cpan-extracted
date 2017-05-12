@@ -1,0 +1,186 @@
+{
+   "abstract" : "Dispatch actions based on HTTP request methods",
+   "author" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "build_requires" : {
+      "Catalyst::Controller::ActionRole" : "0",
+      "Catalyst::Test" : "0",
+      "FindBin" : "0",
+      "HTTP::Request::Common" : "0",
+      "Moose" : "1.03",
+      "Test::More" : "0.89"
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.31"
+   },
+   "generated_by" : "Dist::Zilla version 2.101240",
+   "license" : "perl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : 1.4
+   },
+   "name" : "Catalyst-ActionRole-MatchRequestMethod",
+   "recommends" : {},
+   "requires" : {
+      "Catalyst::Controller::ActionRole" : "0",
+      "Catalyst::Runtime" : "5.80",
+      "Moose::Role" : "0",
+      "Perl6::Junction" : "0",
+      "namespace::autoclean" : "0"
+   },
+   "resources" : {
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-ActionRole-MatchRequestMethod",
+      "homepage" : "http://search.cpan.org/dist/Catalyst-ActionRole-MatchRequestMethod",
+      "repository" : "git://github.com/rafl/catalyst-actionrole-matchrequestmethod.git"
+   },
+   "version" : "0.03",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@FLORA/@Filter/GatherDir",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@FLORA/@Filter/PruneCruft",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@FLORA/@Filter/ManifestSkip",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@FLORA/@Filter/MetaYAML",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@FLORA/@Filter/License",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@FLORA/@Filter/Readme",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@FLORA/@Filter/PkgVersion",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@FLORA/@Filter/PodCoverageTests",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@FLORA/@Filter/PodSyntaxTests",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@FLORA/@Filter/ExtraTests",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@FLORA/@Filter/ExecDir",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@FLORA/@Filter/ShareDir",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@FLORA/@Filter/MakeMaker",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@FLORA/@Filter/Manifest",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@FLORA/@Filter/ConfirmRelease",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@FLORA/@Filter/UploadToCPAN",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@FLORA/MetaConfig",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@FLORA/MetaJSON",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@FLORA/MetaResources",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@FLORA/PodWeaver",
+            "version" : "3.100710"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereq",
+            "name" : "@FLORA/AutoPrereq",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereq",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereq" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereq",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "2.101240"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "2.101240"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "2.101240"
+      }
+   }
+}
+

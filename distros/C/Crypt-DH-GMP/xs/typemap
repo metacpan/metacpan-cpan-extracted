@@ -1,0 +1,65 @@
+TYPEMAP
+PerlCryptDHGMP *        T_DH_GMP
+PerlCryptDHGMP_value      T_DH_GMP_VALUE
+
+INPUT
+T_DH_GMP
+    {
+        MAGIC *mg;
+        mg = PerlCryptDHGMP_mg_find(aTHX_ SvRV($arg), &PerlCryptDHGMP_vtbl);
+        if (mg) {
+            $var = (PerlCryptDHGMP *) mg->mg_ptr;
+        }
+    }
+
+T_DH_GMP_VALUE
+        if (! SvPOK($arg)) {
+            croak(\"$var is not a string!\");
+        }
+        mpz_init_set_str($var, SvPV_nolen($arg), 10);
+
+OUTPUT
+T_DH_GMP
+        if (!$var)          /* if null */
+            SvOK_off($arg); /* then return as undef instead of reaf to undef */
+        else {
+            /* setup $arg as a ref to a blessed hash hv */
+            MAGIC *mg;
+            HV *hv = newHV();
+            const char *classname = \"Crypt::DH::GMP\";
+            /* take (sub)class name to use from class_sv if appropriate */
+            if (class_sv && SvOK(class_sv) && sv_derived_from(class_sv, classname))
+                classname = (SvROK(class_sv)) ? sv_reftype(class_sv, 0) : SvPV_nolen(class_sv);
+            sv_setsv($arg, sv_2mortal(newRV_noinc((SV*)hv)));
+            (void)sv_bless($arg, gv_stashpv(classname, TRUE));
+
+            /* now attach $var to the HV */
+            /* done as two steps to avoid sv_magic SvREFCNT_inc and MGf_REFCOUNTED */
+            mg = sv_magicext((SV*)hv, NULL, PERL_MAGIC_ext, &PerlCryptDHGMP_vtbl, (char*) $var, 0); /* sizeof($var));  */
+            mg->mg_flags |= MGf_DUP;
+        }
+
+
+T_DH_GMP_VALUE
+        {
+            char *buf;
+            char *buf_end;
+            int len;
+
+            mpz_t *tmp = $arg; /* Set aside for temporary use */
+
+            /* len is always >= 1, and might be off (greater) by one than real len */
+            len = mpz_sizeinbase(*tmp, 10);
+            $arg = newSV(len);  /* alloc len + 1 bytes */
+            SvPOK_on($arg);
+            buf = SvPVX($arg); /* get ptr to storage */
+            buf_end = buf + len - 1; /* end of storage (-1) */
+            mpz_get_str(buf, 10, *tmp);
+            if (*buf_end == 0) {
+                len--; /* got one shorter than expected */
+            }
+            
+            SvCUR_set($arg, len);
+        }
+
+

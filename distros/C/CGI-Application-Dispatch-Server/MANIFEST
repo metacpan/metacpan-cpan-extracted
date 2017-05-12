@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/CGI/Application/Dispatch/Server.pm
+MANIFEST			
+README
+Makefile.PL
+META.yml

@@ -1,0 +1,97 @@
+Revision history for Crypt::Password
+
+0.28 2012-02-18
+* windows support
+* cygwin = windows
+
+0.27 2012-02-16
+* some more guesses at cross-platform behaviour
+
+0.26 2012-02-15
+* dont feed hash part in as salt, solaris uses too much for salt
+
+0.25 2011-12-23
+* some tweaks for windows
+
+0.24 2011-12-21
+* fix tests
+
+0.23 2011-12-20
+* test refactoring
+* thinking more in terms of extended, modular and... windows
+* throw away overloading/external OO, add check_password($crypted, $plain)
+
+0.22 2011-12-15
+* less experimenting
+
+0.21 2011-12-15
+* tidy ups, blowfish = 2
+* dont croak ourselves on unknown algorithms
+
+0.20 2011-12-12
+* make a new isnt
+
+0.19 2011-12-11
+* freebsd Extended format experimentation
+* done re-add algorithm id to dollary salt
+
+0.18 2011-12-10
+* freebsd dollarsing to include salt, empty salt
+* experiment with lots of algorithms
+* freebsd seems to like alg 1/5/6 not 2
+
+0.17 2011-12-10
+* work around weird unoverloading bug? in Test::More
+* experimental windows support
+
+0.16 2011-12-09
+* variabullo
+
+0.15 2011-12-08
+* some more freebsd understanding
+
+0.14 2011-12-07
+* actually change the crypt_flav when testing variations
+* return a definite string value to avoid this "isn't numeric is string ne"
+
+0.12 2011-12-04
+* misc/other
+
+0.11 2011-12-02
+* nothing
+
+0.10 2011-12-01
+* debug stuff for cpantesters
+* half-support some underunderstood crypt implementations
+
+0.09 2011-11-29
+* fix infinite recursion bug so *BSDs return actual broken test results
+
+0.08 2011-11-23
+* half-supporting more crypt implementations, release for cpantesters
+
+0.07 2011-11-14
+* doc edits
+* replace the somehow-deleted inc/Module/Install...
+
+0.06 2011-11-12
+* FreeSec (darwin, BSD) support
+* warning labels in docs about not definitely crypting
+* add crypt_password for definitely crypting something
+
+0.05 2010-04-24
+* rewrite without Moose
+
+0.04 2009-10-17
+* test fixes; avoid isnt(), plan once
+
+0.03 2009-10-16
+* compat woe; test salt lengths 1-16 and diag throughout
+
+0.02 2009-10-13
+ * improve tests
+ * add known issue about not working on Darwin
+
+0.01 2009-10-07
+ * initial revision
+

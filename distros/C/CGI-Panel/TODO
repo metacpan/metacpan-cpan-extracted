@@ -1,0 +1,18 @@
+Properly document the local_* methods
+
+Make all html producing methods take an 'other_tags' parameter that allows any other
+tags (eg style, width etc) to be specified.  May not be needed for event_link and 
+the local_* methods * DONE *
+
+Expand the example to use all the functionality of the module suite.
+
+Include a ready-to-run example (perhaps the same example as in the synopsis) * DONE *
+
+Consider explicitly writing action => '?' in the start_form call in screen_main in
+CGI::Panel::MainPanel so that redundant GET parameters are not shown in the URL window.
+
+Merge CGI::Panel::MainPanel into CGI::Panel to make it simpler to use.  Have
+a think about this and decide which way is better.  I really think that
+merging it will be better.  * DONE *
+
+

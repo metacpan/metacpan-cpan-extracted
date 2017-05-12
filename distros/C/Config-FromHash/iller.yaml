@@ -1,0 +1,31 @@
+---
+doctype: dist
+
+header:
+  name: Config-FromHash
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.010001
+     - Hash::Merge: 0.200
+     - File::Basename
+     - Path::Tiny
+
+  test:
+    requires:
+     - Test::Deep: 0.110
+
+plugins:
+  - +config: Author::CSSON
+
+  - +add_plugin: TravisYML
+    +before: Git::Tag
+    perl_version: 5.10 5.14 5.20
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+  - +remove_plugin: Splint

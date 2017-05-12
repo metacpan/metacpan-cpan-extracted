@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Class-DBI-Plugin-AbstractCount
+version:            0.08
+abstract:           get COUNT(*) results with abstract SQL
+author:
+    - Jean-Christophe Zeus <mail@ljczeus.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::DBI:          0.95
+    Class::DBI::Plugin:  0.02
+    SQL::Abstract:       1.5
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

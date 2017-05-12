@@ -1,0 +1,171 @@
+2008-07-04 14:35  cvs
+
+	* Changes, MANIFEST, lib/CGI/Auth/Auto.pm,
+	  t/CGI-Auth-Auto-1.20-1.21.patch: added changes submitted by
+	  Dulaunoy  Fabrice, path in t//CGI-Auth-Auto-1.20-1.21.patch
+
+2006-11-15 17:06  cvs
+
+	* CGI-Auth-Auto-1.10.tar.gz, META.yml: 1.10 distro
+
+2006-11-15 17:02  cvs
+
+	* MANIFEST, Makefile.PL, install.conf, cgi-bin/auth.cgi,
+	  lib/CGI/Auth/Auto.pm, public_html/.templates/template_login.html:
+	  cleaning up, going well
+
+2006-11-15 14:24  cvs
+
+	* cgi-bin/auth.cgi, lib/CGI/Auth/Auto.pm: this version includes cgi
+	  session.. should be deprecated
+
+2006-11-15 11:37  cvs
+
+	* CGI-Auth-Auto-1.08.tar.gz, META.yml: dist 1.08
+
+2006-11-15 11:36  cvs
+
+	* cgi-bin/auth.cgi, lib/CGI/Auth/Auto.pm: stablish, with session
+	  now.
+
+2006-11-14 18:10  cvs
+
+	* lib/CGI/Auth/Auto.pm: trying to use CGI::Session instead
+
+2006-11-14 16:59  cvs
+
+	* CGI-Auth-Auto-1.004.tar.gz, CGI-Auth-Auto-1.05.tar.gz,
+	  CGI-Auth-Auto-1.06.tar.gz, META.yml: updating dists
+
+2006-11-14 16:58  cvs
+
+	* lib/CGI/Auth/Auto.pm: fix doc
+
+2006-11-11 17:57  cvs
+
+	* CGI-Auth-Auto-1.05.tar.gz, META.yml: dist
+
+2006-11-11 17:49  cvs
+
+	* MANIFEST, README, lib/CGI/Auth/Auto.pm: took out auth stuff fixed
+	  up doc
+
+2006-10-27 17:45  cvs
+
+	* MANIFEST: small changesd
+
+2006-10-26 13:31  cvs
+
+	* CGI-Auth-Auto-1.004.tar.gz: updated
+
+2006-10-26 13:21  cvs
+
+	* install.conf: took out test.cgi
+
+2006-10-26 13:10  cvs
+
+	* META.yml, cgi-bin/auth/sess/README: metayml and ensure that
+	  cgi-bin/auth/sess is created with dist
+
+2006-10-26 13:10  cvs
+
+	* CGI-Auth-Auto-1.004.tar.gz, MANIFEST: added stablish dist
+
+2006-10-26 12:59  cvs
+
+	* MANIFEST, Makefile.PL, README, cgi-bin/auth.cgi: preparing for
+	  release
+
+2006-10-26 12:48  cvs
+
+	* cgi-bin/auth/: test.cgi, test.cli.pl, user.dat: changed user.dat
+	  to have one user, default:default
+
+2006-10-26 12:22  cvs
+
+	* install.conf, cgi-bin/auth.cgi, lib/CGI/Auth/Auto.pm:
+	  documentation and added methods get_logout_param_name.. etc
+
+2006-10-25 18:24  cvs
+
+	* lib/CGI/Auth/Auto.pm: waaaay better then before, now inherits
+	  from Auth
+
+2006-10-08 08:47  cvs
+
+	* cgi-bin/auth/test.cli.pl: rudimentary cli test
+
+2006-10-08 08:43  cvs
+
+	* install.conf, cgi-bin/auth/test.cgi, lib/CGI/Auth/Auto.pm: added
+	  test cgi post install.. check to see it working.
+
+2006-10-08 08:16  cvs
+
+	* install.conf: added isntall.conf for use with webapp-install.pl
+
+2006-10-08 08:14  cvs
+
+	* cgi-bin/auth/AuthCfg.pm: made it so it looks for auth as pwd for
+	  authman.pl
+
+2006-10-08 07:37  cvs
+
+	* install.pl, cgi-bin/auth/template_login.html,
+	  public_html/.templates/template_login.html: moved things around
+
+2006-10-08 03:26  cvs
+
+	* Auto.pm: moved Auto to proper place
+
+2006-10-08 03:25  cvs
+
+	* cgi-bin/auth/template_login.html: added template
+
+2006-10-08 03:24  cvs
+
+	* MANIFEST, Makefile.PL, install.pl, lib/CGI/Auth/Auto.pm: updating
+	  for something that would install itself in an account
+
+2006-10-06 18:28  cvs
+
+	* Auto.pm: changes
+
+2006-09-08 11:32  cvs
+
+	* Auto.pm: added some doc
+
+2006-08-29 07:12  cvs
+
+	* Auto.pm: doc
+
+2006-08-29 07:07  cvs
+
+	* Auto.pm: minor fixes
+
+2006-08-23 08:25  cvs
+
+	* Auto.pm: tried to turn off failure message
+
+2006-08-23 08:20  cvs
+
+	* Auto.pm: added auto off option added auto (real auto) capacity
+	  added diff defaults for template etc
+
+2006-08-18 20:59  cvs
+
+	* Auto.pm: corrections
+
+2006-08-18 12:16  cvs
+
+	* Auto.pm, MANIFEST, Makefile.PL, cgi-bin/auth/AuthCfg.pm,
+	  cgi-bin/auth/README, cgi-bin/auth/authman.pl,
+	  cgi-bin/auth/login.html, cgi-bin/auth/user.dat: Initial revision
+
+2006-08-18 12:16  cvs
+
+	* Auto.pm, MANIFEST, Makefile.PL, cgi-bin/auth/AuthCfg.pm,
+	  cgi-bin/auth/README, cgi-bin/auth/authman.pl,
+	  cgi-bin/auth/login.html, cgi-bin/auth/user.dat: init import,
+	  reworked from devel-auth
+

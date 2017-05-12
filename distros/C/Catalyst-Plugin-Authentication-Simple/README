@@ -1,0 +1,73 @@
+Catalyst-Plugin-Authentication-Simple version 1.0
+=================================================
+
+A 'simple' authentication mechanism for Catalyst.
+Usernames, passwords, & roles come from either a file
+or an array ref.
+
+In your Catalyst main module say something like:
+
+MyCatalystObject->config(   
+        ....
+        authentication => {
+            user_file => '/full/path/to/user/file',
+            [ password_hash => 'md5' OR 'sha' ]
+        },
+
+
+The format of 'user_file' is:
+
+<user1>:<pass1>:<role1>,<role2>,<role3>
+<user2>:<pass2>:<role2>,<role4>
+<user3>:<pass3>:<role1>,<role3>,<role4>
+...
+
+Instead of 'user_file' you can pass in an array ref like:
+            
+        authentication => {
+            users => [
+                        '<user1>:<pass1>:<role1>,<role2>,<role3>',
+                        '<user2>:<pass2>:<role2>,<role4>',
+                        '<user3>:<pass3>:<role1>,<role3>,<role4>.
+                    ],
+            [ password_hash => 'md5' OR 'sha' ]
+            
+
+IF 'password_hash' is set to md5 or sha the password is a hash of one of those
+two variants, so the $password you pass into 'login' or 'session_login' will be
+hashed by Digest::MD5::md5_hex or Digest::SHA::sha1_hex & then checked for equality.
+
+Final thing - if you pass in a filename the username list will be read in once & only once & then 
+converted to the 'users' array ref.  Later in your app you can dynamically change this
+array ref. as you please for future login attempts...
+
+Have Fun!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  NEXT
+  Catalyst
+  A Catalyst session module most likely
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Mark Ethan Trostler
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

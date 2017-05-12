@@ -1,0 +1,20 @@
+CGI::Plus
+    Version 0.10 November 22, 2012
+
+      Initial release
+
+    Version 0.12 November 28, 2012
+
+      Fixing prerequisite lists in CPAN upload.
+
+    Version 0.13 April 25, 2014
+
+      Fixed error in META.yml.
+
+    Version 0.14 May 23, 2014
+
+      Fixed bugs in test script.
+
+    Version 0.15 January 4, 2015
+
+      Gave tests names.

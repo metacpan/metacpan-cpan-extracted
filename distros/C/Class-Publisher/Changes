@@ -1,0 +1,10 @@
+Revision history for Class::Publisher
+$Id: Changes,v 1.2 2005/03/25 13:20:21 simonflack Exp $
+
+v0.2  2004-03-25
+    - You can subscribe directly to Class::Publisher to receive all events
+    - removed SET_DBEBUG & $DEBUG - use Log::Trace hooks
+    - added t/pod.t & t/pod_coverage.t
+
+v0.1  2004-09-11
+    - Initial revision

@@ -1,0 +1,16 @@
+[% INCLUDE 'header.tt' %]
+
+<p>
+Welcome to the web-interface for the
+<a href="news://[% nntp_server %]/">[% nntp_server %] news server </a>. Try
+the <a href="group/">web interface</a>.
+</p>
+
+[% SET link = "cgi-app-nni/" %]
+<p>
+This interface is powered by
+<a href="[% link %]">CGI-Application-NetNewsIface</a>. Learn
+<a href="[% link %]">more about it</a>.
+</p>
+
+[% INCLUDE 'footer.tt' %]

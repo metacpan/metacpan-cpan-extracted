@@ -1,0 +1,44 @@
+---
+abstract: 'Language prefix in the request path'
+author:
+  - 'Norbert Buchmuller, C<< <norbi at nix.hu> >>'
+build_requires:
+  Catalyst::Test: 0
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.62
+  FindBin: 0
+  HTTP::Request::Common: 5.824
+  Path::Class: 0.16
+  Test::Deep: 0.103
+  Test::Differences: 0.4801
+  Test::More: 0.92
+  Test::Most: 0.21
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-I18N-PathPrefix
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Catalyst: 5.80013
+  Catalyst::Plugin::I18N: 0.09
+  I18N::LangTags::List: 0.35
+  List::Util: 0
+  Moose: 0.92
+  Scope::Guard: 0.03
+  namespace::autoclean: 0.09
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mendel/Catalyst-Plugin-I18N-PathPrefix.git
+version: 0.07

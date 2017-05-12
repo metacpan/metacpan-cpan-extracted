@@ -1,0 +1,73 @@
+{
+   "abstract" : "Dist with non-matching provides",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Test-Dummy-Perl5-DifferentProvides",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Test::Dummy::Perl5::DifferentProvides" : {
+         "file" : "lib/CPAN/Test/Dummy/Perl5/DifferentProvides.pm",
+         "version" : "0.01"
+      },
+      "CPAN::Test::Dummy::Perl5::DifferentProvides::B" : {
+         "file" : "lib/CPAN/Test/Dummy/Perl5/DifferentProvides/B.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides.git",
+         "web" : "https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-DifferentProvides"
+      }
+   },
+   "version" : "0.01"
+}
+

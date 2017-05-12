@@ -1,0 +1,9 @@
+#
+# config file for ex3
+#
+
+src-host = localhost
+src-port = 80
+
+dst-host = localhost
+dst-port = 8080

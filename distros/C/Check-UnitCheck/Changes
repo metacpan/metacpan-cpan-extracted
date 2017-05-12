@@ -1,0 +1,7 @@
+Revision history for Perl extension Check::UnitCheck.
+0.13  May 2011
+  Tested ok with perl-5.14 RC1 and RC2, add bug fix from team@cpan.org for some perl build flags.
+
+0.10  Tue Oct 24 21:04:58 2006
+  First version of Check::UnitCheck.  Proof that you get what you deserve.
+

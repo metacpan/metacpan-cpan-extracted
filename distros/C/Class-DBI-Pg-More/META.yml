@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Class-DBI-Pg-More
+version:             0.05
+abstract:            Enhances Class::DBI::Pg with more goodies
+license:             ~
+author:              
+    - Boris Sukholitko (boriss@gmail.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::DBI::Plugin::DateTime::Pg: 
+    Test::Simple:                  0.44
+    Test::TempDatabase:            0.12
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

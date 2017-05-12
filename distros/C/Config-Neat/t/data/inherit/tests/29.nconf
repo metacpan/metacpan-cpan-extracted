@@ -1,0 +1,15 @@
+# infinite recursion loop
+inc1
+{
+    @inherit    .#inc2
+}
+
+inc2
+{
+    @inherit    .#inc3
+}
+
+inc3
+{
+    @inherit    .#inc1
+}

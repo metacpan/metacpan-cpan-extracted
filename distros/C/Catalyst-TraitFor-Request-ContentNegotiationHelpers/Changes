@@ -1,0 +1,25 @@
+# This file documents the revision history for Perl extension Catalyst-TraitFor-Request-ContentNegotiationHelpers.
+
+0.006 - 2015-11-30
+  - New ActionRole to delegate media type negotiation across actions
+
+0.005 - 2015-11-12
+  - 'no_match' callbacks now get a hash of the other possible callbacks
+     to make it easier to set a default or to inspect.
+
+0.004 - 2015-09-24
+  - Fixed missing $VERSION information
+
+0.003 - 2015-08-24
+  - all 'accepts_*' methods now accept a list and return allowed content types
+    not just true / false.  This should not break any existing use but be aware
+    that the return value for true is no longer just '1'.  Return value for 
+    'nothing acceptable' is now undef.
+
+0.002 - 2015-08-17
+  - added helper methods: accepts_charset, accepts_language, accepts_encoding,
+    accepts_media_type, on_best_encoding, on_best_charset, on_best_language,
+    on_best_media_type.
+
+0.001 - 2015-04-29
+  - First Release 

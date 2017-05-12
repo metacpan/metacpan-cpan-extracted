@@ -1,0 +1,40 @@
+#! /usr/bin/perl
+
+# This is a test parser and assumes that the keywrods are defined within
+# the configuration file. Try "parse easy.conf"
+#
+#                          Anthony R Fletcher 2 January 2008.
+
+use 5;
+use warnings;
+use strict;
+
+use Data::Dumper;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Config::Nested;
+
+# Slurp configuration data
+$/=undef;
+my $conf = <>;
+
+my $c = new Config::Nested();
+$conf = $c->autoConfigure($conf); # get configuration from file.
+
+# Parse defaults.
+#$c->parse("alive !hungry") || die "Parsing defaults failed\n";
+
+# Parse configuration
+$c->parse($conf) || die "Parsing failed\n";
+
+for my $s ($c->sections())
+{
+	print "================= $s ====================\n";
+	my @obj	= $c->section($s);
+	print Dumper(\@obj);
+}
+
+exit;
+

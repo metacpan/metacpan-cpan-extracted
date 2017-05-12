@@ -1,0 +1,32 @@
+[% INCLUDE "header.tt" %]
+[% PROCESS "list_macros.tt" %]
+
+<div class="list">
+<table id="matrix">
+    <tr>
+    [% FOR column = crud.model.list_columns %]
+        <th>[% crud.column_monikers.$column %]</th>
+    [% END %]
+
+    [% list_additional_column_headings(); %]
+
+    <th id="actionth"></th>
+    </tr>
+
+    [%  SET count = 0; %]
+    [% FOR item = items %]
+        [% SET count = count + 1 %]
+        <tr [% ' class="alternate"' IF count % 2; %]>
+
+            [% list_row_columns(item); %]
+            <td class="actions">[% list_actions(item); %]</td>
+
+        </tr>
+    [% END %]
+</table>
+
+[% INCLUDE "pager.tt" %]
+
+<a href="[% c.uri_for_controller('add') %]">Add</a>
+
+[% INCLUDE "footer.tt" %]

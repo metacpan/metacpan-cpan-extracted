@@ -1,0 +1,3 @@
+Execute this to read the documentation:
+
+perldoc Catalyst::Model::Search::Plucene

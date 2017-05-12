@@ -1,0 +1,224 @@
+Revision history for Config-IOD
+
+0.33    2016-12-29 (PERLANCAR)
+
+	- [test] Try to un-fail test on systems where the home dir is faked
+	  [CT].
+
+
+0.32    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.31    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Moving spec prereq from DevelopRecommends to
+	  DevelopSuggests with _SPEC:: prefix.
+
+
+0.30    2016-12-27 (PERLANCAR)
+
+	- [Bugfix] Fix off-by-one error in calculating section line range
+	  for last section in document.
+
+
+0.29    2016-03-03 (PERLANCAR)
+
+        - Split constants to Config::IOD::Constants so they are usable by other
+          modules.
+
+        - Minor doc polishing.
+
+
+0.28    2016-03-02 (PERLANCAR)
+
+	- Add set_value() method to document object.
+
+
+0.27    2016-03-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update Synopsis.
+
+
+0.26    2016-02-27 (PERLANCAR)
+
+	- [Bugfix] Didn't maintain _cur_section state during parsing.
+
+
+0.25    2016-02-27 (PERLANCAR)
+
+        - [Incompatible change] Directive line with Unknown directive will now
+	  still parse as directive line, not regular comment.
+
+	- Document: Add list_keys() & get_directive_before_key().
+
+        - Implement checking of allow_duplicate_key=0, like in
+          Config::IOD::Reader.
+
+
+0.24    2016-02-24 (PERLANCAR)
+
+	- Adjust to Config::IOD::Base 0.22 (implement encoding !path &
+	  !paths).
+
+	- Remove bench script (see Bencher-Scenario-IODParsing now).
+
+
+0.23    2015-10-08 (PERLANCAR)
+
+	- [Bugfix] Reverse wrong logic in interpreting 'cond' result, d'oh.
+
+
+0.22    2015-10-08 (PERLANCAR)
+
+	- Add 'cond' options for delete_key() & delete_section().
+
+
+0.21    2015-09-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak abstract: mention INI.
+
+
+0.20    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.19    2015-08-18 (PERLANCAR)
+
+	- [Bugfix] ';name=val' was parsed as key line when it should be
+	  comment line.
+
+
+0.18    2015-08-18 (PERLANCAR)
+
+	- Add each_key().
+
+
+0.17    2015-08-18 (PERLANCAR)
+
+        - Add methods: each_section() & list_sections().
+
+        - dump(): Add options linum_start & linum_end.
+
+
+0.16    2015-05-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [opt] Reduce startup overhead by avoiding Carp.
+
+
+0.15    2015-03-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Adjust to IOD::Examples 0.15, which now puts shared files in tarball.
+
+
+0.14    2015-03-19 (PERLANCAR)
+
+        - Support option: ignore_unknown_directive (Config::IOD::Base 0.13).
+
+        - [Bugfix] Fix expr decoding.
+
+        - [Internal] Add tests from Test::Config::IOD::Common.
+
+
+0.13    2015-03-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] Specify dependency to spec IOD.
+
+
+0.12    2015-03-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] insert_key(): Fix insert location when current line is a
+	  section line.
+
+
+0.11     2015-03-18 (PERLANCAR)
+
+         - Add document methods: empty(), dump(), get_value().
+
+
+0.10     2015-03-12 (PERLANCAR)
+
+         - Allow creating empty document using: '$doc =
+           Config::IOD::Document->new'.
+
+         - POD tweaks/fixes/additions.
+
+
+0.09     2015-03-12 (PERLANCAR)
+
+         - Split specification to another dist (IOD). This has been done since
+           2012-10-14.
+
+         - Rename module/dist from Config-Ini-OnDrugs to Config-IOD.
+
+         - Rewrite implementation, interface is now pure OO-only.
+
+         - Implement deleting section/key and inserting (replacing) section/key,
+           but not much else yet. More methods will be added in the future.
+
+
+0.08     2011-12-13 (SHARYANTO)
+
+         - No implementation changes. Spec changes (syntax of nested section,
+           allow comment in section line). Add warning message that module is
+           still not usable.
+
+
+0.07     2011-10-29 (SHARYANTO)
+
+         - No functional changes. Add missing dep [ct].
+
+
+0.06     2011-10-25 (SHARYANTO)
+
+         - No functional changes. Add missing dep [ct].
+
+
+0.05     2011-10-20 (SHARYANTO)
+
+         - Fix chdir.
+
+
+0.04     2011-10-20 (SHARYANTO)
+
+         - Fix stupid mistake in aliasing.
+
+
+0.03     2011-10-20 (SHARYANTO)
+
+         - Fix typo. Add another alias package: Config::INI::OnDrugs.
+
+
+0.02     2011-10-20 (SHARYANTO)
+
+         - Fix and refactor some stuffs. Add as_tree(), Config::IOD alias
+           package, support for !include. Note that this module is still not
+           ready yet.
+
+
+0.01     2011-10-06 (SHARYANTO)
+
+         - First, early release. Only a few features are implemented.

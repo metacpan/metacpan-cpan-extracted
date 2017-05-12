@@ -1,0 +1,37 @@
+/* $Id: ContactForm.css,v 1.7 2003/04/06 02:19:59 gunnarh Exp $ */
+
+p, h1, body { font-family: arial, helvetica, sans-serif }
+p, body { background: #f0f0f0; color: black }
+body { margin-left: 15% }
+h1 {
+    background: #f0f0f0;
+    color: #4c5ea8;
+    font-size: 19px;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+input, textarea {
+    font-family: 'courier new', monospace;
+    font-size: 14px;
+    background: white;
+    color: black;
+}
+p { font-size: 14px; margin-top: 0; margin-bottom: 0.1em }
+p.erroralert { margin-bottom: 0.7em }
+p.returnlink { margin-top: 1em }
+.halign, td p.returnlink { text-align: center }
+.error { color: #cc6600; background: none }
+td { text-align: left }
+input.button {
+    font-family: arial, helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 0.1em;
+    background: #ddeeff;
+    color: black;
+}
+input.button:hover { background: white; color: black }
+a         { color: #4c5ea8; background: none }
+a:visited { color: #4c5ea8; background: none }
+a:active  { color: #cc6600; background: none }
+a:hover   { color: #cc6600; background: none }

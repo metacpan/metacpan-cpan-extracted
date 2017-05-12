@@ -1,0 +1,91 @@
+NAME
+    Class::Method::ModifiersX::Override - adds "override method => sub {...}"
+    support to Class::Method::Modifiers
+
+SYNOPSIS
+       use v5.14;
+       use strict;
+       use Test::More;
+   
+       package Foo {
+          sub new { bless []=> shift }
+          sub foo { return "foo" }
+       }
+   
+       package Foo::Bar {
+          BEGIN { our @ISA = 'Foo' }
+          use Class::Method::ModifiersX::Override;
+          override foo => sub {
+             return uc super;
+          };
+       }
+   
+       is( Foo::Bar->new->foo, "FOO" );
+       done_testing();
+
+    (Note that the synopsis shows Perl v5.14+ syntax for package declaration,
+    but this module and its accompanying Moo and Role::Tiny wrappers support
+    Perl v5.8 and above.)
+
+DESCRIPTION
+    Class::Method::ModifiersX::Override extends Class::Method::Modifiers with
+    the `override` method modifier, allowing you to use this Moose syntactic
+    sugar for overriding superclass methods in non-Moose classes.
+
+    See Moose::Manual::MethodModifiers for details of how `override` and its
+    companion function `super` work.
+
+    This module exports two functions:
+
+    `override NAME, CODE`
+    `super`
+
+    If you want to use these with Moo classes or role, or with Role::Tiny
+    roles, please look at MooX::Override or Role::TinyX::Override instead.
+
+CAVEATS
+    This implementation of `override` piggybacks onto
+    Class::Method::Modifiers' implementation of `around`. As a result, when
+    multiple method modifiers are applied to the same method, the order in
+    which they are applied might not match Moose, where `override` modifiers
+    are "innermost".
+
+    Given that this implementation of `override` piggybacks onto `around`,
+    there's almost no reason to use it; you can just use `around` instead.
+    This module mostly exists as an answer to people who complain that Moo
+    doesn't support `override`/`super`, but it may also be helpful porting
+    Moose code to Moo.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Class-Method-ModifiersX-Overri
+    de>.
+
+DEPENDENCIES
+    Class::Method::ModifiersX::Override requires Perl 5.008, and the
+    Class::Method::Modifiers package (which is available from CPAN).
+
+    The accompanying modules MooX::Override and Role::TinyX::Override require
+    Moo and Role::Tiny respectively. However, the installation scripts for
+    this distribution do not check that these are installed. If you use
+    MooX::Override or Role::TinyX::Override, it is assumed that you have
+    installed their dependencies separately.
+
+SEE ALSO
+    Moose::Manual::MethodModifiers, Class::Method::Modifiers, MooX::Override,
+    Role::TinyX::Override.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012, 2014, 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

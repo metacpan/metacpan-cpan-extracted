@@ -1,0 +1,12 @@
+0.29 - Sat Dec 12 2001
+
+	Fix up the demo system to work now that we are based on 
+	CDB_File
+
+	We now sort our databases by default according to the `C'
+	locale so that perl comparison functions work appropriately.
+
+0.26 - Wed Dec 12 2001
+
+	Work around recent changes in CDB_File which mean we can't
+	seek to a particular place and then keep going.

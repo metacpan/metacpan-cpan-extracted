@@ -1,0 +1,11463 @@
+%PDF-1.2
+%‚„œ”
+1 0 obj
+[/CalRGB
+<<
+/WhitePoint [0.9505 1 1.089]
+/Gamma [1.8 1.8 1.8]
+/Matrix [0.4497 0.2446 0.02518 0.3613 0.672 0.1412 0.1845 0.08334 0.9227]
+>>
+]
+endobj
+2 0 obj
+<<
+/CreationDate (D:20070118112121+0000)
+/Producer (Pequel)
+/Title (Class::STL::Containers)
+>>
+endobj
+5 0 obj
+<<
+/Type /Encoding
+/Differences [ 0 /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /space /exclam
+/quotedbl /numbersign /dollar /percent /ampersand
+/quoteright /parenleft /parenright /asterisk /plus /comma
+/hyphen /period /slash /zero /one /two /three /four /five
+/six /seven /eight /nine /colon /semicolon /less /equal
+/greater /question /at /A /B /C /D /E /F /G /H /I /J /K /L
+/M /N /O /P /Q /R /S /T /U /V /W /X /Y /Z /bracketleft
+/backslash /bracketright /asciicircum /underscore
+/quoteleft /a /b /c /d /e /f /g /h /i /j /k /l /m /n /o /p
+/q /r /s /t /u /v /w /x /y /z /braceleft /bar /braceright
+/asciitilde /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /emdash
+/dotlessi /grave /acute /circumflex /tilde /macron /breve
+/dotaccent /dieresis /.notdef /ring /cedilla /.notdef
+/hungarumlaut /ogonek /caron /space /exclamdown /cent
+/sterling /currency /yen /brokenbar /section /dieresis
+/copyright /ordfeminine /guillemotleft /logicalnot /hyphen
+/registered /macron /degree /plusminus /twosuperior
+/threesuperior /acute /mu /paragraph /periodcentered
+/cedilla /onesuperior /ordmasculine /guillemotright
+/onequarter /onehalf /threequarters /questiondown /Agrave
+/Aacute /Acircumflex /Atilde /Adieresis /Aring /AE
+/Ccedilla /Egrave /Eacute /Ecircumflex /Edieresis /Igrave
+/Iacute /Icircumflex /Idieresis /Eth /Ntilde /Ograve
+/Oacute /Ocircumflex /Otilde /Odieresis /multiply /Oslash
+/Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn
+/germandbls /agrave /aacute /acircumflex /atilde /adieresis
+/aring /ae /ccedilla /egrave /eacute /ecircumflex
+/edieresis /igrave /iacute /icircumflex /idieresis /eth
+/ntilde /ograve /oacute /ocircumflex /otilde /odieresis
+/divide /oslash /ugrave /uacute /ucircumflex /udieresis
+/yacute /thorn /ydieresis ]
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F00
+/Encoding 5 0 R
+/BaseFont /Times-Roman
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F01
+/Encoding 5 0 R
+/BaseFont /Times-Bold
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F02
+/Encoding 5 0 R
+/BaseFont /Times-Italic
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F03
+/Encoding 5 0 R
+/BaseFont /Times-BoldItalic
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F10
+/Encoding 5 0 R
+/BaseFont /Courier
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F11
+/Encoding 5 0 R
+/BaseFont /Courier-Bold
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F12
+/Encoding 5 0 R
+/BaseFont /Courier-Oblique
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F13
+/Encoding 5 0 R
+/BaseFont /Courier-BoldOblique
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F20
+/Encoding 5 0 R
+/BaseFont /Helvetica
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F21
+/Encoding 5 0 R
+/BaseFont /Helvetica-Bold
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F22
+/Encoding 5 0 R
+/BaseFont /Helvetica-Oblique
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/Name /F23
+/Encoding 5 0 R
+/BaseFont /Helvetica-BoldOblique
+>>
+endobj
+0 g
+18 0 obj
+<<
+/Length 19 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F21 12 Tf
+1 0 0 1 52.0 750.0 Tm
+0.0000 Tw
+(NAME ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 735.6 Tm
+0.0000 Tw
+(Class::STL::Containers - Perl extension for STL-like object management ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 705.6 Tm
+0.0000 Tw
+(SYNOPSIS ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 687.0 Tm
+0.0000 Tw
+(  use stl; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 670.2 Tm
+0.0000 Tw
+(  # Deque container... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 661.8 Tm
+0.0000 Tw
+(  my $d = stl::deque\(qw\(first second third fourth\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 653.4 Tm
+0.0000 Tw
+(  $d->push_back\($d->factory\('fifth'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 645.0 Tm
+0.0000 Tw
+(  $d->push_front\($d->factory\('seventh'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 636.6 Tm
+0.0000 Tw
+(  $d->pop_front\(\); # remove element at front. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 628.2 Tm
+0.0000 Tw
+(  $d->pop_back\(\); # remove element at back. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 619.8 Tm
+0.0000 Tw
+(  stl::for_each\($d->begin\(\), $d->end\(\), ptr_fun\('::myprint'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 603.0 Tm
+0.0000 Tw
+(  sub myprint \{ print "Data:", @_, "\\n"; \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 586.2 Tm
+0.0000 Tw
+(  # Copy constructor... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 577.8 Tm
+0.0000 Tw
+(  my $d_copy = stl::deque\($d\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 561.0 Tm
+0.0000 Tw
+(  # Algorithms -- find_if\(\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 552.6 Tm
+0.0000 Tw
+(  print "Element 'second' was ",  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 544.2 Tm
+0.0000 Tw
+(    stl::find_if\($d->begin\(\), $d->end\(\), stl::bind1st\(stl::equal_to\(\), 'second'\)\)  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 535.8 Tm
+0.0000 Tw
+(      ? 'found' : 'not found', "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 519.0 Tm
+0.0000 Tw
+(  # Algorithms -- count_if\(\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 510.6 Tm
+0.0000 Tw
+(  print "Number of elements matching /o/ = ", ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 502.2 Tm
+0.0000 Tw
+(    stl::count_if\($d->begin\(\), $d->end\(\), stl::bind2nd\(stl::matches\(\), 'o'\)\), ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 493.8 Tm
+0.0000 Tw
+("\\n"; # prints '2' -- matches 'second' and 'fourth' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 477.0 Tm
+0.0000 Tw
+(  # Algorithms -- transform\(\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 468.6 Tm
+0.0000 Tw
+(  stl::transform\($d->begin\(\), $d->end\(\), $d2->begin\(\), stl::ptr_fun\('ucfirst'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 460.2 Tm
+0.0000 Tw
+(  stl::transform\($d->begin\(\), $d->end\(\), $d2->begin\(\), $d3->begin\(\), stl::ptr_fun_binary\('::mybfun'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 451.8 Tm
+0.0000 Tw
+(  sub mybfun \{ return $_[0] . '-' . $_[1]; \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 435.0 Tm
+0.0000 Tw
+(  # Function Adaptors -- bind1st ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 426.6 Tm
+0.0000 Tw
+(  stl::remove_if\($v->begin\(\), $v->end\(\), stl::bind1st\(stl::equal_to\(\), $v->back\(\)\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 418.2 Tm
+0.0000 Tw
+(    # remove element equal to back\(\) -- ie remove last element. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 409.8 Tm
+0.0000 Tw
+(  stl::remove_if\($v->begin\(\), $v->end\(\), stl::bind2nd\(stl::matches\(\), '^fi'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 401.4 Tm
+0.0000 Tw
+(    # remove all elements that match reg-ex '^fi' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 384.6 Tm
+0.0000 Tw
+(  # Sort list according to elements cmp\(\) function ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 376.2 Tm
+0.0000 Tw
+(  $v->sort\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 359.4 Tm
+0.0000 Tw
+(  # Queue containers -- FIFO ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 351.0 Tm
+0.0000 Tw
+(  my $v = stl::queue\(qw\(first second third fourth fifth\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 342.6 Tm
+0.0000 Tw
+(  print 'Back:', $v->back\(\)->data\(\), "\\n" # Back:fifth ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 334.2 Tm
+0.0000 Tw
+(  print 'Front:', $v->front\(\)->data\(\), "\\n" # Front:first ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 325.8 Tm
+0.0000 Tw
+(  $v->pop\(\); # pop element first in ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 317.4 Tm
+0.0000 Tw
+(  $v->push\($v->factory\('sixth'\)\), "\\n" ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 309.0 Tm
+0.0000 Tw
+(  print 'Back:', $v->back\(\)->data\(\), "\\n" # Back:sixth ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 300.6 Tm
+0.0000 Tw
+(  print 'Front:', $v->front\(\)->data\(\), "\\n" # Front:second ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 283.8 Tm
+0.0000 Tw
+(  # Iterators ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 275.4 Tm
+0.0000 Tw
+(  for \(my $i = $v->begin\(\); !$i->at_end\(\); ++$i\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 267.0 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 258.6 Tm
+0.0000 Tw
+(print "Data:", $i->p_element\(\)->data\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 250.2 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 233.4 Tm
+0.0000 Tw
+(  # Iterators -- reverse_iterator ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 225.0 Tm
+0.0000 Tw
+(  my $ri = stl::reverse_iterator\($v->iter\(\)\)->first\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 216.6 Tm
+0.0000 Tw
+(  while \(!$ri->at_end\(\)\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 208.2 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 199.8 Tm
+0.0000 Tw
+(print "Data:", $ri->p_element\(\)->data\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 191.4 Tm
+0.0000 Tw
+(++$ri; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 183.0 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 166.2 Tm
+0.0000 Tw
+(  # Inserters ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 157.8 Tm
+0.0000 Tw
+(  my $three2one = stl::list\(qw\(3 2 1\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 149.4 Tm
+0.0000 Tw
+(  my $four2six = stl::list\(qw\(4 5 6\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 141.0 Tm
+0.0000 Tw
+(  my $seven2nine = stl::list\(qw\(7 8 9\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 132.6 Tm
+0.0000 Tw
+(  my $result = stl::list\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 124.2 Tm
+0.0000 Tw
+(  stl::copy\($three2one->begin\(\), $three2one->end\(\), stl::front_inserter\($result\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 115.8 Tm
+0.0000 Tw
+(  stl::copy\($seven2nine->begin\(\), $seven2nine->end\(\), stl::back_inserter\($result\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 107.4 Tm
+0.0000 Tw
+(  my $iseven = stl::find\($result->begin\(\), $result->end\(\), 7\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 99.0 Tm
+0.0000 Tw
+(  stl::copy\($four2six->begin\(\), $four2six->end\(\), stl::inserter\($result, $iseven\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 90.6 Tm
+0.0000 Tw
+(  # $result now contains \(1, 2, 3, 4, 5, 6, 7, 8, 9\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 73.8 Tm
+0.0000 Tw
+(  # Vector container... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 65.4 Tm
+0.0000 Tw
+(  my $v = stl::vector\(qw\(first second third fourth fifth\)\); ) Tj
+/F10 7 Tf
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 537.44 37 Tm
+(1) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+19 0 obj
+6496
+endobj
+20 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+21 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 20 0 R
+/Contents 18 0 R
+>>
+endobj
+22 0 obj
+<<
+/Length 23 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F10 7 Tf
+1 0 0 1 76.0 771.6 Tm
+0.0000 Tw
+(  my $e = $v->at\(0\); # return pointer to first element. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 763.2 Tm
+0.0000 Tw
+(  print 'Element-0:', $e->data\(\), "\\n";   # Element-0:first ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 754.8 Tm
+0.0000 Tw
+(  $e = $v->at\($v->size\(\)-1\); # return pointer to last element. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 746.4 Tm
+0.0000 Tw
+(  print 'Element-last:', $e->data\(\), "\\n";  # Element-last:fifth ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 738.0 Tm
+0.0000 Tw
+(  $e = $v->at\(2\); # return pointer to 3rd element \(idx=2\). ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+(  print 'Element-2:', $e->data\(\), "\\n";   # Element-2:third ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 712.8 Tm
+0.0000 Tw
+(  # Priority Queue ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 704.4 Tm
+0.0000 Tw
+(  my $p = stl::priority_queue\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 696.0 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 10, data => 'ten'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 687.6 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 2, data => 'two'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 679.2 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 12, data => 'twelve'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 670.8 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 3, data => 'three'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 662.4 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 11, data => 'eleven'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 654.0 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 1, data => 'one'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 645.6 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 1, data => 'one-2'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 637.2 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 12, data => 'twelve-2'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 628.8 Tm
+0.0000 Tw
+(  $p->push\($p->factory\(priority => 20, data => 'twenty'\), $p->factory\(priority => 0, data => 'zero'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 620.4 Tm
+0.0000 Tw
+(  print "\\$p->size\(\)=", $p->size\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 612.0 Tm
+0.0000 Tw
+(  print "\\$p->top\(\):", $p->top\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 603.6 Tm
+0.0000 Tw
+(  $p->top\(\)->priority\(7\); # change priority for top element. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 595.2 Tm
+0.0000 Tw
+(  $p->refresh\(\); # refresh required after priority change. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 586.8 Tm
+0.0000 Tw
+(  $p->pop\(\); # remove element with highest priority. ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 578.4 Tm
+0.0000 Tw
+(  print "\\$p->top\(\):", $p->top\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 561.6 Tm
+0.0000 Tw
+(  # Clone $d container into $d1... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 553.2 Tm
+0.0000 Tw
+(  my $d1 = $d->clone\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 536.4 Tm
+0.0000 Tw
+(  my $d2 = stl::deque\(qw\(sixth seventh eight\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 519.6 Tm
+0.0000 Tw
+(  # Append $d container to end of $d2 container... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 511.2 Tm
+0.0000 Tw
+(  $d2 += $d; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 494.4 Tm
+0.0000 Tw
+(  # DataMembers -- Class builder helper... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 486.0 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 477.6 Tm
+0.0000 Tw
+(    package MyClass; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 469.2 Tm
+0.0000 Tw
+(    use Class::STL::ClassMembers \( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 460.8 Tm
+0.0000 Tw
+(        qw\(attrib1 attrib2\), # data members ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 452.4 Tm
+0.0000 Tw
+(        Class::STL::ClassMembers::DataMember->new\( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 444.0 Tm
+0.0000 Tw
+(            name => 'attrib3', default => '100', validate => '^\\d+$'\), # data member with attributes ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 435.6 Tm
+0.0000 Tw
+(        Class::STL::ClassMembers::DataMember->new\( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 427.2 Tm
+0.0000 Tw
+(            name => 'attrib4', default => 'med', validate => '^\(high|med|low\)$'\), ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 418.8 Tm
+0.0000 Tw
+(    \);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 410.4 Tm
+0.0000 Tw
+(    use Class::STL::ClassMembers::Constructor;  # produce class new\(\) function ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 402.0 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 393.6 Tm
+0.0000 Tw
+(  my $cl = MyClass->new\(attrib1 => 'hello', attrib2 => 'world'\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 385.2 Tm
+0.0000 Tw
+(  print $cl->attrib1\(\), " ", $cl->attrib2\(\), "\\n"; # 'hello world' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 376.8 Tm
+0.0000 Tw
+(  $cl->attrib1\(ucfirst\($cl->attrib1\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 368.4 Tm
+0.0000 Tw
+(  $cl->attrib2\(ucfirst\($cl->attrib2\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 360.0 Tm
+0.0000 Tw
+(  print $cl->attrib1\(\), " ", $cl->attrib2\(\), "\\n"; # 'Hello World' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 351.6 Tm
+0.0000 Tw
+(  $cl->attrib4\('avg'\); # Causes progam to die with '** Function attrib2 value failed validation...' ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 330.6 Tm
+0.0000 Tw
+(DESCRIPTION ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 316.2 Tm
+0.3079 Tw
+(This package provides a framework for rapid Object Oriented Perl application development. It consists of) Tj
+1 0 0 1 76.0 304.2 Tm
+1.0382 Tw
+(a number of base classes that are similar to the C++/STL framework, plus a number of ) Tj
+/F22 10 Tf
+1.0382 Tw
+(helper) Tj
+/F20 10 Tf
+1.0382 Tw
+( classes) Tj
+1 0 0 1 76.0 292.2 Tm
+0.5106 Tw
+(which provide the ) Tj
+/F22 10 Tf
+0.5106 Tw
+(glue) Tj
+/F20 10 Tf
+0.5106 Tw
+( to transparently generate common functions, and will enable you to put your Perl) Tj
+1 0 0 1 76.0 280.2 Tm
+0.0000 Tw
+(application together very quickly.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 256.2 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(STL) Tj
+/F20 10 Tf
+0.0000 Tw
+( functionality provided consists of ) Tj
+/F23 10 Tf
+0.0000 Tw
+(containers) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(algorithms) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(utilities) Tj
+/F20 10 Tf
+0.0000 Tw
+( and ) Tj
+/F23 10 Tf
+0.0000 Tw
+(iterators) Tj
+/F20 10 Tf
+0.0000 Tw
+( as follows: ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 241.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Containers) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 229.8 Tm
+0.0000 Tw
+(vector, list, deque, queue, priority_queue, stack, tree. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 203.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Iterators) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 191.4 Tm
+0.0000 Tw
+(iterator, bidirectional_iterator, reverse_iterator, forward_iterator. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 165.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Algorithms) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 153.0 Tm
+0 Tw
+(find, find_if, for_each, transform, count, count_if, copy, copy_backward, remove, remove_if,) Tj
+1 0 0 1 76.0 141.0 Tm
+0.0000 Tw
+(remove_copy, remove_copy_if, replace, replace_if, replace_copy, replace_copy_if. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 114.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Utilities) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 102.6 Tm
+1.1511 Tw
+(equal_to, not_equal_to, greater, greater_equal, less, less_equal, compare, bind1st, bind2nd, mem_fun,) Tj
+1 0 0 1 76.0 90.6 Tm
+2.1467 Tw
+(ptr_fun, ptr_fun_binary, matches, matches_ic, logical_and, logical_or, multiplies, divides, plus, minus,) Tj
+1 0 0 1 76.0 78.6 Tm
+0.0000 Tw
+(modulus. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(2) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+23 0 obj
+7372
+endobj
+24 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+25 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 24 0 R
+/Contents 22 0 R
+>>
+endobj
+26 0 obj
+<<
+/Length 27 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F21 10 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Differences From C++/STL) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 768.0 Tm
+0.0065 Tw
+(Most of the functions have the same arguments and return types as their STL equivalent. There are some) Tj
+1 0 0 1 76.0 756.0 Tm
+0.0000 Tw
+(differences though between the C++/STL and this implementation: ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+(Iterators and the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(end\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 717.6 Tm
+0.0056 Tw
+(An ) Tj
+/F22 10 Tf
+0.0056 Tw
+(iterator) Tj
+/F20 10 Tf
+0.0056 Tw
+( object points to a numeric position within the container, and not to an ) Tj
+/F22 10 Tf
+0.0056 Tw
+(element) Tj
+/F20 10 Tf
+0.0056 Tw
+(. If new elements) Tj
+1 0 0 1 76.0 705.6 Tm
+0.4850 Tw
+(are inserted to, or removed from, a postion preceding the iterator, then the iterator will point to the same) Tj
+1 0 0 1 76.0 693.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(position) Tj
+/F20 10 Tf
+0.0000 Tw
+( but to a different element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 669.6 Tm
+0.5806 Tw
+(The ) Tj
+/F22 10 Tf
+0.5806 Tw
+(end) Tj
+/F20 10 Tf
+0.5806 Tw
+( function will return a newly constructed iterator object which will point to the ) Tj
+/F22 10 Tf
+0.5806 Tw
+(last) Tj
+/F20 10 Tf
+0.5806 Tw
+( element within) Tj
+1 0 0 1 76.0 657.6 Tm
+0.0000 Tw
+(the container, unlike the C++/STL equivalent which points to ) Tj
+/F22 10 Tf
+0.0000 Tw
+(after) Tj
+/F20 10 Tf
+0.0000 Tw
+( the last element.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 631.2 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(tree) Tj
+/F20 10 Tf
+0.0000 Tw
+( Container ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 619.2 Tm
+0.1994 Tw
+(This container provides a hierarchical tree structure. Each element within a ) Tj
+/F22 10 Tf
+0.1994 Tw
+(tree) Tj
+/F20 10 Tf
+0.1994 Tw
+( container can be either a) Tj
+1 0 0 1 76.0 607.2 Tm
+3.1383 Tw
+(simple element or another container object. The ) Tj
+/F22 10 Tf
+3.1383 Tw
+(algorithms) Tj
+/F20 10 Tf
+3.1383 Tw
+( and overridden ) Tj
+/F22 10 Tf
+3.1383 Tw
+(to_array) Tj
+/F20 10 Tf
+3.1383 Tw
+( functions will) Tj
+1 0 0 1 76.0 595.2 Tm
+0.0000 Tw
+(traverse the tree and pocess all element ) Tj
+/F22 10 Tf
+0.0000 Tw
+(nodes) Tj
+/F20 10 Tf
+0.0000 Tw
+( within the tree. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 568.8 Tm
+0.0000 Tw
+(Utilities ) Tj
+/F22 10 Tf
+0.0000 Tw
+(matches) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F22 10 Tf
+0.0000 Tw
+(matches_ic) Tj
+/F20 10 Tf
+0.0000 Tw
+( functions ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 556.8 Tm
+0.4679 Tw
+(These utilities provide unary functions for regular expression matching. The first or second argument will) Tj
+1 0 0 1 76.0 544.8 Tm
+0.0000 Tw
+(be a regular expression string. The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(match_ic) Tj
+/F20 10 Tf
+0.0000 Tw
+( provides case insensitive matching. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 518.4 Tm
+0.0000 Tw
+(Container ) Tj
+/F22 10 Tf
+0.0000 Tw
+(append) Tj
+/F20 10 Tf
+0.0000 Tw
+( function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 506.4 Tm
+0.0000 Tw
+(This function and the overridden ) Tj
+/F10 10 Tf
+0.0000 Tw
+(+) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F10 10 Tf
+0.0000 Tw
+(+=) Tj
+/F20 10 Tf
+0.0000 Tw
+( operators will combine the two containers together. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 480.0 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(clone) Tj
+/F20 10 Tf
+0.0000 Tw
+( function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 468.0 Tm
+0.0000 Tw
+(This function returns a newly constructed object that is a copy of its caller object.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 441.6 Tm
+0.0000 Tw
+(The Container ) Tj
+/F22 10 Tf
+0.0000 Tw
+(to_array) Tj
+/F20 10 Tf
+0.0000 Tw
+( function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 429.6 Tm
+0.0000 Tw
+(This function will return an array consisting of all element objects within the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 403.2 Tm
+0.0000 Tw
+(Container ) Tj
+/F22 10 Tf
+0.0000 Tw
+(element) Tj
+/F20 10 Tf
+0.0000 Tw
+( type ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 391.2 Tm
+0.8892 Tw
+(All containers contain collections of objects which are of type ) Tj
+/F23 10 Tf
+0.8892 Tw
+(Class::STL::Element) Tj
+/F20 10 Tf
+0.8892 Tw
+(, or classes derived) Tj
+1 0 0 1 76.0 379.2 Tm
+0.0000 Tw
+(from this type. The container classes are themselves, ultimately, derived from this ) Tj
+/F22 10 Tf
+0.0000 Tw
+(element) Tj
+/F20 10 Tf
+0.0000 Tw
+( type. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 337.2 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::ClassMembers) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 322.8 Tm
+2.2127 Tw
+(These ) Tj
+/F22 10 Tf
+2.2127 Tw
+(helper) Tj
+/F20 10 Tf
+2.2127 Tw
+( classes can be used to generate code for various basic class functions. This module) Tj
+1 0 0 1 76.0 310.8 Tm
+0 Tw
+(requires an import list consisting of target data member names or) Tj
+1 0 0 1 76.0 298.8 Tm
+4.4371 Tw
+() Tj
+/F22 10 Tf
+4.4371 Tw
+(Class::STL::ClassMembers::DataMember) Tj
+/F20 10 Tf
+4.4371 Tw
+( objects. When using ) Tj
+/F22 10 Tf
+4.4371 Tw
+(ClassMembers) Tj
+/F20 10 Tf
+4.4371 Tw
+( ) Tj
+/F21 10 Tf
+4.4371 Tw
+(ALL) Tj
+/F20 10 Tf
+4.4371 Tw
+( data members) Tj
+1 0 0 1 76.0 286.8 Tm
+2.6927 Tw
+(should be included in order for the generated ) Tj
+/F22 10 Tf
+2.6927 Tw
+(clone) Tj
+/F20 10 Tf
+2.6927 Tw
+( and ) Tj
+/F22 10 Tf
+2.6927 Tw
+(swap) Tj
+/F20 10 Tf
+2.6927 Tw
+( functions to function correctly. The) Tj
+1 0 0 1 76.0 274.8 Tm
+0 Tw
+(constructor function code can be produces as well by using the package) Tj
+1 0 0 1 76.0 262.8 Tm
+2.0367 Tw
+() Tj
+/F23 10 Tf
+2.0367 Tw
+(Class::STL::ClassMembers::Constructor) Tj
+/F20 10 Tf
+2.0367 Tw
+(, or ) Tj
+/F23 10 Tf
+2.0367 Tw
+(Class::STL::ClassMembers::SingletonConstructor) Tj
+/F20 10 Tf
+2.0367 Tw
+( to) Tj
+1 0 0 1 76.0 250.8 Tm
+0.0000 Tw
+(create a singleton class type. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 226.8 Tm
+0.0000 Tw
+(The following target member functions will be generated and made available to the class: ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 200.4 Tm
+0.0000 Tw
+(Data Member Accessor Get/Put Function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 188.4 Tm
+0.1105 Tw
+(This function will have the same name as the data member and should be used to ) Tj
+/F22 10 Tf
+0.1105 Tw
+(set) Tj
+/F20 10 Tf
+0.1105 Tw
+( or ) Tj
+/F22 10 Tf
+0.1105 Tw
+(get) Tj
+/F20 10 Tf
+0.1105 Tw
+( the value for) Tj
+1 0 0 1 76.0 176.4 Tm
+2.2129 Tw
+(the data member. Pass the value as the argument when setting the value for a data member. For) Tj
+1 0 0 1 76.0 164.4 Tm
+0.2500 Tw
+() Tj
+/F22 10 Tf
+0.2500 Tw
+(comlpex) Tj
+/F20 10 Tf
+0.2500 Tw
+( data members with a ) Tj
+/F23 10 Tf
+0.2500 Tw
+(validate) Tj
+/F20 10 Tf
+0.2500 Tw
+( attribute, a validation check will be performed when attempting to) Tj
+1 0 0 1 76.0 152.4 Tm
+0.0000 Tw
+(set the member value by matching the value against the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(validate) Tj
+/F20 10 Tf
+0.0000 Tw
+( regular expression string. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 126.0 Tm
+0.0000 Tw
+(Class ) Tj
+/F22 10 Tf
+0.0000 Tw
+(members_init\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( Function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 114.0 Tm
+1.8865 Tw
+(This function should be called in the target class`s ) Tj
+/F22 10 Tf
+1.8865 Tw
+(new) Tj
+/F20 10 Tf
+1.8865 Tw
+( function after ) Tj
+/F22 10 Tf
+1.8865 Tw
+($self) Tj
+/F20 10 Tf
+1.8865 Tw
+( has been blessed. It will) Tj
+1 0 0 1 76.0 102.0 Tm
+0.0000 Tw
+(perform the necessary data members initialisation. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 75.6 Tm
+0.0000 Tw
+(Class ) Tj
+/F22 10 Tf
+0.0000 Tw
+(clone\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( Function ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 537.44 37 Tm
+(3) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+27 0 obj
+7512
+endobj
+28 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+29 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 28 0 R
+/Contents 26 0 R
+>>
+endobj
+30 0 obj
+<<
+/Length 31 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F20 10 Tf
+1 0 0 1 76.0 780.0 Tm
+0.0000 Tw
+(This function will construct and return an object containing a copy of the caller object. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 753.6 Tm
+0.0000 Tw
+(Class ) Tj
+/F22 10 Tf
+0.0000 Tw
+(swap\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( Function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 741.6 Tm
+0.0647 Tw
+(This function requires one argument consisting of an object of the same type as the caller. It will swap the) Tj
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+(caller object with this ) Tj
+/F22 10 Tf
+0.0000 Tw
+(other) Tj
+/F20 10 Tf
+0.0000 Tw
+( object. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 703.2 Tm
+0.0000 Tw
+(Class ) Tj
+/F22 10 Tf
+0.0000 Tw
+(members\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( Function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 691.2 Tm
+0.2524 Tw
+(This function will return a pointer to an anonymous hash containing the data member names \(as the key\)) Tj
+1 0 0 1 76.0 679.2 Tm
+0.9981 Tw
+(and data member attibutes array list consisting of ) Tj
+/F23 10 Tf
+0.9981 Tw
+(default) Tj
+/F20 10 Tf
+0.9981 Tw
+( and ) Tj
+/F23 10 Tf
+0.9981 Tw
+(validate) Tj
+/F20 10 Tf
+0.9981 Tw
+( attribute fields in that order. All) Tj
+1 0 0 1 76.0 667.2 Tm
+0.0000 Tw
+(data members, including inherited members are contained in this hash. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 640.8 Tm
+0.0000 Tw
+(Class ) Tj
+/F22 10 Tf
+0.0000 Tw
+(members_local\(\)) Tj
+/F20 10 Tf
+0.0000 Tw
+( Function ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 628.8 Tm
+1.1012 Tw
+(Same as ) Tj
+/F23 10 Tf
+1.1012 Tw
+(members) Tj
+/F20 10 Tf
+1.1012 Tw
+( function except that only the data members local to the class are contained in the) Tj
+1 0 0 1 76.0 616.8 Tm
+0.0000 Tw
+(hash returned. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 590.4 Tm
+0.0000 Tw
+(Class::STL::ClassMembers::DataMember ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 578.4 Tm
+1.5840 Tw
+(For more complex data members, this class may be used to provide additional information about the) Tj
+1 0 0 1 76.0 566.4 Tm
+2.2123 Tw
+(member. This information consist of: ) Tj
+/F23 10 Tf
+2.2123 Tw
+(name) Tj
+/F20 10 Tf
+2.2123 Tw
+(, ) Tj
+/F23 10 Tf
+2.2123 Tw
+(default) Tj
+/F20 10 Tf
+2.2123 Tw
+(, and ) Tj
+/F23 10 Tf
+2.2123 Tw
+(validate) Tj
+/F20 10 Tf
+2.2123 Tw
+(. The ) Tj
+/F23 10 Tf
+2.2123 Tw
+(name) Tj
+/F20 10 Tf
+2.2123 Tw
+( attribute contains the) Tj
+1 0 0 1 76.0 554.4 Tm
+0.0087 Tw
+(member name; the ) Tj
+/F23 10 Tf
+0.0087 Tw
+(default) Tj
+/F20 10 Tf
+0.0087 Tw
+( attribute contains a default value for the member when initialised; the ) Tj
+/F23 10 Tf
+0.0087 Tw
+(validate) Tj
+/F20 10 Tf
+1 0 0 1 76.0 542.4 Tm
+2.5613 Tw
+(attribute consists of a regular expression string that will be used to validate the member value by) Tj
+1 0 0 1 76.0 530.4 Tm
+0.0000 Tw
+(matching it to this regex string. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 504.0 Tm
+0.0000 Tw
+(Class::STL::ClassMembers::Constructor ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 492.0 Tm
+0.4856 Tw
+(The constructor function with the name ) Tj
+/F23 10 Tf
+0.4856 Tw
+(new\(\)) Tj
+/F20 10 Tf
+0.4856 Tw
+( will be produced for a package that uses this module. It is) Tj
+1 0 0 1 76.0 480.0 Tm
+2.0831 Tw
+(recomended that this constructor is produced for any class \(package\) that uses the ) Tj
+/F23 10 Tf
+2.0831 Tw
+(ClassMembers) Tj
+/F20 10 Tf
+1 0 0 1 76.0 468.0 Tm
+3.7320 Tw
+(package to produce the data members. This will ensure that the correct calls are done during) Tj
+1 0 0 1 76.0 456.0 Tm
+1.3140 Tw
+(construction and copy-construction of an object. This constructor will make a call to the ) Tj
+/F10 10 Tf
+1.3140 Tw
+(static) Tj
+/F20 10 Tf
+1.3140 Tw
+( user) Tj
+1 0 0 1 76.0 444.0 Tm
+0.8250 Tw
+(member function ) Tj
+/F23 10 Tf
+0.8250 Tw
+(new_extra) Tj
+/F20 10 Tf
+0.8250 Tw
+( if it exists in the calling class. The ) Tj
+/F23 10 Tf
+0.8250 Tw
+(new_extra) Tj
+/F20 10 Tf
+0.8250 Tw
+( function will have the object) Tj
+1 0 0 1 76.0 432.0 Tm
+0.0000 Tw
+(reference passed as the first argument. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 405.6 Tm
+0.0000 Tw
+(Class::STL::ClassMembers::SingletonConstructor ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 393.6 Tm
+0.4159 Tw
+(Use this package to produce a singleton class. This constructor will ensure that only one instance of this) Tj
+1 0 0 1 76.0 381.6 Tm
+0.0000 Tw
+(class will be constructed. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 339.6 Tm
+0.0000 Tw
+(Example ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 323.4 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 315.0 Tm
+0.0000 Tw
+(    package MyClass; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 306.6 Tm
+0.0000 Tw
+(    use Class::STL::ClassMembers \( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 298.2 Tm
+0.0000 Tw
+(        qw\(attrib1 attrib2\), ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 289.8 Tm
+0.0000 Tw
+(        Class::STL::ClassMembers::DataMember->new\( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 281.4 Tm
+0.0000 Tw
+(            name => 'attrib3', default => '100', validate => '^\\d+$'\), ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 273.0 Tm
+0.0000 Tw
+(        Class::STL::ClassMembers::DataMember->new\( ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 264.6 Tm
+0.0000 Tw
+(            name => 'attrib4', default => 'med', validate => '^\(high|med|low\)$'\), ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 256.2 Tm
+0.0000 Tw
+(    \);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 247.8 Tm
+0.0000 Tw
+(    use Class::STL::ClassMembers::Constructor;  # produce class new\(\) function ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 239.4 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 231.0 Tm
+0.0000 Tw
+(  my $cl = MyClass->new\(attrib1 => 'hello', attrib2 => 'world'\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 222.6 Tm
+0.0000 Tw
+(  print $cl->attrib1\(\), " ", $cl->attrib2\(\), "\\n"; # 'hello world' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 214.2 Tm
+0.0000 Tw
+(  $cl->attrib1\(ucfirst\($cl->attrib1\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 205.8 Tm
+0.0000 Tw
+(  $cl->attrib2\(ucfirst\($cl->attrib2\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 197.4 Tm
+0.0000 Tw
+(  print $cl->attrib1\(\), " ", $cl->attrib2\(\), "\\n"; # 'Hello World' ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 189.0 Tm
+0.0000 Tw
+(  $cl->attrib4\('avg'\); # Causes progam to die with '** Function attrib2 value failed validation...' ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 168.0 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 132.0 Tm
+0.0000 Tw
+(Exports ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 120.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(list) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(deque) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(queue) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(priority_queue) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(stack) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(tree) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(4) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+31 0 obj
+6748
+endobj
+32 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+33 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 32 0 R
+/Contents 30 0 R
+>>
+endobj
+34 0 obj
+<<
+/Length 35 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F21 12 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Abstract) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 765.6 Tm
+0.5469 Tw
+(This is the ) Tj
+/F22 10 Tf
+0.5469 Tw
+(abstract) Tj
+/F20 10 Tf
+0.5469 Tw
+( base class for all other container classes. Objects should not be constructed directly) Tj
+1 0 0 1 76.0 753.6 Tm
+0.0000 Tw
+(from this class, but from any of the derived container classes. Common functions are documented here. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 723.6 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Element) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 709.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(new) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 697.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref new \( [ named-argument-list ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 685.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref new \( container-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 673.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref new \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 661.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref new \( iterator-start [, iterator-finish ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 649.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref new \( raw-data [, ... ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 625.2 Tm
+0.6781 Tw
+(The ) Tj
+/F22 10 Tf
+0.6781 Tw
+(new) Tj
+/F20 10 Tf
+0.6781 Tw
+( function constructs an object for this class and returns a blessed reference to this object.) Tj
+1 0 0 1 100.0 613.2 Tm
+0.5346 Tw
+(All forms accept an optional ) Tj
+/F22 10 Tf
+0.5346 Tw
+(hash) Tj
+/F20 10 Tf
+0.5346 Tw
+( containing any of the following named arguments: ) Tj
+/F22 10 Tf
+0.5346 Tw
+(element_type) Tj
+/F20 10 Tf
+0.5346 Tw
+(.) Tj
+1 0 0 1 100.0 601.2 Tm
+4.5108 Tw
+(The ) Tj
+/F22 10 Tf
+4.5108 Tw
+(element_type) Tj
+/F20 10 Tf
+4.5108 Tw
+( defines the class type of element objects that the container will hold.) Tj
+1 0 0 1 100.0 589.2 Tm
+0.2808 Tw
+() Tj
+/F22 10 Tf
+0.2808 Tw
+(element_type) Tj
+/F20 10 Tf
+0.2808 Tw
+( will default to ) Tj
+/F23 10 Tf
+0.2808 Tw
+(Class::STL::Element) Tj
+/F20 10 Tf
+0.2808 Tw
+( if not specified; when specified, the type must be) Tj
+1 0 0 1 100.0 577.2 Tm
+0.0000 Tw
+(derived from ) Tj
+/F23 10 Tf
+0.0000 Tw
+(Class::STL::Element) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 553.2 Tm
+0.0380 Tw
+(The second form is a ) Tj
+/F22 10 Tf
+0.0380 Tw
+(copy constructor) Tj
+/F20 10 Tf
+0.0380 Tw
+(. It requires another container reference as the argument, and) Tj
+1 0 0 1 100.0 541.2 Tm
+0.0000 Tw
+(will return a copy of this container. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 517.2 Tm
+0.3331 Tw
+(The third form requires one or more element refs as arguments. These elements will be copied into) Tj
+1 0 0 1 100.0 505.2 Tm
+0.0000 Tw
+(the newly constructed container. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 481.2 Tm
+1.5020 Tw
+(The fourth form requires one ) Tj
+/F22 10 Tf
+1.5020 Tw
+(start) Tj
+/F20 10 Tf
+1.5020 Tw
+( iterator and an optional ) Tj
+/F22 10 Tf
+1.5020 Tw
+(finish) Tj
+/F20 10 Tf
+1.5020 Tw
+( iterator. All the element objects) Tj
+1 0 0 1 100.0 469.2 Tm
+0.0011 Tw
+(with, and including, the ) Tj
+/F22 10 Tf
+0.0011 Tw
+(start) Tj
+/F20 10 Tf
+0.0011 Tw
+( and ) Tj
+/F22 10 Tf
+0.0011 Tw
+(finish) Tj
+/F20 10 Tf
+0.0011 Tw
+( \(or ) Tj
+/F22 10 Tf
+0.0011 Tw
+(end) Tj
+/F20 10 Tf
+0.0011 Tw
+( if not specified\) positions will be copied into the newly) Tj
+1 0 0 1 100.0 457.2 Tm
+0.0000 Tw
+(constructed container. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 433.2 Tm
+2.3633 Tw
+(The fifth form accepts a list of raw data values. Each of these values will be stored inside a) Tj
+1 0 0 1 100.0 421.2 Tm
+0.1555 Tw
+() Tj
+/F23 10 Tf
+0.1555 Tw
+(Class::STL::Element) Tj
+/F20 10 Tf
+0.1555 Tw
+( object constructed by the container`s ) Tj
+/F22 10 Tf
+0.1555 Tw
+(factory) Tj
+/F20 10 Tf
+0.1555 Tw
+( function, with the element`s ) Tj
+/F22 10 Tf
+0.1555 Tw
+(data) Tj
+/F20 10 Tf
+1 0 0 1 100.0 409.2 Tm
+0.0000 Tw
+(member containing the raw data value. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 382.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(clone) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 370.8 Tm
+0.0000 Tw
+(Returns a newly constructed object which is identical to the calling \(this\) object. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 344.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(factory) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 332.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref factory \( %attributes \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 320.4 Tm
+1.0944 Tw
+(The ) Tj
+/F22 10 Tf
+1.0944 Tw
+(factory) Tj
+/F20 10 Tf
+1.0944 Tw
+( function constructs a new element object and returns a reference to this. The type of) Tj
+1 0 0 1 100.0 308.4 Tm
+2.2467 Tw
+(object created is as specified by the ) Tj
+/F22 10 Tf
+2.2467 Tw
+(element_type) Tj
+/F20 10 Tf
+2.2467 Tw
+( container attribute. The ) Tj
+/F22 10 Tf
+2.2467 Tw
+(attributes) Tj
+/F20 10 Tf
+2.2467 Tw
+( argument) Tj
+1 0 0 1 100.0 296.4 Tm
+0.3861 Tw
+(consists of a hash and is passed on to the element class ) Tj
+/F22 10 Tf
+0.3861 Tw
+(new) Tj
+/F20 10 Tf
+0.3861 Tw
+( function. Override this function if you) Tj
+1 0 0 1 100.0 284.4 Tm
+0.0000 Tw
+(want to avoid the `eval' call. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 258.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(erase) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 246.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator erase \( iterator-start [, iterator-finish ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 234.0 Tm
+0.6500 Tw
+(The ) Tj
+/F22 10 Tf
+0.6500 Tw
+(erase) Tj
+/F20 10 Tf
+0.6500 Tw
+( function requires one starting iterator and an optional finish iterator as arguments. It will) Tj
+1 0 0 1 100.0 222.0 Tm
+0.2413 Tw
+(delete all the elements in the container within, and including, these two iterator positions. The ) Tj
+/F22 10 Tf
+0.2413 Tw
+(erase) Tj
+/F20 10 Tf
+1 0 0 1 100.0 210.0 Tm
+0.0000 Tw
+(funtion returns and iterator pointing to the element following the last  deleted element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 183.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(insert) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 171.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void insert \( position, iterator-start, iterator-finish \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 159.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void insert \( position, iterator-start \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 147.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void insert \( position, element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 135.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void insert \( position, size, element \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 123.6 Tm
+1.9069 Tw
+(The first form will insert copies of elements within the ) Tj
+/F22 10 Tf
+1.9069 Tw
+(iterator-start) Tj
+/F20 10 Tf
+1.9069 Tw
+( and ) Tj
+/F22 10 Tf
+1.9069 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+1.9069 Tw
+( positions) Tj
+1 0 0 1 100.0 111.6 Tm
+0.0000 Tw
+(before ) Tj
+/F22 10 Tf
+0.0000 Tw
+(position) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 87.6 Tm
+1.5107 Tw
+(The second form will insert copies of elements within the ) Tj
+/F22 10 Tf
+1.5107 Tw
+(iterator-start) Tj
+/F20 10 Tf
+1.5107 Tw
+( and ) Tj
+/F22 10 Tf
+1.5107 Tw
+(end) Tj
+/F20 10 Tf
+1.5107 Tw
+( positions before) Tj
+1 0 0 1 100.0 75.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(position) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 537.44 37 Tm
+(5) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+35 0 obj
+7851
+endobj
+36 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+37 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 36 0 R
+/Contents 34 0 R
+>>
+endobj
+38 0 obj
+<<
+/Length 39 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F20 10 Tf
+1 0 0 1 100.0 780.0 Tm
+0.0000 Tw
+(The third form will insert the element, or elements \() Tj
+/F22 10 Tf
+0.0000 Tw
+(not copies) Tj
+/F20 10 Tf
+0.0000 Tw
+(\) before ) Tj
+/F22 10 Tf
+0.0000 Tw
+(position) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 756.0 Tm
+0.0000 Tw
+(The fourth form will insert ) Tj
+/F22 10 Tf
+0.0000 Tw
+(size) Tj
+/F20 10 Tf
+0.0000 Tw
+( copies of ) Tj
+/F22 10 Tf
+0.0000 Tw
+(element) Tj
+/F20 10 Tf
+0.0000 Tw
+( before ) Tj
+/F22 10 Tf
+0.0000 Tw
+(position) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 717.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 705.6 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( function requires no arguments. It will remove the element at the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(top) Tj
+/F20 10 Tf
+0.0000 Tw
+( of the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 679.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 667.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 655.2 Tm
+1.5700 Tw
+(The ) Tj
+/F22 10 Tf
+1.5700 Tw
+(push) Tj
+/F20 10 Tf
+1.5700 Tw
+( function requires one or more arguments consisting of elements. This will append the) Tj
+1 0 0 1 100.0 643.2 Tm
+0.0000 Tw
+(element\(s\) to the end of the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 616.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(clear) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 604.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void clear \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 592.8 Tm
+0.0000 Tw
+(This function will delete all the elements from the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 566.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(begin) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 554.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref begin \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 542.4 Tm
+1.2787 Tw
+(The ) Tj
+/F22 10 Tf
+1.2787 Tw
+(begin) Tj
+/F20 10 Tf
+1.2787 Tw
+( function constructs and returns a new iterator object which points to the ) Tj
+/F22 10 Tf
+1.2787 Tw
+(front) Tj
+/F20 10 Tf
+1.2787 Tw
+( element) Tj
+1 0 0 1 100.0 530.4 Tm
+0.0000 Tw
+(within the container.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 504.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(end) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 492.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref end \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 480.0 Tm
+1.6120 Tw
+(The ) Tj
+/F22 10 Tf
+1.6120 Tw
+(end) Tj
+/F20 10 Tf
+1.6120 Tw
+( function constructs and returns a new iterator object which points to the ) Tj
+/F23 10 Tf
+1.6120 Tw
+(back) Tj
+/F20 10 Tf
+1.6120 Tw
+( element) Tj
+1 0 0 1 100.0 468.0 Tm
+0.2944 Tw
+(within the container. **Note that, unlike C++/STL, this object points to the last element and not ) Tj
+/F22 10 Tf
+0.2944 Tw
+(after) Tj
+1 0 0 1 100.0 456.0 Tm
+0.0000 Tw
+(the last element) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 429.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(rbegin) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 417.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref rbegin \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 405.6 Tm
+0.9206 Tw
+(The ) Tj
+/F22 10 Tf
+0.9206 Tw
+(rbegin) Tj
+/F20 10 Tf
+0.9206 Tw
+( function is the reverse of the ) Tj
+/F22 10 Tf
+0.9206 Tw
+(begin) Tj
+/F20 10 Tf
+0.9206 Tw
+( function \217 the newly constructed iterator points to) Tj
+1 0 0 1 100.0 393.6 Tm
+0.0000 Tw
+(the last element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 367.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(rend) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 355.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref rend \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 343.2 Tm
+0.8006 Tw
+(The ) Tj
+/F22 10 Tf
+0.8006 Tw
+(rend) Tj
+/F20 10 Tf
+0.8006 Tw
+( function is the reverse of the ) Tj
+/F22 10 Tf
+0.8006 Tw
+(end) Tj
+/F20 10 Tf
+0.8006 Tw
+( function \217 the newly constructed iterator points to the) Tj
+1 0 0 1 100.0 331.2 Tm
+0.0000 Tw
+(first element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 304.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(size) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 292.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(int size \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 280.8 Tm
+1.3907 Tw
+(The ) Tj
+/F22 10 Tf
+1.3907 Tw
+(size) Tj
+/F20 10 Tf
+1.3907 Tw
+( function requires no arguments. It will return an integer value containing the number of) Tj
+1 0 0 1 100.0 268.8 Tm
+0.0000 Tw
+(elements in the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 242.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(empty) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 230.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(bool empty \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 218.4 Tm
+0.6065 Tw
+(This function returns ) Tj
+/F22 10 Tf
+0.6065 Tw
+(`1') Tj
+/F20 10 Tf
+0.6065 Tw
+( if the container is empty \(ie. contains no elements\), and ) Tj
+/F22 10 Tf
+0.6065 Tw
+(`0') Tj
+/F20 10 Tf
+0.6065 Tw
+( if the container) Tj
+1 0 0 1 100.0 206.4 Tm
+0.0000 Tw
+(contains one or more elements. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 180.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(to_array) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 168.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(array to_array \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 156.0 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(to_array) Tj
+/F20 10 Tf
+0.0000 Tw
+( function returns an array containing the elements \(references\) from the container. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 129.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(eq) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 117.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(bool eq \( container-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 105.6 Tm
+0.5380 Tw
+(The ) Tj
+/F22 10 Tf
+0.5380 Tw
+(eq) Tj
+/F20 10 Tf
+0.5380 Tw
+( function compares the ) Tj
+/F22 10 Tf
+0.5380 Tw
+(elements) Tj
+/F20 10 Tf
+0.5380 Tw
+( in this container with the ) Tj
+/F22 10 Tf
+0.5380 Tw
+(elements) Tj
+/F20 10 Tf
+0.5380 Tw
+( in the container refered) Tj
+1 0 0 1 100.0 93.6 Tm
+0.7936 Tw
+(to by the argument ) Tj
+/F22 10 Tf
+0.7936 Tw
+(container-ref) Tj
+/F20 10 Tf
+0.7936 Tw
+(. The elements are compared using the element ) Tj
+/F22 10 Tf
+0.7936 Tw
+(eq) Tj
+/F20 10 Tf
+0.7936 Tw
+( function. The) Tj
+1 0 0 1 100.0 81.6 Tm
+0.8875 Tw
+(function will return ) Tj
+/F22 10 Tf
+0.8875 Tw
+(`1') Tj
+/F20 10 Tf
+0.8875 Tw
+( if both containers contain the same number of elements and all elements in) Tj
+1 0 0 1 100.0 69.6 Tm
+0.0000 Tw
+(one container are equal to, and in the same order as, all elements in the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(container-ref) Tj
+/F20 10 Tf
+0.0000 Tw
+( container. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(6) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+39 0 obj
+7250
+endobj
+40 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+41 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 40 0 R
+/Contents 38 0 R
+>>
+endobj
+42 0 obj
+<<
+/Length 43 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+1 0 0 1 76.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(ne) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 768.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(bool ne \( container-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 756.0 Tm
+0.0000 Tw
+(Inverse of ) Tj
+/F22 10 Tf
+0.0000 Tw
+(eq) Tj
+/F20 10 Tf
+0.0000 Tw
+( function. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(operator +) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(operator +=) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 717.6 Tm
+0.0000 Tw
+(Append containers. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 691.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(operator == ) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 679.2 Tm
+0.0000 Tw
+(Containers equality comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 652.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(operator != ) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 640.8 Tm
+0.0000 Tw
+(Containers non-equality comparison. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 598.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::List) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 584.4 Tm
+0.1353 Tw
+(A list container can have elements pushed and popped from both ends, and also inserted at any location.) Tj
+1 0 0 1 76.0 572.4 Tm
+0.0000 Tw
+(Access to the elements is sequential. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 530.4 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Deque) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 516.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(reverse) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 504.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void reverse \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 492.0 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(reverse) Tj
+/F20 10 Tf
+0.0000 Tw
+( function will alter the order of the elements in list by reversing their order. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 465.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(sort) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 453.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void sort \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 441.6 Tm
+0.6344 Tw
+(The ) Tj
+/F22 10 Tf
+0.6344 Tw
+(sort) Tj
+/F20 10 Tf
+0.6344 Tw
+( function will alter the order of the elements in list by sorting the elements. Sorting is done) Tj
+1 0 0 1 100.0 429.6 Tm
+0.0000 Tw
+(based on the elements ) Tj
+/F22 10 Tf
+0.0000 Tw
+(cmp) Tj
+/F20 10 Tf
+0.0000 Tw
+( comparison function. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 387.6 Tm
+0.0000 Tw
+(Example ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 371.4 Tm
+0.0000 Tw
+(  use stl; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 354.6 Tm
+0.0000 Tw
+(  # Construct the list object: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 346.2 Tm
+0.0000 Tw
+(  my $list = list\(qw\( first second third fourth fifth\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 329.4 Tm
+0.0000 Tw
+(  # Display the number of elements in the list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 321.0 Tm
+0.0000 Tw
+(  print "Size:", $list->size\(\), "\\n"; # Size:5 ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 304.2 Tm
+0.0000 Tw
+(  # Reverse the order of elements in the list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 295.8 Tm
+0.0000 Tw
+(  $list->reverse\(\);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 279.0 Tm
+0.0000 Tw
+(  # Display the contents of the element at the front of the list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 270.6 Tm
+0.0000 Tw
+(  print 'Front:', $list->front\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 253.8 Tm
+0.0000 Tw
+(  # Display the contents of the element at the back of the list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 245.4 Tm
+0.0000 Tw
+(  print 'Back:', $list->back\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 228.6 Tm
+0.0000 Tw
+(  # Display the contents of all the elements in the list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 220.2 Tm
+0.0000 Tw
+(  for_each\($list->begin\(\), $list->end\(\), MyPrint->new\(\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 203.4 Tm
+0.0000 Tw
+(  # Return an array of all elements-refs: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 195.0 Tm
+0.0000 Tw
+(  my @arr = $l1->to_array\(\);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 178.2 Tm
+0.0000 Tw
+(  # Delete all elements from list: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 169.8 Tm
+0.0000 Tw
+(  $list->clear\(\);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 153.0 Tm
+0.0000 Tw
+(  print "Size:", $list->size\(\), "\\n"; # Size:0 ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 144.6 Tm
+0.0000 Tw
+(  print '$list container is ',  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 136.2 Tm
+0.0000 Tw
+(    $list->empty\(\) ? 'empty' : 'not empty', "\\n";  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 119.4 Tm
+0.0000 Tw
+(  # MyPrint Unary Function -- used in for_each\(\) above... ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 111.0 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 102.6 Tm
+0.0000 Tw
+(    package MyPrint; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 94.2 Tm
+0.0000 Tw
+(    use base qw\(Class::STL::Utilities::FunctionObject::UnaryFunction\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 85.8 Tm
+0.0000 Tw
+(    sub function_operator ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 77.4 Tm
+0.0000 Tw
+(    \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 69.0 Tm
+0.0000 Tw
+(      my $self = shift; ) Tj
+/F10 7 Tf
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 537.44 37 Tm
+(7) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+43 0 obj
+5297
+endobj
+44 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+45 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 44 0 R
+/Contents 42 0 R
+>>
+endobj
+46 0 obj
+<<
+/Length 47 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F10 7 Tf
+1 0 0 1 76.0 771.6 Tm
+0.0000 Tw
+(      my $arg = shift; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 763.2 Tm
+0.0000 Tw
+(      print "Data:", $arg->data\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 754.8 Tm
+0.0000 Tw
+(    \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 746.4 Tm
+0.0000 Tw
+(  \} ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 725.4 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Vector) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 711.0 Tm
+0.0000 Tw
+(A vector allows for random access to its elements via the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(at) Tj
+/F20 10 Tf
+0.0000 Tw
+( function. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 669.0 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Abstract) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 654.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push_back) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 642.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push_back \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 630.6 Tm
+0.9215 Tw
+(The ) Tj
+/F22 10 Tf
+0.9215 Tw
+(push_back) Tj
+/F20 10 Tf
+0.9215 Tw
+( function requires one or more arguments consisting of elements. This will append) Tj
+1 0 0 1 100.0 618.6 Tm
+0.0000 Tw
+(the element\(s\) to the end of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 592.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop_back) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 580.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop_back \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 568.2 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(pop_back) Tj
+/F20 10 Tf
+0.0000 Tw
+( function requires no arguments. It will remove the element at the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(top) Tj
+/F20 10 Tf
+0.0000 Tw
+( of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 541.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(back) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 529.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref back \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 517.8 Tm
+0.9965 Tw
+(The ) Tj
+/F22 10 Tf
+0.9965 Tw
+(back) Tj
+/F20 10 Tf
+0.9965 Tw
+( function requires no arguments. It returns a reference to the element at the ) Tj
+/F22 10 Tf
+0.9965 Tw
+(back) Tj
+/F20 10 Tf
+0.9965 Tw
+( of the) Tj
+1 0 0 1 100.0 505.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 479.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(front) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 467.4 Tm
+1.1271 Tw
+(The ) Tj
+/F22 10 Tf
+1.1271 Tw
+(front) Tj
+/F20 10 Tf
+1.1271 Tw
+( function requires no arguments. It returns a reference to the element at the ) Tj
+/F22 10 Tf
+1.1271 Tw
+(front) Tj
+/F20 10 Tf
+1.1271 Tw
+( of the) Tj
+1 0 0 1 100.0 455.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 429.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(at) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 417.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref at \( index \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 405.0 Tm
+0.8519 Tw
+(The ) Tj
+/F22 10 Tf
+0.8519 Tw
+(at) Tj
+/F20 10 Tf
+0.8519 Tw
+( function requires an ) Tj
+/F22 10 Tf
+0.8519 Tw
+(index) Tj
+/F20 10 Tf
+0.8519 Tw
+( argument. This function will return a reference to the element at) Tj
+1 0 0 1 100.0 393.0 Tm
+0.0000 Tw
+(the location within the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(vector) Tj
+/F20 10 Tf
+0.0000 Tw
+( specified by the argument ) Tj
+/F22 10 Tf
+0.0000 Tw
+(index) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 351.0 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Deque) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 336.6 Tm
+0.0000 Tw
+(A double-ended container. Elements can be ) Tj
+/F22 10 Tf
+0.0000 Tw
+(pushed) Tj
+/F20 10 Tf
+0.0000 Tw
+( and ) Tj
+/F22 10 Tf
+0.0000 Tw
+(popped) Tj
+/F20 10 Tf
+0.0000 Tw
+( at both ends. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 294.6 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Vector) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 280.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push_front) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 268.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push_front \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 256.2 Tm
+0.3800 Tw
+(The ) Tj
+/F22 10 Tf
+0.3800 Tw
+(push_front) Tj
+/F20 10 Tf
+0.3800 Tw
+( function requires one or more arguments consisting of elements. This will insert the) Tj
+1 0 0 1 100.0 244.2 Tm
+0.0000 Tw
+(element\(s\) to the front of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(deque) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 217.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop_front) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 205.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop_front \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 193.8 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(pop_front) Tj
+/F20 10 Tf
+0.0000 Tw
+( function requires no arguments. It will remove the element at the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(front) Tj
+/F20 10 Tf
+0.0000 Tw
+( of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(deque) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 151.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Queue) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 137.4 Tm
+0.9438 Tw
+(A queue is a FIFO \(first-in-first-out\) container. Elements can be ) Tj
+/F22 10 Tf
+0.9438 Tw
+(pushed) Tj
+/F20 10 Tf
+0.9438 Tw
+( at the back and ) Tj
+/F22 10 Tf
+0.9438 Tw
+(popped) Tj
+/F20 10 Tf
+0.9438 Tw
+( from) Tj
+1 0 0 1 76.0 125.4 Tm
+0.0000 Tw
+(the front. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(8) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+47 0 obj
+6034
+endobj
+48 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+49 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 48 0 R
+/Contents 46 0 R
+>>
+endobj
+50 0 obj
+<<
+/Length 51 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F21 10 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Abstract) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 765.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 753.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 741.6 Tm
+1.5700 Tw
+(The ) Tj
+/F22 10 Tf
+1.5700 Tw
+(push) Tj
+/F20 10 Tf
+1.5700 Tw
+( function requires one or more arguments consisting of elements. This will append the) Tj
+1 0 0 1 100.0 729.6 Tm
+0.0000 Tw
+(element\(s\) to the back of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(queue) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 703.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 691.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 679.2 Tm
+0.1700 Tw
+(The ) Tj
+/F22 10 Tf
+0.1700 Tw
+(pop) Tj
+/F20 10 Tf
+0.1700 Tw
+( function requires no arguments. It will remove the element at the ) Tj
+/F22 10 Tf
+0.1700 Tw
+(front) Tj
+/F20 10 Tf
+0.1700 Tw
+( of the ) Tj
+/F22 10 Tf
+0.1700 Tw
+(queue) Tj
+/F20 10 Tf
+0.1700 Tw
+(. This is) Tj
+1 0 0 1 100.0 667.2 Tm
+0.0000 Tw
+(the earliest inserted element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 640.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(back) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 628.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref back \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 616.8 Tm
+0.9965 Tw
+(The ) Tj
+/F22 10 Tf
+0.9965 Tw
+(back) Tj
+/F20 10 Tf
+0.9965 Tw
+( function requires no arguments. It returns a reference to the element at the ) Tj
+/F22 10 Tf
+0.9965 Tw
+(back) Tj
+/F20 10 Tf
+0.9965 Tw
+( of the) Tj
+1 0 0 1 100.0 604.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(queue) Tj
+/F20 10 Tf
+0.0000 Tw
+(. This is the element last inserted. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 578.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(front) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 566.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref front \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 554.4 Tm
+1.1271 Tw
+(The ) Tj
+/F22 10 Tf
+1.1271 Tw
+(front) Tj
+/F20 10 Tf
+1.1271 Tw
+( function requires no arguments. It returns a reference to the element at the ) Tj
+/F22 10 Tf
+1.1271 Tw
+(front) Tj
+/F20 10 Tf
+1.1271 Tw
+( of the) Tj
+1 0 0 1 100.0 542.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(queue) Tj
+/F20 10 Tf
+0.0000 Tw
+(. This is the earliest inserted element. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 500.4 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Stack) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 486.0 Tm
+0.6588 Tw
+(A stack is a LIFO \(last-in-first-out\) container. Elements can be ) Tj
+/F22 10 Tf
+0.6588 Tw
+(pushed) Tj
+/F20 10 Tf
+0.6588 Tw
+( at the top and ) Tj
+/F22 10 Tf
+0.6588 Tw
+(popped) Tj
+/F20 10 Tf
+0.6588 Tw
+( from the) Tj
+1 0 0 1 76.0 474.0 Tm
+0.0000 Tw
+(top. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 432.0 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Abstract) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 417.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 405.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 393.6 Tm
+1.5700 Tw
+(The ) Tj
+/F22 10 Tf
+1.5700 Tw
+(push) Tj
+/F20 10 Tf
+1.5700 Tw
+( function requires one or more arguments consisting of elements. This will append the) Tj
+1 0 0 1 100.0 381.6 Tm
+0.0000 Tw
+(element\(s\) to the top of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(stack) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 355.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 343.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 331.2 Tm
+0.7572 Tw
+(The ) Tj
+/F22 10 Tf
+0.7572 Tw
+(pop) Tj
+/F20 10 Tf
+0.7572 Tw
+( function requires no arguments. It will remove the element at the ) Tj
+/F22 10 Tf
+0.7572 Tw
+(top) Tj
+/F20 10 Tf
+0.7572 Tw
+( of the ) Tj
+/F22 10 Tf
+0.7572 Tw
+(stack) Tj
+/F20 10 Tf
+0.7572 Tw
+(. This is) Tj
+1 0 0 1 100.0 319.2 Tm
+0.0000 Tw
+(the last inserted element. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 292.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(top) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 280.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref top \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 268.8 Tm
+0.1533 Tw
+(The ) Tj
+/F22 10 Tf
+0.1533 Tw
+(top) Tj
+/F20 10 Tf
+0.1533 Tw
+( function requires no arguments. It returns a reference to the element at the ) Tj
+/F22 10 Tf
+0.1533 Tw
+(top) Tj
+/F20 10 Tf
+0.1533 Tw
+( of the ) Tj
+/F22 10 Tf
+0.1533 Tw
+(stack) Tj
+/F20 10 Tf
+0.1533 Tw
+(.) Tj
+1 0 0 1 100.0 256.8 Tm
+0.0000 Tw
+(This is the last inserted element. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 214.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::Tree) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 200.4 Tm
+0.4556 Tw
+(A tree is a hierarchical structure. Each element within a ) Tj
+/F22 10 Tf
+0.4556 Tw
+(tree) Tj
+/F20 10 Tf
+0.4556 Tw
+( container can be either a simple element or) Tj
+1 0 0 1 76.0 188.4 Tm
+2.0929 Tw
+(another container object. The overridden ) Tj
+/F22 10 Tf
+2.0929 Tw
+(to_array) Tj
+/F20 10 Tf
+2.0929 Tw
+( function will traverse the tree and return an array) Tj
+1 0 0 1 76.0 176.4 Tm
+0.0000 Tw
+(consisting of all the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(nodes) Tj
+/F20 10 Tf
+0.0000 Tw
+( in the tree. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 134.4 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Deque) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 120.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(to_array) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 108.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(array to_array \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 96.0 Tm
+2.0213 Tw
+(The overridden ) Tj
+/F22 10 Tf
+2.0213 Tw
+(to_array) Tj
+/F20 10 Tf
+2.0213 Tw
+( function will traverse the tree and return an array consisting of all the) Tj
+1 0 0 1 100.0 84.0 Tm
+0.0000 Tw
+(element ) Tj
+/F22 10 Tf
+0.0000 Tw
+(nodes) Tj
+/F20 10 Tf
+0.0000 Tw
+( in the tree container. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 537.44 37 Tm
+(9) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+51 0 obj
+6655
+endobj
+52 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+53 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 52 0 R
+/Contents 50 0 R
+>>
+endobj
+54 0 obj
+<<
+/Length 55 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F21 10 Tf
+1 0 0 1 52.0 780.0 Tm
+0.0000 Tw
+(Examples ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 763.8 Tm
+0.0000 Tw
+(  # Tree containers; construct two trees from  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 755.4 Tm
+0.0000 Tw
+(  # previously construced containers: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 747.0 Tm
+0.0000 Tw
+(  my $t1 = tree\($l1\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 738.6 Tm
+0.0000 Tw
+(  my $t2 = tree\($l2\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 721.8 Tm
+0.0000 Tw
+(  # Construct a third tree: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 713.4 Tm
+0.0000 Tw
+(  my $tree = tree\(\);  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 696.6 Tm
+0.0000 Tw
+(  # Add other tree containers as elements to this tree: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 688.2 Tm
+0.0000 Tw
+(  $tree->push_back\($tree->factory\($t1\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 679.8 Tm
+0.0000 Tw
+(  $tree->push_back\($tree->factory\($t2\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 663.0 Tm
+0.0000 Tw
+(  # Search for element \('pink'\) in tree: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 654.6 Tm
+0.0000 Tw
+(  if \(my $f = find_if\($tree->begin\(\), $tree->end\(\), bind1st\(equal_to\(\), 'pink'\)\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 646.2 Tm
+0.0000 Tw
+(    print "FOUND:", $f->data\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 637.8 Tm
+0.0000 Tw
+(  \} else \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 629.4 Tm
+0.0000 Tw
+(    print "'pink' NOT FOUND", "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 621.0 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 604.2 Tm
+0.0000 Tw
+(  # Traverse tree returning all element nodes: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 595.8 Tm
+0.0000 Tw
+(  my @tarr = $tree->to_array\(\);  ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 574.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Containers::PriorityQueue) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 560.4 Tm
+2.2150 Tw
+(A priority queue will maintain the order of the elements based on their priority, with highest priority) Tj
+1 0 0 1 76.0 548.4 Tm
+1.7800 Tw
+(elements at the top of the container. Elements contained in a priority queue must be of the type, or) Tj
+1 0 0 1 76.0 536.4 Tm
+0.1508 Tw
+(derived from, ) Tj
+/F22 10 Tf
+0.1508 Tw
+(Class::STL::Element::Priority) Tj
+/F20 10 Tf
+0.1508 Tw
+(. This element type contains the attribute ) Tj
+/F22 10 Tf
+0.1508 Tw
+(priority) Tj
+/F20 10 Tf
+0.1508 Tw
+(, and needs to) Tj
+1 0 0 1 76.0 524.4 Tm
+0.0000 Tw
+(have its value set whenever an object of this element type is constructed. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 482.4 Tm
+0.0000 Tw
+(Extends ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Containers::Vector) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 452.4 Tm
+0.0000 Tw
+(Element Type ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Element::Priority) Tj
+/F21 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 438.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(push) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 426.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void push \( element [, ...] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 414.0 Tm
+2.2457 Tw
+(The ) Tj
+/F22 10 Tf
+2.2457 Tw
+(push) Tj
+/F20 10 Tf
+2.2457 Tw
+( function requires one or more arguments consisting of elements. This will place the) Tj
+1 0 0 1 100.0 402.0 Tm
+0.0000 Tw
+(element\(s\) in the queue according to their priority value. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 375.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 363.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void pop_back \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 351.6 Tm
+0.0000 Tw
+(The ) Tj
+/F22 10 Tf
+0.0000 Tw
+(pop) Tj
+/F20 10 Tf
+0.0000 Tw
+( function requires no arguments. It will remove the element with the highest priority. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 325.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(top) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 313.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(element-ref top \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 301.2 Tm
+2.0933 Tw
+(The ) Tj
+/F22 10 Tf
+2.0933 Tw
+(top) Tj
+/F20 10 Tf
+2.0933 Tw
+( function requires no arguments. It returns a reference to the element with the highest) Tj
+1 0 0 1 100.0 289.2 Tm
+0.0000 Tw
+(priority. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 262.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(refresh) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 250.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void refresh \( \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 238.8 Tm
+1.1307 Tw
+(The ) Tj
+/F22 10 Tf
+1.1307 Tw
+(refresh) Tj
+/F20 10 Tf
+1.1307 Tw
+( function should be called whenever the priority value for an element has been order.) Tj
+1 0 0 1 100.0 226.8 Tm
+0.0000 Tw
+(This will update the ordering of the elements if required. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 184.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Algorithms) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 170.4 Tm
+0.0000 Tw
+(This module contains various algorithm functions. ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 140.4 Tm
+0.0000 Tw
+(Exports ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 128.4 Tm
+3.3256 Tw
+() Tj
+/F23 10 Tf
+3.3256 Tw
+(remove_if) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(find_if) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(for_each) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(transform) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(count_if) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(find) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(count) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(copy) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(copy_backward) Tj
+/F20 10 Tf
+3.3256 Tw
+(, ) Tj
+/F23 10 Tf
+3.3256 Tw
+(remove) Tj
+/F20 10 Tf
+3.3256 Tw
+(,) Tj
+1 0 0 1 76.0 116.4 Tm
+4.5117 Tw
+() Tj
+/F23 10 Tf
+4.5117 Tw
+(remove_copy) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(remove_copy_if) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(replace) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(replace_if) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(replace_copy) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(replace_copy_if) Tj
+/F20 10 Tf
+4.5117 Tw
+(, ) Tj
+/F23 10 Tf
+4.5117 Tw
+(generate) Tj
+/F20 10 Tf
+4.5117 Tw
+(,) Tj
+1 0 0 1 76.0 104.4 Tm
+0.0800 Tw
+() Tj
+/F23 10 Tf
+0.0800 Tw
+(generate_n) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(fill) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(fill_n) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(equal) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(reverse) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(reverse_copy) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(rotate) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(rotate_copy) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(partition) Tj
+/F20 10 Tf
+0.0800 Tw
+(, ) Tj
+/F23 10 Tf
+0.0800 Tw
+(stable_partition) Tj
+/F20 10 Tf
+0.0800 Tw
+(,) Tj
+1 0 0 1 76.0 92.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(min_element) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(max_element) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(unique) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(unique_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(adjacent_find) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(10) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+55 0 obj
+7429
+endobj
+56 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+57 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 56 0 R
+/Contents 54 0 R
+>>
+endobj
+58 0 obj
+<<
+/Length 59 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+1 0 0 1 76.0 780.0 Tm
+0.0000 Tw
+(The ) Tj
+/F23 10 Tf
+0.0000 Tw
+(Algorithms) Tj
+/F20 10 Tf
+0.0000 Tw
+( package consists of various ) Tj
+/F22 10 Tf
+0.0000 Tw
+(static) Tj
+/F20 10 Tf
+0.0000 Tw
+( algorithm functions. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 768.0 Tm
+0 Tw
+(The ) Tj
+/F22 10 Tf
+0 Tw
+(unary-function) Tj
+/F20 10 Tf
+0 Tw
+( / ) Tj
+/F22 10 Tf
+0 Tw
+(binary-function) Tj
+/F20 10 Tf
+0 Tw
+( argument must be derived from) Tj
+1 0 0 1 76.0 756.0 Tm
+0 Tw
+() Tj
+/F22 10 Tf
+0 Tw
+(Class::STL::Utilities::FunctionObject::UnaryFunction) Tj
+/F20 10 Tf
+0 Tw
+( and) Tj
+1 0 0 1 76.0 744.0 Tm
+1.0917 Tw
+() Tj
+/F22 10 Tf
+1.0917 Tw
+(Class::STL::Utilities::FunctionObject::BinaryFunction) Tj
+/F20 10 Tf
+1.0917 Tw
+( respectively. Standard utility functions are provided) Tj
+1 0 0 1 76.0 732.0 Tm
+3.4718 Tw
+(in the ) Tj
+/F22 10 Tf
+3.4718 Tw
+(Class::STL::Utilities) Tj
+/F20 10 Tf
+3.4718 Tw
+( module. A function object contains the function ) Tj
+/F22 10 Tf
+3.4718 Tw
+(function_operator) Tj
+/F20 10 Tf
+3.4718 Tw
+(. This) Tj
+1 0 0 1 76.0 720.0 Tm
+2.6486 Tw
+() Tj
+/F22 10 Tf
+2.6486 Tw
+(function_operator) Tj
+/F20 10 Tf
+2.6486 Tw
+( function will, in turn, be called by the algorithm for each element traversed. The) Tj
+1 0 0 1 76.0 708.0 Tm
+0.0000 Tw
+(algorithm will pass the element reference as the argument to the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(function_operator) Tj
+/F20 10 Tf
+0.0000 Tw
+( function.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 681.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(for_each) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 669.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void for_each \( iterator-start, iterator-finish, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 645.6 Tm
+4.0775 Tw
+(The ) Tj
+/F22 10 Tf
+4.0775 Tw
+(for_each) Tj
+/F20 10 Tf
+4.0775 Tw
+( function will traverse the container starting from ) Tj
+/F22 10 Tf
+4.0775 Tw
+(iterator-start) Tj
+/F20 10 Tf
+4.0775 Tw
+( and ending at) Tj
+1 0 0 1 100.0 633.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+0.0000 Tw
+( and execute the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(unary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+( with the element passed in as the argument.   ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 607.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(transform) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 595.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void transform \( iterator-start, iterator-finish, iterator-result, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 583.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void transform \( iterator-start, iterator-finish, iterator-start2, iterator-result, binary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 559.2 Tm
+2.4071 Tw
+(The ) Tj
+/F22 10 Tf
+2.4071 Tw
+(transform) Tj
+/F20 10 Tf
+2.4071 Tw
+( functions has two forms. The first form will traverse the container starting from) Tj
+1 0 0 1 100.0 547.2 Tm
+0.5542 Tw
+() Tj
+/F22 10 Tf
+0.5542 Tw
+(iterator-start) Tj
+/F20 10 Tf
+0.5542 Tw
+( and ending at ) Tj
+/F22 10 Tf
+0.5542 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+0.5542 Tw
+( and execute the ) Tj
+/F22 10 Tf
+0.5542 Tw
+(unary-function) Tj
+/F20 10 Tf
+0.5542 Tw
+( with the element passed) Tj
+1 0 0 1 100.0 535.2 Tm
+0.0000 Tw
+(in as the argument, producing ) Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-result) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 511.2 Tm
+0.5193 Tw
+(The second form will traverse two containers with the second one starting from ) Tj
+/F22 10 Tf
+0.5193 Tw
+(iterator-start2) Tj
+/F20 10 Tf
+0.5193 Tw
+(. The) Tj
+1 0 0 1 100.0 499.2 Tm
+1.4847 Tw
+() Tj
+/F22 10 Tf
+1.4847 Tw
+(binary-function) Tj
+/F20 10 Tf
+1.4847 Tw
+( will be called for each pair of elements. The resulting elements will be placed in) Tj
+1 0 0 1 100.0 487.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-result) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 460.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(count) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 448.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(int count \( iterator-start, iterator-finish, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 422.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(count_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 410.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(int count_if \( iterator-start, iterator-finish, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 386.4 Tm
+4.4017 Tw
+(The ) Tj
+/F22 10 Tf
+4.4017 Tw
+(count_if) Tj
+/F20 10 Tf
+4.4017 Tw
+( function will traverse the container starting from ) Tj
+/F22 10 Tf
+4.4017 Tw
+(iterator-start) Tj
+/F20 10 Tf
+4.4017 Tw
+( and ending at) Tj
+1 0 0 1 100.0 374.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+0.0000 Tw
+( and return a count of the elements that evaluate to true by the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(unary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 348.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(find) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 336.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref find \( iterator-start, iterator-finish, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 309.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(find_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 297.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-ref find_if \( iterator-start, iterator-finish, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 273.6 Tm
+0 Tw
+(The ) Tj
+/F22 10 Tf
+0 Tw
+(find_if) Tj
+/F20 10 Tf
+0 Tw
+( function will traverse the container starting from ) Tj
+/F22 10 Tf
+0 Tw
+(iterator-start) Tj
+/F20 10 Tf
+0 Tw
+( and ending at) Tj
+1 0 0 1 100.0 261.6 Tm
+2.8153 Tw
+() Tj
+/F22 10 Tf
+2.8153 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+2.8153 Tw
+( and return an ) Tj
+/F22 10 Tf
+2.8153 Tw
+(iterator) Tj
+/F20 10 Tf
+2.8153 Tw
+( pointing to the first element that evaluate to true by the) Tj
+1 0 0 1 100.0 249.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(unary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+(. If no elements evaluates to true then `o' is returned. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 223.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 211.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void copy \( iterator-start, iterator-finish, iterator-result \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 184.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(copy_backward) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 172.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void copy_backward \( iterator-start, iterator-finish, iterator-result \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 146.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(remove) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 134.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void remove \( iterator-start, iterator-finish, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 108.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(remove_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 96.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void remove_if \( iterator-start, iterator-finish, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 531.88 37 Tm
+(11) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+59 0 obj
+7508
+endobj
+60 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+61 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 60 0 R
+/Contents 58 0 R
+>>
+endobj
+62 0 obj
+<<
+/Length 63 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F20 10 Tf
+1 0 0 1 100.0 780.0 Tm
+3.6617 Tw
+(The ) Tj
+/F22 10 Tf
+3.6617 Tw
+(remove_if) Tj
+/F20 10 Tf
+3.6617 Tw
+( function will traverse the container starting from ) Tj
+/F22 10 Tf
+3.6617 Tw
+(iterator-start) Tj
+/F20 10 Tf
+3.6617 Tw
+( and ending at) Tj
+1 0 0 1 100.0 768.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-finish) Tj
+/F20 10 Tf
+0.0000 Tw
+( and remove the elements that evaluate to true by the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(unary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+(.   ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 741.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(remove_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 729.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void remove_copy \( iterator-start, iterator-finish, iterator-result, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 703.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(remove_copy_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 691.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void remove_copy_if \( iterator-start, iterator-finish, iterator-result, unary-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 664.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(replace) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 652.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void replace \( iterator-start, iterator-finish, old-element-ref, new-element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 626.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(replace_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 614.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void replace_if \( iterator-start, iterator-finish, unary-function, new-element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 588.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(replace_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 576.0 Tm
+0.4800 Tw
+() Tj
+/F22 10 Tf
+0.4800 Tw
+(void replace_copy \( iterator-start, iterator-finish, iterator-result, old-element-ref, new-element-ref) Tj
+1 0 0 1 100.0 564.0 Tm
+0.0000 Tw
+(\);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 537.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(replace_copy_if) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 525.6 Tm
+0 Tw
+() Tj
+/F22 10 Tf
+0 Tw
+(void replace_copy_if \( iterator-start, iterator-finish, iterator-result, unary-function,) Tj
+1 0 0 1 100.0 513.6 Tm
+0.0000 Tw
+(new-element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 487.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(generate) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 475.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void generate \( iterator-start, iterator-finish, generator-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 448.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(generate_n) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 436.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void generate_n \( iterator-start, size, generator-function \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 410.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(fill) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 398.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void fill \( iterator-start, iterator-finish, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 372.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(fill_n) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 360.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void fill_n \( iterator-start, size, element-ref \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 333.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(equal) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 321.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(bool equal \( iterator-start, iterator-finish, iterator-result [, binary-function ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 295.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(reverse) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 283.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void reverse \( iterator-start, iterator-finish \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 256.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(reverse_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 244.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void reverse_copy \( iterator-start, iterator-finish, iterator-result \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 218.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(rotate) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 206.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void rotate \( iterator-start, iterator-mid, iterator-finish \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 180.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(rotate_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 168.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void rotate_copy \( iterator-start, iterator-mid, iterator-finish, iterator-result \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 141.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(partition) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 129.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void partition \( iterator-start, iterator-finish, [, unary-predicate ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 103.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(stable_partition) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 91.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(void stable_partition \( iterator-start, iterator-finish, [, unary-predicate ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 64.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(min_element) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(12) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+63 0 obj
+6016
+endobj
+64 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+65 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 64 0 R
+/Contents 62 0 R
+>>
+endobj
+66 0 obj
+<<
+/Length 67 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+1 0 0 1 100.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator min_element \( iterator-start, iterator-mid [, binary-function ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 753.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(max_element) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 741.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator max_element \( iterator-start, iterator-mid [, binary-function ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 715.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(unique) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 703.2 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator unique \( iterator-start, iterator-finish, [, binary-function ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 676.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(unique_copy) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 664.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator unique_copy \( iterator-start, iterator-finish, iterator-result [, binary-function ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 638.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(adjacent_find) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 626.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator ajacent_find \( iterator-start, iterator-finish, [, binary-predicate ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 584.4 Tm
+0.0000 Tw
+(Examples ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 568.2 Tm
+0.0000 Tw
+(  use Class::STL::Containers; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 559.8 Tm
+0.0000 Tw
+(  use Class::STL::Algorithms; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 551.4 Tm
+0.0000 Tw
+(  use Class::STL::Utilities; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 534.6 Tm
+0.0000 Tw
+(  # Display all elements in list container '$list'  ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 526.2 Tm
+0.0000 Tw
+(  # using unary-function 'myprint' and algorithm 'for_each': ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 517.8 Tm
+0.0000 Tw
+(  for_each\($list->begin\(\), $list->end\(\), ptr_fun\('::myprint'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 509.4 Tm
+0.0000 Tw
+(  sub myprint \{ print "Data:", @_, "\\n"; \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 492.6 Tm
+0.0000 Tw
+(  # Algorithms -- remove_if\(\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 484.2 Tm
+0.0000 Tw
+(  # Remove element equal to back\(\) -- ie remove last element: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 475.8 Tm
+0.0000 Tw
+(  remove_if\($list->begin\(\), $list->end\(\), bind1st\(equal_to\(\), $list->back\(\)\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 459.0 Tm
+0.0000 Tw
+(  # Remove all elements that match regular expression '^fi': ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 450.6 Tm
+0.0000 Tw
+(  remove_if\($v->begin\(\), $v->end\(\), bind2nd\(matches\(\), '^fi'\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 433.8 Tm
+0.0000 Tw
+(  # Search for element \('pink'\) in tree: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 425.4 Tm
+0.0000 Tw
+(  if \(my $f = $tree->find_if\($tree->begin\(\), $tree->end\(\), bind1st\(equal_to\(\), "pink"\)\)\) \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 417.0 Tm
+0.0000 Tw
+(    print "FOUND:", $f->p_element\(\)->data\(\), "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 408.6 Tm
+0.0000 Tw
+(  \} else \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 400.2 Tm
+0.0000 Tw
+(    print "'pink' NOT FOUND", "\\n"; ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 391.8 Tm
+0.0000 Tw
+(  \} ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 370.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Utilities) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 334.8 Tm
+0.0000 Tw
+(Exports ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 322.8 Tm
+3.7375 Tw
+() Tj
+/F23 10 Tf
+3.7375 Tw
+(equal_to) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(not_equal_to) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(greater) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(greater_equal) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(less) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(less_equal) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(compare) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(bind1st) Tj
+/F20 10 Tf
+3.7375 Tw
+(, ) Tj
+/F23 10 Tf
+3.7375 Tw
+(bind2nd) Tj
+/F20 10 Tf
+3.7375 Tw
+(,) Tj
+1 0 0 1 76.0 310.8 Tm
+4.5914 Tw
+() Tj
+/F23 10 Tf
+4.5914 Tw
+(mem_fun) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(ptr_fun) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(ptr_fun_binary) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(matches) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(matches_ic) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(logical_and) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(logical_or) Tj
+/F20 10 Tf
+4.5914 Tw
+(, ) Tj
+/F23 10 Tf
+4.5914 Tw
+(multiplies) Tj
+/F20 10 Tf
+4.5914 Tw
+(,) Tj
+1 0 0 1 76.0 298.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(divides) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(plus) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(minus) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(modulus) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 274.8 Tm
+0.6738 Tw
+(This module contains various utility function objects. Each object will be constructed automatically when) Tj
+1 0 0 1 76.0 262.8 Tm
+3.4713 Tw
+(the function name \(eg. `equal_to'\) is used. Each of the function objects are derived from either) Tj
+1 0 0 1 76.0 250.8 Tm
+0 Tw
+() Tj
+/F22 10 Tf
+0 Tw
+(Class::STL::Utilities::FunctionObject::UnaryFunction) Tj
+/F20 10 Tf
+0 Tw
+( or) Tj
+1 0 0 1 76.0 238.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(Class::STL::Utilities::FunctionObject::BinaryFunction) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 212.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(equal_to) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 200.4 Tm
+1.0708 Tw
+() Tj
+/F23 10 Tf
+1.0708 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+1.0708 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+1.0708 Tw
+(equality) Tj
+/F20 10 Tf
+1.0708 Tw
+( between its argument and) Tj
+1 0 0 1 100.0 188.4 Tm
+0.0000 Tw
+(the object ) Tj
+/F22 10 Tf
+0.0000 Tw
+(arg) Tj
+/F20 10 Tf
+0.0000 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+0.0000 Tw
+(eq) Tj
+/F20 10 Tf
+0.0000 Tw
+( function is used for the comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 162.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(not_equal_to) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 150.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.0000 Tw
+(. This function is the inverse of ) Tj
+/F22 10 Tf
+0.0000 Tw
+(equal_to) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 135.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(greater) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 123.6 Tm
+0.1417 Tw
+() Tj
+/F23 10 Tf
+0.1417 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.1417 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+0.1417 Tw
+(greater-than) Tj
+/F20 10 Tf
+0.1417 Tw
+( comparison between its) Tj
+1 0 0 1 100.0 111.6 Tm
+0.0000 Tw
+(argument and the object ) Tj
+/F22 10 Tf
+0.0000 Tw
+(arg) Tj
+/F20 10 Tf
+0.0000 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+0.0000 Tw
+(gt) Tj
+/F20 10 Tf
+0.0000 Tw
+( function is used for the comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 85.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(greater_equal) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 531.88 37 Tm
+(13) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+67 0 obj
+7424
+endobj
+68 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+69 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 68 0 R
+/Contents 66 0 R
+>>
+endobj
+70 0 obj
+<<
+/Length 71 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F20 10 Tf
+1 0 0 1 100.0 780.0 Tm
+0.9750 Tw
+() Tj
+/F23 10 Tf
+0.9750 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.9750 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+0.9750 Tw
+(greater-than-or-equal) Tj
+/F20 10 Tf
+0.9750 Tw
+( comparison) Tj
+1 0 0 1 100.0 768.0 Tm
+0.3644 Tw
+(between its argument and the object ) Tj
+/F22 10 Tf
+0.3644 Tw
+(arg) Tj
+/F20 10 Tf
+0.3644 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+0.3644 Tw
+(ge) Tj
+/F20 10 Tf
+0.3644 Tw
+( function is used for the) Tj
+1 0 0 1 100.0 756.0 Tm
+0.0000 Tw
+(comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(less) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 717.6 Tm
+1.2767 Tw
+() Tj
+/F23 10 Tf
+1.2767 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+1.2767 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+1.2767 Tw
+(less-than) Tj
+/F20 10 Tf
+1.2767 Tw
+( comparison between its) Tj
+1 0 0 1 100.0 705.6 Tm
+0.0000 Tw
+(argument and the object ) Tj
+/F22 10 Tf
+0.0000 Tw
+(arg) Tj
+/F20 10 Tf
+0.0000 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+0.0000 Tw
+(lt) Tj
+/F20 10 Tf
+0.0000 Tw
+( function is used for the comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 679.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(less_equal) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 667.2 Tm
+2.3650 Tw
+() Tj
+/F23 10 Tf
+2.3650 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+2.3650 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+2.3650 Tw
+(less-than-or-equal) Tj
+/F20 10 Tf
+2.3650 Tw
+( comparison) Tj
+1 0 0 1 100.0 655.2 Tm
+0.5731 Tw
+(between its argument and the object ) Tj
+/F22 10 Tf
+0.5731 Tw
+(arg) Tj
+/F20 10 Tf
+0.5731 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+0.5731 Tw
+(le) Tj
+/F20 10 Tf
+0.5731 Tw
+( function is used for the) Tj
+1 0 0 1 100.0 643.2 Tm
+0.0000 Tw
+(comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 616.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(compare) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 604.8 Tm
+1.6250 Tw
+() Tj
+/F23 10 Tf
+1.6250 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+1.6250 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+1.6250 Tw
+(compare) Tj
+/F20 10 Tf
+1.6250 Tw
+( comparison between its) Tj
+1 0 0 1 100.0 592.8 Tm
+3.6729 Tw
+(argument and the object ) Tj
+/F22 10 Tf
+3.6729 Tw
+(arg) Tj
+/F20 10 Tf
+3.6729 Tw
+( attribute`s value. The element`s ) Tj
+/F22 10 Tf
+3.6729 Tw
+(cmp) Tj
+/F20 10 Tf
+3.6729 Tw
+( function is used for the) Tj
+1 0 0 1 100.0 580.8 Tm
+0.0000 Tw
+(comparison. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 554.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(matches) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 542.4 Tm
+0.3607 Tw
+() Tj
+/F23 10 Tf
+0.3607 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.3607 Tw
+(. This function-object will return the result \(true or false\) of the regular expression) Tj
+1 0 0 1 100.0 530.4 Tm
+0.0031 Tw
+(comparison between its first argument and its second argument which contains a regular expression) Tj
+1 0 0 1 100.0 518.4 Tm
+0.0000 Tw
+(string.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 492.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(matches_ic) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 480.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.0000 Tw
+(. Case-insensitive version of the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(matches) Tj
+/F20 10 Tf
+0.0000 Tw
+( function. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 453.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(bind1st) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 441.6 Tm
+0.3967 Tw
+() Tj
+/F23 10 Tf
+0.3967 Tw
+(Unary function) Tj
+/F20 10 Tf
+0.3967 Tw
+(. This function requires two arguments consisting of a ) Tj
+/F22 10 Tf
+0.3967 Tw
+(binary-function-object) Tj
+/F20 10 Tf
+0.3967 Tw
+( and a) Tj
+1 0 0 1 100.0 429.6 Tm
+3.4873 Tw
+(element or value argument. It will produce a ) Tj
+/F22 10 Tf
+3.4873 Tw
+(unary-function) Tj
+/F20 10 Tf
+3.4873 Tw
+( object whose ) Tj
+/F22 10 Tf
+3.4873 Tw
+(function_operator) Tj
+/F20 10 Tf
+1 0 0 1 100.0 417.6 Tm
+0.0000 Tw
+(member will call the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(binary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+( with ) Tj
+/F22 10 Tf
+0.0000 Tw
+(argument) Tj
+/F20 10 Tf
+0.0000 Tw
+( as the first argument. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 391.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(bind2nd) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 379.2 Tm
+0.3967 Tw
+() Tj
+/F23 10 Tf
+0.3967 Tw
+(Unary function) Tj
+/F20 10 Tf
+0.3967 Tw
+(. This function requires two arguments consisting of a ) Tj
+/F22 10 Tf
+0.3967 Tw
+(binary-function-object) Tj
+/F20 10 Tf
+0.3967 Tw
+( and a) Tj
+1 0 0 1 100.0 367.2 Tm
+3.4873 Tw
+(element or value argument. It will produce a ) Tj
+/F22 10 Tf
+3.4873 Tw
+(unary-function) Tj
+/F20 10 Tf
+3.4873 Tw
+( object whose ) Tj
+/F22 10 Tf
+3.4873 Tw
+(function_operator) Tj
+/F20 10 Tf
+1 0 0 1 100.0 355.2 Tm
+0.0000 Tw
+(member will call the ) Tj
+/F22 10 Tf
+0.0000 Tw
+(binary-function) Tj
+/F20 10 Tf
+0.0000 Tw
+( with ) Tj
+/F22 10 Tf
+0.0000 Tw
+(argument) Tj
+/F20 10 Tf
+0.0000 Tw
+( as the second argument. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 328.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(mem_fun) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 316.8 Tm
+1.0957 Tw
+(This function requires one argument consisting of the class member function name \(string\). It will) Tj
+1 0 0 1 100.0 304.8 Tm
+0.1207 Tw
+(construct an object whose ) Tj
+/F22 10 Tf
+0.1207 Tw
+(function_operator) Tj
+/F20 10 Tf
+0.1207 Tw
+( member will require an element object to be passed as) Tj
+1 0 0 1 100.0 292.8 Tm
+3.1993 Tw
+(the first argument. It will call the elements`s member function as specified by the ) Tj
+/F22 10 Tf
+3.1993 Tw
+(mem_fun) Tj
+/F20 10 Tf
+1 0 0 1 100.0 280.8 Tm
+0.0000 Tw
+(argument. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 254.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(ptr_fun) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 242.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Unary function) Tj
+/F20 10 Tf
+0.0000 Tw
+(. This function requires one argument consisting of a global function name \(string\). ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 216.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(ptr_fun_binary) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 204.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Binary function) Tj
+/F20 10 Tf
+0.0000 Tw
+(. This function requires one argument consisting of global function name \(string\). ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 177.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(logical_and) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 165.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 139.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(logical_or) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 127.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(Binary predicate) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 100.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(multiplies) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 88.8 Tm
+2.1000 Tw
+() Tj
+/F23 10 Tf
+2.1000 Tw
+(Binary function) Tj
+/F20 10 Tf
+2.1000 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+2.1000 Tw
+(multiply) Tj
+/F20 10 Tf
+2.1000 Tw
+( between its two element) Tj
+1 0 0 1 100.0 76.8 Tm
+0.4660 Tw
+(arguments. The element`s ) Tj
+/F22 10 Tf
+0.4660 Tw
+(mult) Tj
+/F20 10 Tf
+0.4660 Tw
+( function is used for the calculation. It will return a newly construced) Tj
+1 0 0 1 100.0 64.8 Tm
+0.0000 Tw
+(element object containing the result. ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(14) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+71 0 obj
+7654
+endobj
+72 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+73 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 72 0 R
+/Contents 70 0 R
+>>
+endobj
+74 0 obj
+<<
+/Length 75 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+1 0 0 1 76.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(divides) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 768.0 Tm
+2.1423 Tw
+() Tj
+/F23 10 Tf
+2.1423 Tw
+(Binary function) Tj
+/F20 10 Tf
+2.1423 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+2.1423 Tw
+(division) Tj
+/F20 10 Tf
+2.1423 Tw
+( between its two element) Tj
+1 0 0 1 100.0 756.0 Tm
+0.8733 Tw
+(arguments. The element`s ) Tj
+/F22 10 Tf
+0.8733 Tw
+(div) Tj
+/F20 10 Tf
+0.8733 Tw
+( function is used for the calculation. It will return a newly construced) Tj
+1 0 0 1 100.0 744.0 Tm
+0.0000 Tw
+(element object containing the result. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 717.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(plus) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 705.6 Tm
+3.2962 Tw
+() Tj
+/F23 10 Tf
+3.2962 Tw
+(Binary function) Tj
+/F20 10 Tf
+3.2962 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+3.2962 Tw
+(plus) Tj
+/F20 10 Tf
+3.2962 Tw
+( between its two element) Tj
+1 0 0 1 100.0 693.6 Tm
+0.6133 Tw
+(arguments. The element`s ) Tj
+/F22 10 Tf
+0.6133 Tw
+(add) Tj
+/F20 10 Tf
+0.6133 Tw
+( function is used for the calculation. It will return a newly construced) Tj
+1 0 0 1 100.0 681.6 Tm
+0.0000 Tw
+(element object containing the result. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 655.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(minus) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 643.2 Tm
+1.9708 Tw
+() Tj
+/F23 10 Tf
+1.9708 Tw
+(Binary function) Tj
+/F20 10 Tf
+1.9708 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+1.9708 Tw
+(subtract) Tj
+/F20 10 Tf
+1.9708 Tw
+( between its two element) Tj
+1 0 0 1 100.0 631.2 Tm
+3.0000 Tw
+(arguments. The element`s ) Tj
+/F22 10 Tf
+3.0000 Tw
+(subtract) Tj
+/F20 10 Tf
+3.0000 Tw
+( function is used for the calculation. It will return a newly) Tj
+1 0 0 1 100.0 619.2 Tm
+0.0000 Tw
+(construced element object containing the result. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 592.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(modulus) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 580.8 Tm
+1.8000 Tw
+() Tj
+/F23 10 Tf
+1.8000 Tw
+(Binary function) Tj
+/F20 10 Tf
+1.8000 Tw
+(. This function-object will return the result of ) Tj
+/F22 10 Tf
+1.8000 Tw
+(modulus) Tj
+/F20 10 Tf
+1.8000 Tw
+( between its two element) Tj
+1 0 0 1 100.0 568.8 Tm
+0.4287 Tw
+(arguments. The element`s ) Tj
+/F22 10 Tf
+0.4287 Tw
+(mod) Tj
+/F20 10 Tf
+0.4287 Tw
+( function is used for the calculation. It will return a newly construced) Tj
+1 0 0 1 100.0 556.8 Tm
+0.0000 Tw
+(element object containing the result. ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 514.8 Tm
+0.0000 Tw
+() Tj
+/F23 12 Tf
+0.0000 Tw
+(CLASS Class::STL::Iterators) Tj
+/F21 12 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 500.4 Tm
+0.0000 Tw
+(This module contains the iterator classes.  ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 470.4 Tm
+0.0000 Tw
+(Exports ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 458.4 Tm
+0.3492 Tw
+() Tj
+/F23 10 Tf
+0.3492 Tw
+(iterator) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(bidirectional_iterator) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(reverse_iterator) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(forward_iterator) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(++) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(\217) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(==) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(!=) Tj
+/F20 10 Tf
+0.3492 Tw
+(, >) Tj
+/F23 10 Tf
+0.3492 Tw
+(=) Tj
+/F20 10 Tf
+0.3492 Tw
+(, <) Tj
+/F23 10 Tf
+0.3492 Tw
+(=) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(+) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(+=) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(-) Tj
+/F20 10 Tf
+0.3492 Tw
+(, ) Tj
+/F23 10 Tf
+0.3492 Tw
+(-=) Tj
+/F20 10 Tf
+0.3492 Tw
+(,) Tj
+1 0 0 1 76.0 446.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(distance) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(advance) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(front_inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(back_inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+(, ) Tj
+/F23 10 Tf
+0.0000 Tw
+(inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 420.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(new) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 405.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(p_container) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 393.6 Tm
+0.0000 Tw
+(Returns a reference to the container that is associated with the iterator. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 367.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(p_element) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 355.2 Tm
+0.0000 Tw
+(This function will return a reference to the element pointed to by the iterator. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 328.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(distance) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 316.8 Tm
+0.5400 Tw
+() Tj
+/F21 10 Tf
+0.5400 Tw
+(Static function) Tj
+/F20 10 Tf
+0.5400 Tw
+(. This function will return the ) Tj
+/F22 10 Tf
+0.5400 Tw
+(distance) Tj
+/F20 10 Tf
+0.5400 Tw
+( between two iterators. Both iterators must be) Tj
+1 0 0 1 100.0 304.8 Tm
+0.0000 Tw
+(from the same container. ) Tj
+/F22 10 Tf
+0.0000 Tw
+(Iterator-finish) Tj
+/F20 10 Tf
+0.0000 Tw
+( must be positioned after ) Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator-first) Tj
+/F20 10 Tf
+0.0000 Tw
+(. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 292.8 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(int distance \( iterator-start, iterator-finish ] \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 266.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(advance) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 254.4 Tm
+0.0000 Tw
+() Tj
+/F21 10 Tf
+0.0000 Tw
+(Static function) Tj
+/F20 10 Tf
+0.0000 Tw
+(. Moves the iterator forward, or backwards if size is negative. ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 230.4 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator advance \( iterator, size \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 204.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 192.0 Tm
+0.0000 Tw
+() Tj
+/F21 10 Tf
+0.0000 Tw
+(Static function) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 168.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator inserter \( container, iterator \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 141.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(front_inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 129.6 Tm
+0.0000 Tw
+() Tj
+/F21 10 Tf
+0.0000 Tw
+(Static function) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 105.6 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator front_inserter \( container \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 79.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(back_inserter) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 531.88 37 Tm
+(15) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+75 0 obj
+7069
+endobj
+76 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+77 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 76 0 R
+/Contents 74 0 R
+>>
+endobj
+78 0 obj
+<<
+/Length 79 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 424.07 797 Tm
+(Programmer's Reference) Tj
+/F20 10 Tf
+1 0 0 1 100.0 780.0 Tm
+0.0000 Tw
+() Tj
+/F21 10 Tf
+0.0000 Tw
+(Static function) Tj
+/F20 10 Tf
+0.0000 Tw
+(.  ) Tj
+/F20 10 Tf
+1 0 0 1 100.0 756.0 Tm
+0.0000 Tw
+() Tj
+/F22 10 Tf
+0.0000 Tw
+(iterator back_inserter \( container \);) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 729.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(first) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 715.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(next) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 700.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(last) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 686.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(prev) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 672.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(at_end) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 657.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(eq) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 643.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(ne) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 628.8 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(lt) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 614.4 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(le) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 600.0 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(gt) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 585.6 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(ge) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 571.2 Tm
+0.0000 Tw
+() Tj
+/F23 10 Tf
+0.0000 Tw
+(cmp) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 10 Tf
+1 0 0 1 52.0 541.2 Tm
+0.0000 Tw
+(Examples ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 525.0 Tm
+0.0000 Tw
+(  # Using overoaded inrement operator: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 516.6 Tm
+0.0000 Tw
+(  for \(my $i = $p->begin\(\); !$i->at_end\(\); $i++\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 508.2 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 499.8 Tm
+0.0000 Tw
+(MyPrint->new\(\)->function_operator\($i->p_element\(\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 491.4 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 474.6 Tm
+0.0000 Tw
+(  # Using overoaded decrement operator: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 466.2 Tm
+0.0000 Tw
+(  for \(my $i = $p->end\(\); !$i->at_end\(\); --$i\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 457.8 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 124.0 449.4 Tm
+0.0000 Tw
+(MyPrint->new\(\)->function_operator\($i->p_element\(\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 441.0 Tm
+0.0000 Tw
+(  \} ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 424.2 Tm
+0.0000 Tw
+(  # Reverse iterator: ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 415.8 Tm
+0.0000 Tw
+(  my $ri = reverse_iterator\($p->iter\(\)\)->first\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 407.4 Tm
+0.0000 Tw
+(  while \(!$ri->at_end\(\)\) ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 399.0 Tm
+0.0000 Tw
+(  \{ ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 390.6 Tm
+0.0000 Tw
+(    MyPrint->new\(\)->function_operator\($ri->p_element\(\)\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 382.2 Tm
+0.0000 Tw
+(    $ri->next\(\); ) Tj
+/F10 7 Tf
+1 0 0 1 76.0 373.8 Tm
+0.0000 Tw
+(  \} ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 352.8 Tm
+0.0000 Tw
+(SEE ALSO ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 338.4 Tm
+0.0000 Tw
+(Sourceforge Project Page: ) Tj
+/F10 10 Tf
+0.0000 Tw
+(http://sourceforge.net/projects/pstl) Tj
+/F20 10 Tf
+0.0000 Tw
+( ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 296.4 Tm
+0.0000 Tw
+(AUTHOR ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 282.0 Tm
+0.0000 Tw
+(m gaffiero, <gaffie@users.sourceforge.net> ) Tj
+/F21 12 Tf
+1 0 0 1 52.0 252.0 Tm
+0.0000 Tw
+(COPYRIGHT AND LICENSE ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 237.6 Tm
+0.0000 Tw
+(Copyright \2511999-2007, Mario Gaffiero. All Rights Reserved. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 213.6 Tm
+0.0000 Tw
+(This file is part of Class::STL::Containers\(TM\). ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 189.6 Tm
+1.3987 Tw
+(Class::STL::Containers is free software; you can redistribute it and/or modify it under the terms of the) Tj
+1 0 0 1 76.0 177.6 Tm
+0.0000 Tw
+(GNU General Public License as published by the Free Software Foundation; version 2 of the License. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 153.6 Tm
+0.7471 Tw
+(Class::STL::Containers is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;) Tj
+1 0 0 1 76.0 141.6 Tm
+0.0175 Tw
+(without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.) Tj
+1 0 0 1 76.0 129.6 Tm
+0.0000 Tw
+( See the GNU General Public License for more details. ) Tj
+/F20 10 Tf
+1 0 0 1 76.0 105.6 Tm
+0.3464 Tw
+(You should have received a copy of the GNU General Public License along with Class::STL::Containers;) Tj
+1 0 0 1 76.0 93.6 Tm
+0.8065 Tw
+(if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301) Tj
+1 0 0 1 76.0 81.6 Tm
+0.0000 Tw
+(USA ) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(16) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+79 0 obj
+4911
+endobj
+80 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F10 10 0 R
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+/F23 17 0 R
+>>
+>>
+endobj
+81 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 80 0 R
+/Contents 78 0 R
+>>
+endobj
+82 0 obj
+<<
+/Length 83 0 R
+>>
+stream
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+/F20 20 Tf
+1 0 0 1 218.57 770 Tm
+(Table of Contents) Tj
+1 0 0 1 194.69 746 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+ET
+q
+0.95 g
+52 695 491 12 re
+f
+Q
+BT
+1 0 0 1 76 698 Tm
+(NAME) Tj
+1 0 0 1 513.44 698 Tm
+(1) Tj
+ET
+q
+1 g
+52 683 491 12 re
+f
+Q
+BT
+1 0 0 1 76 686 Tm
+(SYNOPSIS) Tj
+1 0 0 1 513.44 686 Tm
+(1) Tj
+ET
+q
+0.95 g
+52 671 491 12 re
+f
+Q
+BT
+1 0 0 1 76 674 Tm
+(DESCRIPTION) Tj
+1 0 0 1 513.44 674 Tm
+(2) Tj
+ET
+q
+1 g
+52 659 491 12 re
+f
+Q
+BT
+1 0 0 1 100 662 Tm
+(Containers) Tj
+1 0 0 1 513.44 662 Tm
+(2) Tj
+ET
+q
+0.95 g
+52 647 491 12 re
+f
+Q
+BT
+1 0 0 1 100 650 Tm
+(Iterators) Tj
+1 0 0 1 513.44 650 Tm
+(2) Tj
+ET
+q
+1 g
+52 635 491 12 re
+f
+Q
+BT
+1 0 0 1 100 638 Tm
+(Algorithms) Tj
+1 0 0 1 513.44 638 Tm
+(2) Tj
+ET
+q
+0.95 g
+52 623 491 12 re
+f
+Q
+BT
+1 0 0 1 100 626 Tm
+(Utilities) Tj
+1 0 0 1 513.44 626 Tm
+(2) Tj
+ET
+q
+1 g
+52 611 491 12 re
+f
+Q
+BT
+1 0 0 1 100 614 Tm
+(Differences From C++/STL) Tj
+1 0 0 1 513.44 614 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 599 491 12 re
+f
+Q
+BT
+1 0 0 1 124 602 Tm
+(Iterators and the end\(\) function) Tj
+1 0 0 1 513.44 602 Tm
+(3) Tj
+ET
+q
+1 g
+52 587 491 12 re
+f
+Q
+BT
+1 0 0 1 124 590 Tm
+(The tree Container) Tj
+1 0 0 1 513.44 590 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 575 491 12 re
+f
+Q
+BT
+1 0 0 1 124 578 Tm
+(Utilities matches, matches_ic functions) Tj
+1 0 0 1 513.44 578 Tm
+(3) Tj
+ET
+q
+1 g
+52 563 491 12 re
+f
+Q
+BT
+1 0 0 1 124 566 Tm
+(Container append function) Tj
+1 0 0 1 513.44 566 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 551 491 12 re
+f
+Q
+BT
+1 0 0 1 124 554 Tm
+(The clone function) Tj
+1 0 0 1 513.44 554 Tm
+(3) Tj
+ET
+q
+1 g
+52 539 491 12 re
+f
+Q
+BT
+1 0 0 1 124 542 Tm
+(The Container to_array function) Tj
+1 0 0 1 513.44 542 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 527 491 12 re
+f
+Q
+BT
+1 0 0 1 124 530 Tm
+(Container element type) Tj
+1 0 0 1 513.44 530 Tm
+(3) Tj
+ET
+q
+1 g
+52 515 491 12 re
+f
+Q
+BT
+1 0 0 1 76 518 Tm
+(CLASS Class::STL::ClassMembers) Tj
+1 0 0 1 513.44 518 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 503 491 12 re
+f
+Q
+BT
+1 0 0 1 100 506 Tm
+(Data Member Accessor Get/Put Function) Tj
+1 0 0 1 513.44 506 Tm
+(3) Tj
+ET
+q
+1 g
+52 491 491 12 re
+f
+Q
+BT
+1 0 0 1 100 494 Tm
+(Class members_init\(\) Function) Tj
+1 0 0 1 513.44 494 Tm
+(3) Tj
+ET
+q
+0.95 g
+52 479 491 12 re
+f
+Q
+BT
+1 0 0 1 100 482 Tm
+(Class clone\(\) Function) Tj
+1 0 0 1 513.44 482 Tm
+(3) Tj
+ET
+q
+1 g
+52 467 491 12 re
+f
+Q
+BT
+1 0 0 1 100 470 Tm
+(Class swap\(\) Function) Tj
+1 0 0 1 513.44 470 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 455 491 12 re
+f
+Q
+BT
+1 0 0 1 100 458 Tm
+(Class members\(\) Function) Tj
+1 0 0 1 513.44 458 Tm
+(4) Tj
+ET
+q
+1 g
+52 443 491 12 re
+f
+Q
+BT
+1 0 0 1 100 446 Tm
+(Class members_local\(\) Function) Tj
+1 0 0 1 513.44 446 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 431 491 12 re
+f
+Q
+BT
+1 0 0 1 100 434 Tm
+(Class::STL::ClassMembers::DataMember) Tj
+1 0 0 1 513.44 434 Tm
+(4) Tj
+ET
+q
+1 g
+52 419 491 12 re
+f
+Q
+BT
+1 0 0 1 100 422 Tm
+(Class::STL::ClassMembers::Constructor) Tj
+1 0 0 1 513.44 422 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 407 491 12 re
+f
+Q
+BT
+1 0 0 1 100 410 Tm
+(Class::STL::ClassMembers::SingletonConstructor) Tj
+1 0 0 1 513.44 410 Tm
+(4) Tj
+ET
+q
+1 g
+52 395 491 12 re
+f
+Q
+BT
+1 0 0 1 100 398 Tm
+(Example) Tj
+1 0 0 1 513.44 398 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 383 491 12 re
+f
+Q
+BT
+1 0 0 1 76 386 Tm
+(CLASS Class::STL::Containers) Tj
+1 0 0 1 513.44 386 Tm
+(4) Tj
+ET
+q
+1 g
+52 371 491 12 re
+f
+Q
+BT
+1 0 0 1 100 374 Tm
+(Exports) Tj
+1 0 0 1 513.44 374 Tm
+(4) Tj
+ET
+q
+0.95 g
+52 359 491 12 re
+f
+Q
+BT
+1 0 0 1 76 362 Tm
+(CLASS Class::STL::Containers::Abstract) Tj
+1 0 0 1 513.44 362 Tm
+(5) Tj
+ET
+q
+1 g
+52 347 491 12 re
+f
+Q
+BT
+1 0 0 1 100 350 Tm
+(Extends Class::STL::Element) Tj
+1 0 0 1 513.44 350 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 335 491 12 re
+f
+Q
+BT
+1 0 0 1 124 338 Tm
+(new) Tj
+1 0 0 1 513.44 338 Tm
+(5) Tj
+ET
+q
+1 g
+52 323 491 12 re
+f
+Q
+BT
+1 0 0 1 124 326 Tm
+(clone) Tj
+1 0 0 1 513.44 326 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 311 491 12 re
+f
+Q
+BT
+1 0 0 1 124 314 Tm
+(factory) Tj
+1 0 0 1 513.44 314 Tm
+(5) Tj
+ET
+q
+1 g
+52 299 491 12 re
+f
+Q
+BT
+1 0 0 1 124 302 Tm
+(erase) Tj
+1 0 0 1 513.44 302 Tm
+(5) Tj
+ET
+q
+0.95 g
+52 287 491 12 re
+f
+Q
+BT
+1 0 0 1 124 290 Tm
+(insert) Tj
+1 0 0 1 513.44 290 Tm
+(5) Tj
+ET
+q
+1 g
+52 275 491 12 re
+f
+Q
+BT
+1 0 0 1 124 278 Tm
+(pop) Tj
+1 0 0 1 513.44 278 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 263 491 12 re
+f
+Q
+BT
+1 0 0 1 124 266 Tm
+(push) Tj
+1 0 0 1 513.44 266 Tm
+(6) Tj
+ET
+q
+1 g
+52 251 491 12 re
+f
+Q
+BT
+1 0 0 1 124 254 Tm
+(clear) Tj
+1 0 0 1 513.44 254 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 239 491 12 re
+f
+Q
+BT
+1 0 0 1 124 242 Tm
+(begin) Tj
+1 0 0 1 513.44 242 Tm
+(6) Tj
+ET
+q
+1 g
+52 227 491 12 re
+f
+Q
+BT
+1 0 0 1 124 230 Tm
+(end) Tj
+1 0 0 1 513.44 230 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 215 491 12 re
+f
+Q
+BT
+1 0 0 1 124 218 Tm
+(rbegin) Tj
+1 0 0 1 513.44 218 Tm
+(6) Tj
+ET
+q
+1 g
+52 203 491 12 re
+f
+Q
+BT
+1 0 0 1 124 206 Tm
+(rend) Tj
+1 0 0 1 513.44 206 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 191 491 12 re
+f
+Q
+BT
+1 0 0 1 124 194 Tm
+(size) Tj
+1 0 0 1 513.44 194 Tm
+(6) Tj
+ET
+q
+1 g
+52 179 491 12 re
+f
+Q
+BT
+1 0 0 1 124 182 Tm
+(empty) Tj
+1 0 0 1 513.44 182 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 167 491 12 re
+f
+Q
+BT
+1 0 0 1 124 170 Tm
+(to_array) Tj
+1 0 0 1 513.44 170 Tm
+(6) Tj
+ET
+q
+1 g
+52 155 491 12 re
+f
+Q
+BT
+1 0 0 1 124 158 Tm
+(eq) Tj
+1 0 0 1 513.44 158 Tm
+(6) Tj
+ET
+q
+0.95 g
+52 143 491 12 re
+f
+Q
+BT
+1 0 0 1 124 146 Tm
+(ne) Tj
+1 0 0 1 513.44 146 Tm
+(7) Tj
+ET
+q
+1 g
+52 131 491 12 re
+f
+Q
+BT
+1 0 0 1 124 134 Tm
+(operator +, operator +=) Tj
+1 0 0 1 513.44 134 Tm
+(7) Tj
+ET
+q
+0.95 g
+52 119 491 12 re
+f
+Q
+BT
+1 0 0 1 124 122 Tm
+(operator == ) Tj
+1 0 0 1 513.44 122 Tm
+(7) Tj
+ET
+q
+1 g
+52 107 491 12 re
+f
+Q
+BT
+1 0 0 1 124 110 Tm
+(operator != ) Tj
+1 0 0 1 513.44 110 Tm
+(7) Tj
+ET
+q
+0.95 g
+52 95 491 12 re
+f
+Q
+BT
+1 0 0 1 76 98 Tm
+(CLASS Class::STL::Containers::List) Tj
+1 0 0 1 513.44 98 Tm
+(7) Tj
+ET
+q
+1 g
+52 83 491 12 re
+f
+Q
+BT
+1 0 0 1 100 86 Tm
+(Extends Class::STL::Containers::Deque) Tj
+1 0 0 1 513.44 86 Tm
+(7) Tj
+ET
+q
+0.95 g
+52 71 491 12 re
+f
+Q
+BT
+1 0 0 1 124 74 Tm
+(reverse) Tj
+1 0 0 1 513.44 74 Tm
+(7) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 540.22 37 Tm
+(i) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+83 0 obj
+5850
+endobj
+84 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+85 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 84 0 R
+/Contents 82 0 R
+>>
+endobj
+86 0 obj
+<<
+/Length 87 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 458.55 797 Tm
+(Table of Contents) Tj
+/F20 10 Tf
+ET
+q
+1 g
+52 767 491 12 re
+f
+Q
+BT
+1 0 0 1 124 770 Tm
+(sort) Tj
+1 0 0 1 513.44 770 Tm
+(7) Tj
+ET
+q
+0.95 g
+52 755 491 12 re
+f
+Q
+BT
+1 0 0 1 100 758 Tm
+(Example) Tj
+1 0 0 1 513.44 758 Tm
+(7) Tj
+ET
+q
+1 g
+52 743 491 12 re
+f
+Q
+BT
+1 0 0 1 76 746 Tm
+(CLASS Class::STL::Containers::Vector) Tj
+1 0 0 1 513.44 746 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 731 491 12 re
+f
+Q
+BT
+1 0 0 1 100 734 Tm
+(Extends Class::STL::Containers::Abstract) Tj
+1 0 0 1 513.44 734 Tm
+(8) Tj
+ET
+q
+1 g
+52 719 491 12 re
+f
+Q
+BT
+1 0 0 1 124 722 Tm
+(push_back) Tj
+1 0 0 1 513.44 722 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 707 491 12 re
+f
+Q
+BT
+1 0 0 1 124 710 Tm
+(pop_back) Tj
+1 0 0 1 513.44 710 Tm
+(8) Tj
+ET
+q
+1 g
+52 695 491 12 re
+f
+Q
+BT
+1 0 0 1 124 698 Tm
+(back) Tj
+1 0 0 1 513.44 698 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 683 491 12 re
+f
+Q
+BT
+1 0 0 1 124 686 Tm
+(front) Tj
+1 0 0 1 513.44 686 Tm
+(8) Tj
+ET
+q
+1 g
+52 671 491 12 re
+f
+Q
+BT
+1 0 0 1 124 674 Tm
+(at) Tj
+1 0 0 1 513.44 674 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 659 491 12 re
+f
+Q
+BT
+1 0 0 1 76 662 Tm
+(CLASS Class::STL::Containers::Deque) Tj
+1 0 0 1 513.44 662 Tm
+(8) Tj
+ET
+q
+1 g
+52 647 491 12 re
+f
+Q
+BT
+1 0 0 1 100 650 Tm
+(Extends Class::STL::Containers::Vector) Tj
+1 0 0 1 513.44 650 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 635 491 12 re
+f
+Q
+BT
+1 0 0 1 124 638 Tm
+(push_front) Tj
+1 0 0 1 513.44 638 Tm
+(8) Tj
+ET
+q
+1 g
+52 623 491 12 re
+f
+Q
+BT
+1 0 0 1 124 626 Tm
+(pop_front) Tj
+1 0 0 1 513.44 626 Tm
+(8) Tj
+ET
+q
+0.95 g
+52 611 491 12 re
+f
+Q
+BT
+1 0 0 1 76 614 Tm
+(CLASS Class::STL::Containers::Queue) Tj
+1 0 0 1 513.44 614 Tm
+(8) Tj
+ET
+q
+1 g
+52 599 491 12 re
+f
+Q
+BT
+1 0 0 1 100 602 Tm
+(Extends Class::STL::Containers::Abstract) Tj
+1 0 0 1 513.44 602 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 587 491 12 re
+f
+Q
+BT
+1 0 0 1 124 590 Tm
+(push) Tj
+1 0 0 1 513.44 590 Tm
+(9) Tj
+ET
+q
+1 g
+52 575 491 12 re
+f
+Q
+BT
+1 0 0 1 124 578 Tm
+(pop) Tj
+1 0 0 1 513.44 578 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 563 491 12 re
+f
+Q
+BT
+1 0 0 1 124 566 Tm
+(back) Tj
+1 0 0 1 513.44 566 Tm
+(9) Tj
+ET
+q
+1 g
+52 551 491 12 re
+f
+Q
+BT
+1 0 0 1 124 554 Tm
+(front) Tj
+1 0 0 1 513.44 554 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 539 491 12 re
+f
+Q
+BT
+1 0 0 1 76 542 Tm
+(CLASS Class::STL::Containers::Stack) Tj
+1 0 0 1 513.44 542 Tm
+(9) Tj
+ET
+q
+1 g
+52 527 491 12 re
+f
+Q
+BT
+1 0 0 1 100 530 Tm
+(Extends Class::STL::Containers::Abstract) Tj
+1 0 0 1 513.44 530 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 515 491 12 re
+f
+Q
+BT
+1 0 0 1 124 518 Tm
+(push) Tj
+1 0 0 1 513.44 518 Tm
+(9) Tj
+ET
+q
+1 g
+52 503 491 12 re
+f
+Q
+BT
+1 0 0 1 124 506 Tm
+(pop) Tj
+1 0 0 1 513.44 506 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 491 491 12 re
+f
+Q
+BT
+1 0 0 1 124 494 Tm
+(top) Tj
+1 0 0 1 513.44 494 Tm
+(9) Tj
+ET
+q
+1 g
+52 479 491 12 re
+f
+Q
+BT
+1 0 0 1 76 482 Tm
+(CLASS Class::STL::Containers::Tree) Tj
+1 0 0 1 513.44 482 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 467 491 12 re
+f
+Q
+BT
+1 0 0 1 100 470 Tm
+(Extends Class::STL::Containers::Deque) Tj
+1 0 0 1 513.44 470 Tm
+(9) Tj
+ET
+q
+1 g
+52 455 491 12 re
+f
+Q
+BT
+1 0 0 1 124 458 Tm
+(to_array) Tj
+1 0 0 1 513.44 458 Tm
+(9) Tj
+ET
+q
+0.95 g
+52 443 491 12 re
+f
+Q
+BT
+1 0 0 1 100 446 Tm
+(Examples) Tj
+1 0 0 1 507.88 446 Tm
+(10) Tj
+ET
+q
+1 g
+52 431 491 12 re
+f
+Q
+BT
+1 0 0 1 76 434 Tm
+(CLASS Class::STL::Containers::PriorityQueue) Tj
+1 0 0 1 507.88 434 Tm
+(10) Tj
+ET
+q
+0.95 g
+52 419 491 12 re
+f
+Q
+BT
+1 0 0 1 100 422 Tm
+(Extends Class::STL::Containers::Vector) Tj
+1 0 0 1 507.88 422 Tm
+(10) Tj
+ET
+q
+1 g
+52 407 491 12 re
+f
+Q
+BT
+1 0 0 1 100 410 Tm
+(Element Type Class::STL::Element::Priority) Tj
+1 0 0 1 507.88 410 Tm
+(10) Tj
+ET
+q
+0.95 g
+52 395 491 12 re
+f
+Q
+BT
+1 0 0 1 124 398 Tm
+(push) Tj
+1 0 0 1 507.88 398 Tm
+(10) Tj
+ET
+q
+1 g
+52 383 491 12 re
+f
+Q
+BT
+1 0 0 1 124 386 Tm
+(pop) Tj
+1 0 0 1 507.88 386 Tm
+(10) Tj
+ET
+q
+0.95 g
+52 371 491 12 re
+f
+Q
+BT
+1 0 0 1 124 374 Tm
+(top) Tj
+1 0 0 1 507.88 374 Tm
+(10) Tj
+ET
+q
+1 g
+52 359 491 12 re
+f
+Q
+BT
+1 0 0 1 124 362 Tm
+(refresh) Tj
+1 0 0 1 507.88 362 Tm
+(10) Tj
+ET
+q
+0.95 g
+52 347 491 12 re
+f
+Q
+BT
+1 0 0 1 76 350 Tm
+(CLASS Class::STL::Algorithms) Tj
+1 0 0 1 507.88 350 Tm
+(10) Tj
+ET
+q
+1 g
+52 335 491 12 re
+f
+Q
+BT
+1 0 0 1 100 338 Tm
+(Exports) Tj
+1 0 0 1 507.88 338 Tm
+(10) Tj
+ET
+q
+0.95 g
+52 323 491 12 re
+f
+Q
+BT
+1 0 0 1 124 326 Tm
+(for_each) Tj
+1 0 0 1 507.88 326 Tm
+(11) Tj
+ET
+q
+1 g
+52 311 491 12 re
+f
+Q
+BT
+1 0 0 1 124 314 Tm
+(transform) Tj
+1 0 0 1 507.88 314 Tm
+(11) Tj
+ET
+q
+0.95 g
+52 299 491 12 re
+f
+Q
+BT
+1 0 0 1 124 302 Tm
+(count) Tj
+1 0 0 1 507.88 302 Tm
+(11) Tj
+ET
+q
+1 g
+52 287 491 12 re
+f
+Q
+BT
+1 0 0 1 124 290 Tm
+(count_if) Tj
+1 0 0 1 507.88 290 Tm
+(11) Tj
+ET
+q
+0.95 g
+52 275 491 12 re
+f
+Q
+BT
+1 0 0 1 124 278 Tm
+(find) Tj
+1 0 0 1 507.88 278 Tm
+(11) Tj
+ET
+q
+1 g
+52 263 491 12 re
+f
+Q
+BT
+1 0 0 1 124 266 Tm
+(find_if) Tj
+1 0 0 1 507.88 266 Tm
+(11) Tj
+ET
+q
+0.95 g
+52 251 491 12 re
+f
+Q
+BT
+1 0 0 1 124 254 Tm
+(copy) Tj
+1 0 0 1 507.88 254 Tm
+(11) Tj
+ET
+q
+1 g
+52 239 491 12 re
+f
+Q
+BT
+1 0 0 1 124 242 Tm
+(copy_backward) Tj
+1 0 0 1 507.88 242 Tm
+(11) Tj
+ET
+q
+0.95 g
+52 227 491 12 re
+f
+Q
+BT
+1 0 0 1 124 230 Tm
+(remove) Tj
+1 0 0 1 507.88 230 Tm
+(11) Tj
+ET
+q
+1 g
+52 215 491 12 re
+f
+Q
+BT
+1 0 0 1 124 218 Tm
+(remove_if) Tj
+1 0 0 1 507.88 218 Tm
+(11) Tj
+ET
+q
+0.95 g
+52 203 491 12 re
+f
+Q
+BT
+1 0 0 1 124 206 Tm
+(remove_copy) Tj
+1 0 0 1 507.88 206 Tm
+(12) Tj
+ET
+q
+1 g
+52 191 491 12 re
+f
+Q
+BT
+1 0 0 1 124 194 Tm
+(remove_copy_if) Tj
+1 0 0 1 507.88 194 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 179 491 12 re
+f
+Q
+BT
+1 0 0 1 124 182 Tm
+(replace) Tj
+1 0 0 1 507.88 182 Tm
+(12) Tj
+ET
+q
+1 g
+52 167 491 12 re
+f
+Q
+BT
+1 0 0 1 124 170 Tm
+(replace_if) Tj
+1 0 0 1 507.88 170 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 155 491 12 re
+f
+Q
+BT
+1 0 0 1 124 158 Tm
+(replace_copy) Tj
+1 0 0 1 507.88 158 Tm
+(12) Tj
+ET
+q
+1 g
+52 143 491 12 re
+f
+Q
+BT
+1 0 0 1 124 146 Tm
+(replace_copy_if) Tj
+1 0 0 1 507.88 146 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 131 491 12 re
+f
+Q
+BT
+1 0 0 1 124 134 Tm
+(generate) Tj
+1 0 0 1 507.88 134 Tm
+(12) Tj
+ET
+q
+1 g
+52 119 491 12 re
+f
+Q
+BT
+1 0 0 1 124 122 Tm
+(generate_n) Tj
+1 0 0 1 507.88 122 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 107 491 12 re
+f
+Q
+BT
+1 0 0 1 124 110 Tm
+(fill) Tj
+1 0 0 1 507.88 110 Tm
+(12) Tj
+ET
+q
+1 g
+52 95 491 12 re
+f
+Q
+BT
+1 0 0 1 124 98 Tm
+(fill_n) Tj
+1 0 0 1 507.88 98 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 83 491 12 re
+f
+Q
+BT
+1 0 0 1 124 86 Tm
+(equal) Tj
+1 0 0 1 507.88 86 Tm
+(12) Tj
+ET
+q
+1 g
+52 71 491 12 re
+f
+Q
+BT
+1 0 0 1 124 74 Tm
+(reverse) Tj
+1 0 0 1 507.88 74 Tm
+(12) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(ii) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+87 0 obj
+6339
+endobj
+88 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+89 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 88 0 R
+/Contents 86 0 R
+>>
+endobj
+90 0 obj
+<<
+/Length 91 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Table of Contents) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F20 10 Tf
+ET
+q
+0.95 g
+52 767 491 12 re
+f
+Q
+BT
+1 0 0 1 124 770 Tm
+(reverse_copy) Tj
+1 0 0 1 507.88 770 Tm
+(12) Tj
+ET
+q
+1 g
+52 755 491 12 re
+f
+Q
+BT
+1 0 0 1 124 758 Tm
+(rotate) Tj
+1 0 0 1 507.88 758 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 743 491 12 re
+f
+Q
+BT
+1 0 0 1 124 746 Tm
+(rotate_copy) Tj
+1 0 0 1 507.88 746 Tm
+(12) Tj
+ET
+q
+1 g
+52 731 491 12 re
+f
+Q
+BT
+1 0 0 1 124 734 Tm
+(partition) Tj
+1 0 0 1 507.88 734 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 719 491 12 re
+f
+Q
+BT
+1 0 0 1 124 722 Tm
+(stable_partition) Tj
+1 0 0 1 507.88 722 Tm
+(12) Tj
+ET
+q
+1 g
+52 707 491 12 re
+f
+Q
+BT
+1 0 0 1 124 710 Tm
+(min_element) Tj
+1 0 0 1 507.88 710 Tm
+(12) Tj
+ET
+q
+0.95 g
+52 695 491 12 re
+f
+Q
+BT
+1 0 0 1 124 698 Tm
+(max_element) Tj
+1 0 0 1 507.88 698 Tm
+(13) Tj
+ET
+q
+1 g
+52 683 491 12 re
+f
+Q
+BT
+1 0 0 1 124 686 Tm
+(unique) Tj
+1 0 0 1 507.88 686 Tm
+(13) Tj
+ET
+q
+0.95 g
+52 671 491 12 re
+f
+Q
+BT
+1 0 0 1 124 674 Tm
+(unique_copy) Tj
+1 0 0 1 507.88 674 Tm
+(13) Tj
+ET
+q
+1 g
+52 659 491 12 re
+f
+Q
+BT
+1 0 0 1 124 662 Tm
+(adjacent_find) Tj
+1 0 0 1 507.88 662 Tm
+(13) Tj
+ET
+q
+0.95 g
+52 647 491 12 re
+f
+Q
+BT
+1 0 0 1 100 650 Tm
+(Examples) Tj
+1 0 0 1 507.88 650 Tm
+(13) Tj
+ET
+q
+1 g
+52 635 491 12 re
+f
+Q
+BT
+1 0 0 1 76 638 Tm
+(CLASS Class::STL::Utilities) Tj
+1 0 0 1 507.88 638 Tm
+(13) Tj
+ET
+q
+0.95 g
+52 623 491 12 re
+f
+Q
+BT
+1 0 0 1 100 626 Tm
+(Exports) Tj
+1 0 0 1 507.88 626 Tm
+(13) Tj
+ET
+q
+1 g
+52 611 491 12 re
+f
+Q
+BT
+1 0 0 1 124 614 Tm
+(equal_to) Tj
+1 0 0 1 507.88 614 Tm
+(13) Tj
+ET
+q
+0.95 g
+52 599 491 12 re
+f
+Q
+BT
+1 0 0 1 124 602 Tm
+(not_equal_to) Tj
+1 0 0 1 507.88 602 Tm
+(13) Tj
+ET
+q
+1 g
+52 587 491 12 re
+f
+Q
+BT
+1 0 0 1 124 590 Tm
+(greater) Tj
+1 0 0 1 507.88 590 Tm
+(13) Tj
+ET
+q
+0.95 g
+52 575 491 12 re
+f
+Q
+BT
+1 0 0 1 124 578 Tm
+(greater_equal) Tj
+1 0 0 1 507.88 578 Tm
+(13) Tj
+ET
+q
+1 g
+52 563 491 12 re
+f
+Q
+BT
+1 0 0 1 124 566 Tm
+(less) Tj
+1 0 0 1 507.88 566 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 551 491 12 re
+f
+Q
+BT
+1 0 0 1 124 554 Tm
+(less_equal) Tj
+1 0 0 1 507.88 554 Tm
+(14) Tj
+ET
+q
+1 g
+52 539 491 12 re
+f
+Q
+BT
+1 0 0 1 124 542 Tm
+(compare) Tj
+1 0 0 1 507.88 542 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 527 491 12 re
+f
+Q
+BT
+1 0 0 1 124 530 Tm
+(matches) Tj
+1 0 0 1 507.88 530 Tm
+(14) Tj
+ET
+q
+1 g
+52 515 491 12 re
+f
+Q
+BT
+1 0 0 1 124 518 Tm
+(matches_ic) Tj
+1 0 0 1 507.88 518 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 503 491 12 re
+f
+Q
+BT
+1 0 0 1 124 506 Tm
+(bind1st) Tj
+1 0 0 1 507.88 506 Tm
+(14) Tj
+ET
+q
+1 g
+52 491 491 12 re
+f
+Q
+BT
+1 0 0 1 124 494 Tm
+(bind2nd) Tj
+1 0 0 1 507.88 494 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 479 491 12 re
+f
+Q
+BT
+1 0 0 1 124 482 Tm
+(mem_fun) Tj
+1 0 0 1 507.88 482 Tm
+(14) Tj
+ET
+q
+1 g
+52 467 491 12 re
+f
+Q
+BT
+1 0 0 1 124 470 Tm
+(ptr_fun) Tj
+1 0 0 1 507.88 470 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 455 491 12 re
+f
+Q
+BT
+1 0 0 1 124 458 Tm
+(ptr_fun_binary) Tj
+1 0 0 1 507.88 458 Tm
+(14) Tj
+ET
+q
+1 g
+52 443 491 12 re
+f
+Q
+BT
+1 0 0 1 124 446 Tm
+(logical_and) Tj
+1 0 0 1 507.88 446 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 431 491 12 re
+f
+Q
+BT
+1 0 0 1 124 434 Tm
+(logical_or) Tj
+1 0 0 1 507.88 434 Tm
+(14) Tj
+ET
+q
+1 g
+52 419 491 12 re
+f
+Q
+BT
+1 0 0 1 124 422 Tm
+(multiplies) Tj
+1 0 0 1 507.88 422 Tm
+(14) Tj
+ET
+q
+0.95 g
+52 407 491 12 re
+f
+Q
+BT
+1 0 0 1 124 410 Tm
+(divides) Tj
+1 0 0 1 507.88 410 Tm
+(15) Tj
+ET
+q
+1 g
+52 395 491 12 re
+f
+Q
+BT
+1 0 0 1 124 398 Tm
+(plus) Tj
+1 0 0 1 507.88 398 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 383 491 12 re
+f
+Q
+BT
+1 0 0 1 124 386 Tm
+(minus) Tj
+1 0 0 1 507.88 386 Tm
+(15) Tj
+ET
+q
+1 g
+52 371 491 12 re
+f
+Q
+BT
+1 0 0 1 124 374 Tm
+(modulus.) Tj
+1 0 0 1 507.88 374 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 359 491 12 re
+f
+Q
+BT
+1 0 0 1 76 362 Tm
+(CLASS Class::STL::Iterators) Tj
+1 0 0 1 507.88 362 Tm
+(15) Tj
+ET
+q
+1 g
+52 347 491 12 re
+f
+Q
+BT
+1 0 0 1 100 350 Tm
+(Exports) Tj
+1 0 0 1 507.88 350 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 335 491 12 re
+f
+Q
+BT
+1 0 0 1 124 338 Tm
+(new) Tj
+1 0 0 1 507.88 338 Tm
+(15) Tj
+ET
+q
+1 g
+52 323 491 12 re
+f
+Q
+BT
+1 0 0 1 124 326 Tm
+(p_container) Tj
+1 0 0 1 507.88 326 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 311 491 12 re
+f
+Q
+BT
+1 0 0 1 124 314 Tm
+(p_element) Tj
+1 0 0 1 507.88 314 Tm
+(15) Tj
+ET
+q
+1 g
+52 299 491 12 re
+f
+Q
+BT
+1 0 0 1 124 302 Tm
+(distance) Tj
+1 0 0 1 507.88 302 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 287 491 12 re
+f
+Q
+BT
+1 0 0 1 124 290 Tm
+(advance) Tj
+1 0 0 1 507.88 290 Tm
+(15) Tj
+ET
+q
+1 g
+52 275 491 12 re
+f
+Q
+BT
+1 0 0 1 124 278 Tm
+(inserter) Tj
+1 0 0 1 507.88 278 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 263 491 12 re
+f
+Q
+BT
+1 0 0 1 124 266 Tm
+(front_inserter) Tj
+1 0 0 1 507.88 266 Tm
+(15) Tj
+ET
+q
+1 g
+52 251 491 12 re
+f
+Q
+BT
+1 0 0 1 124 254 Tm
+(back_inserter) Tj
+1 0 0 1 507.88 254 Tm
+(15) Tj
+ET
+q
+0.95 g
+52 239 491 12 re
+f
+Q
+BT
+1 0 0 1 124 242 Tm
+(first) Tj
+1 0 0 1 507.88 242 Tm
+(16) Tj
+ET
+q
+1 g
+52 227 491 12 re
+f
+Q
+BT
+1 0 0 1 124 230 Tm
+(next) Tj
+1 0 0 1 507.88 230 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 215 491 12 re
+f
+Q
+BT
+1 0 0 1 124 218 Tm
+(last) Tj
+1 0 0 1 507.88 218 Tm
+(16) Tj
+ET
+q
+1 g
+52 203 491 12 re
+f
+Q
+BT
+1 0 0 1 124 206 Tm
+(prev) Tj
+1 0 0 1 507.88 206 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 191 491 12 re
+f
+Q
+BT
+1 0 0 1 124 194 Tm
+(at_end) Tj
+1 0 0 1 507.88 194 Tm
+(16) Tj
+ET
+q
+1 g
+52 179 491 12 re
+f
+Q
+BT
+1 0 0 1 124 182 Tm
+(eq) Tj
+1 0 0 1 507.88 182 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 167 491 12 re
+f
+Q
+BT
+1 0 0 1 124 170 Tm
+(ne) Tj
+1 0 0 1 507.88 170 Tm
+(16) Tj
+ET
+q
+1 g
+52 155 491 12 re
+f
+Q
+BT
+1 0 0 1 124 158 Tm
+(lt) Tj
+1 0 0 1 507.88 158 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 143 491 12 re
+f
+Q
+BT
+1 0 0 1 124 146 Tm
+(le) Tj
+1 0 0 1 507.88 146 Tm
+(16) Tj
+ET
+q
+1 g
+52 131 491 12 re
+f
+Q
+BT
+1 0 0 1 124 134 Tm
+(gt) Tj
+1 0 0 1 507.88 134 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 119 491 12 re
+f
+Q
+BT
+1 0 0 1 124 122 Tm
+(ge) Tj
+1 0 0 1 507.88 122 Tm
+(16) Tj
+ET
+q
+1 g
+52 107 491 12 re
+f
+Q
+BT
+1 0 0 1 124 110 Tm
+(cmp) Tj
+1 0 0 1 507.88 110 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 95 491 12 re
+f
+Q
+BT
+1 0 0 1 100 98 Tm
+(Examples) Tj
+1 0 0 1 507.88 98 Tm
+(16) Tj
+ET
+q
+1 g
+52 83 491 12 re
+f
+Q
+BT
+1 0 0 1 76 86 Tm
+(SEE ALSO) Tj
+1 0 0 1 507.88 86 Tm
+(16) Tj
+ET
+q
+0.95 g
+52 71 491 12 re
+f
+Q
+BT
+1 0 0 1 76 74 Tm
+(AUTHOR) Tj
+1 0 0 1 507.88 74 Tm
+(16) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 534.66 37 Tm
+(iii) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+91 0 obj
+6036
+endobj
+92 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+93 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 92 0 R
+/Contents 90 0 R
+>>
+endobj
+94 0 obj
+<<
+/Length 95 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Class::STL::Containers) Tj
+1 0 0 1 458.55 797 Tm
+(Table of Contents) Tj
+/F20 10 Tf
+ET
+q
+1 g
+52 767 491 12 re
+f
+Q
+BT
+1 0 0 1 76 770 Tm
+(COPYRIGHT AND LICENSE) Tj
+1 0 0 1 507.88 770 Tm
+(16) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(iv) Tj
+1 0 0 1 437.38 37 Tm
+(18 January 2007 11:21) Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+95 0 obj
+384
+endobj
+96 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+>>
+>>
+endobj
+97 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 96 0 R
+/Contents 94 0 R
+>>
+endobj
+98 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 101 0 R
+/Contents 99 0 R
+>>
+endobj
+99 0 obj
+<<
+/Length 100 0 R
+>>
+stream
+q
+1 0 0 rg
+180 626 8 130 re
+F
+Q
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+210 626 m
+543 626 l
+s
+BT
+/F21 24 Tf
+1 0 0 1 210 706 Tm
+0 -30 TD
+(Programmer's Reference) Tj
+/F22 12 Tf
+T* (version 0.34) Tj
+0 0 0.8 rg
+/F22 12 Tf
+() Tj
+/F21 9 Tf
+T* (gaffie@users.sourceforge.net) Tj
+/F20 20 Tf
+0 g
+1 0 0 1 194.69 371 Tm
+(Class::STL::Containers) Tj
+/F21 9 Tf
+T* () Tj
+ET
+endstream
+endobj
+100 0 obj
+351
+endobj
+101 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F20 14 0 R
+/F21 15 0 R
+/F22 16 0 R
+>>
+>>
+endobj
+102 0 obj
+<<
+/Length 103 0 R
+>>
+stream
+52 792 m
+543 792 l
+S
+BT
+0 G
+1 i 0 J 0 j 0.1 w 10 M []0 d
+/F21 10 Tf
+1 0 0 1 52 797 Tm
+(Programmer's Reference) Tj
+1 0 0 1 431.88 797 Tm
+(Class::STL::Containers) Tj
+/F21 10 Tf
+1 0 0 1 52 37 Tm
+(18 January 2007 11:21) Tj
+1 0 0 1 543 37 Tm
+() Tj
+ET
+52 50 m
+543 50 l
+S
+endstream
+endobj
+103 0 obj
+265
+endobj
+104 0 obj
+<<
+/ProcSet [/PDF /Text]
+/ColorSpace <</DefaultRGB 1 0 R>>
+/Font
+<<
+/F21 15 0 R
+>>
+>>
+endobj
+105 0 obj
+<<
+/Type /Page
+/Parent 4 0 R
+/Resources 104 0 R
+/Contents 102 0 R
+>>
+endobj
+107 0 obj
+<<
+/Parent 106 0 R
+/Dest [85 0 R /Fit]
+/First 108 0 R
+/Last 279 0 R
+/Count 172 
+/Title (Table of Contents)
+>>
+endobj
+108 0 obj
+<<
+/Parent 107 0 R
+/Dest [21 0 R /FitH 764.4]
+/Next 109 0 R
+/Title (NAME)
+>>
+endobj
+109 0 obj
+<<
+/Parent 107 0 R
+/Dest [21 0 R /FitH 720]
+/Previous 108 0 R
+/Next 110 0 R
+/Title (SYNOPSIS)
+>>
+endobj
+110 0 obj
+<<
+/Parent 107 0 R
+/Dest [25 0 R /FitH 345.000000000001]
+/Previous 109 0 R
+/Next 123 0 R
+/First 111 0 R
+/Last 115 0 R
+/Count 12 
+/Title (DESCRIPTION)
+>>
+endobj
+111 0 obj
+<<
+/Parent 110 0 R
+/Dest [25 0 R /FitH 253.800000000001]
+/Next 112 0 R
+/Title (Containers)
+>>
+endobj
+112 0 obj
+<<
+/Parent 110 0 R
+/Dest [25 0 R /FitH 215.400000000001]
+/Previous 111 0 R
+/Next 113 0 R
+/Title (Iterators)
+>>
+endobj
+113 0 obj
+<<
+/Parent 110 0 R
+/Dest [25 0 R /FitH 177.000000000001]
+/Previous 112 0 R
+/Next 114 0 R
+/Title (Algorithms)
+>>
+endobj
+114 0 obj
+<<
+/Parent 110 0 R
+/Dest [25 0 R /FitH 126.600000000001]
+/Previous 113 0 R
+/Next 115 0 R
+/Title (Utilities)
+>>
+endobj
+115 0 obj
+<<
+/Parent 110 0 R
+/Dest [29 0 R /FitH 792]
+/Previous 114 0 R
+/First 116 0 R
+/Last 122 0 R
+/Count 7 
+/Title (Differences From C++/STL)
+>>
+endobj
+116 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 741.6]
+/Next 117 0 R
+/Title (Iterators and the end\(\) function)
+>>
+endobj
+117 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 643.2]
+/Previous 116 0 R
+/Next 118 0 R
+/Title (The tree Container)
+>>
+endobj
+118 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 580.8]
+/Previous 117 0 R
+/Next 119 0 R
+/Title (Utilities matches, matches_ic functions)
+>>
+endobj
+119 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 530.4]
+/Previous 118 0 R
+/Next 120 0 R
+/Title (Container append function)
+>>
+endobj
+120 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 492]
+/Previous 119 0 R
+/Next 121 0 R
+/Title (The clone function)
+>>
+endobj
+121 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 453.6]
+/Previous 120 0 R
+/Next 122 0 R
+/Title (The Container to_array function)
+>>
+endobj
+122 0 obj
+<<
+/Parent 115 0 R
+/Dest [29 0 R /FitH 415.2]
+/Previous 121 0 R
+/Title (Container element type)
+>>
+endobj
+123 0 obj
+<<
+/Parent 107 0 R
+/Dest [29 0 R /FitH 351.6]
+/Previous 110 0 R
+/Next 134 0 R
+/First 124 0 R
+/Last 133 0 R
+/Count 10 
+/Title (CLASS Class::STL::ClassMembers)
+>>
+endobj
+124 0 obj
+<<
+/Parent 123 0 R
+/Dest [29 0 R /FitH 212.4]
+/Next 125 0 R
+/Title (Data Member Accessor Get/Put Function)
+>>
+endobj
+125 0 obj
+<<
+/Parent 123 0 R
+/Dest [29 0 R /FitH 138]
+/Previous 124 0 R
+/Next 126 0 R
+/Title (Class members_init\(\) Function)
+>>
+endobj
+126 0 obj
+<<
+/Parent 123 0 R
+/Dest [29 0 R /FitH 87.6000000000002]
+/Previous 125 0 R
+/Next 127 0 R
+/Title (Class clone\(\) Function)
+>>
+endobj
+127 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 765.6]
+/Previous 126 0 R
+/Next 128 0 R
+/Title (Class swap\(\) Function)
+>>
+endobj
+128 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 715.2]
+/Previous 127 0 R
+/Next 129 0 R
+/Title (Class members\(\) Function)
+>>
+endobj
+129 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 652.8]
+/Previous 128 0 R
+/Next 130 0 R
+/Title (Class members_local\(\) Function)
+>>
+endobj
+130 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 602.4]
+/Previous 129 0 R
+/Next 131 0 R
+/Title (Class::STL::ClassMembers::DataMember)
+>>
+endobj
+131 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 516]
+/Previous 130 0 R
+/Next 132 0 R
+/Title (Class::STL::ClassMembers::Constructor)
+>>
+endobj
+132 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 417.6]
+/Previous 131 0 R
+/Next 133 0 R
+/Title (Class::STL::ClassMembers::SingletonConstructor)
+>>
+endobj
+133 0 obj
+<<
+/Parent 123 0 R
+/Dest [33 0 R /FitH 351.6]
+/Previous 132 0 R
+/Title (Example)
+>>
+endobj
+134 0 obj
+<<
+/Parent 107 0 R
+/Dest [33 0 R /FitH 182.4]
+/Previous 123 0 R
+/Next 136 0 R
+/First 135 0 R
+/Last 135 0 R
+/Count 1 
+/Title (CLASS Class::STL::Containers)
+>>
+endobj
+135 0 obj
+<<
+/Parent 134 0 R
+/Dest [33 0 R /FitH 144]
+/Title (Exports)
+>>
+endobj
+136 0 obj
+<<
+/Parent 107 0 R
+/Dest [37 0 R /FitH 794.4]
+/Previous 134 0 R
+/Next 158 0 R
+/First 137 0 R
+/Last 137 0 R
+/Count 21 
+/Title (CLASS Class::STL::Containers::Abstract)
+>>
+endobj
+137 0 obj
+<<
+/Parent 136 0 R
+/Dest [37 0 R /FitH 735.6]
+/First 138 0 R
+/Last 157 0 R
+/Count 20 
+/Title (Extends Class::STL::Element)
+>>
+endobj
+138 0 obj
+<<
+/Parent 137 0 R
+/Dest [37 0 R /FitH 721.2]
+/Next 139 0 R
+/Title (new)
+>>
+endobj
+139 0 obj
+<<
+/Parent 137 0 R
+/Dest [37 0 R /FitH 394.8]
+/Previous 138 0 R
+/Next 140 0 R
+/Title (clone)
+>>
+endobj
+140 0 obj
+<<
+/Parent 137 0 R
+/Dest [37 0 R /FitH 356.4]
+/Previous 139 0 R
+/Next 141 0 R
+/Title (factory)
+>>
+endobj
+141 0 obj
+<<
+/Parent 137 0 R
+/Dest [37 0 R /FitH 270]
+/Previous 140 0 R
+/Next 142 0 R
+/Title (erase)
+>>
+endobj
+142 0 obj
+<<
+/Parent 137 0 R
+/Dest [37 0 R /FitH 195.6]
+/Previous 141 0 R
+/Next 143 0 R
+/Title (insert)
+>>
+endobj
+143 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 741.6]
+/Previous 142 0 R
+/Next 144 0 R
+/Title (pop)
+>>
+endobj
+144 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 691.2]
+/Previous 143 0 R
+/Next 145 0 R
+/Title (push)
+>>
+endobj
+145 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 628.8]
+/Previous 144 0 R
+/Next 146 0 R
+/Title (clear)
+>>
+endobj
+146 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 578.4]
+/Previous 145 0 R
+/Next 147 0 R
+/Title (begin)
+>>
+endobj
+147 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 516]
+/Previous 146 0 R
+/Next 148 0 R
+/Title (end)
+>>
+endobj
+148 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 441.6]
+/Previous 147 0 R
+/Next 149 0 R
+/Title (rbegin)
+>>
+endobj
+149 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 379.2]
+/Previous 148 0 R
+/Next 150 0 R
+/Title (rend)
+>>
+endobj
+150 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 316.8]
+/Previous 149 0 R
+/Next 151 0 R
+/Title (size)
+>>
+endobj
+151 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 254.4]
+/Previous 150 0 R
+/Next 152 0 R
+/Title (empty)
+>>
+endobj
+152 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 192]
+/Previous 151 0 R
+/Next 153 0 R
+/Title (to_array)
+>>
+endobj
+153 0 obj
+<<
+/Parent 137 0 R
+/Dest [41 0 R /FitH 141.6]
+/Previous 152 0 R
+/Next 154 0 R
+/Title (eq)
+>>
+endobj
+154 0 obj
+<<
+/Parent 137 0 R
+/Dest [45 0 R /FitH 792]
+/Previous 153 0 R
+/Next 155 0 R
+/Title (ne)
+>>
+endobj
+155 0 obj
+<<
+/Parent 137 0 R
+/Dest [45 0 R /FitH 741.6]
+/Previous 154 0 R
+/Next 156 0 R
+/Title (operator +, operator +=)
+>>
+endobj
+156 0 obj
+<<
+/Parent 137 0 R
+/Dest [45 0 R /FitH 703.2]
+/Previous 155 0 R
+/Next 157 0 R
+/Title (operator == )
+>>
+endobj
+157 0 obj
+<<
+/Parent 137 0 R
+/Dest [45 0 R /FitH 664.8]
+/Previous 156 0 R
+/Title (operator != )
+>>
+endobj
+158 0 obj
+<<
+/Parent 107 0 R
+/Dest [45 0 R /FitH 613.2]
+/Previous 136 0 R
+/Next 163 0 R
+/First 159 0 R
+/Last 162 0 R
+/Count 4 
+/Title (CLASS Class::STL::Containers::List)
+>>
+endobj
+159 0 obj
+<<
+/Parent 158 0 R
+/Dest [45 0 R /FitH 542.4]
+/Next 162 0 R
+/First 160 0 R
+/Last 161 0 R
+/Count 2 
+/Title (Extends Class::STL::Containers::Deque)
+>>
+endobj
+160 0 obj
+<<
+/Parent 159 0 R
+/Dest [45 0 R /FitH 528]
+/Next 161 0 R
+/Title (reverse)
+>>
+endobj
+161 0 obj
+<<
+/Parent 159 0 R
+/Dest [45 0 R /FitH 477.6]
+/Previous 160 0 R
+/Title (sort)
+>>
+endobj
+162 0 obj
+<<
+/Parent 158 0 R
+/Dest [45 0 R /FitH 399.6]
+/Previous 159 0 R
+/Title (Example)
+>>
+endobj
+163 0 obj
+<<
+/Parent 107 0 R
+/Dest [49 0 R /FitH 739.8]
+/Previous 158 0 R
+/Next 170 0 R
+/First 164 0 R
+/Last 164 0 R
+/Count 6 
+/Title (CLASS Class::STL::Containers::Vector)
+>>
+endobj
+164 0 obj
+<<
+/Parent 163 0 R
+/Dest [49 0 R /FitH 681]
+/First 165 0 R
+/Last 169 0 R
+/Count 5 
+/Title (Extends Class::STL::Containers::Abstract)
+>>
+endobj
+165 0 obj
+<<
+/Parent 164 0 R
+/Dest [49 0 R /FitH 666.6]
+/Next 166 0 R
+/Title (push_back)
+>>
+endobj
+166 0 obj
+<<
+/Parent 164 0 R
+/Dest [49 0 R /FitH 604.2]
+/Previous 165 0 R
+/Next 167 0 R
+/Title (pop_back)
+>>
+endobj
+167 0 obj
+<<
+/Parent 164 0 R
+/Dest [49 0 R /FitH 553.8]
+/Previous 166 0 R
+/Next 168 0 R
+/Title (back)
+>>
+endobj
+168 0 obj
+<<
+/Parent 164 0 R
+/Dest [49 0 R /FitH 491.4]
+/Previous 167 0 R
+/Next 169 0 R
+/Title (front)
+>>
+endobj
+169 0 obj
+<<
+/Parent 164 0 R
+/Dest [49 0 R /FitH 441]
+/Previous 168 0 R
+/Title (at)
+>>
+endobj
+170 0 obj
+<<
+/Parent 107 0 R
+/Dest [49 0 R /FitH 365.4]
+/Previous 163 0 R
+/Next 174 0 R
+/First 171 0 R
+/Last 171 0 R
+/Count 3 
+/Title (CLASS Class::STL::Containers::Deque)
+>>
+endobj
+171 0 obj
+<<
+/Parent 170 0 R
+/Dest [49 0 R /FitH 306.6]
+/First 172 0 R
+/Last 173 0 R
+/Count 2 
+/Title (Extends Class::STL::Containers::Vector)
+>>
+endobj
+172 0 obj
+<<
+/Parent 171 0 R
+/Dest [49 0 R /FitH 292.2]
+/Next 173 0 R
+/Title (push_front)
+>>
+endobj
+173 0 obj
+<<
+/Parent 171 0 R
+/Dest [49 0 R /FitH 229.8]
+/Previous 172 0 R
+/Title (pop_front)
+>>
+endobj
+174 0 obj
+<<
+/Parent 107 0 R
+/Dest [49 0 R /FitH 166.2]
+/Previous 170 0 R
+/Next 180 0 R
+/First 175 0 R
+/Last 175 0 R
+/Count 5 
+/Title (CLASS Class::STL::Containers::Queue)
+>>
+endobj
+175 0 obj
+<<
+/Parent 174 0 R
+/Dest [53 0 R /FitH 792]
+/First 176 0 R
+/Last 179 0 R
+/Count 4 
+/Title (Extends Class::STL::Containers::Abstract)
+>>
+endobj
+176 0 obj
+<<
+/Parent 175 0 R
+/Dest [53 0 R /FitH 777.6]
+/Next 177 0 R
+/Title (push)
+>>
+endobj
+177 0 obj
+<<
+/Parent 175 0 R
+/Dest [53 0 R /FitH 715.2]
+/Previous 176 0 R
+/Next 178 0 R
+/Title (pop)
+>>
+endobj
+178 0 obj
+<<
+/Parent 175 0 R
+/Dest [53 0 R /FitH 652.8]
+/Previous 177 0 R
+/Next 179 0 R
+/Title (back)
+>>
+endobj
+179 0 obj
+<<
+/Parent 175 0 R
+/Dest [53 0 R /FitH 590.4]
+/Previous 178 0 R
+/Title (front)
+>>
+endobj
+180 0 obj
+<<
+/Parent 107 0 R
+/Dest [53 0 R /FitH 514.8]
+/Previous 174 0 R
+/Next 185 0 R
+/First 181 0 R
+/Last 181 0 R
+/Count 4 
+/Title (CLASS Class::STL::Containers::Stack)
+>>
+endobj
+181 0 obj
+<<
+/Parent 180 0 R
+/Dest [53 0 R /FitH 444]
+/First 182 0 R
+/Last 184 0 R
+/Count 3 
+/Title (Extends Class::STL::Containers::Abstract)
+>>
+endobj
+182 0 obj
+<<
+/Parent 181 0 R
+/Dest [53 0 R /FitH 429.6]
+/Next 183 0 R
+/Title (push)
+>>
+endobj
+183 0 obj
+<<
+/Parent 181 0 R
+/Dest [53 0 R /FitH 367.2]
+/Previous 182 0 R
+/Next 184 0 R
+/Title (pop)
+>>
+endobj
+184 0 obj
+<<
+/Parent 181 0 R
+/Dest [53 0 R /FitH 304.8]
+/Previous 183 0 R
+/Title (top)
+>>
+endobj
+185 0 obj
+<<
+/Parent 107 0 R
+/Dest [53 0 R /FitH 229.2]
+/Previous 180 0 R
+/Next 189 0 R
+/First 186 0 R
+/Last 188 0 R
+/Count 3 
+/Title (CLASS Class::STL::Containers::Tree)
+>>
+endobj
+186 0 obj
+<<
+/Parent 185 0 R
+/Dest [53 0 R /FitH 146.4]
+/Next 188 0 R
+/First 187 0 R
+/Last 187 0 R
+/Count 1 
+/Title (Extends Class::STL::Containers::Deque)
+>>
+endobj
+187 0 obj
+<<
+/Parent 186 0 R
+/Dest [53 0 R /FitH 132]
+/Title (to_array)
+>>
+endobj
+188 0 obj
+<<
+/Parent 185 0 R
+/Dest [57 0 R /FitH 792]
+/Previous 186 0 R
+/Title (Examples)
+>>
+endobj
+189 0 obj
+<<
+/Parent 107 0 R
+/Dest [57 0 R /FitH 589.2]
+/Previous 185 0 R
+/Next 196 0 R
+/First 190 0 R
+/Last 191 0 R
+/Count 6 
+/Title (CLASS Class::STL::Containers::PriorityQueue)
+>>
+endobj
+190 0 obj
+<<
+/Parent 189 0 R
+/Dest [57 0 R /FitH 494.4]
+/Next 191 0 R
+/Title (Extends Class::STL::Containers::Vector)
+>>
+endobj
+191 0 obj
+<<
+/Parent 189 0 R
+/Dest [57 0 R /FitH 464.4]
+/Previous 190 0 R
+/First 192 0 R
+/Last 195 0 R
+/Count 4 
+/Title (Element Type Class::STL::Element::Priority)
+>>
+endobj
+192 0 obj
+<<
+/Parent 191 0 R
+/Dest [57 0 R /FitH 450]
+/Next 193 0 R
+/Title (push)
+>>
+endobj
+193 0 obj
+<<
+/Parent 191 0 R
+/Dest [57 0 R /FitH 387.6]
+/Previous 192 0 R
+/Next 194 0 R
+/Title (pop)
+>>
+endobj
+194 0 obj
+<<
+/Parent 191 0 R
+/Dest [57 0 R /FitH 337.200000000001]
+/Previous 193 0 R
+/Next 195 0 R
+/Title (top)
+>>
+endobj
+195 0 obj
+<<
+/Parent 191 0 R
+/Dest [57 0 R /FitH 274.800000000001]
+/Previous 194 0 R
+/Title (refresh)
+>>
+endobj
+196 0 obj
+<<
+/Parent 107 0 R
+/Dest [57 0 R /FitH 199.200000000001]
+/Previous 189 0 R
+/Next 231 0 R
+/First 197 0 R
+/Last 230 0 R
+/Count 34 
+/Title (CLASS Class::STL::Algorithms)
+>>
+endobj
+197 0 obj
+<<
+/Parent 196 0 R
+/Dest [57 0 R /FitH 152.400000000001]
+/Next 230 0 R
+/First 198 0 R
+/Last 229 0 R
+/Count 32 
+/Title (Exports)
+>>
+endobj
+198 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 693.6]
+/Next 199 0 R
+/Title (for_each)
+>>
+endobj
+199 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 619.2]
+/Previous 198 0 R
+/Next 200 0 R
+/Title (transform)
+>>
+endobj
+200 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 472.8]
+/Previous 199 0 R
+/Next 201 0 R
+/Title (count)
+>>
+endobj
+201 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 434.4]
+/Previous 200 0 R
+/Next 202 0 R
+/Title (count_if)
+>>
+endobj
+202 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 360]
+/Previous 201 0 R
+/Next 203 0 R
+/Title (find)
+>>
+endobj
+203 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 321.6]
+/Previous 202 0 R
+/Next 204 0 R
+/Title (find_if)
+>>
+endobj
+204 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 235.2]
+/Previous 203 0 R
+/Next 205 0 R
+/Title (copy)
+>>
+endobj
+205 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 196.8]
+/Previous 204 0 R
+/Next 206 0 R
+/Title (copy_backward)
+>>
+endobj
+206 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 158.4]
+/Previous 205 0 R
+/Next 207 0 R
+/Title (remove)
+>>
+endobj
+207 0 obj
+<<
+/Parent 197 0 R
+/Dest [61 0 R /FitH 120]
+/Previous 206 0 R
+/Next 208 0 R
+/Title (remove_if)
+>>
+endobj
+208 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 753.6]
+/Previous 207 0 R
+/Next 209 0 R
+/Title (remove_copy)
+>>
+endobj
+209 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 715.2]
+/Previous 208 0 R
+/Next 210 0 R
+/Title (remove_copy_if)
+>>
+endobj
+210 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 676.8]
+/Previous 209 0 R
+/Next 211 0 R
+/Title (replace)
+>>
+endobj
+211 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 638.4]
+/Previous 210 0 R
+/Next 212 0 R
+/Title (replace_if)
+>>
+endobj
+212 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 600]
+/Previous 211 0 R
+/Next 213 0 R
+/Title (replace_copy)
+>>
+endobj
+213 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 549.6]
+/Previous 212 0 R
+/Next 214 0 R
+/Title (replace_copy_if)
+>>
+endobj
+214 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 499.2]
+/Previous 213 0 R
+/Next 215 0 R
+/Title (generate)
+>>
+endobj
+215 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 460.8]
+/Previous 214 0 R
+/Next 216 0 R
+/Title (generate_n)
+>>
+endobj
+216 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 422.4]
+/Previous 215 0 R
+/Next 217 0 R
+/Title (fill)
+>>
+endobj
+217 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 384]
+/Previous 216 0 R
+/Next 218 0 R
+/Title (fill_n)
+>>
+endobj
+218 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 345.6]
+/Previous 217 0 R
+/Next 219 0 R
+/Title (equal)
+>>
+endobj
+219 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 307.2]
+/Previous 218 0 R
+/Next 220 0 R
+/Title (reverse)
+>>
+endobj
+220 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 268.8]
+/Previous 219 0 R
+/Next 221 0 R
+/Title (reverse_copy)
+>>
+endobj
+221 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 230.4]
+/Previous 220 0 R
+/Next 222 0 R
+/Title (rotate)
+>>
+endobj
+222 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 192]
+/Previous 221 0 R
+/Next 223 0 R
+/Title (rotate_copy)
+>>
+endobj
+223 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 153.6]
+/Previous 222 0 R
+/Next 224 0 R
+/Title (partition)
+>>
+endobj
+224 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 115.2]
+/Previous 223 0 R
+/Next 225 0 R
+/Title (stable_partition)
+>>
+endobj
+225 0 obj
+<<
+/Parent 197 0 R
+/Dest [65 0 R /FitH 76.8000000000003]
+/Previous 224 0 R
+/Next 226 0 R
+/Title (min_element)
+>>
+endobj
+226 0 obj
+<<
+/Parent 197 0 R
+/Dest [69 0 R /FitH 765.6]
+/Previous 225 0 R
+/Next 227 0 R
+/Title (max_element)
+>>
+endobj
+227 0 obj
+<<
+/Parent 197 0 R
+/Dest [69 0 R /FitH 727.2]
+/Previous 226 0 R
+/Next 228 0 R
+/Title (unique)
+>>
+endobj
+228 0 obj
+<<
+/Parent 197 0 R
+/Dest [69 0 R /FitH 688.8]
+/Previous 227 0 R
+/Next 229 0 R
+/Title (unique_copy)
+>>
+endobj
+229 0 obj
+<<
+/Parent 197 0 R
+/Dest [69 0 R /FitH 650.4]
+/Previous 228 0 R
+/Title (adjacent_find)
+>>
+endobj
+230 0 obj
+<<
+/Parent 196 0 R
+/Dest [69 0 R /FitH 596.4]
+/Previous 197 0 R
+/Title (Examples)
+>>
+endobj
+231 0 obj
+<<
+/Parent 107 0 R
+/Dest [69 0 R /FitH 385.200000000001]
+/Previous 196 0 R
+/Next 254 0 R
+/First 232 0 R
+/Last 232 0 R
+/Count 22 
+/Title (CLASS Class::STL::Utilities)
+>>
+endobj
+232 0 obj
+<<
+/Parent 231 0 R
+/Dest [69 0 R /FitH 346.800000000001]
+/First 233 0 R
+/Last 253 0 R
+/Count 21 
+/Title (Exports)
+>>
+endobj
+233 0 obj
+<<
+/Parent 232 0 R
+/Dest [69 0 R /FitH 224.400000000001]
+/Next 234 0 R
+/Title (equal_to)
+>>
+endobj
+234 0 obj
+<<
+/Parent 232 0 R
+/Dest [69 0 R /FitH 174.000000000001]
+/Previous 233 0 R
+/Next 235 0 R
+/Title (not_equal_to)
+>>
+endobj
+235 0 obj
+<<
+/Parent 232 0 R
+/Dest [69 0 R /FitH 147.600000000001]
+/Previous 234 0 R
+/Next 236 0 R
+/Title (greater)
+>>
+endobj
+236 0 obj
+<<
+/Parent 232 0 R
+/Dest [69 0 R /FitH 97.2000000000006]
+/Previous 235 0 R
+/Next 237 0 R
+/Title (greater_equal)
+>>
+endobj
+237 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 741.6]
+/Previous 236 0 R
+/Next 238 0 R
+/Title (less)
+>>
+endobj
+238 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 691.2]
+/Previous 237 0 R
+/Next 239 0 R
+/Title (less_equal)
+>>
+endobj
+239 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 628.8]
+/Previous 238 0 R
+/Next 240 0 R
+/Title (compare)
+>>
+endobj
+240 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 566.4]
+/Previous 239 0 R
+/Next 241 0 R
+/Title (matches)
+>>
+endobj
+241 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 504]
+/Previous 240 0 R
+/Next 242 0 R
+/Title (matches_ic)
+>>
+endobj
+242 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 465.6]
+/Previous 241 0 R
+/Next 243 0 R
+/Title (bind1st)
+>>
+endobj
+243 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 403.2]
+/Previous 242 0 R
+/Next 244 0 R
+/Title (bind2nd)
+>>
+endobj
+244 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 340.8]
+/Previous 243 0 R
+/Next 245 0 R
+/Title (mem_fun)
+>>
+endobj
+245 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 266.4]
+/Previous 244 0 R
+/Next 246 0 R
+/Title (ptr_fun)
+>>
+endobj
+246 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 228]
+/Previous 245 0 R
+/Next 247 0 R
+/Title (ptr_fun_binary)
+>>
+endobj
+247 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 189.6]
+/Previous 246 0 R
+/Next 248 0 R
+/Title (logical_and)
+>>
+endobj
+248 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 151.2]
+/Previous 247 0 R
+/Next 249 0 R
+/Title (logical_or)
+>>
+endobj
+249 0 obj
+<<
+/Parent 232 0 R
+/Dest [73 0 R /FitH 112.8]
+/Previous 248 0 R
+/Next 250 0 R
+/Title (multiplies)
+>>
+endobj
+250 0 obj
+<<
+/Parent 232 0 R
+/Dest [77 0 R /FitH 792]
+/Previous 249 0 R
+/Next 251 0 R
+/Title (divides)
+>>
+endobj
+251 0 obj
+<<
+/Parent 232 0 R
+/Dest [77 0 R /FitH 729.6]
+/Previous 250 0 R
+/Next 252 0 R
+/Title (plus)
+>>
+endobj
+252 0 obj
+<<
+/Parent 232 0 R
+/Dest [77 0 R /FitH 667.2]
+/Previous 251 0 R
+/Next 253 0 R
+/Title (minus)
+>>
+endobj
+253 0 obj
+<<
+/Parent 232 0 R
+/Dest [77 0 R /FitH 604.8]
+/Previous 252 0 R
+/Title (modulus.)
+>>
+endobj
+254 0 obj
+<<
+/Parent 107 0 R
+/Dest [77 0 R /FitH 529.2]
+/Previous 231 0 R
+/Next 277 0 R
+/First 255 0 R
+/Last 276 0 R
+/Count 22 
+/Title (CLASS Class::STL::Iterators)
+>>
+endobj
+255 0 obj
+<<
+/Parent 254 0 R
+/Dest [77 0 R /FitH 482.4]
+/Next 276 0 R
+/First 256 0 R
+/Last 275 0 R
+/Count 20 
+/Title (Exports)
+>>
+endobj
+256 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 432]
+/Next 257 0 R
+/Title (new)
+>>
+endobj
+257 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 417.6]
+/Previous 256 0 R
+/Next 258 0 R
+/Title (p_container)
+>>
+endobj
+258 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 379.2]
+/Previous 257 0 R
+/Next 259 0 R
+/Title (p_element)
+>>
+endobj
+259 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 340.8]
+/Previous 258 0 R
+/Next 260 0 R
+/Title (distance)
+>>
+endobj
+260 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 278.4]
+/Previous 259 0 R
+/Next 261 0 R
+/Title (advance)
+>>
+endobj
+261 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 216]
+/Previous 260 0 R
+/Next 262 0 R
+/Title (inserter)
+>>
+endobj
+262 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 153.6]
+/Previous 261 0 R
+/Next 263 0 R
+/Title (front_inserter)
+>>
+endobj
+263 0 obj
+<<
+/Parent 255 0 R
+/Dest [77 0 R /FitH 91.2000000000002]
+/Previous 262 0 R
+/Next 264 0 R
+/Title (back_inserter)
+>>
+endobj
+264 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 741.6]
+/Previous 263 0 R
+/Next 265 0 R
+/Title (first)
+>>
+endobj
+265 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 727.2]
+/Previous 264 0 R
+/Next 266 0 R
+/Title (next)
+>>
+endobj
+266 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 712.8]
+/Previous 265 0 R
+/Next 267 0 R
+/Title (last)
+>>
+endobj
+267 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 698.4]
+/Previous 266 0 R
+/Next 268 0 R
+/Title (prev)
+>>
+endobj
+268 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 684]
+/Previous 267 0 R
+/Next 269 0 R
+/Title (at_end)
+>>
+endobj
+269 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 669.6]
+/Previous 268 0 R
+/Next 270 0 R
+/Title (eq)
+>>
+endobj
+270 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 655.2]
+/Previous 269 0 R
+/Next 271 0 R
+/Title (ne)
+>>
+endobj
+271 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 640.8]
+/Previous 270 0 R
+/Next 272 0 R
+/Title (lt)
+>>
+endobj
+272 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 626.4]
+/Previous 271 0 R
+/Next 273 0 R
+/Title (le)
+>>
+endobj
+273 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 612]
+/Previous 272 0 R
+/Next 274 0 R
+/Title (gt)
+>>
+endobj
+274 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 597.6]
+/Previous 273 0 R
+/Next 275 0 R
+/Title (ge)
+>>
+endobj
+275 0 obj
+<<
+/Parent 255 0 R
+/Dest [81 0 R /FitH 583.2]
+/Previous 274 0 R
+/Title (cmp)
+>>
+endobj
+276 0 obj
+<<
+/Parent 254 0 R
+/Dest [81 0 R /FitH 553.2]
+/Previous 255 0 R
+/Title (Examples)
+>>
+endobj
+277 0 obj
+<<
+/Parent 107 0 R
+/Dest [81 0 R /FitH 367.200000000001]
+/Previous 254 0 R
+/Next 278 0 R
+/Title (SEE ALSO)
+>>
+endobj
+278 0 obj
+<<
+/Parent 107 0 R
+/Dest [81 0 R /FitH 310.800000000001]
+/Previous 277 0 R
+/Next 279 0 R
+/Title (AUTHOR)
+>>
+endobj
+279 0 obj
+<<
+/Parent 107 0 R
+/Dest [81 0 R /FitH 266.400000000001]
+/Previous 278 0 R
+/Title (COPYRIGHT AND LICENSE)
+>>
+endobj
+106 0 obj
+<<
+/Type /Outlines
+/Count 173
+/First 107 0 R
+/Last 279 0 R
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 4 0 R
+/PageMode /UseOutlines
+/Outlines 106 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Pages
+/Kids [ 98 0 R 105 0 R 85 0 R 89 0 R 93 0 R 97 0 R 21 0 R 25 0 R 29 0 R 33 0 R 37 0 R 41 0 R 45 0 R 49 0 R 53 0 R 57 0 R 61 0 R 65 0 R 69 0 R 73 0 R 77 0 R 81 0 R ]
+/Count 22
+/MediaBox [0 0 595 842]
+>>
+endobj
+xref
+0 280
+0000000000 65535 f 
+0000000015 00000 n 
+0000000171 00000 n 
+0000159877 00000 n 
+0000159967 00000 n 
+0000000281 00000 n 
+0000002381 00000 n 
+0000002480 00000 n 
+0000002578 00000 n 
+0000002678 00000 n 
+0000002782 00000 n 
+0000002878 00000 n 
+0000002979 00000 n 
+0000003083 00000 n 
+0000003191 00000 n 
+0000003289 00000 n 
+0000003392 00000 n 
+0000003498 00000 n 
+0000003612 00000 n 
+0000010162 00000 n 
+0000010183 00000 n 
+0000010309 00000 n 
+0000010392 00000 n 
+0000017818 00000 n 
+0000017839 00000 n 
+0000017989 00000 n 
+0000018072 00000 n 
+0000025638 00000 n 
+0000025659 00000 n 
+0000025809 00000 n 
+0000025892 00000 n 
+0000032694 00000 n 
+0000032715 00000 n 
+0000032865 00000 n 
+0000032948 00000 n 
+0000040853 00000 n 
+0000040874 00000 n 
+0000041012 00000 n 
+0000041095 00000 n 
+0000048399 00000 n 
+0000048420 00000 n 
+0000048558 00000 n 
+0000048641 00000 n 
+0000053992 00000 n 
+0000054013 00000 n 
+0000054163 00000 n 
+0000054246 00000 n 
+0000060334 00000 n 
+0000060355 00000 n 
+0000060505 00000 n 
+0000060588 00000 n 
+0000067297 00000 n 
+0000067318 00000 n 
+0000067456 00000 n 
+0000067539 00000 n 
+0000075022 00000 n 
+0000075043 00000 n 
+0000075193 00000 n 
+0000075276 00000 n 
+0000082838 00000 n 
+0000082859 00000 n 
+0000082997 00000 n 
+0000083080 00000 n 
+0000089150 00000 n 
+0000089171 00000 n 
+0000089309 00000 n 
+0000089392 00000 n 
+0000096870 00000 n 
+0000096891 00000 n 
+0000097041 00000 n 
+0000097124 00000 n 
+0000104832 00000 n 
+0000104853 00000 n 
+0000104991 00000 n 
+0000105074 00000 n 
+0000112197 00000 n 
+0000112218 00000 n 
+0000112356 00000 n 
+0000112439 00000 n 
+0000117404 00000 n 
+0000117425 00000 n 
+0000117575 00000 n 
+0000117658 00000 n 
+0000123562 00000 n 
+0000123583 00000 n 
+0000123697 00000 n 
+0000123780 00000 n 
+0000130173 00000 n 
+0000130194 00000 n 
+0000130308 00000 n 
+0000130391 00000 n 
+0000136481 00000 n 
+0000136502 00000 n 
+0000136616 00000 n 
+0000136699 00000 n 
+0000137137 00000 n 
+0000137157 00000 n 
+0000137271 00000 n 
+0000137354 00000 n 
+0000137438 00000 n 
+0000137844 00000 n 
+0000137865 00000 n 
+0000137992 00000 n 
+0000138313 00000 n 
+0000138334 00000 n 
+0000138437 00000 n 
+0000159798 00000 n 
+0000138523 00000 n 
+0000138650 00000 n 
+0000138744 00000 n 
+0000138858 00000 n 
+0000139028 00000 n 
+0000139139 00000 n 
+0000139267 00000 n 
+0000139396 00000 n 
+0000139524 00000 n 
+0000139679 00000 n 
+0000139803 00000 n 
+0000139929 00000 n 
+0000140076 00000 n 
+0000140209 00000 n 
+0000140333 00000 n 
+0000140472 00000 n 
+0000140588 00000 n 
+0000140766 00000 n 
+0000140893 00000 n 
+0000141030 00000 n 
+0000141173 00000 n 
+0000141304 00000 n 
+0000141438 00000 n 
+0000141578 00000 n 
+0000141722 00000 n 
+0000141865 00000 n 
+0000142019 00000 n 
+0000142120 00000 n 
+0000142295 00000 n 
+0000142376 00000 n 
+0000142562 00000 n 
+0000142705 00000 n 
+0000142798 00000 n 
+0000142911 00000 n 
+0000143026 00000 n 
+0000143137 00000 n 
+0000143251 00000 n 
+0000143362 00000 n 
+0000143474 00000 n 
+0000143587 00000 n 
+0000143700 00000 n 
+0000143809 00000 n 
+0000143923 00000 n 
+0000144035 00000 n 
+0000144147 00000 n 
+0000144260 00000 n 
+0000144374 00000 n 
+0000144484 00000 n 
+0000144592 00000 n 
+0000144723 00000 n 
+0000144843 00000 n 
+0000144949 00000 n 
+0000145130 00000 n 
+0000145296 00000 n 
+0000145391 00000 n 
+0000145489 00000 n 
+0000145590 00000 n 
+0000145773 00000 n 
+0000145926 00000 n 
+0000146025 00000 n 
+0000146141 00000 n 
+0000146253 00000 n 
+0000146366 00000 n 
+0000146460 00000 n 
+0000146642 00000 n 
+0000146795 00000 n 
+0000146895 00000 n 
+0000146998 00000 n 
+0000147180 00000 n 
+0000147333 00000 n 
+0000147427 00000 n 
+0000147538 00000 n 
+0000147650 00000 n 
+0000147749 00000 n 
+0000147931 00000 n 
+0000148084 00000 n 
+0000148178 00000 n 
+0000148289 00000 n 
+0000148386 00000 n 
+0000148567 00000 n 
+0000148733 00000 n 
+0000148815 00000 n 
+0000148915 00000 n 
+0000149105 00000 n 
+0000149233 00000 n 
+0000149408 00000 n 
+0000149500 00000 n 
+0000149611 00000 n 
+0000149733 00000 n 
+0000149845 00000 n 
+0000150032 00000 n 
+0000150180 00000 n 
+0000150278 00000 n 
+0000150395 00000 n 
+0000150508 00000 n 
+0000150624 00000 n 
+0000150734 00000 n 
+0000150849 00000 n 
+0000150961 00000 n 
+0000151082 00000 n 
+0000151196 00000 n 
+0000151311 00000 n 
+0000151430 00000 n 
+0000151552 00000 n 
+0000151667 00000 n 
+0000151785 00000 n 
+0000151903 00000 n 
+0000152026 00000 n 
+0000152142 00000 n 
+0000152260 00000 n 
+0000152372 00000 n 
+0000152484 00000 n 
+0000152597 00000 n 
+0000152712 00000 n 
+0000152832 00000 n 
+0000152946 00000 n 
+0000153063 00000 n 
+0000153180 00000 n 
+0000153304 00000 n 
+0000153434 00000 n 
+0000153553 00000 n 
+0000153667 00000 n 
+0000153786 00000 n 
+0000153893 00000 n 
+0000153995 00000 n 
+0000154181 00000 n 
+0000154315 00000 n 
+0000154424 00000 n 
+0000154555 00000 n 
+0000154681 00000 n 
+0000154813 00000 n 
+0000154925 00000 n 
+0000155043 00000 n 
+0000155158 00000 n 
+0000155273 00000 n 
+0000155389 00000 n 
+0000155504 00000 n 
+0000155619 00000 n 
+0000155734 00000 n 
+0000155849 00000 n 
+0000155969 00000 n 
+0000156088 00000 n 
+0000156206 00000 n 
+0000156324 00000 n 
+0000156437 00000 n 
+0000156549 00000 n 
+0000156662 00000 n 
+0000156764 00000 n 
+0000156939 00000 n 
+0000157076 00000 n 
+0000157167 00000 n 
+0000157286 00000 n 
+0000157403 00000 n 
+0000157519 00000 n 
+0000157634 00000 n 
+0000157748 00000 n 
+0000157870 00000 n 
+0000158002 00000 n 
+0000158115 00000 n 
+0000158227 00000 n 
+0000158339 00000 n 
+0000158451 00000 n 
+0000158563 00000 n 
+0000158673 00000 n 
+0000158783 00000 n 
+0000158893 00000 n 
+0000159003 00000 n 
+0000159111 00000 n 
+0000159221 00000 n 
+0000159318 00000 n 
+0000159420 00000 n 
+0000159547 00000 n 
+0000159672 00000 n 
+trailer
+<<
+/Size 280
+/Root 3 0 R
+/Info 2 0 R
+>>
+startxref
+160200
+%%EOF

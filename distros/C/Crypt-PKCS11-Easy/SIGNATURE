@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 cc3320355655b32d6931ddb4499e4883071f58e5 Build.PL
+SHA1 86417e1bcc01d44c55bc15e42293af29214dc03e Changes
+SHA1 05316bf0cad9c7a3f3ce9e50c0db8c5a33b282c1 LICENSE
+SHA1 337b93f5a946d35b3d0e33d3068d49fa6cec5998 MANIFEST
+SHA1 b09ec6f819ae5dc549794c87668d0016e4d6737c META.json
+SHA1 328e5fd36ec2ae44516012863f2b73e535c6332d README.md
+SHA1 a69f6ac32ab9f405f8daa5fbfe65535df637116b author/keys.sh
+SHA1 e17621fd42af1494a8bcd4407cfac3706790be32 author/softhsm2.conf
+SHA1 a26dc0d4050ec55296a89020df37ee3f617a0e69 bin/hsm
+SHA1 44384d9b9c96dcc080bffedba551ca73b965197f dist.ini
+SHA1 9cb9b8dcd924f73772a76ad899b4d857875cf56d lib/Crypt/PKCS11/Easy.pm
+SHA1 979f7626a60c47e28f800ad96c8268927081bf2f t/00-compile.t
+SHA1 b68ca3eb016d0884c53900f88b2801567485e3b1 t/01-pkcs11_modules.t
+SHA1 394679b3bcc72a96baf62191fdbda81cb0299b41 t/02-basic.t
+SHA1 4d74982f5f0aaf9191178b4beee0904a05ea444b t/data/10K.file
+SHA1 d59d1f3ee7ab865043104c1cf8f227dec28a67db t/data/64B.file
+SHA1 49e6fea7bd0d99aacfea04f69bb1a356d37e4c24 t/data/tokens.tar.gz
+SHA1 55ba224cf0f8f312c6290f17748c917244ae3035 t/keys/1024_enc.pem
+SHA1 ff15c7a539412cdea840918fb9c9e5d45cd6abd3 t/keys/1024_enc_pub.pem
+SHA1 c2337dcefdf02c46fd7628e18cb7de20969d308e t/keys/1024_sign.pem
+SHA1 5dea66e033c59684bc300d3abc33e5e254bfdf25 t/keys/1024_sign_pub.pem
+SHA1 0c963f15131153f3d37ccc3a7653815f075b758d t/lib/CommonTest.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/lib/fakemodule.so
+SHA1 a6d8370909ec0e0755d4bd691eb81d722cf94430 xt/author/pod-coverage.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCgAGBQJXoRQSAAoJEBaIEpACW5CUaaUH/0EF/xl+H2tju/V/Vu95qpb4
+XKaAsjBLKegzOYbnFgNeUhEogojXrMvqcAJ96GLTDtmNmWosd9I1MlWw+eDPPjph
+OfKoVIH7E5DVMmc7FcjB2zkwR3qCGkRCHuuo2k/Cy6/8bQ4d6c26u3HlEgINNGqS
+aJSLpZaqDoY5xMcQTUaQiuzTauGvJsAR8zlMIcU7QL7/y1hxumYG0G7ngFSoBF7g
+vNn35r/rHMXn7GCKDjF7XxFpATdzUfA4pEcArMX9JSIT1bzy4L8IeTxvvemiiO+u
+zGAyzqI8m9B+Rh/MzlQZLfkNeZTcWGyDQAScScjD1Zu8tsQirLSvFnPbg4aLNJs=
+=fER2
+-----END PGP SIGNATURE-----

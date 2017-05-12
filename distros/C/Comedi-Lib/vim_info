@@ -1,0 +1,9 @@
+# 
+# Part of Comedi::Lib
+#
+# Copyright (c) 2009 Manuel Gebele <forensixs@gmx.de>, Germany
+# 
+---------------------------------
+- VIM - Vi IMproved <www.vim.org> -
+ ---------------------------------
+:set nu ts=3 sw=3 tw=78 et sr

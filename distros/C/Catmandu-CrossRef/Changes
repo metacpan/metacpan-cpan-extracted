@@ -1,0 +1,25 @@
+Revision history for Catmandu-CrossRef
+
+0.007  2016-08-11 13:20:37 CEST
+    - [nothing, but needs a new release]
+
+0.006  2014-10-01 10:32:36 CEST
+    - documenation added
+
+0.005  2014-08-28 14:53:34 CEST
+    - (see previous release)
+
+0.004  2014-08-28 14:47:31 CEST
+	- rewrite with Catmandu::XML
+	- badges
+
+0.003  2014-07-02 14:11:52 CEST
+	- tests, pod
+
+0.002  2014-06-27 07:46:24 CEST
+	- pod
+	- bug fix
+
+0.001 2014-06-18 09:03:25 CEST
+	- successor of Catmandu::Importer::DOI, development will be continued here
+	- initial commit

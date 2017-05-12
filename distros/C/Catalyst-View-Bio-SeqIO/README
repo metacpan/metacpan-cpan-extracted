@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Catalyst-View-Bio-SeqIO,
+version 0.02:
+
+  use BioPerl's Bio::SeqIO as a Catalyst view
+
+This software is copyright (c) 2011 by Robert Buels.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 4
+    - 234
+  42989:
+    - 95
+name: ddcbea
+registers:
+  AF: 17106
+  AF_: 0
+  BC: 55930
+  BC_: 0
+  DE: 30079
+  DE_: 0
+  HL: 28070
+  HL_: 0
+  I: 0
+  IX: 42985
+  IY: 47411
+  PC: 0
+  R: 0
+  SP: 0

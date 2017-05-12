@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/CGI/Builder/LogDispatch.pm
+META.yml                                 Module meta-data (added by MakeMaker)

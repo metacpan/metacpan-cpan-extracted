@@ -1,0 +1,7 @@
+$var
+<while condition="outer_loop">
+  $var
+  <while condition="inner_loop">
+    $var
+  </while>
+</while>

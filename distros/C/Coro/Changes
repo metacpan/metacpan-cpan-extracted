@@ -1,0 +1,1399 @@
+Revision history for Perl extension Coro.
+
+TODO: should explore PerlIO::coroaio (perl leaks like hell).
+TODO: channel->maxsize(newsize)?
+TODO: __GCC_HAVE_DWARF2_CFI_ASM
+TODO: swap_sv, maybe add scope_swap_sv?
+TODO: croak when async_pool tries to run canceled thread?
+
+6.511 Sun Jun 26 23:44:50 CEST 2016
+	- make it compile with threaded perls again.
+	- simplify and speed up __DIE__ and __WARN__ handling.
+
+6.51 Sat Jun 25 20:57:20 CEST 2016
+	- 6.5 release didn't compile on most older perls due to
+          a logic error enabling experimental 5.24 code for all versions.
+        - since various broken or deficient patches float around
+          to work around the vtbl API breakage in perl, let's provide
+          our own workaround, which seems to be much less invasive
+          and more compatible than the approaches seen so far. YMMV.
+	- work around assertion failure in perl_destruct on 5.24
+          (analyzed by Dave Mitchell).
+
+6.5  Wed Jun 22 22:23:50 CEST 2016
+	- swap_sv swapping order was not symmetrical, causing
+          wrong swaps when swap_sv was used multiple times on the
+          same sv in the same thread.
+        - swap_sv calls can now be undone by calling it again
+          with the same variables.
+        - swap_sv calls will now be undone in async_pool threads.
+	- split Coro::Semaphore::up/adjust into separate xs functions
+          for better error reporting, at slight codesize increase.
+        - (libcoro) arm assembly support, please test and report.
+        - adjust to PL_savestack changes in perl 5.24 (adapted from
+          the debian patch, which unfortunately gets it wrong).
+
+6.49 Sat Oct 17 01:40:12 CEST 2015
+	- throwing an exception to a thread waiting in
+          Coro::Handle using Coro::EV did not stop the watchers,
+          causing the next call to fail (testcase by Martin Pritchard).
+	- bump minimum perl version to 5.10.
+
+6.48 Sun Oct  4 19:03:51 CEST 2015
+	- fix memory leak when Coro::Handle uses Coro::EV internally
+          (testcase by Sten Sten).
+        - update code to libev 4 API (internally, Coro still used the
+          version 3 API calls).
+        - remove unused hv_sig.
+
+6.47 Sat Jul 11 03:58:20 CEST 2015
+	- swap_svs - NVs can be in the SV head beginning with 5.20.
+
+6.46 Tue Jun 30 14:36:30 CEST 2015
+	- restore portability to perls with windows fork emulation
+          (patch by Petr Písař).
+
+6.45 Tue Jun 30 01:40:08 CEST 2015
+	- restore portability to perl 5.16 and below.
+
+6.44 Tue Jun 30 00:41:54 CEST 2015
+	- avoid segfaulting (or worse) when tracing a canceled thread.
+	- the Event module silently broke it's public hook API, causing
+          failures on perls compiled with -Duselongdouble. Requiring
+          the latest version of Event because I don't know which release
+          changed this (it's not mentioned in the ChangeLog).
+        - allow xs level enterleave hooks via CoroAPI.
+
+6.43 Thu Jun  4 15:38:14 CEST 2015
+	- use stability canary.
+	- port to stableperl-5.22.0-1.001.
+        - update libecb.
+
+6.42 Wed Feb 11 20:29:52 CET 2015
+	- Coro::SemaphoreSet->try did not actually work (analyzed by
+          SATO Kentaro).
+        - upgrade libecb to be C11 compliant.
+
+6.41 Sat Sep  6 22:08:46 CEST 2014
+	- restore portability to perl 5.8.x.
+        - give new Coro's a valid GvHV(PL_hintgv) - this is slow and takes
+          up some memory, but fixes "use feature" and similar modules
+          when used inside a Coro.
+        - allow zero as argument to Coro::Channel to mean the same thing
+          as no argument. this works with older versions as well,
+          but wasn't legal until now.
+        - slightly better c header file detection.
+
+6.39 Mon Jun  2 00:00:08 CEST 2014
+	- work around more incompatible changes in 5.20.
+
+6.38 Sun Jun  1 21:54:23 CEST 2014
+	- check that perl slots actually have enough space to hold
+          interpreter variables.
+	- untested port to perl 5.19 (64 bit tmps indices) (reported
+          by Andreas König).
+	- croak when cancel is called without a thread context.
+
+6.37 Tue Mar  4 13:27:33 CET 2014
+	- *sigh*, removed leftover debugging code from debugging a
+          perl bug, of all things.
+
+6.36 Tue Mar  4 07:11:59 CET 2014
+	- semaphores would not clear the destroy hook when interrupted
+          by ->throw, causing segfaults or worse.
+        - ->throw on a thread waiting for a semaphore did not acquire
+          the semaphore, but also didn't wake up other waiters,
+          possibly causing a deadlock.
+	- "FATAL: $Coro::IDLE blocked itself" will now use Carp::confess
+          to report a full stacktrace, which should help find out
+          where the actual call is.
+        - "atomically" destroy data in slf_destroy, because it is
+          the right thing to do, just in case.
+        - disable ecb.h libm dependency, to compile on ancient systems
+          or under adverse conditions.
+
+6.33 Mon Nov 18 11:26:27 CET 2013
+	- do not crash when freeing padlists with holes (in 5.18).
+	- tentative SVt_BIND 5.19 port/fix.
+
+6.32 Tue Nov  5 15:35:35 CET 2013
+	- use a new algorithm to derive padlists for perl 5.18. The old
+          one could lead to 0-pointer accesses inside perl (reported
+          by Darin McBride).
+
+6.31 Thu May  9 07:39:48 CEST 2013
+	- Coro::AIO requests would crash if the thread was ready'd
+          while the request was ongoing.
+
+6.29 Wed May  8 02:55:18 CEST 2013
+	- when an on_destroy handler destructs the coro currently being
+          destructed a perl scalar could be accessed after being freed,
+          likely causing a crash.
+
+6.28 Wed Mar  6 06:58:02 CET 2013
+	- clean remnants of existing __DIE__ and __WARN__ handlers so
+          they lose their magic and will not cause segfaults later
+          (testcase by Andrey Sagulin).
+	- improved Coro::State documentation a bit.
+        - Coro::Debug::command now flushes the output.
+        - add hack detection code for x32 abi, because the braindead slugs
+          who designed that made it look exactly like x86_64 without
+          providing proper compile time symbols to test for it. as a result,
+          this detection cannot work reliably.
+        - valgrind stack registering was broken.
+        - do not rely on Time::HiRes anymore in Coro::Debug.
+
+6.23 Fri Dec  7 23:36:37 CET 2012
+        - use experimental fiber implementation on native windows
+          perls.
+        - use sizeof (void *) as multiplication factor for stack sizes,
+          to accomodate the totally braindamaged microsoft 64 bit "os".
+        - changed verifier host from win2k-ap510-32 to win7-sp516-32/64.
+          activeperl 5.16 crashes when PerlIO_define_layer is called due
+          to some bug in the perl dll, strawberry perl at least passes
+          the testsuite.
+        - implement Coro::Handle->peeraddr/host/port, for slightly
+          improved compatibility with LWP.
+	- implement 5.17 compatibility by almost blindly applying a
+          good-looking patch by Father Chrysostomos.
+        - move stack management functions into libcoro 3.
+        - libcoro version 3 "released".
+	- support magic values as timed_io_once args.
+	- recommend AnyEvent 7+ or EV 4+, also require EV
+          version 4 or newer for Coro::EV.
+
+6.10 Tue Oct  9 01:14:27 CEST 2012
+	- updated ecb.h, it had a typo that caused it to not compile on many
+          big endian systems (reported by many people).
+        - disable memory fences in ecb.h to improve portability.
+
+6.09 Sat Oct  6 23:25:02 CEST 2012
+	- Coro::EV I/O watchers were not interruptible by exceptions
+          (Coro::State::throw) (testcase by sten).
+        - ->throw now puts threads into the ready queue, as this seems to
+          be expected by existing code, and code that doesn't cope with spurious
+          wakeups needs fixing anyway.
+	- use fd -1 in mmap.
+        - cast I32 to int in error message printf.
+        - warn about broken so-called "hardened" kernels.
+
+6.08 Fri Apr 13 12:05:47 CEST 2012
+	- be more aggressive about exiting like perl does - formerly,
+          exiting from the non-main thread would not execute END blocks.
+
+6.07 Fri Nov 11 21:21:48 CET 2011
+	- work around a bug in PerlIO (setting $SIG{__WARN__} to a PVCV).
+        - update ecb.h.
+
+6.06 Mon Aug  8 23:59:48 CEST 2011
+	- cygwin unfortunately patches the stack at runtime, so we use the pthreads
+          backend, which is an order of magnitude slower. unfortunately, cygwins
+          pthread implementation isn't very complete either, so allocate the stack
+          twice just to be sure.
+          (note: cygwin also enables mymalloc, which is NOT THREADSAFE ON WINDOWS,
+          in its ithreaded perl - best recompile cygwin and use the 'w'indows
+          backend for much better performance. also disable ithreads for
+          even better performance...).
+
+6.05 Thu Aug  4 21:36:36 CEST 2011
+	- blush, condvar values would not be propagated from send to recv anymore
+          (reported by Chip Salzenberg).
+	- use exponential increase for the readline buffer length in
+          Coro::Handle. also reduce initial allocation to 1020 from 4096 bytes.
+
+6.04  Wed Aug  3 17:15:45 CEST 2011
+	- use even more efficient and more compatible condvars for
+          compatibility to AnyEvent 6.x :)
+        - more inconsequential ecb.h updates.
+
+6.03  Wed Aug  3 11:41:30 CEST 2011
+	- change how Coro patches AnyEvent condvars for compatibility to
+          AnyEvent 6.x.
+	- update ecb.h, to no longer include <pthread.h> in case WinNT.h
+          hasn't been included.
+
+6.02  Wed Jul 13 04:35:19 CEST 2011
+	- "improve portability to Gentoo" - gentoo manages to put perl variables
+          in memory areas that are farther than 2gb apart, which the jit couldn't
+          handle and barfed. now it's just a bit slower on gentoo and similar
+          systems.
+
+6.01  Sun Jul  3 12:31:14 CEST 2011
+	- workarounds are good, but the test for whether pthreads are used
+          was not good. this one should be better.
+        - check differently whether gcc generates cfi instructions itself.
+
+6.0   Wed Jun 29 19:43:35 CEST 2011
+	- INCOMPATIBLE CHANGE: unreferenced coro objects will now be
+          destroyed and cleaned up automatically (e.g. async { schedule }).
+        - implement a JIT compiler for part of the thread switch code,
+          which gives a 50% speed improvement on threaded perls, and
+          about 4% on non-threaded perls (so threaded perls now finally
+          reach about half the speed of non-threaded perls).
+        - slightly modernise Coro::Intro, add section about rouse functions.
+        - avoid DEFSV and ERRSV, giving another 10% improvement
+          in thread switching.
+        - Coro::State->is_destroyed is now called is_zombie.
+        - implement a Coro->safe_cancel method that might fail, but
+          cancels in a "safer" way if it succeeds.
+        - add preliminary support for DEBUGGING perls.
+        - get rid of two hash-accesses when initialising a new Coro - this
+          speeds up coro creation by almost a factor of two.
+        - croak when a coro that is being cancelled tries to block
+          (e.g. while executing a guard block), instead of crashing or
+          deadlocking.
+        - use a more robust and also faster method to identify Coro::State
+          objects - speeds up everything a bit.
+	- implement Coro->cancel in XS for a 20% speed improvement, and to
+          be able to implement mutual cancellation.
+	- speed up context switches by a percent or two by more efficiently
+          allocating context stack entries.
+        - implement Coro->join and Coro->on_destroy in XS for a speedup and
+          a reduction in memory use.
+        - cancelling a coro while it itself is cancelling another coro is
+          now supported and working, instead of triggering an assertion.
+	- be a bit more crash-resistant when calling (buggy) on_destroy
+          callbacks (best effort).
+        - move on_destroy into the slf_frame, to allow extension slf
+          functions to have destructors.
+        - get rid if coro refcounting - simply crash in other interpreter
+          threads by nulling the pointers on clone.
+        - simplify warn/die hook handling when loading Coro - the convoluted
+          logic seems to be no longer neccessary.
+        - use libecb instead of our own home-grown gcc hacks.
+        - document alternatives to Coro::LWP. Please use them :)
+        - work around another mindless idiotic NEEDLESS bug in openbsd/mirbsds
+          sigaltstack. Really. wine suffers from it, erlang suffers from it,
+          and it's known since at least 2006.
+
+5.372 Wed Feb 23 06:14:30 CET 2011
+	- apparently mingw doesn't provide a working gettimeofday, try to
+          work around that by relying on Time::HiRes (indirectly brought to
+          my attention by Max Maischein).
+        - fix some portability issues when Time::HiRes was used.
+
+5.371 Mon Feb 21 14:36:08 CET 2011
+	- backport to windows process emulation code again.
+
+5.37  Sat Feb 19 07:49:44 CET 2011
+	- add a big "Coro thread life cycle" section to "man Coro".
+	- try a tentative workaround against the breakage that 5.13 has
+          introduced without depreciation period. sigh.
+        - no longer use Time::HiRes if gettimeofday is available, which
+          saves quite a lot of memory.
+
+5.36  Sun Feb 13 05:33:41 CET 2011
+	- automatically load Coro::Channel, Coro::RWLock, Coro::Semaphore,
+          Coro::SemaphoreSet, Coro::Signal and Coro::Specific on first "new"
+          method call.
+        - undocument Coro::Timer::sleep and obsolete whole module.
+        - optimise Coro::Timer::timeout memory and cpu usage.
+        - slightly updated Coro::Intro for recent changes.
+        - do not initialise PL_dirty anymore.
+
+5.25  Thu Nov 11 01:08:39 CET 2010
+	- try a different approach on netbsd - netbsd 5 finally has marginally
+          working pthreads, but still broken ucontext/sigaltstack.
+        - openbsd 4.8 finally got their act together, Coro works out of the box
+          with asm, setjmp and pthreads (no change, just informational).
+
+5.24  Sat Oct 23 11:27:12 CEST 2010
+	- port to the EV 4.0 API.
+	- work around bugs in mingw32, making strawberry perl work
+          out of the box.
+	- correctly modify Coro::AIO function prototypes
+          so that they reflect the "no optional parameters" rule.
+	- "ported" libcoro to C++.
+
+5.23  Mon May 17 18:50:42 CEST 2010
+	- be more resistant to ordering changes when initialising
+          Coro::AnyEvent, Coro::EV and Coro::Event (reported by Matthias
+          Waldorf).
+	- document that perl 5.12 deliberately removed support for cloning.
+
+5.22  Wed Apr 14 03:55:35 CEST 2010
+	- correctly return udnef on errors in Coro::Handle::read/write
+          (testcase by Marc Mims).
+	- convert Coro::Util into a "perl compatibility wrapper" - the functions
+          are less useful now, but are drop-in replacements for existing
+          functions, listing better alternatives in the documentation. This also
+          fixes a bug in Coro::LWP which naively substituted Socket::inet_aton
+          with Coro::Util::inet_aton.
+        - do not override $Coro::idle unconditionally in Coro.pm, as other
+          modules could have provided their own idle coro already
+          (for exmaple, Coro::AnyEvent).
+	- fix Coro::Util::gethost* functions.
+        - Coro::Timer corretcly exports it's symbols (reported by Hideki Yamamura).
+
+5.21  Wed Dec 16 07:19:51 CET 2009
+        - automatically load Coro::AnyEvent when AnyEvent and Coro are used
+          together.
+        - add some examples on how to combine other event loops with Coro in
+          Coro::AnyEvent, and how to run it (and not to block). Seems to be
+          the most common source of confusion.
+        - try to catch people naively blocking in an event callback.
+        - work around the perl filehandle bug issue in conjunction with
+          older common::sense (as indirectly pointed out by ZSystem).
+	- clarify the "not from signal handlers" section.
+
+5.2   Sun Oct  4 14:54:24 CEST 2009
+        - Coro::Storable destroyed the prototypes of the functions it wrapped.
+        - export rouse_cb and rouse_wait by default now.
+        - fix various prototype mismatches in Coro::AnyEvent and Coro::Handle.
+        - new method $state->swap_sv.
+        - added section on "windows process emulation" to the manpage,
+          after a not-so-fruitful (nor-friendly) "discussion" with chip
+          salzenberg (discussion implies arguments, but his only arguments
+          were ad-hominems, one wonders why he started it in the first
+          place). I hope this explains it well enough for him to understand,
+          and maybe well enough for others to understand.
+        - use common::sense everywhere now.
+        - idle callbacks are no longer supported, use idle coros instead.
+        - print a thread listing when a deadlock is detected.
+
+5.17  Sat Aug 22 23:09:31 CEST 2009
+	- work around a bug in the perl debugger causing crashes
+          when running under the debugger by marking _pool_handler as nodebug.
+	- speed up Coro::async considerably.
+        - try some hacks to get netbsd to work "more often" - their broken
+          setjmp/longjmp, ucontext *and* phtreads are really hard on Coro.
+        - convert Coro to AE 5.0 API.
+
+5.162 Tue Jul 28 04:04:03 CEST 2009
+	- perl 5.8.2 is now minimum requirement.
+        - skip t/19_handle.t on broken windows perls.
+
+5.161 Wed Jul 22 04:47:38 CEST 2009
+	- Coro::AnyEvent::poll could have a different prototype when EV was
+          used as backend (analyzed by Tatsuhiko Miyagawa).
+	- Coro::AnyEvent errornously initialised the event loop when loaded,
+          not on demand.
+        - try to workaround rare */t/01_unblock.t failures.
+
+5.16  Tue Jul 21 01:44:37 CEST 2009
+	- Coro::AnyEvent failed to hook into the event loop
+          when no threads had been readied between detecting
+          the event loop and actually running it.
+	- considerably speed up Coro::Select by taking avdantage
+          of AnyEvent > 4.8 and some other optimisations.
+        - implement paragraph readline mode in Coro::Handle
+          (based on patches by Zsbán Ambrus).
+        - replace WSAEINPROGRESS by WSAEWOULDBLOCK (reported
+          and analyzed by Yasuhiro MATSUMOTO).
+        - clarified libcoro license and copyright.
+        - someone stole my EXTRA_META!!!
+        - implement Coro::Select::patch_pp_sselect and it's brother,
+          for hardcode select overriding.
+
+5.151 Mon Jul  6 05:41:57 CEST 2009
+	- backport to windows process emulation code again (patch by
+          Yasuhiro MATSUMOTO).
+        - slightly update Coro::MakeMaker.
+
+5.15  Tue Jun 30 10:28:06 CEST 2009
+	- deprecate Coro::Socket, document how to get ipv6 support via
+          AnyEvent::Socket instead.
+	- implement signal->wait ($cb) interface, similar to semaphores.
+        - work around SvOK not supporting getmagic, so we have to getmagic
+          to test for undef :/ (reported by Matthias Waldorf).
+        - load Coro::AnyEvent in all modules using AnyEvent.
+        - work around perl corrupting our internal data structures,
+          reported by Tokuhiro Matsuno.
+        - enable per-coroutine real and cpu time gathering
+          (Coro::State::enable_times).
+
+5.14  Wed Jun 24 01:37:48 CEST 2009
+	- provide explicit functions to "cede" to the event loop in Coro::AnyEvent,
+          as this seems to have been a difficult concept (poll, sleep, idle,
+          idle_upto).
+        - add Coro::AnyEvent::readable/writable functions.
+	- clarify Coro::EV/Event/AnyEvent manpages.
+        - free per-thread global scalars in the thread calling ->cancel, to
+          avoid crashes when $_, $@ etc., are magical but some of those
+          had already been freed.
+        - "unexperimentalise" the callback interface for Coro::Semaphore.
+	- speed up ready queue management/context switching by using a linked
+          list instead of an array (~5-10%).
+        - implement "watch" command in Coro::Debug shells.
+        - for fun, implement time-slicing as an example in the manpage.
+        - if AnyEvent detects EV or Event, but we don't have Coro::EV or
+          Coro::Event, use the normal AnyEvent handling instead of dieing
+          (the same is true for Coro::Handle).
+        - properly document Coro::EV::timed_io_once.
+        - avoid unneccessary ->cancel calls in Coro::Handle.
+        - maybe make it work on mingw32 with win32 backend
+          (based on patch by Yasuhiro Matsumoto).
+
+5.132 Fri May 29 09:00:39 CEST 2009
+	- do not keep a reference to the argument itself in
+          Coro::Semaphore::guard, as it could change later.
+        - support SO_RCVBUF/SO_SNDBUF nonstandard Coro::Socket options,
+          should support a prepare callback.
+
+5.131 Mon Mar 16 23:20:37 CET 2009
+	- implement and document Coro->suspend, Coro->resume.
+        - fix Coro::Select implementation to not (often) close
+          the passed file descriptors (testcase provided by pippijn).
+
+5.13 Mon Dec 15 21:51:42 CET 2008
+	- EXPERIMENTAL: implement dynamic winds (on_enter/on_leave).
+	- don't set diehook to C<undef> but instead to NULL, to avoid
+          spurious warnings.
+        - fix a lot of bugs in Coro::SemaphoreSet.
+        - Coro::SemaphoreSet will less often create a semaphore needlessly.
+        - add Coro::SemaphoreSet::count and wait methods.
+        - take advantage of the new Guard module.
+        - deprecate Coro::guard.
+        - try to fix the dreaded 01_unblock tests once more. I hate it when
+          testsuites need more fixing than the code they are supposed to test.
+        - croak in more cases when a required callback isn't resolvable.
+        - fix some minor issues in Coro::State->call/eval.
+        - use current coroutine context instead of a temporary one
+          when temporarily switching to another coroutine.
+        - do not call C-level on_destroy handlers during global destruction,
+          to avoid needless segfaults.
+
+5.12 Sun Dec  7 13:30:38 CET 2008
+        - add default config for MirOS, which seems to be a bug-to-bug
+          compatible fork of openbsd ("world domination by releasing
+          openbsd cvs before the openbsd folks do it" or so :).
+        - free_padlist did destroy the names pad, not good, but didn't
+          seem to bother perl - this could fix issues such as eval ""
+          inside a function called from multiple coroutines.
+        - use a different method to detect destruction time.
+        - be more careful when freeing padlists just before global
+          destruction.
+        - fixed and expanded the call/cc example.
+        - renamed _terminate to _coro_run.
+        - new method Coro::Channel->shutdown.
+        - try pthreads on openbsd <4.4 (broken sigaltstack, will
+          pthreads fare better?).
+        - be less picky about destroying "a" running coroutine.
+
+5.11 Tue Nov 25 21:49:05 CET 2008
+	- DEBUGGING in 5.10.0 is a mess: it constantly flags perfectly
+          working code with failed assertions, introducing more bugs than
+          it fixes, requiring elaborate workarounds :(
+
+5.1  Mon Nov 24 08:54:59 CET 2008
+	- wrote a small introductory tutorial - Coro::Intro.
+	- convert Coro::Timer, Coro::Select and Coro::Util to rouse API.
+        - Coro::Select did errornously dup the file descriptors
+          and didn't work with all AnyEvent backends.
+        - Coro::Select wasn't imported correctly form Coro::LWP, causing blocking
+          LWP data transfers.
+        - disassociate c contexts from coro objects - this is agruably more
+          correct, but mostly allows sharing of cctxs between coro and state
+          objects, for added memory savings and speed increases.
+        - bumped $Coro::POOL_RSS up to 32kb by default.
+        - no longer set the optype to OP_CUSTOM, as B::* understandably
+          doesn't like this very much (and we *are* a type of entersub).
+        - implement state cloning, just to prove that call/cc can be done.
+        - automatically load Coro::AnyEvent in Coro::Handle.
+        - wrap ->cancel calls in eval inside Coro::Handle as EV watchers
+          do not have this method (and don't need it either).
+        - speed up generic anyevent methods in Coro::Handle by using rouse
+          callbacks.
+        - allow coroutines in $Coro::IDLE, speeding up Coro::AnyEvent and
+          others. It also makes the debugger happier, as you can trace
+          through the idle threads now.
+        - add comppad_name* and hints ($^H, %^H) to per-thread variables.
+        - eg/event was pretty broken.
+        - better 5.8.6 compatibility.
+
+5.0  Thu Nov 20 10:35:05 CET 2008
+	- NEW ARCHITECTURE: use the latest 4.x version if you experience
+          stability issues.
+        - bump API version to 7 - all dependents must be recompiled.
+        - removed timed_* functions - they were not being used anyways
+          and should be replaced by a more generic mechanism -
+          and were annoying to support anyways :)
+        - removed SemaphoreSet's waiter method - use sem method instead.
+        - Coro::Semaphore->adjust didn't correctly wake up enough waiters.
+        - async_pool did free a scalar value twice
+          ("Attempt to unreference...").
+        - fix a longstanding bug where calling terminate on a coro that
+          was waiting for a semaphore that was just becoming available
+          would cause a deadlock (semaphore would get into a state where
+          it was available but waiters were still blocked).
+        - calling throw on a coroutine that is waiting for a semaphore will
+          no longer make it acquire the semaphore (and thus leak a count).
+        - perl's process emulation is now not even theoretically supported
+          anymore.
+        - new functions Coro::rouse_cb and Coro::rouse_wait for easier
+          conversion of callback-style to blocking-style.
+        - new methods $coro->schedule_to and ->cede_to, to specifically
+          schedule or cede to a specific coroutine.
+        - new function Coro::Semaphore::wait.
+        - use named constants in Coro::Channel (Richard Hundt).
+        - directly patch the entersub opcode calling SLF functions (cede,
+          transfer and so on). this does speed up context switching, but
+          more importanly, it frees us from the hardcoded behaviour of
+          entersub, so we might actually be able to return something from
+          those functions and atcually create new ones.
+        - take advantage of __builtin_frame_address on gcc.
+        - expose THX in coroapi (not sure whether this was a wise decision,
+          as "threaded" perls are running at half speed anyways).
+        - implement execute_slf (schedule-like-function) interface that makes
+          it possible to implement schedule-like-functions in XS.
+        - use new SLF interface to massively speed up Coro::EV by roughly a
+          factor of two.
+        - used new SLF interface to massively speed up Coro::Semaphore by a
+          factor of three.
+        - used new SLF interface to speed up Coro::AIO by roughly a factor of
+          four and reduce its memory usage considerably.
+        - implement Coro::SemaphoreSet purely in terms of Coro::Semaphore,
+          for a nice speedup and vastly more correct behaviour. Also implement
+          a new method "sem" to get at the underlying semaphore object.
+        - implement Coro::Channel in terms of Coro::Semaphore, for a moderate
+          (in comparison) 20-40% speedup.
+        - used new SLF interface to reimplement Coro::Signal gaining
+          some unknown (because I was too lazy), but certain, speedup, and also
+          making signals reliable for the first time.
+        - used new SLF interface and other optimisations to speed up async_pool
+          by a factor of two. It also doesn't rely on perl's exception mechanism
+          to exit anymore. The overhead for terminating an async_pool, coro over
+          a normal async is now very small.
+        - sped up coroutine creation/destruction by 40%.
+        - forgot to include Coro/libcoro/README in the dist for all these years.
+        - work around a freebsd pthreads bug (manual testcancel is required as
+          pthread_cond_wait isn't a cancellation point on freebsd).
+        - use new rouse functions to speed up and simplify Coro::BDB.
+        - make "prefer perl native functions" work with threaded perls.
+        - condense Coro::Debug ps output, hint at v and w flags.
+        - (libcoro) lots of minor cleanups and portability improvements.
+
+4.914 Wed Nov 19 12:54:18 CET 2008
+        - fix a disastrous bug in the readline optimisation
+          introduced in 4.801.
+
+4.913 Sat Nov 15 07:58:28 CET 2008
+        - async_pool did free a scalar value twice
+          ("Attempt to unreference...").
+
+4.912 Thu Nov 13 18:31:23 CET 2008
+	- minor cleanups.
+        - use much larger stacks on linux and perl < 5.8.8.
+        - Coro::Debug::new_unix_server did not unlink the socket
+          when destroyed.
+
+4.911 Tue Nov 11 04:26:17 CET 2008
+	- "port" to threaded perls.
+
+4.91 Mon Nov 10 05:36:38 CET 2008
+        - the ->throw exception object no longer leaks.
+        - creating a new cctx leaked a scopestack entry (memleak).
+	- new coroutines didn't get created with a zero flags field
+          (unknown impact).
+	- calling ->throw on a not-yet-started coroutine should now work
+          instead of being ignored.
+        - ->throw is now supported on Coro::State objects.
+        - clean up cctx creation code a bit.
+        - entersub is actually a UNOP, not a LOGOP (not a bugfix).
+
+4.9  Sat Nov  8 17:45:27 CET 2008
+	- (libcoro) did not preserve rbp with CORO_ASM (we are getting there).
+        - (libcoro) no longer leak threads in the experimental pthread backend,
+          also speed it up considerably.
+        - (libcoro) do not rely on makecontext passing void *'s unscathed.
+        - fix compiletime dependencies on libcoro in the Makefile.
+        - cctx_count wasn't always updated properly.
+        - Coro::State::cctx_stacksize wasn't applied correctly.
+        - new function Coro::State::cctx_max_idle.
+        - the default max number of idle C contexts is now 4.
+        - (libcoro) try harder to get _setjmp/_longjmp.
+        - (libcoro) cleanup and extend the libcoro API to officially
+          allow the creation of empty source contexts.
+        - very experimental workaround for the totally broken netbsd platform.
+        - tried to hack around openbsd bugs.
+
+4.804 Wed Nov  5 16:36:00 CET 2008
+	- Coro::Debug::new_unix_server would not create a non-blocking listening
+          socket, sometimes causing freezes.
+        - (libcoro) fix misaligned stack points for setjmp and assembly
+          methods, which can cause crashes on x86/x86_64 with a sufficiently
+          aggressive compiler.
+        - new function: Coro::Debug::new_tcp_server.
+	- move ->throw into the Coro class because it only works on coro objects.
+
+4.803 Mon Nov  3 17:16:12 CET 2008
+	- (libcoro) use a global asm statement to become independent of gcc
+          otpimisations for CORO_ASM (thanks to pippijn for the idea).
+        - try to workaround yet another broken bsd, this time dragonfly.
+
+4.802 Thu Oct 30 10:56:12 CET 2008
+        - support -fno-omit-frame-pointer on x86 with the assembly method.
+	- tune 01_unblock.t tests a bit.
+
+4.801 Wed Oct 22 18:33:37 CEST 2008
+	- improve readline speed for very long "lines".
+	- backport to 5.8.8.
+
+4.8  Thu Oct  2 13:34:40 CEST 2008
+	- new function Coro::AIO::aio_wait.
+        - Coro.:AIO and Coro::BDB now "use Coro::AnyEvent".
+        - greatly speed up and reduce memory usage of Coro::AIO requests.
+        - implement some other µ-optimisations.
+
+4.749 Mon Sep 29 14:40:12 CEST 2008
+	- port to slow and broken pseudo-threaded perls. (courtesy pippijn).
+
+4.748 Sat Sep 27 14:03:19 CEST 2008
+	- implement, but do not document, PerlIO::cede(granularity).
+	- Coro::Storable forgot to wrap Storable::pstore.
+        - work around the multitude of leaks and memory corruption
+          bugs in PerlIO::via by using our own C-level perliol. As a side
+          effect, Coro::Storable is now much, much, much faster.
+
+4.747 Tue Sep 23 01:59:41 CEST 2008
+	- fix a per-cv memleak (one empty array was leaked per
+          code reference).
+        - avoid a crash in coro->call|rss when the coroutine was already
+          destroyed (most noticably when using Coro::Debug::ps :)
+        - also protect *Storable::FILE.
+        - push up default storable granularity to 20ms.
+
+4.746 Sun Sep 21 03:22:20 CEST 2008
+        - be more insistent on locking Storable against reentrancy
+          in Coro::Storable.
+	- move swap_def?v and throw to Coro::State, as documented.
+
+4.745 Thu Jul 24 00:14:38 CEST 2008
+	- remove debugging code related to MgPV_nolen_const, also try to
+          make it compile with perl 5.8.6 (yes, apple apparently loves
+          outdated software). Reported by John S.
+
+4.744 Tue Jul  8 22:06:35 CEST 2008
+	- correctly provide default DIE/WARN handlers as documented.
+	- also overwrite PL_vtbl_sigelem.svt_clear, even though current
+          implementations inside perl work fine for us.
+
+4.743 Mon Jun 16 00:21:57 CEST 2008
+	- when using Coro::EV without running EV::loop it could
+          result in busy-waiting for events, this has been fixed.
+        - reduce codesize and improve performance by using EV_DEFAULT_UC.
+
+4.742 Sat May 31 14:10:21 CEST 2008
+	- implement a workaround for (some) perl <5.8.8 versions.
+        - require EV 3.3+.
+
+4.741 Fri May 30 23:33:09 CEST 2008
+	- tell netbsd how utterly broken their imitation of an OS is
+          and refuse to build by default if pthreads are in use.
+        - switch to "s" method on all bsd's by default, as their ucontext
+          stuff seems just too broken.
+        - fix a bug in Coro::Select.
+
+4.74 Thu May 29 20:05:31 CEST 2008
+	- do not test Coro::LWP for lack of dependencies.
+        - do not test Coro::Select for lack of working perls.
+
+4.73 Thu May 29 2008
+	- fix a bug in Coro::EV which would cause it to block despite
+          there being runnable coroutines.
+	- sprinkle "no warnings" freely over everything, also suppress
+          warnings for some other modules.
+        - fix typo in WSAEWOULDBLOCK.
+
+4.72 Sun May 25 05:14:36 CEST 2008
+	- tweak META.yaml a bit, unfortunately, there is no documented way
+          to have optional dependencies with CPAN. doh :(
+	- avoid running some tests on windows because they would fail due to
+          perl bug (broken fork, broken pipes...).
+        - work around perl on windows bugs where perl returns undocumented
+          error codes for sysread, syswrite etc. by taking advantage
+          of AnyEvent's workaround for that problem.
+        - use AnyEvent::Util::fh_nonblocking in Coro::Handle to work around
+          a common perl implementation bug on windows.
+        - use unix domain sockets in testsuite to work around
+          common perl implementation bugs on widows (they are emulated by
+          tcp sockets on windows. ugh.)
+
+4.71 Sat May 24 20:01:27 CEST 2008
+	- fix a bug in Coro::AnyEvent ("Usage: Coro::AnyEvent::_schedule()").
+	- take advantage of async name resolution of AnyEvent::Util.
+        - work around brutal inet_aton override in Coro::LWP.
+        - take advantage of the readyhook in Coro::EV, for smoother
+          scheduling.
+
+4.7  Sun May 11 00:32:19 CEST 2008
+	- completely reworked the Coro manpage.
+	- added Coro::AnyEvent, generic event loop integration.
+	- implement cancel, ready and kill commands in Coro::Debug.
+        - document find_coro in Coro::Debug.
+        - incompatible change: rename has_stack to has_cctx.
+        - Coro::AIO and Coro::BDB no longer force event model detection,
+          use AnyEvent::AIO and AnyEvent::BDB.
+
+4.6  Sat Apr 26 10:05:14 CEST 2008
+	- INCOMPATIBLE CHANGE: sub/code attributes are no longer supported
+          by the Coro module. It was a mistake to have it in the first place.
+        - (experimental) support for activestate perl 5.10 (method "w").
+        - (experimental) support for strawberry perl (method "a").
+        - coro_sigelem_set did not return a value although it had to,
+          actual impact unknown.
+
+4.51 Mon Apr 14 13:28:27 CEST 2008
+	- make it compile again on 5.8.
+
+4.50 Thu Apr 10 09:43:17 CEST 2008
+	- I did it twice! (see 4.49).
+
+4.49 Sun Apr  6 21:23:31 CEST 2008
+	- grr, instead of compiling the recent changes on 5.10 only they
+          were compiled on 5.8 only.
+
+4.48 Sun Apr  6 20:36:46 CEST 2008
+	- allow coroutine switches during eval's under 5.10.x, as it seems
+          the parser is a per-interpreter option now, so this is safe
+          (this might fix the odd crashing bug).
+        - drop support for 5.9.x versions: they are dead, jim.
+
+4.47 Sun Apr  6 00:37:52 CEST 2008
+	- force cctx allocation on API calls: we know we need to force one
+          and gcc actually manages to confuse our heuristic nowadays,
+          leading to crashes and worse.
+        - document force_cctx.
+
+4.46 Fri Apr  4 22:05:43 CEST 2008
+        - upgrade libcoro, resulting in pthread-backend (which was only created
+          to fulfill the rules of the programming languages shootout).
+
+4.45 Thu Mar 13 11:55:36 CET 2008
+	- fix a file leaking bug in eg/mhyttpd that would allow
+          downloading of any file (reported by oesi).
+	- fix deadlock bug in Coro::Channel (reported by Richard Hundt)
+          (also add testcase).
+        - support Broadcast option in Coro::Socket (patch by Richard Hundt,
+          apparently having loads of fun with that).
+        - implement $state->swap_defsv, ->swap_defav and document ->throw.
+
+4.4  Wed Feb 13 16:44:29 CET 2008
+	- only assume .cfi pseudo isns exist on GNU/Linux.
+        - add get_timed method to Coro::Channels.
+        - fixed Coro::Debug manpage.
+        - perl 5.11 compatbility improvement based on patch by
+          Andreas König.
+
+4.37 Sun Jan 20 11:25:23 CET 2008
+	- soften the check for an active parser for perl 5.10 (avoiding
+          "Coro::State::transfer called while parsing" in many cases).
+
+4.36 Sun Jan 13 10:53:56 CET 2008
+	- reset diehook when terminating from an async_pool as to not
+          trigger any __DIE__ handlers.
+
+4.35 Sun Jan 13 04:14:13 CET 2008
+	- "bt" debug command now displays any exceptions
+          from longmess and also skips the innermost
+          stackframes, giving more useufl output.
+	- allow backtraces in coroutines blocked in Coro::EV,
+          at a <1% speed hit.
+        - handle localising of $SIG{__WARN__} and __DIE__
+          properly (with a proper amount of dirty hacking).
+
+4.34 Sat Dec 22 17:49:53 CET 2007
+	- upgrade to EV version 2.0 API.
+
+4.33 Mon Dec 17 08:36:12 CET 2007
+	- make Coro::AIO etc. loadable in the absence of EV.
+
+4.32 Mon Dec 17 07:46:02 CET 2007
+	- majorly improved Coro::Handle's performance with Coro::EV.
+        - implemented the until now mythical Coro::BDB module.
+        - specialcase EV in Coro::AIO and Coro::BDB for extra speed.
+
+4.31 Wed Dec  5 12:32:39 CET 2007
+	- remove warn statement form Coro::Util.
+
+4.3  Tue Dec  4 20:33:14 CET 2007
+	- calls to the idle function could cause stack corruption
+          when the stack changed.
+	- do no longer rely on the presence of EV::DNS if EV is used
+          (because it is gone), but instead take avdantage of EV::ADNS
+          if available.
+        - add ($) prototypes to all functions in Coro::Storable.
+        - use a conventional (safer) idle callback in Coro::EV.
+        - do accept quickly in Coro::Debug to avoid endless loops.
+
+4.22 Fri Nov 30 16:04:04 CET 2007
+	- really use optimised versions for Event and EV in Coro::Util
+          and Coro::Handle.
+
+4.21 Sun Nov 25 10:48:59 CET 2007
+	- fix a spurious memory read.
+        - Coro::EV no longer keeps the eventloop "alive".
+
+4.2  Fri Nov  9 20:47:05 CET 2007
+	- enable/disable tracing from a new coroutine, not a pooled one.
+        - fix a memleak in Coro::Event.
+        - removed killall call from fork_eval.
+        - made sure store_fd is already loaded so that fork_eval
+          does not have to parse autoload in each subprocess.
+        - only use assembly method if -O switch is in $Config{optimize}.
+        - add (optional) Coro::EV module, so far the best event loop module
+          directly supported by Coro.
+        - if the event model is EV, use EV::DNS to resolve
+          stuff in Coro::Util.
+        - don't get confused by multiple event notifications in Coro::Handle.
+        - initial support for EV (libevent interface).
+        - require Event and EV using configure_requires, to force their existance.
+
+4.13 Wed Oct 24 07:26:45 CEST 2007
+	- add Coro::Storable::blocking_thaw.
+        - use a vastly more complicated technique to localise
+          $SIG{__WARN/DIE__} that also works on perls <= 5.8.8.
+        - use a coroutine for the idle callback Coro::Event,
+          instead of running Event in the current coroutine context.
+          This also catches recursive invocations.
+        - actually report fork errors in gethostbyname and inet_aton.
+
+4.11 Thu Oct 11 02:40:24 CEST 2007
+	- port to threaded perls.
+
+4.1  Thu Oct 11 02:38:16 CEST 2007
+	- incompatible change: $SIG{__DIE__} and $SIG{__WARN__} will now
+          be local to each coro (see Coro::State).
+        - incompatible change: for very deep reasons, cede and cede_notself
+          cannot return anything, so nothing will be returned.
+	- possibly bring back 5.10 compatibility (untested).
+        - work around stupid (and wrong) warning on 5.10 :(.
+	- overlay the saved state over the context stack. This saves
+          a few hundred bytes per coroutine on average and also
+          speeds up context switching a bit.
+        - further tune default stack sizes.
+        - (more) correctly calculate stack usage in coro_rss.
+        - Coro::Storable::blocking_* did not properly lock
+          resulting in races between coroutines.
+        - added Coro::Storable::guard.
+        - stopping to trace a coroutine could destroy the cctx of
+          an unrelated coroutine.
+        - explain the relationship between Perl and C coroutines in
+          more detail in Coro::State.
+        - Coro::Util::inet_aton did not short-circuit dotted quad forms,
+          causing a fork per resolve. This also affected Coro::Socket.
+        - switch to a separate stack in $coro->call/eval to avoid
+          invalidating pointers.
+
+4.03 Sat Oct  6 21:24:00 CEST 2007
+	- added Coro::throw method.
+	- minor code cleanups.
+
+4.02 Sat Oct  6 02:36:47 CEST 2007
+	- fix a very minor per-coroutine memleak (a single codereference).
+	- fixed a bug where the currently in-use c context would be freed
+          prematurely (can happen only when programs change the stacksize
+          or use tracing).
+        - tracing can no longer keep a coro alive after it terminated.
+        - do static branch prediction in the common path for gcc. gives
+          about 2-5% speed improvement here.
+
+4.01 Fri Oct  5 22:10:49 CEST 2007
+	- instead of recreating *a* standard output handle we simply
+          use STDOUT, which is faster and hopefully more robust.
+
+4.0  Fri Oct  5 12:56:00 CEST 2007
+        - incompatibly changed Coro::Storable::freeze.
+        - major new feature: added Coro::Debug, for interactive coroutine
+          debugging, tracing and much more.
+        - major bug fix: unbelievable, but true: $_, $/ and many other
+          "saved" variables actually weren't being saved. This has been fixed,
+          of course, while increasing performance while losing all the save
+          flags.
+        - save flags are gone, and all the api functions dealing with them.
+	- added Coro::Semaphore::adjust.
+        - added Coro::Util::fork_eval.
+        - added Coro::Storable::{nfreeze,blocking_{freeze,nfreeze}}.
+        - added Coro::killall.
+        - reduce initial stack sizes to allow for "micro-coroutines".
+        - better async_pool resource management, moved parts of async_pool
+          handling to XS (major speed improvement).
+        - actually croak before modifying important data structures.
+        - refuse to transfer while compiling.
+        - possibly support eval EXPR better now.
+        - enable assembly per default on linux+bsd x86+amd64.
+        - all internal members were renamed _something for easier subclassing.
+        - many minor tweaks.
+
+3.63 Wed May 16 14:10:06 CEST 2007
+	- implement handcoded assembly for x86/amd64 SVR ABI.
+
+3.62 Fri Apr 27 21:36:06 CEST 2007
+	- upgrade libcoro (which might set unwind info correctly).
+        - change default on linux to setjmp/longjmp.
+
+3.61 Thu Apr 19 12:36:18 CEST 2007
+	- Coro::Storable caused an endless loop when thawing invalid
+          pst's sometimes.
+	- use a Semaphore in Coro::Storable, as Storable doesn't
+          seem to be reentrant (although it is documented to
+          be threadsafe...).
+        - fix Coro::Signal to bring back the original unreliable
+          but stateful semantics.
+        - fixed a lot of typos in Coro.pm (patch submitted by David
+          Steinbrunner, which applied flawlessly).
+
+3.6  Sat Apr 14 17:13:31 CEST 2007
+	- added some bugfixes to get eg/myhttpd working again.
+        - added Coro::Storable for often-cede'ing freeze/thaw.
+        - try to do a clean exit when a coroutine calls exit
+          (EXPERIMENTAL).
+        - got rid of indirect call through _coro_init.
+        - updated the partly antique examples in eg/ to
+          work again and be a bit less magic, too.
+        - fixed Coro::Signal semantics to work as documented again.
+
+3.55  Sun Mar 25 01:20:47 CET 2007
+	- add SAVE_DEFFH to save the default filehandle and enable
+          it by default.
+        - finally move socket-operations from Coro::Socket to Coro::Handle
+          to be able to unblock foreign sockets.
+	- add Coro::State::save_also and guarded_save.
+	- add count accessor to Coro::Semaphore.
+        - add Coro::State::cctx_stacksize.
+        - just for the fun of it, do not rely on implicit context,
+          which can dramatically improve performance, but people
+          using windows-process-emulation perls do not care much about
+          performance.
+
+3.51  Sun Mar  4 14:18:04 CET 2007
+	- fixed a problem when you weakened references to Coro::State's
+          (patch by Yuval Kogman).
+
+3.501 Wed Feb 28 12:44:07 CET 2007
+	- rename some global symbols as macosx from hell redefines
+          them without asking.
+
+3.5 Tue Feb 13 20:22:53 CET 2007
+	- do AnyEvent model detection earlier, avoiding problems
+          caused by first using AnyEvent and later Coro::Event.
+        - implement and document Coro::Event event objects.
+        - fix a potential problem in Coro::Event causing crashes.
+        - initialise PL_comppad when creating a new coroutine,
+          avoids crashes on early coro destruction.
+
+3.41 Mon Jan 22 19:19:49 CET 2007
+	- readline on Coro::Handle did not support undefined $/,
+          nor did it deliver partial lines on EOF or error.
+        - implement malloc fallback for stack allocation because
+          stupid broken idiotic OSX has a stupid broken
+          idiotic fits-the-whole-os mmap "implementation" and
+          my dick feels longer if Coro is portable even to
+          obsolete platforms.
+
+3.4  Fri Jan 19 21:52:54 CET 2007
+	- remove t/09_timer.t, as it isn't really testing much
+          but was rather flaky in practise.
+        - async_pool coro would keep arguments and callback alive until
+          it was reused.
+        - cancellation of a coroutine could cause spurious idle calls
+          in cede_notself.
+
+3.3  Sat Jan  6 03:45:00 CET 2007
+	- implement $coro->on_destroy.
+        - Coro::Event blocking semantics have been changed,
+          documented and - hopefully - improved.
+	- fix nice adding, not subtracting, from priority.
+        - fix ->prio and api_is_ready (patch by Mark Hinds).
+        - fixed an assert ("... == prev__cctx->idle_te")
+          that could errronously trigger.
+        - fix various large and small memleaks.
+        - use a (hopefully) more stable cancel implementation
+          that immediately frees the coroutine data.
+        - cede/cede_notself return a status now.
+        - added Coro::guard function.
+        - added a global coroutine pool for jobs (on my machine,
+          I can create and execute 48k simple coros/s with async,
+          and 128k coros with async_pool).
+        - Coro::AIO now uses the coroutine priority as io priority.
+
+3.2  Fri Dec 22 05:07:09 CET 2006
+	- improve portability to slightly older perls.
+        - use cleaner coroutine destruction.
+        - simplify configuration for users.
+        - optionally (unrecommended) prefer perl functions over
+          their coro replacements.
+
+3.11 Tue Dec  5 13:11:24 CET 2006
+        - fixed some bogus assert's, but as perl.h disables assert even
+          without NDEBUG (thank you very much), not too many people should
+          notice (that did include myself). Andreas König noticed, though :)
+	- do not save/restore PL_sortcxix on >= 5.9.x, it doesn't seem to have
+          it. Also noticed by Andreas König :)
+        - save/restore tainted status.
+        - verified to pass the testsuite on my 5.9.5.
+
+3.1  Mon Dec  4 23:03:40 CET 2006
+        - INCOMPATIBLE CHANGE: $/ is now per-coroutine (but slow).
+        - incompatible change: transfer flags are now per-state.
+	- give a better error message on deadlock.
+        - document Coro::nready.
+        - enhanced testsuite.
+
+3.01 Sun Dec  3 23:47:42 CET 2006
+	- forgot to include Coro::Timer.
+
+3.0  Sun Dec  3 22:57:25 CET 2006
+	- the "FINALLY COMPLETELY STABLE" release (coming soon:
+          the "FAMOUS LAST WORDS" release).
+	- implement a new stack sharing algorithm, which uses a stack
+          pool (size currently hardcoded).
+        - make stack sharing mandatory (it no longer uses a heuristic).
+        - eval/die no longer cause weird problems under heavy use.
+        - Coro::Event could cause livelocks if it was used but
+          no Coro::Event watchers were used.
+        - Coro::Event now uses asynccheck as prepare does not
+          check for changed watchers.
+        - Coro::Event allows multiple waiting coros and will wake up one
+          per event.
+        - Coro::Event should be cleaner and more efficient now.
+        - new utility function Coro::unblock_sub.
+        - document the sad fact that Event is no longer reentrant.
+        - putting a coroutine into the ready queue twice could under
+          some circumstances lead to stack corruption.
+        - minor incompatibility: subclassing Coro::State is supported
+          directly now without going through a _coro_state member.
+        - state/coro switching is much faster now.
+        - very minor optimisations and code/documentation cleanup.
+        - avoid problems due to compiler inlining.
+        - removed timers from Coro::Timer -> use AnyEvent instead.
+        - replaced Coro::idle coroutine by (cleaner) idle handler.
+        - updated to newest libcoro.
+        - implement enhanced support for valgrind.
+        - implement is_ready and return value for ready.
+        - removed Coro::Cont, it was a misnomer (it's generators),
+          and it was somewhat annoying to get it right. Will come back
+          if somebody asks for it :)
+        - many ->wait methods and Coro::Event could return
+          spuriously without the event having happened.
+
+2.5  Tue Nov  7 12:22:33 CET 2006
+        - made Coro::Util, Coro::Select, Coro::Handle and Coro::Socket
+          use AnyEvent, moved them to Coro/.
+	- added Coro::LWP which contains all the uglyness required to
+          make LWP non-blocking.
+	- should work with perl 5.9.x now (Andreas König made me do it).
+        - fixed another bug in Coro::Select when the timeout was undef.
+        - reuse PL_start_env for all coros, saves some memory per coroutine.
+        - manage PL_top_env differently, hopefully to avoid panic: top_env.
+        - timeout argument was not properly used in Coro::Socket.
+        - allow limited forms of subclassing in Coro::Handle/Coro::Socket.
+        - emulate undocumented(!) functionality of IO::Socket required
+          by LWP(!!).
+        - updated eg/lwp to work with newer lwp's.
+        - remove "FATAL: uncaught exception" prefix. Coroutines that die
+          kill the whole process, just as exceptions in the main "coroutine"
+          did already.
+
+2.1  Wed Nov  1 23:01:13 CET 2006
+        - fix a long-standing bug in Coro::Select where select with
+          zero timeout would instead change the current default filehandle.
+	- use a simpler and hopefully more robust way to clone padlists
+          (uses less memory and a perl function instead of our own).
+        - coro can now create a stack guard area on many architectures.
+        - Coro::AIO properly reexports additional functions from IO::AIO.
+	- updated libcoro with a workaround for OS X,
+          pach and testing by Michael Schwern.
+
+2.0  Tue Oct 24 05:47:17 CEST 2006
+	- support additional aio requests in Coro::AIO.
+
+1.9  (never properly released due to a glitch)
+
+1.8  Thu Feb  2 00:59:06 CET 2006
+	- applied suggested patch by SAMV to avoid problems during stupid
+          mark & sweep gc run.
+        - applied patch by Scott Walters for 5.9.3 compatibility.
+
+1.7  Tue Dec 27 01:41:58 CET 2005
+	- added Coro::AIO, a thin wrapper around IO::AIO.
+	- improved Makefile.PL explanations.
+
+1.6  Mon Dec 12 21:30:05 CET 2005
+	- additionally save PM_curpm might fix as-of-yet
+          unseen problems with regex matches being attributed to the
+          wrong package.
+        - add t/10_bugs.t, which currently checks against imho broken
+          perls that use 0.26MB of stack space per Perl_magic_get
+          invocation (newer linuxes) as opposed to the 0.0002MB perl
+          normally uses.
+        - make stacksize configurable for the ultimate debian experience.
+
+1.51 Mon Dec 12 18:48:36 CET 2005
+	- remove debugging warn() accidentally left in Coro::Select.
+
+1.5  Tue Nov 29 13:32:44 CET 2005
+	- use Coro::Event inside Coro::Select to avoid spurious deadlocks.
+        - fix Coro::Select 'select'.
+        - strict'ify some modules.
+	- libcoro errornously restored the SIGUSR2 handler to SIGUSR1.
+        - use XSLoader in selected modules.
+        - remove some 5.6 compatibility cruft.
+
+1.4  Tue Sep  6 00:11:05 CEST 2005
+	- libcoro did not take into account the trampoline on amd64,
+          when 'l'inux method was used.
+
+1.31 Tue Aug 30 23:31:33 CEST 2005
+	- some portability fixes/workarounds.
+
+1.3  Sat Aug 20 03:08:56 CEST 2005
+	- no code changes. module seems to work fine.
+	- improve Coro::State docs, remove reference to nonexisting
+          Coro::State::flush method.
+        - no longer autodetect windows, present it as an option instead.
+
+1.2  Mon May 16 02:00:55 CEST 2005
+	- included libcoro.c earlier in State.xs, might improve portability.
+        - use a faster and possibly more stable Coro::Cont implementation.
+        - accept x86_64 in addition to amd64 for optimized linux-amd64 support.
+        - fix bugs Coro::SemaphoreSet that could cause locks never to be freed.
+        - fix bugs in CoroAPI.h and document it in Coro::MakeMaker.
+
+1.11 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+1.1 Tue Feb 22 20:51:16 CET 2005
+	- support [l]inux method on amd64.
+        - allow some context switches while compiling/eval'ing.
+
+1.0  Tue Aug 10 03:47:27 CEST 2004
+	- Event 0.89 fixes the bug again.
+        - fix the remaining(??) memleak. I didn't free the cache-AV for
+          padlists, so one AV per created anon-sub leaked.
+
+0.97 Fri May 14 15:23:32 CEST 2004
+	- remove stupid gcc extension that was an experiment only anyway.
+
+0.96 Thu May 13 18:09:29 CEST 2004
+	- tell people if they have yet another broken Event variant.
+	- made Coro to work _better_ with threads (it seems that, as long
+          as you use Coros in one thread only everything will work fine.
+          Looking at the perl source the problem might be missing locking
+          between Coro and some perl internal routines. That's not easily
+          fixable).
+        - (hopefully) got rid of the static xnext inside transfer.
+
+0.95 Sun Feb 15 03:20:28 CET 2004
+	- removed Coro::State::flush, implemented a new and much
+          faster caching mechanism by attaching magic to the CV.
+        - a memleak with (real) closures remains.
+        - dramatically reduced size of stacks to 65536 (linux/x86), after
+          observing that even myhttpd never had more than a kilobyte
+          of stack in use (stack is still only physically allocated in
+          pagesize increments for systems suporting mmap).
+        - fix for a "cygwin-64" architecture added, proposed by Stefan Traby.
+        - fix for threaded perl.
+
+0.9  Sun Nov 23 04:32:39 CET 2003
+	- fix a few very hard to track down but (of course) stupid
+          memory leaks.
+        - stringify version number to avoid locale problems :(.
+        - perl 5.9.0 does not have SvPADBUSY, reported by Scott Walters,
+          hopefully ignoring it "just works".
+
+0.8   Wed Nov  5 19:38:40 CET 2003
+	- port to perl5.005_03, but only 5.8.x+ is supported!
+	- honor LocalAddr even without LocalPort in Coro::Socket.
+
+0.7   Tue May 27 03:12:38 CEST 2003
+        - the version jump indicates some level of testing, not gobs
+          of new features.
+	- uh... I found the prompt function in ExtUtils::MakeMaker.
+          Highly correct stuff, that is...
+        - fixed(?) a bug with die's in coroutines causing "panic: top_env".
+          the fix is not well understood by the author, so beware :(.
+
+0.652 Thu May  8 02:54:46 CEST 2003
+	- Applied patch by Slaven Rezic to set default to "s" on FreeBSD,
+          cause version 4 doesn't have ucontext.
+	- Benjamin Reed reported that setjmp works fine on darwin,
+          so preselect it.
+
+0.651 Sat Mar 29 15:00:23 CET 2003
+	- fix a bug in Coro::Handle where some bytes could get lost
+          on reading, reported by jason@nichego.net.
+
+0.65  Sun Mar 23 00:08:26 CET 2003
+	- added a README.linux-glibc.
+        - new module Coro::Select.
+        - also save/restore PL_comppad, fixes segfaults with 5.8.1.
+          (I never claimed that I know what I am doing ;).
+        - set default to setjmp/longjmp on non-x86-linux.
+
+0.6   Thu Nov 21 11:09:06 CET 2002
+        - made lazy context switching the default.
+	- fixed the bug where SemaphoreSet::guard
+          was the same as timed_guard and timed_guard was missing.
+        - fix a memleak in Coro::Timer.
+        - reclassified context sharing as not experimental.
+
+0.534 Sun Apr 14 03:05:12 CEST 2002
+	- fixed backspace => tab in header parsing (myhttpd).
+        - added eg/readline, for elmex.
+        - Coro::Event now calls ->start on first call instead of
+          ->again, which created wrong timeouts for the first ->next.
+        - fixed a bug where Coro::Socket returned a closed socket instead
+          of nothing on ECONNREFUSED and similar error conditions.
+
+0.533 Mon Feb 18 18:49:40 CET 2002
+	- adapt to finally working Event-0.85.
+        - fixed buggy event initialization (trapped under windows, but how
+          could it possibly have worked anywhere?)
+
+0.532 Wed Jan 16 02:45:32 CET 2002
+	- removed the reference to pp_entersub, might work on
+          (some) win32 perls now (testsuite works under cygwin,
+          without Event, which freezes).
+
+0.531 Mon Dec 10 22:18:44 CET 2001
+	- Fixed a bug in SemaphoreSet::timed_down.
+
+0.53  Tue Nov 27 21:11:13 CET 2001
+	- some tests for Event.
+        - slightly different internal architecture to get refcnt into the object
+          and not the reference. might fix a few bugs, certainly did introduce
+          new ones.
+        - Coro::Timer (independent of Event).
+        - new timed_wait functions for Coro::Signal, Semaphore, SemaphoreSet.
+
+0.52  Tue Nov  6 21:36:18 CET 2001
+	- ported to cygwin (trivial).
+          patch by Gerrit P. Haase <gp@familiehaase.de>.
+        - small setjmp code fix by Sullivan.DanielJ@epamail.epa.gov.
+
+0.51  Thu Nov  1 20:39:01 CET 2001
+	- terminate/cancel now work properly (otherwise termination
+          could cause a "next coroutine is not and contains not..."
+          error.
+        - added Coro::Socket::shutdown.
+        - Coro::Event::loop no is the same as Event::loop.
+        - implemented terminate with args + join.
+
+0.5   Fri Sep 28 16:15:35 CEST 2001
+	- fixed "print" on a Coro::Handle. The print method worked.
+	- small tweaks (seem to reduce memory consumption a lot)
+          in various modules.
+        - splendid use of "no warnings" scattered throughout.
+        - added Coro::Handle::rbuf, fixed Coro::Handle::fh.
+
+0.49  Sun Sep 16 02:42:45 CEST 2001
+	- changed some method calls to function calls for speed
+          inside Coro::Handle.
+        - make Coro::Handle use an array instead of a hash for
+          speed reasons.
+        - IRIX mystery solved: it's SGI's NT, after all: "standard, huh?".
+          sjlj and ucontext should now work.
+        - IRIX-specific port for libcoro.
+        - swapped order of accept results to match IO::Socket.
+        - changed getsock/peername to sock/peername to match IO::Socket.
+        - fixed a bug that caused segfault when returning to main task
+          under some circumstances.
+        - other bugfixes.
+
+0.45  Sun Sep  2 02:54:01 CEST 2001
+	- new method Coro::Handle::timeout.
+        - corrected speling of set...name to get...name in Coro::Socket.
+        - Coro::Socket::accept now returns a Coro::Socket, not a Coro::Handle.
+        - Coro::Handle now supports fileno and FILENO.
+        - added eg/myhttpd, a web server.
+        - Coro::Socket now accepts numeric ports as well as "port(number)"
+          syntax.
+        - moved some scheduling primitives into xs code. more to come.
+        - new simple priority system.
+        - implemented Coro::Event using XS, almost four times faster!
+        - small memory corruption problem fixed (boy that was difficult).
+
+0.13  Wed Aug  8 16:53:07 CEST 2001
+	- new method Coro::Handle::readline.
+        - added eg/lwp and Coro::Handle::autoflush, to make LWP work.
+          (see eg/lwp on how to make LWP non-blocking).
+        - renamed Coro::Socket::new_inet to new.
+        - added Coro::Util, some utility functions.
+        - die/eval now works better (still get annoying (but true ;)
+          "Callback called exit" messages).
+        - Coro::Handle now supports timeout, and Coro::Socket Timeout.
+        - much better Coro::Socket support.
+
+0.12  Fri Jul 27 04:19:01 CEST 2001
+	- do not use mmap if neither MAP_ANON nor MAP_ANONYMOUS is defined.
+	- very experimental stack sharing algorithm. not 100% safe but
+          should work well in practise ;)
+        - added Coro::RWLock.
+        - Coro::Specific now works.
+
+0.11  Tue Jul 24 22:49:21 CEST 2001
+	- added specialized hack for newer and older linux versions (fast).
+        - renamed Coro::Event::IO to Coro::Handle.
+        - new module Coro::Socket.
+
+0.1   Tue Jul 24 01:47:53 CEST 2001
+	- release candidate 3. A rather new internal structure :(
+        - the great renaming: Damian Conway gave me a suitable replacement
+          for yield.
+	- added Coro/libcoro, a portable coroutine implementation for C
+          (not even perl-dependent!!!), which can be used by Coro::State.
+	- renamed SAVE_DEFSV (on xs-level only) to avoid symbol clash in
+          perl-5.6.
+	- new function Coro::Event::idle.
+        - the idle process is now overriden
+          by default in Coro::Event.
+        - Coro::Channel now enforces the size.
+        - canceling events now works in all cases.
+        - Coro state now include $_ and $@.
+        - yet another bug workaround that I do not really understand :(
+        - new module Coro::Event::IO (very undocumented) to do
+          non-blocking i/o.
+        - performance tuning.
+
+0.08  Thu Jul 19 06:13:25 CEST 2001
+	- release candidate 2 (new functionality).
+	- add Coro::State::flush function.
+        - transfer now supports a flags value (mostly for speed ATM).
+        - might compile and work in the presence of threads now.
+        - continuations have a saner syntax.
+        - no more memleaks.
+
+0.07  Tue Jul 17 17:40:18 CEST 2001
+	- release candidate 1 ;)
+	- slightly nicer code.
+        - fixed a scheduling bug in Coro::Event.
+
+0.06  Tue Jul 17 04:23:24 CEST 2001
+        - ok, I found the showstopper - the same sub must not be
+          re-entered in two different coroutines, otherwise => crash. I
+          see no easy solution to this problem, except by walking the call
+          chaing and saving/restoring the cv's, which is what I do now.
+        - memory leaks still latent, especially at thread termination.
+        - Coro::Event now works (haha).
+
+0.05  Sun Jul 15 17:32:20 CEST 2001
+	- fixed a few issues in Coro::Event.
+        - I forgot to include Coro::Event in 0.04 :(:(:(
+
+0.04  Sun Jul 15 05:24:59 CEST 2001
+	- @_ is now properly localized.
+	- Coro::State is now easier subclassable.
+        - Coro::Cont now coroutine-aware.
+        - Coro::Specific is a low-overhead module to create
+          coroutine-specific vars.
+        - Coro::Event provides a simple interface to Event.
+
+0.03  Fri Jul 13 14:51:52 CEST 2001
+	- transfer() now implemented in XS (beware).
+	- new module Coro::Cont for really faked continuations.
+	- big internal architecture changes: Coro::State is now
+          really low-level and can thus be used to implement other
+          interesting things, While "Coro::" implements a process-like
+          model. Still crude and subject to change.
+        - $_ and $@ are no longer being localized.
+
+0.02  Tue Jul 10 01:38:17 CEST 2001
+	- implemented "async" attribute.
+        - $_ and $@ are now localized.
+        - added Coro::Channel.
+        - more testcases, still no docs.
+
+0.01  Tue Jul  3 02:18:41 CEST 2001
+	- original version; copied from Convert::Scalar.
+

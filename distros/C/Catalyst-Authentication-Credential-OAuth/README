@@ -1,0 +1,72 @@
+NAME
+    Catalyst::Authentication::Credential::OAuth - OAuth credential for
+    Catalyst::Plugin::Authentication framework.
+
+VERSION
+    0.02
+
+SYNOPSIS
+    In MyApp.pm
+
+        use Catalyst qw/
+            Authentication
+            Session
+            Session::Store::FastMmap
+            Session::State::Cookie
+        /;
+
+    In myapp.conf
+
+        <Plugin::Authentication>
+            default_realm   oauth
+            <realms>
+                <oauth>
+                    <credential>
+                        class       OAuth
+                        <providers>
+                            <example.com>
+                                consumer_key             my_app_key
+                                consumer_secret          my_app_secret
+                                request_token_endpoint   http://example.com/oauth/request_token
+                                access_token_endpoint    http://example.com/oauth/access_token
+                                user_auth_endpoint       http://example.com/oauth/authorize
+                            </example.com>
+                        </providers>
+                    </credential>
+                </oauth>
+            </realms>
+        </Plugin::Authentication>
+
+    In controller code,
+
+        sub oauth : Local {
+            my ($self, $c) = @_;
+
+            if( $c->authenticate( { provider => 'example.com' } ) ) {
+                #do something with $c->user
+            }
+        }
+
+USER METHODS
+    $c->user->token
+    $c->user->token_secret
+    $c->user->extra_params - whatever other params the provider sends back
+
+AUTHOR
+    Cosmin Budrica <cosmin@sinapticode.com>
+
+    Bogdan Lucaciu <bogdan@sinapticode.com>
+
+    With contributions from:
+
+      Tomas Doran E<lt>bobtfish@bobtfish.netE</gt>
+
+BUGS
+    Only tested with twitter
+
+COPYRIGHT
+    Copyright (c) 2009 Sinapticode. All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

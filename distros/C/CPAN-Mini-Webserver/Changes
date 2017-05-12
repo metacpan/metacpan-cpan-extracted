@@ -1,0 +1,227 @@
+Revision history for Perl module CPAN-Mini-Webserver
+
+0.58      2012-07-09 14:34:58 Europe/Berlin
+     [ BUGFIXES ]
+     - specified File::Path version dependency because some versions don't
+       have remove_tree
+
+0.57      2011-09-21 19:21:22 Europe/Berlin
+     [ GENERAL CLEANUP ]
+     - rerelease to hopefully fix the worldwritables problem
+
+0.56      2011-09-21 16:40:36 Europe/Berlin
+     [ BUGFIXES ]
+     - added Lingua::StopWords to dependencies (thanks to DOY)
+
+     [ CHANGES ]
+     - dzilified distribution
+
+0.55      2011-09-16 13:48:56 Europe/Berlin
+     [ BUGFIXES ]
+     - added Search::Tokenizer to dependencies (thanks to Brian Cassidy)
+
+0.54      2011-09-12 22:20:39 Europe/Berlin
+     [ ENHANCEMENTS ]
+     - added cache dir option, configurable via cpan mini config file
+     - added global base url option, configurable via cpan mini config file
+     - added optional fulltext indexing of the cpan mirror
+     - added an option to switch off display of non-POD data
+     - added a list of module links to the distribution page
+     - enabled generation of TOC for the module pages
+     - added autocomplete to the search field when full text search is active
+     - added optional indexing of subroutines and restriction of search to subs
+
+     [ CHANGES ]
+     - moved some dist tarball interrogation functions out to
+       Parse::CPAN::Packages
+
+     [ BUGFIXES ]
+     - indexer now does unique filtering only after lowercasing
+     - only try to show an author url if there is one
+     - link to the test matrix domain proper instead of slaven's script on bbbike
+     - fixed some templates so the body actually wraps around the content
+     - trying to load the page of a package that cannot be found now results in
+       a proper not found page, instead of a crash
+
+0.53 Wed Aug 24 14:20:00 GMT 2011
+     [ BUGFIXES ]
+     - updated PreReqs so installation goes fine
+
+0.52 Sat Aug 15 14:07:00 GMT 2011
+     [ BUGFIXES ]
+     - utf8 in file downloads is now transferred in binary mode
+     - CPAN::Mini mirrors with 00whois.xml do not cause a crash anymore
+
+     [ CHANGES ]
+     - requests to unknown dists in file downloads now generated better
+       error messages
+     - Rewrote parts of the documentation to be easier readable.
+
+0.51 Sat Jan 12 16:42:55 GMT 2011
+     [ ENHANCEMENTS ]
+     - the display of recently added dists on the frontpage is now limited
+       to 20 entries
+     - changed the formatting of the depencency list on dist pages to be
+       more readable
+     - updated the stylesheet to the latest version
+
+     [ BUGFIXES ]
+     - the server does not crash anymore while loading a dist that has
+       dependencies that are unknown to the server
+     - selecting the target for a package page is now a bit less naive so
+       duplicate files don't cause wrong pages to be loaded. RT 44196
+
+     [ CHANGES ]
+     - using Capture::Tiny now instead of IO::Capture
+
+     [ GENERAL CLEANUP ]
+     - Perl::Tidy and various git preparations applied
+     - some refactorings to a more MVC-like structure and to remove some
+       performance-problematic algorithms
+
+0.50 Sat Jan 12 16:37:15 GMT 2011
+     - enabled use of the checksum files to get file dates
+     - switched out the self-built mini cpan with ANDK's
+     - handling of link generation for cpan ids with missing mail entries
+       degrades gracefully now
+
+0.49 Sat Jan 12 14:59:24 GMT 2011
+     - updated manifest to include test files in dist
+
+0.48 Sat Jan 12 12:52:57 GMT 2011
+     - tests now come with their own CPAN::Mini and stay in the test dir
+
+0.47 Sat Jan 11 23:00:00 GMT 2011
+     - fixed redirect urls on windows
+
+0.46 Sat Jan 11 22:15:48 GMT 2011
+     - removed dependency on Perl6::Say
+     - generated internal links now have an implicit path
+
+0.45 Wed Apr  8 14:54:22 BST 2009
+     - show recent changes with modern CPAN::Mini
+     - auto focus search box on homepage (patch by mintywalker)
+     - display 'repository' metadata (patch by tokuhirom)
+
+0.44 Sat Mar 28 11:19:48 GMT 2009
+     - autogenerate the CSS and Images template files
+     - use Text::Unidecode so that searching for Leon Brocard works
+     - fix bug to do with "buffy -test" not showing modules
+
+0.43 Thu Sep 18 17:14:50 BST 2008
+     - add an abstract to the Makefile.PL
+     - add a human-readable license
+     - make the Makefile.PL non-executable
+
+0.42 Sun Sep  7 09:31:44 BST 2008
+     - add a documentation section to the distribution page
+       (patch by tokuhirom)
+     - hide sections on the distribution page without any content
+
+0.41 Thu Aug 28 15:39:02 BST 2008
+     - drop the header font size a little
+     - refactored out a bunch of methods, turned into calls to
+       direct_to_template (patch by markf)
+     - remove useless commented out code (patch by markf)
+     - correct out of date comment (patch by markf)
+     - refactored the skipping into the WebserverTester, avoided
+       starting the webserver twice in simple.t, made simple.t
+       ascii not utf8 (patch by markf)
+     - view anything.PL as raw. This is because we want Makefile.PL
+       and Build.PL marked up as perl, not viewed as pod (patch
+       by markf)
+     - unbreak bonjour publishing (patch by miyagawa)
+     - move the archive code into Archive::Peek and require it, with
+       the bonus of being able to explore distributions which are
+       packaged as .zip files
+
+0.40 Fri Aug 22 09:24:54 BST 2008
+     - improve the test suite (patch by markf)
+     - detect installed modules properly (patch by rjbs)
+     - index CamelCase distributions and modules so that you can
+       search for both "camel", "case" and "camelcase"
+     - use PAUSE names if 00whois.xml is mirrored (patch by martijn)
+     - add info like email/homepage and some links to other
+       cpan-related pages for the author (patch by martijn)
+     - make an empty search give "No results found", rather than
+       an error (noticed by corion)
+     - make the webserver work as a local CPAN mirror so that you can
+       point CPAN or CPANPLUS at it (idea by markf)
+     - refactor downloading distributions to use the CPAN codepath
+
+0.39 Tue Aug 19 08:27:37 BST 2008
+     - make a single key from the license text and the license url
+       from resources instead of displaying both seperately (patch
+       by martijn)
+     - sort dependencies
+     - narrow down the search results based on educated guesses based
+       on the search query (patch by martijn)
+     - use Archive::Tar if installed, otherwise external tar
+       (patch by corion)
+     - display the installed version of a distribution (patch by
+       corion)
+     - add an "Install" button, very alpha (patch by corion)
+     - make /dist/Some-Distname work and extract redirect and 404
+       support into their own methods (patch by jesse)
+     - a more CPAN::Mini::Webserver specific banner at startup
+       (patch by jesse)
+     - extract the code used to render an item in the distro list
+       and remove redundant filename prefix (patch by jesse)
+     - require Parse::CPAN::Packages 2.28 to reduce warnings (patch
+       by tokuhirom)
+     - take 'use CPAN::Mini::Webserver' out of eval() so the
+       compliation failure is more obvious and doesn't cause issues
+       (patch by miyagawa)
+     - add links to cpantesters, cpanforum, cpanratings and RT
+       (patch by martijn)
+     - while showing distribution, split up files into categories
+       (patch by martijn)
+     - encode images with Base64 and ship the pod test
+
+0.38 Mon Aug 18 09:15:25 BST 2008
+     - fix bug which repeated metadata (spotted by claes)
+     - remove unnecessary "use Term::ProgressBar::Quiet;"
+
+0.37 Fri Aug 15 09:37:46 CEST 2008
+     - show metadata on distribution pages (patch by martijn)
+     - port can now be configured with --port command line option
+       (thanks to tokuhirom, miyagawa, martijn)
+     - does Bonjour publishing if HTTP::Server::Simple::Bonjour is
+       installed (miyagawa)
+     - added /download links to individual files and tarballs
+       (thanks to miyagawa)
+     - highlight perl files in lib, t and hide files in inc
+       (thanks to tokuhirom)
+
+0.36 Thu Aug 14 16:20:53 CEST 2008
+     - improve searching, you can now search for "buffy -test"
+     - make links to modules in the pod and source point back
+       to minicpan_webserver instead of to search.cpan.org
+       (patch by martijn)
+     - make code highlighting darker
+     - change the port to 2963 (thanks to clkao)
+     - syntax highlight *.t files (thanks to mfowler)
+
+0.35 Tue Aug 12 07:30:28 BST 2008
+     - remove failing pod.t test due to bugs in Pod::Simple
+       (spotted by rsavage)
+     - handle *.tgz as well as *.tar.gz (patch by rsavage)
+
+0.34 Fri Aug  8 18:00:32 BST 2008
+     - mention the subversion repository and the mailing list
+     - require Template::Declare 0.29 (spotted by evdb)
+     - require HTTP::Server::Simple 0.34 (spotted by ranguard)
+     - added favicon
+     - hide POD errors
+     - add an opensearch plugin (such as Firefox's search bar)
+     - skip tests unless there is an existing mirror
+     - fix package links to go to a best-guess filename (and tests)
+
+0.33 Fri Aug  8 08:00:12 BST 2008
+     - require at least CPAN::Mini 0.565 as we need CPAN::Mini::App
+       (noticed by bricas)
+     - glob the local directory name (like CPAN::Mini does) to make
+       ~/my-little-cpan work (patch by Andy Armstrong)
+
+0.32 Sat Aug  2 19:27:12 BST 2008
+     - initial release

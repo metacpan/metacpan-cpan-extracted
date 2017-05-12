@@ -1,0 +1,73 @@
+NAME
+    CGI::Session::ODBC - ODBC driver for CGI::Session
+
+VERSION
+        Version 0.50
+
+SYNOPSIS
+        use CGI::Session;
+        $session = new CGI::Session("driver:ODBC", undef, { Handle => $dbh });
+
+    For more examples, consult the CGI::Session manual.
+
+DESCRIPTION
+    CGI::Session::ODBC is a CGI::Session driver to store session data in any
+    ODBC-capable database. To write your own drivers for "CGI::Session",
+    please refer to the CGI::Session manual.
+
+USAGE
+    To store session data in the ODBC-compliant database, you must first
+    create a suitable table for your session data to live. In many
+    instances, the following SQL will accomplish this:
+
+        CREATE TABLE sessions (
+            id CHAR(32) NOT NULL,
+            a_session TEXT NOT NULL
+        );
+
+    You can add any number of additional columns to the table, but the
+    columns "id" and "a_session" are required as defined above. If you want
+    to store the session data in a table other than "sessions", you will
+    also need to specify the TableName attribute as an argument:
+
+        use CGI::Session;
+
+        $session = new CGI::Session("driver:ODBC", undef,
+            { Handle => $dbh, TableName => 'my_sessions' });
+
+    There are no special provisions made for row-level locking. ODBC is
+    intended to be platform independent, and to the best of the author's
+    knowledge at the time of this writing, there is no platform independent
+    manner of implementing row locking. Please contact the author with your
+    experiences with this module in that regard.
+
+SEE ALSO
+    *   CGI::Session - CGI::Session manual
+
+    *   CGI::Session::Tutorial - extended CGI::Session manual
+
+    *   CGI::Session::CookBook - practical solutions for real life problems
+
+    *   "RFC 2965" - "HTTP State Management Mechanism" found at
+        ftp://ftp.isi.edu/in-notes/rfc2965.txt
+
+    *   CGI - standard CGI library
+
+    *   Apache::Session - another fine alternative to CGI::Session
+
+COPYRIGHT
+    Copyright (C) 2003-2004 by Jason A. Crome. All rights reserved.
+
+    This library is free software and can be modified and distributed under
+    the same terms as Perl itself.
+
+AUTHOR
+    Jason A. Crome "<cromedome@cpan.org>".
+
+CREDITS
+    This module is directly based on CGI::Session::PostgreSQL by Cosimo
+    Streppone, and indirectly based on CGI::Session::MySQL module by Sherzod
+    Ruzmetov.
+
+    Many thanks to Rhesa Rozendaal for the placeholder patch.
+

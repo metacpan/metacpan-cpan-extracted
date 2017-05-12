@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: dd46
+registers:
+  AF: 51032
+  AF_: 0
+  BC: 36137
+  BC_: 0
+  DE: 26354
+  DE_: 0
+  HL: 10735
+  HL_: 0
+  I: 0
+  IX: 23751
+  IY: 16509
+  PC: 3
+  R: 2
+  SP: 0

@@ -1,0 +1,7 @@
+#!/usr/local/bin/perl -w
+
+	use Derived;
+
+	$x=Derived->new();
+
+print "";

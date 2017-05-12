@@ -1,0 +1,28 @@
+---
+abstract: 'Catalyst plugin for scrubbing/sanitizing html'
+author:
+  - 'Hideo Kimura, <hide@hide-k.net<gt>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-HTML-Scrubber
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst::Runtime: 5.71001
+  HTML::Scrubber: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hidek/Catalyst-Plugin-HTML-Scrubber.git
+version: 0.02

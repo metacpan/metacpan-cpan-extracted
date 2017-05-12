@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 19
+  16087:
+    - 234
+name: cb13
+registers:
+  AF: 52736
+  AF_: 0
+  BC: 40727
+  BC_: 0
+  DE: 57640
+  DE_: 0
+  HL: 16087
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

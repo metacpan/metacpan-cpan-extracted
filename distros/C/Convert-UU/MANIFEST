@@ -1,0 +1,12 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/Convert/UU.pm
+puudecode
+puuencode
+t/ext-uu.t
+t/pod.t
+t/podcover.t
+t/uu.t
+META.yml                                 Module meta-data (added by MakeMaker)

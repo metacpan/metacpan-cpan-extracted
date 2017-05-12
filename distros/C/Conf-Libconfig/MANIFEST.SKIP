@@ -1,0 +1,17 @@
+^tmp
+\.swp$
+~$
+^blib
+^smerge$
+^Makefile$
+\.old$
+\.c$
+\.o$
+pm_to_blib
+\.bak$
+\.git*
+po/foo\.po$
+po/meta\.po$
+t/tmp
+^cover_db
+^Conf-Libconfig-

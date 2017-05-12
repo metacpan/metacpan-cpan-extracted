@@ -1,0 +1,9 @@
+TODO list for Config::ApacheExtended
+
+- add support for cummulative values
+	(i.e. add to instead of overwriting values)
+
+- rework the grammar file, to move some of the validation/substitution features into actions in the grammar
+
+- add support in the data structure and methods for access to the
+	extra parameters of a block statement

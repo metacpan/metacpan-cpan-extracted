@@ -1,0 +1,14 @@
+Changes
+lib/Commands/Guarded.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02nullop.t
+t/03trivial.t
+t/04exception.t
+t/05sanity.t
+t/06rollback.t
+t/07doforeach.t
+t/08no-using.t

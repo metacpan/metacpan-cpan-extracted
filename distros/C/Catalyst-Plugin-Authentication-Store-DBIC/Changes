@@ -1,0 +1,69 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication::Store::DBIC
+
+0.11 2008-07-16
+    - Make deprecation notice point to the right damn module
+      (Catalyst::Authentication::Store::DBIx::Class)
+
+0.10 2008-07-03
+    - Add deprecation notice in favour of 
+      Catalyst::Plugin::Authentication::Store::DBIx::Class
+
+0.09 2007-09-13
+    - remove old DBIC class data tests
+    - force DBIx::Class and Catalyst::Model::DBIC::Schema pre-reqs
+    - fix broken CDBI code due to changes in 0.08
+    - cleaned up how components are loaded from values specified in the config
+
+0.08 2007-09-06
+    - Made $c->user->id return the first field of user_field, rather than whatever was passed in.
+    - Lazy fetching of user_obj
+    - Switch to Module::Install
+    - Skip 07auth-sessions.t unless Catalyst::Plugin::Session::State::Cookie
+      is installed (RT #28573)
+    - Skip 06auth-hashed.t unless Digest::SHA1 is installed (RT #29090)
+    - Added Class::Accessor::Fast to prereq (RT #22424)
+
+0.07 2006-06-30 01:08:47 
+    - make the User class stringify to the user id
+    - documentation fixes
+    - move most CDBI-specific code into its own class (User::CDBI)
+    - better DBIx::Class vs. Class::DBI detection
+    - add session_data support and session_data_field option
+    - add salted_hash support (patch from Russell Jenkins)
+
+0.06  2006-04-20 10:36:00
+    - Die on eval error in Backend.
+    - update documentation
+    - allow multiple username fields
+    - add auto_create_user and auto_update_user options
+
+0.05002 2006-03-03 19:16:38
+    - fix oversight that prevented fully-specified models from working when using
+      Catalyst::Model::DBIC::Schema classes
+
+0.05001 2006-03-03 18:30:00
+    - update author and email
+    - clean up code a bit
+
+0.05    2006-03-02 20:36:00
+    - make role_class and user_class auto-vivify to corresponding DBIC
+      resultset when possible
+    - allow direct access to DBIC object columns via $c->user->column
+      (the object itself is $c->user->obj) and deprecated old ways to get object
+    - fix test suite -- should now pass, and hopefully not fail just because
+      don't have some modules, such as Class::DBI or Catalyst::Model::DBIC::Schema
+    - rename real_user_class to catalyst_user_class
+    - use recordsets rather than depend on list context
+    - return undef rather than complain when password is called without user
+
+0.04    2005-12-13 22:30:00
+    - Fixed Build.PL, added dep on Set::Object.
+
+0.03    2005-12-04 22:03:00
+    - Roles passthrough check interface has changed
+
+0.02    2005-12-03 18:00:00
+    - Fixed Auth and Authz::Roles dependencies.
+
+0.01    2005-12-02 20:35:00
+    - initial release

@@ -1,0 +1,4 @@
+Revision history for Perl extension Catalyst::Plugin::Session::Store::DOD
+
+0.01    2008-04-30
+        - initial release based off of v0.13 of C::P::S::Store::DBI by Andy Grundman

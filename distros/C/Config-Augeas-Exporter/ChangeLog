@@ -1,0 +1,58 @@
+2011-02-28  Raphaël Pinson v1.0.0
+
+	* Release 1.0.0.
+	* Add <value> subnodes in the XML to properly
+	  make the distinction between value-less nodes
+	  and empty values.
+
+2011-02-27  Raphaël Pinson v0.7
+
+	* Bugfix release.
+	* Ignore stat nodes in import.
+	* Improve unit tests.
+
+2011-02-27  Raphaël Pinson v0.6
+
+	* Make path an array in to_xml().
+	* Make --path a multiple value option in aug2xml.
+	* Fix passing of @paths and @excludes and default
+	  values in aug2xml.
+	* Add file_stat to to_xml() and stat_to_xml() sub.
+	* Add --include-file-stat option to aug2xml.
+	* Move getting aug_root to new().
+	* Update POD.
+	* Do not trigger is_file and file_stat when analyzing
+	  /augeas//error.
+
+2011-02-27  Raphaël Pinson v0.5
+
+	* Add create_dirs method to from_xml()
+	  to create missing directories.
+	* Add --create-dirs option to xml2aug
+	  to call create_dirs in from_xml().
+	* Module now depends on File::Path.
+	* Use create_dirs in t/02-to_xml.t.
+
+2011-02-26  Raphaël Pinson v0.4
+
+	* Add check_is_file calls to reduce the amount
+	  of calls to Augeas
+	* Improve Build.PL and remove cleanup from t/02-to_xml.t
+
+2011-02-26  Raphaël Pinson v0.3.0
+
+	* Allow reading from STDIN in xml2aug
+	* Add -f option to aug2xml to specify export file
+	* Test to_hash call
+
+2011-02-26  Raphaël Pinson v0.2.0
+
+	* Fix missing dependencies in Build.PL
+	* Fix missing from_xml export
+	* Change maintainer email
+	* Add tests
+	* Add augeas-from directory to run tests
+
+2011-02-25  Raphaël Pinson v0.1
+
+	* Original version.

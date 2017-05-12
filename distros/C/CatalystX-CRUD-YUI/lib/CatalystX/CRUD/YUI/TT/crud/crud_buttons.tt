@@ -1,0 +1,16 @@
+<div id="crud-buttons">
+[% IF c.controller.can_write(c) # see note in edit.tt per CX::CRUD 0.40 %]
+ <div class="buttons" style="float:left">
+ <input id='cxc-save-button' class="button" type="submit" name="save" value="Save" />
+ </div>
+ <div class="buttons" style="float:right">
+ <input id='cxc-reset-button' class="button" type="reset" value="Reset" />
+ [% IF object_id && !no_delete %]
+  <input id='cxc-delete-button' class="button" type="submit" name="_delete" value="Delete"
+         onclick="if(confirm('Really delete?')){
+           YAHOO.util.Dom.get('x-tunneled-method').value='DELETE';
+           return true; } else { return false; }" />
+ [% END %]
+ </div>
+[% END # can_write %]
+</div><!-- end #crud-buttons -->

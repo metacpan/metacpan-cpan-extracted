@@ -1,0 +1,1 @@
+[% IF warnings.size != 0 %]<ul>[% FOREACH warning = warnings %]<li>[% warning %]</li>[% END %]</ul>[% END %]

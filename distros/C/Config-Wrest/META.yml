@@ -1,0 +1,20 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Config-Wrest
+version:      1.036
+version_from: lib/Config/Wrest.pm
+installdirs:  site
+requires:
+    Any::Template:                 0
+    Carp:                          0
+    Cwd:                           0
+    Data::Dumper:                  0
+    File::Basename:                0
+    File::Slurp::WithinPolicy:     0
+    Getopt::Std:                   0
+    Log::Trace:                    0
+    Test::Assertions:              0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

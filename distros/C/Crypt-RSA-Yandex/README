@@ -1,0 +1,38 @@
+NAME
+    Crypt::RSA::Yandex - Perl binding to modified RSA library (yamrsa) for
+    encrypting Yandex auth token
+
+SYNOPSIS
+        use Crypt::RSA::Yandex;
+
+        my $crypter = Crypt::RSA::Yandex->new;
+        $crypter->import_public_key($pubkey);
+
+        my $encrypted = $crypter->encrypt($text);
+    
+        # or 
+        use Crypt::RSA::Yandex 'ya_encrypt';
+        my $encrypted = ya_encrypt($pubkey,$text);
+
+DESCRIPTION
+  FUNCTIONAL INTERFACE
+    None by default.
+
+    $encrypted_text = ya_encrypt($key, $text)
+
+  OOP INTERFACE
+    $crypter = Crypt::RSA::Yandex->new()
+    $self->import_public_key($key)
+    $encrypted_text = $self->encrypt($text)
+
+SEE ALSO
+    http://api.yandex.ru/fotki/doc/overview/authorization-token.xml
+
+AUTHOR
+    Vladimir Timofeev, <vovkasm@gmail.com>
+
+    Mons Anderson, <mons@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2010 by Rambler
+

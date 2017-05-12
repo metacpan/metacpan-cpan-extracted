@@ -1,0 +1,32 @@
+Chemistry::File::QChemOut Version 0.10
+======================================
+
+This module reads Q-Chem output files. It automatically registers the
+'qchemout' format with Chemistry::Mol, so that Q-Chem outuput files may be
+identified and read using Chemistry::Mol->read().
+
+The current version of this reader simply extracts the cartesian coordinates
+and symbols from the Q-Chem outuput file. All other information is ignored.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Chemistry::Mol        0.24
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Ivan Tubert-Brohman <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

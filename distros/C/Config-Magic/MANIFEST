@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Config-Magic.t
+lib/Config/Magic.pm
+lib/Config/Magic/Grammar.pm
+META.yml                                 Module meta-data (added by MakeMaker)

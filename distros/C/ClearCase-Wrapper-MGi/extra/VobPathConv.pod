@@ -1,0 +1,85 @@
+=head1 NAME
+
+VobPathConv.pod -- Convert VOB tags and paths from unix to the local region
+
+This module is needed especially to convert to Windows, paths defined in the
+reference unix region (this of the registry server).
+
+=head1 SYNOPSYS
+
+Only five functions are exported:
+
+=over 5
+
+=item uxtag2local
+
+This function assumes a registered vob tag, and returns the equivalent tag
+in the local region.
+In case the input parameter is not a vob tag, it returns an empty string.
+Note however that all processing is skipped if the local region matches the
+reference unix region: in that case, the input path is returned as such with
+no check whatsoever.
+
+=item uxpath2local
+
+This function assumes a path within a vob. It extracts the vob tag, converts
+it, and based on this, reconstructs the equivalent path in the local region.
+Note that it doesn't attempt to add a view prefix, or to check in any way that
+either of the paths actually exists or is reachable.
+The function returns an empty string in the case the path could not be found
+to be in any registered vob (with the same restriction as above)
+
+=item uxpath2localtag
+
+This function takes a path, and returns the vob tag in the local region.
+Contrarily to the other two, this one actually works even in the reference
+unix region, even if it acts there as a suboptimal replacement for
+C<ct des -s vob:path>.
+
+=item winpath2ux
+
+This function works backwards from the former ones: the path it takes
+is a local Windows one (in a vob).
+It returns the equivalent one in a target unix region (this of the
+registry host, unless a host was explicitely passed as argument).
+
+The path accessibility is not tested beyond the validity of the vob
+tag: the function is intended to be usable on non reachable paths.
+
+Note that the function is only meant to be used from a Windows host,
+and with a local path: the module will not attempt to get the Windows
+region (out of the list of registered regions--there could even be
+several).
+
+=item localtag2tgt
+
+This function is on one hand the counterpart of the previous one for
+vob tags. This means however that it is not restricted to work
+exclusively on Windows tags.
+
+On an other hand, if the target region matches the local one, the
+input tag is tested for existence I<as a directory> (this is a
+compromise for performance--some corner cases might be considered: the
+path might not be a tag; the vob might not be mounted and the mount
+point might not exist).
+
+=back
+
+=head1 DETAILS
+
+The module is designed to be independent from any local configuration.
+The functions except I<localtag2tgt> rely upon the following
+assumptions:
+
+=over 2
+
+=item The local registry server runs a variant of unix -- i.e. uses a path
+separator of C</>.
+
+=item The vob tags offered as input parameters are registered in the region
+of the registry server.
+This may not be true is there are several unix regions.
+
+=back
+
+The implementation relies only on C<lsvob> and vob C<uuid>s.

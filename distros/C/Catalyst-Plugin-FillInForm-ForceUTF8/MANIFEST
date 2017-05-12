@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+t/pod.t
+Makefile.PL
+lib/Catalyst/Plugin/FillInForm/ForceUTF8.pm
+t/01_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

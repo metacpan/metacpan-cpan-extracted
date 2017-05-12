@@ -1,0 +1,29 @@
+Revision history for Catmandu-BibTeX
+
+0.08  2017-01-17 08:01:25 CET
+  - support importing authors/editors as if,
+    i.e. single authors will be SCALARs and multiple authors
+    will be ARRAYs
+
+0.07  2015-08-26 10:29:12 CEST
+  - remove latex_encode, leave utf-8 untouched
+
+0.06  2014-09-30 09:36:49 CEST
+  - well, see 0.05
+
+0.05  2014-09-29 18:16:59 CEST
+  - moved to milla
+  - tests + badges
+
+0.04  2014-03-04
+  - date expansion
+  - default citekey starts at 1
+  - document default citekey
+  - fix roundtripping
+  - add project links to build script
+
+0.03  2013-06-24
+  - BibTeX importer
+
+0.02  2013-06-12
+  - initial release

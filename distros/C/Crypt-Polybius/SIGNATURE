@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 fba868f013afe10f48292a7a12963b164d7e9854 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 cf66f22e8a9e7adfa6d52316192bcca413531a8c Changes
+SHA1 e47b162ad09076358375c6825dfe4600fa57c73b INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 5c325d3751e34410d38d4db3a91c6bdad6aaebe6 MANIFEST
+SHA1 b38aecefa07ecdca604dc7f5f070f36e32b68189 META.json
+SHA1 b2f2d61e8278718230c8a81613e9084865d69da3 META.yml
+SHA1 4de26f0e3a738ea0d759bbc2b4e2afefe50bb9e4 Makefile.PL
+SHA1 0288e4df776e13838e4ed6434ac29fdf51c85227 README
+SHA1 3c41bf80e6387202f609319ad426df760feb3cc8 dist.ini
+SHA1 a1561b2622f50f315cf6b50383a9bdcae9d1a559 doap.ttl
+SHA1 e708f8770bc93f3dc5bab3f6436afa5cb7190d35 lib/Crypt/Polybius.pm
+SHA1 65dc962d33bb6f35fdf7e7e352acf08acc94dd7a lib/Crypt/Polybius/Greek.pm
+SHA1 3bf335e72b8d03161349e814c535eb39d7d9b6ef lib/Crypt/Role/CheckerboardCipher.pm
+SHA1 05b7f9aceb21068b40e4ee378155d72743328d12 lib/Crypt/Role/GreekAlphabet.pm
+SHA1 09e865c3a64b73dca12669d4f24979bdef1acad8 lib/Crypt/Role/LatinAlphabet.pm
+SHA1 2810131aaf75cd7e101ff53287ffd0605c809660 lib/Crypt/Role/ScrambledAlphabet.pm
+SHA1 81e05fd40bbed7b6c597dfb08adc4903c88eecd7 t/01basic.t
+SHA1 609b9fc39f3a176c7405a8912cfd19801e4142b2 t/02greek.t
+SHA1 84449f39d90dd590150f5ef07a61a4b441784cc1 t/03scrambled.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlOB8IgACgkQzr+BKGoqfTkxCgCfWgXl/FcG9mrKSKeMhQE14uvG
+z84An3/MfoaUOkbtY0VktEUKAKzKoLWQ
+=8FC5
+-----END PGP SIGNATURE-----

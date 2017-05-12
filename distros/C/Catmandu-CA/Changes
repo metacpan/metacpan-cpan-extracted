@@ -1,0 +1,23 @@
+Revision history for Catmandu-CA
+
+0.06  2017-02-15 14:14:15 UTC
+	- Added support for field_list as array
+
+0.05  2017-02-15 13:27:00 UTC
+        - Added support for ->each()
+
+0.04  2017-01-17 13:27:56 UTC
+	- Removed Data::Dumper
+	- Bugfix for empty field_list
+
+0.03  2017-01-17 13:22:47 UTC
+        - Added language switch
+        - Added a field_list
+        - Updated documentation
+        - Moved all functionality to Store::CA & Store::CA::Bag and made Store::VKC inherit from Store::CA
+
+0.02  2017-01-13 15:08:08 UTC
+        - Added update/add/delete for Catmandu::Store::CA
+
+0.01  2017-01-13 14:03:24 UTC
+        - Initial release

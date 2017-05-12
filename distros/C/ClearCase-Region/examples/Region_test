@@ -1,0 +1,113 @@
+#!/usr/local/bin/perl -w  
+
+use strict;
+
+use Getopt::Long;
+
+use ClearCase::Region;
+use Log::Log4perl;
+
+sub mainprog
+{
+	use strict;
+	use Carp;
+
+	my(%options			) = ();		# command line parameters
+	my($retval			) = 0;
+	my($obj				) = "";
+	my($stg				) = "";
+	my($i				) = 0;
+	my($name			) = Region->name();
+	my($myname			) = "";
+	my($subregion		) = "";
+	my($subregion_name	) = undef;
+	my(@subregions		) = Region->subregions();
+	my(@subregion_flags	) = ();
+	my($blanks			) = "                                 ";
+	my(@vobs			) = ();
+	my($vobdir			) = "";
+	my($logger			) = "";
+	my($configFile		) = "";
+	my($configFile_found) = 0;
+	my($dir				) = "";
+	my($sum				) = 0;
+	my($flg				) = 0;  
+	
+	foreach $dir (@INC) {
+		if ( -f "$dir/Region_test.conf" ) {
+			$configFile = "$dir/Region_test.conf";
+			$configFile_found = 1;
+			last;
+		}
+	}
+	croak("Error: Region_test.conf not found in any \@INC directory\n")
+		unless $configFile_found;
+	
+	Log::Log4perl->init($configFile);
+	$logger = Log::Log4perl->get_logger("Main");
+	
+	$logger->info("Current region is $name\n");
+	if ($#subregions < 0) {
+			$logger->error("No subregions are defined for $name\n");
+			exit 1;
+	}
+	else {
+		$logger->info("The subregions are @subregions\n");
+	}
+	
+	$i = 0;
+	foreach $subregion (@subregions) {
+		$subregion_flags[$i] = 0;
+		$options{$subregion} = \$subregion_flags[$i];
+		$i++;
+		@vobs = Region->vobs($subregion);
+		$logger->info("\nFor subregion name \'$subregion\' all vobs are: @vobs\n");
+		$vobdir = Region->vobdir($subregion);
+		$logger->info("\nFor subregion name \'$subregion\' the VOB directory is: $vobdir\n");
+	}
+	
+	#
+	# GetOptions is built-in perl function, will deal with abbrev. on cmd line
+	#
+	$retval = GetOptions(%options);
+	if ($retval == 0) {
+		$logger->error("Error in parameter specification.\n");
+		exit 1;
+	}
+	
+	#
+	# Determine if the subregion was set on the command line
+	# 
+	$i = 0;
+	foreach $flg (@subregion_flags) {
+		$sum += $flg;
+		if ( $flg > 0 ) {
+			$subregion_name = $subregions[$i];
+		}
+		$i++;
+	}
+
+	#
+	# Determine if more than one subregion was set on command line
+	#
+	if ($sum > 1) {
+		$logger->error("only one region option can be specified.\n");
+		exit 1;
+	}
+
+	for ($i = 0 ; $i <= $#subregions ; $i++) {
+		$stg = $subregions[$i] . $blanks;
+		$stg = substr($stg, 0, 17);
+		$logger->info("Got $stg : $subregion_flags[$i]\n");
+	}
+	
+	$obj = Region->new($subregion_name);
+	if (! defined $obj) {
+		$logger->error("Error in parameter specification.\n");
+		exit 1;
+	}
+	$myname = $obj->subregion();
+	$logger->info("\nCreated Region object for $myname\n");
+}
+
+mainprog;

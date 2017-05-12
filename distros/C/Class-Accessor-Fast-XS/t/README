@@ -1,0 +1,2 @@
+most of tests comes from Class::Accessor with slight changes
+t/no-aliasing.t is a new one

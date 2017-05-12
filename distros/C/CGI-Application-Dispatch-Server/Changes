@@ -1,0 +1,21 @@
+
+0.53 Fri Jan  1 18:50:33 EST 2010
+
+  No code changes.
+  - Add explicit note that CGI::Application::Server is now recommended instead.
+
+0.52 Sat Jul  7 08:48:45 EDT 2007
+
+  - Removed debugging statement accidently left in the code.
+
+0.51 Fri Jul  6 22:58:09 EDT 2007
+  - Params::Validate added as required module in Build.PL  
+    
+0.50
+ - Support for using an CGI::Application::Dispatch subclass to provide "dispatch_args" 
+   ( Mark Stosberg )
+ - Serving static content works now, including a new document_root option (Mark Stosberg)
+
+0.03 ?
+  public release by George Hartzell
+

@@ -1,0 +1,155 @@
+Sat Jun 12 13:17:48 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* types.cc: Try to fix up things to deal with
+	changes in the way memory management for 
+	the >>= operators for Any work.
+	
+	* server.cc (build_args): Create the argument list
+	as empty, since the length increases when we add().
+
+	* types.cc: Consistently use true/false, not TRUE/FALSE
+
+	* types.cc: Fixed to account for the fact that <<= no longer
+	returns a boolean value but void as in CORBA spec.
+
+	* MICO.xs: Update exception handling for CORBA-standard
+	exception handling in MICO-2.2.7.
+
+Sun May 23 13:25:13 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* typemap (CORBA) types.cc server.cc dispatcher.cc: 
+	Clean up warnings
+
+Fri Apr 30 21:22:23 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* MICO.pm: Up version to 0.5.0
+
+Tue Apr 27 09:06:15 1999  Owen Taylor  <otaylor@redhat.com>
+
+        * ir_browser/*: New example program - an interface
+	browser using Gtk.
+	
+	* MICO.xs: Added complete set of functions for
+	CORBA::TypeCode.
+
+Mon Apr 26 23:30:41 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* MICO.pm (AUTOLOAD): Fixed bug in AUTOLOAD mechanism
+	that affected loading the same interface multiple
+	times. Improve error message for not-found methods.
+
+	* interfaces.cc (pmico_init_interface): Fix bug
+	where already loaded base classes didn't get added to
+	@...::ISA.
+
+	* MICO.pm (AUTOLOAD): Fix up syntax for calling
+	method so that it works when the newly loaded
+	method is in a base class.
+
+Sat Apr 24 13:05:00 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* MICO.pm: Up the version to 0.4.9.
+
+	* MICO/mapping.pod (MICO): Clarified that scopes
+	do not inherit in Perl.
+
+	* interfaces.cc (pmico_load_contained): Load contained
+	interfaces recursively.
+
+	* interfaces.cc constsub.c MICO.xs: Added support
+	for preloading arbitrary containers and
+	support for constants.
+
+Sat Apr 24 05:00:47 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* MICO.xs: Added a catch block for _get_interface,
+	since that goes over the wire and can generate
+	system exceptions.
+
+	* MICO/Fixed.pm MICO.pm: Cleanups to removing warnings
+	with 5.004.
+
+	* Makefile.PL pmico.h: Add compatibility #defines
+	for PL_na, etc, for 5.004
+
+Sun Apr 11 20:59:34 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* MICO.xs pmico.h errors.cc: Catch POA exceptions, convert
+	to Perl exceptions.
+
+	* server.cc MICO.pm: Support ForwardRequest exceptions
+	for ServantActivators
+
+Sun Apr 11 02:02:20 1999  Owen Taylor  <otaylor@redhat.com>
+
+        * tictactoe: Update to POA.
+	
+	* tictactoe (make_ui): Add hack to get around bug
+	in current Gtk/Perl where transparent color can't
+	be left undef.
+
+Fri Apr  9 03:26:37 1999  Owen Taylor  <otaylor@redhat.com>
+
+	* types.cc: Updates for MICO-2.2.6
+
+Fri Apr 24 00:31:05 1998  Owen Taylor  <otaylor@gtk.org>
+
+	* MICO.xs: CORBA::ORB::bind() - fixed bugs handling object
+	tag lengt.
+
+	* shlib/ : Test of library activation mode
+
+Fri Apr 24 00:31:00 1998  Owen Taylor  <otaylor@gtk.org>
+
+	* CORBA-MICO-0.2 released
+
+Thu Apr 23 19:38:28 1998  Owen Taylor  <otaylor@gtk.org>
+
+	* types.cc MICO.xs - Support for fixed,longlong,ulonglong and
+	longdouble types.
+	
+	* MICO/Fixed.pm - implementation of fixed point arithmentic
+	in terms of BigInt.pm
+	
+	* MICO/LongLong.pm ULongLong.pm LongDouble.pm - provide
+	overloading for extended types.
+	
+	* exttypes.{cc/h} : Functions to read/write longlong,
+	ulonglong and longdouble from strings. (Should use
+	library funcs, but don't know how portable that is)
+
+	* MICO.xs : Support the new CORBA-2.2 run()/shutdown(),
+	functions in mico-2.0.6.
+	
+Wed Apr  1 00:38:39 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* types.cc: Arrays
+
+	* MICO.xs true.cc server: Support for persistancy and bind()
+
+Sun Mar 29 01:05:23 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* client-activate: client example, but using micod
+	to activate server
+
+	* MICO.xs: CORBA::ORB::bind() implemented
+
+	* start-servers.sh: Start up micod as well. Add
+	an entry for client-activate
+
+Sat Mar 28 20:14:56 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* tictactoe: Peer-to-peer tictactoe game
+
+Sat Mar 28 20:14:21 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* MICO.xs gtkmico.[cc h]: Support for GtkDispatcher
+
+	* types.cc (pmico_instvars_get): Make sure that SV
+	is magical before calling mg_find.
+
+Thu Mar 26 23:22:10 1998  Owen Taylor  <owt1@cornell.edu>
+
+	* interfaces.cc: typecode_cache wasn't initialized
+	* types.cc: add String support
+

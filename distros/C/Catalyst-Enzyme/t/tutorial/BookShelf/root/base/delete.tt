@@ -1,0 +1,23 @@
+[% INCLUDE "header.tt" %]
+[% PROCESS "view_macros.tt" %]
+
+<div id="title">Delete [% crud.moniker %]</div>
+
+<form action="[% c.uri_for_controller('do_delete', item.id) %]" method="post">
+<fieldset>
+    <legend>[% crud.moniker | html %] '[% item | html %]'</legend>
+
+    [% form_view_item(item); %]
+
+    <span class="item_local_action">
+    <a href="[% c.uri_for_controller('edit', item.id) %]">Edit</a> | <a href="[% c.uri_for_controller('view', item.id) %]">View</a>
+    </span>
+
+    <input type="submit" value="Delete"/>
+</fieldset></form>
+
+<a href="[% c.uri_for_controller('add') %]">Add</a>
+<a href="[% c.uri_for_controller('list') %]">List</a>
+
+[% INCLUDE "footer.tt" %]
+

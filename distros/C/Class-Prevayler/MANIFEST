@@ -1,0 +1,12 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Class/Prevayler.pm
+lib/Class/Prevayler/CommandLogger.pm
+lib/Class/Prevayler/CommandRecoverer.pm
+lib/Class/Prevayler/SystemRecoverer.pm
+lib/Class/Prevayler/FileCounter.pm
+t/001_load.t
+Makefile.PL

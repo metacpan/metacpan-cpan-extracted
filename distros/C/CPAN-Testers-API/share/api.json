@@ -1,0 +1,274 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0",
+        "title": "CPAN Testers API",
+        "description": "API for CPAN Testers data"
+    },
+    "consumes": [ "application/json" ],
+    "produces": [ "application/json" ],
+    "schemes": [ "http" ],
+    "basePath": "/v1",
+    "tags": [
+        {
+            "name": "Release",
+            "description": "Per-release test summary data"
+        },
+        {
+            "name": "Upload",
+            "description": "CPAN uploads data"
+        }
+    ],
+
+    "paths": {
+        "/release": {
+            "get": {
+                "tags": [ "Release" ],
+                "operationId": "release_all",
+                "summary": "Get summary test report info about all CPAN releases",
+                "x-mojo-to": {
+                    "controller": "Release",
+                    "action": "release"
+                },
+                "responses": {
+                    "400": {
+                        "description": "The request or parameters are incorrect"
+                    },
+                    "200": {
+                        "description": "A list of release objects",
+                        "schema": {
+                            "type": "array",
+                            "title": "ReleasesArray",
+                            "items": { "$ref": "#/definitions/Release" }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/release/dist/{dist}": {
+            "get": {
+                "tags": [ "Release" ],
+                "operationId": "release_dist",
+                "summary": "Get summary test report info for releases of a distribution",
+                "x-mojo-to": {
+                    "controller": "Release",
+                    "action": "release"
+                },
+                "parameters": [
+                    { "$ref": "#/parameters/since" },
+                    {
+                        "name": "dist",
+                        "in": "path",
+                        "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/paths/~1release/get/responses/200" },
+                    "400": { "$ref": "#/paths/~1release/get/responses/400" },
+                    "404": {
+                        "description": "The distribution was not found"
+                    }
+                }
+            }
+        },
+
+        "/release/author/{author}": {
+            "get": {
+                "tags": [ "Release" ],
+                "operationId": "release_author",
+                "summary": "Get summary test report info for releases by an author",
+                "x-mojo-to": {
+                    "controller": "Release",
+                    "action": "release"
+                },
+                "parameters": [
+                    { "$ref": "#/parameters/since" },
+                    {
+                        "name": "author",
+                        "in": "path",
+                        "description": "The CPAN author name (like 'PREACTION')",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/paths/~1release/get/responses/200" },
+                    "400": { "$ref": "#/paths/~1release/get/responses/400" },
+                    "404": {
+                        "description": "The distribution was not found"
+                    }
+                }
+            }
+        },
+
+        "/upload": {
+            "get": {
+                "tags": [ "Upload" ],
+                "operationId": "upload_all",
+                "summary": "Get all uploads to CPAN",
+                "description": "This route gets uploads to CPAN. Asking for a WebSocket will subscribe to a feed of new uploads.",
+                "x-mojo-to": {
+                    "controller": "Upload",
+                    "action": "get"
+                },
+                "parameters": [
+                    { "$ref": "#/parameters/since" }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "The request or parameters are incorrect"
+                    },
+                    "200": {
+                        "description": "An array of objects describing uploads",
+                        "schema": {
+                            "type": "array",
+                            "title": "UploadsArray",
+                            "items": { "$ref": "#/definitions/Upload" }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/upload/dist/{dist}": {
+            "get": {
+                "tags": [ "Upload" ],
+                "operationId": "upload_dist",
+                "summary": "Get uploads for a dist",
+                "description": "This route gets uploads to CPAN for a specific distribution. Asking for a WebSocket will subscribe to a feed of new uploads.",
+                "x-mojo-to": {
+                    "controller": "Upload",
+                    "action": "get"
+                },
+                "parameters": [
+                    { "$ref": "#/parameters/since" },
+                    {
+                        "name": "dist",
+                        "in": "path",
+                        "description": "The CPAN distribution name (like 'CPAN-Testers-Schema')",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/paths/~1upload/get/responses/200" },
+                    "400": { "$ref": "#/paths/~1upload/get/responses/400" },
+                    "404": {
+                        "description": "The distribution was not found"
+                    }
+                }
+            }
+        },
+
+        "/upload/author/{author}": {
+            "get": {
+                "tags": [ "Upload" ],
+                "operationId": "upload_author",
+                "summary": "Get uploads for an author",
+                "description": "This route gets uploads to CPAN for the specific author. Asking for a WebSocket will subscribe to a feed of new uploads.",
+                "x-mojo-to": {
+                    "controller": "Upload",
+                    "action": "get"
+                },
+                "parameters": [
+                    { "$ref": "#/parameters/since" },
+                    {
+                        "name": "author",
+                        "in": "path",
+                        "description": "The CPAN author name (like 'PREACTION')",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": { "$ref": "#/paths/~1upload/get/responses/200" },
+                    "400": { "$ref": "#/paths/~1upload/get/responses/400" },
+                    "404": {
+                        "description": "The author was not found"
+                    }
+                }
+            }
+        }
+    },
+
+    "parameters": {
+        "since": {
+            "name": "since",
+            "in": "query",
+            "type": "string",
+            "format": "date-time",
+            "description": "Only send records that have been updated since the given date/time"
+        }
+    },
+
+    "definitions": {
+        "Release": {
+            "type": "object",
+            "title": "Release",
+            "description": "A summary of test reports for a single CPAN release",
+            "properties": {
+                "dist": {
+                    "type": "string",
+                    "description": "The distribution name"
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The distribution release version"
+                },
+                "author": {
+                    "type": "string",
+                    "description": "The CPAN ID of the author who released this version of this distribution"
+                },
+                "pass": {
+                    "type": "integer",
+                    "description": "The number of test passes for this release"
+                },
+                "fail": {
+                    "type": "integer",
+                    "description": "The number of test failures for this release"
+                },
+                "na": {
+                    "type": "integer",
+                    "description": "The number of NA results for this release, which means the release does not apply to the tester's machine due to OS, Perl version, or other conditions"
+                },
+                "unknown": {
+                    "type": "integer",
+                    "description": "The number of unknown reports for this release"
+                }
+            }
+        },
+
+        "Upload": {
+            "type": "object",
+            "title": "Upload",
+            "description": "A release to CPAN",
+            "properties": {
+                "dist": {
+                    "type": "string",
+                    "description": "The distribution name"
+                },
+                "version": {
+                    "type": "string",
+                    "description": "The distribution release version"
+                },
+                "author": {
+                    "type": "string",
+                    "description": "The CPAN ID of the author who released this version of this distribution"
+                },
+                "filename": {
+                    "type": "string",
+                    "description": "The filename on PAUSE, without the author directory"
+                },
+                "released": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time the file was released to CPAN, in UTC"
+                }
+            }
+        }
+
+    }
+}

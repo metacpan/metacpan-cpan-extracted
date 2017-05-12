@@ -1,0 +1,41 @@
+NAME
+    Catalyst::Plugin::Spark::Form - A simple plug-in to make forms
+    accessible quickly off the CTX.
+
+VERSION
+    version 0.01000002
+
+SYNOPSIS
+      use Catalyst qw/ Spark::Form /;
+
+      ...
+
+      sub action {
+        my ( $self, $ctx, @rest ) = @_;
+
+        $ctx->form('bar') # loads My::Project::Form::Bar or My::Project::F::Bar
+
+      }
+
+METHODS
+  form
+      $ctx->form( $formname )
+
+CREDITS
+    Code thrown together by James Laver <http://jameslaver.com>.
+
+    Code stolen from $c->controller.
+
+DISCLAIMER
+    The code mightn't work, but its not my fault if it doesn't. Will gladly
+    accept patches.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Kent Fredric.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

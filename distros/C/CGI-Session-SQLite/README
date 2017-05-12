@@ -1,0 +1,32 @@
+CGI/Session/SQLite version 1.00
+===============================
+
+$Id: README,v 1.1 2004/10/15 15:29:29 bmoyles Exp $
+
+CGI::Session::SQLite is a driver for CGI::Session allowing the use of a 
+SQLite database on the back-end.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+CGI::Session
+DBI
+DBD::SQLite
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Brian Moyles
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

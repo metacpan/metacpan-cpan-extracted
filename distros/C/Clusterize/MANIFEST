@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Clusterize.pm
+lib/Clusterize/Pattern.pm
+t/00-load.t
+t/01-basic.t
+t/03-clusterize.t
+t/99-pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

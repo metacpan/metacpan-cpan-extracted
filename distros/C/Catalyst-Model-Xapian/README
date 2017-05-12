@@ -1,0 +1,66 @@
+NAME
+    Catalyst::Model::Xapian - Catalyst model for Search::Xapian.
+
+SYNOPSIS
+        my ($it,$res)= $c->comp('MyApp::M::Xapian')->search(
+          $c->req->param('q'),
+          $c->req->param('page') ||0 ,
+          $c->req->param('itemsperpage')||0
+        );
+        $c->stash->{searchresults}=$res;
+        $c->stash->{iterator}=$it;
+ 
+DESCRIPTION
+    This model class wraps Search::Xapian to provide a friendly, paged
+    interface to Xapian (www.xapian.org) indexes. This class adds a little
+    extra convenience on top of the Search::Xapian class. It expects you to
+    use the QueryParser, and sets up some keywords based on the standard
+    omega keywords (id, host, date, month, year,title), so that you can do
+    searches like
+
+      'fubar site:microsoft.com'
+
+CONFIG OPTIONS
+    db  Path to the index directory. will default to <MyApp>/index.
+
+    language
+        Language to use for stemming. Defaults to english
+
+    page_size
+        Default page sizes for Data::Page. Defaults to 10.
+
+    utf8_query
+        Queries are passed as utf8 strings. defaults to 1.
+
+    order_by_date
+        Sets weighting to order by docid descending rather than the usual
+        BM25 weighting. Off by default.
+
+METHODS
+    new Constructor. sets up the db and qp accessors. Is called
+        automatically by Catalyst at startup.
+
+    search <q>,[<page>],[<page_size>]
+        perform a search using the Xapian QueryBuilder. expands the document
+        data using extract_data. You can override the page size per query by
+        passing page size as a final argument to the function. returns a
+        Data::Page object and an arrayref to the extracted document data.
+
+    prepare_enq <enq>
+        Prepare enquire object before getting mset. Allows you to modify
+        ordering and such in your subclass.
+
+    extract_data <item> <query>
+        Extract data from a Search::Xapian::Document. Defaults to using
+        Storable::thaw.
+
+    qp  Query Parser. The Search::Xapian::QueryParser object used to parse
+        the query.
+
+AUTHOR
+    Marcus Ramberg <mramberg@cpan.org>
+
+LICENSE
+    This library is free software . You can redistribute it and/or modify it
+    under the same terms as perl itself.
+

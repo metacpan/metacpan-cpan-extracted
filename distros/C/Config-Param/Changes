@@ -1,0 +1,157 @@
+=head1 Revision history for Config-Param
+
+=item * B<3.002000> (2015-12-10)
+
+=over 2
+
+=item - Try config file to include with .conf appended to match primary
+config file search behaviour. Search still does not use global paths, it
+is either absolute or relative to the including config file.
+
+=item - Detect config file inclusion loops and croak in that case.
+
+=item - Avoid modifying parameter definition by storing deep copies of
+referenced values (hashes or arrays). This prevents subtle interaction of
+multiple calls to Config::Param::get() with the same definition.
+
+=back
+
+=item * B<3.001000> (2014-05-31)
+
+=over 2
+
+=item - Rework logic for finding config files: Instead of looking for a fixed configuration directory (unless a specific one is configured), search every file in a default list of directories.
+To that list, ~/.config/program and ~/.config got added.
+
+=item - Add separator syntax for arrays and hashes (--array/,/=1,2,3).
+
+=back
+
+=item * B<3.000010> (2012-10-04)
+
+More checking of hash keys to make perl -w happy.
+
+=item * B<3.000009> (2012-07-31)
+
+Be more permissive about config file candidates: Everything that exists and is not a directory (makes /dev/fd/x special devices work).
+
+Oh, and examples/par_acceptor_include.conf is now in the distribution.
+
+=item * B<3.000008> (2012-07-30)
+
+=over 2
+
+=item - Fix printout of selected parameter values for paramorama (of course, I managed to break it for its initial purpose while reworking the Param module API).
+
+=item - Fix construction mode for included config files (passing it along now).
+
+=back
+
+=item * B<3.000007> (2012-07-28)
+
+Consistent indent for value in single-parameter help.
+
+=item * B<3.000006> (2012-07-27)
+
+Fixing construction mode of parse_file to really behave as if accept_unknown had been specified (incomplete conditional). This fixes construction from files without full meta data.
+
+Also, documentation got further refinement.
+
+=item * B<3.000005> (2012-07-21)
+
+=over 2
+
+=item - Require Perl 5.8.0 as reliable base for main work and tests.
+
+=item - Require some modules explicitly.
+
+=item - Update POD of paramorama (and add TODO about fully automating that).
+
+=back
+
+=item * B<3.000004> (2012-07-21)
+
+Include parameter types in POD output.
+
+=item * B<3.000003> (2012-07-20)
+
+Some documentation fixes of varying substance.
+
+=item * B<3.000002> (2012-07-20)
+
+And another release without functional changes, cleanup up the documentation and putting the plain text files also into POD format. Nicer lookin on da CPAN web, innit so?
+
+=item * B<3.000001> (2012-07-20)
+
+Whoo! Already an update! Well, it's just a version bump because the first PAUSE upload did not work.
+
+=item * B<3.000000> (2012-07-20)
+
+=over 2
+
+=item - Finally putting things on CPAN after prettifying the code and API cleanup (including the obligatory OO interface).
+
+=item - Some features got added, of course:
+
+=over 2
+
+=item - support for hashes
+
+=item - noexit, output, linewidth, silenterr config entries
+
+=back
+
+=item - Others got removed:
+
+=over 2
+
+=item - automatic eval() of files
+
+=item - ignorehelp config switch (just use nofinals)
+
+=back
+
+=item - Behavioural changes:
+
+=over 2
+
+=item - multliline values don't get a line end appended unless there is an empty line before the end marker. Before, it was not possible to enter values that don't end with a line end.
+
+=item - --config is an array now, as well as optionally the file config entry
+
+=back
+
+=item	- Heck, stuff is tested meanwhile!
+
+=back
+
+=item * B<2.x.y> (sometime in 2004, still, till 2012)
+
+=over 2
+
+=item - Letting it grow and mature with the times, adding config hash to the API.
+
+=item - Got a lot of use outside the music archive.
+
+=item - Published on personal web page.
+
+=back
+
+=item * B<1.x> (sometime in 2004, slightly later)
+
+=over 2
+
+=item - Putting a simple routine to handle command line and configuration file parsing into a module, only working on given flat parameter specification.
+
+=back
+
+=item * B<0.x> (sometime in 2004)
+
+=over 2
+
+=item - Starting to write a music archive management system and humbly writing scripts that take command line arguments.
+
+=back
+
+
+=back

@@ -1,0 +1,19 @@
+[%# the user preferences page
+-%]
+
+[%- INCLUDE header.tt %]
+
+[% IF show_prefs_form %]
+  <form action="[% cgi_url %]" method="POST">
+    <h1>Username</h1>
+    <p>How you wish to be identified in Recent Changes:</p>
+    <input type="text" size="20" name="username" value="[% username %]" />
+    <input type="submit" value="Set preferences" />
+    <input type="hidden" name="action" value="preferences" />
+    <input type="hidden" name="set" value="1" />
+  </form>
+[% ELSE %]
+  <p>Preferences saved.</p>
+[% END %]
+
+[% INCLUDE footer.tt %]

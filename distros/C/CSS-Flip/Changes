@@ -1,0 +1,39 @@
+0.04  Sat Feb 23 2013
+# The first much-or-less-stable release.
+! lib/CSS/Janus.pm
+! lib/CSS/Janus/Consts.pm
+  - Imp.: Changed $NON_ASCII to cover Unicode range.
+  - Fix: CPAN RT #83423 (Google Code cssjanus issue #20): Exception is
+    raised with "background: none;".
+  - Imp.: Added pattern for functional color values, rgb(...) etc. to $COLOR.
+  - Requires Perl >= 5.005 since qr{} operators and $10 placeholders are used.
+! Makefile.PL
+  - Workaround for earlier ExtUtils::MakeMaker that doesn't have MY->cd().
+  - Downgrade version of EU::MM to support Perl < 5.6.
+  - Added MIN_PERL_VERSION item.
+! t/18bisBGPositionLength.t
+  - Added tests
+
+0.03  Tue Feb 19 2013
+! bin/cssflip
+  - Fix: not use 3-args open() to support Perl < 5.6.
+! lib/CSS/Janus.pm
+  - Bug fix: failed on border-radius with 7 or 8 parts.
+  - Supports Perl >= 5.005.
++ t/22bisBorderRadiusNotation.t
+
+0.02  Fri Feb 15 2013
+# Updated entirely to be a bit more Perlish. 
+- lib/CSS/Flip.pod
++ lib/CSS/Janus/Consts.pm
+  - Separate package for solely internal constants.
+! lib/CSS/Janus.pm
+  - Removed "~J~" tokenization.
+  - Added "~X...~" tokenization.
+! t/18bisBGPositionLength.t
+  - Added tests.
++ ToDo
+
+0.01  Wed Feb 13 2013
+# Initial chkckin
+

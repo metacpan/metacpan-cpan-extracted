@@ -1,0 +1,106 @@
+: # feed this into perl
+	eval 'exec perl -S $0 ${1+"$@"}'
+		if $running_under_some_shell;
+
+#
+# $Id: example,v 0.1 2001/04/22 17:57:04 ram Exp $
+#
+#  Copyright (c) 1998-2001, Raphael Manfredi
+#  Copyright (c) 2000-2001, Christophe Dehaudt
+#  
+#  You may redistribute only under the terms of the Artistic License,
+#  as specified in the README file that comes with the distribution.
+#
+# HISTORY
+# $Log: example,v $
+# Revision 0.1  2001/04/22 17:57:04  ram
+# Baseline for first Alpha release.
+#
+# $EndLog$
+#
+
+package Color; use base qw(CGI::MxScreen::Screen);
+
+use CGI qw/:standard/;
+
+sub init {
+	my $self = shift;
+	$self->vars->{color} = "";
+}
+
+sub display {
+	my $self = shift;
+	print h1($self->screen_title);
+
+	my $color = $self->record_field(
+		-name		=> "color",
+		-storage	=> "color",
+		-default	=> $self->vars->{color} || "Green",
+		-override	=> 1,
+		-values		=> [qw(Red Green Blue White Black Yellow Orange Cyan)],
+	);
+
+	print p("You told me your favorite weekday was", $self->vars->{weekday})
+		if exists $self->vars->{weekday};
+
+	print p("Your favorite color is", popup_menu($color->properties));
+
+	my $ok = $self->record_button(
+		-name	=> "Next",
+		-target => "Weekday");
+
+	my $redraw = $self->record_button(
+		-name	=> "Redraw",
+		-target => $self->current_screen);
+
+	print submit($ok->properties), submit($redraw->properties);
+}
+
+package Weekday; use base qw(CGI::MxScreen::Screen);
+
+use CGI qw/:standard/;
+
+sub init {
+	my $self = shift;
+	$self->vars->{weekday} = "";
+}
+
+sub display {
+	my $self = shift;
+	print h1($self->screen_title);
+
+	print p("You told me your favorite color was", $self->vars->{color});
+
+	my $weekday = $self->record_field(
+		-name		=> "day",
+		-storage	=> "weekday",
+		-default	=> $self->vars->{weekday} || "Mon",
+		-override	=> 1,
+		-values		=> [qw(Mon Tue Wed Thu Fri Sat Sun)],
+	);
+
+	print p("Your favorite weekday is", popup_menu($weekday->properties));
+
+	my $back = $self->record_button(
+		-name		=> "Back",
+		-target		=> $self->spring_screen,
+	);
+
+	print submit($back->properties);
+}
+
+package main;
+
+require CGI::MxScreen;
+
+my $manager = CGI::MxScreen->make(
+	-screens	=>
+		{
+			'Color'		=> [-class => 'Color',	 -title => "Choose Color" ],
+			'Weekday'	=> [-class => 'Weekday', -title => "Choose Day" ],
+		},
+	-initial	=> ['Color'],
+);
+
+$manager->play();
+

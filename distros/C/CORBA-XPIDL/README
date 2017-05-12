@@ -1,0 +1,33 @@
+CORBA::XPIDL - compiler for Mozilla (XPCOM)
+
+Description:
+------------
+    This package supplies clones of the following tools :
+    xpidl : XPIDL compiler
+    xpt_dump : typelib dumper
+    xpt_link : typelib linker
+
+Prerequisites:
+--------------
+    CORBA::IDL
+
+See also:
+---------
+    CORBA::HTML - Implements HTML documentation
+
+References:
+-----------
+    CORBA Specifications, including IDL (Interface Definition Language) and
+    Python Language Mapping are available on <http://www.omg.org/>.
+
+    XPCOM Type Library File Format, version 1.1, is available on
+    http://mozilla.org/scriptable/typelib_file.html
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	$ perl Makefile.PL
+	$ make
+	$ make install
+
+Send bug reports, comments and suggestions to francois.perrad@gadz.org

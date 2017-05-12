@@ -1,0 +1,496 @@
+libclearpress-perl (475.3.3) stable; urgency=low
+
+  * uncovered a buffer overflow problem when combined with Apache +
+    mod-perl2, possibly related to PerlOptions +ParseHeaders whereby
+    if the response header block is too large (approx > 1KB) it
+    becomes mangled as it's flushed to the client. view->redirect now
+    returns content and sets decorator->meta_refresh if the header
+    containing Location is deemed to be too large.
+
+libclearpress-perl (475.2.2) stable; urgency=low
+
+  * minor order change when emitting error responses
+  * exclude empty header emission
+
+libclearpress-perl (475.2.1) stable; urgency=low
+
+  * Support for JSON POSTDATA, e.g. curl -X POST --data @file.js --header "Content-Type: application/json" http://localhost:8080/service.js
+
+libclearpress-perl (475.1.20) stable; urgency=low
+
+  * Significant refactoring of HTTP response-headers and error serving
+
+libclearpress-perl (474.0.1) stable; urgency=low
+
+  * Set $ClearPress::controller::EXPERIMENTAL_HEADERS = 1 to enable Apache2::RequestRec-based status response headers
+
+libclearpress-perl (473.0.3) stable; urgency=low
+
+  * localization warnings disabled by default. Use $ClearPress::view::DEBUG_L10N = 1 to enable warnings about missing localization strings
+
+libclearpress-perl (473.0.1) stable; urgency=low
+
+  * Added base64 filter: [% string | base64 %] - useful for inline image data
+  * Quietened down DBI DESTROY/disconnect warnings
+  * Added basic SVG response and content-type support
+  * JSON response content-type changed from application/javascript to application/json
+
+libclearpress-perl (472.0.4) stable; urgency=low
+
+  * Downgraded Template version requirement to supported ubuntu-trusty package
+
+libclearpress-perl (471.0.4) stable; urgency=low
+
+  * Forgot to add Lingua::EN::PluralToSingular prerequisite to Build.PL
+
+libclearpress-perl (471.0.3) stable; urgency=low
+
+  * Set $ClearPress::model::EXPERIMENTAL_PL to use (apparently) more robust pluralisation for has_many etc.
+
+libclearpress-perl (466) stable; urgency=low
+
+  * adjusted compound request/extension handling (e.g. .txt + .ajax to drop the _ajax component if present)
+
+libclearpress-perl (457) stable; urgency=low
+
+  * tweak support for compound json XHR "read" requests
+  * repaired dependency sorting - sort by name not memory address
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 4 Feb 2014 16:07:00
+
+libclearpress-perl (451) stable; urgency=low
+
+  * adjusted JSON encoding
+  * experimentation with pipe flushing
+  * pass in decorator to view object just before rendering in case the view wishes to reset headers and resend (e.g. authentication cookies)
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 22 Jan 2014 09:54:00
+
+libclearpress-perl (442) stable; urgency=low
+
+  * new setup_filters method called during new() but before init()
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 4 Apr 2012 14:25:00
+
+libclearpress-perl (438) stable; urgency=low
+
+  * packaging updates
+
+ -- Roger Pettett <rmp@psyphi.net>  Wed, 4 Apr 2012 14:25:00
+
+libclearpress-perl (435) stable; urgency=low
+
+  * packaging updates for rpm/deb
+
+ -- Roger Pettett <rmp@psyphi.net>  Mon, 2 Apr 2012 22:58:00
+
+libclearpress-perl (422) stable; urgency=low
+
+  * RT#72491 allow templates in per-view subdirectories, e.g. user/list.tt2
+  * Fixed parallel testing (e.g. with env HARNESS_OPTIONS=-j7)
+  * Added basic .rpm building with rpmbuild
+  * Added even more basic .deb building with fakeroot, alien and "make rpm"
+  * Removed hard dependency on Spreadsheet::ParseExcel, updated Build.PL prereqs RT#73440
+
+ -- Roger Pettett <rmp@psyphi.net>  Sat, 21 Jan 2012 11:51:00
+
+libclearpress-perl (413) stable; urgency=low
+
+  * Correctly process XHR+overridden methods, i.e. '/entity/custom'(+XHR) => entity::list_custom_ajax
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (410) stable; urgency=low
+
+  * Added controller is_valid_view method to support the dynamic addition of views
+ 
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (407) stable; urgency=low
+
+  * Removed 'model.logged_in' data poking. Use view.logged_in in templates if you need to
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (405) stable; urgency=low
+
+  * build_error_object falls back to ClearPress::view::error if ${ns}::view::error is not present
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (402) stable; urgency=low
+
+  * implemented bounded_select two-arg LIMIT in driver::SQLite
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (398) stable; urgency=low
+
+  * gen_getall orders by secondary_key if specified - much more useful than id_x
+  * tweaks to handling for javascript blocks passed to decorator - may take comas
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (394) stable; urgency=low
+
+  * Downgraded requirements for File::Copy & File::Path - RT#62701
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (393) stable; urgency=low
+
+  * Removed empty 'data' dir
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (392) stable; urgency=low
+
+  * /thing/edit/10.xml => 'thing_edit_xml' rather than 'thing_read_edit_xml'
+  * Tests for ldap authenticator
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (387) stable; urgency=low
+
+  * Fixed some failing tests
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (384) stable; urgency=low
+
+  * Provides DOM handles for error view's h2 & paragraph.  Without
+    needing to override view::error::render, a useful piece of
+    jQuery might be:
+
+    $('.warnings').detach().insertAfter('#actions').effect('highlight', 3000);
+    $('h2.error').detach().insertAfter('#actions');
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (380) stable; urgency=low
+
+  * Correction to order of initialisation of CGI object (from util, passed to decorator).
+  * Provides model::secondary_key support in model::init, allowing load-by-<secondary-field> for most models.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (368) stable; urgency=low
+
+  * corrected cleaning of error message to not expose module & line number in responses
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (363) stable; urgency=low
+
+  * Default to serving Content-type header with charset=UTF-8
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (361) stable; urgency=low
+
+  * UTF8 support enabled by default in MySQL driver
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (360) stable; urgency=low
+
+  * Error messages escaped for HTML, JSON, XML
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (357) stable; urgency=low
+
+  * Minor tweaks to build-process; adjusted some test data.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (351) stable; urgency=low
+
+  * Added basic database-backed authenticator. Needs examples.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (346) stable; urgency=low
+
+  * 0 => "0" bugfix for js_string and xml_filter.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (343) stable; urgency=low
+
+  * patch to allow multiple settings in config.ini, e.g.
+    stylesheet=/css/foo.css,/css/bar.css
+  * patch to fix DBI's warning about "rollback without explicit disconnect"
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (339) stable; urgency=low
+
+  * override STDIN in t::request to account for changes in CGI.pm v3.44 (reported by Slaven)
+  * attempted a PostgreSQL adapter - could do with someone to test it
+  * updated example
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (334) stable; urgency=low
+
+  * sessions saved after processing request, not during
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (327) stable; urgency=low
+
+  * Basic authentication mechanisms - LDAP/AD, passwd/getpwuid
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (325) stable; urgency=low
+
+  * Added support for HTTP_X_FORWARDED_HOST and ...PORT for sitting
+    behind a reverse-proxy
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (323) stable; urgency=low
+
+  * Default support for .txt and .xls
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (320) stable; urgency=low
+
+  * Improvements to singleton handling
+  * Template-toolkit filter registration for views
+  * Revisions for latest perlcritic regex enforcement
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (317) stable; urgency=low
+
+  * Added 'streamed_aspects' view method for easier streamed responses
+  * Added model construction with primary key rather than hashref
+  * Default to *_ajax aspect with XMLHttpRequest request header
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (314) stable; urgency=low
+
+  * Support loading models with a scalar primary key instead of
+    insisting on a hashref
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (302) stable; urgency=low
+
+  * Bugfix affecting SCRIPT_NAME use in the standalone server
+  * Application builder now emits mysql schema-loading help with the
+    correct precedence
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (298) stable; urgency=low
+
+  * Conformance to Perl::Critic 1.094001
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (297) stable; urgency=low
+
+  * Made js_string and xml_entity filters available by
+    default. There's no longer any need to 'USE <x>' them.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (294) stable; urgency=low
+
+  * Fixed up schema problems when auto-generating SQLite applications.
+  * Allow posting XML without XForms:Model. Note it's unadvisable to
+    use this feature in the wild.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (291) stable; urgency=low
+
+  * Added xml_entity TT filter - uses HTML::Entities::encode_entities_numeric
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (284) stable; urgency=low
+
+  * Class::Singleton support moved from ClearPress::driver to
+    ClearPress::util. When running in a mod_perl environment
+    supporting multiple different ClearPress applications, the
+    driver would be a singleton per Apache child process, meaning
+    applications would mistakenly share whichever database
+    connection is first initialised. As drivers are not usually
+    subclassed per-application (only by database back-end platform)
+    the singleton support was moved into ClearPress::util. The util
+    is commonly subclassed for applications so this should be a
+    robust solution, particularly for shared environments.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (278) stable; urgency=low
+
+  * Support for posting XML
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (269) stable; urgency=low
+
+  * Extended aspect handling:
+    /batches/released/cluster.xml routes to
+    app::view::batches::read_released_xml with a primary key of
+    'cluster' by default, but if
+    app::view::batches::list_released_cluster_xml exists that will
+    be preferred.
+
+  * Also fixed a niggle - /thing/15.xml;add mixed
+    aspect+file-extension would previously have failed but should
+    now be correctly routed to app::view::thing::add_xml
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (267) stable; urgency=low
+
+  * Bugfix for aspect checking - previously 'update_*' aspects
+    (e.g. update_xml) would have been incorrectly identified as a 'create'
+    action. Similarly for 'delete_*' aspects.
+  * Added SQLite checks to failing tests
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (255) stable; urgency=low
+
+  * A bunch of new functional tests
+  * Test-harness related stuff (t::request)
+  * Test data for dummy templates and results
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (252) stable; urgency=low
+
+  * Fixed generation of warnings.tt2 & view::error in bin/clearpress
+  * Fixed Y/N on file overwrite in bin/clearpress
+  * Auto-generate application-specific util as it's required by the singleton if not passed explicitly to objects
+  * Fixed requestor->is_member_of authorisation check if is_member_of is not supported (default not authorised) in ClearPress::view
+  * Fixed auto-generation of multiple has_a and has_many (missing whitespace) in bin/clearpress
+  * Default RESTish methods (pass-through) for *_ajax and *_json to complement existing *_xml in ClearPress::view
+  * Moved scripts/clearpress to bin/clearpress as it's more usual
+  * Template caching
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (236) stable; urgency=low
+
+  * driver support for bounded selects (currently basic string concatenation)
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (235) stable; urgency=low
+
+  * Improved test resiliance w.r.t. optional dependencies
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (222) stable; urgency=low
+
+  * ClearPress::driver is now a Class::Singleton. ** TAKE CARE ** if
+    your application makes multiple database handles of the same sort
+    - they need separate subclassing and will then be singletons
+    themselves.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (174) stable; urgency=low
+
+  * Maintenance release - added missing dependencies to Makefile.PL
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (173) stable; urgency=low
+
+  * Improved tests & code coverage for relation accessors (has_a,
+    has_many, has_a_through, has_many_through etc), views and database
+    drivers.
+
+  * NEW BEHAVIOUR: database handling has started to be pushed into
+    ClearPress::driver:: subclasses. You will commonly see transaction
+    errors with applications built using older ClearPress which
+    implement their own 'dbh' methods in util.pm .
+
+  * NEW BEHAVIOUR: better handling of NULL/undef, zero and empty
+    string may cause issues on applications which previously didn't
+    check.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (168) stable; urgency=low
+
+  * Updated POD
+  * Generation script now makes use of has_a and has_many
+    friend-accessor-auto-constructors
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (157) stable; urgency=low
+
+  * Improved error handling with some smarts about requested content
+    types
+  * 'packagemap' config section maps uri entity names to package
+    subclasses for exceptions to the systematic naming rules, e.g.
+    [packagemap]
+    array_feature=feature::array
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (135) stable; urgency=low
+
+  * belongs_to_through now supported in the data model
+  * Added missing Config::IniFiles dependency. Hopefully more CPAN
+    tests will now pass
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (132) stable; urgency=low
+
+  * has_many_through and belongs_to now supported.
+  * Easier access to template subsystem for streamed-output responses.
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (118) stable; urgency=low
+
+  * Update now only saves fields which 'exist' in the object, meaning
+    you don't have to force $object->load() before updating.
+  * New hasa() and hasmany() for easier relationship definitions.
+  * Models can now render ->as_xml() and as_json()
+  * Tweaked route processing (action & aspect) to be safer and more
+    consistent
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (99) stable; urgency=low
+
+  * reworked url/file-extension & HTTP Accept header handling
+    deprecated controller::process_uri in favour of process_request
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (87) stable; urgency=low
+
+   * JSON response support
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (71) stable; urgency=low
+
+   * Buffered output handling, better test coverage
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100
+
+libclearpress-perl (12) stable; urgency=low
+
+   * Added application builder in scripts/clearpress
+
+ -- Roger Pettett <rmp@psyphi.net>  Thu, 9 Jun 2011 12:00:00 +0100

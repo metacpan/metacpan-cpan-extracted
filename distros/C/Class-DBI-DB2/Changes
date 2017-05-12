@@ -1,0 +1,28 @@
+0.16  May 19, 2004
+
+- added optional alias arg to set_up_table()
+
+0.15  May 16, 2004
+
+- MANIFEST correction
+
+0.14  May 15, 2004
+
+- Small documentation tweaks
+- MANIFEST correction
+
+0.13  May 14, 2004
+
+- Composite primary key support
+
+0.12  May 13, 2004
+
+- Makefile.PL corrections
+
+0.11  May 13, 2004
+
+- Documentation corrections
+
+0.10  May 12, 2004
+
+- First release

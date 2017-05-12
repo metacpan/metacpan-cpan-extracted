@@ -1,0 +1,45 @@
+{
+   "abstract" : "Catalyst SOAP Controller",
+   "author" : [
+      "Daniel Ruoso <daniel@ruoso.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catalyst-Controller-SOAP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Runtime" : "5.90017",
+            "MRO::Compat" : 0,
+            "Moose" : "0.9",
+            "XML::Compile::SOAP" : "2.35",
+            "XML::LibXML" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.25"
+}

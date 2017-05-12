@@ -1,0 +1,6 @@
+Thu 11 Apr 2012 15:00:00 CST - Release 1.08
+ Extract Catalyst::Action::(De)serialize::Data::Serializer into it's own dist
+
+ It is presumed that this module is rarely used and it is known to be brittle.
+ Let's not penalize the vast majority of users for the vanishingly few who use
+ this crack.

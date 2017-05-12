@@ -1,0 +1,240 @@
+#!/usr/bin/perl -w
+#                              -*- Mode: Perl -*- 
+# $Basename: screen $
+# $Revision: 1.22 $
+# Author          : Ulrich Pfeifer
+# Created On      : Sun Nov 30 17:38:52 1997
+# Last Modified By: Ulrich Pfeifer
+# Last Modified On: Fri Jan 29 18:44:11 1999
+# Language        : CPerl
+# Update Count    : 59
+# Status          : Unknown, Use with caution!
+# 
+# (C) Copyright 1997, Ulrich Pfeifer, all rights reserved.
+# 
+# 
+
+# change/delete this line to match your local settings
+# use lib qw(/home/upf/pl/CGI-Screen/lib);
+
+use IO::File;
+use CGI::Screen qw(:all);        
+use vars qw(@ISA);
+@ISA = qw(CGI::Screen::Debug); # use 'CGI::Screen' if your application works
+
+my $query = __PACKAGE__->new(-screen => {dont_cut_loops => 1});
+
+$query->dispatch;
+
+#uncomment this to test authentication
+#sub check_auth_user {
+# my ($query, $user, $passwd) = @_;
+#
+#  $user eq 'pfeifer';
+#}
+
+sub trailer {
+  my ($query, $screen, $title) = @_;
+
+  # Generate an application global toolbar.  We open a new form to
+  # avoid accidetal submission the current form. Your application
+  # might follow other policies.
+  $query->hr .
+    $query->new_form .
+      $query->goto_screen('source', 'See screen source') .
+        $query->goto_screen('env', 'Show CGI environment') . 
+          $query->goto_screen('main', 'Main screen') .
+            $query->goto_screen('manual', 'See manual') .
+              $query->goto_screen('rate', 'Rating')
+                ;
+}
+
+sub main_screen {
+  my $query = shift;
+
+  print
+    p({foo=>'bar'}, 'This is the Main Screen'),
+    $query->textfield(-name => 'foo'),
+    $query->goto_screen('first', 'Save'), '<BR>',
+    $query->hr,
+    $query->new_form,
+    $query->goto_screen('second', 'Discard'),
+    ;
+  
+}
+
+sub rate_screen {
+   my $query = shift;
+
+   print
+     $query->p('This is the Rate Screen.'),
+     $query->p('How do you rate the quality of this module?'),
+     $query->radio_group('-name'    => 'quality',
+                         '-values'  => [qw(poor resonable good excellent)],
+                         '-default' => 'poor',
+                        ),
+     $query->p('What features does the module exhibit?'),
+     $query->checkbox_group(
+                            '-name'      => 'features',
+                            '-values'    => [
+                                             'easy to use',
+                                             'compact',
+                                             'extensible',
+                                             'well documented',
+                                            ],
+                            '-default'   => ['easy to use'],
+                            '-linebreak' => 'true',
+                           ),
+    $query->goto_screen('main', 'Save Rating'), '<BR>',
+    ;
+}
+
+sub first_screen {
+  my $query = shift;
+
+  print
+    $query->p('You did actually send the values!'),
+    $query->p('You entered: "', $query->code($query->param('foo')),'"'),
+    $query->goto_screen('main', 'Edit again'),
+    $query->scrolling_list('-name' => 'font',
+                           '-size' => 1,
+                           '-values' => [
+                                         qw(Large MediumBold Small)
+                                        ]),
+    $query->goto_screen('media', 'See input as GIF')
+    ;
+}
+
+sub second_screen {
+  my $query = shift;
+
+  print
+    $query->p('You have just discarded your edits');
+}
+
+
+sub env_screen {
+  my $query = shift;
+  
+  for (keys %ENV) {
+    push @tab, $query->TR($query->td($_) , $query->td($ENV{$_}));
+  }
+  print $query->h1('CGI Environment') . $query->table(@tab);
+}
+
+
+sub source_screen {
+  my $query  = shift;
+  my $fh     = new IO::File $ENV{SCRIPT_FILENAME};
+  my $screen = $query->last_screen;
+  
+  require IO::File;
+
+  print $query->h1("Source for screen '$screen'");
+  unless ($fh) {
+    print "Could not open script: $!\n";
+  } else {
+    print "<LISTING>\n";
+    local ($/, $_) = "\n";
+    while (defined($_ = <$fh>)) {
+      if (/^sub ${screen}_screen/ .. /^}/) {
+         s/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g; 
+         print;
+      }
+    }
+    print "</LISTING>\n";
+  }
+  print $query->goto_screen($query->last_screen);
+}
+
+sub media_screen {
+  my $query = shift;
+
+  print
+    $query->p('You choose:',
+              $query->img({src => $query->url_to_screen('gif')})),
+    $query->link_to_screen('gif', 'GIF only');
+
+  print $query->p("All font sizes:\n");
+  for my $font (qw(Large MediumBold Small)) {
+    print
+      $query->TR
+        ($query->td
+         ($query->img ({src => $query->url_to_screen('gif', 'Foo',
+                                                     'font' => $font)})));
+  }
+ }
+
+sub gif_data {
+  my $query = shift;
+  
+  print $query->header(
+                       -type    => 'image/gif',
+                       -status  => '200 OK',
+                       -expires => '+120s',
+                      );
+  eval { require GD };
+  if ($@ ne '') {               # no GD
+    my $sorry = <<'EOF'
+begin 644 GD.gif
+M1TE&.#EAX  0 *$  /____\          "'Y! $     +     #@ !    +^
+MA(^IR^T/EQ"QVHLSF+I#;H#>2(JD,YDI%7'4RK9J?(:F16_UGN],_P "%2Q0
+M;)@X\B0WW 'INT"C.JGD@R@^6]1JLEE1=CW3:#EY#:9#6*H0S&4_172HJWC,
+MOS:P8&K.1_/WTC?7)*2VYD4$@U='F.42^&>($; EN"6W222GI9FGZ03H2;K(
+MF8.(\I/5UAE9:B,:>780<,LF!MK*6O49NUD[F[FHVSN+_#I9[(K&Z_L\) R 
+MB\O,2YSV22R-D0VM:'BCVI"*VOS,J9Z\_G![>8Z=[KP=3=F^.BP^?\T^9=ZO
+MW+%V*_CA<P OWBYVL7Z="N8M'3F R,@-!'>0(<5K8]U&?,/X<*'#/=$8.CM'
+M4<G&D&6XF31X:J6N:>AFFGI53Y8*46>^0>*)"9;!EG@@HJOXI61&*04KT<)W
+MAX^-HDV=_FC4M&#5J?NP>KUW54<A%%F_9EWV%.:8M6S;NGTK@R;<N73KVLW'
+$H   .TV=
+ 
+end
+EOF
+  ;
+    for (split /\n/, $sorry) {
+      print unpack 'u', $_;
+    }
+  } else {
+    my $font  = $query->param('font');
+    my $w     = GD::Font->$font()->width;
+    my $h     = GD::Font->$font()->height;
+    my $im    = GD::Image->new((length($query->param('foo'))+2)*$w,$h);
+    my $white = $im->colorAllocate(255,255,255);
+    my $red   = $im->colorAllocate(255,0,0);
+    my $black = $im->colorAllocate(0,0,0);
+    $im->transparent($white);
+    $im->arc(8,8,5,5,0,360,$red);
+    $im->string(GD::Font->$font(),10,0,$query->param('foo'),$black);
+    print $im->gif;
+  }
+}
+
+sub manual_screen {
+  my $query = shift;
+  
+  require Pod::Text;
+  require IO::File;
+
+  my $fh = new IO::File "> /tmp/screen.$$" or die; # hate Pod::Text 
+
+  if ($Pod::Text::VERSION >= 2) { # Thanks Brad ;-(
+    $ENV{PATH} = '/bin:/usr/bin:/usr/local/bin'; # Thanks again
+    Pod::Text::pod2text($INC{"CGI/Screen.pm"}, $fh);
+  } else {
+    Pod::Text::pod2text('-72', $INC{"CGI/Screen.pm"}, $fh);
+  }
+  
+  
+  $fh = new IO::File "< /tmp/screen.$$" or die;
+  print "<LISTING>\n";
+  local ($/, $_) = "\n";
+  while (defined($_ = <$fh>)) {
+    s/</&lt;/g; s/>/&gt;/g; 
+    s{\`(.*?)\'}{'<B>$1</B>'}g;
+    s{\'(\w)\'}{<B>$1</B>}g;
+    s{\*(.*?)\*}{<I>$1</I>}g;
+    print;
+  }
+  print "\n</LISTING>";
+  unlink "/tmp/screen.$$";
+}

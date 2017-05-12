@@ -1,0 +1,81 @@
+NAME
+    Catalyst::Action::FromPSGI - Use a PSGI app as a Catalyst action
+
+VERSION
+    version 0.001006
+
+SYNOPSIS
+    First, you have a psgi app you wrote and want to use:
+
+     package MyApp::WS::App;
+
+     use Web::Simple;
+
+     has name => (
+        is => 'ro',
+        required => 1,
+     );
+
+     sub dispatch_request {
+        sub (/hi) {
+           [ 200,
+              [ 'Content-type' => 'text/plain' ],
+              [ 'Hello ' . $_[0]->name ]
+           ]
+        },
+     }
+
+     1;
+
+    Now you want to reuse this app in a Catalyst action:
+
+     package MyApp::Controller::HelloName;
+
+     use base 'Catalyst::Controller';
+
+     sub say_hi :Path('/say_hi_to') ActionClass('FromPSGI') {
+       my ($self, $c, $name, @args) = @_;
+
+       MyApp::WS::App->new(name => $name)->to_psgi_app
+     }
+
+     1;
+
+    The above would yield 'Hello fREW' for the request to
+    "/say_hi_to/fREW/hi".
+
+    Of course the above example is contrived, but keep in mind this will
+    work for any of the myriad PSGI apps out there.
+
+DESCRIPTION
+    "Catalyst::Action::FromPSGI" gives you a handy way to mount PSGI apps
+    under Catalyst actions.
+
+    Note that because Catalyst is in control of the dispatch cycle any
+    limitations you place on it will be placed on the PSGI app as well. So
+    for example:
+
+     sub foo : Path('/foo') Args(1) ActionClass('FromPSGI') { ... }
+
+    will never run the PSGI app if the url is "/foo/bar/baz" because the
+    Catalyst dispatcher won't even match for more than one argument. For
+    this reason I recommend leaving "Args" unspecified for "FromPSGI"
+    actions.
+
+    I actually made this because I'm interested in using Web::Machine
+    instead of Catalyst::Action::REST and possibly even replacing my
+    chaining code with Web::Simple based dispatching.
+
+THANKS
+    Matt S. Trout - for pioneering the actual guts of this code. Stevan
+    Little - for porting Web::Machine, my motivation for making this.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

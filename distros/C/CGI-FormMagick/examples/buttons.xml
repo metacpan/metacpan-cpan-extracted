@@ -1,0 +1,33 @@
+<form title="Button on/off example" header="head.tmpl"
+footer="foot.tmpl" post-event="post">
+    <page name="page1">
+        <title>Gratuitous first page</title>
+        <html>
+        <![cdata[
+            <p>This example form lets you turn buttons on and off.  Hit
+            "Next" to get to the actual example</p>
+        ]]>
+        </html>
+    </page>
+    <page name="buttons" post-event="fix_buttons">
+        <title>Buttons</title>
+        <field id="previousbutton" type="checkbox">
+            <label>Previous button</label>
+        </field>
+        <field id="nextbutton" type="checkbox">
+            <label>Next button</label>
+        </field>
+        <field id="resetbutton" type="checkbox">
+            <label>Reset button</label>
+        </field>
+        <field id="startoverlink" type="checkbox">
+            <label>Start over link</label>
+        </field>
+    </page>
+    <page name="page3">
+        <title>Gratuitous third page</title>
+        <field id="os" type="radio" value="BSD" options="'Linux','BSD','OSX'">
+            <label>Choose an operating system</label>
+        </field>
+    </page>
+</form>

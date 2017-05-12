@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" >
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <title>CPAN Testers API</title>
+        <style>body { margin-top: 60px }</style>
+    </head>
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <div class="navbar-brand">
+                        <a href="/">
+                            <strong>CPAN Testers API</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-left">
+                        <li><a href="http://cpantesters.org">Reports</a></li>
+                        <li><a href="http://api.cpantesters.org">API</a></li>
+                        <li><a href="http://blog.cpantesters.org">Blog</a></li>
+                        <li><a href="http://github.com/cpan-testers">Github</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+        <div class="container">
+            <h1>CPAN Testers API</h1>
+            <p>The CPAN Testers API is a JSON API on to data contained
+            in CPAN Testers. This data includes:</p>
+
+            <ul>
+            <li>Test report summaries (releases) for <a
+            href="/docs/?url=/v1#!/Release/release_all">all of CPAN</a>,
+            <a href="/docs/?url=/v1#!/Release/release_author">by
+            author</a>, or <a
+            href="/docs/?url=/v1#!/Release/release_dist">by
+            distribution</a>.</li>
+            <li>CPAN uploads for <a
+            href="/docs/?url=/v1#!/Upload/upload_all">all of CPAN</a>,
+            <a href="/docs/?url=/v1#!/Upload/upload_author">by
+            author</a>, or <a
+            href="/docs/?url=/v1#!/Upload/upload_dist">by
+            distribution</a>. Subscribing to these using a WebSocket
+            will enable push notifications of new uploads to CPAN (see
+            <a
+            href="https://github.com/cpan-testers/cpantesters-api/blob/master/eg/feed.pl">an
+            example WebSocket subscriber using Mojo::UserAgent</a>).</li>
+            </ul>
+
+            <p>Future data that can be made available by this API include:</p>
+
+            <ul>
+            <li>CPAN Testers reports</li>
+            </ul>
+
+            <p>For full documentation on the available APIs, see <a
+            href="/docs/?url=/v1">the API documentation</a>.</p>
+
+            If you'd like to help contribute to the CPAN Testers API,
+            visit <a
+            href="http://github.com/cpan-testers/cpantesters-api">the
+            CPAN Testers API Github repository</a>. To report an issue
+            with the CPAN Testers API, visit <a
+            href="http://github.com/cpan-testers/cpantesters-api/issues">the
+            CPAN Testers API issue tracker</a>, <a
+            href="https://chat.mibbit.com/?channel=%23cpantesters-discuss&server=irc.perl.org">talk
+            to us on IRC at irc.perl.org channel
+            #cpantesters-discuss</a>, or <a
+            href="mailto:admin@cpantesters.org">e-mail the CPAN Testers
+            admins</a>.
+
+        </div>
+    </body>
+</html>
+

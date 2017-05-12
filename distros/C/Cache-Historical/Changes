@@ -1,0 +1,26 @@
+######################################################################
+Revision history for Perl extension Cache::Historical
+
+0.05  (2011/04/27)
+    (ms) Removed debugging leftover Data::HexDump.
+
+0.04  (2011/04/24)
+    (ms) Stringifying DateTime object in test suite to make it
+         works with is() in perl-5.10.1
+    (ms) Applied patch by Niko Tyni to correct values() sort order
+         (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=615882)
+    (ms) Fixed POD error reported by Mats Erik Andersson
+
+0.03  2008/02/09
+    (ms) Using DB features for faster get_interpolated() now.
+    (ms) Added missing keys() method and test cases for keys()/values()
+
+0.02  2008/01/23
+    (ms) Fixed bug with since_last_update(), which didn't pass the
+         key along to last_update().
+
+    (ms) Bumped up SQLite version number to 1.14 to get rid of 
+    'closing dbh with active statement handles' warning.
+
+0.01  2008/01/12
+    (ms) Where it all began.

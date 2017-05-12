@@ -1,0 +1,35 @@
+---
+abstract: 'Generate data files for use with Open Flash Chart'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.131560'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Chart-OFC
+requires:
+  Graphics::ColorNames: 0
+  List::MoreUtils: 0
+  Moose: 0.56
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::StrictConstructor: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Chart-OFC
+  homepage: http://metacpan.org/release/Chart-OFC
+  repository: git://git.urth.org/Chart-OFC.git
+version: 0.12
+x_authority: cpan:DROLSKY
+x_contributors:
+  - 'autarch <devnull@localhost>'
+  - 'convert-repo <devnull@localhost>'

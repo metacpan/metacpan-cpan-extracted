@@ -1,0 +1,81 @@
+{
+   "abstract" : "Model editor for Config::Model",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Config-Model-Itself",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::Cme" : "1.002",
+            "Module::Build" : "0.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cme" : "1.002",
+            "App::Cme::Common" : "0",
+            "Carp" : "0",
+            "Config::Model" : "2.101",
+            "Config::Model::TkUI" : "0",
+            "Config::Model::Value" : "0",
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "IO::File" : "0",
+            "Log::Log4perl" : "1.11",
+            "Mouse" : "0",
+            "Mouse::Util::TypeConstraints" : "0",
+            "Path::Tiny" : "0.062",
+            "Pod::POM" : "0",
+            "Tk" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "Test::Differences" : "0",
+            "Test::File::Contents" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::More" : "0",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/config-model-itself/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/config-model-itself.git",
+         "web" : "http://github.com/dod38fr/config-model-itself"
+      }
+   },
+   "version" : "2.009",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

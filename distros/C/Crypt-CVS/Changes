@@ -1,0 +1,14 @@
+Revision history for Crypt::CVS
+
+0.03 2010-07-06 18:14:36
+
+    - The module name in Changes / SYNOPSIS was CVS::Password, not
+      Crypt::CVS
+
+0.02 2010-06-19 14:33:28
+
+    - Report and test for invalid password formats correctly.
+
+0.01 2010-05-15 14:34:07
+
+    - Initial release.

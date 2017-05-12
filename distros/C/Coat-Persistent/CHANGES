@@ -1,0 +1,19 @@
+2009-11-25  - 0.222 Alexis Sukrieh
+	* support for DBD::CSV >= 0.22
+
+2009-07-10  - 0.220 - Alexis Sukrieh
+    * Add support for undefined primary_keys (bug #47772)
+    * Now possible to bypass DBIx::Sequence (bug #47773)
+    * Use Test::Database for MySQL/SQLite specific tests
+
+2009-06-19  - 0.210 - Alexis Sukrieh
+    * New module Coat::Persistent::Types for providing default types and coercions
+    * Class::Date support for default types
+    * Uses now Class::Date instead of handling time and dates by hand.
+
+2009-06-19  - 0.200 - Alexis Sukrieh
+
+    * Support for the `store_as' option for attribute declaration.
+    * Added Coat::Persistent::Types::MySQL for providing default data types for
+      MySQL date fields.
+

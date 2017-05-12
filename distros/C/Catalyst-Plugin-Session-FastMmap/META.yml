@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Catalyst-Plugin-Session-FastMmap
+version:            0.13
+abstract:           ~
+author:
+    - Sebastian Riedel (sri@oook.de)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Cache::FastMmap:      0
+    Catalyst:             2.99
+    Class::Accessor::Fast:  0
+    Class::Data::Inheritable:  0
+    Digest::MD5:          0
+    File::Temp:           0
+    MRO::Compat:          0
+    URI:                  0
+    URI::Find:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

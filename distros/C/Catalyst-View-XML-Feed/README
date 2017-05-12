@@ -1,0 +1,184 @@
+NAME
+    Catalyst::View::XML::Feed - Catalyst view for RSS, Atom, or other XML
+    feeds
+
+SYNOPSIS
+    Create your view, e.g. lib/MyApp/View/Feed.pm
+
+      package MyApp::View::Feed;
+      use base qw( Catalyst::View::XML::Feed );
+      1;
+
+    In a controller, set the "feed" stash variable and forward to your view:
+
+      sub rss : Local {
+          my ($self, $c) = @_:
+          $c->stash->{feed} = $feed_obj_or_data;
+          $c->forward('View::Feed');
+      }
+
+DESCRIPTION
+    Catalyst::View::XML::Feed is a hassle-free way to serve an RSS, Atom, or
+    other XML feed from your Catalyst application.
+
+    Your controller should put feed data into "$c->stash->{feed}".
+
+DATA FORMATS
+    The value in "$c->stash->{feed}" can be an object from any of the
+    popular RSS or Atom classes, a plain Perl data structure, arbitrary
+    custom objects, or an xml string.
+
+  Plain Perl data
+      $c->stash->{feed} = {
+          format      => 'RSS 1.0',
+          id          => $c->req->base,
+          title       => 'My Great Site',
+          description => 'Kitten pictures for the masses',
+          link        => $c->req->base,
+          modified    => DateTime->now,
+
+          entries => [
+              {
+                  id       => $c->uri_for('rss', 'kitten_post')->as_string,
+                  link     => $c->uri_for('rss', 'kitten_post')->as_string,
+                  title    => 'First post!',
+                  modified => DateTime->now,
+                  content  => 'This is my first post!',
+              },
+              # ... more entries.
+          ],
+      };
+
+   Keys for feed
+    The "feed" hash can take any of the following keys. They are identical
+    to those supported by XML::Feed. See XML::Feed for more details.
+
+    *Note*: Depending on the feed format you choose, different subsets of
+    attributes might be required. As such, it is recommended that you run
+    the generated XML through a validator such as
+    <http://validator.w3.org/feed/> to ensure you included all necessary
+    information.
+
+    format
+        Can be any of: "Atom", "RSS 0.91", "RSS 1.0", "RSS 2.0"
+
+    id
+    title
+    link
+    description
+    modified
+        This should be a DateTime object.
+
+    base
+    tagline
+    author
+    language
+    copyright
+    generator
+    self_link
+    entries
+        An array ref of entries.
+
+   Keys for entries
+    The "entries" array contains any number of hashrefs, each representing
+    an entry in the feed. Each can contain any of the following keys. They
+    are identical to those of XML::Feed::Entry. See XML::Feed::Entry for
+    details.
+
+    *Note*: Depending on the feed format you choose, different subsets of
+    attributes might be required. As such, it is recommended that you run
+    the generated XML through a validator such as
+    <http://validator.w3.org/feed/> to ensure you included all necessary
+    information.
+
+    id
+    title
+    content
+    link
+    modified
+        This should be a DateTime object.
+
+    issued
+        This should be a DateTime object.
+
+    base
+    summary
+    category
+    tags
+    author
+
+  Arbitrary custom objects
+    If you have custom objects that you would like to turn into feed
+    entries, this can be done similar to plain Perl data structures.
+
+    For example, if we have a "DB::BlogPost" DBIx::Class model, we can do
+    the following:
+
+      $c->stash->{feed} = {
+          format      => 'Atom',
+          id          => $c->req->base,
+          title       => 'My Great Site',
+          description => 'Kitten pictures for the masses',
+          link        => $c->req->base,
+          modified    => DateTime->now,
+
+          entries => [ $c->model('DB::BlogPost')->all() ],
+      };
+
+    The view will go through the keys for entries fields and, if possible,
+    call a method of the same name on your entry object (e.g.
+    "$your_entry->title(); $your_entry->modified();") to get that value for
+    the XML.
+
+    Any missing fields are simply skipped.
+
+    If your class's method names do not match up to the "entries" keys, you
+    can simply alias them by wrapping with another method. For example, if
+    your "DB::BlogPost" has a "post_title" field which should be the title
+    for the feed entry, you can add this to BlogPost.pm:
+
+      sub title { $_[0]->post_title }
+
+  XML::Feed
+    An XML::Feed object.
+
+      $c->stash->{feed} = $xml_feed_obj;
+
+  XML::RSS
+    An XML::RSS object.
+
+      $c->stash->{feed} = $xml_rss_obj;
+
+  XML::Atom::SimpleFeed
+    An XML::Atom::SimpleFeed object.
+
+      $c->stash->{feed} = $xml_atom_simplefeed_obj;
+
+  XML::Atom::Feed
+    An XML::Atom::Feed object.
+
+      $c->stash->{feed} = $xml_atom_feed_obj;
+
+  XML::Atom::Syndication::Feed
+    An XML::Atom::Syndication::Feed object.
+
+      $c->stash->{feed} = $xml_atom_syndication_feed_obj;
+
+  Plain text
+    If none of the formats mentioned above are suitable, you may also
+    provide a string containing the XML data.
+
+      $c->stash->{feed} = $xml_string;
+
+SOURCE REPOSITORY
+    <http://github.com/mstratman/Catalyst-View-XML-Feed>
+
+AUTHOR
+    Mark A. Stratman <stratman@gmail.com>
+
+COPYRIGHT & LICENSE
+    Copyright 2011 the above author(s).
+
+    This sofware is free software, and is licensed under the same terms as
+    perl itself.
+

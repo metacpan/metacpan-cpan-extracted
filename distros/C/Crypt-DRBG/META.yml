@@ -1,0 +1,30 @@
+---
+abstract: 'Base class for fast, cryptographically-secure PRNGs'
+author:
+  - 'brian m. carlson <sandals@crustytoothpaste.net>'
+build_requires:
+  FindBin: '0'
+  IO::Handle: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-DRBG
+recommends:
+  Math::BigInt::GMP: '0'
+requires:
+  Digest::SHA: '0'
+  IO::File: '0'
+  Math::BigInt: '0'
+  integer: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+version: '0.000002'

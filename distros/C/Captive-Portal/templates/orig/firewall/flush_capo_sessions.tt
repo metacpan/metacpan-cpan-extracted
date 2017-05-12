@@ -1,0 +1,8 @@
+##########################################################
+# flush the capo_sessions ipset map for clearing sessions
+##########################################################
+
+ipset flush capo_sessions_ipset
+
+# vim: sw=2 ft=sh
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Application::Plugin::AbstractCallback.
+
+0.01  Fri Mar 10 16:32:31 2006
+	- original version; created by h2xs 1.23 with options
+		-XAn CGI::Application::Plugin::AbstractCallback
+

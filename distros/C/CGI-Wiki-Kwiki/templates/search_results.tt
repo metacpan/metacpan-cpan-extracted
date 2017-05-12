@@ -1,0 +1,16 @@
+[%# this page displays the results of a search for nodes.
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>[% site_name %] - search for [% search %]</h1>
+
+<p>Results found: [% num_results %]</p>
+
+<ul>
+  [% FOREACH hit = results %]
+    <li><a href="[% cgi_url %]?node=[% hit | uri %]">[% hit %]</a></li>
+  [% END %]
+</ul>
+
+[% INCLUDE footer.tt %]

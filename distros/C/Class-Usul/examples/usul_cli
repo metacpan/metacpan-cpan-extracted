@@ -1,0 +1,150 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Spec::Functions qw( catdir updir );
+use FindBin               qw( $Bin );
+use lib               catdir( $Bin, updir, 'lib' );
+
+# Replace this with the name of your subclass
+use Class::Usul::Programs;
+
+# Appclass is the class name of the application to which this program belongs.
+# It is used to determine the location of the default configuration file
+exit Class::Usul::Programs->new_with_options( appclass => 'Class::Usul' )->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+usul_cli - A command line interface to OO methods
+
+=head1 SYNOPSIS
+
+=over 3
+
+=item B<usul_cli> B<-nc> I<method> [B<-o> I<key1=value1> B<-o> I<key2=value2>]
+
+Calls the named method which has access to the hash reference of options
+
+=item B<usul_cli> B<-H> | B<-h> [I<method>] | B<-?>
+
+Display man page | method docs | usage string
+
+=item B<usul_cli> B<-nc> list-methods
+
+Displays a list of available methods
+
+=back
+
+=head1 DESCRIPTION
+
+This program exposes the methods in the L<Class::Usul::Programs> module
+
+=head1 OPTIONS
+
+=over 3
+
+=item B<-c> I<method>
+
+Name of method to call. Required
+
+=item B<-D        >
+
+Turn debugging on. Promps if interactive
+
+=item B<--encoding>
+
+Decodes/encodes input/output using the value. Defaults to I<UTF-8>
+
+=item B<-h        >
+
+Uses Pod::Usage to describe the program usage options
+
+=item B<-H        >
+
+Uses Pod::Man to display the program documentation. Pipes through C<nroff>
+
+=item B<--home    >
+
+Directory containing the configuration file
+
+=item B<-L        >
+
+Loads the specified language message catalog
+
+=item B<-n        >
+
+Do not prompt for debugging
+
+=item B<-o        >
+
+Zero, one or more key/value pairs passed to the method call
+
+=item B<-q        >
+
+Quiet the display of information messages
+
+=item B<-V        >
+
+Displays the version number of the program class
+
+=back
+
+=head1 EXIT STATUS
+
+Returns zero on success, non zero on failure
+
+=head1 CONFIGURATION
+
+Uses the constructor's I<appclass> attribute to locate a configuration file
+
+=head1 DIAGNOSTICS
+
+Prints errors to C<STDERR>
+
+=head1 DEPENDENCIES
+
+=over 3
+
+=item L<Class::Usul::Programs>
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+There are no known incompatibilities in this module
+
+=head1 BUGS and LIMITATIONS
+
+There are no known bugs in this module. Please report problems to
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Usul. Patches are
+welcome
+
+=head1 ACKNOWLEDGEMENTS
+
+Larry Wall - For the Perl programming language
+
+=head1 AUTHOR
+
+Peter Flanigan, C<< <pjfl@cpan.org> >>
+
+=head1 LICENSE and COPYRIGHT
+
+Copyright (c) 2017 Peter Flanigan. All rights reserved
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE
+
+=cut
+
+# Local Variables:
+# mode: perl
+# tab-width: 3
+# End:

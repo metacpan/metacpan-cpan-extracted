@@ -1,0 +1,43 @@
+Chooser
+
+A system for choosing a value for something. Takes a string composed of 
+various tests, arguements, and etc and returns a value based on it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Chooser
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Chooser
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Chooser
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Chooser
+
+    Search CPAN
+        http://search.cpan.org/dist/Chooser
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zane C. Bowers
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

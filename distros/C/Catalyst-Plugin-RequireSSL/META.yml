@@ -1,0 +1,33 @@
+---
+abstract: 'Force SSL mode on select pages'
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+build_requires:
+  Catalyst::Test: 0
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0
+  FindBin: 0
+  HTTP::Request::Common: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-Plugin-RequireSSL
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst: 5.23
+  MRO::Compat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Plugin-RequireSSL/trunk
+version: 0.07

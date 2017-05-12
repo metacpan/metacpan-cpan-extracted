@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Convert-zBase32.t
+lib/Convert/zBase32.pm
+t/01_pod.t
+t/02_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

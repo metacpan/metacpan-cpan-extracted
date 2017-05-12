@@ -1,0 +1,98 @@
+---
+abstract: 'a data toolkit'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  Log::Any::Adapter::Log4perl: '0'
+  Log::Any::Test: '1.03'
+  Log::Log4perl: '0'
+  Module::Build: '0.28'
+  Test::Deep: '0.112'
+  Test::Exception: '0.43'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.99'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Log::Any::Adapter::Log4perl: '0.06'
+  Log::Log4perl: '1.44'
+requires:
+  Any::URI::Escape: '0'
+  App::Cmd: '0.33'
+  CGI::Expand: '2.02'
+  Clone: '0.31'
+  Config::Onion: '1.004'
+  Cpanel::JSON::XS: '3.0213'
+  Data::Compare: '1.22'
+  Data::UUID: '1.217'
+  File::Find::Rule: '0.33'
+  Hash::Merge::Simple: '0'
+  IO::Handle::Util: '0.01'
+  LWP::UserAgent: '0'
+  LWP::UserAgent::Determined: '0'
+  List::MoreUtils: '0.33'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Module::Info: '0'
+  Moo: '1.004006'
+  MooX::Aliases: '0.001006'
+  Parser::MGC: '0.15'
+  Path::Tiny: '0'
+  Ref::Util: '0.020'
+  Sub::Exporter: '0.982'
+  Sub::Quote: '0'
+  Text::CSV: '1.21'
+  Text::Hogan::Compiler: '1.02'
+  Throwable: '0.200004'
+  Time::HiRes: '0'
+  Try::Tiny::ByClass: '0.01'
+  URI: '0'
+  URI::Template: '0.22'
+  Unicode::Normalize: '0'
+  YAML::XS: '0.41'
+  asa: '0'
+  namespace::clean: '0.24'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu/issues
+  homepage: https://github.com/LibreCat/Catmandu
+  repository: https://github.com/LibreCat/Catmandu.git
+version: '1.0504'
+x_contributors:
+  - 'Christian Pietsch <chr.pietsch+github@googlemail.com>'
+  - 'Dave Sherohman <dsheroh@cpan.org>'
+  - 'Doug Bell <preaction@users.noreply.github.com>'
+  - 'EC2 Default User <ec2-user@ip-10-113-18-155.ec2.internal>'
+  - 'EC2 Default User <ec2-user@ip-10-114-199-125.ec2.internal>'
+  - 'EC2 Default User <ec2-user@ip-10-194-230-16.ec2.internal>'
+  - 'EC2 Default User <ec2-user@ip-10-77-5-148.ec2.internal>'
+  - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'Johann Rolschewski <jorol@cpan.org>'
+  - 'Magnus Enger <magnus@enger.priv.no>'
+  - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
+  - 'Nicolas Franck <njfranck@cpan.org>'
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@gmail.com>'
+  - 'Pieter De Praetere <pieter@packed.be>'
+  - 'Snorri Briem <Snorri.Briem@lub.lu.se>'
+  - 'Stefan Weil <sw@weilnetz.de>'
+  - 'Tom Hukins <tom@eborcom.com>'
+  - 'Upasana Shukla <me@upasana.me>'
+  - 'Vitali Peil <vpeil@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

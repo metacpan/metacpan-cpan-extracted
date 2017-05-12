@@ -1,0 +1,23 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Conductrics/Agent.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+README.md
+t/01-uselib.t
+t/02-real_test.t
+t/03-multidecision.t
+t/04-get_decisions.t

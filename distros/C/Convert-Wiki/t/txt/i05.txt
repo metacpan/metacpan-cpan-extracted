@@ -1,0 +1,8 @@
+One
+Headline
+two
+more
+Foobar|foo
+Barbar|baz
+http://bloodgate.com/|bloodgate.com
+multiple lines

@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Class/DBI/AutoIncrement.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+t/01_test_compile.t
+t/02_test_autoincrement.t
+t/03_test_min.t
+t/04_test_fetch_max_from_db.t
+t/05_test_step.t
+t/06_test_cache.t
+t/07_test_errors.t
+t/pod.t
+t/pod-coverage.t
+t/lib/MockDB/DBI.pm
+t/lib/MockDB/Book.pm
+t/lib/MockDB/BookStep.pm
+t/lib/MockDB/BookMin.pm
+t/lib/MockDB/BookCache.pm
+t/lib/MockDB/Invalid.pm

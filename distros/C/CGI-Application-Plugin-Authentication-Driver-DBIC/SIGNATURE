@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 42c17c1e307e3183117b84352a3b70c8e3c035f1 .cvsignore
+SHA1 704d64a3eeb5ddef5cda59d17d4b3f6e5e1dfa34 Build.PL
+SHA1 dc6b2f6fb6baeb51d2392e701552c681c742caab Changes
+SHA1 77cd321c8e699deddf7d612ad787ec5fe67c413e MANIFEST
+SHA1 53bdb7441dbf19c3db8f36ff9bfcb65400592193 MANIFEST.SKIP
+SHA1 fb6fdc457b25bf9e174444298a4567e552b61755 META.yml
+SHA1 780e1c1f66435de76c13fe7da9725835a6ca71b6 Makefile.PL
+SHA1 a869c5487c8d01e77afdceacf8dbb85f7a67b879 README
+SHA1 648394bf7762a926e183ca67a277b4684b1a5c02 lib/CGI/Application/Plugin/Authentication/Driver/DBIC.pm
+SHA1 4aeb184c9bed26ab6c3be1ebdb8470c0cb353b1f t/00-signature.t
+SHA1 6c272658d5e7233f6f0533624f3f3ad363e753f8 t/01-load.t
+SHA1 0bfd45570e209cf5b890842063ca62f4f16115c4 t/authenticate.t
+SHA1 5ac4058770cdeefd578d37db0ce4d4eec466e680 t/authenticate_crypt.t
+SHA1 ebb0dbc2c973b7aefd95e97e2b6390efb27c4942 t/authenticate_md5.t
+SHA1 29d4d5384348a421d48f507d6ef91593decbc0e4 t/lib/TestAppAuthMD5.pm
+SHA1 fdd073ce1268c9f35733a2966b9a697445c91d5c t/lib/TestAppAuthPlain.pm
+SHA1 fe200cd23454c65304a7a395d1549c7083312792 t/lib/TestAppAuthcrypt.pm
+SHA1 b4761bbb78010c165fc1a1de85cc59691069ea2c t/lib/TestAppAuthenticate.pm
+SHA1 ace930587c54726d3e52647c7dae438bfc195157 t/lib/TestDB.pm
+SHA1 7f6ac3e2054235885d53ee80c0948ed24bd6e356 t/lib/TestDB/Users.pm
+SHA1 a4914ed51d6bac81f9c8e6867564b8d1f31996ca t/pod-coverage.t
+SHA1 79175c432b5b97852fd9db39092ca37d8eb38d47 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGXPESIN9eM6kfjroRAp16AKCgw/FPKzK8mEc4jYLXlEBe07PaHACg74N0
+XVXGWFAtA8qKHFfE341i934=
+=8ktL
+-----END PGP SIGNATURE-----

@@ -1,0 +1,27 @@
+inc
+{
+    foo
+    {
+        bar     baz
+    }
+}
+
+foo_2
+{
+    @inherit    .#inc/foo
+}
+
+foo_3
+{
+    @inherit    .#/inc/foo
+}
+
+foo_4
+{
+    @inherit    `#inc/foo`
+}
+
+foo_5
+{
+    @inherit    `#/inc/foo`
+}

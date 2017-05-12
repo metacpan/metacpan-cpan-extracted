@@ -1,0 +1,16 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+example/helloWorld.pl
+example/HelloWorld.pm
+lib/CouchDB/ExternalProcess.pm
+t/00.load.t
+t/01.usecase.t
+t/02.before.t
+t/03.after.t
+t/04.run.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

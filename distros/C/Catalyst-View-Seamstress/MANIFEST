@@ -1,0 +1,17 @@
+Changes
+lib/Catalyst/Helper/View/Seamstress.pm
+lib/Catalyst/View/Seamstress.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/01use.t
+t/02basics.t
+t/03leak.t
+t/lib/TestApp.pm
+t/lib/TestApp/Layouts/index.html
+t/lib/TestApp/Layouts/index.pm
+t/lib/TestApp/Layouts/skel.html
+t/lib/TestApp/Layouts/skel.pm
+t/lib/TestApp/View/Test.pm

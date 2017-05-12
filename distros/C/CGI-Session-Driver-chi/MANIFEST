@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/CGI-Session-Driver-chi.t
+lib/CGI/Session/Driver/chi.pm

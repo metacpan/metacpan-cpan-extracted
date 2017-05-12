@@ -1,0 +1,6 @@
+Define.pm
+test.pl
+Makefile.PL
+./t/AppBuilder::Define.t
+CGI-AppBuilder-Define-0.12.readme
+README

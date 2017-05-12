@@ -1,0 +1,81 @@
+NAME
+    Catalyst::Plugin::Params::Nested - Nested form parameters (ala Ruby on
+    Rails).
+
+SYNOPSIS
+        use Catalyst qw/Params::Nested/;
+
+        # using this html
+
+        <form ...>
+            <!-- can be with either subscripted or dot notation -->
+            <input name="foo[bar]" ... />
+            <input name="foo.gorch" ... />
+        </form>
+
+        # turns params into hashrefs:
+
+        $c->req->param('foo')->{bar};
+
+        $c->req->params({
+            # extra params
+            foo => {
+                bar => ...,
+                gorch => ...
+            },
+
+            # original params untouched
+            'foo[bar]' => ...,
+            'foo.gorch' => ...,
+        });
+
+DESCRIPTION
+    Ruby on Rails has a nice feature to create nested parameters that help
+    with the organization of data in a form - parameters can be an
+    arbitrarily deep nested structure.
+
+    The way this structure is denoted is that when you construct a form the
+    field names have a special syntax which is parsed.
+
+    This plugin supports two syntaxes:
+
+    dot notation
+            <input name="foo.bar.gorch" />
+
+    subscript notation
+            <input name="foo[bar][gorch]" />
+
+    When reading query parameters from "$c->req" you can now access the all
+    the items starting with "foo" as one entity using
+    "$c->req->param('foo');". Each subitem, denoted by either the dot or the
+    square brackets, will be returned as a further deeper hashref.
+
+INTERNAL METHODS
+    prepare_uploads
+        Overrides "prepare_uploads" in Catalyst to expand the parameter data
+        structure post factum.
+
+CAVEATS
+    No attempt is made to merge data intelligently. If you do this:
+
+        <input name="foo" />
+        <input name="foo.bar" />
+
+    the "foo" parameter will stay untouched, and you'll have to access
+    "foo.bar" using its full string name:
+
+        $c->req->param("foo.bar");
+
+AUTHORS
+    Yuval Kogman, "nothingmuch@woobling.org"
+
+    Jess Robinson
+
+COPYRIGHT & LICENSE
+            Copyright (c) 2005 the aforementioned authors. All rights
+            reserved. This program is free software; you can redistribute
+            it and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    CGI::Expand
+

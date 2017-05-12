@@ -1,0 +1,27 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 203
+    - 174
+  6414:
+    - 102
+name: cbae
+registers:
+  AF: 23040
+  AF_: 0
+  BC: 43543
+  BC_: 0
+  DE: 4851
+  DE_: 0
+  HL: 6414
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 0
+  R: 0
+  SP: 0

@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 6bc8926b8e71ca22fb085b5f649178c13e31d1a4 Build.PL
+SHA1 70438bc8d515a30a8eb4f7f93dd6cc4fce185e71 Changes
+SHA1 f45ee1c765646813b442ca58de72e20a64a7ddba LICENCE
+SHA1 9cfcdbe23fb0da74252f1ff247495d278431f82f MANIFEST
+SHA1 887ad540140062834da58ce0bb16c0f0bd013270 META.json
+SHA1 ff3d1a0c14fd6a6b736ce8947afb57fc7b57426f META.yml
+SHA1 2454d51c716f4133a5fc7196d7215b4fed994f48 Makefile.PL
+SHA1 09324d5835c5d7e1309118ff5619367b6fa4df03 README
+SHA1 f094ef3b03751e1a02c680bd6761b03c86c40895 examples/example.pl
+SHA1 bba9f1c45236e6b91580572e8bd1dd7835e19520 lib/Config/Trivial/Storable.pm
+SHA1 dc01d1f2134e72c70ee45b0005bb8d05a980fda0 t/00-signature.t
+SHA1 b39f6160a848b11e9cbdaadcac380f9d47a525a9 t/00-use.t
+SHA1 31142a2952ec22bb1347ad56ffa7f1fd72d8b3a0 t/01-basic.t
+SHA1 b411acd1cd01309f4e836aeb992c4ed2ee7d53ad t/02-read.t
+SHA1 5fde12a8babfc8f3890ae60e3081299f542fb7c7 t/03-error.t
+SHA1 07da8eb686326c6fa438c08122ff6e5a06ba19bf t/03-skip-error.t
+SHA1 bdfbb1d0e407daa332c9684f798daf99a6e629a7 t/04-write.t
+SHA1 dc9f1fd92833721550245912ffa034a89283c2f3 t/05-store.t
+SHA1 0bc4c74b1d073b00a418a80f4c5c71e503858de8 t/60-distribution.t
+SHA1 4fb2980f67c4f3a728351d518c8d0f73135a1ff8 t/61-kwalitee.t
+SHA1 ca4f557b70489d3eb4453d0fd579ea2c6f208d4f t/62-perl-critic.t
+SHA1 0e0f6a87cb51c0b9a3baccfb0f047bdf37bdd4f5 t/70-meta-yaml.t
+SHA1 0464003b27902f980ccb9a9df890550ea93e5fbc t/80-warn.t
+SHA1 7a128da90bba822311c792577dc35d340fa05ef5 t/90-pod.t
+SHA1 f7bf474daefde3f04a4d51db43bd942bf87cb7c2 t/91-pod.t
+SHA1 f7920cc7519ac8c8949572b376635cd7408c16ed t/92-pod.t
+SHA1 f2aa8a4ce50aac49e3c9762b54b08b9022b96a02 t/bad.data
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/empty
+SHA1 86083544f8acad61d59330cc112e51e074849bf4 t/perlcriticrc
+SHA1 dcff37626115d479310382ea54d134316ac070f3 t/second.data
+SHA1 16e43fbdb38ed07e5916004ab5b2808ed11012bc t/test.data
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBCAAGBQJThKLhAAoJEJzaiRGvDbjI67QH/29Bk6wJgTFS21UmSFCPjY2y
+8521DjbT7FZcftz+OeKUFHBKlAcNaqj45pVVJgTYEPWH62kk7E9cmvq+YnFuTKY7
+rTU96rkhwzmYvJFav2YPZHIAt423g3KBLIyfEbojMWxlwJq14T0GOJC4FwI92mly
+GOuyketh2JbpOhuod1KYUB/mWnI8oayKj8R3WTmTBoYZrbl+IfYrNB8TT4usSbNU
+k1W19z0BTBLS2PDcW3/Ie6UHGHMhig8q6GPLbEgtxawKCHrZ+L1wCLZtmMgNHMNj
+EodPSIotUxG7kL8OscTfFnwWYvo7G/1IyoblnvvZZWaQjuBBbihlT39+UK1qjQg=
+=nauP
+-----END PGP SIGNATURE-----

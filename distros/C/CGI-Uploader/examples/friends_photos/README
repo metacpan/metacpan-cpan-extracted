@@ -1,0 +1,28 @@
+
+PREREQUISIITES
+
+The following additional modules (plus their own dependencies) are
+required for this example application:
+
+CGI::Application
+HTML::Template
+CGI::Application::ValidateRM
+SQL::Abstract
+
+INSTALLATION
+
+In photos.cgi, you need configure your DBI connection parameters,
+and possibly adjust the 'use lib' line so that it can find
+CGI::UPloader.
+
+CLEAN UP
+
+Once you are done playing with the application, you may wish to clean up
+the database. Assuming you've used these resources only for this
+example, you can clean up easily:
+
+ - delete all the images in the 'uploads' sub-directory.
+ - delete all the rows from address_book() and uploads() tables. 
+
+# do not disturb the line below.. Thanks
+# arch-tag: b70d1f18-3303-47c8-ac90-64385d483f44

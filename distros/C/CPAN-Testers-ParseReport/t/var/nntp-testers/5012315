@@ -1,0 +1,209 @@
+Newsgroups: perl.cpan.testers
+Path: nntp.perl.org
+Xref: nntp.perl.org perl.cpan.testers:5012315
+Return-Path: <njh@bandsman.co.uk>
+Mailing-List: contact cpan-testers-help@perl.org; run by ezmlm
+Delivered-To: mailing list cpan-testers@perl.org
+Received: (qmail 13935 invoked from network); 14 Aug 2009 20:19:08 -0000
+Received: from x1.develooper.com (207.171.7.70)
+  by x6.develooper.com with SMTP; 14 Aug 2009 20:19:08 -0000
+Received: (qmail 13121 invoked by uid 225); 14 Aug 2009 20:19:08 -0000
+Delivered-To: cpan-testers@perl.org
+Received: (qmail 13109 invoked by alias); 14 Aug 2009 20:19:07 -0000
+X-Spam-Status: No, hits=-2.4 required=8.0
+	tests=PERLBUG_CONF,SARE_PROLOSTOCK_SYM3
+X-Spam-Check-By: la.mx.develooper.com
+Received: from nigelhorne.force9.co.uk (HELO bandsman.co.uk) (212.159.106.41)
+    by la.mx.develooper.com (qpsmtpd/0.28) with ESMTP; Fri, 14 Aug 2009 13:19:02 -0700
+Received: from bandsman.co.uk (bandsman.co.uk [127.0.0.1])
+	by bandsman.co.uk (8.14.3/8.14.3/Debian-9) with ESMTP id n7EKIvxe016017
+	for <cpan-testers@perl.org>; Fri, 14 Aug 2009 21:18:57 +0100
+Received: (from njh@localhost)
+	by bandsman.co.uk (8.14.3/8.14.3/Submit) id n7EKIv18016016;
+	Fri, 14 Aug 2009 21:18:57 +0100
+Date: Fri, 14 Aug 2009 21:18:57 +0100
+Message-ID: <200908142018.n7EKIv18016016@bandsman.co.uk>
+Subject: PASS File-Slurp-9999.13 i386-linux-thread-multi 2.6.18-128.1.14.el5
+To: cpan-testers@perl.org
+X-Virus-Checked: Checked
+Approved: news@nntp.perl.org
+From: njh@bandsman.co.uk (Nigel Horne)
+
+This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Dave Rolsky,
+=20=20=20=20
+This is a computer-generated report for File-Slurp-9999.13
+on perl 5.10.0, created by CPAN-Reporter-1.1708.=20
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester:=20
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=3D1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harn=
+ess(0, 'blib/lib', 'blib/arch')" t/*.t
+t/append_null.t ... ok
+t/data_list.t ..... ok
+t/data_scalar.t ... ok
+t/error.t ......... ok
+t/handle.t ........ ok
+t/inode.t ......... ok
+t/large.t ......... ok
+t/newline.t ....... ok
+t/no_clobber.t .... ok
+t/original.t ...... ok
+t/paragraph.t ..... ok
+t/pod.t ........... ok
+t/pod_coverage.t .. ok
+t/pseudo.t ........ ok
+t/read_dir.t ...... ok
+t/slurp.t ......... ok
+t/stdin.t ......... ok
+All tests successful.
+Files=3D17, Tests=3D260,  5 wallclock secs ( 0.15 usr  0.04 sys +  3.91 cus=
+r  0.34 csys =3D  4.44 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+    No requirements found
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    LANG =3D en_GB.UTF-8
+    PATH =3D /usr/kerberos/sbin:/usr/lib/qt-3.3/bin:/usr/kerberos/bin:/usr/=
+lib/ccache:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/ho=
+me/njh/bin
+    PERL5LIB =3D=20
+    PERL5OPT =3D=20
+    PERL5_CPANPLUS_IS_RUNNING =3D 3127
+    PERL5_CPAN_IS_RUNNING =3D 3127
+    SHELL =3D /bin/bash
+    TERM =3D xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X =3D /usr/bin/perl
+    $UID/$EUID =3D 0 / 0
+    $GID =3D 0 0 1 2 3 4 6 10
+    $EGID =3D 0 0 1 2 3 4 6 10
+
+Perl module toolchain versions installed:
+
+    Module              Have=20=20
+    ------------------- ------
+    CPAN                1.9402
+    Cwd                 3.30=20=20
+    ExtUtils::CBuilder  0.2603
+    ExtUtils::Command   1.16=20=20
+    ExtUtils::Install   1.54=20=20
+    ExtUtils::MakeMaker 6.54=20=20
+    ExtUtils::Manifest  1.56=20=20
+    ExtUtils::ParseXS   2.2002
+    File::Spec          3.30=20=20
+    Module::Build       0.34=20=20
+    Module::Signature   0.55=20=20
+    Test::Harness       3.17=20=20
+    Test::More          0.92=20=20
+    YAML                0.68=20=20
+    YAML::Syck          1.07=20=20
+    version             0.77=20=20
+
+
+--
+
+Summary of my perl5 (revision 5 version 10 subversion 0) configuration:
+  Platform:
+    osname=3Dlinux, osvers=3D2.6.18-128.1.14.el5, archname=3Di386-linux-thr=
+ead-multi
+    uname=3D'linux x86-7.fedora.phx.redhat.com 2.6.18-128.1.14.el5 #1 smp m=
+on jun 1 15:52:58 edt 2009 i686 i686 i386 gnulinux '
+    config_args=3D'-des -Doptimize=3D-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOUR=
+CE=3D2 -fexceptions -fstack-protector --param=3Dssp-buffer-size=3D4 -m32 -m=
+arch=3Di586 -mtune=3Dgeneric -fasynchronous-unwind-tables -Accflags=3D-DPER=
+L_USE_SAFE_PUTENV -Dversion=3D5.10.0 -Dmyhostname=3Dlocalhost -Dperladmin=
+=3Droot@localhost -Dcc=3Dgcc -Dcf_by=3DRed Hat, Inc. -Dprefix=3D/usr -Dvend=
+orprefix=3D/usr -Dsiteprefix=3D/usr/local -Dprivlib=3D/usr/lib/perl5/5.10.0=
+ -Dsitelib=3D/usr/local/lib/perl5/site_perl/5.10.0 -Dvendorlib=3D/usr/lib/p=
+erl5/vendor_perl/5.10.0 -Darchlib=3D/usr/lib/perl5/5.10.0/i386-linux-thread=
+-multi -Dsitearch=3D/usr/local/lib/perl5/site_perl/5.10.0/i386-linux-thread=
+-multi -Dvendorarch=3D/usr/lib/perl5/vendor_perl/5.10.0/i386-linux-thread-m=
+ulti -Dinc_version_list=3Dnone -Darchname=3Di386-linux-thread-multi -Dusesh=
+rplib -Dusethreads -Duseithreads -Duselargefiles -Dd_dosuid -Dd_semctl_semu=
+n -Di_db -Ui_ndbm -Di_gdbm -Di_shadow -Di_syslog -Dman3ext=3D3pm -Duseperli=
+o -Dinstallusrbinperl=3Dn -Ubincompat5005 -Uversiononly -Dpager=3D/usr/bin/=
+less -isr -Dd_gethostent_r_proto -Ud_endhostent_r_proto -Ud_sethostent_r_pr=
+oto -Ud_endprotoent_r_proto -Ud_setprotoent_r_proto -Ud_endservent_r_proto =
+-Ud_setservent_r_proto -Dscriptdir=3D/usr/bin -Dotherlibdirs=3D/usr/lib/per=
+l5/site_perl'
+    hint=3Drecommended, useposix=3Dtrue, d_sigaction=3Ddefine
+    useithreads=3Ddefine, usemultiplicity=3Ddefine
+    useperlio=3Ddefine, d_sfio=3Dundef, uselargefiles=3Ddefine, usesocks=3D=
+undef
+    use64bitint=3Dundef, use64bitall=3Dundef, uselongdouble=3Dundef
+    usemymalloc=3Dn, bincompat5005=3Dundef
+  Compiler:
+    cc=3D'gcc', ccflags =3D'-D_REENTRANT -D_GNU_SOURCE -DPERL_USE_SAFE_PUTE=
+NV -DDEBUGGING -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE=
+_SOURCE -D_FILE_OFFSET_BITS=3D64 -I/usr/include/gdbm',
+    optimize=3D'-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=3D2 -fexceptions -=
+fstack-protector --param=3Dssp-buffer-size=3D4 -m32 -march=3Di586 -mtune=3D=
+generic -fasynchronous-unwind-tables',
+    cppflags=3D'-D_REENTRANT -D_GNU_SOURCE -DPERL_USE_SAFE_PUTENV -DDEBUGGI=
+NG -fno-strict-aliasing -pipe -I/usr/local/include -I/usr/include/gdbm'
+    ccversion=3D'', gccversion=3D'4.4.0 20090506 (Red Hat 4.4.0-4)', gccosa=
+ndvers=3D''
+    intsize=3D4, longsize=3D4, ptrsize=3D4, doublesize=3D8, byteorder=3D1234
+    d_longlong=3Ddefine, longlongsize=3D8, d_longdbl=3Ddefine, longdblsize=
+=3D12
+    ivtype=3D'long', ivsize=3D4, nvtype=3D'double', nvsize=3D8, Off_t=3D'of=
+f_t', lseeksize=3D8
+    alignbytes=3D4, prototype=3Ddefine
+  Linker and Libraries:
+    ld=3D'gcc', ldflags =3D' -L/usr/local/lib'
+    libpth=3D/usr/local/lib /lib /usr/lib
+    libs=3D-lresolv -lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lpthread -lc
+    perllibs=3D-lresolv -lnsl -ldl -lm -lcrypt -lutil -lpthread -lc
+    libc=3D/lib/libc-2.10.1.so, so=3Dso, useshrplib=3Dtrue, libperl=3Dlibpe=
+rl.so
+    gnulibc_version=3D'2.10.1'
+  Dynamic Linking:
+    dlsrc=3Ddl_dlopen.xs, dlext=3Dso, d_dlsymun=3Dundef, ccdlflags=3D'-Wl,-=
+E -Wl,-rpath,/usr/lib/perl5/5.10.0/i386-linux-thread-multi/CORE'
+    cccdlflags=3D'-fPIC', lddlflags=3D'-shared -O2 -g -pipe -Wall -Wp,-D_FO=
+RTIFY_SOURCE=3D2 -fexceptions -fstack-protector --param=3Dssp-buffer-size=
+=3D4 -m32 -march=3Di586 -mtune=3Dgeneric -fasynchronous-unwind-tables -L/us=
+r/local/lib'=

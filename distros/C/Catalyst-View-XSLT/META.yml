@@ -1,0 +1,34 @@
+---
+abstract: 'XSLT View Class'
+author:
+  - 'Simon Bertrang, E<lt>simon.bertrang@puzzworks.comE<gt>'
+build_requires:
+  FindBin: 1.4
+  Test::More: 0.6
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Catalyst-View-XSLT
+provides:
+  Catalyst::Helper::View::XSLT:
+    file: lib/Catalyst/Helper/View/XSLT.pm
+    version: 0.09
+  Catalyst::View::XSLT:
+    file: lib/Catalyst/View/XSLT.pm
+    version: 0.09
+  Catalyst::View::XSLT::XML::LibXSLT:
+    file: lib/Catalyst/View/XSLT/XML/LibXSLT.pm
+    version: 0.09
+requires:
+  Catalyst: 5.7
+  Data::Dumper: 2
+  File::Spec: 3.1
+  Path::Class: 0.12
+  XML::LibXSLT: 1.52
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

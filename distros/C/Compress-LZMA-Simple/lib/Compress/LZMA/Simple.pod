@@ -1,0 +1,31 @@
+=head1 NAME
+
+Compress::LZMA::Simple - simple utility of LZMA compression/decompression
+
+
+=head1 SYNOPSYS
+
+ use Compress::LZMA::Simple qw(compress decompress);
+ my $original = "LZMA stands for Lempel-Ziv-Markov chain-Algorithm.";
+ my $compressed = compress(\$original);
+ my $decompressed = decompress($compressed);
+ printf("%s\n", $$decompressed);
+
+
+=head1 DESCRIPTION
+
+The Lempel-Ziv-Markov chain-Algorithm (LZMA) is an data compression algorithm.  It compresses very well (better than gzip and bzip2), compresses very slowly (much slower than bzip2) but decompresses relatively quickly.
+
+This module is a Perl interface of "lzmalib", which is a tiny wrapper of the LZMA SDK.  "lzmalib" can be downloaded at http://tokyocabinet.sourceforge.net/misc/ .
+
+The functions "compress" and "decompress" accept both of scalar and reference as the parameter.  If a scalar is given, the function returns a scalar.  If a reference is given, the function returns a reference.
+
+
+=head1 AUTHOR
+
+Mikio Hirabayashi <mikio@users.sourceforge.net>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it or modify it under the same terms as Perl itself.

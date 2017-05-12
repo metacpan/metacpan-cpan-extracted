@@ -1,0 +1,75 @@
+Revision history for CHI-Driver-Memcached
+
+** denotes an incompatible change
+
+0.16  Sep 11, 2014
+
+- specifically depend on Moose, until such time as this is converted to Moo
+
+0.15  Jan 26, 2014
+
+- replace deprecated Class::MOP::class_load with Class::Load::class_load
+
+0.14  Nov 30, 2011
+
+- allow max_key_length to be overriden
+
+0.13  Apr 18, 2011
+
+- indicate support for expires_on_backend
+- migrate to Dist::Zilla
+
+0.12  Jun 9, 2010
+
+- define max_key_length for auto-digesting in CHI >0.35
+- skip tests for new test keys in CHI >0.35 containing control characters or whitespace
+
+0.11  Jan 22, 2010
+
+- skip tests if particular memcached library not available - reported by David Yee
+
+0.10  Nov 29, 2009
+
+- support CHI::Driver::Memcached::Fast and CHI::Driver::Memcached::libmemcached
+- allow memd_params to be passed explicitly
+- depend on CHI 0.33 for non_common_constructor_params fix
+
+0.09  Nov 23, 2009
+
+- fix failing tests
+- depend on CHI 0.31
+
+0.08  May 27, 2009
+
+- depend on CHI 0.241, for fuller set of dependencies
+
+0.07  May 26, 2009
+
+- Revert test script to previous format
+
+0.06  May 25, 2009
+
+- Switch back to Moose, to match CHI 0.23
+- Extend list of keys to check in tests, to match CHI 0.23
+
+0.05  Mar 2, 2009
+
+- Switch to Mouse, to match CHI 0.10
+
+0.04  Dec 30, 2008
+
+- Moved source to git
+- Append colon to namespace before passing to Cache::Memcached
+
+0.03  Sep 26, 2008
+
+- Require Cache::Memcached
+- Skip test if memcached not running
+
+0.02  Sep 24, 2008
+
+- Require CHI 0.081 - will not work with previous versions
+
+0.01  Sep 23, 2008
+
+- Initial version

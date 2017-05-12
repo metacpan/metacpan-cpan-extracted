@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+	<title>Edit User</title>
+	<link rel="stylesheet" href="/caf-examples/example.css" type="text/css" />
+</head>
+
+  <body>
+    <div id="banner">
+     <h1>CGI::Application::Framework</h1>
+     <h2>Example Pages</h2>
+    </div>
+
+[% CGIAPP.embed("make_navbar") %]
+
+    <h1>Edit A User</h1>
+    <h2>Template::Toolkit version</h2>
+
+[% IF some_errors %]
+<div id="errormessages">
+There were errors in attempt to add the user.  Please read this page for
+error message (in red), fix things up, and try submitting this form again.
+</div>
+[% END %]
+
+<div id="userform">
+
+	<form   name="[% FORM_NAME %]"
+		  method="[% FORM_METHOD %]"
+		  action="[% FORM_ACTION %]">
+	
+	[% COMEFROMRUNMODE %]
+	[% CURRENTRUNMODE  %]
+	[% SUBMITTORUNMODE %]
+	[% SESSION_STATE   %]
+	
+		<p>
+		<b>Username:</b>
+		<input type="text"
+			   name="username"
+			   value="[% FILTER html %][% username %][% END %]">
+		<span class="error">[% err_username %] </span>
+		<br />
+		<i>Currently: [% FILTER html %][% currently_username %][% END %]</i>
+		</p>
+	
+		<p>
+		<b>Full name:</b>
+		<input type="text"
+			   name="fullname"
+			   value="[% FILTER html %][% fullname %][% END %]">
+		<span class="error">[% err_fullname %] </span>
+		<br/>
+		<i>Currently: [% FILTER html %][% currently_fullname %][% END %] </i>
+		</p>
+	
+		<p>
+		<b>Password:</b>
+		<input type="text"
+			   name="password"
+			   value="[% FILTER html %][% password %][% END %]">
+		<span class="error">[% err_password %] </span>
+		<br/>
+		<i>Currently: [% FILTER html %][% currently_password %][% END %] </i>
+		</p>
+		
+		<input type=submit name=submit value="Edit this user...">
+		
+	</form>
+</div>
+  </body>
+</html>

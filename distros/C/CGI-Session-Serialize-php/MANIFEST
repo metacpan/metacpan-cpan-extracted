@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+MANIFEST
+README
+changelog.txt
+lib/CGI/Session/Serialize/php.pm
+license.txt
+t/pod.t
+t/session_serializer_php.t

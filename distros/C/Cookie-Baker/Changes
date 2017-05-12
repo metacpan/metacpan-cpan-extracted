@@ -1,0 +1,30 @@
+Revision history for Perl extension Cookie-Baker
+
+0.07 2016-09-21T01:35:56Z
+
+   - Allow quoted cookie values, as per RFC 6265. #8
+
+0.06 2015-06-29T05:53:57Z
+
+   - fix compatibility issue. #4 (Thank you shogo82148)
+
+0.05 2014-11-26T05:49:50Z
+
+   - fix bug. accepts expires => 0
+
+0.04 2014-11-25T02:36:43Z
+
+    - requires perl-5.8.1
+
+0.03 2014-02-26T14:04:28Z
+
+    - use Cookie::Baker::XS if available
+
+0.02 2013-10-25T00:08:34Z
+
+    - fix a document bug
+
+0.01 2013-10-08T01:46:21Z
+
+    - original version
+

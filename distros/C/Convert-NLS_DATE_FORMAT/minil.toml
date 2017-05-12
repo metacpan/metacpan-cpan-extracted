@@ -1,0 +1,4 @@
+name = "Convert-NLS_DATE_FORMAT"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

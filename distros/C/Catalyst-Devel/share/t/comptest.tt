@@ -1,0 +1,26 @@
+use strict;
+use warnings;
+use Test::More;
+[% IF long_type == 'Controller' %][% IF mech %]
+
+unless (eval q{use Test::WWW::Mechanize::Catalyst 0.55; 1}) {
+    plan skip_all => 'Test::WWW::Mechanize::Catalyst >= 0.55 required';
+    exit 0;
+}
+
+ok( my $mech = Test::WWW::Mechanize::Catalyst->new(catalyst_app => '[% app %]'), 'Created mech object' );
+
+$mech->get_ok( 'http://localhost[% uri %]' );
+[%- ELSE %]
+
+use Catalyst::Test '[% app %]';
+use [% class %];
+
+ok( request('[% uri %]')->is_success, 'Request should succeed' );
+[%- END -%]
+[% ELSE %]
+
+BEGIN { use_ok '[% class %]' }
+[% END -%]
+
+done_testing();

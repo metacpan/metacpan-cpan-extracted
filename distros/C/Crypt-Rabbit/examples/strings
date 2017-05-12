@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Crypt::Rabbit;
+
+my $key = pack "H32", "00112233445566778899aabbccddeeff";
+my $cipher = new Crypt::Rabbit $key;
+
+my $ks = $cipher->keysize;
+print "keysize = $ks bytes\n";
+
+print "Encrypting...\n\n";
+my $plaintext1 = pack "H40", "00112233445566778899aabbccddeeff01234567";
+print "plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+my $ciphertext1 = $cipher->encrypt($plaintext1);
+print "ciphertext1 : ", unpack("H*", $ciphertext1), "\n";
+
+my $plaintext2 = pack "H60", 0;
+print "plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+my $ciphertext2 = $cipher->encrypt($plaintext2);
+print "ciphertext2 : ", unpack("H*", $ciphertext2), "\n";
+
+my $plaintext3 = pack "H32", "00112233445566778899aabbccddeeff";
+print "plaintext3  : ", unpack("H*", $plaintext3), "\n";
+
+my $ciphertext3 = $cipher->encrypt($plaintext3);
+print "ciphertext3 : ", unpack("H*", $ciphertext3), "\n";
+
+print "\nDecrypting...\n\n";
+
+my $key2 = pack "H32", "00112233445566778899aabbccddeeff";
+my $cipher2 = new Crypt::Rabbit $key2;
+
+$plaintext1 = $cipher2->decrypt($ciphertext1);
+print "plaintext1  : ", unpack("H*", $plaintext1), "\n";
+
+$plaintext2 = $cipher2->decrypt($ciphertext2);
+print "plaintext2  : ", unpack("H*", $plaintext2), "\n";
+
+$plaintext3 = $cipher2->decrypt($ciphertext3);
+print "plaintext3  : ", unpack("H*", $plaintext3), "\n";
+
+print "\n";
+

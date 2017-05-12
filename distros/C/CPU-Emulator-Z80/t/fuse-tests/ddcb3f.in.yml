@@ -1,0 +1,29 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  0:
+    - 221
+    - 203
+    - 49
+    - 63
+  13497:
+    - 4
+name: ddcb3f
+registers:
+  AF: 10775
+  AF_: 0
+  BC: 17053
+  BC_: 0
+  DE: 55488
+  DE_: 0
+  HL: 57449
+  HL_: 0
+  I: 0
+  IX: 13448
+  IY: 29008
+  PC: 0
+  R: 0
+  SP: 0

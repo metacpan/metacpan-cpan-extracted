@@ -1,0 +1,11 @@
+Revision history for Perl extension CGI::okSession.
+
+0.02  Wed Nov  5 22:03:27 EET 2003
+	+ $CGI::okSession->new()
+	+ $Session->expires()
+	+ $Session->expires_www()
+	+ $Session->get_ID()
+0.01  Tue Oct 21 13:14:18 EET 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n CGI::okSession
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Catalyst::Plugin::Authentication::LDAP.
+
+0.02  Mon Feb 12 15:30:00 2007
+        - Deprecation notice, please use C::P::A::Store::LDAP instead.
+
+0.01  Wed Apr 27 17:00:00 2005
+        - first release

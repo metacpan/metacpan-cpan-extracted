@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: ddcb91
+registers:
+  AF: 59486
+  AF_: 0
+  BC: 52355
+  BC_: 0
+  DE: 53833
+  DE_: 0
+  HL: 59963
+  HL_: 0
+  I: 0
+  IX: 51591
+  IY: 50385
+  PC: 4
+  R: 2
+  SP: 0

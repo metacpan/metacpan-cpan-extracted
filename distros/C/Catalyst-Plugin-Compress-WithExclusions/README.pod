@@ -1,0 +1,69 @@
+=head1 Catalyst-Plugin-Compress-WithExclusions
+
+
+It is always a good idea to compress the results that are returned from
+your web application, if the client can handle it. L<Catalyst::Plugin::Compress>
+does that for you with very little effort. However, there are times when you might
+not want the response to be compressed. For example when a returning a file that has
+already been zipped. The extra compression is unlikely to reduce the file size and
+will just add extra load to the server. This module builds upon the
+L<Catalyst::Plugin::Compress> module and adds the option to skip the compression step
+for certain url paths. So, for example, if you don't want to compress any files in the
+download path, then you would add the following to your config:
+
+    __PACKAGE__->config(
+      compression_excluded => ['^download', ],
+    );
+
+Now all urls on the site that start with download will be uncompressed and everything
+else will be compressed as requested.
+
+=cut
+
+=head1 INSTALLATION
+
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+=cut
+
+=head1 SUPPORT AND DOCUMENTATION
+
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Catalyst::Plugin::Compress::WithExclusions
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Catalyst-Plugin-Compress-WithExclusions
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Catalyst-Plugin-Compress-WithExclusions
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Catalyst-Plugin-Compress-WithExclusions
+
+    Search CPAN
+        http://search.cpan.org/dist/Catalyst-Plugin-Compress-WithExclusions/
+
+
+=head1 LICENSE AND COPYRIGHT
+
+
+Copyright (C) 2012 Jody Clements
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

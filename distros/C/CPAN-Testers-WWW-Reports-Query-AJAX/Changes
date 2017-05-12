@@ -1,0 +1,43 @@
+Revision history for CPAN-Testers-WWW-Reports-Query-AJAX
+========================================================
+
+0.09    2014-09-26
+        - fixed license fields in META.json to be lists.
+        - added homepage to META resources.
+        - added documentation about the CPAN Testers Fund.
+        - extended META testing.
+        - fixed option validation.
+        - more documentation.
+        - switched 'txt' to 'csv'.
+
+0.08    2014-04-04
+        - refine percentage calculation to 10 decimal places.
+        - added live test to be used under RELEASE_TESTING.
+        - added LICENSE file.
+
+0.07    2012-11-25
+        - use Test::MockObject instead of an internet connection.
+
+0.06    2012-11-18
+        - change file dates changed to meet W3CDTF standards.
+        - updated README.
+        - updated tests.
+
+0.05    2012-04-29
+        - various code fixes (patched by Manoj Kumar)
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+
+0.04    2012-04-18
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - fixed license in META.yml.
+
+0.03    2012-04-09
+        - added better error handling.
+
+0.02    2012-04-06
+        - added META.json and test script.
+        - added ping test & skip if no network.
+
+0.01    2012-03-30
+        - First release

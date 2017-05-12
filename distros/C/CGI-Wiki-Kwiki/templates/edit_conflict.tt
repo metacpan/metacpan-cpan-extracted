@@ -1,0 +1,54 @@
+[%# If two people make changes to the same version of a page, the last
+    one to hit 'save' gets the job of merging the differences, using this
+    page.
+-%]
+
+[%- INCLUDE header.tt %]
+
+<h1>[% site_name %] - Editing [% node_name %]</h1>
+
+<div class="warning_text">
+<p>Someone has committed changes to this node since you began editing
+
+[% IF conflicts %]
+and I wasn't able to merge the changes you both made together.</p>
+
+<p>You will need to manually merge your changes into the new version. They
+should be clearly marked below.</p>
+[% ELSE %]
+I think I've managed to merge the changes together properly, you should
+check. In most cases, hitting 'commit' again should save the changes into
+the wiki safely.</p>
+[% END %]
+
+</div>
+
+<h2>Current node contents:</h2>
+<pre>
+[% stored %]
+</pre>
+
+<h2>Your proposed revision:</h2>
+[% IF conflicts %]
+<p>(the [% conflicts %] conflict[% conflicts > 1 ? 's' : '' %] I was not able to merge [% conflicts > 1 ? 'are' : 'is' %] marked)</p>
+[% END %]
+
+<form action="[% cgi_url %]" method="POST">
+<textarea name="content" rows="30" cols="70">[% new_content %]</textarea>
+<br />
+[% INCLUDE change_info_boxes.tt %]
+[% INCLUDE formatter_box.tt %]
+<input type="hidden" name="node" value="[% node_name %]" />
+<input type="hidden" name="checksum" value="[% checksum %]" />
+<input type="submit" name="preview" value="preview" />
+<input type="submit" name="commit" value="commit" />
+</form>
+
+<p><a href="[% cgi_url %]?node=[% node_param %]">Cancel edit</a></p>
+
+[% IF preview_html %]
+  <h2>Preview</h2>
+  [% preview_html %]
+[% END %]
+
+[% INCLUDE footer.tt %]

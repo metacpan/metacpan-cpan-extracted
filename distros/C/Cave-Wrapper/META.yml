@@ -1,0 +1,42 @@
+---
+abstract: "A Wrapper to the Paludis 'cave' Client."
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  Devel::CheckBin: '0'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Cave-Wrapper
+provides:
+  Cave::Wrapper:
+    file: lib/Cave/Wrapper.pm
+    version: '1.000001'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  Moo: '0'
+  Sub::Install: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Cave-Wrapper/issues
+  homepage: https://github.com/kentnl/Cave-Wrapper
+  repository: https://github.com/kentnl/Cave-Wrapper.git
+version: '1.000001'

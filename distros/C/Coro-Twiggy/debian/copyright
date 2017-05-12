@@ -1,0 +1,17 @@
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Source: http://search.cpan.org/dist/Coro-Twiggy/
+Name: Coro::Twiggy
+
+Files: *
+Copyright:
+ 2011-2012 Dmitry E. Oboukhov <unera@debian.org>
+License: Artistic
+
+License: Artistic
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the Artistic License, which comes with Perl.
+ .
+ On Debian systems, the complete text of the Artistic License can be
+ found in `/usr/share/common-licenses/Artistic'.
+

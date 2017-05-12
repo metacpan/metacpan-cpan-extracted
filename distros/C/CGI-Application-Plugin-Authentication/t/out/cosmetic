@@ -1,0 +1,31 @@
+
+<form name="loginform" method="post" action="">
+  <div class="login">
+    <div class="login_header">
+      Aanmelden
+    </div>
+    <div class="login_content">
+      <ul class="message">
+<li class="warning">Ongeldige gebruikersnaam of wachtwoord <br /> (login poging 1)</li>
+      </ul>
+      <fieldset>
+        <label for="authen_username">Gebruikersnaam</label>
+        <input id="authen_loginfield" tabindex="1" type="text" name="authen_username" size="20" value="user1" /><br />
+        <label for="authen_password">Wachtwoord</label>
+        <input id="authen_passwordfield" tabindex="2" type="password" name="authen_password" size="20" /><br />
+        <input id="authen_rememberuserfield" tabindex="3" type="checkbox" name="authen_rememberuser" value="1" />Onthouden Gebruikersnaam<br />
+      </fieldset>
+    </div>
+    <div class="login_footer">
+      <div class="buttons">
+        <input id="authen_loginbutton" tabindex="4" type="submit" name="authen_loginbutton" value="Aanmelden" class="button" />
+        
+        
+      </div>
+    </div>
+  </div>
+  <input type="hidden" name="destination" value="http://localhost?rm=two;authen_username=user1" />
+  <input type="hidden" name="rm" value="authen_login" />
+</form>
+<script type="text/javascript" language="JavaScript">document.loginform.authen_username.select();
+</script>

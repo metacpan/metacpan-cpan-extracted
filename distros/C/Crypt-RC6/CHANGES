@@ -1,0 +1,33 @@
+Revision history for Perl extension Crypt::RC6
+
+1.0    March 16, 2002
+
+    -- Optimized the code in _rc6.c.
+    -- Incorporated the test vectors from THE RC6 BLOCK CIPHER
+       into test.pl and t/00_load.t.
+
+0.50   November 17, 2001
+
+    -- Thanks to feedback from Andrew Page, fixed two serious
+       bugs in function rc6_generateKeySchedule. The module now
+       performs in accordance with the test data provided in
+       THE RC6 BLOCK CIPHER.
+
+0.50   November 12, 2001
+
+    -- Made the distribution Crypt::CBC compliant.
+
+0.05   September 16, 2001
+
+    -- Added test.pl to the distribution.
+
+0.04   September 16, 2001
+
+    -- Added a load test.
+
+0.03   September 14, 2001
+
+    -- Added this CHANGES file, README file, COPYING file.
+    -- Changed file permissions so that all may access the
+       unpacked distribution.
+

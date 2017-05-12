@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>General operation</TITLE>
+<META NAME="description" CONTENT="General operation">
+<META NAME="keywords" CONTENT="Cmenu">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="Cmenu.css">
+
+<LINK REL="previous" HREF="node3.html">
+<LINK REL="up" HREF="node3.html">
+<LINK REL="next" HREF="node5.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html86"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html82"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html78"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html84"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html87"
+  HREF="node5.html">Sample Script</A>
+<B> Up:</B> <A NAME="tex2html83"
+  HREF="node3.html">How to use Cmenu</A>
+<B> Previous:</B> <A NAME="tex2html79"
+  HREF="node3.html">How to use Cmenu</A>
+ &nbsp <B>  <A NAME="tex2html85"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00031000000000000000">
+General operation</A>
+</H2>
+The typical sequence of using the Cmenu functions is;
+
+<OL>
+<LI>Initialise the Module and Curses by calling <B>menu_initialise</B>. This activates Curses and sets up module variables. Once this has been called, Curses is active; this means screen I/O should only be performed through Curses functions. If your script bombs before closing Curses down your terminal may well be scrambled - run <B>reset</B> to restore its sanity.
+</LI>
+<LI>Create a new menu with the <B>menu_init</B> function.
+</LI>
+<LI>Create one or more menu items with the <I>menu_item</I> function. This is the most powerful function as it allows you control over the functioning and appearance of each menu item.
+</LI>
+<LI>Display the menu by calling <B>menu_display</B>. This routine performs all menu navigation, field editing, help displays and other stuff. Eventually pressing an exit key will end this routine when the results of the menu navigation will be returned to your script
+</LI>
+<LI>Your script should then react to the data returned by the menu. Most of the time this processing will be fairly trivial but if you built a complex menu with lists and data fields for editing, the return value may be quite complicated to deal with
+</LI>
+<LI>You can continue this process until you no longer need the module when <B>menu_terminate</B> should be called. This will closedown Curses so that screen I/O will return to normal. You can continue user interaction if you wish but none of the Cmenu or Curses functions should be used.
+</LI>
+</OL>
+
+<P>
+
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html86"
+  HREF="node5.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="file:/usr/lib/latex2html/icons/next.png"></A> 
+<A NAME="tex2html82"
+  HREF="node3.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="file:/usr/lib/latex2html/icons/up.png"></A> 
+<A NAME="tex2html78"
+  HREF="node3.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="file:/usr/lib/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html84"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="file:/usr/lib/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html87"
+  HREF="node5.html">Sample Script</A>
+<B> Up:</B> <A NAME="tex2html83"
+  HREF="node3.html">How to use Cmenu</A>
+<B> Previous:</B> <A NAME="tex2html79"
+  HREF="node3.html">How to use Cmenu</A>
+ &nbsp <B>  <A NAME="tex2html85"
+  HREF="node1.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Andy Ferguson (AFC)
+2001-10-20
+</ADDRESS>
+</BODY>
+</HTML>

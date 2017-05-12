@@ -1,0 +1,26 @@
+This is a test: {?$title?}
+
+<select>
+	<option name='test' value="{?$value?}"<iftoken name="value" value="{?if $test --?}{?$test?}{?-- $test?}" as="template"> selected</iftoken>>{?$name?}{?@select?}
+</select>
+
+{? this is some regular text ?}
+
+{? $so is this ?}
+
+{?if $t1 --?}{?if $t2 --?}{?if $t3 --?}{?if $t4 --?}{?if $t5 --?}
+{?if $t6 --?}{?if $t7 --?}{?if $t8 --?}{?if $t9 --?}{?if $t10 --?}
+Test 10 nested.
+{?-- $t10?}{?-- $t9?}{?-- $t8?}{?-- $t7?}{?-- $t6?}{?-- $t5?}
+{?-- $t4?}{?-- $t3?}{?-- $t2?}{?-- $t1?}
+
+This should say Yes: {?if $yes --?}Yes{?-- $yes --?}No{?-- $yes?}.
+This should say No: {?if !$yes --?}Yes{?-- $yes --?}No{?-- $yes?}.
+
+{?$title?}
+
+{?my $t --?}abc{?-- $t?}<vartoken name="vt">vartoken test</vartoken>
+
+This line repeats: {?$num?}{?@r?}. {?if $yes --?}Yes{?-- $yes --?}No{?-- $yes?}
+
+{?my $z="abc"?}<vartoken name="vt2" value="vartoken test 2">

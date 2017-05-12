@@ -1,0 +1,95 @@
+{
+   "abstract" : "see http://xkcd.com/936/",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Crypt-XkcdPassword",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Moo" : "1.006000",
+            "Types::Standard" : "1.000000",
+            "match::simple" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Crypt::XkcdPassword" : {
+         "file" : "lib/Crypt/XkcdPassword.pm",
+         "version" : "0.009"
+      },
+      "Crypt::XkcdPassword::Words" : {
+         "file" : "lib/Crypt/XkcdPassword/Words.pm"
+      },
+      "Crypt::XkcdPassword::Words::EN" : {
+         "file" : "lib/Crypt/XkcdPassword/Words/EN.pm",
+         "version" : "0.009"
+      },
+      "Crypt::XkcdPassword::Words::EN::Roget" : {
+         "file" : "lib/Crypt/XkcdPassword/Words/EN/Roget.pm",
+         "version" : "0.009"
+      },
+      "Crypt::XkcdPassword::Words::IT" : {
+         "file" : "lib/Crypt/XkcdPassword/Words/IT.pm",
+         "version" : "0.009"
+      },
+      "Crypt::XkcdPassword::Words::sys" : {
+         "file" : "lib/Crypt/XkcdPassword/Words/sys.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Crypt-XkcdPassword/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Crypt-XkcdPassword"
+      },
+      "homepage" : "https://metacpan.org/release/Crypt-XkcdPassword",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-crypt-xkcdpassword.git",
+         "web" : "https://github.com/tobyink/p5-crypt-xkcdpassword"
+      }
+   },
+   "version" : "0.009",
+   "x_provides_scripts" : {
+      "passphrase" : {
+         "file" : "bin/passphrase"
+      }
+   }
+}

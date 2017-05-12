@@ -1,0 +1,67 @@
+There are a number of display types and position types that should be
+explained.  These names can be used to both position the widget itself
+and the contents within the widget.
+
+</R>Widget Positioning<!R>
+There are five pre-defined position names that help location either a
+widget or a widgets title, or any other element of a widget. They are 
+listed in the table below.
+
+<C><#UL><#HL(7)><#TT><#HL(46)><#UR>
+<C><#VL></U>Name    <#VL>Purpose                                        <!U><#VL>
+<C><#VL>TOP     <#VL>Positions a widget to the top of the screen.   <#VL>
+<C><#VL>BOTTOM  <#VL>Positions a widget to the bottom of the screen.<#VL>
+<C><#VL>LEFT    <#VL>Positions a widget to the left of the screen.  <#VL>
+<C><#VL>RIGHT   <#VL>Positions a widget to the right of the screen. <#VL>
+<C><#VL>CENTER  <#VL>Positions a widget to the center of the screen.<#VL>
+<C><#LL><#HL(7)><#BT><#HL(46)><#LR>
+
+If the names are not used, then a numeric value can be used for location.
+
+</R>Entry Field Display Types<!R>
+The entry fields, Matrix, Entry and Multiple Line Entry, can define the
+type of input defined. They are specified with the following pre-defined
+display type variables.
+
+<C><#UL><#HL(8)><#TT><#HL(39)><#UR>
+<C><#VL></U>Name     <#VL>Result                                  <!U><#VL>
+<C><#VL>CHAR     <#VL> Character only.                        <#VL>
+<C><#VL>HCHAR    <#VL> Hidden Character Only.                 <#VL>
+<C><#VL>INT      <#VL> Integer only.                          <#VL>
+<C><#VL>HINT     <#VL> Hidden Integer Only.                   <#VL>
+<C><#VL>MIXED    <#VL> Mixed Input.                           <#VL>
+<C><#VL>HMIXED   <#VL> Hidden Mixed Input.                    <#VL>
+<C><#VL>UCHAR    <#VL> Upper Case Character Input.            <#VL>
+<C><#VL>LCHAR    <#VL> Lower Case Character Input.            <#VL>
+<C><#VL>UHCHAR   <#VL> Upper Case Hidden Character Input.     <#VL>
+<C><#VL>LHCHAR   <#VL> Lower Case Hidden Character Input.     <#VL>
+<C><#VL>UMIXED   <#VL> Upper Case Mixed Input.                <#VL>
+<C><#VL>LMIXED   <#VL> Lower Case Mixed Input.                <#VL>
+<C><#VL>UHMIXED  <#VL> Upper Case Hidden Mixed Input.         <#VL>
+<C><#VL>LHMIXED  <#VL> Lower Case Hidden Mixed Input.         <#VL>
+<C><#VL>VIEWONLY <#VL> View only field. (uneditable)          <#VL>
+<C><#LL><#HL(8)><#BT><#HL(39)><#LR>
+
+</K>NOTE<!K> When the above says Upper/Lower Case that means all the input
+     auto-magically gets mapped to Upper/Lower case. When it says hidden
+     it means the input is taken and stored; only a . is presented for
+     each key hit. This is useful for password or hidden entries.
+
+</R>Special Types<!R>
+Special types exist for certain widgets. Below is a list of the current
+widgets that have a special type, its name and description.
+
+<C><#UL<#HL(9)><#TT><#HL(10)><#TT><#HL(43)><#UR>
+<C><#VL></U>Widget    <#VL>Type Name  <#VL>Result                                      <!U><#VL>
+<C><#VL>Histogram <#VL>NONE       <#VL>Turns off the statistics for the histogram. <#VL>
+<C><#VL>          <#VL>PERCENT    <#VL>Sets the statistics to a percentage.        <#VL>
+<C><#VL>          <#VL>REAL       <#VL>Sets the statistics to the real value.      <#VL>
+<C><#VL>          <#VL>HORIZONTAL <#VL>Specifies a horizontal histogram.           <#VL>
+<C><#VL>          <#VL>VERTICAL   <#VL>Specifies a vertical histogram.             <#VL>
+<C><#VL>Graph     <#VL>PLOT       <#VL>Specifies the graph will draw a plot graph. <#VL>
+<C><#VL>          <#VL>LINE       <#VL>Specifies the graph will draw a line graph. <#VL>
+<C><#LL<#HL(9)><#BT><#HL(10)><#BT><#HL(43)><#LR>
+
+<C><#HL(70)>
+<C>Document Created: June,     1995
+<C>Document Revised: November, 1995

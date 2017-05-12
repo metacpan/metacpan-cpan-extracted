@@ -1,0 +1,2 @@
+- Add tests against the real SOAP::Lite, perhaps using MockObject
+  The current tests missed the API changes in SOAP::Lite v0.66

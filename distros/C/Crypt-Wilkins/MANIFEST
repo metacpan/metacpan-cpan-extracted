@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Crypt-Wilkins.t
+lib/Crypt/Wilkins.pm
+META.yml                                 Module meta-data (added by MakeMaker)

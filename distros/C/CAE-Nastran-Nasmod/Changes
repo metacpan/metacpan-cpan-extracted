@@ -1,0 +1,27 @@
+Revision history for Perl extension Nasmod.
+
+0.20  Thu Apr 17 14:36:50 2014
+	- original version; created by h2xs 1.23 with options
+		-v 0.20 -AX Nasmod
+
+0.21 Tue Apr 22
+    - documentation improved
+    - reorganized namespace
+
+0.22 Wed Apr 23
+    - documentation improved
+
+0.23 Wed Apr 23
+    - packagename changed
+
+0.24 Wed Apr 23
+    - error corrections
+
+0.25 Wed Apr 24
+    - pod for nested module
+    - improving META.yml
+
+0.26 Wed Apr 25
+    - improving pod / META.yml
+    - printing nastran model to file
+    - more tests

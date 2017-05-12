@@ -1,0 +1,167 @@
+1.14  - POD Updates
+
+1.13  - CGI::Widget::Tabs::Style now exports css_styles so that tabs-demo.pl
+        works correctly. (Many thanks to James Osborne for the spot)
+
+1.12	- Removed message asking users not to log bugs to rt.cpan.org
+        as I do now seem to finally own the bugs queue for this module
+		  - Added POD to CGI::Widget::Tabs::Styles so Pod::Coverage tests
+			  pass
+
+1.11	- Add Test::Distribution Tests replacing individual sig+pod tests
+	- Added force_active feature (patch from Koos Pol)
+
+1.10	- Added Pod::Coverage tests into 002_pod.t
+	- Corrected version numbers in Changes file
+	- Correctd Pod error in CGI::Widget::Tabs::Headings
+
+1.09    - Added drop_params feature (patch from Koos Pol)
+	- Removed 'Limitations and Extensibility' (was no longer relevant)
+	- Moved docs for Headings into the Headings class.
+
+1.08 	- New Maintainer/Owner: Sagar R. Shah
+     	- Moved from ExtUtils::MakeMaker to Module::Build for building
+      	- Added optional Test::Pod and Test::Signature tests
+  	- Reorganised files to newer style layout with lib and t subdirs
+	- Removed INSTALL, TODO and  COPYRIGHT files ... see README or pod docs
+	- Unified README and pod docs
+        - Revealed hidden piece of docs in a 'Limitations and Extensibility'
+	  section
+        - Pod docs in Tabs.pm are a more literate style. Methods ordered
+ 	  alphabetically, internals method documented.
+
+1.07  (2003-04-27)
+------------------
+    - Removed the distinction between simple headings and OO headings.
+      Simple headings are now (as they should be) just a variation of
+      OO headings. This greatly simplifies programming logic. One
+      consequence is that the headings() method now only returns OO
+      headings. (Thanks to Bernhard Schmalhofer
+      <Bernhard.Schmalhofer@biomax.de> for suggestions and patches.)
+
+    - Added a hash as optional initializer for the headings() method.
+      (Thanks to Bernhard Schmalhofer <Bernhard.Schmalhofer@biomax.de>
+      for suggestions and patches.)
+
+    - Headings can now override the default CSS class using the
+      class() method. (Suggested by Bernie Ledwick
+      <bl@man.fwltech.com>)
+
+    - Documentation updates
+
+
+
+1.06.01 (2003-01-26)
+--------------------
+This is a maintenance release.
+    - Fixed: forgot the replace my private "require" with "use"
+    - Some code rearrangements.
+
+
+
+1.06 (2003-01-16)
+-----------------
+    - Minor interface change as promised in the 1.05 release:
+      $h->raw_text(STRING) has been superseded by
+      $h->raw(BOOLEAN). For a background of the reason, see the
+      BUGS section in the documentation of the 1.05 release. For
+      the current workings, see the documentation in this release
+      for the methods $h->text() and $h->raw().
+
+    - Dropped the "use warnings" to support Perl <= 5.005.
+      But CGI::Widget::Tabs pretends to be warning free all
+      together.
+
+
+
+1.05 (2002-12-02)
+-----------------
+    - Added wrapping and indentation functionality.
+    - Minor documentation changes.
+    - Relocated file Styles.pm. Read INSTALL for details.
+
+
+
+1.04 (2002-11-23)
+--------------------
+    - Added CSS example style sheets to the demo script.
+
+
+
+1.03.01 (2002-11-12)
+--------------------
+    This is a maintenance release.
+    - Changed : Adopted 2 digit version numbering.
+    - Changed : ->cgi_object() now checks if the passed object
+                is a valid CGI or CGI::Minimal object. (Suggested
+                by Bodo Eing <eingb@uni-muenster.de>)
+    - Fixed   : Typo in test script (test.pl)
+
+
+
+1.3 (2002-11-03)
+----------------
+    Continuous discussions with Sagar Shah
+    <sagarshah@softhome.net> had made me (finally) realize that
+    CGI::Widget::Tabs can't be extended without serious design
+    change. (Is everybody so stubborn? Or is it just me?) Well,
+    here it is Sagar :-)
+
+    - Added an OO interface as a basis for future extensions of
+      tab headings.
+    - OO headings can be configured with the new methods:
+          text()       HTML escaped heading text
+          raw_text()   HTML unescaped heading text
+          key()        Value to be used as CGI query param value
+          url()        Redirection URL
+    - Documentation additions, changes and fixes.
+    - Small change to the layout of the HTML table displaying the
+      widget
+    - The test script (`make test') now supports both CGI and
+      CGI::Minimal
+
+
+
+1.2.1 (2002-09-07)
+------------------
+    - Fixed: uncaught undef
+    - Documentation fixes (typo's, grammar, etc)
+    - Documentation additions (section, coding examples, etc)
+    - Minor internal code clean up
+    - Added version as comment to resulting HTML
+    - Added TODO
+
+
+
+1.2 (2002-08-16)
+----------------
+    - CGI::Tabs has adopted the namespace CGI::Widget::Tabs. To
+      create a new tab object, now issue the statements:
+          use CGI::Widget::Tabs;
+          $tab = CGI::Widget::Tabs->new();
+    - Added the ->render() method (suggestions from
+      Bodo Eing <eingb@uni-muenster.de>)
+    - Minor documentation changes
+    - Made it's first public appearance on CPAN
+      (http://cpan.perl.org)
+
+
+
+1.1 (2002-08-07)
+----------------
+    - The leading minus sign in key/value lists is now propagated
+      to the query params in the URL. The reason is that you
+      would get bitten if you wanted to access the CGI tabs
+      parameter directly through the CGI object in stead of
+      through the CGI::Tabs object. The missing '-' would be a
+      fall over. If you are not accessing the tabs parameter
+      outside the CGI::Tabs object, you are not affected.
+    - The space between tabs now has it's own CSS class
+    - demo.pl has been renamed to tabs-demo.pl to avoid future conflicts.
+
+
+
+
+1.0  (2002-07-09)
+----------------
+    First release

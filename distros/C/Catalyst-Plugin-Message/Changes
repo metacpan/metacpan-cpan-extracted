@@ -1,0 +1,11 @@
+Revision history for Catalyst-Plugin-Message
+
+0.03	2006-4-6 22:18
+		add sprintf support for diemsg.
+
+0.02	2006-4-4 23:36
+		add $c->diemsg( "a fatal error." );
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

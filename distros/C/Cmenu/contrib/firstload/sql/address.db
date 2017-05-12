@@ -1,0 +1,26 @@
+DROP TABLE address;
+DROP SEQUENCE address_addressid_seq;
+CREATE TABLE address (
+	addressid	SERIAL,
+	addforename	TEXT,
+	addsurname	TEXT,
+	addorg		TEXT,
+	addstreet	TEXT,
+	addtownland	TEXT,
+	addtown		TEXT,
+	addpostcode	TEXT,
+	addcounty	TEXT,
+	addcountry	TEXT,
+	addphone1	TEXT,
+	addptype1	INT DEFAULT 0,
+	addphone2	TEXT,
+	addptype2	INT DEFAULT 1,
+	addphone3	TEXT,
+	addptype3	INT DEFAULT 2,
+	addphone4	TEXT,
+	addptype4	INT DEFAULT 3,
+	addtype		INT DEFAULT 0,
+	addemail	TEXT,
+	addnote		TEXT,
+	addupdate	TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

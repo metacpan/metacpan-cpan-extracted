@@ -1,0 +1,39 @@
+Changes for CGI::Application::Server
+
+0.063     2013-07-05 21:08:53 America/New_York
+          repackage, update bugtracker
+
+0.062			2010-01-20
+					work on alternate ports (thanks, Potatohead @ github)
+					misc. cleanup (Potatohead, rjbs)
+
+0.061			2009-02-08
+					reinitialize $query between runs when entry point is an object
+					(patch from JALDHAR, rt #42199)
+
+0.060 Sun. Nov  2, 2008
+          a number of patches from George Hartzell; thanks!
+          documenation improvements
+          use HTTP::Server::Simple::Static as its documentation suggests
+          add handling for a "/" entry point
+
+0.050 Sun. Oct 21, 2007
+          add support for CGI::Application objects as entry points
+          handle PATH_INFO munging for CGI::App, not just ::Dispatch
+          both these changes thanks to JALDHAR
+
+0.04 Sun. Oct 21, 2007
+          add support for CGI::Application::Dispatch classes
+
+0.03 Tues. Feb 20, 2007
+          Fixed is_valid_entry_point to be more strict
+          in how it matched URIs, added tests
+
+          fixed the way the captured stdout is recombined
+          to make steaming non-HTML mime-types work
+
+0.02 Mon. April 10, 2006
+          Added logging of every request (uri, entry-point, and params)
+
+0.01 Wed. March 15, 2006
+          initial release of module

@@ -1,0 +1,4 @@
+staff {
+  name = Katsuragi Misato
+  role = executive officer
+}

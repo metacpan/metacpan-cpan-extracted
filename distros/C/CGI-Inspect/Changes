@@ -1,0 +1,29 @@
+Revision history for CGI::Inspect. See Changes-darcs or the main repository for
+a detailed list of internal changes.
+
+Version 0.05 (released 2009.06.26)
+  * Turn on persistent tree state for the callstack
+  * Update hello demo
+  * Improve error checking
+  * Make lexical editing work for regular hashes and arrays
+  * Remove some cruft
+
+Version 0.04 (released 2009.06.06)
+  * Update documentation
+  * Update CallStack plugin, now includes editability
+  * Add experimental CGI::Inspect::Here
+  * Teach the REPL to deal without lexicals
+  * Print plugin load errors to STDERR
+
+Version 0.03 (released 2009.06.04)
+  * Add missing files
+
+Version 0.02 (released 2009.05.30)
+  * Renamed to CGI::Inspect
+  * Significantly refactored to be lighter
+  * Only simple REPL and simple StackTrace plugins for now
+  * Added DIE handler to auto-start
+
+Version 0.01 (released 2008.10.14)
+  * Initial release, just to get it out there
+  * Includes JS and image dependencies

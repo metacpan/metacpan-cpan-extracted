@@ -1,0 +1,5576 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>CaCORE::CaDSR</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#address">Address</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_address">ATTRIBUTES of Address</a></li>
+		<li><a href="#associations_of_address">ASSOCIATIONS of Address</a></li>
+	</ul>
+
+	<li><a href="#administeredcomponent">AdministeredComponent</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_administeredcomponent">ATTRIBUTES of AdministeredComponent</a></li>
+		<li><a href="#associations_of_administeredcomponent">ASSOCIATIONS of AdministeredComponent</a></li>
+	</ul>
+
+	<li><a href="#administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_administeredcomponentclassschemeitem">ATTRIBUTES of AdministeredComponentClassSchemeItem</a></li>
+		<li><a href="#associations_of_administeredcomponentclassschemeitem">ASSOCIATIONS of AdministeredComponentClassSchemeItem</a></li>
+	</ul>
+
+	<li><a href="#administeredcomponentcontact">AdministeredComponentContact</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_administeredcomponentcontact">ATTRIBUTES of AdministeredComponentContact</a></li>
+		<li><a href="#associations_of_administeredcomponentcontact">ASSOCIATIONS of AdministeredComponentContact</a></li>
+	</ul>
+
+	<li><a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_classschemeclassschemeitem">ATTRIBUTES of ClassSchemeClassSchemeItem</a></li>
+		<li><a href="#associations_of_classschemeclassschemeitem">ASSOCIATIONS of ClassSchemeClassSchemeItem</a></li>
+	</ul>
+
+	<li><a href="#classificationscheme">ClassificationScheme</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_classificationscheme">ATTRIBUTES of ClassificationScheme</a></li>
+		<li><a href="#associations_of_classificationscheme">ASSOCIATIONS of ClassificationScheme</a></li>
+	</ul>
+
+	<li><a href="#classificationschemeitem">ClassificationSchemeItem</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_classificationschemeitem">ATTRIBUTES of ClassificationSchemeItem</a></li>
+		<li><a href="#associations_of_classificationschemeitem">ASSOCIATIONS of ClassificationSchemeItem</a></li>
+	</ul>
+
+	<li><a href="#classificationschemeitemrelationship">ClassificationSchemeItemRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_classificationschemeitemrelationship">ATTRIBUTES of ClassificationSchemeItemRelationship</a></li>
+		<li><a href="#associations_of_classificationschemeitemrelationship">ASSOCIATIONS of ClassificationSchemeItemRelationship</a></li>
+	</ul>
+
+	<li><a href="#classificationschemerelationship">ClassificationSchemeRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_classificationschemerelationship">ATTRIBUTES of ClassificationSchemeRelationship</a></li>
+		<li><a href="#associations_of_classificationschemerelationship">ASSOCIATIONS of ClassificationSchemeRelationship</a></li>
+	</ul>
+
+	<li><a href="#componentconcept">ComponentConcept</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_componentconcept">ATTRIBUTES of ComponentConcept</a></li>
+		<li><a href="#associations_of_componentconcept">ASSOCIATIONS of ComponentConcept</a></li>
+	</ul>
+
+	<li><a href="#componentlevel">ComponentLevel</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_componentlevel">ATTRIBUTES of ComponentLevel</a></li>
+		<li><a href="#associations_of_componentlevel">ASSOCIATIONS of ComponentLevel</a></li>
+	</ul>
+
+	<li><a href="#concept">Concept</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_concept">ATTRIBUTES of Concept</a></li>
+		<li><a href="#associations_of_concept">ASSOCIATIONS of Concept</a></li>
+	</ul>
+
+	<li><a href="#conceptderivationrule">ConceptDerivationRule</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_conceptderivationrule">ATTRIBUTES of ConceptDerivationRule</a></li>
+		<li><a href="#associations_of_conceptderivationrule">ASSOCIATIONS of ConceptDerivationRule</a></li>
+	</ul>
+
+	<li><a href="#conceptualdomain">ConceptualDomain</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_conceptualdomain">ATTRIBUTES of ConceptualDomain</a></li>
+		<li><a href="#associations_of_conceptualdomain">ASSOCIATIONS of ConceptualDomain</a></li>
+	</ul>
+
+	<li><a href="#conditionmessage">ConditionMessage</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_conditionmessage">ATTRIBUTES of ConditionMessage</a></li>
+		<li><a href="#associations_of_conditionmessage">ASSOCIATIONS of ConditionMessage</a></li>
+	</ul>
+
+	<li><a href="#contactcommunication">ContactCommunication</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_contactcommunication">ATTRIBUTES of ContactCommunication</a></li>
+		<li><a href="#associations_of_contactcommunication">ASSOCIATIONS of ContactCommunication</a></li>
+	</ul>
+
+	<li><a href="#context">Context</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_context">ATTRIBUTES of Context</a></li>
+		<li><a href="#associations_of_context">ASSOCIATIONS of Context</a></li>
+	</ul>
+
+	<li><a href="#dataelement">DataElement</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_dataelement">ATTRIBUTES of DataElement</a></li>
+		<li><a href="#associations_of_dataelement">ASSOCIATIONS of DataElement</a></li>
+	</ul>
+
+	<li><a href="#dataelementconcept">DataElementConcept</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_dataelementconcept">ATTRIBUTES of DataElementConcept</a></li>
+		<li><a href="#associations_of_dataelementconcept">ASSOCIATIONS of DataElementConcept</a></li>
+	</ul>
+
+	<li><a href="#dataelementconceptrelationship">DataElementConceptRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_dataelementconceptrelationship">ATTRIBUTES of DataElementConceptRelationship</a></li>
+		<li><a href="#associations_of_dataelementconceptrelationship">ASSOCIATIONS of DataElementConceptRelationship</a></li>
+	</ul>
+
+	<li><a href="#dataelementderivation">DataElementDerivation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_dataelementderivation">ATTRIBUTES of DataElementDerivation</a></li>
+		<li><a href="#associations_of_dataelementderivation">ASSOCIATIONS of DataElementDerivation</a></li>
+	</ul>
+
+	<li><a href="#dataelementrelationship">DataElementRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_dataelementrelationship">ATTRIBUTES of DataElementRelationship</a></li>
+		<li><a href="#associations_of_dataelementrelationship">ASSOCIATIONS of DataElementRelationship</a></li>
+	</ul>
+
+	<li><a href="#definition">Definition</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_definition">ATTRIBUTES of Definition</a></li>
+		<li><a href="#associations_of_definition">ASSOCIATIONS of Definition</a></li>
+	</ul>
+
+	<li><a href="#definitionclassschemeitem">DefinitionClassSchemeItem</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_definitionclassschemeitem">ATTRIBUTES of DefinitionClassSchemeItem</a></li>
+		<li><a href="#associations_of_definitionclassschemeitem">ASSOCIATIONS of DefinitionClassSchemeItem</a></li>
+	</ul>
+
+	<li><a href="#derivationtype">DerivationType</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_derivationtype">ATTRIBUTES of DerivationType</a></li>
+		<li><a href="#associations_of_derivationtype">ASSOCIATIONS of DerivationType</a></li>
+	</ul>
+
+	<li><a href="#deriveddataelement">DerivedDataElement</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_deriveddataelement">ATTRIBUTES of DerivedDataElement</a></li>
+		<li><a href="#associations_of_deriveddataelement">ASSOCIATIONS of DerivedDataElement</a></li>
+	</ul>
+
+	<li><a href="#designation">Designation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_designation">ATTRIBUTES of Designation</a></li>
+		<li><a href="#associations_of_designation">ASSOCIATIONS of Designation</a></li>
+	</ul>
+
+	<li><a href="#designationclassschemeitem">DesignationClassSchemeItem</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_designationclassschemeitem">ATTRIBUTES of DesignationClassSchemeItem</a></li>
+		<li><a href="#associations_of_designationclassschemeitem">ASSOCIATIONS of DesignationClassSchemeItem</a></li>
+	</ul>
+
+	<li><a href="#enumeratedvaluedomain">EnumeratedValueDomain</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_enumeratedvaluedomain">ATTRIBUTES of EnumeratedValueDomain</a></li>
+		<li><a href="#associations_of_enumeratedvaluedomain">ASSOCIATIONS of EnumeratedValueDomain</a></li>
+	</ul>
+
+	<li><a href="#form">Form</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_form">ATTRIBUTES of Form</a></li>
+		<li><a href="#associations_of_form">ASSOCIATIONS of Form</a></li>
+	</ul>
+
+	<li><a href="#formelement">FormElement</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_formelement">ATTRIBUTES of FormElement</a></li>
+		<li><a href="#associations_of_formelement">ASSOCIATIONS of FormElement</a></li>
+	</ul>
+
+	<li><a href="#function">Function</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_function">ATTRIBUTES of Function</a></li>
+		<li><a href="#associations_of_function">ASSOCIATIONS of Function</a></li>
+	</ul>
+
+	<li><a href="#instruction">Instruction</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_instruction">ATTRIBUTES of Instruction</a></li>
+		<li><a href="#associations_of_instruction">ASSOCIATIONS of Instruction</a></li>
+	</ul>
+
+	<li><a href="#module">Module</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_module">ATTRIBUTES of Module</a></li>
+		<li><a href="#associations_of_module">ASSOCIATIONS of Module</a></li>
+	</ul>
+
+	<li><a href="#nonenumeratedvaluedomain">NonenumeratedValueDomain</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_nonenumeratedvaluedomain">ATTRIBUTES of NonenumeratedValueDomain</a></li>
+		<li><a href="#associations_of_nonenumeratedvaluedomain">ASSOCIATIONS of NonenumeratedValueDomain</a></li>
+	</ul>
+
+	<li><a href="#objectclass">ObjectClass</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_objectclass">ATTRIBUTES of ObjectClass</a></li>
+		<li><a href="#associations_of_objectclass">ASSOCIATIONS of ObjectClass</a></li>
+	</ul>
+
+	<li><a href="#objectclassrelationship">ObjectClassRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_objectclassrelationship">ATTRIBUTES of ObjectClassRelationship</a></li>
+		<li><a href="#associations_of_objectclassrelationship">ASSOCIATIONS of ObjectClassRelationship</a></li>
+	</ul>
+
+	<li><a href="#organization">Organization</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_organization">ATTRIBUTES of Organization</a></li>
+		<li><a href="#associations_of_organization">ASSOCIATIONS of Organization</a></li>
+	</ul>
+
+	<li><a href="#permissiblevalue">PermissibleValue</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_permissiblevalue">ATTRIBUTES of PermissibleValue</a></li>
+		<li><a href="#associations_of_permissiblevalue">ASSOCIATIONS of PermissibleValue</a></li>
+	</ul>
+
+	<li><a href="#person">Person</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_person">ATTRIBUTES of Person</a></li>
+		<li><a href="#associations_of_person">ASSOCIATIONS of Person</a></li>
+	</ul>
+
+	<li><a href="#property">Property</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_property">ATTRIBUTES of Property</a></li>
+		<li><a href="#associations_of_property">ASSOCIATIONS of Property</a></li>
+	</ul>
+
+	<li><a href="#protocol">Protocol</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_protocol">ATTRIBUTES of Protocol</a></li>
+		<li><a href="#associations_of_protocol">ASSOCIATIONS of Protocol</a></li>
+	</ul>
+
+	<li><a href="#question">Question</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_question">ATTRIBUTES of Question</a></li>
+		<li><a href="#associations_of_question">ASSOCIATIONS of Question</a></li>
+	</ul>
+
+	<li><a href="#questioncondition">QuestionCondition</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_questioncondition">ATTRIBUTES of QuestionCondition</a></li>
+		<li><a href="#associations_of_questioncondition">ASSOCIATIONS of QuestionCondition</a></li>
+	</ul>
+
+	<li><a href="#questionconditioncomponents">QuestionConditionComponents</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_questionconditioncomponents">ATTRIBUTES of QuestionConditionComponents</a></li>
+		<li><a href="#associations_of_questionconditioncomponents">ASSOCIATIONS of QuestionConditionComponents</a></li>
+	</ul>
+
+	<li><a href="#questionrepetition">QuestionRepetition</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_questionrepetition">ATTRIBUTES of QuestionRepetition</a></li>
+		<li><a href="#associations_of_questionrepetition">ASSOCIATIONS of QuestionRepetition</a></li>
+	</ul>
+
+	<li><a href="#referencedocument">ReferenceDocument</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_referencedocument">ATTRIBUTES of ReferenceDocument</a></li>
+		<li><a href="#associations_of_referencedocument">ASSOCIATIONS of ReferenceDocument</a></li>
+	</ul>
+
+	<li><a href="#representation">Representation</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_representation">ATTRIBUTES of Representation</a></li>
+		<li><a href="#associations_of_representation">ASSOCIATIONS of Representation</a></li>
+	</ul>
+
+	<li><a href="#triggeraction">TriggerAction</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_triggeraction">ATTRIBUTES of TriggerAction</a></li>
+		<li><a href="#associations_of_triggeraction">ASSOCIATIONS of TriggerAction</a></li>
+	</ul>
+
+	<li><a href="#validvalue">ValidValue</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_validvalue">ATTRIBUTES of ValidValue</a></li>
+		<li><a href="#associations_of_validvalue">ASSOCIATIONS of ValidValue</a></li>
+	</ul>
+
+	<li><a href="#valuedomain">ValueDomain</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_valuedomain">ATTRIBUTES of ValueDomain</a></li>
+		<li><a href="#associations_of_valuedomain">ASSOCIATIONS of ValueDomain</a></li>
+	</ul>
+
+	<li><a href="#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_valuedomainpermissiblevalue">ATTRIBUTES of ValueDomainPermissibleValue</a></li>
+		<li><a href="#associations_of_valuedomainpermissiblevalue">ASSOCIATIONS of ValueDomainPermissibleValue</a></li>
+	</ul>
+
+	<li><a href="#valuedomainrelationship">ValueDomainRelationship</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_valuedomainrelationship">ATTRIBUTES of ValueDomainRelationship</a></li>
+		<li><a href="#associations_of_valuedomainrelationship">ASSOCIATIONS of ValueDomainRelationship</a></li>
+	</ul>
+
+	<li><a href="#valuemeaning">ValueMeaning</a></li>
+	<ul>
+
+		<li><a href="#abstract">ABSTRACT</a></li>
+		<li><a href="#synopsis">SYNOPSIS</a></li>
+		<li><a href="#description">DESCRIPTION</a></li>
+		<li><a href="#attributes_of_valuemeaning">ATTRIBUTES of ValueMeaning</a></li>
+		<li><a href="#associations_of_valuemeaning">ASSOCIATIONS of ValueMeaning</a></li>
+	</ul>
+
+	<li><a href="#support">SUPPORT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="address">Address</a></h1>
+<p>CaCORE::CaDSR::Address - Perl extension for Address.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Address is a Perl object representation of the
+CaCORE Address object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_address">ATTRIBUTES of Address</a></h2>
+<p>The following are all the attributes of the Address object and their data types:</p>
+<dl>
+<dt><strong><a name="item_addressline1">addressLine1</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_addressline2">addressLine2</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_city">city</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_country">country</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_createdby">createdBy</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_datecreated">dateCreated</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_datemodified">dateModified</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_id">id</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_modifiedby">modifiedBy</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_postalcode">postalCode</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_rank">rank</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_state">state</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_type">type</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_address">ASSOCIATIONS of Address</a></h2>
+<p>The following are all the objects that are associated with the Address:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2forganization_3a">Collection of <a href="#organization">Organization</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOrganization</code> to get the associated Organization.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fperson_3a">Collection of <a href="#person">Person</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getPerson</code> to get the associated Person.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="administeredcomponent">AdministeredComponent</a></h1>
+<p>CaCORE::CaDSR::AdministeredComponent - Perl extension for AdministeredComponent.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::AdministeredComponent is a Perl object representation of the
+CaCORE AdministeredComponent object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_administeredcomponent">ATTRIBUTES of AdministeredComponent</a></h2>
+<p>The following are all the attributes of the AdministeredComponent object and their data types:</p>
+<dl>
+<dt><strong><a name="item_begindate">beginDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_changenote">changeNote</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_deletedindicator">deletedIndicator</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_enddate">endDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_latestversionindicator">latestVersionIndicator</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_longname">longName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_origin">origin</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_preferreddefinition">preferredDefinition</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_preferredname">preferredName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_publicid">publicID</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_registrationstatus">registrationStatus</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_unresolvedissue">unresolvedIssue</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_version">version</a></strong>
+
+<dd>
+<p>data type: <code>float</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_workflowstatusdescription">workflowStatusDescription</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_workflowstatusname">workflowStatusName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_administeredcomponent">ASSOCIATIONS of AdministeredComponent</a></h2>
+<p>The following are all the objects that are associated with the AdministeredComponent:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fadministeredcomponentclassschemeite">Instance of <a href="#administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentClassSchemeItemCollection</code> to get a collection of associated AdministeredComponentClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fadministeredcomponentcontact_3a">Instance of <a href="#administeredcomponentcontact">AdministeredComponentContact</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentContactCollection</code> to get a collection of associated AdministeredComponentContact.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fcontext_3a">Collection of <a href="#context">Context</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getContext</code> to get the associated Context.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdefinition_3a">Instance of <a href="#definition">Definition</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDefinitionCollection</code> to get a collection of associated Definition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdesignation_3a">Instance of <a href="#designation">Designation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDesignationCollection</code> to get a collection of associated Designation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2freferencedocument_3a">Instance of <a href="#referencedocument">ReferenceDocument</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getReferenceDocumentCollection</code> to get a collection of associated ReferenceDocument.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a></h1>
+<p>CaCORE::CaDSR::AdministeredComponentClassSchemeItem - Perl extension for AdministeredComponentClassSchemeItem.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::AdministeredComponentClassSchemeItem is a Perl object representation of the
+CaCORE AdministeredComponentClassSchemeItem object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_administeredcomponentclassschemeitem">ATTRIBUTES of AdministeredComponentClassSchemeItem</a></h2>
+<p>The following are all the attributes of the AdministeredComponentClassSchemeItem object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_administeredcomponentclassschemeitem">ASSOCIATIONS of AdministeredComponentClassSchemeItem</a></h2>
+<p>The following are all the objects that are associated with the AdministeredComponentClassSchemeItem:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fclassschemeclassschemeitem_3a">Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsourceobjectclass_3a">Instance of <a href="#sourceobjectclass">SourceObjectClass</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSourceObjectClassCollection</code> to get a collection of associated SourceObjectClass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftargetobjectclass_3a">Instance of <a href="#targetobjectclass">TargetObjectClass</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTargetObjectClassCollection</code> to get a collection of associated TargetObjectClass.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="administeredcomponentcontact">AdministeredComponentContact</a></h1>
+<p>CaCORE::CaDSR::AdministeredComponentContact - Perl extension for AdministeredComponentContact.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::AdministeredComponentContact is a Perl object representation of the
+CaCORE AdministeredComponentContact object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_administeredcomponentcontact">ATTRIBUTES of AdministeredComponentContact</a></h2>
+<p>The following are all the attributes of the AdministeredComponentContact object and their data types:</p>
+<dl>
+<dt><strong><a name="item_contactrole">contactRole</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>rank</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_administeredcomponentcontact">ASSOCIATIONS of AdministeredComponentContact</a></h2>
+<p>The following are all the objects that are associated with the AdministeredComponentContact:</p>
+<dl>
+<dt><strong>Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fclassificationschemeitem_3a">Collection of <a href="#classificationschemeitem">ClassificationSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassificationSchemeItem</code> to get the associated ClassificationSchemeItem.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#organization">Organization</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOrganization</code> to get the associated Organization.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#person">Person</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getPerson</code> to get the associated Person.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="classschemeclassschemeitem">ClassSchemeClassSchemeItem</a></h1>
+<p>CaCORE::CaDSR::ClassSchemeClassSchemeItem - Perl extension for ClassSchemeClassSchemeItem.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ClassSchemeClassSchemeItem is a Perl object representation of the
+CaCORE ClassSchemeClassSchemeItem object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_classschemeclassschemeitem">ATTRIBUTES of ClassSchemeClassSchemeItem</a></h2>
+<p>The following are all the attributes of the ClassSchemeClassSchemeItem object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_displayorder">displayOrder</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_classschemeclassschemeitem">ASSOCIATIONS of ClassSchemeClassSchemeItem</a></h2>
+<p>The following are all the objects that are associated with the ClassSchemeClassSchemeItem:</p>
+<dl>
+<dt><strong>Instance of <a href="#administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentClassSchemeItemCollection</code> to get a collection of associated AdministeredComponentClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#administeredcomponentcontact">AdministeredComponentContact</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentContactCollection</code> to get a collection of associated AdministeredComponentContact.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fchildclassschemeclassschemeitem_3a">Instance of <a href="#childclassschemeclassschemeitem">ChildClassSchemeClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildClassSchemeClassSchemeItemCollection</code> to get a collection of associated ChildClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fclassificationscheme_3a">Collection of <a href="#classificationscheme">ClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassificationScheme</code> to get the associated ClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#classificationschemeitem">ClassificationSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassificationSchemeItem</code> to get the associated ClassificationSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdefinitionclassschemeitem_3a">Instance of <a href="#definitionclassschemeitem">DefinitionClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDefinitionClassSchemeItemCollection</code> to get a collection of associated DefinitionClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdesignationclassschemeitem_3a">Instance of <a href="#designationclassschemeitem">DesignationClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDesignationClassSchemeItemCollection</code> to get a collection of associated DesignationClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentclassschemeclassschemeitem_">Collection of <a href="#parentclassschemeclassschemeitem">ParentClassSchemeClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentClassSchemeClassSchemeItem</code> to get the associated ParentClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#referencedocument">ReferenceDocument</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getReferenceDocumentCollection</code> to get a collection of associated ReferenceDocument.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="classificationscheme">ClassificationScheme</a></h1>
+<p>CaCORE::CaDSR::ClassificationScheme - Perl extension for ClassificationScheme.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ClassificationScheme is a Perl object representation of the
+CaCORE ClassificationScheme object.</p>
+<p>ClassificationScheme extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_classificationscheme">ATTRIBUTES of ClassificationScheme</a></h2>
+<p>The following are all the attributes of the ClassificationScheme object and their data types:</p>
+<dl>
+<dt><strong><a name="item_labeltypeflag">labelTypeFlag</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_classificationscheme">ASSOCIATIONS of ClassificationScheme</a></h2>
+<p>The following are all the objects that are associated with the ClassificationScheme:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchildclassificationscheme_3a">Instance of <a href="#childclassificationscheme">ChildClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildClassificationSchemeCollection</code> to get a collection of associated ChildClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fchildclassificationschemerelationsh">Instance of <a href="#childclassificationschemerelationship">ChildClassificationSchemeRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildClassificationSchemeRelationshipCollection</code> to get a collection of associated ChildClassificationSchemeRelationship.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fclassschemeclassschemeitem_3a">Instance of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getClassSchemeClassSchemeItemCollection</code> to get a collection of associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fconceptderivationrule_3a">Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentclassificationscheme_3a">Collection of <a href="#parentclassificationscheme">ParentClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentClassificationScheme</code> to get the associated ParentClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentclassificationschemerelations">Instance of <a href="#parentclassificationschemerelationship">ParentClassificationSchemeRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentClassificationSchemeRelationshipCollection</code> to get a collection of associated ParentClassificationSchemeRelationship.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="classificationschemeitem">ClassificationSchemeItem</a></h1>
+<p>CaCORE::CaDSR::ClassificationSchemeItem - Perl extension for ClassificationSchemeItem.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ClassificationSchemeItem is a Perl object representation of the
+CaCORE ClassificationSchemeItem object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_classificationschemeitem">ATTRIBUTES of ClassificationSchemeItem</a></h2>
+<p>The following are all the attributes of the ClassificationSchemeItem object and their data types:</p>
+<dl>
+<dt><strong><a name="item_comments">comments</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_description">description</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_name">name</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_classificationschemeitem">ASSOCIATIONS of ClassificationSchemeItem</a></h2>
+<p>The following are all the objects that are associated with the ClassificationSchemeItem:</p>
+<dl>
+<dt><strong>Instance of <a href="#administeredcomponentcontact">AdministeredComponentContact</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentContactCollection</code> to get a collection of associated AdministeredComponentContact.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fchildclassificationschemeitemrelati">Instance of <a href="#childclassificationschemeitemrelationship">ChildClassificationSchemeItemRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildClassificationSchemeItemRelationshipCollection</code> to get a collection of associated ChildClassificationSchemeItemRelationship.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getClassSchemeClassSchemeItemCollection</code> to get a collection of associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentclassificationschemeitemrelat">Instance of <a href="#parentclassificationschemeitemrelationship">ParentClassificationSchemeItemRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentClassificationSchemeItemRelationshipCollection</code> to get a collection of associated ParentClassificationSchemeItemRelationship.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#referencedocument">ReferenceDocument</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getReferenceDocumentCollection</code> to get a collection of associated ReferenceDocument.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="classificationschemeitemrelationship">ClassificationSchemeItemRelationship</a></h1>
+<p>CaCORE::CaDSR::ClassificationSchemeItemRelationship - Perl extension for ClassificationSchemeItemRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ClassificationSchemeItemRelationship is a Perl object representation of the
+CaCORE ClassificationSchemeItemRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_classificationschemeitemrelationship">ATTRIBUTES of ClassificationSchemeItemRelationship</a></h2>
+<p>The following are all the attributes of the ClassificationSchemeItemRelationship object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_classificationschemeitemrelationship">ASSOCIATIONS of ClassificationSchemeItemRelationship</a></h2>
+<p>The following are all the objects that are associated with the ClassificationSchemeItemRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchildclassificationschemeitem_3a">Collection of <a href="#childclassificationschemeitem">ChildClassificationSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildClassificationSchemeItem</code> to get the associated ChildClassificationSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentclassificationschemeitem_3a">Collection of <a href="#parentclassificationschemeitem">ParentClassificationSchemeItem</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentClassificationSchemeItem</code> to get the associated ParentClassificationSchemeItem.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="classificationschemerelationship">ClassificationSchemeRelationship</a></h1>
+<p>CaCORE::CaDSR::ClassificationSchemeRelationship - Perl extension for ClassificationSchemeRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ClassificationSchemeRelationship is a Perl object representation of the
+CaCORE ClassificationSchemeRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_classificationschemerelationship">ATTRIBUTES of ClassificationSchemeRelationship</a></h2>
+<p>The following are all the attributes of the ClassificationSchemeRelationship object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_classificationschemerelationship">ASSOCIATIONS of ClassificationSchemeRelationship</a></h2>
+<p>The following are all the objects that are associated with the ClassificationSchemeRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchildclassificationscheme_3a">Collection of <a href="#childclassificationscheme">ChildClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildClassificationScheme</code> to get the associated ChildClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#parentclassificationscheme">ParentClassificationScheme</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentClassificationScheme</code> to get the associated ParentClassificationScheme.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="componentconcept">ComponentConcept</a></h1>
+<p>CaCORE::CaDSR::ComponentConcept - Perl extension for ComponentConcept.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ComponentConcept is a Perl object representation of the
+CaCORE ComponentConcept object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_componentconcept">ATTRIBUTES of ComponentConcept</a></h2>
+<p>The following are all the attributes of the ComponentConcept object and their data types:</p>
+<dl>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_primaryflag">primaryFlag</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_value">value</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_componentconcept">ASSOCIATIONS of ComponentConcept</a></h2>
+<p>The following are all the objects that are associated with the ComponentConcept:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fcomponentlevel_3a">Collection of <a href="#componentlevel">Componentlevel</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getComponentlevel</code> to get the associated Componentlevel.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fconcept_3a">Collection of <a href="#concept">Concept</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConcept</code> to get the associated Concept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fderivationrule_3a">Collection of <a href="#derivationrule">DerivationRule</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDerivationRule</code> to get the associated DerivationRule.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="componentlevel">ComponentLevel</a></h1>
+<p>CaCORE::CaDSR::ComponentLevel - Perl extension for ComponentLevel.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ComponentLevel is a Perl object representation of the
+CaCORE ComponentLevel object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_componentlevel">ATTRIBUTES of ComponentLevel</a></h2>
+<p>The following are all the attributes of the ComponentLevel object and their data types:</p>
+<dl>
+<dt><strong><a name="item_concatenationstring">concatenationString</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_level">level</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_componentlevel">ASSOCIATIONS of ComponentLevel</a></h2>
+<p>The following are all the objects that are associated with the ComponentLevel:</p>
+<p>
+</p>
+<hr />
+<h1><a name="concept">Concept</a></h1>
+<p>CaCORE::CaDSR::Concept - Perl extension for Concept.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Concept is a Perl object representation of the
+CaCORE Concept object.</p>
+<p>Concept extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_concept">ATTRIBUTES of Concept</a></h2>
+<p>The following are all the attributes of the Concept object and their data types:</p>
+<dl>
+<dt><strong><a name="item_definitionsource">definitionSource</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_evssource">evsSource</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_concept">ASSOCIATIONS of Concept</a></h2>
+<p>The following are all the objects that are associated with the Concept:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fcomponentconcept_3a">Instance of <a href="#componentconcept">ComponentConcept</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getComponentConceptCollection</code> to get a collection of associated ComponentConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fvaluedomainpermissiblevalue_3a">Instance of <a href="#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainPermissibleValueCollection</code> to get a collection of associated ValueDomainPermissibleValue.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="conceptderivationrule">ConceptDerivationRule</a></h1>
+<p>CaCORE::CaDSR::ConceptDerivationRule - Perl extension for ConceptDerivationRule.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ConceptDerivationRule is a Perl object representation of the
+CaCORE ConceptDerivationRule object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_conceptderivationrule">ATTRIBUTES of ConceptDerivationRule</a></h2>
+<p>The following are all the attributes of the ConceptDerivationRule object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_conceptderivationrule">ASSOCIATIONS of ConceptDerivationRule</a></h2>
+<p>The following are all the objects that are associated with the ConceptDerivationRule:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fclassificationscheme_3a">Instance of <a href="#classificationscheme">ClassificationScheme</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getClassificationSchemeCollection</code> to get a collection of associated ClassificationScheme.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fclassificationschemeitem_3a">Instance of <a href="#classificationschemeitem">ClassificationSchemeItem</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getClassificationSchemeItemCollection</code> to get a collection of associated ClassificationSchemeItem.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#componentconcept">ComponentConcept</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getComponentConceptCollection</code> to get a collection of associated ComponentConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fconceptualdomain_3a">Instance of <a href="#conceptualdomain">ConceptualDomain</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getConceptualDomainCollection</code> to get a collection of associated ConceptualDomain.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fderivationtype_3a">Collection of <a href="#derivationtype">DerivationType</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDerivationType</code> to get the associated DerivationType.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fobjectclass_3a">Instance of <a href="#objectclass">ObjectClass</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getObjectClassCollection</code> to get a collection of associated ObjectClass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fobjectclassrelationship_3a">Instance of <a href="#objectclassrelationship">ObjectClassRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getObjectClassRelationshipCollection</code> to get a collection of associated ObjectClassRelationship.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fproperty_3a">Instance of <a href="#property">Property</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPropertyCollection</code> to get a collection of associated Property.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2frepresentation_3a">Instance of <a href="#representation">Representation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getRepresentationCollection</code> to get a collection of associated Representation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsourceroleconcept_3a">Instance of <a href="#sourceroleconcept">SourceRoleConcept</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSourceRoleConceptCollection</code> to get a collection of associated SourceRoleConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftargetroleconcept_3a">Instance of <a href="#targetroleconcept">TargetRoleConcept</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTargetRoleConceptCollection</code> to get a collection of associated TargetRoleConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fvaluedomain_3a">Instance of <a href="#valuedomain">ValueDomain</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainCollection</code> to get a collection of associated ValueDomain.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fvaluemeaning_3a">Instance of <a href="#valuemeaning">ValueMeaning</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueMeaningCollection</code> to get a collection of associated ValueMeaning.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="conceptualdomain">ConceptualDomain</a></h1>
+<p>CaCORE::CaDSR::ConceptualDomain - Perl extension for ConceptualDomain.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ConceptualDomain is a Perl object representation of the
+CaCORE ConceptualDomain object.</p>
+<p>ConceptualDomain extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_conceptualdomain">ATTRIBUTES of ConceptualDomain</a></h2>
+<p>The following are all the attributes of the ConceptualDomain object and their data types:</p>
+<dl>
+<dt><strong><a name="item_dimensionality">dimensionality</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_conceptualdomain">ASSOCIATIONS of ConceptualDomain</a></h2>
+<p>The following are all the objects that are associated with the ConceptualDomain:</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdataelementconcept_3a">Instance of <a href="#dataelementconcept">DataElementConcept</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementConceptCollection</code> to get a collection of associated DataElementConcept.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#valuedomain">ValueDomain</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainCollection</code> to get a collection of associated ValueDomain.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#valuemeaning">ValueMeaning</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueMeaningCollection</code> to get a collection of associated ValueMeaning.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="conditionmessage">ConditionMessage</a></h1>
+<p>CaCORE::CaDSR::ConditionMessage - Perl extension for ConditionMessage.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ConditionMessage is a Perl object representation of the
+CaCORE ConditionMessage object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_conditionmessage">ATTRIBUTES of ConditionMessage</a></h2>
+<p>The following are all the attributes of the ConditionMessage object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_message">message</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_messagetype">messageType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_conditionmessage">ASSOCIATIONS of ConditionMessage</a></h2>
+<p>The following are all the objects that are associated with the ConditionMessage:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fquestioncondition_3a">Collection of <a href="#questioncondition">QuestionCondition</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestionCondition</code> to get the associated QuestionCondition.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="contactcommunication">ContactCommunication</a></h1>
+<p>CaCORE::CaDSR::ContactCommunication - Perl extension for ContactCommunication.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ContactCommunication is a Perl object representation of the
+CaCORE ContactCommunication object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_contactcommunication">ATTRIBUTES of ContactCommunication</a></h2>
+<p>The following are all the attributes of the ContactCommunication object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>rank</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_contactcommunication">ASSOCIATIONS of ContactCommunication</a></h2>
+<p>The following are all the objects that are associated with the ContactCommunication:</p>
+<dl>
+<dt><strong>Collection of <a href="#organization">Organization</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOrganization</code> to get the associated Organization.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#person">Person</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getPerson</code> to get the associated Person.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="context">Context</a></h1>
+<p>CaCORE::CaDSR::Context - Perl extension for Context.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Context is a Perl object representation of the
+CaCORE Context object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_context">ATTRIBUTES of Context</a></h2>
+<p>The following are all the attributes of the Context object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_languagename">languageName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>version</strong>
+
+<dd>
+<p>data type: <code>float</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_context">ASSOCIATIONS of Context</a></h2>
+<p>The following are all the objects that are associated with the Context:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fadministeredcomponent_3a">Instance of <a href="#administeredcomponent">AdministeredComponent</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentCollection</code> to get a collection of associated AdministeredComponent.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#definition">Definition</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDefinitionCollection</code> to get a collection of associated Definition.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#designation">Designation</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDesignationCollection</code> to get a collection of associated Designation.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#referencedocument">ReferenceDocument</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getReferenceDocumentCollection</code> to get a collection of associated ReferenceDocument.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dataelement">DataElement</a></h1>
+<p>CaCORE::CaDSR::DataElement - Perl extension for DataElement.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DataElement is a Perl object representation of the
+CaCORE DataElement object.</p>
+<p>DataElement extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_dataelement">ATTRIBUTES of DataElement</a></h2>
+<p>The following are all the attributes of the DataElement object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_dataelement">ASSOCIATIONS of DataElement</a></h2>
+<p>The following are all the objects that are associated with the DataElement:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchilddataelementrelationships_3a">Instance of <a href="#childdataelementrelationships">ChildDataElementRelationships</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildDataElementRelationshipsCollection</code> to get a collection of associated ChildDataElementRelationships.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fdataelementconcept_3a">Collection of <a href="#dataelementconcept">DataElementConcept</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDataElementConcept</code> to get the associated DataElementConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdataelementderivation_3a">Instance of <a href="#dataelementderivation">DataElementDerivation</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementDerivationCollection</code> to get a collection of associated DataElementDerivation.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fderiveddataelement_3a">Collection of <a href="#deriveddataelement">DerivedDataElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDerivedDataElement</code> to get the associated DerivedDataElement.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentdataelementrelationships_3a">Instance of <a href="#parentdataelementrelationships">ParentDataElementRelationships</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentDataElementRelationshipsCollection</code> to get a collection of associated ParentDataElementRelationships.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fquestion_3a">Instance of <a href="#question">Question</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionCollection</code> to get a collection of associated Question.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvaluedomain_3a">Collection of <a href="#valuedomain">ValueDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValueDomain</code> to get the associated ValueDomain.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dataelementconcept">DataElementConcept</a></h1>
+<p>CaCORE::CaDSR::DataElementConcept - Perl extension for DataElementConcept.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DataElementConcept is a Perl object representation of the
+CaCORE DataElementConcept object.</p>
+<p>DataElementConcept extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_dataelementconcept">ATTRIBUTES of DataElementConcept</a></h2>
+<p>The following are all the attributes of the DataElementConcept object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_dataelementconcept">ASSOCIATIONS of DataElementConcept</a></h2>
+<p>The following are all the objects that are associated with the DataElementConcept:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchilddataelementconceptrelationship">Instance of <a href="#childdataelementconceptrelationship">ChildDataElementConceptRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildDataElementConceptRelationshipCollection</code> to get a collection of associated ChildDataElementConceptRelationship.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fconceptualdomain_3a">Collection of <a href="#conceptualdomain">ConceptualDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptualDomain</code> to get the associated ConceptualDomain.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fdataelement_3a">Instance of <a href="#dataelement">DataElement</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementCollection</code> to get a collection of associated DataElement.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fobjectclass_3a">Collection of <a href="#objectclass">ObjectClass</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getObjectClass</code> to get the associated ObjectClass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentdataelementconceptrelationshi">Instance of <a href="#parentdataelementconceptrelationship">ParentDataElementConceptRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentDataElementConceptRelationshipCollection</code> to get a collection of associated ParentDataElementConceptRelationship.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fproperty_3a">Collection of <a href="#property">Property</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getProperty</code> to get the associated Property.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dataelementconceptrelationship">DataElementConceptRelationship</a></h1>
+<p>CaCORE::CaDSR::DataElementConceptRelationship - Perl extension for DataElementConceptRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DataElementConceptRelationship is a Perl object representation of the
+CaCORE DataElementConceptRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_dataelementconceptrelationship">ATTRIBUTES of DataElementConceptRelationship</a></h2>
+<p>The following are all the attributes of the DataElementConceptRelationship object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_dataelementconceptrelationship">ASSOCIATIONS of DataElementConceptRelationship</a></h2>
+<p>The following are all the objects that are associated with the DataElementConceptRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchilddataelementconcept_3a">Collection of <a href="#childdataelementconcept">ChildDataElementConcept</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildDataElementConcept</code> to get the associated ChildDataElementConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentdataelementconcept_3a">Collection of <a href="#parentdataelementconcept">ParentDataElementConcept</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentDataElementConcept</code> to get the associated ParentDataElementConcept.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dataelementderivation">DataElementDerivation</a></h1>
+<p>CaCORE::CaDSR::DataElementDerivation - Perl extension for DataElementDerivation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DataElementDerivation is a Perl object representation of the
+CaCORE DataElementDerivation object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_dataelementderivation">ATTRIBUTES of DataElementDerivation</a></h2>
+<p>The following are all the attributes of the DataElementDerivation object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_leadingcharacters">leadingCharacters</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_trailingcharacters">trailingCharacters</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_dataelementderivation">ASSOCIATIONS of DataElementDerivation</a></h2>
+<p>The following are all the objects that are associated with the DataElementDerivation:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fdataelement_3a">Collection of <a href="#dataelement">DataElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDataElement</code> to get the associated DataElement.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#deriveddataelement">DerivedDataElement</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDerivedDataElement</code> to get the associated DerivedDataElement.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fleftoperand_3a">Collection of <a href="#leftoperand">LeftOperand</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getLeftOperand</code> to get the associated LeftOperand.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dataelementrelationship">DataElementRelationship</a></h1>
+<p>CaCORE::CaDSR::DataElementRelationship - Perl extension for DataElementRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DataElementRelationship is a Perl object representation of the
+CaCORE DataElementRelationship object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_dataelementrelationship">ATTRIBUTES of DataElementRelationship</a></h2>
+<p>The following are all the attributes of the DataElementRelationship object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_dataelementrelationship">ASSOCIATIONS of DataElementRelationship</a></h2>
+<p>The following are all the objects that are associated with the DataElementRelationship:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchilddataelement_3a">Collection of <a href="#childdataelement">ChildDataElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildDataElement</code> to get the associated ChildDataElement.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentdataelement_3a">Collection of <a href="#parentdataelement">ParentDataElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentDataElement</code> to get the associated ParentDataElement.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="definition">Definition</a></h1>
+<p>CaCORE::CaDSR::Definition - Perl extension for Definition.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Definition is a Perl object representation of the
+CaCORE Definition object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_definition">ATTRIBUTES of Definition</a></h2>
+<p>The following are all the attributes of the Definition object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>languageName</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_text">text</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_definition">ASSOCIATIONS of Definition</a></h2>
+<p>The following are all the objects that are associated with the Definition:</p>
+<dl>
+<dt><strong>Collection of <a href="#context">Context</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getContext</code> to get the associated Context.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#definitionclassschemeitem">DefinitionClassSchemeItem</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDefinitionClassSchemeItemCollection</code> to get a collection of associated DefinitionClassSchemeItem.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="definitionclassschemeitem">DefinitionClassSchemeItem</a></h1>
+<p>CaCORE::CaDSR::DefinitionClassSchemeItem - Perl extension for DefinitionClassSchemeItem.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DefinitionClassSchemeItem is a Perl object representation of the
+CaCORE DefinitionClassSchemeItem object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_definitionclassschemeitem">ATTRIBUTES of DefinitionClassSchemeItem</a></h2>
+<p>The following are all the attributes of the DefinitionClassSchemeItem object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_definitionclassschemeitem">ASSOCIATIONS of DefinitionClassSchemeItem</a></h2>
+<p>The following are all the objects that are associated with the DefinitionClassSchemeItem:</p>
+<dl>
+<dt><strong>Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fdefinition_3a">Collection of <a href="#definition">Definition</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDefinition</code> to get the associated Definition.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="derivationtype">DerivationType</a></h1>
+<p>CaCORE::CaDSR::DerivationType - Perl extension for DerivationType.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DerivationType is a Perl object representation of the
+CaCORE DerivationType object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_derivationtype">ATTRIBUTES of DerivationType</a></h2>
+<p>The following are all the attributes of the DerivationType object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_derivationtype">ASSOCIATIONS of DerivationType</a></h2>
+<p>The following are all the objects that are associated with the DerivationType:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fconceptderivationrule_3a">Instance of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getConceptDerivationRuleCollection</code> to get a collection of associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fderiveddataelement_3a">Instance of <a href="#deriveddataelement">DerivedDataElement</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getDerivedDataElementCollection</code> to get a collection of associated DerivedDataElement.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="deriveddataelement">DerivedDataElement</a></h1>
+<p>CaCORE::CaDSR::DerivedDataElement - Perl extension for DerivedDataElement.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DerivedDataElement is a Perl object representation of the
+CaCORE DerivedDataElement object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_deriveddataelement">ATTRIBUTES of DerivedDataElement</a></h2>
+<p>The following are all the attributes of the DerivedDataElement object and their data types:</p>
+<dl>
+<dt><strong><a name="item_concatenationcharacter">concatenationCharacter</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_methods">methods</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_rule">rule</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_deriveddataelement">ASSOCIATIONS of DerivedDataElement</a></h2>
+<p>The following are all the objects that are associated with the DerivedDataElement:</p>
+<dl>
+<dt><strong>Collection of <a href="#dataelement">DataElement</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDataElement</code> to get the associated DataElement.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#dataelementderivation">DataElementDerivation</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementDerivationCollection</code> to get a collection of associated DataElementDerivation.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#derivationtype">DerivationType</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDerivationType</code> to get the associated DerivationType.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="designation">Designation</a></h1>
+<p>CaCORE::CaDSR::Designation - Perl extension for Designation.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Designation is a Perl object representation of the
+CaCORE Designation object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_designation">ATTRIBUTES of Designation</a></h2>
+<p>The following are all the attributes of the Designation object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>languageName</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_designation">ASSOCIATIONS of Designation</a></h2>
+<p>The following are all the objects that are associated with the Designation:</p>
+<dl>
+<dt><strong>Collection of <a href="#context">Context</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getContext</code> to get the associated Context.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#designationclassschemeitem">DesignationClassSchemeItem</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDesignationClassSchemeItemCollection</code> to get a collection of associated DesignationClassSchemeItem.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="designationclassschemeitem">DesignationClassSchemeItem</a></h1>
+<p>CaCORE::CaDSR::DesignationClassSchemeItem - Perl extension for DesignationClassSchemeItem.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::DesignationClassSchemeItem is a Perl object representation of the
+CaCORE DesignationClassSchemeItem object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_designationclassschemeitem">ATTRIBUTES of DesignationClassSchemeItem</a></h2>
+<p>The following are all the attributes of the DesignationClassSchemeItem object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_designationclassschemeitem">ASSOCIATIONS of DesignationClassSchemeItem</a></h2>
+<p>The following are all the objects that are associated with the DesignationClassSchemeItem:</p>
+<dl>
+<dt><strong>Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fdesignation_3a">Collection of <a href="#designation">Designation</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDesignation</code> to get the associated Designation.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="enumeratedvaluedomain">EnumeratedValueDomain</a></h1>
+<p>CaCORE::CaDSR::EnumeratedValueDomain - Perl extension for EnumeratedValueDomain.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::EnumeratedValueDomain is a Perl object representation of the
+CaCORE EnumeratedValueDomain object.</p>
+<p>EnumeratedValueDomain extends from domain object <a href="#valuedomain">ValueDomain</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_enumeratedvaluedomain">ATTRIBUTES of EnumeratedValueDomain</a></h2>
+<p>The following are all the attributes of the EnumeratedValueDomain object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_enumeratedvaluedomain">ASSOCIATIONS of EnumeratedValueDomain</a></h2>
+<p>The following are all the objects that are associated with the EnumeratedValueDomain:</p>
+<dl>
+<dt><strong>Instance of <a href="#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainPermissibleValueCollection</code> to get a collection of associated ValueDomainPermissibleValue.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="form">Form</a></h1>
+<p>CaCORE::CaDSR::Form - Perl extension for Form.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Form is a Perl object representation of the
+CaCORE Form object.</p>
+<p>Form extends from domain object <a href="#formelement">FormElement</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_form">ATTRIBUTES of Form</a></h2>
+<p>The following are all the attributes of the Form object and their data types:</p>
+<dl>
+<dt><strong><a name="item_displayname">displayName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_form">ASSOCIATIONS of Form</a></h2>
+<p>The following are all the objects that are associated with the Form:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fmodule_3a">Instance of <a href="#module">Module</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getModuleCollection</code> to get a collection of associated Module.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fprotocol_3a">Instance of <a href="#protocol">Protocol</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getProtocolCollection</code> to get a collection of associated Protocol.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="formelement">FormElement</a></h1>
+<p>CaCORE::CaDSR::FormElement - Perl extension for FormElement.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::FormElement is a Perl object representation of the
+CaCORE FormElement object.</p>
+<p>FormElement extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_formelement">ATTRIBUTES of FormElement</a></h2>
+<p>The following are all the attributes of the FormElement object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_formelement">ASSOCIATIONS of FormElement</a></h2>
+<p>The following are all the objects that are associated with the FormElement:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2finstruction_3a">Instance of <a href="#instruction">Instruction</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getInstructionCollection</code> to get a collection of associated Instruction.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="function">Function</a></h1>
+<p>CaCORE::CaDSR::Function - Perl extension for Function.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Function is a Perl object representation of the
+CaCORE Function object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_function">ATTRIBUTES of Function</a></h2>
+<p>The following are all the attributes of the Function object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_symbol">symbol</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_function">ASSOCIATIONS of Function</a></h2>
+<p>The following are all the objects that are associated with the Function:</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fconditioncomponent_3a">Instance of <a href="#conditioncomponent">ConditionComponent</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getConditionComponentCollection</code> to get a collection of associated ConditionComponent.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="instruction">Instruction</a></h1>
+<p>CaCORE::CaDSR::Instruction - Perl extension for Instruction.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Instruction is a Perl object representation of the
+CaCORE Instruction object.</p>
+<p>Instruction extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_instruction">ATTRIBUTES of Instruction</a></h2>
+<p>The following are all the attributes of the Instruction object and their data types:</p>
+<dl>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_instruction">ASSOCIATIONS of Instruction</a></h2>
+<p>The following are all the objects that are associated with the Instruction:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fformelement_3a">Collection of <a href="#formelement">FormElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getFormElement</code> to get the associated FormElement.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="module">Module</a></h1>
+<p>CaCORE::CaDSR::Module - Perl extension for Module.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Module is a Perl object representation of the
+CaCORE Module object.</p>
+<p>Module extends from domain object <a href="#formelement">FormElement</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_module">ATTRIBUTES of Module</a></h2>
+<p>The following are all the attributes of the Module object and their data types:</p>
+<dl>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_maximumquestionrepeat">maximumQuestionRepeat</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_module">ASSOCIATIONS of Module</a></h2>
+<p>The following are all the objects that are associated with the Module:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fform_3a">Collection of <a href="#form">Form</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getForm</code> to get the associated Form.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#question">Question</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionCollection</code> to get a collection of associated Question.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="nonenumeratedvaluedomain">NonenumeratedValueDomain</a></h1>
+<p>CaCORE::CaDSR::NonenumeratedValueDomain - Perl extension for NonenumeratedValueDomain.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::NonenumeratedValueDomain is a Perl object representation of the
+CaCORE NonenumeratedValueDomain object.</p>
+<p>NonenumeratedValueDomain extends from domain object <a href="#valuedomain">ValueDomain</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_nonenumeratedvaluedomain">ATTRIBUTES of NonenumeratedValueDomain</a></h2>
+<p>The following are all the attributes of the NonenumeratedValueDomain object and their data types:</p>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_nonenumeratedvaluedomain">ASSOCIATIONS of NonenumeratedValueDomain</a></h2>
+<p>The following are all the objects that are associated with the NonenumeratedValueDomain:</p>
+<p>
+</p>
+<hr />
+<h1><a name="objectclass">ObjectClass</a></h1>
+<p>CaCORE::CaDSR::ObjectClass - Perl extension for ObjectClass.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ObjectClass is a Perl object representation of the
+CaCORE ObjectClass object.</p>
+<p>ObjectClass extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_objectclass">ATTRIBUTES of ObjectClass</a></h2>
+<p>The following are all the attributes of the ObjectClass object and their data types:</p>
+<dl>
+<dt><strong>definitionSource</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_objectclass">ASSOCIATIONS of ObjectClass</a></h2>
+<p>The following are all the objects that are associated with the ObjectClass:</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#dataelementconcept">DataElementConcept</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementConceptCollection</code> to get a collection of associated DataElementConcept.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fsourcobjectclassrelationship_3a">Instance of <a href="#sourcobjectclassrelationship">SourcObjectClassRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getSourcObjectClassRelationshipCollection</code> to get a collection of associated SourcObjectClassRelationship.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftargetobjectclassrelationship_3a">Instance of <a href="#targetobjectclassrelationship">TargetObjectClassRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTargetObjectClassRelationshipCollection</code> to get a collection of associated TargetObjectClassRelationship.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="objectclassrelationship">ObjectClassRelationship</a></h1>
+<p>CaCORE::CaDSR::ObjectClassRelationship - Perl extension for ObjectClassRelationship.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ObjectClassRelationship is a Perl object representation of the
+CaCORE ObjectClassRelationship object.</p>
+<p>ObjectClassRelationship extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_objectclassrelationship">ATTRIBUTES of ObjectClassRelationship</a></h2>
+<p>The following are all the attributes of the ObjectClassRelationship object and their data types:</p>
+<dl>
+<dt><strong>dimensionality</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_direction">direction</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_isarray">isArray</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcehighmultiplicity">sourceHighMultiplicity</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcelowmultiplicity">sourceLowMultiplicity</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_sourcerole">sourceRole</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targethighmultiplicity">targetHighMultiplicity</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targetlowmultiplicity">targetLowMultiplicity</a></strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_targetrole">targetRole</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_objectclassrelationship">ASSOCIATIONS of ObjectClassRelationship</a></h2>
+<p>The following are all the objects that are associated with the ObjectClassRelationship:</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourceconceptderivationrule_3a">Collection of <a href="#sourceconceptderivationrule">SourceConceptDerivationRule</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceConceptDerivationRule</code> to get the associated SourceConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourceobjectclass_3a">Collection of <a href="#sourceobjectclass">SourceObjectClass</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceObjectClass</code> to get the associated SourceObjectClass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourceobjectclassclassification_3">Collection of <a href="#sourceobjectclassclassification">SourceObjectClassClassification</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceObjectClassClassification</code> to get the associated SourceObjectClassClassification.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftargetconceptderivationrule_3a">Collection of <a href="#targetconceptderivationrule">TargetConceptDerivationRule</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTargetConceptDerivationRule</code> to get the associated TargetConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftargetobjectclass_3a">Collection of <a href="#targetobjectclass">TargetObjectClass</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTargetObjectClass</code> to get the associated TargetObjectClass.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftargetobjectclassclassification_3">Collection of <a href="#targetobjectclassclassification">TargetObjectClassClassification</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTargetObjectClassClassification</code> to get the associated TargetObjectClassClassification.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="organization">Organization</a></h1>
+<p>CaCORE::CaDSR::Organization - Perl extension for Organization.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Organization is a Perl object representation of the
+CaCORE Organization object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_organization">ATTRIBUTES of Organization</a></h2>
+<p>The following are all the attributes of the Organization object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_organization">ASSOCIATIONS of Organization</a></h2>
+<p>The following are all the objects that are associated with the Organization:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2faddress_3a">Instance of <a href="#address">Address</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getAddressCollection</code> to get a collection of associated Address.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#administeredcomponentcontact">AdministeredComponentContact</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentContactCollection</code> to get a collection of associated AdministeredComponentContact.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fcontactcommunication_3a">Instance of <a href="#contactcommunication">ContactCommunication</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getContactCommunicationCollection</code> to get a collection of associated ContactCommunication.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fperson_3a">Instance of <a href="#person">Person</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPersonCollection</code> to get a collection of associated Person.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="permissiblevalue">PermissibleValue</a></h1>
+<p>CaCORE::CaDSR::PermissibleValue - Perl extension for PermissibleValue.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::PermissibleValue is a Perl object representation of the
+CaCORE PermissibleValue object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_permissiblevalue">ATTRIBUTES of PermissibleValue</a></h2>
+<p>The following are all the attributes of the PermissibleValue object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_highvaluenumber">highValueNumber</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_lowvaluenumber">lowValueNumber</a></strong>
+
+<dd>
+<p>data type: <code>long</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>value</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_permissiblevalue">ASSOCIATIONS of PermissibleValue</a></h2>
+<p>The following are all the objects that are associated with the PermissibleValue:</p>
+<dl>
+<dt><strong>Instance of <a href="#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainPermissibleValueCollection</code> to get a collection of associated ValueDomainPermissibleValue.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvaluemeaning_3a">Collection of <a href="#valuemeaning">ValueMeaning</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValueMeaning</code> to get the associated ValueMeaning.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="person">Person</a></h1>
+<p>CaCORE::CaDSR::Person - Perl extension for Person.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Person is a Perl object representation of the
+CaCORE Person object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_person">ATTRIBUTES of Person</a></h2>
+<p>The following are all the attributes of the Person object and their data types:</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_firstname">firstName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_lastname">lastName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_middleinitial">middleInitial</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_position">position</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>rank</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_person">ASSOCIATIONS of Person</a></h2>
+<p>The following are all the objects that are associated with the Person:</p>
+<dl>
+<dt><strong>Instance of <a href="#address">Address</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAddressCollection</code> to get a collection of associated Address.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#administeredcomponentcontact">AdministeredComponentContact</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentContactCollection</code> to get a collection of associated AdministeredComponentContact.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#contactcommunication">ContactCommunication</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getContactCommunicationCollection</code> to get a collection of associated ContactCommunication.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#organization">Organization</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getOrganization</code> to get the associated Organization.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="property">Property</a></h1>
+<p>CaCORE::CaDSR::Property - Perl extension for Property.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Property is a Perl object representation of the
+CaCORE Property object.</p>
+<p>Property extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_property">ATTRIBUTES of Property</a></h2>
+<p>The following are all the attributes of the Property object and their data types:</p>
+<dl>
+<dt><strong>definitionSource</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_property">ASSOCIATIONS of Property</a></h2>
+<p>The following are all the objects that are associated with the Property:</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#dataelementconcept">DataElementConcept</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementConceptCollection</code> to get a collection of associated DataElementConcept.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="protocol">Protocol</a></h1>
+<p>CaCORE::CaDSR::Protocol - Perl extension for Protocol.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Protocol is a Perl object representation of the
+CaCORE Protocol object.</p>
+<p>Protocol extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_protocol">ATTRIBUTES of Protocol</a></h2>
+<p>The following are all the attributes of the Protocol object and their data types:</p>
+<dl>
+<dt><strong><a name="item_approvedby">approvedBy</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_approveddate">approvedDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_changenumber">changeNumber</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_changetype">changeType</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_leadorganizationname">leadOrganizationName</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_phase">phase</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_protocolid">protocolID</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_reviewedby">reviewedBy</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_revieweddate">reviewedDate</a></strong>
+
+<dd>
+<p>data type: <code>dateTime</code></p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_protocol">ASSOCIATIONS of Protocol</a></h2>
+<p>The following are all the objects that are associated with the Protocol:</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fform_3a">Instance of <a href="#form">Form</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getFormCollection</code> to get a collection of associated Form.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="question">Question</a></h1>
+<p>CaCORE::CaDSR::Question - Perl extension for Question.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Question is a Perl object representation of the
+CaCORE Question object.</p>
+<p>Question extends from domain object <a href="#formelement">FormElement</a>.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_question">ATTRIBUTES of Question</a></h2>
+<p>The following are all the attributes of the Question object and their data types:</p>
+<dl>
+<dt><strong><a name="item_defaultvalidvalueid">defaultValidValueId</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_defaultvalue">defaultValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_iseditable">isEditable</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_ismandatory">isMandatory</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_question">ASSOCIATIONS of Question</a></h2>
+<p>The following are all the objects that are associated with the Question:</p>
+<dl>
+<dt><strong>Collection of <a href="#dataelement">DataElement</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDataElement</code> to get the associated DataElement.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fmodule_3a">Collection of <a href="#module">Module</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getModule</code> to get the associated Module.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fquestioncomponent_3a">Instance of <a href="#questioncomponent">QuestionComponent</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionComponentCollection</code> to get a collection of associated QuestionComponent.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#questioncondition">QuestionCondition</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestionCondition</code> to get the associated QuestionCondition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fquestionrepetition_3a">Instance of <a href="#questionrepetition">QuestionRepetition</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionRepetitionCollection</code> to get a collection of associated QuestionRepetition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fvalidvalue_3a">Instance of <a href="#validvalue">ValidValue</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getValidValueCollection</code> to get a collection of associated ValidValue.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#valuedomain">ValueDomain</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValueDomain</code> to get the associated ValueDomain.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="questioncondition">QuestionCondition</a></h1>
+<p>CaCORE::CaDSR::QuestionCondition - Perl extension for QuestionCondition.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::QuestionCondition is a Perl object representation of the
+CaCORE QuestionCondition object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_questioncondition">ATTRIBUTES of QuestionCondition</a></h2>
+<p>The following are all the attributes of the QuestionCondition object and their data types:</p>
+<dl>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_questioncondition">ASSOCIATIONS of QuestionCondition</a></h2>
+<p>The following are all the objects that are associated with the QuestionCondition:</p>
+<dl>
+<dt><strong>Instance of <a href="#conditioncomponent">ConditionComponent</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getConditionComponentCollection</code> to get a collection of associated ConditionComponent.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fcondtionmessage_3a">Instance of <a href="#condtionmessage">CondtionMessage</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getCondtionMessageCollection</code> to get a collection of associated CondtionMessage.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fforcedconditiontriggeredaction_3a">Instance of <a href="#forcedconditiontriggeredaction">ForcedConditionTriggeredAction</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getForcedConditionTriggeredActionCollection</code> to get a collection of associated ForcedConditionTriggeredAction.</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#question">Question</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionCollection</code> to get a collection of associated Question.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fquestioncondition_3a">Instance of <a href="#questioncondition">QuestionCondition</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionConditionCollection</code> to get a collection of associated QuestionCondition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2ftriggeredaction_3a">Instance of <a href="#triggeredaction">TriggeredAction</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getTriggeredActionCollection</code> to get a collection of associated TriggeredAction.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="questionconditioncomponents">QuestionConditionComponents</a></h1>
+<p>CaCORE::CaDSR::QuestionConditionComponents - Perl extension for QuestionConditionComponents.</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::QuestionConditionComponents is a Perl object representation of the
+CaCORE QuestionConditionComponents object.</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_questionconditioncomponents">ATTRIBUTES of QuestionConditionComponents</a></h2>
+<p>The following are all the attributes of the QuestionConditionComponents object and their data types:</p>
+<dl>
+<dt><strong><a name="item_constantvalue">constantValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code></p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_logicaloperand">logicalOperand</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_operand">operand</a></strong>
+
+<dd>
+<p>data type: <code>string</code></p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.</p>
+<p>
+</p>
+<h2><a name="associations_of_questionconditioncomponents">ASSOCIATIONS of QuestionConditionComponents</a></h2>
+<p>The following are all the objects that are associated with the QuestionConditionComponents:</p>
+<dl>
+<dt><strong><a name="item_collection_of__2ffunction_3a">Collection of <a href="#function">Function</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getFunction</code> to get the associated Function.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentquestioncondition_3a">Collection of <a href="#parentquestioncondition">ParentQuestionCondition</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentQuestionCondition</code> to get the associated ParentQuestionCondition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fquestion_3a">Collection of <a href="#question">Question</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestion</code> to get the associated Question.</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#questioncondition">QuestionCondition</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestionCondition</code> to get the associated QuestionCondition.</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvalidvalue_3a">Collection of <a href="#validvalue">ValidValue</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValidValue</code> to get the associated ValidValue.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="questionrepetition">QuestionRepetition</a></h1>
+<p>CaCORE::CaDSR::QuestionRepetition - Perl extension for QuestionRepetition.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::QuestionRepetition is a Perl object representation of the
+CaCORE QuestionRepetition object.
+
+</p>
+<p>QuestionRepetition extends from domain object <a href="#formelement">FormElement</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_questionrepetition">ATTRIBUTES of QuestionRepetition</a></h2>
+<p>The following are all the attributes of the QuestionRepetition object and their data types:
+
+</p>
+<dl>
+<dt><strong>defaultValue</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>isEditable</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_repeatsequencenumber">repeatSequenceNumber</a></strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_questionrepetition">ASSOCIATIONS of QuestionRepetition</a></h2>
+<p>The following are all the objects that are associated with the QuestionRepetition:
+
+</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fdefaultvalidvalue_3a">Collection of <a href="#defaultvalidvalue">DefaultValidValue</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getDefaultValidValue</code> to get the associated DefaultValidValue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="referencedocument">ReferenceDocument</a></h1>
+<p>CaCORE::CaDSR::ReferenceDocument - Perl extension for ReferenceDocument.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ReferenceDocument is a Perl object representation of the
+CaCORE ReferenceDocument object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_referencedocument">ATTRIBUTES of ReferenceDocument</a></h2>
+<p>The following are all the attributes of the ReferenceDocument object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_url">URL</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>long</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_doctext">doctext</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>languageName</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_organizationid">organizationId</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_rdtlname">rdtlName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>type</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_referencedocument">ASSOCIATIONS of ReferenceDocument</a></h2>
+<p>The following are all the objects that are associated with the ReferenceDocument:
+
+</p>
+<dl>
+<dt><strong>Collection of <a href="#classschemeclassschemeitem">ClassSchemeClassSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassSchemeClassSchemeItem</code> to get the associated ClassSchemeClassSchemeItem.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#classificationschemeitem">ClassificationSchemeItem</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getClassificationSchemeItem</code> to get the associated ClassificationSchemeItem.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#context">Context</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getContext</code> to get the associated Context.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="representation">Representation</a></h1>
+<p>CaCORE::CaDSR::Representation - Perl extension for Representation.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::Representation is a Perl object representation of the
+CaCORE Representation object.
+
+</p>
+<p>Representation extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_representation">ATTRIBUTES of Representation</a></h2>
+<p>The following are all the attributes of the Representation object and their data types:
+
+</p>
+<dl>
+<dt><strong>definitionSource</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_representation">ASSOCIATIONS of Representation</a></h2>
+<p>The following are all the objects that are associated with the Representation:
+
+</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#valuedomain">ValueDomain</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValueDomainCollection</code> to get a collection of associated ValueDomain.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="triggeraction">TriggerAction</a></h1>
+<p>CaCORE::CaDSR::TriggerAction - Perl extension for TriggerAction.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::TriggerAction is a Perl object representation of the
+CaCORE TriggerAction object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_triggeraction">ATTRIBUTES of TriggerAction</a></h2>
+<p>The following are all the attributes of the TriggerAction object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_action">action</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_criterionvalue">criterionValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_forcedvalue">forcedValue</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instruction">instruction</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_triggerrelationship">triggerRelationship</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_triggeraction">ASSOCIATIONS of TriggerAction</a></h2>
+<p>The following are all the objects that are associated with the TriggerAction:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#administeredcomponentclassschemeitem">AdministeredComponentClassSchemeItem</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getAdministeredComponentClassSchemeItemCollection</code> to get a collection of associated AdministeredComponentClassSchemeItem.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fenforcedcondition_3a">Collection of <a href="#enforcedcondition">EnforcedCondition</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getEnforcedCondition</code> to get the associated EnforcedCondition.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#protocol">Protocol</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getProtocolCollection</code> to get a collection of associated Protocol.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#questioncondition">QuestionCondition</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestionCondition</code> to get the associated QuestionCondition.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fsourceformelement_3a">Collection of <a href="#sourceformelement">SourceFormElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getSourceFormElement</code> to get the associated SourceFormElement.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2ftargetformelement_3a">Collection of <a href="#targetformelement">TargetFormElement</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getTargetFormElement</code> to get the associated TargetFormElement.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="validvalue">ValidValue</a></h1>
+<p>CaCORE::CaDSR::ValidValue - Perl extension for ValidValue.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ValidValue is a Perl object representation of the
+CaCORE ValidValue object.
+
+</p>
+<p>ValidValue extends from domain object <a href="#formelement">FormElement</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_validvalue">ATTRIBUTES of ValidValue</a></h2>
+<p>The following are all the attributes of the ValidValue object and their data types:
+
+</p>
+<dl>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>displayOrder</strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_meaningtext">meaningText</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_validvalue">ASSOCIATIONS of ValidValue</a></h2>
+<p>The following are all the objects that are associated with the ValidValue:
+
+</p>
+<dl>
+<dt><strong>Instance of <a href="#conditioncomponent">ConditionComponent</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getConditionComponentCollection</code> to get a collection of associated ConditionComponent.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#question">Question</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getQuestion</code> to get the associated Question.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fvaluedomainpermissiblevalue_3a">Collection of <a href="#valuedomainpermissiblevalue">ValueDomainPermissibleValue</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getValueDomainPermissibleValue</code> to get the associated ValueDomainPermissibleValue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="valuedomain">ValueDomain</a></h1>
+<p>CaCORE::CaDSR::ValueDomain - Perl extension for ValueDomain.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ValueDomain is a Perl object representation of the
+CaCORE ValueDomain object.
+
+</p>
+<p>ValueDomain extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_valuedomain">ATTRIBUTES of ValueDomain</a></h2>
+<p>The following are all the attributes of the ValueDomain object and their data types:
+
+</p>
+<dl>
+<dt><strong><a name="item_uomname">UOMName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_charactersetname">characterSetName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_datatypeannotation">datatypeAnnotation</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_datatypedescription">datatypeDescription</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_datatypeiscodegencompatible">datatypeIsCodegenCompatible</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_datatypename">datatypeName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_datatypeschemereference">datatypeSchemeReference</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_decimalplace">decimalPlace</a></strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_formatname">formatName</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>highValueNumber</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>lowValueNumber</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_maximumlengthnumber">maximumLengthNumber</a></strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_minimumlengthnumber">minimumLengthNumber</a></strong>
+
+<dd>
+<p>data type: <code>int</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_valuedomain">ASSOCIATIONS of ValueDomain</a></h2>
+<p>The following are all the objects that are associated with the ValueDomain:
+
+</p>
+<dl>
+<dt><strong><a name="item_instance_of__2fchildvaluedomainrelationship_3a">Instance of <a href="#childvaluedomainrelationship">ChildValueDomainRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getChildValueDomainRelationshipCollection</code> to get a collection of associated ChildValueDomainRelationship.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.
+
+</p>
+</dd>
+</li>
+<dt><strong>Collection of <a href="#conceptualdomain">ConceptualDomain</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptualDomain</code> to get the associated ConceptualDomain.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#dataelement">DataElement</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getDataElementCollection</code> to get a collection of associated DataElement.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fparentvaluedomainrelationship_3a">Instance of <a href="#parentvaluedomainrelationship">ParentValueDomainRelationship</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getParentValueDomainRelationshipCollection</code> to get a collection of associated ParentValueDomainRelationship.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#question">Question</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getQuestionCollection</code> to get a collection of associated Question.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2frepresention_3a">Collection of <a href="#represention">Represention</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getRepresention</code> to get the associated Represention.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="valuedomainpermissiblevalue">ValueDomainPermissibleValue</a></h1>
+<p>CaCORE::CaDSR::ValueDomainPermissibleValue - Perl extension for ValueDomainPermissibleValue.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ValueDomainPermissibleValue is a Perl object representation of the
+CaCORE ValueDomainPermissibleValue object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_valuedomainpermissiblevalue">ATTRIBUTES of ValueDomainPermissibleValue</a></h2>
+<p>The following are all the attributes of the ValueDomainPermissibleValue object and their data types:
+
+</p>
+<dl>
+<dt><strong>beginDate</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>endDate</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>origin</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_valuedomainpermissiblevalue">ASSOCIATIONS of ValueDomainPermissibleValue</a></h2>
+<p>The following are all the objects that are associated with the ValueDomainPermissibleValue:
+
+</p>
+<dl>
+<dt><strong>Collection of <a href="#concept">Concept</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConcept</code> to get the associated Concept.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fenumeratedvaluedomain_3a">Collection of <a href="#enumeratedvaluedomain">EnumeratedValueDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getEnumeratedValueDomain</code> to get the associated EnumeratedValueDomain.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fpermissiblevalue_3a">Collection of <a href="#permissiblevalue">PermissibleValue</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getPermissibleValue</code> to get the associated PermissibleValue.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#validvalue">ValidValue</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getValidValueCollection</code> to get a collection of associated ValidValue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="valuedomainrelationship">ValueDomainRelationship</a></h1>
+<p>CaCORE::CaDSR::ValueDomainRelationship - Perl extension for ValueDomainRelationship.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ValueDomainRelationship is a Perl object representation of the
+CaCORE ValueDomainRelationship object.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_valuedomainrelationship">ATTRIBUTES of ValueDomainRelationship</a></h2>
+<p>The following are all the attributes of the ValueDomainRelationship object and their data types:
+
+</p>
+<dl>
+<dt><strong>createdBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateCreated</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>dateModified</strong>
+
+<dd>
+<p>data type: <code>dateTime</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>id</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>modifiedBy</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>name</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_valuedomainrelationship">ASSOCIATIONS of ValueDomainRelationship</a></h2>
+<p>The following are all the objects that are associated with the ValueDomainRelationship:
+
+</p>
+<dl>
+<dt><strong><a name="item_collection_of__2fchildvaluedomain_3a">Collection of <a href="#childvaluedomain">ChildValueDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getChildValueDomain</code> to get the associated ChildValueDomain.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_collection_of__2fparentvaluedomain_3a">Collection of <a href="#parentvaluedomain">ParentValueDomain</a>:</a></strong>
+
+<dd>
+<p>Many to one assoication, use <code>getParentValueDomain</code> to get the associated ParentValueDomain.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="valuemeaning">ValueMeaning</a></h1>
+<p>CaCORE::CaDSR::ValueMeaning - Perl extension for ValueMeaning.
+
+</p>
+<p>
+</p>
+<h2><a name="abstract">ABSTRACT</a></h2>
+<p>The CaCORE::CaDSR::ValueMeaning is a Perl object representation of the
+CaCORE ValueMeaning object.
+
+</p>
+<p>ValueMeaning extends from domain object <a href="#administeredcomponent">AdministeredComponent</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="synopsis">SYNOPSIS</a></h2>
+<p>See <a href="/CaCORE/ApplicationService.html">the CaCORE::ApplicationService manpage</a>.
+
+</p>
+<p>
+</p>
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+</p>
+<h2><a name="attributes_of_valuemeaning">ATTRIBUTES of ValueMeaning</a></h2>
+<p>The following are all the attributes of the ValueMeaning object and their data types:
+
+</p>
+<dl>
+<dt><strong>comments</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong>description</strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_shortmeaning">shortMeaning</a></strong>
+
+<dd>
+<p>data type: <code>string</code>
+
+</p>
+</dd>
+</li>
+</dl>
+<p>Note: Although you can also use the corresponding setter methods to set the
+attribute values, it is not recommended to do so unless you absolutely have
+to change the object's attributes.
+
+</p>
+<p>
+</p>
+<h2><a name="associations_of_valuemeaning">ASSOCIATIONS of ValueMeaning</a></h2>
+<p>The following are all the objects that are associated with the ValueMeaning:
+
+</p>
+<dl>
+<dt><strong>Collection of <a href="#conceptderivationrule">ConceptDerivationRule</a>:</strong>
+
+<dd>
+<p>Many to one assoication, use <code>getConceptDerivationRule</code> to get the associated ConceptDerivationRule.
+
+</p>
+</dd>
+</li>
+<dt><strong>Instance of <a href="#conceptualdomain">ConceptualDomain</a>:</strong>
+
+<dd>
+<p>One to many assoication, use <code>getConceptualDomainCollection</code> to get a collection of associated ConceptualDomain.
+
+</p>
+</dd>
+</li>
+<dt><strong><a name="item_instance_of__2fpermissiblevalue_3a">Instance of <a href="#permissiblevalue">PermissibleValue</a>:</a></strong>
+
+<dd>
+<p>One to many assoication, use <code>getPermissibleValueCollection</code> to get a collection of associated PermissibleValue.
+
+</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="support">SUPPORT</a></h1>
+<p>Please do not contact author directly. Send email to <a href="mailto:ncicb@pop.nci.nih.gov">ncicb@pop.nci.nih.gov</a> to request
+support or report a bug.
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Shan Jiang &lt;<a href="mailto:jiangs@mail.nih.gov">jiangs@mail.nih.gov</a>&gt;
+
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>The CaCORE Software License, Version 1.0
+
+</p>
+<p>Copyright 2001-2005 SAIC. This software was developed in conjunction with the National Cancer Institute, and so to the extent government employees are co-authors, any rights in such works shall be subject to Title 17 of the United States Code, section 105. Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+</p>
+<ol>
+<li>
+<p>Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer of Article 5, below. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer of Article 5 in the documentation and/or other materials provided with the distribution.
+
+</p>
+</li>
+<li>
+<p>The end-user documentation included with the redistribution, if any, must include the following acknowledgment: &quot;This product includes software developed by SAIC and the National Cancer Institute.&quot; If no such end-user documentation is to be included, this acknowledgment shall appear in the software itself, wherever such third-party acknowledgments normally appear.
+
+</p>
+</li>
+<li>
+<p>The names &quot;The National Cancer Institute&quot;, &quot;NCI&quot; and &quot;SAIC&quot; must not be used to endorse or promote products derived from this software. This license does not authorize the licensee to use any trademarks owned by either NCI or SAIC.
+
+</p>
+</li>
+<li>
+<p>This license does not authorize or prohibit the incorporation of this software into any third party proprietary programs. Licensee is expressly made responsible for obtaining any permission required to incorporate this software into third party proprietary programs and for informing licensee's end-users of their obligation to secure any required permissions before incorporating this software into third party proprietary software programs.
+
+</p>
+</li>
+<li>
+<p>THIS SOFTWARE IS PROVIDED &quot;AS IS,&quot; AND ANY EXPRESSED OR IMPLIED WARRANTIES, (INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE) ARE DISCLAIMED. IN NO EVENT SHALL THE NATIONAL CANCER INSTITUTE, SAIC, OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</p>
+</li>
+</ol>
+
+</body>
+
+</html>

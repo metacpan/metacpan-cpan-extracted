@@ -1,0 +1,158 @@
+Sat April 8 2000 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.21
+- Minor fix of a bug in sample11.pl
+
+Thu April 4 2000 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.20
+- Major revision from Martien Verbruggen to use GD::Graph instead of
+  linking directly with GD.  This is intended for backward compatibility
+  only-- you are encouraged to use GD::Graph instead of Chart::PNGgraph as 
+  there will not be any more features added to Chart::PNGgraph
+
+Mon January 3 2000 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.15
+- minor bugfix-- 'make test' would fail due to a missing file
+
+Mon December 20 1999 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.14
+- Bugfixes only-- better TrueType support coming soon
+- Fix divide-by-zero error when all data points are zero
+- Clarify documentation on how to use plot(\@data) method
+
+Thu October 21 1999 by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.13
+- Added primitive support for TrueType fonts
+- Fixed bug where 3d charts with very large slices would not have both
+  parts of the front filled properly.
+
+Thu October 7 1999  by sbonds@agora.rdrop.com
+- Chart::PNGgraph version 1.12
+- Changed namespace to Chart:PNGgraph so that CPAN will index it properly
+- Added "base" tests-- still very incomplete
+- Changed sample 5-2 to have multiple lines since this is what the html
+  file described it as having.
+- Checks the read-only attributes 'pngx' and 'pngy' so these will not get
+  accidently set.  $g->set() returns undef if they are present, but the
+  rest of the attributes will be set.
+
+Tue August 31 1999  by sbonds@agora.rdrop.com
+- Please contact me rather than the original author for problems unless
+  you are convinced that the problems are not a result of the port to PNG
+- Converted GIFgraph-1.10 to PNGgraph-1.10 so it works properly with GD-1.20
+- UNISYS has been increasingly defensive of the LZW patent used in GIF
+  compression, which necessitates these kinds of fixes.  
+
+Tue August 25 1998
+
+- Fixed bug with undef values for first value in lines graphs
+- Changed one or two samples, and samples Makefile dependencies
+
+Tue August 25 1998
+
+- Added bar_spacing option.
+- Fixed a slight drawing 'bug' while doing that.
+- Changed a few of the samples to use bar_spacing
+- Implemented numerical X axis, based on a changed axestype.pm from
+  Scott Prahl <prahl@ece.ogi.edu>. many thanks.
+- Added sample54 to illustrate
+
+Tue August 18 1998
+
+- Added rudimentary mixed type graph
+
+Mon August 17 1998
+
+- Added control over axis label placement through x_label_position and
+  y_label_position.
+- Added possibility to call a coderef to format the y labels. See
+  y_number_format.
+	(Idea: brian d foy <comdog@computerdog.com>)
+- Fixed some bugs (see file BUGS, version 1.04)
+
+Fri August 14 1998
+
+- Uploaded version 1.03 to CPAN
+
+- Finally able to make some fixes
+- Changed defaults for zero_axis and zero_axis_only to 0. Were both 1.
+  Needed to do this, because of all the confusion they cause
+- Test for defined $s->{y_(min|max)_value} 
+	(Honza Pazdziora <adelton@informatics.muni.cz>)
+	(Vegard Vesterheim <vegardv@runit.sintef.no>)
+- Fixed handling of negative values (I hope)
+	(brian d foy <comdog@computerdog.com>)
+- From now on, require 5.004. 5.003 is dead, and should be deprecated
+  now that 5.005 is out.
+- Added 5.005 specific MakeMaker fields to Makefile.PL
+
+Tue May 12 1998
+
+- Cleaned up a bit, finalised version 1.02, because of time
+  contraints, and the need to get these bug fixes out. Didn't succeed.
+
+Mon Jan 19 1998
+
+- Fixed some bugs (see file BUGS, version 1.02)
+- Added option x_all_ticks, to force all x ticks to be printed, even
+  if x_label_skip is set.
+- Added option x_labels_vertical, to print x labels vertical
+	(Thanks to DBelcher <dbelcher@cyberhino.com> for a patch)
+
+Fri Jan  9 1998
+
+- Fixed some bugs (see file BUGS, version 1.01)
+- Added formatting for y labels (option y_label_format)
+
+Tue Dec 23 1997
+
+- Changed PERL=perl5 to PERL=perl in samples/Makefile (D'OH!)
+- Added read_rgb to PNGgraph::colour to allow definition of own colours
+- Added t/colour.t
+- Removed a lot of unnecessary quotes all over the place
+
+Mon Dec 22 1997
+
+- Center graph titles on axes, not on png
+- Added line types
+- Moved initialise() to each module with $self->SUPER inheritance
+- Added check for duplicate GD::Image object initialisation
+- Added binmode() to t/ff.pl to make tests compatible with Win32 
+  platforms (D'OH).
+
+Thu Dec 18 1997
+
+- Allow undef values in data sets, and skip them
+- Added prototyping of functions
+- Legends, finally
+  requests from Petter Reinholdtsen <pere@link.no>
+  				Giorgos Andreadakis <gand@forthnet.gr>
+
+Tue Dec 16 1997
+
+- Added documentation for dclrs and markers options
+- removed line_width and ReadFile from the documentation (unimplemented)
+- Started on port to win32
+- Changed Area to use Polygon and to work with negative numbers
+
+Mon Dec 15 1997
+
+- Added support for negative numbers in lines, points and linespoints 
+  graphs
+- Added new options: zero_axis, and zero_axis_only (code and documentation)
+- Added new options: y_min_value, y1_min_value, y2_min_value
+
+Fri Dec 12 1997
+
+- Changed 0 angle for pies to be at front/bottom, to make calculations a 
+  bit easier
+- Added test scripts for 'make test'
+
+Before Fri Dec 05 1997
+
+- Lots of minor tuning
+- Added x_ticks option 
+  requests from Will Mitayai Keeso Rowe - thelab@nmarcom.com
+			    mparvataneni@quadravision.com (Murali Parvataneni)
+- Added binmode() here and there to accommodate for platforms that need
+  it.
+

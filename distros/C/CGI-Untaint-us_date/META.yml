@@ -1,0 +1,22 @@
+---
+abstract: 'CGI::Untaint::date for US-formatted dates'
+author:
+  - 'mike south <msouth@gmail.com>'
+build_requires:
+  CGI::Untaint::date: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CGI-Untaint-us_date
+provides:
+  CGI::Untaint::us_date:
+    file: lib/CGI/Untaint/us_date.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

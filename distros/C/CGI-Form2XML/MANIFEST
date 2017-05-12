@@ -1,0 +1,13 @@
+Changes
+lib/CGI/Form2XML.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+examples/xmlform.xsd
+examples/form2xml.cgi
+t/01pod.t
+t/02podcoverage.t
+t/03form2xml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

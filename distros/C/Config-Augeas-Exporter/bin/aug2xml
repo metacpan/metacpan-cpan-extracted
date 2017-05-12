@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Config::Augeas::Exporter;
+use Getopt::Long;
+
+my @paths;
+my $root = '/';
+my @excludes;
+my $file = '-';
+my $file_stat;
+my $verbose;
+my $debug;
+my $help;
+
+my $result = GetOptions (
+   "path=s@" => \@paths,
+   "root=s" => \$root,
+   "exclude=s@" => \@excludes,
+   "file=s" => \$file,
+   "include-file-stat" => \$file_stat,
+   "verbose" => \$verbose,
+   "debug" => \$debug,
+   "help" => \$help,
+   );
+
+
+if ($help) {
+   usage();
+   exit 0;
+}
+
+$verbose ||= $debug;
+
+my $aug = Config::Augeas::Exporter->new(root => $root);
+
+my $doc = $aug->to_xml(
+   path => \@paths,
+   exclude => \@excludes,
+   file_stat => $file_stat,
+   );
+
+open(my $fh, ">$file")
+   or die "E: Failed to open $file for writing: $!\n";
+print $fh $doc->toString;
+close $fh;
+
+
+#######
+# Subs
+#######
+
+sub usage {
+   print "$0 [-p <path>] [-r fakeroot] [-v] [-d] [-h]
+
+ Flags:
+   -h, --help             Show this help
+   -v, --verbose          Verbose mode
+   -d, --debug            Debug mode
+
+ Options:
+   -p, --path <path>       Set path to export (multiple values allowed)
+   -r, --root <fakeroot>   Set fakeroot for Augeas
+   -e, --exclude <pattern> Label pattern to exclude (multiple values allowed)
+   -f, --file <filename>   Write XML to file
+   -i, --include-file-stat Include file stat
+";
+}
+
+

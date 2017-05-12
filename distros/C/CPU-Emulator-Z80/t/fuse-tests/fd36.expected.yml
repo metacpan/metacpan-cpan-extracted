@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  48469:
+    - 197
+name: fd36
+registers:
+  AF: 57593
+  AF_: 0
+  BC: 44575
+  BC_: 0
+  DE: 19183
+  DE_: 0
+  HL: 51669
+  HL_: 0
+  I: 0
+  IX: 49371
+  IY: 48596
+  PC: 4
+  R: 2
+  SP: 0

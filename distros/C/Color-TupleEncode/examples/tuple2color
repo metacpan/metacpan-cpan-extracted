@@ -1,0 +1,648 @@
+#!/bin/env perl
+
+=head1 NAME
+
+tuple2color - convert a list of tuples into colors using
+C<Color::TupleEncode> encoding and optionally generate a bit map of color
+patches.
+
+=head1 SYNOPSIS
+
+The default C<Color::TupleEncode::Baran> encoding implementation is used. 
+
+Generate a report of colors to STDOUT.
+
+  # report values, do not generate an image
+  tuple2color 
+
+  # specify range of matrix values (default is min=0, max=1, step=(max-min)/10)
+  tuple2color -min 0 -max 1 -step 0.1
+
+  # you can overwrite one or more matrix settings
+  tuple2color -step 0.2
+
+  # instead of using an automatically generated matrix, 
+  # specify input data (tuples)
+  tuple2color -data matrix_data.txt
+
+  # specify how matrix entries should be sorted (default no sort)
+  tuple2color -data matrix_data.txt -sortby a,b,c
+  tuple2color -data matrix_data.txt -sortby b,c,a
+  tuple2color -data matrix_data.txt -sortby c,a,b
+
+  # specify implementation
+  tuple2color -data matrix_data.txt -method Color::TupleEncode::Baran
+
+  # specify options for Color::Threeway
+  draw_color_char ... -options "-saturation=>{dmin=>0,dmax=>1}"
+
+In addition, generate a PNG image of values and corresponding encoded colors.
+
+  # draw color patch matrix using default settings
+  tuple2color -draw
+
+  # make color patches circles (default is "compound", a circle with a
+  # rectangular background)
+  tuple2color ... -glyph compound|circle|rectangle
+
+  # specify output image size
+  tuple2color ... -width 500 -height 500
+
+  # specify output file
+  tuple2color ... -outfile somematrix.png
+
+=head1 DESCRIPTION
+
+Draws color patches for a list of tuples values using the color
+encoding of C<Color::TupleEncode>.
+
+=head1 INPUT DATA OPTIONS
+
+=head2 -min 0, -max 1, -step 0.25
+
+If C<-data> is not used (see below), a list of input values is
+automatically generated within the range min..max. Each component in the tuple is sampled at a rate of -step.
+
+By default, C<(min,max) = (0,1)> and C<step = (max-min)/10>. You can override one or more of these settings. For example,
+
+  -min 0.5 -step 0.1
+
+will result (min,max,step) = (0.5,1,0.1)
+
+=head2 -data matrix_data.txt
+
+Defines the file containing the list of tuples (space separated)
+
+  1.0 0.5 0.2
+  1.0 0.2 0.0
+  0.0 0.1 0.5
+  ...
+
+It's assumed that the values will be in the range C<[0,1]>. If not, you
+need to adjust any ecoding parameters that are sensitive to absolute values (see below).
+
+If C<-data> is not used, then a matrix of values is automatically
+generated (see min/max/step, above).
+
+Make sure that the number of components in the tuple match the
+required number in the implementation. For example,
+C<Color::TupleEncode::Baran> requires three values.
+
+=head1 COLOR ENCODING OPTIONS
+
+=head2 C<-options "-ha=>0,-hb=>120,-hc=>240">
+
+=head2 C<-options "-saturation=>{dmin=>0,dmax=>1}">
+
+=head2 C<-options "-ha=>20,-hb=>60,-hc=>100,-saturation=>{dmin=>0,dmax=>1}">
+
+Specify options for the color encoding engine. All encodings require
+that the characteristic hues of each input variable are set. These
+correspond to options C<-ha>, C<-hb>, and C<-hc> and are by default 0,
+120 and 240, respectively.
+
+The options are passed as a string that evalutes to a hash. Options
+must be compatible with the C<-method> chosen for the encoding.
+
+If no options are defined and the encoding method is
+C<Color::TupleEncode::Baran>, then the following options are automatically
+set
+
+  -saturation=>{dmin=>0,dmax=>1};
+
+Make sure that all of the options are supported by the encoding implementation.
+
+=head2 C<-method Color::TupleEncode::Baran>
+
+Specifies the encoding implementation. By default, it is the method by
+Baran et al. If no options are passed, then the following are also set
+by default
+
+  -saturation=>{dmin=>0,dmax=>1};
+
+For more details about the default, see L<Color::TupleEncode::Baran>.
+
+=head1 REPORTING OPTIONS
+
+=head2 C<-sortby "a,b,c">
+
+Specify the order of tuple components to sort the matrix entries
+by. By default it is a,b,c.
+
+=head1 DRAWING OPTIONS
+
+=head2 C<-draw>
+
+If you want to create a PNG image of the color swatches, use B<-draw>. 
+
+=head2 C<-glyph compound|circle|rectangle>
+
+Determines the shape of the color patch. C<-glyph compound> produces a
+circular patch inset in a slightly darker rectangle.
+
+=head2 C<-width 500 -height 500>
+
+Specify the width and height of the output image. No attempt is made
+to automatically fit the color patches within the image. Therefore,
+choose a canvas size that accomodates all values.
+
+=head2 C<-outputfile myfile.png>
+
+Specify the output image file. If not defined, color_chart.png is used.
+
+=head1 EXAMPLES
+
+The charts produced by these examples are included in C<examples/color-chart-*.png>.
+
+A large 2-tuple encoding chart with C<[a,b]> in the range C<[0,2]> sampling every C<0.15>.
+
+  ./tuple2color -method "Color::TupleEncode::2Way"  \
+                -min 0 -max 2 -step 0.15            \
+                -outfile color-chart-2way.png       \
+                -width 600 -height 1360             \
+                -draw
+
+A small 2-tuple encoding chart with C<[a,b]> in the range C<[0,2]> sampling every C<0.3>.
+
+  ./tuple2color -method "Color::TupleEncode::2Way"  \
+                -min 0 -max 2   -step 0.3           \
+                -outfile color-chart-2way-small.png \
+                -width 600 -height 430              \
+                -draw
+
+A large 3-tuple encoding chart with C<[a,b,c]> in the range C<[0,1]> sampling every C<0.2>.
+
+  ./tuple2color -step 0.2                           \
+                -outfile color-chart-3way.png       \
+                -width 650 -height 1450             \
+                -draw
+
+A large 2-tuple encoding chart with C<[a,b,c]> in the range C<[0,1]> sampling every C<1/3>.
+
+  ./tuple2color -step 0.33333333333                 \
+                -outfile color-chart-3way-small.png \
+                -width 650 -height 450              \
+                -draw
+
+=head1 HISTORY
+
+=over
+
+=item * 11 March 2010
+
+First version.
+
+=back 
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-color-tupleencode at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Color-TupleEncode>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Martin Krzywinski, C<< <martin.krzywinski at gmail.com> >>
+
+=cut
+
+use strict;
+use warnings FATAL=>"all";
+
+use Carp;
+use Config::General;
+use Cwd qw(getcwd abs_path);
+use File::Basename;
+use FindBin;
+use Getopt::Long;
+use GD;
+use Pod::Usage;
+use lib "$FindBin::RealBin";
+use lib "$FindBin::RealBin/../lib";
+use lib "$FindBin::RealBin/lib";
+
+use Math::Round;
+use Math::VecStat qw(sum min max average);
+use Graphics::ColorObject;
+
+use Color::TupleEncode qw(:all);
+
+our (%OPT,%CONF,$conf);
+our $VERSION = 0.01;
+our $COLORNAMES = {white=>[255,255,255],
+		   black=>[0,0,0],
+		   grey =>[127,127,127]};
+our ($IMCOLORS,$IM);
+
+# read and parse configuration file
+_parse_config();
+
+# initialize color encoder
+my $tw = Color::TupleEncode->new(method=>$CONF{method});
+$tw->set_options(%{$CONF{options}}) if $CONF{options};
+
+# initialize image, if requested
+if($CONF{draw}) {
+  $IM = GD::Image->new( @CONF{qw(width height)},1 );
+  $IM->fill(0,0,fetch_color("white"));
+}
+
+# draw/report matrix
+my $method = $tw->get_options(-method);
+draw_matrix(5,5,generate_matrix_tuples($tw->get_tuple_size()));
+
+# write out the image, if defined
+if(defined $IM) {
+  my $IMfh = IO::File->new(">$CONF{outfile}");
+  confess "Could not open output file $CONF{outfile} for writing" unless $IMfh;
+  binmode $IMfh;
+  print {$IMfh} $IM->png();
+  $IMfh->close();
+}
+
+# ................................................................
+# Draw/report the matrix of values and color patches
+
+sub draw_matrix {
+  my ($x0,$y0,$tuples) = @_;
+  
+  my ($x,$y) = ($x0,$y0);
+  my ($rowspace,$colspace) = ($CONF{row_spacing}*$CONF{patch_size},
+			      $CONF{col_spacing}*$CONF{patch_size});
+
+  for my $triplet (@$tuples) {
+    if($y == $y0) {
+    # draw the header, if we're at the top of the figure
+      my @labels = qw(COL R G B HUE H S V);
+      if(@$triplet == 3) {
+	unshift @labels, qw(a b c);
+      } elsif (@$triplet == 2) {
+	unshift @labels, qw(a b);
+      }
+      for my $label (@labels) {
+	if($label eq "-") {
+	  $x += $colspace;
+	} else {
+	  _draw_string($x,$y,"%3s",$label);
+	  if($label =~ /^[abc]$/ && $tw->has_option(lc "-h$label")) {
+	    my @rgb = _hsv2rgb($tw->get_options(lc "-h$label"));
+	    _draw_patch($x,$y,@rgb);
+	  }
+	  $x += $colspace;
+	}
+      }
+      ($x,$y) = ($x0,$y+$rowspace);
+    }
+    # determine and report this triplet's RGB and HSV color
+    $tw->set_tuple($triplet);
+    my @rgb = $tw->as_RGB255();
+    my $hex = $tw->as_RGBhex();
+    my @hsv = $tw->as_HSV();
+    $hsv[0] = round($hsv[0]);
+    printinfo("abc",@$triplet,"rgb",@rgb,"hsv",@hsv,"hex",$hex);
+    # draw this triplet's row and color patch
+    @rgb = map { sprintf("%3d",$_) } @rgb;
+    @hsv = (sprintf("%3d",$hsv[0]),
+	    sprintf("%5.2f",$hsv[1]),
+	    sprintf("%5.2f",$hsv[2]));
+    # triplet values
+    for my $i (0..@$triplet-1) {
+      my $num = $triplet->[$i];
+      my $color = "grey";
+      if($num == max(@$triplet)) {
+	$color = "black";
+      }
+      if($num == min(@$triplet)) {
+	$color = "black";
+      }
+      _draw_string($x,$y,"%4.1f",$num,$color);
+      $x += $colspace;
+    }
+    # triplet color
+    _draw_patch($x,$y,@rgb);
+    $x += $colspace;
+    # individual rgb values
+    for my $num (@rgb) {
+      _draw_string($x,$y,"%s",$num);
+      $x += $colspace;
+    }
+    # hue patch
+    _draw_patch($x,$y,_hsv2rgb($hsv[0]));;
+    $x += $colspace;
+    # individual HSV values
+    for my $num (@hsv) {
+      _draw_string($x,$y,"%s",$num);
+      $x += $colspace;
+    }
+    # return to top of image, if at bottom
+    if($y > $CONF{height}-2*$rowspace) {
+      $y = $y0;
+      $x0 = $x + $colspace;
+      $x = $x0;
+    } else {
+      ($x,$y) = ($x0,$y+$rowspace);
+    }
+  }
+}
+
+sub generate_matrix_tuples {
+  my $tuple_size = shift;
+  my @tuples;
+  if($CONF{data}) {
+    open(F,$CONF{data}) || confess "Cannot open matrix data file $CONF{data}";
+    while(my $line = <F>) {
+      chomp $line;
+      my @tuple = split(" ",$line);
+      if(@tuple != $tuple_size ||
+	 grep(defined $_, @tuple) != $tuple_size) {
+	confess "Line [$line] did not have the right number of values - need $tuple_size values.";
+      }
+      push @tuples, \@tuple
+    }
+    close(F);
+  } else {
+    my ($min,$max,$step) = @CONF{qw(min max step)};
+    my $n = 1+($max-$min)/$step;
+    for my $i (0..$n**$tuple_size-1) {
+      my @tuple = ();
+      for my $j (0..$tuple_size-1) {
+	my $x;
+	$x = int($i / $n**$j) % $n;
+	$tuple[$j] = $min + $x*$step;
+      }
+      push @tuples, \@tuple;
+    }
+  }
+  my $sort_str = $CONF{sortby};
+  if(! $sort_str) {
+    $sort_str = "b,a" if $tuple_size == 2;
+    $sort_str = "a,b,c" if $tuple_size == 3;
+  }
+  if($sort_str) {
+    $sort_str =~ tr/abc/012/;
+    my @sort_idx = split(/\s*,\s*/,$sort_str);
+    confess "Sort function must be a string like 'a,b,c' or 'c,a,b'" unless @sort_idx == $tuple_size;
+    my @sort_terms;
+    for my $i (@sort_idx) {
+      push @sort_terms, sprintf(q{($a->[%d] <=> $b->[%d])},$i,$i);
+    }
+    my $sort_func_text = sprintf(" sub { %s } ",join(" || ",@sort_terms));
+    my $sort_func = eval $sort_func_text;
+    @tuples = sort $sort_func @tuples;
+  }
+  return \@tuples;
+}
+
+# ................................................................
+# GD Color routines - fetch_color(r,g,b) or fetch_color(name) retrieves
+# (and allocates if required) color index. To use color by name, it must
+# be defind in $COLORNAMES.
+#
+sub fetch_color {
+  my @args = @_;
+  my ($r,$g,$b);
+  if(@args == 1 && $COLORNAMES->{$args[0]}) {
+    ($r,$g,$b) = @{$COLORNAMES->{$args[0]}};
+  } elsif (@args == 3) {
+    ($r,$g,$b) = @args;
+  }
+  _validate_rgb($r,$g,$b);
+  if(exists $IMCOLORS->{$r} &&
+     exists $IMCOLORS->{$r}{$g} &&
+     exists $IMCOLORS->{$r}{$g}{$b}) {
+    return $IMCOLORS->{$r}{$g}{$b};
+  } else {
+    return _allocate_color($r,$g,$b);
+    fetch_color(@args);
+  }
+}
+# ................................................................
+# Utility routine to allocate a color.
+sub _allocate_color {
+  my ($r,$g,$b) = @_;
+  _validate_rgb($r,$g,$b);
+  my $idx = $IM->colorExact($r,$g,$b);
+  if($idx == -1) {
+    return $IMCOLORS->{$r}{$g}{$b} = $IM->colorAllocate($r,$g,$b);
+  } else {
+    return $idx;
+  }
+}
+# ................................................................
+# Validates RGB triplet - each must be defined and in range [0,255]
+sub _validate_rgb {
+  my (@rgb) = @_;
+  my $numok = grep(defined $_ && $_ >=0 && $_ <= 255, @rgb);
+  confess "R,G,B triplet failed format check" unless $numok == 3;
+}
+sub _validate_hsv {
+  my (@hsv) = @_;
+  my $ok = (defined $hsv[0] && $hsv[0] >= 0 && $hsv[0] <= 360 &&
+	    defined $hsv[1] && $hsv[1] >= 0 && $hsv[1] <=   1 &&
+	    defined $hsv[2] && $hsv[2] >= 0 && $hsv[2] <=   1);
+  confess "H,S,V triplet failed format check" unless $ok;
+}
+sub _hsv2rgb {
+  my ($h,$s,$v) = @_;
+  confess "Hue not defined in hsv2rgb" unless defined $h;
+  $s = 1 if ! defined $s;
+  $v = 1 if ! defined $v;
+  _validate_hsv($h,$s,$v);
+  my $color = Graphics::ColorObject->new_HSV([$h,$s,$v]);
+  return @{$color->as_RGB255};
+}
+
+sub _draw_string {
+  my ($x,$y,$format,$label,$color) = @_;
+  return unless $CONF{draw};
+  $color ||= "black";
+  $IM->string($CONF{gdfont},$x,$y,sprintf($format,$label),fetch_color($color));
+}
+
+sub _draw_patch {
+  my ($x,$y,@rgb) = @_;
+  return unless $CONF{draw};
+  my $size = $CONF{patch_size};
+  my $border_mult = 0.5;
+  $y += 1;
+  if($CONF{glyph} eq "circle" || $CONF{glyph} eq "compound") {
+    if($CONF{glyph} eq "compound") {
+      $IM->filledRectangle($x,$y,$x+$size,$y+$size,fetch_color(map {$_*$border_mult} @rgb));
+      $IM->rectangle($x,$y,$x+$size,$y+$size,fetch_color(map {$_*$border_mult} @rgb));
+    }
+    $x += $size/2;
+    $y += $size/2;
+    $IM->filledArc($x,$y,$size,$size,0,360,fetch_color(@rgb));
+    $IM->arc($x,$y,$size,$size,0,360,fetch_color(map {$_*$border_mult} @rgb));
+  } elsif($CONF{glyph} eq "rectangle") {
+    $IM->filledRectangle($x,$y,$x+$size,$y+$size,fetch_color(@rgb));
+    $IM->rectangle($x,$y,$x+$size,$y+$size,fetch_color(map {$_*$border_mult} @rgb));
+  } else {
+    confess "Do not understand glyph type $CONF{glyph}. Use either 'circle' or 'rectangle'";
+  }
+}
+
+sub validateconfiguration {
+  $CONF{method} ||= "Color::TupleEncode::Baran";
+  if($CONF{options}) {
+    eval $CONF{options};
+    if($@) {
+      confess "Could not parse option string $CONF{options}. It must be formatted as a hash, e.g. '-saturation=>{dmin=>0,dmax=>1}'";
+    }
+    $CONF{options} = { eval $CONF{options} };
+  }
+
+  $CONF{glyph}       ||= "compound";
+  $CONF{patch_size}  = 10;
+  $CONF{col_spacing} = 2.7;
+  $CONF{row_spacing} = 1.3;
+  $CONF{gdfont}      = gdSmallFont;
+  $CONF{width}       ||= 1000;
+  $CONF{height}      ||= 1000;
+  $CONF{outfile}     ||= "color_chart.png";
+
+  $CONF{min}  = defined $CONF{min} ? $CONF{min} : 0;
+  $CONF{max}  = defined $CONF{max} ? $CONF{max} : 1;
+  $CONF{step} = defined $CONF{step} ? $CONF{step} : ($CONF{max}-$CONF{min})/5;
+}
+
+################################################################
+#
+# *** DO NOT EDIT BELOW THIS LINE ***
+#
+################################################################
+
+sub _parse_config {
+  my $dump_debug_level = 3;
+  GetOptions(\%OPT, 
+	     "draw",
+	     "data=s",
+	     "width=i",
+	     "height=i",
+	     "method=s",
+	     "glyph=s",
+	     "configfile=s",
+	     "options=s",
+	     "outfile=s",
+	     "sortby=s",
+	     "min=f",
+	     "max=f",
+	     "step=f",
+	     "help","man","debug:i");
+  pod2usage() if $OPT{help};
+  pod2usage(-verbose=>2) if $OPT{man};
+  loadconfiguration($OPT{configfile});
+  populateconfiguration(); # copy command line options to config hash
+  validateconfiguration(); 
+  if(defined $CONF{debug} && $CONF{debug} == $dump_debug_level) {
+    $Data::Dumper::Indent    = 2;
+    $Data::Dumper::Quotekeys = 0;
+    $Data::Dumper::Terse     = 0;
+    $Data::Dumper::Sortkeys  = 1;
+    $Data::Dumper::Varname = "OPT";
+    printdumper(\%OPT);
+    $Data::Dumper::Varname = "CONF";
+    printdumper(\%CONF);
+    exit;
+  }
+}
+
+sub populateconfiguration {
+  for my $var (keys %OPT) {
+    $CONF{$var} = $OPT{$var};
+  }
+  repopulateconfiguration(\%CONF);
+}
+
+sub repopulateconfiguration {
+  my $root     = shift;
+  for my $key (keys %$root) {
+    my $value = $root->{$key};
+    if(ref($value) eq "HASH") {
+      repopulateconfiguration($value);
+    } elsif (ref($value) eq "ARRAY") {
+      for my $item (@$value) {
+        repopulateconfiguration($item);
+      }
+    } elsif(defined $value) {
+      while($value =~ /__([^_].+?)__/g) {
+        my $source = "__" . $1 . "__";
+        my $target = eval $1;
+        $value =~ s/\Q$source\E/$target/g;
+      }
+      $root->{$key} = $value;
+    }
+  }
+}
+
+################################################################
+#
+#
+
+sub loadconfiguration {
+  my $file = shift;
+  if(defined $file) {
+    if(-e $file && -r _) {
+      # provided configuration file exists and can be read
+      $file = abs_path($file);
+    } else {
+      confess "The configuration file [$file] passed with -configfile does not exist or cannot be read.";
+    }
+  } else {
+    # otherwise, try to automatically find a configuration file
+    my ($scriptname,$path,$suffix) = fileparse($0);
+    my $cwd     = getcwd();
+    my $bindir  = $FindBin::RealBin;
+    my $userdir = $ENV{HOME};
+    my @candidate_files = (
+			   "$cwd/$scriptname.conf",
+			   "$cwd/etc/$scriptname.conf",
+			   "$cwd/../etc/$scriptname.conf",
+			   "$bindir/$scriptname.conf",
+			   "$bindir/etc/$scriptname.conf",
+			   "$bindir/../etc/$scriptname.conf",
+			   "$userdir/.$scriptname.conf",
+			   );
+    my @additional_files = (
+
+			   );
+    for my $candidate_file (@additional_files,@candidate_files) {
+      #printinfo("configsearch",$candidate_file);
+      if(-e $candidate_file && -r _) {
+	$file = $candidate_file;
+	#printinfo("configfound",$candidate_file);
+	last;
+      }
+    }
+  }
+  if(defined $file) {
+    $OPT{configfile} = $file;
+    $conf = new Config::General(
+				-ConfigFile=>$file,
+				-IncludeRelative=>1,
+				-ExtendedAccess=>1,
+				-AllowMultiOptions=>"yes",
+				-LowerCaseNames=>1,
+				-AutoTrue=>1
+			       );
+    %CONF = $conf->getall;
+  }
+}
+
+sub printdebug {
+  my ($level,@msg) = @_;
+  my $prefix = "debug";
+  if(defined $CONF{debug} && $CONF{debug} >= $level) {
+    printinfo(sprintf("%s[%d]",$prefix,$level),@_);
+  }
+}
+
+sub printinfo {
+  print join(" ",@_),"\n";
+}
+
+sub printdumper {
+  use Data::Dumper;
+  print Dumper(@_);
+}
+

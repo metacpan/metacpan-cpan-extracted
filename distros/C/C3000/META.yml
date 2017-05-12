@@ -1,0 +1,26 @@
+---
+abstract: "A perl wrap for C3000 API!!!\r"
+author:
+  - 'xiaoyafeng <xyf.xiao@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: C3000
+no_index:
+  directory:
+    - inc
+requires:
+  DBI: 0
+  DateTime: 0
+  DateTime::Format::Natural: 0
+  DateTime::Format::Oracle: 0
+  List::MoreUtils: 0
+  Readonly: 0
+  Win32::OLE: 0.17
+version: 1.02

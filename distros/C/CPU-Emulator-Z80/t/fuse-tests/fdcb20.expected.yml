@@ -1,0 +1,24 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem:
+  55967:
+    - 18
+name: fdcb20
+registers:
+  AF: 15621
+  AF_: 0
+  BC: 4751
+  BC_: 0
+  DE: 8303
+  DE_: 0
+  HL: 34964
+  HL_: 0
+  I: 0
+  IX: 56747
+  IY: 55845
+  PC: 4
+  R: 2
+  SP: 0

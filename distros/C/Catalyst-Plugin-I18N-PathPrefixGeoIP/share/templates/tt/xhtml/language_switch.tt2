@@ -1,0 +1,7 @@
+<div id="language-switch">
+  [%~ FOREACH choice IN c.language_switch_options.pairs %]
+    <div class="language-switch-choice">
+      <a class="language-switch-language-link" title="[% choice.value.name %]" href="[% choice.value.uri %]">[% choice.key %]</a>
+    </div>
+  [%~ END %]
+</div>

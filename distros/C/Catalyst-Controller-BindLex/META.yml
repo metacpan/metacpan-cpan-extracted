@@ -1,0 +1,24 @@
+---
+abstract: 'Unmaintained, dangerous proof of concept'
+author:
+  - 'Matt S. Trout'
+distribution_type: module
+generated_by: 'Module::Install version 0.72'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Catalyst-Controller-BindLex
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Array::RefElem: 0
+  Catalyst::Runtime: 0
+  Devel::Caller: 0
+  Devel::LexAlias: 0
+  PadWalker: 0
+  Test::use::ok: 0
+  perl: 5.8.1
+version: 0.05

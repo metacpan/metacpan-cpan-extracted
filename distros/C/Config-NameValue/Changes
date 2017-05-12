@@ -1,0 +1,18 @@
+Revision history for Config-NameValue
+
+1.03      2012-02-09 13:02:22 America/Boise
+  - Don't load NoWarnings in basic tests when Perl 5.10.0 and File::Slurp
+    9999.19, see https://rt.cpan.org/Public/Bug/Display.html?id=74228 I don't
+    have access to 5.10.0 but I think I've done this correctly.
+
+1.02      2012-01-12 19:50:27 America/Boise
+  - Forgot to turn off the Git modules for release when testing Twitter plugin
+
+1.01      2012-01-12 19:17:01 America/Boise
+  - Added coverage and other tests
+  - Tweaked dist.ini and weaver.ini files
+  - Initial release to the CPAN
+
+1.00   2011-12-20
+  - Initial Creation
+  - Changes I've been wanting to make from original code

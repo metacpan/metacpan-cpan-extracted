@@ -1,0 +1,170 @@
+$VAR1 = {
+          'backup' => [
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'repository',
+                                            'server:/var/backup'
+                                          ],
+                                          [
+                                            'backup',
+                                            'workstation'
+                                          ]
+                                        ],
+                                 'PATH' => '/usr/bin:/bin',
+                                 'RSYNC_RSH' => 'ssh -F /dev/null -q -x -p 222 -i .ssh/id_dsa -x',
+                                 'backup' => 'workstation',
+                                 'directory' => [
+                                                  '/etc',
+                                                  '/root'
+                                                ],
+                                 'errors' => [
+                                               'fred@domain.com'
+                                             ],
+                                 'expunge' => '1w',
+                                 'ignore' => 0,
+                                 'keep' => '',
+                                 'linknumber' => '4',
+                                 'maxdel' => '',
+                                 'noop' => 0,
+                                 'okcode' => [],
+                                 'options' => [
+                                                '--bwlimit=1000'
+                                              ],
+                                 'purge' => 0,
+                                 'repository' => 'server:/var/backup',
+                                 'retain' => '4',
+                                 'rsync' => '',
+                                 'tell' => [
+                                             'fred@domain.com'
+                                           ],
+                                 'title' => '',
+                                 'verbose' => 0,
+                                 'worry' => 0
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'repository',
+                                            'server:/var/backup'
+                                          ],
+                                          [
+                                            'backup',
+                                            'workstation2'
+                                          ]
+                                        ],
+                                 'PATH' => '/usr/bin:/bin',
+                                 'RSYNC_RSH' => 'ssh -F /dev/null -q -x -p 222 -i .ssh/id_dsa',
+                                 'backup' => 'workstation2',
+                                 'directory' => [
+                                                  '/home',
+                                                  '/usr/local',
+                                                  '/var/mysql'
+                                                ],
+                                 'errors' => [
+                                               'fred@domain.com'
+                                             ],
+                                 'expunge' => '1w',
+                                 'ignore' => 0,
+                                 'keep' => '',
+                                 'linknumber' => '4',
+                                 'maxdel' => '',
+                                 'noop' => 0,
+                                 'okcode' => [],
+                                 'options' => [
+                                                '--bwlimit=100',
+                                                '--exclude=goodlist.db',
+                                                '--exclude=Cache'
+                                              ],
+                                 'purge' => 0,
+                                 'repository' => 'server:/var/backup',
+                                 'retain' => '4',
+                                 'rsync' => '',
+                                 'tell' => [
+                                             'fred@domain.com'
+                                           ],
+                                 'title' => '',
+                                 'verbose' => 0,
+                                 'worry' => 0
+                               }, 'Config::Nested::Section' ),
+                        bless( {
+                                 '+' => [
+                                          [
+                                            'repository',
+                                            'server:/var/backup'
+                                          ],
+                                          [
+                                            'backup',
+                                            'waltz@pc'
+                                          ]
+                                        ],
+                                 'PATH' => '/usr/bin:/bin',
+                                 'RSYNC_RSH' => 'ssh -F /dev/null -q -x -p 222 -i .ssh/id_dsa',
+                                 'backup' => 'waltz@pc',
+                                 'directory' => [
+                                                  ':backup',
+                                                  ':C/epson'
+                                                ],
+                                 'errors' => [
+                                               'fred@domain.com'
+                                             ],
+                                 'expunge' => '1w',
+                                 'ignore' => 0,
+                                 'keep' => '',
+                                 'linknumber' => '4',
+                                 'maxdel' => '',
+                                 'noop' => 0,
+                                 'okcode' => [
+                                               '23'
+                                             ],
+                                 'options' => [
+                                                '--password-file=.ssh/.pwd'
+                                              ],
+                                 'purge' => 0,
+                                 'repository' => 'server:/var/backup',
+                                 'retain' => '4',
+                                 'rsync' => '',
+                                 'tell' => [
+                                             'fred@domain.com'
+                                           ],
+                                 'title' => '',
+                                 'verbose' => 0,
+                                 'worry' => 0
+                               }, 'Config::Nested::Section' )
+                      ],
+          'repository' => [
+                            bless( {
+                                     '+' => [
+                                              [
+                                                'repository',
+                                                'server:/var/backup'
+                                              ]
+                                            ],
+                                     'PATH' => '/usr/bin:/bin',
+                                     'RSYNC_RSH' => 'ssh -F /dev/null -q -x -p 222 -i .ssh/id_dsa',
+                                     'backup' => '',
+                                     'directory' => [],
+                                     'errors' => [
+                                                   'fred@domain.com'
+                                                 ],
+                                     'expunge' => '1w',
+                                     'ignore' => 0,
+                                     'keep' => '',
+                                     'linknumber' => '4',
+                                     'maxdel' => '',
+                                     'noop' => 0,
+                                     'okcode' => [],
+                                     'options' => [],
+                                     'purge' => 0,
+                                     'repository' => 'server:/var/backup',
+                                     'retain' => '4',
+                                     'rsync' => '',
+                                     'tell' => [
+                                                 'fred@domain.com'
+                                               ],
+                                     'title' => '',
+                                     'verbose' => 0,
+                                     'worry' => 0
+                                   }, 'Config::Nested::Section' )
+                          ]
+        };

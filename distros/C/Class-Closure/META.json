@@ -1,0 +1,56 @@
+{
+   "abstract" : "Encapsulated, declarative class style",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Closure",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Devel::Caller" : "0",
+            "Exporter" : "0",
+            "PadWalker" : "0",
+            "Sentinel" : "0",
+            "Symbol" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ap/Class-Closure/issues"
+      },
+      "homepage" : "http://github.com/ap/Class-Closure",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Class-Closure"
+      }
+   },
+   "version" : "0.302"
+}
+

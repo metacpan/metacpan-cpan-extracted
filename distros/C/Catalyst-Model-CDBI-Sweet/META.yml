@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Catalyst-Model-CDBI-Sweet
+version: 0.06
+author:
+  - Christian Hansen <ch@ngmedia.com>
+abstract: 
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

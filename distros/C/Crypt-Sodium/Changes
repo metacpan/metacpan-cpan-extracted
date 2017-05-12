@@ -1,0 +1,58 @@
+Revision history for Perl extension Crypt::Sodium.
+
+0.01  Wed Jun 26 11:55:07 2013
+	- original version; created by h2xs 1.23 with options
+		-A -n Crypt::Sodium
+
+0.05  Mon May 26 15:23:01 2014
+	- fixed RT #95985 (Confusing length error messages) and 
+                RT #95987 (crypto_box() adds zero padding)
+
+0.06  Fri Jan 23 11:37:00 2015
+    - removed Perl 5.18 requirement, it appears build 
+	  problems on earlier versions of perl have been
+	  fixed.
+
+0.07  Sat Mar 21 01:42:00 2015
+    - fixed RT #102894 (get rid of hand coded padding added
+      for RT #95987, add support for crypto_secretbox(), and
+      crypto_pwhash_scrypt* functions).  thank you for the
+      patches, Tom!
+
+0.08  Thu Oct  1 11:26:31 2015
+    - merged pull request from rdecker adding 
+      crypto_generichash(), crypto_sign_detached(), and 
+      crypto_sign_verify_detached(), and fixing memory leaks
+      in the XS code.  Thank you, Rob!
+      
+0.09  Mon Dec 12 12:06:20 2016
+    - fixing RT #118956 by applying NEWELLC's patch.  many
+      thanks for the patches and the follow up, Colin! 
+    - added support for crypto_scalarmult and a convenience 
+      function crypto_scalarmult_safe (misnamed?) that allows
+      for creating shared secrets between sets of keys GitHub 
+      ticket #3; thanks for the request @petschge!
+    - added support for crypto_scalarmult_base which allows 
+      calculation of a public key from a secret key
+    - added assert()'s around sodium_init() calls to silence 
+      clang's warnings about unused return values
+      
+0.10  Thu Dec 22 19:36:03 2016
+    - accepted and merged PR #4 from @colinnewell that 
+      substitutes all occurrences of newSVpv with newSVpvn
+      to improve the handling of empty string values across
+      the board
+    - got rid of assert.h and redundant sodium_init() calls, 
+      now call sodium_init() once in Sodium.pm's BEGIN {} 
+      block.
+    - tested that segfaults no longer occur fixed on armv7 
+      platforms
+
+0.11  Thu Dec 22 20:18:42 2016
+    - updated crypto_generichash to use sodium_malloc()
+    - removed unused real_crypto_generichash_key XS routine
+    - added support for randombytes_uniform()
+    - added tests for crypto_generichash and company
+    - added tests for randombytes_random() and _uniform()
+    - added crypto_generichash_init(), _update(), and final()
+      to support multi-part hashing

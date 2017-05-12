@@ -1,0 +1,180 @@
+NAME
+    CGI::Untaint - process CGI input parameters
+
+SYNOPSIS
+      use CGI::Untaint;
+
+      my $q = new CGI;
+      my $handler = CGI::Untaint->new( $q->Vars );
+      my $handler2 = CGI::Untaint->new({
+            INCLUDE_PATH => 'My::Untaint',
+      }, $apr->parms);
+
+      my $name     = $handler->extract(-as_printable => 'name');
+      my $homepage = $handler->extract(-as_url => 'homepage');
+
+      my $postcode = $handler->extract(-as_postcode => 'address6');
+
+      # Create your own handler...
+
+      package MyRecipes::CGI::Untaint::legal_age;
+      use base 'CGI::Untaint::integer';
+      sub is_valid { 
+        shift->value > 21;
+      }
+
+      package main;
+      my $age = $handler->extract(-as_legal_age => 'age');
+
+DESCRIPTION
+    Dealing with large web based applications with multiple forms is a
+    minefield. It's often hard enough to ensure you validate all your input
+    at all, without having to worry about doing it in a consistent manner.
+    If any of the validation rules change, you often have to alter them in
+    many different places. And, if you want to operate taint-safe, then
+    you're just adding even more headaches.
+
+    This module provides a simple, convenient, abstracted and extensible
+    manner for validating and untainting the input from web forms.
+
+    You simply create a handler with a hash of your parameters (usually
+    $q->Vars), and then iterate over the fields you wish to extract,
+    performing whatever validations you choose. The resulting variable is
+    guaranteed not only to be valid, but also untainted.
+
+CONSTRUCTOR
+  new
+      my $handler  = CGI::Untaint->new( $q->Vars );
+      my $handler2 = CGI::Untaint->new({
+            INCLUDE_PATH => 'My::Untaint',
+      }, $apr->parms);
+
+    The simplest way to contruct an input handler is to pass a hash of
+    parameters (usually $q->Vars) to new(). Each parameter will then be able
+    to be extracted later by calling an extract() method on it.
+
+    However, you may also pass a leading reference to a hash of
+    configuration variables.
+
+    Currently the only such variable supported is 'INCLUDE_PATH', which
+    allows you to specify a local path in which to find extraction handlers.
+    See "LOCAL EXTRACTION HANDLERS".
+
+METHODS
+  extract
+      my $homepage = $handler->extract(-as_url => 'homepage');
+      my $state = $handler->extract(-as_us_state => 'address4');
+      my $state = $handler->extract(-as_like_us_state => 'address4');
+
+    Once you have constructed your Input Handler, you call the 'extract'
+    method on each piece of data with which you are concerned.
+
+    The takes an -as_whatever flag to state what type of data you require.
+    This will check that the input value correctly matches the required
+    specification, and return an untainted value. It will then call the
+    is_valid() method, where applicable, to ensure that this doesn't just
+    _look_ like a valid value, but actually is one.
+
+    If you want to skip this stage, then you can call -as_like_whatever
+    which will perform the untainting but not the validation.
+
+  error
+      my $error = $handler->error;
+
+    If the validation failed, this will return the reason why.
+
+LOCAL EXTRACTION HANDLERS
+    As well as as the handlers supplied with this module for extracting
+    data, you may also create your own. In general these should inherit from
+    'CGI::Untaint::object', and must provide an '_untaint_re' method which
+    returns a compiled regular expression, suitably bracketed such that $1
+    will return the untainted value required.
+
+    e.g. if you often extract single digit variables, you could create
+
+      package My::Untaint::digit;
+
+      use base 'CGI::Untaint::object';
+
+      sub _untaint_re { qr/^(\d)$/ }
+
+      1;
+
+    You should specify the path 'My::Untaint' in the INCLUDE_PATH
+    configuration option. (See new() above.)
+
+    When extract() is called CGI::Untaint will also check to see if you have
+    an is_valid() method also, and if so will run this against the value
+    extracted from the regular expression (available as $self->value).
+
+    If this returns a true value, then the extracted value will be returned,
+    otherwise we return undef.
+
+    is_valid() can also modify the value being returned, by assigning
+    $self->value($new_value)
+
+    e.g. in the above example, if you sometimes need to ensure that the
+    digit extracted is prime, you would supply:
+
+      sub is_valid { (1 x shift->value) !~ /^1?$|^(11+?)\1+$/ };
+
+    Now, when users call extract(), it will also check that the value is
+    valid(), i.e. prime:
+
+      my $number = $handler->extract(-as_digit => 'value');
+
+    A user wishing to skip the validation, but still ensure untainting can
+    call
+
+      my $number = $handler->extract(-as_like_digit => 'value');
+
+  Test::CGI::Untaint
+    If you create your own local handlers, then you may wish to explore
+    Test::CGI::Untaint, available from the CPAN. This makes it very easy to
+    write tests for your handler. (Thanks to Profero Ltd.)
+
+AVAILABLE HANDLERS
+    This package comes with the following simplistic handlers:
+
+      printable  - a printable string
+      integer    - an integer
+      hex        - a hexadecimal number (as a string)
+
+    To really make this work for you you either need to write, or download
+    from CPAN, other handlers. Some of the handlers available on CPAN
+    include:
+
+      asin         - an Amazon ID
+      boolean      - boolean value
+      country      - a country code or name
+      creditcard   - a credit card number
+      date         - a date (into a Date::Simple)
+      datetime     - a date (into a DateTime)
+      email        - an email address
+      hostname     - a DNS host name
+      html         - sanitized HTML
+      ipaddress    - an IP address
+      isbn         - an ISBN
+      uk_postcode  - a UK Postcode
+      url          - a URL
+      zipcode      - a US zipcode
+
+BUGS
+    None known yet.
+
+SEE ALSO
+    CGI. perlsec. Test::CGI::Untaint.
+
+AUTHOR
+    Tony Bowden
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-CGI-Untaint@rt.cpan.org
+
+COPYRIGHT and LICENSE
+    Copyright (C) 2001-2005 Tony Bowden. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

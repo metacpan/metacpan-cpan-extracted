@@ -1,0 +1,10 @@
+Av_MystructPtr.c
+Av_MystructPtr.h
+Changes
+MANIFEST
+Makefile.PL
+Mstruct.h
+Mstruct.pm
+Mstruct.xs
+test.pl
+typemap

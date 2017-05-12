@@ -1,0 +1,16 @@
+~$
+.*\.bak
+blib
+.*\.bs
+build
+.*\.c
+\.git
+MAINTAINERS$
+Makefile$
+Makefile\.old
+MYMETA\..*$
+.*\.o
+pm_to_blib
+.*\.png
+.*\.swp
+.*\.tar\.gz

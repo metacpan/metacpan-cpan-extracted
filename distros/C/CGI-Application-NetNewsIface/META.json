@@ -1,0 +1,58 @@
+{
+   "abstract" : "a publicly-accessible read-only interface",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CGI-Application-NetNewsIface",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.37"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Application" : "0",
+            "CGI::Application::Plugin::TT" : "0",
+            "Class::Accessor" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Net::NNTP" : "0",
+            "Test::More" : "0",
+            "XML::RSS" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "CGI::Application::NetNewsIface" : {
+         "file" : "lib/CGI/Application/NetNewsIface.pm",
+         "version" : "0.0203"
+      },
+      "CGI::Application::NetNewsIface::Cache::DBI" : {
+         "file" : "lib/CGI/Application/NetNewsIface/Cache/DBI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/perl-cgi-application-netnewsiface/"
+      }
+   },
+   "version" : "0.0203",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,85 @@
+<h1>People</h1>
+
+<div class="box">
+    <form method="post" action="[% cgipath %]/pages.cgi">
+    <input type="hidden" name="act" value="user-list" />
+    <input type="hidden" name="searched" value="[% searched %]" />
+
+    <table width="100%">
+    <tr><td>
+            Search by Name: <input type="text" name="searchname" size="10" /> <input type="submit" value="GO" />
+        </td></tr>
+    <tr><td>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=A'>A</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=B'>B</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=C'>C</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=D'>D</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=E'>E</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=F'>F</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=G'>G</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=H'>H</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=I'>I</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=J'>J</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=K'>K</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=L'>L</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=M'>M</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=N'>N</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=O'>O</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=P'>P</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Q'>Q</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=R'>R</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=S'>S</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=T'>T</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=U'>U</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=V'>V</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=W'>W</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=X'>X</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Y'>Y</a>
+            <a href='[% cgipath %]/pages.cgi?act=user-list&amp;letter=Z'>Z</a>
+        </td></tr>
+    </table>
+    </form>
+    [% IF user.access == 5 %]
+    <a href="[% cgipath %]/pages.cgi?act=user-admin">Admin Mode</a>
+    [% END %]
+</div>
+
+<div class="box">
+<br />
+[% FOREACH item = users %]
+
+[% IF item.password != '-banned-' %]
+<div class="users">
+    [% IF user.access == 5 %]
+    <div class="username"><a href="[% cgipath %]/pages.cgi?act=user-adminedit&amp;userid=[% item.userid %]">[% item.realname %]</a></div>
+    [% ELSE %]
+    <div class="username">[% item.realname %]</div>
+    [% END %]
+    <div class="userbits">
+            <blockquote class="mugshot">[% IF item.link %]<img src="[% webpath %]/[% item.link %]" alt="[% item.tag %]" align="right" />[% END %]
+
+            [% IF item.aboutme AND item.url %]
+                [% item.aboutme %]
+                <p><b>My Web Page:</b> <a href="[% item.url %]">[% item.url %]</a>
+            [% ELSE %]
+                [% IF item.aboutme %]
+                    [% item.aboutme %]
+                [% ELSE %]
+                    [% IF item.url %]<p><b>My Web Page:</b> <a href="[% item.url %]">[% item.url %]</a>
+                    [% ELSE %]<p>... to be completed.
+                    [% END %]
+                [% END %]
+            [% END %]
+            </blockquote>
+    </div>
+</div>
+[% END %]
+
+[% END %]
+
+[% IF searched %]
+[% IF norecs %]<p align="center">Sorry, no-one matches that search.[% END %]
+[% ELSE %]
+<p align="center">Please select a search criteria from the options above.
+[% END %]
+</div>

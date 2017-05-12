@@ -1,0 +1,181 @@
+# NAME
+
+Catalyst::View::Base::JSON - a 'base' JSON View 
+
+<div>
+
+    <a href="https://badge.fury.io/pl/Catalyst-View-Base-JSON"><img src="https://badge.fury.io/pl/Catalyst-View-Base-JSON.svg" alt="CPAN version" height="18"></a>
+    <a href="https://travis-ci.org/jjn1056/Catalyst-View-Base-JSON/"><img src="https://api.travis-ci.org/jjn1056/Catalyst-View-Base-JSON.png" alt="https://api.travis-ci.org/jjn1056/Catalyst-View-Base-JSON.png"></a>
+    <a href="http://cpants.cpanauthors.org/dist/Catalyst-View-Base-JSON"><img src="http://cpants.cpanauthors.org/dist/Catalyst-View-Base-JSON.png" alt='Kwalitee Score' /></a>
+</div>
+
+# SYNOPSIS
+
+    package MyApp::View::Person;
+
+    use Moo;
+    use Types::Standard;
+    use MyApp::Types qw/Version/;
+
+    extends 'Catalyst::View::Base::JSON';
+
+    has name => (
+     is=>'ro',
+     isa=>Str,
+     required=>1);
+
+    has age => (
+     is=>'ro',
+     isa=>Int,
+     required=>1);
+
+    has api_version => (
+     is=>'ro',
+     isa=>Version,
+     required=>1);
+
+    sub amend_headers {
+      my ($self, $headers) = @_;
+      $headers->push_header(Accept => 'application/json');
+    }
+
+    sub TO_JSON {
+      my $self = shift;
+      return +{
+        name => $self->name,
+        age => $self->age,
+        api => $self->api_version,
+      };
+    }
+
+    package MyApp::Controller::Root;
+    use base 'Catalyst::Controller';
+
+    sub example :Local Args(0) {
+      my ($self, $c) = @_;
+      $c->stash(age=>32);
+      $c->view('Person', name=>'John')->http_ok;
+    }
+
+    package MyApp;
+    
+    use Catalyst;
+
+    MyApp->config(
+      'Controller::Root' => { namespace => '' },
+      'View::Person' => {
+        returns_status => [200, 404],
+        api_version => '1.1',
+      },
+    );
+
+    MyApp->setup;
+
+# DESCRIPTION
+
+This is a Catalyst view that lets you create one view per reponse type of JSON
+you are generating.  Because you are creating one view per reponse type that means
+you can define an interface for that view which is strongly typed.  Also, since
+the view is per request, it has access to the context, as well as some helpers
+for creating URLs.  You may find that this helps make your controllers more
+simple and promote reuse of view code.
+
+I consider this work partly a thought experiment.  Documentation and test coverage
+are currently light and I might change parts of the way exceptions are handled.  If
+you are producing JSON with [Catalyst](https://metacpan.org/pod/Catalyst) and new to the framework you might want to
+consider 'tried and true' approaches such as [Catalyst::View:::JSON](https://metacpan.org/pod/Catalyst::View:::JSON) or
+[Catalyst::Action::REST](https://metacpan.org/pod/Catalyst::Action::REST).  My intention here is to get people to start thinking
+about views with stronger interfaces.
+
+# METHODS
+
+This view defines the following methods
+
+## response
+
+    $view->response($status);
+    $view->response($status, @headers);
+    $view->response(@headers);
+
+Used to setup a response.  Calling this method will setup an http status, finalize
+headers and set a body response for the JSON.  Content type will be set based on
+your 'content\_type' configuration value (or 'application/json' by default).
+
+## Method '->response' Helpers
+
+We map status codes from [HTTP::Status](https://metacpan.org/pod/HTTP::Status) into methods to make sending common
+request types more simple and more descriptive.  The following are the same:
+
+    $c->view->response(200, @args);
+    $c->view->http_ok(@args);
+
+    do { $c->view->response(200, @args); $c->detach };
+    $c->view->http_ok(@args)->detach;
+
+See [HTTP::Status](https://metacpan.org/pod/HTTP::Status) for a full list of all the status code helpers.
+
+## ctx
+
+Returns the current context associated with the request creating this view.
+
+## uri ($action|$action\_name|$relative\_action\_name)
+
+Helper used to create links.  Example:
+
+    sub TO_JSON {
+      my $self = shift;
+      return +{
+        name => $self->name,
+        age => $self->age,
+        friends => $self->uri('friends', $self->id),
+      };
+    }
+
+The arguments are basically the same as $c->uri\_for except that the first argument
+may be a full or relative action path.
+
+## render
+
+Returns a string which is the JSON represenation of the current View.  Usually you
+won't need to call this directly.
+
+## process
+
+used as a target for $c->forward.  This is mostly here for compatibility with some
+existing methodology.  For example allows using this View with the RenderView action
+class (or [Catalyst::Action::RenderView](https://metacpan.org/pod/Catalyst::Action::RenderView)).
+
+# ATTRIBUTES
+
+See [Catalyst::View::Base::JSON::\_ClassInfo](https://metacpan.org/pod/Catalyst::View::Base::JSON::_ClassInfo) for application level configuration.
+You may also defined custom attributes in your base class and assign values via
+configuration.
+
+# UTF-8 NOTES
+
+Generally a view should not do any encoding since the core [Catalyst](https://metacpan.org/pod/Catalyst)
+framework handles all this for you.  However, historically the popular
+Catalyst JSON views and related ecosystem (such as [Catalyst::Action::REST](https://metacpan.org/pod/Catalyst::Action::REST))
+have done UTF8 encoding and as a result for compatibility core Catalyst code
+will assume a response content type of 'application/json' is already UTF8 
+encoded.  So even though this is a new module, we will continue to maintain this
+historical situation for compatibility reasons.  As a result the UTF8 encoding
+flags will be enabled and expect the contents of $c->res->body to be encoded
+as expected.  If you set your own JSON class for encoding, or set your own
+initialization arguments, please keep in mind this expectation.
+
+# SEE ALSO
+
+[Catalyst](https://metacpan.org/pod/Catalyst), [Catalyst::View](https://metacpan.org/pod/Catalyst::View), [Catalyst::View::JSON](https://metacpan.org/pod/Catalyst::View::JSON),
+[JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2016, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

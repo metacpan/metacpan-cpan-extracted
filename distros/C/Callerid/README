@@ -1,0 +1,29 @@
+Callerid version 0.04
+=====================
+
+Callerid is a perl module for interpreting raw caller ID information.
+
+This module will interpret the output of my USR data modem running in AT#CID=2 mode here in Canada. I'm not sure that the hex format used by the USR modem will be the same with other modems, and I'm not positive that my understanding of the encoding used is complete. But it is a start, eh?
+
+This module should be fairly portable. Everything in it should be core perl.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Mike Carr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.

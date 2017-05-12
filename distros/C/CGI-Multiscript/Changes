@@ -1,0 +1,9 @@
+Revision history for Perl extension CGI::Multiscript.
+0.73  Sun Sep 16 21:35:23 2007
+	- Added parseArgs method and fixed a bug so that versions can run
+0.72  Sun Sep 16 14:27:23 2007
+	- Added language execution list and selection
+0.71  Sat Sep 15 22:05:12 2007
+	- Added new method and objects
+0.70  Fri Sep 14 21:02:01 2007
+	- original version; created by h2xs 1.23 with options -X -n CGI::Multiscript

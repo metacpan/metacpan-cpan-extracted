@@ -1,0 +1,18 @@
+
+This is a simple interface to the cracklib library.
+
+You need cracklib itself, version 2.7 tested:
+
+ftp://ftp.cert.org/pub/tools/cracklib/
+
+and installed on your machine.
+
+---
+
+In order to install and use this package you will need Perl version
+5.004_04 or better. Installation as usual:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

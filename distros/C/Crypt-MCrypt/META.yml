@@ -1,0 +1,48 @@
+---
+abstract: 'Perl interface for libmcrypt C library.  '
+author:
+  - 'Shantanu Bhadoria <shantanu at cpan dott org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+  Test::Most: 0.22
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Crypt-MCrypt
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Crypt::MCrypt:
+    file: lib/Crypt/MCrypt.pm
+    version: 0.07
+requires:
+  Carp: 0
+  Mo: 0
+  XSLoader: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/crypt-mcrypt/issues
+  homepage: https://metacpan.org/release/Crypt-MCrypt
+  repository: git://github.com/shantanubhadoria/crypt-mcrypt.git
+version: 0.07
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'
+  - 'Shantanu Bhadoria <shantanu@cpan.org>'

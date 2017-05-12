@@ -1,0 +1,40 @@
+From: romane http://forum.dklab.ru/perl/symbiosis/MnogestvennostPoleyFormi-Webin.html
+Добавлено: Сегодня в 15:06  
+Заголовок сообщения: Множественность полей формы - WebIn
+   
+не буду утверждать, что у меня руки прямые -) но: 
+
+Код (html): 
+<table border=0 cellpadding=2 cellspacing=2> 
+<tr> 
+<td valign=top><select name=new_par_id[]><option value=''>----</option><option value=1>1</option><option value=1>2</option></select></td> 
+</tr> 
+<tr> 
+<td valign=top><select name=new_par_id[]><option value=''>----</option><option value=1>1</option><option value=1>2</option></select></td> 
+</tr> 
+<tr> 
+<td valign=top><select name=new_par_id[]><option value=''>----</option><option value=1>1</option><option value=1>2</option></select></td> 
+</tr> 
+</table> 
+
+попытки получить new_par_val & new_par_id: 
+
+Код (perl): 
+$POST{new_par_id} 
+- ссылка на массив, но (!) массив только последнего Код (html): 
+select 
+, что и понятно, т.к. идет замена при одинаковых именах... 
+оно замечательно само по себе, а как быть с остальными Код (html): 
+select 
+? 
+
+P.S.: заранее благодарен 
+
+
+
+From: Дмитрий Котеров 
+Добавлено: Сегодня в 17:56 (спустя 1 минуту 13 секунд) 
+
+Это баг. У меня, вообще-то, уже есть модуль версии 2.0, но в нем не исправлены баги, которые исправлены в 1.x, поэтому я уже год никак не соберусь его выпустить. Понимаете, это не так-то просто: сейчас есть куча проектов, работающих на первой версии, и если во второй будет хоть малейшая несовместимость с первой, они все рухнут. 
+
+Что ж, пожалуй, займусь этим сегодня. 

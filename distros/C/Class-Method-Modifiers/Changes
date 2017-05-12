@@ -1,0 +1,130 @@
+Revision history for Class-Method-Modifiers
+
+2.12      2016-03-04 22:12:15Z
+        - minor documentation tweaks
+
+2.11      2014-08-16 05:21:30Z
+        - add documentation for modifying multiple methods at once (mannih,
+          github #2)
+
+2.10      2014-03-04 19:04:00Z
+        - installation switched to using only ExtUtils::MakeMaker, to allow
+          for use on perl 5.6
+
+2.09      2013-12-14 18:08:35Z
+        - refresh configure_requires checking in generated Makefile.PL; new
+          CONTRIBUTING file; updated tests (compile test now only runs for
+          authors; check-deps test replaced by information-only report-prereqs
+          test)
+
+2.08      2013-10-11 00:30:32Z
+        - remove requirement on perl 5.8 in metadata
+        - repository migrated to the github moose organization
+        - remove t/00-check-deps.t, which fails on old toolchains that do not
+          understand configure_requires
+
+2.07      2013-09-22 22:09:32Z
+        - removed dependency on Test::Warnings in tests (now reserved for
+          author testing)
+        - now packaged with a Build.PL (for Module::Build::Tiny), and a
+          Makefile.PL (for legacy 5.6 and 5.8 users; prints a warning on
+          invocation)
+
+2.06      2013-09-17 19:43:09Z
+        - packaging the dist again with EUMM rather than MBT
+
+2.05      2013-09-11 03:50:28Z
+        - Support for handling lvalue methods (Graham Knop)
+        - convert to building with Dist::Zilla
+
+2.04    2013-03-30
+        - Remove erroneous perl 5.8 requirement
+
+2.03    2013-02-02
+        - New build to fix missing files in inc/
+
+2.02    2013-02-01
+        - Dist improvements (Karen Etheridge)
+
+2.01    2013-01-27
+        - Test for and fix $_ corruption (Vladimir Timofeev)
+
+2.00    2012-12-29
+        - New 'fresh' modifier (Aaron Crane)
+
+1.12    2012-10-28
+        - Another MANIFEST fix
+
+1.11    2012-10-28
+        - Re-release with proper distribution contents and MANIFEST
+
+1.10    2012-10-23
+        - Avoid "Variable "$..." will not stay shared" warnings under 5.8.x
+        - (from changes in 1.09) [#80194] (Karen Etheridge)
+
+1.09    2012-04-02
+        - Install modified subs in the proper namespace [#74569]
+          (Karen Etheridge)
+
+1.08   2011-10-16
+        - Document install_modifier (requested by Tokuhiro Matsuno)
+
+1.07   2011-02-23
+        - Move from Test::Exception to Test::Fatal (Justin Hunter)
+
+1.06   2010-11-26
+        - Add support for: modifier ["name1", "name2"] => sub {}
+
+1.05   2009-10-21 14:01:11
+        - Add install_modifier as a public API (Goro Fuji)
+
+1.04   2009-06-15 11:33:31
+        - We need parens around confess if we're going to delay-load
+          Carp, affects only 5.10 (reported by David Raab)
+
+1.03   2009-06-14 14:44:25
+        - Modernize the dist
+        - Fix possible test failures
+        - Only load Carp if we have to
+
+1.02   2009-05-31 23:33:42
+        - Fix for void context (reported by tokuhirom)
+        - Lift dependency on on MRO::Compat
+
+1.01   2008-06-26 22:22:30
+        - Revert the caching fix. It makes wrapping parent-class methods
+          painfully slower.
+        - Remove the prototypes, newer Perls (rightly) warn about (@&)
+
+1.00   2008-06-11 06:10:51
+        - Complete reimplementation. Half the code. Faster than Moose.
+        - Remove 'guard' for now.
+        - *All* internals are changed.
+
+0.07   2007-09-12 21:55:16
+        - Add 'guard' modifier to facilitate bailing out in some conditions
+
+0.06   2007-09-09 23:27:50
+        - You may now modify a method in the same class as it is defined
+
+0.05   2007-08-17 23:26:53
+        - More internals fixes (I'm abusing this module a bit, you see)
+        - Grammar fixes
+
+0.04   2007-08-17 17:49:55
+        - Internals changes
+
+0.03   2007-08-06 22:57:13
+        - Can now use multiple modifiers of the same type in one class
+        - Should handle C3 MRO now
+        - Can now handle: before 'left', 'right' => sub { ... }
+
+0.02   2007-08-05 16:42:43
+        - No need to shallow-copy @_
+        - Don't stick a super method in UNIVERSAL (mst)
+        - Let multiple modifiers coexist in one class
+        - Better error checking
+
+0.01   2007-08-05 06:10:30
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,27 @@
+Config-Lite version 0.03
+========================
+
+Simple config load module.
+Code is clean and no dependence, so the module is easy to use and install.
+flock() inside.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Chen Gang.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

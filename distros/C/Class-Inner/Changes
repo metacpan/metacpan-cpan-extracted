@@ -1,0 +1,14 @@
+2009-11-21
+
+        * Fixed 
+            http://rt.cpan.org/Ticket/Display.html?id=43938
+            http://rt.cpan.org/Ticket/Display.html?id=39140
+            http://rt.cpan.org/Ticket/Display.html?id=33533
+            Which are all really the same issue.
+
+2001-08-12  Piers Cawley  <pdcawley@iterative-software.com>
+
+	* Initial release. Everthing working as documented, I think.  Now
+	to find out if I'm right, and if what's documented is enough for
+	people
+

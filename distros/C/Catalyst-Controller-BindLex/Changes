@@ -1,0 +1,14 @@
+0.05 2008-05-27
+    - Add danger stickers and unmaintainedness warning
+
+0.04 2007-04-026
+    - switch to Module::Install
+
+0.03
+    - Handling of default config changed to be less wrong ;-)
+
+0.02
+    - Made stack crawling a little less touchy
+
+0.01
+    - Initial release

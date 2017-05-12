@@ -1,0 +1,36 @@
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: CommitBit
+  ApplicationName: CommitBit
+  Database: 
+    Database: commitbit
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.3
+  DevelMode: 1
+  L10N: 
+    PoDir: share/po
+  LogLevel: DEBUG
+  Mailer: Sendmail
+  MailerArgs: []
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates
+application:
+  repository_prefix: repos
+  site_name: our projects

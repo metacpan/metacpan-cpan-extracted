@@ -1,0 +1,14 @@
+Revision history for Perl module CGI::Untaint::Filenames
+
+0.1 Fri Jul  9 00:00:12 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.2 Tue Jul 13 21:33:15 EDT 2004
+    - Fix regex in Filenames.pm to add '.' 
+    - add more tests: trailing /, also names with a . in them
+
+0.3 Sun Aug 22 17:38:19 EDT 2004
+	- Fix regex for UNIX filenames to properly handle $ at end of name and other characters inline
+	- add new package CGI::Untaint::Winfilename 
+	- revise and extend test cases to cover changes
+

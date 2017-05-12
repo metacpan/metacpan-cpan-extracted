@@ -1,0 +1,22 @@
+---
+IFF1: 0
+IFF2: 0
+IM: 0
+halted: 0
+mem: {}
+name: cb76
+registers:
+  AF: 63580
+  AF_: 0
+  BC: 12375
+  BC_: 0
+  DE: 13865
+  DE_: 0
+  HL: 48241
+  HL_: 0
+  I: 0
+  IX: 0
+  IY: 0
+  PC: 2
+  R: 2
+  SP: 0

@@ -1,0 +1,45 @@
+#!/vobs/cello/cade_struct/bin/perl -w
+
+use ClearCase::Argv;
+ClearCase::Argv->ipc(1);
+use File::Spec::Functions;
+use vars qw($acc $cmp);
+
+# There is some concern about the time when config specs are evaluated, either
+# as the view is set, or explicitly with 'setcs -current', and about the 
+# impact of this evaluation, in relation to brtype names or include clauses.
+# This script attempts to show when have the views in current use (during the
+# past week) evaluated their config spec last.
+# It incidently reports of all questionable views (storage not reachable, or
+# missing expected files).
+
+my $ct = ClearCase::Argv->new({autochomp=>1});
+my $now = time();
+my $weekago = $now - 7*24*3600;
+my @view = grep {
+  chomp;
+  if (/^\*?\s+(\w+)\s+(.*)$/) {
+    my ($t, $s) = ($1, $2);
+    if (!($t and $s) or $t !~ /^\w+$/ or ! -r $s) {
+      print "Corrupted/unreachable: $_\n";
+      $_ = 0;
+    } else {
+      $_ = [ ($t, $s) ];
+    }
+  }
+} $ct->argv('lsview', 'em*')->qx;
+my %v;
+foreach (@view) {
+  my $tag = $_->[0];
+  my $stg = $_->[1];
+  if (!($acc = (stat(catdir($stg, '.access_info')))[10])) {
+    print "Pb with last access time on $tag\n"; next; }
+  next if $acc < $weekago;
+  if (!($cmp = (stat(catdir($stg, '.compiled_spec')))[10])) {
+    print "Pb with compilation time on $tag\n"; next; }
+  $v{$tag} = $cmp;
+}
+print "Views accessed last week, sorted by compile time:\n";
+foreach (sort { $v{$b} <=> $v{$a} } keys %v) {
+  printf "%40s: %s\n", $_, scalar localtime($v{$_});
+}

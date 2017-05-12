@@ -1,0 +1,89 @@
+Revision history for Perl extension CORBA::JAVA.
+
+2.66  Wed Dec  3 12:30:00 2008
+	- now package generated on Ubuntu 8.10 Ibex with Perl 5.10.0
+
+2.65  Tue Dec  2 12:30:00 2008
+	- fix world writable permission (for PAUSE indexer)
+
+2.64  Mon Dec  1 18:30:00 2008
+	- fix prototype of operation (for not basic types)
+
+2.63  Tue Jul 29 12:30:00 2008
+	- fix demarshal of default in an union
+
+2.62  Thu Jun  5 12:30:00 2008
+	- fix union when discriminator is a typedef
+
+2.61  Fri Oct 19 08:30:00 2007
+	- compatible with CORBA::IDL 2.61
+
+2.60  Fri Oct 12 08:30:00 2007
+	- compatible with CORBA::IDL 2.60
+	- some Perl Best Practices
+
+2.50  Wed Sep 26 12:30:00 2007
+	- reorg: more compliant with CPAN requirements
+
+2.49  Fri Aug 25 08:30:00 2006
+	- fix typedef in parameter of operation
+	- fix typedef in struct member
+
+2.48  Tue Feb 21 18:30:00 2006
+	- fix const typedef octet
+	- fix mixed typedef & sequence indirection
+
+2.47  Fri Feb 17 12:30:00 2006
+	- add option -s (serialVersionUID compatible with Python & others languages)
+
+2.46  Sun Apr  3 20:30:00 2005
+	- name.pm : inner uid
+	- class.pm : BooleanLiteral
+
+2.45  Fri Dec 24 12:30:00 2004
+	- (jdk1.5)
+	- add a specific visitor for serialVersionUID
+	- modify equals for complex member
+
+2.44  Wed Nov 10 18:30:00 2004
+	- add serialVersionUID
+
+2.43  Thu Jul 29 12:30:00 2004
+	- patch from Mike Castle (*nix platform)
+
+2.42  Mon Jul 19 08:30:00 2004
+	- add XML binding : script idl2javaxml.pl, xml.pm
+            and Java class run-time support for XML
+
+2.41  Mon Jun  7 08:30:00 2004
+	- better support of 'import'
+
+2.40  Tue May 18 18:30:00 2004
+	- compatible with CORBA::IDL 2.40
+
+2.22  Wed Mar 31 12:30:00 2004
+	- improvement of toString() method
+	- literal.pm : move (cast) from IntegerLiteral to Expression
+	- class.pm : bug in _member_helper_read (typedef [])
+
+2.21  Mon Feb 23 08:30:00 2004
+	- pb prerequisite vs VERSION
+
+2.20  Thu Feb 19 18:30:00 2004
+	- compatible with CORBA::IDL 2.20
+	- first full featured version
+	- extra : toString and equals methods
+	- many refactoring
+	- idl2java.pl : add option -h (display help)
+	- idl2java.pl : add option -v (display version)
+
+0.05  Wed Dec 17 12:30:00 2003
+	- CORBA IDL 3.0
+	- IDL to Java Language Mapping, Version 1.2
+
+0.02  Fri Mar 14 12:30:00 2003
+	- first release
+
+0.01  Mon Sep 16 15:29:55 2002
+	- original version; created by h2xs 1.19
+

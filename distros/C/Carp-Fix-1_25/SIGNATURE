@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f723872651f0cd52a4aca957af3536f931667340 .perltidyrc
+SHA1 1e0166bb54997fdf6ae6afe2621184fd950a5510 Build.PL
+SHA1 7f78b1869d65c2ee3a5c5f931e371795254a863d Changes
+SHA1 2d92d07b20b11b98c74864561df6e3d8d3c1ed74 LICENSE
+SHA1 e08b0149cc666bc91fe27e9f1d249456ac9c57e2 MANIFEST
+SHA1 f1ae8c236fb9a727ebec5bb70de2d4dd6e2f7c28 MANIFEST.SKIP
+SHA1 b1e775138610d8e33fb91fe19f8b924b8d295b43 META.json
+SHA1 2db68719e444c00c10d331ab20fcbaf8f2df76a8 META.yml
+SHA1 fa09f948bb4d812bdc82561c4f899ff0a461a80e README
+SHA1 4e6f079b2d7c1af029d3e79e65524b7bfb247e6b lib/Carp/Fix/1_25.pm
+SHA1 8762b8b1eecc9a9172770edb3df9994bce0fb4d1 t/fixed.t
+SHA1 123a57ea69c76268be5e00298b07997393cb2573 t/lib/Test/Builder.pm
+SHA1 b7156a083450f8a2a67bfb390f551843092fc9cd t/lib/Test/Builder/IO/Scalar.pm
+SHA1 a8a438a50013e0491b5bb83286a59f9809ded26b t/lib/Test/Builder/Module.pm
+SHA1 18427c06b51f0855ccc62a401f919f04bafb6a98 t/lib/Test/Builder/Tester.pm
+SHA1 f4e4e8aabc5f752538ac5b66e0d06b87ba690995 t/lib/Test/Builder/Tester/Color.pm
+SHA1 3440943dda0df87ff06292134bf3204e5b12e68b t/lib/Test/More.pm
+SHA1 7fe03ad87d52b45777d721a0b4a5c1606e33ea8e t/lib/Test/Simple.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (Darwin)
+
+iEYEARECAAYFAk/bUN0ACgkQWMohlhD1Qye+VACdG/JrDbQIQDPuqN46j8uyvTdy
+rlcAoJ3anu9f6Mh8IdDeDYh5L7z2T0JS
+=ougg
+-----END PGP SIGNATURE-----
